@@ -167,12 +167,12 @@ The following figure shows the architecture of the Call Manager module.
 
 ## Repositories Involved<a name="section227mcpsimp"></a>
 
-Telephony
+[Telephony](https://gitee.com/openharmony/docs/blob/master/en/readme/telephony.md)
 
-telephony_call_manager
+**telephony_call_manager**
 
-telephony_core_service
+[telephony_core_service](https://gitee.com/openharmony/telephony_core_service/blob/master/README.md)
 
-telephony_cellular_call
+[telephony_cellular_call](https://gitee.com/openharmony/telephony_cellular_call/blob/master/README.md)
 
-telephony_state_registry
+[telephony_state_registry](https://gitee.com/openharmony/telephony_state_registry/blob/master/README.md)
