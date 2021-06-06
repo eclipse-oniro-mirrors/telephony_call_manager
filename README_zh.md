@@ -30,7 +30,7 @@
 ## 目录<a name="section128mcpsimp"></a>
 
 ```
-/OpenHarmony_Standard_System/base/telephony/call_manager
+/base/telephony/call_manager
 ├─ interfaces                              # 对外部暴露的接口
 │  └─ kits                                 # js/napi接口存放目录
 ├─ sa_profile                              # 启动配置文件
