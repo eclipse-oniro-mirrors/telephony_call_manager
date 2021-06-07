@@ -30,7 +30,7 @@ The following figure shows the architecture of the Call Manager module.
 ## Directory Structure<a name="section128mcpsimp"></a>
 
 ```
-/OpenHarmony_Standard_System/base/telephony/call_manager
+/base/telephony/call_manager
 ├─ interfaces                              # External APIs
 │  └─ kits                                 # JS APIs and NAPIs
 ├─ sa_profile                              # SA profile
