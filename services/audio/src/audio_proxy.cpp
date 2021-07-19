@@ -47,7 +47,7 @@ void AudioProxy::Init()
         CALLMANAGER_ERR_LOG("remote object : audio service  , nullptr");
         return;
     }
-    audioManagerProxy_ = std::make_unique<AudioManagerProxy>(remoteObject_);
+    audioManagerProxy_ = std::make_unique<AudioStandard::AudioManagerProxy>(remoteObject_);
     if (audioManagerProxy_ == nullptr) {
         CALLMANAGER_ERR_LOG("audio proxy nullptr");
     }
