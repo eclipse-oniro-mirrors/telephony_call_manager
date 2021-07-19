@@ -84,7 +84,7 @@ public:
 private:
     std::mutex proxyMutex_;
     sptr<IRemoteObject> remoteObject_;
-    std::unique_ptr<AudioManagerProxy> audioManagerProxy_;
+    std::unique_ptr<AudioStandard::AudioManagerProxy> audioManagerProxy_;
 #ifdef ABILITY_AUDIO_SUPPORT
     sptr<IAudioAbility> audioAbility_;
     sptr<IAudioService> audioService_;
