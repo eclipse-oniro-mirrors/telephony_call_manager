@@ -28,7 +28,10 @@ ohos_executable("tel_call_manager_ui_test") {
     "//base/telephony/core_service/interfaces/innerkits/cellular_call/common",
   ]
 
-  deps = [ "//foundation/aafwk/standard/frameworks/kits/ability/native:abilitykit_native" ]
+  deps = [
+    "//base/telephony/core_service/common:libtelephony_common",
+    "//foundation/aafwk/standard/frameworks/kits/ability/native:abilitykit_native",
+  ]
 
   external_deps = [
     "aafwk_standard:want",
@@ -36,6 +39,11 @@ ohos_executable("tel_call_manager_ui_test") {
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
     "samgr_L2:samgr_proxy",
+  ]
+
+  defines = [
+    "TELEPHONY_LOG_TAG = \"CallManagerTest\"",
+    "LOG_DOMAIN = 0xD002B01",
   ]
 
   if (is_standard_system) {

@@ -15,6 +15,7 @@
 
 #ifndef REPORT_CALL_STATE_HANDLER_H
 #define REPORT_CALL_STATE_HANDLER_H
+
 #include <memory>
 #include <mutex>
 
@@ -27,7 +28,7 @@
 #include "call_state_report_proxy.h"
 
 namespace OHOS {
-namespace TelephonyCallManager {
+namespace Telephony {
 class ReportCallStateHandler : public AppExecFwk::EventHandler {
 public:
     ReportCallStateHandler(const std::shared_ptr<AppExecFwk::EventRunner> &runner);
@@ -45,16 +46,11 @@ public:
     ~ReportCallStateHandlerService();
     void Start();
 
-    void NewCallCreated(sptr<CallBase> &callObjectPtr) override;
-    void CallDestroyed(sptr<CallBase> &callObjectPtr) override;
-    void CallStateUpdated(
-        sptr<CallBase> &callObjectPtr, TelCallStates priorState, TelCallStates nextState) override;
-    void IncomingCallHungUp(sptr<CallBase> &callObjectPtr, bool isSendSms, std::string content) override;
-    void IncomingCallActivated(sptr<CallBase> &callObjectPtr) override;
-    int32_t ReportCallState(CallInfo &info);
-    int32_t ReportCallStateForCallId(CallInfo &info);
+    void CallStateUpdated(sptr<CallBase> &callObjectPtr, TelCallState priorState, TelCallState nextState) override;
+    int32_t ReportCallState(CallAttributeInfo &info);
+    int32_t ReportCallStateForCallId(CallAttributeInfo &info);
 
-    enum {
+    enum ReportCallStateInterfaceType {
         HANDLER_REPORT_CALL_STATE = 0,
         HANDLER_REPORT_CALL_STATE_FOR_CALLID,
     };
@@ -64,6 +60,7 @@ private:
     std::shared_ptr<ReportCallStateHandler> handler_;
     std::mutex mutex_;
 };
-} // namespace TelephonyCallManager
+} // namespace Telephony
 } // namespace OHOS
-#endif // CALL_MANAGER_REPORT_CALL_STATE_HANDLER_H
+
+#endif // REPORT_CALL_STATE_HANDLER_H

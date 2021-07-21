@@ -15,6 +15,7 @@
 
 #ifndef CALL_MANAGER_SERVICE_STUB_H
 #define CALL_MANAGER_SERVICE_STUB_H
+
 #include <map>
 
 #include "iremote_object.h"
@@ -23,7 +24,7 @@
 #include "i_call_manager_service.h"
 
 namespace OHOS {
-namespace TelephonyCallManager {
+namespace Telephony {
 class CallManagerServiceStub : public IRemoteStub<ICallManagerService> {
 public:
     CallManagerServiceStub();
@@ -34,13 +35,35 @@ public:
 private:
     using CallManagerServiceFunc = int32_t (CallManagerServiceStub::*)(MessageParcel &data, MessageParcel &reply);
 
+    int32_t RegisterCallBackRequest(MessageParcel &data, MessageParcel &reply);
     int32_t DialCallRequest(MessageParcel &data, MessageParcel &reply);
     int32_t AcceptCallRequest(MessageParcel &data, MessageParcel &reply);
     int32_t RejectCallRequest(MessageParcel &data, MessageParcel &reply);
     int32_t HangUpCallRequest(MessageParcel &data, MessageParcel &reply);
     int32_t GetCallStateRequest(MessageParcel &data, MessageParcel &reply);
+    int32_t HoldCallRequest(MessageParcel &data, MessageParcel &reply);
+    int32_t UnHoldCallRequest(MessageParcel &data, MessageParcel &reply);
+    int32_t SwitchCallRequest(MessageParcel &data, MessageParcel &reply);
+    int32_t HasCallRequest(MessageParcel &data, MessageParcel &reply);
+    int32_t IsNewCallAllowedRequest(MessageParcel &data, MessageParcel &reply);
+    int32_t IsRingingRequest(MessageParcel &data, MessageParcel &reply);
+    int32_t IsInEmergencyCallRequest(MessageParcel &data, MessageParcel &reply);
+    int32_t StartDtmfRequest(MessageParcel &data, MessageParcel &reply);
+    int32_t SendDtmfRequest(MessageParcel &data, MessageParcel &reply);
+    int32_t StopDtmfRequest(MessageParcel &data, MessageParcel &reply);
+    int32_t SendDtmfBunchRequest(MessageParcel &data, MessageParcel &reply);
+    int32_t GetCallWaitingRequest(MessageParcel &data, MessageParcel &reply);
+    int32_t SetCallWaitingRequest(MessageParcel &data, MessageParcel &reply);
+    int32_t JoinConferenceRequest(MessageParcel &data, MessageParcel &reply);
+    int32_t IsEmergencyPhoneNumberRequest(MessageParcel &data, MessageParcel &reply);
+    int32_t FormatPhoneNumberRequest(MessageParcel &data, MessageParcel &reply);
+    int32_t FormatPhoneNumberToE164Request(MessageParcel &data, MessageParcel &reply);
+    int32_t GetMainCallIdRequest(MessageParcel &data, MessageParcel &reply);
+    int32_t GetSubCallIdListRequest(MessageParcel &data, MessageParcel &reply);
+    int32_t GetCallIdListForConferenceRequest(MessageParcel &data, MessageParcel &reply);
     std::map<uint32_t, CallManagerServiceFunc> memberFuncMap_;
 };
-} // namespace TelephonyCallManager
+} // namespace Telephony
 } // namespace OHOS
+
 #endif // CALL_MANAGER_SERVICE_STUB_H

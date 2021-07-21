@@ -17,111 +17,68 @@
 
 #include <securec.h>
 
-#include "call_manager_errors.h"
-#include "call_manager_log.h"
+#include "telephony_log_wrapper.h"
 
+#include "call_manager_errors.h"
+#include "common_type.h"
 #include "cellular_call_ipc_interface_proxy.h"
 #include "audio_control_manager.h"
 
 namespace OHOS {
-namespace TelephonyCallManager {
-CallBase::CallBase(const CallInfo &info)
-    : callState_(CallStateType::CALL_STATE_CREATE_TYPE), callInfo_(info), isSpeakerphoneOn_(false),
-      callEndedType_(CallEndedType::UNKNOWN)
+namespace Telephony {
+CallBase::CallBase()
+    : callId_(0), callType_(TYPE_ERR_CALL), videoState_(TYPE_VOICE), accountNumber_(""),
+      callRunningState_(CallRunningState::CALL_RUNNING_STATE_CREATE), conferenceState_(TEL_CONFERENCE_IDLE),
+      startTime_(0), direction_(CALL_DIRECTION_UNKNOW), policyFlag_(0), callState_(CALL_STATUS_IDLE),
+      isSpeakerphoneOn_(false), callEndedType_(CallEndedType::UNKNOWN)
 {
     (void)memset_s(&contactInfo_, sizeof(ContactInfo), 0, sizeof(ContactInfo));
 }
 
 CallBase::~CallBase() {}
 
-int32_t CallBase::Init()
+void CallBase::InitOutCallBase(const CallReportInfo &info, AppExecFwk::PacMap &extras, int32_t callId)
 {
-    return TELEPHONY_NO_ERROR;
+    videoState_ = (VideoStateType)extras.GetIntValue("videoState");
+    accountNumber_ = info.accountNum;
+    callId_ = callId;
+    direction_ = CALL_DIRECTION_OUT;
+}
+
+void CallBase::InitInCallBase(const CallReportInfo &info, int32_t callId)
+{
+    videoState_ = info.callMode;
+    callId_ = callId;
+    direction_ = CALL_DIRECTION_IN;
 }
 
 int32_t CallBase::DialCallBase()
 {
-    int32_t ret = CALL_MANAGER_DIAL_FAILED;
-    CellularCall::CellularCallInfo callInfo;
-    bool isVoicemailNumber = false;
-    std::string phoneNumber;
-
-    if (strlen(callInfo_.phoneNum) == 0) {
-        CALLMANAGER_WARNING_LOG("phone number is null!");
-        return CALL_MANAGER_PHONENUM_NULL;
-    }
-    callState_ = CallStateType::CALL_STATE_CONNECTING_TYPE;
-    callInfo.callId = callInfo_.callId;
-    callInfo.accountId = callInfo_.accountId;
-    callInfo.phoneNetType = PhoneNetType::PHONE_TYPE_GSM;
-    callInfo.callType = callInfo_.callType;
-    callInfo.videoState = callInfo_.videoState;
-    (void)memset_s(callInfo.phoneNum, kMaxNumberLen, 0, kMaxNumberLen);
-    if (memcpy_s(callInfo.phoneNum, kMaxNumberLen, callInfo_.phoneNum, strlen(callInfo_.phoneNum)) != 0) {
-        return TELEPHONY_MEMCPY_FAIL;
-    }
-    phoneNumber = callInfo_.phoneNum;
-    // Determine voice mail if it is dialed directly by omitting the following steps.
-    isVoicemailNumber = CheckVoicemailNumber(phoneNumber);
-    if (isVoicemailNumber) {
-        if (callInfo_.dialScene == CALL_NORMAL || callInfo_.dialScene == CALL_PRIVILEGED) {
-            ret = DelayedSingleton<CellularCallIpcInterfaceProxy>::GetInstance()->Dial(callInfo);
-        }
-        return ret;
-    }
-    if ((callInfo_.dialScene == CALL_NORMAL && callInfo_.isEcc && !callInfo_.isDefault) ||
-        (callInfo_.dialScene == CALL_EMERGENCY && !callInfo_.isEcc)) {
-        return CALL_MANAGER_DIAL_SCENE_INCORRECT;
-    }
-    // Obtain gateway information
-    CALLMANAGER_ERR_LOG("CALL TYPE: %{public}d", callInfo.callType);
-    ret = DelayedSingleton<CellularCallIpcInterfaceProxy>::GetInstance()->Dial(callInfo);
-    CALLMANAGER_DEBUG_LOG("start to set audio");
+    callRunningState_ = CallRunningState::CALL_RUNNING_STATE_CONNECTING;
+    TELEPHONY_LOGD("start to set audio");
     // Set audio, set hands-free
     SetAudio();
-    return ret;
+    return TELEPHONY_SUCCESS;
 }
 
 int32_t CallBase::IncomingCallBase()
 {
-    return TELEPHONY_NO_ERROR;
+    return TELEPHONY_SUCCESS;
 }
 
-int32_t CallBase::AccpetCallBase()
+int32_t CallBase::AcceptCallBase()
 {
-    int32_t ret = CALL_MANAGER_ACCPET_FAILED;
-    DelayedSingleton<AudioControlManager>::GetInstance()->SetVolumeAudible();
-    CellularCall::CellularCallInfo callInfo;
-    callInfo.callId = callInfo_.callId;
-    callInfo.accountId = callInfo_.accountId;
-    callInfo.phoneNetType = PhoneNetType::PHONE_TYPE_GSM;
-    callInfo.callType = callInfo_.callType;
-    callInfo.videoState = callInfo_.videoState;
-    (void)memset_s(callInfo.phoneNum, kMaxNumberLen, 0, kMaxNumberLen);
-    if (memcpy_s(callInfo.phoneNum, kMaxNumberLen, callInfo_.phoneNum, strlen(callInfo_.phoneNum)) != 0) {
-        return TELEPHONY_MEMCPY_FAIL;
+    if (!IsCurrentRinging()) {
+        TELEPHONY_LOGW("the device is currently not ringing");
+        return TELEPHONY_FAIL;
     }
-    ret = DelayedSingleton<CellularCallIpcInterfaceProxy>::GetInstance()->Answer(callInfo);
-    return ret;
+    DelayedSingleton<AudioControlManager>::GetInstance()->SetVolumeAudible();
+    return TELEPHONY_SUCCESS;
 }
 
 int32_t CallBase::RejectCallBase()
 {
-    int32_t ret = CALL_MANAGER_REJECT_FAILED;
-    if (IsCurrentRinging()) {
-        CellularCall::CellularCallInfo callInfo;
-        callInfo.callId = callInfo_.callId;
-        callInfo.accountId = callInfo_.accountId;
-        callInfo.phoneNetType = PhoneNetType::PHONE_TYPE_GSM;
-        callInfo.callType = callInfo_.callType;
-        callInfo.videoState = callInfo_.videoState;
-        (void)memset_s(callInfo.phoneNum, kMaxNumberLen, 0, kMaxNumberLen);
-        if (memcpy_s(callInfo.phoneNum, kMaxNumberLen, callInfo_.phoneNum, strlen(callInfo_.phoneNum)) != 0) {
-            return TELEPHONY_MEMCPY_FAIL;
-        }
-        ret = DelayedSingleton<CellularCallIpcInterfaceProxy>::GetInstance()->Reject(callInfo);
-    }
-    return ret;
+    return TELEPHONY_SUCCESS;
 }
 
 int32_t CallBase::HoldCallBase()
@@ -136,98 +93,117 @@ int32_t CallBase::UnHoldCallBase()
     return ret;
 }
 
-int32_t CallBase::HangUpBase()
-{
-    CellularCall::CellularCallInfo callInfo;
-    callInfo.callId = callInfo_.callId;
-    callInfo.accountId = callInfo_.accountId;
-    callInfo.phoneNetType = PhoneNetType::PHONE_TYPE_GSM;
-    callInfo.callType = callInfo_.callType;
-    callInfo.videoState = callInfo_.videoState;
-    (void)memset_s(callInfo.phoneNum, kMaxNumberLen, 0, kMaxNumberLen);
-    if (memcpy_s(callInfo.phoneNum, kMaxNumberLen, callInfo_.phoneNum, strlen(callInfo_.phoneNum)) != 0) {
-        return TELEPHONY_MEMCPY_FAIL;
-    }
-
-    int32_t ret = DelayedSingleton<CellularCallIpcInterfaceProxy>::GetInstance()->End(callInfo);
-    return ret;
-}
-
 int32_t CallBase::TurnOffVoice(bool silence)
 {
-    return TELEPHONY_NO_ERROR;
+    return TELEPHONY_SUCCESS;
+}
+
+void CallBase::GetCallAttributeBaseInfo(CallAttributeInfo &info)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    (void)memset_s(info.accountNumber, kMaxNumberLen, 0, kMaxNumberLen);
+    if (memcpy_s(info.accountNumber, kMaxNumberLen, accountNumber_.c_str(), accountNumber_.length()) == 0) {
+        info.speakerphoneOn = isSpeakerphoneOn_;
+        info.videoState = videoState_;
+        info.startTime = startTime_;
+        info.callType = callType_;
+        info.callId = callId_;
+        info.callState = callState_;
+        info.conferenceState = conferenceState_;
+    }
 }
 
 int32_t CallBase::GetCallID()
 {
     std::lock_guard<std::mutex> lock(mutex_);
-    return callInfo_.callId;
+    return callId_;
 }
 
-int32_t CallBase::SetCallID(int32_t callId)
+CallType CallBase::GetCallType()
+{
+    return callType_;
+}
+
+CallRunningState CallBase::GetCallRunningState()
 {
     std::lock_guard<std::mutex> lock(mutex_);
-    callInfo_.callId = callId;
-    return TELEPHONY_NO_ERROR;
+    return callRunningState_;
 }
 
-CallStateType CallBase::GetState()
+int32_t CallBase::SetTelCallState(TelCallState nextState)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (callState_ == nextState) {
+        TELEPHONY_LOGI("Call state duplication %d", nextState);
+        return CALL_MANAGER_NOT_NEW_STATE;
+    }
+    callState_ = nextState;
+    switch (nextState) {
+        case TelCallState::CALL_STATUS_DIALING:
+            callRunningState_ = CallRunningState::CALL_RUNNING_STATE_DIALING;
+            break;
+        case TelCallState::CALL_STATUS_INCOMING:
+            callRunningState_ = CallRunningState::CALL_RUNNING_STATE_RINGING;
+            break;
+        case TelCallState::CALL_STATUS_WAITING:
+            callRunningState_ = CallRunningState::CALL_RUNNING_STATE_RINGING;
+            break;
+        case TelCallState::CALL_STATUS_ACTIVE:
+            callRunningState_ = CallRunningState::CALL_RUNNING_STATE_ACTIVE;
+            break;
+        case TelCallState::CALL_STATUS_HOLDING:
+            callRunningState_ = CallRunningState::CALL_RUNNING_STATE_HOLD;
+            break;
+        case TelCallState::CALL_STATUS_DISCONNECTED:
+            callRunningState_ = CallRunningState::CALL_RUNNING_STATE_ENDED;
+            break;
+        case TelCallState::CALL_STATUS_DISCONNECTING:
+            callRunningState_ = CallRunningState::CALL_RUNNING_STATE_ENDING;
+            break;
+        case TelCallState::CALL_STATUS_ALERTING:
+            callRunningState_ = CallRunningState::CALL_RUNNING_STATE_DIALING;
+            break;
+        default:
+            break;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+TelCallState CallBase::GetTelCallState()
 {
     std::lock_guard<std::mutex> lock(mutex_);
     return callState_;
 }
 
-void CallBase::SetState(TelCallStates nextState)
+int32_t CallBase::SetTelConferenceState(TelConferenceState state)
 {
     std::lock_guard<std::mutex> lock(mutex_);
-    if (callInfo_.state == nextState) {
-        CALLMANAGER_INFO_LOG("Call state duplication %d", nextState);
-        return;
-    }
-    callInfo_.state = nextState;
-    switch (nextState) {
-        case TelCallStates::CALL_STATUS_DIALING:
-            callState_ = CallStateType::CALL_STATE_DIALING_TYPE;
-            break;
-        case TelCallStates::CALL_STATUS_INCOMING:
-            callState_ = CallStateType::CALL_STATE_RINGING_TYPE;
-            break;
-        case TelCallStates::CALL_STATUS_WAITING:
-            callState_ = CallStateType::CALL_STATE_RINGING_TYPE;
-            break;
-        case TelCallStates::CALL_STATUS_ACTIVE:
-            callState_ = CallStateType::CALL_STATE_ACTIVE_TYPE;
-            break;
-        case TelCallStates::CALL_STATUS_HOLDING:
-            callState_ = CallStateType::CALL_STATE_HOLD_TYPE;
-            break;
-        case TelCallStates::CALL_STATUS_DISCONNECTED:
-            callState_ = CallStateType::CALL_STATE_ENDED_TYPE;
-            break;
-        case TelCallStates::CALL_STATUS_DISCONNECTING:
-            callState_ = CallStateType::CALL_STATE_ENDING_TYPE;
-            break;
-        case TelCallStates::CALL_STATUS_ALERTING:
-            callState_ = CallStateType::CALL_STATE_DIALING_TYPE;
-            break;
-        default:
-            break;
-    }
-    CALLMANAGER_INFO_LOG("call new state is %{public}d.", callState_);
+    conferenceState_ = state;
+    return TELEPHONY_SUCCESS;
 }
 
-bool CallBase::GetBaseCallInfo(CallInfo &info)
+TelConferenceState CallBase::GetTelConferenceState()
 {
     std::lock_guard<std::mutex> lock(mutex_);
-    info = callInfo_;
-    return true;
+    return conferenceState_;
 }
 
-int32_t CallBase::SetCallInfo(const CallInfo &info)
+VideoStateType CallBase::GetVideoStateType()
 {
     std::lock_guard<std::mutex> lock(mutex_);
-    callInfo_ = info;
-    return TELEPHONY_NO_ERROR;
+    return videoState_;
+}
+
+void CallBase::SetPolicyFlag(int64_t policyFlag)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    policyFlag_ = policyFlag;
+}
+
+int64_t CallBase::GetPolicyFlag()
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    return policyFlag_;
 }
 
 bool CallBase::GetCallerInfo(ContactInfo &info)
@@ -245,13 +221,15 @@ void CallBase::SetCallerInfo(const ContactInfo &info)
 
 CallEndedType CallBase::GetCallEndedType()
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     return callEndedType_;
 }
 
 int32_t CallBase::SetCallEndedType(CallEndedType callEndedType)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     callEndedType_ = callEndedType;
-    return TELEPHONY_NO_ERROR;
+    return TELEPHONY_SUCCESS;
 }
 
 bool CallBase::CheckVoicemailNumber(std::string phoneNumber)
@@ -283,30 +261,31 @@ bool CallBase::IsSpeakerphoneEnabled()
     return true;
 }
 
-bool CallBase::GetEmergencyState()
-{
-    return callInfo_.isEcc;
-}
-
 bool CallBase::IsCurrentRinging()
 {
-    return (callState_ == CallStateType::CALL_STATE_RINGING_TYPE) ? true : false;
+    return (callRunningState_ == CallRunningState::CALL_RUNNING_STATE_RINGING) ? true : false;
 }
 
-std::string CallBase::GetPhoneNumber()
+std::string CallBase::GetAccountNumber()
 {
-    return callInfo_.phoneNum;
+    return accountNumber_;
 }
 
 int32_t CallBase::SetSpeakerphoneOn(bool speakerphoneOn)
 {
     isSpeakerphoneOn_ = speakerphoneOn;
-    return TELEPHONY_NO_ERROR;
+    return TELEPHONY_SUCCESS;
 }
 
 bool CallBase::IsSpeakerphoneOn()
 {
     return isSpeakerphoneOn_;
 }
-} // namespace TelephonyCallManager
+
+bool CallBase::IsAliveState()
+{
+    return !(callState_ == TelCallState::CALL_STATUS_IDLE || callState_ == TelCallState::CALL_STATUS_DISCONNECTED ||
+        callState_ == TelCallState::CALL_STATUS_DISCONNECTING);
+}
+} // namespace Telephony
 } // namespace OHOS

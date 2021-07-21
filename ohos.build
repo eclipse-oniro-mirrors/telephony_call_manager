@@ -4,11 +4,14 @@
         "call_manager": {
             "module_list": [
                 "//base/telephony/call_manager/:tel_call_manager",
-                "//base/telephony/call_manager/test/unittest/cellular_call_service/:tel_call_manager_cellular_test",
                 "//base/telephony/call_manager/test/unittest/ui_client/:tel_call_manager_ui_test",
-                "//base/telephony/call_manager/interfaces/kits:tel_call_manager_api",
-                "//base/telephony/call_manager/interfaces/kits/js/napi:telephony_call"
+                "//base/telephony/call_manager/sa_profile:call_manager_sa_profile",
+                "//base/telephony/call_manager/interfaces/kits:telephony_call"
+            ],
+            "test_list": [
+                "//base/telephony/call_manager/test/unittest:unittest"
             ]
         }
     }
 }
+

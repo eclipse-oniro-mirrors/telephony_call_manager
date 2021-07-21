@@ -15,378 +15,277 @@
 
 #include "audio_proxy.h"
 
+#ifdef ABILITY_AUDIO_SUPPORT
+#include "audio_service_client.h"
+#include "audio_system_manager.h"
+#endif
 #include "if_system_ability_manager.h"
 #include "iservice_registry.h"
 #include "system_ability.h"
 #include "system_ability_definition.h"
 
-#include "call_manager_log.h"
+#ifdef ABILITY_AUDIO_SUPPORT
+#include "audio_player.h"
+#endif
+
+#include "telephony_log_wrapper.h"
 
 namespace OHOS {
-namespace TelephonyCallManager {
-AudioProxy::AudioProxy() : remoteObject_(nullptr) {}
+namespace Telephony {
+AudioProxy::AudioProxy() {}
 
-AudioProxy::~AudioProxy()
-{
-    if (audioManagerProxy_ != nullptr) {
-        audioManagerProxy_ = nullptr;
-    }
-}
+AudioProxy::~AudioProxy() {}
 
 void AudioProxy::Init()
 {
-    CALLMANAGER_INFO_LOG("audio proxy init");
-    std::lock_guard<std::mutex> lock(proxyMutex_);
-    sptr<ISystemAbilityManager> sam = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    if (sam == nullptr) {
-        CALLMANAGER_ERR_LOG("system ability manager nullptr");
-        return;
-    }
-    remoteObject_ = sam->GetSystemAbility(AUDIO_DISTRIBUTED_SERVICE_ID); // system audio service
-    if (remoteObject_ == nullptr) {
-        CALLMANAGER_ERR_LOG("remote object : audio service  , nullptr");
-        return;
-    }
-    audioManagerProxy_ = std::make_unique<AudioManagerProxy>(remoteObject_);
-    if (audioManagerProxy_ == nullptr) {
-        CALLMANAGER_ERR_LOG("audio proxy nullptr");
-    }
+    TELEPHONY_LOGI("audio proxy init");
 }
 
-void AudioProxy::ActivateAudioInterrupt()
+bool AudioProxy::ActivateAudioInterrupt()
 {
-    if (remoteObject_ == nullptr) {
-        CALLMANAGER_ERR_LOG("remote object : audio service  , nullptr");
-        return;
-    }
 #ifdef ABILITY_AUDIO_SUPPORT
-    audioManagerProxy_->ActivateAudioInterrupt();
+    return AudioSystemManager::GetInstance()->ActivateAudioInterrupt();
 #endif
+    return true;
 }
 
-void AudioProxy::DeactivateAudioInterrupt()
+bool AudioProxy::DeactivateAudioInterrupt()
 {
-    if (remoteObject_ == nullptr) {
-        CALLMANAGER_ERR_LOG("remote object : audio service  , nullptr");
-        return;
-    }
 #ifdef ABILITY_AUDIO_SUPPORT
-    audioManagerProxy_->DeactivateAudioInterrupt();
+    return AudioSystemManager::GetInstance()->DeactivateAudioInterrupt();
 #endif
+    return true;
 }
 
-void AudioProxy::UpdateCallState(int state)
+bool AudioProxy::UpdateCallState(int32_t state)
 {
-    if (remoteObject_ == nullptr) {
-        CALLMANAGER_ERR_LOG("remote object : audio service  , nullptr");
-        return;
-    }
 #ifdef ABILITY_AUDIO_SUPPORT
-    audioManagerProxy_->UpdateCallState(state);
+    return AudioSystemManager::GetInstance()->UpdateCallState(state);
 #endif
-}
-
-void AudioProxy::SetDeviceActive(int deviceType, bool state)
-{
-    if (remoteObject_ == nullptr) {
-        CALLMANAGER_ERR_LOG("remote object : audio service  , nullptr");
-        return;
-    }
-#ifdef ABILITY_AUDIO_SUPPORT
-    audioManagerProxy_->SetDeviceActive(deviceType, state);
-#endif
-}
-
-bool AudioProxy::IsDeviceActive(int deviceType)
-{
-    if (remoteObject_ == nullptr) {
-        CALLMANAGER_ERR_LOG("remote object : audio service  , nullptr");
-        return false;
-    }
-#ifdef ABILITY_AUDIO_SUPPORT
-    return audioManagerProxy_->IsDeviceActive(deviceType);
-#endif
-    return false;
-}
-
-std::string AudioProxy::GetDefaultRingerPath() const
-{
-    if (remoteObject_ == nullptr) {
-        CALLMANAGER_ERR_LOG("remote object : audio service  , nullptr");
-        return "";
-    }
-#ifdef ABILITY_AUDIO_SUPPORT
-    return audioManagerProxy_->GetDefaultRingerPath();
-#endif
-    return "";
-}
-
-void AudioProxy::SetBluetoothDevActive(bool active)
-{
-    if (remoteObject_ == nullptr) {
-        CALLMANAGER_ERR_LOG("remote object : audio service  , nullptr");
-        return;
-    }
-#ifdef ABILITY_AUDIO_SUPPORT
-    audioManagerProxy_->SetDeviceActive(AudioDeviceType::DEV_BLUETOOTH, active);
-#endif
-}
-
-void AudioProxy::SetWiredHeadsetDevActive(bool active)
-{
-    if (remoteObject_ == nullptr) {
-        CALLMANAGER_ERR_LOG("remote object : audio service  , nullptr");
-        return;
-    }
-
-#ifdef ABILITY_AUDIO_SUPPORT
-    audioManagerProxy_->SetDeviceActive(AudioDeviceType::DEV_WIRED_HEADSET, active);
-#endif
-}
-
-void AudioProxy::SetSpeakerDevActive(bool active)
-{
-    if (remoteObject_ == nullptr) {
-        CALLMANAGER_ERR_LOG("remote object : audio service  , nullptr");
-        CALLMANAGER_INFO_LOG("setting speaker dev active state failed");
-        return;
-    }
-#ifdef ABILITY_AUDIO_SUPPORT
-    audioManagerProxy_->SetDeviceActive(AudioDeviceType::DEV_SPEAKERPHONE, active);
-    CALLMANAGER_INFO_LOG("speaker dev active state successfully set , state : %{public}d", active);
-#endif
-}
-
-void AudioProxy::SetEarpieceDevActive(bool active) {}
-
-void AudioProxy::SetAudioDeviceChangeObserver()
-{
-    if (remoteObject_ == nullptr) {
-        CALLMANAGER_ERR_LOG("remote object : audio service  , nullptr");
-        CALLMANAGER_INFO_LOG("setting audio device change observer failed");
-        return;
-    }
-#ifdef ABILITY_AUDIO_SUPPORT
-    audioManagerProxy_->SetAudioDeviceChangeObserver();
-#endif
-}
-
-void AudioProxy::SetOnCreateCompleteListener() {}
-
-int32_t AudioProxy::GetVolume(int audioVolumeType)
-{
-    if (remoteObject_ == nullptr) {
-        CALLMANAGER_ERR_LOG("remote object : audio service  , nullptr");
-        return TELEPHONY_FAIL;
-    }
-#ifdef ABILITY_AUDIO_SUPPORT
-    return audioManagerProxy_->GetVolume(audioVolumeType);
-#endif
-    return TELEPHONY_FAIL;
-}
-
-void AudioProxy::SetVolume(int audioVolumeType, int volume)
-{
-    if (remoteObject_ == nullptr) {
-        CALLMANAGER_ERR_LOG("remote object : audio service  , nullptr");
-        return;
-    }
-#ifdef ABILITY_AUDIO_SUPPORT
-    audioManagerProxy_->SetVolume(audioVolumeType, volume);
-#endif
+    return true;
 }
 
 int32_t AudioProxy::CreateRing(const std::string &ringPath)
 {
 #ifdef ABILITY_AUDIO_SUPPORT
-    return audioManagerProxy_->CreateRing(ringPath);
+    return AudioPlayer::GetInstance()->CreatePlayer(ringPath);
 #endif
-    return TELEPHONY_NO_ERROR;
+    return TELEPHONY_SUCCESS;
 }
 
-int32_t AudioProxy::CreateTone(int toneDescriptor, int durationMs)
+int32_t AudioProxy::CreateTone(int32_t toneDescriptor, int32_t durationMs)
 {
 #ifdef ABILITY_AUDIO_SUPPORT
-    return audioManagerProxy_->CreateTone(int toneDescriptor, int durationMs);
+    return AudioPlayer::GetInstance()->CreatePlayer(toneDescriptor, durationMs);
 #endif
-    return TELEPHONY_NO_ERROR;
+    return TELEPHONY_SUCCESS;
 }
 
-int32_t AudioProxy::Play(int id, double volume, int loopNum, double speed)
+int32_t AudioProxy::Play(int32_t id, float volume, int32_t loopNum, float speed)
 {
-    if (remoteObject_ == nullptr) {
-        CALLMANAGER_ERR_LOG("remote object : audio service  , nullptr");
-        CALLMANAGER_INFO_LOG("ring play failed");
-        return TELEPHONY_FAIL;
-    }
 #ifdef ABILITY_AUDIO_SUPPORT
-    return audioManagerProxy_->Play(id, volume, loopNum, speed);
+    return AudioPlayer::GetInstance()->Play(id, volume, loopNum, speed);
 #endif
-    return TELEPHONY_NO_ERROR;
+    return TELEPHONY_SUCCESS;
 }
 
-int32_t AudioProxy::Play(int toneDescriptor, int duration)
+int32_t AudioProxy::Play(int32_t toneDescriptor, int32_t duration)
 {
-    if (remoteObject_ == nullptr) {
-        CALLMANAGER_ERR_LOG("remote object : audio service  , nullptr");
-        CALLMANAGER_INFO_LOG("tone play failed");
-        return TELEPHONY_FAIL;
-    }
 #ifdef ABILITY_AUDIO_SUPPORT
-    return audioManagerProxy_->Play(toneDescriptor, duration);
+    return AudioPlayer::GetInstance()->Play(toneDescriptor, duration);
 #endif
-    return TELEPHONY_NO_ERROR;
+    return TELEPHONY_SUCCESS;
 }
 
 int32_t AudioProxy::Play()
 {
-    if (remoteObject_ == nullptr) {
-        CALLMANAGER_ERR_LOG("remote object : audio service  , nullptr");
-        CALLMANAGER_INFO_LOG("audio play failed");
-        return TELEPHONY_FAIL;
-    }
 #ifdef ABILITY_AUDIO_SUPPORT
-    return audioManagerProxy_->Play();
+    return AudioPlayer::GetInstance()->Play();
 #endif
-    return TELEPHONY_NO_ERROR;
+    return TELEPHONY_SUCCESS;
 }
 
 int32_t AudioProxy::StopCallTone()
 {
-    if (remoteObject_ == nullptr) {
-        CALLMANAGER_ERR_LOG("remote object : audio service  , nullptr");
-        CALLMANAGER_INFO_LOG("tone stop failed");
-        return TELEPHONY_FAIL;
-    }
 #ifdef ABILITY_AUDIO_SUPPORT
-    return audioManagerProxy_->StopCallTone();
+    return AudioPlayer::GetInstance()->StopCallTone();
 #endif
-    return TELEPHONY_NO_ERROR;
+    return TELEPHONY_SUCCESS;
 }
 
-int32_t AudioProxy::StopRing(int id)
+int32_t AudioProxy::StopRing(int32_t id)
 {
-    if (remoteObject_ == nullptr) {
-        CALLMANAGER_ERR_LOG("remote object : audio service  , nullptr");
-        CALLMANAGER_INFO_LOG("ring stop failed");
-        return TELEPHONY_FAIL;
-    }
 #ifdef ABILITY_AUDIO_SUPPORT
-    return audioManagerProxy_->StopCallTone(id);
+    return AudioPlayer::GetInstance()->StopRing(id);
 #endif
-    return TELEPHONY_NO_ERROR;
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t AudioProxy::Resume(int32_t id)
+{
+#ifdef ABILITY_AUDIO_SUPPORT
+    return AudioPlayer::GetInstance()->Resume(id);
+#endif
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t AudioProxy::Pause(int32_t id)
+{
+#ifdef ABILITY_AUDIO_SUPPORT
+    return AudioPlayer::GetInstance()->Pause(id);
+#endif
+    return TELEPHONY_SUCCESS;
 }
 
 int32_t AudioProxy::Release()
 {
-    if (remoteObject_ == nullptr) {
-        CALLMANAGER_ERR_LOG("remote object : audio service  , nullptr");
-        CALLMANAGER_INFO_LOG("audio release failed");
-        return TELEPHONY_FAIL;
-    }
 #ifdef ABILITY_AUDIO_SUPPORT
-    return audioManagerProxy_->Release();
+    return AudioPlayer::GetInstance()->Release();
 #endif
-    return TELEPHONY_NO_ERROR;
+    return TELEPHONY_SUCCESS;
 }
 
-int32_t AudioProxy::Release(int id)
+int32_t AudioProxy::Release(int32_t id)
 {
-    if (remoteObject_ == nullptr) {
-        CALLMANAGER_ERR_LOG("remote object : audio service  , nullptr");
-        CALLMANAGER_INFO_LOG("audio release failed");
-        return TELEPHONY_FAIL;
-    }
 #ifdef ABILITY_AUDIO_SUPPORT
-    return audioManagerProxy_->Release(id);
+    return AudioPlayer::GetInstance()->Release(id);
 #endif
-    return TELEPHONY_NO_ERROR;
+    return TELEPHONY_SUCCESS;
 }
 
-bool AudioProxy::IsMute(int audioVolumeType)
+std::string AudioProxy::GetDefaultRingerPath() const
 {
-    if (remoteObject_ == nullptr) {
-        CALLMANAGER_ERR_LOG("remote object : audio service  , nullptr");
-        return false;
-    }
-#ifdef ABILITY_AUDIO_SUPPORT
-    return audioManagerProxy_->IsMute(audioVolumeType);
-#endif
-    return false;
-}
-
-int32_t AudioProxy::GetMaxVolume(int audioVolumeType)
-{
-    if (remoteObject_ == nullptr) {
-        CALLMANAGER_ERR_LOG("remote object : audio service  , nullptr");
-        return TELEPHONY_FAIL;
-    }
-#ifdef ABILITY_AUDIO_SUPPORT
-    return audioManagerProxy_->GetMaxVolume(audioVolumeType);
-#endif
-    return TELEPHONY_NO_ERROR;
-}
-
-int32_t AudioProxy::GetMinVolume(int audioVolumeType)
-{
-    if (remoteObject_ == nullptr) {
-        CALLMANAGER_ERR_LOG("remote object : audio service  , nullptr");
-        return TELEPHONY_FAIL;
-    }
-#ifdef ABILITY_AUDIO_SUPPORT
-    return audioManagerProxy_->GetMinVolume(audioVolumeType);
-#endif
-    return TELEPHONY_NO_ERROR;
-}
-
-bool AudioProxy::IsMicrophoneMute()
-{
-    if (remoteObject_ == nullptr) {
-        CALLMANAGER_ERR_LOG("remote object : audio service  , nullptr");
-        return false;
-    }
-#ifdef ABILITY_AUDIO_SUPPORT
-    return audioManagerProxy_->IsMicrophoneMute();
-#endif
-    return false;
-}
-
-void AudioProxy::SetMicrophoneMute(bool mute)
-{
-    if (remoteObject_ == nullptr) {
-        CALLMANAGER_ERR_LOG("remote object : audio service  , nullptr");
-        CALLMANAGER_INFO_LOG("set microphone mute failed");
-        return;
-    }
-#ifdef ABILITY_AUDIO_SUPPORT
-    audioManagerProxy_->SetMicrophoneMute(mute);
-#endif
+    return defaultRingerPath_;
 }
 
 int32_t AudioProxy::StartVibrate()
 {
-    return TELEPHONY_NO_ERROR; // return default value
+    return TELEPHONY_SUCCESS; // return default value
 }
 
 int32_t AudioProxy::CancelVibrate()
 {
-    return TELEPHONY_NO_ERROR; // return default value
+    return TELEPHONY_SUCCESS; // return default value
 }
 
-AudioRingMode AudioProxy::GetRingerMode() const
-{
-    if (remoteObject_ == nullptr) {
-        CALLMANAGER_ERR_LOG("remote object : audio service  , nullptr");
-    }
+void AudioProxy::SetAudioDeviceChangeObserver() {}
+
+void AudioProxy::SetOnCreateCompleteListener() {}
+
 #ifdef ABILITY_AUDIO_SUPPORT
-    return audioManagerProxy_->GetRingerMode();
+bool AudioProxy::SetDeviceActive(AudioDeviceDescriptor::DeviceType deviceType, bool state)
+{
+    return AudioSystemManager::GetInstance()->SetDeviceActive(deviceType, state) == TELEPHONY_SUCCESS;
+}
+
+bool AudioProxy::IsDeviceActive(AudioDeviceDescriptor::DeviceType deviceType)
+{
+    return AudioSystemManager::GetInstance()->IsDeviceActive(deviceType);
+}
 #endif
-    return AudioRingMode::RINGER_MODE_NORMAL;
+
+bool AudioProxy::SetBluetoothDevActive(bool active)
+{
+#ifdef ABILITY_AUDIO_SUPPORT
+    return SetDeviceActive(AudioDeviceDescriptor::DeviceType::BLUETOOTH_SCO, active);
+#endif
+    return true;
+}
+
+bool AudioProxy::SetWiredHeadsetDevActive(bool active)
+{
+#ifdef ABILITY_AUDIO_SUPPORT
+    return SetDeviceActive(AudioDeviceDescriptor::DeviceType::WIRED_HEADSET, active);
+#endif
+    return true;
+}
+
+bool AudioProxy::SetSpeakerDevActive(bool active)
+{
+#ifdef ABILITY_AUDIO_SUPPORT
+    return SetDeviceActive(AudioDeviceDescriptor::DeviceType::SPEAKER, active);
+#endif
+    return true;
+}
+
+bool AudioProxy::SetMicDevActive(bool active)
+{
+#ifdef ABILITY_AUDIO_SUPPORT
+    return SetDeviceActive(AudioDeviceDescriptor::DeviceType::MIC, active);
+#endif
+    return true;
+}
+
+#ifdef ABILITY_AUDIO_SUPPORT
+float AudioProxy::GetVolume(AudioSystemManager::AudioVolumeType audioVolumeType)
+{
+    return AudioSystemManager::GetInstance()->GetVolume(audioVolumeType);
+}
+
+int32_t AudioProxy::SetVolume(AudioSystemManager::AudioVolumeType audioVolumeType, float volume)
+{
+    return AudioSystemManager::GetInstance()->SetVolume(audioVolumeType, volume);
+}
+#endif
+
+void AudioProxy::SetVolumeAudible()
+{
+#ifdef ABILITY_AUDIO_SUPPORT
+    if (GetVolume(AudioSystemManager::AudioVolumeType::STREAM_VOICE_CALL) == 0) {
+        float volume = GetMaxVolume(AudioSystemManager::AudioVolumeType::STREAM_VOICE_CALL);
+        SetVolume(AudioSystemManager::AudioVolumeType::STREAM_VOICE_CALL, volume);
+    }
+#endif
+}
+
+#ifdef ABILITY_AUDIO_SUPPORT
+bool AudioProxy::IsStreamActive(AudioSystemManager::AudioVolumeType audioVolumeType)
+{
+    return AudioSystemManager::GetInstance()->IsStreamActive(audioVolumeType);
+}
+
+bool AudioProxy::IsStreamMute(AudioSystemManager::AudioVolumeType audioVolumeType)
+{
+    return AudioSystemManager::GetInstance()->IsStreamMute(audioVolumeType);
+}
+
+float AudioProxy::GetMaxVolume(AudioSystemManager::AudioVolumeType audioVolumeType)
+{
+    return AudioSystemManager::GetInstance()->GetMaxVolume(audioVolumeType);
+}
+
+float AudioProxy::GetMinVolume(AudioSystemManager::AudioVolumeType audioVolumeType)
+{
+    return AudioSystemManager::GetInstance()->GetMinVolume(audioVolumeType);
+}
+#endif
+
+bool AudioProxy::IsMicrophoneMute()
+{
+#ifdef ABILITY_AUDIO_SUPPORT
+    return AudioSystemManager::GetInstance()->IsMicrophoneMute();
+#endif
+    return false;
+}
+
+int32_t AudioProxy::SetMicrophoneMute(bool mute)
+{
+#ifdef ABILITY_AUDIO_SUPPORT
+    return AudioSystemManager::GetInstance()->SetMicrophoneMute(mute);
+#endif
+    return TELEPHONY_SUCCESS;
+}
+
+#ifdef ABILITY_AUDIO_SUPPORT
+AudioRingerMode AudioProxy::GetRingerMode() const
+{
+    return AudioSystemManager::GetInstance()->GetRingerMode();
 }
 
 bool AudioProxy::IsVibrateMode() const
 {
-    return AudioRingMode::RINGER_MODE_VIBRATE == GetRingerMode();
+    return AudioRingerMode::RINGER_MODE_VIBRATE == GetRingerMode();
 }
-} // namespace TelephonyCallManager
+#endif
+} // namespace Telephony
 } // namespace OHOS

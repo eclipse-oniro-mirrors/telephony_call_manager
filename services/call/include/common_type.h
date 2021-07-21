@@ -13,24 +13,41 @@
  * limitations under the License.
  */
 
-#ifndef COMMONTYPE_H
-#define COMMONTYPE_H
+#ifndef COMMON_TYPE_H
+#define COMMON_TYPE_H
+
 #include <cstdio>
 #include <list>
 #include <string>
 
-#include "call_manager_type.h"
+#include "call_manager_inner_type.h"
+#include "telephony_log_wrapper.h"
+
+#define RETURN_VALUE(...) return __VA_ARGS__
+
+#define RETURN_FAILURE_IF_NULLPTR(ptr, errorInfo, ...) \
+    if (ptr == nullptr) {                              \
+        TELEPHONY_LOGE(errorInfo);                     \
+        RETURN_VALUE(__VA_ARGS__);                     \
+    }
+
+#define RETURN_VALUE_IF_NOT_WITHOUT_PROMT(condition, ...) \
+    if (!condition) {                                     \
+        RETURN_VALUE(__VA_ARGS__);                        \
+    }
+
+#define RETURN_VALUE_IF_NOT_CONDITION_WITHOUT_PROMT(value, condition, ...) \
+    if (value != condition) {                                              \
+        RETURN_VALUE(__VA_ARGS__);                                         \
+    }
 
 const int32_t kMaxRingingCallNumberLen = 30;
 const int32_t kMaxDialingCallNumberLen = 30;
 const int32_t kMaxManeLen = 10;
-const int32_t kMaxAddressLen = 40;
-const int32_t kMaxLookupKeyLen = 40;
 const int32_t kMaxPathKeyLen = 60;
 const int32_t kCallStartId = 1000;
-const int32_t kTimeStampUsMultiplier = 1000000;
 namespace OHOS {
-namespace TelephonyCallManager {
+namespace Telephony {
 enum PolicyFlag {
     // Denote playing ring tone
     POLICY_FLAG_PLAY_RINGTONE = 0x00000001,
@@ -39,7 +56,7 @@ enum PolicyFlag {
     // Represents the play prompt tone
     POLICY_FLAG_PLAY_SOUND = 0x00000004,
     // Represents an audio routing handset
-    POLICY_FLAG_AUDIO_DEVICE_EARPIECE = 0x00000008,
+    POLICY_FLAG_AUDIO_DEVICE_MIC = 0x00000008,
     // Represents an audio routing speaker
     POLICY_FLAG_AUDIO_DEVICE_SPEAKER = 0x00000010,
     // Represents audio routing wired headset
@@ -57,14 +74,13 @@ struct CallInfo {
     bool speakerphoneOn;
     int32_t accountId;
     int32_t videoState;
-    int32_t startime; // Call start time
-    int32_t policyFlags;
+    int32_t startTime; // Call start time
     bool isEcc;
     bool isDefault; // Whether to dial by default
     CallType callType;
     int32_t callId;
     int64_t policyFlag;
-    TelCallStates state;
+    TelCallState state;
 };
 
 struct ContactInfo {
@@ -76,7 +92,7 @@ struct ContactInfo {
     bool isEcc;
     bool isVoiceMail;
 };
-} // namespace TelephonyCallManager
+} // namespace Telephony
 } // namespace OHOS
 
-#endif // COMMONTYPE_H
+#endif // COMMON_TYPE_H

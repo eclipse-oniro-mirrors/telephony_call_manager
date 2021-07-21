@@ -15,6 +15,7 @@
 
 #ifndef AUDIO_PROXY_H
 #define AUDIO_PROXY_H
+
 #include <cstdint>
 #include <memory>
 #include <mutex>
@@ -22,75 +23,58 @@
 #include "audio_manager_proxy.h"
 #include "singleton.h"
 
-#ifdef ABILITY_AUDIO_SUPPORT
-#include "if_audio_ability.h"
-#include "audio_service.h"
-#include "iaudio_service.h"
-#include "sound_player.h"
-#endif
-
 #include "call_manager_errors.h"
 
 namespace OHOS {
-namespace TelephonyCallManager {
-enum AudioRingMode { RINGER_MODE_NORMAL = 0, RINGER_MODE_SILENT, RINGER_MODE_VIBRATE };
-
-enum AudioVolumeType { STREAM_BLUETOOTH_SCO = 0, STREAM_DTMF, STREAM_MUSIC, STREAM_RING, STREAM_VOICE_CALL };
-
-enum RingtoneType { ALARM = 0, NOTIFICATION, RING };
-
-enum AudioDeviceType { DEV_BLUETOOTH = 0, DEV_SPEAKERPHONE, DEV_WIRED_HEADSET };
-
-enum ErrCode { ERR_OK = 0, ERR_INVALID_VALUE };
-
+namespace Telephony {
 class AudioProxy : public std::enable_shared_from_this<AudioProxy> {
     DECLARE_DELAYED_SINGLETON(AudioProxy)
 public:
     void Init();
-    void ActivateAudioInterrupt();
-    void DeactivateAudioInterrupt();
-    void UpdateCallState(int state);
-    bool IsDeviceActive(int deviceType);
-    void SetDeviceActive(int deviceType, bool state);
+    bool ActivateAudioInterrupt();
+    bool DeactivateAudioInterrupt();
+    bool UpdateCallState(int32_t state); // set audio mode
+#ifdef ABILITY_AUDIO_SUPPORT
+    bool IsDeviceActive(AudioDeviceDescriptor::DeviceType deviceType);
+    bool SetDeviceActive(AudioDeviceDescriptor::DeviceType deviceType, bool state);
+#endif
     std::string GetDefaultRingerPath() const;
-    void SetBluetoothDevActive(bool active);
-    void SetSpeakerDevActive(bool active);
-    void SetWiredHeadsetDevActive(bool active);
-    void SetEarpieceDevActive(bool active);
+    void SetVolumeAudible();
+    bool IsMicrophoneMute();
+    int32_t SetMicrophoneMute(bool mute);
+    bool SetMicDevActive(bool active);
+    bool SetSpeakerDevActive(bool active);
+    bool SetBluetoothDevActive(bool active);
+    bool SetWiredHeadsetDevActive(bool active);
+#ifdef ABILITY_AUDIO_SUPPORT
+    AudioRingerMode GetRingerMode() const;
+    float GetVolume(AudioSystemManager::AudioVolumeType audioVolumeType);
+    int32_t SetVolume(AudioSystemManager::AudioVolumeType audioVolumeType, float volume);
+    bool IsStreamActive(AudioSystemManager::AudioVolumeType audioVolumeType);
+    bool IsStreamMute(AudioSystemManager::AudioVolumeType audioVolumeType);
+    float GetMaxVolume(AudioSystemManager::AudioVolumeType audioVolumeType);
+    float GetMinVolume(AudioSystemManager::AudioVolumeType audioVolumeType);
+#endif
     void SetAudioDeviceChangeObserver();
-    void SetOnCreateCompleteListener(); // audio resource create complete listener
-    AudioRingMode GetRingerMode() const;
+    void SetOnCreateCompleteListener();
     bool IsVibrateMode() const;
     int32_t CreateRing(const std::string &ringPath);
-    int32_t CreateTone(int toneDescriptor, int durationMs);
-    int32_t Play(int id, double volume, int loopNum, double speed); // play ringtone
-    int32_t Play(const std::string &ringtonePath, double volume, int loopNum, double speed); // play ringtone
-    int32_t Play(int toneDescriptor, int duration); // play tone
+    int32_t CreateTone(int32_t toneDescriptor, int32_t durationMs);
     int32_t Play();
+    int32_t Play(int32_t toneDescriptor, int32_t duration); // play tone
+    int32_t Play(int32_t id, float volume, int32_t loopNum, float speed); // play ringtone
     int32_t StopCallTone();
-    int32_t StopRing(int id);
+    int32_t StopRing(int32_t id);
     int32_t Release();
-    int32_t Release(int id);
-    int32_t GetVolume(int audioVolumeType);
-    void SetVolume(int audioVolumeType, int volume);
-    bool IsMute(int audioVolumeType);
-    int32_t GetMaxVolume(int audioVolumeType);
-    int32_t GetMinVolume(int audioVolumeType);
-    bool IsMicrophoneMute();
-    void SetMicrophoneMute(bool mute);
+    int32_t Release(int32_t id);
+    int32_t Pause(int32_t id);
+    int32_t Resume(int32_t id);
     int32_t StartVibrate();
     int32_t CancelVibrate();
 
 private:
-    std::mutex proxyMutex_;
-    sptr<IRemoteObject> remoteObject_;
-    std::unique_ptr<AudioManagerProxy> audioManagerProxy_;
-#ifdef ABILITY_AUDIO_SUPPORT
-    sptr<IAudioAbility> audioAbility_;
-    sptr<IAudioService> audioService_;
-    sptr<SoundPlayer> player_;
-#endif
+    const std::string defaultRingerPath_ = "/system/media/audio/ringtones/default.wav";
 };
-} // namespace TelephonyCallManager
+} // namespace Telephony
 } // namespace OHOS
-#endif // !AUDIO_PROXY_H
+#endif // AUDIO_PROXY_H
