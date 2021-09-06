@@ -18,12 +18,12 @@
 #include <securec.h>
 
 #include "call_manager_errors.h"
-#include "call_manager_log.h"
+#include "telephony_log_wrapper.h"
 
 #include "call_control_manager.h"
 
 namespace OHOS {
-namespace TelephonyCallManager {
+namespace Telephony {
 CallStatusPolicy::CallStatusPolicy() {}
 
 CallStatusPolicy::~CallStatusPolicy() {}
@@ -31,75 +31,75 @@ CallStatusPolicy::~CallStatusPolicy() {}
 int32_t CallStatusPolicy::IncomingHandlePolicy(ContactInfo info)
 {
     int32_t ret = TELEPHONY_FAIL;
-    if (ret != TELEPHONY_NO_ERROR) {
-        CALLMANAGER_ERR_LOG("VoicemailInterceptor failed!");
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("VoicemailInterceptor failed!");
     } else {
-        CALLMANAGER_INFO_LOG("VoicemailInterceptor success!");
+        TELEPHONY_LOGI("VoicemailInterceptor success!");
     }
     return ret;
 }
 
 int32_t CallStatusPolicy::DialingHandlePolicy()
 {
-    return TELEPHONY_NO_ERROR;
+    return TELEPHONY_SUCCESS;
 }
 
 int32_t CallStatusPolicy::ActiveHandlePolicy()
 {
-    return TELEPHONY_NO_ERROR;
+    return TELEPHONY_SUCCESS;
 }
 
 int32_t CallStatusPolicy::HoldingHandlePolicy()
 {
-    return TELEPHONY_NO_ERROR;
+    return TELEPHONY_SUCCESS;
 }
 
 int32_t CallStatusPolicy::WaitingHandlePolicy()
 {
-    return TELEPHONY_NO_ERROR;
+    return TELEPHONY_SUCCESS;
 }
 
 int32_t CallStatusPolicy::AlertHandlePolicy()
 {
-    return TELEPHONY_NO_ERROR;
+    return TELEPHONY_SUCCESS;
 }
 
 int32_t CallStatusPolicy::DisconnectingHandlePolicy()
 {
-    return TELEPHONY_NO_ERROR;
+    return TELEPHONY_SUCCESS;
 }
 
 int32_t CallStatusPolicy::DisconnectedHandlePolicy()
 {
-    return TELEPHONY_NO_ERROR;
+    return TELEPHONY_SUCCESS;
 }
 
 int32_t CallStatusPolicy::IdleHandlePolicy()
 {
-    return TELEPHONY_NO_ERROR;
+    return TELEPHONY_SUCCESS;
 }
 
 int32_t CallStatusPolicy::FilterResultsDispose(sptr<CallBase> call)
 {
     int32_t ret = TELEPHONY_FAIL;
-    ContactInfo info;
     if (call == nullptr) {
         return CALL_MANAGER_CALL_NULL;
     }
-    call->GetCallerInfo(info);
     if (HasRingingMaximum() || HasDialingMaximum()) {
-        ret = call->HangUpBase();
-        CALLMANAGER_INFO_LOG("HasDialingMaximum and HasDialingMaximum");
-        // Print the log and log the information to the database
-    } else {
-        ret = call->IncomingCallBase();
-        AddOneCallObject(call);
-        DelayedSingleton<CallControlManager>::GetInstance()->NotifyNewCallCreated(call);
+        TELEPHONY_LOGI("the number of Ringing or Dialing call is bigger than Maximum, start to hung up");
+        ret = call->HangUpCall();
+        if (ret != TELEPHONY_SUCCESS) {
+            TELEPHONY_LOGE("HangUpCall failed!");
+            return ret;
+        }
+        // Print the log and record the information to the database
+        return TELEPHONY_SUCCESS;
     }
-    // Print the log and log the information to the database
-    CALLMANAGER_INFO_LOG("IncomingCall");
+    ret = call->IncomingCallBase();
+    DelayedSingleton<CallControlManager>::GetInstance()->NotifyNewCallCreated(call);
+    // Print the log and record the information to the database
     // Call notification module
-    return ret;
+    return TELEPHONY_SUCCESS;
 }
-} // namespace TelephonyCallManager
+} // namespace Telephony
 } // namespace OHOS

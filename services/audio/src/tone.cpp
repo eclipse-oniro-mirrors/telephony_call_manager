@@ -15,12 +15,12 @@
 
 #include "tone.h"
 
-#include "call_manager_log.h"
+#include "telephony_log_wrapper.h"
 
 #include "audio_control_manager.h"
 
 namespace OHOS {
-namespace TelephonyCallManager {
+namespace Telephony {
 int32_t Tone::toneDuration_ = TONE_DURATION;
 
 Tone::Tone()
@@ -39,17 +39,13 @@ void Tone::Init() {}
 int32_t Tone::Start()
 {
     if (currentToneDescriptor_ == TONE_UNKNOWN) {
-        CALLMANAGER_INFO_LOG("tone type unknown");
+        TELEPHONY_LOGE("tone type unknown");
         return TELEPHONY_FAIL;
     }
-    auto audioProxy = DelayedSingleton<AudioProxy>::GetInstance();
-    if (audioProxy == nullptr) {
-        CALLMANAGER_ERR_LOG("audio proxy nullptr");
-        return TELEPHONY_FAIL;
-    }
-    if (audioProxy->Play(currentToneDescriptor_, toneDuration_) == TELEPHONY_NO_ERROR) {
+    if (DelayedSingleton<AudioProxy>::GetInstance()->Play(currentToneDescriptor_, toneDuration_) ==
+        TELEPHONY_SUCCESS) {
         isTonePlaying_ = true;
-        return TELEPHONY_NO_ERROR;
+        return TELEPHONY_SUCCESS;
     }
     return TELEPHONY_FAIL;
 }
@@ -57,33 +53,23 @@ int32_t Tone::Start()
 int32_t Tone::Stop()
 {
     if (isTonePlaying_ == false) {
-        return TELEPHONY_FAIL;
+        return TELEPHONY_SUCCESS;
     }
-    auto audioProxy = DelayedSingleton<AudioProxy>::GetInstance();
-    if (audioProxy == nullptr) {
-        CALLMANAGER_ERR_LOG("audio proxy nullptr");
-        return TELEPHONY_FAIL;
-    }
-    if (audioProxy->StopCallTone() == TELEPHONY_NO_ERROR) {
+    if (DelayedSingleton<AudioProxy>::GetInstance()->StopCallTone() == TELEPHONY_SUCCESS) {
         isTonePlaying_ = false;
         isCreateComplete_ = false;
-        return TELEPHONY_NO_ERROR;
+        return TELEPHONY_SUCCESS;
     }
     return TELEPHONY_FAIL;
 }
 
 int32_t Tone::Release()
 {
-    CALLMANAGER_INFO_LOG("tone release");
-    auto audioProxy = DelayedSingleton<AudioProxy>::GetInstance();
-    if (audioProxy == nullptr) {
-        CALLMANAGER_ERR_LOG("audio proxy nullptr");
-        return TELEPHONY_FAIL;
-    }
-    if (audioProxy->Release() == TELEPHONY_NO_ERROR) {
+    TELEPHONY_LOGI("tone release");
+    if (DelayedSingleton<AudioProxy>::GetInstance()->Release() == TELEPHONY_SUCCESS) {
         isTonePlaying_ = false;
         isCreateComplete_ = false;
-        return TELEPHONY_NO_ERROR;
+        return TELEPHONY_SUCCESS;
     }
     return TELEPHONY_FAIL;
 }
@@ -97,5 +83,53 @@ int32_t Tone::GetDurationMs()
 {
     return toneDuration_;
 }
-} // namespace TelephonyCallManager
+
+ToneDescriptor Tone::ConvertDigitToTone(char digit)
+{
+    ToneDescriptor tone = ToneDescriptor::TONE_UNKNOWN;
+    switch (digit) {
+        case '0':
+            tone = ToneDescriptor::DTMF_DIGIT_0;
+            break;
+        case '1':
+            tone = ToneDescriptor::DTMF_DIGIT_1;
+            break;
+        case '2':
+            tone = ToneDescriptor::DTMF_DIGIT_2;
+            break;
+        case '3':
+            tone = ToneDescriptor::DTMF_DIGIT_3;
+            break;
+        case '4':
+            tone = ToneDescriptor::DTMF_DIGIT_4;
+            break;
+        case '5':
+            tone = ToneDescriptor::DTMF_DIGIT_5;
+            break;
+        case '6':
+            tone = ToneDescriptor::DTMF_DIGIT_6;
+            break;
+        case '7':
+            tone = ToneDescriptor::DTMF_DIGIT_7;
+            break;
+        case '8':
+            tone = ToneDescriptor::DTMF_DIGIT_8;
+            break;
+        case '9':
+            tone = ToneDescriptor::DTMF_DIGIT_9;
+            break;
+        case 'p':
+        case 'P':
+            tone = ToneDescriptor::DTMF_DIGIT_P;
+            break;
+        case 'w':
+        case 'W':
+            tone = ToneDescriptor::DTMF_DIGIT_W;
+            break;
+        default:
+            break;
+    }
+    return tone;
+}
+} // namespace Telephony
 } // namespace OHOS

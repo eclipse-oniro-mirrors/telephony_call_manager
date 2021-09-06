@@ -15,27 +15,28 @@
 
 #ifndef TELEPHONY_AUDIO_MANAGER_H
 #define TELEPHONY_AUDIO_MANAGER_H
+
 #include <mutex>
 #include <set>
 
 #include "singleton.h"
 
-#include "call_manager_type.h"
+#include "call_manager_inner_type.h"
 
-#include "audio_event.h"
-#include "audio_event_handler.h"
 #include "audio_proxy.h"
 #include "call_state_listener_base.h"
-#include "ring.h"
 #include "tone.h"
+#include "ring.h"
+#include "audio_device_manager.h"
+#include "call_state_process.h"
 
 namespace OHOS {
-namespace TelephonyCallManager {
-enum AudioInterruptState { UN_INTERRUPT = 0, IN_INTERRUPT, IN_RINGING };
-
-enum CallDirection { ENTERING = 0, LEAVING };
-
-enum DisconnectReason { UNKNOWN = 0, ENGAGED, FINISHED, NO_SERVICE, INVALID_NUMBER };
+namespace Telephony {
+enum AudioInterruptState {
+    UN_INTERRUPT = 0,
+    IN_INTERRUPT,
+    IN_RINGING,
+};
 
 struct CallRecord {
     std::string phoneNum;
@@ -46,12 +47,14 @@ class AudioControlManager : public CallStateListenerBase, public std::enable_sha
     DECLARE_DELAYED_SINGLETON(AudioControlManager)
 public:
     void Init();
-    void Reset();
-    void SetAudioDevice(AudioDevice device);
+    bool ProcessEvent(int32_t event);
+    bool SetAudioDevice(int32_t device);
+    bool SetAudioDevice(AudioDevice device);
     bool PlayRingtone(); // plays the default ringtone
     bool PlayRingtone(const std::string &phoneNum); // plays the default ringtone
     bool PlayRingtone(const std::string &phoneNum, const std::string &ringtonePath); // plays the specific ringtone
     bool StopRingtone();
+    int32_t PlayDtmf(char digit);
     int32_t PlayRingback();
     int32_t StopRingback();
     int32_t PlayWaitingTone();
@@ -61,60 +64,57 @@ public:
     int32_t PlayCallEndedTone(ToneDescriptor type);
     int32_t PlayCallTone(ToneDescriptor type);
     int32_t StopCallTone();
-    void SetVolumeAudible();
-    void SetIsTonePlaying(bool isPlaying);
-    bool GetIsTonePlaying() const;
-    bool IsCurrentCallIms() const; // whether foreground call is ims or not
-    bool IsTonePlaying() const;
-    static bool IsCurrentRinging();
-    static bool IsAudioActive();
-    bool NeedToPlayCallEndedTone(TelCallStates priorState, TelCallStates nextState) const;
-    static void SetAudioInterruptState(AudioInterruptState state);
-    static AudioInterruptState GetAudioInterruptState();
-    AudioDevice GetInitAudioDevice() const;
-    void UpdateCallState();
-    void UpdateMuteState(bool on);
     void TurnOffVoice();
+    void SetVolumeAudible();
+    bool IsCurrentVideoCall() const;
+    bool IsTonePlaying() const;
+    bool IsCurrentRinging() const;
+    bool IsAudioActive() const;
+    bool IsActiveCallExists() const;
+    bool ExistOnlyOneActiveCall() const;
+    bool ExistOnlyOneIncomingCall() const;
+    int32_t SetMute(bool on);
+    int32_t MuteRinger(bool isMute);
+    int32_t GetRingingCallId();
+    AudioDevice GetInitAudioDevice() const;
+    sptr<CallBase> GetCurrentCall() const;
+    sptr<CallBase> GetRingingCall() const;
+    std::set<sptr<CallBase>> GetCallList();
+    AudioInterruptState GetAudioInterruptState();
+    bool UpdateCallStateWhenNoMoreActiveCall();
+    void SetAudioInterruptState(AudioInterruptState state);
     void NewCallCreated(sptr<CallBase> &callObjectPtr) override;
     void CallDestroyed(sptr<CallBase> &callObjectPtr) override;
-    void CallStateUpdated(
-        sptr<CallBase> &callObjectPtr, TelCallStates priorState, TelCallStates nextState) override;
-    void IncomingCallHungUp(sptr<CallBase> &callObjectPtr, bool isSendSms, std::string content) override;
     void IncomingCallActivated(sptr<CallBase> &callObjectPtr) override;
-    sptr<CallBase> GetCurrentCall() const;
-    static void HandleEvent(int32_t event);
-    static bool isAudioInterruptActivated_;
+    void IncomingCallHungUp(sptr<CallBase> &callObjectPtr, bool isSendSms, std::string content) override;
+    void CallStateUpdated(sptr<CallBase> &callObjectPtr, TelCallState priorState, TelCallState nextState) override;
 
 private:
-    uint32_t existOneCall_ = 1;
-    void HandleCallAdded(TelCallStates state);
-    void HandleCallDeleted(TelCallStates state);
-    void UpdateCurrentCall(); // update foreground call
-    void AddCallByState(const std::string &phoneNum, TelCallStates stateType);
-    void DeleteCallByState(const std::string &phoneNum, TelCallStates stateType);
-    void DeleteCall(const std::string &phoneNum, TelCallStates stateType);
+    const uint32_t existOnlyOneCall_ = 1;
+    RingState ringState_ = RingState::STOPPED;
+    void AddCall(sptr<CallBase> &callObjectPtr, TelCallState stateType);
+    void DeleteCall(sptr<CallBase> &callObjectPtr, TelCallState stateType);
+    void HandleCallStateChanged(TelCallState stateType, bool isAdded, CallType callType);
     bool IsBlackNumber(const std::string &phoneNum);
-    void PlayCallEndedTone(CallEndedType type);
+    void PlayCallEndedTone(TelCallState priorState, TelCallState nextState, CallEndedType type);
     sptr<CallBase> GetCallBase(const std::string &phoneNum) const;
-    static AudioInterruptState currentAudioInterruptState_;
-    static bool isRinging_;
+    std::string GetIncomingCallRingtonePath();
+    AudioInterruptState audioInterruptState_ = AudioInterruptState::UN_INTERRUPT;
     bool IsRingingCallExists() const;
     bool IsHoldingCallExists() const;
-    bool IsActiveCallExists() const;
     bool IsEmergencyCallExists() const;
     bool isTonePlaying_;
-    std::string foregroundCallNum_; // foreground call number
+    std::string ringingCallNumber_;
     std::set<std::string> alertingCalls_;
     std::set<std::string> activeCalls_;
-    std::set<std::string> ringingCalls_;
+    std::set<std::string> incomingCalls_;
     std::set<std::string> holdingCalls_;
     std::set<sptr<CallBase>> totalCalls_;
     std::unique_ptr<Ring> ring_;
     std::unique_ptr<Tone> tone_;
-    std::shared_ptr<AppExecFwk::EventRunner> audioEventLoop_;
-    std::shared_ptr<AudioEvent> audioEvent_;
-    static std::shared_ptr<AudioEventHandler> audioEventHandler_;
+    std::unique_ptr<CallStateProcess> callStateManager_;
+    std::unique_ptr<AudioDeviceManager> audioDeviceManager_;
 };
-} // namespace TelephonyCallManager
+} // namespace Telephony
 } // namespace OHOS
 #endif // TELEPHONY_AUDIO_MANAGER_H

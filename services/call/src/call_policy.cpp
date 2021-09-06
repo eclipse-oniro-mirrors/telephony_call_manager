@@ -16,10 +16,10 @@
 #include "call_policy.h"
 
 #include "call_manager_errors.h"
-#include "call_manager_log.h"
+#include "telephony_log_wrapper.h"
 
 namespace OHOS {
-namespace TelephonyCallManager {
+namespace Telephony {
 CallPolicy::CallPolicy() {}
 
 CallPolicy::~CallPolicy() {}
@@ -29,95 +29,122 @@ int32_t CallPolicy::DialPolicy()
     return HasNewCall();
 }
 
-int32_t CallPolicy::AccpetCallPolicy(int32_t callid)
+int32_t CallPolicy::AnswerCallPolicy(int32_t callId)
 {
-    std::list<sptr<CallBase>> activeCallList;
-    GetActiveCallList(activeCallList);
-    if (activeCallList.size() <= onlyOneCall_) {
-        activeCallList.clear();
-        return TELEPHONY_NO_ERROR;
+    if (!IsCallExist(callId)) {
+        TELEPHONY_LOGE("callId is invalid, callId:%{public}d", callId);
+        return CALL_MANAGER_CALLID_INVALID;
     }
-    std::list<sptr<CallBase>>::iterator callIterator;
-    for (callIterator = activeCallList.begin(); callIterator != activeCallList.end(); callIterator++) {
-        if ((*callIterator)->GetCallID() != callid) {
-            (*callIterator)->HoldCallBase();
-        }
+    TelCallState state = GetCallState(callId);
+    if (state != CALL_STATUS_INCOMING && state != CALL_STATUS_WAITING) {
+        TELEPHONY_LOGE("current call state is:%{public}d, accept call not allowed", state);
+        return CALL_MANAGER_ILLEGAL_CALL_OPERATION;
     }
-    activeCallList.clear();
-    return TELEPHONY_NO_ERROR;
+    return TELEPHONY_SUCCESS;
 }
 
-int32_t CallPolicy::RejectCallPolicy()
+int32_t CallPolicy::RejectCallPolicy(int32_t callId)
 {
-    return TELEPHONY_NO_ERROR;
+    if (!IsCallExist(callId)) {
+        TELEPHONY_LOGE("callId is invalid, callId:%{public}d", callId);
+        return CALL_MANAGER_CALLID_INVALID;
+    }
+    TelCallState state = GetCallState(callId);
+    if (state != CALL_STATUS_INCOMING && state != CALL_STATUS_WAITING) {
+        TELEPHONY_LOGE("current call state is:%{public}d, reject call not allowed", state);
+        return CALL_MANAGER_ILLEGAL_CALL_OPERATION;
+    }
+    return TELEPHONY_SUCCESS;
 }
 
-int32_t CallPolicy::HoldCallPolicy()
+int32_t CallPolicy::HoldCallPolicy(int32_t callId)
 {
-    return TELEPHONY_NO_ERROR;
+    sptr<CallBase> call = GetOneCallObject(callId);
+    if (call == nullptr) {
+        TELEPHONY_LOGE("GetOneCallObject failed, this callId is invalid! callId:%{public}d", callId);
+        return CALL_MANAGER_CALLID_INVALID;
+    }
+    if (call->GetCallRunningState() != CallRunningState::CALL_RUNNING_STATE_ACTIVE) {
+        TELEPHONY_LOGE("this call is not activated! callId:%{public}d", callId);
+        return CALL_MANAGER_CALL_IS_NOT_ACTIVATED;
+    }
+    return TELEPHONY_SUCCESS;
 }
 
-int32_t CallPolicy::UnHoldCallPolicy()
+int32_t CallPolicy::UnHoldCallPolicy(int32_t callId)
 {
-    return TELEPHONY_NO_ERROR;
+    sptr<CallBase> call = GetOneCallObject(callId);
+    if (call == nullptr) {
+        TELEPHONY_LOGE("GetOneCallObject failed, this callId is invalid! callId:%{public}d", callId);
+        return CALL_MANAGER_CALLID_INVALID;
+    }
+    if (call->GetCallRunningState() != CallRunningState::CALL_RUNNING_STATE_HOLD) {
+        TELEPHONY_LOGE("this call is not on holding state! callId:%{public}d", callId);
+        return CALL_MANAGER_CALL_IS_NOT_ON_HOLDING;
+    }
+    return TELEPHONY_SUCCESS;
 }
 
-int32_t CallPolicy::HangUpPolicy()
+int32_t CallPolicy::HangUpPolicy(int32_t callId)
 {
-    return TELEPHONY_NO_ERROR;
+    if (!IsCallExist(callId)) {
+        TELEPHONY_LOGE("callId is invalid, callId:%{public}d", callId);
+        return CALL_MANAGER_CALLID_INVALID;
+    }
+    TelCallState state = GetCallState(callId);
+    if (state == CALL_STATUS_IDLE || state == CALL_STATUS_DISCONNECTING || state == CALL_STATUS_DISCONNECTED) {
+        TELEPHONY_LOGE("current call state is:%{public}d, hang up call not allowed", state);
+        return CALL_MANAGER_ILLEGAL_CALL_OPERATION;
+    }
+    return TELEPHONY_SUCCESS;
 }
 
-int32_t CallPolicy::SwapCallPolicy()
+int32_t CallPolicy::SwitchCallPolicy(int32_t &callId)
 {
-    return TELEPHONY_NO_ERROR;
+    std::list<sptr<CallBase>> callList;
+    GetCarrierCallList(callList);
+    if (callList.size() < onlyTwoCall_) {
+        callList.clear();
+        return TELEPHONY_FAIL;
+    }
+    callId = callList.front()->GetCallID();
+    callList.clear();
+    return TELEPHONY_SUCCESS;
 }
 
 int32_t CallPolicy::JoinCallPolicy()
 {
-    return TELEPHONY_NO_ERROR;
+    return TELEPHONY_SUCCESS;
 }
 
 int32_t CallPolicy::GetTransferNumberPolicy()
 {
-    return TELEPHONY_NO_ERROR;
+    return TELEPHONY_SUCCESS;
 }
 
 int32_t CallPolicy::SetTransferNumberPolicy()
 {
-    return TELEPHONY_NO_ERROR;
+    return TELEPHONY_SUCCESS;
 }
 
 int32_t CallPolicy::StartConferencePolicy()
 {
-    return TELEPHONY_NO_ERROR;
+    return TELEPHONY_SUCCESS;
 }
 
 int32_t CallPolicy::InviteToConferencePolicy()
 {
-    return TELEPHONY_NO_ERROR;
+    return TELEPHONY_SUCCESS;
 }
 
 int32_t CallPolicy::KickOutConferencePolicy()
 {
-    return TELEPHONY_NO_ERROR;
+    return TELEPHONY_SUCCESS;
 }
 
 int32_t CallPolicy::LeaveConferencePolicy()
 {
-    return TELEPHONY_NO_ERROR;
+    return TELEPHONY_SUCCESS;
 }
-
-bool CallPolicy::IsPhoneNumberLegal(std::string number)
-{
-    if (number.find("!") != number.npos || number.find("@") != number.npos || number.find("$") != number.npos ||
-        number.find("%") != number.npos || number.find("^") != number.npos || number.find("&") != number.npos ||
-        number.find("-") != number.npos || number.find("+") != number.npos || number.find("_") != number.npos ||
-        number.find("=") != number.npos || number.find("(") != number.npos || number.find(")") != number.npos ||
-        number.find(",") != number.npos || number.find(";") != number.npos || number.find("|") != number.npos) {
-        CALLMANAGER_DEBUG_LOG("invalid phone number!");
-        return false;
-    }
-    return true;
-}
-} // namespace TelephonyCallManager
+} // namespace Telephony
 } // namespace OHOS

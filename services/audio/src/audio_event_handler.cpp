@@ -15,10 +15,10 @@
 
 #include "audio_event_handler.h"
 
-#include "call_manager_log.h"
+#include "telephony_log_wrapper.h"
 
 namespace OHOS {
-namespace TelephonyCallManager {
+namespace Telephony {
 AudioEventHandler::AudioEventHandler(
     const std::shared_ptr<AppExecFwk::EventRunner> &runner, const std::shared_ptr<AudioEvent> &manager)
     : AppExecFwk::EventHandler(runner), audioEvent_(manager)
@@ -33,17 +33,10 @@ AudioEventHandler::~AudioEventHandler() {}
 
 void AudioEventHandler::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    if (event == nullptr) {
-        CALLMANAGER_ERR_LOG("event nullptr");
+    if (event == nullptr || audioEvent_ == nullptr) {
         return;
     }
-    int32_t eventId = event->GetInnerEventId();
-    CALLMANAGER_INFO_LOG("audio event handler process event : %{public}d ", eventId);
-    if (audioEvent_ == nullptr) {
-        CALLMANAGER_ERR_LOG("audio event nullptr");
-        return;
-    }
-    audioEvent_->HandleEvent(eventId);
+    audioEvent_->HandleEvent(event->GetInnerEventId());
 }
-} // namespace TelephonyCallManager
+} // namespace Telephony
 } // namespace OHOS

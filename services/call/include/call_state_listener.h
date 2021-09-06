@@ -15,6 +15,7 @@
 
 #ifndef CALL_STATE_LISTENER_H
 #define CALL_STATE_LISTENER_H
+
 #include <memory>
 #include <mutex>
 #include <set>
@@ -23,7 +24,7 @@
 #include "call_state_listener_base.h"
 
 namespace OHOS {
-namespace TelephonyCallManager {
+namespace Telephony {
 class CallStateListener {
 public:
     CallStateListener();
@@ -33,14 +34,16 @@ public:
     bool RemoveAllObserver();
     void NewCallCreated(sptr<CallBase> &callObjectPtr);
     void CallDestroyed(sptr<CallBase> &callObjectPtr);
-    void CallStateUpdated(sptr<CallBase> &callObjectPtr, TelCallStates priorState, TelCallStates nextState);
+    void CallStateUpdated(sptr<CallBase> &callObjectPtr, TelCallState priorState, TelCallState nextState);
     void IncomingCallHungUp(sptr<CallBase> &callObjectPtr, bool isSendSms, std::string content);
     void IncomingCallActivated(sptr<CallBase> &callObjectPtr);
+    void CallEventUpdated(CallEventInfo &info);
 
 private:
     std::set<sptr<CallStateListenerBase>> listenerSet_;
     std::mutex mutex_;
 };
-} // namespace TelephonyCallManager
+} // namespace Telephony
 } // namespace OHOS
-#endif // CALL_MANAGER_CALL_STATE_LISTENER_H
+
+#endif // CALL_STATE_LISTENER_H

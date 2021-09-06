@@ -15,11 +15,12 @@
 
 #ifndef NET_CALL_BASE_H
 #define NET_CALL_BASE_H
+
 #include <cstdio>
 #include <cstdlib>
 
 namespace OHOS {
-namespace TelephonyCallManager {
+namespace Telephony {
 class NetCallBase {
 public:
     NetCallBase();
@@ -33,7 +34,7 @@ public:
     int GetNetCallType();
     int ChangeNetCallType();
 };
-} // namespace TelephonyCallManager
+} // namespace Telephony
 } // namespace OHOS
 
 #endif // NET_CALL_BASE_H

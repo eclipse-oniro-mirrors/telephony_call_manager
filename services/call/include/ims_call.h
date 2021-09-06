@@ -15,26 +15,41 @@
 
 #ifndef IMS_CALL_H
 #define IMS_CALL_H
-#include "call_base.h"
+
+#include "carrier_call.h"
 #include "net_call_base.h"
 
 namespace OHOS {
-namespace TelephonyCallManager {
-class IMSCall : public CallBase, public NetCallBase {
+namespace Telephony {
+class IMSCall : public CarrierCall, public NetCallBase {
 public:
-    IMSCall(const CallInfo &info);
+    IMSCall();
     ~IMSCall();
 
-    int32_t DialCall();
+    void OutCallInit(const CallReportInfo &info, AppExecFwk::PacMap &extras, int32_t callId);
+    void InCallInit(const CallReportInfo &info, int32_t callId);
+    int32_t DialingProcess() override;
+    int32_t AnswerCall(int32_t videoState) override;
+    int32_t RejectCall(bool isSendSms, std::string &content) override;
+    int32_t HangUpCall() override;
+    int32_t HoldCall() override;
+    int32_t UnHoldCall() override;
+    int32_t SwitchCall() override;
+    void GetCallAttributeInfo(CallAttributeInfo &info) override;
+    int32_t CombineConference() override;
+    int32_t CanCombineConference() override;
+    int32_t SubCallCombineToConference() override;
+    int32_t SubCallSeparateFromConference() override;
+    int32_t CanSeparateConference() override;
+    int32_t GetMainCallId() override;
+    std::vector<std::u16string> GetSubCallIdList() override;
+    std::vector<std::u16string> GetCallIdListForConference() override;
 
-    int32_t UpgradeCall();
-    int32_t DownGradeCall();
-    int32_t SetVoLTE();
-    int32_t SetWifiCalling();
-    int32_t SetWifiCallingMode();
-    int32_t SetVoLTEStrongMode();
+private:
+    sptr<CallBase> conferenceHost_;
+    sptr<CallBase> conferencePartner_;
 };
-} // namespace TelephonyCallManager
+} // namespace Telephony
 } // namespace OHOS
 
 #endif // IMS_CALL_H
