@@ -15,14 +15,13 @@
 
 #ifndef TONE_H
 #define TONE_H
+
 #include <memory>
 
 #include "audio_proxy.h"
 
-#define TONE_DURATION 3000 // default tone play duration , in millisecond
-
 namespace OHOS {
-namespace TelephonyCallManager {
+namespace Telephony {
 enum ToneDescriptor {
     TONE_UNKNOWN = 0,
     TONE_ENGAGED,
@@ -31,12 +30,24 @@ enum ToneDescriptor {
     TONE_RING_BACK,
     TONE_NO_SERVICE,
     TONE_INVALID_NUMBER,
+    TONE_CALL_RECORDING,
+    DTMF_DIGIT_0,
+    DTMF_DIGIT_1,
+    DTMF_DIGIT_2,
+    DTMF_DIGIT_3,
+    DTMF_DIGIT_4,
+    DTMF_DIGIT_5,
+    DTMF_DIGIT_6,
+    DTMF_DIGIT_7,
+    DTMF_DIGIT_8,
+    DTMF_DIGIT_9,
+    DTMF_DIGIT_P,
+    DTMF_DIGIT_W
 };
-enum ToneState { STATE_OFF = 0, STATE_ON, STATE_STOPPED };
-struct ToneData {
-    int toneDescriptor;
-    int duration;
-    int volume;
+struct ToneStream {
+    ToneDescriptor toneDescriptor;
+    int32_t duration;
+    int32_t volume;
 };
 
 /**
@@ -54,13 +65,15 @@ public:
     int32_t Release();
     static void SetDurationMs(int32_t duration);
     static int32_t GetDurationMs();
+    static ToneDescriptor ConvertDigitToTone(char digit);
 
 private:
+    const static int32_t TONE_DURATION = 3000; // default tone play duration , in millisecond
     ToneDescriptor currentToneDescriptor_;
     static int32_t toneDuration_;
     bool isTonePlaying_;
     bool isCreateComplete_; // whether audio resource create complete or not
 };
-} // namespace TelephonyCallManager
+} // namespace Telephony
 } // namespace OHOS
-#endif // !TONE_H
+#endif // TONE_H

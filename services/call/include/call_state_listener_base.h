@@ -15,6 +15,7 @@
 
 #ifndef CALL_STATE_LISTENER_BASE_H
 #define CALL_STATE_LISTENER_BASE_H
+
 #include <cstdio>
 #include <memory>
 #include <string>
@@ -24,16 +25,19 @@
 #include "call_base.h"
 
 namespace OHOS {
-namespace TelephonyCallManager {
+namespace Telephony {
 class CallStateListenerBase : public RefBase {
 public:
     virtual ~CallStateListenerBase() {}
-    virtual void NewCallCreated(sptr<CallBase> &callObjectPtr);
-    virtual void CallDestroyed(sptr<CallBase> &callObjectPtr);
-    virtual void CallStateUpdated(sptr<CallBase> &callObjectPtr, TelCallStates priorState, TelCallStates nextState);
-    virtual void IncomingCallHungUp(sptr<CallBase> &callObjectPtr, bool isSendSms, std::string content);
-    virtual void IncomingCallActivated(sptr<CallBase> &callObjectPtr);
+    virtual void NewCallCreated(sptr<CallBase> &callObjectPtr) {}
+    virtual void CallDestroyed(sptr<CallBase> &callObjectPtr) {}
+    virtual void CallStateUpdated(sptr<CallBase> &callObjectPtr, TelCallState priorState, TelCallState nextState)
+    {}
+    virtual void IncomingCallHungUp(sptr<CallBase> &callObjectPtr, bool isSendSms, std::string content) {}
+    virtual void IncomingCallActivated(sptr<CallBase> &callObjectPtr) {}
+    virtual void CallEventUpdated(CallEventInfo &info) {}
 };
-} // namespace TelephonyCallManager
+} // namespace Telephony
 } // namespace OHOS
-#endif // CALL_MANAGER_CALL_STATE_LISTENER_BASE_H
+
+#endif // CALL_STATE_LISTENER_BASE_H

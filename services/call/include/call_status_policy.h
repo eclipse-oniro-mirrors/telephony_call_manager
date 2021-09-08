@@ -15,12 +15,13 @@
 
 #ifndef CALL_STATUS_POLICY_H
 #define CALL_STATUS_POLICY_H
+
 #include "call_manager_errors.h"
 
 #include "call_object_manager.h"
 
 namespace OHOS {
-namespace TelephonyCallManager {
+namespace Telephony {
 class CallStatusPolicy : public CallObjectManager {
 public:
     CallStatusPolicy();
@@ -36,7 +37,7 @@ public:
     int32_t IdleHandlePolicy();
     int32_t FilterResultsDispose(sptr<CallBase> call);
 };
-} // namespace TelephonyCallManager
+} // namespace Telephony
 } // namespace OHOS
 
-#endif // CALL_MANAGER_CALL_STATUS_POLICY_H
+#endif // CALL_STATUS_POLICY_H

@@ -15,6 +15,7 @@
 
 #ifndef AUDIO_EVENT_HANDLER_H
 #define AUDIO_EVENT_HANDLER_H
+
 #include <memory>
 
 #include "event_handler.h"
@@ -23,7 +24,7 @@
 #include "audio_event.h"
 
 namespace OHOS {
-namespace TelephonyCallManager {
+namespace Telephony {
 /**
  * @class AudioEventHandler
  * handle call state event and audio device event.
@@ -39,6 +40,6 @@ public:
 private:
     std::shared_ptr<AudioEvent> audioEvent_;
 };
-} // namespace TelephonyCallManager
+} // namespace Telephony
 } // namespace OHOS
 #endif // AUDIO_EVENT_HANDLER_H

@@ -16,52 +16,106 @@
 #include "ims_call.h"
 
 #include "call_manager_errors.h"
-#include "call_manager_log.h"
+#include "telephony_log_wrapper.h"
 
 namespace OHOS {
-namespace TelephonyCallManager {
-IMSCall::IMSCall(const CallInfo &info) : CallBase(info) {}
+namespace Telephony {
+IMSCall::IMSCall() {}
 
 IMSCall::~IMSCall() {}
 
-int32_t IMSCall::DialCall()
+void IMSCall::OutCallInit(const CallReportInfo &info, AppExecFwk::PacMap &extras, int32_t callId)
 {
-    int32_t ret = TELEPHONY_FAIL;
-    ret = DialCallBase();
-    if (ret == TELEPHONY_NO_ERROR) {
-        callState_ = CallStateType::CALL_STATE_ACTIVE_TYPE;
-    }
-    return ret;
+    InitCarrierOutCallInfo(info, extras, callId);
+    callType_ = CallType::TYPE_IMS;
 }
 
-int32_t IMSCall::UpgradeCall()
+void IMSCall::InCallInit(const CallReportInfo &info, int32_t callId)
 {
-    return TELEPHONY_NO_ERROR;
+    InitCarrierInCallInfo(info, callId);
+    callType_ = CallType::TYPE_IMS;
 }
 
-int32_t IMSCall::DownGradeCall()
+int32_t IMSCall::DialingProcess()
 {
-    return TELEPHONY_NO_ERROR;
+    return CarrierDialingProcess();
 }
 
-int32_t IMSCall::SetVoLTE()
+int32_t IMSCall::AnswerCall(int32_t videoState)
 {
-    return TELEPHONY_NO_ERROR;
+    return CarrierAcceptCall(videoState);
 }
 
-int32_t IMSCall::SetWifiCalling()
+int32_t IMSCall::RejectCall(bool isSendSms, std::string &content)
 {
-    return TELEPHONY_NO_ERROR;
+    return CarrierRejectCall(isSendSms, content);
 }
 
-int32_t IMSCall::SetWifiCallingMode()
+int32_t IMSCall::HangUpCall()
 {
-    return TELEPHONY_NO_ERROR;
+    return CarrierHangUpCall();
 }
 
-int32_t IMSCall::SetVoLTEStrongMode()
+int32_t IMSCall::HoldCall()
 {
-    return TELEPHONY_NO_ERROR;
+    return CarrierHoldCall();
 }
-} // namespace TelephonyCallManager
+
+int32_t IMSCall::UnHoldCall()
+{
+    return CarrierUnHoldCall();
+}
+
+int32_t IMSCall::SwitchCall()
+{
+    return CarrierSwitchCall();
+}
+
+void IMSCall::GetCallAttributeInfo(CallAttributeInfo &info)
+{
+    GetCallAttributeCarrierInfo(info);
+}
+
+int32_t IMSCall::CombineConference()
+{
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t IMSCall::CanCombineConference()
+{
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t IMSCall::SubCallCombineToConference()
+{
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t IMSCall::SubCallSeparateFromConference()
+{
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t IMSCall::CanSeparateConference()
+{
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t IMSCall::GetMainCallId()
+{
+    return TELEPHONY_SUCCESS;
+}
+
+std::vector<std::u16string> IMSCall::GetSubCallIdList()
+{
+    std::vector<std::u16string> vec;
+    return vec;
+}
+
+std::vector<std::u16string> IMSCall::GetCallIdListForConference()
+{
+    std::vector<std::u16string> vec;
+    return vec;
+}
+} // namespace Telephony
 } // namespace OHOS

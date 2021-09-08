@@ -36,10 +36,12 @@
 ├─ sa_profile                              # 启动配置文件
 ├─ services                                # 服务内部代码
 │  ├─ audio                                # 音频管理相关代码
+│  ├─ bluetooth                            # 蓝牙通话相关代码
 │  ├─ call                                 # 通话业务相关代码
 │  ├─ call_manager_service                 # 进程服务管理相关代码
-│  ├─ telephony_base_interaction           # 电话核心服务交互相关代码
-│  └─ ui_interaction                       # UI交互相关代码
+│  ├─ call_setting                         # 通话设置相关代码
+│  ├─ telephony_interaction                # 电话核心服务交互相关代码
+│  └─ call_ui_interaction                  # UI交互相关代码
 ├─ test                                    # 单元测试相关代码
 └─ utils                                   # 通用工具类
 ```
