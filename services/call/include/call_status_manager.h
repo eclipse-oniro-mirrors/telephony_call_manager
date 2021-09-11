@@ -22,7 +22,7 @@
 #include "call_status_policy.h"
 
 namespace OHOS {
-namespace TelephonyCallManager {
+namespace Telephony {
 class CallStatusManager : public CallStatusPolicy {
 public:
     CallStatusManager();
@@ -31,6 +31,7 @@ public:
     int32_t UnInit();
     int32_t HandleCallReportInfo(const CallReportInfo &info);
     int32_t HandleCallsReportInfo(const CallsReportInfo &info);
+    int32_t HandleEventResultReportInfo(const CellularCallEventInfo &info);
 
 private:
     int32_t IncomingHandle(const CallReportInfo &info);
@@ -41,13 +42,10 @@ private:
     int32_t AlertHandle(const CallReportInfo &info);
     int32_t DisconnectingHandle(const CallReportInfo &info);
     int32_t DisconnectedHandle(const CallReportInfo &info);
-    int32_t IdleHandle(const CallReportInfo &info);
 
     int32_t ConferenceHandle();
-
-    int32_t InitCallInfo(CallInfo &callInfo, const CallReportInfo &info);
-    int32_t CreateCall(const CallType &callType, sptr<CallBase> &call, const CallInfo &info);
-    int32_t UpdateCallState(sptr<CallBase> &call, TelCallStates nextState);
+    int32_t CreateNewCall(const CallReportInfo &info, int32_t callId);
+    int32_t UpdateCallState(sptr<CallBase> &call, TelCallState nextState);
     int32_t ToSpeakerPhone(sptr<CallBase> &call);
     int32_t TurnOffMute(sptr<CallBase> &call);
 
@@ -55,6 +53,7 @@ private:
     CallReportInfo callReportInfo_;
     CallsReportInfo callsReportInfo_;
 };
-} // namespace TelephonyCallManager
+} // namespace Telephony
 } // namespace OHOS
+
 #endif // CALL_STATUS_MANAGER_H

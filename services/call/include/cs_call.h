@@ -15,19 +15,36 @@
 
 #ifndef CS_CALL_H
 #define CS_CALL_H
+
+#include "cs_conference_base.h"
 #include "carrier_call.h"
 
 namespace OHOS {
-namespace TelephonyCallManager {
-class CSCall : public CarrierCall {
+namespace Telephony {
+class CSCall : public CarrierCall, public CsConferenceBase {
 public:
-    CSCall(const CallInfo &info);
+    CSCall();
     ~CSCall();
-
-    int32_t DialCall();
-    int32_t SplitCall();
+    void OutCallInit(const CallReportInfo &info, AppExecFwk::PacMap &extras, int32_t callId);
+    void InCallInit(const CallReportInfo &info, int32_t callId);
+    int32_t DialingProcess() override;
+    int32_t AnswerCall(int32_t videoState) override;
+    int32_t RejectCall(bool isSendSms, std::string &content) override;
+    int32_t HangUpCall() override;
+    int32_t HoldCall() override;
+    int32_t UnHoldCall() override;
+    int32_t SwitchCall() override;
+    void GetCallAttributeInfo(CallAttributeInfo &info) override;
+    int32_t CombineConference() override;
+    int32_t CanCombineConference() override;
+    int32_t SubCallCombineToConference() override;
+    int32_t SubCallSeparateFromConference() override;
+    int32_t CanSeparateConference() override;
+    int32_t GetMainCallId() override;
+    std::vector<std::u16string> GetSubCallIdList() override;
+    std::vector<std::u16string> GetCallIdListForConference() override;
 };
-} // namespace TelephonyCallManager
+} // namespace Telephony
 } // namespace OHOS
 
 #endif // CS_CALL_H

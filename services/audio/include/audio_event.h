@@ -15,13 +15,14 @@
 
 #ifndef AUDIO_EVENT_H
 #define AUDIO_EVENT_H
+
 #include <cstdint>
 
 #include "audio_device_manager.h"
-#include "call_state_manager.h"
+#include "call_state_process.h"
 
 namespace OHOS {
-namespace TelephonyCallManager {
+namespace Telephony {
 /**
  * @class AudioEvent
  * audio event manager , handle call state events and audio device events.
@@ -31,14 +32,15 @@ public:
     AudioEvent();
     virtual ~AudioEvent();
     void Init();
-    void HandleEvent(int32_t event);
-    void HandleCallStateEvent(int32_t event);
-    void HandleAudioDeviceEvent(int32_t event);
+    bool HandleEvent(int32_t event);
+    bool SetAudioDevice(AudioDevice device);
+    bool HandleCallStateEvent(int32_t event);
+    bool HandleAudioDeviceEvent(int32_t event);
 
 private:
-    std::unique_ptr<CallStateManager> callStateManager_;
+    std::unique_ptr<CallStateProcess> callStateManager_;
     std::unique_ptr<AudioDeviceManager> audioDeviceManager_;
 };
-} // namespace TelephonyCallManager
+} // namespace Telephony
 } // namespace OHOS
 #endif // AUDIO_EVENT_MANAGER_H

@@ -15,19 +15,43 @@
 
 #ifndef OTT_CALL_H
 #define OTT_CALL_H
+
 #include "call_base.h"
 #include "net_call_base.h"
 
 namespace OHOS {
-namespace TelephonyCallManager {
+namespace Telephony {
 class OTTCall : public CallBase, public NetCallBase {
 public:
-    OTTCall(const CallInfo &info);
+    OTTCall();
     ~OTTCall();
 
-    int32_t DialCall();
+    void OutCallInit(const CallReportInfo &info, AppExecFwk::PacMap &extras, int32_t callId);
+    void InCallInit(const CallReportInfo &info, int32_t callId);
+    int32_t DialingProcess() override;
+    int32_t AnswerCall(int32_t videoState) override;
+    int32_t RejectCall(bool isSendSms, std::string &content) override;
+    int32_t HangUpCall() override;
+    int32_t HoldCall() override;
+    int32_t UnHoldCall() override;
+    int32_t SwitchCall() override;
+    void GetCallAttributeInfo(CallAttributeInfo &info) override;
+    bool GetEmergencyState() override;
+    int32_t StartDtmf(std::string &phoneNum, char str) override;
+    int32_t StopDtmf(std::string &phoneNum) override;
+    int32_t SendDtmf(std::string &phoneNum, char str) override;
+    int32_t SendBurstDtmf(std::string &phoneNum, std::string str, int32_t on, int32_t off) override;
+    int32_t GetSlotId() override;
+    int32_t CombineConference() override;
+    int32_t CanCombineConference() override;
+    int32_t SubCallCombineToConference() override;
+    int32_t SubCallSeparateFromConference() override;
+    int32_t CanSeparateConference() override;
+    int32_t GetMainCallId() override;
+    std::vector<std::u16string> GetSubCallIdList() override;
+    std::vector<std::u16string> GetCallIdListForConference() override;
 };
-} // namespace TelephonyCallManager
+} // namespace Telephony
 } // namespace OHOS
 
 #endif // OTT_CALL_H

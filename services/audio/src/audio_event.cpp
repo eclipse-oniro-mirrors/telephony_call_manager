@@ -15,54 +15,53 @@
 
 #include "audio_event.h"
 
-#include "call_manager_log.h"
+#include "telephony_log_wrapper.h"
 
 #include "audio_control_manager.h"
 
 namespace OHOS {
-namespace TelephonyCallManager {
+namespace Telephony {
 AudioEvent::AudioEvent() : callStateManager_(nullptr), audioDeviceManager_(nullptr) {}
 
 AudioEvent::~AudioEvent() {}
 
 void AudioEvent::Init()
 {
-    CALLMANAGER_INFO_LOG("audio event init");
-    callStateManager_ = std::make_unique<CallStateManager>();
+    callStateManager_ = std::make_unique<CallStateProcess>();
     if (callStateManager_ == nullptr) {
-        CALLMANAGER_ERR_LOG("call state manager nullptr");
+        TELEPHONY_LOGE("call state manager nullptr");
         return;
     }
     audioDeviceManager_ = std::make_unique<AudioDeviceManager>();
     if (audioDeviceManager_ == nullptr) {
-        CALLMANAGER_ERR_LOG("audio device manager nullptr");
+        TELEPHONY_LOGE("audio device manager nullptr");
         return;
     }
     callStateManager_->Init();
     audioDeviceManager_->Init();
 }
 
-void AudioEvent::HandleEvent(int32_t event)
+bool AudioEvent::HandleEvent(int32_t event)
 {
-    CALLMANAGER_INFO_LOG("audio event process event : %{public}d", event);
+    bool result = false;
     switch (event) {
-        case CallStateManager::SWITCH_CS_CALL:
-        case CallStateManager::SWITCH_IMS_CALL:
-        case CallStateManager::SWITCH_RINGING:
-        case CallStateManager::SWITCH_HOLDING:
-        case CallStateManager::ABANDON_AUDIO:
-        case CallStateManager::COMING_CS_CALL:
-        case CallStateManager::COMING_IMS_CALL:
-        case CallStateManager::COMING_RINGING_CALL:
-        case CallStateManager::NONE_ALERTING_OR_ACTIVE_CALLS:
-        case CallStateManager::NONE_RINGING_CALLS:
-            HandleCallStateEvent(event);
+        case CallStateProcess::SWITCH_CS_CALL_STATE:
+        case CallStateProcess::SWITCH_IMS_CALL_STATE:
+        case CallStateProcess::SWITCH_RINGING_STATE:
+        case CallStateProcess::SWITCH_HOLDING_STATE:
+        case CallStateProcess::SWITCH_AUDIO_INACTIVE_STATE:
+        case CallStateProcess::NEW_ACTIVE_CS_CALL:
+        case CallStateProcess::NEW_ACTIVE_IMS_CALL:
+        case CallStateProcess::NEW_INCOMING_CALL:
+        case CallStateProcess::NO_MORE_ACTIVE_CALL:
+        case CallStateProcess::NO_MORE_INCOMING_CALL:
+            result = HandleCallStateEvent(event);
             break;
-        case AudioDeviceManager::SWITCH_DEVICE_BLUETOOTH:
-        case AudioDeviceManager::SWITCH_DEVICE_WIRED_HEADSET:
-        case AudioDeviceManager::SWITCH_DEVICE_SPEAKER:
-        case AudioDeviceManager::SWITCH_DEVICE_EARPIECE:
-        case AudioDeviceManager::SWITCH_INACTIVE:
+        case AudioDeviceManager::ENABLE_DEVICE_BLUETOOTH:
+        case AudioDeviceManager::ENABLE_DEVICE_WIRED_HEADSET:
+        case AudioDeviceManager::ENABLE_DEVICE_SPEAKER:
+        case AudioDeviceManager::ENABLE_DEVICE_MIC:
+        case AudioDeviceManager::DEVICES_INACTIVE:
         case AudioDeviceManager::WIRED_HEADSET_AVAILABLE:
         case AudioDeviceManager::WIRED_HEADSET_UNAVAILABLE:
         case AudioDeviceManager::BLUETOOTH_SCO_AVAILABLE:
@@ -71,30 +70,40 @@ void AudioEvent::HandleEvent(int32_t event)
         case AudioDeviceManager::AUDIO_UN_INTERRUPT:
         case AudioDeviceManager::AUDIO_RINGING:
         case AudioDeviceManager::INIT_AUDIO_DEVICE:
-            HandleAudioDeviceEvent(event);
+            result = HandleAudioDeviceEvent(event);
             break;
         default:
-            CALLMANAGER_ERR_LOG("invalid audio event");
+            TELEPHONY_LOGE("invalid audio event");
             break;
     }
+    return result;
 }
 
-void AudioEvent::HandleCallStateEvent(int32_t event)
+bool AudioEvent::HandleCallStateEvent(int32_t event)
 {
     if (callStateManager_ == nullptr) {
-        CALLMANAGER_ERR_LOG("call state manager nullptr");
-        return;
+        TELEPHONY_LOGE("call state manager nullptr");
+        return false;
     }
-    callStateManager_->HandleEvent(event);
+    return callStateManager_->ProcessEvent(event);
 }
 
-void AudioEvent::HandleAudioDeviceEvent(int32_t event)
+bool AudioEvent::HandleAudioDeviceEvent(int32_t event)
 {
     if (audioDeviceManager_ == nullptr) {
-        CALLMANAGER_ERR_LOG("audio device manager nullptr");
-        return;
+        TELEPHONY_LOGE("audio device manager nullptr");
+        return false;
     }
-    audioDeviceManager_->HandleEvent(event);
+    return audioDeviceManager_->ProcessEvent(event);
 }
-} // namespace TelephonyCallManager
+
+bool AudioEvent::SetAudioDevice(AudioDevice device)
+{
+    if (audioDeviceManager_ == nullptr) {
+        TELEPHONY_LOGE("audio device manager nullptr");
+        return false;
+    }
+    return audioDeviceManager_->SwitchDevice(device);
+}
+} // namespace Telephony
 } // namespace OHOS

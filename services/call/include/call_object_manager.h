@@ -15,6 +15,7 @@
 
 #ifndef CALL_OBJECT_MANAGER_H
 #define CALL_OBJECT_MANAGER_H
+
 #include <cstdio>
 #include <cstdlib>
 #include <list>
@@ -27,34 +28,41 @@
 #include "common_type.h"
 
 namespace OHOS {
-namespace TelephonyCallManager {
+namespace Telephony {
 class CallObjectManager {
 public:
     CallObjectManager();
     virtual ~CallObjectManager();
 
-    static int32_t AddOneCallObject(sptr<CallBase> call);
+    static int32_t AddOneCallObject(sptr<CallBase> &call);
     static int32_t DeleteOneCallObject(int32_t callId);
-    static void DeleteOneCallObject(sptr<CallBase> call);
+    static void DeleteOneCallObject(sptr<CallBase> &call);
     static sptr<CallBase> GetOneCallObject(int32_t callId);
     static sptr<CallBase> GetOneCallObject(std::string &phoneNumber);
     int32_t HasNewCall();
-    int32_t GetActiveCallList(std::list<sptr<CallBase>> &list);
-    int32_t GetHoldCallList(std::list<sptr<CallBase>> &list);
+    bool IsNewCallAllowedCreate();
+    static int32_t GetActiveCallList(std::list<sptr<CallBase>> &list);
+    static int32_t GetHoldCallList(std::list<sptr<CallBase>> &list);
+    int32_t GetCarrierCallList(std::list<sptr<CallBase>> &list);
     bool HasRingingMaximum();
     bool HasDialingMaximum();
     bool HasEmergencyCall();
-    int32_t GetNextCallId();
+    static int32_t GetNewCallId();
+    bool IsCallExist(int32_t callId);
     bool IsCallExist(std::string &phoneNumber);
-    bool HasCallExist();
+    static bool HasCallExist();
     bool HasRingingCall();
+    TelCallState GetCallState(int32_t callId);
+    std::list<sptr<CallBase>> GetCallList();
+    static bool IsCallExist(CallType type, TelCallState callState);
 
 private:
     static std::list<sptr<CallBase>> callObjectPtrList_;
     static std::mutex listMutex_;
     static int32_t callId_;
+    static uint32_t maxCallCount_;
 };
-} // namespace TelephonyCallManager
+} // namespace Telephony
 } // namespace OHOS
 
 #endif // CALL_OBJECT_MANAGER_H

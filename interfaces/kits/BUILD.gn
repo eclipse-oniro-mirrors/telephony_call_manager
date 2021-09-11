@@ -13,25 +13,32 @@
 
 import("//build/ohos.gni")
 SUBSYSTEM_DIR = "//base/telephony"
-CALL_MANAGER_API_DIR = "$SUBSYSTEM_DIR/call_manager/interfaces/kits"
-ohos_shared_library("tel_call_manager_api") {
-  sources = [
-    "$CALL_MANAGER_API_DIR/src/call_manager.cpp",
-    "$SUBSYSTEM_DIR/core_service/interfaces/innerkits/call_manager/proxy/call_manager_service_proxy.cpp",
-  ]
-
+ohos_shared_library("telephony_call") {
   include_dirs = [
-    "$CALL_MANAGER_API_DIR/include",
+    "//third_party/node/src",
+    "js/napi/include",
+    "native/include",
+    "//utils/native/base/include",
     "$SUBSYSTEM_DIR/core_service/interfaces/innerkits/call_manager/common",
     "$SUBSYSTEM_DIR/core_service/interfaces/innerkits/call_manager/proxy",
     "$SUBSYSTEM_DIR/core_service/interfaces/innerkits/cellular_call/common",
     "$SUBSYSTEM_DIR/core_service/interfaces/innerkits/cellular_call/proxy",
-    "$SUBSYSTEM_DIR/ril_adapter/interfaces/innerkits",
-    "$SUBSYSTEM_DIR/call_manager/utils/include",
+  ]
+
+  sources = [
+    "$SUBSYSTEM_DIR/core_service/interfaces/innerkits/call_manager/proxy/call_manager_service_proxy.cpp",
+    "js/napi/src/napi_call_ability_callback.cpp",
+    "js/napi/src/napi_call_ability_handler.cpp",
+    "js/napi/src/napi_call_manager.cpp",
+    "js/napi/src/native_module_call_manager.cpp",
+    "native/src/call_ability_callback.cpp",
+    "native/src/call_ability_callback_stub.cpp",
+    "native/src/call_manager_proxy.cpp",
   ]
 
   deps = [
-    "$SUBSYSTEM_DIR/call_manager:tel_call_manager",
+    "$SUBSYSTEM_DIR/core_service/common:libtelephony_common",
+    "//foundation/ace/napi:ace_napi",
     "//utils/native/base:utils",
   ]
 
@@ -43,6 +50,11 @@ ohos_shared_library("tel_call_manager_api") {
     "samgr_L2:samgr_proxy",
   ]
 
+  defines = [
+    "TELEPHONY_LOG_TAG = \"CallManager\"",
+    "LOG_DOMAIN = 0xD002B01",
+  ]
+
   if (is_standard_system) {
     external_deps += [ "hiviewdfx_hilog_native:libhilog" ]
   } else {
@@ -51,4 +63,5 @@ ohos_shared_library("tel_call_manager_api") {
 
   part_name = "call_manager"
   subsystem_name = "telephony"
+  relative_install_dir = "module"
 }

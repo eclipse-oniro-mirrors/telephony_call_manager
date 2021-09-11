@@ -36,10 +36,12 @@ The following figure shows the architecture of the Call Manager module.
 ├─ sa_profile                              # SA profile
 ├─ services                                # Service code
 │  ├─ audio                                # Audio Manager code
+│  ├─ bluetooth                            # Bluetooth Manager code
 │  ├─ call                                 # Call Manager code
 │  ├─ call_manager_service                 # CallManagerService code
-│  ├─ telephony_base_interaction           # Telephony core service code
-│  └─ ui_interaction                       # CallServiceAbility code
+│  ├─ call_setting                         # CallSetting code
+│  ├─ telephony_interaction                # Telephony core service code
+│  └─ call_ui_interaction                  # CallServiceAbility code
 ├─ test                                    # Unit test code
 └─ utils                                   # Utilities
 ```
