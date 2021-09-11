@@ -15,25 +15,26 @@
 
 #ifndef CALL_POLICY_H
 #define CALL_POLICY_H
+
 #include <string>
 #include <memory>
 
 #include "call_object_manager.h"
 
 namespace OHOS {
-namespace TelephonyCallManager {
+namespace Telephony {
 class CallPolicy : public CallObjectManager {
 public:
     CallPolicy();
     ~CallPolicy();
 
     int32_t DialPolicy();
-    int32_t AccpetCallPolicy(int32_t callid);
-    int32_t RejectCallPolicy();
-    int32_t HoldCallPolicy();
-    int32_t UnHoldCallPolicy();
-    int32_t HangUpPolicy();
-    int32_t SwapCallPolicy();
+    int32_t AnswerCallPolicy(int32_t callId);
+    int32_t RejectCallPolicy(int32_t callId);
+    int32_t HoldCallPolicy(int32_t callId);
+    int32_t UnHoldCallPolicy(int32_t callId);
+    int32_t HangUpPolicy(int32_t callId);
+    int32_t SwitchCallPolicy(int32_t &callId);
     int32_t JoinCallPolicy();
     int32_t GetTransferNumberPolicy();
     int32_t SetTransferNumberPolicy();
@@ -41,12 +42,11 @@ public:
     int32_t InviteToConferencePolicy();
     int32_t KickOutConferencePolicy();
     int32_t LeaveConferencePolicy();
-    bool IsPhoneNumberLegal(std::string number);
 
 private:
-    uint32_t onlyOneCall_ = 1;
+    uint32_t onlyTwoCall_ = 2;
 };
-} // namespace TelephonyCallManager
+} // namespace Telephony
 } // namespace OHOS
 
 #endif // CALL_POLICY_H

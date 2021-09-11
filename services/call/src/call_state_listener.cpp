@@ -15,10 +15,10 @@
 
 #include "call_state_listener.h"
 
-#include "call_manager_log.h"
+#include "telephony_log_wrapper.h"
 
 namespace OHOS {
-namespace TelephonyCallManager {
+namespace Telephony {
 CallStateListener::CallStateListener()
 {
     listenerSet_.clear();
@@ -82,9 +82,10 @@ void CallStateListener::CallDestroyed(sptr<CallBase> &callObjectPtr)
 }
 
 void CallStateListener::CallStateUpdated(
-    sptr<CallBase> &callObjectPtr, TelCallStates priorState, TelCallStates nextState)
+    sptr<CallBase> &callObjectPtr, TelCallState priorState, TelCallState nextState)
 {
     if (callObjectPtr == nullptr) {
+        TELEPHONY_LOGE("callObjectPtr is nullptr");
         return;
     }
     std::lock_guard<std::mutex> lock(mutex_);
@@ -114,5 +115,13 @@ void CallStateListener::IncomingCallActivated(sptr<CallBase> &callObjectPtr)
         observer->IncomingCallActivated(callObjectPtr);
     }
 }
-} // namespace TelephonyCallManager
+
+void CallStateListener::CallEventUpdated(CallEventInfo &info)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    for (auto &observer : listenerSet_) {
+        observer->CallEventUpdated(info);
+    }
+}
+} // namespace Telephony
 } // namespace OHOS

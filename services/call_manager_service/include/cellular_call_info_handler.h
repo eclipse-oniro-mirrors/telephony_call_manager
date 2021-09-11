@@ -15,6 +15,7 @@
 
 #ifndef CELLULAR_CALL_INFO_HANDLER_H
 #define CELLULAR_CALL_INFO_HANDLER_H
+
 #include <memory>
 #include <mutex>
 
@@ -25,7 +26,7 @@
 #include "call_status_manager.h"
 
 namespace OHOS {
-namespace TelephonyCallManager {
+namespace Telephony {
 class CellularCallInfoHandler : public AppExecFwk::EventHandler {
 public:
     CellularCallInfoHandler(const std::shared_ptr<AppExecFwk::EventRunner> &runner);
@@ -34,6 +35,11 @@ public:
     void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event);
 
 private:
+    using CallManagerServiceFunc = void (CellularCallInfoHandler::*)(const AppExecFwk::InnerEvent::Pointer &event);
+    void ReportCallInfo(const AppExecFwk::InnerEvent::Pointer &event);
+    void ReportCallsInfo(const AppExecFwk::InnerEvent::Pointer &event);
+    void ReportEventInfo(const AppExecFwk::InnerEvent::Pointer &event);
+    std::map<uint32_t, CallManagerServiceFunc> memberFuncMap_;
     std::unique_ptr<CallStatusManager> callStatusManagerPtr_;
 };
 
@@ -43,10 +49,12 @@ public:
     void Start();
     int32_t UpdateCallReportInfo(const CallReportInfo &info);
     int32_t UpdateCallsReportInfo(const CallsReportInfo &info);
+    int32_t UpdateEventResultInfo(const CellularCallEventInfo &info);
 
-    enum {
+    enum CellularCallInfoInterfaceType {
         HANDLER_UPDATE_CELLULAR_CALL_INFO = 0,
         HANDLER_UPDATE_CELLULAR_CS_CALL_INFO,
+        HANDLER_UPDATE_CELLULAR_EVENT_RESULT_INFO,
     };
 
 private:
@@ -54,7 +62,7 @@ private:
     std::shared_ptr<CellularCallInfoHandler> handler_;
     std::mutex mutex_;
 };
-} // namespace TelephonyCallManager
+} // namespace Telephony
 } // namespace OHOS
 
 #endif // CELLULAR_CALL_INFO_HANDLER_H

@@ -18,37 +18,37 @@
 #include "call_manager_errors.h"
 
 namespace OHOS {
-namespace TelephonyCallManager {
+namespace Telephony {
 NetCallBase::NetCallBase() {}
 
 int NetCallBase::StartConference()
 {
-    return TELEPHONY_NO_ERROR;
+    return TELEPHONY_SUCCESS;
 }
 
 int NetCallBase::InviteToConference()
 {
-    return TELEPHONY_NO_ERROR;
+    return TELEPHONY_SUCCESS;
 }
 
 int NetCallBase::KickOutConference()
 {
-    return TELEPHONY_NO_ERROR;
+    return TELEPHONY_SUCCESS;
 }
 
 int NetCallBase::LeaveConference()
 {
-    return TELEPHONY_NO_ERROR;
+    return TELEPHONY_SUCCESS;
 }
 
 int NetCallBase::GetNetCallType()
 {
-    return TELEPHONY_NO_ERROR;
+    return TELEPHONY_SUCCESS;
 }
 
 int NetCallBase::ChangeNetCallType()
 {
-    return TELEPHONY_NO_ERROR;
+    return TELEPHONY_SUCCESS;
 }
-} // namespace TelephonyCallManager
+} // namespace Telephony
 } // namespace OHOS

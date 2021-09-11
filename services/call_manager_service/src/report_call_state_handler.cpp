@@ -18,16 +18,14 @@
 #include <string_ex.h>
 
 #include "call_manager_errors.h"
-#include "call_manager_log.h"
+#include "telephony_log_wrapper.h"
 
 namespace OHOS {
-namespace TelephonyCallManager {
+namespace Telephony {
 ReportCallStateHandler::ReportCallStateHandler(const std::shared_ptr<AppExecFwk::EventRunner> &runner)
     : AppExecFwk::EventHandler(runner),
       reportCallStateClientPtr_(DelayedSingleton<CallStateReportProxy>::GetInstance())
-{
-    CALLMANAGER_DEBUG_LOG("ReportCallStateHandler::ReportCallStateHandler constructed.");
-}
+{}
 
 ReportCallStateHandler::~ReportCallStateHandler()
 {
@@ -39,49 +37,49 @@ ReportCallStateHandler::~ReportCallStateHandler()
 void ReportCallStateHandler::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
 {
     if (event == nullptr) {
-        CALLMANAGER_ERR_LOG("ReportCallStateHandler::ProcessEvent parameter error");
+        TELEPHONY_LOGE("ReportCallStateHandler::ProcessEvent parameter error");
         return;
     }
-    CALLMANAGER_DEBUG_LOG("ProcessEvent inner event id obtained: %{public}u.", event->GetInnerEventId());
+    TELEPHONY_LOGD("ProcessEvent inner event id obtained: %{public}u.", event->GetInnerEventId());
     switch (event->GetInnerEventId()) {
         case ReportCallStateHandlerService::HANDLER_REPORT_CALL_STATE: {
-            auto object = event->GetUniqueObject<CallInfo>();
+            auto object = event->GetUniqueObject<CallAttributeInfo>();
             if (object == nullptr) {
-                CALLMANAGER_ERR_LOG("object is nullptr!");
+                TELEPHONY_LOGE("object is nullptr!");
                 return;
             }
-            int32_t callState = (int32_t)(*object).state;
-            std::string str((*object).phoneNum, strlen((*object).phoneNum));
-            std::u16string phoneNumber = Str8ToStr16(str);
+            int32_t callState = (int32_t)(*object).callState;
+            std::string str((*object).accountNumber);
+            std::u16string accountNumber = Str8ToStr16(str);
             if (reportCallStateClientPtr_ == nullptr) {
-                CALLMANAGER_ERR_LOG("reportCallStateClientPtr_ is nullptr!");
+                TELEPHONY_LOGE("reportCallStateClientPtr_ is nullptr!");
                 return;
             }
-            CALLMANAGER_DEBUG_LOG("ReportCallState");
-            reportCallStateClientPtr_->ReportCallState(callState, phoneNumber);
+            TELEPHONY_LOGD("ReportCallState");
+            reportCallStateClientPtr_->ReportCallState(callState, accountNumber);
             break;
         }
         case ReportCallStateHandlerService::HANDLER_REPORT_CALL_STATE_FOR_CALLID: {
-            auto object = event->GetUniqueObject<CallInfo>();
+            auto object = event->GetUniqueObject<CallAttributeInfo>();
             if (object == nullptr) {
-                CALLMANAGER_ERR_LOG("object is nullptr!");
+                TELEPHONY_LOGE("object is nullptr!");
                 return;
             }
             int32_t subId = (int32_t)(*object).accountId;
-            int32_t callId = (int32_t)(*object).accountId;
-            int32_t callState = (int32_t)(*object).state;
-            std::string str((*object).phoneNum, strlen((*object).phoneNum));
+            int32_t callId = (int32_t)(*object).callId;
+            int32_t callState = (int32_t)(*object).callState;
+            std::string str((*object).accountNumber);
             std::u16string incomingNumber = Str8ToStr16(str);
             if (reportCallStateClientPtr_ == nullptr) {
-                CALLMANAGER_ERR_LOG("reportCallStateClientPtr_ is nullptr!");
+                TELEPHONY_LOGE("reportCallStateClientPtr_ is nullptr!");
                 return;
             }
-            CALLMANAGER_DEBUG_LOG("ReportCallStateForCallId");
+            TELEPHONY_LOGD("ReportCallStateForCallId");
             reportCallStateClientPtr_->ReportCallStateForCallId(subId, callId, callState, incomingNumber);
             break;
         }
         default: {
-            CALLMANAGER_ERR_LOG("unknown data!");
+            TELEPHONY_LOGE("unknown data!");
             break;
         }
     }
@@ -104,77 +102,67 @@ void ReportCallStateHandlerService::Start()
 {
     eventLoop_ = AppExecFwk::EventRunner::Create("ReportCallStateHandlerService");
     if (eventLoop_.get() == nullptr) {
-        CALLMANAGER_ERR_LOG("failed to create EventRunner");
+        TELEPHONY_LOGE("failed to create EventRunner");
         return;
     }
     handler_ = std::make_shared<ReportCallStateHandler>(eventLoop_);
     if (handler_.get() == nullptr) {
-        CALLMANAGER_ERR_LOG("failed to create ReportCallStateHandler");
+        TELEPHONY_LOGE("failed to create ReportCallStateHandler");
         return;
     }
     eventLoop_->Run();
     return;
 }
 
-void ReportCallStateHandlerService::NewCallCreated(sptr<CallBase> &callObjectPtr) {}
-
-void ReportCallStateHandlerService::CallDestroyed(sptr<CallBase> &callObjectPtr) {}
-
 void ReportCallStateHandlerService::CallStateUpdated(
-    sptr<CallBase> &callObjectPtr, TelCallStates priorState, TelCallStates nextState)
+    sptr<CallBase> &callObjectPtr, TelCallState priorState, TelCallState nextState)
 {
     if (callObjectPtr == nullptr) {
-        CALLMANAGER_ERR_LOG("callObjectPtr is nullptr!");
+        TELEPHONY_LOGE("callObjectPtr is nullptr!");
         return;
     }
-    CallInfo info;
-    callObjectPtr->GetBaseCallInfo(info);
-    CALLMANAGER_DEBUG_LOG("phoneNum:%s,state:%{public}d", info.phoneNum, info.state);
-    if (info.state == TelCallStates::CALL_STATUS_INCOMING) {
+    CallAttributeInfo info;
+    callObjectPtr->GetCallAttributeInfo(info);
+    TELEPHONY_LOGD("accountNumber:%s,state:%{public}d", info.accountNumber, info.callState);
+    if (info.callState == TelCallState::CALL_STATUS_INCOMING) {
         ReportCallStateForCallId(info);
     } else {
         ReportCallState(info);
     }
 }
 
-void ReportCallStateHandlerService::IncomingCallHungUp(
-    sptr<CallBase> &callObjectPtr, bool isSendSms, std::string content)
-{}
-
-void ReportCallStateHandlerService::IncomingCallActivated(sptr<CallBase> &callObjectPtr) {}
-
-int32_t ReportCallStateHandlerService::ReportCallState(CallInfo &info)
+int32_t ReportCallStateHandlerService::ReportCallState(CallAttributeInfo &info)
 {
     if (handler_.get() == nullptr) {
-        CALLMANAGER_ERR_LOG("failed to create EventRunner");
+        TELEPHONY_LOGE("failed to create EventRunner");
         return TELEPHONY_FAIL;
     }
-    std::unique_ptr<CallInfo> para = std::make_unique<CallInfo>();
+    std::unique_ptr<CallAttributeInfo> para = std::make_unique<CallAttributeInfo>();
     if (para.get() == nullptr) {
-        CALLMANAGER_ERR_LOG("make_unique CallInfo failed!");
+        TELEPHONY_LOGE("make_unique CallAttributeInfo failed!");
         return TELEPHONY_FAIL;
     }
     *para = info;
     std::lock_guard<std::mutex> lock(mutex_);
     handler_->SendEvent(HANDLER_REPORT_CALL_STATE, std::move(para));
-    return TELEPHONY_NO_ERROR;
+    return TELEPHONY_SUCCESS;
 }
 
-int32_t ReportCallStateHandlerService::ReportCallStateForCallId(CallInfo &info)
+int32_t ReportCallStateHandlerService::ReportCallStateForCallId(CallAttributeInfo &info)
 {
     if (handler_.get() == nullptr) {
-        CALLMANAGER_ERR_LOG("failed to create EventRunner");
+        TELEPHONY_LOGE("failed to create EventRunner");
         return TELEPHONY_FAIL;
     }
-    std::unique_ptr<CallInfo> para = std::make_unique<CallInfo>();
+    std::unique_ptr<CallAttributeInfo> para = std::make_unique<CallAttributeInfo>();
     if (para.get() == nullptr) {
-        CALLMANAGER_ERR_LOG("make_unique CallInfo failed!");
+        TELEPHONY_LOGE("make_unique CallAttributeInfo failed!");
         return TELEPHONY_FAIL;
     }
     *para = info;
     std::lock_guard<std::mutex> lock(mutex_);
     handler_->SendEvent(HANDLER_REPORT_CALL_STATE_FOR_CALLID, std::move(para));
-    return TELEPHONY_NO_ERROR;
+    return TELEPHONY_SUCCESS;
 }
-} // namespace TelephonyCallManager
+} // namespace Telephony
 } // namespace OHOS
