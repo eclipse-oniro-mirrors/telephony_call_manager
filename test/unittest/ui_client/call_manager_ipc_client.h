@@ -52,7 +52,7 @@ public:
     int32_t GetCallWaiting(int32_t slotId) const;
     int32_t SetCallWaiting(int32_t slotId, bool activate) const;
     int32_t CombineConference(int32_t mainCallId) const;
-    bool IsEmergencyPhoneNumber(std::u16string &number, int32_t slotId) const;
+    bool IsEmergencyPhoneNumber(std::u16string &number, int32_t slotId, int32_t &errorCode);
     int32_t FormatPhoneNumber(
         std::u16string &number, std::u16string &countryCode, std::u16string &formatNumber) const;
     int32_t FormatPhoneNumberToE164(

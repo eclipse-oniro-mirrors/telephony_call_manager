@@ -420,13 +420,13 @@ bool CallManagerProxy::IsInEmergencyCall()
     return callManagerServicePtr_->IsInEmergencyCall();
 }
 
-bool CallManagerProxy::IsEmergencyPhoneNumber(std::u16string &number, int32_t slotId)
+bool CallManagerProxy::IsEmergencyPhoneNumber(std::u16string &number, int32_t slotId, int32_t &errorCode)
 {
     if (ReConnectService() != TELEPHONY_SUCCESS) {
         return TELEPHONY_CONNECT_SYSTEM_ABILITY_STUB_FAIL;
     }
     std::lock_guard<std::mutex> lock(mutex_);
-    return callManagerServicePtr_->IsEmergencyPhoneNumber(number, slotId);
+    return callManagerServicePtr_->IsEmergencyPhoneNumber(number, slotId, errorCode);
 }
 
 int32_t CallManagerProxy::FormatPhoneNumber(

@@ -59,9 +59,9 @@ int32_t CarrierCall::CarrierDialingProcess()
 {
     TELEPHONY_LOGE("start");
     int32_t ret = CALL_MANAGER_DIAL_FAILED;
-    bool isEcc = false;
-    isEcc = DelayedSingleton<CallNumberUtils>::GetInstance()->CheckNumberIsEmergency(accountNumber_, slotId_);
-    TELEPHONY_LOGE("=========== is Ecc = %{public}d", isEcc);
+    int32_t errorCode = TELEPHONY_FAIL;
+    bool isEcc = DelayedSingleton<CallNumberUtils>::GetInstance()->CheckNumberIsEmergency(
+        accountNumber_, slotId_, errorCode);
     {
         std::lock_guard<std::mutex> lock(mutex_);
         isEcc_ = isEcc;

@@ -100,7 +100,8 @@ int32_t CallControlManager::DialCall(std::u16string &number, AppExecFwk::PacMap 
         TELEPHONY_LOGE("unknow dial type!");
         return CALL_MANAGER_UNKNOW_DIAL_TYPE;
     }
-    ret = DialPolicy();
+    int32_t accountId = extras.GetIntValue("accountId");
+    ret = DialPolicy(accountId);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("dial policy result：%{public}d", ret);
         return ret;
@@ -681,64 +682,5 @@ void CallControlManager::PackCellularCallInfo(CellularCallInfo &callInfo)
         return;
     }
 }
-
-#ifdef ABILITY_MEDIA_SUPPORT
-sptr<CallBase> CallControlManager::GetOneCallFromArray(CallRunningState stateArray[], int32_t size)
-{
-    std::list<sptr<CallBase>> callObjectPtrList;
-    if (!HasCallExist()) {
-        return nullptr;
-    }
-
-    callObjectPtrList = GetCallList();
-    sptr<CallBase> foregroundCall = DelayedSingleton<AudioControlManager>::GetInstance()->GetCurrentCall();
-    for (int32_t i = 0; i < size; i++) {
-        if (foregroundCall != nullptr && foregroundCall->GetCallRunningState() == stateArray[i]) {
-            return foregroundCall;
-        }
-
-        for (sptr<CallBase> call : callObjectPtrList) {
-            if (call->GetCallRunningState() == stateArray[i]) {
-                return call;
-            }
-        }
-    }
-    return nullptr;
-}
-
-bool CallControlManager::onButtonDealing(HeadsetButtonService::Buttontype type)
-{
-    CallRunningState stateArray[] = {CallRunningState::CALL_RUNNING_STATE_RINGING,
-        CallRunningState::CALL_RUNNING_STATE_DIALING, CallRunningState::CALL_RUNNING_STATE_ACTIVE,
-        CallRunningState::CALL_RUNNING_STATE_HOLD};
-    sptr<CallBase> ringingCall = GetOneCallFromArray(stateArray, 1);
-
-    switch (type) {
-        case HeadsetButtonService::SHORT_PRESS:
-            if (ringingCall == nullptr) {
-                sptr<CallBase> callToHangup =
-                    GetOneCallFromArray(stateArray, sizeof(stateArray) / sizeof(CallRunningState));
-                if (callToHangup != nullptr) {
-                    callToHangup->HangUpCall();
-                }
-            } else {
-                ringingCall->AnswerCall(0);
-            }
-            break;
-        case HeadsetButtonService::LONG_PRESS:
-            if (ringingCall != nullptr) {
-                std::string str = "";
-                ringingCall->RejectCall(false, str);
-                break;
-            }
-            DelayedSingleton<AudioControlManager>::GetInstance()->SetMute(true);
-            break;
-        default:
-            return false;
-            break;
-    }
-    return true;
-}
-#endif
 } // namespace Telephony
 } // namespace OHOS

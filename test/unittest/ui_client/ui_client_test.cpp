@@ -427,6 +427,7 @@ void SetCallTransferInfo()
 void IsEmergencyPhoneNumber()
 {
     int32_t slotId = 0;
+    int32_t errorCode = -1;
     std::u16string phoneNumber;
     std::string tmpStr;
     std::cout << "------IsEmergencyPhoneNumber------" << std::endl;
@@ -442,8 +443,9 @@ void IsEmergencyPhoneNumber()
         std::cout << "g_clientPtr is nullptr" << std::endl;
         return;
     }
-    int32_t ret = g_clientPtr->IsEmergencyPhoneNumber(phoneNumber, slotId);
+    int32_t ret = g_clientPtr->IsEmergencyPhoneNumber(phoneNumber, slotId, errorCode);
     std::cout << "return value:" << ret << std::endl;
+    std::cout << "return errorCode:" << errorCode << std::endl;
 }
 
 void FormatPhoneNumber()

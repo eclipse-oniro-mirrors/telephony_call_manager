@@ -30,12 +30,12 @@ public:
     void UnRegisterCallStateCallback();
     void RegisterCallEventCallback(EventListener eventCallback);
     void UnRegisterCallEventCallback();
-    int32_t RegisterGetWaitingCallback(EventListener getWaitingCallback);
-    int32_t RegisterSetWaitingCallback(EventListener setWaitingCallback);
-    int32_t RegisterGetRestrictionCallback(EventListener getRestrictionCallback);
-    int32_t RegisterSetRestrictionCallback(EventListener setRestrictionCallback);
-    int32_t RegisterGetTransferCallback(EventListener getTransferCallback);
-    int32_t RegisterSetTransferCallback(EventListener setTransferCallback);
+    int32_t RegisterGetWaitingCallback(EventListener callback);
+    int32_t RegisterSetWaitingCallback(EventListener callback);
+    int32_t RegisterGetRestrictionCallback(EventListener callback);
+    int32_t RegisterSetRestrictionCallback(EventListener callback);
+    int32_t RegisterGetTransferCallback(EventListener callback);
+    int32_t RegisterSetTransferCallback(EventListener callback);
     int32_t UpdateCallStateInfo(const CallAttributeInfo &info);
     int32_t UpdateCallEvent(const CallEventInfo &info);
     int32_t UpdateSupplementInfo(const CallResultReportId reportId, AppExecFwk::PacMap &resultInfo);
@@ -47,6 +47,7 @@ private:
     int32_t ReportSetRestrictionInfo(AppExecFwk::PacMap &resultInfo);
     int32_t ReportGetTransferInfo(AppExecFwk::PacMap &resultInfo);
     int32_t ReportSetTransferInfo(AppExecFwk::PacMap &resultInfo);
+    void ReportWaitAndLimitInfo(napi_env env, AppExecFwk::PacMap &resultInfo, EventListener supplementInfo);
     void ReportSupplementInfo(
         napi_env env, int32_t result, EventListener supplementInfo, napi_value &callbackValue);
     int32_t ReportSettingInfo(EventListener &settingInfo, AppExecFwk::PacMap &resultInfo);

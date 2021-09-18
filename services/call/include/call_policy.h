@@ -28,7 +28,7 @@ public:
     CallPolicy();
     ~CallPolicy();
 
-    int32_t DialPolicy();
+    int32_t DialPolicy(int32_t slotId);
     int32_t AnswerCallPolicy(int32_t callId);
     int32_t RejectCallPolicy(int32_t callId);
     int32_t HoldCallPolicy(int32_t callId);

@@ -26,7 +26,9 @@
 
 namespace OHOS {
 namespace Telephony {
-CallStateProcess::CallStateProcess() : audioState_(nullptr), currentInCallState_(UNKNOWN_STATE) {}
+CallStateProcess::CallStateProcess()
+    : audioState_(nullptr), currentCallState_(IN_IDLE), currentInCallState_(UNKNOWN_STATE)
+{}
 
 CallStateProcess::~CallStateProcess() {}
 
