@@ -154,8 +154,6 @@ private:
 
     int32_t OnUpdateCallStateInfoRequest(MessageParcel &data, MessageParcel &reply)
     {
-        TELEPHONY_LOGE("start");
-        int32_t result = TELEPHONY_SUCCESS;
         const CallAttributeInfo *parcelPtr = nullptr;
         int32_t len = data.ReadInt32();
         if (len <= 0) {
@@ -170,18 +168,16 @@ private:
             return TELEPHONY_FAIL;
         }
 
-        result = OnCallDetailsChange(*parcelPtr);
+        int32_t result = OnCallDetailsChange(*parcelPtr);
         if (!reply.WriteInt32(result)) {
             TELEPHONY_LOGE("writing parcel failed");
             return TELEPHONY_FAIL;
         }
-        TELEPHONY_LOGE("end");
         return TELEPHONY_SUCCESS;
     }
 
     int32_t OnUpdateCallEventRequest(MessageParcel &data, MessageParcel &reply)
     {
-        int32_t result = TELEPHONY_SUCCESS;
         const CallEventInfo *parcelPtr = nullptr;
         int32_t len = data.ReadInt32();
         if (len <= 0) {
@@ -196,7 +192,7 @@ private:
             return TELEPHONY_FAIL;
         }
 
-        result = OnCallEventChange(*parcelPtr);
+        int32_t result = OnCallEventChange(*parcelPtr);
         if (!reply.WriteInt32(result)) {
             TELEPHONY_LOGE("writing parcel failed");
             return TELEPHONY_FAIL;
@@ -206,7 +202,6 @@ private:
 
     int32_t OnUpdateSupplementResultRequest(MessageParcel &data, MessageParcel &reply)
     {
-        int32_t result = TELEPHONY_SUCCESS;
         AppExecFwk::PacMap resultInfo;
         CallResultReportId reportId = static_cast<CallResultReportId>(data.ReadInt32());
         resultInfo.PutIntValue("result", data.ReadInt32());
@@ -222,7 +217,7 @@ private:
         if (!data.ContainFileDescriptors()) {
             TELEPHONY_LOGW("sent raw data is less than 32k");
         }
-        result = OnSupplementResult(reportId, resultInfo);
+        int32_t result = OnSupplementResult(reportId, resultInfo);
         if (!reply.WriteInt32(result)) {
             TELEPHONY_LOGE("writing parcel failed");
             return TELEPHONY_FAIL;
@@ -441,10 +436,10 @@ public:
         return TELEPHONY_FAIL;
     }
 
-    bool IsEmergencyPhoneNumber(std::u16string &number, int32_t slotId) const
+    bool IsEmergencyPhoneNumber(std::u16string &number, int32_t slotId, int32_t &errorCode) const
     {
         if (callManagerServicePtr_ != nullptr) {
-            return callManagerServicePtr_->IsEmergencyPhoneNumber(number, slotId);
+            return callManagerServicePtr_->IsEmergencyPhoneNumber(number, slotId, errorCode);
         }
         return false;
     }

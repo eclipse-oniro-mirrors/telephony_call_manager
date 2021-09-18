@@ -58,7 +58,7 @@ public:
     bool HasCall();
     bool IsNewCallAllowed();
     bool IsInEmergencyCall();
-    bool IsEmergencyPhoneNumber(std::u16string &number, int32_t slotId);
+    bool IsEmergencyPhoneNumber(std::u16string &number, int32_t slotId, int32_t &errorCode);
     int32_t FormatPhoneNumber(std::u16string &number, std::u16string &countryCode, std::u16string &formatNumber);
     int32_t FormatPhoneNumberToE164(
         std::u16string &number, std::u16string &countryCode, std::u16string &formatNumber);

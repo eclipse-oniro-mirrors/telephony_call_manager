@@ -60,57 +60,57 @@ void NapiCallAbilityCallback::UnRegisterCallEventCallback()
     }
 }
 
-int32_t NapiCallAbilityCallback::RegisterGetWaitingCallback(EventListener getWaitingCallback)
+int32_t NapiCallAbilityCallback::RegisterGetWaitingCallback(EventListener callback)
 {
     if (getWaitingCallback_.thisVar) {
         return CALL_MANAGER_HAS_CALLBACK;
     }
-    getWaitingCallback_ = getWaitingCallback;
+    getWaitingCallback_ = callback;
     return TELEPHONY_SUCCESS;
 }
 
-int32_t NapiCallAbilityCallback::RegisterSetWaitingCallback(EventListener setWaitingCallback)
+int32_t NapiCallAbilityCallback::RegisterSetWaitingCallback(EventListener callback)
 {
     if (setWaitingCallback_.thisVar) {
         return CALL_MANAGER_HAS_CALLBACK;
     }
-    setWaitingCallback_ = setWaitingCallback;
+    setWaitingCallback_ = callback;
     return TELEPHONY_SUCCESS;
 }
 
-int32_t NapiCallAbilityCallback::RegisterGetRestrictionCallback(EventListener getRestrictionCallback)
+int32_t NapiCallAbilityCallback::RegisterGetRestrictionCallback(EventListener callback)
 {
     if (getRestrictionCallback_.thisVar) {
         return CALL_MANAGER_HAS_CALLBACK;
     }
-    getRestrictionCallback_ = getRestrictionCallback;
+    getRestrictionCallback_ = callback;
     return TELEPHONY_SUCCESS;
 }
 
-int32_t NapiCallAbilityCallback::RegisterSetRestrictionCallback(EventListener setRestrictionCallback)
+int32_t NapiCallAbilityCallback::RegisterSetRestrictionCallback(EventListener callback)
 {
     if (setRestrictionCallback_.thisVar) {
         return CALL_MANAGER_HAS_CALLBACK;
     }
-    setRestrictionCallback_ = setRestrictionCallback;
+    setRestrictionCallback_ = callback;
     return TELEPHONY_SUCCESS;
 }
 
-int32_t NapiCallAbilityCallback::RegisterGetTransferCallback(EventListener getTransferCallback)
+int32_t NapiCallAbilityCallback::RegisterGetTransferCallback(EventListener callback)
 {
     if (getTransferCallback_.thisVar) {
         return CALL_MANAGER_HAS_CALLBACK;
     }
-    getTransferCallback_ = getTransferCallback;
+    getTransferCallback_ = callback;
     return TELEPHONY_SUCCESS;
 }
 
-int32_t NapiCallAbilityCallback::RegisterSetTransferCallback(EventListener setTransferCallback)
+int32_t NapiCallAbilityCallback::RegisterSetTransferCallback(EventListener callback)
 {
     if (setTransferCallback_.thisVar) {
         return CALL_MANAGER_HAS_CALLBACK;
     }
-    setTransferCallback_ = setTransferCallback;
+    setTransferCallback_ = callback;
     return TELEPHONY_SUCCESS;
 }
 
@@ -217,13 +217,7 @@ int32_t NapiCallAbilityCallback::ReportGetWaitingInfo(AppExecFwk::PacMap &result
     napi_handle_scope scope = nullptr;
     napi_env env = getWaitingCallback_.env;
     napi_open_handle_scope(env, &scope);
-
-    napi_value callbackValue = nullptr;
-    napi_create_object(env, &callbackValue);
-    SetPropertyInt32(env, callbackValue, "status", resultInfo.GetIntValue("status"));
-    int32_t result = resultInfo.GetIntValue("result");
-
-    ReportSupplementInfo(env, result, getWaitingCallback_, callbackValue);
+    ReportWaitAndLimitInfo(env, resultInfo, getWaitingCallback_);
     if (getWaitingCallback_.thisVar) {
         (void)memset_s(&getWaitingCallback_, sizeof(EventListener), 0, sizeof(EventListener));
     }
@@ -249,13 +243,7 @@ int32_t NapiCallAbilityCallback::ReportGetRestrictionInfo(AppExecFwk::PacMap &re
     napi_handle_scope scope = nullptr;
     napi_env env = getRestrictionCallback_.env;
     napi_open_handle_scope(env, &scope);
-
-    napi_value callbackValue = nullptr;
-    napi_create_object(env, &callbackValue);
-    SetPropertyInt32(env, callbackValue, "status", resultInfo.GetIntValue("status"));
-    int32_t result = resultInfo.GetIntValue("result");
-
-    ReportSupplementInfo(env, result, getRestrictionCallback_, callbackValue);
+    ReportWaitAndLimitInfo(env, resultInfo, getRestrictionCallback_);
     if (getRestrictionCallback_.thisVar) {
         (void)memset_s(&getRestrictionCallback_, sizeof(EventListener), 0, sizeof(EventListener));
     }
@@ -304,6 +292,40 @@ int32_t NapiCallAbilityCallback::ReportSetTransferInfo(AppExecFwk::PacMap &resul
         return TELEPHONY_FAIL;
     }
     return ReportSettingInfo(setTransferCallback_, resultInfo);
+}
+
+void NapiCallAbilityCallback::ReportWaitAndLimitInfo(
+    napi_env env, AppExecFwk::PacMap &resultInfo, EventListener supplementInfo)
+{
+    int32_t result = resultInfo.GetIntValue("result");
+    int32_t status = resultInfo.GetIntValue("status");
+
+    if (supplementInfo.callbackRef != nullptr) {
+        napi_value callbackValues[kArrayIndexThird] = {0};
+        if (result == TELEPHONY_SUCCESS) {
+            callbackValues[kArrayIndexFirst] = CreateUndefined(env);
+            napi_create_int32(env, status, &callbackValues[kArrayIndexSecond]);
+        } else {
+            std::string errTip = std::to_string(result);
+            callbackValues[kArrayIndexFirst] = CreateErrorMessage(env, errTip);
+            callbackValues[kArrayIndexSecond] = CreateUndefined(env);
+        }
+        napi_value callbackFunc = nullptr;
+        napi_get_reference_value(env, supplementInfo.callbackRef, &callbackFunc);
+        napi_value callbackResult = nullptr;
+        napi_call_function(
+            env, supplementInfo.thisVar, callbackFunc, kDataLengthTwo, callbackValues, &callbackResult);
+        napi_delete_reference(env, supplementInfo.callbackRef);
+    } else if (supplementInfo.deferred != nullptr) {
+        if (result == TELEPHONY_SUCCESS) {
+            napi_value promiseValue = nullptr;
+            napi_create_int32(env, status, &promiseValue);
+            napi_resolve_deferred(env, supplementInfo.deferred, promiseValue);
+        } else {
+            std::string errTip = std::to_string(result);
+            napi_reject_deferred(env, supplementInfo.deferred, CreateErrorMessage(env, errTip));
+        }
+    }
 }
 
 void NapiCallAbilityCallback::ReportSupplementInfo(

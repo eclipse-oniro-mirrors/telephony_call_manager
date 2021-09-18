@@ -22,11 +22,12 @@
 namespace OHOS {
 namespace Telephony {
 using namespace testing::ext;
-constexpr int32_t SIM1_SLOTID = 1;
+constexpr int32_t SIM1_SLOTID = 0;
 constexpr int32_t SIM1_SLOTID_NO_CARD = 0;
 constexpr int32_t RETURN_VALUE_IS_ZERO = 0;
 constexpr int32_t INVALID_NEGATIVE_ID = -100;
 constexpr int32_t INVALID_POSITIVE_ID = 100;
+constexpr int32_t CALL_MANAGER_ERROR = -1;
 /********************************************* Test DialCall()***********************************************/
 
 /**
@@ -153,7 +154,8 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SwitchCall_0100, Function | Med
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_HasCall_0100, Function | MediumTest | Level3)
 {
-    ASSERT_EQ(CallManagerGtest::clientPtr_->GetCallState(), (int32_t)CallStateToApp::CALL_STATE_IDLE);
+    int32_t callState = CallManagerGtest::clientPtr_->GetCallState();
+    ASSERT_EQ(callState, (int32_t)CallStateToApp::CALL_STATE_IDLE);
     EXPECT_NE(CallManagerGtest::clientPtr_->HasCall(), true);
 }
 
@@ -165,7 +167,8 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_HasCall_0100, Function | Medium
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_IsNewCallAllowed_0100, Function | MediumTest | Level3)
 {
-    ASSERT_EQ(CallManagerGtest::clientPtr_->GetCallState(), (int32_t)CallStateToApp::CALL_STATE_IDLE);
+    int32_t callState = CallManagerGtest::clientPtr_->GetCallState();
+    ASSERT_EQ(callState, (int32_t)CallStateToApp::CALL_STATE_IDLE);
     EXPECT_EQ(CallManagerGtest::clientPtr_->IsNewCallAllowed(), true);
 }
 
@@ -177,7 +180,8 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_IsNewCallAllowed_0100, Function
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_IsRinging_0100, Function | MediumTest | Level3)
 {
-    ASSERT_EQ(CallManagerGtest::clientPtr_->GetCallState(), (int32_t)CallStateToApp::CALL_STATE_IDLE);
+    int32_t callState = CallManagerGtest::clientPtr_->GetCallState();
+    ASSERT_EQ(callState, (int32_t)CallStateToApp::CALL_STATE_IDLE);
     EXPECT_NE(CallManagerGtest::clientPtr_->IsRinging(), true);
 }
 
@@ -307,7 +311,8 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_IsEmergencyPhoneNumber_0100, Fu
     int32_t slotId = SIM1_SLOTID;
     std::string number = "0-0-0";
     std::u16string phoneNumber = Str8ToStr16(number);
-    EXPECT_NE(CallManagerGtest::clientPtr_->IsEmergencyPhoneNumber(phoneNumber, slotId), true);
+    int32_t error = CALL_MANAGER_ERROR;
+    EXPECT_NE(CallManagerGtest::clientPtr_->IsEmergencyPhoneNumber(phoneNumber, slotId, error), true);
 }
 
 /**
@@ -320,7 +325,8 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_IsEmergencyPhoneNumber_0200, Fu
     int32_t slotId = SIM1_SLOTID;
     std::string number = "112";
     std::u16string phoneNumber = Str8ToStr16(number);
-    EXPECT_EQ(CallManagerGtest::clientPtr_->IsEmergencyPhoneNumber(phoneNumber, slotId), true);
+    int32_t error = CALL_MANAGER_ERROR;
+    EXPECT_EQ(CallManagerGtest::clientPtr_->IsEmergencyPhoneNumber(phoneNumber, slotId, error), true);
 }
 
 /**
@@ -333,7 +339,8 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_IsEmergencyPhoneNumber_0300, Fu
     int32_t slotId = SIM1_SLOTID;
     std::string number = "911";
     std::u16string phoneNumber = Str8ToStr16(number);
-    EXPECT_EQ(CallManagerGtest::clientPtr_->IsEmergencyPhoneNumber(phoneNumber, slotId), true);
+    int32_t error = CALL_MANAGER_ERROR;
+    EXPECT_EQ(CallManagerGtest::clientPtr_->IsEmergencyPhoneNumber(phoneNumber, slotId, error), true);
 }
 
 /**
@@ -346,7 +353,8 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_IsEmergencyPhoneNumber_0400, Fu
     int32_t slotId = SIM1_SLOTID_NO_CARD;
     std::string number = "08";
     std::u16string phoneNumber = Str8ToStr16(number);
-    EXPECT_EQ(CallManagerGtest::clientPtr_->IsEmergencyPhoneNumber(phoneNumber, slotId), true);
+    int32_t error = CALL_MANAGER_ERROR;
+    EXPECT_EQ(CallManagerGtest::clientPtr_->IsEmergencyPhoneNumber(phoneNumber, slotId, error), true);
 }
 
 /**
@@ -359,7 +367,8 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_IsEmergencyPhoneNumber_0500, Fu
     int32_t slotId = SIM1_SLOTID_NO_CARD;
     std::string number = "118";
     std::u16string phoneNumber = Str8ToStr16(number);
-    EXPECT_EQ(CallManagerGtest::clientPtr_->IsEmergencyPhoneNumber(phoneNumber, slotId), true);
+    int32_t error = CALL_MANAGER_ERROR;
+    EXPECT_EQ(CallManagerGtest::clientPtr_->IsEmergencyPhoneNumber(phoneNumber, slotId, error), true);
 }
 
 /**
@@ -372,7 +381,8 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_IsEmergencyPhoneNumber_0600, Fu
     int32_t slotId = SIM1_SLOTID;
     std::string number = "119";
     std::u16string phoneNumber = Str8ToStr16(number);
-    EXPECT_EQ(CallManagerGtest::clientPtr_->IsEmergencyPhoneNumber(phoneNumber, slotId), true);
+    int32_t error = CALL_MANAGER_ERROR;
+    EXPECT_EQ(CallManagerGtest::clientPtr_->IsEmergencyPhoneNumber(phoneNumber, slotId, error), true);
 }
 
 /**
@@ -385,7 +395,8 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_IsEmergencyPhoneNumber_0700, Fu
     int32_t slotId = SIM1_SLOTID_NO_CARD;
     std::string number = "999";
     std::u16string phoneNumber = Str8ToStr16(number);
-    EXPECT_EQ(CallManagerGtest::clientPtr_->IsEmergencyPhoneNumber(phoneNumber, slotId), true);
+    int32_t error = CALL_MANAGER_ERROR;
+    EXPECT_EQ(CallManagerGtest::clientPtr_->IsEmergencyPhoneNumber(phoneNumber, slotId, error), true);
 }
 
 /********************************************* Test GetCallWaiting() ***********************************************/

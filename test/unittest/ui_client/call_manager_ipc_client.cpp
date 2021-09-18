@@ -239,10 +239,10 @@ int32_t CallManagerIpcClient::CombineConference(int32_t mainCallId) const
     return TELEPHONY_FAIL;
 }
 
-bool CallManagerIpcClient::IsEmergencyPhoneNumber(std::u16string &number, int32_t slotId) const
+bool CallManagerIpcClient::IsEmergencyPhoneNumber(std::u16string &number, int32_t slotId, int32_t &errorCode)
 {
     if (callManagerServicePtr_ != nullptr) {
-        return callManagerServicePtr_->IsEmergencyPhoneNumber(number, slotId);
+        return callManagerServicePtr_->IsEmergencyPhoneNumber(number, slotId, errorCode);
     }
     return false;
 }

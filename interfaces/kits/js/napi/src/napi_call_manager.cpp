@@ -37,6 +37,32 @@ void Init()
     DelayedSingleton<NapiCallAbilityHandlerService>::GetInstance()->Start();
 }
 
+napi_value NapiCallManager::CallManagerEnumTypeInit(napi_env env, napi_value exports)
+{
+    napi_property_descriptor desc[] = {
+        DECLARE_NAPI_STATIC_PROPERTY("CALL_WAITING_DISABLE", ToInt32Value(env, CALL_WAITING_DISABLE)),
+        DECLARE_NAPI_STATIC_PROPERTY("CALL_WAITING_ENABLE", ToInt32Value(env, CALL_WAITING_ENABLE)),
+        DECLARE_NAPI_STATIC_PROPERTY("CALL_STATUS_ACTIVE", ToInt32Value(env, CALL_STATUS_ACTIVE)),
+        DECLARE_NAPI_STATIC_PROPERTY("CALL_STATUS_HOLDING", ToInt32Value(env, CALL_STATUS_HOLDING)),
+        DECLARE_NAPI_STATIC_PROPERTY("CALL_STATUS_DIALING", ToInt32Value(env, CALL_STATUS_DIALING)),
+        DECLARE_NAPI_STATIC_PROPERTY("CALL_STATUS_ALERTING", ToInt32Value(env, CALL_STATUS_ALERTING)),
+        DECLARE_NAPI_STATIC_PROPERTY("CALL_STATUS_INCOMING", ToInt32Value(env, CALL_STATUS_INCOMING)),
+        DECLARE_NAPI_STATIC_PROPERTY("CALL_STATUS_WAITING", ToInt32Value(env, CALL_STATUS_WAITING)),
+        DECLARE_NAPI_STATIC_PROPERTY("CALL_STATUS_DISCONNECTED", ToInt32Value(env, CALL_STATUS_DISCONNECTED)),
+        DECLARE_NAPI_STATIC_PROPERTY("CALL_STATUS_DISCONNECTING", ToInt32Value(env, CALL_STATUS_DISCONNECTING)),
+        DECLARE_NAPI_STATIC_PROPERTY("CALL_STATUS_IDLE", ToInt32Value(env, CALL_STATUS_IDLE)),
+        DECLARE_NAPI_STATIC_PROPERTY(
+            "CALL_STATE_UNKNOWN", ToInt32Value(env, (int32_t)CallStateToApp::CALL_STATE_UNKNOWN)),
+        DECLARE_NAPI_STATIC_PROPERTY("CALL_STATE_IDLE", ToInt32Value(env, (int32_t)CallStateToApp::CALL_STATE_IDLE)),
+        DECLARE_NAPI_STATIC_PROPERTY(
+            "CALL_STATE_RINGING", ToInt32Value(env, (int32_t)CallStateToApp::CALL_STATE_RINGING)),
+        DECLARE_NAPI_STATIC_PROPERTY(
+            "CALL_STATE_OFFHOOK", ToInt32Value(env, (int32_t)CallStateToApp::CALL_STATE_OFFHOOK)),
+    };
+    NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc));
+    return exports;
+}
+
 napi_value NapiCallManager::RegisterCallManagerFunc(napi_env env, napi_value exports)
 {
     napi_property_descriptor desc[] = {
@@ -51,7 +77,7 @@ napi_value NapiCallManager::RegisterCallManagerFunc(napi_env env, napi_value exp
         DECLARE_NAPI_FUNCTION("getMainCallId", GetMainCallId),
         DECLARE_NAPI_FUNCTION("getSubCallIdList", GetSubCallIdList),
         DECLARE_NAPI_FUNCTION("getCallIdListForConference", GetCallIdListForConference),
-        DECLARE_NAPI_FUNCTION("getCallWaiting", GetCallWaiting),
+        DECLARE_NAPI_FUNCTION("getCallWaitingStatus", GetCallWaiting),
         DECLARE_NAPI_FUNCTION("setCallWaiting", SetCallWaiting),
         DECLARE_NAPI_FUNCTION("startDTMF", StartDtmf),
         DECLARE_NAPI_FUNCTION("stopDTMF", StopDtmf),
@@ -64,6 +90,7 @@ napi_value NapiCallManager::RegisterCallManagerFunc(napi_env env, napi_value exp
         DECLARE_NAPI_FUNCTION("on", ObserverOn),
     };
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc));
+    CallManagerEnumTypeInit(env, exports);
     Init();
     return exports;
 }
@@ -101,7 +128,8 @@ napi_value NapiCallManager::AnswerCall(napi_env env, napi_callback_info info)
     void *data = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, &data));
     NAPI_ASSERT(env, argc <= kValueMaximumLimit, "parameter error!");
-    NAPI_ASSERT(env, MatchValueType(env, argv[kArrayIndexFirst], napi_number), "Type error, Should is number");
+    bool matchFlag = MatchValueType(env, argv[kArrayIndexFirst], napi_number);
+    NAPI_ASSERT(env, matchFlag, "Type error, Should is number");
     auto asyncContext = (std::make_unique<AnswerAsyncContext>()).release();
     napi_get_value_int32(env, argv[kArrayIndexFirst], &asyncContext->callId);
     if (argc == kTwoValueLimit) {
@@ -125,7 +153,8 @@ napi_value NapiCallManager::RejectCall(napi_env env, napi_callback_info info)
     void *data = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, &data));
     NAPI_ASSERT(env, argc <= kFourValueMaximumLimit, "parameter error!");
-    NAPI_ASSERT(env, MatchValueType(env, argv[kArrayIndexFirst], napi_number), "Type error, Should is number");
+    bool matchFlag = MatchValueType(env, argv[kArrayIndexFirst], napi_number);
+    NAPI_ASSERT(env, matchFlag, "Type error, Should is number");
     auto asyncContext = (std::make_unique<RejectAsyncContext>()).release();
     napi_get_value_int32(env, argv[kArrayIndexFirst], &asyncContext->callId);
     asyncContext->isSendSms = false;
@@ -152,7 +181,8 @@ napi_value NapiCallManager::HangUpCall(napi_env env, napi_callback_info info)
     void *data = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, &data));
     NAPI_ASSERT(env, argc < kValueMaximumLimit, "parameter error!");
-    NAPI_ASSERT(env, MatchValueType(env, argv[kArrayIndexFirst], napi_number), "Type error, Should is number");
+    bool matchFlag = MatchValueType(env, argv[kArrayIndexFirst], napi_number);
+    NAPI_ASSERT(env, matchFlag, "Type error, Should is number");
     auto asyncContext = (std::make_unique<AsyncContext>()).release();
     napi_get_value_int32(env, argv[kArrayIndexFirst], &asyncContext->callId);
     if (argc == kTwoValueLimit) {
@@ -169,7 +199,8 @@ napi_value NapiCallManager::HoldCall(napi_env env, napi_callback_info info)
     void *data = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, &data));
     NAPI_ASSERT(env, argc < kValueMaximumLimit, "parameter error!");
-    NAPI_ASSERT(env, MatchValueType(env, argv[kArrayIndexFirst], napi_number), "Type error, Should is number");
+    bool matchFlag = MatchValueType(env, argv[kArrayIndexFirst], napi_number);
+    NAPI_ASSERT(env, matchFlag, "Type error, Should is number");
     auto asyncContext = (std::make_unique<AsyncContext>()).release();
     napi_get_value_int32(env, argv[kArrayIndexFirst], &asyncContext->callId);
     if (argc == kTwoValueLimit) {
@@ -186,7 +217,8 @@ napi_value NapiCallManager::UnHoldCall(napi_env env, napi_callback_info info)
     void *data = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, &data));
     NAPI_ASSERT(env, argc < kValueMaximumLimit, "parameter error!");
-    NAPI_ASSERT(env, MatchValueType(env, argv[kArrayIndexFirst], napi_number), "Type error, Should is number");
+    bool matchFlag = MatchValueType(env, argv[kArrayIndexFirst], napi_number);
+    NAPI_ASSERT(env, matchFlag, "Type error, Should is number");
     auto asyncContext = (std::make_unique<AsyncContext>()).release();
     napi_get_value_int32(env, argv[kArrayIndexFirst], &asyncContext->callId);
     if (argc == kTwoValueLimit) {
@@ -203,7 +235,8 @@ napi_value NapiCallManager::SwitchCall(napi_env env, napi_callback_info info)
     void *data = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, &data));
     NAPI_ASSERT(env, argc <= kTwoValueLimit, "parameter error!");
-    NAPI_ASSERT(env, MatchValueType(env, argv[kArrayIndexFirst], napi_number), "Type error, Should is number");
+    bool matchFlag = MatchValueType(env, argv[kArrayIndexFirst], napi_number);
+    NAPI_ASSERT(env, matchFlag, "Type error, Should is number");
     auto asyncContext = (std::make_unique<AsyncContext>()).release();
     napi_get_value_int32(env, argv[kArrayIndexFirst], &asyncContext->callId);
     if (argc == kTwoValueLimit) {
@@ -220,7 +253,8 @@ napi_value NapiCallManager::CombineConference(napi_env env, napi_callback_info i
     void *data = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, &data));
     NAPI_ASSERT(env, argc < kValueMaximumLimit, "parameter error!");
-    NAPI_ASSERT(env, MatchValueType(env, argv[kArrayIndexFirst], napi_number), "Type error, Should is number");
+    bool matchFlag = MatchValueType(env, argv[kArrayIndexFirst], napi_number);
+    NAPI_ASSERT(env, matchFlag, "Type error, Should is number");
     auto asyncContext = (std::make_unique<AsyncContext>()).release();
     napi_get_value_int32(env, argv[kArrayIndexFirst], &asyncContext->callId);
     if (argc == kTwoValueLimit) {
@@ -237,7 +271,8 @@ napi_value NapiCallManager::GetMainCallId(napi_env env, napi_callback_info info)
     void *data = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, &data));
     NAPI_ASSERT(env, argc < kValueMaximumLimit, "parameter error!");
-    NAPI_ASSERT(env, MatchValueType(env, argv[kArrayIndexFirst], napi_number), "Type error, Should is number");
+    bool matchFlag = MatchValueType(env, argv[kArrayIndexFirst], napi_number);
+    NAPI_ASSERT(env, matchFlag, "Type error, Should is number");
     auto asyncContext = (std::make_unique<AsyncContext>()).release();
     napi_get_value_int32(env, argv[kArrayIndexFirst], &asyncContext->callId);
     if (argc == kTwoValueLimit) {
@@ -254,7 +289,8 @@ napi_value NapiCallManager::GetSubCallIdList(napi_env env, napi_callback_info in
     void *data = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, &data));
     NAPI_ASSERT(env, argc < kValueMaximumLimit, "parameter error!");
-    NAPI_ASSERT(env, MatchValueType(env, argv[kArrayIndexFirst], napi_number), "Type error, Should is number");
+    bool matchFlag = MatchValueType(env, argv[kArrayIndexFirst], napi_number);
+    NAPI_ASSERT(env, matchFlag, "Type error, Should is number");
     auto asyncContext = (std::make_unique<ListAsyncContext>()).release();
     napi_get_value_int32(env, argv[kArrayIndexFirst], &asyncContext->callId);
     if (argc == kTwoValueLimit) {
@@ -271,7 +307,8 @@ napi_value NapiCallManager::GetCallIdListForConference(napi_env env, napi_callba
     void *data = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, &data));
     NAPI_ASSERT(env, argc < kValueMaximumLimit, "parameter error!");
-    NAPI_ASSERT(env, MatchValueType(env, argv[kArrayIndexFirst], napi_number), "Type error, Should is number");
+    bool matchFlag = MatchValueType(env, argv[kArrayIndexFirst], napi_number);
+    NAPI_ASSERT(env, matchFlag, "Type error, Should is number");
     auto asyncContext = (std::make_unique<ListAsyncContext>()).release();
     napi_get_value_int32(env, argv[kArrayIndexFirst], &asyncContext->callId);
     if (argc == kTwoValueLimit) {
@@ -289,7 +326,8 @@ napi_value NapiCallManager::GetCallWaiting(napi_env env, napi_callback_info info
     void *data = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, &data));
     NAPI_ASSERT(env, argc < kValueMaximumLimit, "parameter error!");
-    NAPI_ASSERT(env, MatchValueType(env, argv[kArrayIndexFirst], napi_number), "Type error, Should is number");
+    bool matchFlag = MatchValueType(env, argv[kArrayIndexFirst], napi_number);
+    NAPI_ASSERT(env, matchFlag, "Type error, Should is number");
     auto asyncContext = (std::make_unique<SupplementAsyncContext>()).release();
     EventListener waitingInfoListener;
     waitingInfoListener.env = env;
@@ -304,11 +342,18 @@ napi_value NapiCallManager::GetCallWaiting(napi_env env, napi_callback_info info
     } else {
         napi_get_undefined(env, &result);
     }
-    asyncContext->result =
-        DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->RegisterGetWaitingCallback(waitingInfoListener);
-    if (asyncContext->result != TELEPHONY_SUCCESS) {
+    int32_t error = TELEPHONY_SUCCESS;
+    if (!IsValidSlotId(asyncContext->slotId)) {
+        error = ERR_INVALID_SLOT_ID;
+    }
+    if (error == TELEPHONY_SUCCESS) {
+        error = DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->RegisterGetWaitingCallback(
+            waitingInfoListener);
+    }
+    if (error != TELEPHONY_SUCCESS) {
         asyncContext->callbackRef = waitingInfoListener.callbackRef;
         asyncContext->deferred = waitingInfoListener.deferred;
+        asyncContext->result = error;
     }
 
     napi_value resourceName = nullptr;
@@ -327,8 +372,10 @@ napi_value NapiCallManager::SetCallWaiting(napi_env env, napi_callback_info info
     void *data = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, &data));
     NAPI_ASSERT(env, argc <= kValueMaximumLimit, "parameter error!");
-    NAPI_ASSERT(env, MatchValueType(env, argv[kArrayIndexFirst], napi_number), "Type error, Should is number");
-    NAPI_ASSERT(env, MatchValueType(env, argv[kArrayIndexSecond], napi_boolean), "Type error, Should is boolean");
+    bool matchFlag = MatchValueType(env, argv[kArrayIndexFirst], napi_number);
+    NAPI_ASSERT(env, matchFlag, "Type error, Should is number");
+    matchFlag = MatchValueType(env, argv[kArrayIndexSecond], napi_boolean);
+    NAPI_ASSERT(env, matchFlag, "Type error, Should is boolean");
     auto asyncContext = (std::make_unique<SupplementAsyncContext>()).release();
     EventListener waitingInfoListener;
     waitingInfoListener.env = env;
@@ -344,11 +391,18 @@ napi_value NapiCallManager::SetCallWaiting(napi_env env, napi_callback_info info
     } else {
         napi_get_undefined(env, &result);
     }
-    asyncContext->result =
-        DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->RegisterSetWaitingCallback(waitingInfoListener);
-    if (asyncContext->result != TELEPHONY_SUCCESS) {
+    int32_t error = TELEPHONY_SUCCESS;
+    if (!IsValidSlotId(asyncContext->slotId)) {
+        error = ERR_INVALID_SLOT_ID;
+    }
+    if (error == TELEPHONY_SUCCESS) {
+        error = DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->RegisterSetWaitingCallback(
+            waitingInfoListener);
+    }
+    if (error != TELEPHONY_SUCCESS) {
         asyncContext->callbackRef = waitingInfoListener.callbackRef;
         asyncContext->deferred = waitingInfoListener.deferred;
+        asyncContext->result = error;
     }
 
     napi_value resourceName = nullptr;
@@ -367,7 +421,8 @@ napi_value NapiCallManager::StartDtmf(napi_env env, napi_callback_info info)
     void *data = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, &data));
     NAPI_ASSERT(env, argc <= kValueMaximumLimit, "parameter error!");
-    NAPI_ASSERT(env, MatchValueType(env, argv[kArrayIndexFirst], napi_number), "Type error, Should is number");
+    bool matchFlag = MatchValueType(env, argv[kArrayIndexFirst], napi_number);
+    NAPI_ASSERT(env, matchFlag, "Type error, Should is number");
     auto asyncContext = (std::make_unique<SupplementAsyncContext>()).release();
     napi_get_value_int32(env, argv[kArrayIndexFirst], &asyncContext->callId);
     napi_get_value_string_utf8(
@@ -386,7 +441,8 @@ napi_value NapiCallManager::StopDtmf(napi_env env, napi_callback_info info)
     void *data = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, &data));
     NAPI_ASSERT(env, argc < kValueMaximumLimit, "parameter error!");
-    NAPI_ASSERT(env, MatchValueType(env, argv[kArrayIndexFirst], napi_number), "Type error, Should is number");
+    bool matchFlag = MatchValueType(env, argv[kArrayIndexFirst], napi_number);
+    NAPI_ASSERT(env, matchFlag, "Type error, Should is number");
     auto asyncContext = (std::make_unique<AsyncContext>()).release();
     napi_get_value_int32(env, argv[kArrayIndexFirst], &asyncContext->callId);
     if (argc == kTwoValueLimit) {
@@ -403,7 +459,8 @@ napi_value NapiCallManager::SendDtmf(napi_env env, napi_callback_info info)
     void *data = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, &data));
     NAPI_ASSERT(env, argc <= kValueMaximumLimit, "parameter error!");
-    NAPI_ASSERT(env, MatchValueType(env, argv[kArrayIndexFirst], napi_number), "Type error, Should is number");
+    bool matchFlag = MatchValueType(env, argv[kArrayIndexFirst], napi_number);
+    NAPI_ASSERT(env, matchFlag, "Type error, Should is number");
     auto asyncContext = (std::make_unique<AsyncContext>()).release();
     napi_get_value_int32(env, argv[kArrayIndexFirst], &asyncContext->callId);
     napi_get_value_string_utf8(
@@ -422,7 +479,8 @@ napi_value NapiCallManager::SendBurstDtmf(napi_env env, napi_callback_info info)
     void *data = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, &data));
     NAPI_ASSERT(env, argc <= kTwoValueLimit, "parameter error!");
-    NAPI_ASSERT(env, MatchValueType(env, argv[kArrayIndexFirst], napi_object), "Type error, Should is object");
+    bool matchFlag = MatchValueType(env, argv[kArrayIndexFirst], napi_object);
+    NAPI_ASSERT(env, matchFlag, "Type error, Should is object");
     auto asyncContext = (std::make_unique<DtmfAsyncContext>()).release();
     GetDtmfBunchInfo(env, argv[kArrayIndexFirst], *asyncContext);
     if (argc == kTwoValueLimit) {
@@ -514,7 +572,8 @@ napi_value NapiCallManager::IsEmergencyPhoneNumber(napi_env env, napi_callback_i
     void *data = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, &data));
     NAPI_ASSERT(env, argc <= kValueMaximumLimit, "parameter error!");
-    NAPI_ASSERT(env, MatchValueType(env, argv[kArrayIndexFirst], napi_string), "Type error, Should is srting");
+    bool matchFlag = MatchValueType(env, argv[kArrayIndexFirst], napi_string);
+    NAPI_ASSERT(env, matchFlag, "Type error, Should is srting");
     auto asyncContext = (std::make_unique<UtilsAsyncContext>()).release();
     napi_get_value_string_utf8(
         env, argv[kArrayIndexFirst], asyncContext->number, kPhoneNumberMaximumLimit, &(asyncContext->numberLen));
@@ -541,7 +600,8 @@ napi_value NapiCallManager::FormatPhoneNumber(napi_env env, napi_callback_info i
     void *data = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, &data));
     NAPI_ASSERT(env, argc <= kValueMaximumLimit, "parameter error!");
-    NAPI_ASSERT(env, MatchValueType(env, argv[kArrayIndexFirst], napi_string), "Type error, Should is srting");
+    bool matchFlag = MatchValueType(env, argv[kArrayIndexFirst], napi_string);
+    NAPI_ASSERT(env, matchFlag, "Type error, Should is srting");
     auto asyncContext = (std::make_unique<UtilsAsyncContext>()).release();
     asyncContext->code = "cn";
     napi_get_value_string_utf8(
@@ -568,8 +628,10 @@ napi_value NapiCallManager::FormatPhoneNumberToE164(napi_env env, napi_callback_
     void *data = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, &data));
     NAPI_ASSERT(env, argc <= kValueMaximumLimit, "parameter error!");
-    NAPI_ASSERT(env, MatchValueType(env, argv[kArrayIndexFirst], napi_string), "Type error, Should is srting");
-    NAPI_ASSERT(env, MatchValueType(env, argv[kArrayIndexSecond], napi_string), "Type error, Should is srting");
+    bool matchFlag = MatchValueType(env, argv[kArrayIndexFirst], napi_string);
+    NAPI_ASSERT(env, matchFlag, "Type error, Should is srting");
+    matchFlag = MatchValueType(env, argv[kArrayIndexSecond], napi_string);
+    NAPI_ASSERT(env, matchFlag, "Type error, Should is srting");
     auto asyncContext = (std::make_unique<UtilsAsyncContext>()).release();
     napi_get_value_string_utf8(
         env, argv[kArrayIndexFirst], asyncContext->number, kPhoneNumberMaximumLimit, &(asyncContext->numberLen));
@@ -593,7 +655,8 @@ napi_value NapiCallManager::ObserverOn(napi_env env, napi_callback_info info)
     void *data = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, &data));
     NAPI_ASSERT(env, argc <= kValueMaximumLimit, "parameter error!");
-    NAPI_ASSERT(env, MatchValueType(env, argv[kArrayIndexFirst], napi_string), "Type error, Should is srting");
+    bool matchFlag = MatchValueType(env, argv[kArrayIndexFirst], napi_string);
+    NAPI_ASSERT(env, matchFlag, "Type error, Should is srting");
     char listenerType[kPhoneNumberMaximumLimit];
     size_t strLength = 0;
     napi_get_value_string_utf8(env, argv[kArrayIndexFirst], listenerType, kPhoneNumberMaximumLimit, &strLength);
@@ -621,7 +684,8 @@ napi_value NapiCallManager::ObserverOff(napi_env env, napi_callback_info info)
     void *data = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, &data));
     NAPI_ASSERT(env, argc <= kValueMaximumLimit, "parameter error!");
-    NAPI_ASSERT(env, MatchValueType(env, argv[kArrayIndexFirst], napi_string), "Type error, Should is srting");
+    bool matchFlag = MatchValueType(env, argv[kArrayIndexFirst], napi_string);
+    NAPI_ASSERT(env, matchFlag, "Type error, Should is srting");
     char listenerType[kPhoneNumberMaximumLimit];
     size_t strLength = 0;
     napi_get_value_string_utf8(env, argv[kArrayIndexFirst], listenerType, kPhoneNumberMaximumLimit, &strLength);
@@ -811,19 +875,26 @@ void NapiCallManager::NativeBoolCallBack(napi_env env, napi_status status, void 
             napi_value promiseValue = nullptr;
             napi_get_boolean(env, true, &promiseValue);
             napi_resolve_deferred(env, asyncContext->deferred, promiseValue);
-        } else {
+        } else if (asyncContext->errorCode == TELEPHONY_SUCCESS) {
             napi_value promiseValue = nullptr;
             napi_get_boolean(env, false, &promiseValue);
             napi_resolve_deferred(env, asyncContext->deferred, promiseValue);
+        } else {
+            std::string errTip = std::to_string(asyncContext->errorCode);
+            napi_reject_deferred(env, asyncContext->deferred, NapiCallManager::CreateErrorMessage(env, errTip));
         }
     } else {
         napi_value callbackValue[kArrayIndexThird] = {0};
         if (asyncContext->result != kBoolValueIsFalse) {
             callbackValue[kArrayIndexFirst] = NapiCallManager::CreateUndefined(env);
             napi_get_boolean(env, true, &callbackValue[kArrayIndexSecond]);
-        } else {
+        } else if (asyncContext->errorCode == TELEPHONY_SUCCESS) {
             callbackValue[kArrayIndexFirst] = NapiCallManager::CreateUndefined(env);
             napi_get_boolean(env, false, &callbackValue[kArrayIndexSecond]);
+        } else {
+            std::string errTip = std::to_string(asyncContext->errorCode);
+            callbackValue[kArrayIndexFirst] = NapiCallManager::CreateErrorMessage(env, errTip);
+            callbackValue[kArrayIndexSecond] = NapiCallManager::CreateUndefined(env);
         }
         napi_value callback = nullptr;
         napi_value result = nullptr;
@@ -1221,7 +1292,7 @@ void NapiCallManager::NativeIsEmergencyPhoneNumber(napi_env env, void *data)
     std::string tmpPhoneNumber(asyncContext->number, asyncContext->numberLen);
     std::u16string phoneNumber = Str8ToStr16(tmpPhoneNumber);
     asyncContext->result = DelayedSingleton<CallManagerProxy>::GetInstance()->IsEmergencyPhoneNumber(
-        phoneNumber, asyncContext->slotId);
+        phoneNumber, asyncContext->slotId, asyncContext->errorCode);
 }
 
 void NapiCallManager::NativeFormatPhoneNumber(napi_env env, void *data)
@@ -1250,6 +1321,13 @@ void NapiCallManager::NativeFormatPhoneNumberToE164(napi_env env, void *data)
     std::u16string countryCode = Str8ToStr16(asyncContext->code);
     asyncContext->result = DelayedSingleton<CallManagerProxy>::GetInstance()->FormatPhoneNumberToE164(
         phoneNumber, countryCode, asyncContext->formatNumber);
+}
+
+napi_value NapiCallManager::ToInt32Value(napi_env env, int32_t value)
+{
+    napi_value staticValue = nullptr;
+    napi_create_int32(env, value, &staticValue);
+    return staticValue;
 }
 
 napi_value NapiCallManager::GetNamedProperty(napi_env env, napi_value object, const std::string &propertyName)
@@ -1305,6 +1383,11 @@ napi_value NapiCallManager::HandleAsyncWork(napi_env env, AsyncContext *context,
     napi_create_async_work(env, resource, resourceName, execute, complete, (void *)context, &context->work);
     napi_queue_async_work(env, context->work);
     return result;
+}
+
+bool NapiCallManager::IsValidSlotId(int32_t slotId)
+{
+    return slotId == kDefaultSlotId;
 }
 } // namespace Telephony
 } // namespace OHOS
