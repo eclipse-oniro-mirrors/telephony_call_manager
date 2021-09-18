@@ -98,7 +98,7 @@ public:
      * @param slotId
      * @return Returns 0 on success, others on failure.
      */
-    int IsUrgentCall(const std::string &phoneNum, int32_t slotId);
+    int IsUrgentCall(const std::string &phoneNum, int32_t slotId, int32_t &errorCode);
 
     /**
      * Merge into multiple calls

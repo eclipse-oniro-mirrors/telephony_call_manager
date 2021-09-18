@@ -18,14 +18,19 @@
 #include "call_manager_errors.h"
 #include "telephony_log_wrapper.h"
 
+#include "call_number_utils.h"
+
 namespace OHOS {
 namespace Telephony {
 CallPolicy::CallPolicy() {}
 
 CallPolicy::~CallPolicy() {}
 
-int32_t CallPolicy::DialPolicy()
+int32_t CallPolicy::DialPolicy(int32_t slotId)
 {
+    if (!DelayedSingleton<CallNumberUtils>::GetInstance()->IsValidSlotId(slotId)) {
+        return ERR_INVALID_SLOT_ID;
+    }
     return HasNewCall();
 }
 

@@ -31,6 +31,7 @@ public:
     NapiCallManager();
     ~NapiCallManager() = default;
 
+    static napi_value CallManagerEnumTypeInit(napi_env env, napi_value exports);
     static napi_value RegisterCallManagerFunc(napi_env env, napi_value exports);
     static napi_value DialCall(napi_env env, napi_callback_info info);
     static napi_value AnswerCall(napi_env env, napi_callback_info info);
@@ -104,11 +105,13 @@ private:
     static void NativeIsEmergencyPhoneNumber(napi_env env, void *data);
     static void NativeFormatPhoneNumber(napi_env env, void *data);
     static void NativeFormatPhoneNumberToE164(napi_env env, void *data);
+    static napi_value ToInt32Value(napi_env env, int32_t value);
     static napi_value GetNamedProperty(napi_env env, napi_value object, const std::string &propertyName);
     static std::string GetStringProperty(napi_env env, napi_value object, const std::string &propertyName);
     static int32_t GetIntProperty(napi_env env, napi_value object, const std::string &propertyName);
     static napi_value HandleAsyncWork(napi_env env, AsyncContext *context, std::string workName,
         napi_async_execute_callback execute, napi_async_complete_callback complete);
+    static bool IsValidSlotId(int32_t slotId);
 };
 } // namespace Telephony
 } // namespace OHOS

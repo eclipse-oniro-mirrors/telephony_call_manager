@@ -19,6 +19,8 @@
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
 
+#include "call_manager_errors.h"
+
 #include "call_manager_inner_type.h"
 
 namespace OHOS {
@@ -41,6 +43,7 @@ const int kDataLengthTwo = 2;
 const int kDtmfDefaultOff = 10;
 const int kPhoneNumberMaximumLimit = 31;
 const int kMessageContentMaximumLimit = 160;
+const int kDefaultSlotId = 0;
 
 struct AsyncContext {
     napi_env env;
@@ -53,6 +56,7 @@ struct AsyncContext {
     size_t numberLen;
     napi_value value[kValueMaximumLimit];
     size_t valueLen;
+    int32_t errorCode = TELEPHONY_SUCCESS;
 };
 
 struct DialAsyncContext : AsyncContext {
@@ -102,6 +106,8 @@ struct EventListener {
     napi_deferred deferred = nullptr;
     bool isExist;
 };
+
+enum CallWaitingStatus { CALL_WAITING_DISABLE = 0, CALL_WAITING_ENABLE };
 } // namespace Telephony
 } // namespace OHOS
 

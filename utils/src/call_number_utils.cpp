@@ -17,10 +17,11 @@
 
 #include "call_number_utils.h"
 
-#include "call_manager_errors.h"
 #include "phonenumbers/phonenumber.pb.h"
+
 #include "telephony_log_wrapper.h"
 
+#include "call_manager_errors.h"
 #include "cellular_call_ipc_interface_proxy.h"
 
 namespace OHOS {
@@ -77,11 +78,20 @@ int32_t CallNumberUtils::FormatNumberBase(const std::string phoneNumber, std::st
     return TELEPHONY_SUCCESS;
 }
 
-bool CallNumberUtils::CheckNumberIsEmergency(const std::string &phoneNumber, const int32_t slotId)
+bool CallNumberUtils::CheckNumberIsEmergency(
+    const std::string &phoneNumber, const int32_t slotId, int32_t &errorCode)
 {
     TELEPHONY_LOGD("CheckNumberIsEmergency");
-    int isEcc = DelayedSingleton<CellularCallIpcInterfaceProxy>::GetInstance()->IsUrgentCall(phoneNumber, slotId);
+    errorCode = TELEPHONY_SUCCESS;
+    int isEcc = DelayedSingleton<CellularCallIpcInterfaceProxy>::GetInstance()->IsUrgentCall(
+        phoneNumber, slotId, errorCode);
+    TELEPHONY_LOGD("CheckNumberIsEmergency  isEcc == %{public}d, errorCode == %{public}d", isEcc, errorCode);
     return (isEcc != 0);
+}
+
+bool CallNumberUtils::IsValidSlotId(int32_t slotId) const
+{
+    return slotId == defaultSlotId_;
 }
 } // namespace Telephony
 } // namespace OHOS

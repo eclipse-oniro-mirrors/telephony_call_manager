@@ -70,12 +70,8 @@ public:
     };
 
 private:
-    std::mutex mutex_;
-    std::unique_ptr<AudioState> audioState_;
     bool SwitchState(InCallState state);
     bool DoSwitch(InCallState state);
-    AudioCallState currentCallState_; // audio call state
-    InCallState currentInCallState_; // in call state
     bool SwitchCSCall();
     bool SwitchIMSCall();
     bool SwitchHolding();
@@ -86,6 +82,11 @@ private:
     AudioCallState GetCurrentCallState() const; // audio call state
     bool ActivateAudio();
     bool DeactivateAudio();
+
+    std::unique_ptr<AudioState> audioState_;
+    AudioCallState currentCallState_; // audio call state
+    InCallState currentInCallState_; // in call state
+    std::mutex mutex_;
 };
 } // namespace Telephony
 } // namespace OHOS

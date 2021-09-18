@@ -327,10 +327,10 @@ int32_t CallManagerService::CombineConference(int32_t mainCallId)
     TELEPHONY_LOGD("leave");
 }
 
-bool CallManagerService::IsEmergencyPhoneNumber(std::u16string &number, int32_t slotId)
+bool CallManagerService::IsEmergencyPhoneNumber(std::u16string &number, int32_t slotId, int32_t &errorCode)
 {
     if (callNumberUtilsPtr_ != nullptr) {
-        return callNumberUtilsPtr_->CheckNumberIsEmergency(Str16ToStr8(number), slotId);
+        return callNumberUtilsPtr_->CheckNumberIsEmergency(Str16ToStr8(number), slotId, errorCode);
     } else {
         TELEPHONY_LOGE("callNumberUtilsPtr_ is nullptr!");
         return TELEPHONY_LOCAL_PTR_NULL;

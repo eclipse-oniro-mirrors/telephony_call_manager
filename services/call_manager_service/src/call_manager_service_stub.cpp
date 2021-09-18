@@ -353,9 +353,10 @@ int32_t CallManagerServiceStub::IsEmergencyPhoneNumberRequest(MessageParcel &dat
 {
     std::u16string callNumber = data.ReadString16();
     int32_t slotId = data.ReadInt32();
-    bool result = IsEmergencyPhoneNumber(callNumber, slotId);
+    int32_t errorCode = TELEPHONY_SUCCESS;
+    bool result = IsEmergencyPhoneNumber(callNumber, slotId, errorCode);
     TELEPHONY_LOGD("result:%{public}d", result);
-    if (!reply.WriteBool(result)) {
+    if (!reply.WriteBool(result) || !reply.WriteInt32(errorCode)) {
         TELEPHONY_LOGE("fail to write parcel");
         return TELEPHONY_WRITE_REPLY_FAIL;
     }

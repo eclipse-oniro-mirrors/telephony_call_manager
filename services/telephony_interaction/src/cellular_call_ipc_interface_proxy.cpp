@@ -278,13 +278,12 @@ int CellularCallIpcInterfaceProxy::Swap()
     return TELEPHONY_SUCCESS;
 }
 
-int CellularCallIpcInterfaceProxy::IsUrgentCall(const std::string &phoneNum, int32_t slotId)
+int CellularCallIpcInterfaceProxy::IsUrgentCall(const std::string &phoneNum, int32_t slotId, int32_t &errorCode)
 {
     if (ReConnectService() != TELEPHONY_SUCCESS) {
         return TELEPHONY_CONNECT_SYSTEM_ABILITY_STUB_FAIL;
     }
     std::lock_guard<std::mutex> lock(mutex_);
-    int errorCode = 0;
     return cellularCallInterfacePtr_->IsUrgentCall(phoneNum, slotId, errorCode);
 }
 
