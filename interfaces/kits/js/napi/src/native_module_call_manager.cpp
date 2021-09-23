@@ -23,7 +23,7 @@ static napi_module g_nativeCallManagerModule = {
     .nm_flags = kNativeFlags,
     .nm_filename = nullptr,
     .nm_register_func = NapiCallManager::RegisterCallManagerFunc,
-    .nm_modname = "libtelephony_call.z.so",
+    .nm_modname = "telephony.call",
     .nm_priv = ((void *)0),
     .reserved = {0},
 };

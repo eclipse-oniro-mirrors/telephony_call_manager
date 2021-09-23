@@ -13,7 +13,7 @@
 
 import("//build/ohos.gni")
 SUBSYSTEM_DIR = "//base/telephony"
-ohos_shared_library("telephony_call") {
+ohos_shared_library("call") {
   include_dirs = [
     "//third_party/node/src",
     "js/napi/include",
@@ -63,5 +63,5 @@ ohos_shared_library("telephony_call") {
 
   part_name = "call_manager"
   subsystem_name = "telephony"
-  relative_install_dir = "module"
+  relative_install_dir = "module/telephony"
 }

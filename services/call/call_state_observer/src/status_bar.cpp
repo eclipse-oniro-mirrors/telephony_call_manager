@@ -19,7 +19,7 @@
 
 namespace OHOS {
 namespace Telephony {
-StatusBar::StatusBar() : isDisplayMute_(false), isDisplaySpeakerphone_(false) {}
+StatusBar::StatusBar() : isDisplayMute_(false), isDisplayIcon_(false) {}
 
 StatusBar::~StatusBar() {}
 
@@ -39,9 +39,9 @@ void StatusBar::UpdateMuteIcon(bool isDisplayMute)
     isDisplayMute_ = isDisplayMute;
 }
 
-void StatusBar::UpdateSpeakerphoneIcon(bool isDisplaySpeakerphone)
+void StatusBar::UpdateSpeakerphoneIcon(bool isDisplay)
 {
-    if (isDisplaySpeakerphone_ == isDisplaySpeakerphone) {
+    if (isDisplayIcon_ == isDisplay) {
         return;
     }
 
@@ -52,7 +52,7 @@ void StatusBar::UpdateSpeakerphoneIcon(bool isDisplaySpeakerphone)
         statusBarControl.removeIcon("Speakerphone");
     }
 #endif
-    isDisplaySpeakerphone_ = isDisplaySpeakerphone;
+    isDisplayIcon_ = isDisplay;
 }
 
 void StatusBar::CallDestroyed(sptr<CallBase> &callObjectPtr)
