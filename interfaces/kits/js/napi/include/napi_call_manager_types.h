@@ -107,7 +107,17 @@ struct EventListener {
     bool isExist;
 };
 
-enum CallWaitingStatus { CALL_WAITING_DISABLE = 0, CALL_WAITING_ENABLE };
+enum CallWaitingStatus {
+    CALL_WAITING_DISABLE = 0,
+    CALL_WAITING_ENABLE,
+};
+
+struct ReceiveDataWorker {
+    napi_env env;
+    napi_ref ref = 0;
+    CallAttributeInfo info;
+    EventListener callback;
+};
 } // namespace Telephony
 } // namespace OHOS
 

@@ -155,7 +155,8 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SwitchCall_0100, Function | Med
 HWTEST_F(CallManagerGtest, Telephony_CallManager_HasCall_0100, Function | MediumTest | Level3)
 {
     int32_t callState = CallManagerGtest::clientPtr_->GetCallState();
-    ASSERT_EQ(callState, (int32_t)CallStateToApp::CALL_STATE_IDLE);
+    int32_t idleState = (int32_t)CallStateToApp::CALL_STATE_IDLE;
+    ASSERT_EQ(callState, idleState);
     EXPECT_NE(CallManagerGtest::clientPtr_->HasCall(), true);
 }
 
@@ -168,7 +169,8 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_HasCall_0100, Function | Medium
 HWTEST_F(CallManagerGtest, Telephony_CallManager_IsNewCallAllowed_0100, Function | MediumTest | Level3)
 {
     int32_t callState = CallManagerGtest::clientPtr_->GetCallState();
-    ASSERT_EQ(callState, (int32_t)CallStateToApp::CALL_STATE_IDLE);
+    int32_t idleState = (int32_t)CallStateToApp::CALL_STATE_IDLE;
+    ASSERT_EQ(callState, idleState);
     EXPECT_EQ(CallManagerGtest::clientPtr_->IsNewCallAllowed(), true);
 }
 
@@ -181,7 +183,8 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_IsNewCallAllowed_0100, Function
 HWTEST_F(CallManagerGtest, Telephony_CallManager_IsRinging_0100, Function | MediumTest | Level3)
 {
     int32_t callState = CallManagerGtest::clientPtr_->GetCallState();
-    ASSERT_EQ(callState, (int32_t)CallStateToApp::CALL_STATE_IDLE);
+    int32_t idleState = (int32_t)CallStateToApp::CALL_STATE_IDLE;
+    ASSERT_EQ(callState, idleState);
     EXPECT_NE(CallManagerGtest::clientPtr_->IsRinging(), true);
 }
 

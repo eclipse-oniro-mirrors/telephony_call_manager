@@ -98,12 +98,13 @@ napi_value NapiCallManager::RegisterCallManagerFunc(napi_env env, napi_value exp
 napi_value NapiCallManager::DialCall(napi_env env, napi_callback_info info)
 {
     size_t argc = kValueMaximumLimit;
-    napi_value argv[kValueMaximumLimit];
+    napi_value argv[kValueMaximumLimit] = {0};
     napi_value thisVar = nullptr;
     void *data = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, &data));
     NAPI_ASSERT(env, argc <= kValueMaximumLimit, "parameter error!");
-    NAPI_ASSERT(env, MatchValueType(env, argv[kArrayIndexFirst], napi_string), "Type error, Should is srting");
+    bool matchFlag = MatchValueType(env, argv[kArrayIndexFirst], napi_string);
+    NAPI_ASSERT(env, matchFlag, "Type error, Should is srting");
     auto asyncContext = (std::make_unique<DialAsyncContext>()).release();
     napi_get_value_string_utf8(
         env, argv[kArrayIndexFirst], asyncContext->number, kPhoneNumberMaximumLimit, &(asyncContext->numberLen));
@@ -123,7 +124,7 @@ napi_value NapiCallManager::DialCall(napi_env env, napi_callback_info info)
 napi_value NapiCallManager::AnswerCall(napi_env env, napi_callback_info info)
 {
     size_t argc = kValueMaximumLimit;
-    napi_value argv[kValueMaximumLimit];
+    napi_value argv[kValueMaximumLimit] = {0};
     napi_value thisVar = nullptr;
     void *data = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, &data));
@@ -148,7 +149,7 @@ napi_value NapiCallManager::AnswerCall(napi_env env, napi_callback_info info)
 napi_value NapiCallManager::RejectCall(napi_env env, napi_callback_info info)
 {
     size_t argc = kFourValueMaximumLimit;
-    napi_value argv[kFourValueMaximumLimit];
+    napi_value argv[kFourValueMaximumLimit] = {0};
     napi_value thisVar = nullptr;
     void *data = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, &data));
@@ -176,7 +177,7 @@ napi_value NapiCallManager::RejectCall(napi_env env, napi_callback_info info)
 napi_value NapiCallManager::HangUpCall(napi_env env, napi_callback_info info)
 {
     size_t argc = kValueMaximumLimit;
-    napi_value argv[kValueMaximumLimit];
+    napi_value argv[kValueMaximumLimit] = {0};
     napi_value thisVar = nullptr;
     void *data = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, &data));
@@ -194,7 +195,7 @@ napi_value NapiCallManager::HangUpCall(napi_env env, napi_callback_info info)
 napi_value NapiCallManager::HoldCall(napi_env env, napi_callback_info info)
 {
     size_t argc = kValueMaximumLimit;
-    napi_value argv[kValueMaximumLimit];
+    napi_value argv[kValueMaximumLimit] = {0};
     napi_value thisVar = nullptr;
     void *data = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, &data));
@@ -212,7 +213,7 @@ napi_value NapiCallManager::HoldCall(napi_env env, napi_callback_info info)
 napi_value NapiCallManager::UnHoldCall(napi_env env, napi_callback_info info)
 {
     size_t argc = kValueMaximumLimit;
-    napi_value argv[kValueMaximumLimit];
+    napi_value argv[kValueMaximumLimit] = {0};
     napi_value thisVar = nullptr;
     void *data = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, &data));
@@ -230,7 +231,7 @@ napi_value NapiCallManager::UnHoldCall(napi_env env, napi_callback_info info)
 napi_value NapiCallManager::SwitchCall(napi_env env, napi_callback_info info)
 {
     size_t argc = kTwoValueLimit;
-    napi_value argv[kTwoValueLimit];
+    napi_value argv[kTwoValueLimit] = {0};
     napi_value thisVar = nullptr;
     void *data = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, &data));
@@ -248,7 +249,7 @@ napi_value NapiCallManager::SwitchCall(napi_env env, napi_callback_info info)
 napi_value NapiCallManager::CombineConference(napi_env env, napi_callback_info info)
 {
     size_t argc = kValueMaximumLimit;
-    napi_value argv[kValueMaximumLimit];
+    napi_value argv[kValueMaximumLimit] = {0};
     napi_value thisVar = nullptr;
     void *data = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, &data));
@@ -266,7 +267,7 @@ napi_value NapiCallManager::CombineConference(napi_env env, napi_callback_info i
 napi_value NapiCallManager::GetMainCallId(napi_env env, napi_callback_info info)
 {
     size_t argc = kValueMaximumLimit;
-    napi_value argv[kValueMaximumLimit];
+    napi_value argv[kValueMaximumLimit] = {0};
     napi_value thisVar = nullptr;
     void *data = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, &data));
@@ -284,7 +285,7 @@ napi_value NapiCallManager::GetMainCallId(napi_env env, napi_callback_info info)
 napi_value NapiCallManager::GetSubCallIdList(napi_env env, napi_callback_info info)
 {
     size_t argc = kValueMaximumLimit;
-    napi_value argv[kValueMaximumLimit];
+    napi_value argv[kValueMaximumLimit] = {0};
     napi_value thisVar = nullptr;
     void *data = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, &data));
@@ -302,7 +303,7 @@ napi_value NapiCallManager::GetSubCallIdList(napi_env env, napi_callback_info in
 napi_value NapiCallManager::GetCallIdListForConference(napi_env env, napi_callback_info info)
 {
     size_t argc = kValueMaximumLimit;
-    napi_value argv[kValueMaximumLimit];
+    napi_value argv[kValueMaximumLimit] = {0};
     napi_value thisVar = nullptr;
     void *data = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, &data));
@@ -321,7 +322,7 @@ napi_value NapiCallManager::GetCallIdListForConference(napi_env env, napi_callba
 napi_value NapiCallManager::GetCallWaiting(napi_env env, napi_callback_info info)
 {
     size_t argc = kValueMaximumLimit;
-    napi_value argv[kValueMaximumLimit];
+    napi_value argv[kValueMaximumLimit] = {0};
     napi_value thisVar = nullptr;
     void *data = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, &data));
@@ -367,7 +368,7 @@ napi_value NapiCallManager::GetCallWaiting(napi_env env, napi_callback_info info
 napi_value NapiCallManager::SetCallWaiting(napi_env env, napi_callback_info info)
 {
     size_t argc = kValueMaximumLimit;
-    napi_value argv[kValueMaximumLimit];
+    napi_value argv[kValueMaximumLimit] = {0};
     napi_value thisVar = nullptr;
     void *data = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, &data));
@@ -416,7 +417,7 @@ napi_value NapiCallManager::SetCallWaiting(napi_env env, napi_callback_info info
 napi_value NapiCallManager::StartDtmf(napi_env env, napi_callback_info info)
 {
     size_t argc = kValueMaximumLimit;
-    napi_value argv[kValueMaximumLimit];
+    napi_value argv[kValueMaximumLimit] = {0};
     napi_value thisVar = nullptr;
     void *data = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, &data));
@@ -436,7 +437,7 @@ napi_value NapiCallManager::StartDtmf(napi_env env, napi_callback_info info)
 napi_value NapiCallManager::StopDtmf(napi_env env, napi_callback_info info)
 {
     size_t argc = kValueMaximumLimit;
-    napi_value argv[kValueMaximumLimit];
+    napi_value argv[kValueMaximumLimit] = {0};
     napi_value thisVar = nullptr;
     void *data = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, &data));
@@ -454,7 +455,7 @@ napi_value NapiCallManager::StopDtmf(napi_env env, napi_callback_info info)
 napi_value NapiCallManager::SendDtmf(napi_env env, napi_callback_info info)
 {
     size_t argc = kValueMaximumLimit;
-    napi_value argv[kValueMaximumLimit];
+    napi_value argv[kValueMaximumLimit] = {0};
     napi_value thisVar = nullptr;
     void *data = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, &data));
@@ -474,7 +475,7 @@ napi_value NapiCallManager::SendDtmf(napi_env env, napi_callback_info info)
 napi_value NapiCallManager::SendBurstDtmf(napi_env env, napi_callback_info info)
 {
     size_t argc = kTwoValueLimit;
-    napi_value argv[kTwoValueLimit];
+    napi_value argv[kTwoValueLimit] = {0};
     napi_value thisVar = nullptr;
     void *data = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, &data));
@@ -492,7 +493,7 @@ napi_value NapiCallManager::SendBurstDtmf(napi_env env, napi_callback_info info)
 napi_value NapiCallManager::GetCallState(napi_env env, napi_callback_info info)
 {
     size_t argc = kTwoValueLimit;
-    napi_value argv[kTwoValueLimit];
+    napi_value argv[kTwoValueLimit] = {0};
     napi_value thisVar = nullptr;
     void *data = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, &data));
@@ -507,7 +508,7 @@ napi_value NapiCallManager::GetCallState(napi_env env, napi_callback_info info)
 napi_value NapiCallManager::IsRinging(napi_env env, napi_callback_info info)
 {
     size_t argc = kTwoValueLimit;
-    napi_value argv[kTwoValueLimit];
+    napi_value argv[kTwoValueLimit] = {0};
     napi_value thisVar = nullptr;
     void *data = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, &data));
@@ -522,7 +523,7 @@ napi_value NapiCallManager::IsRinging(napi_env env, napi_callback_info info)
 napi_value NapiCallManager::HasCall(napi_env env, napi_callback_info info)
 {
     size_t argc = kTwoValueLimit;
-    napi_value argv[kTwoValueLimit];
+    napi_value argv[kTwoValueLimit] = {0};
     napi_value thisVar = nullptr;
     void *data = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, &data));
@@ -537,7 +538,7 @@ napi_value NapiCallManager::HasCall(napi_env env, napi_callback_info info)
 napi_value NapiCallManager::IsNewCallAllowed(napi_env env, napi_callback_info info)
 {
     size_t argc = kTwoValueLimit;
-    napi_value argv[kTwoValueLimit];
+    napi_value argv[kTwoValueLimit] = {0};
     napi_value thisVar = nullptr;
     void *data = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, &data));
@@ -552,7 +553,7 @@ napi_value NapiCallManager::IsNewCallAllowed(napi_env env, napi_callback_info in
 napi_value NapiCallManager::IsInEmergencyCall(napi_env env, napi_callback_info info)
 {
     size_t argc = kTwoValueLimit;
-    napi_value argv[kTwoValueLimit];
+    napi_value argv[kTwoValueLimit] = {0};
     napi_value thisVar = nullptr;
     void *data = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, &data));
@@ -567,7 +568,7 @@ napi_value NapiCallManager::IsInEmergencyCall(napi_env env, napi_callback_info i
 napi_value NapiCallManager::IsEmergencyPhoneNumber(napi_env env, napi_callback_info info)
 {
     size_t argc = kValueMaximumLimit;
-    napi_value argv[kValueMaximumLimit];
+    napi_value argv[kValueMaximumLimit] = {0};
     napi_value thisVar = nullptr;
     void *data = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, &data));
@@ -595,7 +596,7 @@ napi_value NapiCallManager::IsEmergencyPhoneNumber(napi_env env, napi_callback_i
 napi_value NapiCallManager::FormatPhoneNumber(napi_env env, napi_callback_info info)
 {
     size_t argc = kValueMaximumLimit;
-    napi_value argv[kValueMaximumLimit];
+    napi_value argv[kValueMaximumLimit] = {0};
     napi_value thisVar = nullptr;
     void *data = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, &data));
@@ -623,7 +624,7 @@ napi_value NapiCallManager::FormatPhoneNumber(napi_env env, napi_callback_info i
 napi_value NapiCallManager::FormatPhoneNumberToE164(napi_env env, napi_callback_info info)
 {
     size_t argc = kValueMaximumLimit;
-    napi_value argv[kValueMaximumLimit];
+    napi_value argv[kValueMaximumLimit] = {0};
     napi_value thisVar = nullptr;
     void *data = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, &data));
@@ -650,7 +651,7 @@ napi_value NapiCallManager::FormatPhoneNumberToE164(napi_env env, napi_callback_
 napi_value NapiCallManager::ObserverOn(napi_env env, napi_callback_info info)
 {
     size_t argc = kValueMaximumLimit;
-    napi_value argv[kValueMaximumLimit];
+    napi_value argv[kValueMaximumLimit] = {0};
     napi_value thisVar = nullptr;
     void *data = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, &data));
@@ -679,7 +680,7 @@ napi_value NapiCallManager::ObserverOn(napi_env env, napi_callback_info info)
 napi_value NapiCallManager::ObserverOff(napi_env env, napi_callback_info info)
 {
     size_t argc = kValueMaximumLimit;
-    napi_value argv[kValueMaximumLimit];
+    napi_value argv[kValueMaximumLimit] = {0};
     napi_value thisVar = nullptr;
     void *data = nullptr;
     NAPI_CALL(env, napi_get_cb_info(env, info, &argc, argv, &thisVar, &data));
