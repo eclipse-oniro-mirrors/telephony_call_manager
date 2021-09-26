@@ -16,6 +16,8 @@
 #ifndef NAPI_CALL_ABILITY_CALLBACK_H
 #define NAPI_CALL_ABILITY_CALLBACK_H
 
+#include <uv.h>
+
 #include "pac_map.h"
 #include "singleton.h"
 
@@ -31,16 +33,24 @@ public:
     void RegisterCallEventCallback(EventListener eventCallback);
     void UnRegisterCallEventCallback();
     int32_t RegisterGetWaitingCallback(EventListener callback);
+    void UnRegisterGetWaitingCallback();
     int32_t RegisterSetWaitingCallback(EventListener callback);
+    void UnRegisterSetWaitingCallback();
     int32_t RegisterGetRestrictionCallback(EventListener callback);
+    void UnRegisterGetRestrictionCallback();
     int32_t RegisterSetRestrictionCallback(EventListener callback);
+    void UnRegisterSetRestrictionCallback();
     int32_t RegisterGetTransferCallback(EventListener callback);
+    void UnRegisterGetTransferCallback();
     int32_t RegisterSetTransferCallback(EventListener callback);
+    void UnRegisterSetTransferCallback();
     int32_t UpdateCallStateInfo(const CallAttributeInfo &info);
     int32_t UpdateCallEvent(const CallEventInfo &info);
     int32_t UpdateSupplementInfo(const CallResultReportId reportId, AppExecFwk::PacMap &resultInfo);
 
 private:
+    static void ReportCallStateWork(uv_work_t *work, int status);
+    static int32_t ReportCallState(CallAttributeInfo &info, EventListener stateCallback);
     int32_t ReportGetWaitingInfo(AppExecFwk::PacMap &resultInfo);
     int32_t ReportSetWaitingInfo(AppExecFwk::PacMap &resultInfo);
     int32_t ReportGetRestrictionInfo(AppExecFwk::PacMap &resultInfo);
@@ -51,10 +61,10 @@ private:
     void ReportSupplementInfo(
         napi_env env, int32_t result, EventListener supplementInfo, napi_value &callbackValue);
     int32_t ReportSettingInfo(EventListener &settingInfo, AppExecFwk::PacMap &resultInfo);
-    napi_value CreateUndefined(napi_env env);
+    static napi_value CreateUndefined(napi_env env);
     napi_value CreateErrorMessage(napi_env env, std::string msg);
-    void SetPropertyInt32(napi_env env, napi_value object, std::string name, int32_t value);
-    void SetPropertyStringUtf8(napi_env env, napi_value object, std::string name, std::string value);
+    static void SetPropertyInt32(napi_env env, napi_value object, std::string name, int32_t value);
+    static void SetPropertyStringUtf8(napi_env env, napi_value object, std::string name, std::string value);
 
 private:
     EventListener stateCallback_;

@@ -34,7 +34,7 @@ int32_t CallAbilityCallback::OnCallDetailsChange(const CallAttributeInfo &info)
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("UpdateCallStateInfoHandler failed! errCode:%{public}d", ret);
     } else {
-        TELEPHONY_LOGI("UpdateCallStateInfoHandler success! state:%{public}d", info.callState);
+        TELEPHONY_LOGI("UpdateCallStateInfoHandler success! state:%d", info.callState);
     }
     TELEPHONY_LOGE("end");
     return ret;

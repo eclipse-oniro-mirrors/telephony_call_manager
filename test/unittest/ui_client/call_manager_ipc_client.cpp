@@ -38,7 +38,6 @@ CallManagerIpcClient::~CallManagerIpcClient()
 
 int32_t CallManagerIpcClient::Init(int32_t systemAbilityId)
 {
-    TELEPHONY_LOGD("Enter CallManagerIpcClient::Init,systemAbilityId:%d\n", systemAbilityId);
     systemAbilityId_ = systemAbilityId;
     int32_t result = ConnectService();
     TELEPHONY_LOGD("Connect service: %X\n", result);
@@ -59,7 +58,6 @@ int32_t CallManagerIpcClient::ConnectService()
         return ret;
     }
 
-    TELEPHONY_LOGD("Get telephony base service %d start\n", systemAbilityId_);
     sptr<ISystemAbilityManager> managerPtr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (managerPtr == nullptr) {
         TELEPHONY_LOGE("GetSystemAbilityManager null\n");
@@ -80,11 +78,9 @@ int32_t CallManagerIpcClient::ConnectService()
 
 void CallManagerIpcClient::DisconnectService()
 {
-    TELEPHONY_LOGD("Enter CallManagerIpcClient::DisconnectService\n");
     if (callManagerServicePtr_ == nullptr) {
         callManagerServicePtr_ = nullptr;
     }
-    TELEPHONY_LOGD("Leave CallManagerIpcClient::DisconnectService\n");
 }
 
 int32_t CallManagerIpcClient::DialCall(std::u16string number, AppExecFwk::PacMap &extras) const

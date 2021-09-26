@@ -30,7 +30,6 @@ ohos_shared_library("call") {
     "js/napi/src/napi_call_ability_callback.cpp",
     "js/napi/src/napi_call_ability_handler.cpp",
     "js/napi/src/napi_call_manager.cpp",
-    "js/napi/src/native_module_call_manager.cpp",
     "native/src/call_ability_callback.cpp",
     "native/src/call_ability_callback_stub.cpp",
     "native/src/call_manager_proxy.cpp",
@@ -39,6 +38,7 @@ ohos_shared_library("call") {
   deps = [
     "$SUBSYSTEM_DIR/core_service/common:libtelephony_common",
     "//foundation/ace/napi:ace_napi",
+    "//third_party/libuv:uv_static",
     "//utils/native/base:utils",
   ]
 
