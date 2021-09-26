@@ -25,7 +25,7 @@ class StatusBar : public CallStateListenerBase {
     DECLARE_DELAYED_SINGLETON(StatusBar)
 public:
     void UpdateMuteIcon(bool isDisplayMute);
-    void UpdateSpeakerphoneIcon(bool isDisplaySpeakerphone);
+    void UpdateSpeakerphoneIcon(bool isDisplay);
     void NewCallCreated(sptr<CallBase> &callObjectPtr) override;
     void CallDestroyed(sptr<CallBase> &callObjectPtr) override;
     void CallStateUpdated(sptr<CallBase> &callObjectPtr, TelCallState priorState, TelCallState nextState) override;
@@ -34,7 +34,7 @@ public:
 
 private:
     bool isDisplayMute_;
-    bool isDisplaySpeakerphone_;
+    bool isDisplayIcon_;
 };
 } // namespace Telephony
 } // namespace OHOS
