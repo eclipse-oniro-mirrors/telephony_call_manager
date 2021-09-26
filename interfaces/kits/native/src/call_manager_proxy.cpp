@@ -55,7 +55,6 @@ void CallManagerProxy::UnInit()
 
 void CallManagerProxy::task()
 {
-    TELEPHONY_LOGD("start task...");
     int32_t ret = DelayedSingleton<CallManagerProxy>::GetInstance()->ConnectService();
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("call manager service reconnection failed! errCode:%{public}d", ret);
@@ -120,7 +119,6 @@ void CallManagerProxy::Clean()
         callAbilityCallbackPtr_.clear();
         callAbilityCallbackPtr_ = nullptr;
     }
-    TELEPHONY_LOGD("clean");
 }
 
 void CallManagerProxy::OnDeath()

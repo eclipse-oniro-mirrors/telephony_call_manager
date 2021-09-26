@@ -37,7 +37,6 @@ bool EnableMicDevice::ProcessEvent(int32_t event)
         default:
             break;
     }
-    TELEPHONY_LOGD("enable mic device process event lock release");
     return result;
 }
 } // namespace Telephony

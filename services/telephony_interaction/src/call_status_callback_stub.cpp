@@ -25,7 +25,6 @@ namespace OHOS {
 namespace Telephony {
 CallStatusCallbackStub::CallStatusCallbackStub()
 {
-    TELEPHONY_LOGD("CellularCallCallbackStub");
     memberFuncMap_[UPDATE_CALL_INFO] = &CallStatusCallbackStub::OnUpdateCallReportInfoRequest;
     memberFuncMap_[UPDATE_CALLS_INFO] = &CallStatusCallbackStub::OnUpdateCallsReportInfoRequest;
     memberFuncMap_[UPDATE_DISCONNECTED_CAUSE] = &CallStatusCallbackStub::OnUpdateDisconnectedCauseRequest;
@@ -55,7 +54,7 @@ int CallStatusCallbackStub::OnRemoteRequest(
         TELEPHONY_LOGE("descriptor checked failed");
         return TELEPHONY_BAD_TYPE;
     }
-    TELEPHONY_LOGD("OnReceived, cmd = %{public}u", code);
+    TELEPHONY_LOGD("OnReceived, cmd = %u", code);
 
     auto itFunc = memberFuncMap_.find(code);
     if (itFunc != memberFuncMap_.end()) {
@@ -123,10 +122,10 @@ int32_t CallStatusCallbackStub::OnUpdateCallsReportInfoRequest(MessageParcel &da
         }
 
         callReportInfo.callVec.push_back(*parcelPtr);
-        TELEPHONY_LOGD("accountId:%{public}d,state:%{public}d", parcelPtr->accountId, parcelPtr->state);
+        TELEPHONY_LOGD("accountId:%d,state:%d", parcelPtr->accountId, parcelPtr->state);
     }
     callReportInfo.slotId = data.ReadInt32();
-    TELEPHONY_LOGD("slotId:%{public}d", callReportInfo.slotId);
+    TELEPHONY_LOGD("slotId:%d", callReportInfo.slotId);
     result = OnUpdateCallsReportInfo(callReportInfo);
     if (!reply.WriteInt32(result)) {
         TELEPHONY_LOGE("writing parcel failed");

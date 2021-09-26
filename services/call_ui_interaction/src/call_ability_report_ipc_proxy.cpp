@@ -65,7 +65,7 @@ int32_t CallAbilityReportIpcProxy::ReportCallStateInfo(const CallAttributeInfo &
         TELEPHONY_LOGE("OnCallDetailsChange failed, errcode:%{public}d", ret);
         return ret;
     }
-    TELEPHONY_LOGD("report call state:%{public}d", info.callState);
+    TELEPHONY_LOGD("report call state:%d", info.callState);
     return ret;
 }
 

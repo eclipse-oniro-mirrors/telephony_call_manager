@@ -42,7 +42,6 @@ bool CSCallState::ProcessEvent(int32_t event)
         default:
             break;
     }
-    TELEPHONY_LOGD("cs call state process event lock release");
     return result;
 }
 } // namespace Telephony

@@ -33,14 +33,12 @@ bool EnableBluetoothDevice::ProcessEvent(int32_t event)
             break;
         case AudioDeviceManager::BLUETOOTH_SCO_UNAVAILABLE:
             // should reinitialize audio device in order to switch to a proper audio route
-            TELEPHONY_LOGD("bt sco unavailable , reinitialize audio device");
             result = DelayedSingleton<AudioControlManager>::GetInstance()->ProcessEvent(
                 AudioDeviceManager::INIT_AUDIO_DEVICE);
             break;
         default:
             break;
     }
-    TELEPHONY_LOGD("enable bluetooth device process event lock release");
     return result;
 }
 } // namespace Telephony
