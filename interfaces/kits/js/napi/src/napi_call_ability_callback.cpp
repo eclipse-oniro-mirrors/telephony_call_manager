@@ -116,7 +116,6 @@ int32_t NapiCallAbilityCallback::RegisterSetTransferCallback(EventListener callb
 
 int32_t NapiCallAbilityCallback::UpdateCallStateInfo(const CallAttributeInfo &info)
 {
-    TELEPHONY_LOGE("start");
     if (stateCallback_.thisVar == nullptr) {
         TELEPHONY_LOGE("stateCallback is null!");
         return TELEPHONY_FAIL;
@@ -133,17 +132,13 @@ int32_t NapiCallAbilityCallback::UpdateCallStateInfo(const CallAttributeInfo &in
     dataWorker->ref = stateCallback_.callbackRef;
     dataWorker->info = info;
     dataWorker->callback = stateCallback_;
-
     uv_work_t *work = new (std::nothrow) uv_work_t;
     if (!work) {
         return TELEPHONY_FAIL;
     }
     work->data = (void *)dataWorker;
-
     uv_queue_work(
         loop, work, [](uv_work_t *work) {}, ReportCallStateWork);
-
-    TELEPHONY_LOGE("end");
     return TELEPHONY_SUCCESS;
 }
 
@@ -153,7 +148,6 @@ void NapiCallAbilityCallback::ReportCallStateWork(uv_work_t *work, int status)
     if (dataWorkerData == nullptr) {
         return;
     }
-
     int32_t ret = ReportCallState(dataWorkerData->info, dataWorkerData->callback);
     TELEPHONY_LOGE("%{public}d", ret);
     delete dataWorkerData;
@@ -217,7 +211,6 @@ int32_t NapiCallAbilityCallback::UpdateCallEvent(const CallEventInfo &info)
 int32_t NapiCallAbilityCallback::UpdateSupplementInfo(
     const CallResultReportId reportId, AppExecFwk::PacMap &resultInfo)
 {
-    TELEPHONY_LOGE("UpdateSupplementInfo on");
     switch (reportId) {
         case CallResultReportId::GET_CALL_WAITING_REPORT_ID:
             ReportGetWaitingInfo(resultInfo);

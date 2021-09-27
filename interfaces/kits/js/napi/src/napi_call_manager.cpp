@@ -26,6 +26,7 @@
 #include "napi_call_ability_callback.h"
 #include "napi_call_ability_handler.h"
 #include "call_manager_proxy.h"
+#include "napi_call_manager.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -994,10 +995,6 @@ void NapiCallManager::GetDialInfo(napi_env env, napi_value objValue, DialAsyncCo
     asyncContext.videoState = GetIntProperty(env, objValue, "videoState");
     asyncContext.dialScene = GetIntProperty(env, objValue, "dialScene");
     asyncContext.dialType = GetIntProperty(env, objValue, "dialType");
-
-    TELEPHONY_LOGD(
-        "accountId = %{public}d, videoState = %{public}d, dialScene = %{public}d, dialType = %{public}d",
-        asyncContext.accountId, asyncContext.videoState, asyncContext.dialScene, asyncContext.dialType);
 }
 
 void NapiCallManager::GetDtmfBunchInfo(napi_env env, napi_value objValue, DtmfAsyncContext &asyncContext)
@@ -1371,7 +1368,6 @@ int32_t NapiCallManager::GetIntProperty(napi_env env, napi_value object, const s
 napi_value NapiCallManager::HandleAsyncWork(napi_env env, AsyncContext *context, std::string workName,
     napi_async_execute_callback execute, napi_async_complete_callback complete)
 {
-    TELEPHONY_LOGD("HandleAsyncWork start workName = %{public}s", workName.c_str());
     napi_value result = nullptr;
     if (context->callbackRef == nullptr) {
         napi_create_promise(env, &context->deferred, &result);
@@ -1389,6 +1385,21 @@ napi_value NapiCallManager::HandleAsyncWork(napi_env env, AsyncContext *context,
 bool NapiCallManager::IsValidSlotId(int32_t slotId)
 {
     return slotId == kDefaultSlotId;
+}
+
+static napi_module g_nativeCallManagerModule = {
+    .nm_version = kNativeVersion,
+    .nm_flags = kNativeFlags,
+    .nm_filename = nullptr,
+    .nm_register_func = NapiCallManager::RegisterCallManagerFunc,
+    .nm_modname = "telephony.call",
+    .nm_priv = ((void *)0),
+    .reserved = {0},
+};
+
+extern "C" __attribute__((constructor)) void RegisterModule(void)
+{
+    napi_module_register(&g_nativeCallManagerModule);
 }
 } // namespace Telephony
 } // namespace OHOS

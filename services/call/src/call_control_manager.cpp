@@ -78,9 +78,9 @@ bool CallControlManager::Init()
     callStateListenerPtr_->AddOneObserver(reportCallStateHandlerPtr_);
 #ifdef AUDIO_SUPPORT
     callStateListenerPtr_->AddOneObserver(DelayedSingleton<AudioControlManager>::GetInstance().get());
+#endif
     hungUpSms_ = (std::make_unique<HangUpSms>()).release();
     callStateListenerPtr_->AddOneObserver(hungUpSms_);
-#endif
     callStateListenerPtr_->AddOneObserver(DelayedSingleton<CallAbilityHandlerService>::GetInstance().get());
     return true;
 }
@@ -317,7 +317,6 @@ bool CallControlManager::NotifyCallStateUpdated(
     }
     if (callStateListenerPtr_ != nullptr) {
         callStateListenerPtr_->CallStateUpdated(callObjectPtr, priorState, nextState);
-        TELEPHONY_LOGD("NotifyCallStateUpdated priorState:%{public}d,nextState:%{public}d", priorState, nextState);
         return true;
     }
     return false;
@@ -545,7 +544,6 @@ int32_t CallControlManager::DialProcess()
         }
         dialType = (DialType)dialSrcInfo_.extras.GetIntValue("dialType");
     }
-    TELEPHONY_LOGD("dialType:%{public}d", dialType);
     switch (dialType) {
         case DialType::DIAL_CARRIER_TYPE:
             ret = CarrierDialProcess();

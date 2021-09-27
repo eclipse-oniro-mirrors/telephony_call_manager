@@ -118,9 +118,6 @@ int32_t CallManagerServiceStub::DialCallRequest(MessageParcel &data, MessageParc
         TELEPHONY_LOGE("the account number length exceeds the limit");
         return CALL_MANAGER_PHONE_NUMBER_INVALID;
     }
-    TELEPHONY_LOGD("accountId:%{public}d,videoState:%{public}d,dialScene:%{public}d,dialType:%{public}d",
-        dialInfo.GetIntValue("accountId"), dialInfo.GetIntValue("videoState"), dialInfo.GetIntValue("dialScene"),
-        dialInfo.GetIntValue("dialType"));
     result = DialCall(callNumber, dialInfo);
     TELEPHONY_LOGD("result:%{public}d", result);
     if (!reply.WriteInt32(result)) {
@@ -338,14 +335,12 @@ int32_t CallManagerServiceStub::SetCallWaitingRequest(MessageParcel &data, Messa
 
 int32_t CallManagerServiceStub::JoinConferenceRequest(MessageParcel &data, MessageParcel &reply)
 {
-    TELEPHONY_LOGD("Enter");
     int32_t mainCallId = data.ReadInt32();
     int32_t result = CombineConference(mainCallId);
     if (!reply.WriteInt32(result)) {
         TELEPHONY_LOGE("fail to write parcel");
         return TELEPHONY_WRITE_REPLY_FAIL;
     }
-    TELEPHONY_LOGD("Leave");
     return TELEPHONY_SUCCESS;
 }
 

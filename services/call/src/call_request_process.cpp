@@ -117,7 +117,7 @@ void CallRequestProcess::CombineConferenceRequest(int32_t mainCallId)
     }
     int32_t ret = call->CombineConference();
     if (ret != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGD("CombineConference failed");
+        TELEPHONY_LOGE("CombineConference failed");
     }
 }
 

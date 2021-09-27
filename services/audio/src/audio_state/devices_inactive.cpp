@@ -38,7 +38,6 @@ bool DevicesInactive::ProcessEvent(int32_t event)
         default:
             break;
     }
-    TELEPHONY_LOGD("devices inactive process event lock release");
     return result;
 }
 } // namespace Telephony

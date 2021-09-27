@@ -89,42 +89,42 @@ ToneDescriptor Tone::ConvertDigitToTone(char digit)
     ToneDescriptor tone = ToneDescriptor::TONE_UNKNOWN;
     switch (digit) {
         case '0':
-            tone = ToneDescriptor::DTMF_DIGIT_0;
+            tone = ToneDescriptor::TONE_DTMF_CHARACTER_0;
             break;
         case '1':
-            tone = ToneDescriptor::DTMF_DIGIT_1;
+            tone = ToneDescriptor::TONE_DTMF_CHARACTER_1;
             break;
         case '2':
-            tone = ToneDescriptor::DTMF_DIGIT_2;
+            tone = ToneDescriptor::TONE_DTMF_CHARACTER_2;
             break;
         case '3':
-            tone = ToneDescriptor::DTMF_DIGIT_3;
+            tone = ToneDescriptor::TONE_DTMF_CHARACTER_3;
             break;
         case '4':
-            tone = ToneDescriptor::DTMF_DIGIT_4;
+            tone = ToneDescriptor::TONE_DTMF_CHARACTER_4;
             break;
         case '5':
-            tone = ToneDescriptor::DTMF_DIGIT_5;
+            tone = ToneDescriptor::TONE_DTMF_CHARACTER_5;
             break;
         case '6':
-            tone = ToneDescriptor::DTMF_DIGIT_6;
+            tone = ToneDescriptor::TONE_DTMF_CHARACTER_6;
             break;
         case '7':
-            tone = ToneDescriptor::DTMF_DIGIT_7;
+            tone = ToneDescriptor::TONE_DTMF_CHARACTER_7;
             break;
         case '8':
-            tone = ToneDescriptor::DTMF_DIGIT_8;
+            tone = ToneDescriptor::TONE_DTMF_CHARACTER_8;
             break;
         case '9':
-            tone = ToneDescriptor::DTMF_DIGIT_9;
+            tone = ToneDescriptor::TONE_DTMF_CHARACTER_9;
             break;
         case 'p':
         case 'P':
-            tone = ToneDescriptor::DTMF_DIGIT_P;
+            tone = ToneDescriptor::TONE_DTMF_CHARACTER_P;
             break;
         case 'w':
         case 'W':
-            tone = ToneDescriptor::DTMF_DIGIT_W;
+            tone = ToneDescriptor::TONE_DTMF_CHARACTER_W;
             break;
         default:
             break;

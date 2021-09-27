@@ -50,7 +50,6 @@ bool InActiveState::ProcessEvent(int32_t event)
         default:
             break;
     }
-    TELEPHONY_LOGD("inactive state process event lock release");
     return result;
 }
 } // namespace Telephony

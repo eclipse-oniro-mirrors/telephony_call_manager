@@ -44,7 +44,6 @@ bool EnableSpeakerDevice::ProcessEvent(int32_t event)
         default:
             break;
     }
-    TELEPHONY_LOGD("enable speaker device process event lock release");
     return result;
 }
 } // namespace Telephony
