@@ -42,7 +42,6 @@ bool IMSCallState::ProcessEvent(int32_t event)
         default:
             break;
     }
-    TELEPHONY_LOGD("ims call state process event lock release");
     return result;
 }
 } // namespace Telephony

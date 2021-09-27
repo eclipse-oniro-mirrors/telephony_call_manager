@@ -33,7 +33,7 @@ int32_t CallStatusCallback::OnUpdateCallReportInfo(const CallReportInfo &info)
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("UpdateCallReportInfo failed! errCode:%{public}d", ret);
     } else {
-        TELEPHONY_LOGI("UpdateCallReportInfo success! state:%{public}d", info.state);
+        TELEPHONY_LOGI("UpdateCallReportInfo success! state:%d", info.state);
     }
     return ret;
 }

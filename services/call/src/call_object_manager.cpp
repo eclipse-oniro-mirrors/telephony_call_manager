@@ -124,7 +124,7 @@ int32_t CallObjectManager::HasNewCall()
         if ((*it)->GetCallRunningState() == CallRunningState::CALL_RUNNING_STATE_CREATE ||
             (*it)->GetCallRunningState() == CallRunningState::CALL_RUNNING_STATE_CONNECTING ||
             (*it)->GetCallRunningState() == CallRunningState::CALL_RUNNING_STATE_DIALING) {
-            TELEPHONY_LOGE("there is already a new call[callId:%{public}d,state:%{public}d], please redial later",
+            TELEPHONY_LOGE("there is already a new call[callId:%d,state:%d], please redial later",
                 (*it)->GetCallID(), (*it)->GetCallRunningState());
             return CALL_MANAGER_HAS_NEW_CALL;
         }

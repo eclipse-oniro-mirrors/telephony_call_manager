@@ -80,7 +80,6 @@ bool CallStateProcess::ProcessEvent(int32_t event)
 bool CallStateProcess::SwitchState(InCallState state)
 {
     if (currentInCallState_ == state) {
-        TELEPHONY_LOGD("no need to switch call state");
         return true;
     }
     bool result = false;
@@ -123,7 +122,6 @@ bool CallStateProcess::SwitchCSCall()
             return false;
         }
         currentInCallState_ = CS_CALL_STATE;
-        TELEPHONY_LOGD("current call state : cs call state");
         return true;
     }
     return false;
@@ -143,7 +141,6 @@ bool CallStateProcess::SwitchIMSCall()
             return false;
         }
         currentInCallState_ = IMS_CALL_STATE;
-        TELEPHONY_LOGD("current call state : ims call state");
         return true;
     }
     return false;
@@ -162,7 +159,6 @@ bool CallStateProcess::SwitchHolding()
             return false;
         }
         currentInCallState_ = HOLDING_STATE;
-        TELEPHONY_LOGD("current call state : holding state");
         return true;
     }
     return false;

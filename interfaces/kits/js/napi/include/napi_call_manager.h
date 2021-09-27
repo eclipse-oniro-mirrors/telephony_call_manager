@@ -58,9 +58,6 @@ public:
     static napi_value IsEmergencyPhoneNumber(napi_env env, napi_callback_info info);
     static napi_value FormatPhoneNumber(napi_env env, napi_callback_info info);
     static napi_value FormatPhoneNumberToE164(napi_env env, napi_callback_info info);
-    static napi_value RegisterCallStateCallback(napi_env env, napi_callback_info info);
-    static napi_value RegisterCallEventCallback(napi_env env, napi_callback_info info);
-    static napi_value RegisterSupplementCallback(napi_env env, napi_callback_info info);
     static napi_value ObserverOn(napi_env env, napi_callback_info info);
     static napi_value ObserverOff(napi_env env, napi_callback_info info);
 
@@ -87,7 +84,6 @@ private:
     static void NativeUnHoldCall(napi_env env, void *data);
     static void NativeSwitchCall(napi_env env, void *data);
     static void NativeCombineConference(napi_env env, void *data);
-    static void NativeSeparateConference(napi_env env, void *data);
     static void NativeGetMainCallId(napi_env env, void *data);
     static void NativeGetSubCallIdList(napi_env env, void *data);
     static void NativeGetCallIdListForConference(napi_env env, void *data);
@@ -109,6 +105,7 @@ private:
     static napi_value GetNamedProperty(napi_env env, napi_value object, const std::string &propertyName);
     static std::string GetStringProperty(napi_env env, napi_value object, const std::string &propertyName);
     static int32_t GetIntProperty(napi_env env, napi_value object, const std::string &propertyName);
+    static void GetSmsInfo(napi_env env, napi_value objValue, RejectAsyncContext &asyncContext);
     static napi_value HandleAsyncWork(napi_env env, AsyncContext *context, std::string workName,
         napi_async_execute_callback execute, napi_async_complete_callback complete);
     static bool IsValidSlotId(int32_t slotId);

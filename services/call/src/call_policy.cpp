@@ -110,7 +110,7 @@ int32_t CallPolicy::SwitchCallPolicy(int32_t &callId)
     GetCarrierCallList(callList);
     if (callList.size() < onlyTwoCall_) {
         callList.clear();
-        return TELEPHONY_FAIL;
+        return CALL_MANAGER_ILLEGAL_CALL_OPERATION;
     }
     callId = callList.front()->GetCallID();
     callList.clear();

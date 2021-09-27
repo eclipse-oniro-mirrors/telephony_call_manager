@@ -266,19 +266,15 @@ bool AudioDeviceManager::DoSwitch(AudioDevice device)
             result = EnableBtSco();
             break;
         case AudioDevice::DEVICE_WIRED_HEADSET:
-            TELEPHONY_LOGD("switch device : wired headset");
             result = EnableWiredHeadset();
             break;
         case AudioDevice::DEVICE_SPEAKER:
-            TELEPHONY_LOGD("switch device : speaker");
             result = EnableSpeaker();
             break;
         case AudioDevice::DEVICE_MIC:
-            TELEPHONY_LOGD("switch device : mic");
             result = EnableMic();
             break;
         case AudioDevice::DEVICE_DISABLE:
-            TELEPHONY_LOGD("switch device inactive");
             result = DisableAll();
             break;
         default:
