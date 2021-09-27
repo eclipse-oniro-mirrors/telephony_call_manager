@@ -91,13 +91,13 @@ int32_t CallStatusManager::HandleCallReportInfo(const CallReportInfo &info)
 int32_t CallStatusManager::HandleCallsReportInfo(const CallsReportInfo &info)
 {
     bool flag = false;
-    TELEPHONY_LOGD("call list size:%{public}zu,slotId:%{public}d", info.callVec.size(), info.slotId);
+    TELEPHONY_LOGD("call list size:%{public}zu,slotId:%d", info.callVec.size(), info.slotId);
     for (auto &it : info.callVec) {
         for (auto &it1 : callsReportInfo_.callVec) {
             if (strcmp(it.accountNum, it1.accountNum) == 0) {
-                TELEPHONY_LOGD("state:%{public}d", it.state);
+                TELEPHONY_LOGD("state:%d", it.state);
                 if (it.state != it1.state) {
-                    TELEPHONY_LOGI("handle updated call state:%{public}d", it.state);
+                    TELEPHONY_LOGI("handle updated call state:%d", it.state);
                     HandleCallReportInfo(it);
                 }
                 flag = true;
@@ -105,7 +105,7 @@ int32_t CallStatusManager::HandleCallsReportInfo(const CallsReportInfo &info)
             }
         }
         if (!flag || callsReportInfo_.callVec.empty()) {
-            TELEPHONY_LOGI("handle new call state:%{public}d", it.state);
+            TELEPHONY_LOGI("handle new call state:%d", it.state);
             HandleCallReportInfo(it);
         }
         flag = false;
@@ -114,7 +114,7 @@ int32_t CallStatusManager::HandleCallsReportInfo(const CallsReportInfo &info)
     for (auto &it2 : callsReportInfo_.callVec) {
         for (auto &it3 : info.callVec) {
             if (strcmp(it2.accountNum, it3.accountNum) == 0) {
-                TELEPHONY_LOGD("state:%{public}d", it2.state);
+                TELEPHONY_LOGD("state:%d", it2.state);
                 flag = true;
                 break;
             }
@@ -139,29 +139,21 @@ int32_t CallStatusManager::HandleEventResultReportInfo(const CellularCallEventIn
     eventInfo.eventId = CallAbilityEventId::EVENT_UNKNOW_ID;
     switch (info.eventId) {
         case RESULT_INITIATE_DTMF_SUCCESS:
-            TELEPHONY_LOGD("StartDtmf success, eventId:%{public}d", info.eventId);
             eventInfo.eventId = CallAbilityEventId::EVENT_START_DTMF_SUCCESS;
             break;
         case RESULT_INITIATE_DTMF_FAILED:
-            TELEPHONY_LOGD("StartDtmf fail, eventId:%{public}d", info.eventId);
             break;
         case RESULT_CEASE_DTMF_SUCCESS:
-            TELEPHONY_LOGD("StopDtmf success, eventId:%{public}d", info.eventId);
             break;
         case RESULT_CEASE_DTMF_FAILED:
-            TELEPHONY_LOGD("StopDtmf success, eventId:%{public}d", info.eventId);
             break;
         case RESULT_TRANSMIT_DTMF_SUCCESS:
-            TELEPHONY_LOGD("SendDtmf success, eventId:%{public}d", info.eventId);
             break;
         case RESULT_TRANSMIT_DTMF_FAILED:
-            TELEPHONY_LOGD("SendDtmf fail, eventId:%{public}d", info.eventId);
             break;
         case RESULT_TRANSMIT_DTMF_STRING_SUCCESS:
-            TELEPHONY_LOGD("SendBurstDtmf success, eventId:%{public}d", info.eventId);
             break;
         case RESULT_TRANSMIT_DTMF_STRING_FAILED:
-            TELEPHONY_LOGD("SendBurstDtmf fail, eventId:%{public}d", info.eventId);
             break;
         default:
             TELEPHONY_LOGD("error, Unknown event");
@@ -385,7 +377,7 @@ int32_t CallStatusManager::UpdateCallState(sptr<CallBase> &call, TelCallState ne
         return CALL_MANAGER_CALL_NULL;
     }
     TelCallState priorState = call->GetTelCallState();
-    TELEPHONY_LOGD("priorState:%{public}d, nextState:%{public}d", priorState, nextState);
+    TELEPHONY_LOGD("priorState:%d, nextState:%d", priorState, nextState);
     // need DTMF judge
     ret = call->SetTelCallState(nextState);
     if (ret != TELEPHONY_SUCCESS) {

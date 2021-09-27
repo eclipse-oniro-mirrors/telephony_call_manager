@@ -123,7 +123,6 @@ void ReportCallStateHandlerService::CallStateUpdated(
     }
     CallAttributeInfo info;
     callObjectPtr->GetCallAttributeInfo(info);
-    TELEPHONY_LOGD("accountNumber:%s,state:%{public}d", info.accountNumber, info.callState);
     if (info.callState == TelCallState::CALL_STATUS_INCOMING) {
         ReportCallStateForCallId(info);
     } else {

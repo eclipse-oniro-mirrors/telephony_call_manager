@@ -88,7 +88,6 @@ int32_t CsConferenceBase::AddOneConferenceSubCallId(int32_t callId)
 int32_t CsConferenceBase::GetMainCsCallId(int32_t callId)
 {
     std::lock_guard<std::mutex> lock(vecMutex_);
-    TELEPHONY_LOGD("mainCallId_:%{public}d", mainCallId_);
     return mainCallId_;
 }
 
@@ -106,7 +105,6 @@ std::vector<std::u16string> CsConferenceBase::GetSubCsCallIdList(int32_t callId)
     for (; it != subCallIdVec_.end(); it++) {
         tmpStr = std::to_string(*it);
         vec.push_back(Str8ToStr16(tmpStr));
-        TELEPHONY_LOGD("subCallId_:%{public}s", tmpStr.c_str());
     }
     return vec;
 }
@@ -125,11 +123,9 @@ std::vector<std::u16string> CsConferenceBase::GetCsCallIdListForConference(int32
     for (; it != subCallIdVec_.end(); it++) {
         tmpStr = std::to_string(*it);
         vec.push_back(Str8ToStr16(tmpStr));
-        TELEPHONY_LOGD("subCallId_:%{public}s", tmpStr.c_str());
     }
     tmpStr = std::to_string(mainCallId_);
     vec.push_back(Str8ToStr16(tmpStr));
-    TELEPHONY_LOGD("subCallId_:%{public}s", tmpStr.c_str());
     return vec;
 }
 

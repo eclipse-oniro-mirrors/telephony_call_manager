@@ -33,7 +33,6 @@ CallNumberUtils::~CallNumberUtils() {}
 int32_t CallNumberUtils::FormatPhoneNumber(
     const std::string &phoneNumber, const std::string &countryCode, std::string &formatNumber)
 {
-    TELEPHONY_LOGD("FormatPhoneNumber on");
     if (phoneNumber.empty()) {
         return CALL_MANAGER_PHONE_NUMBER_NULL;
     }
@@ -55,14 +54,12 @@ int32_t CallNumberUtils::FormatPhoneNumber(
 int32_t CallNumberUtils::FormatPhoneNumberToE164(
     const std::string phoneNumber, const std::string countryCode, std::string &formatNumber)
 {
-    TELEPHONY_LOGD("FormatPhoneNumberToE164 on");
     return FormatNumberBase(phoneNumber, countryCode, i18n::phonenumbers::PhoneNumberUtil::E164, formatNumber);
 }
 
 int32_t CallNumberUtils::FormatNumberBase(const std::string phoneNumber, std::string countryCode,
     const i18n::phonenumbers::PhoneNumberUtil::PhoneNumberFormat formatInfo, std::string &formatNumber)
 {
-    TELEPHONY_LOGD("formatNumberBase on");
     if (phoneNumber.empty()) {
         return CALL_MANAGER_PHONE_NUMBER_NULL;
     }
@@ -81,11 +78,10 @@ int32_t CallNumberUtils::FormatNumberBase(const std::string phoneNumber, std::st
 bool CallNumberUtils::CheckNumberIsEmergency(
     const std::string &phoneNumber, const int32_t slotId, int32_t &errorCode)
 {
-    TELEPHONY_LOGD("CheckNumberIsEmergency");
     errorCode = TELEPHONY_SUCCESS;
     int isEcc = DelayedSingleton<CellularCallIpcInterfaceProxy>::GetInstance()->IsUrgentCall(
         phoneNumber, slotId, errorCode);
-    TELEPHONY_LOGD("CheckNumberIsEmergency  isEcc == %{public}d, errorCode == %{public}d", isEcc, errorCode);
+    TELEPHONY_LOGD("CheckNumberIsEmergency  isEcc == %d, errorCode == %d", isEcc, errorCode);
     return (isEcc != 0);
 }
 

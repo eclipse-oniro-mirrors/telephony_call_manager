@@ -36,7 +36,7 @@ void CallManagerBroadcastSubscriber::OnReceiveEvent(const CommonEventData &data)
     uint32_t code = UNKNOWN_BROADCAST_EVENT;
     OHOS::EventFwk::Want want = data.GetWant();
     std::string action = data.GetWant().GetAction();
-    TELEPHONY_LOGD("receive one broadcast:%{public}s", action.c_str());
+    TELEPHONY_LOGD("receive one broadcast:%s", action.c_str());
     if (action == SIM_STATE_UPDATE_ACTION) {
         code = SIM_STATE_BROADCAST_EVENT;
     } else {
@@ -59,7 +59,7 @@ void CallManagerBroadcastSubscriber::UnknownBroadcast(const CommonEventData &dat
 
 void CallManagerBroadcastSubscriber::SimStateBroadcast(const CommonEventData &data)
 {
-    TELEPHONY_LOGD("sim state broadcast code:%{public}d", data.GetCode());
+    TELEPHONY_LOGD("sim state broadcast code:%d", data.GetCode());
 }
 } // namespace Telephony
 } // namespace OHOS

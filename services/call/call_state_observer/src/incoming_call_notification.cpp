@@ -114,7 +114,6 @@ void IncomingCallNotification::PublishNotification(const std::string &title, con
 {
     // show the incoming call notification while full screen
     if (!IsFullScreen()) {
-        TELEPHONY_LOGD("not full screen");
         return;
     }
 #ifdef ABILITY_NOTIFICATION_SUPPORT

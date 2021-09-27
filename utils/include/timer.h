@@ -48,7 +48,6 @@ public:
         if (stopStatus_ == false) {
             return;
         }
-        TELEPHONY_LOGD("start thread...");
         stopStatus_ = false;
         std::thread([this, interval, taskFun]() {
             while (!tryStopFlag_) {
@@ -70,7 +69,6 @@ public:
         if (stopStatus_ || tryStopFlag_) {
             return;
         }
-        TELEPHONY_LOGD("stop thread...");
         tryStopFlag_ = true;
         {
             std::unique_lock<std::mutex> locker(mutex_);
