@@ -47,7 +47,6 @@ bool RingingState::ProcessEvent(int32_t event)
         default:
             break;
     }
-    TELEPHONY_LOGD("ringing state process event lock release");
     return result;
 }
 } // namespace Telephony

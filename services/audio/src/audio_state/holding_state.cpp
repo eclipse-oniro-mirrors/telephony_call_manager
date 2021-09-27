@@ -50,7 +50,6 @@ bool HoldingState::ProcessEvent(int32_t event)
         default:
             break;
     }
-    TELEPHONY_LOGD("holding state process event lock release");
     return result;
 }
 } // namespace Telephony

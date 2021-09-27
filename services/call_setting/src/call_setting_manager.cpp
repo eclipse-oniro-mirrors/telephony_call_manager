@@ -43,7 +43,7 @@ int32_t CallSettingManager::SetCallWaiting(int32_t slotId, bool activate)
 
 int32_t CallSettingManager::GetCallRestriction(int32_t slotId, CallRestrictionType type)
 {
-    TELEPHONY_LOGD("===========slotId = %{public}d, type = %{public}d", slotId, type);
+    TELEPHONY_LOGD("===========slotId = %d, type = %d", slotId, type);
     return DelayedSingleton<CellularCallIpcInterfaceProxy>::GetInstance()->InquireCallRestriction(type, slotId);
 }
 
@@ -54,7 +54,6 @@ int32_t CallSettingManager::SetCallRestriction(int32_t slotId, CallRestrictionIn
 
 int32_t CallSettingManager::GetCallTransferInfo(int32_t slotId, CallTransferType type)
 {
-    TELEPHONY_LOGD("===========slotId = %{public}d, type = %{public}d", slotId, type);
     return DelayedSingleton<CellularCallIpcInterfaceProxy>::GetInstance()->InquireCallTransfer(type, slotId);
 }
 

@@ -88,7 +88,7 @@ int32_t CallStateReportProxy::ReportCallState(int32_t callState, std::u16string 
             TELEPHONY_LOGE("notifyCallStateUpdated failed, errcode:%{public}d", ret);
             return ret;
         }
-        TELEPHONY_LOGD("report call state:%{public}d", callState);
+        TELEPHONY_LOGD("report call state:%d", callState);
     }
     return ret;
 }
@@ -114,7 +114,7 @@ int32_t CallStateReportProxy::ReportCallStateForCallId(
             TELEPHONY_LOGE("NotifyCallStateUpdated failed, errcode:%{public}d", ret);
             return ret;
         }
-        TELEPHONY_LOGD("report call state:%{public}d, callId:%{public}d", callState, callId);
+        TELEPHONY_LOGD("report call state:%d, callId:%d", callState, callId);
     }
     return ret;
 }

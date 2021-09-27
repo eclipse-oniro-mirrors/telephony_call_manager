@@ -149,19 +149,15 @@ void AudioControlManager::AddCall(sptr<CallBase> &callObjectPtr, TelCallState st
     bool isCallAdded = true;
     switch (stateType) {
         case TelCallState::CALL_STATUS_ACTIVE:
-            TELEPHONY_LOGD("add call , state : active");
             activeCalls_.insert(callObjectPtr->GetAccountNumber());
             break;
         case TelCallState::CALL_STATUS_ALERTING:
-            TELEPHONY_LOGD("add call , state : alerting");
             alertingCalls_.insert(callObjectPtr->GetAccountNumber());
             break;
         case TelCallState::CALL_STATUS_INCOMING:
-            TELEPHONY_LOGD("add call , state : incoming");
             incomingCalls_.insert(callObjectPtr->GetAccountNumber());
             break;
         case TelCallState::CALL_STATUS_HOLDING:
-            TELEPHONY_LOGD("add call , state : holding");
             holdingCalls_.insert(callObjectPtr->GetAccountNumber());
             break;
         default:
@@ -181,19 +177,15 @@ void AudioControlManager::DeleteCall(sptr<CallBase> &callObjectPtr, TelCallState
     bool isCallDeleted = true;
     switch (stateType) {
         case TelCallState::CALL_STATUS_ACTIVE:
-            TELEPHONY_LOGD("erase call , state : active");
             activeCalls_.erase(callObjectPtr->GetAccountNumber());
             break;
         case TelCallState::CALL_STATUS_ALERTING:
-            TELEPHONY_LOGD("erase call , state : alerting");
             alertingCalls_.erase(callObjectPtr->GetAccountNumber());
             break;
         case TelCallState::CALL_STATUS_INCOMING:
-            TELEPHONY_LOGD("erase call , state : incoming");
             incomingCalls_.erase(callObjectPtr->GetAccountNumber());
             break;
         case TelCallState::CALL_STATUS_HOLDING:
-            TELEPHONY_LOGD("erase call , state : holding");
             holdingCalls_.erase(callObjectPtr->GetAccountNumber());
             break;
         default:
@@ -315,12 +307,10 @@ bool AudioControlManager::PlayRingtone(const std::string &phoneNum, const std::s
 
 bool AudioControlManager::StopRingtone()
 {
-    TELEPHONY_LOGD("try to stop ringtone");
     if (ringState_ == RingState::STOPPED) {
         return true;
     }
     if (ring_ != nullptr && ring_->Stop() == TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGD("stop ringtone succeed");
         ringState_ = RingState::STOPPED;
         ringingCallNumber_ = "";
         return true;
