@@ -72,7 +72,7 @@ struct AnswerAsyncContext : AsyncContext {
 
 struct RejectAsyncContext : AsyncContext {
     bool isSendSms;
-    char messageContent[kMessageContentMaximumLimit];
+    std::string messageContent;
 };
 
 struct ListAsyncContext : AsyncContext {
