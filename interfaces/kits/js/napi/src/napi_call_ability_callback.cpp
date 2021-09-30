@@ -16,6 +16,7 @@
 #include "napi_call_ability_callback.h"
 
 #include <securec.h>
+#include <memory>
 
 #include "call_manager_errors.h"
 #include "telephony_log_wrapper.h"
@@ -124,7 +125,7 @@ int32_t NapiCallAbilityCallback::UpdateCallStateInfo(const CallAttributeInfo &in
 #if NAPI_VERSION >= 2
     napi_get_uv_event_loop(stateCallback_.env, &loop);
 #endif
-    ReceiveDataWorker *dataWorker = new (std::nothrow) ReceiveDataWorker();
+    ReceiveDataWorker *dataWorker = (std::make_unique<ReceiveDataWorker>()).release();
     if (!dataWorker) {
         return TELEPHONY_FAIL;
     }
@@ -132,7 +133,7 @@ int32_t NapiCallAbilityCallback::UpdateCallStateInfo(const CallAttributeInfo &in
     dataWorker->ref = stateCallback_.callbackRef;
     dataWorker->info = info;
     dataWorker->callback = stateCallback_;
-    uv_work_t *work = new (std::nothrow) uv_work_t;
+    uv_work_t *work = (std::make_unique<uv_work_t>()).release();
     if (!work) {
         return TELEPHONY_FAIL;
     }
@@ -144,6 +145,9 @@ int32_t NapiCallAbilityCallback::UpdateCallStateInfo(const CallAttributeInfo &in
 
 void NapiCallAbilityCallback::ReportCallStateWork(uv_work_t *work, int status)
 {
+    if (work == nullptr) {
+        return;
+    }
     ReceiveDataWorker *dataWorkerData = (ReceiveDataWorker *)work->data;
     if (dataWorkerData == nullptr) {
         return;

@@ -22,11 +22,11 @@ ohos_unittest("tel_call_manager_gtest") {
 
   sources = [
     "//base/telephony/core_service/interfaces/innerkits/call_manager/proxy/call_manager_service_proxy.cpp",
-    "src/call_manager_gtest.cpp",
+    "call_manager_gtest.cpp",
   ]
 
   include_dirs = [
-    "//base/telephony/call_manager/test/unittest/call_manager_gtest/include",
+    "//base/telephony/call_manager/test/unittest/call_manager_gtest",
     "//base/telephony/call_manager/utils/include",
     "//base/telephony/core_service/interfaces/innerkits/common",
     "//base/telephony/core_service/interfaces/innerkits/call_manager/common",
