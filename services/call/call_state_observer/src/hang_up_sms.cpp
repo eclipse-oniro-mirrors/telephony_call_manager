@@ -36,6 +36,7 @@ HangUpSms::~HangUpSms()
 
 void HangUpSms::IncomingCallHungUp(sptr<CallBase> &callObjectPtr, bool isSendSms, std::string content)
 {
+    TELEPHONY_LOGD("start to send reject message...");
     if (callObjectPtr == nullptr || !isSendSms || content.empty() || callObjectPtr->GetAccountNumber().empty()) {
         return;
     }
@@ -54,6 +55,7 @@ void HangUpSms::SendMessage(int32_t slotId, const std::u16string &desAddr, const
         return;
     }
     msgManager_->SendMessage(slotId, desAddr, ConvertToUtf16(""), text, nullptr, nullptr);
+    TELEPHONY_LOGD("send reject message success");
 }
 
 std::u16string HangUpSms::ConvertToUtf16(const std::string &str)
