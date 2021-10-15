@@ -45,6 +45,7 @@ void HangUpSms::IncomingCallHungUp(sptr<CallBase> &callObjectPtr, bool isSendSms
 
 void HangUpSms::SendMessage(int32_t slotId, const std::string &desAddr, const std::string &content)
 {
+    TELEPHONY_LOGD("SendMessage...");
     SendMessage(slotId, ConvertToUtf16(desAddr), ConvertToUtf16(content));
 }
 
