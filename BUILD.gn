@@ -122,7 +122,7 @@ ohos_shared_library("tel_call_manager") {
     "multimedia_audio_standard:audio_client",
     "power_manager_native:powermgr_client",
     "safwk:system_ability_fwk",
-    "samgr_L2:samgr_proxy",
+    "samgr_standard:samgr_proxy",
   ]
 
   defines = [
