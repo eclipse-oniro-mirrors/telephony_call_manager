@@ -47,7 +47,7 @@ ohos_shared_library("call") {
     "appexecfwk_standard:libeventhandler",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
-    "samgr_L2:samgr_proxy",
+    "samgr_standard:samgr_proxy",
   ]
 
   defines = [
