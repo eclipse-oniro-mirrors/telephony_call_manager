@@ -15,6 +15,8 @@
 
 #include "call_manager_service_stub.h"
 
+#include <string_ex.h>
+
 #include "call_manager_errors.h"
 #include "telephony_log_wrapper.h"
 
@@ -55,6 +57,7 @@ CallManagerServiceStub::CallManagerServiceStub()
     memberFuncMap_[INTERFACE_GET_SUBCALL_LIST_ID] = &CallManagerServiceStub::GetSubCallIdListRequest;
     memberFuncMap_[INTERFACE_GET_CALL_LIST_ID_FOR_CONFERENCE] =
         &CallManagerServiceStub::GetCallIdListForConferenceRequest;
+    memberFuncMap_[INTERFACE_INSERT_DATA] = &CallManagerServiceStub::InsertDataRequest;
 }
 
 CallManagerServiceStub::~CallManagerServiceStub()
@@ -92,8 +95,16 @@ int32_t CallManagerServiceStub::RegisterCallBackRequest(MessageParcel &data, Mes
         reply.WriteInt32(result);
         return result;
     }
+    std::u16string bundleName = data.ReadString16();
+    std::string strName = Str16ToStr8(bundleName);
+    if (strcmp(strName.c_str(), "com.ohos.callui") != 0) {
+        TELEPHONY_LOGE("%{public}s no permission to register callback", strName.c_str());
+        result = TELEPHONY_PERMISSION_ERR;
+        reply.WriteInt32(result);
+        return result;
+    }
     sptr<ICallAbilityCallback> callback = iface_cast<ICallAbilityCallback>(remote);
-    result = RegisterCallBack(callback);
+    result = RegisterCallBack(callback, bundleName);
     reply.WriteInt32(result);
     return result;
 }
@@ -413,6 +424,17 @@ int32_t CallManagerServiceStub::GetCallIdListForConferenceRequest(MessageParcel 
     int32_t callId = data.ReadInt32();
     std::vector<std::u16string> result = GetCallIdListForConference(callId);
     if (!reply.WriteString16Vector(result)) {
+        TELEPHONY_LOGE("fail to write parcel");
+        return TELEPHONY_WRITE_REPLY_FAIL;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallManagerServiceStub::InsertDataRequest(MessageParcel &data, MessageParcel &reply)
+{
+    TELEPHONY_LOGE("CallManagerServiceStub  InsertDataRequest");
+    int32_t result = InsertData();
+    if (!reply.WriteInt32(result)) {
         TELEPHONY_LOGE("fail to write parcel");
         return TELEPHONY_WRITE_REPLY_FAIL;
     }

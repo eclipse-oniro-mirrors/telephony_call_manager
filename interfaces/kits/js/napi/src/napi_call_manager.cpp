@@ -16,8 +16,10 @@
 #include "napi_call_manager.h"
 
 #include <securec.h>
+#include <string_ex.h>
 
 #include "system_ability_definition.h"
+#include "ability.h"
 
 #include "telephony_log_wrapper.h"
 
@@ -31,12 +33,6 @@
 namespace OHOS {
 namespace Telephony {
 NapiCallManager::NapiCallManager() {}
-
-void Init()
-{
-    DelayedSingleton<CallManagerProxy>::GetInstance()->Init(TELEPHONY_CALL_MANAGER_SYS_ABILITY_ID);
-    DelayedSingleton<NapiCallAbilityHandlerService>::GetInstance()->Start();
-}
 
 napi_value NapiCallManager::CallManagerEnumTypeInit(napi_env env, napi_value exports)
 {
@@ -93,7 +89,8 @@ napi_value NapiCallManager::RegisterCallManagerFunc(napi_env env, napi_value exp
     };
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc));
     CallManagerEnumTypeInit(env, exports);
-    Init();
+    std::u16string bundleName = GetBundleName(env);
+    Init(bundleName);
     return exports;
 }
 
@@ -700,6 +697,29 @@ napi_value NapiCallManager::ObserverOff(napi_env env, napi_callback_info info)
     }
     return HandleAsyncWork(
         env, asyncContext, "Off", [](napi_env env, void *data) {}, NativeVoidCallBack);
+}
+
+void NapiCallManager::Init(std::u16string &bundleName)
+{
+    DelayedSingleton<CallManagerProxy>::GetInstance()->Init(TELEPHONY_CALL_MANAGER_SYS_ABILITY_ID, bundleName);
+    DelayedSingleton<NapiCallAbilityHandlerService>::GetInstance()->Start();
+}
+
+std::u16string NapiCallManager::GetBundleName(napi_env env)
+{
+    // get global value
+    napi_value global = nullptr;
+    napi_get_global(env, &global);
+    // get ability
+    napi_value abilityObj = nullptr;
+    napi_get_named_property(env, global, "ability", &abilityObj);
+    // get ability pointer
+    OHOS::AppExecFwk::Ability *ability = nullptr;
+    napi_get_value_external(env, abilityObj, (void **)&ability);
+    // get bundle path
+    std::string bundleName = ability->GetBundleName();
+    TELEPHONY_LOGD("getBundleName = %{public}s", bundleName.c_str());
+    return Str8ToStr16(bundleName);
 }
 
 bool NapiCallManager::MatchValueType(napi_env env, napi_value value, napi_valuetype targetType)

@@ -18,13 +18,14 @@
 
 #include <memory>
 
-#ifdef ABILITY_AUDIO_SUPPORT
-#include "audio_service_client.h"
-#endif
+#include "audio_renderer.h"
+
+#include "audio_player.h"
 #include "audio_proxy.h"
 
 namespace OHOS {
 namespace Telephony {
+using namespace AudioStandard;
 struct RingtoneStream {
     std::string ringtonePath;
     uint32_t playedPosition;
@@ -41,38 +42,20 @@ public:
     explicit Ring(const std::string &path);
     virtual ~Ring();
     void Init(const std::string &ringtonePath);
-    int32_t Start();
+    int32_t Play();
     int32_t Stop();
     int32_t Resume();
     int32_t Pause();
     int32_t Release();
     int32_t StartVibrate();
     int32_t CancelVibrate();
-    void SetVolume(float volume);
-    float GetVolume();
-    void SetLoop(uint32_t number);
-    uint32_t GetLoop();
-    void SetSpeed(double speed);
-    double GetSpeed();
 
 private:
-    const uint32_t DEFAULT_RING_LOOP_NUMBER = 10; // default loop time
-    const float DEFAULT_RING_SPEED = 1.0; // default play speed
-    const static size_t MIN_BYTES = 4;
-    const static size_t ELEMENT_SIZE = 1;
     bool isVibrating_;
     bool shouldRing_;
     bool shouldVibrate_;
-    float volume_ = 0;
-    int32_t loopNumber_;
-    float speed_;
     bool ShouldVibrate();
-    static bool keepRinging_;
-#ifdef ABILITY_AUDIO_SUPPORT
-    static std::unique_ptr<AudioServiceClient> ringtonePlayer_;
-#endif
-    static std::unique_ptr<RingtoneStream> ringtoneStream_;
-    static int32_t PlayRingtoneStream(const std::string &path, int32_t offset);
+    std::string ringtonePath_;
 };
 } // namespace Telephony
 } // namespace OHOS

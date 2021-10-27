@@ -348,6 +348,11 @@ void AudioDeviceManager::SetWiredHeadsetAvailable(bool available)
     isWiredHeadsetAvailable_ = available;
 }
 
+bool AudioDeviceManager::IsMicAvailable()
+{
+    return isMicAvailable_;
+}
+
 bool AudioDeviceManager::IsSpeakerAvailable()
 {
     return isSpeakerAvailable_;

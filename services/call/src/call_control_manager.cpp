@@ -30,6 +30,7 @@
 #include "report_call_state_handler.h"
 #include "cellular_call_ipc_interface_proxy.h"
 #include "audio_control_manager.h"
+#include "call_records_manager.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -76,12 +77,13 @@ bool CallControlManager::Init()
         }
     }
     callStateListenerPtr_->AddOneObserver(reportCallStateHandlerPtr_);
-#ifdef AUDIO_SUPPORT
     callStateListenerPtr_->AddOneObserver(DelayedSingleton<AudioControlManager>::GetInstance().get());
-#endif
     hungUpSms_ = (std::make_unique<HangUpSms>()).release();
+    missedCallNotification_ = (std::make_unique<MissedCallNotification>()).release();
     callStateListenerPtr_->AddOneObserver(hungUpSms_);
+    callStateListenerPtr_->AddOneObserver(missedCallNotification_);
     callStateListenerPtr_->AddOneObserver(DelayedSingleton<CallAbilityHandlerService>::GetInstance().get());
+    callStateListenerPtr_->AddOneObserver(DelayedSingleton<CallRecordsManager>::GetInstance().get());
     return true;
 }
 

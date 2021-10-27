@@ -15,121 +15,138 @@
 
 #include "tone.h"
 
-#include "telephony_log_wrapper.h"
+#include <thread>
 
-#include "audio_control_manager.h"
+#include "telephony_log_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
-int32_t Tone::toneDuration_ = TONE_DURATION;
+Tone::Tone() {}
 
-Tone::Tone()
-    : currentToneDescriptor_(ToneDescriptor::TONE_UNKNOWN), isTonePlaying_(false), isCreateComplete_(false)
-{}
-
-Tone::Tone(ToneDescriptor type) : currentToneDescriptor_(type), isTonePlaying_(false), isCreateComplete_(false) {}
-
-Tone::~Tone()
+Tone::Tone(ToneDescriptor tone)
 {
-    Release();
+    currentToneDescriptor_ = tone;
 }
+
+Tone::~Tone() {}
 
 void Tone::Init() {}
 
-int32_t Tone::Start()
+int32_t Tone::Play()
 {
     if (currentToneDescriptor_ == TONE_UNKNOWN) {
-        TELEPHONY_LOGE("tone type unknown");
+        TELEPHONY_LOGE("tone descriptor unknown");
         return TELEPHONY_FAIL;
     }
-    if (DelayedSingleton<AudioProxy>::GetInstance()->Play(currentToneDescriptor_, toneDuration_) ==
-        TELEPHONY_SUCCESS) {
-        isTonePlaying_ = true;
-        return TELEPHONY_SUCCESS;
+    if (IsDtmf(currentToneDescriptor_)) {
+        std::thread play(AudioPlayer::Play, GetToneDescriptorPath(currentToneDescriptor_),
+            AudioStreamType::STREAM_MUSIC, PlayerType::TYPE_DTMF);
+        play.detach();
+    } else {
+        std::thread play(AudioPlayer::Play, GetToneDescriptorPath(currentToneDescriptor_),
+            AudioStreamType::STREAM_MUSIC, PlayerType::TYPE_TONE);
+        play.detach();
     }
-    return TELEPHONY_FAIL;
+    return TELEPHONY_SUCCESS;
 }
 
 int32_t Tone::Stop()
 {
-    if (isTonePlaying_ == false) {
-        return TELEPHONY_SUCCESS;
+    if (currentToneDescriptor_ == TONE_UNKNOWN) {
+        TELEPHONY_LOGE("tone descriptor unknown");
+        return TELEPHONY_FAIL;
     }
-    if (DelayedSingleton<AudioProxy>::GetInstance()->StopCallTone() == TELEPHONY_SUCCESS) {
-        isTonePlaying_ = false;
-        isCreateComplete_ = false;
-        return TELEPHONY_SUCCESS;
+    if (IsDtmf(currentToneDescriptor_)) {
+        AudioPlayer::SetStop(PlayerType::TYPE_DTMF, true);
+    } else {
+        AudioPlayer::SetStop(PlayerType::TYPE_TONE, true);
     }
-    return TELEPHONY_FAIL;
+    return TELEPHONY_SUCCESS;
 }
 
 int32_t Tone::Release()
 {
-    TELEPHONY_LOGI("tone release");
-    if (DelayedSingleton<AudioProxy>::GetInstance()->Release() == TELEPHONY_SUCCESS) {
-        isTonePlaying_ = false;
-        isCreateComplete_ = false;
-        return TELEPHONY_SUCCESS;
-    }
-    return TELEPHONY_FAIL;
-}
-
-void Tone::SetDurationMs(int32_t duration)
-{
-    toneDuration_ = duration;
-}
-
-int32_t Tone::GetDurationMs()
-{
-    return toneDuration_;
+    return TELEPHONY_SUCCESS;
 }
 
 ToneDescriptor Tone::ConvertDigitToTone(char digit)
 {
-    ToneDescriptor tone = ToneDescriptor::TONE_UNKNOWN;
+    ToneDescriptor dtmf = ToneDescriptor::TONE_UNKNOWN;
     switch (digit) {
         case '0':
-            tone = ToneDescriptor::TONE_DTMF_CHARACTER_0;
+            dtmf = ToneDescriptor::TONE_DTMF_CHAR_0;
             break;
         case '1':
-            tone = ToneDescriptor::TONE_DTMF_CHARACTER_1;
+            dtmf = ToneDescriptor::TONE_DTMF_CHAR_1;
             break;
         case '2':
-            tone = ToneDescriptor::TONE_DTMF_CHARACTER_2;
+            dtmf = ToneDescriptor::TONE_DTMF_CHAR_2;
             break;
         case '3':
-            tone = ToneDescriptor::TONE_DTMF_CHARACTER_3;
+            dtmf = ToneDescriptor::TONE_DTMF_CHAR_3;
             break;
         case '4':
-            tone = ToneDescriptor::TONE_DTMF_CHARACTER_4;
+            dtmf = ToneDescriptor::TONE_DTMF_CHAR_4;
             break;
         case '5':
-            tone = ToneDescriptor::TONE_DTMF_CHARACTER_5;
+            dtmf = ToneDescriptor::TONE_DTMF_CHAR_5;
             break;
         case '6':
-            tone = ToneDescriptor::TONE_DTMF_CHARACTER_6;
+            dtmf = ToneDescriptor::TONE_DTMF_CHAR_6;
             break;
         case '7':
-            tone = ToneDescriptor::TONE_DTMF_CHARACTER_7;
+            dtmf = ToneDescriptor::TONE_DTMF_CHAR_7;
             break;
         case '8':
-            tone = ToneDescriptor::TONE_DTMF_CHARACTER_8;
+            dtmf = ToneDescriptor::TONE_DTMF_CHAR_8;
             break;
         case '9':
-            tone = ToneDescriptor::TONE_DTMF_CHARACTER_9;
+            dtmf = ToneDescriptor::TONE_DTMF_CHAR_9;
             break;
         case 'p':
         case 'P':
-            tone = ToneDescriptor::TONE_DTMF_CHARACTER_P;
+            dtmf = ToneDescriptor::TONE_DTMF_CHAR_P;
             break;
         case 'w':
         case 'W':
-            tone = ToneDescriptor::TONE_DTMF_CHARACTER_W;
+            dtmf = ToneDescriptor::TONE_DTMF_CHAR_W;
             break;
         default:
             break;
     }
-    return tone;
+    return dtmf;
+}
+
+bool Tone::IsDtmf(ToneDescriptor tone)
+{
+    bool ret = false;
+    switch (tone) {
+        case ToneDescriptor::TONE_DTMF_CHAR_0:
+        case ToneDescriptor::TONE_DTMF_CHAR_1:
+        case ToneDescriptor::TONE_DTMF_CHAR_2:
+        case ToneDescriptor::TONE_DTMF_CHAR_3:
+        case ToneDescriptor::TONE_DTMF_CHAR_4:
+        case ToneDescriptor::TONE_DTMF_CHAR_5:
+        case ToneDescriptor::TONE_DTMF_CHAR_6:
+        case ToneDescriptor::TONE_DTMF_CHAR_7:
+        case ToneDescriptor::TONE_DTMF_CHAR_8:
+        case ToneDescriptor::TONE_DTMF_CHAR_9:
+        case ToneDescriptor::TONE_DTMF_CHAR_P:
+        case ToneDescriptor::TONE_DTMF_CHAR_W:
+            ret = true;
+            break;
+        default:
+            break;
+    }
+    return ret;
+}
+
+std::string Tone::GetToneDescriptorPath(ToneDescriptor tone)
+{
+#ifdef ABILITY_AUDIO_SUPPORT
+    return DelayedSingleton<AudioProxy>::GetInstance()->GetToneDescriptorPath(tone);
+#endif
+    return DelayedSingleton<AudioProxy>::GetInstance()->GetDefaultTonePath();
 }
 } // namespace Telephony
 } // namespace OHOS

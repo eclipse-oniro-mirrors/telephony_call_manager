@@ -41,8 +41,7 @@ bool InActiveState::ProcessEvent(int32_t event)
             break;
         case CallStateProcess::NEW_INCOMING_CALL:
             // should play ringtone while only one incoming call exists
-            if (DelayedSingleton<AudioControlManager>::GetInstance()->ExistOnlyOneIncomingCall() &&
-                DelayedSingleton<AudioControlManager>::GetInstance()->PlayRingtone()) {
+            if (DelayedSingleton<AudioControlManager>::GetInstance()->ExistOnlyOneIncomingCall()) {
                 result = DelayedSingleton<AudioControlManager>::GetInstance()->ProcessEvent(
                     CallStateProcess::SWITCH_RINGING_STATE);
             }
@@ -50,6 +49,7 @@ bool InActiveState::ProcessEvent(int32_t event)
         default:
             break;
     }
+    TELEPHONY_LOGD("inactive state process event lock release");
     return result;
 }
 } // namespace Telephony

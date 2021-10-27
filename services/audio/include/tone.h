@@ -18,6 +18,9 @@
 
 #include <memory>
 
+#include "audio_renderer.h"
+
+#include "audio_player.h"
 #include "audio_proxy.h"
 
 namespace OHOS {
@@ -31,18 +34,18 @@ enum ToneDescriptor {
     TONE_NO_SERVICE,
     TONE_INVALID_NUMBER,
     TONE_CALL_RECORDING,
-    TONE_DTMF_CHARACTER_0,
-    TONE_DTMF_CHARACTER_1,
-    TONE_DTMF_CHARACTER_2,
-    TONE_DTMF_CHARACTER_3,
-    TONE_DTMF_CHARACTER_4,
-    TONE_DTMF_CHARACTER_5,
-    TONE_DTMF_CHARACTER_6,
-    TONE_DTMF_CHARACTER_7,
-    TONE_DTMF_CHARACTER_8,
-    TONE_DTMF_CHARACTER_9,
-    TONE_DTMF_CHARACTER_P,
-    TONE_DTMF_CHARACTER_W
+    TONE_DTMF_CHAR_0,
+    TONE_DTMF_CHAR_1,
+    TONE_DTMF_CHAR_2,
+    TONE_DTMF_CHAR_3,
+    TONE_DTMF_CHAR_4,
+    TONE_DTMF_CHAR_5,
+    TONE_DTMF_CHAR_6,
+    TONE_DTMF_CHAR_7,
+    TONE_DTMF_CHAR_8,
+    TONE_DTMF_CHAR_9,
+    TONE_DTMF_CHAR_P,
+    TONE_DTMF_CHAR_W
 };
 struct ToneStream {
     ToneDescriptor toneDescriptor;
@@ -57,10 +60,10 @@ struct ToneStream {
 class Tone {
 public:
     Tone();
-    explicit Tone(ToneDescriptor type);
+    Tone(ToneDescriptor tone);
     virtual ~Tone();
     void Init();
-    int32_t Start();
+    int32_t Play();
     int32_t Stop();
     int32_t Release();
     static void SetDurationMs(int32_t duration);
@@ -68,11 +71,9 @@ public:
     static ToneDescriptor ConvertDigitToTone(char digit);
 
 private:
-    const static int32_t TONE_DURATION = 3000; // default tone play duration , in millisecond
-    ToneDescriptor currentToneDescriptor_;
-    static int32_t toneDuration_;
-    bool isTonePlaying_;
-    bool isCreateComplete_; // whether audio resource create complete or not
+    ToneDescriptor currentToneDescriptor_ = ToneDescriptor::TONE_UNKNOWN;
+    std::string GetToneDescriptorPath(ToneDescriptor tone);
+    bool IsDtmf(ToneDescriptor tone);
 };
 } // namespace Telephony
 } // namespace OHOS

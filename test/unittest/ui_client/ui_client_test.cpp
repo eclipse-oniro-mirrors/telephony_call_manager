@@ -537,6 +537,13 @@ void GetCallIdListForConference()
     }
 }
 
+void InsertData()
+{
+    std::cout << "InsertData start" << std::endl;
+    int32_t ret = g_clientPtr->InsertData();
+    std::cout << "return value:" << ret << std::endl;
+}
+
 int32_t Init()
 {
     g_clientPtr = std::make_unique<CallManagerIpcClient>();
@@ -575,6 +582,7 @@ int32_t Init()
     g_memberFuncMap[OHOS::Telephony::INTERFACE_GET_SUBCALL_LIST_ID] = &OHOS::Telephony::GetSubCallIdList;
     g_memberFuncMap[OHOS::Telephony::INTERFACE_GET_CALL_LIST_ID_FOR_CONFERENCE] =
         &OHOS::Telephony::GetCallIdListForConference;
+    g_memberFuncMap[OHOS::Telephony::INTERFACE_INSERT_DATA] = &OHOS::Telephony::InsertData;
     return TELEPHONY_SUCCESS;
 }
 
@@ -603,6 +611,7 @@ void PrintfUsage()
               << "28:GetMainCallId\n"
               << "29:GetSubCallIdList\n"
               << "30:GetCallIdListForConference\n"
+              << "35:InsertData\n"
               << "1000:exit\n";
 }
 } // namespace Telephony

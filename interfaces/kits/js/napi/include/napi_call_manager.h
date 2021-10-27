@@ -62,6 +62,8 @@ public:
     static napi_value ObserverOff(napi_env env, napi_callback_info info);
 
 private:
+    static void Init(std::u16string &bundleName);
+    static std::u16string GetBundleName(napi_env env);
     static bool MatchValueType(napi_env env, napi_value value, napi_valuetype targetType);
     static napi_value CreateUndefined(napi_env env);
     static napi_value CreateErrorMessage(napi_env env, std::string msg);

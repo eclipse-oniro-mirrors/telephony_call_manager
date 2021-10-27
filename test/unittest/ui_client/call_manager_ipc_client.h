@@ -60,6 +60,7 @@ public:
     int32_t GetMainCallId(int32_t callId);
     std::vector<std::u16string> GetSubCallIdList(int32_t callId);
     std::vector<std::u16string> GetCallIdListForConference(int32_t callId);
+    int32_t InsertData();
     int32_t ConnectService();
     void DisconnectService();
 

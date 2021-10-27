@@ -170,6 +170,7 @@ int32_t NapiCallAbilityCallback::ReportCallState(CallAttributeInfo &info, EventL
     SetPropertyStringUtf8(env, callbackValues[kArrayIndexSecond], "accountNumber", info.accountNumber);
     SetPropertyInt32(env, callbackValues[kArrayIndexSecond], "accountId", info.accountId);
     SetPropertyInt32(env, callbackValues[kArrayIndexSecond], "videoState", info.videoState);
+    SetPropertyInt64(env, callbackValues[kArrayIndexSecond], "startTime", info.startTime);
     SetPropertyInt32(env, callbackValues[kArrayIndexSecond], "callType", info.callType);
     SetPropertyInt32(env, callbackValues[kArrayIndexSecond], "callId", info.callId);
     SetPropertyInt32(env, callbackValues[kArrayIndexSecond], "callState", info.callState);
@@ -453,6 +454,13 @@ void NapiCallAbilityCallback::SetPropertyInt32(napi_env env, napi_value object, 
 {
     napi_value peopertyValue = nullptr;
     napi_create_int32(env, value, &peopertyValue);
+    napi_set_named_property(env, object, name.c_str(), peopertyValue);
+}
+
+void NapiCallAbilityCallback::SetPropertyInt64(napi_env env, napi_value object, std::string name, int64_t value)
+{
+    napi_value peopertyValue = nullptr;
+    napi_create_int64(env, value, &peopertyValue);
     napi_set_named_property(env, object, name.c_str(), peopertyValue);
 }
 

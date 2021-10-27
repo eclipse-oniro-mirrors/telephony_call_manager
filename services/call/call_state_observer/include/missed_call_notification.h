@@ -16,36 +16,29 @@
 #ifndef MISSED_CALL_NOTIFICATION_H
 #define MISSED_CALL_NOTIFICATION_H
 
-#include <cstdint>
-#include <string>
-#include <mutex>
-
-#ifdef ABILITY_NOTIFICATION_SUPPORT
-#include "ans_manager.h"
-#include "advanced_notification_service.h"
-#include "ans_manager_interface.h"
-#include "ans_manager_proxy.h"
-#endif
+#include "call_state_listener_base.h"
 
 namespace OHOS {
 namespace Telephony {
-class MissedCallNotification {
+class MissedCallNotification : public CallStateListenerBase {
 public:
     MissedCallNotification();
-    virtual ~MissedCallNotification();
-    void Init();
-    void PublishNotification(const std::string &title, const std::string &text);
-    void CancelNotification(int32_t id);
+    ~MissedCallNotification() = default;
+    void NewCallCreated(sptr<CallBase> &callObjectPtr) override;
+    void CallDestroyed(sptr<CallBase> &callObjectPtr) override;
+    void IncomingCallActivated(sptr<CallBase> &callObjectPtr) override;
+    void IncomingCallHungUp(sptr<CallBase> &callObjectPtr, bool isSendSms, std::string content) override;
+    void CallStateUpdated(sptr<CallBase> &callObjectPtr, TelCallState priorState, TelCallState nextState) override;
 
 private:
-    std::mutex mutex_;
-#ifdef ABILITY_NOTIFICATION_SUPPORT
-    int32_t notificationId_ = 0;
-    sptr<AdvancedNotificationService> ansAbility_;
-    sptr<IRemoteObject> remoteObject_;
-    std::unique_ptr<AnsManagerProxy> ansManagerProxy_;
-#endif
-    bool IsAnsAbilityExist();
+    bool isIncomingCallMissed_;
+    std::string incomingCallNumber_;
+    static constexpr int32_t INCOMING_CALL_MISSED_ID = 0;
+    static constexpr int32_t INCOMING_CALL_MISSED_CODE = 0;
+    const std::string INCOMING_CALL_MISSED_TITLE = "Missed Call";
+    const std::string COMMON_EVENT_INCOMING_CALL_MISSED = "usual.event.INCOMING_CALL_MISSED";
+    void PublishMissedCallEvent(sptr<CallBase> &callObjectPtr);
+    void PublishMissedCallNotification(sptr<CallBase> &callObjectPtr);
 };
 } // namespace Telephony
 } // namespace OHOS

@@ -18,6 +18,9 @@
 #include <ctime>
 #include <string_ex.h>
 
+#include "iremote_invoker.h"
+#include "ipc_thread_skeleton.h"
+
 #include "telephony_log_wrapper.h"
 
 #include "call_manager_errors.h"
@@ -27,6 +30,7 @@
 #include "call_ability_handler.h"
 #include "cellular_call_ipc_interface_proxy.h"
 #include "audio_control_manager.h"
+#include "call_records_manager.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -35,7 +39,7 @@ const bool g_registerResult =
 
 CallManagerService::CallManagerService()
     : SystemAbility(TELEPHONY_CALL_MANAGER_SYS_ABILITY_ID, true), callControlManagerPtr_(nullptr),
-      audioControlManagerPtr_(nullptr)
+      audioControlManagerPtr_(nullptr), callDataPtr_(nullptr)
 {}
 
 CallManagerService::~CallManagerService()
@@ -74,6 +78,7 @@ bool CallManagerService::Init()
     DelayedSingleton<CellularCallInfoHandlerService>::GetInstance()->Start();
     DelayedSingleton<CellularCallIpcInterfaceProxy>::GetInstance()->Init(TELEPHONY_CELLULAR_CALL_SYS_ABILITY_ID);
     DelayedSingleton<CallAbilityHandlerService>::GetInstance()->Start();
+    DelayedSingleton<CallRecordsManager>::GetInstance()->Init();
     return true;
 }
 
@@ -135,7 +140,7 @@ void CallManagerService::OnStop()
     state_ = ServiceRunningState::STATE_STOPPED;
 }
 
-int32_t CallManagerService::RegisterCallBack(const sptr<ICallAbilityCallback> &callback)
+int32_t CallManagerService::RegisterCallBack(const sptr<ICallAbilityCallback> &callback, std::u16string &bundleName)
 {
     return DelayedSingleton<CallAbilityReportIpcProxy>::GetInstance()->RegisterCallBack(callback);
 }
@@ -390,6 +395,38 @@ std::vector<std::u16string> CallManagerService::GetCallIdListForConference(int32
     std::vector<std::u16string> vec;
     vec.clear();
     return vec;
+}
+
+int32_t CallManagerService::InsertData()
+{
+    callDataPtr_ = DelayedSingleton<CallDataBaseHelper>::GetInstance();
+    if (callDataPtr_ == nullptr) {
+        TELEPHONY_LOGE("callDataPtr_ is nullptr!");
+        return TELEPHONY_ERROR;
+    }
+
+    NativeRdb::ValuesBucket bucket;
+    bucket.PutString("phone_number", "");
+    bucket.PutString("display_name", "");
+    bucket.PutInt("call_direction", 0);
+    bucket.PutString("voicemail_uri", "");
+    bucket.PutInt("sim_type", 0);
+    bucket.PutInt("is_hd", 0);
+    bucket.PutInt("is_read", 0);
+    bucket.PutInt("ring_duration", 0);
+    bucket.PutInt("talk_duration", 0);
+    bucket.PutString("format_number", "");
+    bucket.PutString("quicksearch_key", "");
+    bucket.PutInt("number_type", 0);
+    bucket.PutString("number_type_name", "");
+    bucket.PutInt("begin_time", 0);
+    bucket.PutInt("end_time", 0);
+    bucket.PutInt("answer_state", 0);
+    bucket.PutInt("create_time", 0);
+    bucket.PutString("number_location", "");
+    bucket.PutInt("photo_id", 0);
+    callDataPtr_->Insert(bucket);
+    return TELEPHONY_SUCCESS;
 }
 } // namespace Telephony
 } // namespace OHOS

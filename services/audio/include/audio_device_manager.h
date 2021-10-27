@@ -22,6 +22,7 @@
 
 namespace OHOS {
 namespace Telephony {
+constexpr uint32_t AUDIO_EVENT_OFFSET = 100;
 /**
  * @class AudioDeviceManager
  * describes the available devices of a call.
@@ -33,6 +34,7 @@ public:
     void Init();
     bool InitAudioDevice();
     bool ProcessEvent(int32_t event);
+    static bool IsMicAvailable();
     static bool IsSpeakerAvailable();
     static bool IsBtScoAvailable();
     static bool IsWiredHeadsetAvailable();
@@ -41,7 +43,7 @@ public:
     static void SetBtScoAvailable(bool available);
     bool SwitchDevice(AudioDevice device);
     enum AudioEventType {
-        AUDIO_INTERRUPTED = 200,
+        AUDIO_INTERRUPTED = AUDIO_EVENT_OFFSET,
         AUDIO_UN_INTERRUPT,
         AUDIO_RINGING,
         ENABLE_DEVICE_MIC,

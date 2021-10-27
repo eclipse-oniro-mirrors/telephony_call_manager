@@ -37,13 +37,17 @@ ohos_shared_library("call") {
 
   deps = [
     "$SUBSYSTEM_DIR/core_service/common:libtelephony_common",
+    "//foundation/aafwk/standard/frameworks/kits/ability/native:abilitykit_native",
     "//foundation/ace/napi:ace_napi",
     "//third_party/libuv:uv_static",
     "//utils/native/base:utils",
   ]
 
   external_deps = [
+    "aafwk_standard:ability_manager",
     "aafwk_standard:want",
+    "appexecfwk_standard:appexecfwk_base",
+    "appexecfwk_standard:appexecfwk_core",
     "appexecfwk_standard:libeventhandler",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",

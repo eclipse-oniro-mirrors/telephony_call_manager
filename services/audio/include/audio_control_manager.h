@@ -32,6 +32,7 @@
 
 namespace OHOS {
 namespace Telephony {
+constexpr uint32_t EXIST_ONLY_ONE_CALL = 1;
 enum AudioInterruptState {
     UN_INTERRUPT = 0,
     IN_INTERRUPT,
@@ -90,11 +91,11 @@ public:
     void CallStateUpdated(sptr<CallBase> &callObjectPtr, TelCallState priorState, TelCallState nextState) override;
 
 private:
-    const uint32_t existOnlyOneCall_ = 1;
+    const uint32_t EXIST_ONLY_ONE_CALL = 1;
     RingState ringState_ = RingState::STOPPED;
     void AddCall(sptr<CallBase> &callObjectPtr, TelCallState stateType);
     void DeleteCall(sptr<CallBase> &callObjectPtr, TelCallState stateType);
-    void HandleCallStateChanged(TelCallState stateType, bool isAdded, CallType callType);
+    void HandleCallStateUpdated(TelCallState stateType, bool isAdded, CallType callType);
     bool IsBlackNumber(const std::string &phoneNum);
     void PlayCallEndedTone(TelCallState priorState, TelCallState nextState, CallEndedType type);
     sptr<CallBase> GetCallBase(const std::string &phoneNum) const;
@@ -102,6 +103,7 @@ private:
     AudioInterruptState audioInterruptState_ = AudioInterruptState::UN_INTERRUPT;
     bool IsRingingCallExists() const;
     bool IsHoldingCallExists() const;
+    bool IsAlertingCallExists() const;
     bool IsEmergencyCallExists() const;
     bool isTonePlaying_;
     std::string ringingCallNumber_;

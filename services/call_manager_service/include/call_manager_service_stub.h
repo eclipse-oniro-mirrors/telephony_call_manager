@@ -61,6 +61,7 @@ private:
     int32_t GetMainCallIdRequest(MessageParcel &data, MessageParcel &reply);
     int32_t GetSubCallIdListRequest(MessageParcel &data, MessageParcel &reply);
     int32_t GetCallIdListForConferenceRequest(MessageParcel &data, MessageParcel &reply);
+    int32_t InsertDataRequest(MessageParcel &data, MessageParcel &reply);
     std::map<uint32_t, CallManagerServiceFunc> memberFuncMap_;
 };
 } // namespace Telephony

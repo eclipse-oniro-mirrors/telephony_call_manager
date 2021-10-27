@@ -130,6 +130,7 @@
 </tr>
 </tbody>
 </table>
+完整的JS API说明以及实例代码请参考：[拨打电话](https://gitee.com/openharmony/docs/blob/master/zh-cn/application-dev/js-reference/apis/js-apis-call.md)。
 
 ## 使用说明<a name="section163mcpsimp"></a>
 
@@ -141,9 +142,9 @@
 
     ```
     import call from "@ohos.telephony.call";
-
+    
     let phoneNumber = "12312312312";
-
+    
     // 调用接口【callback方式】
     call.dial(phoneNumber, {extras: false}, (err, value) => {
       if (err) {
@@ -154,7 +155,7 @@
       // 接口调用成功，err为空
       console.log(`success to dial: ${value}`);
     });
-
+    
     // 调用接口【Promise方式】
     let promise = call.dial(phoneNumber, {extras: false});
     promise.then((value) => {

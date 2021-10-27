@@ -30,7 +30,8 @@ CallBase::CallBase()
     : callId_(0), callType_(TYPE_ERR_CALL), videoState_(TYPE_VOICE), accountNumber_(""),
       callRunningState_(CallRunningState::CALL_RUNNING_STATE_CREATE), conferenceState_(TEL_CONFERENCE_IDLE),
       startTime_(0), direction_(CALL_DIRECTION_UNKNOW), policyFlag_(0), callState_(CALL_STATUS_IDLE),
-      isSpeakerphoneOn_(false), callEndedType_(CallEndedType::UNKNOWN)
+      isSpeakerphoneOn_(false), callEndedType_(CallEndedType::UNKNOWN), callBeginTime_(0), callEndTime_(0),
+      ringBeginTime_(0), ringEndTime_(0), answerType_(CALL_ANSWER_MISSED)
 {
     (void)memset_s(&contactInfo_, sizeof(ContactInfo), 0, sizeof(ContactInfo));
 }
@@ -78,6 +79,7 @@ int32_t CallBase::AcceptCallBase()
 
 int32_t CallBase::RejectCallBase()
 {
+    answerType_ = CALL_ANSWER_REJECT;
     return TELEPHONY_SUCCESS;
 }
 
@@ -110,6 +112,12 @@ void CallBase::GetCallAttributeBaseInfo(CallAttributeInfo &info)
         info.callId = callId_;
         info.callState = callState_;
         info.conferenceState = conferenceState_;
+        info.callBeginTime = callBeginTime_;
+        info.callEndTime = callEndTime_;
+        info.ringBeginTime = ringBeginTime_;
+        info.ringEndTime = ringEndTime_;
+        info.callDirection = direction_;
+        info.answerType = answerType_;
     }
 }
 
@@ -134,7 +142,6 @@ int32_t CallBase::SetTelCallState(TelCallState nextState)
 {
     std::lock_guard<std::mutex> lock(mutex_);
     if (callState_ == nextState) {
-        TELEPHONY_LOGI("Call state duplication %d", nextState);
         return CALL_MANAGER_NOT_NEW_STATE;
     }
     callState_ = nextState;
@@ -144,24 +151,39 @@ int32_t CallBase::SetTelCallState(TelCallState nextState)
             break;
         case TelCallState::CALL_STATUS_INCOMING:
             callRunningState_ = CallRunningState::CALL_RUNNING_STATE_RINGING;
+            ringBeginTime_ = time(nullptr);
             break;
         case TelCallState::CALL_STATUS_WAITING:
             callRunningState_ = CallRunningState::CALL_RUNNING_STATE_RINGING;
+            ringBeginTime_ = time(nullptr);
             break;
         case TelCallState::CALL_STATUS_ACTIVE:
             callRunningState_ = CallRunningState::CALL_RUNNING_STATE_ACTIVE;
+            if (callBeginTime_ == 0) {
+                callBeginTime_ = ringEndTime_ = time(nullptr);
+                startTime_ = ringEndTime_ * kThousand;
+                answerType_ = CALL_ANSWER_ACTIVED;
+            }
             break;
         case TelCallState::CALL_STATUS_HOLDING:
             callRunningState_ = CallRunningState::CALL_RUNNING_STATE_HOLD;
             break;
         case TelCallState::CALL_STATUS_DISCONNECTED:
             callRunningState_ = CallRunningState::CALL_RUNNING_STATE_ENDED;
+            callEndTime_ = time(nullptr);
+            if (ringEndTime_ == 0) {
+                ringEndTime_ = callEndTime_;
+            }
             break;
         case TelCallState::CALL_STATUS_DISCONNECTING:
             callRunningState_ = CallRunningState::CALL_RUNNING_STATE_ENDING;
+            if (ringEndTime_ == 0) {
+                ringEndTime_ = time(nullptr);
+            }
             break;
         case TelCallState::CALL_STATUS_ALERTING:
             callRunningState_ = CallRunningState::CALL_RUNNING_STATE_DIALING;
+            ringBeginTime_ = time(nullptr);
             break;
         default:
             break;
