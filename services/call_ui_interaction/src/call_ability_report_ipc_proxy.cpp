@@ -16,6 +16,7 @@
 #include "call_ability_report_ipc_proxy.h"
 
 #include <string_ex.h>
+#include <cinttypes>
 
 #include "iservice_registry.h"
 #include "system_ability.h"
@@ -65,7 +66,7 @@ int32_t CallAbilityReportIpcProxy::ReportCallStateInfo(const CallAttributeInfo &
         TELEPHONY_LOGE("OnCallDetailsChange failed, errcode:%{public}d", ret);
         return ret;
     }
-    TELEPHONY_LOGD("report call state:%d", info.callState);
+    TELEPHONY_LOGD("report call state:%{public}d,startTime:%{public}" PRId64 "", info.callState, info.startTime);
     return ret;
 }
 

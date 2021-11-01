@@ -35,7 +35,6 @@ AudioControlManager::~AudioControlManager()
 
 void AudioControlManager::Init()
 {
-    TELEPHONY_LOGD("audio control manager init");
     callStateManager_ = std::make_unique<CallStateProcess>();
     if (callStateManager_ == nullptr) {
         TELEPHONY_LOGE("call state manager nullptr");
@@ -49,6 +48,7 @@ void AudioControlManager::Init()
     callStateManager_->Init();
     audioDeviceManager_->Init();
     DelayedSingleton<AudioProxy>::GetInstance()->Init();
+    TELEPHONY_LOGD("audio control manager init done");
 }
 
 void AudioControlManager::NewCallCreated(sptr<CallBase> &callObjectPtr)
@@ -79,7 +79,11 @@ void AudioControlManager::CallStateUpdated(
         return;
     }
     DeleteCall(callObjectPtr, priorState);
-    AddCall(callObjectPtr, nextState);
+    if (nextState == TelCallState::CALL_STATUS_DISCONNECTED) {
+        totalCalls_.erase(callObjectPtr);
+    } else {
+        AddCall(callObjectPtr, nextState);
+    }
 }
 
 void AudioControlManager::IncomingCallActivated(sptr<CallBase> &callObjectPtr)
@@ -87,6 +91,9 @@ void AudioControlManager::IncomingCallActivated(sptr<CallBase> &callObjectPtr)
     if (callObjectPtr == nullptr || totalCalls_.count(callObjectPtr) == 0) {
         TELEPHONY_LOGE("call object ptr nullptr or call not included");
         return;
+    }
+    if (ringState_ != RingState::STOPPED) {
+        StopRingtone();
     }
     DeleteCall(callObjectPtr, TelCallState::CALL_STATUS_INCOMING);
     AddCall(callObjectPtr, TelCallState::CALL_STATUS_ACTIVE);
@@ -99,17 +106,21 @@ void AudioControlManager::IncomingCallHungUp(sptr<CallBase> &callObjectPtr, bool
         TELEPHONY_LOGE("call object ptr nullptr or call not included");
         return;
     }
+    if (ringState_ != RingState::STOPPED) {
+        StopRingtone();
+    }
     DeleteCall(callObjectPtr, TelCallState::CALL_STATUS_INCOMING);
+    totalCalls_.erase(callObjectPtr);
 }
 
-void AudioControlManager::HandleCallStateChanged(TelCallState stateType, bool isAdded, CallType callType)
+void AudioControlManager::HandleCallStateUpdated(TelCallState stateType, bool isAdded, CallType callType)
 {
     switch (stateType) {
         case TelCallState::CALL_STATUS_ALERTING:
             if (alertingCalls_.empty()) {
                 StopRingback(); // should stop ringback tone while no more alerting calls
-            } else if (isAdded && alertingCalls_.size() == existOnlyOneCall_) {
-                PlayRingback(); // should play ringback tone while there exists only one alerting call
+            } else if (isAdded) {
+                PlayRingback();
             }
             break;
         case TelCallState::CALL_STATUS_ACTIVE:
@@ -121,7 +132,7 @@ void AudioControlManager::HandleCallStateChanged(TelCallState stateType, bool is
                         ProcessEvent(CallStateProcess::NEW_ACTIVE_CS_CALL);
                         break;
                     case CallType::TYPE_IMS:
-                        ProcessEvent(CallStateProcess::NEW_ACTIVE_CS_CALL);
+                        ProcessEvent(CallStateProcess::NEW_ACTIVE_IMS_CALL);
                         break;
                     default:
                         break;
@@ -146,26 +157,41 @@ void AudioControlManager::AddCall(sptr<CallBase> &callObjectPtr, TelCallState st
     if (callObjectPtr == nullptr || callObjectPtr->GetAccountNumber().empty()) {
         return;
     }
-    bool isCallAdded = true;
+    bool isCallAdded = false;
     switch (stateType) {
         case TelCallState::CALL_STATUS_ACTIVE:
-            activeCalls_.insert(callObjectPtr->GetAccountNumber());
+            if (activeCalls_.count(callObjectPtr->GetAccountNumber()) == 0) {
+                TELEPHONY_LOGD("add call , state : active");
+                activeCalls_.insert(callObjectPtr->GetAccountNumber());
+                isCallAdded = true;
+            }
             break;
         case TelCallState::CALL_STATUS_ALERTING:
-            alertingCalls_.insert(callObjectPtr->GetAccountNumber());
+            if (alertingCalls_.count(callObjectPtr->GetAccountNumber()) == 0) {
+                TELEPHONY_LOGD("add call , state : alerting");
+                alertingCalls_.insert(callObjectPtr->GetAccountNumber());
+                isCallAdded = true;
+            }
             break;
         case TelCallState::CALL_STATUS_INCOMING:
-            incomingCalls_.insert(callObjectPtr->GetAccountNumber());
+            if (incomingCalls_.count(callObjectPtr->GetAccountNumber()) == 0) {
+                TELEPHONY_LOGD("add call , state : incoming");
+                incomingCalls_.insert(callObjectPtr->GetAccountNumber());
+                isCallAdded = true;
+            }
             break;
         case TelCallState::CALL_STATUS_HOLDING:
-            holdingCalls_.insert(callObjectPtr->GetAccountNumber());
+            if (holdingCalls_.count(callObjectPtr->GetAccountNumber()) == 0) {
+                TELEPHONY_LOGD("add call , state : holding");
+                holdingCalls_.insert(callObjectPtr->GetAccountNumber());
+                isCallAdded = true;
+            }
             break;
         default:
-            isCallAdded = false;
             break;
     }
     if (isCallAdded) {
-        HandleCallStateChanged(stateType, true, callObjectPtr->GetCallType());
+        HandleCallStateUpdated(stateType, true, callObjectPtr->GetCallType());
     }
 }
 
@@ -174,26 +200,41 @@ void AudioControlManager::DeleteCall(sptr<CallBase> &callObjectPtr, TelCallState
     if (callObjectPtr == nullptr || callObjectPtr->GetAccountNumber().empty()) {
         return;
     }
-    bool isCallDeleted = true;
+    bool isCallDeleted = false;
     switch (stateType) {
         case TelCallState::CALL_STATUS_ACTIVE:
-            activeCalls_.erase(callObjectPtr->GetAccountNumber());
+            if (activeCalls_.count(callObjectPtr->GetAccountNumber()) > 0) {
+                TELEPHONY_LOGD("erase call , state : active");
+                activeCalls_.erase(callObjectPtr->GetAccountNumber());
+                isCallDeleted = true;
+            }
             break;
         case TelCallState::CALL_STATUS_ALERTING:
-            alertingCalls_.erase(callObjectPtr->GetAccountNumber());
+            if (alertingCalls_.count(callObjectPtr->GetAccountNumber()) > 0) {
+                TELEPHONY_LOGD("erase call , state : alerting");
+                alertingCalls_.erase(callObjectPtr->GetAccountNumber());
+                isCallDeleted = true;
+            }
             break;
         case TelCallState::CALL_STATUS_INCOMING:
-            incomingCalls_.erase(callObjectPtr->GetAccountNumber());
+            if (incomingCalls_.count(callObjectPtr->GetAccountNumber()) > 0) {
+                TELEPHONY_LOGD("erase call , state : incoming");
+                incomingCalls_.erase(callObjectPtr->GetAccountNumber());
+                isCallDeleted = true;
+            }
             break;
         case TelCallState::CALL_STATUS_HOLDING:
-            holdingCalls_.erase(callObjectPtr->GetAccountNumber());
+            if (holdingCalls_.count(callObjectPtr->GetAccountNumber()) > 0) {
+                TELEPHONY_LOGD("erase call , state : holding");
+                holdingCalls_.erase(callObjectPtr->GetAccountNumber());
+                isCallDeleted = true;
+            }
             break;
         default:
-            isCallDeleted = false;
             break;
     }
     if (isCallDeleted) {
-        HandleCallStateChanged(stateType, false, callObjectPtr->GetCallType());
+        HandleCallStateUpdated(stateType, false, callObjectPtr->GetCallType());
     }
 }
 
@@ -233,6 +274,12 @@ bool AudioControlManager::SetAudioDevice(AudioDevice device)
 
 bool AudioControlManager::PlayRingtone()
 {
+    // should play ringtone while there exists only one incoming call
+    if (!ExistOnlyOneIncomingCall() || IsAlertingCallExists()) {
+        return false;
+    } else {
+        ringingCallNumber_ = *incomingCalls_.begin();
+    }
     if (ring_ != nullptr) {
         ring_ = nullptr;
     }
@@ -241,14 +288,10 @@ bool AudioControlManager::PlayRingtone()
         TELEPHONY_LOGE("create ring object failed");
         return false;
     }
-    if (ring_->Start() != TELEPHONY_SUCCESS) {
+    if (ring_->Play() != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("play ringtone failed");
         return false;
     }
-    if (ExistOnlyOneIncomingCall()) {
-        ringingCallNumber_ = *incomingCalls_.begin();
-    }
-    TELEPHONY_LOGD("play ringtone succeed");
     ringState_ = RingState::RINGING;
     return true;
 }
@@ -267,7 +310,7 @@ bool AudioControlManager::PlayRingtone(const std::string &phoneNum)
         TELEPHONY_LOGE("create ring object failed");
         return false;
     }
-    if (ring_->Start() != TELEPHONY_SUCCESS) {
+    if (ring_->Play() != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("play ringtone failed");
         return false;
     }
@@ -293,7 +336,7 @@ bool AudioControlManager::PlayRingtone(const std::string &phoneNum, const std::s
         TELEPHONY_LOGE("create ring object failed");
         return false;
     }
-    if (ring_->Start() == TELEPHONY_SUCCESS) {
+    if (ring_->Play() == TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("play ringtone failed");
         return false;
     }
@@ -307,12 +350,15 @@ bool AudioControlManager::PlayRingtone(const std::string &phoneNum, const std::s
 
 bool AudioControlManager::StopRingtone()
 {
+    TELEPHONY_LOGD("try to stop ringtone");
     if (ringState_ == RingState::STOPPED) {
         return true;
     }
     if (ring_ != nullptr && ring_->Stop() == TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGD("stop ringtone successfully");
         ringState_ = RingState::STOPPED;
         ringingCallNumber_ = "";
+        ring_ = nullptr;
         return true;
     }
     TELEPHONY_LOGE("stop ringtone failed");
@@ -390,7 +436,7 @@ AudioDevice AudioControlManager::GetInitAudioDevice() const
         // disable device
         return AudioDevice::DEVICE_DISABLE;
     } else {
-        // interrupted or ringing , priority : bt sco , wired headset , speaker , mic
+        // interrupted or ringing , priority : bt sco , wired headset , speaker
         if (AudioDeviceManager::IsBtScoAvailable()) {
             return AudioDevice::DEVICE_BLUETOOTH_SCO;
         }
@@ -401,9 +447,10 @@ AudioDevice AudioControlManager::GetInitAudioDevice() const
             return AudioDevice::DEVICE_SPEAKER;
         }
         if (GetCurrentCall() != nullptr && GetCurrentCall()->IsSpeakerphoneOn()) {
+            TELEPHONY_LOGD("current call speaker is on");
             return AudioDevice::DEVICE_SPEAKER;
         }
-        return AudioDevice::DEVICE_MIC;
+        return AudioDevice::DEVICE_SPEAKER;
     }
 }
 
@@ -493,7 +540,7 @@ sptr<CallBase> AudioControlManager::GetCallBase(const std::string &phoneNum) con
 
 std::string AudioControlManager::GetIncomingCallRingtonePath()
 {
-    if (incomingCalls_.size() == existOnlyOneCall_) {
+    if (incomingCalls_.size() == EXIST_ONLY_ONE_CALL) {
         ContactInfo info;
         sptr<CallBase> incomingCall = GetCallBase(*incomingCalls_.begin());
         if (incomingCall != nullptr) {
@@ -562,6 +609,11 @@ bool AudioControlManager::IsRingingCallExists() const
     return !incomingCalls_.empty();
 }
 
+bool AudioControlManager::IsAlertingCallExists() const
+{
+    return !alertingCalls_.empty();
+}
+
 bool AudioControlManager::IsEmergencyCallExists() const
 {
     for (auto call : totalCalls_) {
@@ -589,12 +641,12 @@ bool AudioControlManager::IsAudioActive() const
 
 bool AudioControlManager::ExistOnlyOneActiveCall() const
 {
-    return activeCalls_.size() == existOnlyOneCall_;
+    return activeCalls_.size() == EXIST_ONLY_ONE_CALL;
 }
 
 bool AudioControlManager::ExistOnlyOneIncomingCall() const
 {
-    return incomingCalls_.size() == existOnlyOneCall_;
+    return incomingCalls_.size() == EXIST_ONLY_ONE_CALL;
 }
 
 int32_t AudioControlManager::PlayCallTone(ToneDescriptor type)
@@ -604,10 +656,10 @@ int32_t AudioControlManager::PlayCallTone(ToneDescriptor type)
     }
     tone_ = std::make_unique<Tone>(type);
     if (tone_ == nullptr) {
-        TELEPHONY_LOGE("create tone object failed");
-        return TELEPHONY_LOCAL_PTR_NULL;
+        TELEPHONY_LOGE("create tone failed");
+        return TELEPHONY_FAIL;
     }
-    if (tone_->Start() == TELEPHONY_SUCCESS) {
+    if (tone_->Play() == TELEPHONY_SUCCESS) {
         isTonePlaying_ = true;
         return TELEPHONY_SUCCESS;
     }
@@ -618,6 +670,7 @@ int32_t AudioControlManager::StopCallTone()
 {
     if (tone_ != nullptr && tone_->Stop() == TELEPHONY_SUCCESS) {
         isTonePlaying_ = false;
+        tone_ = nullptr;
         return TELEPHONY_SUCCESS;
     }
     return TELEPHONY_FAIL;
@@ -640,7 +693,14 @@ int32_t AudioControlManager::PlayDtmf(char digit)
 
 int32_t AudioControlManager::PlayRingback()
 {
-    return PlayCallTone(ToneDescriptor::TONE_RING_BACK);
+    // should play ringback tone while there exists only one alerting call
+    if (alertingCalls_.size() != EXIST_ONLY_ONE_CALL || IsRingingCallExists()) {
+        return TELEPHONY_FAIL;
+    }
+    if (PlayCallTone(ToneDescriptor::TONE_RING_BACK) == TELEPHONY_SUCCESS) {
+        return TELEPHONY_SUCCESS;
+    }
+    return TELEPHONY_FAIL;
 }
 
 int32_t AudioControlManager::StopRingback()

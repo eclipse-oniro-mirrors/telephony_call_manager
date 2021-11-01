@@ -35,8 +35,9 @@ CallManagerProxy::~CallManagerProxy()
     UnInit();
 }
 
-void CallManagerProxy::Init(int32_t systemAbilityId)
+void CallManagerProxy::Init(int32_t systemAbilityId, std::u16string &bundleName)
 {
+    bundleName_ = bundleName;
     systemAbilityId_ = systemAbilityId;
     int32_t result = ConnectService();
     if (result != TELEPHONY_SUCCESS) {
@@ -470,8 +471,8 @@ int32_t CallManagerProxy::RegisterCallBack()
         return TELEPHONY_FAIL;
     }
 
-    int32_t ret = callManagerServicePtr_->RegisterCallBack(callAbilityCallbackPtr_);
-    if (ret != TELEPHONY_SUCCESS) {
+    int32_t ret = callManagerServicePtr_->RegisterCallBack(callAbilityCallbackPtr_, bundleName_);
+    if (ret != TELEPHONY_SUCCESS && ret != TELEPHONY_PERMISSION_ERR) {
         Clean();
         TELEPHONY_LOGE("register callback to call manager service failed,result: %{public}d", ret);
         return TELEPHONY_REGISTER_CALLBACK_FAIL;

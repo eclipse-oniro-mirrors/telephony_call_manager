@@ -54,7 +54,7 @@ public:
     void Init();
     bool ProcessEvent(int32_t event);
     enum CallStateEventType {
-        SWITCH_CS_CALL_STATE = 100,
+        SWITCH_CS_CALL_STATE = 0,
         SWITCH_IMS_CALL_STATE,
         SWITCH_OTT_CALL_STATE,
         SWITCH_RINGING_STATE,

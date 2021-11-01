@@ -24,12 +24,16 @@
 #include "system_ability.h"
 #include "system_ability_definition.h"
 
+#include "values_bucket.h"
+#include "data_ability_helper.h"
+
 #include "call_number_utils.h"
 #include "call_setting_manager.h"
 #include "call_state_report_proxy.h"
 #include "call_manager_service_stub.h"
 #include "call_control_manager.h"
 #include "audio_control_manager.h"
+#include "call_data_base_helper.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -51,7 +55,7 @@ public:
      * @param callback[in], callback function pointer
      * @return Returns TELEPHONY_SUCCESS on success, others on failure.
      */
-    int32_t RegisterCallBack(const sptr<ICallAbilityCallback> &callback) override;
+    int32_t RegisterCallBack(const sptr<ICallAbilityCallback> &callback, std::u16string &bundleName) override;
 
     /**
      * Call diale interface
@@ -215,7 +219,7 @@ public:
     int32_t GetMainCallId(int32_t callId) override;
     std::vector<std::u16string> GetSubCallIdList(int32_t callId) override;
     std::vector<std::u16string> GetCallIdListForConference(int32_t callId) override;
-
+    int32_t InsertData() override;
 private:
     enum ServiceRunningState {
         STATE_STOPPED = 0,
@@ -231,6 +235,7 @@ private:
     std::mutex lock_;
     const int32_t startTime_ = 1900;
     const int32_t extraMonth_ = 1;
+    std::shared_ptr<CallDataBaseHelper> callDataPtr_;
 };
 } // namespace Telephony
 } // namespace OHOS

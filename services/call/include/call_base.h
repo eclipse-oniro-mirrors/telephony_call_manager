@@ -97,14 +97,20 @@ protected:
 private:
     CallRunningState callRunningState_;
     TelConferenceState conferenceState_;
-    int32_t startTime_; // Call start time
+    int64_t startTime_; // Call start time
     CallDirection direction_;
     int64_t policyFlag_;
     TelCallState callState_;
     bool isSpeakerphoneOn_;
     CallEndedType callEndedType_;
     ContactInfo contactInfo_;
+    time_t callBeginTime_;
+    time_t callEndTime_;
+    time_t ringBeginTime_;
+    time_t ringEndTime_;
+    CallAnswerType answerType_;
     std::mutex mutex_;
+    int32_t kThousand = 1000;
 };
 } // namespace Telephony
 } // namespace OHOS

@@ -30,6 +30,7 @@
 #include "report_call_state_handler.h"
 #include "call_request_handler.h"
 #include "hang_up_sms.h"
+#include "missed_call_notification.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -87,6 +88,7 @@ private:
     std::unique_ptr<CallRequestHandlerService> callRequestHandlerServicePtr_;
     sptr<ReportCallStateHandlerService> reportCallStateHandlerPtr_;
     sptr<HangUpSms> hungUpSms_;
+    sptr<MissedCallNotification> missedCallNotification_;
     DialSourceInfo dialSrcInfo_;
     std::mutex mutex_;
 };

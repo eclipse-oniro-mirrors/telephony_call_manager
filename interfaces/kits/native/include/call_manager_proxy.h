@@ -32,7 +32,7 @@ namespace Telephony {
 class CallManagerProxy : public Timer, public std::enable_shared_from_this<CallManagerProxy> {
     DECLARE_DELAYED_SINGLETON(CallManagerProxy)
 public:
-    void Init(int32_t systemAbilityId);
+    void Init(int32_t systemAbilityId, std::u16string &bundleName);
     void UnInit();
     static void task();
 
@@ -76,6 +76,7 @@ private:
     int32_t systemAbilityId_;
     sptr<ICallManagerService> callManagerServicePtr_;
     sptr<ICallAbilityCallback> callAbilityCallbackPtr_;
+    std::u16string bundleName_;
     Utils::RWLock rwClientLock_;
     std::mutex mutex_;
 };

@@ -27,11 +27,13 @@
 #ifdef ABILITY_AUDIO_SUPPORT
 #include "audio_player.h"
 #endif
+#include "audio_system_manager.h"
 
 #include "telephony_log_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
+using namespace AudioStandard;
 AudioProxy::AudioProxy() {}
 
 AudioProxy::~AudioProxy() {}
@@ -153,9 +155,14 @@ int32_t AudioProxy::Release(int32_t id)
     return TELEPHONY_SUCCESS;
 }
 
-std::string AudioProxy::GetDefaultRingerPath() const
+std::string AudioProxy::GetDefaultRingPath() const
 {
-    return defaultRingerPath_;
+    return defaultRingPath_;
+}
+
+std::string AudioProxy::GetDefaultTonePath() const
+{
+    return defaultTonePath_;
 }
 
 int32_t AudioProxy::StartVibrate()
@@ -216,17 +223,31 @@ bool AudioProxy::SetMicDevActive(bool active)
     return true;
 }
 
-#ifdef ABILITY_AUDIO_SUPPORT
-float AudioProxy::GetVolume(AudioSystemManager::AudioVolumeType audioVolumeType)
+int32_t AudioProxy::GetVolume(AudioSystemManager::AudioVolumeType audioVolumeType)
 {
     return AudioSystemManager::GetInstance()->GetVolume(audioVolumeType);
 }
 
-int32_t AudioProxy::SetVolume(AudioSystemManager::AudioVolumeType audioVolumeType, float volume)
+int32_t AudioProxy::SetVolume(AudioSystemManager::AudioVolumeType audioVolumeType, int32_t volume)
 {
     return AudioSystemManager::GetInstance()->SetVolume(audioVolumeType, volume);
 }
-#endif
+
+int32_t AudioProxy::GetMaxVolume(AudioSystemManager::AudioVolumeType audioVolumeType)
+{
+    return AudioSystemManager::GetInstance()->GetMaxVolume(audioVolumeType);
+}
+
+int32_t AudioProxy::GetMinVolume(AudioSystemManager::AudioVolumeType audioVolumeType)
+{
+    return AudioSystemManager::GetInstance()->GetMinVolume(audioVolumeType);
+}
+
+int32_t AudioProxy::SetMaxVolume(AudioSystemManager::AudioVolumeType audioVolumeType)
+{
+    int32_t maxVolume = GetMaxVolume(audioVolumeType);
+    return AudioSystemManager::GetInstance()->SetVolume(audioVolumeType, maxVolume);
+}
 
 void AudioProxy::SetVolumeAudible()
 {
@@ -276,12 +297,12 @@ int32_t AudioProxy::SetMicrophoneMute(bool mute)
     return TELEPHONY_SUCCESS;
 }
 
-#ifdef ABILITY_AUDIO_SUPPORT
 AudioRingerMode AudioProxy::GetRingerMode() const
 {
     return AudioSystemManager::GetInstance()->GetRingerMode();
 }
 
+#ifdef ABILITY_AUDIO_SUPPORT
 bool AudioProxy::IsVibrateMode() const
 {
     return AudioRingerMode::RINGER_MODE_VIBRATE == GetRingerMode();

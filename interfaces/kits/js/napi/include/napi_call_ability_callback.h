@@ -64,6 +64,7 @@ private:
     static napi_value CreateUndefined(napi_env env);
     napi_value CreateErrorMessage(napi_env env, std::string msg);
     static void SetPropertyInt32(napi_env env, napi_value object, std::string name, int32_t value);
+    static void SetPropertyInt64(napi_env env, napi_value object, std::string name, int64_t value);
     static void SetPropertyStringUtf8(napi_env env, napi_value object, std::string name, std::string value);
 
 private:

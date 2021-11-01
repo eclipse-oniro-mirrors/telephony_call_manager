@@ -288,5 +288,14 @@ std::vector<std::u16string> CallManagerIpcClient::GetCallIdListForConference(int
     vec.clear();
     return vec;
 }
+
+int32_t CallManagerIpcClient::InsertData()
+{
+    TELEPHONY_LOGD("CallManagerIpcClient InsertData");
+    if (callManagerServicePtr_ != nullptr) {
+        return callManagerServicePtr_->InsertData();
+    }
+    return TELEPHONY_FAIL;
+}
 } // namespace Telephony
 } // namespace OHOS

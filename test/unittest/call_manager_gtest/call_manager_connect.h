@@ -19,6 +19,7 @@
 #include <map>
 #include <list>
 #include <mutex>
+#include <string_ex.h>
 
 #include "iservice_registry.h"
 #include "system_ability.h"
@@ -545,8 +546,8 @@ private:
             TELEPHONY_LOGE("create CallAbilityCallback object failed!");
             return TELEPHONY_FAIL;
         }
-
-        int32_t ret = callManagerServicePtr_->RegisterCallBack(callAbilityCallbackPtr_);
+        std::u16string bundleName = Str8ToStr16("com.ohos.callui");
+        int32_t ret = callManagerServicePtr_->RegisterCallBack(callAbilityCallbackPtr_, bundleName);
         if (ret != TELEPHONY_SUCCESS) {
             DisconnectService();
             TELEPHONY_LOGE("register callback to call manager service failed,result: %{public}d", ret);

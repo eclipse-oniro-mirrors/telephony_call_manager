@@ -79,9 +79,6 @@ bool CallStateProcess::ProcessEvent(int32_t event)
 
 bool CallStateProcess::SwitchState(InCallState state)
 {
-    if (currentInCallState_ == state) {
-        return true;
-    }
     bool result = false;
     std::lock_guard<std::mutex> lock(mutex_);
     switch (state) {
@@ -195,6 +192,7 @@ bool CallStateProcess::SwitchRinging()
         return false;
     }
     if (DelayedSingleton<AudioProxy>::GetInstance()->UpdateCallState(AudioCallState::RINGTONE)) {
+        DelayedSingleton<AudioControlManager>::GetInstance()->PlayRingtone();
         SetCurrentCallState(AudioCallState::RINGTONE);
         DelayedSingleton<AudioControlManager>::GetInstance()->SetAudioInterruptState(
             AudioInterruptState::IN_RINGING);

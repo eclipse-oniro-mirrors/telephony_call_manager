@@ -27,6 +27,7 @@
 
 namespace OHOS {
 namespace Telephony {
+using namespace AudioStandard;
 class AudioProxy : public std::enable_shared_from_this<AudioProxy> {
     DECLARE_DELAYED_SINGLETON(AudioProxy)
 public:
@@ -38,7 +39,8 @@ public:
     bool IsDeviceActive(AudioDeviceDescriptor::DeviceType deviceType);
     bool SetDeviceActive(AudioDeviceDescriptor::DeviceType deviceType, bool state);
 #endif
-    std::string GetDefaultRingerPath() const;
+    std::string GetDefaultRingPath() const;
+    std::string GetDefaultTonePath() const;
     void SetVolumeAudible();
     bool IsMicrophoneMute();
     int32_t SetMicrophoneMute(bool mute);
@@ -46,14 +48,15 @@ public:
     bool SetSpeakerDevActive(bool active);
     bool SetBluetoothDevActive(bool active);
     bool SetWiredHeadsetDevActive(bool active);
-#ifdef ABILITY_AUDIO_SUPPORT
     AudioRingerMode GetRingerMode() const;
-    float GetVolume(AudioSystemManager::AudioVolumeType audioVolumeType);
-    int32_t SetVolume(AudioSystemManager::AudioVolumeType audioVolumeType, float volume);
+    int32_t GetVolume(AudioSystemManager::AudioVolumeType audioVolumeType);
+    int32_t SetVolume(AudioSystemManager::AudioVolumeType audioVolumeType, int32_t volume);
+    int32_t GetMaxVolume(AudioSystemManager::AudioVolumeType audioVolumeType);
+    int32_t GetMinVolume(AudioSystemManager::AudioVolumeType audioVolumeType);
+    int32_t SetMaxVolume(AudioSystemManager::AudioVolumeType audioVolumeType);
+#ifdef ABILITY_AUDIO_SUPPORT
     bool IsStreamActive(AudioSystemManager::AudioVolumeType audioVolumeType);
     bool IsStreamMute(AudioSystemManager::AudioVolumeType audioVolumeType);
-    float GetMaxVolume(AudioSystemManager::AudioVolumeType audioVolumeType);
-    float GetMinVolume(AudioSystemManager::AudioVolumeType audioVolumeType);
 #endif
     void SetAudioDeviceChangeObserver();
     void SetOnCreateCompleteListener();
@@ -73,7 +76,8 @@ public:
     int32_t CancelVibrate();
 
 private:
-    const std::string defaultRingerPath_ = "/system/media/audio/ringtones/default.wav";
+    const std::string defaultRingPath_ = "/system/data/telephony/rings/ring.wav";
+    const std::string defaultTonePath_ = "/system/data/telephony/tones/tone.wav";
 };
 } // namespace Telephony
 } // namespace OHOS
