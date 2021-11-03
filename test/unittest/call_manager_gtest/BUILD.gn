@@ -22,6 +22,7 @@ ohos_unittest("tel_call_manager_gtest") {
 
   sources = [
     "//base/telephony/core_service/interfaces/innerkits/call_manager/proxy/call_manager_service_proxy.cpp",
+    "//base/telephony/core_service/interfaces/innerkits/proxy/core_service_proxy.cpp",
     "call_manager_gtest.cpp",
   ]
 
@@ -29,12 +30,16 @@ ohos_unittest("tel_call_manager_gtest") {
     "//base/telephony/call_manager/test/unittest/call_manager_gtest",
     "//base/telephony/call_manager/utils/include",
     "//base/telephony/core_service/interfaces/innerkits/common",
+    "//base/telephony/core_service/interfaces/innerkits/proxy",
+    "//base/telephony/ril_adapter/interfaces/innerkits",
     "//base/telephony/core_service/interfaces/innerkits/call_manager/common",
     "//base/telephony/core_service/interfaces/innerkits/call_manager/proxy",
     "//base/telephony/core_service/interfaces/innerkits/cellular_call/common",
   ]
 
   deps = [
+    "//base/telephony/core_service:tel_core_service",
+    "//base/telephony/core_service/common:libtelephony_common",
     "//base/telephony/core_service/common:libtelephony_common",
     "//third_party/googletest:gtest_main",
     "//utils/native/base:utils",

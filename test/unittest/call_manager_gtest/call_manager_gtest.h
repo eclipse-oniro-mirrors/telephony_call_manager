@@ -21,6 +21,7 @@
 #include <string_ex.h>
 
 #include "call_manager_connect.h"
+#include "core_service_connect.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -32,14 +33,33 @@ public:
         std::cout << "---------- gtest start ------------" << std::endl;
         clientPtr_ = std::make_unique<CallManagerConnect>();
         if (clientPtr_ == nullptr) {
-            std::cout << "make_unique CallManagerConnect failed!";
+            std::cout << "make_unique CallManagerConnect failed!" << std::endl;
             return;
         }
         if (clientPtr_->Init(TELEPHONY_CALL_MANAGER_SYS_ABILITY_ID) != TELEPHONY_SUCCESS) {
             std::cout << "connect callManager server failed!" << std::endl;
             return;
         }
-        std::cout << "connect callManager  server success!!!" << std::endl;
+        std::cout << "connect callManager server success!!!" << std::endl;
+
+        coreServicePtr_ = std::make_unique<CoreServiceConnect>();
+        if (coreServicePtr_ == nullptr) {
+            std::cout << "make_unique CoreServiceConnect failed!" << std::endl;
+            return;
+        }
+        if (coreServicePtr_->Init(TELEPHONY_CORE_SERVICE_SYS_ABILITY_ID) != TELEPHONY_SUCCESS) {
+            std::cout << "connect coreService server failed!" << std::endl;
+            return;
+        }
+        std::cout << "connect coreService server success!!!" << std::endl;
+    }
+
+    bool HasSimCard()
+    {
+        if (coreServicePtr_) {
+            return coreServicePtr_->HasSimCard();
+        }
+        return false;
     }
 
     // execute before each testcase
@@ -59,8 +79,11 @@ public:
 
 public:
     static std::unique_ptr<CallManagerConnect> clientPtr_;
+    static std::unique_ptr<CoreServiceConnect> coreServicePtr_;
 };
+
 std::unique_ptr<CallManagerConnect> CallManagerGtest::clientPtr_ = nullptr;
+std::unique_ptr<CoreServiceConnect> CallManagerGtest::coreServicePtr_ = nullptr;
 } // namespace Telephony
 } // namespace OHOS
 
