@@ -31,8 +31,10 @@
 
 ```
 /base/telephony/call_manager
+├─ frameworks                              # napi接口存放目录
 ├─ interfaces                              # 对外部暴露的接口
-│  └─ kits                                 # js/napi接口存放目录
+│  ├─ innerkits                            # 部件间的内部接口
+│  └─ kits                                 # js接口存放目录
 ├─ sa_profile                              # 启动配置文件
 ├─ services                                # 服务内部代码
 │  ├─ audio                                # 音频管理相关代码
@@ -57,81 +59,31 @@
 **表 1**  通话管理对外提供的接口
 
 <a name="table137mcpsimp"></a>
-<table><thead align="left"><tr id="row143mcpsimp"><th class="cellrowborder" valign="top" width="33.33333333333333%" id="mcps1.2.4.1.1"><p id="entry144mcpsimpp0"><a name="entry144mcpsimpp0"></a><a name="entry144mcpsimpp0"></a>接口内容</p>
-</th>
-<th class="cellrowborder" valign="top" width="33.33333333333333%" id="mcps1.2.4.1.2"><p id="entry145mcpsimpp0"><a name="entry145mcpsimpp0"></a><a name="entry145mcpsimpp0"></a>接口描述</p>
-</th>
-<th class="cellrowborder" valign="top" width="33.33333333333333%" id="mcps1.2.4.1.3"><p id="entry146mcpsimpp0"><a name="entry146mcpsimpp0"></a><a name="entry146mcpsimpp0"></a>所需权限</p>
-</th>
-</tr>
-</thead>
-<tbody><tr id="row147mcpsimp"><td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.2.4.1.1 "><p id="p143312519577"><a name="p143312519577"></a><a name="p143312519577"></a>function dial(phoneNumber: string, options: DialOptions, callback: AsyncCallback&lt;boolean&gt;): void;</p>
-</td>
-<td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.2.4.1.2 "><p id="entry149mcpsimpp0"><a name="entry149mcpsimpp0"></a><a name="entry149mcpsimpp0"></a>拨号接口，调用此接口可以进行拨号操作</p>
-</td>
-<td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.2.4.1.3 "><p id="entry150mcpsimpp0"><a name="entry150mcpsimpp0"></a><a name="entry150mcpsimpp0"></a>ohos.permission.PLACE_CALL</p>
-</td>
-</tr>
-</tbody>
-</table>
+
+| 接口内容                                                     | 接口描述                             | 所需权限                   |
+| ------------------------------------------------------------ | ------------------------------------ | -------------------------- |
+| function dial(phoneNumber: string, options: DialOptions, callback: AsyncCallback<boolean\>): void; | 拨号接口，调用此接口可以进行拨号操作 | ohos.permission.PLACE_CALL |
 
 **表 2**  拨号接口参数说明
 
 <a name="table18488202215170"></a>
-<table><thead align="left"><tr id="row748952217179"><th class="cellrowborder" valign="top" width="50%" id="mcps1.2.3.1.1"><p id="p1948942271710"><a name="p1948942271710"></a><a name="p1948942271710"></a>参数</p>
-</th>
-<th class="cellrowborder" valign="top" width="50%" id="mcps1.2.3.1.2"><p id="p1648972215173"><a name="p1648972215173"></a><a name="p1648972215173"></a>描述</p>
-</th>
-</tr>
-</thead>
-<tbody><tr id="row749092213171"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p14901222191720"><a name="p14901222191720"></a><a name="p14901222191720"></a>phoneNumber: string</p>
-</td>
-<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p34906228170"><a name="p34906228170"></a><a name="p34906228170"></a>电话号码</p>
-</td>
-</tr>
-<tr id="row549011221176"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p44902223175"><a name="p44902223175"></a><a name="p44902223175"></a>options: DialOptions</p>
-</td>
-<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p11490162241718"><a name="p11490162241718"></a><a name="p11490162241718"></a>扩展参数（详见下表）</p>
-</td>
-</tr>
-<tr id="row149072216176"><td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.1 "><p id="p5490152211715"><a name="p5490152211715"></a><a name="p5490152211715"></a>callback: AsyncCallback&lt;boolean&gt;</p>
-</td>
-<td class="cellrowborder" valign="top" width="50%" headers="mcps1.2.3.1.2 "><p id="p649002291718"><a name="p649002291718"></a><a name="p649002291718"></a>异步执行结果，true表示执行成功，false表示执行失败</p>
-</td>
-</tr>
-</tbody>
-</table>
+
+| 参数                              | 描述                                              |
+| --------------------------------- | ------------------------------------------------- |
+| phoneNumber: string               | 电话号码                                          |
+| options: DialOptions              | 扩展参数（详见下表）                              |
+| callback: AsyncCallback<boolean\> | 异步执行结果，true表示执行成功，false表示执行失败 |
 
 **表 3**  options: DialOptions参数说明
 
 <a name="table1322739190"></a>
-<table><thead align="left"><tr id="row193221031194"><th class="cellrowborder" valign="top" width="20%" id="mcps1.2.6.1.1"><p id="p203224311917"><a name="p203224311917"></a><a name="p203224311917"></a>参数</p>
-</th>
-<th class="cellrowborder" valign="top" width="20%" id="mcps1.2.6.1.2"><p id="p1639614810198"><a name="p1639614810198"></a><a name="p1639614810198"></a>类型</p>
-</th>
-<th class="cellrowborder" valign="top" width="20%" id="mcps1.2.6.1.3"><p id="p113221730191"><a name="p113221730191"></a><a name="p113221730191"></a>描述</p>
-</th>
-<th class="cellrowborder" valign="top" width="20%" id="mcps1.2.6.1.4"><p id="p153221330197"><a name="p153221330197"></a><a name="p153221330197"></a>是否必填</p>
-</th>
-<th class="cellrowborder" valign="top" width="20%" id="mcps1.2.6.1.5"><p id="p632220310199"><a name="p632220310199"></a><a name="p632220310199"></a>默认值</p>
-</th>
-</tr>
-</thead>
-<tbody><tr id="row123238311920"><td class="cellrowborder" valign="top" width="20%" headers="mcps1.2.6.1.1 "><p id="p932310311197"><a name="p932310311197"></a><a name="p932310311197"></a>extras</p>
-</td>
-<td class="cellrowborder" valign="top" width="20%" headers="mcps1.2.6.1.2 "><p id="p73966801911"><a name="p73966801911"></a><a name="p73966801911"></a>boolean</p>
-</td>
-<td class="cellrowborder" valign="top" width="20%" headers="mcps1.2.6.1.3 "><p id="p19821612162118"><a name="p19821612162118"></a><a name="p19821612162118"></a>false：音频 true：视频</p>
-</td>
-<td class="cellrowborder" valign="top" width="20%" headers="mcps1.2.6.1.4 "><p id="p33231931191"><a name="p33231931191"></a><a name="p33231931191"></a>否</p>
-</td>
-<td class="cellrowborder" valign="top" width="20%" headers="mcps1.2.6.1.5 "><p id="p12323232197"><a name="p12323232197"></a><a name="p12323232197"></a>false</p>
-</td>
-</tr>
-</tbody>
-</table>
-完整的JS API说明以及实例代码请参考：[拨打电话](https://gitee.com/openharmony/docs/blob/master/zh-cn/application-dev/js-reference/apis/js-apis-call.md)。
 
+| 参数   | 类型    | 描述                   | 是否必填 | 默认值 |
+| ------ | ------- | ---------------------- | -------- | ------ |
+| extras | boolean | false：音频 true：视频 | 否       | false  |
+
+
+完整的JS API说明以及实例代码请参考：[拨打电话](https://gitee.com/openharmony/docs/blob/master/zh-cn/application-dev/js-reference/apis/js-apis-call.md)。
 ## 使用说明<a name="section163mcpsimp"></a>
 
 ### 拨打电话接口调用流程及示例代码<a name="section113291522113518"></a>
