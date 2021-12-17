@@ -1,0 +1,80 @@
+/*
+ * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+#ifndef CALL_MANAGER_CLIENT_H
+#define CALL_MANAGER_CLIENT_H
+
+#include "refbase.h"
+#include "singleton.h"
+#include "pac_map.h"
+
+#include "call_manager_callback.h"
+
+namespace OHOS {
+namespace Telephony {
+class CallManagerClient : public std::enable_shared_from_this<CallManagerClient> {
+    DECLARE_DELAYED_SINGLETON(CallManagerClient)
+public:
+    void Init(int32_t systemAbilityId, std::u16string &bundleName);
+    void UnInit();
+    int32_t RegisterCallBack(std::unique_ptr<CallManagerCallback> callback);
+    int32_t UnRegisterCallBack();
+    int32_t DialCall(std::u16string number, AppExecFwk::PacMap &extras);
+    int32_t AnswerCall(int32_t callId, int32_t videoState);
+    int32_t RejectCall(int32_t callId, bool isSendSms, std::u16string content);
+    int32_t HangUpCall(int32_t callId);
+    int32_t GetCallState();
+    int32_t HoldCall(int32_t callId);
+    int32_t UnHoldCall(int32_t callId);
+    int32_t SwitchCall(int32_t callId);
+    int32_t CombineConference(int32_t callId);
+    int32_t SeparateConference(int32_t callId);
+    int32_t GetMainCallId(int32_t &callId);
+    std::vector<std::u16string> GetSubCallIdList(int32_t callId);
+    std::vector<std::u16string> GetCallIdListForConference(int32_t callId);
+    int32_t GetCallWaiting(int32_t slotId);
+    int32_t SetCallWaiting(int32_t slotId, bool activate);
+    int32_t GetCallRestriction(int32_t slotId, CallRestrictionType type);
+    int32_t SetCallRestriction(int32_t slotId, CallRestrictionInfo &info);
+    int32_t GetCallTransferInfo(int32_t slotId, CallTransferType type);
+    int32_t SetCallTransferInfo(int32_t slotId, CallTransferInfo &info);
+    int32_t SetCallPreferenceMode(int32_t slotId, int32_t mode);
+    int32_t StartDtmf(int32_t callId, char str);
+    int32_t StopDtmf(int32_t callId);
+    int32_t SendDtmf(int32_t callId, char str);
+    int32_t SendBurstDtmf(int32_t callId, std::u16string str, int32_t on, int32_t off);
+    bool IsRinging();
+    bool HasCall();
+    bool IsNewCallAllowed();
+    bool IsInEmergencyCall();
+    bool IsEmergencyPhoneNumber(std::u16string &number, int32_t slotId, int32_t &errorCode);
+    int32_t FormatPhoneNumber(std::u16string &number, std::u16string &countryCode, std::u16string &formatNumber);
+    int32_t FormatPhoneNumberToE164(
+        std::u16string &number, std::u16string &countryCode, std::u16string &formatNumber);
+    int32_t SetMuted(bool isMute);
+    int32_t MuteRinger();
+    int32_t SetAudioDevice(AudioDevice deviceType);
+    int32_t CancelMissedCallsNotification(int32_t id);
+    int32_t ControlCamera(std::u16string cameraId, std::u16string callingPackage);
+    int32_t SetPreviewWindow(VideoWindow &window);
+    int32_t SetDisplayWindow(VideoWindow &window);
+    int32_t SetCameraZoom(float zoomRatio);
+    int32_t SetPausePicture(std::u16string path);
+    int32_t SetDeviceDirection(int32_t rotation);
+};
+} // namespace Telephony
+} // namespace OHOS
+
+#endif

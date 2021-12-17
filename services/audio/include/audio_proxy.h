@@ -28,56 +28,55 @@
 namespace OHOS {
 namespace Telephony {
 using namespace AudioStandard;
+constexpr uint32_t VOLUME_AUDIBLE_DIVISOR = 2;
+
+enum AudioInterruptState {
+    INTERRUPT_STATE_UNKNOWN = 0,
+    INTERRUPT_STATE_DEACTIVATED,
+    INTERRUPT_STATE_ACTIVATED,
+    INTERRUPT_STATE_RINGING,
+};
+
 class AudioProxy : public std::enable_shared_from_this<AudioProxy> {
     DECLARE_DELAYED_SINGLETON(AudioProxy)
 public:
     void Init();
-    bool ActivateAudioInterrupt();
-    bool DeactivateAudioInterrupt();
-    bool UpdateCallState(int32_t state); // set audio mode
-#ifdef ABILITY_AUDIO_SUPPORT
-    bool IsDeviceActive(AudioDeviceDescriptor::DeviceType deviceType);
-    bool SetDeviceActive(AudioDeviceDescriptor::DeviceType deviceType, bool state);
-#endif
+    int32_t ActivateAudioInterrupt();
+    int32_t DeactivateAudioInterrupt();
+    /**
+     * Set audio mode
+     * @param state : IN_CALL , IN_VOIP , RINGTONE , IN_IDLE
+     */
+    bool SetAudioMode(int32_t audioMode);
     std::string GetDefaultRingPath() const;
     std::string GetDefaultTonePath() const;
+    std::string GetDefaultDtmfPath() const;
     void SetVolumeAudible();
     bool IsMicrophoneMute();
-    int32_t SetMicrophoneMute(bool mute);
-    bool SetMicDevActive(bool active);
-    bool SetSpeakerDevActive(bool active);
-    bool SetBluetoothDevActive(bool active);
-    bool SetWiredHeadsetDevActive(bool active);
+    bool SetMicrophoneMute(bool mute);
+    bool SetEarpieceDevActive();
+    bool SetSpeakerDevActive();
+    bool SetBluetoothDevActive();
+    bool SetWiredHeadsetDevActive();
     AudioRingerMode GetRingerMode() const;
     int32_t GetVolume(AudioSystemManager::AudioVolumeType audioVolumeType);
     int32_t SetVolume(AudioSystemManager::AudioVolumeType audioVolumeType, int32_t volume);
-    int32_t GetMaxVolume(AudioSystemManager::AudioVolumeType audioVolumeType);
-    int32_t GetMinVolume(AudioSystemManager::AudioVolumeType audioVolumeType);
     int32_t SetMaxVolume(AudioSystemManager::AudioVolumeType audioVolumeType);
-#ifdef ABILITY_AUDIO_SUPPORT
     bool IsStreamActive(AudioSystemManager::AudioVolumeType audioVolumeType);
     bool IsStreamMute(AudioSystemManager::AudioVolumeType audioVolumeType);
-#endif
+    int32_t GetMaxVolume(AudioSystemManager::AudioVolumeType audioVolumeType);
+    int32_t GetMinVolume(AudioSystemManager::AudioVolumeType audioVolumeType);
     void SetAudioDeviceChangeObserver();
     void SetOnCreateCompleteListener();
     bool IsVibrateMode() const;
-    int32_t CreateRing(const std::string &ringPath);
-    int32_t CreateTone(int32_t toneDescriptor, int32_t durationMs);
-    int32_t Play();
-    int32_t Play(int32_t toneDescriptor, int32_t duration); // play tone
-    int32_t Play(int32_t id, float volume, int32_t loopNum, float speed); // play ringtone
-    int32_t StopCallTone();
-    int32_t StopRing(int32_t id);
-    int32_t Release();
-    int32_t Release(int32_t id);
-    int32_t Pause(int32_t id);
-    int32_t Resume(int32_t id);
     int32_t StartVibrate();
     int32_t CancelVibrate();
 
 private:
+    bool isVoiceEnabled = false;
     const std::string defaultRingPath_ = "/system/data/telephony/rings/ring.wav";
     const std::string defaultTonePath_ = "/system/data/telephony/tones/tone.wav";
+    const std::string defaultDtmfPath_ = "/system/data/telephony/dtmfs/dtmf.wav";
 };
 } // namespace Telephony
 } // namespace OHOS

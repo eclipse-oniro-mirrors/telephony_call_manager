@@ -41,14 +41,27 @@
         RETURN_VALUE(__VA_ARGS__);                                         \
     }
 
-const int32_t kMaxRingingCallNumberLen = 30;
-const int32_t kMaxDialingCallNumberLen = 30;
-const int32_t kMaxManeLen = 10;
-const int32_t kMaxPathKeyLen = 60;
-const int32_t kCallStartId = 1000;
+const int32_t MAX_RINGING_CALL_NUMBER_LEN = 30;
+const int32_t MAX_DIALING_CALL_NUMBER_LEN = 30;
+const int32_t MAX_MANE_LEN = 10;
+const int32_t MAX_PATH_KEY_LEN = 60;
+const int32_t CALL_START_ID = 1000;
 namespace OHOS {
 namespace Telephony {
-enum PolicyFlag {
+struct DialParaInfo {
+    int32_t accountId;
+    int32_t callId;
+    int32_t index;
+    std::string number;
+    DialType dialType;
+    VideoStateType videoState;
+    CallType callType;
+    TelCallState callState;
+    bool isDialing;
+    bool isEcc;
+};
+
+enum PolicyFlag : int64_t {
     // Denote playing ring tone
     POLICY_FLAG_PLAY_RINGTONE = 0x00000001,
     // Denote vibration prompt
@@ -56,7 +69,7 @@ enum PolicyFlag {
     // Represents the play prompt tone
     POLICY_FLAG_PLAY_SOUND = 0x00000004,
     // Represents an audio routing handset
-    POLICY_FLAG_AUDIO_DEVICE_MIC = 0x00000008,
+    POLICY_FLAG_AUDIO_DEVICE_EARPIECE = 0x00000008,
     // Represents an audio routing speaker
     POLICY_FLAG_AUDIO_DEVICE_SPEAKER = 0x00000010,
     // Represents audio routing wired headset
@@ -65,29 +78,19 @@ enum PolicyFlag {
     POLICY_FLAG_AUDIO_DEVICE_BLUETOOTH = 0x00000040,
     // Indicates that no audio device is active
     POLICY_FLAG_AUDIO_DEVICE_DISABLE = 0x00000080,
-};
-
-struct CallInfo {
-    char phoneNum[kMaxNumberLen];
-    char scheme[kMaxSchemeNumberLen];
-    int32_t dialScene;
-    bool speakerphoneOn;
-    int32_t accountId;
-    int32_t videoState;
-    int32_t startTime; // Call start time
-    bool isEcc;
-    bool isDefault; // Whether to dial by default
-    CallType callType;
-    int32_t callId;
-    int64_t policyFlag;
-    TelCallState state;
+    // release the held call and the wait call
+    POLICY_FLAG_HANG_UP_HOLD_WAIT = 0x00000100,
+    // release the active call and recover the held call
+    POLICY_FLAG_HANG_UP_ACTIVE = 0x00000200,
+    // release all calls
+    POLICY_FLAG_HANG_UP_ALL = 0x00000400,
 };
 
 struct ContactInfo {
-    char name[kMaxManeLen];
+    char name[MAX_MANE_LEN];
     char number[kMaxNumberLen];
     bool isContacterExists;
-    char ringtonePath[kMaxPathKeyLen];
+    char ringtonePath[MAX_PATH_KEY_LEN];
     bool isSendToVoicemail;
     bool isEcc;
     bool isVoiceMail;

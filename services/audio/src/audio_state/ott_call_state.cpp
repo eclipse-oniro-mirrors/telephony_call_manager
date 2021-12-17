@@ -21,7 +21,7 @@ namespace OHOS {
 namespace Telephony {
 bool OTTCallState::ProcessEvent(int32_t event)
 {
-    TELEPHONY_LOGD("ott call state process : %{public}d", event);
+    TELEPHONY_LOGI("ott call state process : %{public}d", event);
     return false;
 }
 } // namespace Telephony

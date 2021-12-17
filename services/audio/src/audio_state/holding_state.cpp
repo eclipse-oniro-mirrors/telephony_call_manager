@@ -18,7 +18,6 @@
 #include "telephony_log_wrapper.h"
 
 #include "audio_control_manager.h"
-#include "audio_proxy.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -27,28 +26,29 @@ bool HoldingState::ProcessEvent(int32_t event)
     bool result = false;
     std::lock_guard<std::mutex> lock(mutex_);
     switch (event) {
-        case CallStateProcess::NEW_ACTIVE_CS_CALL:
-            if (DelayedSingleton<AudioControlManager>::GetInstance()->ExistOnlyOneActiveCall()) {
-                result = DelayedSingleton<AudioControlManager>::GetInstance()->ProcessEvent(
-                    CallStateProcess::SWITCH_CS_CALL_STATE);
+        case AudioEvent::NEW_ACTIVE_CS_CALL:
+            if (DelayedSingleton<AudioControlManager>::GetInstance()->IsOnlyOneActiveCall()) {
+                result = DelayedSingleton<CallStateProcessor>::GetInstance()->ProcessEvent(
+                    AudioEvent::SWITCH_CS_CALL_STATE);
             }
             break;
-        case CallStateProcess::NEW_ACTIVE_IMS_CALL:
-            if (DelayedSingleton<AudioControlManager>::GetInstance()->ExistOnlyOneActiveCall()) {
-                result = DelayedSingleton<AudioControlManager>::GetInstance()->ProcessEvent(
-                    CallStateProcess::SWITCH_IMS_CALL_STATE);
+        case AudioEvent::NEW_ACTIVE_IMS_CALL:
+            if (DelayedSingleton<AudioControlManager>::GetInstance()->IsOnlyOneActiveCall()) {
+                result = DelayedSingleton<CallStateProcessor>::GetInstance()->ProcessEvent(
+                    AudioEvent::SWITCH_IMS_CALL_STATE);
             }
             break;
-        case CallStateProcess::NEW_INCOMING_CALL:
-            // should play ringtone while only one incoming call exists
-            if (DelayedSingleton<AudioControlManager>::GetInstance()->ExistOnlyOneIncomingCall()) {
-                result = DelayedSingleton<AudioControlManager>::GetInstance()->ProcessEvent(
-                    CallStateProcess::SWITCH_RINGING_STATE); // switch to ringing state
+        case AudioEvent::NEW_INCOMING_CALL:
+            // should switch incoming state while only one incoming call exists
+            if (DelayedSingleton<AudioControlManager>::GetInstance()->IsOnlyOneIncomingCall()) {
+                result = DelayedSingleton<CallStateProcessor>::GetInstance()->ProcessEvent(
+                    AudioEvent::SWITCH_INCOMING_STATE); // switch to incoming state
             }
             break;
         default:
             break;
     }
+    TELEPHONY_LOGI("holding state lock release");
     return result;
 }
 } // namespace Telephony

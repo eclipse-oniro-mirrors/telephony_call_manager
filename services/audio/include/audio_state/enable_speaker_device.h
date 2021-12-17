@@ -16,11 +16,11 @@
 #ifndef ENABLE_SPEAKER_DEVICE_H
 #define ENABLE_SPEAKER_DEVICE_H
 
-#include "audio_state.h"
+#include "audio_base.h"
 
 namespace OHOS {
 namespace Telephony {
-class EnableSpeakerDevice : public AudioState {
+class EnableSpeakerDevice : public AudioBase {
 public:
     EnableSpeakerDevice() = default;
     ~EnableSpeakerDevice() = default;

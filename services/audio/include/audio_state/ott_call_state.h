@@ -16,11 +16,11 @@
 #ifndef OTT_CALL_STATE_H
 #define OTT_CALL_STATE_H
 
-#include "audio_state.h"
+#include "audio_base.h"
 
 namespace OHOS {
 namespace Telephony {
-class OTTCallState : public AudioState {
+class OTTCallState : public AudioBase {
 public:
     OTTCallState() = default;
     ~OTTCallState() = default;

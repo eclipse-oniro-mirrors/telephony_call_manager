@@ -20,21 +20,11 @@
 
 namespace OHOS {
 namespace Telephony {
-CSCall::CSCall() {}
+CSCall::CSCall(DialParaInfo &info) : CarrierCall(info) {}
+
+CSCall::CSCall(DialParaInfo &info, AppExecFwk::PacMap &extras) : CarrierCall(info, extras) {}
 
 CSCall::~CSCall() {}
-
-void CSCall::OutCallInit(const CallReportInfo &info, AppExecFwk::PacMap &extras, int32_t callId)
-{
-    InitCarrierOutCallInfo(info, extras, callId);
-    callType_ = CallType::TYPE_CS;
-}
-
-void CSCall::InCallInit(const CallReportInfo &info, int32_t callId)
-{
-    InitCarrierInCallInfo(info, callId);
-    callType_ = CallType::TYPE_CS;
-}
 
 int32_t CSCall::DialingProcess()
 {
@@ -78,47 +68,71 @@ void CSCall::GetCallAttributeInfo(CallAttributeInfo &info)
 
 int32_t CSCall::CombineConference()
 {
-    int32_t ret = TELEPHONY_ERROR;
-    ret = SetMainCall(GetCallID());
+    int32_t ret = DelayedSingleton<CsConferenceBase>::GetInstance()->SetMainCall(GetCallID());
     if (ret != TELEPHONY_SUCCESS) {
         return ret;
     }
     return CarrierCombineConference();
 }
 
+int32_t CSCall::SeparateConference()
+{
+    return CarrierSeparateConference();
+}
+
 int32_t CSCall::CanCombineConference()
 {
-    return CanCombineCsConference();
-}
-
-int32_t CSCall::SubCallCombineToConference()
-{
-    return SubCallCombineToCsConference(GetCallID());
-}
-
-int32_t CSCall::SubCallSeparateFromConference()
-{
-    return SubCallSeparateFromCsConference(GetCallID());
+    int32_t ret = IsSupportConferenceable();
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("call unsupport conference,  error%{public}d", ret);
+        return ret;
+    }
+    return DelayedSingleton<CsConferenceBase>::GetInstance()->CanCombineConference();
 }
 
 int32_t CSCall::CanSeparateConference()
 {
-    return CanSeparateCsConference();
+    return DelayedSingleton<CsConferenceBase>::GetInstance()->CanSeparateConference();
+}
+
+int32_t CSCall::LunchConference()
+{
+    int32_t ret = DelayedSingleton<CsConferenceBase>::GetInstance()->JoinToConference(GetCallID());
+    if (ret == TELEPHONY_SUCCESS) {
+        SetTelConferenceState(TelConferenceState::TEL_CONFERENCE_ACTIVE);
+    }
+    return ret;
+}
+
+int32_t CSCall::ExitConference()
+{
+    return DelayedSingleton<CsConferenceBase>::GetInstance()->LeaveFromConference(GetCallID());
 }
 
 int32_t CSCall::GetMainCallId()
 {
-    return GetMainCsCallId(GetCallID());
+    return DelayedSingleton<CsConferenceBase>::GetInstance()->GetMainCall();
 }
 
 std::vector<std::u16string> CSCall::GetSubCallIdList()
 {
-    return GetSubCsCallIdList(GetCallID());
+    return DelayedSingleton<CsConferenceBase>::GetInstance()->GetSubCallIdList(GetCallID());
 }
 
 std::vector<std::u16string> CSCall::GetCallIdListForConference()
 {
-    return GetCsCallIdListForConference(GetCallID());
+    return DelayedSingleton<CsConferenceBase>::GetInstance()->GetCallIdListForConference(GetCallID());
+}
+
+int32_t CSCall::IsSupportConferenceable()
+{
+#ifdef ABILIT_CONFIG_SUPPORT
+    bool carrierSupport = GetCarrierConfig(CS_SUPPORT_CONFERENCE);
+    if (!carrierSupport) {
+        return TELEPHONY_CONFERENCE_CARRIER_NOT_SUPPORT;
+    }
+#endif
+    return CarrierCall::IsSupportConferenceable();
 }
 } // namespace Telephony
 } // namespace OHOS

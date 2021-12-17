@@ -41,6 +41,7 @@ void CallRecordsManager::CallStateUpdated(
 {
     CallAttributeInfo info;
     if (nextState != CALL_STATUS_DISCONNECTED) {
+        TELEPHONY_LOGE("nextState not CALL_STATUS_DISCONNECTED");
         return;
     }
     if (callObjectPtr == nullptr) {
@@ -56,7 +57,6 @@ void CallRecordsManager::AddOneCallRecord(sptr<CallBase> call, CallAnswerType an
 {
     CallAttributeInfo info;
     (void)memset_s(&info, sizeof(CallAttributeInfo), 0, sizeof(CallAttributeInfo));
-
     call->GetCallAttributeBaseInfo(info);
     AddOneCallRecord(info);
 }
@@ -73,19 +73,16 @@ void CallRecordsManager::AddOneCallRecord(CallAttributeInfo &info)
         TELEPHONY_LOGE("memcpy_s failed!");
         return;
     }
-
     if ((info.callBeginTime == DEFAULT_TIME) || (info.callEndTime == DEFAULT_TIME)) {
         data.callDuration = DEFAULT_TIME;
     } else {
         data.callDuration = difftime(info.callEndTime, info.callBeginTime);
     }
-
     if ((info.ringBeginTime == DEFAULT_TIME) || (info.ringEndTime == DEFAULT_TIME)) {
         data.ringDuration = DEFAULT_TIME;
     } else {
         data.ringDuration = difftime(info.ringEndTime, info.ringBeginTime);
     }
-
     data.callId = info.callId;
     data.callBeginTime = info.callBeginTime;
     data.callEndTime = info.callEndTime;

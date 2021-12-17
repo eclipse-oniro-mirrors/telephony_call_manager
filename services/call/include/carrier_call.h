@@ -24,10 +24,9 @@ namespace OHOS {
 namespace Telephony {
 class CarrierCall : public CallBase {
 public:
-    CarrierCall();
+    CarrierCall(DialParaInfo &info);
+    CarrierCall(DialParaInfo &info, AppExecFwk::PacMap &extras);
     ~CarrierCall();
-    void InitCarrierOutCallInfo(const CallReportInfo &info, AppExecFwk::PacMap &extras, int32_t callId);
-    void InitCarrierInCallInfo(const CallReportInfo &info, int32_t callId);
     int32_t CarrierDialingProcess();
     int32_t CarrierAcceptCall(int32_t videoState);
     int32_t CarrierRejectCall(bool isSendSms, std::string &content);
@@ -37,14 +36,14 @@ public:
     void GetCallAttributeCarrierInfo(CallAttributeInfo &info);
     bool GetEmergencyState() override;
     int32_t CarrierSwitchCall();
-    int32_t GetCallTransferInfo();
-    int32_t SetCallTransferInfo();
-    int32_t StartDtmf(std::string &phoneNum, char str) override;
-    int32_t StopDtmf(std::string &phoneNum) override;
+    int32_t StartDtmf(char str) override;
+    int32_t StopDtmf() override;
     int32_t SendDtmf(std::string &phoneNum, char str) override;
     int32_t SendBurstDtmf(std::string &phoneNum, std::string str, int32_t on, int32_t off) override;
     int32_t GetSlotId() override;
     int32_t CarrierCombineConference();
+    int32_t CarrierSeparateConference();
+    int32_t IsSupportConferenceable() override;
 
 private:
     void PackCellularCallInfo(CellularCallInfo &callInfo);
@@ -54,8 +53,6 @@ private:
     int32_t slotId_;
     int32_t index_;
     bool isEcc_;
-    bool isDefault_; // Whether to dial by default
-    bool isVoicemailNumber_;
     std::mutex mutex_;
 };
 } // namespace Telephony

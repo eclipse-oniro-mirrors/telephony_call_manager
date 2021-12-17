@@ -21,12 +21,11 @@
 
 namespace OHOS {
 namespace Telephony {
-class CSCall : public CarrierCall, public CsConferenceBase {
+class CSCall : public CarrierCall {
 public:
-    CSCall();
+    CSCall(DialParaInfo &info);
+    CSCall(DialParaInfo &info, AppExecFwk::PacMap &extras);
     ~CSCall();
-    void OutCallInit(const CallReportInfo &info, AppExecFwk::PacMap &extras, int32_t callId);
-    void InCallInit(const CallReportInfo &info, int32_t callId);
     int32_t DialingProcess() override;
     int32_t AnswerCall(int32_t videoState) override;
     int32_t RejectCall(bool isSendSms, std::string &content) override;
@@ -36,13 +35,15 @@ public:
     int32_t SwitchCall() override;
     void GetCallAttributeInfo(CallAttributeInfo &info) override;
     int32_t CombineConference() override;
+    int32_t SeparateConference() override;
     int32_t CanCombineConference() override;
-    int32_t SubCallCombineToConference() override;
-    int32_t SubCallSeparateFromConference() override;
     int32_t CanSeparateConference() override;
+    int32_t LunchConference() override;
+    int32_t ExitConference() override;
     int32_t GetMainCallId() override;
     std::vector<std::u16string> GetSubCallIdList() override;
     std::vector<std::u16string> GetCallIdListForConference() override;
+    int32_t IsSupportConferenceable() override;
 };
 } // namespace Telephony
 } // namespace OHOS

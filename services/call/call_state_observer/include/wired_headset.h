@@ -42,7 +42,7 @@ public:
     void CallStateUpdated(sptr<CallBase> &callObjectPtr, TelCallState priorState, TelCallState nextState) override;
     void IncomingCallHungUp(sptr<CallBase> &callObjectPtr, bool isSendSms, std::string content) override;
     void IncomingCallActivated(sptr<CallBase> &callObjectPtr) override;
-    enum WiredHeadsetInterfaceType {
+    enum {
         MEDIA_INITIALIZE_MSG = 0,
         MEDIA_SET_ACTIVE_MSG,
         MEDIA_SET_LEAVE_MSG,

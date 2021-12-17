@@ -30,6 +30,7 @@ void WiredHeadsetHandler::Init() {}
 void WiredHeadsetHandler::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
 {
     if (event == nullptr) {
+        TELEPHONY_LOGE("event is nullptr!");
         return;
     }
     switch (event->GetInnerEventId()) {

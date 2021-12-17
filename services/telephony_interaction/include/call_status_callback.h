@@ -28,19 +28,19 @@ public:
     explicit CallStatusCallback();
     ~CallStatusCallback();
 
-    int32_t OnUpdateCallReportInfo(const CallReportInfo &info) override;
-    int32_t OnUpdateCallsReportInfo(const CallsReportInfo &info) override;
-    int32_t OnUpdateDisconnectedCause(const DisconnectedDetails &cause) override;
-    int32_t OnUpdateEventResultInfo(const CellularCallEventInfo &info) override;
-    int32_t OnUpdateGetWaitingResult(const CallWaitResponse &response) override;
-    int32_t OnUpdateSetWaitingResult(int32_t result) override;
-    int32_t OnUpdateGetRestrictionResult(const CallRestrictionResponse &result) override;
-    int32_t OnUpdateSetRestrictionResult(int32_t result) override;
-    int32_t OnUpdateGetTransferResult(const CallTransferResponse &response) override;
-    int32_t OnUpdateSetTransferResult(int32_t result) override;
-    int32_t OnUpdateGetCallClipResult(const ClipResponse &clipResponse) override;
-    int32_t OnUpdateGetCallClirResult(const ClirResponse &clirResponse) override;
-    int32_t OnUpdateSetCallClirResult(int32_t result) override;
+    int32_t UpdateCallReportInfo(const CallReportInfo &info) override;
+    int32_t UpdateCallsReportInfo(const CallsReportInfo &info) override;
+    int32_t UpdateDisconnectedCause(const DisconnectedDetails &cause) override;
+    int32_t UpdateEventResultInfo(const CellularCallEventInfo &info) override;
+    int32_t UpdateGetWaitingResult(const CallWaitResponse &response) override;
+    int32_t UpdateSetWaitingResult(int32_t result) override;
+    int32_t UpdateGetRestrictionResult(const CallRestrictionResponse &result) override;
+    int32_t UpdateSetRestrictionResult(int32_t result) override;
+    int32_t UpdateGetTransferResult(const CallTransferResponse &response) override;
+    int32_t UpdateSetTransferResult(int32_t result) override;
+    int32_t UpdateGetCallClipResult(const ClipResponse &clipResponse) override;
+    int32_t UpdateGetCallClirResult(const ClirResponse &clirResponse) override;
+    int32_t UpdateSetCallClirResult(int32_t result) override;
 };
 } // namespace Telephony
 } // namespace OHOS

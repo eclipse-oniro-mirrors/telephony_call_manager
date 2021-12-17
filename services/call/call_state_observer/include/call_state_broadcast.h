@@ -31,10 +31,9 @@ public:
     void CallStateUpdated(sptr<CallBase> &callObjectPtr, TelCallState priorState, TelCallState nextState) override;
 
 private:
-    int32_t eventCode_ = 0;
-    const std::string EVENT_DATA = "call state update";
-    const std::string CALL_STATE_UPDATE = "ohos.action.TELEPHONY_CALL_MANAGER_CALL_STATE_UPDATE";
-    void PublishCommonEvent(sptr<CallBase> &callObjectPtr, int32_t code);
+    constexpr static int16_t CALL_STATE_UPDATED_CODE = 0;
+    const std::string COMMON_EVENT_CALL_STATE_UPDATED = "usual.event.CALL_STATE_UPDATED";
+    void PublishCallStateEvent(sptr<CallBase> &callObjectPtr, int32_t priorState, int32_t nextState);
 };
 } // namespace Telephony
 } // namespace OHOS

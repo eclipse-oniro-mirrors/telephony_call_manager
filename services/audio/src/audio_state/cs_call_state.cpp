@@ -27,21 +27,22 @@ bool CSCallState::ProcessEvent(int32_t event)
     bool result = false;
     std::lock_guard<std::mutex> lock(mutex_);
     switch (event) {
-        case CallStateProcess::NO_MORE_ACTIVE_CALL:
-            result = DelayedSingleton<AudioControlManager>::GetInstance()->UpdateCallStateWhenNoMoreActiveCall();
+        case AudioEvent::NO_MORE_ACTIVE_CALL:
+            result = DelayedSingleton<AudioControlManager>::GetInstance()->UpdateCurrentCallState();
             break;
-        case CallStateProcess::NEW_INCOMING_CALL:
+        case AudioEvent::NEW_INCOMING_CALL:
             result = DelayedSingleton<AudioControlManager>::GetInstance()->PlayWaitingTone();
             break;
-        case CallStateProcess::VIDEO_STATE_CHANGED:
+        case AudioEvent::CALL_TYPE_CHANGED:
             if (DelayedSingleton<AudioControlManager>::GetInstance()->IsCurrentVideoCall()) {
-                result = DelayedSingleton<AudioControlManager>::GetInstance()->ProcessEvent(
-                    CallStateProcess::SWITCH_IMS_CALL_STATE);
+                result = DelayedSingleton<CallStateProcessor>::GetInstance()->ProcessEvent(
+                    AudioEvent::SWITCH_IMS_CALL_STATE);
             }
             break;
         default:
             break;
     }
+    TELEPHONY_LOGI("cs call state lock release");
     return result;
 }
 } // namespace Telephony

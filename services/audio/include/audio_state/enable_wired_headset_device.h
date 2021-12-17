@@ -16,11 +16,11 @@
 #ifndef ENABLE_WIRED_HEADSET_DEVICE_H
 #define ENABLE_WIRED_HEADSET_DEVICE_H
 
-#include "audio_state.h"
+#include "audio_base.h"
 
 namespace OHOS {
 namespace Telephony {
-class EnableWiredHeadsetDevice : public AudioState {
+class EnableWiredHeadsetDevice : public AudioBase {
 public:
     EnableWiredHeadsetDevice() = default;
     ~EnableWiredHeadsetDevice() = default;

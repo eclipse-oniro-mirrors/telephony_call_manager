@@ -23,9 +23,6 @@
 
 namespace OHOS {
 namespace Telephony {
-using namespace OHOS::AppExecFwk;
-using namespace OHOS::AAFwk;
-using namespace NativeRdb;
 class AbsSharedResultSet;
 CallDataBaseHelper::CallDataBaseHelper() {}
 
@@ -35,27 +32,26 @@ std::shared_ptr<AppExecFwk::DataAbilityHelper> CallDataBaseHelper::CreateDataAHe
 {
     auto saManager = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (saManager == nullptr) {
-        TELEPHONY_LOGD("Get system ability mgr failed.");
+        TELEPHONY_LOGE("Get system ability mgr failed.");
         return nullptr;
     }
-
     auto remoteObj = saManager->GetSystemAbility(TELEPHONY_CALL_MANAGER_SYS_ABILITY_ID);
     if (remoteObj == nullptr) {
-        TELEPHONY_LOGD("GetSystemAbility Service Failed.");
+        TELEPHONY_LOGE("GetSystemAbility Service Failed.");
         return nullptr;
     }
-
-    return DataAbilityHelper::Creator(remoteObj);
+    return AppExecFwk::DataAbilityHelper::Creator(remoteObj);
 }
 
 bool CallDataBaseHelper::Insert(NativeRdb::ValuesBucket &values)
 {
-    std::shared_ptr<DataAbilityHelper> helper = CreateDataAHelper();
+    std::shared_ptr<AppExecFwk::DataAbilityHelper> helper = CreateDataAHelper();
     if (helper == nullptr) {
+        TELEPHONY_LOGE("helper is nullptr!");
         return false;
     }
-    std::shared_ptr<Uri> uri = std::make_shared<Uri>(CALL_SUBSECTION);
-    return helper->Insert(*uri, values);
+    Uri uri(CALL_SUBSECTION);
+    return helper->Insert(uri, values);
 }
 
 bool CallDataBaseHelper::Query(NativeRdb::DataAbilityPredicates &predicates)
@@ -65,16 +61,16 @@ bool CallDataBaseHelper::Query(NativeRdb::DataAbilityPredicates &predicates)
 
 bool CallDataBaseHelper::Delete(NativeRdb::DataAbilityPredicates &predicates)
 {
-    std::shared_ptr<DataAbilityHelper> helper = CreateDataAHelper();
+    std::shared_ptr<AppExecFwk::DataAbilityHelper> helper = CreateDataAHelper();
     if (helper == nullptr) {
+        TELEPHONY_LOGE("helper is nullptr!");
         return false;
     }
-    std::shared_ptr<Uri> uri = std::make_shared<Uri>(CALL_SUBSECTION);
-    return helper->Delete(*uri, predicates);
+    Uri uri(CALL_SUBSECTION);
+    return helper->Delete(uri, predicates);
 }
 
 void CallDataBaseHelper::ResultSetConvertToIndexer(const std::shared_ptr<NativeRdb::AbsSharedResultSet> &resultSet)
-{
-}
+{}
 } // namespace Telephony
 } // namespace OHOS

@@ -16,11 +16,11 @@
 #ifndef DEVICES_INACTIVE_H
 #define DEVICES_INACTIVE_H
 
-#include "audio_state.h"
+#include "audio_base.h"
 
 namespace OHOS {
 namespace Telephony {
-class DevicesInactive : public AudioState {
+class DevicesInactive : public AudioBase {
 public:
     DevicesInactive() = default;
     ~DevicesInactive() = default;

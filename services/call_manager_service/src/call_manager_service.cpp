@@ -15,21 +15,18 @@
 
 #include "call_manager_service.h"
 
-#include <ctime>
-#include <string_ex.h>
+#include "ipc_skeleton.h"
 
-#include "iremote_invoker.h"
-#include "ipc_thread_skeleton.h"
-
-#include "telephony_log_wrapper.h"
-
-#include "call_manager_errors.h"
-#include "call_ability_report_ipc_proxy.h"
-#include "common_type.h"
-#include "cellular_call_info_handler.h"
 #include "call_ability_handler.h"
+#include "call_ability_report_proxy.h"
+#include "call_manager_errors.h"
+#include "telephony_log_wrapper.h"
+#include "common_type.h"
+
+#include "call_manager_dump_helper.h"
+#include "cellular_call_info_handler.h"
+#include "cellular_call_info_handler.h"
 #include "cellular_call_ipc_interface_proxy.h"
-#include "audio_control_manager.h"
 #include "call_records_manager.h"
 
 namespace OHOS {
@@ -38,8 +35,7 @@ const bool g_registerResult =
     SystemAbility::MakeAndRegisterAbility(DelayedSingleton<CallManagerService>::GetInstance().get());
 
 CallManagerService::CallManagerService()
-    : SystemAbility(TELEPHONY_CALL_MANAGER_SYS_ABILITY_ID, true), callControlManagerPtr_(nullptr),
-      audioControlManagerPtr_(nullptr), callDataPtr_(nullptr)
+    : SystemAbility(TELEPHONY_CALL_MANAGER_SYS_ABILITY_ID, true), callControlManagerPtr_(nullptr)
 {}
 
 CallManagerService::~CallManagerService()
@@ -59,22 +55,6 @@ bool CallManagerService::Init()
         TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");
         return false;
     }
-    audioControlManagerPtr_ = DelayedSingleton<AudioControlManager>::GetInstance();
-    if (audioControlManagerPtr_ == nullptr) {
-        TELEPHONY_LOGE("audioControlManagerPtr_ is nullptr!");
-        return false;
-    }
-    callSettingManagerPtr_ = DelayedSingleton<CallSettingManager>::GetInstance();
-    if (callSettingManagerPtr_ == nullptr) {
-        TELEPHONY_LOGE("callSettingManagerPtr_ is nullptr!");
-        return false;
-    }
-    callNumberUtilsPtr_ = DelayedSingleton<CallNumberUtils>::GetInstance();
-    if (callNumberUtilsPtr_ == nullptr) {
-        TELEPHONY_LOGE("callNumberUtilsPtr_ is nullptr!");
-        return false;
-    }
-    DelayedSingleton<AudioControlManager>::GetInstance()->Init();
     DelayedSingleton<CellularCallInfoHandlerService>::GetInstance()->Start();
     DelayedSingleton<CellularCallIpcInterfaceProxy>::GetInstance()->Init(TELEPHONY_CELLULAR_CALL_SYS_ABILITY_ID);
     DelayedSingleton<CallAbilityHandlerService>::GetInstance()->Start();
@@ -89,42 +69,28 @@ void CallManagerService::UnInit()
     }
 }
 
-void CallManagerService::OnDump()
-{
-    std::lock_guard<std::mutex> guard(lock_);
-    struct tm *timeNow;
-    time_t second = time(0);
-    timeNow = localtime(&second);
-    if (timeNow != nullptr) {
-        TELEPHONY_LOGI(
-            "CallManagerService dump time:%{public}d-%{public}d-%{public}d %{public}d:%{public}d:%{public}d",
-            timeNow->tm_year + startTime_, timeNow->tm_mon + extraMonth_, timeNow->tm_mday, timeNow->tm_hour,
-            timeNow->tm_min, timeNow->tm_sec);
-    }
-}
-
 void CallManagerService::OnStart()
 {
     std::lock_guard<std::mutex> guard(lock_);
     if (state_ == ServiceRunningState::STATE_RUNNING) {
         return;
     }
-
     if (!Init()) {
         TELEPHONY_LOGE("Leave, init failed!");
         return;
     }
-
     bool ret = SystemAbility::Publish(DelayedSingleton<CallManagerService>::GetInstance().get());
     if (!ret) {
         TELEPHONY_LOGE("Leave, publishing CallManagerService failed!");
         return;
     }
     TELEPHONY_LOGI("Publish CallManagerService SUCCESS");
-
     state_ = ServiceRunningState::STATE_RUNNING;
     struct tm *timeNow;
     time_t second = time(0);
+    if (second < 0) {
+        return;
+    }
     timeNow = localtime(&second);
     if (timeNow != nullptr) {
         TELEPHONY_LOGI(
@@ -137,12 +103,67 @@ void CallManagerService::OnStart()
 void CallManagerService::OnStop()
 {
     std::lock_guard<std::mutex> guard(lock_);
+    struct tm *timeNow;
+    time_t second = time(0);
+    if (second < 0) {
+        return;
+    }
+    timeNow = localtime(&second);
+    if (timeNow != nullptr) {
+        TELEPHONY_LOGI(
+            "CallManagerService dump time:%{public}d-%{public}d-%{public}d %{public}d:%{public}d:%{public}d",
+            timeNow->tm_year + startTime_, timeNow->tm_mon + extraMonth_, timeNow->tm_mday, timeNow->tm_hour,
+            timeNow->tm_min, timeNow->tm_sec);
+    }
     state_ = ServiceRunningState::STATE_STOPPED;
+}
+
+int32_t CallManagerService::Dump(std::int32_t fd, const std::vector<std::u16string> &args)
+{
+    if (fd < 0) {
+        TELEPHONY_LOGE("dump fd invalid");
+        return TELEPHONY_ERR_FAIL;
+    }
+    std::vector<std::string> argsInStr;
+    for (const auto &arg : args) {
+        TELEPHONY_LOGI("Dump args: %s", Str16ToStr8(arg).c_str());
+        argsInStr.emplace_back(Str16ToStr8(arg));
+    }
+    std::string result;
+    CallManagerDumpHelper dumpHelper;
+    if (dumpHelper.Dump(argsInStr, result)) {
+        TELEPHONY_LOGI("%s", result.c_str());
+        std::int32_t ret = dprintf(fd, "%s", result.c_str());
+        if (ret < 0) {
+            TELEPHONY_LOGE("dprintf to dump fd failed");
+            return TELEPHONY_ERR_FAIL;
+        }
+        return TELEPHONY_SUCCESS;
+    }
+    TELEPHONY_LOGW("dumpHelper failed");
+    return TELEPHONY_ERR_FAIL;
+}
+
+std::string CallManagerService::GetBindTime()
+{
+    bindTime_ =
+        std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now().time_since_epoch())
+            .count();
+    std::ostringstream oss;
+    oss << bindTime_;
+    return oss.str();
 }
 
 int32_t CallManagerService::RegisterCallBack(const sptr<ICallAbilityCallback> &callback, std::u16string &bundleName)
 {
-    return DelayedSingleton<CallAbilityReportIpcProxy>::GetInstance()->RegisterCallBack(callback);
+    std::string strName = Str16ToStr8(bundleName);
+    return DelayedSingleton<CallAbilityReportProxy>::GetInstance()->RegisterCallBack(callback, strName);
+}
+
+int32_t CallManagerService::UnRegisterCallBack(std::u16string &bundleName)
+{
+    std::string strName = Str16ToStr8(bundleName);
+    return DelayedSingleton<CallAbilityReportProxy>::GetInstance()->UnRegisterCallBack(strName);
 }
 
 int32_t CallManagerService::DialCall(std::u16string number, AppExecFwk::PacMap &extras)
@@ -151,7 +172,7 @@ int32_t CallManagerService::DialCall(std::u16string number, AppExecFwk::PacMap &
         return callControlManagerPtr_->DialCall(number, extras);
     } else {
         TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");
-        return TELEPHONY_LOCAL_PTR_NULL;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
 }
 
@@ -161,7 +182,7 @@ int32_t CallManagerService::AnswerCall(int32_t callId, int32_t videoState)
         return callControlManagerPtr_->AnswerCall(callId, videoState);
     } else {
         TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");
-        return TELEPHONY_LOCAL_PTR_NULL;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
 }
 
@@ -171,7 +192,7 @@ int32_t CallManagerService::RejectCall(int32_t callId, bool rejectWithMessage, s
         return callControlManagerPtr_->RejectCall(callId, rejectWithMessage, textMessage);
     } else {
         TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");
-        return TELEPHONY_LOCAL_PTR_NULL;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
 }
 
@@ -181,7 +202,7 @@ int32_t CallManagerService::HangUpCall(int32_t callId)
         return callControlManagerPtr_->HangUpCall(callId);
     } else {
         TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");
-        return TELEPHONY_LOCAL_PTR_NULL;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
 }
 
@@ -191,7 +212,7 @@ int32_t CallManagerService::GetCallState()
         return callControlManagerPtr_->GetCallState();
     } else {
         TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");
-        return TELEPHONY_LOCAL_PTR_NULL;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
 }
 
@@ -201,7 +222,7 @@ int32_t CallManagerService::HoldCall(int32_t callId)
         return callControlManagerPtr_->HoldCall(callId);
     } else {
         TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");
-        return TELEPHONY_LOCAL_PTR_NULL;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
 }
 
@@ -211,17 +232,17 @@ int32_t CallManagerService::UnHoldCall(int32_t callId)
         return callControlManagerPtr_->UnHoldCall(callId);
     } else {
         TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");
-        return TELEPHONY_LOCAL_PTR_NULL;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
 }
 
 int32_t CallManagerService::SwitchCall(int32_t callId)
 {
     if (callControlManagerPtr_ != nullptr) {
-        return callControlManagerPtr_->SwitchCall();
+        return callControlManagerPtr_->SwitchCall(callId);
     } else {
         TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");
-        return TELEPHONY_LOCAL_PTR_NULL;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
 }
 
@@ -231,7 +252,7 @@ bool CallManagerService::HasCall()
         return callControlManagerPtr_->HasCall();
     } else {
         TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");
-        return TELEPHONY_LOCAL_PTR_NULL;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
 }
 
@@ -241,7 +262,40 @@ bool CallManagerService::IsNewCallAllowed()
         return callControlManagerPtr_->IsNewCallAllowed();
     } else {
         TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");
-        return TELEPHONY_LOCAL_PTR_NULL;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+}
+
+int32_t CallManagerService::SetMuted(bool isMute)
+{
+    if (callControlManagerPtr_ != nullptr) {
+        return callControlManagerPtr_->SetMuted(isMute);
+    } else {
+        TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+}
+
+int32_t CallManagerService::MuteRinger()
+{
+    if (callControlManagerPtr_ != nullptr) {
+        return callControlManagerPtr_->MuteRinger();
+    } else {
+        TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+}
+
+int32_t CallManagerService::SetAudioDevice(AudioDevice deviceType)
+{
+    if (callControlManagerPtr_ != nullptr) {
+        if (callControlManagerPtr_->SetAudioDevice(deviceType) == TELEPHONY_SUCCESS) {
+            return TELEPHONY_SUCCESS;
+        }
+        return TELEPHONY_ERR_FAIL;
+    } else {
+        TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
 }
 
@@ -251,7 +305,7 @@ bool CallManagerService::IsRinging()
         return callControlManagerPtr_->IsRinging();
     } else {
         TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");
-        return TELEPHONY_LOCAL_PTR_NULL;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
 }
 
@@ -261,7 +315,7 @@ bool CallManagerService::IsInEmergencyCall()
         return callControlManagerPtr_->HasEmergency();
     } else {
         TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");
-        return TELEPHONY_LOCAL_PTR_NULL;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
 }
 
@@ -271,7 +325,7 @@ int32_t CallManagerService::StartDtmf(int32_t callId, char str)
         return callControlManagerPtr_->StartDtmf(callId, str);
     } else {
         TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");
-        return TELEPHONY_LOCAL_PTR_NULL;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
 }
 
@@ -281,7 +335,7 @@ int32_t CallManagerService::SendDtmf(int32_t callId, char str)
         return callControlManagerPtr_->SendDtmf(callId, str);
     } else {
         TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");
-        return TELEPHONY_LOCAL_PTR_NULL;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
 }
 
@@ -291,7 +345,7 @@ int32_t CallManagerService::SendBurstDtmf(int32_t callId, std::u16string str, in
         return callControlManagerPtr_->SendBurstDtmf(callId, str, on, off);
     } else {
         TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");
-        return TELEPHONY_LOCAL_PTR_NULL;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
 }
 
@@ -301,79 +355,191 @@ int32_t CallManagerService::StopDtmf(int32_t callId)
         return callControlManagerPtr_->StopDtmf(callId);
     } else {
         TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");
-        return TELEPHONY_LOCAL_PTR_NULL;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
 }
 
 int32_t CallManagerService::GetCallWaiting(int32_t slotId)
 {
-    if (callSettingManagerPtr_ != nullptr) {
-        return callSettingManagerPtr_->GetCallWaiting(slotId);
+    if (callControlManagerPtr_ != nullptr) {
+        return callControlManagerPtr_->GetCallWaiting(slotId);
     } else {
-        TELEPHONY_LOGE("callSettingManagerPtr_ is nullptr!");
-        return TELEPHONY_LOCAL_PTR_NULL;
+        TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
 }
 
 int32_t CallManagerService::SetCallWaiting(int32_t slotId, bool activate)
 {
-    if (callSettingManagerPtr_ != nullptr) {
-        return callSettingManagerPtr_->SetCallWaiting(slotId, activate);
+    if (callControlManagerPtr_ != nullptr) {
+        return callControlManagerPtr_->SetCallWaiting(slotId, activate);
     } else {
-        TELEPHONY_LOGE("callSettingManagerPtr_ is nullptr!");
-        return TELEPHONY_LOCAL_PTR_NULL;
+        TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+}
+
+int32_t CallManagerService::GetCallRestriction(int32_t slotId, CallRestrictionType type)
+{
+    if (callControlManagerPtr_ != nullptr) {
+        return callControlManagerPtr_->GetCallRestriction(slotId, type);
+    } else {
+        TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+}
+
+int32_t CallManagerService::SetCallRestriction(int32_t slotId, CallRestrictionInfo &info)
+{
+    if (callControlManagerPtr_ != nullptr) {
+        return callControlManagerPtr_->SetCallRestriction(slotId, info);
+    } else {
+        TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+}
+
+int32_t CallManagerService::GetCallTransferInfo(int32_t slotId, CallTransferType type)
+{
+    if (callControlManagerPtr_ != nullptr) {
+        return callControlManagerPtr_->GetCallTransferInfo(slotId, type);
+    } else {
+        TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+}
+
+int32_t CallManagerService::SetCallTransferInfo(int32_t slotId, CallTransferInfo &info)
+{
+    if (callControlManagerPtr_ != nullptr) {
+        return callControlManagerPtr_->SetCallTransferInfo(slotId, info);
+    } else {
+        TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+}
+
+int32_t CallManagerService::SetCallPreferenceMode(int32_t slotId, int32_t mode)
+{
+    if (callControlManagerPtr_ != nullptr) {
+        return callControlManagerPtr_->SetCallPreferenceMode(slotId, mode);
+    } else {
+        TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
 }
 
 int32_t CallManagerService::CombineConference(int32_t mainCallId)
 {
-    RETURN_FAILURE_IF_NULLPTR(callControlManagerPtr_, "callControlManagerPtr_ is null", TELEPHONY_LOCAL_PTR_NULL);
+    RETURN_FAILURE_IF_NULLPTR(
+        callControlManagerPtr_, "callControlManagerPtr_ is null", TELEPHONY_ERR_LOCAL_PTR_NULL);
     return callControlManagerPtr_->CombineConference(mainCallId);
-    TELEPHONY_LOGD("leave");
+}
+
+int32_t CallManagerService::SeparateConference(int32_t callId)
+{
+    RETURN_FAILURE_IF_NULLPTR(
+        callControlManagerPtr_, "callControlManagerPtr_ is null", TELEPHONY_ERR_LOCAL_PTR_NULL);
+    return callControlManagerPtr_->SeparateConference(callId);
+}
+
+int32_t CallManagerService::ControlCamera(std::u16string cameraId, std::u16string callingPackage)
+{
+    if (callControlManagerPtr_ != nullptr) {
+        return callControlManagerPtr_->ControlCamera(
+            cameraId, callingPackage, IPCSkeleton::GetCallingUid(), IPCSkeleton::GetCallingPid());
+    } else {
+        TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+}
+
+int32_t CallManagerService::SetPreviewWindow(VideoWindow &window)
+{
+    if (callControlManagerPtr_ != nullptr) {
+        return callControlManagerPtr_->SetPreviewWindow(window);
+    } else {
+        TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+}
+
+int32_t CallManagerService::SetDisplayWindow(VideoWindow &window)
+{
+    if (callControlManagerPtr_ != nullptr) {
+        return callControlManagerPtr_->SetDisplayWindow(window);
+    } else {
+        TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+}
+
+int32_t CallManagerService::SetCameraZoom(float zoomRatio)
+{
+    if (callControlManagerPtr_ != nullptr) {
+        return callControlManagerPtr_->SetCameraZoom(zoomRatio);
+    } else {
+        TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+}
+
+int32_t CallManagerService::SetPausePicture(std::u16string path)
+{
+    if (callControlManagerPtr_ != nullptr) {
+        return callControlManagerPtr_->SetPausePicture(path);
+    } else {
+        TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+}
+
+int32_t CallManagerService::SetDeviceDirection(int32_t rotation)
+{
+    if (callControlManagerPtr_ != nullptr) {
+        return callControlManagerPtr_->SetDeviceDirection(rotation);
+    } else {
+        TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
 }
 
 bool CallManagerService::IsEmergencyPhoneNumber(std::u16string &number, int32_t slotId, int32_t &errorCode)
 {
-    if (callNumberUtilsPtr_ != nullptr) {
-        return callNumberUtilsPtr_->CheckNumberIsEmergency(Str16ToStr8(number), slotId, errorCode);
+    if (callControlManagerPtr_ != nullptr) {
+        return callControlManagerPtr_->IsEmergencyPhoneNumber(number, slotId, errorCode);
     } else {
-        TELEPHONY_LOGE("callNumberUtilsPtr_ is nullptr!");
-        return TELEPHONY_LOCAL_PTR_NULL;
+        TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
 }
 
 int32_t CallManagerService::FormatPhoneNumber(
     std::u16string &number, std::u16string &countryCode, std::u16string &formatNumber)
 {
-    if (callNumberUtilsPtr_ != nullptr) {
-        std::string tmpStr("");
-        int32_t ret = callNumberUtilsPtr_->FormatPhoneNumber(Str16ToStr8(number), Str16ToStr8(countryCode), tmpStr);
-        formatNumber = Str8ToStr16(tmpStr);
-        return ret;
+    if (callControlManagerPtr_ != nullptr) {
+        return callControlManagerPtr_->FormatPhoneNumber(number, countryCode, formatNumber);
     } else {
-        TELEPHONY_LOGE("callNumberUtilsPtr_ is nullptr!");
-        return TELEPHONY_LOCAL_PTR_NULL;
+        TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
 }
 
 int32_t CallManagerService::FormatPhoneNumberToE164(
     std::u16string &number, std::u16string &countryCode, std::u16string &formatNumber)
 {
-    if (callNumberUtilsPtr_ != nullptr) {
-        std::string tmpStr("");
-        int32_t ret =
-            callNumberUtilsPtr_->FormatPhoneNumberToE164(Str16ToStr8(number), Str16ToStr8(countryCode), tmpStr);
-        formatNumber = Str8ToStr16(tmpStr);
-        return ret;
+    if (callControlManagerPtr_ != nullptr) {
+        return callControlManagerPtr_->FormatPhoneNumberToE164(number, countryCode, formatNumber);
     } else {
-        TELEPHONY_LOGE("callNumberUtilsPtr_ is nullptr!");
-        return TELEPHONY_LOCAL_PTR_NULL;
+        TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
 }
 
 int32_t CallManagerService::GetMainCallId(int32_t callId)
 {
-    RETURN_FAILURE_IF_NULLPTR(callControlManagerPtr_, "callControlManagerPtr_ is null", TELEPHONY_LOCAL_PTR_NULL);
+    RETURN_FAILURE_IF_NULLPTR(
+        callControlManagerPtr_, "callControlManagerPtr_ is null", TELEPHONY_ERR_LOCAL_PTR_NULL);
     return callControlManagerPtr_->GetMainCallId(callId);
 }
 
@@ -397,36 +563,14 @@ std::vector<std::u16string> CallManagerService::GetCallIdListForConference(int32
     return vec;
 }
 
-int32_t CallManagerService::InsertData()
+int32_t CallManagerService::CancelMissedCallsNotification(int32_t id)
 {
-    callDataPtr_ = DelayedSingleton<CallDataBaseHelper>::GetInstance();
-    if (callDataPtr_ == nullptr) {
-        TELEPHONY_LOGE("callDataPtr_ is nullptr!");
-        return TELEPHONY_ERROR;
+    if (callControlManagerPtr_ != nullptr) {
+        return callControlManagerPtr_->CancelMissedCallsNotification(id);
+    } else {
+        TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-
-    NativeRdb::ValuesBucket bucket;
-    bucket.PutString("phone_number", "");
-    bucket.PutString("display_name", "");
-    bucket.PutInt("call_direction", 0);
-    bucket.PutString("voicemail_uri", "");
-    bucket.PutInt("sim_type", 0);
-    bucket.PutInt("is_hd", 0);
-    bucket.PutInt("is_read", 0);
-    bucket.PutInt("ring_duration", 0);
-    bucket.PutInt("talk_duration", 0);
-    bucket.PutString("format_number", "");
-    bucket.PutString("quicksearch_key", "");
-    bucket.PutInt("number_type", 0);
-    bucket.PutString("number_type_name", "");
-    bucket.PutInt("begin_time", 0);
-    bucket.PutInt("end_time", 0);
-    bucket.PutInt("answer_state", 0);
-    bucket.PutInt("create_time", 0);
-    bucket.PutString("number_location", "");
-    bucket.PutInt("photo_id", 0);
-    callDataPtr_->Insert(bucket);
-    return TELEPHONY_SUCCESS;
 }
 } // namespace Telephony
 } // namespace OHOS

@@ -18,42 +18,22 @@
 
 #include <cstdio>
 #include <cstdlib>
-#include <vector>
-#include <memory>
-#include <mutex>
+
+#include "singleton.h"
+#include "conference_base.h"
 
 namespace OHOS {
 namespace Telephony {
-enum ConferenceState {
-    CONFERENCE_STATE_IDLE = 0,
-    CONFERENCE_STATE_CREATING,
-    CONFERENCE_STATE_HOLDING,
-    CONFERENCE_STATE_ACTIVE,
-    CONFERENCE_STATE_LEAVING,
-};
-
-class CsConferenceBase {
+class CsConferenceBase : public ConferenceBase {
+    DECLARE_DELAYED_SINGLETON(CsConferenceBase)
 public:
-    CsConferenceBase();
-    ~CsConferenceBase();
-    static int32_t SetMainCall(int32_t callId);
-    static int32_t AddOneConferenceSubCallId(int32_t callId);
-    static int32_t GetMainCsCallId(int32_t callId);
-    static std::vector<std::u16string> GetSubCsCallIdList(int32_t callId);
-    static std::vector<std::u16string> GetCsCallIdListForConference(int32_t callId);
-    static ConferenceState GetCsConferenceState();
-    static void SetCsConferenceState(ConferenceState state);
-    static int32_t SeparateConference(int32_t callId);
-    static int32_t CanCombineCsConference();
-    static int32_t SubCallCombineToCsConference(int32_t callId);
-    static int32_t SubCallSeparateFromCsConference(int32_t callId);
-    static int32_t CanSeparateCsConference();
+    int32_t JoinToConference(int32_t callId) override;
+    int32_t LeaveFromConference(int32_t callId) override;
+    int32_t CanCombineConference() override;
+    int32_t CanSeparateConference() override;
 
 private:
-    static int32_t mainCallId_;
-    static ConferenceState state_;
-    static std::vector<int32_t> subCallIdVec_;
-    static std::mutex vecMutex_;
+    uint32_t maxSubCallLimits_;
 };
 } // namespace Telephony
 } // namespace OHOS

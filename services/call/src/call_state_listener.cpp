@@ -32,6 +32,7 @@ CallStateListener::~CallStateListener()
 bool CallStateListener::AddOneObserver(const sptr<CallStateListenerBase> &observer)
 {
     if (observer == nullptr) {
+        TELEPHONY_LOGE("observer is nullptr!");
         return false;
     }
     std::lock_guard<std::mutex> lock(mutex_);
@@ -45,6 +46,7 @@ bool CallStateListener::AddOneObserver(const sptr<CallStateListenerBase> &observ
 bool CallStateListener::RemoveOneObserver(const sptr<CallStateListenerBase> &observer)
 {
     if (observer == nullptr) {
+        TELEPHONY_LOGE("observer is nullptr!");
         return false;
     }
     std::lock_guard<std::mutex> lock(mutex_);
@@ -62,6 +64,7 @@ bool CallStateListener::RemoveAllObserver()
 void CallStateListener::NewCallCreated(sptr<CallBase> &callObjectPtr)
 {
     if (callObjectPtr == nullptr) {
+        TELEPHONY_LOGE("observer is nullptr!");
         return;
     }
     std::lock_guard<std::mutex> lock(mutex_);
@@ -73,6 +76,7 @@ void CallStateListener::NewCallCreated(sptr<CallBase> &callObjectPtr)
 void CallStateListener::CallDestroyed(sptr<CallBase> &callObjectPtr)
 {
     if (callObjectPtr == nullptr) {
+        TELEPHONY_LOGE("observer is nullptr!");
         return;
     }
     std::lock_guard<std::mutex> lock(mutex_);
@@ -97,6 +101,7 @@ void CallStateListener::CallStateUpdated(
 void CallStateListener::IncomingCallHungUp(sptr<CallBase> &callObjectPtr, bool isSendSms, std::string content)
 {
     if (callObjectPtr == nullptr) {
+        TELEPHONY_LOGE("callObjectPtr is nullptr");
         return;
     }
     std::lock_guard<std::mutex> lock(mutex_);
@@ -108,6 +113,7 @@ void CallStateListener::IncomingCallHungUp(sptr<CallBase> &callObjectPtr, bool i
 void CallStateListener::IncomingCallActivated(sptr<CallBase> &callObjectPtr)
 {
     if (callObjectPtr == nullptr) {
+        TELEPHONY_LOGE("callObjectPtr is nullptr");
         return;
     }
     std::lock_guard<std::mutex> lock(mutex_);

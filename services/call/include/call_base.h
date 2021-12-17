@@ -25,16 +25,16 @@
 #include "pac_map.h"
 
 #include "common_type.h"
+#include "conference_base.h"
 
 namespace OHOS {
 namespace Telephony {
 class CallBase : public virtual RefBase {
 public:
-    CallBase();
+    CallBase(DialParaInfo &info);
+    CallBase(DialParaInfo &info, AppExecFwk::PacMap &extras);
     virtual ~CallBase();
 
-    void InitOutCallBase(const CallReportInfo &info, AppExecFwk::PacMap &extras, int32_t callId);
-    void InitInCallBase(const CallReportInfo &info, int32_t callId);
     virtual int32_t DialingProcess() = 0;
     virtual int32_t AnswerCall(int32_t videoState) = 0;
     virtual int32_t RejectCall(bool isSendSms, std::string &content) = 0;
@@ -44,36 +44,36 @@ public:
     virtual int32_t SwitchCall() = 0;
     virtual void GetCallAttributeInfo(CallAttributeInfo &info) = 0;
     virtual bool GetEmergencyState() = 0;
-    virtual int32_t StartDtmf(std::string &phoneNum, char str) = 0;
-    virtual int32_t StopDtmf(std::string &phoneNum) = 0;
+    virtual int32_t StartDtmf(char str) = 0;
+    virtual int32_t StopDtmf() = 0;
     virtual int32_t SendDtmf(std::string &phoneNum, char str) = 0;
     virtual int32_t SendBurstDtmf(std::string &phoneNum, std::string str, int32_t on, int32_t off) = 0;
     virtual int32_t GetSlotId() = 0;
     virtual int32_t CombineConference() = 0;
+    virtual int32_t SeparateConference() = 0;
     virtual int32_t CanCombineConference() = 0;
-    virtual int32_t SubCallCombineToConference() = 0;
-    virtual int32_t SubCallSeparateFromConference() = 0;
     virtual int32_t CanSeparateConference() = 0;
+    virtual int32_t LunchConference() = 0;
+    virtual int32_t ExitConference() = 0;
     virtual int32_t GetMainCallId() = 0;
     virtual std::vector<std::u16string> GetSubCallIdList() = 0;
     virtual std::vector<std::u16string> GetCallIdListForConference() = 0;
+    virtual int32_t IsSupportConferenceable() = 0;
     int32_t DialCallBase();
     int32_t IncomingCallBase();
     int32_t AcceptCallBase();
     int32_t RejectCallBase();
-    int32_t HoldCallBase();
-    int32_t UnHoldCallBase();
-    int32_t TurnOffVoice(bool silence);
     void GetCallAttributeBaseInfo(CallAttributeInfo &info);
     int32_t GetCallID();
     CallType GetCallType();
     CallRunningState GetCallRunningState();
     int32_t SetTelCallState(TelCallState nextState);
     TelCallState GetTelCallState();
-    int32_t SetTelConferenceState(TelConferenceState state);
+    void SetTelConferenceState(TelConferenceState state);
     TelConferenceState GetTelConferenceState();
     VideoStateType GetVideoStateType();
-    void SetPolicyFlag(int64_t policyFlag);
+    void SetVideoStateType(VideoStateType mediaType);
+    void SetPolicyFlag(PolicyFlag flag);
     int64_t GetPolicyFlag();
     bool GetCallerInfo(ContactInfo &info);
     void SetCallerInfo(const ContactInfo &contactInfo);
@@ -95,6 +95,15 @@ protected:
     std::string accountNumber_;
 
 private:
+    void StateChangesToDialing();
+    void StateChangesToIncoming();
+    void StateChangesToWaiting();
+    void StateChangesToActive();
+    void StateChangesToHolding();
+    void StateChangesToDisconnected();
+    void StateChangesToDisconnecting();
+    void StateChangesToAlering();
+
     CallRunningState callRunningState_;
     TelConferenceState conferenceState_;
     int64_t startTime_; // Call start time
@@ -110,7 +119,6 @@ private:
     time_t ringEndTime_;
     CallAnswerType answerType_;
     std::mutex mutex_;
-    int32_t kThousand = 1000;
 };
 } // namespace Telephony
 } // namespace OHOS

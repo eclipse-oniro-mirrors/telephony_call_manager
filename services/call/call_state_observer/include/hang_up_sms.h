@@ -16,13 +16,8 @@
 #ifndef HANG_UP_SMS_H
 #define HANG_UP_SMS_H
 
-#include <mutex>
-
 #include "call_state_listener_base.h"
 
-#include "i_sms_service_interface.h"
-#include "i_delivery_short_message_callback.h"
-#include "i_send_short_message_callback.h"
 #include "short_message_manager.h"
 
 namespace OHOS {
@@ -30,7 +25,7 @@ namespace Telephony {
 class HangUpSms : public CallStateListenerBase {
 public:
     HangUpSms();
-    virtual ~HangUpSms();
+    ~HangUpSms() = default;
     void NewCallCreated(sptr<CallBase> &callObjectPtr) override;
     void CallDestroyed(sptr<CallBase> &callObjectPtr) override;
     void IncomingCallActivated(sptr<CallBase> &callObjectPtr) override;
@@ -38,15 +33,8 @@ public:
     void CallStateUpdated(sptr<CallBase> &callObjectPtr, TelCallState priorState, TelCallState nextState) override;
 
 private:
-    std::mutex mutex_;
-    const int32_t DEFAULT_SLOT_ID = 0;
-    sptr<ISmsServiceInterface> smsService_;
     std::unique_ptr<ShortMessageManager> msgManager_;
-    bool IsSmsAbilityExist();
-    int32_t ConnectSmsService();
-    void SendMessage(int32_t slotId, const std::string &desAddr, const std::string &text);
     void SendMessage(int32_t slotId, const std::u16string &desAddr, const std::u16string &text);
-    int32_t GetSlotId() const;
     std::u16string ConvertToUtf16(const std::string &str);
 };
 } // namespace Telephony

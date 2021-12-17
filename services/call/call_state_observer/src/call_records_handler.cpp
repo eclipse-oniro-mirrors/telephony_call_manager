@@ -34,23 +34,18 @@ void CallRecordsHandler::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &eve
         TELEPHONY_LOGE("CallRecordsHandler::ProcessEvent parameter error");
         return;
     }
-
     if (event->GetInnerEventId() == CallRecordsHandlerService::HANDLER_ADD_CALL_RECORD_INFO) {
         auto object = event->GetUniqueObject<CallRecordInfo>();
         if (object == nullptr) {
             TELEPHONY_LOGE("object is nullptr!");
             return;
         }
-
         CallRecordInfo info = *object;
         if (callDataPtr_ == nullptr) {
             TELEPHONY_LOGE("callDataPtr_ is nullptr!");
             return;
         }
-
         NativeRdb::ValuesBucket bucket;
-        TELEPHONY_LOGD("callLog Insert begin");
-        time_t logTime = time(nullptr);
         bucket.PutString(CALL_PHONE_NUMBER, std::string(info.phoneNumber));
         bucket.PutString(CALL_DISPLAY_NAME, std::string(""));
         bucket.PutInt(CALL_DIRECTION, info.directionType);
@@ -67,11 +62,11 @@ void CallRecordsHandler::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &eve
         bucket.PutInt(CALL_BEGIN_TIME, info.callBeginTime);
         bucket.PutInt(CALL_END_TIME, info.callEndTime);
         bucket.PutInt(CALL_ANSWER_STATE, info.answerType);
-        bucket.PutInt(CALL_CREATE_TIME, logTime);
+        uint64_t timeStamp = time(0);
+        bucket.PutInt(CALL_CREATE_TIME, timeStamp);
         bucket.PutString(CALL_NUMBER_LOCATION, std::string(""));
         bucket.PutInt(CALL_PHOTO_ID, 0);
         callDataPtr_->Insert(bucket);
-        TELEPHONY_LOGD("callLog Insert end");
         return;
     }
 }
@@ -100,15 +95,14 @@ int32_t CallRecordsHandlerService::StoreCallRecord(const CallRecordInfo &info)
 {
     if (handler_.get() == nullptr) {
         TELEPHONY_LOGE("handler_ is nullptr");
-        return TELEPHONY_FAIL;
+        return TELEPHONY_ERROR;
     }
     std::unique_ptr<CallRecordInfo> para = std::make_unique<CallRecordInfo>();
     if (para.get() == nullptr) {
         TELEPHONY_LOGE("make_unique CallRecordInfo failed!");
-        return TELEPHONY_FAIL;
+        return TELEPHONY_ERROR;
     }
     *para = info;
-    std::lock_guard<std::mutex> lock(mutex_);
     handler_->SendEvent(HANDLER_ADD_CALL_RECORD_INFO, std::move(para));
     return TELEPHONY_SUCCESS;
 }

@@ -15,31 +15,15 @@
 
 #include "call_state_broadcast.h"
 
-#include "common_event_manager.h"
 #include "want.h"
+#include "common_event_support.h"
+#include "common_event.h"
+#include "common_event_manager.h"
 
 #include "telephony_log_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
-void CallStateBroadcast::NewCallCreated(sptr<CallBase> &callObjectPtr)
-{
-    if (callObjectPtr == nullptr) {
-        TELEPHONY_LOGE("call object ptr nullptr");
-        return;
-    }
-    PublishCommonEvent(callObjectPtr, ++eventCode_);
-}
-
-void CallStateBroadcast::CallDestroyed(sptr<CallBase> &callObjectPtr)
-{
-    if (callObjectPtr == nullptr) {
-        TELEPHONY_LOGE("call object ptr nullptr");
-        return;
-    }
-    PublishCommonEvent(callObjectPtr, ++eventCode_);
-}
-
 void CallStateBroadcast::CallStateUpdated(
     sptr<CallBase> &callObjectPtr, TelCallState priorState, TelCallState nextState)
 {
@@ -47,29 +31,34 @@ void CallStateBroadcast::CallStateUpdated(
         TELEPHONY_LOGE("call object ptr nullptr");
         return;
     }
-    PublishCommonEvent(callObjectPtr, ++eventCode_);
+    PublishCallStateEvent(callObjectPtr, (int32_t)priorState, (int32_t)nextState);
 }
 
-void CallStateBroadcast::PublishCommonEvent(sptr<CallBase> &callObjectPtr, int32_t eventCode)
+void CallStateBroadcast::PublishCallStateEvent(sptr<CallBase> &callObjectPtr, int32_t priorState, int32_t nextState)
 {
     AAFwk::Want want;
     want.SetParam("callId", callObjectPtr->GetCallID());
-    want.SetParam("callState", (int32_t)callObjectPtr->GetTelCallState());
+    want.SetParam("priorState", priorState);
+    want.SetParam("nextState", nextState);
     want.SetParam("phoneNumber", callObjectPtr->GetAccountNumber());
-    want.SetAction(CALL_STATE_UPDATE);
+#ifdef ABILITY_NOTIFICATION_SUPPORT
+    want.SetAction(CommonEventSupport::COMMON_EVENT_CALL_STATE_UPDATED);
+#endif
+#ifndef ABILITY_NOTIFICATION_SUPPORT
+    want.SetAction(COMMON_EVENT_CALL_STATE_UPDATED);
+#endif
     EventFwk::CommonEventData data;
     data.SetWant(want);
-    data.SetCode(eventCode);
-    data.SetData(EVENT_DATA);
+    data.SetCode(CALL_STATE_UPDATED_CODE);
     EventFwk::CommonEventPublishInfo publishInfo;
     publishInfo.SetOrdered(true);
     bool result = EventFwk::CommonEventManager::PublishCommonEvent(data, publishInfo, nullptr);
-    if (result) {
-        TELEPHONY_LOGD("call state update published successfully");
-    } else {
-        TELEPHONY_LOGE("call state update published failed");
-    }
+    TELEPHONY_LOGI("publish call state event result : %{public}d", result);
 }
+
+void CallStateBroadcast::NewCallCreated(sptr<CallBase> &callObjectPtr) {}
+
+void CallStateBroadcast::CallDestroyed(sptr<CallBase> &callObjectPtr) {}
 
 void CallStateBroadcast::IncomingCallActivated(sptr<CallBase> &callObjectPtr) {}
 

@@ -23,7 +23,12 @@
 namespace OHOS {
 namespace Telephony {
 using namespace AudioStandard;
-enum PlayerType { TYPE_RING = 0, TYPE_TONE, TYPE_DTMF };
+
+enum PlayerType {
+    TYPE_RING = 0,
+    TYPE_TONE,
+    TYPE_DTMF,
+};
 
 struct wav_hdr {
     /* RIFF Chunk Descriptor */
@@ -54,11 +59,12 @@ private:
     static constexpr uint32_t READ_SIZE = 1;
     static constexpr uint32_t MIN_BYTES = 4;
     static size_t bufferLen;
+    static bool isStop_;
     static bool isRingStop_;
     static bool isToneStop_;
     static bool isDtmfStop_;
     static bool IsStop(PlayerType playerType);
-    static bool IsPause(PlayerType playerType);
+    static void Release(const std::unique_ptr<AudioRenderer> &audioRenderer);
 };
 } // namespace Telephony
 } // namespace OHOS

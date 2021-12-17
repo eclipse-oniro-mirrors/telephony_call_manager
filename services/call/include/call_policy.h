@@ -19,6 +19,8 @@
 #include <string>
 #include <memory>
 
+#include "pac_map.h"
+
 #include "call_object_manager.h"
 
 namespace OHOS {
@@ -28,20 +30,15 @@ public:
     CallPolicy();
     ~CallPolicy();
 
-    int32_t DialPolicy(int32_t slotId);
-    int32_t AnswerCallPolicy(int32_t callId);
+    int32_t DialPolicy(std::u16string &number, AppExecFwk::PacMap &extras, bool isEcc);
+    int32_t AnswerCallPolicy(int32_t callId, int32_t videoState);
     int32_t RejectCallPolicy(int32_t callId);
     int32_t HoldCallPolicy(int32_t callId);
     int32_t UnHoldCallPolicy(int32_t callId);
     int32_t HangUpPolicy(int32_t callId);
     int32_t SwitchCallPolicy(int32_t &callId);
-    int32_t JoinCallPolicy();
-    int32_t GetTransferNumberPolicy();
-    int32_t SetTransferNumberPolicy();
-    int32_t StartConferencePolicy();
-    int32_t InviteToConferencePolicy();
-    int32_t KickOutConferencePolicy();
-    int32_t LeaveConferencePolicy();
+    static int32_t UpgradeCallPolicy(int32_t callId);
+    static int32_t DowngradeCallPolicy(int32_t callId);
 
 private:
     uint32_t onlyTwoCall_ = 2;

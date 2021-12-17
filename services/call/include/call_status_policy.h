@@ -26,15 +26,8 @@ class CallStatusPolicy : public CallObjectManager {
 public:
     CallStatusPolicy();
     ~CallStatusPolicy();
-    int32_t IncomingHandlePolicy(ContactInfo info);
-    int32_t DialingHandlePolicy();
-    int32_t ActiveHandlePolicy();
-    int32_t HoldingHandlePolicy();
-    int32_t WaitingHandlePolicy();
-    int32_t AlertHandlePolicy();
-    int32_t DisconnectingHandlePolicy();
-    int32_t DisconnectedHandlePolicy();
-    int32_t IdleHandlePolicy();
+    int32_t IncomingHandlePolicy(const CallReportInfo &info);
+    int32_t DialingHandlePolicy(const CallReportInfo &info);
     int32_t FilterResultsDispose(sptr<CallBase> call);
 };
 } // namespace Telephony
