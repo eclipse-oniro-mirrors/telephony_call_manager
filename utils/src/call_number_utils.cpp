@@ -13,8 +13,6 @@
  * limitations under the License.
  */
 
-#include <algorithm>
-
 #include "call_number_utils.h"
 
 #include "phonenumbers/phonenumber.pb.h"
@@ -34,7 +32,8 @@ int32_t CallNumberUtils::FormatPhoneNumber(
     const std::string &phoneNumber, const std::string &countryCode, std::string &formatNumber)
 {
     if (phoneNumber.empty()) {
-        return CALL_MANAGER_PHONE_NUMBER_NULL;
+        TELEPHONY_LOGE("phoneNumber is nullptr!");
+        return CALL_ERR_PHONE_NUMBER_EMPTY;
     }
     if (phoneNumber.front() == '#' || phoneNumber.front() == '*') {
         formatNumber = phoneNumber;
@@ -43,10 +42,15 @@ int32_t CallNumberUtils::FormatPhoneNumber(
     std::string tmpCode = countryCode;
     transform(tmpCode.begin(), tmpCode.end(), tmpCode.begin(), ::toupper);
     i18n::phonenumbers::PhoneNumber parseResult;
+    if (phoneUtils_ == nullptr) {
+        TELEPHONY_LOGE("phoneUtils_ is nullptr");
+        return TELEPHONY_ERROR;
+    }
     phoneUtils_->ParseAndKeepRawInput(phoneNumber, tmpCode, &parseResult);
     phoneUtils_->FormatInOriginalFormat(parseResult, tmpCode, &formatNumber);
     if (formatNumber.empty() || formatNumber == "0" || phoneNumber == formatNumber) {
-        return CALL_MANAGER_FORMATTING_FAILED;
+        TELEPHONY_LOGE("FormatPhoneNumber failed!");
+        return CALL_ERR_FORMAT_PHONE_NUMBER_FAILED;
     }
     return TELEPHONY_SUCCESS;
 }
@@ -61,16 +65,22 @@ int32_t CallNumberUtils::FormatNumberBase(const std::string phoneNumber, std::st
     const i18n::phonenumbers::PhoneNumberUtil::PhoneNumberFormat formatInfo, std::string &formatNumber)
 {
     if (phoneNumber.empty()) {
-        return CALL_MANAGER_PHONE_NUMBER_NULL;
+        TELEPHONY_LOGE("phoneNumber is nullptr!");
+        return CALL_ERR_PHONE_NUMBER_EMPTY;
     }
     transform(countryCode.begin(), countryCode.end(), countryCode.begin(), ::toupper);
     i18n::phonenumbers::PhoneNumber parseResult;
+    if (phoneUtils_ == nullptr) {
+        TELEPHONY_LOGE("phoneUtils_ is nullptr");
+        return TELEPHONY_ERROR;
+    }
     phoneUtils_->Parse(phoneNumber, countryCode, &parseResult);
     if (phoneUtils_->IsValidNumber(parseResult)) {
         phoneUtils_->Format(parseResult, formatInfo, &formatNumber);
     }
     if (formatNumber.empty() || formatNumber == "0" || phoneNumber == formatNumber) {
-        return CALL_MANAGER_FORMATTING_FAILED;
+        TELEPHONY_LOGE("FormatPhoneNumber failed!");
+        return CALL_ERR_FORMAT_PHONE_NUMBER_FAILED;
     }
     return TELEPHONY_SUCCESS;
 }
@@ -78,16 +88,14 @@ int32_t CallNumberUtils::FormatNumberBase(const std::string phoneNumber, std::st
 bool CallNumberUtils::CheckNumberIsEmergency(
     const std::string &phoneNumber, const int32_t slotId, int32_t &errorCode)
 {
-    errorCode = TELEPHONY_SUCCESS;
-    int isEcc = DelayedSingleton<CellularCallIpcInterfaceProxy>::GetInstance()->IsUrgentCall(
+    int isEcc = DelayedSingleton<CellularCallIpcInterfaceProxy>::GetInstance()->IsEmergencyPhoneNumber(
         phoneNumber, slotId, errorCode);
-    TELEPHONY_LOGD("CheckNumberIsEmergency  isEcc == %d, errorCode == %d", isEcc, errorCode);
     return (isEcc != 0);
 }
 
 bool CallNumberUtils::IsValidSlotId(int32_t slotId) const
 {
-    return slotId == defaultSlotId_;
+    return slotId == DEFAULT_SLOT_ID;
 }
 } // namespace Telephony
 } // namespace OHOS

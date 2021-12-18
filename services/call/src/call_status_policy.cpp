@@ -28,62 +28,36 @@ CallStatusPolicy::CallStatusPolicy() {}
 
 CallStatusPolicy::~CallStatusPolicy() {}
 
-int32_t CallStatusPolicy::IncomingHandlePolicy(ContactInfo info)
+int32_t CallStatusPolicy::IncomingHandlePolicy(const CallReportInfo &info)
 {
-    int32_t ret = TELEPHONY_FAIL;
-    if (ret != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("VoicemailInterceptor failed!");
-    } else {
-        TELEPHONY_LOGI("VoicemailInterceptor success!");
+    std::string numberStr(info.accountNum);
+    if (numberStr.empty()) {
+        TELEPHONY_LOGE("phone number is NULL!");
+        return CALL_ERR_PHONE_NUMBER_EMPTY;
     }
-    return ret;
-}
 
-int32_t CallStatusPolicy::DialingHandlePolicy()
-{
+    if (IsCallExist(numberStr)) {
+        TELEPHONY_LOGE("the call already exists!");
+        return CALL_ERR_CALL_ALREADY_EXISTS;
+    }
     return TELEPHONY_SUCCESS;
 }
 
-int32_t CallStatusPolicy::ActiveHandlePolicy()
+int32_t CallStatusPolicy::DialingHandlePolicy(const CallReportInfo &info)
 {
-    return TELEPHONY_SUCCESS;
-}
-
-int32_t CallStatusPolicy::HoldingHandlePolicy()
-{
-    return TELEPHONY_SUCCESS;
-}
-
-int32_t CallStatusPolicy::WaitingHandlePolicy()
-{
-    return TELEPHONY_SUCCESS;
-}
-
-int32_t CallStatusPolicy::AlertHandlePolicy()
-{
-    return TELEPHONY_SUCCESS;
-}
-
-int32_t CallStatusPolicy::DisconnectingHandlePolicy()
-{
-    return TELEPHONY_SUCCESS;
-}
-
-int32_t CallStatusPolicy::DisconnectedHandlePolicy()
-{
-    return TELEPHONY_SUCCESS;
-}
-
-int32_t CallStatusPolicy::IdleHandlePolicy()
-{
+    std::string number(info.accountNum);
+    if (IsCallExist(number)) {
+        TELEPHONY_LOGW("this call has created yet!");
+        return CALL_ERR_CALL_ALREADY_EXISTS;
+    }
     return TELEPHONY_SUCCESS;
 }
 
 int32_t CallStatusPolicy::FilterResultsDispose(sptr<CallBase> call)
 {
-    int32_t ret = TELEPHONY_FAIL;
+    int32_t ret = TELEPHONY_ERR_FAIL;
     if (call == nullptr) {
-        return CALL_MANAGER_CALL_NULL;
+        return CALL_ERR_CALL_OBJECT_IS_NULL;
     }
     if (HasRingingMaximum() || HasDialingMaximum()) {
         TELEPHONY_LOGI("the number of Ringing or Dialing call is bigger than Maximum, start to hung up");

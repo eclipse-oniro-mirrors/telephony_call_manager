@@ -14,7 +14,6 @@
  */
 
 #include "proximity_sensor.h"
-
 #include "call_object_manager.h"
 
 namespace OHOS {

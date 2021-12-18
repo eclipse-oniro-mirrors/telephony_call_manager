@@ -18,7 +18,7 @@
 #include "call_manager_errors.h"
 #include "telephony_log_wrapper.h"
 
-#include "call_ability_report_ipc_proxy.h"
+#include "call_ability_report_proxy.h"
 #include "cellular_call_info_handler.h"
 
 namespace OHOS {
@@ -27,18 +27,18 @@ CallStatusCallback::CallStatusCallback() {}
 
 CallStatusCallback::~CallStatusCallback() {}
 
-int32_t CallStatusCallback::OnUpdateCallReportInfo(const CallReportInfo &info)
+int32_t CallStatusCallback::UpdateCallReportInfo(const CallReportInfo &info)
 {
     int32_t ret = DelayedSingleton<CellularCallInfoHandlerService>::GetInstance()->UpdateCallReportInfo(info);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("UpdateCallReportInfo failed! errCode:%{public}d", ret);
     } else {
-        TELEPHONY_LOGI("UpdateCallReportInfo success! state:%d", info.state);
+        TELEPHONY_LOGI("UpdateCallReportInfo success! state:%{public}d", info.state);
     }
     return ret;
 }
 
-int32_t CallStatusCallback::OnUpdateCallsReportInfo(const CallsReportInfo &info)
+int32_t CallStatusCallback::UpdateCallsReportInfo(const CallsReportInfo &info)
 {
     int32_t ret = DelayedSingleton<CellularCallInfoHandlerService>::GetInstance()->UpdateCallsReportInfo(info);
     if (ret != TELEPHONY_SUCCESS) {
@@ -49,12 +49,18 @@ int32_t CallStatusCallback::OnUpdateCallsReportInfo(const CallsReportInfo &info)
     return ret;
 }
 
-int32_t CallStatusCallback::OnUpdateDisconnectedCause(const DisconnectedDetails &cause)
+int32_t CallStatusCallback::UpdateDisconnectedCause(const DisconnectedDetails &cause)
 {
-    return TELEPHONY_SUCCESS;
+    int32_t ret = DelayedSingleton<CellularCallInfoHandlerService>::GetInstance()->UpdateDisconnectedCause(cause);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("UpdateDisconnectedCause failed! errCode:%{public}d", ret);
+    } else {
+        TELEPHONY_LOGI("UpdateDisconnectedCause success!");
+    }
+    return ret;
 }
 
-int32_t CallStatusCallback::OnUpdateEventResultInfo(const CellularCallEventInfo &info)
+int32_t CallStatusCallback::UpdateEventResultInfo(const CellularCallEventInfo &info)
 {
     int32_t ret = DelayedSingleton<CellularCallInfoHandlerService>::GetInstance()->UpdateEventResultInfo(info);
     if (ret != TELEPHONY_SUCCESS) {
@@ -65,7 +71,7 @@ int32_t CallStatusCallback::OnUpdateEventResultInfo(const CellularCallEventInfo 
     return ret;
 }
 
-int32_t CallStatusCallback::OnUpdateGetWaitingResult(const CallWaitResponse &response)
+int32_t CallStatusCallback::UpdateGetWaitingResult(const CallWaitResponse &response)
 {
     TELEPHONY_LOGI("GetWaitingResult  status = %{public}d, classCw = %{public}d, result = %{public}d",
         response.status, response.classCw, response.result);
@@ -74,21 +80,21 @@ int32_t CallStatusCallback::OnUpdateGetWaitingResult(const CallWaitResponse &res
     resultInfo.PutIntValue("result", response.result);
     resultInfo.PutIntValue("status", response.status);
     resultInfo.PutIntValue("classCw", response.classCw);
-    DelayedSingleton<CallAbilityReportIpcProxy>::GetInstance()->ReportSupplementResult(reportId, resultInfo);
+    DelayedSingleton<CallAbilityReportProxy>::GetInstance()->ReportSupplementResult(reportId, resultInfo);
     return TELEPHONY_SUCCESS;
 }
 
-int32_t CallStatusCallback::OnUpdateSetWaitingResult(int32_t result)
+int32_t CallStatusCallback::UpdateSetWaitingResult(int32_t result)
 {
     TELEPHONY_LOGI("SetWaitingResult  result = %{public}d", result);
     CallResultReportId reportId = CallResultReportId::SET_CALL_WAITING_REPORT_ID;
     AppExecFwk::PacMap resultInfo;
     resultInfo.PutIntValue("result", result);
-    DelayedSingleton<CallAbilityReportIpcProxy>::GetInstance()->ReportSupplementResult(reportId, resultInfo);
+    DelayedSingleton<CallAbilityReportProxy>::GetInstance()->ReportSupplementResult(reportId, resultInfo);
     return TELEPHONY_SUCCESS;
 }
 
-int32_t CallStatusCallback::OnUpdateGetRestrictionResult(const CallRestrictionResponse &result)
+int32_t CallStatusCallback::UpdateGetRestrictionResult(const CallRestrictionResponse &result)
 {
     TELEPHONY_LOGI("GetRestrictionResult  status = %{public}d, classCw = %{public}d, result = %{public}d",
         result.status, result.classCw, result.result);
@@ -97,19 +103,19 @@ int32_t CallStatusCallback::OnUpdateGetRestrictionResult(const CallRestrictionRe
     resultInfo.PutIntValue("result", result.result);
     resultInfo.PutIntValue("status", result.status);
     resultInfo.PutIntValue("classCw", result.classCw);
-    return DelayedSingleton<CallAbilityReportIpcProxy>::GetInstance()->ReportSupplementResult(reportId, resultInfo);
+    return DelayedSingleton<CallAbilityReportProxy>::GetInstance()->ReportSupplementResult(reportId, resultInfo);
 }
 
-int32_t CallStatusCallback::OnUpdateSetRestrictionResult(int32_t result)
+int32_t CallStatusCallback::UpdateSetRestrictionResult(int32_t result)
 {
     TELEPHONY_LOGI("SetRestrictionResult  result = %{public}d", result);
     CallResultReportId reportId = CallResultReportId::SET_CALL_RESTRICTION_REPORT_ID;
     AppExecFwk::PacMap resultInfo;
     resultInfo.PutIntValue("result", result);
-    return DelayedSingleton<CallAbilityReportIpcProxy>::GetInstance()->ReportSupplementResult(reportId, resultInfo);
+    return DelayedSingleton<CallAbilityReportProxy>::GetInstance()->ReportSupplementResult(reportId, resultInfo);
 }
 
-int32_t CallStatusCallback::OnUpdateGetTransferResult(const CallTransferResponse &response)
+int32_t CallStatusCallback::UpdateGetTransferResult(const CallTransferResponse &response)
 {
     CallResultReportId reportId = CallResultReportId::GET_CALL_TRANSFER_REPORT_ID;
     AppExecFwk::PacMap resultInfo;
@@ -118,19 +124,19 @@ int32_t CallStatusCallback::OnUpdateGetTransferResult(const CallTransferResponse
     resultInfo.PutIntValue("classx", response.classx);
     resultInfo.PutStringValue("number", response.number);
     resultInfo.PutIntValue("type", response.type);
-    return DelayedSingleton<CallAbilityReportIpcProxy>::GetInstance()->ReportSupplementResult(reportId, resultInfo);
+    return DelayedSingleton<CallAbilityReportProxy>::GetInstance()->ReportSupplementResult(reportId, resultInfo);
 }
 
-int32_t CallStatusCallback::OnUpdateSetTransferResult(int32_t result)
+int32_t CallStatusCallback::UpdateSetTransferResult(int32_t result)
 {
     TELEPHONY_LOGI("SetTransferResult  result = %{public}d", result);
-    CallResultReportId reportId = CallResultReportId::GET_CALL_TRANSFER_REPORT_ID;
+    CallResultReportId reportId = CallResultReportId::SET_CALL_TRANSFER_REPORT_ID;
     AppExecFwk::PacMap resultInfo;
     resultInfo.PutIntValue("result", result);
-    return DelayedSingleton<CallAbilityReportIpcProxy>::GetInstance()->ReportSupplementResult(reportId, resultInfo);
+    return DelayedSingleton<CallAbilityReportProxy>::GetInstance()->ReportSupplementResult(reportId, resultInfo);
 }
 
-int32_t CallStatusCallback::OnUpdateGetCallClipResult(const ClipResponse &clipResponse)
+int32_t CallStatusCallback::UpdateGetCallClipResult(const ClipResponse &clipResponse)
 {
     TELEPHONY_LOGI("GetCallClipResult  action = %{public}d, clipStat = %{public}d, result = %{public}d",
         clipResponse.action, clipResponse.clipStat, clipResponse.result);
@@ -139,10 +145,10 @@ int32_t CallStatusCallback::OnUpdateGetCallClipResult(const ClipResponse &clipRe
     resultInfo.PutIntValue("result", clipResponse.result);
     resultInfo.PutIntValue("action", clipResponse.action);
     resultInfo.PutIntValue("clipStat", clipResponse.clipStat);
-    return DelayedSingleton<CallAbilityReportIpcProxy>::GetInstance()->ReportSupplementResult(reportId, resultInfo);
+    return DelayedSingleton<CallAbilityReportProxy>::GetInstance()->ReportSupplementResult(reportId, resultInfo);
 }
 
-int32_t CallStatusCallback::OnUpdateGetCallClirResult(const ClirResponse &clirResponse)
+int32_t CallStatusCallback::UpdateGetCallClirResult(const ClirResponse &clirResponse)
 {
     TELEPHONY_LOGI("GetCallClirResult  action = %{public}d, clirStat = %{public}d, result = %{public}d",
         clirResponse.action, clirResponse.clirStat, clirResponse.result);
@@ -151,16 +157,16 @@ int32_t CallStatusCallback::OnUpdateGetCallClirResult(const ClirResponse &clirRe
     resultInfo.PutIntValue("result", clirResponse.result);
     resultInfo.PutIntValue("action", clirResponse.action);
     resultInfo.PutIntValue("clirStat", clirResponse.clirStat);
-    return DelayedSingleton<CallAbilityReportIpcProxy>::GetInstance()->ReportSupplementResult(reportId, resultInfo);
+    return DelayedSingleton<CallAbilityReportProxy>::GetInstance()->ReportSupplementResult(reportId, resultInfo);
 }
 
-int32_t CallStatusCallback::OnUpdateSetCallClirResult(int32_t result)
+int32_t CallStatusCallback::UpdateSetCallClirResult(int32_t result)
 {
     TELEPHONY_LOGI("GetCallClirResult  result = %{public}d", result);
     CallResultReportId reportId = CallResultReportId::SET_CALL_CLIR_ID;
     AppExecFwk::PacMap resultInfo;
     resultInfo.PutIntValue("result", result);
-    return DelayedSingleton<CallAbilityReportIpcProxy>::GetInstance()->ReportSupplementResult(reportId, resultInfo);
+    return DelayedSingleton<CallAbilityReportProxy>::GetInstance()->ReportSupplementResult(reportId, resultInfo);
 }
 } // namespace Telephony
 } // namespace OHOS

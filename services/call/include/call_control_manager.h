@@ -25,23 +25,17 @@
 #include "singleton.h"
 #include "cellular_call_types.h"
 
+#include "call_setting_manager.h"
 #include "call_policy.h"
 #include "call_state_listener.h"
 #include "report_call_state_handler.h"
 #include "call_request_handler.h"
 #include "hang_up_sms.h"
+#include "call_state_broadcast.h"
 #include "missed_call_notification.h"
 
 namespace OHOS {
 namespace Telephony {
-struct DialSourceInfo {
-    int32_t callId;
-    std::string number;
-    AppExecFwk::PacMap extras;
-    DialType dialType;
-    bool isDialing;
-};
-
 class CallControlManager : public CallPolicy {
     DECLARE_DELAYED_SINGLETON(CallControlManager)
 public:
@@ -53,13 +47,13 @@ public:
     int32_t GetCallState();
     int32_t HoldCall(int32_t callId);
     int32_t UnHoldCall(int32_t callId);
-    int32_t SwitchCall();
+    int32_t SwitchCall(int32_t callId);
     bool HasCall();
     bool IsNewCallAllowed();
     bool IsRinging();
     bool HasEmergency();
     bool NotifyNewCallCreated(sptr<CallBase> &callObjectPtr);
-    bool NotifyCallDestroyed(sptr<CallBase> &callObjectPtr);
+    bool NotifyCallDestroyed(int32_t cause);
     bool NotifyCallStateUpdated(sptr<CallBase> &callObjectPtr, TelCallState priorState, TelCallState nextState);
     bool NotifyIncomingCallAnswered(sptr<CallBase> &callObjectPtr);
     bool NotifyIncomingCallRejected(sptr<CallBase> &callObjectPtr, bool isSendSms, std::string content);
@@ -68,31 +62,54 @@ public:
     int32_t SendDtmf(int32_t callId, char str);
     int32_t SendBurstDtmf(int32_t callId, std::u16string str, int32_t on, int32_t off);
     int32_t StopDtmf(int32_t callId);
+    int32_t GetCallWaiting(int32_t slotId);
+    int32_t SetCallWaiting(int32_t slotId, bool activate);
+    int32_t GetCallRestriction(int32_t slotId, CallRestrictionType type);
+    int32_t SetCallRestriction(int32_t slotId, CallRestrictionInfo &info);
+    int32_t GetCallTransferInfo(int32_t slotId, CallTransferType type);
+    int32_t SetCallTransferInfo(int32_t slotId, CallTransferInfo &info);
+    int32_t SetCallPreferenceMode(int32_t slotId, int32_t mode);
     int32_t CombineConference(int32_t mainCallId);
     int32_t SeparateConference(int32_t callId);
     int32_t GetMainCallId(int32_t callId);
     std::vector<std::u16string> GetSubCallIdList(int32_t callId);
     std::vector<std::u16string> GetCallIdListForConference(int32_t callId);
-    int32_t DialProcess();
-    int32_t CreateNewCall(const CallReportInfo &info);
+    int32_t CancelMissedCallsNotification(int32_t id);
+    int32_t UpgradeCall(int32_t callId);
+    int32_t DowngradeCall(int32_t callId);
+    int32_t SetMuted(bool isMute);
+    int32_t MuteRinger();
+    int32_t SetAudioDevice(AudioDevice deviceType);
+    int32_t ControlCamera(
+        std::u16string cameraId, std::u16string callingPackage, int32_t callingUid, int32_t callingPid);
+    int32_t SetPreviewWindow(VideoWindow &window);
+    int32_t SetDisplayWindow(VideoWindow &window);
+    int32_t SetCameraZoom(float zoomRatio);
+    int32_t SetPausePicture(std::u16string path);
+    int32_t SetDeviceDirection(int32_t rotation);
+    bool IsEmergencyPhoneNumber(std::u16string &number, int32_t slotId, int32_t &errorCode);
+    int32_t FormatPhoneNumber(std::u16string &number, std::u16string &countryCode, std::u16string &formatNumber);
+    int32_t FormatPhoneNumberToE164(
+        std::u16string &number, std::u16string &countryCode, std::u16string &formatNumber);
+    void GetDialParaInfo(DialParaInfo &info);
+    void GetDialParaInfo(DialParaInfo &info, AppExecFwk::PacMap &extras);
 
 private:
     int32_t NumberLegalityCheck(std::string &number);
-    int32_t CarrierDialProcess();
-    int32_t VoiceMailDialProcess();
-    int32_t OttDialProcess();
-    void PackCellularCallInfo(CellularCallInfo &callInfo);
+    int32_t BroadcastSubscriber();
 
 private:
     std::unique_ptr<CallStateListener> callStateListenerPtr_;
     std::unique_ptr<CallRequestHandlerService> callRequestHandlerServicePtr_;
     sptr<ReportCallStateHandlerService> reportCallStateHandlerPtr_;
-    sptr<HangUpSms> hungUpSms_;
+    sptr<HangUpSms> hangUpSms_;
+    sptr<CallStateBroadcast> callStateBroadcast_;
     sptr<MissedCallNotification> missedCallNotification_;
-    DialSourceInfo dialSrcInfo_;
+    std::unique_ptr<CallSettingManager> callSettingManagerPtr_;
+    DialParaInfo dialSrcInfo_;
+    AppExecFwk::PacMap extras_;
     std::mutex mutex_;
 };
 } // namespace Telephony
 } // namespace OHOS
-
 #endif // CALL_CONTROL_MANAGER_H

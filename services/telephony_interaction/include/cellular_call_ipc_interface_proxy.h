@@ -46,12 +46,12 @@ public:
     int Dial(const CellularCallInfo &callInfo);
 
     /**
-     * End.
+     * HangUp.
      *
-     * @param CallInfo, End param.
+     * @param CallInfo, HangUp param.
      * @return Returns 0 on success, others on failure.
      */
-    int End(const CellularCallInfo &callInfo);
+    int HangUp(const CellularCallInfo &callInfo);
 
     /**
      * Reject.
@@ -75,123 +75,149 @@ public:
      * @param CellularCallInfo, Hold param.
      * @return Returns TELEPHONY_SUCCESS on success, others on failure.
      */
-    int Hold(const CellularCallInfo &callInfo);
+    int HoldCall(const CellularCallInfo &callInfo);
 
     /**
-     * Active.
+     * UnHold.
      *
-     * @param CellularCallInfo, Active param.
+     * @param CellularCallInfo, UnHold param.
      * @return Returns TELEPHONY_SUCCESS on success, others on failure.
      */
-    int Active(const CellularCallInfo &callInfo);
+    int UnHoldCall(const CellularCallInfo &callInfo);
 
     /**
-     * Swap.
+     * Switch.
      *
      * @return Returns TELEPHONY_SUCCESS on success, others on failure.
      */
-    int Swap();
+    int SwitchCall();
 
     /**
+     * IsEmergencyPhoneNumber
+     *
      * @brief Is it an emergency call
      * @param string &phoneNum
      * @param slotId
      * @return Returns 0 on success, others on failure.
      */
-    int IsUrgentCall(const std::string &phoneNum, int32_t slotId, int32_t &errorCode);
+    int IsEmergencyPhoneNumber(const std::string &phoneNum, int32_t slotId, int32_t &errorCode);
 
     /**
      * Merge into multiple calls
-     * @return Returns kTelephonyNoErr on success, others on failure.
+     *
+     * @return Returns TELEPHONY_SUCCESS on success, others on failure.
      */
-    int Join();
+    int CombineConference(const CellularCallInfo &callInfo);
 
     /**
-     * Split.
+     * SeparateConference.
      *
      * @param std::string splitString
      * @param index
-     * @return Returns kTelephonyNoErr on success, others on failure.
+     * @return Returns TELEPHONY_SUCCESS on success, others on failure.
      */
-    int Split(const std::string &splitString, int32_t index);
+    int SeparateConference(const CellularCallInfo &callInfo);
 
     /**
-     * InitiateDTMF.
+     * CallSupplement.
+     *
+     * @param CallSupplementType type
+     * @return Returns TELEPHONY_SUCCESS on success, others on failure.
+     */
+    int CallSupplement(CallSupplementType type);
+
+    /**
+     * Start Dtmf.
+     *
+     * @param DTMF Code.
+     * @param CellularCallInfo callInfo.
+     * @return Returns TELEPHONY_SUCCESS on success, others on failure.
+     */
+    int StartDtmf(char cDTMFCode, const CellularCallInfo &callInfo);
+
+    /**
+     * Stop Dtmf.
+     *
+     * @param CellularCallInfo callInfo.
+     * @return Returns TELEPHONY_SUCCESS on success, others on failure.
+     */
+    int StopDtmf(const CellularCallInfo &callInfo);
+
+    /**
+     * Send Dtmf.
      *
      * @param DTMF Code.
      * @param phoneNum.
-     * @return Returns kTelephonyNoErr on success, others on failure.
+     * @return Returns TELEPHONY_SUCCESS on success, others on failure.
      */
-    int InitiateDTMF(char cDTMFCode, const std::string &phoneNum);
-
-    /**
-     * CeaseDTMF.
-     *
-     * @param phoneNum.
-     * @return Returns kTelephonyNoErr on success, others on failure.
-     */
-    int CeaseDTMF(const std::string &phoneNum);
-
-    /**
-     * TransmitDTMF.
-     *
-     * @param DTMF Code.
-     * @param phoneNum.
-     * @return Returns kTelephonyNoErr on success, others on failure.
-     */
-    int TransmitDTMF(char cDTMFCode, const std::string &phoneNum);
+    int SendDtmf(char cDTMFCode, const std::string &phoneNum);
 
     /**
      * Send DTMF String.
+     *
      * @param DTMF Code string.
      * @param phoneNum.
      * @param switchOn.
      * @param switchOff.
-     * @return Returns kTelephonyNoErr on success, others on failure.
+     * @return Returns TELEPHONY_SUCCESS on success, others on failure.
      */
-    int TransmitDTMFString(const std::string &dtmfCodeStr, const std::string &phoneNum, PhoneNetType phoneNetType,
+    int SendDtmfString(const std::string &dtmfCodeStr, const std::string &phoneNum, PhoneNetType phoneNetType,
         int32_t switchOn, int32_t switchOff);
 
     /**
-     * Set Call Forwarding
+     * Set Call Transfer Info
+     *
      * @param CallForwardInfo
-     * @return Returns kTelephonyNoErr on success, others on failure.
+     * @return Returns TELEPHONY_SUCCESS on success, others on failure.
      */
-    int SetCallTransfer(const CallTransferInfo &info, int32_t slotId);
+    int SetCallTransferInfo(const CallTransferInfo &info, int32_t slotId);
 
     /**
-     * Inquire Call Forwarding
+     * Get Call Transfer Info
+     *
      * @param CallForwardInfo
-     * @return Returns kTelephonyNoErr on success, others on failure.
+     * @return Returns TELEPHONY_SUCCESS on success, others on failure.
      */
-    int InquireCallTransfer(CallTransferType type, int32_t slotId);
+    int GetCallTransferInfo(CallTransferType type, int32_t slotId);
 
     /**
      * Set Call Waiting
+     *
      * @param activate
-     * @return Returns kTelephonyNoErr on success, others on failure.
+     * @return Returns TELEPHONY_SUCCESS on success, others on failure.
      */
     int SetCallWaiting(bool activate, int32_t slotId);
 
     /**
      * Inquire Call Waiting
-     * @return Returns kTelephonyNoErr on success, others on failure.
+     *
+     * @return Returns TELEPHONY_SUCCESS on success, others on failure.
      */
-    int InquireCallWaiting(int32_t slotId);
+    int GetCallWaiting(int32_t slotId);
 
     /**
-     * Set Call Barring
+     * Set Call Restriction
+     *
      * @param CallBarringInfo
-     * @return Returns kTelephonyNoErr on success, others on failure.
+     * @return Returns TELEPHONY_SUCCESS on success, others on failure.
      */
     int SetCallRestriction(const CallRestrictionInfo &info, int32_t slotId);
 
     /**
-     * Inquire Call Barring
+     * Get Call Restriction
+     *
      * @param CallBarringInfo
-     * @return Returns kTelephonyNoErr on success, others on failure.
+     * @return Returns TELEPHONY_SUCCESS on success, others on failure.
      */
-    int InquireCallRestriction(CallRestrictionType facType, int32_t slotId);
+    int GetCallRestriction(CallRestrictionType facType, int32_t slotId);
+
+    /**
+     * SetCallPreferenceMode
+     *
+     * @param mode
+     * @return Returns TELEPHONY_SUCCESS on success, others on failure.
+     */
+    int SetCallPreferenceMode(int32_t slotId, int32_t mode);
 
     /**
      * RegisterCallBack
@@ -199,6 +225,73 @@ public:
      * @return Returns 0 on success, others on failure.
      */
     int RegisterCallBack(const sptr<ICallStatusCallback> &callback);
+
+    /**
+     * open or close Camera
+     *
+     * @param cameraId
+     * @param callingPackage
+     * @param callingUid
+     * @param callingPid
+     * @return Returns TELEPHONY_SUCCESS on success, others on failure.
+     */
+    int32_t ControlCamera(
+        std::u16string cameraId, std::u16string callingPackage, int32_t callingUid, int32_t callingPid);
+
+    /**
+     * Set Camera Preview Window
+     *
+     * @param window
+     * @return Returns TELEPHONY_SUCCESS on success, others on failure.
+     */
+    int32_t SetPreviewWindow(VideoWindow &window);
+
+    /**
+     * set remote display video window
+     *
+     * @param window
+     * @return Returns TELEPHONY_SUCCESS on success, others on failure.
+     */
+    int32_t SetDisplayWindow(VideoWindow &window);
+
+    /**
+     * Set Camera Zoom
+     *
+     * @param zoomRatio
+     * @return Returns TELEPHONY_SUCCESS on success, others on failure.
+     */
+    int32_t SetCameraZoom(float zoomRatio);
+
+    /**
+     * Set Pause Picture
+     *
+     * @param path
+     * @return Returns TELEPHONY_SUCCESS on success, others on failure.
+     */
+    int32_t SetPausePicture(std::u16string path);
+
+    /**
+     * Set Device Direction
+     *
+     * @param rotation
+     * @return Returns TELEPHONY_SUCCESS on success, others on failure.
+     */
+    int32_t SetDeviceDirection(int32_t rotation);
+
+    /**
+     * Set Lte Ims Switch Status
+     *
+     * @param active
+     * @return Returns kTelephonyNoErr on success, others on failure.
+     */
+    int32_t SetLteImsSwitchStatus(int32_t slotId, bool active);
+
+    /**
+     * Get Lte Ims Switch Status
+     *
+     * @return Returns kTelephonyNoErr on success, others on failure.
+     */
+    int32_t GetLteImsSwitchStatus(int32_t slotId);
 
 private:
     int32_t ConnectService();

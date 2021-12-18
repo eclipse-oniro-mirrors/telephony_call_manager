@@ -20,23 +20,29 @@
 #include <memory>
 
 #include "pac_map.h"
-#include "singleton.h"
 
 #include "cellular_call_types.h"
 
 namespace OHOS {
 namespace Telephony {
 class CallSettingManager {
-    DECLARE_DELAYED_SINGLETON(CallSettingManager)
 public:
-    bool Init();
-
+    CallSettingManager();
+    ~CallSettingManager();
     int32_t GetCallWaiting(int32_t slotId);
     int32_t SetCallWaiting(int32_t slotId, bool activate);
     int32_t GetCallRestriction(int32_t slotId, CallRestrictionType type);
     int32_t SetCallRestriction(int32_t slotId, CallRestrictionInfo &info);
     int32_t GetCallTransferInfo(int32_t slotId, CallTransferType type);
     int32_t SetCallTransferInfo(int32_t slotId, CallTransferInfo &info);
+    int32_t SetCallPreferenceMode(int32_t slotId, int32_t mode);
+
+private:
+    int32_t CallWaitingPolicy(int32_t slotId);
+    int32_t GetCallRestrictionPolicy(int32_t slotId, CallRestrictionType type);
+    int32_t SetCallRestrictionPolicy(int32_t slotId, CallRestrictionInfo &info);
+    int32_t GetCallTransferInfoPolicy(int32_t slotId, CallTransferType type);
+    int32_t SetCallTransferInfoPolicy(int32_t slotId, CallTransferInfo &info);
 };
 } // namespace Telephony
 } // namespace OHOS

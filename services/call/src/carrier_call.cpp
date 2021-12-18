@@ -25,122 +25,102 @@
 
 namespace OHOS {
 namespace Telephony {
-CarrierCall::CarrierCall()
-    : dialScene_(CALL_NORMAL), slotId_(0), index_(ERR_ID), isEcc_(false), isDefault_(true),
-      isVoicemailNumber_(false)
+CarrierCall::CarrierCall(DialParaInfo &info)
+    : CallBase(info), dialScene_(CALL_NORMAL), slotId_(info.accountId), index_(info.index), isEcc_(info.isEcc)
+{}
+
+CarrierCall::CarrierCall(DialParaInfo &info, AppExecFwk::PacMap &extras)
+    : CallBase(info, extras), dialScene_((DialScene)extras.GetIntValue("dialScene")), slotId_(info.accountId),
+    index_(info.index), isEcc_(info.isEcc)
 {}
 
 CarrierCall::~CarrierCall() {}
 
-void CarrierCall::InitCarrierOutCallInfo(const CallReportInfo &info, AppExecFwk::PacMap &extras, int32_t callId)
-{
-    std::lock_guard<std::mutex> lock(mutex_);
-    dialScene_ = (DialScene)extras.GetIntValue("dialScene");
-    slotId_ = extras.GetIntValue("accountId");
-    isEcc_ = false;
-    isDefault_ = true; // judging by the package name of the dial application
-    isVoicemailNumber_ = false;
-    if ((DialType)extras.GetIntValue("dialType") == DialType::DIAL_VOICE_MAIL_TYPE) {
-        isVoicemailNumber_ = true;
-    }
-    InitOutCallBase(info, extras, callId);
-}
-
-void CarrierCall::InitCarrierInCallInfo(const CallReportInfo &info, int32_t callId)
-{
-    std::lock_guard<std::mutex> lock(mutex_);
-    accountNumber_ = info.accountNum;
-    slotId_ = info.accountId;
-    index_ = info.index;
-    InitInCallBase(info, callId);
-}
-
 int32_t CarrierCall::CarrierDialingProcess()
 {
-    TELEPHONY_LOGE("start");
-    int32_t ret = CALL_MANAGER_DIAL_FAILED;
-    int32_t errorCode = TELEPHONY_FAIL;
-    bool isEcc = DelayedSingleton<CallNumberUtils>::GetInstance()->CheckNumberIsEmergency(
-        accountNumber_, slotId_, errorCode);
-    {
-        std::lock_guard<std::mutex> lock(mutex_);
-        isEcc_ = isEcc;
-    }
-    ret = DialCallBase();
+    int32_t ret = DialCallBase();
     if (ret != TELEPHONY_SUCCESS) {
         CarrierHangUpCall();
     }
-    TELEPHONY_LOGE("end");
     return ret;
 }
 
 int32_t CarrierCall::CarrierAcceptCall(int32_t videoState)
 {
-    int32_t ret = CALL_MANAGER_ACCEPT_FAILED;
     CellularCallInfo callInfo;
-    AcceptCallBase();
-
+    int32_t ret = AcceptCallBase();
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("Accept failed!");
+        return CALL_ERR_ACCEPT_FAILED;
+    }
     PackCellularCallInfo(callInfo);
     ret = DelayedSingleton<CellularCallIpcInterfaceProxy>::GetInstance()->Answer(callInfo);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("Accept failed!");
-        return CALL_MANAGER_ACCEPT_FAILED;
+        return CALL_ERR_ACCEPT_FAILED;
     }
     return TELEPHONY_SUCCESS;
 }
 
 int32_t CarrierCall::CarrierRejectCall(bool isSendSms, std::string &content)
 {
-    int32_t ret = CALL_MANAGER_REJECT_FAILED;
     CellularCallInfo callInfo;
-    ret = RejectCallBase();
+    int32_t ret = RejectCallBase();
     if (ret != TELEPHONY_SUCCESS) {
         return ret;
     }
     PackCellularCallInfo(callInfo);
-    ret = DelayedSingleton<CellularCallIpcInterfaceProxy>::GetInstance()->Reject(callInfo);
+    TelCallState state = GetTelCallState();
+    if (state == CALL_STATUS_INCOMING) {
+        ret = DelayedSingleton<CellularCallIpcInterfaceProxy>::GetInstance()->Reject(callInfo);
+    } else {
+        ret = DelayedSingleton<CellularCallIpcInterfaceProxy>::GetInstance()->HangUp(callInfo);
+    }
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("Reject failed!");
-        return CALL_MANAGER_REJECT_FAILED;
+        return CALL_ERR_REJECT_FAILED;
     }
     return TELEPHONY_SUCCESS;
 }
 
 int32_t CarrierCall::CarrierHangUpCall()
 {
-    int32_t ret = CALL_MANAGER_HANGUP_FAILED;
+    int32_t ret = CALL_ERR_HANGUP_FAILED;
     CellularCallInfo callInfo;
     PackCellularCallInfo(callInfo);
-    ret = DelayedSingleton<CellularCallIpcInterfaceProxy>::GetInstance()->End(callInfo);
+    int64_t policyFlag = GetPolicyFlag();
+    if (policyFlag & POLICY_FLAG_HANG_UP_ACTIVE) {
+        ret = DelayedSingleton<CellularCallIpcInterfaceProxy>::GetInstance()->CallSupplement(TYPE_HANG_UP_ACTIVE);
+    } else {
+        ret = DelayedSingleton<CellularCallIpcInterfaceProxy>::GetInstance()->HangUp(callInfo);
+    }
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("End failed!");
-        return CALL_MANAGER_HANGUP_FAILED;
+        return CALL_ERR_HANGUP_FAILED;
     }
     return TELEPHONY_SUCCESS;
 }
 
 int32_t CarrierCall::CarrierHoldCall()
 {
-    int32_t ret = CALL_MANAGER_HANGUP_FAILED;
     CellularCallInfo callInfo;
     PackCellularCallInfo(callInfo);
-    ret = DelayedSingleton<CellularCallIpcInterfaceProxy>::GetInstance()->Hold(callInfo);
+    int32_t ret = DelayedSingleton<CellularCallIpcInterfaceProxy>::GetInstance()->HoldCall(callInfo);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("Hold failed!");
-        return CALL_MANAGER_HOLD_FAILED;
+        return CALL_ERR_HOLD_FAILED;
     }
     return TELEPHONY_SUCCESS;
 }
 
 int32_t CarrierCall::CarrierUnHoldCall()
 {
-    int32_t ret = CALL_MANAGER_HANGUP_FAILED;
     CellularCallInfo callInfo;
     PackCellularCallInfo(callInfo);
-    ret = DelayedSingleton<CellularCallIpcInterfaceProxy>::GetInstance()->Active(callInfo);
+    int32_t ret = DelayedSingleton<CellularCallIpcInterfaceProxy>::GetInstance()->UnHoldCall(callInfo);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("UnHold failed!");
-        return CALL_MANAGER_UNHOLD_FAILED;
+        return CALL_ERR_UNHOLD_FAILED;
     }
     return TELEPHONY_SUCCESS;
 }
@@ -161,22 +141,11 @@ bool CarrierCall::GetEmergencyState()
 
 int32_t CarrierCall::CarrierSwitchCall()
 {
-    int32_t ret = CALL_MANAGER_SWAP_FAILED;
-    ret = DelayedSingleton<CellularCallIpcInterfaceProxy>::GetInstance()->Swap();
+    int32_t ret = DelayedSingleton<CellularCallIpcInterfaceProxy>::GetInstance()->SwitchCall();
     if (ret != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("UnHold failed!");
-        return CALL_MANAGER_UNHOLD_FAILED;
+        TELEPHONY_LOGE("SwitchCall failed!");
+        return CALL_ERR_UNHOLD_FAILED;
     }
-    return TELEPHONY_SUCCESS;
-}
-
-int32_t CarrierCall::GetCallTransferInfo()
-{
-    return TELEPHONY_SUCCESS;
-}
-
-int32_t CarrierCall::SetCallTransferInfo()
-{
     return TELEPHONY_SUCCESS;
 }
 
@@ -187,7 +156,21 @@ int32_t CarrierCall::GetSlotId()
 
 int32_t CarrierCall::CarrierCombineConference()
 {
-    return DelayedSingleton<CellularCallIpcInterfaceProxy>::GetInstance()->Join();
+    CellularCallInfo callInfo;
+    PackCellularCallInfo(callInfo);
+    return DelayedSingleton<CellularCallIpcInterfaceProxy>::GetInstance()->CombineConference(callInfo);
+}
+
+int32_t CarrierCall::CarrierSeparateConference()
+{
+    CellularCallInfo callInfo;
+    PackCellularCallInfo(callInfo);
+    return DelayedSingleton<CellularCallIpcInterfaceProxy>::GetInstance()->SeparateConference(callInfo);
+}
+
+int32_t CarrierCall::IsSupportConferenceable()
+{
+    return GetEmergencyState() != true ? TELEPHONY_SUCCESS : CALL_ERR_EMERGENCY_UNSOPPORT_CONFERENCEABLE;
 }
 
 void CarrierCall::PackCellularCallInfo(CellularCallInfo &callInfo)
@@ -197,6 +180,7 @@ void CarrierCall::PackCellularCallInfo(CellularCallInfo &callInfo)
     callInfo.videoState = (int32_t)videoState_;
     callInfo.index = index_;
     callInfo.slotId = slotId_;
+    callInfo.accountId = slotId_;
     (void)memset_s(callInfo.phoneNum, kMaxNumberLen, 0, kMaxNumberLen);
     if (memcpy_s(callInfo.phoneNum, kMaxNumberLen, accountNumber_.c_str(), accountNumber_.length()) != 0) {
         TELEPHONY_LOGW("memcpy_s failed!");
@@ -204,25 +188,29 @@ void CarrierCall::PackCellularCallInfo(CellularCallInfo &callInfo)
     }
 }
 
-int32_t CarrierCall::StartDtmf(std::string &phoneNum, char str)
+int32_t CarrierCall::StartDtmf(char str)
 {
-    return DelayedSingleton<CellularCallIpcInterfaceProxy>::GetInstance()->InitiateDTMF(str, phoneNum);
+    CellularCallInfo callInfo;
+    PackCellularCallInfo(callInfo);
+    return DelayedSingleton<CellularCallIpcInterfaceProxy>::GetInstance()->StartDtmf(str, callInfo);
 }
 
-int32_t CarrierCall::StopDtmf(std::string &phoneNum)
+int32_t CarrierCall::StopDtmf()
 {
-    return DelayedSingleton<CellularCallIpcInterfaceProxy>::GetInstance()->CeaseDTMF(phoneNum);
+    CellularCallInfo callInfo;
+    PackCellularCallInfo(callInfo);
+    return DelayedSingleton<CellularCallIpcInterfaceProxy>::GetInstance()->StopDtmf(callInfo);
 }
 
 int32_t CarrierCall::SendDtmf(std::string &phoneNum, char str)
 {
-    return DelayedSingleton<CellularCallIpcInterfaceProxy>::GetInstance()->TransmitDTMF(str, phoneNum);
+    return DelayedSingleton<CellularCallIpcInterfaceProxy>::GetInstance()->SendDtmf(str, phoneNum);
 }
 
 int32_t CarrierCall::SendBurstDtmf(std::string &phoneNum, std::string str, int32_t on, int32_t off)
 {
     PhoneNetType phoneNetType = PhoneNetType::PHONE_TYPE_CDMA;
-    return DelayedSingleton<CellularCallIpcInterfaceProxy>::GetInstance()->TransmitDTMFString(
+    return DelayedSingleton<CellularCallIpcInterfaceProxy>::GetInstance()->SendDtmfString(
         str, phoneNum, phoneNetType, on, off);
 }
 } // namespace Telephony

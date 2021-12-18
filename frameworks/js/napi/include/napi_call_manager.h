@@ -1,0 +1,172 @@
+/*
+ * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+#ifndef NAPI_CALL_MANAGER_H
+#define NAPI_CALL_MANAGER_H
+
+#include "pac_map.h"
+#include "string_ex.h"
+
+#include "napi/native_api.h"
+#include "napi/native_node_api.h"
+
+#include "napi_call_manager_callback.h"
+#include "napi_call_manager_types.h"
+
+namespace OHOS {
+namespace Telephony {
+#define GET_PARAMS(env, info, num) \
+    size_t argc = num;             \
+    napi_value argv[num] = {0};    \
+    napi_value thisVar = nullptr;  \
+    void *data;                    \
+    napi_get_cb_info(env, info, &argc, argv, &thisVar, &data)
+
+class NapiCallManager {
+public:
+    NapiCallManager();
+    ~NapiCallManager() = default;
+
+    static napi_value DeclareCallBasisInterface(napi_env env, napi_value exports);
+    static napi_value DeclareCallConferenceInterface(napi_env env, napi_value exports);
+    static napi_value DeclareCallSupplementInterface(napi_env env, napi_value exports);
+    static napi_value DeclareCallExtendInterface(napi_env env, napi_value exports);
+    static napi_value DeclareCallMultimediaInterface(napi_env env, napi_value exports);
+    static napi_value DeclareCallMediaEnum(napi_env env, napi_value exports);
+    static napi_value DeclareCallDialEnum(napi_env env, napi_value exports);
+    static napi_value DeclareCallStateEnum(napi_env env, napi_value exports);
+    static napi_value DeclareCallEventEnum(napi_env env, napi_value exports);
+    static napi_value DeclareCallRestrictionEnum(napi_env env, napi_value exports);
+    static napi_value DeclareCallWaitingEnum(napi_env env, napi_value exports);
+    static napi_value DeclareCallTransferEnum(napi_env env, napi_value exports);
+    static napi_value RegisterCallManagerFunc(napi_env env, napi_value exports);
+    static napi_value DialCall(napi_env env, napi_callback_info info);
+    static napi_value AnswerCall(napi_env env, napi_callback_info info);
+    static napi_value RejectCall(napi_env env, napi_callback_info info);
+    static napi_value HangUpCall(napi_env env, napi_callback_info info);
+    static napi_value HoldCall(napi_env env, napi_callback_info info);
+    static napi_value UnHoldCall(napi_env env, napi_callback_info info);
+    static napi_value SwitchCall(napi_env env, napi_callback_info info);
+    static napi_value CombineConference(napi_env env, napi_callback_info info);
+    static napi_value SeparateConference(napi_env env, napi_callback_info info);
+    static napi_value GetMainCallId(napi_env env, napi_callback_info info);
+    static napi_value GetSubCallIdList(napi_env env, napi_callback_info info);
+    static napi_value GetCallIdListForConference(napi_env env, napi_callback_info info);
+    static napi_value GetCallWaiting(napi_env env, napi_callback_info info);
+    static napi_value SetCallWaiting(napi_env env, napi_callback_info info);
+    static napi_value GetCallRestriction(napi_env env, napi_callback_info info);
+    static napi_value SetCallRestriction(napi_env env, napi_callback_info info);
+    static napi_value GetCallTransferInfo(napi_env env, napi_callback_info info);
+    static napi_value SetCallTransferInfo(napi_env env, napi_callback_info info);
+    static napi_value StartDTMF(napi_env env, napi_callback_info info);
+    static napi_value StopDTMF(napi_env env, napi_callback_info info);
+    static napi_value SendDtmf(napi_env env, napi_callback_info info);
+    static napi_value SendBurstDtmf(napi_env env, napi_callback_info info);
+    static napi_value GetCallState(napi_env env, napi_callback_info info);
+    static napi_value IsRinging(napi_env env, napi_callback_info info);
+    static napi_value HasCall(napi_env env, napi_callback_info info);
+    static napi_value IsNewCallAllowed(napi_env env, napi_callback_info info);
+    static napi_value IsInEmergencyCall(napi_env env, napi_callback_info info);
+    static napi_value IsEmergencyPhoneNumber(napi_env env, napi_callback_info info);
+    static napi_value FormatPhoneNumber(napi_env env, napi_callback_info info);
+    static napi_value FormatPhoneNumberToE164(napi_env env, napi_callback_info info);
+    static napi_value ObserverOn(napi_env env, napi_callback_info info);
+    static napi_value ObserverOff(napi_env env, napi_callback_info info);
+    static napi_value SetMuted(napi_env env, napi_callback_info info);
+    static napi_value CancelMuted(napi_env env, napi_callback_info info);
+    static napi_value MuteRinger(napi_env env, napi_callback_info info);
+    static napi_value SetAudioDevice(napi_env env, napi_callback_info info);
+    static napi_value ControlCamera(napi_env env, napi_callback_info info);
+    static napi_value SetPreviewWindow(napi_env env, napi_callback_info info);
+    static napi_value SetDisplayWindow(napi_env env, napi_callback_info info);
+    static napi_value SetCameraZoom(napi_env env, napi_callback_info info);
+    static napi_value SetPausePicture(napi_env env, napi_callback_info info);
+    static napi_value SetDeviceDirection(napi_env env, napi_callback_info info);
+    static napi_value SetCallPreferenceMode(napi_env env, napi_callback_info info);
+
+private:
+    static void RegisterCallBack();
+    static std::u16string GetBundleName(napi_env env);
+    static bool MatchValueType(napi_env env, napi_value value, napi_valuetype targetType);
+    static napi_value CreateUndefined(napi_env env);
+    static napi_value CreateErrorMessage(napi_env env, std::string msg);
+    static void NativeCallBack(napi_env env, napi_status status, void *data);
+    static void NativeDialCallBack(napi_env env, napi_status status, void *data);
+    static void NativeVoidCallBack(napi_env env, napi_status status, void *data);
+    static void NativePropertyCallBack(napi_env env, napi_status status, void *data);
+    static void NativeBoolCallBack(napi_env env, napi_status status, void *data);
+    static void NativeFormatNumberCallBack(napi_env env, napi_status status, void *data);
+    static void NativeListCallBack(napi_env env, napi_status status, void *data);
+    static void GetDialInfo(napi_env env, napi_value objValue, DialAsyncContext &asyncContext);
+    static void GetSmsInfo(napi_env env, napi_value objValue, RejectAsyncContext &asyncContext);
+    static void GetDtmfBunchInfo(napi_env env, napi_value objValue, DtmfAsyncContext &asyncContext);
+    static void GetRestrictionInfo(napi_env env, napi_value objValue, SupplementAsyncContext &asyncContext);
+    static void GetTransferInfo(napi_env env, napi_value objValue, SupplementAsyncContext &asyncContext);
+    static void NativeDialCall(napi_env env, void *data);
+    static void NativeAnswerCall(napi_env env, void *data);
+    static void NativeRejectCall(napi_env env, void *data);
+    static void NativeHangUpCall(napi_env env, void *data);
+    static void NativeHoldCall(napi_env env, void *data);
+    static void NativeUnHoldCall(napi_env env, void *data);
+    static void NativeSwitchCall(napi_env env, void *data);
+    static void NativeCombineConference(napi_env env, void *data);
+    static void NativeSeparateConference(napi_env env, void *data);
+    static void NativeGetMainCallId(napi_env env, void *data);
+    static void NativeGetSubCallIdList(napi_env env, void *data);
+    static void NativeGetCallIdListForConference(napi_env env, void *data);
+    static void NativeGetCallWaiting(napi_env env, void *data);
+    static void NativeSetCallWaiting(napi_env env, void *data);
+    static void NativeGetCallRestriction(napi_env env, void *data);
+    static void NativeSetCallRestriction(napi_env env, void *data);
+    static void NativeGetTransferNumber(napi_env env, void *data);
+    static void NativeSetTransferNumber(napi_env env, void *data);
+    static void NativeStartDTMF(napi_env env, void *data);
+    static void NativeStopDTMF(napi_env env, void *data);
+    static void NativeSendDtmf(napi_env env, void *data);
+    static void NativeSendDtmfBunch(napi_env env, void *data);
+    static void NativeGetCallState(napi_env env, void *data);
+    static void NativeIsRinging(napi_env env, void *data);
+    static void NativeHasCall(napi_env env, void *data);
+    static void NativeIsNewCallAllowed(napi_env env, void *data);
+    static void NativeIsInEmergencyCall(napi_env env, void *data);
+    static void NativeIsEmergencyPhoneNumber(napi_env env, void *data);
+    static void NativeFormatPhoneNumber(napi_env env, void *data);
+    static void NativeFormatPhoneNumberToE164(napi_env env, void *data);
+    static void NativeSetMuted(napi_env env, void *data);
+    static void NativeCancelMuted(napi_env env, void *data);
+    static void NativeMuteRinger(napi_env env, void *data);
+    static void NativeSetAudioDevice(napi_env env, void *data);
+    static void NativeControlCamera(napi_env env, void *data);
+    static void NativeSetPreviewWindow(napi_env env, void *data);
+    static void NativeSetDisplayWindow(napi_env env, void *data);
+    static void NativeSetCameraZoom(napi_env env, void *data);
+    static void NativeSetPausePicture(napi_env env, void *data);
+    static void NativeSetDeviceDirection(napi_env env, void *data);
+    static void NativeSetCallPreferenceMode(napi_env env, void *data);
+
+    // PrivateNativeMethod
+    static napi_value ToInt32Value(napi_env env, int32_t value);
+    static napi_value GetNamedProperty(napi_env env, napi_value object, const std::string &propertyName);
+    static std::string GetStringProperty(napi_env env, napi_value object, const std::string &propertyName);
+    static int32_t GetIntProperty(napi_env env, napi_value object, const std::string &propertyName);
+    static bool GetBoolProperty(napi_env env, napi_value object, const std::string &propertyName);
+    static napi_value HandleAsyncWork(napi_env env, AsyncContext *context, std::string workName,
+        napi_async_execute_callback execute, napi_async_complete_callback complete);
+    static bool registerStatus_;
+};
+} // namespace Telephony
+} // namespace OHOS
+
+#endif // NAPI_CALL_MANAGER_H

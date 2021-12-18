@@ -15,181 +15,98 @@
 
 #include "incoming_call_notification.h"
 
-#include "if_system_ability_manager.h"
-#include "iservice_registry.h"
-#include "system_ability_definition.h"
+#include "notification_normal_content.h"
+#include "notification_helper.h"
+#include "notification_content.h"
+#include "notification_request.h"
+#include "common_event_support.h"
+#include "common_event_manager.h"
+#include "common_event.h"
+#include "want.h"
 
+#include "call_manager_errors.h"
 #include "telephony_log_wrapper.h"
-
-#ifdef ABILITY_DISPLAY_SUPPORT
-#include "display_manager.h"
-#include "display_mgr_service.h"
-#endif
 
 namespace OHOS {
 namespace Telephony {
-IncomingCallNotification::IncomingCallNotification()
-{
-    Init();
-}
-
-IncomingCallNotification::~IncomingCallNotification()
-{
-#ifdef ABILITY_NOTIFICATION_SUPPORT
-    if (ansAbility_ != nullptr) {
-        ansAbility_ = nullptr;
-    }
-    if (ansManagerProxy_ != nullptr) {
-        ansManagerProxy_ = nullptr;
-    }
-#endif
-}
-
-void IncomingCallNotification::Init()
-{
-#ifdef ABILITY_NOTIFICATION_SUPPORT
-    std::lock_guard<std::mutex> lock(mutex_);
-    sptr<ISystemAbilityManager> sam = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    if (sam == nullptr) {
-        TELEPHONY_LOGE("system ability manager nullptr");
-        return;
-    }
-    remoteObject_ = sam->GetSystemAbility(ADVANCED_NOTIFICATION_SERVICE_ABILITY_ID); // ans ability
-    if (remoteObject_ == nullptr) {
-        TELEPHONY_LOGE("ans ability nullptr");
-        return;
-    }
-    ansManagerProxy_ = std::make_unique<AnsManagerProxy>(remoteObject_);
-    if (audioManagerProxy_ == nullptr) {
-        TELEPHONY_LOGE("ans manager nullptr");
-    }
-#endif
-}
+IncomingCallNotification::IncomingCallNotification() : incomingCallNumber_("") {}
 
 void IncomingCallNotification::NewCallCreated(sptr<CallBase> &callObjectPtr)
 {
-    if (callObjectPtr != nullptr && callObjectPtr->GetTelCallState() == TelCallState::CALL_STATUS_INCOMING) {
-        PublishNotification(title_, callObjectPtr->GetAccountNumber());
-    }
-}
-
-void IncomingCallNotification::CallDestroyed(sptr<CallBase> &callObjectPtr)
-{
-    if (callObjectPtr != nullptr && callObjectPtr->GetTelCallState() == TelCallState::CALL_STATUS_INCOMING) {
-        CancelNotification();
+    if (callObjectPtr != nullptr && callObjectPtr->GetTelCallState() == TelCallState::CALL_STATUS_INCOMING &&
+        !callObjectPtr->GetAccountNumber().empty()) {
+        incomingCallNumber_ = callObjectPtr->GetAccountNumber();
+        PublishIncomingCallNotification(callObjectPtr);
+    } else {
+        incomingCallNumber_ = "";
     }
 }
 
 void IncomingCallNotification::CallStateUpdated(
     sptr<CallBase> &callObjectPtr, TelCallState priorState, TelCallState nextState)
 {
-    if (callObjectPtr == nullptr) {
-        return;
-    }
-    if (priorState == TelCallState::CALL_STATUS_INCOMING) {
-        CancelNotification(); // incoming call state left
-    } else if (nextState == TelCallState::CALL_STATUS_INCOMING) {
-        PublishNotification(title_, callObjectPtr->GetAccountNumber()); // other call state --> incoming
+    if (callObjectPtr != nullptr && priorState == TelCallState::CALL_STATUS_INCOMING &&
+        callObjectPtr->GetAccountNumber() == incomingCallNumber_) {
+        CancelIncomingCallNotification();
     }
 }
 
 void IncomingCallNotification::IncomingCallActivated(sptr<CallBase> &callObjectPtr)
 {
-    if (callObjectPtr == nullptr) {
-        return;
+    if (callObjectPtr != nullptr && callObjectPtr->GetAccountNumber() == incomingCallNumber_) {
+        CancelIncomingCallNotification();
     }
-    CancelNotification();
 }
 
 void IncomingCallNotification::IncomingCallHungUp(
     sptr<CallBase> &callObjectPtr, bool isSendSms, std::string content)
 {
-    if (callObjectPtr == nullptr) {
-        return;
+    if (callObjectPtr != nullptr && callObjectPtr->GetAccountNumber() == incomingCallNumber_) {
+        CancelIncomingCallNotification();
     }
-    CancelNotification();
 }
 
-void IncomingCallNotification::PublishNotification(const std::string &title, const std::string &text)
+void IncomingCallNotification::CallDestroyed(sptr<CallBase> &callObjectPtr) {}
+
+void IncomingCallNotification::PublishIncomingCallNotification(sptr<CallBase> &callObjectPtr)
 {
     // show the incoming call notification while full screen
     if (!IsFullScreen()) {
+        TELEPHONY_LOGE("not full screen");
         return;
     }
-#ifdef ABILITY_NOTIFICATION_SUPPORT
-    if (ansManagerProxy_ == nullptr) {
-        TELEPHONY_LOGE("ans manager proxy nullptr");
+    std::shared_ptr<Notification::NotificationNormalContent> normalContent =
+        std::make_shared<Notification::NotificationNormalContent>();
+    if (normalContent == nullptr) {
+        TELEPHONY_LOGE("notification normal content nullptr");
         return;
     }
-    std::unique_ptr<NotificationMediaContent> notificationMediaContent =
-        std::make_unique<NotificationMediaContent>();
-    sptr<NotificationMediaContent> mediaContent = notificationMediaContent.release();
-    if (mediaContent == nullptr) {
-        TELEPHONY_LOGE("ans notification nullptr");
-        return;
-    }
-    mediaContent->SetTitle(title);
-    mediaContent->SetText(text);
-    mediaContent.SetShownActions(ACTION_ANSWER, ACTION_REJECT);
-    std::unique_ptr<NotificationContent> notificationContent = std::make_unique<NotificationContent>(mediaContent);
-    sptr<NotificationContent> content = notificationContent.release();
+    normalContent->SetTitle(INCOMING_CALL_NOTIFICATION_TITLE);
+    normalContent->SetText(callObjectPtr->GetAccountNumber());
+    std::shared_ptr<Notification::NotificationContent> content =
+        std::make_shared<Notification::NotificationContent>(normalContent);
     if (content == nullptr) {
-        TELEPHONY_LOGE("ans notification nullptr");
+        TELEPHONY_LOGE("notification content nullptr");
         return;
     }
-    std::unique_ptr<AnsNotification> ansNotification = std::make_unique<AnsNotification>();
-    sptr<AnsNotification> notification = ansNotification.release();
-    if (notification == nullptr) {
-        TELEPHONY_LOGE("ans notification nullptr");
-        return;
-    }
-    notification->SetNotificationId(notificationId_);
-    notification->SetContent(content);
-    ansManagerProxy_->Publish(notification, nullptr, true);
-#endif
+    Notification::NotificationRequest request;
+    request.SetContent(content);
+    request.SetNotificationId(INCOMING_CALL_NOTIFICATION_ID);
+    int32_t result = Notification::NotificationHelper::PublishNotification(request);
+    TELEPHONY_LOGI("publish incoming call notification result : %{public}d", result);
 }
 
-void IncomingCallNotification::CancelNotification()
+int32_t IncomingCallNotification::CancelIncomingCallNotification()
 {
 #ifdef ABILITY_NOTIFICATION_SUPPORT
-    if (ansManagerProxy_ == nullptr) {
-        TELEPHONY_LOGE("ans manager proxy nullptr");
-        return;
-    }
-    ansManagerProxy_->CancelNotification(notificationId_);
+    return NotificationHelper::CancelNotification(INCOMING_CALL_NOTIFICATION_ID);
 #endif
-}
-
-bool IncomingCallNotification::IsAnsAbilityExist()
-{
-    std::lock_guard<std::mutex> lock(mutex_);
-    sptr<ISystemAbilityManager> sysAbilityMgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    if (!sysAbilityMgr) {
-        TELEPHONY_LOGE("system ability manager nullptr");
-        return false;
-    }
-    sptr<IRemoteObject> remote = sysAbilityMgr->CheckSystemAbility(ADVANCED_NOTIFICATION_SERVICE_ABILITY_ID);
-    if (!remote) {
-        TELEPHONY_LOGE("no ans service ability");
-        return false;
-    }
-    return true;
+    return TELEPHONY_SUCCESS;
 }
 
 bool IncomingCallNotification::IsFullScreen()
 {
 #ifdef ABILITY_DISPLAY_SUPPORT
-    std::lock_guard<std::mutex> lock(mutex_);
-    sptr<ISystemAbilityManager> sysAbilityMgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    if (!sysAbilityMgr) {
-        TELEPHONY_LOGE("system ability manager nullptr");
-        return false;
-    }
-    sptr<IRemoteObject> remote = sysAbilityMgr->CheckSystemAbility(DISPLAY_MANAGER_SERVICE_ID);
-    if (!remote) {
-        TELEPHONY_LOGE("no display ability");
-        return false;
-    }
     return DisplayManager::IsFullScreen();
 #endif
     return false;

@@ -21,26 +21,27 @@ ohos_unittest("tel_call_manager_gtest") {
   module_out_path = part_name + "/" + test_module
 
   sources = [
-    "//base/telephony/core_service/interfaces/innerkits/call_manager/proxy/call_manager_service_proxy.cpp",
-    "//base/telephony/core_service/interfaces/innerkits/proxy/core_service_proxy.cpp",
-    "call_manager_gtest.cpp",
+    "//base/telephony/core_service/frameworks/native/src/core_service_client.cpp",
+    "//base/telephony/core_service/frameworks/native/src/core_service_proxy.cpp",
+    "//base/telephony/core_service/interfaces/innerkits/call_manager/call_manager_service_proxy.cpp",
+    "src/call_manager_gtest.cpp",
   ]
 
   include_dirs = [
-    "//base/telephony/call_manager/test/unittest/call_manager_gtest",
+    "//base/telephony/call_manager/test/unittest/call_manager_gtest/include",
     "//base/telephony/call_manager/utils/include",
     "//base/telephony/core_service/interfaces/innerkits/common",
-    "//base/telephony/core_service/interfaces/innerkits/proxy",
-    "//base/telephony/ril_adapter/interfaces/innerkits",
-    "//base/telephony/core_service/interfaces/innerkits/call_manager/common",
-    "//base/telephony/core_service/interfaces/innerkits/call_manager/proxy",
-    "//base/telephony/core_service/interfaces/innerkits/cellular_call/common",
+    "//base/telephony/core_service/interfaces/innerkits/core",
+    "//base/telephony/core_service/interfaces/innerkits/sim",
+    "//base/telephony/core_service/interfaces/innerkits/network_search",
+    "//base/telephony/ril_adapter/interfaces/innerkits/include",
+    "//base/telephony/core_service/interfaces/innerkits/call_manager",
+    "//base/telephony/core_service/interfaces/innerkits/cellular_call",
   ]
 
   deps = [
     "//base/telephony/core_service:tel_core_service",
-    "//base/telephony/core_service/common:libtelephony_common",
-    "//base/telephony/core_service/common:libtelephony_common",
+    "//base/telephony/core_service/utils:libtelephony_common",
     "//third_party/googletest:gtest_main",
     "//utils/native/base:utils",
   ]
@@ -48,6 +49,7 @@ ohos_unittest("tel_call_manager_gtest") {
   external_deps = [
     "aafwk_standard:want",
     "appexecfwk_standard:libeventhandler",
+    "ces_standard:cesfwk_innerkits",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
     "samgr_standard:samgr_proxy",

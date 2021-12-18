@@ -16,11 +16,11 @@
 #ifndef ENABLE_BLUETOOTH_DEVICE_H
 #define ENABLE_BLUETOOTH_DEVICE_H
 
-#include "audio_state.h"
+#include "audio_base.h"
 
 namespace OHOS {
 namespace Telephony {
-class EnableBluetoothDevice : public AudioState {
+class EnableBluetoothDevice : public AudioBase {
 public:
     EnableBluetoothDevice() = default;
     ~EnableBluetoothDevice() = default;

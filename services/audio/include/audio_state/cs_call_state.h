@@ -16,11 +16,11 @@
 #ifndef CS_CALL_STATE_H
 #define CS_CALL_STATE_H
 
-#include "audio_state.h"
+#include "audio_base.h"
 
 namespace OHOS {
 namespace Telephony {
-class CSCallState : public AudioState {
+class CSCallState : public AudioBase {
 public:
     CSCallState() = default;
     ~CSCallState() = default;

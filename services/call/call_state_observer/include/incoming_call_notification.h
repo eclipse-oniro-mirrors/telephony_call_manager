@@ -16,9 +16,7 @@
 #ifndef INCOMING_CALL_NOTIFICATION_H
 #define INCOMING_CALL_NOTIFICATION_H
 
-#include <set>
 #include <cstdint>
-#include <mutex>
 
 #include "call_state_listener_base.h"
 
@@ -27,8 +25,7 @@ namespace Telephony {
 class IncomingCallNotification : public CallStateListenerBase {
 public:
     IncomingCallNotification();
-    virtual ~IncomingCallNotification();
-    void Init();
+    ~IncomingCallNotification() = default;
     void NewCallCreated(sptr<CallBase> &callObjectPtr) override;
     void CallDestroyed(sptr<CallBase> &callObjectPtr) override;
     void IncomingCallActivated(sptr<CallBase> &callObjectPtr) override;
@@ -36,20 +33,13 @@ public:
     void CallStateUpdated(sptr<CallBase> &callObjectPtr, TelCallState priorState, TelCallState nextState) override;
 
 private:
-    std::mutex mutex_;
-    const std::string title_ = "incoming call";
-    void PublishNotification(const std::string &title, const std::string &text); // publish a notification
-    void CancelNotification(); // cancel a notification
-    bool IsAnsAbilityExist();
+    std::string incomingCallNumber_;
+    static constexpr int16_t INCOMING_CALL_NOTIFICATION_ID = 0;
+    static constexpr int16_t INCOMING_CALL_NOTIFICATION_CODE = 0;
+    const std::string INCOMING_CALL_NOTIFICATION_TITLE = "Incoming Call";
+    void PublishIncomingCallNotification(sptr<CallBase> &callObjectPtr);
+    int32_t CancelIncomingCallNotification();
     bool IsFullScreen();
-#ifdef ABILITY_NOTIFICATION_SUPPORT
-    uint32_t notificationId_ = 0;
-    const uint32_t ACTION_ANSWER = 1;
-    const uint32_t ACTION_REJECT = 2;
-    sptr<AdvancedNotificationService> ansAbility_;
-    sptr<IRemoteObject> remoteObject_;
-    std::unique_ptr<AnsManagerProxy> ansManagerProxy_;
-#endif
 };
 } // namespace Telephony
 } // namespace OHOS

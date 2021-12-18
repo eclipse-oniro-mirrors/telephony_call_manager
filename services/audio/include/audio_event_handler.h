@@ -21,10 +21,13 @@
 #include "event_handler.h"
 #include "event_runner.h"
 
-#include "audio_event.h"
-
 namespace OHOS {
 namespace Telephony {
+class AudioCommonEvent {
+public:
+    void ProcessEvent(int32_t event);
+};
+
 /**
  * @class AudioEventHandler
  * handle call state event and audio device event.
@@ -32,13 +35,13 @@ namespace Telephony {
 class AudioEventHandler : public AppExecFwk::EventHandler {
 public:
     AudioEventHandler(
-        const std::shared_ptr<AppExecFwk::EventRunner> &runner, const std::shared_ptr<AudioEvent> &manager);
+        const std::shared_ptr<AppExecFwk::EventRunner> &runner, const std::shared_ptr<AudioCommonEvent> &manager);
     ~AudioEventHandler();
     void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event) override;
     void SendEmptyEvent(uint32_t event);
 
 private:
-    std::shared_ptr<AudioEvent> audioEvent_;
+    std::shared_ptr<AudioCommonEvent> audioCommonEvent_;
 };
 } // namespace Telephony
 } // namespace OHOS

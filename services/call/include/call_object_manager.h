@@ -39,21 +39,19 @@ public:
     static void DeleteOneCallObject(sptr<CallBase> &call);
     static sptr<CallBase> GetOneCallObject(int32_t callId);
     static sptr<CallBase> GetOneCallObject(std::string &phoneNumber);
-    int32_t HasNewCall();
-    bool IsNewCallAllowedCreate();
-    static int32_t GetActiveCallList(std::list<sptr<CallBase>> &list);
-    static int32_t GetHoldCallList(std::list<sptr<CallBase>> &list);
-    int32_t GetCarrierCallList(std::list<sptr<CallBase>> &list);
-    bool HasRingingMaximum();
-    bool HasDialingMaximum();
-    bool HasEmergencyCall();
+    static int32_t HasNewCall();
+    static bool IsNewCallAllowedCreate();
+    static int32_t GetCarrierCallList(std::list<int32_t> &list);
+    static bool HasRingingMaximum();
+    static bool HasDialingMaximum();
+    static bool HasEmergencyCall();
     static int32_t GetNewCallId();
-    bool IsCallExist(int32_t callId);
-    bool IsCallExist(std::string &phoneNumber);
+    static bool IsCallExist(int32_t callId);
+    static bool IsCallExist(std::string &phoneNumber);
     static bool HasCallExist();
-    bool HasRingingCall();
-    TelCallState GetCallState(int32_t callId);
-    std::list<sptr<CallBase>> GetCallList();
+    static bool HasRingingCall();
+    static TelCallState GetCallState(int32_t callId);
+    static sptr<CallBase> GetOneCallObject(CallRunningState callState);
     static bool IsCallExist(CallType type, TelCallState callState);
 
 private:

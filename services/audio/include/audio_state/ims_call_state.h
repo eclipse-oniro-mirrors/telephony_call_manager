@@ -16,11 +16,11 @@
 #ifndef IMS_CALL_STATE_H
 #define IMS_CALL_STATE_H
 
-#include "audio_state.h"
+#include "audio_base.h"
 
 namespace OHOS {
 namespace Telephony {
-class IMSCallState : public AudioState {
+class IMSCallState : public AudioBase {
 public:
     IMSCallState() = default;
     ~IMSCallState() = default;

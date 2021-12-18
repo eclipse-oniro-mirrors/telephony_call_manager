@@ -16,11 +16,11 @@
 #ifndef HOLDING_STATE_H
 #define HOLDING_STATE_H
 
-#include "audio_state.h"
+#include "audio_base.h"
 
 namespace OHOS {
 namespace Telephony {
-class HoldingState : public AudioState {
+class HoldingState : public AudioBase {
 public:
     HoldingState() = default;
     ~HoldingState() = default;

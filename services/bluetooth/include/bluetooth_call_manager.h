@@ -20,24 +20,38 @@
 
 #include "singleton.h"
 
+#include "bluetooth_connection.h"
+
 namespace OHOS {
 namespace Telephony {
 class BluetoothCallManager : public CallStateListenerBase,
                              public std::enable_shared_from_this<BluetoothCallManager> {
     DECLARE_DELAYED_SINGLETON(BluetoothCallManager)
 public:
-    void Init();
+    int32_t Init();
     bool ConnectBtSco();
     bool DisconnectBtSco();
     bool AnswerBtCall();
-    bool HungUpBtCall();
+    bool HangupBtCall();
     void NewCallCreated(sptr<CallBase> &callObjectPtr) override;
     void CallDestroyed(sptr<CallBase> &callObjectPtr) override;
     void IncomingCallActivated(sptr<CallBase> &callObjectPtr) override;
     void IncomingCallHungUp(sptr<CallBase> &callObjectPtr, bool isSendSms, std::string content) override;
     void CallStateUpdated(sptr<CallBase> &callObjectPtr, TelCallState priorState, TelCallState nextState) override;
+    /**
+     * Send call state info to bluetooth headset.
+     */
     int32_t SendCallState(TelCallState callState, const std::string &number, VideoStateType videoState);
-    void SendCallList();
+    /**
+     * Send call list info to bluetooth headset.
+     */
+    int32_t SendCallList();
+    int32_t SendDtmf(int32_t callId, char str);
+    BtScoState GetBtScoState();
+
+private:
+    std::unique_ptr<BluetoothConnection> btConnection_;
+    bool IsBtScoConnected();
 };
 } // namespace Telephony
 } // namespace OHOS

@@ -16,6 +16,8 @@
 #ifndef CALL_STATUS_MANAGER_H
 #define CALL_STATUS_MANAGER_H
 
+#include <map>
+
 #include "refbase.h"
 
 #include "common_type.h"
@@ -31,6 +33,7 @@ public:
     int32_t UnInit();
     int32_t HandleCallReportInfo(const CallReportInfo &info);
     int32_t HandleCallsReportInfo(const CallsReportInfo &info);
+    int32_t HandleDisconnectedCause(int32_t cause);
     int32_t HandleEventResultReportInfo(const CellularCallEventInfo &info);
 
 private:
@@ -42,9 +45,7 @@ private:
     int32_t AlertHandle(const CallReportInfo &info);
     int32_t DisconnectingHandle(const CallReportInfo &info);
     int32_t DisconnectedHandle(const CallReportInfo &info);
-
-    int32_t ConferenceHandle();
-    int32_t CreateNewCall(const CallReportInfo &info, int32_t callId);
+    sptr<CallBase> CreateNewCall(const CallReportInfo &info, CallDirection dir);
     int32_t UpdateCallState(sptr<CallBase> &call, TelCallState nextState);
     int32_t ToSpeakerPhone(sptr<CallBase> &call);
     int32_t TurnOffMute(sptr<CallBase> &call);
@@ -52,6 +53,7 @@ private:
 private:
     CallReportInfo callReportInfo_;
     CallsReportInfo callsReportInfo_;
+    std::map<RequestResultEventId, CallAbilityEventId> mEventIdTransferMap_;
 };
 } // namespace Telephony
 } // namespace OHOS

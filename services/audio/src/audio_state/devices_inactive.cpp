@@ -26,18 +26,19 @@ bool DevicesInactive::ProcessEvent(int32_t event)
     bool result = false;
     std::lock_guard<std::mutex> lock(mutex_);
     switch (event) {
-        case AudioDeviceManager::AUDIO_INTERRUPTED:
-        case AudioDeviceManager::AUDIO_RINGING:
+        case AudioEvent::AUDIO_ACTIVATED:
+        case AudioEvent::AUDIO_RINGING:
             // should reinitialize audio device when audio interrupted or ringing
-            result = DelayedSingleton<AudioControlManager>::GetInstance()->ProcessEvent(
-                AudioDeviceManager::INIT_AUDIO_DEVICE);
+            result =
+                DelayedSingleton<AudioDeviceManager>::GetInstance()->ProcessEvent(AudioEvent::INIT_AUDIO_DEVICE);
             break;
-        case AudioDeviceManager::AUDIO_UN_INTERRUPT:
+        case AudioEvent::AUDIO_DEACTIVATED:
             // do nothing
             break;
         default:
             break;
     }
+    TELEPHONY_LOGI("devices inactive lock release");
     return result;
 }
 } // namespace Telephony

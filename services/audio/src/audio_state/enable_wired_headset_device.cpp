@@ -26,19 +26,20 @@ bool EnableWiredHeadsetDevice::ProcessEvent(int32_t event)
     bool result = false;
     std::lock_guard<std::mutex> lock(mutex_);
     switch (event) {
-        case AudioDeviceManager::WIRED_HEADSET_UNAVAILABLE:
+        case AudioEvent::WIRED_HEADSET_UNAVAILABLE:
             // should reinitialize audio device in order to switch to a proper audio route
-            result = DelayedSingleton<AudioControlManager>::GetInstance()->ProcessEvent(
-                AudioDeviceManager::INIT_AUDIO_DEVICE);
+            result =
+                DelayedSingleton<AudioDeviceManager>::GetInstance()->ProcessEvent(AudioEvent::INIT_AUDIO_DEVICE);
             break;
-        case AudioDeviceManager::BLUETOOTH_SCO_AVAILABLE:
+        case AudioEvent::BLUETOOTH_SCO_AVAILABLE:
             // should switch to bluetooth route when bluetooth available
-            result = DelayedSingleton<AudioControlManager>::GetInstance()->ProcessEvent(
-                AudioDeviceManager::ENABLE_DEVICE_BLUETOOTH);
+            result = DelayedSingleton<AudioDeviceManager>::GetInstance()->ProcessEvent(
+                AudioEvent::ENABLE_DEVICE_BLUETOOTH);
             break;
         default:
             break;
     }
+    TELEPHONY_LOGI("enable wired headset device lock release");
     return result;
 }
 } // namespace Telephony

@@ -34,19 +34,19 @@ public:
 private:
     using CallStatusCallbackFunc = int32_t (CallStatusCallbackStub::*)(MessageParcel &data, MessageParcel &reply);
 
-    int32_t OnUpdateCallReportInfoRequest(MessageParcel &data, MessageParcel &reply);
-    int32_t OnUpdateCallsReportInfoRequest(MessageParcel &data, MessageParcel &reply);
-    int32_t OnUpdateDisconnectedCauseRequest(MessageParcel &data, MessageParcel &reply);
-    int32_t OnUpdateEventReportRequest(MessageParcel &data, MessageParcel &reply);
-    int32_t OnUpdateGetWaitingResultRequest(MessageParcel &data, MessageParcel &reply);
-    int32_t OnUpdateSetWaitingResultRequest(MessageParcel &data, MessageParcel &reply);
-    int32_t OnUpdateGetRestrictionResultRequest(MessageParcel &data, MessageParcel &reply);
-    int32_t OnUpdateSetRestrictionResultRequest(MessageParcel &data, MessageParcel &reply);
-    int32_t OnUpdateGetTransferResultRequest(MessageParcel &data, MessageParcel &reply);
-    int32_t OnUpdateSetTransferResultRequest(MessageParcel &data, MessageParcel &reply);
-    int32_t OnUpdateGetCallClipResultRequest(MessageParcel &data, MessageParcel &reply);
-    int32_t OnUpdateGetCallClirResultRequest(MessageParcel &data, MessageParcel &reply);
-    int32_t OnUpdateSetCallClirResultRequest(MessageParcel &data, MessageParcel &reply);
+    int32_t OnUpdateCallReportInfo(MessageParcel &data, MessageParcel &reply);
+    int32_t OnUpdateCallsReportInfo(MessageParcel &data, MessageParcel &reply);
+    int32_t OnUpdateDisconnectedCause(MessageParcel &data, MessageParcel &reply);
+    int32_t OnUpdateEventReport(MessageParcel &data, MessageParcel &reply);
+    int32_t OnUpdateGetWaitingResult(MessageParcel &data, MessageParcel &reply);
+    int32_t OnUpdateSetWaitingResult(MessageParcel &data, MessageParcel &reply);
+    int32_t OnUpdateGetRestrictionResult(MessageParcel &data, MessageParcel &reply);
+    int32_t OnUpdateSetRestrictionResult(MessageParcel &data, MessageParcel &reply);
+    int32_t OnUpdateGetTransferResult(MessageParcel &data, MessageParcel &reply);
+    int32_t OnUpdateSetTransferResult(MessageParcel &data, MessageParcel &reply);
+    int32_t OnUpdateGetCallClipResult(MessageParcel &data, MessageParcel &reply);
+    int32_t OnUpdateGetCallClirResult(MessageParcel &data, MessageParcel &reply);
+    int32_t OnUpdateSetCallClirResult(MessageParcel &data, MessageParcel &reply);
 
     std::map<uint32_t, CallStatusCallbackFunc> memberFuncMap_;
 };

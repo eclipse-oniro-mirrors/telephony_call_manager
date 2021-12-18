@@ -16,11 +16,11 @@
 #ifndef INACTIVE_STATE_H
 #define INACTIVE_STATE_H
 
-#include "audio_state.h"
+#include "audio_base.h"
 
 namespace OHOS {
 namespace Telephony {
-class InActiveState : public AudioState {
+class InActiveState : public AudioBase {
 public:
     InActiveState() = default;
     ~InActiveState() = default;

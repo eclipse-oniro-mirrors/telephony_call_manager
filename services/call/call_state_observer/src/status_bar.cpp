@@ -28,7 +28,6 @@ void StatusBar::UpdateMuteIcon(bool isDisplayMute)
     if (isDisplayMute_ == isDisplayMute) {
         return;
     }
-
 #ifdef ABILITY_STATUS_BAR_CONTROL_SUPPORT
     if (isDisplayMute) {
         statusBarControl.setIcon("Mute");
@@ -44,7 +43,6 @@ void StatusBar::UpdateSpeakerphoneIcon(bool isDisplay)
     if (isDisplayIcon_ == isDisplay) {
         return;
     }
-
 #ifdef ABILITY_STATUS_BAR_CONTROL_SUPPORT
     if (isDisplaySpeakerphone) {
         statusBarControl.setIcon("Speakerphone");

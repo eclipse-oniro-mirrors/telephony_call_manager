@@ -16,6 +16,8 @@
 #ifndef CALL_REQUEST_PROCESS_H
 #define CALL_REQUEST_PROCESS_H
 
+#include "cellular_call_types.h"
+
 #include "call_object_manager.h"
 
 namespace OHOS {
@@ -34,6 +36,13 @@ public:
     void SwitchRequest(int32_t callId);
     void CombineConferenceRequest(int32_t mainCallId);
     void SeparateConferenceRequest(int32_t callId);
+    void UpgradeCallRequest(int32_t callId);
+    void DowngradeCallRequest(int32_t callId);
+
+private:
+    void CarrierDialProcess(DialParaInfo &info);
+    void VoiceMailDialProcess(DialParaInfo &info);
+    void PackCellularCallInfo(DialParaInfo &info, CellularCallInfo &callInfo);
 };
 } // namespace Telephony
 } // namespace OHOS

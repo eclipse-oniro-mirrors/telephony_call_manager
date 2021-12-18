@@ -16,27 +16,50 @@ import("//build/ohos.gni")
 ohos_executable("tel_call_manager_ui_test") {
   install_enable = true
   sources = [
-    "//base/telephony/core_service/interfaces/innerkits/call_manager/proxy/call_manager_service_proxy.cpp",
-    "call_manager_ipc_client.cpp",
+    "call_manager_callback_test.cpp",
+    "common_event_subscriber_test.cpp",
     "ui_client_test.cpp",
   ]
 
   include_dirs = [
-    "//base/telephony/call_manager/utils/include",
-    "//base/telephony/core_service/interfaces/innerkits/call_manager/common",
-    "//base/telephony/core_service/interfaces/innerkits/call_manager/proxy",
-    "//base/telephony/core_service/interfaces/innerkits/cellular_call/common",
+    "//base/telephony/call_manager/services/audio/include",
+    "//base/telephony/core_service/common/call_manager",
+
+    "//foundation/multimedia/camera_standard/interfaces/innerkits/native/camera/include",
+    "//foundation/multimedia/camera_standard/services/camera_service/include",
+    "//foundation/multimedia/camera_standard/services/camera_service/binder/base/include",
+    "//foundation/multimedia/camera_standard/services/camera_service/binder/client/include",
+    "//foundation/multimedia/camera_standard/services/camera_service/binder/server/include",
+    "//foundation/graphic/standard/frameworks/surface/include",
+    "//foundation/multimedia/camera_standard/frameworks/innerkitsimpl/metadata/include",
+    "//utils/system/safwk/native/include",
+    "//drivers/framework/include/utils",
+    "//drivers/adapter/uhdf2/utils/include",
+    "//drivers/adapter/uhdf2/include/hdi",
+    "//drivers/peripheral/display/interfaces/include",
+    "//drivers/peripheral/camera/interfaces/include",
+    "//drivers/peripheral/camera/interfaces/include/server",
+    "//drivers/peripheral/camera/interfaces/include/callback/device",
+    "//drivers/peripheral/camera/interfaces/include/callback/operator",
+    "//drivers/peripheral/camera/interfaces/include/callback/host",
   ]
 
   deps = [
-    "//base/telephony/core_service/common:libtelephony_common",
+    "//base/telephony/call_manager/frameworks/native:tel_call_manager_api",
+    "//base/telephony/core_service/utils:libtelephony_common",
     "//foundation/aafwk/standard/frameworks/kits/ability/native:abilitykit_native",
+    "//foundation/graphic/standard:libsurface",
+    "//foundation/multimedia/camera_standard/frameworks/innerkitsimpl/camera:camera_framework",
+    "//foundation/multimedia/camera_standard/frameworks/innerkitsimpl/metadata:metadata",
   ]
 
   external_deps = [
     "aafwk_standard:want",
     "appexecfwk_standard:libeventhandler",
+    "ces_standard:cesfwk_innerkits",
     "ipc:ipc_core",
+    "multimedia_audio_standard:audio_client",
+    "multimedia_audio_standard:audio_renderer",
     "safwk:system_ability_fwk",
     "samgr_standard:samgr_proxy",
   ]

@@ -17,9 +17,6 @@
 #define CALL_STATE_LISTENER_H
 
 #include <memory>
-#include <mutex>
-#include <set>
-#include <vector>
 
 #include "call_state_listener_base.h"
 

@@ -53,6 +53,8 @@ public:
     CallRecordsHandler(const std::shared_ptr<AppExecFwk::EventRunner> &runner);
     virtual ~CallRecordsHandler() = default;
     void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event);
+
+private:
     std::shared_ptr<CallDataBaseHelper> callDataPtr_;
 };
 
@@ -68,7 +70,6 @@ public:
 private:
     std::shared_ptr<AppExecFwk::EventRunner> eventLoop_;
     std::shared_ptr<CallRecordsHandler> handler_;
-    std::mutex mutex_;
 };
 } // namespace Telephony
 } // namespace OHOS

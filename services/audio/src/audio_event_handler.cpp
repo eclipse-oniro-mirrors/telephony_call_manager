@@ -20,23 +20,29 @@
 namespace OHOS {
 namespace Telephony {
 AudioEventHandler::AudioEventHandler(
-    const std::shared_ptr<AppExecFwk::EventRunner> &runner, const std::shared_ptr<AudioEvent> &manager)
-    : AppExecFwk::EventHandler(runner), audioEvent_(manager)
+    const std::shared_ptr<AppExecFwk::EventRunner> &runner, const std::shared_ptr<AudioCommonEvent> &manager)
+    : AppExecFwk::EventHandler(runner), audioCommonEvent_(manager)
 {}
+
+AudioEventHandler::~AudioEventHandler() {}
+
+void AudioEventHandler::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    if (event == nullptr || audioCommonEvent_ == nullptr) {
+        TELEPHONY_LOGE("event or audio event nullptr");
+        return;
+    }
+    audioCommonEvent_->ProcessEvent(event->GetInnerEventId());
+}
 
 void AudioEventHandler::SendEmptyEvent(uint32_t event)
 {
     SendEvent(event, 0, 0);
 }
 
-AudioEventHandler::~AudioEventHandler() {}
-
-void AudioEventHandler::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
+void AudioCommonEvent::ProcessEvent(int32_t event)
 {
-    if (event == nullptr || audioEvent_ == nullptr) {
-        return;
-    }
-    audioEvent_->HandleEvent(event->GetInnerEventId());
+    TELEPHONY_LOGI("process event : %{public}d", event);
 }
 } // namespace Telephony
 } // namespace OHOS

@@ -16,6 +16,8 @@
 #ifndef MISSED_CALL_NOTIFICATION_H
 #define MISSED_CALL_NOTIFICATION_H
 
+#include <cstdint>
+
 #include "call_state_listener_base.h"
 
 namespace OHOS {
@@ -29,12 +31,13 @@ public:
     void IncomingCallActivated(sptr<CallBase> &callObjectPtr) override;
     void IncomingCallHungUp(sptr<CallBase> &callObjectPtr, bool isSendSms, std::string content) override;
     void CallStateUpdated(sptr<CallBase> &callObjectPtr, TelCallState priorState, TelCallState nextState) override;
+    int32_t CancelMissedCallsNotification(int32_t id);
 
 private:
     bool isIncomingCallMissed_;
     std::string incomingCallNumber_;
-    static constexpr int32_t INCOMING_CALL_MISSED_ID = 0;
-    static constexpr int32_t INCOMING_CALL_MISSED_CODE = 0;
+    static constexpr int16_t INCOMING_CALL_MISSED_ID = 0;
+    static constexpr int16_t INCOMING_CALL_MISSED_CODE = 0;
     const std::string INCOMING_CALL_MISSED_TITLE = "Missed Call";
     const std::string COMMON_EVENT_INCOMING_CALL_MISSED = "usual.event.INCOMING_CALL_MISSED";
     void PublishMissedCallEvent(sptr<CallBase> &callObjectPtr);

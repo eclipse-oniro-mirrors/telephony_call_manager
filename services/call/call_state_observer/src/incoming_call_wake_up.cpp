@@ -15,8 +15,8 @@
 
 #include "incoming_call_wake_up.h"
 
-#include "iservice_registry.h"
 #include "power_mgr_client.h"
+#include "iservice_registry.h"
 #include "system_ability.h"
 #include "system_ability_definition.h"
 
@@ -35,6 +35,7 @@ void IncomingCallWakeup::NewCallCreated(sptr<CallBase> &callObjectPtr)
 void IncomingCallWakeup::WakeupDevice()
 {
     if (IsScreenOn()) {
+        TELEPHONY_LOGE("screen not wake up");
         return;
     }
     PowerMgr::PowerMgrClient::GetInstance().WakeupDevice(
