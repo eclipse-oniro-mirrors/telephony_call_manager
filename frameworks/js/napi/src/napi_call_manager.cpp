@@ -2000,19 +2000,28 @@ void NapiCallManager::RegisterCallBack()
 
 std::u16string NapiCallManager::GetBundleName(napi_env env)
 {
-    // get global value
     napi_value global = nullptr;
-    napi_get_global(env, &global);
-    // get ability
+    napi_status status = napi_get_global(env, &global);
+    if (status != napi_ok || global == nullptr) {
+        TELEPHONY_LOGE("can't get global instance for %{public}d", status);
+        return u"";
+    }
+
     napi_value abilityObj = nullptr;
-    napi_get_named_property(env, global, "ability", &abilityObj);
-    // get ability pointer
+    status = napi_get_named_property(env, global, "ability", &abilityObj);
+    if (status != napi_ok || abilityObj == nullptr) {
+        TELEPHONY_LOGE("can't get ability obj for %{public}d", status);
+        return u"";
+    }
+
     OHOS::AppExecFwk::Ability *ability = nullptr;
-    napi_get_value_external(env, abilityObj, (void **)&ability);
-    // get bundle path
-    std::string bundleName = ability->GetBundleName();
-    TELEPHONY_LOGI("getBundleName = %{public}s", bundleName.c_str());
-    return Str8ToStr16(bundleName);
+    status = napi_get_value_external(env, abilityObj, (void **)&ability);
+    if (status != napi_ok || ability == nullptr) {
+        TELEPHONY_LOGE("get ability from property failed for %{public}d", status);
+        return u"";
+    }
+
+    return Str8ToStr16(ability->GetBundleName());
 }
 
 napi_value NapiCallManager::HandleAsyncWork(napi_env env, AsyncContext *context, std::string workName,
