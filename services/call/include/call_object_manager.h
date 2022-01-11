@@ -53,12 +53,12 @@ public:
     static TelCallState GetCallState(int32_t callId);
     static sptr<CallBase> GetOneCallObject(CallRunningState callState);
     static bool IsCallExist(CallType type, TelCallState callState);
+    static bool IsCallExist(TelCallState callState);
 
 private:
     static std::list<sptr<CallBase>> callObjectPtrList_;
     static std::mutex listMutex_;
     static int32_t callId_;
-    static uint32_t maxCallCount_;
 };
 } // namespace Telephony
 } // namespace OHOS

@@ -30,8 +30,8 @@ namespace Telephony {
 bool AudioDeviceManager::isBtScoDevEnable_ = false;
 bool AudioDeviceManager::isSpeakerAvailable_ = true; // default available
 bool AudioDeviceManager::isEarpieceAvailable_ = false;
-bool AudioDeviceManager::isWiredHeadsetAvailable_ = false;
-bool AudioDeviceManager::isBtScoAvailable_ = false;
+bool AudioDeviceManager::isWiredHeadsetConnected_ = false;
+bool AudioDeviceManager::isBtScoConnected_ = false;
 
 AudioDeviceManager::AudioDeviceManager()
     : audioDevice_(AudioDevice::DEVICE_UNKNOWN), currentAudioDevice_(nullptr), isAudioActivated_(false)
@@ -57,7 +57,7 @@ void AudioDeviceManager::Init()
 bool AudioDeviceManager::InitAudioDevice()
 {
     // when audio deactivate interrupt , reinit
-    // when external audio device available state changed , reinit
+    // when external audio device connection state changed , reinit
     auto device = DelayedSingleton<AudioControlManager>::GetInstance()->GetInitAudioDevice();
     return SwitchDevice(device);
 }
@@ -90,12 +90,12 @@ bool AudioDeviceManager::ProcessEvent(AudioEvent event)
                 result = InitAudioDevice();
             }
             break;
-        case AudioEvent::BLUETOOTH_SCO_AVAILABLE:
-            isBtScoAvailable_ = true;
+        case AudioEvent::BLUETOOTH_SCO_CONNECTED:
+            isBtScoConnected_ = true;
             result = currentAudioDevice_->ProcessEvent(event);
             break;
-        case AudioEvent::BLUETOOTH_SCO_UNAVAILABLE:
-            isBtScoAvailable_ = false;
+        case AudioEvent::BLUETOOTH_SCO_DISCONNECTED:
+            isBtScoConnected_ = false;
             result = currentAudioDevice_->ProcessEvent(event);
             break;
         case AudioEvent::INIT_AUDIO_DEVICE:
@@ -157,7 +157,7 @@ bool AudioDeviceManager::EnableSpeaker()
         SetSpeakerDevEnable();
         return true;
     }
-    TELEPHONY_LOGE("enable speaker device failed");
+    TELEPHONY_LOGI("enable speaker device failed");
     return false;
 }
 
@@ -174,13 +174,13 @@ bool AudioDeviceManager::EnableEarpiece()
         SetEarpieceDevEnable();
         return true;
     }
-    TELEPHONY_LOGE("enable earpiece device failed");
+    TELEPHONY_LOGI("enable earpiece device failed");
     return false;
 }
 
 bool AudioDeviceManager::EnableWiredHeadset()
 {
-    if (isWiredHeadsetAvailable_ && DelayedSingleton<AudioProxy>::GetInstance()->SetWiredHeadsetDevActive()) {
+    if (isWiredHeadsetConnected_ && DelayedSingleton<AudioProxy>::GetInstance()->SetWiredHeadsetDevActive()) {
         currentAudioDevice_ = std::make_unique<EnableWiredHeadsetDevice>();
         if (currentAudioDevice_ == nullptr) {
             TELEPHONY_LOGE("make_unique EnableWiredHeadsetDevice failed");
@@ -191,13 +191,13 @@ bool AudioDeviceManager::EnableWiredHeadset()
         SetWiredHeadsetDevEnable();
         return true;
     }
-    TELEPHONY_LOGE("enable wired headset device failed");
+    TELEPHONY_LOGI("enable wired headset device failed");
     return false;
 }
 
 bool AudioDeviceManager::EnableBtSco()
 {
-    if (isBtScoAvailable_ && DelayedSingleton<AudioProxy>::GetInstance()->SetBluetoothDevActive() &&
+    if (isBtScoConnected_ && DelayedSingleton<AudioProxy>::GetInstance()->SetBluetoothDevActive() &&
         DelayedSingleton<BluetoothCallManager>::GetInstance()->ConnectBtSco()) {
         currentAudioDevice_ = std::make_unique<EnableBluetoothDevice>();
         if (currentAudioDevice_ == nullptr) {
@@ -209,7 +209,7 @@ bool AudioDeviceManager::EnableBtSco()
         SetBtScoDevEnable();
         return true;
     }
-    TELEPHONY_LOGE("enable bluetooth sco device failed");
+    TELEPHONY_LOGI("enable bluetooth sco device failed");
     return false;
 }
 
@@ -275,14 +275,6 @@ void AudioDeviceManager::SetWiredHeadsetDevEnable()
     isEarpieceDevEnable_ = false;
 }
 
-bool AudioDeviceManager::EnableDefaultAudioDevice()
-{
-    if (DelayedSingleton<AudioControlManager>::GetInstance()->IsCurrentVideoCall()) {
-        return EnableSpeaker();
-    }
-    return EnableEarpiece();
-}
-
 bool AudioDeviceManager::IsEarpieceDevEnable()
 {
     return isEarpieceDevEnable_;
@@ -303,24 +295,24 @@ bool AudioDeviceManager::IsBtScoDevEnable()
     return isBtScoDevEnable_;
 }
 
-bool AudioDeviceManager::IsBtScoAvailable()
+bool AudioDeviceManager::IsBtScoConnected()
 {
-    return isBtScoAvailable_;
+    return isBtScoConnected_;
 }
 
-void AudioDeviceManager::SetBtScoAvailable(bool available)
+void AudioDeviceManager::SetBtScoAvailable(bool connected)
 {
-    isBtScoAvailable_ = available;
+    isBtScoConnected_ = connected;
 }
 
-bool AudioDeviceManager::IsWiredHeadsetAvailable()
+bool AudioDeviceManager::IsWiredHeadsetConnected()
 {
-    return isWiredHeadsetAvailable_;
+    return isWiredHeadsetConnected_;
 }
 
-void AudioDeviceManager::SetWiredHeadsetAvailable(bool available)
+void AudioDeviceManager::SetWiredHeadsetAvailable(bool connected)
 {
-    isWiredHeadsetAvailable_ = available;
+    isWiredHeadsetConnected_ = connected;
 }
 
 bool AudioDeviceManager::IsEarpieceAvailable()

@@ -17,28 +17,44 @@
 
 namespace OHOS {
 namespace Telephony {
-constexpr int32_t RETURN_SUCCESS = 0;
+constexpr int16_t RETURN_SUCCESS = 0;
 
 int32_t CallManagerCallbackTest::OnCallDetailsChange(const CallAttributeInfo &info)
 {
     std::cout << "----------OnCallDetailsChange--------" << std::endl
               << "callId:" << info.callId << std::endl
-              << "callType:" << info.callType << std::endl
-              << "callState:" << info.callState << std::endl
-              << "conferenceState:" << info.conferenceState << std::endl
+              << "callType:" << (int32_t)info.callType << std::endl
+              << "callState:" << (int32_t)info.callState << std::endl
+              << "conferenceState:" << (int32_t)info.conferenceState << std::endl
               << "accountNumber:" << info.accountNumber << std::endl;
     return RETURN_SUCCESS;
 }
 
 int32_t CallManagerCallbackTest::OnCallEventChange(const CallEventInfo &info)
 {
-    std::cout << "----------OnCallEventChange--------" << std::endl << "eventId:" << info.eventId << std::endl;
+    std::cout << "----------OnCallEventChange--------" << std::endl
+              << "eventId:" << (int32_t)info.eventId << std::endl;
     return RETURN_SUCCESS;
 }
 
-int32_t CallManagerCallbackTest::OnSupplementResult(CallResultReportId reportId, AppExecFwk::PacMap &resultInfo)
+int32_t CallManagerCallbackTest::OnCallDisconnectedCause(DisconnectedDetails cause)
 {
-    std::cout << "----------OnSupplementResult--------" << std::endl << "reportId:" << reportId << std::endl;
+    std::cout << "----------OnCallDisconnectedCause--------" << std::endl
+              << "cause:" << (int32_t)cause << std::endl;
+    return RETURN_SUCCESS;
+}
+
+int32_t CallManagerCallbackTest::OnReportAsyncResults(CallResultReportId reportId, AppExecFwk::PacMap &resultInfo)
+{
+    std::cout << "----------OnReportAsyncResults--------" << std::endl
+              << "reportId:" << (int32_t)reportId << std::endl;
+    return RETURN_SUCCESS;
+}
+
+int32_t CallManagerCallbackTest::OnOttCallRequest(OttCallRequestId requestId, AppExecFwk::PacMap &info)
+{
+    std::cout << "----------OnOttCallRequest--------" << std::endl
+              << "requestId:" << (int32_t)requestId << std::endl;
     return RETURN_SUCCESS;
 }
 } // namespace Telephony

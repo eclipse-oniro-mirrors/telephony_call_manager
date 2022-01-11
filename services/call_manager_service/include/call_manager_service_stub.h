@@ -29,7 +29,7 @@ class CallManagerServiceStub : public IRemoteStub<ICallManagerService> {
 public:
     CallManagerServiceStub();
     ~CallManagerServiceStub();
-    virtual int OnRemoteRequest(
+    virtual int32_t OnRemoteRequest(
         uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
 
 private:
@@ -62,32 +62,45 @@ private:
     int32_t OnIsRinging(MessageParcel &data, MessageParcel &reply);
     int32_t OnIsInEmergencyCall(MessageParcel &data, MessageParcel &reply);
     int32_t OnStartDtmf(MessageParcel &data, MessageParcel &reply);
-    int32_t OnSendDtmf(MessageParcel &data, MessageParcel &reply);
     int32_t OnStopDtmf(MessageParcel &data, MessageParcel &reply);
-    int32_t OnSendDtmfBunch(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetCallWaiting(MessageParcel &data, MessageParcel &reply);
     int32_t OnSetCallWaiting(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetCallRestriction(MessageParcel &data, MessageParcel &reply);
     int32_t OnSetCallRestriction(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetTransferNumber(MessageParcel &data, MessageParcel &reply);
     int32_t OnSetTransferNumber(MessageParcel &data, MessageParcel &reply);
-    int32_t OnJoinConference(MessageParcel &data, MessageParcel &reply);
+    int32_t OnCombineConference(MessageParcel &data, MessageParcel &reply);
     int32_t OnSeparateConference(MessageParcel &data, MessageParcel &reply);
-    int32_t OnIsEmergencyPhoneNumber(MessageParcel &data, MessageParcel &reply);
-    int32_t OnFormatPhoneNumber(MessageParcel &data, MessageParcel &reply);
-    int32_t OnFormatPhoneNumberToE164(MessageParcel &data, MessageParcel &reply);
-    int32_t OnGetMainCallId(MessageParcel &data, MessageParcel &reply);
-    int32_t OnGetSubCallIdList(MessageParcel &data, MessageParcel &reply);
-    int32_t OnGetCallIdListForConference(MessageParcel &data, MessageParcel &reply);
-    int32_t OnCancelMissedCallsNotification(MessageParcel &data, MessageParcel &reply);
+    int32_t OnJoinConference(MessageParcel &data, MessageParcel &reply);
+    int32_t OnSetCallPreferenceMode(MessageParcel &data, MessageParcel &reply);
     int32_t OnControlCamera(MessageParcel &data, MessageParcel &reply);
     int32_t OnSetPreviewWindow(MessageParcel &data, MessageParcel &reply);
     int32_t OnSetDisplayWindow(MessageParcel &data, MessageParcel &reply);
     int32_t OnSetCameraZoom(MessageParcel &data, MessageParcel &reply);
     int32_t OnSetPausePicture(MessageParcel &data, MessageParcel &reply);
     int32_t OnSetDeviceDirection(MessageParcel &data, MessageParcel &reply);
-    int32_t OnSetCallPreferenceMode(MessageParcel &data, MessageParcel &reply);
+    int32_t OnIsEmergencyPhoneNumber(MessageParcel &data, MessageParcel &reply);
+    int32_t OnFormatPhoneNumber(MessageParcel &data, MessageParcel &reply);
+    int32_t OnFormatPhoneNumberToE164(MessageParcel &data, MessageParcel &reply);
+    int32_t OnGetMainCallId(MessageParcel &data, MessageParcel &reply);
+    int32_t OnGetSubCallIdList(MessageParcel &data, MessageParcel &reply);
+    int32_t OnGetCallIdListForConference(MessageParcel &data, MessageParcel &reply);
+    int32_t OnGetImsConfig(MessageParcel &data, MessageParcel &reply);
+    int32_t OnSetImsConfig(MessageParcel &data, MessageParcel &reply);
+    int32_t OnGetImsFeatureValue(MessageParcel &data, MessageParcel &reply);
+    int32_t OnSetImsFeatureValue(MessageParcel &data, MessageParcel &reply);
+    int32_t OnUpdateCallMediaMode(MessageParcel &data, MessageParcel &reply);
+    int32_t OnEnableVoLte(MessageParcel &data, MessageParcel &reply);
+    int32_t OnDisableVoLte(MessageParcel &data, MessageParcel &reply);
+    int32_t OnIsVoLteEnabled(MessageParcel &data, MessageParcel &reply);
+    int32_t OnEnableLteEnhanceMode(MessageParcel &data, MessageParcel &reply);
+    int32_t OnDisableEnhanceMode(MessageParcel &data, MessageParcel &reply);
+    int32_t OnIsLteEnhanceModeEnabled(MessageParcel &data, MessageParcel &reply);
+    int32_t OnStartRtt(MessageParcel &data, MessageParcel &reply);
+    int32_t OnStopRtt(MessageParcel &data, MessageParcel &reply);
+    int32_t OnReportOttCallDetailsInfo(MessageParcel &data, MessageParcel &reply);
     int32_t CheckBundleName(std::string bundleName);
+
     std::map<uint32_t, CallManagerServiceFunc> memberFuncMap_;
 };
 } // namespace Telephony

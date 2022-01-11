@@ -46,9 +46,10 @@ void CallRecordsHandler::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &eve
             return;
         }
         NativeRdb::ValuesBucket bucket;
+        TELEPHONY_LOGI("callLog Insert begin");
         bucket.PutString(CALL_PHONE_NUMBER, std::string(info.phoneNumber));
         bucket.PutString(CALL_DISPLAY_NAME, std::string(""));
-        bucket.PutInt(CALL_DIRECTION, info.directionType);
+        bucket.PutInt(CALL_DIRECTION, static_cast<int32_t>(info.directionType));
         bucket.PutString(CALL_VOICEMAIL_URI, std::string(""));
         bucket.PutInt(CALL_SIM_TYPE, 0);
         bucket.PutInt(CALL_IS_HD, 0);
@@ -61,7 +62,7 @@ void CallRecordsHandler::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &eve
         bucket.PutString(CALL_NUMBER_TYPE_NAME, std::string(""));
         bucket.PutInt(CALL_BEGIN_TIME, info.callBeginTime);
         bucket.PutInt(CALL_END_TIME, info.callEndTime);
-        bucket.PutInt(CALL_ANSWER_STATE, info.answerType);
+        bucket.PutInt(CALL_ANSWER_STATE, static_cast<int32_t>(info.answerType));
         uint64_t timeStamp = time(0);
         bucket.PutInt(CALL_CREATE_TIME, timeStamp);
         bucket.PutString(CALL_NUMBER_LOCATION, std::string(""));
@@ -95,12 +96,12 @@ int32_t CallRecordsHandlerService::StoreCallRecord(const CallRecordInfo &info)
 {
     if (handler_.get() == nullptr) {
         TELEPHONY_LOGE("handler_ is nullptr");
-        return TELEPHONY_ERROR;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     std::unique_ptr<CallRecordInfo> para = std::make_unique<CallRecordInfo>();
     if (para.get() == nullptr) {
         TELEPHONY_LOGE("make_unique CallRecordInfo failed!");
-        return TELEPHONY_ERROR;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     *para = info;
     handler_->SendEvent(HANDLER_ADD_CALL_RECORD_INFO, std::move(para));

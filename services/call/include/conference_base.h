@@ -27,8 +27,8 @@
 
 namespace OHOS {
 namespace Telephony {
-constexpr uint32_t CS_CONFERENCE_MIN_CALLS_CNT = 2;
-constexpr uint32_t CS_CONFERENCE_MAX_CALLS_CNT = 5;
+constexpr uint16_t CS_CONFERENCE_MIN_CALLS_CNT = 2;
+constexpr uint16_t CS_CONFERENCE_MAX_CALLS_CNT = 5;
 
 enum ConferenceState {
     CONFERENCE_STATE_IDLE = 0,
@@ -42,16 +42,17 @@ class ConferenceBase {
 public:
     ConferenceBase();
     virtual ~ConferenceBase();
-    int32_t GetMainCall();
+    int32_t GetMainCall(); // get host call id
     int32_t SetMainCall(int32_t callId);
     ConferenceState GetConferenceState();
     void SetConferenceState(ConferenceState state);
     virtual int32_t JoinToConference(int32_t callId) = 0;
     virtual int32_t LeaveFromConference(int32_t callId) = 0;
-    std::vector<std::u16string> GetSubCallIdList(int32_t callId);
-    std::vector<std::u16string> GetCallIdListForConference(int32_t callId);
+    virtual int32_t HoldConference(int32_t callId) = 0;
     virtual int32_t CanCombineConference() = 0;
     virtual int32_t CanSeparateConference() = 0;
+    std::vector<std::u16string> GetSubCallIdList(int32_t callId); // get participant list except host
+    std::vector<std::u16string> GetCallIdListForConference(int32_t callId); // get participant list besides host
 
 protected:
     int32_t mainCallId_;
@@ -63,4 +64,5 @@ protected:
 };
 } // namespace Telephony
 } // namespace OHOS
+
 #endif

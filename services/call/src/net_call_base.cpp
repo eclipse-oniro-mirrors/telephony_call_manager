@@ -21,32 +21,32 @@ namespace OHOS {
 namespace Telephony {
 NetCallBase::NetCallBase() {}
 
-int NetCallBase::StartConference()
+int32_t NetCallBase::StartConference()
 {
     return TELEPHONY_SUCCESS;
 }
 
-int NetCallBase::InviteToConference()
+int32_t NetCallBase::JoinConference()
 {
     return TELEPHONY_SUCCESS;
 }
 
-int NetCallBase::KickOutConference()
+int32_t NetCallBase::KickOutConference()
 {
     return TELEPHONY_SUCCESS;
 }
 
-int NetCallBase::LeaveConference()
+int32_t NetCallBase::LeaveConference()
 {
     return TELEPHONY_SUCCESS;
 }
 
-int NetCallBase::GetNetCallType()
+int32_t NetCallBase::GetNetCallType()
 {
     return TELEPHONY_SUCCESS;
 }
 
-int NetCallBase::ChangeNetCallType()
+int32_t NetCallBase::ChangeNetCallType()
 {
     return TELEPHONY_SUCCESS;
 }

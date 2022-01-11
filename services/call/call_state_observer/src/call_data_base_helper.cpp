@@ -24,6 +24,26 @@
 namespace OHOS {
 namespace Telephony {
 class AbsSharedResultSet;
+CallDataRdbObserver::CallDataRdbObserver(std::vector<std::string> *phones)
+{
+    this->phones = phones;
+}
+
+CallDataRdbObserver::~CallDataRdbObserver() {}
+
+void CallDataRdbObserver::OnChange()
+{
+    std::shared_ptr<CallDataBaseHelper> callDataPtr = DelayedSingleton<CallDataBaseHelper>::GetInstance();
+    if (callDataPtr == nullptr) {
+        TELEPHONY_LOGE("callDataPtr is nullptr!");
+    }
+
+    NativeRdb::DataAbilityPredicates predicates;
+    predicates.NotEqualTo("phone_number", std::string(""));
+    this->phones->clear();
+    callDataPtr->Query(this->phones, predicates);
+}
+
 CallDataBaseHelper::CallDataBaseHelper() {}
 
 CallDataBaseHelper::~CallDataBaseHelper() {}
@@ -43,6 +63,35 @@ std::shared_ptr<AppExecFwk::DataAbilityHelper> CallDataBaseHelper::CreateDataAHe
     return AppExecFwk::DataAbilityHelper::Creator(remoteObj);
 }
 
+void CallDataBaseHelper::RegisterObserver(std::vector<std::string> *phones)
+{
+    std::shared_ptr<AppExecFwk::DataAbilityHelper> helper = CreateDataAHelper();
+    if (helper == nullptr) {
+        TELEPHONY_LOGE("helper_ is null");
+        return;
+    }
+    Uri uri(CALL_BLOCK);
+    callDataRdbObserverPtr_ = (std::make_unique<CallDataRdbObserver>(phones)).release();
+    if (callDataRdbObserverPtr_ == nullptr) {
+        TELEPHONY_LOGE("callDataRdbObserverPtr_ is null");
+    }
+    helper->RegisterObserver(uri, callDataRdbObserverPtr_);
+}
+
+void CallDataBaseHelper::UnRegisterObserver()
+{
+    std::shared_ptr<AppExecFwk::DataAbilityHelper> helper = CreateDataAHelper();
+    if (helper == nullptr) {
+        TELEPHONY_LOGE("helper_ is null");
+        return;
+    }
+    Uri uri(CALL_BLOCK);
+    if (callDataRdbObserverPtr_ == nullptr) {
+        TELEPHONY_LOGE("callDataRdbObserverPtr_ is null");
+    }
+    helper->UnregisterObserver(uri, callDataRdbObserverPtr_);
+}
+
 bool CallDataBaseHelper::Insert(NativeRdb::ValuesBucket &values)
 {
     std::shared_ptr<AppExecFwk::DataAbilityHelper> helper = CreateDataAHelper();
@@ -54,8 +103,34 @@ bool CallDataBaseHelper::Insert(NativeRdb::ValuesBucket &values)
     return helper->Insert(uri, values);
 }
 
-bool CallDataBaseHelper::Query(NativeRdb::DataAbilityPredicates &predicates)
+bool CallDataBaseHelper::Query(std::vector<std::string> *phones, NativeRdb::DataAbilityPredicates &predicates)
 {
+    std::shared_ptr<AppExecFwk::DataAbilityHelper> helper = CreateDataAHelper();
+    if (helper == nullptr) {
+        TELEPHONY_LOGE("helper is nullptr");
+        return false;
+    }
+    Uri uri(CALL_BLOCK);
+    std::vector<std::string> columns;
+    columns.push_back("phone_number");
+    std::shared_ptr<NativeRdb::AbsSharedResultSet> resultSet = helper->Query(uri, columns, predicates);
+    helper->Release();
+    if (resultSet == nullptr) {
+        return false;
+    }
+    int32_t resultSetNum = resultSet->GoToFirstRow();
+    while (resultSetNum == 0) {
+        std::string phone;
+        int32_t columnIndex;
+        int32_t ret = resultSet->GetColumnIndex("phone_number", columnIndex);
+        ret = resultSet->GetString(columnIndex, phone);
+        if (ret == 0 && (!phone.empty())) {
+            phones->push_back(phone);
+        }
+        resultSetNum = resultSet->GoToNextRow();
+    }
+    resultSet->Close();
+    TELEPHONY_LOGI("Query end");
     return true;
 }
 

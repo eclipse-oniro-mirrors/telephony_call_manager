@@ -32,15 +32,32 @@ public:
     int32_t UpdateCallsReportInfo(const CallsReportInfo &info) override;
     int32_t UpdateDisconnectedCause(const DisconnectedDetails &cause) override;
     int32_t UpdateEventResultInfo(const CellularCallEventInfo &info) override;
+    int32_t UpdateRBTPlayInfo(const RBTPlayInfo info) override;
+    int32_t StartDtmfResult(const int32_t result) override;
+    int32_t StopDtmfResult(const int32_t result) override;
+    int32_t SendUssdResult(const int32_t result) override;
+    int32_t GetImsCallDataResult(const int32_t result) override;
     int32_t UpdateGetWaitingResult(const CallWaitResponse &response) override;
-    int32_t UpdateSetWaitingResult(int32_t result) override;
+    int32_t UpdateSetWaitingResult(const int32_t result) override;
     int32_t UpdateGetRestrictionResult(const CallRestrictionResponse &result) override;
-    int32_t UpdateSetRestrictionResult(int32_t result) override;
+    int32_t UpdateSetRestrictionResult(const int32_t result) override;
     int32_t UpdateGetTransferResult(const CallTransferResponse &response) override;
-    int32_t UpdateSetTransferResult(int32_t result) override;
+    int32_t UpdateSetTransferResult(const int32_t result) override;
     int32_t UpdateGetCallClipResult(const ClipResponse &clipResponse) override;
     int32_t UpdateGetCallClirResult(const ClirResponse &clirResponse) override;
-    int32_t UpdateSetCallClirResult(int32_t result) override;
+    int32_t UpdateSetCallClirResult(const int32_t result) override;
+    int32_t GetVoLteStatusResult(const LteImsSwitchResponse &switchResponse) override;
+    int32_t SetVoLteStatusResult(const LteImsSwitchResponse &switchResponse) override;
+    int32_t StartRttResult(const int32_t result) override;
+    int32_t StopRttResult(const int32_t result) override;
+    int32_t GetImsConfigResult(const GetImsConfigResponse &response) override;
+    int32_t SetImsConfigResult(const int32_t result) override;
+    int32_t GetImsFeatureValueResult(const GetImsFeatureValueResponse &response) override;
+    int32_t SetImsFeatureValueResult(const int32_t result) override;
+    int32_t GetLteEnhanceModeResult(const GetLteEnhanceModeResponse &response) override;
+    int32_t SetLteEnhanceModeResult(const int32_t result) override;
+    int32_t ReceiveUpdateCallMediaModeResponse(const CallMediaModeResponse &response) override;
+    int32_t InviteToConferenceResult(const int32_t result) override;
 };
 } // namespace Telephony
 } // namespace OHOS

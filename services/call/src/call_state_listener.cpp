@@ -64,7 +64,7 @@ bool CallStateListener::RemoveAllObserver()
 void CallStateListener::NewCallCreated(sptr<CallBase> &callObjectPtr)
 {
     if (callObjectPtr == nullptr) {
-        TELEPHONY_LOGE("observer is nullptr!");
+        TELEPHONY_LOGE("callObjectPtr is nullptr!");
         return;
     }
     std::lock_guard<std::mutex> lock(mutex_);
@@ -73,15 +73,11 @@ void CallStateListener::NewCallCreated(sptr<CallBase> &callObjectPtr)
     }
 }
 
-void CallStateListener::CallDestroyed(sptr<CallBase> &callObjectPtr)
+void CallStateListener::CallDestroyed(int32_t cause)
 {
-    if (callObjectPtr == nullptr) {
-        TELEPHONY_LOGE("observer is nullptr!");
-        return;
-    }
     std::lock_guard<std::mutex> lock(mutex_);
     for (auto &observer : listenerSet_) {
-        observer->CallDestroyed(callObjectPtr);
+        observer->CallDestroyed(cause);
     }
 }
 

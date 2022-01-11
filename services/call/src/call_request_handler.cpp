@@ -37,9 +37,12 @@ CallRequestHandler::CallRequestHandler(const std::shared_ptr<AppExecFwk::EventRu
         &CallRequestHandler::CombineConferenceEvent;
     memberFuncMap_[CallRequestHandlerService::HANDLER_SEPARATE_CONFERENCE_REQUEST] =
         &CallRequestHandler::SeparateConferenceEvent;
-    memberFuncMap_[CallRequestHandlerService::HANDLER_UPGRADE_CALL_REQUEST] = &CallRequestHandler::UpgradeCallEvent;
-    memberFuncMap_[CallRequestHandlerService::HANDLER_DOWNGRADE_CALL_REQUEST] =
-        &CallRequestHandler::DowngradeCallEvent;
+    memberFuncMap_[CallRequestHandlerService::HANDLER_UPDATE_CALL_MEDIA_MODE_REQUEST] =
+        &CallRequestHandler::UpdateCallMediaModeEvent;
+    memberFuncMap_[CallRequestHandlerService::HANDLER_STARTRTT_REQUEST] = &CallRequestHandler::StartRttEvent;
+    memberFuncMap_[CallRequestHandlerService::HANDLER_STOPRTT_REQUEST] = &CallRequestHandler::StopRttEvent;
+    memberFuncMap_[CallRequestHandlerService::HANDLER_INVITE_TO_CONFERENCE] =
+        &CallRequestHandler::JoinConferenceEvent;
 }
 
 CallRequestHandler::~CallRequestHandler()
@@ -238,26 +241,45 @@ void CallRequestHandler::SeparateConferenceEvent(const AppExecFwk::InnerEvent::P
     }
     callRequestProcessPtr_->SeparateConferenceRequest(callId);
 }
-void CallRequestHandler::UpgradeCallEvent(const AppExecFwk::InnerEvent::Pointer &event)
+
+void CallRequestHandler::UpdateCallMediaModeEvent(const AppExecFwk::InnerEvent::Pointer &event)
 {
     if (event == nullptr) {
         TELEPHONY_LOGE("CallRequestHandler::ProcessEvent parameter error");
         return;
     }
-    auto object = event->GetUniqueObject<int32_t>();
+    auto object = event->GetUniqueObject<CallMediaUpdatePara>();
     if (object == nullptr) {
         TELEPHONY_LOGE("object is nullptr!");
         return;
     }
-    int32_t callId = *object;
     if (callRequestProcessPtr_ == nullptr) {
         TELEPHONY_LOGE("callRequestProcessPtr_ is nullptr");
         return;
     }
-    callRequestProcessPtr_->UpgradeCallRequest(callId);
+    callRequestProcessPtr_->UpdateCallMediaModeRequest(object->callId, object->mode);
 }
 
-void CallRequestHandler::DowngradeCallEvent(const AppExecFwk::InnerEvent::Pointer &event)
+void CallRequestHandler::StartRttEvent(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    if (event == nullptr) {
+        TELEPHONY_LOGE("CallRequestHandler::ProcessEvent parameter error");
+        return;
+    }
+    auto object = event->GetUniqueObject<StartRttPara>();
+    if (object == nullptr) {
+        TELEPHONY_LOGE("object is nullptr!");
+        return;
+    }
+    StartRttPara rttPara = *object;
+    if (callRequestProcessPtr_ == nullptr) {
+        TELEPHONY_LOGE("callRequestProcessPtr_ is nullptr");
+        return;
+    }
+    callRequestProcessPtr_->StartRttRequest(rttPara.callId, rttPara.msg);
+}
+
+void CallRequestHandler::StopRttEvent(const AppExecFwk::InnerEvent::Pointer &event)
 {
     if (event == nullptr) {
         TELEPHONY_LOGE("CallRequestHandler::ProcessEvent parameter error");
@@ -273,7 +295,25 @@ void CallRequestHandler::DowngradeCallEvent(const AppExecFwk::InnerEvent::Pointe
         TELEPHONY_LOGE("callRequestProcessPtr_ is nullptr");
         return;
     }
-    callRequestProcessPtr_->DowngradeCallRequest(callId);
+    callRequestProcessPtr_->StopRttRequest(callId);
+}
+
+void CallRequestHandler::JoinConferenceEvent(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    if (event == nullptr) {
+        TELEPHONY_LOGE("CallRequestHandler::JoinConferenceEvent parameter error");
+        return;
+    }
+    auto object = event->GetUniqueObject<JoinConferencePara>();
+    if (object == nullptr) {
+        TELEPHONY_LOGE("object is nullptr!");
+        return;
+    }
+    if (callRequestProcessPtr_ == nullptr) {
+        TELEPHONY_LOGE("callRequestProcessPtr_ is nullptr");
+        return;
+    }
+    callRequestProcessPtr_->JoinConference(object->callId, object->numberList);
 }
 
 CallRequestHandlerService::CallRequestHandlerService() : eventLoop_(nullptr), handler_(nullptr) {}
@@ -310,11 +350,11 @@ int32_t CallRequestHandlerService::DialCall()
 {
     if (handler_.get() == nullptr) {
         TELEPHONY_LOGE("handler_ is nullptr");
-        return TELEPHONY_ERR_FAIL;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     if (!handler_->SendEvent(HANDLER_DIAL_CALL_REQUEST)) {
         TELEPHONY_LOGE("send dial event failed!");
-        return TELEPHONY_ERR_FAIL;
+        return CALL_ERR_SYSTEM_EVENT_HANDLE_FAILURE;
     }
     return TELEPHONY_SUCCESS;
 }
@@ -323,32 +363,32 @@ int32_t CallRequestHandlerService::AnswerCall(int32_t callId, int32_t videoState
 {
     if (handler_.get() == nullptr) {
         TELEPHONY_LOGE("handler_ is nullptr");
-        return TELEPHONY_ERR_FAIL;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     std::unique_ptr<AnswerCallPara> para = std::make_unique<AnswerCallPara>();
     if (para.get() == nullptr) {
         TELEPHONY_LOGE("make_unique AnswerCallPara failed!");
-        return TELEPHONY_ERR_FAIL;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     para->callId = callId;
     para->videoState = videoState;
     if (!handler_->SendEvent(HANDLER_ANSWER_CALL_REQUEST, std::move(para))) {
         TELEPHONY_LOGE("send accept event failed!");
-        return TELEPHONY_ERR_FAIL;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     return TELEPHONY_SUCCESS;
 }
 
-int32_t CallRequestHandlerService::RejectCall(int32_t callId, bool isSendSms, const std::string &content)
+int32_t CallRequestHandlerService::RejectCall(int32_t callId, bool isSendSms, std::string &content)
 {
     if (handler_.get() == nullptr) {
         TELEPHONY_LOGE("handler_ is nullptr");
-        return TELEPHONY_ERR_FAIL;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     std::unique_ptr<RejectCallPara> para = std::make_unique<RejectCallPara>();
     if (para.get() == nullptr) {
         TELEPHONY_LOGE("make_unique RejectCallPara failed!");
-        return TELEPHONY_ERR_FAIL;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     para->callId = callId;
     para->isSendSms = isSendSms;
@@ -360,7 +400,7 @@ int32_t CallRequestHandlerService::RejectCall(int32_t callId, bool isSendSms, co
     }
     if (!handler_->SendEvent(HANDLER_REJECT_CALL_REQUEST, std::move(para))) {
         TELEPHONY_LOGE("send reject event failed!");
-        return TELEPHONY_ERR_FAIL;
+        return CALL_ERR_SYSTEM_EVENT_HANDLE_FAILURE;
     }
     return TELEPHONY_SUCCESS;
 }
@@ -369,16 +409,16 @@ int32_t CallRequestHandlerService::HangUpCall(int32_t callId)
 {
     if (handler_.get() == nullptr) {
         TELEPHONY_LOGE("handler_ is nullptr");
-        return TELEPHONY_ERR_FAIL;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     std::unique_ptr<int32_t> para = std::make_unique<int32_t>(callId);
     if (para.get() == nullptr) {
         TELEPHONY_LOGE("make_unique callId failed!");
-        return TELEPHONY_ERR_FAIL;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     if (!handler_->SendEvent(HANDLER_HANGUP_CALL_REQUEST, std::move(para))) {
         TELEPHONY_LOGE("send hung up event failed!");
-        return TELEPHONY_ERR_FAIL;
+        return CALL_ERR_SYSTEM_EVENT_HANDLE_FAILURE;
     }
     return TELEPHONY_SUCCESS;
 }
@@ -387,16 +427,16 @@ int32_t CallRequestHandlerService::HoldCall(int32_t callId)
 {
     if (handler_.get() == nullptr) {
         TELEPHONY_LOGE("handler_ is nullptr");
-        return TELEPHONY_ERR_FAIL;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     std::unique_ptr<int32_t> para = std::make_unique<int32_t>(callId);
     if (para.get() == nullptr) {
         TELEPHONY_LOGE("make_unique callId failed!");
-        return TELEPHONY_ERR_FAIL;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     if (!handler_->SendEvent(HANDLER_HOLD_CALL_REQUEST, std::move(para))) {
         TELEPHONY_LOGE("send hold event failed!");
-        return TELEPHONY_ERR_FAIL;
+        return CALL_ERR_SYSTEM_EVENT_HANDLE_FAILURE;
     }
     return TELEPHONY_SUCCESS;
 }
@@ -405,16 +445,16 @@ int32_t CallRequestHandlerService::UnHoldCall(int32_t callId)
 {
     if (handler_.get() == nullptr) {
         TELEPHONY_LOGE("handler_ is nullptr");
-        return TELEPHONY_ERR_FAIL;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     std::unique_ptr<int32_t> para = std::make_unique<int32_t>(callId);
     if (para.get() == nullptr) {
         TELEPHONY_LOGE("make_unique callId failed!");
-        return TELEPHONY_ERR_FAIL;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     if (!handler_->SendEvent(HANDLER_UNHOLD_CALL_REQUEST, std::move(para))) {
         TELEPHONY_LOGE("send unHold event failed!");
-        return TELEPHONY_ERR_FAIL;
+        return CALL_ERR_SYSTEM_EVENT_HANDLE_FAILURE;
     }
     return TELEPHONY_SUCCESS;
 }
@@ -423,16 +463,74 @@ int32_t CallRequestHandlerService::SwitchCall(int32_t callId)
 {
     if (handler_.get() == nullptr) {
         TELEPHONY_LOGE("handler_ is nullptr");
-        return TELEPHONY_ERR_FAIL;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     std::unique_ptr<int32_t> para = std::make_unique<int32_t>(callId);
     if (para.get() == nullptr) {
         TELEPHONY_LOGE("make_unique callId failed!");
-        return TELEPHONY_ERR_FAIL;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     if (!handler_->SendEvent(HANDLER_SWAP_CALL_REQUEST, std::move(para))) {
         TELEPHONY_LOGE("send swap event failed!");
-        return TELEPHONY_ERR_FAIL;
+        return CALL_ERR_SYSTEM_EVENT_HANDLE_FAILURE;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallRequestHandlerService::StartRtt(int32_t callId, std::u16string &msg)
+{
+    if (handler_.get() == nullptr) {
+        TELEPHONY_LOGE("handler_ is nullptr");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    std::unique_ptr<StartRttPara> para = std::make_unique<StartRttPara>();
+    if (para.get() == nullptr) {
+        TELEPHONY_LOGE("make_unique StartRttPara failed!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    para->callId = callId;
+    para->msg = msg;
+    if (!handler_->SendEvent(HANDLER_STARTRTT_REQUEST, std::move(para))) {
+        TELEPHONY_LOGE("send StartRtt event failed!");
+        return CALL_ERR_SYSTEM_EVENT_HANDLE_FAILURE;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallRequestHandlerService::StopRtt(int32_t callId)
+{
+    if (handler_.get() == nullptr) {
+        TELEPHONY_LOGE("handler_ is nullptr");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    std::unique_ptr<int32_t> para = std::make_unique<int32_t>(callId);
+    if (para.get() == nullptr) {
+        TELEPHONY_LOGE("make_unique callId failed!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    if (!handler_->SendEvent(HANDLER_STOPRTT_REQUEST, std::move(para))) {
+        TELEPHONY_LOGE("send StopRtt event failed!");
+        return CALL_ERR_SYSTEM_EVENT_HANDLE_FAILURE;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallRequestHandlerService::JoinConference(int32_t callId, std::vector<std::string> &numberList)
+{
+    if (handler_.get() == nullptr) {
+        TELEPHONY_LOGE("handler_ is nullptr");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    std::unique_ptr<JoinConferencePara> para = std::make_unique<JoinConferencePara>();
+    if (para.get() == nullptr) {
+        TELEPHONY_LOGE("make_unique JoinConferencePara failed!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    para->callId = callId;
+    para->numberList = numberList;
+    if (!handler_->SendEvent(HANDLER_INVITE_TO_CONFERENCE, std::move(para))) {
+        TELEPHONY_LOGE("send JoinConference event failed!");
+        return CALL_ERR_SYSTEM_EVENT_HANDLE_FAILURE;
     }
     return TELEPHONY_SUCCESS;
 }
@@ -441,16 +539,16 @@ int32_t CallRequestHandlerService::CombineConference(int32_t mainCallId)
 {
     if (handler_.get() == nullptr) {
         TELEPHONY_LOGE("handler_ is nullptr");
-        return TELEPHONY_ERR_FAIL;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     std::unique_ptr<int32_t> para = std::make_unique<int32_t>(mainCallId);
     if (para.get() == nullptr) {
         TELEPHONY_LOGE("make_unique mainCallId failed!");
-        return TELEPHONY_ERR_FAIL;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     if (!handler_->SendEvent(HANDLER_COMBINE_CONFERENCE_REQUEST, std::move(para))) {
         TELEPHONY_LOGE("send CombineConference event failed!");
-        return TELEPHONY_ERR_FAIL;
+        return CALL_ERR_SYSTEM_EVENT_HANDLE_FAILURE;
     }
     return TELEPHONY_SUCCESS;
 }
@@ -459,52 +557,36 @@ int32_t CallRequestHandlerService::SeparateConference(int32_t callId)
 {
     if (handler_.get() == nullptr) {
         TELEPHONY_LOGE("handler_ is nullptr");
-        return TELEPHONY_ERR_FAIL;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     std::unique_ptr<int32_t> para = std::make_unique<int32_t>(callId);
     if (para.get() == nullptr) {
         TELEPHONY_LOGE("make_unique callId failed!");
-        return TELEPHONY_ERR_FAIL;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     if (!handler_->SendEvent(HANDLER_SEPARATE_CONFERENCE_REQUEST, std::move(para))) {
         TELEPHONY_LOGE("send SeparateConference event failed!");
-        return TELEPHONY_ERR_FAIL;
+        return CALL_ERR_SYSTEM_EVENT_HANDLE_FAILURE;
     }
     return TELEPHONY_SUCCESS;
 }
 
-int32_t CallRequestHandlerService::UpgradeCall(int32_t callId)
+int32_t CallRequestHandlerService::UpdateCallMediaMode(int32_t callId, CallMediaMode mode)
 {
     if (handler_.get() == nullptr) {
         TELEPHONY_LOGE("handler_ is nullptr");
-        return TELEPHONY_ERR_FAIL;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    std::unique_ptr<int32_t> para = std::make_unique<int32_t>(callId);
+    std::unique_ptr<CallMediaUpdatePara> para = std::make_unique<CallMediaUpdatePara>();
     if (para.get() == nullptr) {
-        TELEPHONY_LOGE("make_unique callId failed!");
-        return TELEPHONY_ERR_FAIL;
+        TELEPHONY_LOGE("make_unique CallMediaUpdatePara failed!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    if (!handler_->SendEvent(HANDLER_UPGRADE_CALL_REQUEST, std::move(para))) {
-        TELEPHONY_LOGE("send UpgradeCall event failed!");
-        return TELEPHONY_ERR_FAIL;
-    }
-    return TELEPHONY_SUCCESS;
-}
-
-int32_t CallRequestHandlerService::DowngradeCall(int32_t callId)
-{
-    if (handler_.get() == nullptr) {
-        TELEPHONY_LOGE("handler_ is nullptr");
-        return TELEPHONY_ERR_FAIL;
-    }
-    std::unique_ptr<int32_t> para = std::make_unique<int32_t>(callId);
-    if (para.get() == nullptr) {
-        TELEPHONY_LOGE("make_unique callId failed!");
-        return TELEPHONY_ERR_FAIL;
-    }
-    if (!handler_->SendEvent(HANDLER_DOWNGRADE_CALL_REQUEST, std::move(para))) {
-        TELEPHONY_LOGE("send DowngradeCall event failed!");
-        return TELEPHONY_ERR_FAIL;
+    para->callId = callId;
+    para->mode = mode;
+    if (!handler_->SendEvent(HANDLER_UPDATE_CALL_MEDIA_MODE_REQUEST, std::move(para))) {
+        TELEPHONY_LOGE("send UpdateCallMediaMode event failed!");
+        return CALL_ERR_SYSTEM_EVENT_HANDLE_FAILURE;
     }
     return TELEPHONY_SUCCESS;
 }

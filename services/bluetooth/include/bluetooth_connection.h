@@ -18,9 +18,10 @@
 
 #include <set>
 #include <string>
+#include <memory>
 
 #ifdef ABILITY_BLUETOOTH_SUPPORT
-#include "bluetooth_hfp_client.h"
+#include "bluetooth_hfp_ag.h"
 #endif
 
 namespace OHOS {
@@ -44,8 +45,8 @@ public:
     static BtScoState GetBtScoState();
     static void SetBtScoState(BtScoState state);
 #ifdef ABILITY_BLUETOOTH_SUPPORT
-    virtual void OnScoStateChanged(const BluetoothRemoteDevice &device, int state);
-    virtual void OnConnectionStateChanged(const BluetoothRemoteDevice &device, int state);
+    void OnScoStateChanged(const Bluetooth::BluetoothRemoteDevice &device, int32_t state) override;
+    void OnConnectionStateChanged(const Bluetooth::BluetoothRemoteDevice &device, int32_t state) override;
 #endif
 
 private:
@@ -53,8 +54,10 @@ private:
     static BtScoState btScoState_;
     std::string connectedScoAddr_;
     std::set<std::string> connectedBtDevices_;
-    bool ConnectBtSco(const std::string &macAddress);
-    bool DisconnectBtSco(const std::string &macAddress);
+#ifdef ABILITY_BLUETOOTH_SUPPORT
+    bool ConnectBtSco(const Bluetooth::BluetoothRemoteDevice &device);
+    bool DisconnectBtSco(const Bluetooth::BluetoothRemoteDevice &device);
+#endif
 };
 } // namespace Telephony
 } // namespace OHOS

@@ -22,8 +22,7 @@ namespace OHOS {
 namespace Telephony {
 std::list<sptr<CallBase>> CallObjectManager::callObjectPtrList_;
 std::mutex CallObjectManager::listMutex_;
-int32_t CallObjectManager::callId_ = CALL_START_ID;
-uint32_t CallObjectManager::maxCallCount_ = MAX_CALL_COUNT;
+int32_t CallObjectManager::callId_ = kCallStartId;
 
 CallObjectManager::CallObjectManager()
 {
@@ -42,14 +41,14 @@ CallObjectManager::~CallObjectManager()
 int32_t CallObjectManager::AddOneCallObject(sptr<CallBase> &call)
 {
     if (call == nullptr) {
-        return CALL_ERR_CALL_OBJECT_IS_NULL;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     std::lock_guard<std::mutex> lock(listMutex_);
     std::list<sptr<CallBase>>::iterator it = callObjectPtrList_.begin();
     for (; it != callObjectPtrList_.end(); it++) {
         if ((*it)->GetCallID() == call->GetCallID()) {
             TELEPHONY_LOGE("this call has existed yet!");
-            return TELEPHONY_ERR_FAIL;
+            return CALL_ERR_PHONE_CALL_ALREADY_EXISTS;
         }
     }
     callObjectPtrList_.emplace_back(call);
@@ -136,10 +135,6 @@ bool CallObjectManager::IsNewCallAllowedCreate()
 {
     bool ret = true;
     std::lock_guard<std::mutex> lock(listMutex_);
-    if (callObjectPtrList_.size() > maxCallCount_) {
-        TELEPHONY_LOGE("The number of calls exceeds the limit");
-        return false;
-    }
     std::list<sptr<CallBase>>::iterator it;
     for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); it++) {
         if ((*it)->GetCallRunningState() == CallRunningState::CALL_RUNNING_STATE_CREATE ||
@@ -178,7 +173,7 @@ bool CallObjectManager::HasRingingMaximum()
             ringingCount++;
         }
     }
-    if (ringingCount >= MAX_RINGING_CALL_NUMBER_LEN) {
+    if (ringingCount >= kMaxRingingCallNumberLen) {
         return true;
     }
     return false;
@@ -195,7 +190,7 @@ bool CallObjectManager::HasDialingMaximum()
             dialingCount++;
         }
     }
-    if (dialingCount >= MAX_DIALING_CALL_NUMBER_LEN) {
+    if (dialingCount >= kMaxDialingCallNumberLen) {
         return true;
     }
     return false;
@@ -227,11 +222,10 @@ bool CallObjectManager::IsCallExist(int32_t callId)
     std::list<sptr<CallBase>>::iterator it = callObjectPtrList_.begin();
     for (; it != callObjectPtrList_.end(); it++) {
         if ((*it)->GetCallID() == callId) {
-            TELEPHONY_LOGI("the call is exist.");
+            TELEPHONY_LOGW("the call is exist.");
             return true;
         }
     }
-    TELEPHONY_LOGI("the call is does not exist.");
     return false;
 }
 
@@ -244,7 +238,6 @@ bool CallObjectManager::IsCallExist(std::string &phoneNumber)
     std::list<sptr<CallBase>>::iterator it = callObjectPtrList_.begin();
     for (; it != callObjectPtrList_.end(); it++) {
         if ((*it)->GetAccountNumber() == phoneNumber) {
-            TELEPHONY_LOGI("the call is exist.");
             return true;
         }
     }
@@ -279,7 +272,7 @@ bool CallObjectManager::HasRingingCall()
 
 TelCallState CallObjectManager::GetCallState(int32_t callId)
 {
-    TelCallState retState = CALL_STATUS_IDLE;
+    TelCallState retState = TelCallState::CALL_STATUS_IDLE;
     std::lock_guard<std::mutex> lock(listMutex_);
     std::list<sptr<CallBase>>::iterator it = CallObjectManager::callObjectPtrList_.begin();
     for (; it != callObjectPtrList_.end(); it++) {
@@ -309,11 +302,23 @@ bool CallObjectManager::IsCallExist(CallType callType, TelCallState callState)
     std::list<sptr<CallBase>>::iterator it;
     for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); it++) {
         if ((*it)->GetCallType() == callType && (*it)->GetTelCallState() == callState) {
-            TELEPHONY_LOGI("the call is exist.");
             return true;
         }
     }
-    TELEPHONY_LOGE("the call is does not exist.");
+    TELEPHONY_LOGI("the call is does not exist.");
+    return false;
+}
+
+bool CallObjectManager::IsCallExist(TelCallState callState)
+{
+    std::lock_guard<std::mutex> lock(listMutex_);
+    std::list<sptr<CallBase>>::iterator it;
+    for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); it++) {
+        if ((*it)->GetTelCallState() == callState) {
+            return true;
+        }
+    }
+    TELEPHONY_LOGI("the call is does not exist.");
     return false;
 }
 } // namespace Telephony

@@ -27,6 +27,7 @@
 #include "call_state_report_proxy.h"
 #include "call_manager_service_stub.h"
 #include "call_control_manager.h"
+#include "bluetooth_call_manager.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -59,29 +60,39 @@ public:
 
     /**
      * Get bindTime_
-     * @return int64_t
+     * @return string
      */
     std::string GetBindTime();
 
     /**
-     * register callback
+     * Get spendTime_
+     * @return string
+     */
+    std::string GetStartServiceSpent();
+
+    /**
+     * RegisterCallBack
      *
+     * @brief Register callback
      * @param callback[in], callback function pointer
-     * @return Returns TELEPHONY_SUCCESS on success, others on failure.
+     * @param bundleName[in], bundle name
+     * @return Returns 0 on success, others on failure.
      */
     int32_t RegisterCallBack(const sptr<ICallAbilityCallback> &callback, std::u16string &bundleName) override;
 
     /**
-     * unregister callback
+     * UnRegisterCallBack
      *
+     * @brief unregister callback
      * @param bundleName[in], bundle name
-     * @return Returns TELEPHONY_SUCCESS on success, others on failure.
+     * @return Returns 0 on success, others on failure.
      */
     int32_t UnRegisterCallBack(std::u16string &bundleName) override;
 
     /**
-     * Call diale interface
+     * DialCall
      *
+     * @brief Make a phone call
      * @param number[in], dial param.
      * @param extras[in], extras date.
      * @return Returns callId when the value is greater than zero, others on failure.
@@ -89,117 +100,132 @@ public:
     int32_t DialCall(std::u16string number, AppExecFwk::PacMap &extras) override;
 
     /**
-     * Answer call
+     * AnswerCall
      *
+     * @brief Answer a phone call
      * @param callId[in], call id
      * @param videoState[in], 0: audio, 1: video
-     * @return Returns TELEPHONY_SUCCESS on success, others on failure.
+     * @return Returns 0 on success, others on failure.
      */
     int32_t AnswerCall(int32_t callId, int32_t videoState) override;
 
     /**
-     * Reject call
+     * RejectCall
      *
+     * @brief Reject a phone call
      * @param callId[in], call id
      * @param rejectWithMessage[in], Whether to enter the reason for rejection,true:yes false:no
      * @param textMessage[in], The reason you reject the call
-     * @return Returns TELEPHONY_SUCCESS on success, others on failure.
+     * @return Returns 0 on success, others on failure.
      */
     int32_t RejectCall(int32_t callId, bool rejectWithMessage, std::u16string textMessage) override;
 
     /**
-     * Disconnect call
+     * HangUpCall
      *
+     * @brief Hang up the phone
      * @param callId[in], call id
-     * @return Returns TELEPHONY_SUCCESS on success, others on failure.
+     * @return Returns 0 on success, others on failure.
      */
     int32_t HangUpCall(int32_t callId) override;
 
     /**
-     * app get call state
+     * GetCallState
      *
+     * @brief Obtain the call status of the device
      * @return Returns call state.
      */
     int32_t GetCallState() override;
 
     /**
-     * Hold call
+     * HoldCall
      *
+     * @brief Park a phone call
      * @param callId[in], call id
-     * @return Returns TELEPHONY_SUCCESS on success, others on failure.
+     * @return Returns 0 on success, others on failure.
      */
     int32_t HoldCall(int32_t callId) override;
 
     /**
-     * UnHold call
+     * UnHoldCall
      *
+     * @brief Activate a phone call
      * @param callId[in], call id
-     * @return Returns TELEPHONY_SUCCESS on success, others on failure.
+     * @return Returns 0 on success, others on failure.
      */
     int32_t UnHoldCall(int32_t callId) override;
 
     /**
-     * Switch call
+     * SwitchCall
      *
+     * @brief Switch the phone
      * @param callId[in], call id
-     * @return Returns TELEPHONY_SUCCESS on success, others on failure.
+     * @return Returns 0 on success, others on failure.
      */
     int32_t SwitchCall(int32_t callId) override;
 
     /**
-     * Is there Call
+     * HasCall
      *
-     * @return Returns ture on has call, others on there is no call.
+     * @brief Is there Call
+     * @return Returns true on has call, others on there is no call.
      */
     bool HasCall() override;
 
     /**
-     * Can I initiate a call
+     * IsNewCallAllowed
      *
+     * @brief Can I initiate a call
      * @return Returns ture on can, others on there is not can.
      */
     bool IsNewCallAllowed() override;
 
     /**
-     * Set mute state
+     * SetMuted
      *
+     * @brief Mute the Microphone
      * @param isMute[in], mute state
-     * @return Returns TELEPHONY_SUCCESS on success, others on failure.
+     * @return Returns 0 on success, others on failure.
      */
     int32_t SetMuted(bool isMute) override;
 
     /**
-     * Mute Ringer
+     * MuteRinger
      *
-     * @return Returns TELEPHONY_SUCCESS on success, others on failure.
+     * @brief Call mute
+     * @return Returns 0 on success, others on failure.
      */
     int32_t MuteRinger() override;
 
     /**
-     * Set mute
+     * SetAudioDevice
      *
+     * @brief Setting the Audio Channel
      * @param deviceType[in], audio device type
-     * @return Returns TELEPHONY_SUCCESS on success, others on failure.
+     * @return Returns 0 on success, others on failure.
      */
     int32_t SetAudioDevice(AudioDevice deviceType) override;
 
     /**
-     * Get ringing state
+     * IsRinging
      *
-     * @return Returns ringing state.
+     * @brief Whether the ringing
+     * @return Returns ture on ringing, false on there is no ringing.
      */
     bool IsRinging() override;
 
     /**
-     * Is there an emergency call
+     * IsInEmergencyCall
      *
-     * @return Returns ture on Emergency call, false on No emergency call.
+     * @brief Is there an emergency call
+     * @return Returns ture on emergency call, false on no emergency call.
      */
     bool IsInEmergencyCall() override;
 
     /**
-     * Play dtmf tone dtmf
+     * StartDtmf
      *
+     * @brief Enable and send DTMF
      * @param callId[in], call id
      * @param str[in], Characters sent
      * @return Returns 0 on success, others on failure.
@@ -207,160 +233,361 @@ public:
     int32_t StartDtmf(int32_t callId, char str) override;
 
     /**
-     * Send dtmf
+     * StopDtmf
      *
-     * @param callId[in], call id
-     * @param str[in], Characters sent
-     * @return Returns 0 on success, others on failure.
-     */
-    int32_t SendDtmf(int32_t callId, char str) override;
-
-    /**
-     * Stop dtmf tone
-     *
+     * @brief Stop the DTMF
      * @param callId[in], call id
      * @return Returns 0 on success, others on failure.
      */
     int32_t StopDtmf(int32_t callId) override;
 
     /**
-     * Send dtmf string
+     * GetCallWaiting
      *
-     * @param callId[in], call id
-     * @param str[in], String sent
-     * @param on  DTMF pulse width, the unit is milliseconds, default is 0.
-     * @param off DTMF pulse interval, the unit is milliseconds, default is 0.
+     * @brief Gets whether the call waiting service of the current account is enabled
+     * @param slotId[in], The slot id
      * @return Returns 0 on success, others on failure.
-     */
-    int32_t SendBurstDtmf(int32_t callId, std::u16string str, int32_t on, int32_t off) override;
-
-    /**
-     * Get Call Waiting
-     *
-     * @param slotId
-     * @return Returns kTelephonyNoErr on success, others on failure.
      */
     int32_t GetCallWaiting(int32_t slotId) override;
 
     /**
-     * Set Call Waiting
+     * SetCallWaiting
      *
-     * @param slotId
-     * @param activate
-     * @return Returns kTelephonyNoErr on success, others on failure.
+     * @brief Set the call waiting function for the current account
+     * @param slotId[in], The slot id
+     * @param activate[in], Activation of switch
+     * @return Returns 0 on success, others on failure.
      */
     int32_t SetCallWaiting(int32_t slotId, bool activate) override;
 
     /**
-     * Get Call Restriction
+     * GetCallRestriction
      *
-     * @param slotId
-     * @param type
-     * @return Returns kTelephonyNoErr on success, others on failure.
+     * @brief Gets the call restriction information of the specified account
+     * @param slotId[in], The slot id
+     * @param type[in], Call Restriction type
+     * @return Returns 0 on success, others on failure.
      */
     int32_t GetCallRestriction(int32_t slotId, CallRestrictionType type) override;
 
     /**
-     * Set Call Restriction
+     * SetCallRestriction
      *
-     * @param slotId
-     * @param info
-     * @return Returns kTelephonyNoErr on success, others on failure.
+     * @brief Set the call restriction function for the current account
+     * @param slotId[in], The slot id
+     * @param info[in], Call restriction information
+     * @return Returns 0 on success, others on failure.
      */
     int32_t SetCallRestriction(int32_t slotId, CallRestrictionInfo &info) override;
 
     /**
-     * Get Call Transfer
+     * GetCallTransferInfo
      *
-     * @param slotId
-     * @param type
-     * @return Returns kTelephonyNoErr on success, others on failure.
+     * @brief Gets the call transfer information of the current account
+     * @param slotId[in], The slot id
+     * @param type[in], Call Transfer Type
+     * @return Returns 0 on success, others on failure.
      */
     int32_t GetCallTransferInfo(int32_t slotId, CallTransferType type) override;
 
     /**
-     * Set Call Transfer
+     * SetCallTransferInfo
      *
-     * @param slotId
-     * @param info
-     * @return Returns kTelephonyNoErr on success, others on failure.
+     * @brief Set the call transfer function for the current account
+     * @param slotId[in], The slot id
+     * @param info[in], Call Transfer Information
+     * @return Returns 0 on success, others on failure.
      */
     int32_t SetCallTransferInfo(int32_t slotId, CallTransferInfo &info) override;
 
     /**
-     * Combine Conference
+     * CombineConference
      *
-     * @param mainCallId
-     * @return Returns TELEPHONY_SUCCESS on success, others on failure.
+     * @brief Merge calls to form a conference
+     * @param callId[in], call id
+     * @return Returns 0 on success, others on failure.
      */
     int32_t CombineConference(int32_t mainCallId) override;
 
     /**
-     * split from Conference
-     * @param callId
-     * @return Returns TELEPHONY_SUCCESS on success, others on failure.
+     * SeparateConference
+     *
+     * @brief Separates a specified call from a conference call
+     * @param callId[in], call id
+     * @return Returns 0 on success, others on failure.
      */
     int32_t SeparateConference(int32_t callId) override;
 
     /**
-     * open or close Camera
+     * ControlCamera
      *
-     * @param cameraId
-     * @param callingPackage
-     * @return Returns TELEPHONY_SUCCESS on success, others on failure.
+     * @brief Open or close camera
+     * @param cameraId[in], The camera id
+     * @param callingPackage[in], Package name of the application
+     * @return Returns 0 on success, others on failure.
      */
     int32_t ControlCamera(std::u16string cameraId, std::u16string callingPackage) override;
 
     /**
-     * Set Camera Preview Window
+     * SetPreviewWindow
      *
-     * @param window
-     * @return Returns TELEPHONY_SUCCESS on success, others on failure.
+     * @brief Set the location and size of the preview window for videos captured by the local camera.
+     * @param window[in], Window information
+     * @return Returns 0 on success, others on failure.
      */
     int32_t SetPreviewWindow(VideoWindow &window) override;
 
     /**
-     * set remote display video window
+     * SetDisplayWindow
      *
-     * @param window
-     * @return Returns TELEPHONY_SUCCESS on success, others on failure.
+     * @brief Sets the location and size of the remote video window.
+     * @param window[in], Window information
+     * @return Returns 0 on success, others on failure.
      */
     int32_t SetDisplayWindow(VideoWindow &window) override;
 
     /**
-     * Set Camera Zoom
+     * SetCameraZoom
      *
-     * @param zoomRatio
-     * @return Returns TELEPHONY_SUCCESS on success, others on failure.
+     * @brief Sets the local camera zoom scale
+     * @param zoomRatio[in], Camera scale
+     * @return Returns 0 on success, others on failure.
      */
     int32_t SetCameraZoom(float zoomRatio) override;
 
     /**
-     * Set Pause Picture
+     * SetPausePicture
      *
-     * @param path
-     * @return Returns TELEPHONY_SUCCESS on success, others on failure.
+     * @brief APP sets the screen of the remote video freeze immediately.
+     * If the APP does not call this interface when making a video call,
+     * the last frame before the remote video freeze is displayed by default
+     * @param path[in], Local Picture address
+     * @return Returns 0 on success, others on failure.
      */
     int32_t SetPausePicture(std::u16string path) override;
 
     /**
-     * Set Device Direction
+     * SetDeviceDirection
      *
-     * @param rotation
-     * @return Returns TELEPHONY_SUCCESS on success, others on failure.
+     * @brief Set the rotation Angle of the local device. The default value is 0
+     * @param rotation[in], Rotation Angle
+     * @return Returns 0 on success, others on failure.
      */
     int32_t SetDeviceDirection(int32_t rotation) override;
 
+    /**
+     * IsEmergencyPhoneNumber
+     *
+     * @brief Is it an emergency call
+     * @param number[in], Phone number to be formatted
+     * @param slotId[in], The slot id
+     * @param errorCode[out] Failed to provision the error code
+     * @return Returns 0 on ture, others on false.
+     */
     bool IsEmergencyPhoneNumber(std::u16string &number, int32_t slotId, int32_t &errorCode) override;
+
+    /**
+     * FormatPhoneNumber
+     *
+     * @brief Formatting a phone number
+     * @param number[in], Phone number to be formatted
+     * @param countryCode[in], Country code of the phone number
+     * @param formatNumber[out] Formatting a phone number
+     * @return Returns 0 on success, others on failure.
+     */
     int32_t FormatPhoneNumber(
         std::u16string &number, std::u16string &countryCode, std::u16string &formatNumber) override;
+
+    /**
+     * FormatPhoneNumberToE164
+     *
+     * @brief Formatting a phone number
+     * @param number[in]. Phone number to be formatted
+     * @param countryCode[in], Country code of the phone number
+     * @param formatNumber[out] Formatting a phone number
+     * @return Returns 0 on success, others on failure.
+     */
     int32_t FormatPhoneNumberToE164(
         std::u16string &number, std::u16string &countryCode, std::u16string &formatNumber) override;
+
+    /**
+     * GetMainCallId
+     *
+     * @brief Obtain the ID of the primary call in a conference
+     * @param callId[in], Id of a call in a conference
+     * @return Returns main call id, -1 on not call id.
+     */
     int32_t GetMainCallId(int32_t callId) override;
+
+    /**
+     * GetSubCallIdList
+     *
+     * @brief Obtain the list of neutron call ids
+     * @param callId[in], Id of a call in a conference
+     * @return Returns call id list.
+     */
     std::vector<std::u16string> GetSubCallIdList(int32_t callId) override;
+
+    /**
+     * GetCallIdListForConference
+     *
+     * @brief Obtain the callId list of all calls in a conference
+     * @param callId[in], Id of a call in a conference
+     * @return Returns call id list.
+     */
     std::vector<std::u16string> GetCallIdListForConference(int32_t callId) override;
-    int32_t CancelMissedCallsNotification(int32_t id) override;
+
+    /**
+     * SetCallPreferenceMode
+     *
+     * @brief Setting the Call Type
+     * @param slotId[in], The slot id
+     * @param mode[in], Preference Mode
+     * @return Returns 0 on success, others on failure.
+     */
     int32_t SetCallPreferenceMode(int32_t slotId, int32_t mode) override;
+
+    /**
+     * GetImsConfig
+     *
+     * @brief Obtain the IMS service configuration
+     * @param slotId[in], The slot id
+     * @param item[in]
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t GetImsConfig(int32_t slotId, ImsConfigItem item) override;
+
+    /**
+     * SetImsConfig
+     *
+     * @brief Example Set the IMS service configuration
+     * @param slotId[in], The slot id
+     * @param item[in]
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t SetImsConfig(int32_t slotId, ImsConfigItem item, std::u16string &value) override;
+
+    /**
+     * GetImsFeatureValue
+     *
+     * @brief Gets the value of the IMS function item of the specified network type
+     * @param slotId[in], The slot id
+     * @param info[in], FeatureType
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t GetImsFeatureValue(int32_t slotId, FeatureType type) override;
+
+    /**
+     * SetImsFeatureValue
+     *
+     * @brief Set the value of the IMS function item of the specified network type
+     * @param slotId[in], The slot id
+     * @param info[in], FeatureType
+     * @param value[in]
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t SetImsFeatureValue(int32_t slotId, FeatureType type, int32_t value) override;
+
+    /**
+     * UpdateCallMediaMode
+     *
+     * @brief Setting the Call Mode
+     * @param callId[in], The call id
+     * @param mode[in], Calling patterns
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t UpdateCallMediaMode(int32_t callId, CallMediaMode mode) override;
+
+    /**
+     * EnableVoLte
+     *
+     * @brief Start VoLte
+     * @param slotId[in], The slot id
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t EnableVoLte(int32_t slotId) override;
+
+    /**
+     * DisableVoLte
+     *
+     * @brief Stop VoLte
+     * @param slotId[in], The slot id
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t DisableVoLte(int32_t slotId) override;
+
+    /**
+     * IsVoLteEnabled
+     *
+     * @brief Whether to enable VoLte
+     * @param slotId[in], The slot id
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t IsVoLteEnabled(int32_t slotId) override;
+
+    /**
+     * EnableLteEnhanceMode
+     *
+     * @brief Setting 4G Lte Mode
+     * @param slotId[in], The slot id
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t EnableLteEnhanceMode(int32_t slotId) override;
+
+    /**
+     * DisableLteEnhanceMode
+     *
+     * @brief Setting 4G Lte Mode
+     * @param slotId[in], The slot id
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t DisableLteEnhanceMode(int32_t slotId) override;
+
+    /**
+     * GetLteEnhanceMode
+     *
+     * @brief Obtaining 4G Lte mode
+     * @param slotId[in], The slot id
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t IsLteEnhanceModeEnabled(int32_t slotId) override;
+
+    /**
+     * StartRtt
+     *
+     * @brief Enable and send RTT information
+     * @param callId[in], The call id
+     * @param msg[in], RTT information
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t StartRtt(int32_t callId, std::u16string &msg) override;
+
+    /**
+     * StopRtt
+     *
+     * @brief Close the RTT
+     * @param callId[in], The call id
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t StopRtt(int32_t callId) override;
+
+    /**
+     * JoinConference
+     *
+     * @brief Bring someone into a meeting
+     * @param callId[in], The call id
+     * @param numberList[in], List of calls to join the conference
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t JoinConference(int32_t callId, std::vector<std::u16string> &numberList) override;
+    /**
+     * ReportOttCallDetailsInfo
+     *
+     * @brief report ott call details info
+     * @param ottVec[in], ott call status detail info list
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t ReportOttCallDetailsInfo(std::vector<OttCallDetailsInfo> &ottVec) override;
 
 private:
     enum ServiceRunningState {
@@ -369,11 +596,14 @@ private:
     };
 
     ServiceRunningState state_ {ServiceRunningState::STATE_STOPPED};
+
     std::shared_ptr<CallControlManager> callControlManagerPtr_;
+    std::shared_ptr<BluetoothCallManager> bluetoothCallManagerPtr_;
     std::mutex lock_;
     const int32_t startTime_ = 1900;
     const int32_t extraMonth_ = 1;
     int64_t bindTime_ = 0L;
+    int32_t spendTime_ = 0;
 };
 } // namespace Telephony
 } // namespace OHOS

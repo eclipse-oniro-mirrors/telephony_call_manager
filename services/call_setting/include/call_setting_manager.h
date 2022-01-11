@@ -22,6 +22,7 @@
 #include "pac_map.h"
 
 #include "cellular_call_types.h"
+#include "cellular_call_connection.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -29,6 +30,7 @@ class CallSettingManager {
 public:
     CallSettingManager();
     ~CallSettingManager();
+
     int32_t GetCallWaiting(int32_t slotId);
     int32_t SetCallWaiting(int32_t slotId, bool activate);
     int32_t GetCallRestriction(int32_t slotId, CallRestrictionType type);
@@ -36,6 +38,15 @@ public:
     int32_t GetCallTransferInfo(int32_t slotId, CallTransferType type);
     int32_t SetCallTransferInfo(int32_t slotId, CallTransferInfo &info);
     int32_t SetCallPreferenceMode(int32_t slotId, int32_t mode);
+    int32_t GetImsConfig(int32_t slotId, ImsConfigItem item);
+    int32_t SetImsConfig(int32_t slotId, ImsConfigItem item, std::u16string &value);
+    int32_t GetImsFeatureValue(int32_t slotId, FeatureType type);
+    int32_t SetImsFeatureValue(int32_t slotId, FeatureType type, int32_t value);
+    int32_t EnableVoLte(int32_t slotId);
+    int32_t DisableVoLte(int32_t slotId);
+    int32_t IsVoLteEnabled(int32_t slotId);
+    int32_t SetLteEnhanceMode(int32_t slotId, bool value);
+    int32_t GetLteEnhanceMode(int32_t slotId);
 
 private:
     int32_t CallWaitingPolicy(int32_t slotId);
@@ -43,6 +54,9 @@ private:
     int32_t SetCallRestrictionPolicy(int32_t slotId, CallRestrictionInfo &info);
     int32_t GetCallTransferInfoPolicy(int32_t slotId, CallTransferType type);
     int32_t SetCallTransferInfoPolicy(int32_t slotId, CallTransferInfo &info);
+
+private:
+    std::shared_ptr<CellularCallConnection> cellularCallConnectionPtr_;
 };
 } // namespace Telephony
 } // namespace OHOS

@@ -18,8 +18,6 @@ config("call_manager_js_config") {
   include_dirs = [
     "//third_party/node/src",
     "$SUBSYSTEM_DIR/call_manager/frameworks/js/napi/include",
-    "$SUBSYSTEM_DIR/core_service/common/call_manager",
-    "$SUBSYSTEM_DIR/core_service/common/core",
     "//utils/native/base/include",
   ]
 }
@@ -29,12 +27,12 @@ ohos_shared_library("call") {
     "napi/src/napi_call_ability_callback.cpp",
     "napi/src/napi_call_manager.cpp",
     "napi/src/napi_call_manager_callback.cpp",
+    "napi/src/napi_call_manager_utils.cpp",
   ]
 
   public_configs = [ ":call_manager_js_config" ]
 
   deps = [
-    "$SUBSYSTEM_DIR/call_manager/frameworks/native:tel_call_manager_api",
     "$SUBSYSTEM_DIR/core_service/utils:libtelephony_common",
     "//foundation/aafwk/standard/frameworks/kits/ability/native:abilitykit_native",
     "//foundation/ace/napi:ace_napi",
@@ -48,6 +46,7 @@ ohos_shared_library("call") {
     "appexecfwk_standard:appexecfwk_base",
     "appexecfwk_standard:appexecfwk_core",
     "appexecfwk_standard:libeventhandler",
+    "call_manager:tel_call_manager_api",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
     "samgr_standard:samgr_proxy",

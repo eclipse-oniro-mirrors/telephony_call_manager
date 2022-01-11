@@ -17,7 +17,8 @@
 
 #include "telephony_log_wrapper.h"
 
-#include "audio_control_manager.h"
+#include "call_state_processor.h"
+#include "audio_scene_processor.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -27,21 +28,21 @@ bool HoldingState::ProcessEvent(int32_t event)
     std::lock_guard<std::mutex> lock(mutex_);
     switch (event) {
         case AudioEvent::NEW_ACTIVE_CS_CALL:
-            if (DelayedSingleton<AudioControlManager>::GetInstance()->IsOnlyOneActiveCall()) {
-                result = DelayedSingleton<CallStateProcessor>::GetInstance()->ProcessEvent(
+            if (DelayedSingleton<CallStateProcessor>::GetInstance()->ShouldSwitchActive()) {
+                result = DelayedSingleton<AudioSceneProcessor>::GetInstance()->ProcessEvent(
                     AudioEvent::SWITCH_CS_CALL_STATE);
             }
             break;
         case AudioEvent::NEW_ACTIVE_IMS_CALL:
-            if (DelayedSingleton<AudioControlManager>::GetInstance()->IsOnlyOneActiveCall()) {
-                result = DelayedSingleton<CallStateProcessor>::GetInstance()->ProcessEvent(
+            if (DelayedSingleton<CallStateProcessor>::GetInstance()->ShouldSwitchActive()) {
+                result = DelayedSingleton<AudioSceneProcessor>::GetInstance()->ProcessEvent(
                     AudioEvent::SWITCH_IMS_CALL_STATE);
             }
             break;
         case AudioEvent::NEW_INCOMING_CALL:
             // should switch incoming state while only one incoming call exists
-            if (DelayedSingleton<AudioControlManager>::GetInstance()->IsOnlyOneIncomingCall()) {
-                result = DelayedSingleton<CallStateProcessor>::GetInstance()->ProcessEvent(
+            if (DelayedSingleton<CallStateProcessor>::GetInstance()->ShouldSwitchIncoming()) {
+                result = DelayedSingleton<AudioSceneProcessor>::GetInstance()->ProcessEvent(
                     AudioEvent::SWITCH_INCOMING_STATE); // switch to incoming state
             }
             break;

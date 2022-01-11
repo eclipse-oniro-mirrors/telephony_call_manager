@@ -29,14 +29,17 @@ class CallAbilityCallbackStub : public IRemoteStub<ICallAbilityCallback> {
 public:
     CallAbilityCallbackStub();
     virtual ~CallAbilityCallbackStub();
-    int OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
+    int32_t OnRemoteRequest(
+        uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
 
 private:
     using CallAbilityCallbackFunc = int32_t (CallAbilityCallbackStub::*)(MessageParcel &data, MessageParcel &reply);
 
     int32_t OnUpdateCallStateInfo(MessageParcel &data, MessageParcel &reply);
     int32_t OnUpdateCallEvent(MessageParcel &data, MessageParcel &reply);
-    int32_t OnUpdateSupplementResult(MessageParcel &data, MessageParcel &reply);
+    int32_t OnUpdateCallDisconnectedCause(MessageParcel &data, MessageParcel &reply);
+    int32_t OnUpdateAysncResults(MessageParcel &data, MessageParcel &reply);
+    int32_t OnUpdateOttCallRequest(MessageParcel &data, MessageParcel &reply);
 
     std::map<uint32_t, CallAbilityCallbackFunc> memberFuncMap_;
 };

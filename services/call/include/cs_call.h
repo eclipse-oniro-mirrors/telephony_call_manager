@@ -28,18 +28,19 @@ public:
     ~CSCall();
     int32_t DialingProcess() override;
     int32_t AnswerCall(int32_t videoState) override;
-    int32_t RejectCall(bool isSendSms, std::string &content) override;
+    int32_t RejectCall() override;
     int32_t HangUpCall() override;
     int32_t HoldCall() override;
     int32_t UnHoldCall() override;
     int32_t SwitchCall() override;
     void GetCallAttributeInfo(CallAttributeInfo &info) override;
-    int32_t CombineConference() override;
+    int32_t CombineConference() override; // merge calls
     int32_t SeparateConference() override;
     int32_t CanCombineConference() override;
     int32_t CanSeparateConference() override;
-    int32_t LunchConference() override;
+    int32_t LaunchConference() override;
     int32_t ExitConference() override;
+    int32_t HoldConference() override;
     int32_t GetMainCallId() override;
     std::vector<std::u16string> GetSubCallIdList() override;
     std::vector<std::u16string> GetCallIdListForConference() override;

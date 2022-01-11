@@ -38,7 +38,7 @@ public:
 
 private:
     i18n::phonenumbers::PhoneNumberUtil *phoneUtils_;
-    static const int32_t DEFAULT_SLOT_ID = 0;
+    static const int16_t DEFAULT_SLOT_ID = 0;
 };
 } // namespace Telephony
 } // namespace OHOS

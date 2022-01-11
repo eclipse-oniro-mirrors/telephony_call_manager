@@ -22,8 +22,6 @@
 
 namespace OHOS {
 namespace Telephony {
-using namespace AudioStandard;
-
 enum PlayerType {
     TYPE_RING = 0,
     TYPE_TONE,
@@ -51,20 +49,20 @@ struct wav_hdr {
 
 class AudioPlayer {
 public:
-    static bool Init(const std::unique_ptr<AudioRenderer> &audioRenderer, const wav_hdr &wavHeader);
-    static int32_t Play(const std::string &path, AudioStreamType audioStreamType, PlayerType playerType);
+    static bool InitRenderer(const wav_hdr &wavHeader, AudioStandard::AudioStreamType streamType);
+    static int32_t Play(const std::string &path, AudioStandard::AudioStreamType streamType, PlayerType playerType);
     static void SetStop(PlayerType playerType, bool state);
 
 private:
-    static constexpr uint32_t READ_SIZE = 1;
-    static constexpr uint32_t MIN_BYTES = 4;
+    static constexpr uint16_t READ_SIZE = 1;
+    static constexpr uint16_t MIN_BYTES = 4;
     static size_t bufferLen;
     static bool isStop_;
     static bool isRingStop_;
     static bool isToneStop_;
-    static bool isDtmfStop_;
     static bool IsStop(PlayerType playerType);
-    static void Release(const std::unique_ptr<AudioRenderer> &audioRenderer);
+    static void ReleaseRenderer();
+    static std::unique_ptr<AudioStandard::AudioRenderer> audioRenderer_;
 };
 } // namespace Telephony
 } // namespace OHOS

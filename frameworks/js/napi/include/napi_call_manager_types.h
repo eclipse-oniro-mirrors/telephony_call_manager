@@ -25,23 +25,23 @@
 
 namespace OHOS {
 namespace Telephony {
-const int BOOL_VALUE_IS_FALSE = 0;
-const int NATIVE_VERSION = 1;
-const int NATIVE_FLAGS = 0;
-const int ONLY_ONE_VALUE = 1;
-const int TWO_VALUE_LIMIT = 2;
-const int VALUE_MAXIMUM_LIMIT = 3;
-const int FOUR_VALUE_MAXIMUM_LIMIT = 4;
-const int FIVE_VALUE_MAXIMUM_LIMIT = 5;
-const int ARRAY_INDEX_FIRST = 0;
-const int ARRAY_INDEX_SECOND = 1;
-const int ARRAY_INDEX_THIRD = 2;
-const int ARRAY_INDEX_FOURTH = 3;
-const int DATA_LENGTH_ONE = 1;
-const int DATA_LENGTH_TWO = 2;
-const int DTMF_DEFAULT_OFF = 10;
-const int PHONE_NUMBER_MAXIMUM_LIMIT = 31;
-const int MESSAGE_CONTENT_MAXIMUM_LIMIT = 160;
+const int16_t BOOL_VALUE_IS_FALSE = 0;
+const int16_t NATIVE_VERSION = 1;
+const int16_t NATIVE_FLAGS = 0;
+const int16_t ONLY_ONE_VALUE = 1;
+const int16_t TWO_VALUE_LIMIT = 2;
+const int16_t VALUE_MAXIMUM_LIMIT = 3;
+const int16_t FOUR_VALUE_MAXIMUM_LIMIT = 4;
+const int16_t FIVE_VALUE_MAXIMUM_LIMIT = 5;
+const int16_t ARRAY_INDEX_FIRST = 0;
+const int16_t ARRAY_INDEX_SECOND = 1;
+const int16_t ARRAY_INDEX_THIRD = 2;
+const int16_t ARRAY_INDEX_FOURTH = 3;
+const int16_t DATA_LENGTH_ONE = 1;
+const int16_t DATA_LENGTH_TWO = 2;
+const int16_t DTMF_DEFAULT_OFF = 10;
+const int16_t PHONE_NUMBER_MAXIMUM_LIMIT = 31;
+const int16_t MESSAGE_CONTENT_MAXIMUM_LIMIT = 160;
 
 struct AsyncContext {
     virtual ~AsyncContext() {}
@@ -51,7 +51,7 @@ struct AsyncContext {
     napi_ref callbackRef;
     int32_t callId;
     int32_t result;
-    char number[kMaxNumberLen];
+    char number[kMaxNumberLen + 1];
     size_t numberLen;
     napi_value value[VALUE_MAXIMUM_LIMIT];
     size_t valueLen;
@@ -99,8 +99,8 @@ struct UtilsAsyncContext : AsyncContext {
     std::string code;
 };
 
-struct EventListener {
-    EventListener() : env(nullptr), thisVar(nullptr), callbackRef(nullptr), deferred(nullptr) {}
+struct EventCallback {
+    EventCallback() : env(nullptr), thisVar(nullptr), callbackRef(nullptr), deferred(nullptr) {}
     napi_env env;
     napi_value thisVar;
     napi_ref callbackRef;
@@ -109,7 +109,7 @@ struct EventListener {
 
 struct AudioAsyncContext : AsyncContext {
     bool isMute;
-    char digit[kMaxNumberLen];
+    char digit[kMaxNumberLen + 1];
     int32_t dudioDevice;
 };
 
@@ -125,7 +125,11 @@ struct VideoAsyncContext : AsyncContext {
     int32_t callingPid;
     std::string cameraId;
     std::u16string callingPackage;
-    char path[kMaxNumberLen];
+    char path[kMaxNumberLen + 1];
+};
+
+struct OttAsyncContext : AsyncContext {
+    std::vector<OttCallDetailsInfo> ottVec;
 };
 
 enum CallWaitingStatus {
@@ -145,17 +149,28 @@ enum TransferStatus {
 
 struct CallStateWorker {
     CallAttributeInfo info;
-    EventListener callback;
+    EventCallback callback;
 };
 
 struct CallEventWorker {
     CallEventInfo info;
-    EventListener callback;
+    EventCallback callback;
 };
 
 struct CallSupplementWorker {
     AppExecFwk::PacMap info;
-    EventListener callback;
+    EventCallback callback;
+};
+
+struct CallDisconnectedCauseWorker {
+    int32_t cause;
+    EventCallback callback;
+};
+
+struct CallOttWorker {
+    OttCallRequestId requestId;
+    AppExecFwk::PacMap info;
+    EventCallback callback;
 };
 } // namespace Telephony
 } // namespace OHOS

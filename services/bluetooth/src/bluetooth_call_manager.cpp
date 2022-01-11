@@ -25,6 +25,7 @@
 
 #ifdef ABILITY_BLUETOOTH_SUPPORT
 #include "bluetooth_mgr_client.h"
+#include "bluetooth_remote_device.h"
 #endif
 
 namespace OHOS {
@@ -37,7 +38,7 @@ int32_t BluetoothCallManager::Init()
 {
     if (!BluetoothStateObserver::SubscribeBluetoothEvent()) {
         TELEPHONY_LOGE("subscribe bluetooth connection event failed");
-        return TELEPHONY_ERR_FAIL;
+        return CALL_ERR_BLUETOOTH_CONNECTION_FAILED;
     }
     return TELEPHONY_SUCCESS;
 }
@@ -102,7 +103,7 @@ bool BluetoothCallManager::AnswerBtCall()
     for (auto call : callList) {
         if (call->GetTelCallState() == TelCallState::CALL_STATUS_INCOMING) {
             result = DelayedSingleton<CallControlManager>::GetInstance()->AnswerCall(
-                call->GetCallID(), (int32_t)(call->GetVideoStateType()));
+                call->GetCallID(), static_cast<int32_t>(call->GetVideoStateType()));
             TELEPHONY_LOGI("call id : %{public}d, answer result : %{public}d", call->GetCallID(), result);
             break;
         }
@@ -138,11 +139,11 @@ int32_t BluetoothCallManager::SendCallState(
 {
     if (!IsBtScoConnected()) {
         TELEPHONY_LOGE("bluetooth sco is not connected");
-        return TELEPHONY_ERR_FAIL;
+        return CALL_ERR_BLUETOOTH_CONNECTION_FAILED;
     }
 #ifdef ABILITY_BLUETOOTH_SUPPORT
     return BluetoothMgr::BluetoothMgrClient::GetInstance()->PhoneStateChanged(
-        (int32_t)callState, number, (int32_t)videoState);
+        static_cast<int32_t>(callState, number), static_cast<int32_t>(videoState));
 #endif
     return TELEPHONY_SUCCESS;
 }
@@ -151,14 +152,15 @@ int32_t BluetoothCallManager::SendCallList()
 {
     if (!IsBtScoConnected()) {
         TELEPHONY_LOGE("bluetooth sco is not connected");
-        return TELEPHONY_ERR_FAIL;
+        return CALL_ERR_BLUETOOTH_CONNECTION_FAILED;
     }
 #ifdef ABILITY_BLUETOOTH_SUPPORT
     auto callList = DelayedSingleton<AudioControlManager>::GetInstance()->GetCallList();
     bool result = false;
     for (auto call : callList) {
         result = BluetoothMgr::BluetoothMgrClient::GetInstance()->ClccResponse(call->GetCallID(),
-            (int32_t)(call->GetTelCallState()), call->GetAccountNumber(), (int32_t)(call->GetVideoStateType()));
+            static_cast<int32_t>((call->GetTelCallState())), call->GetAccountNumber(),
+            static_cast<int32_t>((call->GetVideoStateType())));
     }
     return result;
 #endif
@@ -167,12 +169,12 @@ int32_t BluetoothCallManager::SendCallList()
 
 int32_t BluetoothCallManager::SendDtmf(int32_t callId, char str)
 {
-    return DelayedSingleton<CallControlManager>::GetInstance()->SendDtmf(callId, str);
+    return DelayedSingleton<CallControlManager>::GetInstance()->StartDtmf(callId, str);
 }
 
 void BluetoothCallManager::NewCallCreated(sptr<CallBase> &callObjectPtr) {}
 
-void BluetoothCallManager::CallDestroyed(sptr<CallBase> &callObjectPtr) {}
+void BluetoothCallManager::CallDestroyed(int32_t cause) {}
 
 void BluetoothCallManager::IncomingCallActivated(sptr<CallBase> &callObjectPtr) {}
 

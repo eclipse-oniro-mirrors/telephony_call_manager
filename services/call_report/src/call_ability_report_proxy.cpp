@@ -56,17 +56,28 @@ int32_t CallAbilityReportProxy::RegisterCallBack(
     std::lock_guard<std::mutex> lock(mutex_);
     std::list<sptr<ICallAbilityCallback>>::iterator it = callbackPtrList_.begin();
     for (; it != callbackPtrList_.end(); it++) {
-        if ((*it)) {
-            (*it)->GetBundleName(tmpName);
-            if (tmpName == bundleName) {
-                (*it).clear();
-                (*it) = callAbilityCallbackPtr;
-                TELEPHONY_LOGI("%{public}s RegisterCallBack success", bundleName.c_str());
-                return TELEPHONY_SUCCESS;
-            }
+        (*it)->GetBundleName(tmpName);
+        if (tmpName == bundleName) {
+            (*it).clear();
+            (*it) = callAbilityCallbackPtr;
+            TELEPHONY_LOGI("%{public}s RegisterCallBack success", bundleName.c_str());
+            return TELEPHONY_SUCCESS;
         }
     }
     callbackPtrList_.emplace_back(callAbilityCallbackPtr);
+    if ((bundleName == "com.example.callmanager") || (bundleName == "com.ohos.calldemo") ||
+        (bundleName == "com.example.telephone_demo")) {
+        std::list<sptr<ICallAbilityCallback>>::iterator it = callbackPtrList_.begin();
+        for (; it != callbackPtrList_.end(); it++) {
+            (*it)->GetBundleName(tmpName);
+            if (tmpName == "com.ohos.callui") {
+                callAbilityCallbackPtr_ = (*it);
+                callbackPtrList_.erase(it++);
+                callbackPtrList_.emplace_back(callAbilityCallbackPtr_);
+                break;
+            }
+        }
+    }
     TELEPHONY_LOGI("%{public}s successfully registered the callback for the first time!", bundleName.c_str());
     return TELEPHONY_SUCCESS;
 }
@@ -75,7 +86,7 @@ int32_t CallAbilityReportProxy::UnRegisterCallBack(std::string &bundleName)
 {
     if (callbackPtrList_.empty()) {
         TELEPHONY_LOGE("callbackPtrList_ is null!");
-        return TELEPHONY_ERROR;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     std::string tmpName = "";
     std::lock_guard<std::mutex> lock(mutex_);
@@ -91,17 +102,59 @@ int32_t CallAbilityReportProxy::UnRegisterCallBack(std::string &bundleName)
     return TELEPHONY_ERROR;
 }
 
-int32_t CallAbilityReportProxy::ReportCallStateInfo(const CallAttributeInfo &info)
+void CallAbilityReportProxy::CallStateUpdated(
+    sptr<CallBase> &callObjectPtr, TelCallState priorState, TelCallState nextState)
 {
-    int ret = TELEPHONY_ERR_FAIL;
+    if (callObjectPtr == nullptr) {
+        TELEPHONY_LOGE("callObjectPtr is nullptr!");
+        return;
+    }
+    CallAttributeInfo info;
+    callObjectPtr->GetCallAttributeInfo(info);
+    ReportCallStateInfo(info);
+}
+
+void CallAbilityReportProxy::CallEventUpdated(CallEventInfo &info)
+{
+    ReportCallEvent(info);
+}
+
+void CallAbilityReportProxy::CallDestroyed(int32_t cause)
+{
+    int32_t ret = TELEPHONY_ERR_FAIL;
     std::string bundleName = "";
     std::lock_guard<std::mutex> lock(mutex_);
     std::list<sptr<ICallAbilityCallback>>::iterator it = callbackPtrList_.begin();
     for (; it != callbackPtrList_.end(); it++) {
         if ((*it)) {
-            ret = (*it)->OnCallDetailsChange(info);
+            ret = (*it)->OnCallDisconnectedCause((DisconnectedDetails)cause);
             if (ret != TELEPHONY_SUCCESS) {
                 (*it)->GetBundleName(bundleName);
+                TELEPHONY_LOGW("OnCallDisconnectedCause failed, errcode:%{public}d, bundleName:%{public}s", ret,
+                    bundleName.c_str());
+                continue;
+            }
+        }
+    }
+    TELEPHONY_LOGI("report call disconnected cause[%{public}d] success", cause);
+}
+
+int32_t CallAbilityReportProxy::ReportCallStateInfo(const CallAttributeInfo &info)
+{
+    int32_t ret = TELEPHONY_ERR_FAIL;
+    std::string bundleName = "";
+    std::lock_guard<std::mutex> lock(mutex_);
+    std::list<sptr<ICallAbilityCallback>>::iterator it = callbackPtrList_.begin();
+    for (; it != callbackPtrList_.end(); it++) {
+        if ((*it)) {
+            (*it)->GetBundleName(bundleName);
+            if (IsBundleNameConflict(bundleName)) {
+                continue;
+            }
+            ret = (*it)->OnCallDetailsChange(info);
+            if (ret != TELEPHONY_SUCCESS) {
+                callbackPtrList_.erase(it++);
+                it--;
                 TELEPHONY_LOGW("OnCallDetailsChange failed, errcode:%{public}d, bundleName:%{public}s", ret,
                     bundleName.c_str());
                 continue;
@@ -115,8 +168,9 @@ int32_t CallAbilityReportProxy::ReportCallStateInfo(const CallAttributeInfo &inf
 
 int32_t CallAbilityReportProxy::ReportCallEvent(const CallEventInfo &info)
 {
-    int ret = TELEPHONY_ERR_FAIL;
+    int32_t ret = TELEPHONY_ERR_FAIL;
     std::string bundleName = "";
+    TELEPHONY_LOGI("report call event, eventId:%{public}d", info.eventId);
     std::lock_guard<std::mutex> lock(mutex_);
     std::list<sptr<ICallAbilityCallback>>::iterator it = callbackPtrList_.begin();
     for (; it != callbackPtrList_.end(); it++) {
@@ -134,26 +188,62 @@ int32_t CallAbilityReportProxy::ReportCallEvent(const CallEventInfo &info)
     return ret;
 }
 
-int32_t CallAbilityReportProxy::ReportSupplementResult(
+int32_t CallAbilityReportProxy::ReportAsyncResults(
     const CallResultReportId reportId, AppExecFwk::PacMap &resultInfo)
 {
-    int ret = TELEPHONY_ERR_FAIL;
+    int32_t ret = TELEPHONY_ERR_FAIL;
     std::string bundleName = "";
     std::lock_guard<std::mutex> lock(mutex_);
     std::list<sptr<ICallAbilityCallback>>::iterator it = callbackPtrList_.begin();
     for (; it != callbackPtrList_.end(); it++) {
         if ((*it)) {
-            ret = (*it)->OnSupplementResult(reportId, resultInfo);
+            ret = (*it)->OnReportAsyncResults(reportId, resultInfo);
             if (ret != TELEPHONY_SUCCESS) {
                 (*it)->GetBundleName(bundleName);
-                TELEPHONY_LOGW("ReportSupplementResult failed, errcode:%{public}d, bundleName:%{public}s", ret,
+                TELEPHONY_LOGW("ReportAsyncResults failed, errcode:%{public}d, bundleName:%{public}s", ret,
                     bundleName.c_str());
                 continue;
             }
         }
     }
-    TELEPHONY_LOGI("ReportSupplementResult success, reportId:%{public}d", reportId);
+    TELEPHONY_LOGI("ReportAsyncResults success, reportId:%{public}d", reportId);
     return ret;
+}
+
+int32_t CallAbilityReportProxy::OttCallRequest(OttCallRequestId requestId, AppExecFwk::PacMap &info)
+{
+    int32_t ret = TELEPHONY_ERR_FAIL;
+    std::string name = "";
+    std::lock_guard<std::mutex> lock(mutex_);
+    std::list<sptr<ICallAbilityCallback>>::iterator it = callbackPtrList_.begin();
+    for (; it != callbackPtrList_.end(); it++) {
+        (*it)->GetBundleName(name);
+        if (name == "com.ohos.callui") {
+            ret = (*it)->OnOttCallRequest(requestId, info);
+            if (ret != TELEPHONY_SUCCESS) {
+                TELEPHONY_LOGW(
+                    "OttCallRequest failed, errcode:%{public}d, bundleName:%{public}s", ret, name.c_str());
+                break;
+            }
+        }
+    }
+    TELEPHONY_LOGI("OttCallRequest success, requestId:%{public}d", requestId);
+    return ret;
+}
+
+bool CallAbilityReportProxy::IsBundleNameConflict(std::string &bundleName)
+{
+    std::string tmpName = "";
+    std::list<sptr<ICallAbilityCallback>>::iterator it = callbackPtrList_.begin();
+    for (; it != callbackPtrList_.end(); it++) {
+        (*it)->GetBundleName(tmpName);
+        if ((tmpName == "com.example.callmanager" || tmpName == "com.ohos.calldemo" ||
+                tmpName == "com.example.telephone_demo") &&
+            (bundleName == "com.ohos.callui")) {
+            return true;
+        }
+    }
+    return false;
 }
 } // namespace Telephony
 } // namespace OHOS

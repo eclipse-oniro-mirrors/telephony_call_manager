@@ -15,9 +15,7 @@
 
 #include "ims_conference_base.h"
 
-#include <string>
 #include <string_ex.h>
-#include <list>
 
 #include "call_base.h"
 #include "call_object_manager.h"
@@ -51,16 +49,11 @@ int32_t ImsConferenceBase::JoinToConference(int32_t callId)
         TELEPHONY_LOGE("already %{public}zu calls in the conference, exceed limits!", subCallIdSet_.size());
         return CALL_ERR_CONFERENCE_CALL_EXCEED_LIMIT;
     }
-    // if host is video call then set video paused
-#ifdef ABILITY_VIDEO_SUPPORT
-    auto call = CallObjectManager::GetOneCallObject(GetMainCall());
-    if (call->GetVideoState() == VideoStateType::TYPE_VIDEO) {
-        call->setVideoState(CallMediaMode::PAUSED);
-    }
-#endif
+
     subCallIdSet_.insert(callId);
     state_ = CONFERENCE_STATE_ACTIVE;
     beginTime_ = time(nullptr);
+    TELEPHONY_LOGI("JoinToConference success, callId:%{public}d", callId);
     return TELEPHONY_SUCCESS;
 }
 
@@ -71,7 +64,28 @@ int32_t ImsConferenceBase::LeaveFromConference(int32_t callId)
         subCallIdSet_.erase(callId);
     } else {
         TELEPHONY_LOGE("separate conference failed, callId %{public}d not in conference", callId);
-        return CALL_ERR_CALLID_INVALID;
+        return CALL_ERR_CONFERENCE_SEPERATE_FAILED;
+    }
+    if (subCallIdSet_.empty()) {
+        mainCallId_ = ERR_ID;
+        state_ = CONFERENCE_STATE_IDLE;
+        beginTime_ = 0;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t ImsConferenceBase::HoldConference(int32_t callId)
+{
+    std::lock_guard<std::mutex> lock(conferenceMutex_);
+    if (state_ == CONFERENCE_STATE_HOLDING) {
+        TELEPHONY_LOGI("HoldConference success");
+        return TELEPHONY_SUCCESS;
+    }
+    if (subCallIdSet_.find(callId) != subCallIdSet_.end()) {
+        subCallIdSet_.erase(callId);
+    } else {
+        TELEPHONY_LOGE("separate conference failed, callId %{public}d not in conference", callId);
+        return CALL_ERR_CONFERENCE_SEPERATE_FAILED;
     }
     if (subCallIdSet_.empty()) {
         mainCallId_ = ERR_ID;

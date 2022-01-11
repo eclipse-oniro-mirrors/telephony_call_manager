@@ -75,7 +75,7 @@ void WiredHeadset::NewCallCreated(sptr<CallBase> &callObjectPtr)
     }
 }
 
-void WiredHeadset::CallDestroyed(sptr<CallBase> &callObjectPtr)
+void WiredHeadset::CallDestroyed(int32_t cause)
 {
     if (handler_ != nullptr) {
         handler_->SendEvent(WiredHeadset::MEDIA_SET_LEAVE_MSG);

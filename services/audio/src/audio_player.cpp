@@ -27,60 +27,62 @@ size_t AudioPlayer::bufferLen = 0;
 bool AudioPlayer::isStop_ = false;
 bool AudioPlayer::isRingStop_ = false;
 bool AudioPlayer::isToneStop_ = false;
-bool AudioPlayer::isDtmfStop_ = false;
+std::unique_ptr<AudioStandard::AudioRenderer> AudioPlayer::audioRenderer_ = nullptr;
 
-bool AudioPlayer::Init(const std::unique_ptr<AudioRenderer> &audioRenderer, const wav_hdr &wavHeader)
+bool AudioPlayer::InitRenderer(const wav_hdr &wavHeader, AudioStandard::AudioStreamType streamType)
 {
-    AudioRendererParams rendererParams;
-    rendererParams.sampleFormat = static_cast<AudioSampleFormat>(wavHeader.bitsPerSample);
-    rendererParams.sampleRate = static_cast<AudioSamplingRate>(wavHeader.SamplesPerSec);
-    rendererParams.channelCount = static_cast<AudioChannel>(wavHeader.NumOfChan);
-    rendererParams.encodingType = static_cast<AudioEncodingType>(ENCODING_PCM);
-    if (audioRenderer == nullptr) {
-        TELEPHONY_LOGE("audio renderer nullptr");
+    AudioStandard::AudioRendererParams rendererParams;
+    rendererParams.sampleFormat = static_cast<AudioStandard::AudioSampleFormat>(wavHeader.bitsPerSample);
+    rendererParams.sampleRate = static_cast<AudioStandard::AudioSamplingRate>(wavHeader.SamplesPerSec);
+    rendererParams.channelCount = static_cast<AudioStandard::AudioChannel>(wavHeader.NumOfChan);
+    rendererParams.encodingType = static_cast<AudioStandard::AudioEncodingType>(AudioStandard::ENCODING_PCM);
+    audioRenderer_ = AudioStandard::AudioRenderer::Create(streamType);
+    if (audioRenderer_ == nullptr) {
+        TELEPHONY_LOGE("audio renderer create failed");
         return false;
     }
-    if (audioRenderer->SetParams(rendererParams) != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("set params failed");
+    if (audioRenderer_->SetParams(rendererParams) != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("audio renderer set params failed");
         return false;
     }
-    if (!audioRenderer->Start()) {
+    if (!audioRenderer_->Start()) {
         TELEPHONY_LOGE("audio renderer start failed");
         return false;
     }
-    if (audioRenderer->GetBufferSize(bufferLen)) {
+    if (audioRenderer_->GetBufferSize(bufferLen)) {
         TELEPHONY_LOGE("audio renderer get buffer size failed");
-        return TELEPHONY_ERR_FAIL;
+        return TELEPHONY_ERR_UNINIT;
     }
     uint32_t frameCount;
-    if (audioRenderer->GetFrameCount(frameCount)) {
+    if (audioRenderer_->GetFrameCount(frameCount)) {
         TELEPHONY_LOGE("audio renderer get frame count failed");
         return false;
     }
     return true;
 }
 
-int32_t AudioPlayer::Play(const std::string &path, AudioStreamType audioStreamType, PlayerType playerType)
+int32_t AudioPlayer::Play(const std::string &path, AudioStandard::AudioStreamType streamType, PlayerType playerType)
 {
     wav_hdr wavHeader;
+    if (path.empty()) {
+        TELEPHONY_LOGE("path is empty");
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
+    }
     FILE *wavFile = fopen(path.c_str(), "rb");
     if (wavFile == nullptr) {
         TELEPHONY_LOGE("open audio file failed");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     (void)fread(&wavHeader, READ_SIZE, sizeof(wav_hdr), wavFile);
-    std::unique_ptr<AudioRenderer> audioRenderer = AudioRenderer::Create(audioStreamType);
-    if (audioRenderer == nullptr) {
-        TELEPHONY_LOGE("audio renderer nullptr");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-    if (!Init(audioRenderer, wavHeader)) {
+    if (!InitRenderer(wavHeader, streamType)) {
         TELEPHONY_LOGE("audio renderer init failed");
-        return TELEPHONY_ERR_FAIL;
+        (void)fclose(wavFile);
+        return TELEPHONY_ERR_UNINIT;
     }
     uint8_t *buffer = (uint8_t *)malloc(bufferLen + bufferLen);
     if (buffer == nullptr) {
         TELEPHONY_LOGE("audio malloc buffer failed");
+        (void)fclose(wavFile);
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     size_t bytesToWrite = 0, bytesWritten = 0;
@@ -99,10 +101,10 @@ int32_t AudioPlayer::Play(const std::string &path, AudioStreamType audioStreamTy
             if (IsStop(playerType)) {
                 break;
             }
-            bytesWritten += audioRenderer->Write(buffer + bytesWritten, bytesToWrite - bytesWritten);
+            bytesWritten += audioRenderer_->Write(buffer + bytesWritten, bytesToWrite - bytesWritten);
         }
     }
-    Release(audioRenderer);
+    ReleaseRenderer();
     free(buffer);
     (void)fclose(wavFile);
     TELEPHONY_LOGI("audio renderer playback done");
@@ -123,9 +125,6 @@ void AudioPlayer::SetStop(PlayerType playerType, bool state)
         case PlayerType::TYPE_TONE:
             isToneStop_ = state;
             break;
-        case PlayerType::TYPE_DTMF:
-            isDtmfStop_ = state;
-            break;
         default:
             break;
     }
@@ -141,21 +140,18 @@ bool AudioPlayer::IsStop(PlayerType playerType)
         case PlayerType::TYPE_TONE:
             ret = isToneStop_;
             break;
-        case PlayerType::TYPE_DTMF:
-            ret = isDtmfStop_;
-            break;
         default:
             break;
     }
     return ret;
 }
 
-void AudioPlayer::Release(const std::unique_ptr<AudioRenderer> &audioRenderer)
+void AudioPlayer::ReleaseRenderer()
 {
-    audioRenderer->Flush();
-    audioRenderer->Drain();
-    audioRenderer->Stop();
-    audioRenderer->Release();
+    audioRenderer_->Flush();
+    audioRenderer_->Drain();
+    audioRenderer_->Stop();
+    audioRenderer_->Release();
 }
 } // namespace Telephony
 } // namespace OHOS

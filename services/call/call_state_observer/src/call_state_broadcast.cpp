@@ -31,11 +31,12 @@ void CallStateBroadcast::CallStateUpdated(
         TELEPHONY_LOGE("call object ptr nullptr");
         return;
     }
-    PublishCallStateEvent(callObjectPtr, (int32_t)priorState, (int32_t)nextState);
+    PublishCallStateEvent(callObjectPtr, static_cast<int32_t>(priorState), static_cast<int32_t>(nextState));
 }
 
 void CallStateBroadcast::PublishCallStateEvent(sptr<CallBase> &callObjectPtr, int32_t priorState, int32_t nextState)
 {
+#ifdef ABILITY_STATE_NOTIFICATION_SUPPORT
     AAFwk::Want want;
     want.SetParam("callId", callObjectPtr->GetCallID());
     want.SetParam("priorState", priorState);
@@ -54,11 +55,12 @@ void CallStateBroadcast::PublishCallStateEvent(sptr<CallBase> &callObjectPtr, in
     publishInfo.SetOrdered(true);
     bool result = EventFwk::CommonEventManager::PublishCommonEvent(data, publishInfo, nullptr);
     TELEPHONY_LOGI("publish call state event result : %{public}d", result);
+#endif
 }
 
 void CallStateBroadcast::NewCallCreated(sptr<CallBase> &callObjectPtr) {}
 
-void CallStateBroadcast::CallDestroyed(sptr<CallBase> &callObjectPtr) {}
+void CallStateBroadcast::CallDestroyed(int32_t cause) {}
 
 void CallStateBroadcast::IncomingCallActivated(sptr<CallBase> &callObjectPtr) {}
 

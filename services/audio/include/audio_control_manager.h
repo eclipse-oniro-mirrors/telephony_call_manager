@@ -25,24 +25,17 @@
 
 #include "audio_proxy.h"
 #include "call_state_listener_base.h"
-#include "audio_tone.h"
-#include "audio_ring.h"
+#include "tone.h"
+#include "ring.h"
 #include "audio_device_manager.h"
-#include "call_state_processor.h"
+#include "audio_scene_processor.h"
 
 namespace OHOS {
 namespace Telephony {
-constexpr uint32_t EXIST_ONLY_ONE_CALL = 1;
-struct CallRecord {
-    std::string phoneNum;
-    bool isIms;
-};
-
 class AudioControlManager : public CallStateListenerBase, public std::enable_shared_from_this<AudioControlManager> {
     DECLARE_DELAYED_SINGLETON(AudioControlManager)
 public:
     void Init();
-    bool SetAudioDevice(int32_t device);
     bool SetAudioDevice(AudioDevice device);
     bool PlayRingtone(); // plays the default ringtone
     bool PlayRingtone(const std::string &phoneNum); // plays the default ringtone
@@ -52,62 +45,49 @@ public:
     int32_t StopRingback();
     int32_t PlayWaitingTone();
     int32_t StopWaitingTone();
-    int32_t PlayHoldingTone();
-    int32_t StopHoldingTone();
-    int32_t PlayCallEndedTone(ToneDescriptor type);
     int32_t PlayCallTone(ToneDescriptor type);
     int32_t StopCallTone();
     int32_t MuteRinger();
     int32_t SetMute(bool on);
-    void TurnOffVoice();
     void SetVolumeAudible();
     bool IsTonePlaying() const;
     bool IsAudioActivated() const;
     bool IsCurrentRinging() const;
-    bool IsCurrentVideoCall() const;
     bool IsActiveCallExists() const;
-    bool IsOnlyOneActiveCall() const;
-    bool IsOnlyOneAlertingCall() const;
-    bool IsOnlyOneIncomingCall() const;
-    bool ShouldSwitchAlertingState() const;
-    bool ShouldSwitchIncomingState() const;
+    bool ShouldSwitchActive() const;
+    bool ShouldSwitchAlerting() const;
+    bool ShouldSwitchIncoming() const;
     AudioDevice GetInitAudioDevice() const;
-    sptr<CallBase> GetCurrentCall() const;
     std::set<sptr<CallBase>> GetCallList();
+    sptr<CallBase> GetCurrentActiveCall() const;
     AudioInterruptState GetAudioInterruptState();
     bool UpdateCurrentCallState();
     void SetRingState(RingState state);
+    void SetLocalRingbackNeeded(bool isNeeded);
     void SetAudioInterruptState(AudioInterruptState state);
     void NewCallCreated(sptr<CallBase> &callObjectPtr) override;
-    void CallDestroyed(sptr<CallBase> &callObjectPtr) override;
+    void CallDestroyed(int32_t cause) override;
     void IncomingCallActivated(sptr<CallBase> &callObjectPtr) override;
     void IncomingCallHungUp(sptr<CallBase> &callObjectPtr, bool isSendSms, std::string content) override;
     void CallStateUpdated(sptr<CallBase> &callObjectPtr, TelCallState priorState, TelCallState nextState) override;
 
 private:
     RingState ringState_ = RingState::STOPPED;
-    void AddCall(const std::string &phoneNum, TelCallState state);
-    void DeleteCall(const std::string &phoneNum, TelCallState state);
-    void HandleCallStateUpdated(TelCallState stateType, bool isAdded, CallType callType);
+    void HandleNextState(sptr<CallBase> &callObjectPtr, TelCallState nextState);
+    void HandlePriorState(sptr<CallBase> &callObjectPtr, TelCallState priorState);
     void HandleCallStateUpdated(sptr<CallBase> &callObjectPtr, TelCallState priorState, TelCallState nextState);
-    void AddNewActiveCall(CallType callType);
-    bool IsAllowNumber(const std::string &phoneNum);
+    void HandleNewActiveCall(sptr<CallBase> &callObjectPtr);
+    bool IsNumberAllowed(const std::string &phoneNum);
     void PlayCallEndedTone(TelCallState priorState, TelCallState nextState, CallEndedType type);
     sptr<CallBase> GetCallBase(const std::string &phoneNum) const;
-    std::string GetIncomingCallRingtonePath();
     AudioInterruptState audioInterruptState_ = AudioInterruptState::INTERRUPT_STATE_DEACTIVATED;
-    bool IsHoldingCallExists() const;
-    bool IsAlertingCallExists() const;
-    bool IsIncomingCallExists() const;
+    bool ShouldPlayRingtone() const;
     bool IsEmergencyCallExists() const;
     bool isTonePlaying_;
-    std::set<std::string> activeCalls_;
-    std::set<std::string> holdingCalls_;
-    std::set<std::string> alertingCalls_;
-    std::set<std::string> incomingCalls_;
+    bool isLocalRingbackNeeded_;
     std::set<sptr<CallBase>> totalCalls_;
-    std::unique_ptr<AudioRing> ring_;
-    std::unique_ptr<AudioTone> tone_;
+    std::unique_ptr<Ring> ring_;
+    std::unique_ptr<Tone> tone_;
 };
 } // namespace Telephony
 } // namespace OHOS

@@ -47,110 +47,92 @@ CallManagerServiceStub::~CallManagerServiceStub()
 
 void CallManagerServiceStub::InitCallBasicRequest()
 {
-    memberFuncMap_[(uint32_t)CallManagerSurfaceCode::INTERFACE_REGISTER_CALLBACK] =
-        &CallManagerServiceStub::OnRegisterCallBack;
-    memberFuncMap_[(uint32_t)CallManagerSurfaceCode::INTERFACE_UNREGISTER_CALLBACK] =
-        &CallManagerServiceStub::OnUnRegisterCallBack;
-    memberFuncMap_[(uint32_t)CallManagerSurfaceCode::INTERFACE_DIAL_CALL] = &CallManagerServiceStub::OnDialCall;
-    memberFuncMap_[(uint32_t)CallManagerSurfaceCode::INTERFACE_ANSWER_CALL] = &CallManagerServiceStub::OnAcceptCall;
-    memberFuncMap_[(uint32_t)CallManagerSurfaceCode::INTERFACE_REJECT_CALL] = &CallManagerServiceStub::OnRejectCall;
-    memberFuncMap_[(uint32_t)CallManagerSurfaceCode::INTERFACE_HOLD_CALL] = &CallManagerServiceStub::OnHoldCall;
-    memberFuncMap_[(uint32_t)CallManagerSurfaceCode::INTERFACE_UNHOLD_CALL] = &CallManagerServiceStub::OnUnHoldCall;
-    memberFuncMap_[(uint32_t)CallManagerSurfaceCode::INTERFACE_DISCONNECT_CALL] =
-        &CallManagerServiceStub::OnHangUpCall;
-    memberFuncMap_[(uint32_t)CallManagerSurfaceCode::INTERFACE_GET_CALL_STATE] =
-        &CallManagerServiceStub::OnGetCallState;
-    memberFuncMap_[(uint32_t)CallManagerSurfaceCode::INTERFACE_SWAP_CALL] = &CallManagerServiceStub::OnSwitchCall;
+    memberFuncMap_[INTERFACE_REGISTER_CALLBACK] = &CallManagerServiceStub::OnRegisterCallBack;
+    memberFuncMap_[INTERFACE_UNREGISTER_CALLBACK] = &CallManagerServiceStub::OnUnRegisterCallBack;
+    memberFuncMap_[INTERFACE_DIAL_CALL] = &CallManagerServiceStub::OnDialCall;
+    memberFuncMap_[INTERFACE_ANSWER_CALL] = &CallManagerServiceStub::OnAcceptCall;
+    memberFuncMap_[INTERFACE_REJECT_CALL] = &CallManagerServiceStub::OnRejectCall;
+    memberFuncMap_[INTERFACE_HOLD_CALL] = &CallManagerServiceStub::OnHoldCall;
+    memberFuncMap_[INTERFACE_UNHOLD_CALL] = &CallManagerServiceStub::OnUnHoldCall;
+    memberFuncMap_[INTERFACE_DISCONNECT_CALL] = &CallManagerServiceStub::OnHangUpCall;
+    memberFuncMap_[INTERFACE_GET_CALL_STATE] = &CallManagerServiceStub::OnGetCallState;
+    memberFuncMap_[INTERFACE_SWAP_CALL] = &CallManagerServiceStub::OnSwitchCall;
 }
 
 void CallManagerServiceStub::InitCallUtilsRequest()
 {
-    memberFuncMap_[(uint32_t)CallManagerSurfaceCode::INTERFACE_HAS_CALL] = &CallManagerServiceStub::OnHasCall;
-    memberFuncMap_[(uint32_t)CallManagerSurfaceCode::INTERFACE_IS_NEW_CALL_ALLOWED] =
-        &CallManagerServiceStub::OnIsNewCallAllowed;
-    memberFuncMap_[(uint32_t)CallManagerSurfaceCode::INTERFACE_IS_RINGING] = &CallManagerServiceStub::OnIsRinging;
-    memberFuncMap_[(uint32_t)CallManagerSurfaceCode::INTERFACE_IS_EMERGENCY_CALL] =
-        &CallManagerServiceStub::OnIsInEmergencyCall;
-    memberFuncMap_[(uint32_t)CallManagerSurfaceCode::INTERFACE_IS_EMERGENCY_NUMBER] =
-        &CallManagerServiceStub::OnIsEmergencyPhoneNumber;
-    memberFuncMap_[(uint32_t)CallManagerSurfaceCode::INTERFACE_IS_FORMAT_NUMBER] =
-        &CallManagerServiceStub::OnFormatPhoneNumber;
-    memberFuncMap_[(uint32_t)CallManagerSurfaceCode::INTERFACE_IS_FORMAT_NUMBER_E164] =
-        &CallManagerServiceStub::OnFormatPhoneNumberToE164;
+    memberFuncMap_[INTERFACE_HAS_CALL] = &CallManagerServiceStub::OnHasCall;
+    memberFuncMap_[INTERFACE_IS_NEW_CALL_ALLOWED] = &CallManagerServiceStub::OnIsNewCallAllowed;
+    memberFuncMap_[INTERFACE_IS_RINGING] = &CallManagerServiceStub::OnIsRinging;
+    memberFuncMap_[INTERFACE_IS_EMERGENCY_CALL] = &CallManagerServiceStub::OnIsInEmergencyCall;
+    memberFuncMap_[INTERFACE_IS_EMERGENCY_NUMBER] = &CallManagerServiceStub::OnIsEmergencyPhoneNumber;
+    memberFuncMap_[INTERFACE_IS_FORMAT_NUMBER] = &CallManagerServiceStub::OnFormatPhoneNumber;
+    memberFuncMap_[INTERFACE_IS_FORMAT_NUMBER_E164] = &CallManagerServiceStub::OnFormatPhoneNumberToE164;
 }
 
 void CallManagerServiceStub::InitCallConferenceRequest()
 {
-    memberFuncMap_[(uint32_t)CallManagerSurfaceCode::INTERFACE_COMBINE_CONFERENCE] =
-        &CallManagerServiceStub::OnJoinConference;
-    memberFuncMap_[(uint32_t)CallManagerSurfaceCode::INTERFACE_SEPARATE_CONFERENCE] =
-        &CallManagerServiceStub::OnSeparateConference;
+    memberFuncMap_[INTERFACE_COMBINE_CONFERENCE] = &CallManagerServiceStub::OnCombineConference;
+    memberFuncMap_[INTERFACE_SEPARATE_CONFERENCE] = &CallManagerServiceStub::OnSeparateConference;
+    memberFuncMap_[INTERFACE_JOIN_CONFERENCE] = &CallManagerServiceStub::OnJoinConference;
 }
 
 void CallManagerServiceStub::InitCallDtmfRequest()
 {
-    memberFuncMap_[(uint32_t)CallManagerSurfaceCode::INTERFACE_START_DTMF] = &CallManagerServiceStub::OnStartDtmf;
-    memberFuncMap_[(uint32_t)CallManagerSurfaceCode::INTERFACE_SEND_DTMF] = &CallManagerServiceStub::OnSendDtmf;
-    memberFuncMap_[(uint32_t)CallManagerSurfaceCode::INTERFACE_STOP_DTMF] = &CallManagerServiceStub::OnStopDtmf;
-    memberFuncMap_[(uint32_t)CallManagerSurfaceCode::INTERFACE_SEND_DTMF_BUNCH] =
-        &CallManagerServiceStub::OnSendDtmfBunch;
+    memberFuncMap_[INTERFACE_START_DTMF] = &CallManagerServiceStub::OnStartDtmf;
+    memberFuncMap_[INTERFACE_STOP_DTMF] = &CallManagerServiceStub::OnStopDtmf;
 }
 
 void CallManagerServiceStub::InitCallSupplementRequest()
 {
-    memberFuncMap_[(uint32_t)CallManagerSurfaceCode::INTERFACE_GET_CALL_WAITING] =
-        &CallManagerServiceStub::OnGetCallWaiting;
-    memberFuncMap_[(uint32_t)CallManagerSurfaceCode::INTERFACE_SET_CALL_WAITING] =
-        &CallManagerServiceStub::OnSetCallWaiting;
-    memberFuncMap_[(uint32_t)CallManagerSurfaceCode::INTERFACE_GET_CALL_RESTRICTION] =
-        &CallManagerServiceStub::OnGetCallRestriction;
-    memberFuncMap_[(uint32_t)CallManagerSurfaceCode::INTERFACE_SET_CALL_RESTRICTION] =
-        &CallManagerServiceStub::OnSetCallRestriction;
-    memberFuncMap_[(uint32_t)CallManagerSurfaceCode::INTERFACE_GET_CALL_TRANSFER] =
-        &CallManagerServiceStub::OnGetTransferNumber;
-    memberFuncMap_[(uint32_t)CallManagerSurfaceCode::INTERFACE_SET_CALL_TRANSFER] =
-        &CallManagerServiceStub::OnSetTransferNumber;
+    memberFuncMap_[INTERFACE_GET_CALL_WAITING] = &CallManagerServiceStub::OnGetCallWaiting;
+    memberFuncMap_[INTERFACE_SET_CALL_WAITING] = &CallManagerServiceStub::OnSetCallWaiting;
+    memberFuncMap_[INTERFACE_GET_CALL_RESTRICTION] = &CallManagerServiceStub::OnGetCallRestriction;
+    memberFuncMap_[INTERFACE_SET_CALL_RESTRICTION] = &CallManagerServiceStub::OnSetCallRestriction;
+    memberFuncMap_[INTERFACE_GET_CALL_TRANSFER] = &CallManagerServiceStub::OnGetTransferNumber;
+    memberFuncMap_[INTERFACE_SET_CALL_TRANSFER] = &CallManagerServiceStub::OnSetTransferNumber;
 }
 
 void CallManagerServiceStub::initCallConferenceExRequest()
 {
-    memberFuncMap_[(uint32_t)CallManagerSurfaceCode::INTERFACE_GET_MAINID] =
-        &CallManagerServiceStub::OnGetMainCallId;
-    memberFuncMap_[(uint32_t)CallManagerSurfaceCode::INTERFACE_GET_SUBCALL_LIST_ID] =
-        &CallManagerServiceStub::OnGetSubCallIdList;
-    memberFuncMap_[(uint32_t)CallManagerSurfaceCode::INTERFACE_GET_CALL_LIST_ID_FOR_CONFERENCE] =
+    memberFuncMap_[INTERFACE_GET_MAINID] = &CallManagerServiceStub::OnGetMainCallId;
+    memberFuncMap_[INTERFACE_GET_SUBCALL_LIST_ID] = &CallManagerServiceStub::OnGetSubCallIdList;
+    memberFuncMap_[INTERFACE_GET_CALL_LIST_ID_FOR_CONFERENCE] =
         &CallManagerServiceStub::OnGetCallIdListForConference;
 }
 
 void CallManagerServiceStub::InitCallMultimediaRequest()
 {
-    memberFuncMap_[(uint32_t)CallManagerSurfaceCode::INTERFACE_SET_MUTE] = &CallManagerServiceStub::OnSetMute;
-    memberFuncMap_[(uint32_t)CallManagerSurfaceCode::INTERFACE_MUTE_RINGER] = &CallManagerServiceStub::OnMuteRinger;
-    memberFuncMap_[(uint32_t)CallManagerSurfaceCode::INTERFACE_SET_AUDIO_DEVICE] =
-        &CallManagerServiceStub::OnSetAudioDevice;
-    memberFuncMap_[(uint32_t)CallManagerSurfaceCode::INTERFACE_CANCEL_MISSED_CALLS_NOTIFICATION] =
-        &CallManagerServiceStub::OnCancelMissedCallsNotification;
-    memberFuncMap_[(uint32_t)CallManagerSurfaceCode::INTERFACE_CTRL_CAMERA] =
-        &CallManagerServiceStub::OnControlCamera;
-    memberFuncMap_[(uint32_t)CallManagerSurfaceCode::INTERFACE_SET_PREVIEW_WINDOW] =
-        &CallManagerServiceStub::OnSetPreviewWindow;
-    memberFuncMap_[(uint32_t)CallManagerSurfaceCode::INTERFACE_SET_DISPLAY_WINDOW] =
-        &CallManagerServiceStub::OnSetDisplayWindow;
-    memberFuncMap_[(uint32_t)CallManagerSurfaceCode::INTERFACE_SET_CAMERA_ZOOM] =
-        &CallManagerServiceStub::OnSetCameraZoom;
-    memberFuncMap_[(uint32_t)CallManagerSurfaceCode::INTERFACE_SET_PAUSE_PICTURE] =
-        &CallManagerServiceStub::OnSetPausePicture;
-    memberFuncMap_[(uint32_t)CallManagerSurfaceCode::INTERFACE_SET_DEVICE_DIRECTION] =
-        &CallManagerServiceStub::OnSetDeviceDirection;
+    memberFuncMap_[INTERFACE_SET_MUTE] = &CallManagerServiceStub::OnSetMute;
+    memberFuncMap_[INTERFACE_MUTE_RINGER] = &CallManagerServiceStub::OnMuteRinger;
+    memberFuncMap_[INTERFACE_SET_AUDIO_DEVICE] = &CallManagerServiceStub::OnSetAudioDevice;
+    memberFuncMap_[INTERFACE_CTRL_CAMERA] = &CallManagerServiceStub::OnControlCamera;
+    memberFuncMap_[INTERFACE_SET_PREVIEW_WINDOW] = &CallManagerServiceStub::OnSetPreviewWindow;
+    memberFuncMap_[INTERFACE_SET_DISPLAY_WINDOW] = &CallManagerServiceStub::OnSetDisplayWindow;
+    memberFuncMap_[INTERFACE_SET_CAMERA_ZOOM] = &CallManagerServiceStub::OnSetCameraZoom;
+    memberFuncMap_[INTERFACE_SET_PAUSE_IMAGE] = &CallManagerServiceStub::OnSetPausePicture;
+    memberFuncMap_[INTERFACE_SET_DEVICE_DIRECTION] = &CallManagerServiceStub::OnSetDeviceDirection;
+    memberFuncMap_[INTERFACE_UPDATE_CALL_MEDIA_MODE] = &CallManagerServiceStub::OnUpdateCallMediaMode;
 }
 
 void CallManagerServiceStub::InitImsServiceRequest()
 {
-    memberFuncMap_[(uint32_t)CallManagerSurfaceCode::INTERFACE_SETCALL_PREFERENCEMODE] =
-        &CallManagerServiceStub::OnSetCallPreferenceMode;
+    memberFuncMap_[INTERFACE_SETCALL_PREFERENCEMODE] = &CallManagerServiceStub::OnSetCallPreferenceMode;
+    memberFuncMap_[INTERFACE_GET_IMS_CONFIG] = &CallManagerServiceStub::OnGetImsConfig;
+    memberFuncMap_[INTERFACE_SET_IMS_CONFIG] = &CallManagerServiceStub::OnSetImsConfig;
+    memberFuncMap_[INTERFACE_GET_IMS_FEATURE_VALUE] = &CallManagerServiceStub::OnGetImsFeatureValue;
+    memberFuncMap_[INTERFACE_SET_IMS_FEATURE_VALUE] = &CallManagerServiceStub::OnSetImsFeatureValue;
+    memberFuncMap_[INTERFACE_ENABLE_VOLTE] = &CallManagerServiceStub::OnEnableVoLte;
+    memberFuncMap_[INTERFACE_DISABLE_VOLTE] = &CallManagerServiceStub::OnDisableVoLte;
+    memberFuncMap_[INTERFACE_IS_VOLTE_ENABLED] = &CallManagerServiceStub::OnIsVoLteEnabled;
+    memberFuncMap_[INTERFACE_ENABLE_LTE_ENHANCE_MODE] = &CallManagerServiceStub::OnEnableLteEnhanceMode;
+    memberFuncMap_[INTERFACE_DISABLE_LTE_ENHANCE_MODE] = &CallManagerServiceStub::OnDisableEnhanceMode;
+    memberFuncMap_[INTERFACE_IS_LTE_ENHANCE_MODE_ENABLED] = &CallManagerServiceStub::OnIsLteEnhanceModeEnabled;
+    memberFuncMap_[INTERFACE_START_RTT] = &CallManagerServiceStub::OnStartRtt;
+    memberFuncMap_[INTERFACE_STOP_RTT] = &CallManagerServiceStub::OnStopRtt;
 }
 
-int CallManagerServiceStub::OnRemoteRequest(
+int32_t CallManagerServiceStub::OnRemoteRequest(
     uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
     std::u16string myDescriptor = CallManagerServiceStub::GetDescriptor();
@@ -173,6 +155,9 @@ int CallManagerServiceStub::OnRemoteRequest(
 int32_t CallManagerServiceStub::OnRegisterCallBack(MessageParcel &data, MessageParcel &reply)
 {
     int32_t result = TELEPHONY_ERR_FAIL;
+    if (!data.ContainFileDescriptors()) {
+        TELEPHONY_LOGW("sent raw data is less than 32k");
+    }
     sptr<IRemoteObject> remote = data.ReadRemoteObject();
     if (remote == nullptr) {
         TELEPHONY_LOGE("callback ptr is nullptr.");
@@ -196,6 +181,9 @@ int32_t CallManagerServiceStub::OnRegisterCallBack(MessageParcel &data, MessageP
 int32_t CallManagerServiceStub::OnUnRegisterCallBack(MessageParcel &data, MessageParcel &reply)
 {
     int32_t result = TELEPHONY_ERR_FAIL;
+    if (!data.ContainFileDescriptors()) {
+        TELEPHONY_LOGW("sent raw data is less than 32k");
+    }
     std::u16string bundleName = data.ReadString16();
     result = UnRegisterCallBack(bundleName);
     if (!reply.WriteInt32(result)) {
@@ -208,21 +196,17 @@ int32_t CallManagerServiceStub::OnUnRegisterCallBack(MessageParcel &data, Messag
 int32_t CallManagerServiceStub::OnDialCall(MessageParcel &data, MessageParcel &reply)
 {
     int32_t result = TELEPHONY_ERR_FAIL;
-    std::u16string callNumber = data.ReadString16();
-    int32_t accountId = data.ReadInt32();
-    int32_t videoState = data.ReadInt32();
-    int32_t dialScene = data.ReadInt32();
-    int32_t dialType = data.ReadInt32();
-    int32_t callType = data.ReadInt32();
     AppExecFwk::PacMap dialInfo;
-    dialInfo.PutIntValue("accountId", accountId);
-    dialInfo.PutIntValue("videoState", videoState);
-    dialInfo.PutIntValue("dialScene", dialScene);
-    dialInfo.PutIntValue("dialType", dialType);
-    dialInfo.PutIntValue("callType", callType);
     if (!data.ContainFileDescriptors()) {
         TELEPHONY_LOGW("sent raw data is less than 32k");
     }
+    std::u16string callNumber = data.ReadString16();
+    dialInfo.PutIntValue("accountId", data.ReadInt32());
+    dialInfo.PutIntValue("videoState", data.ReadInt32());
+    dialInfo.PutIntValue("dialScene", data.ReadInt32());
+    dialInfo.PutIntValue("dialType", data.ReadInt32());
+    dialInfo.PutIntValue("callType", data.ReadInt32());
+    dialInfo.PutStringValue("bundleName", data.ReadString());
     if (callNumber.length() > ACCOUNT_NUMBER_MAX_LENGTH) {
         TELEPHONY_LOGE("the account number length exceeds the limit");
         return CALL_ERR_NUMBER_OUT_OF_RANGE;
@@ -238,6 +222,9 @@ int32_t CallManagerServiceStub::OnDialCall(MessageParcel &data, MessageParcel &r
 
 int32_t CallManagerServiceStub::OnAcceptCall(MessageParcel &data, MessageParcel &reply)
 {
+    if (!data.ContainFileDescriptors()) {
+        TELEPHONY_LOGW("sent raw data is less than 32k");
+    }
     int32_t callId = data.ReadInt32();
     int32_t videoState = data.ReadInt32();
     int32_t result = AnswerCall(callId, videoState);
@@ -251,6 +238,9 @@ int32_t CallManagerServiceStub::OnAcceptCall(MessageParcel &data, MessageParcel 
 
 int32_t CallManagerServiceStub::OnRejectCall(MessageParcel &data, MessageParcel &reply)
 {
+    if (!data.ContainFileDescriptors()) {
+        TELEPHONY_LOGW("sent raw data is less than 32k");
+    }
     int32_t callId = data.ReadInt32();
     bool isSendSms = data.ReadBool();
     std::u16string content = data.ReadString16();
@@ -265,6 +255,9 @@ int32_t CallManagerServiceStub::OnRejectCall(MessageParcel &data, MessageParcel 
 
 int32_t CallManagerServiceStub::OnHangUpCall(MessageParcel &data, MessageParcel &reply)
 {
+    if (!data.ContainFileDescriptors()) {
+        TELEPHONY_LOGW("sent raw data is less than 32k");
+    }
     int32_t callId = data.ReadInt32();
     int32_t result = HangUpCall(callId);
     TELEPHONY_LOGI("result:%{public}d", result);
@@ -277,6 +270,9 @@ int32_t CallManagerServiceStub::OnHangUpCall(MessageParcel &data, MessageParcel 
 
 int32_t CallManagerServiceStub::OnGetCallState(MessageParcel &data, MessageParcel &reply)
 {
+    if (!data.ContainFileDescriptors()) {
+        TELEPHONY_LOGW("sent raw data is less than 32k");
+    }
     int32_t result = GetCallState();
     TELEPHONY_LOGI("result:%{public}d", result);
     if (!reply.WriteInt32(result)) {
@@ -288,6 +284,9 @@ int32_t CallManagerServiceStub::OnGetCallState(MessageParcel &data, MessageParce
 
 int32_t CallManagerServiceStub::OnHoldCall(MessageParcel &data, MessageParcel &reply)
 {
+    if (!data.ContainFileDescriptors()) {
+        TELEPHONY_LOGW("sent raw data is less than 32k");
+    }
     int32_t callId = data.ReadInt32();
     int32_t result = HoldCall(callId);
     TELEPHONY_LOGI("result:%{public}d", result);
@@ -300,6 +299,9 @@ int32_t CallManagerServiceStub::OnHoldCall(MessageParcel &data, MessageParcel &r
 
 int32_t CallManagerServiceStub::OnUnHoldCall(MessageParcel &data, MessageParcel &reply)
 {
+    if (!data.ContainFileDescriptors()) {
+        TELEPHONY_LOGW("sent raw data is less than 32k");
+    }
     int32_t callId = data.ReadInt32();
     int32_t result = UnHoldCall(callId);
     TELEPHONY_LOGI("result:%{public}d", result);
@@ -312,6 +314,9 @@ int32_t CallManagerServiceStub::OnUnHoldCall(MessageParcel &data, MessageParcel 
 
 int32_t CallManagerServiceStub::OnSwitchCall(MessageParcel &data, MessageParcel &reply)
 {
+    if (!data.ContainFileDescriptors()) {
+        TELEPHONY_LOGW("sent raw data is less than 32k");
+    }
     int32_t callId = data.ReadInt32();
     int32_t result = SwitchCall(callId);
     TELEPHONY_LOGI("result:%{public}d", result);
@@ -324,6 +329,9 @@ int32_t CallManagerServiceStub::OnSwitchCall(MessageParcel &data, MessageParcel 
 
 int32_t CallManagerServiceStub::OnHasCall(MessageParcel &data, MessageParcel &reply)
 {
+    if (!data.ContainFileDescriptors()) {
+        TELEPHONY_LOGW("sent raw data is less than 32k");
+    }
     bool result = HasCall();
     TELEPHONY_LOGI("result:%{public}d", result);
     if (!reply.WriteBool(result)) {
@@ -335,6 +343,9 @@ int32_t CallManagerServiceStub::OnHasCall(MessageParcel &data, MessageParcel &re
 
 int32_t CallManagerServiceStub::OnIsNewCallAllowed(MessageParcel &data, MessageParcel &reply)
 {
+    if (!data.ContainFileDescriptors()) {
+        TELEPHONY_LOGW("sent raw data is less than 32k");
+    }
     bool result = IsNewCallAllowed();
     TELEPHONY_LOGI("result:%{public}d", result);
     if (!reply.WriteBool(result)) {
@@ -346,6 +357,9 @@ int32_t CallManagerServiceStub::OnIsNewCallAllowed(MessageParcel &data, MessageP
 
 int32_t CallManagerServiceStub::OnSetMute(MessageParcel &data, MessageParcel &reply)
 {
+    if (!data.ContainFileDescriptors()) {
+        TELEPHONY_LOGW("sent raw data is less than 32k");
+    }
     bool isMute = data.ReadBool();
     int32_t result = SetMuted(isMute);
     TELEPHONY_LOGI("result:%{public}d", result);
@@ -358,6 +372,9 @@ int32_t CallManagerServiceStub::OnSetMute(MessageParcel &data, MessageParcel &re
 
 int32_t CallManagerServiceStub::OnMuteRinger(MessageParcel &data, MessageParcel &reply)
 {
+    if (!data.ContainFileDescriptors()) {
+        TELEPHONY_LOGW("sent raw data is less than 32k");
+    }
     int32_t result = MuteRinger();
     TELEPHONY_LOGI("result:%{public}d", result);
     if (!reply.WriteInt32(result)) {
@@ -369,25 +386,11 @@ int32_t CallManagerServiceStub::OnMuteRinger(MessageParcel &data, MessageParcel 
 
 int32_t CallManagerServiceStub::OnSetAudioDevice(MessageParcel &data, MessageParcel &reply)
 {
-    int32_t deviceType = data.ReadInt32();
-    AudioDevice device = AudioDevice::DEVICE_UNKNOWN;
-    switch (deviceType) {
-        case (int32_t)AudioDevice::DEVICE_EARPIECE:
-            device = AudioDevice::DEVICE_EARPIECE;
-            break;
-        case (int32_t)AudioDevice::DEVICE_SPEAKER:
-            device = AudioDevice::DEVICE_SPEAKER;
-            break;
-        case (int32_t)AudioDevice::DEVICE_WIRED_HEADSET:
-            device = AudioDevice::DEVICE_WIRED_HEADSET;
-            break;
-        case (int32_t)AudioDevice::DEVICE_BLUETOOTH_SCO:
-            device = AudioDevice::DEVICE_BLUETOOTH_SCO;
-            break;
-        default:
-            break;
+    if (!data.ContainFileDescriptors()) {
+        TELEPHONY_LOGW("sent raw data is less than 32k");
     }
-    int32_t result = SetAudioDevice(device);
+    int32_t deviceType = data.ReadInt32();
+    int32_t result = SetAudioDevice((AudioDevice)deviceType);
     TELEPHONY_LOGI("result:%{public}d", result);
     if (!reply.WriteInt32(result)) {
         TELEPHONY_LOGE("fail to write parcel");
@@ -398,6 +401,9 @@ int32_t CallManagerServiceStub::OnSetAudioDevice(MessageParcel &data, MessagePar
 
 int32_t CallManagerServiceStub::OnIsRinging(MessageParcel &data, MessageParcel &reply)
 {
+    if (!data.ContainFileDescriptors()) {
+        TELEPHONY_LOGW("sent raw data is less than 32k");
+    }
     bool result = IsRinging();
     TELEPHONY_LOGI("result:%{public}d", result);
     if (!reply.WriteBool(result)) {
@@ -409,6 +415,9 @@ int32_t CallManagerServiceStub::OnIsRinging(MessageParcel &data, MessageParcel &
 
 int32_t CallManagerServiceStub::OnIsInEmergencyCall(MessageParcel &data, MessageParcel &reply)
 {
+    if (!data.ContainFileDescriptors()) {
+        TELEPHONY_LOGW("sent raw data is less than 32k");
+    }
     bool result = IsInEmergencyCall();
     TELEPHONY_LOGI("result:%{public}d", result);
     if (!reply.WriteBool(result)) {
@@ -421,6 +430,9 @@ int32_t CallManagerServiceStub::OnIsInEmergencyCall(MessageParcel &data, Message
 int32_t CallManagerServiceStub::OnStartDtmf(MessageParcel &data, MessageParcel &reply)
 {
     int32_t result = TELEPHONY_ERR_FAIL;
+    if (!data.ContainFileDescriptors()) {
+        TELEPHONY_LOGW("sent raw data is less than 32k");
+    }
     int32_t callId = data.ReadInt32();
     char str = data.ReadInt8();
     result = StartDtmf(callId, str);
@@ -432,39 +444,12 @@ int32_t CallManagerServiceStub::OnStartDtmf(MessageParcel &data, MessageParcel &
     return TELEPHONY_SUCCESS;
 }
 
-int32_t CallManagerServiceStub::OnSendDtmf(MessageParcel &data, MessageParcel &reply)
-{
-    int32_t result = TELEPHONY_ERR_FAIL;
-    int32_t callId = data.ReadInt32();
-    char str = data.ReadInt8();
-    result = SendDtmf(callId, str);
-    TELEPHONY_LOGI("result:%{public}d", result);
-    if (!reply.WriteInt32(result)) {
-        TELEPHONY_LOGE("fail to write parcel");
-        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
-    }
-    return TELEPHONY_SUCCESS;
-}
-
-int32_t CallManagerServiceStub::OnSendDtmfBunch(MessageParcel &data, MessageParcel &reply)
-{
-    int32_t result = TELEPHONY_ERR_FAIL;
-    int32_t callId = data.ReadInt32();
-    std::u16string str = data.ReadString16();
-    int32_t on = data.ReadInt32();
-    int32_t off = data.ReadInt32();
-    result = SendBurstDtmf(callId, str, on, off);
-    TELEPHONY_LOGI("result:%{public}d", result);
-    if (!reply.WriteInt32(result)) {
-        TELEPHONY_LOGE("fail to write parcel");
-        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
-    }
-    return TELEPHONY_SUCCESS;
-}
-
 int32_t CallManagerServiceStub::OnStopDtmf(MessageParcel &data, MessageParcel &reply)
 {
     int32_t result = TELEPHONY_ERR_FAIL;
+    if (!data.ContainFileDescriptors()) {
+        TELEPHONY_LOGW("sent raw data is less than 32k");
+    }
     int32_t callId = data.ReadInt32();
     result = StopDtmf(callId);
     TELEPHONY_LOGI("result:%{public}d", result);
@@ -478,6 +463,9 @@ int32_t CallManagerServiceStub::OnStopDtmf(MessageParcel &data, MessageParcel &r
 int32_t CallManagerServiceStub::OnGetCallWaiting(MessageParcel &data, MessageParcel &reply)
 {
     int32_t result = TELEPHONY_ERR_FAIL;
+    if (!data.ContainFileDescriptors()) {
+        TELEPHONY_LOGW("sent raw data is less than 32k");
+    }
     int32_t slotId = data.ReadInt32();
     result = GetCallWaiting(slotId);
     TELEPHONY_LOGI("result:%{public}d", result);
@@ -491,6 +479,9 @@ int32_t CallManagerServiceStub::OnGetCallWaiting(MessageParcel &data, MessagePar
 int32_t CallManagerServiceStub::OnSetCallWaiting(MessageParcel &data, MessageParcel &reply)
 {
     int32_t result = TELEPHONY_ERR_FAIL;
+    if (!data.ContainFileDescriptors()) {
+        TELEPHONY_LOGW("sent raw data is less than 32k");
+    }
     int32_t slotId = data.ReadInt32();
     bool activate = data.ReadBool();
     result = SetCallWaiting(slotId, activate);
@@ -505,6 +496,9 @@ int32_t CallManagerServiceStub::OnSetCallWaiting(MessageParcel &data, MessagePar
 int32_t CallManagerServiceStub::OnGetCallRestriction(MessageParcel &data, MessageParcel &reply)
 {
     int32_t result = TELEPHONY_ERR_FAIL;
+    if (!data.ContainFileDescriptors()) {
+        TELEPHONY_LOGW("sent raw data is less than 32k");
+    }
     int32_t slotId = data.ReadInt32();
     CallRestrictionType type = static_cast<CallRestrictionType>(data.ReadInt32());
     result = GetCallRestriction(slotId, type);
@@ -519,6 +513,9 @@ int32_t CallManagerServiceStub::OnGetCallRestriction(MessageParcel &data, Messag
 int32_t CallManagerServiceStub::OnSetCallRestriction(MessageParcel &data, MessageParcel &reply)
 {
     int32_t result = TELEPHONY_ERR_FAIL;
+    if (!data.ContainFileDescriptors()) {
+        TELEPHONY_LOGW("sent raw data is less than 32k");
+    }
     int32_t slotId = data.ReadInt32();
     CallRestrictionInfo *pCRInfo = (CallRestrictionInfo *)data.ReadRawData(sizeof(CallRestrictionInfo));
     result = SetCallRestriction(slotId, *pCRInfo);
@@ -533,6 +530,9 @@ int32_t CallManagerServiceStub::OnSetCallRestriction(MessageParcel &data, Messag
 int32_t CallManagerServiceStub::OnGetTransferNumber(MessageParcel &data, MessageParcel &reply)
 {
     int32_t result = TELEPHONY_ERR_FAIL;
+    if (!data.ContainFileDescriptors()) {
+        TELEPHONY_LOGW("sent raw data is less than 32k");
+    }
     int32_t slotId = data.ReadInt32();
     CallTransferType type = static_cast<CallTransferType>(data.ReadInt32());
     result = GetCallTransferInfo(slotId, type);
@@ -547,6 +547,9 @@ int32_t CallManagerServiceStub::OnGetTransferNumber(MessageParcel &data, Message
 int32_t CallManagerServiceStub::OnSetTransferNumber(MessageParcel &data, MessageParcel &reply)
 {
     int32_t result = TELEPHONY_ERR_FAIL;
+    if (!data.ContainFileDescriptors()) {
+        TELEPHONY_LOGW("sent raw data is less than 32k");
+    }
     int32_t slotId = data.ReadInt32();
     CallTransferInfo *pCTInfo = (CallTransferInfo *)data.ReadRawData(sizeof(CallTransferInfo));
     result = SetCallTransferInfo(slotId, *pCTInfo);
@@ -558,8 +561,11 @@ int32_t CallManagerServiceStub::OnSetTransferNumber(MessageParcel &data, Message
     return TELEPHONY_SUCCESS;
 }
 
-int32_t CallManagerServiceStub::OnJoinConference(MessageParcel &data, MessageParcel &reply)
+int32_t CallManagerServiceStub::OnCombineConference(MessageParcel &data, MessageParcel &reply)
 {
+    if (!data.ContainFileDescriptors()) {
+        TELEPHONY_LOGW("sent raw data is less than 32k");
+    }
     int32_t mainCallId = data.ReadInt32();
     int32_t result = CombineConference(mainCallId);
     TELEPHONY_LOGI("result:%{public}d", result);
@@ -572,6 +578,9 @@ int32_t CallManagerServiceStub::OnJoinConference(MessageParcel &data, MessagePar
 
 int32_t CallManagerServiceStub::OnSeparateConference(MessageParcel &data, MessageParcel &reply)
 {
+    if (!data.ContainFileDescriptors()) {
+        TELEPHONY_LOGW("sent raw data is less than 32k");
+    }
     int32_t callId = data.ReadInt32();
     int32_t result = SeparateConference(callId);
     TELEPHONY_LOGI("result:%{public}d", result);
@@ -582,11 +591,145 @@ int32_t CallManagerServiceStub::OnSeparateConference(MessageParcel &data, Messag
     return TELEPHONY_SUCCESS;
 }
 
+int32_t CallManagerServiceStub::OnJoinConference(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t result = TELEPHONY_ERR_FAIL;
+    if (!data.ContainFileDescriptors()) {
+        TELEPHONY_LOGW("sent raw data is less than 32k");
+    }
+    int32_t callId = data.ReadInt32();
+    std::vector<std::u16string> numberList;
+    if (!data.ReadString16Vector(&numberList)) {
+        TELEPHONY_LOGE("read conference participants numberList failed");
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
+    result = JoinConference(callId, numberList);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("JoinConference fail to write parcel");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallManagerServiceStub::OnSetCallPreferenceMode(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t result = TELEPHONY_ERR_FAIL;
+    if (!data.ContainFileDescriptors()) {
+        TELEPHONY_LOGW("sent raw data is less than 32k");
+    }
+    int32_t slotId = data.ReadInt32();
+    int32_t mode = data.ReadInt32();
+    result = SetCallPreferenceMode(slotId, mode);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("SetCallPreferenceMode fail to write parcel");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallManagerServiceStub::OnControlCamera(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t result = TELEPHONY_ERR_FAIL;
+    if (!data.ContainFileDescriptors()) {
+        TELEPHONY_LOGW("sent raw data is less than 32k");
+    }
+    std::u16string cameraId = data.ReadString16();
+    std::u16string callingPackage = data.ReadString16();
+    result = ControlCamera(cameraId, callingPackage);
+    TELEPHONY_LOGI("result:%{public}d", result);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("ControlCamera fail to write parcel");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallManagerServiceStub::OnSetPreviewWindow(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t result = TELEPHONY_ERR_FAIL;
+    if (!data.ContainFileDescriptors()) {
+        TELEPHONY_LOGW("sent raw data is less than 32k");
+    }
+    VideoWindow *pSurface = (VideoWindow *)data.ReadRawData(sizeof(VideoWindow));
+    result = SetPreviewWindow(*pSurface);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("SetPreviewWindow fail to write parcel");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallManagerServiceStub::OnSetDisplayWindow(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t result = TELEPHONY_ERR_FAIL;
+    if (!data.ContainFileDescriptors()) {
+        TELEPHONY_LOGW("sent raw data is less than 32k");
+    }
+    VideoWindow *pSurface = (VideoWindow *)data.ReadRawData(sizeof(VideoWindow));
+    result = SetDisplayWindow(*pSurface);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("SetDisplayWindow fail to write parcel");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallManagerServiceStub::OnSetCameraZoom(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t result = TELEPHONY_ERR_FAIL;
+    if (!data.ContainFileDescriptors()) {
+        TELEPHONY_LOGW("sent raw data is less than 32k");
+    }
+    float zoom = data.ReadFloat();
+    result = SetCameraZoom(zoom);
+    TELEPHONY_LOGI("result:%{public}d", result);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("SetCameraZoom fail to write parcel");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallManagerServiceStub::OnSetPausePicture(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t result = TELEPHONY_ERR_FAIL;
+    if (!data.ContainFileDescriptors()) {
+        TELEPHONY_LOGW("sent raw data is less than 32k");
+    }
+    std::u16string path = data.ReadString16();
+    result = SetPausePicture(path);
+    TELEPHONY_LOGI("result:%{public}d", result);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("SetPausePicture fail to write parcel");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallManagerServiceStub::OnSetDeviceDirection(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t result = TELEPHONY_ERR_FAIL;
+    if (!data.ContainFileDescriptors()) {
+        TELEPHONY_LOGW("sent raw data is less than 32k");
+    }
+    int32_t rotation = data.ReadInt32();
+    result = SetDeviceDirection(rotation);
+    TELEPHONY_LOGI("result:%{public}d", result);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("SetDeviceDirection fail to write parcel");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
 int32_t CallManagerServiceStub::OnIsEmergencyPhoneNumber(MessageParcel &data, MessageParcel &reply)
 {
+    if (!data.ContainFileDescriptors()) {
+        TELEPHONY_LOGW("sent raw data is less than 32k");
+    }
     std::u16string callNumber = data.ReadString16();
     int32_t slotId = data.ReadInt32();
-    int32_t errorCode = TELEPHONY_ERROR;
+    int32_t errorCode = TELEPHONY_ERR_FAIL;
     bool result = IsEmergencyPhoneNumber(callNumber, slotId, errorCode);
     TELEPHONY_LOGI("result:%{public}d", result);
     if (!reply.WriteBool(result) || !reply.WriteInt32(errorCode)) {
@@ -598,6 +741,9 @@ int32_t CallManagerServiceStub::OnIsEmergencyPhoneNumber(MessageParcel &data, Me
 
 int32_t CallManagerServiceStub::OnFormatPhoneNumber(MessageParcel &data, MessageParcel &reply)
 {
+    if (!data.ContainFileDescriptors()) {
+        TELEPHONY_LOGW("sent raw data is less than 32k");
+    }
     std::u16string callNumber = data.ReadString16();
     std::u16string countryCode = data.ReadString16();
     std::u16string formatNumber;
@@ -612,6 +758,9 @@ int32_t CallManagerServiceStub::OnFormatPhoneNumber(MessageParcel &data, Message
 
 int32_t CallManagerServiceStub::OnFormatPhoneNumberToE164(MessageParcel &data, MessageParcel &reply)
 {
+    if (!data.ContainFileDescriptors()) {
+        TELEPHONY_LOGW("sent raw data is less than 32k");
+    }
     std::u16string callNumber = data.ReadString16();
     std::u16string countryCode = data.ReadString16();
     std::u16string formatNumber;
@@ -626,6 +775,9 @@ int32_t CallManagerServiceStub::OnFormatPhoneNumberToE164(MessageParcel &data, M
 
 int32_t CallManagerServiceStub::OnGetMainCallId(MessageParcel &data, MessageParcel &reply)
 {
+    if (!data.ContainFileDescriptors()) {
+        TELEPHONY_LOGW("sent raw data is less than 32k");
+    }
     int32_t callId = data.ReadInt32();
     int32_t result = GetMainCallId(callId);
     TELEPHONY_LOGI("result:%{public}d", result);
@@ -638,6 +790,9 @@ int32_t CallManagerServiceStub::OnGetMainCallId(MessageParcel &data, MessageParc
 
 int32_t CallManagerServiceStub::OnGetSubCallIdList(MessageParcel &data, MessageParcel &reply)
 {
+    if (!data.ContainFileDescriptors()) {
+        TELEPHONY_LOGW("sent raw data is less than 32k");
+    }
     int32_t callId = data.ReadInt32();
     std::vector<std::u16string> result = GetSubCallIdList(callId);
     if (!reply.WriteString16Vector(result)) {
@@ -649,6 +804,9 @@ int32_t CallManagerServiceStub::OnGetSubCallIdList(MessageParcel &data, MessageP
 
 int32_t CallManagerServiceStub::OnGetCallIdListForConference(MessageParcel &data, MessageParcel &reply)
 {
+    if (!data.ContainFileDescriptors()) {
+        TELEPHONY_LOGW("sent raw data is less than 32k");
+    }
     int32_t callId = data.ReadInt32();
     std::vector<std::u16string> result = GetCallIdListForConference(callId);
     if (!reply.WriteString16Vector(result)) {
@@ -658,98 +816,226 @@ int32_t CallManagerServiceStub::OnGetCallIdListForConference(MessageParcel &data
     return TELEPHONY_SUCCESS;
 }
 
-int32_t CallManagerServiceStub::OnCancelMissedCallsNotification(MessageParcel &data, MessageParcel &reply)
+int32_t CallManagerServiceStub::OnGetImsConfig(MessageParcel &data, MessageParcel &reply)
 {
-    int32_t id = data.ReadInt32();
-    int32_t result = CancelMissedCallsNotification(id);
-    TELEPHONY_LOGI("result:%{public}d", result);
+    int32_t result = TELEPHONY_ERR_FAIL;
+    if (!data.ContainFileDescriptors()) {
+        TELEPHONY_LOGW("sent raw data is less than 32k");
+    }
+    int32_t slotId = data.ReadInt32();
+    int32_t item = data.ReadInt32();
+    result = GetImsConfig(slotId, static_cast<ImsConfigItem>(item));
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("GetImsConfig fail to write parcel");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallManagerServiceStub::OnSetImsConfig(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t result = TELEPHONY_ERR_FAIL;
+    if (!data.ContainFileDescriptors()) {
+        TELEPHONY_LOGW("sent raw data is less than 32k");
+    }
+    int32_t slotId = data.ReadInt32();
+    int32_t item = data.ReadInt32();
+    std::u16string value = data.ReadString16();
+    result = SetImsConfig(slotId, static_cast<ImsConfigItem>(item), value);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("SetImsConfig fail to write parcel");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallManagerServiceStub::OnGetImsFeatureValue(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t result = TELEPHONY_ERR_FAIL;
+    if (!data.ContainFileDescriptors()) {
+        TELEPHONY_LOGW("sent raw data is less than 32k");
+    }
+    int32_t slotId = data.ReadInt32();
+    FeatureType type = static_cast<FeatureType>(data.ReadInt32());
+    result = GetImsFeatureValue(slotId, type);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("GetImsFeatureValue fail to write parcel");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallManagerServiceStub::OnSetImsFeatureValue(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t result = TELEPHONY_ERR_FAIL;
+    if (!data.ContainFileDescriptors()) {
+        TELEPHONY_LOGW("sent raw data is less than 32k");
+    }
+    int32_t slotId = data.ReadInt32();
+    FeatureType type = static_cast<FeatureType>(data.ReadInt32());
+    int32_t value = data.ReadInt32();
+    result = SetImsFeatureValue(slotId, type, value);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("SetImsFeatureValue fail to write parcel");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallManagerServiceStub::OnUpdateCallMediaMode(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t result = TELEPHONY_ERR_FAIL;
+    if (!data.ContainFileDescriptors()) {
+        TELEPHONY_LOGW("sent raw data is less than 32k");
+    }
+    int32_t callId = data.ReadInt32();
+    CallMediaMode mode = (CallMediaMode)data.ReadUint32();
+    result = UpdateCallMediaMode(callId, mode);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("OnUpdateCallMediaMode fail to write parcel");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallManagerServiceStub::OnEnableVoLte(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t result = TELEPHONY_ERR_FAIL;
+    if (!data.ContainFileDescriptors()) {
+        TELEPHONY_LOGW("sent raw data is less than 32k");
+    }
+    int32_t slotId = data.ReadInt32();
+    result = EnableVoLte(slotId);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("EnableVoLte fail to write parcel");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallManagerServiceStub::OnDisableVoLte(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t result = TELEPHONY_ERR_FAIL;
+    if (!data.ContainFileDescriptors()) {
+        TELEPHONY_LOGW("sent raw data is less than 32k");
+    }
+    int32_t slotId = data.ReadInt32();
+    result = DisableVoLte(slotId);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("DisableVoLte fail to write parcel");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallManagerServiceStub::OnIsVoLteEnabled(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t result = TELEPHONY_ERR_FAIL;
+    if (!data.ContainFileDescriptors()) {
+        TELEPHONY_LOGW("sent raw data is less than 32k");
+    }
+    int32_t slotId = data.ReadInt32();
+    result = IsVoLteEnabled(slotId);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("IsVoLteEnabled fail to write parcel");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallManagerServiceStub::OnEnableLteEnhanceMode(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t result = TELEPHONY_ERR_FAIL;
+    if (!data.ContainFileDescriptors()) {
+        TELEPHONY_LOGW("sent raw data is less than 32k");
+    }
+    int32_t slotId = data.ReadInt32();
+    result = EnableLteEnhanceMode(slotId);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("EnableLteEnhanceMode fail to write parcel");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallManagerServiceStub::OnDisableEnhanceMode(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t result = TELEPHONY_ERR_FAIL;
+    if (!data.ContainFileDescriptors()) {
+        TELEPHONY_LOGW("sent raw data is less than 32k");
+    }
+    int32_t slotId = data.ReadInt32();
+    result = DisableLteEnhanceMode(slotId);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("DisableLteEnhanceMode fail to write parcel");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallManagerServiceStub::OnIsLteEnhanceModeEnabled(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t result = TELEPHONY_ERR_FAIL;
+    int32_t slotId = data.ReadInt32();
+    result = IsLteEnhanceModeEnabled(slotId);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("GetLteEnhanceMode fail to write parcel");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallManagerServiceStub::OnStartRtt(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t result = TELEPHONY_ERR_FAIL;
+    if (!data.ContainFileDescriptors()) {
+        TELEPHONY_LOGW("sent raw data is less than 32k");
+    }
+    int32_t callId = data.ReadInt32();
+    std::u16string msg = data.ReadString16();
+    result = StartRtt(callId, msg);
     if (!reply.WriteInt32(result)) {
         TELEPHONY_LOGE("fail to write parcel");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    return result;
+    return TELEPHONY_SUCCESS;
 }
-int32_t CallManagerServiceStub::OnControlCamera(MessageParcel &data, MessageParcel &reply)
+
+int32_t CallManagerServiceStub::OnStopRtt(MessageParcel &data, MessageParcel &reply)
 {
     int32_t result = TELEPHONY_ERR_FAIL;
-    std::u16string cameraId = data.ReadString16();
-    std::u16string callingPackage = data.ReadString16();
-    result = ControlCamera(cameraId, callingPackage);
+    if (!data.ContainFileDescriptors()) {
+        TELEPHONY_LOGW("sent raw data is less than 32k");
+    }
+    int32_t callId = data.ReadInt32();
+    result = StopRtt(callId);
     if (!reply.WriteInt32(result)) {
-        TELEPHONY_LOGE("ControlCamera fail to write parcel");
+        TELEPHONY_LOGE("fail to write parcel");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
     return TELEPHONY_SUCCESS;
 }
 
-int32_t CallManagerServiceStub::OnSetPreviewWindow(MessageParcel &data, MessageParcel &reply)
+int32_t CallManagerServiceStub::OnReportOttCallDetailsInfo(MessageParcel &data, MessageParcel &reply)
 {
     int32_t result = TELEPHONY_ERR_FAIL;
-    VideoWindow *pSurface = (VideoWindow *)data.ReadRawData(sizeof(VideoWindow));
-    result = SetPreviewWindow(*pSurface);
-    if (!reply.WriteInt32(result)) {
-        TELEPHONY_LOGE("SetPreviewWindow fail to write parcel");
-        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    if (!data.ContainFileDescriptors()) {
+        TELEPHONY_LOGW("sent raw data is less than 32k");
     }
-    return TELEPHONY_SUCCESS;
-}
-
-int32_t CallManagerServiceStub::OnSetDisplayWindow(MessageParcel &data, MessageParcel &reply)
-{
-    int32_t result = TELEPHONY_ERR_FAIL;
-    VideoWindow *pSurface = (VideoWindow *)data.ReadRawData(sizeof(VideoWindow));
-    result = SetDisplayWindow(*pSurface);
-    if (!reply.WriteInt32(result)) {
-        TELEPHONY_LOGE("SetDisplayWindow fail to write parcel");
-        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    int32_t vecCnt = data.ReadInt32();
+    if (vecCnt <= 0) {
+        TELEPHONY_LOGE("vector is empty");
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
-    return TELEPHONY_SUCCESS;
-}
-
-int32_t CallManagerServiceStub::OnSetCameraZoom(MessageParcel &data, MessageParcel &reply)
-{
-    int32_t result = TELEPHONY_ERR_FAIL;
-    float zoom = data.ReadFloat();
-    result = SetCameraZoom(zoom);
-    if (!reply.WriteInt32(result)) {
-        TELEPHONY_LOGE("SetCameraZoom fail to write parcel");
-        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    std::vector<OttCallDetailsInfo> ottVec;
+    OttCallDetailsInfo *infoPtr = nullptr;
+    for (int32_t i = 0; i < vecCnt; i++) {
+        infoPtr = (OttCallDetailsInfo *)data.ReadRawData(sizeof(OttCallDetailsInfo));
+        ottVec.push_back(*infoPtr);
     }
-    return TELEPHONY_SUCCESS;
-}
-
-int32_t CallManagerServiceStub::OnSetPausePicture(MessageParcel &data, MessageParcel &reply)
-{
-    int32_t result = TELEPHONY_ERR_FAIL;
-    std::u16string path = data.ReadString16();
-    result = SetPausePicture(path);
+    result = ReportOttCallDetailsInfo(ottVec);
     if (!reply.WriteInt32(result)) {
-        TELEPHONY_LOGE("SetPausePicture fail to write parcel");
-        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
-    }
-    return TELEPHONY_SUCCESS;
-}
-
-int32_t CallManagerServiceStub::OnSetDeviceDirection(MessageParcel &data, MessageParcel &reply)
-{
-    int32_t result = TELEPHONY_ERR_FAIL;
-    int32_t rotation = data.ReadInt32();
-    result = SetDeviceDirection(rotation);
-    if (!reply.WriteInt32(result)) {
-        TELEPHONY_LOGE("SetDeviceDirection fail to write parcel");
-        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
-    }
-    return TELEPHONY_SUCCESS;
-}
-
-int32_t CallManagerServiceStub::OnSetCallPreferenceMode(MessageParcel &data, MessageParcel &reply)
-{
-    int32_t result = TELEPHONY_ERR_FAIL;
-    int32_t slotId = data.ReadInt32();
-    int32_t mode = data.ReadInt32();
-    result = SetCallPreferenceMode(slotId, mode);
-    if (!reply.WriteInt32(result)) {
-        TELEPHONY_LOGE("SetCallPreferenceMode fail to write parcel");
+        TELEPHONY_LOGE("ReportOttCallDetailsInfo fail to write parcel");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
     return TELEPHONY_SUCCESS;
@@ -759,8 +1045,8 @@ int32_t CallManagerServiceStub::CheckBundleName(std::string bundleName)
 {
     std::string bundleNameList[] = {
         "com.ohos.callui",
+        "com.ohos.service.callui",
         "com.ohos.callManagerTest",
-        "com.ohos.callManagerGtest",
         "com.ohos.callmanagercallmedia",
         "com.ohos.callmanager",
         "com.ohos.callmanagerregister",
@@ -772,8 +1058,9 @@ int32_t CallManagerServiceStub::CheckBundleName(std::string bundleName)
         "com.example.callmanager",
         "com.example.telephone_demo",
         "com.ohos.calldemo",
+        "com.ohos.callservice",
     };
-    for (int i = 0; i < end(bundleNameList) - begin(bundleNameList); i++) {
+    for (int32_t i = 0; i < end(bundleNameList) - begin(bundleNameList); i++) {
         if (strcmp(bundleName.c_str(), bundleNameList[i].c_str()) == 0) {
             return TELEPHONY_SUCCESS;
         }

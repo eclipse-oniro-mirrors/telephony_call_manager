@@ -23,7 +23,7 @@
 
 namespace OHOS {
 namespace Telephony {
-std::unique_ptr<CallManagerProxy> g_callManagerProxy = nullptr;
+std::shared_ptr<CallManagerProxy> g_callManagerProxy = nullptr;
 
 CallManagerClient::CallManagerClient() {}
 
@@ -32,13 +32,14 @@ CallManagerClient::~CallManagerClient() {}
 void CallManagerClient::Init(int32_t systemAbilityId, std::u16string &bundleName)
 {
     if (g_callManagerProxy == nullptr) {
-        g_callManagerProxy = std::make_unique<CallManagerProxy>();
+        g_callManagerProxy = DelayedSingleton<CallManagerProxy>::GetInstance();
         if (g_callManagerProxy == nullptr) {
-            TELEPHONY_LOGE("make_unique CallManagerProxy failed");
+            TELEPHONY_LOGE("g_callManagerProxy is nullptr");
             return;
         }
         g_callManagerProxy->Init(systemAbilityId, bundleName);
     }
+    TELEPHONY_LOGI("CallManagerClient init success!");
 }
 
 void CallManagerClient::UnInit()
@@ -294,33 +295,13 @@ int32_t CallManagerClient::StopDtmf(int32_t callId)
     }
 }
 
-int32_t CallManagerClient::SendDtmf(int32_t callId, char str)
-{
-    if (g_callManagerProxy != nullptr) {
-        return g_callManagerProxy->SendDtmf(callId, str);
-    } else {
-        TELEPHONY_LOGE("init first please!");
-        return TELEPHONY_ERR_UNINIT;
-    }
-}
-
-int32_t CallManagerClient::SendBurstDtmf(int32_t callId, std::u16string str, int32_t on, int32_t off)
-{
-    if (g_callManagerProxy != nullptr) {
-        return g_callManagerProxy->SendBurstDtmf(callId, str, on, off);
-    } else {
-        TELEPHONY_LOGE("init first please!");
-        return TELEPHONY_ERR_UNINIT;
-    }
-}
-
 bool CallManagerClient::IsRinging()
 {
     if (g_callManagerProxy != nullptr) {
         return g_callManagerProxy->IsRinging();
     } else {
         TELEPHONY_LOGE("init first please!");
-        return false;
+        return TELEPHONY_ERR_UNINIT;
     }
 }
 
@@ -330,7 +311,7 @@ bool CallManagerClient::HasCall()
         return g_callManagerProxy->HasCall();
     } else {
         TELEPHONY_LOGE("init first please!");
-        return false;
+        return TELEPHONY_ERR_UNINIT;
     }
 }
 
@@ -340,7 +321,7 @@ bool CallManagerClient::IsNewCallAllowed()
         return g_callManagerProxy->IsNewCallAllowed();
     } else {
         TELEPHONY_LOGE("init first please!");
-        return false;
+        return TELEPHONY_ERR_UNINIT;
     }
 }
 
@@ -350,7 +331,7 @@ bool CallManagerClient::IsInEmergencyCall()
         return g_callManagerProxy->IsInEmergencyCall();
     } else {
         TELEPHONY_LOGE("init first please!");
-        return false;
+        return TELEPHONY_ERR_UNINIT;
     }
 }
 
@@ -360,7 +341,7 @@ bool CallManagerClient::IsEmergencyPhoneNumber(std::u16string &number, int32_t s
         return g_callManagerProxy->IsEmergencyPhoneNumber(number, slotId, errorCode);
     } else {
         TELEPHONY_LOGE("init first please!");
-        return false;
+        return TELEPHONY_ERR_UNINIT;
     }
 }
 
@@ -410,16 +391,6 @@ int32_t CallManagerClient::SetAudioDevice(AudioDevice deviceType)
 {
     if (g_callManagerProxy != nullptr) {
         return g_callManagerProxy->SetAudioDevice(deviceType);
-    } else {
-        TELEPHONY_LOGE("init first please!");
-        return TELEPHONY_ERR_UNINIT;
-    }
-}
-
-int32_t CallManagerClient::CancelMissedCallsNotification(int32_t id)
-{
-    if (g_callManagerProxy != nullptr) {
-        return g_callManagerProxy->CancelMissedCallsNotification(id);
     } else {
         TELEPHONY_LOGE("init first please!");
         return TELEPHONY_ERR_UNINIT;
@@ -480,6 +451,156 @@ int32_t CallManagerClient::SetDeviceDirection(int32_t rotation)
 {
     if (g_callManagerProxy != nullptr) {
         return g_callManagerProxy->SetDeviceDirection(rotation);
+    } else {
+        TELEPHONY_LOGE("init first please!");
+        return TELEPHONY_ERR_UNINIT;
+    }
+}
+
+int32_t CallManagerClient::GetImsConfig(int32_t slotId, ImsConfigItem item)
+{
+    if (g_callManagerProxy != nullptr) {
+        return g_callManagerProxy->GetImsConfig(slotId, item);
+    } else {
+        TELEPHONY_LOGE("init first please!");
+        return TELEPHONY_ERR_UNINIT;
+    }
+}
+
+int32_t CallManagerClient::SetImsConfig(int32_t slotId, ImsConfigItem item, std::u16string &value)
+{
+    if (g_callManagerProxy != nullptr) {
+        return g_callManagerProxy->SetImsConfig(slotId, item, value);
+    } else {
+        TELEPHONY_LOGE("init first please!");
+        return TELEPHONY_ERR_UNINIT;
+    }
+}
+
+int32_t CallManagerClient::GetImsFeatureValue(int32_t slotId, FeatureType type)
+{
+    if (g_callManagerProxy != nullptr) {
+        return g_callManagerProxy->GetImsFeatureValue(slotId, type);
+    } else {
+        TELEPHONY_LOGE("init first please!");
+        return TELEPHONY_ERR_UNINIT;
+    }
+}
+
+int32_t CallManagerClient::SetImsFeatureValue(int32_t slotId, FeatureType type, int32_t value)
+{
+    if (g_callManagerProxy != nullptr) {
+        return g_callManagerProxy->SetImsFeatureValue(slotId, type, value);
+    } else {
+        TELEPHONY_LOGE("init first please!");
+        return TELEPHONY_ERR_UNINIT;
+    }
+}
+
+int32_t CallManagerClient::UpdateCallMediaMode(int32_t callId, CallMediaMode mode)
+{
+    if (g_callManagerProxy != nullptr) {
+        return g_callManagerProxy->UpdateCallMediaMode(callId, mode);
+    } else {
+        TELEPHONY_LOGE("init first please!");
+        return TELEPHONY_ERR_UNINIT;
+    }
+}
+
+int32_t CallManagerClient::EnableVoLte(int32_t slotId)
+{
+    if (g_callManagerProxy != nullptr) {
+        return g_callManagerProxy->EnableVoLte(slotId);
+    } else {
+        TELEPHONY_LOGE("init first please!");
+        return TELEPHONY_ERR_UNINIT;
+    }
+}
+
+int32_t CallManagerClient::DisableVoLte(int32_t slotId)
+{
+    if (g_callManagerProxy != nullptr) {
+        return g_callManagerProxy->DisableVoLte(slotId);
+    } else {
+        TELEPHONY_LOGE("init first please!");
+        return TELEPHONY_ERR_UNINIT;
+    }
+}
+
+int32_t CallManagerClient::IsVoLteEnabled(int32_t slotId)
+{
+    if (g_callManagerProxy != nullptr) {
+        return g_callManagerProxy->IsVoLteEnabled(slotId);
+    } else {
+        TELEPHONY_LOGE("init first please!");
+        return TELEPHONY_ERR_UNINIT;
+    }
+}
+
+int32_t CallManagerClient::EnableLteEnhanceMode(int32_t slotId)
+{
+    if (g_callManagerProxy != nullptr) {
+        return g_callManagerProxy->EnableLteEnhanceMode(slotId);
+    } else {
+        TELEPHONY_LOGE("init first please!");
+        return TELEPHONY_ERR_UNINIT;
+    }
+}
+
+int32_t CallManagerClient::DisableLteEnhanceMode(int32_t slotId)
+{
+    if (g_callManagerProxy != nullptr) {
+        return g_callManagerProxy->DisableLteEnhanceMode(slotId);
+    } else {
+        TELEPHONY_LOGE("init first please!");
+        return TELEPHONY_ERR_UNINIT;
+    }
+}
+
+int32_t CallManagerClient::IsLteEnhanceModeEnabled(int32_t slotId)
+{
+    if (g_callManagerProxy != nullptr) {
+        return g_callManagerProxy->IsLteEnhanceModeEnabled(slotId);
+    } else {
+        TELEPHONY_LOGE("init first please!");
+        return TELEPHONY_ERR_UNINIT;
+    }
+}
+
+int32_t CallManagerClient::StartRtt(int32_t callId, std::u16string &msg)
+{
+    if (g_callManagerProxy != nullptr) {
+        return g_callManagerProxy->StartRtt(callId, msg);
+    } else {
+        TELEPHONY_LOGE("init first please!");
+        return TELEPHONY_ERR_UNINIT;
+    }
+}
+
+int32_t CallManagerClient::StopRtt(int32_t callId)
+{
+    if (g_callManagerProxy != nullptr) {
+        return g_callManagerProxy->StopRtt(callId);
+    } else {
+        TELEPHONY_LOGE("init first please!");
+        return TELEPHONY_ERR_UNINIT;
+    }
+}
+
+int32_t CallManagerClient::JoinConference(int32_t callId, std::vector<std::u16string> &numberList)
+{
+    if (g_callManagerProxy != nullptr) {
+        return g_callManagerProxy->JoinConference(callId, numberList);
+    } else {
+        TELEPHONY_LOGE("init first please!");
+        return TELEPHONY_ERR_UNINIT;
+    }
+}
+
+int32_t CallManagerClient::ReportOttCallDetailsInfo(std::vector<OttCallDetailsInfo> &ottVec)
+{
+    if (g_callManagerProxy != nullptr) {
+        return g_callManagerProxy->ReportOttCallDetailsInfo(ottVec);
     } else {
         TELEPHONY_LOGE("init first please!");
         return TELEPHONY_ERR_UNINIT;

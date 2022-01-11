@@ -20,14 +20,18 @@
 
 #include "call_object_manager.h"
 
+/**
+ * @ClassName: CallStatusPolicy
+ * @Description: check prerequisites before perfom ops in callstatusmanager
+ */
 namespace OHOS {
 namespace Telephony {
 class CallStatusPolicy : public CallObjectManager {
 public:
     CallStatusPolicy();
     ~CallStatusPolicy();
-    int32_t IncomingHandlePolicy(const CallReportInfo &info);
-    int32_t DialingHandlePolicy(const CallReportInfo &info);
+    int32_t IncomingHandlePolicy(const CallDetailInfo &info);
+    int32_t DialingHandlePolicy(const CallDetailInfo &info);
     int32_t FilterResultsDispose(sptr<CallBase> call);
 };
 } // namespace Telephony

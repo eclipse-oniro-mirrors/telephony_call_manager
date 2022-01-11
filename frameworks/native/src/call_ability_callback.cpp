@@ -53,11 +53,29 @@ int32_t CallAbilityCallback::OnCallEventChange(const CallEventInfo &info)
     return TELEPHONY_SUCCESS;
 }
 
-int32_t CallAbilityCallback::OnSupplementResult(CallResultReportId reportId, AppExecFwk::PacMap &resultInfo)
+int32_t CallAbilityCallback::OnCallDisconnectedCause(DisconnectedDetails cause)
 {
     std::lock_guard<std::mutex> lock(mutex_);
     if (callbackPtr_ != nullptr) {
-        return callbackPtr_->OnSupplementResult(reportId, resultInfo);
+        return callbackPtr_->OnCallDisconnectedCause(cause);
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallAbilityCallback::OnReportAsyncResults(CallResultReportId reportId, AppExecFwk::PacMap &resultInfo)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (callbackPtr_ != nullptr) {
+        return callbackPtr_->OnReportAsyncResults(reportId, resultInfo);
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallAbilityCallback::OnOttCallRequest(OttCallRequestId requestId, AppExecFwk::PacMap &info)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (callbackPtr_ != nullptr) {
+        return callbackPtr_->OnOttCallRequest(requestId, info);
     }
     return TELEPHONY_SUCCESS;
 }

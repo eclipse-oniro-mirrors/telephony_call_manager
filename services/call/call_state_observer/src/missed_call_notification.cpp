@@ -54,6 +54,7 @@ void MissedCallNotification::CallStateUpdated(
 
 void MissedCallNotification::PublishMissedCallEvent(sptr<CallBase> &callObjectPtr)
 {
+#ifdef ABILITY_STATE_NOTIFICATION_SUPPORT
     AAFwk::Want want;
     want.SetParam("callId", callObjectPtr->GetCallID());
     want.SetParam("phoneNumber", callObjectPtr->GetAccountNumber());
@@ -72,6 +73,7 @@ void MissedCallNotification::PublishMissedCallEvent(sptr<CallBase> &callObjectPt
     publishInfo.SetOrdered(true);
     bool result = EventFwk::CommonEventManager::PublishCommonEvent(data, publishInfo, nullptr);
     TELEPHONY_LOGI("publish missed call event result : %{public}d", result);
+#endif
 }
 
 void MissedCallNotification::PublishMissedCallNotification(sptr<CallBase> &callObjectPtr)
@@ -119,6 +121,6 @@ void MissedCallNotification::IncomingCallHungUp(sptr<CallBase> &callObjectPtr, b
     }
 }
 
-void MissedCallNotification::CallDestroyed(sptr<CallBase> &callObjectPtr) {}
+void MissedCallNotification::CallDestroyed(int32_t cause) {}
 } // namespace Telephony
 } // namespace OHOS

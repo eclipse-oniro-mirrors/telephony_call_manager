@@ -21,21 +21,21 @@
 #include "input/camera_manager.h"
 #include "file_ex.h"
 
-#include "cellular_call_ipc_interface_proxy.h"
+#include "cellular_call_connection.h"
 #include "video_control_manager.h"
 
 namespace OHOS {
 namespace Telephony {
 namespace {
-    const int32_t CAMERA_ROTATION_0 = 0;
-    const int32_t CAMERA_ROTATION_90 = 90;
-    const int32_t CAMERA_ROTATION_180 = 180;
-    const int32_t CAMERA_ROTATION_270 = 270;
-    const int32_t VIDEO_WINDOWS_Z_BOTTOM = 0;
-    const int32_t VIDEO_WINDOWS_Z_TOP = 1;
-    const float MIN_CAMERA_ZOOM = 0.1;
-    const float MAX_CAMERA_ZOOM = 10.0;
-    const std::string SUPPORT_PICTURE_EXT = "png";
+const int16_t CAMERA_ROTATION_0 = 0;
+const int16_t CAMERA_ROTATION_90 = 90;
+const int16_t CAMERA_ROTATION_180 = 180;
+const int16_t CAMERA_ROTATION_270 = 270;
+const int16_t VIDEO_WINDOWS_Z_BOTTOM = 0;
+const int16_t VIDEO_WINDOWS_Z_TOP = 1;
+const float MIN_CAMERA_ZOOM = 0.1;
+const float MAX_CAMERA_ZOOM = 10.0;
+const std::string SUPPORT_PICTURE_EXT = "png";
 } // namespace
 
 VideoControlManager::VideoControlManager() : isOpenCamera_(false) {}
@@ -55,17 +55,17 @@ int32_t VideoControlManager::ControlCamera(
 int32_t VideoControlManager::SetPreviewWindow(VideoWindow &window)
 {
     if (CheckWindow(window)) {
-        return DelayedSingleton<CellularCallIpcInterfaceProxy>::GetInstance()->SetPreviewWindow(window);
+        return DelayedSingleton<CellularCallConnection>::GetInstance()->SetPreviewWindow(window);
     }
-    return TELEPHONY_ERR_FAIL;
+    return CALL_ERR_VIDEO_INVALID_COORDINATES;
 }
 
 int32_t VideoControlManager::SetDisplayWindow(VideoWindow &window)
 {
     if (CheckWindow(window)) {
-        return DelayedSingleton<CellularCallIpcInterfaceProxy>::GetInstance()->SetDisplayWindow(window);
+        return DelayedSingleton<CellularCallConnection>::GetInstance()->SetDisplayWindow(window);
     }
-    return TELEPHONY_ERR_FAIL;
+    return CALL_ERR_VIDEO_INVALID_COORDINATES;
 }
 
 int32_t VideoControlManager::SetCameraZoom(float zoomRatio)
@@ -73,19 +73,20 @@ int32_t VideoControlManager::SetCameraZoom(float zoomRatio)
     // param check
     if (zoomRatio < MIN_CAMERA_ZOOM || zoomRatio > MAX_CAMERA_ZOOM) {
         TELEPHONY_LOGE("camera zoom error!!");
-        return TELEPHONY_ERR_FAIL;
+        return CALL_ERR_VIDEO_INVALID_ZOOM;
     }
-    return DelayedSingleton<CellularCallIpcInterfaceProxy>::GetInstance()->SetCameraZoom(zoomRatio);
+    return DelayedSingleton<CellularCallConnection>::GetInstance()->SetCameraZoom(zoomRatio);
 }
 
 int32_t VideoControlManager::SetPausePicture(std::u16string path)
 {
     std::string tempPath(Str16ToStr8(path));
     // param check
-    if (FileExists(tempPath) && IsPNGFile(tempPath)) {
-        return DelayedSingleton<CellularCallIpcInterfaceProxy>::GetInstance()->SetPausePicture(path);
+    if (FileExists(tempPath) && IsPngFile(tempPath)) {
+        return DelayedSingleton<CellularCallConnection>::GetInstance()->SetPausePicture(path);
     } else {
-        return TELEPHONY_ERR_FAIL;
+        TELEPHONY_LOGE("invalid path");
+        return CALL_ERR_INVALID_PATH;
     }
 }
 
@@ -94,10 +95,10 @@ int32_t VideoControlManager::SetDeviceDirection(int32_t rotation)
     // param check
     if (rotation == CAMERA_ROTATION_0 || rotation == CAMERA_ROTATION_90 || rotation == CAMERA_ROTATION_180 ||
         rotation == CAMERA_ROTATION_270) {
-        return DelayedSingleton<CellularCallIpcInterfaceProxy>::GetInstance()->SetDeviceDirection(rotation);
+        return DelayedSingleton<CellularCallConnection>::GetInstance()->SetDeviceDirection(rotation);
     }
     TELEPHONY_LOGE("error rotation:%{public}d", rotation);
-    return TELEPHONY_ERR_FAIL;
+    return CALL_ERR_VIDEO_INVALID_ROTATION;
 }
 
 int32_t VideoControlManager::OpenCamera(
@@ -108,27 +109,35 @@ int32_t VideoControlManager::OpenCamera(
     bool bRet = ContainCameraID(id);
     if (!bRet) {
         TELEPHONY_LOGE("camera id is error!!");
-        return TELEPHONY_ERR_FAIL;
+        return CALL_ERR_VIDEO_INVALID_CAMERA_ID;
     }
-    isOpenCamera_ = true;
-    return DelayedSingleton<CellularCallIpcInterfaceProxy>::GetInstance()->ControlCamera(
+    int32_t errCode = DelayedSingleton<CellularCallConnection>::GetInstance()->ControlCamera(
         cameraId, callingPackage, callingUid, callingPid);
+    if (errCode == TELEPHONY_SUCCESS) {
+        isOpenCamera_ = true;
+    }
+    return errCode;
 }
 
 int32_t VideoControlManager::CloseCamera(
     std::u16string cameraId, std::u16string callingPackage, int32_t callingUid, int32_t callingPid)
 {
     if (isOpenCamera_) {
-        isOpenCamera_ = false;
-        return DelayedSingleton<CellularCallIpcInterfaceProxy>::GetInstance()->ControlCamera(
+        int32_t errCode = DelayedSingleton<CellularCallConnection>::GetInstance()->ControlCamera(
             cameraId, callingPackage, callingUid, callingPid);
+        if (errCode == TELEPHONY_SUCCESS) {
+            isOpenCamera_ = false;
+        }
+        return errCode;
     }
-    return TELEPHONY_ERR_FAIL;
+    TELEPHONY_LOGE("Camera not turned on");
+    return CALL_ERR_CAMERA_NOT_TURNED_ON;
 }
 
 bool VideoControlManager::ContainCameraID(std::string id)
 {
-    sptr<CameraStandard::CameraManager> camManagerObj = CameraStandard::CameraManager::GetInstance();
+    using namespace OHOS::CameraStandard;
+    sptr<CameraManager> camManagerObj = CameraManager::GetInstance();
     std::vector<sptr<CameraStandard::CameraInfo>> cameraObjList = camManagerObj->GetCameras();
     bool bRet = false;
     for (auto &it : cameraObjList) {
@@ -141,9 +150,9 @@ bool VideoControlManager::ContainCameraID(std::string id)
     return bRet;
 }
 
-bool VideoControlManager::IsPNGFile(std::string fileName)
+bool VideoControlManager::IsPngFile(std::string fileName)
 {
-    int len = SUPPORT_PICTURE_EXT.length();
+    int32_t len = SUPPORT_PICTURE_EXT.length();
     std::string ext = fileName.substr(fileName.length() - len, len);
     std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
     if (!((ext == SUPPORT_PICTURE_EXT))) {

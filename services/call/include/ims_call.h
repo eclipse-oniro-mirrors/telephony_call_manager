@@ -23,13 +23,20 @@ namespace OHOS {
 namespace Telephony {
 class IMSCall : public CarrierCall, public NetCallBase {
 public:
+    enum VideoUpgradeState {
+        VIDEO_UPGRADE_NONE = 0,
+        VIDEO_UPGRADE_SEND_ONLY,
+        VIDEO_UPGRADE_RECV_ONLY,
+        VIDEO_UPGRADE_SEND_RECV,
+    };
+
+public:
     IMSCall(DialParaInfo &info);
     IMSCall(DialParaInfo &info, AppExecFwk::PacMap &extras);
     ~IMSCall();
-
     int32_t DialingProcess() override;
     int32_t AnswerCall(int32_t videoState) override;
-    int32_t RejectCall(bool isSendSms, std::string &content) override;
+    int32_t RejectCall() override;
     int32_t HangUpCall() override;
     int32_t HoldCall() override;
     int32_t UnHoldCall() override;
@@ -39,16 +46,34 @@ public:
     int32_t SeparateConference() override;
     int32_t CanCombineConference() override;
     int32_t CanSeparateConference() override;
-    int32_t LunchConference() override;
+    int32_t LaunchConference() override;
     int32_t ExitConference() override;
+    int32_t HoldConference() override;
     int32_t GetMainCallId() override;
     std::vector<std::u16string> GetSubCallIdList() override;
     std::vector<std::u16string> GetCallIdListForConference() override;
     int32_t IsSupportConferenceable() override;
+    int32_t StartRtt();
+    int32_t StopRtt();
+    int32_t SetMute(int32_t mute, int32_t slotId);
+    int32_t SendUpdateCallMediaModeRequest(CallMediaMode mode) override;
+    int32_t RecieveUpdateCallMediaModeRequest(CallMediaMode mode) override;
+    int32_t SendUpdateCallMediaModeResponse(CallMediaMode mode) override;
+    int32_t ReceiveUpdateCallMediaModeResponse(CallMediaModeResponse &reponse) override;
+
+protected:
+    VideoUpgradeState GetVideoUpdateState();
+    void SetVideoUpdateState(VideoUpgradeState state);
+    int32_t HandleUpgradeVideoRequest(CallMediaMode mode);
+    int32_t HandleDowngradeVideoRequest(CallMediaMode mode);
+    int32_t SendUpgradeVideoRequest(CallMediaMode mode);
+    int32_t NotifyCallMediaModeUpdate(VideoUpgradeState state);
+    bool IsSupportVideoCall();
 
 private:
-    sptr<CallBase> conferenceHost_;
-    sptr<CallBase> conferencePartner_;
+    // video call
+    VideoUpgradeState videoUpgradeState_;
+    std::mutex videoUpdateMutex_;
 };
 } // namespace Telephony
 } // namespace OHOS

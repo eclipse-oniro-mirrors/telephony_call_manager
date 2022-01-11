@@ -24,12 +24,11 @@ namespace OHOS {
 namespace Telephony {
 CallAbilityCallbackStub::CallAbilityCallbackStub()
 {
-    memberFuncMap_[(uint32_t)CallManagerCallAbilityCode::UPDATE_CALL_STATE_INFO] =
-        &CallAbilityCallbackStub::OnUpdateCallStateInfo;
-    memberFuncMap_[(uint32_t)CallManagerCallAbilityCode::UPDATE_CALL_EVENT] =
-        &CallAbilityCallbackStub::OnUpdateCallEvent;
-    memberFuncMap_[(uint32_t)CallManagerCallAbilityCode::UPDATE_CALL_SUPPLEMENT_REQUEST] =
-        &CallAbilityCallbackStub::OnUpdateSupplementResult;
+    memberFuncMap_[UPDATE_CALL_STATE_INFO] = &CallAbilityCallbackStub::OnUpdateCallStateInfo;
+    memberFuncMap_[UPDATE_CALL_EVENT] = &CallAbilityCallbackStub::OnUpdateCallEvent;
+    memberFuncMap_[UPDATE_CALL_DISCONNECTED_CAUSE] = &CallAbilityCallbackStub::OnUpdateCallDisconnectedCause;
+    memberFuncMap_[UPDATE_CALL_ASYNC_RESULT_REQUEST] = &CallAbilityCallbackStub::OnUpdateAysncResults;
+    memberFuncMap_[REPORT_OTT_CALL_REQUEST] = &CallAbilityCallbackStub::OnUpdateOttCallRequest;
 }
 
 CallAbilityCallbackStub::~CallAbilityCallbackStub()
@@ -37,7 +36,7 @@ CallAbilityCallbackStub::~CallAbilityCallbackStub()
     memberFuncMap_.clear();
 }
 
-int CallAbilityCallbackStub::OnRemoteRequest(
+int32_t CallAbilityCallbackStub::OnRemoteRequest(
     uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
     std::u16string myDescriptor = CallAbilityCallbackStub::GetDescriptor();
@@ -47,7 +46,6 @@ int CallAbilityCallbackStub::OnRemoteRequest(
         return TELEPHONY_ERR_DESCRIPTOR_MISMATCH;
     }
     TELEPHONY_LOGI("OnReceived, cmd = %{public}u", code);
-
     auto itFunc = memberFuncMap_.find(code);
     if (itFunc != memberFuncMap_.end()) {
         auto memberFunc = itFunc->second;
@@ -65,20 +63,19 @@ int32_t CallAbilityCallbackStub::OnUpdateCallStateInfo(MessageParcel &data, Mess
     int32_t len = data.ReadInt32();
     if (len <= 0) {
         TELEPHONY_LOGE("Invalid parameter, len = %{public}d", len);
-        return TELEPHONY_ERR_FAIL;
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
     if (!data.ContainFileDescriptors()) {
         TELEPHONY_LOGW("sent raw data is less than 32k");
     }
     if ((parcelPtr = reinterpret_cast<const CallAttributeInfo *>(data.ReadRawData(len))) == nullptr) {
         TELEPHONY_LOGE("reading raw data failed, length = %{public}d", len);
-        return TELEPHONY_ERR_FAIL;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-
     result = OnCallDetailsChange(*parcelPtr);
     if (!reply.WriteInt32(result)) {
         TELEPHONY_LOGE("writing parcel failed");
-        return TELEPHONY_ERR_FAIL;
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
     return TELEPHONY_SUCCESS;
 }
@@ -90,25 +87,36 @@ int32_t CallAbilityCallbackStub::OnUpdateCallEvent(MessageParcel &data, MessageP
     int32_t len = data.ReadInt32();
     if (len <= 0) {
         TELEPHONY_LOGE("Invalid parameter, len = %{public}d", len);
-        return TELEPHONY_ERR_FAIL;
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
     if (!data.ContainFileDescriptors()) {
         TELEPHONY_LOGW("sent raw data is less than 32k");
     }
     if ((parcelPtr = reinterpret_cast<const CallEventInfo *>(data.ReadRawData(len))) == nullptr) {
         TELEPHONY_LOGE("reading raw data failed, length = %d", len);
-        return TELEPHONY_ERR_FAIL;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
 
     result = OnCallEventChange(*parcelPtr);
     if (!reply.WriteInt32(result)) {
         TELEPHONY_LOGE("writing parcel failed");
-        return TELEPHONY_ERR_FAIL;
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
     return TELEPHONY_SUCCESS;
 }
 
-int32_t CallAbilityCallbackStub::OnUpdateSupplementResult(MessageParcel &data, MessageParcel &reply)
+int32_t CallAbilityCallbackStub::OnUpdateCallDisconnectedCause(MessageParcel &data, MessageParcel &reply)
+{
+    DisconnectedDetails cause = (DisconnectedDetails)data.ReadInt32();
+    int32_t result = OnCallDisconnectedCause(cause);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("writing parcel failed");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallAbilityCallbackStub::OnUpdateAysncResults(MessageParcel &data, MessageParcel &reply)
 {
     int32_t result = TELEPHONY_SUCCESS;
     AppExecFwk::PacMap resultInfo;
@@ -134,16 +142,59 @@ int32_t CallAbilityCallbackStub::OnUpdateSupplementResult(MessageParcel &data, M
             resultInfo.PutIntValue("action", data.ReadInt32());
             resultInfo.PutIntValue("clirStat", data.ReadInt32());
             break;
+        case CallResultReportId::GET_CALL_VOTLE_REPORT_ID:
+            resultInfo.PutIntValue("active", data.ReadInt32());
+            break;
+        case CallResultReportId::GET_IMS_CONFIG_REPORT_ID:
+        case CallResultReportId::GET_IMS_FEATURE_VALUE_REPORT_ID:
+        case CallResultReportId::GET_LTE_ENHANCE_MODE_REPORT_ID:
+            resultInfo.PutIntValue("value", data.ReadInt32());
+            break;
+        case CallResultReportId::START_RTT_REPORT_ID:
+            resultInfo.PutIntValue("active", data.ReadInt32());
+            break;
+        case CallResultReportId::STOP_RTT_REPORT_ID:
+            resultInfo.PutIntValue("inactive", data.ReadInt32());
+            break;
         default:
             break;
     }
     if (!data.ContainFileDescriptors()) {
         TELEPHONY_LOGW("sent raw data is less than 32k");
     }
-    result = OnSupplementResult(reportId, resultInfo);
+    result = OnReportAsyncResults(reportId, resultInfo);
     if (!reply.WriteInt32(result)) {
         TELEPHONY_LOGE("writing parcel failed");
-        return TELEPHONY_ERR_FAIL;
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallAbilityCallbackStub::OnUpdateOttCallRequest(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t result = TELEPHONY_SUCCESS;
+    AppExecFwk::PacMap resultInfo;
+    OttCallRequestId requestId = static_cast<OttCallRequestId>(data.ReadInt32());
+    resultInfo.PutStringValue("phoneNumber", data.ReadString());
+    resultInfo.PutStringValue("bundleName", data.ReadString());
+    resultInfo.PutIntValue("videoState", data.ReadInt32());
+    switch (requestId) {
+        case OttCallRequestId::OTT_REQUEST_INVITE_TO_CONFERENCE:
+            resultInfo.PutStringValue("number", data.ReadString());
+            break;
+        case OttCallRequestId::OTT_REQUEST_UPDATE_CALL_MEDIA_MODE:
+            resultInfo.PutIntValue("callMediaMode", data.ReadInt32());
+            break;
+        default:
+            break;
+    }
+    if (!data.ContainFileDescriptors()) {
+        TELEPHONY_LOGW("sent raw data is less than 32k");
+    }
+    result = OnOttCallRequest(requestId, resultInfo);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("writing parcel failed");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
     return TELEPHONY_SUCCESS;
 }

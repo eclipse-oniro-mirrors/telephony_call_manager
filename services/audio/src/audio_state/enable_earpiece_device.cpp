@@ -26,11 +26,11 @@ bool EnableEarpieceDevice::ProcessEvent(int32_t event)
     bool result = false;
     std::lock_guard<std::mutex> lock(mutex_);
     switch (event) {
-        case AudioEvent::WIRED_HEADSET_AVAILABLE:
+        case AudioEvent::WIRED_HEADSET_CONNECTED:
             result = DelayedSingleton<AudioDeviceManager>::GetInstance()->ProcessEvent(
                 AudioEvent::ENABLE_DEVICE_WIRED_HEADSET);
             break;
-        case AudioEvent::BLUETOOTH_SCO_AVAILABLE:
+        case AudioEvent::BLUETOOTH_SCO_CONNECTED:
             result = DelayedSingleton<AudioDeviceManager>::GetInstance()->ProcessEvent(
                 AudioEvent::ENABLE_DEVICE_BLUETOOTH);
             break;

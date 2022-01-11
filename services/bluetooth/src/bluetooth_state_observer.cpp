@@ -14,16 +14,14 @@
  */
 
 #include "bluetooth_state_observer.h"
-#include "bluetooth_connection.h"
-#include "bluetooth_call_manager.h"
-
-#include "audio_device_manager.h"
 
 #include "telephony_log_wrapper.h"
 
+#include "bluetooth_connection.h"
+#include "audio_device_manager.h"
+
 namespace OHOS {
 namespace Telephony {
-using namespace OHOS::EventFwk;
 std::shared_ptr<BtEventSubscriber> BluetoothStateObserver::btEventSubscriber_ = nullptr;
 
 BtEventSubscriber::BtEventSubscriber(const OHOS::EventFwk::CommonEventSubscribeInfo &subscriberInfo)
@@ -36,12 +34,12 @@ void BtEventSubscriber::OnReceiveEvent(const OHOS::EventFwk::CommonEventData &da
     std::string action = want.GetAction();
     if (action == BluetoothConnection::EVENT_BLUETOOTH_SCO_CONNECTED) {
         TELEPHONY_LOGI("bluetooth connection receive action : EVENT_BLUETOOTH_SCO_CONNECTED");
-        BluetoothConnection::SetBtScoState(SCO_STATE_CONNECTED);
-        DelayedSingleton<AudioDeviceManager>::GetInstance()->ProcessEvent(AudioEvent::BLUETOOTH_SCO_AVAILABLE);
+        BluetoothConnection::SetBtScoState(BtScoState::SCO_STATE_CONNECTED);
+        DelayedSingleton<AudioDeviceManager>::GetInstance()->ProcessEvent(AudioEvent::BLUETOOTH_SCO_CONNECTED);
     } else if (action == BluetoothConnection::EVENT_BLUETOOTH_SCO_DISCONNECTED) {
         TELEPHONY_LOGI("bluetooth connection receive action : EVENT_BLUETOOTH_SCO_DISCONNECTED");
         BluetoothConnection::SetBtScoState(BtScoState::SCO_STATE_DISCONNECTED);
-        DelayedSingleton<AudioDeviceManager>::GetInstance()->ProcessEvent(AudioEvent::BLUETOOTH_SCO_UNAVAILABLE);
+        DelayedSingleton<AudioDeviceManager>::GetInstance()->ProcessEvent(AudioEvent::BLUETOOTH_SCO_DISCONNECTED);
     }
 }
 
@@ -54,16 +52,16 @@ BluetoothStateObserver::~BluetoothStateObserver()
 
 bool BluetoothStateObserver::SubscribeBluetoothEvent()
 {
-    MatchingSkills matchingSkills;
+    EventFwk::MatchingSkills matchingSkills;
     matchingSkills.AddEvent(BluetoothConnection::EVENT_BLUETOOTH_SCO_CONNECTED);
     matchingSkills.AddEvent(BluetoothConnection::EVENT_BLUETOOTH_SCO_DISCONNECTED);
-    CommonEventSubscribeInfo subscriberInfo(matchingSkills);
+    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
     btEventSubscriber_ = std::make_shared<BtEventSubscriber>(subscriberInfo);
     if (btEventSubscriber_ == nullptr) {
         TELEPHONY_LOGE("bt connection nullptr");
         return false;
     }
-    return CommonEventManager::SubscribeCommonEvent(btEventSubscriber_);
+    return EventFwk::CommonEventManager::SubscribeCommonEvent(btEventSubscriber_);
 }
 
 bool BluetoothStateObserver::UnSubscribeBluetoothEvent()
@@ -72,7 +70,7 @@ bool BluetoothStateObserver::UnSubscribeBluetoothEvent()
         TELEPHONY_LOGE("bt connection nullptr");
         return false;
     }
-    return CommonEventManager::UnSubscribeCommonEvent(btEventSubscriber_);
+    return EventFwk::CommonEventManager::UnSubscribeCommonEvent(btEventSubscriber_);
 }
 } // namespace Telephony
 } // namespace OHOS

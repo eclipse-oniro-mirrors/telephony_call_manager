@@ -15,15 +15,17 @@
 
 #include "call_setting_manager.h"
 
+#include "cellular_call_data_struct.h"
 #include "call_manager_errors.h"
 #include "telephony_log_wrapper.h"
 
 #include "call_number_utils.h"
-#include "cellular_call_ipc_interface_proxy.h"
 
 namespace OHOS {
 namespace Telephony {
-CallSettingManager::CallSettingManager() {}
+CallSettingManager::CallSettingManager()
+    : cellularCallConnectionPtr_(DelayedSingleton<CellularCallConnection>::GetInstance())
+{}
 
 CallSettingManager::~CallSettingManager() {}
 
@@ -34,7 +36,11 @@ int32_t CallSettingManager::GetCallWaiting(int32_t slotId)
         TELEPHONY_LOGE("Invalid data!");
         return ret;
     }
-    return DelayedSingleton<CellularCallIpcInterfaceProxy>::GetInstance()->GetCallWaiting(slotId);
+    if (cellularCallConnectionPtr_ == nullptr) {
+        TELEPHONY_LOGE("cellularCallConnectionPtr_ is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return cellularCallConnectionPtr_->GetCallWaiting(slotId);
 }
 
 int32_t CallSettingManager::SetCallWaiting(int32_t slotId, bool activate)
@@ -44,7 +50,11 @@ int32_t CallSettingManager::SetCallWaiting(int32_t slotId, bool activate)
         TELEPHONY_LOGE("Invalid data!");
         return ret;
     }
-    return DelayedSingleton<CellularCallIpcInterfaceProxy>::GetInstance()->SetCallWaiting(activate, slotId);
+    if (cellularCallConnectionPtr_ == nullptr) {
+        TELEPHONY_LOGE("cellularCallConnectionPtr_ is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return cellularCallConnectionPtr_->SetCallWaiting(activate, slotId);
 }
 
 int32_t CallSettingManager::GetCallRestriction(int32_t slotId, CallRestrictionType type)
@@ -54,17 +64,29 @@ int32_t CallSettingManager::GetCallRestriction(int32_t slotId, CallRestrictionTy
         TELEPHONY_LOGE("Invalid data!");
         return ret;
     }
-    return DelayedSingleton<CellularCallIpcInterfaceProxy>::GetInstance()->GetCallRestriction(type, slotId);
+    if (cellularCallConnectionPtr_ == nullptr) {
+        TELEPHONY_LOGE("cellularCallConnectionPtr_ is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return cellularCallConnectionPtr_->GetCallRestriction(type, slotId);
 }
 
 int32_t CallSettingManager::SetCallRestriction(int32_t slotId, CallRestrictionInfo &info)
 {
+    TELEPHONY_LOGI(
+        "SetCallRestriction: slotId = %{public}d, mode = %{public}d, type = %{public}d, password = "
+        "%{public}s",
+        slotId, info.mode, info.fac, info.password);
     int32_t ret = SetCallRestrictionPolicy(slotId, info);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("Invalid data!");
         return ret;
     }
-    return DelayedSingleton<CellularCallIpcInterfaceProxy>::GetInstance()->SetCallRestriction(info, slotId);
+    if (cellularCallConnectionPtr_ == nullptr) {
+        TELEPHONY_LOGE("cellularCallConnectionPtr_ is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return cellularCallConnectionPtr_->SetCallRestriction(info, slotId);
 }
 
 int32_t CallSettingManager::GetCallTransferInfo(int32_t slotId, CallTransferType type)
@@ -74,27 +96,120 @@ int32_t CallSettingManager::GetCallTransferInfo(int32_t slotId, CallTransferType
         TELEPHONY_LOGE("Invalid data!");
         return ret;
     }
-    return DelayedSingleton<CellularCallIpcInterfaceProxy>::GetInstance()->GetCallTransferInfo(type, slotId);
+    if (cellularCallConnectionPtr_ == nullptr) {
+        TELEPHONY_LOGE("cellularCallConnectionPtr_ is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return cellularCallConnectionPtr_->GetCallTransferInfo(type, slotId);
 }
 
 int32_t CallSettingManager::SetCallTransferInfo(int32_t slotId, CallTransferInfo &info)
 {
+    TELEPHONY_LOGI(
+        "SetCallTransferInfo: slotId = %{public}d, settingType = %{public}d, type = %{public}d, transferNum = "
+        "%{public}s",
+        slotId, info.settingType, info.type, info.transferNum);
     int32_t ret = SetCallTransferInfoPolicy(slotId, info);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("Invalid data!");
         return ret;
     }
-    return DelayedSingleton<CellularCallIpcInterfaceProxy>::GetInstance()->SetCallTransferInfo(info, slotId);
+    if (cellularCallConnectionPtr_ == nullptr) {
+        TELEPHONY_LOGE("cellularCallConnectionPtr_ is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return cellularCallConnectionPtr_->SetCallTransferInfo(info, slotId);
 }
 
 int32_t CallSettingManager::SetCallPreferenceMode(int32_t slotId, int32_t mode)
 {
-    int32_t preferenceMode = 3;
-    if (mode == 0) {
-        preferenceMode = 1;
+    int32_t preferenceMode = IMS_PS_VOICE_PREFERRED;
+    if (mode != CS_VOICE_ONLY && mode != CS_VOICE_PREFERRED && mode != IMS_PS_VOICE_PREFERRED &&
+        mode != IMS_PS_VOICE_ONLY) {
+        preferenceMode = CS_VOICE_ONLY;
     }
-    return DelayedSingleton<CellularCallIpcInterfaceProxy>::GetInstance()->SetCallPreferenceMode(
-        slotId, preferenceMode);
+    return cellularCallConnectionPtr_->SetCallPreferenceMode(slotId, preferenceMode);
+}
+
+int32_t CallSettingManager::GetImsConfig(int32_t slotId, ImsConfigItem item)
+{
+    return cellularCallConnectionPtr_->GetImsConfig(item, slotId);
+}
+
+int32_t CallSettingManager::SetImsConfig(int32_t slotId, ImsConfigItem item, std::u16string &value)
+{
+    if (item == ITEM_VIDEO_QUALITY || item == ITEM_IMS_SWITCH_STATUS) {
+        int32_t flag = CONFIG_FAILED;
+        bool succ = StrToInt(Str16ToStr8(value), flag);
+        if (succ) {
+            return cellularCallConnectionPtr_->SetImsConfig(item, flag, slotId);
+        }
+        return TELEPHONY_ERR_STRTOINT_FAIL;
+    }
+    return cellularCallConnectionPtr_->SetImsConfig(item, Str16ToStr8(value), slotId);
+}
+
+int32_t CallSettingManager::GetImsFeatureValue(int32_t slotId, FeatureType type)
+{
+    if (cellularCallConnectionPtr_ == nullptr) {
+        TELEPHONY_LOGE("cellularCallConnectionPtr_ is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return cellularCallConnectionPtr_->GetImsFeatureValue(type, slotId);
+}
+
+int32_t CallSettingManager::SetImsFeatureValue(int32_t slotId, FeatureType type, int32_t value)
+{
+    if (cellularCallConnectionPtr_ == nullptr) {
+        TELEPHONY_LOGE("cellularCallConnectionPtr_ is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return cellularCallConnectionPtr_->SetImsFeatureValue(type, value, slotId);
+}
+
+int32_t CallSettingManager::EnableVoLte(int32_t slotId)
+{
+    if (cellularCallConnectionPtr_ == nullptr) {
+        TELEPHONY_LOGE("cellularCallConnectionPtr_ is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return cellularCallConnectionPtr_->SetLteImsSwitchStatus(slotId, true);
+}
+
+int32_t CallSettingManager::DisableVoLte(int32_t slotId)
+{
+    if (cellularCallConnectionPtr_ == nullptr) {
+        TELEPHONY_LOGE("cellularCallConnectionPtr_ is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return cellularCallConnectionPtr_->SetLteImsSwitchStatus(slotId, false);
+}
+
+int32_t CallSettingManager::IsVoLteEnabled(int32_t slotId)
+{
+    if (cellularCallConnectionPtr_ == nullptr) {
+        TELEPHONY_LOGE("cellularCallConnectionPtr_ is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return cellularCallConnectionPtr_->GetLteImsSwitchStatus(slotId);
+}
+
+int32_t CallSettingManager::SetLteEnhanceMode(int32_t slotId, bool value)
+{
+    if (cellularCallConnectionPtr_ == nullptr) {
+        TELEPHONY_LOGE("cellularCallConnectionPtr_ is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return cellularCallConnectionPtr_->SetVolteEnhanceMode(value, slotId);
+}
+
+int32_t CallSettingManager::GetLteEnhanceMode(int32_t slotId)
+{
+    if (cellularCallConnectionPtr_ == nullptr) {
+        TELEPHONY_LOGE("cellularCallConnectionPtr_ is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return cellularCallConnectionPtr_->GetVolteEnhanceMode(slotId);
 }
 
 int32_t CallSettingManager::CallWaitingPolicy(int32_t slotId)

@@ -17,6 +17,7 @@
 #define HOLDING_STATE_H
 
 #include "audio_base.h"
+#include <mutex>
 
 namespace OHOS {
 namespace Telephony {

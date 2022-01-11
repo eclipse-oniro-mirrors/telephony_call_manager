@@ -15,7 +15,9 @@
 
 #include "cs_conference_base.h"
 
+#include <string>
 #include <string_ex.h>
+#include <list>
 
 #include "call_base.h"
 #include "call_object_manager.h"
@@ -61,8 +63,29 @@ int32_t CsConferenceBase::LeaveFromConference(int32_t callId)
     if (subCallIdSet_.find(callId) != subCallIdSet_.end()) {
         subCallIdSet_.erase(callId);
     } else {
+        TELEPHONY_LOGE("leave conference failed, callId %{public}d not in conference", callId);
+        return CALL_ERR_CONFERENCE_SEPERATE_FAILED;
+    }
+    if (subCallIdSet_.empty()) {
+        mainCallId_ = ERR_ID;
+        state_ = CONFERENCE_STATE_IDLE;
+        beginTime_ = 0;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CsConferenceBase::HoldConference(int32_t callId)
+{
+    std::lock_guard<std::mutex> lock(conferenceMutex_);
+    if (state_ == CONFERENCE_STATE_HOLDING) {
+        TELEPHONY_LOGI("HoldConference success");
+        return TELEPHONY_SUCCESS;
+    }
+    if (subCallIdSet_.find(callId) != subCallIdSet_.end()) {
+        subCallIdSet_.erase(callId);
+    } else {
         TELEPHONY_LOGE("separate conference failed, callId %{public}d not in conference", callId);
-        return CALL_ERR_CALLID_INVALID;
+        return CALL_ERR_CONFERENCE_SEPERATE_FAILED;
     }
     if (subCallIdSet_.empty()) {
         mainCallId_ = ERR_ID;

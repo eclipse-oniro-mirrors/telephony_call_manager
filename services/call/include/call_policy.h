@@ -23,6 +23,10 @@
 
 #include "call_object_manager.h"
 
+/**
+ * @ClassName: CallPolicy
+ * @Description: check prerequisites before perfom ops in callcontrolmanager
+ */
 namespace OHOS {
 namespace Telephony {
 class CallPolicy : public CallObjectManager {
@@ -36,12 +40,31 @@ public:
     int32_t HoldCallPolicy(int32_t callId);
     int32_t UnHoldCallPolicy(int32_t callId);
     int32_t HangUpPolicy(int32_t callId);
-    int32_t SwitchCallPolicy(int32_t &callId);
-    static int32_t UpgradeCallPolicy(int32_t callId);
-    static int32_t DowngradeCallPolicy(int32_t callId);
+    int32_t SwitchCallPolicy(int32_t callId);
+    static int32_t UpdateCallMediaModePolicy(int32_t callId, CallMediaMode mode);
+    static int32_t StartRttPolicy(int32_t callId);
+    static int32_t StopRttPolicy(int32_t callId);
+    int32_t IsValidSlotId(int32_t slotId);
+    int32_t EnableVoLtePolicy(int32_t slotId);
+    int32_t DisableVoLtePolicy(int32_t slotId);
+    int32_t IsVoLteEnabledPolicy(int32_t slotId);
+    int32_t GetCallWaitingPolicy(int32_t slotId);
+    int32_t SetCallWaitingPolicy(int32_t slotId);
+    int32_t GetCallRestrictionPolicy(int32_t slotId);
+    int32_t SetCallRestrictionPolicy(int32_t slotId);
+    int32_t GetCallTransferInfoPolicy(int32_t slotId);
+    int32_t SetCallTransferInfoPolicy(int32_t slotId);
+    int32_t SetCallPreferenceModePolicy(int32_t slotId);
+    int32_t GetImsConfigPolicy(int32_t slotId);
+    int32_t SetImsConfigPolicy(int32_t slotId);
+    int32_t GetImsFeatureValuePolicy(int32_t slotId);
+    int32_t SetImsFeatureValuePolicy(int32_t slotId);
+    int32_t GetLteEnhanceModePolicy(int32_t slotId);
+    int32_t SetLteEnhanceModePolicy(int32_t slotId);
+    static int32_t InviteToConferencePolicy(int32_t callId, std::vector<std::string> &numberList);
 
 private:
-    uint32_t onlyTwoCall_ = 2;
+    uint16_t onlyTwoCall_ = 2;
 };
 } // namespace Telephony
 } // namespace OHOS

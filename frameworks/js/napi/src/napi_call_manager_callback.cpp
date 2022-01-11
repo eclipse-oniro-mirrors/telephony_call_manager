@@ -37,23 +37,45 @@ int32_t NapiCallManagerCallback::OnCallEventChange(const CallEventInfo &info)
 {
     int32_t ret = DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->UpdateCallEvent(info);
     if (ret != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("UpdateCallEventHandler failed! errCode:%{public}d", ret);
+        TELEPHONY_LOGE("UpdateCallEvent failed! errCode:%{public}d", ret);
     } else {
-        TELEPHONY_LOGI("UpdateCallEventHandler success!");
+        TELEPHONY_LOGI("UpdateCallEvent success!");
     }
     return ret;
 }
 
-int32_t NapiCallManagerCallback::OnSupplementResult(CallResultReportId reportId, AppExecFwk::PacMap &resultInfo)
+int32_t NapiCallManagerCallback::OnCallDisconnectedCause(DisconnectedDetails cause)
+{
+    int32_t ret = DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->UpdateCallDisconnectedCause(cause);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("UpdateCallEvent failed! errCode:%{public}d", ret);
+    } else {
+        TELEPHONY_LOGI("UpdateCallEvent success!");
+    }
+    return ret;
+}
+
+int32_t NapiCallManagerCallback::OnReportAsyncResults(CallResultReportId reportId, AppExecFwk::PacMap &resultInfo)
 {
     int32_t ret =
-        DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->UpdateSupplementInfo(reportId, resultInfo);
+        DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->UpdateAsyncResultsInfo(reportId, resultInfo);
     if (ret != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("OnSupplementResult failed! errCode:%{public}d", ret);
+        TELEPHONY_LOGE("UpdateAsyncInfo failed! errCode:%{public}d", ret);
     } else {
-        TELEPHONY_LOGI("OnSupplementResult success!");
+        TELEPHONY_LOGI("UpdateAsyncInfo success!");
     }
-    return TELEPHONY_SUCCESS;
+    return ret;
+}
+
+int32_t NapiCallManagerCallback::OnOttCallRequest(OttCallRequestId requestId, AppExecFwk::PacMap &info)
+{
+    int32_t ret = DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->OttCallRequest(requestId, info);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("ott call request failed! errCode:%{public}d", ret);
+    } else {
+        TELEPHONY_LOGI("ott call request success!");
+    }
+    return ret;
 }
 } // namespace Telephony
 } // namespace OHOS

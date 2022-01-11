@@ -30,7 +30,7 @@ class CallStateListenerBase : public RefBase {
 public:
     virtual ~CallStateListenerBase() {}
     virtual void NewCallCreated(sptr<CallBase> &callObjectPtr) {}
-    virtual void CallDestroyed(sptr<CallBase> &callObjectPtr) {}
+    virtual void CallDestroyed(int32_t cause) {}
     virtual void CallStateUpdated(sptr<CallBase> &callObjectPtr, TelCallState priorState, TelCallState nextState)
     {}
     virtual void IncomingCallHungUp(sptr<CallBase> &callObjectPtr, bool isSendSms, std::string content) {}

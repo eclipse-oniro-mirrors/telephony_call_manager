@@ -215,6 +215,12 @@ declare namespace call {
     /**
      * @systemapi Hide this for inner system use.
      */
+    function on(type: 'callDisconnectedCause', callback: Callback<DisconnectedDetails>): void;
+    function off(type: 'callDisconnectedCause', callback?: Callback<DisconnectedDetails>): void;
+
+    /**
+     * @systemapi Hide this for inner system use.
+     */
     function isNewCallAllowed(callback: AsyncCallback<boolean>): void;
     function isNewCallAllowed(): Promise<boolean>;
 
@@ -273,6 +279,62 @@ declare namespace call {
      */
     function setAudioDevice(device: AudioDevice, callback: AsyncCallback<void>): void;
     function setAudioDevice(device: AudioDevice): Promise<void>;
+
+    /**
+     * @systemapi Hide this for inner system use.
+     */
+    function joinConference(mainCallId: number, callNumberList: Array<string>, callback: AsyncCallback<void>): void;
+    function joinConference(mainCallId: number, callNumberList: Array<string>): Promise<void>;
+
+    /**
+     * @systemapi Hide this for inner system use.
+     */
+    function updateCallMediaMode(callId: number, mode: CallMediaMode, callback: AsyncCallback<void>): void;
+    function updateCallMediaMode(callId: number, mode: CallMediaMode): Promise<void>;
+
+    /**
+     * @systemapi Hide this for inner system use.
+     */
+    function enableLteEnhanceMode(slotId: number, callback: AsyncCallback<void>): void;
+    function enableLteEnhanceMode(slotId: number): Promise<void>;
+
+    /**
+     * @systemapi Hide this for inner system use.
+     */
+    function disableLteEnhanceMode(slotId: number, callback: AsyncCallback<void>): void;
+    function disableLteEnhanceMode(slotId: number): Promise<void>;
+
+    /**
+     * @systemapi Hide this for inner system use.
+     */
+    function isLteEnhanceModeEnabled(slotId: number, callback: AsyncCallback<boolean>): void;
+    function isLteEnhanceModeEnabled(slotId: number): Promise<boolean>;
+
+    /**
+     * @systemapi Hide this for inner system use.
+     */
+    function enableVoLTE(slotId: number, callback: AsyncCallback<void>): void;
+    function enableVoLTE(slotId: number): Promise<void>;
+
+    /**
+     * @systemapi Hide this for inner system use.
+     */
+    function disableVoLTE(slotId: number, callback: AsyncCallback<void>): void;
+    function disableVoLTE(slotId: number): Promise<void>;
+
+    /**
+     * @systemapi Hide this for inner system use.
+     */
+    function isVoLTEEnabled(slotId: number, callback: AsyncCallback<boolean>): void;
+    function isVoLTEEnabled(slotId: number): Promise<boolean>;
+
+    export enum CallMediaMode {
+        CALL_MODE_AUDIO_ONLY = 0,
+        CALL_MODE_SEND_ONLY,
+        CALL_MODE_RECEIVE_ONLY,
+        CALL_MODE_SEND_RECEIVE,
+        CALL_MODE_VIDEO_PAUSED,
+    }
 
     /**
      * @systemapi Hide this for inner system use.
@@ -349,6 +411,7 @@ declare namespace call {
     export enum ConferenceState {
         TEL_CONFERENCE_IDLE = 0,
         TEL_CONFERENCE_ACTIVE,
+        TEL_CONFERENCE_HOLDING,
         TEL_CONFERENCE_DISCONNECTING,
         TEL_CONFERENCE_DISCONNECTED,
     }
@@ -418,14 +481,8 @@ declare namespace call {
      * @since 8
      */
     export enum CallAbilityEventId {
-        EVENT_DIAL_CMD_SEND_FAILED = 1,
-        EVENT_DIAL_NO_CARRIER = 2,
-        EVENT_HOLD_SEND_FAILED = 3,
-        EVENT_ACTIVE_SEND_FAILED = 4,
-        EVENT_START_DTMF_SUCCESS = 5,
-        EVENT_START_DTMF_FAILED = 6,
-        EVENT_STOP_DTMF_SUCCESS = 7,
-        EVENT_STOP_DTMF_FAILED = 8,
+        EVENT_DIAL_NO_CARRIER = 1,
+        EVENT_INVALID_FDN_NUMBER,
     }
 
     export enum CallState {
@@ -551,6 +608,29 @@ declare namespace call {
         numB: string;
         netISOB: string;
     }
+
+    export enum DisconnectedDetails {
+        UNASSIGNED_NUMBER = 1,
+        NO_ROUTE_TO_DESTINATION = 3,
+        CHANNEL_UNACCEPTABLE = 6,
+        OPERATOR_DETERMINED_BARRING = 8,
+        NORMAL_CALL_CLEARING = 16,
+        USER_BUSY = 17,
+        NO_USER_RESPONDING = 18,
+        USER_ALERTING_NO_ANSWER = 19,
+        CALL_REJECTED = 21,
+        NUMBER_CHANGED = 22,
+        DESTINATION_OUT_OF_ORDER = 27,
+        INVALID_NUMBER_FORMAT = 28,
+        NETWORK_OUT_OF_ORDER = 38,
+        TEMPORARY_FAILURE = 41,
+        INVALID_PARAMETER = 1025,
+        SIM_NOT_EXIT = 1026,
+        SIM_PIN_NEED = 1027,
+        CALL_NOT_ALLOW = 1029,
+        SIM_INVALID = 1045,
+        UNKNOWN = 1279,
+    };
 }
 
 export default call;
