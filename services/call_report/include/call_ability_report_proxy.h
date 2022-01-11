@@ -22,17 +22,26 @@
 
 #include "i_call_ability_callback.h"
 
+#include "call_state_listener_base.h"
+
 namespace OHOS {
 namespace Telephony {
-class CallAbilityReportProxy : public std::enable_shared_from_this<CallAbilityReportProxy> {
+class CallAbilityReportProxy : public CallStateListenerBase,
+                               public std::enable_shared_from_this<CallAbilityReportProxy> {
     DECLARE_DELAYED_SINGLETON(CallAbilityReportProxy)
 public:
     int32_t RegisterCallBack(sptr<ICallAbilityCallback> callback, std::string &bundleName);
     int32_t UnRegisterCallBack(std::string &bundleName);
+    void CallStateUpdated(sptr<CallBase> &callObjectPtr, TelCallState priorState, TelCallState nextState) override;
+    void CallEventUpdated(CallEventInfo &info) override;
+    void CallDestroyed(int32_t cause) override;
+    int32_t ReportAsyncResults(const CallResultReportId reportId, AppExecFwk::PacMap &resultInfo);
+    int32_t OttCallRequest(OttCallRequestId requestId, AppExecFwk::PacMap &info);
+    bool IsBundleNameConflict(std::string &bundleName);
+
+private:
     int32_t ReportCallStateInfo(const CallAttributeInfo &info);
     int32_t ReportCallEvent(const CallEventInfo &info);
-    int32_t ReportSupplementResult(const CallResultReportId reportId, AppExecFwk::PacMap &resultInfo);
-    int32_t ReportImsSwitchResult(const CallResultReportId reportId, AppExecFwk::PacMap &resultInfo);
 
 private:
     std::list<sptr<ICallAbilityCallback>> callbackPtrList_;
@@ -42,4 +51,4 @@ private:
 } // namespace Telephony
 } // namespace OHOS
 
-#endif // CALL_ABILITY_REPORT_PROXY_H
+#endif // CALL_ABILITY_REPORT_IPC_PROXY_H

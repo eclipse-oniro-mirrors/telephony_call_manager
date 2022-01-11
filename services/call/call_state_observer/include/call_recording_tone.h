@@ -32,14 +32,14 @@ public:
     ~CallRecordingTone() = default;
     void OnReceiveEvent(const EventFwk::CommonEventData &data) override;
     void NewCallCreated(sptr<CallBase> &callObjectPtr) override;
-    void CallDestroyed(sptr<CallBase> &callObjectPtr) override;
+    void CallDestroyed(int32_t cause) override;
     void IncomingCallActivated(sptr<CallBase> &callObjectPtr) override;
     void IncomingCallHungUp(sptr<CallBase> &callObjectPtr, bool isSendSms, std::string content) override;
     void CallStateUpdated(sptr<CallBase> &callObjectPtr, TelCallState priorState, TelCallState nextState) override;
 
 private:
     bool isRecording_;
-    const std::string CALL_RECORDING_ACTION = "ohos.action.CALL_RECORDING_ACTION";
+    const std::string CALL_RECORDING_ACTION = "usual.event.CALL_RECORDING";
     int32_t PlayRecordingTone();
     int32_t StopRecordingTone();
 };

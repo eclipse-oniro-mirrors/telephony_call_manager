@@ -20,7 +20,8 @@
 #include "telephony_log_wrapper.h"
 
 #include "call_manager_errors.h"
-#include "cellular_call_ipc_interface_proxy.h"
+#include "core_manager.h"
+#include "cellular_call_connection.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -44,7 +45,7 @@ int32_t CallNumberUtils::FormatPhoneNumber(
     i18n::phonenumbers::PhoneNumber parseResult;
     if (phoneUtils_ == nullptr) {
         TELEPHONY_LOGE("phoneUtils_ is nullptr");
-        return TELEPHONY_ERROR;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     phoneUtils_->ParseAndKeepRawInput(phoneNumber, tmpCode, &parseResult);
     phoneUtils_->FormatInOriginalFormat(parseResult, tmpCode, &formatNumber);
@@ -72,7 +73,7 @@ int32_t CallNumberUtils::FormatNumberBase(const std::string phoneNumber, std::st
     i18n::phonenumbers::PhoneNumber parseResult;
     if (phoneUtils_ == nullptr) {
         TELEPHONY_LOGE("phoneUtils_ is nullptr");
-        return TELEPHONY_ERROR;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     phoneUtils_->Parse(phoneNumber, countryCode, &parseResult);
     if (phoneUtils_->IsValidNumber(parseResult)) {
@@ -88,14 +89,14 @@ int32_t CallNumberUtils::FormatNumberBase(const std::string phoneNumber, std::st
 bool CallNumberUtils::CheckNumberIsEmergency(
     const std::string &phoneNumber, const int32_t slotId, int32_t &errorCode)
 {
-    int isEcc = DelayedSingleton<CellularCallIpcInterfaceProxy>::GetInstance()->IsEmergencyPhoneNumber(
+    int isEcc = DelayedSingleton<CellularCallConnection>::GetInstance()->IsEmergencyPhoneNumber(
         phoneNumber, slotId, errorCode);
     return (isEcc != 0);
 }
 
 bool CallNumberUtils::IsValidSlotId(int32_t slotId) const
 {
-    return slotId == DEFAULT_SLOT_ID;
+    return slotId == CoreManager::DEFAULT_SLOT_ID;
 }
 } // namespace Telephony
 } // namespace OHOS

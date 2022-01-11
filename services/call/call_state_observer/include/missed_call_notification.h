@@ -27,7 +27,7 @@ public:
     MissedCallNotification();
     ~MissedCallNotification() = default;
     void NewCallCreated(sptr<CallBase> &callObjectPtr) override;
-    void CallDestroyed(sptr<CallBase> &callObjectPtr) override;
+    void CallDestroyed(int32_t cause) override;
     void IncomingCallActivated(sptr<CallBase> &callObjectPtr) override;
     void IncomingCallHungUp(sptr<CallBase> &callObjectPtr, bool isSendSms, std::string content) override;
     void CallStateUpdated(sptr<CallBase> &callObjectPtr, TelCallState priorState, TelCallState nextState) override;
@@ -39,7 +39,7 @@ private:
     static constexpr int16_t INCOMING_CALL_MISSED_ID = 0;
     static constexpr int16_t INCOMING_CALL_MISSED_CODE = 0;
     const std::string INCOMING_CALL_MISSED_TITLE = "Missed Call";
-    const std::string COMMON_EVENT_INCOMING_CALL_MISSED = "usual.event.INCOMING_CALL_MISSED";
+    const std::string COMMON_EVENT_INCOMING_CALL_MISSED = "usual.event.MISSED_CALLS";
     void PublishMissedCallEvent(sptr<CallBase> &callObjectPtr);
     void PublishMissedCallNotification(sptr<CallBase> &callObjectPtr);
 };

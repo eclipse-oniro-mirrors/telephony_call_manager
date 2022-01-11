@@ -66,7 +66,7 @@ void IncomingCallNotification::IncomingCallHungUp(
     }
 }
 
-void IncomingCallNotification::CallDestroyed(sptr<CallBase> &callObjectPtr) {}
+void IncomingCallNotification::CallDestroyed(int32_t cause) {}
 
 void IncomingCallNotification::PublishIncomingCallNotification(sptr<CallBase> &callObjectPtr)
 {

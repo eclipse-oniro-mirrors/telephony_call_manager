@@ -17,6 +17,7 @@
 #define ENABLE_BLUETOOTH_DEVICE_H
 
 #include "audio_base.h"
+#include <mutex>
 
 namespace OHOS {
 namespace Telephony {

@@ -33,12 +33,12 @@ int32_t CSCall::DialingProcess()
 
 int32_t CSCall::AnswerCall(int32_t videoState)
 {
-    return CarrierAcceptCall(videoState);
+    return CarrierAnswerCall(videoState);
 }
 
-int32_t CSCall::RejectCall(bool isSendSms, std::string &content)
+int32_t CSCall::RejectCall()
 {
-    return CarrierRejectCall(isSendSms, content);
+    return CarrierRejectCall();
 }
 
 int32_t CSCall::HangUpCall()
@@ -48,11 +48,19 @@ int32_t CSCall::HangUpCall()
 
 int32_t CSCall::HoldCall()
 {
+    ConferenceState conferenceState = DelayedSingleton<CsConferenceBase>::GetInstance()->GetConferenceState();
+    if (conferenceState == CONFERENCE_STATE_ACTIVE) {
+        DelayedSingleton<CsConferenceBase>::GetInstance()->SetConferenceState(CONFERENCE_STATE_HOLDING);
+    }
     return CarrierHoldCall();
 }
 
 int32_t CSCall::UnHoldCall()
 {
+    ConferenceState conferenceState = DelayedSingleton<CsConferenceBase>::GetInstance()->GetConferenceState();
+    if (conferenceState == CONFERENCE_STATE_HOLDING) {
+        DelayedSingleton<CsConferenceBase>::GetInstance()->SetConferenceState(CONFERENCE_STATE_ACTIVE);
+    }
     return CarrierUnHoldCall();
 }
 
@@ -95,7 +103,7 @@ int32_t CSCall::CanSeparateConference()
     return DelayedSingleton<CsConferenceBase>::GetInstance()->CanSeparateConference();
 }
 
-int32_t CSCall::LunchConference()
+int32_t CSCall::LaunchConference()
 {
     int32_t ret = DelayedSingleton<CsConferenceBase>::GetInstance()->JoinToConference(GetCallID());
     if (ret == TELEPHONY_SUCCESS) {
@@ -107,6 +115,15 @@ int32_t CSCall::LunchConference()
 int32_t CSCall::ExitConference()
 {
     return DelayedSingleton<CsConferenceBase>::GetInstance()->LeaveFromConference(GetCallID());
+}
+
+int32_t CSCall::HoldConference()
+{
+    int32_t ret = DelayedSingleton<CsConferenceBase>::GetInstance()->HoldConference(GetCallID());
+    if (ret == TELEPHONY_SUCCESS) {
+        SetTelConferenceState(TelConferenceState::TEL_CONFERENCE_HOLDING);
+    }
+    return ret;
 }
 
 int32_t CSCall::GetMainCallId()
@@ -126,6 +143,7 @@ std::vector<std::u16string> CSCall::GetCallIdListForConference()
 
 int32_t CSCall::IsSupportConferenceable()
 {
+    // get from configure file
 #ifdef ABILIT_CONFIG_SUPPORT
     bool carrierSupport = GetCarrierConfig(CS_SUPPORT_CONFERENCE);
     if (!carrierSupport) {

@@ -30,7 +30,7 @@ public:
     bool RemoveOneObserver(const sptr<CallStateListenerBase> &observer);
     bool RemoveAllObserver();
     void NewCallCreated(sptr<CallBase> &callObjectPtr);
-    void CallDestroyed(sptr<CallBase> &callObjectPtr);
+    void CallDestroyed(int32_t cause);
     void CallStateUpdated(sptr<CallBase> &callObjectPtr, TelCallState priorState, TelCallState nextState);
     void IncomingCallHungUp(sptr<CallBase> &callObjectPtr, bool isSendSms, std::string content);
     void IncomingCallActivated(sptr<CallBase> &callObjectPtr);

@@ -22,7 +22,16 @@
 
 #include "common_type.h"
 #include "call_status_policy.h"
+#include "call_incoming_filter_manager.h"
 
+/**
+ * Singleton
+ * @ClassName:CallStatusManager
+ * @Description:CallStatusManager is designed for watching call state changes,
+ * when call state changes, cellularcall will notify callstatusmanager to handle it.
+ * call state: idle,disconnected, disconnecting,dialing,alerting,active,holding,waiting
+ * incoming
+ */
 namespace OHOS {
 namespace Telephony {
 class CallStatusManager : public CallStatusPolicy {
@@ -31,28 +40,34 @@ public:
     ~CallStatusManager();
     int32_t Init();
     int32_t UnInit();
-    int32_t HandleCallReportInfo(const CallReportInfo &info);
-    int32_t HandleCallsReportInfo(const CallsReportInfo &info);
+    int32_t HandleCallReportInfo(const CallDetailInfo &info);
+    int32_t HandleCallsReportInfo(const CallDetailsInfo &info);
     int32_t HandleDisconnectedCause(int32_t cause);
     int32_t HandleEventResultReportInfo(const CellularCallEventInfo &info);
+    void CallFilterCompleteResult(const CallDetailInfo &info);
 
 private:
-    int32_t IncomingHandle(const CallReportInfo &info);
-    int32_t DialingHandle(const CallReportInfo &info);
-    int32_t ActiveHandle(const CallReportInfo &info);
-    int32_t HoldingHandle(const CallReportInfo &info);
-    int32_t WaitingHandle(const CallReportInfo &info);
-    int32_t AlertHandle(const CallReportInfo &info);
-    int32_t DisconnectingHandle(const CallReportInfo &info);
-    int32_t DisconnectedHandle(const CallReportInfo &info);
-    sptr<CallBase> CreateNewCall(const CallReportInfo &info, CallDirection dir);
+    void InitCallBaseEvent();
+    int32_t IncomingHandle(const CallDetailInfo &info);
+    int32_t DialingHandle(const CallDetailInfo &info);
+    int32_t ActiveHandle(const CallDetailInfo &info);
+    int32_t HoldingHandle(const CallDetailInfo &info);
+    int32_t WaitingHandle(const CallDetailInfo &info);
+    int32_t AlertHandle(const CallDetailInfo &info);
+    int32_t DisconnectingHandle(const CallDetailInfo &info);
+    int32_t DisconnectedHandle(const CallDetailInfo &info);
+    sptr<CallBase> CreateNewCall(const CallDetailInfo &info, CallDirection dir);
+    void PackParaInfo(
+        DialParaInfo &paraInfo, const CallDetailInfo &info, CallDirection dir, AppExecFwk::PacMap &extras);
     int32_t UpdateCallState(sptr<CallBase> &call, TelCallState nextState);
     int32_t ToSpeakerPhone(sptr<CallBase> &call);
     int32_t TurnOffMute(sptr<CallBase> &call);
+    int32_t IncomingFilterPolicy(const CallDetailInfo &info);
 
 private:
-    CallReportInfo callReportInfo_;
-    CallsReportInfo callsReportInfo_;
+    CallDetailInfo callReportInfo_;
+    CallDetailsInfo callDetailsInfo_;
+    sptr<CallIncomingFilterManager> CallIncomingFilterManagerPtr_;
     std::map<RequestResultEventId, CallAbilityEventId> mEventIdTransferMap_;
 };
 } // namespace Telephony

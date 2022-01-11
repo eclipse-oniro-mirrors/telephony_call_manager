@@ -27,7 +27,10 @@ bool CallManagerDumpHelper::Dump(const std::vector<std::string> &args, std::stri
     return true;
 }
 
-CallManagerDumpHelper::CallManagerDumpHelper() {}
+CallManagerDumpHelper::CallManagerDumpHelper()
+{
+    TELEPHONY_LOGI("CallManagerDumpHelper() entry.");
+}
 
 void CallManagerDumpHelper::ShowHelp(std::string &result) const
 {
@@ -49,9 +52,13 @@ void CallManagerDumpHelper::ShowHelp(std::string &result) const
 
 void CallManagerDumpHelper::ShowCallManagerInfo(std::string &result) const
 {
-    result.append("Ohos call_manager service: ");
-    result.append(",    Ohos call_manager bind time:  ");
+    result.append("Ohos call_manager service:");
+    result.append("\n");
+    result.append("Ohos call_manager bind time:  ");
     result.append(DelayedSingleton<CallManagerService>::GetInstance()->GetBindTime());
+    result.append("\n");
+    result.append("Ohos call_manager start spend time(milliseconds):  ");
+    result.append(DelayedSingleton<CallManagerService>::GetInstance()->GetStartServiceSpent());
     result.append("\n");
 }
 } // namespace Telephony

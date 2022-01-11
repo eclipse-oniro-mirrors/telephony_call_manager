@@ -32,7 +32,7 @@ void ProximitySensor::StartUp(PowerMgr::WakeupDeviceType operationType, std::str
     PowerMgr::PowerMgrClient::GetInstance().WakeupDevice(operationType, wakeupReason);
 }
 
-void ProximitySensor::CallDestroyed(sptr<CallBase> &callObjectPtr)
+void ProximitySensor::CallDestroyed(int32_t cause)
 {
     if (CallObjectManager::HasCallExist()) {
         ShutDown(PowerMgr::SuspendDeviceType::SUSPEND_DEVICE_REASON_APPLICATION, true);

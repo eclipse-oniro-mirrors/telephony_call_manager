@@ -35,7 +35,7 @@ void IncomingCallWakeup::NewCallCreated(sptr<CallBase> &callObjectPtr)
 void IncomingCallWakeup::WakeupDevice()
 {
     if (IsScreenOn()) {
-        TELEPHONY_LOGE("screen not wake up");
+        TELEPHONY_LOGE("screen already up");
         return;
     }
     PowerMgr::PowerMgrClient::GetInstance().WakeupDevice(
@@ -63,7 +63,7 @@ bool IncomingCallWakeup::IsPowerAbilityExist()
     return true;
 }
 
-void IncomingCallWakeup::CallDestroyed(sptr<CallBase> &callObjectPtr) {}
+void IncomingCallWakeup::CallDestroyed(int32_t cause) {}
 
 void IncomingCallWakeup::IncomingCallActivated(sptr<CallBase> &callObjectPtr) {}
 

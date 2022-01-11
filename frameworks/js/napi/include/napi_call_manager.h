@@ -19,9 +19,6 @@
 #include "pac_map.h"
 #include "string_ex.h"
 
-#include "napi/native_api.h"
-#include "napi/native_node_api.h"
-
 #include "napi_call_manager_callback.h"
 #include "napi_call_manager_types.h"
 
@@ -34,6 +31,9 @@ namespace Telephony {
     void *data;                    \
     napi_get_cb_info(env, info, &argc, argv, &thisVar, &data)
 
+/**
+ * NapiCallManager is responsible for NAPI initialization and JavaScript data parsing.
+ */
 class NapiCallManager {
 public:
     NapiCallManager();
@@ -44,6 +44,7 @@ public:
     static napi_value DeclareCallSupplementInterface(napi_env env, napi_value exports);
     static napi_value DeclareCallExtendInterface(napi_env env, napi_value exports);
     static napi_value DeclareCallMultimediaInterface(napi_env env, napi_value exports);
+    static napi_value DeclareCallImsInterface(napi_env env, napi_value exports);
     static napi_value DeclareCallMediaEnum(napi_env env, napi_value exports);
     static napi_value DeclareCallDialEnum(napi_env env, napi_value exports);
     static napi_value DeclareCallStateEnum(napi_env env, napi_value exports);
@@ -72,8 +73,6 @@ public:
     static napi_value SetCallTransferInfo(napi_env env, napi_callback_info info);
     static napi_value StartDTMF(napi_env env, napi_callback_info info);
     static napi_value StopDTMF(napi_env env, napi_callback_info info);
-    static napi_value SendDtmf(napi_env env, napi_callback_info info);
-    static napi_value SendBurstDtmf(napi_env env, napi_callback_info info);
     static napi_value GetCallState(napi_env env, napi_callback_info info);
     static napi_value IsRinging(napi_env env, napi_callback_info info);
     static napi_value HasCall(napi_env env, napi_callback_info info);
@@ -95,13 +94,20 @@ public:
     static napi_value SetPausePicture(napi_env env, napi_callback_info info);
     static napi_value SetDeviceDirection(napi_env env, napi_callback_info info);
     static napi_value SetCallPreferenceMode(napi_env env, napi_callback_info info);
+    static napi_value EnableVoLTE(napi_env env, napi_callback_info info);
+    static napi_value DisableVoLTE(napi_env env, napi_callback_info info);
+    static napi_value IsVoLTEEnabled(napi_env env, napi_callback_info info);
+    static napi_value StartRTT(napi_env env, napi_callback_info info);
+    static napi_value StopRTT(napi_env env, napi_callback_info info);
+    static napi_value JoinConference(napi_env env, napi_callback_info info);
+    static napi_value UpdateCallMediaMode(napi_env env, napi_callback_info info);
+    static napi_value EnableLteEnhanceMode(napi_env env, napi_callback_info info);
+    static napi_value DisableLteEnhanceMode(napi_env env, napi_callback_info info);
+    static napi_value IsLteEnhanceModeEnabled(napi_env env, napi_callback_info info);
+    static napi_value ReportOttCallDetailsInfo(napi_env env, napi_callback_info info);
 
 private:
     static void RegisterCallBack();
-    static std::u16string GetBundleName(napi_env env);
-    static bool MatchValueType(napi_env env, napi_value value, napi_valuetype targetType);
-    static napi_value CreateUndefined(napi_env env);
-    static napi_value CreateErrorMessage(napi_env env, std::string msg);
     static void NativeCallBack(napi_env env, napi_status status, void *data);
     static void NativeDialCallBack(napi_env env, napi_status status, void *data);
     static void NativeVoidCallBack(napi_env env, napi_status status, void *data);
@@ -134,8 +140,6 @@ private:
     static void NativeSetTransferNumber(napi_env env, void *data);
     static void NativeStartDTMF(napi_env env, void *data);
     static void NativeStopDTMF(napi_env env, void *data);
-    static void NativeSendDtmf(napi_env env, void *data);
-    static void NativeSendDtmfBunch(napi_env env, void *data);
     static void NativeGetCallState(napi_env env, void *data);
     static void NativeIsRinging(napi_env env, void *data);
     static void NativeHasCall(napi_env env, void *data);
@@ -155,15 +159,21 @@ private:
     static void NativeSetPausePicture(napi_env env, void *data);
     static void NativeSetDeviceDirection(napi_env env, void *data);
     static void NativeSetCallPreferenceMode(napi_env env, void *data);
-
-    // PrivateNativeMethod
-    static napi_value ToInt32Value(napi_env env, int32_t value);
-    static napi_value GetNamedProperty(napi_env env, napi_value object, const std::string &propertyName);
-    static std::string GetStringProperty(napi_env env, napi_value object, const std::string &propertyName);
-    static int32_t GetIntProperty(napi_env env, napi_value object, const std::string &propertyName);
-    static bool GetBoolProperty(napi_env env, napi_value object, const std::string &propertyName);
+    static void NativeGetVoLTE(napi_env env, void *data);
+    static void NativeEnableVoLTE(napi_env env, void *data);
+    static void NativeDisableVoLTE(napi_env env, void *data);
+    static void NativeStartRTT(napi_env env, void *data);
+    static void NativeStopRTT(napi_env env, void *data);
+    static void NativeJoinConference(napi_env env, void *data);
+    static void NativeUpdateCallMediaMode(napi_env env, void *data);
+    static void NativeEnableLteEnhanceMode(napi_env env, void *data);
+    static void NativeDisableLteEnhanceMode(napi_env env, void *data);
+    static void NativeIsLteEnhanceModeEnabled(napi_env env, void *data);
+    static void NativeReportOttCallDetailsInfo(napi_env env, void *data);
     static napi_value HandleAsyncWork(napi_env env, AsyncContext *context, std::string workName,
         napi_async_execute_callback execute, napi_async_complete_callback complete);
+
+private:
     static bool registerStatus_;
 };
 } // namespace Telephony

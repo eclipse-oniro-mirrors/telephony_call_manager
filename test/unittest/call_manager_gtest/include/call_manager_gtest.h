@@ -33,17 +33,15 @@
 namespace OHOS {
 namespace Telephony {
 constexpr int32_t DEFAULT_SLOT_ID = 0;
-constexpr int32_t SLEEP_SECONDS = 2;
-constexpr int32_t EVENT_BLUETOOTH_SCO_CONNECTED_CODE = 0;
-constexpr int32_t EVENT_BLUETOOTH_SCO_DISCONNECTED_CODE = 1;
-const std::string EVENT_BLUETOOTH_SCO_CONNECTED = "usual.event.BLUETOOTH_SCO_CONNECTED";
-const std::string EVENT_BLUETOOTH_SCO_DISCONNECTED = "usual.event.BLUETOOTH_SCO_DISCONNECTED";
+constexpr int16_t SLEEP_THREE_SECONDS = 3;
 
 class CallManagerGtest : public testing::Test {
 public:
     // execute before first testcase
     static void SetUpTestCase()
     {
+        std::cout << "---------- warning ------------" << std::endl;
+        std::cout << "---Please modify PHONE_NUMBER first in the file call_manager_gtest.cpp---" << std::endl;
         std::cout << "---------- gtest start ------------" << std::endl;
         clientPtr_ = std::make_unique<CallManagerConnect>();
         if (clientPtr_ == nullptr) {
@@ -56,49 +54,17 @@ public:
         }
         std::cout << "connect callManager server success!!!" << std::endl;
 
-        if (CoreServiceClient::GetInstance().GetProxy() == nullptr) {
-            std::cout << "connect coreService server failed!" << std::endl;
-            return;
-        }
-        std::cout << "connect coreService server success!!!" << std::endl;
         CallInfoManager::Init();
     }
 
     bool HasSimCard()
     {
-        if (CoreServiceClient::GetInstance().GetProxy() == nullptr) {
-            return false;
-        }
-        return CoreServiceClient::GetInstance().HasSimCard(DEFAULT_SLOT_ID);
+        return DelayedRefSingleton<CoreServiceClient>::GetInstance().HasSimCard(DEFAULT_SLOT_ID);
     }
 
-    inline void SleepForSeconds()
+    inline void SleepForSeconds(int32_t seconds)
     {
-        std::this_thread::sleep_for(std::chrono::seconds(SLEEP_SECONDS));
-    }
-
-    bool SendConnectBtScoBroadcast()
-    {
-        AAFwk::Want want;
-        want.SetAction(EVENT_BLUETOOTH_SCO_CONNECTED);
-        EventFwk::CommonEventData data;
-        data.SetWant(want);
-        data.SetCode(EVENT_BLUETOOTH_SCO_CONNECTED_CODE);
-        OHOS::EventFwk::CommonEventPublishInfo publishInfo;
-        publishInfo.SetOrdered(true);
-        return EventFwk::CommonEventManager::PublishCommonEvent(data, publishInfo, nullptr);
-    }
-
-    bool SendDisconnectBtScoBroadcast()
-    {
-        AAFwk::Want want;
-        want.SetAction(EVENT_BLUETOOTH_SCO_DISCONNECTED);
-        EventFwk::CommonEventData data;
-        data.SetWant(want);
-        data.SetCode(EVENT_BLUETOOTH_SCO_DISCONNECTED_CODE);
-        OHOS::EventFwk::CommonEventPublishInfo publishInfo;
-        publishInfo.SetOrdered(true);
-        return EventFwk::CommonEventManager::PublishCommonEvent(data, publishInfo, nullptr);
+        std::this_thread::sleep_for(std::chrono::seconds(seconds));
     }
 
     void InitDialInfo(int32_t accountId, int32_t videoState, int32_t dialScene, int32_t dialType)
@@ -110,7 +76,10 @@ public:
     }
 
     // execute before each testcase
-    void SetUp() {}
+    void SetUp()
+    {
+        std::this_thread::sleep_for(std::chrono::seconds(SLEEP_THREE_SECONDS));
+    }
 
     // execute after each testcase
     void TearDown() {}
@@ -124,7 +93,7 @@ public:
         std::cout << "---------- gtest end ------------" << std::endl;
     }
 
-    bool HasState(int callId, int callState)
+    bool HasState(int32_t callId, int32_t callState)
     {
         if (g_callStateMap.find(callId) == g_callStateMap.end()) {
             return false;
@@ -139,13 +108,13 @@ public:
     static std::unique_ptr<CallManagerConnect> clientPtr_;
     AppExecFwk::PacMap dialInfo_;
 
-    const int SLEEP_50_MS = 50;
-    const int SLEEP_1000_MS = 1000;
-    const int SLEEP_12000_MS = 12000;
-    const int SLEEP_30000_MS = 30000;
+    const int32_t SLEEP_50_MS = 50;
+    const int32_t SLEEP_1000_MS = 1000;
+    const int32_t SLEEP_12000_MS = 12000;
+    const int32_t SLEEP_30000_MS = 30000;
     const std::string EMPTY_DEFAULT = "";
-    const int FALSE_DEFAULT = -1;
-    std::unordered_map<int, std::unordered_set<int>> g_callStateMap;
+    const int32_t FALSE_DEFAULT = -1;
+    std::unordered_map<int32_t, std::unordered_set<int32_t>> g_callStateMap;
     int newCallId_ = -1;
 };
 

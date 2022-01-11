@@ -21,8 +21,8 @@
 
 #include "if_system_ability_manager.h"
 #include "refbase.h"
-#include "rwlock.h"
 #include "singleton.h"
+#include "rwlock.h"
 #include "pac_map.h"
 
 #include "i_call_manager_service.h"
@@ -34,17 +34,16 @@
 
 namespace OHOS {
 namespace Telephony {
-class CallManagerProxy : public Telephony::Timer {
+class CallManagerProxy : public Telephony::Timer, public std::enable_shared_from_this<CallManagerProxy> {
+    DECLARE_DELAYED_SINGLETON(CallManagerProxy)
 public:
-    CallManagerProxy();
-    ~CallManagerProxy();
     void Init(int32_t systemAbilityId, std::u16string &bundleName);
     void UnInit();
     int32_t RegisterCallBack(std::unique_ptr<CallManagerCallback> callback);
     int32_t UnRegisterCallBack();
-    int32_t DialCall(std::u16string &number, AppExecFwk::PacMap &extras);
+    int32_t DialCall(std::u16string number, AppExecFwk::PacMap &extras);
     int32_t AnswerCall(int32_t callId, int32_t videoState);
-    int32_t RejectCall(int32_t callId, bool isSendSms, std::u16string &content);
+    int32_t RejectCall(int32_t callId, bool isSendSms, std::u16string content);
     int32_t HangUpCall(int32_t callId);
     int32_t GetCallState();
     int32_t HoldCall(int32_t callId);
@@ -64,8 +63,6 @@ public:
     int32_t SetCallPreferenceMode(int32_t slotId, int32_t mode);
     int32_t StartDtmf(int32_t callId, char str);
     int32_t StopDtmf(int32_t callId);
-    int32_t SendDtmf(int32_t callId, char str);
-    int32_t SendBurstDtmf(int32_t callId, std::u16string str, int32_t on, int32_t off);
     bool IsRinging();
     bool HasCall();
     bool IsNewCallAllowed();
@@ -77,13 +74,27 @@ public:
     int32_t SetMuted(bool isMute);
     int32_t MuteRinger();
     int32_t SetAudioDevice(AudioDevice deviceType);
-    int32_t CancelMissedCallsNotification(int32_t id);
     int32_t ControlCamera(std::u16string cameraId, std::u16string callingPackage);
     int32_t SetPreviewWindow(VideoWindow &window);
     int32_t SetDisplayWindow(VideoWindow &window);
     int32_t SetCameraZoom(float zoomRatio);
-    int32_t SetPausePicture(std::u16string &path);
+    int32_t SetPausePicture(std::u16string path);
     int32_t SetDeviceDirection(int32_t rotation);
+    int32_t GetImsConfig(int32_t slotId, ImsConfigItem item);
+    int32_t SetImsConfig(int32_t slotId, ImsConfigItem item, std::u16string &value);
+    int32_t GetImsFeatureValue(int32_t slotId, FeatureType type);
+    int32_t SetImsFeatureValue(int32_t slotId, FeatureType type, int32_t value);
+    int32_t UpdateCallMediaMode(int32_t callId, CallMediaMode mode);
+    int32_t EnableVoLte(int32_t slotId);
+    int32_t DisableVoLte(int32_t slotId);
+    int32_t IsVoLteEnabled(int32_t slotId);
+    int32_t EnableLteEnhanceMode(int32_t slotId);
+    int32_t DisableLteEnhanceMode(int32_t slotId);
+    int32_t IsLteEnhanceModeEnabled(int32_t slotId);
+    int32_t StartRtt(int32_t callId, std::u16string &msg);
+    int32_t StopRtt(int32_t callId);
+    int32_t JoinConference(int32_t callId, std::vector<std::u16string> &numberList);
+    int32_t ReportOttCallDetailsInfo(std::vector<OttCallDetailsInfo> &ottVec);
 
 private:
     static void task();

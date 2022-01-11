@@ -15,249 +15,146 @@
 
 #include "call_state_processor.h"
 
-#include "alerting_state.h"
-#include "incoming_state.h"
-#include "cs_call_state.h"
-#include "holding_state.h"
-#include "ims_call_state.h"
-#include "inactive_state.h"
-#include "audio_control_manager.h"
+#include "audio_scene_processor.h"
 
 #include "telephony_log_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
-CallStateProcessor::CallStateProcessor() : currentAudioMode_(IN_IDLE), currentCallState_(nullptr) {}
+CallStateProcessor::CallStateProcessor() {}
 
-CallStateProcessor::~CallStateProcessor() {}
-
-int32_t CallStateProcessor::Init()
+CallStateProcessor::~CallStateProcessor()
 {
-    memberFuncMap_[AudioEvent::SWITCH_ALERTING_STATE] = &CallStateProcessor::SwitchAlerting;
-    memberFuncMap_[AudioEvent::SWITCH_INCOMING_STATE] = &CallStateProcessor::SwitchIncoming;
-    memberFuncMap_[AudioEvent::SWITCH_CS_CALL_STATE] = &CallStateProcessor::SwitchCS;
-    memberFuncMap_[AudioEvent::SWITCH_IMS_CALL_STATE] = &CallStateProcessor::SwitchIMS;
-    memberFuncMap_[AudioEvent::SWITCH_HOLDING_STATE] = &CallStateProcessor::SwitchHolding;
-    memberFuncMap_[AudioEvent::SWITCH_AUDIO_INACTIVE_STATE] = &CallStateProcessor::SwitchInactive;
-    currentCallState_ = std::make_unique<InActiveState>();
-    if (currentCallState_ == nullptr) {
-        TELEPHONY_LOGE("current call state nullptr");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-    return TELEPHONY_SUCCESS;
+    activeCalls_.clear();
+    alertingCalls_.clear();
+    incomingCalls_.clear();
+    holdingCalls_.clear();
 }
 
-bool CallStateProcessor::ProcessEvent(AudioEvent event)
+void CallStateProcessor::AddCall(const std::string &phoneNum, TelCallState state)
 {
-    if (currentCallState_ == nullptr) {
-        TELEPHONY_LOGE("current call state nullptr");
-        return false;
-    }
-    bool result = false;
-    switch (event) {
-        case AudioEvent::SWITCH_ALERTING_STATE:
-        case AudioEvent::SWITCH_INCOMING_STATE:
-        case AudioEvent::SWITCH_CS_CALL_STATE:
-        case AudioEvent::SWITCH_IMS_CALL_STATE:
-        case AudioEvent::SWITCH_HOLDING_STATE:
-        case AudioEvent::SWITCH_AUDIO_INACTIVE_STATE:
-            result = SwitchState(event);
+    switch (state) {
+        case TelCallState::CALL_STATUS_ALERTING:
+            if (alertingCalls_.count(phoneNum) == EMPTY_VALUE) {
+                TELEPHONY_LOGI("add call , state : alerting");
+                alertingCalls_.insert(phoneNum);
+            }
             break;
-        case AudioEvent::NEW_ACTIVE_CS_CALL:
-        case AudioEvent::NEW_ACTIVE_IMS_CALL:
-        case AudioEvent::NEW_ALERTING_CALL:
-        case AudioEvent::NEW_INCOMING_CALL:
-        case AudioEvent::NO_MORE_ACTIVE_CALL:
-        case AudioEvent::NO_MORE_ALERTING_CALL:
-        case AudioEvent::NO_MORE_INCOMING_CALL:
-            result = currentCallState_->ProcessEvent(event);
+        case TelCallState::CALL_STATUS_INCOMING:
+            if (incomingCalls_.count(phoneNum) == EMPTY_VALUE) {
+                TELEPHONY_LOGI("add call , state : incoming");
+                incomingCalls_.insert(phoneNum);
+            }
+            break;
+        case TelCallState::CALL_STATUS_ACTIVE:
+            if (activeCalls_.count(phoneNum) == EMPTY_VALUE) {
+                TELEPHONY_LOGI("add call , state : active");
+                activeCalls_.insert(phoneNum);
+            }
+            break;
+        case TelCallState::CALL_STATUS_HOLDING:
+            if (holdingCalls_.count(phoneNum) == EMPTY_VALUE) {
+                TELEPHONY_LOGI("add call , state : holding");
+                holdingCalls_.insert(phoneNum);
+            }
             break;
         default:
             break;
     }
-    return result;
 }
 
-bool CallStateProcessor::SwitchState(AudioEvent event)
+void CallStateProcessor::DeleteCall(const std::string &phoneNum, TelCallState state)
 {
-    auto itFunc = memberFuncMap_.find(event);
-    if (itFunc != memberFuncMap_.end() && itFunc->second != nullptr) {
-        auto memberFunc = itFunc->second;
-        return (this->*memberFunc)();
-    }
-    return false;
-}
-
-bool CallStateProcessor::SwitchState(CallStateType stateType)
-{
-    bool result = false;
-    std::lock_guard<std::mutex> lock(mutex_);
-    switch (stateType) {
-        case CallStateType::ALERTING_STATE:
-            result = SwitchAlerting();
+    switch (state) {
+        case TelCallState::CALL_STATUS_ALERTING:
+            if (alertingCalls_.count(phoneNum) > EMPTY_VALUE) {
+                TELEPHONY_LOGI("erase call , state : alerting");
+                alertingCalls_.erase(phoneNum);
+            }
             break;
-        case CallStateType::INCOMING_STATE:
-            result = SwitchIncoming();
+        case TelCallState::CALL_STATUS_INCOMING:
+            if (incomingCalls_.count(phoneNum) > EMPTY_VALUE) {
+                TELEPHONY_LOGI("erase call , state : incoming");
+                incomingCalls_.erase(phoneNum);
+            }
             break;
-        case CallStateType::CS_CALL_STATE:
-            result = SwitchCS();
+        case TelCallState::CALL_STATUS_ACTIVE:
+            if (activeCalls_.count(phoneNum) > EMPTY_VALUE) {
+                TELEPHONY_LOGI("erase call , state : active");
+                activeCalls_.erase(phoneNum);
+            }
             break;
-        case CallStateType::IMS_CALL_STATE:
-            result = SwitchIMS();
-            break;
-        case CallStateType::HOLDING_STATE:
-            result = SwitchHolding();
-            break;
-        case CallStateType::INACTIVE_STATE:
-            result = SwitchInactive();
+        case TelCallState::CALL_STATUS_HOLDING:
+            if (holdingCalls_.count(phoneNum) > EMPTY_VALUE) {
+                TELEPHONY_LOGI("erase call , state : holding");
+                holdingCalls_.erase(phoneNum);
+            }
             break;
         default:
             break;
     }
-    TELEPHONY_LOGI("switch call state lock release");
-    return result;
 }
 
-bool CallStateProcessor::SwitchAlerting()
+int32_t CallStateProcessor::GetCallNumber(TelCallState state)
 {
-    if (!ActivateAudioInterrupt()) {
-        TELEPHONY_LOGE("activate audio interrupt failed");
+    int32_t number = EMPTY_VALUE;
+    switch (state) {
+        case TelCallState::CALL_STATUS_ALERTING:
+            number = alertingCalls_.size();
+            break;
+        case TelCallState::CALL_STATUS_INCOMING:
+            number = incomingCalls_.size();
+            break;
+        case TelCallState::CALL_STATUS_ACTIVE:
+            number = activeCalls_.size();
+            break;
+        case TelCallState::CALL_STATUS_HOLDING:
+            number = holdingCalls_.size();
+            break;
+        default:
+            break;
+    }
+    return number;
+}
+
+bool CallStateProcessor::UpdateCurrentCallState()
+{
+    if (activeCalls_.size() > EMPTY_VALUE) {
+        // no need to update call state while active calls exists
         return false;
     }
-    if (DelayedSingleton<AudioProxy>::GetInstance()->SetAudioMode(AudioCallState::IN_IDLE)) {
-        currentCallState_ = std::make_unique<AlertingState>();
-        if (currentCallState_ == nullptr) {
-            TELEPHONY_LOGE("make_unique AlertingState failed");
-            return false;
-        }
-        DelayedSingleton<AudioControlManager>::GetInstance()->PlayRingback();
-        currentAudioMode_ = AudioCallState::IN_IDLE;
-        TELEPHONY_LOGI("current call state : alerting state");
-        return true;
+    AudioEvent event = AudioEvent::UNKNOWN_EVENT;
+    if (holdingCalls_.size() > EMPTY_VALUE) {
+        event = AudioEvent::SWITCH_HOLDING_STATE;
+    } else if (incomingCalls_.size() > EMPTY_VALUE) {
+        event = AudioEvent::SWITCH_INCOMING_STATE;
+    } else {
+        event = AudioEvent::SWITCH_AUDIO_INACTIVE_STATE;
     }
-    return false;
+    return DelayedSingleton<AudioSceneProcessor>::GetInstance()->ProcessEvent(event);
 }
 
-bool CallStateProcessor::SwitchIncoming()
+std::string CallStateProcessor::GetCurrentActiveCall() const
 {
-    if (!ActivateAudioInterrupt()) {
-        TELEPHONY_LOGE("activate audio interrupt failed");
-        return false;
+    if (activeCalls_.size() > EMPTY_VALUE) {
+        return (*activeCalls_.begin());
     }
-    if (DelayedSingleton<AudioProxy>::GetInstance()->SetAudioMode(AudioCallState::RINGTONE)) {
-        currentCallState_ = std::make_unique<IncomingState>();
-        if (currentCallState_ == nullptr) {
-            TELEPHONY_LOGE("make_unique IncomingState failed");
-            return false;
-        }
-        DelayedSingleton<AudioControlManager>::GetInstance()->PlayRingtone(); // play ringtone while incoming state
-        currentAudioMode_ = AudioCallState::RINGTONE;
-        TELEPHONY_LOGI("current call state : incoming state");
-        return true;
-    }
-    return false;
+    return "";
 }
 
-bool CallStateProcessor::SwitchCS()
+bool CallStateProcessor::ShouldSwitchActive() const
 {
-    if (!ActivateAudioInterrupt()) {
-        TELEPHONY_LOGE("activate audio interrupt failed");
-        return false;
-    }
-    if (DelayedSingleton<AudioProxy>::GetInstance()->SetAudioMode(AudioCallState::IN_CALL)) {
-        currentCallState_ = std::make_unique<CSCallState>();
-        if (currentCallState_ == nullptr) {
-            TELEPHONY_LOGE("make_unique CSCallState failed");
-            return false;
-        }
-        currentAudioMode_ = AudioCallState::IN_CALL;
-        TELEPHONY_LOGI("current call state : cs call state");
-        return true;
-    }
-    return false;
+    return activeCalls_.size() == EXIST_ONLY_ONE_CALL;
 }
 
-bool CallStateProcessor::SwitchIMS()
+bool CallStateProcessor::ShouldSwitchAlerting() const
 {
-    if (!ActivateAudioInterrupt()) {
-        TELEPHONY_LOGE("activate audio interrupt failed");
-        return false;
-    }
-    if (DelayedSingleton<AudioProxy>::GetInstance()->SetAudioMode(AudioCallState::IN_VOIP)) {
-        currentCallState_ = std::make_unique<IMSCallState>();
-        if (currentCallState_ == nullptr) {
-            TELEPHONY_LOGE("make_unique IMSCallState failed");
-            return false;
-        }
-        currentAudioMode_ = AudioCallState::IN_VOIP;
-        TELEPHONY_LOGI("current call state : ims call state");
-        return true;
-    }
-    return false;
+    return alertingCalls_.size() == EXIST_ONLY_ONE_CALL && activeCalls_.empty() && incomingCalls_.empty();
 }
 
-bool CallStateProcessor::SwitchHolding()
+bool CallStateProcessor::ShouldSwitchIncoming() const
 {
-    if (DelayedSingleton<AudioProxy>::GetInstance()->SetAudioMode(currentAudioMode_)) {
-        currentCallState_ = std::make_unique<HoldingState>();
-        if (currentCallState_ == nullptr) {
-            TELEPHONY_LOGE("make_unique HoldingState failed");
-            return false;
-        }
-        TELEPHONY_LOGI("current call state : holding state");
-        return true;
-    }
-    return false;
-}
-
-bool CallStateProcessor::SwitchInactive()
-{
-    if (!DeactivateAudioInterrupt()) {
-        TELEPHONY_LOGE("deactivate audio interrupt failed");
-        return false;
-    }
-    if (DelayedSingleton<AudioProxy>::GetInstance()->SetAudioMode(AudioCallState::IN_IDLE)) {
-        currentCallState_ = std::make_unique<InActiveState>();
-        if (currentCallState_ == nullptr) {
-            TELEPHONY_LOGE("make_unique InActiveState failed");
-            return false;
-        }
-        currentAudioMode_ = AudioCallState::IN_IDLE;
-        TELEPHONY_LOGI("current call state : inactive state");
-        return true;
-    }
-    return false;
-}
-
-bool CallStateProcessor::SwitchOTT()
-{
-    if (!ActivateAudioInterrupt()) {
-        TELEPHONY_LOGE("activate audio interrupt failed");
-        return false;
-    }
-    return true;
-}
-
-bool CallStateProcessor::ActivateAudioInterrupt()
-{
-    int32_t ret = DelayedSingleton<AudioProxy>::GetInstance()->ActivateAudioInterrupt();
-    if (ret == TELEPHONY_SUCCESS) {
-        DelayedSingleton<AudioControlManager>::GetInstance()->SetAudioInterruptState(
-            AudioInterruptState::INTERRUPT_STATE_ACTIVATED);
-        return true;
-    }
-    return false;
-}
-
-bool CallStateProcessor::DeactivateAudioInterrupt()
-{
-    int32_t ret = DelayedSingleton<AudioProxy>::GetInstance()->DeactivateAudioInterrupt();
-    if (ret == TELEPHONY_SUCCESS) {
-        DelayedSingleton<AudioControlManager>::GetInstance()->SetAudioInterruptState(
-            AudioInterruptState::INTERRUPT_STATE_DEACTIVATED);
-        return true;
-    }
-    return false;
+    return incomingCalls_.size() == EXIST_ONLY_ONE_CALL && activeCalls_.empty() && alertingCalls_.empty();
 }
 } // namespace Telephony
 } // namespace OHOS

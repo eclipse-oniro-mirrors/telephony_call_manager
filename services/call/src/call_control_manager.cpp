@@ -22,22 +22,23 @@
 #include "telephony_log_wrapper.h"
 
 #include "common_type.h"
-#include "cs_call.h"
-#include "ims_call.h"
-#include "ott_call.h"
-#include "report_call_state_handler.h"
 #include "audio_control_manager.h"
 #include "video_control_manager.h"
 #include "bluetooth_call_manager.h"
-#include "call_ability_handler.h"
-#include "cellular_call_ipc_interface_proxy.h"
+#include "call_ability_report_proxy.h"
+#include "call_state_broadcast.h"
+#include "call_state_report_proxy.h"
+#include "cellular_call_connection.h"
 #include "call_broadcast_subscriber.h"
 #include "call_records_manager.h"
 #include "call_number_utils.h"
+#include "reject_call_sms.h"
 
 namespace OHOS {
 namespace Telephony {
-CallControlManager::CallControlManager() : callStateListenerPtr_(nullptr), callRequestHandlerServicePtr_(nullptr)
+CallControlManager::CallControlManager()
+    : callStateListenerPtr_(nullptr), callRequestHandlerServicePtr_(nullptr), missedCallNotification_(nullptr),
+      callSettingManagerPtr_(nullptr)
 {
     dialSrcInfo_.callId = ERR_ID;
     dialSrcInfo_.number = "";
@@ -60,12 +61,11 @@ bool CallControlManager::Init()
         return false;
     }
     callRequestHandlerServicePtr_->Start();
-    reportCallStateHandlerPtr_ = (std::make_unique<ReportCallStateHandlerService>()).release();
-    if (reportCallStateHandlerPtr_ == nullptr) {
-        TELEPHONY_LOGE("reportCallStateHandlerPtr_ is null");
+    missedCallNotification_ = std::make_unique<MissedCallNotification>();
+    if (missedCallNotification_ == nullptr) {
+        TELEPHONY_LOGE("missedCallNotification_ is null");
         return false;
     }
-    reportCallStateHandlerPtr_->Start();
     callSettingManagerPtr_ = std::make_unique<CallSettingManager>();
     if (callSettingManagerPtr_ == nullptr) {
         TELEPHONY_LOGE("callSettingManagerPtr_ is nullptr!");
@@ -77,20 +77,13 @@ bool CallControlManager::Init()
     }
     DelayedSingleton<AudioControlManager>::GetInstance()->Init();
     DelayedSingleton<BluetoothCallManager>::GetInstance()->Init();
-    callStateListenerPtr_->AddOneObserver(reportCallStateHandlerPtr_);
-    hangUpSms_ = (std::make_unique<HangUpSms>()).release();
-    missedCallNotification_ = (std::make_unique<MissedCallNotification>()).release();
-    callStateListenerPtr_->AddOneObserver(hangUpSms_);
-    callStateListenerPtr_->AddOneObserver(missedCallNotification_);
-    callStateListenerPtr_->AddOneObserver(DelayedSingleton<AudioControlManager>::GetInstance().get());
-    callStateListenerPtr_->AddOneObserver(DelayedSingleton<CallAbilityHandlerService>::GetInstance().get());
-    callStateListenerPtr_->AddOneObserver(DelayedSingleton<CallRecordsManager>::GetInstance().get());
+    CallStateObserve();
     return true;
 }
 
 int32_t CallControlManager::DialCall(std::u16string &number, AppExecFwk::PacMap &extras)
 {
-    int32_t errorCode = TELEPHONY_ERROR;
+    int32_t errorCode = TELEPHONY_ERR_FAIL;
     sptr<CallBase> callObjectPtr = nullptr;
     std::string accountNumber(Str16ToStr8(number));
     int32_t ret = NumberLegalityCheck(accountNumber);
@@ -115,6 +108,8 @@ int32_t CallControlManager::DialCall(std::u16string &number, AppExecFwk::PacMap 
         dialSrcInfo_.callType = (CallType)extras.GetIntValue("callType");
         dialSrcInfo_.accountId = extras.GetIntValue("accountId");
         dialSrcInfo_.dialType = (DialType)extras.GetIntValue("dialType");
+        dialSrcInfo_.videoState = (VideoStateType)extras.GetIntValue("videoState");
+        dialSrcInfo_.bundleName = extras.GetStringValue("bundleName");
         extras_.Clear();
         extras_ = extras;
     }
@@ -199,7 +194,7 @@ int32_t CallControlManager::GetCallState()
             callState = CallStateToApp::CALL_STATE_RINGING;
         }
     }
-    return (int32_t)callState;
+    return static_cast<int32_t>(callState);
 }
 
 int32_t CallControlManager::HoldCall(int32_t callId)
@@ -240,6 +235,7 @@ int32_t CallControlManager::UnHoldCall(const int32_t callId)
     return TELEPHONY_SUCCESS;
 }
 
+// swap two calls state, turn active call into holding, and turn holding call into active
 int32_t CallControlManager::SwitchCall(int32_t callId)
 {
     int32_t ret = SwitchCallPolicy(callId);
@@ -294,9 +290,7 @@ bool CallControlManager::NotifyNewCallCreated(sptr<CallBase> &callObjectPtr)
 bool CallControlManager::NotifyCallDestroyed(int32_t cause)
 {
     if (callStateListenerPtr_ != nullptr) {
-        CallEventInfo info;
-        info.eventId = EVENT_DISCONNECTED_UNKNOW;
-        callStateListenerPtr_->CallEventUpdated(info);
+        callStateListenerPtr_->CallDestroyed(cause);
         return true;
     }
     return false;
@@ -357,11 +351,9 @@ int32_t CallControlManager::StartDtmf(int32_t callId, char str)
 {
     sptr<CallBase> call = GetOneCallObject(callId);
     if (call == nullptr) {
-        TELEPHONY_LOGE("call is null!");
-        return CALL_ERR_CALL_OBJECT_IS_NULL;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     if (!call->IsAliveState()) {
-        TELEPHONY_LOGE("call not activated!");
         return CALL_ERR_CALL_STATE_MISMATCH_OPERATION;
     }
 
@@ -372,70 +364,13 @@ int32_t CallControlManager::StartDtmf(int32_t callId, char str)
     return ret;
 }
 
-int32_t CallControlManager::SendDtmf(int32_t callId, char str)
-{
-    sptr<CallBase> call = GetOneCallObject(callId);
-    if (call == nullptr) {
-        TELEPHONY_LOGE("call is null!");
-        return CALL_ERR_CALL_OBJECT_IS_NULL;
-    }
-    if (!call->IsAliveState()) {
-        TELEPHONY_LOGE("call not activated!");
-        return CALL_ERR_CALL_STATE_MISMATCH_OPERATION;
-    }
-    std::string phoneNum = call->GetAccountNumber();
-    int32_t ret = call->SendDtmf(phoneNum, str);
-    if (ret != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("SendDtmf failed, return:%{public}d", ret);
-    }
-    return ret;
-}
-
-int32_t CallControlManager::SendBurstDtmf(int32_t callId, std::u16string str, int32_t on, int32_t off)
-{
-    std::string strCode = Str16ToStr8(str);
-    sptr<CallBase> call = GetOneCallObject(callId);
-    if (call == nullptr) {
-        TELEPHONY_LOGE("call is null!");
-        return CALL_ERR_CALL_OBJECT_IS_NULL;
-    }
-    if (!((on == DtmfPlaytime::DTMF_PLAY_TONE_MSEC_0) || (on == DtmfPlaytime::DTMF_PLAY_TONE_MSEC_1) ||
-        (on == DtmfPlaytime::DTMF_PLAY_TONE_MSEC_2) || (on == DtmfPlaytime::DTMF_PLAY_TONE_MSEC_3) ||
-        (on == DtmfPlaytime::DTMF_PLAY_TONE_MSEC_4) || (on == DtmfPlaytime::DTMF_PLAY_TONE_MSEC_5) ||
-        (on == DtmfPlaytime::DTMF_PLAY_TONE_MSEC_6) || (on == DtmfPlaytime::DTMF_PLAY_TONE_MSEC_7))) {
-        return CALL_ERR_DTMF_PARAMETER_INVALID;
-    }
-    if ((off < DtmfPlayIntervalTime::DTMF_PLAY_TONE_MIN_INTERVAL_MSEC) ||
-        (off > DtmfPlayIntervalTime::DTMF_PLAY_TONE_MAX_INTERVAL_MSEC)) {
-        off = DtmfPlayIntervalTime::DTMF_PLAY_TONE_DEFAULT_INTERVAL_MSEC;
-    }
-    if (on == DtmfPlaytime::DTMF_PLAY_TONE_MSEC_1) {
-        on = DtmfPlaytime::DTMF_PLAY_TONE_DEFAULT_MSEC;
-    }
-    if (strCode.empty()) {
-        return CALL_ERR_SEND_DTMF_INPUT_IS_EMPTY;
-    }
-    if (!call->IsAliveState()) {
-        TELEPHONY_LOGE("call not activated!");
-        return CALL_ERR_CALL_STATE_MISMATCH_OPERATION;
-    }
-    std::string phoneNum = call->GetAccountNumber();
-    int32_t ret = call->SendBurstDtmf(phoneNum, strCode, on, off);
-    if (ret != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("SendBurstDtmf failed, return:%{public}d", ret);
-    }
-    return ret;
-}
-
 int32_t CallControlManager::StopDtmf(int32_t callId)
 {
     sptr<CallBase> call = GetOneCallObject(callId);
     if (call == nullptr) {
-        TELEPHONY_LOGE("call is null!");
-        return CALL_ERR_CALL_OBJECT_IS_NULL;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     if (!call->IsAliveState()) {
-        TELEPHONY_LOGE("call not activated!");
         return CALL_ERR_CALL_STATE_MISMATCH_OPERATION;
     }
 
@@ -445,8 +380,14 @@ int32_t CallControlManager::StopDtmf(int32_t callId)
     }
     return ret;
 }
+
 int32_t CallControlManager::GetCallWaiting(int32_t slotId)
 {
+    int32_t ret = CallPolicy::GetCallWaitingPolicy(slotId);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("EnableVoLte failed!");
+        return ret;
+    }
     if (callSettingManagerPtr_ != nullptr) {
         return callSettingManagerPtr_->GetCallWaiting(slotId);
     } else {
@@ -457,6 +398,11 @@ int32_t CallControlManager::GetCallWaiting(int32_t slotId)
 
 int32_t CallControlManager::SetCallWaiting(int32_t slotId, bool activate)
 {
+    int32_t ret = CallPolicy::SetCallWaitingPolicy(slotId);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("EnableVoLte failed!");
+        return ret;
+    }
     if (callSettingManagerPtr_ != nullptr) {
         return callSettingManagerPtr_->SetCallWaiting(slotId, activate);
     } else {
@@ -467,6 +413,11 @@ int32_t CallControlManager::SetCallWaiting(int32_t slotId, bool activate)
 
 int32_t CallControlManager::GetCallRestriction(int32_t slotId, CallRestrictionType type)
 {
+    int32_t ret = CallPolicy::GetCallRestrictionPolicy(slotId);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("EnableVoLte failed!");
+        return ret;
+    }
     if (callSettingManagerPtr_ != nullptr) {
         return callSettingManagerPtr_->GetCallRestriction(slotId, type);
     } else {
@@ -477,6 +428,11 @@ int32_t CallControlManager::GetCallRestriction(int32_t slotId, CallRestrictionTy
 
 int32_t CallControlManager::SetCallRestriction(int32_t slotId, CallRestrictionInfo &info)
 {
+    int32_t ret = CallPolicy::SetCallRestrictionPolicy(slotId);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("EnableVoLte failed!");
+        return ret;
+    }
     if (callSettingManagerPtr_ != nullptr) {
         return callSettingManagerPtr_->SetCallRestriction(slotId, info);
     } else {
@@ -487,6 +443,11 @@ int32_t CallControlManager::SetCallRestriction(int32_t slotId, CallRestrictionIn
 
 int32_t CallControlManager::GetCallTransferInfo(int32_t slotId, CallTransferType type)
 {
+    int32_t ret = CallPolicy::GetCallTransferInfoPolicy(slotId);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("EnableVoLte failed!");
+        return ret;
+    }
     if (callSettingManagerPtr_ != nullptr) {
         return callSettingManagerPtr_->GetCallTransferInfo(slotId, type);
     } else {
@@ -497,6 +458,11 @@ int32_t CallControlManager::GetCallTransferInfo(int32_t slotId, CallTransferType
 
 int32_t CallControlManager::SetCallTransferInfo(int32_t slotId, CallTransferInfo &info)
 {
+    int32_t ret = CallPolicy::SetCallTransferInfoPolicy(slotId);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("EnableVoLte failed!");
+        return ret;
+    }
     if (callSettingManagerPtr_ != nullptr) {
         return callSettingManagerPtr_->SetCallTransferInfo(slotId, info);
     } else {
@@ -507,6 +473,11 @@ int32_t CallControlManager::SetCallTransferInfo(int32_t slotId, CallTransferInfo
 
 int32_t CallControlManager::SetCallPreferenceMode(int32_t slotId, int32_t mode)
 {
+    int32_t ret = CallPolicy::SetCallPreferenceModePolicy(slotId);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("EnableVoLte failed!");
+        return ret;
+    }
     if (callSettingManagerPtr_ != nullptr) {
         return callSettingManagerPtr_->SetCallPreferenceMode(slotId, mode);
     } else {
@@ -515,12 +486,19 @@ int32_t CallControlManager::SetCallPreferenceMode(int32_t slotId, int32_t mode)
     }
 }
 
+/**
+ * start a telephone conference by merging three-way calls,steps as follows:
+ * 1.A call B: A<---->B,set holding
+ * 2.A call C: A<---->C, active
+ * 3.A initial merge request by CombineConference
+ * @param mainCallId:active call id
+ */
 int32_t CallControlManager::CombineConference(int32_t mainCallId)
 {
     sptr<CallBase> mainCall = GetOneCallObject(mainCallId);
     if (mainCall == nullptr) {
         TELEPHONY_LOGE("GetOneCallObject failed, mainCallId:%{public}d", mainCallId);
-        return CALL_ERR_CALL_OBJECT_IS_NULL;
+        return CALL_ERR_INVALID_CALLID;
     }
     if (mainCall->GetTelCallState() != TelCallState::CALL_STATUS_ACTIVE) {
         TELEPHONY_LOGE("mainCall state should be active ");
@@ -549,7 +527,10 @@ int32_t CallControlManager::CombineConference(int32_t mainCallId)
 int32_t CallControlManager::SeparateConference(int32_t callId)
 {
     sptr<CallBase> call = GetOneCallObject(callId);
-    RETURN_FAILURE_IF_NULLPTR(call, "call is NULL!", CALL_ERR_CALL_OBJECT_IS_NULL);
+    if (call == nullptr) {
+        TELEPHONY_LOGE("GetOneCallObject failed, callId:%{public}d", callId);
+        return CALL_ERR_INVALID_CALLID;
+    }
     int32_t ret = call->CanSeparateConference();
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("CanSeparateConference failed");
@@ -570,7 +551,10 @@ int32_t CallControlManager::SeparateConference(int32_t callId)
 int32_t CallControlManager::GetMainCallId(int32_t callId)
 {
     sptr<CallBase> call = GetOneCallObject(callId);
-    RETURN_FAILURE_IF_NULLPTR(call, "call is NULL!", TELEPHONY_ERROR);
+    if (call == nullptr) {
+        TELEPHONY_LOGE("GetOneCallObject failed! callId:%{public}d", callId);
+        return CALL_ERR_INVALID_CALLID;
+    }
     return call->GetMainCallId();
 }
 
@@ -578,9 +562,7 @@ std::vector<std::u16string> CallControlManager::GetSubCallIdList(int32_t callId)
 {
     sptr<CallBase> call = GetOneCallObject(callId);
     if (call == nullptr) {
-        std::vector<std::u16string> vec;
-        vec.clear();
-        return vec;
+        return std::vector<std::u16string>();
     }
     return call->GetSubCallIdList();
 }
@@ -589,46 +571,222 @@ std::vector<std::u16string> CallControlManager::GetCallIdListForConference(int32
 {
     sptr<CallBase> call = GetOneCallObject(callId);
     if (call == nullptr) {
-        std::vector<std::u16string> vec;
-        vec.clear();
-        return vec;
+        return std::vector<std::u16string>();
     }
     return call->GetCallIdListForConference();
 }
 
-int32_t CallControlManager::UpgradeCall(int32_t callId)
+int32_t CallControlManager::GetImsConfig(int32_t slotId, ImsConfigItem item)
 {
-    int32_t ret = CallPolicy::UpgradeCallPolicy(callId);
+    int32_t ret = CallPolicy::GetImsConfigPolicy(slotId);
     if (ret != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("upgrade call failed !");
+        TELEPHONY_LOGE("EnableVoLte failed!");
+        return ret;
+    }
+    if (callSettingManagerPtr_ != nullptr) {
+        return callSettingManagerPtr_->GetImsConfig(slotId, item);
+    } else {
+        TELEPHONY_LOGE("callSettingManagerPtr_ is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+}
+
+int32_t CallControlManager::SetImsConfig(int32_t slotId, ImsConfigItem item, std::u16string &value)
+{
+    int32_t ret = CallPolicy::SetImsConfigPolicy(slotId);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("EnableVoLte failed!");
+        return ret;
+    }
+    if (callSettingManagerPtr_ != nullptr) {
+        return callSettingManagerPtr_->SetImsConfig(slotId, item, value);
+    } else {
+        TELEPHONY_LOGE("callSettingManagerPtr_ is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+}
+
+int32_t CallControlManager::GetImsFeatureValue(int32_t slotId, FeatureType type)
+{
+    int32_t ret = CallPolicy::GetImsFeatureValuePolicy(slotId);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("EnableVoLte failed!");
+        return ret;
+    }
+    if (callSettingManagerPtr_ != nullptr) {
+        return callSettingManagerPtr_->GetImsFeatureValue(slotId, type);
+    } else {
+        TELEPHONY_LOGE("callSettingManagerPtr_ is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+}
+
+int32_t CallControlManager::SetImsFeatureValue(int32_t slotId, FeatureType type, int32_t value)
+{
+    int32_t ret = CallPolicy::SetImsFeatureValuePolicy(slotId);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("EnableVoLte failed!");
+        return ret;
+    }
+    if (callSettingManagerPtr_ != nullptr) {
+        return callSettingManagerPtr_->SetImsFeatureValue(slotId, type, value);
+    } else {
+        TELEPHONY_LOGE("callSettingManagerPtr_ is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+}
+
+int32_t CallControlManager::EnableVoLte(int32_t slotId)
+{
+    int32_t ret = CallPolicy::EnableVoLtePolicy(slotId);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("EnableVoLte failed!");
+        return ret;
+    }
+    if (callSettingManagerPtr_ != nullptr) {
+        return callSettingManagerPtr_->EnableVoLte(slotId);
+    } else {
+        TELEPHONY_LOGE("callSettingManagerPtr_ is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+}
+
+int32_t CallControlManager::DisableVoLte(int32_t slotId)
+{
+    int32_t ret = CallPolicy::DisableVoLtePolicy(slotId);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("EnableVoLte failed!");
+        return ret;
+    }
+    if (callSettingManagerPtr_ != nullptr) {
+        return callSettingManagerPtr_->DisableVoLte(slotId);
+    } else {
+        TELEPHONY_LOGE("callSettingManagerPtr_ is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+}
+
+int32_t CallControlManager::IsVoLteEnabled(int32_t slotId)
+{
+    int32_t ret = CallPolicy::IsVoLteEnabledPolicy(slotId);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("EnableVoLte failed!");
+        return ret;
+    }
+    if (callSettingManagerPtr_ != nullptr) {
+        return callSettingManagerPtr_->IsVoLteEnabled(slotId);
+    } else {
+        TELEPHONY_LOGE("callSettingManagerPtr_ is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+}
+
+int32_t CallControlManager::SetLteEnhanceMode(int32_t slotId, bool value)
+{
+    int32_t ret = CallPolicy::SetLteEnhanceModePolicy(slotId);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("EnableVoLte failed!");
+        return ret;
+    }
+    if (callSettingManagerPtr_ != nullptr) {
+        return callSettingManagerPtr_->SetLteEnhanceMode(slotId, value);
+    } else {
+        TELEPHONY_LOGE("callSettingManagerPtr_ is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+}
+
+int32_t CallControlManager::GetLteEnhanceMode(int32_t slotId)
+{
+    int32_t ret = CallPolicy::GetLteEnhanceModePolicy(slotId);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("EnableVoLte failed!");
+        return ret;
+    }
+    if (callSettingManagerPtr_ != nullptr) {
+        return callSettingManagerPtr_->GetLteEnhanceMode(slotId);
+    } else {
+        TELEPHONY_LOGE("callSettingManagerPtr_ is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+}
+
+int32_t CallControlManager::UpdateCallMediaMode(int32_t callId, CallMediaMode mode)
+{
+    int32_t ret = TELEPHONY_ERR_FAIL;
+    ret = UpdateCallMediaModePolicy(callId, mode);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("check prerequisites failed !");
         return ret;
     }
     if (callRequestHandlerServicePtr_ == nullptr) {
         TELEPHONY_LOGE("callRequestHandlerServicePtr_ is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    ret = callRequestHandlerServicePtr_->UpgradeCall(callId);
+    ret = callRequestHandlerServicePtr_->UpdateCallMediaMode(callId, mode);
     if (ret != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("upgrade call failed!");
+        TELEPHONY_LOGE("UpdateCallMediaMode failed!");
         return ret;
     }
     return TELEPHONY_SUCCESS;
 }
 
-int32_t CallControlManager::DowngradeCall(int32_t callId)
+int32_t CallControlManager::StartRtt(int32_t callId, std::u16string &msg)
 {
-    int32_t ret = CallPolicy::DowngradeCallPolicy(callId);
+    int32_t ret = CallPolicy::StartRttPolicy(callId);
     if (ret != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("downgrade call failed !");
+        TELEPHONY_LOGE("NO IMS call,can not StartRtt!");
         return ret;
     }
     if (callRequestHandlerServicePtr_ == nullptr) {
         TELEPHONY_LOGE("callRequestHandlerServicePtr_ is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    ret = callRequestHandlerServicePtr_->DowngradeCall(callId);
+    ret = callRequestHandlerServicePtr_->StartRtt(callId, msg);
     if (ret != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("downgrade call failed!");
+        TELEPHONY_LOGE("StartRtt failed!");
+        return ret;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallControlManager::StopRtt(int32_t callId)
+{
+    int32_t ret = CallPolicy::StopRttPolicy(callId);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("NO IMS call,no need StopRtt!");
+        return ret;
+    }
+    if (callRequestHandlerServicePtr_ == nullptr) {
+        TELEPHONY_LOGE("callRequestHandlerServicePtr_ is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    ret = callRequestHandlerServicePtr_->StopRtt(callId);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("StopRtt failed!");
+        return ret;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallControlManager::JoinConference(int32_t callId, std::vector<std::u16string> &numberList)
+{
+    if (callRequestHandlerServicePtr_ == nullptr) {
+        TELEPHONY_LOGE("callRequestHandlerServicePtr_ is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    std::vector<std::string> phoneNumberList(numberList.size());
+    for (size_t index = 0; index < numberList.size(); ++index) {
+        phoneNumberList[index] = Str16ToStr8(numberList[index]);
+    }
+    int32_t ret = CallPolicy::InviteToConferencePolicy(callId, phoneNumberList);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("check InviteToConference Policy failed!");
+        return ret;
+    }
+    ret = callRequestHandlerServicePtr_->JoinConference(callId, phoneNumberList);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("JoinConference failed!");
         return ret;
     }
     return TELEPHONY_SUCCESS;
@@ -646,11 +804,7 @@ int32_t CallControlManager::MuteRinger()
 
 int32_t CallControlManager::SetAudioDevice(AudioDevice deviceType)
 {
-    if (DelayedSingleton<AudioControlManager>::GetInstance()->SetAudioDevice(deviceType)) {
-        return TELEPHONY_SUCCESS;
-    } else {
-        return TELEPHONY_ERR_FAIL;
-    }
+    return DelayedSingleton<AudioControlManager>::GetInstance()->SetAudioDevice(deviceType);
 }
 
 int32_t CallControlManager::ControlCamera(
@@ -724,6 +878,36 @@ void CallControlManager::GetDialParaInfo(DialParaInfo &info, AppExecFwk::PacMap 
     extras = extras_;
 }
 
+void CallControlManager::CallStateObserve()
+{
+    if (callStateListenerPtr_ == nullptr) {
+        TELEPHONY_LOGE("callStateListenerPtr_ is null");
+        return;
+    }
+    std::unique_ptr<RejectCallSms> hangUpSmsPtr = std::make_unique<RejectCallSms>();
+    if (hangUpSmsPtr == nullptr) {
+        TELEPHONY_LOGE("hangUpSmsPtr is null");
+        return;
+    }
+    std::unique_ptr<CallStateBroadcast> callStateBroadcastPtr = std::make_unique<CallStateBroadcast>();
+    if (callStateBroadcastPtr == nullptr) {
+        TELEPHONY_LOGE("callStateBroadcastPtr is null");
+        return;
+    }
+    std::unique_ptr<CallStateReportProxy> callStateReportPtr = std::make_unique<CallStateReportProxy>();
+    if (callStateReportPtr == nullptr) {
+        TELEPHONY_LOGE("CallStateReportProxy is nullptr!");
+        return;
+    }
+    callStateListenerPtr_->AddOneObserver(DelayedSingleton<CallAbilityReportProxy>::GetInstance().get());
+    callStateListenerPtr_->AddOneObserver(callStateReportPtr.release());
+    callStateListenerPtr_->AddOneObserver(DelayedSingleton<AudioControlManager>::GetInstance().get());
+    callStateListenerPtr_->AddOneObserver(hangUpSmsPtr.release());
+    callStateListenerPtr_->AddOneObserver(callStateBroadcastPtr.release());
+    callStateListenerPtr_->AddOneObserver(missedCallNotification_.release());
+    callStateListenerPtr_->AddOneObserver(DelayedSingleton<CallRecordsManager>::GetInstance().get());
+}
+
 int32_t CallControlManager::NumberLegalityCheck(std::string &number)
 {
     if (number.empty()) {
@@ -740,13 +924,13 @@ int32_t CallControlManager::NumberLegalityCheck(std::string &number)
 
 int32_t CallControlManager::BroadcastSubscriber()
 {
-    MatchingSkills matchingSkills;
+    EventFwk::MatchingSkills matchingSkills;
     matchingSkills.AddEvent(SIM_STATE_UPDATE_ACTION);
-    CommonEventSubscribeInfo subscriberInfo(matchingSkills);
+    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
     std::shared_ptr<CallBroadcastSubscriber> subscriberPtr =
         std::make_shared<CallBroadcastSubscriber>(subscriberInfo);
     if (subscriberPtr != nullptr) {
-        bool subscribeResult = CommonEventManager::SubscribeCommonEvent(subscriberPtr);
+        bool subscribeResult = EventFwk::CommonEventManager::SubscribeCommonEvent(subscriberPtr);
         if (!subscribeResult) {
             TELEPHONY_LOGW("SubscribeCommonEvent failed");
             return TELEPHONY_ERR_SUBSCRIBE_BROADCAST_FAIL;
@@ -755,20 +939,12 @@ int32_t CallControlManager::BroadcastSubscriber()
     return TELEPHONY_SUCCESS;
 }
 
-int32_t CallControlManager::CancelMissedCallsNotification(int32_t id)
-{
-    if (missedCallNotification_ == nullptr) {
-        TELEPHONY_LOGE("missed call notification nullptr");
-        return TELEPHONY_ERR_FAIL;
-    }
-    return missedCallNotification_->CancelMissedCallsNotification(id);
-}
-
 #ifdef ABILITY_MEDIA_SUPPORT
 bool CallControlManager::onButtonDealing(HeadsetButtonService::ButtonEvent type)
 {
     bool isRingState = false;
     sptr<CallBase> call = nullptr;
+
     if (call = GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_RINGING) != nullptr) {
         isRingState = true;
     } else if (call = GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_DIALING) != nullptr ||
@@ -778,6 +954,7 @@ bool CallControlManager::onButtonDealing(HeadsetButtonService::ButtonEvent type)
     } else {
         return false;
     }
+
     switch (type) {
         case HeadsetButtonService::SHORT_PRESS_EVENT:
             if (isRingState) {

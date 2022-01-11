@@ -26,6 +26,7 @@ class ImsConferenceBase : public ConferenceBase {
 public:
     int32_t JoinToConference(int32_t callId) override;
     int32_t LeaveFromConference(int32_t callId) override;
+    int32_t HoldConference(int32_t callId) override;
     int32_t CanCombineConference() override;
     int32_t CanSeparateConference() override;
 
@@ -34,4 +35,5 @@ private:
 };
 } // namespace Telephony
 } // namespace OHOS
+
 #endif

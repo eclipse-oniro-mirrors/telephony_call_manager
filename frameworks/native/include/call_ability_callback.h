@@ -33,7 +33,9 @@ public:
     int32_t SetProcessCallback(std::unique_ptr<CallManagerCallback> callback);
     int32_t OnCallDetailsChange(const CallAttributeInfo &info) override;
     int32_t OnCallEventChange(const CallEventInfo &info) override;
-    int32_t OnSupplementResult(CallResultReportId reportId, AppExecFwk::PacMap &resultInfo) override;
+    int32_t OnCallDisconnectedCause(DisconnectedDetails cause) override;
+    int32_t OnReportAsyncResults(CallResultReportId reportId, AppExecFwk::PacMap &resultInfo) override;
+    int32_t OnOttCallRequest(OttCallRequestId requestId, AppExecFwk::PacMap &info) override;
 
 private:
     std::unique_ptr<CallManagerCallback> callbackPtr_;

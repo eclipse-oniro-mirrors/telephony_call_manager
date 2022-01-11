@@ -53,7 +53,7 @@ void StatusBar::UpdateSpeakerphoneIcon(bool isDisplay)
     isDisplayIcon_ = isDisplay;
 }
 
-void StatusBar::CallDestroyed(sptr<CallBase> &callObjectPtr)
+void StatusBar::CallDestroyed(int32_t cause)
 {
     UpdateMuteIcon(false);
     UpdateSpeakerphoneIcon(false);

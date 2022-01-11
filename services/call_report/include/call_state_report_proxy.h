@@ -18,39 +18,19 @@
 
 #include "if_system_ability_manager.h"
 #include "rwlock.h"
-#include "singleton.h"
 
-#include "i_telephony_state_notify.h"
-
-#include "timer.h"
+#include "call_state_listener_base.h"
 
 namespace OHOS {
 namespace Telephony {
-class CallStateReportProxy : public Timer, public std::enable_shared_from_this<CallStateReportProxy> {
-    DECLARE_DELAYED_SINGLETON(CallStateReportProxy)
+class CallStateReportProxy : public CallStateListenerBase {
 public:
-    int32_t Init(int32_t systemAbilityId);
-    void UnInit();
-    static void task();
-    int32_t ReportCallState(int32_t callState, std::u16string phoneNumber);
+    CallStateReportProxy();
+    ~CallStateReportProxy();
+    void CallStateUpdated(sptr<CallBase> &callObjectPtr, TelCallState priorState, TelCallState nextState);
+    int32_t ReportCallState(int32_t slotId, int32_t callState, std::u16string phoneNumber);
     int32_t ReportCallStateForCallId(
-        int32_t subId, int32_t callId, int32_t callState, std::u16string incomingNumber);
-
-private:
-    int32_t ConnectService();
-    void DisconnectService();
-    void ReConnectService();
-    void OnDeath();
-    void Clean();
-    void NotifyDeath();
-
-private:
-    int32_t systemAbilityId_;
-    sptr<ITelephonyStateNotify> telephonyStateNotifyPtr_;
-    sptr<IRemoteObject::DeathRecipient> stateRegistryRecipient_;
-    bool connectState_;
-    Utils::RWLock rwClientLock_;
-    std::mutex mutex_;
+        int32_t slotId, int32_t callId, int32_t callState, std::u16string incomingNumber);
 };
 } // namespace Telephony
 } // namespace OHOS

@@ -17,6 +17,7 @@
 
 #include "telephony_log_wrapper.h"
 
+#include "call_state_processor.h"
 #include "audio_control_manager.h"
 
 namespace OHOS {
@@ -27,16 +28,12 @@ bool IMSCallState::ProcessEvent(int32_t event)
     std::lock_guard<std::mutex> lock(mutex_);
     switch (event) {
         case AudioEvent::NO_MORE_ACTIVE_CALL:
-            result = DelayedSingleton<AudioControlManager>::GetInstance()->UpdateCurrentCallState();
+            result = DelayedSingleton<CallStateProcessor>::GetInstance()->UpdateCurrentCallState();
             break;
         case AudioEvent::NEW_INCOMING_CALL:
             result = DelayedSingleton<AudioControlManager>::GetInstance()->PlayWaitingTone();
             break;
         case AudioEvent::CALL_TYPE_CHANGED:
-            if (!DelayedSingleton<AudioControlManager>::GetInstance()->IsCurrentVideoCall()) {
-                result = DelayedSingleton<CallStateProcessor>::GetInstance()->ProcessEvent(
-                    AudioEvent::SWITCH_CS_CALL_STATE);
-            }
             break;
         default:
             break;

@@ -28,12 +28,15 @@
 #include "call_setting_manager.h"
 #include "call_policy.h"
 #include "call_state_listener.h"
-#include "report_call_state_handler.h"
 #include "call_request_handler.h"
-#include "hang_up_sms.h"
-#include "call_state_broadcast.h"
 #include "missed_call_notification.h"
 
+/**
+ * Singleton
+ * @ClassName:CallControlManager
+ * @Description:CallControlManager is designed for performing dial/answer/reject etc ops
+ * on kinds of calls(ims,cs,ott). usually as a entrance for downflowed [app->ril] telephony business
+ */
 namespace OHOS {
 namespace Telephony {
 class CallControlManager : public CallPolicy {
@@ -59,8 +62,6 @@ public:
     bool NotifyIncomingCallRejected(sptr<CallBase> &callObjectPtr, bool isSendSms, std::string content);
     bool NotifyCallEventUpdated(CallEventInfo &info);
     int32_t StartDtmf(int32_t callId, char str);
-    int32_t SendDtmf(int32_t callId, char str);
-    int32_t SendBurstDtmf(int32_t callId, std::u16string str, int32_t on, int32_t off);
     int32_t StopDtmf(int32_t callId);
     int32_t GetCallWaiting(int32_t slotId);
     int32_t SetCallWaiting(int32_t slotId, bool activate);
@@ -69,14 +70,26 @@ public:
     int32_t GetCallTransferInfo(int32_t slotId, CallTransferType type);
     int32_t SetCallTransferInfo(int32_t slotId, CallTransferInfo &info);
     int32_t SetCallPreferenceMode(int32_t slotId, int32_t mode);
+    // merge calls
     int32_t CombineConference(int32_t mainCallId);
     int32_t SeparateConference(int32_t callId);
     int32_t GetMainCallId(int32_t callId);
     std::vector<std::u16string> GetSubCallIdList(int32_t callId);
     std::vector<std::u16string> GetCallIdListForConference(int32_t callId);
-    int32_t CancelMissedCallsNotification(int32_t id);
-    int32_t UpgradeCall(int32_t callId);
-    int32_t DowngradeCall(int32_t callId);
+    int32_t GetImsConfig(int32_t slotId, ImsConfigItem item);
+    int32_t SetImsConfig(int32_t slotId, ImsConfigItem item, std::u16string &value);
+    int32_t GetImsFeatureValue(int32_t slotId, FeatureType type);
+    int32_t SetImsFeatureValue(int32_t slotId, FeatureType type, int32_t value);
+    int32_t EnableVoLte(int32_t slotId);
+    int32_t DisableVoLte(int32_t slotId);
+    int32_t IsVoLteEnabled(int32_t slotId);
+    int32_t SetLteEnhanceMode(int32_t slotId, bool value);
+    int32_t GetLteEnhanceMode(int32_t slotId);
+    int32_t UpdateCallMediaMode(int32_t callId, CallMediaMode mode);
+    int32_t StartRtt(int32_t callId, std::u16string &msg);
+    int32_t StopRtt(int32_t callId);
+    // invite calls to participate conference
+    int32_t JoinConference(int32_t callId, std::vector<std::u16string> &numberList);
     int32_t SetMuted(bool isMute);
     int32_t MuteRinger();
     int32_t SetAudioDevice(AudioDevice deviceType);
@@ -95,16 +108,15 @@ public:
     void GetDialParaInfo(DialParaInfo &info, AppExecFwk::PacMap &extras);
 
 private:
+    void CallStateObserve();
     int32_t NumberLegalityCheck(std::string &number);
     int32_t BroadcastSubscriber();
 
 private:
     std::unique_ptr<CallStateListener> callStateListenerPtr_;
     std::unique_ptr<CallRequestHandlerService> callRequestHandlerServicePtr_;
-    sptr<ReportCallStateHandlerService> reportCallStateHandlerPtr_;
-    sptr<HangUpSms> hangUpSms_;
-    sptr<CallStateBroadcast> callStateBroadcast_;
-    sptr<MissedCallNotification> missedCallNotification_;
+    // notify when incoming calls are ignored, not rejected or answered
+    std::unique_ptr<MissedCallNotification> missedCallNotification_;
     std::unique_ptr<CallSettingManager> callSettingManagerPtr_;
     DialParaInfo dialSrcInfo_;
     AppExecFwk::PacMap extras_;

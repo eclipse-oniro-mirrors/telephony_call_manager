@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef AUDIO_DEVICE_MANAGER_H
-#define AUDIO_DEVICE_MANAGER_H
+#ifndef TELEPHONY_AUDIO_DEVICE_MANAGER_H
+#define TELEPHONY_AUDIO_DEVICE_MANAGER_H
 
 #include "audio_base.h"
 
@@ -38,12 +38,11 @@ public:
     bool ProcessEvent(AudioEvent event);
     static bool IsEarpieceAvailable();
     static bool IsSpeakerAvailable();
-    static bool IsBtScoAvailable();
-    static bool IsWiredHeadsetAvailable();
+    static bool IsBtScoConnected();
+    static bool IsWiredHeadsetConnected();
     static void SetSpeakerAvailable(bool available);
     static void SetWiredHeadsetAvailable(bool available);
     static void SetBtScoAvailable(bool available);
-    static bool IsBtScoDevEnable();
     bool SwitchDevice(AudioDevice device);
 
 private:
@@ -56,8 +55,8 @@ private:
     std::unique_ptr<AudioBase> currentAudioDevice_;
     static bool isEarpieceAvailable_;
     static bool isSpeakerAvailable_;
-    static bool isWiredHeadsetAvailable_;
-    static bool isBtScoAvailable_;
+    static bool isWiredHeadsetConnected_;
+    static bool isBtScoConnected_;
     bool isAudioActivated_;
     using AudioDeviceManagerFunc = bool (AudioDeviceManager::*)();
     std::map<uint32_t, AudioDeviceManagerFunc> memberFuncMap_;
@@ -67,17 +66,17 @@ private:
     bool EnableSpeaker();
     bool EnableEarpiece();
     bool DisableAll();
-    bool IsWiredHeadsetDevEnable();
+    bool IsBtScoDevEnable();
     bool IsSpeakerDevEnable();
     bool IsEarpieceDevEnable();
+    bool IsWiredHeadsetDevEnable();
     void SetBtScoDevEnable();
-    void SetWiredHeadsetDevEnable();
     void SetSpeakerDevEnable();
     void SetEarpieceDevEnable();
+    void SetWiredHeadsetDevEnable();
     AudioDevice GetCurrentAudioDevice();
     void SetCurrentAudioDevice(AudioDevice device);
-    bool EnableDefaultAudioDevice();
 };
 } // namespace Telephony
 } // namespace OHOS
-#endif // AUDIO_DEVICE_MANAGER_H
+#endif // TELEPHONY_AUDIO_DEVICE_MANAGER_H

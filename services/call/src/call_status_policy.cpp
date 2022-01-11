@@ -28,9 +28,9 @@ CallStatusPolicy::CallStatusPolicy() {}
 
 CallStatusPolicy::~CallStatusPolicy() {}
 
-int32_t CallStatusPolicy::IncomingHandlePolicy(const CallReportInfo &info)
+int32_t CallStatusPolicy::IncomingHandlePolicy(const CallDetailInfo &info)
 {
-    std::string numberStr(info.accountNum);
+    std::string numberStr(info.phoneNum);
     if (numberStr.empty()) {
         TELEPHONY_LOGE("phone number is NULL!");
         return CALL_ERR_PHONE_NUMBER_EMPTY;
@@ -43,9 +43,9 @@ int32_t CallStatusPolicy::IncomingHandlePolicy(const CallReportInfo &info)
     return TELEPHONY_SUCCESS;
 }
 
-int32_t CallStatusPolicy::DialingHandlePolicy(const CallReportInfo &info)
+int32_t CallStatusPolicy::DialingHandlePolicy(const CallDetailInfo &info)
 {
-    std::string number(info.accountNum);
+    std::string number(info.phoneNum);
     if (IsCallExist(number)) {
         TELEPHONY_LOGW("this call has created yet!");
         return CALL_ERR_CALL_ALREADY_EXISTS;
@@ -57,6 +57,7 @@ int32_t CallStatusPolicy::FilterResultsDispose(sptr<CallBase> call)
 {
     int32_t ret = TELEPHONY_ERR_FAIL;
     if (call == nullptr) {
+        TELEPHONY_LOGE("Call is NULL");
         return CALL_ERR_CALL_OBJECT_IS_NULL;
     }
     if (HasRingingMaximum() || HasDialingMaximum()) {

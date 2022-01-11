@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef AUDIO_PROXY_H
-#define AUDIO_PROXY_H
+#ifndef TELEPHONY_AUDIO_PROXY_H
+#define TELEPHONY_AUDIO_PROXY_H
 
 #include <cstdint>
 #include <memory>
@@ -22,13 +22,16 @@
 
 #include "audio_manager_proxy.h"
 #include "singleton.h"
+#include "audio_sound_manager.h"
 
 #include "call_manager_errors.h"
 
 namespace OHOS {
 namespace Telephony {
-using namespace AudioStandard;
-constexpr uint32_t VOLUME_AUDIBLE_DIVISOR = 2;
+constexpr int16_t DEFAULT_SESSION_ID = -1;
+constexpr uint16_t VOICE_CALL_SESSION_ID = 2000;
+constexpr uint16_t RINGTONE_SESSION_ID = 2001;
+constexpr uint16_t VOLUME_AUDIBLE_DIVISOR = 2;
 
 enum AudioInterruptState {
     INTERRUPT_STATE_UNKNOWN = 0,
@@ -37,20 +40,25 @@ enum AudioInterruptState {
     INTERRUPT_STATE_RINGING,
 };
 
+class VoiceCallCallback : public AudioStandard::AudioManagerCallback {
+    void OnInterrupt(const AudioStandard::InterruptAction &interruptAction) override;
+};
+
+class RingtoneCallback : public AudioStandard::AudioManagerCallback {
+    void OnInterrupt(const AudioStandard::InterruptAction &interruptAction) override;
+};
+
+class AudioDeviceChangeCallback : public AudioStandard::AudioManagerDeviceChangeCallback {
+    void OnDeviceChange(const AudioStandard::DeviceChangeAction &deviceChangeAction) override;
+};
+
 class AudioProxy : public std::enable_shared_from_this<AudioProxy> {
     DECLARE_DELAYED_SINGLETON(AudioProxy)
 public:
-    void Init();
-    int32_t ActivateAudioInterrupt();
+    bool SetAudioScene(AudioStandard::AudioScene audioScene);
+    int32_t ActivateAudioInterrupt(const AudioStandard::AudioInterrupt &audioInterrupt);
+    int32_t DeactivateAudioInterrupt(const AudioStandard::AudioInterrupt &audioInterrupt);
     int32_t DeactivateAudioInterrupt();
-    /**
-     * Set audio mode
-     * @param state : IN_CALL , IN_VOIP , RINGTONE , IN_IDLE
-     */
-    bool SetAudioMode(int32_t audioMode);
-    std::string GetDefaultRingPath() const;
-    std::string GetDefaultTonePath() const;
-    std::string GetDefaultDtmfPath() const;
     void SetVolumeAudible();
     bool IsMicrophoneMute();
     bool SetMicrophoneMute(bool mute);
@@ -58,26 +66,45 @@ public:
     bool SetSpeakerDevActive();
     bool SetBluetoothDevActive();
     bool SetWiredHeadsetDevActive();
-    AudioRingerMode GetRingerMode() const;
-    int32_t GetVolume(AudioSystemManager::AudioVolumeType audioVolumeType);
-    int32_t SetVolume(AudioSystemManager::AudioVolumeType audioVolumeType, int32_t volume);
-    int32_t SetMaxVolume(AudioSystemManager::AudioVolumeType audioVolumeType);
-    bool IsStreamActive(AudioSystemManager::AudioVolumeType audioVolumeType);
-    bool IsStreamMute(AudioSystemManager::AudioVolumeType audioVolumeType);
-    int32_t GetMaxVolume(AudioSystemManager::AudioVolumeType audioVolumeType);
-    int32_t GetMinVolume(AudioSystemManager::AudioVolumeType audioVolumeType);
-    void SetAudioDeviceChangeObserver();
-    void SetOnCreateCompleteListener();
+    AudioStandard::AudioRingerMode GetRingerMode() const;
+    int32_t GetVolume(AudioStandard::AudioSystemManager::AudioVolumeType audioVolumeType);
+    int32_t SetVolume(AudioStandard::AudioSystemManager::AudioVolumeType audioVolumeType, int32_t volume);
+    int32_t SetMaxVolume(AudioStandard::AudioSystemManager::AudioVolumeType audioVolumeType);
+    bool IsStreamActive(AudioStandard::AudioSystemManager::AudioVolumeType audioVolumeType);
+    bool IsStreamMute(AudioStandard::AudioSystemManager::AudioVolumeType audioVolumeType);
+    int32_t GetMaxVolume(AudioStandard::AudioSystemManager::AudioVolumeType audioVolumeType);
+    int32_t GetMinVolume(AudioStandard::AudioSystemManager::AudioVolumeType audioVolumeType);
+    int32_t SetAudioDeviceChangeCallback();
     bool IsVibrateMode() const;
     int32_t StartVibrate();
     int32_t CancelVibrate();
+    static int32_t currentSessionId_;
+    static bool isRingtoneActivated_;
+    static bool isVoiceCallActivated_;
+    AudioStandard::AudioInterrupt ringtoneAudioInterrupt_;
+    AudioStandard::AudioInterrupt voiceCallAudioInterrupt_;
+    static std::shared_ptr<AudioStandard::AudioManagerCallback> audioManagerCallback_;
+    int32_t ActivateVoiceCallStream();
+    int32_t DeactivateVoiceCallStream();
+    int32_t ActivateRingtoneStream();
+    int32_t DeactivateRingtoneStream();
+    std::string GetSystemRingtoneUri() const;
+    std::string GetDefaultRingPath() const;
+    std::string GetDefaultTonePath() const;
+    std::string GetDefaultDtmfPath() const;
 
 private:
     bool isVoiceEnabled = false;
+    int32_t SetAudioManagerCallback(AudioStandard::AudioStreamType streamType);
+    int32_t UnsetAudioManagerCallback(AudioStandard::AudioStreamType streamType);
+    int32_t UnsetAudioManagerCallback();
     const std::string defaultRingPath_ = "/system/data/telephony/rings/ring.wav";
     const std::string defaultTonePath_ = "/system/data/telephony/tones/tone.wav";
     const std::string defaultDtmfPath_ = "/system/data/telephony/dtmfs/dtmf.wav";
+    std::shared_ptr<AppExecFwk::Context> context_;
+    std::unique_ptr<AudioStandard::AudioSoundManager> audioSoundManager_;
+    std::shared_ptr<AudioStandard::AudioManagerDeviceChangeCallback> deviceCallback_;
 };
 } // namespace Telephony
 } // namespace OHOS
-#endif // AUDIO_PROXY_H
+#endif // TELEPHONY_AUDIO_PROXY_H

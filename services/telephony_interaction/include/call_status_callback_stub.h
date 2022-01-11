@@ -29,7 +29,8 @@ class CallStatusCallbackStub : public IRemoteStub<ICallStatusCallback> {
 public:
     CallStatusCallbackStub();
     virtual ~CallStatusCallbackStub();
-    int OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
+    int32_t OnRemoteRequest(
+        uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
 
 private:
     using CallStatusCallbackFunc = int32_t (CallStatusCallbackStub::*)(MessageParcel &data, MessageParcel &reply);
@@ -38,6 +39,7 @@ private:
     int32_t OnUpdateCallsReportInfo(MessageParcel &data, MessageParcel &reply);
     int32_t OnUpdateDisconnectedCause(MessageParcel &data, MessageParcel &reply);
     int32_t OnUpdateEventReport(MessageParcel &data, MessageParcel &reply);
+    int32_t OnUpdateRBTPlayInfo(MessageParcel &data, MessageParcel &reply);
     int32_t OnUpdateGetWaitingResult(MessageParcel &data, MessageParcel &reply);
     int32_t OnUpdateSetWaitingResult(MessageParcel &data, MessageParcel &reply);
     int32_t OnUpdateGetRestrictionResult(MessageParcel &data, MessageParcel &reply);
@@ -47,6 +49,22 @@ private:
     int32_t OnUpdateGetCallClipResult(MessageParcel &data, MessageParcel &reply);
     int32_t OnUpdateGetCallClirResult(MessageParcel &data, MessageParcel &reply);
     int32_t OnUpdateSetCallClirResult(MessageParcel &data, MessageParcel &reply);
+    int32_t OnGetVoLteStatusResult(MessageParcel &data, MessageParcel &reply);
+    int32_t OnSetVoLteStatusResult(MessageParcel &data, MessageParcel &reply);
+    int32_t OnStartRttResult(MessageParcel &data, MessageParcel &reply);
+    int32_t OnStopRttResult(MessageParcel &data, MessageParcel &reply);
+    int32_t OnGetImsConfigResult(MessageParcel &data, MessageParcel &reply);
+    int32_t OnSetImsConfigResult(MessageParcel &data, MessageParcel &reply);
+    int32_t OnGetImsFeatureValueResult(MessageParcel &data, MessageParcel &reply);
+    int32_t OnSetImsFeatureValueResult(MessageParcel &data, MessageParcel &reply);
+    int32_t OnGetLteEnhanceModeResult(MessageParcel &data, MessageParcel &reply);
+    int32_t OnSetLteEnhanceModeResult(MessageParcel &data, MessageParcel &reply);
+    int32_t OnReceiveUpdateMediaModeResponse(MessageParcel &data, MessageParcel &reply);
+    int32_t OnInviteToConferenceResult(MessageParcel &data, MessageParcel &reply);
+    int32_t OnStartDtmfResult(MessageParcel &data, MessageParcel &reply);
+    int32_t OnStopDtmfResult(MessageParcel &data, MessageParcel &reply);
+    int32_t OnSendUssdResult(MessageParcel &data, MessageParcel &reply);
+    int32_t OnGetImsCallDataResult(MessageParcel &data, MessageParcel &reply);
 
     std::map<uint32_t, CallStatusCallbackFunc> memberFuncMap_;
 };

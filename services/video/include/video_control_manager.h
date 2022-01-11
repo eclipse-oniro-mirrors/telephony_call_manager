@@ -42,7 +42,7 @@ private:
         std::u16string cameraId, std::u16string callingPackage, int32_t callingUid, int32_t callingPid);
     bool CheckWindow(VideoWindow &window);
     bool ContainCameraID(std::string id);
-    bool IsPNGFile(std::string fileName);
+    bool IsPngFile(std::string fileName);
     bool isOpenCamera_;
 };
 } // namespace Telephony

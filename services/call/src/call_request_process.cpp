@@ -23,7 +23,9 @@
 #include "ott_call.h"
 #include "common_type.h"
 #include "call_control_manager.h"
-#include "cellular_call_ipc_interface_proxy.h"
+#include "call_ability_report_proxy.h"
+#include "core_service_connection.h"
+#include "cellular_call_connection.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -39,6 +41,19 @@ void CallRequestProcess::DialRequest()
         TELEPHONY_LOGE("the device is not dialing!");
         return;
     }
+    if (info.dialType == DialType::DIAL_CARRIER_TYPE) {
+        std::vector<std::u16string> fdnNumberList =
+            DelayedSingleton<CoreServiceConnection>::GetInstance()->GetFdnNumberList(info.accountId);
+        if (!fdnNumberList.empty() && !IsFdnNumber(fdnNumberList, info.number)) {
+            CallEventInfo eventInfo;
+            (void)memset_s(eventInfo.phoneNum, kMaxNumberLen, 0, kMaxNumberLen);
+            eventInfo.eventId = CallAbilityEventId::EVENT_INVALID_FDN_NUMBER;
+            (void)memcpy_s(eventInfo.phoneNum, kMaxNumberLen, info.number.c_str(), info.number.length());
+            DelayedSingleton<CallControlManager>::GetInstance()->NotifyCallEventUpdated(eventInfo);
+            TELEPHONY_LOGW("invalid fdn number!");
+            return;
+        }
+    }
     TELEPHONY_LOGI("dialType:%{public}d", info.dialType);
     switch (info.dialType) {
         case DialType::DIAL_CARRIER_TYPE:
@@ -48,6 +63,7 @@ void CallRequestProcess::DialRequest()
             VoiceMailDialProcess(info);
             break;
         case DialType::DIAL_OTT_TYPE:
+            OttDialProcess(info);
             break;
         default:
             TELEPHONY_LOGE("invalid dialType:%{public}d", info.dialType);
@@ -78,13 +94,13 @@ void CallRequestProcess::RejectRequest(int32_t callId, bool isSendSms, std::stri
         return;
     }
 
-    int32_t ret = call->RejectCall(isSendSms, content);
+    int32_t ret = call->RejectCall();
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("RejectCall failed!");
         return;
     }
-    DelayedSingleton<CallControlManager>::GetInstance()->NotifyIncomingCallRejected(call, isSendSms, content);
     TELEPHONY_LOGI("start to send reject message...");
+    DelayedSingleton<CallControlManager>::GetInstance()->NotifyIncomingCallRejected(call, isSendSms, content);
 }
 
 void CallRequestProcess::HangUpRequest(int32_t callId)
@@ -95,7 +111,7 @@ void CallRequestProcess::HangUpRequest(int32_t callId)
         return;
     }
     TelCallState state = call->GetTelCallState();
-    if ((state == CALL_STATUS_ACTIVE) &&
+    if ((state == TelCallState::CALL_STATUS_ACTIVE) &&
         (CallObjectManager::IsCallExist(call->GetCallType(), TelCallState::CALL_STATUS_HOLDING))) {
         TELEPHONY_LOGI("release the active call and recover the held call");
         call->SetPolicyFlag(PolicyFlag::POLICY_FLAG_HANG_UP_ACTIVE);
@@ -159,38 +175,95 @@ void CallRequestProcess::SeparateConferenceRequest(int32_t callId)
     }
 }
 
-void CallRequestProcess::UpgradeCallRequest(int32_t callId)
+int32_t CallRequestProcess::UpdateCallMediaMode(int32_t callId, CallMediaMode mode)
 {
+    int32_t ret = TELEPHONY_ERR_FAIL;
     sptr<CallBase> call = GetOneCallObject(callId);
     if (call == nullptr) {
         TELEPHONY_LOGE("the call object is nullptr, callId:%{public}d", callId);
-        return;
+        return ret;
     }
-#ifdef ABILITY_VIDEO_SUPPORT
-    DelayedSingleton<VideoControlManager>::GetInstance()->CallDestroyed(call);
-#endif
-    call->SetVideoStateType(VideoStateType::TYPE_VOICE);
+    // only netcall type support update call media mode
+    if (call->GetCallType() == CallType::TYPE_IMS) {
+        sptr<IMSCall> netCall = reinterpret_cast<IMSCall *>(call.GetRefPtr());
+        TELEPHONY_LOGI("ims call update media request");
+        ret = netCall->SendUpdateCallMediaModeRequest(mode);
+        if (ret != TELEPHONY_SUCCESS) {
+            TELEPHONY_LOGE("SendUpdateCallMediaModeRequest failed");
+        }
+    } else {
+        TELEPHONY_LOGE("the call object not support upgrade/downgrad media, callId:%{public}d", callId);
+    }
+    return ret;
 }
 
-void CallRequestProcess::DowngradeCallRequest(int32_t callId)
+void CallRequestProcess::UpdateCallMediaModeRequest(int32_t callId, CallMediaMode mode)
+{
+    int32_t ret = TELEPHONY_ERR_FAIL;
+    AppExecFwk::PacMap resultInfo;
+    ret = UpdateCallMediaMode(callId, mode);
+    if (ret != TELEPHONY_SUCCESS) {
+        resultInfo.PutIntValue("result", ret);
+        DelayedSingleton<CallAbilityReportProxy>::GetInstance()->ReportAsyncResults(
+            CallResultReportId::UPDATE_MEDIA_MODE_REPORT_ID, resultInfo);
+    }
+}
+
+void CallRequestProcess::StartRttRequest(int32_t callId, std::u16string &msg)
 {
     sptr<CallBase> call = GetOneCallObject(callId);
     if (call == nullptr) {
         TELEPHONY_LOGE("the call object is nullptr, callId:%{public}d", callId);
         return;
     }
-#ifdef ABILITY_VIDEO_SUPPORT
-    DelayedSingleton<VideoControlManager>::GetInstance()->NewCallCreated(call);
-#endif
-    call->SetVideoStateType(VideoStateType::TYPE_VIDEO);
+    if (call->GetCallType() != CallType::TYPE_IMS) {
+        TELEPHONY_LOGE("Unsupported Network type, callId:%{public}d", callId);
+        return;
+    } else {
+        sptr<IMSCall> imsCall = reinterpret_cast<IMSCall *>(call.GetRefPtr());
+        imsCall->StartRtt();
+    }
+}
+
+void CallRequestProcess::StopRttRequest(int32_t callId)
+{
+    sptr<CallBase> call = GetOneCallObject(callId);
+    if (call == nullptr) {
+        TELEPHONY_LOGE("the call object is nullptr, callId:%{public}d", callId);
+        return;
+    }
+    if (call->GetCallType() != CallType::TYPE_IMS) {
+        TELEPHONY_LOGE("Unsupported Network type, callId:%{public}d", callId);
+        return;
+    } else {
+        sptr<IMSCall> imsCall = reinterpret_cast<IMSCall *>(call.GetRefPtr());
+        imsCall->StopRtt();
+    }
+}
+
+void CallRequestProcess::JoinConference(int32_t callId, std::vector<std::string> &numberList)
+{
+    sptr<CallBase> call = GetOneCallObject(callId);
+    if (call == nullptr) {
+        TELEPHONY_LOGE("the call object is nullptr, callId:%{public}d", callId);
+        return;
+    }
+    int32_t ret = DelayedSingleton<CellularCallConnection>::GetInstance()->InviteToConference(numberList, callId);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("Invite to conference failed!");
+        return;
+    }
 }
 
 void CallRequestProcess::CarrierDialProcess(DialParaInfo &info)
 {
     CellularCallInfo callInfo;
-    PackCellularCallInfo(info, callInfo);
+    int32_t ret = PackCellularCallInfo(info, callInfo);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGW("PackCellularCallInfo failed!");
+    }
     // Obtain gateway information
-    int32_t ret = DelayedSingleton<CellularCallIpcInterfaceProxy>::GetInstance()->Dial(callInfo);
+    ret = DelayedSingleton<CellularCallConnection>::GetInstance()->Dial(callInfo);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("Dial failed!");
         return;
@@ -200,27 +273,59 @@ void CallRequestProcess::CarrierDialProcess(DialParaInfo &info)
 void CallRequestProcess::VoiceMailDialProcess(DialParaInfo &info)
 {
     CellularCallInfo callInfo;
-    PackCellularCallInfo(info, callInfo);
-    int32_t ret = DelayedSingleton<CellularCallIpcInterfaceProxy>::GetInstance()->Dial(callInfo);
+    int32_t ret = PackCellularCallInfo(info, callInfo);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGW("PackCellularCallInfo failed!");
+    }
+    ret = DelayedSingleton<CellularCallConnection>::GetInstance()->Dial(callInfo);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("Dial VoiceMail failed!");
         return;
     }
 }
 
-void CallRequestProcess::PackCellularCallInfo(DialParaInfo &info, CellularCallInfo &callInfo)
+void CallRequestProcess::OttDialProcess(DialParaInfo &info)
+{
+    AppExecFwk::PacMap callInfo;
+    callInfo.PutStringValue("phoneNumber", info.number);
+    callInfo.PutStringValue("bundleName", info.bundleName);
+    callInfo.PutIntValue("videoState", static_cast<int32_t>(info.videoState));
+    int32_t ret = DelayedSingleton<CallAbilityReportProxy>::GetInstance()->OttCallRequest(
+        OttCallRequestId::OTT_REQUEST_DIAL, callInfo);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("OTT call Dial failed!");
+        return;
+    }
+}
+
+int32_t CallRequestProcess::PackCellularCallInfo(DialParaInfo &info, CellularCallInfo &callInfo)
 {
     callInfo.callId = info.callId;
     callInfo.accountId = info.accountId;
     callInfo.callType = info.callType;
-    callInfo.videoState = info.videoState;
+    callInfo.videoState = static_cast<int32_t>(info.videoState);
     callInfo.index = info.index;
     callInfo.slotId = info.accountId;
-    (void)memset_s(callInfo.phoneNum, kMaxNumberLen, 0, kMaxNumberLen);
-    if (memcpy_s(callInfo.phoneNum, kMaxNumberLen, info.number.c_str(), info.number.length()) != 0) {
-        TELEPHONY_LOGE("memcpy_s failed!");
-        return;
+    if (memset_s(callInfo.phoneNum, kMaxNumberLen, 0, kMaxNumberLen) != EOK) {
+        TELEPHONY_LOGW("memset_s failed!");
+        return TELEPHONY_ERR_MEMSET_FAIL;
     }
+    if (memcpy_s(callInfo.phoneNum, kMaxNumberLen, info.number.c_str(), info.number.length()) != EOK) {
+        TELEPHONY_LOGE("memcpy_s failed!");
+        return TELEPHONY_ERR_MEMCPY_FAIL;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+bool CallRequestProcess::IsFdnNumber(std::vector<std::u16string> fdnNumberList, std::string phoneNumber)
+{
+    for (std::vector<std::u16string>::iterator it = fdnNumberList.begin(); it != fdnNumberList.end(); it++) {
+        if (strcmp(phoneNumber.c_str(), Str16ToStr8(*it).c_str()) == 0) {
+            return true;
+        }
+    }
+    TELEPHONY_LOGW("There is no fixed number.");
+    return false;
 }
 } // namespace Telephony
 } // namespace OHOS

@@ -26,13 +26,13 @@ bool EnableSpeakerDevice::ProcessEvent(int32_t event)
     bool result = false;
     std::lock_guard<std::mutex> lock(mutex_);
     switch (event) {
-        case AudioEvent::WIRED_HEADSET_AVAILABLE:
-            // should switch to wired headset route when wired headset available
+        case AudioEvent::WIRED_HEADSET_CONNECTED:
+            // should switch to wired headset route while wired headset connected
             result = DelayedSingleton<AudioDeviceManager>::GetInstance()->ProcessEvent(
                 AudioEvent::ENABLE_DEVICE_WIRED_HEADSET);
             break;
-        case AudioEvent::BLUETOOTH_SCO_AVAILABLE:
-            // should switch to bluetooth sco route when bluetooth sco available
+        case AudioEvent::BLUETOOTH_SCO_CONNECTED:
+            // should switch to bluetooth sco route while bluetooth sco connected
             result = DelayedSingleton<AudioDeviceManager>::GetInstance()->ProcessEvent(
                 AudioEvent::ENABLE_DEVICE_BLUETOOTH);
             break;

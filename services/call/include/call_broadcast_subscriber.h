@@ -25,23 +25,22 @@
 
 namespace OHOS {
 namespace Telephony {
-using namespace OHOS::EventFwk;
 const std::string SIM_STATE_UPDATE_ACTION = "com.hos.action.SIM_STATE_CHANGED";
-class CallBroadcastSubscriber : public CommonEventSubscriber {
+class CallBroadcastSubscriber : public EventFwk::CommonEventSubscriber {
 public:
-    explicit CallBroadcastSubscriber(const CommonEventSubscribeInfo &subscriberInfo);
+    explicit CallBroadcastSubscriber(const EventFwk::CommonEventSubscribeInfo &subscriberInfo);
     ~CallBroadcastSubscriber() = default;
-    virtual void OnReceiveEvent(const CommonEventData &data);
+    virtual void OnReceiveEvent(const EventFwk::CommonEventData &data);
 
 private:
     enum {
         UNKNOWN_BROADCAST_EVENT = 0,
         SIM_STATE_BROADCAST_EVENT,
     };
-    using broadcastSubscriberFunc = void (CallBroadcastSubscriber::*)(const CommonEventData &data);
+    using broadcastSubscriberFunc = void (CallBroadcastSubscriber::*)(const EventFwk::CommonEventData &data);
 
-    void UnknownBroadcast(const CommonEventData &data);
-    void SimStateBroadcast(const CommonEventData &data);
+    void UnknownBroadcast(const EventFwk::CommonEventData &data);
+    void SimStateBroadcast(const EventFwk::CommonEventData &data);
     std::map<uint32_t, broadcastSubscriberFunc> memberFuncMap_;
 };
 } // namespace Telephony

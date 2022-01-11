@@ -18,21 +18,33 @@
 
 #include <cstdio>
 #include <cstdlib>
+#include <stdint.h>
+
+#include "refbase.h"
+#include "call_manager_inner_type.h"
 
 namespace OHOS {
 namespace Telephony {
-class NetCallBase {
+class NetCallBase : public virtual RefBase {
 public:
     NetCallBase();
     virtual ~NetCallBase() = default;
 
-    int StartConference();
-    int InviteToConference();
-    int KickOutConference();
-    int LeaveConference();
+    int32_t StartConference();
+    int32_t JoinConference();
+    int32_t KickOutConference();
+    int32_t LeaveConference();
 
-    int GetNetCallType();
-    int ChangeNetCallType();
+    int32_t GetNetCallType();
+    int32_t ChangeNetCallType();
+    // send call media mode modify request to peer
+    virtual int32_t SendUpdateCallMediaModeRequest(CallMediaMode mode) = 0;
+    // recieve call media mode modify request from peer
+    virtual int32_t RecieveUpdateCallMediaModeRequest(CallMediaMode mode) = 0;
+    // send call media mode modify reponse to peer
+    virtual int32_t SendUpdateCallMediaModeResponse(CallMediaMode mode) = 0;
+    // recieve call media mode modify reponse to peer
+    virtual int32_t ReceiveUpdateCallMediaModeResponse(CallMediaModeResponse &response) = 0;
 };
 } // namespace Telephony
 } // namespace OHOS

@@ -16,7 +16,6 @@
 #ifndef CALL_MANAGER_CLIENT_H
 #define CALL_MANAGER_CLIENT_H
 
-#include "refbase.h"
 #include "singleton.h"
 #include "pac_map.h"
 
@@ -53,8 +52,6 @@ public:
     int32_t SetCallPreferenceMode(int32_t slotId, int32_t mode);
     int32_t StartDtmf(int32_t callId, char str);
     int32_t StopDtmf(int32_t callId);
-    int32_t SendDtmf(int32_t callId, char str);
-    int32_t SendBurstDtmf(int32_t callId, std::u16string str, int32_t on, int32_t off);
     bool IsRinging();
     bool HasCall();
     bool IsNewCallAllowed();
@@ -66,13 +63,27 @@ public:
     int32_t SetMuted(bool isMute);
     int32_t MuteRinger();
     int32_t SetAudioDevice(AudioDevice deviceType);
-    int32_t CancelMissedCallsNotification(int32_t id);
     int32_t ControlCamera(std::u16string cameraId, std::u16string callingPackage);
     int32_t SetPreviewWindow(VideoWindow &window);
     int32_t SetDisplayWindow(VideoWindow &window);
     int32_t SetCameraZoom(float zoomRatio);
     int32_t SetPausePicture(std::u16string path);
     int32_t SetDeviceDirection(int32_t rotation);
+    int32_t GetImsConfig(int32_t slotId, ImsConfigItem item);
+    int32_t SetImsConfig(int32_t slotId, ImsConfigItem item, std::u16string &value);
+    int32_t GetImsFeatureValue(int32_t slotId, FeatureType type);
+    int32_t SetImsFeatureValue(int32_t slotId, FeatureType type, int32_t value);
+    int32_t UpdateCallMediaMode(int32_t callId, CallMediaMode mode);
+    int32_t EnableVoLte(int32_t slotId);
+    int32_t DisableVoLte(int32_t slotId);
+    int32_t IsVoLteEnabled(int32_t slotId);
+    int32_t EnableLteEnhanceMode(int32_t slotId);
+    int32_t DisableLteEnhanceMode(int32_t slotId);
+    int32_t IsLteEnhanceModeEnabled(int32_t slotId);
+    int32_t StartRtt(int32_t callId, std::u16string &msg);
+    int32_t StopRtt(int32_t callId);
+    int32_t JoinConference(int32_t callId, std::vector<std::u16string> &numberList);
+    int32_t ReportOttCallDetailsInfo(std::vector<OttCallDetailsInfo> &ottVec);
 };
 } // namespace Telephony
 } // namespace OHOS

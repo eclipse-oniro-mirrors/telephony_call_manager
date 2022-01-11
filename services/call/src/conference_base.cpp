@@ -23,7 +23,8 @@
 
 namespace OHOS {
 namespace Telephony {
-ConferenceBase::ConferenceBase() : mainCallId_(ERR_ID), state_(CONFERENCE_STATE_IDLE), beginTime_(0)
+ConferenceBase::ConferenceBase()
+    : mainCallId_(ERR_ID), state_(CONFERENCE_STATE_IDLE), beginTime_(0), conferenceType_(CallType::TYPE_CS)
 {
     subCallIdSet_.clear();
 }
@@ -44,7 +45,7 @@ int32_t ConferenceBase::SetMainCall(int32_t callId)
 {
     if (callId <= ERR_ID) {
         TELEPHONY_LOGE("callId is invalid:%{public}d", callId);
-        return CALL_ERR_CALLID_INVALID;
+        return CALL_ERR_INVALID_CALLID;
     }
     int32_t ret = CanCombineConference();
     if (ret != TELEPHONY_SUCCESS) {

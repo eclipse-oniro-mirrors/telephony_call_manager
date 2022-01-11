@@ -18,21 +18,18 @@ config("call_manager_config") {
   include_dirs = [
     "$SUBSYSTEM_DIR/call_manager/frameworks/native/include",
     "$SUBSYSTEM_DIR/call_manager/interfaces/innerkits",
-    "$SUBSYSTEM_DIR/core_service/interfaces/innerkits/call_manager",
-    "$SUBSYSTEM_DIR/core_service/interfaces/innerkits/call_manager",
-    "$SUBSYSTEM_DIR/core_service/interfaces/innerkits/cellular_call",
+    "$SUBSYSTEM_DIR/call_manager/utils/include",
     "$SUBSYSTEM_DIR/core_service/interfaces/innerkits/core",
-    "$SUBSYSTEM_DIR/core_service/interfaces/innerkits/cellular_call",
   ]
 }
 
 ohos_shared_library("tel_call_manager_api") {
   sources = [
-    "$SUBSYSTEM_DIR/core_service/interfaces/innerkits/call_manager/call_manager_service_proxy.cpp",
     "src/call_ability_callback.cpp",
     "src/call_ability_callback_stub.cpp",
     "src/call_manager_client.cpp",
     "src/call_manager_proxy.cpp",
+    "src/call_manager_service_proxy.cpp",
   ]
 
   public_configs = [ ":call_manager_config" ]
@@ -44,7 +41,6 @@ ohos_shared_library("tel_call_manager_api") {
 
   external_deps = [
     "aafwk_standard:want",
-    "appexecfwk_standard:libeventhandler",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
     "samgr_standard:samgr_proxy",

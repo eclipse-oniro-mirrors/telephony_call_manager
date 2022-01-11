@@ -27,6 +27,10 @@
 #include "common_type.h"
 #include "conference_base.h"
 
+/**
+ * @ClassName: CallBase
+ * @Description: an abstraction  of telephone calls, provide basic call ops interfaces
+ */
 namespace OHOS {
 namespace Telephony {
 class CallBase : public virtual RefBase {
@@ -37,7 +41,7 @@ public:
 
     virtual int32_t DialingProcess() = 0;
     virtual int32_t AnswerCall(int32_t videoState) = 0;
-    virtual int32_t RejectCall(bool isSendSms, std::string &content) = 0;
+    virtual int32_t RejectCall() = 0;
     virtual int32_t HangUpCall() = 0;
     virtual int32_t HoldCall() = 0;
     virtual int32_t UnHoldCall() = 0;
@@ -46,22 +50,21 @@ public:
     virtual bool GetEmergencyState() = 0;
     virtual int32_t StartDtmf(char str) = 0;
     virtual int32_t StopDtmf() = 0;
-    virtual int32_t SendDtmf(std::string &phoneNum, char str) = 0;
-    virtual int32_t SendBurstDtmf(std::string &phoneNum, std::string str, int32_t on, int32_t off) = 0;
     virtual int32_t GetSlotId() = 0;
     virtual int32_t CombineConference() = 0;
     virtual int32_t SeparateConference() = 0;
     virtual int32_t CanCombineConference() = 0;
     virtual int32_t CanSeparateConference() = 0;
-    virtual int32_t LunchConference() = 0;
+    virtual int32_t LaunchConference() = 0;
     virtual int32_t ExitConference() = 0;
+    virtual int32_t HoldConference() = 0;
     virtual int32_t GetMainCallId() = 0;
     virtual std::vector<std::u16string> GetSubCallIdList() = 0;
     virtual std::vector<std::u16string> GetCallIdListForConference() = 0;
     virtual int32_t IsSupportConferenceable() = 0;
     int32_t DialCallBase();
     int32_t IncomingCallBase();
-    int32_t AcceptCallBase();
+    int32_t AnswerCallBase();
     int32_t RejectCallBase();
     void GetCallAttributeBaseInfo(CallAttributeInfo &info);
     int32_t GetCallID();
@@ -73,8 +76,10 @@ public:
     TelConferenceState GetTelConferenceState();
     VideoStateType GetVideoStateType();
     void SetVideoStateType(VideoStateType mediaType);
+    CallMediaMode GetCallMediaMode();
+    void SetCallMediaMode(CallMediaMode mode);
     void SetPolicyFlag(PolicyFlag flag);
-    int64_t GetPolicyFlag();
+    uint64_t GetPolicyFlag();
     bool GetCallerInfo(ContactInfo &info);
     void SetCallerInfo(const ContactInfo &contactInfo);
     CallEndedType GetCallEndedType();
@@ -93,6 +98,7 @@ protected:
     CallType callType_;
     VideoStateType videoState_;
     std::string accountNumber_;
+    std::string bundleName_;
 
 private:
     void StateChangesToDialing();
@@ -102,13 +108,13 @@ private:
     void StateChangesToHolding();
     void StateChangesToDisconnected();
     void StateChangesToDisconnecting();
-    void StateChangesToAlering();
+    void StateChangesToAlerting();
 
     CallRunningState callRunningState_;
     TelConferenceState conferenceState_;
     int64_t startTime_; // Call start time
     CallDirection direction_;
-    int64_t policyFlag_;
+    uint64_t policyFlag_;
     TelCallState callState_;
     bool isSpeakerphoneOn_;
     CallEndedType callEndedType_;
@@ -119,6 +125,7 @@ private:
     time_t ringEndTime_;
     CallAnswerType answerType_;
     std::mutex mutex_;
+    CallMediaMode mediaMode_; // media mode
 };
 } // namespace Telephony
 } // namespace OHOS

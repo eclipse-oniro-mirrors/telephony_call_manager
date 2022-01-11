@@ -23,29 +23,12 @@
 #include "call_manager_inner_type.h"
 #include "telephony_log_wrapper.h"
 
-#define RETURN_VALUE(...) return __VA_ARGS__
-
-#define RETURN_FAILURE_IF_NULLPTR(ptr, errorInfo, ...) \
-    if (ptr == nullptr) {                              \
-        TELEPHONY_LOGE(errorInfo);                     \
-        RETURN_VALUE(__VA_ARGS__);                     \
-    }
-
-#define RETURN_VALUE_IF_NOT_WITHOUT_PROMT(condition, ...) \
-    if (!condition) {                                     \
-        RETURN_VALUE(__VA_ARGS__);                        \
-    }
-
-#define RETURN_VALUE_IF_NOT_CONDITION_WITHOUT_PROMT(value, condition, ...) \
-    if (value != condition) {                                              \
-        RETURN_VALUE(__VA_ARGS__);                                         \
-    }
-
-const int32_t MAX_RINGING_CALL_NUMBER_LEN = 30;
-const int32_t MAX_DIALING_CALL_NUMBER_LEN = 30;
-const int32_t MAX_MANE_LEN = 10;
-const int32_t MAX_PATH_KEY_LEN = 60;
-const int32_t CALL_START_ID = 1000;
+const int16_t kMaxRingingCallNumberLen = 30;
+const int16_t kMaxDialingCallNumberLen = 30;
+const int16_t kMaxManeLen = 10;
+const int16_t kMaxPathKeyLen = 60;
+const int16_t kCallStartId = 1000;
+const int16_t kMilliSecond = 1000;
 namespace OHOS {
 namespace Telephony {
 struct DialParaInfo {
@@ -59,9 +42,10 @@ struct DialParaInfo {
     TelCallState callState;
     bool isDialing;
     bool isEcc;
+    std::string bundleName;
 };
 
-enum PolicyFlag : int64_t {
+enum PolicyFlag : uint64_t {
     // Denote playing ring tone
     POLICY_FLAG_PLAY_RINGTONE = 0x00000001,
     // Denote vibration prompt
@@ -87,10 +71,10 @@ enum PolicyFlag : int64_t {
 };
 
 struct ContactInfo {
-    char name[MAX_MANE_LEN];
+    char name[kMaxManeLen];
     char number[kMaxNumberLen];
     bool isContacterExists;
-    char ringtonePath[MAX_PATH_KEY_LEN];
+    char ringtonePath[kMaxPathKeyLen];
     bool isSendToVoicemail;
     bool isEcc;
     bool isVoiceMail;

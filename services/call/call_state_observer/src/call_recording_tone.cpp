@@ -33,9 +33,9 @@ void CallRecordingTone::OnReceiveEvent(const EventFwk::CommonEventData &data)
     }
 }
 
-void CallRecordingTone::CallDestroyed(sptr<CallBase> &callObjectPtr)
+void CallRecordingTone::CallDestroyed(int32_t cause)
 {
-    if (isRecording_ && !DelayedSingleton<AudioControlManager>::GetInstance()->IsActiveCallExists()) {
+    if (isRecording_) {
         StopRecordingTone();
     }
 }
@@ -53,8 +53,8 @@ void CallRecordingTone::CallStateUpdated(
 int32_t CallRecordingTone::PlayRecordingTone()
 {
     // the recording call's call state should be active
-    if (DelayedSingleton<AudioControlManager>::GetInstance()->GetCurrentCall() == nullptr) {
-        TELEPHONY_LOGE("call is nullptr!");
+    if (DelayedSingleton<AudioControlManager>::GetInstance()->GetCurrentActiveCall() == nullptr) {
+        TELEPHONY_LOGE("call is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     if (DelayedSingleton<AudioControlManager>::GetInstance()->PlayCallTone(ToneDescriptor::TONE_CALL_RECORDING) ==
@@ -62,7 +62,7 @@ int32_t CallRecordingTone::PlayRecordingTone()
         isRecording_ = true;
         return TELEPHONY_SUCCESS;
     }
-    return TELEPHONY_ERR_FAIL;
+    return CALL_ERR_AUDIO_TONE_PLAY_FAILED;
 }
 
 int32_t CallRecordingTone::StopRecordingTone()
@@ -74,7 +74,7 @@ int32_t CallRecordingTone::StopRecordingTone()
         isRecording_ = false;
         return TELEPHONY_SUCCESS;
     }
-    return TELEPHONY_ERR_FAIL;
+    return CALL_ERR_AUDIO_TONE_STOP_FAILED;
 }
 } // namespace Telephony
 } // namespace OHOS

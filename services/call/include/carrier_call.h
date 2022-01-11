@@ -19,6 +19,7 @@
 #include "cellular_call_types.h"
 
 #include "call_base.h"
+#include "cellular_call_connection.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -28,8 +29,8 @@ public:
     CarrierCall(DialParaInfo &info, AppExecFwk::PacMap &extras);
     ~CarrierCall();
     int32_t CarrierDialingProcess();
-    int32_t CarrierAcceptCall(int32_t videoState);
-    int32_t CarrierRejectCall(bool isSendSms, std::string &content);
+    int32_t CarrierAnswerCall(int32_t videoState);
+    int32_t CarrierRejectCall();
     int32_t CarrierHangUpCall();
     int32_t CarrierHoldCall();
     int32_t CarrierUnHoldCall();
@@ -38,15 +39,13 @@ public:
     int32_t CarrierSwitchCall();
     int32_t StartDtmf(char str) override;
     int32_t StopDtmf() override;
-    int32_t SendDtmf(std::string &phoneNum, char str) override;
-    int32_t SendBurstDtmf(std::string &phoneNum, std::string str, int32_t on, int32_t off) override;
     int32_t GetSlotId() override;
     int32_t CarrierCombineConference();
     int32_t CarrierSeparateConference();
     int32_t IsSupportConferenceable() override;
 
-private:
-    void PackCellularCallInfo(CellularCallInfo &callInfo);
+protected:
+    int32_t PackCellularCallInfo(CellularCallInfo &callInfo);
 
 private:
     DialScene dialScene_;
@@ -54,6 +53,7 @@ private:
     int32_t index_;
     bool isEcc_;
     std::mutex mutex_;
+    std::shared_ptr<CellularCallConnection> cellularCallConnectionPtr_;
 };
 } // namespace Telephony
 } // namespace OHOS

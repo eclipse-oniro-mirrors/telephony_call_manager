@@ -36,13 +36,18 @@ public:
     void SwitchRequest(int32_t callId);
     void CombineConferenceRequest(int32_t mainCallId);
     void SeparateConferenceRequest(int32_t callId);
-    void UpgradeCallRequest(int32_t callId);
-    void DowngradeCallRequest(int32_t callId);
+    void UpdateCallMediaModeRequest(int32_t callId, CallMediaMode mode);
+    void StartRttRequest(int32_t callId, std::u16string &msg);
+    void StopRttRequest(int32_t callId);
+    void JoinConference(int32_t callId, std::vector<std::string> &numberList);
 
 private:
     void CarrierDialProcess(DialParaInfo &info);
     void VoiceMailDialProcess(DialParaInfo &info);
-    void PackCellularCallInfo(DialParaInfo &info, CellularCallInfo &callInfo);
+    void OttDialProcess(DialParaInfo &info);
+    int32_t UpdateCallMediaMode(int32_t callId, CallMediaMode mode);
+    int32_t PackCellularCallInfo(DialParaInfo &info, CellularCallInfo &callInfo);
+    bool IsFdnNumber(std::vector<std::u16string> fdnNumberList, std::string phoneNumber);
 };
 } // namespace Telephony
 } // namespace OHOS

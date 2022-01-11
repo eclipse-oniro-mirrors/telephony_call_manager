@@ -21,73 +21,62 @@
 
 namespace OHOS {
 namespace Telephony {
-using namespace AudioStandard;
+int32_t AudioProxy::currentSessionId_ = DEFAULT_SESSION_ID;
+bool AudioProxy::isRingtoneActivated_ = false;
+bool AudioProxy::isVoiceCallActivated_ = false;
+std::shared_ptr<AudioStandard::AudioManagerCallback> AudioProxy::audioManagerCallback_ = nullptr;
 
-AudioProxy::AudioProxy() {}
-
-AudioProxy::~AudioProxy() {}
-
-void AudioProxy::Init() {}
-
-bool AudioProxy::SetAudioMode(int32_t audioMode)
+AudioProxy::AudioProxy()
+    : context_(nullptr), audioSoundManager_(std::make_unique<AudioStandard::AudioSoundManager>()),
+      deviceCallback_(std::make_shared<AudioDeviceChangeCallback>())
 {
-#ifdef ABILITY_AUDIO_SUPPORT
-    return AudioSystemManager::GetInstance()->SetMode(audioMode);
-#endif
-    return true;
+    ringtoneAudioInterrupt_.streamUsage = AudioStandard::StreamUsage::STREAM_USAGE_NOTIFICATION_RINGTONE;
+    ringtoneAudioInterrupt_.contentType = AudioStandard::ContentType::CONTENT_TYPE_MUSIC;
+    ringtoneAudioInterrupt_.streamType = AudioStandard::AudioStreamType::STREAM_RING;
+    ringtoneAudioInterrupt_.sessionID = RINGTONE_SESSION_ID;
+    voiceCallAudioInterrupt_.streamUsage = AudioStandard::StreamUsage::STREAM_USAGE_VOICE_COMMUNICATION;
+    voiceCallAudioInterrupt_.contentType = AudioStandard::ContentType::CONTENT_TYPE_SPEECH;
+    voiceCallAudioInterrupt_.streamType = AudioStandard::AudioStreamType::STREAM_VOICE_CALL;
+    voiceCallAudioInterrupt_.sessionID = VOICE_CALL_SESSION_ID;
 }
 
-int32_t AudioProxy::ActivateAudioInterrupt()
+AudioProxy::~AudioProxy()
 {
-    return TELEPHONY_SUCCESS;
+    UnsetAudioManagerCallback();
 }
 
-int32_t AudioProxy::DeactivateAudioInterrupt()
+int32_t AudioProxy::ActivateAudioInterrupt(const AudioStandard::AudioInterrupt &audioInterrupt)
 {
-    return TELEPHONY_SUCCESS;
+    return AudioStandard::AudioSystemManager::GetInstance()->ActivateAudioInterrupt(audioInterrupt);
 }
 
-std::string AudioProxy::GetDefaultRingPath() const
+int32_t AudioProxy::DeactivateAudioInterrupt(const AudioStandard::AudioInterrupt &audioInterrupt)
 {
-    return defaultRingPath_;
+    return AudioStandard::AudioSystemManager::GetInstance()->DeactivateAudioInterrupt(audioInterrupt);
 }
 
-std::string AudioProxy::GetDefaultTonePath() const
+bool AudioProxy::SetAudioScene(AudioStandard::AudioScene audioScene)
 {
-    return defaultTonePath_;
+    return AudioStandard::AudioSystemManager::GetInstance()->SetAudioScene(audioScene) == TELEPHONY_SUCCESS;
 }
 
-std::string AudioProxy::GetDefaultDtmfPath() const
+int32_t AudioProxy::SetAudioDeviceChangeCallback()
 {
-    return defaultDtmfPath_;
+    if (deviceCallback_ == nullptr) {
+        TELEPHONY_LOGE("device callback nullptr");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return AudioStandard::AudioSystemManager::GetInstance()->SetDeviceChangeCallback(deviceCallback_);
 }
-
-int32_t AudioProxy::StartVibrate()
-{
-    return TELEPHONY_SUCCESS; // return default value
-}
-
-int32_t AudioProxy::CancelVibrate()
-{
-    return TELEPHONY_SUCCESS; // return default value
-}
-
-void AudioProxy::SetAudioDeviceChangeObserver() {}
-
-void AudioProxy::SetOnCreateCompleteListener() {}
 
 bool AudioProxy::SetBluetoothDevActive()
 {
-    if (!DelayedSingleton<AudioControlManager>::GetInstance()->IsAudioActivated()) {
-        TELEPHONY_LOGE("audio is not activated");
-        return false;
-    }
     if (AudioStandard::AudioSystemManager::GetInstance()->IsDeviceActive(
         AudioStandard::ActiveDeviceType::BLUETOOTH_SCO)) {
         TELEPHONY_LOGI("bluetooth device is already active");
         return true;
     }
-#ifdef ABILITY_BLUETOOTH_SUPPORT
+#ifdef ABILITY_AUDIO_SUPPORT
     return AudioStandard::AudioSystemManager::GetInstance()->SetDeviceActive(
         AudioStandard::ActiveDeviceType::BLUETOOTH_SCO, true) &&
         AudioStandard::AudioSystemManager::GetInstance()->SetDeviceActive(
@@ -103,15 +92,11 @@ bool AudioProxy::SetWiredHeadsetDevActive()
 
 bool AudioProxy::SetSpeakerDevActive()
 {
-    if (!DelayedSingleton<AudioControlManager>::GetInstance()->IsAudioActivated()) {
-        TELEPHONY_LOGE("audio is not activated");
-        return false;
-    }
     if (AudioStandard::AudioSystemManager::GetInstance()->IsDeviceActive(AudioStandard::ActiveDeviceType::SPEAKER)) {
         TELEPHONY_LOGI("speaker device is already active");
         return true;
     }
-#ifdef ABILITY_BLUETOOTH_SUPPORT
+#ifdef ABILITY_AUDIO_SUPPORT
     return AudioStandard::AudioSystemManager::GetInstance()->SetDeviceActive(
         AudioStandard::ActiveDeviceType::BLUETOOTH_SCO, false) &&
         AudioStandard::AudioSystemManager::GetInstance()->SetDeviceActive(
@@ -125,54 +110,52 @@ bool AudioProxy::SetEarpieceDevActive()
     return false;
 }
 
-int32_t AudioProxy::GetVolume(AudioSystemManager::AudioVolumeType audioVolumeType)
+int32_t AudioProxy::GetVolume(AudioStandard::AudioSystemManager::AudioVolumeType audioVolumeType)
 {
-    return AudioSystemManager::GetInstance()->GetVolume(audioVolumeType);
+    return AudioStandard::AudioSystemManager::GetInstance()->GetVolume(audioVolumeType);
 }
 
-int32_t AudioProxy::SetVolume(AudioSystemManager::AudioVolumeType audioVolumeType, int32_t volume)
+int32_t AudioProxy::SetVolume(AudioStandard::AudioSystemManager::AudioVolumeType audioVolumeType, int32_t volume)
 {
-    return AudioSystemManager::GetInstance()->SetVolume(audioVolumeType, volume);
+    return AudioStandard::AudioSystemManager::GetInstance()->SetVolume(audioVolumeType, volume);
 }
 
-int32_t AudioProxy::SetMaxVolume(AudioSystemManager::AudioVolumeType audioVolumeType)
+int32_t AudioProxy::SetMaxVolume(AudioStandard::AudioSystemManager::AudioVolumeType audioVolumeType)
 {
     int32_t maxVolume = GetMaxVolume(audioVolumeType);
-    return AudioSystemManager::GetInstance()->SetVolume(audioVolumeType, maxVolume);
+    return AudioStandard::AudioSystemManager::GetInstance()->SetVolume(audioVolumeType, maxVolume);
 }
 
 void AudioProxy::SetVolumeAudible()
 {
-    if (GetVolume(AudioSystemManager::AudioVolumeType::STREAM_VOICE_CALL) != TELEPHONY_SUCCESS) {
-        return;
-    }
-    int32_t volume = GetMaxVolume(AudioSystemManager::AudioVolumeType::STREAM_VOICE_CALL);
-    SetVolume(AudioSystemManager::AudioVolumeType::STREAM_VOICE_CALL, (int32_t)(volume / VOLUME_AUDIBLE_DIVISOR));
+    int32_t volume = GetMaxVolume(AudioStandard::AudioSystemManager::AudioVolumeType::STREAM_VOICE_CALL);
+    SetVolume(AudioStandard::AudioSystemManager::AudioVolumeType::STREAM_VOICE_CALL,
+        (int32_t)(volume / VOLUME_AUDIBLE_DIVISOR));
 }
 
-bool AudioProxy::IsStreamActive(AudioSystemManager::AudioVolumeType audioVolumeType)
+bool AudioProxy::IsStreamActive(AudioStandard::AudioSystemManager::AudioVolumeType audioVolumeType)
 {
-    return AudioSystemManager::GetInstance()->IsStreamActive(audioVolumeType);
+    return AudioStandard::AudioSystemManager::GetInstance()->IsStreamActive(audioVolumeType);
 }
 
-bool AudioProxy::IsStreamMute(AudioSystemManager::AudioVolumeType audioVolumeType)
+bool AudioProxy::IsStreamMute(AudioStandard::AudioSystemManager::AudioVolumeType audioVolumeType)
 {
-    return AudioSystemManager::GetInstance()->IsStreamMute(audioVolumeType);
+    return AudioStandard::AudioSystemManager::GetInstance()->IsStreamMute(audioVolumeType);
 }
 
-int32_t AudioProxy::GetMaxVolume(AudioSystemManager::AudioVolumeType audioVolumeType)
+int32_t AudioProxy::GetMaxVolume(AudioStandard::AudioSystemManager::AudioVolumeType audioVolumeType)
 {
-    return AudioSystemManager::GetInstance()->GetMaxVolume(audioVolumeType);
+    return AudioStandard::AudioSystemManager::GetInstance()->GetMaxVolume(audioVolumeType);
 }
 
-int32_t AudioProxy::GetMinVolume(AudioSystemManager::AudioVolumeType audioVolumeType)
+int32_t AudioProxy::GetMinVolume(AudioStandard::AudioSystemManager::AudioVolumeType audioVolumeType)
 {
-    return AudioSystemManager::GetInstance()->GetMinVolume(audioVolumeType);
+    return AudioStandard::AudioSystemManager::GetInstance()->GetMinVolume(audioVolumeType);
 }
 
 bool AudioProxy::IsMicrophoneMute()
 {
-    return AudioSystemManager::GetInstance()->IsMicrophoneMute();
+    return AudioStandard::AudioSystemManager::GetInstance()->IsMicrophoneMute();
 }
 
 bool AudioProxy::SetMicrophoneMute(bool mute)
@@ -189,14 +172,267 @@ bool AudioProxy::SetMicrophoneMute(bool mute)
     return muteResult == TELEPHONY_SUCCESS;
 }
 
-AudioRingerMode AudioProxy::GetRingerMode() const
+AudioStandard::AudioRingerMode AudioProxy::GetRingerMode() const
 {
-    return AudioSystemManager::GetInstance()->GetRingerMode();
+    return AudioStandard::AudioSystemManager::GetInstance()->GetRingerMode();
 }
 
 bool AudioProxy::IsVibrateMode() const
 {
-    return AudioRingerMode::RINGER_MODE_VIBRATE == GetRingerMode();
+    return AudioStandard::AudioRingerMode::RINGER_MODE_VIBRATE == GetRingerMode();
+}
+
+int32_t AudioProxy::ActivateVoiceCallStream()
+{
+    if (isVoiceCallActivated_) {
+        TELEPHONY_LOGI("voice call stream is already activate");
+        return TELEPHONY_SUCCESS;
+    }
+    int32_t ret = SetAudioManagerCallback(AudioStandard::AudioStreamType::STREAM_VOICE_CALL);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("set audio manager callback failed");
+        return TELEPHONY_ERR_REGISTER_CALLBACK_FAIL;
+    } else {
+        TELEPHONY_LOGI("set voice call stream callback success");
+    }
+    return DelayedSingleton<AudioProxy>::GetInstance()->ActivateAudioInterrupt(voiceCallAudioInterrupt_);
+}
+
+int32_t AudioProxy::DeactivateVoiceCallStream()
+{
+    if (!isVoiceCallActivated_) {
+        TELEPHONY_LOGI("voice call stream is already deactivate");
+        return TELEPHONY_SUCCESS;
+    }
+    return AudioStandard::AudioSystemManager::GetInstance()->DeactivateAudioInterrupt(voiceCallAudioInterrupt_);
+}
+
+int32_t AudioProxy::ActivateRingtoneStream()
+{
+    if (isRingtoneActivated_) {
+        TELEPHONY_LOGI("ringtone stream is already activate");
+        return TELEPHONY_SUCCESS;
+    }
+    int32_t ret = SetAudioManagerCallback(AudioStandard::AudioStreamType::STREAM_RING);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("set audio manager callback failed");
+        return TELEPHONY_ERR_REGISTER_CALLBACK_FAIL;
+    } else {
+        TELEPHONY_LOGI("set ringtone stream callback success");
+    }
+    return DelayedSingleton<AudioProxy>::GetInstance()->ActivateAudioInterrupt(ringtoneAudioInterrupt_);
+}
+
+int32_t AudioProxy::DeactivateRingtoneStream()
+{
+    if (!isRingtoneActivated_) {
+        TELEPHONY_LOGI("ringtone stream is already deactivate");
+        return TELEPHONY_SUCCESS;
+    }
+    return AudioStandard::AudioSystemManager::GetInstance()->DeactivateAudioInterrupt(ringtoneAudioInterrupt_);
+}
+
+int32_t AudioProxy::DeactivateAudioInterrupt()
+{
+    int32_t ret = TELEPHONY_SUCCESS;
+    switch (currentSessionId_) {
+        case VOICE_CALL_SESSION_ID:
+            ret = DeactivateVoiceCallStream();
+            break;
+        case RINGTONE_SESSION_ID:
+            ret = DeactivateRingtoneStream();
+            break;
+        default:
+            break;
+    }
+    return ret;
+}
+
+int32_t AudioProxy::SetAudioManagerCallback(AudioStandard::AudioStreamType streamType)
+{
+    int32_t ret = TELEPHONY_SUCCESS;
+    switch (streamType) {
+        case AudioStandard::AudioStreamType::STREAM_VOICE_CALL:
+            if (currentSessionId_ == VOICE_CALL_SESSION_ID) {
+                return TELEPHONY_SUCCESS;
+            }
+            ret = UnsetAudioManagerCallback();
+            if (ret == TELEPHONY_SUCCESS) {
+                audioManagerCallback_ = std::make_shared<VoiceCallCallback>();
+            } else {
+                TELEPHONY_LOGE("unset audio manager callback failed");
+            }
+            break;
+        case AudioStandard::AudioStreamType::STREAM_RING:
+            if (currentSessionId_ == RINGTONE_SESSION_ID) {
+                return TELEPHONY_SUCCESS;
+            }
+            ret = UnsetAudioManagerCallback();
+            if (ret == TELEPHONY_SUCCESS) {
+                audioManagerCallback_ = std::make_shared<RingtoneCallback>();
+            } else {
+                TELEPHONY_LOGE("unset audio manager callback failed");
+            }
+            break;
+        default:
+            break;
+    }
+    if (audioManagerCallback_ == nullptr) {
+        TELEPHONY_LOGE("audio manager callback nullptr");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return AudioStandard::AudioSystemManager::GetInstance()->SetAudioManagerCallback(
+        static_cast<AudioStandard::AudioSystemManager::AudioVolumeType>(streamType), audioManagerCallback_);
+}
+
+int32_t AudioProxy::UnsetAudioManagerCallback()
+{
+    int32_t ret = TELEPHONY_SUCCESS;
+    switch (currentSessionId_) {
+        case VOICE_CALL_SESSION_ID:
+            ret = UnsetAudioManagerCallback(AudioStandard::AudioStreamType::STREAM_VOICE_CALL);
+            break;
+        case RINGTONE_SESSION_ID:
+            ret = UnsetAudioManagerCallback(AudioStandard::AudioStreamType::STREAM_RING);
+            break;
+        default:
+            break;
+    }
+    return ret;
+}
+
+int32_t AudioProxy::UnsetAudioManagerCallback(AudioStandard::AudioStreamType streamType)
+{
+    return AudioStandard::AudioSystemManager::GetInstance()->UnsetAudioManagerCallback(
+        static_cast<AudioStandard::AudioSystemManager::AudioVolumeType>(streamType));
+}
+
+void VoiceCallCallback::OnInterrupt(const AudioStandard::InterruptAction &interruptAction)
+{
+    AudioStandard::InterruptActionType type = interruptAction.actionType;
+    AudioProxy::isRingtoneActivated_ = false;
+    AudioInterruptState state = AudioInterruptState::INTERRUPT_STATE_UNKNOWN;
+    switch (type) {
+        case AudioStandard::InterruptActionType::TYPE_ACTIVATED:
+            AudioProxy::isVoiceCallActivated_ = true;
+            AudioProxy::currentSessionId_ = VOICE_CALL_SESSION_ID;
+            state = AudioInterruptState::INTERRUPT_STATE_ACTIVATED;
+            break;
+        case AudioStandard::InterruptActionType::TYPE_DEACTIVATED:
+            AudioProxy::isVoiceCallActivated_ = false;
+            AudioProxy::currentSessionId_ = DEFAULT_SESSION_ID;
+            state = AudioInterruptState::INTERRUPT_STATE_DEACTIVATED;
+            break;
+        default:
+            AudioProxy::isVoiceCallActivated_ = false;
+            break;
+    }
+    DelayedSingleton<AudioControlManager>::GetInstance()->SetAudioInterruptState(state);
+}
+
+void RingtoneCallback::OnInterrupt(const AudioStandard::InterruptAction &interruptAction)
+{
+    AudioStandard::InterruptActionType type = interruptAction.actionType;
+    AudioProxy::isVoiceCallActivated_ = false;
+    AudioInterruptState state = AudioInterruptState::INTERRUPT_STATE_UNKNOWN;
+    switch (type) {
+        case AudioStandard::InterruptActionType::TYPE_ACTIVATED:
+            AudioProxy::isRingtoneActivated_ = true;
+            AudioProxy::currentSessionId_ = RINGTONE_SESSION_ID;
+            state = AudioInterruptState::INTERRUPT_STATE_RINGING;
+            break;
+        case AudioStandard::InterruptActionType::TYPE_DEACTIVATED:
+            AudioProxy::isRingtoneActivated_ = false;
+            AudioProxy::currentSessionId_ = DEFAULT_SESSION_ID;
+            state = AudioInterruptState::INTERRUPT_STATE_DEACTIVATED;
+            break;
+        default:
+            AudioProxy::isRingtoneActivated_ = false;
+            break;
+    }
+    DelayedSingleton<AudioControlManager>::GetInstance()->SetAudioInterruptState(state);
+}
+
+void AudioDeviceChangeCallback::OnDeviceChange(const AudioStandard::DeviceChangeAction &deviceChangeAction)
+{
+    AudioStandard::DeviceChangeType changeType = deviceChangeAction.type;
+    switch (changeType) {
+        case AudioStandard::DeviceChangeType::CONNECT:
+#ifdef ABILITY_AUDIO_SUPPORT
+            auto devices = deviceChangeAction.deviceDescriptors;
+            for (auto device : devices) {
+                if (device->getType() == AudioStandard::DeviceType::DEVICE_TYPE_BLUETOOTH_SCO) {
+                    DelayedSingleton<AudioDeviceManager>::GetInstance()->ProcessEvent(
+                        AudioEvent::BLUETOOTH_SCO_CONNECTED);
+                } else if (device->getType() == AudioStandard::DeviceType::DEVICE_TYPE_WIRED_HEADSET) {
+                    DelayedSingleton<AudioDeviceManager>::GetInstance()->ProcessEvent(
+                        AudioEvent::WIRED_HEADSET_CONNECTED);
+                }
+            }
+#endif
+            break;
+        case AudioStandard::DeviceChangeType::DISCONNECT:
+#ifdef ABILITY_AUDIO_SUPPORT
+            auto devices = deviceChangeAction.deviceDescriptors;
+            for (auto device : devices) {
+                if (device->getType() == AudioStandard::DeviceType::DEVICE_TYPE_BLUETOOTH_SCO) {
+                    DelayedSingleton<AudioDeviceManager>::GetInstance()->ProcessEvent(
+                        AudioEvent::BLUETOOTH_SCO_DISCONNECTED);
+                } else if (device->getType() == AudioStandard::DeviceType::DEVICE_TYPE_WIRED_HEADSET) {
+                    DelayedSingleton<AudioDeviceManager>::GetInstance()->ProcessEvent(
+                        AudioEvent::WIRED_HEADSET_DISCONNECTED);
+                }
+            }
+#endif
+            break;
+        default:
+            break;
+    }
+}
+
+std::string AudioProxy::GetSystemRingtoneUri() const
+{
+    if (audioSoundManager_ == nullptr) {
+        TELEPHONY_LOGE("audio sound manager nullptr");
+        return "";
+    }
+    if (context_ == nullptr) {
+        TELEPHONY_LOGE("context nullptr");
+        return "";
+    }
+    AudioStandard::RingtoneType rinigtoneType = AudioStandard::RingtoneType::RINGTONE_TYPE_DEFAULT;
+    return audioSoundManager_->GetSystemRingtoneUri(context_, rinigtoneType);
+}
+
+int32_t AudioProxy::StartVibrate()
+{
+#ifdef ABILITY_SENSOR_SUPPORT
+    return VibratorManager::GetInstance()->StartVibrate();
+#endif
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t AudioProxy::CancelVibrate()
+{
+#ifdef ABILITY_SENSOR_SUPPORT
+    return VibratorManager::GetInstance()->CancelVibrate();
+#endif
+    return TELEPHONY_SUCCESS;
+}
+
+std::string AudioProxy::GetDefaultRingPath() const
+{
+    return defaultRingPath_;
+}
+
+std::string AudioProxy::GetDefaultTonePath() const
+{
+    return defaultTonePath_;
+}
+
+std::string AudioProxy::GetDefaultDtmfPath() const
+{
+    return defaultDtmfPath_;
 }
 } // namespace Telephony
 } // namespace OHOS

@@ -20,7 +20,7 @@
 #include "call_manager_errors.h"
 #include "telephony_log_wrapper.h"
 
-#include "cellular_call_info_handler.h"
+#include "report_call_info_handler.h"
 #include "cs_call.h"
 #include "ims_call.h"
 #include "ott_call.h"
@@ -31,8 +31,8 @@ namespace OHOS {
 namespace Telephony {
 CallStatusManager::CallStatusManager()
 {
-    (void)memset_s(&callReportInfo_, sizeof(CallReportInfo), 0, sizeof(CallReportInfo));
-    (void)memset_s(&callsReportInfo_, sizeof(CallsReportInfo), 0, sizeof(CallsReportInfo));
+    (void)memset_s(&callReportInfo_, sizeof(CallDetailInfo), 0, sizeof(CallDetailInfo));
+    (void)memset_s(&callDetailsInfo_, sizeof(CallDetailsInfo), 0, sizeof(CallDetailsInfo));
 }
 
 CallStatusManager::~CallStatusManager()
@@ -42,52 +42,26 @@ CallStatusManager::~CallStatusManager()
 
 int32_t CallStatusManager::Init()
 {
-    callsReportInfo_.callVec.clear();
+    callDetailsInfo_.callVec.clear();
     mEventIdTransferMap_.clear();
-    mEventIdTransferMap_[RequestResultEventId::RESULT_HOLD_SEND_FAILED] =
-        CallAbilityEventId::EVENT_HOLD_SEND_FAILED;
-    mEventIdTransferMap_[RequestResultEventId::RESULT_ACTIVE_SEND_FAILED] =
-        CallAbilityEventId::EVENT_ACTIVE_SEND_FAILED;
-    mEventIdTransferMap_[RequestResultEventId::RESULT_INITIATE_DTMF_SUCCESS] =
-        CallAbilityEventId::EVENT_START_DTMF_SUCCESS;
-    mEventIdTransferMap_[RequestResultEventId::RESULT_INITIATE_DTMF_FAILED] =
-        CallAbilityEventId::EVENT_START_DTMF_FAILED;
-    mEventIdTransferMap_[RequestResultEventId::RESULT_CEASE_DTMF_SUCCESS] =
-        CallAbilityEventId::EVENT_STOP_DTMF_SUCCESS;
-    mEventIdTransferMap_[RequestResultEventId::RESULT_CEASE_DTMF_FAILED] =
-        CallAbilityEventId::EVENT_STOP_DTMF_FAILED;
-    mEventIdTransferMap_[RequestResultEventId::RESULT_TRANSMIT_DTMF_SUCCESS] =
-        CallAbilityEventId::EVENT_SEND_DTMF_SUCCESS;
-    mEventIdTransferMap_[RequestResultEventId::RESULT_TRANSMIT_DTMF_FAILED] =
-        CallAbilityEventId::EVENT_SEND_DTMF_FAILED;
-    mEventIdTransferMap_[RequestResultEventId::RESULT_TRANSMIT_DTMF_STRING_SUCCESS] =
-        CallAbilityEventId::EVENT_SEND_DTMF_STRING_SUCCESS;
-    mEventIdTransferMap_[RequestResultEventId::RESULT_TRANSMIT_DTMF_STRING_FAILED] =
-        CallAbilityEventId::EVENT_SEND_DTMF_STRING_FAILED;
-    mEventIdTransferMap_[RequestResultEventId::RESULT_DIAL_SEND_FAILED] =
-        CallAbilityEventId::EVENT_DIAL_AT_CMD_SEND_FAILED;
-    mEventIdTransferMap_[RequestResultEventId::RESULT_DIAL_NO_CARRIER] = CallAbilityEventId::EVENT_DIAL_NO_CARRIER;
-    mEventIdTransferMap_[RequestResultEventId::RESULT_SET_CALL_PREFERENCE_MODE_SUCCESS] =
-        CallAbilityEventId::EVENT_SET_CALL_PREFERENCE_MODE_SUCCESS;
-    mEventIdTransferMap_[RequestResultEventId::RESULT_SET_CALL_PREFERENCE_MODE_FAILED] =
-        CallAbilityEventId::EVENT_SET_CALL_PREFERENCE_MODE_FAILED;
-    mEventIdTransferMap_[RequestResultEventId::RESULT_SET_LTE_IMS_SWITCH_STATUS_SUCCESS] =
-        CallAbilityEventId::EVENT_SET_IMS_VOLTE_SUCCESS;
-    mEventIdTransferMap_[RequestResultEventId::RESULT_SET_LTE_IMS_SWITCH_STATUS_FAILED] =
-        CallAbilityEventId::EVENT_SET_IMS_VOLTE_FAILED;
-    mEventIdTransferMap_[RequestResultEventId::RESULT_GET_IMS_CALLS_DATA_FAILED] =
-        CallAbilityEventId::EVENT_GET_IMS_DATA_FAILED;
+    InitCallBaseEvent();
+    CallIncomingFilterManagerPtr_ = (std::make_unique<CallIncomingFilterManager>()).release();
     return TELEPHONY_SUCCESS;
+}
+
+void CallStatusManager::InitCallBaseEvent()
+{
+    mEventIdTransferMap_[RequestResultEventId::RESULT_DIAL_NO_CARRIER] = CallAbilityEventId::EVENT_DIAL_NO_CARRIER;
 }
 
 int32_t CallStatusManager::UnInit()
 {
-    callsReportInfo_.callVec.clear();
+    callDetailsInfo_.callVec.clear();
     mEventIdTransferMap_.clear();
     return TELEPHONY_SUCCESS;
 }
 
-int32_t CallStatusManager::HandleCallReportInfo(const CallReportInfo &info)
+int32_t CallStatusManager::HandleCallReportInfo(const CallDetailInfo &info)
 {
     int32_t ret = TELEPHONY_ERR_FAIL;
     callReportInfo_ = info;
@@ -123,14 +97,15 @@ int32_t CallStatusManager::HandleCallReportInfo(const CallReportInfo &info)
     return ret;
 }
 
-int32_t CallStatusManager::HandleCallsReportInfo(const CallsReportInfo &info)
+// handle call state changes, incoming call, outgoing call.
+int32_t CallStatusManager::HandleCallsReportInfo(const CallDetailsInfo &info)
 {
     bool flag = false;
     TELEPHONY_LOGI("call list size:%{public}zu,slotId:%{public}d", info.callVec.size(), info.slotId);
     for (auto &it : info.callVec) {
-        for (auto &it1 : callsReportInfo_.callVec) {
-            if (strcmp(it.accountNum, it1.accountNum) == 0) {
-                TELEPHONY_LOGI("state:%{public}d", it.state);
+        for (auto &it1 : callDetailsInfo_.callVec) {
+            if (strcmp(it.phoneNum, it1.phoneNum) == 0) {
+                // call state changes
                 if (it.state != it1.state) {
                     TELEPHONY_LOGI("handle updated call state:%{public}d", it.state);
                     HandleCallReportInfo(it);
@@ -139,16 +114,17 @@ int32_t CallStatusManager::HandleCallsReportInfo(const CallsReportInfo &info)
                 break;
             }
         }
-        if (!flag || callsReportInfo_.callVec.empty()) {
+        // incoming/outgoing call handle
+        if (!flag || callDetailsInfo_.callVec.empty()) {
             TELEPHONY_LOGI("handle new call state:%{public}d", it.state);
             HandleCallReportInfo(it);
         }
         flag = false;
     }
-
-    for (auto &it2 : callsReportInfo_.callVec) {
+    // disconnected calls handle
+    for (auto &it2 : callDetailsInfo_.callVec) {
         for (auto &it3 : info.callVec) {
-            if (strcmp(it2.accountNum, it3.accountNum) == 0) {
+            if (strcmp(it2.phoneNum, it3.phoneNum) == 0) {
                 TELEPHONY_LOGI("state:%{public}d", it2.state);
                 flag = true;
                 break;
@@ -160,8 +136,8 @@ int32_t CallStatusManager::HandleCallsReportInfo(const CallsReportInfo &info)
         }
         flag = false;
     }
-    callsReportInfo_.callVec.clear();
-    callsReportInfo_ = info;
+    callDetailsInfo_.callVec.clear();
+    callDetailsInfo_ = info;
     return TELEPHONY_SUCCESS;
 }
 
@@ -169,38 +145,52 @@ int32_t CallStatusManager::HandleDisconnectedCause(int32_t cause)
 {
     bool ret = DelayedSingleton<CallControlManager>::GetInstance()->NotifyCallDestroyed(cause);
     if (!ret) {
-        TELEPHONY_LOGE("NotifyCallDestroyed failed!");
-        return TELEPHONY_ERR_FAIL;
+        TELEPHONY_LOGI("NotifyCallDestroyed failed!");
+        return CALL_ERR_PHONE_CALLSTATE_NOTIFY_FAILED;
     }
     return TELEPHONY_SUCCESS;
 }
 
 int32_t CallStatusManager::HandleEventResultReportInfo(const CellularCallEventInfo &info)
 {
-    if (info.eventType != EVENT_REQUEST_RESULT_TYPE) {
-        return TELEPHONY_ERR_FAIL;
+    if (info.eventType != CellularCallEventType::EVENT_REQUEST_RESULT_TYPE) {
+        TELEPHONY_LOGE("unexpected type event occurs, eventId:%{public}d", info.eventId);
+        return CALL_ERR_PHONE_TYPE_UNEXPECTED;
     }
     TELEPHONY_LOGI("recv one Event, eventId:%{public}d", info.eventId);
     CallEventInfo eventInfo;
-    eventInfo.eventId = CallAbilityEventId::EVENT_UNKNOW_ID;
+    (void)memset_s(&eventInfo, sizeof(CallEventInfo), 0, sizeof(CallEventInfo));
     if (mEventIdTransferMap_.find(info.eventId) != mEventIdTransferMap_.end()) {
         eventInfo.eventId = mEventIdTransferMap_[info.eventId];
-    } else {
-        TELEPHONY_LOGE("unkown type Event, eventid %{public}d", info.eventId);
-    }
-    if (eventInfo.eventId != CallAbilityEventId::EVENT_UNKNOW_ID) {
+        DialParaInfo dialInfo;
+        if (eventInfo.eventId == CallAbilityEventId::EVENT_DIAL_NO_CARRIER) {
+            DelayedSingleton<CallControlManager>::GetInstance()->GetDialParaInfo(dialInfo);
+            if (memcpy_s(eventInfo.phoneNum, kMaxNumberLen, dialInfo.number.c_str(), dialInfo.number.length()) !=
+                0) {
+                TELEPHONY_LOGE("memcpy_s failed!");
+                return TELEPHONY_ERR_MEMCPY_FAIL;
+            }
+        }
         DelayedSingleton<CallControlManager>::GetInstance()->NotifyCallEventUpdated(eventInfo);
+    } else {
+        TELEPHONY_LOGW("unkown type Event, eventid %{public}d", info.eventId);
     }
     return TELEPHONY_SUCCESS;
 }
 
-int32_t CallStatusManager::IncomingHandle(const CallReportInfo &info)
+int32_t CallStatusManager::IncomingHandle(const CallDetailInfo &info)
 {
-    TELEPHONY_LOGI("handle incoming state");
     int32_t ret = IncomingHandlePolicy(info);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("IncomingHandlePolicy failed!");
         return ret;
+    }
+    if (info.callType == CallType::TYPE_CS || info.callType == CallType::TYPE_IMS) {
+        ret = IncomingFilterPolicy(info);
+        if (ret != TELEPHONY_SUCCESS) {
+            TELEPHONY_LOGE("IncomingFilterPolicy failed!");
+            return ret;
+        }
     }
     sptr<CallBase> call = CreateNewCall(info, CallDirection::CALL_DIRECTION_IN);
     if (call == nullptr) {
@@ -226,7 +216,46 @@ int32_t CallStatusManager::IncomingHandle(const CallReportInfo &info)
     return ret;
 }
 
-int32_t CallStatusManager::DialingHandle(const CallReportInfo &info)
+int32_t CallStatusManager::IncomingFilterPolicy(const CallDetailInfo &info)
+{
+    if (CallIncomingFilterManagerPtr_ == nullptr) {
+        TELEPHONY_LOGE("CallIncomingFilterManagerPtr_ is null");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    if (CallIncomingFilterManagerPtr_->IsFirstIncoming()) {
+        CallIncomingFilterManagerPtr_->UpdateIncomingFilterData();
+    }
+    return CallIncomingFilterManagerPtr_->doIncomingFilter(info);
+}
+
+void CallStatusManager::CallFilterCompleteResult(const CallDetailInfo &info)
+{
+    int32_t ret = TELEPHONY_ERR_FAIL;
+    sptr<CallBase> call = CreateNewCall(info, CallDirection::CALL_DIRECTION_IN);
+    if (call == nullptr) {
+        TELEPHONY_LOGE("CreateNewCall failed!");
+        return;
+    }
+#ifdef ABILITY_DATABASE_SUPPORT
+    // allow list filtering
+    // Get the contact data from the database
+    GetCallerInfoDate(ContactInfo);
+    SetCallerInfo(contactInfo);
+#endif
+    DelayedSingleton<CallControlManager>::GetInstance()->NotifyNewCallCreated(call);
+    ret = UpdateCallState(call, info.state);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("UpdateCallState failed!");
+        return;
+    }
+    ret = FilterResultsDispose(call);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("FilterResultsDispose failed!");
+        return;
+    }
+}
+
+int32_t CallStatusManager::DialingHandle(const CallDetailInfo &info)
 {
     TELEPHONY_LOGI("handle dialing state");
     int32_t ret = DialingHandlePolicy(info);
@@ -237,7 +266,7 @@ int32_t CallStatusManager::DialingHandle(const CallReportInfo &info)
     sptr<CallBase> call = CreateNewCall(info, CallDirection::CALL_DIRECTION_OUT);
     if (call == nullptr) {
         TELEPHONY_LOGE("CreateNewCall failed!");
-        return CALL_ERR_CALL_OBJECT_IS_NULL;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     ret = call->DialingProcess();
     if (ret != TELEPHONY_SUCCESS) {
@@ -251,21 +280,22 @@ int32_t CallStatusManager::DialingHandle(const CallReportInfo &info)
     return ret;
 }
 
-int32_t CallStatusManager::ActiveHandle(const CallReportInfo &info)
+int32_t CallStatusManager::ActiveHandle(const CallDetailInfo &info)
 {
     TELEPHONY_LOGI("handle active state");
-    std::string tmpStr(info.accountNum);
+    std::string tmpStr(info.phoneNum);
     sptr<CallBase> call = GetOneCallObject(tmpStr);
     if (call == nullptr) {
         TELEPHONY_LOGE("Call is NULL");
-        return CALL_ERR_CALL_OBJECT_IS_NULL;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    int32_t ret = call->LunchConference();
+    // call state change active, need to judge if launching a conference
+    int32_t ret = call->LaunchConference();
     if (ret == TELEPHONY_SUCCESS) {
         int32_t mainCallId = call->GetMainCallId();
         sptr<CallBase> mainCall = GetOneCallObject(mainCallId);
         if (mainCall != nullptr) {
-            mainCall->SetTelConferenceState(TEL_CONFERENCE_ACTIVE);
+            mainCall->SetTelConferenceState(TelConferenceState::TEL_CONFERENCE_ACTIVE);
         }
     }
     ret = UpdateCallState(call, TelCallState::CALL_STATUS_ACTIVE);
@@ -273,26 +303,27 @@ int32_t CallStatusManager::ActiveHandle(const CallReportInfo &info)
         TELEPHONY_LOGE("UpdateCallState failed, errCode:%{public}d", ret);
         return ret;
     }
-
 #ifdef AUDIO_SUPPORT
     ToSpeakerPhone(call);
     DelayedSingleton<AudioControlManager>::GetInstance()->SetVolumeAudible();
 #endif
+    TELEPHONY_LOGI("handle active state success");
     return ret;
 }
 
-int32_t CallStatusManager::HoldingHandle(const CallReportInfo &info)
+int32_t CallStatusManager::HoldingHandle(const CallDetailInfo &info)
 {
     TELEPHONY_LOGI("handle holding state");
-    std::string tmpStr(info.accountNum);
+    std::string tmpStr(info.phoneNum);
     sptr<CallBase> call = GetOneCallObject(tmpStr);
     if (call == nullptr) {
         TELEPHONY_LOGE("Call is NULL");
-        return CALL_ERR_CALL_OBJECT_IS_NULL;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    int32_t ret = call->ExitConference();
+    // if the call is in a conference, it will exit, otherwise just set it holding
+    int32_t ret = call->HoldConference();
     if (ret == TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGI("SubCallSeparateFromConference success");
+        TELEPHONY_LOGI("HoldConference success");
     }
     ret = UpdateCallState(call, TelCallState::CALL_STATUS_HOLDING);
     if (ret != TELEPHONY_SUCCESS) {
@@ -301,19 +332,19 @@ int32_t CallStatusManager::HoldingHandle(const CallReportInfo &info)
     return ret;
 }
 
-int32_t CallStatusManager::WaitingHandle(const CallReportInfo &info)
+int32_t CallStatusManager::WaitingHandle(const CallDetailInfo &info)
 {
     return IncomingHandle(info);
 }
 
-int32_t CallStatusManager::AlertHandle(const CallReportInfo &info)
+int32_t CallStatusManager::AlertHandle(const CallDetailInfo &info)
 {
     TELEPHONY_LOGI("handle alerting state");
-    std::string tmpStr(info.accountNum);
+    std::string tmpStr(info.phoneNum);
     sptr<CallBase> call = GetOneCallObject(tmpStr);
     if (call == nullptr) {
         TELEPHONY_LOGE("Call is NULL");
-        return CALL_ERR_CALL_OBJECT_IS_NULL;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     int32_t ret = UpdateCallState(call, TelCallState::CALL_STATUS_ALERTING);
     if (ret != TELEPHONY_SUCCESS) {
@@ -328,14 +359,14 @@ int32_t CallStatusManager::AlertHandle(const CallReportInfo &info)
     return ret;
 }
 
-int32_t CallStatusManager::DisconnectingHandle(const CallReportInfo &info)
+int32_t CallStatusManager::DisconnectingHandle(const CallDetailInfo &info)
 {
     TELEPHONY_LOGI("handle disconnecting state");
-    std::string tmpStr(info.accountNum);
+    std::string tmpStr(info.phoneNum);
     sptr<CallBase> call = GetOneCallObject(tmpStr);
     if (call == nullptr) {
         TELEPHONY_LOGE("Call is NULL");
-        return CALL_ERR_CALL_OBJECT_IS_NULL;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     int32_t ret = UpdateCallState(call, TelCallState::CALL_STATUS_DISCONNECTING);
     if (ret != TELEPHONY_SUCCESS) {
@@ -344,14 +375,14 @@ int32_t CallStatusManager::DisconnectingHandle(const CallReportInfo &info)
     return ret;
 }
 
-int32_t CallStatusManager::DisconnectedHandle(const CallReportInfo &info)
+int32_t CallStatusManager::DisconnectedHandle(const CallDetailInfo &info)
 {
     TELEPHONY_LOGI("handle disconnected state");
-    std::string tmpStr(info.accountNum);
+    std::string tmpStr(info.phoneNum);
     sptr<CallBase> call = GetOneCallObject(tmpStr);
     if (call == nullptr) {
         TELEPHONY_LOGE("Call is NULL");
-        return CALL_ERR_CALL_OBJECT_IS_NULL;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     int32_t ret = call->ExitConference();
     if (ret == TELEPHONY_SUCCESS) {
@@ -368,22 +399,24 @@ int32_t CallStatusManager::DisconnectedHandle(const CallReportInfo &info)
 
 int32_t CallStatusManager::UpdateCallState(sptr<CallBase> &call, TelCallState nextState)
 {
+    TELEPHONY_LOGI("UpdateCallState start");
     if (call == nullptr) {
         TELEPHONY_LOGE("Call is NULL");
-        return CALL_ERR_CALL_OBJECT_IS_NULL;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     TelCallState priorState = call->GetTelCallState();
     TELEPHONY_LOGI("priorState:%{public}d, nextState:%{public}d", priorState, nextState);
+    // need DTMF judge
     int32_t ret = call->SetTelCallState(nextState);
     if (ret != TELEPHONY_SUCCESS && ret != CALL_ERR_NOT_NEW_STATE) {
-        TELEPHONY_LOGE("SetTelCallState failed!");
-        return CALL_ERR_CALL_OBJECT_IS_NULL;
+        TELEPHONY_LOGE("SetTelCallState failed");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    // State radio
+    // notify state changed
     if (!DelayedSingleton<CallControlManager>::GetInstance()->NotifyCallStateUpdated(call, priorState, nextState)) {
         TELEPHONY_LOGE(
             "NotifyCallStateUpdated failed! priorState:%{public}d,nextState:%{public}d", priorState, nextState);
-        return TELEPHONY_ERR_FAIL;
+        return CALL_ERR_PHONE_CALLSTATE_NOTIFY_FAILED;
     }
     return TELEPHONY_SUCCESS;
 }
@@ -393,14 +426,14 @@ int32_t CallStatusManager::ToSpeakerPhone(sptr<CallBase> &call)
     int32_t ret = TELEPHONY_ERR_FAIL;
     if (call == nullptr) {
         TELEPHONY_LOGE("Call is NULL");
-        return CALL_ERR_CALL_OBJECT_IS_NULL;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     if (call->GetCallRunningState() == CallRunningState::CALL_RUNNING_STATE_DIALING) {
         TELEPHONY_LOGI("Call is CALL_STATUS_DIALING");
         return ret;
     }
     if (call->IsSpeakerphoneOn()) {
-        DelayedSingleton<AudioControlManager>::GetInstance()->SetAudioDevice(DEVICE_SPEAKER);
+        DelayedSingleton<AudioControlManager>::GetInstance()->SetAudioDevice(AudioDevice::DEVICE_SPEAKER);
         ret = call->SetSpeakerphoneOn(false);
     }
     return ret;
@@ -416,24 +449,13 @@ int32_t CallStatusManager::TurnOffMute(sptr<CallBase> &call)
     return TELEPHONY_SUCCESS;
 }
 
-sptr<CallBase> CallStatusManager::CreateNewCall(const CallReportInfo &info, CallDirection dir)
+sptr<CallBase> CallStatusManager::CreateNewCall(const CallDetailInfo &info, CallDirection dir)
 {
     sptr<CallBase> callPtr = nullptr;
     DialParaInfo paraInfo;
     AppExecFwk::PacMap extras;
     extras.Clear();
-    paraInfo.isEcc = false;
-    paraInfo.dialType = DialType::DIAL_CARRIER_TYPE;
-    if (dir == CallDirection::CALL_DIRECTION_OUT) {
-        DelayedSingleton<CallControlManager>::GetInstance()->GetDialParaInfo(paraInfo, extras);
-    }
-    paraInfo.number = info.accountNum;
-    paraInfo.callId = GetNewCallId();
-    paraInfo.index = info.index;
-    paraInfo.videoState = info.callMode;
-    paraInfo.accountId = info.accountId;
-    paraInfo.callType = info.callType;
-    paraInfo.callState = info.state;
+    PackParaInfo(paraInfo, info, dir, extras);
     switch (info.callType) {
         case CallType::TYPE_CS: {
             if (dir == CallDirection::CALL_DIRECTION_OUT) {
@@ -468,6 +490,24 @@ sptr<CallBase> CallStatusManager::CreateNewCall(const CallReportInfo &info, Call
     }
     AddOneCallObject(callPtr);
     return callPtr;
+}
+
+void CallStatusManager::PackParaInfo(
+    DialParaInfo &paraInfo, const CallDetailInfo &info, CallDirection dir, AppExecFwk::PacMap &extras)
+{
+    paraInfo.isEcc = false;
+    paraInfo.dialType = DialType::DIAL_CARRIER_TYPE;
+    if (dir == CallDirection::CALL_DIRECTION_OUT) {
+        DelayedSingleton<CallControlManager>::GetInstance()->GetDialParaInfo(paraInfo, extras);
+    }
+    paraInfo.number = info.phoneNum;
+    paraInfo.callId = GetNewCallId();
+    paraInfo.index = info.index;
+    paraInfo.videoState = VideoStateType::TYPE_VOICE;
+    paraInfo.accountId = info.accountId;
+    paraInfo.callType = info.callType;
+    paraInfo.callState = info.state;
+    paraInfo.bundleName = info.bundleName;
 }
 } // namespace Telephony
 } // namespace OHOS

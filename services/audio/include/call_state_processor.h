@@ -13,65 +13,39 @@
  * limitations under the License.
  */
 
-#ifndef CALL_STATE_PROCESSOR_H
-#define CALL_STATE_PROCESSOR_H
+#ifndef TELEPHONY_CALL_STATE_PROCESSOR_H
+#define TELEPHONY_CALL_STATE_PROCESSOR_H
 
-#include "audio_base.h"
-
-#include <map>
+#include <set>
+#include <string>
 
 #include "singleton.h"
-#include "audio_proxy.h"
+
+#include "call_manager_inner_type.h"
 
 namespace OHOS {
 namespace Telephony {
-enum CallStateType {
-    INACTIVE_STATE = 0,
-    ALERTING_STATE,
-    INCOMING_STATE,
-    CS_CALL_STATE,
-    IMS_CALL_STATE,
-    HOLDING_STATE,
-    UNKNOWN_STATE
-};
-/**
- * audio mode
- */
-enum AudioCallState {
-    IN_IDLE = 0,
-    IN_CALL,
-    IN_VOIP,
-    RINGTONE,
-};
+constexpr uint16_t EMPTY_VALUE = 0;
+constexpr uint16_t EXIST_ONLY_ONE_CALL = 1;
 
-/**
- * @class CallStateProcessor
- * describes the available call states of a call.
- */
 class CallStateProcessor : public std::enable_shared_from_this<CallStateProcessor> {
     DECLARE_DELAYED_SINGLETON(CallStateProcessor)
 public:
-    int32_t Init();
-    bool ProcessEvent(AudioEvent event);
+    void AddCall(const std::string &phoneNum, TelCallState state);
+    void DeleteCall(const std::string &phoneNum, TelCallState state);
+    int32_t GetCallNumber(TelCallState state);
+    bool UpdateCurrentCallState();
+    bool ShouldSwitchActive() const;
+    bool ShouldSwitchAlerting() const;
+    bool ShouldSwitchIncoming() const;
+    std::string GetCurrentActiveCall() const;
 
 private:
-    std::mutex mutex_;
-    bool SwitchState(AudioEvent event);
-    bool SwitchState(CallStateType state);
-    bool SwitchCS();
-    bool SwitchIMS();
-    bool SwitchOTT();
-    bool SwitchAlerting();
-    bool SwitchIncoming();
-    bool SwitchHolding();
-    bool SwitchInactive();
-    bool ActivateAudioInterrupt();
-    bool DeactivateAudioInterrupt();
-    AudioCallState currentAudioMode_; // audio mode
-    std::unique_ptr<AudioBase> currentCallState_;
-    using CallStateProcessorFunc = bool (CallStateProcessor::*)();
-    std::map<uint32_t, CallStateProcessorFunc> memberFuncMap_;
+    std::set<std::string> activeCalls_;
+    std::set<std::string> holdingCalls_;
+    std::set<std::string> alertingCalls_;
+    std::set<std::string> incomingCalls_;
 };
 } // namespace Telephony
 } // namespace OHOS
-#endif // CALL_STATE_PROCESSOR_H
+#endif // TELEPHONY_CALL_STATE_PROCESSOR_H

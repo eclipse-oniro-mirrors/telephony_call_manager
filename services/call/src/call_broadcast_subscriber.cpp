@@ -22,7 +22,6 @@
 
 namespace OHOS {
 namespace Telephony {
-using namespace OHOS::EventFwk;
 CallBroadcastSubscriber::CallBroadcastSubscriber(const OHOS::EventFwk::CommonEventSubscribeInfo &subscriberInfo)
     : CommonEventSubscriber(subscriberInfo)
 {
@@ -30,7 +29,7 @@ CallBroadcastSubscriber::CallBroadcastSubscriber(const OHOS::EventFwk::CommonEve
     memberFuncMap_[SIM_STATE_BROADCAST_EVENT] = &CallBroadcastSubscriber::SimStateBroadcast;
 }
 
-void CallBroadcastSubscriber::OnReceiveEvent(const CommonEventData &data)
+void CallBroadcastSubscriber::OnReceiveEvent(const EventFwk::CommonEventData &data)
 {
     uint32_t code = UNKNOWN_BROADCAST_EVENT;
     OHOS::EventFwk::Want want = data.GetWant();
@@ -50,12 +49,12 @@ void CallBroadcastSubscriber::OnReceiveEvent(const CommonEventData &data)
     }
 }
 
-void CallBroadcastSubscriber::UnknownBroadcast(const CommonEventData &data)
+void CallBroadcastSubscriber::UnknownBroadcast(const EventFwk::CommonEventData &data)
 {
     TELEPHONY_LOGI("you receive one unknown broadcast!");
 }
 
-void CallBroadcastSubscriber::SimStateBroadcast(const CommonEventData &data)
+void CallBroadcastSubscriber::SimStateBroadcast(const EventFwk::CommonEventData &data)
 {
     TELEPHONY_LOGI("sim state broadcast code:%{public}d", data.GetCode());
 }

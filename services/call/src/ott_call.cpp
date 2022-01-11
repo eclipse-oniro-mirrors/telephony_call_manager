@@ -18,47 +18,111 @@
 #include "call_manager_errors.h"
 #include "telephony_log_wrapper.h"
 
+#include "ott_call_connection.h"
+
 namespace OHOS {
 namespace Telephony {
-OTTCall::OTTCall(DialParaInfo &info) : CallBase(info) {}
+OTTCall::OTTCall(DialParaInfo &info) : CallBase(info), ottCallConnectionPtr_(std::make_unique<OTTCallConnection>())
+{}
 
-OTTCall::OTTCall(DialParaInfo &info, AppExecFwk::PacMap &extras) : CallBase(info, extras) {}
+OTTCall::OTTCall(DialParaInfo &info, AppExecFwk::PacMap &extras)
+    : CallBase(info, extras), ottCallConnectionPtr_(std::make_unique<OTTCallConnection>())
+{}
 
 OTTCall::~OTTCall() {}
 
 int32_t OTTCall::DialingProcess()
 {
-    return CALL_ERR_FUNCTION_NOT_SUPPORTED;
+    int32_t ret = DialCallBase();
+    if (ret != TELEPHONY_SUCCESS) {
+        HangUpCall();
+    }
+    return ret;
 }
 
 int32_t OTTCall::AnswerCall(int32_t videoState)
 {
-    return CALL_ERR_FUNCTION_NOT_SUPPORTED;
+    int32_t ret = AnswerCallBase();
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("answer call failed!");
+        return CALL_ERR_ANSWER_FAILED;
+    }
+    OttCallRequestInfo requestInfo;
+    PackOttCallRequestInfo(requestInfo);
+    if (ottCallConnectionPtr_ == nullptr) {
+        TELEPHONY_LOGE("ottCallConnectionPtr_ is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    ret = ottCallConnectionPtr_->Answer(requestInfo);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("answer call failed!");
+        return CALL_ERR_ANSWER_FAILED;
+    }
+    return TELEPHONY_SUCCESS;
 }
 
-int32_t OTTCall::RejectCall(bool isSendSms, std::string &content)
+int32_t OTTCall::RejectCall()
 {
-    return CALL_ERR_FUNCTION_NOT_SUPPORTED;
+    int32_t ret = RejectCallBase();
+    if (ret != TELEPHONY_SUCCESS) {
+        return ret;
+    }
+    OttCallRequestInfo requestInfo;
+    PackOttCallRequestInfo(requestInfo);
+    ret = ottCallConnectionPtr_->Reject(requestInfo);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("reject call failed!");
+        return CALL_ERR_REJECT_FAILED;
+    }
+    return TELEPHONY_SUCCESS;
 }
 
 int32_t OTTCall::HangUpCall()
 {
-    return CALL_ERR_FUNCTION_NOT_SUPPORTED;
+    OttCallRequestInfo requestInfo;
+    PackOttCallRequestInfo(requestInfo);
+    int32_t ret = ottCallConnectionPtr_->HangUp(requestInfo);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("hangUp call failed!");
+        return CALL_ERR_HANGUP_FAILED;
+    }
+    return TELEPHONY_SUCCESS;
 }
 
 int32_t OTTCall::HoldCall()
 {
-    return CALL_ERR_ILLEGAL_CALL_OPERATION;
+    OttCallRequestInfo requestInfo;
+    PackOttCallRequestInfo(requestInfo);
+    int32_t ret = ottCallConnectionPtr_->HoldCall(requestInfo);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("holdCall call failed!");
+        return CALL_ERR_HOLD_FAILED;
+    }
+    return TELEPHONY_SUCCESS;
 }
 
 int32_t OTTCall::UnHoldCall()
 {
-    return CALL_ERR_ILLEGAL_CALL_OPERATION;
+    OttCallRequestInfo requestInfo;
+    PackOttCallRequestInfo(requestInfo);
+    int32_t ret = ottCallConnectionPtr_->UnHoldCall(requestInfo);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("unHoldCall call failed!");
+        return CALL_ERR_UNHOLD_FAILED;
+    }
+    return TELEPHONY_SUCCESS;
 }
 
 int32_t OTTCall::SwitchCall()
 {
-    return CALL_ERR_ILLEGAL_CALL_OPERATION;
+    OttCallRequestInfo requestInfo;
+    PackOttCallRequestInfo(requestInfo);
+    int32_t ret = ottCallConnectionPtr_->SwitchCall(requestInfo);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("switchCall call failed!");
+        return CALL_ERR_UNHOLD_FAILED;
+    }
+    return TELEPHONY_SUCCESS;
 }
 
 void OTTCall::GetCallAttributeInfo(CallAttributeInfo &info)
@@ -73,22 +137,12 @@ bool OTTCall::GetEmergencyState()
 
 int32_t OTTCall::StartDtmf(char str)
 {
-    return CALL_ERR_ILLEGAL_CALL_OPERATION;
+    return CALL_ERR_FUNCTION_NOT_SUPPORTED;
 }
 
 int32_t OTTCall::StopDtmf()
 {
-    return CALL_ERR_ILLEGAL_CALL_OPERATION;
-}
-
-int32_t OTTCall::SendDtmf(std::string &phoneNum, char str)
-{
-    return CALL_ERR_ILLEGAL_CALL_OPERATION;
-}
-
-int32_t OTTCall::SendBurstDtmf(std::string &phoneNum, std::string str, int32_t on, int32_t off)
-{
-    return CALL_ERR_ILLEGAL_CALL_OPERATION;
+    return CALL_ERR_FUNCTION_NOT_SUPPORTED;
 }
 
 int32_t OTTCall::GetSlotId()
@@ -101,12 +155,11 @@ int32_t OTTCall::CombineConference()
     return CALL_ERR_FUNCTION_NOT_SUPPORTED;
 }
 
-int32_t OTTCall::SeparateConference()
+int32_t OTTCall::CanCombineConference()
 {
     return CALL_ERR_FUNCTION_NOT_SUPPORTED;
 }
-
-int32_t OTTCall::CanCombineConference()
+int32_t OTTCall::SeparateConference()
 {
     return CALL_ERR_FUNCTION_NOT_SUPPORTED;
 }
@@ -116,12 +169,17 @@ int32_t OTTCall::CanSeparateConference()
     return CALL_ERR_FUNCTION_NOT_SUPPORTED;
 }
 
-int32_t OTTCall::LunchConference()
+int32_t OTTCall::LaunchConference()
 {
     return CALL_ERR_FUNCTION_NOT_SUPPORTED;
 }
 
 int32_t OTTCall::ExitConference()
+{
+    return CALL_ERR_FUNCTION_NOT_SUPPORTED;
+}
+
+int32_t OTTCall::HoldConference()
 {
     return CALL_ERR_FUNCTION_NOT_SUPPORTED;
 }
@@ -145,7 +203,34 @@ std::vector<std::u16string> OTTCall::GetCallIdListForConference()
 
 int32_t OTTCall::IsSupportConferenceable()
 {
-    return TELEPHONY_SUCCESS;
+    return CALL_ERR_FUNCTION_NOT_SUPPORTED;
+}
+
+int32_t OTTCall::SendUpdateCallMediaModeRequest(CallMediaMode mode)
+{
+    return CALL_ERR_FUNCTION_NOT_SUPPORTED;
+}
+
+int32_t OTTCall::RecieveUpdateCallMediaModeRequest(CallMediaMode mode)
+{
+    return CALL_ERR_FUNCTION_NOT_SUPPORTED;
+}
+
+int32_t OTTCall::SendUpdateCallMediaModeResponse(CallMediaMode mode)
+{
+    return CALL_ERR_FUNCTION_NOT_SUPPORTED;
+}
+
+int32_t OTTCall::ReceiveUpdateCallMediaModeResponse(CallMediaModeResponse &response)
+{
+    return CALL_ERR_FUNCTION_NOT_SUPPORTED;
+}
+
+void OTTCall::PackOttCallRequestInfo(OttCallRequestInfo &requestInfo)
+{
+    (void)memcpy_s(requestInfo.phoneNum, kMaxNumberLen, accountNumber_.c_str(), accountNumber_.length());
+    (void)memcpy_s(requestInfo.bundleName, kMaxBundleNameLen, bundleName_.c_str(), bundleName_.length());
+    requestInfo.videoState = videoState_;
 }
 } // namespace Telephony
 } // namespace OHOS

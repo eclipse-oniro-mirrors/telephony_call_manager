@@ -27,7 +27,7 @@ public:
     void UpdateMuteIcon(bool isDisplayMute);
     void UpdateSpeakerphoneIcon(bool isDisplay);
     void NewCallCreated(sptr<CallBase> &callObjectPtr) override;
-    void CallDestroyed(sptr<CallBase> &callObjectPtr) override;
+    void CallDestroyed(int32_t cause) override;
     void CallStateUpdated(sptr<CallBase> &callObjectPtr, TelCallState priorState, TelCallState nextState) override;
     void IncomingCallHungUp(sptr<CallBase> &callObjectPtr, bool isSendSms, std::string content) override;
     void IncomingCallActivated(sptr<CallBase> &callObjectPtr) override;

@@ -20,8 +20,8 @@
 
 namespace OHOS {
 namespace Telephony {
-constexpr int32_t DEFAULT_COUNTRY_CODE = 0;
-constexpr int32_t DEFAULT_TIME = 0;
+constexpr int16_t DEFAULT_COUNTRY_CODE = 0;
+constexpr int16_t DEFAULT_TIME = 0;
 CallRecordsManager::CallRecordsManager() : callRecordsHandlerServerPtr_(nullptr) {}
 
 CallRecordsManager::~CallRecordsManager() {}
@@ -40,7 +40,7 @@ void CallRecordsManager::CallStateUpdated(
     sptr<CallBase> &callObjectPtr, TelCallState priorState, TelCallState nextState)
 {
     CallAttributeInfo info;
-    if (nextState != CALL_STATUS_DISCONNECTED) {
+    if (nextState != TelCallState::CALL_STATUS_DISCONNECTED) {
         TELEPHONY_LOGE("nextState not CALL_STATUS_DISCONNECTED");
         return;
     }
