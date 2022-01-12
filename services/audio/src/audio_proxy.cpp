@@ -27,7 +27,7 @@ bool AudioProxy::isVoiceCallActivated_ = false;
 std::shared_ptr<AudioStandard::AudioManagerCallback> AudioProxy::audioManagerCallback_ = nullptr;
 
 AudioProxy::AudioProxy()
-    : context_(nullptr), audioSoundManager_(std::make_unique<AudioStandard::AudioSoundManager>()),
+    : context_(nullptr), audioSoundManager_(std::make_unique<AudioStandard::RingtoneSoundManager>()),
       deviceCallback_(std::make_shared<AudioDeviceChangeCallback>())
 {
     ringtoneAudioInterrupt_.streamUsage = AudioStandard::StreamUsage::STREAM_USAGE_NOTIFICATION_RINGTONE;
