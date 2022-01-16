@@ -129,8 +129,9 @@ ohos_shared_library("tel_call_manager") {
     "//drivers/peripheral/camera/interfaces/include/callback/operator",
     "//drivers/peripheral/camera/interfaces/include/callback/host",
     "//foundation/aafwk/standard/interfaces/innerkits/dataobs_manager/include",
-    "//foundation/multimedia/audio_standard/frameworks/innerkitsimpl/audiosoundmanager/include",
-    "//foundation/multimedia/audio_standard/interfaces/innerkits/native/audiosoundmanager/include",
+    "//foundation/multimedia/audio_standard/interfaces/innerkits/native/audioringtone/include",
+    "//foundation/multimedia/audio_standard/services/include/client",
+    "//foundation/multimedia/media_standard/interfaces/innerkits/native/media/include",
   ]
 
   deps = [
@@ -161,7 +162,7 @@ ohos_shared_library("tel_call_manager") {
     "ipc:ipc_core",
     "multimedia_audio_standard:audio_client",
     "multimedia_audio_standard:audio_renderer",
-    "multimedia_audio_standard:audio_sound_manager",
+    "multimedia_audio_standard:audio_ringtone_client",
     "native_appdatamgr:native_appdatafwk",
     "native_appdatamgr:native_dataability",
     "native_appdatamgr:native_rdb",
