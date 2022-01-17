@@ -1,0 +1,81 @@
+{
+    "name": "@ohos/call_manager",
+    "version": "3.1.0",
+    "description": "telephony call manager service",
+    "publishAs": "code-segment",
+    "homePage": "https://gitee.com/openharmony",
+    "repository": "https://gitee.com/openharmony/telephony_call_manager",
+    "license": "Apache License 2.0",
+    "language": "",
+    "private": false,
+    "scripts": {},
+    "envs": [],
+    "dirs": [],
+    "author": {},
+    "contributors": [],
+    "segment": {
+        "destPath": "//base/telephony/call_manager"
+    },
+    "component": {
+        "name": "call_manager",
+        "subsystem": "telephony",
+        "syscap": [
+            "SystemCapability.Telephony.CallManager"
+        ],
+        "features": [],
+        "adapted_system_type": [
+            "standard"
+        ],
+        "rom": "",
+        "ram": "",
+        "deps": {
+            "components": [
+                "ability_runtime",
+                "appexecfwk_standard",
+                "camera_device_driver",
+                "ces_standard",
+                "core_service",
+                "device_driver_framework",
+                "display_device_driver",
+                "display_manager_native",
+                "dmsfwk_standard",
+                "ipc",
+                "multimedia_audio_standard",
+                "native_appdatamgr",
+                "power_manager_native",
+                "safwk",
+                "samgr_standard",
+                "sms_mms",
+                "state_registry",
+                "utils_base"
+            ],
+            "third_party": [
+                "libphonenumber",
+                "protobuf"
+            ]
+        },
+        "build": {
+            "sub_component": [
+                "//base/telephony/call_manager:tel_call_manager",
+                "//base/telephony/call_manager/sa_profile:call_manager_sa_profile",
+                "//base/telephony/call_manager/frameworks/js:call",
+                "//base/telephony/call_manager/frameworks/native:tel_call_manager_api"
+            ],
+            "inner_kits": [
+                {
+                    "header": {
+                        "header_base" : "//base/telephony/call_manager/interfaces/innerkits/",
+                        "header_files": [
+                            "call_manager_client.h",
+                            "call_manager_callback.h"
+                        ]
+                    },
+                    "name":"//base/telephony/call_manager/frameworks/native:tel_call_manager_api"
+                }
+            ],
+            "test": [
+                "//base/telephony/call_manager/test/unittest:unittest"
+            ]
+        }
+    }
+}
