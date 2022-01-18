@@ -56,7 +56,7 @@ ohos_executable("tel_call_manager_ui_test") {
   ]
 
   external_deps = [
-    "aafwk_standard:want",
+    "ability_runtime:want",
     "appexecfwk_standard:libeventhandler",
     "call_manager:tel_call_manager_api",
     "ces_standard:cesfwk_innerkits",
