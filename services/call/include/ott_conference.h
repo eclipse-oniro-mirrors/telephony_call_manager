@@ -13,23 +13,27 @@
  * limitations under the License.
  */
 
-#ifndef ENABLE_SPEAKER_DEVICE_H
-#define ENABLE_SPEAKER_DEVICE_H
+#ifndef OTT_CONFERENCE_H
+#define OTT_CONFERENCE_H
 
-#include "audio_base.h"
-#include <mutex>
+#include "singleton.h"
+#include "conference_base.h"
 
 namespace OHOS {
 namespace Telephony {
-class EnableSpeakerDevice : public AudioBase {
+class OttConference : public ConferenceBase {
+    DECLARE_DELAYED_SINGLETON(OttConference)
 public:
-    EnableSpeakerDevice() = default;
-    ~EnableSpeakerDevice() = default;
-    bool ProcessEvent(int32_t event) override;
+    int32_t JoinToConference(int32_t callId) override;
+    int32_t LeaveFromConference(int32_t callId) override;
+    int32_t HoldConference(int32_t callId) override;
+    int32_t CanCombineConference() override;
+    int32_t CanSeparateConference() override;
 
 private:
-    std::mutex mutex_;
+    uint32_t maxSubCallLimits_;
 };
 } // namespace Telephony
 } // namespace OHOS
-#endif // !ENABLE_SPEAKER_DEVICE_H
+
+#endif

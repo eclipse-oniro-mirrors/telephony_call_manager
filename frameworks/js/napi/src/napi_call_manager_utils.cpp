@@ -107,36 +107,6 @@ bool NapiCallManagerUtils::GetBoolProperty(napi_env env, napi_value object, cons
     return boolValue;
 }
 
-std::u16string NapiCallManagerUtils::GetBundleName(napi_env env)
-{
-    // get global value
-    napi_value global = nullptr;
-    std::string bundleName = "";
-    napi_status status = napi_get_global(env, &global);
-    if (status != napi_ok || global == nullptr) {
-        TELEPHONY_LOGE("can't get global instance for %{public}d", status);
-        return u"";
-    }
-    // get ability
-    napi_value abilityObj = nullptr;
-    status = napi_get_named_property(env, global, "ability", &abilityObj);
-    if (status != napi_ok || abilityObj == nullptr) {
-        TELEPHONY_LOGE("can't get ability obj for %{public}d", status);
-        return u"";
-    }
-    // get ability pointer
-    OHOS::AppExecFwk::Ability *ability = nullptr;
-    status = napi_get_value_external(env, abilityObj, (void **)&ability);
-    if (status != napi_ok || ability == nullptr) {
-        TELEPHONY_LOGE("get ability from property failed for %{public}d", status);
-        return u"";
-    }
-    // get bundle path
-    bundleName = ability->GetBundleName();
-    TELEPHONY_LOGI("getBundleName = %{public}s", bundleName.c_str());
-    return Str8ToStr16(bundleName);
-}
-
 void NapiCallManagerUtils::SetPropertyInt32(napi_env env, napi_value object, std::string name, int32_t value)
 {
     napi_value peopertyValue = nullptr;

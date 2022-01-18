@@ -53,7 +53,8 @@ void CallStateReportProxy::CallStateUpdated(
 int32_t CallStateReportProxy::ReportCallState(int32_t slotId, int32_t callState, std::u16string phoneNumber)
 {
     int32_t ret = TELEPHONY_ERR_FAIL;
-    ret = TelephonyStateRegistryClient::GetInstance().UpdateCallState(slotId, callState, phoneNumber);
+    ret = DelayedRefSingleton<TelephonyStateRegistryClient>::GetInstance().UpdateCallState(
+        slotId, callState, phoneNumber);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("notifyCallStateUpdated failed, errcode:%{public}d", ret);
         return ret;
@@ -66,7 +67,7 @@ int32_t CallStateReportProxy::ReportCallStateForCallId(
     int32_t slotId, int32_t callId, int32_t callState, std::u16string incomingNumber)
 {
     int32_t ret = TELEPHONY_ERR_FAIL;
-    ret = TelephonyStateRegistryClient::GetInstance().UpdateCallStateForSlotId(
+    ret = DelayedRefSingleton<TelephonyStateRegistryClient>::GetInstance().UpdateCallStateForSlotId(
         slotId, callId, callState, incomingNumber);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("NotifyCallStateUpdated failed, errcode:%{public}d", ret);

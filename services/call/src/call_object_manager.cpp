@@ -287,8 +287,8 @@ TelCallState CallObjectManager::GetCallState(int32_t callId)
 sptr<CallBase> CallObjectManager::GetOneCallObject(CallRunningState callState)
 {
     std::lock_guard<std::mutex> lock(listMutex_);
-    std::list<sptr<CallBase>>::iterator it;
-    for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); it++) {
+    std::list<sptr<CallBase>>::reverse_iterator it;
+    for (it = callObjectPtrList_.rbegin(); it != callObjectPtrList_.rend(); it++) {
         if ((*it)->GetCallRunningState() == callState) {
             return (*it);
         }

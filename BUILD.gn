@@ -11,6 +11,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//base/telephony/core_service/telephony.gni")
 import("//build/ohos.gni")
 
 ohos_shared_library("tel_call_manager") {
@@ -23,17 +24,17 @@ ohos_shared_library("tel_call_manager") {
     "services/audio/src/audio_proxy.cpp",
     "services/audio/src/audio_scene_processor.cpp",
     "services/audio/src/audio_state/alerting_state.cpp",
+    "services/audio/src/audio_state/bluetooth_device_state.cpp",
     "services/audio/src/audio_state/cs_call_state.cpp",
-    "services/audio/src/audio_state/devices_inactive.cpp",
-    "services/audio/src/audio_state/enable_bluetooth_device.cpp",
-    "services/audio/src/audio_state/enable_earpiece_device.cpp",
-    "services/audio/src/audio_state/enable_speaker_device.cpp",
-    "services/audio/src/audio_state/enable_wired_headset_device.cpp",
+    "services/audio/src/audio_state/earpiece_device_state.cpp",
     "services/audio/src/audio_state/holding_state.cpp",
     "services/audio/src/audio_state/ims_call_state.cpp",
+    "services/audio/src/audio_state/inactive_device_state.cpp",
     "services/audio/src/audio_state/inactive_state.cpp",
     "services/audio/src/audio_state/incoming_state.cpp",
     "services/audio/src/audio_state/ott_call_state.cpp",
+    "services/audio/src/audio_state/speaker_device_state.cpp",
+    "services/audio/src/audio_state/wired_headset_device_state.cpp",
     "services/audio/src/call_state_processor.cpp",
     "services/audio/src/ring.cpp",
     "services/audio/src/tone.cpp",
@@ -66,12 +67,14 @@ ohos_shared_library("tel_call_manager") {
     "services/call/src/carrier_call.cpp",
     "services/call/src/conference_base.cpp",
     "services/call/src/cs_call.cpp",
-    "services/call/src/cs_conference_base.cpp",
+    "services/call/src/cs_conference.cpp",
     "services/call/src/ims_call.cpp",
-    "services/call/src/ims_conference_base.cpp",
+    "services/call/src/ims_conference.cpp",
     "services/call/src/net_call_base.cpp",
     "services/call/src/ott_call.cpp",
     "services/call/src/ott_call_connection.cpp",
+    "services/call/src/ott_conference.cpp",
+    "services/call/src/video_call_state.cpp",
     "services/call_manager_service/src/call_manager_dump_helper.cpp",
     "services/call_manager_service/src/call_manager_service.cpp",
     "services/call_manager_service/src/call_manager_service_stub.cpp",
@@ -95,7 +98,6 @@ ohos_shared_library("tel_call_manager") {
     "//third_party/protobuf/src",
     "//third_party/protobuf/src/google/protobuf",
     "//base/telephony/cellular_call/interfaces",
-    "//base/telephony/core_service/utils/common/include",
     "//base/telephony/call_manager/interfaces/innerkits",
     "//base/telephony/cellular_call/services/common/include",
     "//base/telephony/sms_mms/interfaces/innerkits/",
@@ -138,8 +140,7 @@ ohos_shared_library("tel_call_manager") {
     "//base/notification/ans_standard/frameworks/ans/core:ans_core",
     "//base/notification/ans_standard/frameworks/ans/native:ans_innerkits",
     "//base/notification/ans_standard/services/ans:libans",
-    "//base/telephony/core_service:tel_core_service",
-    "//base/telephony/core_service/utils:libtelephony_common",
+    "//base/telephony/core_service/utils:libtel_common",
     "//base/telephony/sms_mms/frameworks/native:tel_sms_mms_api",
     "//foundation/aafwk/standard/frameworks/kits/ability/native:abilitykit_native",
     "//foundation/aafwk/standard/interfaces/innerkits/ability_manager:ability_manager",
@@ -183,7 +184,7 @@ ohos_shared_library("tel_call_manager") {
 
   ldflags = [ "-flto" ]
 
-  defines = [
+  defines += [
     "TELEPHONY_LOG_TAG = \"CallManager\"",
     "LOG_DOMAIN = 0xD002B01",
   ]

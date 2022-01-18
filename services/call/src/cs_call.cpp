@@ -48,18 +48,18 @@ int32_t CSCall::HangUpCall()
 
 int32_t CSCall::HoldCall()
 {
-    ConferenceState conferenceState = DelayedSingleton<CsConferenceBase>::GetInstance()->GetConferenceState();
+    ConferenceState conferenceState = DelayedSingleton<CsConference>::GetInstance()->GetConferenceState();
     if (conferenceState == CONFERENCE_STATE_ACTIVE) {
-        DelayedSingleton<CsConferenceBase>::GetInstance()->SetConferenceState(CONFERENCE_STATE_HOLDING);
+        DelayedSingleton<CsConference>::GetInstance()->SetConferenceState(CONFERENCE_STATE_HOLDING);
     }
     return CarrierHoldCall();
 }
 
 int32_t CSCall::UnHoldCall()
 {
-    ConferenceState conferenceState = DelayedSingleton<CsConferenceBase>::GetInstance()->GetConferenceState();
+    ConferenceState conferenceState = DelayedSingleton<CsConference>::GetInstance()->GetConferenceState();
     if (conferenceState == CONFERENCE_STATE_HOLDING) {
-        DelayedSingleton<CsConferenceBase>::GetInstance()->SetConferenceState(CONFERENCE_STATE_ACTIVE);
+        DelayedSingleton<CsConference>::GetInstance()->SetConferenceState(CONFERENCE_STATE_ACTIVE);
     }
     return CarrierUnHoldCall();
 }
@@ -76,7 +76,7 @@ void CSCall::GetCallAttributeInfo(CallAttributeInfo &info)
 
 int32_t CSCall::CombineConference()
 {
-    int32_t ret = DelayedSingleton<CsConferenceBase>::GetInstance()->SetMainCall(GetCallID());
+    int32_t ret = DelayedSingleton<CsConference>::GetInstance()->SetMainCall(GetCallID());
     if (ret != TELEPHONY_SUCCESS) {
         return ret;
     }
@@ -95,17 +95,17 @@ int32_t CSCall::CanCombineConference()
         TELEPHONY_LOGE("call unsupport conference,  error%{public}d", ret);
         return ret;
     }
-    return DelayedSingleton<CsConferenceBase>::GetInstance()->CanCombineConference();
+    return DelayedSingleton<CsConference>::GetInstance()->CanCombineConference();
 }
 
 int32_t CSCall::CanSeparateConference()
 {
-    return DelayedSingleton<CsConferenceBase>::GetInstance()->CanSeparateConference();
+    return DelayedSingleton<CsConference>::GetInstance()->CanSeparateConference();
 }
 
 int32_t CSCall::LaunchConference()
 {
-    int32_t ret = DelayedSingleton<CsConferenceBase>::GetInstance()->JoinToConference(GetCallID());
+    int32_t ret = DelayedSingleton<CsConference>::GetInstance()->JoinToConference(GetCallID());
     if (ret == TELEPHONY_SUCCESS) {
         SetTelConferenceState(TelConferenceState::TEL_CONFERENCE_ACTIVE);
     }
@@ -114,12 +114,12 @@ int32_t CSCall::LaunchConference()
 
 int32_t CSCall::ExitConference()
 {
-    return DelayedSingleton<CsConferenceBase>::GetInstance()->LeaveFromConference(GetCallID());
+    return DelayedSingleton<CsConference>::GetInstance()->LeaveFromConference(GetCallID());
 }
 
 int32_t CSCall::HoldConference()
 {
-    int32_t ret = DelayedSingleton<CsConferenceBase>::GetInstance()->HoldConference(GetCallID());
+    int32_t ret = DelayedSingleton<CsConference>::GetInstance()->HoldConference(GetCallID());
     if (ret == TELEPHONY_SUCCESS) {
         SetTelConferenceState(TelConferenceState::TEL_CONFERENCE_HOLDING);
     }
@@ -128,17 +128,17 @@ int32_t CSCall::HoldConference()
 
 int32_t CSCall::GetMainCallId()
 {
-    return DelayedSingleton<CsConferenceBase>::GetInstance()->GetMainCall();
+    return DelayedSingleton<CsConference>::GetInstance()->GetMainCall();
 }
 
 std::vector<std::u16string> CSCall::GetSubCallIdList()
 {
-    return DelayedSingleton<CsConferenceBase>::GetInstance()->GetSubCallIdList(GetCallID());
+    return DelayedSingleton<CsConference>::GetInstance()->GetSubCallIdList(GetCallID());
 }
 
 std::vector<std::u16string> CSCall::GetCallIdListForConference()
 {
-    return DelayedSingleton<CsConferenceBase>::GetInstance()->GetCallIdListForConference(GetCallID());
+    return DelayedSingleton<CsConference>::GetInstance()->GetCallIdListForConference(GetCallID());
 }
 
 int32_t CSCall::IsSupportConferenceable()

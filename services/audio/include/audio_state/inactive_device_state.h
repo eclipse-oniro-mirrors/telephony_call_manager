@@ -13,18 +13,17 @@
  * limitations under the License.
  */
 
-#ifndef ENABLE_EARPIECE_DEVICE_H
-#define ENABLE_EARPIECE_DEVICE_H
+#ifndef TELEPHONY_INACTIVE_DEVICE_STATE_H
+#define TELEPHONY_INACTIVE_DEVICE_STATE_H
 
 #include "audio_base.h"
-#include <mutex>
 
 namespace OHOS {
 namespace Telephony {
-class EnableEarpieceDevice : public AudioBase {
+class InactiveDeviceState : public AudioBase {
 public:
-    EnableEarpieceDevice() = default;
-    ~EnableEarpieceDevice() = default;
+    InactiveDeviceState() = default;
+    ~InactiveDeviceState() = default;
     bool ProcessEvent(int32_t event) override;
 
 private:
@@ -32,4 +31,4 @@ private:
 };
 } // namespace Telephony
 } // namespace OHOS
-#endif // ENABLE_EARPIECE_DEVICE_H
+#endif // TELEPHONY_INACTIVE_DEVICE_STATE_H

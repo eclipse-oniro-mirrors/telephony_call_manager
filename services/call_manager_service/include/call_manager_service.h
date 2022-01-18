@@ -78,7 +78,7 @@ public:
      * @param bundleName[in], bundle name
      * @return Returns 0 on success, others on failure.
      */
-    int32_t RegisterCallBack(const sptr<ICallAbilityCallback> &callback, std::u16string &bundleName) override;
+    int32_t RegisterCallBack(const sptr<ICallAbilityCallback> &callback) override;
 
     /**
      * UnRegisterCallBack
@@ -87,7 +87,7 @@ public:
      * @param bundleName[in], bundle name
      * @return Returns 0 on success, others on failure.
      */
-    int32_t UnRegisterCallBack(std::u16string &bundleName) override;
+    int32_t UnRegisterCallBack() override;
 
     /**
      * DialCall
@@ -323,10 +323,9 @@ public:
      *
      * @brief Open or close camera
      * @param cameraId[in], The camera id
-     * @param callingPackage[in], Package name of the application
      * @return Returns 0 on success, others on failure.
      */
-    int32_t ControlCamera(std::u16string cameraId, std::u16string callingPackage) override;
+    int32_t ControlCamera(std::u16string cameraId) override;
 
     /**
      * SetPreviewWindow
@@ -489,41 +488,41 @@ public:
     int32_t SetImsFeatureValue(int32_t slotId, FeatureType type, int32_t value) override;
 
     /**
-     * UpdateCallMediaMode
+     * UpdateImsCallMode
      *
      * @brief Setting the Call Mode
      * @param callId[in], The call id
      * @param mode[in], Calling patterns
      * @return Returns 0 on success, others on failure.
      */
-    int32_t UpdateCallMediaMode(int32_t callId, CallMediaMode mode) override;
+    int32_t UpdateImsCallMode(int32_t callId, ImsCallMode mode) override;
 
     /**
-     * EnableVoLte
+     * EnableImsSwitch
      *
      * @brief Start VoLte
      * @param slotId[in], The slot id
      * @return Returns 0 on success, others on failure.
      */
-    int32_t EnableVoLte(int32_t slotId) override;
+    int32_t EnableImsSwitch(int32_t slotId) override;
 
     /**
-     * DisableVoLte
+     * DisableImsSwitch
      *
      * @brief Stop VoLte
      * @param slotId[in], The slot id
      * @return Returns 0 on success, others on failure.
      */
-    int32_t DisableVoLte(int32_t slotId) override;
+    int32_t DisableImsSwitch(int32_t slotId) override;
 
     /**
-     * IsVoLteEnabled
+     * IsImsSwitchEnabled
      *
      * @brief Whether to enable VoLte
      * @param slotId[in], The slot id
      * @return Returns 0 on success, others on failure.
      */
-    int32_t IsVoLteEnabled(int32_t slotId) override;
+    int32_t IsImsSwitchEnabled(int32_t slotId) override;
 
     /**
      * EnableLteEnhanceMode
@@ -580,6 +579,7 @@ public:
      * @return Returns 0 on success, others on failure.
      */
     int32_t JoinConference(int32_t callId, std::vector<std::u16string> &numberList) override;
+
     /**
      * ReportOttCallDetailsInfo
      *
@@ -588,6 +588,18 @@ public:
      * @return Returns 0 on success, others on failure.
      */
     int32_t ReportOttCallDetailsInfo(std::vector<OttCallDetailsInfo> &ottVec) override;
+
+    /**
+     * ReportOttCallEventInfo
+     *
+     * @brief report ott call details info
+     * @param ottVec[in], ott call status detail info list
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t ReportOttCallEventInfo(OttCallEventInfo &eventInfo) override;
+
+private:
+    int32_t CheckBundleName(std::string bundleName);
 
 private:
     enum ServiceRunningState {

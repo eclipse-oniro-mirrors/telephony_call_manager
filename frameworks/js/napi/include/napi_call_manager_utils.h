@@ -38,7 +38,6 @@ public:
     static std::string GetStringProperty(napi_env env, napi_value object, const std::string &propertyName);
     static int32_t GetIntProperty(napi_env env, napi_value object, const std::string &propertyName);
     static bool GetBoolProperty(napi_env env, napi_value object, const std::string &propertyName);
-    static std::u16string GetBundleName(napi_env env);
     static void SetPropertyInt32(napi_env env, napi_value object, std::string name, int32_t value);
     static void SetPropertyStringUtf8(napi_env env, napi_value object, std::string name, std::string value);
     static void SetPropertyBoolean(napi_env env, napi_value object, std::string name, int32_t value);

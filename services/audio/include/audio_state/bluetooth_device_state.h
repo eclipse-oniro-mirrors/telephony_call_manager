@@ -13,30 +13,22 @@
  * limitations under the License.
  */
 
-#ifndef CS_CONFERENCE_BASE_H
-#define CS_CONFERENCE_BASE_H
+#ifndef TELEPHONY_BLUETOOTH_DEVICE_STATE_H
+#define TELEPHONY_BLUETOOTH_DEVICE_STATE_H
 
-#include <cstdio>
-#include <cstdlib>
-
-#include "singleton.h"
-#include "conference_base.h"
+#include "audio_base.h"
 
 namespace OHOS {
 namespace Telephony {
-class CsConferenceBase : public ConferenceBase {
-    DECLARE_DELAYED_SINGLETON(CsConferenceBase)
+class BluetoothDeviceState : public AudioBase {
 public:
-    int32_t JoinToConference(int32_t callId) override;
-    int32_t LeaveFromConference(int32_t callId) override;
-    int32_t HoldConference(int32_t callId) override;
-    int32_t CanCombineConference() override;
-    int32_t CanSeparateConference() override;
+    BluetoothDeviceState() = default;
+    ~BluetoothDeviceState() = default;
+    bool ProcessEvent(int32_t event) override;
 
 private:
-    uint32_t maxSubCallLimits_;
+    std::mutex mutex_;
 };
 } // namespace Telephony
 } // namespace OHOS
-
-#endif // CS_CONFERENCE_BASE_H
+#endif // TELEPHONY_BLUETOOTH_DEVICE_STATE_H

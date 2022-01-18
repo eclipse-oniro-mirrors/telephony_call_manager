@@ -13,11 +13,9 @@
  * limitations under the License.
  */
 
-#include "cs_conference_base.h"
+#include "ims_conference.h"
 
-#include <string>
 #include <string_ex.h>
-#include <list>
 
 #include "call_base.h"
 #include "call_object_manager.h"
@@ -27,19 +25,19 @@
 
 namespace OHOS {
 namespace Telephony {
-CsConferenceBase::CsConferenceBase() : ConferenceBase()
+ImsConference::ImsConference() : ConferenceBase()
 {
-    conferenceType_ = CallType::TYPE_CS;
+    conferenceType_ = CallType::TYPE_IMS;
     maxSubCallLimits_ = CS_CONFERENCE_MAX_CALLS_CNT;
     // get from configuration file
 #ifdef ABILITY_CONFIG_SUPPORT
-    maxSubCallLimits_ = GetConfig(CS_CONFERENCE_SUB_CALL_LIMITS);
+    maxSubCallLimits_ = GetConfig(IMS_CONFERENCE_SUB_CALL_LIMITS);
 #endif
 }
 
-CsConferenceBase::~CsConferenceBase() {}
+ImsConference::~ImsConference() {}
 
-int32_t CsConferenceBase::JoinToConference(int32_t callId)
+int32_t ImsConference::JoinToConference(int32_t callId)
 {
     std::lock_guard<std::mutex> lock(conferenceMutex_);
     if (state_ != CONFERENCE_STATE_CREATING && state_ != CONFERENCE_STATE_ACTIVE &&
@@ -51,19 +49,21 @@ int32_t CsConferenceBase::JoinToConference(int32_t callId)
         TELEPHONY_LOGE("already %{public}zu calls in the conference, exceed limits!", subCallIdSet_.size());
         return CALL_ERR_CONFERENCE_CALL_EXCEED_LIMIT;
     }
+
     subCallIdSet_.insert(callId);
     state_ = CONFERENCE_STATE_ACTIVE;
     beginTime_ = time(nullptr);
+    TELEPHONY_LOGI("JoinToConference success, callId:%{public}d", callId);
     return TELEPHONY_SUCCESS;
 }
 
-int32_t CsConferenceBase::LeaveFromConference(int32_t callId)
+int32_t ImsConference::LeaveFromConference(int32_t callId)
 {
     std::lock_guard<std::mutex> lock(conferenceMutex_);
     if (subCallIdSet_.find(callId) != subCallIdSet_.end()) {
         subCallIdSet_.erase(callId);
     } else {
-        TELEPHONY_LOGE("leave conference failed, callId %{public}d not in conference", callId);
+        TELEPHONY_LOGE("separate conference failed, callId %{public}d not in conference", callId);
         return CALL_ERR_CONFERENCE_SEPERATE_FAILED;
     }
     if (subCallIdSet_.empty()) {
@@ -74,7 +74,7 @@ int32_t CsConferenceBase::LeaveFromConference(int32_t callId)
     return TELEPHONY_SUCCESS;
 }
 
-int32_t CsConferenceBase::HoldConference(int32_t callId)
+int32_t ImsConference::HoldConference(int32_t callId)
 {
     std::lock_guard<std::mutex> lock(conferenceMutex_);
     if (state_ == CONFERENCE_STATE_HOLDING) {
@@ -95,17 +95,17 @@ int32_t CsConferenceBase::HoldConference(int32_t callId)
     return TELEPHONY_SUCCESS;
 }
 
-int32_t CsConferenceBase::CanCombineConference()
+int32_t ImsConference::CanCombineConference()
 {
     std::lock_guard<std::mutex> lock(conferenceMutex_);
     if (subCallIdSet_.size() >= maxSubCallLimits_) {
-        TELEPHONY_LOGE("there is %{public}zu calls in the conference yet!", subCallIdSet_.size());
+        TELEPHONY_LOGE("already %{public}zu calls in the conference, exceed limits!", subCallIdSet_.size());
         return CALL_ERR_CONFERENCE_CALL_EXCEED_LIMIT;
     }
     return TELEPHONY_SUCCESS;
 }
 
-int32_t CsConferenceBase::CanSeparateConference()
+int32_t ImsConference::CanSeparateConference()
 {
     std::lock_guard<std::mutex> lock(conferenceMutex_);
     if (subCallIdSet_.empty() || state_ != CONFERENCE_STATE_ACTIVE) {

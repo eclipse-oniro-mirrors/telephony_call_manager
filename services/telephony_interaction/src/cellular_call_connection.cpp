@@ -24,7 +24,6 @@
 #include "call_manager_errors.h"
 #include "cellular_call_death_recipient.h"
 #include "telephony_log_wrapper.h"
-#include "core_manager.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -204,14 +203,14 @@ int CellularCallConnection::Dial(const CellularCallInfo &callInfo)
     return TELEPHONY_SUCCESS;
 }
 
-int CellularCallConnection::HangUp(const CellularCallInfo &callInfo)
+int CellularCallConnection::HangUp(const CellularCallInfo &callInfo, CallSupplementType type)
 {
     if (ReConnectService() != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     std::lock_guard<std::mutex> lock(mutex_);
-    int errCode = cellularCallInterfacePtr_->HangUp(callInfo);
+    int errCode = cellularCallInterfacePtr_->HangUp(callInfo, type);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("hangup call failed, errcode:%{public}d", errCode);
         return errCode;
@@ -329,21 +328,6 @@ int CellularCallConnection::SeparateConference(const CellularCallInfo &callInfo)
     int errCode = cellularCallInterfacePtr_->SeparateConference(callInfo);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("separate conference failed, errcode:%{public}d", errCode);
-        return errCode;
-    }
-    return TELEPHONY_SUCCESS;
-}
-
-int CellularCallConnection::CallSupplement(CallSupplementType type)
-{
-    if (ReConnectService() != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("ipc reconnect failed!");
-        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
-    }
-    std::lock_guard<std::mutex> lock(mutex_);
-    int errCode = cellularCallInterfacePtr_->CallSupplement(type);
-    if (errCode != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("call supplement failed, errcode:%{public}d", errCode);
         return errCode;
     }
     return TELEPHONY_SUCCESS;
@@ -545,15 +529,14 @@ int CellularCallConnection::RegisterCallBack(const sptr<ICallStatusCallback> &ca
     return TELEPHONY_SUCCESS;
 }
 
-int32_t CellularCallConnection::ControlCamera(
-    std::u16string cameraId, std::u16string callingPackage, int32_t callingUid, int32_t callingPid)
+int32_t CellularCallConnection::ControlCamera(std::u16string cameraId, int32_t callingUid, int32_t callingPid)
 {
     if (ReConnectService() != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     std::lock_guard<std::mutex> lock(mutex_);
-    int errCode = cellularCallInterfacePtr_->CtrlCamera(cameraId, callingPackage, callingUid, callingPid);
+    int errCode = cellularCallInterfacePtr_->CtrlCamera(cameraId, callingUid, callingPid);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("cellularCallInterface CtrlCamera failed, errcode:%{public}d", errCode);
         return errCode;
@@ -667,14 +650,14 @@ int32_t CellularCallConnection::GetLteImsSwitchStatus(int32_t slotId)
     return TELEPHONY_SUCCESS;
 }
 
-int32_t CellularCallConnection::SendUpdateCallMediaModeRequest(const CellularCallInfo &callInfo, CallMediaMode mode)
+int32_t CellularCallConnection::SendUpdateCallMediaModeRequest(const CellularCallInfo &callInfo, ImsCallMode mode)
 {
     if (ReConnectService() != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     std::lock_guard<std::mutex> lock(mutex_);
-    int errCode = cellularCallInterfacePtr_->UpdateCallMediaMode(callInfo, mode);
+    int errCode = cellularCallInterfacePtr_->UpdateImsCallMode(callInfo, mode);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("send media modify request failed, errcode:%{public}d", errCode);
         return errCode;
@@ -764,7 +747,7 @@ int32_t CellularCallConnection::SetVolteEnhanceMode(bool value, int32_t slotId)
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     std::lock_guard<std::mutex> lock(mutex_);
-    int errCode = cellularCallInterfacePtr_->SetVolteEnhanceMode(slotId, value);
+    int errCode = cellularCallInterfacePtr_->SetImsSwitchEnhanceMode(slotId, value);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("SetVolteEnhanceMode failed, errcode:%{public}d", errCode);
         return errCode;
@@ -779,7 +762,7 @@ int32_t CellularCallConnection::GetVolteEnhanceMode(int32_t slotId)
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     std::lock_guard<std::mutex> lock(mutex_);
-    int errCode = cellularCallInterfacePtr_->GetVolteEnhanceMode(slotId);
+    int errCode = cellularCallInterfacePtr_->GetImsSwitchEnhanceMode(slotId);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("GetVolteEnhanceMode failed, errcode:%{public}d", errCode);
         return errCode;
@@ -796,7 +779,7 @@ int32_t CellularCallConnection::InviteToConference(const std::vector<std::string
     std::lock_guard<std::mutex> lock(mutex_);
     int errCode = cellularCallInterfacePtr_->InviteToConference(slotId, numberList);
     if (errCode != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("GetVolteEnhanceMode failed, errcode:%{public}d", errCode);
+        TELEPHONY_LOGE("InviteToConference failed, errcode:%{public}d", errCode);
         return errCode;
     }
     return TELEPHONY_SUCCESS;

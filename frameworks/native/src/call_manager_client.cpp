@@ -29,7 +29,7 @@ CallManagerClient::CallManagerClient() {}
 
 CallManagerClient::~CallManagerClient() {}
 
-void CallManagerClient::Init(int32_t systemAbilityId, std::u16string &bundleName)
+void CallManagerClient::Init(int32_t systemAbilityId)
 {
     if (g_callManagerProxy == nullptr) {
         g_callManagerProxy = DelayedSingleton<CallManagerProxy>::GetInstance();
@@ -37,7 +37,7 @@ void CallManagerClient::Init(int32_t systemAbilityId, std::u16string &bundleName
             TELEPHONY_LOGE("g_callManagerProxy is nullptr");
             return;
         }
-        g_callManagerProxy->Init(systemAbilityId, bundleName);
+        g_callManagerProxy->Init(systemAbilityId);
     }
     TELEPHONY_LOGI("CallManagerClient init success!");
 }
@@ -397,10 +397,10 @@ int32_t CallManagerClient::SetAudioDevice(AudioDevice deviceType)
     }
 }
 
-int32_t CallManagerClient::ControlCamera(std::u16string cameraId, std::u16string callingPackage)
+int32_t CallManagerClient::ControlCamera(std::u16string cameraId)
 {
     if (g_callManagerProxy != nullptr) {
-        return g_callManagerProxy->ControlCamera(cameraId, callingPackage);
+        return g_callManagerProxy->ControlCamera(cameraId);
     } else {
         TELEPHONY_LOGE("init first please!");
         return TELEPHONY_ERR_UNINIT;
@@ -497,40 +497,40 @@ int32_t CallManagerClient::SetImsFeatureValue(int32_t slotId, FeatureType type, 
     }
 }
 
-int32_t CallManagerClient::UpdateCallMediaMode(int32_t callId, CallMediaMode mode)
+int32_t CallManagerClient::UpdateImsCallMode(int32_t callId, ImsCallMode mode)
 {
     if (g_callManagerProxy != nullptr) {
-        return g_callManagerProxy->UpdateCallMediaMode(callId, mode);
+        return g_callManagerProxy->UpdateImsCallMode(callId, mode);
     } else {
         TELEPHONY_LOGE("init first please!");
         return TELEPHONY_ERR_UNINIT;
     }
 }
 
-int32_t CallManagerClient::EnableVoLte(int32_t slotId)
+int32_t CallManagerClient::EnableImsSwitch(int32_t slotId)
 {
     if (g_callManagerProxy != nullptr) {
-        return g_callManagerProxy->EnableVoLte(slotId);
+        return g_callManagerProxy->EnableImsSwitch(slotId);
     } else {
         TELEPHONY_LOGE("init first please!");
         return TELEPHONY_ERR_UNINIT;
     }
 }
 
-int32_t CallManagerClient::DisableVoLte(int32_t slotId)
+int32_t CallManagerClient::DisableImsSwitch(int32_t slotId)
 {
     if (g_callManagerProxy != nullptr) {
-        return g_callManagerProxy->DisableVoLte(slotId);
+        return g_callManagerProxy->DisableImsSwitch(slotId);
     } else {
         TELEPHONY_LOGE("init first please!");
         return TELEPHONY_ERR_UNINIT;
     }
 }
 
-int32_t CallManagerClient::IsVoLteEnabled(int32_t slotId)
+int32_t CallManagerClient::IsImsSwitchEnabled(int32_t slotId)
 {
     if (g_callManagerProxy != nullptr) {
-        return g_callManagerProxy->IsVoLteEnabled(slotId);
+        return g_callManagerProxy->IsImsSwitchEnabled(slotId);
     } else {
         TELEPHONY_LOGE("init first please!");
         return TELEPHONY_ERR_UNINIT;
@@ -601,6 +601,16 @@ int32_t CallManagerClient::ReportOttCallDetailsInfo(std::vector<OttCallDetailsIn
 {
     if (g_callManagerProxy != nullptr) {
         return g_callManagerProxy->ReportOttCallDetailsInfo(ottVec);
+    } else {
+        TELEPHONY_LOGE("init first please!");
+        return TELEPHONY_ERR_UNINIT;
+    }
+}
+
+int32_t CallManagerClient::ReportOttCallEventInfo(OttCallEventInfo &eventInfo)
+{
+    if (g_callManagerProxy != nullptr) {
+        return g_callManagerProxy->ReportOttCallEventInfo(eventInfo);
     } else {
         TELEPHONY_LOGE("init first please!");
         return TELEPHONY_ERR_UNINIT;

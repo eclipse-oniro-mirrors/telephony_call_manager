@@ -33,14 +33,13 @@ CallManagerProxy::~CallManagerProxy()
     UnInit();
 }
 
-void CallManagerProxy::Init(int32_t systemAbilityId, std::u16string &bundleName)
+void CallManagerProxy::Init(int32_t systemAbilityId)
 {
     std::lock_guard<std::mutex> lock(mutex_);
     if (initStatus_) {
         TELEPHONY_LOGW("you have already initialized");
         return;
     }
-    bundleName_ = bundleName;
     systemAbilityId_ = systemAbilityId;
     int32_t result = ConnectService();
     if (result != TELEPHONY_SUCCESS) {
@@ -79,7 +78,7 @@ int32_t CallManagerProxy::RegisterCallBack(std::unique_ptr<CallManagerCallback> 
         TELEPHONY_LOGE("create CallAbilityCallback object failed!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    int32_t ret = callManagerServicePtr_->RegisterCallBack(callAbilityCallbackPtr_, bundleName_);
+    int32_t ret = callManagerServicePtr_->RegisterCallBack(callAbilityCallbackPtr_);
     if (ret != TELEPHONY_SUCCESS && ret != TELEPHONY_ERR_PERMISSION_ERR) {
         callAbilityCallbackPtr_.clear();
         callAbilityCallbackPtr_ = nullptr;
@@ -99,7 +98,11 @@ int32_t CallManagerProxy::UnRegisterCallBack()
         TELEPHONY_LOGE("you haven't register callback yet, please RegisterCallBack first!");
         return TELEPHONY_ERR_REGISTER_CALLBACK_FAIL;
     }
-    int32_t ret = callManagerServicePtr_->UnRegisterCallBack(bundleName_);
+    if (callManagerServicePtr_ == nullptr) {
+        TELEPHONY_LOGE("callManagerServicePtr_ is null");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    int32_t ret = callManagerServicePtr_->UnRegisterCallBack();
     if (ret != TELEPHONY_SUCCESS && ret != TELEPHONY_ERR_PERMISSION_ERR) {
         TELEPHONY_LOGE("UnRegisterCallBack failed,result: %{public}d", ret);
         return TELEPHONY_ERR_UNREGISTER_CALLBACK_FAIL;
@@ -172,9 +175,9 @@ int32_t CallManagerProxy::ReConnectService()
             TELEPHONY_LOGE("Connect service: %{public}d", result);
             return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
         }
-    }
-    if (registerStatus_) {
-        ReRegisterCallBack();
+        if (registerStatus_) {
+            ReRegisterCallBack();
+        }
     }
     return TELEPHONY_SUCCESS;
 }
@@ -190,7 +193,7 @@ int32_t CallManagerProxy::ReRegisterCallBack()
         TELEPHONY_LOGE("create CallAbilityCallback object failed!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    int32_t ret = callManagerServicePtr_->RegisterCallBack(callAbilityCallbackPtr_, bundleName_);
+    int32_t ret = callManagerServicePtr_->RegisterCallBack(callAbilityCallbackPtr_);
     if (ret != TELEPHONY_SUCCESS && ret != TELEPHONY_ERR_PERMISSION_ERR) {
         callAbilityCallbackPtr_.clear();
         callAbilityCallbackPtr_ = nullptr;
@@ -667,14 +670,14 @@ int32_t CallManagerProxy::SetAudioDevice(AudioDevice deviceType)
     return TELEPHONY_SUCCESS;
 }
 
-int32_t CallManagerProxy::ControlCamera(std::u16string cameraId, std::u16string callingPackage)
+int32_t CallManagerProxy::ControlCamera(std::u16string cameraId)
 {
     if (ReConnectService() != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     std::lock_guard<std::mutex> lock(mutex_);
-    int32_t errCode = callManagerServicePtr_->ControlCamera(cameraId, callingPackage);
+    int32_t errCode = callManagerServicePtr_->ControlCamera(cameraId);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("ControlCamera failed, errcode:%{public}d", errCode);
         return errCode;
@@ -817,61 +820,61 @@ int32_t CallManagerProxy::SetImsFeatureValue(int32_t slotId, FeatureType type, i
     return TELEPHONY_SUCCESS;
 }
 
-int32_t CallManagerProxy::UpdateCallMediaMode(int32_t callId, CallMediaMode mode)
+int32_t CallManagerProxy::UpdateImsCallMode(int32_t callId, ImsCallMode mode)
 {
     if (ReConnectService() != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     std::lock_guard<std::mutex> lock(mutex_);
-    int32_t errCode = callManagerServicePtr_->UpdateCallMediaMode(callId, mode);
+    int32_t errCode = callManagerServicePtr_->UpdateImsCallMode(callId, mode);
     if (errCode != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("UpdateCallMediaMode failed, errcode:%{public}d", errCode);
+        TELEPHONY_LOGE("UpdateImsCallMode failed, errcode:%{public}d", errCode);
         return errCode;
     }
     return TELEPHONY_SUCCESS;
 }
 
-int32_t CallManagerProxy::EnableVoLte(int32_t slotId)
+int32_t CallManagerProxy::EnableImsSwitch(int32_t slotId)
 {
     if (ReConnectService() != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     std::lock_guard<std::mutex> lock(mutex_);
-    int32_t errCode = callManagerServicePtr_->EnableVoLte(slotId);
+    int32_t errCode = callManagerServicePtr_->EnableImsSwitch(slotId);
     if (errCode != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("EnableVoLte failed, errcode:%{public}d", errCode);
+        TELEPHONY_LOGE("EnableImsSwitch failed, errcode:%{public}d", errCode);
         return errCode;
     }
     return TELEPHONY_SUCCESS;
 }
 
-int32_t CallManagerProxy::DisableVoLte(int32_t slotId)
+int32_t CallManagerProxy::DisableImsSwitch(int32_t slotId)
 {
     if (ReConnectService() != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     std::lock_guard<std::mutex> lock(mutex_);
-    int32_t errCode = callManagerServicePtr_->DisableVoLte(slotId);
+    int32_t errCode = callManagerServicePtr_->DisableImsSwitch(slotId);
     if (errCode != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("DisableVoLte failed, errcode:%{public}d", errCode);
+        TELEPHONY_LOGE("DisableImsSwitch failed, errcode:%{public}d", errCode);
         return errCode;
     }
     return TELEPHONY_SUCCESS;
 }
 
-int32_t CallManagerProxy::IsVoLteEnabled(int32_t slotId)
+int32_t CallManagerProxy::IsImsSwitchEnabled(int32_t slotId)
 {
     if (ReConnectService() != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     std::lock_guard<std::mutex> lock(mutex_);
-    int32_t errCode = callManagerServicePtr_->IsVoLteEnabled(slotId);
+    int32_t errCode = callManagerServicePtr_->IsImsSwitchEnabled(slotId);
     if (errCode != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("IsVoLteEnabled failed, errcode:%{public}d", errCode);
+        TELEPHONY_LOGE("IsImsSwitchEnabled failed, errcode:%{public}d", errCode);
         return errCode;
     }
     return TELEPHONY_SUCCESS;
@@ -977,6 +980,21 @@ int32_t CallManagerProxy::ReportOttCallDetailsInfo(std::vector<OttCallDetailsInf
     int32_t errCode = callManagerServicePtr_->ReportOttCallDetailsInfo(ottVec);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("ReportOttCallInfo failed, errcode:%{public}d", errCode);
+        return errCode;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallManagerProxy::ReportOttCallEventInfo(OttCallEventInfo &eventInfo)
+{
+    if (ReConnectService() != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("ipc reconnect failed!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    std::lock_guard<std::mutex> lock(mutex_);
+    int32_t errCode = callManagerServicePtr_->ReportOttCallEventInfo(eventInfo);
+    if (errCode != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("ReportOttCallEventInfo failed, errcode:%{public}d", errCode);
         return errCode;
     }
     return TELEPHONY_SUCCESS;

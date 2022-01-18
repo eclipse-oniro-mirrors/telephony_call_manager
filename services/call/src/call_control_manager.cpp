@@ -385,7 +385,7 @@ int32_t CallControlManager::GetCallWaiting(int32_t slotId)
 {
     int32_t ret = CallPolicy::GetCallWaitingPolicy(slotId);
     if (ret != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("EnableVoLte failed!");
+        TELEPHONY_LOGE("GetCallWaiting failed!");
         return ret;
     }
     if (callSettingManagerPtr_ != nullptr) {
@@ -400,7 +400,7 @@ int32_t CallControlManager::SetCallWaiting(int32_t slotId, bool activate)
 {
     int32_t ret = CallPolicy::SetCallWaitingPolicy(slotId);
     if (ret != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("EnableVoLte failed!");
+        TELEPHONY_LOGE("SetCallWaiting failed!");
         return ret;
     }
     if (callSettingManagerPtr_ != nullptr) {
@@ -415,7 +415,7 @@ int32_t CallControlManager::GetCallRestriction(int32_t slotId, CallRestrictionTy
 {
     int32_t ret = CallPolicy::GetCallRestrictionPolicy(slotId);
     if (ret != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("EnableVoLte failed!");
+        TELEPHONY_LOGE("GetCallRestriction failed!");
         return ret;
     }
     if (callSettingManagerPtr_ != nullptr) {
@@ -430,7 +430,7 @@ int32_t CallControlManager::SetCallRestriction(int32_t slotId, CallRestrictionIn
 {
     int32_t ret = CallPolicy::SetCallRestrictionPolicy(slotId);
     if (ret != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("EnableVoLte failed!");
+        TELEPHONY_LOGE("SetCallRestriction failed!");
         return ret;
     }
     if (callSettingManagerPtr_ != nullptr) {
@@ -445,7 +445,7 @@ int32_t CallControlManager::GetCallTransferInfo(int32_t slotId, CallTransferType
 {
     int32_t ret = CallPolicy::GetCallTransferInfoPolicy(slotId);
     if (ret != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("EnableVoLte failed!");
+        TELEPHONY_LOGE("GetCallTransferInfo failed!");
         return ret;
     }
     if (callSettingManagerPtr_ != nullptr) {
@@ -460,7 +460,7 @@ int32_t CallControlManager::SetCallTransferInfo(int32_t slotId, CallTransferInfo
 {
     int32_t ret = CallPolicy::SetCallTransferInfoPolicy(slotId);
     if (ret != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("EnableVoLte failed!");
+        TELEPHONY_LOGE("SetCallTransferInfo failed!");
         return ret;
     }
     if (callSettingManagerPtr_ != nullptr) {
@@ -475,7 +475,7 @@ int32_t CallControlManager::SetCallPreferenceMode(int32_t slotId, int32_t mode)
 {
     int32_t ret = CallPolicy::SetCallPreferenceModePolicy(slotId);
     if (ret != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("EnableVoLte failed!");
+        TELEPHONY_LOGE("SetCallPreferenceMode failed!");
         return ret;
     }
     if (callSettingManagerPtr_ != nullptr) {
@@ -553,7 +553,7 @@ int32_t CallControlManager::GetMainCallId(int32_t callId)
     sptr<CallBase> call = GetOneCallObject(callId);
     if (call == nullptr) {
         TELEPHONY_LOGE("GetOneCallObject failed! callId:%{public}d", callId);
-        return CALL_ERR_INVALID_CALLID;
+        return TELEPHONY_ERROR;
     }
     return call->GetMainCallId();
 }
@@ -580,7 +580,7 @@ int32_t CallControlManager::GetImsConfig(int32_t slotId, ImsConfigItem item)
 {
     int32_t ret = CallPolicy::GetImsConfigPolicy(slotId);
     if (ret != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("EnableVoLte failed!");
+        TELEPHONY_LOGE("GetImsConfig failed!");
         return ret;
     }
     if (callSettingManagerPtr_ != nullptr) {
@@ -595,7 +595,7 @@ int32_t CallControlManager::SetImsConfig(int32_t slotId, ImsConfigItem item, std
 {
     int32_t ret = CallPolicy::SetImsConfigPolicy(slotId);
     if (ret != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("EnableVoLte failed!");
+        TELEPHONY_LOGE("SetImsConfig failed!");
         return ret;
     }
     if (callSettingManagerPtr_ != nullptr) {
@@ -610,7 +610,7 @@ int32_t CallControlManager::GetImsFeatureValue(int32_t slotId, FeatureType type)
 {
     int32_t ret = CallPolicy::GetImsFeatureValuePolicy(slotId);
     if (ret != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("EnableVoLte failed!");
+        TELEPHONY_LOGE("GetImsFeatureValue failed!");
         return ret;
     }
     if (callSettingManagerPtr_ != nullptr) {
@@ -625,7 +625,7 @@ int32_t CallControlManager::SetImsFeatureValue(int32_t slotId, FeatureType type,
 {
     int32_t ret = CallPolicy::SetImsFeatureValuePolicy(slotId);
     if (ret != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("EnableVoLte failed!");
+        TELEPHONY_LOGE("SetImsFeatureValue failed!");
         return ret;
     }
     if (callSettingManagerPtr_ != nullptr) {
@@ -636,45 +636,45 @@ int32_t CallControlManager::SetImsFeatureValue(int32_t slotId, FeatureType type,
     }
 }
 
-int32_t CallControlManager::EnableVoLte(int32_t slotId)
+int32_t CallControlManager::EnableImsSwitch(int32_t slotId)
 {
     int32_t ret = CallPolicy::EnableVoLtePolicy(slotId);
     if (ret != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("EnableVoLte failed!");
+        TELEPHONY_LOGE("EnableImsSwitch failed!");
         return ret;
     }
     if (callSettingManagerPtr_ != nullptr) {
-        return callSettingManagerPtr_->EnableVoLte(slotId);
+        return callSettingManagerPtr_->EnableImsSwitch(slotId);
     } else {
         TELEPHONY_LOGE("callSettingManagerPtr_ is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
 }
 
-int32_t CallControlManager::DisableVoLte(int32_t slotId)
+int32_t CallControlManager::DisableImsSwitch(int32_t slotId)
 {
     int32_t ret = CallPolicy::DisableVoLtePolicy(slotId);
     if (ret != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("EnableVoLte failed!");
+        TELEPHONY_LOGE("DisableImsSwitch failed!");
         return ret;
     }
     if (callSettingManagerPtr_ != nullptr) {
-        return callSettingManagerPtr_->DisableVoLte(slotId);
+        return callSettingManagerPtr_->DisableImsSwitch(slotId);
     } else {
         TELEPHONY_LOGE("callSettingManagerPtr_ is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
 }
 
-int32_t CallControlManager::IsVoLteEnabled(int32_t slotId)
+int32_t CallControlManager::IsImsSwitchEnabled(int32_t slotId)
 {
     int32_t ret = CallPolicy::IsVoLteEnabledPolicy(slotId);
     if (ret != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("EnableVoLte failed!");
+        TELEPHONY_LOGE("IsImsSwitchEnabled failed!");
         return ret;
     }
     if (callSettingManagerPtr_ != nullptr) {
-        return callSettingManagerPtr_->IsVoLteEnabled(slotId);
+        return callSettingManagerPtr_->IsImsSwitchEnabled(slotId);
     } else {
         TELEPHONY_LOGE("callSettingManagerPtr_ is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -685,7 +685,7 @@ int32_t CallControlManager::SetLteEnhanceMode(int32_t slotId, bool value)
 {
     int32_t ret = CallPolicy::SetLteEnhanceModePolicy(slotId);
     if (ret != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("EnableVoLte failed!");
+        TELEPHONY_LOGE("SetLteEnhanceMode failed!");
         return ret;
     }
     if (callSettingManagerPtr_ != nullptr) {
@@ -700,7 +700,7 @@ int32_t CallControlManager::GetLteEnhanceMode(int32_t slotId)
 {
     int32_t ret = CallPolicy::GetLteEnhanceModePolicy(slotId);
     if (ret != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("EnableVoLte failed!");
+        TELEPHONY_LOGE("GetLteEnhanceMode failed!");
         return ret;
     }
     if (callSettingManagerPtr_ != nullptr) {
@@ -711,7 +711,7 @@ int32_t CallControlManager::GetLteEnhanceMode(int32_t slotId)
     }
 }
 
-int32_t CallControlManager::UpdateCallMediaMode(int32_t callId, CallMediaMode mode)
+int32_t CallControlManager::UpdateImsCallMode(int32_t callId, ImsCallMode mode)
 {
     int32_t ret = TELEPHONY_ERR_FAIL;
     ret = UpdateCallMediaModePolicy(callId, mode);
@@ -723,9 +723,9 @@ int32_t CallControlManager::UpdateCallMediaMode(int32_t callId, CallMediaMode mo
         TELEPHONY_LOGE("callRequestHandlerServicePtr_ is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    ret = callRequestHandlerServicePtr_->UpdateCallMediaMode(callId, mode);
+    ret = callRequestHandlerServicePtr_->UpdateImsCallMode(callId, mode);
     if (ret != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("UpdateCallMediaMode failed!");
+        TELEPHONY_LOGE("UpdateImsCallMode failed!");
         return ret;
     }
     return TELEPHONY_SUCCESS;
@@ -807,11 +807,9 @@ int32_t CallControlManager::SetAudioDevice(AudioDevice deviceType)
     return DelayedSingleton<AudioControlManager>::GetInstance()->SetAudioDevice(deviceType);
 }
 
-int32_t CallControlManager::ControlCamera(
-    std::u16string cameraId, std::u16string callingPackage, int32_t callingUid, int32_t callingPid)
+int32_t CallControlManager::ControlCamera(std::u16string cameraId, int32_t callingUid, int32_t callingPid)
 {
-    return DelayedSingleton<VideoControlManager>::GetInstance()->ControlCamera(
-        cameraId, callingPackage, callingUid, callingPid);
+    return DelayedSingleton<VideoControlManager>::GetInstance()->ControlCamera(cameraId, callingUid, callingPid);
 }
 
 int32_t CallControlManager::SetPreviewWindow(VideoWindow &window)
@@ -841,6 +839,10 @@ int32_t CallControlManager::SetDeviceDirection(int32_t rotation)
 
 bool CallControlManager::IsEmergencyPhoneNumber(std::u16string &number, int32_t slotId, int32_t &errorCode)
 {
+    if (IsValidSlotId(slotId)) {
+        errorCode = CALL_ERR_INVALID_SLOT_ID;
+        return false;
+    }
     return DelayedSingleton<CallNumberUtils>::GetInstance()->CheckNumberIsEmergency(
         Str16ToStr8(number), slotId, errorCode);
 }

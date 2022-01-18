@@ -50,9 +50,10 @@ public:
      *
      * @brief Hang up the phone
      * @param callInfo[in], Call information.
+     * @param CallSupplementType
      * @return Returns 0 on success, others on failure.
      */
-    int HangUp(const CellularCallInfo &callInfo);
+    int HangUp(const CellularCallInfo &callInfo, CallSupplementType type);
 
     /**
      * Reject
@@ -127,15 +128,6 @@ public:
      * @return Returns 0 on success, others on failure.
      */
     int SeparateConference(const CellularCallInfo &callInfo);
-
-    /**
-     * CallSupplement.
-     *
-     * @brief Supplementary interface for calls
-     * @param type[in], Call Supplement Type
-     * @return Returns 0 on success, others on failure.
-     */
-    int CallSupplement(CallSupplementType type);
 
     /**
      * StartDtmf
@@ -282,12 +274,11 @@ public:
      *
      * @brief Open or close camera
      * @param cameraId[in], The camera id
-     * @param callingPackage[in], Package name of the application
      * @param callingUid[in]
      * @param callingPid[in]
      * @return Returns 0 on success, others on failure.
      */
-    int32_t ControlCamera(std::u16string cameraId, std::u16string callingPackage, int32_t callingUid, int32_t);
+    int32_t ControlCamera(std::u16string cameraId, int32_t callingUid, int32_t);
 
     /**
      * SetPreviewWindow
@@ -363,7 +354,7 @@ public:
      * @param mode[in], Calling patterns
      * @return Returns 0 on success, others on failure.
      */
-    int32_t SendUpdateCallMediaModeRequest(const CellularCallInfo &callInfo, CallMediaMode mode);
+    int32_t SendUpdateCallMediaModeRequest(const CellularCallInfo &callInfo, ImsCallMode mode);
 
     /**
      * Set Ims Config

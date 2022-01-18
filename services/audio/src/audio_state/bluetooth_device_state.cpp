@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "devices_inactive.h"
+#include "bluetooth_device_state.h"
 
 #include "telephony_log_wrapper.h"
 
@@ -21,24 +21,26 @@
 
 namespace OHOS {
 namespace Telephony {
-bool DevicesInactive::ProcessEvent(int32_t event)
+bool BluetoothDeviceState::ProcessEvent(int32_t event)
 {
     bool result = false;
     std::lock_guard<std::mutex> lock(mutex_);
     switch (event) {
-        case AudioEvent::AUDIO_ACTIVATED:
-        case AudioEvent::AUDIO_RINGING:
-            // should reinitialize audio device when audio interrupted or ringing
+        case AudioEvent::WIRED_HEADSET_CONNECTED:
+            // should switch to wired headset route while wired headset connected
+            result = DelayedSingleton<AudioDeviceManager>::GetInstance()->ProcessEvent(
+                AudioEvent::ENABLE_DEVICE_WIRED_HEADSET);
+            break;
+        case AudioEvent::BLUETOOTH_SCO_DISCONNECTED:
+            // should reinitialize audio device in order to switch to a proper audio route
+            TELEPHONY_LOGI("bt sco disconnected , reinitialize audio device");
             result =
                 DelayedSingleton<AudioDeviceManager>::GetInstance()->ProcessEvent(AudioEvent::INIT_AUDIO_DEVICE);
-            break;
-        case AudioEvent::AUDIO_DEACTIVATED:
-            // do nothing
             break;
         default:
             break;
     }
-    TELEPHONY_LOGI("devices inactive lock release");
+    TELEPHONY_LOGI("enable bluetooth device lock release");
     return result;
 }
 } // namespace Telephony
