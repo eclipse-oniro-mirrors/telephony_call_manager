@@ -42,13 +42,12 @@ VideoControlManager::VideoControlManager() : isOpenCamera_(false) {}
 
 VideoControlManager::~VideoControlManager() {}
 
-int32_t VideoControlManager::ControlCamera(
-    std::u16string cameraId, std::u16string callingPackage, int32_t callingUid, int32_t callingPid)
+int32_t VideoControlManager::ControlCamera(std::u16string cameraId, int32_t callingUid, int32_t callingPid)
 {
     if (cameraId.empty()) {
-        return CloseCamera(cameraId, callingPackage, callingUid, callingPid);
+        return CloseCamera(cameraId, callingUid, callingPid);
     } else {
-        return OpenCamera(cameraId, callingPackage, callingUid, callingPid);
+        return OpenCamera(cameraId, callingUid, callingPid);
     }
 }
 
@@ -101,8 +100,7 @@ int32_t VideoControlManager::SetDeviceDirection(int32_t rotation)
     return CALL_ERR_VIDEO_INVALID_ROTATION;
 }
 
-int32_t VideoControlManager::OpenCamera(
-    std::u16string cameraId, std::u16string callingPackage, int32_t callingUid, int32_t callingPid)
+int32_t VideoControlManager::OpenCamera(std::u16string cameraId, int32_t callingUid, int32_t callingPid)
 {
     // cameraId check
     std::string id(Str16ToStr8(cameraId));
@@ -111,20 +109,19 @@ int32_t VideoControlManager::OpenCamera(
         TELEPHONY_LOGE("camera id is error!!");
         return CALL_ERR_VIDEO_INVALID_CAMERA_ID;
     }
-    int32_t errCode = DelayedSingleton<CellularCallConnection>::GetInstance()->ControlCamera(
-        cameraId, callingPackage, callingUid, callingPid);
+    int32_t errCode =
+        DelayedSingleton<CellularCallConnection>::GetInstance()->ControlCamera(cameraId, callingUid, callingPid);
     if (errCode == TELEPHONY_SUCCESS) {
         isOpenCamera_ = true;
     }
     return errCode;
 }
 
-int32_t VideoControlManager::CloseCamera(
-    std::u16string cameraId, std::u16string callingPackage, int32_t callingUid, int32_t callingPid)
+int32_t VideoControlManager::CloseCamera(std::u16string cameraId, int32_t callingUid, int32_t callingPid)
 {
     if (isOpenCamera_) {
         int32_t errCode = DelayedSingleton<CellularCallConnection>::GetInstance()->ControlCamera(
-            cameraId, callingPackage, callingUid, callingPid);
+            cameraId, callingUid, callingPid);
         if (errCode == TELEPHONY_SUCCESS) {
             isOpenCamera_ = false;
         }

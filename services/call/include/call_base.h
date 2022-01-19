@@ -76,8 +76,6 @@ public:
     TelConferenceState GetTelConferenceState();
     VideoStateType GetVideoStateType();
     void SetVideoStateType(VideoStateType mediaType);
-    CallMediaMode GetCallMediaMode();
-    void SetCallMediaMode(CallMediaMode mode);
     void SetPolicyFlag(PolicyFlag flag);
     uint64_t GetPolicyFlag();
     bool GetCallerInfo(ContactInfo &info);
@@ -125,7 +123,6 @@ private:
     time_t ringEndTime_;
     CallAnswerType answerType_;
     std::mutex mutex_;
-    CallMediaMode mediaMode_; // media mode
 };
 } // namespace Telephony
 } // namespace OHOS

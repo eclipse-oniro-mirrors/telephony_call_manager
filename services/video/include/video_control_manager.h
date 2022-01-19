@@ -27,8 +27,7 @@ namespace Telephony {
 class VideoControlManager : public std::enable_shared_from_this<VideoControlManager> {
     DECLARE_DELAYED_SINGLETON(VideoControlManager)
 public:
-    int32_t ControlCamera(
-        std::u16string cameraId, std::u16string callingPackage, int32_t callingUid, int32_t callingPid);
+    int32_t ControlCamera(std::u16string cameraId, int32_t callingUid, int32_t callingPid);
     int32_t SetPreviewWindow(VideoWindow &window);
     int32_t SetDisplayWindow(VideoWindow &window);
     int32_t SetCameraZoom(float zoomRatio);
@@ -36,10 +35,8 @@ public:
     int32_t SetDeviceDirection(int32_t rotation);
 
 private:
-    int32_t OpenCamera(
-        std::u16string cameraId, std::u16string callingPackage, int32_t callingUid, int32_t callingPid);
-    int32_t CloseCamera(
-        std::u16string cameraId, std::u16string callingPackage, int32_t callingUid, int32_t callingPid);
+    int32_t OpenCamera(std::u16string cameraId, int32_t callingUid, int32_t callingPid);
+    int32_t CloseCamera(std::u16string cameraId, int32_t callingUid, int32_t callingPid);
     bool CheckWindow(VideoWindow &window);
     bool ContainCameraID(std::string id);
     bool IsPngFile(std::string fileName);

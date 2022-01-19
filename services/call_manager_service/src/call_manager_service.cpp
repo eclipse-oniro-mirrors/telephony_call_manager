@@ -174,20 +174,41 @@ std::string CallManagerService::GetStartServiceSpent()
     return oss.str();
 }
 
-int32_t CallManagerService::RegisterCallBack(const sptr<ICallAbilityCallback> &callback, std::u16string &bundleName)
+int32_t CallManagerService::RegisterCallBack(const sptr<ICallAbilityCallback> &callback)
 {
-    std::string strName = Str16ToStr8(bundleName);
-    return DelayedSingleton<CallAbilityReportProxy>::GetInstance()->RegisterCallBack(callback, strName);
+    int32_t uid = IPCSkeleton::GetCallingUid();
+    std::string bundleName = "";
+    TelephonyPermission::GetBundleNameByUid(uid, bundleName);
+    if (bundleName.empty()) {
+        bundleName.append(std::to_string(uid));
+        bundleName.append(std::to_string(IPCSkeleton::GetCallingPid()));
+    } else {
+        if (CheckBundleName(bundleName) != TELEPHONY_SUCCESS) {
+            TELEPHONY_LOGE("%{public}s no permission to register callback", bundleName.c_str());
+            return TELEPHONY_ERR_PERMISSION_ERR;
+        }
+    }
+    return DelayedSingleton<CallAbilityReportProxy>::GetInstance()->RegisterCallBack(callback, bundleName);
 }
 
-int32_t CallManagerService::UnRegisterCallBack(std::u16string &bundleName)
+int32_t CallManagerService::UnRegisterCallBack()
 {
-    std::string strName = Str16ToStr8(bundleName);
-    return DelayedSingleton<CallAbilityReportProxy>::GetInstance()->UnRegisterCallBack(strName);
+    int32_t uid = IPCSkeleton::GetCallingUid();
+    std::string bundleName = "";
+    TelephonyPermission::GetBundleNameByUid(uid, bundleName);
+    if (bundleName.empty()) {
+        bundleName.append(std::to_string(uid));
+        bundleName.append(std::to_string(IPCSkeleton::GetCallingPid()));
+    }
+    return DelayedSingleton<CallAbilityReportProxy>::GetInstance()->UnRegisterCallBack(bundleName);
 }
 
 int32_t CallManagerService::DialCall(std::u16string number, AppExecFwk::PacMap &extras)
 {
+    int32_t uid = IPCSkeleton::GetCallingUid();
+    std::string bundleName = "";
+    TelephonyPermission::GetBundleNameByUid(uid, bundleName);
+    extras.PutStringValue("bundleName", bundleName);
     if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_PLACE_CALL)) {
         TELEPHONY_LOGE("Permission denied!");
         return TELEPHONY_ERR_PERMISSION_ERR;
@@ -486,11 +507,11 @@ int32_t CallManagerService::SetAudioDevice(AudioDevice deviceType)
     }
 }
 
-int32_t CallManagerService::ControlCamera(std::u16string cameraId, std::u16string callingPackage)
+int32_t CallManagerService::ControlCamera(std::u16string cameraId)
 {
     if (callControlManagerPtr_ != nullptr) {
         return callControlManagerPtr_->ControlCamera(
-            cameraId, callingPackage, IPCSkeleton::GetCallingUid(), IPCSkeleton::GetCallingPid());
+            cameraId, IPCSkeleton::GetCallingUid(), IPCSkeleton::GetCallingPid());
     } else {
         TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -649,40 +670,40 @@ int32_t CallManagerService::SetImsFeatureValue(int32_t slotId, FeatureType type,
     }
 }
 
-int32_t CallManagerService::UpdateCallMediaMode(int32_t callId, CallMediaMode mode)
+int32_t CallManagerService::UpdateImsCallMode(int32_t callId, ImsCallMode mode)
 {
     if (callControlManagerPtr_ != nullptr) {
-        return callControlManagerPtr_->UpdateCallMediaMode(callId, mode);
+        return callControlManagerPtr_->UpdateImsCallMode(callId, mode);
     } else {
         TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
 }
 
-int32_t CallManagerService::EnableVoLte(int32_t slotId)
+int32_t CallManagerService::EnableImsSwitch(int32_t slotId)
 {
     if (callControlManagerPtr_ != nullptr) {
-        return callControlManagerPtr_->EnableVoLte(slotId);
+        return callControlManagerPtr_->EnableImsSwitch(slotId);
     } else {
         TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
 }
 
-int32_t CallManagerService::DisableVoLte(int32_t slotId)
+int32_t CallManagerService::DisableImsSwitch(int32_t slotId)
 {
     if (callControlManagerPtr_ != nullptr) {
-        return callControlManagerPtr_->DisableVoLte(slotId);
+        return callControlManagerPtr_->DisableImsSwitch(slotId);
     } else {
         TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
 }
 
-int32_t CallManagerService::IsVoLteEnabled(int32_t slotId)
+int32_t CallManagerService::IsImsSwitchEnabled(int32_t slotId)
 {
     if (callControlManagerPtr_ != nullptr) {
-        return callControlManagerPtr_->IsVoLteEnabled(slotId);
+        return callControlManagerPtr_->IsImsSwitchEnabled(slotId);
     } else {
         TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -757,6 +778,43 @@ int32_t CallManagerService::ReportOttCallDetailsInfo(std::vector<OttCallDetailsI
         TELEPHONY_LOGI("UpdateCallsReportInfo success!");
     }
     return ret;
+}
+
+int32_t CallManagerService::ReportOttCallEventInfo(OttCallEventInfo &eventInfo)
+{
+    int32_t ret = DelayedSingleton<ReportCallInfoHandlerService>::GetInstance()->UpdateOttEventInfo(eventInfo);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("UpdateOttEventInfo failed! errCode:%{public}d", ret);
+    } else {
+        TELEPHONY_LOGI("UpdateOttEventInfo success!");
+    }
+    return ret;
+}
+
+int32_t CallManagerService::CheckBundleName(std::string bundleName)
+{
+    std::string bundleNameList[] = {
+        "com.ohos.callui",
+        "com.ohos.service.callui",
+        "com.ohos.callmanagercallmedia",
+        "com.ohos.callmanager",
+        "com.ohos.callmanagerregister",
+        "com.ohos.callmanagerreliabilityperformance",
+        "com.ohos.callmanagerimscall",
+        "com.ohos.callmanagercallcarmera",
+        "com.ohos.callmanagerreliability",
+        "com.ohos.callmanagerperformance",
+        "com.example.callmanager",
+        "com.example.telephone_demo",
+        "com.ohos.calldemo",
+        "com.ohos.callservice",
+    };
+    for (int32_t i = 0; i < end(bundleNameList) - begin(bundleNameList); i++) {
+        if (strcmp(bundleName.c_str(), bundleNameList[i].c_str()) == 0) {
+            return TELEPHONY_SUCCESS;
+        }
+    }
+    return TELEPHONY_ERROR;
 }
 } // namespace Telephony
 } // namespace OHOS

@@ -26,8 +26,7 @@ CallManagerServiceProxy::CallManagerServiceProxy(const sptr<IRemoteObject> &impl
     : IRemoteProxy<ICallManagerService>(impl)
 {}
 
-int32_t CallManagerServiceProxy::RegisterCallBack(
-    const sptr<ICallAbilityCallback> &callback, std::u16string &bundleName)
+int32_t CallManagerServiceProxy::RegisterCallBack(const sptr<ICallAbilityCallback> &callback)
 {
     MessageOption option;
     MessageParcel dataParcel;
@@ -36,12 +35,7 @@ int32_t CallManagerServiceProxy::RegisterCallBack(
         TELEPHONY_LOGE("write descriptor fail");
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
-    if (bundleName.empty()) {
-        TELEPHONY_LOGE("bundleName is empty");
-        return TELEPHONY_ERR_ARGUMENT_INVALID;
-    }
     dataParcel.WriteRemoteObject(callback->AsObject().GetRefPtr());
-    dataParcel.WriteString16(bundleName);
     int32_t error = Remote()->SendRequest(INTERFACE_REGISTER_CALLBACK, dataParcel, replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("Function RegisterCallBack! errCode:%{public}d", error);
@@ -50,7 +44,7 @@ int32_t CallManagerServiceProxy::RegisterCallBack(
     return replyParcel.ReadInt32();
 }
 
-int32_t CallManagerServiceProxy::UnRegisterCallBack(std::u16string &bundleName)
+int32_t CallManagerServiceProxy::UnRegisterCallBack()
 {
     MessageOption option;
     MessageParcel dataParcel;
@@ -59,11 +53,6 @@ int32_t CallManagerServiceProxy::UnRegisterCallBack(std::u16string &bundleName)
         TELEPHONY_LOGE("write descriptor fail");
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
-    if (bundleName.empty()) {
-        TELEPHONY_LOGE("bundleName is empty");
-        return TELEPHONY_ERR_ARGUMENT_INVALID;
-    }
-    dataParcel.WriteString16(bundleName);
     int32_t error = Remote()->SendRequest(INTERFACE_UNREGISTER_CALLBACK, dataParcel, replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("Function RegisterCallBack! errCode:%{public}d", error);
@@ -91,7 +80,6 @@ int32_t CallManagerServiceProxy::DialCall(std::u16string number, AppExecFwk::Pac
     dataParcel.WriteInt32(extras.GetIntValue("dialScene"));
     dataParcel.WriteInt32(extras.GetIntValue("dialType"));
     dataParcel.WriteInt32(extras.GetIntValue("callType"));
-    dataParcel.WriteString(extras.GetStringValue("bundleName"));
     if (Remote() == nullptr) {
         TELEPHONY_LOGE("function Remote() return nullptr!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
@@ -718,7 +706,7 @@ int32_t CallManagerServiceProxy::SeparateConference(int32_t callId)
     return replyParcel.ReadInt32();
 }
 
-int32_t CallManagerServiceProxy::ControlCamera(std::u16string cameraId, std::u16string callingPackage)
+int32_t CallManagerServiceProxy::ControlCamera(std::u16string cameraId)
 {
     MessageOption option;
     MessageParcel dataParcel;
@@ -728,7 +716,6 @@ int32_t CallManagerServiceProxy::ControlCamera(std::u16string cameraId, std::u16
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
     dataParcel.WriteString16(cameraId);
-    dataParcel.WriteString16(callingPackage);
     if (Remote() == nullptr) {
         TELEPHONY_LOGE("function Remote() return nullptr!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
@@ -880,6 +867,7 @@ bool CallManagerServiceProxy::IsEmergencyPhoneNumber(std::u16string &number, int
         return error;
     }
     bool result = replyParcel.ReadBool();
+    errorCode = replyParcel.ReadInt32();
     return result;
 }
 
@@ -948,12 +936,12 @@ int32_t CallManagerServiceProxy::GetMainCallId(int32_t callId)
     MessageParcel replyParcel;
     if (!dataParcel.WriteInterfaceToken(CallManagerServiceProxy::GetDescriptor())) {
         TELEPHONY_LOGE("write descriptor fail");
-        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+        return TELEPHONY_ERROR;
     }
     dataParcel.WriteInt32(callId);
     if (Remote() == nullptr) {
         TELEPHONY_LOGE("function Remote() return nullptr!");
-        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+        return TELEPHONY_ERROR;
     }
     int32_t error = Remote()->SendRequest(INTERFACE_GET_MAINID, dataParcel, replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
@@ -1106,7 +1094,7 @@ int32_t CallManagerServiceProxy::SetImsFeatureValue(int32_t slotId, FeatureType 
     return replyParcel.ReadInt32();
 }
 
-int32_t CallManagerServiceProxy::UpdateCallMediaMode(int32_t callId, CallMediaMode mode)
+int32_t CallManagerServiceProxy::UpdateImsCallMode(int32_t callId, ImsCallMode mode)
 {
     MessageOption option;
     MessageParcel dataParcel;
@@ -1116,20 +1104,20 @@ int32_t CallManagerServiceProxy::UpdateCallMediaMode(int32_t callId, CallMediaMo
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     dataParcel.WriteInt32(callId);
-    dataParcel.WriteInt32(mode);
+    dataParcel.WriteUint32(mode);
     if (Remote() == nullptr) {
         TELEPHONY_LOGE("function Remote() return nullptr!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     int32_t error = Remote()->SendRequest(INTERFACE_UPDATE_CALL_MEDIA_MODE, dataParcel, replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("function UpdateCallMediaMode failed! errCode:%{public}d", error);
+        TELEPHONY_LOGE("function UpdateImsCallMode failed! errCode:%{public}d", error);
         return error;
     }
     return replyParcel.ReadInt32();
 }
 
-int32_t CallManagerServiceProxy::EnableVoLte(int32_t slotId)
+int32_t CallManagerServiceProxy::EnableImsSwitch(int32_t slotId)
 {
     MessageOption option;
     MessageParcel dataParcel;
@@ -1145,13 +1133,13 @@ int32_t CallManagerServiceProxy::EnableVoLte(int32_t slotId)
     }
     int32_t error = Remote()->SendRequest(INTERFACE_ENABLE_VOLTE, dataParcel, replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("function EnableVoLte failed! errCode:%{public}d", error);
+        TELEPHONY_LOGE("function EnableImsSwitch failed! errCode:%{public}d", error);
         return error;
     }
     return replyParcel.ReadInt32();
 }
 
-int32_t CallManagerServiceProxy::DisableVoLte(int32_t slotId)
+int32_t CallManagerServiceProxy::DisableImsSwitch(int32_t slotId)
 {
     MessageOption option;
     MessageParcel dataParcel;
@@ -1167,13 +1155,13 @@ int32_t CallManagerServiceProxy::DisableVoLte(int32_t slotId)
     }
     int32_t error = Remote()->SendRequest(INTERFACE_DISABLE_VOLTE, dataParcel, replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("function DisableVoLte failed! errCode:%{public}d", error);
+        TELEPHONY_LOGE("function DisableImsSwitch failed! errCode:%{public}d", error);
         return error;
     }
     return replyParcel.ReadInt32();
 }
 
-int32_t CallManagerServiceProxy::IsVoLteEnabled(int32_t slotId)
+int32_t CallManagerServiceProxy::IsImsSwitchEnabled(int32_t slotId)
 {
     MessageOption option;
     MessageParcel dataParcel;
@@ -1189,7 +1177,7 @@ int32_t CallManagerServiceProxy::IsVoLteEnabled(int32_t slotId)
     }
     int32_t error = Remote()->SendRequest(INTERFACE_IS_VOLTE_ENABLED, dataParcel, replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("function IsVoLteEnabled failed! errCode:%{public}d", error);
+        TELEPHONY_LOGE("function IsImsSwitchEnabled failed! errCode:%{public}d", error);
         return error;
     }
     return replyParcel.ReadInt32();
@@ -1307,6 +1295,28 @@ int32_t CallManagerServiceProxy::ReportOttCallDetailsInfo(std::vector<OttCallDet
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     int32_t error = Remote()->SendRequest(INTERFACE_REPORT_OTT_CALL_DETAIL_INFO, dataParcel, replyParcel, option);
+    if (error != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("function ReportOttCallDetailsInfo failed! errCode:%{public}d", error);
+        return error;
+    }
+    return replyParcel.ReadInt32();
+}
+
+int32_t CallManagerServiceProxy::ReportOttCallEventInfo(OttCallEventInfo &eventInfo)
+{
+    MessageOption option;
+    MessageParcel dataParcel;
+    MessageParcel replyParcel;
+    if (!dataParcel.WriteInterfaceToken(CallManagerServiceProxy::GetDescriptor())) {
+        TELEPHONY_LOGE("write descriptor fail");
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    dataParcel.WriteRawData((const void *)&eventInfo, sizeof(OttCallEventInfo));
+    if (Remote() == nullptr) {
+        TELEPHONY_LOGE("function Remote() return nullptr!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t error = Remote()->SendRequest(INTERFACE_REPORT_OTT_CALL_EVENT_INFO, dataParcel, replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("function ReportOttCallDetailsInfo failed! errCode:%{public}d", error);
         return error;

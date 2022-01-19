@@ -13,7 +13,7 @@
 * limitations under the License.
 */
 
-import { AsyncCallback, Callback } from "./basic";
+import {AsyncCallback, Callback} from "./basic";
 
 /**
  * Provides methods related to call management.
@@ -214,6 +214,7 @@ declare namespace call {
 
     /**
      * @systemapi Hide this for inner system use.
+     * @since 8
      */
     function on(type: 'callDisconnectedCause', callback: Callback<DisconnectedDetails>): void;
     function off(type: 'callDisconnectedCause', callback?: Callback<DisconnectedDetails>): void;
@@ -282,53 +283,44 @@ declare namespace call {
 
     /**
      * @systemapi Hide this for inner system use.
+     * @since 8
      */
     function joinConference(mainCallId: number, callNumberList: Array<string>, callback: AsyncCallback<void>): void;
     function joinConference(mainCallId: number, callNumberList: Array<string>): Promise<void>;
 
     /**
      * @systemapi Hide this for inner system use.
+     * @since 8
      */
-    function updateCallMediaMode(callId: number, mode: CallMediaMode, callback: AsyncCallback<void>): void;
-    function updateCallMediaMode(callId: number, mode: CallMediaMode): Promise<void>;
+    function UpdateImsCallMode(callId: number, mode: ImsCallMode, callback: AsyncCallback<void>): void;
+    function UpdateImsCallMode(callId: number, mode: ImsCallMode): Promise<void>;
 
     /**
      * @systemapi Hide this for inner system use.
+     * @since 8
      */
-    function enableLteEnhanceMode(slotId: number, callback: AsyncCallback<void>): void;
-    function enableLteEnhanceMode(slotId: number): Promise<void>;
+    function enableImsSwitch(slotId: number, callback: AsyncCallback<void>): void;
+    function enableImsSwitch(slotId: number): Promise<void>;
 
     /**
      * @systemapi Hide this for inner system use.
+     * @since 8
      */
-    function disableLteEnhanceMode(slotId: number, callback: AsyncCallback<void>): void;
-    function disableLteEnhanceMode(slotId: number): Promise<void>;
+    function disableImsSwitch(slotId: number, callback: AsyncCallback<void>): void;
+    function disableImsSwitch(slotId: number): Promise<void>;
 
     /**
      * @systemapi Hide this for inner system use.
+     * @since 8
      */
-    function isLteEnhanceModeEnabled(slotId: number, callback: AsyncCallback<boolean>): void;
-    function isLteEnhanceModeEnabled(slotId: number): Promise<boolean>;
+    function isImsSwitchEnabled(slotId: number, callback: AsyncCallback<boolean>): void;
+    function isImsSwitchEnabled(slotId: number): Promise<boolean>;
 
     /**
      * @systemapi Hide this for inner system use.
+     * @since 8
      */
-    function enableVoLTE(slotId: number, callback: AsyncCallback<void>): void;
-    function enableVoLTE(slotId: number): Promise<void>;
-
-    /**
-     * @systemapi Hide this for inner system use.
-     */
-    function disableVoLTE(slotId: number, callback: AsyncCallback<void>): void;
-    function disableVoLTE(slotId: number): Promise<void>;
-
-    /**
-     * @systemapi Hide this for inner system use.
-     */
-    function isVoLTEEnabled(slotId: number, callback: AsyncCallback<boolean>): void;
-    function isVoLTEEnabled(slotId: number): Promise<boolean>;
-
-    export enum CallMediaMode {
+    export enum ImsCallMode {
         CALL_MODE_AUDIO_ONLY = 0,
         CALL_MODE_SEND_ONLY,
         CALL_MODE_RECEIVE_ONLY,
@@ -411,7 +403,6 @@ declare namespace call {
     export enum ConferenceState {
         TEL_CONFERENCE_IDLE = 0,
         TEL_CONFERENCE_ACTIVE,
-        TEL_CONFERENCE_HOLDING,
         TEL_CONFERENCE_DISCONNECTING,
         TEL_CONFERENCE_DISCONNECTED,
     }
@@ -602,6 +593,9 @@ declare namespace call {
         countryCode?: string;
     }
 
+    /**
+     * @systemapi Hide this for inner system use.
+     */
     export interface NumberCompareOptions {
         numA: string;
         netISOA: string;
@@ -609,6 +603,10 @@ declare namespace call {
         netISOB: string;
     }
 
+    /**
+     * @systemapi Hide this for inner system use.
+     * @since 8
+     */
     export enum DisconnectedDetails {
         UNASSIGNED_NUMBER = 1,
         NO_ROUTE_TO_DESTINATION = 3,

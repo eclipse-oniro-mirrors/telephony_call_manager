@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "enable_speaker_device.h"
+#include "earpiece_device_state.h"
 
 #include "telephony_log_wrapper.h"
 
@@ -21,30 +21,23 @@
 
 namespace OHOS {
 namespace Telephony {
-bool EnableSpeakerDevice::ProcessEvent(int32_t event)
+bool EarpieceDeviceState::ProcessEvent(int32_t event)
 {
     bool result = false;
     std::lock_guard<std::mutex> lock(mutex_);
     switch (event) {
         case AudioEvent::WIRED_HEADSET_CONNECTED:
-            // should switch to wired headset route while wired headset connected
             result = DelayedSingleton<AudioDeviceManager>::GetInstance()->ProcessEvent(
                 AudioEvent::ENABLE_DEVICE_WIRED_HEADSET);
             break;
         case AudioEvent::BLUETOOTH_SCO_CONNECTED:
-            // should switch to bluetooth sco route while bluetooth sco connected
             result = DelayedSingleton<AudioDeviceManager>::GetInstance()->ProcessEvent(
                 AudioEvent::ENABLE_DEVICE_BLUETOOTH);
-            break;
-        case AudioEvent::AUDIO_ACTIVATED:
-            // maybe incoming state -> cs call state , should reinitialize audio route
-            result =
-                DelayedSingleton<AudioDeviceManager>::GetInstance()->ProcessEvent(AudioEvent::INIT_AUDIO_DEVICE);
             break;
         default:
             break;
     }
-    TELEPHONY_LOGI("enable speaker device lock release");
+    TELEPHONY_LOGI("enable earpiece device lock release");
     return result;
 }
 } // namespace Telephony

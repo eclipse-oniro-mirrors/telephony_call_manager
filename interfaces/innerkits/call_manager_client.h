@@ -26,7 +26,7 @@ namespace Telephony {
 class CallManagerClient : public std::enable_shared_from_this<CallManagerClient> {
     DECLARE_DELAYED_SINGLETON(CallManagerClient)
 public:
-    void Init(int32_t systemAbilityId, std::u16string &bundleName);
+    void Init(int32_t systemAbilityId);
     void UnInit();
     int32_t RegisterCallBack(std::unique_ptr<CallManagerCallback> callback);
     int32_t UnRegisterCallBack();
@@ -63,7 +63,7 @@ public:
     int32_t SetMuted(bool isMute);
     int32_t MuteRinger();
     int32_t SetAudioDevice(AudioDevice deviceType);
-    int32_t ControlCamera(std::u16string cameraId, std::u16string callingPackage);
+    int32_t ControlCamera(std::u16string cameraId);
     int32_t SetPreviewWindow(VideoWindow &window);
     int32_t SetDisplayWindow(VideoWindow &window);
     int32_t SetCameraZoom(float zoomRatio);
@@ -73,10 +73,10 @@ public:
     int32_t SetImsConfig(int32_t slotId, ImsConfigItem item, std::u16string &value);
     int32_t GetImsFeatureValue(int32_t slotId, FeatureType type);
     int32_t SetImsFeatureValue(int32_t slotId, FeatureType type, int32_t value);
-    int32_t UpdateCallMediaMode(int32_t callId, CallMediaMode mode);
-    int32_t EnableVoLte(int32_t slotId);
-    int32_t DisableVoLte(int32_t slotId);
-    int32_t IsVoLteEnabled(int32_t slotId);
+    int32_t UpdateImsCallMode(int32_t callId, ImsCallMode mode);
+    int32_t EnableImsSwitch(int32_t slotId);
+    int32_t DisableImsSwitch(int32_t slotId);
+    int32_t IsImsSwitchEnabled(int32_t slotId);
     int32_t EnableLteEnhanceMode(int32_t slotId);
     int32_t DisableLteEnhanceMode(int32_t slotId);
     int32_t IsLteEnhanceModeEnabled(int32_t slotId);
@@ -84,6 +84,7 @@ public:
     int32_t StopRtt(int32_t callId);
     int32_t JoinConference(int32_t callId, std::vector<std::u16string> &numberList);
     int32_t ReportOttCallDetailsInfo(std::vector<OttCallDetailsInfo> &ottVec);
+    int32_t ReportOttCallEventInfo(OttCallEventInfo &eventInfo);
 };
 } // namespace Telephony
 } // namespace OHOS

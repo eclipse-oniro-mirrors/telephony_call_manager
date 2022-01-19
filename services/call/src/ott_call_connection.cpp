@@ -107,7 +107,7 @@ int32_t OTTCallConnection::InviteToConference(
         OttCallRequestId::OTT_REQUEST_INVITE_TO_CONFERENCE, info);
 }
 
-int32_t OTTCallConnection::UpdateCallMediaMode(const OttCallRequestInfo &requestInfo, CallMediaMode mode)
+int32_t OTTCallConnection::UpdateImsCallMode(const OttCallRequestInfo &requestInfo, ImsCallMode mode)
 {
     AppExecFwk::PacMap info;
     PackCellularCallInfo(requestInfo, info);

@@ -522,10 +522,10 @@ public:
         return vec;
     }
 
-    int32_t ControlCamera(std::u16string cameraId, std::u16string callingPackage)
+    int32_t ControlCamera(std::u16string cameraId)
     {
         if (callManagerServicePtr_ != nullptr) {
-            return callManagerServicePtr_->ControlCamera(cameraId, callingPackage);
+            return callManagerServicePtr_->ControlCamera(cameraId);
         }
         TELEPHONY_LOGE("callManagerServicePtr_ is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -576,28 +576,28 @@ public:
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
 
-    int32_t EnableVoLte(int32_t slotId)
+    int32_t EnableImsSwitch(int32_t slotId)
     {
         if (callManagerServicePtr_ != nullptr) {
-            return callManagerServicePtr_->EnableVoLte(slotId);
+            return callManagerServicePtr_->EnableImsSwitch(slotId);
         }
         TELEPHONY_LOGE("callManagerServicePtr_ is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
 
-    int32_t DisableVoLte(int32_t slotId)
+    int32_t DisableImsSwitch(int32_t slotId)
     {
         if (callManagerServicePtr_ != nullptr) {
-            return callManagerServicePtr_->DisableVoLte(slotId);
+            return callManagerServicePtr_->DisableImsSwitch(slotId);
         }
         TELEPHONY_LOGE("callManagerServicePtr_ is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
 
-    int32_t IsVoLteEnabled(int32_t slotId)
+    int32_t IsImsSwitchEnabled(int32_t slotId)
     {
         if (callManagerServicePtr_ != nullptr) {
-            return callManagerServicePtr_->IsVoLteEnabled(slotId);
+            return callManagerServicePtr_->IsImsSwitchEnabled(slotId);
         }
         TELEPHONY_LOGE("callManagerServicePtr_ is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -637,8 +637,7 @@ public:
             TELEPHONY_LOGE("create CallAbilityCallbackStub object failed!");
             return TELEPHONY_ERR_LOCAL_PTR_NULL;
         }
-        std::u16string bundleName = Str8ToStr16("com.ohos.callManagerTest");
-        int32_t ret = callManagerServicePtr_->RegisterCallBack(callAbilityCallbackPtr_, bundleName);
+        int32_t ret = callManagerServicePtr_->RegisterCallBack(callAbilityCallbackPtr_);
         if (ret != TELEPHONY_SUCCESS) {
             DisconnectService();
             TELEPHONY_LOGE("register callback to call manager service failed,result: %{public}d", ret);

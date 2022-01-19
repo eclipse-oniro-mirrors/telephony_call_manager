@@ -16,7 +16,7 @@
 #ifndef CS_CALL_H
 #define CS_CALL_H
 
-#include "cs_conference_base.h"
+#include "cs_conference.h"
 #include "carrier_call.h"
 
 namespace OHOS {

@@ -44,6 +44,7 @@ public:
     int32_t HandleCallsReportInfo(const CallDetailsInfo &info);
     int32_t HandleDisconnectedCause(int32_t cause);
     int32_t HandleEventResultReportInfo(const CellularCallEventInfo &info);
+    int32_t HandleOttEventReportInfo(const OttCallEventInfo &info);
     void CallFilterCompleteResult(const CallDetailInfo &info);
 
 private:
@@ -69,6 +70,7 @@ private:
     CallDetailsInfo callDetailsInfo_;
     sptr<CallIncomingFilterManager> CallIncomingFilterManagerPtr_;
     std::map<RequestResultEventId, CallAbilityEventId> mEventIdTransferMap_;
+    std::map<OttCallEventId, CallAbilityEventId> mOttEventIdTransferMap_;
 };
 } // namespace Telephony
 } // namespace OHOS

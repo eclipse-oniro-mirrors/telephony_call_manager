@@ -90,7 +90,7 @@ int32_t CarrierCall::CarrierRejectCall()
     if (state == TelCallState::CALL_STATUS_INCOMING) {
         ret = cellularCallConnectionPtr_->Reject(callInfo);
     } else {
-        ret = cellularCallConnectionPtr_->HangUp(callInfo);
+        ret = cellularCallConnectionPtr_->HangUp(callInfo, CallSupplementType::TYPE_DEFAULT);
     }
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("Reject failed!");
@@ -113,9 +113,9 @@ int32_t CarrierCall::CarrierHangUpCall()
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     if (policyFlag & POLICY_FLAG_HANG_UP_ACTIVE) {
-        ret = cellularCallConnectionPtr_->CallSupplement(TYPE_HANG_UP_ACTIVE);
+        ret = cellularCallConnectionPtr_->HangUp(callInfo, CallSupplementType::TYPE_HANG_UP_ACTIVE);
     } else {
-        ret = cellularCallConnectionPtr_->HangUp(callInfo);
+        ret = cellularCallConnectionPtr_->HangUp(callInfo, CallSupplementType::TYPE_DEFAULT);
     }
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("End failed!");

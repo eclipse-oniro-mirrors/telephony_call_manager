@@ -13,27 +13,22 @@
  * limitations under the License.
  */
 
-#ifndef IMS_CONFERENCE_BASE_H
-#define IMS_CONFERENCE_BASE_H
+#ifndef TELEPHONY_SPEAKER_DEVICE_STATE_H
+#define TELEPHONY_SPEAKER_DEVICE_STATE_H
 
-#include "singleton.h"
-#include "conference_base.h"
+#include "audio_base.h"
 
 namespace OHOS {
 namespace Telephony {
-class ImsConferenceBase : public ConferenceBase {
-    DECLARE_DELAYED_SINGLETON(ImsConferenceBase)
+class SpeakerDeviceState : public AudioBase {
 public:
-    int32_t JoinToConference(int32_t callId) override;
-    int32_t LeaveFromConference(int32_t callId) override;
-    int32_t HoldConference(int32_t callId) override;
-    int32_t CanCombineConference() override;
-    int32_t CanSeparateConference() override;
+    SpeakerDeviceState() = default;
+    ~SpeakerDeviceState() = default;
+    bool ProcessEvent(int32_t event) override;
 
 private:
-    uint32_t maxSubCallLimits_;
+    std::mutex mutex_;
 };
 } // namespace Telephony
 } // namespace OHOS
-
-#endif
+#endif // !TELEPHONY_SPEAKER_DEVICE_STATE_H

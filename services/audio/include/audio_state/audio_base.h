@@ -13,9 +13,11 @@
  * limitations under the License.
  */
 
-#ifndef AUDIO_BASE_H
-#define AUDIO_BASE_H
+#ifndef TELEPHONY_AUDIO_BASE_H
+#define TELEPHONY_AUDIO_BASE_H
+
 #include <cstdint>
+#include <mutex>
 
 namespace OHOS {
 namespace Telephony {
@@ -41,13 +43,13 @@ enum AudioEvent {
     NO_MORE_ACTIVE_CALL,
     NO_MORE_ALERTING_CALL,
     NO_MORE_INCOMING_CALL,
-    CALL_TYPE_CHANGED, // call type : cs ims ott
+    CALL_TYPE_CS_CHANGE_IMS,
+    CALL_TYPE_IMS_CHANGE_CS,
     // audio device event
     ENABLE_DEVICE_EARPIECE,
     ENABLE_DEVICE_SPEAKER,
     ENABLE_DEVICE_WIRED_HEADSET,
     ENABLE_DEVICE_BLUETOOTH,
-    DEVICES_INACTIVE,
     WIRED_HEADSET_CONNECTED,
     WIRED_HEADSET_DISCONNECTED,
     BLUETOOTH_SCO_CONNECTED,
@@ -64,4 +66,4 @@ public:
 };
 } // namespace Telephony
 } // namespace OHOS
-#endif // AUDIO_BASE_H
+#endif // TELEPHONY_AUDIO_BASE_H

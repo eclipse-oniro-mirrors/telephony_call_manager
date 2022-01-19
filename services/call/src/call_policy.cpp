@@ -17,7 +17,7 @@
 
 #include "call_manager_errors.h"
 #include "telephony_log_wrapper.h"
-#include "ims_conference_base.h"
+#include "ims_conference.h"
 
 #include "call_number_utils.h"
 
@@ -160,32 +160,17 @@ int32_t CallPolicy::SwitchCallPolicy(int32_t callId)
     return TELEPHONY_SUCCESS;
 }
 
-int32_t CallPolicy::UpdateCallMediaModePolicy(int32_t callId, CallMediaMode mode)
+int32_t CallPolicy::UpdateCallMediaModePolicy(int32_t callId, ImsCallMode mode)
 {
-    if (mode != CallMediaMode::CALL_MODE_AUDIO_ONLY && mode != CallMediaMode::CALL_MODE_SEND_RECEIVE) {
-        TELEPHONY_LOGE("media mode is illegal");
-        return CALL_ERR_VIDEO_ILLEGAL_MEDIA_TYPE;
-    }
+    TELEPHONY_LOGI("callid %{public}d, mode:%{public}d", callId, mode);
     sptr<CallBase> callPtr = CallObjectManager::GetOneCallObject(callId);
     if (callPtr == nullptr) {
         TELEPHONY_LOGE("callId is invalid, callId:%{public}d", callId);
         return CALL_ERR_INVALID_CALLID;
     }
-    if (callPtr->GetTelCallState() != TelCallState::CALL_STATUS_ACTIVE) {
-        TELEPHONY_LOGE("call state illegal");
-        return CALL_ERR_CALL_STATE;
-    }
     if (callPtr->GetCallType() != CallType::TYPE_IMS && callPtr->GetCallType() != CallType::TYPE_OTT) {
         TELEPHONY_LOGE("calltype is illegal, calltype:%{public}d", callPtr->GetCallType());
         return CALL_ERR_VIDEO_ILLEGAL_CALL_TYPE;
-    }
-    // if a video call upgrade to video, it's not allowed, and audio call downgrade to audio-only also is forbidden
-    if ((callPtr->GetCallMediaMode() == CallMediaMode::CALL_MODE_SEND_RECEIVE &&
-            mode == CallMediaMode::CALL_MODE_SEND_RECEIVE) ||
-        (callPtr->GetCallMediaMode() == CallMediaMode::CALL_MODE_AUDIO_ONLY &&
-            mode == CallMediaMode::CALL_MODE_AUDIO_ONLY)) {
-        TELEPHONY_LOGE("illegal media type swtich");
-        return CALL_ERR_VIDEO_ILLEGAL_MEDIA_TYPE;
     }
     return TELEPHONY_SUCCESS;
 }
@@ -403,7 +388,7 @@ int32_t CallPolicy::InviteToConferencePolicy(int32_t callId, std::vector<std::st
             return CALL_ERR_NUMBER_OUT_OF_RANGE;
         }
     }
-    if (DelayedSingleton<ImsConferenceBase>::GetInstance()->GetMainCall() != callId) {
+    if (DelayedSingleton<ImsConference>::GetInstance()->GetMainCall() != callId) {
         TELEPHONY_LOGE("conference with main callId %{public}d not exist", callId);
         return CALL_ERR_CONFERENCE_NOT_EXISTS;
     }

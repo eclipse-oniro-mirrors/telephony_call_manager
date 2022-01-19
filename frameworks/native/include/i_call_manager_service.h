@@ -85,14 +85,15 @@ enum CallManagerSurfaceCode {
     INTERFACE_STOP_RTT,
     INTERFACE_JOIN_CONFERENCE,
     INTERFACE_REPORT_OTT_CALL_DETAIL_INFO,
+    INTERFACE_REPORT_OTT_CALL_EVENT_INFO,
 };
 } // end extern
 
 class ICallManagerService : public IRemoteBroker {
 public:
     virtual ~ICallManagerService() = default;
-    virtual int32_t RegisterCallBack(const sptr<ICallAbilityCallback> &callback, std::u16string &bundleName) = 0;
-    virtual int32_t UnRegisterCallBack(std::u16string &bundleName) = 0;
+    virtual int32_t RegisterCallBack(const sptr<ICallAbilityCallback> &callback) = 0;
+    virtual int32_t UnRegisterCallBack() = 0;
     virtual int32_t DialCall(std::u16string number, AppExecFwk::PacMap &extras) = 0;
     virtual int32_t AnswerCall(int32_t callId, int32_t videoState) = 0;
     virtual int32_t RejectCall(int32_t callId, bool rejectWithMessage, std::u16string textMessage) = 0;
@@ -126,7 +127,7 @@ public:
     virtual int32_t GetMainCallId(int32_t callId) = 0;
     virtual std::vector<std::u16string> GetSubCallIdList(int32_t callId) = 0;
     virtual std::vector<std::u16string> GetCallIdListForConference(int32_t callId) = 0;
-    virtual int32_t ControlCamera(std::u16string cameraId, std::u16string callingPackage) = 0;
+    virtual int32_t ControlCamera(std::u16string cameraId) = 0;
     virtual int32_t SetPreviewWindow(VideoWindow &window) = 0;
     virtual int32_t SetDisplayWindow(VideoWindow &window) = 0;
     virtual int32_t SetCameraZoom(float zoomRatio) = 0;
@@ -137,10 +138,10 @@ public:
     virtual int32_t SetImsConfig(int32_t slotId, ImsConfigItem item, std::u16string &value) = 0;
     virtual int32_t GetImsFeatureValue(int32_t slotId, FeatureType type) = 0;
     virtual int32_t SetImsFeatureValue(int32_t slotId, FeatureType type, int32_t value) = 0;
-    virtual int32_t UpdateCallMediaMode(int32_t callId, CallMediaMode mode) = 0;
-    virtual int32_t EnableVoLte(int32_t slotId) = 0;
-    virtual int32_t DisableVoLte(int32_t slotId) = 0;
-    virtual int32_t IsVoLteEnabled(int32_t slotId) = 0;
+    virtual int32_t UpdateImsCallMode(int32_t callId, ImsCallMode mode) = 0;
+    virtual int32_t EnableImsSwitch(int32_t slotId) = 0;
+    virtual int32_t DisableImsSwitch(int32_t slotId) = 0;
+    virtual int32_t IsImsSwitchEnabled(int32_t slotId) = 0;
     virtual int32_t EnableLteEnhanceMode(int32_t slotId) = 0;
     virtual int32_t DisableLteEnhanceMode(int32_t slotId) = 0;
     virtual int32_t IsLteEnhanceModeEnabled(int32_t slotId) = 0;
@@ -148,6 +149,7 @@ public:
     virtual int32_t StopRtt(int32_t callId) = 0;
     virtual int32_t JoinConference(int32_t callId, std::vector<std::u16string> &numberList) = 0;
     virtual int32_t ReportOttCallDetailsInfo(std::vector<OttCallDetailsInfo> &ottVec) = 0;
+    virtual int32_t ReportOttCallEventInfo(OttCallEventInfo &eventInfo) = 0;
 
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"OHOS.Telephony.ICallManagerService");

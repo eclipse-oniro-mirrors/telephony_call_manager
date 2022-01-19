@@ -30,8 +30,8 @@ AudioControlManager::~AudioControlManager() {}
 
 void AudioControlManager::Init()
 {
-    DelayedSingleton<AudioSceneProcessor>::GetInstance()->Init();
     DelayedSingleton<AudioDeviceManager>::GetInstance()->Init();
+    DelayedSingleton<AudioSceneProcessor>::GetInstance()->Init();
 }
 
 void AudioControlManager::CallStateUpdated(
@@ -60,7 +60,7 @@ void AudioControlManager::IncomingCallActivated(sptr<CallBase> &callObjectPtr)
         return;
     }
     StopRingtone();
-    SetMute(false); // unmute microphone
+    DelayedSingleton<AudioProxy>::GetInstance()->SetMicrophoneMute(false); // unmute microphone
 }
 
 void AudioControlManager::IncomingCallHungUp(sptr<CallBase> &callObjectPtr, bool isSendSms, std::string content)
@@ -70,12 +70,8 @@ void AudioControlManager::IncomingCallHungUp(sptr<CallBase> &callObjectPtr, bool
         return;
     }
     StopRingtone();
-    SetMute(true); // mute microphone
+    DelayedSingleton<AudioProxy>::GetInstance()->SetMicrophoneMute(true); // mute microphone
 }
-
-void AudioControlManager::NewCallCreated(sptr<CallBase> &callObjectPtr) {}
-
-void AudioControlManager::CallDestroyed(int32_t cause) {}
 
 void AudioControlManager::HandleCallStateUpdated(
     sptr<CallBase> &callObjectPtr, TelCallState priorState, TelCallState nextState)
@@ -133,7 +129,8 @@ void AudioControlManager::HandlePriorState(sptr<CallBase> &callObjectPtr, TelCal
             break;
         case TelCallState::CALL_STATUS_ACTIVE:
             if (stateNumber == EMPTY_VALUE) {
-                SetMute(true); // mute microphone while no more active calls
+                // mute microphone while no more active call
+                DelayedSingleton<AudioProxy>::GetInstance()->SetMicrophoneMute(true);
                 event = AudioEvent::NO_MORE_ACTIVE_CALL;
             }
             break;
@@ -178,7 +175,7 @@ void AudioControlManager::HandleNewActiveCall(sptr<CallBase> &callObjectPtr)
  * @param device , audio device
  * usually called by the ui interaction , in purpose of switching to another audio device
  */
-bool AudioControlManager::SetAudioDevice(AudioDevice device)
+int32_t AudioControlManager::SetAudioDevice(AudioDevice device)
 {
     AudioDevice audioDevice = AudioDevice::DEVICE_UNKNOWN;
     switch (device) {
@@ -191,7 +188,11 @@ bool AudioControlManager::SetAudioDevice(AudioDevice device)
         default:
             break;
     }
-    return DelayedSingleton<AudioDeviceManager>::GetInstance()->SwitchDevice(audioDevice);
+    if (audioDevice != AudioDevice::DEVICE_UNKNOWN &&
+        DelayedSingleton<AudioDeviceManager>::GetInstance()->SwitchDevice(audioDevice)) {
+        return TELEPHONY_SUCCESS;
+    }
+    return CALL_ERR_AUDIO_SET_AUDIO_DEVICE_FAILED;
 }
 
 bool AudioControlManager::PlayRingtone()
@@ -331,9 +332,16 @@ AudioDevice AudioControlManager::GetInitAudioDevice() const
     }
 }
 
-// mute or unmute microphone
+/**
+ * @param isMute , mute state
+ * usually called by the ui interaction , mute or unmute microphone
+ */
 int32_t AudioControlManager::SetMute(bool isMute)
 {
+    if (!IsAudioActivated()) {
+        TELEPHONY_LOGE("audio is not activated, set mute failed");
+        return CALL_ERR_AUDIO_SETTING_MUTE_FAILED;
+    }
     if (DelayedSingleton<CallControlManager>::GetInstance()->HasEmergency()) {
         isMute = false;
     }
@@ -530,5 +538,9 @@ int32_t AudioControlManager::StopWaitingTone()
 {
     return StopCallTone();
 }
+
+void AudioControlManager::NewCallCreated(sptr<CallBase> &callObjectPtr) {}
+
+void AudioControlManager::CallDestroyed(int32_t cause) {}
 } // namespace Telephony
 } // namespace OHOS

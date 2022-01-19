@@ -43,6 +43,7 @@ public:
         std::cout << "---------- warning ------------" << std::endl;
         std::cout << "---Please modify PHONE_NUMBER first in the file call_manager_gtest.cpp---" << std::endl;
         std::cout << "---------- gtest start ------------" << std::endl;
+        isConnected_ = false;
         clientPtr_ = std::make_unique<CallManagerConnect>();
         if (clientPtr_ == nullptr) {
             std::cout << "make_unique CallManagerConnect failed!" << std::endl;
@@ -52,6 +53,7 @@ public:
             std::cout << "connect callManager server failed!" << std::endl;
             return;
         }
+        isConnected_ = true;
         std::cout << "connect callManager server success!!!" << std::endl;
 
         CallInfoManager::Init();
@@ -60,6 +62,14 @@ public:
     bool HasSimCard()
     {
         return DelayedRefSingleton<CoreServiceClient>::GetInstance().HasSimCard(DEFAULT_SLOT_ID);
+    }
+
+    static bool IsServiceConnected()
+    {
+        if (!isConnected_) {
+            std::cout << "call manager service not connected" << std::endl;
+        }
+        return isConnected_;
     }
 
     inline void SleepForSeconds(int32_t seconds)
@@ -105,19 +115,24 @@ public:
     }
 
 public:
+    static bool isConnected_;
     static std::unique_ptr<CallManagerConnect> clientPtr_;
     AppExecFwk::PacMap dialInfo_;
 
     const int32_t SLEEP_50_MS = 50;
+    const int32_t SLEEP_100_MS = 100;
+    const int32_t SLEEP_200_MS = 200;
     const int32_t SLEEP_1000_MS = 1000;
     const int32_t SLEEP_12000_MS = 12000;
     const int32_t SLEEP_30000_MS = 30000;
     const std::string EMPTY_DEFAULT = "";
     const int32_t FALSE_DEFAULT = -1;
+    const int32_t DIAL_SCENE_TEST = 100;
     std::unordered_map<int32_t, std::unordered_set<int32_t>> g_callStateMap;
     int newCallId_ = -1;
 };
 
+bool CallManagerGtest::isConnected_ = false;
 std::unique_ptr<CallManagerConnect> CallManagerGtest::clientPtr_ = nullptr;
 } // namespace Telephony
 } // namespace OHOS

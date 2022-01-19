@@ -42,9 +42,9 @@ public:
     int32_t SetImsConfig(int32_t slotId, ImsConfigItem item, std::u16string &value);
     int32_t GetImsFeatureValue(int32_t slotId, FeatureType type);
     int32_t SetImsFeatureValue(int32_t slotId, FeatureType type, int32_t value);
-    int32_t EnableVoLte(int32_t slotId);
-    int32_t DisableVoLte(int32_t slotId);
-    int32_t IsVoLteEnabled(int32_t slotId);
+    int32_t EnableImsSwitch(int32_t slotId);
+    int32_t DisableImsSwitch(int32_t slotId);
+    int32_t IsImsSwitchEnabled(int32_t slotId);
     int32_t SetLteEnhanceMode(int32_t slotId, bool value);
     int32_t GetLteEnhanceMode(int32_t slotId);
 
