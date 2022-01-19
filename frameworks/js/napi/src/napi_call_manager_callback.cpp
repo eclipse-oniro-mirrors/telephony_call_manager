@@ -48,9 +48,9 @@ int32_t NapiCallManagerCallback::OnCallDisconnectedCause(DisconnectedDetails cau
 {
     int32_t ret = DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->UpdateCallDisconnectedCause(cause);
     if (ret != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("UpdateCallEvent failed! errCode:%{public}d", ret);
+        TELEPHONY_LOGE("UpdateCallDisconnectedCause failed! errCode:%{public}d", ret);
     } else {
-        TELEPHONY_LOGI("UpdateCallEvent success!");
+        TELEPHONY_LOGI("UpdateCallDisconnectedCause success!");
     }
     return ret;
 }

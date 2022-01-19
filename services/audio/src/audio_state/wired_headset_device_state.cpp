@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "enable_wired_headset_device.h"
+#include "wired_headset_device_state.h"
 
 #include "telephony_log_wrapper.h"
 
@@ -21,7 +21,7 @@
 
 namespace OHOS {
 namespace Telephony {
-bool EnableWiredHeadsetDevice::ProcessEvent(int32_t event)
+bool WiredHeadsetDeviceState::ProcessEvent(int32_t event)
 {
     bool result = false;
     std::lock_guard<std::mutex> lock(mutex_);

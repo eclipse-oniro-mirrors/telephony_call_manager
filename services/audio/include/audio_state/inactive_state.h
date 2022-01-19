@@ -13,11 +13,10 @@
  * limitations under the License.
  */
 
-#ifndef INACTIVE_STATE_H
-#define INACTIVE_STATE_H
+#ifndef TELEPHONY_INACTIVE_STATE_H
+#define TELEPHONY_INACTIVE_STATE_H
 
 #include "audio_base.h"
-#include <mutex>
 
 namespace OHOS {
 namespace Telephony {
@@ -32,4 +31,4 @@ private:
 };
 } // namespace Telephony
 } // namespace OHOS
-#endif // INACTIVE_STATE_H
+#endif // TELEPHONY_INACTIVE_STATE_H

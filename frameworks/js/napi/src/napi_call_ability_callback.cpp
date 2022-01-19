@@ -44,6 +44,7 @@ NapiCallAbilityCallback::NapiCallAbilityCallback()
     (void)memset_s(&startRttCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
     (void)memset_s(&stopRttCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
     (void)memset_s(&updateCallMediaModeCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
+    (void)memset_s(&callDisconnectCauseCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
     memberFuncMap_[CallResultReportId::GET_CALL_WAITING_REPORT_ID] = &NapiCallAbilityCallback::ReportGetWaitingInfo;
     memberFuncMap_[CallResultReportId::SET_CALL_WAITING_REPORT_ID] = &NapiCallAbilityCallback::ReportSetWaitingInfo;
     memberFuncMap_[CallResultReportId::GET_CALL_RESTRICTION_REPORT_ID] =
@@ -209,11 +210,15 @@ void NapiCallAbilityCallback::UnRegisterSetTransferCallback()
 
 int32_t NapiCallAbilityCallback::RegisterGetVolteCallback(EventCallback callback)
 {
-    if (getVolteCallback_.thisVar) {
-        TELEPHONY_LOGE("callback already exist!");
-        return CALL_ERR_CALLBACK_ALREADY_EXIST;
+    if (getVolteCallback_.callbackBeginTime_ != 0) {
+        if ((time(nullptr) - getVolteCallback_.callbackBeginTime_) < NAPI_MAX_TIMEOUT_SECOND) {
+            return CALL_ERR_CALLBACK_ALREADY_EXIST;
+        } else {
+            TELEPHONY_LOGE("callback already timeout");
+        }
     }
     getVolteCallback_ = callback;
+    getVolteCallback_.callbackBeginTime_ = time(nullptr);
     return TELEPHONY_SUCCESS;
 }
 
@@ -224,11 +229,15 @@ void NapiCallAbilityCallback::UnRegisterGetVolteCallback()
 
 int32_t NapiCallAbilityCallback::RegisterEnableVolteCallback(EventCallback callback)
 {
-    if (enableVolteCallback_.thisVar) {
-        TELEPHONY_LOGE("callback already exist!");
-        return CALL_ERR_CALLBACK_ALREADY_EXIST;
+    if (enableVolteCallback_.callbackBeginTime_ != 0) {
+        if ((time(nullptr) - enableVolteCallback_.callbackBeginTime_) < NAPI_MAX_TIMEOUT_SECOND) {
+            return CALL_ERR_CALLBACK_ALREADY_EXIST;
+        } else {
+            TELEPHONY_LOGE("callback already timeout");
+        }
     }
     enableVolteCallback_ = callback;
+    enableVolteCallback_.callbackBeginTime_ = time(nullptr);
     return TELEPHONY_SUCCESS;
 }
 
@@ -239,11 +248,15 @@ void NapiCallAbilityCallback::UnRegisterEnableVolteCallback()
 
 int32_t NapiCallAbilityCallback::RegisterDisableVolteCallback(EventCallback callback)
 {
-    if (disableVolteCallback_.thisVar) {
-        TELEPHONY_LOGE("callback already exist!");
-        return CALL_ERR_CALLBACK_ALREADY_EXIST;
+    if (disableVolteCallback_.callbackBeginTime_ != 0) {
+        if ((time(nullptr) - disableVolteCallback_.callbackBeginTime_) < NAPI_MAX_TIMEOUT_SECOND) {
+            return CALL_ERR_CALLBACK_ALREADY_EXIST;
+        } else {
+            TELEPHONY_LOGE("callback already timeout");
+        }
     }
     disableVolteCallback_ = callback;
+    disableVolteCallback_.callbackBeginTime_ = time(nullptr);
     return TELEPHONY_SUCCESS;
 }
 
@@ -254,11 +267,15 @@ void NapiCallAbilityCallback::UnRegisterDisableVolteCallback()
 
 int32_t NapiCallAbilityCallback::RegisterGetLteEnhanceCallback(EventCallback callback)
 {
-    if (getLteEnhanceCallback_.thisVar) {
-        TELEPHONY_LOGE("callback already exist!");
-        return CALL_ERR_CALLBACK_ALREADY_EXIST;
+    if (getLteEnhanceCallback_.callbackBeginTime_ != 0) {
+        if ((time(nullptr) - getLteEnhanceCallback_.callbackBeginTime_) < NAPI_MAX_TIMEOUT_SECOND) {
+            return CALL_ERR_CALLBACK_ALREADY_EXIST;
+        } else {
+            TELEPHONY_LOGE("callback already timeout");
+        }
     }
     getLteEnhanceCallback_ = callback;
+    getLteEnhanceCallback_.callbackBeginTime_ = time(nullptr);
     return TELEPHONY_SUCCESS;
 }
 
@@ -269,11 +286,15 @@ void NapiCallAbilityCallback::UnRegisterGetLteEnhanceCallback()
 
 int32_t NapiCallAbilityCallback::RegisterEnableLteEnhanceModeCallback(EventCallback callback)
 {
-    if (enableLteEnhanceCallback_.thisVar) {
-        TELEPHONY_LOGE("callback already exist!");
-        return CALL_ERR_CALLBACK_ALREADY_EXIST;
+    if (enableLteEnhanceCallback_.callbackBeginTime_ != 0) {
+        if ((time(nullptr) - enableLteEnhanceCallback_.callbackBeginTime_) < NAPI_MAX_TIMEOUT_SECOND) {
+            return CALL_ERR_CALLBACK_ALREADY_EXIST;
+        } else {
+            TELEPHONY_LOGE("callback already timeout");
+        }
     }
     enableLteEnhanceCallback_ = callback;
+    enableLteEnhanceCallback_.callbackBeginTime_ = time(nullptr);
     return TELEPHONY_SUCCESS;
 }
 
@@ -284,11 +305,15 @@ void NapiCallAbilityCallback::UnRegisterEnableLteEnhanceModeCallback()
 
 int32_t NapiCallAbilityCallback::RegisterDisableLteEnhanceModeCallback(EventCallback callback)
 {
-    if (disableLteEnhanceCallback_.thisVar) {
-        TELEPHONY_LOGE("callback already exist!");
-        return CALL_ERR_CALLBACK_ALREADY_EXIST;
+    if (disableLteEnhanceCallback_.callbackBeginTime_ != 0) {
+        if ((time(nullptr) - disableLteEnhanceCallback_.callbackBeginTime_) < NAPI_MAX_TIMEOUT_SECOND) {
+            return CALL_ERR_CALLBACK_ALREADY_EXIST;
+        } else {
+            TELEPHONY_LOGE("callback already timeout");
+        }
     }
     disableLteEnhanceCallback_ = callback;
+    disableLteEnhanceCallback_.callbackBeginTime_ = time(nullptr);
     return TELEPHONY_SUCCESS;
 }
 
@@ -365,11 +390,9 @@ int32_t NapiCallAbilityCallback::ReportGetVolteInfo(AppExecFwk::PacMap &resultIn
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     work->data = (void *)dataWorker;
+    (void)memset_s(&getVolteCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
     uv_queue_work(
         loop, work, [](uv_work_t *work) {}, ReportGetVolteInfoWork);
-    if (getVolteCallback_.thisVar) {
-        (void)memset_s(&getVolteCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
-    }
     return TELEPHONY_SUCCESS;
 }
 
@@ -396,11 +419,9 @@ int32_t NapiCallAbilityCallback::ReportEnableVolteInfo(AppExecFwk::PacMap &resul
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     work->data = (void *)dataWorker;
+    (void)memset_s(&enableVolteCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
     uv_queue_work(
         loop, work, [](uv_work_t *work) {}, ReportSetVolteInfoWork);
-    if (enableVolteCallback_.thisVar) {
-        (void)memset_s(&enableVolteCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
-    }
     return TELEPHONY_SUCCESS;
 }
 
@@ -427,18 +448,16 @@ int32_t NapiCallAbilityCallback::ReportDisableVolteInfo(AppExecFwk::PacMap &resu
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     work->data = (void *)dataWorker;
+    (void)memset_s(&disableVolteCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
     uv_queue_work(
         loop, work, [](uv_work_t *work) {}, ReportSetVolteInfoWork);
-    if (disableVolteCallback_.thisVar) {
-        (void)memset_s(&disableVolteCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
-    }
     return TELEPHONY_SUCCESS;
 }
 
 int32_t NapiCallAbilityCallback::ReportGetLteEnhanceInfo(AppExecFwk::PacMap &resultInfo)
 {
     if (getLteEnhanceCallback_.thisVar == nullptr) {
-        TELEPHONY_LOGE("disableVolteCallback_ is null!");
+        TELEPHONY_LOGE("getLteEnhanceCallback_ is null!");
         return CALL_ERR_CALLBACK_NOT_EXIST;
     }
     uv_loop_s *loop = nullptr;
@@ -458,11 +477,9 @@ int32_t NapiCallAbilityCallback::ReportGetLteEnhanceInfo(AppExecFwk::PacMap &res
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     work->data = (void *)dataWorker;
+    (void)memset_s(&getLteEnhanceCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
     uv_queue_work(
         loop, work, [](uv_work_t *work) {}, ReportGetLteEnhanceWork);
-    if (getLteEnhanceCallback_.thisVar) {
-        (void)memset_s(&getLteEnhanceCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
-    }
     return TELEPHONY_SUCCESS;
 }
 
@@ -537,11 +554,9 @@ int32_t NapiCallAbilityCallback::ReportEnableLteEnhanceInfo(AppExecFwk::PacMap &
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     work->data = (void *)dataWorker;
+    (void)memset_s(&enableLteEnhanceCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
     uv_queue_work(
         loop, work, [](uv_work_t *work) {}, ReportExecutionResultWork);
-    if (enableLteEnhanceCallback_.thisVar) {
-        (void)memset_s(&enableLteEnhanceCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
-    }
     return TELEPHONY_SUCCESS;
 }
 
@@ -568,11 +583,9 @@ int32_t NapiCallAbilityCallback::ReportDisableLteEnhanceInfo(AppExecFwk::PacMap 
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     work->data = (void *)dataWorker;
+    (void)memset_s(&disableLteEnhanceCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
     uv_queue_work(
         loop, work, [](uv_work_t *work) {}, ReportExecutionResultWork);
-    if (disableLteEnhanceCallback_.thisVar) {
-        (void)memset_s(&disableLteEnhanceCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
-    }
     return TELEPHONY_SUCCESS;
 }
 
@@ -801,6 +814,8 @@ int32_t NapiCallAbilityCallback::ReportCallEvent(CallEventInfo &info, EventCallb
         env, callbackValues[ARRAY_INDEX_SECOND], "eventId", static_cast<int32_t>(info.eventId));
     NapiCallManagerUtils::SetPropertyStringUtf8(
         env, callbackValues[ARRAY_INDEX_SECOND], "accountNumber", info.phoneNum);
+    NapiCallManagerUtils::SetPropertyStringUtf8(
+        env, callbackValues[ARRAY_INDEX_SECOND], "bundleName", info.bundleName);
     napi_get_reference_value(env, eventCallback.callbackRef, &callbackFunc);
     napi_value callbackResult = nullptr;
     if (callbackFunc == nullptr) {
@@ -819,7 +834,7 @@ int32_t NapiCallAbilityCallback::UpdateCallDisconnectedCause(DisconnectedDetails
     }
     uv_loop_s *loop = nullptr;
 #if NAPI_VERSION >= 2
-    napi_get_uv_event_loop(disableLteEnhanceCallback_.env, &loop);
+    napi_get_uv_event_loop(callDisconnectCauseCallback_.env, &loop);
 #endif
     CallDisconnectedCauseWorker *dataWorker = std::make_unique<CallDisconnectedCauseWorker>().release();
     if (dataWorker == nullptr) {
@@ -835,7 +850,7 @@ int32_t NapiCallAbilityCallback::UpdateCallDisconnectedCause(DisconnectedDetails
     }
     work->data = (void *)dataWorker;
     uv_queue_work(
-        loop, work, [](uv_work_t *work) {}, ReportExecutionResultWork);
+        loop, work, [](uv_work_t *work) {}, ReportCallDisconnectedCauseWork);
     if (callDisconnectCauseCallback_.thisVar) {
         (void)memset_s(&callDisconnectCauseCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
     }

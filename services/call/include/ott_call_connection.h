@@ -108,14 +108,14 @@ public:
     int32_t InviteToConference(const OttCallRequestInfo &requestInfo, const std::vector<std::string> &numberList);
 
     /**
-     * UpdateCallMediaMode
+     * UpdateImsCallMode
      *
      * @brief send update call media request
      * @param requestInfo[in], Call request information.
      * @param mode[in], Calling patterns
      * @return Returns 0 on success, others on failure.
      */
-    int32_t UpdateCallMediaMode(const OttCallRequestInfo &requestInfo, CallMediaMode mode);
+    int32_t UpdateImsCallMode(const OttCallRequestInfo &requestInfo, ImsCallMode mode);
 
 private:
     void PackCellularCallInfo(const OttCallRequestInfo &requestInfo, AppExecFwk::PacMap &info);

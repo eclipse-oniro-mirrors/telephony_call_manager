@@ -179,11 +179,13 @@ struct CallRecordInfo {
 enum class CallAbilityEventId {
     EVENT_DIAL_NO_CARRIER = 1,
     EVENT_INVALID_FDN_NUMBER,
+    EVENT_OTT_FUNCTION_UNSUPPORTED,
 };
 
 struct CallEventInfo {
     CallAbilityEventId eventId;
     char phoneNum[kMaxNumberLen + 1];
+    char bundleName[kMaxBundleNameLen + 1];
 };
 
 struct AccountInfo {
@@ -448,9 +450,9 @@ enum class CallTransferType {
 };
 
 struct CallTransferInfo {
+    char transferNum[kMaxNumberLen + 1];
     CallTransferSettingType settingType;
     CallTransferType type;
-    char transferNum[kMaxNumberLen + 1];
 };
 
 struct VideoWindow {
@@ -508,14 +510,17 @@ enum DomainPreferenceMode {
     IMS_PS_VOICE_ONLY = 4,
 };
 
-enum CallMediaMode {
+enum ImsCallMode {
     CALL_MODE_AUDIO_ONLY = 0,
+    CALL_MODE_SEND_ONLY,
+    CALL_MODE_RECEIVE_ONLY,
     CALL_MODE_SEND_RECEIVE,
+    CALL_MODE_VIDEO_PAUSED,
 };
 
 struct CallMediaModeRequest {
     char phoneNum[kMaxNumberLen + 1];
-    CallMediaMode mode;
+    ImsCallMode mode;
 };
 
 struct CallMediaModeResponse {
@@ -599,6 +604,15 @@ struct OttCallDetailsInfo {
     char bundleName[kMaxBundleNameLen + 1];
     VideoStateType videoState; // 0: audio 1:video
     TelCallState callState;
+};
+
+enum class OttCallEventId {
+    OTT_CALL_EVENT_FUNCTION_UNSUPPORTED = 0,
+};
+
+struct OttCallEventInfo {
+    OttCallEventId ottCallEventId;
+    char bundleName[kMaxBundleNameLen + 1];
 };
 
 struct CallDetailInfo {

@@ -150,6 +150,16 @@ int32_t CallStatusCallbackStub::OnUpdateCallsReportInfo(MessageParcel &data, Mes
 
 int32_t CallStatusCallbackStub::OnUpdateDisconnectedCause(MessageParcel &data, MessageParcel &reply)
 {
+    int32_t result = TELEPHONY_ERR_FAIL;
+    if (!data.ContainFileDescriptors()) {
+        TELEPHONY_LOGW("sent raw data is less than 32k");
+    }
+    DisconnectedDetails cause = static_cast<DisconnectedDetails>(data.ReadInt32());
+    result = UpdateDisconnectedCause(cause);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("writing parcel failed");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
     return TELEPHONY_SUCCESS;
 }
 

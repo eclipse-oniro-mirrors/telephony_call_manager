@@ -773,20 +773,9 @@ void ControlCamera()
     }
 
     std::u16string CameraID;
-    std::u16string callingPackage;
     CameraID.clear();
-    callingPackage.clear();
-    std::string cp = "com.ohos.videocall";
-    CameraID = Str8ToStr16(cp);
-    callingPackage = Str8ToStr16(cp);
-    int32_t ret = g_clientPtr->ControlCamera(CameraID, callingPackage);
-    std::cout << "error return value:" << ret << std::endl;
-
-    CameraID.clear();
-    callingPackage.clear();
     CameraID = Str8ToStr16(tmpStr);
-    callingPackage = Str8ToStr16(cp);
-    ret = g_clientPtr->ControlCamera(CameraID, callingPackage);
+    int32_t ret = g_clientPtr->ControlCamera(CameraID);
     std::cout << "ok return value:" << ret << std::endl;
 
     std::cout << "ControlCamera done" << std::endl;
@@ -1016,29 +1005,29 @@ void SetImsFeatureValue()
     std::cout << "return value:" << ret << std::endl;
 }
 
-void UpdateCallMediaMode()
+void UpdateImsCallMode()
 {
     int32_t callId = DEFAULT_CALL_ID;
     uint32_t mediaMode = DEFAULT_VIDEO_STATE;
-    std::cout << "------UpdateCallMediaMode------" << std::endl;
+    std::cout << "------UpdateImsCallMode------" << std::endl;
     std::cout << "please input callId:" << std::endl;
     std::cin >> callId;
-    std::cout << "please input media mode[0:voice, 1:video]:" << std::endl;
+    std::cout << "please input media mode[0:voice, 3:video]:" << std::endl;
     std::cin >> mediaMode;
-    CallMediaMode mode = static_cast<CallMediaMode>(mediaMode);
+    ImsCallMode mode = static_cast<ImsCallMode>(mediaMode);
     int32_t ret = TELEPHONY_SUCCESS;
     if (g_clientPtr == nullptr) {
         std::cout << "g_clientPtr is nullptr" << std::endl;
         return;
     }
-    ret = g_clientPtr->UpdateCallMediaMode(callId, mode);
+    ret = g_clientPtr->UpdateImsCallMode(callId, mode);
     std::cout << "return value:" << ret << std::endl;
 }
 
-void EnableVoLte()
+void EnableImsSwitch()
 {
     int32_t slotId = SIM1_SLOTID;
-    std::cout << "------EnableVoLte------" << std::endl;
+    std::cout << "------EnableImsSwitch------" << std::endl;
     std::cout << "please input slot id:" << std::endl;
     std::cin >> slotId;
     int32_t ret = TELEPHONY_SUCCESS;
@@ -1046,14 +1035,14 @@ void EnableVoLte()
         std::cout << "g_clientPtr is nullptr" << std::endl;
         return;
     }
-    ret = g_clientPtr->EnableVoLte(slotId);
+    ret = g_clientPtr->EnableImsSwitch(slotId);
     std::cout << "return value:" << ret << std::endl;
 }
 
-void DisableVoLte()
+void DisableImsSwitch()
 {
     int32_t slotId = SIM1_SLOTID;
-    std::cout << "------DisableVoLte------" << std::endl;
+    std::cout << "------DisableImsSwitch------" << std::endl;
     std::cout << "please input slot id:" << std::endl;
     std::cin >> slotId;
     int32_t ret = TELEPHONY_SUCCESS;
@@ -1061,14 +1050,14 @@ void DisableVoLte()
         std::cout << "g_clientPtr is nullptr" << std::endl;
         return;
     }
-    ret = g_clientPtr->DisableVoLte(slotId);
+    ret = g_clientPtr->DisableImsSwitch(slotId);
     std::cout << "return value:" << ret << std::endl;
 }
 
-void IsVoLteEnabled()
+void IsImsSwitchEnabled()
 {
     int32_t slotId = SIM1_SLOTID;
-    std::cout << "------IsVoLteEnabled------" << std::endl;
+    std::cout << "------IsImsSwitchEnabled------" << std::endl;
     std::cout << "please input slot id:" << std::endl;
     std::cin >> slotId;
     int32_t ret = TELEPHONY_SUCCESS;
@@ -1076,7 +1065,7 @@ void IsVoLteEnabled()
         std::cout << "g_clientPtr is nullptr" << std::endl;
         return;
     }
-    ret = g_clientPtr->IsVoLteEnabled(slotId);
+    ret = g_clientPtr->IsImsSwitchEnabled(slotId);
     std::cout << "return value:" << ret << std::endl;
 }
 
@@ -1308,7 +1297,7 @@ void InitCallMultimediaPower()
     g_memberFuncMap[OHOS::Telephony::INTERFACE_SET_CAMERA_ZOOM] = &OHOS::Telephony::SetCameraZoom;
     g_memberFuncMap[OHOS::Telephony::INTERFACE_SET_PAUSE_IMAGE] = &OHOS::Telephony::SetPausePicture;
     g_memberFuncMap[OHOS::Telephony::INTERFACE_SET_DEVICE_DIRECTION] = &OHOS::Telephony::SetDeviceDirection;
-    g_memberFuncMap[OHOS::Telephony::INTERFACE_UPDATE_CALL_MEDIA_MODE] = &OHOS::Telephony::UpdateCallMediaMode;
+    g_memberFuncMap[OHOS::Telephony::INTERFACE_UPDATE_CALL_MEDIA_MODE] = &OHOS::Telephony::UpdateImsCallMode;
 
     g_memberFuncMap[DEFINE_INIT_PERMISSIONS] = &OHOS::Telephony::InitPermission;
     g_memberFuncMap[DEFINE_VERIFY_PERMISSIONS] = &OHOS::Telephony::VerifyPermission;
@@ -1320,9 +1309,9 @@ void InitImsServicePower()
     g_memberFuncMap[OHOS::Telephony::INTERFACE_SET_IMS_CONFIG] = &OHOS::Telephony::SetImsConfig;
     g_memberFuncMap[OHOS::Telephony::INTERFACE_GET_IMS_FEATURE_VALUE] = &OHOS::Telephony::GetImsFeatureValue;
     g_memberFuncMap[OHOS::Telephony::INTERFACE_SET_IMS_FEATURE_VALUE] = &OHOS::Telephony::SetImsFeatureValue;
-    g_memberFuncMap[OHOS::Telephony::INTERFACE_ENABLE_VOLTE] = &OHOS::Telephony::EnableVoLte;
-    g_memberFuncMap[OHOS::Telephony::INTERFACE_DISABLE_VOLTE] = &OHOS::Telephony::DisableVoLte;
-    g_memberFuncMap[OHOS::Telephony::INTERFACE_IS_VOLTE_ENABLED] = &OHOS::Telephony::IsVoLteEnabled;
+    g_memberFuncMap[OHOS::Telephony::INTERFACE_ENABLE_VOLTE] = &OHOS::Telephony::EnableImsSwitch;
+    g_memberFuncMap[OHOS::Telephony::INTERFACE_DISABLE_VOLTE] = &OHOS::Telephony::DisableImsSwitch;
+    g_memberFuncMap[OHOS::Telephony::INTERFACE_IS_VOLTE_ENABLED] = &OHOS::Telephony::IsImsSwitchEnabled;
     g_memberFuncMap[OHOS::Telephony::INTERFACE_ENABLE_LTE_ENHANCE_MODE] = &OHOS::Telephony::EnableLteEnhanceMode;
     g_memberFuncMap[OHOS::Telephony::INTERFACE_DISABLE_LTE_ENHANCE_MODE] = &OHOS::Telephony::DisableLteEnhanceMode;
     g_memberFuncMap[OHOS::Telephony::INTERFACE_IS_LTE_ENHANCE_MODE_ENABLED] =
@@ -1343,8 +1332,7 @@ int32_t Init()
         std::cout << "g_clientPtr is nullptr" << std::endl;
         return TELEPHONY_ERROR;
     }
-    std::u16string bundleName = Str8ToStr16(TEST_BUNDLE_NAME);
-    g_clientPtr->Init(TELEPHONY_CALL_MANAGER_SYS_ABILITY_ID, bundleName);
+    g_clientPtr->Init(TELEPHONY_CALL_MANAGER_SYS_ABILITY_ID);
     std::unique_ptr<CallManagerCallbackTest> callbackPtr = std::make_unique<CallManagerCallbackTest>();
     if (callbackPtr == nullptr) {
         std::cout << "make_unique NapiCallManagerCallback failed!" << std::endl;
@@ -1437,10 +1425,10 @@ void PrintfCallMultimediaInterface()
               << "41:SetImsConfig\n"
               << "42:GetImsNetworkValue\n"
               << "43:SetImsNetworkValue\n"
-              << "44:UpdateCallMediaMode\n"
-              << "45:EnableVoLte\n"
-              << "46:DisableVoLte\n"
-              << "47:IsVoLteEnabled\n"
+              << "44:UpdateImsCallMode\n"
+              << "45:EnableImsSwitch\n"
+              << "46:DisableImsSwitch\n"
+              << "47:IsImsSwitchEnabled\n"
               << "48:EnableLteEnhanceMode\n"
               << "49:DisableLteEnhanceMode\n"
               << "50:IsLteEnhanceModeEnabled\n"

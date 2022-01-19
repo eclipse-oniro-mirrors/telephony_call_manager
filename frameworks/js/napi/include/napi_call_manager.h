@@ -94,17 +94,18 @@ public:
     static napi_value SetPausePicture(napi_env env, napi_callback_info info);
     static napi_value SetDeviceDirection(napi_env env, napi_callback_info info);
     static napi_value SetCallPreferenceMode(napi_env env, napi_callback_info info);
-    static napi_value EnableVoLTE(napi_env env, napi_callback_info info);
-    static napi_value DisableVoLTE(napi_env env, napi_callback_info info);
-    static napi_value IsVoLTEEnabled(napi_env env, napi_callback_info info);
+    static napi_value EnableImsSwitch(napi_env env, napi_callback_info info);
+    static napi_value DisableImsSwitch(napi_env env, napi_callback_info info);
+    static napi_value IsImsSwitchEnabled(napi_env env, napi_callback_info info);
     static napi_value StartRTT(napi_env env, napi_callback_info info);
     static napi_value StopRTT(napi_env env, napi_callback_info info);
     static napi_value JoinConference(napi_env env, napi_callback_info info);
-    static napi_value UpdateCallMediaMode(napi_env env, napi_callback_info info);
+    static napi_value UpdateImsCallMode(napi_env env, napi_callback_info info);
     static napi_value EnableLteEnhanceMode(napi_env env, napi_callback_info info);
     static napi_value DisableLteEnhanceMode(napi_env env, napi_callback_info info);
     static napi_value IsLteEnhanceModeEnabled(napi_env env, napi_callback_info info);
     static napi_value ReportOttCallDetailsInfo(napi_env env, napi_callback_info info);
+    static napi_value ReportOttCallEventInfo(napi_env env, napi_callback_info info);
 
 private:
     static void RegisterCallBack();
@@ -117,9 +118,8 @@ private:
     static void NativeListCallBack(napi_env env, napi_status status, void *data);
     static void GetDialInfo(napi_env env, napi_value objValue, DialAsyncContext &asyncContext);
     static void GetSmsInfo(napi_env env, napi_value objValue, RejectAsyncContext &asyncContext);
-    static void GetDtmfBunchInfo(napi_env env, napi_value objValue, DtmfAsyncContext &asyncContext);
-    static void GetRestrictionInfo(napi_env env, napi_value objValue, SupplementAsyncContext &asyncContext);
-    static void GetTransferInfo(napi_env env, napi_value objValue, SupplementAsyncContext &asyncContext);
+    static int32_t GetRestrictionInfo(napi_env env, napi_value objValue, CallRestrictionAsyncContext &asyncContext);
+    static int32_t GetTransferInfo(napi_env env, napi_value objValue, CallTransferAsyncContext &asyncContext);
     static void NativeDialCall(napi_env env, void *data);
     static void NativeAnswerCall(napi_env env, void *data);
     static void NativeRejectCall(napi_env env, void *data);
@@ -159,17 +159,18 @@ private:
     static void NativeSetPausePicture(napi_env env, void *data);
     static void NativeSetDeviceDirection(napi_env env, void *data);
     static void NativeSetCallPreferenceMode(napi_env env, void *data);
-    static void NativeGetVoLTE(napi_env env, void *data);
-    static void NativeEnableVoLTE(napi_env env, void *data);
-    static void NativeDisableVoLTE(napi_env env, void *data);
+    static void NativeIsImsSwitchEnabled(napi_env env, void *data);
+    static void NativeEnableImsSwitch(napi_env env, void *data);
+    static void NativeDisableImsSwitch(napi_env env, void *data);
     static void NativeStartRTT(napi_env env, void *data);
     static void NativeStopRTT(napi_env env, void *data);
     static void NativeJoinConference(napi_env env, void *data);
-    static void NativeUpdateCallMediaMode(napi_env env, void *data);
+    static void NativeUpdateImsCallMode(napi_env env, void *data);
     static void NativeEnableLteEnhanceMode(napi_env env, void *data);
     static void NativeDisableLteEnhanceMode(napi_env env, void *data);
     static void NativeIsLteEnhanceModeEnabled(napi_env env, void *data);
     static void NativeReportOttCallDetailsInfo(napi_env env, void *data);
+    static void NativeReportOttCallEventInfo(napi_env env, void *data);
     static napi_value HandleAsyncWork(napi_env env, AsyncContext *context, std::string workName,
         napi_async_execute_callback execute, napi_async_complete_callback complete);
 

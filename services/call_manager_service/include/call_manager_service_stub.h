@@ -43,6 +43,7 @@ private:
     void initCallConferenceExRequest();
     void InitCallMultimediaRequest();
     void InitImsServiceRequest();
+    void InitOttServiceRequest();
 
     int32_t OnRegisterCallBack(MessageParcel &data, MessageParcel &reply);
     int32_t OnUnRegisterCallBack(MessageParcel &data, MessageParcel &reply);
@@ -99,7 +100,7 @@ private:
     int32_t OnStartRtt(MessageParcel &data, MessageParcel &reply);
     int32_t OnStopRtt(MessageParcel &data, MessageParcel &reply);
     int32_t OnReportOttCallDetailsInfo(MessageParcel &data, MessageParcel &reply);
-    int32_t CheckBundleName(std::string bundleName);
+    int32_t OnReportOttCallEventInfo(MessageParcel &data, MessageParcel &reply);
 
     std::map<uint32_t, CallManagerServiceFunc> memberFuncMap_;
 };

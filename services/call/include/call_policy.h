@@ -41,7 +41,7 @@ public:
     int32_t UnHoldCallPolicy(int32_t callId);
     int32_t HangUpPolicy(int32_t callId);
     int32_t SwitchCallPolicy(int32_t callId);
-    static int32_t UpdateCallMediaModePolicy(int32_t callId, CallMediaMode mode);
+    static int32_t UpdateCallMediaModePolicy(int32_t callId, ImsCallMode mode);
     static int32_t StartRttPolicy(int32_t callId);
     static int32_t StopRttPolicy(int32_t callId);
     int32_t IsValidSlotId(int32_t slotId);

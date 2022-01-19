@@ -36,7 +36,7 @@ public:
     void SwitchRequest(int32_t callId);
     void CombineConferenceRequest(int32_t mainCallId);
     void SeparateConferenceRequest(int32_t callId);
-    void UpdateCallMediaModeRequest(int32_t callId, CallMediaMode mode);
+    void UpdateCallMediaModeRequest(int32_t callId, ImsCallMode mode);
     void StartRttRequest(int32_t callId, std::u16string &msg);
     void StopRttRequest(int32_t callId);
     void JoinConference(int32_t callId, std::vector<std::string> &numberList);
@@ -45,7 +45,7 @@ private:
     void CarrierDialProcess(DialParaInfo &info);
     void VoiceMailDialProcess(DialParaInfo &info);
     void OttDialProcess(DialParaInfo &info);
-    int32_t UpdateCallMediaMode(int32_t callId, CallMediaMode mode);
+    int32_t UpdateImsCallMode(int32_t callId, ImsCallMode mode);
     int32_t PackCellularCallInfo(DialParaInfo &info, CellularCallInfo &callInfo);
     bool IsFdnNumber(std::vector<std::u16string> fdnNumberList, std::string phoneNumber);
 };

@@ -343,7 +343,7 @@ int32_t CallStatusCallback::ReceiveUpdateCallMediaModeResponse(const CallMediaMo
     CallResultReportId reportId = CallResultReportId::UPDATE_MEDIA_MODE_REPORT_ID;
     AppExecFwk::PacMap resultInfo;
     resultInfo.PutIntValue("result", response.result);
-    TELEPHONY_LOGI("UpdateCallMediaMode result = %{public}d", response.result);
+    TELEPHONY_LOGI("UpdateImsCallMode result = %{public}d", response.result);
     (void)DelayedSingleton<ReportCallInfoHandlerService>::GetInstance()->UpdateMediaModeResponse(response);
     return DelayedSingleton<CallAbilityReportProxy>::GetInstance()->ReportAsyncResults(reportId, resultInfo);
 }

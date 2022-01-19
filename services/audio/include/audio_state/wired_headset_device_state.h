@@ -13,18 +13,17 @@
  * limitations under the License.
  */
 
-#ifndef DEVICES_INACTIVE_H
-#define DEVICES_INACTIVE_H
+#ifndef TELEPHONY_WIRED_HEADSET_DEVICE_STATE_H
+#define TELEPHONY_WIRED_HEADSET_DEVICE_STATE_H
 
 #include "audio_base.h"
-#include <mutex>
 
 namespace OHOS {
 namespace Telephony {
-class DevicesInactive : public AudioBase {
+class WiredHeadsetDeviceState : public AudioBase {
 public:
-    DevicesInactive() = default;
-    ~DevicesInactive() = default;
+    WiredHeadsetDeviceState() = default;
+    ~WiredHeadsetDeviceState() = default;
     bool ProcessEvent(int32_t event) override;
 
 private:
@@ -32,4 +31,4 @@ private:
 };
 } // namespace Telephony
 } // namespace OHOS
-#endif // DEVICES_INACTIVE_H
+#endif // !TELEPHONY_WIRED_HEADSET_DEVICE_STATE_H

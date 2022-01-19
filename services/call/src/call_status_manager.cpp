@@ -44,6 +44,7 @@ int32_t CallStatusManager::Init()
 {
     callDetailsInfo_.callVec.clear();
     mEventIdTransferMap_.clear();
+    mOttEventIdTransferMap_.clear();
     InitCallBaseEvent();
     CallIncomingFilterManagerPtr_ = (std::make_unique<CallIncomingFilterManager>()).release();
     return TELEPHONY_SUCCESS;
@@ -52,12 +53,15 @@ int32_t CallStatusManager::Init()
 void CallStatusManager::InitCallBaseEvent()
 {
     mEventIdTransferMap_[RequestResultEventId::RESULT_DIAL_NO_CARRIER] = CallAbilityEventId::EVENT_DIAL_NO_CARRIER;
+    mOttEventIdTransferMap_[OttCallEventId::OTT_CALL_EVENT_FUNCTION_UNSUPPORTED] =
+        CallAbilityEventId::EVENT_OTT_FUNCTION_UNSUPPORTED;
 }
 
 int32_t CallStatusManager::UnInit()
 {
     callDetailsInfo_.callVec.clear();
     mEventIdTransferMap_.clear();
+    mOttEventIdTransferMap_.clear();
     return TELEPHONY_SUCCESS;
 }
 
@@ -166,7 +170,7 @@ int32_t CallStatusManager::HandleEventResultReportInfo(const CellularCallEventIn
         if (eventInfo.eventId == CallAbilityEventId::EVENT_DIAL_NO_CARRIER) {
             DelayedSingleton<CallControlManager>::GetInstance()->GetDialParaInfo(dialInfo);
             if (memcpy_s(eventInfo.phoneNum, kMaxNumberLen, dialInfo.number.c_str(), dialInfo.number.length()) !=
-                0) {
+                EOK) {
                 TELEPHONY_LOGE("memcpy_s failed!");
                 return TELEPHONY_ERR_MEMCPY_FAIL;
             }
@@ -174,6 +178,24 @@ int32_t CallStatusManager::HandleEventResultReportInfo(const CellularCallEventIn
         DelayedSingleton<CallControlManager>::GetInstance()->NotifyCallEventUpdated(eventInfo);
     } else {
         TELEPHONY_LOGW("unkown type Event, eventid %{public}d", info.eventId);
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallStatusManager::HandleOttEventReportInfo(const OttCallEventInfo &info)
+{
+    TELEPHONY_LOGI("recv one Event, eventId:%{public}d", info.ottCallEventId);
+    CallEventInfo eventInfo;
+    (void)memset_s(&eventInfo, sizeof(CallEventInfo), 0, sizeof(CallEventInfo));
+    if (mOttEventIdTransferMap_.find(info.ottCallEventId) != mOttEventIdTransferMap_.end()) {
+        eventInfo.eventId = mOttEventIdTransferMap_[info.ottCallEventId];
+        if (memcpy_s(eventInfo.bundleName, kMaxNumberLen, info.bundleName, strlen(info.bundleName)) != EOK) {
+            TELEPHONY_LOGE("memcpy_s failed!");
+            return TELEPHONY_ERR_MEMCPY_FAIL;
+        }
+        DelayedSingleton<CallControlManager>::GetInstance()->NotifyCallEventUpdated(eventInfo);
+    } else {
+        TELEPHONY_LOGW("unkown type Event, eventid %{public}d", info.ottCallEventId);
     }
     return TELEPHONY_SUCCESS;
 }

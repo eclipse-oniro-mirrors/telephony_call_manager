@@ -571,7 +571,7 @@ int32_t CallRequestHandlerService::SeparateConference(int32_t callId)
     return TELEPHONY_SUCCESS;
 }
 
-int32_t CallRequestHandlerService::UpdateCallMediaMode(int32_t callId, CallMediaMode mode)
+int32_t CallRequestHandlerService::UpdateImsCallMode(int32_t callId, ImsCallMode mode)
 {
     if (handler_.get() == nullptr) {
         TELEPHONY_LOGE("handler_ is nullptr");
@@ -585,7 +585,7 @@ int32_t CallRequestHandlerService::UpdateCallMediaMode(int32_t callId, CallMedia
     para->callId = callId;
     para->mode = mode;
     if (!handler_->SendEvent(HANDLER_UPDATE_CALL_MEDIA_MODE_REQUEST, std::move(para))) {
-        TELEPHONY_LOGE("send UpdateCallMediaMode event failed!");
+        TELEPHONY_LOGE("send UpdateImsCallMode event failed!");
         return CALL_ERR_SYSTEM_EVENT_HANDLE_FAILURE;
     }
     return TELEPHONY_SUCCESS;

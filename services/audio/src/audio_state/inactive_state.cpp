@@ -28,27 +28,31 @@ bool InActiveState::ProcessEvent(int32_t event)
     std::lock_guard<std::mutex> lock(mutex_);
     switch (event) {
         case AudioEvent::NEW_ACTIVE_CS_CALL:
-            if (DelayedSingleton<CallStateProcessor>::GetInstance()->ShouldSwitchActive()) {
+            if (DelayedSingleton<CallStateProcessor>::GetInstance()->
+                ShouldSwitchState(TelCallState::CALL_STATUS_ACTIVE)) {
                 result = DelayedSingleton<AudioSceneProcessor>::GetInstance()->ProcessEvent(
                     AudioEvent::SWITCH_CS_CALL_STATE);
             }
             break;
         case AudioEvent::NEW_ACTIVE_IMS_CALL:
-            if (DelayedSingleton<CallStateProcessor>::GetInstance()->ShouldSwitchActive()) {
+            if (DelayedSingleton<CallStateProcessor>::GetInstance()->
+                ShouldSwitchState(TelCallState::CALL_STATUS_ACTIVE)) {
                 result = DelayedSingleton<AudioSceneProcessor>::GetInstance()->ProcessEvent(
                     AudioEvent::SWITCH_IMS_CALL_STATE);
             }
             break;
         case AudioEvent::NEW_ALERTING_CALL:
             // should switch alerting state while only one alerting call exists
-            if (DelayedSingleton<CallStateProcessor>::GetInstance()->ShouldSwitchAlerting()) {
+            if (DelayedSingleton<CallStateProcessor>::GetInstance()->
+                ShouldSwitchState(TelCallState::CALL_STATUS_ALERTING)) {
                 result = DelayedSingleton<AudioSceneProcessor>::GetInstance()->ProcessEvent(
                     AudioEvent::SWITCH_ALERTING_STATE);
             }
             break;
         case AudioEvent::NEW_INCOMING_CALL:
             // should switch incoming state while only one incoming call exists
-            if (DelayedSingleton<CallStateProcessor>::GetInstance()->ShouldSwitchIncoming()) {
+            if (DelayedSingleton<CallStateProcessor>::GetInstance()->
+                ShouldSwitchState(TelCallState::CALL_STATUS_INCOMING)) {
                 result = DelayedSingleton<AudioSceneProcessor>::GetInstance()->ProcessEvent(
                     AudioEvent::SWITCH_INCOMING_STATE);
             }

@@ -33,7 +33,9 @@ bool IMSCallState::ProcessEvent(int32_t event)
         case AudioEvent::NEW_INCOMING_CALL:
             result = DelayedSingleton<AudioControlManager>::GetInstance()->PlayWaitingTone();
             break;
-        case AudioEvent::CALL_TYPE_CHANGED:
+        case AudioEvent::CALL_TYPE_IMS_CHANGE_CS:
+            result = DelayedSingleton<AudioSceneProcessor>::GetInstance()->ProcessEvent(
+                AudioEvent::SWITCH_CS_CALL_STATE);
             break;
         default:
             break;

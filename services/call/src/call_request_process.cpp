@@ -117,6 +117,13 @@ void CallRequestProcess::HangUpRequest(int32_t callId)
         call->SetPolicyFlag(PolicyFlag::POLICY_FLAG_HANG_UP_ACTIVE);
     }
     call->HangUpCall();
+    if (state == TelCallState::CALL_STATUS_WAITING) {
+        TELEPHONY_LOGI("release the waiting call and recover the held call");
+        sptr<CallBase> holdCall = CallObjectManager::GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_HOLD);
+        if (holdCall) {
+            holdCall->UnHoldCall();
+        }
+    }
 }
 
 void CallRequestProcess::HoldRequest(int32_t callId)
@@ -175,7 +182,7 @@ void CallRequestProcess::SeparateConferenceRequest(int32_t callId)
     }
 }
 
-int32_t CallRequestProcess::UpdateCallMediaMode(int32_t callId, CallMediaMode mode)
+int32_t CallRequestProcess::UpdateImsCallMode(int32_t callId, ImsCallMode mode)
 {
     int32_t ret = TELEPHONY_ERR_FAIL;
     sptr<CallBase> call = GetOneCallObject(callId);
@@ -189,7 +196,7 @@ int32_t CallRequestProcess::UpdateCallMediaMode(int32_t callId, CallMediaMode mo
         TELEPHONY_LOGI("ims call update media request");
         ret = netCall->SendUpdateCallMediaModeRequest(mode);
         if (ret != TELEPHONY_SUCCESS) {
-            TELEPHONY_LOGE("SendUpdateCallMediaModeRequest failed");
+            TELEPHONY_LOGE("SendUpdateCallMediaModeRequest failed. %{public}d", ret);
         }
     } else {
         TELEPHONY_LOGE("the call object not support upgrade/downgrad media, callId:%{public}d", callId);
@@ -197,11 +204,11 @@ int32_t CallRequestProcess::UpdateCallMediaMode(int32_t callId, CallMediaMode mo
     return ret;
 }
 
-void CallRequestProcess::UpdateCallMediaModeRequest(int32_t callId, CallMediaMode mode)
+void CallRequestProcess::UpdateCallMediaModeRequest(int32_t callId, ImsCallMode mode)
 {
     int32_t ret = TELEPHONY_ERR_FAIL;
     AppExecFwk::PacMap resultInfo;
-    ret = UpdateCallMediaMode(callId, mode);
+    ret = UpdateImsCallMode(callId, mode);
     if (ret != TELEPHONY_SUCCESS) {
         resultInfo.PutIntValue("result", ret);
         DelayedSingleton<CallAbilityReportProxy>::GetInstance()->ReportAsyncResults(
@@ -221,7 +228,7 @@ void CallRequestProcess::StartRttRequest(int32_t callId, std::u16string &msg)
         return;
     } else {
         sptr<IMSCall> imsCall = reinterpret_cast<IMSCall *>(call.GetRefPtr());
-        imsCall->StartRtt();
+        imsCall->StartRtt(msg);
     }
 }
 
@@ -248,7 +255,8 @@ void CallRequestProcess::JoinConference(int32_t callId, std::vector<std::string>
         TELEPHONY_LOGE("the call object is nullptr, callId:%{public}d", callId);
         return;
     }
-    int32_t ret = DelayedSingleton<CellularCallConnection>::GetInstance()->InviteToConference(numberList, callId);
+    int32_t ret = DelayedSingleton<CellularCallConnection>::GetInstance()->
+        InviteToConference(numberList, call->GetSlotId());
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("Invite to conference failed!");
         return;
@@ -319,8 +327,19 @@ int32_t CallRequestProcess::PackCellularCallInfo(DialParaInfo &info, CellularCal
 
 bool CallRequestProcess::IsFdnNumber(std::vector<std::u16string> fdnNumberList, std::string phoneNumber)
 {
+    char number[kMaxNumberLen + 1] = {0};
+    int32_t j = 0;
+    for (int32_t i = 0; i < phoneNumber.length(); i++) {
+        if (i >= kMaxNumberLen) {
+            break;
+        }
+        if (*(phoneNumber.c_str() + i) != ' ') {
+            number[j++] = *(phoneNumber.c_str() + i);
+        }
+    }
     for (std::vector<std::u16string>::iterator it = fdnNumberList.begin(); it != fdnNumberList.end(); it++) {
-        if (strcmp(phoneNumber.c_str(), Str16ToStr8(*it).c_str()) == 0) {
+        if (strstr(number, Str16ToStr8(*it).c_str()) != nullptr) {
+            TELEPHONY_LOGI("you are allowed to dial!");
             return true;
         }
     }

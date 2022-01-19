@@ -42,6 +42,7 @@ const int16_t DATA_LENGTH_TWO = 2;
 const int16_t DTMF_DEFAULT_OFF = 10;
 const int16_t PHONE_NUMBER_MAXIMUM_LIMIT = 31;
 const int16_t MESSAGE_CONTENT_MAXIMUM_LIMIT = 160;
+const int16_t NAPI_MAX_TIMEOUT_SECOND = 10;
 
 struct AsyncContext {
     virtual ~AsyncContext() {}
@@ -78,18 +79,24 @@ struct ListAsyncContext : AsyncContext {
     std::vector<std::u16string> listResult;
 };
 
-struct DtmfAsyncContext : AsyncContext {
-    int32_t on;
-    int32_t off;
-    std::string code;
-};
-
 struct SupplementAsyncContext : AsyncContext {
     int32_t slotId;
     int32_t type;
     int32_t mode;
     std::string content;
     bool flag;
+    napi_value thisVar;
+};
+
+struct CallRestrictionAsyncContext : AsyncContext {
+    int32_t slotId;
+    CallRestrictionInfo info;
+    napi_value thisVar;
+};
+
+struct CallTransferAsyncContext : AsyncContext {
+    int32_t slotId;
+    CallTransferInfo info;
     napi_value thisVar;
 };
 
@@ -105,6 +112,7 @@ struct EventCallback {
     napi_value thisVar;
     napi_ref callbackRef;
     napi_deferred deferred;
+    time_t callbackBeginTime_;
 };
 
 struct AudioAsyncContext : AsyncContext {
@@ -128,8 +136,12 @@ struct VideoAsyncContext : AsyncContext {
     char path[kMaxNumberLen + 1];
 };
 
-struct OttAsyncContext : AsyncContext {
+struct OttCallAsyncContext : AsyncContext {
     std::vector<OttCallDetailsInfo> ottVec;
+};
+
+struct OttEventAsyncContext : AsyncContext {
+    OttCallEventInfo eventInfo;
 };
 
 enum CallWaitingStatus {
