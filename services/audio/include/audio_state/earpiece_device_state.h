@@ -13,18 +13,17 @@
  * limitations under the License.
  */
 
-#ifndef ENABLE_WIRED_HEADSET_DEVICE_H
-#define ENABLE_WIRED_HEADSET_DEVICE_H
+#ifndef TELEPHONY_EARPIECE_DEVICE_STATE_H
+#define TELEPHONY_EARPIECE_DEVICE_STATE_H
 
 #include "audio_base.h"
-#include <mutex>
 
 namespace OHOS {
 namespace Telephony {
-class EnableWiredHeadsetDevice : public AudioBase {
+class EarpieceDeviceState : public AudioBase {
 public:
-    EnableWiredHeadsetDevice() = default;
-    ~EnableWiredHeadsetDevice() = default;
+    EarpieceDeviceState() = default;
+    ~EarpieceDeviceState() = default;
     bool ProcessEvent(int32_t event) override;
 
 private:
@@ -32,4 +31,4 @@ private:
 };
 } // namespace Telephony
 } // namespace OHOS
-#endif // !ENABLE_WIRED_HEADSET_DEVICE_H
+#endif // TELEPHONY_EARPIECE_DEVICE_STATE_H

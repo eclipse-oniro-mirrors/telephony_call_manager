@@ -13,11 +13,10 @@
  * limitations under the License.
  */
 
-#ifndef CS_CALL_STATE_H
-#define CS_CALL_STATE_H
+#ifndef TELEPHONY_CS_CALL_STATE_H
+#define TELEPHONY_CS_CALL_STATE_H
 
 #include "audio_base.h"
-#include <mutex>
 
 namespace OHOS {
 namespace Telephony {
@@ -32,4 +31,4 @@ private:
 };
 } // namespace Telephony
 } // namespace OHOS
-#endif // CS_CALL_STATE_H
+#endif // TELEPHONY_CS_CALL_STATE_H

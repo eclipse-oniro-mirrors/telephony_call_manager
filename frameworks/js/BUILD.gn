@@ -33,7 +33,7 @@ ohos_shared_library("call") {
   public_configs = [ ":call_manager_js_config" ]
 
   deps = [
-    "$SUBSYSTEM_DIR/core_service/utils:libtelephony_common",
+    "$SUBSYSTEM_DIR/core_service/utils:libtel_common",
     "//foundation/aafwk/standard/frameworks/kits/ability/native:abilitykit_native",
     "//foundation/ace/napi:ace_napi",
     "//third_party/libuv:uv_static",

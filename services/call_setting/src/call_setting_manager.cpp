@@ -167,7 +167,7 @@ int32_t CallSettingManager::SetImsFeatureValue(int32_t slotId, FeatureType type,
     return cellularCallConnectionPtr_->SetImsFeatureValue(type, value, slotId);
 }
 
-int32_t CallSettingManager::EnableVoLte(int32_t slotId)
+int32_t CallSettingManager::EnableImsSwitch(int32_t slotId)
 {
     if (cellularCallConnectionPtr_ == nullptr) {
         TELEPHONY_LOGE("cellularCallConnectionPtr_ is nullptr!");
@@ -176,7 +176,7 @@ int32_t CallSettingManager::EnableVoLte(int32_t slotId)
     return cellularCallConnectionPtr_->SetLteImsSwitchStatus(slotId, true);
 }
 
-int32_t CallSettingManager::DisableVoLte(int32_t slotId)
+int32_t CallSettingManager::DisableImsSwitch(int32_t slotId)
 {
     if (cellularCallConnectionPtr_ == nullptr) {
         TELEPHONY_LOGE("cellularCallConnectionPtr_ is nullptr!");
@@ -185,7 +185,7 @@ int32_t CallSettingManager::DisableVoLte(int32_t slotId)
     return cellularCallConnectionPtr_->SetLteImsSwitchStatus(slotId, false);
 }
 
-int32_t CallSettingManager::IsVoLteEnabled(int32_t slotId)
+int32_t CallSettingManager::IsImsSwitchEnabled(int32_t slotId)
 {
     if (cellularCallConnectionPtr_ == nullptr) {
         TELEPHONY_LOGE("cellularCallConnectionPtr_ is nullptr!");
@@ -285,6 +285,10 @@ int32_t CallSettingManager::SetCallTransferInfoPolicy(int32_t slotId, CallTransf
         info.settingType != CallTransferSettingType::CALL_TRANSFER_ERASURE) {
         TELEPHONY_LOGE("invalid transfer setting type!");
         return CALL_ERR_INVALID_TRANSFER_SETTING_TYPE;
+    }
+    if (strlen(info.transferNum) > kMaxNumberLen) {
+        TELEPHONY_LOGE("Number out of limit!");
+        return CALL_ERR_NUMBER_OUT_OF_RANGE;
     }
     return TELEPHONY_SUCCESS;
 }

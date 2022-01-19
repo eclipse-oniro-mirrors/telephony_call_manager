@@ -38,6 +38,7 @@ CallManagerServiceStub::CallManagerServiceStub()
     initCallConferenceExRequest();
     InitCallMultimediaRequest();
     InitImsServiceRequest();
+    InitOttServiceRequest();
 }
 
 CallManagerServiceStub::~CallManagerServiceStub()
@@ -132,6 +133,12 @@ void CallManagerServiceStub::InitImsServiceRequest()
     memberFuncMap_[INTERFACE_STOP_RTT] = &CallManagerServiceStub::OnStopRtt;
 }
 
+void CallManagerServiceStub::InitOttServiceRequest()
+{
+    memberFuncMap_[INTERFACE_REPORT_OTT_CALL_DETAIL_INFO] = &CallManagerServiceStub::OnReportOttCallDetailsInfo;
+    memberFuncMap_[INTERFACE_REPORT_OTT_CALL_EVENT_INFO] = &CallManagerServiceStub::OnReportOttCallEventInfo;
+}
+
 int32_t CallManagerServiceStub::OnRemoteRequest(
     uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
 {
@@ -164,16 +171,8 @@ int32_t CallManagerServiceStub::OnRegisterCallBack(MessageParcel &data, MessageP
         reply.WriteInt32(result);
         return result;
     }
-    std::u16string bundleName = data.ReadString16();
-    std::string strName = Str16ToStr8(bundleName);
-    if (CheckBundleName(strName) != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("%{public}s no permission to register callback", strName.c_str());
-        result = TELEPHONY_ERR_PERMISSION_ERR;
-        reply.WriteInt32(result);
-        return result;
-    }
     sptr<ICallAbilityCallback> callback = iface_cast<ICallAbilityCallback>(remote);
-    result = RegisterCallBack(callback, bundleName);
+    result = RegisterCallBack(callback);
     reply.WriteInt32(result);
     return result;
 }
@@ -184,8 +183,7 @@ int32_t CallManagerServiceStub::OnUnRegisterCallBack(MessageParcel &data, Messag
     if (!data.ContainFileDescriptors()) {
         TELEPHONY_LOGW("sent raw data is less than 32k");
     }
-    std::u16string bundleName = data.ReadString16();
-    result = UnRegisterCallBack(bundleName);
+    result = UnRegisterCallBack();
     if (!reply.WriteInt32(result)) {
         TELEPHONY_LOGE("fail to write parcel");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
@@ -634,8 +632,7 @@ int32_t CallManagerServiceStub::OnControlCamera(MessageParcel &data, MessageParc
         TELEPHONY_LOGW("sent raw data is less than 32k");
     }
     std::u16string cameraId = data.ReadString16();
-    std::u16string callingPackage = data.ReadString16();
-    result = ControlCamera(cameraId, callingPackage);
+    result = ControlCamera(cameraId);
     TELEPHONY_LOGI("result:%{public}d", result);
     if (!reply.WriteInt32(result)) {
         TELEPHONY_LOGE("ControlCamera fail to write parcel");
@@ -889,8 +886,8 @@ int32_t CallManagerServiceStub::OnUpdateCallMediaMode(MessageParcel &data, Messa
         TELEPHONY_LOGW("sent raw data is less than 32k");
     }
     int32_t callId = data.ReadInt32();
-    CallMediaMode mode = (CallMediaMode)data.ReadUint32();
-    result = UpdateCallMediaMode(callId, mode);
+    ImsCallMode mode = static_cast<ImsCallMode>(data.ReadUint32());
+    result = UpdateImsCallMode(callId, mode);
     if (!reply.WriteInt32(result)) {
         TELEPHONY_LOGE("OnUpdateCallMediaMode fail to write parcel");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
@@ -905,9 +902,9 @@ int32_t CallManagerServiceStub::OnEnableVoLte(MessageParcel &data, MessageParcel
         TELEPHONY_LOGW("sent raw data is less than 32k");
     }
     int32_t slotId = data.ReadInt32();
-    result = EnableVoLte(slotId);
+    result = EnableImsSwitch(slotId);
     if (!reply.WriteInt32(result)) {
-        TELEPHONY_LOGE("EnableVoLte fail to write parcel");
+        TELEPHONY_LOGE("EnableImsSwitch fail to write parcel");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
     return TELEPHONY_SUCCESS;
@@ -920,9 +917,9 @@ int32_t CallManagerServiceStub::OnDisableVoLte(MessageParcel &data, MessageParce
         TELEPHONY_LOGW("sent raw data is less than 32k");
     }
     int32_t slotId = data.ReadInt32();
-    result = DisableVoLte(slotId);
+    result = DisableImsSwitch(slotId);
     if (!reply.WriteInt32(result)) {
-        TELEPHONY_LOGE("DisableVoLte fail to write parcel");
+        TELEPHONY_LOGE("DisableImsSwitch fail to write parcel");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
     return TELEPHONY_SUCCESS;
@@ -935,9 +932,9 @@ int32_t CallManagerServiceStub::OnIsVoLteEnabled(MessageParcel &data, MessagePar
         TELEPHONY_LOGW("sent raw data is less than 32k");
     }
     int32_t slotId = data.ReadInt32();
-    result = IsVoLteEnabled(slotId);
+    result = IsImsSwitchEnabled(slotId);
     if (!reply.WriteInt32(result)) {
-        TELEPHONY_LOGE("IsVoLteEnabled fail to write parcel");
+        TELEPHONY_LOGE("IsImsSwitchEnabled fail to write parcel");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
     return TELEPHONY_SUCCESS;
@@ -1041,31 +1038,19 @@ int32_t CallManagerServiceStub::OnReportOttCallDetailsInfo(MessageParcel &data, 
     return TELEPHONY_SUCCESS;
 }
 
-int32_t CallManagerServiceStub::CheckBundleName(std::string bundleName)
+int32_t CallManagerServiceStub::OnReportOttCallEventInfo(MessageParcel &data, MessageParcel &reply)
 {
-    std::string bundleNameList[] = {
-        "com.ohos.callui",
-        "com.ohos.service.callui",
-        "com.ohos.callManagerTest",
-        "com.ohos.callmanagercallmedia",
-        "com.ohos.callmanager",
-        "com.ohos.callmanagerregister",
-        "com.ohos.callmanagerreliabilityperformance",
-        "com.ohos.callmanagerimscall",
-        "com.ohos.callmanagercallcarmera",
-        "com.ohos.callmanagerreliability",
-        "com.ohos.callmanagerperformance",
-        "com.example.callmanager",
-        "com.example.telephone_demo",
-        "com.ohos.calldemo",
-        "com.ohos.callservice",
-    };
-    for (int32_t i = 0; i < end(bundleNameList) - begin(bundleNameList); i++) {
-        if (strcmp(bundleName.c_str(), bundleNameList[i].c_str()) == 0) {
-            return TELEPHONY_SUCCESS;
-        }
+    int32_t result = TELEPHONY_ERR_FAIL;
+    if (!data.ContainFileDescriptors()) {
+        TELEPHONY_LOGW("sent raw data is less than 32k");
     }
-    return TELEPHONY_ERROR;
+    OttCallEventInfo *pEventInfo = (OttCallEventInfo *)data.ReadRawData(sizeof(OttCallEventInfo));
+    result = ReportOttCallEventInfo(*pEventInfo);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("ReportOttCallDetailsInfo fail to write parcel");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return TELEPHONY_SUCCESS;
 }
 } // namespace Telephony
 } // namespace OHOS

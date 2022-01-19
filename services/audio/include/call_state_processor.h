@@ -33,12 +33,10 @@ class CallStateProcessor : public std::enable_shared_from_this<CallStateProcesso
 public:
     void AddCall(const std::string &phoneNum, TelCallState state);
     void DeleteCall(const std::string &phoneNum, TelCallState state);
-    int32_t GetCallNumber(TelCallState state);
     bool UpdateCurrentCallState();
-    bool ShouldSwitchActive() const;
-    bool ShouldSwitchAlerting() const;
-    bool ShouldSwitchIncoming() const;
     std::string GetCurrentActiveCall() const;
+    int32_t GetCallNumber(TelCallState state);
+    bool ShouldSwitchState(TelCallState callState);
 
 private:
     std::set<std::string> activeCalls_;

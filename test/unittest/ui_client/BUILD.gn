@@ -47,7 +47,7 @@ ohos_executable("tel_call_manager_ui_test") {
   deps = [
     "//base/security/permission/frameworks/permission_standard/permissioninfrastructure:permission_standard_infrastructure_cxx",
     "//base/security/permission/interfaces/innerkits/permission_standard/permissionsdk:libpermissionsdk_standard",
-    "//base/telephony/core_service/utils:libtelephony_common",
+    "//base/telephony/core_service/utils:libtel_common",
     "//foundation/aafwk/standard/frameworks/kits/ability/native:abilitykit_native",
     "//foundation/graphic/standard:libsurface",
     "//foundation/multimedia/camera_standard/frameworks/innerkitsimpl/camera:camera_framework",

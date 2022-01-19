@@ -117,6 +117,27 @@ int32_t CallStateProcessor::GetCallNumber(TelCallState state)
     return number;
 }
 
+bool CallStateProcessor::ShouldSwitchState(TelCallState callState)
+{
+    bool shouldSwitch = false;
+    switch (callState) {
+        case TelCallState::CALL_STATUS_ALERTING:
+            shouldSwitch =
+                (alertingCalls_.size() == EXIST_ONLY_ONE_CALL && activeCalls_.empty() && incomingCalls_.empty());
+            break;
+        case TelCallState::CALL_STATUS_INCOMING:
+            shouldSwitch =
+                (incomingCalls_.size() == EXIST_ONLY_ONE_CALL && activeCalls_.empty() && alertingCalls_.empty());
+            break;
+        case TelCallState::CALL_STATUS_ACTIVE:
+            shouldSwitch = (activeCalls_.size() == EXIST_ONLY_ONE_CALL);
+            break;
+        default:
+            break;
+    }
+    return shouldSwitch;
+}
+
 bool CallStateProcessor::UpdateCurrentCallState()
 {
     if (activeCalls_.size() > EMPTY_VALUE) {
@@ -140,21 +161,6 @@ std::string CallStateProcessor::GetCurrentActiveCall() const
         return (*activeCalls_.begin());
     }
     return "";
-}
-
-bool CallStateProcessor::ShouldSwitchActive() const
-{
-    return activeCalls_.size() == EXIST_ONLY_ONE_CALL;
-}
-
-bool CallStateProcessor::ShouldSwitchAlerting() const
-{
-    return alertingCalls_.size() == EXIST_ONLY_ONE_CALL && activeCalls_.empty() && incomingCalls_.empty();
-}
-
-bool CallStateProcessor::ShouldSwitchIncoming() const
-{
-    return incomingCalls_.size() == EXIST_ONLY_ONE_CALL && activeCalls_.empty() && alertingCalls_.empty();
 }
 } // namespace Telephony
 } // namespace OHOS

@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef OTT_CALL_STATE_H
-#define OTT_CALL_STATE_H
+#ifndef TELEPHONY_OTT_CALL_STATE_H
+#define TELEPHONY_OTT_CALL_STATE_H
 
 #include "audio_base.h"
 
@@ -28,4 +28,4 @@ public:
 };
 } // namespace Telephony
 } // namespace OHOS
-#endif // OTT_CALL_STATE_H
+#endif // TELEPHONY_OTT_CALL_STATE_H

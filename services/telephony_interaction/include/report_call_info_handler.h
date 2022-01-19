@@ -40,6 +40,7 @@ private:
     void ReportCallsInfo(const AppExecFwk::InnerEvent::Pointer &event);
     void ReportDisconnectedCause(const AppExecFwk::InnerEvent::Pointer &event);
     void ReportEventInfo(const AppExecFwk::InnerEvent::Pointer &event);
+    void ReportOttEvent(const AppExecFwk::InnerEvent::Pointer &event);
     void OnUpdateMediaModeResponse(const AppExecFwk::InnerEvent::Pointer &event);
     std::map<uint32_t, CallManagerServiceFunc> memberFuncMap_;
     std::unique_ptr<CallStatusManager> callStatusManagerPtr_;
@@ -53,6 +54,7 @@ public:
     int32_t UpdateCallsReportInfo(CallDetailsInfo &info);
     int32_t UpdateDisconnectedCause(const DisconnectedDetails &cause);
     int32_t UpdateEventResultInfo(const CellularCallEventInfo &info);
+    int32_t UpdateOttEventInfo(const OttCallEventInfo &info);
     int32_t UpdateMediaModeResponse(const CallMediaModeResponse &response);
 
     enum {
@@ -60,6 +62,7 @@ public:
         HANDLER_UPDATE_CALL_INFO_LIST,
         HANDLER_UPDATE_DISCONNECTED_CAUSE,
         HANDLER_UPDATE_CELLULAR_EVENT_RESULT_INFO,
+        HANDLER_UPDATE_OTT_EVENT_RESULT_INFO,
         HANDLE_UPDATE_MEDIA_MODE_RESPONSE,
     };
 

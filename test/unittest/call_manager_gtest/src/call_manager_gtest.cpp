@@ -69,37 +69,37 @@ void CallInfoManager::Init()
     updateCallInfo_.videoState = VideoStateType::TYPE_VOICE;
 }
 
-void CallInfoManager::LockCallId(bool eq, int32_t originVal, int32_t slipMs, int32_t timeoutMs)
+void CallInfoManager::LockCallId(bool eq, int32_t targetId, int32_t slipMs, int32_t timeoutMs)
 {
     int32_t useTimeMs = 0;
-    while ((updateCallInfo_.callId != originVal) && (useTimeMs < timeoutMs)) {
+    std::cout << "wait for a few seconds......" << std::endl;
+    while ((updateCallInfo_.callId != targetId) && (useTimeMs < timeoutMs)) {
         usleep(slipMs * SLEEP_1000_MS);
-        std::cout << "  sleep:" << slipMs * SLEEP_1000_MS;
         useTimeMs += slipMs;
     }
     std::cout << "\n===========wait " << useTimeMs << " ms target:" << updateCallInfo_.callId << std::endl;
     if (eq) {
-        EXPECT_NE(updateCallInfo_.callId, originVal);
+        EXPECT_EQ(updateCallInfo_.callId, targetId);
     } else {
-        EXPECT_EQ(updateCallInfo_.callId, originVal);
+        EXPECT_NE(updateCallInfo_.callId, targetId);
     }
 }
-void CallInfoManager::LockCallState(bool eq, int32_t originVal, int32_t slipMs, int32_t timeoutMs)
+
+void CallInfoManager::LockCallState(bool eq, int32_t targetState, int32_t slipMs, int32_t timeoutMs)
 {
-    int32_t useTimeMs = 0;
-    while ((CallManagerGtest::clientPtr_->GetCallState() != originVal) && (useTimeMs < timeoutMs)) {
+    if (CallManagerGtest::clientPtr_->GetCallState() == targetState) {
+        return;
+    }
+    int32_t usedTimeMs = 0;
+    std::cout << "wait for a few seconds......" << std::endl;
+    while ((CallManagerGtest::clientPtr_->GetCallState() != targetState) && (usedTimeMs < timeoutMs)) {
         usleep(slipMs * SLEEP_1000_MS);
-        std::cout << "  sleep:" << slipMs * SLEEP_1000_MS;
-        useTimeMs += slipMs;
+        usedTimeMs += slipMs;
     }
     int32_t callState = CallManagerGtest::clientPtr_->GetCallState();
-    std::cout << "\n===========wait " << useTimeMs << " ms target:" << callState;
-    std::cout << " originVal:" << originVal << std::endl;
-    if (eq) {
-        EXPECT_NE(callState, originVal);
-    } else {
-        EXPECT_EQ(callState, originVal);
-    }
+    std::cout << "waited " << usedTimeMs << " seconds" << std::endl;
+    std::cout << "target call state:" << targetState << std::endl;
+    EXPECT_EQ(callState, targetState);
 }
 
 /********************************************* Test DialCall()***********************************************/
@@ -113,11 +113,11 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_0100, Function | Mediu
     if (!HasSimCard()) {
         return;
     }
+    EXPECT_EQ(CallManagerGtest::IsServiceConnected(), true);
     std::string phoneNumber = "00000000000";
-    InitDialInfo(0, (int32_t)VideoStateType::TYPE_VOICE, (int32_t)DialScene::CALL_NORMAL,
-        (int32_t)DialType::DIAL_CARRIER_TYPE);
+    InitDialInfo(0, (int32_t)VideoStateType::TYPE_VOICE, DIAL_SCENE_TEST, (int32_t)DialType::DIAL_CARRIER_TYPE);
     int32_t ret = CallManagerGtest::clientPtr_->DialCall(Str8ToStr16(phoneNumber), dialInfo_);
-    EXPECT_EQ(ret, RETURN_VALUE_IS_ZERO);
+    EXPECT_NE(ret, RETURN_VALUE_IS_ZERO);
 }
 
 /**
@@ -131,9 +131,9 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_0200, Function | Mediu
     if (!HasSimCard()) {
         return;
     }
+    EXPECT_EQ(CallManagerGtest::IsServiceConnected(), true);
     std::string phoneNumber = "";
-    InitDialInfo(0, (int32_t)VideoStateType::TYPE_VOICE, (int32_t)DialScene::CALL_NORMAL,
-        (int32_t)DialType::DIAL_CARRIER_TYPE);
+    InitDialInfo(0, (int32_t)VideoStateType::TYPE_VOICE, DIAL_SCENE_TEST, (int32_t)DialType::DIAL_CARRIER_TYPE);
     int32_t ret = CallManagerGtest::clientPtr_->DialCall(Str8ToStr16(phoneNumber), dialInfo_);
     EXPECT_NE(ret, RETURN_VALUE_IS_ZERO);
 }
@@ -148,12 +148,11 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_0300, Function | Mediu
     if (!HasSimCard()) {
         return;
     }
-    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_50_MS, SLEEP_30000_MS);
+    EXPECT_EQ(CallManagerGtest::IsServiceConnected(), true);
     std::string phoneNumber = "-12354785268";
-    InitDialInfo(0, (int32_t)VideoStateType::TYPE_VOICE, (int32_t)DialScene::CALL_NORMAL,
-        (int32_t)DialType::DIAL_CARRIER_TYPE);
+    InitDialInfo(0, (int32_t)VideoStateType::TYPE_VOICE, DIAL_SCENE_TEST, (int32_t)DialType::DIAL_CARRIER_TYPE);
     int32_t ret = CallManagerGtest::clientPtr_->DialCall(Str8ToStr16(phoneNumber), dialInfo_);
-    EXPECT_EQ(ret, RETURN_VALUE_IS_ZERO);
+    EXPECT_NE(ret, RETURN_VALUE_IS_ZERO);
 }
 
 /**
@@ -166,11 +165,11 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_0400, Function | Mediu
     if (!HasSimCard()) {
         return;
     }
+    EXPECT_EQ(CallManagerGtest::IsServiceConnected(), true);
     std::string phoneNumber = "19119080646435437102938190283912471651865810514786470168818468143768714648";
-    InitDialInfo(0, (int32_t)VideoStateType::TYPE_VOICE, (int32_t)DialScene::CALL_NORMAL,
-        (int32_t)DialType::DIAL_CARRIER_TYPE);
+    InitDialInfo(0, (int32_t)VideoStateType::TYPE_VOICE, DIAL_SCENE_TEST, (int32_t)DialType::DIAL_CARRIER_TYPE);
     int32_t ret = CallManagerGtest::clientPtr_->DialCall(Str8ToStr16(phoneNumber), dialInfo_);
-    EXPECT_EQ(ret, RETURN_VALUE_IS_ZERO);
+    EXPECT_NE(ret, RETURN_VALUE_IS_ZERO);
 }
 
 /**
@@ -183,12 +182,11 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_0500, Function | Mediu
     if (!HasSimCard()) {
         return;
     }
-    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_50_MS, SLEEP_30000_MS);
+    EXPECT_EQ(CallManagerGtest::IsServiceConnected(), true);
     std::string phoneNumber = "19!@#$%^&*:";
-    InitDialInfo(0, (int32_t)VideoStateType::TYPE_VOICE, (int32_t)DialScene::CALL_NORMAL,
-        (int32_t)DialType::DIAL_CARRIER_TYPE);
+    InitDialInfo(0, (int32_t)VideoStateType::TYPE_VOICE, DIAL_SCENE_TEST, (int32_t)DialType::DIAL_CARRIER_TYPE);
     int32_t ret = CallManagerGtest::clientPtr_->DialCall(Str8ToStr16(phoneNumber), dialInfo_);
-    EXPECT_EQ(ret, RETURN_VALUE_IS_ZERO);
+    EXPECT_NE(ret, RETURN_VALUE_IS_ZERO);
 }
 
 /**
@@ -201,31 +199,13 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_1000, Function | Mediu
     if (!HasSimCard()) {
         return;
     }
-    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_50_MS, SLEEP_30000_MS);
+    EXPECT_EQ(CallManagerGtest::IsServiceConnected(), true);
     std::string phoneNumber = PHONE_NUMBER; // OPERATOR PHONY NUMBER
-    InitDialInfo(0, (int32_t)VideoStateType::TYPE_VOICE, (int32_t)DialScene::CALL_NORMAL,
-        (int32_t)DialType::DIAL_CARRIER_TYPE);
-    int32_t ret = CallManagerGtest::clientPtr_->DialCall(Str8ToStr16(phoneNumber), dialInfo_);
-    EXPECT_EQ(ret, RETURN_VALUE_IS_ZERO);
-}
-
-/**
- * @tc.number   Telephony_CallManager_DialCall_1100
- * @tc.name     make a normal phone call with card1, TYPE_VOICE import phoneNumber 112
- * @tc.desc     Function test
- */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_1100, Function | MediumTest | Level0)
-{
-    if (!HasSimCard()) {
-        return;
-    }
-    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_50_MS, SLEEP_30000_MS);
-    std::string phoneNumber = "112";
-    InitDialInfo(0, (int32_t)VideoStateType::TYPE_VOICE, (int32_t)DialScene::CALL_NORMAL,
-        (int32_t)DialType::DIAL_CARRIER_TYPE);
+    InitDialInfo(0, (int32_t)VideoStateType::TYPE_VOICE, DIAL_SCENE_TEST, (int32_t)DialType::DIAL_CARRIER_TYPE);
     int32_t ret = CallManagerGtest::clientPtr_->DialCall(Str8ToStr16(phoneNumber), dialInfo_);
     EXPECT_NE(ret, RETURN_VALUE_IS_ZERO);
 }
+
 /********************************************* Test AnswerCall() ***********************************************/
 /**
  * @tc.number   Telephony_CallManager_AnswerCall_0100
@@ -237,10 +217,10 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_AnswerCall_0100, Function | Med
     if (!HasSimCard()) {
         return;
     }
+    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_200_MS, SLEEP_30000_MS);
     int32_t callId = INVALID_NEGATIVE_ID;
     int32_t videoState = (int32_t)VideoStateType::TYPE_VOICE;
-    EXPECT_NE(CallManagerGtest::clientPtr_->AnswerCall(callId, videoState), RETURN_VALUE_IS_ZERO)
-        << "callId = " << callId;
+    EXPECT_NE(CallManagerGtest::clientPtr_->AnswerCall(callId, videoState), RETURN_VALUE_IS_ZERO);
 }
 
 /**
@@ -253,10 +233,10 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_AnswerCall_0200, Function | Med
     if (!HasSimCard()) {
         return;
     }
+    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_200_MS, SLEEP_30000_MS);
     int32_t callId = INVALID_POSITIVE_ID;
     int32_t videoState = INVALID_NEGATIVE_ID;
-    EXPECT_NE(CallManagerGtest::clientPtr_->AnswerCall(callId, videoState), RETURN_VALUE_IS_ZERO)
-        << "callId = " << callId;
+    EXPECT_NE(CallManagerGtest::clientPtr_->AnswerCall(callId, videoState), RETURN_VALUE_IS_ZERO);
 }
 
 /********************************************* Test RejectCall() ***********************************************/
@@ -270,10 +250,10 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_RejectCall_0100, Function | Med
     if (!HasSimCard()) {
         return;
     }
+    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_200_MS, SLEEP_30000_MS);
     int32_t callId = INVALID_NEGATIVE_ID;
     std::u16string textMessage = Str8ToStr16("this is a test message");
-    EXPECT_NE(CallManagerGtest::clientPtr_->RejectCall(callId, true, textMessage), RETURN_VALUE_IS_ZERO)
-        << "callId = " << callId;
+    EXPECT_NE(CallManagerGtest::clientPtr_->RejectCall(callId, true, textMessage), RETURN_VALUE_IS_ZERO);
 }
 
 /******************************************* Test HangUpCall() *********************************************/
@@ -287,8 +267,9 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_HangUpCall_0100, Function | Med
     if (!HasSimCard()) {
         return;
     }
+    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_200_MS, SLEEP_30000_MS);
     int32_t callId = INVALID_NEGATIVE_ID;
-    EXPECT_NE(CallManagerGtest::clientPtr_->HangUpCall(callId), RETURN_VALUE_IS_ZERO) << "callId = " << callId;
+    EXPECT_NE(CallManagerGtest::clientPtr_->HangUpCall(callId), RETURN_VALUE_IS_ZERO);
 }
 
 /**
@@ -302,11 +283,11 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_HangUpCall_0200, Function | Med
     if (!HasSimCard()) {
         return;
     }
-    std::string phoneNumber = "00000000000";
+    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_200_MS, SLEEP_30000_MS);
     InitDialInfo(0, (int32_t)VideoStateType::TYPE_VOICE, (int32_t)DialScene::CALL_NORMAL,
         (int32_t)DialType::DIAL_CARRIER_TYPE);
-    int32_t ret = CallManagerGtest::clientPtr_->DialCall(Str8ToStr16(phoneNumber), dialInfo_);
-    EXPECT_EQ(ret, RETURN_VALUE_IS_ZERO);
+    int32_t callId = INVALID_NEGATIVE_ID;
+    EXPECT_NE(CallManagerGtest::clientPtr_->HangUpCall(callId), RETURN_VALUE_IS_ZERO);
 }
 
 /******************************************* Test GetCallState() *********************************************/
@@ -320,6 +301,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_GetCallState_0100, Function | M
     if (!HasSimCard()) {
         return;
     }
+    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_200_MS, SLEEP_30000_MS);
     EXPECT_EQ(CallManagerGtest::clientPtr_->GetCallState(), (int32_t)CallStateToApp::CALL_STATE_IDLE);
 }
 
@@ -334,11 +316,10 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_GetCallState_0200, Function | M
     if (!HasSimCard()) {
         return;
     }
-    std::string phoneNumber = "00000000000";
+    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_200_MS, SLEEP_30000_MS);
     InitDialInfo(0, (int32_t)VideoStateType::TYPE_VOICE, (int32_t)DialScene::CALL_NORMAL,
         (int32_t)DialType::DIAL_CARRIER_TYPE);
-    int32_t ret = CallManagerGtest::clientPtr_->DialCall(Str8ToStr16(phoneNumber), dialInfo_);
-    EXPECT_EQ(ret, RETURN_VALUE_IS_ZERO);
+    EXPECT_EQ(CallManagerGtest::clientPtr_->GetCallState(), (int32_t)CallStateToApp::CALL_STATE_IDLE);
 }
 
 /******************************************* Test HoldCall() *********************************************/
@@ -352,8 +333,9 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_HoldCall_0100, Function | Mediu
     if (!HasSimCard()) {
         return;
     }
+    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_200_MS, SLEEP_30000_MS);
     int32_t callId = INVALID_NEGATIVE_ID;
-    EXPECT_NE(CallManagerGtest::clientPtr_->HoldCall(callId), RETURN_VALUE_IS_ZERO) << "callId = " << callId;
+    EXPECT_NE(CallManagerGtest::clientPtr_->HoldCall(callId), RETURN_VALUE_IS_ZERO);
 }
 
 /**
@@ -367,11 +349,11 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_HoldCall_0200, Function | Mediu
     if (!HasSimCard()) {
         return;
     }
-    std::string phoneNumber = "00000000000";
+    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_200_MS, SLEEP_30000_MS);
     InitDialInfo(0, (int32_t)VideoStateType::TYPE_VOICE, (int32_t)DialScene::CALL_NORMAL,
         (int32_t)DialType::DIAL_CARRIER_TYPE);
-    int32_t ret = CallManagerGtest::clientPtr_->DialCall(Str8ToStr16(phoneNumber), dialInfo_);
-    EXPECT_EQ(ret, RETURN_VALUE_IS_ZERO);
+    int32_t callId = INVALID_NEGATIVE_ID;
+    EXPECT_NE(CallManagerGtest::clientPtr_->HoldCall(callId), RETURN_VALUE_IS_ZERO);
 }
 
 /**
@@ -385,12 +367,13 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_HoldCall_0600, Function | Mediu
     if (!HasSimCard()) {
         return;
     }
-    std::string phoneNumber = PHONE_NUMBER;
+    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_200_MS, SLEEP_30000_MS);
     InitDialInfo(0, (int32_t)VideoStateType::TYPE_VOICE, (int32_t)DialScene::CALL_NORMAL,
         (int32_t)DialType::DIAL_CARRIER_TYPE);
-    int32_t ret = CallManagerGtest::clientPtr_->DialCall(Str8ToStr16(phoneNumber), dialInfo_);
-    EXPECT_EQ(ret, RETURN_VALUE_IS_ZERO);
+    int32_t callId = INVALID_NEGATIVE_ID;
+    EXPECT_NE(CallManagerGtest::clientPtr_->HoldCall(callId), RETURN_VALUE_IS_ZERO);
 }
+
 /******************************************* Test UnHoldCall() *********************************************/
 /**
  * @tc.number   Telephony_CallManager_UnHoldCall_0100
@@ -402,8 +385,9 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_UnHoldCall_0100, Function | Med
     if (!HasSimCard()) {
         return;
     }
+    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_200_MS, SLEEP_30000_MS);
     int32_t callId = INVALID_NEGATIVE_ID;
-    EXPECT_NE(CallManagerGtest::clientPtr_->UnHoldCall(callId), RETURN_VALUE_IS_ZERO) << "callId = " << callId;
+    EXPECT_NE(CallManagerGtest::clientPtr_->UnHoldCall(callId), RETURN_VALUE_IS_ZERO);
 }
 
 /**
@@ -417,11 +401,11 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_UnHoldCall_0200, Function | Med
     if (!HasSimCard()) {
         return;
     }
-    std::string phoneNumber = "00000000000";
+    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_200_MS, SLEEP_30000_MS);
     InitDialInfo(0, (int32_t)VideoStateType::TYPE_VOICE, (int32_t)DialScene::CALL_NORMAL,
         (int32_t)DialType::DIAL_CARRIER_TYPE);
-    int32_t ret = CallManagerGtest::clientPtr_->DialCall(Str8ToStr16(phoneNumber), dialInfo_);
-    EXPECT_EQ(ret, RETURN_VALUE_IS_ZERO);
+    int32_t callId = INVALID_NEGATIVE_ID;
+    EXPECT_NE(CallManagerGtest::clientPtr_->UnHoldCall(callId), RETURN_VALUE_IS_ZERO);
 }
 
 /**
@@ -435,11 +419,11 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_UnHoldCall_0600, Function | Med
     if (!HasSimCard()) {
         return;
     }
-    std::string phoneNumber = PHONE_NUMBER;
+    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_200_MS, SLEEP_30000_MS);
     InitDialInfo(0, (int32_t)VideoStateType::TYPE_VOICE, (int32_t)DialScene::CALL_NORMAL,
         (int32_t)DialType::DIAL_CARRIER_TYPE);
-    int32_t ret = CallManagerGtest::clientPtr_->DialCall(Str8ToStr16(phoneNumber), dialInfo_);
-    EXPECT_EQ(ret, RETURN_VALUE_IS_ZERO);
+    int32_t callId = INVALID_NEGATIVE_ID;
+    EXPECT_NE(CallManagerGtest::clientPtr_->UnHoldCall(callId), RETURN_VALUE_IS_ZERO);
 }
 
 /******************************************* Test SwitchCall() *********************************************/
@@ -453,6 +437,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SwitchCall_0100, Function | Med
     if (!HasSimCard()) {
         return;
     }
+    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_200_MS, SLEEP_30000_MS);
     int32_t callId = INVALID_NEGATIVE_ID;
     EXPECT_NE(CallManagerGtest::clientPtr_->SwitchCall(callId), RETURN_VALUE_IS_ZERO);
 }
@@ -469,15 +454,14 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SwitchCall_0200, Function | Med
         return;
     }
 
-    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_50_MS, SLEEP_30000_MS);
+    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_200_MS, SLEEP_30000_MS);
     std::string phoneNumber = "00000000000";
+    int32_t callId = INVALID_NEGATIVE_ID;
     InitDialInfo(0, (int32_t)VideoStateType::TYPE_VOICE, (int32_t)DialScene::CALL_NORMAL,
         (int32_t)DialType::DIAL_CARRIER_TYPE);
     int32_t ret = CallManagerGtest::clientPtr_->DialCall(Str8ToStr16(phoneNumber), dialInfo_);
     EXPECT_EQ(ret, RETURN_VALUE_IS_ZERO);
-    CallInfoManager::LockCallId(false, FALSE_DEFAULT, SLEEP_50_MS, SLEEP_1000_MS);
-    ret = CallManagerGtest::clientPtr_->SwitchCall(newCallId_);
-    EXPECT_NE(ret, RETURN_VALUE_IS_ZERO);
+    EXPECT_NE(CallManagerGtest::clientPtr_->SwitchCall(callId), RETURN_VALUE_IS_ZERO);
 }
 
 /********************************************* Test HasCall() ***********************************************/
@@ -491,10 +475,11 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_HasCall_0100, Function | Medium
     if (!HasSimCard()) {
         return;
     }
+    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_200_MS, SLEEP_30000_MS);
     int32_t callState = CallManagerGtest::clientPtr_->GetCallState();
     int32_t idleState = (int32_t)CallStateToApp::CALL_STATE_IDLE;
     ASSERT_EQ(callState, idleState);
-    EXPECT_NE(CallManagerGtest::clientPtr_->HasCall(), true);
+    EXPECT_EQ(CallManagerGtest::clientPtr_->HasCall(), false);
 }
 
 /**
@@ -507,14 +492,12 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_HasCall_0200, Function | Medium
     if (!HasSimCard()) {
         return;
     }
-
-    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_50_MS, SLEEP_30000_MS);
+    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_200_MS, SLEEP_30000_MS);
     std::string phoneNumber = "";
     InitDialInfo(0, (int32_t)VideoStateType::TYPE_VOICE, (int32_t)DialScene::CALL_NORMAL,
         (int32_t)DialType::DIAL_CARRIER_TYPE);
     int32_t ret = CallManagerGtest::clientPtr_->DialCall(Str8ToStr16(phoneNumber), dialInfo_);
     EXPECT_NE(ret, RETURN_VALUE_IS_ZERO);
-
     bool isRet = CallManagerGtest::clientPtr_->HasCall();
     EXPECT_NE(isRet, true);
 }
@@ -529,8 +512,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_HasCall_0300, Function | Medium
     if (!HasSimCard()) {
         return;
     }
-
-    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_50_MS, SLEEP_30000_MS);
+    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_200_MS, SLEEP_30000_MS);
     bool isRet = CallManagerGtest::clientPtr_->HasCall();
     EXPECT_NE(isRet, true);
 }
@@ -551,7 +533,6 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_IsNewCallAllowed_0100, Function
         (int32_t)DialType::DIAL_CARRIER_TYPE);
     int32_t ret = CallManagerGtest::clientPtr_->DialCall(Str8ToStr16(phoneNumber), dialInfo_);
     ASSERT_EQ(ret, RETURN_VALUE_IS_ZERO);
-
     CallInfoManager::LockCallState(false, (int32_t)TelCallState::CALL_STATUS_ACTIVE, SLEEP_50_MS, SLEEP_12000_MS);
     EXPECT_EQ(CallManagerGtest::clientPtr_->IsNewCallAllowed(), true);
 }
@@ -567,6 +548,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_IsRinging_0100, Function | Medi
     if (!HasSimCard()) {
         return;
     }
+    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_200_MS, SLEEP_30000_MS);
     int32_t callState = CallManagerGtest::clientPtr_->GetCallState();
     int32_t idleState = (int32_t)CallStateToApp::CALL_STATE_IDLE;
     ASSERT_EQ(callState, idleState);
@@ -585,8 +567,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_CombineConference_0100, Functio
         return;
     }
     int32_t callId = INVALID_NEGATIVE_ID;
-    EXPECT_NE(CallManagerGtest::clientPtr_->CombineConference(callId), RETURN_VALUE_IS_ZERO)
-        << "callId = " << callId;
+    EXPECT_NE(CallManagerGtest::clientPtr_->CombineConference(callId), RETURN_VALUE_IS_ZERO);
 }
 
 /**
@@ -600,8 +581,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_CombineConference_0200, Functio
         return;
     }
     int32_t callId = INVALID_POSITIVE_ID;
-    EXPECT_NE(CallManagerGtest::clientPtr_->CombineConference(callId), RETURN_VALUE_IS_ZERO)
-        << "callId = " << callId;
+    EXPECT_NE(CallManagerGtest::clientPtr_->CombineConference(callId), RETURN_VALUE_IS_ZERO);
 }
 
 /********************************************* Test GetMainCallId() ***********************************************/
@@ -616,7 +596,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_GetMainCallId_0100, Function | 
         return;
     }
     int32_t callId = INVALID_NEGATIVE_ID;
-    EXPECT_NE(CallManagerGtest::clientPtr_->GetMainCallId(callId), RETURN_VALUE_IS_ZERO) << "callId = " << callId;
+    EXPECT_NE(CallManagerGtest::clientPtr_->GetMainCallId(callId), RETURN_VALUE_IS_ZERO);
 }
 
 /**
@@ -630,7 +610,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_GetMainCallId_0200, Function | 
         return;
     }
     int32_t callId = INVALID_POSITIVE_ID;
-    EXPECT_NE(CallManagerGtest::clientPtr_->GetMainCallId(callId), RETURN_VALUE_IS_ZERO) << "callId = " << callId;
+    EXPECT_NE(CallManagerGtest::clientPtr_->GetMainCallId(callId), RETURN_VALUE_IS_ZERO);
 }
 
 /***************************************** Test GetSubCallIdList() ******************************************/
@@ -1237,7 +1217,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_GetCallRestriction_0100, Functi
     }
 
     EXPECT_EQ(CallManagerGtest::clientPtr_->GetCallRestriction(
-        SIM1_SLOTID, CallRestrictionType::RESTRICTION_TYPE_ALL_INCOMING),
+                  SIM1_SLOTID, CallRestrictionType::RESTRICTION_TYPE_ALL_INCOMING),
         RETURN_VALUE_IS_ZERO);
 }
 
@@ -1254,7 +1234,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_GetCallRestriction_0200, Functi
     }
 
     EXPECT_EQ(CallManagerGtest::clientPtr_->GetCallRestriction(
-        SIM1_SLOTID, CallRestrictionType::RESTRICTION_TYPE_ALL_OUTGOING),
+                  SIM1_SLOTID, CallRestrictionType::RESTRICTION_TYPE_ALL_OUTGOING),
         RETURN_VALUE_IS_ZERO);
 }
 
@@ -1323,7 +1303,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_GetCallTransferInfo_0300, Funct
     }
 
     EXPECT_EQ(CallManagerGtest::clientPtr_->GetCallTransferInfo(
-        SIM1_SLOTID, CallTransferType::TRANSFER_TYPE_NOT_REACHABLE),
+                  SIM1_SLOTID, CallTransferType::TRANSFER_TYPE_NOT_REACHABLE),
         RETURN_VALUE_IS_ZERO);
 }
 
@@ -1346,10 +1326,10 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallTransferInfo_0100, Funct
     EXPECT_EQ(CallManagerGtest::clientPtr_->SetCallTransferInfo(SIM1_SLOTID, info), RETURN_VALUE_IS_ZERO);
 }
 
-/******************************************* Test EnableVoLte() ********************************************/
+/******************************************* Test EnableImsSwitch() ********************************************/
 /**
  * @tc.number   Telephony_CallManager_EnableVoLte_0100
- * @tc.name     test EnableVoLte
+ * @tc.name     test EnableImsSwitch
  * @tc.desc     Function test
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_EnableVoLte_0100, Function | MediumTest | Level3)
@@ -1358,13 +1338,13 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_EnableVoLte_0100, Function | Me
         return;
     }
 
-    EXPECT_EQ(CallManagerGtest::clientPtr_->EnableVoLte(SIM1_SLOTID), RETURN_VALUE_IS_ZERO);
+    EXPECT_EQ(CallManagerGtest::clientPtr_->EnableImsSwitch(SIM1_SLOTID), RETURN_VALUE_IS_ZERO);
 }
 
-/******************************************* Test DisableVoLte() ********************************************/
+/******************************************* Test DisableImsSwitch() ********************************************/
 /**
  * @tc.number   Telephony_CallManager_DisableVoLte_0100
- * @tc.name     test DisableVoLte
+ * @tc.name     test DisableImsSwitch
  * @tc.desc     Function test
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_DisableVoLte_0100, Function | MediumTest | Level3)
@@ -1373,13 +1353,13 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_DisableVoLte_0100, Function | M
         return;
     }
 
-    EXPECT_EQ(CallManagerGtest::clientPtr_->DisableVoLte(SIM1_SLOTID), RETURN_VALUE_IS_ZERO);
+    EXPECT_EQ(CallManagerGtest::clientPtr_->DisableImsSwitch(SIM1_SLOTID), RETURN_VALUE_IS_ZERO);
 }
 
-/******************************************* Test IsVoLteEnabled() ********************************************/
+/******************************************* Test IsImsSwitchEnabled() ********************************************/
 /**
  * @tc.number   Telephony_CallManager_IsVoLteEnabled_0100
- * @tc.name     test IsVoLteEnabled
+ * @tc.name     test IsImsSwitchEnabled
  * @tc.desc     Function test
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_IsVoLteEnabled_0100, Function | MediumTest | Level3)
@@ -1388,7 +1368,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_IsVoLteEnabled_0100, Function |
         return;
     }
 
-    EXPECT_EQ(CallManagerGtest::clientPtr_->IsVoLteEnabled(SIM1_SLOTID), RETURN_VALUE_IS_ZERO);
+    EXPECT_EQ(CallManagerGtest::clientPtr_->IsImsSwitchEnabled(SIM1_SLOTID), RETURN_VALUE_IS_ZERO);
 }
 
 /******************************************* Test SetLteEnhanceMode() ********************************************/
@@ -1449,11 +1429,9 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_ControlCamera_0100, Function | 
     }
     // 3516DV300 camera id string is "lcam001"
     std::string id = "lcam001";
-    std::string pc = "com.example.myapplication";
 
     std::u16string cameraID = Str8ToStr16(id);
-    std::u16string callingPackage = Str8ToStr16(pc);
-    EXPECT_EQ(CallManagerGtest::clientPtr_->ControlCamera(cameraID, callingPackage), RETURN_VALUE_IS_ZERO);
+    EXPECT_EQ(CallManagerGtest::clientPtr_->ControlCamera(cameraID), RETURN_VALUE_IS_ZERO);
 }
 
 /**
@@ -1467,11 +1445,9 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_ControlCamera_0200, Function | 
         return;
     }
     std::string id = "xtsautotest123456";
-    std::string pc = "com.example.myapplication";
 
     std::u16string cameraID = Str8ToStr16(id);
-    std::u16string callingPackage = Str8ToStr16(pc);
-    EXPECT_NE(CallManagerGtest::clientPtr_->ControlCamera(cameraID, callingPackage), RETURN_VALUE_IS_ZERO);
+    EXPECT_NE(CallManagerGtest::clientPtr_->ControlCamera(cameraID), RETURN_VALUE_IS_ZERO);
 }
 
 /**
@@ -1485,15 +1461,13 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_ControlCamera_0300, Function | 
         return;
     }
     std::string id = "lcam001";
-    std::string pc = "com.ohos.errorpkg";
 
     std::u16string cameraID = Str8ToStr16(id);
-    std::u16string callingPackage = Str8ToStr16(pc);
-    EXPECT_EQ(CallManagerGtest::clientPtr_->ControlCamera(cameraID, callingPackage), RETURN_VALUE_IS_ZERO);
+    EXPECT_EQ(CallManagerGtest::clientPtr_->ControlCamera(cameraID), RETURN_VALUE_IS_ZERO);
 
     id = "";
     cameraID = Str8ToStr16(id);
-    EXPECT_EQ(CallManagerGtest::clientPtr_->ControlCamera(cameraID, callingPackage), RETURN_VALUE_IS_ZERO);
+    EXPECT_EQ(CallManagerGtest::clientPtr_->ControlCamera(cameraID), RETURN_VALUE_IS_ZERO);
 }
 
 /**
@@ -1507,33 +1481,9 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_ControlCamera_0600, Function | 
         return;
     }
     std::string id = "";
-    std::string pc = "com.example.myapplication";
 
     std::u16string cameraID = Str8ToStr16(id);
-    std::u16string callingPackage = Str8ToStr16(pc);
-    EXPECT_NE(CallManagerGtest::clientPtr_->ControlCamera(cameraID, callingPackage), RETURN_VALUE_IS_ZERO);
-}
-
-/**
- * @tc.number   Telephony_CallManager_ControlCamera_0700
- * @tc.name     Test returns error after ControlCamera
- * @tc.desc     Function test
- */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_ControlCamera_0700, Function | MediumTest | Level2)
-{
-    if (!HasSimCard()) {
-        return;
-    }
-    std::string id = "lcam001";
-    std::string pc = "com.example.myapplication";
-
-    std::u16string cameraID = Str8ToStr16(id);
-    std::u16string callingPackage = Str8ToStr16(pc);
-    EXPECT_EQ(CallManagerGtest::clientPtr_->ControlCamera(cameraID, callingPackage), RETURN_VALUE_IS_ZERO);
-
-    id = "";
-    cameraID = Str8ToStr16(id);
-    EXPECT_EQ(CallManagerGtest::clientPtr_->ControlCamera(cameraID, callingPackage), RETURN_VALUE_IS_ZERO);
+    EXPECT_NE(CallManagerGtest::clientPtr_->ControlCamera(cameraID), RETURN_VALUE_IS_ZERO);
 }
 
 /******************************************* Test SetPreviewWindow() *********************************************/

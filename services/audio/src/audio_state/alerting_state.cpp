@@ -32,14 +32,16 @@ bool AlertingState::ProcessEvent(int32_t event)
             break;
         case AudioEvent::NEW_ACTIVE_CS_CALL:
             // switch to cs call state anyway.
-            if (DelayedSingleton<CallStateProcessor>::GetInstance()->ShouldSwitchActive()) {
+            if (DelayedSingleton<CallStateProcessor>::GetInstance()->
+                ShouldSwitchState(TelCallState::CALL_STATUS_ACTIVE)) {
                 result = DelayedSingleton<AudioSceneProcessor>::GetInstance()->ProcessEvent(
                     AudioEvent::SWITCH_CS_CALL_STATE);
             }
             break;
         case AudioEvent::NEW_ACTIVE_IMS_CALL:
             // switch to ims call state anyway.
-            if (DelayedSingleton<CallStateProcessor>::GetInstance()->ShouldSwitchActive()) {
+            if (DelayedSingleton<CallStateProcessor>::GetInstance()->
+                ShouldSwitchState(TelCallState::CALL_STATUS_ACTIVE)) {
                 result = DelayedSingleton<AudioSceneProcessor>::GetInstance()->ProcessEvent(
                     AudioEvent::SWITCH_IMS_CALL_STATE);
             }

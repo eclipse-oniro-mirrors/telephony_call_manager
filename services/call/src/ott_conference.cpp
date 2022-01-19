@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "ims_conference_base.h"
+#include "ott_conference.h"
 
 #include <string_ex.h>
 
@@ -25,7 +25,7 @@
 
 namespace OHOS {
 namespace Telephony {
-ImsConferenceBase::ImsConferenceBase() : ConferenceBase()
+OttConference::OttConference() : ConferenceBase()
 {
     conferenceType_ = CallType::TYPE_IMS;
     maxSubCallLimits_ = CS_CONFERENCE_MAX_CALLS_CNT;
@@ -35,9 +35,9 @@ ImsConferenceBase::ImsConferenceBase() : ConferenceBase()
 #endif
 }
 
-ImsConferenceBase::~ImsConferenceBase() {}
+OttConference::~OttConference() {}
 
-int32_t ImsConferenceBase::JoinToConference(int32_t callId)
+int32_t OttConference::JoinToConference(int32_t callId)
 {
     std::lock_guard<std::mutex> lock(conferenceMutex_);
     if (state_ != CONFERENCE_STATE_CREATING && state_ != CONFERENCE_STATE_ACTIVE &&
@@ -57,7 +57,7 @@ int32_t ImsConferenceBase::JoinToConference(int32_t callId)
     return TELEPHONY_SUCCESS;
 }
 
-int32_t ImsConferenceBase::LeaveFromConference(int32_t callId)
+int32_t OttConference::LeaveFromConference(int32_t callId)
 {
     std::lock_guard<std::mutex> lock(conferenceMutex_);
     if (subCallIdSet_.find(callId) != subCallIdSet_.end()) {
@@ -74,7 +74,7 @@ int32_t ImsConferenceBase::LeaveFromConference(int32_t callId)
     return TELEPHONY_SUCCESS;
 }
 
-int32_t ImsConferenceBase::HoldConference(int32_t callId)
+int32_t OttConference::HoldConference(int32_t callId)
 {
     std::lock_guard<std::mutex> lock(conferenceMutex_);
     if (state_ == CONFERENCE_STATE_HOLDING) {
@@ -95,7 +95,7 @@ int32_t ImsConferenceBase::HoldConference(int32_t callId)
     return TELEPHONY_SUCCESS;
 }
 
-int32_t ImsConferenceBase::CanCombineConference()
+int32_t OttConference::CanCombineConference()
 {
     std::lock_guard<std::mutex> lock(conferenceMutex_);
     if (subCallIdSet_.size() >= maxSubCallLimits_) {
@@ -105,7 +105,7 @@ int32_t ImsConferenceBase::CanCombineConference()
     return TELEPHONY_SUCCESS;
 }
 
-int32_t ImsConferenceBase::CanSeparateConference()
+int32_t OttConference::CanSeparateConference()
 {
     std::lock_guard<std::mutex> lock(conferenceMutex_);
     if (subCallIdSet_.empty() || state_ != CONFERENCE_STATE_ACTIVE) {

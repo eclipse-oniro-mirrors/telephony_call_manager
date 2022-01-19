@@ -50,10 +50,12 @@ public:
     std::vector<std::u16string> GetSubCallIdList() override;
     std::vector<std::u16string> GetCallIdListForConference() override;
     int32_t IsSupportConferenceable() override;
-    int32_t SendUpdateCallMediaModeRequest(CallMediaMode mode) override;
-    int32_t RecieveUpdateCallMediaModeRequest(CallMediaMode mode) override;
-    int32_t SendUpdateCallMediaModeResponse(CallMediaMode mode) override;
+    int32_t SendUpdateCallMediaModeRequest(ImsCallMode mode) override;
+    int32_t RecieveUpdateCallMediaModeRequest(ImsCallMode mode) override;
+    int32_t SendUpdateCallMediaModeResponse(ImsCallMode mode) override;
     int32_t ReceiveUpdateCallMediaModeResponse(CallMediaModeResponse &reponse) override;
+    int32_t DispatchUpdateVideoRequest(ImsCallMode mode) override;
+    int32_t DispatchUpdateVideoResponse(ImsCallMode mode) override;
 
 private:
     void PackOttCallRequestInfo(OttCallRequestInfo &requestInfo);

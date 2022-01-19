@@ -19,7 +19,8 @@ config("call_manager_config") {
     "$SUBSYSTEM_DIR/call_manager/frameworks/native/include",
     "$SUBSYSTEM_DIR/call_manager/interfaces/innerkits",
     "$SUBSYSTEM_DIR/call_manager/utils/include",
-    "$SUBSYSTEM_DIR/core_service/interfaces/innerkits/core",
+    "$SUBSYSTEM_DIR/core_service/interfaces/innerkits/call_manager",
+    "$SUBSYSTEM_DIR/core_service/interfaces/innerkits/include",
   ]
 }
 
@@ -35,7 +36,7 @@ ohos_shared_library("tel_call_manager_api") {
   public_configs = [ ":call_manager_config" ]
 
   deps = [
-    "$SUBSYSTEM_DIR/core_service/utils:libtelephony_common",
+    "$SUBSYSTEM_DIR/core_service/utils:libtel_common",
     "//utils/native/base:utils",
   ]
 

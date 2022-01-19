@@ -32,6 +32,8 @@ ReportCallInfoHandler::ReportCallInfoHandler(const std::shared_ptr<AppExecFwk::E
         &ReportCallInfoHandler::ReportDisconnectedCause;
     memberFuncMap_[ReportCallInfoHandlerService::HANDLER_UPDATE_CELLULAR_EVENT_RESULT_INFO] =
         &ReportCallInfoHandler::ReportEventInfo;
+    memberFuncMap_[ReportCallInfoHandlerService::HANDLER_UPDATE_OTT_EVENT_RESULT_INFO] =
+        &ReportCallInfoHandler::ReportOttEvent;
     memberFuncMap_[ReportCallInfoHandlerService::HANDLE_UPDATE_MEDIA_MODE_RESPONSE] =
         &ReportCallInfoHandler::OnUpdateMediaModeResponse;
 }
@@ -123,10 +125,10 @@ void ReportCallInfoHandler::ReportDisconnectedCause(const AppExecFwk::InnerEvent
     }
     int32_t ret = callStatusManagerPtr_->HandleDisconnectedCause(cause);
     if (ret != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("HandleEventResultReportInfo failed! ret:%{public}d", ret);
+        TELEPHONY_LOGE("HandleDisconnectedCause failed! ret:%{public}d", ret);
         return;
     }
-    TELEPHONY_LOGI("HandleEventResultReportInfo success!");
+    TELEPHONY_LOGI("HandleDisconnectedCause success!");
 }
 
 void ReportCallInfoHandler::ReportEventInfo(const AppExecFwk::InnerEvent::Pointer &event)
@@ -147,6 +149,26 @@ void ReportCallInfoHandler::ReportEventInfo(const AppExecFwk::InnerEvent::Pointe
         return;
     }
     TELEPHONY_LOGI("HandleEventResultReportInfo success!");
+}
+
+void ReportCallInfoHandler::ReportOttEvent(const AppExecFwk::InnerEvent::Pointer &event)
+{
+    auto object = event->GetUniqueObject<OttCallEventInfo>();
+    if (object == nullptr) {
+        TELEPHONY_LOGE("object is nullptr!");
+        return;
+    }
+    OttCallEventInfo info = *object;
+    if (callStatusManagerPtr_ == nullptr) {
+        TELEPHONY_LOGE("callStatusManagerPtr_ is nullptr");
+        return;
+    }
+    int32_t ret = callStatusManagerPtr_->HandleOttEventReportInfo(info);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("HandleOttEventReportInfo failed! ret:%{public}d", ret);
+        return;
+    }
+    TELEPHONY_LOGI("HandleOttEventReportInfo success!");
 }
 
 void ReportCallInfoHandler::OnUpdateMediaModeResponse(const AppExecFwk::InnerEvent::Pointer &event)
@@ -253,6 +275,7 @@ int32_t ReportCallInfoHandlerService::UpdateDisconnectedCause(const Disconnected
     if (!ret) {
         TELEPHONY_LOGE("SendEvent failed! DisconnectedDetails:%{public}d", cause);
     }
+    TELEPHONY_LOGE("UpdateDisconnectedCause success, cause:%{public}d", cause);
     return TELEPHONY_SUCCESS;
 }
 
@@ -271,6 +294,25 @@ int32_t ReportCallInfoHandlerService::UpdateEventResultInfo(const CellularCallEv
     bool ret = handler_->SendEvent(HANDLER_UPDATE_CELLULAR_EVENT_RESULT_INFO, std::move(para));
     if (!ret) {
         TELEPHONY_LOGE("SendEvent failed! eventType:%{public}d, eventId:%{public}d", info.eventType, info.eventId);
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t ReportCallInfoHandlerService::UpdateOttEventInfo(const OttCallEventInfo &info)
+{
+    if (handler_.get() == nullptr) {
+        TELEPHONY_LOGE("handler_ is nullptr");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    std::unique_ptr<OttCallEventInfo> para = std::make_unique<OttCallEventInfo>();
+    if (para.get() == nullptr) {
+        TELEPHONY_LOGE("make_unique OttCallEventInfo failed!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    *para = info;
+    bool ret = handler_->SendEvent(HANDLER_UPDATE_OTT_EVENT_RESULT_INFO, std::move(para));
+    if (!ret) {
+        TELEPHONY_LOGE("SendEvent failed! eventId:%{public}d", info.ottCallEventId);
     }
     return TELEPHONY_SUCCESS;
 }

@@ -18,22 +18,16 @@
 
 #include "carrier_call.h"
 #include "net_call_base.h"
+#include "video_call_state.h"
 
 namespace OHOS {
 namespace Telephony {
 class IMSCall : public CarrierCall, public NetCallBase {
 public:
-    enum VideoUpgradeState {
-        VIDEO_UPGRADE_NONE = 0,
-        VIDEO_UPGRADE_SEND_ONLY,
-        VIDEO_UPGRADE_RECV_ONLY,
-        VIDEO_UPGRADE_SEND_RECV,
-    };
-
-public:
     IMSCall(DialParaInfo &info);
     IMSCall(DialParaInfo &info, AppExecFwk::PacMap &extras);
     ~IMSCall();
+    int32_t InitVideoCall();
     int32_t DialingProcess() override;
     int32_t AnswerCall(int32_t videoState) override;
     int32_t RejectCall() override;
@@ -53,27 +47,26 @@ public:
     std::vector<std::u16string> GetSubCallIdList() override;
     std::vector<std::u16string> GetCallIdListForConference() override;
     int32_t IsSupportConferenceable() override;
-    int32_t StartRtt();
+    int32_t StartRtt(std::u16string &msg);
     int32_t StopRtt();
     int32_t SetMute(int32_t mute, int32_t slotId);
-    int32_t SendUpdateCallMediaModeRequest(CallMediaMode mode) override;
-    int32_t RecieveUpdateCallMediaModeRequest(CallMediaMode mode) override;
-    int32_t SendUpdateCallMediaModeResponse(CallMediaMode mode) override;
-    int32_t ReceiveUpdateCallMediaModeResponse(CallMediaModeResponse &reponse) override;
-
-protected:
-    VideoUpgradeState GetVideoUpdateState();
-    void SetVideoUpdateState(VideoUpgradeState state);
-    int32_t HandleUpgradeVideoRequest(CallMediaMode mode);
-    int32_t HandleDowngradeVideoRequest(CallMediaMode mode);
-    int32_t SendUpgradeVideoRequest(CallMediaMode mode);
-    int32_t NotifyCallMediaModeUpdate(VideoUpgradeState state);
+    int32_t AcceptVideoCall();
+    int32_t RefuseVideoCall();
+    int32_t SendUpdateCallMediaModeRequest(ImsCallMode mode) override;
+    int32_t RecieveUpdateCallMediaModeRequest(ImsCallMode mode) override;
+    int32_t SendUpdateCallMediaModeResponse(ImsCallMode mode) override;
+    int32_t ReceiveUpdateCallMediaModeResponse(CallMediaModeResponse &response) override;
+    void SwitchVideoState(ImsCallMode mode);
     bool IsSupportVideoCall();
+    int32_t DispatchUpdateVideoRequest(ImsCallMode mode) override;
+    int32_t DispatchUpdateVideoResponse(ImsCallMode mode) override;
+    sptr<VideoCallState> GetCallVideoState(ImsCallMode mode);
 
 private:
-    // video call
-    VideoUpgradeState videoUpgradeState_;
     std::mutex videoUpdateMutex_;
+    sptr<VideoCallState> videoCallState_;
+    bool isInitialized_;
+    std::map<ImsCallMode, sptr<VideoCallState>> videoStateMap_;
 };
 } // namespace Telephony
 } // namespace OHOS

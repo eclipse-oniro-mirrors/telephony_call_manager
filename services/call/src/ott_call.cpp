@@ -19,6 +19,7 @@
 #include "telephony_log_wrapper.h"
 
 #include "ott_call_connection.h"
+#include "ott_conference.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -152,76 +153,127 @@ int32_t OTTCall::GetSlotId()
 
 int32_t OTTCall::CombineConference()
 {
-    return CALL_ERR_FUNCTION_NOT_SUPPORTED;
+    int32_t ret = DelayedSingleton<OttConference>::GetInstance()->SetMainCall(GetCallID());
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("SetMainCall failed,  error%{public}d", ret);
+        return ret;
+    }
+    OttCallRequestInfo requestInfo;
+    PackOttCallRequestInfo(requestInfo);
+    if (ottCallConnectionPtr_ == nullptr) {
+        TELEPHONY_LOGE("ottCallConnectionPtr_ is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return ottCallConnectionPtr_->CombineConference(requestInfo);
 }
 
 int32_t OTTCall::CanCombineConference()
 {
-    return CALL_ERR_FUNCTION_NOT_SUPPORTED;
+    int32_t ret = IsSupportConferenceable();
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("call unsupport conference,  error%{public}d", ret);
+        return ret;
+    }
+    return DelayedSingleton<OttConference>::GetInstance()->CanCombineConference();
 }
+
 int32_t OTTCall::SeparateConference()
 {
-    return CALL_ERR_FUNCTION_NOT_SUPPORTED;
+    OttCallRequestInfo requestInfo;
+    PackOttCallRequestInfo(requestInfo);
+    if (ottCallConnectionPtr_ == nullptr) {
+        TELEPHONY_LOGE("ottCallConnectionPtr_ is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return ottCallConnectionPtr_->SeparateConference(requestInfo);
 }
 
 int32_t OTTCall::CanSeparateConference()
 {
-    return CALL_ERR_FUNCTION_NOT_SUPPORTED;
+    return DelayedSingleton<OttConference>::GetInstance()->CanSeparateConference();
 }
 
 int32_t OTTCall::LaunchConference()
 {
-    return CALL_ERR_FUNCTION_NOT_SUPPORTED;
+    int32_t ret = DelayedSingleton<OttConference>::GetInstance()->JoinToConference(GetCallID());
+    if (ret == TELEPHONY_SUCCESS) {
+        SetTelConferenceState(TelConferenceState::TEL_CONFERENCE_ACTIVE);
+    }
+    return ret;
 }
 
 int32_t OTTCall::ExitConference()
 {
-    return CALL_ERR_FUNCTION_NOT_SUPPORTED;
+    return DelayedSingleton<OttConference>::GetInstance()->LeaveFromConference(GetCallID());
 }
 
 int32_t OTTCall::HoldConference()
 {
-    return CALL_ERR_FUNCTION_NOT_SUPPORTED;
+    int32_t ret = DelayedSingleton<OttConference>::GetInstance()->HoldConference(GetCallID());
+    if (ret == TELEPHONY_SUCCESS) {
+        SetTelConferenceState(TelConferenceState::TEL_CONFERENCE_HOLDING);
+    }
+    return ret;
 }
 
 int32_t OTTCall::GetMainCallId()
 {
-    return CALL_ERR_FUNCTION_NOT_SUPPORTED;
+    return DelayedSingleton<OttConference>::GetInstance()->GetMainCall();
 }
 
 std::vector<std::u16string> OTTCall::GetSubCallIdList()
 {
-    std::vector<std::u16string> vec;
-    return vec;
+    return DelayedSingleton<OttConference>::GetInstance()->GetSubCallIdList(GetCallID());
 }
 
 std::vector<std::u16string> OTTCall::GetCallIdListForConference()
 {
-    std::vector<std::u16string> vec;
-    return vec;
+    return DelayedSingleton<OttConference>::GetInstance()->GetCallIdListForConference(GetCallID());
 }
 
 int32_t OTTCall::IsSupportConferenceable()
 {
-    return CALL_ERR_FUNCTION_NOT_SUPPORTED;
+#ifdef ABILIT_CONFIG_SUPPORT
+    bool ottSupport = GetOttConfig(OTT_SUPPORT_CONFERENCE);
+    if (!ottSupport) {
+        return TELEPHONY_CONFERENCE_OTT_NOT_SUPPORT;
+    }
+    if (isVideoCall()) {
+        ottSupport = GetOTTConfig(OTT_VIDEO_SUPPORT_CONFERENCE)
+    }
+    if (!ottSupport) {
+        return TELEPHONY_CONFERENCE_VIDEO_CALL_NOT_SUPPORT;
+    }
+#endif
+    return TELEPHONY_SUCCESS;
 }
 
-int32_t OTTCall::SendUpdateCallMediaModeRequest(CallMediaMode mode)
+int32_t OTTCall::SendUpdateCallMediaModeRequest(ImsCallMode mode)
 {
     return CALL_ERR_FUNCTION_NOT_SUPPORTED;
 }
 
-int32_t OTTCall::RecieveUpdateCallMediaModeRequest(CallMediaMode mode)
+int32_t OTTCall::RecieveUpdateCallMediaModeRequest(ImsCallMode mode)
 {
     return CALL_ERR_FUNCTION_NOT_SUPPORTED;
 }
 
-int32_t OTTCall::SendUpdateCallMediaModeResponse(CallMediaMode mode)
+int32_t OTTCall::SendUpdateCallMediaModeResponse(ImsCallMode mode)
 {
     return CALL_ERR_FUNCTION_NOT_SUPPORTED;
 }
 
 int32_t OTTCall::ReceiveUpdateCallMediaModeResponse(CallMediaModeResponse &response)
+{
+    return CALL_ERR_FUNCTION_NOT_SUPPORTED;
+}
+
+int32_t OTTCall::DispatchUpdateVideoRequest(ImsCallMode mode)
+{
+    return CALL_ERR_FUNCTION_NOT_SUPPORTED;
+}
+
+int32_t OTTCall::DispatchUpdateVideoResponse(ImsCallMode mode)
 {
     return CALL_ERR_FUNCTION_NOT_SUPPORTED;
 }

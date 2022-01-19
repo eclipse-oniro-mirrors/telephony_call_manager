@@ -18,11 +18,11 @@
 #include "telephony_log_wrapper.h"
 
 #include "audio_control_manager.h"
-#include "devices_inactive.h"
-#include "enable_bluetooth_device.h"
-#include "enable_earpiece_device.h"
-#include "enable_speaker_device.h"
-#include "enable_wired_headset_device.h"
+#include "inactive_device_state.h"
+#include "bluetooth_device_state.h"
+#include "earpiece_device_state.h"
+#include "speaker_device_state.h"
+#include "wired_headset_device_state.h"
 #include "bluetooth_call_manager.h"
 
 namespace OHOS {
@@ -48,7 +48,7 @@ void AudioDeviceManager::Init()
     memberFuncMap_[AudioEvent::ENABLE_DEVICE_SPEAKER] = &AudioDeviceManager::EnableSpeaker;
     memberFuncMap_[AudioEvent::ENABLE_DEVICE_WIRED_HEADSET] = &AudioDeviceManager::EnableWiredHeadset;
     memberFuncMap_[AudioEvent::ENABLE_DEVICE_BLUETOOTH] = &AudioDeviceManager::EnableBtSco;
-    currentAudioDevice_ = std::make_unique<DevicesInactive>();
+    currentAudioDevice_ = std::make_unique<InactiveDeviceState>();
     if (currentAudioDevice_ == nullptr) {
         TELEPHONY_LOGE("current audio device nullptr");
     }
@@ -74,7 +74,6 @@ bool AudioDeviceManager::ProcessEvent(AudioEvent event)
         case AudioEvent::ENABLE_DEVICE_SPEAKER:
         case AudioEvent::ENABLE_DEVICE_BLUETOOTH:
         case AudioEvent::ENABLE_DEVICE_WIRED_HEADSET:
-        case AudioEvent::DEVICES_INACTIVE:
             result = SwitchDevice(event);
             break;
         case AudioEvent::AUDIO_ACTIVATED:
@@ -147,9 +146,9 @@ bool AudioDeviceManager::SwitchDevice(AudioDevice device)
 bool AudioDeviceManager::EnableSpeaker()
 {
     if (isSpeakerAvailable_ && DelayedSingleton<AudioProxy>::GetInstance()->SetSpeakerDevActive()) {
-        currentAudioDevice_ = std::make_unique<EnableSpeakerDevice>();
+        currentAudioDevice_ = std::make_unique<SpeakerDeviceState>();
         if (currentAudioDevice_ == nullptr) {
-            TELEPHONY_LOGE("make_unique EnableSpeakerDevice failed");
+            TELEPHONY_LOGE("make_unique SpeakerDeviceState failed");
             return false;
         }
         TELEPHONY_LOGI("speaker enabled , current audio device : speaker");
@@ -164,9 +163,9 @@ bool AudioDeviceManager::EnableSpeaker()
 bool AudioDeviceManager::EnableEarpiece()
 {
     if (isEarpieceAvailable_ && DelayedSingleton<AudioProxy>::GetInstance()->SetEarpieceDevActive()) {
-        currentAudioDevice_ = std::make_unique<EnableEarpieceDevice>();
+        currentAudioDevice_ = std::make_unique<EarpieceDeviceState>();
         if (currentAudioDevice_ == nullptr) {
-            TELEPHONY_LOGE("make_unique EnableEarpieceDevice failed");
+            TELEPHONY_LOGE("make_unique EarpieceDeviceState failed");
             return false;
         }
         TELEPHONY_LOGI("earpiece enabled , current audio device : earpiece");
@@ -181,9 +180,9 @@ bool AudioDeviceManager::EnableEarpiece()
 bool AudioDeviceManager::EnableWiredHeadset()
 {
     if (isWiredHeadsetConnected_ && DelayedSingleton<AudioProxy>::GetInstance()->SetWiredHeadsetDevActive()) {
-        currentAudioDevice_ = std::make_unique<EnableWiredHeadsetDevice>();
+        currentAudioDevice_ = std::make_unique<WiredHeadsetDeviceState>();
         if (currentAudioDevice_ == nullptr) {
-            TELEPHONY_LOGE("make_unique EnableWiredHeadsetDevice failed");
+            TELEPHONY_LOGE("make_unique WiredHeadsetDeviceState failed");
             return false;
         }
         TELEPHONY_LOGI("wired headset enabled , current audio device : wired headset");
@@ -199,9 +198,9 @@ bool AudioDeviceManager::EnableBtSco()
 {
     if (isBtScoConnected_ && DelayedSingleton<AudioProxy>::GetInstance()->SetBluetoothDevActive() &&
         DelayedSingleton<BluetoothCallManager>::GetInstance()->ConnectBtSco()) {
-        currentAudioDevice_ = std::make_unique<EnableBluetoothDevice>();
+        currentAudioDevice_ = std::make_unique<BluetoothDeviceState>();
         if (currentAudioDevice_ == nullptr) {
-            TELEPHONY_LOGE("make_unique EnableBluetoothDevice failed");
+            TELEPHONY_LOGE("make_unique BluetoothDeviceState failed");
             return false;
         }
         TELEPHONY_LOGI("bluetooth sco enabled , current audio device : bluetooth sco");
@@ -219,9 +218,9 @@ bool AudioDeviceManager::DisableAll()
     isWiredHeadsetDevEnable_ = false;
     isSpeakerDevEnable_ = false;
     isEarpieceDevEnable_ = false;
-    currentAudioDevice_ = std::make_unique<DevicesInactive>();
+    currentAudioDevice_ = std::make_unique<InactiveDeviceState>();
     if (currentAudioDevice_ == nullptr) {
-        TELEPHONY_LOGE("make_unique DevicesInactive failed");
+        TELEPHONY_LOGE("make_unique InactiveDeviceState failed");
         return false;
     }
     TELEPHONY_LOGI("current audio device : all audio devices disabled");

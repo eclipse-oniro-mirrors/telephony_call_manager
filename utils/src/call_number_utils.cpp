@@ -20,7 +20,6 @@
 #include "telephony_log_wrapper.h"
 
 #include "call_manager_errors.h"
-#include "core_manager.h"
 #include "cellular_call_connection.h"
 
 namespace OHOS {
@@ -96,7 +95,15 @@ bool CallNumberUtils::CheckNumberIsEmergency(
 
 bool CallNumberUtils::IsValidSlotId(int32_t slotId) const
 {
-    return slotId == CoreManager::DEFAULT_SLOT_ID;
+    if (SIM_SLOT_COUNT == HAS_A_SLOT) {
+        return slotId == SIM_SLOT_0;
+    }
+    if (SIM_SLOT_COUNT == HAS_TWO_SLOT) {
+        if (slotId == SIM_SLOT_0 || slotId == SIM_SLOT_1) {
+            return true;
+        }
+    }
+    return false;
 }
 } // namespace Telephony
 } // namespace OHOS

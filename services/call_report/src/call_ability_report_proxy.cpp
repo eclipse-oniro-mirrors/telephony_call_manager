@@ -85,7 +85,7 @@ int32_t CallAbilityReportProxy::RegisterCallBack(
 int32_t CallAbilityReportProxy::UnRegisterCallBack(std::string &bundleName)
 {
     if (callbackPtrList_.empty()) {
-        TELEPHONY_LOGE("callbackPtrList_ is null!");
+        TELEPHONY_LOGE("callbackPtrList_ is null! %{public}s UnRegisterCallBack failed", bundleName.c_str());
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     std::string tmpName = "";
@@ -95,6 +95,7 @@ int32_t CallAbilityReportProxy::UnRegisterCallBack(std::string &bundleName)
         (*it)->GetBundleName(tmpName);
         if (tmpName == bundleName) {
             callbackPtrList_.erase(it);
+            TELEPHONY_LOGI("%{public}s UnRegisterCallBack success", bundleName.c_str());
             return TELEPHONY_SUCCESS;
         }
     }
@@ -218,7 +219,7 @@ int32_t CallAbilityReportProxy::OttCallRequest(OttCallRequestId requestId, AppEx
     std::list<sptr<ICallAbilityCallback>>::iterator it = callbackPtrList_.begin();
     for (; it != callbackPtrList_.end(); it++) {
         (*it)->GetBundleName(name);
-        if (name == "com.ohos.callui") {
+        if (name == "com.ohos.callservice") {
             ret = (*it)->OnOttCallRequest(requestId, info);
             if (ret != TELEPHONY_SUCCESS) {
                 TELEPHONY_LOGW(

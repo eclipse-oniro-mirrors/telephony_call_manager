@@ -258,18 +258,6 @@ void CallBase::SetVideoStateType(VideoStateType mediaType)
     videoState_ = mediaType;
 }
 
-CallMediaMode CallBase::GetCallMediaMode()
-{
-    std::lock_guard<std::mutex> lock(mutex_);
-    return mediaMode_;
-}
-
-void CallBase::SetCallMediaMode(CallMediaMode mode)
-{
-    std::lock_guard<std::mutex> lock(mutex_);
-    mediaMode_ = mode;
-}
-
 void CallBase::SetPolicyFlag(PolicyFlag flag)
 {
     std::lock_guard<std::mutex> lock(mutex_);
