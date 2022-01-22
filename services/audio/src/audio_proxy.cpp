@@ -21,43 +21,16 @@
 
 namespace OHOS {
 namespace Telephony {
-int32_t AudioProxy::currentSessionId_ = DEFAULT_SESSION_ID;
-bool AudioProxy::isRingtoneActivated_ = false;
-bool AudioProxy::isVoiceCallActivated_ = false;
-std::shared_ptr<AudioStandard::AudioManagerCallback> AudioProxy::audioManagerCallback_ = nullptr;
-
 AudioProxy::AudioProxy()
     : context_(nullptr), audioSoundManager_(std::make_unique<AudioStandard::RingtoneSoundManager>()),
       deviceCallback_(std::make_shared<AudioDeviceChangeCallback>())
-{
-    ringtoneAudioInterrupt_.streamUsage = AudioStandard::StreamUsage::STREAM_USAGE_NOTIFICATION_RINGTONE;
-    ringtoneAudioInterrupt_.contentType = AudioStandard::ContentType::CONTENT_TYPE_MUSIC;
-    ringtoneAudioInterrupt_.streamType = AudioStandard::AudioStreamType::STREAM_RING;
-    ringtoneAudioInterrupt_.sessionID = RINGTONE_SESSION_ID;
-    voiceCallAudioInterrupt_.streamUsage = AudioStandard::StreamUsage::STREAM_USAGE_VOICE_COMMUNICATION;
-    voiceCallAudioInterrupt_.contentType = AudioStandard::ContentType::CONTENT_TYPE_SPEECH;
-    voiceCallAudioInterrupt_.streamType = AudioStandard::AudioStreamType::STREAM_VOICE_CALL;
-    voiceCallAudioInterrupt_.sessionID = VOICE_CALL_SESSION_ID;
-}
+{}
 
-AudioProxy::~AudioProxy()
-{
-    UnsetAudioManagerCallback();
-}
-
-int32_t AudioProxy::ActivateAudioInterrupt(const AudioStandard::AudioInterrupt &audioInterrupt)
-{
-    return TELEPHONY_SUCCESS;
-}
-
-int32_t AudioProxy::DeactivateAudioInterrupt(const AudioStandard::AudioInterrupt &audioInterrupt)
-{
-    return TELEPHONY_SUCCESS;
-}
+AudioProxy::~AudioProxy() {}
 
 bool AudioProxy::SetAudioScene(AudioStandard::AudioScene audioScene)
 {
-    return AudioStandard::AudioSystemManager::GetInstance()->SetAudioScene(audioScene) == TELEPHONY_SUCCESS;
+    return (AudioStandard::AudioSystemManager::GetInstance()->SetAudioScene(audioScene) == TELEPHONY_SUCCESS);
 }
 
 int32_t AudioProxy::SetAudioDeviceChangeCallback()
@@ -72,22 +45,17 @@ int32_t AudioProxy::SetAudioDeviceChangeCallback()
 bool AudioProxy::SetBluetoothDevActive()
 {
     if (AudioStandard::AudioSystemManager::GetInstance()->IsDeviceActive(
-            AudioStandard::ActiveDeviceType::BLUETOOTH_SCO)) {
+        AudioStandard::ActiveDeviceType::BLUETOOTH_SCO)) {
         TELEPHONY_LOGI("bluetooth device is already active");
         return true;
     }
 #ifdef ABILITY_AUDIO_SUPPORT
     return AudioStandard::AudioSystemManager::GetInstance()->SetDeviceActive(
-               AudioStandard::ActiveDeviceType::BLUETOOTH_SCO, true) &&
+        AudioStandard::ActiveDeviceType::BLUETOOTH_SCO, true) &&
         AudioStandard::AudioSystemManager::GetInstance()->SetDeviceActive(
             AudioStandard::ActiveDeviceType::SPEAKER, false);
 #endif
     return true;
-}
-
-bool AudioProxy::SetWiredHeadsetDevActive()
-{
-    return false;
 }
 
 bool AudioProxy::SetSpeakerDevActive()
@@ -98,11 +66,16 @@ bool AudioProxy::SetSpeakerDevActive()
     }
 #ifdef ABILITY_AUDIO_SUPPORT
     return AudioStandard::AudioSystemManager::GetInstance()->SetDeviceActive(
-               AudioStandard::ActiveDeviceType::BLUETOOTH_SCO, false) &&
+        AudioStandard::ActiveDeviceType::BLUETOOTH_SCO, false) &&
         AudioStandard::AudioSystemManager::GetInstance()->SetDeviceActive(
             AudioStandard::ActiveDeviceType::SPEAKER, true);
 #endif
     return true;
+}
+
+bool AudioProxy::SetWiredHeadsetDevActive()
+{
+    return false;
 }
 
 bool AudioProxy::SetEarpieceDevActive()
@@ -165,7 +138,7 @@ bool AudioProxy::SetMicrophoneMute(bool mute)
     }
     int32_t muteResult = AudioStandard::AudioSystemManager::GetInstance()->SetMicrophoneMute(mute);
     TELEPHONY_LOGI("set microphone mute result : %{public}d", muteResult);
-    return muteResult == TELEPHONY_SUCCESS;
+    return (muteResult == TELEPHONY_SUCCESS);
 }
 
 AudioStandard::AudioRingerMode AudioProxy::GetRingerMode() const
@@ -175,176 +148,7 @@ AudioStandard::AudioRingerMode AudioProxy::GetRingerMode() const
 
 bool AudioProxy::IsVibrateMode() const
 {
-    return AudioStandard::AudioRingerMode::RINGER_MODE_VIBRATE == GetRingerMode();
-}
-
-int32_t AudioProxy::ActivateVoiceCallStream()
-{
-    if (isVoiceCallActivated_) {
-        TELEPHONY_LOGI("voice call stream is already activate");
-        return TELEPHONY_SUCCESS;
-    }
-    int32_t ret = SetAudioManagerCallback(AudioStandard::AudioStreamType::STREAM_VOICE_CALL);
-    if (ret != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("set audio manager callback failed");
-        return TELEPHONY_ERR_REGISTER_CALLBACK_FAIL;
-    } else {
-        TELEPHONY_LOGI("set voice call stream callback success");
-    }
-    return DelayedSingleton<AudioProxy>::GetInstance()->ActivateAudioInterrupt(voiceCallAudioInterrupt_);
-}
-
-int32_t AudioProxy::DeactivateVoiceCallStream()
-{
-    if (!isVoiceCallActivated_) {
-        TELEPHONY_LOGI("voice call stream is already deactivate");
-        return TELEPHONY_SUCCESS;
-    }
-    return DelayedSingleton<AudioProxy>::GetInstance()->DeactivateAudioInterrupt(voiceCallAudioInterrupt_);
-}
-
-int32_t AudioProxy::ActivateRingtoneStream()
-{
-    if (isRingtoneActivated_) {
-        TELEPHONY_LOGI("ringtone stream is already activate");
-        return TELEPHONY_SUCCESS;
-    }
-    int32_t ret = SetAudioManagerCallback(AudioStandard::AudioStreamType::STREAM_RING);
-    if (ret != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("set audio manager callback failed");
-        return TELEPHONY_ERR_REGISTER_CALLBACK_FAIL;
-    } else {
-        TELEPHONY_LOGI("set ringtone stream callback success");
-    }
-    return DelayedSingleton<AudioProxy>::GetInstance()->ActivateAudioInterrupt(ringtoneAudioInterrupt_);
-}
-
-int32_t AudioProxy::DeactivateRingtoneStream()
-{
-    if (!isRingtoneActivated_) {
-        TELEPHONY_LOGI("ringtone stream is already deactivate");
-        return TELEPHONY_SUCCESS;
-    }
-    return DelayedSingleton<AudioProxy>::GetInstance()->DeactivateAudioInterrupt(ringtoneAudioInterrupt_);
-}
-
-int32_t AudioProxy::DeactivateAudioInterrupt()
-{
-    int32_t ret = TELEPHONY_SUCCESS;
-    switch (currentSessionId_) {
-        case VOICE_CALL_SESSION_ID:
-            ret = DeactivateVoiceCallStream();
-            break;
-        case RINGTONE_SESSION_ID:
-            ret = DeactivateRingtoneStream();
-            break;
-        default:
-            break;
-    }
-    return ret;
-}
-
-int32_t AudioProxy::SetAudioManagerCallback(AudioStandard::AudioStreamType streamType)
-{
-    int32_t ret = TELEPHONY_SUCCESS;
-    switch (streamType) {
-        case AudioStandard::AudioStreamType::STREAM_VOICE_CALL:
-            if (currentSessionId_ == VOICE_CALL_SESSION_ID) {
-                return TELEPHONY_SUCCESS;
-            }
-            ret = UnsetAudioManagerCallback();
-            if (ret == TELEPHONY_SUCCESS) {
-                audioManagerCallback_ = std::make_shared<VoiceCallCallback>();
-            } else {
-                TELEPHONY_LOGE("unset audio manager callback failed");
-            }
-            break;
-        case AudioStandard::AudioStreamType::STREAM_RING:
-            if (currentSessionId_ == RINGTONE_SESSION_ID) {
-                return TELEPHONY_SUCCESS;
-            }
-            ret = UnsetAudioManagerCallback();
-            if (ret == TELEPHONY_SUCCESS) {
-                audioManagerCallback_ = std::make_shared<RingtoneCallback>();
-            } else {
-                TELEPHONY_LOGE("unset audio manager callback failed");
-            }
-            break;
-        default:
-            break;
-    }
-    if (audioManagerCallback_ == nullptr) {
-        TELEPHONY_LOGE("audio manager callback nullptr");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-    return TELEPHONY_SUCCESS;
-}
-
-int32_t AudioProxy::UnsetAudioManagerCallback()
-{
-    int32_t ret = TELEPHONY_SUCCESS;
-    switch (currentSessionId_) {
-        case VOICE_CALL_SESSION_ID:
-            ret = UnsetAudioManagerCallback(AudioStandard::AudioStreamType::STREAM_VOICE_CALL);
-            break;
-        case RINGTONE_SESSION_ID:
-            ret = UnsetAudioManagerCallback(AudioStandard::AudioStreamType::STREAM_RING);
-            break;
-        default:
-            break;
-    }
-    return ret;
-}
-
-int32_t AudioProxy::UnsetAudioManagerCallback(AudioStandard::AudioStreamType streamType)
-{
-    return TELEPHONY_SUCCESS;
-}
-
-void VoiceCallCallback::OnInterrupt(const AudioStandard::InterruptAction &interruptAction)
-{
-    AudioStandard::InterruptActionType type = interruptAction.actionType;
-    AudioProxy::isRingtoneActivated_ = false;
-    AudioInterruptState state = AudioInterruptState::INTERRUPT_STATE_UNKNOWN;
-    switch (type) {
-        case AudioStandard::InterruptActionType::TYPE_ACTIVATED:
-            AudioProxy::isVoiceCallActivated_ = true;
-            AudioProxy::currentSessionId_ = VOICE_CALL_SESSION_ID;
-            state = AudioInterruptState::INTERRUPT_STATE_ACTIVATED;
-            break;
-        case AudioStandard::InterruptActionType::TYPE_DEACTIVATED:
-            AudioProxy::isVoiceCallActivated_ = false;
-            AudioProxy::currentSessionId_ = DEFAULT_SESSION_ID;
-            state = AudioInterruptState::INTERRUPT_STATE_DEACTIVATED;
-            break;
-        default:
-            AudioProxy::isVoiceCallActivated_ = false;
-            break;
-    }
-    DelayedSingleton<AudioControlManager>::GetInstance()->SetAudioInterruptState(state);
-}
-
-void RingtoneCallback::OnInterrupt(const AudioStandard::InterruptAction &interruptAction)
-{
-    AudioStandard::InterruptActionType type = interruptAction.actionType;
-    AudioProxy::isVoiceCallActivated_ = false;
-    AudioInterruptState state = AudioInterruptState::INTERRUPT_STATE_UNKNOWN;
-    switch (type) {
-        case AudioStandard::InterruptActionType::TYPE_ACTIVATED:
-            AudioProxy::isRingtoneActivated_ = true;
-            AudioProxy::currentSessionId_ = RINGTONE_SESSION_ID;
-            state = AudioInterruptState::INTERRUPT_STATE_RINGING;
-            break;
-        case AudioStandard::InterruptActionType::TYPE_DEACTIVATED:
-            AudioProxy::isRingtoneActivated_ = false;
-            AudioProxy::currentSessionId_ = DEFAULT_SESSION_ID;
-            state = AudioInterruptState::INTERRUPT_STATE_DEACTIVATED;
-            break;
-        default:
-            AudioProxy::isRingtoneActivated_ = false;
-            break;
-    }
-    DelayedSingleton<AudioControlManager>::GetInstance()->SetAudioInterruptState(state);
+    return (AudioStandard::AudioRingerMode::RINGER_MODE_VIBRATE == GetRingerMode());
 }
 
 void AudioDeviceChangeCallback::OnDeviceChange(const AudioStandard::DeviceChangeAction &deviceChangeAction)

@@ -28,9 +28,6 @@
 
 namespace OHOS {
 namespace Telephony {
-constexpr int16_t DEFAULT_SESSION_ID = -1;
-constexpr uint16_t VOICE_CALL_SESSION_ID = 2000;
-constexpr uint16_t RINGTONE_SESSION_ID = 2001;
 constexpr uint16_t VOLUME_AUDIBLE_DIVISOR = 2;
 
 enum AudioInterruptState {
@@ -38,14 +35,6 @@ enum AudioInterruptState {
     INTERRUPT_STATE_DEACTIVATED,
     INTERRUPT_STATE_ACTIVATED,
     INTERRUPT_STATE_RINGING,
-};
-
-class VoiceCallCallback : public AudioStandard::AudioManagerCallback {
-    void OnInterrupt(const AudioStandard::InterruptAction &interruptAction) override;
-};
-
-class RingtoneCallback : public AudioStandard::AudioManagerCallback {
-    void OnInterrupt(const AudioStandard::InterruptAction &interruptAction) override;
 };
 
 class AudioDeviceChangeCallback : public AudioStandard::AudioManagerDeviceChangeCallback {
@@ -78,26 +67,12 @@ public:
     bool IsVibrateMode() const;
     int32_t StartVibrate();
     int32_t CancelVibrate();
-    static int32_t currentSessionId_;
-    static bool isRingtoneActivated_;
-    static bool isVoiceCallActivated_;
-    AudioStandard::AudioInterrupt ringtoneAudioInterrupt_;
-    AudioStandard::AudioInterrupt voiceCallAudioInterrupt_;
-    static std::shared_ptr<AudioStandard::AudioManagerCallback> audioManagerCallback_;
-    int32_t ActivateVoiceCallStream();
-    int32_t DeactivateVoiceCallStream();
-    int32_t ActivateRingtoneStream();
-    int32_t DeactivateRingtoneStream();
     std::string GetSystemRingtoneUri() const;
     std::string GetDefaultRingPath() const;
     std::string GetDefaultTonePath() const;
     std::string GetDefaultDtmfPath() const;
 
 private:
-    bool isVoiceEnabled = false;
-    int32_t SetAudioManagerCallback(AudioStandard::AudioStreamType streamType);
-    int32_t UnsetAudioManagerCallback(AudioStandard::AudioStreamType streamType);
-    int32_t UnsetAudioManagerCallback();
     const std::string defaultRingPath_ = "/system/data/telephony/rings/ring.wav";
     const std::string defaultTonePath_ = "/system/data/telephony/tones/tone.wav";
     const std::string defaultDtmfPath_ = "/system/data/telephony/dtmfs/dtmf.wav";

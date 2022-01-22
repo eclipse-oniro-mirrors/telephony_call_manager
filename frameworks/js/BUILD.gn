@@ -30,10 +30,11 @@ ohos_shared_library("call") {
     "napi/src/napi_call_manager_utils.cpp",
   ]
 
+  configs = [ "//base/telephony/core_service/utils:telephony_log_config" ]
+
   public_configs = [ ":call_manager_js_config" ]
 
   deps = [
-    "$SUBSYSTEM_DIR/core_service/utils:libtel_common",
     "//foundation/aafwk/standard/frameworks/kits/ability/native:abilitykit_native",
     "//foundation/ace/napi:ace_napi",
     "//third_party/libuv:uv_static",
@@ -48,6 +49,7 @@ ohos_shared_library("call") {
     "appexecfwk_standard:appexecfwk_core",
     "appexecfwk_standard:libeventhandler",
     "call_manager:tel_call_manager_api",
+    "core_service:tel_core_service_api",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
     "samgr_standard:samgr_proxy",

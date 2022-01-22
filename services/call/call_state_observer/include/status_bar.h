@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef STATUS_BAR_H
-#define STATUS_BAR_H
+#ifndef TELEPHONY_STATUS_BAR_H
+#define TELEPHONY_STATUS_BAR_H
 
 #include "singleton.h"
 #include "call_state_listener_base.h"
@@ -38,4 +38,4 @@ private:
 };
 } // namespace Telephony
 } // namespace OHOS
-#endif // STATUS_BAR_H
+#endif // TELEPHONY_STATUS_BAR_H

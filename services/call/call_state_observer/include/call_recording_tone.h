@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef CALL_RECORDING_TONE_H
-#define CALL_RECORDING_TONE_H
+#ifndef TELEPHONY_CALL_RECORDING_TONE_H
+#define TELEPHONY_CALL_RECORDING_TONE_H
 
 #include <cstdint>
 #include <map>

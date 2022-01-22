@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef BLUETOOTH_CALL_MANAGER_H
-#define BLUETOOTH_CALL_MANAGER_H
+#ifndef TELEPHONY_BLUETOOTH_CALL_MANAGER_H
+#define TELEPHONY_BLUETOOTH_CALL_MANAGER_H
 
 #include "call_state_listener_base.h"
 
@@ -24,6 +24,8 @@
 
 namespace OHOS {
 namespace Telephony {
+constexpr int16_t DEFAULT_CALL_NUMBER_TYPE = 86;
+
 class BluetoothCallManager : public CallStateListenerBase,
                              public std::enable_shared_from_this<BluetoothCallManager> {
     DECLARE_DELAYED_SINGLETON(BluetoothCallManager)
@@ -41,7 +43,7 @@ public:
     /**
      * Send call state info to bluetooth headset.
      */
-    int32_t SendCallState(TelCallState callState, const std::string &number, VideoStateType videoState);
+    int32_t SendCallState(TelCallState callState, const std::string &number, int32_t type, const std::string &name);
     /**
      * Send call list info to bluetooth headset.
      */
@@ -52,6 +54,8 @@ public:
 private:
     std::unique_ptr<BluetoothConnection> btConnection_;
     bool IsBtScoConnected();
+    int32_t GetCallNumberType(const std::string &number);
+    std::string GetContactsName(const std::string &number);
 };
 } // namespace Telephony
 } // namespace OHOS

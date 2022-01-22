@@ -122,10 +122,6 @@ bool AudioSceneProcessor::SwitchState(CallStateType stateType)
 
 bool AudioSceneProcessor::SwitchAlerting()
 {
-    if (!ActivateAudioInterrupt(AudioStandard::AudioStreamType::STREAM_VOICE_CALL)) {
-        TELEPHONY_LOGE("activate audio interrupt failed");
-        return false;
-    }
     if (DelayedSingleton<AudioProxy>::GetInstance()->SetAudioScene(
         AudioStandard::AudioScene::AUDIO_SCENE_PHONE_CALL)) {
         currentState_ = std::make_unique<AlertingState>();
@@ -144,10 +140,6 @@ bool AudioSceneProcessor::SwitchAlerting()
 
 bool AudioSceneProcessor::SwitchIncoming()
 {
-    if (!ActivateAudioInterrupt(AudioStandard::AudioStreamType::STREAM_RING)) {
-        TELEPHONY_LOGE("activate audio interrupt failed");
-        return false;
-    }
     if (DelayedSingleton<AudioProxy>::GetInstance()->SetAudioScene(AudioStandard::AudioScene::AUDIO_SCENE_RINGING)) {
         currentState_ = std::make_unique<IncomingState>();
         if (currentState_ == nullptr) {
@@ -165,10 +157,6 @@ bool AudioSceneProcessor::SwitchIncoming()
 
 bool AudioSceneProcessor::SwitchCS()
 {
-    if (!ActivateAudioInterrupt(AudioStandard::AudioStreamType::STREAM_VOICE_CALL)) {
-        TELEPHONY_LOGE("activate audio interrupt failed");
-        return false;
-    }
     if (DelayedSingleton<AudioProxy>::GetInstance()->SetAudioScene(
         AudioStandard::AudioScene::AUDIO_SCENE_PHONE_CALL)) {
         currentState_ = std::make_unique<CSCallState>();
@@ -185,10 +173,6 @@ bool AudioSceneProcessor::SwitchCS()
 
 bool AudioSceneProcessor::SwitchIMS()
 {
-    if (!ActivateAudioInterrupt(AudioStandard::AudioStreamType::STREAM_VOICE_CALL)) {
-        TELEPHONY_LOGE("activate audio interrupt failed");
-        return false;
-    }
     if (DelayedSingleton<AudioProxy>::GetInstance()->SetAudioScene(
         AudioStandard::AudioScene::AUDIO_SCENE_PHONE_CHAT)) {
         currentState_ = std::make_unique<IMSCallState>();
@@ -222,10 +206,6 @@ bool AudioSceneProcessor::SwitchHolding()
 
 bool AudioSceneProcessor::SwitchInactive()
 {
-    if (!DeactivateAudioInterrupt()) {
-        TELEPHONY_LOGE("deactivate audio interrupt failed");
-        return false;
-    }
     if (DelayedSingleton<AudioProxy>::GetInstance()->SetAudioScene(AudioStandard::AudioScene::AUDIO_SCENE_DEFAULT)) {
         DelayedSingleton<AudioControlManager>::GetInstance()->SetAudioInterruptState(
             AudioInterruptState::INTERRUPT_STATE_DEACTIVATED);
@@ -243,32 +223,7 @@ bool AudioSceneProcessor::SwitchInactive()
 
 bool AudioSceneProcessor::SwitchOTT()
 {
-    if (!ActivateAudioInterrupt(AudioStandard::AudioStreamType::STREAM_VOICE_CALL)) {
-        TELEPHONY_LOGE("activate audio interrupt failed");
-        return false;
-    }
     return true;
-}
-
-bool AudioSceneProcessor::ActivateAudioInterrupt(const AudioStandard::AudioStreamType &streamType)
-{
-    bool ret = false;
-    switch (streamType) {
-        case AudioStandard::AudioStreamType::STREAM_RING:
-            ret = DelayedSingleton<AudioProxy>::GetInstance()->ActivateRingtoneStream() == TELEPHONY_SUCCESS;
-            break;
-        case AudioStandard::AudioStreamType::STREAM_VOICE_CALL:
-            ret = DelayedSingleton<AudioProxy>::GetInstance()->ActivateVoiceCallStream() == TELEPHONY_SUCCESS;
-            break;
-        default:
-            break;
-    }
-    return ret;
-}
-
-bool AudioSceneProcessor::DeactivateAudioInterrupt()
-{
-    return DelayedSingleton<AudioProxy>::GetInstance()->DeactivateAudioInterrupt() == TELEPHONY_SUCCESS;
 }
 } // namespace Telephony
 } // namespace OHOS

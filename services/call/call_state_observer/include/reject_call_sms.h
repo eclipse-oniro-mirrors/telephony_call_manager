@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef REJECT_CALL_SMS_H
-#define REJECT_CALL_SMS_H
+#ifndef TELEPHONY_REJECT_CALL_SMS_H
+#define TELEPHONY_REJECT_CALL_SMS_H
 
 #include "call_state_listener_base.h"
 
@@ -39,4 +39,4 @@ private:
 };
 } // namespace Telephony
 } // namespace OHOS
-#endif // REJECT_CALL_SMS_H
+#endif // TELEPHONY_REJECT_CALL_SMS_H

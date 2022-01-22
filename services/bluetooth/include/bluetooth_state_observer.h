@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef BLUETOOTH_STATE_OBSERVER_H
-#define BLUETOOTH_STATE_OBSERVER_H
+#ifndef TELEPHONY_BLUETOOTH_STATE_OBSERVER_H
+#define TELEPHONY_BLUETOOTH_STATE_OBSERVER_H
 
 #include <memory>
 

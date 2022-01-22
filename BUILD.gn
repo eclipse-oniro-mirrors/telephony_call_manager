@@ -120,11 +120,23 @@ ohos_shared_library("tel_call_manager") {
     "//foundation/multimedia/camera_standard/services/camera_service/binder/server/include",
     "//foundation/graphic/standard/frameworks/surface/include",
     "//foundation/multimedia/camera_standard/frameworks/innerkitsimpl/metadata/include",
+    "//utils/system/safwk/native/include",
+    "//drivers/framework/include/utils",
+    "//drivers/adapter/uhdf2/utils/include",
+    "//drivers/adapter/uhdf2/include/hdi",
+    "//drivers/peripheral/display/interfaces/include",
+    "//drivers/peripheral/camera/interfaces/include",
+    "//drivers/peripheral/camera/interfaces/include/server",
+    "//drivers/peripheral/camera/interfaces/include/callback/device",
+    "//drivers/peripheral/camera/interfaces/include/callback/operator",
+    "//drivers/peripheral/camera/interfaces/include/callback/host",
     "//foundation/aafwk/standard/interfaces/innerkits/dataobs_manager/include",
     "//foundation/multimedia/audio_standard/interfaces/innerkits/native/audioringtone/include",
     "//foundation/multimedia/audio_standard/services/include/client",
     "//foundation/multimedia/media_standard/interfaces/innerkits/native/media/include",
   ]
+
+  configs = [ "//base/telephony/core_service/utils:telephony_log_config" ]
 
   deps = [
     "//base/notification/ans_standard/frameworks/ans/core:ans_core",
@@ -132,26 +144,24 @@ ohos_shared_library("tel_call_manager") {
     "//base/notification/ans_standard/services/ans:libans",
     "//base/telephony/core_service/utils:libtel_common",
     "//base/telephony/sms_mms/frameworks/native:tel_sms_mms_api",
+    "//foundation/aafwk/standard/frameworks/kits/ability/native:abilitykit_native",
+    "//foundation/aafwk/standard/interfaces/innerkits/ability_manager:ability_manager",
     "//foundation/aafwk/standard/interfaces/innerkits/dataobs_manager:dataobs_manager",
+    "//foundation/distributedschedule/dmsfwk/interfaces/innerkits/uri:zuri",
     "//foundation/graphic/standard:libsurface",
     "//foundation/multimedia/camera_standard/frameworks/innerkitsimpl/camera:camera_framework",
     "//foundation/multimedia/camera_standard/frameworks/innerkitsimpl/metadata:metadata",
     "//third_party/libphonenumber/cpp:phonenumber_standard",
     "//third_party/protobuf/src:protobuf_standard",
+    "//utils/native/base:utils",
   ]
 
   external_deps = [
-    "ability_runtime:ability_manager",
-    "ability_runtime:abilitykit_native",
     "ability_runtime:want",
     "appexecfwk_standard:libeventhandler",
-    "camera_device_driver:camera_hal",
     "ces_standard:cesfwk_innerkits",
     "core_service:tel_core_service_api",
-    "device_driver_framework:libhdf_utils",
-    "display_device_driver:hdi_display_device",
     "display_manager_native:displaymgr",
-    "dmsfwk_standard:zuri",
     "ipc:ipc_core",
     "multimedia_audio_standard:audio_client",
     "multimedia_audio_standard:audio_renderer",
@@ -162,9 +172,7 @@ ohos_shared_library("tel_call_manager") {
     "power_manager_native:powermgr_client",
     "safwk:system_ability_fwk",
     "samgr_standard:samgr_proxy",
-    "sms_mms:tel_sms_mms_api",
     "state_registry:tel_state_registry_notify",
-    "utils_base:utils",
   ]
 
   cflags_cc = [

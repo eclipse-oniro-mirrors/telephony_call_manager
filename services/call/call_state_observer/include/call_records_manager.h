@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef CALL_RECORDS_MANAGER_H
-#define CALL_RECORDS_MANAGER_H
+#ifndef TELEPHONY_CALL_RECORDS_MANAGER_H
+#define TELEPHONY_CALL_RECORDS_MANAGER_H
 
 #include <mutex>
 #include <set>
@@ -45,4 +45,4 @@ private:
 };
 } // namespace Telephony
 } // namespace OHOS
-#endif // CALL_RECORDS_MANAGER_H
+#endif // TELEPHONY_CALL_RECORDS_MANAGER_H

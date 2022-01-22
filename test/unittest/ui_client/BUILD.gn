@@ -44,10 +44,11 @@ ohos_executable("tel_call_manager_ui_test") {
     "//base/security/permission/interfaces/innerkits/permission_standard/permissionsdk/main/cpp/include/permission/",
   ]
 
+  configs = [ "//base/telephony/core_service/utils:telephony_log_config" ]
+
   deps = [
     "//base/security/permission/frameworks/permission_standard/permissioninfrastructure:permission_standard_infrastructure_cxx",
     "//base/security/permission/interfaces/innerkits/permission_standard/permissionsdk:libpermissionsdk_standard",
-    "//base/telephony/core_service/utils:libtel_common",
     "//foundation/aafwk/standard/frameworks/kits/ability/native:abilitykit_native",
     "//foundation/graphic/standard:libsurface",
     "//foundation/multimedia/camera_standard/frameworks/innerkitsimpl/camera:camera_framework",
@@ -60,6 +61,7 @@ ohos_executable("tel_call_manager_ui_test") {
     "appexecfwk_standard:libeventhandler",
     "call_manager:tel_call_manager_api",
     "ces_standard:cesfwk_innerkits",
+    "core_service:tel_core_service_api",
     "ipc:ipc_core",
     "multimedia_audio_standard:audio_client",
     "multimedia_audio_standard:audio_renderer",
