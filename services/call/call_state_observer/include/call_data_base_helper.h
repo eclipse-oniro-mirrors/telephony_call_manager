@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef CALL_DATA_BASE_HELPER_H
-#define CALL_DATA_BASE_HELPER_H
+#ifndef TELEPHONY_CALL_DATA_BASE_HELPER_H
+#define TELEPHONY_CALL_DATA_BASE_HELPER_H
 
 #include "ability_manager_interface.h"
 #include "if_system_ability_manager.h"

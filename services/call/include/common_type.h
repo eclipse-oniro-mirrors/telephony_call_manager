@@ -27,7 +27,7 @@ const int16_t kMaxRingingCallNumberLen = 30;
 const int16_t kMaxDialingCallNumberLen = 30;
 const int16_t kMaxManeLen = 10;
 const int16_t kMaxPathKeyLen = 60;
-const int16_t kCallStartId = 1000;
+const int16_t kCallStartId = 1;
 const int16_t kMilliSecond = 1000;
 namespace OHOS {
 namespace Telephony {

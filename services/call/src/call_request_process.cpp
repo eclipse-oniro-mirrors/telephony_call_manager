@@ -117,10 +117,10 @@ void CallRequestProcess::HangUpRequest(int32_t callId)
         call->SetPolicyFlag(PolicyFlag::POLICY_FLAG_HANG_UP_ACTIVE);
     }
     call->HangUpCall();
-    if (state == TelCallState::CALL_STATUS_WAITING) {
-        TELEPHONY_LOGI("release the waiting call and recover the held call");
+    if (state == TelCallState::CALL_STATUS_DIALING || state == TelCallState::CALL_STATUS_ALERTING) {
         sptr<CallBase> holdCall = CallObjectManager::GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_HOLD);
         if (holdCall) {
+            TELEPHONY_LOGI("release the dialing/alerting call and recover the held call");
             holdCall->UnHoldCall();
         }
     }
@@ -255,8 +255,8 @@ void CallRequestProcess::JoinConference(int32_t callId, std::vector<std::string>
         TELEPHONY_LOGE("the call object is nullptr, callId:%{public}d", callId);
         return;
     }
-    int32_t ret = DelayedSingleton<CellularCallConnection>::GetInstance()->
-        InviteToConference(numberList, call->GetSlotId());
+    int32_t ret =
+        DelayedSingleton<CellularCallConnection>::GetInstance()->InviteToConference(numberList, call->GetSlotId());
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("Invite to conference failed!");
         return;

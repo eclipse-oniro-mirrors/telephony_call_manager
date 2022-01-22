@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef PROXIMITY_SENSOR_H
-#define PROXIMITY_SENSOR_H
+#ifndef TELEPHONY_PROXIMITY_SENSOR_H
+#define TELEPHONY_PROXIMITY_SENSOR_H
 
 #include "singleton.h"
 #include "call_state_listener_base.h"
@@ -35,4 +35,4 @@ public:
 };
 } // namespace Telephony
 } // namespace OHOS
-#endif // PROXIMITY_SENSOR_H
+#endif // TELEPHONY_PROXIMITY_SENSOR_H

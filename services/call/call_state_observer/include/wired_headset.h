@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef WIRED_HEADSET_H
-#define WIRED_HEADSET_H
+#ifndef TELEPHONY_WIRED_HEADSET_H
+#define TELEPHONY_WIRED_HEADSET_H
 #include <memory>
 #include <mutex>
 
@@ -59,4 +59,4 @@ private:
 };
 } // namespace Telephony
 } // namespace OHOS
-#endif // WIRED_HEADSET_H
+#endif // TELEPHONY_WIRED_HEADSET_H

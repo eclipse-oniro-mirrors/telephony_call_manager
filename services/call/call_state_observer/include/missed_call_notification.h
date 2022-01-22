@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef MISSED_CALL_NOTIFICATION_H
-#define MISSED_CALL_NOTIFICATION_H
+#ifndef TELEPHONY_MISSED_CALL_NOTIFICATION_H
+#define TELEPHONY_MISSED_CALL_NOTIFICATION_H
 
 #include <cstdint>
 
@@ -45,4 +45,4 @@ private:
 };
 } // namespace Telephony
 } // namespace OHOS
-#endif // MISSED_CALL_NOTIFICATION_H
+#endif // TELEPHONY_MISSED_CALL_NOTIFICATION_H

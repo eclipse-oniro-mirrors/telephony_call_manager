@@ -32,8 +32,9 @@ ohos_unittest("tel_call_manager_gtest") {
     "//base/telephony/call_manager/interfaces/innerkits",
   ]
 
+  configs = [ "//base/telephony/core_service/utils:telephony_log_config" ]
+
   deps = [
-    "//base/telephony/core_service/utils:libtel_common",
     "//third_party/googletest:gtest_main",
     "//utils/native/base:utils",
   ]

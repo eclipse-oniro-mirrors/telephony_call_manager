@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef CALL_STATE_BROADCAST_H
-#define CALL_STATE_BROADCAST_H
+#ifndef TELEPHONY_CALL_STATE_BROADCAST_H
+#define TELEPHONY_CALL_STATE_BROADCAST_H
 
 #include "call_state_listener_base.h"
 
@@ -37,4 +37,4 @@ private:
 };
 } // namespace Telephony
 } // namespace OHOS
-#endif // CALL_STATE_BROADCAST_H
+#endif // TELEPHONY_CALL_STATE_BROADCAST_H

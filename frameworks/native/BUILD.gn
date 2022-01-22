@@ -19,8 +19,6 @@ config("call_manager_config") {
     "$SUBSYSTEM_DIR/call_manager/frameworks/native/include",
     "$SUBSYSTEM_DIR/call_manager/interfaces/innerkits",
     "$SUBSYSTEM_DIR/call_manager/utils/include",
-    "$SUBSYSTEM_DIR/core_service/interfaces/innerkits/call_manager",
-    "$SUBSYSTEM_DIR/core_service/interfaces/innerkits/include",
   ]
 }
 
@@ -33,15 +31,15 @@ ohos_shared_library("tel_call_manager_api") {
     "src/call_manager_service_proxy.cpp",
   ]
 
+  configs = [ "//base/telephony/core_service/utils:telephony_log_config" ]
+
   public_configs = [ ":call_manager_config" ]
 
-  deps = [
-    "$SUBSYSTEM_DIR/core_service/utils:libtel_common",
-    "//utils/native/base:utils",
-  ]
+  deps = [ "//utils/native/base:utils" ]
 
   external_deps = [
     "ability_runtime:want",
+    "core_service:tel_core_service_api",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
     "samgr_standard:samgr_proxy",

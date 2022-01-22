@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef BLUETOOTH_CONNECTION_H
-#define BLUETOOTH_CONNECTION_H
+#ifndef TELEPHONY_BLUETOOTH_CONNECTION_H
+#define TELEPHONY_BLUETOOTH_CONNECTION_H
 
 #include <set>
 #include <string>

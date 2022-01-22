@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef CALL_RECORDS_HANDLER_H
-#define CALL_RECORDS_HANDLER_H
+#ifndef TELEPHONY_CALL_RECORDS_HANDLER_H
+#define TELEPHONY_CALL_RECORDS_HANDLER_H
 
 #include <memory>
 #include <mutex>
@@ -53,4 +53,4 @@ private:
 };
 } // namespace Telephony
 } // namespace OHOS
-#endif // CALL_RECORDS_HANDLER_H
+#endif // TELEPHONY_CALL_RECORDS_HANDLER_H

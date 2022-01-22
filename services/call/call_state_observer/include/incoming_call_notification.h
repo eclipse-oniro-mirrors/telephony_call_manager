@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef INCOMING_CALL_NOTIFICATION_H
-#define INCOMING_CALL_NOTIFICATION_H
+#ifndef TELEPHONY_INCOMING_CALL_NOTIFICATION_H
+#define TELEPHONY_INCOMING_CALL_NOTIFICATION_H
 
 #include <cstdint>
 
