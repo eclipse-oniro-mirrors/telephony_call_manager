@@ -58,10 +58,10 @@ ohos_executable("tel_call_manager_ui_test") {
 
   external_deps = [
     "ability_runtime:want",
-    "appexecfwk_standard:libeventhandler",
     "call_manager:tel_call_manager_api",
     "ces_standard:cesfwk_innerkits",
     "core_service:tel_core_service_api",
+    "eventhandler:libeventhandler",
     "ipc:ipc_core",
     "multimedia_audio_standard:audio_client",
     "multimedia_audio_standard:audio_renderer",
