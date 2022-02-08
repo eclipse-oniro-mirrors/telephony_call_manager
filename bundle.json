@@ -26,8 +26,8 @@
         "adapted_system_type": [
             "standard"
         ],
-        "rom": "",
-        "ram": "",
+        "rom": "1.6MB",
+        "ram": "6MB",
         "deps": {
             "components": [
                 "ability_runtime",
@@ -58,8 +58,7 @@
             "sub_component": [
                 "//base/telephony/call_manager:tel_call_manager",
                 "//base/telephony/call_manager/sa_profile:call_manager_sa_profile",
-                "//base/telephony/call_manager/frameworks/js:call",
-                "//base/telephony/call_manager/frameworks/native:tel_call_manager_api"
+                "//base/telephony/call_manager/frameworks/js:call"
             ],
             "inner_kits": [
                 {
