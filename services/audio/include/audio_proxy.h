@@ -76,7 +76,7 @@ private:
     const std::string defaultRingPath_ = "/system/data/telephony/rings/ring.wav";
     const std::string defaultTonePath_ = "/system/data/telephony/tones/tone.wav";
     const std::string defaultDtmfPath_ = "/system/data/telephony/dtmfs/dtmf.wav";
-    std::shared_ptr<AppExecFwk::Context> context_;
+    std::shared_ptr<AbilityRuntime::Context> context_;
     std::unique_ptr<AudioStandard::RingtoneSoundManager> audioSoundManager_;
     std::shared_ptr<AudioStandard::AudioManagerDeviceChangeCallback> deviceCallback_;
 };
