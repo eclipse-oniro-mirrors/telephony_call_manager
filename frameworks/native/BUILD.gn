@@ -38,7 +38,7 @@ ohos_shared_library("tel_call_manager_api") {
   deps = [ "//utils/native/base:utils" ]
 
   external_deps = [
-    "ability_runtime:want",
+    "ability_base:want",
     "core_service:tel_core_service_api",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
