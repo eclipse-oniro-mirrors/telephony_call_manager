@@ -40,7 +40,7 @@ ohos_unittest("tel_call_manager_gtest") {
   ]
 
   external_deps = [
-    "ability_runtime:want",
+    "ability_base:want",
     "ces_standard:cesfwk_innerkits",
     "core_service:tel_core_service_api",
     "eventhandler:libeventhandler",
