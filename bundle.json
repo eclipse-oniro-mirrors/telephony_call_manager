@@ -30,6 +30,7 @@
         "ram": "6MB",
         "deps": {
             "components": [
+                "ability_base",
                 "ability_runtime",
                 "appexecfwk_standard",
                 "camera_device_driver",
