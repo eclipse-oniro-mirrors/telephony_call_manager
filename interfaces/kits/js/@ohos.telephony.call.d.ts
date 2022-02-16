@@ -19,8 +19,7 @@ import {AsyncCallback, Callback} from "./basic";
  * Provides methods related to call management.
  *
  * @since 7
- * @sysCap SystemCapability.Telephony.DCall
- * @devices phone, tablet, wearable, car
+ * @sysCap SystemCapability.Telephony.CallManager
  */
 declare namespace call {
     /**
