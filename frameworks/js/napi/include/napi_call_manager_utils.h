@@ -41,6 +41,7 @@ public:
     static void SetPropertyInt32(napi_env env, napi_value object, std::string name, int32_t value);
     static void SetPropertyStringUtf8(napi_env env, napi_value object, std::string name, std::string value);
     static void SetPropertyBoolean(napi_env env, napi_value object, std::string name, int32_t value);
+    static napi_value CreateEnumConstructor(napi_env env, napi_callback_info info);
 };
 } // namespace Telephony
 } // namespace OHOS

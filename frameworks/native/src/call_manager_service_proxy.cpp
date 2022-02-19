@@ -1287,7 +1287,7 @@ int32_t CallManagerServiceProxy::ReportOttCallDetailsInfo(std::vector<OttCallDet
     }
     dataParcel.WriteInt32(ottVec.size());
     std::vector<OttCallDetailsInfo>::iterator it = ottVec.begin();
-    for (; it != ottVec.end(); it++) {
+    for (; it != ottVec.end(); ++it) {
         dataParcel.WriteRawData((const void *)&(*it), sizeof(OttCallDetailsInfo));
     }
     if (Remote() == nullptr) {
@@ -1322,6 +1322,28 @@ int32_t CallManagerServiceProxy::ReportOttCallEventInfo(OttCallEventInfo &eventI
         return error;
     }
     return replyParcel.ReadInt32();
+}
+
+sptr<IRemoteObject> CallManagerServiceProxy::GetProxyObjectPtr(CallManagerProxyType proxyType)
+{
+    MessageOption option;
+    MessageParcel dataParcel;
+    MessageParcel replyParcel;
+    if (!dataParcel.WriteInterfaceToken(CallManagerServiceProxy::GetDescriptor())) {
+        TELEPHONY_LOGE("write descriptor fail");
+        return nullptr;
+    }
+    dataParcel.WriteInt32(static_cast<int32_t>(proxyType));
+    if (Remote() == nullptr) {
+        TELEPHONY_LOGE("function Remote() return nullptr!");
+        return nullptr;
+    }
+    int32_t error = Remote()->SendRequest(INTERFACE_GET_PROXY_OBJECT_PTR, dataParcel, replyParcel, option);
+    if (error != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("function GetProxyObjectPtr failed! errCode:%{public}d", error);
+        return nullptr;
+    }
+    return replyParcel.ReadRemoteObject();
 }
 } // namespace Telephony
 } // namespace OHOS

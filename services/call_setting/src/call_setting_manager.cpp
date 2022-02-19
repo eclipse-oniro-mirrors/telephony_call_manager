@@ -15,7 +15,6 @@
 
 #include "call_setting_manager.h"
 
-#include "cellular_call_data_struct.h"
 #include "call_manager_errors.h"
 #include "telephony_log_wrapper.h"
 

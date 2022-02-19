@@ -24,6 +24,8 @@ config("call_manager_config") {
 
 ohos_shared_library("tel_call_manager_api") {
   sources = [
+    "src/bluetooth_call_client.cpp",
+    "src/bluetooth_call_proxy.cpp",
     "src/call_ability_callback.cpp",
     "src/call_ability_callback_stub.cpp",
     "src/call_manager_client.cpp",

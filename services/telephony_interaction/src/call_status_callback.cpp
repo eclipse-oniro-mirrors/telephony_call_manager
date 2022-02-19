@@ -54,7 +54,7 @@ int32_t CallStatusCallback::UpdateCallsReportInfo(const CallsReportInfo &info)
     CallDetailInfo detailInfo;
     CallsReportInfo callsInfo = info;
     std::vector<CallReportInfo>::iterator it = callsInfo.callVec.begin();
-    for (; it != callsInfo.callVec.end(); it++) {
+    for (; it != callsInfo.callVec.end(); ++it) {
         detailInfo.callType = (*it).callType;
         detailInfo.accountId = (*it).accountId;
         detailInfo.index = (*it).index;

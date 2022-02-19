@@ -338,8 +338,9 @@ AudioDevice AudioControlManager::GetInitAudioDevice() const
  */
 int32_t AudioControlManager::SetMute(bool isMute)
 {
-    if (!IsAudioActivated()) {
-        TELEPHONY_LOGE("audio is not activated, set mute failed");
+    bool hasCall = DelayedSingleton<CallControlManager>::GetInstance()->HasCall();
+    if (!hasCall) {
+        TELEPHONY_LOGE("no call exists, set mute failed");
         return CALL_ERR_AUDIO_SETTING_MUTE_FAILED;
     }
     if (DelayedSingleton<CallControlManager>::GetInstance()->HasEmergency()) {

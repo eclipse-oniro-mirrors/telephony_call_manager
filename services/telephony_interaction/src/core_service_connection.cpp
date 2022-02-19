@@ -33,7 +33,7 @@ std::vector<std::u16string> CoreServiceConnection::GetFdnNumberList(int slotId)
         return numberVec;
     }
     for (std::vector<std::shared_ptr<DiallingNumbersInfo>>::iterator it = diallingNumbers.begin();
-         it != diallingNumbers.end(); it++) {
+         it != diallingNumbers.end(); ++it) {
         numberVec.push_back((*it)->GetNumber());
     }
     return numberVec;

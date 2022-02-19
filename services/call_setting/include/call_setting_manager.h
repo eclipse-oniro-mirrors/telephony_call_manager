@@ -21,7 +21,6 @@
 
 #include "pac_map.h"
 
-#include "cellular_call_types.h"
 #include "cellular_call_connection.h"
 
 namespace OHOS {

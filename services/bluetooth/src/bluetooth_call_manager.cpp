@@ -20,7 +20,6 @@
 
 #include "audio_control_manager.h"
 #include "call_control_manager.h"
-#include "bluetooth_state_observer.h"
 #include "bluetooth_connection.h"
 
 #ifdef ABILITY_BLUETOOTH_SUPPORT
@@ -33,26 +32,6 @@ namespace Telephony {
 BluetoothCallManager::BluetoothCallManager() : btConnection_(std::make_unique<BluetoothConnection>()) {}
 
 BluetoothCallManager::~BluetoothCallManager() {}
-
-int32_t BluetoothCallManager::Init()
-{
-    if (!BluetoothStateObserver::SubscribeBluetoothEvent()) {
-        TELEPHONY_LOGE("subscribe bluetooth connection event failed");
-        return CALL_ERR_BLUETOOTH_CONNECTION_FAILED;
-    }
-    return TELEPHONY_SUCCESS;
-}
-
-void BluetoothCallManager::CallStateUpdated(
-    sptr<CallBase> &callObjectPtr, TelCallState priorState, TelCallState nextState)
-{
-    if (callObjectPtr == nullptr) {
-        TELEPHONY_LOGE("call object nullptr");
-        return;
-    }
-    std::string number = callObjectPtr->GetAccountNumber();
-    SendCallState(nextState, number, GetCallNumberType(number), GetContactsName(number));
-}
 
 bool BluetoothCallManager::ConnectBtSco()
 {
@@ -72,6 +51,16 @@ bool BluetoothCallManager::DisconnectBtSco()
     return btConnection_->DisconnectBtSco();
 }
 
+int32_t BluetoothCallManager::SendBtCallState(
+    int32_t numActive, int32_t numHeld, int32_t callState, const std::string &number)
+{
+    if (btConnection_ == nullptr) {
+        TELEPHONY_LOGE("bluetooth connection nullptr");
+        return false;
+    }
+    return btConnection_->SendBtCallState(numActive, numHeld, callState, number);
+}
+
 BtScoState BluetoothCallManager::GetBtScoState()
 {
     if (btConnection_ == nullptr) {
@@ -89,108 +78,5 @@ bool BluetoothCallManager::IsBtScoConnected()
     }
     return btConnection_->IsBtScoConnected();
 }
-
-bool BluetoothCallManager::AnswerBtCall()
-{
-    if (!IsBtScoConnected()) {
-        TELEPHONY_LOGE("bluetooth sco is not connected");
-        return false;
-    }
-    auto callList = DelayedSingleton<AudioControlManager>::GetInstance()->GetCallList();
-    bool result = true;
-    for (auto call : callList) {
-        if (call->GetTelCallState() == TelCallState::CALL_STATUS_INCOMING) {
-            result = DelayedSingleton<CallControlManager>::GetInstance()->AnswerCall(
-                call->GetCallID(), static_cast<int32_t>(call->GetVideoStateType()));
-            TELEPHONY_LOGI("call id : %{public}d, answer result : %{public}d", call->GetCallID(), result);
-            break;
-        }
-    }
-    return result;
-}
-
-bool BluetoothCallManager::HangupBtCall()
-{
-    if (!IsBtScoConnected()) {
-        TELEPHONY_LOGE("bluetooth sco is not connected");
-        return false;
-    }
-    auto callList = DelayedSingleton<AudioControlManager>::GetInstance()->GetCallList();
-    bool result = true;
-    for (auto call : callList) {
-        if (call->GetTelCallState() == TelCallState::CALL_STATUS_INCOMING ||
-            call->GetTelCallState() == TelCallState::CALL_STATUS_ACTIVE ||
-            call->GetTelCallState() == TelCallState::CALL_STATUS_HOLDING) {
-            int32_t ret = DelayedSingleton<CallControlManager>::GetInstance()->HangUpCall(call->GetCallID());
-            TELEPHONY_LOGI("call id : %{public}d, state : %{public}d, hangup result : %{public}d",
-                call->GetCallID(), call->GetTelCallState(), ret);
-            if (ret != TELEPHONY_SUCCESS) {
-                result = false;
-            }
-        }
-    }
-    return result;
-}
-
-int32_t BluetoothCallManager::SendCallState(
-    TelCallState callState, const std::string &number, int32_t type, const std::string &name)
-{
-    if (!IsBtScoConnected()) {
-        TELEPHONY_LOGE("bluetooth sco is not connected");
-        return CALL_ERR_BLUETOOTH_CONNECTION_FAILED;
-    }
-#ifdef ABILITY_BLUETOOTH_SUPPORT
-    int32_t numActive =
-        DelayedSingleton<CallStateProcessor>::GetInstance()->GetCallNumber(TelCallState::CALL_STATUS_ACTIVE);
-    int32_t numHeld =
-        DelayedSingleton<CallStateProcessor>::GetInstance()->GetCallNumber(TelCallState::CALL_STATUS_HOLDING);
-    return BluetoothMgr::BluetoothMgrClient::GetInstance()->PhoneStateChanged(
-        numActive, numHeld, callState, number, type, name);
-#endif
-    return TELEPHONY_SUCCESS;
-}
-
-int32_t BluetoothCallManager::SendCallList()
-{
-    if (!IsBtScoConnected()) {
-        TELEPHONY_LOGE("bluetooth sco is not connected");
-        return CALL_ERR_BLUETOOTH_CONNECTION_FAILED;
-    }
-#ifdef ABILITY_BLUETOOTH_SUPPORT
-    auto callList = DelayedSingleton<AudioControlManager>::GetInstance()->GetCallList();
-    bool result = false;
-    for (auto call : callList) {
-        result = BluetoothMgr::BluetoothMgrClient::GetInstance()->ClccResponse(call->GetCallID(),
-            static_cast<int32_t>((call->GetTelCallState())), call->GetAccountNumber(),
-            static_cast<int32_t>((call->GetVideoStateType())));
-    }
-    return result;
-#endif
-    return TELEPHONY_SUCCESS;
-}
-
-int32_t BluetoothCallManager::GetCallNumberType(const std::string &number)
-{
-    return DEFAULT_CALL_NUMBER_TYPE;
-}
-
-std::string BluetoothCallManager::GetContactsName(const std::string &number)
-{
-    return "";
-}
-
-int32_t BluetoothCallManager::SendDtmf(int32_t callId, char str)
-{
-    return DelayedSingleton<CallControlManager>::GetInstance()->StartDtmf(callId, str);
-}
-
-void BluetoothCallManager::NewCallCreated(sptr<CallBase> &callObjectPtr) {}
-
-void BluetoothCallManager::CallDestroyed(int32_t cause) {}
-
-void BluetoothCallManager::IncomingCallActivated(sptr<CallBase> &callObjectPtr) {}
-
-void BluetoothCallManager::IncomingCallHungUp(sptr<CallBase> &callObjectPtr, bool isSendSms, std::string content)
-{}
 } // namespace Telephony
 } // namespace OHOS

@@ -203,12 +203,18 @@ declare namespace call {
      * @systemapi Hide this for inner system use.
      */
     function on(type: 'callDetailsChange', callback: Callback<CallAttributeOptions>): void;
+    /**
+     * @systemapi Hide this for inner system use.
+     */
     function off(type: 'callDetailsChange', callback?: Callback<CallAttributeOptions>): void;
 
     /**
      * @systemapi Hide this for inner system use.
      */
     function on(type: 'callEventChange', callback: Callback<CallEventOptions>): void;
+    /**
+     * @systemapi Hide this for inner system use.
+     */
     function off(type: 'callEventChange', callback?: Callback<CallEventOptions>): void;
 
     /**
@@ -216,6 +222,10 @@ declare namespace call {
      * @since 8
      */
     function on(type: 'callDisconnectedCause', callback: Callback<DisconnectedDetails>): void;
+    /**
+     * @systemapi Hide this for inner system use.
+     * @since 8
+     */
     function off(type: 'callDisconnectedCause', callback?: Callback<DisconnectedDetails>): void;
 
     /**
@@ -291,8 +301,8 @@ declare namespace call {
      * @systemapi Hide this for inner system use.
      * @since 8
      */
-    function UpdateImsCallMode(callId: number, mode: ImsCallMode, callback: AsyncCallback<void>): void;
-    function UpdateImsCallMode(callId: number, mode: ImsCallMode): Promise<void>;
+    function updateImsCallMode(callId: number, mode: ImsCallMode, callback: AsyncCallback<void>): void;
+    function updateImsCallMode(callId: number, mode: ImsCallMode): Promise<void>;
 
     /**
      * @systemapi Hide this for inner system use.

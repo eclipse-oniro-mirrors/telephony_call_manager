@@ -15,6 +15,7 @@
 
 #include "napi_call_ability_callback.h"
 
+#include <ctime>
 #include <securec.h>
 
 #include "call_manager_errors.h"
@@ -211,7 +212,9 @@ void NapiCallAbilityCallback::UnRegisterSetTransferCallback()
 int32_t NapiCallAbilityCallback::RegisterGetVolteCallback(EventCallback callback)
 {
     if (getVolteCallback_.callbackBeginTime_ != 0) {
-        if ((time(nullptr) - getVolteCallback_.callbackBeginTime_) < NAPI_MAX_TIMEOUT_SECOND) {
+        timespec tmpTime = {0, 0};
+        clock_gettime(CLOCK_MONOTONIC, &tmpTime);
+        if ((tmpTime.tv_sec - getVolteCallback_.callbackBeginTime_) < NAPI_MAX_TIMEOUT_SECOND) {
             return CALL_ERR_CALLBACK_ALREADY_EXIST;
         } else {
             TELEPHONY_LOGE("callback already timeout");
@@ -230,7 +233,9 @@ void NapiCallAbilityCallback::UnRegisterGetVolteCallback()
 int32_t NapiCallAbilityCallback::RegisterEnableVolteCallback(EventCallback callback)
 {
     if (enableVolteCallback_.callbackBeginTime_ != 0) {
-        if ((time(nullptr) - enableVolteCallback_.callbackBeginTime_) < NAPI_MAX_TIMEOUT_SECOND) {
+        timespec tmpTime = {0, 0};
+        clock_gettime(CLOCK_MONOTONIC, &tmpTime);
+        if ((tmpTime.tv_sec - enableVolteCallback_.callbackBeginTime_) < NAPI_MAX_TIMEOUT_SECOND) {
             return CALL_ERR_CALLBACK_ALREADY_EXIST;
         } else {
             TELEPHONY_LOGE("callback already timeout");
@@ -249,7 +254,9 @@ void NapiCallAbilityCallback::UnRegisterEnableVolteCallback()
 int32_t NapiCallAbilityCallback::RegisterDisableVolteCallback(EventCallback callback)
 {
     if (disableVolteCallback_.callbackBeginTime_ != 0) {
-        if ((time(nullptr) - disableVolteCallback_.callbackBeginTime_) < NAPI_MAX_TIMEOUT_SECOND) {
+        timespec tmpTime = {0, 0};
+        clock_gettime(CLOCK_MONOTONIC, &tmpTime);
+        if ((tmpTime.tv_sec - disableVolteCallback_.callbackBeginTime_) < NAPI_MAX_TIMEOUT_SECOND) {
             return CALL_ERR_CALLBACK_ALREADY_EXIST;
         } else {
             TELEPHONY_LOGE("callback already timeout");
@@ -268,7 +275,9 @@ void NapiCallAbilityCallback::UnRegisterDisableVolteCallback()
 int32_t NapiCallAbilityCallback::RegisterGetLteEnhanceCallback(EventCallback callback)
 {
     if (getLteEnhanceCallback_.callbackBeginTime_ != 0) {
-        if ((time(nullptr) - getLteEnhanceCallback_.callbackBeginTime_) < NAPI_MAX_TIMEOUT_SECOND) {
+        timespec tmpTime = {0, 0};
+        clock_gettime(CLOCK_MONOTONIC, &tmpTime);
+        if ((tmpTime.tv_sec - getLteEnhanceCallback_.callbackBeginTime_) < NAPI_MAX_TIMEOUT_SECOND) {
             return CALL_ERR_CALLBACK_ALREADY_EXIST;
         } else {
             TELEPHONY_LOGE("callback already timeout");
@@ -287,7 +296,9 @@ void NapiCallAbilityCallback::UnRegisterGetLteEnhanceCallback()
 int32_t NapiCallAbilityCallback::RegisterEnableLteEnhanceModeCallback(EventCallback callback)
 {
     if (enableLteEnhanceCallback_.callbackBeginTime_ != 0) {
-        if ((time(nullptr) - enableLteEnhanceCallback_.callbackBeginTime_) < NAPI_MAX_TIMEOUT_SECOND) {
+        timespec tmpTime = {0, 0};
+        clock_gettime(CLOCK_MONOTONIC, &tmpTime);
+        if ((tmpTime.tv_sec - enableLteEnhanceCallback_.callbackBeginTime_) < NAPI_MAX_TIMEOUT_SECOND) {
             return CALL_ERR_CALLBACK_ALREADY_EXIST;
         } else {
             TELEPHONY_LOGE("callback already timeout");
@@ -306,7 +317,9 @@ void NapiCallAbilityCallback::UnRegisterEnableLteEnhanceModeCallback()
 int32_t NapiCallAbilityCallback::RegisterDisableLteEnhanceModeCallback(EventCallback callback)
 {
     if (disableLteEnhanceCallback_.callbackBeginTime_ != 0) {
-        if ((time(nullptr) - disableLteEnhanceCallback_.callbackBeginTime_) < NAPI_MAX_TIMEOUT_SECOND) {
+        timespec tmpTime = {0, 0};
+        clock_gettime(CLOCK_MONOTONIC, &tmpTime);
+        if ((tmpTime.tv_sec - disableLteEnhanceCallback_.callbackBeginTime_) < NAPI_MAX_TIMEOUT_SECOND) {
             return CALL_ERR_CALLBACK_ALREADY_EXIST;
         } else {
             TELEPHONY_LOGE("callback already timeout");

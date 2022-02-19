@@ -23,7 +23,6 @@
 
 #include "pac_map.h"
 #include "singleton.h"
-#include "cellular_call_types.h"
 
 #include "call_setting_manager.h"
 #include "call_policy.h"

@@ -18,6 +18,7 @@
 #include "phonenumbers/phonenumber.pb.h"
 
 #include "telephony_log_wrapper.h"
+#include "telephony_types.h"
 
 #include "call_manager_errors.h"
 #include "cellular_call_connection.h"

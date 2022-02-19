@@ -63,6 +63,9 @@ public:
     virtual ~AudioBase() {}
     // handle audio events in current state
     virtual bool ProcessEvent(int32_t event) = 0;
+
+protected:
+    std::mutex mutex_;
 };
 } // namespace Telephony
 } // namespace OHOS

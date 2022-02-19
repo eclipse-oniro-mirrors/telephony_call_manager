@@ -16,8 +16,6 @@
 #ifndef CALL_REQUEST_PROCESS_H
 #define CALL_REQUEST_PROCESS_H
 
-#include "cellular_call_types.h"
-
 #include "call_object_manager.h"
 
 namespace OHOS {

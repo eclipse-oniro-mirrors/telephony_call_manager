@@ -23,12 +23,12 @@
 #include "call_manager_inner_type.h"
 #include "telephony_log_wrapper.h"
 
-const int16_t kMaxRingingCallNumberLen = 30;
-const int16_t kMaxDialingCallNumberLen = 30;
-const int16_t kMaxManeLen = 10;
-const int16_t kMaxPathKeyLen = 60;
-const int16_t kCallStartId = 1;
-const int16_t kMilliSecond = 1000;
+const int16_t RINGING_CALL_NUMBER_LEN = 30;
+const int16_t DIALING_CALL_NUMBER_LEN = 30;
+const int16_t CONTACT_NAME_LEN = 10;
+const int16_t FILE_PATH_MAX_LEN = 60;
+const int16_t CALL_START_ID = 0;
+
 namespace OHOS {
 namespace Telephony {
 struct DialParaInfo {
@@ -71,10 +71,10 @@ enum PolicyFlag : uint64_t {
 };
 
 struct ContactInfo {
-    char name[kMaxManeLen];
+    char name[CONTACT_NAME_LEN];
     char number[kMaxNumberLen];
     bool isContacterExists;
-    char ringtonePath[kMaxPathKeyLen];
+    char ringtonePath[FILE_PATH_MAX_LEN];
     bool isSendToVoicemail;
     bool isEcc;
     bool isVoiceMail;

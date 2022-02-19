@@ -128,5 +128,15 @@ void NapiCallManagerUtils::SetPropertyBoolean(napi_env env, napi_value object, s
     napi_get_boolean(env, value, &peopertyValue);
     napi_set_named_property(env, object, name.c_str(), peopertyValue);
 }
+
+napi_value NapiCallManagerUtils::CreateEnumConstructor(napi_env env, napi_callback_info info)
+{
+    napi_value thisArg = nullptr;
+    void *data = nullptr;
+    napi_get_cb_info(env, info, nullptr, nullptr, &thisArg, &data);
+    napi_value global = nullptr;
+    napi_get_global(env, &global);
+    return thisArg;
+}
 } // namespace Telephony
 } // namespace OHOS

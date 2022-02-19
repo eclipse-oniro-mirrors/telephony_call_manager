@@ -40,10 +40,9 @@ public:
     bool ConnectBtSco();
     bool DisconnectBtSco();
     bool IsBtScoConnected();
-    static const std::string EVENT_BLUETOOTH_SCO_CONNECTED;
-    static const std::string EVENT_BLUETOOTH_SCO_DISCONNECTED;
     static BtScoState GetBtScoState();
     static void SetBtScoState(BtScoState state);
+    int32_t SendBtCallState(int32_t numActive, int32_t numHeld, int32_t callState, const std::string &number);
 #ifdef ABILITY_BLUETOOTH_SUPPORT
     void OnScoStateChanged(const Bluetooth::BluetoothRemoteDevice &device, int32_t state) override;
     void OnConnectionStateChanged(const Bluetooth::BluetoothRemoteDevice &device, int32_t state) override;

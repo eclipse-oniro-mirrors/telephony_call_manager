@@ -417,6 +417,16 @@ struct MuteControlResponse {
     int32_t value; // 0: Un mute 1: Set mute
 };
 
+struct CellularCallInfo {
+    int32_t callId; // uuid
+    char phoneNum[kMaxNumberLen]; // call phone number
+    int32_t slotId; // del
+    int32_t accountId;
+    CallType callType; // call type: CS、IMS
+    int32_t videoState; // 0: audio 1:video
+    int32_t index; // CallInfo index
+};
+
 /**
  * 27007-430_2001 7.11	Call forwarding number and conditions +CCFC
  * 3GPP TS 22.082 [4]

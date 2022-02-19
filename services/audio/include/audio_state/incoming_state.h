@@ -25,9 +25,6 @@ public:
     IncomingState() = default;
     ~IncomingState() = default;
     bool ProcessEvent(int32_t event) override;
-
-private:
-    std::mutex mutex_;
 };
 } // namespace Telephony
 } // namespace OHOS

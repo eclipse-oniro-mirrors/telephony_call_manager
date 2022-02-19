@@ -98,7 +98,7 @@ int32_t OTTCallConnection::InviteToConference(
     PackCellularCallInfo(requestInfo, info);
     info.PutIntValue("listCnt", list.size());
     std::vector<std::string>::iterator it = list.begin();
-    for (; it != list.end(); it++) {
+    for (; it != list.end(); ++it) {
         if (!(*it).empty()) {
             info.PutStringValue("number", *it);
         }

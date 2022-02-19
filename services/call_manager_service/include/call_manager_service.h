@@ -598,6 +598,15 @@ public:
      */
     int32_t ReportOttCallEventInfo(OttCallEventInfo &eventInfo) override;
 
+    /**
+     * GetProxyObjectPtr
+     *
+     * @brief get callManager proxy object ptr
+     * @param proxyType[in], proxy type
+     * @return Returns nullptr on failure, others on success.
+     */
+    sptr<IRemoteObject> GetProxyObjectPtr(CallManagerProxyType proxyType) override;
+
 private:
     int32_t CheckBundleName(std::string bundleName);
 
@@ -610,7 +619,7 @@ private:
     ServiceRunningState state_ {ServiceRunningState::STATE_STOPPED};
 
     std::shared_ptr<CallControlManager> callControlManagerPtr_;
-    std::shared_ptr<BluetoothCallManager> bluetoothCallManagerPtr_;
+    std::map<uint32_t, sptr<IRemoteObject>> proxyObjectPtrMap_;
     std::mutex lock_;
     const int32_t startTime_ = 1900;
     const int32_t extraMonth_ = 1;

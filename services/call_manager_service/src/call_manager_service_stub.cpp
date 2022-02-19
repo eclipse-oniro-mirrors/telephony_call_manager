@@ -24,7 +24,6 @@
 #include "message_parcel.h"
 
 #include "call_control_manager.h"
-#include "cellular_call_types.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -39,6 +38,7 @@ CallManagerServiceStub::CallManagerServiceStub()
     InitCallMultimediaRequest();
     InitImsServiceRequest();
     InitOttServiceRequest();
+    memberFuncMap_[INTERFACE_GET_PROXY_OBJECT_PTR] = &CallManagerServiceStub::OnGetProxyObjectPtr;
 }
 
 CallManagerServiceStub::~CallManagerServiceStub()
@@ -162,9 +162,6 @@ int32_t CallManagerServiceStub::OnRemoteRequest(
 int32_t CallManagerServiceStub::OnRegisterCallBack(MessageParcel &data, MessageParcel &reply)
 {
     int32_t result = TELEPHONY_ERR_FAIL;
-    if (!data.ContainFileDescriptors()) {
-        TELEPHONY_LOGW("sent raw data is less than 32k");
-    }
     sptr<IRemoteObject> remote = data.ReadRemoteObject();
     if (remote == nullptr) {
         TELEPHONY_LOGE("callback ptr is nullptr.");
@@ -180,9 +177,6 @@ int32_t CallManagerServiceStub::OnRegisterCallBack(MessageParcel &data, MessageP
 int32_t CallManagerServiceStub::OnUnRegisterCallBack(MessageParcel &data, MessageParcel &reply)
 {
     int32_t result = TELEPHONY_ERR_FAIL;
-    if (!data.ContainFileDescriptors()) {
-        TELEPHONY_LOGW("sent raw data is less than 32k");
-    }
     result = UnRegisterCallBack();
     if (!reply.WriteInt32(result)) {
         TELEPHONY_LOGE("fail to write parcel");
@@ -195,9 +189,6 @@ int32_t CallManagerServiceStub::OnDialCall(MessageParcel &data, MessageParcel &r
 {
     int32_t result = TELEPHONY_ERR_FAIL;
     AppExecFwk::PacMap dialInfo;
-    if (!data.ContainFileDescriptors()) {
-        TELEPHONY_LOGW("sent raw data is less than 32k");
-    }
     std::u16string callNumber = data.ReadString16();
     dialInfo.PutIntValue("accountId", data.ReadInt32());
     dialInfo.PutIntValue("videoState", data.ReadInt32());
@@ -220,9 +211,6 @@ int32_t CallManagerServiceStub::OnDialCall(MessageParcel &data, MessageParcel &r
 
 int32_t CallManagerServiceStub::OnAcceptCall(MessageParcel &data, MessageParcel &reply)
 {
-    if (!data.ContainFileDescriptors()) {
-        TELEPHONY_LOGW("sent raw data is less than 32k");
-    }
     int32_t callId = data.ReadInt32();
     int32_t videoState = data.ReadInt32();
     int32_t result = AnswerCall(callId, videoState);
@@ -236,9 +224,6 @@ int32_t CallManagerServiceStub::OnAcceptCall(MessageParcel &data, MessageParcel 
 
 int32_t CallManagerServiceStub::OnRejectCall(MessageParcel &data, MessageParcel &reply)
 {
-    if (!data.ContainFileDescriptors()) {
-        TELEPHONY_LOGW("sent raw data is less than 32k");
-    }
     int32_t callId = data.ReadInt32();
     bool isSendSms = data.ReadBool();
     std::u16string content = data.ReadString16();
@@ -253,9 +238,6 @@ int32_t CallManagerServiceStub::OnRejectCall(MessageParcel &data, MessageParcel 
 
 int32_t CallManagerServiceStub::OnHangUpCall(MessageParcel &data, MessageParcel &reply)
 {
-    if (!data.ContainFileDescriptors()) {
-        TELEPHONY_LOGW("sent raw data is less than 32k");
-    }
     int32_t callId = data.ReadInt32();
     int32_t result = HangUpCall(callId);
     TELEPHONY_LOGI("result:%{public}d", result);
@@ -268,9 +250,6 @@ int32_t CallManagerServiceStub::OnHangUpCall(MessageParcel &data, MessageParcel 
 
 int32_t CallManagerServiceStub::OnGetCallState(MessageParcel &data, MessageParcel &reply)
 {
-    if (!data.ContainFileDescriptors()) {
-        TELEPHONY_LOGW("sent raw data is less than 32k");
-    }
     int32_t result = GetCallState();
     TELEPHONY_LOGI("result:%{public}d", result);
     if (!reply.WriteInt32(result)) {
@@ -282,9 +261,6 @@ int32_t CallManagerServiceStub::OnGetCallState(MessageParcel &data, MessageParce
 
 int32_t CallManagerServiceStub::OnHoldCall(MessageParcel &data, MessageParcel &reply)
 {
-    if (!data.ContainFileDescriptors()) {
-        TELEPHONY_LOGW("sent raw data is less than 32k");
-    }
     int32_t callId = data.ReadInt32();
     int32_t result = HoldCall(callId);
     TELEPHONY_LOGI("result:%{public}d", result);
@@ -297,9 +273,6 @@ int32_t CallManagerServiceStub::OnHoldCall(MessageParcel &data, MessageParcel &r
 
 int32_t CallManagerServiceStub::OnUnHoldCall(MessageParcel &data, MessageParcel &reply)
 {
-    if (!data.ContainFileDescriptors()) {
-        TELEPHONY_LOGW("sent raw data is less than 32k");
-    }
     int32_t callId = data.ReadInt32();
     int32_t result = UnHoldCall(callId);
     TELEPHONY_LOGI("result:%{public}d", result);
@@ -312,9 +285,6 @@ int32_t CallManagerServiceStub::OnUnHoldCall(MessageParcel &data, MessageParcel 
 
 int32_t CallManagerServiceStub::OnSwitchCall(MessageParcel &data, MessageParcel &reply)
 {
-    if (!data.ContainFileDescriptors()) {
-        TELEPHONY_LOGW("sent raw data is less than 32k");
-    }
     int32_t callId = data.ReadInt32();
     int32_t result = SwitchCall(callId);
     TELEPHONY_LOGI("result:%{public}d", result);
@@ -327,9 +297,6 @@ int32_t CallManagerServiceStub::OnSwitchCall(MessageParcel &data, MessageParcel 
 
 int32_t CallManagerServiceStub::OnHasCall(MessageParcel &data, MessageParcel &reply)
 {
-    if (!data.ContainFileDescriptors()) {
-        TELEPHONY_LOGW("sent raw data is less than 32k");
-    }
     bool result = HasCall();
     TELEPHONY_LOGI("result:%{public}d", result);
     if (!reply.WriteBool(result)) {
@@ -341,9 +308,6 @@ int32_t CallManagerServiceStub::OnHasCall(MessageParcel &data, MessageParcel &re
 
 int32_t CallManagerServiceStub::OnIsNewCallAllowed(MessageParcel &data, MessageParcel &reply)
 {
-    if (!data.ContainFileDescriptors()) {
-        TELEPHONY_LOGW("sent raw data is less than 32k");
-    }
     bool result = IsNewCallAllowed();
     TELEPHONY_LOGI("result:%{public}d", result);
     if (!reply.WriteBool(result)) {
@@ -355,9 +319,6 @@ int32_t CallManagerServiceStub::OnIsNewCallAllowed(MessageParcel &data, MessageP
 
 int32_t CallManagerServiceStub::OnSetMute(MessageParcel &data, MessageParcel &reply)
 {
-    if (!data.ContainFileDescriptors()) {
-        TELEPHONY_LOGW("sent raw data is less than 32k");
-    }
     bool isMute = data.ReadBool();
     int32_t result = SetMuted(isMute);
     TELEPHONY_LOGI("result:%{public}d", result);
@@ -370,9 +331,6 @@ int32_t CallManagerServiceStub::OnSetMute(MessageParcel &data, MessageParcel &re
 
 int32_t CallManagerServiceStub::OnMuteRinger(MessageParcel &data, MessageParcel &reply)
 {
-    if (!data.ContainFileDescriptors()) {
-        TELEPHONY_LOGW("sent raw data is less than 32k");
-    }
     int32_t result = MuteRinger();
     TELEPHONY_LOGI("result:%{public}d", result);
     if (!reply.WriteInt32(result)) {
@@ -384,9 +342,6 @@ int32_t CallManagerServiceStub::OnMuteRinger(MessageParcel &data, MessageParcel 
 
 int32_t CallManagerServiceStub::OnSetAudioDevice(MessageParcel &data, MessageParcel &reply)
 {
-    if (!data.ContainFileDescriptors()) {
-        TELEPHONY_LOGW("sent raw data is less than 32k");
-    }
     int32_t deviceType = data.ReadInt32();
     int32_t result = SetAudioDevice((AudioDevice)deviceType);
     TELEPHONY_LOGI("result:%{public}d", result);
@@ -399,9 +354,6 @@ int32_t CallManagerServiceStub::OnSetAudioDevice(MessageParcel &data, MessagePar
 
 int32_t CallManagerServiceStub::OnIsRinging(MessageParcel &data, MessageParcel &reply)
 {
-    if (!data.ContainFileDescriptors()) {
-        TELEPHONY_LOGW("sent raw data is less than 32k");
-    }
     bool result = IsRinging();
     TELEPHONY_LOGI("result:%{public}d", result);
     if (!reply.WriteBool(result)) {
@@ -413,9 +365,6 @@ int32_t CallManagerServiceStub::OnIsRinging(MessageParcel &data, MessageParcel &
 
 int32_t CallManagerServiceStub::OnIsInEmergencyCall(MessageParcel &data, MessageParcel &reply)
 {
-    if (!data.ContainFileDescriptors()) {
-        TELEPHONY_LOGW("sent raw data is less than 32k");
-    }
     bool result = IsInEmergencyCall();
     TELEPHONY_LOGI("result:%{public}d", result);
     if (!reply.WriteBool(result)) {
@@ -428,9 +377,6 @@ int32_t CallManagerServiceStub::OnIsInEmergencyCall(MessageParcel &data, Message
 int32_t CallManagerServiceStub::OnStartDtmf(MessageParcel &data, MessageParcel &reply)
 {
     int32_t result = TELEPHONY_ERR_FAIL;
-    if (!data.ContainFileDescriptors()) {
-        TELEPHONY_LOGW("sent raw data is less than 32k");
-    }
     int32_t callId = data.ReadInt32();
     char str = data.ReadInt8();
     result = StartDtmf(callId, str);
@@ -445,9 +391,6 @@ int32_t CallManagerServiceStub::OnStartDtmf(MessageParcel &data, MessageParcel &
 int32_t CallManagerServiceStub::OnStopDtmf(MessageParcel &data, MessageParcel &reply)
 {
     int32_t result = TELEPHONY_ERR_FAIL;
-    if (!data.ContainFileDescriptors()) {
-        TELEPHONY_LOGW("sent raw data is less than 32k");
-    }
     int32_t callId = data.ReadInt32();
     result = StopDtmf(callId);
     TELEPHONY_LOGI("result:%{public}d", result);
@@ -461,9 +404,6 @@ int32_t CallManagerServiceStub::OnStopDtmf(MessageParcel &data, MessageParcel &r
 int32_t CallManagerServiceStub::OnGetCallWaiting(MessageParcel &data, MessageParcel &reply)
 {
     int32_t result = TELEPHONY_ERR_FAIL;
-    if (!data.ContainFileDescriptors()) {
-        TELEPHONY_LOGW("sent raw data is less than 32k");
-    }
     int32_t slotId = data.ReadInt32();
     result = GetCallWaiting(slotId);
     TELEPHONY_LOGI("result:%{public}d", result);
@@ -477,9 +417,6 @@ int32_t CallManagerServiceStub::OnGetCallWaiting(MessageParcel &data, MessagePar
 int32_t CallManagerServiceStub::OnSetCallWaiting(MessageParcel &data, MessageParcel &reply)
 {
     int32_t result = TELEPHONY_ERR_FAIL;
-    if (!data.ContainFileDescriptors()) {
-        TELEPHONY_LOGW("sent raw data is less than 32k");
-    }
     int32_t slotId = data.ReadInt32();
     bool activate = data.ReadBool();
     result = SetCallWaiting(slotId, activate);
@@ -494,9 +431,6 @@ int32_t CallManagerServiceStub::OnSetCallWaiting(MessageParcel &data, MessagePar
 int32_t CallManagerServiceStub::OnGetCallRestriction(MessageParcel &data, MessageParcel &reply)
 {
     int32_t result = TELEPHONY_ERR_FAIL;
-    if (!data.ContainFileDescriptors()) {
-        TELEPHONY_LOGW("sent raw data is less than 32k");
-    }
     int32_t slotId = data.ReadInt32();
     CallRestrictionType type = static_cast<CallRestrictionType>(data.ReadInt32());
     result = GetCallRestriction(slotId, type);
@@ -528,9 +462,6 @@ int32_t CallManagerServiceStub::OnSetCallRestriction(MessageParcel &data, Messag
 int32_t CallManagerServiceStub::OnGetTransferNumber(MessageParcel &data, MessageParcel &reply)
 {
     int32_t result = TELEPHONY_ERR_FAIL;
-    if (!data.ContainFileDescriptors()) {
-        TELEPHONY_LOGW("sent raw data is less than 32k");
-    }
     int32_t slotId = data.ReadInt32();
     CallTransferType type = static_cast<CallTransferType>(data.ReadInt32());
     result = GetCallTransferInfo(slotId, type);
@@ -561,9 +492,6 @@ int32_t CallManagerServiceStub::OnSetTransferNumber(MessageParcel &data, Message
 
 int32_t CallManagerServiceStub::OnCombineConference(MessageParcel &data, MessageParcel &reply)
 {
-    if (!data.ContainFileDescriptors()) {
-        TELEPHONY_LOGW("sent raw data is less than 32k");
-    }
     int32_t mainCallId = data.ReadInt32();
     int32_t result = CombineConference(mainCallId);
     TELEPHONY_LOGI("result:%{public}d", result);
@@ -576,9 +504,6 @@ int32_t CallManagerServiceStub::OnCombineConference(MessageParcel &data, Message
 
 int32_t CallManagerServiceStub::OnSeparateConference(MessageParcel &data, MessageParcel &reply)
 {
-    if (!data.ContainFileDescriptors()) {
-        TELEPHONY_LOGW("sent raw data is less than 32k");
-    }
     int32_t callId = data.ReadInt32();
     int32_t result = SeparateConference(callId);
     TELEPHONY_LOGI("result:%{public}d", result);
@@ -592,9 +517,6 @@ int32_t CallManagerServiceStub::OnSeparateConference(MessageParcel &data, Messag
 int32_t CallManagerServiceStub::OnJoinConference(MessageParcel &data, MessageParcel &reply)
 {
     int32_t result = TELEPHONY_ERR_FAIL;
-    if (!data.ContainFileDescriptors()) {
-        TELEPHONY_LOGW("sent raw data is less than 32k");
-    }
     int32_t callId = data.ReadInt32();
     std::vector<std::u16string> numberList;
     if (!data.ReadString16Vector(&numberList)) {
@@ -612,9 +534,6 @@ int32_t CallManagerServiceStub::OnJoinConference(MessageParcel &data, MessagePar
 int32_t CallManagerServiceStub::OnSetCallPreferenceMode(MessageParcel &data, MessageParcel &reply)
 {
     int32_t result = TELEPHONY_ERR_FAIL;
-    if (!data.ContainFileDescriptors()) {
-        TELEPHONY_LOGW("sent raw data is less than 32k");
-    }
     int32_t slotId = data.ReadInt32();
     int32_t mode = data.ReadInt32();
     result = SetCallPreferenceMode(slotId, mode);
@@ -628,9 +547,6 @@ int32_t CallManagerServiceStub::OnSetCallPreferenceMode(MessageParcel &data, Mes
 int32_t CallManagerServiceStub::OnControlCamera(MessageParcel &data, MessageParcel &reply)
 {
     int32_t result = TELEPHONY_ERR_FAIL;
-    if (!data.ContainFileDescriptors()) {
-        TELEPHONY_LOGW("sent raw data is less than 32k");
-    }
     std::u16string cameraId = data.ReadString16();
     result = ControlCamera(cameraId);
     TELEPHONY_LOGI("result:%{public}d", result);
@@ -674,9 +590,6 @@ int32_t CallManagerServiceStub::OnSetDisplayWindow(MessageParcel &data, MessageP
 int32_t CallManagerServiceStub::OnSetCameraZoom(MessageParcel &data, MessageParcel &reply)
 {
     int32_t result = TELEPHONY_ERR_FAIL;
-    if (!data.ContainFileDescriptors()) {
-        TELEPHONY_LOGW("sent raw data is less than 32k");
-    }
     float zoom = data.ReadFloat();
     result = SetCameraZoom(zoom);
     TELEPHONY_LOGI("result:%{public}d", result);
@@ -690,9 +603,6 @@ int32_t CallManagerServiceStub::OnSetCameraZoom(MessageParcel &data, MessageParc
 int32_t CallManagerServiceStub::OnSetPausePicture(MessageParcel &data, MessageParcel &reply)
 {
     int32_t result = TELEPHONY_ERR_FAIL;
-    if (!data.ContainFileDescriptors()) {
-        TELEPHONY_LOGW("sent raw data is less than 32k");
-    }
     std::u16string path = data.ReadString16();
     result = SetPausePicture(path);
     TELEPHONY_LOGI("result:%{public}d", result);
@@ -706,9 +616,6 @@ int32_t CallManagerServiceStub::OnSetPausePicture(MessageParcel &data, MessagePa
 int32_t CallManagerServiceStub::OnSetDeviceDirection(MessageParcel &data, MessageParcel &reply)
 {
     int32_t result = TELEPHONY_ERR_FAIL;
-    if (!data.ContainFileDescriptors()) {
-        TELEPHONY_LOGW("sent raw data is less than 32k");
-    }
     int32_t rotation = data.ReadInt32();
     result = SetDeviceDirection(rotation);
     TELEPHONY_LOGI("result:%{public}d", result);
@@ -721,9 +628,6 @@ int32_t CallManagerServiceStub::OnSetDeviceDirection(MessageParcel &data, Messag
 
 int32_t CallManagerServiceStub::OnIsEmergencyPhoneNumber(MessageParcel &data, MessageParcel &reply)
 {
-    if (!data.ContainFileDescriptors()) {
-        TELEPHONY_LOGW("sent raw data is less than 32k");
-    }
     std::u16string callNumber = data.ReadString16();
     int32_t slotId = data.ReadInt32();
     int32_t errorCode = TELEPHONY_ERR_FAIL;
@@ -738,9 +642,6 @@ int32_t CallManagerServiceStub::OnIsEmergencyPhoneNumber(MessageParcel &data, Me
 
 int32_t CallManagerServiceStub::OnFormatPhoneNumber(MessageParcel &data, MessageParcel &reply)
 {
-    if (!data.ContainFileDescriptors()) {
-        TELEPHONY_LOGW("sent raw data is less than 32k");
-    }
     std::u16string callNumber = data.ReadString16();
     std::u16string countryCode = data.ReadString16();
     std::u16string formatNumber;
@@ -755,9 +656,6 @@ int32_t CallManagerServiceStub::OnFormatPhoneNumber(MessageParcel &data, Message
 
 int32_t CallManagerServiceStub::OnFormatPhoneNumberToE164(MessageParcel &data, MessageParcel &reply)
 {
-    if (!data.ContainFileDescriptors()) {
-        TELEPHONY_LOGW("sent raw data is less than 32k");
-    }
     std::u16string callNumber = data.ReadString16();
     std::u16string countryCode = data.ReadString16();
     std::u16string formatNumber;
@@ -772,9 +670,6 @@ int32_t CallManagerServiceStub::OnFormatPhoneNumberToE164(MessageParcel &data, M
 
 int32_t CallManagerServiceStub::OnGetMainCallId(MessageParcel &data, MessageParcel &reply)
 {
-    if (!data.ContainFileDescriptors()) {
-        TELEPHONY_LOGW("sent raw data is less than 32k");
-    }
     int32_t callId = data.ReadInt32();
     int32_t result = GetMainCallId(callId);
     TELEPHONY_LOGI("result:%{public}d", result);
@@ -787,9 +682,6 @@ int32_t CallManagerServiceStub::OnGetMainCallId(MessageParcel &data, MessageParc
 
 int32_t CallManagerServiceStub::OnGetSubCallIdList(MessageParcel &data, MessageParcel &reply)
 {
-    if (!data.ContainFileDescriptors()) {
-        TELEPHONY_LOGW("sent raw data is less than 32k");
-    }
     int32_t callId = data.ReadInt32();
     std::vector<std::u16string> result = GetSubCallIdList(callId);
     if (!reply.WriteString16Vector(result)) {
@@ -801,9 +693,6 @@ int32_t CallManagerServiceStub::OnGetSubCallIdList(MessageParcel &data, MessageP
 
 int32_t CallManagerServiceStub::OnGetCallIdListForConference(MessageParcel &data, MessageParcel &reply)
 {
-    if (!data.ContainFileDescriptors()) {
-        TELEPHONY_LOGW("sent raw data is less than 32k");
-    }
     int32_t callId = data.ReadInt32();
     std::vector<std::u16string> result = GetCallIdListForConference(callId);
     if (!reply.WriteString16Vector(result)) {
@@ -816,9 +705,6 @@ int32_t CallManagerServiceStub::OnGetCallIdListForConference(MessageParcel &data
 int32_t CallManagerServiceStub::OnGetImsConfig(MessageParcel &data, MessageParcel &reply)
 {
     int32_t result = TELEPHONY_ERR_FAIL;
-    if (!data.ContainFileDescriptors()) {
-        TELEPHONY_LOGW("sent raw data is less than 32k");
-    }
     int32_t slotId = data.ReadInt32();
     int32_t item = data.ReadInt32();
     result = GetImsConfig(slotId, static_cast<ImsConfigItem>(item));
@@ -832,9 +718,6 @@ int32_t CallManagerServiceStub::OnGetImsConfig(MessageParcel &data, MessageParce
 int32_t CallManagerServiceStub::OnSetImsConfig(MessageParcel &data, MessageParcel &reply)
 {
     int32_t result = TELEPHONY_ERR_FAIL;
-    if (!data.ContainFileDescriptors()) {
-        TELEPHONY_LOGW("sent raw data is less than 32k");
-    }
     int32_t slotId = data.ReadInt32();
     int32_t item = data.ReadInt32();
     std::u16string value = data.ReadString16();
@@ -849,9 +732,6 @@ int32_t CallManagerServiceStub::OnSetImsConfig(MessageParcel &data, MessageParce
 int32_t CallManagerServiceStub::OnGetImsFeatureValue(MessageParcel &data, MessageParcel &reply)
 {
     int32_t result = TELEPHONY_ERR_FAIL;
-    if (!data.ContainFileDescriptors()) {
-        TELEPHONY_LOGW("sent raw data is less than 32k");
-    }
     int32_t slotId = data.ReadInt32();
     FeatureType type = static_cast<FeatureType>(data.ReadInt32());
     result = GetImsFeatureValue(slotId, type);
@@ -865,9 +745,6 @@ int32_t CallManagerServiceStub::OnGetImsFeatureValue(MessageParcel &data, Messag
 int32_t CallManagerServiceStub::OnSetImsFeatureValue(MessageParcel &data, MessageParcel &reply)
 {
     int32_t result = TELEPHONY_ERR_FAIL;
-    if (!data.ContainFileDescriptors()) {
-        TELEPHONY_LOGW("sent raw data is less than 32k");
-    }
     int32_t slotId = data.ReadInt32();
     FeatureType type = static_cast<FeatureType>(data.ReadInt32());
     int32_t value = data.ReadInt32();
@@ -898,9 +775,6 @@ int32_t CallManagerServiceStub::OnUpdateCallMediaMode(MessageParcel &data, Messa
 int32_t CallManagerServiceStub::OnEnableVoLte(MessageParcel &data, MessageParcel &reply)
 {
     int32_t result = TELEPHONY_ERR_FAIL;
-    if (!data.ContainFileDescriptors()) {
-        TELEPHONY_LOGW("sent raw data is less than 32k");
-    }
     int32_t slotId = data.ReadInt32();
     result = EnableImsSwitch(slotId);
     if (!reply.WriteInt32(result)) {
@@ -913,9 +787,6 @@ int32_t CallManagerServiceStub::OnEnableVoLte(MessageParcel &data, MessageParcel
 int32_t CallManagerServiceStub::OnDisableVoLte(MessageParcel &data, MessageParcel &reply)
 {
     int32_t result = TELEPHONY_ERR_FAIL;
-    if (!data.ContainFileDescriptors()) {
-        TELEPHONY_LOGW("sent raw data is less than 32k");
-    }
     int32_t slotId = data.ReadInt32();
     result = DisableImsSwitch(slotId);
     if (!reply.WriteInt32(result)) {
@@ -928,9 +799,6 @@ int32_t CallManagerServiceStub::OnDisableVoLte(MessageParcel &data, MessageParce
 int32_t CallManagerServiceStub::OnIsVoLteEnabled(MessageParcel &data, MessageParcel &reply)
 {
     int32_t result = TELEPHONY_ERR_FAIL;
-    if (!data.ContainFileDescriptors()) {
-        TELEPHONY_LOGW("sent raw data is less than 32k");
-    }
     int32_t slotId = data.ReadInt32();
     result = IsImsSwitchEnabled(slotId);
     if (!reply.WriteInt32(result)) {
@@ -943,9 +811,6 @@ int32_t CallManagerServiceStub::OnIsVoLteEnabled(MessageParcel &data, MessagePar
 int32_t CallManagerServiceStub::OnEnableLteEnhanceMode(MessageParcel &data, MessageParcel &reply)
 {
     int32_t result = TELEPHONY_ERR_FAIL;
-    if (!data.ContainFileDescriptors()) {
-        TELEPHONY_LOGW("sent raw data is less than 32k");
-    }
     int32_t slotId = data.ReadInt32();
     result = EnableLteEnhanceMode(slotId);
     if (!reply.WriteInt32(result)) {
@@ -958,9 +823,6 @@ int32_t CallManagerServiceStub::OnEnableLteEnhanceMode(MessageParcel &data, Mess
 int32_t CallManagerServiceStub::OnDisableEnhanceMode(MessageParcel &data, MessageParcel &reply)
 {
     int32_t result = TELEPHONY_ERR_FAIL;
-    if (!data.ContainFileDescriptors()) {
-        TELEPHONY_LOGW("sent raw data is less than 32k");
-    }
     int32_t slotId = data.ReadInt32();
     result = DisableLteEnhanceMode(slotId);
     if (!reply.WriteInt32(result)) {
@@ -985,9 +847,6 @@ int32_t CallManagerServiceStub::OnIsLteEnhanceModeEnabled(MessageParcel &data, M
 int32_t CallManagerServiceStub::OnStartRtt(MessageParcel &data, MessageParcel &reply)
 {
     int32_t result = TELEPHONY_ERR_FAIL;
-    if (!data.ContainFileDescriptors()) {
-        TELEPHONY_LOGW("sent raw data is less than 32k");
-    }
     int32_t callId = data.ReadInt32();
     std::u16string msg = data.ReadString16();
     result = StartRtt(callId, msg);
@@ -1001,9 +860,6 @@ int32_t CallManagerServiceStub::OnStartRtt(MessageParcel &data, MessageParcel &r
 int32_t CallManagerServiceStub::OnStopRtt(MessageParcel &data, MessageParcel &reply)
 {
     int32_t result = TELEPHONY_ERR_FAIL;
-    if (!data.ContainFileDescriptors()) {
-        TELEPHONY_LOGW("sent raw data is less than 32k");
-    }
     int32_t callId = data.ReadInt32();
     result = StopRtt(callId);
     if (!reply.WriteInt32(result)) {
@@ -1048,6 +904,17 @@ int32_t CallManagerServiceStub::OnReportOttCallEventInfo(MessageParcel &data, Me
     result = ReportOttCallEventInfo(*pEventInfo);
     if (!reply.WriteInt32(result)) {
         TELEPHONY_LOGE("ReportOttCallDetailsInfo fail to write parcel");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallManagerServiceStub::OnGetProxyObjectPtr(MessageParcel &data, MessageParcel &reply)
+{
+    CallManagerProxyType proxyType = static_cast<CallManagerProxyType>(data.ReadInt32());
+    sptr<IRemoteObject> objectPtr = GetProxyObjectPtr(proxyType);
+    if (!reply.WriteRemoteObject(objectPtr)) {
+        TELEPHONY_LOGE("OnGetProxyObjectPtr fail to write parcel");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
     return TELEPHONY_SUCCESS;

@@ -18,7 +18,6 @@
 #include <securec.h>
 
 #include "call_manager_errors.h"
-#include "cellular_call_types.h"
 #include "telephony_log_wrapper.h"
 
 namespace OHOS {

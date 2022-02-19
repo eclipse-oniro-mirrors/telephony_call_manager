@@ -16,6 +16,7 @@ import("//build/ohos.gni")
 ohos_executable("tel_call_manager_ui_test") {
   install_enable = true
   sources = [
+    "bluetooth_call_test.cpp",
     "call_manager_callback_test.cpp",
     "common_event_subscriber_test.cpp",
     "ui_client_test.cpp",
