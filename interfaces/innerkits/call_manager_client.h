@@ -85,6 +85,7 @@ public:
     int32_t JoinConference(int32_t callId, std::vector<std::u16string> &numberList);
     int32_t ReportOttCallDetailsInfo(std::vector<OttCallDetailsInfo> &ottVec);
     int32_t ReportOttCallEventInfo(OttCallEventInfo &eventInfo);
+    bool HasVoiceCapability();
 };
 } // namespace Telephony
 } // namespace OHOS

@@ -52,6 +52,7 @@ napi_value NapiCallManager::DeclareCallBasisInterface(napi_env env, napi_value e
         DECLARE_NAPI_FUNCTION("unHoldCall", UnHoldCall),
         DECLARE_NAPI_FUNCTION("switchCall", SwitchCall),
         DECLARE_NAPI_FUNCTION("setCallPreferenceMode", SetCallPreferenceMode),
+        DECLARE_NAPI_FUNCTION("hasVoiceCapability", HasVoiceCapability),
     };
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc));
     return exports;
@@ -1342,6 +1343,14 @@ napi_value NapiCallManager::ReportOttCallEventInfo(napi_env env, napi_callback_i
     }
     return HandleAsyncWork(
         env, asyncContext, "ReportOttCallEventInfo", NativeReportOttCallEventInfo, NativeVoidCallBack);
+}
+
+napi_value NapiCallManager::HasVoiceCapability(napi_env env, napi_callback_info)
+{
+    TELEPHONY_LOGI("napi_call HasVoiceCapability");
+    napi_value result = nullptr;
+    napi_get_boolean(env, DelayedSingleton<CallManagerClient>::GetInstance()->HasVoiceCapability(), &result);
+    return result;
 }
 
 void NapiCallManager::NativeCallBack(napi_env env, napi_status status, void *data)
