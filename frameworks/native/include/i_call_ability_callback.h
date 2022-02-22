@@ -25,6 +25,7 @@ namespace OHOS {
 namespace Telephony {
 class ICallAbilityCallback : public IRemoteBroker {
 public:
+    ICallAbilityCallback() : bundleName_("") {}
     virtual ~ICallAbilityCallback() = default;
 
     virtual int32_t OnCallDetailsChange(const CallAttributeInfo &info) = 0;
@@ -37,9 +38,9 @@ public:
         bundleName_ = name;
     }
 
-    void GetBundleName(std::string &name)
+    std::string GetBundleName()
     {
-        name = bundleName_;
+        return bundleName_;
     }
 
     enum CallManagerCallAbilityCode {
@@ -51,7 +52,7 @@ public:
     };
 
 public:
-    std::string bundleName_ = "";
+    std::string bundleName_;
     DECLARE_INTERFACE_DESCRIPTOR(u"OHOS.Telephony.ICallAbilityCallback");
 };
 } // namespace Telephony

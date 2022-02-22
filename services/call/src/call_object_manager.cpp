@@ -22,7 +22,7 @@ namespace OHOS {
 namespace Telephony {
 std::list<sptr<CallBase>> CallObjectManager::callObjectPtrList_;
 std::mutex CallObjectManager::listMutex_;
-int32_t CallObjectManager::callId_ = kCallStartId;
+int32_t CallObjectManager::callId_ = CALL_START_ID;
 
 CallObjectManager::CallObjectManager()
 {
@@ -45,7 +45,7 @@ int32_t CallObjectManager::AddOneCallObject(sptr<CallBase> &call)
     }
     std::lock_guard<std::mutex> lock(listMutex_);
     std::list<sptr<CallBase>>::iterator it = callObjectPtrList_.begin();
-    for (; it != callObjectPtrList_.end(); it++) {
+    for (; it != callObjectPtrList_.end(); ++it) {
         if ((*it)->GetCallID() == call->GetCallID()) {
             TELEPHONY_LOGE("this call has existed yet!");
             return CALL_ERR_PHONE_CALL_ALREADY_EXISTS;
@@ -61,7 +61,7 @@ int32_t CallObjectManager::DeleteOneCallObject(int32_t callId)
 {
     std::lock_guard<std::mutex> lock(listMutex_);
     std::list<sptr<CallBase>>::iterator it;
-    for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); it++) {
+    for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
         if ((*it)->GetCallID() == callId) {
             callObjectPtrList_.erase(it);
             TELEPHONY_LOGI("DeleteOneCallObject success! call list size:%{public}zu", callObjectPtrList_.size());
@@ -87,7 +87,7 @@ sptr<CallBase> CallObjectManager::GetOneCallObject(int32_t callId)
     sptr<CallBase> retPtr = nullptr;
     std::lock_guard<std::mutex> lock(listMutex_);
     std::list<sptr<CallBase>>::iterator it = CallObjectManager::callObjectPtrList_.begin();
-    for (; it != callObjectPtrList_.end(); it++) {
+    for (; it != callObjectPtrList_.end(); ++it) {
         if ((*it)->GetCallID() == callId) {
             retPtr = *it;
             break;
@@ -105,7 +105,7 @@ sptr<CallBase> CallObjectManager::GetOneCallObject(std::string &phoneNumber)
     sptr<CallBase> retPtr = nullptr;
     std::lock_guard<std::mutex> lock(listMutex_);
     std::list<sptr<CallBase>>::iterator it = callObjectPtrList_.begin();
-    for (; it != callObjectPtrList_.end(); it++) {
+    for (; it != callObjectPtrList_.end(); ++it) {
         if ((*it)->GetAccountNumber() == phoneNumber) {
             TELEPHONY_LOGI("GetOneCallObject success!");
             retPtr = *it;
@@ -119,7 +119,7 @@ int32_t CallObjectManager::HasNewCall()
 {
     std::lock_guard<std::mutex> lock(listMutex_);
     std::list<sptr<CallBase>>::iterator it;
-    for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); it++) {
+    for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
         if ((*it)->GetCallRunningState() == CallRunningState::CALL_RUNNING_STATE_CREATE ||
             (*it)->GetCallRunningState() == CallRunningState::CALL_RUNNING_STATE_CONNECTING ||
             (*it)->GetCallRunningState() == CallRunningState::CALL_RUNNING_STATE_DIALING) {
@@ -136,7 +136,7 @@ bool CallObjectManager::IsNewCallAllowedCreate()
     bool ret = true;
     std::lock_guard<std::mutex> lock(listMutex_);
     std::list<sptr<CallBase>>::iterator it;
-    for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); it++) {
+    for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
         if ((*it)->GetCallRunningState() == CallRunningState::CALL_RUNNING_STATE_CREATE ||
             (*it)->GetCallRunningState() == CallRunningState::CALL_RUNNING_STATE_CONNECTING ||
             (*it)->GetCallRunningState() == CallRunningState::CALL_RUNNING_STATE_DIALING ||
@@ -154,7 +154,7 @@ int32_t CallObjectManager::GetCarrierCallList(std::list<int32_t> &list)
     list.clear();
     std::lock_guard<std::mutex> lock(listMutex_);
     std::list<sptr<CallBase>>::iterator it;
-    for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); it++) {
+    for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
         if ((*it)->GetCallType() == CallType::TYPE_CS || (*it)->GetCallType() == CallType::TYPE_IMS) {
             list.emplace_back((*it)->GetCallID());
         }
@@ -167,13 +167,13 @@ bool CallObjectManager::HasRingingMaximum()
     int32_t ringingCount = 0;
     std::lock_guard<std::mutex> lock(listMutex_);
     std::list<sptr<CallBase>>::iterator it;
-    for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); it++) {
+    for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
         // Count the number of calls in the ringing state
         if ((*it)->GetCallRunningState() == CallRunningState::CALL_RUNNING_STATE_RINGING) {
             ringingCount++;
         }
     }
-    if (ringingCount >= kMaxRingingCallNumberLen) {
+    if (ringingCount >= RINGING_CALL_NUMBER_LEN) {
         return true;
     }
     return false;
@@ -184,13 +184,13 @@ bool CallObjectManager::HasDialingMaximum()
     int32_t dialingCount = 0;
     std::lock_guard<std::mutex> lock(listMutex_);
     std::list<sptr<CallBase>>::iterator it;
-    for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); it++) {
+    for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
         // Count the number of calls in the active state
         if ((*it)->GetCallRunningState() == CallRunningState::CALL_RUNNING_STATE_ACTIVE) {
             dialingCount++;
         }
     }
-    if (dialingCount >= kMaxDialingCallNumberLen) {
+    if (dialingCount >= DIALING_CALL_NUMBER_LEN) {
         return true;
     }
     return false;
@@ -200,7 +200,7 @@ bool CallObjectManager::HasEmergencyCall()
 {
     std::lock_guard<std::mutex> lock(listMutex_);
     std::list<sptr<CallBase>>::iterator it;
-    for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); it++) {
+    for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
         if ((*it)->GetEmergencyState()) {
             return true;
         }
@@ -220,7 +220,7 @@ bool CallObjectManager::IsCallExist(int32_t callId)
 {
     std::lock_guard<std::mutex> lock(listMutex_);
     std::list<sptr<CallBase>>::iterator it = callObjectPtrList_.begin();
-    for (; it != callObjectPtrList_.end(); it++) {
+    for (; it != callObjectPtrList_.end(); ++it) {
         if ((*it)->GetCallID() == callId) {
             TELEPHONY_LOGW("the call is exist.");
             return true;
@@ -236,7 +236,7 @@ bool CallObjectManager::IsCallExist(std::string &phoneNumber)
     }
     std::lock_guard<std::mutex> lock(listMutex_);
     std::list<sptr<CallBase>>::iterator it = callObjectPtrList_.begin();
-    for (; it != callObjectPtrList_.end(); it++) {
+    for (; it != callObjectPtrList_.end(); ++it) {
         if ((*it)->GetAccountNumber() == phoneNumber) {
             return true;
         }
@@ -260,7 +260,7 @@ bool CallObjectManager::HasRingingCall()
     bool ret = false;
     std::lock_guard<std::mutex> lock(listMutex_);
     std::list<sptr<CallBase>>::iterator it;
-    for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); it++) {
+    for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
         // Count the number of calls in the ringing state
         if ((*it)->GetCallRunningState() == CallRunningState::CALL_RUNNING_STATE_RINGING) {
             ret = true;
@@ -275,7 +275,7 @@ TelCallState CallObjectManager::GetCallState(int32_t callId)
     TelCallState retState = TelCallState::CALL_STATUS_IDLE;
     std::lock_guard<std::mutex> lock(listMutex_);
     std::list<sptr<CallBase>>::iterator it = CallObjectManager::callObjectPtrList_.begin();
-    for (; it != callObjectPtrList_.end(); it++) {
+    for (; it != callObjectPtrList_.end(); ++it) {
         if ((*it)->GetCallID() == callId) {
             retState = (*it)->GetTelCallState();
             break;
@@ -288,7 +288,7 @@ sptr<CallBase> CallObjectManager::GetOneCallObject(CallRunningState callState)
 {
     std::lock_guard<std::mutex> lock(listMutex_);
     std::list<sptr<CallBase>>::reverse_iterator it;
-    for (it = callObjectPtrList_.rbegin(); it != callObjectPtrList_.rend(); it++) {
+    for (it = callObjectPtrList_.rbegin(); it != callObjectPtrList_.rend(); ++it) {
         if ((*it)->GetCallRunningState() == callState) {
             return (*it);
         }
@@ -300,7 +300,7 @@ bool CallObjectManager::IsCallExist(CallType callType, TelCallState callState)
 {
     std::lock_guard<std::mutex> lock(listMutex_);
     std::list<sptr<CallBase>>::iterator it;
-    for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); it++) {
+    for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
         if ((*it)->GetCallType() == callType && (*it)->GetTelCallState() == callState) {
             return true;
         }
@@ -313,13 +313,87 @@ bool CallObjectManager::IsCallExist(TelCallState callState)
 {
     std::lock_guard<std::mutex> lock(listMutex_);
     std::list<sptr<CallBase>>::iterator it;
-    for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); it++) {
+    for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
         if ((*it)->GetTelCallState() == callState) {
             return true;
         }
     }
     TELEPHONY_LOGI("the call is does not exist.");
     return false;
+}
+
+bool CallObjectManager::IsCallExist(TelCallState callState, int32_t &callId)
+{
+    std::lock_guard<std::mutex> lock(listMutex_);
+    std::list<sptr<CallBase>>::iterator it;
+    for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
+        if ((*it)->GetTelCallState() == callState) {
+            callId = (*it)->GetCallID();
+            return true;
+        }
+    }
+    TELEPHONY_LOGI("the call is does not exist.");
+    return false;
+}
+
+bool CallObjectManager::IsConferenceCallExist(TelConferenceState state, int32_t &callId)
+{
+    std::lock_guard<std::mutex> lock(listMutex_);
+    std::list<sptr<CallBase>>::iterator it;
+    for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
+        if ((*it)->GetTelConferenceState() == state) {
+            callId = (*it)->GetCallID();
+            return true;
+        }
+    }
+    TELEPHONY_LOGI("the call is does not exist.");
+    return false;
+}
+
+int32_t CallObjectManager::GetCallNum(TelCallState callState)
+{
+    int32_t num = 0;
+    std::lock_guard<std::mutex> lock(listMutex_);
+    std::list<sptr<CallBase>>::iterator it;
+    for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
+        if ((*it)->GetTelCallState() == callState) {
+            ++num;
+            continue;
+        }
+    }
+    TELEPHONY_LOGI("callState:%{public}d, num:%{public}d", callState, num);
+    return num;
+}
+
+std::string CallObjectManager::GetCallNumber(TelCallState callState)
+{
+    std::string number = "";
+    std::lock_guard<std::mutex> lock(listMutex_);
+    std::list<sptr<CallBase>>::iterator it;
+    for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
+        if ((*it)->GetTelCallState() == callState) {
+            number = (*it)->GetAccountNumber();
+            break;
+        }
+    }
+    return number;
+}
+
+std::vector<CallAttributeInfo> CallObjectManager::GetCallInfoList(int32_t slotId)
+{
+    std::vector<CallAttributeInfo> callVec;
+    CallAttributeInfo info;
+    callVec.clear();
+    std::lock_guard<std::mutex> lock(listMutex_);
+    std::list<sptr<CallBase>>::iterator it;
+    for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
+        (void)memset_s(&info, sizeof(CallAttributeInfo), 0, sizeof(CallAttributeInfo));
+        (*it)->GetCallAttributeInfo(info);
+        if (info.accountId == slotId && info.callType != CallType::TYPE_OTT) {
+            callVec.emplace_back(info);
+        }
+    }
+    return callVec;
 }
 } // namespace Telephony
 } // namespace OHOS

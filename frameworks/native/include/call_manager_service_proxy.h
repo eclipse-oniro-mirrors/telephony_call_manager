@@ -567,9 +567,17 @@ public:
      */
     int32_t ReportOttCallEventInfo(OttCallEventInfo &eventInfo) override;
 
+    /**
+     * GetProxyObjectPtr
+     *
+     * @brief get callManager proxy object ptr
+     * @param proxyType[in], proxy type
+     * @return Returns nullptr on failure, others on success.
+     */
+    sptr<IRemoteObject> GetProxyObjectPtr(CallManagerProxyType proxyType) override;
+
 private:
     static inline BrokerDelegator<CallManagerServiceProxy> delegator_;
-    static constexpr HiviewDFX::HiLogLabel LOG_LABEL = {LOG_CORE, LOG_DOMAIN, "CallManager"};
 };
 } // namespace Telephony
 } // namespace OHOS

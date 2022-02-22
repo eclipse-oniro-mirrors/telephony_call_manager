@@ -36,6 +36,7 @@ void CallDataRdbObserver::OnChange()
     std::shared_ptr<CallDataBaseHelper> callDataPtr = DelayedSingleton<CallDataBaseHelper>::GetInstance();
     if (callDataPtr == nullptr) {
         TELEPHONY_LOGE("callDataPtr is nullptr!");
+        return;
     }
 
     NativeRdb::DataAbilityPredicates predicates;

@@ -337,7 +337,7 @@ bool CallRequestProcess::IsFdnNumber(std::vector<std::u16string> fdnNumberList, 
             number[j++] = *(phoneNumber.c_str() + i);
         }
     }
-    for (std::vector<std::u16string>::iterator it = fdnNumberList.begin(); it != fdnNumberList.end(); it++) {
+    for (std::vector<std::u16string>::iterator it = fdnNumberList.begin(); it != fdnNumberList.end(); ++it) {
         if (strstr(number, Str16ToStr8(*it).c_str()) != nullptr) {
             TELEPHONY_LOGI("you are allowed to dial!");
             return true;

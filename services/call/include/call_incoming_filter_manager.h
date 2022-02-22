@@ -22,7 +22,6 @@
 
 #include "call_base.h"
 #include "call_status_policy.h"
-#include "cellular_call_types.h"
 #include "call_data_base_helper.h"
 
 namespace OHOS {

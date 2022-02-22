@@ -21,6 +21,7 @@
 #include "telephony_log_wrapper.h"
 #include "telephony_permission.h"
 
+#include "bluetooth_call_service.h"
 #include "call_ability_report_proxy.h"
 #include "call_manager_dump_helper.h"
 #include "report_call_info_handler.h"
@@ -56,12 +57,6 @@ bool CallManagerService::Init()
         TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");
         return false;
     }
-    bluetoothCallManagerPtr_ = DelayedSingleton<BluetoothCallManager>::GetInstance();
-    if (bluetoothCallManagerPtr_ == nullptr) {
-        TELEPHONY_LOGE("bluetoothCallManagerPtr_ is nullptr!");
-        return false;
-    }
-    DelayedSingleton<BluetoothCallManager>::GetInstance()->Init();
     DelayedSingleton<ReportCallInfoHandlerService>::GetInstance()->Start();
     DelayedSingleton<CellularCallConnection>::GetInstance()->Init(TELEPHONY_CELLULAR_CALL_SYS_ABILITY_ID);
     DelayedSingleton<CallRecordsManager>::GetInstance()->Init();
@@ -764,7 +759,7 @@ int32_t CallManagerService::ReportOttCallDetailsInfo(std::vector<OttCallDetailsI
     detailInfo.index = ERR_ID;
     detailInfo.voiceDomain = ERR_ID;
     std::vector<OttCallDetailsInfo>::iterator it = ottVec.begin();
-    for (; it != ottVec.end(); it++) {
+    for (; it != ottVec.end(); ++it) {
         detailInfo.callMode = (*it).videoState;
         detailInfo.state = (*it).callState;
         (void)memcpy_s(detailInfo.phoneNum, kMaxNumberLen, (*it).phoneNum, kMaxNumberLen);
@@ -789,6 +784,33 @@ int32_t CallManagerService::ReportOttCallEventInfo(OttCallEventInfo &eventInfo)
         TELEPHONY_LOGI("UpdateOttEventInfo success!");
     }
     return ret;
+}
+
+sptr<IRemoteObject> CallManagerService::GetProxyObjectPtr(CallManagerProxyType proxyType)
+{
+    auto it = proxyObjectPtrMap_.find(static_cast<uint32_t>(proxyType));
+    if (it != proxyObjectPtrMap_.end()) {
+        TELEPHONY_LOGI("GetProxyObjectPtr success! proxyType:%{public}d", proxyType);
+        return it->second;
+    } else {
+        switch (proxyType) {
+            case PROXY_BLUETOOTH_CALL: {
+                sptr<BluetoothCallService> ptr = (std::make_unique<BluetoothCallService>()).release();
+                if (ptr == nullptr) {
+                    TELEPHONY_LOGE("create BluetoothCallService object failed!");
+                    return nullptr;
+                }
+                proxyObjectPtrMap_[proxyType] = ptr->AsObject().GetRefPtr();
+                TELEPHONY_LOGI("create BluetoothCallService object success! proxyType:%{public}d", proxyType);
+                return ptr->AsObject().GetRefPtr();
+            }
+            default:
+                TELEPHONY_LOGE("invalid proxyType!");
+                break;
+        }
+    }
+    TELEPHONY_LOGE("GetProxyObjectPtr failed! proxyType:%{public}d", proxyType);
+    return nullptr;
 }
 
 int32_t CallManagerService::CheckBundleName(std::string bundleName)

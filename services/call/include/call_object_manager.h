@@ -26,6 +26,7 @@
 
 #include "call_base.h"
 #include "common_type.h"
+#include "call_manager_inner_type.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -54,7 +55,11 @@ public:
     static sptr<CallBase> GetOneCallObject(CallRunningState callState);
     static bool IsCallExist(CallType type, TelCallState callState);
     static bool IsCallExist(TelCallState callState);
-
+    static bool IsCallExist(TelCallState callState, int32_t &callId);
+    static bool IsConferenceCallExist(TelConferenceState state, int32_t &callId);
+    static int32_t GetCallNum(TelCallState callState);
+    static std::string GetCallNumber(TelCallState callState);
+    static std::vector<CallAttributeInfo> GetCallInfoList(int32_t slotId);
 private:
     static std::list<sptr<CallBase>> callObjectPtrList_;
     static std::mutex listMutex_;

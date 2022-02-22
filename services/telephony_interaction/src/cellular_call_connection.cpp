@@ -45,8 +45,10 @@ void CellularCallConnection::Init(int32_t systemAbilityId)
     systemAbilityId_ = systemAbilityId;
     int32_t result = ConnectService();
     if (result != TELEPHONY_SUCCESS) {
+#ifdef CELLULAR_SUPPORT
         TELEPHONY_LOGE("connect service failed,errCode: %{public}X", result);
         Timer::start(CONNECT_SERVICE_WAIT_TIME, CellularCallConnection::task);
+#endif
         return;
     }
     TELEPHONY_LOGI("connected to cellular call service successfully!");
@@ -135,6 +137,7 @@ void CellularCallConnection::DisconnectService()
 
 int32_t CellularCallConnection::ReConnectService()
 {
+#ifdef CELLULAR_SUPPORT
     if (cellularCallInterfacePtr_ == nullptr) {
         TELEPHONY_LOGI("try to reconnect cellular call service now...");
         int32_t result = ConnectService();
@@ -143,6 +146,7 @@ int32_t CellularCallConnection::ReConnectService()
             return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
         }
     }
+#endif
     return TELEPHONY_SUCCESS;
 }
 

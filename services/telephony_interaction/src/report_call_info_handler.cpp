@@ -275,7 +275,7 @@ int32_t ReportCallInfoHandlerService::UpdateDisconnectedCause(const Disconnected
     if (!ret) {
         TELEPHONY_LOGE("SendEvent failed! DisconnectedDetails:%{public}d", cause);
     }
-    TELEPHONY_LOGE("UpdateDisconnectedCause success, cause:%{public}d", cause);
+    TELEPHONY_LOGI("UpdateDisconnectedCause success, cause:%{public}d", cause);
     return TELEPHONY_SUCCESS;
 }
 

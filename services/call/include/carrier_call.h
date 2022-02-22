@@ -16,8 +16,6 @@
 #ifndef CARRIER_CALL_H
 #define CARRIER_CALL_H
 
-#include "cellular_call_types.h"
-
 #include "call_base.h"
 #include "cellular_call_connection.h"
 

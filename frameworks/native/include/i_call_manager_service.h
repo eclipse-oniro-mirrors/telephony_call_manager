@@ -86,6 +86,11 @@ enum CallManagerSurfaceCode {
     INTERFACE_JOIN_CONFERENCE,
     INTERFACE_REPORT_OTT_CALL_DETAIL_INFO,
     INTERFACE_REPORT_OTT_CALL_EVENT_INFO,
+    INTERFACE_GET_PROXY_OBJECT_PTR,
+};
+
+enum CallManagerProxyType {
+    PROXY_BLUETOOTH_CALL = 0,
 };
 } // end extern
 
@@ -150,6 +155,7 @@ public:
     virtual int32_t JoinConference(int32_t callId, std::vector<std::u16string> &numberList) = 0;
     virtual int32_t ReportOttCallDetailsInfo(std::vector<OttCallDetailsInfo> &ottVec) = 0;
     virtual int32_t ReportOttCallEventInfo(OttCallEventInfo &eventInfo) = 0;
+    virtual sptr<IRemoteObject> GetProxyObjectPtr(CallManagerProxyType proxyType) = 0;
 
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"OHOS.Telephony.ICallManagerService");

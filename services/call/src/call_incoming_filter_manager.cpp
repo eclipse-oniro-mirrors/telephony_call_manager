@@ -62,6 +62,7 @@ void CallIncomingFilterManager::UpdateIncomingFilterData()
     std::shared_ptr<CallDataBaseHelper> callDataPtr = DelayedSingleton<CallDataBaseHelper>::GetInstance();
     if (callDataPtr == nullptr) {
         TELEPHONY_LOGE("callDataPtr is nullptr!");
+        return;
     }
     NativeRdb::DataAbilityPredicates predicates;
     predicates.NotEqualTo("phone_number", std::string(""));

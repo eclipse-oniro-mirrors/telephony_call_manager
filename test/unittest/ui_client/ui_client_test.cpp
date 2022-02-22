@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+#include <memory>
 #include <securec.h>
 #include <string_ex.h>
 
@@ -24,59 +25,24 @@
 #include "call_manager_client.h"
 
 #include "audio_player.h"
+#include "bluetooth_call_test.h"
 #include "call_manager_inner_type.h"
 #include "call_manager_errors.h"
 #include "call_manager_callback_test.h"
+#include "call_manager_test_types.h"
 #include "common_event_subscriber_test.h"
 
 namespace OHOS {
 namespace Telephony {
+enum class CallManagerInterfaceType {
+    INTERFACE_CALL_MANAGER_TYPE = 1,
+    INTERFACE_BLUETOOTH_CALL_TYPE,
+};
+
 std::shared_ptr<CallManagerClient> g_clientPtr = nullptr;
 using CallManagerServiceFunc = void (*)();
 std::map<uint32_t, CallManagerServiceFunc> g_memberFuncMap;
 std::vector<Security::Permission::PermissionDef> permDefList;
-constexpr int16_t MIN_VOLUME = 0;
-constexpr int16_t MAX_VOLUME = 15;
-constexpr int16_t READ_SIZE = 1;
-constexpr int16_t MIN_BYTES = 4;
-constexpr int16_t RING_PATH_MAX_LENGTH = 100;
-constexpr int16_t SIM1_SLOTID = 0;
-constexpr int16_t DEFAULT_ACCOUNT_ID = 0;
-constexpr int16_t DEFAULT_VIDEO_STATE = 0;
-constexpr int16_t DEFAULT_DIAL_SCENE = 0;
-constexpr int16_t DEFAULT_DIAL_TYPE = 0;
-constexpr int16_t DEFAULT_CALL_TYPE = 0;
-constexpr int16_t DEFAULT_CALL_ID = 0;
-constexpr int16_t DEFAULT_VALUE = 0;
-constexpr size_t DEFAULT_SIZE = 0;
-constexpr int16_t WINDOWS_X_START = 0;
-constexpr int16_t WINDOWS_Y_START = 0;
-constexpr int16_t WINDOWS_Z_ERROR = -1;
-constexpr int16_t WINDOWS_Z_TOP = 1;
-constexpr int16_t WINDOWS_Z_BOTTOM = 0;
-constexpr int16_t WINDOWS_WIDTH = 200;
-constexpr int16_t WINDOWS_HEIGHT = 200;
-constexpr size_t DEFAULT_PREFERENCEMODE = 3;
-constexpr int16_t EVENT_BLUETOOTH_SCO_CONNECTED_CODE = 0;
-constexpr int16_t EVENT_BLUETOOTH_SCO_DISCONNECTED_CODE = 1;
-const std::string EVENT_BLUETOOTH_SCO_CONNECTED = "usual.event.BLUETOOTH_SCO_CONNECTED";
-const std::string EVENT_BLUETOOTH_SCO_DISCONNECTED = "usual.event.BLUETOOTH_SCO_DISCONNECTED";
-constexpr size_t DEFAULT_NET_TYPE = 0;
-constexpr size_t DEFAULT_ITEM_VALUE = 0;
-const int32_t DEFINE_INIT_PERMISSIONS = 93;
-const int32_t DEFINE_VERIFY_PERMISSIONS = 94;
-const int32_t DEFINE_CONNECT_BT_SCO = 95;
-const int32_t DEFINE_DISCONNECT_BT_SCO = 96;
-const int32_t DEFINE_SUBSCRIBERCOMMON_EVENT = 97;
-const std::string TEST_BUNDLE_NAME = "com.ohos.callManagerTest";
-const std::string CALL_UI_BUNDLE_NAME = "com.ohos.videocall";
-const std::string TEST_PERMISSION_NAME_CAMERA = "ohos.permission.camera";
-const std::string TEST_LABEL = "test label";
-const std::string TEST_DESCRIPTION = "test description";
-
-const int32_t TEST_LABEL_ID = 9527;
-const int32_t TEST_DESCRIPTION_ID = 9528;
-const int32_t TEST_USER_ID = 0;
 
 void DialCall()
 {
@@ -559,7 +525,7 @@ void GetSubCallIdList()
     std::cin >> callId;
     std::vector<std::u16string> ret = g_clientPtr->GetSubCallIdList(callId);
     std::vector<std::u16string>::iterator it = ret.begin();
-    for (; it != ret.end(); it++) {
+    for (; it != ret.end(); ++it) {
         std::cout << "callId:" << Str16ToStr8(*it) << std::endl;
     }
 }
@@ -571,7 +537,7 @@ void GetCallIdListForConference()
     std::cin >> callId;
     std::vector<std::u16string> ret = g_clientPtr->GetCallIdListForConference(callId);
     std::vector<std::u16string>::iterator it = ret.begin();
-    for (; it != ret.end(); it++) {
+    for (; it != ret.end(); ++it) {
         std::cout << "callId:" << Str16ToStr8(*it) << std::endl;
     }
 }
@@ -893,32 +859,6 @@ void SubscribeCommonEvent()
     // subscribe a common event
     bool result = OHOS::EventFwk::CommonEventManager::SubscribeCommonEvent(subscriberTest);
     std::cout << "subscribe common event : " << eventType << ", result : " << result << std::endl;
-}
-
-void SendConnectBluetoothScoBroadcast()
-{
-    AAFwk::Want want;
-    want.SetAction(EVENT_BLUETOOTH_SCO_CONNECTED);
-    EventFwk::CommonEventData data;
-    data.SetWant(want);
-    data.SetCode(EVENT_BLUETOOTH_SCO_CONNECTED_CODE);
-    OHOS::EventFwk::CommonEventPublishInfo publishInfo;
-    publishInfo.SetOrdered(true);
-    bool result = EventFwk::CommonEventManager::PublishCommonEvent(data, publishInfo, nullptr);
-    std::cout << "publish common event : EVENT_BLUETOOTH_SCO_CONNECTED , result : " << result << std::endl;
-}
-
-void SendDisconnectBluetoothScoBroadcast()
-{
-    AAFwk::Want want;
-    want.SetAction(EVENT_BLUETOOTH_SCO_DISCONNECTED);
-    EventFwk::CommonEventData data;
-    data.SetWant(want);
-    data.SetCode(EVENT_BLUETOOTH_SCO_DISCONNECTED_CODE);
-    OHOS::EventFwk::CommonEventPublishInfo publishInfo;
-    publishInfo.SetOrdered(true);
-    bool result = EventFwk::CommonEventManager::PublishCommonEvent(data, publishInfo, nullptr);
-    std::cout << "publish common event : EVENT_BLUETOOTH_SCO_DISCONNECTED , result : " << result << std::endl;
 }
 
 void GetImsConfig()
@@ -1318,13 +1258,6 @@ void InitImsServicePower()
         &OHOS::Telephony::IsLteEnhanceModeEnabled;
 }
 
-void InitBluetooth()
-{
-    g_memberFuncMap[DEFINE_CONNECT_BT_SCO] = &OHOS::Telephony::SendConnectBluetoothScoBroadcast;
-    g_memberFuncMap[DEFINE_DISCONNECT_BT_SCO] = &OHOS::Telephony::SendDisconnectBluetoothScoBroadcast;
-    g_memberFuncMap[DEFINE_SUBSCRIBERCOMMON_EVENT] = &OHOS::Telephony::SubscribeCommonEvent;
-}
-
 int32_t Init()
 {
     g_clientPtr = DelayedSingleton<CallManagerClient>::GetInstance();
@@ -1335,7 +1268,7 @@ int32_t Init()
     g_clientPtr->Init(TELEPHONY_CALL_MANAGER_SYS_ABILITY_ID);
     std::unique_ptr<CallManagerCallbackTest> callbackPtr = std::make_unique<CallManagerCallbackTest>();
     if (callbackPtr == nullptr) {
-        std::cout << "make_unique NapiCallManagerCallback failed!" << std::endl;
+        std::cout << "make_unique CallManagerCallbackTest failed!" << std::endl;
         return TELEPHONY_ERROR;
     }
     int32_t ret = g_clientPtr->RegisterCallBack(std::move(callbackPtr));
@@ -1467,44 +1400,79 @@ int32_t mainExit()
     std::cout << "exit success" << std::endl;
     return OHOS::Telephony::TELEPHONY_SUCCESS;
 }
-} // namespace Telephony
-} // namespace OHOS
 
-int32_t main()
+int32_t RunTest()
 {
     std::cout << "callManager test start...." << std::endl;
-    int32_t interfaceNum = OHOS::Telephony::DEFAULT_VALUE;
+    int32_t interfaceNum = DEFAULT_VALUE;
     const int32_t exitNumber = 1000;
     const int32_t getVolumeNumber = 98;
     const int32_t setVolumeNumber = 99;
     const int32_t playRingtoneNumber = 100;
-    if (OHOS::Telephony::Init() != OHOS::Telephony::TELEPHONY_SUCCESS) {
+    if (Init() != TELEPHONY_SUCCESS) {
         std::cout << "callManager test init failed!" << std::endl;
-        return OHOS::Telephony::TELEPHONY_SUCCESS;
+        return TELEPHONY_SUCCESS;
     }
     while (true) {
-        OHOS::Telephony::PrintfUsage();
+        PrintfUsage();
         std::cin >> interfaceNum;
         if (interfaceNum == exitNumber) {
             std::cout << "start to exit now...." << std::endl;
             break;
         } else if (interfaceNum == playRingtoneNumber) {
-            OHOS::Telephony::PlayRingtone();
+            PlayRingtone();
             continue;
         } else if (interfaceNum == setVolumeNumber) {
-            OHOS::Telephony::SetVolume();
+            SetVolume();
             continue;
         } else if (interfaceNum == getVolumeNumber) {
-            OHOS::Telephony::GetVolume();
+            GetVolume();
             continue;
         }
-        auto itFunc = OHOS::Telephony::g_memberFuncMap.find(interfaceNum);
-        if (itFunc != OHOS::Telephony::g_memberFuncMap.end() && itFunc->second != nullptr) {
+        auto itFunc = g_memberFuncMap.find(interfaceNum);
+        if (itFunc != g_memberFuncMap.end() && itFunc->second != nullptr) {
             auto memberFunc = itFunc->second;
             (*memberFunc)();
             continue;
         }
         std::cout << "err: invalid input!" << std::endl;
     }
-    return OHOS::Telephony::mainExit();
+    return mainExit();
+}
+} // namespace Telephony
+} // namespace OHOS
+
+int32_t main()
+{
+    int32_t code = OHOS::Telephony::DEFAULT_VALUE;
+    const int32_t exitCode = 1000;
+    std::cout << "Please select interface type...." << std::endl;
+    while (true) {
+        std::cout << "1:callManager interface\n"
+            << "2:bluetooth call interface\n"
+            << "1000:exit\n";
+        std::cin >> code;
+        switch (code) {
+            case static_cast<int32_t>(OHOS::Telephony::CallManagerInterfaceType::INTERFACE_CALL_MANAGER_TYPE):
+                OHOS::Telephony::RunTest();
+                OHOS::Telephony::mainExit();
+                break;
+            case static_cast<int32_t>(OHOS::Telephony::CallManagerInterfaceType::INTERFACE_BLUETOOTH_CALL_TYPE): {
+                std::unique_ptr<OHOS::Telephony::BluetoothCallTest> testPtr =
+                    std::make_unique<OHOS::Telephony::BluetoothCallTest>();
+                if (testPtr != nullptr) {
+                    testPtr->Init();
+                    testPtr->RunBluetoothCallTest();
+                }
+                break;
+            }
+            default:
+                std::cout << "invalid input" << std::endl;
+                break;
+        }
+        if (code == exitCode) {
+            break;
+        }
+    }
+    return OHOS::Telephony::TELEPHONY_SUCCESS;
 }

@@ -26,8 +26,6 @@
 namespace OHOS {
 namespace Telephony {
 BtScoState BluetoothConnection::btScoState_ = BtScoState::SCO_STATE_DISCONNECTED;
-const std::string BluetoothConnection::EVENT_BLUETOOTH_SCO_CONNECTED = "usual.event.BLUETOOTH_SCO_CONNECTED";
-const std::string BluetoothConnection::EVENT_BLUETOOTH_SCO_DISCONNECTED = "usual.event.BLUETOOTH_SCO_DISCONNECTED";
 
 BluetoothConnection::BluetoothConnection() : connectedScoAddr_("") {}
 
@@ -96,6 +94,20 @@ bool BluetoothConnection::IsBtScoConnected()
 void BluetoothConnection::SetBtScoState(BtScoState state)
 {
     btScoState_ = state;
+}
+
+int32_t BluetoothConnection::SendBtCallState(
+    int32_t numActive, int32_t numHeld, int32_t callState, const std::string &number)
+{
+#ifdef ABILITY_BLUETOOTH_SUPPORT
+    std::string nickName = "";
+    constexpr int32_t numberType = 0x81;
+    Bluetooth::HandsFreeAudioGateway.GetProfile()->
+        PhoneStateChanged(numActive, numHeld, callState, number, numberType, nickName);
+#endif
+    TELEPHONY_LOGI("PhoneStateChanged,numActive:%{public}d,numHeld:%{public}d,callState:%{public}d",
+        numActive, numHeld, callState);
+    return TELEPHONY_SUCCESS;
 }
 
 BtScoState BluetoothConnection::GetBtScoState()

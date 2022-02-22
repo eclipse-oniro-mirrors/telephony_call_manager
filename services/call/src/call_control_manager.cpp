@@ -76,7 +76,6 @@ bool CallControlManager::Init()
         return false;
     }
     DelayedSingleton<AudioControlManager>::GetInstance()->Init();
-    DelayedSingleton<BluetoothCallManager>::GetInstance()->Init();
     CallStateObserve();
     return true;
 }

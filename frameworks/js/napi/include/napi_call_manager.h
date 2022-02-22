@@ -52,6 +52,24 @@ public:
     static napi_value DeclareCallRestrictionEnum(napi_env env, napi_value exports);
     static napi_value DeclareCallWaitingEnum(napi_env env, napi_value exports);
     static napi_value DeclareCallTransferEnum(napi_env env, napi_value exports);
+    // Enumeration type extension
+    static napi_value DeclareAudioDeviceEnum(napi_env env, napi_value exports);
+    static napi_value DeclareVideoStateTypeEnum(napi_env env, napi_value exports);
+    static napi_value DeclareImsCallModeEnum(napi_env env, napi_value exports);
+    static napi_value DeclareDialSceneEnum(napi_env env, napi_value exports);
+    static napi_value DeclareCallTypeEnum(napi_env env, napi_value exports);
+    static napi_value DeclareDialTypeEnum(napi_env env, napi_value exports);
+    static napi_value DeclareTelCallStateEnum(napi_env env, napi_value exports);
+    static napi_value DeclareConferenceStateEnum(napi_env env, napi_value exports);
+    static napi_value DeclareCallStateToAppEnum(napi_env env, napi_value exports);
+    static napi_value DeclareCallEventEnumEx(napi_env env, napi_value exports);
+    static napi_value DeclareRestrictionTypeEnum(napi_env env, napi_value exports);
+    static napi_value DeclareRestrictionModeEnum(napi_env env, napi_value exports);
+    static napi_value DeclareRestrictionStatusEnum(napi_env env, napi_value exports);
+    static napi_value DeclareCallWaitingEnumEx(napi_env env, napi_value exports);
+    static napi_value DeclareTransferStatusEnum(napi_env env, napi_value exports);
+    static napi_value DeclareTransferTypeEnum(napi_env env, napi_value exports);
+    static napi_value DeclareTransferSettingTypeEnum(napi_env env, napi_value exports);
     static napi_value RegisterCallManagerFunc(napi_env env, napi_value exports);
     static napi_value DialCall(napi_env env, napi_callback_info info);
     static napi_value AnswerCall(napi_env env, napi_callback_info info);

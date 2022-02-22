@@ -39,7 +39,6 @@ private:
 
 private:
     static inline BrokerDelegator<CallAbilityCallbackProxy> delegator_;
-    static constexpr HiviewDFX::HiLogLabel LOG_LABEL = {LOG_CORE, LOG_DOMAIN, "CallManager"};
 };
 } // namespace Telephony
 } // namespace OHOS

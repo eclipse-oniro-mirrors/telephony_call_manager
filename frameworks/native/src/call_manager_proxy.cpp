@@ -547,7 +547,7 @@ bool CallManagerProxy::IsRinging()
 {
     if (ReConnectService() != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("ipc reconnect failed!");
-        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+        return false;
     }
     std::lock_guard<std::mutex> lock(mutex_);
     return callManagerServicePtr_->IsRinging();
@@ -557,7 +557,7 @@ bool CallManagerProxy::HasCall()
 {
     if (ReConnectService() != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("ipc reconnect failed!");
-        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+        return false;
     }
     std::lock_guard<std::mutex> lock(mutex_);
     return callManagerServicePtr_->HasCall();
@@ -567,7 +567,7 @@ bool CallManagerProxy::IsNewCallAllowed()
 {
     if (ReConnectService() != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("ipc reconnect failed!");
-        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+        return false;
     }
     std::lock_guard<std::mutex> lock(mutex_);
     return callManagerServicePtr_->IsNewCallAllowed();
@@ -577,7 +577,7 @@ bool CallManagerProxy::IsInEmergencyCall()
 {
     if (ReConnectService() != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("ipc reconnect failed!");
-        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+        return false;
     }
     std::lock_guard<std::mutex> lock(mutex_);
     return callManagerServicePtr_->IsInEmergencyCall();
@@ -587,7 +587,7 @@ bool CallManagerProxy::IsEmergencyPhoneNumber(std::u16string &number, int32_t sl
 {
     if (ReConnectService() != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("ipc reconnect failed!");
-        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+        return false;
     }
     std::lock_guard<std::mutex> lock(mutex_);
     return callManagerServicePtr_->IsEmergencyPhoneNumber(number, slotId, errorCode);
@@ -998,6 +998,21 @@ int32_t CallManagerProxy::ReportOttCallEventInfo(OttCallEventInfo &eventInfo)
         return errCode;
     }
     return TELEPHONY_SUCCESS;
+}
+
+sptr<IRemoteObject> CallManagerProxy::GetProxyObjectPtr(CallManagerProxyType proxyType)
+{
+    if (ReConnectService() != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("ipc reconnect failed!");
+        return nullptr;
+    }
+    std::lock_guard<std::mutex> lock(mutex_);
+    sptr<IRemoteObject> ptr = callManagerServicePtr_->GetProxyObjectPtr(proxyType);
+    if (ptr == nullptr) {
+        TELEPHONY_LOGE("GetProxyObjectPtr failed");
+        return nullptr;
+    }
+    return ptr;
 }
 } // namespace Telephony
 } // namespace OHOS
