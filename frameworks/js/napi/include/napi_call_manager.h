@@ -106,6 +106,7 @@ public:
     static napi_value IsLteEnhanceModeEnabled(napi_env env, napi_callback_info info);
     static napi_value ReportOttCallDetailsInfo(napi_env env, napi_callback_info info);
     static napi_value ReportOttCallEventInfo(napi_env env, napi_callback_info info);
+    static napi_value HasVoiceCapability(napi_env env, napi_callback_info info);
 
 private:
     static void RegisterCallBack();

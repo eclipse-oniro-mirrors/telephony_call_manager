@@ -21,9 +21,14 @@
 
 #include "call_manager_proxy.h"
 
+#include "parameter.h"
+
 namespace OHOS {
 namespace Telephony {
 std::shared_ptr<CallManagerProxy> g_callManagerProxy = nullptr;
+
+const std::string KEY_VOICECALL_CAP = "const.telephony.voice.capable";
+const int32_t VOICECALL_CAP_VAL_LEN = 6;
 
 CallManagerClient::CallManagerClient() {}
 
@@ -615,6 +620,17 @@ int32_t CallManagerClient::ReportOttCallEventInfo(OttCallEventInfo &eventInfo)
         TELEPHONY_LOGE("init first please!");
         return TELEPHONY_ERR_UNINIT;
     }
+}
+
+bool CallManagerClient::HasVoiceCapability()
+{
+    char retValue[VOICECALL_CAP_VAL_LEN + 1] = {"true"};
+    int retLen = GetParameter(KEY_VOICECALL_CAP.c_str(), "true", retValue, VOICECALL_CAP_VAL_LEN);
+    TELEPHONY_LOGI("HasVoiceCapability retValue %{public}s, retLen %{public}d", retValue, retLen);
+    if (strcmp(retValue, "false") == 0) {
+        return false;
+    }
+    return true;
 }
 } // namespace Telephony
 } // namespace OHOS
