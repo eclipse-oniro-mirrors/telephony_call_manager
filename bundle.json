@@ -58,9 +58,9 @@
         "build": {
             "sub_component": [
                 "//base/telephony/call_manager:tel_call_manager",
-                "//base/telephony/call_manager/test/unittest/ui_client/:tel_call_manager_ui_test",
                 "//base/telephony/call_manager/sa_profile:call_manager_sa_profile",
-                "//base/telephony/call_manager/frameworks/js:call"
+                "//base/telephony/call_manager/frameworks/js:call",
+                "//base/telephony/call_manager/resource/audio:ring.wav"
             ],
             "inner_kits": [
                 {

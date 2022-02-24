@@ -18,7 +18,7 @@
 
 #include "call_state_listener_base.h"
 
-#include "short_message_manager.h"
+#include "sms_service_manager_client.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -33,7 +33,6 @@ public:
     void CallStateUpdated(sptr<CallBase> &callObjectPtr, TelCallState priorState, TelCallState nextState) override;
 
 private:
-    std::unique_ptr<ShortMessageManager> msgManager_;
     void SendMessage(int32_t slotId, const std::u16string &desAddr, const std::u16string &text);
     std::u16string ConvertToUtf16(const std::string &str);
 };

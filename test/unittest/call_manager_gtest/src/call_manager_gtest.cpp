@@ -1177,7 +1177,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_FormatPhoneNumberToE164_0700, F
 /********************************************* Test SetCallWaiting() ***********************************************/
 /**
  * @tc.number   Telephony_CallManager_SetCallWaiting_0100
- * @tc.name     test SetCallWaiting
+ * @tc.name     input slotId 0, test SetCallWaiting() enable callWaiting
  * @tc.desc     Function test
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallWaiting_0100, Function | MediumTest | Level3)
@@ -1192,7 +1192,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallWaiting_0100, Function |
 /********************************************* Test SetCallWaiting() ***********************************************/
 /**
  * @tc.number   Telephony_CallManager_SetCallWaiting_0200
- * @tc.name     test SetCallWaiting
+ * @tc.name     input slotId 0, test SetCallWaiting() disable callWaiting
  * @tc.desc     Function test
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallWaiting_0200, Function | MediumTest | Level3)
@@ -1207,7 +1207,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallWaiting_0200, Function |
 /******************************************* Test GetCallRestriction() ********************************************/
 /**
  * @tc.number   Telephony_CallManager_GetCallRestriction_0100
- * @tc.name     test GetCallRestriction
+ * @tc.name     input slotId 0, CallRestrictionType RESTRICTION_TYPE_ALL_INCOMING, test GetCallRestriction()
  * @tc.desc     Function test
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_GetCallRestriction_0100, Function | MediumTest | Level3)
@@ -1224,7 +1224,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_GetCallRestriction_0100, Functi
 /******************************************* Test GetCallRestriction() ********************************************/
 /**
  * @tc.number   Telephony_CallManager_GetCallRestriction_0200
- * @tc.name     test GetCallRestriction
+ * @tc.name     input slotId 0, CallRestrictionType RESTRICTION_TYPE_ALL_OUTGOING, test GetCallRestriction()
  * @tc.desc     Function test
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_GetCallRestriction_0200, Function | MediumTest | Level3)
@@ -1241,7 +1241,9 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_GetCallRestriction_0200, Functi
 /******************************************* Test SetCallRestriction() ********************************************/
 /**
  * @tc.number   Telephony_CallManager_SetCallRestriction_0100
- * @tc.name     test SetCallRestriction
+ * @tc.name     input slotId 0, CallRestrictionType RESTRICTION_TYPE_ALL_OUTGOING,
+ *              CallRestrictionMode::RESTRICTION_MODE_ACTIVATION,
+ *              test SetCallRestriction()
  * @tc.desc     Function test
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallRestriction_0100, Function | MediumTest | Level3)
@@ -1260,7 +1262,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallRestriction_0100, Functi
 /******************************************* Test GetCallTransferInfo() ********************************************/
 /**
  * @tc.number   Telephony_CallManager_GetCallRestriction_0100
- * @tc.name     test GetCallTransferInfo
+ * @tc.name     input slotId 0, CallTransferType TRANSFER_TYPE_BUSY, test GetCallTransferInfo()
  * @tc.desc     Function test
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_GetCallTransferInfo_0100, Function | MediumTest | Level3)
@@ -1276,7 +1278,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_GetCallTransferInfo_0100, Funct
 /******************************************* Test GetCallTransferInfo() ********************************************/
 /**
  * @tc.number   Telephony_CallManager_GetCallRestriction_0200
- * @tc.name     test GetCallTransferInfo
+ * @tc.name     input slotId 0, CallTransferType TRANSFER_TYPE_NO_REPLY, test GetCallTransferInfo()
  * @tc.desc     Function test
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_GetCallTransferInfo_0200, Function | MediumTest | Level3)
@@ -1293,7 +1295,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_GetCallTransferInfo_0200, Funct
 /******************************************* Test GetCallTransferInfo() ********************************************/
 /**
  * @tc.number   Telephony_CallManager_GetCallRestriction_0300
- * @tc.name     test GetCallTransferInfo
+ * @tc.name     input slotId 0, CallTransferType TRANSFER_TYPE_NOT_REACHABLE, test GetCallTransferInfo()
  * @tc.desc     Function test
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_GetCallTransferInfo_0300, Function | MediumTest | Level3)
@@ -1310,7 +1312,8 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_GetCallTransferInfo_0300, Funct
 /******************************************* Test SetCallTransferInfo() ********************************************/
 /**
  * @tc.number   Telephony_CallManager_SetCallTransferInfo_0100
- * @tc.name     test SetCallTransferInfo
+ * @tc.name     input slotId 0, CallTransferSettingType CALL_TRANSFER_ENABLE, CallTransferType TRANSFER_TYPE_BUSY,
+ *              test SetCallTransferInfo()
  * @tc.desc     Function test
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallTransferInfo_0100, Function | MediumTest | Level3)
@@ -1329,7 +1332,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallTransferInfo_0100, Funct
 /******************************************* Test EnableImsSwitch() ********************************************/
 /**
  * @tc.number   Telephony_CallManager_EnableVoLte_0100
- * @tc.name     test EnableImsSwitch
+ * @tc.name     input slotId 0, test EnableImsSwitch
  * @tc.desc     Function test
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_EnableVoLte_0100, Function | MediumTest | Level3)
@@ -1344,7 +1347,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_EnableVoLte_0100, Function | Me
 /******************************************* Test DisableImsSwitch() ********************************************/
 /**
  * @tc.number   Telephony_CallManager_DisableVoLte_0100
- * @tc.name     test DisableImsSwitch
+ * @tc.name     input slotId 0, test DisableImsSwitch
  * @tc.desc     Function test
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_DisableVoLte_0100, Function | MediumTest | Level3)
@@ -1359,7 +1362,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_DisableVoLte_0100, Function | M
 /******************************************* Test IsImsSwitchEnabled() ********************************************/
 /**
  * @tc.number   Telephony_CallManager_IsVoLteEnabled_0100
- * @tc.name     test IsImsSwitchEnabled
+ * @tc.name     input slotId 0, test IsImsSwitchEnabled
  * @tc.desc     Function test
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_IsVoLteEnabled_0100, Function | MediumTest | Level3)
@@ -1374,7 +1377,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_IsVoLteEnabled_0100, Function |
 /******************************************* Test SetLteEnhanceMode() ********************************************/
 /**
  * @tc.number   Telephony_CallManager_SetLteEnhanceMode_0100
- * @tc.name     test SetLteEnhanceMode
+ * @tc.name     input slotId 0, test SetLteEnhanceMode
  * @tc.desc     Function test
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_SetLteEnhanceMode_0100, Function | MediumTest | Level3)
@@ -1389,7 +1392,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetLteEnhanceMode_0100, Functio
 /******************************************* Test SetLteEnhanceMode() ********************************************/
 /**
  * @tc.number   Telephony_CallManager_SetLteEnhanceMode_0200
- * @tc.name     test SetLteEnhanceMode
+ * @tc.name     input slotId 0, test SetLteEnhanceMode, disable LteEnhanceMode
  * @tc.desc     Function test
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_SetLteEnhanceMode_0200, Function | MediumTest | Level3)
@@ -1404,7 +1407,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetLteEnhanceMode_0200, Functio
 /******************************************* Test GetLteEnhanceMode() ********************************************/
 /**
  * @tc.number   Telephony_CallManager_GetLteEnhanceMode_0100
- * @tc.name     test GetLteEnhanceMode
+ * @tc.name     input slotId 0, test GetLteEnhanceMode
  * @tc.desc     Function test
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_GetLteEnhanceMode_0100, Function | MediumTest | Level3)
@@ -1419,7 +1422,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_GetLteEnhanceMode_0100, Functio
 /******************************************* Test ControlCamera() *********************************************/
 /**
  * @tc.number   Telephony_CallManager_ControlCamera_0100
- * @tc.name     Test returns 0 after ControlCamera
+ * @tc.name     input camera id lcam001, Test ControlCamera, returns 0 if success
  * @tc.desc     Function test
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_ControlCamera_0100, Function | MediumTest | Level0)
@@ -1436,7 +1439,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_ControlCamera_0100, Function | 
 
 /**
  * @tc.number   Telephony_CallManager_ControlCamera_0200
- * @tc.name     Test returns error after ControlCamera
+ * @tc.name     input error camera id xtsautotest123456, Test ControlCamera, return err code if failed
  * @tc.desc     Function test
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_ControlCamera_0200, Function | MediumTest | Level2)
@@ -1452,7 +1455,8 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_ControlCamera_0200, Function | 
 
 /**
  * @tc.number   Telephony_CallManager_ControlCamera_0300
- * @tc.name     Test returns error after ControlCamera
+ * @tc.name     input error camera id xtsautotest123456, Test ControlCamera,
+ *              then input empty camera id, Test ControlCamera
  * @tc.desc     Function test
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_ControlCamera_0300, Function | MediumTest | Level2)
@@ -1472,7 +1476,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_ControlCamera_0300, Function | 
 
 /**
  * @tc.number   Telephony_CallManager_ControlCamera_0600
- * @tc.name     Test returns error after ControlCamera
+ * @tc.name     input empty camera id, Test ControlCamera, returns error code if failed
  * @tc.desc     Function test
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_ControlCamera_0600, Function | MediumTest | Level2)
@@ -1489,7 +1493,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_ControlCamera_0600, Function | 
 /******************************************* Test SetPreviewWindow() *********************************************/
 /**
  * @tc.number   Telephony_CallManager_SetPreviewWindow_0100
- * @tc.name     Test returns error after set preview window
+ * @tc.name     input x:0, y:0, z:-1, width:200, height:200, Test set preview window
  * @tc.desc     Function test
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_SetPreviewWindow_0100, Function | MediumTest | Level2)
@@ -1508,7 +1512,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetPreviewWindow_0100, Function
 
 /**
  * @tc.number   Telephony_CallManager_SetPreviewWindow_0200
- * @tc.name     Test returns 0 after set preview window
+ * @tc.name     input x:0, y:0, z:0, width:200, height:200, Test set preview window
  * @tc.desc     Function test
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_SetPreviewWindow_0200, Function | MediumTest | Level2)
@@ -1528,7 +1532,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetPreviewWindow_0200, Function
 /******************************************* Test SetDisplayWindow() *********************************************/
 /**
  * @tc.number   Telephony_CallManager_SetDisplayWindow_0100
- * @tc.name     Test returns error after set display window
+ * @tc.name     input x:10, y:10, z:10, width:100, height:200, Test set display window
  * @tc.desc     Function test
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_SetDisplayWindow_0100, Function | MediumTest | Level2)
@@ -1547,7 +1551,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetDisplayWindow_0100, Function
 
 /**
  * @tc.number   Telephony_CallManager_SetDisplayWindow_0200
- * @tc.name     Test returns 0 after set display window
+ * @tc.name     input x:10, y:10, z:0, width:200, height:200, Test set display window
  * @tc.desc     Function test
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_SetDisplayWindow_0200, Function | MediumTest | Level2)
@@ -1567,7 +1571,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetDisplayWindow_0200, Function
 /******************************************* Test SetDeviceDirection() *********************************************/
 /**
  * @tc.number   Telephony_CallManager_SetDeviceDirection_0100
- * @tc.name     Test returns error after set device direction
+ * @tc.name     input invalid rotation, Test SetDeviceDirection, return error code if failed
  * @tc.desc     Function test
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_SetDeviceDirection_0100, Function | MediumTest | Level2)
@@ -1581,7 +1585,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetDeviceDirection_0100, Functi
 
 /**
  * @tc.number   Telephony_CallManager_SetDeviceDirection_0200
- * @tc.name     Test returns error after set device direction
+ * @tc.name     input rotation 0, Test SetDeviceDirection, return 0 if success
  * @tc.desc     Function test
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_SetDeviceDirection_0200, Function | MediumTest | Level2)
@@ -1595,7 +1599,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetDeviceDirection_0200, Functi
 
 /**
  * @tc.number   Telephony_CallManager_SetDeviceDirection_0300
- * @tc.name     Test returns 0 after set device direction
+ * @tc.name     input rotation 90, Test SetDeviceDirection
  * @tc.desc     Function test
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_SetDeviceDirection_0300, Function | MediumTest | Level1)
@@ -1610,7 +1614,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetDeviceDirection_0300, Functi
 /******************************************* Test SetCameraZoom() *********************************************/
 /**
  * @tc.number   Telephony_CallManager_SetDeviceDirection_0100
- * @tc.name     Test returns error after set camera zoom
+ * @tc.name     input zoomRatio 5.0, Test SetCameraZoom
  * @tc.desc     Function test
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCameraZoom_0100, Function | MediumTest | Level2)
@@ -1624,7 +1628,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCameraZoom_0100, Function | 
 
 /**
  * @tc.number   Telephony_CallManager_SetDeviceDirection_0200
- * @tc.name     Test returns 0 after set camera zoom
+ * @tc.name     input zoomRatio 0.1, Test SetCameraZoom
  * @tc.desc     Function test
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCameraZoom_0200, Function | MediumTest | Level1)
@@ -1638,7 +1642,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCameraZoom_0200, Function | 
 
 /**
  * @tc.number   Telephony_CallManager_SetDeviceDirection_0300
- * @tc.name     Test returns 0 after set camera zoom
+ * @tc.name     input zoomRatio 10.0, Test SetCameraZoom
  * @tc.desc     Function test
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCameraZoom_0300, Function | MediumTest | Level1)
@@ -1652,7 +1656,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCameraZoom_0300, Function | 
 
 /**
  * @tc.number   Telephony_CallManager_SetDeviceDirection_0400
- * @tc.name     Test returns 0 after set camera zoom
+ * @tc.name     input invalid para zoomRatio 15.0, Test SetCameraZoom, return error code if failed
  * @tc.desc     Function test
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCameraZoom_0400, Function | MediumTest | Level1)
@@ -1666,7 +1670,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCameraZoom_0400, Function | 
 
 /**
  * @tc.number   Telephony_CallManager_SetDeviceDirection_0500
- * @tc.name     Test returns 0 after set camera zoom
+ * @tc.name     input invalid para zoomRatio 0.0, Test SetCameraZoom, return error code if failed
  * @tc.desc     Function test
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCameraZoom_0500, Function | MediumTest | Level1)
@@ -1680,7 +1684,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCameraZoom_0500, Function | 
 
 /**
  * @tc.number   Telephony_CallManager_SetDeviceDirection_0600
- * @tc.name     Test returns 0 after set camera zoom
+ * @tc.name     input invalid para zoomRatio -1.0, Test SetCameraZoom, return error code if failed
  * @tc.desc     Function test
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCameraZoom_0600, Function | MediumTest | Level1)
@@ -1694,7 +1698,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCameraZoom_0600, Function | 
 
 /**
  * @tc.number   Telephony_CallManager_SetDeviceDirection_0700
- * @tc.name     Test returns 0 after set camera zoom
+ * @tc.name     input invalid para zoomRatio 10.1, Test SetCameraZoom, return error code if failed
  * @tc.desc     Function test
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCameraZoom_0700, Function | MediumTest | Level1)
@@ -1708,7 +1712,8 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCameraZoom_0700, Function | 
 /******************************************* Test SetPausePicture() *********************************************/
 /**
  * @tc.number   Telephony_CallManager_SetPausePicture_0100
- * @tc.name     Test returns 0 after set pause picture
+ * @tc.name     input locale picture path /system/bin/test.png that does not exist, Test SetPausePicture,
+ *              return error code if failed
  * @tc.desc     Function test
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_SetPausePicture_0100, Function | MediumTest | Level1)
@@ -1723,7 +1728,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetPausePicture_0100, Function 
 
 /**
  * @tc.number   Telephony_CallManager_SetPausePicture_0200
- * @tc.name     Test returns 0 after set pause picture
+ * @tc.name     input an invalid image format file path, Test SetPausePicture, return error code if failed
  * @tc.desc     Function test
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_SetPausePicture_0200, Function | MediumTest | Level1)
@@ -1738,7 +1743,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetPausePicture_0200, Function 
 
 /**
  * @tc.number   Telephony_CallManager_SetPausePicture_0300
- * @tc.name     Test returns 0 after set pause picture
+ * @tc.name     input an invalid image format file path, Test SetPausePicture, return error code if failed
  * @tc.desc     Function test
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_SetPausePicture_0300, Function | MediumTest | Level1)
@@ -1753,7 +1758,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetPausePicture_0300, Function 
 
 /**
  * @tc.number   Telephony_CallManager_SetPausePicture_0400
- * @tc.name     Test returns 0 after set pause picture
+ * @tc.name     input an invalid image format file path, Test SetPausePicture, return error code if failed
  * @tc.desc     Function test
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_SetPausePicture_0400, Function | MediumTest | Level1)
@@ -1768,7 +1773,8 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetPausePicture_0400, Function 
 
 /**
  * @tc.number   Telephony_CallManager_SetPausePicture_0500
- * @tc.name     Test returns 0 after set pause picture
+ * @tc.name     input remote picture path http://callManager.jpg that does not exist, Test SetPausePicture,
+ *              return error code if failed
  * @tc.desc     Function test
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_SetPausePicture_0500, Function | MediumTest | Level1)
@@ -1783,7 +1789,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetPausePicture_0500, Function 
 
 /**
  * @tc.number   Telephony_CallManager_SetPausePicture_0600
- * @tc.name     Test returns 0 after set pause picture
+ * @tc.name     input empty picture path , Test SetPausePicture, return error code if failed
  * @tc.desc     Function test
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_SetPausePicture_0600, Function | MediumTest | Level1)

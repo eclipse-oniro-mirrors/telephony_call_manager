@@ -143,7 +143,6 @@ ohos_shared_library("tel_call_manager") {
     "//base/notification/ans_standard/frameworks/ans/core:ans_core",
     "//base/notification/ans_standard/frameworks/ans/native:ans_innerkits",
     "//base/notification/ans_standard/services/ans:libans",
-    "//base/startup/syspara_lite/interfaces/innerkits/native/syspara:syspara",
     "//base/telephony/core_service/utils:libtel_common",
     "//base/telephony/sms_mms/frameworks/native:tel_sms_mms_api",
     "//foundation/aafwk/standard/frameworks/kits/ability/native:abilitykit_native",
@@ -174,6 +173,7 @@ ohos_shared_library("tel_call_manager") {
     "power_manager_native:powermgr_client",
     "safwk:system_ability_fwk",
     "samgr_standard:samgr_proxy",
+    "startup_l2:syspara",
     "state_registry:tel_state_registry_notify",
   ]
 
