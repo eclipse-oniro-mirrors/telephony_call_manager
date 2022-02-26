@@ -73,9 +73,8 @@ int32_t CallSettingManager::GetCallRestriction(int32_t slotId, CallRestrictionTy
 int32_t CallSettingManager::SetCallRestriction(int32_t slotId, CallRestrictionInfo &info)
 {
     TELEPHONY_LOGI(
-        "SetCallRestriction: slotId = %{public}d, mode = %{public}d, type = %{public}d, password = "
-        "%{public}s",
-        slotId, info.mode, info.fac, info.password);
+        "SetCallRestriction: slotId = %{public}d, mode = %{public}d, type = %{public}d",
+        slotId, info.mode, info.fac);
     int32_t ret = SetCallRestrictionPolicy(slotId, info);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("Invalid data!");
