@@ -232,7 +232,7 @@ bool CallObjectManager::IsCallExist(int32_t callId)
 bool CallObjectManager::IsCallExist(std::string &phoneNumber)
 {
     if (phoneNumber.empty()) {
-        return CALL_ERR_PHONE_NUMBER_EMPTY;
+        return false;
     }
     std::lock_guard<std::mutex> lock(listMutex_);
     std::list<sptr<CallBase>>::iterator it = callObjectPtrList_.begin();

@@ -292,7 +292,7 @@ bool CallManagerService::HasCall()
         return callControlManagerPtr_->HasCall();
     } else {
         TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+        return false;
     }
 }
 
@@ -302,7 +302,7 @@ bool CallManagerService::IsNewCallAllowed()
         return callControlManagerPtr_->IsNewCallAllowed();
     } else {
         TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+        return false;
     }
 }
 
@@ -310,13 +310,13 @@ bool CallManagerService::IsRinging()
 {
     if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_SET_TELEPHONY_STATE)) {
         TELEPHONY_LOGE("Permission denied!");
-        return TELEPHONY_ERR_PERMISSION_ERR;
+        return false;
     }
     if (callControlManagerPtr_ != nullptr) {
         return callControlManagerPtr_->IsRinging();
     } else {
         TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+        return false;
     }
 }
 
@@ -324,13 +324,13 @@ bool CallManagerService::IsInEmergencyCall()
 {
     if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_SET_TELEPHONY_STATE)) {
         TELEPHONY_LOGE("Permission denied!");
-        return TELEPHONY_ERR_PERMISSION_ERR;
+        return false;
     }
     if (callControlManagerPtr_ != nullptr) {
         return callControlManagerPtr_->HasEmergency();
     } else {
         TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+        return false;
     }
 }
 
@@ -569,7 +569,7 @@ bool CallManagerService::IsEmergencyPhoneNumber(std::u16string &number, int32_t 
         return callControlManagerPtr_->IsEmergencyPhoneNumber(number, slotId, errorCode);
     } else {
         TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+        return false;
     }
 }
 

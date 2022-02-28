@@ -306,7 +306,7 @@ bool CallManagerClient::IsRinging()
         return g_callManagerProxy->IsRinging();
     } else {
         TELEPHONY_LOGE("init first please!");
-        return TELEPHONY_ERR_UNINIT;
+        return false;
     }
 }
 
@@ -316,7 +316,7 @@ bool CallManagerClient::HasCall()
         return g_callManagerProxy->HasCall();
     } else {
         TELEPHONY_LOGE("init first please!");
-        return TELEPHONY_ERR_UNINIT;
+        return false;
     }
 }
 
@@ -326,7 +326,7 @@ bool CallManagerClient::IsNewCallAllowed()
         return g_callManagerProxy->IsNewCallAllowed();
     } else {
         TELEPHONY_LOGE("init first please!");
-        return TELEPHONY_ERR_UNINIT;
+        return false;
     }
 }
 
@@ -336,7 +336,7 @@ bool CallManagerClient::IsInEmergencyCall()
         return g_callManagerProxy->IsInEmergencyCall();
     } else {
         TELEPHONY_LOGE("init first please!");
-        return TELEPHONY_ERR_UNINIT;
+        return false;
     }
 }
 
@@ -346,7 +346,7 @@ bool CallManagerClient::IsEmergencyPhoneNumber(std::u16string &number, int32_t s
         return g_callManagerProxy->IsEmergencyPhoneNumber(number, slotId, errorCode);
     } else {
         TELEPHONY_LOGE("init first please!");
-        return TELEPHONY_ERR_UNINIT;
+        return false;
     }
 }
 
