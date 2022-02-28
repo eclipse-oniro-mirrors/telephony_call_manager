@@ -51,7 +51,7 @@ bool AudioPlayer::InitRenderer(const wav_hdr &wavHeader, AudioStandard::AudioStr
     }
     if (audioRenderer_->GetBufferSize(bufferLen)) {
         TELEPHONY_LOGE("audio renderer get buffer size failed");
-        return TELEPHONY_ERR_UNINIT;
+        return false;
     }
     uint32_t frameCount;
     if (audioRenderer_->GetFrameCount(frameCount)) {

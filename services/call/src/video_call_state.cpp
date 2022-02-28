@@ -30,7 +30,7 @@ bool VideoCallState::IsCallSupportVideoCall()
 {
     if (call_ == nullptr) {
         TELEPHONY_LOGE("unexpect null pointer.");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+        return false;
     }
     sptr<IMSCall> netCall = static_cast<IMSCall *>(call_.GetRefPtr());
     return netCall->IsSupportVideoCall();

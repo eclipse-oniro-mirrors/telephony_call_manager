@@ -853,7 +853,7 @@ bool CallManagerServiceProxy::IsEmergencyPhoneNumber(std::u16string &number, int
     }
     if (number.empty()) {
         TELEPHONY_LOGE("number is empty");
-        return TELEPHONY_ERR_ARGUMENT_INVALID;
+        return false;
     }
     dataParcel.WriteString16(number);
     dataParcel.WriteInt32(slotId);
@@ -864,7 +864,7 @@ bool CallManagerServiceProxy::IsEmergencyPhoneNumber(std::u16string &number, int
     int32_t error = Remote()->SendRequest(INTERFACE_IS_EMERGENCY_NUMBER, dataParcel, replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("Function IsEmergencyPhoneNumber call failed! errCode:%{public}d", error);
-        return error;
+        return false;
     }
     bool result = replyParcel.ReadBool();
     errorCode = replyParcel.ReadInt32();
