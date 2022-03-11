@@ -1324,7 +1324,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallTransferInfo_0100, Funct
     CallTransferInfo info;
     info.settingType = CallTransferSettingType::CALL_TRANSFER_ENABLE;
     info.type = CallTransferType::TRANSFER_TYPE_BUSY;
-    strcpy_s(info.password, strlen("123") + 1, "123");
+    strcpy_s(info.transferNum, strlen("123") + 1, "123");
 
     EXPECT_EQ(CallManagerGtest::clientPtr_->SetCallTransferInfo(SIM1_SLOTID, info), RETURN_VALUE_IS_ZERO);
 }
