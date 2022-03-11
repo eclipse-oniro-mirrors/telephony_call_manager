@@ -133,7 +133,7 @@ int32_t CallAbilityReportProxy::ReportCallStateInfo(const CallAttributeInfo &inf
             ret = (*it)->OnCallDetailsChange(info);
             if (ret != TELEPHONY_SUCCESS) {
                 callbackPtrList_.erase(it++);
-                it--;
+                --it;
                 TELEPHONY_LOGW("OnCallDetailsChange failed, errcode:%{public}d, bundleName:%{public}s", ret,
                     bundleName.c_str());
                 continue;
