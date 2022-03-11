@@ -37,7 +37,6 @@ public:
     void CallDestroyed(int32_t cause) override;
     int32_t ReportAsyncResults(const CallResultReportId reportId, AppExecFwk::PacMap &resultInfo);
     int32_t OttCallRequest(OttCallRequestId requestId, AppExecFwk::PacMap &info);
-    bool IsBundleNameConflict(std::string &bundleName);
 
 private:
     int32_t ReportCallStateInfo(const CallAttributeInfo &info);

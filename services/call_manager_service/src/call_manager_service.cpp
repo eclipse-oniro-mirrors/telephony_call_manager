@@ -817,19 +817,6 @@ int32_t CallManagerService::CheckBundleName(std::string bundleName)
 {
     std::string bundleNameList[] = {
         "com.ohos.callui",
-        "com.ohos.service.callui",
-        "com.ohos.callmanagercallmedia",
-        "com.ohos.callmanager",
-        "com.ohos.callmanagerregister",
-        "com.ohos.callmanagerreliabilityperformance",
-        "com.ohos.callmanagerimscall",
-        "com.ohos.callmanagercallcarmera",
-        "com.ohos.callmanagerreliability",
-        "com.ohos.callmanagerperformance",
-        "com.example.callmanager",
-        "com.example.telephone_demo",
-        "com.ohos.calldemo",
-        "com.ohos.callservice",
     };
     for (int32_t i = 0; i < end(bundleNameList) - begin(bundleNameList); i++) {
         if (strcmp(bundleName.c_str(), bundleNameList[i].c_str()) == 0) {
