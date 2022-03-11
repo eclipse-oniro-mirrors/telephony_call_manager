@@ -148,7 +148,6 @@ ohos_shared_library("tel_call_manager") {
     "//foundation/aafwk/standard/frameworks/kits/ability/native:abilitykit_native",
     "//foundation/aafwk/standard/interfaces/innerkits/ability_manager:ability_manager",
     "//foundation/aafwk/standard/interfaces/innerkits/dataobs_manager:dataobs_manager",
-    "//foundation/distributedschedule/dmsfwk/interfaces/innerkits/uri:zuri",
     "//foundation/graphic/standard:libsurface",
     "//foundation/multimedia/camera_standard/frameworks/native/camera:camera_framework",
     "//foundation/multimedia/camera_standard/frameworks/native/metadata:metadata",
@@ -159,6 +158,7 @@ ohos_shared_library("tel_call_manager") {
 
   external_deps = [
     "ability_base:want",
+    "ability_base:zuri",
     "ces_standard:cesfwk_innerkits",
     "core_service:tel_core_service_api",
     "display_manager_native:displaymgr",
