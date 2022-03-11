@@ -205,6 +205,5 @@ int32_t CallAbilityReportProxy::OttCallRequest(OttCallRequestId requestId, AppEx
     TELEPHONY_LOGI("OttCallRequest success, requestId:%{public}d", requestId);
     return ret;
 }
-
 } // namespace Telephony
 } // namespace OHOS
