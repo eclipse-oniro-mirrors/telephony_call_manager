@@ -1254,7 +1254,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallRestriction_0100, Functi
     CallRestrictionInfo info;
     info.fac = CallRestrictionType::RESTRICTION_TYPE_ALL_OUTGOING;
     info.mode = CallRestrictionMode::RESTRICTION_MODE_ACTIVATION;
-    strcpy(info.password, "123");
+    strcpy_s(info.password, strlen("123") + 1, "123");
 
     EXPECT_EQ(CallManagerGtest::clientPtr_->SetCallRestriction(SIM1_SLOTID, info), RETURN_VALUE_IS_ZERO);
 }
@@ -1324,7 +1324,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallTransferInfo_0100, Funct
     CallTransferInfo info;
     info.settingType = CallTransferSettingType::CALL_TRANSFER_ENABLE;
     info.type = CallTransferType::TRANSFER_TYPE_BUSY;
-    strcpy(info.transferNum, "123");
+    strcpy_s(info.transferNum, strlen("123") + 1, "123");
 
     EXPECT_EQ(CallManagerGtest::clientPtr_->SetCallTransferInfo(SIM1_SLOTID, info), RETURN_VALUE_IS_ZERO);
 }
