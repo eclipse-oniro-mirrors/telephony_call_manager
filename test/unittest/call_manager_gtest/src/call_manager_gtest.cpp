@@ -22,6 +22,7 @@
 namespace OHOS {
 namespace Telephony {
 using namespace testing::ext;
+#ifndef TEL_TEST_UNSUPPORT
 constexpr int16_t SIM1_SLOTID = 0;
 constexpr int16_t SIM1_SLOTID_NO_CARD = 0;
 constexpr int16_t RETURN_VALUE_IS_ZERO = 0;
@@ -30,6 +31,7 @@ constexpr int16_t INVALID_POSITIVE_ID = 100;
 constexpr int16_t CALL_MANAGER_ERROR = -1;
 constexpr int16_t CAMERA_ROTATION_90 = 90;
 constexpr int16_t CAMERA_ROTATION_ERROR = 50;
+#endif // TEL_TEST_UNSUPPORT
 constexpr int16_t SLEEP_1000_MS = 1000;
 const std::string PHONE_NUMBER = "xxxxx";
 
@@ -102,6 +104,7 @@ void CallInfoManager::LockCallState(bool eq, int32_t targetState, int32_t slipMs
     EXPECT_EQ(callState, targetState);
 }
 
+#ifndef TEL_TEST_UNSUPPORT
 /********************************************* Test DialCall()***********************************************/
 /**
  * @tc.number   Telephony_CallManager_DialCall_0100
@@ -1816,5 +1819,19 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_RegisterCallBack_0100, Function
 
     EXPECT_EQ(CallManagerGtest::clientPtr_->RegisterCallBack(), RETURN_VALUE_IS_ZERO);
 }
+
+#else // TEL_TEST_UNSUPPORT
+/***************************************** Test For Unsupport Platform ***********************************************/
+/**
+ * @tc.number   Telephony_CallManager_Mock_0100
+ * @tc.name     test for unsupported platform
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_Mock_0100, Function | MediumTest | Level3)
+{
+    EXPECT_TRUE(true);
+}
+
+#endif // TEL_TEST_UNSUPPORT
 } // namespace Telephony
 } // namespace OHOS
