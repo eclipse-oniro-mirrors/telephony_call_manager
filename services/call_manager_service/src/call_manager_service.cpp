@@ -65,9 +65,7 @@ bool CallManagerService::Init()
 
 void CallManagerService::UnInit()
 {
-    if (callControlManagerPtr_ != nullptr) {
-        callControlManagerPtr_ = nullptr;
-    }
+    callControlManagerPtr_ = nullptr;
 }
 
 void CallManagerService::OnStart()
