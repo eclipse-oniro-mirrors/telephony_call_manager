@@ -78,8 +78,8 @@ enum class DialScene {
 };
 
 enum class CallDirection {
-    CALL_DIRECTION_OUT = 0,
-    CALL_DIRECTION_IN,
+    CALL_DIRECTION_IN = 0,
+    CALL_DIRECTION_OUT,
     CALL_DIRECTION_UNKNOW,
 };
 
