@@ -166,6 +166,7 @@ struct CallAttributeInfo {
 struct CallRecordInfo {
     int32_t callId;
     char phoneNumber[kMaxNumberLen + 1];
+    char formattedPhoneNumber[kMaxNumberLen + 1];
     CallType callType;
     time_t callBeginTime;
     time_t callEndTime;

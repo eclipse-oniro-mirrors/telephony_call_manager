@@ -17,6 +17,7 @@
 
 #include "securec.h"
 #include "call_manager_inner_type.h"
+#include "call_number_utils.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -89,6 +90,13 @@ void CallRecordsManager::AddOneCallRecord(CallAttributeInfo &info)
     data.directionType = info.callDirection;
     data.answerType = info.answerType;
     data.countryCode = DEFAULT_COUNTRY_CODE;
+    std::string tmpStr("");
+    (void)DelayedSingleton<CallNumberUtils>::GetInstance()->FormatPhoneNumber(
+        std::string(data.phoneNumber), "CN", tmpStr);
+    if (memcpy_s(data.formattedPhoneNumber, kMaxNumberLen, tmpStr.c_str(), tmpStr.length()) != 0) {
+        TELEPHONY_LOGE("memcpy_s failed!");
+        return;
+    }
     callRecordsHandlerServerPtr_->StoreCallRecord(data);
 }
 } // namespace Telephony
