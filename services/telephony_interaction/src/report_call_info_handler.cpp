@@ -199,9 +199,7 @@ ReportCallInfoHandlerService::~ReportCallInfoHandlerService()
         eventLoop_->Stop();
         eventLoop_ = nullptr;
     }
-    if (handler_ != nullptr) {
-        handler_ = nullptr;
-    }
+    handler_ = nullptr;
 }
 
 void ReportCallInfoHandlerService::Start()

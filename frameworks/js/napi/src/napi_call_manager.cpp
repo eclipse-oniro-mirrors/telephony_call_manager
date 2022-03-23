@@ -2001,8 +2001,8 @@ int32_t NapiCallManager::GetRestrictionInfo(
     }
     asyncContext.info.fac = static_cast<CallRestrictionType>(type);
     asyncContext.info.mode = static_cast<CallRestrictionMode>(mode);
-    TELEPHONY_LOGI("GetRestrictionInfo: type = %{public}d, mode = %{public}d, content = %{public}s",
-        asyncContext.info.fac, asyncContext.info.mode, asyncContext.info.password);
+    TELEPHONY_LOGI("GetRestrictionInfo: type = %{public}d, mode = %{public}d",
+        asyncContext.info.fac, asyncContext.info.mode);
     return TELEPHONY_SUCCESS;
 }
 
