@@ -75,6 +75,7 @@ void CallDataBaseHelper::RegisterObserver(std::vector<std::string> *phones)
     callDataRdbObserverPtr_ = (std::make_unique<CallDataRdbObserver>(phones)).release();
     if (callDataRdbObserverPtr_ == nullptr) {
         TELEPHONY_LOGE("callDataRdbObserverPtr_ is null");
+        return;
     }
     helper->RegisterObserver(uri, callDataRdbObserverPtr_);
 }
@@ -89,6 +90,7 @@ void CallDataBaseHelper::UnRegisterObserver()
     Uri uri(CALL_BLOCK);
     if (callDataRdbObserverPtr_ == nullptr) {
         TELEPHONY_LOGE("callDataRdbObserverPtr_ is null");
+        return;
     }
     helper->UnregisterObserver(uri, callDataRdbObserverPtr_);
 }

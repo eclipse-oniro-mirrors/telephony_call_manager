@@ -160,7 +160,7 @@ int32_t AudioOnlyState::RecieveUpdateCallMediaModeRequest(ImsCallMode mode)
                 sptr<IMSCall> netCall = static_cast<IMSCall *>(call_.GetRefPtr());
                 if (netCall == nullptr) {
                     TELEPHONY_LOGE("unexpect null pointer.");
-                    ret = TELEPHONY_ERR_LOCAL_PTR_NULL;
+                    return TELEPHONY_ERR_LOCAL_PTR_NULL;
                 }
                 (void)netCall->AcceptVideoCall();
             } else {
