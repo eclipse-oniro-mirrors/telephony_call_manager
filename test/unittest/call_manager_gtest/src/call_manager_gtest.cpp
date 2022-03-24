@@ -1258,7 +1258,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallRestriction_0100, Functi
     info.fac = CallRestrictionType::RESTRICTION_TYPE_ALL_OUTGOING;
     info.mode = CallRestrictionMode::RESTRICTION_MODE_ACTIVATION;
     if (strcpy_s(info.password, kMaxNumberLen + 1, "123") != EOK) {
-        TELEPHONY_LOGE("strcpy_s fail.")
+        TELEPHONY_LOGE("strcpy_s fail.");
         return;
     }
 
@@ -1331,7 +1331,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallTransferInfo_0100, Funct
     info.settingType = CallTransferSettingType::CALL_TRANSFER_ENABLE;
     info.type = CallTransferType::TRANSFER_TYPE_BUSY;
     if (strcpy_s(info.transferNum, kMaxNumberLen + 1, "123") != EOK) {
-        TELEPHONY_LOGE("strcpy_s fail.")
+        TELEPHONY_LOGE("strcpy_s fail.");
         return;
     }
 
