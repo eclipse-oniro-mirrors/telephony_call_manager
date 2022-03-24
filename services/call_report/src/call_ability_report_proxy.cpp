@@ -63,18 +63,6 @@ int32_t CallAbilityReportProxy::RegisterCallBack(
         }
     }
     callbackPtrList_.emplace_back(callAbilityCallbackPtr);
-    if ((bundleName == "com.example.callmanager") || (bundleName == "com.ohos.calldemo") ||
-        (bundleName == "com.example.telephone_demo")) {
-        std::list<sptr<ICallAbilityCallback>>::iterator it = callbackPtrList_.begin();
-        for (; it != callbackPtrList_.end(); ++it) {
-            if ((*it)->GetBundleName() == "com.ohos.callui") {
-                callAbilityCallbackPtr_ = (*it);
-                callbackPtrList_.erase(it++);
-                callbackPtrList_.emplace_back(callAbilityCallbackPtr_);
-                break;
-            }
-        }
-    }
     TELEPHONY_LOGI("%{public}s successfully registered the callback for the first time!", bundleName.c_str());
     return TELEPHONY_SUCCESS;
 }
@@ -142,13 +130,10 @@ int32_t CallAbilityReportProxy::ReportCallStateInfo(const CallAttributeInfo &inf
     for (; it != callbackPtrList_.end(); ++it) {
         if ((*it)) {
             bundleName = (*it)->GetBundleName();
-            if (IsBundleNameConflict(bundleName)) {
-                continue;
-            }
             ret = (*it)->OnCallDetailsChange(info);
             if (ret != TELEPHONY_SUCCESS) {
                 callbackPtrList_.erase(it++);
-                it--;
+                --it;
                 TELEPHONY_LOGW("OnCallDetailsChange failed, errcode:%{public}d, bundleName:%{public}s", ret,
                     bundleName.c_str());
                 continue;
@@ -219,21 +204,6 @@ int32_t CallAbilityReportProxy::OttCallRequest(OttCallRequestId requestId, AppEx
     }
     TELEPHONY_LOGI("OttCallRequest success, requestId:%{public}d", requestId);
     return ret;
-}
-
-bool CallAbilityReportProxy::IsBundleNameConflict(std::string &bundleName)
-{
-    std::string tmpName = "";
-    std::list<sptr<ICallAbilityCallback>>::iterator it = callbackPtrList_.begin();
-    for (; it != callbackPtrList_.end(); ++it) {
-        tmpName = (*it)->GetBundleName();
-        if ((tmpName == "com.example.callmanager" || tmpName == "com.ohos.calldemo" ||
-                tmpName == "com.example.telephone_demo") &&
-            (bundleName == "com.ohos.callui")) {
-            return true;
-        }
-    }
-    return false;
 }
 } // namespace Telephony
 } // namespace OHOS
