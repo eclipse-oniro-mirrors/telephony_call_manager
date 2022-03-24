@@ -78,8 +78,8 @@ enum class DialScene {
 };
 
 enum class CallDirection {
-    CALL_DIRECTION_OUT = 0,
-    CALL_DIRECTION_IN,
+    CALL_DIRECTION_IN = 0,
+    CALL_DIRECTION_OUT,
     CALL_DIRECTION_UNKNOW,
 };
 
@@ -166,6 +166,7 @@ struct CallAttributeInfo {
 struct CallRecordInfo {
     int32_t callId;
     char phoneNumber[kMaxNumberLen + 1];
+    char formattedPhoneNumber[kMaxNumberLen + 1];
     CallType callType;
     time_t callBeginTime;
     time_t callEndTime;

@@ -47,9 +47,7 @@ CallRequestHandler::CallRequestHandler(const std::shared_ptr<AppExecFwk::EventRu
 
 CallRequestHandler::~CallRequestHandler()
 {
-    if (callRequestProcessPtr_ != nullptr) {
-        callRequestProcessPtr_ = nullptr;
-    }
+    callRequestProcessPtr_ = nullptr;
 }
 
 void CallRequestHandler::Init()
@@ -324,9 +322,7 @@ CallRequestHandlerService::~CallRequestHandlerService()
         eventLoop_->Stop();
         eventLoop_ = nullptr;
     }
-    if (handler_ != nullptr) {
-        handler_ = nullptr;
-    }
+    handler_ = nullptr;
 }
 
 void CallRequestHandlerService::Start()

@@ -56,7 +56,7 @@ void CallRecordsHandler::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &eve
         bucket.PutInt(CALL_IS_READ, 0);
         bucket.PutInt(CALL_RING_DURATION, info.ringDuration);
         bucket.PutInt(CALL_TALK_DURATION, info.callDuration);
-        bucket.PutString(CALL_FORMAT_NUMBER, std::string(""));
+        bucket.PutString(CALL_FORMAT_NUMBER, std::string(info.formattedPhoneNumber));
         bucket.PutString(CALL_QUICKSEARCH_KEY, std::string(""));
         bucket.PutInt(CALL_NUMBER_TYPE, 0);
         bucket.PutString(CALL_NUMBER_TYPE_NAME, std::string(""));

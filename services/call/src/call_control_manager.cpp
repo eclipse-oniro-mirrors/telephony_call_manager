@@ -94,7 +94,7 @@ int32_t CallControlManager::DialCall(std::u16string &number, AppExecFwk::PacMap 
         accountNumber, extras.GetIntValue("accountId"), errorCode);
     ret = DialPolicy(number, extras, isEcc);
     if (ret != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("dial policy result：%{public}d", ret);
+        TELEPHONY_LOGE("dial policy result:%{public}d", ret);
         return ret;
     }
     // temporarily save dial information
@@ -946,11 +946,11 @@ bool CallControlManager::onButtonDealing(HeadsetButtonService::ButtonEvent type)
     bool isRingState = false;
     sptr<CallBase> call = nullptr;
 
-    if (call = GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_RINGING) != nullptr) {
+    if ((call = GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_RINGING)) != nullptr) {
         isRingState = true;
-    } else if (call = GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_DIALING) != nullptr ||
-        call = GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_ACTIVE) != nullptr ||
-        call = GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_HOLD) != nullptr) {
+    } else if (((call = GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_DIALING)) != nullptr) ||
+        ((call = GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_ACTIVE)) != nullptr) ||
+        ((call = GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_HOLD)) != nullptr)) {
         isRingState = false;
     } else {
         return false;
