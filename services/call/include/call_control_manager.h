@@ -29,6 +29,7 @@
 #include "call_state_listener.h"
 #include "call_request_handler.h"
 #include "missed_call_notification.h"
+#include "incoming_call_wake_up.h"
 
 /**
  * Singleton
@@ -114,6 +115,7 @@ private:
     std::unique_ptr<CallStateListener> callStateListenerPtr_;
     std::unique_ptr<CallRequestHandlerService> callRequestHandlerServicePtr_;
     // notify when incoming calls are ignored, not rejected or answered
+    std::unique_ptr<IncomingCallWakeup> incomingCallWakeup_;
     std::unique_ptr<MissedCallNotification> missedCallNotification_;
     std::unique_ptr<CallSettingManager> callSettingManagerPtr_;
     DialParaInfo dialSrcInfo_;
