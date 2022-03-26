@@ -37,8 +37,8 @@
 namespace OHOS {
 namespace Telephony {
 CallControlManager::CallControlManager()
-    : callStateListenerPtr_(nullptr), callRequestHandlerServicePtr_(nullptr), missedCallNotification_(nullptr),
-      callSettingManagerPtr_(nullptr)
+    : callStateListenerPtr_(nullptr), callRequestHandlerServicePtr_(nullptr), incomingCallWakeup_(nullptr),
+      missedCallNotification_(nullptr), callSettingManagerPtr_(nullptr)
 {
     dialSrcInfo_.callId = ERR_ID;
     dialSrcInfo_.number = "";
@@ -61,6 +61,11 @@ bool CallControlManager::Init()
         return false;
     }
     callRequestHandlerServicePtr_->Start();
+    incomingCallWakeup_ = std::make_unique<IncomingCallWakeup>();
+    if (incomingCallWakeup_ == nullptr) {
+        TELEPHONY_LOGE("incomingCallWakeup_ is null");
+        return false;
+    }
     missedCallNotification_ = std::make_unique<MissedCallNotification>();
     if (missedCallNotification_ == nullptr) {
         TELEPHONY_LOGE("missedCallNotification_ is null");
@@ -906,6 +911,7 @@ void CallControlManager::CallStateObserve()
     callStateListenerPtr_->AddOneObserver(hangUpSmsPtr.release());
     callStateListenerPtr_->AddOneObserver(callStateBroadcastPtr.release());
     callStateListenerPtr_->AddOneObserver(missedCallNotification_.release());
+    callStateListenerPtr_->AddOneObserver(incomingCallWakeup_.release());
     callStateListenerPtr_->AddOneObserver(DelayedSingleton<CallRecordsManager>::GetInstance().get());
 }
 
