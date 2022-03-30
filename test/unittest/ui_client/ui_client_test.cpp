@@ -660,7 +660,6 @@ bool InitRenderer(const std::unique_ptr<AudioStandard::AudioRenderer> &audioRend
         std::cout << "audioRenderer is null" << std::endl;
         return false;
     }
-
     AudioStandard::AudioRendererParams rendererParams;
     rendererParams.sampleFormat = static_cast<AudioStandard::AudioSampleFormat>(wavHeader.bitsPerSample);
     rendererParams.sampleRate = static_cast<AudioStandard::AudioSamplingRate>(wavHeader.SamplesPerSec);
