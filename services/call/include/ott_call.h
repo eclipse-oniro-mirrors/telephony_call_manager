@@ -58,7 +58,7 @@ public:
     int32_t DispatchUpdateVideoResponse(ImsCallMode mode) override;
 
 private:
-    void PackOttCallRequestInfo(OttCallRequestInfo &requestInfo);
+    int32_t PackOttCallRequestInfo(OttCallRequestInfo &requestInfo);
 
 private:
     std::unique_ptr<OTTCallConnection> ottCallConnectionPtr_;

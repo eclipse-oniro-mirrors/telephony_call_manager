@@ -329,7 +329,7 @@ bool CallRequestProcess::IsFdnNumber(std::vector<std::u16string> fdnNumberList, 
 {
     char number[kMaxNumberLen + 1] = {0};
     int32_t j = 0;
-    for (int32_t i = 0; i < phoneNumber.length(); i++) {
+    for (int32_t i = 0; i < static_cast<int32_t>(phoneNumber.length()); i++) {
         if (i >= kMaxNumberLen) {
             break;
         }

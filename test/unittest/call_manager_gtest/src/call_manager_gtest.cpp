@@ -361,7 +361,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_HoldCall_0200, Function | Mediu
 
 /**
  * @tc.number   Telephony_CallManager_HoldCall_0600 to do ...
- * @tc.name     coming a active call test hold call, return 0
+ * @tc.name     coming an active call test hold call, return 0
  *              wait for the correct status of the callback to execute correctly
  * @tc.desc     Function test
  */

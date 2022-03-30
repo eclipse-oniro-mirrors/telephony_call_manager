@@ -107,7 +107,8 @@ struct UtilsAsyncContext : AsyncContext {
 };
 
 struct EventCallback {
-    EventCallback() : env(nullptr), thisVar(nullptr), callbackRef(nullptr), deferred(nullptr) {}
+    EventCallback() : env(nullptr), thisVar(nullptr), callbackRef(nullptr), deferred(nullptr),
+                      callbackBeginTime_(0) {}
     napi_env env;
     napi_value thisVar;
     napi_ref callbackRef;

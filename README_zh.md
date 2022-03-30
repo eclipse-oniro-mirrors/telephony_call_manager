@@ -134,7 +134,7 @@
 </tbody>
 </table>
 
-完整的JS API说明以及实例代码请参考：[拨打电话](https://gitee.com/openharmony/docs/blob/master/zh-cn/application-dev/js-reference/apis/js-apis-call.md)。
+完整的JS API说明以及实例代码请参考：[拨打电话](https://gitee.com/openharmony/docs/blob/master/zh-cn/application-dev/reference/apis/js-apis-call.md)。
 ## 使用说明<a name="section163mcpsimp"></a>
 
 ### 拨打电话接口调用流程及示例代码<a name="section113291522113518"></a>

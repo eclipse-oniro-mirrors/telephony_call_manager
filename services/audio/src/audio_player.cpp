@@ -64,11 +64,12 @@ bool AudioPlayer::InitRenderer(const wav_hdr &wavHeader, AudioStandard::AudioStr
 int32_t AudioPlayer::Play(const std::string &path, AudioStandard::AudioStreamType streamType, PlayerType playerType)
 {
     wav_hdr wavHeader;
-    if (path.empty()) {
-        TELEPHONY_LOGE("path is empty");
+    char *realPath = GetRealPath(path.c_str());
+    if (realPath == nullptr) {
+        TELEPHONY_LOGE("path or realPath is NULL");
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
-    FILE *wavFile = fopen(path.c_str(), "rb");
+    FILE *wavFile = fopen(realPath, "rb");
     if (wavFile == nullptr) {
         TELEPHONY_LOGE("open audio file failed");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -101,7 +102,8 @@ int32_t AudioPlayer::Play(const std::string &path, AudioStandard::AudioStreamTyp
             if (IsStop(playerType)) {
                 break;
             }
-            bytesWritten += audioRenderer_->Write(buffer + bytesWritten, bytesToWrite - bytesWritten);
+            bytesWritten += static_cast<size_t>(
+                    audioRenderer_->Write(buffer + bytesWritten, bytesToWrite - bytesWritten));
         }
     }
     ReleaseRenderer();
@@ -152,6 +154,20 @@ void AudioPlayer::ReleaseRenderer()
     audioRenderer_->Drain();
     audioRenderer_->Stop();
     audioRenderer_->Release();
+}
+
+char *AudioPlayer::GetRealPath(const std::string &path)
+{
+    if (path.empty()) {
+        return nullptr;
+    }
+
+    char realPath[PATH_MAX] = {0x00};
+    if (realpath(path.c_str(), realPath) == nullptr) {
+        return nullptr;
+    }
+
+    return realPath;
 }
 } // namespace Telephony
 } // namespace OHOS

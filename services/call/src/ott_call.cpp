@@ -49,7 +49,11 @@ int32_t OTTCall::AnswerCall(int32_t videoState)
         return CALL_ERR_ANSWER_FAILED;
     }
     OttCallRequestInfo requestInfo;
-    PackOttCallRequestInfo(requestInfo);
+    ret = PackOttCallRequestInfo(requestInfo);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("PackOttCallRequestInfo failed,  error%{public}d", ret);
+        return CALL_ERR_ANSWER_FAILED;
+    }
     if (ottCallConnectionPtr_ == nullptr) {
         TELEPHONY_LOGE("ottCallConnectionPtr_ is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -69,7 +73,11 @@ int32_t OTTCall::RejectCall()
         return ret;
     }
     OttCallRequestInfo requestInfo;
-    PackOttCallRequestInfo(requestInfo);
+    ret = PackOttCallRequestInfo(requestInfo);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("PackOttCallRequestInfo failed,  error%{public}d", ret);
+        return CALL_ERR_REJECT_FAILED;
+    }
     ret = ottCallConnectionPtr_->Reject(requestInfo);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("reject call failed!");
@@ -81,8 +89,12 @@ int32_t OTTCall::RejectCall()
 int32_t OTTCall::HangUpCall()
 {
     OttCallRequestInfo requestInfo;
-    PackOttCallRequestInfo(requestInfo);
-    int32_t ret = ottCallConnectionPtr_->HangUp(requestInfo);
+    int32_t ret = PackOttCallRequestInfo(requestInfo);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("PackOttCallRequestInfo failed,  error%{public}d", ret);
+        return CALL_ERR_HANGUP_FAILED;
+    }
+    ret = ottCallConnectionPtr_->HangUp(requestInfo);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("hangUp call failed!");
         return CALL_ERR_HANGUP_FAILED;
@@ -93,8 +105,12 @@ int32_t OTTCall::HangUpCall()
 int32_t OTTCall::HoldCall()
 {
     OttCallRequestInfo requestInfo;
-    PackOttCallRequestInfo(requestInfo);
-    int32_t ret = ottCallConnectionPtr_->HoldCall(requestInfo);
+    int32_t ret = PackOttCallRequestInfo(requestInfo);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("PackOttCallRequestInfo failed,  error%{public}d", ret);
+        return CALL_ERR_HOLD_FAILED;
+    }
+    ret = ottCallConnectionPtr_->HoldCall(requestInfo);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("holdCall call failed!");
         return CALL_ERR_HOLD_FAILED;
@@ -105,8 +121,12 @@ int32_t OTTCall::HoldCall()
 int32_t OTTCall::UnHoldCall()
 {
     OttCallRequestInfo requestInfo;
-    PackOttCallRequestInfo(requestInfo);
-    int32_t ret = ottCallConnectionPtr_->UnHoldCall(requestInfo);
+    int32_t ret = PackOttCallRequestInfo(requestInfo);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("PackOttCallRequestInfo failed,  error%{public}d", ret);
+        return CALL_ERR_UNHOLD_FAILED;
+    }
+    ret = ottCallConnectionPtr_->UnHoldCall(requestInfo);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("unHoldCall call failed!");
         return CALL_ERR_UNHOLD_FAILED;
@@ -117,8 +137,12 @@ int32_t OTTCall::UnHoldCall()
 int32_t OTTCall::SwitchCall()
 {
     OttCallRequestInfo requestInfo;
-    PackOttCallRequestInfo(requestInfo);
-    int32_t ret = ottCallConnectionPtr_->SwitchCall(requestInfo);
+    int32_t ret = PackOttCallRequestInfo(requestInfo);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("PackOttCallRequestInfo failed,  error%{public}d", ret);
+        return CALL_ERR_UNHOLD_FAILED;
+    }
+    ret = ottCallConnectionPtr_->SwitchCall(requestInfo);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("switchCall call failed!");
         return CALL_ERR_UNHOLD_FAILED;
@@ -159,7 +183,11 @@ int32_t OTTCall::CombineConference()
         return ret;
     }
     OttCallRequestInfo requestInfo;
-    PackOttCallRequestInfo(requestInfo);
+    ret = PackOttCallRequestInfo(requestInfo);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("PackOttCallRequestInfo failed,  error%{public}d", ret);
+        return ret;
+    }
     if (ottCallConnectionPtr_ == nullptr) {
         TELEPHONY_LOGE("ottCallConnectionPtr_ is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -180,7 +208,11 @@ int32_t OTTCall::CanCombineConference()
 int32_t OTTCall::SeparateConference()
 {
     OttCallRequestInfo requestInfo;
-    PackOttCallRequestInfo(requestInfo);
+    int32_t ret = PackOttCallRequestInfo(requestInfo);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("PackOttCallRequestInfo failed,  error%{public}d", ret);
+        return ret;
+    }
     if (ottCallConnectionPtr_ == nullptr) {
         TELEPHONY_LOGE("ottCallConnectionPtr_ is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -278,11 +310,18 @@ int32_t OTTCall::DispatchUpdateVideoResponse(ImsCallMode mode)
     return CALL_ERR_FUNCTION_NOT_SUPPORTED;
 }
 
-void OTTCall::PackOttCallRequestInfo(OttCallRequestInfo &requestInfo)
+int32_t OTTCall::PackOttCallRequestInfo(OttCallRequestInfo &requestInfo)
 {
-    (void)memcpy_s(requestInfo.phoneNum, kMaxNumberLen, accountNumber_.c_str(), accountNumber_.length());
-    (void)memcpy_s(requestInfo.bundleName, kMaxBundleNameLen, bundleName_.c_str(), bundleName_.length());
+    if (memcpy_s(requestInfo.phoneNum, kMaxNumberLen, accountNumber_.c_str(), accountNumber_.length()) != EOK) {
+        TELEPHONY_LOGW("memset_s failed!");
+        return TELEPHONY_ERR_MEMSET_FAIL;
+    }
+    if (memcpy_s(requestInfo.bundleName, kMaxBundleNameLen, bundleName_.c_str(), bundleName_.length()) != EOK) {
+        TELEPHONY_LOGW("memset_s failed!");
+        return TELEPHONY_ERR_MEMSET_FAIL;
+    }
     requestInfo.videoState = videoState_;
+    return TELEPHONY_SUCCESS;
 }
 } // namespace Telephony
 } // namespace OHOS

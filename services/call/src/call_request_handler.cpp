@@ -58,6 +58,7 @@ void CallRequestHandler::Init()
         return;
     }
 }
+
 void CallRequestHandler::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
 {
     if (event == nullptr) {
@@ -389,8 +390,9 @@ int32_t CallRequestHandlerService::RejectCall(int32_t callId, bool isSendSms, st
     para->callId = callId;
     para->isSendSms = isSendSms;
     (void)memset_s(para->content, REJECT_CALL_MSG_MAX_LEN + 1, 0, REJECT_CALL_MSG_MAX_LEN + 1);
-    if (para->isSendSms &&
-        memcpy_s(para->content, REJECT_CALL_MSG_MAX_LEN, content.c_str(), REJECT_CALL_MSG_MAX_LEN) != 0) {
+    errno_t result = memcpy_s(para->content, REJECT_CALL_MSG_MAX_LEN, content.c_str(),
+                              REJECT_CALL_MSG_MAX_LEN);
+    if (para->isSendSms && result != EOK) {
         TELEPHONY_LOGE("memcpy_s rejectCall content failed!");
         return TELEPHONY_ERR_MEMCPY_FAIL;
     }
