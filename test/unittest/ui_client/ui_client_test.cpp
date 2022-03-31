@@ -20,7 +20,6 @@
 #include "audio_system_manager.h"
 #include "system_ability_definition.h"
 #include "input/camera_manager.h"
-#include "permission_kit.h"
 #include "i_call_manager_service.h"
 #include "call_manager_client.h"
 
@@ -42,7 +41,6 @@ enum class CallManagerInterfaceType {
 std::shared_ptr<CallManagerClient> g_clientPtr = nullptr;
 using CallManagerServiceFunc = void (*)();
 std::map<uint32_t, CallManagerServiceFunc> g_memberFuncMap;
-std::vector<Security::Permission::PermissionDef> permDefList;
 
 void DialCall()
 {
@@ -1095,82 +1093,17 @@ void StopRtt()
 
 void AddPermission()
 {
-    using namespace OHOS::Security::Permission;
-    PermissionDef permissionDefAlpha = {.permissionName = TEST_PERMISSION_NAME_CAMERA,
-        .bundleName = TEST_BUNDLE_NAME,
-        .grantMode = GrantMode::USER_GRANT,
-        .availableScope = AVAILABLE_SCOPE_ALL,
-        .label = TEST_LABEL,
-        .labelId = TEST_LABEL_ID,
-        .description = TEST_DESCRIPTION,
-        .descriptionId = TEST_DESCRIPTION_ID};
-
-    PermissionDef permissionDefBeta = {.permissionName = TEST_PERMISSION_NAME_CAMERA,
-        .bundleName = CALL_UI_BUNDLE_NAME,
-        .grantMode = GrantMode::SYSTEM_GRANT,
-        .availableScope = AVAILABLE_SCOPE_ALL,
-        .label = TEST_LABEL,
-        .labelId = TEST_LABEL_ID,
-        .description = TEST_DESCRIPTION,
-        .descriptionId = TEST_DESCRIPTION_ID};
-
-    permDefList.emplace_back(permissionDefAlpha);
-    permDefList.emplace_back(permissionDefBeta);
-    PermissionKit::AddDefPermissions(permDefList);
-
-    std::vector<std::string> permList;
-    permList.push_back(TEST_PERMISSION_NAME_CAMERA);
-    int32_t ret = PermissionKit::AddUserGrantedReqPermissions(TEST_BUNDLE_NAME, permList, TEST_USER_ID);
-    std::cout << TEST_BUNDLE_NAME << " AddPermission AddUserGrantedReqPermissions return:" << ret << std::endl;
-    ret = PermissionKit::GrantUserGrantedPermission(TEST_BUNDLE_NAME, TEST_PERMISSION_NAME_CAMERA, TEST_USER_ID);
-    std::cout << TEST_BUNDLE_NAME << " AddPermission GrantUserGrantedPermission return:" << ret << std::endl;
-
-    ret = PermissionKit::AddUserGrantedReqPermissions(CALL_UI_BUNDLE_NAME, permList, TEST_USER_ID);
-    std::cout << CALL_UI_BUNDLE_NAME << " AddPermission AddUserGrantedReqPermissions return:" << ret << std::endl;
-    ret = PermissionKit::GrantUserGrantedPermission(CALL_UI_BUNDLE_NAME, TEST_PERMISSION_NAME_CAMERA, TEST_USER_ID);
-    std::cout << CALL_UI_BUNDLE_NAME << " AddPermission GrantUserGrantedPermission return:" << ret << std::endl;
+    return;
 }
 
 void InitPermission()
 {
-    using namespace OHOS::Security::Permission;
-    std::cout << "------InitPermission------" << std::endl;
-    int32_t ret = PermissionKit::VerifyPermission(TEST_BUNDLE_NAME, TEST_PERMISSION_NAME_CAMERA, TEST_USER_ID);
-    std::cout << "VerifyPermission return ret:" << ret << std::endl;
-
-    int32_t retCallUI =
-        PermissionKit::VerifyPermission(CALL_UI_BUNDLE_NAME, TEST_PERMISSION_NAME_CAMERA, TEST_USER_ID);
-    std::cout << "VerifyPermission return retCallUI:" << retCallUI << std::endl;
-    if (ret != PermissionKitRet::RET_SUCCESS || retCallUI != PermissionKitRet::RET_SUCCESS) {
-        AddPermission();
-    }
+    return;
 }
 
 void VerifyPermission()
 {
-    using namespace OHOS::Security::Permission;
-    std::cout << "------VerifyPermission------" << std::endl;
-    int32_t ret = PermissionKit::VerifyPermission(TEST_BUNDLE_NAME, TEST_PERMISSION_NAME_CAMERA, TEST_USER_ID);
-    if (ret == PermissionKitRet::RET_SUCCESS) {
-        std::cout << TEST_BUNDLE_NAME << " VerifyPermission success:" << ret << std::endl;
-    } else {
-        std::cout << TEST_BUNDLE_NAME << " VerifyPermission failed:" << ret << std::endl;
-    }
-
-    ret = PermissionKit::VerifyPermission(CALL_UI_BUNDLE_NAME, TEST_PERMISSION_NAME_CAMERA, TEST_USER_ID);
-    if (ret == PermissionKitRet::RET_SUCCESS) {
-        std::cout << CALL_UI_BUNDLE_NAME << " VerifyPermission success:" << ret << std::endl;
-    } else {
-        std::cout << CALL_UI_BUNDLE_NAME << " VerifyPermission failed:" << ret << std::endl;
-    }
-
-    const std::string bundleName = "com.ohos.errorpkg";
-    ret = PermissionKit::VerifyPermission(bundleName, TEST_PERMISSION_NAME_CAMERA, TEST_USER_ID);
-    if (ret == PermissionKitRet::RET_SUCCESS) {
-        std::cout << bundleName << " VerifyPermission success:" << ret << std::endl;
-    } else {
-        std::cout << bundleName << " VerifyPermission failed:" << ret << std::endl;
-    }
+    return;
 }
 
 void InitCallBasicPower()

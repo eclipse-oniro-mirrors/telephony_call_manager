@@ -42,14 +42,11 @@ ohos_executable("tel_call_manager_ui_test") {
     "//drivers/peripheral/camera/interfaces/include/callback/operator",
     "//drivers/peripheral/camera/interfaces/include/callback/host",
     "/utils/native/base/include",
-    "//base/security/permission/interfaces/innerkits/permission_standard/permissionsdk/main/cpp/include/permission/",
   ]
 
   configs = [ "//base/telephony/core_service/utils:telephony_log_config" ]
 
   deps = [
-    "//base/security/permission/frameworks/permission_standard/permissioninfrastructure:permission_standard_infrastructure_cxx",
-    "//base/security/permission/interfaces/innerkits/permission_standard/permissionsdk:libpermissionsdk_standard",
     "//foundation/aafwk/standard/frameworks/kits/ability/native:abilitykit_native",
     "//foundation/graphic/standard:libsurface",
     "//foundation/multimedia/camera_standard/frameworks/native/camera:camera_framework",
