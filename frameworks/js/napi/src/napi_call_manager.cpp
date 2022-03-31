@@ -1667,11 +1667,11 @@ napi_value NapiCallManager::ReportOttCallDetailsInfo(napi_env env, napi_callback
         bool matchFlag = NapiCallManagerUtils::MatchValueType(env, napiFormId, napi_object);
         NAPI_ASSERT(env, matchFlag, "Type error, should be napi_object type");
         std::string tmpStr = NapiCallManagerUtils::GetStringProperty(env, napiFormId, "phoneNumber");
-        if (memcpy_s(tmpOttVec.phoneNum, kMaxNumberLen, tmpStr.c_str(), tmpStr.length()) != 0) {
+        if (memcpy_s(tmpOttVec.phoneNum, kMaxNumberLen, tmpStr.c_str(), tmpStr.length()) != EOK) {
             return (napi_value) nullptr;
         }
         tmpStr = NapiCallManagerUtils::GetStringProperty(env, napiFormId, "bundleName");
-        if (memcpy_s(tmpOttVec.bundleName, kMaxNumberLen, tmpStr.c_str(), tmpStr.length()) != 0) {
+        if (memcpy_s(tmpOttVec.bundleName, kMaxNumberLen, tmpStr.c_str(), tmpStr.length()) != EOK) {
             return (napi_value) nullptr;
         }
         int32_t tmpValue = NapiCallManagerUtils::GetIntProperty(env, napiFormId, "videoState");
@@ -1746,6 +1746,7 @@ void NapiCallManager::NativeCallBack(napi_env env, napi_status status, void *dat
     }
     napi_delete_async_work(env, asyncContext->work);
     delete asyncContext;
+    asyncContext = nullptr;
 }
 
 void NapiCallManager::NativeDialCallBack(napi_env env, napi_status status, void *data)
@@ -1783,6 +1784,7 @@ void NapiCallManager::NativeDialCallBack(napi_env env, napi_status status, void 
     }
     napi_delete_async_work(env, asyncContext->work);
     delete asyncContext;
+    asyncContext = nullptr;
 }
 
 void NapiCallManager::NativeVoidCallBack(napi_env env, napi_status status, void *data)
@@ -1824,6 +1826,7 @@ void NapiCallManager::NativeVoidCallBack(napi_env env, napi_status status, void 
     }
     napi_delete_async_work(env, asyncContext->work);
     delete asyncContext;
+    asyncContext = nullptr;
 }
 
 void NapiCallManager::NativePropertyCallBack(napi_env env, napi_status status, void *data)
@@ -1849,6 +1852,7 @@ void NapiCallManager::NativePropertyCallBack(napi_env env, napi_status status, v
     }
     napi_delete_async_work(env, asyncContext->work);
     delete asyncContext;
+    asyncContext = nullptr;
 }
 
 void NapiCallManager::NativeBoolCallBack(napi_env env, napi_status status, void *data)
@@ -1893,6 +1897,7 @@ void NapiCallManager::NativeBoolCallBack(napi_env env, napi_status status, void 
     }
     napi_delete_async_work(env, asyncContext->work);
     delete asyncContext;
+    asyncContext = nullptr;
 }
 
 void NapiCallManager::NativeFormatNumberCallBack(napi_env env, napi_status status, void *data)
@@ -1932,6 +1937,7 @@ void NapiCallManager::NativeFormatNumberCallBack(napi_env env, napi_status statu
     }
     napi_delete_async_work(env, asyncContext->work);
     delete asyncContext;
+    asyncContext = nullptr;
 }
 
 void NapiCallManager::NativeListCallBack(napi_env env, napi_status status, void *data)
@@ -1973,6 +1979,7 @@ void NapiCallManager::NativeListCallBack(napi_env env, napi_status status, void 
     }
     napi_delete_async_work(env, asyncContext->work);
     delete asyncContext;
+    asyncContext = nullptr;
 }
 
 void NapiCallManager::GetDialInfo(napi_env env, napi_value objValue, DialAsyncContext &asyncContext)

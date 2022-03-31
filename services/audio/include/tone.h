@@ -71,6 +71,7 @@ private:
     ToneDescriptor currentToneDescriptor_ = ToneDescriptor::TONE_UNKNOWN;
     std::string GetToneDescriptorPath(ToneDescriptor tone);
     bool IsDtmf(ToneDescriptor tone);
+    std::mutex mutex_;
 };
 } // namespace Telephony
 } // namespace OHOS

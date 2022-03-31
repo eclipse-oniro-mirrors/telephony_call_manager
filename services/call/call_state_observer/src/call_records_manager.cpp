@@ -70,7 +70,9 @@ void CallRecordsManager::AddOneCallRecord(CallAttributeInfo &info)
         TELEPHONY_LOGE("callRecordsHandlerServerPtr_ is nullptr");
         return;
     }
-    if (memcpy_s(data.phoneNumber, kMaxNumberLen, info.accountNumber, strlen(info.accountNumber)) != 0) {
+    errno_t result = memcpy_s(data.phoneNumber, kMaxNumberLen, info.accountNumber,
+                              strlen(info.accountNumber));
+    if (result != EOK) {
         TELEPHONY_LOGE("memcpy_s failed!");
         return;
     }

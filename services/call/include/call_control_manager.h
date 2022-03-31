@@ -35,7 +35,7 @@
  * Singleton
  * @ClassName:CallControlManager
  * @Description:CallControlManager is designed for performing dial/answer/reject etc ops
- * on kinds of calls(ims,cs,ott). usually as a entrance for downflowed [app->ril] telephony business
+ * on kinds of calls(ims,cs,ott). usually as an entrance for downflowed [app->ril] telephony business
  */
 namespace OHOS {
 namespace Telephony {

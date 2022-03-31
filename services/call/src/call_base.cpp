@@ -99,7 +99,9 @@ void CallBase::GetCallAttributeBaseInfo(CallAttributeInfo &info)
         info.ringEndTime = ringEndTime_;
         info.callDirection = direction_;
         info.answerType = answerType_;
-        if (memcpy_s(info.bundleName, kMaxBundleNameLen, bundleName_.c_str(), bundleName_.length()) != 0) {
+        errno_t result = memcpy_s(info.bundleName, kMaxBundleNameLen, bundleName_.c_str(),
+                                  bundleName_.length());
+        if (result != EOK) {
             TELEPHONY_LOGE("memcpy_s failed!");
         }
     }

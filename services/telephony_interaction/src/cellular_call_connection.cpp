@@ -182,7 +182,7 @@ void CellularCallConnection::NotifyDeath()
         std::this_thread::sleep_for(std::chrono::milliseconds(CONNECT_SERVICE_WAIT_TIME));
         int32_t result = ConnectService();
         if (result != TELEPHONY_SUCCESS) {
-            TELEPHONY_LOGI("connect cellular call service successful");
+            TELEPHONY_LOGI("connect cellular call service successfully");
             return;
         }
     }

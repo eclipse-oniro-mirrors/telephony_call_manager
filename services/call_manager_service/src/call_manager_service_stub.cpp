@@ -378,7 +378,7 @@ int32_t CallManagerServiceStub::OnStartDtmf(MessageParcel &data, MessageParcel &
 {
     int32_t result = TELEPHONY_ERR_FAIL;
     int32_t callId = data.ReadInt32();
-    char str = data.ReadInt8();
+    char str = static_cast<char>(data.ReadInt8());
     result = StartDtmf(callId, str);
     TELEPHONY_LOGI("result:%{public}d", result);
     if (!reply.WriteInt32(result)) {

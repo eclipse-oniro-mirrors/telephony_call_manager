@@ -170,7 +170,7 @@ int32_t BluetoothCallStub::OnSeparateConference(MessageParcel &data, MessageParc
 int32_t BluetoothCallStub::OnStartDtmf(MessageParcel &data, MessageParcel &reply)
 {
     int32_t result = TELEPHONY_ERR_FAIL;
-    char str = data.ReadInt8();
+    char str = static_cast<char>(data.ReadInt8());
     result = StartDtmf(str);
     TELEPHONY_LOGI("result:%{public}d", result);
     if (!reply.WriteInt32(result)) {

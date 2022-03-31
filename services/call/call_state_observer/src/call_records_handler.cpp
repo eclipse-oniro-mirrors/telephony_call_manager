@@ -63,7 +63,7 @@ void CallRecordsHandler::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &eve
         bucket.PutInt(CALL_BEGIN_TIME, info.callBeginTime);
         bucket.PutInt(CALL_END_TIME, info.callEndTime);
         bucket.PutInt(CALL_ANSWER_STATE, static_cast<int32_t>(info.answerType));
-        uint64_t timeStamp = time(0);
+        time_t timeStamp = time(0);
         bucket.PutInt(CALL_CREATE_TIME, timeStamp);
         bucket.PutString(CALL_NUMBER_LOCATION, std::string(""));
         bucket.PutInt(CALL_PHOTO_ID, 0);

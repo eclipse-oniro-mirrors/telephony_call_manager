@@ -32,6 +32,9 @@ const int16_t CALL_START_ID = 0;
 namespace OHOS {
 namespace Telephony {
 struct DialParaInfo {
+    DialParaInfo() : accountId(0), callId(0), index(0), dialType(DialType::DIAL_CARRIER_TYPE),
+        videoState(VideoStateType::TYPE_VOICE), callType(CallType::TYPE_ERR_CALL),
+        callState(TelCallState::CALL_STATUS_IDLE), isDialing(false), isEcc(false) {}
     int32_t accountId;
     int32_t callId;
     int32_t index;

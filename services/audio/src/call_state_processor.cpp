@@ -100,16 +100,16 @@ int32_t CallStateProcessor::GetCallNumber(TelCallState state)
     int32_t number = EMPTY_VALUE;
     switch (state) {
         case TelCallState::CALL_STATUS_ALERTING:
-            number = alertingCalls_.size();
+            number = static_cast<int32_t>(alertingCalls_.size());
             break;
         case TelCallState::CALL_STATUS_INCOMING:
-            number = incomingCalls_.size();
+            number = static_cast<int32_t>(incomingCalls_.size());
             break;
         case TelCallState::CALL_STATUS_ACTIVE:
-            number = activeCalls_.size();
+            number = static_cast<int32_t>(activeCalls_.size());
             break;
         case TelCallState::CALL_STATUS_HOLDING:
-            number = holdingCalls_.size();
+            number = static_cast<int32_t>(holdingCalls_.size());
             break;
         default:
             break;

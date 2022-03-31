@@ -55,6 +55,7 @@ private:
     bool shouldVibrate_;
     bool ShouldVibrate();
     std::string ringtonePath_;
+    std::mutex mutex_;
 };
 } // namespace Telephony
 } // namespace OHOS

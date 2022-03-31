@@ -50,6 +50,7 @@ int32_t Tone::Play()
 
 int32_t Tone::Stop()
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     if (currentToneDescriptor_ == TONE_UNKNOWN) {
         TELEPHONY_LOGE("tone descriptor unknown");
         return CALL_ERR_AUDIO_UNKNOWN_TONE;

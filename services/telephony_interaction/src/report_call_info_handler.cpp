@@ -326,7 +326,10 @@ int32_t ReportCallInfoHandlerService::UpdateMediaModeResponse(const CallMediaMod
         TELEPHONY_LOGE("make_unique CellularCallEventInfo failed!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    (void)memcpy_s(para->phoneNum, kMaxNumberLen, 0, kMaxNumberLen);
+    if (memcpy_s(para->phoneNum, kMaxNumberLen, 0, kMaxNumberLen) != EOK) {
+        TELEPHONY_LOGE("memcpy_s para->phoneNum failed!");
+        return TELEPHONY_ERR_MEMSET_FAIL;
+    }
     para->result = response.result;
     bool ret = handler_->SendEvent(HANDLE_UPDATE_MEDIA_MODE_RESPONSE, std::move(para));
     if (!ret) {

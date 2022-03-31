@@ -76,6 +76,7 @@ int32_t Ring::Play()
 
 int32_t Ring::Stop()
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     if (!shouldRing_ || ringtonePath_.empty()) {
         TELEPHONY_LOGE("should not ring or ringtone path empty");
         return CALL_ERR_INVALID_PATH;
