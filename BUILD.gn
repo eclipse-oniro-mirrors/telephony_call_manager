@@ -133,7 +133,7 @@ ohos_shared_library("tel_call_manager") {
     "//foundation/aafwk/standard/interfaces/innerkits/dataobs_manager/include",
     "//foundation/multimedia/audio_standard/interfaces/inner_api/native/audioringtone/include",
     "//foundation/multimedia/audio_standard/services/include/client",
-    "//foundation/multimedia/media_standard/interfaces/innerkits/native/media/include",
+    "//foundation/multimedia/media_standard/interfaces/inner_api/native",
     "//foundation/multimedia/medialibrary_standard/interfaces/innerkits/native/include",
   ]
 
