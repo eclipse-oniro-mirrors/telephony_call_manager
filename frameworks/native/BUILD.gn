@@ -19,6 +19,10 @@ config("call_manager_config") {
     "$SUBSYSTEM_DIR/call_manager/frameworks/native/include",
     "$SUBSYSTEM_DIR/call_manager/interfaces/innerkits",
     "$SUBSYSTEM_DIR/call_manager/utils/include",
+    "//foundation/aafwk/standard/interfaces/innerkits/ability_manager/include",
+    "//foundation/aafwk/standard/interfaces/innerkits/app_manager/include/appmgr",
+    "//foundation/aafwk/standard/interfaces/innerkits/base/include/ohos/aafwk/base",
+    "//foundation/appexecfwk/standard/interfaces/innerkits/appexecfwk_base/include",
   ]
 }
 
@@ -37,10 +41,14 @@ ohos_shared_library("tel_call_manager_api") {
 
   public_configs = [ ":call_manager_config" ]
 
-  deps = [ "//utils/native/base:utils" ]
+  deps = [
+    "//foundation/aafwk/standard/interfaces/innerkits/base:base",
+    "//utils/native/base:utils",
+  ]
 
   external_deps = [
     "ability_base:want",
+    "ability_runtime:ability_manager",
     "core_service:tel_core_service_api",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
