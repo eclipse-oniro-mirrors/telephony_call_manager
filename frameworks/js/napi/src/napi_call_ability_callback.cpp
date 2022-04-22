@@ -888,17 +888,16 @@ int32_t NapiCallAbilityCallback::ReportDisconnectedCause(int32_t cause, EventCal
     napi_value callbackFunc = nullptr;
     napi_env env = eventCallback.env;
     napi_value callbackValues[ARRAY_INDEX_THIRD] = {0};
-    callbackValues[ARRAY_INDEX_FIRST] = NapiCallManagerUtils::CreateUndefined(env);
-    napi_create_object(env, &callbackValues[ARRAY_INDEX_SECOND]);
+    napi_create_object(env, &callbackValues[ARRAY_INDEX_FIRST]);
     NapiCallManagerUtils::SetPropertyInt32(
-        env, callbackValues[ARRAY_INDEX_SECOND], "disconnectedCause", static_cast<int32_t>(cause));
+        env, callbackValues[ARRAY_INDEX_FIRST], "disconnectedCause", static_cast<int32_t>(cause));
     napi_get_reference_value(env, eventCallback.callbackRef, &callbackFunc);
     napi_value callbackResult = nullptr;
     if (callbackFunc == nullptr) {
         TELEPHONY_LOGE("callbackFunc is null!");
         return CALL_ERR_CALLBACK_NOT_EXIST;
     }
-    napi_call_function(env, eventCallback.thisVar, callbackFunc, DATA_LENGTH_TWO, callbackValues, &callbackResult);
+    napi_call_function(env, eventCallback.thisVar, callbackFunc, DATA_LENGTH_ONE, callbackValues, &callbackResult);
     return TELEPHONY_SUCCESS;
 }
 
@@ -1552,24 +1551,23 @@ int32_t NapiCallAbilityCallback::ReportCallOtt(
     napi_value callbackFunc = nullptr;
     napi_env env = settingInfo.env;
     napi_value callbackValues[ARRAY_INDEX_THIRD] = {0};
-    callbackValues[ARRAY_INDEX_FIRST] = NapiCallManagerUtils::CreateUndefined(env);
-    napi_create_object(env, &callbackValues[ARRAY_INDEX_SECOND]);
+    napi_create_object(env, &callbackValues[ARRAY_INDEX_FIRST]);
     NapiCallManagerUtils::SetPropertyInt32(
-        env, callbackValues[ARRAY_INDEX_SECOND], "requestId", static_cast<int32_t>(requestId));
+        env, callbackValues[ARRAY_INDEX_FIRST], "requestId", static_cast<int32_t>(requestId));
     NapiCallManagerUtils::SetPropertyStringUtf8(
-        env, callbackValues[ARRAY_INDEX_SECOND], "phoneNumber", resultInfo.GetStringValue("phoneNumber").c_str());
+        env, callbackValues[ARRAY_INDEX_FIRST], "phoneNumber", resultInfo.GetStringValue("phoneNumber").c_str());
     NapiCallManagerUtils::SetPropertyStringUtf8(
-        env, callbackValues[ARRAY_INDEX_SECOND], "bundleName", resultInfo.GetStringValue("bundleName").c_str());
+        env, callbackValues[ARRAY_INDEX_FIRST], "bundleName", resultInfo.GetStringValue("bundleName").c_str());
     NapiCallManagerUtils::SetPropertyInt32(
-        env, callbackValues[ARRAY_INDEX_SECOND], "videoState", resultInfo.GetIntValue("videoState"));
+        env, callbackValues[ARRAY_INDEX_FIRST], "videoState", resultInfo.GetIntValue("videoState"));
     switch (requestId) {
         case OttCallRequestId::OTT_REQUEST_INVITE_TO_CONFERENCE:
             NapiCallManagerUtils::SetPropertyStringUtf8(
-                env, callbackValues[ARRAY_INDEX_SECOND], "number", resultInfo.GetStringValue("number").c_str());
+                env, callbackValues[ARRAY_INDEX_FIRST], "number", resultInfo.GetStringValue("number").c_str());
             break;
         case OttCallRequestId::OTT_REQUEST_UPDATE_CALL_MEDIA_MODE:
             NapiCallManagerUtils::SetPropertyInt32(
-                env, callbackValues[ARRAY_INDEX_SECOND], "callMediaMode", resultInfo.GetIntValue("callMediaMode"));
+                env, callbackValues[ARRAY_INDEX_FIRST], "callMediaMode", resultInfo.GetIntValue("callMediaMode"));
             break;
         default:
             break;
@@ -1581,7 +1579,7 @@ int32_t NapiCallAbilityCallback::ReportCallOtt(
         TELEPHONY_LOGE("callbackFunc is null!");
         return CALL_ERR_CALLBACK_NOT_EXIST;
     }
-    napi_call_function(env, settingInfo.thisVar, callbackFunc, DATA_LENGTH_TWO, callbackValues, &callbackResult);
+    napi_call_function(env, settingInfo.thisVar, callbackFunc, DATA_LENGTH_ONE, callbackValues, &callbackResult);
     return TELEPHONY_SUCCESS;
 }
 } // namespace Telephony
