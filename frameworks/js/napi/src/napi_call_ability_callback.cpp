@@ -747,29 +747,28 @@ int32_t NapiCallAbilityCallback::ReportCallState(CallAttributeInfo &info, EventC
     napi_value callbackFunc = nullptr;
     napi_env env = stateCallback.env;
     napi_value callbackValues[ARRAY_INDEX_THIRD] = {0};
-    callbackValues[ARRAY_INDEX_FIRST] = NapiCallManagerUtils::CreateUndefined(env);
-    napi_create_object(env, &callbackValues[ARRAY_INDEX_SECOND]);
+    napi_create_object(env, &callbackValues[ARRAY_INDEX_FIRST]);
     NapiCallManagerUtils::SetPropertyStringUtf8(
-        env, callbackValues[ARRAY_INDEX_SECOND], "accountNumber", info.accountNumber);
-    NapiCallManagerUtils::SetPropertyInt32(env, callbackValues[ARRAY_INDEX_SECOND], "accountId", info.accountId);
+        env, callbackValues[ARRAY_INDEX_FIRST], "accountNumber", info.accountNumber);
+    NapiCallManagerUtils::SetPropertyInt32(env, callbackValues[ARRAY_INDEX_FIRST], "accountId", info.accountId);
     NapiCallManagerUtils::SetPropertyInt32(
-        env, callbackValues[ARRAY_INDEX_SECOND], "videoState", static_cast<int32_t>(info.videoState));
-    NapiCallManagerUtils::SetPropertyInt32(env, callbackValues[ARRAY_INDEX_SECOND], "startTime", info.startTime);
-    NapiCallManagerUtils::SetPropertyBoolean(env, callbackValues[ARRAY_INDEX_SECOND], "isEcc", info.isEcc);
+        env, callbackValues[ARRAY_INDEX_FIRST], "videoState", static_cast<int32_t>(info.videoState));
+    NapiCallManagerUtils::SetPropertyInt32(env, callbackValues[ARRAY_INDEX_FIRST], "startTime", info.startTime);
+    NapiCallManagerUtils::SetPropertyBoolean(env, callbackValues[ARRAY_INDEX_FIRST], "isEcc", info.isEcc);
     NapiCallManagerUtils::SetPropertyInt32(
-        env, callbackValues[ARRAY_INDEX_SECOND], "callType", static_cast<int32_t>(info.callType));
-    NapiCallManagerUtils::SetPropertyInt32(env, callbackValues[ARRAY_INDEX_SECOND], "callId", info.callId);
+        env, callbackValues[ARRAY_INDEX_FIRST], "callType", static_cast<int32_t>(info.callType));
+    NapiCallManagerUtils::SetPropertyInt32(env, callbackValues[ARRAY_INDEX_FIRST], "callId", info.callId);
     NapiCallManagerUtils::SetPropertyInt32(
-        env, callbackValues[ARRAY_INDEX_SECOND], "callState", static_cast<int32_t>(info.callState));
+        env, callbackValues[ARRAY_INDEX_FIRST], "callState", static_cast<int32_t>(info.callState));
     NapiCallManagerUtils::SetPropertyInt32(
-        env, callbackValues[ARRAY_INDEX_SECOND], "conferenceState", static_cast<int32_t>(info.conferenceState));
+        env, callbackValues[ARRAY_INDEX_FIRST], "conferenceState", static_cast<int32_t>(info.conferenceState));
     napi_get_reference_value(env, stateCallback.callbackRef, &callbackFunc);
     napi_value callbackResult = nullptr;
     if (callbackFunc == nullptr) {
         TELEPHONY_LOGE("callbackFunc is null!");
         return CALL_ERR_CALLBACK_NOT_EXIST;
     }
-    napi_call_function(env, stateCallback.thisVar, callbackFunc, DATA_LENGTH_TWO, callbackValues, &callbackResult);
+    napi_call_function(env, stateCallback.thisVar, callbackFunc, DATA_LENGTH_ONE, callbackValues, &callbackResult);
     return TELEPHONY_SUCCESS;
 }
 
@@ -821,21 +820,20 @@ int32_t NapiCallAbilityCallback::ReportCallEvent(CallEventInfo &info, EventCallb
     napi_value callbackFunc = nullptr;
     napi_env env = eventCallback.env;
     napi_value callbackValues[ARRAY_INDEX_THIRD] = {0};
-    callbackValues[ARRAY_INDEX_FIRST] = NapiCallManagerUtils::CreateUndefined(env);
-    napi_create_object(env, &callbackValues[ARRAY_INDEX_SECOND]);
+    napi_create_object(env, &callbackValues[ARRAY_INDEX_FIRST]);
     NapiCallManagerUtils::SetPropertyInt32(
-        env, callbackValues[ARRAY_INDEX_SECOND], "eventId", static_cast<int32_t>(info.eventId));
+        env, callbackValues[ARRAY_INDEX_FIRST], "eventId", static_cast<int32_t>(info.eventId));
     NapiCallManagerUtils::SetPropertyStringUtf8(
-        env, callbackValues[ARRAY_INDEX_SECOND], "accountNumber", info.phoneNum);
+        env, callbackValues[ARRAY_INDEX_FIRST], "accountNumber", info.phoneNum);
     NapiCallManagerUtils::SetPropertyStringUtf8(
-        env, callbackValues[ARRAY_INDEX_SECOND], "bundleName", info.bundleName);
+        env, callbackValues[ARRAY_INDEX_FIRST], "bundleName", info.bundleName);
     napi_get_reference_value(env, eventCallback.callbackRef, &callbackFunc);
     napi_value callbackResult = nullptr;
     if (callbackFunc == nullptr) {
         TELEPHONY_LOGE("callbackFunc is null!");
         return CALL_ERR_CALLBACK_NOT_EXIST;
     }
-    napi_call_function(env, eventCallback.thisVar, callbackFunc, DATA_LENGTH_TWO, callbackValues, &callbackResult);
+    napi_call_function(env, eventCallback.thisVar, callbackFunc, DATA_LENGTH_ONE, callbackValues, &callbackResult);
     return TELEPHONY_SUCCESS;
 }
 
