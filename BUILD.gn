@@ -120,7 +120,6 @@ ohos_shared_library("tel_call_manager") {
     "//foundation/multimedia/camera_standard/services/camera_service/binder/server/include",
     "//foundation/graphic/standard/frameworks/surface/include",
     "//drivers/peripheral/camera/interfaces/metadata/include",
-    "//utils/system/safwk/native/include",
     "//drivers/framework/include/utils",
     "//drivers/adapter/uhdf2/utils/include",
     "//drivers/adapter/uhdf2/include/hdi",
@@ -142,7 +141,6 @@ ohos_shared_library("tel_call_manager") {
   deps = [
     "//base/notification/ans_standard/frameworks/ans/core:ans_core",
     "//base/notification/ans_standard/frameworks/ans/native:ans_innerkits",
-    "//base/notification/ans_standard/services/ans:libans",
     "//base/telephony/core_service/utils:libtel_common",
     "//base/telephony/sms_mms/frameworks/native:tel_sms_mms_api",
     "//drivers/peripheral/camera/interfaces/metadata:metadata",

@@ -19,7 +19,6 @@
 #include <securec.h>
 
 #include "system_ability_definition.h"
-#include "ability.h"
 
 #include "call_manager_errors.h"
 #include "telephony_log_wrapper.h"

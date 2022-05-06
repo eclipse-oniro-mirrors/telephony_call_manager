@@ -16,7 +16,6 @@
 #include "napi_call_manager_utils.h"
 
 #include "system_ability_definition.h"
-#include "ability.h"
 
 #include "telephony_log_wrapper.h"
 
