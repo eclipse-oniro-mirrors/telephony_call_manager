@@ -148,7 +148,6 @@ ohos_shared_library("tel_call_manager") {
     "//foundation/aafwk/standard/interfaces/innerkits/dataobs_manager:dataobs_manager",
     "//foundation/multimedia/camera_standard/frameworks/native/camera:camera_framework",
     "//third_party/libphonenumber/cpp:phonenumber_standard",
-    "//third_party/protobuf/src:protobuf_standard",
     "//utils/native/base:utils",
   ]
 
