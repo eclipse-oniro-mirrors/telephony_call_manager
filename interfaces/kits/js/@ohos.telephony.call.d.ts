@@ -398,10 +398,11 @@ declare namespace call {
    * @since 8
    */
   export enum AudioDevice {
-    DEVICE_MIC,
+    DEVICE_EARPIECE,
     DEVICE_SPEAKER,
     DEVICE_WIRED_HEADSET,
-    DEVICE_BLUETOOTH_SCO
+    DEVICE_BLUETOOTH_SCO,
+    DEVICE_MIC,
   }
 
   /**

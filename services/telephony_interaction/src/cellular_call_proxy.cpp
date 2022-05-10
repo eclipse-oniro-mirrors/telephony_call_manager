@@ -1101,5 +1101,42 @@ int32_t CellularCallProxy::GetMute(int32_t slotId)
     }
     return error;
 }
+
+int32_t CellularCallProxy::SetEmergencyCallList(int32_t slotId, std::vector<EmergencyCall>  &eccVec)
+{
+    MessageOption option;
+    MessageParcel in;
+    MessageParcel out;
+    if (!in.WriteInterfaceToken(CellularCallProxy::GetDescriptor())) {
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    if (!in.WriteInt32(MAX_SIZE)) {
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
+    if (!in.WriteInt32(slotId)) {
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
+
+    if (eccVec.size() <= 0) {
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
+
+    if (!in.WriteInt32(static_cast<int32_t>(eccVec.size()))) {
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
+
+    for (auto ecc : eccVec) {
+        if (!in.WriteRawData((const void *)&ecc, sizeof(EmergencyCall))) {
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+        }
+    }
+
+    int32_t error = Remote()->SendRequest(static_cast<uint32_t>(OperationType::SET_EMERGENCY_CALL_LIST),
+        in, out, option);
+    if (error == ERR_NONE) {
+        return out.ReadInt32();
+    }
+    return error;
+}
 } // namespace Telephony
 } // namespace OHOS

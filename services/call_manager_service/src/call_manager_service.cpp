@@ -60,6 +60,7 @@ bool CallManagerService::Init()
     DelayedSingleton<ReportCallInfoHandlerService>::GetInstance()->Start();
     DelayedSingleton<CellularCallConnection>::GetInstance()->Init(TELEPHONY_CELLULAR_CALL_SYS_ABILITY_ID);
     DelayedSingleton<CallRecordsManager>::GetInstance()->Init();
+    DelayedSingleton<BluetoothConnection>::GetInstance()->Init();
     return true;
 }
 

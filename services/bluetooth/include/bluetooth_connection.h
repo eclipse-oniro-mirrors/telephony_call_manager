@@ -33,10 +33,15 @@ enum BtScoState {
     SCO_STATE_PENDING,
 };
 
+#ifdef ABILITY_BLUETOOTH_SUPPORT
+class BluetoothConnection : public OHOS::Bluetooth::HandsFreeAudioGatewayObserver {
+#else
 class BluetoothConnection {
+#endif    
 public:
     BluetoothConnection();
     ~BluetoothConnection();
+    void Init();
     bool ConnectBtSco();
     bool DisconnectBtSco();
     bool IsBtScoConnected();
