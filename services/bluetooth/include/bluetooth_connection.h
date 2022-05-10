@@ -38,6 +38,7 @@ class BluetoothConnection : public OHOS::Bluetooth::HandsFreeAudioGatewayObserve
 #else
 class BluetoothConnection {
 #endif    
+
 public:
     BluetoothConnection();
     ~BluetoothConnection();

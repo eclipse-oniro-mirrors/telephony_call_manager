@@ -201,7 +201,7 @@ ohos_shared_library("tel_call_manager") {
     external_deps += [ "bluetooth_standard:btframework" ]
     defines += [ "ABILITY_BLUETOOTH_SUPPORT" ]
   }
-  s
+
   part_name = "call_manager"
   subsystem_name = "telephony"
 }
