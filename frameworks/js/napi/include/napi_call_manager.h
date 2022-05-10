@@ -72,6 +72,7 @@ public:
     static napi_value DeclareTransferSettingTypeEnum(napi_env env, napi_value exports);
     static napi_value RegisterCallManagerFunc(napi_env env, napi_value exports);
     static napi_value DialCall(napi_env env, napi_callback_info info);
+    static napi_value MakeCall(napi_env env, napi_callback_info info);
     static napi_value AnswerCall(napi_env env, napi_callback_info info);
     static napi_value RejectCall(napi_env env, napi_callback_info info);
     static napi_value HangUpCall(napi_env env, napi_callback_info info);
@@ -140,6 +141,7 @@ private:
     static int32_t GetRestrictionInfo(napi_env env, napi_value objValue, CallRestrictionAsyncContext &asyncContext);
     static int32_t GetTransferInfo(napi_env env, napi_value objValue, CallTransferAsyncContext &asyncContext);
     static void NativeDialCall(napi_env env, void *data);
+    static void NativeMakeCall(napi_env env, void *data);
     static void NativeAnswerCall(napi_env env, void *data);
     static void NativeRejectCall(napi_env env, void *data);
     static void NativeHangUpCall(napi_env env, void *data);
