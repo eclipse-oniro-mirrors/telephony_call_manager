@@ -30,7 +30,7 @@ ohos_executable("tel_call_manager_ui_test") {
     "//foundation/multimedia/camera_standard/services/camera_service/binder/client/include",
     "//foundation/multimedia/camera_standard/services/camera_service/binder/server/include",
     "//foundation/graphic/standard/frameworks/surface/include",
-    "//foundation/multimedia/camera_standard/frameworks/native/metadata/include",
+    "//drivers/peripheral/camera/interfaces/metadata/include",
     "//utils/system/safwk/native/include",
     "//drivers/framework/include/utils",
     "//drivers/adapter/uhdf2/utils/include",
@@ -50,10 +50,10 @@ ohos_executable("tel_call_manager_ui_test") {
   deps = [
     "//base/security/permission/frameworks/permission_standard/permissioninfrastructure:permission_standard_infrastructure_cxx",
     "//base/security/permission/interfaces/innerkits/permission_standard/permissionsdk:libpermissionsdk_standard",
+    "//drivers/peripheral/camera/interfaces/metadata:metadata",
     "//foundation/aafwk/standard/frameworks/kits/ability/native:abilitykit_native",
     "//foundation/graphic/standard:libsurface",
     "//foundation/multimedia/camera_standard/frameworks/native/camera:camera_framework",
-    "//foundation/multimedia/camera_standard/frameworks/native/metadata:metadata",
     "//utils/native/base:utils",
   ]
 
