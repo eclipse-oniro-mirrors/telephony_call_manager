@@ -37,7 +37,7 @@ enum BtScoState {
 class BluetoothConnection : public OHOS::Bluetooth::HandsFreeAudioGatewayObserver {
 #else
 class BluetoothConnection {
-#endif    
+#endif
 
 public:
     BluetoothConnection();
