@@ -39,8 +39,7 @@ void BluetoothConnection::Init()
 #ifdef ABILITY_BLUETOOTH_SUPPORT
     TELEPHONY_LOGI("BluetoothConnection init success!");
     Bluetooth::HandsFreeAudioGateway::GetProfile()->RegisterObserver(this);
-#endif  
-  
+#endif
 }
 
 bool BluetoothConnection::ConnectBtSco()
