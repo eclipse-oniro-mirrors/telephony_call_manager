@@ -64,12 +64,12 @@ bool AudioPlayer::InitRenderer(const wav_hdr &wavHeader, AudioStandard::AudioStr
 int32_t AudioPlayer::Play(const std::string &path, AudioStandard::AudioStreamType streamType, PlayerType playerType)
 {
     wav_hdr wavHeader;
-    char *realPath = GetRealPath(path.c_str());
-    if (realPath == nullptr) {
+    std::string realPath = GetRealPath(path);
+    if (realPath.empty()) {
         TELEPHONY_LOGE("path or realPath is NULL");
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
-    FILE *wavFile = fopen(realPath, "rb");
+    FILE *wavFile = fopen(realPath.c_str(), "rb");
     if (wavFile == nullptr) {
         TELEPHONY_LOGE("open audio file failed");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -156,17 +156,19 @@ void AudioPlayer::ReleaseRenderer()
     audioRenderer_->Release();
 }
 
-char *AudioPlayer::GetRealPath(const std::string &path)
+std::string AudioPlayer::GetRealPath(const std::string &profilePath)
 {
-    if (path.empty()) {
-        return nullptr;
+    if (profilePath.empty()) {
+        TELEPHONY_LOGE("profilePath is empty");
+        return "";
     }
 
-    char realPath[PATH_MAX] = {0x00};
-    if (realpath(path.c_str(), realPath) == nullptr) {
-        return nullptr;
+    char path[PATH_MAX] = {'\0'};
+    if (realpath(profilePath.c_str(), path) == nullptr) {
+        TELEPHONY_LOGE("get real path fail");
+        return "";
     }
-
+    std::string realPath(path);
     return realPath;
 }
 } // namespace Telephony
