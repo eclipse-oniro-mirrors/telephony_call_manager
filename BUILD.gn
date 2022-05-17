@@ -152,6 +152,7 @@ ohos_shared_library("tel_call_manager") {
   ]
 
   external_deps = [
+    "ability_base:configuration",
     "ability_base:want",
     "ability_base:zuri",
     "common_event_service:cesfwk_innerkits",
