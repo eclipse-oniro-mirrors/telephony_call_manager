@@ -22,9 +22,7 @@
         "syscap": [
             "SystemCapability.Telephony.CallManager"
         ],
-        "features": [
-            "call_manager_feature_bt_activity"
-        ],
+        "features": [],
         "adapted_system_type": [
             "standard"
         ],

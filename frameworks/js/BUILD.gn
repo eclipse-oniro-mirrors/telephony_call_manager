@@ -35,7 +35,6 @@ ohos_shared_library("call") {
   public_configs = [ ":call_manager_js_config" ]
 
   deps = [
-    "//foundation/aafwk/standard/frameworks/kits/ability/native:abilitykit_native/",
     "//foundation/arkui/napi:ace_napi",
     "//third_party/libuv:uv_static",
     "//utils/native/base:utils",
@@ -43,7 +42,6 @@ ohos_shared_library("call") {
 
   external_deps = [
     "ability_base:want",
-    "ability_runtime:ability_manager",
     "bundle_framework:appexecfwk_base",
     "bundle_framework:appexecfwk_core",
     "call_manager:tel_call_manager_api",

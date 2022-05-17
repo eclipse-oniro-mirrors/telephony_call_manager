@@ -198,7 +198,8 @@ ohos_shared_library("tel_call_manager") {
     external_deps += [ "hilog:libhilog" ]
   }
 
-  if (call_manager_feature_bt_activity) {
+  if (defined(global_parts_info) &&
+      defined(global_parts_info.communication_bluetooth_standard)) {
     external_deps += [ "bluetooth_standard:btframework" ]
     defines += [ "ABILITY_BLUETOOTH_SUPPORT" ]
   }

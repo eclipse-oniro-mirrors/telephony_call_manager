@@ -19,7 +19,6 @@
 #include <securec.h>
 
 #include "system_ability_definition.h"
-#include "ability.h"
 
 #include "call_manager_errors.h"
 #include "telephony_log_wrapper.h"
@@ -2625,6 +2624,9 @@ void NapiCallManager::NativeSetAudioDevice(napi_env env, void *data)
     AudioDevice type;
     auto asyncContext = (AudioAsyncContext *)data;
     type = static_cast<AudioDevice>(asyncContext->dudioDevice);
+    
+    // For interface compatibility, when AudioDevice::DEVICE_MIC is deleted, this code block should also be deleted
+    // When the parameter passed is DEVICE_MIC, point to DEVICE_EARPIECE
     int32_t DEVICE_MIC = 4;
     if (static_cast<int32_t>(type) == DEVICE_MIC) {
         type = AudioDevice::DEVICE_EARPIECE;
