@@ -193,6 +193,12 @@ ohos_shared_library("tel_call_manager") {
   } else {
     external_deps += [ "hilog:libhilog" ]
   }
+
+  if (defined(global_parts_info) &&
+      defined(global_parts_info.communication_bluetooth_standard)) {
+    external_deps += [ "bluetooth_standard:btframework" ]
+    defines += [ "ABILITY_BLUETOOTH_SUPPORT" ]
+  }
   part_name = "call_manager"
   subsystem_name = "telephony"
 }

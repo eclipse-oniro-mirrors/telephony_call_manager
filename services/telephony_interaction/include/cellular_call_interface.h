@@ -15,6 +15,7 @@
 
 #ifndef CELLULAR_CALL_INTERFACE_H
 #define CELLULAR_CALL_INTERFACE_H
+#include "telephony_types.h"
 
 #include "i_call_status_callback.h"
 
@@ -33,6 +34,7 @@ public:
         UN_HOLD_CALL,
         SWITCH_CALL,
         EMERGENCY_CALL,
+        SET_EMERGENCY_CALL_LIST,
         COMBINE_CONFERENCE,
         SEPARATE_CONFERENCE,
         INVITE_TO_CONFERENCE,
@@ -481,6 +483,16 @@ public:
      * @return Returns TELEPHONY_SUCCESS on success, others on failure.
      */
     virtual int32_t GetMute(int32_t slotId) = 0;
+
+    /**
+     * SetEmergencyCallList
+     *
+     * @brief Is it an emergency call
+     * @param eccVecr[in], Phone number to be formatted
+     * @param slotId[in], The slot id
+     * @return Returns 0 on ture, others on false.
+     */
+    virtual int32_t SetEmergencyCallList(int32_t slotId, std::vector<EmergencyCall>  &eccVec) = 0;
 
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"OHOS.Telephony.CellularCallInterface");
