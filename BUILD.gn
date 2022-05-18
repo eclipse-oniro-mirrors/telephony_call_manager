@@ -118,9 +118,8 @@ ohos_shared_library("tel_call_manager") {
     "//foundation/multimedia/camera_standard/services/camera_service/binder/base/include",
     "//foundation/multimedia/camera_standard/services/camera_service/binder/client/include",
     "//foundation/multimedia/camera_standard/services/camera_service/binder/server/include",
-    "//foundation/graphic/standard/frameworks/surface/include",
+    "//foundation/graphic/graphic/frameworks/surface/include",
     "//drivers/peripheral/camera/interfaces/metadata/include",
-    "//utils/system/safwk/native/include",
     "//drivers/framework/include/utils",
     "//drivers/adapter/uhdf2/utils/include",
     "//drivers/adapter/uhdf2/include/hdi",
@@ -142,21 +141,18 @@ ohos_shared_library("tel_call_manager") {
   deps = [
     "//base/notification/ans_standard/frameworks/ans/core:ans_core",
     "//base/notification/ans_standard/frameworks/ans/native:ans_innerkits",
-    "//base/notification/ans_standard/services/ans:libans",
     "//base/telephony/core_service/utils:libtel_common",
     "//base/telephony/sms_mms/frameworks/native:tel_sms_mms_api",
     "//drivers/peripheral/camera/interfaces/metadata:metadata",
     "//foundation/aafwk/standard/frameworks/kits/ability/native:abilitykit_native",
-    "//foundation/aafwk/standard/interfaces/innerkits/ability_manager:ability_manager",
     "//foundation/aafwk/standard/interfaces/innerkits/dataobs_manager:dataobs_manager",
-    "//foundation/graphic/standard:libsurface",
     "//foundation/multimedia/camera_standard/frameworks/native/camera:camera_framework",
     "//third_party/libphonenumber/cpp:phonenumber_standard",
-    "//third_party/protobuf/src:protobuf_standard",
     "//utils/native/base:utils",
   ]
 
   external_deps = [
+    "ability_base:configuration",
     "ability_base:want",
     "ability_base:zuri",
     "common_event_service:cesfwk_innerkits",
@@ -203,7 +199,6 @@ ohos_shared_library("tel_call_manager") {
     external_deps += [ "bluetooth_standard:btframework" ]
     defines += [ "ABILITY_BLUETOOTH_SUPPORT" ]
   }
-
   part_name = "call_manager"
   subsystem_name = "telephony"
 }
