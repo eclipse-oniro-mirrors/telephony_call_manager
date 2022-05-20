@@ -185,6 +185,25 @@ int32_t CallAbilityReportProxy::ReportAsyncResults(
     return ret;
 }
 
+int32_t CallAbilityReportProxy::ReportMmiCodeResult(const MmiCodeInfo &info)
+{
+    int32_t ret = TELEPHONY_ERR_FAIL;
+    std::lock_guard<std::mutex> lock(mutex_);
+    std::list<sptr<ICallAbilityCallback>>::iterator it = callbackPtrList_.begin();
+    for (; it != callbackPtrList_.end(); ++it) {
+        if ((*it)) {
+            ret = (*it)->OnReportMmiCodeResult(info);
+            if (ret != TELEPHONY_SUCCESS) {
+                TELEPHONY_LOGW("ReportMmiCodeResult failed, errcode:%{public}d, bundleName:%{public}s", ret,
+                    ((*it)->GetBundleName()).c_str());
+                continue;
+            }
+        }
+    }
+    TELEPHONY_LOGI("ReportMmiCodeResult success");
+    return ret;
+}
+
 int32_t CallAbilityReportProxy::OttCallRequest(OttCallRequestId requestId, AppExecFwk::PacMap &info)
 {
     int32_t ret = TELEPHONY_ERR_FAIL;

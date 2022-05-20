@@ -26,6 +26,7 @@
 #include "ott_call.h"
 #include "audio_control_manager.h"
 #include "call_control_manager.h"
+#include "bluetooth_call_service.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -98,6 +99,8 @@ int32_t CallStatusManager::HandleCallReportInfo(const CallDetailInfo &info)
             TELEPHONY_LOGE("Invalid call state!");
             break;
     }
+    TELEPHONY_LOGI("Entry CallStatusManager HandleCallReportInfo");
+    DelayedSingleton<BluetoothCallService>::GetInstance()->GetCallState();
     return ret;
 }
 
@@ -311,6 +314,7 @@ int32_t CallStatusManager::ActiveHandle(const CallDetailInfo &info)
         TELEPHONY_LOGE("Call is NULL");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
+    call = RefreshCallIfNecessary(call, info);
     // call state change active, need to judge if launching a conference
     int32_t ret = call->LaunchConference();
     if (ret == TELEPHONY_SUCCESS) {
@@ -343,6 +347,7 @@ int32_t CallStatusManager::HoldingHandle(const CallDetailInfo &info)
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     // if the call is in a conference, it will exit, otherwise just set it holding
+    call = RefreshCallIfNecessary(call, info);
     int32_t ret = call->HoldConference();
     if (ret == TELEPHONY_SUCCESS) {
         TELEPHONY_LOGI("HoldConference success");
@@ -368,6 +373,7 @@ int32_t CallStatusManager::AlertHandle(const CallDetailInfo &info)
         TELEPHONY_LOGE("Call is NULL");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
+    call = RefreshCallIfNecessary(call, info);
     int32_t ret = UpdateCallState(call, TelCallState::CALL_STATUS_ALERTING);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("UpdateCallState failed, errCode:%{public}d", ret);
@@ -390,6 +396,7 @@ int32_t CallStatusManager::DisconnectingHandle(const CallDetailInfo &info)
         TELEPHONY_LOGE("Call is NULL");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
+    call = RefreshCallIfNecessary(call, info);
     int32_t ret = UpdateCallState(call, TelCallState::CALL_STATUS_DISCONNECTING);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("UpdateCallState failed, errCode:%{public}d", ret);
@@ -406,6 +413,7 @@ int32_t CallStatusManager::DisconnectedHandle(const CallDetailInfo &info)
         TELEPHONY_LOGE("Call is NULL");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
+    call = RefreshCallIfNecessary(call, info);
     int32_t ret = call->ExitConference();
     if (ret == TELEPHONY_SUCCESS) {
         TELEPHONY_LOGI("SubCallSeparateFromConference success");
@@ -441,6 +449,36 @@ int32_t CallStatusManager::UpdateCallState(sptr<CallBase> &call, TelCallState ne
         return CALL_ERR_PHONE_CALLSTATE_NOTIFY_FAILED;
     }
     return TELEPHONY_SUCCESS;
+}
+
+sptr<CallBase> CallStatusManager::RefreshCallIfNecessary(const sptr<CallBase> &call, const CallDetailInfo &info)
+{
+    TELEPHONY_LOGI("RefreshCallIfNecessary");
+    if (call->GetCallType() == info.callType) {
+        TELEPHONY_LOGI("RefreshCallIfNecessary not need Refresh");
+        return call;
+    }
+    CallAttributeInfo attrInfo;
+    (void)memset_s(&attrInfo, sizeof(CallAttributeInfo), 0, sizeof(CallAttributeInfo));
+    call->GetCallAttributeBaseInfo(attrInfo);
+    sptr<CallBase> newCall = CreateNewCall(info, attrInfo.callDirection);
+    if (newCall == nullptr) {
+        TELEPHONY_LOGE("RefreshCallIfNecessary createCallFail");
+        return call;
+    }
+    newCall->SetCallRunningState(call->GetCallRunningState());
+    newCall->SetTelConferenceState(call->GetTelConferenceState());
+    newCall->SetStartTime(attrInfo.startTime);
+    newCall->SetPolicyFlag(PolicyFlag(call->GetPolicyFlag()));
+    newCall->SetSpeakerphoneOn(call->IsSpeakerphoneOn());
+    newCall->SetCallEndedType(call->GetCallEndedType());
+    newCall->SetCallEndTime(attrInfo.callBeginTime);
+    newCall->SetCallEndTime(attrInfo.callEndTime);
+    newCall->SetRingBeginTime(attrInfo.ringBeginTime);
+    newCall->SetRingEndTime(attrInfo.ringEndTime);
+    newCall->SetAnswerType(attrInfo.answerType);
+    DeleteOneCallObject(call->GetCallID());
+    return newCall;
 }
 
 int32_t CallStatusManager::ToSpeakerPhone(sptr<CallBase> &call)

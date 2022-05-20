@@ -67,6 +67,17 @@ int32_t NapiCallManagerCallback::OnReportAsyncResults(CallResultReportId reportI
     return ret;
 }
 
+int32_t NapiCallManagerCallback::OnReportMmiCodeResult(const MmiCodeInfo &info)
+{
+    int32_t ret = DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->UpdateMmiCodeResultsInfo(info);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("UpdateMmiCodeInfo failed! errCode:%{public}d", ret);
+    } else {
+        TELEPHONY_LOGI("UpdateMmiCodeInfo success!");
+    }
+    return ret;
+}
+
 int32_t NapiCallManagerCallback::OnOttCallRequest(OttCallRequestId requestId, AppExecFwk::PacMap &info)
 {
     int32_t ret = DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->OttCallRequest(requestId, info);

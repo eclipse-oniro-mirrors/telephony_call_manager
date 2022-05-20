@@ -55,6 +55,7 @@ public:
     virtual int32_t StopDtmfResult(const int32_t result) = 0;
     virtual int32_t SendUssdResult(const int32_t result) = 0;
     virtual int32_t GetImsCallDataResult(const int32_t result) = 0;
+    virtual int32_t SendMmiCodeResult(const MmiCodeInfo &info) = 0;
 
     enum CallManagerCallStatusCode {
         UPDATE_CALL_INFO = 0,
@@ -87,6 +88,7 @@ public:
         STOP_DTMF,
         SEND_USSD,
         GET_IMS_CALL_DATA,
+        MMI_CODE_INFO_RESPONSE,
     };
 
 public:

@@ -1318,6 +1318,13 @@ napi_value NapiCallManager::ObserverOn(napi_env env, napi_callback_info info)
         causeCallback.thisVar = thisVar;
         napi_create_reference(env, argv[ARRAY_INDEX_SECOND], DATA_LENGTH_ONE, &causeCallback.callbackRef);
         DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->RegisterDisconnectedCauseCallback(causeCallback);
+    } else if (tmpStr == "mmiCodeResult") {
+        EventCallback mmiCodeResultListener;
+        (void)memset_s(&mmiCodeResultListener, sizeof(EventCallback), 0, sizeof(EventCallback));
+        mmiCodeResultListener.env = env;
+        mmiCodeResultListener.thisVar = thisVar;
+        napi_create_reference(env, argv[ARRAY_INDEX_SECOND], DATA_LENGTH_ONE, &mmiCodeResultListener.callbackRef);
+        DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->RegisterMmiCodeCallback(mmiCodeResultListener);
     }
     napi_value result = nullptr;
     return result;
@@ -1343,6 +1350,8 @@ napi_value NapiCallManager::ObserverOff(napi_env env, napi_callback_info info)
         DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->UnRegisterCallOttRequestCallback();
     } else if (tmpStr == "callDisconnectedCause") {
         DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->UnRegisterDisconnectedCauseCallback();
+    } else if (tmpStr == "mmiCodeResult") {
+        DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->UnRegisterMmiCodeCallback();
     }
     asyncContext->result = TELEPHONY_SUCCESS;
     if (argc == TWO_VALUE_LIMIT) {
@@ -2043,7 +2052,7 @@ int32_t NapiCallManager::GetTransferInfo(napi_env env, napi_value objValue, Call
     }
     asyncContext.info.settingType = static_cast<CallTransferSettingType>(settingType);
     asyncContext.info.type = static_cast<CallTransferType>(type);
-    TELEPHONY_LOGI("GetRestrictionInfo: type = %{public}d, settingType = %{public}d, transferNum = %{public}s",
+    TELEPHONY_LOGI("GetTransferInfo: type = %{public}d, settingType = %{public}d, transferNum = %{public}s",
         asyncContext.info.type, asyncContext.info.settingType, asyncContext.info.transferNum);
     return TELEPHONY_SUCCESS;
 }
