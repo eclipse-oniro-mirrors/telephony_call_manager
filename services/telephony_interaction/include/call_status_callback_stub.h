@@ -65,6 +65,7 @@ private:
     int32_t OnStopDtmfResult(MessageParcel &data, MessageParcel &reply);
     int32_t OnSendUssdResult(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetImsCallDataResult(MessageParcel &data, MessageParcel &reply);
+    int32_t OnSendMmiCodeResult(MessageParcel &data, MessageParcel &reply);
 
     std::map<uint32_t, CallStatusCallbackFunc> memberFuncMap_;
 };

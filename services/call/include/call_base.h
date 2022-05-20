@@ -80,6 +80,13 @@ public:
     uint64_t GetPolicyFlag();
     bool GetCallerInfo(ContactInfo &info);
     void SetCallerInfo(const ContactInfo &contactInfo);
+    void SetCallRunningState(CallRunningState callRunningState);
+    void SetStartTime(int64_t startTime);
+    void SetCallBeginTime(time_t callBeginTime);
+    void SetCallEndTime(time_t callEndTime);
+    void SetRingBeginTime(time_t ringBeginTime);
+    void SetRingEndTime(time_t ringEndTime);
+    void SetAnswerType(CallAnswerType answerType);
     CallEndedType GetCallEndedType();
     int32_t SetCallEndedType(CallEndedType callEndedType);
     bool IsSpeakerphoneEnabled();

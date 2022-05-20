@@ -58,6 +58,7 @@ public:
     int32_t SetLteEnhanceModeResult(const int32_t result) override;
     int32_t ReceiveUpdateCallMediaModeResponse(const CallMediaModeResponse &response) override;
     int32_t InviteToConferenceResult(const int32_t result) override;
+    int32_t SendMmiCodeResult(const MmiCodeInfo &info) override;
 };
 } // namespace Telephony
 } // namespace OHOS

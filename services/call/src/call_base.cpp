@@ -285,6 +285,48 @@ void CallBase::SetCallerInfo(const ContactInfo &info)
     contactInfo_ = info;
 }
 
+void CallBase::SetCallRunningState(CallRunningState callRunningState)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    callRunningState_ = callRunningState;
+}
+
+void CallBase::SetStartTime(int64_t startTime)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    startTime_ = startTime;
+}
+
+void CallBase::SetCallBeginTime(time_t callBeginTime)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    callBeginTime_ = callBeginTime;
+}
+
+void CallBase::SetCallEndTime(time_t callEndTime)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    callEndTime_ = callEndTime;
+}
+
+void CallBase::SetRingBeginTime(time_t ringBeginTime)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    ringBeginTime_ = ringBeginTime;
+}
+
+void CallBase::SetRingEndTime(time_t ringEndTime)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    ringEndTime_ = ringEndTime;
+}
+
+void CallBase::SetAnswerType(CallAnswerType answerType)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    answerType_ = answerType;
+}
+
 CallEndedType CallBase::GetCallEndedType()
 {
     std::lock_guard<std::mutex> lock(mutex_);

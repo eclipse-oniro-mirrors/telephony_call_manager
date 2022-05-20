@@ -33,6 +33,7 @@ public:
     virtual int32_t OnCallDisconnectedCause(DisconnectedDetails cause) = 0;
     virtual int32_t OnReportAsyncResults(CallResultReportId reportId, AppExecFwk::PacMap &resultInfo) = 0;
     virtual int32_t OnOttCallRequest(OttCallRequestId requestId, AppExecFwk::PacMap &info) = 0;
+    virtual int32_t OnReportMmiCodeResult(const MmiCodeInfo &info) = 0;
     void SetBundleName(std::string &name)
     {
         bundleName_ = name;
@@ -49,6 +50,7 @@ public:
         UPDATE_CALL_DISCONNECTED_CAUSE,
         UPDATE_CALL_ASYNC_RESULT_REQUEST,
         REPORT_OTT_CALL_REQUEST,
+        UPDATE_MMI_CODE_RESULT_REQUEST,
     };
 
 public:

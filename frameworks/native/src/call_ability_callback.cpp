@@ -71,6 +71,15 @@ int32_t CallAbilityCallback::OnReportAsyncResults(CallResultReportId reportId, A
     return TELEPHONY_SUCCESS;
 }
 
+int32_t CallAbilityCallback::OnReportMmiCodeResult(const MmiCodeInfo &info)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (callbackPtr_ != nullptr) {
+        return callbackPtr_->OnReportMmiCodeResult(info);
+    }
+    return TELEPHONY_SUCCESS;
+}
+
 int32_t CallAbilityCallback::OnOttCallRequest(OttCallRequestId requestId, AppExecFwk::PacMap &info)
 {
     std::lock_guard<std::mutex> lock(mutex_);

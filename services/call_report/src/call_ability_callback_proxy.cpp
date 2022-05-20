@@ -118,6 +118,30 @@ int32_t CallAbilityCallbackProxy::OnReportAsyncResults(CallResultReportId report
     return replyParcel.ReadInt32();
 }
 
+int32_t CallAbilityCallbackProxy::OnReportMmiCodeResult(const MmiCodeInfo &info)
+{
+    MessageParcel dataParcel;
+    MessageParcel replyParcel;
+    MessageOption option;
+    if (!dataParcel.WriteInterfaceToken(CallAbilityCallbackProxy::GetDescriptor())) {
+        TELEPHONY_LOGE("write descriptor fail");
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    int32_t length = sizeof(MmiCodeInfo);
+    dataParcel.WriteInt32(length);
+    dataParcel.WriteRawData((const void *)&info, length);
+    if (Remote() == nullptr) {
+        TELEPHONY_LOGE("function Remote() return nullptr!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t error = Remote()->SendRequest(UPDATE_MMI_CODE_RESULT_REQUEST, dataParcel, replyParcel, option);
+    if (error != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("report async results failed, error: %{public}d", error);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return replyParcel.ReadInt32();
+}
+
 void CallAbilityCallbackProxy::PackDataParcel(
     CallResultReportId reportId, AppExecFwk::PacMap &resultInfo, MessageParcel &dataParcel)
 {

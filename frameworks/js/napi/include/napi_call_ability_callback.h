@@ -67,6 +67,8 @@ public:
     void UnRegisterStartRttCallback();
     int32_t RegisterStopRttCallback(EventCallback callback);
     void UnRegisterStopRttCallback();
+    void RegisterMmiCodeCallback(EventCallback eventCallback);
+    void UnRegisterMmiCodeCallback();
     int32_t UpdateCallStateInfo(const CallAttributeInfo &info);
     int32_t UpdateCallEvent(const CallEventInfo &info);
     int32_t UpdateCallDisconnectedCause(DisconnectedDetails cause);
@@ -76,6 +78,7 @@ public:
     void UnRegisterUpdateCallMediaModeCallback();
     int32_t ReportSetVolteStateInfo(AppExecFwk::PacMap &resultInfo);
     int32_t ReportSetLteEnhanceModeInfo(AppExecFwk::PacMap &resultInfo);
+    int32_t UpdateMmiCodeResultsInfo(const MmiCodeInfo &info);
 
 private:
     static void ReportCallStateWork(uv_work_t *work, int32_t status);
@@ -120,6 +123,8 @@ private:
     int32_t ReportCallMediaModeInfo(AppExecFwk::PacMap &resultInfo);
     static void ReportCallMediaModeInfoWork(uv_work_t *work, int32_t status);
     static void ReportCallMediaModeInfo(AppExecFwk::PacMap &resultInfo, EventCallback supplementInfo);
+    static void ReportMmiCodeWork(uv_work_t *work, int32_t status);
+    static int32_t ReportMmiCode(MmiCodeInfo &info, EventCallback eventCallback);
 
 private:
     EventCallback stateCallback_;
@@ -141,6 +146,7 @@ private:
     EventCallback startRttCallback_;
     EventCallback stopRttCallback_;
     EventCallback updateCallMediaModeCallback_;
+    EventCallback mmiCodeCallback_;
     using CallResultReportIdProcessorFunc = int32_t (NapiCallAbilityCallback::*)(AppExecFwk::PacMap &resultInfo);
     std::map<CallResultReportId, CallResultReportIdProcessorFunc> memberFuncMap_;
     std::mutex mutex_;

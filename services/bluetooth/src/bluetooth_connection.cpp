@@ -28,8 +28,8 @@ BluetoothConnection::BluetoothConnection() : connectedScoAddr_("") {}
 
 BluetoothConnection::~BluetoothConnection()
 {
-    connectedBtDevices_.clear();
 #ifdef ABILITY_BLUETOOTH_SUPPORT
+    mapConnectedBtDevices_.clear();
     Bluetooth::HandsFreeAudioGateway::GetProfile()->DeregisterObserver(this);
 #endif
 }

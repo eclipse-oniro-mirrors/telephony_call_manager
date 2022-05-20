@@ -54,6 +54,7 @@ CallStatusCallbackStub::CallStatusCallbackStub()
     memberFuncMap_[UPDATE_STARTRTT_STATUS] = &CallStatusCallbackStub::OnStartRttResult;
     memberFuncMap_[UPDATE_STOPRTT_STATUS] = &CallStatusCallbackStub::OnStopRttResult;
     memberFuncMap_[INVITE_TO_CONFERENCE] = &CallStatusCallbackStub::OnInviteToConferenceResult;
+    memberFuncMap_[MMI_CODE_INFO_RESPONSE] = &CallStatusCallbackStub::OnSendMmiCodeResult;
 }
 
 CallStatusCallbackStub::~CallStatusCallbackStub()
@@ -666,6 +667,31 @@ int32_t CallStatusCallbackStub::OnSendUssdResult(MessageParcel &data, MessagePar
     result = data.ReadInt32();
     error = SendUssdResult(result);
     if (!reply.WriteInt32(error)) {
+        TELEPHONY_LOGE("writing parcel failed");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallStatusCallbackStub::OnSendMmiCodeResult(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t result = TELEPHONY_ERR_FAIL;
+    const MmiCodeInfo *parcelPtr = nullptr;
+    if (!data.ContainFileDescriptors()) {
+        TELEPHONY_LOGW("sent raw data is less than 32k");
+    }
+    int32_t len = data.ReadInt32();
+    if (len <= TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("Invalid parameter, len = %{public}d", len);
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
+    }
+    if ((parcelPtr = reinterpret_cast<const MmiCodeInfo *>(data.ReadRawData(len))) == nullptr) {
+        TELEPHONY_LOGE("reading raw data failed, length = %d", len);
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+
+    result = SendMmiCodeResult(*parcelPtr);
+    if (!reply.WriteInt32(result)) {
         TELEPHONY_LOGE("writing parcel failed");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }

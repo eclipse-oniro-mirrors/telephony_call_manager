@@ -185,6 +185,11 @@ struct CallOttWorker {
     AppExecFwk::PacMap info;
     EventCallback callback;
 };
+
+struct MmiCodeWorker {
+    MmiCodeInfo info;
+    EventCallback callback;
+};
 } // namespace Telephony
 } // namespace OHOS
 

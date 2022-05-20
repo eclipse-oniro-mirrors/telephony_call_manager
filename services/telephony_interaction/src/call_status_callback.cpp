@@ -136,6 +136,18 @@ int32_t CallStatusCallback::SendUssdResult(const int32_t result)
     return DelayedSingleton<CallAbilityReportProxy>::GetInstance()->ReportAsyncResults(reportId, resultInfo);
 }
 
+int32_t CallStatusCallback::SendMmiCodeResult(const MmiCodeInfo &info)
+{
+    TELEPHONY_LOGI("SendMmiCodeResult  result = %{public}d, message = %{public}s", info.result, info.message);
+    int32_t ret = DelayedSingleton<CallAbilityReportProxy>::GetInstance()->ReportMmiCodeResult(info);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("UpdateDisconnectedCause failed! errCode:%{public}d", ret);
+    } else {
+        TELEPHONY_LOGI("UpdateDisconnectedCause success!");
+    }
+    return ret;
+}
+
 int32_t CallStatusCallback::GetImsCallDataResult(const int32_t result)
 {
     CallResultReportId reportId = CallResultReportId::GET_IMS_CALL_DATA_REPORT_ID;
@@ -198,6 +210,8 @@ int32_t CallStatusCallback::UpdateGetTransferResult(const CallTransferResponse &
     resultInfo.PutIntValue("classx", response.classx);
     resultInfo.PutStringValue("number", response.number);
     resultInfo.PutIntValue("type", response.type);
+    resultInfo.PutIntValue("reason", response.reason);
+    resultInfo.PutIntValue("time", response.time);
     return DelayedSingleton<CallAbilityReportProxy>::GetInstance()->ReportAsyncResults(reportId, resultInfo);
 }
 
