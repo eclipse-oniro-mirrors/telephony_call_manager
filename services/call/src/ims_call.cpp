@@ -143,7 +143,7 @@ int32_t IMSCall::StopRtt()
 
 int32_t IMSCall::SetMute(int32_t mute, int32_t slotId)
 {
-    return DelayedSingleton<CellularCallConnection>::GetInstance()->SetMute(mute, slotId);
+    return CarrierSetMute(mute, slotId);
 }
 
 void IMSCall::GetCallAttributeInfo(CallAttributeInfo &info)

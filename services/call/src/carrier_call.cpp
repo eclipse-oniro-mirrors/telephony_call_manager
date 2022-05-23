@@ -162,6 +162,20 @@ int32_t CarrierCall::CarrierUnHoldCall()
     return TELEPHONY_SUCCESS;
 }
 
+int32_t CarrierCall::CarrierSetMute(int32_t mute, int32_t slotId)
+{
+    if (cellularCallConnectionPtr_ == nullptr) {
+        TELEPHONY_LOGE("cellularCallConnectionPtr_ is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    int32_t ret = cellularCallConnectionPtr_->SetMute(mute, slotId);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("SetMute failed!");
+        return CALL_ERR_UNHOLD_FAILED;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
 void CarrierCall::GetCallAttributeCarrierInfo(CallAttributeInfo &info)
 {
     std::lock_guard<std::mutex> lock(mutex_);

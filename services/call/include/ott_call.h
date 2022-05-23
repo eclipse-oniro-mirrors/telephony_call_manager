@@ -56,6 +56,7 @@ public:
     int32_t ReceiveUpdateCallMediaModeResponse(CallMediaModeResponse &reponse) override;
     int32_t DispatchUpdateVideoRequest(ImsCallMode mode) override;
     int32_t DispatchUpdateVideoResponse(ImsCallMode mode) override;
+    int32_t SetMute(int32_t mute, int32_t slotId) override;
 
 private:
     int32_t PackOttCallRequestInfo(OttCallRequestInfo &requestInfo);

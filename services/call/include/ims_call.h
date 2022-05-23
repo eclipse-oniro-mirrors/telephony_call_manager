@@ -49,7 +49,7 @@ public:
     int32_t IsSupportConferenceable() override;
     int32_t StartRtt(std::u16string &msg);
     int32_t StopRtt();
-    int32_t SetMute(int32_t mute, int32_t slotId);
+    int32_t SetMute(int32_t mute, int32_t slotId) override;
     int32_t AcceptVideoCall();
     int32_t RefuseVideoCall();
     int32_t SendUpdateCallMediaModeRequest(ImsCallMode mode) override;

@@ -62,6 +62,7 @@ public:
     virtual std::vector<std::u16string> GetSubCallIdList() = 0;
     virtual std::vector<std::u16string> GetCallIdListForConference() = 0;
     virtual int32_t IsSupportConferenceable() = 0;
+    virtual int32_t SetMute(int32_t mute, int32_t slotId) = 0;
     int32_t DialCallBase();
     int32_t IncomingCallBase();
     int32_t AnswerCallBase();
