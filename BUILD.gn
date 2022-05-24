@@ -11,6 +11,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//base/telephony/call_manager/call_manager_aafwk.gni")
 import("//base/telephony/core_service/telephony.gni")
 import("//build/ohos.gni")
 
@@ -129,7 +130,7 @@ ohos_shared_library("tel_call_manager") {
     "//drivers/peripheral/camera/interfaces/include/callback/device",
     "//drivers/peripheral/camera/interfaces/include/callback/operator",
     "//drivers/peripheral/camera/interfaces/include/callback/host",
-    "//foundation/aafwk/standard/interfaces/innerkits/dataobs_manager/include",
+    "${aafwk_inner_api_path}/dataobs_manager/include",
     "//foundation/multimedia/audio_standard/interfaces/inner_api/native/audioringtone/include",
     "//foundation/multimedia/audio_standard/services/include/client",
     "//foundation/multimedia/media_standard/interfaces/inner_api/native",
@@ -139,13 +140,13 @@ ohos_shared_library("tel_call_manager") {
   configs = [ "//base/telephony/core_service/utils:telephony_log_config" ]
 
   deps = [
+    "${aafwk_inner_api_path}/dataobs_manager:dataobs_manager",
+    "${aafwk_kits_path}/ability/native:abilitykit_native",
     "//base/notification/ans_standard/frameworks/ans/core:ans_core",
     "//base/notification/ans_standard/frameworks/ans/native:ans_innerkits",
     "//base/telephony/core_service/utils:libtel_common",
     "//base/telephony/sms_mms/frameworks/native:tel_sms_mms_api",
     "//drivers/peripheral/camera/interfaces/metadata:metadata",
-    "//foundation/aafwk/standard/frameworks/kits/ability/native:abilitykit_native",
-    "//foundation/aafwk/standard/interfaces/innerkits/dataobs_manager:dataobs_manager",
     "//foundation/multimedia/camera_standard/frameworks/native/camera:camera_framework",
     "//third_party/libphonenumber/cpp:phonenumber_standard",
     "//utils/native/base:utils",
