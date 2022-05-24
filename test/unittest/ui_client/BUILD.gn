@@ -30,7 +30,7 @@ ohos_executable("tel_call_manager_ui_test") {
     "//foundation/multimedia/camera_standard/services/camera_service/binder/base/include",
     "//foundation/multimedia/camera_standard/services/camera_service/binder/client/include",
     "//foundation/multimedia/camera_standard/services/camera_service/binder/server/include",
-    "//foundation/graphic/graphic/frameworks/surface/include",
+    "//foundation/graphic/graphic_2d/frameworks/surface/include",
     "//drivers/peripheral/camera/interfaces/metadata/include",
     "//utils/system/safwk/native/include",
     "//drivers/framework/include/utils",
@@ -50,7 +50,7 @@ ohos_executable("tel_call_manager_ui_test") {
   deps = [
     "${aafwk_kits_path}/ability/native:abilitykit_native",
     "//drivers/peripheral/camera/interfaces/metadata:metadata",
-    "//foundation/graphic/graphic:libsurface",
+    "//foundation/graphic/graphic_2d:libsurface",
     "//foundation/multimedia/camera_standard/frameworks/native/camera:camera_framework",
     "//utils/native/base:utils",
   ]
