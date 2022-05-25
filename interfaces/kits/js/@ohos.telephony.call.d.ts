@@ -277,6 +277,18 @@ declare namespace call {
 
   /**
    * @systemapi Hide this for inner system use.
+   * @since 9
+   */
+  function on(type: 'mmiCodeResult', callback: Callback<MmiCodeResults>): void;
+
+  /**
+   * @systemapi Hide this for inner system use.
+   * @since 9
+   */
+  function off(type: 'mmiCodeResult', callback?: Callback<MmiCodeResults>): void;
+
+  /**
+   * @systemapi Hide this for inner system use.
    * @since 8
    */
   function isNewCallAllowed(callback: AsyncCallback<boolean>): void;
@@ -398,10 +410,11 @@ declare namespace call {
    * @since 8
    */
   export enum AudioDevice {
-    DEVICE_MIC,
+    DEVICE_EARPIECE,
     DEVICE_SPEAKER,
     DEVICE_WIRED_HEADSET,
-    DEVICE_BLUETOOTH_SCO
+    DEVICE_BLUETOOTH_SCO,
+    DEVICE_MIC,
   }
 
   /**
@@ -677,6 +690,14 @@ declare namespace call {
    */
   export interface NumberFormatOptions {
     countryCode?: string;
+  }
+
+  /**
+   * @since 9
+   */
+  export interface MmiCodeResults {
+    result: Int32Array;
+    message: string;
   }
 
   /**

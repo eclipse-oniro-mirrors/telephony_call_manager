@@ -33,29 +33,38 @@ enum BtScoState {
     SCO_STATE_PENDING,
 };
 
+#ifdef ABILITY_BLUETOOTH_SUPPORT
+class BluetoothConnection : public OHOS::Bluetooth::HandsFreeAudioGatewayObserver {
+#else
 class BluetoothConnection {
+#endif
+
 public:
     BluetoothConnection();
     ~BluetoothConnection();
+    void Init();
     bool ConnectBtSco();
     bool DisconnectBtSco();
     bool IsBtScoConnected();
     static BtScoState GetBtScoState();
     static void SetBtScoState(BtScoState state);
     int32_t SendBtCallState(int32_t numActive, int32_t numHeld, int32_t callState, const std::string &number);
+    void RemoveBtDevice(std::string address);
 #ifdef ABILITY_BLUETOOTH_SUPPORT
     void OnScoStateChanged(const Bluetooth::BluetoothRemoteDevice &device, int32_t state) override;
     void OnConnectionStateChanged(const Bluetooth::BluetoothRemoteDevice &device, int32_t state) override;
+    Bluetooth::BluetoothRemoteDevice GetBtDevice(std::string address);
+    void AddBtDevice(std::string address, Bluetooth::BluetoothRemoteDevice device);
 #endif
 
 private:
     bool IsAudioActivated();
     static BtScoState btScoState_;
     std::string connectedScoAddr_;
-    std::set<std::string> connectedBtDevices_;
 #ifdef ABILITY_BLUETOOTH_SUPPORT
     bool ConnectBtSco(const Bluetooth::BluetoothRemoteDevice &device);
     bool DisconnectBtSco(const Bluetooth::BluetoothRemoteDevice &device);
+    std::unordered_map<std::string, Bluetooth::BluetoothRemoteDevice> mapConnectedBtDevices_;
 #endif
 };
 } // namespace Telephony

@@ -62,6 +62,7 @@ public:
     virtual std::vector<std::u16string> GetSubCallIdList() = 0;
     virtual std::vector<std::u16string> GetCallIdListForConference() = 0;
     virtual int32_t IsSupportConferenceable() = 0;
+    virtual int32_t SetMute(int32_t mute, int32_t slotId) = 0;
     int32_t DialCallBase();
     int32_t IncomingCallBase();
     int32_t AnswerCallBase();
@@ -80,6 +81,13 @@ public:
     uint64_t GetPolicyFlag();
     bool GetCallerInfo(ContactInfo &info);
     void SetCallerInfo(const ContactInfo &contactInfo);
+    void SetCallRunningState(CallRunningState callRunningState);
+    void SetStartTime(int64_t startTime);
+    void SetCallBeginTime(time_t callBeginTime);
+    void SetCallEndTime(time_t callEndTime);
+    void SetRingBeginTime(time_t ringBeginTime);
+    void SetRingEndTime(time_t ringEndTime);
+    void SetAnswerType(CallAnswerType answerType);
     CallEndedType GetCallEndedType();
     int32_t SetCallEndedType(CallEndedType callEndedType);
     bool IsSpeakerphoneEnabled();

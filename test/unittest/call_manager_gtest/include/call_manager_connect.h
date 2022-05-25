@@ -121,6 +121,12 @@ public:
         return TELEPHONY_SUCCESS;
     }
 
+    int32_t OnReportMmiCodeResult(const MmiCodeInfo &info)
+    {
+        TELEPHONY_LOGI("OnReportMmiCodeResult success!");
+        return TELEPHONY_SUCCESS;
+    }
+
     int32_t OnOttCallRequest(OttCallRequestId requestId, AppExecFwk::PacMap &info)
     {
         TELEPHONY_LOGI("OnOttCallRequest success!");
@@ -194,6 +200,8 @@ private:
                 resultInfo.PutIntValue("classx", data.ReadInt32());
                 resultInfo.PutStringValue("number", data.ReadString());
                 resultInfo.PutIntValue("type", data.ReadInt32());
+                resultInfo.PutIntValue("reason", data.ReadInt32());
+                resultInfo.PutIntValue("time", data.ReadInt32());
                 break;
             case CallResultReportId::GET_CALL_CLIP_ID:
                 resultInfo.PutIntValue("action", data.ReadInt32());
@@ -204,15 +212,13 @@ private:
                 resultInfo.PutIntValue("clirStat", data.ReadInt32());
                 break;
             case CallResultReportId::GET_CALL_VOTLE_REPORT_ID:
+            case CallResultReportId::START_RTT_REPORT_ID:
                 resultInfo.PutIntValue("active", data.ReadInt32());
                 break;
             case CallResultReportId::GET_IMS_CONFIG_REPORT_ID:
             case CallResultReportId::GET_IMS_FEATURE_VALUE_REPORT_ID:
             case CallResultReportId::GET_LTE_ENHANCE_MODE_REPORT_ID:
                 resultInfo.PutIntValue("value", data.ReadInt32());
-                break;
-            case CallResultReportId::START_RTT_REPORT_ID:
-                resultInfo.PutIntValue("active", data.ReadInt32());
                 break;
             case CallResultReportId::STOP_RTT_REPORT_ID:
                 resultInfo.PutIntValue("inactive", data.ReadInt32());

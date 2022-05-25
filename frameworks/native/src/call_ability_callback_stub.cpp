@@ -29,6 +29,7 @@ CallAbilityCallbackStub::CallAbilityCallbackStub()
     memberFuncMap_[UPDATE_CALL_DISCONNECTED_CAUSE] = &CallAbilityCallbackStub::OnUpdateCallDisconnectedCause;
     memberFuncMap_[UPDATE_CALL_ASYNC_RESULT_REQUEST] = &CallAbilityCallbackStub::OnUpdateAysncResults;
     memberFuncMap_[REPORT_OTT_CALL_REQUEST] = &CallAbilityCallbackStub::OnUpdateOttCallRequest;
+    memberFuncMap_[UPDATE_MMI_CODE_RESULT_REQUEST] = &CallAbilityCallbackStub::OnUpdateMmiCodeResults;
 }
 
 CallAbilityCallbackStub::~CallAbilityCallbackStub()
@@ -133,6 +134,8 @@ int32_t CallAbilityCallbackStub::OnUpdateAysncResults(MessageParcel &data, Messa
             resultInfo.PutIntValue("classx", data.ReadInt32());
             resultInfo.PutStringValue("number", data.ReadString());
             resultInfo.PutIntValue("type", data.ReadInt32());
+            resultInfo.PutIntValue("reason", data.ReadInt32());
+            resultInfo.PutIntValue("time", data.ReadInt32());
             break;
         case CallResultReportId::GET_CALL_CLIP_ID:
             resultInfo.PutIntValue("action", data.ReadInt32());
@@ -143,15 +146,13 @@ int32_t CallAbilityCallbackStub::OnUpdateAysncResults(MessageParcel &data, Messa
             resultInfo.PutIntValue("clirStat", data.ReadInt32());
             break;
         case CallResultReportId::GET_CALL_VOTLE_REPORT_ID:
+        case CallResultReportId::START_RTT_REPORT_ID:
             resultInfo.PutIntValue("active", data.ReadInt32());
             break;
         case CallResultReportId::GET_IMS_CONFIG_REPORT_ID:
         case CallResultReportId::GET_IMS_FEATURE_VALUE_REPORT_ID:
         case CallResultReportId::GET_LTE_ENHANCE_MODE_REPORT_ID:
             resultInfo.PutIntValue("value", data.ReadInt32());
-            break;
-        case CallResultReportId::START_RTT_REPORT_ID:
-            resultInfo.PutIntValue("active", data.ReadInt32());
             break;
         case CallResultReportId::STOP_RTT_REPORT_ID:
             resultInfo.PutIntValue("inactive", data.ReadInt32());
@@ -163,6 +164,31 @@ int32_t CallAbilityCallbackStub::OnUpdateAysncResults(MessageParcel &data, Messa
         TELEPHONY_LOGW("sent raw data is less than 32k");
     }
     result = OnReportAsyncResults(reportId, resultInfo);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("writing parcel failed");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallAbilityCallbackStub::OnUpdateMmiCodeResults(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t result = TELEPHONY_SUCCESS;
+    const MmiCodeInfo *parcelPtr = nullptr;
+    int32_t len = data.ReadInt32();
+    if (len <= 0) {
+        TELEPHONY_LOGE("Invalid parameter, len = %{public}d", len);
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
+    }
+    if (!data.ContainFileDescriptors()) {
+        TELEPHONY_LOGW("sent raw data is less than 32k");
+    }
+    if ((parcelPtr = reinterpret_cast<const MmiCodeInfo *>(data.ReadRawData(len))) == nullptr) {
+        TELEPHONY_LOGE("reading raw data failed, length = %d", len);
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+
+    result = OnReportMmiCodeResult(*parcelPtr);
     if (!reply.WriteInt32(result)) {
         TELEPHONY_LOGE("writing parcel failed");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;

@@ -438,6 +438,8 @@ public:
      */
     int32_t GetMute(int32_t slotId) override;
 
+    int32_t SetEmergencyCallList(int32_t slotId, std::vector<EmergencyCall>  &eccVec) override;
+    
 private:
     const int32_t MAX_SIZE = 10;
     static inline BrokerDelegator<CellularCallProxy> delegator_;

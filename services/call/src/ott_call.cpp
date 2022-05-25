@@ -310,6 +310,11 @@ int32_t OTTCall::DispatchUpdateVideoResponse(ImsCallMode mode)
     return CALL_ERR_FUNCTION_NOT_SUPPORTED;
 }
 
+int32_t OTTCall::SetMute(int32_t mute, int32_t slotId)
+{
+    return CALL_ERR_FUNCTION_NOT_SUPPORTED;
+}
+
 int32_t OTTCall::PackOttCallRequestInfo(OttCallRequestInfo &requestInfo)
 {
     if (memcpy_s(requestInfo.phoneNum, kMaxNumberLen, accountNumber_.c_str(), accountNumber_.length()) != EOK) {

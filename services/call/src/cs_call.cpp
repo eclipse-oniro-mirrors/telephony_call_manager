@@ -74,6 +74,11 @@ void CSCall::GetCallAttributeInfo(CallAttributeInfo &info)
     GetCallAttributeCarrierInfo(info);
 }
 
+int32_t CSCall::SetMute(int32_t mute, int32_t slotId)
+{
+    return CarrierSetMute(mute, slotId);
+}
+
 int32_t CSCall::CombineConference()
 {
     int32_t ret = DelayedSingleton<CsConference>::GetInstance()->SetMainCall(GetCallID());

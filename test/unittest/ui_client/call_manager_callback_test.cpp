@@ -57,5 +57,13 @@ int32_t CallManagerCallbackTest::OnOttCallRequest(OttCallRequestId requestId, Ap
               << "requestId:" << (int32_t)requestId << std::endl;
     return RETURN_SUCCESS;
 }
+
+int32_t CallManagerCallbackTest::OnReportMmiCodeResult(const MmiCodeInfo &info)
+{
+    std::cout << "----------OnReportMmiCodeResult--------" << std::endl
+              << "result:" << info.result << std::endl
+              << "message:" << info.message << std::endl;
+    return RETURN_SUCCESS;
+}
 } // namespace Telephony
 } // namespace OHOS

@@ -11,6 +11,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//base/telephony/call_manager/call_manager_aafwk.gni")
 import("//build/ohos.gni")
 
 ohos_executable("tel_call_manager_ui_test") {
@@ -47,8 +48,8 @@ ohos_executable("tel_call_manager_ui_test") {
   configs = [ "//base/telephony/core_service/utils:telephony_log_config" ]
 
   deps = [
+    "${aafwk_kits_path}/ability/native:abilitykit_native",
     "//drivers/peripheral/camera/interfaces/metadata:metadata",
-    "//foundation/aafwk/standard/frameworks/kits/ability/native:abilitykit_native",
     "//foundation/graphic/graphic:libsurface",
     "//foundation/multimedia/camera_standard/frameworks/native/camera:camera_framework",
     "//utils/native/base:utils",

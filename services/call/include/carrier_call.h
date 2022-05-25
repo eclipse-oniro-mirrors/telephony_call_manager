@@ -32,6 +32,7 @@ public:
     int32_t CarrierHangUpCall();
     int32_t CarrierHoldCall();
     int32_t CarrierUnHoldCall();
+    int32_t CarrierSetMute(int32_t mute, int32_t slotId);
     void GetCallAttributeCarrierInfo(CallAttributeInfo &info);
     bool GetEmergencyState() override;
     int32_t CarrierSwitchCall();

@@ -368,12 +368,19 @@ struct ClirResponse {
     int32_t clirStat;
 };
 
+struct MmiCodeInfo {
+    int32_t result;  // 0: ok  other: error
+    char message[kMaxNumberLen + 1];
+};
+
 struct CallTransferResponse {
     int32_t result; // 0: ok  other: error
     int32_t status;
     int32_t classx;
     int32_t type;
     char number[kMaxNumberLen + 1];
+    int32_t reason;
+    int32_t time;
 };
 
 struct CallRestrictionResponse {
@@ -464,6 +471,14 @@ struct CallTransferInfo {
     char transferNum[kMaxNumberLen + 1];
     CallTransferSettingType settingType;
     CallTransferType type;
+};
+
+enum class SsRequestType {
+    SS_ACTIVATION = 0,
+    SS_DEACTIVATION,
+    SS_INTERROGATION,
+    SS_REGISTRATION,
+    SS_ERASURE,
 };
 
 struct VideoWindow {

@@ -46,6 +46,7 @@ NapiCallAbilityCallback::NapiCallAbilityCallback()
     (void)memset_s(&stopRttCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
     (void)memset_s(&updateCallMediaModeCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
     (void)memset_s(&callDisconnectCauseCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
+    (void)memset_s(&mmiCodeCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
     memberFuncMap_[CallResultReportId::GET_CALL_WAITING_REPORT_ID] = &NapiCallAbilityCallback::ReportGetWaitingInfo;
     memberFuncMap_[CallResultReportId::SET_CALL_WAITING_REPORT_ID] = &NapiCallAbilityCallback::ReportSetWaitingInfo;
     memberFuncMap_[CallResultReportId::GET_CALL_RESTRICTION_REPORT_ID] =
@@ -80,6 +81,18 @@ void NapiCallAbilityCallback::UnRegisterCallStateCallback()
 {
     if (stateCallback_.callbackRef) {
         (void)memset_s(&stateCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
+    }
+}
+
+void NapiCallAbilityCallback::RegisterMmiCodeCallback(EventCallback eventCallback)
+{
+    mmiCodeCallback_ = eventCallback;
+}
+
+void NapiCallAbilityCallback::UnRegisterMmiCodeCallback()
+{
+    if (mmiCodeCallback_.callbackRef) {
+        (void)memset_s(&mmiCodeCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
     }
 }
 
@@ -732,7 +745,7 @@ void NapiCallAbilityCallback::ReportCallStateWork(uv_work_t *work, int32_t statu
         return;
     }
     int32_t ret = ReportCallState(dataWorkerData->info, dataWorkerData->callback);
-    TELEPHONY_LOGI("%{public}d", ret);
+    TELEPHONY_LOGI("ReportCallState result = %{public}d", ret);
     delete dataWorkerData;
     dataWorkerData = nullptr;
     delete work;
@@ -934,6 +947,74 @@ int32_t NapiCallAbilityCallback::UpdateAsyncResultsInfo(
         result = (this->*memberFunc)(resultInfo);
     }
     return result;
+}
+
+int32_t NapiCallAbilityCallback::UpdateMmiCodeResultsInfo(const MmiCodeInfo &info)
+{
+    if (mmiCodeCallback_.thisVar == nullptr) {
+        TELEPHONY_LOGE("mmiCodeCallback is null!");
+        return CALL_ERR_CALLBACK_NOT_EXIST;
+    }
+    uv_loop_s *loop = nullptr;
+#if NAPI_VERSION >= 2
+    napi_get_uv_event_loop(mmiCodeCallback_.env, &loop);
+#endif
+    MmiCodeWorker *dataWorker = std::make_unique<MmiCodeWorker>().release();
+    if (dataWorker == nullptr) {
+        TELEPHONY_LOGE("dataWorker is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    dataWorker->info = info;
+    dataWorker->callback = mmiCodeCallback_;
+    uv_work_t *work = std::make_unique<uv_work_t>().release();
+    if (work == nullptr) {
+        TELEPHONY_LOGE("work is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    work->data = (void *)dataWorker;
+    uv_queue_work(
+        loop, work, [](uv_work_t *work) {}, ReportMmiCodeWork);
+
+    return TELEPHONY_SUCCESS;
+}
+
+void NapiCallAbilityCallback::ReportMmiCodeWork(uv_work_t *work, int32_t status)
+{
+    MmiCodeWorker *dataWorkerData = (MmiCodeWorker *)work->data;
+    if (dataWorkerData == nullptr) {
+        TELEPHONY_LOGE("dataWorkerData is nullptr!");
+        return;
+    }
+    int32_t ret = ReportMmiCode(dataWorkerData->info, dataWorkerData->callback);
+    TELEPHONY_LOGI("ReportMmiCode result = %{public}d", ret);
+    delete dataWorkerData;
+    dataWorkerData = nullptr;
+    delete work;
+    work = nullptr;
+}
+
+/**
+ * To notify an application of MMI code result, register a callback with on() first.
+ */
+int32_t NapiCallAbilityCallback::ReportMmiCode(MmiCodeInfo &info, EventCallback eventCallback)
+{
+    napi_value callbackFunc = nullptr;
+    napi_env env = eventCallback.env;
+    napi_value callbackValues[ARRAY_INDEX_THIRD] = {0};
+    callbackValues[ARRAY_INDEX_FIRST] = NapiCallManagerUtils::CreateUndefined(env);
+    napi_create_object(env, &callbackValues[ARRAY_INDEX_SECOND]);
+    NapiCallManagerUtils::SetPropertyInt32(
+        env, callbackValues[ARRAY_INDEX_SECOND], "result", static_cast<int32_t>(info.result));
+    NapiCallManagerUtils::SetPropertyStringUtf8(
+        env, callbackValues[ARRAY_INDEX_SECOND], "message", info.message);
+    napi_get_reference_value(env, eventCallback.callbackRef, &callbackFunc);
+    napi_value callbackResult = nullptr;
+    if (callbackFunc == nullptr) {
+        TELEPHONY_LOGE("callbackFunc is null!");
+        return CALL_ERR_CALLBACK_NOT_EXIST;
+    }
+    napi_call_function(env, eventCallback.thisVar, callbackFunc, DATA_LENGTH_TWO, callbackValues, &callbackResult);
+    return TELEPHONY_SUCCESS;
 }
 
 int32_t NapiCallAbilityCallback::OttCallRequest(OttCallRequestId requestId, AppExecFwk::PacMap &info)

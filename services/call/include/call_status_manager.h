@@ -58,6 +58,7 @@ private:
     int32_t DisconnectingHandle(const CallDetailInfo &info);
     int32_t DisconnectedHandle(const CallDetailInfo &info);
     sptr<CallBase> CreateNewCall(const CallDetailInfo &info, CallDirection dir);
+    sptr<CallBase> RefreshCallIfNecessary(const sptr<CallBase> &call, const CallDetailInfo &info);
     void PackParaInfo(
         DialParaInfo &paraInfo, const CallDetailInfo &info, CallDirection dir, AppExecFwk::PacMap &extras);
     int32_t UpdateCallState(sptr<CallBase> &call, TelCallState nextState);

@@ -22,11 +22,6 @@
 #include "call_control_manager.h"
 #include "bluetooth_connection.h"
 
-#ifdef ABILITY_BLUETOOTH_SUPPORT
-#include "bluetooth_mgr_client.h"
-#include "bluetooth_remote_device.h"
-#endif
-
 namespace OHOS {
 namespace Telephony {
 BluetoothCallManager::BluetoothCallManager() : btConnection_(std::make_unique<BluetoothConnection>()) {}

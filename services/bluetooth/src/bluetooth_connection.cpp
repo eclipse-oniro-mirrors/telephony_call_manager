@@ -19,9 +19,6 @@
 
 #include "audio_control_manager.h"
 #include "bluetooth_call_manager.h"
-#ifdef ABILITY_BLUETOOTH_SUPPORT
-#include "bt_def.h"
-#endif
 
 namespace OHOS {
 namespace Telephony {
@@ -31,7 +28,18 @@ BluetoothConnection::BluetoothConnection() : connectedScoAddr_("") {}
 
 BluetoothConnection::~BluetoothConnection()
 {
-    connectedBtDevices_.clear();
+#ifdef ABILITY_BLUETOOTH_SUPPORT
+    mapConnectedBtDevices_.clear();
+    Bluetooth::HandsFreeAudioGateway::GetProfile()->DeregisterObserver(this);
+#endif
+}
+
+void BluetoothConnection::Init()
+{
+#ifdef ABILITY_BLUETOOTH_SUPPORT
+    TELEPHONY_LOGI("BluetoothConnection init success!");
+    Bluetooth::HandsFreeAudioGateway::GetProfile()->RegisterObserver(this);
+#endif
 }
 
 bool BluetoothConnection::ConnectBtSco()
@@ -41,7 +49,7 @@ bool BluetoothConnection::ConnectBtSco()
         return true;
     }
 #ifdef ABILITY_BLUETOOTH_SUPPORT
-    return Bluetooth::HandsFreeAudioGateway.GetProfile()->ConnectSco();
+    return Bluetooth::HandsFreeAudioGateway::GetProfile()->ConnectSco();
 #endif
     return true;
 }
@@ -53,7 +61,7 @@ bool BluetoothConnection::DisconnectBtSco()
         return true;
     }
 #ifdef ABILITY_BLUETOOTH_SUPPORT
-    return Bluetooth::HandsFreeAudioGateway.GetProfile()->DisconnectSco();
+    return Bluetooth::HandsFreeAudioGateway::GetProfile()->DisconnectSco();
 #endif
     return true;
 }
@@ -61,7 +69,7 @@ bool BluetoothConnection::DisconnectBtSco()
 #ifdef ABILITY_BLUETOOTH_SUPPORT
 bool BluetoothConnection::ConnectBtSco(const Bluetooth::BluetoothRemoteDevice &device)
 {
-    bool result = Bluetooth::HandsFreeAudioGateway.GetProfile()->Connect(device);
+    bool result = Bluetooth::HandsFreeAudioGateway::GetProfile()->Connect(device);
     if (result) {
         connectedScoAddr_ = device.GetDeviceAddr();
         btScoState_ = BtScoState::SCO_STATE_CONNECTED;
@@ -102,7 +110,7 @@ int32_t BluetoothConnection::SendBtCallState(
 #ifdef ABILITY_BLUETOOTH_SUPPORT
     std::string nickName = "";
     constexpr int32_t numberType = 0x81;
-    Bluetooth::HandsFreeAudioGateway.GetProfile()->
+    Bluetooth::HandsFreeAudioGateway::GetProfile()->
         PhoneStateChanged(numActive, numHeld, callState, number, numberType, nickName);
 #endif
     TELEPHONY_LOGI("PhoneStateChanged,numActive:%{public}d,numHeld:%{public}d,callState:%{public}d",
@@ -155,7 +163,7 @@ void BluetoothConnection::OnConnectionStateChanged(const Bluetooth::BluetoothRem
                  *  if connect sco successfully , should switch current audio device to bluetooth sco
                  */
                 if (BluetoothConnection::GetBtScoState() == BtScoState::SCO_STATE_DISCONNECTED &&
-                    IsAudioActivated() && ConnectBtSco(macAddress)) {
+                    IsAudioActivated() && ConnectBtSco(device)) {
                     connectedScoAddr_ = macAddress;
                     DelayedSingleton<AudioDeviceManager>::GetInstance()->ProcessEvent(
                         AudioEvent::BLUETOOTH_SCO_CONNECTED);
