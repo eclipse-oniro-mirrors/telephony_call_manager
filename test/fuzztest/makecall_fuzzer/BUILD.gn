@@ -35,12 +35,7 @@ ohos_fuzztest("MakeCallFuzzTest") {
 
   external_deps = [
     "ability_base:want",
-    "ability_runtime:ability_manager",
-    "core_service:tel_core_service_api",
-    "ipc:ipc_core",
-    "safwk:system_ability_fwk",
     "samgr_standard:samgr_proxy",
-    "startup_l2:syspara",
   ]
 
   cflags = [
