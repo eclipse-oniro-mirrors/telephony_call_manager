@@ -693,11 +693,21 @@ declare namespace call {
   }
 
   /**
+   * @systemapi Hide this for inner system use.
    * @since 9
    */
   export interface MmiCodeResults {
-    result: Int32Array;
+    result: MmiCodeResult;
     message: string;
+  }
+
+  /**
+   * @systemapi Hide this for inner system use.
+   * @since 9
+   */
+  export enum MmiCodeResult {
+    MMI_CODE_SUCCESS = 0,
+    MMI_CODE_FAILED = 1
   }
 
   /**
