@@ -142,8 +142,8 @@ ohos_shared_library("tel_call_manager") {
   deps = [
     "${aafwk_inner_api_path}/dataobs_manager:dataobs_manager",
     "${aafwk_kits_path}/ability/native:abilitykit_native",
-    "//base/notification/ans_standard/frameworks/ans/core:ans_core",
-    "//base/notification/ans_standard/frameworks/ans/native:ans_innerkits",
+    "//base/notification/distributed_notification_service/frameworks/ans:ans_innerkits",
+    "//base/notification/distributed_notification_service/frameworks/core:ans_core",
     "//base/telephony/core_service/utils:libtel_common",
     "//base/telephony/sms_mms/frameworks/native:tel_sms_mms_api",
     "//drivers/peripheral/camera/interfaces/metadata:metadata",
