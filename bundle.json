@@ -75,7 +75,8 @@
                 }
             ],
             "test": [
-                "//base/telephony/call_manager/test/unittest:unittest"
+                "//base/telephony/call_manager/test/unittest:unittest",
+                "//base/telephony/call_manager/test/fuzztest:fuzztest"
             ]
         }
     }
