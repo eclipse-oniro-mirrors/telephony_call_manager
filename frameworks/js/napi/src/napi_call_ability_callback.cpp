@@ -909,6 +909,7 @@ int32_t NapiCallAbilityCallback::ReportDisconnectedCause(int32_t cause, EventCal
     napi_create_object(env, &callbackValues[ARRAY_INDEX_FIRST]);
     NapiCallManagerUtils::SetPropertyInt32(
         env, callbackValues[ARRAY_INDEX_FIRST], "disconnectedCause", static_cast<int32_t>(cause));
+    napi_get_reference_value(env, eventCallback.callbackRef, &callbackFunc);
     if (callbackFunc == nullptr) {
         TELEPHONY_LOGE("callbackFunc is null!");
         return CALL_ERR_CALLBACK_NOT_EXIST;
