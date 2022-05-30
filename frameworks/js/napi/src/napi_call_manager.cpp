@@ -970,7 +970,7 @@ napi_value NapiCallManager::GetCallWaiting(napi_env env, napi_callback_info info
         napi_create_reference(env, argv[ARRAY_INDEX_SECOND], DATA_LENGTH_ONE, &(asyncContext->callbackRef));
     }
     asyncContext->env = env;
-    asyncContext->thisVar = thisVar;
+    napi_create_reference(env, thisVar, DATA_LENGTH_ONE, &(asyncContext->thisVar));
     return HandleAsyncWork(env, asyncContext, "GetCallWaiting", NativeGetCallWaiting, NativeCallBack);
 }
 
@@ -989,7 +989,7 @@ napi_value NapiCallManager::SetCallWaiting(napi_env env, napi_callback_info info
         napi_create_reference(env, argv[ARRAY_INDEX_THIRD], DATA_LENGTH_ONE, &(asyncContext->callbackRef));
     }
     asyncContext->env = env;
-    asyncContext->thisVar = thisVar;
+    napi_create_reference(env, thisVar, DATA_LENGTH_ONE, &(asyncContext->thisVar));
     return HandleAsyncWork(env, asyncContext, "SetCallWaiting", NativeSetCallWaiting, NativeCallBack);
 }
 
@@ -1008,7 +1008,7 @@ napi_value NapiCallManager::GetCallRestriction(napi_env env, napi_callback_info 
         napi_create_reference(env, argv[ARRAY_INDEX_THIRD], DATA_LENGTH_ONE, &(asyncContext->callbackRef));
     }
     asyncContext->env = env;
-    asyncContext->thisVar = thisVar;
+    napi_create_reference(env, thisVar, DATA_LENGTH_ONE, &(asyncContext->thisVar));
     return HandleAsyncWork(env, asyncContext, "GetCallRestriction", NativeGetCallRestriction, NativeCallBack);
 }
 
@@ -1027,7 +1027,7 @@ napi_value NapiCallManager::SetCallRestriction(napi_env env, napi_callback_info 
         napi_create_reference(env, argv[ARRAY_INDEX_THIRD], DATA_LENGTH_ONE, &(asyncContext->callbackRef));
     }
     asyncContext->env = env;
-    asyncContext->thisVar = thisVar;
+    napi_create_reference(env, thisVar, DATA_LENGTH_ONE, &(asyncContext->thisVar));
     return HandleAsyncWork(env, asyncContext, "SetCallRestriction", NativeSetCallRestriction, NativeCallBack);
 }
 
@@ -1046,7 +1046,7 @@ napi_value NapiCallManager::GetCallTransferInfo(napi_env env, napi_callback_info
         napi_create_reference(env, argv[ARRAY_INDEX_THIRD], DATA_LENGTH_ONE, &(asyncContext->callbackRef));
     }
     asyncContext->env = env;
-    asyncContext->thisVar = thisVar;
+    napi_create_reference(env, thisVar, DATA_LENGTH_ONE, &(asyncContext->thisVar));
     return HandleAsyncWork(env, asyncContext, "GetCallTransferInfo", NativeGetTransferNumber, NativeCallBack);
 }
 
@@ -1065,7 +1065,7 @@ napi_value NapiCallManager::SetCallTransferInfo(napi_env env, napi_callback_info
         napi_create_reference(env, argv[ARRAY_INDEX_THIRD], DATA_LENGTH_ONE, &(asyncContext->callbackRef));
     }
     asyncContext->env = env;
-    asyncContext->thisVar = thisVar;
+    napi_create_reference(env, thisVar, DATA_LENGTH_ONE, &(asyncContext->thisVar));
     return HandleAsyncWork(env, asyncContext, "SetCallTransferInfo", NativeSetTransferNumber, NativeCallBack);
 }
 
@@ -1082,7 +1082,7 @@ napi_value NapiCallManager::EnableImsSwitch(napi_env env, napi_callback_info inf
         napi_create_reference(env, argv[ARRAY_INDEX_SECOND], DATA_LENGTH_ONE, &(asyncContext->callbackRef));
     }
     asyncContext->env = env;
-    asyncContext->thisVar = thisVar;
+    napi_create_reference(env, thisVar, DATA_LENGTH_ONE, &(asyncContext->thisVar));
     return HandleAsyncWork(env, asyncContext, "EnableImsSwitch", NativeEnableImsSwitch, NativeCallBack);
 }
 
@@ -1099,7 +1099,7 @@ napi_value NapiCallManager::DisableImsSwitch(napi_env env, napi_callback_info in
         napi_create_reference(env, argv[ARRAY_INDEX_SECOND], DATA_LENGTH_ONE, &(asyncContext->callbackRef));
     }
     asyncContext->env = env;
-    asyncContext->thisVar = thisVar;
+    napi_create_reference(env, thisVar, DATA_LENGTH_ONE, &(asyncContext->thisVar));
     return HandleAsyncWork(env, asyncContext, "DisableImsSwitch", NativeDisableImsSwitch, NativeCallBack);
 }
 
@@ -1115,7 +1115,7 @@ napi_value NapiCallManager::IsImsSwitchEnabled(napi_env env, napi_callback_info 
         napi_create_reference(env, argv[ARRAY_INDEX_SECOND], DATA_LENGTH_ONE, &(asyncContext->callbackRef));
     }
     asyncContext->env = env;
-    asyncContext->thisVar = thisVar;
+    napi_create_reference(env, thisVar, DATA_LENGTH_ONE, &(asyncContext->thisVar));
     return HandleAsyncWork(env, asyncContext, "IsImsSwitchEnabled", NativeIsImsSwitchEnabled, NativeCallBack);
 }
 
@@ -1294,35 +1294,35 @@ napi_value NapiCallManager::ObserverOn(napi_env env, napi_callback_info info)
         EventCallback callStateListener;
         (void)memset_s(&callStateListener, sizeof(EventCallback), 0, sizeof(EventCallback));
         callStateListener.env = env;
-        callStateListener.thisVar = thisVar;
+        napi_create_reference(env, thisVar, DATA_LENGTH_ONE, &callStateListener.thisVar);
         napi_create_reference(env, argv[ARRAY_INDEX_SECOND], DATA_LENGTH_ONE, &callStateListener.callbackRef);
         DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->RegisterCallStateCallback(callStateListener);
     } else if (tmpStr == "callEventChange") {
         EventCallback callEventCallback;
         (void)memset_s(&callEventCallback, sizeof(EventCallback), 0, sizeof(EventCallback));
         callEventCallback.env = env;
-        callEventCallback.thisVar = thisVar;
+        napi_create_reference(env, thisVar, DATA_LENGTH_ONE, &callEventCallback.thisVar);
         napi_create_reference(env, argv[ARRAY_INDEX_SECOND], DATA_LENGTH_ONE, &callEventCallback.callbackRef);
         DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->RegisterCallEventCallback(callEventCallback);
     } else if (tmpStr == "callOttRequest") {
         EventCallback callOttCallback;
         (void)memset_s(&callOttCallback, sizeof(EventCallback), 0, sizeof(EventCallback));
         callOttCallback.env = env;
-        callOttCallback.thisVar = thisVar;
+        napi_create_reference(env, thisVar, DATA_LENGTH_ONE, &callOttCallback.thisVar);
         napi_create_reference(env, argv[ARRAY_INDEX_SECOND], DATA_LENGTH_ONE, &callOttCallback.callbackRef);
         DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->RegisterCallOttRequestCallback(callOttCallback);
     } else if (tmpStr == "callDisconnectedCause") {
         EventCallback causeCallback;
         (void)memset_s(&causeCallback, sizeof(EventCallback), 0, sizeof(EventCallback));
         causeCallback.env = env;
-        causeCallback.thisVar = thisVar;
+        napi_create_reference(env, thisVar, DATA_LENGTH_ONE, &causeCallback.thisVar);
         napi_create_reference(env, argv[ARRAY_INDEX_SECOND], DATA_LENGTH_ONE, &causeCallback.callbackRef);
         DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->RegisterDisconnectedCauseCallback(causeCallback);
     } else if (tmpStr == "mmiCodeResult") {
         EventCallback mmiCodeResultListener;
         (void)memset_s(&mmiCodeResultListener, sizeof(EventCallback), 0, sizeof(EventCallback));
         mmiCodeResultListener.env = env;
-        mmiCodeResultListener.thisVar = thisVar;
+        napi_create_reference(env, thisVar, DATA_LENGTH_ONE, &mmiCodeResultListener.thisVar);
         napi_create_reference(env, argv[ARRAY_INDEX_SECOND], DATA_LENGTH_ONE, &mmiCodeResultListener.callbackRef);
         DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->RegisterMmiCodeCallback(mmiCodeResultListener);
     }
@@ -1547,7 +1547,7 @@ napi_value NapiCallManager::StartRTT(napi_env env, napi_callback_info info)
         napi_create_reference(env, argv[ARRAY_INDEX_THIRD], DATA_LENGTH_ONE, &(asyncContext->callbackRef));
     }
     asyncContext->env = env;
-    asyncContext->thisVar = thisVar;
+    napi_create_reference(env, thisVar, DATA_LENGTH_ONE, &(asyncContext->thisVar));
     return HandleAsyncWork(env, asyncContext, "StartRTT", NativeStartRTT, NativeVoidCallBack);
 }
 
@@ -1563,7 +1563,7 @@ napi_value NapiCallManager::StopRTT(napi_env env, napi_callback_info info)
         napi_create_reference(env, argv[ARRAY_INDEX_SECOND], DATA_LENGTH_ONE, &(asyncContext->callbackRef));
     }
     asyncContext->env = env;
-    asyncContext->thisVar = thisVar;
+    napi_create_reference(env, thisVar, DATA_LENGTH_ONE, &(asyncContext->thisVar));
     return HandleAsyncWork(env, asyncContext, "StopRTT", NativeStopRTT, NativeVoidCallBack);
 }
 
@@ -1618,7 +1618,7 @@ napi_value NapiCallManager::UpdateImsCallMode(napi_env env, napi_callback_info i
         napi_create_reference(env, argv[ARRAY_INDEX_THIRD], DATA_LENGTH_ONE, &(asyncContext->callbackRef));
     }
     asyncContext->env = env;
-    asyncContext->thisVar = thisVar;
+    napi_create_reference(env, thisVar, DATA_LENGTH_ONE, &(asyncContext->thisVar));
     return HandleAsyncWork(env, asyncContext, "UpdateImsCallMode", NativeUpdateImsCallMode, NativeVoidCallBack);
 }
 
@@ -1634,7 +1634,7 @@ napi_value NapiCallManager::EnableLteEnhanceMode(napi_env env, napi_callback_inf
         napi_create_reference(env, argv[ARRAY_INDEX_SECOND], DATA_LENGTH_ONE, &(asyncContext->callbackRef));
     }
     asyncContext->env = env;
-    asyncContext->thisVar = thisVar;
+    napi_create_reference(env, thisVar, DATA_LENGTH_ONE, &(asyncContext->thisVar));
     return HandleAsyncWork(
         env, asyncContext, "EnableLteEnhanceMode", NativeEnableLteEnhanceMode, NativeVoidCallBack);
 }
@@ -1651,7 +1651,7 @@ napi_value NapiCallManager::DisableLteEnhanceMode(napi_env env, napi_callback_in
         napi_create_reference(env, argv[ARRAY_INDEX_SECOND], DATA_LENGTH_ONE, &(asyncContext->callbackRef));
     }
     asyncContext->env = env;
-    asyncContext->thisVar = thisVar;
+    napi_create_reference(env, thisVar, DATA_LENGTH_ONE, &(asyncContext->thisVar));
     return HandleAsyncWork(
         env, asyncContext, "DisableLteEnhanceMode", NativeDisableLteEnhanceMode, NativeVoidCallBack);
 }
@@ -1668,7 +1668,7 @@ napi_value NapiCallManager::IsLteEnhanceModeEnabled(napi_env env, napi_callback_
         napi_create_reference(env, argv[ARRAY_INDEX_SECOND], DATA_LENGTH_ONE, &(asyncContext->callbackRef));
     }
     asyncContext->env = env;
-    asyncContext->thisVar = thisVar;
+    napi_create_reference(env, thisVar, DATA_LENGTH_ONE, &(asyncContext->thisVar));
     return HandleAsyncWork(
         env, asyncContext, "IsLteEnhanceModeEnabled", NativeIsLteEnhanceModeEnabled, NativeDialCallBack);
 }
