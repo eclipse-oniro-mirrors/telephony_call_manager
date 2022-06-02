@@ -85,19 +85,19 @@ struct SupplementAsyncContext : AsyncContext {
     int32_t mode;
     std::string content;
     bool flag;
-    napi_value thisVar;
+    napi_ref thisVar;
 };
 
 struct CallRestrictionAsyncContext : AsyncContext {
     int32_t slotId;
     CallRestrictionInfo info;
-    napi_value thisVar;
+    napi_ref thisVar;
 };
 
 struct CallTransferAsyncContext : AsyncContext {
     int32_t slotId;
     CallTransferInfo info;
-    napi_value thisVar;
+    napi_ref thisVar;
 };
 
 struct UtilsAsyncContext : AsyncContext {
@@ -110,7 +110,7 @@ struct EventCallback {
     EventCallback() : env(nullptr), thisVar(nullptr), callbackRef(nullptr), deferred(nullptr),
                       callbackBeginTime_(0) {}
     napi_env env;
-    napi_value thisVar;
+    napi_ref thisVar;
     napi_ref callbackRef;
     napi_deferred deferred;
     time_t callbackBeginTime_;
