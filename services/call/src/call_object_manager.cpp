@@ -26,7 +26,6 @@ int32_t CallObjectManager::callId_ = CALL_START_ID;
 
 CallObjectManager::CallObjectManager()
 {
-    callObjectPtrList_.clear();
 }
 
 CallObjectManager::~CallObjectManager()

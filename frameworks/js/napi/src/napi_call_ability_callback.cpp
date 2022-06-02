@@ -527,10 +527,12 @@ void NapiCallAbilityCallback::ReportGetLteEnhanceInfo(AppExecFwk::PacMap &result
         }
         napi_value callbackFunc = nullptr;
         napi_get_reference_value(env, supplementInfo.callbackRef, &callbackFunc);
+        napi_value thisVar = nullptr;
+        napi_get_reference_value(env, supplementInfo.thisVar, &thisVar);
         napi_value callbackResult = nullptr;
-        napi_call_function(
-            env, supplementInfo.thisVar, callbackFunc, DATA_LENGTH_TWO, callbackValues, &callbackResult);
+        napi_call_function(env, thisVar, callbackFunc, DATA_LENGTH_TWO, callbackValues, &callbackResult);
         napi_delete_reference(env, supplementInfo.callbackRef);
+        napi_delete_reference(env, supplementInfo.thisVar);
     } else if (supplementInfo.deferred != nullptr) {
         if (result == TELEPHONY_SUCCESS) {
             napi_value promiseValue = nullptr;
@@ -763,12 +765,14 @@ int32_t NapiCallAbilityCallback::ReportCallState(CallAttributeInfo &info, EventC
     NapiCallManagerUtils::SetPropertyInt32(
         env, callbackValues[ARRAY_INDEX_FIRST], "conferenceState", static_cast<int32_t>(info.conferenceState));
     napi_get_reference_value(env, stateCallback.callbackRef, &callbackFunc);
-    napi_value callbackResult = nullptr;
     if (callbackFunc == nullptr) {
         TELEPHONY_LOGE("callbackFunc is null!");
         return CALL_ERR_CALLBACK_NOT_EXIST;
     }
-    napi_call_function(env, stateCallback.thisVar, callbackFunc, DATA_LENGTH_ONE, callbackValues, &callbackResult);
+    napi_value thisVar = nullptr;
+    napi_get_reference_value(env, stateCallback.thisVar, &thisVar);
+    napi_value callbackResult = nullptr;
+    napi_call_function(env, thisVar, callbackFunc, DATA_LENGTH_ONE, callbackValues, &callbackResult);
     return TELEPHONY_SUCCESS;
 }
 
@@ -828,12 +832,14 @@ int32_t NapiCallAbilityCallback::ReportCallEvent(CallEventInfo &info, EventCallb
     NapiCallManagerUtils::SetPropertyStringUtf8(
         env, callbackValues[ARRAY_INDEX_FIRST], "bundleName", info.bundleName);
     napi_get_reference_value(env, eventCallback.callbackRef, &callbackFunc);
-    napi_value callbackResult = nullptr;
     if (callbackFunc == nullptr) {
         TELEPHONY_LOGE("callbackFunc is null!");
         return CALL_ERR_CALLBACK_NOT_EXIST;
     }
-    napi_call_function(env, eventCallback.thisVar, callbackFunc, DATA_LENGTH_ONE, callbackValues, &callbackResult);
+    napi_value thisVar = nullptr;
+    napi_get_reference_value(env, eventCallback.thisVar, &thisVar);
+    napi_value callbackResult = nullptr;
+    napi_call_function(env, thisVar, callbackFunc, DATA_LENGTH_ONE, callbackValues, &callbackResult);
     return TELEPHONY_SUCCESS;
 }
 
@@ -892,12 +898,14 @@ int32_t NapiCallAbilityCallback::ReportDisconnectedCause(int32_t cause, EventCal
     NapiCallManagerUtils::SetPropertyInt32(
         env, callbackValues[ARRAY_INDEX_FIRST], "disconnectedCause", static_cast<int32_t>(cause));
     napi_get_reference_value(env, eventCallback.callbackRef, &callbackFunc);
-    napi_value callbackResult = nullptr;
     if (callbackFunc == nullptr) {
         TELEPHONY_LOGE("callbackFunc is null!");
         return CALL_ERR_CALLBACK_NOT_EXIST;
     }
-    napi_call_function(env, eventCallback.thisVar, callbackFunc, DATA_LENGTH_ONE, callbackValues, &callbackResult);
+    napi_value thisVar = nullptr;
+    napi_get_reference_value(env, eventCallback.thisVar, &thisVar);
+    napi_value callbackResult = nullptr;
+    napi_call_function(env, thisVar, callbackFunc, DATA_LENGTH_ONE, callbackValues, &callbackResult);
     return TELEPHONY_SUCCESS;
 }
 
@@ -1183,10 +1191,12 @@ void NapiCallAbilityCallback::ReportWaitAndLimitInfo(AppExecFwk::PacMap &resultI
         }
         napi_value callbackFunc = nullptr;
         napi_get_reference_value(env, supplementInfo.callbackRef, &callbackFunc);
+        napi_value thisVar = nullptr;
+        napi_get_reference_value(env, supplementInfo.thisVar, &thisVar);
         napi_value callbackResult = nullptr;
-        napi_call_function(
-            env, supplementInfo.thisVar, callbackFunc, DATA_LENGTH_TWO, callbackValues, &callbackResult);
+        napi_call_function(env, thisVar, callbackFunc, DATA_LENGTH_TWO, callbackValues, &callbackResult);
         napi_delete_reference(env, supplementInfo.callbackRef);
+        napi_delete_reference(env, supplementInfo.thisVar);
     } else if (supplementInfo.deferred != nullptr) {
         if (result == TELEPHONY_SUCCESS) {
             napi_value promiseValue = nullptr;
@@ -1231,10 +1241,12 @@ void NapiCallAbilityCallback::ReportGetVolteInfo(AppExecFwk::PacMap &resultInfo,
         }
         napi_value callbackFunc = nullptr;
         napi_get_reference_value(env, supplementInfo.callbackRef, &callbackFunc);
+        napi_value thisVar = nullptr;
+        napi_get_reference_value(env, supplementInfo.thisVar, &thisVar);
         napi_value callbackResult = nullptr;
-        napi_call_function(
-            env, supplementInfo.thisVar, callbackFunc, DATA_LENGTH_TWO, callbackValues, &callbackResult);
+        napi_call_function(env, thisVar, callbackFunc, DATA_LENGTH_TWO, callbackValues, &callbackResult);
         napi_delete_reference(env, supplementInfo.callbackRef);
+        napi_delete_reference(env, supplementInfo.thisVar);
     } else if (supplementInfo.deferred != nullptr) {
         if (result == TELEPHONY_SUCCESS) {
             napi_value promiseValue = nullptr;
@@ -1282,10 +1294,12 @@ void NapiCallAbilityCallback::ReportSupplementInfo(AppExecFwk::PacMap &resultInf
         }
         napi_value callbackFunc = nullptr;
         napi_get_reference_value(env, supplementInfo.callbackRef, &callbackFunc);
+        napi_value thisVar = nullptr;
+        napi_get_reference_value(env, supplementInfo.thisVar, &thisVar);
         napi_value callbackResult = nullptr;
-        napi_call_function(
-            env, supplementInfo.thisVar, callbackFunc, DATA_LENGTH_TWO, callbackValues, &callbackResult);
+        napi_call_function(env, thisVar, callbackFunc, DATA_LENGTH_TWO, callbackValues, &callbackResult);
         napi_delete_reference(env, supplementInfo.callbackRef);
+        napi_delete_reference(env, supplementInfo.thisVar);
     } else if (supplementInfo.deferred != nullptr) {
         if (result == TELEPHONY_SUCCESS) {
             napi_resolve_deferred(env, supplementInfo.deferred, callbackValue);
@@ -1329,10 +1343,12 @@ void NapiCallAbilityCallback::ReportExecutionResult(EventCallback &settingInfo, 
         }
         napi_value callbackFunc = nullptr;
         napi_get_reference_value(env, settingInfo.callbackRef, &callbackFunc);
+        napi_value thisVar = nullptr;
+        napi_get_reference_value(env, settingInfo.thisVar, &thisVar);
         napi_value callbackResult = nullptr;
-        napi_call_function(
-            env, settingInfo.thisVar, callbackFunc, DATA_LENGTH_TWO, callbackValues, &callbackResult);
+        napi_call_function(env, thisVar, callbackFunc, DATA_LENGTH_TWO, callbackValues, &callbackResult);
         napi_delete_reference(env, settingInfo.callbackRef);
+        napi_delete_reference(env, settingInfo.thisVar);
     } else if (settingInfo.deferred != nullptr) {
         if (result == TELEPHONY_SUCCESS) {
             napi_value promiseValue = nullptr;
@@ -1377,10 +1393,12 @@ void NapiCallAbilityCallback::ReportSetVolteInfo(EventCallback &settingInfo, App
         }
         napi_value callbackFunc = nullptr;
         napi_get_reference_value(env, settingInfo.callbackRef, &callbackFunc);
+        napi_value thisVar = nullptr;
+        napi_get_reference_value(env, settingInfo.thisVar, &thisVar);
         napi_value callbackResult = nullptr;
-        napi_call_function(
-            env, settingInfo.thisVar, callbackFunc, DATA_LENGTH_TWO, callbackValues, &callbackResult);
+        napi_call_function(env, thisVar, callbackFunc, DATA_LENGTH_TWO, callbackValues, &callbackResult);
         napi_delete_reference(env, settingInfo.callbackRef);
+        napi_delete_reference(env, settingInfo.thisVar);
     } else if (settingInfo.deferred != nullptr) {
         if (!result) {
             napi_value promiseValue = nullptr;
@@ -1422,10 +1440,12 @@ void NapiCallAbilityCallback::ReportStartRttInfo(AppExecFwk::PacMap &resultInfo,
         }
         napi_value callbackFunc = nullptr;
         napi_get_reference_value(env, supplementInfo.callbackRef, &callbackFunc);
+        napi_value thisVar = nullptr;
+        napi_get_reference_value(env, supplementInfo.thisVar, &thisVar);
         napi_value callbackResult = nullptr;
-        napi_call_function(
-            env, supplementInfo.thisVar, callbackFunc, DATA_LENGTH_TWO, callbackValues, &callbackResult);
+        napi_call_function(env, thisVar, callbackFunc, DATA_LENGTH_TWO, callbackValues, &callbackResult);
         napi_delete_reference(env, supplementInfo.callbackRef);
+        napi_delete_reference(env, supplementInfo.thisVar);
     } else if (supplementInfo.deferred != nullptr) {
         if (result == TELEPHONY_SUCCESS) {
             napi_value promiseValue = nullptr;
@@ -1468,10 +1488,12 @@ void NapiCallAbilityCallback::ReportStopRttInfo(AppExecFwk::PacMap &resultInfo, 
         }
         napi_value callbackFunc = nullptr;
         napi_get_reference_value(env, supplementInfo.callbackRef, &callbackFunc);
+        napi_value thisVar = nullptr;
+        napi_get_reference_value(env, supplementInfo.thisVar, &thisVar);
         napi_value callbackResult = nullptr;
-        napi_call_function(
-            env, supplementInfo.thisVar, callbackFunc, DATA_LENGTH_TWO, callbackValues, &callbackResult);
+        napi_call_function(env, thisVar, callbackFunc, DATA_LENGTH_TWO, callbackValues, &callbackResult);
         napi_delete_reference(env, supplementInfo.callbackRef);
+        napi_delete_reference(env, supplementInfo.thisVar);
     } else if (supplementInfo.deferred != nullptr) {
         if (result == TELEPHONY_SUCCESS) {
             napi_value promiseValue = nullptr;
@@ -1514,10 +1536,12 @@ void NapiCallAbilityCallback::ReportCallMediaModeInfo(AppExecFwk::PacMap &result
         }
         napi_value callbackFunc = nullptr;
         napi_get_reference_value(env, supplementInfo.callbackRef, &callbackFunc);
+        napi_value thisVar = nullptr;
+        napi_get_reference_value(env, supplementInfo.thisVar, &thisVar);
         napi_value callbackResult = nullptr;
-        napi_call_function(
-            env, supplementInfo.thisVar, callbackFunc, DATA_LENGTH_TWO, callbackValues, &callbackResult);
+        napi_call_function(env, thisVar, callbackFunc, DATA_LENGTH_TWO, callbackValues, &callbackResult);
         napi_delete_reference(env, supplementInfo.callbackRef);
+        napi_delete_reference(env, supplementInfo.thisVar);
     } else if (supplementInfo.deferred != nullptr) {
         if (result == TELEPHONY_SUCCESS) {
             napi_value promiseValue = nullptr;
@@ -1574,12 +1598,14 @@ int32_t NapiCallAbilityCallback::ReportCallOtt(
     }
 
     napi_get_reference_value(env, settingInfo.callbackRef, &callbackFunc);
-    napi_value callbackResult = nullptr;
     if (callbackFunc == nullptr) {
         TELEPHONY_LOGE("callbackFunc is null!");
         return CALL_ERR_CALLBACK_NOT_EXIST;
     }
-    napi_call_function(env, settingInfo.thisVar, callbackFunc, DATA_LENGTH_ONE, callbackValues, &callbackResult);
+    napi_value thisVar = nullptr;
+    napi_get_reference_value(env, settingInfo.thisVar, &thisVar);
+    napi_value callbackResult = nullptr;
+    napi_call_function(env, thisVar, callbackFunc, DATA_LENGTH_ONE, callbackValues, &callbackResult);
     return TELEPHONY_SUCCESS;
 }
 } // namespace Telephony
