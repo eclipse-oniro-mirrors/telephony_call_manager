@@ -606,14 +606,14 @@ void GetVolume()
     std::cout << "------GetVolume------" << std::endl;
     std::cout << "please input volume type(3:ring 4:music)" << std::endl;
     std::cin >> type;
-    AudioStandard::AudioSystemManager::AudioVolumeType volumeType =
-        AudioStandard::AudioSystemManager::AudioVolumeType::STREAM_MUSIC;
+    AudioStandard::AudioVolumeType volumeType =
+        AudioStandard::AudioVolumeType::STREAM_MUSIC;
     switch (type) {
-        case AudioStandard::AudioSystemManager::AudioVolumeType::STREAM_RING:
-            volumeType = AudioStandard::AudioSystemManager::AudioVolumeType::STREAM_RING;
+        case AudioStandard::AudioVolumeType::STREAM_RING:
+            volumeType = AudioStandard::AudioVolumeType::STREAM_RING;
             break;
-        case AudioStandard::AudioSystemManager::AudioVolumeType::STREAM_MUSIC:
-            volumeType = AudioStandard::AudioSystemManager::AudioVolumeType::STREAM_MUSIC;
+        case AudioStandard::AudioVolumeType::STREAM_MUSIC:
+            volumeType = AudioStandard::AudioVolumeType::STREAM_MUSIC;
             break;
         default:
             break;
@@ -636,14 +636,14 @@ void SetVolume()
         std::cout << "volume value error" << std::endl;
         return;
     }
-    AudioStandard::AudioSystemManager::AudioVolumeType volumeType =
-        AudioStandard::AudioSystemManager::AudioVolumeType::STREAM_MUSIC;
+    AudioStandard::AudioVolumeType volumeType =
+        AudioStandard::AudioVolumeType::STREAM_MUSIC;
     switch (type) {
-        case AudioStandard::AudioSystemManager::AudioVolumeType::STREAM_RING:
-            volumeType = AudioStandard::AudioSystemManager::AudioVolumeType::STREAM_RING;
+        case AudioStandard::AudioVolumeType::STREAM_RING:
+            volumeType = AudioStandard::AudioVolumeType::STREAM_RING;
             break;
-        case AudioStandard::AudioSystemManager::AudioVolumeType::STREAM_MUSIC:
-            volumeType = AudioStandard::AudioSystemManager::AudioVolumeType::STREAM_MUSIC;
+        case AudioStandard::AudioVolumeType::STREAM_MUSIC:
+            volumeType = AudioStandard::AudioVolumeType::STREAM_MUSIC;
             break;
         default:
             break;

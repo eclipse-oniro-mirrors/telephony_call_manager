@@ -84,17 +84,17 @@ bool AudioProxy::SetEarpieceDevActive()
     return false;
 }
 
-int32_t AudioProxy::GetVolume(AudioStandard::AudioSystemManager::AudioVolumeType audioVolumeType)
+int32_t AudioProxy::GetVolume(AudioStandard::AudioVolumeType audioVolumeType)
 {
     return AudioStandard::AudioSystemManager::GetInstance()->GetVolume(audioVolumeType);
 }
 
-int32_t AudioProxy::SetVolume(AudioStandard::AudioSystemManager::AudioVolumeType audioVolumeType, int32_t volume)
+int32_t AudioProxy::SetVolume(AudioStandard::AudioVolumeType audioVolumeType, int32_t volume)
 {
     return AudioStandard::AudioSystemManager::GetInstance()->SetVolume(audioVolumeType, volume);
 }
 
-int32_t AudioProxy::SetMaxVolume(AudioStandard::AudioSystemManager::AudioVolumeType audioVolumeType)
+int32_t AudioProxy::SetMaxVolume(AudioStandard::AudioVolumeType audioVolumeType)
 {
     int32_t maxVolume = GetMaxVolume(audioVolumeType);
     return AudioStandard::AudioSystemManager::GetInstance()->SetVolume(audioVolumeType, maxVolume);
@@ -102,27 +102,27 @@ int32_t AudioProxy::SetMaxVolume(AudioStandard::AudioSystemManager::AudioVolumeT
 
 void AudioProxy::SetVolumeAudible()
 {
-    int32_t volume = GetMaxVolume(AudioStandard::AudioSystemManager::AudioVolumeType::STREAM_VOICE_CALL);
-    SetVolume(AudioStandard::AudioSystemManager::AudioVolumeType::STREAM_VOICE_CALL,
+    int32_t volume = GetMaxVolume(AudioStandard::AudioVolumeType::STREAM_VOICE_CALL);
+    SetVolume(AudioStandard::AudioVolumeType::STREAM_VOICE_CALL,
         (int32_t)(volume / VOLUME_AUDIBLE_DIVISOR));
 }
 
-bool AudioProxy::IsStreamActive(AudioStandard::AudioSystemManager::AudioVolumeType audioVolumeType)
+bool AudioProxy::IsStreamActive(AudioStandard::AudioVolumeType audioVolumeType)
 {
     return AudioStandard::AudioSystemManager::GetInstance()->IsStreamActive(audioVolumeType);
 }
 
-bool AudioProxy::IsStreamMute(AudioStandard::AudioSystemManager::AudioVolumeType audioVolumeType)
+bool AudioProxy::IsStreamMute(AudioStandard::AudioVolumeType audioVolumeType)
 {
     return AudioStandard::AudioSystemManager::GetInstance()->IsStreamMute(audioVolumeType);
 }
 
-int32_t AudioProxy::GetMaxVolume(AudioStandard::AudioSystemManager::AudioVolumeType audioVolumeType)
+int32_t AudioProxy::GetMaxVolume(AudioStandard::AudioVolumeType audioVolumeType)
 {
     return AudioStandard::AudioSystemManager::GetInstance()->GetMaxVolume(audioVolumeType);
 }
 
-int32_t AudioProxy::GetMinVolume(AudioStandard::AudioSystemManager::AudioVolumeType audioVolumeType)
+int32_t AudioProxy::GetMinVolume(AudioStandard::AudioVolumeType audioVolumeType)
 {
     return AudioStandard::AudioSystemManager::GetInstance()->GetMinVolume(audioVolumeType);
 }
