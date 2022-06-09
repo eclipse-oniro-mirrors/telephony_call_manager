@@ -595,7 +595,8 @@ void SetAudioDevice()
     }
     AudioDevice device = AudioDevice::DEVICE_UNKNOWN;
     device = static_cast<AudioDevice>(deviceType);
-    int32_t ret = g_clientPtr->SetAudioDevice(device);
+    std::string address = "0C:D7:46:14:AA:33";
+    int32_t ret = g_clientPtr->SetAudioDevice(device, address);
     std::cout << "return value:" << ret << std::endl;
 }
 

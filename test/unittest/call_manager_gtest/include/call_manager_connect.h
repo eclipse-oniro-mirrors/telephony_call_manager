@@ -537,6 +537,15 @@ public:
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
 
+    int32_t SetAudioDevice(AudioDevice deviceType, const std::string &bluetoothAddress)
+    {
+        if (callManagerServicePtr_ == nullptr) {
+            TELEPHONY_LOGE("callManagerServicePtr_ is nullptr!");
+            return TELEPHONY_ERR_LOCAL_PTR_NULL;
+        }
+        return callManagerServicePtr_->SetAudioDevice(deviceType, bluetoothAddress);
+    }
+
     int32_t SetPreviewWindow(VideoWindow &window)
     {
         if (callManagerServicePtr_ != nullptr) {

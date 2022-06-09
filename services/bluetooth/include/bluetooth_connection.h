@@ -16,9 +16,10 @@
 #ifndef TELEPHONY_BLUETOOTH_CONNECTION_H
 #define TELEPHONY_BLUETOOTH_CONNECTION_H
 
-#include <set>
-#include <string>
 #include <memory>
+#include <string>
+
+#include "unordered_map"
 
 #ifdef ABILITY_BLUETOOTH_SUPPORT
 #include "bluetooth_hfp_ag.h"
@@ -38,23 +39,23 @@ class BluetoothConnection : public OHOS::Bluetooth::HandsFreeAudioGatewayObserve
 #else
 class BluetoothConnection {
 #endif
-
 public:
     BluetoothConnection();
     ~BluetoothConnection();
     void Init();
     bool ConnectBtSco();
+    bool ConnectBtSco(const std::string &bluetoothAddress);
     bool DisconnectBtSco();
     bool IsBtScoConnected();
     static BtScoState GetBtScoState();
     static void SetBtScoState(BtScoState state);
     int32_t SendBtCallState(int32_t numActive, int32_t numHeld, int32_t callState, const std::string &number);
-    void RemoveBtDevice(std::string address);
+    void RemoveBtDevice(const std::string &address);
 #ifdef ABILITY_BLUETOOTH_SUPPORT
     void OnScoStateChanged(const Bluetooth::BluetoothRemoteDevice &device, int32_t state) override;
     void OnConnectionStateChanged(const Bluetooth::BluetoothRemoteDevice &device, int32_t state) override;
-    Bluetooth::BluetoothRemoteDevice GetBtDevice(std::string address);
-    void AddBtDevice(std::string address, Bluetooth::BluetoothRemoteDevice device);
+    Bluetooth::BluetoothRemoteDevice *GetBtDevice(const std::string &address);
+    void AddBtDevice(const std::string &address, Bluetooth::BluetoothRemoteDevice device);
 #endif
 
 private:

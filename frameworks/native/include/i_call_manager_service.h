@@ -111,7 +111,7 @@ public:
     virtual bool IsNewCallAllowed() = 0;
     virtual int32_t SetMuted(bool isMute) = 0;
     virtual int32_t MuteRinger() = 0;
-    virtual int32_t SetAudioDevice(AudioDevice deviceType) = 0;
+    virtual int32_t SetAudioDevice(AudioDevice deviceType, const std::string &bluetoothAddress) = 0;
     virtual bool IsRinging() = 0;
     virtual bool IsInEmergencyCall() = 0;
     virtual int32_t StartDtmf(int32_t callId, char str) = 0;

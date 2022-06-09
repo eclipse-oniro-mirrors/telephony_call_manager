@@ -43,6 +43,7 @@ public:
     static void SetSpeakerAvailable(bool available);
     static void SetWiredHeadsetAvailable(bool available);
     static void SetBtScoAvailable(bool available);
+    void SetBluetoothAddress(const std::string &bluetoothAddress);
     bool SwitchDevice(AudioDevice device);
 
 private:
@@ -58,6 +59,7 @@ private:
     static bool isWiredHeadsetConnected_;
     static bool isBtScoConnected_;
     bool isAudioActivated_;
+    std::string bluetoothAddress_;
     using AudioDeviceManagerFunc = bool (AudioDeviceManager::*)();
     std::map<uint32_t, AudioDeviceManagerFunc> memberFuncMap_;
     bool SwitchDevice(AudioEvent event);

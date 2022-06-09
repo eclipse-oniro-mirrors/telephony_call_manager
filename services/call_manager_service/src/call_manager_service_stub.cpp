@@ -343,7 +343,8 @@ int32_t CallManagerServiceStub::OnMuteRinger(MessageParcel &data, MessageParcel 
 int32_t CallManagerServiceStub::OnSetAudioDevice(MessageParcel &data, MessageParcel &reply)
 {
     int32_t deviceType = data.ReadInt32();
-    int32_t result = SetAudioDevice((AudioDevice)deviceType);
+    std::string bluetoothAddress = data.ReadString();
+    int32_t result = SetAudioDevice((AudioDevice)deviceType, bluetoothAddress);
     TELEPHONY_LOGI("result:%{public}d", result);
     if (!reply.WriteInt32(result)) {
         TELEPHONY_LOGE("fail to write parcel");

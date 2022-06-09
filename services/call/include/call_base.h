@@ -79,7 +79,7 @@ public:
     void SetVideoStateType(VideoStateType mediaType);
     void SetPolicyFlag(PolicyFlag flag);
     uint64_t GetPolicyFlag();
-    bool GetCallerInfo(ContactInfo &info);
+    ContactInfo GetCallerInfo();
     void SetCallerInfo(const ContactInfo &contactInfo);
     void SetCallRunningState(CallRunningState callRunningState);
     void SetStartTime(int64_t startTime);

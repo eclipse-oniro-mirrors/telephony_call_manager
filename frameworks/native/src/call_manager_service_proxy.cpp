@@ -333,7 +333,7 @@ int32_t CallManagerServiceProxy::MuteRinger()
     return replyParcel.ReadInt32();
 }
 
-int32_t CallManagerServiceProxy::SetAudioDevice(AudioDevice deviceType)
+int32_t CallManagerServiceProxy::SetAudioDevice(AudioDevice deviceType, const std::string &bluetoothAddress)
 {
     MessageOption option;
     MessageParcel dataParcel;
@@ -343,6 +343,7 @@ int32_t CallManagerServiceProxy::SetAudioDevice(AudioDevice deviceType)
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
     dataParcel.WriteInt32(static_cast<int32_t>(deviceType));
+    dataParcel.WriteString(bluetoothAddress);
     if (Remote() == nullptr) {
         TELEPHONY_LOGE("function Remote() return nullptr!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;

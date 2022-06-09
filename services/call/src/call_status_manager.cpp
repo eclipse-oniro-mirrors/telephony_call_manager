@@ -222,12 +222,13 @@ int32_t CallStatusManager::IncomingHandle(const CallDetailInfo &info)
         TELEPHONY_LOGE("CreateNewCall failed!");
         return CALL_ERR_CALL_OBJECT_IS_NULL;
     }
-#ifdef ABILITY_DATABASE_SUPPORT
+
     // allow list filtering
     // Get the contact data from the database
-    GetCallerInfoDate(ContactInfo);
-    SetCallerInfo(contactInfo);
-#endif
+    ContactInfo contactInfo;
+    QueryCallerInfo(contactInfo, std::string(info.phoneNum));
+    call->SetCallerInfo(contactInfo);
+
     DelayedSingleton<CallControlManager>::GetInstance()->NotifyNewCallCreated(call);
     ret = UpdateCallState(call, info.state);
     if (ret != TELEPHONY_SUCCESS) {
@@ -239,6 +240,21 @@ int32_t CallStatusManager::IncomingHandle(const CallDetailInfo &info)
         TELEPHONY_LOGE("FilterResultsDispose failed!");
     }
     return ret;
+}
+
+void CallStatusManager::QueryCallerInfo(ContactInfo &contactInfo, std::string phoneNum)
+{
+    TELEPHONY_LOGI("Entry CallStatusManager QueryCallerInfo");
+    std::shared_ptr<CallDataBaseHelper> callDataPtr = DelayedSingleton<CallDataBaseHelper>::GetInstance();
+    if (callDataPtr == nullptr) {
+        TELEPHONY_LOGE("callDataPtr is nullptr!");
+        return;
+    }
+    NativeRdb::DataAbilityPredicates predicates;
+    predicates.EqualTo(DETAIL_INFO, phoneNum);
+    predicates.And();
+    predicates.EqualTo(CONTENT_TYPE, PHONE);
+    callDataPtr->Query(contactInfo, predicates);
 }
 
 int32_t CallStatusManager::IncomingFilterPolicy(const CallDetailInfo &info)

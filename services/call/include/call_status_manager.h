@@ -65,6 +65,7 @@ private:
     int32_t ToSpeakerPhone(sptr<CallBase> &call);
     int32_t TurnOffMute(sptr<CallBase> &call);
     int32_t IncomingFilterPolicy(const CallDetailInfo &info);
+    void QueryCallerInfo(ContactInfo &contactInfo, std::string phoneNum);
 
 private:
     CallDetailInfo callReportInfo_;
@@ -72,6 +73,9 @@ private:
     sptr<CallIncomingFilterManager> CallIncomingFilterManagerPtr_;
     std::map<RequestResultEventId, CallAbilityEventId> mEventIdTransferMap_;
     std::map<OttCallEventId, CallAbilityEventId> mOttEventIdTransferMap_;
+    const std::string DETAIL_INFO = "detail_info";
+    const std::string CONTENT_TYPE = "content_type";
+    const std::string PHONE = "phone";
 };
 } // namespace Telephony
 } // namespace OHOS
