@@ -134,7 +134,7 @@ ohos_shared_library("tel_call_manager") {
     "//foundation/multimedia/audio_standard/interfaces/inner_api/native/audioringtone/include",
     "//foundation/multimedia/audio_standard/services/include/client",
     "//foundation/multimedia/media_standard/interfaces/inner_api/native",
-    "//foundation/multimedia/medialibrary_standard/interfaces/innerkits/native/include",
+    "//foundation/multimedia/media_library/interfaces/innerkits/native/include",
   ]
 
   configs = [ "//base/telephony/core_service/utils:telephony_log_config" ]
