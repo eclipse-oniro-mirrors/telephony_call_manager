@@ -368,6 +368,18 @@ struct ClirResponse {
     int32_t clirStat;
 };
 
+struct ColrResponse {
+    int32_t result; // 0: ok  other: error
+    int32_t action;
+    int32_t colrStat;
+};
+
+struct ColpResponse {
+    int32_t result; // 0: ok  other: error
+    int32_t action;
+    int32_t colpStat;
+};
+
 struct MmiCodeInfo {
     int32_t result;  // 0: ok  other: error
     char message[kMaxNumberLen + 1];
