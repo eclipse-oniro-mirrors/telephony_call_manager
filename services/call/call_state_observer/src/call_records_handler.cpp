@@ -45,7 +45,15 @@ void CallRecordsHandler::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &eve
             TELEPHONY_LOGE("callDataPtr_ is nullptr!");
             return;
         }
-        ContactInfo contactInfo;
+        ContactInfo contactInfo = {
+            .name = "",
+            .number = "",
+            .isContacterExists = false,
+            .ringtonePath = "",
+            .isSendToVoicemail = false,
+            .isEcc = false,
+            .isVoiceMail = false,
+        };
         QueryCallerInfo(contactInfo, std::string(info.phoneNumber));
 
         NativeRdb::ValuesBucket bucket;
@@ -86,7 +94,11 @@ void CallRecordsHandler::QueryCallerInfo(ContactInfo &contactInfo, std::string p
     predicates.EqualTo(CALL_DETAIL_INFO, phoneNumber);
     predicates.And();
     predicates.EqualTo(CALL_CONTENT_TYPE, CALL_PHONE);
-    callDataPtr->Query(contactInfo, predicates);
+    bool ret = callDataPtr->Query(contactInfo, predicates);
+    if (!ret) {
+        TELEPHONY_LOGE("Query contact database fail!");
+        return;
+    }
 }
 
 CallRecordsHandlerService::CallRecordsHandlerService() : eventLoop_(nullptr), handler_(nullptr) {}

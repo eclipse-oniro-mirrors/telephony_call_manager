@@ -17,16 +17,15 @@
 
 #include <securec.h>
 
+#include "audio_control_manager.h"
+#include "bluetooth_call_service.h"
+#include "call_control_manager.h"
 #include "call_manager_errors.h"
-#include "telephony_log_wrapper.h"
-
-#include "report_call_info_handler.h"
 #include "cs_call.h"
 #include "ims_call.h"
 #include "ott_call.h"
-#include "audio_control_manager.h"
-#include "call_control_manager.h"
-#include "bluetooth_call_service.h"
+#include "report_call_info_handler.h"
+#include "telephony_log_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -172,8 +171,7 @@ int32_t CallStatusManager::HandleEventResultReportInfo(const CellularCallEventIn
         DialParaInfo dialInfo;
         if (eventInfo.eventId == CallAbilityEventId::EVENT_DIAL_NO_CARRIER) {
             DelayedSingleton<CallControlManager>::GetInstance()->GetDialParaInfo(dialInfo);
-            if (memcpy_s(eventInfo.phoneNum, kMaxNumberLen, dialInfo.number.c_str(), dialInfo.number.length()) !=
-                EOK) {
+            if (memcpy_s(eventInfo.phoneNum, kMaxNumberLen, dialInfo.number.c_str(), dialInfo.number.length()) != EOK) {
                 TELEPHONY_LOGE("memcpy_s failed!");
                 return TELEPHONY_ERR_MEMCPY_FAIL;
             }
@@ -225,7 +223,15 @@ int32_t CallStatusManager::IncomingHandle(const CallDetailInfo &info)
 
     // allow list filtering
     // Get the contact data from the database
-    ContactInfo contactInfo;
+    ContactInfo contactInfo = {
+        .name = "",
+        .number = "",
+        .isContacterExists = false,
+        .ringtonePath = "",
+        .isSendToVoicemail = false,
+        .isEcc = false,
+        .isVoiceMail = false,
+    };
     QueryCallerInfo(contactInfo, std::string(info.phoneNum));
     call->SetCallerInfo(contactInfo);
 
@@ -254,7 +260,11 @@ void CallStatusManager::QueryCallerInfo(ContactInfo &contactInfo, std::string ph
     predicates.EqualTo(DETAIL_INFO, phoneNum);
     predicates.And();
     predicates.EqualTo(CONTENT_TYPE, PHONE);
-    callDataPtr->Query(contactInfo, predicates);
+    bool ret = callDataPtr->Query(contactInfo, predicates);
+    if (!ret) {
+        TELEPHONY_LOGE("Query contact database fail!");
+        return;
+    }
 }
 
 int32_t CallStatusManager::IncomingFilterPolicy(const CallDetailInfo &info)
