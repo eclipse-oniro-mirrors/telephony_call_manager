@@ -97,7 +97,6 @@ void CallRecordsHandler::QueryCallerInfo(ContactInfo &contactInfo, std::string p
     bool ret = callDataPtr->Query(contactInfo, predicates);
     if (!ret) {
         TELEPHONY_LOGE("Query contact database fail!");
-        return;
     }
 }
 

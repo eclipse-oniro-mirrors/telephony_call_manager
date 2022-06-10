@@ -263,7 +263,6 @@ void CallStatusManager::QueryCallerInfo(ContactInfo &contactInfo, std::string ph
     bool ret = callDataPtr->Query(contactInfo, predicates);
     if (!ret) {
         TELEPHONY_LOGE("Query contact database fail!");
-        return;
     }
 }
 
