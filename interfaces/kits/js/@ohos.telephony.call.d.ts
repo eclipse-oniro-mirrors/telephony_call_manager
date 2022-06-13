@@ -276,12 +276,20 @@ declare namespace call {
   function off(type: 'callDisconnectedCause', callback?: Callback<DisconnectedDetails>): void;
 
   /**
+   * Observe the result of MMI code
+   *
+   * @param type Indicates the observer type.
+   * @param callback Return the result of MMI code.
    * @systemapi Hide this for inner system use.
    * @since 9
    */
   function on(type: 'mmiCodeResult', callback: Callback<MmiCodeResults>): void;
 
   /**
+   * Unobserve the result of MMI code
+   *
+   * @param type Indicates the observer type.
+   * @param callback Return the result of MMI code.
    * @systemapi Hide this for inner system use.
    * @since 9
    */
@@ -352,11 +360,17 @@ declare namespace call {
   function cancelMuted(): Promise<void>;
 
   /**
+   * Set the audio device
+   *
+   * @param device Indicates the device of audio.
+   * @param options Indicates additional information, such as address of bluetooth(Since API 9).
+   * @param callback Returns {@code true} if the request is successful; returns {@code false} otherwise.
    * @systemapi Hide this for inner system use.
    * @since 8
    */
   function setAudioDevice(device: AudioDevice, callback: AsyncCallback<void>): void;
-  function setAudioDevice(device: AudioDevice): Promise<void>;
+  function setAudioDevice(device: AudioDevice, options: AudioDeviceOptions, callback: AsyncCallback<void>): void;
+  function setAudioDevice(device: AudioDevice, options?: AudioDeviceOptions): Promise<void>;
 
   /**
    * @systemapi Hide this for inner system use.
@@ -696,8 +710,18 @@ declare namespace call {
    * @systemapi Hide this for inner system use.
    * @since 9
    */
+  export interface AudioDeviceOptions {
+    bluetoothAddress?: string;
+  }
+
+  /**
+   * @systemapi Hide this for inner system use.
+   * @since 9
+   */
   export interface MmiCodeResults {
+    /** Indicates the result of MMI code. */
     result: MmiCodeResult;
+    /** Indicates the message of MMI code. */
     message: string;
   }
 
@@ -706,7 +730,9 @@ declare namespace call {
    * @since 9
    */
   export enum MmiCodeResult {
+    /** Indicates the result of MMI code with successfully. */
     MMI_CODE_SUCCESS = 0,
+    /** Indicates the result of MMI code with failed. */
     MMI_CODE_FAILED = 1
   }
 

@@ -19,12 +19,11 @@
 #include <memory>
 #include <mutex>
 
+#include "call_data_base_helper.h"
+#include "call_status_manager.h"
 #include "event_handler.h"
 #include "event_runner.h"
 #include "singleton.h"
-
-#include "call_status_manager.h"
-#include "call_data_base_helper.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -33,6 +32,9 @@ public:
     CallRecordsHandler(const std::shared_ptr<AppExecFwk::EventRunner> &runner);
     virtual ~CallRecordsHandler() = default;
     void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event);
+
+private:
+    void QueryCallerInfo(ContactInfo &contactInfo, std::string phoneNumber);
 
 private:
     std::shared_ptr<CallDataBaseHelper> callDataPtr_;

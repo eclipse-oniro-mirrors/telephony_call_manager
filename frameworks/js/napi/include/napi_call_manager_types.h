@@ -119,6 +119,7 @@ struct EventCallback {
 struct AudioAsyncContext : AsyncContext {
     bool isMute;
     char digit[kMaxNumberLen + 1];
+    size_t digitLen;
     int32_t dudioDevice;
 };
 

@@ -272,11 +272,10 @@ uint64_t CallBase::GetPolicyFlag()
     return policyFlag_;
 }
 
-bool CallBase::GetCallerInfo(ContactInfo &info)
+ContactInfo CallBase::GetCallerInfo()
 {
     std::lock_guard<std::mutex> lock(mutex_);
-    info = contactInfo_;
-    return true;
+    return contactInfo_;
 }
 
 void CallBase::SetCallerInfo(const ContactInfo &info)

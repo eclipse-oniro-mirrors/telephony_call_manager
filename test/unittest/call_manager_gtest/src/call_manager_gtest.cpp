@@ -1811,6 +1811,77 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetPausePicture_0600, Function 
     EXPECT_NE(CallManagerGtest::clientPtr_->SetPausePicture(path), RETURN_VALUE_IS_ZERO);
 }
 
+/********************************************* Test SetAudioDevic()***********************************************/
+/**
+ * @tc.number   Telephony_CallManager_SetAudioDevice_0100
+ * @tc.name     make a normal buletoothAddress , set active bluetooth device
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_SetAudioDevice_0100, Function | MediumTest | Level2)
+{
+    EXPECT_EQ(CallManagerGtest::IsServiceConnected(), true);
+    std::string address = "0C:D7:46:14:AA:33";
+    AudioDevice device = AudioDevice::DEVICE_BLUETOOTH_SCO;
+    int32_t ret = CallManagerGtest::clientPtr_->SetAudioDevice(device, address);
+    EXPECT_NE(ret, RETURN_VALUE_IS_ZERO);
+}
+
+/**
+ * @tc.number   Telephony_CallManager_SetAudioDevice_0200
+ * @tc.name     make EARPIECE device type , set active EARPIECE device
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_SetAudioDevice_0200, Function | MediumTest | Level2)
+{
+    EXPECT_EQ(CallManagerGtest::IsServiceConnected(), true);
+    std::string address = "0C:D7:46:14:AA:33";
+    AudioDevice device = AudioDevice::DEVICE_EARPIECE;
+    int32_t ret = CallManagerGtest::clientPtr_->SetAudioDevice(device, address);
+    EXPECT_NE(ret, RETURN_VALUE_IS_ZERO);
+}
+
+/**
+ * @tc.number   Telephony_CallManager_SetAudioDevice_0300
+ * @tc.name     make SPEAKER device type , set active SPEAKER device
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_SetAudioDevice_0300, Function | MediumTest | Level2)
+{
+    EXPECT_EQ(CallManagerGtest::IsServiceConnected(), true);
+    std::string address = "0C:D7:46:14:AA:33";
+    AudioDevice device = AudioDevice::DEVICE_SPEAKER;
+    int32_t ret = CallManagerGtest::clientPtr_->SetAudioDevice(device, address);
+    EXPECT_EQ(ret, RETURN_VALUE_IS_ZERO);
+}
+
+/**
+ * @tc.number   Telephony_CallManager_SetAudioDevice_0400
+ * @tc.name     make DEVICE_WIRED_HEADSET device type , set active DEVICE_WIRED_HEADSET device
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_SetAudioDevice_0400, Function | MediumTest | Level2)
+{
+    EXPECT_EQ(CallManagerGtest::IsServiceConnected(), true);
+    std::string address = "0C:D7:46:14:AA:33";
+    AudioDevice device = AudioDevice::DEVICE_WIRED_HEADSET;
+    int32_t ret = CallManagerGtest::clientPtr_->SetAudioDevice(device, address);
+    EXPECT_NE(ret, RETURN_VALUE_IS_ZERO);
+}
+
+/**
+ * @tc.number   Telephony_CallManager_SetAudioDevice_0500
+ * @tc.name     make a empty buletoothAddress , set active bluetooth device
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_SetAudioDevice_0500, Function | MediumTest | Level2)
+{
+    EXPECT_EQ(CallManagerGtest::IsServiceConnected(), true);
+    std::string address = "";
+    AudioDevice device = AudioDevice::DEVICE_BLUETOOTH_SCO;
+    int32_t ret = CallManagerGtest::clientPtr_->SetAudioDevice(device, address);
+    EXPECT_NE(ret, RETURN_VALUE_IS_ZERO);
+}
+
 /********************************************* Test RegisterCallBack() ***********************************************/
 /**
  * @tc.number   Telephony_CallManager_RegisterCallBack_0100

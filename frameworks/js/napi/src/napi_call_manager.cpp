@@ -1397,14 +1397,29 @@ napi_value NapiCallManager::MuteRinger(napi_env env, napi_callback_info info)
 napi_value NapiCallManager::SetAudioDevice(napi_env env, napi_callback_info info)
 {
     GET_PARAMS(env, info, VALUE_MAXIMUM_LIMIT);
-    NAPI_ASSERT(env, argc < VALUE_MAXIMUM_LIMIT, "parameter error!");
+    NAPI_ASSERT(env, argc <= VALUE_MAXIMUM_LIMIT, "parameter error!");
     bool matchFlag = NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_FIRST], napi_number);
     NAPI_ASSERT(env, matchFlag, "Type error, should be number type");
     auto asyncContext = (std::make_unique<AudioAsyncContext>()).release();
     napi_get_value_int32(env, argv[ARRAY_INDEX_FIRST], &asyncContext->dudioDevice);
     if (argc == TWO_VALUE_LIMIT) {
-        napi_create_reference(env, argv[ARRAY_INDEX_SECOND], DATA_LENGTH_ONE, &(asyncContext->callbackRef));
+        if (NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_SECOND], napi_function)) {
+            napi_create_reference(env, argv[ARRAY_INDEX_SECOND], DATA_LENGTH_ONE, &(asyncContext->callbackRef));
+        } else if (NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_SECOND], napi_string)) {
+            napi_get_value_string_utf8(env, argv[ARRAY_INDEX_SECOND], asyncContext->digit,
+                kMaxNumberLen, &(asyncContext->digitLen));
+        } else {
+            TELEPHONY_LOGE("args error, argv type is not correct");
+        }
+    } else if (argc == VALUE_MAXIMUM_LIMIT &&
+        NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_SECOND], napi_string)) {
+        napi_get_value_string_utf8(env, argv[ARRAY_INDEX_SECOND], asyncContext->digit,
+            kMaxNumberLen, &(asyncContext->digitLen));
+        napi_create_reference(env, argv[ARRAY_INDEX_THIRD], DATA_LENGTH_ONE, &(asyncContext->callbackRef));
+    } else {
+        TELEPHONY_LOGE("args error, argv type is not correct");
     }
+
     return HandleAsyncWork(env, asyncContext, "SetAudioDevice", NativeSetAudioDevice, NativeVoidCallBack);
 }
 
@@ -2633,14 +2648,14 @@ void NapiCallManager::NativeSetAudioDevice(napi_env env, void *data)
     AudioDevice type;
     auto asyncContext = (AudioAsyncContext *)data;
     type = static_cast<AudioDevice>(asyncContext->dudioDevice);
-    
+    std::string bluetoothAddress(asyncContext->digit, asyncContext->digitLen);
     // For interface compatibility, when AudioDevice::DEVICE_MIC is deleted, this code block should also be deleted
     // When the parameter passed is DEVICE_MIC, point to DEVICE_EARPIECE
     int32_t DEVICE_MIC = 4;
     if (static_cast<int32_t>(type) == DEVICE_MIC) {
         type = AudioDevice::DEVICE_EARPIECE;
     }
-    asyncContext->result = DelayedSingleton<CallManagerClient>::GetInstance()->SetAudioDevice(type);
+    asyncContext->result = DelayedSingleton<CallManagerClient>::GetInstance()->SetAudioDevice(type, bluetoothAddress);
 }
 
 void NapiCallManager::NativeControlCamera(napi_env env, void *data)
