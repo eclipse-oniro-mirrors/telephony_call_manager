@@ -62,8 +62,8 @@ ohos_executable("tel_call_manager_ui_test") {
     "core_service:tel_core_service_api",
     "eventhandler:libeventhandler",
     "ipc:ipc_core",
-    "multimedia_audio_standard:audio_client",
-    "multimedia_audio_standard:audio_renderer",
+    "multimedia_audio_framework:audio_client",
+    "multimedia_audio_framework:audio_renderer",
     "safwk:system_ability_fwk",
     "samgr_standard:samgr_proxy",
   ]
