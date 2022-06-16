@@ -27,7 +27,7 @@ constexpr int16_t DEFAULT_CALL_NUMBER_TYPE = 86;
 class BluetoothCallManager : public std::enable_shared_from_this<BluetoothCallManager> {
     DECLARE_DELAYED_SINGLETON(BluetoothCallManager)
 public:
-    bool ConnectBtSco();
+    bool ConnectBtSco(const std::string &bluetoothAddress);
     bool DisconnectBtSco();
     int32_t SendBtCallState(int32_t numActive, int32_t numHeld, int32_t callState, const std::string &number);
     BtScoState GetBtScoState();

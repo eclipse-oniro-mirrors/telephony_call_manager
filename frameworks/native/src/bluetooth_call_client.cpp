@@ -35,6 +35,7 @@ BluetoothCallClient::~BluetoothCallClient() {}
 
 void BluetoothCallClient::Init()
 {
+    TELEPHONY_LOGI("BluetoothCallClient init:");
     if (g_callManagerProxyPtr == nullptr) {
         g_callManagerProxyPtr = DelayedSingleton<CallManagerProxy>::GetInstance();
         if (g_callManagerProxyPtr == nullptr) {
@@ -265,10 +266,10 @@ int32_t BluetoothCallClient::MuteRinger()
     }
 }
 
-int32_t BluetoothCallClient::SetAudioDevice(AudioDevice deviceType)
+int32_t BluetoothCallClient::SetAudioDevice(AudioDevice deviceType, const std::string &bluetoothAddress)
 {
     if (g_callManagerProxyPtr != nullptr) {
-        return g_callManagerProxyPtr->SetAudioDevice(deviceType);
+        return g_callManagerProxyPtr->SetAudioDevice(deviceType, bluetoothAddress);
     } else {
         TELEPHONY_LOGE("init first please!");
         return TELEPHONY_ERR_UNINIT;

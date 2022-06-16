@@ -17,19 +17,17 @@
 #define TELEPHONY_CALL_DATA_BASE_HELPER_H
 
 #include "ability_manager_interface.h"
+#include "abs_shared_result_set.h"
+#include "common_type.h"
+#include "data_ability_helper.h"
+#include "data_ability_observer_stub.h"
+#include "data_ability_predicates.h"
 #include "if_system_ability_manager.h"
-
 #include "refbase.h"
 #include "singleton.h"
-
 #include "system_ability.h"
 #include "system_ability_definition.h"
-
-#include "data_ability_helper.h"
-#include "data_ability_predicates.h"
 #include "values_bucket.h"
-#include "abs_shared_result_set.h"
-#include "data_ability_observer_stub.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -52,6 +50,9 @@ const std::string CALL_ANSWER_STATE = "answer_state";
 const std::string CALL_CREATE_TIME = "create_time";
 const std::string CALL_NUMBER_LOCATION = "number_location";
 const std::string CALL_PHOTO_ID = "photo_id";
+const std::string CALL_DETAIL_INFO = "detail_info";
+const std::string CALL_CONTENT_TYPE = "content_type";
+const std::string CALL_PHONE = "phone";
 
 class CallDataRdbObserver : public AAFwk::DataAbilityObserverStub {
 public:
@@ -70,6 +71,7 @@ public:
     void UnRegisterObserver();
     bool Insert(NativeRdb::ValuesBucket &values);
     bool Query(std::vector<std::string> *phones, NativeRdb::DataAbilityPredicates &predicates);
+    bool Query(ContactInfo &contactInfo, NativeRdb::DataAbilityPredicates &predicates);
     bool Delete(NativeRdb::DataAbilityPredicates &predicates);
 
 private:
@@ -78,6 +80,7 @@ private:
     void ResultSetConvertToIndexer(const std::shared_ptr<NativeRdb::AbsSharedResultSet> &resultSet);
     const std::string CALL_SUBSECTION = "dataability:///com.ohos.calllogability/calls/calllog";
     const std::string CALL_BLOCK = "dataability:///com.ohos.contactsdataability/contacts/contact_blocklist";
+    const std::string CONTACT_DATA = "dataability:///com.ohos.contactsdataability/contacts/contact_data";
 };
 } // namespace Telephony
 } // namespace OHOS

@@ -411,10 +411,10 @@ int32_t CallManagerClient::MuteRinger()
     }
 }
 
-int32_t CallManagerClient::SetAudioDevice(AudioDevice deviceType)
+int32_t CallManagerClient::SetAudioDevice(AudioDevice deviceType, const std::string &bluetoothAddress)
 {
     if (g_callManagerProxy != nullptr) {
-        return g_callManagerProxy->SetAudioDevice(deviceType);
+        return g_callManagerProxy->SetAudioDevice(deviceType, bluetoothAddress);
     } else {
         TELEPHONY_LOGE("init first please!");
         return TELEPHONY_ERR_UNINIT;

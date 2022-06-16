@@ -48,7 +48,7 @@ public:
     bool IsInEmergencyCall();
     int32_t SetMuted(bool isMute);
     int32_t MuteRinger();
-    int32_t SetAudioDevice(AudioDevice deviceType);
+    int32_t SetAudioDevice(AudioDevice deviceType, const std::string &bluetoothAddress);
     std::vector<CallAttributeInfo> GetCurrentCallList(int32_t slotId);
 };
 } // namespace Telephony

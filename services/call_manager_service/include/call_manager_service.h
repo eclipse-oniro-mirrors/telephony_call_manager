@@ -202,9 +202,10 @@ public:
      *
      * @brief Setting the Audio Channel
      * @param deviceType[in], audio device type
+     * @param bluetoothAddress[in], bluetooth device Address
      * @return Returns 0 on success, others on failure.
      */
-    int32_t SetAudioDevice(AudioDevice deviceType) override;
+    int32_t SetAudioDevice(AudioDevice deviceType, const std::string &bluetoothAddress) override;
 
     /**
      * IsRinging

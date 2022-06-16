@@ -63,7 +63,7 @@ public:
         std::u16string &number, std::u16string &countryCode, std::u16string &formatNumber);
     int32_t SetMuted(bool isMute);
     int32_t MuteRinger();
-    int32_t SetAudioDevice(AudioDevice deviceType);
+    int32_t SetAudioDevice(AudioDevice deviceType, const std::string &bluetoothAddress);
     int32_t ControlCamera(std::u16string cameraId);
     int32_t SetPreviewWindow(VideoWindow &window);
     int32_t SetDisplayWindow(VideoWindow &window);

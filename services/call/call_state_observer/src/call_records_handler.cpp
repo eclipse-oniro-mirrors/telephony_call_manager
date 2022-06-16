@@ -45,10 +45,21 @@ void CallRecordsHandler::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &eve
             TELEPHONY_LOGE("callDataPtr_ is nullptr!");
             return;
         }
+        ContactInfo contactInfo = {
+            .name = "",
+            .number = "",
+            .isContacterExists = false,
+            .ringtonePath = "",
+            .isSendToVoicemail = false,
+            .isEcc = false,
+            .isVoiceMail = false,
+        };
+        QueryCallerInfo(contactInfo, std::string(info.phoneNumber));
+
         NativeRdb::ValuesBucket bucket;
         TELEPHONY_LOGI("callLog Insert begin");
         bucket.PutString(CALL_PHONE_NUMBER, std::string(info.phoneNumber));
-        bucket.PutString(CALL_DISPLAY_NAME, std::string(""));
+        bucket.PutString(CALL_DISPLAY_NAME, std::string(contactInfo.name));
         bucket.PutInt(CALL_DIRECTION, static_cast<int32_t>(info.directionType));
         bucket.PutString(CALL_VOICEMAIL_URI, std::string(""));
         bucket.PutInt(CALL_SIM_TYPE, 0);
@@ -69,6 +80,23 @@ void CallRecordsHandler::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &eve
         bucket.PutInt(CALL_PHOTO_ID, 0);
         callDataPtr_->Insert(bucket);
         return;
+    }
+}
+
+void CallRecordsHandler::QueryCallerInfo(ContactInfo &contactInfo, std::string phoneNumber)
+{
+    std::shared_ptr<CallDataBaseHelper> callDataPtr = DelayedSingleton<CallDataBaseHelper>::GetInstance();
+    if (callDataPtr == nullptr) {
+        TELEPHONY_LOGE("callDataPtr is nullptr!");
+        return;
+    }
+    NativeRdb::DataAbilityPredicates predicates;
+    predicates.EqualTo(CALL_DETAIL_INFO, phoneNumber);
+    predicates.And();
+    predicates.EqualTo(CALL_CONTENT_TYPE, CALL_PHONE);
+    bool ret = callDataPtr->Query(contactInfo, predicates);
+    if (!ret) {
+        TELEPHONY_LOGE("Query contact database fail!");
     }
 }
 

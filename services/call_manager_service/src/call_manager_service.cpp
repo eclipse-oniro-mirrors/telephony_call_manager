@@ -489,10 +489,10 @@ int32_t CallManagerService::MuteRinger()
     }
 }
 
-int32_t CallManagerService::SetAudioDevice(AudioDevice deviceType)
+int32_t CallManagerService::SetAudioDevice(AudioDevice deviceType, const std::string &bluetoothAddress)
 {
     if (callControlManagerPtr_ != nullptr) {
-        if (callControlManagerPtr_->SetAudioDevice(deviceType) == TELEPHONY_SUCCESS) {
+        if (callControlManagerPtr_->SetAudioDevice(deviceType, bluetoothAddress) == TELEPHONY_SUCCESS) {
             return TELEPHONY_SUCCESS;
         }
         TELEPHONY_LOGE("SetAudioDevice failed!");

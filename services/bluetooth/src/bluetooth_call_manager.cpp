@@ -28,12 +28,19 @@ BluetoothCallManager::BluetoothCallManager() : btConnection_(std::make_unique<Bl
 
 BluetoothCallManager::~BluetoothCallManager() {}
 
-bool BluetoothCallManager::ConnectBtSco()
+bool BluetoothCallManager::ConnectBtSco(const std::string &bluetoothAddress)
 {
     if (btConnection_ == nullptr) {
         TELEPHONY_LOGE("bluetooth connection nullptr");
         return false;
     }
+
+#ifdef ABILITY_BLUETOOTH_SUPPORT
+    if (!bluetoothAddress.empty()) {
+        return btConnection_->ConnectBtSco(bluetoothAddress);
+    }
+#endif
+
     return btConnection_->ConnectBtSco();
 }
 

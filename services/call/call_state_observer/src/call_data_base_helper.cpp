@@ -137,6 +137,41 @@ bool CallDataBaseHelper::Query(std::vector<std::string> *phones, NativeRdb::Data
     return true;
 }
 
+bool CallDataBaseHelper::Query(ContactInfo &contactInfo, NativeRdb::DataAbilityPredicates &predicates)
+{
+    std::shared_ptr<AppExecFwk::DataAbilityHelper> helper = CreateDataAHelper();
+    if (helper == nullptr) {
+        TELEPHONY_LOGE("helper is nullptr");
+        return false;
+    }
+    Uri uri(CONTACT_DATA);
+    std::vector<std::string> columns;
+    std::shared_ptr<NativeRdb::AbsSharedResultSet> resultSet = helper->Query(uri, columns, predicates);
+    helper->Release();
+    if (resultSet == nullptr) {
+        TELEPHONY_LOGE("resultSet is nullptr");
+        return false;
+    }
+    int32_t resultSetNum = resultSet->GoToFirstRow();
+    while (resultSetNum == 0) {
+        std::string displayName;
+        int32_t columnIndex;
+        int32_t ret = resultSet->GetColumnIndex(CALL_DISPLAY_NAME, columnIndex);
+        ret = resultSet->GetString(columnIndex, displayName);
+        if (ret == 0 && (!displayName.empty())) {
+            size_t cpyLen = strlen(displayName.c_str()) + 1;
+            if (strcpy_s(contactInfo.name, cpyLen, displayName.c_str()) != EOK) {
+                TELEPHONY_LOGE("strcpy_s fail.");
+                return false;
+            }
+        }
+        resultSetNum = resultSet->GoToNextRow();
+    }
+    resultSet->Close();
+    TELEPHONY_LOGI("Query end");
+    return true;
+}
+
 bool CallDataBaseHelper::Delete(NativeRdb::DataAbilityPredicates &predicates)
 {
     std::shared_ptr<AppExecFwk::DataAbilityHelper> helper = CreateDataAHelper();
