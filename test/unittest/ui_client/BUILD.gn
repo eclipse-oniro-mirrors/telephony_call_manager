@@ -48,7 +48,7 @@ ohos_executable("tel_call_manager_ui_test") {
   configs = [ "//base/telephony/core_service/utils:telephony_log_config" ]
 
   deps = [
-    "${aafwk_kits_path}/ability/native:abilitykit_native",
+    "${aafwk_path}/frameworks/native/ability/native:abilitykit_native",
     "//drivers/peripheral/camera/interfaces/metadata:metadata",
     "//foundation/graphic/graphic_2d:libsurface",
     "//foundation/multimedia/camera_standard/frameworks/native/camera:camera_framework",
