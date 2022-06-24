@@ -19,6 +19,7 @@
 #include "telephony_log_wrapper.h"
 
 #include "call_ability_report_proxy.h"
+#include "call_hisysevent.h"
 #include "report_call_info_handler.h"
 #include "audio_control_manager.h"
 
@@ -66,6 +67,7 @@ int32_t CallStatusCallback::UpdateCallsReportInfo(const CallsReportInfo &info)
         detailsInfo.callVec.push_back(detailInfo);
     }
     detailsInfo.slotId = callsInfo.slotId;
+    CallHisysevent::HiSysEventWriteCallState(detailsInfo.slotId, static_cast<int32_t>(detailInfo.state));
     (void)memset_s(detailsInfo.bundleName, kMaxBundleNameLen, 0, kMaxBundleNameLen);
     int32_t ret = DelayedSingleton<ReportCallInfoHandlerService>::GetInstance()->UpdateCallsReportInfo(detailsInfo);
     if (ret != TELEPHONY_SUCCESS) {
