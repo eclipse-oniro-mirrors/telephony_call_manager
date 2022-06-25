@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -177,13 +177,13 @@ bool AudioSceneProcessor::SwitchCS()
 bool AudioSceneProcessor::SwitchIMS()
 {
     if (DelayedSingleton<AudioProxy>::GetInstance()->SetAudioScene(
-        AudioStandard::AudioScene::AUDIO_SCENE_PHONE_CHAT)) {
+        AudioStandard::AudioScene::AUDIO_SCENE_PHONE_CALL)) {
         currentState_ = std::make_unique<IMSCallState>();
         if (currentState_ == nullptr) {
             TELEPHONY_LOGE("make_unique IMSCallState failed");
             return false;
         }
-        currentAudioScene_ = AudioStandard::AudioScene::AUDIO_SCENE_PHONE_CHAT;
+        currentAudioScene_ = AudioStandard::AudioScene::AUDIO_SCENE_PHONE_CALL;
         DelayedSingleton<AudioDeviceManager>::GetInstance()->ProcessEvent(AudioEvent::AUDIO_ACTIVATED);
         TELEPHONY_LOGI("current call state : ims call state");
         return true;
