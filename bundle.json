@@ -23,6 +23,9 @@
             "SystemCapability.Telephony.CallManager"
         ],
         "features": [],
+        "hisysevent_config": [
+            "//base/telephony/call_manager/hisysevent.yaml"
+        ],
         "adapted_system_type": [
             "standard"
         ],

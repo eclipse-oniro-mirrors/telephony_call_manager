@@ -91,6 +91,7 @@ ohos_shared_library("tel_call_manager") {
     "services/telephony_interaction/src/core_service_connection.cpp",
     "services/telephony_interaction/src/report_call_info_handler.cpp",
     "services/video/src/video_control_manager.cpp",
+    "utils/src/call_hisysevent.cpp",
     "utils/src/call_number_utils.cpp",
   ]
 
@@ -100,6 +101,7 @@ ohos_shared_library("tel_call_manager") {
     "//third_party/libphonenumber/cpp/src/phonenumbers",
     "//third_party/protobuf/src",
     "//third_party/protobuf/src/google/protobuf",
+    "//base/hiviewdfx/hisysevent/interfaces/native/innerkits/hisysevent/include",
     "//base/telephony/call_manager/interfaces/innerkits",
     "//base/telephony/sms_mms/interfaces/innerkits/",
     "services/audio/include",
@@ -162,6 +164,7 @@ ohos_shared_library("tel_call_manager") {
     "core_service:tel_core_service_api",
     "display_manager_native:displaymgr",
     "eventhandler:libeventhandler",
+    "hisysevent_native:libhisysevent",
     "ipc:ipc_core",
     "multimedia_audio_framework:audio_client",
     "multimedia_audio_framework:audio_renderer",
