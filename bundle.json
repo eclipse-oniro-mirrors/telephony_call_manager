@@ -23,6 +23,9 @@
             "SystemCapability.Telephony.CallManager"
         ],
         "features": [],
+        "hisysevent_config": [
+            "//base/telephony/call_manager/hisysevent.yaml"
+        ],
         "adapted_system_type": [
             "standard"
         ],
@@ -33,7 +36,7 @@
                 "ability_base",
                 "ability_runtime",
                 "appexecfwk_standard",
-                "camera_device_driver",
+                "driver_peripheral_camera",
                 "common_event_service",
                 "core_service",
                 "hdf_core",
@@ -42,7 +45,6 @@
                 "dmsfwk_standard",
                 "ipc",
                 "multimedia_audio_framework",
-                "dataability",
                 "relational_store",
                 "power_manager_native",
                 "safwk",
