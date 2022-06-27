@@ -47,10 +47,10 @@ ohos_shared_library("tel_call_manager_api") {
     "ability_base:want",
     "ability_runtime:ability_manager",
     "core_service:tel_core_service_api",
+    "init:libbegetutil",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
     "samgr_standard:samgr_proxy",
-    "startup_l2:syspara",
   ]
 
   defines = [

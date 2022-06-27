@@ -165,6 +165,7 @@ ohos_shared_library("tel_call_manager") {
     "display_manager_native:displaymgr",
     "eventhandler:libeventhandler",
     "hisysevent_native:libhisysevent",
+    "init:libbegetutil",
     "ipc:ipc_core",
     "multimedia_audio_framework:audio_client",
     "multimedia_audio_framework:audio_renderer",
@@ -175,7 +176,6 @@ ohos_shared_library("tel_call_manager") {
     "relational_store:native_rdb",
     "safwk:system_ability_fwk",
     "samgr_standard:samgr_proxy",
-    "startup_l2:syspara",
   ]
 
   cflags_cc = [
