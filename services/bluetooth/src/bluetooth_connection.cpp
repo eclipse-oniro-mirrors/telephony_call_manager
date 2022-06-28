@@ -258,8 +258,7 @@ void BluetoothConnection::OnConnectionStateChanged(const Bluetooth::BluetoothRem
             /** try to connect sco while new bluetooth device connected
              *  if connect sco successfully , should switch current audio device to bluetooth sco
              */
-            if (BluetoothConnection::GetBtScoState() == BtScoState::SCO_STATE_DISCONNECTED && IsAudioActivated() &&
-                ConnectBtSco(device)) {
+            if (BluetoothConnection::GetBtScoState() == BtScoState::SCO_STATE_DISCONNECTED && ConnectBtSco(device)) {
                 connectedScoAddr_ = macAddress;
                 DelayedSingleton<AudioDeviceManager>::GetInstance()->ProcessEvent(AudioEvent::BLUETOOTH_SCO_CONNECTED);
             }
