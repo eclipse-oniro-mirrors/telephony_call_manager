@@ -32,7 +32,7 @@ std::unique_ptr<AudioStandard::AudioRenderer> AudioPlayer::audioRenderer_ = null
 bool AudioPlayer::InitRenderer(const wav_hdr &wavHeader, AudioStandard::AudioStreamType streamType)
 {
     AudioStandard::AudioRendererParams rendererParams;
-    rendererParams.sampleFormat = static_cast<AudioStandard::AudioSampleFormat>(wavHeader.bitsPerSample);
+    rendererParams.sampleFormat = AudioStandard::AudioSampleFormat::SAMPLE_S16LE;
     rendererParams.sampleRate = static_cast<AudioStandard::AudioSamplingRate>(wavHeader.SamplesPerSec);
     rendererParams.channelCount = static_cast<AudioStandard::AudioChannel>(wavHeader.NumOfChan);
     rendererParams.encodingType = static_cast<AudioStandard::AudioEncodingType>(AudioStandard::ENCODING_PCM);

@@ -41,7 +41,6 @@ struct wav_hdr {
     uint32_t SamplesPerSec = 44100; // Sampling Frequency in Hz
     uint32_t bytesPerSec = 176400; // bytes per second
     uint16_t blockAlign = 2; // 2=16-bit mono, 4=16-bit stereo
-    uint16_t bitsPerSample = 16; // Number of bits per sample
     /* "data" sub-chunk */
     uint8_t Subchunk2ID[4] = {'d', 'a', 't', 'a'}; // "data"  string
     uint32_t Subchunk2Size = 0; // Sampled data length
