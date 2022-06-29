@@ -660,7 +660,7 @@ bool InitRenderer(const std::unique_ptr<AudioStandard::AudioRenderer> &audioRend
         return false;
     }
     AudioStandard::AudioRendererParams rendererParams;
-    rendererParams.sampleFormat = static_cast<AudioStandard::AudioSampleFormat>(wavHeader.bitsPerSample);
+    rendererParams.sampleFormat = AudioStandard::AudioSampleFormat::SAMPLE_S16LE;
     rendererParams.sampleRate = static_cast<AudioStandard::AudioSamplingRate>(wavHeader.SamplesPerSec);
     rendererParams.channelCount = static_cast<AudioStandard::AudioChannel>(wavHeader.NumOfChan);
     rendererParams.encodingType = static_cast<AudioStandard::AudioEncodingType>(AudioStandard::ENCODING_PCM);
