@@ -176,7 +176,7 @@ public:
      * IsNewCallAllowed
      *
      * @brief Can I initiate a call
-     * @return Returns ture on can, others on there is not can.
+     * @return Returns true on can, others on there is not can.
      */
     bool IsNewCallAllowed() override;
 
@@ -211,7 +211,7 @@ public:
      * IsRinging
      *
      * @brief Whether the ringing
-     * @return Returns ture on ringing, false on there is no ringing.
+     * @return Returns true on ringing, false on there is no ringing.
      */
     bool IsRinging() override;
 
@@ -219,7 +219,7 @@ public:
      * IsInEmergencyCall
      *
      * @brief Is there an emergency call
-     * @return Returns ture on emergency call, false on no emergency call.
+     * @return Returns true on emergency call, false on no emergency call.
      */
     bool IsInEmergencyCall() override;
 
@@ -382,7 +382,7 @@ public:
      * @param number[in], Phone number to be formatted
      * @param slotId[in], The slot id
      * @param errorCode[out] Failed to provision the error code
-     * @return Returns 0 on ture, others on false.
+     * @return Returns 0 on true, others on false.
      */
     bool IsEmergencyPhoneNumber(std::u16string &number, int32_t slotId, int32_t &errorCode) override;
 

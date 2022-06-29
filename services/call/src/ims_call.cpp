@@ -170,7 +170,7 @@ int32_t IMSCall::CanCombineConference()
 {
     int32_t ret = IsSupportConferenceable();
     if (ret != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("call unsupport conference,  error%{public}d", ret);
+        TELEPHONY_LOGE("call unsupported conference,  error%{public}d", ret);
         return ret;
     }
     return DelayedSingleton<ImsConference>::GetInstance()->CanCombineConference();
@@ -261,7 +261,7 @@ int32_t IMSCall::SendUpdateCallMediaModeRequest(ImsCallMode mode)
         return CALL_ERR_CALL_STATE;
     }
     if (videoCallState_ == nullptr) {
-        TELEPHONY_LOGE("unexpect null pointer");
+        TELEPHONY_LOGE("unexpected null pointer");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     return videoCallState_->SendUpdateCallMediaModeRequest(mode);

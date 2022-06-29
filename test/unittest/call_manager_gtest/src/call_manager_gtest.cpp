@@ -1898,7 +1898,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_RegisterCallBack_0100, Function
 }
 
 #else // TEL_TEST_UNSUPPORT
-/***************************************** Test For Unsupport Platform ***********************************************/
+/**************************************** Test For Unsupported Platform **********************************************/
 /**
  * @tc.number   Telephony_CallManager_Mock_0100
  * @tc.name     test for unsupported platform
