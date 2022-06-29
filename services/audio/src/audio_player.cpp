@@ -15,11 +15,10 @@
 
 #include "audio_player.h"
 
+#include "audio_control_manager.h"
+#include "audio_system_manager.h"
 #include "call_manager_errors.h"
 #include "telephony_log_wrapper.h"
-#include "audio_control_manager.h"
-
-#include "audio_system_manager.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -64,8 +63,8 @@ bool AudioPlayer::InitRenderer(const wav_hdr &wavHeader, AudioStandard::AudioStr
 int32_t AudioPlayer::Play(const std::string &path, AudioStandard::AudioStreamType streamType, PlayerType playerType)
 {
     wav_hdr wavHeader;
-    std::string realPath = GetRealPath(path);
-    if (realPath.empty()) {
+    std::string realPath = "";
+    if (!GetRealPath(path, realPath) || realPath.empty()) {
         TELEPHONY_LOGE("path or realPath is NULL");
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
@@ -156,20 +155,20 @@ void AudioPlayer::ReleaseRenderer()
     audioRenderer_->Release();
 }
 
-std::string AudioPlayer::GetRealPath(const std::string &profilePath)
+bool AudioPlayer::GetRealPath(const std::string &profilePath, std::string &realPath)
 {
     if (profilePath.empty()) {
         TELEPHONY_LOGE("profilePath is empty");
-        return "";
+        return false;
     }
 
-    char path[PATH_MAX] = {'\0'};
+    char path[PATH_MAX] = { '\0' };
     if (realpath(profilePath.c_str(), path) == nullptr) {
         TELEPHONY_LOGE("get real path fail");
-        return "";
+        return false;
     }
-    std::string realPath(path);
-    return realPath;
+    realPath = path;
+    return true;
 }
 } // namespace Telephony
 } // namespace OHOS

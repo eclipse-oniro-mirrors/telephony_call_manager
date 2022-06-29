@@ -62,7 +62,7 @@ private:
     static bool IsStop(PlayerType playerType);
     static void ReleaseRenderer();
     static std::unique_ptr<AudioStandard::AudioRenderer> audioRenderer_;
-    static std::string GetRealPath(const std::string &profilePath);
+    static bool GetRealPath(const std::string &profilePath, std::string &realPath);
 };
 } // namespace Telephony
 } // namespace OHOS
