@@ -29,6 +29,7 @@ constexpr uint16_t REJECT_CALL_MSG_MAX_LEN = 300;
 constexpr uint16_t ACCOUNT_NUMBER_MAX_LENGTH = 100;
 constexpr uint16_t CONNECT_SERVICE_WAIT_TIME = 1000; // ms
 constexpr int16_t ERR_ID = -1;
+constexpr int16_t INVALID_CALLID = 0;
 
 // call type
 enum class CallType {
