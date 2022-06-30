@@ -133,26 +133,41 @@ declare namespace call {
   function formatPhoneNumberToE164(phoneNumber: string, countryCode: string): Promise<string>;
 
   /**
+   * Answers the incoming call.
+   *
+   * @param callId Indicates the identifier of the call to answer. It is optional since API 9.
+   * @permission ohos.permission.ANSWER_CALL
    * @systemapi Hide this for inner system use.
    * @since 7
    */
+  function answer(callback: AsyncCallback<void>): void;
   function answer(callId: number, callback: AsyncCallback<void>): void;
-  function answer(callId: number): Promise<void>;
+  function answer(callId?: number): Promise<void>;
 
   /**
+   * Hangups the foreground call.
+   *
+   * @param callId Indicates the identifier of the call to hangup. It is optional since API 9.
    * @systemapi Hide this for inner system use.
    * @since 7
    */
+  function hangup(callback: AsyncCallback<void>): void;
   function hangup(callId: number, callback: AsyncCallback<void>): void;
-  function hangup(callId: number): Promise<void>;
+  function hangup(callId?: number): Promise<void>;
 
   /**
+   * Rejects the incoming call.
+   *
+   * @param callId Indicates the identifier of the call to reject. It is optional since API 9.
+   * @param options Indicates the text message to reject.
    * @systemapi Hide this for inner system use.
    * @since 7
    */
+  function reject(callback: AsyncCallback<void>): void;
+  function reject(options: RejectMessageOptions, callback: AsyncCallback<void>): void;
   function reject(callId: number, callback: AsyncCallback<void>): void;
   function reject(callId: number, options: RejectMessageOptions, callback: AsyncCallback<void>): void;
-  function reject(callId: number, options?: RejectMessageOptions): Promise<void>;
+  function reject(callId?: number, options?: RejectMessageOptions): Promise<void>;
 
   /**
    * @systemapi Hide this for inner system use.

@@ -131,6 +131,15 @@ int32_t CallControlManager::DialCall(std::u16string &number, AppExecFwk::PacMap 
 
 int32_t CallControlManager::AnswerCall(int32_t callId, int32_t videoState)
 {
+    if (callId == INVALID_CALLID) {
+        sptr<CallBase> call = GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_RINGING);
+        if (call == nullptr) {
+            TELEPHONY_LOGE("call is nullptr");
+            return TELEPHONY_ERROR;
+        }
+        callId = call->GetCallID();
+    }
+
     int32_t ret = AnswerCallPolicy(callId, videoState);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("AnswerCallPolicy failed!");
@@ -154,6 +163,16 @@ int32_t CallControlManager::RejectCall(int32_t callId, bool rejectWithMessage, s
         TELEPHONY_LOGE("callRequestHandlerServicePtr_ is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
+
+    if (callId == INVALID_CALLID) {
+        sptr<CallBase> call = GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_RINGING);
+        if (call == nullptr) {
+            TELEPHONY_LOGE("call is nullptr");
+            return TELEPHONY_ERROR;
+        }
+        callId = call->GetCallID();
+    }
+
     int32_t ret = RejectCallPolicy(callId);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("RejectCallPolicy failed!");
@@ -170,6 +189,15 @@ int32_t CallControlManager::RejectCall(int32_t callId, bool rejectWithMessage, s
 
 int32_t CallControlManager::HangUpCall(int32_t callId)
 {
+    if (callId == INVALID_CALLID) {
+        sptr<CallBase> call = GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_ACTIVE);
+        if (call == nullptr) {
+            TELEPHONY_LOGE("call is nullptr");
+            return TELEPHONY_ERROR;
+        }
+        callId = call->GetCallID();
+    }
+
     if (callRequestHandlerServicePtr_ == nullptr) {
         TELEPHONY_LOGE("callRequestHandlerServicePtr_ is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;

@@ -28,6 +28,7 @@ namespace Telephony {
 const int16_t BOOL_VALUE_IS_FALSE = 0;
 const int16_t NATIVE_VERSION = 1;
 const int16_t NATIVE_FLAGS = 0;
+const int16_t ZERO_VALUE = 0;
 const int16_t ONLY_ONE_VALUE = 1;
 const int16_t TWO_VALUE_LIMIT = 2;
 const int16_t VALUE_MAXIMUM_LIMIT = 3;
@@ -118,9 +119,8 @@ struct EventCallback {
 
 struct AudioAsyncContext : AsyncContext {
     bool isMute;
-    char digit[kMaxNumberLen + 1];
-    size_t digitLen;
-    int32_t dudioDevice;
+    std::string address;
+    int32_t audioDevice;
 };
 
 struct VideoAsyncContext : AsyncContext {

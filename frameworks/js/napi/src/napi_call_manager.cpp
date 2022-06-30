@@ -800,8 +800,6 @@ napi_value NapiCallManager::AnswerCall(napi_env env, napi_callback_info info)
 {
     GET_PARAMS(env, info, VALUE_MAXIMUM_LIMIT);
     NAPI_ASSERT(env, argc <= VALUE_MAXIMUM_LIMIT, "parameter error!");
-    bool matchFlag = NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_FIRST], napi_number);
-    NAPI_ASSERT(env, matchFlag, "Type error, should be number type");
     auto asyncContext = std::make_unique<AnswerAsyncContext>();
     if (asyncContext == nullptr) {
         std::string errorCode = std::to_string(napi_generic_failure);
@@ -809,18 +807,26 @@ napi_value NapiCallManager::AnswerCall(napi_env env, napi_callback_info info)
         NAPI_CALL(env, napi_throw_error(env, errorCode.c_str(), errorMessage.c_str()));
         return nullptr;
     }
-    napi_get_value_int32(env, argv[ARRAY_INDEX_FIRST], &asyncContext->callId);
-    if (argc == TWO_VALUE_LIMIT) {
-        if (NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_SECOND], napi_function)) {
-            napi_create_reference(env, argv[ARRAY_INDEX_SECOND], DATA_LENGTH_ONE, &(asyncContext->callbackRef));
-        } else if (NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_SECOND], napi_number)) {
-            asyncContext->videoState =
-                NapiCallManagerUtils::GetIntProperty(env, argv[ARRAY_INDEX_SECOND], "videoState");
+
+    if (argc == ZERO_VALUE) {
+        TELEPHONY_LOGI("no param input");
+    } else if (argc == ONLY_ONE_VALUE) {
+        if (NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_FIRST], napi_function)) {
+            napi_create_reference(env, argv[ARRAY_INDEX_FIRST], DATA_LENGTH_ONE, &(asyncContext->callbackRef));
+        } else if (NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_FIRST], napi_number)) {
+            napi_get_value_int32(env, argv[ARRAY_INDEX_FIRST], &asyncContext->callId);
+        } else {
+            TELEPHONY_LOGE("args error, argv type is not correct");
         }
-    } else if (argc == VALUE_MAXIMUM_LIMIT) {
-        asyncContext->videoState = NapiCallManagerUtils::GetIntProperty(env, argv[ARRAY_INDEX_SECOND], "videoState");
-        napi_create_reference(env, argv[ARRAY_INDEX_THIRD], DATA_LENGTH_ONE, &(asyncContext->callbackRef));
+    } else if (argc == TWO_VALUE_LIMIT &&
+        NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_FIRST], napi_number) &&
+        NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_SECOND], napi_function)) {
+        napi_get_value_int32(env, argv[ARRAY_INDEX_FIRST], &asyncContext->callId);
+        napi_create_reference(env, argv[ARRAY_INDEX_SECOND], DATA_LENGTH_ONE, &(asyncContext->callbackRef));
+    } else {
+        TELEPHONY_LOGE("args error, argv type is not correct");
     }
+
     return HandleAsyncWork(env, asyncContext.release(), "AnswerCall", NativeAnswerCall, NativeVoidCallBack);
 }
 
@@ -828,8 +834,6 @@ napi_value NapiCallManager::RejectCall(napi_env env, napi_callback_info info)
 {
     GET_PARAMS(env, info, FOUR_VALUE_MAXIMUM_LIMIT);
     NAPI_ASSERT(env, argc < FOUR_VALUE_MAXIMUM_LIMIT, "parameter error!");
-    bool matchFlag = NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_FIRST], napi_number);
-    NAPI_ASSERT(env, matchFlag, "Type error, should be number type");
     auto asyncContext = std::make_unique<RejectAsyncContext>();
     if (asyncContext == nullptr) {
         std::string errorCode = std::to_string(napi_generic_failure);
@@ -837,20 +841,47 @@ napi_value NapiCallManager::RejectCall(napi_env env, napi_callback_info info)
         NAPI_CALL(env, napi_throw_error(env, errorCode.c_str(), errorMessage.c_str()));
         return nullptr;
     }
-    napi_get_value_int32(env, argv[ARRAY_INDEX_FIRST], &asyncContext->callId);
+
     asyncContext->isSendSms = false;
-    if (argc == TWO_VALUE_LIMIT) {
-        if (NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_SECOND], napi_function)) {
+    if (argc == ZERO_VALUE) {
+        TELEPHONY_LOGI("no param input");
+    } else if (argc == ONLY_ONE_VALUE) {
+        if (NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_FIRST], napi_function)) {
+            napi_create_reference(env, argv[ARRAY_INDEX_FIRST], DATA_LENGTH_ONE, &(asyncContext->callbackRef));
+        } else if (NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_FIRST], napi_number)) {
+            napi_get_value_int32(env, argv[ARRAY_INDEX_FIRST], &asyncContext->callId);
+        } else if (NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_FIRST], napi_object)) {
+            GetSmsInfo(env, argv[ARRAY_INDEX_FIRST], *asyncContext);
+        } else {
+            TELEPHONY_LOGE("args error, argv type is not correct");
+        }
+    } else if (argc == TWO_VALUE_LIMIT) {
+        if (NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_FIRST], napi_object) &&
+            NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_SECOND], napi_function)) {
+            GetSmsInfo(env, argv[ARRAY_INDEX_FIRST], *asyncContext);
             napi_create_reference(env, argv[ARRAY_INDEX_SECOND], DATA_LENGTH_ONE, &(asyncContext->callbackRef));
-        } else if (NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_SECOND], napi_object)) {
+        } else if (NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_FIRST], napi_number) &&
+            NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_SECOND], napi_function)) {
+            napi_get_value_int32(env, argv[ARRAY_INDEX_FIRST], &asyncContext->callId);
+            napi_create_reference(env, argv[ARRAY_INDEX_SECOND], DATA_LENGTH_ONE, &(asyncContext->callbackRef));
+        } else if (NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_FIRST], napi_number) &&
+            NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_SECOND], napi_object)) {
+            napi_get_value_int32(env, argv[ARRAY_INDEX_FIRST], &asyncContext->callId);
             GetSmsInfo(env, argv[ARRAY_INDEX_SECOND], *asyncContext);
+        } else {
+            TELEPHONY_LOGE("args error, argv type is not correct");
         }
-    } else if (argc == VALUE_MAXIMUM_LIMIT) {
-        if (NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_SECOND], napi_object)) {
-            GetSmsInfo(env, argv[ARRAY_INDEX_SECOND], *asyncContext);
-        }
+    } else if (argc == VALUE_MAXIMUM_LIMIT &&
+        NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_FIRST], napi_number) &&
+        NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_SECOND], napi_object) &&
+        NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_THIRD], napi_function)) {
+        napi_get_value_int32(env, argv[ARRAY_INDEX_FIRST], &asyncContext->callId);
+        GetSmsInfo(env, argv[ARRAY_INDEX_SECOND], *asyncContext);
         napi_create_reference(env, argv[ARRAY_INDEX_THIRD], DATA_LENGTH_ONE, &(asyncContext->callbackRef));
+    } else {
+        TELEPHONY_LOGE("args error, argv type is not correct");
     }
+
     return HandleAsyncWork(env, asyncContext.release(), "RejectCall", NativeRejectCall, NativeVoidCallBack);
 }
 
@@ -858,8 +889,6 @@ napi_value NapiCallManager::HangUpCall(napi_env env, napi_callback_info info)
 {
     GET_PARAMS(env, info, VALUE_MAXIMUM_LIMIT);
     NAPI_ASSERT(env, argc < VALUE_MAXIMUM_LIMIT, "parameter error!");
-    bool matchFlag = NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_FIRST], napi_number);
-    NAPI_ASSERT(env, matchFlag, "Type error, should be number type");
     auto asyncContext = std::make_unique<AsyncContext>();
     if (asyncContext == nullptr) {
         std::string errorCode = std::to_string(napi_generic_failure);
@@ -867,10 +896,26 @@ napi_value NapiCallManager::HangUpCall(napi_env env, napi_callback_info info)
         NAPI_CALL(env, napi_throw_error(env, errorCode.c_str(), errorMessage.c_str()));
         return nullptr;
     }
-    napi_get_value_int32(env, argv[ARRAY_INDEX_FIRST], &asyncContext->callId);
-    if (argc == TWO_VALUE_LIMIT) {
+
+    if (argc == ZERO_VALUE) {
+        TELEPHONY_LOGI("no param input");
+    } else if (argc == ONLY_ONE_VALUE) {
+        if (NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_FIRST], napi_function)) {
+            napi_create_reference(env, argv[ARRAY_INDEX_FIRST], DATA_LENGTH_ONE, &(asyncContext->callbackRef));
+        } else if (NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_FIRST], napi_number)) {
+            napi_get_value_int32(env, argv[ARRAY_INDEX_FIRST], &asyncContext->callId);
+        } else {
+            TELEPHONY_LOGE("args error, argv type is not correct");
+        }
+    } else if (argc == TWO_VALUE_LIMIT &&
+        NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_FIRST], napi_number) &&
+        NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_SECOND], napi_function)) {
+        napi_get_value_int32(env, argv[ARRAY_INDEX_FIRST], &asyncContext->callId);
         napi_create_reference(env, argv[ARRAY_INDEX_SECOND], DATA_LENGTH_ONE, &(asyncContext->callbackRef));
+    } else {
+        TELEPHONY_LOGE("args error, argv type is not correct");
     }
+
     return HandleAsyncWork(env, asyncContext.release(), "HangUpCall", NativeHangUpCall, NativeVoidCallBack);
 }
 
@@ -1624,20 +1669,20 @@ napi_value NapiCallManager::SetAudioDevice(napi_env env, napi_callback_info info
         NAPI_CALL(env, napi_throw_error(env, errorCode.c_str(), errorMessage.c_str()));
         return nullptr;
     }
-    napi_get_value_int32(env, argv[ARRAY_INDEX_FIRST], &asyncContext->dudioDevice);
+    napi_get_value_int32(env, argv[ARRAY_INDEX_FIRST], &asyncContext->audioDevice);
     if (argc == TWO_VALUE_LIMIT) {
         if (NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_SECOND], napi_function)) {
             napi_create_reference(env, argv[ARRAY_INDEX_SECOND], DATA_LENGTH_ONE, &(asyncContext->callbackRef));
-        } else if (NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_SECOND], napi_string)) {
-            napi_get_value_string_utf8(
-                env, argv[ARRAY_INDEX_SECOND], asyncContext->digit, kMaxNumberLen, &(asyncContext->digitLen));
+        } else if (NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_SECOND], napi_object)) {
+            asyncContext->address =
+                NapiCallManagerUtils::GetStringProperty(env, argv[ARRAY_INDEX_SECOND], "bluetoothAddress");
         } else {
             TELEPHONY_LOGE("args error, argv type is not correct");
         }
     } else if (argc == VALUE_MAXIMUM_LIMIT &&
-        NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_SECOND], napi_string)) {
-        napi_get_value_string_utf8(
-            env, argv[ARRAY_INDEX_SECOND], asyncContext->digit, kMaxNumberLen, &(asyncContext->digitLen));
+        NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_SECOND], napi_object)) {
+        asyncContext->address =
+            NapiCallManagerUtils::GetStringProperty(env, argv[ARRAY_INDEX_SECOND], "bluetoothAddress");
         napi_create_reference(env, argv[ARRAY_INDEX_THIRD], DATA_LENGTH_ONE, &(asyncContext->callbackRef));
     } else {
         TELEPHONY_LOGE("args error, argv type is not correct");
@@ -2966,15 +3011,15 @@ void NapiCallManager::NativeSetAudioDevice(napi_env env, void *data)
     }
     AudioDevice type;
     auto asyncContext = (AudioAsyncContext *)data;
-    type = static_cast<AudioDevice>(asyncContext->dudioDevice);
-    std::string bluetoothAddress(asyncContext->digit, asyncContext->digitLen);
+    type = static_cast<AudioDevice>(asyncContext->audioDevice);
     // For interface compatibility, when AudioDevice::DEVICE_MIC is deleted, this code block should also be deleted
     // When the parameter passed is DEVICE_MIC, point to DEVICE_EARPIECE
     int32_t DEVICE_MIC = 4;
     if (static_cast<int32_t>(type) == DEVICE_MIC) {
         type = AudioDevice::DEVICE_EARPIECE;
     }
-    asyncContext->result = DelayedSingleton<CallManagerClient>::GetInstance()->SetAudioDevice(type, bluetoothAddress);
+    asyncContext->result =
+        DelayedSingleton<CallManagerClient>::GetInstance()->SetAudioDevice(type, asyncContext->address);
 }
 
 void NapiCallManager::NativeControlCamera(napi_env env, void *data)
