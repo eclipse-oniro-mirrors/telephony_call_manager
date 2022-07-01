@@ -133,7 +133,7 @@ ohos_shared_library("tel_call_manager") {
     "//drivers/peripheral/camera/interfaces/include/callback/device",
     "//drivers/peripheral/camera/interfaces/include/callback/operator",
     "//drivers/peripheral/camera/interfaces/include/callback/host",
-    "${aafwk_inner_api_path}/dataobs_manager/include",
+    "${ability_runtime_inner_api_path}/dataobs_manager/include",
     "//foundation/multimedia/audio_framework/interfaces/inner_api/native/audioringtone/include",
     "//foundation/multimedia/audio_framework/services/include/client",
     "//foundation/multimedia/media_standard/interfaces/inner_api/native",
@@ -143,9 +143,9 @@ ohos_shared_library("tel_call_manager") {
   configs = [ "//base/telephony/core_service/utils:telephony_log_config" ]
 
   deps = [
-    "${aafwk_inner_api_path}/dataobs_manager:dataobs_manager",
-    "${aafwk_path}/frameworks/native/ability/native:abilitykit_native",
-    "${aafwk_path}/frameworks/native/ability/native:data_ability_helper",
+    "${ability_runtime_inner_api_path}/dataobs_manager:dataobs_manager",
+    "${ability_runtime_path}/frameworks/native/ability/native:abilitykit_native",
+    "${ability_runtime_path}/frameworks/native/ability/native:data_ability_helper",
     "//base/notification/distributed_notification_service/frameworks/ans:ans_innerkits",
     "//base/notification/distributed_notification_service/frameworks/core:ans_core",
     "//base/telephony/core_service/utils:libtel_common",
