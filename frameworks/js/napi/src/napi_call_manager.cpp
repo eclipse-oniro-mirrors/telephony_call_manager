@@ -743,6 +743,7 @@ napi_value NapiCallManager::RegisterCallManagerFunc(napi_env env, napi_value exp
     DeclareTransferTypeEnum(env, exports);
     DeclareTransferSettingTypeEnum(env, exports);
     Init();
+    RegisterCallBack();
     return exports;
 }
 
@@ -1518,7 +1519,6 @@ napi_value NapiCallManager::FormatPhoneNumberToE164(napi_env env, napi_callback_
 
 napi_value NapiCallManager::ObserverOn(napi_env env, napi_callback_info info)
 {
-    RegisterCallBack();
     GET_PARAMS(env, info, VALUE_MAXIMUM_LIMIT);
     NAPI_ASSERT(env, argc <= VALUE_MAXIMUM_LIMIT, "parameter error!");
     bool matchFlag = NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_FIRST], napi_string);
