@@ -14,6 +14,6 @@
 domain: CALL_MANAGER
 
 PHONE_STATE:
-  __BASE: {type: STATISTIC, level: MINOR, tag:PowerStats, desc: phone state}
+  __BASE: {type: STATISTIC, level: MINOR, tag: PowerStats, desc: phone state}
   state: {type: INT32, desc: phone state}
   slotId: {type: INT32, desc: phone slot id}
