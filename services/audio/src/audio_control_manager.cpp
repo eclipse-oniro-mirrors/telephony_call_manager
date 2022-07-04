@@ -92,12 +92,18 @@ void AudioControlManager::HandleNextState(sptr<CallBase> &callObjectPtr, TelCall
     switch (nextState) {
         case TelCallState::CALL_STATUS_ALERTING:
             event = AudioEvent::NEW_ALERTING_CALL;
+            SetAudioInterruptState(AudioInterruptState::INTERRUPT_STATE_RINGING);
             break;
         case TelCallState::CALL_STATUS_ACTIVE:
             HandleNewActiveCall(callObjectPtr);
+            SetAudioInterruptState(AudioInterruptState::INTERRUPT_STATE_ACTIVATED);
             break;
         case TelCallState::CALL_STATUS_INCOMING:
             event = AudioEvent::NEW_INCOMING_CALL;
+            SetAudioInterruptState(AudioInterruptState::INTERRUPT_STATE_RINGING);
+            break;
+        case TelCallState::CALL_STATUS_DISCONNECTED:
+            SetAudioInterruptState(AudioInterruptState::INTERRUPT_STATE_DEACTIVATED);
             break;
         default:
             break;

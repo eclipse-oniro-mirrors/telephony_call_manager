@@ -31,7 +31,15 @@ bool BluetoothDeviceState::ProcessEvent(int32_t event)
             result = DelayedSingleton<AudioDeviceManager>::GetInstance()->ProcessEvent(
                 AudioEvent::ENABLE_DEVICE_WIRED_HEADSET);
             break;
+        case AudioEvent::BLUETOOTH_SCO_CONNECTED:
+        case AudioEvent::AUDIO_ACTIVATED:
+        case AudioEvent::AUDIO_RINGING:
+            // should switch to bluetooth sco route while bluetooth sco connected
+            result =
+                DelayedSingleton<AudioDeviceManager>::GetInstance()->ProcessEvent(AudioEvent::ENABLE_DEVICE_BLUETOOTH);
+            break;
         case AudioEvent::BLUETOOTH_SCO_DISCONNECTED:
+        case AudioEvent::AUDIO_DEACTIVATED:
             // should reinitialize audio device in order to switch to a proper audio route
             TELEPHONY_LOGI("bt sco disconnected , reinitialize audio device");
             result =
