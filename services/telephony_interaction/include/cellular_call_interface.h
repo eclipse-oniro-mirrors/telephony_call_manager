@@ -490,7 +490,7 @@ public:
      * @brief Is it an emergency call
      * @param eccVecr[in], Phone number to be formatted
      * @param slotId[in], The slot id
-     * @return Returns 0 on ture, others on false.
+     * @return Returns 0 on true, others on false.
      */
     virtual int32_t SetEmergencyCallList(int32_t slotId, std::vector<EmergencyCall>  &eccVec) = 0;
 

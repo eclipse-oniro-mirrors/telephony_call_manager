@@ -22,7 +22,7 @@
 
 /**
  * @ClassName: CallStatusPolicy
- * @Description: check prerequisites before perfom ops in callstatusmanager
+ * @Description: check prerequisites before performing ops in callstatusmanager
  */
 namespace OHOS {
 namespace Telephony {

@@ -107,7 +107,7 @@ public:
      * @param number[in], Phone number to be formatted
      * @param slotId[in], The slot id
      * @param errorCode[out] Failed to provision the error code
-     * @return Returns 0 on ture, others on false.
+     * @return Returns 0 on true, others on false.
      */
     int IsEmergencyPhoneNumber(const std::string &phoneNum, int32_t slotId, int32_t &errorCode);
 

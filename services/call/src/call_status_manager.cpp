@@ -178,7 +178,7 @@ int32_t CallStatusManager::HandleEventResultReportInfo(const CellularCallEventIn
         }
         DelayedSingleton<CallControlManager>::GetInstance()->NotifyCallEventUpdated(eventInfo);
     } else {
-        TELEPHONY_LOGW("unkown type Event, eventid %{public}d", info.eventId);
+        TELEPHONY_LOGW("unknown type Event, eventid %{public}d", info.eventId);
     }
     return TELEPHONY_SUCCESS;
 }
@@ -196,7 +196,7 @@ int32_t CallStatusManager::HandleOttEventReportInfo(const OttCallEventInfo &info
         }
         DelayedSingleton<CallControlManager>::GetInstance()->NotifyCallEventUpdated(eventInfo);
     } else {
-        TELEPHONY_LOGW("unkown type Event, eventid %{public}d", info.ottCallEventId);
+        TELEPHONY_LOGW("unknown type Event, eventid %{public}d", info.ottCallEventId);
     }
     return TELEPHONY_SUCCESS;
 }

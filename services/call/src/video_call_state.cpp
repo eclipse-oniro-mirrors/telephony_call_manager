@@ -29,7 +29,7 @@ VideoCallState::VideoCallState(sptr<NetCallBase> callPtr)
 bool VideoCallState::IsCallSupportVideoCall()
 {
     if (call_ == nullptr) {
-        TELEPHONY_LOGE("unexpect null pointer.");
+        TELEPHONY_LOGE("unexpected null pointer.");
         return false;
     }
     sptr<IMSCall> netCall = static_cast<IMSCall *>(call_.GetRefPtr());
@@ -49,7 +49,7 @@ VideoUpdateStatus VideoCallState::GetVideoUpdateStatus()
 int32_t VideoCallState::SwitchCallVideoState(ImsCallMode mode)
 {
     if (call_ == nullptr) {
-        TELEPHONY_LOGE("unexpect null pointer.");
+        TELEPHONY_LOGE("unexpected null pointer.");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     sptr<IMSCall> netCall = static_cast<IMSCall *>(call_.GetRefPtr());
@@ -60,7 +60,7 @@ int32_t VideoCallState::SwitchCallVideoState(ImsCallMode mode)
 int32_t VideoCallState::DispatchUpdateVideoRequest(ImsCallMode mode)
 {
     if (call_ == nullptr) {
-        TELEPHONY_LOGE("unexpect null pointer.");
+        TELEPHONY_LOGE("unexpected null pointer.");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     return call_->DispatchUpdateVideoRequest(mode);
@@ -69,7 +69,7 @@ int32_t VideoCallState::DispatchUpdateVideoRequest(ImsCallMode mode)
 int32_t VideoCallState::DispatchUpdateVideoResponse(ImsCallMode mode)
 {
     if (call_ == nullptr) {
-        TELEPHONY_LOGE("unexpect null pointer.");
+        TELEPHONY_LOGE("unexpected null pointer.");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     return call_->DispatchUpdateVideoResponse(mode);
@@ -78,7 +78,7 @@ int32_t VideoCallState::DispatchUpdateVideoResponse(ImsCallMode mode)
 sptr<VideoCallState> VideoCallState::GetCallVideoState(ImsCallMode mode)
 {
     if (call_ == nullptr) {
-        TELEPHONY_LOGE("unexpect null pointer.");
+        TELEPHONY_LOGE("unexpected null pointer.");
         return nullptr;
     }
     sptr<IMSCall> netCall = static_cast<IMSCall *>(call_.GetRefPtr());
@@ -123,7 +123,7 @@ int32_t AudioOnlyState::SendUpdateCallMediaModeRequest(ImsCallMode mode)
             SetVideoUpdateStatus(VideoUpdateStatus::STATUS_SEND_REQUEST);
             break;
         default:
-            TELEPHONY_LOGE("unkown call media type.");
+            TELEPHONY_LOGE("unknown call media type.");
             return CALL_ERR_VIDEO_ILLEGAL_MEDIA_TYPE;
     }
     return ret;
@@ -159,17 +159,17 @@ int32_t AudioOnlyState::RecieveUpdateCallMediaModeRequest(ImsCallMode mode)
                 // notify app to accept or refuse, assume always accept here
                 sptr<IMSCall> netCall = static_cast<IMSCall *>(call_.GetRefPtr());
                 if (netCall == nullptr) {
-                    TELEPHONY_LOGE("unexpect null pointer.");
+                    TELEPHONY_LOGE("unexpected null pointer.");
                     return TELEPHONY_ERR_LOCAL_PTR_NULL;
                 }
                 (void)netCall->AcceptVideoCall();
             } else {
-                TELEPHONY_LOGE("unexpect null pointer.");
+                TELEPHONY_LOGE("unexpected null pointer.");
                 ret = TELEPHONY_ERR_LOCAL_PTR_NULL;
             }
             break;
         default:
-            TELEPHONY_LOGE("unkown call media type.");
+            TELEPHONY_LOGE("unknown call media type.");
             ret = CALL_ERR_VIDEO_ILLEGAL_MEDIA_TYPE;
             break;
     }
@@ -178,13 +178,13 @@ int32_t AudioOnlyState::RecieveUpdateCallMediaModeRequest(ImsCallMode mode)
 
 int32_t AudioOnlyState::SendUpdateCallMediaModeResponse(ImsCallMode mode)
 {
-    TELEPHONY_LOGI("AudioOnlyState send reponse ignored, mode %{public}d", mode);
+    TELEPHONY_LOGI("AudioOnlyState send response ignored, mode %{public}d", mode);
     return TELEPHONY_SUCCESS;
 }
 
 int32_t AudioOnlyState::ReceiveUpdateCallMediaModeResponse(ImsCallMode mode)
 {
-    TELEPHONY_LOGI("AudioOnlyState receive reponse, mode %{public}d", mode);
+    TELEPHONY_LOGI("AudioOnlyState receive response, mode %{public}d", mode);
     int32_t ret = TELEPHONY_SUCCESS;
     VideoUpdateStatus status = GetVideoUpdateStatus();
     switch (mode) {
@@ -230,7 +230,7 @@ int32_t VideoSendState::SendUpdateCallMediaModeRequest(ImsCallMode mode)
             ret = CALL_ERR_VIDEO_IN_PROGRESS;
             break;
         default:
-            TELEPHONY_LOGE("unkown media type.");
+            TELEPHONY_LOGE("unknown media type.");
             ret = CALL_ERR_VIDEO_ILLEGAL_MEDIA_TYPE;
             break;
     }
@@ -247,7 +247,7 @@ int32_t VideoSendState::RecieveUpdateCallMediaModeRequest(ImsCallMode mode)
         case ImsCallMode::CALL_MODE_VIDEO_PAUSED:
             ret = SwitchCallVideoState(mode);
             if (ret != TELEPHONY_SUCCESS) {
-                TELEPHONY_LOGE("error occure when switch call state.");
+                TELEPHONY_LOGE("error occurs when switch call state.");
                 return ret;
             }
             SetVideoUpdateStatus(VideoUpdateStatus::STATUS_NONE);
@@ -264,7 +264,7 @@ int32_t VideoSendState::RecieveUpdateCallMediaModeRequest(ImsCallMode mode)
             }
             break;
         default:
-            TELEPHONY_LOGE("unkown media type.");
+            TELEPHONY_LOGE("unknown media type.");
             ret = CALL_ERR_VIDEO_ILLEGAL_MEDIA_TYPE;
             break;
     }
@@ -313,7 +313,7 @@ int32_t VideoSendState::ReceiveUpdateCallMediaModeResponse(ImsCallMode mode)
             GetCallVideoState(ImsCallMode::CALL_MODE_AUDIO_ONLY)->SetVideoUpdateStatus(VideoUpdateStatus::STATUS_NONE);
             break;
         default:
-            TELEPHONY_LOGE("unkown media type.");
+            TELEPHONY_LOGE("unknown media type.");
             ret = CALL_ERR_VIDEO_ILLEGAL_MEDIA_TYPE;
             break;
     }
@@ -351,7 +351,7 @@ int32_t VideoReceiveState::SendUpdateCallMediaModeRequest(ImsCallMode mode)
             }
             break;
         default:
-            TELEPHONY_LOGE("unkown media type.");
+            TELEPHONY_LOGE("unknown media type.");
             ret = CALL_ERR_VIDEO_ILLEGAL_MEDIA_TYPE;
             break;
     }
@@ -381,7 +381,7 @@ int32_t VideoReceiveState::RecieveUpdateCallMediaModeRequest(ImsCallMode mode)
             }
             break;
         default:
-            TELEPHONY_LOGE("unkown media type.");
+            TELEPHONY_LOGE("unknown media type.");
             ret = CALL_ERR_VIDEO_ILLEGAL_MEDIA_TYPE;
             break;
     }
@@ -414,7 +414,7 @@ int32_t VideoReceiveState::SendUpdateCallMediaModeResponse(ImsCallMode mode)
             ret = DispatchUpdateVideoResponse(mode);
             break;
         default:
-            TELEPHONY_LOGE("unkown media type.");
+            TELEPHONY_LOGE("unknown media type.");
             ret = CALL_ERR_VIDEO_ILLEGAL_MEDIA_TYPE;
             break;
     }
@@ -442,7 +442,7 @@ int32_t VideoReceiveState::ReceiveUpdateCallMediaModeResponse(ImsCallMode mode)
             ret = CALL_ERR_VIDEO_IN_PROGRESS;
             break;
         default:
-            TELEPHONY_LOGE("unkown media type.");
+            TELEPHONY_LOGE("unknown media type.");
             ret = CALL_ERR_VIDEO_ILLEGAL_MEDIA_TYPE;
             break;
     }
@@ -482,7 +482,7 @@ int32_t VideoSendReceiveState::SendUpdateCallMediaModeRequest(ImsCallMode mode)
             TELEPHONY_LOGE("illegal media type.");
             return CALL_ERR_VIDEO_ILLEAGAL_SCENARIO;
         default:
-            TELEPHONY_LOGE("unkown media type.");
+            TELEPHONY_LOGE("unknown media type.");
             ret = CALL_ERR_VIDEO_ILLEGAL_MEDIA_TYPE;
             break;
     }
@@ -498,7 +498,7 @@ int32_t VideoSendReceiveState::RecieveUpdateCallMediaModeRequest(ImsCallMode mod
         case ImsCallMode::CALL_MODE_VIDEO_PAUSED:
             ret = SwitchCallVideoState(mode); // support send downgrade & pause video request
             if (ret != TELEPHONY_SUCCESS) {
-                TELEPHONY_LOGE("error occure when switch call state");
+                TELEPHONY_LOGE("error occurs when switch call state");
                 return ret;
             }
             SetVideoUpdateStatus(VideoUpdateStatus::STATUS_NONE);
@@ -512,7 +512,7 @@ int32_t VideoSendReceiveState::RecieveUpdateCallMediaModeRequest(ImsCallMode mod
             ret = CALL_ERR_VIDEO_ILLEAGAL_SCENARIO;
             break;
         default:
-            TELEPHONY_LOGE("unkown media type.");
+            TELEPHONY_LOGE("unknown media type.");
             ret = CALL_ERR_VIDEO_ILLEGAL_MEDIA_TYPE;
             break;
     }
@@ -562,7 +562,7 @@ int32_t VideoPauseState::SendUpdateCallMediaModeRequest(ImsCallMode mode)
             ret = CALL_ERR_VIDEO_ILLEAGAL_SCENARIO;
             break;
         default:
-            TELEPHONY_LOGE("unkown media type.");
+            TELEPHONY_LOGE("unknown media type.");
             ret = CALL_ERR_VIDEO_ILLEGAL_MEDIA_TYPE;
             break;
     }
@@ -592,7 +592,7 @@ int32_t VideoPauseState::RecieveUpdateCallMediaModeRequest(ImsCallMode mode)
             ret = CALL_ERR_VIDEO_ILLEAGAL_SCENARIO;
             break;
         default:
-            TELEPHONY_LOGE("unkown media type.");
+            TELEPHONY_LOGE("unknown media type.");
             ret = CALL_ERR_VIDEO_ILLEGAL_MEDIA_TYPE;
             break;
     }

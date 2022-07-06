@@ -97,7 +97,7 @@ int32_t CSCall::CanCombineConference()
 {
     int32_t ret = IsSupportConferenceable();
     if (ret != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("call unsupport conference,  error%{public}d", ret);
+        TELEPHONY_LOGE("call unsupported conference, error%{public}d", ret);
         return ret;
     }
     return DelayedSingleton<CsConference>::GetInstance()->CanCombineConference();

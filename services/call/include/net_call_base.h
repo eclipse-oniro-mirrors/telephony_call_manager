@@ -39,11 +39,11 @@ public:
     int32_t ChangeNetCallType();
     // send call media mode modify request to peer
     virtual int32_t SendUpdateCallMediaModeRequest(ImsCallMode mode) = 0;
-    // recieve call media mode modify request from peer
+    // receive call media mode modify request from peer
     virtual int32_t RecieveUpdateCallMediaModeRequest(ImsCallMode mode) = 0;
-    // send call media mode modify reponse to peer
+    // send call media mode modify response to peer
     virtual int32_t SendUpdateCallMediaModeResponse(ImsCallMode mode) = 0;
-    // recieve call media mode modify reponse to peer
+    // receive call media mode modify response to peer
     virtual int32_t ReceiveUpdateCallMediaModeResponse(CallMediaModeResponse &response) = 0;
     virtual int32_t DispatchUpdateVideoRequest(ImsCallMode mode) = 0;
     virtual int32_t DispatchUpdateVideoResponse(ImsCallMode mode) = 0;

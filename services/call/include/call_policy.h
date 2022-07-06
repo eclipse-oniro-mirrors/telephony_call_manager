@@ -25,7 +25,7 @@
 
 /**
  * @ClassName: CallPolicy
- * @Description: check prerequisites before perfom ops in callcontrolmanager
+ * @Description: check prerequisites before performing ops in callcontrolmanager
  */
 namespace OHOS {
 namespace Telephony {

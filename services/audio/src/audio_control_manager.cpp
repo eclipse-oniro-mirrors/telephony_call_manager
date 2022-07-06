@@ -363,7 +363,7 @@ int32_t AudioControlManager::SetMute(bool isMute)
 int32_t AudioControlManager::MuteRinger()
 {
     if (ringState_ == RingState::STOPPED) {
-        TELEPHONY_LOGI("ring alreay stopped");
+        TELEPHONY_LOGI("ring already stopped");
         return TELEPHONY_SUCCESS;
     }
     if (ring_ != nullptr && ring_->Stop() == TELEPHONY_SUCCESS) {
