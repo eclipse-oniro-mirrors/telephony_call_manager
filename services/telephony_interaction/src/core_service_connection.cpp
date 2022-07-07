@@ -38,5 +38,15 @@ std::vector<std::u16string> CoreServiceConnection::GetFdnNumberList(int slotId)
     }
     return numberVec;
 }
+
+bool CoreServiceConnection::IsFdnEnabled(int slotId)
+{
+    int32_t ret = DelayedRefSingleton<CoreServiceClient>::GetInstance().GetLockState(slotId, LockType::FDN_LOCK);
+    if (ret == static_cast<int32_t>(LockState::LOCK_ON)) {
+        TELEPHONY_LOGI("Fdn is enabled");
+        return true;
+    }
+    return false;
+}
 } // namespace Telephony
 } // namespace OHOS
