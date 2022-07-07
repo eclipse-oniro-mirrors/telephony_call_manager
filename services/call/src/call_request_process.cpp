@@ -15,17 +15,16 @@
 
 #include "call_request_process.h"
 
+#include "call_ability_report_proxy.h"
+#include "call_control_manager.h"
 #include "call_manager_errors.h"
-#include "telephony_log_wrapper.h"
-
+#include "cellular_call_connection.h"
+#include "common_type.h"
+#include "core_service_connection.h"
 #include "cs_call.h"
 #include "ims_call.h"
 #include "ott_call.h"
-#include "common_type.h"
-#include "call_control_manager.h"
-#include "call_ability_report_proxy.h"
-#include "core_service_connection.h"
-#include "cellular_call_connection.h"
+#include "telephony_log_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -42,16 +41,19 @@ void CallRequestProcess::DialRequest()
         return;
     }
     if (info.dialType == DialType::DIAL_CARRIER_TYPE) {
-        std::vector<std::u16string> fdnNumberList =
-            DelayedSingleton<CoreServiceConnection>::GetInstance()->GetFdnNumberList(info.accountId);
-        if (!fdnNumberList.empty() && !IsFdnNumber(fdnNumberList, info.number)) {
-            CallEventInfo eventInfo;
-            (void)memset_s(eventInfo.phoneNum, kMaxNumberLen, 0, kMaxNumberLen);
-            eventInfo.eventId = CallAbilityEventId::EVENT_INVALID_FDN_NUMBER;
-            (void)memcpy_s(eventInfo.phoneNum, kMaxNumberLen, info.number.c_str(), info.number.length());
-            DelayedSingleton<CallControlManager>::GetInstance()->NotifyCallEventUpdated(eventInfo);
-            TELEPHONY_LOGW("invalid fdn number!");
-            return;
+        bool isFdnEnabled = DelayedSingleton<CoreServiceConnection>::GetInstance()->IsFdnEnabled(info.accountId);
+        if (isFdnEnabled) {
+            std::vector<std::u16string> fdnNumberList =
+                DelayedSingleton<CoreServiceConnection>::GetInstance()->GetFdnNumberList(info.accountId);
+            if (!fdnNumberList.empty() && !IsFdnNumber(fdnNumberList, info.number)) {
+                CallEventInfo eventInfo;
+                (void)memset_s(eventInfo.phoneNum, kMaxNumberLen, 0, kMaxNumberLen);
+                eventInfo.eventId = CallAbilityEventId::EVENT_INVALID_FDN_NUMBER;
+                (void)memcpy_s(eventInfo.phoneNum, kMaxNumberLen, info.number.c_str(), info.number.length());
+                DelayedSingleton<CallControlManager>::GetInstance()->NotifyCallEventUpdated(eventInfo);
+                TELEPHONY_LOGW("invalid fdn number!");
+                return;
+            }
         }
     }
     TELEPHONY_LOGI("dialType:%{public}d", info.dialType);
@@ -327,7 +329,7 @@ int32_t CallRequestProcess::PackCellularCallInfo(DialParaInfo &info, CellularCal
 
 bool CallRequestProcess::IsFdnNumber(std::vector<std::u16string> fdnNumberList, std::string phoneNumber)
 {
-    char number[kMaxNumberLen + 1] = {0};
+    char number[kMaxNumberLen + 1] = { 0 };
     int32_t j = 0;
     for (int32_t i = 0; i < static_cast<int32_t>(phoneNumber.length()); i++) {
         if (i >= kMaxNumberLen) {

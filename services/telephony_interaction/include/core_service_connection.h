@@ -26,6 +26,7 @@ public:
     CoreServiceConnection() = default;
     ~CoreServiceConnection() = default;
     std::vector<std::u16string> GetFdnNumberList(int slotId);
+    bool IsFdnEnabled(int slotId);
 };
 } // namespace Telephony
 } // namespace OHOS
