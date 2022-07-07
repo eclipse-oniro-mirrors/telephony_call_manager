@@ -22,16 +22,18 @@ namespace OHOS {
 namespace Telephony {
 static const std::string DOMAIN_CALL_MANAGER = "CALL_MANAGER";
 // EVENT
-static const std::string CALL_STATE_CHANGED_EVENT = "PHONE_STATE";
+static const std::string CALL_STATE_CHANGED_EVENT = "CALL_STATE";
 
-static const std::string CALL_STATE = "state";
-static const std::string SLOT_ID = "slotId";
+// KEY
+static const std::string CALL_STATE_KEY = "STATE";
+static const std::string SLOT_ID_KEY = "SLOT_ID";
+static const std::string INDEX_ID_KEY = "INDEX_ID";
 
 class CallHisysevent {
 public:
     template<typename... Types>
     static void CallWriteEvent(const std::string &eventName, Types... args);
-    static void HiSysEventWriteCallState(const int32_t slotId, const int32_t state);
+    static void HiSysEventWriteCallState(const int32_t slotId, const int32_t state, const int32_t index);
 };
 } // namespace Telephony
 } // namespace OHOS

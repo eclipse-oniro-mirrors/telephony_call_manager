@@ -34,9 +34,9 @@ void CallHisysevent::CallWriteEvent(const std::string &eventName, Types... args)
     OHOS::HiviewDFX::HiSysEvent::Write(DOMAIN_CALL_MANAGER, eventName, type, args...);
 }
 
-void CallHisysevent::HiSysEventWriteCallState(const int32_t slotId, const int32_t state)
+void CallHisysevent::HiSysEventWriteCallState(const int32_t slotId, const int32_t state, const int32_t index)
 {
-    CallWriteEvent(CALL_STATE_CHANGED_EVENT, SLOT_ID, slotId, CALL_STATE, state);
+    CallWriteEvent(CALL_STATE_CHANGED_EVENT, SLOT_ID_KEY, slotId, CALL_STATE_KEY, state, INDEX_ID_KEY, index);
 }
 } // namespace Telephony
 } // namespace OHOS

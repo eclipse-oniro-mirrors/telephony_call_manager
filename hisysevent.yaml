@@ -13,7 +13,8 @@
 
 domain: CALL_MANAGER
 
-PHONE_STATE:
-  __BASE: {type: STATISTIC, level: MINOR, tag: PowerStats, desc: phone state}
-  state: {type: INT32, desc: phone state}
-  slotId: {type: INT32, desc: phone slot id}
+CALL_STATE:
+  __BASE: {type: STATISTIC, level: MINOR, tag: PowerStats, desc: call state}
+  SLOT_ID: {type: INT32, desc: slot id}
+  STATE: {type: INT32, desc: call state}
+  INDEX_ID: {type: INT32, desc: differentiate multiple calls simultaneously}
