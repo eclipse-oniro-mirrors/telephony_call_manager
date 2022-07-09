@@ -67,7 +67,8 @@ int32_t CallStatusCallback::UpdateCallsReportInfo(const CallsReportInfo &info)
         detailsInfo.callVec.push_back(detailInfo);
     }
     detailsInfo.slotId = callsInfo.slotId;
-    CallHisysevent::HiSysEventWriteCallState(detailsInfo.slotId, static_cast<int32_t>(detailInfo.state));
+    CallHisysevent::HiSysEventWriteCallState(
+        detailsInfo.slotId, static_cast<int32_t>(detailInfo.state), detailInfo.index);
     (void)memset_s(detailsInfo.bundleName, kMaxBundleNameLen, 0, kMaxBundleNameLen);
     int32_t ret = DelayedSingleton<ReportCallInfoHandlerService>::GetInstance()->UpdateCallsReportInfo(detailsInfo);
     if (ret != TELEPHONY_SUCCESS) {
