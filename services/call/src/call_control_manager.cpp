@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -707,36 +707,6 @@ int32_t CallControlManager::IsImsSwitchEnabled(int32_t slotId)
     }
     if (callSettingManagerPtr_ != nullptr) {
         return callSettingManagerPtr_->IsImsSwitchEnabled(slotId);
-    } else {
-        TELEPHONY_LOGE("callSettingManagerPtr_ is nullptr!");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-}
-
-int32_t CallControlManager::SetLteEnhanceMode(int32_t slotId, bool value)
-{
-    int32_t ret = CallPolicy::SetLteEnhanceModePolicy(slotId);
-    if (ret != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("SetLteEnhanceMode failed!");
-        return ret;
-    }
-    if (callSettingManagerPtr_ != nullptr) {
-        return callSettingManagerPtr_->SetLteEnhanceMode(slotId, value);
-    } else {
-        TELEPHONY_LOGE("callSettingManagerPtr_ is nullptr!");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-}
-
-int32_t CallControlManager::GetLteEnhanceMode(int32_t slotId)
-{
-    int32_t ret = CallPolicy::GetLteEnhanceModePolicy(slotId);
-    if (ret != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("GetLteEnhanceMode failed!");
-        return ret;
-    }
-    if (callSettingManagerPtr_ != nullptr) {
-        return callSettingManagerPtr_->GetLteEnhanceMode(slotId);
     } else {
         TELEPHONY_LOGE("callSettingManagerPtr_ is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;

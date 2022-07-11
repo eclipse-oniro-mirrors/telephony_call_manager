@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -328,23 +328,23 @@ public:
     int32_t SetDeviceDirection(int32_t rotation);
 
     /**
-     * SetLteImsSwitchStatus
+     * SetImsSwitchStatus
      *
-     * @brief Setting 4G Lte Mode
+     * @brief Setting Ims Switch
      * @param slotId[in], The slot id
      * @param active[in],  On or off
      * @return Returns 0 on success, others on failure.
      */
-    int32_t SetLteImsSwitchStatus(int32_t slotId, bool active);
+    int32_t SetImsSwitchStatus(int32_t slotId, bool active);
 
     /**
-     * GetLteImsSwitchStatus
+     * GetImsSwitchStatus
      *
-     * @brief Obtaining 4G Lte mode
+     * @brief Getting Ims Switch
      * @param slotId[in], The slot id
      * @return Returns 0 on success, others on failure.
      */
-    int32_t GetLteImsSwitchStatus(int32_t slotId);
+    int32_t GetImsSwitchStatus(int32_t slotId);
 
     /**
      * SendUpdateCallMediaModeRequest
@@ -404,21 +404,6 @@ public:
      */
     int32_t GetImsFeatureValue(FeatureType type, int32_t slotId);
 
-    /**
-     * Set Volte Enhance Mode
-     *
-     * @param value
-     * @param slotId
-     * @return Returns TELEPHONY_SUCCESS on success, others on failure.
-     */
-    int32_t SetVolteEnhanceMode(bool value, int32_t slotId);
-
-    /**
-     * Get Volte Enhance Mode
-     * @param slotId
-     * @return Returns TELEPHONY_SUCCESS on success, others on failure.
-     */
-    int32_t GetVolteEnhanceMode(int32_t slotId);
     /**
      * InviteToConference interface
      *

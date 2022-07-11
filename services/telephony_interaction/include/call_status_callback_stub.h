@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -49,8 +49,8 @@ private:
     int32_t OnUpdateGetCallClipResult(MessageParcel &data, MessageParcel &reply);
     int32_t OnUpdateGetCallClirResult(MessageParcel &data, MessageParcel &reply);
     int32_t OnUpdateSetCallClirResult(MessageParcel &data, MessageParcel &reply);
-    int32_t OnGetVoLteStatusResult(MessageParcel &data, MessageParcel &reply);
-    int32_t OnSetVoLteStatusResult(MessageParcel &data, MessageParcel &reply);
+    int32_t OnGetImsSwitchStatusResult(MessageParcel &data, MessageParcel &reply);
+    int32_t OnSetImsSwitchStatusResult(MessageParcel &data, MessageParcel &reply);
     int32_t OnStartRttResult(MessageParcel &data, MessageParcel &reply);
     int32_t OnStopRttResult(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetImsConfigResult(MessageParcel &data, MessageParcel &reply);

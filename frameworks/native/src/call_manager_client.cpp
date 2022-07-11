@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -555,36 +555,6 @@ int32_t CallManagerClient::IsImsSwitchEnabled(int32_t slotId)
 {
     if (g_callManagerProxy != nullptr) {
         return g_callManagerProxy->IsImsSwitchEnabled(slotId);
-    } else {
-        TELEPHONY_LOGE("init first please!");
-        return TELEPHONY_ERR_UNINIT;
-    }
-}
-
-int32_t CallManagerClient::EnableLteEnhanceMode(int32_t slotId)
-{
-    if (g_callManagerProxy != nullptr) {
-        return g_callManagerProxy->EnableLteEnhanceMode(slotId);
-    } else {
-        TELEPHONY_LOGE("init first please!");
-        return TELEPHONY_ERR_UNINIT;
-    }
-}
-
-int32_t CallManagerClient::DisableLteEnhanceMode(int32_t slotId)
-{
-    if (g_callManagerProxy != nullptr) {
-        return g_callManagerProxy->DisableLteEnhanceMode(slotId);
-    } else {
-        TELEPHONY_LOGE("init first please!");
-        return TELEPHONY_ERR_UNINIT;
-    }
-}
-
-int32_t CallManagerClient::IsLteEnhanceModeEnabled(int32_t slotId)
-{
-    if (g_callManagerProxy != nullptr) {
-        return g_callManagerProxy->IsLteEnhanceModeEnabled(slotId);
     } else {
         TELEPHONY_LOGE("init first please!");
         return TELEPHONY_ERR_UNINIT;

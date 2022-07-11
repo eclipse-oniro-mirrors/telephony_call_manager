@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -62,15 +62,13 @@ public:
         /****************** config ******************/
         SET_DOMAIN_PREFERENCE_MODE = 300,
         GET_DOMAIN_PREFERENCE_MODE,
-        SET_LTE_IMS_SWITCH_STATUS,
-        GET_LTE_IMS_SWITCH_STATUS,
+        SET_IMS_SWITCH_STATUS,
+        GET_IMS_SWITCH_STATUS,
         SET_IMS_CONFIG_STRING,
         SET_IMS_CONFIG_INT,
         GET_IMS_CONFIG,
         SET_IMS_FEATURE,
         GET_IMS_FEATURE,
-        SET_IMS_SWITCH_ENHANCE_MODE,
-        GET_IMS_SWITCH_ENHANCE_MODE,
         SET_MUTE,
         GET_MUTE,
 
@@ -329,21 +327,21 @@ public:
     virtual int32_t GetDomainPreferenceMode(int32_t slotId) = 0;
 
     /**
-     * Set Lte Ims Switch Status
+     * Set Ims Switch Status
      *
      * @param active
      * @param slotId
      * @return Returns TELEPHONY_SUCCESS on success, others on failure.
      */
-    virtual int32_t SetLteImsSwitchStatus(int32_t slotId, bool active) = 0;
+    virtual int32_t SetImsSwitchStatus(int32_t slotId, bool active) = 0;
 
     /**
-     * Get Lte Ims Switch Status
+     * Get Ims Switch Status
      *
      * @param slotId
      * @return Returns TELEPHONY_SUCCESS on success, others on failure.
      */
-    virtual int32_t GetLteImsSwitchStatus(int32_t slotId) = 0;
+    virtual int32_t GetImsSwitchStatus(int32_t slotId) = 0;
 
     /**
      * Set Ims Config
@@ -392,22 +390,6 @@ public:
      * @return Returns TELEPHONY_SUCCESS on success, others on failure.
      */
     virtual int32_t GetImsFeatureValue(int32_t slotId, FeatureType type) = 0;
-
-    /**
-     * Set Ims Switch Enhance Mode
-     *
-     * @param value
-     * @param slotId
-     * @return Returns TELEPHONY_SUCCESS on success, others on failure.
-     */
-    virtual int32_t SetImsSwitchEnhanceMode(int32_t slotId, bool value) = 0;
-
-    /**
-     * Get Ims Switch Enhance Mode
-     * @param slotId
-     * @return Returns TELEPHONY_SUCCESS on success, others on failure.
-     */
-    virtual int32_t GetImsSwitchEnhanceMode(int32_t slotId) = 0;
 
     /**
      * CtrlCamera

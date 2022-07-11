@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -59,8 +59,6 @@ public:
     int32_t SetImsConfigPolicy(int32_t slotId);
     int32_t GetImsFeatureValuePolicy(int32_t slotId);
     int32_t SetImsFeatureValuePolicy(int32_t slotId);
-    int32_t GetLteEnhanceModePolicy(int32_t slotId);
-    int32_t SetLteEnhanceModePolicy(int32_t slotId);
     static int32_t InviteToConferencePolicy(int32_t callId, std::vector<std::string> &numberList);
 
 private:

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -126,9 +126,6 @@ void CallManagerServiceStub::InitImsServiceRequest()
     memberFuncMap_[INTERFACE_ENABLE_VOLTE] = &CallManagerServiceStub::OnEnableVoLte;
     memberFuncMap_[INTERFACE_DISABLE_VOLTE] = &CallManagerServiceStub::OnDisableVoLte;
     memberFuncMap_[INTERFACE_IS_VOLTE_ENABLED] = &CallManagerServiceStub::OnIsVoLteEnabled;
-    memberFuncMap_[INTERFACE_ENABLE_LTE_ENHANCE_MODE] = &CallManagerServiceStub::OnEnableLteEnhanceMode;
-    memberFuncMap_[INTERFACE_DISABLE_LTE_ENHANCE_MODE] = &CallManagerServiceStub::OnDisableEnhanceMode;
-    memberFuncMap_[INTERFACE_IS_LTE_ENHANCE_MODE_ENABLED] = &CallManagerServiceStub::OnIsLteEnhanceModeEnabled;
     memberFuncMap_[INTERFACE_START_RTT] = &CallManagerServiceStub::OnStartRtt;
     memberFuncMap_[INTERFACE_STOP_RTT] = &CallManagerServiceStub::OnStopRtt;
 }
@@ -804,42 +801,6 @@ int32_t CallManagerServiceStub::OnIsVoLteEnabled(MessageParcel &data, MessagePar
     result = IsImsSwitchEnabled(slotId);
     if (!reply.WriteInt32(result)) {
         TELEPHONY_LOGE("IsImsSwitchEnabled fail to write parcel");
-        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
-    }
-    return TELEPHONY_SUCCESS;
-}
-
-int32_t CallManagerServiceStub::OnEnableLteEnhanceMode(MessageParcel &data, MessageParcel &reply)
-{
-    int32_t result = TELEPHONY_ERR_FAIL;
-    int32_t slotId = data.ReadInt32();
-    result = EnableLteEnhanceMode(slotId);
-    if (!reply.WriteInt32(result)) {
-        TELEPHONY_LOGE("EnableLteEnhanceMode fail to write parcel");
-        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
-    }
-    return TELEPHONY_SUCCESS;
-}
-
-int32_t CallManagerServiceStub::OnDisableEnhanceMode(MessageParcel &data, MessageParcel &reply)
-{
-    int32_t result = TELEPHONY_ERR_FAIL;
-    int32_t slotId = data.ReadInt32();
-    result = DisableLteEnhanceMode(slotId);
-    if (!reply.WriteInt32(result)) {
-        TELEPHONY_LOGE("DisableLteEnhanceMode fail to write parcel");
-        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
-    }
-    return TELEPHONY_SUCCESS;
-}
-
-int32_t CallManagerServiceStub::OnIsLteEnhanceModeEnabled(MessageParcel &data, MessageParcel &reply)
-{
-    int32_t result = TELEPHONY_ERR_FAIL;
-    int32_t slotId = data.ReadInt32();
-    result = IsLteEnhanceModeEnabled(slotId);
-    if (!reply.WriteInt32(result)) {
-        TELEPHONY_LOGE("GetLteEnhanceMode fail to write parcel");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
     return TELEPHONY_SUCCESS;

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -677,7 +677,7 @@ int32_t CellularCallProxy::GetDomainPreferenceMode(int32_t slotId)
     return error;
 }
 
-int32_t CellularCallProxy::SetLteImsSwitchStatus(int32_t slotId, bool active)
+int32_t CellularCallProxy::SetImsSwitchStatus(int32_t slotId, bool active)
 {
     MessageOption option;
     MessageParcel in;
@@ -695,14 +695,14 @@ int32_t CellularCallProxy::SetLteImsSwitchStatus(int32_t slotId, bool active)
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
     int32_t error =
-        Remote()->SendRequest(static_cast<uint32_t>(OperationType::SET_LTE_IMS_SWITCH_STATUS), in, out, option);
+        Remote()->SendRequest(static_cast<uint32_t>(OperationType::SET_IMS_SWITCH_STATUS), in, out, option);
     if (error == ERR_NONE) {
         return out.ReadInt32();
     }
     return error;
 }
 
-int32_t CellularCallProxy::GetLteImsSwitchStatus(int32_t slotId)
+int32_t CellularCallProxy::GetImsSwitchStatus(int32_t slotId)
 {
     MessageOption option;
     MessageParcel in;
@@ -717,7 +717,7 @@ int32_t CellularCallProxy::GetLteImsSwitchStatus(int32_t slotId)
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
     int32_t error =
-        Remote()->SendRequest(static_cast<uint32_t>(OperationType::GET_LTE_IMS_SWITCH_STATUS), in, out, option);
+        Remote()->SendRequest(static_cast<uint32_t>(OperationType::GET_IMS_SWITCH_STATUS), in, out, option);
     if (error == ERR_NONE) {
         return out.ReadInt32();
     }
@@ -848,53 +848,6 @@ int32_t CellularCallProxy::GetImsFeatureValue(int32_t slotId, FeatureType type)
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
     int32_t error = Remote()->SendRequest(static_cast<uint32_t>(OperationType::GET_IMS_FEATURE), in, out, option);
-    if (error == ERR_NONE) {
-        return out.ReadInt32();
-    }
-    return error;
-}
-
-int32_t CellularCallProxy::SetImsSwitchEnhanceMode(int32_t slotId, bool value)
-{
-    MessageOption option;
-    MessageParcel in;
-    MessageParcel out;
-    if (!in.WriteInterfaceToken(CellularCallProxy::GetDescriptor())) {
-        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
-    }
-    if (!in.WriteInt32(MAX_SIZE)) {
-        return TELEPHONY_ERR_WRITE_DATA_FAIL;
-    }
-    if (!in.WriteInt32(slotId)) {
-        return TELEPHONY_ERR_WRITE_DATA_FAIL;
-    }
-    if (!in.WriteBool(value)) {
-        return TELEPHONY_ERR_WRITE_DATA_FAIL;
-    }
-    int32_t error =
-        Remote()->SendRequest(static_cast<uint32_t>(OperationType::SET_IMS_SWITCH_ENHANCE_MODE), in, out, option);
-    if (error == ERR_NONE) {
-        return out.ReadInt32();
-    }
-    return error;
-}
-
-int32_t CellularCallProxy::GetImsSwitchEnhanceMode(int32_t slotId)
-{
-    MessageOption option;
-    MessageParcel in;
-    MessageParcel out;
-    if (!in.WriteInterfaceToken(CellularCallProxy::GetDescriptor())) {
-        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
-    }
-    if (!in.WriteInt32(MAX_SIZE)) {
-        return TELEPHONY_ERR_WRITE_DATA_FAIL;
-    }
-    if (!in.WriteInt32(slotId)) {
-        return TELEPHONY_ERR_WRITE_DATA_FAIL;
-    }
-    int32_t error =
-        Remote()->SendRequest(static_cast<uint32_t>(OperationType::GET_IMS_SWITCH_ENHANCE_MODE), in, out, option);
     if (error == ERR_NONE) {
         return out.ReadInt32();
     }

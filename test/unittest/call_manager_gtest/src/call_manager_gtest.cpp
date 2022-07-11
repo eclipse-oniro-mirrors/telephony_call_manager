@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -1381,51 +1381,6 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_IsVoLteEnabled_0100, Function |
     }
 
     EXPECT_EQ(CallManagerGtest::clientPtr_->IsImsSwitchEnabled(SIM1_SLOTID), RETURN_VALUE_IS_ZERO);
-}
-
-/******************************************* Test SetLteEnhanceMode() ********************************************/
-/**
- * @tc.number   Telephony_CallManager_SetLteEnhanceMode_0100
- * @tc.name     input slotId 0, test SetLteEnhanceMode
- * @tc.desc     Function test
- */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_SetLteEnhanceMode_0100, Function | MediumTest | Level3)
-{
-    if (!HasSimCard()) {
-        return;
-    }
-
-    EXPECT_EQ(CallManagerGtest::clientPtr_->SetLteEnhanceMode(SIM1_SLOTID, true), RETURN_VALUE_IS_ZERO);
-}
-
-/******************************************* Test SetLteEnhanceMode() ********************************************/
-/**
- * @tc.number   Telephony_CallManager_SetLteEnhanceMode_0200
- * @tc.name     input slotId 0, test SetLteEnhanceMode, disable LteEnhanceMode
- * @tc.desc     Function test
- */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_SetLteEnhanceMode_0200, Function | MediumTest | Level3)
-{
-    if (!HasSimCard()) {
-        return;
-    }
-
-    EXPECT_EQ(CallManagerGtest::clientPtr_->SetLteEnhanceMode(SIM1_SLOTID, false), RETURN_VALUE_IS_ZERO);
-}
-
-/******************************************* Test GetLteEnhanceMode() ********************************************/
-/**
- * @tc.number   Telephony_CallManager_GetLteEnhanceMode_0100
- * @tc.name     input slotId 0, test GetLteEnhanceMode
- * @tc.desc     Function test
- */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_GetLteEnhanceMode_0100, Function | MediumTest | Level3)
-{
-    if (!HasSimCard()) {
-        return;
-    }
-
-    EXPECT_EQ(CallManagerGtest::clientPtr_->GetLteEnhanceMode(SIM1_SLOTID), RETURN_VALUE_IS_ZERO);
 }
 
 /******************************************* Test ControlCamera() *********************************************/

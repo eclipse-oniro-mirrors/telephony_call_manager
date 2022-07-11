@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -88,9 +88,6 @@ public:
     int32_t EnableImsSwitch(int32_t slotId);
     int32_t DisableImsSwitch(int32_t slotId);
     int32_t IsImsSwitchEnabled(int32_t slotId);
-    int32_t EnableLteEnhanceMode(int32_t slotId);
-    int32_t DisableLteEnhanceMode(int32_t slotId);
-    int32_t IsLteEnhanceModeEnabled(int32_t slotId);
     int32_t StartRtt(int32_t callId, std::u16string &msg);
     int32_t StopRtt(int32_t callId);
     int32_t JoinConference(int32_t callId, std::vector<std::u16string> &numberList);
