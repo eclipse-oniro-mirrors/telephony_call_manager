@@ -70,10 +70,10 @@ bool BluetoothConnection::ConnectBtSco()
 
     Bluetooth::BluetoothRemoteDevice *device = nullptr;
     if (!connectedScoAddr_.empty()) {
-        TELEPHONY_LOGE("connectedScoAddr_ is not empty");
+        TELEPHONY_LOGI("connectedScoAddr_ is not empty");
         device = GetBtDevice(connectedScoAddr_);
     } else if (!mapConnectedBtDevices_.empty()) {
-        TELEPHONY_LOGE("mapConnectedBtDevices_ is not empty");
+        TELEPHONY_LOGI("mapConnectedBtDevices_ is not empty");
         device = &mapConnectedBtDevices_.begin()->second;
     } else {
         TELEPHONY_LOGE("device is invalid");
