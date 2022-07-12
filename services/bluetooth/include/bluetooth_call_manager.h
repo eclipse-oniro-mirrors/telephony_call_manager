@@ -25,16 +25,18 @@ namespace Telephony {
 constexpr int16_t DEFAULT_CALL_NUMBER_TYPE = 86;
 
 class BluetoothCallManager : public std::enable_shared_from_this<BluetoothCallManager> {
-    DECLARE_DELAYED_SINGLETON(BluetoothCallManager)
 public:
+    BluetoothCallManager();
+    ~BluetoothCallManager();
     bool ConnectBtSco(const std::string &bluetoothAddress);
     bool DisconnectBtSco();
     int32_t SendBtCallState(int32_t numActive, int32_t numHeld, int32_t callState, const std::string &number);
     BtScoState GetBtScoState();
+    bool IsBtAvailble();
 
 private:
-    std::unique_ptr<BluetoothConnection> btConnection_;
     bool IsBtScoConnected();
+    std::shared_ptr<BluetoothConnection> btConnection_;
 };
 } // namespace Telephony
 } // namespace OHOS

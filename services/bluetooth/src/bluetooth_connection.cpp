@@ -68,13 +68,26 @@ bool BluetoothConnection::ConnectBtSco()
         return false;
     }
 
-    Bluetooth::BluetoothRemoteDevice *device = GetBtDevice(connectedScoAddr_);
+    Bluetooth::BluetoothRemoteDevice *device = nullptr;
+    if (!connectedScoAddr_.empty()) {
+        TELEPHONY_LOGI("connectedScoAddr_ is not empty");
+        device = GetBtDevice(connectedScoAddr_);
+    } else if (!mapConnectedBtDevices_.empty()) {
+        TELEPHONY_LOGI("mapConnectedBtDevices_ is not empty");
+        device = &mapConnectedBtDevices_.begin()->second;
+    } else {
+        TELEPHONY_LOGE("device is invalid");
+    }
+
     if (device == nullptr) {
         TELEPHONY_LOGE("device is nullptr");
         return false;
     }
-    if (profile->SetActiveDevice(*device)) {
-        return profile->ConnectSco();
+    if (profile->SetActiveDevice(*device) && profile->ConnectSco()) {
+        btScoState_ = BtScoState::SCO_STATE_CONNECTED;
+        DelayedSingleton<AudioDeviceManager>::GetInstance()->ProcessEvent(AudioEvent::BLUETOOTH_SCO_CONNECTED);
+        TELEPHONY_LOGI("bluetooth sco is already connected");
+        return true;
     }
 #endif
     TELEPHONY_LOGE("Connect Bluetooth Sco Fail !");
@@ -150,6 +163,16 @@ bool BluetoothConnection::DisconnectBtSco(const Bluetooth::BluetoothRemoteDevice
     TELEPHONY_LOGE("Disconnect Bluetooth Sco Fail !");
     return false;
 }
+
+bool BluetoothConnection::IsBtAvailble()
+{
+    if (mapConnectedBtDevices_.empty()) {
+        TELEPHONY_LOGE("mapConnectedBtDevices_ is empty");
+        return false;
+    }
+
+    return true;
+}
 #endif
 
 bool BluetoothConnection::IsBtScoConnected()
@@ -195,17 +218,18 @@ bool BluetoothConnection::IsAudioActivated()
 #ifdef ABILITY_BLUETOOTH_SUPPORT
 void BluetoothConnection::OnScoStateChanged(const Bluetooth::BluetoothRemoteDevice &device, int32_t state)
 {
+    TELEPHONY_LOGI("BluetoothConnection::OnScoStateChanged state : %{public}d", state);
     switch (state) {
-        case (int32_t)Bluetooth::BTConnectState::CONNECTED:
+        case (int32_t)Bluetooth::HfpScoConnectState::SCO_CONNECTED:
             if (connectedScoAddr_.empty()) {
                 connectedScoAddr_ = device.GetDeviceAddr();
                 BluetoothConnection::SetBtScoState(BtScoState::SCO_STATE_CONNECTED);
             }
             break;
-        case (int32_t)Bluetooth::BTConnectState::DISCONNECTED:
+        case (int32_t)Bluetooth::HfpScoConnectState::SCO_DISCONNECTED:
             if (device.GetDeviceAddr() == connectedScoAddr_) {
                 connectedScoAddr_ = "";
-                BluetoothConnection::SetBtScoState(BtScoState::SCO_STATE_DISCONNECTED);
+                btScoState_ = BtScoState::SCO_STATE_DISCONNECTED;
                 DelayedSingleton<AudioDeviceManager>::GetInstance()->ProcessEvent(
                     AudioEvent::BLUETOOTH_SCO_DISCONNECTED);
             }
@@ -250,7 +274,7 @@ Bluetooth::BluetoothRemoteDevice *BluetoothConnection::GetBtDevice(const std::st
 
 void BluetoothConnection::OnConnectionStateChanged(const Bluetooth::BluetoothRemoteDevice &device, int32_t state)
 {
-    TELEPHONY_LOGI("OnConnectionStateChanged");
+    TELEPHONY_LOGI("BluetoothConnection::OnConnectionStateChanged state : %{public}d", state);
     std::string macAddress = device.GetDeviceAddr();
     switch (state) {
         case (int32_t)Bluetooth::BTConnectState::CONNECTED:

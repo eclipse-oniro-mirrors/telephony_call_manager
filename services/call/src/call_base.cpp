@@ -17,12 +17,12 @@
 
 #include <securec.h>
 
-#include "call_manager_errors.h"
-#include "telephony_log_wrapper.h"
-
-#include "common_type.h"
-#include "cellular_call_connection.h"
 #include "audio_control_manager.h"
+#include "bluetooth_call_manager.h"
+#include "call_manager_errors.h"
+#include "cellular_call_connection.h"
+#include "common_type.h"
+#include "telephony_log_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -354,16 +354,24 @@ void CallBase::SetAudio()
      * please turn on the hands-free
      */
     bool useSpeakerForDock = IsSpeakerphoneEnabled();
-    SetSpeakerphoneOn(useSpeakerWhenDocked || useSpeakerForDock);
+    SetSpeakerphoneOn(useSpeakerWhenDocked && useSpeakerForDock);
     // Confirm whether the speaker is turned on
     if (isSpeakerphoneOn_) {
+        TELEPHONY_LOGI("set audio speaker");
         DelayedSingleton<AudioControlManager>::GetInstance()->SetAudioDevice(AudioDevice::DEVICE_SPEAKER);
+    } else {
+        TELEPHONY_LOGI("set audio bluetooth");
+        DelayedSingleton<AudioControlManager>::GetInstance()->SetAudioDevice(AudioDevice::DEVICE_BLUETOOTH_SCO);
     }
 }
 
 bool CallBase::IsSpeakerphoneEnabled()
 {
+    std::shared_ptr<BluetoothCallManager> bluetoothCallManager = std::make_shared<BluetoothCallManager>();
     // Gets whether the device can be started from the configuration
+    if (bluetoothCallManager->IsBtAvailble()) {
+        return false;
+    }
     return true;
 }
 

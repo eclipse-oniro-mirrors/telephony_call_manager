@@ -24,7 +24,7 @@
 
 namespace OHOS {
 namespace Telephony {
-BluetoothCallManager::BluetoothCallManager() : btConnection_(std::make_unique<BluetoothConnection>()) {}
+BluetoothCallManager::BluetoothCallManager() : btConnection_(DelayedSingleton<BluetoothConnection>::GetInstance()) {}
 
 BluetoothCallManager::~BluetoothCallManager() {}
 
@@ -79,6 +79,20 @@ bool BluetoothCallManager::IsBtScoConnected()
         return false;
     }
     return btConnection_->IsBtScoConnected();
+}
+
+bool BluetoothCallManager::IsBtAvailble()
+{
+    if (btConnection_ == nullptr) {
+        TELEPHONY_LOGE("bluetooth connection nullptr");
+        return false;
+    }
+    bool isBtAvailble = false;
+
+#ifdef ABILITY_BLUETOOTH_SUPPORT
+    isBtAvailble = btConnection_->IsBtAvailble();
+#endif
+    return isBtAvailble;
 }
 } // namespace Telephony
 } // namespace OHOS
