@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -1012,51 +1012,6 @@ void IsImsSwitchEnabled()
     std::cout << "return value:" << ret << std::endl;
 }
 
-void EnableLteEnhanceMode()
-{
-    int32_t slotId = SIM1_SLOTID;
-    std::cout << "------EnableLteEnhanceMode------" << std::endl;
-    std::cout << "please input slot id:" << std::endl;
-    std::cin >> slotId;
-    int32_t ret = TELEPHONY_SUCCESS;
-    if (g_clientPtr == nullptr) {
-        std::cout << "g_clientPtr is nullptr" << std::endl;
-        return;
-    }
-    ret = g_clientPtr->EnableLteEnhanceMode(slotId);
-    std::cout << "return value:" << ret << std::endl;
-}
-
-void DisableLteEnhanceMode()
-{
-    int slotId = SIM1_SLOTID;
-    std::cout << "------DisableLteEnhanceMode------" << std::endl;
-    std::cout << "please input slot id:" << std::endl;
-    std::cin >> slotId;
-    int32_t ret = TELEPHONY_SUCCESS;
-    if (g_clientPtr == nullptr) {
-        std::cout << "g_clientPtr is nullptr" << std::endl;
-        return;
-    }
-    ret = g_clientPtr->DisableLteEnhanceMode(slotId);
-    std::cout << "return value:" << ret << std::endl;
-}
-
-void IsLteEnhanceModeEnabled()
-{
-    int32_t slotId = SIM1_SLOTID;
-    std::cout << "------IsLteEnhanceModeEnabled------" << std::endl;
-    std::cout << "please input slot id:" << std::endl;
-    std::cin >> slotId;
-    int32_t ret = TELEPHONY_SUCCESS;
-    if (g_clientPtr == nullptr) {
-        std::cout << "g_clientPtr is nullptr" << std::endl;
-        return;
-    }
-    ret = g_clientPtr->IsLteEnhanceModeEnabled(slotId);
-    std::cout << "return value:" << ret << std::endl;
-}
-
 void StartRtt()
 {
     int32_t callId = DEFAULT_CALL_ID;
@@ -1190,10 +1145,6 @@ void InitImsServicePower()
     g_memberFuncMap[OHOS::Telephony::INTERFACE_ENABLE_VOLTE] = &OHOS::Telephony::EnableImsSwitch;
     g_memberFuncMap[OHOS::Telephony::INTERFACE_DISABLE_VOLTE] = &OHOS::Telephony::DisableImsSwitch;
     g_memberFuncMap[OHOS::Telephony::INTERFACE_IS_VOLTE_ENABLED] = &OHOS::Telephony::IsImsSwitchEnabled;
-    g_memberFuncMap[OHOS::Telephony::INTERFACE_ENABLE_LTE_ENHANCE_MODE] = &OHOS::Telephony::EnableLteEnhanceMode;
-    g_memberFuncMap[OHOS::Telephony::INTERFACE_DISABLE_LTE_ENHANCE_MODE] = &OHOS::Telephony::DisableLteEnhanceMode;
-    g_memberFuncMap[OHOS::Telephony::INTERFACE_IS_LTE_ENHANCE_MODE_ENABLED] =
-        &OHOS::Telephony::IsLteEnhanceModeEnabled;
 }
 
 int32_t Init()
@@ -1300,11 +1251,8 @@ void PrintfCallMultimediaInterface()
               << "45:EnableImsSwitch\n"
               << "46:DisableImsSwitch\n"
               << "47:IsImsSwitchEnabled\n"
-              << "48:EnableLteEnhanceMode\n"
-              << "49:DisableLteEnhanceMode\n"
-              << "50:IsLteEnhanceModeEnabled\n"
-              << "51:StartRtt\n"
-              << "52:StopRtt\n"
+              << "48:StartRtt\n"
+              << "49:StopRtt\n"
               << "93:InitPermission\n"
               << "94:VerifyPermission\n"
               << "95:SendConnectBluetoothScoBroadcast\n"

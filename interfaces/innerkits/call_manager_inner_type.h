@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -413,7 +413,7 @@ struct CallPreferenceResponse {
     int32_t mode;
 };
 
-struct LteImsSwitchResponse {
+struct ImsSwitchResponse {
     int32_t result; // 0: ok  other: error
     int32_t active; // 0: off 1: on
 };

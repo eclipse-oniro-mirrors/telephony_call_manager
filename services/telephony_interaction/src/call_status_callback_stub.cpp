@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -42,8 +42,8 @@ CallStatusCallbackStub::CallStatusCallbackStub()
     memberFuncMap_[UPDATE_GET_CALL_CLIP] = &CallStatusCallbackStub::OnUpdateGetCallClipResult;
     memberFuncMap_[UPDATE_GET_CALL_CLIR] = &CallStatusCallbackStub::OnUpdateGetCallClirResult;
     memberFuncMap_[UPDATE_SET_CALL_CLIR] = &CallStatusCallbackStub::OnUpdateSetCallClirResult;
-    memberFuncMap_[GET_VOLTE_SWITCH_STATUS] = &CallStatusCallbackStub::OnGetVoLteStatusResult;
-    memberFuncMap_[SET_VOLTE_SWITCH_STATUS] = &CallStatusCallbackStub::OnSetVoLteStatusResult;
+    memberFuncMap_[GET_IMS_SWITCH_STATUS] = &CallStatusCallbackStub::OnGetImsSwitchStatusResult;
+    memberFuncMap_[SET_IMS_SWITCH_STATUS] = &CallStatusCallbackStub::OnSetImsSwitchStatusResult;
     memberFuncMap_[GET_IMS_CONFIG] = &CallStatusCallbackStub::OnGetImsConfigResult;
     memberFuncMap_[SET_IMS_CONFIG] = &CallStatusCallbackStub::OnSetImsConfigResult;
     memberFuncMap_[GET_IMS_FEATURE_VALUE] = &CallStatusCallbackStub::OnGetImsFeatureValueResult;
@@ -385,23 +385,23 @@ int32_t CallStatusCallbackStub::OnUpdateSetCallClirResult(MessageParcel &data, M
     return TELEPHONY_SUCCESS;
 }
 
-int32_t CallStatusCallbackStub::OnGetVoLteStatusResult(MessageParcel &data, MessageParcel &reply)
+int32_t CallStatusCallbackStub::OnGetImsSwitchStatusResult(MessageParcel &data, MessageParcel &reply)
 {
     int32_t error = TELEPHONY_ERR_FAIL;
     if (!data.ContainFileDescriptors()) {
         TELEPHONY_LOGW("sent raw data is less than 32k");
     }
-    const LteImsSwitchResponse *parcelPtr = nullptr;
+    const ImsSwitchResponse *parcelPtr = nullptr;
     int32_t len = data.ReadInt32();
     if (len <= TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("Invalid parameter, len = %{public}d", len);
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
-    if ((parcelPtr = reinterpret_cast<const LteImsSwitchResponse *>(data.ReadRawData(len))) == nullptr) {
+    if ((parcelPtr = reinterpret_cast<const ImsSwitchResponse *>(data.ReadRawData(len))) == nullptr) {
         TELEPHONY_LOGE("reading raw data failed, length = %d", len);
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    error = GetVoLteStatusResult(*parcelPtr);
+    error = GetImsSwitchStatusResult(*parcelPtr);
     if (!reply.WriteInt32(error)) {
         TELEPHONY_LOGE("writing parcel failed");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
@@ -409,23 +409,23 @@ int32_t CallStatusCallbackStub::OnGetVoLteStatusResult(MessageParcel &data, Mess
     return TELEPHONY_SUCCESS;
 }
 
-int32_t CallStatusCallbackStub::OnSetVoLteStatusResult(MessageParcel &data, MessageParcel &reply)
+int32_t CallStatusCallbackStub::OnSetImsSwitchStatusResult(MessageParcel &data, MessageParcel &reply)
 {
     int32_t error = TELEPHONY_ERR_FAIL;
     if (!data.ContainFileDescriptors()) {
         TELEPHONY_LOGW("sent raw data is less than 32k");
     }
-    const LteImsSwitchResponse *parcelPtr = nullptr;
+    const ImsSwitchResponse *parcelPtr = nullptr;
     int32_t len = data.ReadInt32();
     if (len <= TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("Invalid parameter, len = %{public}d", len);
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
-    if ((parcelPtr = reinterpret_cast<const LteImsSwitchResponse *>(data.ReadRawData(len))) == nullptr) {
+    if ((parcelPtr = reinterpret_cast<const ImsSwitchResponse *>(data.ReadRawData(len))) == nullptr) {
         TELEPHONY_LOGE("reading raw data failed, length = %d", len);
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    error = SetVoLteStatusResult(*parcelPtr);
+    error = SetImsSwitchStatusResult(*parcelPtr);
     if (!reply.WriteInt32(error)) {
         TELEPHONY_LOGE("writing parcel failed");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;

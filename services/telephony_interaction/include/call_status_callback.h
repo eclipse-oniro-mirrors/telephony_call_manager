@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -46,8 +46,8 @@ public:
     int32_t UpdateGetCallClipResult(const ClipResponse &clipResponse) override;
     int32_t UpdateGetCallClirResult(const ClirResponse &clirResponse) override;
     int32_t UpdateSetCallClirResult(const int32_t result) override;
-    int32_t GetVoLteStatusResult(const LteImsSwitchResponse &switchResponse) override;
-    int32_t SetVoLteStatusResult(const LteImsSwitchResponse &switchResponse) override;
+    int32_t GetImsSwitchStatusResult(const ImsSwitchResponse &switchResponse) override;
+    int32_t SetImsSwitchStatusResult(const ImsSwitchResponse &switchResponse) override;
     int32_t StartRttResult(const int32_t result) override;
     int32_t StopRttResult(const int32_t result) override;
     int32_t GetImsConfigResult(const GetImsConfigResponse &response) override;

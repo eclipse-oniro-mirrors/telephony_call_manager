@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -341,24 +341,6 @@ int32_t CallPolicy::GetImsFeatureValuePolicy(int32_t slotId)
 }
 
 int32_t CallPolicy::SetImsFeatureValuePolicy(int32_t slotId)
-{
-    if (IsValidSlotId(slotId) != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("invalid slotId!");
-        return CALL_ERR_INVALID_SLOT_ID;
-    }
-    return TELEPHONY_SUCCESS;
-}
-
-int32_t CallPolicy::GetLteEnhanceModePolicy(int32_t slotId)
-{
-    if (IsValidSlotId(slotId) != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("invalid slotId!");
-        return CALL_ERR_INVALID_SLOT_ID;
-    }
-    return TELEPHONY_SUCCESS;
-}
-
-int32_t CallPolicy::SetLteEnhanceModePolicy(int32_t slotId)
 {
     if (IsValidSlotId(slotId) != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("invalid slotId!");

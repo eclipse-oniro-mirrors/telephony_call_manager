@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -120,9 +120,6 @@ public:
     static napi_value StopRTT(napi_env env, napi_callback_info info);
     static napi_value JoinConference(napi_env env, napi_callback_info info);
     static napi_value UpdateImsCallMode(napi_env env, napi_callback_info info);
-    static napi_value EnableLteEnhanceMode(napi_env env, napi_callback_info info);
-    static napi_value DisableLteEnhanceMode(napi_env env, napi_callback_info info);
-    static napi_value IsLteEnhanceModeEnabled(napi_env env, napi_callback_info info);
     static napi_value ReportOttCallDetailsInfo(napi_env env, napi_callback_info info);
     static napi_value ReportOttCallEventInfo(napi_env env, napi_callback_info info);
     static napi_value HasVoiceCapability(napi_env env, napi_callback_info info);
@@ -187,9 +184,6 @@ private:
     static void NativeStopRTT(napi_env env, void *data);
     static void NativeJoinConference(napi_env env, void *data);
     static void NativeUpdateImsCallMode(napi_env env, void *data);
-    static void NativeEnableLteEnhanceMode(napi_env env, void *data);
-    static void NativeDisableLteEnhanceMode(napi_env env, void *data);
-    static void NativeIsLteEnhanceModeEnabled(napi_env env, void *data);
     static void NativeReportOttCallDetailsInfo(napi_env env, void *data);
     static void NativeReportOttCallEventInfo(napi_env env, void *data);
     static napi_value HandleAsyncWork(napi_env env, AsyncContext *context, std::string workName,

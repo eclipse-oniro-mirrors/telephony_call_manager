@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -1179,72 +1179,6 @@ int32_t CallManagerServiceProxy::IsImsSwitchEnabled(int32_t slotId)
     int32_t error = Remote()->SendRequest(INTERFACE_IS_VOLTE_ENABLED, dataParcel, replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("function IsImsSwitchEnabled failed! errCode:%{public}d", error);
-        return error;
-    }
-    return replyParcel.ReadInt32();
-}
-
-int32_t CallManagerServiceProxy::EnableLteEnhanceMode(int32_t slotId)
-{
-    MessageOption option;
-    MessageParcel dataParcel;
-    MessageParcel replyParcel;
-    if (!dataParcel.WriteInterfaceToken(CallManagerServiceProxy::GetDescriptor())) {
-        TELEPHONY_LOGE("write descriptor fail");
-        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
-    }
-    dataParcel.WriteInt32(slotId);
-    if (Remote() == nullptr) {
-        TELEPHONY_LOGE("function Remote() return nullptr!");
-        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
-    }
-    int32_t error = Remote()->SendRequest(INTERFACE_ENABLE_LTE_ENHANCE_MODE, dataParcel, replyParcel, option);
-    if (error != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("function EnableLteEnhanceMode failed! errCode:%{public}d", error);
-        return error;
-    }
-    return replyParcel.ReadInt32();
-}
-
-int32_t CallManagerServiceProxy::DisableLteEnhanceMode(int32_t slotId)
-{
-    MessageOption option;
-    MessageParcel dataParcel;
-    MessageParcel replyParcel;
-    if (!dataParcel.WriteInterfaceToken(CallManagerServiceProxy::GetDescriptor())) {
-        TELEPHONY_LOGE("write descriptor fail");
-        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
-    }
-    dataParcel.WriteInt32(slotId);
-    if (Remote() == nullptr) {
-        TELEPHONY_LOGE("function Remote() return nullptr!");
-        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
-    }
-    int32_t error = Remote()->SendRequest(INTERFACE_DISABLE_LTE_ENHANCE_MODE, dataParcel, replyParcel, option);
-    if (error != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("function DisableLteEnhanceMode failed! errCode:%{public}d", error);
-        return error;
-    }
-    return replyParcel.ReadInt32();
-}
-
-int32_t CallManagerServiceProxy::IsLteEnhanceModeEnabled(int32_t slotId)
-{
-    MessageOption option;
-    MessageParcel dataParcel;
-    MessageParcel replyParcel;
-    if (!dataParcel.WriteInterfaceToken(CallManagerServiceProxy::GetDescriptor())) {
-        TELEPHONY_LOGE("write descriptor fail");
-        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
-    }
-    dataParcel.WriteInt32(slotId);
-    if (Remote() == nullptr) {
-        TELEPHONY_LOGE("function Remote() return nullptr!");
-        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
-    }
-    int32_t error = Remote()->SendRequest(INTERFACE_IS_LTE_ENHANCE_MODE_ENABLED, dataParcel, replyParcel, option);
-    if (error != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("function IsLteEnhanceModeEnabled failed! errCode:%{public}d", error);
         return error;
     }
     return replyParcel.ReadInt32();

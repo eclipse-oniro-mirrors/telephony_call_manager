@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -327,7 +327,7 @@ int32_t CallStatusCallbackProxy::UpdateSetCallClirResult(const int32_t result)
     return replyParcel.ReadInt32();
 }
 
-int32_t CallStatusCallbackProxy::GetVoLteStatusResult(const LteImsSwitchResponse &switchResponse)
+int32_t CallStatusCallbackProxy::GetImsSwitchStatusResult(const ImsSwitchResponse &switchResponse)
 {
     MessageParcel dataParcel;
     MessageParcel replyParcel;
@@ -336,20 +336,20 @@ int32_t CallStatusCallbackProxy::GetVoLteStatusResult(const LteImsSwitchResponse
     if (!dataParcel.WriteInterfaceToken(CallStatusCallbackProxy::GetDescriptor())) {
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
-    int32_t length = sizeof(LteImsSwitchResponse);
+    int32_t length = sizeof(ImsSwitchResponse);
     dataParcel.WriteInt32(length);
     dataParcel.WriteRawData((const void *)&switchResponse, length);
     if (Remote() == nullptr) {
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    error = Remote()->SendRequest(GET_VOLTE_SWITCH_STATUS, dataParcel, replyParcel, option);
+    error = Remote()->SendRequest(GET_IMS_SWITCH_STATUS, dataParcel, replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     return replyParcel.ReadInt32();
 }
 
-int32_t CallStatusCallbackProxy::SetVoLteStatusResult(const LteImsSwitchResponse &switchResponse)
+int32_t CallStatusCallbackProxy::SetImsSwitchStatusResult(const ImsSwitchResponse &switchResponse)
 {
     MessageParcel dataParcel;
     MessageParcel replyParcel;
@@ -358,13 +358,13 @@ int32_t CallStatusCallbackProxy::SetVoLteStatusResult(const LteImsSwitchResponse
     if (!dataParcel.WriteInterfaceToken(CallStatusCallbackProxy::GetDescriptor())) {
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
-    int32_t length = sizeof(LteImsSwitchResponse);
+    int32_t length = sizeof(ImsSwitchResponse);
     dataParcel.WriteInt32(length);
     dataParcel.WriteRawData((const void *)&switchResponse, length);
     if (Remote() == nullptr) {
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    error = Remote()->SendRequest(SET_VOLTE_SWITCH_STATUS, dataParcel, replyParcel, option);
+    error = Remote()->SendRequest(SET_IMS_SWITCH_STATUS, dataParcel, replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }

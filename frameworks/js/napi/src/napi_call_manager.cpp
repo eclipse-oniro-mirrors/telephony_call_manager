@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -135,9 +135,6 @@ napi_value NapiCallManager::DeclareCallImsInterface(napi_env env, napi_value exp
         DECLARE_NAPI_FUNCTION("stopRTT", StopRTT),
         DECLARE_NAPI_FUNCTION("joinConference", JoinConference),
         DECLARE_NAPI_FUNCTION("updateImsCallMode", UpdateImsCallMode),
-        DECLARE_NAPI_FUNCTION("enableLteEnhanceMode", EnableLteEnhanceMode),
-        DECLARE_NAPI_FUNCTION("disableLteEnhanceMode", DisableLteEnhanceMode),
-        DECLARE_NAPI_FUNCTION("isLteEnhanceModeEnabled", IsLteEnhanceModeEnabled),
     };
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc));
     return exports;
@@ -1972,75 +1969,6 @@ napi_value NapiCallManager::UpdateImsCallMode(napi_env env, napi_callback_info i
         env, asyncContext.release(), "UpdateImsCallMode", NativeUpdateImsCallMode, NativeVoidCallBack);
 }
 
-napi_value NapiCallManager::EnableLteEnhanceMode(napi_env env, napi_callback_info info)
-{
-    GET_PARAMS(env, info, VALUE_MAXIMUM_LIMIT);
-    NAPI_ASSERT(env, argc < VALUE_MAXIMUM_LIMIT, "parameter error!");
-    bool matchFlag = NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_FIRST], napi_number);
-    NAPI_ASSERT(env, matchFlag, "Type error, should be number type");
-    auto asyncContext = std::make_unique<SupplementAsyncContext>();
-    if (asyncContext == nullptr) {
-        std::string errorCode = std::to_string(napi_generic_failure);
-        std::string errorMessage = "error at baseContext is nullptr";
-        NAPI_CALL(env, napi_throw_error(env, errorCode.c_str(), errorMessage.c_str()));
-        return nullptr;
-    }
-    napi_get_value_int32(env, argv[ARRAY_INDEX_FIRST], &asyncContext->slotId);
-    if (argc == TWO_VALUE_LIMIT) {
-        napi_create_reference(env, argv[ARRAY_INDEX_SECOND], DATA_LENGTH_ONE, &(asyncContext->callbackRef));
-    }
-    asyncContext->env = env;
-    napi_create_reference(env, thisVar, DATA_LENGTH_ONE, &(asyncContext->thisVar));
-    return HandleAsyncWork(
-        env, asyncContext.release(), "EnableLteEnhanceMode", NativeEnableLteEnhanceMode, NativeVoidCallBack);
-}
-
-napi_value NapiCallManager::DisableLteEnhanceMode(napi_env env, napi_callback_info info)
-{
-    GET_PARAMS(env, info, VALUE_MAXIMUM_LIMIT);
-    NAPI_ASSERT(env, argc < VALUE_MAXIMUM_LIMIT, "parameter error!");
-    bool matchFlag = NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_FIRST], napi_number);
-    NAPI_ASSERT(env, matchFlag, "Type error, should be number type");
-    auto asyncContext = std::make_unique<SupplementAsyncContext>();
-    if (asyncContext == nullptr) {
-        std::string errorCode = std::to_string(napi_generic_failure);
-        std::string errorMessage = "error at baseContext is nullptr";
-        NAPI_CALL(env, napi_throw_error(env, errorCode.c_str(), errorMessage.c_str()));
-        return nullptr;
-    }
-    napi_get_value_int32(env, argv[ARRAY_INDEX_FIRST], &asyncContext->slotId);
-    if (argc == TWO_VALUE_LIMIT) {
-        napi_create_reference(env, argv[ARRAY_INDEX_SECOND], DATA_LENGTH_ONE, &(asyncContext->callbackRef));
-    }
-    asyncContext->env = env;
-    napi_create_reference(env, thisVar, DATA_LENGTH_ONE, &(asyncContext->thisVar));
-    return HandleAsyncWork(
-        env, asyncContext.release(), "DisableLteEnhanceMode", NativeDisableLteEnhanceMode, NativeVoidCallBack);
-}
-
-napi_value NapiCallManager::IsLteEnhanceModeEnabled(napi_env env, napi_callback_info info)
-{
-    GET_PARAMS(env, info, VALUE_MAXIMUM_LIMIT);
-    NAPI_ASSERT(env, argc < VALUE_MAXIMUM_LIMIT, "parameter error!");
-    bool matchFlag = NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_FIRST], napi_number);
-    NAPI_ASSERT(env, matchFlag, "Type error, should be number type");
-    auto asyncContext = std::make_unique<SupplementAsyncContext>();
-    if (asyncContext == nullptr) {
-        std::string errorCode = std::to_string(napi_generic_failure);
-        std::string errorMessage = "error at baseContext is nullptr";
-        NAPI_CALL(env, napi_throw_error(env, errorCode.c_str(), errorMessage.c_str()));
-        return nullptr;
-    }
-    napi_get_value_int32(env, argv[ARRAY_INDEX_FIRST], &asyncContext->slotId);
-    if (argc == TWO_VALUE_LIMIT) {
-        napi_create_reference(env, argv[ARRAY_INDEX_SECOND], DATA_LENGTH_ONE, &(asyncContext->callbackRef));
-    }
-    asyncContext->env = env;
-    napi_create_reference(env, thisVar, DATA_LENGTH_ONE, &(asyncContext->thisVar));
-    return HandleAsyncWork(
-        env, asyncContext.release(), "IsLteEnhanceModeEnabled", NativeIsLteEnhanceModeEnabled, NativeDialCallBack);
-}
-
 napi_value NapiCallManager::ReportOttCallDetailsInfo(napi_env env, napi_callback_info info)
 {
     GET_PARAMS(env, info, VALUE_MAXIMUM_LIMIT);
@@ -3203,95 +3131,6 @@ void NapiCallManager::NativeUpdateImsCallMode(napi_env env, void *data)
     if (asyncContext->result != TELEPHONY_SUCCESS) {
         DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->UnRegisterUpdateCallMediaModeCallback();
         TELEPHONY_LOGE("UnRegisterUpdateCallMediaModeCallback failed!");
-        return;
-    }
-    asyncContext->callbackRef = nullptr;
-    asyncContext->deferred = nullptr;
-}
-
-void NapiCallManager::NativeEnableLteEnhanceMode(napi_env env, void *data)
-{
-    if (data == nullptr) {
-        TELEPHONY_LOGE("data is nullptr");
-        return;
-    }
-    auto asyncContext = (SupplementAsyncContext *)data;
-    EventCallback infoListener;
-    infoListener.env = asyncContext->env;
-    infoListener.thisVar = asyncContext->thisVar;
-    infoListener.callbackRef = asyncContext->callbackRef;
-    infoListener.deferred = asyncContext->deferred;
-    asyncContext->result =
-        DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->RegisterEnableLteEnhanceModeCallback(
-            infoListener);
-    if (asyncContext->result != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("RegisterEnableLteEnhanceModeCallback failed!");
-        return;
-    }
-    asyncContext->result =
-        DelayedSingleton<CallManagerClient>::GetInstance()->EnableLteEnhanceMode(asyncContext->slotId);
-    if (asyncContext->result != TELEPHONY_SUCCESS) {
-        DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->UnRegisterEnableLteEnhanceModeCallback();
-        TELEPHONY_LOGE("UnRegisterEnableLteEnhanceModeCallback failed!");
-        return;
-    }
-    asyncContext->callbackRef = nullptr;
-    asyncContext->deferred = nullptr;
-}
-
-void NapiCallManager::NativeDisableLteEnhanceMode(napi_env env, void *data)
-{
-    if (data == nullptr) {
-        TELEPHONY_LOGE("data is nullptr");
-        return;
-    }
-    auto asyncContext = (SupplementAsyncContext *)data;
-    EventCallback infoListener;
-    infoListener.env = asyncContext->env;
-    infoListener.thisVar = asyncContext->thisVar;
-    infoListener.callbackRef = asyncContext->callbackRef;
-    infoListener.deferred = asyncContext->deferred;
-    asyncContext->result =
-        DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->RegisterDisableLteEnhanceModeCallback(
-            infoListener);
-    if (asyncContext->result != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("RegisterEnableLteEnhanceModeCallback failed!");
-        return;
-    }
-    asyncContext->result =
-        DelayedSingleton<CallManagerClient>::GetInstance()->DisableLteEnhanceMode(asyncContext->slotId);
-    if (asyncContext->result != TELEPHONY_SUCCESS) {
-        DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->UnRegisterDisableLteEnhanceModeCallback();
-        TELEPHONY_LOGE("UnRegisterDisableLteEnhanceModeCallback failed!");
-        return;
-    }
-    asyncContext->callbackRef = nullptr;
-    asyncContext->deferred = nullptr;
-}
-
-void NapiCallManager::NativeIsLteEnhanceModeEnabled(napi_env env, void *data)
-{
-    if (data == nullptr) {
-        TELEPHONY_LOGE("data is nullptr");
-        return;
-    }
-    auto asyncContext = (SupplementAsyncContext *)data;
-    EventCallback infoListener;
-    infoListener.env = asyncContext->env;
-    infoListener.thisVar = asyncContext->thisVar;
-    infoListener.callbackRef = asyncContext->callbackRef;
-    infoListener.deferred = asyncContext->deferred;
-    asyncContext->result =
-        DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->RegisterGetLteEnhanceCallback(infoListener);
-    if (asyncContext->result != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("RegisterGetLteEnhanceCallback failed!");
-        return;
-    }
-    asyncContext->result =
-        DelayedSingleton<CallManagerClient>::GetInstance()->IsLteEnhanceModeEnabled(asyncContext->slotId);
-    if (asyncContext->result != TELEPHONY_SUCCESS) {
-        DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->UnRegisterGetLteEnhanceCallback();
-        TELEPHONY_LOGE("IsLteEnhanceModeEnabled failed!");
         return;
     }
     asyncContext->callbackRef = nullptr;

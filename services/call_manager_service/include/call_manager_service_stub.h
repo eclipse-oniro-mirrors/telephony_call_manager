@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -94,9 +94,6 @@ private:
     int32_t OnEnableVoLte(MessageParcel &data, MessageParcel &reply);
     int32_t OnDisableVoLte(MessageParcel &data, MessageParcel &reply);
     int32_t OnIsVoLteEnabled(MessageParcel &data, MessageParcel &reply);
-    int32_t OnEnableLteEnhanceMode(MessageParcel &data, MessageParcel &reply);
-    int32_t OnDisableEnhanceMode(MessageParcel &data, MessageParcel &reply);
-    int32_t OnIsLteEnhanceModeEnabled(MessageParcel &data, MessageParcel &reply);
     int32_t OnStartRtt(MessageParcel &data, MessageParcel &reply);
     int32_t OnStopRtt(MessageParcel &data, MessageParcel &reply);
     int32_t OnReportOttCallDetailsInfo(MessageParcel &data, MessageParcel &reply);

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -78,9 +78,6 @@ enum CallManagerSurfaceCode {
     INTERFACE_ENABLE_VOLTE,
     INTERFACE_DISABLE_VOLTE,
     INTERFACE_IS_VOLTE_ENABLED,
-    INTERFACE_ENABLE_LTE_ENHANCE_MODE,
-    INTERFACE_DISABLE_LTE_ENHANCE_MODE,
-    INTERFACE_IS_LTE_ENHANCE_MODE_ENABLED,
     INTERFACE_START_RTT,
     INTERFACE_STOP_RTT,
     INTERFACE_JOIN_CONFERENCE,
@@ -147,9 +144,6 @@ public:
     virtual int32_t EnableImsSwitch(int32_t slotId) = 0;
     virtual int32_t DisableImsSwitch(int32_t slotId) = 0;
     virtual int32_t IsImsSwitchEnabled(int32_t slotId) = 0;
-    virtual int32_t EnableLteEnhanceMode(int32_t slotId) = 0;
-    virtual int32_t DisableLteEnhanceMode(int32_t slotId) = 0;
-    virtual int32_t IsLteEnhanceModeEnabled(int32_t slotId) = 0;
     virtual int32_t StartRtt(int32_t callId, std::u16string &msg) = 0;
     virtual int32_t StopRtt(int32_t callId) = 0;
     virtual int32_t JoinConference(int32_t callId, std::vector<std::u16string> &numberList) = 0;

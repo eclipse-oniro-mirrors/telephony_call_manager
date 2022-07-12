@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -875,51 +875,6 @@ int32_t CallManagerProxy::IsImsSwitchEnabled(int32_t slotId)
     int32_t errCode = callManagerServicePtr_->IsImsSwitchEnabled(slotId);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("IsImsSwitchEnabled failed, errcode:%{public}d", errCode);
-        return errCode;
-    }
-    return TELEPHONY_SUCCESS;
-}
-
-int32_t CallManagerProxy::EnableLteEnhanceMode(int32_t slotId)
-{
-    if (ReConnectService() != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("ipc reconnect failed!");
-        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
-    }
-    std::lock_guard<std::mutex> lock(mutex_);
-    int32_t errCode = callManagerServicePtr_->EnableLteEnhanceMode(slotId);
-    if (errCode != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("EnableLteEnhanceMode failed, errcode:%{public}d", errCode);
-        return errCode;
-    }
-    return TELEPHONY_SUCCESS;
-}
-
-int32_t CallManagerProxy::DisableLteEnhanceMode(int32_t slotId)
-{
-    if (ReConnectService() != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("ipc reconnect failed!");
-        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
-    }
-    std::lock_guard<std::mutex> lock(mutex_);
-    int32_t errCode = callManagerServicePtr_->DisableLteEnhanceMode(slotId);
-    if (errCode != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("DisableLteEnhanceMode failed, errcode:%{public}d", errCode);
-        return errCode;
-    }
-    return TELEPHONY_SUCCESS;
-}
-
-int32_t CallManagerProxy::IsLteEnhanceModeEnabled(int32_t slotId)
-{
-    if (ReConnectService() != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("ipc reconnect failed!");
-        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
-    }
-    std::lock_guard<std::mutex> lock(mutex_);
-    int32_t errCode = callManagerServicePtr_->IsLteEnhanceModeEnabled(slotId);
-    if (errCode != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("GetLteEnhanceMode failed, errcode:%{public}d", errCode);
         return errCode;
     }
     return TELEPHONY_SUCCESS;

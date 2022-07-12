@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -624,31 +624,31 @@ int32_t CellularCallConnection::SetDeviceDirection(int32_t rotation)
     return TELEPHONY_SUCCESS;
 }
 
-int32_t CellularCallConnection::SetLteImsSwitchStatus(int32_t slotId, bool active)
+int32_t CellularCallConnection::SetImsSwitchStatus(int32_t slotId, bool active)
 {
     if (ReConnectService() != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     std::lock_guard<std::mutex> lock(mutex_);
-    int errCode = cellularCallInterfacePtr_->SetLteImsSwitchStatus(slotId, active);
+    int errCode = cellularCallInterfacePtr_->SetImsSwitchStatus(slotId, active);
     if (errCode != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("SetLteImsSwitchStatus failed, errcode:%{public}d", errCode);
+        TELEPHONY_LOGE("SetImsSwitchStatus failed, errcode:%{public}d", errCode);
         return errCode;
     }
     return TELEPHONY_SUCCESS;
 }
 
-int32_t CellularCallConnection::GetLteImsSwitchStatus(int32_t slotId)
+int32_t CellularCallConnection::GetImsSwitchStatus(int32_t slotId)
 {
     if (ReConnectService() != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     std::lock_guard<std::mutex> lock(mutex_);
-    int errCode = cellularCallInterfacePtr_->GetLteImsSwitchStatus(slotId);
+    int errCode = cellularCallInterfacePtr_->GetImsSwitchStatus(slotId);
     if (errCode != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("GetLteImsSwitchStatus failed, errcode:%{public}d", errCode);
+        TELEPHONY_LOGE("GetImsSwitchStatus failed, errcode:%{public}d", errCode);
         return errCode;
     }
     return TELEPHONY_SUCCESS;
@@ -693,7 +693,7 @@ int32_t CellularCallConnection::SetImsConfig(ImsConfigItem item, int32_t value, 
     std::lock_guard<std::mutex> lock(mutex_);
     int errCode = cellularCallInterfacePtr_->SetImsConfig(slotId, item, value);
     if (errCode != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("GetLteImsSwitchStatus failed, errcode:%{public}d", errCode);
+        TELEPHONY_LOGE("SetImsConfig failed, errcode:%{public}d", errCode);
         return errCode;
     }
     return TELEPHONY_SUCCESS;
@@ -739,36 +739,6 @@ int32_t CellularCallConnection::GetImsFeatureValue(FeatureType type, int32_t slo
     int errCode = cellularCallInterfacePtr_->GetImsFeatureValue(slotId, type);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("GetImsFeatureValue failed, errcode:%{public}d", errCode);
-        return errCode;
-    }
-    return TELEPHONY_SUCCESS;
-}
-
-int32_t CellularCallConnection::SetVolteEnhanceMode(bool value, int32_t slotId)
-{
-    if (ReConnectService() != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("ipc reconnect failed!");
-        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
-    }
-    std::lock_guard<std::mutex> lock(mutex_);
-    int errCode = cellularCallInterfacePtr_->SetImsSwitchEnhanceMode(slotId, value);
-    if (errCode != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("SetVolteEnhanceMode failed, errcode:%{public}d", errCode);
-        return errCode;
-    }
-    return TELEPHONY_SUCCESS;
-}
-
-int32_t CellularCallConnection::GetVolteEnhanceMode(int32_t slotId)
-{
-    if (ReConnectService() != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("ipc reconnect failed!");
-        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
-    }
-    std::lock_guard<std::mutex> lock(mutex_);
-    int errCode = cellularCallInterfacePtr_->GetImsSwitchEnhanceMode(slotId);
-    if (errCode != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("GetVolteEnhanceMode failed, errcode:%{public}d", errCode);
         return errCode;
     }
     return TELEPHONY_SUCCESS;

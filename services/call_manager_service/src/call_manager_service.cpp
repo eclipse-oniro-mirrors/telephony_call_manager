@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -700,36 +700,6 @@ int32_t CallManagerService::IsImsSwitchEnabled(int32_t slotId)
 {
     if (callControlManagerPtr_ != nullptr) {
         return callControlManagerPtr_->IsImsSwitchEnabled(slotId);
-    } else {
-        TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-}
-
-int32_t CallManagerService::EnableLteEnhanceMode(int32_t slotId)
-{
-    if (callControlManagerPtr_ != nullptr) {
-        return callControlManagerPtr_->SetLteEnhanceMode(slotId, true);
-    } else {
-        TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-}
-
-int32_t CallManagerService::DisableLteEnhanceMode(int32_t slotId)
-{
-    if (callControlManagerPtr_ != nullptr) {
-        return callControlManagerPtr_->SetLteEnhanceMode(slotId, false);
-    } else {
-        TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-}
-
-int32_t CallManagerService::IsLteEnhanceModeEnabled(int32_t slotId)
-{
-    if (callControlManagerPtr_ != nullptr) {
-        return callControlManagerPtr_->GetLteEnhanceMode(slotId);
     } else {
         TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;

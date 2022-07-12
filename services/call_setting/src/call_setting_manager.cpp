@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -171,7 +171,7 @@ int32_t CallSettingManager::EnableImsSwitch(int32_t slotId)
         TELEPHONY_LOGE("cellularCallConnectionPtr_ is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return cellularCallConnectionPtr_->SetLteImsSwitchStatus(slotId, true);
+    return cellularCallConnectionPtr_->SetImsSwitchStatus(slotId, true);
 }
 
 int32_t CallSettingManager::DisableImsSwitch(int32_t slotId)
@@ -180,7 +180,7 @@ int32_t CallSettingManager::DisableImsSwitch(int32_t slotId)
         TELEPHONY_LOGE("cellularCallConnectionPtr_ is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return cellularCallConnectionPtr_->SetLteImsSwitchStatus(slotId, false);
+    return cellularCallConnectionPtr_->SetImsSwitchStatus(slotId, false);
 }
 
 int32_t CallSettingManager::IsImsSwitchEnabled(int32_t slotId)
@@ -189,25 +189,7 @@ int32_t CallSettingManager::IsImsSwitchEnabled(int32_t slotId)
         TELEPHONY_LOGE("cellularCallConnectionPtr_ is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return cellularCallConnectionPtr_->GetLteImsSwitchStatus(slotId);
-}
-
-int32_t CallSettingManager::SetLteEnhanceMode(int32_t slotId, bool value)
-{
-    if (cellularCallConnectionPtr_ == nullptr) {
-        TELEPHONY_LOGE("cellularCallConnectionPtr_ is nullptr!");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-    return cellularCallConnectionPtr_->SetVolteEnhanceMode(value, slotId);
-}
-
-int32_t CallSettingManager::GetLteEnhanceMode(int32_t slotId)
-{
-    if (cellularCallConnectionPtr_ == nullptr) {
-        TELEPHONY_LOGE("cellularCallConnectionPtr_ is nullptr!");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-    return cellularCallConnectionPtr_->GetVolteEnhanceMode(slotId);
+    return cellularCallConnectionPtr_->GetImsSwitchStatus(slotId);
 }
 
 int32_t CallSettingManager::CallWaitingPolicy(int32_t slotId)

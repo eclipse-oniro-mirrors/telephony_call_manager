@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -524,33 +524,6 @@ public:
      * @return Returns 0 on success, others on failure.
      */
     int32_t IsImsSwitchEnabled(int32_t slotId) override;
-
-    /**
-     * EnableLteEnhanceMode
-     *
-     * @brief Setting 4G Lte Mode
-     * @param slotId[in], The slot id
-     * @return Returns 0 on success, others on failure.
-     */
-    int32_t EnableLteEnhanceMode(int32_t slotId) override;
-
-    /**
-     * DisableLteEnhanceMode
-     *
-     * @brief Setting 4G Lte Mode
-     * @param slotId[in], The slot id
-     * @return Returns 0 on success, others on failure.
-     */
-    int32_t DisableLteEnhanceMode(int32_t slotId) override;
-
-    /**
-     * GetLteEnhanceMode
-     *
-     * @brief Obtaining 4G Lte mode
-     * @param slotId[in], The slot id
-     * @return Returns 0 on success, others on failure.
-     */
-    int32_t IsLteEnhanceModeEnabled(int32_t slotId) override;
 
     /**
      * StartRtt

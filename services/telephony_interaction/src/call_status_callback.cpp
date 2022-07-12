@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -260,9 +260,9 @@ int32_t CallStatusCallback::UpdateSetCallClirResult(const int32_t result)
     return DelayedSingleton<CallAbilityReportProxy>::GetInstance()->ReportAsyncResults(reportId, resultInfo);
 }
 
-int32_t CallStatusCallback::GetVoLteStatusResult(const LteImsSwitchResponse &switchResponse)
+int32_t CallStatusCallback::GetImsSwitchStatusResult(const ImsSwitchResponse &switchResponse)
 {
-    TELEPHONY_LOGI("GetVoLteStatusResult result = %{public}d, active = %{public}d", switchResponse.result,
+    TELEPHONY_LOGI("GetImsSwitchStatusResult result = %{public}d, active = %{public}d", switchResponse.result,
         switchResponse.active);
     CallResultReportId reportId = CallResultReportId::GET_CALL_VOTLE_REPORT_ID;
     AppExecFwk::PacMap resultInfo;
@@ -271,9 +271,9 @@ int32_t CallStatusCallback::GetVoLteStatusResult(const LteImsSwitchResponse &swi
     return DelayedSingleton<CallAbilityReportProxy>::GetInstance()->ReportAsyncResults(reportId, resultInfo);
 }
 
-int32_t CallStatusCallback::SetVoLteStatusResult(const LteImsSwitchResponse &switchResponse)
+int32_t CallStatusCallback::SetImsSwitchStatusResult(const ImsSwitchResponse &switchResponse)
 {
-    TELEPHONY_LOGI("SetVoLteStatusResult result = %{public}d", switchResponse.result);
+    TELEPHONY_LOGI("SetImsSwitchStatusResult result = %{public}d", switchResponse.result);
     CallResultReportId reportId = CallResultReportId::SET_CALL_VOTLE_REPORT_ID;
     AppExecFwk::PacMap resultInfo;
     resultInfo.PutIntValue("result", switchResponse.result);

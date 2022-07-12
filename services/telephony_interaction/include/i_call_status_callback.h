@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -39,8 +39,8 @@ public:
     virtual int32_t UpdateGetCallClipResult(const ClipResponse &clipResponse) = 0;
     virtual int32_t UpdateGetCallClirResult(const ClirResponse &clirResponse) = 0;
     virtual int32_t UpdateSetCallClirResult(const int32_t result) = 0;
-    virtual int32_t GetVoLteStatusResult(const LteImsSwitchResponse &switchResponse) = 0;
-    virtual int32_t SetVoLteStatusResult(const LteImsSwitchResponse &switchResponse) = 0;
+    virtual int32_t GetImsSwitchStatusResult(const ImsSwitchResponse &switchResponse) = 0;
+    virtual int32_t SetImsSwitchStatusResult(const ImsSwitchResponse &switchResponse) = 0;
     virtual int32_t StartRttResult(const int32_t result) = 0;
     virtual int32_t StopRttResult(const int32_t result) = 0;
     virtual int32_t GetImsConfigResult(const GetImsConfigResponse &response) = 0;
@@ -72,8 +72,8 @@ public:
         UPDATE_GET_CALL_CLIP,
         UPDATE_GET_CALL_CLIR,
         UPDATE_SET_CALL_CLIR,
-        GET_VOLTE_SWITCH_STATUS,
-        SET_VOLTE_SWITCH_STATUS,
+        GET_IMS_SWITCH_STATUS,
+        SET_IMS_SWITCH_STATUS,
         UPDATE_STARTRTT_STATUS,
         UPDATE_STOPRTT_STATUS,
         GET_IMS_CONFIG,
