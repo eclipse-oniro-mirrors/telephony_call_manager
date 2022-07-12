@@ -19,6 +19,7 @@
 #include <memory>
 #include <string>
 
+#include "singleton.h"
 #include "unordered_map"
 
 #ifdef ABILITY_BLUETOOTH_SUPPORT
@@ -39,9 +40,8 @@ class BluetoothConnection : public OHOS::Bluetooth::HandsFreeAudioGatewayObserve
 #else
 class BluetoothConnection {
 #endif
+    DECLARE_DELAYED_SINGLETON(BluetoothConnection)
 public:
-    BluetoothConnection();
-    ~BluetoothConnection();
     void Init();
     bool ConnectBtSco();
     bool ConnectBtSco(const std::string &bluetoothAddress);
@@ -51,6 +51,8 @@ public:
     static void SetBtScoState(BtScoState state);
     int32_t SendBtCallState(int32_t numActive, int32_t numHeld, int32_t callState, const std::string &number);
     void RemoveBtDevice(const std::string &address);
+    bool IsBtAvailble();
+
 #ifdef ABILITY_BLUETOOTH_SUPPORT
     void OnScoStateChanged(const Bluetooth::BluetoothRemoteDevice &device, int32_t state) override;
     void OnConnectionStateChanged(const Bluetooth::BluetoothRemoteDevice &device, int32_t state) override;
