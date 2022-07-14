@@ -37,7 +37,10 @@ ohos_fuzztest("RejectCallFuzzTest") {
     "ability_base:want",
     "samgr_standard:samgr_proxy",
   ]
-
+  defines += [
+    "TELEPHONY_LOG_TAG = \"CallManagerFuzzTest\"",
+    "LOG_DOMAIN = 0xD000F00",
+  ]
   cflags = [
     "-g",
     "-O0",
