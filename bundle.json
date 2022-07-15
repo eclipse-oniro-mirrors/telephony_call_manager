@@ -44,7 +44,7 @@
                 "ipc",
                 "multimedia_audio_framework",
                 "relational_store",
-                "power_manager_native",
+                "power_manager",
                 "safwk",
                 "samgr_standard",
                 "sms_mms",
