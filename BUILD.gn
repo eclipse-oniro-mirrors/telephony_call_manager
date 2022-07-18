@@ -169,7 +169,7 @@ ohos_shared_library("tel_call_manager") {
     "multimedia_audio_framework:audio_client",
     "multimedia_audio_framework:audio_renderer",
     "multimedia_audio_framework:audio_ringtone_client",
-    "power_manager_native:powermgr_client",
+    "power_manager:powermgr_client",
     "relational_store:native_appdatafwk",
     "relational_store:native_dataability",
     "relational_store:native_rdb",
