@@ -58,7 +58,7 @@ void BluetoothConnection::Init()
 bool BluetoothConnection::ConnectBtSco()
 {
     if (btScoState_ == BtScoState::SCO_STATE_CONNECTED) {
-        TELEPHONY_LOGI("bluetooth sco is already connected");
+        TELEPHONY_LOGI("BluetoothConnection::ConnectBtSco bluetooth sco is already connected");
         return true;
     }
 #ifdef ABILITY_BLUETOOTH_SUPPORT
@@ -86,7 +86,7 @@ bool BluetoothConnection::ConnectBtSco()
     if (profile->SetActiveDevice(*device) && profile->ConnectSco()) {
         btScoState_ = BtScoState::SCO_STATE_CONNECTED;
         DelayedSingleton<AudioDeviceManager>::GetInstance()->ProcessEvent(AudioEvent::BLUETOOTH_SCO_CONNECTED);
-        TELEPHONY_LOGI("bluetooth sco is already connected");
+        TELEPHONY_LOGI("bluetooth sco connected successfully.");
         return true;
     }
 #endif
@@ -221,10 +221,9 @@ void BluetoothConnection::OnScoStateChanged(const Bluetooth::BluetoothRemoteDevi
     TELEPHONY_LOGI("BluetoothConnection::OnScoStateChanged state : %{public}d", state);
     switch (state) {
         case (int32_t)Bluetooth::HfpScoConnectState::SCO_CONNECTED:
-            if (connectedScoAddr_.empty()) {
-                connectedScoAddr_ = device.GetDeviceAddr();
-                BluetoothConnection::SetBtScoState(BtScoState::SCO_STATE_CONNECTED);
-            }
+            connectedScoAddr_ = device.GetDeviceAddr();
+            btScoState_ = BtScoState::SCO_STATE_CONNECTED;
+            DelayedSingleton<AudioDeviceManager>::GetInstance()->ProcessEvent(AudioEvent::BLUETOOTH_SCO_CONNECTED);
             break;
         case (int32_t)Bluetooth::HfpScoConnectState::SCO_DISCONNECTED:
             if (device.GetDeviceAddr() == connectedScoAddr_) {
@@ -282,10 +281,8 @@ void BluetoothConnection::OnConnectionStateChanged(const Bluetooth::BluetoothRem
             /** try to connect sco while new bluetooth device connected
              *  if connect sco successfully , should switch current audio device to bluetooth sco
              */
-            if (BluetoothConnection::GetBtScoState() == BtScoState::SCO_STATE_DISCONNECTED && IsAudioActivated() &&
-                ConnectBtSco(device)) {
-                connectedScoAddr_ = macAddress;
-                DelayedSingleton<AudioDeviceManager>::GetInstance()->ProcessEvent(AudioEvent::BLUETOOTH_SCO_CONNECTED);
+            if (BluetoothConnection::GetBtScoState() == BtScoState::SCO_STATE_DISCONNECTED && IsAudioActivated()) {
+                ConnectBtSco(device);
             }
             break;
         case (int32_t)Bluetooth::BTConnectState::DISCONNECTED:
