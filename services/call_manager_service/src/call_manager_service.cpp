@@ -766,7 +766,7 @@ sptr<IRemoteObject> CallManagerService::GetProxyObjectPtr(CallManagerProxyType p
     } else {
         switch (proxyType) {
             case PROXY_BLUETOOTH_CALL: {
-                sptr<BluetoothCallService> ptr = (std::make_unique<BluetoothCallService>()).release();
+                sptr<BluetoothCallService> ptr = new (std::nothrow) BluetoothCallService();
                 if (ptr == nullptr) {
                     TELEPHONY_LOGE("create BluetoothCallService object failed!");
                     return nullptr;
