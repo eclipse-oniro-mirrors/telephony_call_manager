@@ -73,7 +73,7 @@ int32_t CallManagerProxy::RegisterCallBack(std::unique_ptr<CallManagerCallback> 
         TELEPHONY_LOGE("callManagerServicePtr_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    callAbilityCallbackPtr_ = (std::make_unique<CallAbilityCallback>()).release();
+    callAbilityCallbackPtr_ = new (std::nothrow) CallAbilityCallback();
     if (callAbilityCallbackPtr_ == nullptr) {
         TELEPHONY_LOGE("create CallAbilityCallback object failed!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;

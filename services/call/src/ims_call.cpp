@@ -39,7 +39,7 @@ int32_t IMSCall::InitVideoCall()
         TELEPHONY_LOGI("video call initialize ok!");
         return TELEPHONY_SUCCESS;
     }
-    sptr<VideoCallState> state = (std::make_unique<AudioOnlyState>(this)).release();
+    sptr<VideoCallState> state = new (std::nothrow) AudioOnlyState(this);
     if (state == nullptr) {
         TELEPHONY_LOGE("null pointer");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
