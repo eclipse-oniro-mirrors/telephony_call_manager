@@ -40,7 +40,7 @@
                 "common_event_service",
                 "core_service",
                 "hdf_core",
-                "dmsfwk_standard",
+                "dmsfwk",
                 "ipc",
                 "multimedia_audio_framework",
                 "relational_store",
