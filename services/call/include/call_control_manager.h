@@ -23,13 +23,14 @@
 
 #include "pac_map.h"
 #include "singleton.h"
-
+#include "call_broadcast_subscriber.h"
 #include "call_setting_manager.h"
 #include "call_policy.h"
 #include "call_state_listener.h"
 #include "call_request_handler.h"
 #include "missed_call_notification.h"
 #include "incoming_call_wake_up.h"
+#include "system_ability_status_change_stub.h"
 
 /**
  * Singleton
@@ -110,12 +111,25 @@ private:
     int32_t BroadcastSubscriber();
 
 private:
+    class SystemAbilityListener : public SystemAbilityStatusChangeStub {
+    public:
+        explicit SystemAbilityListener(std::shared_ptr<CallBroadcastSubscriber> subscriberPtr);
+        ~SystemAbilityListener() = default;
+        void OnAddSystemAbility(int32_t systemAbilityId, const std::string &deviceId) override;
+        void OnRemoveSystemAbility(int32_t systemAbilityId, const std::string &deviceId) override;
+
+    private:
+        std::shared_ptr<CallBroadcastSubscriber> subscriberPtr_;
+    };
+
+private:
     std::unique_ptr<CallStateListener> callStateListenerPtr_;
     std::unique_ptr<CallRequestHandlerService> callRequestHandlerServicePtr_;
     // notify when incoming calls are ignored, not rejected or answered
     std::unique_ptr<IncomingCallWakeup> incomingCallWakeup_;
     std::unique_ptr<MissedCallNotification> missedCallNotification_;
     std::unique_ptr<CallSettingManager> callSettingManagerPtr_;
+    sptr<ISystemAbilityStatusChange> statusChangeListener_ = nullptr;
     DialParaInfo dialSrcInfo_;
     AppExecFwk::PacMap extras_;
     std::mutex mutex_;

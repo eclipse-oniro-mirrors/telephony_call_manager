@@ -29,10 +29,11 @@
 #include "call_state_broadcast.h"
 #include "call_state_report_proxy.h"
 #include "cellular_call_connection.h"
-#include "call_broadcast_subscriber.h"
 #include "call_records_manager.h"
 #include "call_number_utils.h"
 #include "reject_call_sms.h"
+#include "ims_call.h"
+#include "iservice_registry.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -46,7 +47,13 @@ CallControlManager::CallControlManager()
     dialSrcInfo_.isDialing = false;
 }
 
-CallControlManager::~CallControlManager() {}
+CallControlManager::~CallControlManager()
+{
+    if (statusChangeListener_ != nullptr) {
+        statusChangeListener_.clear();
+        statusChangeListener_ = nullptr;
+    }
+}
 
 bool CallControlManager::Init()
 {
@@ -939,20 +946,68 @@ int32_t CallControlManager::NumberLegalityCheck(std::string &number)
     return TELEPHONY_SUCCESS;
 }
 
+CallControlManager::SystemAbilityListener::SystemAbilityListener(std::shared_ptr<CallBroadcastSubscriber> subscriberPtr)
+    : subscriberPtr_(subscriberPtr)
+{}
+
+void CallControlManager::SystemAbilityListener::OnAddSystemAbility(int32_t systemAbilityId, const std::string &deviceId)
+{
+    if (systemAbilityId != COMMON_EVENT_SERVICE_ID) {
+        TELEPHONY_LOGE("systemAbilityId is not COMMON_EVENT_SERVICE_ID");
+        return;
+    }
+
+    if (subscriberPtr_ == nullptr) {
+        TELEPHONY_LOGE("CallControlManager::OnAddSystemAbility subscriberPtr is nullptr");
+        return;
+    }
+
+    bool subscribeResult = EventFwk::CommonEventManager::SubscribeCommonEvent(subscriberPtr_);
+    TELEPHONY_LOGI("CallControlManager::OnAddSystemAbility subscribeResult = %{public}d", subscribeResult);
+}
+
+void CallControlManager::SystemAbilityListener::OnRemoveSystemAbility(
+    int32_t systemAbilityId, const std::string &deviceId)
+{
+    if (systemAbilityId != COMMON_EVENT_SERVICE_ID) {
+        TELEPHONY_LOGE("systemAbilityId is not COMMON_EVENT_SERVICE_ID");
+        return;
+    }
+
+    if (subscriberPtr_ == nullptr) {
+        TELEPHONY_LOGE("CallControlManager::OnRemoveSystemAbility subscriberPtr is nullptr");
+        return;
+    }
+
+    bool subscribeResult = EventFwk::CommonEventManager::UnSubscribeCommonEvent(subscriberPtr_);
+    TELEPHONY_LOGI("CallControlManager::OnRemoveSystemAbility subscribeResult = %{public}d", subscribeResult);
+}
+
 int32_t CallControlManager::BroadcastSubscriber()
 {
     EventFwk::MatchingSkills matchingSkills;
     matchingSkills.AddEvent(SIM_STATE_UPDATE_ACTION);
     EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
-    std::shared_ptr<CallBroadcastSubscriber> subscriberPtr =
-        std::make_shared<CallBroadcastSubscriber>(subscriberInfo);
-    if (subscriberPtr != nullptr) {
-        bool subscribeResult = EventFwk::CommonEventManager::SubscribeCommonEvent(subscriberPtr);
-        if (!subscribeResult) {
-            TELEPHONY_LOGW("SubscribeCommonEvent failed");
-            return TELEPHONY_ERR_SUBSCRIBE_BROADCAST_FAIL;
-        }
+    std::shared_ptr<CallBroadcastSubscriber> subscriberPtr = std::make_shared<CallBroadcastSubscriber>(subscriberInfo);
+    if (subscriberPtr == nullptr) {
+        TELEPHONY_LOGE("CallControlManager::BroadcastSubscriber subscriberPtr is nullptr");
+        return TELEPHONY_ERROR;
     }
+    // if SubscribeCommonEvent fail, register statusChangeListener to SubscribeCommonEvent again
+    auto samgrProxy = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (samgrProxy == nullptr) {
+        TELEPHONY_LOGE("samgrProxy is nullptr");
+        return TELEPHONY_ERROR;
+    }
+
+    statusChangeListener_ = new (std::nothrow) SystemAbilityListener(subscriberPtr);
+    if (statusChangeListener_ == nullptr) {
+        TELEPHONY_LOGE("statusChangeListener_ is nullptr");
+        return TELEPHONY_ERROR;
+    }
+
+    int32_t ret = samgrProxy->SubscribeSystemAbility(COMMON_EVENT_SERVICE_ID, statusChangeListener_);
+    TELEPHONY_LOGI("CallControlManager::BroadcastSubscriber ret: %{public}d", ret);
     return TELEPHONY_SUCCESS;
 }
 

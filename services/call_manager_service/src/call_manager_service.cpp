@@ -124,6 +124,7 @@ void CallManagerService::OnStop()
             timeNow->tm_year + startTime_, timeNow->tm_mon + extraMonth_, timeNow->tm_mday, timeNow->tm_hour,
             timeNow->tm_min, timeNow->tm_sec);
     }
+    DelayedSingleton<CellularCallConnection>::GetInstance()->UnInit();
     state_ = ServiceRunningState::STATE_STOPPED;
 }
 
