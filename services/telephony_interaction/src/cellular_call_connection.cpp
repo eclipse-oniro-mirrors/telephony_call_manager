@@ -17,12 +17,10 @@
 
 #include <thread>
 
+#include "call_manager_errors.h"
 #include "iservice_registry.h"
 #include "system_ability.h"
 #include "system_ability_definition.h"
-
-#include "call_manager_errors.h"
-#include "cellular_call_death_recipient.h"
 #include "telephony_log_wrapper.h"
 
 namespace OHOS {
@@ -37,35 +35,46 @@ CellularCallConnection::CellularCallConnection()
 
 CellularCallConnection::~CellularCallConnection()
 {
-    unInit();
+    UnInit();
 }
 
 void CellularCallConnection::Init(int32_t systemAbilityId)
 {
-    systemAbilityId_ = systemAbilityId;
-    int32_t result = ConnectService();
-    if (result != TELEPHONY_SUCCESS) {
-#ifdef CELLULAR_SUPPORT
-        TELEPHONY_LOGE("connect service failed,errCode: %{public}X", result);
-        Timer::start(CONNECT_SERVICE_WAIT_TIME, CellularCallConnection::task);
-#endif
+    TELEPHONY_LOGI("CellularCallConnection Init start");
+    if (connectState_) {
+        TELEPHONY_LOGE("Init, connectState is true");
         return;
     }
+    systemAbilityId_ = systemAbilityId;
+    ConnectService();
+
+    statusChangeListener_ = new (std::nothrow) SystemAbilityListener();
+    if (statusChangeListener_ == nullptr) {
+        TELEPHONY_LOGE("Init, failed to create statusChangeListener.");
+        return;
+    }
+    auto managerPtr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (managerPtr == nullptr) {
+        TELEPHONY_LOGE("Init, get system ability manager error.");
+        return;
+    }
+    int32_t ret = managerPtr->SubscribeSystemAbility(systemAbilityId_, statusChangeListener_);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("Init, failed to subscribe sa:%{public}d", systemAbilityId_);
+        return;
+    }
+
     TELEPHONY_LOGI("connected to cellular call service successfully!");
 }
 
-void CellularCallConnection::unInit()
+void CellularCallConnection::UnInit()
 {
     DisconnectService();
 }
 
-void CellularCallConnection::task()
+bool CellularCallConnection::IsConnect() const
 {
-    int32_t ret = DelayedSingleton<CellularCallConnection>::GetInstance()->ConnectService();
-    if (ret != TELEPHONY_SUCCESS) {
-        return;
-    }
-    DelayedSingleton<CellularCallConnection>::GetInstance()->ThreadExit();
+    return connectState_;
 }
 
 int32_t CellularCallConnection::ConnectService()
@@ -87,20 +96,7 @@ int32_t CellularCallConnection::ConnectService()
     if (!cellularCallInterfacePtr) {
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    std::weak_ptr<CellularCallConnection> weakPtr = shared_from_this();
-    auto deathCallback = [weakPtr](const wptr<IRemoteObject> &object) {
-        auto sharedPtr = weakPtr.lock();
-        if (sharedPtr) {
-            sharedPtr->OnDeath();
-        }
-    };
-    cellularCallRecipient_ = (std::make_unique<CellularCallDeathRecipient>(deathCallback)).release();
-    if (cellularCallRecipient_ == nullptr) {
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-    if (!iRemoteObjectPtr->AddDeathRecipient(cellularCallRecipient_)) {
-        return TELEPHONY_ERR_ADD_DEATH_RECIPIENT_FAIL;
-    }
+
     cellularCallInterfacePtr_ = cellularCallInterfacePtr;
     int32_t ret = RegisterCallBackFun();
     if (ret != TELEPHONY_SUCCESS) {
@@ -150,45 +146,25 @@ int32_t CellularCallConnection::ReConnectService()
     return TELEPHONY_SUCCESS;
 }
 
-void CellularCallConnection::OnDeath()
-{
-    Clean();
-    NotifyDeath();
-}
-
 void CellularCallConnection::Clean()
 {
     Utils::UniqueWriteGuard<Utils::RWLock> guard(rwClientLock_);
-    if (cellularCallRecipient_ != nullptr) {
-        cellularCallRecipient_.clear();
-        cellularCallRecipient_ = nullptr;
-    }
     if (cellularCallInterfacePtr_ != nullptr) {
         cellularCallInterfacePtr_.clear();
         cellularCallInterfacePtr_ = nullptr;
     }
+
     if (cellularCallCallbackPtr_ != nullptr) {
         cellularCallCallbackPtr_.clear();
         cellularCallCallbackPtr_ = nullptr;
     }
-    connectState_ = false;
-}
 
-void CellularCallConnection::NotifyDeath()
-{
-    TELEPHONY_LOGI("service is dead, connect again");
-#ifdef RECONNECT_MAX_TRY_COUNT
-    for (uint32_t i = 0; i < CONNECT_MAX_TRY_COUNT; i++) {
-        std::this_thread::sleep_for(std::chrono::milliseconds(CONNECT_SERVICE_WAIT_TIME));
-        int32_t result = ConnectService();
-        if (result != TELEPHONY_SUCCESS) {
-            TELEPHONY_LOGI("connect cellular call service successfully");
-            return;
-        }
+    if (statusChangeListener_ != nullptr) {
+        statusChangeListener_.clear();
+        statusChangeListener_ = nullptr;
     }
-    TELEPHONY_LOGI("connect cellular call service failed");
-#endif
-    Timer::start(CONNECT_SERVICE_WAIT_TIME, CellularCallConnection::task);
+
+    connectState_ = false;
 }
 
 int CellularCallConnection::Dial(const CellularCallInfo &callInfo)
@@ -772,6 +748,52 @@ int32_t CellularCallConnection::SetMute(int32_t mute, int32_t slotId)
         return errCode;
     }
     return TELEPHONY_SUCCESS;
+}
+
+void CellularCallConnection::SystemAbilityListener::OnAddSystemAbility(
+    int32_t systemAbilityId, const std::string &deviceId)
+{
+    TELEPHONY_LOGI("SA:%{public}d is added!", systemAbilityId);
+    if (!CheckInputSysAbilityId(systemAbilityId)) {
+        TELEPHONY_LOGE("add SA:%{public}d is invalid!", systemAbilityId);
+        return;
+    }
+
+    auto cellularCallConnection = DelayedSingleton<CellularCallConnection>::GetInstance();
+    if (cellularCallConnection == nullptr) {
+        TELEPHONY_LOGE("cellularCallConnection is nullptr");
+        return;
+    }
+
+    if (cellularCallConnection->IsConnect()) {
+        TELEPHONY_LOGI("SA:%{public}d already connected!", systemAbilityId);
+        return;
+    }
+
+    cellularCallConnection->Clean();
+    int32_t res = cellularCallConnection->ReConnectService();
+    if (res != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("SA:%{public}d reconnect service failed!", systemAbilityId);
+        return;
+    }
+    TELEPHONY_LOGI("SA:%{public}d reconnect service successfully!", systemAbilityId);
+}
+
+void CellularCallConnection::SystemAbilityListener::OnRemoveSystemAbility(
+    int32_t systemAbilityId, const std::string &deviceId)
+{
+    TELEPHONY_LOGI("SA:%{public}d is removed!", systemAbilityId);
+    auto cellularCallConnection = DelayedSingleton<CellularCallConnection>::GetInstance();
+    if (cellularCallConnection == nullptr) {
+        TELEPHONY_LOGE("cellularCallConnection is nullptr");
+        return;
+    }
+
+    if (!cellularCallConnection->IsConnect()) {
+        return;
+    }
+
+    cellularCallConnection->Clean();
 }
 } // namespace Telephony
 } // namespace OHOS

@@ -18,24 +18,23 @@
 
 #include <mutex>
 
+#include "call_status_callback.h"
+#include "cellular_call_interface.h"
+#include "i_call_status_callback.h"
 #include "if_system_ability_manager.h"
 #include "refbase.h"
 #include "rwlock.h"
 #include "singleton.h"
-
-#include "call_status_callback.h"
-#include "cellular_call_interface.h"
-#include "i_call_status_callback.h"
-#include "timer.h"
+#include "system_ability_status_change_stub.h"
 
 namespace OHOS {
 namespace Telephony {
-class CellularCallConnection : public Timer, public std::enable_shared_from_this<CellularCallConnection> {
+class CellularCallConnection : public std::enable_shared_from_this<CellularCallConnection> {
     DECLARE_DELAYED_SINGLETON(CellularCallConnection)
 public:
     void Init(int32_t systemAbilityId);
-    void unInit();
-    static void task();
+    void UnInit();
+
     /**
      * Dial
      *
@@ -422,6 +421,13 @@ public:
      */
     int32_t SetMute(int32_t mute, int32_t slotId);
 
+    /**
+     * Is Connect cellular call service Object
+     *
+     * @return result for Connect cellular call service
+     */
+    bool IsConnect() const;
+
 private:
     int32_t ConnectService();
     int32_t RegisterCallBackFun();
@@ -432,10 +438,19 @@ private:
     void NotifyDeath();
 
 private:
+    class SystemAbilityListener : public SystemAbilityStatusChangeStub {
+    public:
+        SystemAbilityListener() = default;
+        ~SystemAbilityListener() = default;
+        void OnAddSystemAbility(int32_t systemAbilityId, const std::string &deviceId) override;
+        void OnRemoveSystemAbility(int32_t systemAbilityId, const std::string &deviceId) override;
+    };
+
+private:
     int32_t systemAbilityId_;
     sptr<ICallStatusCallback> cellularCallCallbackPtr_;
     sptr<CellularCallInterface> cellularCallInterfacePtr_;
-    sptr<IRemoteObject::DeathRecipient> cellularCallRecipient_;
+    sptr<ISystemAbilityStatusChange> statusChangeListener_ = nullptr;
     bool connectState_;
     Utils::RWLock rwClientLock_;
     std::mutex mutex_;

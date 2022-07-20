@@ -86,7 +86,6 @@ ohos_shared_library("tel_call_manager") {
     "services/telephony_interaction/src/call_status_callback.cpp",
     "services/telephony_interaction/src/call_status_callback_stub.cpp",
     "services/telephony_interaction/src/cellular_call_connection.cpp",
-    "services/telephony_interaction/src/cellular_call_death_recipient.cpp",
     "services/telephony_interaction/src/cellular_call_proxy.cpp",
     "services/telephony_interaction/src/core_service_connection.cpp",
     "services/telephony_interaction/src/report_call_info_handler.cpp",
