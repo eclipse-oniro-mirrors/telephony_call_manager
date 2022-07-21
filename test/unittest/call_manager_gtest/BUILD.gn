@@ -34,13 +34,11 @@ ohos_unittest("tel_call_manager_gtest") {
 
   configs = [ "//base/telephony/core_service/utils:telephony_log_config" ]
 
-  deps = [
-    "//third_party/googletest:gtest_main",
-    "//utils/native/base:utils",
-  ]
+  deps = [ "//third_party/googletest:gtest_main" ]
 
   external_deps = [
     "ability_base:want",
+    "c_utils:utils",
     "common_event_service:cesfwk_innerkits",
     "core_service:tel_core_service_api",
     "eventhandler:libeventhandler",

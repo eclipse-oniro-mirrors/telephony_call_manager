@@ -27,13 +27,12 @@ ohos_fuzztest("DialCallFuzzTest") {
 
   configs = [ "//base/telephony/core_service/utils:telephony_log_config" ]
 
-  deps = [
-    "//base/telephony/call_manager/frameworks/native:tel_call_manager_api",
-    "//utils/native/base:utils",
-  ]
+  deps =
+      [ "//base/telephony/call_manager/frameworks/native:tel_call_manager_api" ]
 
   external_deps = [
     "ability_base:want",
+    "c_utils:utils",
     "samgr_standard:samgr_proxy",
   ]
   defines += [
