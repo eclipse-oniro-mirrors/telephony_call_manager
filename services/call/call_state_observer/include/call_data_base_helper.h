@@ -31,28 +31,28 @@
 
 namespace OHOS {
 namespace Telephony {
-const std::string CALL_PHONE_NUMBER = "phone_number";
-const std::string CALL_DISPLAY_NAME = "display_name";
-const std::string CALL_DIRECTION = "call_direction";
-const std::string CALL_VOICEMAIL_URI = "voicemail_uri";
-const std::string CALL_SIM_TYPE = "sim_type";
-const std::string CALL_IS_HD = "is_hd";
-const std::string CALL_IS_READ = "is_read";
-const std::string CALL_RING_DURATION = "ring_duration";
-const std::string CALL_TALK_DURATION = "talk_duration";
-const std::string CALL_FORMAT_NUMBER = "format_number";
-const std::string CALL_QUICKSEARCH_KEY = "quicksearch_key";
-const std::string CALL_NUMBER_TYPE = "number_type";
-const std::string CALL_NUMBER_TYPE_NAME = "number_type_name";
-const std::string CALL_BEGIN_TIME = "begin_time";
-const std::string CALL_END_TIME = "end_time";
-const std::string CALL_ANSWER_STATE = "answer_state";
-const std::string CALL_CREATE_TIME = "create_time";
-const std::string CALL_NUMBER_LOCATION = "number_location";
-const std::string CALL_PHOTO_ID = "photo_id";
-const std::string CALL_DETAIL_INFO = "detail_info";
-const std::string CALL_CONTENT_TYPE = "content_type";
-const std::string CALL_PHONE = "phone";
+constexpr const char *CALL_PHONE_NUMBER = "phone_number";
+constexpr const char *CALL_DISPLAY_NAME = "display_name";
+constexpr const char *CALL_DIRECTION = "call_direction";
+constexpr const char *CALL_VOICEMAIL_URI = "voicemail_uri";
+constexpr const char *CALL_SIM_TYPE = "sim_type";
+constexpr const char *CALL_IS_HD = "is_hd";
+constexpr const char *CALL_IS_READ = "is_read";
+constexpr const char *CALL_RING_DURATION = "ring_duration";
+constexpr const char *CALL_TALK_DURATION = "talk_duration";
+constexpr const char *CALL_FORMAT_NUMBER = "format_number";
+constexpr const char *CALL_QUICKSEARCH_KEY = "quicksearch_key";
+constexpr const char *CALL_NUMBER_TYPE = "number_type";
+constexpr const char *CALL_NUMBER_TYPE_NAME = "number_type_name";
+constexpr const char *CALL_BEGIN_TIME = "begin_time";
+constexpr const char *CALL_END_TIME = "end_time";
+constexpr const char *CALL_ANSWER_STATE = "answer_state";
+constexpr const char *CALL_CREATE_TIME = "create_time";
+constexpr const char *CALL_NUMBER_LOCATION = "number_location";
+constexpr const char *CALL_PHOTO_ID = "photo_id";
+constexpr const char *CALL_DETAIL_INFO = "detail_info";
+constexpr const char *CALL_CONTENT_TYPE = "content_type";
+constexpr const char *CALL_PHONE = "phone";
 
 class CallDataRdbObserver : public AAFwk::DataAbilityObserverStub {
 public:

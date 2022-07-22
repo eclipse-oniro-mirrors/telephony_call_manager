@@ -25,7 +25,7 @@
 
 namespace OHOS {
 namespace Telephony {
-const std::string SIM_STATE_UPDATE_ACTION = "com.hos.action.SIM_STATE_CHANGED";
+constexpr const char *SIM_STATE_UPDATE_ACTION = "com.hos.action.SIM_STATE_CHANGED";
 class CallBroadcastSubscriber : public EventFwk::CommonEventSubscriber {
 public:
     explicit CallBroadcastSubscriber(const EventFwk::CommonEventSubscribeInfo &subscriberInfo);
