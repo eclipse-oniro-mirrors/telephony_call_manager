@@ -39,7 +39,8 @@ int32_t AudioProxy::SetAudioDeviceChangeCallback()
         TELEPHONY_LOGE("device callback nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return AudioStandard::AudioSystemManager::GetInstance()->SetDeviceChangeCallback(deviceCallback_);
+    return AudioStandard::AudioSystemManager::GetInstance()->SetDeviceChangeCallback(
+        AudioStandard::DeviceFlag::ALL_DEVICES_FLAG, deviceCallback_);
 }
 
 bool AudioProxy::SetBluetoothDevActive()
