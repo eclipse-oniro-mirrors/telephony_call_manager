@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -45,7 +45,7 @@ CallAbilityReportProxy::~CallAbilityReportProxy()
 }
 
 int32_t CallAbilityReportProxy::RegisterCallBack(
-    sptr<ICallAbilityCallback> callAbilityCallbackPtr, std::string &bundleName)
+    sptr<ICallAbilityCallback> callAbilityCallbackPtr, const std::string &bundleName)
 {
     if (callAbilityCallbackPtr == nullptr) {
         TELEPHONY_LOGE("callAbilityCallbackPtr is null");
@@ -67,7 +67,7 @@ int32_t CallAbilityReportProxy::RegisterCallBack(
     return TELEPHONY_SUCCESS;
 }
 
-int32_t CallAbilityReportProxy::UnRegisterCallBack(std::string &bundleName)
+int32_t CallAbilityReportProxy::UnRegisterCallBack(const std::string &bundleName)
 {
     if (callbackPtrList_.empty()) {
         TELEPHONY_LOGE("callbackPtrList_ is null! %{public}s UnRegisterCallBack failed", bundleName.c_str());
