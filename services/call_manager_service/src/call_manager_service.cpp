@@ -173,31 +173,20 @@ std::string CallManagerService::GetStartServiceSpent()
 
 int32_t CallManagerService::RegisterCallBack(const sptr<ICallAbilityCallback> &callback)
 {
-    int32_t uid = IPCSkeleton::GetCallingUid();
-    std::string bundleName = "";
-    TelephonyPermission::GetBundleNameByUid(uid, bundleName);
-    if (bundleName.empty()) {
-        bundleName.append(std::to_string(uid));
-        bundleName.append(std::to_string(IPCSkeleton::GetCallingPid()));
-    } else {
-        if (CheckBundleName(bundleName) != TELEPHONY_SUCCESS) {
-            TELEPHONY_LOGE("%{public}s no permission to register callback", bundleName.c_str());
-            return TELEPHONY_ERR_PERMISSION_ERR;
-        }
+    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_SET_TELEPHONY_STATE)) {
+        TELEPHONY_LOGE("Permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
     }
-    return DelayedSingleton<CallAbilityReportProxy>::GetInstance()->RegisterCallBack(callback, bundleName);
+    return DelayedSingleton<CallAbilityReportProxy>::GetInstance()->RegisterCallBack(callback, GetBundleName());
 }
 
 int32_t CallManagerService::UnRegisterCallBack()
 {
-    int32_t uid = IPCSkeleton::GetCallingUid();
-    std::string bundleName = "";
-    TelephonyPermission::GetBundleNameByUid(uid, bundleName);
-    if (bundleName.empty()) {
-        bundleName.append(std::to_string(uid));
-        bundleName.append(std::to_string(IPCSkeleton::GetCallingPid()));
+    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_SET_TELEPHONY_STATE)) {
+        TELEPHONY_LOGE("Permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
     }
-    return DelayedSingleton<CallAbilityReportProxy>::GetInstance()->UnRegisterCallBack(bundleName);
+    return DelayedSingleton<CallAbilityReportProxy>::GetInstance()->UnRegisterCallBack(GetBundleName());
 }
 
 int32_t CallManagerService::DialCall(std::u16string number, AppExecFwk::PacMap &extras)
@@ -785,17 +774,16 @@ sptr<IRemoteObject> CallManagerService::GetProxyObjectPtr(CallManagerProxyType p
     return nullptr;
 }
 
-int32_t CallManagerService::CheckBundleName(std::string bundleName)
+std::string CallManagerService::GetBundleName()
 {
-    std::string bundleNameList[] = {
-        "com.ohos.callui",
-    };
-    for (int32_t i = 0; i < end(bundleNameList) - begin(bundleNameList); i++) {
-        if (strcmp(bundleName.c_str(), bundleNameList[i].c_str()) == 0) {
-            return TELEPHONY_SUCCESS;
-        }
+    int32_t uid = IPCSkeleton::GetCallingUid();
+    std::string bundleName = "";
+    TelephonyPermission::GetBundleNameByUid(uid, bundleName);
+    if (bundleName.empty()) {
+        bundleName.append(std::to_string(uid));
+        bundleName.append(std::to_string(IPCSkeleton::GetCallingPid()));
     }
-    return TELEPHONY_ERROR;
+    return bundleName;
 }
 } // namespace Telephony
 } // namespace OHOS
