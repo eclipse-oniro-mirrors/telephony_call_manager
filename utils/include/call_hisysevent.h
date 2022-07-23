@@ -20,14 +20,14 @@
 
 namespace OHOS {
 namespace Telephony {
-static const std::string DOMAIN_CALL_MANAGER = "CALL_MANAGER";
+static constexpr const char *DOMAIN_CALL_MANAGER = "CALL_MANAGER";
 // EVENT
-static const std::string CALL_STATE_CHANGED_EVENT = "CALL_STATE";
+static constexpr const char *CALL_STATE_CHANGED_EVENT = "CALL_STATE";
 
 // KEY
-static const std::string CALL_STATE_KEY = "STATE";
-static const std::string SLOT_ID_KEY = "SLOT_ID";
-static const std::string INDEX_ID_KEY = "INDEX_ID";
+static constexpr const char *CALL_STATE_KEY = "STATE";
+static constexpr const char *SLOT_ID_KEY = "SLOT_ID";
+static constexpr const char *INDEX_ID_KEY = "INDEX_ID";
 
 class CallHisysevent {
 public:
