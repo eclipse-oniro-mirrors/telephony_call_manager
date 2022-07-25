@@ -609,7 +609,7 @@ public:
     sptr<IRemoteObject> GetProxyObjectPtr(CallManagerProxyType proxyType) override;
 
 private:
-    int32_t CheckBundleName(std::string bundleName);
+    std::string GetBundleName();
 
 private:
     enum ServiceRunningState {
