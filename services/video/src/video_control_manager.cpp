@@ -161,7 +161,7 @@ bool VideoControlManager::IsPngFile(std::string fileName)
 
 bool VideoControlManager::CheckWindow(VideoWindow &window)
 {
-    if (window == nullptr) {
+    if (this.window == nullptr) {
         return false;
     }
     if (window.width <= 0 || window.height <= 0) {
