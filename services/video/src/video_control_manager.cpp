@@ -53,6 +53,9 @@ int32_t VideoControlManager::ControlCamera(std::u16string cameraId, int32_t call
 
 int32_t VideoControlManager::SetPreviewWindow(VideoWindow &window)
 {
+    if (CheckWindow(window)) {
+        return DelayedSingleton<CellularCallConnection>::GetInstance()->SetPreviewWindow(window);
+    }
     return CALL_ERR_VIDEO_INVALID_COORDINATES;
 }
 
@@ -158,6 +161,9 @@ bool VideoControlManager::IsPngFile(std::string fileName)
 
 bool VideoControlManager::CheckWindow(VideoWindow &window)
 {
+    if (window == nullptr) {
+        return false ;
+    }
     if (window.width <= 0 || window.height <= 0) {
         TELEPHONY_LOGE("width or height value error");
         return false;
