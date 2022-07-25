@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -30,8 +30,8 @@ class CallAbilityReportProxy : public CallStateListenerBase,
                                public std::enable_shared_from_this<CallAbilityReportProxy> {
     DECLARE_DELAYED_SINGLETON(CallAbilityReportProxy)
 public:
-    int32_t RegisterCallBack(sptr<ICallAbilityCallback> callback, std::string &bundleName);
-    int32_t UnRegisterCallBack(std::string &bundleName);
+    int32_t RegisterCallBack(sptr<ICallAbilityCallback> callback, const std::string &bundleName);
+    int32_t UnRegisterCallBack(const std::string &bundleName);
     void CallStateUpdated(sptr<CallBase> &callObjectPtr, TelCallState priorState, TelCallState nextState) override;
     void CallEventUpdated(CallEventInfo &info) override;
     void CallDestroyed(int32_t cause) override;
