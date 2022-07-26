@@ -155,9 +155,6 @@ bool VideoControlManager::IsPngFile(std::string fileName)
 
 bool VideoControlManager::CheckWindow(VideoWindow &window)
 {
-    if (window.empty()) {
-        return false;
-    }
     if (window.width <= 0 || window.height <= 0) {
         TELEPHONY_LOGE("width or height value error");
         return false;
