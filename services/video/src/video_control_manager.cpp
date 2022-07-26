@@ -58,9 +58,6 @@ int32_t VideoControlManager::SetPreviewWindow(VideoWindow &window)
 
 int32_t VideoControlManager::SetDisplayWindow(VideoWindow &window)
 {
-    if (CheckWindow(window)) {
-        return DelayedSingleton<CellularCallConnection>::GetInstance()->SetDisplayWindow(window);
-    }
     return CALL_ERR_VIDEO_INVALID_COORDINATES;
 }
 
