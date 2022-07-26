@@ -53,17 +53,11 @@ int32_t VideoControlManager::ControlCamera(std::u16string cameraId, int32_t call
 
 int32_t VideoControlManager::SetPreviewWindow(VideoWindow &window)
 {
-    if (CheckWindow(window)) {
-        return DelayedSingleton<CellularCallConnection>::GetInstance()->SetPreviewWindow(window);
-    }
     return CALL_ERR_VIDEO_INVALID_COORDINATES;
 }
 
 int32_t VideoControlManager::SetDisplayWindow(VideoWindow &window)
 {
-    if (CheckWindow(window)) {
-        return DelayedSingleton<CellularCallConnection>::GetInstance()->SetDisplayWindow(window);
-    }
     return CALL_ERR_VIDEO_INVALID_COORDINATES;
 }
 
