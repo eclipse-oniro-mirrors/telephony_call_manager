@@ -18,7 +18,7 @@ config("call_manager_js_config") {
   include_dirs = [
     "//third_party/node/src",
     "$SUBSYSTEM_DIR/call_manager/frameworks/js/napi/include",
-    "//utils/native/base/include",
+    "//commonlibrary/c_utils/base/include",
   ]
 }
 
@@ -37,13 +37,13 @@ ohos_shared_library("call") {
   deps = [
     "//foundation/arkui/napi:ace_napi",
     "//third_party/libuv:uv_static",
-    "//utils/native/base:utils",
   ]
 
   external_deps = [
     "ability_base:want",
     "bundle_framework:appexecfwk_base",
     "bundle_framework:appexecfwk_core",
+    "c_utils:utils",
     "call_manager:tel_call_manager_api",
     "core_service:tel_core_service_api",
     "eventhandler:libeventhandler",

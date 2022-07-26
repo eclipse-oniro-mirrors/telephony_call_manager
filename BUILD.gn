@@ -152,13 +152,13 @@ ohos_shared_library("tel_call_manager") {
     "//drivers/peripheral/camera/interfaces/metadata:metadata",
     "//foundation/multimedia/camera_standard/frameworks/native/camera:camera_framework",
     "//third_party/libphonenumber/cpp:phonenumber_standard",
-    "//utils/native/base:utils",
   ]
 
   external_deps = [
     "ability_base:configuration",
     "ability_base:want",
     "ability_base:zuri",
+    "c_utils:utils",
     "common_event_service:cesfwk_innerkits",
     "core_service:tel_core_service_api",
     "eventhandler:libeventhandler",
