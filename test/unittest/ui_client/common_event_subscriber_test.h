@@ -26,9 +26,6 @@ public:
     explicit CommonEventSubscriberTest(const OHOS::EventFwk::CommonEventSubscribeInfo &subscriberInfo);
     ~CommonEventSubscriberTest() = default;
     virtual void OnReceiveEvent(const OHOS::EventFwk::CommonEventData &data);
-
-private:
-    const std::string COMMON_EVENT_INCOMING_CALL_MISSED = "usual.event.INCOMING_CALL_MISSED";
 };
 } // namespace Telephony
 } // namespace OHOS

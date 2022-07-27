@@ -21,6 +21,7 @@
 
 namespace OHOS {
 namespace Telephony {
+using namespace OHOS::EventFwk;
 CallRecordingTone::CallRecordingTone(const EventFwk::CommonEventSubscribeInfo &subscriberInfo)
     : CommonEventSubscriber(subscriberInfo), isRecording_(false)
 {}
@@ -28,7 +29,7 @@ CallRecordingTone::CallRecordingTone(const EventFwk::CommonEventSubscribeInfo &s
 void CallRecordingTone::OnReceiveEvent(const EventFwk::CommonEventData &data)
 {
     EventFwk::Want want = data.GetWant();
-    if (want.GetAction() == CALL_RECORDING_ACTION) {
+    if (want.GetAction() == EventFwk::CommonEventSupport::COMMON_EVENT_CALL_RECORDING_CHANGED) {
         want.GetBoolParam("isRecording", false) ? PlayRecordingTone() : StopRecordingTone();
     }
 }

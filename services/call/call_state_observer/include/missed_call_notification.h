@@ -39,7 +39,6 @@ private:
     static constexpr int16_t INCOMING_CALL_MISSED_ID = 0;
     static constexpr int16_t INCOMING_CALL_MISSED_CODE = 0;
     const std::string INCOMING_CALL_MISSED_TITLE = "Missed Call";
-    const std::string COMMON_EVENT_INCOMING_CALL_MISSED = "usual.event.MISSED_CALLS";
     void PublishMissedCallEvent(sptr<CallBase> &callObjectPtr);
     void PublishMissedCallNotification(sptr<CallBase> &callObjectPtr);
 };

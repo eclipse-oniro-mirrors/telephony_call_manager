@@ -15,15 +15,16 @@
 
 #include "call_state_broadcast.h"
 
-#include "want.h"
-#include "common_event_support.h"
 #include "common_event.h"
 #include "common_event_manager.h"
-
+#include "common_event_support.h"
 #include "telephony_log_wrapper.h"
+#include "telephony_permission.h"
+#include "want.h"
 
 namespace OHOS {
 namespace Telephony {
+using namespace OHOS::EventFwk;
 void CallStateBroadcast::CallStateUpdated(
     sptr<CallBase> &callObjectPtr, TelCallState priorState, TelCallState nextState)
 {
@@ -36,18 +37,11 @@ void CallStateBroadcast::CallStateUpdated(
 
 void CallStateBroadcast::PublishCallStateEvent(sptr<CallBase> &callObjectPtr, int32_t priorState, int32_t nextState)
 {
-#ifdef ABILITY_STATE_NOTIFICATION_SUPPORT
     AAFwk::Want want;
     want.SetParam("callId", callObjectPtr->GetCallID());
     want.SetParam("priorState", priorState);
     want.SetParam("nextState", nextState);
-    want.SetParam("phoneNumber", callObjectPtr->GetAccountNumber());
-#ifdef ABILITY_NOTIFICATION_SUPPORT
-    want.SetAction(CommonEventSupport::COMMON_EVENT_CALL_STATE_UPDATED);
-#endif
-#ifndef ABILITY_NOTIFICATION_SUPPORT
-    want.SetAction(COMMON_EVENT_CALL_STATE_UPDATED);
-#endif
+    want.SetAction(EventFwk::CommonEventSupport::COMMON_EVENT_CALL_STATE_UPDATED);
     EventFwk::CommonEventData data;
     data.SetWant(want);
     data.SetCode(CALL_STATE_UPDATED_CODE);
@@ -55,7 +49,17 @@ void CallStateBroadcast::PublishCallStateEvent(sptr<CallBase> &callObjectPtr, in
     publishInfo.SetOrdered(true);
     bool result = EventFwk::CommonEventManager::PublishCommonEvent(data, publishInfo, nullptr);
     TELEPHONY_LOGI("publish call state event result : %{public}d", result);
-#endif
+
+    AAFwk::Want wantWithNumber = want;
+    wantWithNumber.SetParam("phoneNumber", callObjectPtr->GetAccountNumber());
+    EventFwk::CommonEventData dataWithNumber;
+    dataWithNumber.SetWant(wantWithNumber);
+    dataWithNumber.SetCode(CALL_STATE_UPDATED_CODE);
+    std::vector<std::string> callPermissions;
+    callPermissions.emplace_back(Permission::GET_TELEPHONY_STATE);
+    publishInfo.SetSubscriberPermissions(callPermissions);
+    bool resultWithNumber = EventFwk::CommonEventManager::PublishCommonEvent(data, publishInfo, nullptr);
+    TELEPHONY_LOGI("publish call state event with number result : %{public}d", resultWithNumber);
 }
 
 void CallStateBroadcast::NewCallCreated(sptr<CallBase> &callObjectPtr) {}

@@ -21,6 +21,7 @@
 
 namespace OHOS {
 namespace Telephony {
+using namespace OHOS::EventFwk;
 constexpr int16_t DEFAULT_MISSED_CALL_NOTIFICATION_ID = 0;
 
 CommonEventSubscriberTest::CommonEventSubscriberTest(const OHOS::EventFwk::CommonEventSubscribeInfo &subscriberInfo)
@@ -31,7 +32,7 @@ void CommonEventSubscriberTest::OnReceiveEvent(const OHOS::EventFwk::CommonEvent
 {
     OHOS::EventFwk::Want want = data.GetWant();
     std::string action = want.GetAction();
-    if (action == COMMON_EVENT_INCOMING_CALL_MISSED) {
+    if (action == EventFwk::CommonEventSupport::COMMON_EVENT_INCOMING_CALL_MISSED) {
         TELEPHONY_LOGI("receive action : INCOMING_CALL_MISSED");
         int32_t id = want.GetIntParam("notificationId", DEFAULT_MISSED_CALL_NOTIFICATION_ID);
         TELEPHONY_LOGI("missed call notification id : %{public}d", id);

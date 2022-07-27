@@ -37,6 +37,7 @@
 
 namespace OHOS {
 namespace Telephony {
+using namespace OHOS::EventFwk;
 CallControlManager::CallControlManager()
     : callStateListenerPtr_(nullptr), callRequestHandlerServicePtr_(nullptr), incomingCallWakeup_(nullptr),
       missedCallNotification_(nullptr), callSettingManagerPtr_(nullptr)
@@ -986,7 +987,7 @@ void CallControlManager::SystemAbilityListener::OnRemoveSystemAbility(
 int32_t CallControlManager::BroadcastSubscriber()
 {
     EventFwk::MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(SIM_STATE_UPDATE_ACTION);
+    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_SIM_STATE_CHANGED);
     EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
     std::shared_ptr<CallBroadcastSubscriber> subscriberPtr = std::make_shared<CallBroadcastSubscriber>(subscriberInfo);
     if (subscriberPtr == nullptr) {

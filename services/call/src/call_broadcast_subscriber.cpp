@@ -22,6 +22,7 @@
 
 namespace OHOS {
 namespace Telephony {
+using namespace OHOS::EventFwk;
 CallBroadcastSubscriber::CallBroadcastSubscriber(const OHOS::EventFwk::CommonEventSubscribeInfo &subscriberInfo)
     : CommonEventSubscriber(subscriberInfo)
 {
@@ -35,7 +36,7 @@ void CallBroadcastSubscriber::OnReceiveEvent(const EventFwk::CommonEventData &da
     OHOS::EventFwk::Want want = data.GetWant();
     std::string action = data.GetWant().GetAction();
     TELEPHONY_LOGI("receive one broadcast:%{public}s", action.c_str());
-    if (action == SIM_STATE_UPDATE_ACTION) {
+    if (action == EventFwk::CommonEventSupport::COMMON_EVENT_SIM_STATE_CHANGED) {
         code = SIM_STATE_BROADCAST_EVENT;
     } else {
         code = UNKNOWN_BROADCAST_EVENT;

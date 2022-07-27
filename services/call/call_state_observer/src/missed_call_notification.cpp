@@ -15,20 +15,21 @@
 
 #include "missed_call_notification.h"
 
-#include "notification_normal_content.h"
-#include "notification_helper.h"
-#include "notification_content.h"
-#include "notification_request.h"
-#include "common_event_support.h"
-#include "common_event_manager.h"
-#include "common_event.h"
-#include "want.h"
-
 #include "call_manager_errors.h"
+#include "common_event.h"
+#include "common_event_manager.h"
+#include "common_event_support.h"
+#include "notification_content.h"
+#include "notification_helper.h"
+#include "notification_normal_content.h"
+#include "notification_request.h"
 #include "telephony_log_wrapper.h"
+#include "telephony_permission.h"
+#include "want.h"
 
 namespace OHOS {
 namespace Telephony {
+using namespace OHOS::EventFwk;
 MissedCallNotification::MissedCallNotification() : isIncomingCallMissed_(true), incomingCallNumber_("") {}
 
 void MissedCallNotification::NewCallCreated(sptr<CallBase> &callObjectPtr)
@@ -54,26 +55,29 @@ void MissedCallNotification::CallStateUpdated(
 
 void MissedCallNotification::PublishMissedCallEvent(sptr<CallBase> &callObjectPtr)
 {
-#ifdef ABILITY_STATE_NOTIFICATION_SUPPORT
     AAFwk::Want want;
     want.SetParam("callId", callObjectPtr->GetCallID());
-    want.SetParam("phoneNumber", callObjectPtr->GetAccountNumber());
     want.SetParam("notificationId", INCOMING_CALL_MISSED_ID);
-#ifdef ABILITY_NOTIFICATION_SUPPORT
-    want.SetAction(CommonEventSupport::COMMON_EVENT_INCOMING_CALL_MISSED);
-#endif
-#ifndef ABILITY_NOTIFICATION_SUPPORT
-    want.SetAction(COMMON_EVENT_INCOMING_CALL_MISSED);
-#endif
+    want.SetAction(EventFwk::CommonEventSupport::COMMON_EVENT_INCOMING_CALL_MISSED);
     EventFwk::CommonEventData data;
     data.SetWant(want);
     data.SetCode(INCOMING_CALL_MISSED_CODE);
-    data.SetData(callObjectPtr->GetAccountNumber());
     EventFwk::CommonEventPublishInfo publishInfo;
     publishInfo.SetOrdered(true);
     bool result = EventFwk::CommonEventManager::PublishCommonEvent(data, publishInfo, nullptr);
     TELEPHONY_LOGI("publish missed call event result : %{public}d", result);
-#endif
+
+    AAFwk::Want wantWithNumber = want;
+    wantWithNumber.SetParam("phoneNumber", callObjectPtr->GetAccountNumber());
+    EventFwk::CommonEventData dataWithNumber;
+    dataWithNumber.SetWant(wantWithNumber);
+    dataWithNumber.SetCode(INCOMING_CALL_MISSED_CODE);
+    dataWithNumber.SetData(callObjectPtr->GetAccountNumber());
+    std::vector<std::string> callPermissions;
+    callPermissions.emplace_back(Permission::GET_TELEPHONY_STATE);
+    publishInfo.SetSubscriberPermissions(callPermissions);
+    bool resultWithNumber = EventFwk::CommonEventManager::PublishCommonEvent(data, publishInfo, nullptr);
+    TELEPHONY_LOGI("publish missed call event with number result : %{public}d", resultWithNumber);
 }
 
 void MissedCallNotification::PublishMissedCallNotification(sptr<CallBase> &callObjectPtr)
