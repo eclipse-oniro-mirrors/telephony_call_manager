@@ -17,13 +17,9 @@
 
 #include <memory>
 
-#include "ability_manager_client.h"
-#include "string_wrapper.h"
-#include "telephony_errors.h"
-
 #include "call_manager_proxy.h"
-
 #include "parameter.h"
+#include "telephony_errors.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -86,23 +82,6 @@ int32_t CallManagerClient::DialCall(std::u16string number, AppExecFwk::PacMap &e
         TELEPHONY_LOGE("init first please!");
         return TELEPHONY_ERR_UNINIT;
     }
-}
-
-int32_t CallManagerClient::MakeCall(std::string number)
-{
-    AAFwk::Want want;
-    AppExecFwk::ElementName element("", "com.ohos.contacts", "com.ohos.contacts.MainAbility");
-    want.SetElement(element);
-    AAFwk::WantParams wantParams;
-    wantParams.SetParam("phoneNumber", AAFwk::String::Box(number));
-    wantParams.SetParam("pageFlag", AAFwk::String::Box("page_flag_edit_before_calling"));
-    want.SetParams(wantParams);
-    ErrCode err = AAFwk::AbilityManagerClient::GetInstance()->StartAbility(want);
-    if (err != ERR_OK) {
-        TELEPHONY_LOGE("Fail to make call, err:%{public}d", err);
-        return TELEPHONY_ERR_FAIL;
-    }
-    return TELEPHONY_SUCCESS;
 }
 
 int32_t CallManagerClient::AnswerCall(int32_t callId, int32_t videoState)
