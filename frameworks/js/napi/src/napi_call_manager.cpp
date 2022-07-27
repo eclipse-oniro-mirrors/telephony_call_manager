@@ -27,6 +27,10 @@
 #include "napi_call_ability_callback.h"
 #include "call_manager_client.h"
 #include "napi_call_manager_utils.h"
+#include "ability_manager_client.h"
+#include "element_name.h"
+#include "string_wrapper.h"
+#include "want.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -2389,7 +2393,20 @@ void NapiCallManager::NativeMakeCall(napi_env env, void *data)
     }
     auto asyncContext = (AsyncContext *)data;
     std::string phoneNumber(asyncContext->number, asyncContext->numberLen);
-    asyncContext->result = DelayedSingleton<CallManagerClient>::GetInstance()->MakeCall(phoneNumber);
+    AAFwk::Want want;
+    AppExecFwk::ElementName element("", "com.ohos.contacts", "com.ohos.contacts.MainAbility");
+    want.SetElement(element);
+    AAFwk::WantParams wantParams;
+    wantParams.SetParam("phoneNumber", AAFwk::String::Box(phoneNumber));
+    wantParams.SetParam("pageFlag", AAFwk::String::Box("page_flag_edit_before_calling"));
+    want.SetParams(wantParams);
+    ErrCode err = AAFwk::AbilityManagerClient::GetInstance()->StartAbility(want);
+    if (err != ERR_OK) {
+        TELEPHONY_LOGE("Fail to make call, err:%{public}d", err);
+        asyncContext->result = TELEPHONY_ERR_FAIL;
+        return;
+    }
+    asyncContext->result = TELEPHONY_SUCCESS;
 }
 
 void NapiCallManager::NativeAnswerCall(napi_env env, void *data)

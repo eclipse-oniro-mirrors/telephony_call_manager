@@ -43,7 +43,6 @@ ohos_shared_library("tel_call_manager_api") {
   external_deps = [
     "ability_base:base",
     "ability_base:want",
-    "ability_runtime:ability_manager",
     "c_utils:utils",
     "core_service:tel_core_service_api",
     "init:libbegetutil",
