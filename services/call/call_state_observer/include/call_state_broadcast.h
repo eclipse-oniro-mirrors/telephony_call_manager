@@ -32,7 +32,6 @@ public:
 
 private:
     constexpr static int16_t CALL_STATE_UPDATED_CODE = 0;
-    const std::string COMMON_EVENT_CALL_STATE_UPDATED = "usual.event.CALL_STATE_UPDATED";
     void PublishCallStateEvent(sptr<CallBase> &callObjectPtr, int32_t priorState, int32_t nextState);
 };
 } // namespace Telephony

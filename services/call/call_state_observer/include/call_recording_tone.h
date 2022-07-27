@@ -21,6 +21,7 @@
 
 #include "common_event.h"
 #include "common_event_manager.h"
+#include "common_event_support.h"
 
 #include "call_state_listener_base.h"
 
@@ -39,7 +40,6 @@ public:
 
 private:
     bool isRecording_;
-    const std::string CALL_RECORDING_ACTION = "usual.event.CALL_RECORDING";
     int32_t PlayRecordingTone();
     int32_t StopRecordingTone();
 };

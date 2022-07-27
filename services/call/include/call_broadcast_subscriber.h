@@ -22,10 +22,10 @@
 
 #include "common_event.h"
 #include "common_event_manager.h"
+#include "common_event_support.h"
 
 namespace OHOS {
 namespace Telephony {
-constexpr const char *SIM_STATE_UPDATE_ACTION = "com.hos.action.SIM_STATE_CHANGED";
 class CallBroadcastSubscriber : public EventFwk::CommonEventSubscriber {
 public:
     explicit CallBroadcastSubscriber(const EventFwk::CommonEventSubscribeInfo &subscriberInfo);
