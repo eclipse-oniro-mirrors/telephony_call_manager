@@ -49,15 +49,6 @@ const int32_t DEFINE_VERIFY_PERMISSIONS = 94;
 const int32_t DEFINE_CONNECT_BT_SCO = 95;
 const int32_t DEFINE_DISCONNECT_BT_SCO = 96;
 const int32_t DEFINE_SUBSCRIBERCOMMON_EVENT = 97;
-constexpr const char *TEST_BUNDLE_NAME = "com.ohos.callManagerTest";
-constexpr const char *CALL_UI_BUNDLE_NAME = "com.ohos.videocall";
-constexpr const char *TEST_PERMISSION_NAME_CAMERA = "ohos.permission.camera";
-constexpr const char *TEST_LABEL = "test label";
-constexpr const char *TEST_DESCRIPTION = "test description";
-
-const int32_t TEST_LABEL_ID = 9527;
-const int32_t TEST_DESCRIPTION_ID = 9528;
-const int32_t TEST_USER_ID = 0;
 } // namespace Telephony
 } // namespace OHOS
 #endif
