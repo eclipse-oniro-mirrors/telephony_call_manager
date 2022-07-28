@@ -805,7 +805,7 @@ napi_value NapiCallManager::AnswerCall(napi_env env, napi_callback_info info)
     auto asyncContext = std::make_unique<AnswerAsyncContext>();
     if (asyncContext == nullptr) {
         std::string errorCode = std::to_string(napi_generic_failure);
-        std::string errorMessage = "error at baseContext is nullptr";
+        std::string errorMessage = "AnswerCall error at answerAsyncContext is nullptr";
         NAPI_CALL(env, napi_throw_error(env, errorCode.c_str(), errorMessage.c_str()));
         return nullptr;
     }
@@ -818,7 +818,7 @@ napi_value NapiCallManager::AnswerCall(napi_env env, napi_callback_info info)
         } else if (NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_FIRST], napi_number)) {
             napi_get_value_int32(env, argv[ARRAY_INDEX_FIRST], &asyncContext->callId);
         } else {
-            TELEPHONY_LOGE("args error, argv type is not correct");
+            TELEPHONY_LOGE("AnswerCall args error, argv type is not correct");
         }
     } else if (argc == TWO_VALUE_LIMIT &&
         NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_FIRST], napi_number) &&
@@ -826,65 +826,110 @@ napi_value NapiCallManager::AnswerCall(napi_env env, napi_callback_info info)
         napi_get_value_int32(env, argv[ARRAY_INDEX_FIRST], &asyncContext->callId);
         napi_create_reference(env, argv[ARRAY_INDEX_SECOND], DATA_LENGTH_ONE, &(asyncContext->callbackRef));
     } else {
-        TELEPHONY_LOGE("args error, argv type is not correct");
+        TELEPHONY_LOGE("AnswerCall args error, argv type is not correct");
     }
 
     return HandleAsyncWork(env, asyncContext.release(), "AnswerCall", NativeAnswerCall, NativeVoidCallBack);
+}
+
+napi_value NapiCallManager::RejectCallWithOneArgc(napi_env env, napi_callback_info info)
+{
+    GET_PARAMS(env, info, FOUR_VALUE_MAXIMUM_LIMIT);
+    auto asyncContext = std::make_unique<RejectAsyncContext>();
+    if (asyncContext == nullptr) {
+        std::string errorCode = std::to_string(napi_generic_failure);
+        std::string errorMessage = "reject with one argc, error at rejectAsyncContext is nullptr";
+        NAPI_CALL(env, napi_throw_error(env, errorCode.c_str(), errorMessage.c_str()));
+        return nullptr;
+    }
+    asyncContext->isSendSms = false;
+    if (NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_FIRST], napi_function)) {
+        napi_create_reference(env, argv[ARRAY_INDEX_FIRST], DATA_LENGTH_ONE, &(asyncContext->callbackRef));
+    } else if (NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_FIRST], napi_number)) {
+        napi_get_value_int32(env, argv[ARRAY_INDEX_FIRST], &asyncContext->callId);
+    } else if (NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_FIRST], napi_object)) {
+        GetSmsInfo(env, argv[ARRAY_INDEX_FIRST], *asyncContext);
+    } else {
+        TELEPHONY_LOGE("args error, argv type is not correct");
+    }
+
+    return HandleAsyncWork(env, asyncContext.release(), "RejectCall", NativeRejectCall, NativeVoidCallBack);
+}
+
+napi_value NapiCallManager::RejectCallWithTwoArgc(napi_env env, napi_callback_info info)
+{
+    GET_PARAMS(env, info, FOUR_VALUE_MAXIMUM_LIMIT);
+    auto asyncContext = std::make_unique<RejectAsyncContext>();
+    if (asyncContext == nullptr) {
+        std::string errorCode = std::to_string(napi_generic_failure);
+        std::string errorMessage = "reject with two argcs, error at rejectAsyncContext is nullptr";
+        NAPI_CALL(env, napi_throw_error(env, errorCode.c_str(), errorMessage.c_str()));
+        return nullptr;
+    }
+    asyncContext->isSendSms = false;
+    if (NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_FIRST], napi_object) &&
+        NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_SECOND], napi_function)) {
+        GetSmsInfo(env, argv[ARRAY_INDEX_FIRST], *asyncContext);
+        napi_create_reference(env, argv[ARRAY_INDEX_SECOND], DATA_LENGTH_ONE, &(asyncContext->callbackRef));
+    } else if (NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_FIRST], napi_number) &&
+               NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_SECOND], napi_function)) {
+        napi_get_value_int32(env, argv[ARRAY_INDEX_FIRST], &asyncContext->callId);
+        napi_create_reference(env, argv[ARRAY_INDEX_SECOND], DATA_LENGTH_ONE, &(asyncContext->callbackRef));
+    } else if (NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_FIRST], napi_number) &&
+               NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_SECOND], napi_object)) {
+        napi_get_value_int32(env, argv[ARRAY_INDEX_FIRST], &asyncContext->callId);
+        GetSmsInfo(env, argv[ARRAY_INDEX_SECOND], *asyncContext);
+    } else {
+        TELEPHONY_LOGE("args error, argv type is not correct");
+    }
+
+    return HandleAsyncWork(env, asyncContext.release(), "RejectCall", NativeRejectCall, NativeVoidCallBack);
+}
+
+napi_value NapiCallManager::RejectCallWithThreeArgc(napi_env env, napi_callback_info info)
+{
+    GET_PARAMS(env, info, FOUR_VALUE_MAXIMUM_LIMIT);
+    auto asyncContext = std::make_unique<RejectAsyncContext>();
+    if (asyncContext == nullptr) {
+        std::string errorCode = std::to_string(napi_generic_failure);
+        std::string errorMessage = "reject with three argcs, error at rejectAsyncContext is nullptr";
+        NAPI_CALL(env, napi_throw_error(env, errorCode.c_str(), errorMessage.c_str()));
+        return nullptr;
+    }
+    asyncContext->isSendSms = false;
+    if (NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_FIRST], napi_number) &&
+        NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_SECOND], napi_object)) {
+        napi_get_value_int32(env, argv[ARRAY_INDEX_FIRST], &asyncContext->callId);
+        GetSmsInfo(env, argv[ARRAY_INDEX_SECOND], *asyncContext);
+        napi_create_reference(env, argv[ARRAY_INDEX_THIRD], DATA_LENGTH_ONE, &(asyncContext->callbackRef));
+    }
+
+    return HandleAsyncWork(env, asyncContext.release(), "RejectCall", NativeRejectCall, NativeVoidCallBack);
 }
 
 napi_value NapiCallManager::RejectCall(napi_env env, napi_callback_info info)
 {
     GET_PARAMS(env, info, FOUR_VALUE_MAXIMUM_LIMIT);
     NAPI_ASSERT(env, argc < FOUR_VALUE_MAXIMUM_LIMIT, "parameter error!");
-    auto asyncContext = std::make_unique<RejectAsyncContext>();
-    if (asyncContext == nullptr) {
-        std::string errorCode = std::to_string(napi_generic_failure);
-        std::string errorMessage = "error at baseContext is nullptr";
-        NAPI_CALL(env, napi_throw_error(env, errorCode.c_str(), errorMessage.c_str()));
-        return nullptr;
-    }
-
-    asyncContext->isSendSms = false;
-    if (argc == ZERO_VALUE) {
-        TELEPHONY_LOGI("no param input");
-    } else if (argc == ONLY_ONE_VALUE) {
-        if (NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_FIRST], napi_function)) {
-            napi_create_reference(env, argv[ARRAY_INDEX_FIRST], DATA_LENGTH_ONE, &(asyncContext->callbackRef));
-        } else if (NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_FIRST], napi_number)) {
-            napi_get_value_int32(env, argv[ARRAY_INDEX_FIRST], &asyncContext->callId);
-        } else if (NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_FIRST], napi_object)) {
-            GetSmsInfo(env, argv[ARRAY_INDEX_FIRST], *asyncContext);
-        } else {
+    napi_value result = nullptr;
+    switch (argc) {
+        case ZERO_VALUE:
+            TELEPHONY_LOGI("no param input");
+            break;
+        case ONLY_ONE_VALUE:
+            result = RejectCallWithOneArgc(env, info);
+            break;
+        case TWO_VALUE_LIMIT:
+            result = RejectCallWithTwoArgc(env, info);
+            break;
+        case VALUE_MAXIMUM_LIMIT:
+            result = RejectCallWithThreeArgc(env, info);
+            break;
+        default:
             TELEPHONY_LOGE("args error, argv type is not correct");
-        }
-    } else if (argc == TWO_VALUE_LIMIT) {
-        if (NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_FIRST], napi_object) &&
-            NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_SECOND], napi_function)) {
-            GetSmsInfo(env, argv[ARRAY_INDEX_FIRST], *asyncContext);
-            napi_create_reference(env, argv[ARRAY_INDEX_SECOND], DATA_LENGTH_ONE, &(asyncContext->callbackRef));
-        } else if (NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_FIRST], napi_number) &&
-            NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_SECOND], napi_function)) {
-            napi_get_value_int32(env, argv[ARRAY_INDEX_FIRST], &asyncContext->callId);
-            napi_create_reference(env, argv[ARRAY_INDEX_SECOND], DATA_LENGTH_ONE, &(asyncContext->callbackRef));
-        } else if (NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_FIRST], napi_number) &&
-            NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_SECOND], napi_object)) {
-            napi_get_value_int32(env, argv[ARRAY_INDEX_FIRST], &asyncContext->callId);
-            GetSmsInfo(env, argv[ARRAY_INDEX_SECOND], *asyncContext);
-        } else {
-            TELEPHONY_LOGE("args error, argv type is not correct");
-        }
-    } else if (argc == VALUE_MAXIMUM_LIMIT &&
-        NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_FIRST], napi_number) &&
-        NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_SECOND], napi_object) &&
-        NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_THIRD], napi_function)) {
-        napi_get_value_int32(env, argv[ARRAY_INDEX_FIRST], &asyncContext->callId);
-        GetSmsInfo(env, argv[ARRAY_INDEX_SECOND], *asyncContext);
-        napi_create_reference(env, argv[ARRAY_INDEX_THIRD], DATA_LENGTH_ONE, &(asyncContext->callbackRef));
-    } else {
-        TELEPHONY_LOGE("args error, argv type is not correct");
+            break;
     }
-
-    return HandleAsyncWork(env, asyncContext.release(), "RejectCall", NativeRejectCall, NativeVoidCallBack);
+    return result;
 }
 
 napi_value NapiCallManager::HangUpCall(napi_env env, napi_callback_info info)
@@ -894,7 +939,7 @@ napi_value NapiCallManager::HangUpCall(napi_env env, napi_callback_info info)
     auto asyncContext = std::make_unique<AsyncContext>();
     if (asyncContext == nullptr) {
         std::string errorCode = std::to_string(napi_generic_failure);
-        std::string errorMessage = "error at baseContext is nullptr";
+        std::string errorMessage = "HangUpCall error at asyncContext is nullptr";
         NAPI_CALL(env, napi_throw_error(env, errorCode.c_str(), errorMessage.c_str()));
         return nullptr;
     }
@@ -907,7 +952,7 @@ napi_value NapiCallManager::HangUpCall(napi_env env, napi_callback_info info)
         } else if (NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_FIRST], napi_number)) {
             napi_get_value_int32(env, argv[ARRAY_INDEX_FIRST], &asyncContext->callId);
         } else {
-            TELEPHONY_LOGE("args error, argv type is not correct");
+            TELEPHONY_LOGE("HangUpCall args error, argv type is not correct");
         }
     } else if (argc == TWO_VALUE_LIMIT &&
         NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_FIRST], napi_number) &&
@@ -915,7 +960,7 @@ napi_value NapiCallManager::HangUpCall(napi_env env, napi_callback_info info)
         napi_get_value_int32(env, argv[ARRAY_INDEX_FIRST], &asyncContext->callId);
         napi_create_reference(env, argv[ARRAY_INDEX_SECOND], DATA_LENGTH_ONE, &(asyncContext->callbackRef));
     } else {
-        TELEPHONY_LOGE("args error, argv type is not correct");
+        TELEPHONY_LOGE("HangUpCall args error, argv type is not correct");
     }
 
     return HandleAsyncWork(env, asyncContext.release(), "HangUpCall", NativeHangUpCall, NativeVoidCallBack);
@@ -926,11 +971,11 @@ napi_value NapiCallManager::HoldCall(napi_env env, napi_callback_info info)
     GET_PARAMS(env, info, VALUE_MAXIMUM_LIMIT);
     NAPI_ASSERT(env, argc < VALUE_MAXIMUM_LIMIT, "parameter error!");
     bool matchFlag = NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_FIRST], napi_number);
-    NAPI_ASSERT(env, matchFlag, "Type error, should be number type");
+    NAPI_ASSERT(env, matchFlag, "HoldCall type error, should be number type");
     auto asyncContext = std::make_unique<AsyncContext>();
     if (asyncContext == nullptr) {
         std::string errorCode = std::to_string(napi_generic_failure);
-        std::string errorMessage = "error at baseContext is nullptr";
+        std::string errorMessage = "HoldCall error at baseContext is nullptr";
         NAPI_CALL(env, napi_throw_error(env, errorCode.c_str(), errorMessage.c_str()));
         return nullptr;
     }
@@ -950,7 +995,7 @@ napi_value NapiCallManager::UnHoldCall(napi_env env, napi_callback_info info)
     auto asyncContext = std::make_unique<AsyncContext>();
     if (asyncContext == nullptr) {
         std::string errorCode = std::to_string(napi_generic_failure);
-        std::string errorMessage = "error at baseContext is nullptr";
+        std::string errorMessage = "UnHoldCall error at asyncContext is nullptr";
         NAPI_CALL(env, napi_throw_error(env, errorCode.c_str(), errorMessage.c_str()));
         return nullptr;
     }
@@ -970,7 +1015,7 @@ napi_value NapiCallManager::SwitchCall(napi_env env, napi_callback_info info)
     auto asyncContext = std::make_unique<AsyncContext>();
     if (asyncContext == nullptr) {
         std::string errorCode = std::to_string(napi_generic_failure);
-        std::string errorMessage = "error at baseContext is nullptr";
+        std::string errorMessage = "SwitchCall error at baseContext is nullptr";
         NAPI_CALL(env, napi_throw_error(env, errorCode.c_str(), errorMessage.c_str()));
         return nullptr;
     }
@@ -986,11 +1031,11 @@ napi_value NapiCallManager::CombineConference(napi_env env, napi_callback_info i
     GET_PARAMS(env, info, VALUE_MAXIMUM_LIMIT);
     NAPI_ASSERT(env, argc < VALUE_MAXIMUM_LIMIT, "parameter error!");
     bool matchFlag = NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_FIRST], napi_number);
-    NAPI_ASSERT(env, matchFlag, "Type error, should be number type");
+    NAPI_ASSERT(env, matchFlag, "CombineConference type error, should be number type");
     auto asyncContext = std::make_unique<AsyncContext>();
     if (asyncContext == nullptr) {
         std::string errorCode = std::to_string(napi_generic_failure);
-        std::string errorMessage = "error at baseContext is nullptr";
+        std::string errorMessage = "CombineConference error at asyncContext is nullptr";
         NAPI_CALL(env, napi_throw_error(env, errorCode.c_str(), errorMessage.c_str()));
         return nullptr;
     }
@@ -1007,11 +1052,11 @@ napi_value NapiCallManager::SeparateConference(napi_env env, napi_callback_info 
     GET_PARAMS(env, info, VALUE_MAXIMUM_LIMIT);
     NAPI_ASSERT(env, argc < VALUE_MAXIMUM_LIMIT, "parameter error!");
     bool matchFlag = NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_FIRST], napi_number);
-    NAPI_ASSERT(env, matchFlag, "Type error, should be number type");
+    NAPI_ASSERT(env, matchFlag, "SeparateConference type error, should be number type");
     auto asyncContext = std::make_unique<AsyncContext>();
     if (asyncContext == nullptr) {
         std::string errorCode = std::to_string(napi_generic_failure);
-        std::string errorMessage = "error at baseContext is nullptr";
+        std::string errorMessage = "SeparateConference error at asyncContext is nullptr";
         NAPI_CALL(env, napi_throw_error(env, errorCode.c_str(), errorMessage.c_str()));
         return nullptr;
     }
@@ -1028,11 +1073,11 @@ napi_value NapiCallManager::GetMainCallId(napi_env env, napi_callback_info info)
     GET_PARAMS(env, info, VALUE_MAXIMUM_LIMIT);
     NAPI_ASSERT(env, argc < VALUE_MAXIMUM_LIMIT, "parameter error!");
     bool matchFlag = NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_FIRST], napi_number);
-    NAPI_ASSERT(env, matchFlag, "Type error, should be number type");
+    NAPI_ASSERT(env, matchFlag, "GetMainCallId type error, should be number type");
     auto asyncContext = std::make_unique<AsyncContext>();
     if (asyncContext == nullptr) {
         std::string errorCode = std::to_string(napi_generic_failure);
-        std::string errorMessage = "error at baseContext is nullptr";
+        std::string errorMessage = "GetMainCallId error at baseContext is nullptr";
         NAPI_CALL(env, napi_throw_error(env, errorCode.c_str(), errorMessage.c_str()));
         return nullptr;
     }
@@ -1048,11 +1093,11 @@ napi_value NapiCallManager::GetSubCallIdList(napi_env env, napi_callback_info in
     GET_PARAMS(env, info, VALUE_MAXIMUM_LIMIT);
     NAPI_ASSERT(env, argc < VALUE_MAXIMUM_LIMIT, "parameter error!");
     bool matchFlag = NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_FIRST], napi_number);
-    NAPI_ASSERT(env, matchFlag, "Type error, should be number type");
+    NAPI_ASSERT(env, matchFlag, "GetSubCallIdList type error, should be number type");
     auto asyncContext = std::make_unique<ListAsyncContext>();
     if (asyncContext == nullptr) {
         std::string errorCode = std::to_string(napi_generic_failure);
-        std::string errorMessage = "error at baseContext is nullptr";
+        std::string errorMessage = "GetSubCallIdList error at listAsyncContext is nullptr";
         NAPI_CALL(env, napi_throw_error(env, errorCode.c_str(), errorMessage.c_str()));
         return nullptr;
     }
@@ -1068,11 +1113,11 @@ napi_value NapiCallManager::GetCallIdListForConference(napi_env env, napi_callba
     GET_PARAMS(env, info, VALUE_MAXIMUM_LIMIT);
     NAPI_ASSERT(env, argc < VALUE_MAXIMUM_LIMIT, "parameter error!");
     bool matchFlag = NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_FIRST], napi_number);
-    NAPI_ASSERT(env, matchFlag, "Type error, should be number type");
+    NAPI_ASSERT(env, matchFlag, "GetCallIdListForConference type error, should be number type");
     auto asyncContext = std::make_unique<ListAsyncContext>();
     if (asyncContext == nullptr) {
         std::string errorCode = std::to_string(napi_generic_failure);
-        std::string errorMessage = "error at baseContext is nullptr";
+        std::string errorMessage = "GetCallIdListForConference error at listAsyncContext is nullptr";
         NAPI_CALL(env, napi_throw_error(env, errorCode.c_str(), errorMessage.c_str()));
         return nullptr;
     }
@@ -1136,9 +1181,9 @@ napi_value NapiCallManager::GetCallRestriction(napi_env env, napi_callback_info 
     GET_PARAMS(env, info, VALUE_MAXIMUM_LIMIT);
     NAPI_ASSERT(env, argc <= VALUE_MAXIMUM_LIMIT, "parameter error!");
     bool matchFlag = NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_FIRST], napi_number);
-    NAPI_ASSERT(env, matchFlag, "Type error, should be number type");
+    NAPI_ASSERT(env, matchFlag, "GetCallRestriction type error, should be number type");
     matchFlag = NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_SECOND], napi_number);
-    NAPI_ASSERT(env, matchFlag, "Type error, should be number type");
+    NAPI_ASSERT(env, matchFlag, "GetCallRestriction type error, should be number type");
     auto asyncContext = std::make_unique<SupplementAsyncContext>();
     if (asyncContext == nullptr) {
         std::string errorCode = std::to_string(napi_generic_failure);
@@ -1186,9 +1231,9 @@ napi_value NapiCallManager::GetCallTransferInfo(napi_env env, napi_callback_info
     GET_PARAMS(env, info, VALUE_MAXIMUM_LIMIT);
     NAPI_ASSERT(env, argc <= VALUE_MAXIMUM_LIMIT, "parameter error!");
     bool matchFlag = NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_FIRST], napi_number);
-    NAPI_ASSERT(env, matchFlag, "Type error, should be number type");
+    NAPI_ASSERT(env, matchFlag, "GetCallTransferInfo type error, should be number type");
     matchFlag = NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_SECOND], napi_number);
-    NAPI_ASSERT(env, matchFlag, "Type error, should be number type");
+    NAPI_ASSERT(env, matchFlag, "GetCallTransferInfo type error, should be number type");
     auto asyncContext = std::make_unique<SupplementAsyncContext>();
     if (asyncContext == nullptr) {
         std::string errorCode = std::to_string(napi_generic_failure);
@@ -1304,11 +1349,11 @@ napi_value NapiCallManager::StartDTMF(napi_env env, napi_callback_info info)
     GET_PARAMS(env, info, VALUE_MAXIMUM_LIMIT);
     NAPI_ASSERT(env, argc <= VALUE_MAXIMUM_LIMIT, "parameter error!");
     bool matchFlag = NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_FIRST], napi_number);
-    NAPI_ASSERT(env, matchFlag, "Type error, should be number type");
+    NAPI_ASSERT(env, matchFlag, "StartDTMF type error, should be number type");
     auto asyncContext = std::make_unique<SupplementAsyncContext>();
     if (asyncContext == nullptr) {
         std::string errorCode = std::to_string(napi_generic_failure);
-        std::string errorMessage = "error at baseContext is nullptr";
+        std::string errorMessage = "StartDTMF error at supplementAsyncContext is nullptr";
         NAPI_CALL(env, napi_throw_error(env, errorCode.c_str(), errorMessage.c_str()));
         return nullptr;
     }
@@ -1326,11 +1371,11 @@ napi_value NapiCallManager::StopDTMF(napi_env env, napi_callback_info info)
     GET_PARAMS(env, info, VALUE_MAXIMUM_LIMIT);
     NAPI_ASSERT(env, argc < VALUE_MAXIMUM_LIMIT, "parameter error!");
     bool matchFlag = NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_FIRST], napi_number);
-    NAPI_ASSERT(env, matchFlag, "Type error, should be number type");
+    NAPI_ASSERT(env, matchFlag, "StopDTMF type error, should be number type");
     auto asyncContext = std::make_unique<AsyncContext>();
     if (asyncContext == nullptr) {
         std::string errorCode = std::to_string(napi_generic_failure);
-        std::string errorMessage = "error at baseContext is nullptr";
+        std::string errorMessage = "StopDTMF error at baseContext is nullptr";
         NAPI_CALL(env, napi_throw_error(env, errorCode.c_str(), errorMessage.c_str()));
         return nullptr;
     }
@@ -1348,7 +1393,7 @@ napi_value NapiCallManager::GetCallState(napi_env env, napi_callback_info info)
     auto asyncContext = std::make_unique<AsyncContext>();
     if (asyncContext == nullptr) {
         std::string errorCode = std::to_string(napi_generic_failure);
-        std::string errorMessage = "error at baseContext is nullptr";
+        std::string errorMessage = "GetCallState error at asyncContext is nullptr";
         NAPI_CALL(env, napi_throw_error(env, errorCode.c_str(), errorMessage.c_str()));
         return nullptr;
     }
@@ -1365,7 +1410,7 @@ napi_value NapiCallManager::IsRinging(napi_env env, napi_callback_info info)
     auto asyncContext = std::make_unique<AsyncContext>();
     if (asyncContext == nullptr) {
         std::string errorCode = std::to_string(napi_generic_failure);
-        std::string errorMessage = "error at baseContext is nullptr";
+        std::string errorMessage = "IsRinging error at asyncContext is nullptr";
         NAPI_CALL(env, napi_throw_error(env, errorCode.c_str(), errorMessage.c_str()));
         return nullptr;
     }
@@ -1382,7 +1427,7 @@ napi_value NapiCallManager::HasCall(napi_env env, napi_callback_info info)
     auto asyncContext = std::make_unique<AsyncContext>();
     if (asyncContext == nullptr) {
         std::string errorCode = std::to_string(napi_generic_failure);
-        std::string errorMessage = "error at baseContext is nullptr";
+        std::string errorMessage = "HasCall error at asyncContext is nullptr";
         NAPI_CALL(env, napi_throw_error(env, errorCode.c_str(), errorMessage.c_str()));
         return nullptr;
     }
@@ -1399,7 +1444,7 @@ napi_value NapiCallManager::IsNewCallAllowed(napi_env env, napi_callback_info in
     auto asyncContext = std::make_unique<AsyncContext>();
     if (asyncContext == nullptr) {
         std::string errorCode = std::to_string(napi_generic_failure);
-        std::string errorMessage = "error at baseContext is nullptr";
+        std::string errorMessage = "IsNewCallAllowed error at asyncContext is nullptr";
         NAPI_CALL(env, napi_throw_error(env, errorCode.c_str(), errorMessage.c_str()));
         return nullptr;
     }
@@ -1416,7 +1461,7 @@ napi_value NapiCallManager::IsInEmergencyCall(napi_env env, napi_callback_info i
     auto asyncContext = std::make_unique<AsyncContext>();
     if (asyncContext == nullptr) {
         std::string errorCode = std::to_string(napi_generic_failure);
-        std::string errorMessage = "error at baseContext is nullptr";
+        std::string errorMessage = "IsInEmergencyCall error at asyncContext is nullptr";
         NAPI_CALL(env, napi_throw_error(env, errorCode.c_str(), errorMessage.c_str()));
         return nullptr;
     }
@@ -1432,11 +1477,11 @@ napi_value NapiCallManager::IsEmergencyPhoneNumber(napi_env env, napi_callback_i
     GET_PARAMS(env, info, VALUE_MAXIMUM_LIMIT);
     NAPI_ASSERT(env, argc <= VALUE_MAXIMUM_LIMIT, "parameter error!");
     bool matchFlag = NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_FIRST], napi_string);
-    NAPI_ASSERT(env, matchFlag, "Type error, should be string type");
+    NAPI_ASSERT(env, matchFlag, "IsEmergencyPhoneNumber type error, type must be of type string");
     auto asyncContext = std::make_unique<UtilsAsyncContext>();
     if (asyncContext == nullptr) {
         std::string errorCode = std::to_string(napi_generic_failure);
-        std::string errorMessage = "error at baseContext is nullptr";
+        std::string errorMessage = "IsEmergencyPhoneNumber error at utilsAsyncContext is nullptr";
         NAPI_CALL(env, napi_throw_error(env, errorCode.c_str(), errorMessage.c_str()));
         return nullptr;
     }
@@ -1463,11 +1508,11 @@ napi_value NapiCallManager::FormatPhoneNumber(napi_env env, napi_callback_info i
     GET_PARAMS(env, info, VALUE_MAXIMUM_LIMIT);
     NAPI_ASSERT(env, argc <= VALUE_MAXIMUM_LIMIT, "parameter error!");
     bool matchFlag = NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_FIRST], napi_string);
-    NAPI_ASSERT(env, matchFlag, "Type error, should be string type");
+    NAPI_ASSERT(env, matchFlag, "Type error, type should be string type");
     auto asyncContext = std::make_unique<UtilsAsyncContext>();
     if (asyncContext == nullptr) {
         std::string errorCode = std::to_string(napi_generic_failure);
-        std::string errorMessage = "error at baseContext is nullptr";
+        std::string errorMessage = "error at UtilsAsyncContext is nullptr";
         NAPI_CALL(env, napi_throw_error(env, errorCode.c_str(), errorMessage.c_str()));
         return nullptr;
     }
@@ -1494,13 +1539,13 @@ napi_value NapiCallManager::FormatPhoneNumberToE164(napi_env env, napi_callback_
     GET_PARAMS(env, info, VALUE_MAXIMUM_LIMIT);
     NAPI_ASSERT(env, argc <= VALUE_MAXIMUM_LIMIT, "parameter error!");
     bool matchFlag = NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_FIRST], napi_string);
-    NAPI_ASSERT(env, matchFlag, "Type error, should be string type");
+    NAPI_ASSERT(env, matchFlag, "FormatPhoneNumberToE164 type error, should be string type");
     matchFlag = NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_SECOND], napi_string);
-    NAPI_ASSERT(env, matchFlag, "Type error, should be string type");
+    NAPI_ASSERT(env, matchFlag, "FormatPhoneNumberToE164 type error, should be string type");
     auto asyncContext = std::make_unique<UtilsAsyncContext>();
     if (asyncContext == nullptr) {
         std::string errorCode = std::to_string(napi_generic_failure);
-        std::string errorMessage = "error at baseContext is nullptr";
+        std::string errorMessage = "FormatPhoneNumberToE164 error at utilsAsyncContext is nullptr";
         NAPI_CALL(env, napi_throw_error(env, errorCode.c_str(), errorMessage.c_str()));
         return nullptr;
     }
@@ -1613,7 +1658,7 @@ napi_value NapiCallManager::SetMuted(napi_env env, napi_callback_info info)
     auto asyncContext = std::make_unique<AudioAsyncContext>();
     if (asyncContext == nullptr) {
         std::string errorCode = std::to_string(napi_generic_failure);
-        std::string errorMessage = "error at baseContext is nullptr";
+        std::string errorMessage = "SetMuted error at audioAsyncContext is nullptr";
         NAPI_CALL(env, napi_throw_error(env, errorCode.c_str(), errorMessage.c_str()));
         return nullptr;
     }
@@ -1630,7 +1675,7 @@ napi_value NapiCallManager::CancelMuted(napi_env env, napi_callback_info info)
     auto asyncContext = std::make_unique<AudioAsyncContext>();
     if (asyncContext == nullptr) {
         std::string errorCode = std::to_string(napi_generic_failure);
-        std::string errorMessage = "error at baseContext is nullptr";
+        std::string errorMessage = "CancelMuted error at audioAsyncContext is nullptr";
         NAPI_CALL(env, napi_throw_error(env, errorCode.c_str(), errorMessage.c_str()));
         return nullptr;
     }
@@ -1647,7 +1692,7 @@ napi_value NapiCallManager::MuteRinger(napi_env env, napi_callback_info info)
     auto asyncContext = std::make_unique<AudioAsyncContext>();
     if (asyncContext == nullptr) {
         std::string errorCode = std::to_string(napi_generic_failure);
-        std::string errorMessage = "error at baseContext is nullptr";
+        std::string errorMessage = "MuteRinger error at audioAsyncContext is nullptr";
         NAPI_CALL(env, napi_throw_error(env, errorCode.c_str(), errorMessage.c_str()));
         return nullptr;
     }
@@ -1662,11 +1707,11 @@ napi_value NapiCallManager::SetAudioDevice(napi_env env, napi_callback_info info
     GET_PARAMS(env, info, VALUE_MAXIMUM_LIMIT);
     NAPI_ASSERT(env, argc <= VALUE_MAXIMUM_LIMIT, "parameter error!");
     bool matchFlag = NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_FIRST], napi_number);
-    NAPI_ASSERT(env, matchFlag, "Type error, should be number type");
+    NAPI_ASSERT(env, matchFlag, "SetDeviceDirection type error, should be number type");
     auto asyncContext = std::make_unique<AudioAsyncContext>();
     if (asyncContext == nullptr) {
         std::string errorCode = std::to_string(napi_generic_failure);
-        std::string errorMessage = "error at baseContext is nullptr";
+        std::string errorMessage = "SetDeviceDirection error at audioAsyncContext is nullptr";
         NAPI_CALL(env, napi_throw_error(env, errorCode.c_str(), errorMessage.c_str()));
         return nullptr;
     }
@@ -1814,11 +1859,11 @@ napi_value NapiCallManager::SetDeviceDirection(napi_env env, napi_callback_info 
     GET_PARAMS(env, info, VALUE_MAXIMUM_LIMIT);
     NAPI_ASSERT(env, argc < VALUE_MAXIMUM_LIMIT, "parameter error!");
     bool matchFlag = NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_FIRST], napi_number);
-    NAPI_ASSERT(env, matchFlag, "Type error, should be number type");
+    NAPI_ASSERT(env, matchFlag, "SetDeviceDirection type error, should be number type");
     auto asyncContext = std::make_unique<VideoAsyncContext>();
     if (asyncContext == nullptr) {
         std::string errorCode = std::to_string(napi_generic_failure);
-        std::string errorMessage = "error at baseContext is nullptr";
+        std::string errorMessage = "SetDeviceDirection error at videoAsyncContext is nullptr";
         NAPI_CALL(env, napi_throw_error(env, errorCode.c_str(), errorMessage.c_str()));
         return nullptr;
     }
@@ -1835,9 +1880,9 @@ napi_value NapiCallManager::SetCallPreferenceMode(napi_env env, napi_callback_in
     GET_PARAMS(env, info, VALUE_MAXIMUM_LIMIT);
     NAPI_ASSERT(env, argc <= VALUE_MAXIMUM_LIMIT, "parameter error!");
     bool matchFlag = NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_FIRST], napi_number);
-    NAPI_ASSERT(env, matchFlag, "Type error, should be number type");
+    NAPI_ASSERT(env, matchFlag, "SetCallPreferenceMode type error, should be number type");
     matchFlag = NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_SECOND], napi_number);
-    NAPI_ASSERT(env, matchFlag, "Type error, should be number type");
+    NAPI_ASSERT(env, matchFlag, "SetCallPreferenceMode type error, should be number type");
     auto asyncContext = std::make_unique<SupplementAsyncContext>();
     if (asyncContext == nullptr) {
         std::string errorCode = std::to_string(napi_generic_failure);
@@ -1859,13 +1904,13 @@ napi_value NapiCallManager::StartRTT(napi_env env, napi_callback_info info)
     GET_PARAMS(env, info, VALUE_MAXIMUM_LIMIT);
     NAPI_ASSERT(env, argc <= VALUE_MAXIMUM_LIMIT, "parameter error!");
     bool matchFlag = NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_FIRST], napi_number);
-    NAPI_ASSERT(env, matchFlag, "Type error, should be number type");
+    NAPI_ASSERT(env, matchFlag, "StartRTT Type error, should be number type");
     matchFlag = NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_SECOND], napi_string);
     NAPI_ASSERT(env, matchFlag, "Type error, should be string type");
     auto asyncContext = std::make_unique<SupplementAsyncContext>();
     if (asyncContext == nullptr) {
         std::string errorCode = std::to_string(napi_generic_failure);
-        std::string errorMessage = "error at baseContext is nullptr";
+        std::string errorMessage = "StartRTT error at supplementAsyncContext is nullptr";
         NAPI_CALL(env, napi_throw_error(env, errorCode.c_str(), errorMessage.c_str()));
         return nullptr;
     }
@@ -1888,11 +1933,11 @@ napi_value NapiCallManager::StopRTT(napi_env env, napi_callback_info info)
     GET_PARAMS(env, info, VALUE_MAXIMUM_LIMIT);
     NAPI_ASSERT(env, argc < VALUE_MAXIMUM_LIMIT, "parameter error!");
     bool matchFlag = NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_FIRST], napi_number);
-    NAPI_ASSERT(env, matchFlag, "Type error, should be number type");
+    NAPI_ASSERT(env, matchFlag, "StopRTT type error, should be number type");
     auto asyncContext = std::make_unique<SupplementAsyncContext>();
     if (asyncContext == nullptr) {
         std::string errorCode = std::to_string(napi_generic_failure);
-        std::string errorMessage = "error at baseContext is nullptr";
+        std::string errorMessage = "StopRTT error at supplementAsyncContext is nullptr";
         NAPI_CALL(env, napi_throw_error(env, errorCode.c_str(), errorMessage.c_str()));
         return nullptr;
     }
@@ -1952,9 +1997,9 @@ napi_value NapiCallManager::UpdateImsCallMode(napi_env env, napi_callback_info i
     GET_PARAMS(env, info, VALUE_MAXIMUM_LIMIT);
     NAPI_ASSERT(env, argc <= VALUE_MAXIMUM_LIMIT, "parameter error!");
     bool matchFlag = NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_FIRST], napi_number);
-    NAPI_ASSERT(env, matchFlag, "Type error, should be number type");
+    NAPI_ASSERT(env, matchFlag, "UpdateImsCallMode type error, should be number type");
     matchFlag = NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_SECOND], napi_number);
-    NAPI_ASSERT(env, matchFlag, "Type error, should be number type");
+    NAPI_ASSERT(env, matchFlag, "UpdateImsCallMode type error, should be number type");
     auto asyncContext = std::make_unique<SupplementAsyncContext>();
     if (asyncContext == nullptr) {
         std::string errorCode = std::to_string(napi_generic_failure);
