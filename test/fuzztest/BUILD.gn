@@ -18,7 +18,6 @@ group("fuzztest") {
   testonly = true
   deps = []
 
-  deps += [ "makecall_fuzzer:fuzztest" ]
   deps += [ "dialcall_fuzzer:fuzztest" ]
   deps += [ "rejectcall_fuzzer:fuzztest" ]
   deps += [ "isemergencyphonenumber_fuzzer:fuzztest" ]
