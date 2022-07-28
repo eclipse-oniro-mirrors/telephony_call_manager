@@ -34,7 +34,7 @@ ohos_fuzztest("FormatPhoneNumberFuzzTest") {
   external_deps = [
     "ability_base:want",
     "c_utils:utils",
-    "samgr_standard:samgr_proxy",
+    "samgr:samgr_proxy",
   ]
   defines += [
     "TELEPHONY_LOG_TAG = \"CallManagerFuzzTest\"",
