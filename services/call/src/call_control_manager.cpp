@@ -198,12 +198,23 @@ int32_t CallControlManager::RejectCall(int32_t callId, bool rejectWithMessage, s
 int32_t CallControlManager::HangUpCall(int32_t callId)
 {
     if (callId == INVALID_CALLID) {
-        sptr<CallBase> call = GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_ACTIVE);
-        if (call == nullptr) {
-            TELEPHONY_LOGE("call is nullptr");
+        std::vector<CallRunningState> callRunningStateVec;
+        callRunningStateVec.push_back(CallRunningState::CALL_RUNNING_STATE_ACTIVE);
+        callRunningStateVec.push_back(CallRunningState::CALL_RUNNING_STATE_DIALING);
+        callRunningStateVec.push_back(CallRunningState::CALL_RUNNING_STATE_CONNECTING);
+
+        for (auto &state : callRunningStateVec) {
+            sptr<CallBase> call = GetOneCallObject(state);
+            if (call != nullptr) {
+                callId = call->GetCallID();
+                break;
+            }
+        }
+
+        if (callId == INVALID_CALLID) {
+            TELEPHONY_LOGE("callId is INVALID_CALLID!");
             return TELEPHONY_ERROR;
         }
-        callId = call->GetCallID();
     }
 
     if (callRequestHandlerServicePtr_ == nullptr) {
