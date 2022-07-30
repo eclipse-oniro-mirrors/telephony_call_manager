@@ -616,6 +616,7 @@ enum FeatureType {
      * 3GPP TS 24.167 V17.1.0 (2020-12) 5.43 /<X>/Media_type_restriction_policy
      */
     TYPE_VIDEO_OVER_LTE,
+    TYPE_SS_OVER_UT,
 };
 
 enum class OttCallRequestId {
