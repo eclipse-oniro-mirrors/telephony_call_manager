@@ -834,8 +834,9 @@ int32_t CallControlManager::MuteRinger()
 
 int32_t CallControlManager::SetAudioDevice(AudioDevice deviceType, const std::string &bluetoothAddress)
 {
-    if (deviceType == AudioDevice::DEVICE_BLUETOOTH_SCO) {
-        DelayedSingleton<AudioDeviceManager>::GetInstance()->SetBluetoothAddress(bluetoothAddress);
+    if (deviceType == AudioDevice::DEVICE_BLUETOOTH_SCO &&
+        DelayedSingleton<AudioDeviceManager>::GetInstance()->ConnectBtScoWithAddress(bluetoothAddress)) {
+        return TELEPHONY_SUCCESS;
     }
     return DelayedSingleton<AudioControlManager>::GetInstance()->SetAudioDevice(deviceType);
 }

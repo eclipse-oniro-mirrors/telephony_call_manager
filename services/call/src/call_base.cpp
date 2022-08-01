@@ -361,7 +361,9 @@ void CallBase::SetAudio()
         DelayedSingleton<AudioControlManager>::GetInstance()->SetAudioDevice(AudioDevice::DEVICE_SPEAKER);
     } else {
         TELEPHONY_LOGI("set audio bluetooth");
-        DelayedSingleton<AudioControlManager>::GetInstance()->SetAudioDevice(AudioDevice::DEVICE_BLUETOOTH_SCO);
+        std::shared_ptr<BluetoothCallManager> bluetoothCallManager = std::make_shared<BluetoothCallManager>();
+        std::string address;
+        bluetoothCallManager->ConnectBtSco(address);
     }
 }
 
