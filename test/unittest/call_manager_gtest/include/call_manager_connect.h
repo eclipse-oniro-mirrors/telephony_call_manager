@@ -38,6 +38,8 @@
 
 namespace OHOS {
 namespace Telephony {
+std::unordered_map<int32_t, std::unordered_set<int32_t>> g_callStateMap;
+int32_t newCallId_ = -1;
 class CallInfoManager {
 public:
     static int32_t CallDetailsChange(const CallAttributeInfo &info);
@@ -46,23 +48,20 @@ public:
     // replace LOCK_NUM_WHILE_EQ and LOCK_NUM_WHILE_NE
     static void LockCallId(bool eq, int32_t originVal, int32_t slipMs, int32_t timeoutMs);
     static void LockCallState(bool eq, int32_t originVal, int32_t slipMs, int32_t timeoutMs);
+    static bool HasState(int32_t callId, int32_t callState);
+    static bool HasActiveStatus();
 
 private:
     static std::mutex mutex_;
-    static int32_t newCallId_;
     static int16_t newCallState_;
     static CallAttributeInfo updateCallInfo_;
-
     static std::unordered_set<int32_t> callIdSet_;
-    static std::unordered_map<int32_t, std::unordered_set<int32_t>> callStateMap_;
 };
 
 std::mutex CallInfoManager::mutex_;
-int32_t CallInfoManager::CallInfoManager::newCallId_;
 int16_t CallInfoManager::newCallState_;
 CallAttributeInfo CallInfoManager::updateCallInfo_;
 std::unordered_set<int32_t> CallInfoManager::callIdSet_;
-std::unordered_map<int32_t, std::unordered_set<int32_t>> CallInfoManager::callStateMap_;
 
 class CallAbilityCallbackStub : public IRemoteStub<ICallAbilityCallback> {
 public:

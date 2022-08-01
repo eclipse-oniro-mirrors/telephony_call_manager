@@ -103,17 +103,7 @@ public:
         std::cout << "---------- gtest end ------------" << std::endl;
     }
 
-    bool HasState(int32_t callId, int32_t callState)
-    {
-        if (g_callStateMap.find(callId) == g_callStateMap.end()) {
-            return false;
-        }
-        if (g_callStateMap[callId].find(callState) == g_callStateMap[callId].end()) {
-            return false;
-        }
-        return true;
-    }
-
+    void HangUpCall();
 public:
     static bool isConnected_;
     static std::unique_ptr<CallManagerConnect> clientPtr_;
@@ -128,8 +118,6 @@ public:
     const std::string EMPTY_DEFAULT = "";
     const int32_t FALSE_DEFAULT = -1;
     const int32_t DIAL_SCENE_TEST = 100;
-    std::unordered_map<int32_t, std::unordered_set<int32_t>> g_callStateMap;
-    int newCallId_ = -1;
 };
 
 bool CallManagerGtest::isConnected_ = false;

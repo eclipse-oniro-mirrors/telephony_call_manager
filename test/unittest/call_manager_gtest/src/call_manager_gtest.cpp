@@ -18,7 +18,9 @@
 #include <cstring>
 #include <gtest/gtest.h>
 #include <string>
+#include "bluetooth_hfp_ag.h"
 
+using namespace OHOS::Bluetooth;
 namespace OHOS {
 namespace Telephony {
 using namespace testing::ext;
@@ -47,10 +49,41 @@ int32_t CallInfoManager::CallDetailsChange(const CallAttributeInfo &info)
         newCallState_ = (int32_t)updateCallInfo_.callState;
         std::unordered_set<int32_t> newSet;
         newSet.clear();
-        callStateMap_.insert(std::pair<int32_t, std::unordered_set<int32_t>>(newCallId_, newSet));
+        g_callStateMap.insert(std::pair<int32_t, std::unordered_set<int32_t>>(newCallId_, newSet));
     }
-    callStateMap_[updateCallInfo_.callId].insert((int32_t)updateCallInfo_.callState);
+    g_callStateMap[updateCallInfo_.callId].insert((int32_t)updateCallInfo_.callState);
     return TELEPHONY_SUCCESS;
+}
+
+bool CallInfoManager::HasActiveStatus()
+{
+    TELEPHONY_LOGI("Waiting for activation !");
+    int sumUseTime = 0;
+    int slipMs = 50;
+    int increasingTime = 1000;
+    int useTimeMs = 18000;
+    do {
+        if (!(HasState(newCallId_, (int32_t)TelCallState::CALL_STATUS_ACTIVE))) {
+            usleep(slipMs * increasingTime);
+            sumUseTime += slipMs;
+        } else {
+            TELEPHONY_LOGI("===========wait %d ms callStatus:%d==============", sumUseTime, newCallState_);
+            return true;
+        }
+    } while (useTimeMs > sumUseTime);
+    TELEPHONY_LOGI("===========wait %d ms callStatus:%d=====not active=========", sumUseTime, newCallState_);
+    return false;
+}
+
+bool CallInfoManager::HasState(int callId, int32_t callState)
+{
+    if (g_callStateMap.find(callId) == g_callStateMap.end()) {
+        return false;
+    }
+    if (g_callStateMap[callId].find(callState) == g_callStateMap[callId].end()) {
+        return false;
+    }
+    return true;
 }
 
 int32_t CallInfoManager::CallEventChange(const CallEventInfo &info)
@@ -102,6 +135,19 @@ void CallInfoManager::LockCallState(bool eq, int32_t targetState, int32_t slipMs
     std::cout << "waited " << usedTimeMs << " seconds" << std::endl;
     std::cout << "target call state:" << targetState << std::endl;
     EXPECT_EQ(callState, targetState);
+}
+
+void CallManagerGtest::HangUpCall()
+{
+    clientPtr_->HangUpCall(newCallId_);
+    int useTimeMs = 0;
+    while ((CallInfoManager::HasState(newCallId_, (int32_t)TelCallState::CALL_STATUS_DISCONNECTED) != true) &&
+        (useTimeMs < SLEEP_12000_MS)) {
+        usleep((SLEEP_50_MS * SLEEP_1000_MS));
+        useTimeMs += SLEEP_50_MS;
+    }
+    TELEPHONY_LOGI("===========wait %d ms target:%d==============", useTimeMs,
+        CallInfoManager::HasState(newCallId_, (int32_t)TelCallState::CALL_STATUS_DISCONNECTED));
 }
 
 #ifndef TEL_TEST_UNSUPPORT
@@ -1774,11 +1820,32 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetPausePicture_0600, Function 
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_SetAudioDevice_0100, Function | MediumTest | Level2)
 {
+    if (!HasSimCard()) {
+        return;
+    }
+
     EXPECT_EQ(CallManagerGtest::IsServiceConnected(), true);
-    std::string address = "0C:D7:46:14:AA:33";
-    AudioDevice device = AudioDevice::DEVICE_BLUETOOTH_SCO;
-    int32_t ret = CallManagerGtest::clientPtr_->SetAudioDevice(device, address);
-    EXPECT_NE(ret, RETURN_VALUE_IS_ZERO);
+    std::string phoneNumber = "00000000000";
+    int32_t ret = CallManagerGtest::clientPtr_->DialCall(Str8ToStr16(phoneNumber), dialInfo_);
+    EXPECT_EQ(ret, RETURN_VALUE_IS_ZERO);
+
+    HandsFreeAudioGateway *profile = HandsFreeAudioGateway::GetProfile();
+    vector<BluetoothRemoteDevice> devices = profile->GetConnectedDevices();
+    int deviceNum = devices.size();
+    std::string address = "";
+    const int32_t zeroDevice = 0;
+    if (deviceNum > zeroDevice) {
+        address = devices[0].GetDeviceAddr();
+    }
+
+    if (CallInfoManager::HasActiveStatus()) {
+        EXPECT_EQ(clientPtr_->SetAudioDevice(AudioDevice::DEVICE_BLUETOOTH_SCO, address), RETURN_VALUE_IS_ZERO);
+    }
+
+    if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
+        HangUpCall();
+        EXPECT_EQ(CallInfoManager::HasState(newCallId_, (int32_t)TelCallState::CALL_STATUS_DISCONNECTED), true);
+    }
 }
 
 /**
@@ -1788,11 +1855,23 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetAudioDevice_0100, Function |
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_SetAudioDevice_0200, Function | MediumTest | Level2)
 {
+    if (!HasSimCard()) {
+        return;
+    }
+
     EXPECT_EQ(CallManagerGtest::IsServiceConnected(), true);
-    std::string address = "0C:D7:46:14:AA:33";
-    AudioDevice device = AudioDevice::DEVICE_EARPIECE;
-    int32_t ret = CallManagerGtest::clientPtr_->SetAudioDevice(device, address);
-    EXPECT_NE(ret, RETURN_VALUE_IS_ZERO);
+    std::string phoneNumber = "00000000000";
+    int32_t ret = CallManagerGtest::clientPtr_->DialCall(Str8ToStr16(phoneNumber), dialInfo_);
+    EXPECT_EQ(ret, RETURN_VALUE_IS_ZERO);
+    std::string address = "";
+    if (CallInfoManager::HasActiveStatus()) {
+        EXPECT_EQ(clientPtr_->SetAudioDevice(AudioDevice::DEVICE_EARPIECE, address), RETURN_VALUE_IS_ZERO);
+    }
+
+    if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
+        HangUpCall();
+        EXPECT_EQ(CallInfoManager::HasState(newCallId_, (int32_t)TelCallState::CALL_STATUS_DISCONNECTED), true);
+    }
 }
 
 /**
@@ -1802,11 +1881,24 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetAudioDevice_0200, Function |
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_SetAudioDevice_0300, Function | MediumTest | Level2)
 {
+    if (!HasSimCard()) {
+        return;
+    }
+
     EXPECT_EQ(CallManagerGtest::IsServiceConnected(), true);
-    std::string address = "0C:D7:46:14:AA:33";
-    AudioDevice device = AudioDevice::DEVICE_SPEAKER;
-    int32_t ret = CallManagerGtest::clientPtr_->SetAudioDevice(device, address);
+    std::string phoneNumber = "00000000000";
+    int32_t ret = CallManagerGtest::clientPtr_->DialCall(Str8ToStr16(phoneNumber), dialInfo_);
     EXPECT_EQ(ret, RETURN_VALUE_IS_ZERO);
+
+    std::string address = "";
+    if (CallInfoManager::HasActiveStatus()) {
+        EXPECT_EQ(clientPtr_->SetAudioDevice(AudioDevice::DEVICE_SPEAKER, address), RETURN_VALUE_IS_ZERO);
+    }
+
+    if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
+        HangUpCall();
+        EXPECT_EQ(CallInfoManager::HasState(newCallId_, (int32_t)TelCallState::CALL_STATUS_DISCONNECTED), true);
+    }
 }
 
 /**
@@ -1816,11 +1908,24 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetAudioDevice_0300, Function |
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_SetAudioDevice_0400, Function | MediumTest | Level2)
 {
+    if (!HasSimCard()) {
+        return;
+    }
+
     EXPECT_EQ(CallManagerGtest::IsServiceConnected(), true);
-    std::string address = "0C:D7:46:14:AA:33";
-    AudioDevice device = AudioDevice::DEVICE_WIRED_HEADSET;
-    int32_t ret = CallManagerGtest::clientPtr_->SetAudioDevice(device, address);
-    EXPECT_NE(ret, RETURN_VALUE_IS_ZERO);
+    std::string phoneNumber = "00000000000";
+    int32_t ret = CallManagerGtest::clientPtr_->DialCall(Str8ToStr16(phoneNumber), dialInfo_);
+    EXPECT_EQ(ret, RETURN_VALUE_IS_ZERO);
+
+    std::string address = "";
+    if (CallInfoManager::HasActiveStatus()) {
+        EXPECT_EQ(clientPtr_->SetAudioDevice(AudioDevice::DEVICE_WIRED_HEADSET, address), RETURN_VALUE_IS_ZERO);
+    }
+
+    if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
+        HangUpCall();
+        EXPECT_EQ(CallInfoManager::HasState(newCallId_, (int32_t)TelCallState::CALL_STATUS_DISCONNECTED), true);
+    }
 }
 
 /**
@@ -1830,11 +1935,24 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetAudioDevice_0400, Function |
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_SetAudioDevice_0500, Function | MediumTest | Level2)
 {
+    if (!HasSimCard()) {
+        return;
+    }
+
     EXPECT_EQ(CallManagerGtest::IsServiceConnected(), true);
+    std::string phoneNumber = "00000000000";
+    int32_t ret = CallManagerGtest::clientPtr_->DialCall(Str8ToStr16(phoneNumber), dialInfo_);
+    EXPECT_EQ(ret, RETURN_VALUE_IS_ZERO);
+
     std::string address = "";
-    AudioDevice device = AudioDevice::DEVICE_BLUETOOTH_SCO;
-    int32_t ret = CallManagerGtest::clientPtr_->SetAudioDevice(device, address);
-    EXPECT_NE(ret, RETURN_VALUE_IS_ZERO);
+    if (CallInfoManager::HasActiveStatus()) {
+        EXPECT_EQ(clientPtr_->SetAudioDevice(AudioDevice::DEVICE_BLUETOOTH_SCO, address), RETURN_VALUE_IS_ZERO);
+    }
+
+    if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
+        HangUpCall();
+        EXPECT_EQ(CallInfoManager::HasState(newCallId_, (int32_t)TelCallState::CALL_STATUS_DISCONNECTED), true);
+    }
 }
 
 /********************************************* Test RegisterCallBack() ***********************************************/
