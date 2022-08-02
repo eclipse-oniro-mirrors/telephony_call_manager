@@ -83,7 +83,8 @@ bool AudioDeviceManager::ProcessEvent(AudioEvent event)
                 std::shared_ptr<BluetoothCallManager> bluetoothCallManager = std::make_shared<BluetoothCallManager>();
                 // Gets whether the device can be started from the configuration
                 if (bluetoothCallManager->IsBtAvailble()) {
-                    currentAudioDevice_ = std::make_unique<BluetoothDeviceState>();
+                    TELEPHONY_LOGE("bluetooth device is avalid");
+                    return DelayedSingleton<BluetoothConnection>::GetInstance()->ConnectBtSco();
                 }
                 result = currentAudioDevice_->ProcessEvent(event);
             }
@@ -95,7 +96,12 @@ bool AudioDeviceManager::ProcessEvent(AudioEvent event)
             }
             break;
         case AudioEvent::BLUETOOTH_SCO_CONNECTED:
+            TELEPHONY_LOGE("process BLUETOOTH_SCO_CONNECTED");
             isBtScoConnected_ = true;
+            currentAudioDevice_ = std::make_unique<BluetoothDeviceState>();
+            if (currentAudioDevice_ == nullptr) {
+                return false;
+            }
             result = currentAudioDevice_->ProcessEvent(event);
             break;
         case AudioEvent::BLUETOOTH_SCO_DISCONNECTED:
@@ -121,9 +127,13 @@ bool AudioDeviceManager::SwitchDevice(AudioEvent event)
     return false;
 }
 
-void AudioDeviceManager::SetBluetoothAddress(const std::string &bluetoothAddress)
+bool AudioDeviceManager::ConnectBtScoWithAddress(const std::string &bluetoothAddress)
 {
-    bluetoothAddress_ = bluetoothAddress;
+    std::shared_ptr<BluetoothCallManager> bluetoothCallManager = std::make_shared<BluetoothCallManager>();
+    if (bluetoothCallManager->ConnectBtSco(bluetoothAddress)) {
+        return true;
+    }
+    return false;
 }
 
 bool AudioDeviceManager::SwitchDevice(AudioDevice device)
@@ -206,10 +216,8 @@ bool AudioDeviceManager::EnableWiredHeadset()
 
 bool AudioDeviceManager::EnableBtSco()
 {
-    std::shared_ptr<BluetoothCallManager> bluetoothCallManager = std::make_shared<BluetoothCallManager>();
-    isBtScoConnected_ = bluetoothCallManager->IsBtAvailble();
-    if (isBtScoConnected_ && DelayedSingleton<AudioProxy>::GetInstance()->SetBluetoothDevActive() &&
-        bluetoothCallManager->ConnectBtSco(bluetoothAddress_)) {
+    TELEPHONY_LOGE("EnableBtSco start");
+    if (isBtScoConnected_ && DelayedSingleton<AudioProxy>::GetInstance()->SetBluetoothDevActive()) {
         currentAudioDevice_ = std::make_unique<BluetoothDeviceState>();
         if (currentAudioDevice_ == nullptr) {
             TELEPHONY_LOGE("make_unique BluetoothDeviceState failed");
@@ -242,9 +250,9 @@ bool AudioDeviceManager::DisableAll()
 void AudioDeviceManager::SetCurrentAudioDevice(AudioDevice device)
 {
     if (audioDevice_ == AudioDevice::DEVICE_BLUETOOTH_SCO && audioDevice_ != device) {
-        BluetoothConnection::SetBtScoState(SCO_STATE_PENDING);
+        DelayedSingleton<BluetoothConnection>::GetInstance()->SetBtScoState(SCO_STATE_PENDING);
     } else if (audioDevice_ != AudioDevice::DEVICE_BLUETOOTH_SCO && device == AudioDevice::DEVICE_BLUETOOTH_SCO) {
-        BluetoothConnection::SetBtScoState(SCO_STATE_CONNECTED);
+        DelayedSingleton<BluetoothConnection>::GetInstance()->SetBtScoState(SCO_STATE_CONNECTED);
     }
     audioDevice_ = device;
 }

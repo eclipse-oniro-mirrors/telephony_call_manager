@@ -47,8 +47,8 @@ public:
     bool ConnectBtSco(const std::string &bluetoothAddress);
     bool DisconnectBtSco();
     bool IsBtScoConnected();
-    static BtScoState GetBtScoState();
-    static void SetBtScoState(BtScoState state);
+    BtScoState GetBtScoState();
+    void SetBtScoState(BtScoState state);
     int32_t SendBtCallState(int32_t numActive, int32_t numHeld, int32_t callState, const std::string &number);
     void RemoveBtDevice(const std::string &address);
     bool IsBtAvailble();
@@ -62,7 +62,7 @@ public:
 
 private:
     bool IsAudioActivated();
-    static BtScoState btScoState_;
+    BtScoState btScoState_ = BtScoState::SCO_STATE_DISCONNECTED;
     std::string connectedScoAddr_;
 #ifdef ABILITY_BLUETOOTH_SUPPORT
     bool ConnectBtSco(const Bluetooth::BluetoothRemoteDevice &device);
