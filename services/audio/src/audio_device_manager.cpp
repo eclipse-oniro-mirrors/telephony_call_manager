@@ -83,7 +83,6 @@ bool AudioDeviceManager::ProcessEvent(AudioEvent event)
                 std::shared_ptr<BluetoothCallManager> bluetoothCallManager = std::make_shared<BluetoothCallManager>();
                 // Gets whether the device can be started from the configuration
                 if (bluetoothCallManager->IsBtAvailble()) {
-                    TELEPHONY_LOGE("bluetooth device is avalid");
                     return DelayedSingleton<BluetoothConnection>::GetInstance()->ConnectBtSco();
                 }
                 result = currentAudioDevice_->ProcessEvent(event);
@@ -96,7 +95,6 @@ bool AudioDeviceManager::ProcessEvent(AudioEvent event)
             }
             break;
         case AudioEvent::BLUETOOTH_SCO_CONNECTED:
-            TELEPHONY_LOGE("process BLUETOOTH_SCO_CONNECTED");
             isBtScoConnected_ = true;
             currentAudioDevice_ = std::make_unique<BluetoothDeviceState>();
             if (currentAudioDevice_ == nullptr) {
@@ -216,7 +214,6 @@ bool AudioDeviceManager::EnableWiredHeadset()
 
 bool AudioDeviceManager::EnableBtSco()
 {
-    TELEPHONY_LOGE("EnableBtSco start");
     if (isBtScoConnected_ && DelayedSingleton<AudioProxy>::GetInstance()->SetBluetoothDevActive()) {
         currentAudioDevice_ = std::make_unique<BluetoothDeviceState>();
         if (currentAudioDevice_ == nullptr) {

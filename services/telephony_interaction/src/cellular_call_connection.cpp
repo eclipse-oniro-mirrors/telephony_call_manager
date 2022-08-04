@@ -70,6 +70,10 @@ void CellularCallConnection::Init(int32_t systemAbilityId)
 void CellularCallConnection::UnInit()
 {
     DisconnectService();
+    if (statusChangeListener_ != nullptr) {
+        statusChangeListener_.clear();
+        statusChangeListener_ = nullptr;
+    }
 }
 
 bool CellularCallConnection::IsConnect() const
@@ -157,11 +161,6 @@ void CellularCallConnection::Clean()
     if (cellularCallCallbackPtr_ != nullptr) {
         cellularCallCallbackPtr_.clear();
         cellularCallCallbackPtr_ = nullptr;
-    }
-
-    if (statusChangeListener_ != nullptr) {
-        statusChangeListener_.clear();
-        statusChangeListener_ = nullptr;
     }
 
     connectState_ = false;
