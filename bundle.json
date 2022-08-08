@@ -56,12 +56,18 @@
             ]
         },
         "build": {
-            "sub_component": [
-                "//base/telephony/call_manager:tel_call_manager",
-                "//base/telephony/call_manager/sa_profile:call_manager_sa_profile",
-                "//base/telephony/call_manager/frameworks/js:call",
-                "//base/telephony/call_manager/resource/audio:ring.wav"
-            ],
+            "group_type": {
+                "base_group": [
+                ],
+                "fwk_group": [
+                    "//base/telephony/call_manager/frameworks/js:call"
+                ],
+                "service_group": [
+                    "//base/telephony/call_manager:tel_call_manager",
+                    "//base/telephony/call_manager/sa_profile:call_manager_sa_profile",
+                    "//base/telephony/call_manager/resource/audio:ring.wav"
+                ]
+            },
             "inner_kits": [
                 {
                     "header": {
