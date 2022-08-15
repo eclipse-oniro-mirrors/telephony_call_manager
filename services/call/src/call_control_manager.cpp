@@ -816,12 +816,14 @@ int32_t CallControlManager::JoinConference(int32_t callId, std::vector<std::u16s
 int32_t CallControlManager::SetMuted(bool isMute)
 {
     sptr<CallBase> call = CallObjectManager::GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_ACTIVE);
-    if (call != nullptr) {
-        if (call->GetCallType() == CallType::TYPE_IMS
-            || call->GetCallType() == CallType::TYPE_CS) {
-            TELEPHONY_LOGI("SetMute by ims or cs");
-            call->SetMute(isMute, call->GetSlotId());
-        }
+    if (call == nullptr) {
+        return TELEPHONY_ERROR;
+    }
+
+    if (call->GetCallType() == CallType::TYPE_IMS
+        || call->GetCallType() == CallType::TYPE_CS) {
+        TELEPHONY_LOGI("SetMute by ims or cs");
+        call->SetMute(isMute, call->GetSlotId());
     }
 
     return DelayedSingleton<AudioControlManager>::GetInstance()->SetMute(isMute);
