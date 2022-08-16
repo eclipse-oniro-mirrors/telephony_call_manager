@@ -115,11 +115,6 @@ ohos_shared_library("tel_call_manager") {
     "services/video/include",
     "services/call/call_state_observer/include",
     "frameworks/native/include",
-    "//foundation/multimedia/camera_standard/interfaces/inner_api/native/camera/include",
-    "//foundation/multimedia/camera_standard/services/camera_service/include",
-    "//foundation/multimedia/camera_standard/services/camera_service/binder/base/include",
-    "//foundation/multimedia/camera_standard/services/camera_service/binder/client/include",
-    "//foundation/multimedia/camera_standard/services/camera_service/binder/server/include",
     "//foundation/graphic/graphic_2d/interfaces/inner_api/surface",
     "//foundation/graphic/graphic_2d/interfaces/inner_api/common",
     "//drivers/peripheral/camera/interfaces/metadata/include",
@@ -150,7 +145,6 @@ ohos_shared_library("tel_call_manager") {
     "//base/telephony/core_service/utils:libtel_common",
     "//base/telephony/sms_mms/frameworks/native:tel_sms_mms_api",
     "//drivers/peripheral/camera/interfaces/metadata:metadata",
-    "//foundation/multimedia/camera_standard/frameworks/native/camera:camera_framework",
     "//third_party/libphonenumber/cpp:phonenumber_standard",
   ]
 
@@ -168,6 +162,7 @@ ohos_shared_library("tel_call_manager") {
     "multimedia_audio_framework:audio_client",
     "multimedia_audio_framework:audio_renderer",
     "multimedia_audio_framework:audio_ringtone_client",
+    "multimedia_camera_framework:camera_framework",
     "power_manager:powermgr_client",
     "relational_store:native_appdatafwk",
     "relational_store:native_dataability",
