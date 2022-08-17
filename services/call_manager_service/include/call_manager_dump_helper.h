@@ -31,7 +31,7 @@ public:
 
 private:
     void ShowHelp(std::string &result) const;
-
+    bool WhetherHasSimCard(const int32_t slotId) const;
     void ShowCallManagerInfo(std::string &result) const;
 };
 } // namespace Telephony

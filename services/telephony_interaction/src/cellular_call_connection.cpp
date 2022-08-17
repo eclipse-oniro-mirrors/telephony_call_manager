@@ -18,6 +18,7 @@
 #include <thread>
 
 #include "call_manager_errors.h"
+#include "call_manager_hisysevent.h"
 #include "iservice_registry.h"
 #include "system_ability.h"
 #include "system_ability_definition.h"
@@ -170,6 +171,8 @@ int CellularCallConnection::Dial(const CellularCallInfo &callInfo)
 {
     if (ReConnectService() != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("ipc reconnect failed!");
+        CallManagerHisysevent::WriteDialCallFaultEvent(callInfo.accountId, static_cast<int32_t>(callInfo.callType),
+            callInfo.videoState, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL, "ReConnectService failed");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     std::lock_guard<std::mutex> lock(mutex_);
@@ -186,6 +189,8 @@ int CellularCallConnection::HangUp(const CellularCallInfo &callInfo, CallSupplem
 {
     if (ReConnectService() != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("ipc reconnect failed!");
+        CallManagerHisysevent::WriteHangUpFaultEvent(
+            callInfo.accountId, callInfo.callId, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL, "HangUp ipc reconnect failed");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     std::lock_guard<std::mutex> lock(mutex_);
@@ -201,6 +206,8 @@ int CellularCallConnection::Reject(const CellularCallInfo &callInfo)
 {
     if (ReConnectService() != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("ipc reconnect failed!");
+        CallManagerHisysevent::WriteHangUpFaultEvent(
+            callInfo.accountId, callInfo.callId, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL, "Reject ipc reconnect failed");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     std::lock_guard<std::mutex> lock(mutex_);
@@ -216,6 +223,8 @@ int CellularCallConnection::Answer(const CellularCallInfo &callInfo)
 {
     if (ReConnectService() != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("ipc reconnect failed!");
+        CallManagerHisysevent::WriteAnswerCallFaultEvent(callInfo.accountId, callInfo.callId, callInfo.videoState,
+            TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL, "ipc reconnect failed");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     std::lock_guard<std::mutex> lock(mutex_);

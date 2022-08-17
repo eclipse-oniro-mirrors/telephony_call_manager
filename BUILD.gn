@@ -77,6 +77,7 @@ ohos_shared_library("tel_call_manager") {
     "services/call/src/ott_conference.cpp",
     "services/call/src/video_call_state.cpp",
     "services/call_manager_service/src/call_manager_dump_helper.cpp",
+    "services/call_manager_service/src/call_manager_hisysevent.cpp",
     "services/call_manager_service/src/call_manager_service.cpp",
     "services/call_manager_service/src/call_manager_service_stub.cpp",
     "services/call_report/src/call_ability_callback_proxy.cpp",
@@ -90,7 +91,6 @@ ohos_shared_library("tel_call_manager") {
     "services/telephony_interaction/src/core_service_connection.cpp",
     "services/telephony_interaction/src/report_call_info_handler.cpp",
     "services/video/src/video_control_manager.cpp",
-    "utils/src/call_hisysevent.cpp",
     "utils/src/call_number_utils.cpp",
   ]
 
@@ -100,7 +100,6 @@ ohos_shared_library("tel_call_manager") {
     "//third_party/libphonenumber/cpp/src/phonenumbers",
     "//third_party/protobuf/src",
     "//third_party/protobuf/src/google/protobuf",
-    "//base/hiviewdfx/hisysevent/interfaces/native/innerkits/hisysevent/include",
     "//base/telephony/call_manager/interfaces/innerkits",
     "//base/telephony/sms_mms/interfaces/innerkits/",
     "services/audio/include",
@@ -163,6 +162,7 @@ ohos_shared_library("tel_call_manager") {
     "core_service:tel_core_service_api",
     "eventhandler:libeventhandler",
     "hisysevent_native:libhisysevent",
+    "hitrace_native:hitrace_meter",
     "init:libbegetutil",
     "ipc:ipc_core",
     "multimedia_audio_framework:audio_client",

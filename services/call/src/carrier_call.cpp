@@ -18,6 +18,7 @@
 #include <securec.h>
 
 #include "call_manager_errors.h"
+#include "call_manager_hisysevent.h"
 #include "telephony_log_wrapper.h"
 
 #include "call_number_utils.h"
@@ -53,11 +54,15 @@ int32_t CarrierCall::CarrierAnswerCall(int32_t videoState)
     int32_t ret = AnswerCallBase();
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("answer call failed!");
+        CallManagerHisysevent::WriteAnswerCallFaultEvent(
+            slotId_, INVALID_PARAMETER, videoState, ret, "the device is currently not ringing");
         return CALL_ERR_ANSWER_FAILED;
     }
     ret = PackCellularCallInfo(callInfo);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGW("PackCellularCallInfo failed!");
+        CallManagerHisysevent::WriteAnswerCallFaultEvent(
+            slotId_, INVALID_PARAMETER, videoState, ret, "PackCellularCallInfo failed");
     }
     if (cellularCallConnectionPtr_ == nullptr) {
         TELEPHONY_LOGE("cellularCallConnectionPtr_ is nullptr!");
@@ -81,6 +86,8 @@ int32_t CarrierCall::CarrierRejectCall()
     ret = PackCellularCallInfo(callInfo);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGW("PackCellularCallInfo failed!");
+        CallManagerHisysevent::WriteHangUpFaultEvent(
+            slotId_, callInfo.callId, ret, "Reject PackCellularCallInfo failed");
     }
     TelCallState state = GetTelCallState();
     if (cellularCallConnectionPtr_ == nullptr) {
@@ -106,6 +113,8 @@ int32_t CarrierCall::CarrierHangUpCall()
     ret = PackCellularCallInfo(callInfo);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGW("PackCellularCallInfo failed!");
+        CallManagerHisysevent::WriteHangUpFaultEvent(
+            callInfo.accountId, callInfo.callId, ret, "HangUp PackCellularCallInfo failed");
     }
     uint64_t policyFlag = GetPolicyFlag();
     if (cellularCallConnectionPtr_ == nullptr) {
