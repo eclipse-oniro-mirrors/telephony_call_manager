@@ -134,7 +134,7 @@ ohos_shared_library("tel_call_manager") {
     "//drivers/peripheral/camera/interfaces/include/callback/host",
     "${ability_runtime_inner_api_path}/dataobs_manager/include",
     "//foundation/multimedia/audio_framework/interfaces/inner_api/native/audioringtone/include",
-    "//foundation/multimedia/audio_framework/services/include/client",
+    "//foundation/multimedia/audio_framework/frameworks/native/systemsound",
     "//foundation/multimedia/player_framework/interfaces/inner_api/native",
     "//foundation/multimedia/media_library/interfaces/innerkits/native/include",
   ]
