@@ -24,6 +24,7 @@
 
 namespace OHOS {
 namespace Telephony {
+constexpr int32_t SLOT_ID_INVALID = 202;
 #define GET_PARAMS(env, info, num) \
     size_t argc = num;             \
     napi_value argv[num] = {0};    \

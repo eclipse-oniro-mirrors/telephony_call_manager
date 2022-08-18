@@ -52,7 +52,7 @@ struct AsyncContext {
     napi_deferred deferred;
     napi_ref callbackRef;
     int32_t callId;
-    int32_t result;
+    int32_t resolved = TELEPHONY_ERROR;
     char number[kMaxNumberLen + 1];
     size_t numberLen;
     napi_value value[VALUE_MAXIMUM_LIMIT];
