@@ -15,13 +15,13 @@
 
 #include "call_status_callback.h"
 
-#include "call_manager_errors.h"
-#include "telephony_log_wrapper.h"
-
-#include "call_ability_report_proxy.h"
-#include "call_hisysevent.h"
-#include "report_call_info_handler.h"
 #include "audio_control_manager.h"
+#include "call_ability_report_proxy.h"
+#include "call_manager_errors.h"
+#include "call_manager_hisysevent.h"
+#include "hitrace_meter.h"
+#include "report_call_info_handler.h"
+#include "telephony_log_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -67,9 +67,17 @@ int32_t CallStatusCallback::UpdateCallsReportInfo(const CallsReportInfo &info)
         detailsInfo.callVec.push_back(detailInfo);
     }
     detailsInfo.slotId = callsInfo.slotId;
-    CallHisysevent::HiSysEventWriteCallState(
+    CallManagerHisysevent::WriteCallStateBehaviorEvent(
         detailsInfo.slotId, static_cast<int32_t>(detailInfo.state), detailInfo.index);
     (void)memset_s(detailsInfo.bundleName, kMaxBundleNameLen, 0, kMaxBundleNameLen);
+
+    if (detailInfo.state == TelCallState::CALL_STATUS_INCOMING) {
+        CallManagerHisysevent::WriteIncomingCallBehaviorEvent(
+            detailsInfo.slotId, static_cast<int32_t>(detailInfo.callType), static_cast<int32_t>(detailInfo.callMode));
+        TELEPHONY_LOGI("CallStatusCallback InComingCall StartAsyncTrace!");
+        DelayedSingleton<CallManagerHisysevent>::GetInstance()->SetIncomingStartTime();
+        StartAsyncTrace(HITRACE_TAG_OHOS, "InComingCall", getpid());
+    }
     int32_t ret = DelayedSingleton<ReportCallInfoHandlerService>::GetInstance()->UpdateCallsReportInfo(detailsInfo);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("UpdateCallsReportInfo failed! errCode:%{public}d", ret);

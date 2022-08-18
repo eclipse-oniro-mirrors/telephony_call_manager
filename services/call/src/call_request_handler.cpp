@@ -19,6 +19,7 @@
 #include <string_ex.h>
 
 #include "call_manager_errors.h"
+#include "call_manager_hisysevent.h"
 #include "telephony_log_wrapper.h"
 
 namespace OHOS {
@@ -371,6 +372,8 @@ int32_t CallRequestHandlerService::AnswerCall(int32_t callId, int32_t videoState
     para->videoState = videoState;
     if (!handler_->SendEvent(HANDLER_ANSWER_CALL_REQUEST, std::move(para))) {
         TELEPHONY_LOGE("send accept event failed!");
+        CallManagerHisysevent::WriteAnswerCallFaultEvent(INVALID_PARAMETER, callId, videoState,
+            CALL_ERR_SYSTEM_EVENT_HANDLE_FAILURE, "send HANDLER_ANSWER_CALL_REQUEST event failed");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     return TELEPHONY_SUCCESS;
@@ -394,10 +397,14 @@ int32_t CallRequestHandlerService::RejectCall(int32_t callId, bool isSendSms, st
                               REJECT_CALL_MSG_MAX_LEN);
     if (para->isSendSms && result != EOK) {
         TELEPHONY_LOGE("memcpy_s rejectCall content failed!");
+        CallManagerHisysevent::WriteHangUpFaultEvent(
+            INVALID_PARAMETER, callId, TELEPHONY_ERR_MEMCPY_FAIL, "Reject memcpy_s rejectCall content failed");
         return TELEPHONY_ERR_MEMCPY_FAIL;
     }
     if (!handler_->SendEvent(HANDLER_REJECT_CALL_REQUEST, std::move(para))) {
         TELEPHONY_LOGE("send reject event failed!");
+        CallManagerHisysevent::WriteHangUpFaultEvent(INVALID_PARAMETER, callId, CALL_ERR_SYSTEM_EVENT_HANDLE_FAILURE,
+            "Reject send HANDLER_REJECT_CALL_REQUEST event failed");
         return CALL_ERR_SYSTEM_EVENT_HANDLE_FAILURE;
     }
     return TELEPHONY_SUCCESS;
@@ -416,6 +423,8 @@ int32_t CallRequestHandlerService::HangUpCall(int32_t callId)
     }
     if (!handler_->SendEvent(HANDLER_HANGUP_CALL_REQUEST, std::move(para))) {
         TELEPHONY_LOGE("send hung up event failed!");
+        CallManagerHisysevent::WriteHangUpFaultEvent(INVALID_PARAMETER, callId,
+            CALL_ERR_SYSTEM_EVENT_HANDLE_FAILURE, "HangUp send HANDLER_HANGUP_CALL_REQUEST event failed");
         return CALL_ERR_SYSTEM_EVENT_HANDLE_FAILURE;
     }
     return TELEPHONY_SUCCESS;

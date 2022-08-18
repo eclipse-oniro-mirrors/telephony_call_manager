@@ -18,22 +18,22 @@
 #include <securec.h>
 #include <string_ex.h>
 
-#include "call_manager_errors.h"
-#include "telephony_log_wrapper.h"
-
-#include "common_type.h"
 #include "audio_control_manager.h"
-#include "video_control_manager.h"
 #include "bluetooth_call_manager.h"
 #include "call_ability_report_proxy.h"
+#include "call_manager_errors.h"
+#include "call_manager_hisysevent.h"
+#include "call_number_utils.h"
+#include "call_records_manager.h"
 #include "call_state_broadcast.h"
 #include "call_state_report_proxy.h"
 #include "cellular_call_connection.h"
-#include "call_records_manager.h"
-#include "call_number_utils.h"
-#include "reject_call_sms.h"
+#include "common_type.h"
 #include "ims_call.h"
 #include "iservice_registry.h"
+#include "reject_call_sms.h"
+#include "telephony_log_wrapper.h"
+#include "video_control_manager.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -143,6 +143,8 @@ int32_t CallControlManager::AnswerCall(int32_t callId, int32_t videoState)
         sptr<CallBase> call = GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_RINGING);
         if (call == nullptr) {
             TELEPHONY_LOGE("call is nullptr");
+            CallManagerHisysevent::WriteAnswerCallFaultEvent(
+                INVALID_PARAMETER, callId, videoState, TELEPHONY_ERR_LOCAL_PTR_NULL, "call is nullptr");
             return TELEPHONY_ERROR;
         }
         callId = call->GetCallID();
@@ -151,6 +153,8 @@ int32_t CallControlManager::AnswerCall(int32_t callId, int32_t videoState)
     int32_t ret = AnswerCallPolicy(callId, videoState);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("AnswerCallPolicy failed!");
+        CallManagerHisysevent::WriteAnswerCallFaultEvent(
+            INVALID_PARAMETER, callId, videoState, ret, "AnswerCallPolicy failed");
         return ret;
     }
     if (callRequestHandlerServicePtr_ == nullptr) {
@@ -176,6 +180,8 @@ int32_t CallControlManager::RejectCall(int32_t callId, bool rejectWithMessage, s
         sptr<CallBase> call = GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_RINGING);
         if (call == nullptr) {
             TELEPHONY_LOGE("call is nullptr");
+            CallManagerHisysevent::WriteHangUpFaultEvent(
+                INVALID_PARAMETER, callId, TELEPHONY_ERR_LOCAL_PTR_NULL, "Reject call is nullptr");
             return TELEPHONY_ERROR;
         }
         callId = call->GetCallID();
@@ -184,6 +190,7 @@ int32_t CallControlManager::RejectCall(int32_t callId, bool rejectWithMessage, s
     int32_t ret = RejectCallPolicy(callId);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("RejectCallPolicy failed!");
+        CallManagerHisysevent::WriteHangUpFaultEvent(INVALID_PARAMETER, callId, ret, "Reject RejectCallPolicy failed");
         return ret;
     }
     std::string messageStr(Str16ToStr8(textMessage));
@@ -213,6 +220,8 @@ int32_t CallControlManager::HangUpCall(int32_t callId)
 
         if (callId == INVALID_CALLID) {
             TELEPHONY_LOGE("callId is INVALID_CALLID!");
+            CallManagerHisysevent::WriteHangUpFaultEvent(
+                INVALID_PARAMETER, callId, TELEPHONY_ERR_LOCAL_PTR_NULL, "HangUp callId is INVALID_CALLID");
             return TELEPHONY_ERROR;
         }
     }
@@ -224,6 +233,7 @@ int32_t CallControlManager::HangUpCall(int32_t callId)
     int32_t ret = HangUpPolicy(callId);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("HangUpPolicy failed!");
+        CallManagerHisysevent::WriteHangUpFaultEvent(INVALID_PARAMETER, callId, ret, "HangUp HangUpPolicy failed");
         return ret;
     }
     ret = callRequestHandlerServicePtr_->HangUpCall(callId);

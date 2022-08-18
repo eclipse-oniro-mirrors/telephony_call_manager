@@ -18,6 +18,7 @@
 #include "call_ability_report_proxy.h"
 #include "call_control_manager.h"
 #include "call_manager_errors.h"
+#include "call_manager_hisysevent.h"
 #include "cellular_call_connection.h"
 #include "common_type.h"
 #include "core_service_connection.h"
@@ -38,6 +39,9 @@ void CallRequestProcess::DialRequest()
     DelayedSingleton<CallControlManager>::GetInstance()->GetDialParaInfo(info);
     if (!info.isDialing) {
         TELEPHONY_LOGE("the device is not dialing!");
+        CallManagerHisysevent::WriteDialCallFaultEvent(info.accountId, static_cast<int32_t>(info.callType),
+            static_cast<int32_t>(info.videoState), static_cast<int32_t>(CallErrorCode::CALL_ERROR_DEVICE_NOT_DIALING),
+            "the device is not dialing");
         return;
     }
     if (info.dialType == DialType::DIAL_CARRIER_TYPE) {
@@ -52,6 +56,9 @@ void CallRequestProcess::DialRequest()
                 (void)memcpy_s(eventInfo.phoneNum, kMaxNumberLen, info.number.c_str(), info.number.length());
                 DelayedSingleton<CallControlManager>::GetInstance()->NotifyCallEventUpdated(eventInfo);
                 TELEPHONY_LOGW("invalid fdn number!");
+                CallManagerHisysevent::WriteDialCallFaultEvent(info.accountId, static_cast<int32_t>(info.callType),
+                    static_cast<int32_t>(info.videoState),
+                    static_cast<int32_t>(CallErrorCode::CALL_ERROR_INVALID_FDN_NUMBER), "invalid fdn number!");
                 return;
             }
         }
@@ -271,6 +278,8 @@ void CallRequestProcess::CarrierDialProcess(DialParaInfo &info)
     int32_t ret = PackCellularCallInfo(info, callInfo);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGW("PackCellularCallInfo failed!");
+        CallManagerHisysevent::WriteDialCallFaultEvent(info.accountId, static_cast<int32_t>(info.callType),
+            static_cast<int32_t>(info.videoState), ret, "Carrier type PackCellularCallInfo failed");
     }
     // Obtain gateway information
     ret = DelayedSingleton<CellularCallConnection>::GetInstance()->Dial(callInfo);
@@ -286,6 +295,8 @@ void CallRequestProcess::VoiceMailDialProcess(DialParaInfo &info)
     int32_t ret = PackCellularCallInfo(info, callInfo);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGW("PackCellularCallInfo failed!");
+        CallManagerHisysevent::WriteDialCallFaultEvent(info.accountId, static_cast<int32_t>(info.callType),
+            static_cast<int32_t>(info.videoState), ret, "Voice mail type PackCellularCallInfo failed");
     }
     ret = DelayedSingleton<CellularCallConnection>::GetInstance()->Dial(callInfo);
     if (ret != TELEPHONY_SUCCESS) {

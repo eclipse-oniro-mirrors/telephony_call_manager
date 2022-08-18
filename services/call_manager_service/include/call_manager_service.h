@@ -71,6 +71,12 @@ public:
     std::string GetStartServiceSpent();
 
     /**
+     * Get serviceRunningState_
+     * @return serviceRunningState_
+     */
+    int32_t GetServiceRunningState();
+
+    /**
      * RegisterCallBack
      *
      * @brief Register callback
@@ -599,6 +605,7 @@ private:
     const int32_t extraMonth_ = 1;
     int64_t bindTime_ = 0L;
     int32_t spendTime_ = 0;
+    int32_t serviceRunningState_ = 0;
 };
 } // namespace Telephony
 } // namespace OHOS

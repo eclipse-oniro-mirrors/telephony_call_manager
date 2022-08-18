@@ -16,6 +16,7 @@
 #include "ott_call.h"
 
 #include "call_manager_errors.h"
+#include "call_manager_hisysevent.h"
 #include "telephony_log_wrapper.h"
 
 #include "ott_call_connection.h"
@@ -46,12 +47,16 @@ int32_t OTTCall::AnswerCall(int32_t videoState)
     int32_t ret = AnswerCallBase();
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("answer call failed!");
+        CallManagerHisysevent::WriteAnswerCallFaultEvent(
+            INVALID_PARAMETER, INVALID_PARAMETER, videoState, ret, "the device is currently not ringing");
         return CALL_ERR_ANSWER_FAILED;
     }
     OttCallRequestInfo requestInfo;
     ret = PackOttCallRequestInfo(requestInfo);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("PackOttCallRequestInfo failed,  error%{public}d", ret);
+        CallManagerHisysevent::WriteAnswerCallFaultEvent(
+            INVALID_PARAMETER, INVALID_PARAMETER, videoState, ret, "PackOttCallRequestInfo failed");
         return CALL_ERR_ANSWER_FAILED;
     }
     if (ottCallConnectionPtr_ == nullptr) {
@@ -76,6 +81,8 @@ int32_t OTTCall::RejectCall()
     ret = PackOttCallRequestInfo(requestInfo);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("PackOttCallRequestInfo failed,  error%{public}d", ret);
+        CallManagerHisysevent::WriteHangUpFaultEvent(
+            INVALID_PARAMETER, INVALID_PARAMETER, ret, "Reject PackOttCallRequestInfo failed");
         return CALL_ERR_REJECT_FAILED;
     }
     ret = ottCallConnectionPtr_->Reject(requestInfo);
@@ -92,6 +99,8 @@ int32_t OTTCall::HangUpCall()
     int32_t ret = PackOttCallRequestInfo(requestInfo);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("PackOttCallRequestInfo failed,  error%{public}d", ret);
+        CallManagerHisysevent::WriteHangUpFaultEvent(
+            INVALID_PARAMETER, INVALID_PARAMETER, ret, "HangUp PackOttCallRequestInfo failed");
         return CALL_ERR_HANGUP_FAILED;
     }
     ret = ottCallConnectionPtr_->HangUp(requestInfo);

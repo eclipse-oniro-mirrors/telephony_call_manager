@@ -16,6 +16,7 @@
 #include "call_manager_dump_helper.h"
 
 #include "call_manager_service.h"
+#include "core_service_client.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -30,6 +31,11 @@ bool CallManagerDumpHelper::Dump(const std::vector<std::string> &args, std::stri
 CallManagerDumpHelper::CallManagerDumpHelper()
 {
     TELEPHONY_LOGI("CallManagerDumpHelper() entry.");
+}
+
+bool CallManagerDumpHelper::WhetherHasSimCard(const int32_t slotId) const
+{
+    return DelayedRefSingleton<CoreServiceClient>::GetInstance().HasSimCard(slotId);
 }
 
 void CallManagerDumpHelper::ShowHelp(std::string &result) const
@@ -54,11 +60,30 @@ void CallManagerDumpHelper::ShowCallManagerInfo(std::string &result) const
 {
     result.append("Ohos call_manager service:");
     result.append("\n");
-    result.append("Ohos call_manager bind time:  ");
+    result.append("CurrentTime:  ");
     result.append(DelayedSingleton<CallManagerService>::GetInstance()->GetBindTime());
     result.append("\n");
-    result.append("Ohos call_manager start spend time(milliseconds):  ");
+    result.append("SpendTime:");
     result.append(DelayedSingleton<CallManagerService>::GetInstance()->GetStartServiceSpent());
+    result.append("\n");
+    result.append("ServiceRunningState:");
+    result.append(std::to_string(DelayedSingleton<CallManagerService>::GetInstance()->GetServiceRunningState()));
+    result.append("\n");
+    for (int32_t i = 0; i < SIM_SLOT_COUNT; i++) {
+        if (WhetherHasSimCard(i)) {
+            result.append("SlotId = ");
+            result.append(std::to_string(i));
+            result.append("\n");
+        }
+    }
+    result.append("CallState:");
+    result.append(std::to_string(DelayedSingleton<CallManagerService>::GetInstance()->GetCallState()));
+    result.append("\n");
+    result.append("RingingCallState:");
+    result.append(std::to_string(DelayedSingleton<CallManagerService>::GetInstance()->IsRinging()));
+    result.append("\n");
+    result.append("HasCall:");
+    result.append(std::to_string(DelayedSingleton<CallManagerService>::GetInstance()->HasCall()));
     result.append("\n");
 }
 } // namespace Telephony

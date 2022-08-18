@@ -21,7 +21,9 @@
 #include "bluetooth_call_service.h"
 #include "call_control_manager.h"
 #include "call_manager_errors.h"
+#include "call_manager_hisysevent.h"
 #include "cs_call.h"
+#include "hitrace_meter.h"
 #include "ims_call.h"
 #include "ott_call.h"
 #include "report_call_info_handler.h"
@@ -76,15 +78,23 @@ int32_t CallStatusManager::HandleCallReportInfo(const CallDetailInfo &info)
         case TelCallState::CALL_STATUS_HOLDING:
             ret = HoldingHandle(info);
             break;
-        case TelCallState::CALL_STATUS_DIALING:
+        case TelCallState::CALL_STATUS_DIALING: {
             ret = DialingHandle(info);
+            FinishAsyncTrace(HITRACE_TAG_OHOS, "DialCall", getpid());
+            DelayedSingleton<CallManagerHisysevent>::GetInstance()->JudgingDialTimeOut(
+                info.accountId, static_cast<int32_t>(info.callType), static_cast<int32_t>(info.callMode));
             break;
+        }
         case TelCallState::CALL_STATUS_ALERTING:
             ret = AlertHandle(info);
             break;
-        case TelCallState::CALL_STATUS_INCOMING:
+        case TelCallState::CALL_STATUS_INCOMING: {
             ret = IncomingHandle(info);
+            FinishAsyncTrace(HITRACE_TAG_OHOS, "InComingCall", getpid());
+            DelayedSingleton<CallManagerHisysevent>::GetInstance()->JudgingIncomingTimeOut(
+                info.accountId, static_cast<int32_t>(info.callType), static_cast<int32_t>(info.callMode));
             break;
+        }
         case TelCallState::CALL_STATUS_WAITING:
             ret = WaitingHandle(info);
             break;
@@ -206,6 +216,10 @@ int32_t CallStatusManager::IncomingHandle(const CallDetailInfo &info)
     int32_t ret = IncomingHandlePolicy(info);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("IncomingHandlePolicy failed!");
+        if (info.state == TelCallState::CALL_STATUS_INCOMING) {
+            CallManagerHisysevent::WriteIncomingCallFaultEvent(info.accountId, static_cast<int32_t>(info.callType),
+                static_cast<int32_t>(info.callMode), ret, "IncomingHandlePolicy failed");
+        }
         return ret;
     }
     if (info.callType == CallType::TYPE_CS || info.callType == CallType::TYPE_IMS) {
@@ -461,6 +475,10 @@ int32_t CallStatusManager::UpdateCallState(sptr<CallBase> &call, TelCallState ne
     }
     TelCallState priorState = call->GetTelCallState();
     TELEPHONY_LOGI("priorState:%{public}d, nextState:%{public}d", priorState, nextState);
+    if (priorState == TelCallState::CALL_STATUS_INCOMING && nextState == TelCallState::CALL_STATUS_ACTIVE) {
+        DelayedSingleton<CallManagerHisysevent>::GetInstance()->JudgingAnswerTimeOut(
+            call->GetSlotId(), call->GetCallID(), static_cast<int32_t>(call->GetVideoStateType()));
+    }
     // need DTMF judge
     int32_t ret = call->SetTelCallState(nextState);
     if (ret != TELEPHONY_SUCCESS && ret != CALL_ERR_NOT_NEW_STATE) {
@@ -471,6 +489,11 @@ int32_t CallStatusManager::UpdateCallState(sptr<CallBase> &call, TelCallState ne
     if (!DelayedSingleton<CallControlManager>::GetInstance()->NotifyCallStateUpdated(call, priorState, nextState)) {
         TELEPHONY_LOGE(
             "NotifyCallStateUpdated failed! priorState:%{public}d,nextState:%{public}d", priorState, nextState);
+        if (nextState == TelCallState::CALL_STATUS_INCOMING) {
+            CallManagerHisysevent::WriteIncomingCallFaultEvent(call->GetSlotId(),
+                static_cast<int32_t>(call->GetCallType()), static_cast<int32_t>(call->GetVideoStateType()), ret,
+                "NotifyCallStateUpdated failed");
+        }
         return CALL_ERR_PHONE_CALLSTATE_NOTIFY_FAILED;
     }
     return TELEPHONY_SUCCESS;

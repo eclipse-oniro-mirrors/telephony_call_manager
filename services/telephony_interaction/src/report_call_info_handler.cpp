@@ -16,8 +16,9 @@
 #include "report_call_info_handler.h"
 
 #include "call_manager_errors.h"
-#include "telephony_log_wrapper.h"
+#include "call_manager_hisysevent.h"
 #include "ims_call.h"
+#include "telephony_log_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -253,6 +254,19 @@ int32_t ReportCallInfoHandlerService::UpdateCallsReportInfo(CallDetailsInfo &inf
     bool ret = handler_->SendEvent(HANDLER_UPDATE_CALL_INFO_LIST, std::move(para));
     if (!ret) {
         TELEPHONY_LOGE("SendEvent failed! status update failed, slotId:%{public}d", info.slotId);
+        CallDetailInfo detailInfo;
+        std::vector<CallDetailInfo>::iterator it = info.callVec.begin();
+        for (; it != info.callVec.end(); ++it) {
+            detailInfo.callType = (*it).callType;
+            detailInfo.accountId = (*it).accountId;
+            detailInfo.state = (*it).state;
+            detailInfo.callMode = (*it).callMode;
+        }
+        if (detailInfo.state == TelCallState::CALL_STATUS_INCOMING) {
+            CallManagerHisysevent::WriteIncomingCallFaultEvent(info.slotId, static_cast<int32_t>(detailInfo.callType),
+                static_cast<int32_t>(detailInfo.callMode), CALL_ERR_SYSTEM_EVENT_HANDLE_FAILURE,
+                "ID HANDLER_UPDATE_CALL_INFO_LIST");
+        }
     }
     return TELEPHONY_SUCCESS;
 }

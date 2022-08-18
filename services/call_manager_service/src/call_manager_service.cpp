@@ -15,19 +15,19 @@
 
 #include "call_manager_service.h"
 
-#include "ipc_skeleton.h"
-
-#include "call_manager_errors.h"
-#include "telephony_log_wrapper.h"
-#include "telephony_permission.h"
-
 #include "bluetooth_call_service.h"
 #include "call_ability_report_proxy.h"
 #include "call_manager_dump_helper.h"
-#include "report_call_info_handler.h"
-#include "cellular_call_connection.h"
+#include "call_manager_errors.h"
+#include "call_manager_hisysevent.h"
 #include "call_records_manager.h"
+#include "cellular_call_connection.h"
 #include "common_type.h"
+#include "hitrace_meter.h"
+#include "ipc_skeleton.h"
+#include "report_call_info_handler.h"
+#include "telephony_log_wrapper.h"
+#include "telephony_permission.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -128,6 +128,11 @@ void CallManagerService::OnStop()
     state_ = ServiceRunningState::STATE_STOPPED;
 }
 
+int32_t CallManagerService::GetServiceRunningState()
+{
+    return static_cast<int32_t>(state_);
+}
+
 int32_t CallManagerService::Dump(std::int32_t fd, const std::vector<std::u16string> &args)
 {
     if (fd < 0) {
@@ -191,24 +196,39 @@ int32_t CallManagerService::UnRegisterCallBack()
 
 int32_t CallManagerService::DialCall(std::u16string number, AppExecFwk::PacMap &extras)
 {
+    DelayedSingleton<CallManagerHisysevent>::GetInstance()->SetDialStartTime();
+    StartAsyncTrace(HITRACE_TAG_OHOS, "DialCall", getpid());
     int32_t uid = IPCSkeleton::GetCallingUid();
     std::string bundleName = "";
     TelephonyPermission::GetBundleNameByUid(uid, bundleName);
     extras.PutStringValue("bundleName", bundleName);
     if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_PLACE_CALL)) {
         TELEPHONY_LOGE("Permission denied!");
+        CallManagerHisysevent::WriteDialCallFaultEvent(extras.GetIntValue("accountId"), extras.GetIntValue("callType"),
+            extras.GetIntValue("videoState"), TELEPHONY_ERR_PERMISSION_ERR, OHOS_PERMISSION_PLACE_CALL);
+        FinishAsyncTrace(HITRACE_TAG_OHOS, "DialCall", getpid());
         return TELEPHONY_ERR_PERMISSION_ERR;
     }
     if (callControlManagerPtr_ != nullptr) {
-        return callControlManagerPtr_->DialCall(number, extras);
+        int32_t ret = callControlManagerPtr_->DialCall(number, extras);
+        if (ret != TELEPHONY_SUCCESS) {
+            std::string errordesc = "";
+            DelayedSingleton<CallManagerHisysevent>::GetInstance()->GetErrorDescription(ret, errordesc);
+            CallManagerHisysevent::WriteDialCallFaultEvent(extras.GetIntValue("accountId"),
+                extras.GetIntValue("callType"), extras.GetIntValue("videoState"), ret, errordesc);
+            FinishAsyncTrace(HITRACE_TAG_OHOS, "DialCall", getpid());
+        }
+        return ret;
     } else {
         TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");
+        FinishAsyncTrace(HITRACE_TAG_OHOS, "DialCall", getpid());
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
 }
 
 int32_t CallManagerService::AnswerCall(int32_t callId, int32_t videoState)
 {
+    DelayedSingleton<CallManagerHisysevent>::GetInstance()->SetAnswerStartTime();
     if (callControlManagerPtr_ != nullptr) {
         return callControlManagerPtr_->AnswerCall(callId, videoState);
     } else {
