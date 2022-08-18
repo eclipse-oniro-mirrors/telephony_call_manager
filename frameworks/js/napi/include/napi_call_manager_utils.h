@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,12 +16,11 @@
 #ifndef NATIVE_CALL_MANAGER_UTILS_H
 #define NATIVE_CALL_MANAGER_UTILS_H
 
-#include "string_ex.h"
-
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
-
 #include "napi_call_manager_types.h"
+#include "string_ex.h"
+#include "telephony_napi_common_error.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -33,6 +32,8 @@ public:
     static bool MatchValueType(napi_env env, napi_value value, napi_valuetype targetType);
     static napi_value CreateUndefined(napi_env env);
     static napi_value CreateErrorMessage(napi_env env, std::string msg);
+    static napi_value CreateErrorMessageWithErrorCode(
+        napi_env env, std::string message, int32_t errorCode = ERROR_DEFAULT);
     static napi_value ToInt32Value(napi_env env, int32_t value);
     static napi_value GetNamedProperty(napi_env env, napi_value object, const std::string &propertyName);
     static std::string GetStringProperty(napi_env env, napi_value object, const std::string &propertyName);

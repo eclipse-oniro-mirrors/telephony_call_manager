@@ -31,6 +31,8 @@
 #include "element_name.h"
 #include "string_wrapper.h"
 #include "want.h"
+#include "telephony_napi_common_error.h"
+#include "telephony_types.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -1217,7 +1219,7 @@ napi_value NapiCallManager::SetCallRestriction(napi_env env, napi_callback_info 
         return nullptr;
     }
     napi_get_value_int32(env, argv[ARRAY_INDEX_FIRST], &asyncContext->slotId);
-    asyncContext->result = GetRestrictionInfo(env, argv[ARRAY_INDEX_SECOND], *asyncContext);
+    asyncContext->resolved = GetRestrictionInfo(env, argv[ARRAY_INDEX_SECOND], *asyncContext);
     if (argc == VALUE_MAXIMUM_LIMIT) {
         napi_create_reference(env, argv[ARRAY_INDEX_THIRD], DATA_LENGTH_ONE, &(asyncContext->callbackRef));
     }
@@ -1267,7 +1269,7 @@ napi_value NapiCallManager::SetCallTransferInfo(napi_env env, napi_callback_info
         return nullptr;
     }
     napi_get_value_int32(env, argv[ARRAY_INDEX_FIRST], &asyncContext->slotId);
-    asyncContext->result = GetTransferInfo(env, argv[ARRAY_INDEX_SECOND], *asyncContext);
+    asyncContext->resolved = GetTransferInfo(env, argv[ARRAY_INDEX_SECOND], *asyncContext);
     if (argc == VALUE_MAXIMUM_LIMIT) {
         napi_create_reference(env, argv[ARRAY_INDEX_THIRD], DATA_LENGTH_ONE, &(asyncContext->callbackRef));
     }
@@ -1643,7 +1645,7 @@ napi_value NapiCallManager::ObserverOff(napi_env env, napi_callback_info info)
     } else if (tmpStr == "mmiCodeResult") {
         DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->UnRegisterMmiCodeCallback();
     }
-    asyncContext->result = TELEPHONY_SUCCESS;
+    asyncContext->resolved = TELEPHONY_SUCCESS;
     if (argc == TWO_VALUE_LIMIT) {
         napi_create_reference(env, argv[ARRAY_INDEX_SECOND], DATA_LENGTH_ONE, &(asyncContext->callbackRef));
     }
@@ -2100,24 +2102,35 @@ void NapiCallManager::NativeCallBack(napi_env env, napi_status status, void *dat
     }
     auto asyncContext = (AsyncContext *)data;
     if (asyncContext->deferred != nullptr) {
-        if (asyncContext->result == TELEPHONY_SUCCESS) {
+        if (asyncContext->resolved == TELEPHONY_SUCCESS) {
             napi_value promiseValue = nullptr;
-            napi_create_int32(env, asyncContext->result, &promiseValue);
+            napi_create_int32(env, asyncContext->resolved, &promiseValue);
             napi_resolve_deferred(env, asyncContext->deferred, promiseValue);
         } else {
-            std::string errTip = std::to_string(asyncContext->result);
-            napi_reject_deferred(
-                env, asyncContext->deferred, NapiCallManagerUtils::CreateErrorMessage(env, errTip));
+            if (asyncContext->errorCode == SLOT_ID_INVALID) {
+                napi_reject_deferred(env, asyncContext->deferred,
+                    NapiCallManagerUtils::CreateErrorMessageWithErrorCode(env, "slotId is invalid", SLOT_ID_INVALID));
+            } else {
+                std::string errTip = std::to_string(asyncContext->resolved);
+                napi_reject_deferred(
+                    env, asyncContext->deferred, NapiCallManagerUtils::CreateErrorMessage(env, errTip));
+            }
         }
     } else if (asyncContext->callbackRef != nullptr) {
-        napi_value callbackValue[ARRAY_INDEX_THIRD] = {0};
-        if (asyncContext->result == TELEPHONY_SUCCESS) {
+        napi_value callbackValue[ARRAY_INDEX_THIRD] = { 0 };
+        if (asyncContext->resolved == TELEPHONY_SUCCESS) {
             callbackValue[ARRAY_INDEX_FIRST] = NapiCallManagerUtils::CreateUndefined(env);
-            napi_create_int32(env, asyncContext->result, &callbackValue[ARRAY_INDEX_SECOND]);
+            napi_create_int32(env, asyncContext->resolved, &callbackValue[ARRAY_INDEX_SECOND]);
         } else {
-            std::string errTip = std::to_string(asyncContext->result);
-            callbackValue[ARRAY_INDEX_FIRST] = NapiCallManagerUtils::CreateErrorMessage(env, errTip);
-            callbackValue[ARRAY_INDEX_SECOND] = NapiCallManagerUtils::CreateUndefined(env);
+            if (asyncContext->errorCode == SLOT_ID_INVALID) {
+                callbackValue[ARRAY_INDEX_FIRST] =
+                    NapiCallManagerUtils::CreateErrorMessageWithErrorCode(env, "slotId is invalid", SLOT_ID_INVALID);
+                callbackValue[ARRAY_INDEX_SECOND] = NapiCallManagerUtils::CreateUndefined(env);
+            } else {
+                std::string errTip = std::to_string(asyncContext->resolved);
+                callbackValue[ARRAY_INDEX_FIRST] = NapiCallManagerUtils::CreateErrorMessage(env, errTip);
+                callbackValue[ARRAY_INDEX_SECOND] = NapiCallManagerUtils::CreateUndefined(env);
+            }
         }
         napi_value callback = nullptr;
         napi_value result = nullptr;
@@ -2138,23 +2151,35 @@ void NapiCallManager::NativeDialCallBack(napi_env env, napi_status status, void 
     }
     auto asyncContext = (AsyncContext *)data;
     if (asyncContext->deferred != nullptr) {
-        if (asyncContext->result == TELEPHONY_SUCCESS) {
+        if (asyncContext->resolved == TELEPHONY_SUCCESS) {
             napi_value promiseValue = nullptr;
             napi_get_boolean(env, true, &promiseValue);
             napi_resolve_deferred(env, asyncContext->deferred, promiseValue);
         } else {
-            std::string errTip = std::to_string(asyncContext->result);
-            napi_reject_deferred(env, asyncContext->deferred, NapiCallManagerUtils::CreateErrorMessage(env, errTip));
+            if (asyncContext->errorCode == SLOT_ID_INVALID) {
+                napi_reject_deferred(env, asyncContext->deferred,
+                    NapiCallManagerUtils::CreateErrorMessageWithErrorCode(env, "slotId is invalid", SLOT_ID_INVALID));
+            } else {
+                std::string errTip = std::to_string(asyncContext->resolved);
+                napi_reject_deferred(
+                    env, asyncContext->deferred, NapiCallManagerUtils::CreateErrorMessage(env, errTip));
+            }
         }
     } else if (asyncContext->callbackRef != nullptr) {
-        napi_value callbackValue[ARRAY_INDEX_THIRD] = {0};
-        if (asyncContext->result == TELEPHONY_SUCCESS) {
+        napi_value callbackValue[ARRAY_INDEX_THIRD] = { 0 };
+        if (asyncContext->resolved == TELEPHONY_SUCCESS) {
             callbackValue[ARRAY_INDEX_FIRST] = NapiCallManagerUtils::CreateUndefined(env);
             napi_get_boolean(env, true, &callbackValue[ARRAY_INDEX_SECOND]);
         } else {
-            std::string errTip = std::to_string(asyncContext->result);
-            callbackValue[ARRAY_INDEX_FIRST] = NapiCallManagerUtils::CreateErrorMessage(env, errTip);
-            callbackValue[ARRAY_INDEX_SECOND] = NapiCallManagerUtils::CreateUndefined(env);
+            if (asyncContext->errorCode == SLOT_ID_INVALID) {
+                callbackValue[ARRAY_INDEX_FIRST] =
+                    NapiCallManagerUtils::CreateErrorMessageWithErrorCode(env, "slotId is invalid", SLOT_ID_INVALID);
+                callbackValue[ARRAY_INDEX_SECOND] = NapiCallManagerUtils::CreateUndefined(env);
+            } else {
+                std::string errTip = std::to_string(asyncContext->resolved);
+                callbackValue[ARRAY_INDEX_FIRST] = NapiCallManagerUtils::CreateErrorMessage(env, errTip);
+                callbackValue[ARRAY_INDEX_SECOND] = NapiCallManagerUtils::CreateUndefined(env);
+            }
         }
         napi_value callback = nullptr;
         napi_value result = nullptr;
@@ -2175,24 +2200,24 @@ void NapiCallManager::NativeVoidCallBack(napi_env env, napi_status status, void 
     }
     auto asyncContext = (AsyncContext *)data;
     if (asyncContext->deferred != nullptr) {
-        if (asyncContext->result == TELEPHONY_SUCCESS) {
+        if (asyncContext->resolved == TELEPHONY_SUCCESS) {
             napi_value promiseValue = nullptr;
             napi_get_null(env, &promiseValue);
             napi_status ret = napi_resolve_deferred(env, asyncContext->deferred, promiseValue);
             TELEPHONY_LOGI("promise successful result = %{public}d", ret);
         } else {
-            std::string errTip = std::to_string(asyncContext->result);
+            std::string errTip = std::to_string(asyncContext->resolved);
             napi_status ret = napi_reject_deferred(
                 env, asyncContext->deferred, NapiCallManagerUtils::CreateErrorMessage(env, errTip));
             TELEPHONY_LOGI("promise failed result = %{public}d", ret);
         }
     } else if (asyncContext->callbackRef != nullptr) {
-        napi_value callbackValue[ARRAY_INDEX_THIRD] = {0};
-        if (asyncContext->result == TELEPHONY_SUCCESS) {
+        napi_value callbackValue[ARRAY_INDEX_THIRD] = { 0 };
+        if (asyncContext->resolved == TELEPHONY_SUCCESS) {
             callbackValue[ARRAY_INDEX_FIRST] = NapiCallManagerUtils::CreateUndefined(env);
             napi_get_null(env, &callbackValue[ARRAY_INDEX_SECOND]);
         } else {
-            std::string errTip = std::to_string(asyncContext->result);
+            std::string errTip = std::to_string(asyncContext->resolved);
             callbackValue[ARRAY_INDEX_FIRST] = NapiCallManagerUtils::CreateErrorMessage(env, errTip);
             callbackValue[ARRAY_INDEX_SECOND] = NapiCallManagerUtils::CreateUndefined(env);
         }
@@ -2218,12 +2243,12 @@ void NapiCallManager::NativePropertyCallBack(napi_env env, napi_status status, v
     auto asyncContext = (AsyncContext *)data;
     if (asyncContext->deferred != nullptr) {
         napi_value promiseValue = nullptr;
-        napi_create_int32(env, asyncContext->result, &promiseValue);
+        napi_create_int32(env, asyncContext->resolved, &promiseValue);
         napi_resolve_deferred(env, asyncContext->deferred, promiseValue);
     } else {
         napi_value callbackValue[ARRAY_INDEX_THIRD] = {0};
         callbackValue[ARRAY_INDEX_FIRST] = NapiCallManagerUtils::CreateUndefined(env);
-        napi_create_int32(env, asyncContext->result, &callbackValue[ARRAY_INDEX_SECOND]);
+        napi_create_int32(env, asyncContext->resolved, &callbackValue[ARRAY_INDEX_SECOND]);
         napi_value callback = nullptr;
         napi_value result = nullptr;
         napi_get_reference_value(env, asyncContext->callbackRef, &callback);
@@ -2243,7 +2268,7 @@ void NapiCallManager::NativeBoolCallBack(napi_env env, napi_status status, void 
     }
     auto asyncContext = (AsyncContext *)data;
     if (asyncContext->deferred != nullptr) {
-        if (asyncContext->result != BOOL_VALUE_IS_FALSE) {
+        if (asyncContext->resolved != BOOL_VALUE_IS_FALSE) {
             napi_value promiseValue = nullptr;
             napi_get_boolean(env, true, &promiseValue);
             napi_resolve_deferred(env, asyncContext->deferred, promiseValue);
@@ -2251,19 +2276,26 @@ void NapiCallManager::NativeBoolCallBack(napi_env env, napi_status status, void 
             napi_value promiseValue = nullptr;
             napi_get_boolean(env, false, &promiseValue);
             napi_resolve_deferred(env, asyncContext->deferred, promiseValue);
+        } else if (asyncContext->errorCode == SLOT_ID_INVALID) {
+            napi_reject_deferred(env, asyncContext->deferred,
+                NapiCallManagerUtils::CreateErrorMessageWithErrorCode(env, "slotId is invalid", SLOT_ID_INVALID));
         } else {
             std::string errTip = std::to_string(asyncContext->errorCode);
             napi_reject_deferred(
                 env, asyncContext->deferred, NapiCallManagerUtils::CreateErrorMessage(env, errTip));
         }
     } else {
-        napi_value callbackValue[ARRAY_INDEX_THIRD] = {0};
-        if (asyncContext->result != BOOL_VALUE_IS_FALSE) {
+        napi_value callbackValue[ARRAY_INDEX_THIRD] = { 0 };
+        if (asyncContext->resolved != BOOL_VALUE_IS_FALSE) {
             callbackValue[ARRAY_INDEX_FIRST] = NapiCallManagerUtils::CreateUndefined(env);
             napi_get_boolean(env, true, &callbackValue[ARRAY_INDEX_SECOND]);
         } else if (asyncContext->errorCode == TELEPHONY_SUCCESS) {
             callbackValue[ARRAY_INDEX_FIRST] = NapiCallManagerUtils::CreateUndefined(env);
             napi_get_boolean(env, false, &callbackValue[ARRAY_INDEX_SECOND]);
+        } else if (asyncContext->errorCode == SLOT_ID_INVALID) {
+            callbackValue[ARRAY_INDEX_FIRST] =
+                NapiCallManagerUtils::CreateErrorMessageWithErrorCode(env, "slotId is invalid", SLOT_ID_INVALID);
+            callbackValue[ARRAY_INDEX_SECOND] = NapiCallManagerUtils::CreateUndefined(env);
         } else {
             std::string errTip = std::to_string(asyncContext->errorCode);
             callbackValue[ARRAY_INDEX_FIRST] = NapiCallManagerUtils::CreateErrorMessage(env, errTip);
@@ -2288,24 +2320,23 @@ void NapiCallManager::NativeFormatNumberCallBack(napi_env env, napi_status statu
     }
     auto asyncContext = (UtilsAsyncContext *)data;
     if (asyncContext->deferred != nullptr) {
-        if (asyncContext->result == TELEPHONY_SUCCESS) {
+        if (asyncContext->resolved == TELEPHONY_SUCCESS) {
             napi_value promiseValue = nullptr;
             napi_create_string_utf8(env, Str16ToStr8(asyncContext->formatNumber).data(),
                 asyncContext->formatNumber.length(), &promiseValue);
             napi_resolve_deferred(env, asyncContext->deferred, promiseValue);
         } else {
-            std::string errTip = std::to_string(asyncContext->result);
-            napi_reject_deferred(
-                env, asyncContext->deferred, NapiCallManagerUtils::CreateErrorMessage(env, errTip));
+            std::string errTip = std::to_string(asyncContext->resolved);
+            napi_reject_deferred(env, asyncContext->deferred, NapiCallManagerUtils::CreateErrorMessage(env, errTip));
         }
     } else {
-        napi_value callbackValue[ARRAY_INDEX_THIRD] = {0};
-        if (asyncContext->result == TELEPHONY_SUCCESS) {
+        napi_value callbackValue[ARRAY_INDEX_THIRD] = { 0 };
+        if (asyncContext->resolved == TELEPHONY_SUCCESS) {
             callbackValue[ARRAY_INDEX_FIRST] = NapiCallManagerUtils::CreateUndefined(env);
             napi_create_string_utf8(env, Str16ToStr8(asyncContext->formatNumber).data(),
                 asyncContext->formatNumber.length(), &callbackValue[ARRAY_INDEX_SECOND]);
         } else {
-            std::string errTip = std::to_string(asyncContext->result);
+            std::string errTip = std::to_string(asyncContext->resolved);
             callbackValue[ARRAY_INDEX_FIRST] = NapiCallManagerUtils::CreateErrorMessage(env, errTip);
             callbackValue[ARRAY_INDEX_SECOND] = NapiCallManagerUtils::CreateUndefined(env);
         }
@@ -2413,6 +2444,11 @@ int32_t NapiCallManager::GetTransferInfo(napi_env env, napi_value objValue, Call
     return TELEPHONY_SUCCESS;
 }
 
+static inline bool IsValidSlotId(int32_t slotId)
+{
+    return ((slotId >= DEFAULT_SIM_SLOT_ID) && (slotId < SIM_SLOT_COUNT));
+}
+
 void NapiCallManager::NativeDialCall(napi_env env, void *data)
 {
     if (data == nullptr) {
@@ -2420,13 +2456,18 @@ void NapiCallManager::NativeDialCall(napi_env env, void *data)
         return;
     }
     auto asyncContext = (DialAsyncContext *)data;
+    if (!IsValidSlotId(asyncContext->accountId)) {
+        TELEPHONY_LOGE("NativeDialCall slotId is invalid");
+        asyncContext->errorCode = SLOT_ID_INVALID;
+        return;
+    }
     std::string phoneNumber(asyncContext->number, asyncContext->numberLen);
     OHOS::AppExecFwk::PacMap dialInfo;
     dialInfo.PutIntValue("accountId", asyncContext->accountId);
     dialInfo.PutIntValue("videoState", asyncContext->videoState);
     dialInfo.PutIntValue("dialScene", asyncContext->dialScene);
     dialInfo.PutIntValue("dialType", asyncContext->dialType);
-    asyncContext->result =
+    asyncContext->resolved =
         DelayedSingleton<CallManagerClient>::GetInstance()->DialCall(Str8ToStr16(phoneNumber), dialInfo);
 }
 
@@ -2448,10 +2489,10 @@ void NapiCallManager::NativeMakeCall(napi_env env, void *data)
     ErrCode err = AAFwk::AbilityManagerClient::GetInstance()->StartAbility(want);
     if (err != ERR_OK) {
         TELEPHONY_LOGE("Fail to make call, err:%{public}d", err);
-        asyncContext->result = TELEPHONY_ERR_FAIL;
+        asyncContext->resolved = TELEPHONY_ERR_FAIL;
         return;
     }
-    asyncContext->result = TELEPHONY_SUCCESS;
+    asyncContext->resolved = TELEPHONY_SUCCESS;
 }
 
 void NapiCallManager::NativeAnswerCall(napi_env env, void *data)
@@ -2461,9 +2502,9 @@ void NapiCallManager::NativeAnswerCall(napi_env env, void *data)
         return;
     }
     auto asyncContext = (AnswerAsyncContext *)data;
-    int32_t ret = DelayedSingleton<CallManagerClient>::GetInstance()->AnswerCall(
-        asyncContext->callId, asyncContext->videoState);
-    asyncContext->result = ret;
+    int32_t ret =
+        DelayedSingleton<CallManagerClient>::GetInstance()->AnswerCall(asyncContext->callId, asyncContext->videoState);
+    asyncContext->resolved = ret;
 }
 
 void NapiCallManager::NativeRejectCall(napi_env env, void *data)
@@ -2475,7 +2516,7 @@ void NapiCallManager::NativeRejectCall(napi_env env, void *data)
     auto asyncContext = (RejectAsyncContext *)data;
     int32_t ret = DelayedSingleton<CallManagerClient>::GetInstance()->RejectCall(
         asyncContext->callId, asyncContext->isSendSms, Str8ToStr16(asyncContext->messageContent));
-    asyncContext->result = ret;
+    asyncContext->resolved = ret;
 }
 
 void NapiCallManager::NativeHangUpCall(napi_env env, void *data)
@@ -2485,7 +2526,7 @@ void NapiCallManager::NativeHangUpCall(napi_env env, void *data)
         return;
     }
     auto asyncContext = (AsyncContext *)data;
-    asyncContext->result = DelayedSingleton<CallManagerClient>::GetInstance()->HangUpCall(asyncContext->callId);
+    asyncContext->resolved = DelayedSingleton<CallManagerClient>::GetInstance()->HangUpCall(asyncContext->callId);
 }
 
 void NapiCallManager::NativeHoldCall(napi_env env, void *data)
@@ -2495,7 +2536,7 @@ void NapiCallManager::NativeHoldCall(napi_env env, void *data)
         return;
     }
     auto asyncContext = (AsyncContext *)data;
-    asyncContext->result = DelayedSingleton<CallManagerClient>::GetInstance()->HoldCall(asyncContext->callId);
+    asyncContext->resolved = DelayedSingleton<CallManagerClient>::GetInstance()->HoldCall(asyncContext->callId);
 }
 
 void NapiCallManager::NativeUnHoldCall(napi_env env, void *data)
@@ -2505,7 +2546,7 @@ void NapiCallManager::NativeUnHoldCall(napi_env env, void *data)
         return;
     }
     auto asyncContext = (AsyncContext *)data;
-    asyncContext->result = DelayedSingleton<CallManagerClient>::GetInstance()->UnHoldCall(asyncContext->callId);
+    asyncContext->resolved = DelayedSingleton<CallManagerClient>::GetInstance()->UnHoldCall(asyncContext->callId);
 }
 
 void NapiCallManager::NativeSwitchCall(napi_env env, void *data)
@@ -2515,7 +2556,7 @@ void NapiCallManager::NativeSwitchCall(napi_env env, void *data)
         return;
     }
     auto asyncContext = (AsyncContext *)data;
-    asyncContext->result = DelayedSingleton<CallManagerClient>::GetInstance()->SwitchCall(asyncContext->callId);
+    asyncContext->resolved = DelayedSingleton<CallManagerClient>::GetInstance()->SwitchCall(asyncContext->callId);
 }
 
 void NapiCallManager::NativeCombineConference(napi_env env, void *data)
@@ -2525,7 +2566,7 @@ void NapiCallManager::NativeCombineConference(napi_env env, void *data)
         return;
     }
     auto asyncContext = (AsyncContext *)data;
-    asyncContext->result =
+    asyncContext->resolved =
         DelayedSingleton<CallManagerClient>::GetInstance()->CombineConference(asyncContext->callId);
 }
 
@@ -2536,7 +2577,7 @@ void NapiCallManager::NativeSeparateConference(napi_env env, void *data)
         return;
     }
     auto asyncContext = (AsyncContext *)data;
-    asyncContext->result =
+    asyncContext->resolved =
         DelayedSingleton<CallManagerClient>::GetInstance()->SeparateConference(asyncContext->callId);
 }
 
@@ -2547,7 +2588,7 @@ void NapiCallManager::NativeGetMainCallId(napi_env env, void *data)
         return;
     }
     auto asyncContext = (AsyncContext *)data;
-    asyncContext->result = DelayedSingleton<CallManagerClient>::GetInstance()->GetMainCallId(asyncContext->callId);
+    asyncContext->resolved = DelayedSingleton<CallManagerClient>::GetInstance()->GetMainCallId(asyncContext->callId);
 }
 
 void NapiCallManager::NativeGetSubCallIdList(napi_env env, void *data)
@@ -2584,19 +2625,24 @@ void NapiCallManager::NativeGetCallWaiting(napi_env env, void *data)
         return;
     }
     auto asyncContext = (SupplementAsyncContext *)data;
+    if (!IsValidSlotId(asyncContext->slotId)) {
+        TELEPHONY_LOGE("NativeGetCallWaiting slotId is invalid");
+        asyncContext->errorCode = SLOT_ID_INVALID;
+        return;
+    }
     EventCallback infoListener;
     infoListener.env = asyncContext->env;
     infoListener.thisVar = asyncContext->thisVar;
     infoListener.callbackRef = asyncContext->callbackRef;
     infoListener.deferred = asyncContext->deferred;
-    asyncContext->result =
+    asyncContext->resolved =
         DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->RegisterGetWaitingCallback(infoListener);
-    if (asyncContext->result != TELEPHONY_SUCCESS) {
+    if (asyncContext->resolved != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("RegisterGetWaitingCallback failed!");
         return;
     }
-    asyncContext->result = DelayedSingleton<CallManagerClient>::GetInstance()->GetCallWaiting(asyncContext->slotId);
-    if (asyncContext->result != TELEPHONY_SUCCESS) {
+    asyncContext->resolved = DelayedSingleton<CallManagerClient>::GetInstance()->GetCallWaiting(asyncContext->slotId);
+    if (asyncContext->resolved != TELEPHONY_SUCCESS) {
         DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->UnRegisterGetWaitingCallback();
         TELEPHONY_LOGE("GetCallWaiting failed!");
         return;
@@ -2612,20 +2658,26 @@ void NapiCallManager::NativeSetCallWaiting(napi_env env, void *data)
         return;
     }
     auto asyncContext = (SupplementAsyncContext *)data;
+    if (!IsValidSlotId(asyncContext->slotId)) {
+        TELEPHONY_LOGE("NativeSetCallWaiting slotId is invalid");
+        asyncContext->errorCode = SLOT_ID_INVALID;
+        return;
+    }
+
     EventCallback infoListener;
     infoListener.env = asyncContext->env;
     infoListener.thisVar = asyncContext->thisVar;
     infoListener.callbackRef = asyncContext->callbackRef;
     infoListener.deferred = asyncContext->deferred;
-    asyncContext->result =
+    asyncContext->resolved =
         DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->RegisterSetWaitingCallback(infoListener);
-    if (asyncContext->result != TELEPHONY_SUCCESS) {
+    if (asyncContext->resolved != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("RegisterSetWaitingCallback failed!");
         return;
     }
-    asyncContext->result = DelayedSingleton<CallManagerClient>::GetInstance()->SetCallWaiting(
-        asyncContext->slotId, asyncContext->flag);
-    if (asyncContext->result != TELEPHONY_SUCCESS) {
+    asyncContext->resolved =
+        DelayedSingleton<CallManagerClient>::GetInstance()->SetCallWaiting(asyncContext->slotId, asyncContext->flag);
+    if (asyncContext->resolved != TELEPHONY_SUCCESS) {
         DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->UnRegisterSetWaitingCallback();
         TELEPHONY_LOGE("SetCallWaiting failed!");
         return;
@@ -2641,21 +2693,26 @@ void NapiCallManager::NativeGetCallRestriction(napi_env env, void *data)
         return;
     }
     auto asyncContext = (SupplementAsyncContext *)data;
+    if (!IsValidSlotId(asyncContext->slotId)) {
+        TELEPHONY_LOGE("NativeGetCallRestriction slotId is invalid");
+        asyncContext->errorCode = SLOT_ID_INVALID;
+        return;
+    }
     EventCallback infoListener;
     infoListener.env = asyncContext->env;
     infoListener.thisVar = asyncContext->thisVar;
     infoListener.callbackRef = asyncContext->callbackRef;
     infoListener.deferred = asyncContext->deferred;
-    asyncContext->result =
+    asyncContext->resolved =
         DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->RegisterGetRestrictionCallback(infoListener);
-    if (asyncContext->result != TELEPHONY_SUCCESS) {
+    if (asyncContext->resolved != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("RegisterGetRestrictionCallback failed!");
         return;
     }
     CallRestrictionType type = static_cast<CallRestrictionType>(asyncContext->type);
-    asyncContext->result =
+    asyncContext->resolved =
         DelayedSingleton<CallManagerClient>::GetInstance()->GetCallRestriction(asyncContext->slotId, type);
-    if (asyncContext->result != TELEPHONY_SUCCESS) {
+    if (asyncContext->resolved != TELEPHONY_SUCCESS) {
         DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->UnRegisterGetRestrictionCallback();
         TELEPHONY_LOGE("GetCallRestriction failed!");
         return;
@@ -2671,7 +2728,12 @@ void NapiCallManager::NativeSetCallRestriction(napi_env env, void *data)
         return;
     }
     auto asyncContext = (CallRestrictionAsyncContext *)data;
-    if (asyncContext->result != TELEPHONY_SUCCESS) {
+    if (!IsValidSlotId(asyncContext->slotId)) {
+        TELEPHONY_LOGE("NativeSetCallRestriction slotId is invalid");
+        asyncContext->errorCode = SLOT_ID_INVALID;
+        return;
+    }
+    if (asyncContext->resolved != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("Data acquisition failure!");
         return;
     }
@@ -2680,15 +2742,15 @@ void NapiCallManager::NativeSetCallRestriction(napi_env env, void *data)
     infoListener.thisVar = asyncContext->thisVar;
     infoListener.callbackRef = asyncContext->callbackRef;
     infoListener.deferred = asyncContext->deferred;
-    asyncContext->result =
+    asyncContext->resolved =
         DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->RegisterSetRestrictionCallback(infoListener);
-    if (asyncContext->result != TELEPHONY_SUCCESS) {
+    if (asyncContext->resolved != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("RegisterSetRestrictionCallback failed!");
         return;
     }
-    asyncContext->result = DelayedSingleton<CallManagerClient>::GetInstance()->SetCallRestriction(
+    asyncContext->resolved = DelayedSingleton<CallManagerClient>::GetInstance()->SetCallRestriction(
         asyncContext->slotId, asyncContext->info);
-    if (asyncContext->result != TELEPHONY_SUCCESS) {
+    if (asyncContext->resolved != TELEPHONY_SUCCESS) {
         DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->UnRegisterSetRestrictionCallback();
         TELEPHONY_LOGE("SetCallRestriction failed!");
         return;
@@ -2704,21 +2766,26 @@ void NapiCallManager::NativeGetTransferNumber(napi_env env, void *data)
         return;
     }
     auto asyncContext = (SupplementAsyncContext *)data;
+    if (!IsValidSlotId(asyncContext->slotId)) {
+        TELEPHONY_LOGE("NativeGetTransferNumber slotId is invalid");
+        asyncContext->errorCode = SLOT_ID_INVALID;
+        return;
+    }
     EventCallback infoListener;
     infoListener.env = asyncContext->env;
     infoListener.thisVar = asyncContext->thisVar;
     infoListener.callbackRef = asyncContext->callbackRef;
     infoListener.deferred = asyncContext->deferred;
-    asyncContext->result =
+    asyncContext->resolved =
         DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->RegisterGetTransferCallback(infoListener);
-    if (asyncContext->result != TELEPHONY_SUCCESS) {
+    if (asyncContext->resolved != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("RegisterGetTransferCallback failed!");
         return;
     }
     CallTransferType type = static_cast<CallTransferType>(asyncContext->type);
-    asyncContext->result =
+    asyncContext->resolved =
         DelayedSingleton<CallManagerClient>::GetInstance()->GetCallTransferInfo(asyncContext->slotId, type);
-    if (asyncContext->result != TELEPHONY_SUCCESS) {
+    if (asyncContext->resolved != TELEPHONY_SUCCESS) {
         DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->UnRegisterGetTransferCallback();
         TELEPHONY_LOGE("GetCallTransferInfo failed!");
         return;
@@ -2734,7 +2801,13 @@ void NapiCallManager::NativeSetTransferNumber(napi_env env, void *data)
         return;
     }
     auto asyncContext = (CallTransferAsyncContext *)data;
-    if (asyncContext->result != TELEPHONY_SUCCESS) {
+    if (!IsValidSlotId(asyncContext->slotId)) {
+        TELEPHONY_LOGE("NativeSetTransferNumber slotId is invalid");
+        asyncContext->errorCode = SLOT_ID_INVALID;
+        return;
+    }
+
+    if (asyncContext->resolved != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("Data acquisition failure!");
         return;
     }
@@ -2743,15 +2816,15 @@ void NapiCallManager::NativeSetTransferNumber(napi_env env, void *data)
     infoListener.thisVar = asyncContext->thisVar;
     infoListener.callbackRef = asyncContext->callbackRef;
     infoListener.deferred = asyncContext->deferred;
-    asyncContext->result =
+    asyncContext->resolved =
         DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->RegisterSetTransferCallback(infoListener);
-    if (asyncContext->result != TELEPHONY_SUCCESS) {
+    if (asyncContext->resolved != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("RegisterSetTransferCallback failed!");
         return;
     }
-    asyncContext->result = DelayedSingleton<CallManagerClient>::GetInstance()->SetCallTransferInfo(
+    asyncContext->resolved = DelayedSingleton<CallManagerClient>::GetInstance()->SetCallTransferInfo(
         asyncContext->slotId, asyncContext->info);
-    if (asyncContext->result != TELEPHONY_SUCCESS) {
+    if (asyncContext->resolved != TELEPHONY_SUCCESS) {
         DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->UnRegisterSetTransferCallback();
         TELEPHONY_LOGE("SetCallTransferInfo failed!");
         return;
@@ -2767,20 +2840,24 @@ void NapiCallManager::NativeEnableImsSwitch(napi_env env, void *data)
         return;
     }
     auto asyncContext = (SupplementAsyncContext *)data;
+    if (!IsValidSlotId(asyncContext->slotId)) {
+        TELEPHONY_LOGE("NativeEnableImsSwitch slotId is invalid");
+        asyncContext->errorCode = SLOT_ID_INVALID;
+        return;
+    }
     EventCallback infoListener;
     infoListener.env = asyncContext->env;
     infoListener.thisVar = asyncContext->thisVar;
     infoListener.callbackRef = asyncContext->callbackRef;
     infoListener.deferred = asyncContext->deferred;
-    asyncContext->result =
+    asyncContext->resolved =
         DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->RegisterEnableVolteCallback(infoListener);
-    if (asyncContext->result != TELEPHONY_SUCCESS) {
+    if (asyncContext->resolved != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("RegisterEnableVolteCallback failed!");
         return;
     }
-    asyncContext->result =
-        DelayedSingleton<CallManagerClient>::GetInstance()->EnableImsSwitch(asyncContext->slotId);
-    if (asyncContext->result != TELEPHONY_SUCCESS) {
+    asyncContext->resolved = DelayedSingleton<CallManagerClient>::GetInstance()->EnableImsSwitch(asyncContext->slotId);
+    if (asyncContext->resolved != TELEPHONY_SUCCESS) {
         DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->UnRegisterEnableVolteCallback();
         TELEPHONY_LOGE("EnableImsSwitch failed!");
         return;
@@ -2796,20 +2873,24 @@ void NapiCallManager::NativeDisableImsSwitch(napi_env env, void *data)
         return;
     }
     auto asyncContext = (SupplementAsyncContext *)data;
+    if (!IsValidSlotId(asyncContext->slotId)) {
+        TELEPHONY_LOGE("NativeDisableImsSwitch slotId is invalid");
+        asyncContext->errorCode = SLOT_ID_INVALID;
+        return;
+    }
     EventCallback infoListener;
     infoListener.env = asyncContext->env;
     infoListener.thisVar = asyncContext->thisVar;
     infoListener.callbackRef = asyncContext->callbackRef;
     infoListener.deferred = asyncContext->deferred;
-    asyncContext->result =
+    asyncContext->resolved =
         DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->RegisterDisableVolteCallback(infoListener);
-    if (asyncContext->result != TELEPHONY_SUCCESS) {
+    if (asyncContext->resolved != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("RegisterDisableVolteCallback failed!");
         return;
     }
-    asyncContext->result =
-        DelayedSingleton<CallManagerClient>::GetInstance()->DisableImsSwitch(asyncContext->slotId);
-    if (asyncContext->result != TELEPHONY_SUCCESS) {
+    asyncContext->resolved = DelayedSingleton<CallManagerClient>::GetInstance()->DisableImsSwitch(asyncContext->slotId);
+    if (asyncContext->resolved != TELEPHONY_SUCCESS) {
         DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->UnRegisterDisableVolteCallback();
         TELEPHONY_LOGE("DisableImsSwitch failed!");
         return;
@@ -2825,20 +2906,25 @@ void NapiCallManager::NativeIsImsSwitchEnabled(napi_env env, void *data)
         return;
     }
     auto asyncContext = (SupplementAsyncContext *)data;
+    if (!IsValidSlotId(asyncContext->slotId)) {
+        TELEPHONY_LOGE("NativeIsImsSwitchEnabled slotId is invalid");
+        asyncContext->errorCode = SLOT_ID_INVALID;
+        return;
+    }
     EventCallback infoListener;
     infoListener.env = asyncContext->env;
     infoListener.thisVar = asyncContext->thisVar;
     infoListener.callbackRef = asyncContext->callbackRef;
     infoListener.deferred = asyncContext->deferred;
-    asyncContext->result =
+    asyncContext->resolved =
         DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->RegisterGetVolteCallback(infoListener);
-    if (asyncContext->result != TELEPHONY_SUCCESS) {
+    if (asyncContext->resolved != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("RegisterGetVolteCallback failed!");
         return;
     }
-    asyncContext->result =
+    asyncContext->resolved =
         DelayedSingleton<CallManagerClient>::GetInstance()->IsImsSwitchEnabled(asyncContext->slotId);
-    if (asyncContext->result != TELEPHONY_SUCCESS) {
+    if (asyncContext->resolved != TELEPHONY_SUCCESS) {
         DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->UnRegisterGetVolteCallback();
         TELEPHONY_LOGE("IsImsSwitchEnabled failed!");
         return;
@@ -2855,10 +2941,10 @@ void NapiCallManager::NativeStartDTMF(napi_env env, void *data)
     }
     auto asyncContext = (AsyncContext *)data;
     if (asyncContext->numberLen < TWO_VALUE_LIMIT) {
-        asyncContext->result = DelayedSingleton<CallManagerClient>::GetInstance()->StartDtmf(
+        asyncContext->resolved = DelayedSingleton<CallManagerClient>::GetInstance()->StartDtmf(
             asyncContext->callId, asyncContext->number[ARRAY_INDEX_FIRST]);
     } else {
-        asyncContext->result = CALL_ERR_DTMF_EXCEED_LIMIT;
+        asyncContext->resolved = CALL_ERR_DTMF_EXCEED_LIMIT;
     }
 }
 
@@ -2869,7 +2955,7 @@ void NapiCallManager::NativeStopDTMF(napi_env env, void *data)
         return;
     }
     auto asyncContext = (AsyncContext *)data;
-    asyncContext->result = DelayedSingleton<CallManagerClient>::GetInstance()->StopDtmf(asyncContext->callId);
+    asyncContext->resolved = DelayedSingleton<CallManagerClient>::GetInstance()->StopDtmf(asyncContext->callId);
 }
 
 void NapiCallManager::NativeGetCallState(napi_env env, void *data)
@@ -2879,7 +2965,7 @@ void NapiCallManager::NativeGetCallState(napi_env env, void *data)
         return;
     }
     auto asyncContext = (AsyncContext *)data;
-    asyncContext->result = DelayedSingleton<CallManagerClient>::GetInstance()->GetCallState();
+    asyncContext->resolved = DelayedSingleton<CallManagerClient>::GetInstance()->GetCallState();
 }
 
 void NapiCallManager::NativeIsRinging(napi_env env, void *data)
@@ -2889,7 +2975,7 @@ void NapiCallManager::NativeIsRinging(napi_env env, void *data)
         return;
     }
     auto asyncContext = (AsyncContext *)data;
-    asyncContext->result = DelayedSingleton<CallManagerClient>::GetInstance()->IsRinging();
+    asyncContext->resolved = DelayedSingleton<CallManagerClient>::GetInstance()->IsRinging();
 }
 
 void NapiCallManager::NativeHasCall(napi_env env, void *data)
@@ -2899,7 +2985,7 @@ void NapiCallManager::NativeHasCall(napi_env env, void *data)
         return;
     }
     auto asyncContext = (AsyncContext *)data;
-    asyncContext->result = DelayedSingleton<CallManagerClient>::GetInstance()->HasCall();
+    asyncContext->resolved = DelayedSingleton<CallManagerClient>::GetInstance()->HasCall();
 }
 
 void NapiCallManager::NativeIsNewCallAllowed(napi_env env, void *data)
@@ -2909,7 +2995,7 @@ void NapiCallManager::NativeIsNewCallAllowed(napi_env env, void *data)
         return;
     }
     auto asyncContext = (AsyncContext *)data;
-    asyncContext->result = DelayedSingleton<CallManagerClient>::GetInstance()->IsNewCallAllowed();
+    asyncContext->resolved = DelayedSingleton<CallManagerClient>::GetInstance()->IsNewCallAllowed();
 }
 
 void NapiCallManager::NativeIsInEmergencyCall(napi_env env, void *data)
@@ -2919,7 +3005,7 @@ void NapiCallManager::NativeIsInEmergencyCall(napi_env env, void *data)
         return;
     }
     auto asyncContext = (AsyncContext *)data;
-    asyncContext->result = DelayedSingleton<CallManagerClient>::GetInstance()->IsInEmergencyCall();
+    asyncContext->resolved = DelayedSingleton<CallManagerClient>::GetInstance()->IsInEmergencyCall();
 }
 
 void NapiCallManager::NativeIsEmergencyPhoneNumber(napi_env env, void *data)
@@ -2929,9 +3015,14 @@ void NapiCallManager::NativeIsEmergencyPhoneNumber(napi_env env, void *data)
         return;
     }
     auto asyncContext = (UtilsAsyncContext *)data;
+    if (!IsValidSlotId(asyncContext->slotId)) {
+        TELEPHONY_LOGE("NativeIsEmergencyPhoneNumber slotId is invalid");
+        asyncContext->errorCode = SLOT_ID_INVALID;
+        return;
+    }
     std::string tmpPhoneNumber(asyncContext->number, asyncContext->numberLen);
     std::u16string phoneNumber = Str8ToStr16(tmpPhoneNumber);
-    asyncContext->result = DelayedSingleton<CallManagerClient>::GetInstance()->IsEmergencyPhoneNumber(
+    asyncContext->resolved = DelayedSingleton<CallManagerClient>::GetInstance()->IsEmergencyPhoneNumber(
         phoneNumber, asyncContext->slotId, asyncContext->errorCode);
 }
 
@@ -2945,7 +3036,7 @@ void NapiCallManager::NativeFormatPhoneNumber(napi_env env, void *data)
     std::string tmpPhoneNumber(asyncContext->number, asyncContext->numberLen);
     std::u16string phoneNumber = Str8ToStr16(tmpPhoneNumber);
     std::u16string countryCode = Str8ToStr16(asyncContext->code);
-    asyncContext->result = DelayedSingleton<CallManagerClient>::GetInstance()->FormatPhoneNumber(
+    asyncContext->resolved = DelayedSingleton<CallManagerClient>::GetInstance()->FormatPhoneNumber(
         phoneNumber, countryCode, asyncContext->formatNumber);
 }
 
@@ -2959,7 +3050,7 @@ void NapiCallManager::NativeFormatPhoneNumberToE164(napi_env env, void *data)
     std::string tmpPhoneNumber(asyncContext->number, asyncContext->numberLen);
     std::u16string phoneNumber = Str8ToStr16(tmpPhoneNumber);
     std::u16string countryCode = Str8ToStr16(asyncContext->code);
-    asyncContext->result = DelayedSingleton<CallManagerClient>::GetInstance()->FormatPhoneNumberToE164(
+    asyncContext->resolved = DelayedSingleton<CallManagerClient>::GetInstance()->FormatPhoneNumberToE164(
         phoneNumber, countryCode, asyncContext->formatNumber);
 }
 
@@ -2970,7 +3061,7 @@ void NapiCallManager::NativeSetMuted(napi_env env, void *data)
         return;
     }
     auto asyncContext = (AudioAsyncContext *)data;
-    asyncContext->result = DelayedSingleton<CallManagerClient>::GetInstance()->SetMuted(true);
+    asyncContext->resolved = DelayedSingleton<CallManagerClient>::GetInstance()->SetMuted(true);
 }
 
 void NapiCallManager::NativeCancelMuted(napi_env env, void *data)
@@ -2980,7 +3071,7 @@ void NapiCallManager::NativeCancelMuted(napi_env env, void *data)
         return;
     }
     auto asyncContext = (AudioAsyncContext *)data;
-    asyncContext->result = DelayedSingleton<CallManagerClient>::GetInstance()->SetMuted(false);
+    asyncContext->resolved = DelayedSingleton<CallManagerClient>::GetInstance()->SetMuted(false);
 }
 
 void NapiCallManager::NativeMuteRinger(napi_env env, void *data)
@@ -2990,7 +3081,7 @@ void NapiCallManager::NativeMuteRinger(napi_env env, void *data)
         return;
     }
     auto asyncContext = (AudioAsyncContext *)data;
-    asyncContext->result = DelayedSingleton<CallManagerClient>::GetInstance()->MuteRinger();
+    asyncContext->resolved = DelayedSingleton<CallManagerClient>::GetInstance()->MuteRinger();
 }
 
 void NapiCallManager::NativeSetAudioDevice(napi_env env, void *data)
@@ -3008,7 +3099,7 @@ void NapiCallManager::NativeSetAudioDevice(napi_env env, void *data)
     if (static_cast<int32_t>(type) == DEVICE_MIC) {
         type = AudioDevice::DEVICE_EARPIECE;
     }
-    asyncContext->result =
+    asyncContext->resolved =
         DelayedSingleton<CallManagerClient>::GetInstance()->SetAudioDevice(type, asyncContext->address);
 }
 
@@ -3019,7 +3110,7 @@ void NapiCallManager::NativeControlCamera(napi_env env, void *data)
         return;
     }
     auto asyncContext = (VideoAsyncContext *)data;
-    asyncContext->result =
+    asyncContext->resolved =
         DelayedSingleton<CallManagerClient>::GetInstance()->ControlCamera(Str8ToStr16(asyncContext->cameraId));
 }
 
@@ -3037,7 +3128,7 @@ void NapiCallManager::NativeSetPreviewWindow(napi_env env, void *data)
     window.z = asyncContext->z;
     window.width = asyncContext->width;
     window.height = asyncContext->height;
-    asyncContext->result = DelayedSingleton<CallManagerClient>::GetInstance()->SetPreviewWindow(window);
+    asyncContext->resolved = DelayedSingleton<CallManagerClient>::GetInstance()->SetPreviewWindow(window);
 }
 
 void NapiCallManager::NativeSetDisplayWindow(napi_env env, void *data)
@@ -3054,7 +3145,7 @@ void NapiCallManager::NativeSetDisplayWindow(napi_env env, void *data)
     window.z = asyncContext->z;
     window.width = asyncContext->width;
     window.height = asyncContext->height;
-    asyncContext->result = DelayedSingleton<CallManagerClient>::GetInstance()->SetDisplayWindow(window);
+    asyncContext->resolved = DelayedSingleton<CallManagerClient>::GetInstance()->SetDisplayWindow(window);
 }
 
 void NapiCallManager::NativeSetCameraZoom(napi_env env, void *data)
@@ -3064,8 +3155,7 @@ void NapiCallManager::NativeSetCameraZoom(napi_env env, void *data)
         return;
     }
     auto asyncContext = (VideoAsyncContext *)data;
-    asyncContext->result =
-        DelayedSingleton<CallManagerClient>::GetInstance()->SetCameraZoom(asyncContext->zoomRatio);
+    asyncContext->resolved = DelayedSingleton<CallManagerClient>::GetInstance()->SetCameraZoom(asyncContext->zoomRatio);
 }
 
 void NapiCallManager::NativeSetPausePicture(napi_env env, void *data)
@@ -3075,7 +3165,7 @@ void NapiCallManager::NativeSetPausePicture(napi_env env, void *data)
         return;
     }
     auto asyncContext = (VideoAsyncContext *)data;
-    asyncContext->result =
+    asyncContext->resolved =
         DelayedSingleton<CallManagerClient>::GetInstance()->SetPausePicture(Str8ToStr16(asyncContext->path));
 }
 
@@ -3086,7 +3176,7 @@ void NapiCallManager::NativeSetDeviceDirection(napi_env env, void *data)
         return;
     }
     auto asyncContext = (VideoAsyncContext *)data;
-    asyncContext->result =
+    asyncContext->resolved =
         DelayedSingleton<CallManagerClient>::GetInstance()->SetDeviceDirection(asyncContext->rotation);
 }
 
@@ -3097,7 +3187,7 @@ void NapiCallManager::NativeSetCallPreferenceMode(napi_env env, void *data)
         return;
     }
     auto asyncContext = (SupplementAsyncContext *)data;
-    asyncContext->result = DelayedSingleton<CallManagerClient>::GetInstance()->SetCallPreferenceMode(
+    asyncContext->resolved = DelayedSingleton<CallManagerClient>::GetInstance()->SetCallPreferenceMode(
         asyncContext->callId, asyncContext->mode);
 }
 
@@ -3113,16 +3203,16 @@ void NapiCallManager::NativeStartRTT(napi_env env, void *data)
     infoListener.thisVar = asyncContext->thisVar;
     infoListener.callbackRef = asyncContext->callbackRef;
     infoListener.deferred = asyncContext->deferred;
-    asyncContext->result =
+    asyncContext->resolved =
         DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->RegisterStartRttCallback(infoListener);
-    if (asyncContext->result != TELEPHONY_SUCCESS) {
+    if (asyncContext->resolved != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("RegisterStartRttCallback failed!");
         return;
     }
 
     std::u16string msg = Str8ToStr16(asyncContext->content);
-    asyncContext->result = DelayedSingleton<CallManagerClient>::GetInstance()->StartRtt(asyncContext->callId, msg);
-    if (asyncContext->result != TELEPHONY_SUCCESS) {
+    asyncContext->resolved = DelayedSingleton<CallManagerClient>::GetInstance()->StartRtt(asyncContext->callId, msg);
+    if (asyncContext->resolved != TELEPHONY_SUCCESS) {
         DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->UnRegisterStartRttCallback();
         TELEPHONY_LOGE("StartRtt failed!");
         return;
@@ -3143,14 +3233,14 @@ void NapiCallManager::NativeStopRTT(napi_env env, void *data)
     infoListener.thisVar = asyncContext->thisVar;
     infoListener.callbackRef = asyncContext->callbackRef;
     infoListener.deferred = asyncContext->deferred;
-    asyncContext->result =
+    asyncContext->resolved =
         DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->RegisterStopRttCallback(infoListener);
-    if (asyncContext->result != TELEPHONY_SUCCESS) {
+    if (asyncContext->resolved != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("RegisterStopRttCallback failed!");
         return;
     }
-    asyncContext->result = DelayedSingleton<CallManagerClient>::GetInstance()->StopRtt(asyncContext->callId);
-    if (asyncContext->result != TELEPHONY_SUCCESS) {
+    asyncContext->resolved = DelayedSingleton<CallManagerClient>::GetInstance()->StopRtt(asyncContext->callId);
+    if (asyncContext->resolved != TELEPHONY_SUCCESS) {
         DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->UnRegisterStopRttCallback();
         TELEPHONY_LOGE("StopRtt failed!");
         return;
@@ -3166,7 +3256,7 @@ void NapiCallManager::NativeJoinConference(napi_env env, void *data)
         return;
     }
     auto asyncContext = (ListAsyncContext *)data;
-    asyncContext->result = DelayedSingleton<CallManagerClient>::GetInstance()->JoinConference(
+    asyncContext->resolved = DelayedSingleton<CallManagerClient>::GetInstance()->JoinConference(
         asyncContext->callId, asyncContext->listResult);
 }
 
@@ -3182,15 +3272,15 @@ void NapiCallManager::NativeUpdateImsCallMode(napi_env env, void *data)
     infoListener.thisVar = asyncContext->thisVar;
     infoListener.callbackRef = asyncContext->callbackRef;
     infoListener.deferred = asyncContext->deferred;
-    asyncContext->result =
+    asyncContext->resolved =
         DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->RegisterUpdateCallMediaModeCallback(infoListener);
-    if (asyncContext->result != TELEPHONY_SUCCESS) {
+    if (asyncContext->resolved != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("RegisterUpdateCallMediaModeCallback failed!");
         return;
     }
-    asyncContext->result = DelayedSingleton<CallManagerClient>::GetInstance()->UpdateImsCallMode(
+    asyncContext->resolved = DelayedSingleton<CallManagerClient>::GetInstance()->UpdateImsCallMode(
         asyncContext->callId, (ImsCallMode)asyncContext->type);
-    if (asyncContext->result != TELEPHONY_SUCCESS) {
+    if (asyncContext->resolved != TELEPHONY_SUCCESS) {
         DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->UnRegisterUpdateCallMediaModeCallback();
         TELEPHONY_LOGE("UnRegisterUpdateCallMediaModeCallback failed!");
         return;
@@ -3206,7 +3296,7 @@ void NapiCallManager::NativeReportOttCallDetailsInfo(napi_env env, void *data)
         return;
     }
     auto asyncContext = (OttCallAsyncContext *)data;
-    asyncContext->result =
+    asyncContext->resolved =
         DelayedSingleton<CallManagerClient>::GetInstance()->ReportOttCallDetailsInfo(asyncContext->ottVec);
 }
 
@@ -3217,7 +3307,7 @@ void NapiCallManager::NativeReportOttCallEventInfo(napi_env env, void *data)
         return;
     }
     auto asyncContext = (OttEventAsyncContext *)data;
-    asyncContext->result =
+    asyncContext->resolved =
         DelayedSingleton<CallManagerClient>::GetInstance()->ReportOttCallEventInfo(asyncContext->eventInfo);
 }
 

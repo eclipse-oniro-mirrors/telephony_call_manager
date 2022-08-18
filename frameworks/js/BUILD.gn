@@ -1,4 +1,4 @@
-# Copyright (C) 2021 Huawei Device Co., Ltd.
+# Copyright (C) 2021-2022 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -19,6 +19,7 @@ config("call_manager_js_config") {
     "//third_party/node/src",
     "$SUBSYSTEM_DIR/call_manager/frameworks/js/napi/include",
     "//commonlibrary/c_utils/base/include",
+    "$SUBSYSTEM_DIR/core_service/frameworks/js/napi",
   ]
 }
 
@@ -49,6 +50,7 @@ ohos_shared_library("call") {
     "call_manager:tel_call_manager_api",
     "core_service:tel_core_service_api",
     "eventhandler:libeventhandler",
+    "init:libbegetutil",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",

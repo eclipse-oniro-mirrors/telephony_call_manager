@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -41,6 +41,19 @@ napi_value NapiCallManagerUtils::CreateErrorMessage(napi_env env, std::string ms
     napi_value message = nullptr;
     napi_create_string_utf8(env, msg.c_str(), msg.length(), &message);
     napi_create_error(env, nullptr, message, &result);
+    return result;
+}
+
+napi_value NapiCallManagerUtils::CreateErrorMessageWithErrorCode(napi_env env, std::string msg, int32_t errorCode)
+{
+    napi_value result = nullptr;
+    napi_value message = nullptr;
+    NAPI_CALL(env, napi_create_string_utf8(env, msg.c_str(), msg.length(), &message));
+    napi_value codeValue = nullptr;
+    NAPI_CALL(env, napi_create_int32(env, errorCode, &codeValue));
+    NAPI_CALL(env, napi_create_object(env, &result));
+    NAPI_CALL(env, napi_set_named_property(env, result, "code", codeValue));
+    NAPI_CALL(env, napi_set_named_property(env, result, "message", message));
     return result;
 }
 
