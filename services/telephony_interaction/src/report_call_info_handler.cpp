@@ -325,7 +325,7 @@ int32_t ReportCallInfoHandlerService::UpdateOttEventInfo(const OttCallEventInfo 
         TELEPHONY_LOGE("memcpy_s para->phoneNum failed!");
         return TELEPHONY_ERR_MEMSET_FAIL;
     }
-    *para = info;
+    para->ottCallEventId = info.ottCallEventId;
     bool ret = handler_->SendEvent(HANDLER_UPDATE_OTT_EVENT_RESULT_INFO, std::move(para));
     if (!ret) {
         TELEPHONY_LOGE("SendEvent failed! eventId:%{public}d", info.ottCallEventId);
