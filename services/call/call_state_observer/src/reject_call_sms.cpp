@@ -34,6 +34,7 @@ void RejectCallSms::IncomingCallHungUp(sptr<CallBase> &callObjectPtr, bool isSen
 
 void RejectCallSms::SendMessage(int32_t slotId, const std::u16string &desAddr, const std::u16string &text)
 {
+#ifdef ABILITY_SMS_SUPPORT
     auto msgManager = DelayedSingleton<SmsServiceManagerClient>::GetInstance();
     if (msgManager == nullptr) {
         TELEPHONY_LOGE("short message manager nullptr");
@@ -41,6 +42,7 @@ void RejectCallSms::SendMessage(int32_t slotId, const std::u16string &desAddr, c
     }
     msgManager->SendMessage(slotId, desAddr, ConvertToUtf16(""), text, nullptr, nullptr);
     TELEPHONY_LOGI("reject call message sended");
+#endif
 }
 
 std::u16string RejectCallSms::ConvertToUtf16(const std::string &str)

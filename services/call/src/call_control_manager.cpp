@@ -25,7 +25,6 @@
 #include "call_manager_hisysevent.h"
 #include "call_number_utils.h"
 #include "call_records_manager.h"
-#include "call_state_broadcast.h"
 #include "call_state_report_proxy.h"
 #include "cellular_call_connection.h"
 #include "common_type.h"
@@ -937,11 +936,6 @@ void CallControlManager::CallStateObserve()
         TELEPHONY_LOGE("hangUpSmsPtr is null");
         return;
     }
-    std::unique_ptr<CallStateBroadcast> callStateBroadcastPtr = std::make_unique<CallStateBroadcast>();
-    if (callStateBroadcastPtr == nullptr) {
-        TELEPHONY_LOGE("callStateBroadcastPtr is null");
-        return;
-    }
     std::unique_ptr<CallStateReportProxy> callStateReportPtr = std::make_unique<CallStateReportProxy>();
     if (callStateReportPtr == nullptr) {
         TELEPHONY_LOGE("CallStateReportProxy is nullptr!");
@@ -951,7 +945,6 @@ void CallControlManager::CallStateObserve()
     callStateListenerPtr_->AddOneObserver(callStateReportPtr.release());
     callStateListenerPtr_->AddOneObserver(DelayedSingleton<AudioControlManager>::GetInstance().get());
     callStateListenerPtr_->AddOneObserver(hangUpSmsPtr.release());
-    callStateListenerPtr_->AddOneObserver(callStateBroadcastPtr.release());
     callStateListenerPtr_->AddOneObserver(missedCallNotification_.release());
     callStateListenerPtr_->AddOneObserver(incomingCallWakeup_.release());
     callStateListenerPtr_->AddOneObserver(DelayedSingleton<CallRecordsManager>::GetInstance().get());

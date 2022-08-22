@@ -43,10 +43,8 @@ ohos_shared_library("tel_call_manager") {
     "services/bluetooth/src/bluetooth_call_stub.cpp",
     "services/bluetooth/src/bluetooth_connection.cpp",
     "services/call/call_state_observer/src/call_data_base_helper.cpp",
-    "services/call/call_state_observer/src/call_recording_tone.cpp",
     "services/call/call_state_observer/src/call_records_handler.cpp",
     "services/call/call_state_observer/src/call_records_manager.cpp",
-    "services/call/call_state_observer/src/call_state_broadcast.cpp",
     "services/call/call_state_observer/src/incoming_call_notification.cpp",
     "services/call/call_state_observer/src/incoming_call_wake_up.cpp",
     "services/call/call_state_observer/src/missed_call_notification.cpp",
@@ -147,7 +145,6 @@ ohos_shared_library("tel_call_manager") {
     "//base/notification/distributed_notification_service/frameworks/ans:ans_innerkits",
     "//base/notification/distributed_notification_service/frameworks/core:ans_core",
     "//base/telephony/core_service/utils:libtel_common",
-    "//base/telephony/sms_mms/frameworks/native:tel_sms_mms_api",
     "//drivers/peripheral/camera/interfaces/metadata:metadata",
     "//foundation/multimedia/camera_standard/frameworks/native/camera:camera_framework",
     "//third_party/libphonenumber/cpp:phonenumber_standard",
@@ -204,6 +201,13 @@ ohos_shared_library("tel_call_manager") {
     deps +=
         [ "//foundation/communication/bluetooth/frameworks/inner:btframework" ]
     defines += [ "ABILITY_BLUETOOTH_SUPPORT" ]
+  }
+
+  if (defined(global_parts_info) &&
+      defined(global_parts_info.telephony_sms_mms) &&
+      global_parts_info.telephony_sms_mms) {
+    deps += [ "//base/telephony/sms_mms/frameworks/native:tel_sms_mms_api" ]
+    defines += [ "ABILITY_SMS_SUPPORT" ]
   }
   part_name = "call_manager"
   subsystem_name = "telephony"
