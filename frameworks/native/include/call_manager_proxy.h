@@ -34,7 +34,7 @@
 
 namespace OHOS {
 namespace Telephony {
-class CallManagerProxy : public Telephony::Timer, public std::enable_shared_from_this<CallManagerProxy> {
+class CallManagerProxy : public std::enable_shared_from_this<CallManagerProxy> {
     DECLARE_DELAYED_SINGLETON(CallManagerProxy)
 public:
     void Init(int32_t systemAbilityId);
@@ -94,15 +94,27 @@ public:
     int32_t ReportOttCallDetailsInfo(std::vector<OttCallDetailsInfo> &ottVec);
     int32_t ReportOttCallEventInfo(OttCallEventInfo &eventInfo);
     sptr<IRemoteObject> GetProxyObjectPtr(CallManagerProxyType proxyType);
+    void OnRemoteDied(const wptr<IRemoteObject> &remote);
 
 private:
-    static void task();
     int32_t ConnectService();
     void DisconnectService();
     int32_t ReConnectService();
     int32_t ReRegisterCallBack();
-    void OnDeath();
-    void NotifyDeath();
+
+private:
+    class CallManagerServiceDeathRecipient : public IRemoteObject::DeathRecipient {
+    public:
+        explicit CallManagerServiceDeathRecipient(CallManagerProxy &proxy) : proxy_(proxy) {}
+        ~CallManagerServiceDeathRecipient() override = default;
+        void OnRemoteDied(const wptr<IRemoteObject> &remote) override
+        {
+            proxy_.OnRemoteDied(remote);
+        }
+
+    private:
+        CallManagerProxy &proxy_;
+    };
 
 private:
     int32_t systemAbilityId_;
@@ -112,6 +124,7 @@ private:
     sptr<ICallManagerService> callManagerServicePtr_ = nullptr;
     sptr<CallAbilityCallback> callAbilityCallbackPtr_ = nullptr;
     std::mutex mutex_;
+    sptr<IRemoteObject::DeathRecipient> deathRecipient_ { nullptr };
 };
 } // namespace Telephony
 } // namespace OHOS

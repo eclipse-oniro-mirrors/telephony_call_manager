@@ -44,7 +44,6 @@ void CallManagerProxy::Init(int32_t systemAbilityId)
     int32_t result = ConnectService();
     if (result != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("connect service failed,errCode: %{public}d", result);
-        Timer::start(CONNECT_SERVICE_WAIT_TIME, CallManagerProxy::task);
         return;
     }
     initStatus_ = true;
@@ -119,17 +118,6 @@ int32_t CallManagerProxy::UnRegisterCallBack()
     return TELEPHONY_SUCCESS;
 }
 
-void CallManagerProxy::task()
-{
-    int32_t ret = DelayedSingleton<CallManagerProxy>::GetInstance()->ReConnectService();
-    if (ret != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("call manager service reconnection failed! errCode:%{public}d", ret);
-        return;
-    }
-    DelayedSingleton<CallManagerProxy>::GetInstance()->ThreadExit();
-    TELEPHONY_LOGI("call manager service reconnection successfully!");
-}
-
 int32_t CallManagerProxy::ConnectService()
 {
     Utils::UniqueWriteGuard<Utils::RWLock> guard(rwClientLock_);
@@ -147,12 +135,25 @@ int32_t CallManagerProxy::ConnectService()
         TELEPHONY_LOGE("GetSystemAbility failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
+
+    std::unique_ptr<CallManagerServiceDeathRecipient> recipient =
+        std::make_unique<CallManagerServiceDeathRecipient>(*this);
+    if (recipient == nullptr) {
+        TELEPHONY_LOGE("recipient is null");
+        return TELEPHONY_ERROR;
+    }
+    sptr<IRemoteObject::DeathRecipient> dr(recipient.release());
+    if ((iRemoteObjectPtr->IsProxyObject()) && (!iRemoteObjectPtr->AddDeathRecipient(dr))) {
+        TELEPHONY_LOGE("Failed to add death recipient");
+        return TELEPHONY_ERROR;
+    }
     callManagerServicePtr = iface_cast<ICallManagerService>(iRemoteObjectPtr);
     if (!callManagerServicePtr) {
         TELEPHONY_LOGE("iface_cast<ICallManagerService> failed!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     callManagerServicePtr_ = callManagerServicePtr;
+    deathRecipient_ = dr;
     return TELEPHONY_SUCCESS;
 }
 
@@ -202,21 +203,6 @@ int32_t CallManagerProxy::ReRegisterCallBack()
     }
     TELEPHONY_LOGI("register call ability callback again success!");
     return TELEPHONY_SUCCESS;
-}
-
-void CallManagerProxy::OnDeath()
-{
-    Utils::UniqueWriteGuard<Utils::RWLock> guard(rwClientLock_);
-    if (callManagerServicePtr_ != nullptr) {
-        callManagerServicePtr_.clear();
-        callManagerServicePtr_ = nullptr;
-    }
-    NotifyDeath();
-}
-
-void CallManagerProxy::NotifyDeath()
-{
-    Timer::start(CONNECT_SERVICE_WAIT_TIME, CallManagerProxy::task);
 }
 
 int32_t CallManagerProxy::DialCall(std::u16string number, AppExecFwk::PacMap &extras)
@@ -968,6 +954,26 @@ sptr<IRemoteObject> CallManagerProxy::GetProxyObjectPtr(CallManagerProxyType pro
         return nullptr;
     }
     return ptr;
+}
+
+void CallManagerProxy::OnRemoteDied(const wptr<IRemoteObject> &remote)
+{
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("OnRemoteDied failed, remote is nullptr");
+        return;
+    }
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (callManagerServicePtr_ == nullptr) {
+        TELEPHONY_LOGE("OnRemoteDied failed, callManagerServicePtr_ is nullptr");
+        return;
+    }
+    auto serviceRemote = callManagerServicePtr_->AsObject();
+    if (serviceRemote != nullptr && serviceRemote == remote.promote()) {
+        serviceRemote->RemoveDeathRecipient(deathRecipient_);
+        callManagerServicePtr_ = nullptr;
+        initStatus_ = false;
+        TELEPHONY_LOGE("on remote died");
+    }
 }
 } // namespace Telephony
 } // namespace OHOS
