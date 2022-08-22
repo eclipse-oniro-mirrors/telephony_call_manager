@@ -845,7 +845,10 @@ int32_t CallManagerServiceStub::OnReportOttCallDetailsInfo(MessageParcel &data, 
     std::vector<OttCallDetailsInfo> ottVec;
     OttCallDetailsInfo *infoPtr = nullptr;
     for (int32_t i = 0; i < vecCnt; i++) {
-        infoPtr = (OttCallDetailsInfo *)data.ReadRawData(sizeof(OttCallDetailsInfo));
+        if (infoPtr = (OttCallDetailsInfo *)data.ReadRawData(sizeof(OttCallDetailsInfo)) == nullptr) {
+        TELEPHONY_LOGE("reading raw data failed");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+        }
         ottVec.push_back(*infoPtr);
     }
     result = ReportOttCallDetailsInfo(ottVec);
