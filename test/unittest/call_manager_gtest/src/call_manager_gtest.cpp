@@ -1817,6 +1817,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetPausePicture_0600, Function 
  * @tc.number   Telephony_CallManager_SetAudioDevice_0100
  * @tc.name     make a normal buletoothAddress , set active bluetooth device
  * @tc.desc     Function test
+ * @tc.require: issueI5JUAQ
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_SetAudioDevice_0100, Function | MediumTest | Level2)
 {
@@ -1932,6 +1933,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetAudioDevice_0400, Function |
  * @tc.number   Telephony_CallManager_SetAudioDevice_0500
  * @tc.name     make a empty buletoothAddress , set active bluetooth device
  * @tc.desc     Function test
+ * @tc.require: issueI5JUAQ
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_SetAudioDevice_0500, Function | MediumTest | Level2)
 {
