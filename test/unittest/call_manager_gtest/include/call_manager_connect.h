@@ -617,6 +617,15 @@ public:
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
 
+    int32_t SetMuted(bool isMuted) const
+    {
+        if (callManagerServicePtr_ != nullptr) {
+            return callManagerServicePtr_->SetMuted(isMuted);
+        }
+        TELEPHONY_LOGE("callManagerServicePtr_ is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+
     int32_t RegisterCallBack()
     {
         if (callManagerServicePtr_ == nullptr) {
