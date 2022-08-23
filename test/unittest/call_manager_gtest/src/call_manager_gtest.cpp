@@ -1853,6 +1853,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetAudioDevice_0100, Function |
  * @tc.number   Telephony_CallManager_SetAudioDevice_0200
  * @tc.name     make EARPIECE device type , set active EARPIECE device
  * @tc.desc     Function test
+ * @tc.require: issueI5JUAQ
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_SetAudioDevice_0200, Function | MediumTest | Level2)
 {
@@ -1879,6 +1880,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetAudioDevice_0200, Function |
  * @tc.number   Telephony_CallManager_SetAudioDevice_0300
  * @tc.name     make SPEAKER device type , set active SPEAKER device
  * @tc.desc     Function test
+ * @tc.require: issueI5JUAQ
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_SetAudioDevice_0300, Function | MediumTest | Level2)
 {
@@ -1906,6 +1908,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetAudioDevice_0300, Function |
  * @tc.number   Telephony_CallManager_SetAudioDevice_0400
  * @tc.name     make DEVICE_WIRED_HEADSET device type , set active DEVICE_WIRED_HEADSET device
  * @tc.desc     Function test
+ * @tc.require: issueI5JUAQ
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_SetAudioDevice_0400, Function | MediumTest | Level2)
 {
