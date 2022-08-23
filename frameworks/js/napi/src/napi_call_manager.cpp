@@ -2268,7 +2268,7 @@ void NapiCallManager::NativeBoolCallBack(napi_env env, napi_status status, void 
     }
     auto asyncContext = (AsyncContext *)data;
     if (asyncContext->deferred != nullptr) {
-        if (asyncContext->resolved != BOOL_VALUE_IS_FALSE) {
+        if (asyncContext->resolved == BOOL_VALUE_IS_TRUE) {
             napi_value promiseValue = nullptr;
             napi_get_boolean(env, true, &promiseValue);
             napi_resolve_deferred(env, asyncContext->deferred, promiseValue);
@@ -2286,7 +2286,7 @@ void NapiCallManager::NativeBoolCallBack(napi_env env, napi_status status, void 
         }
     } else {
         napi_value callbackValue[ARRAY_INDEX_THIRD] = { 0 };
-        if (asyncContext->resolved != BOOL_VALUE_IS_FALSE) {
+        if (asyncContext->resolved == BOOL_VALUE_IS_TRUE) {
             callbackValue[ARRAY_INDEX_FIRST] = NapiCallManagerUtils::CreateUndefined(env);
             napi_get_boolean(env, true, &callbackValue[ARRAY_INDEX_SECOND]);
         } else if (asyncContext->errorCode == TELEPHONY_SUCCESS) {

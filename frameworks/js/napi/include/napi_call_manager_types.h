@@ -25,7 +25,7 @@
 
 namespace OHOS {
 namespace Telephony {
-const int16_t BOOL_VALUE_IS_FALSE = 0;
+const int16_t BOOL_VALUE_IS_TRUE = 1;
 const int16_t NATIVE_VERSION = 1;
 const int16_t NATIVE_FLAGS = 0;
 const int16_t ZERO_VALUE = 0;
