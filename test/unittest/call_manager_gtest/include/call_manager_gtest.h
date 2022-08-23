@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -32,7 +32,6 @@
 
 namespace OHOS {
 namespace Telephony {
-constexpr int32_t DEFAULT_SLOT_ID = 0;
 constexpr int16_t SLEEP_THREE_SECONDS = 3;
 
 class CallManagerGtest : public testing::Test {
@@ -59,9 +58,9 @@ public:
         CallInfoManager::Init();
     }
 
-    bool HasSimCard()
+    bool HasSimCard(int32_t slotId)
     {
-        return DelayedRefSingleton<CoreServiceClient>::GetInstance().HasSimCard(DEFAULT_SLOT_ID);
+        return DelayedRefSingleton<CoreServiceClient>::GetInstance().HasSimCard(slotId);
     }
 
     static bool IsServiceConnected()
@@ -118,6 +117,8 @@ public:
     const std::string EMPTY_DEFAULT = "";
     const int32_t FALSE_DEFAULT = -1;
     const int32_t DIAL_SCENE_TEST = 100;
+    const int32_t INVALID_VIDEO_STATE = -1;
+    const int32_t INVALID_SLOT_ID = -1;
 };
 
 bool CallManagerGtest::isConnected_ = false;
