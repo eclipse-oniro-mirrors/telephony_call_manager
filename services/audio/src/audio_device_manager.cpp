@@ -247,7 +247,7 @@ bool AudioDeviceManager::DisableAll()
 void AudioDeviceManager::SetCurrentAudioDevice(AudioDevice device)
 {
     if (audioDevice_ == AudioDevice::DEVICE_BLUETOOTH_SCO && audioDevice_ != device) {
-        DelayedSingleton<BluetoothConnection>::GetInstance()->SetBtScoState(SCO_STATE_PENDING);
+        DelayedSingleton<BluetoothConnection>::GetInstance()->SetBtScoState(SCO_STATE_DISCONNECTED);
     } else if (audioDevice_ != AudioDevice::DEVICE_BLUETOOTH_SCO && device == AudioDevice::DEVICE_BLUETOOTH_SCO) {
         DelayedSingleton<BluetoothConnection>::GetInstance()->SetBtScoState(SCO_STATE_CONNECTED);
     }
