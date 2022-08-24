@@ -1960,6 +1960,52 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetAudioDevice_0500, Function |
     }
 }
 
+/********************************************* Test SetMuted()***********************************************/
+/**
+ * @tc.number   Telephony_CallManager_SetMuted_0100
+ * @tc.name     set muted true
+ * @tc.desc     Function test
+ * @tc.require: issueI5K59I
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_SetMuted_0100, Function | MediumTest | Level2)
+{
+    if (!HasSimCard()) {
+        return;
+    }
+
+    EXPECT_EQ(CallManagerGtest::IsServiceConnected(), true);
+    std::string phoneNumber = "00000000000";
+    int32_t ret = CallManagerGtest::clientPtr_->DialCall(Str8ToStr16(phoneNumber), dialInfo_);
+    EXPECT_EQ(ret, RETURN_VALUE_IS_ZERO);
+    bool muted = true;
+    if (CallInfoManager::HasActiveStatus()) {
+        EXPECT_EQ(CallManagerGtest::clientPtr_->SetMuted(muted), RETURN_VALUE_IS_ZERO);
+    }
+
+    if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
+        HangUpCall();
+        EXPECT_EQ(CallInfoManager::HasState(newCallId_, (int32_t)TelCallState::CALL_STATUS_DISCONNECTED), true);
+    }
+}
+
+/**
+ * @tc.number   Telephony_CallManager_SetMuted_0200
+ * @tc.name     without call, set muted failed
+ * @tc.desc     Function test
+ * @tc.require: issueI5K59I
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_SetMuted_0200, Function | MediumTest | Level2)
+{
+    if (!HasSimCard()) {
+        return;
+    }
+
+    EXPECT_EQ(CallManagerGtest::IsServiceConnected(), true);
+    bool muted = true;
+
+    EXPECT_EQ(CallManagerGtest::clientPtr_->SetMuted(muted), CALL_ERR_AUDIO_SETTING_MUTE_FAILED);
+}
+
 /********************************************* Test RegisterCallBack() ***********************************************/
 /**
  * @tc.number   Telephony_CallManager_RegisterCallBack_0100
