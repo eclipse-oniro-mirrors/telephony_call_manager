@@ -526,6 +526,7 @@ sptr<CallBase> CallStatusManager::RefreshCallIfNecessary(const sptr<CallBase> &c
     newCall->SetRingEndTime(attrInfo.ringEndTime);
     newCall->SetAnswerType(attrInfo.answerType);
     DeleteOneCallObject(call->GetCallID());
+    newCall->SetCallId(call->GetCallID());
     return newCall;
 }
 

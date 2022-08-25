@@ -339,6 +339,11 @@ int32_t CallBase::SetCallEndedType(CallEndedType callEndedType)
     return TELEPHONY_SUCCESS;
 }
 
+void CallBase::SetCallId(int32_t callId)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    callId_ = callId;
+}
 bool CallBase::CheckVoicemailNumber(std::string phoneNumber)
 {
     return false;
