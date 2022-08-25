@@ -423,7 +423,17 @@ public:
     int32_t GetMute(int32_t slotId) override;
 
     int32_t SetEmergencyCallList(int32_t slotId, std::vector<EmergencyCall>  &eccVec) override;
-    
+
+private:
+    /**
+     * SetCommonParamForMessageParcel, set common param for MessageParcel
+     *
+     * @param slotId
+     * @param in
+     * @return Returns TELEPHONY_SUCCESS on success, others on failure.
+     */
+    int32_t SetCommonParamForMessageParcel(int32_t slotId, MessageParcel &in);
+
 private:
     const int32_t MAX_SIZE = 10;
     static inline BrokerDelegator<CellularCallProxy> delegator_;

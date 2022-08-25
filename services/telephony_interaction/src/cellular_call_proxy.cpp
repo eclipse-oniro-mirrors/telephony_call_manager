@@ -218,14 +218,10 @@ int32_t CellularCallProxy::IsEmergencyPhoneNumber(int32_t slotId, const std::str
     MessageOption option;
     MessageParcel in;
     MessageParcel out;
-    if (!in.WriteInterfaceToken(CellularCallProxy::GetDescriptor())) {
-        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
-    }
-    if (!in.WriteInt32(MAX_SIZE)) {
-        return TELEPHONY_ERR_WRITE_DATA_FAIL;
-    }
-    if (!in.WriteInt32(slotId)) {
-        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    int32_t result = TELEPHONY_SUCCESS;
+    result = SetCommonParamForMessageParcel(slotId, in);
+    if (result != TELEPHONY_SUCCESS) {
+        return result;
     }
     if (!in.WriteString(phoneNum)) {
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
@@ -288,14 +284,10 @@ int32_t CellularCallProxy::InviteToConference(int32_t slotId, const std::vector<
     MessageOption option;
     MessageParcel in;
     MessageParcel out;
-    if (!in.WriteInterfaceToken(CellularCallProxy::GetDescriptor())) {
-        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
-    }
-    if (!in.WriteInt32(MAX_SIZE)) {
-        return TELEPHONY_ERR_WRITE_DATA_FAIL;
-    }
-    if (!in.WriteInt32(slotId)) {
-        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    int32_t result = TELEPHONY_SUCCESS;
+    result = SetCommonParamForMessageParcel(slotId, in);
+    if (result != TELEPHONY_SUCCESS) {
+        return result;
     }
     if (!in.WriteStringVector(numberList)) {
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
@@ -312,14 +304,10 @@ int32_t CellularCallProxy::KickOutFromConference(int32_t slotId, const std::vect
     MessageOption option;
     MessageParcel in;
     MessageParcel out;
-    if (!in.WriteInterfaceToken(CellularCallProxy::GetDescriptor())) {
-        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
-    }
-    if (!in.WriteInt32(MAX_SIZE)) {
-        return TELEPHONY_ERR_WRITE_DATA_FAIL;
-    }
-    if (!in.WriteInt32(slotId)) {
-        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    int32_t result = TELEPHONY_SUCCESS;
+    result = SetCommonParamForMessageParcel(slotId, in);
+    if (result != TELEPHONY_SUCCESS) {
+        return result;
     }
     if (!in.WriteStringVector(numberList)) {
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
@@ -449,14 +437,10 @@ int32_t CellularCallProxy::StartRtt(int32_t slotId, const std::string &msg)
     MessageOption option;
     MessageParcel in;
     MessageParcel out;
-    if (!in.WriteInterfaceToken(CellularCallProxy::GetDescriptor())) {
-        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
-    }
-    if (!in.WriteInt32(MAX_SIZE)) {
-        return TELEPHONY_ERR_WRITE_DATA_FAIL;
-    }
-    if (!in.WriteInt32(slotId)) {
-        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    int32_t result = TELEPHONY_SUCCESS;
+    result = SetCommonParamForMessageParcel(slotId, in);
+    if (result != TELEPHONY_SUCCESS) {
+        return result;
     }
     if (!in.WriteString(msg)) {
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
@@ -473,14 +457,10 @@ int32_t CellularCallProxy::StopRtt(int32_t slotId)
     MessageOption option;
     MessageParcel in;
     MessageParcel out;
-    if (!in.WriteInterfaceToken(CellularCallProxy::GetDescriptor())) {
-        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
-    }
-    if (!in.WriteInt32(MAX_SIZE)) {
-        return TELEPHONY_ERR_WRITE_DATA_FAIL;
-    }
-    if (!in.WriteInt32(slotId)) {
-        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    int32_t result = TELEPHONY_SUCCESS;
+    result = SetCommonParamForMessageParcel(slotId, in);
+    if (result != TELEPHONY_SUCCESS) {
+        return result;
     }
     int32_t error = Remote()->SendRequest(static_cast<uint32_t>(OperationType::STOP_RTT), in, out, option);
     if (error == ERR_NONE) {
@@ -494,14 +474,10 @@ int32_t CellularCallProxy::SetCallTransferInfo(int32_t slotId, const CallTransfe
     MessageOption option;
     MessageParcel in;
     MessageParcel out;
-    if (!in.WriteInterfaceToken(CellularCallProxy::GetDescriptor())) {
-        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
-    }
-    if (!in.WriteInt32(MAX_SIZE)) {
-        return TELEPHONY_ERR_WRITE_DATA_FAIL;
-    }
-    if (!in.WriteInt32(slotId)) {
-        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    int32_t result = TELEPHONY_SUCCESS;
+    result = SetCommonParamForMessageParcel(slotId, in);
+    if (result != TELEPHONY_SUCCESS) {
+        return result;
     }
     if (!in.WriteRawData((const void *)&ctInfo, sizeof(CallTransferInfo))) {
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
@@ -518,14 +494,10 @@ int32_t CellularCallProxy::GetCallTransferInfo(int32_t slotId, CallTransferType 
     MessageOption option;
     MessageParcel in;
     MessageParcel out;
-    if (!in.WriteInterfaceToken(CellularCallProxy::GetDescriptor())) {
-        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
-    }
-    if (!in.WriteInt32(MAX_SIZE)) {
-        return TELEPHONY_ERR_WRITE_DATA_FAIL;
-    }
-    if (!in.WriteInt32(slotId)) {
-        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    int32_t result = TELEPHONY_SUCCESS;
+    result = SetCommonParamForMessageParcel(slotId, in);
+    if (result != TELEPHONY_SUCCESS) {
+        return result;
     }
     if (!in.WriteInt32((int32_t)type)) {
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
@@ -542,14 +514,10 @@ int32_t CellularCallProxy::SetCallWaiting(int32_t slotId, bool activate)
     MessageOption option;
     MessageParcel in;
     MessageParcel out;
-    if (!in.WriteInterfaceToken(CellularCallProxy::GetDescriptor())) {
-        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
-    }
-    if (!in.WriteInt32(MAX_SIZE)) {
-        return TELEPHONY_ERR_WRITE_DATA_FAIL;
-    }
-    if (!in.WriteInt32(slotId)) {
-        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    int32_t result = TELEPHONY_SUCCESS;
+    result = SetCommonParamForMessageParcel(slotId, in);
+    if (result != TELEPHONY_SUCCESS) {
+        return result;
     }
     if (!in.WriteBool(activate)) {
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
@@ -566,14 +534,10 @@ int32_t CellularCallProxy::GetCallWaiting(int32_t slotId)
     MessageOption option;
     MessageParcel in;
     MessageParcel out;
-    if (!in.WriteInterfaceToken(CellularCallProxy::GetDescriptor())) {
-        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
-    }
-    if (!in.WriteInt32(MAX_SIZE)) {
-        return TELEPHONY_ERR_WRITE_DATA_FAIL;
-    }
-    if (!in.WriteInt32(slotId)) {
-        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    int32_t result = TELEPHONY_SUCCESS;
+    result = SetCommonParamForMessageParcel(slotId, in);
+    if (result != TELEPHONY_SUCCESS) {
+        return result;
     }
     int32_t error = Remote()->SendRequest(static_cast<uint32_t>(OperationType::GET_CALL_WAITING), in, out, option);
     if (error == ERR_NONE) {
@@ -587,14 +551,10 @@ int32_t CellularCallProxy::SetCallRestriction(int32_t slotId, const CallRestrict
     MessageOption option;
     MessageParcel in;
     MessageParcel out;
-    if (!in.WriteInterfaceToken(CellularCallProxy::GetDescriptor())) {
-        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
-    }
-    if (!in.WriteInt32(MAX_SIZE)) {
-        return TELEPHONY_ERR_WRITE_DATA_FAIL;
-    }
-    if (!in.WriteInt32(slotId)) {
-        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    int32_t result = TELEPHONY_SUCCESS;
+    result = SetCommonParamForMessageParcel(slotId, in);
+    if (result != TELEPHONY_SUCCESS) {
+        return result;
     }
     if (!in.WriteRawData((const void *)&crInfo, sizeof(CallRestrictionInfo))) {
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
@@ -611,14 +571,10 @@ int32_t CellularCallProxy::GetCallRestriction(int32_t slotId, CallRestrictionTyp
     MessageOption option;
     MessageParcel in;
     MessageParcel out;
-    if (!in.WriteInterfaceToken(CellularCallProxy::GetDescriptor())) {
-        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
-    }
-    if (!in.WriteInt32(MAX_SIZE)) {
-        return TELEPHONY_ERR_WRITE_DATA_FAIL;
-    }
-    if (!in.WriteInt32(slotId)) {
-        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    int32_t result = TELEPHONY_SUCCESS;
+    result = SetCommonParamForMessageParcel(slotId, in);
+    if (result != TELEPHONY_SUCCESS) {
+        return result;
     }
     if (!in.WriteInt32((int32_t)facType)) {
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
@@ -635,14 +591,10 @@ int32_t CellularCallProxy::SetDomainPreferenceMode(int32_t slotId, int32_t mode)
     MessageOption option;
     MessageParcel in;
     MessageParcel out;
-    if (!in.WriteInterfaceToken(CellularCallProxy::GetDescriptor())) {
-        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
-    }
-    if (!in.WriteInt32(MAX_SIZE)) {
-        return TELEPHONY_ERR_WRITE_DATA_FAIL;
-    }
-    if (!in.WriteInt32(slotId)) {
-        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    int32_t result = TELEPHONY_SUCCESS;
+    result = SetCommonParamForMessageParcel(slotId, in);
+    if (result != TELEPHONY_SUCCESS) {
+        return result;
     }
     if (!in.WriteInt32(mode)) {
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
@@ -660,14 +612,10 @@ int32_t CellularCallProxy::GetDomainPreferenceMode(int32_t slotId)
     MessageOption option;
     MessageParcel in;
     MessageParcel out;
-    if (!in.WriteInterfaceToken(CellularCallProxy::GetDescriptor())) {
-        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
-    }
-    if (!in.WriteInt32(MAX_SIZE)) {
-        return TELEPHONY_ERR_WRITE_DATA_FAIL;
-    }
-    if (!in.WriteInt32(slotId)) {
-        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    int32_t result = TELEPHONY_SUCCESS;
+    result = SetCommonParamForMessageParcel(slotId, in);
+    if (result != TELEPHONY_SUCCESS) {
+        return result;
     }
     int32_t error =
         Remote()->SendRequest(static_cast<uint32_t>(OperationType::GET_DOMAIN_PREFERENCE_MODE), in, out, option);
@@ -682,14 +630,10 @@ int32_t CellularCallProxy::SetImsSwitchStatus(int32_t slotId, bool active)
     MessageOption option;
     MessageParcel in;
     MessageParcel out;
-    if (!in.WriteInterfaceToken(CellularCallProxy::GetDescriptor())) {
-        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
-    }
-    if (!in.WriteInt32(MAX_SIZE)) {
-        return TELEPHONY_ERR_WRITE_DATA_FAIL;
-    }
-    if (!in.WriteInt32(slotId)) {
-        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    int32_t result = TELEPHONY_SUCCESS;
+    result = SetCommonParamForMessageParcel(slotId, in);
+    if (result != TELEPHONY_SUCCESS) {
+        return result;
     }
     if (!in.WriteBool(active)) {
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
@@ -705,16 +649,12 @@ int32_t CellularCallProxy::SetImsSwitchStatus(int32_t slotId, bool active)
 int32_t CellularCallProxy::GetImsSwitchStatus(int32_t slotId)
 {
     MessageOption option;
-    MessageParcel in;
     MessageParcel out;
-    if (!in.WriteInterfaceToken(CellularCallProxy::GetDescriptor())) {
-        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
-    }
-    if (!in.WriteInt32(MAX_SIZE)) {
-        return TELEPHONY_ERR_WRITE_DATA_FAIL;
-    }
-    if (!in.WriteInt32(slotId)) {
-        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    MessageParcel in;
+    int32_t result = TELEPHONY_SUCCESS;
+    result = SetCommonParamForMessageParcel(slotId, in);
+    if (result != TELEPHONY_SUCCESS) {
+        return result;
     }
     int32_t error =
         Remote()->SendRequest(static_cast<uint32_t>(OperationType::GET_IMS_SWITCH_STATUS), in, out, option);
@@ -729,14 +669,10 @@ int32_t CellularCallProxy::SetImsConfig(int32_t slotId, ImsConfigItem item, cons
     MessageOption option;
     MessageParcel in;
     MessageParcel out;
-    if (!in.WriteInterfaceToken(CellularCallProxy::GetDescriptor())) {
-        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
-    }
-    if (!in.WriteInt32(MAX_SIZE)) {
-        return TELEPHONY_ERR_WRITE_DATA_FAIL;
-    }
-    if (!in.WriteInt32(slotId)) {
-        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    int32_t result = TELEPHONY_SUCCESS;
+    result = SetCommonParamForMessageParcel(slotId, in);
+    if (result != TELEPHONY_SUCCESS) {
+        return result;
     }
     if (!in.WriteInt32(item)) {
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
@@ -757,14 +693,10 @@ int32_t CellularCallProxy::SetImsConfig(int32_t slotId, ImsConfigItem item, int3
     MessageOption option;
     MessageParcel in;
     MessageParcel out;
-    if (!in.WriteInterfaceToken(CellularCallProxy::GetDescriptor())) {
-        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
-    }
-    if (!in.WriteInt32(MAX_SIZE)) {
-        return TELEPHONY_ERR_WRITE_DATA_FAIL;
-    }
-    if (!in.WriteInt32(slotId)) {
-        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    int32_t result = TELEPHONY_SUCCESS;
+    result = SetCommonParamForMessageParcel(slotId, in);
+    if (result != TELEPHONY_SUCCESS) {
+        return result;
     }
     if (!in.WriteInt32(item)) {
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
@@ -784,14 +716,10 @@ int32_t CellularCallProxy::GetImsConfig(int32_t slotId, ImsConfigItem item)
     MessageOption option;
     MessageParcel in;
     MessageParcel out;
-    if (!in.WriteInterfaceToken(CellularCallProxy::GetDescriptor())) {
-        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
-    }
-    if (!in.WriteInt32(MAX_SIZE)) {
-        return TELEPHONY_ERR_WRITE_DATA_FAIL;
-    }
-    if (!in.WriteInt32(slotId)) {
-        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    int32_t result = TELEPHONY_SUCCESS;
+    result = SetCommonParamForMessageParcel(slotId, in);
+    if (result != TELEPHONY_SUCCESS) {
+        return result;
     }
     if (!in.WriteInt32(item)) {
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
@@ -808,14 +736,10 @@ int32_t CellularCallProxy::SetImsFeatureValue(int32_t slotId, FeatureType type, 
     MessageOption option;
     MessageParcel in;
     MessageParcel out;
-    if (!in.WriteInterfaceToken(CellularCallProxy::GetDescriptor())) {
-        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
-    }
-    if (!in.WriteInt32(MAX_SIZE)) {
-        return TELEPHONY_ERR_WRITE_DATA_FAIL;
-    }
-    if (!in.WriteInt32(slotId)) {
-        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    int32_t result = TELEPHONY_SUCCESS;
+    result = SetCommonParamForMessageParcel(slotId, in);
+    if (result != TELEPHONY_SUCCESS) {
+        return result;
     }
     if (!in.WriteInt32(type)) {
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
@@ -835,14 +759,10 @@ int32_t CellularCallProxy::GetImsFeatureValue(int32_t slotId, FeatureType type)
     MessageOption option;
     MessageParcel in;
     MessageParcel out;
-    if (!in.WriteInterfaceToken(CellularCallProxy::GetDescriptor())) {
-        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
-    }
-    if (!in.WriteInt32(MAX_SIZE)) {
-        return TELEPHONY_ERR_WRITE_DATA_FAIL;
-    }
-    if (!in.WriteInt32(slotId)) {
-        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    int32_t result = TELEPHONY_SUCCESS;
+    result = SetCommonParamForMessageParcel(slotId, in);
+    if (result != TELEPHONY_SUCCESS) {
+        return result;
     }
     if (!in.WriteInt32(type)) {
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
@@ -1015,14 +935,10 @@ int32_t CellularCallProxy::SetMute(int32_t slotId, int32_t mute)
     MessageOption option;
     MessageParcel in;
     MessageParcel out;
-    if (!in.WriteInterfaceToken(CellularCallProxy::GetDescriptor())) {
-        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
-    }
-    if (!in.WriteInt32(MAX_SIZE)) {
-        return TELEPHONY_ERR_WRITE_DATA_FAIL;
-    }
-    if (!in.WriteInt32(slotId)) {
-        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    int32_t result = TELEPHONY_SUCCESS;
+    result = SetCommonParamForMessageParcel(slotId, in);
+    if (result != TELEPHONY_SUCCESS) {
+        return result;
     }
     if (!in.WriteInt32(mute)) {
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
@@ -1039,14 +955,10 @@ int32_t CellularCallProxy::GetMute(int32_t slotId)
     MessageOption option;
     MessageParcel in;
     MessageParcel out;
-    if (!in.WriteInterfaceToken(CellularCallProxy::GetDescriptor())) {
-        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
-    }
-    if (!in.WriteInt32(MAX_SIZE)) {
-        return TELEPHONY_ERR_WRITE_DATA_FAIL;
-    }
-    if (!in.WriteInt32(slotId)) {
-        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    int32_t result = TELEPHONY_SUCCESS;
+    result = SetCommonParamForMessageParcel(slotId, in);
+    if (result != TELEPHONY_SUCCESS) {
+        return result;
     }
     int32_t error = Remote()->SendRequest(static_cast<uint32_t>(OperationType::GET_MUTE), in, out, option);
     if (error == ERR_NONE) {
@@ -1060,14 +972,10 @@ int32_t CellularCallProxy::SetEmergencyCallList(int32_t slotId, std::vector<Emer
     MessageOption option;
     MessageParcel in;
     MessageParcel out;
-    if (!in.WriteInterfaceToken(CellularCallProxy::GetDescriptor())) {
-        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
-    }
-    if (!in.WriteInt32(MAX_SIZE)) {
-        return TELEPHONY_ERR_WRITE_DATA_FAIL;
-    }
-    if (!in.WriteInt32(slotId)) {
-        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    int32_t result = TELEPHONY_SUCCESS;
+    result = SetCommonParamForMessageParcel(slotId, in);
+    if (result != TELEPHONY_SUCCESS) {
+        return result;
     }
 
     if (eccVec.size() <= 0) {
@@ -1090,6 +998,20 @@ int32_t CellularCallProxy::SetEmergencyCallList(int32_t slotId, std::vector<Emer
         return out.ReadInt32();
     }
     return error;
+}
+
+int32_t CellularCallProxy::SetCommonParamForMessageParcel(int32_t slotId, MessageParcel &in)
+{
+    if (!in.WriteInterfaceToken(CellularCallProxy::GetDescriptor())) {
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    if (!in.WriteInt32(MAX_SIZE)) {
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
+    if (!in.WriteInt32(slotId)) {
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
+    return TELEPHONY_SUCCESS;
 }
 } // namespace Telephony
 } // namespace OHOS

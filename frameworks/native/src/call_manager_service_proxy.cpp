@@ -1164,9 +1164,9 @@ int32_t CallManagerServiceProxy::DisableImsSwitch(int32_t slotId)
 
 int32_t CallManagerServiceProxy::IsImsSwitchEnabled(int32_t slotId)
 {
-    MessageOption option;
     MessageParcel dataParcel;
     MessageParcel replyParcel;
+    MessageOption option;
     if (!dataParcel.WriteInterfaceToken(CallManagerServiceProxy::GetDescriptor())) {
         TELEPHONY_LOGE("write descriptor fail");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
