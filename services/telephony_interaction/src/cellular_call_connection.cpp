@@ -662,7 +662,7 @@ int32_t CellularCallConnection::SetImsConfig(ImsConfigItem item, const std::stri
     std::lock_guard<std::mutex> lock(mutex_);
     int errCode = cellularCallInterfacePtr_->SetImsConfig(slotId, item, value);
     if (errCode != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("SetImsConfig failed, errcode:%{public}d", errCode);
+        TELEPHONY_LOGE("SetImsConfig for string value failed, errcode:%{public}d", errCode);
         return errCode;
     }
     return TELEPHONY_SUCCESS;
@@ -677,7 +677,7 @@ int32_t CellularCallConnection::SetImsConfig(ImsConfigItem item, int32_t value, 
     std::lock_guard<std::mutex> lock(mutex_);
     int errCode = cellularCallInterfacePtr_->SetImsConfig(slotId, item, value);
     if (errCode != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("SetImsConfig failed, errcode:%{public}d", errCode);
+        TELEPHONY_LOGE("SetImsConfig for int value failed, errcode:%{public}d", errCode);
         return errCode;
     }
     return TELEPHONY_SUCCESS;
