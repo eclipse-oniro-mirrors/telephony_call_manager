@@ -90,6 +90,7 @@ public:
     void SetAnswerType(CallAnswerType answerType);
     CallEndedType GetCallEndedType();
     int32_t SetCallEndedType(CallEndedType callEndedType);
+    void SetCallId(int32_t callId);
     bool IsSpeakerphoneEnabled();
     bool IsCurrentRinging();
     std::string GetAccountNumber();
