@@ -25,11 +25,6 @@ ohos_executable("tel_call_manager_ui_test") {
 
   include_dirs = [
     "//base/telephony/call_manager/services/audio/include",
-    "//foundation/multimedia/camera_standard/interfaces/inner_api/native/camera/include",
-    "//foundation/multimedia/camera_standard/services/camera_service/include",
-    "//foundation/multimedia/camera_standard/services/camera_service/binder/base/include",
-    "//foundation/multimedia/camera_standard/services/camera_service/binder/client/include",
-    "//foundation/multimedia/camera_standard/services/camera_service/binder/server/include",
     "//foundation/graphic/graphic_2d/frameworks/surface/include",
     "//drivers/peripheral/camera/interfaces/metadata/include",
     "//utils/system/safwk/native/include",
@@ -51,7 +46,6 @@ ohos_executable("tel_call_manager_ui_test") {
     "${ability_runtime_path}/frameworks/native/ability/native:abilitykit_native",
     "//drivers/peripheral/camera/interfaces/metadata:metadata",
     "//foundation/graphic/graphic_2d:libsurface",
-    "//foundation/multimedia/camera_standard/frameworks/native/camera:camera_framework",
   ]
 
   external_deps = [
@@ -64,6 +58,7 @@ ohos_executable("tel_call_manager_ui_test") {
     "ipc:ipc_core",
     "multimedia_audio_framework:audio_client",
     "multimedia_audio_framework:audio_renderer",
+    "multimedia_camera_framework:camera_framework",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
   ]
