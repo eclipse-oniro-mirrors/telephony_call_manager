@@ -605,7 +605,6 @@ private:
     const int32_t extraMonth_ = 1;
     int64_t bindTime_ = 0L;
     int32_t spendTime_ = 0;
-    int32_t serviceRunningState_ = 0;
 };
 } // namespace Telephony
 } // namespace OHOS
