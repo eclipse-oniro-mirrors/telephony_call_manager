@@ -76,6 +76,7 @@ public:
     static napi_value MakeCall(napi_env env, napi_callback_info info);
     static napi_value AnswerCall(napi_env env, napi_callback_info info);
     static napi_value RejectCall(napi_env env, napi_callback_info info);
+    static napi_value RejectCallWithZeroArgc(napi_env env, napi_callback_info info);
     static napi_value RejectCallWithOneArgc(napi_env env, napi_callback_info info);
     static napi_value RejectCallWithTwoArgc(napi_env env, napi_callback_info info);
     static napi_value RejectCallWithThreeArgc(napi_env env, napi_callback_info info);

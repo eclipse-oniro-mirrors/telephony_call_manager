@@ -834,6 +834,21 @@ napi_value NapiCallManager::AnswerCall(napi_env env, napi_callback_info info)
     return HandleAsyncWork(env, asyncContext.release(), "AnswerCall", NativeAnswerCall, NativeVoidCallBack);
 }
 
+napi_value NapiCallManager::RejectCallWithZeroArgc(napi_env env, napi_callback_info info)
+{
+    GET_PARAMS(env, info, FOUR_VALUE_MAXIMUM_LIMIT);
+    auto asyncContext = std::make_unique<RejectAsyncContext>();
+    if (asyncContext == nullptr) {
+        std::string errorCode = std::to_string(napi_generic_failure);
+        std::string errorMessage = "reject with zero argc, error at rejectAsyncContext is nullptr";
+        NAPI_CALL(env, napi_throw_error(env, errorCode.c_str(), errorMessage.c_str()));
+        return nullptr;
+    }
+    asyncContext->isSendSms = false;
+
+    return HandleAsyncWork(env, asyncContext.release(), "RejectCall", NativeRejectCall, NativeVoidCallBack);
+}
+
 napi_value NapiCallManager::RejectCallWithOneArgc(napi_env env, napi_callback_info info)
 {
     GET_PARAMS(env, info, FOUR_VALUE_MAXIMUM_LIMIT);
@@ -917,6 +932,7 @@ napi_value NapiCallManager::RejectCall(napi_env env, napi_callback_info info)
     switch (argc) {
         case ZERO_VALUE:
             TELEPHONY_LOGI("no param input");
+            result = RejectCallWithZeroArgc(env, info);
             break;
         case ONLY_ONE_VALUE:
             result = RejectCallWithOneArgc(env, info);
