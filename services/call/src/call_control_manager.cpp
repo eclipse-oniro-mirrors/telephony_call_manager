@@ -105,6 +105,11 @@ int32_t CallControlManager::DialCall(std::u16string &number, AppExecFwk::PacMap 
     }
     bool isEcc = DelayedSingleton<CallNumberUtils>::GetInstance()->CheckNumberIsEmergency(
         accountNumber, extras.GetIntValue("accountId"), errorCode);
+    if (isEcc) {
+        extras.PutIntValue("dialScene", (int32_t)DialScene::CALL_EMERGENCY);
+    } else {
+        extras.PutIntValue("dialScene", (int32_t)DialScene::CALL_NORMAL);
+    }
     ret = DialPolicy(number, extras, isEcc);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("dial policy result:%{public}d", ret);
