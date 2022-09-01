@@ -23,8 +23,8 @@
 namespace OHOS {
 namespace Telephony {
 static const int32_t NORMAL_DIAL_TIME = 500;     // dial time (ms)
-static const int32_t NORMAL_INCOMING_TIME = 500; // incoming time (ms)
-static const int32_t NORMAL_ANSWER_TIME = 500;   // answer time (ms)
+static const int32_t NORMAL_INCOMING_TIME = 100; // incoming time (ms)
+static const int32_t NORMAL_ANSWER_TIME = 300;   // answer time (ms)
 
 enum class IncomingCallType {
     IMS_VOICE_INCOMING = 0,
