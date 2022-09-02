@@ -31,10 +31,13 @@
 
 ```
 /base/telephony/call_manager
-├─ frameworks                              # napi接口存放目录
-├─ interfaces                              # 对外部暴露的接口
+├─ figures                                 # Readme资源文件
+├─ frameworks                              # 框架层目录
+│  ├─ js                                   # js相关代码
+│  └─ native                               # native相关代码
+├─ interfaces                              # 接口目录
 │  ├─ innerkits                            # 部件间的内部接口
-│  └─ kits                                 # js接口存放目录
+│  └─ kits                                 # 对应用提供的接口（例如JS接口）
 ├─ sa_profile                              # 启动配置文件
 ├─ services                                # 服务内部代码
 │  ├─ audio                                # 音频管理相关代码
@@ -45,8 +48,11 @@
 │  ├─ call_setting                         # 通话设置相关代码
 │  ├─ telephony_interaction                # 电话核心服务交互相关代码
 │  └─ video                                # 视频管理相关代码
-├─ test                                    # 单元测试相关代码
-└─ utils                                   # 通用工具类
+├─ test                                    # 测试相关代码
+│  ├─ fuzztest                             # 模糊测试相关代码
+│  ├─ mock                                 # 模拟测试相关代码
+│  └─ unittest                             # 单元测试相关代码
+└─ utils                                   # 通用工具代码目录
 ```
 
 ## 约束<a name="section131mcpsimp"></a>
