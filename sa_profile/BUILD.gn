@@ -14,7 +14,11 @@
 import("//build/ohos/sa_profile/sa_profile.gni")
 
 ohos_sa_profile("call_manager_sa_profile") {
-  sources = [ "4005.xml" ]
+  if (device_name == "rk3568") {
+    sources = [ "4005_auto_start_optimize.xml" ]
+  } else {
+    sources = [ "4005.xml" ]
+  }
 
   part_name = "call_manager"
 }

@@ -56,6 +56,10 @@ ohos_unittest("tel_call_manager_gtest") {
     "LOG_DOMAIN = 0xD000F00",
   ]
 
+  if (device_name == "rk3568") {
+    defines += [ "CALL_MANAGER_IMS_LITE_UNSUPPORT" ]
+  }
+
   if (is_standard_system) {
     external_deps += [ "hiviewdfx_hilog_native:libhilog" ]
   } else {
