@@ -831,7 +831,7 @@ int32_t CallControlManager::SetMuted(bool isMute)
 {
     sptr<CallBase> call = CallObjectManager::GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_ACTIVE);
     if (call == nullptr) {
-        return TELEPHONY_ERROR;
+        return CALL_ERR_AUDIO_SETTING_MUTE_FAILED;
     }
 
     if (call->GetCallType() == CallType::TYPE_IMS

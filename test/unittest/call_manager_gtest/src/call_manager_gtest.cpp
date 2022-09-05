@@ -170,14 +170,14 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_0100, Function | Mediu
         InitDialInfo(
             SIM1_SLOTID, (int32_t)VideoStateType::TYPE_VOICE, DIAL_SCENE_TEST, (int32_t)DialType::DIAL_CARRIER_TYPE);
         int32_t ret = CallManagerGtest::clientPtr_->DialCall(Str8ToStr16(phoneNumber), dialInfo_);
-        EXPECT_NE(ret, RETURN_VALUE_IS_ZERO);
+        EXPECT_EQ(ret, RETURN_VALUE_IS_ZERO);
     }
 
     if (HasSimCard(SIM2_SLOTID)) {
         InitDialInfo(
             SIM2_SLOTID, (int32_t)VideoStateType::TYPE_VOICE, DIAL_SCENE_TEST, (int32_t)DialType::DIAL_CARRIER_TYPE);
         int32_t ret = CallManagerGtest::clientPtr_->DialCall(Str8ToStr16(phoneNumber), dialInfo_);
-        EXPECT_NE(ret, RETURN_VALUE_IS_ZERO);
+        EXPECT_EQ(ret, RETURN_VALUE_IS_ZERO);
     }
 }
 
