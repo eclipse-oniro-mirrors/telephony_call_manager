@@ -1,13 +1,5 @@
 # Call Manager<a name="EN-US_TOPIC_0000001105058232"></a>
 
--   [Introduction](#section117mcpsimp)
--   [Directory Structure](#section128mcpsimp)
--   [Constraints](#section131mcpsimp)
--   [Available APIs](#section136mcpsimp)
--   [Usage Guidelines](#section163mcpsimp)
-    -   [Calling the dial API to Place a Call](#section113291522113518)
-
--   [Repositories Involved](#section227mcpsimp)
 
 ## Introduction<a name="section117mcpsimp"></a>
 
@@ -31,21 +23,27 @@ The following figure shows the architecture of the Call Manager module.
 
 ```
 /base/telephony/call_manager
-├─ frameworks                              # JS NAPIs
-├─ interfaces                              # External APIs
+├─ figures                                 # Figures of readme files
+├─ frameworks                              # Frameworks
+│  ├─ js                                   # JS code
+│  └─ native                               # Native code
+├─ interfaces                              # APIs
 │  ├─ innerkits                            # Internal APIs
-│  └─ kits                                 # JS APIs
+│  └─ kits                                 # External APIs (such as JS APIs)
 ├─ sa_profile                              # SA profile
 ├─ services                                # Service code
-│  ├─ audio                                # Audio Manager code
-│  ├─ bluetooth                            # Bluetooth Manager code
-│  ├─ call                                 # Call Manager code
-│  ├─ call_manager_service                 # CallManagerService code
-│  ├─ call_report                          # CallReport code
-│  ├─ call_setting                         # CallSetting code
-│  ├─ telephony_interaction                # Telephony core service code
-│  └─ video                                # Video code
-├─ test                                    # Unit test code
+│  ├─ audio                                # Audio management
+│  ├─ bluetooth                            # Bluetooth call management
+│  ├─ call                                 # Call service
+│  ├─ call_manager_service                 # Call Manager service
+│  ├─ call_report                          # Call status reporting
+│  ├─ call_setting                         # Call setting
+│  ├─ telephony_interaction                # Telephony core service interaction
+│  └─ video                                # Video Manager code
+├─ test                                    # Test code
+│  ├─ fuzztest                             # Fuzzy test
+│  ├─ mock                                 # Simulation test
+│  └─ unittest                             # Unit test
 └─ utils                                   # Utilities
 ```
 
