@@ -135,17 +135,13 @@ ohos_shared_library("tel_call_manager") {
 
   deps = [
     "${ability_runtime_inner_api_path}/dataobs_manager:dataobs_manager",
-    "${ability_runtime_path}/frameworks/native/ability/native:abilitykit_native",
     "${ability_runtime_path}/frameworks/native/ability/native:data_ability_helper",
     "//base/notification/distributed_notification_service/frameworks/ans:ans_innerkits",
-    "//base/notification/distributed_notification_service/frameworks/core:ans_core",
     "//base/telephony/core_service/utils:libtel_common",
-    "//drivers/peripheral/camera/interfaces/metadata:metadata",
     "//third_party/libphonenumber/cpp:phonenumber_standard",
   ]
 
   external_deps = [
-    "ability_base:configuration",
     "ability_base:want",
     "ability_base:zuri",
     "c_utils:utils",
@@ -161,7 +157,6 @@ ohos_shared_library("tel_call_manager") {
     "multimedia_audio_framework:audio_ringtone_client",
     "multimedia_camera_framework:camera_framework",
     "power_manager:powermgr_client",
-    "relational_store:native_appdatafwk",
     "relational_store:native_dataability",
     "relational_store:native_rdb",
     "safwk:system_ability_fwk",
