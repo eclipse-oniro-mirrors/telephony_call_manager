@@ -21,6 +21,9 @@
 
 #include "call_manager_errors.h"
 #include "telephony_log_wrapper.h"
+#ifdef CALL_MANAGER_AUTO_START_OPTIMIZE
+#include "core_manager_inner.h"
+#endif
 
 namespace OHOS {
 namespace Telephony {
@@ -33,6 +36,31 @@ CallManagerProxy::~CallManagerProxy()
     UnInit();
 }
 
+#ifdef CALL_MANAGER_AUTO_START_OPTIMIZE
+bool CallManagerProxy::IsRadioOn(int32_t simNum)
+{
+    for (int32_t i = 0; i < simNum; i++) {
+        int32_t ret = CoreManagerInner::GetInstance().GetRadioState(i);
+        if (ret != ModemPowerState::CORE_SERVICE_POWER_ON) {
+            TELEPHONY_LOGE("CallManagerProxy::GetRadioState radio off.");
+            continue;
+        }
+        return true;
+    }
+    return false;
+}
+
+void CallManagerProxy::SetInitState(bool status)
+{
+    initStatus_ = status;
+}
+
+std::unique_ptr<CallManagerCallback> CallManagerProxy::GetCallBack()
+{
+    return std::move(callBack_);
+}
+#endif
+
 void CallManagerProxy::Init(int32_t systemAbilityId)
 {
     std::lock_guard<std::mutex> lock(mutex_);
@@ -41,6 +69,25 @@ void CallManagerProxy::Init(int32_t systemAbilityId)
         return;
     }
     systemAbilityId_ = systemAbilityId;
+#ifdef CALL_MANAGER_AUTO_START_OPTIMIZE
+    int32_t simNum = CoreManagerInner::GetInstance().GetMaxSimCount();
+    if (!IsRadioOn(simNum)) {
+        EventFwk::MatchingSkills matchingSkills;
+        matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_RADIO_STATE_CHANGE);
+        EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
+        std::shared_ptr<CallManagerProxySubcribed> subscriberPtr =
+            std::make_shared<CallManagerProxySubcribed>(subscriberInfo);
+
+        if (subscriberPtr == nullptr) {
+            TELEPHONY_LOGE("CallManagerProxy::Init subscriberPtr is nullptr");
+            return;
+        }
+
+        bool subscribeResult = EventFwk::CommonEventManager::SubscribeCommonEvent(subscriberPtr);
+        TELEPHONY_LOGI("CallManagerProxy::Init subscribeResult = %{public}d", subscribeResult);
+        return;
+    }
+#endif
     int32_t result = ConnectService();
     if (result != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("connect service failed,errCode: %{public}d", result);
@@ -49,6 +96,36 @@ void CallManagerProxy::Init(int32_t systemAbilityId)
     initStatus_ = true;
     TELEPHONY_LOGI("connected to call manager service successfully!");
 }
+
+#ifdef CALL_MANAGER_AUTO_START_OPTIMIZE
+CallManagerProxy::CallManagerProxySubcribed::CallManagerProxySubcribed(
+    const EventFwk::CommonEventSubscribeInfo &subscriberInfo)
+    : CommonEventSubscriber(subscriberInfo)
+{}
+
+void CallManagerProxy::CallManagerProxySubcribed::OnReceiveEvent(const EventFwk::CommonEventData &data)
+{
+    std::shared_ptr<CallManagerProxy> proxy = DelayedSingleton<CallManagerProxy>::GetInstance();
+    if (proxy == nullptr) {
+        TELEPHONY_LOGE("proxy is nullptr");
+        return;
+    }
+    int32_t result = proxy->ConnectService();
+    if (result != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("OnReceiveEvent connect service failed,errCode: %{public}d", result);
+        return;
+    }
+    result = proxy->RegisterCallBack(proxy->GetCallBack());
+    if (result != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("OnReceiveEvent register callback failed,errCode: %{public}d", result);
+        return;
+    }
+    proxy->SetInitState(true);
+    TELEPHONY_LOGI("OnReceiveEvent connected to call manager service successfully!");
+    bool unsubscribeResult = EventFwk::CommonEventManager::UnSubscribeCommonEvent(shared_from_this());
+    TELEPHONY_LOGI("OnReceiveEvent UnSubscribeCommonEvent unsubscribeResult: %{public}d", unsubscribeResult);
+}
+#endif
 
 void CallManagerProxy::UnInit()
 {
@@ -70,6 +147,9 @@ int32_t CallManagerProxy::RegisterCallBack(std::unique_ptr<CallManagerCallback> 
     }
     if (callManagerServicePtr_ == nullptr) {
         TELEPHONY_LOGE("callManagerServicePtr_ is null");
+#ifdef CALL_MANAGER_AUTO_START_OPTIMIZE
+        callBack_ = std::move(callback);
+#endif
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     callAbilityCallbackPtr_ = new (std::nothrow) CallAbilityCallback();

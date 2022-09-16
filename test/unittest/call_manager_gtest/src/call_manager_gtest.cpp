@@ -33,8 +33,10 @@ constexpr int16_t RETURN_VALUE_IS_ZERO = 0;
 constexpr int16_t INVALID_NEGATIVE_ID = -100;
 constexpr int16_t INVALID_POSITIVE_ID = 100;
 constexpr int16_t CALL_MANAGER_ERROR = -1;
+#ifndef CALL_MANAGER_IMS_LITE_UNSUPPORT
 constexpr int16_t CAMERA_ROTATION_90 = 90;
 constexpr int16_t CAMERA_ROTATION_ERROR = 50;
+#endif // CALL_MANAGER_IMS_LITE_UNSUPPORT
 #endif // TEL_TEST_UNSUPPORT
 constexpr int16_t SLEEP_1000_MS = 1000;
 const std::string PHONE_NUMBER = "xxxxx";
@@ -2030,6 +2032,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallTransferInfo_0600, Funct
     }
 }
 
+#ifndef CALL_MANAGER_IMS_LITE_UNSUPPORT
 /******************************************* Test EnableImsSwitch() ********************************************/
 /**
  * @tc.number   Telephony_CallManager_EnableImsSwitch_0100
@@ -2559,6 +2562,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetPausePicture_0600, Function 
     std::u16string path = Str8ToStr16(pathTemp);
     EXPECT_NE(CallManagerGtest::clientPtr_->SetPausePicture(path), RETURN_VALUE_IS_ZERO);
 }
+#endif
 
 /********************************************* Test SetAudioDevic()***********************************************/
 /**
