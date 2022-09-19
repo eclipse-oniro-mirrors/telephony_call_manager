@@ -41,13 +41,10 @@ ohos_shared_library("tel_call_manager_api") {
   public_configs = [ ":call_manager_config" ]
 
   external_deps = [
-    "ability_base:base",
     "ability_base:want",
     "c_utils:utils",
     "common_event_service:cesfwk_innerkits",
     "core_service:tel_core_service_api",
-    "drivers_interface_ril:hril_innerkits",
-    "eventhandler:libeventhandler",
     "init:libbegetutil",
     "ipc:ipc_core",
     "safwk:system_ability_fwk",
