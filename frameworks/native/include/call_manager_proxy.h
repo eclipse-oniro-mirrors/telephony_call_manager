@@ -31,6 +31,10 @@
 
 #include "call_manager_callback.h"
 #include "call_ability_callback.h"
+#ifdef CALL_MANAGER_AUTO_START_OPTIMIZE
+#include "common_event_manager.h"
+#include "common_event_support.h"
+#endif
 
 namespace OHOS {
 namespace Telephony {
@@ -101,6 +105,11 @@ private:
     void DisconnectService();
     int32_t ReConnectService();
     int32_t ReRegisterCallBack();
+#ifdef CALL_MANAGER_AUTO_START_OPTIMIZE
+    void SetInitState(bool status);
+    bool IsRadioOn(int32_t simNum);
+    std::unique_ptr<CallManagerCallback> GetCallBack();
+#endif
 
 private:
     class CallManagerServiceDeathRecipient : public IRemoteObject::DeathRecipient {
@@ -116,6 +125,16 @@ private:
         CallManagerProxy &proxy_;
     };
 
+#ifdef CALL_MANAGER_AUTO_START_OPTIMIZE
+    class CallManagerProxySubcribed : public EventFwk::CommonEventSubscriber,
+        public std::enable_shared_from_this<CallManagerProxySubcribed> {
+    public:
+        explicit CallManagerProxySubcribed(const EventFwk::CommonEventSubscribeInfo &subscriberInfo);
+        ~CallManagerProxySubcribed() = default;
+        void OnReceiveEvent(const EventFwk::CommonEventData &data) override;
+    };
+#endif
+
 private:
     int32_t systemAbilityId_;
     Utils::RWLock rwClientLock_;
@@ -125,6 +144,9 @@ private:
     sptr<CallAbilityCallback> callAbilityCallbackPtr_ = nullptr;
     std::mutex mutex_;
     sptr<IRemoteObject::DeathRecipient> deathRecipient_ { nullptr };
+#ifdef CALL_MANAGER_AUTO_START_OPTIMIZE
+    std::unique_ptr<CallManagerCallback> callBack_ = nullptr;
+#endif
 };
 } // namespace Telephony
 } // namespace OHOS
