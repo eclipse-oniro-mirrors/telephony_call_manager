@@ -32,24 +32,29 @@
             "components": [
                 "ability_base",
                 "ability_runtime",
-                "appexecfwk_standard",
-                "drivers_peripheral_camera",
+                "bluetooth",
+                "c_utils",
                 "common_event_service",
                 "core_service",
-                "hdf_core",
-                "dmsfwk",
+                "distributed_notification_service",
+                "eventhandler",
+                "hisysevent_native",
+                "hitrace_native",
+                "hiviewdfx_hilog_native",
+                "init",
                 "ipc",
+                "libuv",
                 "multimedia_audio_framework",
-                "relational_store",
+                "multimedia_camera_framework",
+                "napi",
                 "power_manager",
+                "relational_store",
                 "safwk",
                 "samgr",
-                "sms_mms",
-                "utils_base"
+                "sms_mms"
             ],
             "third_party": [
-                "libphonenumber",
-                "protobuf"
+                "libphonenumber"
             ]
         },
         "build": {
