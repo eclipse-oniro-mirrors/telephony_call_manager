@@ -50,13 +50,8 @@ bool AudioProxy::SetBluetoothDevActive()
         TELEPHONY_LOGI("bluetooth device is already active");
         return true;
     }
-#ifdef ABILITY_AUDIO_SUPPORT
     return AudioStandard::AudioSystemManager::GetInstance()->SetDeviceActive(
-        AudioStandard::ActiveDeviceType::BLUETOOTH_SCO, true) &&
-        AudioStandard::AudioSystemManager::GetInstance()->SetDeviceActive(
-            AudioStandard::ActiveDeviceType::SPEAKER, false);
-#endif
-    return true;
+        AudioStandard::ActiveDeviceType::BLUETOOTH_SCO, true);
 }
 
 bool AudioProxy::SetSpeakerDevActive()
@@ -65,13 +60,8 @@ bool AudioProxy::SetSpeakerDevActive()
         TELEPHONY_LOGI("speaker device is already active");
         return true;
     }
-#ifdef ABILITY_AUDIO_SUPPORT
     return AudioStandard::AudioSystemManager::GetInstance()->SetDeviceActive(
-        AudioStandard::ActiveDeviceType::BLUETOOTH_SCO, false) &&
-        AudioStandard::AudioSystemManager::GetInstance()->SetDeviceActive(
-            AudioStandard::ActiveDeviceType::SPEAKER, true);
-#endif
-    return true;
+        AudioStandard::ActiveDeviceType::SPEAKER, true);
 }
 
 bool AudioProxy::SetWiredHeadsetDevActive()
