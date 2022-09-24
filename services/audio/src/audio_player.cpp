@@ -105,7 +105,6 @@ int32_t AudioPlayer::Play(const std::string &path, AudioStandard::AudioStreamTyp
                     audioRenderer_->Write(buffer + bytesWritten, bytesToWrite - bytesWritten));
         }
     }
-    ReleaseRenderer();
     free(buffer);
     (void)fclose(wavFile);
     TELEPHONY_LOGI("audio renderer playback done");
