@@ -17,6 +17,7 @@
 
 #include "call_manager_errors.h"
 #include "telephony_log_wrapper.h"
+#include "call_connect_ability.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -50,6 +51,11 @@ int32_t CallObjectManager::AddOneCallObject(sptr<CallBase> &call)
             return CALL_ERR_PHONE_CALL_ALREADY_EXISTS;
         }
     }
+    if (callObjectPtrList_.size() == 0) {
+        CallAttributeInfo info;
+        call->GetCallAttributeInfo(info);
+        DelayedSingleton<CallConnectAbility>::GetInstance()->ConnectAbility(info);
+    }
     callObjectPtrList_.emplace_back(call);
     TELEPHONY_LOGI("AddOneCallObject success! callId:%{public}d,call list size:%{public}zu", call->GetCallID(),
         callObjectPtrList_.size());
@@ -62,8 +68,7 @@ int32_t CallObjectManager::DeleteOneCallObject(int32_t callId)
     std::list<sptr<CallBase>>::iterator it;
     for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
         if ((*it)->GetCallID() == callId) {
-            callObjectPtrList_.erase(it);
-            TELEPHONY_LOGI("DeleteOneCallObject success! call list size:%{public}zu", callObjectPtrList_.size());
+            DeleteOneCallObject(*it);
             break;
         }
     }
@@ -78,6 +83,9 @@ void CallObjectManager::DeleteOneCallObject(sptr<CallBase> &call)
     }
     std::lock_guard<std::mutex> lock(listMutex_);
     callObjectPtrList_.remove(call);
+    if (callObjectPtrList_.size() == 0) {
+        DelayedSingleton<CallConnectAbility>::GetInstance()->DisconnectAbility();
+    }
     TELEPHONY_LOGI("DeleteOneCallObject success! callList size:%{public}zu", callObjectPtrList_.size());
 }
 
