@@ -50,6 +50,7 @@ class AudioPlayer {
 public:
     static bool InitRenderer(const wav_hdr &wavHeader, AudioStandard::AudioStreamType streamType);
     static int32_t Play(const std::string &path, AudioStandard::AudioStreamType streamType, PlayerType playerType);
+    static void ReleaseRenderer();
     static void SetStop(PlayerType playerType, bool state);
 
 private:
@@ -60,7 +61,6 @@ private:
     static bool isRingStop_;
     static bool isToneStop_;
     static bool IsStop(PlayerType playerType);
-    static void ReleaseRenderer();
     static std::unique_ptr<AudioStandard::AudioRenderer> audioRenderer_;
     static bool GetRealPath(const std::string &profilePath, std::string &realPath);
 };
