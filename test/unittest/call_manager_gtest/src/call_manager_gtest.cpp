@@ -929,6 +929,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_IsEmergencyPhoneNumber_0100, Fu
  * @tc.number   Telephony_CallManager_IsEmergencyPhoneNumber_0200
  * @tc.name     Call one phonynumber "112",test IsEmergencyPhoneNumber(),return false
  * @tc.desc     Function test
+ * @tc.require: I5O1OQ
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_IsEmergencyPhoneNumber_0200, Function | MediumTest | Level2)
 {
