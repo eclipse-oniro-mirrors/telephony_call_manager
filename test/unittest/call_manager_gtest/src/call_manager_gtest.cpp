@@ -160,6 +160,7 @@ void CallManagerGtest::HangUpCall()
  * @tc.number   Telephony_CallManager_DialCall_0100
  * @tc.name     make a normal phone call with card1, TYPE_VOICE
  * @tc.desc     Function test
+ * @tc.require: I5P2WO
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_0100, Function | MediumTest | Level2)
 {
@@ -189,6 +190,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_0100, Function | Mediu
  * @tc.name     make a normal phone call with null telephone numbers,
  *              wait for the correct status of the callback to execute correctly
  * @tc.desc     Function test
+ * @tc.require: I5P2WO
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_0200, Function | MediumTest | Level2)
 {
@@ -216,6 +218,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_0200, Function | Mediu
  * @tc.number   Telephony_CallManager_DialCall_0300
  * @tc.name     make a normal phone call with telephone numbers is negative number
  * @tc.desc     Function test
+ * @tc.require: I5P2WO
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_0300, Function | MediumTest | Level3)
 {
@@ -243,6 +246,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_0300, Function | Mediu
  * @tc.number   Telephony_CallManager_DialCall_0400
  * @tc.name     make a normal phone call with telephone numbers is too long
  * @tc.desc     Function test
+ * @tc.require: I5P2WO
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_0400, Function | MediumTest | Level3)
 {
@@ -271,6 +275,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_0400, Function | Mediu
  * @tc.number   Telephony_CallManager_DialCall_0500
  * @tc.name     If an invalid number is dialed, the DialCall() interface succeeds, but callId is not generated
  * @tc.desc     Function test
+ * @tc.require: I5P2WO
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_0500, Function | MediumTest | Level3)
 {
@@ -298,6 +303,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_0500, Function | Mediu
  * @tc.number   Telephony_CallManager_DialCall_1000 to do ...
  * @tc.name     make a normal phone call with card1, TYPE_VOICE, import phonynumber 10086
  * @tc.desc     Function test
+ * @tc.require: I5P2WA
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_1000, Function | MediumTest | Level0)
 {
@@ -325,6 +331,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_1000, Function | Mediu
  * @tc.number   Telephony_CallManager_DialCall_1100
  * @tc.name     make a normal phone call with card1, TYPE_VOICE, slot id was invalid
  * @tc.desc     Function test
+ * @tc.require: I5P2WA
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_1100, Function | MediumTest | Level0)
 {
@@ -344,6 +351,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_1100, Function | Mediu
  * @tc.number   Telephony_CallManager_DialCall_1200
  * @tc.name     make a normal phone call with card1, TYPE_VOICE, slot id out of count
  * @tc.desc     Function test
+ * @tc.require: I5P2WA
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_1200, Function | MediumTest | Level0)
 {
@@ -364,6 +372,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_1200, Function | Mediu
  * @tc.number   Telephony_CallManager_DialCall_1300
  * @tc.name     make a normal phone call with card1, TYPE_VOICE, video state was invalid
  * @tc.desc     Function test
+ * @tc.require: I5P2WA
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_1300, Function | MediumTest | Level0)
 {
@@ -392,6 +401,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_1300, Function | Mediu
  * @tc.number   Telephony_CallManager_AnswerCall_0100
  * @tc.name     test AnswerCall with the callId does not exist
  * @tc.desc     Function test
+ * @tc.require: I5P2WA
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_AnswerCall_0100, Function | MediumTest | Level2)
 {
@@ -408,6 +418,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_AnswerCall_0100, Function | Med
  * @tc.number   Telephony_CallManager_AnswerCall_0200
  * @tc.name     test AnswerCall with the videoState does not exist
  * @tc.desc     Function test
+ * @tc.require: I5P2WA
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_AnswerCall_0200, Function | MediumTest | Level2)
 {
@@ -931,6 +942,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_IsEmergencyPhoneNumber_0100, Fu
  * @tc.number   Telephony_CallManager_IsEmergencyPhoneNumber_0200
  * @tc.name     Call one phonynumber "112",test IsEmergencyPhoneNumber(),return false
  * @tc.desc     Function test
+ * @tc.require: I5O1OQ
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_IsEmergencyPhoneNumber_0200, Function | MediumTest | Level2)
 {
