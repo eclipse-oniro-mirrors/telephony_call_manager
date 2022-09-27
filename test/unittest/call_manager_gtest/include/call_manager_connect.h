@@ -21,6 +21,7 @@
 #include <mutex>
 #include <string_ex.h>
 
+#include "accesstoken_kit.h"
 #include "iservice_registry.h"
 #include "system_ability.h"
 #include "system_ability_definition.h"
@@ -35,11 +36,86 @@
 #include "telephony_log_wrapper.h"
 #include "call_manager_service_proxy.h"
 #include "i_call_ability_callback.h"
+#include "token_setproc.h"
 
 namespace OHOS {
 namespace Telephony {
+using namespace Security::AccessToken;
+using Security::AccessToken::AccessTokenID;
 std::unordered_map<int32_t, std::unordered_set<int32_t>> g_callStateMap;
 int32_t newCallId_ = -1;
+
+HapInfoParams testInfoParams = {
+    .bundleName = "tel_call_manager_gtest",
+    .userID = 1,
+    .instIndex = 0,
+    .appIDDesc = "test",
+};
+
+PermissionDef testPermPlaceCallDef = {
+    .permissionName = "ohos.permission.PLACE_CALL",
+    .bundleName = "tel_call_manager_gtest",
+    .grantMode = 1, // SYSTEM_GRANT
+    .label = "label",
+    .labelId = 1,
+    .description = "Test call manager",
+    .descriptionId = 1,
+    .availableLevel = APL_SYSTEM_BASIC,
+};
+
+PermissionStateFull testPlaceCallState = {
+    .grantFlags = { 2 }, // PERMISSION_USER_SET
+    .grantStatus = { PermissionState::PERMISSION_GRANTED },
+    .isGeneral = true,
+    .permissionName = "ohos.permission.PLACE_CALL",
+    .resDeviceID = { "local" },
+};
+
+PermissionDef testPermSetTelephonyStateDef = {
+    .permissionName = "ohos.permission.SET_TELEPHONY_STATE",
+    .bundleName = "tel_call_manager_gtest",
+    .grantMode = 1, // SYSTEM_GRANT
+    .label = "label",
+    .labelId = 1,
+    .description = "Test call manager",
+    .descriptionId = 1,
+    .availableLevel = APL_SYSTEM_BASIC,
+};
+
+PermissionStateFull testSetTelephonyState = {
+    .grantFlags = { 2 }, // PERMISSION_USER_SET
+    .grantStatus = { PermissionState::PERMISSION_GRANTED },
+    .isGeneral = true,
+    .permissionName = "ohos.permission.SET_TELEPHONY_STATE",
+    .resDeviceID = { "local" },
+};
+
+HapPolicyParams testPolicyParams = {
+    .apl = APL_SYSTEM_BASIC,
+    .domain = "test.domain",
+    .permList = { testPermPlaceCallDef, testPermSetTelephonyStateDef },
+    .permStateList = { testPlaceCallState, testSetTelephonyState },
+};
+
+class AccessToken {
+public:
+    AccessToken()
+    {
+        currentID_ = GetSelfTokenID();
+        AccessTokenIDEx tokenIdEx = AccessTokenKit::AllocHapToken(testInfoParams, testPolicyParams);
+        accessID_ = tokenIdEx.tokenIdExStruct.tokenID;
+        SetSelfTokenID(accessID_);
+    }
+    ~AccessToken()
+    {
+        AccessTokenKit::DeleteToken(accessID_);
+        SetSelfTokenID(currentID_);
+    }
+private:
+    AccessTokenID currentID_ = 0;
+    AccessTokenID accessID_ = 0;
+};
+
 class CallInfoManager {
 public:
     static int32_t CallDetailsChange(const CallAttributeInfo &info);
@@ -259,6 +335,7 @@ public:
 
     int32_t Init(int32_t systemAbilityId)
     {
+        AccessToken token;
         TELEPHONY_LOGI("Enter CallManagerIpcClient::Init,systemAbilityId:%d\n", systemAbilityId);
         systemAbilityId_ = systemAbilityId;
         int32_t result = ConnectService();
