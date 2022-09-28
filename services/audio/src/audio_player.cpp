@@ -150,7 +150,7 @@ bool AudioPlayer::IsStop(PlayerType playerType)
 
 void AudioPlayer::ReleaseRenderer()
 {
-    if (!isRenderInitialized_){
+    if (!isRenderInitialized_) {
         return;
     }
     audioRenderer_->Flush();
