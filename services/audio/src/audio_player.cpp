@@ -26,6 +26,7 @@ size_t AudioPlayer::bufferLen = 0;
 bool AudioPlayer::isStop_ = false;
 bool AudioPlayer::isRingStop_ = false;
 bool AudioPlayer::isToneStop_ = false;
+bool AudioPlayer::isRenderInitialized_ = false;
 std::unique_ptr<AudioStandard::AudioRenderer> AudioPlayer::audioRenderer_ = nullptr;
 
 bool AudioPlayer::InitRenderer(const wav_hdr &wavHeader, AudioStandard::AudioStreamType streamType)
@@ -57,6 +58,7 @@ bool AudioPlayer::InitRenderer(const wav_hdr &wavHeader, AudioStandard::AudioStr
         TELEPHONY_LOGE("audio renderer get frame count failed");
         return false;
     }
+    isRenderInitialized_ = true;
     return true;
 }
 
@@ -148,6 +150,9 @@ bool AudioPlayer::IsStop(PlayerType playerType)
 
 void AudioPlayer::ReleaseRenderer()
 {
+    if (!isRenderInitialized_){
+        return;
+    }
     audioRenderer_->Flush();
     audioRenderer_->Drain();
     audioRenderer_->Stop();
