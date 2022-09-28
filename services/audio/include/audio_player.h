@@ -59,6 +59,7 @@ private:
     static size_t bufferLen;
     static bool isStop_;
     static bool isRingStop_;
+    static bool isRenderInitialized_;
     static bool isToneStop_;
     static bool IsStop(PlayerType playerType);
     static std::unique_ptr<AudioStandard::AudioRenderer> audioRenderer_;
