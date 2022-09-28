@@ -52,8 +52,10 @@ ohos_shared_library("tel_call_manager") {
     "services/call/call_state_observer/src/reject_call_sms.cpp",
     "services/call/call_state_observer/src/status_bar.cpp",
     "services/call/call_state_observer/src/wired_headset.cpp",
+    "services/call/src/call_ability_connect_callback.cpp",
     "services/call/src/call_base.cpp",
     "services/call/src/call_broadcast_subscriber.cpp",
+    "services/call/src/call_connect_ability.cpp",
     "services/call/src/call_control_manager.cpp",
     "services/call/src/call_incoming_filter_manager.cpp",
     "services/call/src/call_object_manager.cpp",
@@ -145,9 +147,11 @@ ohos_shared_library("tel_call_manager") {
   ]
 
   external_deps = [
+    "ability_base:base",
     "ability_base:configuration",
     "ability_base:want",
     "ability_base:zuri",
+    "ability_runtime:ability_manager",
     "c_utils:utils",
     "common_event_service:cesfwk_innerkits",
     "core_service:tel_core_service_api",
