@@ -68,9 +68,13 @@ int32_t CallObjectManager::DeleteOneCallObject(int32_t callId)
     std::list<sptr<CallBase>>::iterator it;
     for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
         if ((*it)->GetCallID() == callId) {
-            DeleteOneCallObject(*it);
+            callObjectPtrList_.erase(it);
+            TELEPHONY_LOGI("DeleteOneCallObject success! call list size:%{public}zu", callObjectPtrList_.size());
             break;
         }
+    }
+    if (callObjectPtrList_.size() == 0) {
+        DelayedSingleton<CallConnectAbility>::GetInstance()->DisconnectAbility();
     }
     return TELEPHONY_SUCCESS;
 }
