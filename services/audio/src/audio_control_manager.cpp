@@ -32,6 +32,7 @@ void AudioControlManager::Init()
 {
     DelayedSingleton<AudioDeviceManager>::GetInstance()->Init();
     DelayedSingleton<AudioSceneProcessor>::GetInstance()->Init();
+    DelayedSingleton<AudioProxy>::GetInstance()->SetMicrophoneMute(true);
 }
 
 void AudioControlManager::CallStateUpdated(
