@@ -35,6 +35,11 @@ CallConnectAbility::CallConnectAbility() {}
 
 void CallConnectAbility::ConnectAbility(const CallAttributeInfo &info)
 {
+    if (isConnected_) {
+        TELEPHONY_LOGE("callui has already connected");
+        return;
+    }
+    TELEPHONY_LOGI("Connect callui ability");
     AAFwk::Want want;
     AppExecFwk::ElementName element("", "com.ohos.callui", "com.ohos.callui.ServiceAbility");
     want.SetElement(element);
@@ -43,27 +48,28 @@ void CallConnectAbility::ConnectAbility(const CallAttributeInfo &info)
     wantParams.SetParam("videoState", AAFwk::Integer::Box(static_cast<int32_t>(info.videoState)));
     wantParams.SetParam("callType", AAFwk::Integer::Box(static_cast<int32_t>(info.callType)));
     wantParams.SetParam("callState", AAFwk::Integer::Box(static_cast<int32_t>(info.callState)));
+    wantParams.SetParam("callId", AAFwk::Integer::Box(static_cast<int32_t>(info.callId)));
+    wantParams.SetParam("startTime", AAFwk::Integer::Box(static_cast<int32_t>(info.startTime)));
+    wantParams.SetParam("accountId", AAFwk::Integer::Box(static_cast<int32_t>(info.accountId)));
+    wantParams.SetParam("isEcc", AAFwk::Integer::Box(static_cast<bool>(info.isEcc)));
     wantParams.SetParam("conferenceState", AAFwk::Integer::Box(static_cast<int32_t>(info.conferenceState)));
     want.SetParams(wantParams);
     if (connectCallback_ == nullptr) {
         connectCallback_ = new CallAbilityConnectCallback();
     }
     int32_t userId = 0;
-    if (isConnected_ == true) {
-        TELEPHONY_LOGE("callui has already connected");
-        return;
-    }
     AAFwk::AbilityManagerClient::GetInstance()->ConnectAbility(want, connectCallback_, userId);
 }
 
 void CallConnectAbility::DisconnectAbility()
 {
-    if (isConnected_ == false) {
+    if (!isConnected_) {
         TELEPHONY_LOGE("callui is not connected, no need to disconnect ability");
         return;
     }
-    AAFwk::AbilityManagerClient::GetInstance()->DisconnectAbility(connectCallback_);
     if (connectCallback_ != nullptr) {
+        TELEPHONY_LOGI("Disconnect callui ability");
+        AAFwk::AbilityManagerClient::GetInstance()->DisconnectAbility(connectCallback_);
         delete connectCallback_;
         connectCallback_ = nullptr;
     }
