@@ -46,6 +46,7 @@ int32_t AudioSceneProcessor::Init()
         TELEPHONY_LOGE("current call state nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
+    DelayedSingleton<AudioProxy>::GetInstance()->SetAudioScene(AudioStandard::AudioScene::AUDIO_SCENE_DEFAULT);
     return TELEPHONY_SUCCESS;
 }
 
