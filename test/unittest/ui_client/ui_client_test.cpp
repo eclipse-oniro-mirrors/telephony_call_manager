@@ -733,7 +733,7 @@ void ControlCamera()
     std::cout << "------ControlCamera test------" << std::endl;
     std::string tmpStr = "";
     sptr<CameraStandard::CameraManager> camManagerObj = CameraStandard::CameraManager::GetInstance();
-    std::vector<sptr<CameraStandard::CameraInfo>> cameraObjList = camManagerObj->GetCameras();
+    std::vector<sptr<CameraStandard::CameraDevice>> cameraObjList = camManagerObj->GetSupportedCameras();
 
     for (auto &it : cameraObjList) {
         tmpStr = it->GetID();

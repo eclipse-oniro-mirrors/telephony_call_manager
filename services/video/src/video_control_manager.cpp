@@ -129,7 +129,7 @@ bool VideoControlManager::ContainCameraID(std::string id)
 {
     using namespace OHOS::CameraStandard;
     sptr<CameraManager> camManagerObj = CameraManager::GetInstance();
-    std::vector<sptr<CameraStandard::CameraInfo>> cameraObjList = camManagerObj->GetCameras();
+    std::vector<sptr<CameraStandard::CameraDevice>> cameraObjList = camManagerObj->GetSupportedCameras();
     bool bRet = false;
     for (auto &it : cameraObjList) {
         if (id.compare(it->GetID()) == 0) {
