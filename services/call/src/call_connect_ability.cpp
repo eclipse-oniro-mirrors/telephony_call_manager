@@ -70,7 +70,6 @@ void CallConnectAbility::DisconnectAbility()
     if (connectCallback_ != nullptr) {
         TELEPHONY_LOGI("Disconnect callui ability");
         AAFwk::AbilityManagerClient::GetInstance()->DisconnectAbility(connectCallback_);
-        delete connectCallback_;
         connectCallback_ = nullptr;
     }
 }
