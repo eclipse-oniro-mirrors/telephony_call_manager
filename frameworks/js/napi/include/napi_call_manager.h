@@ -195,7 +195,7 @@ private:
         napi_async_execute_callback execute, napi_async_complete_callback complete);
 
 private:
-    static bool registerStatus_;
+    static int32_t registerStatus_;
 };
 } // namespace Telephony
 } // namespace OHOS

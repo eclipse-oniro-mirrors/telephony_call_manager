@@ -25,6 +25,7 @@ config("call_manager_js_config") {
 
 ohos_shared_library("call") {
   sources = [
+    "$SUBSYSTEM_DIR/core_service/frameworks/js/napi/napi_util.cpp",
     "napi/src/napi_call_ability_callback.cpp",
     "napi/src/napi_call_manager.cpp",
     "napi/src/napi_call_manager_callback.cpp",

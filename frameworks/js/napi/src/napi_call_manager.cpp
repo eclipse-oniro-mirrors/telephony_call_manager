@@ -29,6 +29,7 @@
 #include "napi_call_manager_utils.h"
 #include "ability_manager_client.h"
 #include "element_name.h"
+#include "napi_util.h"
 #include "string_wrapper.h"
 #include "want.h"
 #include "telephony_napi_common_error.h"
@@ -36,7 +37,15 @@
 
 namespace OHOS {
 namespace Telephony {
-bool NapiCallManager::registerStatus_ = false;
+static constexpr const char *JS_ERROR_TELEPHONY_INVALID_INPUT_PARAMETER_STRING =
+    "BusinessError 401: Parameter error. The type of parameter should match or the number of parameters must match.";
+static constexpr const char *OBSERVER_ON_JS_PERMISSION_ERROR_STRING =
+    "BusinessError 201: Permission denied. An attempt was made to On forbidden by permission: "
+    "ohos.permission.SET_TELEPHONY_STATE.";
+static constexpr const char *OBSERVER_OFF_JS_PERMISSION_ERROR_STRING =
+    "BusinessError 201: Permission denied. An attempt was made to Off forbidden by permission: "
+    "ohos.permission.SET_TELEPHONY_STATE.";
+int32_t NapiCallManager::registerStatus_ = TELEPHONY_ERROR;
 
 NapiCallManager::NapiCallManager() {}
 
@@ -1584,49 +1593,37 @@ napi_value NapiCallManager::FormatPhoneNumberToE164(napi_env env, napi_callback_
 napi_value NapiCallManager::ObserverOn(napi_env env, napi_callback_info info)
 {
     GET_PARAMS(env, info, VALUE_MAXIMUM_LIMIT);
-    NAPI_ASSERT(env, argc <= VALUE_MAXIMUM_LIMIT, "parameter error!");
-    bool matchFlag = NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_FIRST], napi_string);
-    NAPI_ASSERT(env, matchFlag, "ObserverOn type error, should be string type");
+    if ((argc > VALUE_MAXIMUM_LIMIT) ||
+        (!NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_FIRST], napi_string))) {
+        NAPI_CALL(env, napi_throw_error(env, std::to_string(JS_ERROR_TELEPHONY_INVALID_INPUT_PARAMETER).c_str(),
+                           JS_ERROR_TELEPHONY_INVALID_INPUT_PARAMETER_STRING));
+        return nullptr;
+    }
+    if (registerStatus_ == TELEPHONY_ERR_PERMISSION_ERR) {
+        NAPI_CALL(env, napi_throw_error(env, std::to_string(JS_ERROR_TELEPHONY_PERMISSION_DENIED).c_str(),
+                           OBSERVER_ON_JS_PERMISSION_ERROR_STRING));
+        return nullptr;
+    }
     char listenerType[PHONE_NUMBER_MAXIMUM_LIMIT + 1] = { 0 };
     size_t strLength = 0;
     napi_get_value_string_utf8(env, argv[ARRAY_INDEX_FIRST], listenerType, PHONE_NUMBER_MAXIMUM_LIMIT, &strLength);
     std::string tmpStr = listenerType;
     TELEPHONY_LOGI("listenerType == %{public}s", tmpStr.c_str());
+    EventCallback stateCallback;
+    (void)memset_s(&stateCallback, sizeof(EventCallback), 0, sizeof(EventCallback));
+    stateCallback.env = env;
+    napi_create_reference(env, thisVar, DATA_LENGTH_ONE, &stateCallback.thisVar);
+    napi_create_reference(env, argv[ARRAY_INDEX_SECOND], DATA_LENGTH_ONE, &stateCallback.callbackRef);
     if (tmpStr == "callDetailsChange") {
-        EventCallback callStateListener;
-        (void)memset_s(&callStateListener, sizeof(EventCallback), 0, sizeof(EventCallback));
-        callStateListener.env = env;
-        napi_create_reference(env, thisVar, DATA_LENGTH_ONE, &callStateListener.thisVar);
-        napi_create_reference(env, argv[ARRAY_INDEX_SECOND], DATA_LENGTH_ONE, &callStateListener.callbackRef);
-        DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->RegisterCallStateCallback(callStateListener);
+        DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->RegisterCallStateCallback(stateCallback);
     } else if (tmpStr == "callEventChange") {
-        EventCallback callEventCallback;
-        (void)memset_s(&callEventCallback, sizeof(EventCallback), 0, sizeof(EventCallback));
-        callEventCallback.env = env;
-        napi_create_reference(env, thisVar, DATA_LENGTH_ONE, &callEventCallback.thisVar);
-        napi_create_reference(env, argv[ARRAY_INDEX_SECOND], DATA_LENGTH_ONE, &callEventCallback.callbackRef);
-        DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->RegisterCallEventCallback(callEventCallback);
+        DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->RegisterCallEventCallback(stateCallback);
     } else if (tmpStr == "callOttRequest") {
-        EventCallback callOttCallback;
-        (void)memset_s(&callOttCallback, sizeof(EventCallback), 0, sizeof(EventCallback));
-        callOttCallback.env = env;
-        napi_create_reference(env, thisVar, DATA_LENGTH_ONE, &callOttCallback.thisVar);
-        napi_create_reference(env, argv[ARRAY_INDEX_SECOND], DATA_LENGTH_ONE, &callOttCallback.callbackRef);
-        DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->RegisterCallOttRequestCallback(callOttCallback);
+        DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->RegisterCallOttRequestCallback(stateCallback);
     } else if (tmpStr == "callDisconnectedCause") {
-        EventCallback causeCallback;
-        (void)memset_s(&causeCallback, sizeof(EventCallback), 0, sizeof(EventCallback));
-        causeCallback.env = env;
-        napi_create_reference(env, thisVar, DATA_LENGTH_ONE, &causeCallback.thisVar);
-        napi_create_reference(env, argv[ARRAY_INDEX_SECOND], DATA_LENGTH_ONE, &causeCallback.callbackRef);
-        DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->RegisterDisconnectedCauseCallback(causeCallback);
+        DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->RegisterDisconnectedCauseCallback(stateCallback);
     } else if (tmpStr == "mmiCodeResult") {
-        EventCallback mmiCodeResultListener;
-        (void)memset_s(&mmiCodeResultListener, sizeof(EventCallback), 0, sizeof(EventCallback));
-        mmiCodeResultListener.env = env;
-        napi_create_reference(env, thisVar, DATA_LENGTH_ONE, &mmiCodeResultListener.thisVar);
-        napi_create_reference(env, argv[ARRAY_INDEX_SECOND], DATA_LENGTH_ONE, &mmiCodeResultListener.callbackRef);
-        DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->RegisterMmiCodeCallback(mmiCodeResultListener);
+        DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->RegisterMmiCodeCallback(stateCallback);
     }
     napi_value result = nullptr;
     return result;
@@ -1635,14 +1632,27 @@ napi_value NapiCallManager::ObserverOn(napi_env env, napi_callback_info info)
 napi_value NapiCallManager::ObserverOff(napi_env env, napi_callback_info info)
 {
     GET_PARAMS(env, info, VALUE_MAXIMUM_LIMIT);
-    NAPI_ASSERT(env, argc <= VALUE_MAXIMUM_LIMIT, "parameter error!");
-    bool matchFlag = NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_FIRST], napi_string);
-    NAPI_ASSERT(env, matchFlag, "ObserverOff type error, should be string type");
+    if ((argc > VALUE_MAXIMUM_LIMIT) ||
+        (!NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_FIRST], napi_string))) {
+        NAPI_CALL(env, napi_throw_error(env, std::to_string(JS_ERROR_TELEPHONY_INVALID_INPUT_PARAMETER).c_str(),
+                           JS_ERROR_TELEPHONY_INVALID_INPUT_PARAMETER_STRING));
+        return nullptr;
+    }
+    if ((argc > ONLY_ONE_VALUE) &&
+        (!NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_SECOND], napi_function))) {
+        NAPI_CALL(env, napi_throw_error(env, std::to_string(JS_ERROR_TELEPHONY_INVALID_INPUT_PARAMETER).c_str(),
+                           JS_ERROR_TELEPHONY_INVALID_INPUT_PARAMETER_STRING));
+        return nullptr;
+    }
+    if (registerStatus_ == TELEPHONY_ERR_PERMISSION_ERR) {
+        NAPI_CALL(env, napi_throw_error(env, std::to_string(JS_ERROR_TELEPHONY_PERMISSION_DENIED).c_str(),
+                           OBSERVER_OFF_JS_PERMISSION_ERROR_STRING));
+        return nullptr;
+    }
     auto asyncContext = std::make_unique<AsyncContext>();
     if (asyncContext == nullptr) {
-        std::string errorCode = std::to_string(napi_generic_failure);
-        std::string errorMessage = "ObserverOff error at baseContext is nullptr";
-        NAPI_CALL(env, napi_throw_error(env, errorCode.c_str(), errorMessage.c_str()));
+        JsError error = NapiUtil::ConverErrorMessageForJs(ERROR_PARAMETER_TYPE_INVALID);
+        NAPI_CALL(env, napi_throw_error(env, error.errorMessage.c_str(), std::to_string(error.errorCode).c_str()));
         return nullptr;
     }
     char listenerType[PHONE_NUMBER_MAXIMUM_LIMIT + 1] = {0};
@@ -2222,9 +2232,10 @@ void NapiCallManager::NativeVoidCallBack(napi_env env, napi_status status, void 
             napi_status ret = napi_resolve_deferred(env, asyncContext->deferred, promiseValue);
             TELEPHONY_LOGI("promise successful result = %{public}d", ret);
         } else {
-            std::string errTip = std::to_string(asyncContext->resolved);
-            napi_status ret = napi_reject_deferred(
-                env, asyncContext->deferred, NapiCallManagerUtils::CreateErrorMessage(env, errTip));
+            JsError error = NapiUtil::ConverErrorMessageForJs(asyncContext->resolved);
+            napi_status ret = napi_reject_deferred(env, asyncContext->deferred,
+                NapiCallManagerUtils::CreateErrorMessageWithErrorCode(
+                    env, error.errorMessage.c_str(), error.errorCode));
             TELEPHONY_LOGI("promise failed result = %{public}d", ret);
         }
     } else if (asyncContext->callbackRef != nullptr) {
@@ -2233,8 +2244,9 @@ void NapiCallManager::NativeVoidCallBack(napi_env env, napi_status status, void 
             callbackValue[ARRAY_INDEX_FIRST] = NapiCallManagerUtils::CreateUndefined(env);
             napi_get_null(env, &callbackValue[ARRAY_INDEX_SECOND]);
         } else {
-            std::string errTip = std::to_string(asyncContext->resolved);
-            callbackValue[ARRAY_INDEX_FIRST] = NapiCallManagerUtils::CreateErrorMessage(env, errTip);
+            JsError error = NapiUtil::ConverErrorMessageForJs(asyncContext->resolved);
+            callbackValue[ARRAY_INDEX_FIRST] =
+                NapiCallManagerUtils::CreateErrorMessageWithErrorCode(env, error.errorMessage.c_str(), error.errorCode);
             callbackValue[ARRAY_INDEX_SECOND] = NapiCallManagerUtils::CreateUndefined(env);
         }
         napi_value callback = nullptr;
@@ -3328,7 +3340,7 @@ void NapiCallManager::NativeReportOttCallEventInfo(napi_env env, void *data)
 
 void NapiCallManager::RegisterCallBack()
 {
-    if (registerStatus_) {
+    if (registerStatus_ == TELEPHONY_SUCCESS) {
         TELEPHONY_LOGW("you are already registered!");
         return;
     }
@@ -3337,12 +3349,11 @@ void NapiCallManager::RegisterCallBack()
         TELEPHONY_LOGE("make_unique NapiCallManagerCallback failed!");
         return;
     }
-    int32_t ret = DelayedSingleton<CallManagerClient>::GetInstance()->RegisterCallBack(std::move(callbackPtr));
-    if (ret != TELEPHONY_SUCCESS) {
+    registerStatus_ = DelayedSingleton<CallManagerClient>::GetInstance()->RegisterCallBack(std::move(callbackPtr));
+    if (registerStatus_ != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("RegisterCallBack failed!");
         return;
     }
-    registerStatus_ = true;
 }
 
 napi_value NapiCallManager::HandleAsyncWork(napi_env env, AsyncContext *context, std::string workName,

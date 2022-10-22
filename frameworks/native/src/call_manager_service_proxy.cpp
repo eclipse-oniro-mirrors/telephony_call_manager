@@ -56,7 +56,7 @@ int32_t CallManagerServiceProxy::UnRegisterCallBack()
     int32_t error = Remote()->SendRequest(INTERFACE_UNREGISTER_CALLBACK, dataParcel, replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("Function RegisterCallBack! errCode:%{public}d", error);
-        return error;
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     return replyParcel.ReadInt32();
 }
