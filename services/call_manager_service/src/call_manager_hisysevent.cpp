@@ -143,6 +143,8 @@ void CallManagerHisysevent::GetErrorDescription(const int32_t errCode, std::stri
         case CALL_ERR_SYSTEM_EVENT_HANDLE_FAILURE:
             errordesc = "Send HANDLER_DIAL_CALL_REQUEST event failed";
             break;
+        default:
+            break;
     }
 }
 
