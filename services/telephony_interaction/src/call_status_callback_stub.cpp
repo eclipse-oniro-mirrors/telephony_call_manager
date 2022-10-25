@@ -22,6 +22,7 @@
 
 namespace OHOS {
 namespace Telephony {
+const int32_t MAX_LEN = 100000;
 CallStatusCallbackStub::CallStatusCallbackStub()
 {
     memberFuncMap_[UPDATE_CALL_INFO] = &CallStatusCallbackStub::OnUpdateCallReportInfo;
@@ -90,7 +91,7 @@ int32_t CallStatusCallbackStub::OnUpdateCallReportInfo(MessageParcel &data, Mess
         TELEPHONY_LOGW("sent raw data is less than 32k");
     }
     int32_t len = data.ReadInt32();
-    if (len <= TELEPHONY_SUCCESS) {
+    if (len <= 0 || len >= MAX_LEN) {
         TELEPHONY_LOGE("Invalid parameter, len = %{public}d", len);
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
@@ -124,7 +125,7 @@ int32_t CallStatusCallbackStub::OnUpdateCallsReportInfo(MessageParcel &data, Mes
     const CallReportInfo *parcelPtr = nullptr;
     for (int32_t i = 0; i < cnt; i++) {
         len = data.ReadInt32();
-        if (len <= 0) {
+        if (len <= 0 || len >= MAX_LEN) {
             TELEPHONY_LOGE("invalid parameter, len = %d", len);
             return TELEPHONY_ERR_ARGUMENT_INVALID;
         }
@@ -171,7 +172,7 @@ int32_t CallStatusCallbackStub::OnUpdateEventReport(MessageParcel &data, Message
         TELEPHONY_LOGW("sent raw data is less than 32k");
     }
     int32_t len = data.ReadInt32();
-    if (len <= TELEPHONY_SUCCESS) {
+    if (len <= 0 || len >= MAX_LEN) {
         TELEPHONY_LOGE("Invalid parameter, len = %{public}d", len);
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
@@ -210,7 +211,7 @@ int32_t CallStatusCallbackStub::OnUpdateGetWaitingResult(MessageParcel &data, Me
         TELEPHONY_LOGW("sent raw data is less than 32k");
     }
     int32_t len = data.ReadInt32();
-    if (len <= TELEPHONY_SUCCESS) {
+    if (len <= 0 || len >= MAX_LEN) {
         TELEPHONY_LOGE("Invalid parameter, len = %{public}d", len);
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
@@ -249,7 +250,7 @@ int32_t CallStatusCallbackStub::OnUpdateGetRestrictionResult(MessageParcel &data
         TELEPHONY_LOGW("sent raw data is less than 32k");
     }
     int32_t len = data.ReadInt32();
-    if (len <= TELEPHONY_SUCCESS) {
+    if (len <= 0 || len >= MAX_LEN) {
         TELEPHONY_LOGE("Invalid parameter, len = %{public}d", len);
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
@@ -289,7 +290,7 @@ int32_t CallStatusCallbackStub::OnUpdateGetTransferResult(MessageParcel &data, M
         TELEPHONY_LOGW("sent raw data is less than 32k");
     }
     int32_t len = data.ReadInt32();
-    if (len <= TELEPHONY_SUCCESS) {
+    if (len <= 0 || len >= MAX_LEN) {
         TELEPHONY_LOGE("Invalid parameter, len = %{public}d", len);
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
@@ -329,7 +330,7 @@ int32_t CallStatusCallbackStub::OnUpdateGetCallClipResult(MessageParcel &data, M
         TELEPHONY_LOGW("sent raw data is less than 32k");
     }
     int32_t len = data.ReadInt32();
-    if (len <= TELEPHONY_SUCCESS) {
+    if (len <= 0 || len >= MAX_LEN) {
         TELEPHONY_LOGE("Invalid parameter, len = %{public}d", len);
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
@@ -353,7 +354,7 @@ int32_t CallStatusCallbackStub::OnUpdateGetCallClirResult(MessageParcel &data, M
     }
     const ClirResponse *parcelPtr = nullptr;
     int32_t len = data.ReadInt32();
-    if (len <= TELEPHONY_SUCCESS) {
+    if (len <= 0 || len >= MAX_LEN) {
         TELEPHONY_LOGE("Invalid parameter, len = %{public}d", len);
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
@@ -393,7 +394,7 @@ int32_t CallStatusCallbackStub::OnGetImsSwitchStatusResult(MessageParcel &data, 
     }
     const ImsSwitchResponse *parcelPtr = nullptr;
     int32_t len = data.ReadInt32();
-    if (len <= TELEPHONY_SUCCESS) {
+    if (len <= 0 || len >= MAX_LEN) {
         TELEPHONY_LOGE("Invalid parameter, len = %{public}d", len);
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
@@ -417,7 +418,7 @@ int32_t CallStatusCallbackStub::OnSetImsSwitchStatusResult(MessageParcel &data, 
     }
     const ImsSwitchResponse *parcelPtr = nullptr;
     int32_t len = data.ReadInt32();
-    if (len <= TELEPHONY_SUCCESS) {
+    if (len <= 0 || len >= MAX_LEN) {
         TELEPHONY_LOGE("Invalid parameter, len = %{public}d", len);
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
@@ -473,7 +474,7 @@ int32_t CallStatusCallbackStub::OnGetImsConfigResult(MessageParcel &data, Messag
     }
     const GetImsConfigResponse *parcelPtr = nullptr;
     int32_t len = data.ReadInt32();
-    if (len <= TELEPHONY_SUCCESS) {
+    if (len <= 0 || len >= MAX_LEN) {
         TELEPHONY_LOGE("Invalid parameter, len = %{public}d", len);
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
@@ -513,7 +514,7 @@ int32_t CallStatusCallbackStub::OnGetImsFeatureValueResult(MessageParcel &data, 
     }
     const GetImsFeatureValueResponse *parcelPtr = nullptr;
     int32_t len = data.ReadInt32();
-    if (len <= TELEPHONY_SUCCESS) {
+    if (len <= 0 || len >= MAX_LEN) {
         TELEPHONY_LOGE("Invalid parameter, len = %{public}d", len);
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
@@ -553,7 +554,7 @@ int32_t CallStatusCallbackStub::OnGetLteEnhanceModeResult(MessageParcel &data, M
     }
     const GetLteEnhanceModeResponse *parcelPtr = nullptr;
     int32_t len = data.ReadInt32();
-    if (len <= TELEPHONY_SUCCESS) {
+    if (len <= 0 || len >= MAX_LEN) {
         TELEPHONY_LOGE("Invalid parameter, len = %{public}d", len);
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
@@ -593,7 +594,7 @@ int32_t CallStatusCallbackStub::OnReceiveUpdateMediaModeResponse(MessageParcel &
     }
     const CallMediaModeResponse *parcelPtr = nullptr;
     int32_t len = data.ReadInt32();
-    if (len <= TELEPHONY_SUCCESS) {
+    if (len <= 0 || len >= MAX_LEN) {
         TELEPHONY_LOGE("Invalid parameter, len = %{public}d", len);
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
@@ -681,7 +682,7 @@ int32_t CallStatusCallbackStub::OnSendMmiCodeResult(MessageParcel &data, Message
         TELEPHONY_LOGW("sent raw data is less than 32k");
     }
     int32_t len = data.ReadInt32();
-    if (len <= TELEPHONY_SUCCESS) {
+    if (len <= 0 || len >= MAX_LEN) {
         TELEPHONY_LOGE("Invalid parameter, len = %{public}d", len);
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }

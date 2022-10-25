@@ -15,6 +15,7 @@
 
 #include "cellular_call_proxy.h"
 #include "call_manager_errors.h"
+#include "telephony_log_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -32,7 +33,12 @@ int32_t CellularCallProxy::Dial(const CellularCallInfo &callInfo)
     if (!in.WriteRawData((const void *)&callInfo, sizeof(CellularCallInfo))) {
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
-    int32_t error = Remote()->SendRequest(static_cast<uint32_t>(OperationType::DIAL), in, out, option);
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("function Remote() return nullptr!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t error = remote->SendRequest(static_cast<uint32_t>(OperationType::DIAL), in, out, option);
     if (error == ERR_NONE) {
         return out.ReadInt32();
     }
@@ -56,8 +62,12 @@ int32_t CellularCallProxy::HangUp(const CellularCallInfo &callInfo, CallSuppleme
     if (!in.WriteInt32((int32_t)type)) {
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
-
-    int32_t error = Remote()->SendRequest(static_cast<uint32_t>(OperationType::HANG_UP), in, out, option);
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("function Remote() return nullptr!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t error = remote->SendRequest(static_cast<uint32_t>(OperationType::HANG_UP), in, out, option);
     if (error == ERR_NONE) {
         return out.ReadInt32();
     }
@@ -78,7 +88,12 @@ int32_t CellularCallProxy::Reject(const CellularCallInfo &callInfo)
     if (!in.WriteRawData((const void *)&callInfo, sizeof(CellularCallInfo))) {
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
-    int32_t error = Remote()->SendRequest(static_cast<uint32_t>(OperationType::REJECT), in, out, option);
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("function Remote() return nullptr!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t error = remote->SendRequest(static_cast<uint32_t>(OperationType::REJECT), in, out, option);
     if (error == ERR_NONE) {
         return out.ReadInt32();
     }
@@ -99,7 +114,12 @@ int32_t CellularCallProxy::Answer(const CellularCallInfo &callInfo)
     if (!in.WriteRawData((const void *)&callInfo, sizeof(CellularCallInfo))) {
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
-    int32_t error = Remote()->SendRequest(static_cast<uint32_t>(OperationType::ANSWER), in, out, option);
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("function Remote() return nullptr!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t error = remote->SendRequest(static_cast<uint32_t>(OperationType::ANSWER), in, out, option);
     if (error == ERR_NONE) {
         return out.ReadInt32();
     }
@@ -120,7 +140,12 @@ int32_t CellularCallProxy::HoldCall(const CellularCallInfo &callInfo)
     if (!in.WriteRawData((const void *)&callInfo, sizeof(CellularCallInfo))) {
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
-    int32_t error = Remote()->SendRequest(static_cast<uint32_t>(OperationType::HOLD_CALL), in, out, option);
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("function Remote() return nullptr!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t error = remote->SendRequest(static_cast<uint32_t>(OperationType::HOLD_CALL), in, out, option);
     if (error == ERR_NONE) {
         return out.ReadInt32();
     }
@@ -141,7 +166,12 @@ int32_t CellularCallProxy::UnHoldCall(const CellularCallInfo &callInfo)
     if (!in.WriteRawData((const void *)&callInfo, sizeof(CellularCallInfo))) {
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
-    int32_t error = Remote()->SendRequest(static_cast<uint32_t>(OperationType::UN_HOLD_CALL), in, out, option);
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("function Remote() return nullptr!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t error = remote->SendRequest(static_cast<uint32_t>(OperationType::UN_HOLD_CALL), in, out, option);
     if (error == ERR_NONE) {
         return out.ReadInt32();
     }
@@ -162,7 +192,12 @@ int32_t CellularCallProxy::SwitchCall(const CellularCallInfo &callInfo)
     if (!in.WriteRawData((const void *)&callInfo, sizeof(CellularCallInfo))) {
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
-    int32_t error = Remote()->SendRequest(static_cast<uint32_t>(OperationType::SWITCH_CALL), in, out, option);
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("function Remote() return nullptr!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t error = remote->SendRequest(static_cast<uint32_t>(OperationType::SWITCH_CALL), in, out, option);
     if (error == ERR_NONE) {
         return out.ReadInt32();
     }
@@ -187,8 +222,12 @@ int32_t CellularCallProxy::RegisterCallManagerCallBack(const sptr<ICallStatusCal
     if (!in.WriteRemoteObject(callback->AsObject().GetRefPtr())) {
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
-
-    int32_t error = Remote()->SendRequest(static_cast<uint32_t>(OperationType::REGISTER_CALLBACK), in, out, option);
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("function Remote() return nullptr!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t error = remote->SendRequest(static_cast<uint32_t>(OperationType::REGISTER_CALLBACK), in, out, option);
     if (error == ERR_NONE) {
         return out.ReadInt32();
     }
@@ -206,7 +245,12 @@ int32_t CellularCallProxy::UnRegisterCallManagerCallBack()
     if (!in.WriteInt32(MAX_SIZE)) {
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
-    int32_t error = Remote()->SendRequest(static_cast<uint32_t>(OperationType::UNREGISTER_CALLBACK), in, out, option);
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("function Remote() return nullptr!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t error = remote->SendRequest(static_cast<uint32_t>(OperationType::UNREGISTER_CALLBACK), in, out, option);
     if (error == ERR_NONE) {
         return out.ReadInt32();
     }
@@ -229,7 +273,12 @@ int32_t CellularCallProxy::IsEmergencyPhoneNumber(int32_t slotId, const std::str
     if (!in.WriteInt32(errorCode)) {
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
-    int32_t ret = Remote()->SendRequest(static_cast<uint32_t>(OperationType::EMERGENCY_CALL), in, out, option);
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("function Remote() return nullptr!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(OperationType::EMERGENCY_CALL), in, out, option);
     if (ret == ERR_NONE) {
         ret = out.ReadInt32();
         errorCode = out.ReadInt32();
@@ -251,7 +300,12 @@ int32_t CellularCallProxy::CombineConference(const CellularCallInfo &callInfo)
     if (!in.WriteRawData((const void *)&callInfo, sizeof(CellularCallInfo))) {
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
-    int32_t error = Remote()->SendRequest(static_cast<uint32_t>(OperationType::COMBINE_CONFERENCE), in, out, option);
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("function Remote() return nullptr!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t error = remote->SendRequest(static_cast<uint32_t>(OperationType::COMBINE_CONFERENCE), in, out, option);
     if (error == ERR_NONE) {
         return out.ReadInt32();
     }
@@ -272,7 +326,12 @@ int32_t CellularCallProxy::SeparateConference(const CellularCallInfo &callInfo)
     if (!in.WriteRawData((const void *)&callInfo, sizeof(CellularCallInfo))) {
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
-    int32_t error = Remote()->SendRequest(static_cast<uint32_t>(OperationType::SEPARATE_CONFERENCE), in, out, option);
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("function Remote() return nullptr!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t error = remote->SendRequest(static_cast<uint32_t>(OperationType::SEPARATE_CONFERENCE), in, out, option);
     if (error == ERR_NONE) {
         return out.ReadInt32();
     }
@@ -292,7 +351,12 @@ int32_t CellularCallProxy::InviteToConference(int32_t slotId, const std::vector<
     if (!in.WriteStringVector(numberList)) {
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
-    int32_t error = Remote()->SendRequest(static_cast<uint32_t>(OperationType::INVITE_TO_CONFERENCE), in, out, option);
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("function Remote() return nullptr!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t error = remote->SendRequest(static_cast<uint32_t>(OperationType::INVITE_TO_CONFERENCE), in, out, option);
     if (error == ERR_NONE) {
         return out.ReadInt32();
     }
@@ -312,7 +376,12 @@ int32_t CellularCallProxy::KickOutFromConference(int32_t slotId, const std::vect
     if (!in.WriteStringVector(numberList)) {
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
-    int32_t error = Remote()->SendRequest(static_cast<uint32_t>(OperationType::KICK_OUT_CONFERENCE), in, out, option);
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("function Remote() return nullptr!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t error = remote->SendRequest(static_cast<uint32_t>(OperationType::KICK_OUT_CONFERENCE), in, out, option);
     if (error == ERR_NONE) {
         return out.ReadInt32();
     }
@@ -330,8 +399,12 @@ int32_t CellularCallProxy::HangUpAllConnection()
     if (!in.WriteInt32(MAX_SIZE)) {
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
-    int32_t error =
-        Remote()->SendRequest(static_cast<uint32_t>(OperationType::HANG_UP_ALL_CONNECTION), in, out, option);
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("function Remote() return nullptr!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t error = remote->SendRequest(static_cast<uint32_t>(OperationType::HANG_UP_ALL_CONNECTION), in, out, option);
     if (error == ERR_NONE) {
         return out.ReadInt32();
     }
@@ -355,8 +428,12 @@ int32_t CellularCallProxy::UpdateImsCallMode(const CellularCallInfo &callInfo, I
     if (!in.WriteInt32((int32_t)mode)) {
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
-    int32_t error =
-        Remote()->SendRequest(static_cast<uint32_t>(OperationType::UPDATE_CALL_MEDIA_MODE), in, out, option);
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("function Remote() return nullptr!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t error = remote->SendRequest(static_cast<uint32_t>(OperationType::UPDATE_CALL_MEDIA_MODE), in, out, option);
     if (error == ERR_NONE) {
         return out.ReadInt32();
     }
@@ -380,7 +457,12 @@ int32_t CellularCallProxy::StartDtmf(char cDtmfCode, const CellularCallInfo &cal
     if (!in.WriteRawData((const void *)&callInfo, sizeof(CellularCallInfo))) {
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
-    int32_t error = Remote()->SendRequest(static_cast<uint32_t>(OperationType::START_DTMF), in, out, option);
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("function Remote() return nullptr!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t error = remote->SendRequest(static_cast<uint32_t>(OperationType::START_DTMF), in, out, option);
     if (error == ERR_NONE) {
         return out.ReadInt32();
     }
@@ -401,7 +483,12 @@ int32_t CellularCallProxy::StopDtmf(const CellularCallInfo &callInfo)
     if (!in.WriteRawData((const void *)&callInfo, sizeof(CellularCallInfo))) {
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
-    int32_t error = Remote()->SendRequest(static_cast<uint32_t>(OperationType::STOP_DTMF), in, out, option);
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("function Remote() return nullptr!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t error = remote->SendRequest(static_cast<uint32_t>(OperationType::STOP_DTMF), in, out, option);
     if (error == ERR_NONE) {
         return out.ReadInt32();
     }
@@ -425,7 +512,12 @@ int32_t CellularCallProxy::SendDtmf(char cDtmfCode, const CellularCallInfo &call
     if (!in.WriteRawData((const void *)&callInfo, sizeof(CellularCallInfo))) {
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
-    int32_t error = Remote()->SendRequest(static_cast<uint32_t>(OperationType::SEND_DTMF), in, out, option);
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("function Remote() return nullptr!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t error = remote->SendRequest(static_cast<uint32_t>(OperationType::SEND_DTMF), in, out, option);
     if (error == ERR_NONE) {
         return out.ReadInt32();
     }
@@ -445,7 +537,12 @@ int32_t CellularCallProxy::StartRtt(int32_t slotId, const std::string &msg)
     if (!in.WriteString(msg)) {
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
-    int32_t error = Remote()->SendRequest(static_cast<uint32_t>(OperationType::START_RTT), in, out, option);
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("function Remote() return nullptr!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t error = remote->SendRequest(static_cast<uint32_t>(OperationType::START_RTT), in, out, option);
     if (error == ERR_NONE) {
         return out.ReadInt32();
     }
@@ -462,7 +559,12 @@ int32_t CellularCallProxy::StopRtt(int32_t slotId)
     if (result != TELEPHONY_SUCCESS) {
         return result;
     }
-    int32_t error = Remote()->SendRequest(static_cast<uint32_t>(OperationType::STOP_RTT), in, out, option);
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("function Remote() return nullptr!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t error = remote->SendRequest(static_cast<uint32_t>(OperationType::STOP_RTT), in, out, option);
     if (error == ERR_NONE) {
         return out.ReadInt32();
     }
@@ -482,7 +584,12 @@ int32_t CellularCallProxy::SetCallTransferInfo(int32_t slotId, const CallTransfe
     if (!in.WriteRawData((const void *)&ctInfo, sizeof(CallTransferInfo))) {
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
-    int32_t error = Remote()->SendRequest(static_cast<uint32_t>(OperationType::SET_CALL_TRANSFER), in, out, option);
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("function Remote() return nullptr!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t error = remote->SendRequest(static_cast<uint32_t>(OperationType::SET_CALL_TRANSFER), in, out, option);
     if (error == ERR_NONE) {
         return out.ReadInt32();
     }
@@ -502,7 +609,12 @@ int32_t CellularCallProxy::GetCallTransferInfo(int32_t slotId, CallTransferType 
     if (!in.WriteInt32((int32_t)type)) {
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
-    int32_t error = Remote()->SendRequest(static_cast<uint32_t>(OperationType::GET_CALL_TRANSFER), in, out, option);
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("function Remote() return nullptr!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t error = remote->SendRequest(static_cast<uint32_t>(OperationType::GET_CALL_TRANSFER), in, out, option);
     if (error == ERR_NONE) {
         return out.ReadInt32();
     }
@@ -522,7 +634,12 @@ int32_t CellularCallProxy::SetCallWaiting(int32_t slotId, bool activate)
     if (!in.WriteBool(activate)) {
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
-    int32_t error = Remote()->SendRequest(static_cast<uint32_t>(OperationType::SET_CALL_WAITING), in, out, option);
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("function Remote() return nullptr!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t error = remote->SendRequest(static_cast<uint32_t>(OperationType::SET_CALL_WAITING), in, out, option);
     if (error == ERR_NONE) {
         return out.ReadInt32();
     }
@@ -539,7 +656,12 @@ int32_t CellularCallProxy::GetCallWaiting(int32_t slotId)
     if (result != TELEPHONY_SUCCESS) {
         return result;
     }
-    int32_t error = Remote()->SendRequest(static_cast<uint32_t>(OperationType::GET_CALL_WAITING), in, out, option);
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("function Remote() return nullptr!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t error = remote->SendRequest(static_cast<uint32_t>(OperationType::GET_CALL_WAITING), in, out, option);
     if (error == ERR_NONE) {
         return out.ReadInt32();
     }
@@ -559,7 +681,12 @@ int32_t CellularCallProxy::SetCallRestriction(int32_t slotId, const CallRestrict
     if (!in.WriteRawData((const void *)&crInfo, sizeof(CallRestrictionInfo))) {
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
-    int32_t error = Remote()->SendRequest(static_cast<uint32_t>(OperationType::SET_CALL_RESTRICTION), in, out, option);
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("function Remote() return nullptr!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t error = remote->SendRequest(static_cast<uint32_t>(OperationType::SET_CALL_RESTRICTION), in, out, option);
     if (error == ERR_NONE) {
         return out.ReadInt32();
     }
@@ -579,7 +706,12 @@ int32_t CellularCallProxy::GetCallRestriction(int32_t slotId, CallRestrictionTyp
     if (!in.WriteInt32((int32_t)facType)) {
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
-    int32_t error = Remote()->SendRequest(static_cast<uint32_t>(OperationType::GET_CALL_RESTRICTION), in, out, option);
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("function Remote() return nullptr!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t error = remote->SendRequest(static_cast<uint32_t>(OperationType::GET_CALL_RESTRICTION), in, out, option);
     if (error == ERR_NONE) {
         return out.ReadInt32();
     }
@@ -599,8 +731,13 @@ int32_t CellularCallProxy::SetDomainPreferenceMode(int32_t slotId, int32_t mode)
     if (!in.WriteInt32(mode)) {
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("function Remote() return nullptr!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
     int32_t error =
-        Remote()->SendRequest(static_cast<uint32_t>(OperationType::SET_DOMAIN_PREFERENCE_MODE), in, out, option);
+        remote->SendRequest(static_cast<uint32_t>(OperationType::SET_DOMAIN_PREFERENCE_MODE), in, out, option);
     if (error == ERR_NONE) {
         return out.ReadInt32();
     }
@@ -617,8 +754,13 @@ int32_t CellularCallProxy::GetDomainPreferenceMode(int32_t slotId)
     if (result != TELEPHONY_SUCCESS) {
         return result;
     }
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("function Remote() return nullptr!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
     int32_t error =
-        Remote()->SendRequest(static_cast<uint32_t>(OperationType::GET_DOMAIN_PREFERENCE_MODE), in, out, option);
+        remote->SendRequest(static_cast<uint32_t>(OperationType::GET_DOMAIN_PREFERENCE_MODE), in, out, option);
     if (error == ERR_NONE) {
         return out.ReadInt32();
     }
@@ -638,8 +780,12 @@ int32_t CellularCallProxy::SetImsSwitchStatus(int32_t slotId, bool active)
     if (!in.WriteBool(active)) {
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
-    int32_t error =
-        Remote()->SendRequest(static_cast<uint32_t>(OperationType::SET_IMS_SWITCH_STATUS), in, out, option);
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("function Remote() return nullptr!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t error = remote->SendRequest(static_cast<uint32_t>(OperationType::SET_IMS_SWITCH_STATUS), in, out, option);
     if (error == ERR_NONE) {
         return out.ReadInt32();
     }
@@ -656,8 +802,12 @@ int32_t CellularCallProxy::GetImsSwitchStatus(int32_t slotId)
     if (result != TELEPHONY_SUCCESS) {
         return result;
     }
-    int32_t error =
-        Remote()->SendRequest(static_cast<uint32_t>(OperationType::GET_IMS_SWITCH_STATUS), in, out, option);
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("function Remote() return nullptr!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t error = remote->SendRequest(static_cast<uint32_t>(OperationType::GET_IMS_SWITCH_STATUS), in, out, option);
     if (error == ERR_NONE) {
         return out.ReadInt32();
     }
@@ -680,8 +830,12 @@ int32_t CellularCallProxy::SetImsConfig(int32_t slotId, ImsConfigItem item, cons
     if (!in.WriteString(value)) {
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
-    int32_t error =
-        Remote()->SendRequest(static_cast<uint32_t>(OperationType::SET_IMS_CONFIG_STRING), in, out, option);
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("function Remote() return nullptr!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t error = remote->SendRequest(static_cast<uint32_t>(OperationType::SET_IMS_CONFIG_STRING), in, out, option);
     if (error == ERR_NONE) {
         return out.ReadInt32();
     }
@@ -704,7 +858,12 @@ int32_t CellularCallProxy::SetImsConfig(int32_t slotId, ImsConfigItem item, int3
     if (!in.WriteInt32(value)) {
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
-    int32_t error = Remote()->SendRequest(static_cast<uint32_t>(OperationType::SET_IMS_CONFIG_INT), in, out, option);
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("function Remote() return nullptr!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t error = remote->SendRequest(static_cast<uint32_t>(OperationType::SET_IMS_CONFIG_INT), in, out, option);
     if (error == ERR_NONE) {
         return out.ReadInt32();
     }
@@ -724,7 +883,12 @@ int32_t CellularCallProxy::GetImsConfig(int32_t slotId, ImsConfigItem item)
     if (!in.WriteInt32(item)) {
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
-    int32_t error = Remote()->SendRequest(static_cast<uint32_t>(OperationType::GET_IMS_CONFIG), in, out, option);
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("function Remote() return nullptr!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t error = remote->SendRequest(static_cast<uint32_t>(OperationType::GET_IMS_CONFIG), in, out, option);
     if (error == ERR_NONE) {
         return out.ReadInt32();
     }
@@ -747,7 +911,12 @@ int32_t CellularCallProxy::SetImsFeatureValue(int32_t slotId, FeatureType type, 
     if (!in.WriteInt32(value)) {
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
-    int32_t error = Remote()->SendRequest(static_cast<uint32_t>(OperationType::SET_IMS_FEATURE), in, out, option);
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("function Remote() return nullptr!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t error = remote->SendRequest(static_cast<uint32_t>(OperationType::SET_IMS_FEATURE), in, out, option);
     if (error == ERR_NONE) {
         return out.ReadInt32();
     }
@@ -767,7 +936,12 @@ int32_t CellularCallProxy::GetImsFeatureValue(int32_t slotId, FeatureType type)
     if (!in.WriteInt32(type)) {
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
-    int32_t error = Remote()->SendRequest(static_cast<uint32_t>(OperationType::GET_IMS_FEATURE), in, out, option);
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("function Remote() return nullptr!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t error = remote->SendRequest(static_cast<uint32_t>(OperationType::GET_IMS_FEATURE), in, out, option);
     if (error == ERR_NONE) {
         return out.ReadInt32();
     }
@@ -794,7 +968,12 @@ int32_t CellularCallProxy::CtrlCamera(const std::u16string &cameraId, int32_t ca
     if (!in.WriteInt32(callingPid)) {
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
-    int32_t error = Remote()->SendRequest(static_cast<uint32_t>(OperationType::CTRL_CAMERA), in, out, option);
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("function Remote() return nullptr!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t error = remote->SendRequest(static_cast<uint32_t>(OperationType::CTRL_CAMERA), in, out, option);
     if (error == ERR_NONE) {
         return out.ReadInt32();
     }
@@ -827,7 +1006,12 @@ int32_t CellularCallProxy::SetPreviewWindow(int32_t x, int32_t y, int32_t z, int
     if (!in.WriteInt32(height)) {
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
-    int32_t error = Remote()->SendRequest(static_cast<uint32_t>(OperationType::SET_PREVIEW_WINDOW), in, out, option);
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("function Remote() return nullptr!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t error = remote->SendRequest(static_cast<uint32_t>(OperationType::SET_PREVIEW_WINDOW), in, out, option);
     if (error == ERR_NONE) {
         return out.ReadInt32();
     }
@@ -860,7 +1044,12 @@ int32_t CellularCallProxy::SetDisplayWindow(int32_t x, int32_t y, int32_t z, int
     if (!in.WriteInt32(height)) {
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
-    int32_t error = Remote()->SendRequest(static_cast<uint32_t>(OperationType::SET_DISPLAY_WINDOW), in, out, option);
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("function Remote() return nullptr!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t error = remote->SendRequest(static_cast<uint32_t>(OperationType::SET_DISPLAY_WINDOW), in, out, option);
     if (error == ERR_NONE) {
         return out.ReadInt32();
     }
@@ -881,7 +1070,12 @@ int32_t CellularCallProxy::SetCameraZoom(float zoomRatio)
     if (!in.WriteFloat(zoomRatio)) {
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
-    int32_t error = Remote()->SendRequest(static_cast<uint32_t>(OperationType::SET_CAMERA_ZOOM), in, out, option);
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("function Remote() return nullptr!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t error = remote->SendRequest(static_cast<uint32_t>(OperationType::SET_CAMERA_ZOOM), in, out, option);
     if (error == ERR_NONE) {
         return out.ReadInt32();
     }
@@ -902,7 +1096,12 @@ int32_t CellularCallProxy::SetPauseImage(const std::u16string &path)
     if (!in.WriteString16(path)) {
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
-    int32_t error = Remote()->SendRequest(static_cast<uint32_t>(OperationType::SET_PAUSE_IMAGE), in, out, option);
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("function Remote() return nullptr!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t error = remote->SendRequest(static_cast<uint32_t>(OperationType::SET_PAUSE_IMAGE), in, out, option);
     if (error == ERR_NONE) {
         return out.ReadInt32();
     }
@@ -923,7 +1122,12 @@ int32_t CellularCallProxy::SetDeviceDirection(int32_t rotation)
     if (!in.WriteInt32(rotation)) {
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
-    int32_t error = Remote()->SendRequest(static_cast<uint32_t>(OperationType::SET_DEVICE_DIRECTION), in, out, option);
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("function Remote() return nullptr!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t error = remote->SendRequest(static_cast<uint32_t>(OperationType::SET_DEVICE_DIRECTION), in, out, option);
     if (error == ERR_NONE) {
         return out.ReadInt32();
     }
@@ -943,7 +1147,12 @@ int32_t CellularCallProxy::SetMute(int32_t slotId, int32_t mute)
     if (!in.WriteInt32(mute)) {
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
-    int32_t error = Remote()->SendRequest(static_cast<uint32_t>(OperationType::SET_MUTE), in, out, option);
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("function Remote() return nullptr!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t error = remote->SendRequest(static_cast<uint32_t>(OperationType::SET_MUTE), in, out, option);
     if (error == ERR_NONE) {
         return out.ReadInt32();
     }
@@ -960,7 +1169,12 @@ int32_t CellularCallProxy::GetMute(int32_t slotId)
     if (result != TELEPHONY_SUCCESS) {
         return result;
     }
-    int32_t error = Remote()->SendRequest(static_cast<uint32_t>(OperationType::GET_MUTE), in, out, option);
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("function Remote() return nullptr!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t error = remote->SendRequest(static_cast<uint32_t>(OperationType::GET_MUTE), in, out, option);
     if (error == ERR_NONE) {
         return out.ReadInt32();
     }
@@ -992,8 +1206,12 @@ int32_t CellularCallProxy::SetEmergencyCallList(int32_t slotId, std::vector<Emer
         }
     }
 
-    int32_t error = Remote()->SendRequest(static_cast<uint32_t>(OperationType::SET_EMERGENCY_CALL_LIST),
-        in, out, option);
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("function Remote() return nullptr!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t error = remote->SendRequest(static_cast<uint32_t>(OperationType::SET_EMERGENCY_CALL_LIST), in, out, option);
     if (error == ERR_NONE) {
         return out.ReadInt32();
     }

@@ -40,6 +40,7 @@
 
 namespace OHOS {
 namespace Telephony {
+const int32_t MAX_LEN = 100000;
 using namespace Security::AccessToken;
 using Security::AccessToken::AccessTokenID;
 std::unordered_map<int32_t, std::unordered_set<int32_t>> g_callStateMap;
@@ -254,7 +255,7 @@ private:
     {
         const CallAttributeInfo *parcelPtr = nullptr;
         int32_t len = data.ReadInt32();
-        if (len <= 0) {
+        if (len <= 0 || len >= MAX_LEN) {
             TELEPHONY_LOGE("Invalid parameter, len = %{public}d", len);
             return TELEPHONY_ERR_ARGUMENT_INVALID;
         }
@@ -278,7 +279,7 @@ private:
     {
         const CallEventInfo *parcelPtr = nullptr;
         int32_t len = data.ReadInt32();
-        if (len <= 0) {
+        if (len <= 0 || len >= MAX_LEN) {
             TELEPHONY_LOGE("Invalid parameter, len = %{public}d", len);
             return TELEPHONY_ERR_ARGUMENT_INVALID;
         }

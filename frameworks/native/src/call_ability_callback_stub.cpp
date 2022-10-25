@@ -22,6 +22,7 @@
 
 namespace OHOS {
 namespace Telephony {
+const int32_t MAX_LEN = 100000;
 CallAbilityCallbackStub::CallAbilityCallbackStub()
 {
     memberFuncMap_[UPDATE_CALL_STATE_INFO] = &CallAbilityCallbackStub::OnUpdateCallStateInfo;
@@ -62,7 +63,7 @@ int32_t CallAbilityCallbackStub::OnUpdateCallStateInfo(MessageParcel &data, Mess
     int32_t result = TELEPHONY_SUCCESS;
     const CallAttributeInfo *parcelPtr = nullptr;
     int32_t len = data.ReadInt32();
-    if (len <= 0) {
+    if (len <= 0 || len >= MAX_LEN) {
         TELEPHONY_LOGE("Invalid parameter, len = %{public}d", len);
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
@@ -86,7 +87,7 @@ int32_t CallAbilityCallbackStub::OnUpdateCallEvent(MessageParcel &data, MessageP
     int32_t result = TELEPHONY_SUCCESS;
     const CallEventInfo *parcelPtr = nullptr;
     int32_t len = data.ReadInt32();
-    if (len <= 0) {
+    if (len <= 0 || len >= MAX_LEN) {
         TELEPHONY_LOGE("Invalid parameter, len = %{public}d", len);
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
@@ -176,7 +177,7 @@ int32_t CallAbilityCallbackStub::OnUpdateMmiCodeResults(MessageParcel &data, Mes
     int32_t result = TELEPHONY_SUCCESS;
     const MmiCodeInfo *parcelPtr = nullptr;
     int32_t len = data.ReadInt32();
-    if (len <= 0) {
+    if (len <= 0 || len >= MAX_LEN) {
         TELEPHONY_LOGE("Invalid parameter, len = %{public}d", len);
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
