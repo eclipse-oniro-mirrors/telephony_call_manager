@@ -16,18 +16,17 @@
 #ifndef CALL_MANAGER_GTEST
 #define CALL_MANAGER_GTEST
 
-#include <unordered_set>
+#include <chrono>
 #include <gtest/gtest.h>
 #include <iostream>
 #include <string_ex.h>
-
-#include <chrono>
 #include <thread>
+#include <unordered_set>
 
+#include "call_manager_client.h"
+#include "call_manager_connect.h"
 #include "common_event.h"
 #include "common_event_manager.h"
-
-#include "call_manager_connect.h"
 #include "core_service_client.h"
 
 namespace OHOS {
@@ -43,12 +42,18 @@ public:
         std::cout << "---Please modify PHONE_NUMBER first in the file call_manager_gtest.cpp---" << std::endl;
         std::cout << "---------- gtest start ------------" << std::endl;
         isConnected_ = false;
-        clientPtr_ = std::make_unique<CallManagerConnect>();
+        clientPtr_ = DelayedSingleton<CallManagerClient>::GetInstance();
         if (clientPtr_ == nullptr) {
+            std::cout << "clientPtr_ is nullptr!" << std::endl;
+            return;
+        }
+        clientPtr_->Init(TELEPHONY_CALL_MANAGER_SYS_ABILITY_ID);
+        servicePtr_ = std::make_unique<CallManagerConnect>();
+        if (servicePtr_ == nullptr) {
             std::cout << "make_unique CallManagerConnect failed!" << std::endl;
             return;
         }
-        if (clientPtr_->Init(TELEPHONY_CALL_MANAGER_SYS_ABILITY_ID) != TELEPHONY_SUCCESS) {
+        if (servicePtr_->Init(TELEPHONY_CALL_MANAGER_SYS_ABILITY_ID) != TELEPHONY_SUCCESS) {
             std::cout << "connect callManager server failed!" << std::endl;
             return;
         }
@@ -99,13 +104,17 @@ public:
         if (clientPtr_ != nullptr) {
             clientPtr_->UnInit();
         }
+        if (servicePtr_ != nullptr) {
+            servicePtr_->UnInit();
+        }
         std::cout << "---------- gtest end ------------" << std::endl;
     }
 
     void HangUpCall();
 public:
     static bool isConnected_;
-    static std::unique_ptr<CallManagerConnect> clientPtr_;
+    static std::shared_ptr<CallManagerClient> clientPtr_;
+    static std::unique_ptr<CallManagerConnect> servicePtr_;
     AppExecFwk::PacMap dialInfo_;
 
     const int32_t SLEEP_50_MS = 50;
@@ -122,7 +131,8 @@ public:
 };
 
 bool CallManagerGtest::isConnected_ = false;
-std::unique_ptr<CallManagerConnect> CallManagerGtest::clientPtr_ = nullptr;
+std::shared_ptr<CallManagerClient> CallManagerGtest::clientPtr_ = nullptr;
+std::unique_ptr<CallManagerConnect> CallManagerGtest::servicePtr_ = nullptr;
 } // namespace Telephony
 } // namespace OHOS
 
