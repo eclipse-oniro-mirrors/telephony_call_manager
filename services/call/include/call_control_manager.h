@@ -57,7 +57,7 @@ public:
     bool IsRinging();
     bool HasEmergency();
     bool NotifyNewCallCreated(sptr<CallBase> &callObjectPtr);
-    bool NotifyCallDestroyed(int32_t cause);
+    bool NotifyCallDestroyed(const DisconnectedDetails &details);
     bool NotifyCallStateUpdated(sptr<CallBase> &callObjectPtr, TelCallState priorState, TelCallState nextState);
     bool NotifyIncomingCallAnswered(sptr<CallBase> &callObjectPtr);
     bool NotifyIncomingCallRejected(sptr<CallBase> &callObjectPtr, bool isSendSms, std::string content);

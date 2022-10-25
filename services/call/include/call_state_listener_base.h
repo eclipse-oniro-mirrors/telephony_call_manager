@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -30,7 +30,7 @@ class CallStateListenerBase : public RefBase {
 public:
     virtual ~CallStateListenerBase() {}
     virtual void NewCallCreated(sptr<CallBase> &callObjectPtr) {}
-    virtual void CallDestroyed(int32_t cause) {}
+    virtual void CallDestroyed(const DisconnectedDetails &details) {}
     virtual void CallStateUpdated(sptr<CallBase> &callObjectPtr, TelCallState priorState, TelCallState nextState)
     {}
     virtual void IncomingCallHungUp(sptr<CallBase> &callObjectPtr, bool isSendSms, std::string content) {}

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -109,8 +109,8 @@ int32_t CallAbilityCallbackStub::OnUpdateCallEvent(MessageParcel &data, MessageP
 
 int32_t CallAbilityCallbackStub::OnUpdateCallDisconnectedCause(MessageParcel &data, MessageParcel &reply)
 {
-    DisconnectedDetails cause = (DisconnectedDetails)data.ReadInt32();
-    int32_t result = OnCallDisconnectedCause(cause);
+    auto info = (DisconnectedDetails *)data.ReadRawData(sizeof(DisconnectedDetails));
+    int32_t result = OnCallDisconnectedCause(*info);
     if (!reply.WriteInt32(result)) {
         TELEPHONY_LOGE("writing parcel failed");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;

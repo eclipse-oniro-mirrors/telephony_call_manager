@@ -30,7 +30,7 @@ public:
 
     int32_t UpdateCallReportInfo(const CallReportInfo &info) override;
     int32_t UpdateCallsReportInfo(const CallsReportInfo &info) override;
-    int32_t UpdateDisconnectedCause(const DisconnectedDetails &cause) override;
+    int32_t UpdateDisconnectedCause(const DisconnectedDetails &details) override;
     int32_t UpdateEventResultInfo(const CellularCallEventInfo &info) override;
     int32_t UpdateRBTPlayInfo(const RBTPlayInfo info) override;
     int32_t StartDtmfResult(const int32_t result) override;

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -856,7 +856,7 @@ int32_t NapiCallAbilityCallback::ReportCallEvent(CallEventInfo &info, EventCallb
     return TELEPHONY_SUCCESS;
 }
 
-int32_t NapiCallAbilityCallback::UpdateCallDisconnectedCause(DisconnectedDetails cause)
+int32_t NapiCallAbilityCallback::UpdateCallDisconnectedCause(const DisconnectedDetails &details)
 {
     if (callDisconnectCauseCallback_.thisVar == nullptr) {
         TELEPHONY_LOGE("callDisconnectCauseCallback_ is null!");
@@ -871,7 +871,7 @@ int32_t NapiCallAbilityCallback::UpdateCallDisconnectedCause(DisconnectedDetails
         TELEPHONY_LOGE("dataWorker is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    dataWorker->cause = static_cast<int32_t>(cause);
+    dataWorker->details = details;
     dataWorker->callback = callDisconnectCauseCallback_;
     uv_work_t *work = std::make_unique<uv_work_t>().release();
     if (work == nullptr) {
@@ -894,7 +894,7 @@ void NapiCallAbilityCallback::ReportCallDisconnectedCauseWork(uv_work_t *work, i
         TELEPHONY_LOGE("dataWorkerData is nullptr!");
         return;
     }
-    int32_t ret = ReportDisconnectedCause(dataWorkerData->cause, dataWorkerData->callback);
+    int32_t ret = ReportDisconnectedCause(dataWorkerData->details, dataWorkerData->callback);
     TELEPHONY_LOGI("ReportDisconnectedCause results %{public}d", ret);
     delete dataWorkerData;
     dataWorkerData = nullptr;
@@ -902,14 +902,16 @@ void NapiCallAbilityCallback::ReportCallDisconnectedCauseWork(uv_work_t *work, i
     work = nullptr;
 }
 
-int32_t NapiCallAbilityCallback::ReportDisconnectedCause(int32_t cause, EventCallback eventCallback)
+int32_t NapiCallAbilityCallback::ReportDisconnectedCause(
+    const DisconnectedDetails &details, EventCallback eventCallback)
 {
     napi_value callbackFunc = nullptr;
     napi_env env = eventCallback.env;
-    napi_value callbackValues[ARRAY_INDEX_THIRD] = {0};
-    napi_create_object(env, &callbackValues[ARRAY_INDEX_FIRST]);
+    napi_value callbackValues[ARRAY_INDEX_THIRD] = { 0 };
+    napi_create_object(env, &callbackValues[ARRAY_INDEX_SECOND]);
     NapiCallManagerUtils::SetPropertyInt32(
-        env, callbackValues[ARRAY_INDEX_FIRST], "disconnectedCause", static_cast<int32_t>(cause));
+        env, callbackValues[ARRAY_INDEX_SECOND], "disconnectedCause", static_cast<int32_t>(details.reason));
+    NapiCallManagerUtils::SetPropertyStringUtf8(env, callbackValues[ARRAY_INDEX_SECOND], "message", details.message);
     napi_get_reference_value(env, eventCallback.callbackRef, &callbackFunc);
     if (callbackFunc == nullptr) {
         TELEPHONY_LOGE("callbackFunc is null!");

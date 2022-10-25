@@ -87,9 +87,9 @@ int32_t CallStatusCallback::UpdateCallsReportInfo(const CallsReportInfo &info)
     return ret;
 }
 
-int32_t CallStatusCallback::UpdateDisconnectedCause(const DisconnectedDetails &cause)
+int32_t CallStatusCallback::UpdateDisconnectedCause(const DisconnectedDetails &details)
 {
-    int32_t ret = DelayedSingleton<ReportCallInfoHandlerService>::GetInstance()->UpdateDisconnectedCause(cause);
+    int32_t ret = DelayedSingleton<ReportCallInfoHandlerService>::GetInstance()->UpdateDisconnectedCause(details);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("UpdateDisconnectedCause failed! errCode:%{public}d", ret);
     } else {

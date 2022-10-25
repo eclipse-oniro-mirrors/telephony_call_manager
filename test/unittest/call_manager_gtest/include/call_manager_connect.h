@@ -224,7 +224,7 @@ public:
         return CallInfoManager::CallEventChange(info);
     }
 
-    int32_t OnCallDisconnectedCause(DisconnectedDetails cause)
+    int32_t OnCallDisconnectedCause(const DisconnectedDetails &details)
     {
         TELEPHONY_LOGI("OnCallDisconnectedCause success!");
         return TELEPHONY_SUCCESS;

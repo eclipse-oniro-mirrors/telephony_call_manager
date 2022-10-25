@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -53,7 +53,7 @@ void StatusBar::UpdateSpeakerphoneIcon(bool isDisplay)
     isDisplayIcon_ = isDisplay;
 }
 
-void StatusBar::CallDestroyed(int32_t cause)
+void StatusBar::CallDestroyed(const DisconnectedDetails &details)
 {
     UpdateMuteIcon(false);
     UpdateSpeakerphoneIcon(false);
