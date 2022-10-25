@@ -309,6 +309,8 @@ declare namespace call {
    * @permission ohos.permission.SET_TELEPHONY_STATE
    * @param type Indicates the observer type.
    * @param callback Return the result of MMI code.
+   * @throws {BusinessError} 201 - Permission denied.
+   * @throws {BusinessError} 401 - Parameter error.
    * @systemapi Hide this for inner system use.
    * @since 9
    */
@@ -320,6 +322,8 @@ declare namespace call {
    * @permission ohos.permission.SET_TELEPHONY_STATE
    * @param type Indicates the observer type.
    * @param callback Return the result of MMI code.
+   * @throws {BusinessError} 201 - Permission denied.
+   * @throws {BusinessError} 401 - Parameter error.
    * @systemapi Hide this for inner system use.
    * @since 9
    */
