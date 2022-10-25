@@ -2859,7 +2859,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_RegisterCallBack_0100, Function
         return;
     }
 
-    EXPECT_EQ(CallManagerGtest::clientPtr_->RegisterCallBack(), RETURN_VALUE_IS_ZERO);
+    EXPECT_EQ(CallManagerGtest::servicePtr_->RegisterCallBack(), RETURN_VALUE_IS_ZERO);
 }
 
 #else // TEL_TEST_UNSUPPORT
