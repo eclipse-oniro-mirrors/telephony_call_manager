@@ -29,6 +29,7 @@ std::shared_ptr<BluetoothCallClient> g_bluetoothCallPtr = nullptr;
 
 int32_t BluetoothCallTest::Init()
 {
+    AccessToken token;
     g_bluetoothCallPtr = DelayedSingleton<BluetoothCallClient>::GetInstance();
     if (g_bluetoothCallPtr == nullptr) {
         std::cout << "g_bluetoothCallPtr is nullptr" << std::endl;
@@ -132,6 +133,7 @@ void BluetoothCallTest::InitFunMap()
 
 void BluetoothCallTest::DialCall()
 {
+    AccessToken token;
     int32_t accountId = DEFAULT_ACCOUNT_ID;
     int32_t videoState = DEFAULT_VIDEO_STATE;
     int32_t dialScene = DEFAULT_DIAL_SCENE;
@@ -173,6 +175,7 @@ void BluetoothCallTest::DialCall()
 
 void BluetoothCallTest::AnswerCall()
 {
+    AccessToken token;
     std::cout << "------Answer------" << std::endl;
     if (g_bluetoothCallPtr == nullptr) {
         std::cout << "g_bluetoothCallPtr is nullptr" << std::endl;
@@ -184,6 +187,7 @@ void BluetoothCallTest::AnswerCall()
 
 void BluetoothCallTest::RejectCall()
 {
+    AccessToken token;
     std::cout << "------Reject------" << std::endl;
     if (g_bluetoothCallPtr == nullptr) {
         std::cout << "g_bluetoothCallPtr is nullptr" << std::endl;
@@ -195,6 +199,7 @@ void BluetoothCallTest::RejectCall()
 
 void BluetoothCallTest::HangUpCall()
 {
+    AccessToken token;
     std::cout << "------HangUpCall------" << std::endl;
     if (g_bluetoothCallPtr == nullptr) {
         std::cout << "g_bluetoothCallPtr is nullptr" << std::endl;
@@ -217,6 +222,7 @@ void BluetoothCallTest::GetCallState()
 
 void BluetoothCallTest::HoldCall()
 {
+    AccessToken token;
     std::cout << "------HoldCall------" << std::endl;
     if (g_bluetoothCallPtr == nullptr) {
         std::cout << "g_bluetoothCallPtr is nullptr" << std::endl;
@@ -228,6 +234,7 @@ void BluetoothCallTest::HoldCall()
 
 void BluetoothCallTest::UnHoldCall()
 {
+    AccessToken token;
     std::cout << "------UnHoldCall------" << std::endl;
     if (g_bluetoothCallPtr == nullptr) {
         std::cout << "g_bluetoothCallPtr is nullptr" << std::endl;
@@ -261,6 +268,7 @@ void BluetoothCallTest::SeparateConference()
 
 void BluetoothCallTest::SwitchCall()
 {
+    AccessToken token;
     std::cout << "------SwitchCall------" << std::endl;
     if (g_bluetoothCallPtr == nullptr) {
         std::cout << "g_bluetoothCallPtr is nullptr" << std::endl;
@@ -294,6 +302,7 @@ void BluetoothCallTest::IsNewCallAllowed()
 
 void BluetoothCallTest::IsRinging()
 {
+    AccessToken token;
     std::cout << "------IsRinging------" << std::endl;
     if (g_bluetoothCallPtr == nullptr) {
         std::cout << "g_bluetoothCallPtr is nullptr" << std::endl;
@@ -305,6 +314,7 @@ void BluetoothCallTest::IsRinging()
 
 void BluetoothCallTest::IsInEmergencyCall()
 {
+    AccessToken token;
     std::cout << "------IsInEmergencyCall------" << std::endl;
     if (g_bluetoothCallPtr == nullptr) {
         std::cout << "g_bluetoothCallPtr is nullptr" << std::endl;
@@ -355,6 +365,7 @@ void BluetoothCallTest::SetMute()
 
 void BluetoothCallTest::MuteRinger()
 {
+    AccessToken token;
     std::cout << "------MuteRinger------" << std::endl;
     if (g_bluetoothCallPtr == nullptr) {
         std::cout << "g_bluetoothCallPtr is nullptr" << std::endl;
@@ -383,6 +394,7 @@ void BluetoothCallTest::SetAudioDevice()
 
 void BluetoothCallTest::GetCurrentCallList()
 {
+    AccessToken token;
     int32_t slotId = DEFAULT_VALUE;
     std::cout << "------GetCurrentCallList------" << std::endl;
     std::cout << "Please enter slotId:" << std::endl;
