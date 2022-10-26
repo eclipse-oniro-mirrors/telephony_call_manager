@@ -352,10 +352,10 @@ bool CallControlManager::NotifyNewCallCreated(sptr<CallBase> &callObjectPtr)
     return true;
 }
 
-bool CallControlManager::NotifyCallDestroyed(int32_t cause)
+bool CallControlManager::NotifyCallDestroyed(const DisconnectedDetails &details)
 {
     if (callStateListenerPtr_ != nullptr) {
-        callStateListenerPtr_->CallDestroyed(cause);
+        callStateListenerPtr_->CallDestroyed(details);
         return true;
     }
     return false;

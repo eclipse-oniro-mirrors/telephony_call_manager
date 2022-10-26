@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -29,7 +29,7 @@ public:
 
     virtual int32_t OnCallDetailsChange(const CallAttributeInfo &info) = 0;
     virtual int32_t OnCallEventChange(const CallEventInfo &info) = 0;
-    virtual int32_t OnCallDisconnectedCause(DisconnectedDetails cause) = 0;
+    virtual int32_t OnCallDisconnectedCause(const DisconnectedDetails &details) = 0;
     virtual int32_t OnReportAsyncResults(CallResultReportId reportId, AppExecFwk::PacMap &resultInfo) = 0;
     virtual int32_t OnOttCallRequest(OttCallRequestId requestId, AppExecFwk::PacMap &info) = 0;
     virtual int32_t OnReportMmiCodeResult(const MmiCodeInfo &info) = 0;

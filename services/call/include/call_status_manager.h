@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -42,7 +42,7 @@ public:
     int32_t UnInit();
     int32_t HandleCallReportInfo(const CallDetailInfo &info);
     int32_t HandleCallsReportInfo(const CallDetailsInfo &info);
-    int32_t HandleDisconnectedCause(int32_t cause);
+    int32_t HandleDisconnectedCause(const DisconnectedDetails &details);
     int32_t HandleEventResultReportInfo(const CellularCallEventInfo &info);
     int32_t HandleOttEventReportInfo(const OttCallEventInfo &info);
     void CallFilterCompleteResult(const CallDetailInfo &info);

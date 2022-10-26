@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -114,17 +114,17 @@ void ReportCallInfoHandler::ReportCallsInfo(const AppExecFwk::InnerEvent::Pointe
 
 void ReportCallInfoHandler::ReportDisconnectedCause(const AppExecFwk::InnerEvent::Pointer &event)
 {
-    auto object = event->GetUniqueObject<int32_t>();
+    auto object = event->GetUniqueObject<DisconnectedDetails>();
     if (object == nullptr) {
         TELEPHONY_LOGE("object is nullptr!");
         return;
     }
-    int32_t cause = *object;
     if (callStatusManagerPtr_ == nullptr) {
         TELEPHONY_LOGE("callStatusManagerPtr_ is nullptr");
         return;
     }
-    int32_t ret = callStatusManagerPtr_->HandleDisconnectedCause(cause);
+
+    int32_t ret = callStatusManagerPtr_->HandleDisconnectedCause(*object);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("HandleDisconnectedCause failed! ret:%{public}d", ret);
         return;
@@ -271,23 +271,27 @@ int32_t ReportCallInfoHandlerService::UpdateCallsReportInfo(CallDetailsInfo &inf
     return TELEPHONY_SUCCESS;
 }
 
-int32_t ReportCallInfoHandlerService::UpdateDisconnectedCause(const DisconnectedDetails &cause)
+int32_t ReportCallInfoHandlerService::UpdateDisconnectedCause(const DisconnectedDetails &details)
 {
     if (handler_.get() == nullptr) {
         TELEPHONY_LOGE("handler_ is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    std::unique_ptr<int32_t> para = std::make_unique<int32_t>();
+    std::unique_ptr<DisconnectedDetails> para = std::make_unique<DisconnectedDetails>();
     if (para.get() == nullptr) {
         TELEPHONY_LOGE("make_unique int32_t failed!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    *para = static_cast<int32_t>(cause);
+    para->reason = details.reason;
+    if (details.message.empty()) {
+        para->message = "";
+    } else {
+        para->message = details.message;
+    }
     bool ret = handler_->SendEvent(HANDLER_UPDATE_DISCONNECTED_CAUSE, std::move(para));
     if (!ret) {
-        TELEPHONY_LOGE("SendEvent failed! DisconnectedDetails:%{public}d", cause);
+        TELEPHONY_LOGE("SendEvent failed! DisconnectedDetails:%{public}d", details.reason);
     }
-    TELEPHONY_LOGI("UpdateDisconnectedCause success, cause:%{public}d", cause);
     return TELEPHONY_SUCCESS;
 }
 

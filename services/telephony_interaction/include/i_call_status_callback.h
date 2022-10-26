@@ -27,7 +27,7 @@ public:
 
     virtual int32_t UpdateCallReportInfo(const CallReportInfo &info) = 0;
     virtual int32_t UpdateCallsReportInfo(const CallsReportInfo &info) = 0;
-    virtual int32_t UpdateDisconnectedCause(const DisconnectedDetails &cause) = 0;
+    virtual int32_t UpdateDisconnectedCause(const DisconnectedDetails &details) = 0;
     virtual int32_t UpdateEventResultInfo(const CellularCallEventInfo &info) = 0;
     virtual int32_t UpdateRBTPlayInfo(const RBTPlayInfo info) = 0;
     virtual int32_t UpdateGetWaitingResult(const CallWaitResponse &callWaitResponse) = 0;

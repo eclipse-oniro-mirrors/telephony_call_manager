@@ -34,7 +34,7 @@ public:
     int32_t UnRegisterCallBack(const std::string &bundleName);
     void CallStateUpdated(sptr<CallBase> &callObjectPtr, TelCallState priorState, TelCallState nextState) override;
     void CallEventUpdated(CallEventInfo &info) override;
-    void CallDestroyed(int32_t cause) override;
+    void CallDestroyed(const DisconnectedDetails &details) override;
     int32_t ReportAsyncResults(const CallResultReportId reportId, AppExecFwk::PacMap &resultInfo);
     int32_t OttCallRequest(OttCallRequestId requestId, AppExecFwk::PacMap &info);
     int32_t ReportMmiCodeResult(const MmiCodeInfo &info);

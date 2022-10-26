@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -71,7 +71,7 @@ public:
     void UnRegisterMmiCodeCallback();
     int32_t UpdateCallStateInfo(const CallAttributeInfo &info);
     int32_t UpdateCallEvent(const CallEventInfo &info);
-    int32_t UpdateCallDisconnectedCause(DisconnectedDetails cause);
+    int32_t UpdateCallDisconnectedCause(const DisconnectedDetails &details);
     int32_t UpdateAsyncResultsInfo(const CallResultReportId reportId, AppExecFwk::PacMap &resultInfo);
     int32_t OttCallRequest(OttCallRequestId requestId, AppExecFwk::PacMap &info);
     int32_t RegisterUpdateCallMediaModeCallback(EventCallback callback);
@@ -86,7 +86,7 @@ private:
     static void ReportCallEventWork(uv_work_t *work, int32_t status);
     static int32_t ReportCallEvent(CallEventInfo &info, EventCallback stateCallback);
     static void ReportCallDisconnectedCauseWork(uv_work_t *work, int32_t status);
-    static int32_t ReportDisconnectedCause(int32_t cause, EventCallback eventCallback);
+    static int32_t ReportDisconnectedCause(const DisconnectedDetails &details, EventCallback eventCallback);
     int32_t ReportGetWaitingInfo(AppExecFwk::PacMap &resultInfo);
     int32_t ReportSetWaitingInfo(AppExecFwk::PacMap &resultInfo);
     int32_t ReportGetRestrictionInfo(AppExecFwk::PacMap &resultInfo);
