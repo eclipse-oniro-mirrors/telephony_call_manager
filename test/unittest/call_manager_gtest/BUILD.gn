@@ -35,6 +35,7 @@ ohos_unittest("tel_call_manager_gtest") {
   configs = [ "//base/telephony/core_service/utils:telephony_log_config" ]
 
   deps = [
+    "//base/telephony/call_manager/frameworks/native:tel_call_manager_api",
     "//foundation/communication/bluetooth/frameworks/inner:btframework",
     "//third_party/googletest:gtest_main",
   ]
