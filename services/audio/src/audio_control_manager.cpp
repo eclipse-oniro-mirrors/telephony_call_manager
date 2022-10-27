@@ -32,7 +32,6 @@ void AudioControlManager::Init()
 {
     DelayedSingleton<AudioDeviceManager>::GetInstance()->Init();
     DelayedSingleton<AudioSceneProcessor>::GetInstance()->Init();
-    DelayedSingleton<AudioProxy>::GetInstance()->SetMicrophoneMute(true);
 }
 
 void AudioControlManager::CallStateUpdated(
@@ -71,7 +70,6 @@ void AudioControlManager::IncomingCallHungUp(sptr<CallBase> &callObjectPtr, bool
         return;
     }
     StopRingtone();
-    DelayedSingleton<AudioProxy>::GetInstance()->SetMicrophoneMute(true); // mute microphone
 }
 
 void AudioControlManager::HandleCallStateUpdated(
@@ -136,8 +134,6 @@ void AudioControlManager::HandlePriorState(sptr<CallBase> &callObjectPtr, TelCal
             break;
         case TelCallState::CALL_STATUS_ACTIVE:
             if (stateNumber == EMPTY_VALUE) {
-                // mute microphone while no more active call
-                DelayedSingleton<AudioProxy>::GetInstance()->SetMicrophoneMute(true);
                 event = AudioEvent::NO_MORE_ACTIVE_CALL;
             }
             break;
