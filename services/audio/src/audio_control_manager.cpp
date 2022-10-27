@@ -69,8 +69,8 @@ void AudioControlManager::IncomingCallHungUp(sptr<CallBase> &callObjectPtr, bool
         TELEPHONY_LOGE("call object ptr nullptr");
         return;
     }
-    DelayedSingleton<AudioProxy>::GetInstance()->SetMicrophoneMute(false); // unmute microphone
     StopRingtone();
+    DelayedSingleton<AudioProxy>::GetInstance()->SetMicrophoneMute(false); // unmute microphone
 }
 
 void AudioControlManager::HandleCallStateUpdated(
