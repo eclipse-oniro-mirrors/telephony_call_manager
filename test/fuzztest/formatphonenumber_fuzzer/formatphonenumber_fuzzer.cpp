@@ -21,27 +21,27 @@
 
 using namespace OHOS::Telephony;
 namespace OHOS {
-    void DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
-    {
-        if (data == nullptr || size <= 0) {
-            return;
-        }
-        auto cmClient = DelayedSingleton<CallManagerClient>::GetInstance();
-        if (!cmClient) {
-            return;
-        }
-
-        cmClient->Init(TELEPHONY_CALL_MANAGER_SYS_ABILITY_ID);
-
-        std::string number(reinterpret_cast<const char*>(data), size);
-        auto numberU16 = Str8ToStr16(number);
-        std::string formatNumber(reinterpret_cast<const char*>(data), size);
-        auto formatNumberU16 = Str8ToStr16(formatNumber);
-        std::string countryCode(reinterpret_cast<const char*>(data), size);
-        auto countryCodeU16 = Str8ToStr16(countryCode);
-
-        cmClient->FormatPhoneNumber(numberU16, countryCodeU16, formatNumberU16);
+void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
+{
+    if (data == nullptr || size <= 0) {
+        return;
     }
+    auto cmClient = DelayedSingleton<CallManagerClient>::GetInstance();
+    if (!cmClient) {
+        return;
+    }
+
+    cmClient->Init(TELEPHONY_CALL_MANAGER_SYS_ABILITY_ID);
+
+    std::string number(reinterpret_cast<const char *>(data), size);
+    auto numberU16 = Str8ToStr16(number);
+    std::string formatNumber(reinterpret_cast<const char *>(data), size);
+    auto formatNumberU16 = Str8ToStr16(formatNumber);
+    std::string countryCode(reinterpret_cast<const char *>(data), size);
+    auto countryCodeU16 = Str8ToStr16(countryCode);
+
+    cmClient->FormatPhoneNumber(numberU16, countryCodeU16, formatNumberU16);
+}
 }  // namespace OHOS
 
 /* Fuzzer entry point */

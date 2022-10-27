@@ -21,23 +21,23 @@
 
 using namespace OHOS::Telephony;
 namespace OHOS {
-    void DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
-    {
-        if (data == nullptr || size <= 0) {
-            return;
-        }
-        auto cmClient = DelayedSingleton<CallManagerClient>::GetInstance();
-        if (!cmClient) {
-            return;
-        }
-
-        cmClient->Init(TELEPHONY_CALL_MANAGER_SYS_ABILITY_ID);
-        std::string number(reinterpret_cast<char*>(const_cast<uint8_t*>(data)), size);
-        auto numberU16 = Str8ToStr16(number);
-        int32_t sizeInt = static_cast<int32_t>(size);
-        int32_t slotId = static_cast<int32_t>(size % 2);
-        cmClient->IsEmergencyPhoneNumber(numberU16, slotId, sizeInt);
+void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
+{
+    if (data == nullptr || size <= 0) {
+        return;
     }
+    auto cmClient = DelayedSingleton<CallManagerClient>::GetInstance();
+    if (!cmClient) {
+        return;
+    }
+
+    cmClient->Init(TELEPHONY_CALL_MANAGER_SYS_ABILITY_ID);
+    std::string number(reinterpret_cast<char *>(const_cast<uint8_t *>(data)), size);
+    auto numberU16 = Str8ToStr16(number);
+    int32_t sizeInt = static_cast<int32_t>(size);
+    int32_t slotId = static_cast<int32_t>(size % 2);
+    cmClient->IsEmergencyPhoneNumber(numberU16, slotId, sizeInt);
+}
 }  // namespace OHOS
 
 /* Fuzzer entry point */
