@@ -18,11 +18,11 @@ import("//build/ohos.gni")
 import("//build/test.gni")
 
 ##############################fuzztest##########################################
-ohos_fuzztest("DialCallFuzzTest") {
-  module_output_path = "call_manager/DialCallFuzzTest"
+ohos_fuzztest("StartDtmfFuzzTest") {
+  module_output_path = "call_manager/StartDtmfFuzzTest"
   module_out_path = module_output_path
   fuzz_config_file =
-      "//base/telephony/call_manager/test/fuzztest/dialcall_fuzzer"
+      "//base/telephony/call_manager/test/fuzztest/startdtmf_fuzzer"
   include_dirs = [ "//base/telephony/call_manager/test/fuzztest/common_fuzzer" ]
 
   configs = [ "//base/telephony/core_service/utils:telephony_log_config" ]
@@ -50,7 +50,7 @@ ohos_fuzztest("DialCallFuzzTest") {
   ]
   sources = [
     "//base/telephony/call_manager/test/fuzztest/common_fuzzer/addcalltoken_fuzzer.cpp",
-    "dialcall_fuzzer.cpp",
+    "startdtmf_fuzzer.cpp",
   ]
   if (is_standard_system) {
     external_deps += [ "hiviewdfx_hilog_native:libhilog" ]
@@ -65,7 +65,7 @@ group("fuzztest") {
   deps = []
   deps += [
     # deps file
-    ":DialCallFuzzTest",
+    ":StartDtmfFuzzTest",
   ]
 }
 ###############################################################################

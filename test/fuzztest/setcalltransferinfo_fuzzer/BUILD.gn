@@ -18,18 +18,17 @@ import("//build/ohos.gni")
 import("//build/test.gni")
 
 ##############################fuzztest##########################################
-ohos_fuzztest("DialCallFuzzTest") {
-  module_output_path = "call_manager/DialCallFuzzTest"
+ohos_fuzztest("SetCallTransferInfoFuzzTest") {
+  module_output_path = "call_manager/SetCallTransferInfoFuzzTest"
   module_out_path = module_output_path
   fuzz_config_file =
-      "//base/telephony/call_manager/test/fuzztest/dialcall_fuzzer"
+      "//base/telephony/call_manager/test/fuzztest/setcalltransferinfo_fuzzer"
   include_dirs = [ "//base/telephony/call_manager/test/fuzztest/common_fuzzer" ]
 
   configs = [ "//base/telephony/core_service/utils:telephony_log_config" ]
 
   deps =
       [ "//base/telephony/call_manager/frameworks/native:tel_call_manager_api" ]
-
   external_deps = [
     "ability_base:want",
     "access_token:libaccesstoken_sdk",
@@ -50,7 +49,7 @@ ohos_fuzztest("DialCallFuzzTest") {
   ]
   sources = [
     "//base/telephony/call_manager/test/fuzztest/common_fuzzer/addcalltoken_fuzzer.cpp",
-    "dialcall_fuzzer.cpp",
+    "setcalltransferinfo_fuzzer.cpp",
   ]
   if (is_standard_system) {
     external_deps += [ "hiviewdfx_hilog_native:libhilog" ]
@@ -65,7 +64,7 @@ group("fuzztest") {
   deps = []
   deps += [
     # deps file
-    ":DialCallFuzzTest",
+    ":SetCallTransferInfoFuzzTest",
   ]
 }
 ###############################################################################

@@ -16,31 +16,33 @@
 #include "rejectcall_fuzzer.h"
 #include <cstddef>
 #include <cstdint>
+#include "addcalltoken_fuzzer.h"
 #include "call_manager_client.h"
 #include "system_ability_definition.h"
 
 using namespace OHOS::Telephony;
 namespace OHOS {
-    void DoSomethingInterestingWithMyAPI(const uint8_t* data, size_t size)
-    {
-        if (data == nullptr || size <= 0) {
-            return;
-        }
-        auto cmClient = DelayedSingleton<CallManagerClient>::GetInstance();
-        if (!cmClient) {
-            return;
-        }
-
-        cmClient->Init(TELEPHONY_CALL_MANAGER_SYS_ABILITY_ID);
-        std::string number(reinterpret_cast<const char*>(data), size);
-        cmClient->RejectCall(size, true, Str8ToStr16(number));
-        cmClient->RejectCall(size, false, Str8ToStr16(number));
+void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
+{
+    if (data == nullptr || size <= 0) {
+        return;
     }
+    auto cmClient = DelayedSingleton<CallManagerClient>::GetInstance();
+    if (!cmClient) {
+        return;
+    }
+
+    cmClient->Init(TELEPHONY_CALL_MANAGER_SYS_ABILITY_ID);
+    std::string number(reinterpret_cast<const char *>(data), size);
+    cmClient->RejectCall(size, true, Str8ToStr16(number));
+    cmClient->RejectCall(size, false, Str8ToStr16(number));
+}
 }  // namespace OHOS
 
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
 {
+    OHOS::AddCallTokenFuzzer token;
     /* Run your code on data */
     OHOS::DoSomethingInterestingWithMyAPI(data, size);
     return 0;
