@@ -23,4 +23,6 @@ group("fuzztest") {
   deps += [ "isemergencyphonenumber_fuzzer:fuzztest" ]
   deps += [ "formatphonenumber_fuzzer:fuzztest" ]
   deps += [ "formatphonenumbertoe164_fuzzer:fuzztest" ]
+  deps += [ "setcalltransferinfo_fuzzer:fuzztest" ]
+  deps += [ "startdtmf_fuzzer:fuzztest" ]
 }
