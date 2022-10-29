@@ -36,8 +36,6 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
 
     cmClient->Init(TELEPHONY_CALL_MANAGER_SYS_ABILITY_ID);
     int32_t callId = size % 10;
-    cmClient->GetMainCallId(callId);
-
     char c = *reinterpret_cast<const char *>(data);
     cmClient->StartDtmf(callId, c);
 }

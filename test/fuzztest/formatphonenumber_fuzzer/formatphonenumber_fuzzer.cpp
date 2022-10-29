@@ -33,6 +33,7 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
 
     cmClient->Init(TELEPHONY_CALL_MANAGER_SYS_ABILITY_ID);
 
+    int32_t callId = static_cast<int32_t>(size);
     std::string number(reinterpret_cast<const char *>(data), size);
     auto numberU16 = Str8ToStr16(number);
     std::string formatNumber(reinterpret_cast<const char *>(data), size);
@@ -40,6 +41,10 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     std::string countryCode(reinterpret_cast<const char *>(data), size);
     auto countryCodeU16 = Str8ToStr16(countryCode);
 
+    cmClient->GetMainCallId(callId);
+    cmClient->GetSubCallIdList(callId);
+    cmClient->GetCallIdListForConference(callId);
+    cmClient->GetCallRestriction(callId, static_cast<CallRestrictionType>(size));
     cmClient->FormatPhoneNumber(numberU16, countryCodeU16, formatNumberU16);
 }
 }  // namespace OHOS
