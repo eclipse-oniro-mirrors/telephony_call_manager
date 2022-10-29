@@ -78,9 +78,6 @@ private:
     sptr<CallDataRdbObserver> callDataRdbObserverPtr_;
     std::shared_ptr<AppExecFwk::DataAbilityHelper> CreateDataAHelper();
     void ResultSetConvertToIndexer(const std::shared_ptr<NativeRdb::AbsSharedResultSet> &resultSet);
-    const std::string CALL_SUBSECTION = "dataability:///com.ohos.calllogability/calls/calllog";
-    const std::string CALL_BLOCK = "dataability:///com.ohos.contactsdataability/contacts/contact_blocklist";
-    const std::string CONTACT_DATA = "dataability:///com.ohos.contactsdataability/contacts/contact_data";
 };
 } // namespace Telephony
 } // namespace OHOS

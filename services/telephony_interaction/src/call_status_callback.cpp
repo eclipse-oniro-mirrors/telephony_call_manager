@@ -53,6 +53,7 @@ int32_t CallStatusCallback::UpdateCallsReportInfo(const CallsReportInfo &info)
 {
     CallDetailsInfo detailsInfo;
     CallDetailInfo detailInfo;
+    detailInfo.state = TelCallState::CALL_STATUS_UNKNOWN;
     CallsReportInfo callsInfo = info;
     std::vector<CallReportInfo>::iterator it = callsInfo.callVec.begin();
     for (; it != callsInfo.callVec.end(); ++it) {
@@ -149,7 +150,7 @@ int32_t CallStatusCallback::SendUssdResult(const int32_t result)
 
 int32_t CallStatusCallback::SendMmiCodeResult(const MmiCodeInfo &info)
 {
-    TELEPHONY_LOGI("SendMmiCodeResult  result = %{public}d, message = %{public}s", info.result, info.message);
+    TELEPHONY_LOGI("SendMmiCodeResult result = %{public}d, message = %{public}s", info.result, info.message);
     int32_t ret = DelayedSingleton<CallAbilityReportProxy>::GetInstance()->ReportMmiCodeResult(info);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("UpdateDisconnectedCause failed! errCode:%{public}d", ret);
@@ -170,8 +171,8 @@ int32_t CallStatusCallback::GetImsCallDataResult(const int32_t result)
 
 int32_t CallStatusCallback::UpdateGetWaitingResult(const CallWaitResponse &response)
 {
-    TELEPHONY_LOGI("GetWaitingResult  status = %{public}d, classCw = %{public}d, result = %{public}d",
-        response.status, response.classCw, response.result);
+    TELEPHONY_LOGI("GetWaitingResult status = %{public}d, classCw = %{public}d, result = %{public}d", response.status,
+        response.classCw, response.result);
     CallResultReportId reportId = CallResultReportId::GET_CALL_WAITING_REPORT_ID;
     AppExecFwk::PacMap resultInfo;
     resultInfo.PutIntValue("result", response.result);
@@ -183,7 +184,7 @@ int32_t CallStatusCallback::UpdateGetWaitingResult(const CallWaitResponse &respo
 
 int32_t CallStatusCallback::UpdateSetWaitingResult(const int32_t result)
 {
-    TELEPHONY_LOGI("SetWaitingResult  result = %{public}d", result);
+    TELEPHONY_LOGI("SetWaitingResult result = %{public}d", result);
     CallResultReportId reportId = CallResultReportId::SET_CALL_WAITING_REPORT_ID;
     AppExecFwk::PacMap resultInfo;
     resultInfo.PutIntValue("result", result);
@@ -193,7 +194,7 @@ int32_t CallStatusCallback::UpdateSetWaitingResult(const int32_t result)
 
 int32_t CallStatusCallback::UpdateGetRestrictionResult(const CallRestrictionResponse &result)
 {
-    TELEPHONY_LOGI("GetRestrictionResult  status = %{public}d, classCw = %{public}d, result = %{public}d",
+    TELEPHONY_LOGI("GetRestrictionResult status = %{public}d, classCw = %{public}d, result = %{public}d",
         result.status, result.classCw, result.result);
     CallResultReportId reportId = CallResultReportId::GET_CALL_RESTRICTION_REPORT_ID;
     AppExecFwk::PacMap resultInfo;
@@ -205,7 +206,7 @@ int32_t CallStatusCallback::UpdateGetRestrictionResult(const CallRestrictionResp
 
 int32_t CallStatusCallback::UpdateSetRestrictionResult(const int32_t result)
 {
-    TELEPHONY_LOGI("SetRestrictionResult  result = %{public}d", result);
+    TELEPHONY_LOGI("SetRestrictionResult result = %{public}d", result);
     CallResultReportId reportId = CallResultReportId::SET_CALL_RESTRICTION_REPORT_ID;
     AppExecFwk::PacMap resultInfo;
     resultInfo.PutIntValue("result", result);
@@ -228,7 +229,7 @@ int32_t CallStatusCallback::UpdateGetTransferResult(const CallTransferResponse &
 
 int32_t CallStatusCallback::UpdateSetTransferResult(const int32_t result)
 {
-    TELEPHONY_LOGI("SetTransferResult  result = %{public}d", result);
+    TELEPHONY_LOGI("SetTransferResult result = %{public}d", result);
     CallResultReportId reportId = CallResultReportId::SET_CALL_TRANSFER_REPORT_ID;
     AppExecFwk::PacMap resultInfo;
     resultInfo.PutIntValue("result", result);
@@ -237,7 +238,7 @@ int32_t CallStatusCallback::UpdateSetTransferResult(const int32_t result)
 
 int32_t CallStatusCallback::UpdateGetCallClipResult(const ClipResponse &clipResponse)
 {
-    TELEPHONY_LOGI("GetCallClipResult  action = %{public}d, clipStat = %{public}d, result = %{public}d",
+    TELEPHONY_LOGI("GetCallClipResult action = %{public}d, clipStat = %{public}d, result = %{public}d",
         clipResponse.action, clipResponse.clipStat, clipResponse.result);
     CallResultReportId reportId = CallResultReportId::GET_CALL_CLIP_ID;
     AppExecFwk::PacMap resultInfo;
@@ -249,7 +250,7 @@ int32_t CallStatusCallback::UpdateGetCallClipResult(const ClipResponse &clipResp
 
 int32_t CallStatusCallback::UpdateGetCallClirResult(const ClirResponse &clirResponse)
 {
-    TELEPHONY_LOGI("GetCallClirResult  action = %{public}d, clirStat = %{public}d, result = %{public}d",
+    TELEPHONY_LOGI("GetCallClirResult action = %{public}d, clirStat = %{public}d, result = %{public}d",
         clirResponse.action, clirResponse.clirStat, clirResponse.result);
     CallResultReportId reportId = CallResultReportId::GET_CALL_CLIR_ID;
     AppExecFwk::PacMap resultInfo;
@@ -261,7 +262,7 @@ int32_t CallStatusCallback::UpdateGetCallClirResult(const ClirResponse &clirResp
 
 int32_t CallStatusCallback::UpdateSetCallClirResult(const int32_t result)
 {
-    TELEPHONY_LOGI("GetCallClirResult  result = %{public}d", result);
+    TELEPHONY_LOGI("GetCallClirResult result = %{public}d", result);
     CallResultReportId reportId = CallResultReportId::SET_CALL_CLIR_ID;
     AppExecFwk::PacMap resultInfo;
     resultInfo.PutIntValue("result", result);

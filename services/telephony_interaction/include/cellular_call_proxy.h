@@ -435,7 +435,6 @@ private:
     int32_t SetCommonParamForMessageParcel(int32_t slotId, MessageParcel &in);
 
 private:
-    const int32_t MAX_SIZE = 10;
     static inline BrokerDelegator<CellularCallProxy> delegator_;
 };
 } // namespace Telephony

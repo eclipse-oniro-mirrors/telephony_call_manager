@@ -39,6 +39,9 @@ constexpr int16_t CAMERA_ROTATION_ERROR = 50;
 #endif // CALL_MANAGER_IMS_LITE_UNSUPPORT
 #endif // TEL_TEST_UNSUPPORT
 constexpr int16_t SLEEP_1000_MS = 1000;
+constexpr int BASE_TIME_MS = 1000;
+constexpr int SLEEP_TIME_MS = 50;
+constexpr int MAX_LIMIT_TIME = 18000;
 const std::string PHONE_NUMBER = "xxxxx";
 
 int32_t CallInfoManager::CallDetailsChange(const CallAttributeInfo &info)
@@ -63,18 +66,16 @@ bool CallInfoManager::HasActiveStatus()
 {
     TELEPHONY_LOGI("Waiting for activation !");
     int sumUseTime = 0;
-    int slipMs = 50;
-    int increasingTime = 1000;
-    int useTimeMs = 18000;
+    int slipMs = SLEEP_TIME_MS;
     do {
-        if (!(HasState(newCallId_, (int32_t)TelCallState::CALL_STATUS_ACTIVE))) {
-            usleep(slipMs * increasingTime);
+        if (!(HasState(newCallId_, static_cast<int32_t>(TelCallState::CALL_STATUS_ACTIVE)))) {
+            usleep(slipMs * BASE_TIME_MS);
             sumUseTime += slipMs;
         } else {
             TELEPHONY_LOGI("===========wait %d ms callStatus:%d==============", sumUseTime, newCallState_);
             return true;
         }
-    } while (useTimeMs > sumUseTime);
+    } while (sumUseTime < MAX_LIMIT_TIME);
     TELEPHONY_LOGI("===========wait %d ms callStatus:%d=====not active=========", sumUseTime, newCallState_);
     return false;
 }
