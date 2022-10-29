@@ -29,6 +29,7 @@ ohos_fuzztest("SetCallTransferInfoFuzzTest") {
 
   deps =
       [ "//base/telephony/call_manager/frameworks/native:tel_call_manager_api" ]
+
   external_deps = [
     "ability_base:want",
     "access_token:libaccesstoken_sdk",
