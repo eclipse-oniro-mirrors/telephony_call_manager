@@ -40,6 +40,10 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     (void)memcpy_s(info.transferNum, kMaxNumberLen, reinterpret_cast<const char *>(data), size);
     info.settingType = CallTransferSettingType::CALL_TRANSFER_ENABLE;
     info.type = CallTransferType::TRANSFER_TYPE_BUSY;
+    cmClient->IsImsSwitchEnabled(slotId);
+    cmClient->GetImsConfig(slotId, static_cast<ImsConfigItem>(size));
+    cmClient->GetImsFeatureValue(slotId, static_cast<FeatureType>(size));
+    cmClient->GetCallTransferInfo(slotId, static_cast<CallTransferType>(size));
     cmClient->SetCallTransferInfo(slotId, info);
 }
 } // namespace OHOS
