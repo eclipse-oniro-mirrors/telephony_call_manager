@@ -40,12 +40,8 @@ AddCallTokenFuzzer::AddCallTokenFuzzer()
         .aplStr = "system_basic",
     };
     currentID_ = GetAccessTokenId(&testCallInfoParams);
-    std::cout << "AddCallTokenFuzzer currentID_ : " << currentID_ << std::endl;
     SetSelfTokenID(currentID_);
     Security::AccessToken::AccessTokenKit::ReloadNativeTokenInfo();
 }
-AddCallTokenFuzzer::~AddCallTokenFuzzer()
-{
-    std::cout << "AddCallTokenFuzzer ~AddCallTokenFuzzer" << std::endl;
-}
+AddCallTokenFuzzer::~AddCallTokenFuzzer() {}
 } // namespace OHOS
