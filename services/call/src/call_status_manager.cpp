@@ -119,7 +119,7 @@ int32_t CallStatusManager::HandleCallsReportInfo(const CallDetailsInfo &info)
     bool flag = false;
     TELEPHONY_LOGI("call list size:%{public}zu,slotId:%{public}d", info.callVec.size(), info.slotId);
     for (auto &it : info.callVec) {
-        for (auto &it1 : callDetailsInfo_.callVec) {
+        for (const auto &it1 : callDetailsInfo_.callVec) {
             if (strcmp(it.phoneNum, it1.phoneNum) == 0) {
                 // call state changes
                 if (it.state != it1.state) {
@@ -139,7 +139,7 @@ int32_t CallStatusManager::HandleCallsReportInfo(const CallDetailsInfo &info)
     }
     // disconnected calls handle
     for (auto &it2 : callDetailsInfo_.callVec) {
-        for (auto &it3 : info.callVec) {
+        for (const auto &it3 : info.callVec) {
             if (strcmp(it2.phoneNum, it3.phoneNum) == 0) {
                 TELEPHONY_LOGI("state:%{public}d", it2.state);
                 flag = true;
