@@ -1593,15 +1593,22 @@ napi_value NapiCallManager::FormatPhoneNumberToE164(napi_env env, napi_callback_
 napi_value NapiCallManager::ObserverOn(napi_env env, napi_callback_info info)
 {
     GET_PARAMS(env, info, VALUE_MAXIMUM_LIMIT);
-    if ((argc > VALUE_MAXIMUM_LIMIT) ||
+    if ((argc > TWO_VALUE_LIMIT) ||
         (!NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_FIRST], napi_string))) {
-        NAPI_CALL(env, napi_throw_error(env, std::to_string(JS_ERROR_TELEPHONY_INVALID_INPUT_PARAMETER).c_str(),
-                           JS_ERROR_TELEPHONY_INVALID_INPUT_PARAMETER_STRING));
+        NapiUtil::ThrowError(
+            env, JS_ERROR_TELEPHONY_INVALID_INPUT_PARAMETER, JS_ERROR_TELEPHONY_INVALID_INPUT_PARAMETER_STRING);
         return nullptr;
     }
+
+    if ((argc == TWO_VALUE_LIMIT) &&
+        (!NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_SECOND], napi_function))) {
+        NapiUtil::ThrowError(
+            env, JS_ERROR_TELEPHONY_INVALID_INPUT_PARAMETER, JS_ERROR_TELEPHONY_INVALID_INPUT_PARAMETER_STRING);
+        return nullptr;
+    }
+
     if (registerStatus_ == TELEPHONY_ERR_PERMISSION_ERR) {
-        NAPI_CALL(env, napi_throw_error(env, std::to_string(JS_ERROR_TELEPHONY_PERMISSION_DENIED).c_str(),
-                           OBSERVER_ON_JS_PERMISSION_ERROR_STRING));
+        NapiUtil::ThrowError(env, JS_ERROR_TELEPHONY_PERMISSION_DENIED, OBSERVER_ON_JS_PERMISSION_ERROR_STRING);
         return nullptr;
     }
     char listenerType[PHONE_NUMBER_MAXIMUM_LIMIT + 1] = { 0 };
@@ -1632,27 +1639,26 @@ napi_value NapiCallManager::ObserverOn(napi_env env, napi_callback_info info)
 napi_value NapiCallManager::ObserverOff(napi_env env, napi_callback_info info)
 {
     GET_PARAMS(env, info, VALUE_MAXIMUM_LIMIT);
-    if ((argc > VALUE_MAXIMUM_LIMIT) ||
+    if ((argc > TWO_VALUE_LIMIT) ||
         (!NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_FIRST], napi_string))) {
-        NAPI_CALL(env, napi_throw_error(env, std::to_string(JS_ERROR_TELEPHONY_INVALID_INPUT_PARAMETER).c_str(),
-                           JS_ERROR_TELEPHONY_INVALID_INPUT_PARAMETER_STRING));
+        NapiUtil::ThrowError(
+            env, JS_ERROR_TELEPHONY_INVALID_INPUT_PARAMETER, JS_ERROR_TELEPHONY_INVALID_INPUT_PARAMETER_STRING);
         return nullptr;
     }
-    if ((argc > ONLY_ONE_VALUE) &&
+    if ((argc == TWO_VALUE_LIMIT) &&
         (!NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_SECOND], napi_function))) {
-        NAPI_CALL(env, napi_throw_error(env, std::to_string(JS_ERROR_TELEPHONY_INVALID_INPUT_PARAMETER).c_str(),
-                           JS_ERROR_TELEPHONY_INVALID_INPUT_PARAMETER_STRING));
+        NapiUtil::ThrowError(
+            env, JS_ERROR_TELEPHONY_INVALID_INPUT_PARAMETER, JS_ERROR_TELEPHONY_INVALID_INPUT_PARAMETER_STRING);
         return nullptr;
     }
     if (registerStatus_ == TELEPHONY_ERR_PERMISSION_ERR) {
-        NAPI_CALL(env, napi_throw_error(env, std::to_string(JS_ERROR_TELEPHONY_PERMISSION_DENIED).c_str(),
-                           OBSERVER_OFF_JS_PERMISSION_ERROR_STRING));
+        NapiUtil::ThrowError(env, JS_ERROR_TELEPHONY_PERMISSION_DENIED, OBSERVER_OFF_JS_PERMISSION_ERROR_STRING);
         return nullptr;
     }
     auto asyncContext = std::make_unique<AsyncContext>();
     if (asyncContext == nullptr) {
         JsError error = NapiUtil::ConverErrorMessageForJs(ERROR_PARAMETER_TYPE_INVALID);
-        NAPI_CALL(env, napi_throw_error(env, error.errorMessage.c_str(), std::to_string(error.errorCode).c_str()));
+        NapiUtil::ThrowError(env, error.errorCode, error.errorMessage);
         return nullptr;
     }
     char listenerType[PHONE_NUMBER_MAXIMUM_LIMIT + 1] = {0};
