@@ -179,7 +179,7 @@ void ReportCallInfoHandler::OnUpdateMediaModeResponse(const AppExecFwk::InnerEve
         TELEPHONY_LOGE("object is nullptr!");
         return;
     }
-    std::string phoneNumber(object->phoneNum);
+
     sptr<CallBase> call = CallObjectManager::GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_ACTIVE);
     if (call == nullptr) {
         TELEPHONY_LOGE("call not exists");

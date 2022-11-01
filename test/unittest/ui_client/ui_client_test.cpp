@@ -110,7 +110,6 @@ void RejectCall()
     int32_t boolValue = DEFAULT_VALUE;
     bool flag = false;
     std::u16string content;
-    std::string tmpStr;
     content.clear();
     std::cout << "------Reject------" << std::endl;
     std::cout << "please input callId:" << std::endl;
@@ -119,8 +118,9 @@ void RejectCall()
     std::cin >> boolValue;
     if (boolValue != DEFAULT_VALUE) {
         flag = true;
-        std::cout << "please input reject message:" << std::endl;
+        std::string tmpStr;
         tmpStr.clear();
+        std::cout << "please input reject message:" << std::endl;
         std::cin >> tmpStr;
         content = Str8ToStr16(tmpStr);
     }
@@ -755,7 +755,9 @@ void ControlCamera()
     for (auto &it : cameraObjList) {
         tmpStr = it->GetID();
         std::cout << "camManagerObj->GetCameras Camera ID:" << tmpStr.c_str() << std::endl;
-        break;
+        if (!tmpStr.empty()) {
+            break;
+        }
     }
 
     std::u16string CameraID;
