@@ -53,6 +53,10 @@ void CallRequestProcess::DialRequest()
                 CallEventInfo eventInfo;
                 (void)memset_s(eventInfo.phoneNum, kMaxNumberLen, 0, kMaxNumberLen);
                 eventInfo.eventId = CallAbilityEventId::EVENT_INVALID_FDN_NUMBER;
+                if (info.number.length() > static_cast<size_t>(kMaxNumberLen)) {
+                    TELEPHONY_LOGE("Number out of limit!");
+                    return;
+                }
                 (void)memcpy_s(eventInfo.phoneNum, kMaxNumberLen, info.number.c_str(), info.number.length());
                 DelayedSingleton<CallControlManager>::GetInstance()->NotifyCallEventUpdated(eventInfo);
                 TELEPHONY_LOGW("invalid fdn number!");
@@ -330,6 +334,10 @@ int32_t CallRequestProcess::PackCellularCallInfo(DialParaInfo &info, CellularCal
     if (memset_s(callInfo.phoneNum, kMaxNumberLen, 0, kMaxNumberLen) != EOK) {
         TELEPHONY_LOGW("memset_s failed!");
         return TELEPHONY_ERR_MEMSET_FAIL;
+    }
+    if (info.number.length() > static_cast<size_t>(kMaxNumberLen)) {
+        TELEPHONY_LOGE("Number out of limit!");
+        return CALL_ERR_NUMBER_OUT_OF_RANGE;
     }
     if (memcpy_s(callInfo.phoneNum, kMaxNumberLen, info.number.c_str(), info.number.length()) != EOK) {
         TELEPHONY_LOGE("memcpy_s failed!");

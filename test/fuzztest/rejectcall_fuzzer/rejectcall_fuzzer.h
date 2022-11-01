@@ -13,10 +13,9 @@
  * limitations under the License.
  */
 
-#ifndef REJECTCALL_fuzzer_H_
-#define REJECTCALL_fuzzer_H_
+#ifndef REJECTCALL_fuzzer_H
+#define REJECTCALL_fuzzer_H
 
 #define FUZZ_PROJECT_NAME "rejectcall_fuzzer"
 
-#endif // REJECTCALL_fuzzer_H_
-
+#endif // REJECTCALL_fuzzer_H

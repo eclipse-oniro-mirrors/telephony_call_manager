@@ -54,7 +54,7 @@ int32_t OTTCall::AnswerCall(int32_t videoState)
     OttCallRequestInfo requestInfo;
     ret = PackOttCallRequestInfo(requestInfo);
     if (ret != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("PackOttCallRequestInfo failed,  error%{public}d", ret);
+        TELEPHONY_LOGE("PackOttCallRequestInfo failed, error%{public}d", ret);
         CallManagerHisysevent::WriteAnswerCallFaultEvent(
             INVALID_PARAMETER, INVALID_PARAMETER, videoState, ret, "PackOttCallRequestInfo failed");
         return CALL_ERR_ANSWER_FAILED;
@@ -80,7 +80,7 @@ int32_t OTTCall::RejectCall()
     OttCallRequestInfo requestInfo;
     ret = PackOttCallRequestInfo(requestInfo);
     if (ret != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("PackOttCallRequestInfo failed,  error%{public}d", ret);
+        TELEPHONY_LOGE("PackOttCallRequestInfo failed, error%{public}d", ret);
         CallManagerHisysevent::WriteHangUpFaultEvent(
             INVALID_PARAMETER, INVALID_PARAMETER, ret, "Reject PackOttCallRequestInfo failed");
         return CALL_ERR_REJECT_FAILED;
@@ -98,7 +98,7 @@ int32_t OTTCall::HangUpCall()
     OttCallRequestInfo requestInfo;
     int32_t ret = PackOttCallRequestInfo(requestInfo);
     if (ret != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("PackOttCallRequestInfo failed,  error%{public}d", ret);
+        TELEPHONY_LOGE("PackOttCallRequestInfo failed, error%{public}d", ret);
         CallManagerHisysevent::WriteHangUpFaultEvent(
             INVALID_PARAMETER, INVALID_PARAMETER, ret, "HangUp PackOttCallRequestInfo failed");
         return CALL_ERR_HANGUP_FAILED;
@@ -116,7 +116,7 @@ int32_t OTTCall::HoldCall()
     OttCallRequestInfo requestInfo;
     int32_t ret = PackOttCallRequestInfo(requestInfo);
     if (ret != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("PackOttCallRequestInfo failed,  error%{public}d", ret);
+        TELEPHONY_LOGE("PackOttCallRequestInfo failed, error%{public}d", ret);
         return CALL_ERR_HOLD_FAILED;
     }
     ret = ottCallConnectionPtr_->HoldCall(requestInfo);
@@ -132,7 +132,7 @@ int32_t OTTCall::UnHoldCall()
     OttCallRequestInfo requestInfo;
     int32_t ret = PackOttCallRequestInfo(requestInfo);
     if (ret != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("PackOttCallRequestInfo failed,  error%{public}d", ret);
+        TELEPHONY_LOGE("PackOttCallRequestInfo failed, error%{public}d", ret);
         return CALL_ERR_UNHOLD_FAILED;
     }
     ret = ottCallConnectionPtr_->UnHoldCall(requestInfo);
@@ -148,7 +148,7 @@ int32_t OTTCall::SwitchCall()
     OttCallRequestInfo requestInfo;
     int32_t ret = PackOttCallRequestInfo(requestInfo);
     if (ret != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("PackOttCallRequestInfo failed,  error%{public}d", ret);
+        TELEPHONY_LOGE("PackOttCallRequestInfo failed, error%{public}d", ret);
         return CALL_ERR_UNHOLD_FAILED;
     }
     ret = ottCallConnectionPtr_->SwitchCall(requestInfo);
@@ -194,7 +194,7 @@ int32_t OTTCall::CombineConference()
     OttCallRequestInfo requestInfo;
     ret = PackOttCallRequestInfo(requestInfo);
     if (ret != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("PackOttCallRequestInfo failed,  error%{public}d", ret);
+        TELEPHONY_LOGE("PackOttCallRequestInfo failed, error%{public}d", ret);
         return ret;
     }
     if (ottCallConnectionPtr_ == nullptr) {
@@ -219,7 +219,7 @@ int32_t OTTCall::SeparateConference()
     OttCallRequestInfo requestInfo;
     int32_t ret = PackOttCallRequestInfo(requestInfo);
     if (ret != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("PackOttCallRequestInfo failed,  error%{public}d", ret);
+        TELEPHONY_LOGE("PackOttCallRequestInfo failed, error%{public}d", ret);
         return ret;
     }
     if (ottCallConnectionPtr_ == nullptr) {
@@ -326,9 +326,17 @@ int32_t OTTCall::SetMute(int32_t mute, int32_t slotId)
 
 int32_t OTTCall::PackOttCallRequestInfo(OttCallRequestInfo &requestInfo)
 {
+    if (accountNumber_.length() > static_cast<size_t>(kMaxNumberLen)) {
+        TELEPHONY_LOGE("Number out of limit!");
+        return CALL_ERR_NUMBER_OUT_OF_RANGE;
+    }
     if (memcpy_s(requestInfo.phoneNum, kMaxNumberLen, accountNumber_.c_str(), accountNumber_.length()) != EOK) {
         TELEPHONY_LOGW("memset_s failed!");
         return TELEPHONY_ERR_MEMSET_FAIL;
+    }
+    if (bundleName_.length() > static_cast<size_t>(kMaxBundleNameLen)) {
+        TELEPHONY_LOGE("Number out of limit!");
+        return CALL_ERR_NUMBER_OUT_OF_RANGE;
     }
     if (memcpy_s(requestInfo.bundleName, kMaxBundleNameLen, bundleName_.c_str(), bundleName_.length()) != EOK) {
         TELEPHONY_LOGW("memset_s failed!");

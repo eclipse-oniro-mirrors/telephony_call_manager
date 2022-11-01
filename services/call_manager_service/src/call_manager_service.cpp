@@ -32,7 +32,9 @@
 namespace OHOS {
 namespace Telephony {
 const std::string OHOS_PERMISSION_SET_TELEPHONY_STATE = "ohos.permission.SET_TELEPHONY_STATE";
+const std::string OHOS_PERMISSION_GET_TELEPHONY_STATE = "ohos.permission.GET_TELEPHONY_STATE";
 const std::string OHOS_PERMISSION_PLACE_CALL = "ohos.permission.PLACE_CALL";
+const std::string OHOS_PERMISSION_ANSWER_CALL = "ohos.permission.ANSWER_CALL";
 
 const bool g_registerResult =
     SystemAbility::MakeAndRegisterAbility(DelayedSingleton<CallManagerService>::GetInstance().get());
@@ -92,12 +94,12 @@ void CallManagerService::OnStart()
 
     state_ = ServiceRunningState::STATE_RUNNING;
     struct tm *timeNow = nullptr;
-    struct tm nowTime = {0};
+    struct tm nowTime = { 0 };
     time_t second = time(0);
     if (second < 0) {
         return;
     }
-    timeNow = localtime_r(&second,  &nowTime);
+    timeNow = localtime_r(&second, &nowTime);
     if (timeNow != nullptr) {
         spendTime_ = duration_cast<std::chrono::milliseconds>(high_resolution_clock::now() - beginTime).count();
         TELEPHONY_LOGI(
@@ -112,12 +114,12 @@ void CallManagerService::OnStop()
 {
     std::lock_guard<std::mutex> guard(lock_);
     struct tm *timeNow = nullptr;
-    struct tm nowTime = {0};
+    struct tm nowTime = { 0 };
     time_t second = time(0);
     if (second < 0) {
         return;
     }
-    timeNow = localtime_r(&second,  &nowTime);
+    timeNow = localtime_r(&second, &nowTime);
     if (timeNow != nullptr) {
         TELEPHONY_LOGI(
             "CallManagerService dump time:%{public}d-%{public}d-%{public}d %{public}d:%{public}d:%{public}d",
@@ -228,6 +230,10 @@ int32_t CallManagerService::DialCall(std::u16string number, AppExecFwk::PacMap &
 
 int32_t CallManagerService::AnswerCall(int32_t callId, int32_t videoState)
 {
+    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_ANSWER_CALL)) {
+        TELEPHONY_LOGE("Permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
     DelayedSingleton<CallManagerHisysevent>::GetInstance()->SetAnswerStartTime();
     if (callControlManagerPtr_ != nullptr) {
         return callControlManagerPtr_->AnswerCall(callId, videoState);
@@ -239,6 +245,10 @@ int32_t CallManagerService::AnswerCall(int32_t callId, int32_t videoState)
 
 int32_t CallManagerService::RejectCall(int32_t callId, bool rejectWithMessage, std::u16string textMessage)
 {
+    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_ANSWER_CALL)) {
+        TELEPHONY_LOGE("Permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
     if (callControlManagerPtr_ != nullptr) {
         return callControlManagerPtr_->RejectCall(callId, rejectWithMessage, textMessage);
     } else {
@@ -249,6 +259,10 @@ int32_t CallManagerService::RejectCall(int32_t callId, bool rejectWithMessage, s
 
 int32_t CallManagerService::HangUpCall(int32_t callId)
 {
+    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_ANSWER_CALL)) {
+        TELEPHONY_LOGE("Permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
     if (callControlManagerPtr_ != nullptr) {
         return callControlManagerPtr_->HangUpCall(callId);
     } else {
@@ -269,6 +283,10 @@ int32_t CallManagerService::GetCallState()
 
 int32_t CallManagerService::HoldCall(int32_t callId)
 {
+    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_ANSWER_CALL)) {
+        TELEPHONY_LOGE("Permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
     if (callControlManagerPtr_ != nullptr) {
         return callControlManagerPtr_->HoldCall(callId);
     } else {
@@ -279,6 +297,10 @@ int32_t CallManagerService::HoldCall(int32_t callId)
 
 int32_t CallManagerService::UnHoldCall(int32_t callId)
 {
+    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_ANSWER_CALL)) {
+        TELEPHONY_LOGE("Permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
     if (callControlManagerPtr_ != nullptr) {
         return callControlManagerPtr_->UnHoldCall(callId);
     } else {
@@ -289,6 +311,10 @@ int32_t CallManagerService::UnHoldCall(int32_t callId)
 
 int32_t CallManagerService::SwitchCall(int32_t callId)
 {
+    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_ANSWER_CALL)) {
+        TELEPHONY_LOGE("Permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
     if (callControlManagerPtr_ != nullptr) {
         return callControlManagerPtr_->SwitchCall(callId);
     } else {
@@ -367,6 +393,10 @@ int32_t CallManagerService::StopDtmf(int32_t callId)
 
 int32_t CallManagerService::GetCallWaiting(int32_t slotId)
 {
+    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_GET_TELEPHONY_STATE)) {
+        TELEPHONY_LOGE("Permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
     if (callControlManagerPtr_ != nullptr) {
         return callControlManagerPtr_->GetCallWaiting(slotId);
     } else {
@@ -377,6 +407,10 @@ int32_t CallManagerService::GetCallWaiting(int32_t slotId)
 
 int32_t CallManagerService::SetCallWaiting(int32_t slotId, bool activate)
 {
+    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_SET_TELEPHONY_STATE)) {
+        TELEPHONY_LOGE("Permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
     if (callControlManagerPtr_ != nullptr) {
         return callControlManagerPtr_->SetCallWaiting(slotId, activate);
     } else {
@@ -387,6 +421,10 @@ int32_t CallManagerService::SetCallWaiting(int32_t slotId, bool activate)
 
 int32_t CallManagerService::GetCallRestriction(int32_t slotId, CallRestrictionType type)
 {
+    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_GET_TELEPHONY_STATE)) {
+        TELEPHONY_LOGE("Permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
     if (callControlManagerPtr_ != nullptr) {
         return callControlManagerPtr_->GetCallRestriction(slotId, type);
     } else {
@@ -397,6 +435,10 @@ int32_t CallManagerService::GetCallRestriction(int32_t slotId, CallRestrictionTy
 
 int32_t CallManagerService::SetCallRestriction(int32_t slotId, CallRestrictionInfo &info)
 {
+    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_SET_TELEPHONY_STATE)) {
+        TELEPHONY_LOGE("Permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
     if (callControlManagerPtr_ != nullptr) {
         return callControlManagerPtr_->SetCallRestriction(slotId, info);
     } else {
@@ -407,6 +449,10 @@ int32_t CallManagerService::SetCallRestriction(int32_t slotId, CallRestrictionIn
 
 int32_t CallManagerService::GetCallTransferInfo(int32_t slotId, CallTransferType type)
 {
+    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_GET_TELEPHONY_STATE)) {
+        TELEPHONY_LOGE("Permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
     if (callControlManagerPtr_ != nullptr) {
         return callControlManagerPtr_->GetCallTransferInfo(slotId, type);
     } else {
@@ -417,6 +463,10 @@ int32_t CallManagerService::GetCallTransferInfo(int32_t slotId, CallTransferType
 
 int32_t CallManagerService::SetCallTransferInfo(int32_t slotId, CallTransferInfo &info)
 {
+    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_SET_TELEPHONY_STATE)) {
+        TELEPHONY_LOGE("Permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
     if (callControlManagerPtr_ != nullptr) {
         return callControlManagerPtr_->SetCallTransferInfo(slotId, info);
     } else {
@@ -427,6 +477,10 @@ int32_t CallManagerService::SetCallTransferInfo(int32_t slotId, CallTransferInfo
 
 int32_t CallManagerService::SetCallPreferenceMode(int32_t slotId, int32_t mode)
 {
+    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_SET_TELEPHONY_STATE)) {
+        TELEPHONY_LOGE("Permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
     if (callControlManagerPtr_ != nullptr) {
         return callControlManagerPtr_->SetCallPreferenceMode(slotId, mode);
     } else {
@@ -688,6 +742,10 @@ int32_t CallManagerService::UpdateImsCallMode(int32_t callId, ImsCallMode mode)
 
 int32_t CallManagerService::EnableImsSwitch(int32_t slotId)
 {
+    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_SET_TELEPHONY_STATE)) {
+        TELEPHONY_LOGE("Permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
     if (callControlManagerPtr_ != nullptr) {
         return callControlManagerPtr_->EnableImsSwitch(slotId);
     } else {
@@ -698,6 +756,10 @@ int32_t CallManagerService::EnableImsSwitch(int32_t slotId)
 
 int32_t CallManagerService::DisableImsSwitch(int32_t slotId)
 {
+    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_SET_TELEPHONY_STATE)) {
+        TELEPHONY_LOGE("Permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
     if (callControlManagerPtr_ != nullptr) {
         return callControlManagerPtr_->DisableImsSwitch(slotId);
     } else {

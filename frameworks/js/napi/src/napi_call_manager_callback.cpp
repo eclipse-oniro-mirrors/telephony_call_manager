@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -44,9 +44,9 @@ int32_t NapiCallManagerCallback::OnCallEventChange(const CallEventInfo &info)
     return ret;
 }
 
-int32_t NapiCallManagerCallback::OnCallDisconnectedCause(DisconnectedDetails cause)
+int32_t NapiCallManagerCallback::OnCallDisconnectedCause(const DisconnectedDetails &details)
 {
-    int32_t ret = DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->UpdateCallDisconnectedCause(cause);
+    int32_t ret = DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->UpdateCallDisconnectedCause(details);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("UpdateCallDisconnectedCause failed! errCode:%{public}d", ret);
     } else {

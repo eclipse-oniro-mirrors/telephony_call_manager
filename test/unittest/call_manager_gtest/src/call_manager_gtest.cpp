@@ -39,6 +39,9 @@ constexpr int16_t CAMERA_ROTATION_ERROR = 50;
 #endif // CALL_MANAGER_IMS_LITE_UNSUPPORT
 #endif // TEL_TEST_UNSUPPORT
 constexpr int16_t SLEEP_1000_MS = 1000;
+constexpr int BASE_TIME_MS = 1000;
+constexpr int SLEEP_TIME_MS = 50;
+constexpr int MAX_LIMIT_TIME = 18000;
 const std::string PHONE_NUMBER = "xxxxx";
 
 int32_t CallInfoManager::CallDetailsChange(const CallAttributeInfo &info)
@@ -63,18 +66,16 @@ bool CallInfoManager::HasActiveStatus()
 {
     TELEPHONY_LOGI("Waiting for activation !");
     int sumUseTime = 0;
-    int slipMs = 50;
-    int increasingTime = 1000;
-    int useTimeMs = 18000;
+    int slipMs = SLEEP_TIME_MS;
     do {
-        if (!(HasState(newCallId_, (int32_t)TelCallState::CALL_STATUS_ACTIVE))) {
-            usleep(slipMs * increasingTime);
+        if (!(HasState(newCallId_, static_cast<int32_t>(TelCallState::CALL_STATUS_ACTIVE)))) {
+            usleep(slipMs * BASE_TIME_MS);
             sumUseTime += slipMs;
         } else {
             TELEPHONY_LOGI("===========wait %d ms callStatus:%d==============", sumUseTime, newCallState_);
             return true;
         }
-    } while (useTimeMs > sumUseTime);
+    } while (sumUseTime < MAX_LIMIT_TIME);
     TELEPHONY_LOGI("===========wait %d ms callStatus:%d=====not active=========", sumUseTime, newCallState_);
     return false;
 }
@@ -404,6 +405,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_1300, Function | Mediu
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_AnswerCall_0100, Function | MediumTest | Level2)
 {
+    AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
     }
@@ -421,6 +423,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_AnswerCall_0100, Function | Med
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_AnswerCall_0200, Function | MediumTest | Level2)
 {
+    AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
     }
@@ -438,6 +441,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_AnswerCall_0200, Function | Med
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_RejectCall_0100, Function | MediumTest | Level2)
 {
+    AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
     }
@@ -455,6 +459,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_RejectCall_0100, Function | Med
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_HangUpCall_0100, Function | MediumTest | Level2)
 {
+    AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
     }
@@ -471,6 +476,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_HangUpCall_0100, Function | Med
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_HangUpCall_0200, Function | MediumTest | Level2)
 {
+    AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
     }
@@ -489,6 +495,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_HangUpCall_0200, Function | Med
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_GetCallState_0100, Function | MediumTest | Level1)
 {
+    AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
     }
@@ -504,6 +511,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_GetCallState_0100, Function | M
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_GetCallState_0200, Function | MediumTest | Level1)
 {
+    AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
     }
@@ -521,6 +529,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_GetCallState_0200, Function | M
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_HoldCall_0100, Function | MediumTest | Level2)
 {
+    AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
     }
@@ -537,6 +546,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_HoldCall_0100, Function | Mediu
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_HoldCall_0200, Function | MediumTest | Level2)
 {
+    AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
     }
@@ -555,6 +565,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_HoldCall_0200, Function | Mediu
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_HoldCall_0600, Function | MediumTest | Level0)
 {
+    AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
     }
@@ -573,6 +584,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_HoldCall_0600, Function | Mediu
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_UnHoldCall_0100, Function | MediumTest | Level2)
 {
+    AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
     }
@@ -589,6 +601,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_UnHoldCall_0100, Function | Med
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_UnHoldCall_0200, Function | MediumTest | Level2)
 {
+    AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
     }
@@ -607,6 +620,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_UnHoldCall_0200, Function | Med
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_UnHoldCall_0600, Function | MediumTest | Level0)
 {
+    AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
     }
@@ -625,6 +639,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_UnHoldCall_0600, Function | Med
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_SwitchCall_0100, Function | MediumTest | Level2)
 {
+    AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
     }
@@ -664,6 +679,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SwitchCall_0200, Function | Med
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_HasCall_0100, Function | MediumTest | Level1)
 {
+    AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
     }
@@ -702,6 +718,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_HasCall_0200, Function | Medium
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_HasCall_0300, Function | MediumTest | Level1)
 {
+    AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
     }
@@ -739,6 +756,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_IsNewCallAllowed_0100, Function
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_IsRinging_0100, Function | MediumTest | Level1)
 {
+    AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
     }
@@ -757,6 +775,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_IsRinging_0100, Function | Medi
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_CombineConference_0100, Function | MediumTest | Level2)
 {
+    AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
     }
@@ -771,6 +790,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_CombineConference_0100, Functio
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_CombineConference_0200, Function | MediumTest | Level2)
 {
+    AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
     }
@@ -1061,6 +1081,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_IsEmergencyPhoneNumber_0700, Fu
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_GetCallWaiting_0100, Function | MediumTest | Level3)
 {
+    AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
     }
@@ -1427,6 +1448,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_FormatPhoneNumberToE164_0700, F
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallWaiting_0100, Function | MediumTest | Level3)
 {
+    AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
     }
@@ -1446,6 +1468,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallWaiting_0100, Function |
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallWaiting_0200, Function | MediumTest | Level3)
 {
+    AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
     }
@@ -1460,6 +1483,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallWaiting_0200, Function |
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallWaiting_0300, Function | MediumTest | Level3)
 {
+    AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
     }
@@ -1475,6 +1499,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallWaiting_0300, Function |
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallWaiting_0400, Function | MediumTest | Level3)
 {
+    AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
     }
@@ -1494,6 +1519,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallWaiting_0400, Function |
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallWaiting_0500, Function | MediumTest | Level3)
 {
+    AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
     }
@@ -1508,6 +1534,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallWaiting_0500, Function |
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallWaiting_0600, Function | MediumTest | Level3)
 {
+    AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
     }
@@ -1524,6 +1551,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallWaiting_0600, Function |
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_GetCallRestriction_0100, Function | MediumTest | Level3)
 {
+    AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
     }
@@ -1548,6 +1576,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_GetCallRestriction_0100, Functi
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_GetCallRestriction_0200, Function | MediumTest | Level3)
 {
+    AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
     }
@@ -1565,6 +1594,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_GetCallRestriction_0200, Functi
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_GetCallRestriction_0300, Function | MediumTest | Level3)
 {
+    AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
     }
@@ -1582,6 +1612,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_GetCallRestriction_0300, Functi
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_GetCallRestriction_0400, Function | MediumTest | Level3)
 {
+    AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
     }
@@ -1606,6 +1637,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_GetCallRestriction_0400, Functi
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_GetCallRestriction_0500, Function | MediumTest | Level3)
 {
+    AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
     }
@@ -1623,6 +1655,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_GetCallRestriction_0500, Functi
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_GetCallRestriction_0600, Function | MediumTest | Level3)
 {
+    AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
     }
@@ -1643,6 +1676,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_GetCallRestriction_0600, Functi
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallRestriction_0100, Function | MediumTest | Level3)
 {
+    AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
     }
@@ -1671,6 +1705,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallRestriction_0100, Functi
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallRestriction_0200, Function | MediumTest | Level3)
 {
+    AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
     }
@@ -1694,6 +1729,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallRestriction_0200, Functi
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallRestriction_0300, Function | MediumTest | Level3)
 {
+    AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
     }
@@ -1717,6 +1753,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallRestriction_0300, Functi
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_GetCallTransferInfo_0100, Function | MediumTest | Level3)
 {
+    AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
     }
@@ -1738,6 +1775,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_GetCallTransferInfo_0100, Funct
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_GetCallTransferInfo_0200, Function | MediumTest | Level3)
 {
+    AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
     }
@@ -1754,6 +1792,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_GetCallTransferInfo_0200, Funct
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_GetCallTransferInfo_0300, Function | MediumTest | Level3)
 {
+    AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
     }
@@ -1770,6 +1809,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_GetCallTransferInfo_0300, Funct
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_GetCallTransferInfo_0400, Function | MediumTest | Level3)
 {
+    AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
     }
@@ -1793,6 +1833,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_GetCallTransferInfo_0400, Funct
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_GetCallTransferInfo_0500, Function | MediumTest | Level3)
 {
+    AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
     }
@@ -1810,6 +1851,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_GetCallTransferInfo_0500, Funct
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_GetCallTransferInfo_0600, Function | MediumTest | Level3)
 {
+    AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
     }
@@ -1826,6 +1868,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_GetCallTransferInfo_0600, Funct
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_GetCallTransferInfo_0700, Function | MediumTest | Level3)
 {
+    AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
     }
@@ -1850,6 +1893,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_GetCallTransferInfo_0700, Funct
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_GetCallTransferInfo_0800, Function | MediumTest | Level3)
 {
+    AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
     }
@@ -1867,6 +1911,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_GetCallTransferInfo_0800, Funct
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_GetCallTransferInfo_0900, Function | MediumTest | Level3)
 {
+    AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
     }
@@ -1883,6 +1928,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_GetCallTransferInfo_0900, Funct
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_GetCallTransferInfo_1000, Function | MediumTest | Level3)
 {
+    AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
     }
@@ -1906,6 +1952,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_GetCallTransferInfo_1000, Funct
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallTransferInfo_0100, Function | MediumTest | Level3)
 {
+    AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
     }
@@ -1933,6 +1980,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallTransferInfo_0100, Funct
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallTransferInfo_0200, Function | MediumTest | Level3)
 {
+    AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
     }
@@ -1955,6 +2003,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallTransferInfo_0200, Funct
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallTransferInfo_0300, Function | MediumTest | Level3)
 {
+    AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
     }
@@ -1978,6 +2027,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallTransferInfo_0300, Funct
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallTransferInfo_0400, Function | MediumTest | Level3)
 {
+    AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
     }
@@ -2005,6 +2055,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallTransferInfo_0400, Funct
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallTransferInfo_0500, Function | MediumTest | Level3)
 {
+    AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
     }
@@ -2034,6 +2085,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallTransferInfo_0500, Funct
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallTransferInfo_0600, Function | MediumTest | Level3)
 {
+    AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
     }
@@ -2064,6 +2116,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallTransferInfo_0600, Funct
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_EnableImsSwitch_0100, Function | MediumTest | Level3)
 {
+    AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
     }
@@ -2083,6 +2136,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_EnableImsSwitch_0100, Function 
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_EnableImsSwitch_0200, Function | MediumTest | Level3)
 {
+    AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
     }
@@ -2097,6 +2151,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_EnableImsSwitch_0200, Function 
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_EnableImsSwitch_0300, Function | MediumTest | Level3)
 {
+    AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
     }
@@ -2113,6 +2168,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_EnableImsSwitch_0300, Function 
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_DisableImsSwitch_0100, Function | MediumTest | Level3)
 {
+    AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
     }
@@ -2132,6 +2188,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_DisableImsSwitch_0100, Function
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_DisableImsSwitch_0200, Function | MediumTest | Level3)
 {
+    AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
     }
@@ -2146,6 +2203,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_DisableImsSwitch_0200, Function
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_DisableImsSwitch_0300, Function | MediumTest | Level3)
 {
+    AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
     }
@@ -2162,6 +2220,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_DisableImsSwitch_0300, Function
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_IsImsSwitchEnabled_0100, Function | MediumTest | Level3)
 {
+    AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
     }
@@ -2181,6 +2240,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_IsImsSwitchEnabled_0100, Functi
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_IsImsSwitchEnabled_0200, Function | MediumTest | Level3)
 {
+    AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
     }
@@ -2195,6 +2255,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_IsImsSwitchEnabled_0200, Functi
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_IsImsSwitchEnabled_0300, Function | MediumTest | Level3)
 {
+    AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
     }

@@ -40,6 +40,7 @@
 
 namespace OHOS {
 namespace Telephony {
+const int32_t MAX_LEN = 100000;
 using namespace Security::AccessToken;
 using Security::AccessToken::AccessTokenID;
 std::unordered_map<int32_t, std::unordered_set<int32_t>> g_callStateMap;
@@ -90,11 +91,50 @@ PermissionStateFull testSetTelephonyState = {
     .resDeviceID = { "local" },
 };
 
+PermissionDef testPermGetTelephonyStateDef = {
+    .permissionName = "ohos.permission.GET_TELEPHONY_STATE",
+    .bundleName = "tel_call_manager_gtest",
+    .grantMode = 1, // SYSTEM_GRANT
+    .label = "label",
+    .labelId = 1,
+    .description = "Test call manager",
+    .descriptionId = 1,
+    .availableLevel = APL_SYSTEM_BASIC,
+};
+
+PermissionStateFull testGetTelephonyState = {
+    .grantFlags = { 2 }, // PERMISSION_USER_SET
+    .grantStatus = { PermissionState::PERMISSION_GRANTED },
+    .isGeneral = true,
+    .permissionName = "ohos.permission.GET_TELEPHONY_STATE",
+    .resDeviceID = { "local" },
+};
+
+PermissionDef testPermAnswerCallDef = {
+    .permissionName = "ohos.permission.ANSWER_CALL",
+    .bundleName = "tel_call_manager_gtest",
+    .grantMode = 1, // SYSTEM_GRANT
+    .label = "label",
+    .labelId = 1,
+    .description = "Test call manager",
+    .descriptionId = 1,
+    .availableLevel = APL_SYSTEM_BASIC,
+};
+
+PermissionStateFull testAnswerCallState = {
+    .grantFlags = { 2 }, // PERMISSION_USER_SET
+    .grantStatus = { PermissionState::PERMISSION_GRANTED },
+    .isGeneral = true,
+    .permissionName = "ohos.permission.ANSWER_CALL",
+    .resDeviceID = { "local" },
+};
+
 HapPolicyParams testPolicyParams = {
     .apl = APL_SYSTEM_BASIC,
     .domain = "test.domain",
-    .permList = { testPermPlaceCallDef, testPermSetTelephonyStateDef },
-    .permStateList = { testPlaceCallState, testSetTelephonyState },
+    .permList = { testPermPlaceCallDef, testPermSetTelephonyStateDef, testPermGetTelephonyStateDef,
+        testPermAnswerCallDef },
+    .permStateList = { testPlaceCallState, testSetTelephonyState, testGetTelephonyState, testAnswerCallState },
 };
 
 class AccessToken {
@@ -184,7 +224,7 @@ public:
         return CallInfoManager::CallEventChange(info);
     }
 
-    int32_t OnCallDisconnectedCause(DisconnectedDetails cause)
+    int32_t OnCallDisconnectedCause(const DisconnectedDetails &details)
     {
         TELEPHONY_LOGI("OnCallDisconnectedCause success!");
         return TELEPHONY_SUCCESS;
@@ -215,7 +255,7 @@ private:
     {
         const CallAttributeInfo *parcelPtr = nullptr;
         int32_t len = data.ReadInt32();
-        if (len <= 0) {
+        if (len <= 0 || len >= MAX_LEN) {
             TELEPHONY_LOGE("Invalid parameter, len = %{public}d", len);
             return TELEPHONY_ERR_ARGUMENT_INVALID;
         }
@@ -239,7 +279,7 @@ private:
     {
         const CallEventInfo *parcelPtr = nullptr;
         int32_t len = data.ReadInt32();
-        if (len <= 0) {
+        if (len <= 0 || len >= MAX_LEN) {
             TELEPHONY_LOGE("Invalid parameter, len = %{public}d", len);
             return TELEPHONY_ERR_ARGUMENT_INVALID;
         }

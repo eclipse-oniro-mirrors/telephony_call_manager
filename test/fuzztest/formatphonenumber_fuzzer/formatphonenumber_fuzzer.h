@@ -13,10 +13,9 @@
  * limitations under the License.
  */
 
-#ifndef FORMATPHONENUMBER_FUZZER_H_
-#define FORMATPHONENUMBER_FUZZER_H_
+#ifndef FORMATPHONENUMBER_FUZZER_H
+#define FORMATPHONENUMBER_FUZZER_H
 
 #define FUZZ_PROJECT_NAME "formatphonenumber_fuzzer"
 
-#endif // FORMATPHONENUMBER_FUZZER_H_
-
+#endif // FORMATPHONENUMBER_FUZZER_H

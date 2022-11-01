@@ -22,9 +22,9 @@
 
 namespace OHOS {
 namespace Telephony {
-static const int32_t NORMAL_DIAL_TIME = 500;     // dial time (ms)
-static const int32_t NORMAL_INCOMING_TIME = 100; // incoming time (ms)
-static const int32_t NORMAL_ANSWER_TIME = 300;   // answer time (ms)
+static const int64_t NORMAL_DIAL_TIME = 500;     // dial time (ms)
+static const int64_t NORMAL_INCOMING_TIME = 100; // incoming time (ms)
+static const int64_t NORMAL_ANSWER_TIME = 300;   // answer time (ms)
 
 enum class IncomingCallType {
     IMS_VOICE_INCOMING = 0,
@@ -57,6 +57,8 @@ private:
     static int32_t CallDataErrorCodeConversion(const int32_t errCode, CallErrorCode &eventValue);
     static int32_t CallInterfaceErrorCodeConversion(const int32_t errCode, CallErrorCode &eventValue);
     static int32_t TelephonyErrorCodeConversion(const int32_t errCode, CallErrorCode &eventValue);
+
+private:
     int64_t dialStartTime_ = 0;
     int64_t incomingStartTime_ = 0;
     int64_t answerStartTime_ = 0;

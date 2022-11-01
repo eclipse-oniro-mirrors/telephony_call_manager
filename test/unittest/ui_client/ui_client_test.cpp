@@ -44,6 +44,7 @@ std::map<uint32_t, CallManagerServiceFunc> g_memberFuncMap;
 
 void DialCall()
 {
+    AccessToken token;
     int32_t accountId = DEFAULT_ACCOUNT_ID;
     int32_t videoState = DEFAULT_VIDEO_STATE;
     int32_t dialScene = DEFAULT_DIAL_SCENE;
@@ -85,6 +86,7 @@ void DialCall()
 
 void AnswerCall()
 {
+    AccessToken token;
     int32_t callId = DEFAULT_CALL_ID;
     int32_t videoState = DEFAULT_VIDEO_STATE;
     std::cout << "------Answer------" << std::endl;
@@ -103,11 +105,11 @@ void AnswerCall()
 
 void RejectCall()
 {
+    AccessToken token;
     int32_t callId = DEFAULT_CALL_ID;
     int32_t boolValue = DEFAULT_VALUE;
     bool flag = false;
     std::u16string content;
-    std::string tmpStr;
     content.clear();
     std::cout << "------Reject------" << std::endl;
     std::cout << "please input callId:" << std::endl;
@@ -116,8 +118,9 @@ void RejectCall()
     std::cin >> boolValue;
     if (boolValue != DEFAULT_VALUE) {
         flag = true;
-        std::cout << "please input reject message:" << std::endl;
+        std::string tmpStr;
         tmpStr.clear();
+        std::cout << "please input reject message:" << std::endl;
         std::cin >> tmpStr;
         content = Str8ToStr16(tmpStr);
     }
@@ -131,6 +134,7 @@ void RejectCall()
 
 void HoldCall()
 {
+    AccessToken token;
     int32_t callId = DEFAULT_CALL_ID;
     std::cout << "------HoldCall------" << std::endl;
     std::cout << "please input callId:" << std::endl;
@@ -145,6 +149,7 @@ void HoldCall()
 
 void UnHoldCall()
 {
+    AccessToken token;
     int32_t callId = DEFAULT_CALL_ID;
     std::cout << "------UnHoldCall------" << std::endl;
     std::cout << "please input callId:" << std::endl;
@@ -159,6 +164,7 @@ void UnHoldCall()
 
 void HangUpCall()
 {
+    AccessToken token;
     int32_t callId = DEFAULT_CALL_ID;
     std::cout << "------HangUpCall------" << std::endl;
     std::cout << "please input callId:" << std::endl;
@@ -212,6 +218,7 @@ void GetCallState()
 
 void SwitchCall()
 {
+    AccessToken token;
     int32_t callId = DEFAULT_CALL_ID;
     std::cout << "------SwitchCall------" << std::endl;
     std::cout << "please input callId:" << std::endl;
@@ -248,6 +255,7 @@ void IsNewCallAllowed()
 
 void IsRinging()
 {
+    AccessToken token;
     std::cout << "------IsRinging------" << std::endl;
     if (g_clientPtr == nullptr) {
         std::cout << "g_clientPtr is nullptr" << std::endl;
@@ -259,6 +267,7 @@ void IsRinging()
 
 void IsInEmergencyCall()
 {
+    AccessToken token;
     std::cout << "------IsInEmergencyCall------" << std::endl;
     if (g_clientPtr == nullptr) {
         std::cout << "g_clientPtr is nullptr" << std::endl;
@@ -291,6 +300,7 @@ void StopDtmf()
 
 void GetCallWaiting()
 {
+    AccessToken token;
     int32_t slotId = SIM1_SLOTID;
     std::cout << "------GetCallWaiting------" << std::endl;
     std::cout << "please input slotId:" << std::endl;
@@ -305,6 +315,7 @@ void GetCallWaiting()
 
 void SetCallWaiting()
 {
+    AccessToken token;
     int32_t slotId = SIM1_SLOTID;
     int32_t flag = DEFAULT_VALUE;
     std::cout << "------SetCallWaiting------" << std::endl;
@@ -322,6 +333,7 @@ void SetCallWaiting()
 
 void GetCallRestriction()
 {
+    AccessToken token;
     int32_t slotId = SIM1_SLOTID;
     int32_t tmpType = DEFAULT_VALUE;
     CallRestrictionType type;
@@ -341,6 +353,7 @@ void GetCallRestriction()
 
 void SetCallRestriction()
 {
+    AccessToken token;
     int32_t slotId = SIM1_SLOTID;
     int32_t tmpType = DEFAULT_VALUE;
     CallRestrictionInfo info;
@@ -365,6 +378,7 @@ void SetCallRestriction()
 
 void SetCallPreferenceMode()
 {
+    AccessToken token;
     int32_t slotId = SIM1_SLOTID;
     int32_t mode = DEFAULT_PREFERENCEMODE;
     std::cout << "------CallPreferenceMode------" << std::endl;
@@ -386,6 +400,7 @@ void SetCallPreferenceMode()
 
 void GetCallTransferInfo()
 {
+    AccessToken token;
     int32_t slotId = SIM1_SLOTID;
     int32_t tmpType = DEFAULT_VALUE;
     CallTransferType type;
@@ -405,6 +420,7 @@ void GetCallTransferInfo()
 
 void SetCallTransferInfo()
 {
+    AccessToken token;
     int32_t slotId = SIM1_SLOTID;
     int32_t tmpType = DEFAULT_VALUE;
     CallTransferInfo info;
@@ -574,6 +590,7 @@ void SetMute()
 
 void MuteRinger()
 {
+    AccessToken token;
     std::cout << "------MuteRinger------" << std::endl;
     if (g_clientPtr == nullptr) {
         std::cout << "g_clientPtr is nullptr" << std::endl;
@@ -738,7 +755,9 @@ void ControlCamera()
     for (auto &it : cameraObjList) {
         tmpStr = it->GetID();
         std::cout << "camManagerObj->GetCameras Camera ID:" << tmpStr.c_str() << std::endl;
-        break;
+        if (!tmpStr.empty()) {
+            break;
+        }
     }
 
     std::u16string CameraID;
@@ -969,6 +988,7 @@ void UpdateImsCallMode()
 
 void EnableImsSwitch()
 {
+    AccessToken token;
     int32_t slotId = SIM1_SLOTID;
     std::cout << "------EnableImsSwitch------" << std::endl;
     std::cout << "please input slot id:" << std::endl;
@@ -984,6 +1004,7 @@ void EnableImsSwitch()
 
 void DisableImsSwitch()
 {
+    AccessToken token;
     int32_t slotId = SIM1_SLOTID;
     std::cout << "------DisableImsSwitch------" << std::endl;
     std::cout << "please input slot id:" << std::endl;
@@ -1149,6 +1170,7 @@ void InitImsServicePower()
 
 int32_t Init()
 {
+    AccessToken token;
     g_clientPtr = DelayedSingleton<CallManagerClient>::GetInstance();
     if (g_clientPtr == nullptr) {
         std::cout << "g_clientPtr is nullptr" << std::endl;

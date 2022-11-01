@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -53,11 +53,11 @@ int32_t CallAbilityCallback::OnCallEventChange(const CallEventInfo &info)
     return TELEPHONY_SUCCESS;
 }
 
-int32_t CallAbilityCallback::OnCallDisconnectedCause(DisconnectedDetails cause)
+int32_t CallAbilityCallback::OnCallDisconnectedCause(const DisconnectedDetails &details)
 {
     std::lock_guard<std::mutex> lock(mutex_);
     if (callbackPtr_ != nullptr) {
-        return callbackPtr_->OnCallDisconnectedCause(cause);
+        return callbackPtr_->OnCallDisconnectedCause(details);
     }
     return TELEPHONY_SUCCESS;
 }

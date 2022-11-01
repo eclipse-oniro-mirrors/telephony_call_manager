@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -75,7 +75,7 @@ void WiredHeadset::NewCallCreated(sptr<CallBase> &callObjectPtr)
     }
 }
 
-void WiredHeadset::CallDestroyed(int32_t cause)
+void WiredHeadset::CallDestroyed(const DisconnectedDetails &details)
 {
     if (handler_ != nullptr) {
         handler_->SendEvent(WiredHeadset::MEDIA_SET_LEAVE_MSG);

@@ -15,10 +15,11 @@
 
 #include "bluetooth_call_service.h"
 
-#include "call_manager_errors.h"
-#include "telephony_log_wrapper.h"
-
 #include "bluetooth_call_manager.h"
+#include "call_manager_errors.h"
+#include "telephony_errors.h"
+#include "telephony_log_wrapper.h"
+#include "telephony_permission.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -54,6 +55,10 @@ int32_t BluetoothCallService::AnswerCall()
 
 int32_t BluetoothCallService::RejectCall()
 {
+    if (!TelephonyPermission::CheckPermission(Permission::ANSWER_CALL)) {
+        TELEPHONY_LOGE("Permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
     int32_t callId = ERR_ID;
     bool rejectWithMessage = false;
     std::u16string textMessage = Str8ToStr16("");
@@ -72,6 +77,10 @@ int32_t BluetoothCallService::RejectCall()
 
 int32_t BluetoothCallService::HangUpCall()
 {
+    if (!TelephonyPermission::CheckPermission(Permission::ANSWER_CALL)) {
+        TELEPHONY_LOGE("Permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
     int32_t callId = ERR_ID;
     int32_t ret = HangUpPolicy(callId);
     if (ret != TELEPHONY_SUCCESS) {
@@ -137,6 +146,10 @@ int32_t BluetoothCallService::GetCallState()
 
 int32_t BluetoothCallService::HoldCall()
 {
+    if (!TelephonyPermission::CheckPermission(Permission::ANSWER_CALL)) {
+        TELEPHONY_LOGE("Permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
     int32_t callId = ERR_ID;
     int32_t ret = HoldCallPolicy(callId);
     if (ret != TELEPHONY_SUCCESS) {
@@ -153,6 +166,10 @@ int32_t BluetoothCallService::HoldCall()
 
 int32_t BluetoothCallService::UnHoldCall()
 {
+    if (!TelephonyPermission::CheckPermission(Permission::ANSWER_CALL)) {
+        TELEPHONY_LOGE("Permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
     int32_t callId = ERR_ID;
     int32_t ret = UnHoldCallPolicy(callId);
     if (ret != TELEPHONY_SUCCESS) {
@@ -169,6 +186,10 @@ int32_t BluetoothCallService::UnHoldCall()
 
 int32_t BluetoothCallService::SwitchCall()
 {
+    if (!TelephonyPermission::CheckPermission(Permission::ANSWER_CALL)) {
+        TELEPHONY_LOGE("Permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
     int32_t callId = ERR_ID;
     int32_t ret = SwitchCallPolicy(callId);
     if (ret != TELEPHONY_SUCCESS) {
@@ -250,6 +271,12 @@ int32_t BluetoothCallService::SeparateConference()
 
 std::vector<CallAttributeInfo> BluetoothCallService::GetCurrentCallList(int32_t slotId)
 {
+    if (!TelephonyPermission::CheckPermission(Permission::GET_TELEPHONY_STATE)) {
+        TELEPHONY_LOGE("BluetoothCallService::GetCurrentCallList, Permission denied!");
+        std::vector<CallAttributeInfo> vec;
+        vec.clear();
+        return vec;
+    }
     return GetCallInfoList(slotId);
 }
 } // namespace Telephony

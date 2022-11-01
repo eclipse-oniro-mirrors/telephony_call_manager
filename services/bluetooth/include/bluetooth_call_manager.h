@@ -36,6 +36,8 @@ public:
 
 private:
     bool IsBtScoConnected();
+
+private:
     std::shared_ptr<BluetoothConnection> btConnection_;
 };
 } // namespace Telephony

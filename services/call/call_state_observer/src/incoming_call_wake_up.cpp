@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -63,7 +63,7 @@ bool IncomingCallWakeup::IsPowerAbilityExist()
     return true;
 }
 
-void IncomingCallWakeup::CallDestroyed(int32_t cause) {}
+void IncomingCallWakeup::CallDestroyed(const DisconnectedDetails &details) {}
 
 void IncomingCallWakeup::IncomingCallActivated(sptr<CallBase> &callObjectPtr) {}
 
