@@ -19,6 +19,8 @@
 
 namespace OHOS {
 namespace Telephony {
+constexpr int32_t MAX_SIZE = 10;
+
 int32_t CellularCallProxy::Dial(const CellularCallInfo &callInfo)
 {
     MessageOption option;

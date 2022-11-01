@@ -255,6 +255,7 @@ int32_t ReportCallInfoHandlerService::UpdateCallsReportInfo(CallDetailsInfo &inf
     if (!ret) {
         TELEPHONY_LOGE("SendEvent failed! status update failed, slotId:%{public}d", info.slotId);
         CallDetailInfo detailInfo;
+        detailInfo.state = TelCallState::CALL_STATUS_UNKNOWN;
         std::vector<CallDetailInfo>::iterator it = info.callVec.begin();
         for (; it != info.callVec.end(); ++it) {
             detailInfo.callType = (*it).callType;

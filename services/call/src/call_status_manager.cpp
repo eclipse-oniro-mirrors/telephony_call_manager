@@ -181,6 +181,10 @@ int32_t CallStatusManager::HandleEventResultReportInfo(const CellularCallEventIn
         DialParaInfo dialInfo;
         if (eventInfo.eventId == CallAbilityEventId::EVENT_DIAL_NO_CARRIER) {
             DelayedSingleton<CallControlManager>::GetInstance()->GetDialParaInfo(dialInfo);
+            if (dialInfo.number.length() > static_cast<size_t>(kMaxNumberLen)) {
+                TELEPHONY_LOGE("Number out of limit!");
+                return CALL_ERR_NUMBER_OUT_OF_RANGE;
+            }
             if (memcpy_s(eventInfo.phoneNum, kMaxNumberLen, dialInfo.number.c_str(), dialInfo.number.length()) != EOK) {
                 TELEPHONY_LOGE("memcpy_s failed!");
                 return TELEPHONY_ERR_MEMCPY_FAIL;
@@ -200,6 +204,10 @@ int32_t CallStatusManager::HandleOttEventReportInfo(const OttCallEventInfo &info
     (void)memset_s(&eventInfo, sizeof(CallEventInfo), 0, sizeof(CallEventInfo));
     if (mOttEventIdTransferMap_.find(info.ottCallEventId) != mOttEventIdTransferMap_.end()) {
         eventInfo.eventId = mOttEventIdTransferMap_[info.ottCallEventId];
+        if (strlen(info.bundleName) > static_cast<size_t>(kMaxNumberLen)) {
+            TELEPHONY_LOGE("Number out of limit!");
+            return CALL_ERR_NUMBER_OUT_OF_RANGE;
+        }
         if (memcpy_s(eventInfo.bundleName, kMaxNumberLen, info.bundleName, strlen(info.bundleName)) != EOK) {
             TELEPHONY_LOGE("memcpy_s failed!");
             return TELEPHONY_ERR_MEMCPY_FAIL;
@@ -520,7 +528,7 @@ sptr<CallBase> CallStatusManager::RefreshCallIfNecessary(const sptr<CallBase> &c
     newCall->SetPolicyFlag(PolicyFlag(call->GetPolicyFlag()));
     newCall->SetSpeakerphoneOn(call->IsSpeakerphoneOn());
     newCall->SetCallEndedType(call->GetCallEndedType());
-    newCall->SetCallEndTime(attrInfo.callBeginTime);
+    newCall->SetCallBeginTime(attrInfo.callBeginTime);
     newCall->SetCallEndTime(attrInfo.callEndTime);
     newCall->SetRingBeginTime(attrInfo.ringBeginTime);
     newCall->SetRingEndTime(attrInfo.ringEndTime);

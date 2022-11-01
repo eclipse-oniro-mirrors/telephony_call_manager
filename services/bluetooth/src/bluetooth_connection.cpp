@@ -20,6 +20,8 @@
 #include "telephony_log_wrapper.h"
 #ifdef ABILITY_BLUETOOTH_SUPPORT
 #include "bluetooth_host.h"
+
+constexpr int32_t PHONE_NUMBER_TYPE = 0x81;
 #endif
 
 namespace OHOS {
@@ -195,8 +197,7 @@ int32_t BluetoothConnection::SendBtCallState(
     }
 
     std::string nickName = "";
-    constexpr int32_t numberType = 0x81;
-    profile->PhoneStateChanged(numActive, numHeld, callState, number, numberType, nickName);
+    profile->PhoneStateChanged(numActive, numHeld, callState, number, PHONE_NUMBER_TYPE, nickName);
 #endif
     TELEPHONY_LOGI("PhoneStateChanged,numActive:%{public}d,numHeld:%{public}d,callState:%{public}d", numActive, numHeld,
         callState);

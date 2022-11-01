@@ -12,10 +12,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef ISEMERGENCYPHONENUMBER_FUZZER_H_
-#define ISEMERGENCYPHONENUMBER_FUZZER_H_
+
+#ifndef ISEMERGENCYPHONENUMBER_FUZZER_H
+#define ISEMERGENCYPHONENUMBER_FUZZER_H
 
 #define FUZZ_PROJECT_NAME "isemergencyphonenumber_fuzzer"
 
-#endif // ISEMERGENCYPHONENUMBER_FUZZER_H_
-
+#endif // ISEMERGENCYPHONENUMBER_FUZZER_H

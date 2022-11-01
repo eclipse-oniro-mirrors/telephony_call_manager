@@ -94,12 +94,12 @@ void CallManagerService::OnStart()
 
     state_ = ServiceRunningState::STATE_RUNNING;
     struct tm *timeNow = nullptr;
-    struct tm nowTime = {0};
+    struct tm nowTime = { 0 };
     time_t second = time(0);
     if (second < 0) {
         return;
     }
-    timeNow = localtime_r(&second,  &nowTime);
+    timeNow = localtime_r(&second, &nowTime);
     if (timeNow != nullptr) {
         spendTime_ = duration_cast<std::chrono::milliseconds>(high_resolution_clock::now() - beginTime).count();
         TELEPHONY_LOGI(
@@ -114,12 +114,12 @@ void CallManagerService::OnStop()
 {
     std::lock_guard<std::mutex> guard(lock_);
     struct tm *timeNow = nullptr;
-    struct tm nowTime = {0};
+    struct tm nowTime = { 0 };
     time_t second = time(0);
     if (second < 0) {
         return;
     }
-    timeNow = localtime_r(&second,  &nowTime);
+    timeNow = localtime_r(&second, &nowTime);
     if (timeNow != nullptr) {
         TELEPHONY_LOGI(
             "CallManagerService dump time:%{public}d-%{public}d-%{public}d %{public}d:%{public}d:%{public}d",

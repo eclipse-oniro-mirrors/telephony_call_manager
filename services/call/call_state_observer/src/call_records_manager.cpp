@@ -70,8 +70,11 @@ void CallRecordsManager::AddOneCallRecord(CallAttributeInfo &info)
         TELEPHONY_LOGE("callRecordsHandlerServerPtr_ is nullptr");
         return;
     }
-    errno_t result = memcpy_s(data.phoneNumber, kMaxNumberLen, info.accountNumber,
-                              strlen(info.accountNumber));
+    if (strlen(info.accountNumber) > static_cast<size_t>(kMaxNumberLen)) {
+        TELEPHONY_LOGE("Number out of limit!");
+        return;
+    }
+    errno_t result = memcpy_s(data.phoneNumber, kMaxNumberLen, info.accountNumber, strlen(info.accountNumber));
     if (result != EOK) {
         TELEPHONY_LOGE("memcpy_s failed!");
         return;
@@ -95,6 +98,10 @@ void CallRecordsManager::AddOneCallRecord(CallAttributeInfo &info)
     std::string tmpStr("");
     (void)DelayedSingleton<CallNumberUtils>::GetInstance()->FormatPhoneNumber(
         std::string(data.phoneNumber), "CN", tmpStr);
+    if (tmpStr.length() > static_cast<size_t>(kMaxNumberLen)) {
+        TELEPHONY_LOGE("Number out of limit!");
+        return;
+    }
     if (memcpy_s(data.formattedPhoneNumber, kMaxNumberLen, tmpStr.c_str(), tmpStr.length()) != 0) {
         TELEPHONY_LOGE("memcpy_s failed!");
         return;

@@ -64,9 +64,12 @@ private:
     bool IsAudioActivated();
     BtScoState btScoState_ = BtScoState::SCO_STATE_DISCONNECTED;
     std::string connectedScoAddr_;
+
 #ifdef ABILITY_BLUETOOTH_SUPPORT
     bool ConnectBtSco(const Bluetooth::BluetoothRemoteDevice &device);
     bool DisconnectBtSco(const Bluetooth::BluetoothRemoteDevice &device);
+
+private:
     std::unordered_map<std::string, Bluetooth::BluetoothRemoteDevice> mapConnectedBtDevices_;
 #endif
 };

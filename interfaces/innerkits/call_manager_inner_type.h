@@ -41,6 +41,7 @@ enum class CallType {
 
 // call state
 enum class TelCallState {
+    CALL_STATUS_UNKNOWN = -1,
     CALL_STATUS_ACTIVE = 0,
     CALL_STATUS_HOLDING,
     CALL_STATUS_DIALING,
@@ -320,6 +321,7 @@ enum class CellularCallEventType {
 };
 
 enum class RequestResultEventId {
+    INVALID_REQUEST_RESULT_EVENT_ID = -1,
     RESULT_DIAL_SEND_FAILED = 0,
     RESULT_DIAL_NO_CARRIER,
     RESULT_END_SEND_FAILED,

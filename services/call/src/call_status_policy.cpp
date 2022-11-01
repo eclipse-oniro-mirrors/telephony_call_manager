@@ -71,6 +71,7 @@ int32_t CallStatusPolicy::FilterResultsDispose(sptr<CallBase> call)
         return TELEPHONY_SUCCESS;
     }
     ret = call->IncomingCallBase();
+    TELEPHONY_LOGI("IncomingCallBase ret : %{public}d", ret);
     DelayedSingleton<CallControlManager>::GetInstance()->NotifyNewCallCreated(call);
     // Print the log and record the information to the database
     // Call notification module
