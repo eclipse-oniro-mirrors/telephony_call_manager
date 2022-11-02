@@ -44,7 +44,7 @@ public:
         REGISTER_CALLBACK,
         UNREGISTER_CALLBACK,
 
-        /****************** dtmf、rtt ******************/
+        /****************** dtmf rtt ******************/
         START_DTMF = 100,
         STOP_DTMF,
         SEND_DTMF,

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -28,7 +28,7 @@ public:
     void ShutDown(PowerMgr::SuspendDeviceType operationType, bool suspendImmed);
     void StartUp(PowerMgr::WakeupDeviceType operationType, std::string wakeupReason);
     void NewCallCreated(sptr<CallBase> &callObjectPtr) override;
-    void CallDestroyed(int32_t cause) override;
+    void CallDestroyed(const DisconnectedDetails &details) override;
     void CallStateUpdated(sptr<CallBase> &callObjectPtr, TelCallState priorState, TelCallState nextState) override;
     void IncomingCallHungUp(sptr<CallBase> &callObjectPtr, bool isSendSms, std::string content) override;
     void IncomingCallActivated(sptr<CallBase> &callObjectPtr) override;

@@ -85,6 +85,10 @@ void CallBase::GetCallAttributeBaseInfo(CallAttributeInfo &info)
 {
     std::lock_guard<std::mutex> lock(mutex_);
     (void)memset_s(info.accountNumber, kMaxNumberLen, 0, kMaxNumberLen);
+    if (accountNumber_.length() > static_cast<size_t>(kMaxNumberLen)) {
+        TELEPHONY_LOGE("Number out of limit!");
+        return;
+    }
     if (memcpy_s(info.accountNumber, kMaxNumberLen, accountNumber_.c_str(), accountNumber_.length()) == 0) {
         info.speakerphoneOn = isSpeakerphoneOn_;
         info.videoState = videoState_;
@@ -99,8 +103,11 @@ void CallBase::GetCallAttributeBaseInfo(CallAttributeInfo &info)
         info.ringEndTime = ringEndTime_;
         info.callDirection = direction_;
         info.answerType = answerType_;
-        errno_t result = memcpy_s(info.bundleName, kMaxBundleNameLen, bundleName_.c_str(),
-                                  bundleName_.length());
+        if (bundleName_.length() > static_cast<size_t>(kMaxBundleNameLen)) {
+            TELEPHONY_LOGE("Number out of limit!");
+            return;
+        }
+        errno_t result = memcpy_s(info.bundleName, kMaxBundleNameLen, bundleName_.c_str(), bundleName_.length());
         if (result != EOK) {
             TELEPHONY_LOGE("memcpy_s failed!");
         }

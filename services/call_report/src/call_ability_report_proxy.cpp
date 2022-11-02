@@ -103,14 +103,14 @@ void CallAbilityReportProxy::CallEventUpdated(CallEventInfo &info)
     ReportCallEvent(info);
 }
 
-void CallAbilityReportProxy::CallDestroyed(int32_t cause)
+void CallAbilityReportProxy::CallDestroyed(const DisconnectedDetails &details)
 {
     int32_t ret = TELEPHONY_ERR_FAIL;
     std::lock_guard<std::mutex> lock(mutex_);
     std::list<sptr<ICallAbilityCallback>>::iterator it = callbackPtrList_.begin();
     for (; it != callbackPtrList_.end(); ++it) {
         if ((*it)) {
-            ret = (*it)->OnCallDisconnectedCause((DisconnectedDetails)cause);
+            ret = (*it)->OnCallDisconnectedCause(details);
             if (ret != TELEPHONY_SUCCESS) {
                 TELEPHONY_LOGW("OnCallDisconnectedCause failed, errcode:%{public}d, bundleName:%{public}s", ret,
                     ((*it)->GetBundleName()).c_str());
@@ -118,7 +118,7 @@ void CallAbilityReportProxy::CallDestroyed(int32_t cause)
             }
         }
     }
-    TELEPHONY_LOGI("report call disconnected cause[%{public}d] success", cause);
+    TELEPHONY_LOGI("report call disconnected cause[%{public}d] success", details.reason);
 }
 
 int32_t CallAbilityReportProxy::ReportCallStateInfo(const CallAttributeInfo &info)
@@ -205,11 +205,10 @@ int32_t CallAbilityReportProxy::ReportMmiCodeResult(const MmiCodeInfo &info)
 int32_t CallAbilityReportProxy::OttCallRequest(OttCallRequestId requestId, AppExecFwk::PacMap &info)
 {
     int32_t ret = TELEPHONY_ERR_FAIL;
-    std::string name = "";
     std::lock_guard<std::mutex> lock(mutex_);
     std::list<sptr<ICallAbilityCallback>>::iterator it = callbackPtrList_.begin();
     for (; it != callbackPtrList_.end(); ++it) {
-        name = (*it)->GetBundleName();
+        std::string name = (*it)->GetBundleName();
         if (name == "com.ohos.callservice") {
             ret = (*it)->OnOttCallRequest(requestId, info);
             if (ret != TELEPHONY_SUCCESS) {

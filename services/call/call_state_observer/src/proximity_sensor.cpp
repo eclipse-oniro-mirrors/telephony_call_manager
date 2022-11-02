@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -32,7 +32,7 @@ void ProximitySensor::StartUp(PowerMgr::WakeupDeviceType operationType, std::str
     PowerMgr::PowerMgrClient::GetInstance().WakeupDevice(operationType, wakeupReason);
 }
 
-void ProximitySensor::CallDestroyed(int32_t cause)
+void ProximitySensor::CallDestroyed(const DisconnectedDetails &details)
 {
     if (CallObjectManager::HasCallExist()) {
         ShutDown(PowerMgr::SuspendDeviceType::SUSPEND_DEVICE_REASON_APPLICATION, true);

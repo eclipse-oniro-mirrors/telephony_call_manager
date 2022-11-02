@@ -352,10 +352,10 @@ bool CallControlManager::NotifyNewCallCreated(sptr<CallBase> &callObjectPtr)
     return true;
 }
 
-bool CallControlManager::NotifyCallDestroyed(int32_t cause)
+bool CallControlManager::NotifyCallDestroyed(const DisconnectedDetails &details)
 {
     if (callStateListenerPtr_ != nullptr) {
-        callStateListenerPtr_->CallDestroyed(cause);
+        callStateListenerPtr_->CallDestroyed(details);
         return true;
     }
     return false;
@@ -1040,12 +1040,15 @@ bool CallControlManager::onButtonDealing(HeadsetButtonService::ButtonEvent type)
     bool isRingState = false;
     sptr<CallBase> call = nullptr;
 
-    if ((call = GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_RINGING)) != nullptr) {
+    if (GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_RINGING) != nullptr) {
+        call = GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_RINGING);
         isRingState = true;
-    } else if (((call = GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_DIALING)) != nullptr) ||
-        ((call = GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_ACTIVE)) != nullptr) ||
-        ((call = GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_HOLD)) != nullptr)) {
-        isRingState = false;
+    } else if (GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_DIALING) != nullptr) {
+        call = GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_DIALING);
+    } else if (GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_ACTIVE) != nullptr) {
+        call = GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_ACTIVE);
+    } else if (GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_HOLD) != nullptr) {
+        call = GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_HOLD);
     } else {
         return false;
     }

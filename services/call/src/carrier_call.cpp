@@ -269,6 +269,10 @@ int32_t CarrierCall::PackCellularCallInfo(CellularCallInfo &callInfo)
         TELEPHONY_LOGW("memset_s failed!");
         return TELEPHONY_ERR_MEMSET_FAIL;
     }
+    if (accountNumber_.length() > static_cast<size_t>(kMaxNumberLen)) {
+        TELEPHONY_LOGE("Number out of limit!");
+        return CALL_ERR_NUMBER_OUT_OF_RANGE;
+    }
     if (memcpy_s(callInfo.phoneNum, kMaxNumberLen, accountNumber_.c_str(), accountNumber_.length()) != EOK) {
         TELEPHONY_LOGW("memcpy_s failed!");
         return TELEPHONY_ERR_MEMCPY_FAIL;

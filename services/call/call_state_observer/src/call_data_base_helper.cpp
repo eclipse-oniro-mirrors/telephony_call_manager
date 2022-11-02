@@ -24,6 +24,10 @@
 namespace OHOS {
 namespace Telephony {
 class AbsSharedResultSet;
+static constexpr const char *CALL_SUBSECTION = "dataability:///com.ohos.calllogability/calls/calllog";
+static constexpr const char *CALL_BLOCK = "dataability:///com.ohos.contactsdataability/contacts/contact_blocklist";
+static constexpr const char *CONTACT_DATA = "dataability:///com.ohos.contactsdataability/contacts/contact_data";
+
 CallDataRdbObserver::CallDataRdbObserver(std::vector<std::string> *phones)
 {
     this->phones = phones;
@@ -125,8 +129,8 @@ bool CallDataBaseHelper::Query(std::vector<std::string> *phones, NativeRdb::Data
     while (resultSetNum == 0) {
         std::string phone;
         int32_t columnIndex;
-        int32_t ret = resultSet->GetColumnIndex("phone_number", columnIndex);
-        ret = resultSet->GetString(columnIndex, phone);
+        resultSet->GetColumnIndex("phone_number", columnIndex);
+        int32_t ret = resultSet->GetString(columnIndex, phone);
         if (ret == 0 && (!phone.empty())) {
             phones->push_back(phone);
         }
@@ -156,10 +160,13 @@ bool CallDataBaseHelper::Query(ContactInfo &contactInfo, NativeRdb::DataAbilityP
     while (resultSetNum == 0) {
         std::string displayName;
         int32_t columnIndex;
-        int32_t ret = resultSet->GetColumnIndex(CALL_DISPLAY_NAME, columnIndex);
-        ret = resultSet->GetString(columnIndex, displayName);
+        resultSet->GetColumnIndex(CALL_DISPLAY_NAME, columnIndex);
+        int32_t ret = resultSet->GetString(columnIndex, displayName);
         if (ret == 0 && (!displayName.empty())) {
-            size_t cpyLen = strlen(displayName.c_str()) + 1;
+            size_t cpyLen = displayName.length() + 1;
+            if (displayName.length() > static_cast<size_t>(CONTACT_NAME_LEN)) {
+                return false;
+            }
             if (strcpy_s(contactInfo.name, cpyLen, displayName.c_str()) != EOK) {
                 TELEPHONY_LOGE("strcpy_s fail.");
                 return false;

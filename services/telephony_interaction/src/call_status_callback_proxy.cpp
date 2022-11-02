@@ -75,7 +75,7 @@ int32_t CallStatusCallbackProxy::UpdateCallsReportInfo(const CallsReportInfo &in
     return replyParcel.ReadInt32();
 }
 
-int32_t CallStatusCallbackProxy::UpdateDisconnectedCause(const DisconnectedDetails &cause)
+int32_t CallStatusCallbackProxy::UpdateDisconnectedCause(const DisconnectedDetails &details)
 {
     MessageParcel dataParcel;
     MessageParcel replyParcel;
@@ -84,7 +84,9 @@ int32_t CallStatusCallbackProxy::UpdateDisconnectedCause(const DisconnectedDetai
     if (!dataParcel.WriteInterfaceToken(CallStatusCallbackProxy::GetDescriptor())) {
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
-    dataParcel.WriteInt32(static_cast<int32_t>(cause));
+    if (!dataParcel.WriteRawData((const void *)&details, sizeof(DisconnectedDetails))) {
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
     if (Remote() == nullptr) {
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }

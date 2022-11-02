@@ -13,10 +13,9 @@
  * limitations under the License.
  */
 
-#ifndef DIALCALL_FUZZER_H_
-#define DIALCALL_FUZZER_H_
+#ifndef DIALCALL_FUZZER_H
+#define DIALCALL_FUZZER_H
 
 #define FUZZ_PROJECT_NAME "dialcall_fuzzer"
 
-#endif // DIALCALL_FUZZER_H_
-
+#endif // DIALCALL_FUZZER_H

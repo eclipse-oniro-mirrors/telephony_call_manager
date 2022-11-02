@@ -1593,15 +1593,22 @@ napi_value NapiCallManager::FormatPhoneNumberToE164(napi_env env, napi_callback_
 napi_value NapiCallManager::ObserverOn(napi_env env, napi_callback_info info)
 {
     GET_PARAMS(env, info, VALUE_MAXIMUM_LIMIT);
-    if ((argc > VALUE_MAXIMUM_LIMIT) ||
+    if ((argc > TWO_VALUE_LIMIT) ||
         (!NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_FIRST], napi_string))) {
-        NAPI_CALL(env, napi_throw_error(env, std::to_string(JS_ERROR_TELEPHONY_INVALID_INPUT_PARAMETER).c_str(),
-                           JS_ERROR_TELEPHONY_INVALID_INPUT_PARAMETER_STRING));
+        NapiUtil::ThrowError(
+            env, JS_ERROR_TELEPHONY_INVALID_INPUT_PARAMETER, JS_ERROR_TELEPHONY_INVALID_INPUT_PARAMETER_STRING);
         return nullptr;
     }
+
+    if ((argc == TWO_VALUE_LIMIT) &&
+        (!NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_SECOND], napi_function))) {
+        NapiUtil::ThrowError(
+            env, JS_ERROR_TELEPHONY_INVALID_INPUT_PARAMETER, JS_ERROR_TELEPHONY_INVALID_INPUT_PARAMETER_STRING);
+        return nullptr;
+    }
+
     if (registerStatus_ == TELEPHONY_ERR_PERMISSION_ERR) {
-        NAPI_CALL(env, napi_throw_error(env, std::to_string(JS_ERROR_TELEPHONY_PERMISSION_DENIED).c_str(),
-                           OBSERVER_ON_JS_PERMISSION_ERROR_STRING));
+        NapiUtil::ThrowError(env, JS_ERROR_TELEPHONY_PERMISSION_DENIED, OBSERVER_ON_JS_PERMISSION_ERROR_STRING);
         return nullptr;
     }
     char listenerType[PHONE_NUMBER_MAXIMUM_LIMIT + 1] = { 0 };
@@ -1632,27 +1639,26 @@ napi_value NapiCallManager::ObserverOn(napi_env env, napi_callback_info info)
 napi_value NapiCallManager::ObserverOff(napi_env env, napi_callback_info info)
 {
     GET_PARAMS(env, info, VALUE_MAXIMUM_LIMIT);
-    if ((argc > VALUE_MAXIMUM_LIMIT) ||
+    if ((argc > TWO_VALUE_LIMIT) ||
         (!NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_FIRST], napi_string))) {
-        NAPI_CALL(env, napi_throw_error(env, std::to_string(JS_ERROR_TELEPHONY_INVALID_INPUT_PARAMETER).c_str(),
-                           JS_ERROR_TELEPHONY_INVALID_INPUT_PARAMETER_STRING));
+        NapiUtil::ThrowError(
+            env, JS_ERROR_TELEPHONY_INVALID_INPUT_PARAMETER, JS_ERROR_TELEPHONY_INVALID_INPUT_PARAMETER_STRING);
         return nullptr;
     }
-    if ((argc > ONLY_ONE_VALUE) &&
+    if ((argc == TWO_VALUE_LIMIT) &&
         (!NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_SECOND], napi_function))) {
-        NAPI_CALL(env, napi_throw_error(env, std::to_string(JS_ERROR_TELEPHONY_INVALID_INPUT_PARAMETER).c_str(),
-                           JS_ERROR_TELEPHONY_INVALID_INPUT_PARAMETER_STRING));
+        NapiUtil::ThrowError(
+            env, JS_ERROR_TELEPHONY_INVALID_INPUT_PARAMETER, JS_ERROR_TELEPHONY_INVALID_INPUT_PARAMETER_STRING);
         return nullptr;
     }
     if (registerStatus_ == TELEPHONY_ERR_PERMISSION_ERR) {
-        NAPI_CALL(env, napi_throw_error(env, std::to_string(JS_ERROR_TELEPHONY_PERMISSION_DENIED).c_str(),
-                           OBSERVER_OFF_JS_PERMISSION_ERROR_STRING));
+        NapiUtil::ThrowError(env, JS_ERROR_TELEPHONY_PERMISSION_DENIED, OBSERVER_OFF_JS_PERMISSION_ERROR_STRING);
         return nullptr;
     }
     auto asyncContext = std::make_unique<AsyncContext>();
     if (asyncContext == nullptr) {
         JsError error = NapiUtil::ConverErrorMessageForJs(ERROR_PARAMETER_TYPE_INVALID);
-        NAPI_CALL(env, napi_throw_error(env, error.errorMessage.c_str(), std::to_string(error.errorCode).c_str()));
+        NapiUtil::ThrowError(env, error.errorCode, error.errorMessage);
         return nullptr;
     }
     char listenerType[PHONE_NUMBER_MAXIMUM_LIMIT + 1] = {0};
@@ -2070,10 +2076,18 @@ napi_value NapiCallManager::ReportOttCallDetailsInfo(napi_env env, napi_callback
         bool matchFlag = NapiCallManagerUtils::MatchValueType(env, napiFormId, napi_object);
         NAPI_ASSERT(env, matchFlag, "ReportOttCallDetailsInfo type error, should be napi_object type");
         std::string tmpStr = NapiCallManagerUtils::GetStringProperty(env, napiFormId, "phoneNumber");
+        if (tmpStr.length() > static_cast<size_t>(kMaxNumberLen)) {
+            TELEPHONY_LOGE("Number out of limit!");
+            return (napi_value) nullptr;
+        }
         if (memcpy_s(tmpOttVec.phoneNum, kMaxNumberLen, tmpStr.c_str(), tmpStr.length()) != EOK) {
             return (napi_value) nullptr;
         }
         tmpStr = NapiCallManagerUtils::GetStringProperty(env, napiFormId, "bundleName");
+        if (tmpStr.length() > static_cast<size_t>(kMaxNumberLen)) {
+            TELEPHONY_LOGE("Number out of limit!");
+            return (napi_value) nullptr;
+        }
         if (memcpy_s(tmpOttVec.bundleName, kMaxNumberLen, tmpStr.c_str(), tmpStr.length()) != EOK) {
             return (napi_value) nullptr;
         }
@@ -2104,6 +2118,10 @@ napi_value NapiCallManager::ReportOttCallEventInfo(napi_env env, napi_callback_i
     (void)memset_s(&asyncContext->eventInfo, sizeof(OttCallEventInfo), 0, sizeof(OttCallEventInfo));
     int32_t eventId = NapiCallManagerUtils::GetIntProperty(env, argv[ARRAY_INDEX_FIRST], "eventId");
     std::string tmpStr = NapiCallManagerUtils::GetStringProperty(env, argv[ARRAY_INDEX_FIRST], "bundleName");
+    if (tmpStr.length() > static_cast<size_t>(kMaxNumberLen)) {
+        TELEPHONY_LOGE("Number out of limit!");
+        return (napi_value) nullptr;
+    }
     asyncContext->eventInfo.ottCallEventId = static_cast<OttCallEventId>(eventId);
     if (memcpy_s(asyncContext->eventInfo.bundleName, kMaxNumberLen, tmpStr.c_str(), tmpStr.length()) != EOK) {
         return (napi_value) nullptr;
@@ -2440,6 +2458,10 @@ int32_t NapiCallManager::GetRestrictionInfo(
     int32_t type = NapiCallManagerUtils::GetIntProperty(env, objValue, "type");
     int32_t mode = NapiCallManagerUtils::GetIntProperty(env, objValue, "mode");
     std::string pw = NapiCallManagerUtils::GetStringProperty(env, objValue, "password");
+    if (pw.length() > static_cast<size_t>(kMaxNumberLen)) {
+        TELEPHONY_LOGE("Number out of limit!");
+        return CALL_ERR_NUMBER_OUT_OF_RANGE;
+    }
     if (memcpy_s(asyncContext.info.password, kMaxNumberLen, pw.c_str(), pw.length()) != EOK) {
         TELEPHONY_LOGE("memcpy_s failed!");
         return TELEPHONY_ERR_MEMCPY_FAIL;
@@ -2456,7 +2478,7 @@ int32_t NapiCallManager::GetTransferInfo(napi_env env, napi_value objValue, Call
     int32_t type = NapiCallManagerUtils::GetIntProperty(env, objValue, "type");
     int32_t settingType = NapiCallManagerUtils::GetIntProperty(env, objValue, "settingType");
     std::string transferNum = NapiCallManagerUtils::GetStringProperty(env, objValue, "transferNum");
-    if (transferNum.length() > kMaxNumberLen) {
+    if (transferNum.length() > static_cast<size_t>(kMaxNumberLen)) {
         TELEPHONY_LOGE("Number out of limit!");
         return CALL_ERR_NUMBER_OUT_OF_RANGE;
     }

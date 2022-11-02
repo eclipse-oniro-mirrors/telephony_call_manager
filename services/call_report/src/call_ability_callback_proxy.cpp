@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -74,7 +74,7 @@ int32_t CallAbilityCallbackProxy::OnCallEventChange(const CallEventInfo &info)
     return replyParcel.ReadInt32();
 }
 
-int32_t CallAbilityCallbackProxy::OnCallDisconnectedCause(DisconnectedDetails cause)
+int32_t CallAbilityCallbackProxy::OnCallDisconnectedCause(const DisconnectedDetails &details)
 {
     MessageParcel dataParcel;
     MessageParcel replyParcel;
@@ -83,7 +83,10 @@ int32_t CallAbilityCallbackProxy::OnCallDisconnectedCause(DisconnectedDetails ca
         TELEPHONY_LOGE("write descriptor fail");
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
-    dataParcel.WriteInt32(static_cast<int32_t>(cause));
+    if (!dataParcel.WriteRawData((const void *)&details, sizeof(DisconnectedDetails))) {
+        TELEPHONY_LOGE("write DisconnectedDetails fail");
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
     if (Remote() == nullptr) {
         TELEPHONY_LOGE("function Remote() return nullptr!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
