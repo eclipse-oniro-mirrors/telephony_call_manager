@@ -107,7 +107,7 @@ private:
     int32_t ReRegisterCallBack();
 #ifdef CALL_MANAGER_AUTO_START_OPTIMIZE
     void SetInitState(bool status);
-    bool IsRadioOn(int32_t simNum);
+    bool IsServiceStart();
     std::unique_ptr<CallManagerCallback> GetCallBack();
 #endif
 

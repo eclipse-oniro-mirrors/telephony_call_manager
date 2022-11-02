@@ -37,17 +37,17 @@ CallManagerProxy::~CallManagerProxy()
 }
 
 #ifdef CALL_MANAGER_AUTO_START_OPTIMIZE
-bool CallManagerProxy::IsRadioOn(int32_t simNum)
+bool CallManagerProxy::IsServiceStart()
 {
-    for (int32_t i = 0; i < simNum; i++) {
-        int32_t ret = CoreManagerInner::GetInstance().GetRadioState(i);
-        if (ret != ModemPowerState::CORE_SERVICE_POWER_ON) {
-            TELEPHONY_LOGE("CallManagerProxy::GetRadioState radio off.");
-            continue;
-        }
-        return true;
+    sptr<ISystemAbilityManager> managerPtr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (managerPtr == nullptr) {
+        TELEPHONY_LOGE("GetSystemAbilityManager failed!");
+        return false;
     }
-    return false;
+    if (managerPtr->CheckSystemAbility(TELEPHONY_CALL_MANAGER_SYS_ABILITY_ID) == nullptr) {
+        return false;
+    }
+    return true;
 }
 
 void CallManagerProxy::SetInitState(bool status)
@@ -70,8 +70,7 @@ void CallManagerProxy::Init(int32_t systemAbilityId)
     }
     systemAbilityId_ = systemAbilityId;
 #ifdef CALL_MANAGER_AUTO_START_OPTIMIZE
-    int32_t simNum = CoreManagerInner::GetInstance().GetMaxSimCount();
-    if (!IsRadioOn(simNum)) {
+    if (!IsServiceStart()) {
         EventFwk::MatchingSkills matchingSkills;
         matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_RADIO_STATE_CHANGE);
         EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
