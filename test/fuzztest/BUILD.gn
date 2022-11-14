@@ -25,4 +25,7 @@ group("fuzztest") {
   deps += [ "formatphonenumbertoe164_fuzzer:fuzztest" ]
   deps += [ "setcalltransferinfo_fuzzer:fuzztest" ]
   deps += [ "startdtmf_fuzzer:fuzztest" ]
+  deps += [ "setaudiodevice_fuzzer:fuzztest" ]
+  deps += [ "controlcamera_fuzzer:fuzztest" ]
+  deps += [ "setpausepicture_fuzzer:fuzztest" ]
 }
