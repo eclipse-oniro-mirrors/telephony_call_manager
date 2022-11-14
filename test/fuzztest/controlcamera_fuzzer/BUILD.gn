@@ -18,11 +18,12 @@ import("//build/ohos.gni")
 import("//build/test.gni")
 
 ##############################fuzztest##########################################
-ohos_fuzztest("DialCallFuzzTest") {
-  module_output_path = "call_manager/DialCallFuzzTest"
+ohos_fuzztest("ControlCameraFuzzTest") {
+  module_output_path = "call_manager/ControlCameraFuzzTest"
   module_out_path = module_output_path
   fuzz_config_file =
-      "//base/telephony/call_manager/test/fuzztest/dialcall_fuzzer"
+      "//base/telephony/call_manager/test/fuzztest/controlcamera_fuzzer"
+
   include_dirs = [
     "//base/telephony/call_manager/interfaces/innerkits",
     "//base/telephony/call_manager/services/audio/include",
@@ -71,7 +72,7 @@ ohos_fuzztest("DialCallFuzzTest") {
   ]
   sources = [
     "//base/telephony/call_manager/test/fuzztest/common_fuzzer/addcalltoken_fuzzer.cpp",
-    "dialcall_fuzzer.cpp",
+    "controlcamera_fuzzer.cpp",
   ]
   if (is_standard_system) {
     external_deps += [ "hiviewdfx_hilog_native:libhilog" ]
@@ -86,7 +87,7 @@ group("fuzztest") {
   deps = []
   deps += [
     # deps file
-    ":DialCallFuzzTest",
+    ":ControlCameraFuzzTest",
   ]
 }
 ###############################################################################

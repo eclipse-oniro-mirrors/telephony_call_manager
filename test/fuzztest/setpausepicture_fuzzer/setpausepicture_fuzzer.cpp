@@ -13,19 +13,19 @@
  * limitations under the License.
  */
 
-#include "isemergencyphonenumber_fuzzer.h"
+#include "setpausepicture_fuzzer.h"
 
 #include <cstddef>
 #include <cstdint>
 #define private public
 #include "addcalltoken_fuzzer.h"
 #include "call_manager_service.h"
+#include "call_manager_service_stub.h"
 #include "system_ability_definition.h"
 
 using namespace OHOS::Telephony;
 namespace OHOS {
 static bool g_isInited = false;
-constexpr int32_t SLOT_NUM = 2;
 
 bool IsServiceInited()
 {
@@ -39,21 +39,18 @@ bool IsServiceInited()
     return g_isInited;
 }
 
-bool IsEmergencyPhoneNumber(const uint8_t *data, size_t size)
+void SetPausePicture(const uint8_t *data, size_t size)
 {
     if (!IsServiceInited()) {
-        return false;
+        return;
     }
 
-    std::string number(reinterpret_cast<char *>(const_cast<uint8_t *>(data)), size);
-    auto numberU16 = Str8ToStr16(number);
-    int32_t slotId = static_cast<uint32_t>(size % SLOT_NUM);
-    MessageParcel dataParcel;
-    dataParcel.WriteString16(numberU16);
-    dataParcel.WriteInt32(slotId);
-    dataParcel.RewindRead(0);
+    std::string path(reinterpret_cast<const char *>(data), size);
+    MessageParcel dataMessageParcel;
+    dataMessageParcel.WriteString16(Str8ToStr16(path));
+    dataMessageParcel.RewindRead(0);
     MessageParcel reply;
-    return DelayedSingleton<CallManagerService>::GetInstance()->OnIsEmergencyPhoneNumber(dataParcel, reply);
+    DelayedSingleton<CallManagerService>::GetInstance()->OnSetPausePicture(dataMessageParcel, reply);
 }
 
 void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
@@ -62,12 +59,12 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
         return;
     }
 
-    IsEmergencyPhoneNumber(data, size);
+    SetPausePicture(data, size);
 }
-}  // namespace OHOS
+} // namespace OHOS
 
 /* Fuzzer entry point */
-extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
+extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
     OHOS::AddCallTokenFuzzer token;
     /* Run your code on data */
