@@ -17,27 +17,96 @@
 
 #include <cstddef>
 #include <cstdint>
-
+#define private public
 #include "addcalltoken_fuzzer.h"
-#include "call_manager_client.h"
+#include "call_manager_service.h"
+#include "call_manager_service_stub.h"
 #include "system_ability_definition.h"
 
 using namespace OHOS::Telephony;
 namespace OHOS {
+static bool g_isInited = false;
+constexpr int32_t CALL_ID_NUM = 10;
+
+bool IsServiceInited()
+{
+    if (!g_isInited) {
+        DelayedSingleton<CallManagerService>::GetInstance()->OnStart();
+        if (DelayedSingleton<CallManagerService>::GetInstance()->GetServiceRunningState() ==
+            static_cast<int32_t>(CallManagerService::ServiceRunningState::STATE_RUNNING)) {
+            g_isInited = true;
+        }
+    }
+    return g_isInited;
+}
+
+void StartDtmf(const uint8_t *data, size_t size)
+{
+    if (!IsServiceInited()) {
+        return;
+    }
+
+    int32_t callId = size % CALL_ID_NUM;
+    char str = *reinterpret_cast<const char *>(data);
+    MessageParcel dataMessageParcel;
+    dataMessageParcel.WriteInt32(callId);
+    dataMessageParcel.WriteInt8(str);
+    dataMessageParcel.RewindRead(0);
+    MessageParcel reply;
+    DelayedSingleton<CallManagerService>::GetInstance()->OnStartDtmf(dataMessageParcel, reply);
+}
+
+void StopRtt(const uint8_t *data, size_t size)
+{
+    if (!IsServiceInited()) {
+        return;
+    }
+
+    int32_t callId = size % CALL_ID_NUM;
+    MessageParcel dataMessageParcel;
+    dataMessageParcel.WriteInt32(callId);
+    dataMessageParcel.RewindRead(0);
+    MessageParcel reply;
+    DelayedSingleton<CallManagerService>::GetInstance()->OnStopRtt(dataMessageParcel, reply);
+}
+
+void SetMuted(const uint8_t *data, size_t size)
+{
+    if (!IsServiceInited()) {
+        return;
+    }
+
+    bool isMute = false;
+    MessageParcel dataMessageParcel;
+    dataMessageParcel.WriteBool(isMute);
+    dataMessageParcel.RewindRead(0);
+    MessageParcel reply;
+    DelayedSingleton<CallManagerService>::GetInstance()->OnSetMute(dataMessageParcel, reply);
+}
+
+void MuteRinger(const uint8_t *data, size_t size)
+{
+    if (!IsServiceInited()) {
+        return;
+    }
+
+    MessageParcel dataMessageParcel;
+    dataMessageParcel.WriteBuffer(data, size);
+    dataMessageParcel.RewindRead(0);
+    MessageParcel reply;
+    DelayedSingleton<CallManagerService>::GetInstance()->OnSetMute(dataMessageParcel, reply);
+}
+
 void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
 {
     if (data == nullptr || size == 0) {
         return;
     }
-    auto cmClient = DelayedSingleton<CallManagerClient>::GetInstance();
-    if (!cmClient) {
-        return;
-    }
 
-    cmClient->Init(TELEPHONY_CALL_MANAGER_SYS_ABILITY_ID);
-    int32_t callId = size % 10;
-    char c = *reinterpret_cast<const char *>(data);
-    cmClient->StartDtmf(callId, c);
+    StartDtmf(data, size);
+    StopRtt(data, size);
+    SetMuted(data, size);
+    MuteRinger(data, size);
 }
 } // namespace OHOS
 

@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "isemergencyphonenumber_fuzzer.h"
+#include "setaudiodevice_fuzzer.h"
 
 #include <cstddef>
 #include <cstdint>
@@ -25,7 +25,7 @@
 using namespace OHOS::Telephony;
 namespace OHOS {
 static bool g_isInited = false;
-constexpr int32_t SLOT_NUM = 2;
+constexpr int32_t DEVICE_TYPE = 8;
 
 bool IsServiceInited()
 {
@@ -39,21 +39,20 @@ bool IsServiceInited()
     return g_isInited;
 }
 
-bool IsEmergencyPhoneNumber(const uint8_t *data, size_t size)
+int32_t SetAudioDevice(const uint8_t *data, size_t size)
 {
     if (!IsServiceInited()) {
-        return false;
+        return TELEPHONY_ERROR;
     }
-
-    std::string number(reinterpret_cast<char *>(const_cast<uint8_t *>(data)), size);
-    auto numberU16 = Str8ToStr16(number);
-    int32_t slotId = static_cast<uint32_t>(size % SLOT_NUM);
+    std::string address(reinterpret_cast<const char *>(data), size);
+    int32_t deviceType = static_cast<int32_t>(size % DEVICE_TYPE);
     MessageParcel dataParcel;
-    dataParcel.WriteString16(numberU16);
-    dataParcel.WriteInt32(slotId);
+    dataParcel.WriteInt32(deviceType);
+    dataParcel.WriteString(address);
     dataParcel.RewindRead(0);
+
     MessageParcel reply;
-    return DelayedSingleton<CallManagerService>::GetInstance()->OnIsEmergencyPhoneNumber(dataParcel, reply);
+    return DelayedSingleton<CallManagerService>::GetInstance()->OnSetAudioDevice(dataParcel, reply);
 }
 
 void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
@@ -62,12 +61,12 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
         return;
     }
 
-    IsEmergencyPhoneNumber(data, size);
+    SetAudioDevice(data, size);
 }
-}  // namespace OHOS
+} // namespace OHOS
 
 /* Fuzzer entry point */
-extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
+extern "C" int LLVMFuzzerTestOneInput(const uint8_t *data, size_t size)
 {
     OHOS::AddCallTokenFuzzer token;
     /* Run your code on data */
