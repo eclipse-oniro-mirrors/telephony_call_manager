@@ -135,7 +135,7 @@ CallRunningState CallBase::GetCallRunningState()
 int32_t CallBase::SetTelCallState(TelCallState nextState)
 {
     std::lock_guard<std::mutex> lock(mutex_);
-    if (callState_ == nextState) {
+    if (callRunningState_ != CallRunningState::CALL_RUNNING_STATE_CREATE && callState_ == nextState) {
         TELEPHONY_LOGI("Call state duplication %{public}d", nextState);
         return CALL_ERR_NOT_NEW_STATE;
     }
