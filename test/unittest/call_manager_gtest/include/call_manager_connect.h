@@ -356,6 +356,39 @@ private:
     std::map<uint32_t, CallAbilityCallbackFunc> memberFuncMap_;
 };
 
+class CallManagerCallBackStub : public CallManagerCallback {
+public:
+    int32_t OnCallDetailsChange(const CallAttributeInfo &info)
+    {
+        return TELEPHONY_SUCCESS;
+    }
+
+    int32_t OnCallEventChange(const CallEventInfo &info)
+    {
+        return TELEPHONY_SUCCESS;
+    }
+
+    int32_t OnCallDisconnectedCause(const DisconnectedDetails &details)
+    {
+        return TELEPHONY_SUCCESS;
+    }
+
+    int32_t OnReportAsyncResults(CallResultReportId reportId, AppExecFwk::PacMap &resultInfo)
+    {
+        return TELEPHONY_SUCCESS;
+    }
+
+    int32_t OnOttCallRequest(OttCallRequestId requestId, AppExecFwk::PacMap &info)
+    {
+        return TELEPHONY_SUCCESS;
+    }
+
+    int32_t OnReportMmiCodeResult(const MmiCodeInfo &info)
+    {
+        return TELEPHONY_SUCCESS;
+    }
+};
+
 class CallManagerConnect {
 public:
     CallManagerConnect()
