@@ -72,8 +72,11 @@ void CellularCallConnection::UnInit()
 {
     DisconnectService();
     if (statusChangeListener_ != nullptr) {
-        statusChangeListener_.clear();
-        statusChangeListener_ = nullptr;
+        auto samgrProxy = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+        if (samgrProxy != nullptr) {
+            samgrProxy->UnSubscribeSystemAbility(TELEPHONY_CELLULAR_CALL_SYS_ABILITY_ID, statusChangeListener_);
+            statusChangeListener_ = nullptr;
+        }
     }
 }
 
