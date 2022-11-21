@@ -284,6 +284,7 @@ void CallRequestProcess::CarrierDialProcess(DialParaInfo &info)
         TELEPHONY_LOGW("PackCellularCallInfo failed!");
         CallManagerHisysevent::WriteDialCallFaultEvent(info.accountId, static_cast<int32_t>(info.callType),
             static_cast<int32_t>(info.videoState), ret, "Carrier type PackCellularCallInfo failed");
+        return;
     }
     // Obtain gateway information
     ret = DelayedSingleton<CellularCallConnection>::GetInstance()->Dial(callInfo);
@@ -301,6 +302,7 @@ void CallRequestProcess::VoiceMailDialProcess(DialParaInfo &info)
         TELEPHONY_LOGW("PackCellularCallInfo failed!");
         CallManagerHisysevent::WriteDialCallFaultEvent(info.accountId, static_cast<int32_t>(info.callType),
             static_cast<int32_t>(info.videoState), ret, "Voice mail type PackCellularCallInfo failed");
+        return;
     }
     ret = DelayedSingleton<CellularCallConnection>::GetInstance()->Dial(callInfo);
     if (ret != TELEPHONY_SUCCESS) {

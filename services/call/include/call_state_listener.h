@@ -26,8 +26,8 @@ class CallStateListener {
 public:
     CallStateListener();
     virtual ~CallStateListener();
-    bool AddOneObserver(const sptr<CallStateListenerBase> &observer);
-    bool RemoveOneObserver(const sptr<CallStateListenerBase> &observer);
+    bool AddOneObserver(const std::shared_ptr<CallStateListenerBase> &observer);
+    bool RemoveOneObserver(const std::shared_ptr<CallStateListenerBase> &observer);
     bool RemoveAllObserver();
     void NewCallCreated(sptr<CallBase> &callObjectPtr);
     void CallDestroyed(const DisconnectedDetails &details);
@@ -37,7 +37,7 @@ public:
     void CallEventUpdated(CallEventInfo &info);
 
 private:
-    std::set<sptr<CallStateListenerBase>> listenerSet_;
+    std::set<std::shared_ptr<CallStateListenerBase>> listenerSet_;
     std::mutex mutex_;
 };
 } // namespace Telephony
