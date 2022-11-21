@@ -29,7 +29,7 @@ CallStateListener::~CallStateListener()
     listenerSet_.clear();
 }
 
-bool CallStateListener::AddOneObserver(const sptr<CallStateListenerBase> &observer)
+bool CallStateListener::AddOneObserver(const std::shared_ptr<CallStateListenerBase> &observer)
 {
     if (observer == nullptr) {
         TELEPHONY_LOGE("observer is nullptr!");
@@ -43,7 +43,7 @@ bool CallStateListener::AddOneObserver(const sptr<CallStateListenerBase> &observ
     return true;
 }
 
-bool CallStateListener::RemoveOneObserver(const sptr<CallStateListenerBase> &observer)
+bool CallStateListener::RemoveOneObserver(const std::shared_ptr<CallStateListenerBase> &observer)
 {
     if (observer == nullptr) {
         TELEPHONY_LOGE("observer is nullptr!");

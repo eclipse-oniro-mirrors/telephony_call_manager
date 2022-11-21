@@ -50,8 +50,11 @@ CallControlManager::CallControlManager()
 CallControlManager::~CallControlManager()
 {
     if (statusChangeListener_ != nullptr) {
-        statusChangeListener_.clear();
-        statusChangeListener_ = nullptr;
+        auto samgrProxy = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+        if (samgrProxy != nullptr) {
+            samgrProxy->UnSubscribeSystemAbility(COMMON_EVENT_SERVICE_ID, statusChangeListener_);
+            statusChangeListener_ = nullptr;
+        }
     }
 }
 
@@ -68,12 +71,12 @@ bool CallControlManager::Init()
         return false;
     }
     callRequestHandlerServicePtr_->Start();
-    incomingCallWakeup_ = std::make_unique<IncomingCallWakeup>();
+    incomingCallWakeup_ = std::make_shared<IncomingCallWakeup>();
     if (incomingCallWakeup_ == nullptr) {
         TELEPHONY_LOGE("incomingCallWakeup_ is null");
         return false;
     }
-    missedCallNotification_ = std::make_unique<MissedCallNotification>();
+    missedCallNotification_ = std::make_shared<MissedCallNotification>();
     if (missedCallNotification_ == nullptr) {
         TELEPHONY_LOGE("missedCallNotification_ is null");
         return false;
@@ -936,23 +939,23 @@ void CallControlManager::CallStateObserve()
         TELEPHONY_LOGE("callStateListenerPtr_ is null");
         return;
     }
-    std::unique_ptr<RejectCallSms> hangUpSmsPtr = std::make_unique<RejectCallSms>();
+    std::shared_ptr<RejectCallSms> hangUpSmsPtr = std::make_shared<RejectCallSms>();
     if (hangUpSmsPtr == nullptr) {
         TELEPHONY_LOGE("hangUpSmsPtr is null");
         return;
     }
-    std::unique_ptr<CallStateReportProxy> callStateReportPtr = std::make_unique<CallStateReportProxy>();
+    std::shared_ptr<CallStateReportProxy> callStateReportPtr = std::make_shared<CallStateReportProxy>();
     if (callStateReportPtr == nullptr) {
         TELEPHONY_LOGE("CallStateReportProxy is nullptr!");
         return;
     }
-    callStateListenerPtr_->AddOneObserver(DelayedSingleton<CallAbilityReportProxy>::GetInstance().get());
-    callStateListenerPtr_->AddOneObserver(callStateReportPtr.release());
-    callStateListenerPtr_->AddOneObserver(DelayedSingleton<AudioControlManager>::GetInstance().get());
-    callStateListenerPtr_->AddOneObserver(hangUpSmsPtr.release());
-    callStateListenerPtr_->AddOneObserver(missedCallNotification_.release());
-    callStateListenerPtr_->AddOneObserver(incomingCallWakeup_.release());
-    callStateListenerPtr_->AddOneObserver(DelayedSingleton<CallRecordsManager>::GetInstance().get());
+    callStateListenerPtr_->AddOneObserver(DelayedSingleton<CallAbilityReportProxy>::GetInstance());
+    callStateListenerPtr_->AddOneObserver(callStateReportPtr);
+    callStateListenerPtr_->AddOneObserver(DelayedSingleton<AudioControlManager>::GetInstance());
+    callStateListenerPtr_->AddOneObserver(hangUpSmsPtr);
+    callStateListenerPtr_->AddOneObserver(missedCallNotification_);
+    callStateListenerPtr_->AddOneObserver(incomingCallWakeup_);
+    callStateListenerPtr_->AddOneObserver(DelayedSingleton<CallRecordsManager>::GetInstance());
 }
 
 int32_t CallControlManager::NumberLegalityCheck(std::string &number)

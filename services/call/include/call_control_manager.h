@@ -126,8 +126,8 @@ private:
     std::unique_ptr<CallStateListener> callStateListenerPtr_;
     std::unique_ptr<CallRequestHandlerService> callRequestHandlerServicePtr_;
     // notify when incoming calls are ignored, not rejected or answered
-    std::unique_ptr<IncomingCallWakeup> incomingCallWakeup_;
-    std::unique_ptr<MissedCallNotification> missedCallNotification_;
+    std::shared_ptr<IncomingCallWakeup> incomingCallWakeup_;
+    std::shared_ptr<MissedCallNotification> missedCallNotification_;
     std::unique_ptr<CallSettingManager> callSettingManagerPtr_;
     sptr<ISystemAbilityStatusChange> statusChangeListener_ = nullptr;
     DialParaInfo dialSrcInfo_;
