@@ -44,27 +44,25 @@ void CallRequestProcess::DialRequest()
             "the device is not dialing");
         return;
     }
-    if (info.dialType == DialType::DIAL_CARRIER_TYPE) {
-        bool isFdnEnabled = DelayedSingleton<CoreServiceConnection>::GetInstance()->IsFdnEnabled(info.accountId);
-        if (isFdnEnabled) {
-            std::vector<std::u16string> fdnNumberList =
-                DelayedSingleton<CoreServiceConnection>::GetInstance()->GetFdnNumberList(info.accountId);
-            if (!fdnNumberList.empty() && !IsFdnNumber(fdnNumberList, info.number)) {
-                CallEventInfo eventInfo;
-                (void)memset_s(eventInfo.phoneNum, kMaxNumberLen, 0, kMaxNumberLen);
-                eventInfo.eventId = CallAbilityEventId::EVENT_INVALID_FDN_NUMBER;
-                if (info.number.length() > static_cast<size_t>(kMaxNumberLen)) {
-                    TELEPHONY_LOGE("Number out of limit!");
-                    return;
-                }
-                (void)memcpy_s(eventInfo.phoneNum, kMaxNumberLen, info.number.c_str(), info.number.length());
-                DelayedSingleton<CallControlManager>::GetInstance()->NotifyCallEventUpdated(eventInfo);
-                TELEPHONY_LOGW("invalid fdn number!");
-                CallManagerHisysevent::WriteDialCallFaultEvent(info.accountId, static_cast<int32_t>(info.callType),
-                    static_cast<int32_t>(info.videoState),
-                    static_cast<int32_t>(CallErrorCode::CALL_ERROR_INVALID_FDN_NUMBER), "invalid fdn number!");
-                return;
-            }
+    if (info.number.length() > static_cast<size_t>(kMaxNumberLen)) {
+        TELEPHONY_LOGE("Number out of limit!");
+        return;
+    }
+    if (info.dialType == DialType::DIAL_CARRIER_TYPE &&
+        DelayedSingleton<CoreServiceConnection>::GetInstance()->IsFdnEnabled(info.accountId)) {
+        std::vector<std::u16string> fdnNumberList =
+            DelayedSingleton<CoreServiceConnection>::GetInstance()->GetFdnNumberList(info.accountId);
+        if (!fdnNumberList.empty() && !IsFdnNumber(fdnNumberList, info.number)) {
+            CallEventInfo eventInfo;
+            (void)memset_s(eventInfo.phoneNum, kMaxNumberLen, 0, kMaxNumberLen);
+            eventInfo.eventId = CallAbilityEventId::EVENT_INVALID_FDN_NUMBER;
+            (void)memcpy_s(eventInfo.phoneNum, kMaxNumberLen, info.number.c_str(), info.number.length());
+            DelayedSingleton<CallControlManager>::GetInstance()->NotifyCallEventUpdated(eventInfo);
+            TELEPHONY_LOGW("invalid fdn number!");
+            CallManagerHisysevent::WriteDialCallFaultEvent(info.accountId, static_cast<int32_t>(info.callType),
+                static_cast<int32_t>(info.videoState),
+                static_cast<int32_t>(CallErrorCode::CALL_ERROR_INVALID_FDN_NUMBER), "invalid fdn number!");
+            return;
         }
     }
     TELEPHONY_LOGI("dialType:%{public}d", info.dialType);
