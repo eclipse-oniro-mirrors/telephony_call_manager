@@ -75,29 +75,29 @@ void BluetoothCallTest::RunBluetoothCallTest()
 
 void BluetoothCallTest::PrintfUsage()
 {
-    std::cout << "\n\n-----------bluetooth call test start--------------\n"
-              << "usage:please input a cmd num:\n"
-              << "0:dial\n"
-              << "1:answer\n"
-              << "2:reject\n"
-              << "3:hangup\n"
-              << "4:getCallState\n"
-              << "5:hold\n"
-              << "6:unhold\n"
-              << "7:switchCall\n"
-              << "8:combineConference\n"
-              << "9:separateConference\n"
-              << "10:startDtmf\n"
-              << "11:stopRtt\n"
-              << "12:isRinging\n"
-              << "13:hasCall\n"
-              << "14:isNewCallAllowed\n"
-              << "15:isInEmergencyCall\n"
-              << "16:setMuted\n"
-              << "17:muteRinger\n"
-              << "18:setAudioDevice\n"
-              << "19:GetCurrentCallList\n"
-              << "1000:exit\n";
+    std::cout << "\n\n-----------bluetooth call test start--------------\n";
+    std::cout << "usage:please input a cmd num:\n";
+    std::cout << "0:dial\n";
+    std::cout << "1:answer\n";
+    std::cout << "2:reject\n";
+    std::cout << "3:hangup\n";
+    std::cout << "4:getCallState\n";
+    std::cout << "5:hold\n";
+    std::cout << "6:unhold\n";
+    std::cout << "7:switchCall\n";
+    std::cout << "8:combineConference\n";
+    std::cout << "9:separateConference\n";
+    std::cout << "10:startDtmf\n";
+    std::cout << "11:stopRtt\n";
+    std::cout << "12:isRinging\n";
+    std::cout << "13:hasCall\n";
+    std::cout << "14:isNewCallAllowed\n";
+    std::cout << "15:isInEmergencyCall\n";
+    std::cout << "16:setMuted\n";
+    std::cout << "17:muteRinger\n";
+    std::cout << "18:setAudioDevice\n";
+    std::cout << "19:GetCurrentCallList\n";
+    std::cout << "1000:exit\n";
 }
 
 void BluetoothCallTest::InitFunMap()
