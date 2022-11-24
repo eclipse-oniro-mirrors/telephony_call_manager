@@ -23,13 +23,7 @@
 
 namespace OHOS {
 namespace Telephony {
-CallConnectAbility::~CallConnectAbility()
-{
-    if (connectCallback_ != nullptr) {
-        delete connectCallback_;
-        connectCallback_ = nullptr;
-    }
-}
+CallConnectAbility::~CallConnectAbility() {}
 
 CallConnectAbility::CallConnectAbility() {}
 
