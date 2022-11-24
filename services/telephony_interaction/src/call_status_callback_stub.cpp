@@ -156,6 +156,10 @@ int32_t CallStatusCallbackStub::OnUpdateDisconnectedCause(MessageParcel &data, M
         TELEPHONY_LOGW("sent raw data is less than 32k");
     }
     auto info = (DisconnectedDetails *)data.ReadRawData(sizeof(DisconnectedDetails));
+    if (info == nullptr) {
+        TELEPHONY_LOGE("data error");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     result = UpdateDisconnectedCause(*info);
     if (!reply.WriteInt32(result)) {
         TELEPHONY_LOGE("writing parcel failed");

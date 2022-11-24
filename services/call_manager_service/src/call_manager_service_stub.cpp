@@ -448,6 +448,10 @@ int32_t CallManagerServiceStub::OnSetCallRestriction(MessageParcel &data, Messag
     }
     int32_t slotId = data.ReadInt32();
     CallRestrictionInfo *pCRInfo = (CallRestrictionInfo *)data.ReadRawData(sizeof(CallRestrictionInfo));
+    if (pCRInfo == nullptr) {
+        TELEPHONY_LOGE("data error");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     result = SetCallRestriction(slotId, *pCRInfo);
     TELEPHONY_LOGI("result:%{public}d", result);
     if (!reply.WriteInt32(result)) {
@@ -479,6 +483,10 @@ int32_t CallManagerServiceStub::OnSetTransferNumber(MessageParcel &data, Message
     }
     int32_t slotId = data.ReadInt32();
     CallTransferInfo *pCTInfo = (CallTransferInfo *)data.ReadRawData(sizeof(CallTransferInfo));
+    if (pCTInfo == nullptr) {
+        TELEPHONY_LOGE("data error");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     result = SetCallTransferInfo(slotId, *pCTInfo);
     TELEPHONY_LOGI("result:%{public}d", result);
     if (!reply.WriteInt32(result)) {
@@ -562,6 +570,10 @@ int32_t CallManagerServiceStub::OnSetPreviewWindow(MessageParcel &data, MessageP
         TELEPHONY_LOGW("sent raw data is less than 32k");
     }
     VideoWindow *pSurface = (VideoWindow *)data.ReadRawData(sizeof(VideoWindow));
+    if (pSurface == nullptr) {
+        TELEPHONY_LOGE("data error");
+        return result;
+    }
     result = SetPreviewWindow(*pSurface);
     if (!reply.WriteInt32(result)) {
         TELEPHONY_LOGE("SetPreviewWindow fail to write parcel");
@@ -577,6 +589,10 @@ int32_t CallManagerServiceStub::OnSetDisplayWindow(MessageParcel &data, MessageP
         TELEPHONY_LOGW("sent raw data is less than 32k");
     }
     VideoWindow *pSurface = (VideoWindow *)data.ReadRawData(sizeof(VideoWindow));
+    if (pSurface == nullptr) {
+        TELEPHONY_LOGE("data error");
+        return result;
+    }
     result = SetDisplayWindow(*pSurface);
     if (!reply.WriteInt32(result)) {
         TELEPHONY_LOGE("SetDisplayWindow fail to write parcel");
@@ -866,6 +882,10 @@ int32_t CallManagerServiceStub::OnReportOttCallEventInfo(MessageParcel &data, Me
         TELEPHONY_LOGW("sent raw data is less than 32k");
     }
     OttCallEventInfo *pEventInfo = (OttCallEventInfo *)data.ReadRawData(sizeof(OttCallEventInfo));
+    if (pEventInfo == nullptr) {
+        TELEPHONY_LOGE("data error");
+        return result;
+    }
     result = ReportOttCallEventInfo(*pEventInfo);
     if (!reply.WriteInt32(result)) {
         TELEPHONY_LOGE("ReportOttCallDetailsInfo fail to write parcel");
