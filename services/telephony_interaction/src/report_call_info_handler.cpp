@@ -307,7 +307,11 @@ int32_t ReportCallInfoHandlerService::UpdateOttEventInfo(const OttCallEventInfo 
         TELEPHONY_LOGE("make_unique OttCallEventInfo failed!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    *para = info;
+    if (memcpy_s(para->bundleName, kMaxBundleNameLen, 0, kMaxBundleNameLen) != EOK) {
+        TELEPHONY_LOGE("memcpy_s para->phoneNum failed!");
+        return TELEPHONY_ERR_MEMSET_FAIL;
+    }
+    para->ottCallEventId = info.ottCallEventId;
     bool ret = handler_->SendEvent(HANDLER_UPDATE_OTT_EVENT_RESULT_INFO, std::move(para));
     if (!ret) {
         TELEPHONY_LOGE("SendEvent failed! eventId:%{public}d", info.ottCallEventId);
