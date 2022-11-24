@@ -22,6 +22,7 @@
 
 namespace OHOS {
 namespace Telephony {
+static const int32_t MAX_SIZE = 10000;
 BluetoothCallProxy::BluetoothCallProxy(const sptr<IRemoteObject> &impl)
     : IRemoteProxy<IBluetoothCall>(impl)
 {}
@@ -281,14 +282,17 @@ std::vector<CallAttributeInfo> BluetoothCallProxy::GetCurrentCallList(int32_t sl
         return callVec;
     }
     int32_t vecCnt = replyParcel.ReadInt32();
-    if (vecCnt <= 0) {
-        TELEPHONY_LOGE("vector is empty");
+    if (vecCnt <= 0 || vecCnt >= MAX_SIZE) {
+        TELEPHONY_LOGE("vector size is error");
         return callVec;
     }
-    CallAttributeInfo *infoPtr = nullptr;
     for (int32_t i = 0; i < vecCnt; i++) {
-        infoPtr = (CallAttributeInfo *)replyParcel.ReadRawData(sizeof(CallAttributeInfo));
-        callVec.push_back(*infoPtr);
+        auto value = reinterpret_cast<const CallAttributeInfo *>(replyParcel.ReadRawData(sizeof(CallAttributeInfo)));
+        if (value == nullptr) {
+            TELEPHONY_LOGE("data error");
+            return callVec;
+        }
+        callVec.push_back(*value);
     }
     return callVec;
 }
