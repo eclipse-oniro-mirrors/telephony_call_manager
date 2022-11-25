@@ -28,4 +28,8 @@ group("fuzztest") {
   deps += [ "setaudiodevice_fuzzer:fuzztest" ]
   deps += [ "controlcamera_fuzzer:fuzztest" ]
   deps += [ "setpausepicture_fuzzer:fuzztest" ]
+  deps += [ "bluetoothdialcall_fuzzer:fuzztest" ]
+  deps += [ "callnotification_fuzzer:fuzztest" ]
+  deps += [ "audiodevice_fuzzer:fuzztest" ]
+  deps += [ "call_fuzzer:fuzztest" ]
 }
