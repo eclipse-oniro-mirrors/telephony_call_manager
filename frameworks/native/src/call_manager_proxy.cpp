@@ -189,7 +189,6 @@ int32_t CallManagerProxy::UnRegisterCallBack()
         TELEPHONY_LOGE("callAbilityCallbackPtr_ is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    callAbilityCallbackPtr_->SetProcessCallback(nullptr);
     callAbilityCallbackPtr_.clear();
     callAbilityCallbackPtr_ = nullptr;
     registerStatus_ = false;
