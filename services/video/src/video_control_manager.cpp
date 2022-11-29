@@ -143,7 +143,11 @@ bool VideoControlManager::ContainCameraID(std::string id)
 
 bool VideoControlManager::IsPngFile(std::string fileName)
 {
-    int32_t len = SUPPORT_PICTURE_EXT.length();
+    size_t len = SUPPORT_PICTURE_EXT.length();
+    if (fileName.length() <= len + 1) {
+        TELEPHONY_LOGE("file not support: %{public}s", fileName.c_str());
+        return false;
+    }
     std::string ext = fileName.substr(fileName.length() - len, len);
     std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
     if (!((ext == SUPPORT_PICTURE_EXT))) {

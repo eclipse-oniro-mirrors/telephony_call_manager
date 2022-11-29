@@ -453,7 +453,7 @@ int32_t CellularCallProxy::StartDtmf(char cDtmfCode, const CellularCallInfo &cal
     if (!in.WriteInt32(MAX_SIZE)) {
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
-    if (!in.WriteCString(&cDtmfCode)) {
+    if (!in.WriteInt8(cDtmfCode)) {
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
     if (!in.WriteRawData((const void *)&callInfo, sizeof(CellularCallInfo))) {
@@ -508,7 +508,7 @@ int32_t CellularCallProxy::SendDtmf(char cDtmfCode, const CellularCallInfo &call
     if (!in.WriteInt32(MAX_SIZE)) {
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
-    if (!in.WriteCString(&cDtmfCode)) {
+    if (!in.WriteInt8(cDtmfCode)) {
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
     if (!in.WriteRawData((const void *)&callInfo, sizeof(CellularCallInfo))) {
