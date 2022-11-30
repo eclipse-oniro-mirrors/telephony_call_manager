@@ -31,10 +31,7 @@ CallManagerProxy::CallManagerProxy()
     : systemAbilityId_(TELEPHONY_CALL_MANAGER_SYS_ABILITY_ID), registerStatus_(false), initStatus_(false)
 {}
 
-CallManagerProxy::~CallManagerProxy()
-{
-    UnInit();
-}
+CallManagerProxy::~CallManagerProxy() = default;
 
 #ifdef CALL_MANAGER_AUTO_START_OPTIMIZE
 bool CallManagerProxy::IsServiceStart()
