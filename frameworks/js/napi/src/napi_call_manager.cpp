@@ -51,7 +51,7 @@ NapiCallManager::NapiCallManager() {}
 
 NapiCallManager::~NapiCallManager() 
 {
-    DelayedSingleton<CallManagerClient>::GetInstance()->UnRegisterCallback();
+    DelayedSingleton<CallManagerClient>::GetInstance()->UnRegisterCallBack();
 }
 
 void Init()
