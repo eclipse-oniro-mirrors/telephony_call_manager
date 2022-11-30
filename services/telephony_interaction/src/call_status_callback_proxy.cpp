@@ -329,50 +329,6 @@ int32_t CallStatusCallbackProxy::UpdateSetCallClirResult(const int32_t result)
     return replyParcel.ReadInt32();
 }
 
-int32_t CallStatusCallbackProxy::GetImsSwitchStatusResult(const ImsSwitchResponse &getSwitchResponse)
-{
-    MessageParcel dataParcel;
-    MessageParcel replyParcel;
-    MessageOption option;
-    int32_t error = TELEPHONY_ERR_FAIL;
-    if (!dataParcel.WriteInterfaceToken(CallStatusCallbackProxy::GetDescriptor())) {
-        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
-    }
-    int32_t length = sizeof(ImsSwitchResponse);
-    dataParcel.WriteInt32(length);
-    dataParcel.WriteRawData((const void *)&getSwitchResponse, length);
-    if (Remote() == nullptr) {
-        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
-    }
-    error = Remote()->SendRequest(GET_IMS_SWITCH_STATUS, dataParcel, replyParcel, option);
-    if (error != TELEPHONY_SUCCESS) {
-        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
-    }
-    return replyParcel.ReadInt32();
-}
-
-int32_t CallStatusCallbackProxy::SetImsSwitchStatusResult(const ImsSwitchResponse &setSwitchResponse)
-{
-    MessageOption option;
-    MessageParcel dataParcel;
-    MessageParcel replyParcel;
-    int32_t error = TELEPHONY_ERR_FAIL;
-    if (!dataParcel.WriteInterfaceToken(CallStatusCallbackProxy::GetDescriptor())) {
-        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
-    }
-    int32_t length = sizeof(ImsSwitchResponse);
-    dataParcel.WriteInt32(length);
-    dataParcel.WriteRawData((const void *)&setSwitchResponse, length);
-    if (Remote() == nullptr) {
-        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
-    }
-    error = Remote()->SendRequest(SET_IMS_SWITCH_STATUS, dataParcel, replyParcel, option);
-    if (error != TELEPHONY_SUCCESS) {
-        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
-    }
-    return replyParcel.ReadInt32();
-}
-
 int32_t CallStatusCallbackProxy::StartRttResult(const int32_t result)
 {
     MessageParcel dataParcel;
@@ -491,48 +447,6 @@ int32_t CallStatusCallbackProxy::SetImsFeatureValueResult(const int32_t result)
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     error = Remote()->SendRequest(SET_IMS_FEATURE_VALUE, dataParcel, replyParcel, option);
-    if (error != TELEPHONY_SUCCESS) {
-        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
-    }
-    return replyParcel.ReadInt32();
-}
-
-int32_t CallStatusCallbackProxy::GetLteEnhanceModeResult(const GetLteEnhanceModeResponse &response)
-{
-    MessageParcel dataParcel;
-    MessageParcel replyParcel;
-    MessageOption option;
-    int32_t error = TELEPHONY_ERR_FAIL;
-    if (!dataParcel.WriteInterfaceToken(CallStatusCallbackProxy::GetDescriptor())) {
-        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
-    }
-    int32_t length = sizeof(GetLteEnhanceModeResponse);
-    dataParcel.WriteInt32(length);
-    dataParcel.WriteRawData((const void *)&response, length);
-    if (Remote() == nullptr) {
-        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
-    }
-    error = Remote()->SendRequest(GET_LTE_ENHANCE_MODE, dataParcel, replyParcel, option);
-    if (error != TELEPHONY_SUCCESS) {
-        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
-    }
-    return replyParcel.ReadInt32();
-}
-
-int32_t CallStatusCallbackProxy::SetLteEnhanceModeResult(const int32_t result)
-{
-    MessageParcel dataParcel;
-    MessageParcel replyParcel;
-    MessageOption option;
-    int32_t error = CALL_ERR_ILLEGAL_CALL_OPERATION;
-    if (!dataParcel.WriteInterfaceToken(CallStatusCallbackProxy::GetDescriptor())) {
-        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
-    }
-    dataParcel.WriteInt32(result);
-    if (Remote() == nullptr) {
-        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
-    }
-    error = Remote()->SendRequest(SET_LTE_ENHANCE_MODE, dataParcel, replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }

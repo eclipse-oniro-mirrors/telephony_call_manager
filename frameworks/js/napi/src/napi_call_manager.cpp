@@ -1309,7 +1309,7 @@ napi_value NapiCallManager::EnableImsSwitch(napi_env env, napi_callback_info inf
     NAPI_ASSERT(env, argc < VALUE_MAXIMUM_LIMIT, "parameter error!");
     bool matchFlag = NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_FIRST], napi_number);
     NAPI_ASSERT(env, matchFlag, "EnableImsSwitch type error, should be number type");
-    auto asyncContext = std::make_unique<SupplementAsyncContext>();
+    auto asyncContext = std::make_unique<ImsSwitchAsyncContext>();
     if (asyncContext == nullptr) {
         std::string errorCode = std::to_string(napi_generic_failure);
         std::string errorMessage = "EnableImsSwitch error at baseContext is nullptr";
@@ -1317,13 +1317,10 @@ napi_value NapiCallManager::EnableImsSwitch(napi_env env, napi_callback_info inf
         return nullptr;
     }
     napi_get_value_int32(env, argv[ARRAY_INDEX_FIRST], &asyncContext->slotId);
-    asyncContext->flag = true;
     if (argc == TWO_VALUE_LIMIT) {
         napi_create_reference(env, argv[ARRAY_INDEX_SECOND], DATA_LENGTH_ONE, &(asyncContext->callbackRef));
     }
-    asyncContext->env = env;
-    napi_create_reference(env, thisVar, DATA_LENGTH_ONE, &(asyncContext->thisVar));
-    return HandleAsyncWork(env, asyncContext.release(), "EnableImsSwitch", NativeEnableImsSwitch, NativeCallBack);
+    return HandleAsyncWork(env, asyncContext.release(), "EnableImsSwitch", NativeEnableImsSwitch, NativeVoidCallBack);
 }
 
 napi_value NapiCallManager::DisableImsSwitch(napi_env env, napi_callback_info info)
@@ -1332,7 +1329,7 @@ napi_value NapiCallManager::DisableImsSwitch(napi_env env, napi_callback_info in
     NAPI_ASSERT(env, argc < VALUE_MAXIMUM_LIMIT, "parameter error!");
     bool matchFlag = NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_FIRST], napi_number);
     NAPI_ASSERT(env, matchFlag, "DisableImsSwitch type error, should be number type");
-    auto asyncContext = std::make_unique<SupplementAsyncContext>();
+    auto asyncContext = std::make_unique<ImsSwitchAsyncContext>();
     if (asyncContext == nullptr) {
         std::string errorCode = std::to_string(napi_generic_failure);
         std::string errorMessage = "DisableImsSwitch error at baseContext is nullptr";
@@ -1340,13 +1337,10 @@ napi_value NapiCallManager::DisableImsSwitch(napi_env env, napi_callback_info in
         return nullptr;
     }
     napi_get_value_int32(env, argv[ARRAY_INDEX_FIRST], &asyncContext->slotId);
-    asyncContext->flag = false;
     if (argc == TWO_VALUE_LIMIT) {
         napi_create_reference(env, argv[ARRAY_INDEX_SECOND], DATA_LENGTH_ONE, &(asyncContext->callbackRef));
     }
-    asyncContext->env = env;
-    napi_create_reference(env, thisVar, DATA_LENGTH_ONE, &(asyncContext->thisVar));
-    return HandleAsyncWork(env, asyncContext.release(), "DisableImsSwitch", NativeDisableImsSwitch, NativeCallBack);
+    return HandleAsyncWork(env, asyncContext.release(), "DisableImsSwitch", NativeDisableImsSwitch, NativeVoidCallBack);
 }
 
 napi_value NapiCallManager::IsImsSwitchEnabled(napi_env env, napi_callback_info info)
@@ -1355,7 +1349,7 @@ napi_value NapiCallManager::IsImsSwitchEnabled(napi_env env, napi_callback_info 
     NAPI_ASSERT(env, argc < VALUE_MAXIMUM_LIMIT, "parameter error!");
     bool matchFlag = NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_FIRST], napi_number);
     NAPI_ASSERT(env, matchFlag, "IsImsSwitchEnabled type error, should be number type");
-    auto asyncContext = std::make_unique<SupplementAsyncContext>();
+    auto asyncContext = std::make_unique<ImsSwitchAsyncContext>();
     if (asyncContext == nullptr) {
         std::string errorCode = std::to_string(napi_generic_failure);
         std::string errorMessage = "IsImsSwitchEnabled error at baseContext is nullptr";
@@ -1366,9 +1360,8 @@ napi_value NapiCallManager::IsImsSwitchEnabled(napi_env env, napi_callback_info 
     if (argc == TWO_VALUE_LIMIT) {
         napi_create_reference(env, argv[ARRAY_INDEX_SECOND], DATA_LENGTH_ONE, &(asyncContext->callbackRef));
     }
-    asyncContext->env = env;
-    napi_create_reference(env, thisVar, DATA_LENGTH_ONE, &(asyncContext->thisVar));
-    return HandleAsyncWork(env, asyncContext.release(), "IsImsSwitchEnabled", NativeIsImsSwitchEnabled, NativeCallBack);
+    return HandleAsyncWork(
+        env, asyncContext.release(), "IsImsSwitchEnabled", NativeIsImsSwitchEnabled, NativeBoolCallBack);
 }
 
 napi_value NapiCallManager::StartDTMF(napi_env env, napi_callback_info info)
@@ -2888,31 +2881,13 @@ void NapiCallManager::NativeEnableImsSwitch(napi_env env, void *data)
         TELEPHONY_LOGE("data is nullptr");
         return;
     }
-    auto asyncContext = (SupplementAsyncContext *)data;
+    auto asyncContext = (ImsSwitchAsyncContext *)data;
     if (!IsValidSlotId(asyncContext->slotId)) {
         TELEPHONY_LOGE("NativeEnableImsSwitch slotId is invalid");
         asyncContext->errorCode = SLOT_ID_INVALID;
         return;
     }
-    EventCallback infoListener;
-    infoListener.env = asyncContext->env;
-    infoListener.thisVar = asyncContext->thisVar;
-    infoListener.callbackRef = asyncContext->callbackRef;
-    infoListener.deferred = asyncContext->deferred;
-    asyncContext->resolved =
-        DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->RegisterEnableVolteCallback(infoListener);
-    if (asyncContext->resolved != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("RegisterEnableVolteCallback failed!");
-        return;
-    }
     asyncContext->resolved = DelayedSingleton<CallManagerClient>::GetInstance()->EnableImsSwitch(asyncContext->slotId);
-    if (asyncContext->resolved != TELEPHONY_SUCCESS) {
-        DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->UnRegisterEnableVolteCallback();
-        TELEPHONY_LOGE("EnableImsSwitch failed!");
-        return;
-    }
-    asyncContext->callbackRef = nullptr;
-    asyncContext->deferred = nullptr;
 }
 
 void NapiCallManager::NativeDisableImsSwitch(napi_env env, void *data)
@@ -2921,31 +2896,13 @@ void NapiCallManager::NativeDisableImsSwitch(napi_env env, void *data)
         TELEPHONY_LOGE("data is nullptr");
         return;
     }
-    auto asyncContext = (SupplementAsyncContext *)data;
+    auto asyncContext = (ImsSwitchAsyncContext *)data;
     if (!IsValidSlotId(asyncContext->slotId)) {
         TELEPHONY_LOGE("NativeDisableImsSwitch slotId is invalid");
         asyncContext->errorCode = SLOT_ID_INVALID;
         return;
     }
-    EventCallback infoListener;
-    infoListener.env = asyncContext->env;
-    infoListener.thisVar = asyncContext->thisVar;
-    infoListener.callbackRef = asyncContext->callbackRef;
-    infoListener.deferred = asyncContext->deferred;
-    asyncContext->resolved =
-        DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->RegisterDisableVolteCallback(infoListener);
-    if (asyncContext->resolved != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("RegisterDisableVolteCallback failed!");
-        return;
-    }
     asyncContext->resolved = DelayedSingleton<CallManagerClient>::GetInstance()->DisableImsSwitch(asyncContext->slotId);
-    if (asyncContext->resolved != TELEPHONY_SUCCESS) {
-        DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->UnRegisterDisableVolteCallback();
-        TELEPHONY_LOGE("DisableImsSwitch failed!");
-        return;
-    }
-    asyncContext->callbackRef = nullptr;
-    asyncContext->deferred = nullptr;
 }
 
 void NapiCallManager::NativeIsImsSwitchEnabled(napi_env env, void *data)
@@ -2954,32 +2911,17 @@ void NapiCallManager::NativeIsImsSwitchEnabled(napi_env env, void *data)
         TELEPHONY_LOGE("data is nullptr");
         return;
     }
-    auto asyncContext = (SupplementAsyncContext *)data;
+    auto asyncContext = (ImsSwitchAsyncContext *)data;
     if (!IsValidSlotId(asyncContext->slotId)) {
         TELEPHONY_LOGE("NativeIsImsSwitchEnabled slotId is invalid");
         asyncContext->errorCode = SLOT_ID_INVALID;
         return;
     }
-    EventCallback infoListener;
-    infoListener.env = asyncContext->env;
-    infoListener.thisVar = asyncContext->thisVar;
-    infoListener.callbackRef = asyncContext->callbackRef;
-    infoListener.deferred = asyncContext->deferred;
-    asyncContext->resolved =
-        DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->RegisterGetVolteCallback(infoListener);
-    if (asyncContext->resolved != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("RegisterGetVolteCallback failed!");
-        return;
+    asyncContext->errorCode = DelayedSingleton<CallManagerClient>::GetInstance()->IsImsSwitchEnabled(
+        asyncContext->slotId, asyncContext->enabled);
+    if (asyncContext->enabled) {
+        asyncContext->resolved = BOOL_VALUE_IS_TRUE;
     }
-    asyncContext->resolved =
-        DelayedSingleton<CallManagerClient>::GetInstance()->IsImsSwitchEnabled(asyncContext->slotId);
-    if (asyncContext->resolved != TELEPHONY_SUCCESS) {
-        DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->UnRegisterGetVolteCallback();
-        TELEPHONY_LOGE("IsImsSwitchEnabled failed!");
-        return;
-    }
-    asyncContext->callbackRef = nullptr;
-    asyncContext->deferred = nullptr;
 }
 
 void NapiCallManager::NativeStartDTMF(napi_env env, void *data)

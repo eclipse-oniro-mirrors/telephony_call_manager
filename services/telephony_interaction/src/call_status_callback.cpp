@@ -269,26 +269,6 @@ int32_t CallStatusCallback::UpdateSetCallClirResult(const int32_t result)
     return DelayedSingleton<CallAbilityReportProxy>::GetInstance()->ReportAsyncResults(reportId, resultInfo);
 }
 
-int32_t CallStatusCallback::GetImsSwitchStatusResult(const ImsSwitchResponse &switchResponse)
-{
-    TELEPHONY_LOGI("GetImsSwitchStatusResult result = %{public}d, active = %{public}d", switchResponse.result,
-        switchResponse.active);
-    CallResultReportId reportId = CallResultReportId::GET_CALL_VOTLE_REPORT_ID;
-    AppExecFwk::PacMap resultInfo;
-    resultInfo.PutIntValue("result", switchResponse.result);
-    resultInfo.PutIntValue("active", switchResponse.active);
-    return DelayedSingleton<CallAbilityReportProxy>::GetInstance()->ReportAsyncResults(reportId, resultInfo);
-}
-
-int32_t CallStatusCallback::SetImsSwitchStatusResult(const ImsSwitchResponse &switchResponse)
-{
-    TELEPHONY_LOGI("SetImsSwitchStatusResult result = %{public}d", switchResponse.result);
-    CallResultReportId reportId = CallResultReportId::SET_CALL_VOTLE_REPORT_ID;
-    AppExecFwk::PacMap resultInfo;
-    resultInfo.PutIntValue("result", switchResponse.result);
-    return DelayedSingleton<CallAbilityReportProxy>::GetInstance()->ReportAsyncResults(reportId, resultInfo);
-}
-
 int32_t CallStatusCallback::StartRttResult(const int32_t result)
 {
     TELEPHONY_LOGI("StartRttResult result = %{public}d", result);
@@ -342,25 +322,6 @@ int32_t CallStatusCallback::SetImsFeatureValueResult(const int32_t result)
     AppExecFwk::PacMap resultInfo;
     resultInfo.PutIntValue("result", result);
     TELEPHONY_LOGI("result = %{public}d", result);
-    return DelayedSingleton<CallAbilityReportProxy>::GetInstance()->ReportAsyncResults(reportId, resultInfo);
-}
-
-int32_t CallStatusCallback::GetLteEnhanceModeResult(const GetLteEnhanceModeResponse &response)
-{
-    CallResultReportId reportId = CallResultReportId::GET_LTE_ENHANCE_MODE_REPORT_ID;
-    AppExecFwk::PacMap resultInfo;
-    resultInfo.PutIntValue("result", response.result);
-    resultInfo.PutIntValue("value", response.value);
-    TELEPHONY_LOGI("result = %{public}d value = %{public}d", response.result, response.value);
-    return DelayedSingleton<CallAbilityReportProxy>::GetInstance()->ReportAsyncResults(reportId, resultInfo);
-}
-
-int32_t CallStatusCallback::SetLteEnhanceModeResult(const int32_t result)
-{
-    CallResultReportId reportId = CallResultReportId::SET_LTE_ENHANCE_MODE_REPORT_ID;
-    AppExecFwk::PacMap resultInfo;
-    resultInfo.PutIntValue("result", result);
-    TELEPHONY_LOGI("SetLteEnhanceModeResult result = %{public}d", result);
     return DelayedSingleton<CallAbilityReportProxy>::GetInstance()->ReportAsyncResults(reportId, resultInfo);
 }
 

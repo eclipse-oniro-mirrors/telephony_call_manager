@@ -326,13 +326,11 @@ private:
                 resultInfo.PutIntValue("action", data.ReadInt32());
                 resultInfo.PutIntValue("clirStat", data.ReadInt32());
                 break;
-            case CallResultReportId::GET_CALL_VOTLE_REPORT_ID:
             case CallResultReportId::START_RTT_REPORT_ID:
                 resultInfo.PutIntValue("active", data.ReadInt32());
                 break;
             case CallResultReportId::GET_IMS_CONFIG_REPORT_ID:
             case CallResultReportId::GET_IMS_FEATURE_VALUE_REPORT_ID:
-            case CallResultReportId::GET_LTE_ENHANCE_MODE_REPORT_ID:
                 resultInfo.PutIntValue("value", data.ReadInt32());
                 break;
             case CallResultReportId::STOP_RTT_REPORT_ID:
@@ -761,7 +759,8 @@ public:
     int32_t IsImsSwitchEnabled(int32_t slotId)
     {
         if (callManagerServicePtr_ != nullptr) {
-            return callManagerServicePtr_->IsImsSwitchEnabled(slotId);
+            bool enabled;
+            return callManagerServicePtr_->IsImsSwitchEnabled(slotId, enabled);
         }
         TELEPHONY_LOGE("callManagerServicePtr_ is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;

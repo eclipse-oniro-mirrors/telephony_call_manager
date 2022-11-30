@@ -339,9 +339,10 @@ public:
      * Get Ims Switch Status
      *
      * @param slotId
+     * @param enabled
      * @return Returns TELEPHONY_SUCCESS on success, others on failure.
      */
-    virtual int32_t GetImsSwitchStatus(int32_t slotId) = 0;
+    virtual int32_t GetImsSwitchStatus(int32_t slotId, bool &enabled) = 0;
 
     /**
      * Set Ims Config
