@@ -38,7 +38,7 @@ constexpr int32_t SLOT_ID_INVALID = 202;
 class NapiCallManager {
 public:
     NapiCallManager();
-    ~NapiCallManager() = default;
+    ~NapiCallManager();
 
     static napi_value DeclareCallBasisInterface(napi_env env, napi_value exports);
     static napi_value DeclareCallConferenceInterface(napi_env env, napi_value exports);
