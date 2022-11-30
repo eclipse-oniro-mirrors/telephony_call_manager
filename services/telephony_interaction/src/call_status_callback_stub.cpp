@@ -43,14 +43,10 @@ CallStatusCallbackStub::CallStatusCallbackStub()
     memberFuncMap_[UPDATE_GET_CALL_CLIP] = &CallStatusCallbackStub::OnUpdateGetCallClipResult;
     memberFuncMap_[UPDATE_GET_CALL_CLIR] = &CallStatusCallbackStub::OnUpdateGetCallClirResult;
     memberFuncMap_[UPDATE_SET_CALL_CLIR] = &CallStatusCallbackStub::OnUpdateSetCallClirResult;
-    memberFuncMap_[GET_IMS_SWITCH_STATUS] = &CallStatusCallbackStub::OnGetImsSwitchStatusResult;
-    memberFuncMap_[SET_IMS_SWITCH_STATUS] = &CallStatusCallbackStub::OnSetImsSwitchStatusResult;
     memberFuncMap_[GET_IMS_CONFIG] = &CallStatusCallbackStub::OnGetImsConfigResult;
     memberFuncMap_[SET_IMS_CONFIG] = &CallStatusCallbackStub::OnSetImsConfigResult;
     memberFuncMap_[GET_IMS_FEATURE_VALUE] = &CallStatusCallbackStub::OnGetImsFeatureValueResult;
     memberFuncMap_[SET_IMS_FEATURE_VALUE] = &CallStatusCallbackStub::OnSetImsFeatureValueResult;
-    memberFuncMap_[GET_LTE_ENHANCE_MODE] = &CallStatusCallbackStub::OnGetLteEnhanceModeResult;
-    memberFuncMap_[SET_LTE_ENHANCE_MODE] = &CallStatusCallbackStub::OnSetLteEnhanceModeResult;
     memberFuncMap_[RECEIVE_UPDATE_MEDIA_MODE_RESPONSE] = &CallStatusCallbackStub::OnReceiveUpdateMediaModeResponse;
     memberFuncMap_[UPDATE_STARTRTT_STATUS] = &CallStatusCallbackStub::OnStartRttResult;
     memberFuncMap_[UPDATE_STOPRTT_STATUS] = &CallStatusCallbackStub::OnStopRttResult;
@@ -390,54 +386,6 @@ int32_t CallStatusCallbackStub::OnUpdateSetCallClirResult(MessageParcel &data, M
     return TELEPHONY_SUCCESS;
 }
 
-int32_t CallStatusCallbackStub::OnGetImsSwitchStatusResult(MessageParcel &data, MessageParcel &reply)
-{
-    int32_t error = TELEPHONY_ERR_FAIL;
-    if (!data.ContainFileDescriptors()) {
-        TELEPHONY_LOGW("sent raw data is less than 32k");
-    }
-    const ImsSwitchResponse *parcelPtr = nullptr;
-    int32_t len = data.ReadInt32();
-    if (len <= 0 || len >= MAX_LEN) {
-        TELEPHONY_LOGE("Invalid parameter, len = %{public}d", len);
-        return TELEPHONY_ERR_ARGUMENT_INVALID;
-    }
-    if ((parcelPtr = reinterpret_cast<const ImsSwitchResponse *>(data.ReadRawData(len))) == nullptr) {
-        TELEPHONY_LOGE("reading raw data failed, length = %d", len);
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-    error = GetImsSwitchStatusResult(*parcelPtr);
-    if (!reply.WriteInt32(error)) {
-        TELEPHONY_LOGE("writing parcel failed");
-        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
-    }
-    return TELEPHONY_SUCCESS;
-}
-
-int32_t CallStatusCallbackStub::OnSetImsSwitchStatusResult(MessageParcel &data, MessageParcel &reply)
-{
-    int32_t error = TELEPHONY_ERR_FAIL;
-    if (!data.ContainFileDescriptors()) {
-        TELEPHONY_LOGW("sent raw data is less than 32k");
-    }
-    const ImsSwitchResponse *parcelPtr = nullptr;
-    int32_t len = data.ReadInt32();
-    if (len <= 0 || len >= MAX_LEN) {
-        TELEPHONY_LOGE("Invalid parameter, len = %{public}d", len);
-        return TELEPHONY_ERR_ARGUMENT_INVALID;
-    }
-    if ((parcelPtr = reinterpret_cast<const ImsSwitchResponse *>(data.ReadRawData(len))) == nullptr) {
-        TELEPHONY_LOGE("reading raw data failed, length = %d", len);
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-    error = SetImsSwitchStatusResult(*parcelPtr);
-    if (!reply.WriteInt32(error)) {
-        TELEPHONY_LOGE("writing parcel failed");
-        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
-    }
-    return TELEPHONY_SUCCESS;
-}
-
 int32_t CallStatusCallbackStub::OnStartRttResult(MessageParcel &data, MessageParcel &reply)
 {
     int32_t error = TELEPHONY_ERR_FAIL;
@@ -543,46 +491,6 @@ int32_t CallStatusCallbackStub::OnSetImsFeatureValueResult(MessageParcel &data, 
     }
     result = data.ReadInt32();
     error = SetImsFeatureValueResult(result);
-    if (!reply.WriteInt32(error)) {
-        TELEPHONY_LOGE("writing parcel failed");
-        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
-    }
-    return TELEPHONY_SUCCESS;
-}
-
-int32_t CallStatusCallbackStub::OnGetLteEnhanceModeResult(MessageParcel &data, MessageParcel &reply)
-{
-    int32_t error = TELEPHONY_ERR_FAIL;
-    if (!data.ContainFileDescriptors()) {
-        TELEPHONY_LOGW("sent raw data is less than 32k");
-    }
-    const GetLteEnhanceModeResponse *parcelPtr = nullptr;
-    int32_t len = data.ReadInt32();
-    if (len <= 0 || len >= MAX_LEN) {
-        TELEPHONY_LOGE("Invalid parameter, len = %{public}d", len);
-        return TELEPHONY_ERR_ARGUMENT_INVALID;
-    }
-    if ((parcelPtr = reinterpret_cast<const GetLteEnhanceModeResponse *>(data.ReadRawData(len))) == nullptr) {
-        TELEPHONY_LOGE("reading raw data failed, length = %d", len);
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-    error = GetLteEnhanceModeResult(*parcelPtr);
-    if (!reply.WriteInt32(error)) {
-        TELEPHONY_LOGE("writing parcel failed");
-        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
-    }
-    return TELEPHONY_SUCCESS;
-}
-
-int32_t CallStatusCallbackStub::OnSetLteEnhanceModeResult(MessageParcel &data, MessageParcel &reply)
-{
-    int32_t error = TELEPHONY_ERR_FAIL;
-    int32_t result = TELEPHONY_ERR_FAIL;
-    if (!data.ContainFileDescriptors()) {
-        TELEPHONY_LOGW("sent raw data is less than 32k");
-    }
-    result = data.ReadInt32();
-    error = SetLteEnhanceModeResult(result);
     if (!reply.WriteInt32(error)) {
         TELEPHONY_LOGE("writing parcel failed");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;

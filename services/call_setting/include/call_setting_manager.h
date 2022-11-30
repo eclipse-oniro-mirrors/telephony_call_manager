@@ -43,7 +43,7 @@ public:
     int32_t SetImsFeatureValue(int32_t slotId, FeatureType type, int32_t value);
     int32_t EnableImsSwitch(int32_t slotId);
     int32_t DisableImsSwitch(int32_t slotId);
-    int32_t IsImsSwitchEnabled(int32_t slotId);
+    int32_t IsImsSwitchEnabled(int32_t slotId, bool &enabled);
 
 private:
     int32_t CallWaitingPolicy(int32_t slotId);

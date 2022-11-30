@@ -48,6 +48,42 @@ int32_t CallManagerCallbackTest::OnReportAsyncResults(CallResultReportId reportI
 {
     std::cout << "----------OnReportAsyncResults--------" << std::endl
               << "reportId:" << (int32_t)reportId << std::endl;
+    switch (reportId) {
+        case CallResultReportId::GET_CALL_WAITING_REPORT_ID:
+            std::cout << "result:" << (int32_t)resultInfo.GetIntValue("result", -1) << std::endl
+                      << "status:" << (int32_t)resultInfo.GetIntValue("status", -1) << std::endl
+                      << "classCw:" << (int32_t)resultInfo.GetIntValue("classCw", -1) << std::endl;
+            break;
+        case CallResultReportId::SET_CALL_WAITING_REPORT_ID:
+            std::cout << "result:" << (int32_t)resultInfo.GetIntValue("result", -1) << std::endl;
+            break;
+        case CallResultReportId::GET_CALL_RESTRICTION_REPORT_ID:
+            std::cout << "result:" << (int32_t)resultInfo.GetIntValue("result", -1) << std::endl
+                      << "status:" << (int32_t)resultInfo.GetIntValue("status", -1) << std::endl
+                      << "classCw:" << (int32_t)resultInfo.GetIntValue("classCw", -1) << std::endl;
+            break;
+        case CallResultReportId::SET_CALL_RESTRICTION_REPORT_ID:
+            std::cout << "result:" << (int32_t)resultInfo.GetIntValue("result", -1) << std::endl;
+            break;
+        case CallResultReportId::GET_CALL_TRANSFER_REPORT_ID:
+            std::cout << "result:" << (int32_t)resultInfo.GetIntValue("result", -1) << std::endl
+                      << "status:" << (int32_t)resultInfo.GetIntValue("status", -1) << std::endl
+                      << "classx:" << (int32_t)resultInfo.GetIntValue("classx", -1) << std::endl
+                      << "number:" << resultInfo.GetStringValue("number", "") << std::endl
+                      << "type:" << (int32_t)resultInfo.GetIntValue("type", -1) << std::endl
+                      << "reason:" << (int32_t)resultInfo.GetIntValue("reason", -1) << std::endl
+                      << "time:" << (int32_t)resultInfo.GetIntValue("time", -1) << std::endl
+                      << "startHour:" << (int32_t)resultInfo.GetIntValue("startHour", -1) << std::endl
+                      << "startMinute:" << (int32_t)resultInfo.GetIntValue("startMinute", -1) << std::endl
+                      << "endHour:" << (int32_t)resultInfo.GetIntValue("endHour", -1) << std::endl
+                      << "endMinute:" << (int32_t)resultInfo.GetIntValue("endMinute", -1) << std::endl;
+            break;
+        case CallResultReportId::SET_CALL_TRANSFER_REPORT_ID:
+            std::cout << "result:" << (int32_t)resultInfo.GetIntValue("result", -1) << std::endl;
+            break;
+        default:
+            break;
+    }
     return RETURN_SUCCESS;
 }
 

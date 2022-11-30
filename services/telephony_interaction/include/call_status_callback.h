@@ -46,16 +46,12 @@ public:
     int32_t UpdateGetCallClipResult(const ClipResponse &clipResponse) override;
     int32_t UpdateGetCallClirResult(const ClirResponse &clirResponse) override;
     int32_t UpdateSetCallClirResult(const int32_t result) override;
-    int32_t GetImsSwitchStatusResult(const ImsSwitchResponse &switchResponse) override;
-    int32_t SetImsSwitchStatusResult(const ImsSwitchResponse &switchResponse) override;
     int32_t StartRttResult(const int32_t result) override;
     int32_t StopRttResult(const int32_t result) override;
     int32_t GetImsConfigResult(const GetImsConfigResponse &response) override;
     int32_t SetImsConfigResult(const int32_t result) override;
     int32_t GetImsFeatureValueResult(const GetImsFeatureValueResponse &response) override;
     int32_t SetImsFeatureValueResult(const int32_t result) override;
-    int32_t GetLteEnhanceModeResult(const GetLteEnhanceModeResponse &response) override;
-    int32_t SetLteEnhanceModeResult(const int32_t result) override;
     int32_t ReceiveUpdateCallMediaModeResponse(const CallMediaModeResponse &response) override;
     int32_t InviteToConferenceResult(const int32_t result) override;
     int32_t SendMmiCodeResult(const MmiCodeInfo &info) override;

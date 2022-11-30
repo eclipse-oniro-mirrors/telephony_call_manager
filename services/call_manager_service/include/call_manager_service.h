@@ -527,9 +527,10 @@ public:
      *
      * @brief Whether to enable VoLte
      * @param slotId[in], The slot id
+     * @param enabled[out], The result of enable or not
      * @return Returns 0 on success, others on failure.
      */
-    int32_t IsImsSwitchEnabled(int32_t slotId) override;
+    int32_t IsImsSwitchEnabled(int32_t slotId, bool &enabled) override;
 
     /**
      * StartRtt
