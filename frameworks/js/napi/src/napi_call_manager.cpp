@@ -51,7 +51,7 @@ NapiCallManager::NapiCallManager() {}
 
 NapiCallManager::~NapiCallManager() 
 {
-    DelayedSingleton<CallManagerProxy>::GetInstance()->UnInit();
+    DelayedSingleton<CallManagerClient>::GetInstance()->UnInit();
 }
 
 void Init()
