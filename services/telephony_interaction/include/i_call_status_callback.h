@@ -39,16 +39,12 @@ public:
     virtual int32_t UpdateGetCallClipResult(const ClipResponse &clipResponse) = 0;
     virtual int32_t UpdateGetCallClirResult(const ClirResponse &clirResponse) = 0;
     virtual int32_t UpdateSetCallClirResult(const int32_t result) = 0;
-    virtual int32_t GetImsSwitchStatusResult(const ImsSwitchResponse &switchResponse) = 0;
-    virtual int32_t SetImsSwitchStatusResult(const ImsSwitchResponse &switchResponse) = 0;
     virtual int32_t StartRttResult(const int32_t result) = 0;
     virtual int32_t StopRttResult(const int32_t result) = 0;
     virtual int32_t GetImsConfigResult(const GetImsConfigResponse &response) = 0;
     virtual int32_t SetImsConfigResult(const int32_t result) = 0;
     virtual int32_t GetImsFeatureValueResult(const GetImsFeatureValueResponse &response) = 0;
     virtual int32_t SetImsFeatureValueResult(const int32_t result) = 0;
-    virtual int32_t GetLteEnhanceModeResult(const GetLteEnhanceModeResponse &response) = 0;
-    virtual int32_t SetLteEnhanceModeResult(const int32_t result) = 0;
     virtual int32_t ReceiveUpdateCallMediaModeResponse(const CallMediaModeResponse &response) = 0;
     virtual int32_t InviteToConferenceResult(const int32_t result) = 0;
     virtual int32_t StartDtmfResult(const int32_t result) = 0;

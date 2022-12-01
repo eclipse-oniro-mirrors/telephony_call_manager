@@ -143,7 +143,7 @@ public:
     virtual int32_t UpdateImsCallMode(int32_t callId, ImsCallMode mode) = 0;
     virtual int32_t EnableImsSwitch(int32_t slotId) = 0;
     virtual int32_t DisableImsSwitch(int32_t slotId) = 0;
-    virtual int32_t IsImsSwitchEnabled(int32_t slotId) = 0;
+    virtual int32_t IsImsSwitchEnabled(int32_t slotId, bool &enabled) = 0;
     virtual int32_t StartRtt(int32_t callId, std::u16string &msg) = 0;
     virtual int32_t StopRtt(int32_t callId) = 0;
     virtual int32_t JoinConference(int32_t callId, std::vector<std::u16string> &numberList) = 0;

@@ -83,7 +83,7 @@ public:
     int32_t SetImsFeatureValue(int32_t slotId, FeatureType type, int32_t value);
     int32_t EnableImsSwitch(int32_t slotId);
     int32_t DisableImsSwitch(int32_t slotId);
-    int32_t IsImsSwitchEnabled(int32_t slotId);
+    int32_t IsImsSwitchEnabled(int32_t slotId, bool &enabled);
     int32_t UpdateImsCallMode(int32_t callId, ImsCallMode mode);
     int32_t StartRtt(int32_t callId, std::u16string &msg);
     int32_t StopRtt(int32_t callId);

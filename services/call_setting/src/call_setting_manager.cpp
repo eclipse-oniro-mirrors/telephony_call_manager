@@ -183,13 +183,13 @@ int32_t CallSettingManager::DisableImsSwitch(int32_t slotId)
     return cellularCallConnectionPtr_->SetImsSwitchStatus(slotId, false);
 }
 
-int32_t CallSettingManager::IsImsSwitchEnabled(int32_t slotId)
+int32_t CallSettingManager::IsImsSwitchEnabled(int32_t slotId, bool &enabled)
 {
     if (cellularCallConnectionPtr_ == nullptr) {
         TELEPHONY_LOGE("cellularCallConnectionPtr_ is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return cellularCallConnectionPtr_->GetImsSwitchStatus(slotId);
+    return cellularCallConnectionPtr_->GetImsSwitchStatus(slotId, enabled);
 }
 
 int32_t CallSettingManager::CallWaitingPolicy(int32_t slotId)

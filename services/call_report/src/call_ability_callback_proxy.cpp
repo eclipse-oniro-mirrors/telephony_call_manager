@@ -170,12 +170,8 @@ void CallAbilityCallbackProxy::PackDataParcel(
             dataParcel.WriteInt32(resultInfo.GetIntValue("action"));
             dataParcel.WriteInt32(resultInfo.GetIntValue("clirStat"));
             break;
-        case CallResultReportId::GET_CALL_VOTLE_REPORT_ID:
-            dataParcel.WriteInt32(resultInfo.GetIntValue("active"));
-            break;
         case CallResultReportId::GET_IMS_CONFIG_REPORT_ID:
         case CallResultReportId::GET_IMS_FEATURE_VALUE_REPORT_ID:
-        case CallResultReportId::GET_LTE_ENHANCE_MODE_REPORT_ID:
             dataParcel.WriteInt32(resultInfo.GetIntValue("value"));
             break;
         case CallResultReportId::START_RTT_REPORT_ID:

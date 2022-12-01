@@ -814,7 +814,12 @@ int32_t CallManagerServiceStub::OnIsVoLteEnabled(MessageParcel &data, MessagePar
 {
     int32_t result = TELEPHONY_ERR_FAIL;
     int32_t slotId = data.ReadInt32();
-    result = IsImsSwitchEnabled(slotId);
+    bool enabled;
+    result = IsImsSwitchEnabled(slotId, enabled);
+    if (!reply.WriteBool(enabled)) {
+        TELEPHONY_LOGE("IsImsSwitchEnabled fail to write parcel");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
     if (!reply.WriteInt32(result)) {
         TELEPHONY_LOGE("IsImsSwitchEnabled fail to write parcel");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;

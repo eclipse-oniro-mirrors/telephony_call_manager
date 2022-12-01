@@ -51,18 +51,6 @@ public:
     void UnRegisterGetTransferCallback();
     int32_t RegisterSetTransferCallback(EventCallback callback);
     void UnRegisterSetTransferCallback();
-    int32_t RegisterGetVolteCallback(EventCallback callback);
-    void UnRegisterGetVolteCallback();
-    int32_t RegisterEnableVolteCallback(EventCallback callback);
-    void UnRegisterEnableVolteCallback();
-    int32_t RegisterDisableVolteCallback(EventCallback callback);
-    void UnRegisterDisableVolteCallback();
-    int32_t RegisterGetLteEnhanceCallback(EventCallback callback);
-    void UnRegisterGetLteEnhanceCallback();
-    int32_t RegisterEnableLteEnhanceModeCallback(EventCallback callback);
-    void UnRegisterEnableLteEnhanceModeCallback();
-    int32_t RegisterDisableLteEnhanceModeCallback(EventCallback callback);
-    void UnRegisterDisableLteEnhanceModeCallback();
     int32_t RegisterStartRttCallback(EventCallback callback);
     void UnRegisterStartRttCallback();
     int32_t RegisterStopRttCallback(EventCallback callback);
@@ -76,8 +64,6 @@ public:
     int32_t OttCallRequest(OttCallRequestId requestId, AppExecFwk::PacMap &info);
     int32_t RegisterUpdateCallMediaModeCallback(EventCallback callback);
     void UnRegisterUpdateCallMediaModeCallback();
-    int32_t ReportSetVolteStateInfo(AppExecFwk::PacMap &resultInfo);
-    int32_t ReportSetLteEnhanceModeInfo(AppExecFwk::PacMap &resultInfo);
     int32_t UpdateMmiCodeResultsInfo(const MmiCodeInfo &info);
 
 private:
@@ -99,18 +85,6 @@ private:
     static void ReportSupplementInfo(AppExecFwk::PacMap &resultInfo, EventCallback supplementInfo);
     static void ReportExecutionResultWork(uv_work_t *work, int32_t status);
     static void ReportExecutionResult(EventCallback &settingInfo, AppExecFwk::PacMap &resultInfo);
-    int32_t ReportGetVolteInfo(AppExecFwk::PacMap &resultInfo);
-    int32_t ReportEnableVolteInfo(AppExecFwk::PacMap &resultInfo);
-    int32_t ReportDisableVolteInfo(AppExecFwk::PacMap &resultInfo);
-    int32_t ReportGetLteEnhanceInfo(AppExecFwk::PacMap &resultInfo);
-    int32_t ReportEnableLteEnhanceInfo(AppExecFwk::PacMap &resultInfo);
-    int32_t ReportDisableLteEnhanceInfo(AppExecFwk::PacMap &resultInfo);
-    static void ReportGetVolteInfoWork(uv_work_t *work, int32_t status);
-    static void ReportGetVolteInfo(AppExecFwk::PacMap &resultInfo, EventCallback supplementInfo);
-    static void ReportSetVolteInfoWork(uv_work_t *work, int32_t status);
-    static void ReportSetVolteInfo(EventCallback &settingInfo, AppExecFwk::PacMap &resultInfo);
-    static void ReportGetLteEnhanceWork(uv_work_t *work, int32_t status);
-    static void ReportGetLteEnhanceInfo(AppExecFwk::PacMap &resultInfo, EventCallback supplementInfo);
     static void ReportStartRttInfoWork(uv_work_t *work, int32_t status);
     static void ReportStartRttInfo(AppExecFwk::PacMap &resultInfo, EventCallback supplementInfo);
     static void ReportStopRttInfoWork(uv_work_t *work, int32_t status);
@@ -137,12 +111,6 @@ private:
     EventCallback setRestrictionCallback_;
     EventCallback getTransferCallback_;
     EventCallback setTransferCallback_;
-    EventCallback getVolteCallback_;
-    EventCallback enableVolteCallback_;
-    EventCallback disableVolteCallback_;
-    EventCallback getLteEnhanceCallback_;
-    EventCallback enableLteEnhanceCallback_;
-    EventCallback disableLteEnhanceCallback_;
     EventCallback startRttCallback_;
     EventCallback stopRttCallback_;
     EventCallback updateCallMediaModeCallback_;

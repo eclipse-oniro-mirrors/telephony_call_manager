@@ -1214,7 +1214,7 @@ int32_t CallManagerServiceProxy::DisableImsSwitch(int32_t slotId)
     return replyParcel.ReadInt32();
 }
 
-int32_t CallManagerServiceProxy::IsImsSwitchEnabled(int32_t slotId)
+int32_t CallManagerServiceProxy::IsImsSwitchEnabled(int32_t slotId, bool &enabled)
 {
     MessageParcel dataParcel;
     MessageParcel replyParcel;
@@ -1234,7 +1234,8 @@ int32_t CallManagerServiceProxy::IsImsSwitchEnabled(int32_t slotId)
         TELEPHONY_LOGE("function IsImsSwitchEnabled failed! errCode:%{public}d", error);
         return error;
     }
-    return replyParcel.ReadInt32();
+    enabled = replyParcel.ReadBool();
+    return TELEPHONY_SUCCESS;
 }
 
 int32_t CallManagerServiceProxy::JoinConference(int32_t callId, std::vector<std::u16string> &numberList)
