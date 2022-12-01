@@ -25,8 +25,6 @@ declare namespace call {
   /**
    * Makes a call.
    *
-   * <p>Applications must have the {@code ohos.permission.PLACE_CALL} permission to call this method.
-   *
    * @param phoneNumber Indicates the called number.
    * @param options Indicates additional information carried in the call.
    * @param callback Returns {@code true} if the call request is successful; returns {@code false} otherwise.
@@ -75,7 +73,7 @@ declare namespace call {
    *
    * <p>If an incoming call is ringing, the phone stops ringing. Otherwise, this method does not function.
    *
-   * @permission ohos.permission.SET_TELEPHONY_STATE or System App
+   * @permission ohos.permission.SET_TELEPHONY_STATE
    * @systemapi Hide this for inner system use.
    * @since 8
    */
@@ -135,41 +133,65 @@ declare namespace call {
   /**
    * Answers the incoming call.
    *
-   * @param callId Indicates the identifier of the call to answer. It is optional since API 9.
+   * @param callId Indicates the identifier of the call to answer.
    * @permission ohos.permission.ANSWER_CALL
    * @systemapi Hide this for inner system use.
    * @since 7
    */
-  function answer(callback: AsyncCallback<void>): void;
   function answer(callId: number, callback: AsyncCallback<void>): void;
   function answer(callId?: number): Promise<void>;
 
   /**
-   * Hangups the foreground call.
+   * Answers the incoming call without callId.
    *
    * @permission ohos.permission.ANSWER_CALL
-   * @param callId Indicates the identifier of the call to hangup. It is optional since API 9.
+   * @systemapi Hide this for inner system use.
+   * @since 9
+   */
+  function answer(callback: AsyncCallback<void>): void;
+
+  /**
+   * Hangups the foreground call.
+   *
+   * @param callId Indicates the identifier of the call to hangup.
+   * @permission ohos.permission.ANSWER_CALL
    * @systemapi Hide this for inner system use.
    * @since 7
    */
-  function hangup(callback: AsyncCallback<void>): void;
   function hangup(callId: number, callback: AsyncCallback<void>): void;
   function hangup(callId?: number): Promise<void>;
 
   /**
+   * Hangups the foreground call without callId.
+   *
+   * @systemapi Hide this for inner system use.
+   * @since 9
+   */
+  function hangup(callback: AsyncCallback<void>): void;
+
+  /**
    * Rejects the incoming call.
    *
-   * @permission ohos.permission.ANSWER_CALL
-   * @param callId Indicates the identifier of the call to reject. It is optional since API 9.
+   * @param callId Indicates the identifier of the call to reject.
    * @param options Indicates the text message to reject.
+   * @permission ohos.permission.ANSWER_CALL
    * @systemapi Hide this for inner system use.
    * @since 7
    */
-  function reject(callback: AsyncCallback<void>): void;
-  function reject(options: RejectMessageOptions, callback: AsyncCallback<void>): void;
   function reject(callId: number, callback: AsyncCallback<void>): void;
   function reject(callId: number, options: RejectMessageOptions, callback: AsyncCallback<void>): void;
   function reject(callId?: number, options?: RejectMessageOptions): Promise<void>;
+
+  /**
+   * Rejects the incoming call without callId.
+   *
+   * @param options Indicates the text message to reject.
+   * @permission ohos.permission.ANSWER_CALL
+   * @systemapi Hide this for inner system use.
+   * @since 9
+   */
+  function reject(callback: AsyncCallback<void>): void;
+  function reject(options: RejectMessageOptions, callback: AsyncCallback<void>): void;
 
   /**
    * @permission ohos.permission.ANSWER_CALL
@@ -306,9 +328,9 @@ declare namespace call {
   /**
    * Observe the result of MMI code
    *
-   * @permission ohos.permission.SET_TELEPHONY_STATE
    * @param type Indicates the observer type.
    * @param callback Return the result of MMI code.
+   * @permission ohos.permission.SET_TELEPHONY_STATE
    * @throws {BusinessError} 201 - Permission denied.
    * @throws {BusinessError} 401 - Parameter error.
    * @throws {BusinessError} 8300001 - Invalid parameter value.
@@ -324,9 +346,9 @@ declare namespace call {
   /**
    * Unobserve the result of MMI code
    *
-   * @permission ohos.permission.SET_TELEPHONY_STATE
    * @param type Indicates the observer type.
    * @param callback Return the result of MMI code.
+   * @permission ohos.permission.SET_TELEPHONY_STATE
    * @throws {BusinessError} 201 - Permission denied.
    * @throws {BusinessError} 401 - Parameter error.
    * @throws {BusinessError} 8300001 - Invalid parameter value.
@@ -411,12 +433,21 @@ declare namespace call {
    * Set the audio device
    *
    * @param device Indicates the device of audio.
-   * @param options Indicates additional information, such as address of bluetooth(Since API 9).
    * @param callback Returns {@code true} if the request is successful; returns {@code false} otherwise.
    * @systemapi Hide this for inner system use.
    * @since 8
    */
   function setAudioDevice(device: AudioDevice, callback: AsyncCallback<void>): void;
+
+  /**
+   * Set the audio device with options.
+   *
+   * @param device Indicates the device of audio.
+   * @param options Indicates additional information, such as address of bluetooth.
+   * @param callback Returns {@code true} if the request is successful; returns {@code false} otherwise.
+   * @systemapi Hide this for inner system use.
+   * @since 9
+   */
   function setAudioDevice(device: AudioDevice, options: AudioDeviceOptions, callback: AsyncCallback<void>): void;
   function setAudioDevice(device: AudioDevice, options?: AudioDeviceOptions): Promise<void>;
 
@@ -504,6 +535,10 @@ declare namespace call {
     transferNum: string;
     type: CallTransferType;
     settingType: CallTransferSettingType;
+    startHour?: number;
+    startMinute?: number;
+    endHour?: number;
+    endMinute?: number;
   }
 
   /**
@@ -713,6 +748,10 @@ declare namespace call {
   export interface CallTransferResult {
     status: TransferStatus;
     number: string;
+    startHour: number;
+    startMinute: number;
+    endHour: number;
+    endMinute: number;
   }
 
   /**
@@ -788,7 +827,7 @@ declare namespace call {
 
   /**
    * @systemapi Hide this for inner system use.
-   * @since 8
+   * @since 9
    */
   export enum DisconnectedReason {
     UNASSIGNED_NUMBER = 1,
@@ -870,17 +909,16 @@ declare namespace call {
     CALL_NOT_ALLOW = 1029,
     SIM_INVALID = 1045,
     UNKNOWN = 1279,
-  };
+  }
 
   /**
    * @systemapi Hide this for inner system use.
    * @since 9
    */
-
   export interface DisconnectedDetails {
     reason: DisconnectedReason;
     message: string;
-  };
+  }
 }
 
 export default call;
