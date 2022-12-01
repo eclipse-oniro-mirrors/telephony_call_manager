@@ -50,7 +50,7 @@ int32_t NapiCallManager::registerStatus_ = TELEPHONY_ERROR;
 NapiCallManager::NapiCallManager() {}
 
 NapiCallManager::NapiCallManager() {
-    DelayedSingleton<CallManagerClient>::GetInstance()->UnRegisterCallBack();
+    DelayedSingleton<CallManagerClient>::GetInstance()->UnInit();
 }
 
 void Init()
