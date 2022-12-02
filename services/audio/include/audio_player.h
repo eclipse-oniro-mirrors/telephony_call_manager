@@ -40,7 +40,21 @@ struct wav_hdr {
     uint16_t NumOfChan = 2; // Number of channels 1=Mono 2=Stereo
     uint32_t SamplesPerSec = 44100; // Sampling Frequency in Hz
     uint32_t bytesPerSec = 176400; // bytes per second
-    uint16_t blockAlign = 2; // 2=16-bit mono, 4=16-bit stereo
+    uint16_t blockAlign = 4; // 2=16-bit mono, 4=16-bit stereo
+    /* "INFO" sub-chunk */
+    uint16_t SubchunkInfo1 = 16;
+    uint8_t LISTB[5] = {'L', 'I', 'S', 'T', 'B'};
+    uint16_t SubchunkInfo2 = 0;
+    uint8_t SubchunkInfo3 = 0;
+    uint8_t INFOICRD[8] = {'I', 'N', 'F', 'O', 'I', 'C', 'R', 'D'};
+    uint32_t SubchunkInfo4 = 11;
+    uint8_t TIME[10] = {'2', '0', '2', '0', '-', '0', '9', '-', '0', '4'};
+    uint16_t SubchunkInfo5 = 0;
+    uint8_t ISFT[4] = {'I', 'S', 'F', 'T'};
+    uint32_t SubchunkInfo6 = 14;
+    uint8_t Lavf[18] = {'L', 'a', 'v', 'f', '5', '8', ' ', '7', '6', ' ', '1', '0', '0', ' ', 'I', 'T', 'C', 'H'};
+    uint32_t SubchunkInfo7 = 12;
+    uint8_t Logic[12] = {'L', 'o', 'g', 'i', 'c', ' ', 'P', 'r', 'o', ' ', 'X', ' '};
     /* "data" sub-chunk */
     uint8_t Subchunk2ID[4] = {'d', 'a', 't', 'a'}; // "data"  string
     uint32_t Subchunk2Size = 0; // Sampled data length
