@@ -33,6 +33,9 @@
 
 namespace OHOS {
 namespace Telephony {
+using namespace OHOS::Security::AccessToken;
+using OHOS::Security::AccessToken::AccessTokenID;
+
 enum class CallManagerInterfaceType {
     INTERFACE_CALL_MANAGER_TYPE = 1,
     INTERFACE_BLUETOOTH_CALL_TYPE,
@@ -41,6 +44,117 @@ enum class CallManagerInterfaceType {
 std::shared_ptr<CallManagerClient> g_clientPtr = nullptr;
 using CallManagerServiceFunc = void (*)();
 std::map<uint32_t, CallManagerServiceFunc> g_memberFuncMap;
+
+HapInfoParams testInfoParams = {
+    .userID = 1,
+    .bundleName = "tel_call_manager_ui_test",
+    .instIndex = 0,
+    .appIDDesc = "test",
+};
+
+PermissionDef testPermPlaceCallDef = {
+    .permissionName = "ohos.permission.PLACE_CALL",
+    .bundleName = "tel_call_manager_ui_test",
+    .grantMode = 1, // SYSTEM_GRANT
+    .availableLevel = APL_SYSTEM_BASIC,
+    .label = "label",
+    .labelId = 1,
+    .description = "Test call maneger",
+    .descriptionId = 1,
+};
+
+PermissionStateFull testPlaceCallState = {
+    .permissionName = "ohos.permission.PLACE_CALL",
+    .isGeneral = true,
+    .resDeviceID = { "local" },
+    .grantStatus = { PermissionState::PERMISSION_GRANTED },
+    .grantFlags = { 2 }, // PERMISSION_USER_SET
+};
+
+PermissionDef testPermSetTelephonyStateDef = {
+    .permissionName = "ohos.permission.SET_TELEPHONY_STATE",
+    .bundleName = "tel_call_manager_ui_test",
+    .grantMode = 1, // SYSTEM_GRANT
+    .availableLevel = APL_SYSTEM_BASIC,
+    .label = "label",
+    .labelId = 1,
+    .description = "Test call maneger",
+    .descriptionId = 1,
+};
+
+PermissionStateFull testSetTelephonyState = {
+    .permissionName = "ohos.permission.SET_TELEPHONY_STATE",
+    .isGeneral = true,
+    .resDeviceID = { "local" },
+    .grantStatus = { PermissionState::PERMISSION_GRANTED },
+    .grantFlags = { 2 }, // PERMISSION_USER_SET
+};
+
+PermissionDef testPermGetTelephonyStateDef = {
+    .permissionName = "ohos.permission.GET_TELEPHONY_STATE",
+    .bundleName = "tel_call_manager_ui_test",
+    .grantMode = 1, // SYSTEM_GRANT
+    .availableLevel = APL_SYSTEM_BASIC,
+    .label = "label",
+    .labelId = 1,
+    .description = "Test call maneger",
+    .descriptionId = 1,
+};
+
+PermissionStateFull testGetTelephonyState = {
+    .permissionName = "ohos.permission.GET_TELEPHONY_STATE",
+    .isGeneral = true,
+    .resDeviceID = { "local" },
+    .grantStatus = { PermissionState::PERMISSION_GRANTED },
+    .grantFlags = { 2 }, // PERMISSION_USER_SET
+};
+
+PermissionDef testPermAnswerCallDef = {
+    .permissionName = "ohos.permission.ANSWER_CALL",
+    .bundleName = "tel_call_manager_ui_test",
+    .grantMode = 1, // SYSTEM_GRANT
+    .availableLevel = APL_SYSTEM_BASIC,
+    .label = "label",
+    .labelId = 1,
+    .description = "Test call maneger",
+    .descriptionId = 1,
+};
+
+PermissionStateFull testAnswerCallState = {
+    .permissionName = "ohos.permission.ANSWER_CALL",
+    .isGeneral = true,
+    .resDeviceID = { "local" },
+    .grantStatus = { PermissionState::PERMISSION_GRANTED },
+    .grantFlags = { 2 }, // PERMISSION_USER_SET
+};
+
+HapPolicyParams testPolicyParams = {
+    .apl = APL_SYSTEM_BASIC,
+    .domain = "test.domain",
+    .permList = { testPermPlaceCallDef, testPermSetTelephonyStateDef, testPermGetTelephonyStateDef,
+        testPermAnswerCallDef },
+    .permStateList = { testPlaceCallState, testSetTelephonyState, testGetTelephonyState, testAnswerCallState },
+};
+
+class AccessToken {
+public:
+    AccessToken()
+    {
+        currentID_ = GetSelfTokenID();
+        AccessTokenIDEx tokenIdEx = AccessTokenKit::AllocHapToken(testInfoParams, testPolicyParams);
+        accessID_ = tokenIdEx.tokenIdExStruct.tokenID;
+        SetSelfTokenID(accessID_);
+    }
+    ~AccessToken()
+    {
+        AccessTokenKit::DeleteToken(accessID_);
+        SetSelfTokenID(currentID_);
+    }
+
+private:
+    AccessTokenID currentID_ = 0;
+    AccessTokenID accessID_ = 0;
+};
 
 void DialCall()
 {
