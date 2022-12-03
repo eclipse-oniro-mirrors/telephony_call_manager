@@ -21,17 +21,20 @@
 #include "token_setproc.h"
 
 namespace OHOS {
+const int PERMS_NUM = 4;
+
 AddCallTokenFuzzer::AddCallTokenFuzzer()
 {
-    const char **perms = new const char *[4];
-    perms[0] = "ohos.permission.PLACE_CALL";
-    perms[1] = "ohos.permission.ANSWER_CALL";
-    perms[2] = "ohos.permission.SET_TELEPHONY_STATE";
-    perms[3] = "ohos.permission.GET_TELEPHONY_STATE";
+    const char *perms[PERMS_NUM] = {
+        "ohos.permission.PLACE_CALL",
+        "ohos.permission.ANSWER_CALL",
+        "ohos.permission.SET_TELEPHONY_STATE",
+        "ohos.permission.GET_TELEPHONY_STATE",
+    };
 
     NativeTokenInfoParams testCallInfoParams = {
         .dcapsNum = 0,
-        .permsNum = 4,
+        .permsNum = PERMS_NUM,
         .aclsNum = 0,
         .dcaps = nullptr,
         .perms = perms,
@@ -43,5 +46,6 @@ AddCallTokenFuzzer::AddCallTokenFuzzer()
     SetSelfTokenID(currentID_);
     Security::AccessToken::AccessTokenKit::ReloadNativeTokenInfo();
 }
+
 AddCallTokenFuzzer::~AddCallTokenFuzzer() {}
 } // namespace OHOS

@@ -25,7 +25,121 @@
 
 namespace OHOS {
 namespace Telephony {
+using namespace Security::AccessToken;
+using Security::AccessToken::AccessTokenID;
 std::shared_ptr<BluetoothCallClient> g_bluetoothCallPtr = nullptr;
+
+HapInfoParams testInfoParamsCase = {
+    .userID = 1,
+    .bundleName = "tel_call_manager_ui_test",
+    .instIndex = 0,
+    .appIDDesc = "test",
+};
+
+PermissionDef testPermPlaceCallDefCase = {
+    .permissionName = "ohos.permission.PLACE_CALL",
+    .bundleName = "tel_call_manager_ui_test",
+    .grantMode = 1, // SYSTEM_GRANT
+    .availableLevel = APL_SYSTEM_BASIC,
+    .label = "label",
+    .labelId = 1,
+    .description = "Test call maneger",
+    .descriptionId = 1,
+};
+
+PermissionStateFull testPlaceCallStateCase = {
+    .permissionName = "ohos.permission.PLACE_CALL",
+    .isGeneral = true,
+    .resDeviceID = { "local" },
+    .grantStatus = { PermissionState::PERMISSION_GRANTED },
+    .grantFlags = { 2 }, // PERMISSION_USER_SET
+};
+
+PermissionDef testPermSetTelephonyStateDefCase = {
+    .permissionName = "ohos.permission.SET_TELEPHONY_STATE",
+    .bundleName = "tel_call_manager_ui_test",
+    .grantMode = 1, // SYSTEM_GRANT
+    .availableLevel = APL_SYSTEM_BASIC,
+    .label = "label",
+    .labelId = 1,
+    .description = "Test call maneger",
+    .descriptionId = 1,
+};
+
+PermissionStateFull testSetTelephonyStateCase = {
+    .permissionName = "ohos.permission.SET_TELEPHONY_STATE",
+    .isGeneral = true,
+    .resDeviceID = { "local" },
+    .grantStatus = { PermissionState::PERMISSION_GRANTED },
+    .grantFlags = { 2 }, // PERMISSION_USER_SET
+};
+
+PermissionDef testPermGetTelephonyStateDefCase = {
+    .permissionName = "ohos.permission.GET_TELEPHONY_STATE",
+    .bundleName = "tel_call_manager_ui_test",
+    .grantMode = 1, // SYSTEM_GRANT
+    .availableLevel = APL_SYSTEM_BASIC,
+    .label = "label",
+    .labelId = 1,
+    .description = "Test call maneger",
+    .descriptionId = 1,
+};
+
+PermissionStateFull testGetTelephonyStateCase = {
+    .permissionName = "ohos.permission.GET_TELEPHONY_STATE",
+    .isGeneral = true,
+    .resDeviceID = { "local" },
+    .grantStatus = { PermissionState::PERMISSION_GRANTED },
+    .grantFlags = { 2 }, // PERMISSION_USER_SET
+};
+
+PermissionDef testPermAnswerCallDefCase = {
+    .permissionName = "ohos.permission.ANSWER_CALL",
+    .bundleName = "tel_call_manager_ui_test",
+    .grantMode = 1, // SYSTEM_GRANT
+    .availableLevel = APL_SYSTEM_BASIC,
+    .label = "label",
+    .labelId = 1,
+    .description = "Test call maneger",
+    .descriptionId = 1,
+};
+
+PermissionStateFull testAnswerCallStateCase = {
+    .permissionName = "ohos.permission.ANSWER_CALL",
+    .isGeneral = true,
+    .resDeviceID = { "local" },
+    .grantStatus = { PermissionState::PERMISSION_GRANTED },
+    .grantFlags = { 2 }, // PERMISSION_USER_SET
+};
+
+HapPolicyParams testPolicyParamsCase = {
+    .apl = APL_SYSTEM_BASIC,
+    .domain = "test.domain",
+    .permList = { testPermPlaceCallDefCase, testPermSetTelephonyStateDefCase, testPermGetTelephonyStateDefCase,
+        testPermAnswerCallDefCase },
+    .permStateList = { testPlaceCallStateCase, testSetTelephonyStateCase, testGetTelephonyStateCase,
+        testAnswerCallStateCase },
+};
+
+class AccessToken {
+public:
+    AccessToken()
+    {
+        currentID_ = GetSelfTokenID();
+        AccessTokenIDEx tokenIdEx = AccessTokenKit::AllocHapToken(testInfoParamss, testPolicyParamss);
+        accessID_ = tokenIdEx.tokenIdExStruct.tokenID;
+        SetSelfTokenID(accessID_);
+    }
+    ~AccessToken()
+    {
+        AccessTokenKit::DeleteToken(accessID_);
+        SetSelfTokenID(currentID_);
+    }
+
+private:
+    AccessTokenID currentID_ = 0;
+    AccessTokenID accessID_ = 0;
+};
 
 int32_t BluetoothCallTest::Init()
 {
