@@ -67,7 +67,6 @@ void AudioControlManagerFunc(const uint8_t *data, size_t size)
     TelCallState priorState = static_cast<TelCallState>(size % TEL_CALL_STATE_NUM);
     TelCallState nextState = static_cast<TelCallState>(size % TEL_CALL_STATE_NUM);
     std::string message(reinterpret_cast<const char *>(data), size);
-    std::string phoneNum(reinterpret_cast<const char *>(data), size);
     AudioInterruptState state = static_cast<AudioInterruptState>(size % AUDIO_INTERRUPT_STATE_NUM);
     DisconnectedDetails details;
     bool isMute = static_cast<bool>(size % BOOL_NUM);
