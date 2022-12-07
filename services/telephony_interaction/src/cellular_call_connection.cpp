@@ -365,6 +365,9 @@ int CellularCallConnection::SendDtmf(char cDTMFCode, const std::string &phoneNum
         TELEPHONY_LOGE("send dtmf return, memset_s failed.");
         return TELEPHONY_ERR_MEMSET_FAIL;
     }
+    if (phoneNum.length() + 1 > static_cast<size_t>(kMaxNumberLen)) {
+        return TELEPHONY_ERR_STRCPY_FAIL;
+    }
     if (strcpy_s(callInfo.phoneNum, strlen(phoneNum.c_str()) + 1, phoneNum.c_str()) != EOK) {
         TELEPHONY_LOGE("send dtmf return, strcpy_s fail.");
         return TELEPHONY_ERR_STRCPY_FAIL;
