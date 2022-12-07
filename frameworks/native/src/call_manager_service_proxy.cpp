@@ -1184,9 +1184,9 @@ int32_t CallManagerServiceProxy::EnableImsSwitch(int32_t slotId)
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     int32_t error = remote->SendRequest(INTERFACE_ENABLE_VOLTE, dataParcel, replyParcel, option);
-    if (error != TELEPHONY_SUCCESS) {
+    if (error != ERR_NONE) {
         TELEPHONY_LOGE("function EnableImsSwitch failed! errCode:%{public}d", error);
-        return error;
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     return replyParcel.ReadInt32();
 }
@@ -1207,9 +1207,9 @@ int32_t CallManagerServiceProxy::DisableImsSwitch(int32_t slotId)
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     int32_t error = remote->SendRequest(INTERFACE_DISABLE_VOLTE, dataParcel, replyParcel, option);
-    if (error != TELEPHONY_SUCCESS) {
+    if (error != ERR_NONE) {
         TELEPHONY_LOGE("function DisableImsSwitch failed! errCode:%{public}d", error);
-        return error;
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     return replyParcel.ReadInt32();
 }
@@ -1230,12 +1230,12 @@ int32_t CallManagerServiceProxy::IsImsSwitchEnabled(int32_t slotId, bool &enable
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     int32_t error = remote->SendRequest(INTERFACE_IS_VOLTE_ENABLED, dataParcel, replyParcel, option);
-    if (error != TELEPHONY_SUCCESS) {
+    if (error != ERR_NONE) {
         TELEPHONY_LOGE("function IsImsSwitchEnabled failed! errCode:%{public}d", error);
-        return error;
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     enabled = replyParcel.ReadBool();
-    return TELEPHONY_SUCCESS;
+    return replyParcel.ReadInt32();
 }
 
 int32_t CallManagerServiceProxy::JoinConference(int32_t callId, std::vector<std::u16string> &numberList)
