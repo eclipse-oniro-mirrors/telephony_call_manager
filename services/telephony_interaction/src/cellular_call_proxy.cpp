@@ -788,10 +788,11 @@ int32_t CellularCallProxy::SetImsSwitchStatus(int32_t slotId, bool active)
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     int32_t error = remote->SendRequest(static_cast<uint32_t>(OperationType::SET_IMS_SWITCH_STATUS), in, out, option);
-    if (error == ERR_NONE) {
-        return out.ReadInt32();
+    if (error != ERR_NONE) {
+        TELEPHONY_LOGE("function SetImsSwitchStatus failed! errCode:%{public}d", error);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    return error;
+    return out.ReadInt32();
 }
 
 int32_t CellularCallProxy::GetImsSwitchStatus(int32_t slotId, bool &enabled)
@@ -810,8 +811,12 @@ int32_t CellularCallProxy::GetImsSwitchStatus(int32_t slotId, bool &enabled)
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     int32_t error = remote->SendRequest(static_cast<uint32_t>(OperationType::GET_IMS_SWITCH_STATUS), in, out, option);
+    if (error != ERR_NONE) {
+        TELEPHONY_LOGE("function GetImsSwitchStatus failed! errCode:%{public}d", error);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
     enabled = out.ReadBool();
-    return error;
+    return out.ReadInt32();
 }
 
 int32_t CellularCallProxy::SetImsConfig(int32_t slotId, ImsConfigItem item, const std::string &value)
