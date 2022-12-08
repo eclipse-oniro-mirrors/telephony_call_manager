@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -92,6 +92,7 @@ enum CallManagerErrorCode {
     CALL_ERR_INVALID_RESTRICTION_MODE,
     CALL_ERR_INVALID_TRANSFER_TYPE,
     CALL_ERR_INVALID_TRANSFER_SETTING_TYPE,
+    CALL_ERR_INVALID_TRANSFER_TIME,
     // call utils error
     CALL_ERR_FORMAT_PHONE_NUMBER_FAILED,
     // common error
@@ -99,6 +100,8 @@ enum CallManagerErrorCode {
     CALL_ERR_SERVICE_DUMP_FAILED,
     CALL_ERR_FUNCTION_NOT_SUPPORTED,
     CALL_ERR_VIDEO_NOT_SUPPORTED,
+    // ims call supplyment error
+    CALL_ERR_UT_NO_CONNECTION,
 };
 
 // 3GPP TS 24.008 V3.9.0 (2001-09)  10.5.4.11 Cause

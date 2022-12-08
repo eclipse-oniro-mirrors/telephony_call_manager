@@ -92,6 +92,7 @@ void CallManagerServiceStub::InitCallSupplementRequest()
     memberFuncMap_[INTERFACE_SET_CALL_RESTRICTION] = &CallManagerServiceStub::OnSetCallRestriction;
     memberFuncMap_[INTERFACE_GET_CALL_TRANSFER] = &CallManagerServiceStub::OnGetTransferNumber;
     memberFuncMap_[INTERFACE_SET_CALL_TRANSFER] = &CallManagerServiceStub::OnSetTransferNumber;
+    memberFuncMap_[INTERFACE_IS_SUPPORT_CALL_TRANSFER_TIMER] = &CallManagerServiceStub::OnIsSupportCallTransferTime;
 }
 
 void CallManagerServiceStub::initCallConferenceExRequest()
@@ -491,6 +492,23 @@ int32_t CallManagerServiceStub::OnSetTransferNumber(MessageParcel &data, Message
     TELEPHONY_LOGI("result:%{public}d", result);
     if (!reply.WriteInt32(result)) {
         TELEPHONY_LOGE("fail to write parcel");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallManagerServiceStub::OnIsSupportCallTransferTime(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t ret = TELEPHONY_ERR_FAIL;
+    if (!data.ContainFileDescriptors()) {
+        TELEPHONY_LOGW("sent raw data is less than 32k");
+    }
+    int32_t slotId = data.ReadInt32();
+    bool result = data.ReadBool();
+    ret = IsSupportCallTransferTime(slotId, result);
+    TELEPHONY_LOGI("[slot%{public}d] result:%{public}d", slotId, ret);
+    if (!reply.WriteInt32(ret)) {
+        TELEPHONY_LOGE("[slot%{public}d] fail to write parcel", slotId);
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
     return TELEPHONY_SUCCESS;

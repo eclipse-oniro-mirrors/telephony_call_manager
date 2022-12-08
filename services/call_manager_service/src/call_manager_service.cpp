@@ -475,6 +475,16 @@ int32_t CallManagerService::SetCallTransferInfo(int32_t slotId, CallTransferInfo
     }
 }
 
+int32_t CallManagerService::IsSupportCallTransferTime(int32_t slotId, bool &result)
+{
+    if (callControlManagerPtr_ != nullptr) {
+        return callControlManagerPtr_->IsSupportCallTransferTime(slotId, result);
+    } else {
+        TELEPHONY_LOGE("[slot%{public}d] callControlManagerPtr_ is nullptr!", slotId);
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+}
+
 int32_t CallManagerService::SetCallPreferenceMode(int32_t slotId, int32_t mode)
 {
     if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_SET_TELEPHONY_STATE)) {

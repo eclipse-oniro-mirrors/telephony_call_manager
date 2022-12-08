@@ -182,6 +182,16 @@ public:
     int SetCallTransferInfo(const CallTransferInfo &info, int32_t slotId);
 
     /**
+     * IsSupportCallTransferTime
+     *
+     * @brief confirm whether IMS support call transfer due to time.
+     * @param slotId[in], The slot id
+     * @param result[out], The result of support or not
+     * @return Returns true on support, others on unsupport.
+     */
+    int IsSupportCallTransferTime(int32_t slotId, bool &result);
+
+    /**
      * GetCallTransferInfo
      *
      * @brief Gets the call transfer information of the current account

@@ -598,6 +598,32 @@ int32_t CellularCallProxy::SetCallTransferInfo(int32_t slotId, const CallTransfe
     return error;
 }
 
+int32_t CellularCallProxy::IsSupportCallTransferTime(int32_t slotId, bool &result)
+{
+    MessageOption option;
+    MessageParcel in;
+    MessageParcel out;
+    int32_t ret = TELEPHONY_SUCCESS;
+    ret = SetCommonParamForMessageParcel(slotId, in);
+    if (ret != TELEPHONY_SUCCESS) {
+        return ret;
+    }
+    if (!in.WriteBool(result)) {
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("[slot%{public}d] function Remote() return nullptr!", slotId);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t error =
+        remote->SendRequest(static_cast<uint32_t>(OperationType::IS_SUPPORT_CALL_TRANSFER_TIME), in, out, option);
+    if (error == ERR_NONE) {
+        return out.ReadBool();
+    }
+    return false;
+}
+
 int32_t CellularCallProxy::GetCallTransferInfo(int32_t slotId, CallTransferType type)
 {
     MessageOption option;

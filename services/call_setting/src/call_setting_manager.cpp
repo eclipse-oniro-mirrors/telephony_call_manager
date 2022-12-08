@@ -119,6 +119,16 @@ int32_t CallSettingManager::SetCallTransferInfo(int32_t slotId, CallTransferInfo
     return cellularCallConnectionPtr_->SetCallTransferInfo(info, slotId);
 }
 
+int32_t CallSettingManager::IsSupportCallTransferTime(int32_t slotId, bool &result)
+{
+    TELEPHONY_LOGI("[slot%{public}d] entry", slotId);
+    if (cellularCallConnectionPtr_ == nullptr) {
+        TELEPHONY_LOGE("[slot%{public}d] cellularCallConnectionPtr_ is nullptr!", slotId);
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return cellularCallConnectionPtr_->IsSupportCallTransferTime(slotId, result);
+}
+
 int32_t CallSettingManager::SetCallPreferenceMode(int32_t slotId, int32_t mode)
 {
     int32_t preferenceMode = IMS_PS_VOICE_PREFERRED;
@@ -265,6 +275,13 @@ int32_t CallSettingManager::SetCallTransferInfoPolicy(int32_t slotId, CallTransf
         info.settingType != CallTransferSettingType::CALL_TRANSFER_ERASURE) {
         TELEPHONY_LOGE("invalid transfer setting type!");
         return CALL_ERR_INVALID_TRANSFER_SETTING_TYPE;
+    }
+    // if haven't transfer the time from app. The default time was 0.
+    if (std::min(info.startHour, info.endHour) < MIN_HOUR || std::max(info.startHour, info.endHour) > MAX_HOUR ||
+        std::min(info.startMinute, info.startMinute) < MIN_MINUTE ||
+        std::max(info.startMinute, info.endMinute) > MAX_MINUTE) {
+        TELEPHONY_LOGE("invalid transfer time!");
+        return CALL_ERR_INVALID_TRANSFER_TIME;
     }
     if (strlen(info.transferNum) > kMaxNumberLen) {
         TELEPHONY_LOGE("Number out of limit!");
