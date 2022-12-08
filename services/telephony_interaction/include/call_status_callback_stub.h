@@ -49,16 +49,12 @@ private:
     int32_t OnUpdateGetCallClipResult(MessageParcel &data, MessageParcel &reply);
     int32_t OnUpdateGetCallClirResult(MessageParcel &data, MessageParcel &reply);
     int32_t OnUpdateSetCallClirResult(MessageParcel &data, MessageParcel &reply);
-    int32_t OnGetImsSwitchStatusResult(MessageParcel &data, MessageParcel &reply);
-    int32_t OnSetImsSwitchStatusResult(MessageParcel &data, MessageParcel &reply);
     int32_t OnStartRttResult(MessageParcel &data, MessageParcel &reply);
     int32_t OnStopRttResult(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetImsConfigResult(MessageParcel &data, MessageParcel &reply);
     int32_t OnSetImsConfigResult(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetImsFeatureValueResult(MessageParcel &data, MessageParcel &reply);
     int32_t OnSetImsFeatureValueResult(MessageParcel &data, MessageParcel &reply);
-    int32_t OnGetLteEnhanceModeResult(MessageParcel &data, MessageParcel &reply);
-    int32_t OnSetLteEnhanceModeResult(MessageParcel &data, MessageParcel &reply);
     int32_t OnReceiveUpdateMediaModeResponse(MessageParcel &data, MessageParcel &reply);
     int32_t OnInviteToConferenceResult(MessageParcel &data, MessageParcel &reply);
     int32_t OnStartDtmfResult(MessageParcel &data, MessageParcel &reply);

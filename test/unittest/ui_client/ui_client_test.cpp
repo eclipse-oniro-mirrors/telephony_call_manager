@@ -1143,7 +1143,9 @@ void IsImsSwitchEnabled()
         std::cout << "g_clientPtr is nullptr" << std::endl;
         return;
     }
-    ret = g_clientPtr->IsImsSwitchEnabled(slotId);
+    bool enabled;
+    ret = g_clientPtr->IsImsSwitchEnabled(slotId, enabled);
+    std::cout << "enabled:" << enabled << std::endl;
     std::cout << "return value:" << ret << std::endl;
 }
 

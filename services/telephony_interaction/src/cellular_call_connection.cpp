@@ -626,14 +626,14 @@ int32_t CellularCallConnection::SetImsSwitchStatus(int32_t slotId, bool active)
     return TELEPHONY_SUCCESS;
 }
 
-int32_t CellularCallConnection::GetImsSwitchStatus(int32_t slotId)
+int32_t CellularCallConnection::GetImsSwitchStatus(int32_t slotId, bool &enabled)
 {
     if (ReConnectService() != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     std::lock_guard<std::mutex> lock(mutex_);
-    int errCode = cellularCallInterfacePtr_->GetImsSwitchStatus(slotId);
+    int errCode = cellularCallInterfacePtr_->GetImsSwitchStatus(slotId, enabled);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("GetImsSwitchStatus failed, errcode:%{public}d", errCode);
         return errCode;

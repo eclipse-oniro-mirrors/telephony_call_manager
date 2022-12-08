@@ -794,7 +794,7 @@ int32_t CellularCallProxy::SetImsSwitchStatus(int32_t slotId, bool active)
     return error;
 }
 
-int32_t CellularCallProxy::GetImsSwitchStatus(int32_t slotId)
+int32_t CellularCallProxy::GetImsSwitchStatus(int32_t slotId, bool &enabled)
 {
     MessageOption option;
     MessageParcel out;
@@ -810,9 +810,7 @@ int32_t CellularCallProxy::GetImsSwitchStatus(int32_t slotId)
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     int32_t error = remote->SendRequest(static_cast<uint32_t>(OperationType::GET_IMS_SWITCH_STATUS), in, out, option);
-    if (error == ERR_NONE) {
-        return out.ReadInt32();
-    }
+    enabled = out.ReadBool();
     return error;
 }
 

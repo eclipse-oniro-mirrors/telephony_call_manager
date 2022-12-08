@@ -393,16 +393,12 @@ enum class CallResultReportId {
     GET_CALL_CLIP_ID,
     GET_CALL_CLIR_ID,
     SET_CALL_CLIR_ID,
-    GET_CALL_VOTLE_REPORT_ID,
-    SET_CALL_VOTLE_REPORT_ID,
     START_RTT_REPORT_ID,
     STOP_RTT_REPORT_ID,
     GET_IMS_CONFIG_REPORT_ID,
     SET_IMS_CONFIG_REPORT_ID,
     GET_IMS_FEATURE_VALUE_REPORT_ID,
     SET_IMS_FEATURE_VALUE_REPORT_ID,
-    GET_LTE_ENHANCE_MODE_REPORT_ID,
-    SET_LTE_ENHANCE_MODE_REPORT_ID,
     INVITE_TO_CONFERENCE_REPORT_ID,
     UPDATE_MEDIA_MODE_REPORT_ID,
 };
@@ -477,11 +473,6 @@ struct CallPreferenceResponse {
      * 4：IMS PS Voice only
      */
     int32_t mode;
-};
-
-struct ImsSwitchResponse {
-    int32_t result; // 0: ok  other: error
-    int32_t active; // 0: off 1: on
 };
 
 struct GetImsConfigResponse {

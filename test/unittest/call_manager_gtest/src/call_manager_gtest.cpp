@@ -2936,11 +2936,12 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_IsImsSwitchEnabled_0100, Functi
         return;
     }
 
+    bool enabled;
     if (HasSimCard(SIM1_SLOTID)) {
-        EXPECT_EQ(CallManagerGtest::clientPtr_->IsImsSwitchEnabled(SIM1_SLOTID), RETURN_VALUE_IS_ZERO);
+        EXPECT_EQ(CallManagerGtest::clientPtr_->IsImsSwitchEnabled(SIM1_SLOTID, enabled), RETURN_VALUE_IS_ZERO);
     }
     if (HasSimCard(SIM2_SLOTID)) {
-        EXPECT_EQ(CallManagerGtest::clientPtr_->IsImsSwitchEnabled(SIM2_SLOTID), RETURN_VALUE_IS_ZERO);
+        EXPECT_EQ(CallManagerGtest::clientPtr_->IsImsSwitchEnabled(SIM2_SLOTID, enabled), RETURN_VALUE_IS_ZERO);
     }
 }
 
@@ -2956,7 +2957,8 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_IsImsSwitchEnabled_0200, Functi
         return;
     }
 
-    EXPECT_EQ(CallManagerGtest::clientPtr_->IsImsSwitchEnabled(INVALID_SLOT_ID), CALL_ERR_INVALID_SLOT_ID);
+    bool enabled;
+    EXPECT_EQ(CallManagerGtest::clientPtr_->IsImsSwitchEnabled(INVALID_SLOT_ID, enabled), CALL_ERR_INVALID_SLOT_ID);
 }
 
 /**
@@ -2972,7 +2974,8 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_IsImsSwitchEnabled_0300, Functi
     }
 
     int32_t slotId = SIM_SLOT_COUNT; // out of the count
-    EXPECT_EQ(CallManagerGtest::clientPtr_->IsImsSwitchEnabled(slotId), CALL_ERR_INVALID_SLOT_ID);
+    bool enabled;
+    EXPECT_EQ(CallManagerGtest::clientPtr_->IsImsSwitchEnabled(slotId, enabled), CALL_ERR_INVALID_SLOT_ID);
 }
 
 /******************************************* Test ControlCamera() *********************************************/

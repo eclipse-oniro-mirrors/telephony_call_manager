@@ -734,7 +734,7 @@ int32_t CallControlManager::DisableImsSwitch(int32_t slotId)
     }
 }
 
-int32_t CallControlManager::IsImsSwitchEnabled(int32_t slotId)
+int32_t CallControlManager::IsImsSwitchEnabled(int32_t slotId, bool &enabled)
 {
     int32_t ret = CallPolicy::IsVoLteEnabledPolicy(slotId);
     if (ret != TELEPHONY_SUCCESS) {
@@ -742,7 +742,7 @@ int32_t CallControlManager::IsImsSwitchEnabled(int32_t slotId)
         return ret;
     }
     if (callSettingManagerPtr_ != nullptr) {
-        return callSettingManagerPtr_->IsImsSwitchEnabled(slotId);
+        return callSettingManagerPtr_->IsImsSwitchEnabled(slotId, enabled);
     } else {
         TELEPHONY_LOGE("callSettingManagerPtr_ is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;

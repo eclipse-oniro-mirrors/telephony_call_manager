@@ -89,6 +89,11 @@ struct SupplementAsyncContext : AsyncContext {
     napi_ref thisVar;
 };
 
+struct ImsSwitchAsyncContext : AsyncContext {
+    int32_t slotId;
+    bool enabled;
+};
+
 struct CallRestrictionAsyncContext : AsyncContext {
     int32_t slotId;
     CallRestrictionInfo info;
