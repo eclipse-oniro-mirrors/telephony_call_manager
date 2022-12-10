@@ -21,7 +21,6 @@
 
 #include "call_control_manager.h"
 
-
 namespace OHOS {
 namespace Telephony {
 AudioControlManager::AudioControlManager()
