@@ -70,10 +70,7 @@ void AudioControlManager::IncomingCallHungUp(sptr<CallBase> &callObjectPtr, bool
         TELEPHONY_LOGE("call object ptr nullptr");
         return;
     }
-    bool result = StopRingtone();
-    if (result) {
-        AudioPlayer::ReleaseRenderer();
-    }
+    StopRingtone();
     DelayedSingleton<AudioProxy>::GetInstance()->SetMicrophoneMute(false); // unmute microphone
 }
 
@@ -133,7 +130,10 @@ void AudioControlManager::HandlePriorState(sptr<CallBase> &callObjectPtr, TelCal
             break;
         case TelCallState::CALL_STATUS_INCOMING:
             if (stateNumber == EMPTY_VALUE) {
-                StopRingtone(); // should stop ringtone while no more incoming calls
+                bool result = StopRingtone(); // should stop ringtone while no more incoming calls
+                if (result && callObjectPtr->GetCallRunningState() != CallRunningState::CALL_RUNNING_STATE_ACTIVE) {
+                    AudioPlayer::ReleaseRenderer();
+                }
                 event = AudioEvent::NO_MORE_INCOMING_CALL;
             }
             break;
