@@ -70,7 +70,10 @@ void AudioControlManager::IncomingCallHungUp(sptr<CallBase> &callObjectPtr, bool
         TELEPHONY_LOGE("call object ptr nullptr");
         return;
     }
-    StopRingtone();
+    bool result = StopRingtone();
+    if (result) {
+        AudioPlayer::ReleaseRenderer();
+    }
     DelayedSingleton<AudioProxy>::GetInstance()->SetMicrophoneMute(false); // unmute microphone
 }
 
@@ -274,7 +277,6 @@ bool AudioControlManager::StopRingtone()
         return true;
     }
     if (ring_ != nullptr && ring_->Stop() == TELEPHONY_SUCCESS) {
-        AudioPlayer::ReleaseRenderer();
         TELEPHONY_LOGI("stop ringtone success");
         ring_ = nullptr;
         return true;
