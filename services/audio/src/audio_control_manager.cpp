@@ -14,11 +14,13 @@
  */
 
 #include "audio_control_manager.h"
+#include "audio_player.h"
 #include "call_state_processor.h"
 
 #include "telephony_log_wrapper.h"
 
 #include "call_control_manager.h"
+
 
 namespace OHOS {
 namespace Telephony {
@@ -273,6 +275,7 @@ bool AudioControlManager::StopRingtone()
         return true;
     }
     if (ring_ != nullptr && ring_->Stop() == TELEPHONY_SUCCESS) {
+        AudioPlayer::ReleaseRenderer();
         TELEPHONY_LOGI("stop ringtone success");
         ring_ = nullptr;
         return true;
