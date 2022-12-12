@@ -14,6 +14,7 @@
  */
 
 #include "audio_control_manager.h"
+#include "audio_player.h"
 #include "call_state_processor.h"
 
 #include "telephony_log_wrapper.h"
@@ -129,7 +130,10 @@ void AudioControlManager::HandlePriorState(sptr<CallBase> &callObjectPtr, TelCal
             break;
         case TelCallState::CALL_STATUS_INCOMING:
             if (stateNumber == EMPTY_VALUE) {
-                StopRingtone(); // should stop ringtone while no more incoming calls
+                bool result = StopRingtone(); // should stop ringtone while no more incoming calls
+                if (result && callObjectPtr->GetCallRunningState() != CallRunningState::CALL_RUNNING_STATE_ACTIVE) {
+                    AudioPlayer::ReleaseRenderer();
+                }
                 event = AudioEvent::NO_MORE_INCOMING_CALL;
             }
             break;
