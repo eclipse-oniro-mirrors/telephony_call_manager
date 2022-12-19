@@ -20,6 +20,7 @@
 #include <string>
 
 #include "bluetooth_hfp_ag.h"
+#include "call_manager_service.h"
 #include "telephony_types.h"
 
 using namespace OHOS::Bluetooth;
@@ -4400,6 +4401,21 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_HasVoiceCapability_0100, Functi
     }
 
     EXPECT_EQ(CallManagerGtest::clientPtr_->HasVoiceCapability(), true);
+}
+
+/*********************************** Test Dump() ***************************************/
+/**
+ * @tc.number   Telephony_CallManager_TestDump_0100
+ * @tc.name     Test Dump
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_TestDump_0100, Function | MediumTest | Level3)
+{
+    std::vector<std::u16string> emptyArgs = {};
+    std::vector<std::u16string> args = { u"test", u"test1" };
+    EXPECT_EQ(DelayedSingleton<CallManagerService>::GetInstance()->Dump(-1, args), TELEPHONY_ERR_ARGUMENT_INVALID);
+    EXPECT_EQ(DelayedSingleton<CallManagerService>::GetInstance()->Dump(0, emptyArgs), 0);
+    EXPECT_EQ(DelayedSingleton<CallManagerService>::GetInstance()->Dump(0, args), 0);
 }
 
 #else // TEL_TEST_UNSUPPORT
