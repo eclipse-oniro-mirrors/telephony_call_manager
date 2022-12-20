@@ -11,6 +11,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//base/telephony/call_manager/call_manager_aafwk.gni")
 import("//build/test.gni")
 
 ohos_unittest("tel_call_manager_gtest") {
@@ -26,8 +27,15 @@ ohos_unittest("tel_call_manager_gtest") {
   ]
 
   include_dirs = [
+    "//base/telephony/call_manager/services/bluetooth/include",
+    "//base/telephony/call_manager/services/call_manager_service/include",
     "//base/telephony/call_manager/test/unittest/call_manager_gtest/include",
     "//base/telephony/call_manager/utils/include",
+    "//base/telephony/call_manager/services/call_report/include",
+    "//base/telephony/call_manager/services/call/include",
+    "//base/telephony/call_manager/services/call_setting/include",
+    "//base/telephony/call_manager/services/telephony_interaction/include",
+    "//base/telephony/call_manager/services/call/call_state_observer/include",
     "//base/telephony/call_manager/frameworks/native/include",
     "//base/telephony/call_manager/interfaces/innerkits",
   ]
@@ -35,6 +43,10 @@ ohos_unittest("tel_call_manager_gtest") {
   configs = [ "//base/telephony/core_service/utils:telephony_log_config" ]
 
   deps = [
+    "${ability_runtime_inner_api_path}/ability_manager:ability_manager",
+    "${ability_runtime_path}/frameworks/native/ability/native:abilitykit_native",
+    "${ability_runtime_path}/frameworks/native/ability/native:data_ability_helper",
+    "//base/telephony/call_manager:tel_call_manager",
     "//base/telephony/call_manager/frameworks/native:tel_call_manager_api",
     "//foundation/communication/bluetooth/frameworks/inner:btframework",
     "//third_party/googletest:gtest_main",
@@ -51,6 +63,8 @@ ohos_unittest("tel_call_manager_gtest") {
     "eventhandler:libeventhandler",
     "init:libbegetutil",
     "ipc:ipc_core",
+    "relational_store:native_dataability",
+    "relational_store:native_rdb",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
   ]
