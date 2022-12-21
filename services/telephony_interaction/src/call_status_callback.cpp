@@ -54,6 +54,7 @@ int32_t CallStatusCallback::UpdateCallsReportInfo(const CallsReportInfo &info)
     CallDetailsInfo detailsInfo;
     CallDetailInfo detailInfo;
     detailInfo.state = TelCallState::CALL_STATUS_UNKNOWN;
+    detailInfo.index = 0;
     CallsReportInfo callsInfo = info;
     std::vector<CallReportInfo>::iterator it = callsInfo.callVec.begin();
     for (; it != callsInfo.callVec.end(); ++it) {
@@ -224,6 +225,10 @@ int32_t CallStatusCallback::UpdateGetTransferResult(const CallTransferResponse &
     resultInfo.PutIntValue("type", response.type);
     resultInfo.PutIntValue("reason", response.reason);
     resultInfo.PutIntValue("time", response.time);
+    resultInfo.PutIntValue("startHour", response.startHour);
+    resultInfo.PutIntValue("startMinute", response.startMinute);
+    resultInfo.PutIntValue("endHour", response.endHour);
+    resultInfo.PutIntValue("endMinute", response.endMinute);
     return DelayedSingleton<CallAbilityReportProxy>::GetInstance()->ReportAsyncResults(reportId, resultInfo);
 }
 

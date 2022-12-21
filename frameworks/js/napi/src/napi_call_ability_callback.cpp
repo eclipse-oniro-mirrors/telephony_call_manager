@@ -986,6 +986,10 @@ void NapiCallAbilityCallback::ReportExecutionResult(EventCallback &settingInfo, 
         if (result == TELEPHONY_SUCCESS) {
             callbackValues[ARRAY_INDEX_FIRST] = NapiCallManagerUtils::CreateUndefined(env);
             napi_get_null(env, &callbackValues[ARRAY_INDEX_SECOND]);
+        } else if (result == CALL_ERR_UT_NO_CONNECTION) {
+            std::string errTip = std::to_string(CALL_ERR_UT_NO_CONNECTION);
+            callbackValues[ARRAY_INDEX_FIRST] = NapiCallManagerUtils::CreateErrorMessage(env, errTip);
+            callbackValues[ARRAY_INDEX_SECOND] = NapiCallManagerUtils::CreateUndefined(env);
         } else {
             std::string errTip = std::to_string(CALL_ERR_NAPI_INTERFACE_FAILED);
             callbackValues[ARRAY_INDEX_FIRST] = NapiCallManagerUtils::CreateErrorMessage(env, errTip);
@@ -1004,6 +1008,9 @@ void NapiCallAbilityCallback::ReportExecutionResult(EventCallback &settingInfo, 
             napi_value promiseValue = nullptr;
             napi_get_null(env, &promiseValue);
             napi_resolve_deferred(env, settingInfo.deferred, promiseValue);
+        } else if (result == CALL_ERR_UT_NO_CONNECTION) {
+            std::string errTip = std::to_string(CALL_ERR_UT_NO_CONNECTION);
+            napi_reject_deferred(env, settingInfo.deferred, NapiCallManagerUtils::CreateErrorMessage(env, errTip));
         } else {
             std::string errTip = std::to_string(CALL_ERR_NAPI_INTERFACE_FAILED);
             napi_reject_deferred(env, settingInfo.deferred, NapiCallManagerUtils::CreateErrorMessage(env, errTip));

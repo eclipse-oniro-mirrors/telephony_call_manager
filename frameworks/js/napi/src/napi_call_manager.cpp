@@ -19,10 +19,8 @@
 #include <securec.h>
 
 #include "system_ability_definition.h"
-
 #include "call_manager_errors.h"
 #include "telephony_log_wrapper.h"
-
 #include "napi_call_manager_types.h"
 #include "napi_call_ability_callback.h"
 #include "call_manager_client.h"
@@ -2476,7 +2474,11 @@ int32_t NapiCallManager::GetTransferInfo(napi_env env, napi_value objValue, Call
     int32_t type = NapiCallManagerUtils::GetIntProperty(env, objValue, "type");
     int32_t settingType = NapiCallManagerUtils::GetIntProperty(env, objValue, "settingType");
     std::string transferNum = NapiCallManagerUtils::GetStringProperty(env, objValue, "transferNum");
-    if (transferNum.length() > static_cast<size_t>(kMaxNumberLen)) {
+    int32_t startHour = NapiCallManagerUtils::GetIntProperty(env, objValue, "startHour");
+    int32_t startMinute = NapiCallManagerUtils::GetIntProperty(env, objValue, "startMinute");
+    int32_t endHour = NapiCallManagerUtils::GetIntProperty(env, objValue, "endHour");
+    int32_t endMinute = NapiCallManagerUtils::GetIntProperty(env, objValue, "endMinute");
+    if (transferNum.length() > kMaxNumberLen) {
         TELEPHONY_LOGE("Number out of limit!");
         return CALL_ERR_NUMBER_OUT_OF_RANGE;
     }
@@ -2486,8 +2488,15 @@ int32_t NapiCallManager::GetTransferInfo(napi_env env, napi_value objValue, Call
     }
     asyncContext.info.settingType = static_cast<CallTransferSettingType>(settingType);
     asyncContext.info.type = static_cast<CallTransferType>(type);
-    TELEPHONY_LOGI("GetTransferInfo: type = %{public}d, settingType = %{public}d, transferNum = %{public}s",
-        asyncContext.info.type, asyncContext.info.settingType, asyncContext.info.transferNum);
+    asyncContext.info.startHour = startHour;
+    asyncContext.info.startMinute = startMinute;
+    asyncContext.info.endHour = endHour;
+    asyncContext.info.endMinute = endMinute;
+    TELEPHONY_LOGI(
+        "GetTransferInfo: type = %{public}d, settingType = %{public}d, startHour = %{public}d, startMinute = "
+        "%{public}d, endHour = %{public}d, endMinute = %{public}d",
+        asyncContext.info.type, asyncContext.info.settingType, asyncContext.info.startHour,
+        asyncContext.info.startMinute, asyncContext.info.endHour, asyncContext.info.endMinute);
     return TELEPHONY_SUCCESS;
 }
 

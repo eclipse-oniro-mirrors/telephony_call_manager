@@ -619,6 +619,37 @@ int32_t CallManagerServiceProxy::SetCallTransferInfo(int32_t slotId, CallTransfe
     return replyParcel.ReadInt32();
 }
 
+int32_t CallManagerServiceProxy::IsSupportCallTransferTime(int32_t slotId, bool &result)
+{
+    MessageOption option;
+    MessageParcel dataParcel;
+    MessageParcel replyParcel;
+    if (!dataParcel.WriteInterfaceToken(CallManagerServiceProxy::GetDescriptor())) {
+        TELEPHONY_LOGE("[slot%{public}d] write descriptor fail", slotId);
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("[slot%{public}d] function Remote() return nullptr!", slotId);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    if (!dataParcel.WriteInt32(slotId)) {
+        TELEPHONY_LOGE("[slot%{public}d] write slotId fail", slotId);
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
+    if (!dataParcel.WriteBool(result)) {
+        TELEPHONY_LOGE("[slot%{public}d] write result fail", slotId);
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
+    int32_t error = remote->SendRequest(
+        CallManagerSurfaceCode::INTERFACE_IS_SUPPORT_CALL_TRANSFER_TIMER, dataParcel, replyParcel, option);
+    if (error != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("[slot%{public}d] Function failed! errCode:%{public}d", slotId, error);
+        return false;
+    }
+    return replyParcel.ReadBool();
+}
+
 int32_t CallManagerServiceProxy::SetCallPreferenceMode(int32_t slotId, int32_t mode)
 {
     MessageOption option;

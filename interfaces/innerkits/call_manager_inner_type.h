@@ -30,6 +30,12 @@ constexpr uint16_t ACCOUNT_NUMBER_MAX_LENGTH = 100;
 constexpr uint16_t CONNECT_SERVICE_WAIT_TIME = 1000; // ms
 constexpr int16_t ERR_ID = -1;
 constexpr int16_t INVALID_CALLID = 0;
+// The follow hour and minute was use to confirm the set call transfer info time
+constexpr int16_t MIN_HOUR = 0;
+constexpr int16_t MAX_HOUR = 24;
+constexpr int16_t MIN_MINUTE = 0;
+constexpr int16_t MAX_MINUTE = 60;
+constexpr int16_t INVALID_TIME = -1;
 
 // call type
 enum class CallType {
@@ -456,6 +462,10 @@ struct CallTransferResponse {
     char number[kMaxNumberLen + 1];
     int32_t reason;
     int32_t time;
+    int32_t startHour = INVALID_TIME;
+    int32_t startMinute = INVALID_TIME;
+    int32_t endHour = INVALID_TIME;
+    int32_t endMinute = INVALID_TIME;
 };
 
 struct CallRestrictionResponse {
@@ -541,6 +551,10 @@ struct CallTransferInfo {
     char transferNum[kMaxNumberLen + 1];
     CallTransferSettingType settingType;
     CallTransferType type;
+    int32_t startHour;
+    int32_t startMinute;
+    int32_t endHour;
+    int32_t endMinute;
 };
 
 enum class SsRequestType {

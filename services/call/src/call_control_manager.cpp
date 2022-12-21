@@ -539,6 +539,21 @@ int32_t CallControlManager::SetCallTransferInfo(int32_t slotId, CallTransferInfo
     }
 }
 
+int32_t CallControlManager::IsSupportCallTransferTime(int32_t slotId, bool &result)
+{
+    int32_t ret = CallPolicy::SetCallTransferInfoPolicy(slotId);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("[slot%{public}d] failed!", slotId);
+        return ret;
+    }
+    if (callSettingManagerPtr_ != nullptr) {
+        return callSettingManagerPtr_->IsSupportCallTransferTime(slotId, result);
+    } else {
+        TELEPHONY_LOGE("[slot%{public}d]  callSettingManagerPtr_ is nullptr!", slotId);
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+}
+
 int32_t CallControlManager::SetCallPreferenceMode(int32_t slotId, int32_t mode)
 {
     int32_t ret = CallPolicy::SetCallPreferenceModePolicy(slotId);

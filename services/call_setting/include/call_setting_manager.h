@@ -36,6 +36,7 @@ public:
     int32_t SetCallRestriction(int32_t slotId, CallRestrictionInfo &info);
     int32_t GetCallTransferInfo(int32_t slotId, CallTransferType type);
     int32_t SetCallTransferInfo(int32_t slotId, CallTransferInfo &info);
+    int32_t IsSupportCallTransferTime(int32_t slotId, bool &result);
     int32_t SetCallPreferenceMode(int32_t slotId, int32_t mode);
     int32_t GetImsConfig(int32_t slotId, ImsConfigItem item);
     int32_t SetImsConfig(int32_t slotId, ImsConfigItem item, std::u16string &value);

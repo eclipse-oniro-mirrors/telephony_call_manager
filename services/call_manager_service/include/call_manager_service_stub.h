@@ -70,6 +70,7 @@ private:
     int32_t OnSetCallRestriction(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetTransferNumber(MessageParcel &data, MessageParcel &reply);
     int32_t OnSetTransferNumber(MessageParcel &data, MessageParcel &reply);
+    int32_t OnIsSupportCallTransferTime(MessageParcel &data, MessageParcel &reply);
     int32_t OnCombineConference(MessageParcel &data, MessageParcel &reply);
     int32_t OnSeparateConference(MessageParcel &data, MessageParcel &reply);
     int32_t OnJoinConference(MessageParcel &data, MessageParcel &reply);
