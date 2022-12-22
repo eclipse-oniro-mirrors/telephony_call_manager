@@ -131,19 +131,20 @@ int32_t CSCall::HoldConference()
     return ret;
 }
 
-int32_t CSCall::GetMainCallId()
+int32_t CSCall::GetMainCallId(int32_t &mainCallId)
 {
-    return DelayedSingleton<CsConference>::GetInstance()->GetMainCall();
+    mainCallId = DelayedSingleton<CsConference>::GetInstance()->GetMainCall();
+    return TELEPHONY_SUCCESS;
 }
 
-std::vector<std::u16string> CSCall::GetSubCallIdList()
+int32_t CSCall::GetSubCallIdList(std::vector<std::u16string> &callIdList)
 {
-    return DelayedSingleton<CsConference>::GetInstance()->GetSubCallIdList(GetCallID());
+    return DelayedSingleton<CsConference>::GetInstance()->GetSubCallIdList(GetCallID(), callIdList);
 }
 
-std::vector<std::u16string> CSCall::GetCallIdListForConference()
+int32_t CSCall::GetCallIdListForConference(std::vector<std::u16string> &callIdList)
 {
-    return DelayedSingleton<CsConference>::GetInstance()->GetCallIdListForConference(GetCallID());
+    return DelayedSingleton<CsConference>::GetInstance()->GetCallIdListForConference(GetCallID(), callIdList);
 }
 
 int32_t CSCall::IsSupportConferenceable()

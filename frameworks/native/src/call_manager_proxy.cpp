@@ -430,14 +430,14 @@ int32_t CallManagerProxy::SeparateConference(int32_t callId)
     return TELEPHONY_SUCCESS;
 }
 
-int32_t CallManagerProxy::GetMainCallId(int32_t &callId)
+int32_t CallManagerProxy::GetMainCallId(int32_t &callId, int32_t &mainCallId)
 {
     if (ReConnectService() != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     std::lock_guard<std::mutex> lock(mutex_);
-    int32_t errCode = callManagerServicePtr_->GetMainCallId(callId);
+    int32_t errCode = callManagerServicePtr_->GetMainCallId(callId, mainCallId);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("GetMainCallId failed, errcode:%{public}d", errCode);
         return errCode;
@@ -445,28 +445,34 @@ int32_t CallManagerProxy::GetMainCallId(int32_t &callId)
     return TELEPHONY_SUCCESS;
 }
 
-std::vector<std::u16string> CallManagerProxy::GetSubCallIdList(int32_t callId)
+int32_t CallManagerProxy::GetSubCallIdList(int32_t callId, std::vector<std::u16string> &callIdList)
 {
-    std::vector<std::u16string> list;
     if (ReConnectService() != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("ipc reconnect failed!");
-        return list;
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     std::lock_guard<std::mutex> lock(mutex_);
-    list = callManagerServicePtr_->GetSubCallIdList(callId);
-    return list;
+    int32_t errCode = callManagerServicePtr_->GetSubCallIdList(callId, callIdList);
+    if (errCode != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("GetMainCallId failed, errcode:%{public}d", errCode);
+        return errCode;
+    }
+    return TELEPHONY_SUCCESS;
 }
 
-std::vector<std::u16string> CallManagerProxy::GetCallIdListForConference(int32_t callId)
+int32_t CallManagerProxy::GetCallIdListForConference(int32_t callId, std::vector<std::u16string> &callIdList)
 {
-    std::vector<std::u16string> list;
     if (ReConnectService() != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("ipc reconnect failed!");
-        return list;
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     std::lock_guard<std::mutex> lock(mutex_);
-    list = callManagerServicePtr_->GetCallIdListForConference(callId);
-    return list;
+    int32_t errCode = callManagerServicePtr_->GetCallIdListForConference(callId, callIdList);
+    if (errCode != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("GetMainCallId failed, errcode:%{public}d", errCode);
+        return errCode;
+    }
+    return TELEPHONY_SUCCESS;
 }
 
 int32_t CallManagerProxy::GetCallWaiting(int32_t slotId)
@@ -614,14 +620,14 @@ int32_t CallManagerProxy::StopDtmf(int32_t callId)
     return TELEPHONY_SUCCESS;
 }
 
-bool CallManagerProxy::IsRinging()
+int32_t CallManagerProxy::IsRinging(bool &enabled)
 {
     if (ReConnectService() != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("ipc reconnect failed!");
-        return false;
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     std::lock_guard<std::mutex> lock(mutex_);
-    return callManagerServicePtr_->IsRinging();
+    return callManagerServicePtr_->IsRinging(enabled);
 }
 
 bool CallManagerProxy::HasCall()
@@ -634,24 +640,24 @@ bool CallManagerProxy::HasCall()
     return callManagerServicePtr_->HasCall();
 }
 
-bool CallManagerProxy::IsNewCallAllowed()
+int32_t CallManagerProxy::IsNewCallAllowed(bool &enabled)
 {
     if (ReConnectService() != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("ipc reconnect failed!");
-        return false;
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     std::lock_guard<std::mutex> lock(mutex_);
-    return callManagerServicePtr_->IsNewCallAllowed();
+    return callManagerServicePtr_->IsNewCallAllowed(enabled);
 }
 
-bool CallManagerProxy::IsInEmergencyCall()
+int32_t CallManagerProxy::IsInEmergencyCall(bool &enabled)
 {
     if (ReConnectService() != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("ipc reconnect failed!");
-        return false;
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     std::lock_guard<std::mutex> lock(mutex_);
-    return callManagerServicePtr_->IsInEmergencyCall();
+    return callManagerServicePtr_->IsInEmergencyCall(enabled);
 }
 
 bool CallManagerProxy::IsEmergencyPhoneNumber(std::u16string &number, int32_t slotId, int32_t &errorCode)

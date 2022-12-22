@@ -72,7 +72,7 @@ int32_t CallPolicy::AnswerCallPolicy(int32_t callId, int32_t videoState)
     }
     if (!IsCallExist(callId)) {
         TELEPHONY_LOGE("callId is invalid, callId:%{public}d", callId);
-        return CALL_ERR_INVALID_CALLID;
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
     TelCallState state = GetCallState(callId);
     if (state != TelCallState::CALL_STATUS_INCOMING && state != TelCallState::CALL_STATUS_WAITING) {
@@ -86,7 +86,7 @@ int32_t CallPolicy::RejectCallPolicy(int32_t callId)
 {
     if (!IsCallExist(callId)) {
         TELEPHONY_LOGE("callId is invalid, callId:%{public}d", callId);
-        return CALL_ERR_INVALID_CALLID;
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
     TelCallState state = GetCallState(callId);
     if (state != TelCallState::CALL_STATUS_INCOMING && state != TelCallState::CALL_STATUS_WAITING) {
@@ -101,7 +101,7 @@ int32_t CallPolicy::HoldCallPolicy(int32_t callId)
     sptr<CallBase> call = GetOneCallObject(callId);
     if (call == nullptr) {
         TELEPHONY_LOGE("GetOneCallObject failed, this callId is invalid! callId:%{public}d", callId);
-        return CALL_ERR_INVALID_CALLID;
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
     if (call->GetCallRunningState() != CallRunningState::CALL_RUNNING_STATE_ACTIVE) {
         TELEPHONY_LOGE("this call is not activated! callId:%{public}d", callId);
@@ -115,7 +115,7 @@ int32_t CallPolicy::UnHoldCallPolicy(int32_t callId)
     sptr<CallBase> call = GetOneCallObject(callId);
     if (call == nullptr) {
         TELEPHONY_LOGE("GetOneCallObject failed, this callId is invalid! callId:%{public}d", callId);
-        return CALL_ERR_INVALID_CALLID;
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
     if (call->GetCallRunningState() != CallRunningState::CALL_RUNNING_STATE_HOLD) {
         TELEPHONY_LOGE("this call is not on holding state! callId:%{public}d", callId);
@@ -128,7 +128,7 @@ int32_t CallPolicy::HangUpPolicy(int32_t callId)
 {
     if (!IsCallExist(callId)) {
         TELEPHONY_LOGE("callId is invalid, callId:%{public}d", callId);
-        return CALL_ERR_INVALID_CALLID;
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
     TelCallState state = GetCallState(callId);
     if (state == TelCallState::CALL_STATUS_IDLE || state == TelCallState::CALL_STATUS_DISCONNECTING ||
@@ -144,7 +144,7 @@ int32_t CallPolicy::SwitchCallPolicy(int32_t callId)
     std::list<int32_t> callIdList;
     if (!IsCallExist(callId)) {
         TELEPHONY_LOGE("callId is invalid");
-        return CALL_ERR_INVALID_CALLID;
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
     GetCarrierCallList(callIdList);
     if (callIdList.size() < onlyTwoCall_) {
@@ -166,7 +166,7 @@ int32_t CallPolicy::UpdateCallMediaModePolicy(int32_t callId, ImsCallMode mode)
     sptr<CallBase> callPtr = CallObjectManager::GetOneCallObject(callId);
     if (callPtr == nullptr) {
         TELEPHONY_LOGE("callId is invalid, callId:%{public}d", callId);
-        return CALL_ERR_INVALID_CALLID;
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
     if (callPtr->GetCallType() != CallType::TYPE_IMS && callPtr->GetCallType() != CallType::TYPE_OTT) {
         TELEPHONY_LOGE("calltype is illegal, calltype:%{public}d", callPtr->GetCallType());
@@ -353,7 +353,7 @@ int32_t CallPolicy::InviteToConferencePolicy(int32_t callId, std::vector<std::st
 {
     if (!IsCallExist(callId)) {
         TELEPHONY_LOGE("callId is invalid, callId:%{public}d", callId);
-        return CALL_ERR_INVALID_CALLID;
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
     // check number legality
     if (numberList.empty()) {

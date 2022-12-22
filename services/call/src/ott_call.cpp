@@ -257,19 +257,20 @@ int32_t OTTCall::HoldConference()
     return ret;
 }
 
-int32_t OTTCall::GetMainCallId()
+int32_t OTTCall::GetMainCallId(int32_t &mainCallId)
 {
-    return DelayedSingleton<OttConference>::GetInstance()->GetMainCall();
+    mainCallId = DelayedSingleton<OttConference>::GetInstance()->GetMainCall();
+    return TELEPHONY_SUCCESS;
 }
 
-std::vector<std::u16string> OTTCall::GetSubCallIdList()
+int32_t OTTCall::GetSubCallIdList(std::vector<std::u16string> &callIdList)
 {
-    return DelayedSingleton<OttConference>::GetInstance()->GetSubCallIdList(GetCallID());
+    return DelayedSingleton<OttConference>::GetInstance()->GetSubCallIdList(GetCallID(), callIdList);
 }
 
-std::vector<std::u16string> OTTCall::GetCallIdListForConference()
+int32_t OTTCall::GetCallIdListForConference(std::vector<std::u16string> &callIdList)
 {
-    return DelayedSingleton<OttConference>::GetInstance()->GetCallIdListForConference(GetCallID());
+    return DelayedSingleton<OttConference>::GetInstance()->GetCallIdListForConference(GetCallID(), callIdList);
 }
 
 int32_t OTTCall::IsSupportConferenceable()

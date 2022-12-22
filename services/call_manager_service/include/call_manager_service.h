@@ -182,9 +182,10 @@ public:
      * IsNewCallAllowed
      *
      * @brief Can I initiate a call
-     * @return Returns true on can, others on there is not can.
+     * @param enabled[out], true on can, others on there is not can
+     * @return Returns interface processing results.
      */
-    bool IsNewCallAllowed() override;
+    int32_t IsNewCallAllowed(bool &enabled) override;
 
     /**
      * SetMuted
@@ -217,17 +218,19 @@ public:
      * IsRinging
      *
      * @brief Whether the ringing
-     * @return Returns true on ringing, false on there is no ringing.
+     * @param enabled[out], true on ringing, false on there is no ringing
+     * @return Returns interface processing results.
      */
-    bool IsRinging() override;
+    int32_t IsRinging(bool &enabled) override;
 
     /**
      * IsInEmergencyCall
      *
      * @brief Is there an emergency call
-     * @return Returns true on emergency call, false on no emergency call.
+     * @param enabled[out], true on emergency call, false on no emergency call
+     * @return Returns interface processing results.
      */
-    bool IsInEmergencyCall() override;
+    int32_t IsInEmergencyCall(bool &enabled) override;
 
     /**
      * StartDtmf
@@ -433,25 +436,27 @@ public:
      * @param callId[in], Id of a call in a conference
      * @return Returns main call id, -1 on not call id.
      */
-    int32_t GetMainCallId(int32_t callId) override;
+    int32_t GetMainCallId(int32_t callId, int32_t &mainCallId) override;
 
     /**
      * GetSubCallIdList
      *
      * @brief Obtain the list of neutron call ids
      * @param callId[in], Id of a call in a conference
-     * @return Returns call id list.
+     * @param callIdList[out], the list of neutron call ids
+     * @return Returns 0 on success, others on failure.
      */
-    std::vector<std::u16string> GetSubCallIdList(int32_t callId) override;
+    int32_t GetSubCallIdList(int32_t callId, std::vector<std::u16string> &callIdList) override;
 
     /**
      * GetCallIdListForConference
      *
      * @brief Obtain the callId list of all calls in a conference
      * @param callId[in], Id of a call in a conference
-     * @return Returns call id list.
+     * @param callIdList[out], the callId list of all calls in a conference
+     * @return Returns 0 on success, others on failure.
      */
-    std::vector<std::u16string> GetCallIdListForConference(int32_t callId) override;
+    int32_t GetCallIdListForConference(int32_t callId, std::vector<std::u16string> &callIdList) override;
 
     /**
      * SetCallPreferenceMode

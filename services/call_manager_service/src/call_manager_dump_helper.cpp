@@ -80,7 +80,9 @@ void CallManagerDumpHelper::ShowCallManagerInfo(std::string &result) const
     result.append(std::to_string(DelayedSingleton<CallManagerService>::GetInstance()->GetCallState()));
     result.append("\n");
     result.append("RingingCallState:");
-    result.append(std::to_string(DelayedSingleton<CallManagerService>::GetInstance()->IsRinging()));
+    bool enabled = false;
+    DelayedSingleton<CallManagerService>::GetInstance()->IsRinging(enabled);
+    result.append(std::to_string(enabled));
     result.append("\n");
     result.append("HasCall:");
     result.append(std::to_string(DelayedSingleton<CallManagerService>::GetInstance()->HasCall()));

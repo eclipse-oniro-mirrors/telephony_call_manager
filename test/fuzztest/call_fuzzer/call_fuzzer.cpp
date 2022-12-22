@@ -38,6 +38,7 @@ constexpr int32_t TEL_CONFERENCE_STATE_NUM = 4;
 constexpr int32_t CALL_RUNNING_STATE_NUM = 8;
 constexpr int32_t CALL_ENDED_TYPE_NUM = 4;
 constexpr int32_t CALL_ANSWER_TYPE_NUM = 3;
+constexpr int32_t INVALID_CALL_ID = -1;
 
 bool IsServiceInited()
 {
@@ -120,9 +121,12 @@ void DialingProcess(const uint8_t *data, size_t size)
     callObjectPtr->LaunchConference();
     callObjectPtr->ExitConference();
     callObjectPtr->HoldConference();
-    callObjectPtr->GetMainCallId();
-    callObjectPtr->GetSubCallIdList();
-    callObjectPtr->GetCallIdListForConference();
+    int32_t mainCallId = INVALID_CALL_ID;
+    callObjectPtr->GetMainCallId(mainCallId);
+    std::vector<std::u16string> subCallIdList;
+    callObjectPtr->GetSubCallIdList(subCallIdList);
+    std::vector<std::u16string> callIdList;
+    callObjectPtr->GetCallIdListForConference(callIdList);
     callObjectPtr->IsSupportConferenceable();
     callObjectPtr->GetEmergencyState();
 }
@@ -212,9 +216,12 @@ void IMSCallFunc(const uint8_t *data, size_t size)
     callObjectPtr->LaunchConference();
     callObjectPtr->ExitConference();
     callObjectPtr->HoldConference();
-    callObjectPtr->GetMainCallId();
-    callObjectPtr->GetSubCallIdList();
-    callObjectPtr->GetCallIdListForConference();
+    int32_t mainCallId = INVALID_CALL_ID;
+    callObjectPtr->GetMainCallId(mainCallId);
+    std::vector<std::u16string> subCallIdList;
+    callObjectPtr->GetSubCallIdList(subCallIdList);
+    std::vector<std::u16string> callIdList;
+    callObjectPtr->GetCallIdListForConference(callIdList);
     callObjectPtr->IsSupportConferenceable();
     callObjectPtr->StartRtt(msgU16);
     callObjectPtr->StopRtt();
@@ -264,9 +271,12 @@ void OttCallFunc(const uint8_t *data, size_t size)
     callObjectPtr->LaunchConference();
     callObjectPtr->ExitConference();
     callObjectPtr->HoldConference();
-    callObjectPtr->GetMainCallId();
-    callObjectPtr->GetSubCallIdList();
-    callObjectPtr->GetCallIdListForConference();
+    int32_t mainCallId = INVALID_CALL_ID;
+    callObjectPtr->GetMainCallId(mainCallId);
+    std::vector<std::u16string> subCallIdList;
+    callObjectPtr->GetSubCallIdList(subCallIdList);
+    std::vector<std::u16string> callIdList;
+    callObjectPtr->GetCallIdListForConference(callIdList);
     callObjectPtr->IsSupportConferenceable();
     callObjectPtr->ReceiveUpdateCallMediaModeResponse(response);
     callObjectPtr->SetMute(mute, slotId);
