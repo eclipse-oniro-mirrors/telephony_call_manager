@@ -2507,7 +2507,7 @@ void NapiCallManager::NativeIsImsSwitchEnabledCallBack(napi_env env, napi_status
             napi_get_boolean(env, asyncContext->enabled, &callbackValue[ARRAY_INDEX_SECOND]);
         } else {
             JsError error = NapiUtil::ConverErrorMessageForJs(asyncContext->errorCode);
-             callbackValue[ARRAY_INDEX_FIRST] =
+            callbackValue[ARRAY_INDEX_FIRST] =
                 NapiCallManagerUtils::CreateErrorMessageWithErrorCode(env, error.errorMessage, error.errorCode);
             callbackValue[ARRAY_INDEX_SECOND] = NapiCallManagerUtils::CreateUndefined(env);
         }
@@ -2600,7 +2600,7 @@ void NapiCallManager::NativeBoolCallBackWithErrorCode(napi_env env, napi_status 
             napi_get_boolean(env, asyncContext->enabled, &callbackValue[ARRAY_INDEX_SECOND]);
         } else {
             JsError error = NapiUtil::ConverErrorMessageForJs(asyncContext->errorCode);
-             callbackValue[ARRAY_INDEX_FIRST] =
+            callbackValue[ARRAY_INDEX_FIRST] =
                 NapiCallManagerUtils::CreateErrorMessageWithErrorCode(env, error.errorMessage, error.errorCode);
             callbackValue[ARRAY_INDEX_SECOND] = NapiCallManagerUtils::CreateUndefined(env);
         }

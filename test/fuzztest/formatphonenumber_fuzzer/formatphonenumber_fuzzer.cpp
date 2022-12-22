@@ -50,8 +50,8 @@ int32_t GetMainCallId(const uint8_t *data, size_t size)
     dataParcel.WriteInt32(callId);
     size_t mainCallId = static_cast<int32_t>(size);
     dataParcel.WriteInt32(mainCallId);
-    size_t dataSize = size - sizeof(int32_t) * 2;
-    dataParcel.WriteBuffer(data + sizeof(int32_t) * 2, dataSize);
+    size_t dataSize = size - sizeof(int32_t) * TWO_INT_NUM;
+    dataParcel.WriteBuffer(data + sizeof(int32_t) * TWO_INT_NUM, dataSize);
     dataParcel.RewindRead(0);
     MessageParcel reply;
     return DelayedSingleton<CallManagerService>::GetInstance()->OnGetMainCallId(dataParcel, reply);
