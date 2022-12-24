@@ -363,8 +363,10 @@ void IsNewCallAllowed()
         std::cout << "g_clientPtr is nullptr" << std::endl;
         return;
     }
-    int32_t ret = g_clientPtr->IsNewCallAllowed();
-    std::cout << "return value:" << ret << std::endl;
+    bool enabled = false;
+    int32_t ret = g_clientPtr->IsNewCallAllowed(enabled);
+    std::cout << "return result:" << ret << std::endl;
+    std::cout << "enabled value:" << enabled << std::endl;
 }
 
 void IsRinging()
@@ -375,8 +377,10 @@ void IsRinging()
         std::cout << "g_clientPtr is nullptr" << std::endl;
         return;
     }
-    int32_t ret = g_clientPtr->IsRinging();
-    std::cout << "return value:" << ret << std::endl;
+    bool enabled = false;
+    int32_t ret = g_clientPtr->IsRinging(enabled);
+    std::cout << "return result:" << ret << std::endl;
+    std::cout << "enabled value:" << enabled << std::endl;
 }
 
 void IsInEmergencyCall()
@@ -387,8 +391,10 @@ void IsInEmergencyCall()
         std::cout << "g_clientPtr is nullptr" << std::endl;
         return;
     }
-    int32_t ret = g_clientPtr->IsInEmergencyCall();
-    std::cout << "return value:" << ret << std::endl;
+    bool enabled = false;
+    int32_t ret = g_clientPtr->IsInEmergencyCall(enabled);
+    std::cout << "return result:" << ret << std::endl;
+    std::cout << "enabled value:" << enabled << std::endl;
 }
 
 void StartDtmf()
@@ -642,8 +648,10 @@ void GetMainCallId()
     int callId = DEFAULT_CALL_ID;
     std::cout << "please input callId:" << std::endl;
     std::cin >> callId;
-    int32_t ret = g_clientPtr->GetMainCallId(callId);
+    int mainCallId = DEFAULT_CALL_ID;
+    int32_t ret = g_clientPtr->GetMainCallId(callId, mainCallId);
     std::cout << "return value:" << ret << std::endl;
+    std::cout << "mainCallId value:" << mainCallId << std::endl;
 }
 
 void GetSubCallIdList()
@@ -651,9 +659,14 @@ void GetSubCallIdList()
     int32_t callId = DEFAULT_CALL_ID;
     std::cout << "please input callId:" << std::endl;
     std::cin >> callId;
-    std::vector<std::u16string> ret = g_clientPtr->GetSubCallIdList(callId);
-    std::vector<std::u16string>::iterator it = ret.begin();
-    for (; it != ret.end(); ++it) {
+    std::vector<std::u16string> result;
+    result.clear();
+    int32_t ret = g_clientPtr->GetSubCallIdList(callId, result);
+    if (ret != TELEPHONY_SUCCESS) {
+        std::cout << "GetSubCallIdList ret value:" << ret << std::endl;
+    }
+    std::vector<std::u16string>::iterator it = result.begin();
+    for (; it != result.end(); ++it) {
         std::cout << "callId:" << Str16ToStr8(*it) << std::endl;
     }
 }
@@ -663,9 +676,14 @@ void GetCallIdListForConference()
     int32_t callId = DEFAULT_CALL_ID;
     std::cout << "please input callId:" << std::endl;
     std::cin >> callId;
-    std::vector<std::u16string> ret = g_clientPtr->GetCallIdListForConference(callId);
-    std::vector<std::u16string>::iterator it = ret.begin();
-    for (; it != ret.end(); ++it) {
+    std::vector<std::u16string> result;
+    result.clear();
+    int32_t ret = g_clientPtr->GetCallIdListForConference(callId, result);
+    if (ret != TELEPHONY_SUCCESS) {
+        std::cout << "GetCallIdListForConference ret value:" << ret << std::endl;
+    }
+    std::vector<std::u16string>::iterator it = result.begin();
+    for (; it != result.end(); ++it) {
         std::cout << "callId:" << Str16ToStr8(*it) << std::endl;
     }
 }

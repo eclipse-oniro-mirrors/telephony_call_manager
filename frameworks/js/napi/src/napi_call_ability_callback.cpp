@@ -19,9 +19,8 @@
 #include <securec.h>
 
 #include "call_manager_errors.h"
-#include "telephony_log_wrapper.h"
-
 #include "napi_call_manager_utils.h"
+#include "telephony_log_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {

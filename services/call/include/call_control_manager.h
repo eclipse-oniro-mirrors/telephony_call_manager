@@ -53,9 +53,9 @@ public:
     int32_t UnHoldCall(int32_t callId);
     int32_t SwitchCall(int32_t callId);
     bool HasCall();
-    bool IsNewCallAllowed();
-    bool IsRinging();
-    bool HasEmergency();
+    int32_t IsNewCallAllowed(bool &enabled);
+    int32_t IsRinging(bool &enabled);
+    int32_t HasEmergency(bool &enabled);
     bool NotifyNewCallCreated(sptr<CallBase> &callObjectPtr);
     bool NotifyCallDestroyed(const DisconnectedDetails &details);
     bool NotifyCallStateUpdated(sptr<CallBase> &callObjectPtr, TelCallState priorState, TelCallState nextState);
@@ -75,9 +75,9 @@ public:
     // merge calls
     int32_t CombineConference(int32_t mainCallId);
     int32_t SeparateConference(int32_t callId);
-    int32_t GetMainCallId(int32_t callId);
-    std::vector<std::u16string> GetSubCallIdList(int32_t callId);
-    std::vector<std::u16string> GetCallIdListForConference(int32_t callId);
+    int32_t GetMainCallId(int32_t callId, int32_t &mainCallId);
+    int32_t GetSubCallIdList(int32_t callId, std::vector<std::u16string> &callIdList);
+    int32_t GetCallIdListForConference(int32_t callId, std::vector<std::u16string> &callIdList);
     int32_t GetImsConfig(int32_t slotId, ImsConfigItem item);
     int32_t SetImsConfig(int32_t slotId, ImsConfigItem item, std::u16string &value);
     int32_t GetImsFeatureValue(int32_t slotId, FeatureType type);

@@ -16,12 +16,11 @@
 #ifndef NATIVE_COMMON_TYPE_H
 #define NATIVE_COMMON_TYPE_H
 
+#include "call_manager_inner_type.h"
 #include "napi/native_api.h"
 #include "napi/native_node_api.h"
 #include "pac_map.h"
-
 #include "telephony_errors.h"
-#include "call_manager_inner_type.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -32,6 +31,7 @@ const int16_t ZERO_VALUE = 0;
 const int16_t ONLY_ONE_VALUE = 1;
 const int16_t TWO_VALUE_LIMIT = 2;
 const int16_t VALUE_MAXIMUM_LIMIT = 3;
+const int16_t THREE_VALUE_MAXIMUM_LIMIT = 3;
 const int16_t FOUR_VALUE_MAXIMUM_LIMIT = 4;
 const int16_t FIVE_VALUE_MAXIMUM_LIMIT = 5;
 const int16_t ARRAY_INDEX_FIRST = 0;
@@ -44,6 +44,7 @@ const int16_t DTMF_DEFAULT_OFF = 10;
 const int16_t PHONE_NUMBER_MAXIMUM_LIMIT = 31;
 const int16_t MESSAGE_CONTENT_MAXIMUM_LIMIT = 160;
 const int16_t NAPI_MAX_TIMEOUT_SECOND = 10;
+const int16_t UNKNOWN_EVENT = 0;
 
 struct AsyncContext {
     virtual ~AsyncContext() {}
@@ -58,6 +59,7 @@ struct AsyncContext {
     napi_value value[VALUE_MAXIMUM_LIMIT];
     size_t valueLen;
     int32_t errorCode = TELEPHONY_SUCCESS;
+    int32_t eventId = UNKNOWN_EVENT;
 };
 
 struct DialAsyncContext : AsyncContext {
@@ -69,6 +71,14 @@ struct DialAsyncContext : AsyncContext {
 
 struct AnswerAsyncContext : AsyncContext {
     int32_t videoState;
+};
+
+struct BoolResultAsyncContext : AsyncContext {
+    bool enabled;
+};
+
+struct IntResultAsyncContext : AsyncContext {
+    int32_t result;
 };
 
 struct RejectAsyncContext : AsyncContext {

@@ -76,10 +76,6 @@ public:
     static napi_value MakeCall(napi_env env, napi_callback_info info);
     static napi_value AnswerCall(napi_env env, napi_callback_info info);
     static napi_value RejectCall(napi_env env, napi_callback_info info);
-    static napi_value RejectCallWithZeroArgc(napi_env env, napi_callback_info info);
-    static napi_value RejectCallWithOneArgc(napi_env env, napi_callback_info info);
-    static napi_value RejectCallWithTwoArgc(napi_env env, napi_callback_info info);
-    static napi_value RejectCallWithThreeArgc(napi_env env, napi_callback_info info);
     static napi_value HangUpCall(napi_env env, napi_callback_info info);
     static napi_value HoldCall(napi_env env, napi_callback_info info);
     static napi_value UnHoldCall(napi_env env, napi_callback_info info);
@@ -134,8 +130,12 @@ private:
     static void NativeCallBack(napi_env env, napi_status status, void *data);
     static void NativeDialCallBack(napi_env env, napi_status status, void *data);
     static void NativeVoidCallBack(napi_env env, napi_status status, void *data);
+    static void NativeVoidCallBackWithErrorCode(napi_env env, napi_status status, void *data);
     static void NativePropertyCallBack(napi_env env, napi_status status, void *data);
+    static void NativeGetMainCallIdCallBack(napi_env env, napi_status status, void *data);
+    static void NativeIsImsSwitchEnabledCallBack(napi_env env, napi_status status, void *data);
     static void NativeBoolCallBack(napi_env env, napi_status status, void *data);
+    static void NativeBoolCallBackWithErrorCode(napi_env env, napi_status status, void *data);
     static void NativeFormatNumberCallBack(napi_env env, napi_status status, void *data);
     static void NativeListCallBack(napi_env env, napi_status status, void *data);
     static void GetDialInfo(napi_env env, napi_value objValue, DialAsyncContext &asyncContext);
@@ -189,6 +189,19 @@ private:
     static void NativeStopRTT(napi_env env, void *data);
     static void NativeJoinConference(napi_env env, void *data);
     static void NativeUpdateImsCallMode(napi_env env, void *data);
+    static bool MatchEmptyParameter(napi_env env, const napi_value parameters[], const size_t parameterCount);
+    static bool MatchOneOptionalNumberParameter(
+        napi_env env, const napi_value parameters[], const size_t parameterCount);
+    static bool MatchOneNumberParameter(napi_env env, const napi_value parameters[], const size_t parameterCount);
+    static bool MatchOneStringParameter(napi_env env, const napi_value parameters[], const size_t parameterCount);
+    static bool MatchTwoNumberParameters(napi_env env, const napi_value parameters[], const size_t parameterCount);
+    static bool MatchNumberAndObjectParameters(
+        napi_env env, const napi_value parameters[], const size_t parameterCount);
+    static bool MatchNumberAndBoolParameters(napi_env env, const napi_value parameters[], const size_t parameterCount);
+    static bool MatchNumberAndStringParameters(
+        napi_env env, const napi_value parameters[], const size_t parameterCount);
+    static bool MatchAudioDeviceParameters(napi_env env, const napi_value parameters[], const size_t parameterCount);
+    static bool MatchRejectCallParameters(napi_env env, const napi_value parameters[], const size_t parameterCount);
     static void NativeReportOttCallDetailsInfo(napi_env env, void *data);
     static void NativeReportOttCallEventInfo(napi_env env, void *data);
     static napi_value HandleAsyncWork(napi_env env, AsyncContext *context, std::string workName,

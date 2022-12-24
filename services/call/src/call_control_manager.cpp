@@ -258,7 +258,8 @@ int32_t CallControlManager::GetCallState()
         callState = CallStateToApp::CALL_STATE_IDLE;
     } else {
         callState = CallStateToApp::CALL_STATE_OFFHOOK;
-        if (HasRingingCall()) {
+        bool enabled = false;
+        if ((HasRingingCall(enabled) == TELEPHONY_SUCCESS) && enabled) {
             callState = CallStateToApp::CALL_STATE_RINGING;
         }
     }
@@ -328,19 +329,19 @@ bool CallControlManager::HasCall()
     return HasCallExist();
 }
 
-bool CallControlManager::IsNewCallAllowed()
+int32_t CallControlManager::IsNewCallAllowed(bool &enabled)
 {
-    return IsNewCallAllowedCreate();
+    return IsNewCallAllowedCreate(enabled);
 }
 
-bool CallControlManager::IsRinging()
+int32_t CallControlManager::IsRinging(bool &enabled)
 {
-    return HasRingingCall();
+    return HasRingingCall(enabled);
 }
 
-bool CallControlManager::HasEmergency()
+int32_t CallControlManager::HasEmergency(bool &enabled)
 {
-    return HasEmergencyCall();
+    return HasEmergencyCall(enabled);
 }
 
 bool CallControlManager::NotifyNewCallCreated(sptr<CallBase> &callObjectPtr)
@@ -419,7 +420,7 @@ int32_t CallControlManager::StartDtmf(int32_t callId, char str)
 {
     sptr<CallBase> call = GetOneCallObject(callId);
     if (call == nullptr) {
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
     if (!call->IsAliveState()) {
         return CALL_ERR_CALL_STATE_MISMATCH_OPERATION;
@@ -436,7 +437,7 @@ int32_t CallControlManager::StopDtmf(int32_t callId)
 {
     sptr<CallBase> call = GetOneCallObject(callId);
     if (call == nullptr) {
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
     if (!call->IsAliveState()) {
         return CALL_ERR_CALL_STATE_MISMATCH_OPERATION;
@@ -581,7 +582,7 @@ int32_t CallControlManager::CombineConference(int32_t mainCallId)
     sptr<CallBase> mainCall = GetOneCallObject(mainCallId);
     if (mainCall == nullptr) {
         TELEPHONY_LOGE("GetOneCallObject failed, mainCallId:%{public}d", mainCallId);
-        return CALL_ERR_INVALID_CALLID;
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
     if (mainCall->GetTelCallState() != TelCallState::CALL_STATUS_ACTIVE) {
         TELEPHONY_LOGE("mainCall state should be active ");
@@ -612,7 +613,7 @@ int32_t CallControlManager::SeparateConference(int32_t callId)
     sptr<CallBase> call = GetOneCallObject(callId);
     if (call == nullptr) {
         TELEPHONY_LOGE("GetOneCallObject failed, callId:%{public}d", callId);
-        return CALL_ERR_INVALID_CALLID;
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
     int32_t ret = call->CanSeparateConference();
     if (ret != TELEPHONY_SUCCESS) {
@@ -631,32 +632,34 @@ int32_t CallControlManager::SeparateConference(int32_t callId)
     return TELEPHONY_SUCCESS;
 }
 
-int32_t CallControlManager::GetMainCallId(int32_t callId)
+int32_t CallControlManager::GetMainCallId(int32_t callId, int32_t &mainCallId)
 {
     sptr<CallBase> call = GetOneCallObject(callId);
     if (call == nullptr) {
-        TELEPHONY_LOGE("GetOneCallObject failed! callId:%{public}d", callId);
-        return TELEPHONY_ERROR;
+        TELEPHONY_LOGE("GetMainCallId failed! callId:%{public}d", callId);
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
-    return call->GetMainCallId();
+    return call->GetMainCallId(mainCallId);
 }
 
-std::vector<std::u16string> CallControlManager::GetSubCallIdList(int32_t callId)
+int32_t CallControlManager::GetSubCallIdList(int32_t callId, std::vector<std::u16string> &callIdList)
 {
     sptr<CallBase> call = GetOneCallObject(callId);
     if (call == nullptr) {
-        return std::vector<std::u16string>();
+        TELEPHONY_LOGE("GetSubCallIdList failed! callId:%{public}d", callId);
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
-    return call->GetSubCallIdList();
+    return call->GetSubCallIdList(callIdList);
 }
 
-std::vector<std::u16string> CallControlManager::GetCallIdListForConference(int32_t callId)
+int32_t CallControlManager::GetCallIdListForConference(int32_t callId, std::vector<std::u16string> &callIdList)
 {
     sptr<CallBase> call = GetOneCallObject(callId);
     if (call == nullptr) {
-        return std::vector<std::u16string>();
+        TELEPHONY_LOGE("GetCallIdListForConference failed! callId:%{public}d", callId);
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
-    return call->GetCallIdListForConference();
+    return call->GetCallIdListForConference(callIdList);
 }
 
 int32_t CallControlManager::GetImsConfig(int32_t slotId, ImsConfigItem item)

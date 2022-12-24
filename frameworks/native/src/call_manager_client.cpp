@@ -174,37 +174,35 @@ int32_t CallManagerClient::SeparateConference(int32_t callId)
     }
 }
 
-int32_t CallManagerClient::GetMainCallId(int32_t &callId)
+int32_t CallManagerClient::GetMainCallId(int32_t &callId, int32_t &mainCallId)
 {
     if (g_callManagerProxy != nullptr) {
-        return g_callManagerProxy->GetMainCallId(callId);
+        return g_callManagerProxy->GetMainCallId(callId, mainCallId);
     } else {
         TELEPHONY_LOGE("init first please!");
         return TELEPHONY_ERR_UNINIT;
     }
 }
 
-std::vector<std::u16string> CallManagerClient::GetSubCallIdList(int32_t callId)
+int32_t CallManagerClient::GetSubCallIdList(int32_t callId, std::vector<std::u16string> &callIdList)
 {
     if (g_callManagerProxy != nullptr) {
-        return g_callManagerProxy->GetSubCallIdList(callId);
+        return g_callManagerProxy->GetSubCallIdList(callId, callIdList);
     } else {
         TELEPHONY_LOGE("init first please!");
-        std::vector<std::u16string> vec;
-        vec.clear();
-        return vec;
+        callIdList.clear();
+        return TELEPHONY_ERR_UNINIT;
     }
 }
 
-std::vector<std::u16string> CallManagerClient::GetCallIdListForConference(int32_t callId)
+int32_t CallManagerClient::GetCallIdListForConference(int32_t callId, std::vector<std::u16string> &callIdList)
 {
     if (g_callManagerProxy != nullptr) {
-        return g_callManagerProxy->GetCallIdListForConference(callId);
+        return g_callManagerProxy->GetCallIdListForConference(callId, callIdList);
     } else {
         TELEPHONY_LOGE("init first please!");
-        std::vector<std::u16string> vec;
-        vec.clear();
-        return vec;
+        callIdList.clear();
+        return TELEPHONY_ERR_UNINIT;
     }
 }
 
@@ -308,13 +306,13 @@ int32_t CallManagerClient::StopDtmf(int32_t callId)
     }
 }
 
-bool CallManagerClient::IsRinging()
+int32_t CallManagerClient::IsRinging(bool &enabled)
 {
     if (g_callManagerProxy != nullptr) {
-        return g_callManagerProxy->IsRinging();
+        return g_callManagerProxy->IsRinging(enabled);
     } else {
         TELEPHONY_LOGE("init first please!");
-        return false;
+        return TELEPHONY_ERR_UNINIT;
     }
 }
 
@@ -328,23 +326,23 @@ bool CallManagerClient::HasCall()
     }
 }
 
-bool CallManagerClient::IsNewCallAllowed()
+int32_t CallManagerClient::IsNewCallAllowed(bool &enabled)
 {
     if (g_callManagerProxy != nullptr) {
-        return g_callManagerProxy->IsNewCallAllowed();
+        return g_callManagerProxy->IsNewCallAllowed(enabled);
     } else {
         TELEPHONY_LOGE("init first please!");
-        return false;
+        return TELEPHONY_ERR_UNINIT;
     }
 }
 
-bool CallManagerClient::IsInEmergencyCall()
+int32_t CallManagerClient::IsInEmergencyCall(bool &enabled)
 {
     if (g_callManagerProxy != nullptr) {
-        return g_callManagerProxy->IsInEmergencyCall();
+        return g_callManagerProxy->IsInEmergencyCall(enabled);
     } else {
         TELEPHONY_LOGE("init first please!");
-        return false;
+        return TELEPHONY_ERR_UNINIT;
     }
 }
 

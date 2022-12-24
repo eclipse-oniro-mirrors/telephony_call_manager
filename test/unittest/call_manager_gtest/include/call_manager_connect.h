@@ -500,31 +500,31 @@ public:
         return false;
     }
 
-    bool IsNewCallAllowed() const
+    int32_t IsNewCallAllowed(bool &enabled) const
     {
         if (callManagerServicePtr_ != nullptr) {
-            return callManagerServicePtr_->IsNewCallAllowed();
+            return callManagerServicePtr_->IsNewCallAllowed(enabled);
         }
         TELEPHONY_LOGE("callManagerServicePtr_ is nullptr!");
-        return false;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
 
-    bool IsRinging() const
+    int32_t IsRinging(bool &enabled) const
     {
         if (callManagerServicePtr_ != nullptr) {
-            return callManagerServicePtr_->IsRinging();
+            return callManagerServicePtr_->IsRinging(enabled);
         }
         TELEPHONY_LOGE("callManagerServicePtr_ is nullptr!");
-        return false;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
 
-    bool IsInEmergencyCall() const
+    int32_t IsInEmergencyCall(bool &enabled) const
     {
         if (callManagerServicePtr_ != nullptr) {
-            return callManagerServicePtr_->IsInEmergencyCall();
+            return callManagerServicePtr_->IsInEmergencyCall(enabled);
         }
         TELEPHONY_LOGE("callManagerServicePtr_ is nullptr!");
-        return false;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
 
     int32_t StartDtmf(int32_t callId, char c) const
@@ -646,33 +646,31 @@ public:
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
 
-    int32_t GetMainCallId(int32_t callId)
+    int32_t GetMainCallId(int32_t callId, int32_t &mainCallId)
     {
         if (callManagerServicePtr_ != nullptr) {
-            return callManagerServicePtr_->GetMainCallId(callId);
+            return callManagerServicePtr_->GetMainCallId(callId, mainCallId);
         }
         TELEPHONY_LOGE("callManagerServicePtr_ is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
 
-    std::vector<std::u16string> GetSubCallIdList(int32_t callId)
+    int32_t GetSubCallIdList(int32_t callId, std::vector<std::u16string> &callIdList)
     {
         if (callManagerServicePtr_ != nullptr) {
-            return callManagerServicePtr_->GetSubCallIdList(callId);
+            return callManagerServicePtr_->GetSubCallIdList(callId, callIdList);
         }
-        std::vector<std::u16string> vec;
-        vec.clear();
-        return vec;
+        callIdList.clear();
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
 
-    std::vector<std::u16string> GetCallIdListForConference(int32_t callId)
+    int32_t GetCallIdListForConference(int32_t callId, std::vector<std::u16string> &callIdList)
     {
         if (callManagerServicePtr_ != nullptr) {
-            return callManagerServicePtr_->GetCallIdListForConference(callId);
+            return callManagerServicePtr_->GetCallIdListForConference(callId, callIdList);
         }
-        std::vector<std::u16string> vec;
-        vec.clear();
-        return vec;
+        callIdList.clear();
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
 
     int32_t ControlCamera(std::u16string cameraId)

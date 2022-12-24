@@ -1100,7 +1100,9 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_IsNewCallAllowed_0100, Function
     int32_t ret = CallManagerGtest::clientPtr_->DialCall(Str8ToStr16(phoneNumber), dialInfo_);
     ASSERT_EQ(ret, RETURN_VALUE_IS_ZERO);
     CallInfoManager::LockCallState(false, (int32_t)TelCallState::CALL_STATUS_ACTIVE, SLEEP_50_MS, SLEEP_12000_MS);
-    EXPECT_EQ(CallManagerGtest::clientPtr_->IsNewCallAllowed(), true);
+    bool enabled = false;
+    EXPECT_EQ(CallManagerGtest::clientPtr_->IsNewCallAllowed(enabled), TELEPHONY_SUCCESS);
+    EXPECT_EQ(enabled, true);
 }
 
 /**
@@ -1116,7 +1118,9 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_IsNewCallAllowed_0200, Function
     }
     CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_200_MS, SLEEP_30000_MS);
     ASSERT_TRUE(blueToothClientPtr_ != nullptr);
-    EXPECT_EQ(CallManagerGtest::blueToothClientPtr_->IsNewCallAllowed(), true);
+    bool enabled = false;
+    EXPECT_EQ(CallManagerGtest::blueToothClientPtr_->IsNewCallAllowed(enabled), TELEPHONY_SUCCESS);
+    EXPECT_EQ(enabled, true);
 }
 
 /********************************************* Test IsRinging() ***********************************************/
@@ -1135,7 +1139,9 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_IsRinging_0100, Function | Medi
     int32_t callState = CallManagerGtest::clientPtr_->GetCallState();
     int32_t idleState = (int32_t)CallStateToApp::CALL_STATE_IDLE;
     ASSERT_EQ(callState, idleState);
-    EXPECT_NE(CallManagerGtest::clientPtr_->IsRinging(), true);
+    bool enabled = false;
+    EXPECT_EQ(CallManagerGtest::clientPtr_->IsRinging(enabled), TELEPHONY_SUCCESS);
+    EXPECT_NE(enabled, true);
 }
 
 /**
@@ -1154,7 +1160,9 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_IsRinging_0200, Function | Medi
     int32_t idleState = (int32_t)CallStateToApp::CALL_STATE_IDLE;
     ASSERT_EQ(callState, idleState);
     ASSERT_TRUE(blueToothClientPtr_ != nullptr);
-    EXPECT_NE(CallManagerGtest::blueToothClientPtr_->IsRinging(), true);
+    bool enabled = false;
+    EXPECT_EQ(CallManagerGtest::blueToothClientPtr_->IsRinging(enabled), TELEPHONY_SUCCESS);
+    EXPECT_NE(enabled, true);
 }
 
 /***************************************** Test CombineConference() ********************************************/
@@ -1258,7 +1266,9 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_GetMainCallId_0100, Function | 
         return;
     }
     int32_t callId = INVALID_NEGATIVE_ID;
-    EXPECT_NE(CallManagerGtest::clientPtr_->GetMainCallId(callId), RETURN_VALUE_IS_ZERO);
+    int32_t mainCallId = INVALID_NEGATIVE_ID;
+    EXPECT_NE(CallManagerGtest::clientPtr_->GetMainCallId(callId, mainCallId), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(mainCallId, RETURN_VALUE_IS_ZERO);
 }
 
 /**
@@ -1272,7 +1282,9 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_GetMainCallId_0200, Function | 
         return;
     }
     int32_t callId = INVALID_POSITIVE_ID;
-    EXPECT_NE(CallManagerGtest::clientPtr_->GetMainCallId(callId), RETURN_VALUE_IS_ZERO);
+    int32_t mainCallId = INVALID_NEGATIVE_ID;
+    EXPECT_NE(CallManagerGtest::clientPtr_->GetMainCallId(callId, mainCallId), TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(mainCallId, RETURN_VALUE_IS_ZERO);
 }
 
 /***************************************** Test GetSubCallIdList() ******************************************/
@@ -1288,7 +1300,10 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_GetSubCallIdList_0100, Function
         return;
     }
     int32_t callId = INVALID_NEGATIVE_ID;
-    std::vector<std::u16string> ans = CallManagerGtest::clientPtr_->GetSubCallIdList(callId);
+    std::vector<std::u16string> ans;
+    ans.clear();
+    int32_t result = CallManagerGtest::clientPtr_->GetSubCallIdList(callId, ans);
+    EXPECT_NE(result, TELEPHONY_ERR_SUCCESS);
     bool isEmpty = ans.empty();
     EXPECT_EQ(isEmpty, true);
     if (!ans.empty()) {
@@ -1307,7 +1322,10 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_GetSubCallIdList_0200, Function
         return;
     }
     int32_t callId = INVALID_POSITIVE_ID;
-    std::vector<std::u16string> ans = CallManagerGtest::clientPtr_->GetSubCallIdList(callId);
+    std::vector<std::u16string> ans;
+    ans.clear();
+    int32_t result = CallManagerGtest::clientPtr_->GetSubCallIdList(callId, ans);
+    EXPECT_NE(result, TELEPHONY_ERR_SUCCESS);
     bool isEmpty = ans.empty();
     EXPECT_EQ(isEmpty, true);
     if (!ans.empty()) {
@@ -1328,7 +1346,10 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_GetCallIdListForConference_0100
         return;
     }
     int32_t callId = INVALID_NEGATIVE_ID;
-    std::vector<std::u16string> ans = CallManagerGtest::clientPtr_->GetCallIdListForConference(callId);
+    std::vector<std::u16string> ans;
+    ans.clear();
+    int32_t result = CallManagerGtest::clientPtr_->GetCallIdListForConference(callId, ans);
+    EXPECT_NE(result, TELEPHONY_ERR_SUCCESS);
     bool isEmpty = ans.empty();
     EXPECT_EQ(isEmpty, true);
     if (!ans.empty()) {
@@ -1347,7 +1368,10 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_GetCallIdListForConference_0200
         return;
     }
     int32_t callId = INVALID_POSITIVE_ID;
-    std::vector<std::u16string> ans = CallManagerGtest::clientPtr_->GetCallIdListForConference(callId);
+    std::vector<std::u16string> ans;
+    ans.clear();
+    int32_t result = CallManagerGtest::clientPtr_->GetCallIdListForConference(callId, ans);
+    EXPECT_NE(result, TELEPHONY_ERR_SUCCESS);
     bool isEmpty = ans.empty();
     EXPECT_EQ(isEmpty, true);
     if (!ans.empty()) {
@@ -4212,8 +4236,9 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_IsInEmergencyCall_0100, Functio
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
     }
-
-    EXPECT_EQ(CallManagerGtest::clientPtr_->IsInEmergencyCall(), false);
+    bool enabled = false;
+    EXPECT_EQ(CallManagerGtest::clientPtr_->IsInEmergencyCall(enabled), TELEPHONY_SUCCESS);
+    EXPECT_EQ(enabled, false);
 }
 
 /**
@@ -4228,7 +4253,9 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_IsInEmergencyCall_0200, Functio
         return;
     }
     ASSERT_TRUE(blueToothClientPtr_ != nullptr);
-    EXPECT_EQ(CallManagerGtest::blueToothClientPtr_->IsInEmergencyCall(), false);
+    bool enabled = false;
+    EXPECT_EQ(CallManagerGtest::blueToothClientPtr_->IsInEmergencyCall(enabled), TELEPHONY_SUCCESS);
+    EXPECT_EQ(enabled, false);
 }
 
 /**
@@ -4241,7 +4268,9 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_IsInEmergencyCall_0300, Functio
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
     }
-    EXPECT_EQ(CallManagerGtest::clientPtr_->IsInEmergencyCall(), false);
+    bool enabled = false;
+    EXPECT_NE(CallManagerGtest::clientPtr_->IsInEmergencyCall(enabled), TELEPHONY_SUCCESS);
+    EXPECT_EQ(enabled, false);
 }
 
 /****************************************** Test MuteRinger() *******************************************/

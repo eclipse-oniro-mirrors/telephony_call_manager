@@ -51,8 +51,10 @@ public:
     virtual int32_t HoldConference(int32_t callId) = 0;
     virtual int32_t CanCombineConference() = 0;
     virtual int32_t CanSeparateConference() = 0;
-    std::vector<std::u16string> GetSubCallIdList(int32_t callId); // get participant list except host
-    std::vector<std::u16string> GetCallIdListForConference(int32_t callId); // get participant list besides host
+    int32_t GetSubCallIdList(
+        int32_t callId, std::vector<std::u16string> &callIdList); // get participant list except host
+    int32_t GetCallIdListForConference(
+        int32_t callId, std::vector<std::u16string> &callIdList); // get participant list besides host
 
 protected:
     int32_t mainCallId_;
