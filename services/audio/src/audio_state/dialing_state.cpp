@@ -22,7 +22,7 @@
 
 namespace OHOS {
 namespace Telephony {
-bool AlertingState::ProcessEvent(int32_t event)
+bool DialingState::ProcessEvent(int32_t event)
 {
     bool result = false;
     std::lock_guard<std::mutex> lock(mutex_);
