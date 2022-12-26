@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "inactive_state.h"
+#include "dialing_state.h"
 
 #include "telephony_log_wrapper.h"
 
@@ -22,20 +22,16 @@
 
 namespace OHOS {
 namespace Telephony {
-bool InActiveState::ProcessEvent(int32_t event)
+bool DialingState::ProcessEvent(int32_t event)
 {
     bool result = false;
     std::lock_guard<std::mutex> lock(mutex_);
     switch (event) {
-        case AudioEvent::NEW_DIALING_CALL:
-            // should switch alerting state while only one alerting call exists
-            if (DelayedSingleton<CallStateProcessor>::GetInstance()->
-                ShouldSwitchState(TelCallState::CALL_STATUS_DIALING)) {
-                result = DelayedSingleton<AudioSceneProcessor>::GetInstance()->ProcessEvent(
-                    AudioEvent::SWITCH_DIALING_STATE);
-            }
+        case AudioEvent::NO_MORE_DIALING_CALL:
+            result = DelayedSingleton<CallStateProcessor>::GetInstance()->UpdateCurrentCallState();
             break;
         case AudioEvent::NEW_ACTIVE_CS_CALL:
+            // switch to cs call state anyway.
             if (DelayedSingleton<CallStateProcessor>::GetInstance()->
                 ShouldSwitchState(TelCallState::CALL_STATUS_ACTIVE)) {
                 result = DelayedSingleton<AudioSceneProcessor>::GetInstance()->ProcessEvent(
@@ -43,32 +39,17 @@ bool InActiveState::ProcessEvent(int32_t event)
             }
             break;
         case AudioEvent::NEW_ACTIVE_IMS_CALL:
+            // switch to ims call state anyway.
             if (DelayedSingleton<CallStateProcessor>::GetInstance()->
                 ShouldSwitchState(TelCallState::CALL_STATUS_ACTIVE)) {
                 result = DelayedSingleton<AudioSceneProcessor>::GetInstance()->ProcessEvent(
                     AudioEvent::SWITCH_IMS_CALL_STATE);
             }
             break;
-        case AudioEvent::NEW_ALERTING_CALL:
-            // should switch alerting state while only one alerting call exists
-            if (DelayedSingleton<CallStateProcessor>::GetInstance()->
-                ShouldSwitchState(TelCallState::CALL_STATUS_ALERTING)) {
-                result = DelayedSingleton<AudioSceneProcessor>::GetInstance()->ProcessEvent(
-                    AudioEvent::SWITCH_ALERTING_STATE);
-            }
-            break;
-        case AudioEvent::NEW_INCOMING_CALL:
-            // should switch incoming state while only one incoming call exists
-            if (DelayedSingleton<CallStateProcessor>::GetInstance()->
-                ShouldSwitchState(TelCallState::CALL_STATUS_INCOMING)) {
-                result = DelayedSingleton<AudioSceneProcessor>::GetInstance()->ProcessEvent(
-                    AudioEvent::SWITCH_INCOMING_STATE);
-            }
-            break;
         default:
             break;
     }
-    TELEPHONY_LOGI("inactive state lock release");
+    TELEPHONY_LOGI("dialing state lock release");
     return result;
 }
 } // namespace Telephony

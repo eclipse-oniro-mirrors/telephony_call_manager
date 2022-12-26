@@ -43,6 +43,7 @@ private:
     std::set<std::string> holdingCalls_;
     std::set<std::string> alertingCalls_;
     std::set<std::string> incomingCalls_;
+    std::set<std::string> dialingCalls_;
 };
 } // namespace Telephony
 } // namespace OHOS

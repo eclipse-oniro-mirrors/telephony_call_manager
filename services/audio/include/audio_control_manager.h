@@ -55,6 +55,7 @@ public:
     bool IsCurrentRinging() const;
     bool IsActiveCallExists() const;
     bool ShouldSwitchActive() const;
+    bool ShouldSwitchDialing() const;
     bool ShouldSwitchAlerting() const;
     bool ShouldSwitchIncoming() const;
     AudioDevice GetInitAudioDevice() const;

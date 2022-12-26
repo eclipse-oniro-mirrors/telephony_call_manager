@@ -29,11 +29,18 @@ CallStateProcessor::~CallStateProcessor()
     alertingCalls_.clear();
     incomingCalls_.clear();
     holdingCalls_.clear();
+    dialingCalls_.clear();
 }
 
 void CallStateProcessor::AddCall(const std::string &phoneNum, TelCallState state)
 {
     switch (state) {
+        case TelCallState::CALL_STATUS_DIALING:
+            if (dialingCalls_.count(phoneNum) == EMPTY_VALUE) {
+                TELEPHONY_LOGI("add call , state : dialing");
+                dialingCalls_.insert(phoneNum);
+            }
+            break;
         case TelCallState::CALL_STATUS_ALERTING:
             if (alertingCalls_.count(phoneNum) == EMPTY_VALUE) {
                 TELEPHONY_LOGI("add call , state : alerting");
@@ -66,6 +73,12 @@ void CallStateProcessor::AddCall(const std::string &phoneNum, TelCallState state
 void CallStateProcessor::DeleteCall(const std::string &phoneNum, TelCallState state)
 {
     switch (state) {
+        case TelCallState::CALL_STATUS_DIALING:
+            if (dialingCalls_.count(phoneNum) > EMPTY_VALUE) {
+                TELEPHONY_LOGI("erase call , state : dialing");
+                dialingCalls_.erase(phoneNum);
+            }
+            break;
         case TelCallState::CALL_STATUS_ALERTING:
             if (alertingCalls_.count(phoneNum) > EMPTY_VALUE) {
                 TELEPHONY_LOGI("erase call , state : alerting");
@@ -99,6 +112,9 @@ int32_t CallStateProcessor::GetCallNumber(TelCallState state)
 {
     int32_t number = EMPTY_VALUE;
     switch (state) {
+        case TelCallState::CALL_STATUS_DIALING:
+            number = static_cast<int32_t>(dialingCalls_.size());
+            break;
         case TelCallState::CALL_STATUS_ALERTING:
             number = static_cast<int32_t>(alertingCalls_.size());
             break;
@@ -121,13 +137,17 @@ bool CallStateProcessor::ShouldSwitchState(TelCallState callState)
 {
     bool shouldSwitch = false;
     switch (callState) {
+        case TelCallState::CALL_STATUS_DIALING:
+            shouldSwitch = (dialingCalls_.size() == EXIST_ONLY_ONE_CALL && activeCalls_.empty() &&
+                incomingCalls_.empty() && alertingCalls_.empty());
+            break;
         case TelCallState::CALL_STATUS_ALERTING:
-            shouldSwitch =
-                (alertingCalls_.size() == EXIST_ONLY_ONE_CALL && activeCalls_.empty() && incomingCalls_.empty());
+            shouldSwitch = (alertingCalls_.size() == EXIST_ONLY_ONE_CALL && activeCalls_.empty() &&
+                incomingCalls_.empty() && dialingCalls_.empty());
             break;
         case TelCallState::CALL_STATUS_INCOMING:
-            shouldSwitch =
-                (incomingCalls_.size() == EXIST_ONLY_ONE_CALL && activeCalls_.empty() && alertingCalls_.empty());
+            shouldSwitch = (incomingCalls_.size() == EXIST_ONLY_ONE_CALL && activeCalls_.empty() &&
+                dialingCalls_.empty() && alertingCalls_.empty());
             break;
         case TelCallState::CALL_STATUS_ACTIVE:
             shouldSwitch = (activeCalls_.size() == EXIST_ONLY_ONE_CALL);

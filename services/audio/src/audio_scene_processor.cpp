@@ -15,6 +15,7 @@
 
 #include "audio_scene_processor.h"
 
+#include "dialing_state.h"
 #include "alerting_state.h"
 #include "incoming_state.h"
 #include "cs_call_state.h"
@@ -35,6 +36,7 @@ AudioSceneProcessor::~AudioSceneProcessor() {}
 
 int32_t AudioSceneProcessor::Init()
 {
+    memberFuncMap_[AudioEvent::SWITCH_DIALING_STATE] = &AudioSceneProcessor::SwitchDialing;
     memberFuncMap_[AudioEvent::SWITCH_ALERTING_STATE] = &AudioSceneProcessor::SwitchAlerting;
     memberFuncMap_[AudioEvent::SWITCH_INCOMING_STATE] = &AudioSceneProcessor::SwitchIncoming;
     memberFuncMap_[AudioEvent::SWITCH_CS_CALL_STATE] = &AudioSceneProcessor::SwitchCS;
@@ -57,6 +59,7 @@ bool AudioSceneProcessor::ProcessEvent(AudioEvent event)
     }
     bool result = false;
     switch (event) {
+        case AudioEvent::SWITCH_DIALING_STATE:
         case AudioEvent::SWITCH_ALERTING_STATE:
         case AudioEvent::SWITCH_INCOMING_STATE:
         case AudioEvent::SWITCH_CS_CALL_STATE:
@@ -67,9 +70,11 @@ bool AudioSceneProcessor::ProcessEvent(AudioEvent event)
             break;
         case AudioEvent::NEW_ACTIVE_CS_CALL:
         case AudioEvent::NEW_ACTIVE_IMS_CALL:
+        case AudioEvent::NEW_DIALING_CALL:
         case AudioEvent::NEW_ALERTING_CALL:
         case AudioEvent::NEW_INCOMING_CALL:
         case AudioEvent::NO_MORE_ACTIVE_CALL:
+        case AudioEvent::NO_MORE_DIALING_CALL:
         case AudioEvent::NO_MORE_ALERTING_CALL:
         case AudioEvent::NO_MORE_INCOMING_CALL:
             result = currentState_->ProcessEvent(event);
@@ -95,6 +100,9 @@ bool AudioSceneProcessor::SwitchState(CallStateType stateType)
     bool result = false;
     std::lock_guard<std::mutex> lock(mutex_);
     switch (stateType) {
+        case CallStateType::DIALING_STATE:
+            result = SwitchDialing();
+            break;
         case CallStateType::ALERTING_STATE:
             result = SwitchAlerting();
             break;
@@ -118,6 +126,24 @@ bool AudioSceneProcessor::SwitchState(CallStateType stateType)
     }
     TELEPHONY_LOGI("switch call state lock release");
     return result;
+}
+
+bool AudioSceneProcessor::SwitchDialing()
+{
+    if (DelayedSingleton<AudioProxy>::GetInstance()->SetAudioScene(
+        AudioStandard::AudioScene::AUDIO_SCENE_PHONE_CALL)) {
+        currentState_ = std::make_unique<DialingState>();
+        if (currentState_ == nullptr) {
+            TELEPHONY_LOGE("make_unique DialingState failed");
+            return false;
+        }
+        // play ringback tone while dialing state
+        currentAudioScene_ = AudioStandard::AudioScene::AUDIO_SCENE_PHONE_CALL;
+        DelayedSingleton<AudioDeviceManager>::GetInstance()->ProcessEvent(AudioEvent::AUDIO_ACTIVATED);
+        TELEPHONY_LOGI("current call state : dialing state");
+        return true;
+    }
+    return false;
 }
 
 bool AudioSceneProcessor::SwitchAlerting()
