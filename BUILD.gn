@@ -22,6 +22,7 @@ ohos_shared_library("tel_call_manager") {
     "services/audio/src/audio_player.cpp",
     "services/audio/src/audio_proxy.cpp",
     "services/audio/src/audio_scene_processor.cpp",
+    "services/audio/src/audio_state/dialing_state.cpp",
     "services/audio/src/audio_state/alerting_state.cpp",
     "services/audio/src/audio_state/bluetooth_device_state.cpp",
     "services/audio/src/audio_state/cs_call_state.cpp",

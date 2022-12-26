@@ -27,6 +27,7 @@ namespace OHOS {
 namespace Telephony {
 enum CallStateType {
     INACTIVE_STATE = 0,
+    DIALING_STATE,
     ALERTING_STATE,
     INCOMING_STATE,
     CS_CALL_STATE,
@@ -52,6 +53,7 @@ private:
     bool SwitchCS();
     bool SwitchIMS();
     bool SwitchOTT();
+    bool SwitchDialing();
     bool SwitchAlerting();
     bool SwitchIncoming();
     bool SwitchHolding();
