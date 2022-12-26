@@ -91,6 +91,10 @@ void AudioControlManager::HandleNextState(sptr<CallBase> &callObjectPtr, TelCall
     std::string number = callObjectPtr->GetAccountNumber();
     DelayedSingleton<CallStateProcessor>::GetInstance()->AddCall(number, nextState);
     switch (nextState) {
+        case TelCallState::CALL_STATUS_DIALING:
+            event = AudioEvent::NEW_DIALING_CALL;
+            SetAudioInterruptState(AudioInterruptState::INTERRUPT_STATE_RINGING);
+            break;
         case TelCallState::CALL_STATUS_ALERTING:
             event = AudioEvent::NEW_ALERTING_CALL;
             SetAudioInterruptState(AudioInterruptState::INTERRUPT_STATE_RINGING);
@@ -122,6 +126,12 @@ void AudioControlManager::HandlePriorState(sptr<CallBase> &callObjectPtr, TelCal
     DelayedSingleton<CallStateProcessor>::GetInstance()->DeleteCall(number, priorState);
     int32_t stateNumber = DelayedSingleton<CallStateProcessor>::GetInstance()->GetCallNumber(priorState);
     switch (priorState) {
+        case TelCallState::CALL_STATUS_DIALING:
+            if (stateNumber == EMPTY_VALUE) {
+                StopRingback(); // should stop ringtone while no more alerting calls
+                event = AudioEvent::NO_MORE_DIALING_CALL;
+            }
+            break;
         case TelCallState::CALL_STATUS_ALERTING:
             if (stateNumber == EMPTY_VALUE) {
                 StopRingback(); // should stop ringtone while no more alerting calls
