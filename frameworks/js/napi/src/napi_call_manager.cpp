@@ -1093,7 +1093,7 @@ napi_value NapiCallManager::GetCallIdListForConference(napi_env env, napi_callba
 
 bool NapiCallManager::MatchEmptyParameter(napi_env env, const napi_value parameters[], const size_t parameterCount)
 {
-    TELEPHONY_LOGI("Telephony_CallManager MatchEmptyParameter %{public}d", parameterCount);
+    TELEPHONY_LOGI("Telephony_CallManager MatchEmptyParameter %{public}zu", parameterCount);
     switch (parameterCount) {
         case ZERO_VALUE:
             return true;
