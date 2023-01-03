@@ -74,6 +74,10 @@ void ReportCallInfoHandler::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &
 
 void ReportCallInfoHandler::ReportCallInfo(const AppExecFwk::InnerEvent::Pointer &event)
 {
+    if (event == nullptr) {
+        TELEPHONY_LOGE("ReportCallInfoHandler::ProcessEvent parameter error");
+        return;
+    }
     auto object = event->GetUniqueObject<CallDetailInfo>();
     if (object == nullptr) {
         TELEPHONY_LOGE("object is nullptr!");
@@ -94,6 +98,10 @@ void ReportCallInfoHandler::ReportCallInfo(const AppExecFwk::InnerEvent::Pointer
 
 void ReportCallInfoHandler::ReportCallsInfo(const AppExecFwk::InnerEvent::Pointer &event)
 {
+    if (event == nullptr) {
+        TELEPHONY_LOGE("ReportCallInfoHandler::ProcessEvent parameter error");
+        return;
+    }
     auto object = event->GetUniqueObject<CallDetailsInfo>();
     if (object == nullptr) {
         TELEPHONY_LOGE("object is nullptr!");
@@ -114,6 +122,10 @@ void ReportCallInfoHandler::ReportCallsInfo(const AppExecFwk::InnerEvent::Pointe
 
 void ReportCallInfoHandler::ReportDisconnectedCause(const AppExecFwk::InnerEvent::Pointer &event)
 {
+    if (event == nullptr) {
+        TELEPHONY_LOGE("ReportCallInfoHandler::ProcessEvent parameter error");
+        return;
+    }
     auto object = event->GetUniqueObject<DisconnectedDetails>();
     if (object == nullptr) {
         TELEPHONY_LOGE("object is nullptr!");
@@ -134,6 +146,10 @@ void ReportCallInfoHandler::ReportDisconnectedCause(const AppExecFwk::InnerEvent
 
 void ReportCallInfoHandler::ReportEventInfo(const AppExecFwk::InnerEvent::Pointer &event)
 {
+    if (event == nullptr) {
+        TELEPHONY_LOGE("ReportCallInfoHandler::ProcessEvent parameter error");
+        return;
+    }
     auto object = event->GetUniqueObject<CellularCallEventInfo>();
     if (object == nullptr) {
         TELEPHONY_LOGE("object is nullptr!");
@@ -154,6 +170,10 @@ void ReportCallInfoHandler::ReportEventInfo(const AppExecFwk::InnerEvent::Pointe
 
 void ReportCallInfoHandler::ReportOttEvent(const AppExecFwk::InnerEvent::Pointer &event)
 {
+    if (event == nullptr) {
+        TELEPHONY_LOGE("ReportCallInfoHandler::ProcessEvent parameter error");
+        return;
+    }
     auto object = event->GetUniqueObject<OttCallEventInfo>();
     if (object == nullptr) {
         TELEPHONY_LOGE("object is nullptr!");
@@ -174,6 +194,10 @@ void ReportCallInfoHandler::ReportOttEvent(const AppExecFwk::InnerEvent::Pointer
 
 void ReportCallInfoHandler::OnUpdateMediaModeResponse(const AppExecFwk::InnerEvent::Pointer &event)
 {
+    if (event == nullptr) {
+        TELEPHONY_LOGE("ReportCallInfoHandler::ProcessEvent parameter error");
+        return;
+    }
     auto object = event->GetUniqueObject<CallMediaModeResponse>();
     if (object == nullptr) {
         TELEPHONY_LOGE("object is nullptr!");
