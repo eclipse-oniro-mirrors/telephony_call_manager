@@ -91,6 +91,7 @@ public:
     static napi_value SetCallRestriction(napi_env env, napi_callback_info info);
     static napi_value GetCallTransferInfo(napi_env env, napi_callback_info info);
     static napi_value SetCallTransferInfo(napi_env env, napi_callback_info info);
+    static napi_value CanSetCallTransferTime(napi_env env, napi_callback_info info);
     static napi_value StartDTMF(napi_env env, napi_callback_info info);
     static napi_value StopDTMF(napi_env env, napi_callback_info info);
     static napi_value GetCallState(napi_env env, napi_callback_info info);

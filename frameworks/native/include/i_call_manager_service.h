@@ -57,7 +57,7 @@ enum CallManagerSurfaceCode {
     INTERFACE_SET_CALL_RESTRICTION,
     INTERFACE_GET_CALL_TRANSFER,
     INTERFACE_SET_CALL_TRANSFER,
-    INTERFACE_IS_SUPPORT_CALL_TRANSFER_TIMER,
+    INTERFACE_CAN_SET_CALL_TRANSFER_TIME,
     INTERFACE_GET_MAINID,
     INTERFACE_GET_SUBCALL_LIST_ID,
     INTERFACE_GET_CALL_LIST_ID_FOR_CONFERENCE,
@@ -120,7 +120,7 @@ public:
     virtual int32_t SetCallRestriction(int32_t slotId, CallRestrictionInfo &info) = 0;
     virtual int32_t GetCallTransferInfo(int32_t slotId, CallTransferType type) = 0;
     virtual int32_t SetCallTransferInfo(int32_t slotId, CallTransferInfo &info) = 0;
-    virtual int32_t IsSupportCallTransferTime(int32_t slotId, bool &result) = 0;
+    virtual int32_t CanSetCallTransferTime(int32_t slotId, bool &result) = 0;
     virtual int32_t CombineConference(int32_t mainCallId) = 0;
     virtual int32_t SeparateConference(int32_t callId) = 0;
     virtual bool IsEmergencyPhoneNumber(std::u16string &number, int32_t slotId, int32_t &errorCode) = 0;

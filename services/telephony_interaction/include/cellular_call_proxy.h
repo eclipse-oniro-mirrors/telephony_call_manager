@@ -207,13 +207,13 @@ public:
     int32_t SetCallTransferInfo(int32_t slotId, const CallTransferInfo &cfInfo) override;
 
     /**
-     * confirm whether IMS support call transfer due to time.
+     * confirm whether IMS can set call transfer time.
      *
      * @param slotId[in], The slot id
-     * @param result[out], The result of support or not
-     * @return Returns true on support, others on unsupport.
+     * @param result[out], The result of can set or not
+     * @return Returns TELEPHONY_SUCCESS on success, others on failure.
      */
-    int32_t IsSupportCallTransferTime(int32_t slotId, bool &result) override;
+    int32_t CanSetCallTransferTime(int32_t slotId, bool &result) override;
 
     /**
      * Inquire Call Transfer
