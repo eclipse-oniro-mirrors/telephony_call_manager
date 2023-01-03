@@ -598,7 +598,7 @@ int32_t CellularCallProxy::SetCallTransferInfo(int32_t slotId, const CallTransfe
     return error;
 }
 
-int32_t CellularCallProxy::CanSetCallTransferTime(int32_t slotId, bool &result)
+int32_t CellularCallProxy::IsSupportCallTransferTime(int32_t slotId, bool &result)
 {
     MessageOption option;
     MessageParcel in;
@@ -617,13 +617,11 @@ int32_t CellularCallProxy::CanSetCallTransferTime(int32_t slotId, bool &result)
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     int32_t error =
-        remote->SendRequest(static_cast<uint32_t>(OperationType::CAN_SET_CALL_TRANSFER_TIME), in, out, option);
+        remote->SendRequest(static_cast<uint32_t>(OperationType::IS_SUPPORT_CALL_TRANSFER_TIME), in, out, option);
     if (error == ERR_NONE) {
-        result = out.ReadBool();
-        return out.ReadInt32();
+        return out.ReadBool();
     }
-
-    return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    return false;
 }
 
 int32_t CellularCallProxy::GetCallTransferInfo(int32_t slotId, CallTransferType type)
