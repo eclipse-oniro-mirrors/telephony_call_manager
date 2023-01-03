@@ -24,6 +24,7 @@ ohos_unittest("tel_call_manager_gtest") {
   sources = [
     "//base/telephony/call_manager/frameworks/native/src/call_manager_service_proxy.cpp",
     "src/call_manager_gtest.cpp",
+    "src/zero_branch_test.cpp",
   ]
 
   include_dirs = [
@@ -36,8 +37,13 @@ ohos_unittest("tel_call_manager_gtest") {
     "//base/telephony/call_manager/services/call_setting/include",
     "//base/telephony/call_manager/services/telephony_interaction/include",
     "//base/telephony/call_manager/services/call/call_state_observer/include",
+    "//base/telephony/call_manager/services/video/include",
     "//base/telephony/call_manager/frameworks/native/include",
     "//base/telephony/call_manager/interfaces/innerkits",
+    "//third_party/libphonenumber/cpp/src",
+    "//third_party/libphonenumber/cpp/src/phonenumbers",
+    "//third_party/protobuf/src",
+    "//third_party/protobuf/src/google/protobuf",
   ]
 
   configs = [ "//base/telephony/core_service/utils:telephony_log_config" ]
@@ -48,8 +54,10 @@ ohos_unittest("tel_call_manager_gtest") {
     "${ability_runtime_path}/frameworks/native/ability/native:data_ability_helper",
     "//base/telephony/call_manager:tel_call_manager",
     "//base/telephony/call_manager/frameworks/native:tel_call_manager_api",
+    "//base/telephony/core_service/utils:libtel_common",
     "//foundation/communication/bluetooth/frameworks/inner:btframework",
     "//third_party/googletest:gtest_main",
+    "//third_party/libphonenumber/cpp:phonenumber_standard",
   ]
 
   external_deps = [
