@@ -54,7 +54,7 @@ public:
         /****************** supplement ******************/
         SET_CALL_TRANSFER = 200,
         GET_CALL_TRANSFER,
-        CAN_SET_CALL_TRANSFER_TIME,
+        IS_SUPPORT_CALL_TRANSFER_TIME,
         SET_CALL_WAITING,
         GET_CALL_WAITING,
         SET_CALL_RESTRICTION,
@@ -252,13 +252,13 @@ public:
     virtual int32_t SetCallTransferInfo(int32_t slotId, const CallTransferInfo &ctInfo) = 0;
 
     /**
-     * confirm whether IMS can set call transfer time
+     * confirm whether IMS support call transfer due to time
      *
      * @param slotId
      * @param result
-     * @return Returns TELEPHONY_SUCCESS on success, others on failure.
+     * @return Returns true on support, others on unsupport.
      */
-    virtual int32_t CanSetCallTransferTime(int32_t slotId, bool &result) = 0;
+    virtual int32_t IsSupportCallTransferTime(int32_t slotId, bool &result) = 0;
 
     /**
      * Get Call Transfer

@@ -182,14 +182,14 @@ public:
     int SetCallTransferInfo(const CallTransferInfo &info, int32_t slotId);
 
     /**
-     * CanSetCallTransferTime
+     * IsSupportCallTransferTime
      *
-     * @brief confirm whether IMS can set call transfer time.
+     * @brief confirm whether IMS support call transfer due to time.
      * @param slotId[in], The slot id
-     * @param result[out], The result of can set or not
-     * @return Returns TELEPHONY_SUCCESS on success, others on failure.
+     * @param result[out], The result of support or not
+     * @return Returns true on support, others on unsupport.
      */
-    int CanSetCallTransferTime(int32_t slotId, bool &result);
+    int IsSupportCallTransferTime(int32_t slotId, bool &result);
 
     /**
      * GetCallTransferInfo

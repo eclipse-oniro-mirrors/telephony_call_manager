@@ -401,14 +401,14 @@ int CellularCallConnection::SetCallTransferInfo(const CallTransferInfo &info, in
     return cellularCallInterfacePtr_->SetCallTransferInfo(slotId, info);
 }
 
-int CellularCallConnection::CanSetCallTransferTime(int32_t slotId, bool &result)
+int CellularCallConnection::IsSupportCallTransferTime(int32_t slotId, bool &result)
 {
     if (ReConnectService() != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("[slot%{public}d] ipc reconnect failed!", slotId);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     std::lock_guard<std::mutex> lock(mutex_);
-    return cellularCallInterfacePtr_->CanSetCallTransferTime(slotId, result);
+    return cellularCallInterfacePtr_->IsSupportCallTransferTime(slotId, result);
 }
 
 int CellularCallConnection::GetCallTransferInfo(CallTransferType type, int32_t slotId)
