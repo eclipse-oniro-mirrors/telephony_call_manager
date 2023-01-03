@@ -266,10 +266,10 @@ int32_t CallManagerClient::SetCallTransferInfo(int32_t slotId, CallTransferInfo 
     }
 }
 
-int32_t CallManagerClient::CanSetCallTransferTime(int32_t slotId, bool &result)
+int32_t CallManagerClient::IsSupportCallTransferTime(int32_t slotId, bool &result)
 {
     if (g_callManagerProxy != nullptr) {
-        return g_callManagerProxy->CanSetCallTransferTime(slotId, result);
+        return g_callManagerProxy->IsSupportCallTransferTime(slotId, result);
     } else {
         TELEPHONY_LOGE("[slot%{public}d] init first please!", slotId);
         return TELEPHONY_ERR_UNINIT;

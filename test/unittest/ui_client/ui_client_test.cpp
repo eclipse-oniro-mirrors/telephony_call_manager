@@ -563,23 +563,6 @@ void SetCallTransferInfo()
     std::cout << "return value:" << ret << std::endl;
 }
 
-void CanSetCallTransferTime()
-{
-    AccessToken token;
-    int32_t slotId = SIM1_SLOTID;
-    std::cout << "------CanSetCallTransferTime------" << std::endl;
-    std::cout << "please input slotId:" << std::endl;
-    std::cin >> slotId;
-    if (g_clientPtr == nullptr) {
-        std::cout << "g_clientPtr is nullptr" << std::endl;
-        return;
-    }
-    bool result;
-    int32_t ret = g_clientPtr->CanSetCallTransferTime(slotId, result);
-    std::cout << "return value:" << ret << std::endl;
-    std::cout << "return result:" << result << std::endl;
-}
-
 void IsEmergencyPhoneNumber()
 {
     int32_t slotId = SIM1_SLOTID;
@@ -1279,7 +1262,6 @@ void InitCallSupplementPower()
     g_memberFuncMap[OHOS::Telephony::INTERFACE_SET_CALL_RESTRICTION] = &OHOS::Telephony::SetCallRestriction;
     g_memberFuncMap[OHOS::Telephony::INTERFACE_GET_CALL_TRANSFER] = &OHOS::Telephony::GetCallTransferInfo;
     g_memberFuncMap[OHOS::Telephony::INTERFACE_SET_CALL_TRANSFER] = &OHOS::Telephony::SetCallTransferInfo;
-    g_memberFuncMap[OHOS::Telephony::INTERFACE_CAN_SET_CALL_TRANSFER_TIME] = &OHOS::Telephony::CanSetCallTransferTime;
     g_memberFuncMap[OHOS::Telephony::INTERFACE_SETCALL_PREFERENCEMODE] = &OHOS::Telephony::SetCallPreferenceMode;
 }
 
@@ -1395,8 +1377,7 @@ void PrintfCallSupplementInterface()
               << "23:getCallRestriction\n"
               << "24:setCallRestriction\n"
               << "25:getCallTransferInfo\n"
-              << "26:setCallTransferInfo\n"
-              << "27:CanSetCallTransferTime\n";
+              << "26:setCallTransferInfo\n";
 }
 
 void PrintfCallConferenceExInterface()
