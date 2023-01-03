@@ -630,7 +630,7 @@ int32_t CallManagerServiceProxy::SetCallTransferInfo(int32_t slotId, CallTransfe
     return replyParcel.ReadInt32();
 }
 
-int32_t CallManagerServiceProxy::IsSupportCallTransferTime(int32_t slotId, bool &result)
+int32_t CallManagerServiceProxy::CanSetCallTransferTime(int32_t slotId, bool &result)
 {
     MessageOption option;
     MessageParcel dataParcel;
@@ -653,12 +653,12 @@ int32_t CallManagerServiceProxy::IsSupportCallTransferTime(int32_t slotId, bool 
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
     int32_t error = remote->SendRequest(
-        CallManagerSurfaceCode::INTERFACE_IS_SUPPORT_CALL_TRANSFER_TIMER, dataParcel, replyParcel, option);
-    if (error != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("[slot%{public}d] Function failed! errCode:%{public}d", slotId, error);
-        return false;
+        CallManagerSurfaceCode::INTERFACE_CAN_SET_CALL_TRANSFER_TIME, dataParcel, replyParcel, option);
+    if (error == ERR_NONE) {
+        result = replyParcel.ReadBool();
+        return replyParcel.ReadInt32();
     }
-    return replyParcel.ReadBool();
+    return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
 }
 
 int32_t CallManagerServiceProxy::SetCallPreferenceMode(int32_t slotId, int32_t mode)

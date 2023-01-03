@@ -119,14 +119,14 @@ int32_t CallSettingManager::SetCallTransferInfo(int32_t slotId, CallTransferInfo
     return cellularCallConnectionPtr_->SetCallTransferInfo(info, slotId);
 }
 
-int32_t CallSettingManager::IsSupportCallTransferTime(int32_t slotId, bool &result)
+int32_t CallSettingManager::CanSetCallTransferTime(int32_t slotId, bool &result)
 {
     TELEPHONY_LOGI("[slot%{public}d] entry", slotId);
     if (cellularCallConnectionPtr_ == nullptr) {
         TELEPHONY_LOGE("[slot%{public}d] cellularCallConnectionPtr_ is nullptr!", slotId);
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return cellularCallConnectionPtr_->IsSupportCallTransferTime(slotId, result);
+    return cellularCallConnectionPtr_->CanSetCallTransferTime(slotId, result);
 }
 
 int32_t CallSettingManager::SetCallPreferenceMode(int32_t slotId, int32_t mode)
