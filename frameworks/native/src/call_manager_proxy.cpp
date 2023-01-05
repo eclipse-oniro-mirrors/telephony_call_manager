@@ -565,14 +565,14 @@ int32_t CallManagerProxy::SetCallTransferInfo(int32_t slotId, CallTransferInfo &
     return TELEPHONY_SUCCESS;
 }
 
-int32_t CallManagerProxy::IsSupportCallTransferTime(int32_t slotId, bool &result)
+int32_t CallManagerProxy::CanSetCallTransferTime(int32_t slotId, bool &result)
 {
     if (ReConnectService() != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("[slot%{public}d] ipc reconnect failed!", slotId);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     std::lock_guard<std::mutex> lock(mutex_);
-    return callManagerServicePtr_->IsSupportCallTransferTime(slotId, result);
+    return callManagerServicePtr_->CanSetCallTransferTime(slotId, result);
 }
 
 int32_t CallManagerProxy::SetCallPreferenceMode(int32_t slotId, int32_t mode)

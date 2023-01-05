@@ -92,7 +92,7 @@ void CallManagerServiceStub::InitCallSupplementRequest()
     memberFuncMap_[INTERFACE_SET_CALL_RESTRICTION] = &CallManagerServiceStub::OnSetCallRestriction;
     memberFuncMap_[INTERFACE_GET_CALL_TRANSFER] = &CallManagerServiceStub::OnGetTransferNumber;
     memberFuncMap_[INTERFACE_SET_CALL_TRANSFER] = &CallManagerServiceStub::OnSetTransferNumber;
-    memberFuncMap_[INTERFACE_IS_SUPPORT_CALL_TRANSFER_TIMER] = &CallManagerServiceStub::OnIsSupportCallTransferTime;
+    memberFuncMap_[INTERFACE_CAN_SET_CALL_TRANSFER_TIME] = &CallManagerServiceStub::OnCanSetCallTransferTime;
 }
 
 void CallManagerServiceStub::initCallConferenceExRequest()
@@ -521,7 +521,7 @@ int32_t CallManagerServiceStub::OnSetTransferNumber(MessageParcel &data, Message
     return TELEPHONY_SUCCESS;
 }
 
-int32_t CallManagerServiceStub::OnIsSupportCallTransferTime(MessageParcel &data, MessageParcel &reply)
+int32_t CallManagerServiceStub::OnCanSetCallTransferTime(MessageParcel &data, MessageParcel &reply)
 {
     int32_t ret = TELEPHONY_ERR_FAIL;
     if (!data.ContainFileDescriptors()) {
@@ -529,8 +529,11 @@ int32_t CallManagerServiceStub::OnIsSupportCallTransferTime(MessageParcel &data,
     }
     int32_t slotId = data.ReadInt32();
     bool result = data.ReadBool();
-    ret = IsSupportCallTransferTime(slotId, result);
-    TELEPHONY_LOGI("[slot%{public}d] result:%{public}d", slotId, ret);
+    ret = CanSetCallTransferTime(slotId, result);
+    if (!reply.WriteBool(result)) {
+        TELEPHONY_LOGE("[slot%{public}d] fail to write parcel with bool", slotId);
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
     if (!reply.WriteInt32(ret)) {
         TELEPHONY_LOGE("[slot%{public}d] fail to write parcel", slotId);
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;

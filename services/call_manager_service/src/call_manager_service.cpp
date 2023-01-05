@@ -475,10 +475,14 @@ int32_t CallManagerService::SetCallTransferInfo(int32_t slotId, CallTransferInfo
     }
 }
 
-int32_t CallManagerService::IsSupportCallTransferTime(int32_t slotId, bool &result)
+int32_t CallManagerService::CanSetCallTransferTime(int32_t slotId, bool &result)
 {
+    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_GET_TELEPHONY_STATE)) {
+        TELEPHONY_LOGE("Permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
     if (callControlManagerPtr_ != nullptr) {
-        return callControlManagerPtr_->IsSupportCallTransferTime(slotId, result);
+        return callControlManagerPtr_->CanSetCallTransferTime(slotId, result);
     } else {
         TELEPHONY_LOGE("[slot%{public}d] callControlManagerPtr_ is nullptr!", slotId);
         return TELEPHONY_ERR_LOCAL_PTR_NULL;

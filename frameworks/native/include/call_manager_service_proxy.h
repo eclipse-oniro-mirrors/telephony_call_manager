@@ -274,14 +274,14 @@ public:
     int32_t SetCallTransferInfo(int32_t slotId, CallTransferInfo &info) override;
 
     /**
-     * IsSupportCallTransferTime
+     * CanSetCallTransferTime
      *
-     * @brief confirm whether IMS support call transfer due to time.
+     * @brief confirm whether IMS can set call transfer time.
      * @param slotId[in], The slot id
-     * @param result[out], The result of support or not
-     * @return Returns true on support, others on unsupport.
+     * @param result[out], The result of can set or not
+     * @return Returns true on can set, others on can not set.
      */
-    int32_t IsSupportCallTransferTime(int32_t slotId, bool &result) override;
+    int32_t CanSetCallTransferTime(int32_t slotId, bool &result) override;
 
     /**
      * CombineConference

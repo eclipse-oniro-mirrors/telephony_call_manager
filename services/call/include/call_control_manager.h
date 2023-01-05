@@ -70,7 +70,7 @@ public:
     int32_t SetCallRestriction(int32_t slotId, CallRestrictionInfo &info);
     int32_t GetCallTransferInfo(int32_t slotId, CallTransferType type);
     int32_t SetCallTransferInfo(int32_t slotId, CallTransferInfo &info);
-    int32_t IsSupportCallTransferTime(int32_t slotId, bool &result);
+    int32_t CanSetCallTransferTime(int32_t slotId, bool &result);
     int32_t SetCallPreferenceMode(int32_t slotId, int32_t mode);
     // merge calls
     int32_t CombineConference(int32_t mainCallId);
