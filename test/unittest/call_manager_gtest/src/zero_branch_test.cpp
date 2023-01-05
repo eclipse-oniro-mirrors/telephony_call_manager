@@ -243,7 +243,7 @@ HWTEST_F(BranchTest, Telephony_CellularCallConnection_002, Function | MediumTest
     ASSERT_NE(DelayedSingleton<CellularCallConnection>::GetInstance()->SetCallTransferInfo(mCallTransferInfo, 0),
         TELEPHONY_ERR_SUCCESS);
     bool result;
-    ASSERT_NE(DelayedSingleton<CellularCallConnection>::GetInstance()->IsSupportCallTransferTime(0, result),
+    ASSERT_NE(DelayedSingleton<CellularCallConnection>::GetInstance()->CanSetCallTransferTime(0, result),
         TELEPHONY_ERR_SUCCESS);
     ASSERT_NE(
         DelayedSingleton<CellularCallConnection>::GetInstance()->GetImsSwitchStatus(0, result), TELEPHONY_ERR_SUCCESS);

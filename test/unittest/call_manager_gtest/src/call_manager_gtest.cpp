@@ -2595,6 +2595,84 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_GetCallTransferInfo_1100, Funct
     }
 }
 
+/**************************************** Test CanSetCallTransferTime() ******************************************/
+/**
+ * @tc.number   Telephony_CallManager_CanSetCallTransferTime_0100
+ * @tc.name     input invalid slotId, test CanSetCallTransferTime() return failed
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_CanSetCallTransferTime_0100, Function | MediumTest | Level3)
+{
+    AccessToken token;
+    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+
+    bool result;
+    EXPECT_EQ(CallManagerGtest::clientPtr_->CanSetCallTransferTime(INVALID_SLOT_ID, result), CALL_ERR_INVALID_SLOT_ID);
+}
+
+/**
+ * @tc.number   Telephony_CallManager_CanSetCallTransferTime_0200
+ * @tc.name     input slotId was out of count
+ *              test CanSetCallTransferTime() return failed
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_CanSetCallTransferTime_0200, Function | MediumTest | Level3)
+{
+    AccessToken token;
+    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+
+    bool result;
+    int32_t slotId = SIM_SLOT_COUNT; // out of the count
+    EXPECT_EQ(CallManagerGtest::clientPtr_->CanSetCallTransferTime(slotId, result), CALL_ERR_INVALID_SLOT_ID);
+}
+
+/**
+ * @tc.number   Telephony_CallManager_CanSetCallTransferTime_0300
+ * @tc.name     test CanSetCallTransferTime() without permission
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_CanSetCallTransferTime_0300, Function | MediumTest | Level3)
+{
+    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+
+    bool result;
+    if (HasSimCard(SIM1_SLOTID)) {
+        EXPECT_EQ(
+            CallManagerGtest::clientPtr_->CanSetCallTransferTime(SIM1_SLOTID, result), TELEPHONY_ERR_PERMISSION_ERR);
+    }
+    if (HasSimCard(SIM2_SLOTID)) {
+        EXPECT_EQ(
+            CallManagerGtest::clientPtr_->CanSetCallTransferTime(SIM2_SLOTID, result), TELEPHONY_ERR_PERMISSION_ERR);
+    }
+}
+
+/**
+ * @tc.number   Telephony_CallManager_CanSetCallTransferTime_0400
+ * @tc.name     test CanSetCallTransferTime() with normal situation
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_CanSetCallTransferTime_0400, Function | MediumTest | Level3)
+{
+    AccessToken token;
+    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+
+    bool result;
+    if (HasSimCard(SIM1_SLOTID)) {
+        EXPECT_EQ(CallManagerGtest::clientPtr_->CanSetCallTransferTime(SIM1_SLOTID, result), RETURN_VALUE_IS_ZERO);
+    }
+    if (HasSimCard(SIM2_SLOTID)) {
+        EXPECT_EQ(CallManagerGtest::clientPtr_->CanSetCallTransferTime(SIM2_SLOTID, result), RETURN_VALUE_IS_ZERO);
+    }
+}
+
 /******************************************* Test SetCallTransferInfo() ********************************************/
 /**
  * @tc.number   Telephony_CallManager_SetCallTransferInfo_0100
