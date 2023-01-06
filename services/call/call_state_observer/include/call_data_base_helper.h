@@ -17,17 +17,15 @@
 #define TELEPHONY_CALL_DATA_BASE_HELPER_H
 
 #include "ability_manager_interface.h"
-#include "abs_shared_result_set.h"
 #include "common_type.h"
-#include "data_ability_helper.h"
 #include "data_ability_observer_stub.h"
-#include "data_ability_predicates.h"
+#include "datashare_helper.h"
+#include "datashare_predicates.h"
 #include "if_system_ability_manager.h"
 #include "refbase.h"
 #include "singleton.h"
 #include "system_ability.h"
 #include "system_ability_definition.h"
-#include "values_bucket.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -69,15 +67,14 @@ class CallDataBaseHelper {
 public:
     void RegisterObserver(std::vector<std::string> *phones);
     void UnRegisterObserver();
-    bool Insert(NativeRdb::ValuesBucket &values);
-    bool Query(std::vector<std::string> *phones, NativeRdb::DataAbilityPredicates &predicates);
-    bool Query(ContactInfo &contactInfo, NativeRdb::DataAbilityPredicates &predicates);
-    bool Delete(NativeRdb::DataAbilityPredicates &predicates);
+    bool Insert(DataShare::DataShareValuesBucket &values);
+    bool Query(std::vector<std::string> *phones, DataShare::DataSharePredicates &predicates);
+    bool Query(ContactInfo &contactInfo, DataShare::DataSharePredicates &predicates);
+    bool Delete(DataShare::DataSharePredicates &predicates);
 
 private:
     sptr<CallDataRdbObserver> callDataRdbObserverPtr_;
-    std::shared_ptr<AppExecFwk::DataAbilityHelper> CreateDataAHelper();
-    void ResultSetConvertToIndexer(const std::shared_ptr<NativeRdb::AbsSharedResultSet> &resultSet);
+    std::shared_ptr<DataShare::DataShareHelper> CreateDataShareHelper(std::string uri);
 };
 } // namespace Telephony
 } // namespace OHOS
