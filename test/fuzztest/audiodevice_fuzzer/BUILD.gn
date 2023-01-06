@@ -81,6 +81,7 @@ ohos_fuzztest("AudioDeviceFuzzTest") {
     "c_utils:utils",
     "common_event_service:cesfwk_innerkits",
     "core_service:tel_core_service_api",
+    "data_share:datashare_consumer",
     "eventhandler:libeventhandler",
     "hisysevent_native:libhisysevent",
     "hitrace_native:hitrace_meter",
@@ -91,8 +92,6 @@ ohos_fuzztest("AudioDeviceFuzzTest") {
     "multimedia_camera_framework:camera_framework",
     "multimedia_player_framework:audio_ringtone_client",
     "power_manager:powermgr_client",
-    "relational_store:native_dataability",
-    "relational_store:native_rdb",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
   ]

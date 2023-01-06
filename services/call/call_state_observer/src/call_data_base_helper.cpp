@@ -24,9 +24,11 @@
 namespace OHOS {
 namespace Telephony {
 class AbsSharedResultSet;
-static constexpr const char *CALL_SUBSECTION = "dataability:///com.ohos.calllogability/calls/calllog";
-static constexpr const char *CALL_BLOCK = "dataability:///com.ohos.contactsdataability/contacts/contact_blocklist";
-static constexpr const char *CONTACT_DATA = "dataability:///com.ohos.contactsdataability/contacts/contact_data";
+static constexpr const char *CALLLOG_URI = "datashare:///com.ohos.calllogability";
+static constexpr const char *CALL_SUBSECTION = "datashare:///com.ohos.calllogability/calls/calllog";
+static constexpr const char *CONTACT_URI = "datashare:///com.ohos.contactsdataability";
+static constexpr const char *CALL_BLOCK = "datashare:///com.ohos.contactsdataability/contacts/contact_blocklist";
+static constexpr const char *CONTACT_DATA = "datashare:///com.ohos.contactsdataability/contacts/contact_data";
 
 CallDataRdbObserver::CallDataRdbObserver(std::vector<std::string> *phones)
 {
@@ -43,7 +45,7 @@ void CallDataRdbObserver::OnChange()
         return;
     }
 
-    NativeRdb::DataAbilityPredicates predicates;
+    DataShare::DataSharePredicates predicates;
     predicates.NotEqualTo("phone_number", std::string(""));
     this->phones->clear();
     callDataPtr->Query(this->phones, predicates);
@@ -53,7 +55,7 @@ CallDataBaseHelper::CallDataBaseHelper() {}
 
 CallDataBaseHelper::~CallDataBaseHelper() {}
 
-std::shared_ptr<AppExecFwk::DataAbilityHelper> CallDataBaseHelper::CreateDataAHelper()
+std::shared_ptr<DataShare::DataShareHelper> CallDataBaseHelper::CreateDataShareHelper(std::string uri)
 {
     auto saManager = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (saManager == nullptr) {
@@ -65,12 +67,12 @@ std::shared_ptr<AppExecFwk::DataAbilityHelper> CallDataBaseHelper::CreateDataAHe
         TELEPHONY_LOGE("GetSystemAbility Service Failed.");
         return nullptr;
     }
-    return AppExecFwk::DataAbilityHelper::Creator(remoteObj);
+    return DataShare::DataShareHelper::Creator(remoteObj, uri);
 }
 
 void CallDataBaseHelper::RegisterObserver(std::vector<std::string> *phones)
 {
-    std::shared_ptr<AppExecFwk::DataAbilityHelper> helper = CreateDataAHelper();
+    std::shared_ptr<DataShare::DataShareHelper> helper = CreateDataShareHelper(CONTACT_URI);
     if (helper == nullptr) {
         TELEPHONY_LOGE("helper_ is null");
         return;
@@ -86,7 +88,7 @@ void CallDataBaseHelper::RegisterObserver(std::vector<std::string> *phones)
 
 void CallDataBaseHelper::UnRegisterObserver()
 {
-    std::shared_ptr<AppExecFwk::DataAbilityHelper> helper = CreateDataAHelper();
+    std::shared_ptr<DataShare::DataShareHelper> helper = CreateDataShareHelper(CONTACT_URI);
     if (helper == nullptr) {
         TELEPHONY_LOGE("helper_ is null");
         return;
@@ -99,9 +101,9 @@ void CallDataBaseHelper::UnRegisterObserver()
     helper->UnregisterObserver(uri, callDataRdbObserverPtr_);
 }
 
-bool CallDataBaseHelper::Insert(NativeRdb::ValuesBucket &values)
+bool CallDataBaseHelper::Insert(DataShare::DataShareValuesBucket &values)
 {
-    std::shared_ptr<AppExecFwk::DataAbilityHelper> helper = CreateDataAHelper();
+    std::shared_ptr<DataShare::DataShareHelper> helper = CreateDataShareHelper(CALLLOG_URI);
     if (helper == nullptr) {
         TELEPHONY_LOGE("helper is nullptr!");
         return false;
@@ -110,9 +112,9 @@ bool CallDataBaseHelper::Insert(NativeRdb::ValuesBucket &values)
     return helper->Insert(uri, values);
 }
 
-bool CallDataBaseHelper::Query(std::vector<std::string> *phones, NativeRdb::DataAbilityPredicates &predicates)
+bool CallDataBaseHelper::Query(std::vector<std::string> *phones, DataShare::DataSharePredicates &predicates)
 {
-    std::shared_ptr<AppExecFwk::DataAbilityHelper> helper = CreateDataAHelper();
+    std::shared_ptr<DataShare::DataShareHelper> helper = CreateDataShareHelper(CONTACT_URI);
     if (helper == nullptr) {
         TELEPHONY_LOGE("helper is nullptr");
         return false;
@@ -120,7 +122,7 @@ bool CallDataBaseHelper::Query(std::vector<std::string> *phones, NativeRdb::Data
     Uri uri(CALL_BLOCK);
     std::vector<std::string> columns;
     columns.push_back("phone_number");
-    std::shared_ptr<NativeRdb::AbsSharedResultSet> resultSet = helper->Query(uri, columns, predicates);
+    auto resultSet = helper->Query(uri, predicates, columns);
     helper->Release();
     if (resultSet == nullptr) {
         return false;
@@ -141,16 +143,16 @@ bool CallDataBaseHelper::Query(std::vector<std::string> *phones, NativeRdb::Data
     return true;
 }
 
-bool CallDataBaseHelper::Query(ContactInfo &contactInfo, NativeRdb::DataAbilityPredicates &predicates)
+bool CallDataBaseHelper::Query(ContactInfo &contactInfo, DataShare::DataSharePredicates &predicates)
 {
-    std::shared_ptr<AppExecFwk::DataAbilityHelper> helper = CreateDataAHelper();
+    std::shared_ptr<DataShare::DataShareHelper> helper = CreateDataShareHelper(CONTACT_URI);
     if (helper == nullptr) {
         TELEPHONY_LOGE("helper is nullptr");
         return false;
     }
     Uri uri(CONTACT_DATA);
     std::vector<std::string> columns;
-    std::shared_ptr<NativeRdb::AbsSharedResultSet> resultSet = helper->Query(uri, columns, predicates);
+    auto resultSet = helper->Query(uri, predicates, columns);
     helper->Release();
     if (resultSet == nullptr) {
         TELEPHONY_LOGE("resultSet is nullptr");
@@ -179,9 +181,9 @@ bool CallDataBaseHelper::Query(ContactInfo &contactInfo, NativeRdb::DataAbilityP
     return true;
 }
 
-bool CallDataBaseHelper::Delete(NativeRdb::DataAbilityPredicates &predicates)
+bool CallDataBaseHelper::Delete(DataShare::DataSharePredicates &predicates)
 {
-    std::shared_ptr<AppExecFwk::DataAbilityHelper> helper = CreateDataAHelper();
+    std::shared_ptr<DataShare::DataShareHelper> helper = CreateDataShareHelper(CALLLOG_URI);
     if (helper == nullptr) {
         TELEPHONY_LOGE("helper is nullptr!");
         return false;
@@ -189,8 +191,5 @@ bool CallDataBaseHelper::Delete(NativeRdb::DataAbilityPredicates &predicates)
     Uri uri(CALL_SUBSECTION);
     return helper->Delete(uri, predicates);
 }
-
-void CallDataBaseHelper::ResultSetConvertToIndexer(const std::shared_ptr<NativeRdb::AbsSharedResultSet> &resultSet)
-{}
 } // namespace Telephony
 } // namespace OHOS
