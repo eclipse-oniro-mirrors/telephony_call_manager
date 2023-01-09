@@ -105,10 +105,10 @@ public:
      * @brief Is it an emergency call
      * @param number[in], Phone number to be formatted
      * @param slotId[in], The slot id
-     * @param errorCode[out] Failed to provision the error code
-     * @return Returns 0 on true, others on false.
+     * @param enabled[out] true is emergency phonenumber, other is not
+     * @return Returns 0 on success, others on failure.
      */
-    int IsEmergencyPhoneNumber(const std::string &phoneNum, int32_t slotId, int32_t &errorCode);
+    int IsEmergencyPhoneNumber(const std::string &phoneNum, int32_t slotId, bool &enabled);
 
     /**
      * CombineConference

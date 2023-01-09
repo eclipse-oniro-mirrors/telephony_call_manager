@@ -33,7 +33,7 @@ public:
         const std::string phoneNumber, const std::string countryCode, std::string &formatNumber);
     int32_t FormatNumberBase(const std::string phoneNumber, std::string countryCode,
         const i18n::phonenumbers::PhoneNumberUtil::PhoneNumberFormat formatInfo, std::string &formatNumber);
-    bool CheckNumberIsEmergency(const std::string &phoneNumber, const int32_t slotId, int32_t &errorCode);
+    int32_t CheckNumberIsEmergency(const std::string &phoneNumber, const int32_t slotId, bool &enabled);
     bool IsValidSlotId(int32_t slotId) const;
 
 private:

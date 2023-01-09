@@ -308,7 +308,7 @@ int32_t CallManagerServiceStub::OnIsNewCallAllowed(MessageParcel &data, MessageP
 {
     bool enabled = false;
     int32_t result = IsNewCallAllowed(enabled);
-    TELEPHONY_LOGI("result:%{public}d enabled:%{public}d", result, enabled);
+    TELEPHONY_LOGI("OnIsNewCallAllowed result:%{public}d enabled:%{public}d", result, enabled);
     if (!reply.WriteInt32(result)) {
         TELEPHONY_LOGE("OnIsNewCallAllowed write reply failed.");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
@@ -689,11 +689,18 @@ int32_t CallManagerServiceStub::OnIsEmergencyPhoneNumber(MessageParcel &data, Me
 {
     std::u16string callNumber = data.ReadString16();
     int32_t slotId = data.ReadInt32();
-    int32_t errorCode = TELEPHONY_ERR_FAIL;
-    bool result = IsEmergencyPhoneNumber(callNumber, slotId, errorCode);
-    TELEPHONY_LOGI("result:%{public}d", result);
-    if (!reply.WriteBool(result) || !reply.WriteInt32(errorCode)) {
-        TELEPHONY_LOGE("fail to write parcel");
+    bool enabled = false;
+    int32_t result = IsEmergencyPhoneNumber(callNumber, slotId, enabled);
+    TELEPHONY_LOGI("OnIsEmergencyPhoneNumber result:%{public}d enabled:%{public}d", result, enabled);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("OnIsEmergencyPhoneNumber write reply failed.");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    if (result != TELEPHONY_ERR_SUCCESS) {
+        return result;
+    }
+    if (!reply.WriteBool(enabled)) {
+        TELEPHONY_LOGE("OnIsEmergencyPhoneNumber fail to write parcel");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
     return TELEPHONY_SUCCESS;
@@ -706,8 +713,15 @@ int32_t CallManagerServiceStub::OnFormatPhoneNumber(MessageParcel &data, Message
     std::u16string formatNumber;
     int32_t result = FormatPhoneNumber(callNumber, countryCode, formatNumber);
     TELEPHONY_LOGI("result:%{public}d", result);
-    if (!reply.WriteString16(formatNumber) || !reply.WriteInt32(result)) {
-        TELEPHONY_LOGE("fail to write parcel");
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("OnFormatPhoneNumber write reply failed.");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    if (result != TELEPHONY_ERR_SUCCESS) {
+        return result;
+    }
+    if (!reply.WriteString16(formatNumber)) {
+        TELEPHONY_LOGE("OnFormatPhoneNumber fail to write parcel");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
     return TELEPHONY_SUCCESS;
@@ -720,8 +734,15 @@ int32_t CallManagerServiceStub::OnFormatPhoneNumberToE164(MessageParcel &data, M
     std::u16string formatNumber;
     int32_t result = FormatPhoneNumberToE164(callNumber, countryCode, formatNumber);
     TELEPHONY_LOGI("result:%{public}d", result);
-    if (!reply.WriteString16(formatNumber) || !reply.WriteInt32(result)) {
-        TELEPHONY_LOGE("fail to write parcel");
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("OnFormatPhoneNumberToE164 write reply failed.");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    if (result != TELEPHONY_ERR_SUCCESS) {
+        return result;
+    }
+    if (!reply.WriteString16(formatNumber)) {
+        TELEPHONY_LOGE("OnFormatPhoneNumberToE164 fail to write parcel");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
     return TELEPHONY_SUCCESS;

@@ -144,10 +144,10 @@ public:
      *
      * @param slotId.
      * @param phone number.
-     * @param error Code.
+     * @param enabled
      * @return Returns TELEPHONY_SUCCESS on success, others on failure.
      */
-    virtual int32_t IsEmergencyPhoneNumber(int32_t slotId, const std::string &phoneNum, int32_t &errorCode) = 0;
+    virtual int32_t IsEmergencyPhoneNumber(int32_t slotId, const std::string &phoneNum, bool &enabled) = 0;
 
     /**
      * Merge into multiple calls

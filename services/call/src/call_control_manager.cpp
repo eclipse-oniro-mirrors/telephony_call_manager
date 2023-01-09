@@ -97,7 +97,6 @@ bool CallControlManager::Init()
 
 int32_t CallControlManager::DialCall(std::u16string &number, AppExecFwk::PacMap &extras)
 {
-    int32_t errorCode = TELEPHONY_ERR_FAIL;
     sptr<CallBase> callObjectPtr = nullptr;
     std::string accountNumber(Str16ToStr8(number));
     int32_t ret = NumberLegalityCheck(accountNumber);
@@ -105,8 +104,13 @@ int32_t CallControlManager::DialCall(std::u16string &number, AppExecFwk::PacMap 
         TELEPHONY_LOGE("Invalid number!");
         return ret;
     }
-    bool isEcc = DelayedSingleton<CallNumberUtils>::GetInstance()->CheckNumberIsEmergency(
-        accountNumber, extras.GetIntValue("accountId"), errorCode);
+    bool isEcc = false;
+    ret = DelayedSingleton<CallNumberUtils>::GetInstance()->CheckNumberIsEmergency(
+        accountNumber, extras.GetIntValue("accountId"), isEcc);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("check number is emergency result:%{public}d", ret);
+        return ret;
+    }
     if (isEcc) {
         extras.PutIntValue("dialScene", (int32_t)DialScene::CALL_EMERGENCY);
     } else {
@@ -908,14 +912,13 @@ int32_t CallControlManager::SetDeviceDirection(int32_t rotation)
     return DelayedSingleton<VideoControlManager>::GetInstance()->SetDeviceDirection(rotation);
 }
 
-bool CallControlManager::IsEmergencyPhoneNumber(std::u16string &number, int32_t slotId, int32_t &errorCode)
+int32_t CallControlManager::IsEmergencyPhoneNumber(std::u16string &number, int32_t slotId, bool &enabled)
 {
     if (IsValidSlotId(slotId)) {
-        errorCode = CALL_ERR_INVALID_SLOT_ID;
-        return false;
+        return CALL_ERR_INVALID_SLOT_ID;
     }
     return DelayedSingleton<CallNumberUtils>::GetInstance()->CheckNumberIsEmergency(
-        Str16ToStr8(number), slotId, errorCode);
+        Str16ToStr8(number), slotId, enabled);
 }
 
 int32_t CallControlManager::FormatPhoneNumber(

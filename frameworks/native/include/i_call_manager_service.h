@@ -123,7 +123,7 @@ public:
     virtual int32_t CanSetCallTransferTime(int32_t slotId, bool &result) = 0;
     virtual int32_t CombineConference(int32_t mainCallId) = 0;
     virtual int32_t SeparateConference(int32_t callId) = 0;
-    virtual bool IsEmergencyPhoneNumber(std::u16string &number, int32_t slotId, int32_t &errorCode) = 0;
+    virtual int32_t IsEmergencyPhoneNumber(std::u16string &number, int32_t slotId, bool &enabled) = 0;
     virtual int32_t FormatPhoneNumber(
         std::u16string &number, std::u16string &countryCode, std::u16string &formatNumber) = 0;
     virtual int32_t FormatPhoneNumberToE164(

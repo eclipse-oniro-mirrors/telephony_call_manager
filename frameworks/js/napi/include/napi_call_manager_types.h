@@ -74,6 +74,7 @@ struct AnswerAsyncContext : AsyncContext {
 };
 
 struct BoolResultAsyncContext : AsyncContext {
+    int32_t slotId;
     bool enabled;
 };
 
@@ -118,6 +119,7 @@ struct CallTransferAsyncContext : AsyncContext {
 
 struct UtilsAsyncContext : AsyncContext {
     int32_t slotId;
+    bool enabled;
     std::u16string formatNumber;
     std::string code;
 };

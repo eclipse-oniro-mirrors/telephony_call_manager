@@ -284,14 +284,14 @@ int CellularCallConnection::SwitchCall(const CellularCallInfo &callInfo)
     return TELEPHONY_SUCCESS;
 }
 
-int CellularCallConnection::IsEmergencyPhoneNumber(const std::string &phoneNum, int32_t slotId, int32_t &errorCode)
+int CellularCallConnection::IsEmergencyPhoneNumber(const std::string &phoneNum, int32_t slotId, bool &enabled)
 {
     if (ReConnectService() != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     std::lock_guard<std::mutex> lock(mutex_);
-    return cellularCallInterfacePtr_->IsEmergencyPhoneNumber(slotId, phoneNum, errorCode);
+    return cellularCallInterfacePtr_->IsEmergencyPhoneNumber(slotId, phoneNum, enabled);
 }
 
 int CellularCallConnection::CombineConference(const CellularCallInfo &callInfo)

@@ -98,10 +98,10 @@ public:
      *
      * @param phone number.
      * @param slotId.
-     * @param error Code.
-     * @return Is Urgent Call.
+     * @param enabled.
+     * @return Returns TELEPHONY_SUCCESS on success, others on failure.
      */
-    int32_t IsEmergencyPhoneNumber(int32_t slotId, const std::string &phoneNum, int32_t &errorCode) override;
+    int32_t IsEmergencyPhoneNumber(int32_t slotId, const std::string &phoneNum, bool &enabled) override;
 
     /**
      * Merge into multiple calls

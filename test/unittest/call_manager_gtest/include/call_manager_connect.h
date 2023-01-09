@@ -617,13 +617,13 @@ public:
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
 
-    bool IsEmergencyPhoneNumber(std::u16string &number, int32_t slotId, int32_t &errorCode) const
+    int32_t IsEmergencyPhoneNumber(std::u16string &number, int32_t slotId, bool &enabled) const
     {
         if (callManagerServicePtr_ != nullptr) {
-            return callManagerServicePtr_->IsEmergencyPhoneNumber(number, slotId, errorCode);
+            return callManagerServicePtr_->IsEmergencyPhoneNumber(number, slotId, enabled);
         }
         TELEPHONY_LOGE("callManagerServicePtr_ is nullptr!");
-        return false;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
 
     int32_t FormatPhoneNumber(

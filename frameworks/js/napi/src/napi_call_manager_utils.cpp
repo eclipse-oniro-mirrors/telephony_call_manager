@@ -193,6 +193,40 @@ int32_t NapiCallManagerUtils::GetIntProperty(napi_env env, napi_value object, co
     return intValue;
 }
 
+bool NapiCallManagerUtils::GetUssdIntProperty(
+    napi_env env, napi_value object, const std::string &propertyName, int32_t &result)
+{
+    napi_value value = nullptr;
+    napi_status getNameStatus = napi_get_named_property(env, object, propertyName.c_str(), &value);
+    if (getNameStatus == napi_ok) {
+        napi_status getIntStatus = napi_get_value_int32(env, value, &result);
+        if (getIntStatus == napi_ok) {
+            return true;
+        }
+    }
+    TELEPHONY_LOGW("GetUssdIntProperty failed!");
+    return false;
+}
+
+bool NapiCallManagerUtils::GetUssdStringProperty(
+    napi_env env, napi_value object, const std::string &propertyName, std::string &result)
+{
+    napi_value value = nullptr;
+    napi_status getNameStatus = napi_get_named_property(env, object, propertyName.c_str(), &value);
+    if (getNameStatus == napi_ok) {
+        char tmpStr[MESSAGE_CONTENT_MAXIMUM_LIMIT + 1] = { 0 };
+        size_t len = 0;
+        napi_status getStringStatus =
+            napi_get_value_string_utf8(env, value, tmpStr, MESSAGE_CONTENT_MAXIMUM_LIMIT, &len);
+        if (getStringStatus == napi_ok && len > 0) {
+            result = std::string(tmpStr, len);
+            return true;
+        }
+    }
+    TELEPHONY_LOGW("GetUssdStringProperty failed!");
+    return false;
+}
+
 bool NapiCallManagerUtils::GetBoolProperty(napi_env env, napi_value object, const std::string &propertyName)
 {
     bool boolValue = false;

@@ -583,7 +583,6 @@ void CanSetCallTransferTime()
 void IsEmergencyPhoneNumber()
 {
     int32_t slotId = SIM1_SLOTID;
-    int32_t errorCode = TELEPHONY_ERROR;
     std::u16string phoneNumber;
     std::string tmpStr;
     std::cout << "------IsEmergencyPhoneNumber------" << std::endl;
@@ -599,9 +598,10 @@ void IsEmergencyPhoneNumber()
         std::cout << "g_clientPtr is nullptr" << std::endl;
         return;
     }
-    int32_t ret = g_clientPtr->IsEmergencyPhoneNumber(phoneNumber, slotId, errorCode);
-    std::cout << "return value:" << ret << std::endl;
-    std::cout << "return errorCode:" << errorCode << std::endl;
+    bool enabled = false;
+    int32_t ret = g_clientPtr->IsEmergencyPhoneNumber(phoneNumber, slotId, enabled);
+    std::cout << "return value:" << enabled << std::endl;
+    std::cout << "return errorCode:" << ret << std::endl;
 }
 
 void FormatPhoneNumber()
