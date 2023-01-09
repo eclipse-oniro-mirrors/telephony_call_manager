@@ -46,6 +46,14 @@ bool DialingState::ProcessEvent(int32_t event)
                     AudioEvent::SWITCH_IMS_CALL_STATE);
             }
             break;
+        case AudioEvent::NEW_ALERTING_CALL:
+            // switch to ims call state anyway.
+            if (DelayedSingleton<CallStateProcessor>::GetInstance()->
+                ShouldSwitchState(TelCallState::CALL_STATUS_ALERTING)) {
+                result = DelayedSingleton<AudioSceneProcessor>::GetInstance()->ProcessEvent(
+                    AudioEvent::SWITCH_ALERTING_STATE);
+            }
+            break;
         default:
             break;
     }
