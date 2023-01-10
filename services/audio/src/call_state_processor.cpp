@@ -169,6 +169,10 @@ bool CallStateProcessor::UpdateCurrentCallState()
         event = AudioEvent::SWITCH_HOLDING_STATE;
     } else if (incomingCalls_.size() > EMPTY_VALUE) {
         event = AudioEvent::SWITCH_INCOMING_STATE;
+    } else if (dialingCalls_.size() > EMPTY_VALUE) {
+        event = AudioEvent::SWITCH_DIALING_STATE;
+    } else if (alertingCalls_.size() > EMPTY_VALUE) {
+        event = AudioEvent::SWITCH_ALERTING_STATE;
     } else {
         event = AudioEvent::SWITCH_AUDIO_INACTIVE_STATE;
     }
