@@ -197,8 +197,8 @@ HWTEST_F(BranchTest, Telephony_CellularCallConnection_001, Function | MediumTest
         DelayedSingleton<CellularCallConnection>::GetInstance()->UnHoldCall(mCellularCallInfo), TELEPHONY_ERR_SUCCESS);
     ASSERT_NE(
         DelayedSingleton<CellularCallConnection>::GetInstance()->SwitchCall(mCellularCallInfo), TELEPHONY_ERR_SUCCESS);
-    int32_t errorCode;
-    ASSERT_NE(DelayedSingleton<CellularCallConnection>::GetInstance()->IsEmergencyPhoneNumber("", 0, errorCode),
+    bool enabled = false;
+    ASSERT_NE(DelayedSingleton<CellularCallConnection>::GetInstance()->IsEmergencyPhoneNumber("", 0, enabled),
         TELEPHONY_ERR_SUCCESS);
     ASSERT_NE(DelayedSingleton<CellularCallConnection>::GetInstance()->CombineConference(mCellularCallInfo),
         TELEPHONY_ERR_SUCCESS);

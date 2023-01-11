@@ -37,9 +37,33 @@ declare namespace call {
   function dial(phoneNumber: string, options?: DialOptions): Promise<boolean>;
 
   /**
+   * Makes a call.
+   *
+   * @permission ohos.permission.PLACE_CALL
+   * @param phoneNumber Indicates the called number.
+   * @param options Indicates additional information carried in the call.
+   * @throws {BusinessError} 201 - Permission denied.
+   * @throws {BusinessError} 401 - Parameter error.
+   * @throws {BusinessError} 8300001 - Invalid parameter value.
+   * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
+   * @throws {BusinessError} 8300003 - System internal error.
+   * @throws {BusinessError} 8300999 - Unknown error code.
+   * @systemapi Hide this for inner system use.
+   * @since 9
+   */
+   function dialCall(phoneNumber: string, callback: AsyncCallback<void>): void;
+   function dialCall(phoneNumber: string, options: DialCallOptions, callback: AsyncCallback<void>): void;
+   function dialCall(phoneNumber: string, options?: DialCallOptions): Promise<void>;
+
+  /**
    * Go to the dial screen and the called number is displayed.
    *
    * @param phoneNumber Indicates the called number.
+   * @throws {BusinessError} 401 - Parameter error.
+   * @throws {BusinessError} 8300001 - Invalid parameter value.
+   * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
+   * @throws {BusinessError} 8300003 - System internal error.
+   * @throws {BusinessError} 8300999 - Unknown error code.
    * @syscap SystemCapability.Applications.Contacts
    * @since 7
    */
@@ -102,7 +126,12 @@ declare namespace call {
    * Checks whether a phone number is on the emergency number list.
    *
    * @param phoneNumber Indicates the phone number to check.
-   * @param callback Returns {@code true} if the phone number is on the emergency number list;
+   * @returns Returns {@code true} if the phone number is on the emergency number list;
+   * @throws {BusinessError} 401 - Parameter error.
+   * @throws {BusinessError} 8300001 - Invalid parameter value.
+   * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
+   * @throws {BusinessError} 8300003 - System internal error.
+   * @throws {BusinessError} 8300999 - Unknown error code.
    * returns {@code false} otherwise.
    * @since 7
    */
@@ -117,8 +146,13 @@ declare namespace call {
    * each part is separated by a space.
    *
    * @param phoneNumber Indicates the phone number to format.
-   * @param callback Returns the phone number after being formatted; returns an empty string
-   * if the input phone number is invalid.
+   * @param options countryCode option
+   * @returns Returns the phone number after being formatted; returns an empty string if the input phone number is invalid.
+   * @throws {BusinessError} 401 - Parameter error.
+   * @throws {BusinessError} 8300001 - Invalid parameter value.
+   * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
+   * @throws {BusinessError} 8300003 - System internal error.
+   * @throws {BusinessError} 8300999 - Unknown error code.
    * @since 7
    */
   function formatPhoneNumber(phoneNumber: string, callback: AsyncCallback<string>): void;
@@ -130,7 +164,12 @@ declare namespace call {
    *
    * @param phoneNumber Indicates the phone number to format.
    * @param countryCode Indicates a two-digit country code defined in ISO 3166-1.
-   * @param callback Returns an E.164 number; returns an empty string if the input phone number is invalid.
+   * @returns Returns an E.164 number; returns an empty string if the input phone number is invalid.
+   * @throws {BusinessError} 401 - Parameter error.
+   * @throws {BusinessError} 8300001 - Invalid parameter value.
+   * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
+   * @throws {BusinessError} 8300003 - System internal error.
+   * @throws {BusinessError} 8300999 - Unknown error code.
    * @since 7
    */
   function formatPhoneNumberToE164(phoneNumber: string, countryCode: string, callback: AsyncCallback<string>): void;
@@ -146,7 +185,6 @@ declare namespace call {
    * @throws {BusinessError} 8300001 - Invalid parameter value.
    * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
    * @throws {BusinessError} 8300003 - System internal error.
-   * @throws {BusinessError} 8300004 - Do not have sim card.
    * @throws {BusinessError} 8300999 - Unknown error code.
    * @systemapi Hide this for inner system use.
    * @since 7
@@ -163,7 +201,6 @@ declare namespace call {
    * @throws {BusinessError} 8300001 - Invalid parameter value.
    * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
    * @throws {BusinessError} 8300003 - System internal error.
-   * @throws {BusinessError} 8300004 - Do not have sim card.
    * @throws {BusinessError} 8300999 - Unknown error code.
    * @systemapi Hide this for inner system use.
    * @since 9
@@ -180,7 +217,6 @@ declare namespace call {
    * @throws {BusinessError} 8300001 - Invalid parameter value.
    * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
    * @throws {BusinessError} 8300003 - System internal error.
-   * @throws {BusinessError} 8300004 - Do not have sim card.
    * @throws {BusinessError} 8300999 - Unknown error code.
    * @systemapi Hide this for inner system use.
    * @since 7
@@ -197,7 +233,6 @@ declare namespace call {
    * @throws {BusinessError} 8300001 - Invalid parameter value.
    * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
    * @throws {BusinessError} 8300003 - System internal error.
-   * @throws {BusinessError} 8300004 - Do not have sim card.
    * @throws {BusinessError} 8300999 - Unknown error code.
    * @systemapi Hide this for inner system use.
    * @since 9
@@ -215,7 +250,6 @@ declare namespace call {
    * @throws {BusinessError} 8300001 - Invalid parameter value.
    * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
    * @throws {BusinessError} 8300003 - System internal error.
-   * @throws {BusinessError} 8300004 - Do not have sim card.
    * @throws {BusinessError} 8300999 - Unknown error code.
    * @systemapi Hide this for inner system use.
    * @since 7
@@ -234,7 +268,6 @@ declare namespace call {
    * @throws {BusinessError} 8300001 - Invalid parameter value.
    * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
    * @throws {BusinessError} 8300003 - System internal error.
-   * @throws {BusinessError} 8300004 - Do not have sim card.
    * @throws {BusinessError} 8300999 - Unknown error code.
    * @systemapi Hide this for inner system use.
    * @since 9
@@ -250,7 +283,6 @@ declare namespace call {
    * @throws {BusinessError} 8300001 - Invalid parameter value.
    * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
    * @throws {BusinessError} 8300003 - System internal error.
-   * @throws {BusinessError} 8300004 - Do not have sim card.
    * @throws {BusinessError} 8300999 - Unknown error code.
    * @systemapi Hide this for inner system use.
    * @since 7
@@ -266,7 +298,6 @@ declare namespace call {
    * @throws {BusinessError} 8300001 - Invalid parameter value.
    * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
    * @throws {BusinessError} 8300003 - System internal error.
-   * @throws {BusinessError} 8300004 - Do not have sim card.
    * @throws {BusinessError} 8300999 - Unknown error code.
    * @systemapi Hide this for inner system use.
    * @since 7
@@ -282,7 +313,6 @@ declare namespace call {
    * @throws {BusinessError} 8300001 - Invalid parameter value.
    * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
    * @throws {BusinessError} 8300003 - System internal error.
-   * @throws {BusinessError} 8300004 - Do not have sim card.
    * @throws {BusinessError} 8300999 - Unknown error code.
    * @systemapi Hide this for inner system use.
    * @since 7
@@ -428,7 +458,6 @@ declare namespace call {
    * @throws {BusinessError} 8300001 - Invalid parameter value.
    * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
    * @throws {BusinessError} 8300003 - System internal error.
-   * @throws {BusinessError} 8300004 - Do not have sim card.
    * @throws {BusinessError} 8300999 - Unknown error code.
    * @systemapi Hide this for inner system use.
    * @since 7
@@ -443,7 +472,6 @@ declare namespace call {
    * @throws {BusinessError} 8300001 - Invalid parameter value.
    * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
    * @throws {BusinessError} 8300003 - System internal error.
-   * @throws {BusinessError} 8300004 - Do not have sim card.
    * @throws {BusinessError} 8300999 - Unknown error code.
    * @systemapi Hide this for inner system use.
    * @since 7
@@ -458,7 +486,6 @@ declare namespace call {
    * @throws {BusinessError} 8300001 - Invalid parameter value.
    * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
    * @throws {BusinessError} 8300003 - System internal error.
-   * @throws {BusinessError} 8300004 - Do not have sim card.
    * @throws {BusinessError} 8300999 - Unknown error code.
    * @systemapi Hide this for inner system use.
    * @since 8
@@ -473,7 +500,6 @@ declare namespace call {
    * @throws {BusinessError} 8300001 - Invalid parameter value.
    * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
    * @throws {BusinessError} 8300003 - System internal error.
-   * @throws {BusinessError} 8300004 - Do not have sim card.
    * @throws {BusinessError} 8300999 - Unknown error code.
    * @systemapi Hide this for inner system use.
    * @since 8
@@ -488,7 +514,6 @@ declare namespace call {
    * @throws {BusinessError} 8300001 - Invalid parameter value.
    * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
    * @throws {BusinessError} 8300003 - System internal error.
-   * @throws {BusinessError} 8300004 - Do not have sim card.
    * @throws {BusinessError} 8300999 - Unknown error code.
    * @systemapi Hide this for inner system use.
    * @since 8
@@ -503,7 +528,6 @@ declare namespace call {
    * @throws {BusinessError} 8300001 - Invalid parameter value.
    * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
    * @throws {BusinessError} 8300003 - System internal error.
-   * @throws {BusinessError} 8300004 - Do not have sim card.
    * @throws {BusinessError} 8300999 - Unknown error code.
    * @systemapi Hide this for inner system use.
    * @since 8
@@ -521,7 +545,6 @@ declare namespace call {
    * @throws {BusinessError} 8300001 - Invalid parameter value.
    * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
    * @throws {BusinessError} 8300003 - System internal error.
-   * @throws {BusinessError} 8300004 - Do not have sim card.
    * @throws {BusinessError} 8300999 - Unknown error code.
    * @systemapi Hide this for inner system use.
    * @since 9
@@ -539,7 +562,6 @@ declare namespace call {
    * @throws {BusinessError} 8300001 - Invalid parameter value.
    * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
    * @throws {BusinessError} 8300003 - System internal error.
-   * @throws {BusinessError} 8300004 - Do not have sim card.
    * @throws {BusinessError} 8300999 - Unknown error code.
    * @systemapi Hide this for inner system use.
    * @since 9
@@ -552,7 +574,6 @@ declare namespace call {
    * @throws {BusinessError} 8300001 - Invalid parameter value.
    * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
    * @throws {BusinessError} 8300003 - System internal error.
-   * @throws {BusinessError} 8300004 - Do not have sim card.
    * @throws {BusinessError} 8300999 - Unknown error code.
    * @systemapi Hide this for inner system use.
    * @since 8
@@ -566,7 +587,6 @@ declare namespace call {
    * @throws {BusinessError} 8300001 - Invalid parameter value.
    * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
    * @throws {BusinessError} 8300003 - System internal error.
-   * @throws {BusinessError} 8300004 - Do not have sim card.
    * @throws {BusinessError} 8300999 - Unknown error code.
    * @systemapi Hide this for inner system use.
    * @since 8
@@ -671,7 +691,6 @@ declare namespace call {
    * @throws {BusinessError} 8300001 - Invalid parameter value.
    * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
    * @throws {BusinessError} 8300003 - System internal error.
-   * @throws {BusinessError} 8300004 - Do not have sim card.
    * @throws {BusinessError} 8300999 - Unknown error code.
    * @systemapi Hide this for inner system use.
    * @since 8
@@ -684,7 +703,6 @@ declare namespace call {
    * @throws {BusinessError} 8300001 - Invalid parameter value.
    * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
    * @throws {BusinessError} 8300003 - System internal error.
-   * @throws {BusinessError} 8300004 - Do not have sim card.
    * @throws {BusinessError} 8300999 - Unknown error code.
    * @systemapi Hide this for inner system use.
    * @since 8
@@ -697,7 +715,6 @@ declare namespace call {
    * @throws {BusinessError} 8300001 - Invalid parameter value.
    * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
    * @throws {BusinessError} 8300003 - System internal error.
-   * @throws {BusinessError} 8300004 - Do not have sim card.
    * @throws {BusinessError} 8300999 - Unknown error code.
    * @systemapi Hide this for inner system use.
    * @since 8
@@ -744,7 +761,6 @@ declare namespace call {
    * @throws {BusinessError} 8300001 - Invalid parameter value.
    * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
    * @throws {BusinessError} 8300003 - System internal error.
-   * @throws {BusinessError} 8300004 - Do not have sim card.
    * @throws {BusinessError} 8300999 - Unknown error code.
    * @systemapi Hide this for inner system use.
    * @since 8
@@ -759,7 +775,6 @@ declare namespace call {
    * @throws {BusinessError} 8300001 - Invalid parameter value.
    * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
    * @throws {BusinessError} 8300003 - System internal error.
-   * @throws {BusinessError} 8300004 - Do not have sim card.
    * @throws {BusinessError} 8300999 - Unknown error code.
    * @systemapi Hide this for inner system use.
    * @since 8
@@ -776,7 +791,6 @@ declare namespace call {
    * @throws {BusinessError} 8300001 - Invalid parameter value.
    * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
    * @throws {BusinessError} 8300003 - System internal error.
-   * @throws {BusinessError} 8300004 - Do not have sim card.
    * @throws {BusinessError} 8300999 - Unknown error code.
    * @systemapi Hide this for inner system use.
    * @since 8
@@ -793,7 +807,6 @@ declare namespace call {
    * @throws {BusinessError} 8300001 - Invalid parameter value.
    * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
    * @throws {BusinessError} 8300003 - System internal error.
-   * @throws {BusinessError} 8300004 - Do not have sim card.
    * @throws {BusinessError} 8300999 - Unknown error code.
    * @systemapi Hide this for inner system use.
    * @since 8
@@ -807,7 +820,6 @@ declare namespace call {
    * @throws {BusinessError} 8300001 - Invalid parameter value.
    * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
    * @throws {BusinessError} 8300003 - System internal error.
-   * @throws {BusinessError} 8300004 - Do not have sim card.
    * @throws {BusinessError} 8300999 - Unknown error code.
    * @systemapi Hide this for inner system use.
    * @since 8
@@ -1081,6 +1093,29 @@ declare namespace call {
     /**
      * @systemapi Hide this for inner system use.
      * @since 8
+     */
+    dialType?: DialType;
+  }
+
+  /**
+   * @systemapi Hide this for inner system use.
+   * @since 9
+   */
+   export interface DialCallOptions {
+    /**
+     * @systemapi Hide this for inner system use.
+     */
+    accountId?: number;
+    /**
+     * @systemapi Hide this for inner system use.
+     */
+    videoState?: VideoStateType;
+    /**
+     * @systemapi Hide this for inner system use.
+     */
+    dialScene?: DialScene;
+    /**
+     * @systemapi Hide this for inner system use.
      */
     dialType?: DialType;
   }
@@ -1783,6 +1818,7 @@ declare namespace call {
      * @since 9
      */
     RADIO_SETUP_FAILURE = 257,
+
     /**
      * Radio release normal.
      *

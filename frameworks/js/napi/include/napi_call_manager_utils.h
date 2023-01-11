@@ -60,6 +60,9 @@ public:
     static napi_value GetNamedProperty(napi_env env, napi_value object, const std::string &propertyName);
     static std::string GetStringProperty(napi_env env, napi_value object, const std::string &propertyName);
     static int32_t GetIntProperty(napi_env env, napi_value object, const std::string &propertyName);
+    static bool GetUssdIntProperty(napi_env env, napi_value object, const std::string &propertyName, int32_t &result);
+    static bool GetUssdStringProperty(
+        napi_env env, napi_value object, const std::string &propertyName, std::string &result);
     static bool GetBoolProperty(napi_env env, napi_value object, const std::string &propertyName);
     static void SetPropertyInt32(napi_env env, napi_value object, std::string name, int32_t value);
     static void SetPropertyStringUtf8(napi_env env, napi_value object, std::string name, std::string value);

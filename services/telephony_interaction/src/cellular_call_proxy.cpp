@@ -259,7 +259,7 @@ int32_t CellularCallProxy::UnRegisterCallManagerCallBack()
     return error;
 }
 
-int32_t CellularCallProxy::IsEmergencyPhoneNumber(int32_t slotId, const std::string &phoneNum, int32_t &errorCode)
+int32_t CellularCallProxy::IsEmergencyPhoneNumber(int32_t slotId, const std::string &phoneNum, bool &enabled)
 {
     MessageOption option;
     MessageParcel in;
@@ -272,20 +272,21 @@ int32_t CellularCallProxy::IsEmergencyPhoneNumber(int32_t slotId, const std::str
     if (!in.WriteString(phoneNum)) {
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
-    if (!in.WriteInt32(errorCode)) {
-        return TELEPHONY_ERR_WRITE_DATA_FAIL;
-    }
     auto remote = Remote();
     if (remote == nullptr) {
         TELEPHONY_LOGE("function Remote() return nullptr!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     int32_t ret = remote->SendRequest(static_cast<uint32_t>(OperationType::EMERGENCY_CALL), in, out, option);
-    if (ret == ERR_NONE) {
-        ret = out.ReadInt32();
-        errorCode = out.ReadInt32();
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("Function FormatPhoneNumberToE164 call failed! errCode:%{public}d", ret);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    return ret;
+    result = out.ReadInt32();
+    if (result == TELEPHONY_SUCCESS) {
+        enabled = out.ReadBool();
+    }
+    return result;
 }
 
 int32_t CellularCallProxy::CombineConference(const CellularCallInfo &callInfo)

@@ -97,7 +97,7 @@ int32_t CallManagerServiceProxy::DialCall(std::u16string number, AppExecFwk::Pac
     int32_t error = remote->SendRequest(INTERFACE_DIAL_CALL, dataParcel, replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("function DialCall call failed! errCode:%{public}d", error);
-        return error;
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     return replyParcel.ReadInt32();
 }
@@ -925,18 +925,18 @@ int32_t CallManagerServiceProxy::SetDeviceDirection(int32_t rotation)
     return replyParcel.ReadInt32();
 }
 
-bool CallManagerServiceProxy::IsEmergencyPhoneNumber(std::u16string &number, int32_t slotId, int32_t &errorCode)
+int32_t CallManagerServiceProxy::IsEmergencyPhoneNumber(std::u16string &number, int32_t slotId, bool &enabled)
 {
     MessageOption option;
     MessageParcel dataParcel;
     MessageParcel replyParcel;
     if (!dataParcel.WriteInterfaceToken(CallManagerServiceProxy::GetDescriptor())) {
         TELEPHONY_LOGE("write descriptor fail");
-        return false;
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
     if (number.empty()) {
         TELEPHONY_LOGE("number is empty");
-        return false;
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
     dataParcel.WriteString16(number);
     dataParcel.WriteInt32(slotId);
@@ -948,10 +948,12 @@ bool CallManagerServiceProxy::IsEmergencyPhoneNumber(std::u16string &number, int
     int32_t error = remote->SendRequest(INTERFACE_IS_EMERGENCY_NUMBER, dataParcel, replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("Function IsEmergencyPhoneNumber call failed! errCode:%{public}d", error);
-        return false;
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    bool result = replyParcel.ReadBool();
-    errorCode = replyParcel.ReadInt32();
+    int32_t result = replyParcel.ReadInt32();
+    if (result == TELEPHONY_SUCCESS) {
+        enabled = replyParcel.ReadBool();
+    }
     return result;
 }
 
@@ -979,10 +981,13 @@ int32_t CallManagerServiceProxy::FormatPhoneNumber(
     int32_t error = remote->SendRequest(INTERFACE_IS_FORMAT_NUMBER, dataParcel, replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("Function FormatPhoneNumber call failed! errCode:%{public}d", error);
-        return error;
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    formatNumber = replyParcel.ReadString16();
-    return replyParcel.ReadInt32();
+    int32_t result = replyParcel.ReadInt32();
+    if (result == TELEPHONY_SUCCESS) {
+        formatNumber = replyParcel.ReadString16();
+    }
+    return result;
 }
 
 int32_t CallManagerServiceProxy::FormatPhoneNumberToE164(
@@ -1009,10 +1014,13 @@ int32_t CallManagerServiceProxy::FormatPhoneNumberToE164(
     int32_t error = remote->SendRequest(INTERFACE_IS_FORMAT_NUMBER_E164, dataParcel, replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("Function FormatPhoneNumberToE164 call failed! errCode:%{public}d", error);
-        return error;
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    formatNumber = replyParcel.ReadString16();
-    return replyParcel.ReadInt32();
+    int32_t result = replyParcel.ReadInt32();
+    if (result == TELEPHONY_SUCCESS) {
+        formatNumber = replyParcel.ReadString16();
+    }
+    return result;
 }
 
 int32_t CallManagerServiceProxy::GetMainCallId(int32_t callId, int32_t &mainCallId)

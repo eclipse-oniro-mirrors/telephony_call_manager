@@ -346,13 +346,13 @@ int32_t CallManagerClient::IsInEmergencyCall(bool &enabled)
     }
 }
 
-bool CallManagerClient::IsEmergencyPhoneNumber(std::u16string &number, int32_t slotId, int32_t &errorCode)
+int32_t CallManagerClient::IsEmergencyPhoneNumber(std::u16string &number, int32_t slotId, bool &enabled)
 {
     if (g_callManagerProxy != nullptr) {
-        return g_callManagerProxy->IsEmergencyPhoneNumber(number, slotId, errorCode);
+        return g_callManagerProxy->IsEmergencyPhoneNumber(number, slotId, enabled);
     } else {
         TELEPHONY_LOGE("[slot%{public}d] init first please!", slotId);
-        return false;
+        return TELEPHONY_ERR_UNINIT;
     }
 }
 

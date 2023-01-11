@@ -660,14 +660,14 @@ int32_t CallManagerProxy::IsInEmergencyCall(bool &enabled)
     return callManagerServicePtr_->IsInEmergencyCall(enabled);
 }
 
-bool CallManagerProxy::IsEmergencyPhoneNumber(std::u16string &number, int32_t slotId, int32_t &errorCode)
+int32_t CallManagerProxy::IsEmergencyPhoneNumber(std::u16string &number, int32_t slotId, bool &enabled)
 {
     if (ReConnectService() != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("[slot%{public}d] ipc reconnect failed!", slotId);
-        return false;
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     std::lock_guard<std::mutex> lock(mutex_);
-    return callManagerServicePtr_->IsEmergencyPhoneNumber(number, slotId, errorCode);
+    return callManagerServicePtr_->IsEmergencyPhoneNumber(number, slotId, enabled);
 }
 
 int32_t CallManagerProxy::FormatPhoneNumber(

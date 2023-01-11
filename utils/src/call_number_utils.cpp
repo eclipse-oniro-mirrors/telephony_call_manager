@@ -34,7 +34,7 @@ int32_t CallNumberUtils::FormatPhoneNumber(
 {
     if (phoneNumber.empty()) {
         TELEPHONY_LOGE("phoneNumber is nullptr!");
-        return CALL_ERR_PHONE_NUMBER_EMPTY;
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
     if (phoneNumber.front() == '#' || phoneNumber.front() == '*') {
         formatNumber = phoneNumber;
@@ -67,7 +67,7 @@ int32_t CallNumberUtils::FormatNumberBase(const std::string phoneNumber, std::st
 {
     if (phoneNumber.empty()) {
         TELEPHONY_LOGE("phoneNumber is nullptr!");
-        return CALL_ERR_PHONE_NUMBER_EMPTY;
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
     transform(countryCode.begin(), countryCode.end(), countryCode.begin(), ::toupper);
     i18n::phonenumbers::PhoneNumber parseResult;
@@ -86,12 +86,10 @@ int32_t CallNumberUtils::FormatNumberBase(const std::string phoneNumber, std::st
     return TELEPHONY_SUCCESS;
 }
 
-bool CallNumberUtils::CheckNumberIsEmergency(
-    const std::string &phoneNumber, const int32_t slotId, int32_t &errorCode)
+int32_t CallNumberUtils::CheckNumberIsEmergency(const std::string &phoneNumber, const int32_t slotId, bool &enabled)
 {
-    int isEcc = DelayedSingleton<CellularCallConnection>::GetInstance()->IsEmergencyPhoneNumber(
-        phoneNumber, slotId, errorCode);
-    return (isEcc != 0);
+    return DelayedSingleton<CellularCallConnection>::GetInstance()->IsEmergencyPhoneNumber(
+        phoneNumber, slotId, enabled);
 }
 
 bool CallNumberUtils::IsValidSlotId(int32_t slotId) const

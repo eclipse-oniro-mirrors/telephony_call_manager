@@ -34,7 +34,6 @@ constexpr int16_t SIM1_SLOTID_NO_CARD = 0;
 constexpr int16_t RETURN_VALUE_IS_ZERO = 0;
 constexpr int16_t INVALID_NEGATIVE_ID = -100;
 constexpr int16_t INVALID_POSITIVE_ID = 100;
-constexpr int16_t CALL_MANAGER_ERROR = -1;
 #ifndef CALL_MANAGER_IMS_LITE_UNSUPPORT
 constexpr int16_t CAMERA_ROTATION_90 = 90;
 constexpr int16_t CAMERA_ROTATION_ERROR = 50;
@@ -501,14 +500,14 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_1700, Function | Mediu
         InitDialInfo(SIM1_SLOTID, (int32_t)VideoStateType::TYPE_VOICE, (int32_t)DialScene::CALL_NORMAL,
             (int32_t)DialType::DIAL_CARRIER_TYPE);
         int32_t ret = CallManagerGtest::blueToothClientPtr_->DialCall(Str8ToStr16(phoneNumber), dialInfo_);
-        EXPECT_EQ(ret, CALL_ERR_NUMBER_OUT_OF_RANGE);
+        EXPECT_EQ(ret, TELEPHONY_ERR_ARGUMENT_INVALID);
     }
 
     if (HasSimCard(SIM2_SLOTID)) {
         InitDialInfo(SIM2_SLOTID, (int32_t)VideoStateType::TYPE_VOICE, (int32_t)DialScene::CALL_NORMAL,
             (int32_t)DialType::DIAL_CARRIER_TYPE);
         int32_t ret = CallManagerGtest::blueToothClientPtr_->DialCall(Str8ToStr16(phoneNumber), dialInfo_);
-        EXPECT_EQ(ret, CALL_ERR_NUMBER_OUT_OF_RANGE);
+        EXPECT_EQ(ret, TELEPHONY_ERR_ARGUMENT_INVALID);
     }
 }
 
@@ -531,13 +530,13 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_1800, Function | Mediu
         InitDialInfo(
             SIM1_SLOTID, (int32_t)VideoStateType::TYPE_VOICE, DIAL_SCENE_TEST, (int32_t)DialType::DIAL_CARRIER_TYPE);
         int32_t ret = CallManagerGtest::blueToothClientPtr_->DialCall(Str8ToStr16(phoneNumber), dialInfo_);
-        EXPECT_NE(ret, CALL_ERR_PHONE_NUMBER_EMPTY);
+        EXPECT_NE(ret, TELEPHONY_ERR_SUCCESS);
     }
     if (HasSimCard(SIM2_SLOTID)) {
         InitDialInfo(
             SIM2_SLOTID, (int32_t)VideoStateType::TYPE_VOICE, DIAL_SCENE_TEST, (int32_t)DialType::DIAL_CARRIER_TYPE);
         int32_t ret = CallManagerGtest::blueToothClientPtr_->DialCall(Str8ToStr16(phoneNumber), dialInfo_);
-        EXPECT_NE(ret, CALL_ERR_PHONE_NUMBER_EMPTY);
+        EXPECT_NE(ret, TELEPHONY_ERR_SUCCESS);
     }
 }
 
@@ -1391,12 +1390,17 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_IsEmergencyPhoneNumber_0100, Fu
     }
     std::string number = "0-0-0";
     std::u16string phoneNumber = Str8ToStr16(number);
-    int32_t error = CALL_MANAGER_ERROR;
     if (HasSimCard(SIM1_SLOTID)) {
-        EXPECT_NE(CallManagerGtest::clientPtr_->IsEmergencyPhoneNumber(phoneNumber, SIM1_SLOTID, error), true);
+        bool enabled = false;
+        int32_t result = CallManagerGtest::clientPtr_->IsEmergencyPhoneNumber(phoneNumber, SIM1_SLOTID, enabled);
+        EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
+        EXPECT_NE(enabled, true);
     }
     if (HasSimCard(SIM2_SLOTID)) {
-        EXPECT_NE(CallManagerGtest::clientPtr_->IsEmergencyPhoneNumber(phoneNumber, SIM2_SLOTID, error), true);
+        bool enabled = false;
+        int32_t result = CallManagerGtest::clientPtr_->IsEmergencyPhoneNumber(phoneNumber, SIM2_SLOTID, enabled);
+        EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
+        EXPECT_NE(enabled, true);
     }
 }
 
@@ -1413,12 +1417,17 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_IsEmergencyPhoneNumber_0200, Fu
     }
     std::string number = "112";
     std::u16string phoneNumber = Str8ToStr16(number);
-    int32_t error = CALL_MANAGER_ERROR;
     if (HasSimCard(SIM1_SLOTID)) {
-        EXPECT_EQ(CallManagerGtest::clientPtr_->IsEmergencyPhoneNumber(phoneNumber, SIM1_SLOTID, error), true);
+        bool enabled = false;
+        int32_t result = CallManagerGtest::clientPtr_->IsEmergencyPhoneNumber(phoneNumber, SIM1_SLOTID, enabled);
+        EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
+        EXPECT_EQ(enabled, true);
     }
     if (HasSimCard(SIM2_SLOTID)) {
-        EXPECT_EQ(CallManagerGtest::clientPtr_->IsEmergencyPhoneNumber(phoneNumber, SIM2_SLOTID, error), true);
+        bool enabled = false;
+        int32_t result = CallManagerGtest::clientPtr_->IsEmergencyPhoneNumber(phoneNumber, SIM2_SLOTID, enabled);
+        EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
+        EXPECT_EQ(enabled, true);
     }
 }
 
@@ -1434,12 +1443,17 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_IsEmergencyPhoneNumber_0300, Fu
     }
     std::string number = "911";
     std::u16string phoneNumber = Str8ToStr16(number);
-    int32_t error = CALL_MANAGER_ERROR;
     if (HasSimCard(SIM1_SLOTID)) {
-        EXPECT_EQ(CallManagerGtest::clientPtr_->IsEmergencyPhoneNumber(phoneNumber, SIM1_SLOTID, error), true);
+        bool enabled = false;
+        int32_t result = CallManagerGtest::clientPtr_->IsEmergencyPhoneNumber(phoneNumber, SIM1_SLOTID, enabled);
+        EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
+        EXPECT_EQ(enabled, true);
     }
     if (HasSimCard(SIM2_SLOTID)) {
-        EXPECT_EQ(CallManagerGtest::clientPtr_->IsEmergencyPhoneNumber(phoneNumber, SIM2_SLOTID, error), true);
+        bool enabled = false;
+        int32_t result = CallManagerGtest::clientPtr_->IsEmergencyPhoneNumber(phoneNumber, SIM2_SLOTID, enabled);
+        EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
+        EXPECT_EQ(enabled, true);
     }
 }
 
@@ -1456,8 +1470,10 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_IsEmergencyPhoneNumber_0400, Fu
     int32_t slotId = SIM1_SLOTID_NO_CARD;
     std::string number = "08";
     std::u16string phoneNumber = Str8ToStr16(number);
-    int32_t error = CALL_MANAGER_ERROR;
-    EXPECT_EQ(CallManagerGtest::clientPtr_->IsEmergencyPhoneNumber(phoneNumber, slotId, error), true);
+    bool enabled = false;
+    int32_t result = CallManagerGtest::clientPtr_->IsEmergencyPhoneNumber(phoneNumber, slotId, enabled);
+    EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
+    EXPECT_EQ(enabled, true);
 }
 
 /**
@@ -1473,8 +1489,10 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_IsEmergencyPhoneNumber_0500, Fu
     int32_t slotId = SIM1_SLOTID_NO_CARD;
     std::string number = "118";
     std::u16string phoneNumber = Str8ToStr16(number);
-    int32_t error = CALL_MANAGER_ERROR;
-    EXPECT_EQ(CallManagerGtest::clientPtr_->IsEmergencyPhoneNumber(phoneNumber, slotId, error), true);
+    bool enabled = false;
+    int32_t result = CallManagerGtest::clientPtr_->IsEmergencyPhoneNumber(phoneNumber, slotId, enabled);
+    EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
+    EXPECT_EQ(enabled, true);
 }
 
 /**
@@ -1489,12 +1507,17 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_IsEmergencyPhoneNumber_0600, Fu
     }
     std::string number = "119";
     std::u16string phoneNumber = Str8ToStr16(number);
-    int32_t error = CALL_MANAGER_ERROR;
     if (HasSimCard(SIM1_SLOTID)) {
-        EXPECT_EQ(CallManagerGtest::clientPtr_->IsEmergencyPhoneNumber(phoneNumber, SIM1_SLOTID, error), true);
+        bool enabled = false;
+        int32_t result = CallManagerGtest::clientPtr_->IsEmergencyPhoneNumber(phoneNumber, SIM1_SLOTID, enabled);
+        EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
+        EXPECT_EQ(enabled, true);
     }
     if (HasSimCard(SIM2_SLOTID)) {
-        EXPECT_EQ(CallManagerGtest::clientPtr_->IsEmergencyPhoneNumber(phoneNumber, SIM2_SLOTID, error), true);
+        bool enabled = false;
+        int32_t result = CallManagerGtest::clientPtr_->IsEmergencyPhoneNumber(phoneNumber, SIM2_SLOTID, enabled);
+        EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
+        EXPECT_EQ(enabled, true);
     }
 }
 
@@ -1511,8 +1534,10 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_IsEmergencyPhoneNumber_0700, Fu
     int32_t slotId = SIM1_SLOTID_NO_CARD;
     std::string number = "999";
     std::u16string phoneNumber = Str8ToStr16(number);
-    int32_t error = CALL_MANAGER_ERROR;
-    EXPECT_EQ(CallManagerGtest::clientPtr_->IsEmergencyPhoneNumber(phoneNumber, slotId, error), true);
+    bool enabled = false;
+    int32_t result = CallManagerGtest::clientPtr_->IsEmergencyPhoneNumber(phoneNumber, slotId, enabled);
+    EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
+    EXPECT_EQ(enabled, true);
 }
 
 /**
@@ -1528,8 +1553,10 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_IsEmergencyPhoneNumber_0800, Fu
     int32_t slotId = SIM1_SLOTID_NO_CARD;
     std::string number = "";
     std::u16string phoneNumber = Str8ToStr16(number);
-    int32_t error = CALL_MANAGER_ERROR;
-    EXPECT_EQ(CallManagerGtest::clientPtr_->IsEmergencyPhoneNumber(phoneNumber, slotId, error), false);
+    bool enabled = false;
+    int32_t result = CallManagerGtest::clientPtr_->IsEmergencyPhoneNumber(phoneNumber, slotId, enabled);
+    EXPECT_NE(result, TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(enabled, true);
 }
 
 /**
@@ -1545,8 +1572,10 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_IsEmergencyPhoneNumber_0900, Fu
     int32_t slotId = SIM1_SLOTID_NO_CARD;
     std::string number = "@123";
     std::u16string phoneNumber = Str8ToStr16(number);
-    int32_t error = CALL_MANAGER_ERROR;
-    EXPECT_EQ(CallManagerGtest::clientPtr_->IsEmergencyPhoneNumber(phoneNumber, slotId, error), false);
+    bool enabled = false;
+    int32_t result = CallManagerGtest::clientPtr_->IsEmergencyPhoneNumber(phoneNumber, slotId, enabled);
+    EXPECT_NE(result, TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(enabled, true);
 }
 
 /**
@@ -1562,8 +1591,10 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_IsEmergencyPhoneNumber_1000, Fu
     int32_t slotId = SIM1_SLOTID_NO_CARD;
     std::string number = "+1+1+9";
     std::u16string phoneNumber = Str8ToStr16(number);
-    int32_t error = CALL_MANAGER_ERROR;
-    EXPECT_EQ(CallManagerGtest::clientPtr_->IsEmergencyPhoneNumber(phoneNumber, slotId, error), false);
+    bool enabled = false;
+    int32_t result = CallManagerGtest::clientPtr_->IsEmergencyPhoneNumber(phoneNumber, slotId, enabled);
+    EXPECT_NE(result, TELEPHONY_ERR_SUCCESS);
+    EXPECT_NE(enabled, true);
 }
 
 /********************************************* Test GetCallWaiting() ***********************************************/

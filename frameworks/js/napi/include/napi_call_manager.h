@@ -72,6 +72,7 @@ public:
     static napi_value DeclareTransferTypeEnum(napi_env env, napi_value exports);
     static napi_value DeclareTransferSettingTypeEnum(napi_env env, napi_value exports);
     static napi_value RegisterCallManagerFunc(napi_env env, napi_value exports);
+    static napi_value Dial(napi_env env, napi_callback_info info);
     static napi_value DialCall(napi_env env, napi_callback_info info);
     static napi_value MakeCall(napi_env env, napi_callback_info info);
     static napi_value AnswerCall(napi_env env, napi_callback_info info);
@@ -137,12 +138,14 @@ private:
     static void NativeIsImsSwitchEnabledCallBack(napi_env env, napi_status status, void *data);
     static void NativeBoolCallBack(napi_env env, napi_status status, void *data);
     static void NativeBoolCallBackWithErrorCode(napi_env env, napi_status status, void *data);
+    static void NativeIsEmergencyPhoneNumberCallBack(napi_env env, napi_status status, void *data);
     static void NativeFormatNumberCallBack(napi_env env, napi_status status, void *data);
     static void NativeListCallBack(napi_env env, napi_status status, void *data);
     static void GetDialInfo(napi_env env, napi_value objValue, DialAsyncContext &asyncContext);
     static void GetSmsInfo(napi_env env, napi_value objValue, RejectAsyncContext &asyncContext);
     static int32_t GetRestrictionInfo(napi_env env, napi_value objValue, CallRestrictionAsyncContext &asyncContext);
     static int32_t GetTransferInfo(napi_env env, napi_value objValue, CallTransferAsyncContext &asyncContext);
+    static void NativeDial(napi_env env, void *data);
     static void NativeDialCall(napi_env env, void *data);
     static void NativeMakeCall(napi_env env, void *data);
     static void NativeAnswerCall(napi_env env, void *data);
@@ -207,6 +210,9 @@ private:
     static void NativeReportOttCallEventInfo(napi_env env, void *data);
     static napi_value HandleAsyncWork(napi_env env, AsyncContext *context, std::string workName,
         napi_async_execute_callback execute, napi_async_complete_callback complete);
+    static bool MatchStringAndVariableObjectParameters(
+        napi_env env, const napi_value parameters[], const size_t parameterCount);
+    static bool MatchTwoStringParameter(napi_env env, const napi_value parameters[], const size_t parameterCount);
 
 private:
     static int32_t registerStatus_;

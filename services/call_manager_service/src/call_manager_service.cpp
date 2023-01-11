@@ -642,13 +642,13 @@ int32_t CallManagerService::SetDeviceDirection(int32_t rotation)
     }
 }
 
-bool CallManagerService::IsEmergencyPhoneNumber(std::u16string &number, int32_t slotId, int32_t &errorCode)
+int32_t CallManagerService::IsEmergencyPhoneNumber(std::u16string &number, int32_t slotId, bool &enabled)
 {
     if (callControlManagerPtr_ != nullptr) {
-        return callControlManagerPtr_->IsEmergencyPhoneNumber(number, slotId, errorCode);
+        return callControlManagerPtr_->IsEmergencyPhoneNumber(number, slotId, enabled);
     } else {
         TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");
-        return false;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
 }
 
