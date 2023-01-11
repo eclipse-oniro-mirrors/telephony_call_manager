@@ -56,28 +56,28 @@ void CallRecordsHandler::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &eve
         };
         QueryCallerInfo(contactInfo, std::string(info.phoneNumber));
 
-        NativeRdb::ValuesBucket bucket;
+        DataShare::DataShareValuesBucket bucket;
         TELEPHONY_LOGI("callLog Insert begin");
-        bucket.PutString(CALL_PHONE_NUMBER, std::string(info.phoneNumber));
-        bucket.PutString(CALL_DISPLAY_NAME, std::string(contactInfo.name));
-        bucket.PutInt(CALL_DIRECTION, static_cast<int32_t>(info.directionType));
-        bucket.PutString(CALL_VOICEMAIL_URI, std::string(""));
-        bucket.PutInt(CALL_SIM_TYPE, 0);
-        bucket.PutInt(CALL_IS_HD, 0);
-        bucket.PutInt(CALL_IS_READ, 0);
-        bucket.PutInt(CALL_RING_DURATION, info.ringDuration);
-        bucket.PutInt(CALL_TALK_DURATION, info.callDuration);
-        bucket.PutString(CALL_FORMAT_NUMBER, std::string(info.formattedPhoneNumber));
-        bucket.PutString(CALL_QUICKSEARCH_KEY, std::string(""));
-        bucket.PutInt(CALL_NUMBER_TYPE, 0);
-        bucket.PutString(CALL_NUMBER_TYPE_NAME, std::string(""));
-        bucket.PutInt(CALL_BEGIN_TIME, info.callBeginTime);
-        bucket.PutInt(CALL_END_TIME, info.callEndTime);
-        bucket.PutInt(CALL_ANSWER_STATE, static_cast<int32_t>(info.answerType));
+        bucket.Put(CALL_PHONE_NUMBER, std::string(info.phoneNumber));
+        bucket.Put(CALL_DISPLAY_NAME, std::string(contactInfo.name));
+        bucket.Put(CALL_DIRECTION, static_cast<int32_t>(info.directionType));
+        bucket.Put(CALL_VOICEMAIL_URI, std::string(""));
+        bucket.Put(CALL_SIM_TYPE, 0);
+        bucket.Put(CALL_IS_HD, 0);
+        bucket.Put(CALL_IS_READ, 0);
+        bucket.Put(CALL_RING_DURATION, static_cast<int32_t>(info.ringDuration));
+        bucket.Put(CALL_TALK_DURATION, static_cast<int32_t>(info.callDuration));
+        bucket.Put(CALL_FORMAT_NUMBER, std::string(info.formattedPhoneNumber));
+        bucket.Put(CALL_QUICKSEARCH_KEY, std::string(""));
+        bucket.Put(CALL_NUMBER_TYPE, 0);
+        bucket.Put(CALL_NUMBER_TYPE_NAME, std::string(""));
+        bucket.Put(CALL_BEGIN_TIME, info.callBeginTime);
+        bucket.Put(CALL_END_TIME, info.callEndTime);
+        bucket.Put(CALL_ANSWER_STATE, static_cast<int32_t>(info.answerType));
         time_t timeStamp = time(0);
-        bucket.PutInt(CALL_CREATE_TIME, timeStamp);
-        bucket.PutString(CALL_NUMBER_LOCATION, std::string(""));
-        bucket.PutInt(CALL_PHOTO_ID, 0);
+        bucket.Put(CALL_CREATE_TIME, timeStamp);
+        bucket.Put(CALL_NUMBER_LOCATION, std::string(""));
+        bucket.Put(CALL_PHOTO_ID, 0);
         callDataPtr_->Insert(bucket);
         return;
     }
@@ -90,7 +90,7 @@ void CallRecordsHandler::QueryCallerInfo(ContactInfo &contactInfo, std::string p
         TELEPHONY_LOGE("callDataPtr is nullptr!");
         return;
     }
-    NativeRdb::DataAbilityPredicates predicates;
+    DataShare::DataSharePredicates predicates;
     predicates.EqualTo(CALL_DETAIL_INFO, phoneNumber);
     predicates.And();
     predicates.EqualTo(CALL_CONTENT_TYPE, CALL_PHONE);
