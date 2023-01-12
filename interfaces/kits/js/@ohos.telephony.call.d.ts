@@ -678,10 +678,12 @@ declare namespace call {
    * @throws {BusinessError} 8300001 - Invalid parameter value.
    * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
    * @throws {BusinessError} 8300003 - System internal error.
+   * @throws {BusinessError} 8300999 - Unknown error code.
    * @systemapi Hide this for inner system use.
    * @since 10
    */
-  function canSetCallTransferTime(slotId: number): boolean;
+  function canSetCallTransferTime(slotId: number, callback: AsyncCallback<boolean>): void;
+  function canSetCallTransferTime(slotId: number): Promise<boolean>;
 
   /**
    * @permission ohos.permission.SET_TELEPHONY_STATE

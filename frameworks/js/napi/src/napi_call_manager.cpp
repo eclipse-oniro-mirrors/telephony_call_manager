@@ -41,7 +41,6 @@ static constexpr const char *OBSERVER_OFF_JS_PERMISSION_ERROR_STRING =
     "BusinessError 201: Permission denied. An attempt was made to Off forbidden by permission: "
     "ohos.permission.SET_TELEPHONY_STATE.";
 int32_t NapiCallManager::registerStatus_ = TELEPHONY_ERROR;
-static constexpr const char *GET_TELEPHONY_STATE = "ohos.permission.GET_TELEPHONY_STATE";
 
 NapiCallManager::NapiCallManager() {}
 
@@ -1462,28 +1461,19 @@ static inline bool IsValidSlotId(int32_t slotId)
 napi_value NapiCallManager::CanSetCallTransferTime(napi_env env, napi_callback_info info)
 {
     GET_PARAMS(env, info, VALUE_MAXIMUM_LIMIT);
-    if (argc != ONLY_ONE_VALUE || !NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_FIRST], napi_number)) {
+    if (!MatchOneNumberParameter(env, argv, argc)) {
+        TELEPHONY_LOGE("MatchOneNumberParameter failed.");
         NapiUtil::ThrowParameterError(env);
         return nullptr;
     }
-    int32_t slotId;
-    napi_get_value_int32(env, argv[ARRAY_INDEX_FIRST], &slotId);
-    if (!IsValidSlotId(slotId)) {
-        JsError error = NapiUtil::ConverErrorMessageForJs(TELEPHONY_ERR_SLOTID_INVALID);
-        NapiUtil::ThrowError(env, error.errorCode, error.errorMessage);
-        return nullptr;
+    auto asyncContext = std::make_unique<BoolResultAsyncContext>();
+    asyncContext->eventId = CALL_MANAGER_CAN_SET_CALL_TRANSFER_TIME;
+    napi_get_value_int32(env, argv[ARRAY_INDEX_FIRST], &asyncContext->slotId);
+    if (argc == TWO_VALUE_LIMIT) {
+        napi_create_reference(env, argv[ARRAY_INDEX_SECOND], DATA_LENGTH_ONE, &(asyncContext->callbackRef));
     }
-    bool canSet = false;
-    int32_t ret = DelayedSingleton<CallManagerClient>::GetInstance()->CanSetCallTransferTime(slotId, canSet);
-    if (ret != TELEPHONY_SUCCESS) {
-        JsError jsError =
-            NapiUtil::ConverErrorMessageWithPermissionForJs(ret, TELEPHONY_LOG_FUNC_NAME, GET_TELEPHONY_STATE);
-        NapiUtil::ThrowError(env, jsError.errorCode, jsError.errorMessage);
-        return nullptr;
-    }
-    napi_value result = nullptr;
-    napi_get_boolean(env, canSet, &result);
-    return result;
+    return HandleAsyncWork(env, asyncContext.release(), "CanSetCallTransferTime", NativeCanSetCallTransferTime,
+        NativeBoolCallBackWithErrorCode);
 }
 
 napi_value NapiCallManager::EnableImsSwitch(napi_env env, napi_callback_info info)
@@ -3413,6 +3403,23 @@ void NapiCallManager::NativeSetTransferNumber(napi_env env, void *data)
     asyncContext->resolved = TELEPHONY_SUCCESS;
     asyncContext->callbackRef = nullptr;
     asyncContext->deferred = nullptr;
+}
+
+void NapiCallManager::NativeCanSetCallTransferTime(napi_env env, void *data)
+{
+    if (data == nullptr) {
+        TELEPHONY_LOGE("data is nullptr");
+        NapiUtil::ThrowParameterError(env);
+        return;
+    }
+    auto asyncContext = (BoolResultAsyncContext *)data;
+    if (!IsValidSlotId(asyncContext->slotId)) {
+        TELEPHONY_LOGE("[slot%{public}d]slotId is invalid", asyncContext->slotId);
+        asyncContext->errorCode = SLOT_ID_INVALID;
+        return;
+    }
+    asyncContext->errorCode = DelayedSingleton<CallManagerClient>::GetInstance()->CanSetCallTransferTime(
+        asyncContext->slotId, asyncContext->enabled);
 }
 
 void NapiCallManager::NativeEnableImsSwitch(napi_env env, void *data)
