@@ -178,7 +178,6 @@ int CellularCallConnection::Dial(const CellularCallInfo &callInfo)
             callInfo.videoState, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL, "ReConnectService failed");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
     TELEPHONY_LOGI("callType:%{public}d", callInfo.callType);
     int errCode = cellularCallInterfacePtr_->Dial(callInfo);
     if (errCode != TELEPHONY_SUCCESS) {
@@ -196,7 +195,6 @@ int CellularCallConnection::HangUp(const CellularCallInfo &callInfo, CallSupplem
             callInfo.accountId, callInfo.callId, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL, "HangUp ipc reconnect failed");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
     int errCode = cellularCallInterfacePtr_->HangUp(callInfo, type);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("hangup call failed, errcode:%{public}d", errCode);
@@ -213,7 +211,6 @@ int CellularCallConnection::Reject(const CellularCallInfo &callInfo)
             callInfo.accountId, callInfo.callId, TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL, "Reject ipc reconnect failed");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
     int errCode = cellularCallInterfacePtr_->Reject(callInfo);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("rejecting call failed, errcode:%{public}d", errCode);
@@ -230,7 +227,6 @@ int CellularCallConnection::Answer(const CellularCallInfo &callInfo)
             TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL, "ipc reconnect failed");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
     int errCode = cellularCallInterfacePtr_->Answer(callInfo);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("answering call failed, errcode:%{public}d", errCode);
@@ -245,7 +241,6 @@ int CellularCallConnection::HoldCall(const CellularCallInfo &callInfo)
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
     int errCode = cellularCallInterfacePtr_->HoldCall(callInfo);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("holding call failed, errcode:%{public}d", errCode);
@@ -260,7 +255,6 @@ int CellularCallConnection::UnHoldCall(const CellularCallInfo &callInfo)
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
     int errCode = cellularCallInterfacePtr_->UnHoldCall(callInfo);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("unhold call failed, errcode:%{public}d", errCode);
@@ -275,7 +269,6 @@ int CellularCallConnection::SwitchCall(const CellularCallInfo &callInfo)
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
     int errCode = cellularCallInterfacePtr_->SwitchCall(callInfo);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("switch call failed, errcode:%{public}d", errCode);
@@ -290,7 +283,6 @@ int CellularCallConnection::IsEmergencyPhoneNumber(const std::string &phoneNum, 
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
     return cellularCallInterfacePtr_->IsEmergencyPhoneNumber(slotId, phoneNum, enabled);
 }
 
@@ -300,7 +292,6 @@ int CellularCallConnection::CombineConference(const CellularCallInfo &callInfo)
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
     int errCode = cellularCallInterfacePtr_->CombineConference(callInfo);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("combine conference failed, errcode:%{public}d", errCode);
@@ -315,7 +306,6 @@ int CellularCallConnection::SeparateConference(const CellularCallInfo &callInfo)
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
     int errCode = cellularCallInterfacePtr_->SeparateConference(callInfo);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("separate conference failed, errcode:%{public}d", errCode);
@@ -330,7 +320,6 @@ int CellularCallConnection::StartDtmf(char cDTMFCode, const CellularCallInfo &ca
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
     int errCode = cellularCallInterfacePtr_->StartDtmf(cDTMFCode, callInfo);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("start dtmf failed, errcode:%{public}d", errCode);
@@ -345,7 +334,6 @@ int CellularCallConnection::StopDtmf(const CellularCallInfo &callInfo)
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
     int errCode = cellularCallInterfacePtr_->StopDtmf(callInfo);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("stop dtmf failed, errcode:%{public}d", errCode);
@@ -372,7 +360,6 @@ int CellularCallConnection::SendDtmf(char cDTMFCode, const std::string &phoneNum
         TELEPHONY_LOGE("send dtmf return, strcpy_s fail.");
         return TELEPHONY_ERR_STRCPY_FAIL;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
     int errCode = cellularCallInterfacePtr_->SendDtmf(cDTMFCode, callInfo);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("send dtmf failed, errcode:%{public}d", errCode);
@@ -397,7 +384,6 @@ int CellularCallConnection::SetCallTransferInfo(const CallTransferInfo &info, in
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
     return cellularCallInterfacePtr_->SetCallTransferInfo(slotId, info);
 }
 
@@ -407,7 +393,6 @@ int CellularCallConnection::CanSetCallTransferTime(int32_t slotId, bool &result)
         TELEPHONY_LOGE("[slot%{public}d] ipc reconnect failed!", slotId);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
     return cellularCallInterfacePtr_->CanSetCallTransferTime(slotId, result);
 }
 
@@ -417,7 +402,6 @@ int CellularCallConnection::GetCallTransferInfo(CallTransferType type, int32_t s
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
     return cellularCallInterfacePtr_->GetCallTransferInfo(slotId, type);
 }
 
@@ -427,7 +411,6 @@ int CellularCallConnection::SetCallWaiting(bool activate, int32_t slotId)
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
     int errCode = cellularCallInterfacePtr_->SetCallWaiting(slotId, activate);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("SetCallWaiting failed, errcode:%{public}d", errCode);
@@ -442,7 +425,6 @@ int CellularCallConnection::GetCallWaiting(int32_t slotId)
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
     int errCode = cellularCallInterfacePtr_->GetCallWaiting(slotId);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("GetCallWaiting failed, errcode:%{public}d", errCode);
@@ -457,7 +439,6 @@ int CellularCallConnection::SetCallRestriction(const CallRestrictionInfo &info, 
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
     return cellularCallInterfacePtr_->SetCallRestriction(slotId, info);
 }
 
@@ -467,7 +448,6 @@ int CellularCallConnection::GetCallRestriction(CallRestrictionType facType, int3
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
     return cellularCallInterfacePtr_->GetCallRestriction(slotId, facType);
 }
 
@@ -477,7 +457,6 @@ int CellularCallConnection::SetCallPreferenceMode(int32_t slotId, int32_t mode)
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
     int errCode = cellularCallInterfacePtr_->SetDomainPreferenceMode(slotId, mode);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("SetCallPreferenceMode failed, errcode:%{public}d", errCode);
@@ -492,7 +471,6 @@ int CellularCallConnection::StartRtt(const CellularCallInfo &callInfo, std::u16s
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
     int32_t slotId = callInfo.slotId;
     int errCode = cellularCallInterfacePtr_->StartRtt(slotId, Str16ToStr8(msg));
     if (errCode != TELEPHONY_SUCCESS) {
@@ -508,7 +486,6 @@ int CellularCallConnection::StopRtt(const CellularCallInfo &callInfo)
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
     int32_t slotId = callInfo.slotId;
     int errCode = cellularCallInterfacePtr_->StopRtt(slotId);
     if (errCode != TELEPHONY_SUCCESS) {
@@ -524,7 +501,6 @@ int CellularCallConnection::RegisterCallBack(const sptr<ICallStatusCallback> &ca
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
     int errCode = cellularCallInterfacePtr_->RegisterCallManagerCallBack(callback);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("registerCallBack failed, errcode:%{public}d", errCode);
@@ -539,7 +515,6 @@ int32_t CellularCallConnection::ControlCamera(std::u16string cameraId, int32_t c
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
     int errCode = cellularCallInterfacePtr_->CtrlCamera(cameraId, callingUid, callingPid);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("cellularCallInterface CtrlCamera failed, errcode:%{public}d", errCode);
@@ -553,7 +528,6 @@ int32_t CellularCallConnection::SetPreviewWindow(VideoWindow &window)
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
     int errCode =
         cellularCallInterfacePtr_->SetPreviewWindow(window.x, window.y, window.z, window.width, window.height);
     if (errCode != TELEPHONY_SUCCESS) {
@@ -569,7 +543,6 @@ int32_t CellularCallConnection::SetDisplayWindow(VideoWindow &window)
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
     int errCode =
         cellularCallInterfacePtr_->SetDisplayWindow(window.x, window.y, window.z, window.width, window.height);
     if (errCode != TELEPHONY_SUCCESS) {
@@ -585,7 +558,6 @@ int32_t CellularCallConnection::SetCameraZoom(float zoomRatio)
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
     int errCode = cellularCallInterfacePtr_->SetCameraZoom(zoomRatio);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("SetCameraZoom failed, errcode:%{public}d", errCode);
@@ -600,7 +572,6 @@ int32_t CellularCallConnection::SetPausePicture(std::u16string path)
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
     int errCode = cellularCallInterfacePtr_->SetPauseImage(path);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("SetPauseImage failed, errcode:%{public}d", errCode);
@@ -615,7 +586,6 @@ int32_t CellularCallConnection::SetDeviceDirection(int32_t rotation)
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
     int errCode = cellularCallInterfacePtr_->SetDeviceDirection(rotation);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("SetDeviceDirection failed, errcode:%{public}d", errCode);
@@ -630,7 +600,6 @@ int32_t CellularCallConnection::SetImsSwitchStatus(int32_t slotId, bool active)
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
     int errCode = cellularCallInterfacePtr_->SetImsSwitchStatus(slotId, active);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("SetImsSwitchStatus failed, errcode:%{public}d", errCode);
@@ -645,7 +614,6 @@ int32_t CellularCallConnection::GetImsSwitchStatus(int32_t slotId, bool &enabled
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
     int errCode = cellularCallInterfacePtr_->GetImsSwitchStatus(slotId, enabled);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("GetImsSwitchStatus failed, errcode:%{public}d", errCode);
@@ -660,7 +628,6 @@ int32_t CellularCallConnection::SendUpdateCallMediaModeRequest(const CellularCal
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
     int errCode = cellularCallInterfacePtr_->UpdateImsCallMode(callInfo, mode);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("send media modify request failed, errcode:%{public}d", errCode);
@@ -675,7 +642,6 @@ int32_t CellularCallConnection::SetImsConfig(ImsConfigItem item, const std::stri
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
     int errCode = cellularCallInterfacePtr_->SetImsConfig(slotId, item, value);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("SetImsConfig for string value failed, errcode:%{public}d", errCode);
@@ -690,7 +656,6 @@ int32_t CellularCallConnection::SetImsConfig(ImsConfigItem item, int32_t value, 
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
     int errCode = cellularCallInterfacePtr_->SetImsConfig(slotId, item, value);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("SetImsConfig for int value failed, errcode:%{public}d", errCode);
@@ -705,7 +670,6 @@ int32_t CellularCallConnection::GetImsConfig(ImsConfigItem item, int32_t slotId)
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
     int errCode = cellularCallInterfacePtr_->GetImsConfig(slotId, item);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("GetImsConfig failed, errcode:%{public}d", errCode);
@@ -720,7 +684,6 @@ int32_t CellularCallConnection::SetImsFeatureValue(FeatureType type, int32_t val
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
     int errCode = cellularCallInterfacePtr_->SetImsFeatureValue(slotId, type, value);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("SetImsFeatureValue failed, errcode:%{public}d", errCode);
@@ -735,7 +698,6 @@ int32_t CellularCallConnection::GetImsFeatureValue(FeatureType type, int32_t slo
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
     int errCode = cellularCallInterfacePtr_->GetImsFeatureValue(slotId, type);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("GetImsFeatureValue failed, errcode:%{public}d", errCode);
@@ -750,7 +712,6 @@ int32_t CellularCallConnection::InviteToConference(const std::vector<std::string
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
     int errCode = cellularCallInterfacePtr_->InviteToConference(slotId, numberList);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("InviteToConference failed, errcode:%{public}d", errCode);
@@ -765,7 +726,6 @@ int32_t CellularCallConnection::SetMute(int32_t mute, int32_t slotId)
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
     int errCode = cellularCallInterfacePtr_->SetMute(slotId, mute);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("SetMute failed, errcode:%{public}d", errCode);

@@ -464,7 +464,6 @@ private:
     sptr<ISystemAbilityStatusChange> statusChangeListener_ = nullptr;
     bool connectState_;
     Utils::RWLock rwClientLock_;
-    std::mutex mutex_;
 };
 } // namespace Telephony
 } // namespace OHOS
