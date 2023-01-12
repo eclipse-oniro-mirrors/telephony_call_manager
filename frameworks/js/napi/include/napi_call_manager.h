@@ -165,6 +165,7 @@ private:
     static void NativeSetCallRestriction(napi_env env, void *data);
     static void NativeGetTransferNumber(napi_env env, void *data);
     static void NativeSetTransferNumber(napi_env env, void *data);
+    static void NativeCanSetCallTransferTime(napi_env env, void *data);
     static void NativeStartDTMF(napi_env env, void *data);
     static void NativeStopDTMF(napi_env env, void *data);
     static void NativeGetCallState(napi_env env, void *data);
