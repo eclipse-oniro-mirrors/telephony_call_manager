@@ -23,6 +23,7 @@
 #include "call_manager_errors.h"
 #include "call_manager_hisysevent.h"
 #include "cs_call.h"
+#include "datashare_predicates.h"
 #include "hitrace_meter.h"
 #include "ims_call.h"
 #include "ott_call.h"
@@ -278,7 +279,7 @@ void CallStatusManager::QueryCallerInfo(ContactInfo &contactInfo, std::string ph
         TELEPHONY_LOGE("callDataPtr is nullptr!");
         return;
     }
-    NativeRdb::DataAbilityPredicates predicates;
+    DataShare::DataSharePredicates predicates;
     predicates.EqualTo(DETAIL_INFO, phoneNum);
     predicates.And();
     predicates.EqualTo(CONTENT_TYPE, PHONE);

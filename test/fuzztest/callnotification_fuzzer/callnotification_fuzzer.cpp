@@ -173,9 +173,8 @@ void CallDataRdbObserverFunc(const uint8_t *data, size_t size)
 
     std::string message(reinterpret_cast<const char *>(data), size);
     std::shared_ptr<CallDataBaseHelper> callDataBaseHelper = DelayedSingleton<CallDataBaseHelper>::GetInstance();
-    NativeRdb::ValuesBucket values;
-    NativeRdb::DataAbilityPredicates predicates;
-    std::shared_ptr<NativeRdb::AbsSharedResultSet> resultSet;
+    DataShare::DataShareValuesBucket values;
+    DataShare::DataSharePredicates predicates;
     DialParaInfo paraInfo;
     sptr<CallBase> callObjectPtr = std::make_unique<CSCall>(paraInfo).release();
     ContactInfo contactInfo;
@@ -192,12 +191,10 @@ void CallDataRdbObserverFunc(const uint8_t *data, size_t size)
         return;
     }
 
-    callDataBaseHelper->CreateDataAHelper();
     callDataBaseHelper->UnRegisterObserver();
     callDataBaseHelper->Insert(values);
     callDataBaseHelper->Query(contactInfo, predicates);
     callDataBaseHelper->Delete(predicates);
-    callDataBaseHelper->ResultSetConvertToIndexer(resultSet);
 }
 
 void MissedCallNotificationFunc(const uint8_t *data, size_t size)

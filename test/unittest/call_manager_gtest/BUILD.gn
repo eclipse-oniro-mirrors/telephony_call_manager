@@ -45,7 +45,6 @@ ohos_unittest("tel_call_manager_gtest") {
   deps = [
     "${ability_runtime_inner_api_path}/ability_manager:ability_manager",
     "${ability_runtime_path}/frameworks/native/ability/native:abilitykit_native",
-    "${ability_runtime_path}/frameworks/native/ability/native:data_ability_helper",
     "//base/telephony/call_manager:tel_call_manager",
     "//base/telephony/call_manager/frameworks/native:tel_call_manager_api",
     "//foundation/communication/bluetooth/frameworks/inner:btframework",
@@ -60,11 +59,10 @@ ohos_unittest("tel_call_manager_gtest") {
     "c_utils:utils",
     "common_event_service:cesfwk_innerkits",
     "core_service:tel_core_service_api",
+    "data_share:datashare_consumer",
     "eventhandler:libeventhandler",
     "init:libbegetutil",
     "ipc:ipc_core",
-    "relational_store:native_dataability",
-    "relational_store:native_rdb",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
   ]

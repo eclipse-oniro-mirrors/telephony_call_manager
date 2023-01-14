@@ -64,7 +64,7 @@ void CallIncomingFilterManager::UpdateIncomingFilterData()
         TELEPHONY_LOGE("callDataPtr is nullptr!");
         return;
     }
-    NativeRdb::DataAbilityPredicates predicates;
+    DataShare::DataSharePredicates predicates;
     predicates.NotEqualTo("phone_number", std::string(""));
     phones_.clear();
     callDataPtr->Query(&phones_, predicates);
