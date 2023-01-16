@@ -18,10 +18,16 @@
 #include "call_policy.h"
 #include "call_request_handler.h"
 #include "call_request_process.h"
+#include "call_setting_manager.h"
 #include "cellular_call_connection.h"
 #include "common_event_manager.h"
 #include "common_event_support.h"
+#include "cs_call.h"
 #include "gtest/gtest.h"
+#include "incoming_call_notification.h"
+#include "missed_call_notification.h"
+#include "ott_call.h"
+#include "reject_call_sms.h"
 #include "report_call_info_handler.h"
 #include "telephony_errors.h"
 #include "telephony_hisysevent.h"
@@ -35,10 +41,13 @@ using namespace testing::ext;
 
 namespace {
 const int32_t INVALID_SLOTID = 2;
+const int32_t SIM1_SLOTID = 0;
 const int16_t CAMERA_ROTATION_0 = 0;
 const int16_t CAMERA_ROTATION_90 = 90;
 const int16_t CAMERA_ROTATION_180 = 180;
 const int16_t CAMERA_ROTATION_270 = 270;
+const int32_t INVALID_MODE = 0;
+constexpr const char *TEST_STR = "123";
 } // namespace
 
 class DemoHandler : public AppExecFwk::EventHandler {
@@ -657,6 +666,227 @@ HWTEST_F(BranchTest, Telephony_VideoCallState_005, Function | MediumTest | Level
         videoPauseState.RecieveUpdateCallMediaModeRequest(ImsCallMode::CALL_MODE_SEND_RECEIVE), TELEPHONY_ERR_SUCCESS);
     ASSERT_NE(
         videoPauseState.RecieveUpdateCallMediaModeRequest(ImsCallMode::CALL_MODE_VIDEO_PAUSED), TELEPHONY_ERR_SUCCESS);
+}
+
+/**
+ * @tc.number   Telephony_IncomingCallNotification_001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_IncomingCallNotification_001, Function | MediumTest | Level3)
+{
+    std::shared_ptr<IncomingCallNotification> incomingCallNotification = std::make_shared<IncomingCallNotification>();
+    sptr<CallBase> callObjectPtr = nullptr;
+    incomingCallNotification->NewCallCreated(callObjectPtr);
+    incomingCallNotification->CallStateUpdated(
+        callObjectPtr, TelCallState::CALL_STATUS_IDLE, TelCallState::CALL_STATUS_INCOMING);
+    incomingCallNotification->CallStateUpdated(
+        callObjectPtr, TelCallState::CALL_STATUS_INCOMING, TelCallState::CALL_STATUS_INCOMING);
+    incomingCallNotification->IncomingCallActivated(callObjectPtr);
+    incomingCallNotification->IncomingCallHungUp(callObjectPtr, false, "");
+    DialParaInfo info;
+    info.number = TEST_STR;
+    callObjectPtr = new CSCall(info);
+    incomingCallNotification->NewCallCreated(callObjectPtr);
+    callObjectPtr->SetTelCallState(TelCallState::CALL_STATUS_INCOMING);
+    incomingCallNotification->NewCallCreated(callObjectPtr);
+    incomingCallNotification->NewCallCreated(callObjectPtr);
+    incomingCallNotification->CallStateUpdated(
+        callObjectPtr, TelCallState::CALL_STATUS_IDLE, TelCallState::CALL_STATUS_INCOMING);
+    incomingCallNotification->CallStateUpdated(
+        callObjectPtr, TelCallState::CALL_STATUS_INCOMING, TelCallState::CALL_STATUS_INCOMING);
+    incomingCallNotification->IncomingCallActivated(callObjectPtr);
+    incomingCallNotification->IncomingCallHungUp(callObjectPtr, false, "");
+
+    DialParaInfo emptyNumberInfo;
+    sptr<CallBase> emptyNumberInfocall = new CSCall(emptyNumberInfo);
+    incomingCallNotification->CallStateUpdated(
+        emptyNumberInfocall, TelCallState::CALL_STATUS_INCOMING, TelCallState::CALL_STATUS_INCOMING);
+    incomingCallNotification->IncomingCallActivated(emptyNumberInfocall);
+    incomingCallNotification->IncomingCallHungUp(callObjectPtr, true, "");
+
+    DisconnectedDetails details;
+    incomingCallNotification->CallDestroyed(details);
+    incomingCallNotification->PublishIncomingCallNotification(emptyNumberInfocall);
+    ASSERT_EQ(incomingCallNotification->CancelIncomingCallNotification(), TELEPHONY_SUCCESS);
+    ASSERT_FALSE(incomingCallNotification->IsFullScreen());
+}
+
+/**
+ * @tc.number   Telephony_RejectCallSms_001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_RejectCallSms_001, Function | MediumTest | Level3)
+{
+    std::shared_ptr<RejectCallSms> rejectCallSms = std::make_shared<RejectCallSms>();
+    sptr<CallBase> callObjectPtr = nullptr;
+    rejectCallSms->IncomingCallHungUp(callObjectPtr, true, "");
+    DialParaInfo info;
+    info.number = TEST_STR;
+    callObjectPtr = new CSCall(info);
+    rejectCallSms->IncomingCallHungUp(callObjectPtr, true, "");
+    rejectCallSms->IncomingCallHungUp(callObjectPtr, false, "");
+    rejectCallSms->IncomingCallHungUp(callObjectPtr, false, TEST_STR);
+
+    std::u16string desAddr = u"123";
+    std::u16string text = u"";
+    rejectCallSms->SendMessage(INVALID_SLOTID, desAddr, text);
+    rejectCallSms->NewCallCreated(callObjectPtr);
+
+    DisconnectedDetails details;
+    rejectCallSms->CallDestroyed(details);
+    rejectCallSms->IncomingCallActivated(callObjectPtr);
+
+    rejectCallSms->CallStateUpdated(
+        callObjectPtr, TelCallState::CALL_STATUS_INCOMING, TelCallState::CALL_STATUS_INCOMING);
+
+    bool convertRet = rejectCallSms->ConvertToUtf16(TEST_STR) == desAddr;
+    ASSERT_TRUE(convertRet);
+}
+
+/**
+ * @tc.number   Telephony_MissedCallNotification_001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_MissedCallNotification_001, Function | MediumTest | Level3)
+{
+    std::shared_ptr<MissedCallNotification> missedCallNotification = std::make_shared<MissedCallNotification>();
+    sptr<CallBase> callObjectPtr = nullptr;
+
+    missedCallNotification->NewCallCreated(callObjectPtr);
+    missedCallNotification->CallStateUpdated(
+        callObjectPtr, TelCallState::CALL_STATUS_INCOMING, TelCallState::CALL_STATUS_INCOMING);
+
+    missedCallNotification->IncomingCallActivated(callObjectPtr);
+    missedCallNotification->IncomingCallHungUp(callObjectPtr, true, "");
+
+    DisconnectedDetails details;
+    missedCallNotification->CallDestroyed(details);
+
+    DialParaInfo info;
+    info.number = TEST_STR;
+    callObjectPtr = new CSCall(info);
+    missedCallNotification->CallStateUpdated(
+        callObjectPtr, TelCallState::CALL_STATUS_INCOMING, TelCallState::CALL_STATUS_INCOMING);
+    missedCallNotification->CallStateUpdated(
+        callObjectPtr, TelCallState::CALL_STATUS_DISCONNECTED, TelCallState::CALL_STATUS_INCOMING);
+
+    missedCallNotification->PublishMissedCallEvent(callObjectPtr);
+    missedCallNotification->PublishMissedCallNotification(callObjectPtr);
+    int32_t id = 1;
+    ASSERT_EQ(missedCallNotification->CancelMissedCallsNotification(id), TELEPHONY_SUCCESS);
+}
+
+/**
+ * @tc.number   Telephony_CallSettingManager_001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_CallSettingManager_001, Function | MediumTest | Level3)
+{
+    std::shared_ptr<CallSettingManager> callSettingManager = std::make_shared<CallSettingManager>();
+    ASSERT_NE(callSettingManager->SetCallWaiting(SIM1_SLOTID, true), TELEPHONY_SUCCESS);
+    ASSERT_NE(callSettingManager->SetCallWaiting(INVALID_SLOTID, true), TELEPHONY_SUCCESS);
+    ASSERT_NE(callSettingManager->GetCallWaiting(SIM1_SLOTID), TELEPHONY_SUCCESS);
+    ASSERT_NE(callSettingManager->GetCallWaiting(INVALID_SLOTID), TELEPHONY_SUCCESS);
+    ASSERT_NE(callSettingManager->GetCallRestriction(SIM1_SLOTID, CallRestrictionType::RESTRICTION_TYPE_ALL_INCOMING),
+        TELEPHONY_SUCCESS);
+    ASSERT_NE(callSettingManager->GetCallRestriction(INVALID_SLOTID, CallRestrictionType::RESTRICTION_TYPE_ALL_CALLS),
+        TELEPHONY_SUCCESS);
+
+    CallRestrictionInfo callRestrictionInfo = {
+        .password = "",
+        .fac = CallRestrictionType::RESTRICTION_TYPE_ALL_INCOMING,
+        .mode = CallRestrictionMode::RESTRICTION_MODE_DEACTIVATION,
+    };
+    callSettingManager->SetCallRestriction(SIM1_SLOTID, callRestrictionInfo);
+    callSettingManager->SetCallRestriction(INVALID_SLOTID, callRestrictionInfo);
+
+    CallTransferInfo callTransferInfo = {
+        .transferNum = "",
+        .settingType = CallTransferSettingType::CALL_TRANSFER_ENABLE,
+        .type = CallTransferType::TRANSFER_TYPE_BUSY,
+        .startHour = 1,
+        .startMinute = 1,
+        .endHour = 1,
+        .endMinute = 1,
+    };
+    ASSERT_NE(callSettingManager->SetCallTransferInfo(SIM1_SLOTID, callTransferInfo), TELEPHONY_SUCCESS);
+    ASSERT_NE(callSettingManager->SetCallTransferInfo(INVALID_SLOTID, callTransferInfo), TELEPHONY_SUCCESS);
+    bool result = false;
+    ASSERT_NE(callSettingManager->CanSetCallTransferTime(SIM1_SLOTID, result), TELEPHONY_SUCCESS);
+    ASSERT_NE(callSettingManager->SetCallPreferenceMode(SIM1_SLOTID, INVALID_MODE), TELEPHONY_SUCCESS);
+    ASSERT_NE(callSettingManager->SetCallPreferenceMode(SIM1_SLOTID, CS_VOICE_ONLY), TELEPHONY_SUCCESS);
+    ImsConfigItem item = ITEM_VIDEO_QUALITY;
+    ASSERT_NE(callSettingManager->GetImsConfig(SIM1_SLOTID, item), TELEPHONY_SUCCESS);
+    std::u16string value = u"";
+    ASSERT_NE(callSettingManager->SetImsConfig(SIM1_SLOTID, item, value), TELEPHONY_SUCCESS);
+    ASSERT_NE(callSettingManager->GetImsFeatureValue(SIM1_SLOTID, FeatureType::TYPE_VOICE_OVER_LTE), TELEPHONY_SUCCESS);
+    int32_t featureValue = 0;
+    ASSERT_NE(callSettingManager->SetImsFeatureValue(SIM1_SLOTID, FeatureType::TYPE_VOICE_OVER_LTE, featureValue),
+        TELEPHONY_SUCCESS);
+    ASSERT_NE(callSettingManager->EnableImsSwitch(SIM1_SLOTID), TELEPHONY_SUCCESS);
+    ASSERT_NE(callSettingManager->DisableImsSwitch(SIM1_SLOTID), TELEPHONY_SUCCESS);
+    bool enabled = false;
+    ASSERT_NE(callSettingManager->IsImsSwitchEnabled(SIM1_SLOTID, enabled), TELEPHONY_SUCCESS);
+}
+
+/**
+ * @tc.number   Telephony_OTTCall_001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_OTTCall_001, Function | MediumTest | Level3)
+{
+    DialParaInfo info;
+    info.number = TEST_STR;
+    std::shared_ptr<OTTCall> ottCall = std::make_shared<OTTCall>(info);
+    int32_t videoState = static_cast<int32_t>(VideoStateType::TYPE_VOICE);
+    CallAttributeInfo callAttributeInfo;
+    ottCall->GetCallAttributeInfo(callAttributeInfo);
+    ASSERT_EQ(ottCall->DialingProcess(), TELEPHONY_SUCCESS);
+    ASSERT_NE(ottCall->AnswerCall(videoState), TELEPHONY_SUCCESS);
+    ASSERT_NE(ottCall->RejectCall(), TELEPHONY_SUCCESS);
+    ASSERT_NE(ottCall->HangUpCall(), TELEPHONY_SUCCESS);
+    ASSERT_NE(ottCall->HoldCall(), TELEPHONY_SUCCESS);
+    ASSERT_NE(ottCall->UnHoldCall(), TELEPHONY_SUCCESS);
+    ASSERT_NE(ottCall->SwitchCall(), TELEPHONY_SUCCESS);
+    ASSERT_FALSE(ottCall->GetEmergencyState());
+    ASSERT_NE(ottCall->StartDtmf('a'), TELEPHONY_SUCCESS);
+    ASSERT_NE(ottCall->StopDtmf(), TELEPHONY_SUCCESS);
+    ASSERT_NE(ottCall->GetSlotId(), TELEPHONY_SUCCESS);
+    ASSERT_NE(ottCall->CombineConference(), TELEPHONY_SUCCESS);
+    ASSERT_EQ(ottCall->CanCombineConference(), TELEPHONY_SUCCESS);
+    ASSERT_NE(ottCall->SeparateConference(), TELEPHONY_SUCCESS);
+    ASSERT_NE(ottCall->CanSeparateConference(), TELEPHONY_SUCCESS);
+    ASSERT_EQ(ottCall->LaunchConference(), TELEPHONY_SUCCESS);
+    ASSERT_EQ(ottCall->ExitConference(), TELEPHONY_SUCCESS);
+    ASSERT_NE(ottCall->HoldConference(), TELEPHONY_SUCCESS);
+    int32_t mainCallId = 1;
+    ASSERT_EQ(ottCall->GetMainCallId(mainCallId), TELEPHONY_SUCCESS);
+    std::vector<std::u16string> subCallIdList;
+    ASSERT_NE(ottCall->GetSubCallIdList(subCallIdList), TELEPHONY_SUCCESS);
+    std::vector<std::u16string> callIdList;
+    ASSERT_NE(ottCall->GetCallIdListForConference(callIdList), TELEPHONY_SUCCESS);
+    ASSERT_EQ(ottCall->IsSupportConferenceable(), TELEPHONY_SUCCESS);
+    ImsCallMode mode = ImsCallMode::CALL_MODE_AUDIO_ONLY;
+    ASSERT_NE(ottCall->SendUpdateCallMediaModeRequest(mode), TELEPHONY_SUCCESS);
+    ASSERT_NE(ottCall->RecieveUpdateCallMediaModeRequest(mode), TELEPHONY_SUCCESS);
+    ASSERT_NE(ottCall->SendUpdateCallMediaModeResponse(mode), TELEPHONY_SUCCESS);
+    CallMediaModeResponse response;
+    ASSERT_NE(ottCall->ReceiveUpdateCallMediaModeResponse(response), TELEPHONY_SUCCESS);
+    ASSERT_NE(ottCall->DispatchUpdateVideoRequest(mode), TELEPHONY_SUCCESS);
+    ASSERT_NE(ottCall->DispatchUpdateVideoResponse(mode), TELEPHONY_SUCCESS);
+    int32_t mute = 0;
+    ASSERT_NE(ottCall->SetMute(mute, SIM1_SLOTID), TELEPHONY_SUCCESS);
+    OttCallRequestInfo requestInfo = {
+        .phoneNum = "",
+        .bundleName = "",
+        .videoState = VideoStateType::TYPE_VOICE,
+    };
+    ASSERT_EQ(ottCall->PackOttCallRequestInfo(requestInfo), TELEPHONY_SUCCESS);
 }
 } // namespace Telephony
 } // namespace OHOS
