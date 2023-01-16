@@ -551,9 +551,9 @@ napi_value NapiCallManager::DeclareCallStateToAppEnum(napi_env env, napi_value e
             NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(CallStateToApp::CALL_STATE_OFFHOOK))),
     };
     napi_value result = nullptr;
-    napi_define_class(env, "CallStateToApp", NAPI_AUTO_LENGTH, NapiCallManagerUtils::CreateEnumConstructor, nullptr,
+    napi_define_class(env, "CallState", NAPI_AUTO_LENGTH, NapiCallManagerUtils::CreateEnumConstructor, nullptr,
         sizeof(desc) / sizeof(*desc), desc, &result);
-    napi_set_named_property(env, exports, "CallStateToApp", result);
+    napi_set_named_property(env, exports, "CallState", result);
     return exports;
 }
 
