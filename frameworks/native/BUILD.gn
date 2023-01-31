@@ -68,5 +68,4 @@ ohos_shared_library("tel_call_manager_api") {
 
   part_name = "call_manager"
   subsystem_name = "telephony"
-  relative_install_dir = "module"
 }
