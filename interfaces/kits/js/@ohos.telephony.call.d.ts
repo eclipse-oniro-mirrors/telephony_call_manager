@@ -126,13 +126,13 @@ declare namespace call {
    * Checks whether a phone number is on the emergency number list.
    *
    * @param phoneNumber Indicates the phone number to check.
-   * @returns Returns {@code true} if the phone number is on the emergency number list;
+   * @param callback Returns {@code true} if the phone number is on the emergency number list;
+   * returns {@code false} otherwise.
    * @throws {BusinessError} 401 - Parameter error.
    * @throws {BusinessError} 8300001 - Invalid parameter value.
    * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
    * @throws {BusinessError} 8300003 - System internal error.
    * @throws {BusinessError} 8300999 - Unknown error code.
-   * returns {@code false} otherwise.
    * @since 7
    */
   function isEmergencyPhoneNumber(phoneNumber: string, callback: AsyncCallback<boolean>): void;
@@ -147,7 +147,7 @@ declare namespace call {
    *
    * @param phoneNumber Indicates the phone number to format.
    * @param options countryCode option
-   * @returns Returns the phone number after being formatted; returns an empty string if the input phone number is invalid.
+   * @param callback Returns the phone number after being formatted; returns an empty string if the input phone number is invalid.
    * @throws {BusinessError} 401 - Parameter error.
    * @throws {BusinessError} 8300001 - Invalid parameter value.
    * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
@@ -164,7 +164,7 @@ declare namespace call {
    *
    * @param phoneNumber Indicates the phone number to format.
    * @param countryCode Indicates a two-digit country code defined in ISO 3166-1.
-   * @returns Returns an E.164 number; returns an empty string if the input phone number is invalid.
+   * @param callback Returns an E.164 number; returns an empty string if the input phone number is invalid.
    * @throws {BusinessError} 401 - Parameter error.
    * @throws {BusinessError} 8300001 - Invalid parameter value.
    * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
@@ -178,8 +178,8 @@ declare namespace call {
   /**
    * Answers the incoming call.
    *
-   * @permission ohos.permission.ANSWER_CALL
    * @param callId Indicates the identifier of the call to answer.
+   * @permission ohos.permission.ANSWER_CALL
    * @throws {BusinessError} 201 - Permission denied.
    * @throws {BusinessError} 401 - Parameter error.
    * @throws {BusinessError} 8300001 - Invalid parameter value.
@@ -242,9 +242,9 @@ declare namespace call {
   /**
    * Reject the incoming call.
    *
-   * @permission ohos.permission.ANSWER_CALL
    * @param callId Indicates the identifier of the call to reject.
    * @param options Indicates the text message to reject.
+   * @permission ohos.permission.ANSWER_CALL
    * @throws {BusinessError} 201 - Permission denied.
    * @throws {BusinessError} 401 - Parameter error.
    * @throws {BusinessError} 8300001 - Invalid parameter value.
@@ -261,8 +261,8 @@ declare namespace call {
   /**
    * Reject the incoming call without callId.
    *
-   * @permission ohos.permission.ANSWER_CALL
    * @param options Indicates the text message to reject.
+   * @permission ohos.permission.ANSWER_CALL
    * @throws {BusinessError} 201 - Permission denied.
    * @throws {BusinessError} 401 - Parameter error.
    * @throws {BusinessError} 8300001 - Invalid parameter value.
@@ -276,6 +276,8 @@ declare namespace call {
   function reject(options: RejectMessageOptions, callback: AsyncCallback<void>): void;
 
   /**
+   * Keep a call on hold.
+   *
    * @permission ohos.permission.ANSWER_CALL
    * @param callId Indicates the identifier of the call.
    * @throws {BusinessError} 201 - Permission denied.
@@ -291,6 +293,8 @@ declare namespace call {
   function holdCall(callId: number): Promise<void>;
 
   /**
+   * Cancel call hold status.
+   *
    * @permission ohos.permission.ANSWER_CALL
    * @param callId Indicates the identifier of the call.
    * @throws {BusinessError} 201 - Permission denied.
@@ -306,6 +310,8 @@ declare namespace call {
   function unHoldCall(callId: number): Promise<void>;
 
   /**
+   * Switch call.
+   *
    * @permission ohos.permission.ANSWER_CALL
    * @param callId Indicates the identifier of the call.
    * @throws {BusinessError} 201 - Permission denied.
@@ -321,6 +327,8 @@ declare namespace call {
   function switchCall(callId: number): Promise<void>;
 
   /**
+   * Merge calls, merge two calls into conference calls.
+   *
    * @param callId Indicates the identifier of the call.
    * @throws {BusinessError} 401 - Parameter error.
    * @throws {BusinessError} 801 - Capability not supported.
@@ -334,6 +342,8 @@ declare namespace call {
   function combineConference(callId: number): Promise<void>;
 
   /**
+   * Get the main call Id.
+   *
    * @param callId Indicates the identifier of the call.
    * @returns Returns the main call id.
    * @throws {BusinessError} 401 - Parameter error.
@@ -348,6 +358,8 @@ declare namespace call {
   function getMainCallId(callId: number): Promise<number>;
 
   /**
+   * Get the list of sub-call Ids.
+   *
    * @param callId Indicates the identifier of the call.
    * @returns Returns the list of sub call ids.
    * @throws {BusinessError} 401 - Parameter error.
@@ -362,8 +374,10 @@ declare namespace call {
   function getSubCallIdList(callId: number): Promise<Array<string>>;
 
   /**
+   * Get the call Id list of the conference.
+   *
    * @param callId Indicates the identifier of the call.
-   * @returns Returns the call id list of conference calls.
+   * @param callback Returns the call id list of conference calls.
    * @throws {BusinessError} 401 - Parameter error.
    * @throws {BusinessError} 801 - Capability not supported.
    * @throws {BusinessError} 8300001 - Invalid parameter value.
@@ -376,10 +390,12 @@ declare namespace call {
   function getCallIdListForConference(callId: number): Promise<Array<string>>;
 
   /**
+   * Get call waiting status.
+   *
    * @permission ohos.permission.GET_TELEPHONY_STATE
    * @param slotId Indicates the card slot index number,
    * ranging from 0 to the maximum card slot index number supported by the device.
-   * @returns Returns call waiting status.
+   * @param callback Returns call waiting status.
    * @throws {BusinessError} 201 - Permission denied.
    * @throws {BusinessError} 401 - Parameter error.
    * @throws {BusinessError} 801 - Capability not supported.
@@ -393,6 +409,8 @@ declare namespace call {
   function getCallWaitingStatus(slotId: number): Promise<CallWaitingStatus>;
 
   /**
+   * Set call waiting.
+   *
    * @permission ohos.permission.SET_TELEPHONY_STATE
    * @param slotId Indicates the card slot index number,
    * ranging from 0 to the maximum card slot index number supported by the device.
@@ -410,6 +428,8 @@ declare namespace call {
   function setCallWaiting(slotId: number, activate: boolean): Promise<void>;
 
   /**
+   * Start DTMF(Dual Tone Multi Frequency).
+   *
    * @param callId Indicates the identifier of the call.
    * @throws {BusinessError} 401 - Parameter error.
    * @throws {BusinessError} 801 - Capability not supported.
@@ -423,6 +443,8 @@ declare namespace call {
   function startDTMF(callId: number, character: string): Promise<void>;
 
   /**
+   * Stop DTMF(Dual Tone Multi Frequency).
+   *
    * @param callId Indicates the identifier of the call.
    * @throws {BusinessError} 401 - Parameter error.
    * @throws {BusinessError} 801 - Capability not supported.
@@ -436,8 +458,10 @@ declare namespace call {
   function stopDTMF(callId: number): Promise<void>;
 
   /**
+   * Judge whether the emergency call is in progress.
+   *
    * @permission ohos.permission.SET_TELEPHONY_STATE
-   * @returns Returns {@code true} if the call is in emergency; returns {@code false} otherwise.
+   * @param callback Returns {@code true} if the call is in emergency; returns {@code false} otherwise.
    * @throws {BusinessError} 201 - Permission denied.
    * @throws {BusinessError} 401 - Parameter error.
    * @throws {BusinessError} 8300001 - Invalid parameter value.
@@ -451,6 +475,8 @@ declare namespace call {
   function isInEmergencyCall(): Promise<boolean>;
 
   /**
+   * Subscribe to the callDetailsChange event.
+   *
    * @permission ohos.permission.SET_TELEPHONY_STATE
    * @param callback Return the result of call details.
    * @throws {BusinessError} 201 - Permission denied.
@@ -465,6 +491,8 @@ declare namespace call {
   function on(type: 'callDetailsChange', callback: Callback<CallAttributeOptions>): void;
 
   /**
+   * Unsubscribe from the callDetailsChange event.
+   *
    * @permission ohos.permission.SET_TELEPHONY_STATE
    * @param callback Cancel call details registration.
    * @throws {BusinessError} 201 - Permission denied.
@@ -479,6 +507,8 @@ declare namespace call {
   function off(type: 'callDetailsChange', callback?: Callback<CallAttributeOptions>): void;
 
   /**
+   * Subscribe to the callEventChange event.
+   *
    * @permission ohos.permission.SET_TELEPHONY_STATE
    * @param callback Return the call event id.
    * @throws {BusinessError} 201 - Permission denied.
@@ -493,6 +523,8 @@ declare namespace call {
   function on(type: 'callEventChange', callback: Callback<CallEventOptions>): void;
 
   /**
+   * Unsubscribe from the callEventChange event.
+   *
    * @permission ohos.permission.SET_TELEPHONY_STATE
    * @param callback Cancel call event registration.
    * @throws {BusinessError} 201 - Permission denied.
@@ -507,6 +539,8 @@ declare namespace call {
   function off(type: 'callEventChange', callback?: Callback<CallEventOptions>): void;
 
   /**
+   * Subscribe to the callDisconnectedCause event.
+   *
    * @permission ohos.permission.SET_TELEPHONY_STATE
    * @param callback Return the call disconnection reason.
    * @throws {BusinessError} 201 - Permission denied.
@@ -521,6 +555,8 @@ declare namespace call {
   function on(type: 'callDisconnectedCause', callback: Callback<DisconnectedDetails>): void;
 
   /**
+   * Unsubscribe from the callDisconnectedCause event.
+   *
    * @permission ohos.permission.SET_TELEPHONY_STATE
    * @param callback Cancel the call disconnection reason registration.
    * @throws {BusinessError} 201 - Permission denied.
@@ -535,7 +571,7 @@ declare namespace call {
   function off(type: 'callDisconnectedCause', callback?: Callback<DisconnectedDetails>): void;
 
   /**
-   * Observe the result of MMI code
+   * Subscribe to the mmiCodeResult event.
    *
    * @param type Indicates the observer type.
    * @param callback Return the result of MMI code.
@@ -552,10 +588,10 @@ declare namespace call {
   function on(type: 'mmiCodeResult', callback: Callback<MmiCodeResults>): void;
 
   /**
-   * Unobserve the result of MMI code
+   * Unsubscribe from the mmiCodeResult event.
    *
    * @param type Indicates the observer type.
-   * @param callback Cancel mmicode result registration.
+   * @param callback Return the result of MMI code.
    * @permission ohos.permission.SET_TELEPHONY_STATE
    * @throws {BusinessError} 201 - Permission denied.
    * @throws {BusinessError} 401 - Parameter error.
@@ -569,7 +605,9 @@ declare namespace call {
   function off(type: 'mmiCodeResult', callback?: Callback<MmiCodeResults>): void;
 
   /**
-   * @returns Returns {@code true} If the device currently allows new calls; returns {@code false} otherwise.
+   * Judge whether to allow another new call.
+   *
+   * @param callback Returns {@code true} If the device currently allows new calls; returns {@code false} otherwise.
    * @throws {BusinessError} 401 - Parameter error.
    * @throws {BusinessError} 8300001 - Invalid parameter value.
    * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
@@ -582,6 +620,8 @@ declare namespace call {
   function isNewCallAllowed(): Promise<boolean>;
 
   /**
+   * Split conference call.
+   *
    * @param callId Indicates the identifier of the call.
    * @throws {BusinessError} 401 - Parameter error.
    * @throws {BusinessError} 8300001 - Invalid parameter value.
@@ -595,11 +635,13 @@ declare namespace call {
   function separateConference(callId: number): Promise<void>;
 
   /**
+   * Get call barring status.
+   *
    * @permission ohos.permission.GET_TELEPHONY_STATE
    * @param slotId Indicates the card slot index number,
    * ranging from 0 to the maximum card slot index number supported by the device.
    * @param type Indicates which type of call restriction to obtain.
-   * @returns Returns call restriction status.
+   * @param callback Returns call restriction status.
    * @throws {BusinessError} 201 - Permission denied.
    * @throws {BusinessError} 401 - Parameter error.
    * @throws {BusinessError} 801 - Capability not supported.
@@ -613,6 +655,8 @@ declare namespace call {
   function getCallRestrictionStatus(slotId: number, type: CallRestrictionType): Promise<RestrictionStatus>;
 
   /**
+   * Set call barring status.
+   *
    * @permission ohos.permission.SET_TELEPHONY_STATE
    * @param slotId Indicates the card slot index number,
    * ranging from 0 to the maximum card slot index number supported by the device.
@@ -630,11 +674,13 @@ declare namespace call {
   function setCallRestriction(slotId: number, info: CallRestrictionInfo): Promise<void>;
 
   /**
+   * Get call forwarding information.
+   *
    * @permission ohos.permission.GET_TELEPHONY_STATE
    * @param slotId Indicates the card slot index number,
    * ranging from 0 to the maximum card slot index number supported by the device.
    * @param type Indicates which type of call forwarding to obtain.
-   * @returns Returns call forwarding status.
+   * @param callback Returns call forwarding status.
    * @throws {BusinessError} 201 - Permission denied.
    * @throws {BusinessError} 401 - Parameter error.
    * @throws {BusinessError} 801 - Capability not supported.
@@ -648,6 +694,8 @@ declare namespace call {
   function getCallTransferInfo(slotId: number, type: CallTransferType): Promise<CallTransferResult>;
 
   /**
+   * Set call forwarding information.
+   *
    * @permission ohos.permission.SET_TELEPHONY_STATE
    * @param slotId Indicates the card slot index number,
    * ranging from 0 to the maximum card slot index number supported by the device.
@@ -672,7 +720,7 @@ declare namespace call {
    * @permission ohos.permission.GET_TELEPHONY_STATE
    * @param slotId Indicates the card slot index number,
    * ranging from 0 to the maximum card slot index number supported by the device.
-   * @returns Returns {@code true} if the device can set call transfer time; returns {@code false} otherwise.
+   * @param callback Returns {@code true} if the device can set call transfer time; returns {@code false} otherwise.
    * @throws {BusinessError} 201 - Permission denied.
    * @throws {BusinessError} 401 - Parameter error.
    * @throws {BusinessError} 8300001 - Invalid parameter value.
@@ -686,8 +734,10 @@ declare namespace call {
   function canSetCallTransferTime(slotId: number): Promise<boolean>;
 
   /**
+   * Judge whether the bell is ringing.
+   *
    * @permission ohos.permission.SET_TELEPHONY_STATE
-   * @returns Returns {@code true} if the device is ringing; returns {@code false} otherwise.
+   * @param callback Returns {@code true} if the device is ringing; returns {@code false} otherwise.
    * @throws {BusinessError} 201 - Permission denied.
    * @throws {BusinessError} 401 - Parameter error.
    * @throws {BusinessError} 8300001 - Invalid parameter value.
@@ -701,6 +751,8 @@ declare namespace call {
   function isRinging(): Promise<boolean>;
 
   /**
+   * Set mute during a call.
+   *
    * @throws {BusinessError} 401 - Parameter error.
    * @throws {BusinessError} 8300001 - Invalid parameter value.
    * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
@@ -713,6 +765,8 @@ declare namespace call {
   function setMuted(): Promise<void>;
 
   /**
+   * Unmute during a call.
+   *
    * @throws {BusinessError} 401 - Parameter error.
    * @throws {BusinessError} 8300001 - Invalid parameter value.
    * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
@@ -725,7 +779,7 @@ declare namespace call {
   function cancelMuted(): Promise<void>;
 
   /**
-   * Set the audio device
+   * Set the audio device.
    *
    * @param device Indicates the device of audio.
    * @param callback Returns {@code true} if the request is successful; returns {@code false} otherwise.
@@ -757,6 +811,8 @@ declare namespace call {
   function setAudioDevice(device: AudioDevice, options?: AudioDeviceOptions): Promise<void>;
 
   /**
+   * Join the conference call.
+   *
    * @param mainCallId Indicates the identifier of the main call.
    * @param callNumberList Indicates a call list.
    * @throws {BusinessError} 401 - Parameter error.
@@ -771,6 +827,8 @@ declare namespace call {
   function joinConference(mainCallId: number, callNumberList: Array<string>): Promise<void>;
 
   /**
+   * Update Ims call mode.
+   *
    * @param callId Indicates the identifier of the call.
    * @param mode Indicates the mode of the ims call.
    * @throws {BusinessError} 401 - Parameter error.
@@ -785,6 +843,8 @@ declare namespace call {
   function updateImsCallMode(callId: number, mode: ImsCallMode): Promise<void>;
 
   /**
+   * Turn on Ims switch.
+   *
    * @permission ohos.permission.SET_TELEPHONY_STATE
    * @param slotId Indicates the card slot index number,
    * ranging from 0 to the maximum card slot index number supported by the device.
@@ -801,6 +861,8 @@ declare namespace call {
   function enableImsSwitch(slotId: number): Promise<void>;
 
   /**
+   * Turn off Ims switch.
+   *
    * @permission ohos.permission.SET_TELEPHONY_STATE
    * @param slotId Indicates the card slot index number,
    * ranging from 0 to the maximum card slot index number supported by the device.
@@ -817,7 +879,11 @@ declare namespace call {
   function disableImsSwitch(slotId: number): Promise<void>;
 
   /**
-   * @returns Returns {@code true} If the ims switch is on; returns {@code false} otherwise.
+   * Judge whether the Ims switch is enabled.
+   *
+   * @param slotId Indicates the card slot index number,
+   * ranging from 0 to the maximum card slot index number supported by the device.
+   * @param callback Returns {@code true} If the ims switch is on; returns {@code false} otherwise.
    * @throws {BusinessError} 401 - Parameter error.
    * @throws {BusinessError} 8300001 - Invalid parameter value.
    * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
