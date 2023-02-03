@@ -1,4 +1,4 @@
-# Copyright (C) 2021 Huawei Device Co., Ltd.
+# Copyright (C) 2021 - 2023 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -26,7 +26,6 @@ ohos_executable("tel_call_manager_ui_test") {
   include_dirs = [
     "//base/telephony/call_manager/services/audio/include",
     "//foundation/graphic/graphic_2d/frameworks/surface/include",
-    "//drivers/peripheral/camera/interfaces/metadata/include",
     "//utils/system/safwk/native/include",
     "//drivers/hdf_core/framework/include/utils",
     "//drivers/hdf_core/adapter/uhdf2/utils/include",
@@ -44,7 +43,6 @@ ohos_executable("tel_call_manager_ui_test") {
 
   deps = [
     "${ability_runtime_path}/frameworks/native/ability/native:abilitykit_native",
-    "//drivers/peripheral/camera/interfaces/metadata:metadata",
     "//foundation/graphic/graphic_2d:libsurface",
   ]
 
@@ -57,6 +55,7 @@ ohos_executable("tel_call_manager_ui_test") {
     "call_manager:tel_call_manager_api",
     "common_event_service:cesfwk_innerkits",
     "core_service:tel_core_service_api",
+    "drivers_interface_camera:metadata",
     "eventhandler:libeventhandler",
     "ipc:ipc_core",
     "multimedia_audio_framework:audio_client",
