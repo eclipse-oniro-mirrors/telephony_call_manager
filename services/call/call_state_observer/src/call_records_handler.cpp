@@ -78,6 +78,7 @@ void CallRecordsHandler::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &eve
         bucket.Put(CALL_CREATE_TIME, timeStamp);
         bucket.Put(CALL_NUMBER_LOCATION, std::string(""));
         bucket.Put(CALL_PHOTO_ID, 0);
+        bucket.Put(CALL_SLOT_ID, info.slotId);
         callDataPtr_->Insert(bucket);
         return;
     }
