@@ -84,6 +84,12 @@ ohos_unittest("tel_call_manager_gtest") {
     defines += [ "CALL_MANAGER_IMS_LITE_UNSUPPORT" ]
   }
 
+  if (defined(global_parts_info) &&
+      defined(global_parts_info.communication_bluetooth) &&
+      global_parts_info.communication_bluetooth) {
+    defines += [ "ABILITY_BLUETOOTH_SUPPORT" ]
+  }
+
   if (is_standard_system) {
     external_deps += [ "hiviewdfx_hilog_native:libhilog" ]
   } else {
