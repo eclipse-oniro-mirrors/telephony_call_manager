@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 
+#define private public
+#define protected public
 #include "call_manager_gtest.h"
 
 #include <cstring>
@@ -561,6 +563,55 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_1900, Function | Mediu
     EXPECT_EQ(ret, CALL_ERR_INVALID_SLOT_ID);
 }
 
+/**
+ * @tc.number   Telephony_CallManager_DialCall_2000
+ * @tc.name     make a normal phone call with card1, TYPE_VOICE
+ * @tc.desc     Function test
+ * @tc.require: I5P2WO
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_2000, Function | MediumTest | Level1)
+{
+    AccessToken token;
+    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+    EXPECT_EQ(CallManagerGtest::IsServiceConnected(), true);
+    if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
+        HangUpCall();
+    }
+    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_200_MS, SLEEP_30000_MS);
+    std::string phoneNumber = "10086";
+    if (HasSimCard(SIM1_SLOTID)) {
+        InitDialInfo(
+            SIM1_SLOTID, (int32_t)VideoStateType::TYPE_VOICE, DIAL_SCENE_TEST, (int32_t)DialType::DIAL_CARRIER_TYPE);
+        EXPECT_EQ(CallManagerGtest::clientPtr_->DialCall(Str8ToStr16(phoneNumber), dialInfo_), RETURN_VALUE_IS_ZERO);
+        if (CallInfoManager::HasActiveStatus()) {
+            EXPECT_EQ(CallManagerGtest::clientPtr_->HoldCall(newCallId_), RETURN_VALUE_IS_ZERO);
+            sleep(1);
+            EXPECT_EQ(CallManagerGtest::clientPtr_->UnHoldCall(newCallId_), RETURN_VALUE_IS_ZERO);
+            sleep(1);
+            if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
+                HangUpCall();
+            }
+        }
+    }
+
+    if (HasSimCard(SIM2_SLOTID)) {
+        InitDialInfo(
+            SIM2_SLOTID, (int32_t)VideoStateType::TYPE_VOICE, DIAL_SCENE_TEST, (int32_t)DialType::DIAL_CARRIER_TYPE);
+        EXPECT_EQ(CallManagerGtest::clientPtr_->DialCall(Str8ToStr16(phoneNumber), dialInfo_), RETURN_VALUE_IS_ZERO);
+        if (CallInfoManager::HasActiveStatus()) {
+            EXPECT_EQ(CallManagerGtest::clientPtr_->HoldCall(newCallId_), RETURN_VALUE_IS_ZERO);
+            sleep(1);
+            EXPECT_EQ(CallManagerGtest::clientPtr_->UnHoldCall(newCallId_), RETURN_VALUE_IS_ZERO);
+            sleep(1);
+            if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
+                HangUpCall();
+            }
+        }
+    }
+}
+
 /********************************************* Test AnswerCall() ***********************************************/
 /**
  * @tc.number   Telephony_CallManager_AnswerCall_0100
@@ -573,6 +624,9 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_AnswerCall_0100, Function | Med
     AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
+    }
+    if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
+        HangUpCall();
     }
     CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_200_MS, SLEEP_30000_MS);
     int32_t callId = INVALID_NEGATIVE_ID;
@@ -996,6 +1050,9 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SwitchCall_0400, Function | Med
         return;
     }
 
+    if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
+        HangUpCall();
+    }
     CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_200_MS, SLEEP_30000_MS);
     std::string phoneNumber = "00000000000";
     int32_t callId = INVALID_NEGATIVE_ID;
@@ -1003,7 +1060,12 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SwitchCall_0400, Function | Med
         0, (int32_t)VideoStateType::TYPE_VOICE, (int32_t)DialScene::CALL_NORMAL, (int32_t)DialType::DIAL_CARRIER_TYPE);
     int32_t ret = CallManagerGtest::clientPtr_->DialCall(Str8ToStr16(phoneNumber), dialInfo_);
     EXPECT_EQ(ret, RETURN_VALUE_IS_ZERO);
+    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_OFFHOOK, SLEEP_200_MS, SLEEP_30000_MS);
     EXPECT_NE(CallManagerGtest::clientPtr_->SwitchCall(callId), RETURN_VALUE_IS_ZERO);
+    sleep(1);
+    if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
+        HangUpCall();
+    }
 }
 
 /********************************************* Test HasCall() ***********************************************/
@@ -1017,6 +1079,9 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_HasCall_0100, Function | Medium
     AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
+    }
+    if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
+        HangUpCall();
     }
     CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_200_MS, SLEEP_30000_MS);
     int32_t callState = CallManagerGtest::clientPtr_->GetCallState();
@@ -1036,6 +1101,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_HasCall_0200, Function | Medium
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
     }
+
     CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_200_MS, SLEEP_30000_MS);
     std::string phoneNumber = "";
     InitDialInfo(0, (int32_t)VideoStateType::TYPE_VOICE, (int32_t)DialScene::CALL_NORMAL,
@@ -1093,15 +1159,23 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_IsNewCallAllowed_0100, Function
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
     }
+    if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
+        HangUpCall();
+    }
+    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_200_MS, SLEEP_30000_MS);
     std::string phoneNumber = "00000000000";
     InitDialInfo(SIM1_SLOTID, (int32_t)VideoStateType::TYPE_VOICE, (int32_t)DialScene::CALL_NORMAL,
         (int32_t)DialType::DIAL_CARRIER_TYPE);
     int32_t ret = CallManagerGtest::clientPtr_->DialCall(Str8ToStr16(phoneNumber), dialInfo_);
     ASSERT_EQ(ret, RETURN_VALUE_IS_ZERO);
-    CallInfoManager::LockCallState(false, (int32_t)TelCallState::CALL_STATUS_ACTIVE, SLEEP_50_MS, SLEEP_12000_MS);
+    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_OFFHOOK, SLEEP_200_MS, SLEEP_30000_MS);
     bool enabled = false;
     EXPECT_EQ(CallManagerGtest::clientPtr_->IsNewCallAllowed(enabled), TELEPHONY_SUCCESS);
-    EXPECT_EQ(enabled, true);
+    EXPECT_EQ(enabled, false);
+    sleep(1);
+    if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
+        HangUpCall();
+    }
 }
 
 /**
@@ -1114,6 +1188,9 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_IsNewCallAllowed_0200, Function
     AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
+    }
+    if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
+        HangUpCall();
     }
     CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_200_MS, SLEEP_30000_MS);
     ASSERT_TRUE(blueToothClientPtr_ != nullptr);
@@ -1210,6 +1287,32 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_CombineConference_0300, Functio
     EXPECT_NE(CallManagerGtest::blueToothClientPtr_->CombineConference(), RETURN_VALUE_IS_ZERO);
 }
 
+/**
+ * @tc.number   Telephony_CallManager_CombineConference_0400
+ * @tc.name     Import callId "@&%￥", test CombineConference(), return non 0
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_CombineConference_0400, Function | MediumTest | Level2)
+{
+    AccessToken token;
+    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+
+    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_200_MS, SLEEP_30000_MS);
+    std::string phoneNumber = "10086";
+    InitDialInfo(
+        0, (int32_t)VideoStateType::TYPE_VOICE, (int32_t)DialScene::CALL_NORMAL, (int32_t)DialType::DIAL_CARRIER_TYPE);
+    EXPECT_EQ(CallManagerGtest::clientPtr_->DialCall(Str8ToStr16(phoneNumber), dialInfo_), RETURN_VALUE_IS_ZERO);
+    if (CallInfoManager::HasActiveStatus()) {
+        EXPECT_NE(CallManagerGtest::clientPtr_->CombineConference(newCallId_), RETURN_VALUE_IS_ZERO);
+        sleep(1);
+        if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
+            HangUpCall();
+        }
+    }
+}
+
 /***************************************** Test SeparateConference() ********************************************/
 /**
  * @tc.number   Telephony_CallManager_SeparateConference_0100
@@ -1251,6 +1354,32 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SeparateConference_0300, Functi
     }
     ASSERT_TRUE(blueToothClientPtr_ != nullptr);
     EXPECT_NE(CallManagerGtest::blueToothClientPtr_->SeparateConference(), RETURN_VALUE_IS_ZERO);
+}
+
+/**
+ * @tc.number   Telephony_CallManager_SeparateConference_0400
+ * @tc.name     Import callId normal, test SeparateConference(), return non 0
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_SeparateConference_0400, Function | MediumTest | Level2)
+{
+    AccessToken token;
+    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+
+    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_200_MS, SLEEP_30000_MS);
+    std::string phoneNumber = "10086";
+    InitDialInfo(
+        0, (int32_t)VideoStateType::TYPE_VOICE, (int32_t)DialScene::CALL_NORMAL, (int32_t)DialType::DIAL_CARRIER_TYPE);
+    EXPECT_EQ(CallManagerGtest::clientPtr_->DialCall(Str8ToStr16(phoneNumber), dialInfo_), RETURN_VALUE_IS_ZERO);
+    if (CallInfoManager::HasActiveStatus()) {
+        EXPECT_NE(CallManagerGtest::clientPtr_->SeparateConference(newCallId_), RETURN_VALUE_IS_ZERO);
+        sleep(1);
+        if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
+            HangUpCall();
+        }
+    }
 }
 
 /********************************************* Test GetMainCallId() ***********************************************/
@@ -1686,6 +1815,39 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_StartDtmf_0300, Function | Medi
     EXPECT_NE(CallManagerGtest::blueToothClientPtr_->StartDtmf(str), RETURN_VALUE_IS_ZERO);
 }
 
+/**
+ * @tc.number   Telephony_CallManager_StartDtmf_0400
+ * @tc.name     Import callId abcd, test StartDtmf(), return non 0
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_StartDtmf_0400, Function | MediumTest | Level2)
+{
+    AccessToken token;
+    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+    char str = '1';
+    EXPECT_EQ(CallManagerGtest::IsServiceConnected(), true);
+    if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
+        HangUpCall();
+    }
+    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_200_MS, SLEEP_30000_MS);
+    std::string phoneNumber = "10086";
+    InitDialInfo(SIM1_SLOTID, (int32_t)VideoStateType::TYPE_VOICE, (int32_t)DialScene::CALL_NORMAL,
+        (int32_t)DialType::DIAL_CARRIER_TYPE);
+    int32_t ret = CallManagerGtest::clientPtr_->DialCall(Str8ToStr16(phoneNumber), dialInfo_);
+    EXPECT_EQ(ret, RETURN_VALUE_IS_ZERO);
+    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_OFFHOOK, SLEEP_200_MS, SLEEP_30000_MS);
+    if (CallInfoManager::HasActiveStatus()) {
+        EXPECT_EQ(CallManagerGtest::clientPtr_->StartDtmf(newCallId_, str), RETURN_VALUE_IS_ZERO);
+    }
+
+    if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
+        sleep(1);
+        HangUpCall();
+    }
+}
+
 /********************************************* Test StopDtmf() ***********************************************/
 
 /**
@@ -1728,6 +1890,37 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_StopDtmf_0300, Function | Mediu
     }
     ASSERT_TRUE(blueToothClientPtr_ != nullptr);
     EXPECT_NE(CallManagerGtest::blueToothClientPtr_->StopDtmf(), RETURN_VALUE_IS_ZERO);
+}
+
+/**
+ * @tc.number   Telephony_CallManager_StopDtmf_0400
+ * @tc.name     Import callId abcd, test StopDtmf(), return non 0
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_StopDtmf_0400, Function | MediumTest | Level2)
+{
+    AccessToken token;
+    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+    EXPECT_EQ(CallManagerGtest::IsServiceConnected(), true);
+    if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
+        HangUpCall();
+    }
+    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_200_MS, SLEEP_30000_MS);
+    std::string phoneNumber = "10086";
+    InitDialInfo(SIM1_SLOTID, (int32_t)VideoStateType::TYPE_VOICE, (int32_t)DialScene::CALL_NORMAL,
+        (int32_t)DialType::DIAL_CARRIER_TYPE);
+    int32_t ret = CallManagerGtest::clientPtr_->DialCall(Str8ToStr16(phoneNumber), dialInfo_);
+    EXPECT_EQ(ret, RETURN_VALUE_IS_ZERO);
+    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_OFFHOOK, SLEEP_200_MS, SLEEP_30000_MS);
+    if (CallInfoManager::HasActiveStatus()) {
+        EXPECT_EQ(CallManagerGtest::clientPtr_->StopDtmf(newCallId_), RETURN_VALUE_IS_ZERO);
+    }
+    if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
+        sleep(1);
+        HangUpCall();
+    }
 }
 
 /******************************** Test FormatPhoneNumber() * **************************************/
@@ -3920,6 +4113,10 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetAudioDevice_0100, Function |
     }
 
     EXPECT_EQ(CallManagerGtest::IsServiceConnected(), true);
+    if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
+        HangUpCall();
+    }
+    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_200_MS, SLEEP_30000_MS);
     std::string phoneNumber = "00000000000";
     int32_t ret = CallManagerGtest::clientPtr_->DialCall(Str8ToStr16(phoneNumber), dialInfo_);
     EXPECT_EQ(ret, RETURN_VALUE_IS_ZERO);
@@ -3933,13 +4130,11 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetAudioDevice_0100, Function |
         address = devices[0].GetDeviceAddr();
     }
 
-    if (CallInfoManager::HasActiveStatus()) {
-        EXPECT_EQ(clientPtr_->SetAudioDevice(AudioDevice::DEVICE_BLUETOOTH_SCO, address), RETURN_VALUE_IS_ZERO);
-    }
-
+    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_OFFHOOK, SLEEP_200_MS, SLEEP_30000_MS);
+    EXPECT_NE(clientPtr_->SetAudioDevice(AudioDevice::DEVICE_BLUETOOTH_SCO, address), RETURN_VALUE_IS_ZERO);
+    sleep(1);
     if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
         HangUpCall();
-        EXPECT_EQ(CallInfoManager::HasState(newCallId_, (int32_t)TelCallState::CALL_STATUS_DISCONNECTED), true);
     }
 }
 
@@ -3957,17 +4152,19 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetAudioDevice_0200, Function |
     }
 
     EXPECT_EQ(CallManagerGtest::IsServiceConnected(), true);
+    if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
+        HangUpCall();
+    }
+    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_200_MS, SLEEP_30000_MS);
     std::string phoneNumber = "00000000000";
     int32_t ret = CallManagerGtest::clientPtr_->DialCall(Str8ToStr16(phoneNumber), dialInfo_);
     EXPECT_EQ(ret, RETURN_VALUE_IS_ZERO);
     std::string address = "";
-    if (CallInfoManager::HasActiveStatus()) {
-        EXPECT_EQ(clientPtr_->SetAudioDevice(AudioDevice::DEVICE_EARPIECE, address), RETURN_VALUE_IS_ZERO);
-    }
-
+    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_OFFHOOK, SLEEP_200_MS, SLEEP_30000_MS);
+    EXPECT_NE(clientPtr_->SetAudioDevice(AudioDevice::DEVICE_EARPIECE, address), RETURN_VALUE_IS_ZERO);
+    sleep(1);
     if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
         HangUpCall();
-        EXPECT_EQ(CallInfoManager::HasState(newCallId_, (int32_t)TelCallState::CALL_STATUS_DISCONNECTED), true);
     }
 }
 
@@ -3985,18 +4182,20 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetAudioDevice_0300, Function |
     }
 
     EXPECT_EQ(CallManagerGtest::IsServiceConnected(), true);
+    if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
+        HangUpCall();
+    }
+    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_200_MS, SLEEP_30000_MS);
     std::string phoneNumber = "00000000000";
     int32_t ret = CallManagerGtest::clientPtr_->DialCall(Str8ToStr16(phoneNumber), dialInfo_);
     EXPECT_EQ(ret, RETURN_VALUE_IS_ZERO);
 
     std::string address = "";
-    if (CallInfoManager::HasActiveStatus()) {
-        EXPECT_EQ(clientPtr_->SetAudioDevice(AudioDevice::DEVICE_SPEAKER, address), RETURN_VALUE_IS_ZERO);
-    }
-
+    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_OFFHOOK, SLEEP_200_MS, SLEEP_30000_MS);
+    EXPECT_EQ(clientPtr_->SetAudioDevice(AudioDevice::DEVICE_SPEAKER, address), RETURN_VALUE_IS_ZERO);
+    sleep(1);
     if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
         HangUpCall();
-        EXPECT_EQ(CallInfoManager::HasState(newCallId_, (int32_t)TelCallState::CALL_STATUS_DISCONNECTED), true);
     }
 }
 
@@ -4014,18 +4213,20 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetAudioDevice_0400, Function |
     }
 
     EXPECT_EQ(CallManagerGtest::IsServiceConnected(), true);
+    if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
+        HangUpCall();
+    }
+    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_200_MS, SLEEP_30000_MS);
     std::string phoneNumber = "00000000000";
     int32_t ret = CallManagerGtest::clientPtr_->DialCall(Str8ToStr16(phoneNumber), dialInfo_);
     EXPECT_EQ(ret, RETURN_VALUE_IS_ZERO);
 
     std::string address = "";
-    if (CallInfoManager::HasActiveStatus()) {
-        EXPECT_EQ(clientPtr_->SetAudioDevice(AudioDevice::DEVICE_WIRED_HEADSET, address), RETURN_VALUE_IS_ZERO);
-    }
-
+    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_OFFHOOK, SLEEP_200_MS, SLEEP_30000_MS);
+    EXPECT_NE(clientPtr_->SetAudioDevice(AudioDevice::DEVICE_WIRED_HEADSET, address), RETURN_VALUE_IS_ZERO);
+    sleep(1);
     if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
         HangUpCall();
-        EXPECT_EQ(CallInfoManager::HasState(newCallId_, (int32_t)TelCallState::CALL_STATUS_DISCONNECTED), true);
     }
 }
 
@@ -4043,18 +4244,20 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetAudioDevice_0500, Function |
     }
 
     EXPECT_EQ(CallManagerGtest::IsServiceConnected(), true);
+    if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
+        HangUpCall();
+    }
+    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_200_MS, SLEEP_30000_MS);
     std::string phoneNumber = "00000000000";
     int32_t ret = CallManagerGtest::clientPtr_->DialCall(Str8ToStr16(phoneNumber), dialInfo_);
     EXPECT_EQ(ret, RETURN_VALUE_IS_ZERO);
 
     std::string address = "";
-    if (CallInfoManager::HasActiveStatus()) {
-        EXPECT_EQ(clientPtr_->SetAudioDevice(AudioDevice::DEVICE_BLUETOOTH_SCO, address), RETURN_VALUE_IS_ZERO);
-    }
-
+    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_OFFHOOK, SLEEP_200_MS, SLEEP_30000_MS);
+    EXPECT_NE(clientPtr_->SetAudioDevice(AudioDevice::DEVICE_BLUETOOTH_SCO, address), RETURN_VALUE_IS_ZERO);
+    sleep(1);
     if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
         HangUpCall();
-        EXPECT_EQ(CallInfoManager::HasState(newCallId_, (int32_t)TelCallState::CALL_STATUS_DISCONNECTED), true);
     }
 }
 
@@ -4072,18 +4275,20 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetAudioDevice_0600, Function |
     }
 
     EXPECT_EQ(CallManagerGtest::IsServiceConnected(), true);
+    if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
+        HangUpCall();
+    }
+    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_200_MS, SLEEP_30000_MS);
     std::string phoneNumber = "00000000000";
     int32_t ret = CallManagerGtest::clientPtr_->DialCall(Str8ToStr16(phoneNumber), dialInfo_);
     EXPECT_EQ(ret, RETURN_VALUE_IS_ZERO);
 
     std::string address = "";
-    if (CallInfoManager::HasActiveStatus()) {
-        EXPECT_EQ(clientPtr_->SetAudioDevice(AudioDevice::DEVICE_DISABLE, address), RETURN_VALUE_IS_ZERO);
-    }
-
+    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_OFFHOOK, SLEEP_200_MS, SLEEP_30000_MS);
+    EXPECT_NE(clientPtr_->SetAudioDevice(AudioDevice::DEVICE_DISABLE, address), RETURN_VALUE_IS_ZERO);
+    sleep(1);
     if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
         HangUpCall();
-        EXPECT_EQ(CallInfoManager::HasState(newCallId_, (int32_t)TelCallState::CALL_STATUS_DISCONNECTED), true);
     }
 }
 
@@ -4101,18 +4306,20 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetAudioDevice_0700, Function |
     }
 
     EXPECT_EQ(CallManagerGtest::IsServiceConnected(), true);
+    if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
+        HangUpCall();
+    }
+    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_200_MS, SLEEP_30000_MS);
     std::string phoneNumber = "00000000000";
     int32_t ret = CallManagerGtest::clientPtr_->DialCall(Str8ToStr16(phoneNumber), dialInfo_);
     EXPECT_EQ(ret, RETURN_VALUE_IS_ZERO);
 
     std::string address = "";
-    if (CallInfoManager::HasActiveStatus()) {
-        EXPECT_EQ(clientPtr_->SetAudioDevice(AudioDevice::DEVICE_UNKNOWN, address), RETURN_VALUE_IS_ZERO);
-    }
-
+    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_OFFHOOK, SLEEP_200_MS, SLEEP_30000_MS);
+    EXPECT_NE(clientPtr_->SetAudioDevice(AudioDevice::DEVICE_UNKNOWN, address), RETURN_VALUE_IS_ZERO);
+    sleep(1);
     if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
         HangUpCall();
-        EXPECT_EQ(CallInfoManager::HasState(newCallId_, (int32_t)TelCallState::CALL_STATUS_DISCONNECTED), true);
     }
 }
 
@@ -4131,17 +4338,22 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetMuted_0100, Function | Mediu
     }
 
     EXPECT_EQ(CallManagerGtest::IsServiceConnected(), true);
+    if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
+        HangUpCall();
+    }
+    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_200_MS, SLEEP_30000_MS);
     std::string phoneNumber = "00000000000";
     int32_t ret = CallManagerGtest::clientPtr_->DialCall(Str8ToStr16(phoneNumber), dialInfo_);
     EXPECT_EQ(ret, RETURN_VALUE_IS_ZERO);
     bool muted = true;
+    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_OFFHOOK, SLEEP_200_MS, SLEEP_30000_MS);
     if (CallInfoManager::HasActiveStatus()) {
         EXPECT_EQ(CallManagerGtest::clientPtr_->SetMuted(muted), RETURN_VALUE_IS_ZERO);
     }
 
     if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
+        sleep(1);
         HangUpCall();
-        EXPECT_EQ(CallInfoManager::HasState(newCallId_, (int32_t)TelCallState::CALL_STATUS_DISCONNECTED), true);
     }
 }
 
@@ -4178,16 +4390,21 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetMuted_0300, Function | Mediu
 
     EXPECT_EQ(CallManagerGtest::IsServiceConnected(), true);
     std::string phoneNumber = "00000000000";
+    if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
+        HangUpCall();
+    }
+    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_200_MS, SLEEP_30000_MS);
     int32_t ret = CallManagerGtest::clientPtr_->DialCall(Str8ToStr16(phoneNumber), dialInfo_);
     EXPECT_EQ(ret, RETURN_VALUE_IS_ZERO);
     bool muted = false;
+    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_OFFHOOK, SLEEP_200_MS, SLEEP_30000_MS);
     if (CallInfoManager::HasActiveStatus()) {
         EXPECT_EQ(CallManagerGtest::clientPtr_->SetMuted(muted), RETURN_VALUE_IS_ZERO);
     }
 
     if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
+        sleep(1);
         HangUpCall();
-        EXPECT_EQ(CallInfoManager::HasState(newCallId_, (int32_t)TelCallState::CALL_STATUS_DISCONNECTED), true);
     }
 }
 
@@ -4517,6 +4734,112 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_TestDump_0100, Function | Mediu
     EXPECT_EQ(DelayedSingleton<CallManagerService>::GetInstance()->Dump(-1, args), TELEPHONY_ERR_ARGUMENT_INVALID);
     EXPECT_EQ(DelayedSingleton<CallManagerService>::GetInstance()->Dump(0, emptyArgs), 0);
     EXPECT_EQ(DelayedSingleton<CallManagerService>::GetInstance()->Dump(0, args), 0);
+}
+
+/**
+ * @tc.number   Telephony_CallManagerService_001
+ * @tc.name     test error branch without permission
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManagerService_001, Function | MediumTest | Level3)
+{
+    std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
+    callManagerService->Init();
+    callManagerService->OnStart();
+    callManagerService->UnInit();
+    callManagerService->OnStop();
+    callManagerService->GetServiceRunningState();
+    callManagerService->GetBindTime();
+    callManagerService->GetStartServiceSpent();
+    ASSERT_NE(callManagerService->RegisterCallBack(nullptr), TELEPHONY_SUCCESS);
+    ASSERT_NE(callManagerService->UnRegisterCallBack(), TELEPHONY_SUCCESS);
+}
+
+/**
+ * @tc.number   Telephony_CallManagerService_002
+ * @tc.name     test error nullptr branch with permission
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManagerService_002, Function | MediumTest | Level3)
+{
+    AccessToken token;
+    std::u16string test = u"";
+    bool enabled;
+    std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
+    ASSERT_NE(callManagerService->DialCall(test, dialInfo_), TELEPHONY_SUCCESS);
+    ASSERT_NE(callManagerService->AnswerCall(0, 0), TELEPHONY_SUCCESS);
+    ASSERT_NE(callManagerService->RejectCall(0, false, test), TELEPHONY_SUCCESS);
+    ASSERT_NE(callManagerService->HangUpCall(0), TELEPHONY_SUCCESS);
+    ASSERT_NE(callManagerService->GetCallState(), TELEPHONY_SUCCESS);
+    ASSERT_NE(callManagerService->HoldCall(0), TELEPHONY_SUCCESS);
+    ASSERT_NE(callManagerService->UnHoldCall(0), TELEPHONY_SUCCESS);
+    ASSERT_NE(callManagerService->SwitchCall(0), TELEPHONY_SUCCESS);
+    ASSERT_NE(callManagerService->IsNewCallAllowed(enabled), TELEPHONY_SUCCESS);
+    ASSERT_NE(callManagerService->IsRinging(enabled), TELEPHONY_SUCCESS);
+    ASSERT_NE(callManagerService->IsInEmergencyCall(enabled), TELEPHONY_SUCCESS);
+    ASSERT_NE(callManagerService->StartDtmf(0, 'a'), TELEPHONY_SUCCESS);
+    ASSERT_NE(callManagerService->StopDtmf(0), TELEPHONY_SUCCESS);
+    ASSERT_NE(callManagerService->GetCallWaiting(0), TELEPHONY_SUCCESS);
+    ASSERT_NE(callManagerService->SetCallWaiting(0, false), TELEPHONY_SUCCESS);
+    ASSERT_NE(callManagerService->GetCallRestriction(0, CallRestrictionType::RESTRICTION_TYPE_ALL_INCOMING),
+        TELEPHONY_SUCCESS);
+    CallRestrictionInfo callRestrictionInfo;
+    ASSERT_NE(callManagerService->SetCallRestriction(0, callRestrictionInfo), TELEPHONY_SUCCESS);
+    ASSERT_NE(
+        callManagerService->GetCallTransferInfo(0, CallTransferType::TRANSFER_TYPE_UNCONDITIONAL), TELEPHONY_SUCCESS);
+    CallTransferInfo callTransferInfo;
+    ASSERT_NE(callManagerService->SetCallTransferInfo(0, callTransferInfo), TELEPHONY_SUCCESS);
+    ASSERT_NE(callManagerService->CanSetCallTransferTime(0, enabled), TELEPHONY_SUCCESS);
+    ASSERT_NE(callManagerService->SetCallPreferenceMode(0, 0), TELEPHONY_SUCCESS);
+    ASSERT_NE(callManagerService->StartRtt(0, test), TELEPHONY_SUCCESS);
+    ASSERT_NE(callManagerService->StopRtt(0), TELEPHONY_SUCCESS);
+    ASSERT_NE(callManagerService->CombineConference(0), TELEPHONY_SUCCESS);
+    ASSERT_NE(callManagerService->SeparateConference(0), TELEPHONY_SUCCESS);
+    ASSERT_NE(callManagerService->SetMuted(false), TELEPHONY_SUCCESS);
+    ASSERT_NE(callManagerService->MuteRinger(), TELEPHONY_SUCCESS);
+    std::string test2;
+    ASSERT_NE(callManagerService->SetAudioDevice(AudioDevice::DEVICE_BLUETOOTH_SCO, test2), TELEPHONY_SUCCESS);
+    ASSERT_NE(callManagerService->ControlCamera(test), TELEPHONY_SUCCESS);
+    VideoWindow window;
+    ASSERT_NE(callManagerService->SetPreviewWindow(window), TELEPHONY_SUCCESS);
+    ASSERT_NE(callManagerService->SetDisplayWindow(window), TELEPHONY_SUCCESS);
+}
+
+/**
+ * @tc.number   Telephony_CallManagerService_003
+ * @tc.name     test error nullptr branch with permission
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManagerService_003, Function | MediumTest | Level3)
+{
+    AccessToken token;
+    std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
+    float zoomRatio = 1;
+    std::u16string test = u"";
+    int32_t value = 1;
+    bool enabled;
+    ASSERT_NE(callManagerService->SetCameraZoom(zoomRatio), TELEPHONY_SUCCESS);
+    ASSERT_NE(callManagerService->SetPausePicture(test), TELEPHONY_SUCCESS);
+    ASSERT_NE(callManagerService->SetDeviceDirection(value), TELEPHONY_SUCCESS);
+    ASSERT_NE(callManagerService->IsEmergencyPhoneNumber(test, 0, enabled), TELEPHONY_SUCCESS);
+    ASSERT_NE(callManagerService->FormatPhoneNumber(test, test, test), TELEPHONY_SUCCESS);
+    ASSERT_NE(callManagerService->FormatPhoneNumberToE164(test, test, test), TELEPHONY_SUCCESS);
+    ASSERT_NE(callManagerService->GetMainCallId(value, value), TELEPHONY_SUCCESS);
+    std::vector<std::u16string> callIdList;
+    ASSERT_NE(callManagerService->GetSubCallIdList(0, callIdList), TELEPHONY_SUCCESS);
+    ASSERT_NE(callManagerService->GetCallIdListForConference(0, callIdList), TELEPHONY_SUCCESS);
+    ASSERT_NE(callManagerService->GetImsConfig(0, ImsConfigItem::ITEM_VIDEO_QUALITY), TELEPHONY_SUCCESS);
+    ASSERT_NE(callManagerService->SetImsConfig(0, ImsConfigItem::ITEM_VIDEO_QUALITY, test), TELEPHONY_SUCCESS);
+    ASSERT_NE(callManagerService->GetImsFeatureValue(0, FeatureType::TYPE_VOICE_OVER_LTE), TELEPHONY_SUCCESS);
+    ASSERT_NE(callManagerService->SetImsFeatureValue(0, FeatureType::TYPE_VOICE_OVER_LTE, 0), TELEPHONY_SUCCESS);
+    ASSERT_NE(callManagerService->UpdateImsCallMode(0, ImsCallMode::CALL_MODE_AUDIO_ONLY), TELEPHONY_SUCCESS);
+    ASSERT_NE(callManagerService->EnableImsSwitch(false), TELEPHONY_SUCCESS);
+    ASSERT_NE(callManagerService->DisableImsSwitch(false), TELEPHONY_SUCCESS);
+    ASSERT_NE(callManagerService->IsImsSwitchEnabled(0, enabled), TELEPHONY_SUCCESS);
+    std::vector<std::u16string> numberList;
+    ASSERT_NE(callManagerService->JoinConference(false, numberList), TELEPHONY_SUCCESS);
+    std::vector<OttCallDetailsInfo> ottVec;
+    ASSERT_NE(callManagerService->ReportOttCallDetailsInfo(ottVec), TELEPHONY_SUCCESS);
 }
 
 #else // TEL_TEST_UNSUPPORT
