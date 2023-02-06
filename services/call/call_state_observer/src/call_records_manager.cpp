@@ -95,6 +95,7 @@ void CallRecordsManager::AddOneCallRecord(CallAttributeInfo &info)
     data.directionType = info.callDirection;
     data.answerType = info.answerType;
     data.countryCode = DEFAULT_COUNTRY_CODE;
+    data.slotId = info.accountId;
     std::string tmpStr("");
     (void)DelayedSingleton<CallNumberUtils>::GetInstance()->FormatPhoneNumber(
         std::string(data.phoneNumber), "CN", tmpStr);

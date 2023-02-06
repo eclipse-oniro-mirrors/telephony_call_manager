@@ -177,6 +177,7 @@ struct CallRecordInfo {
     CallDirection directionType;
     CallAnswerType answerType;
     int32_t countryCode;
+    int32_t slotId;
 };
 
 enum class CallAbilityEventId {
