@@ -191,6 +191,8 @@ declare namespace call {
    * @systemapi Hide this for inner system use.
    * @since 7
    */
+  function answer(callId: number, callback: AsyncCallback<void>): void;
+  function answer(callId?: number): Promise<void>;
   function answerCall(callId: number, callback: AsyncCallback<void>): void;
   function answerCall(callId?: number): Promise<void>;
 
@@ -207,6 +209,7 @@ declare namespace call {
    * @systemapi Hide this for inner system use.
    * @since 9
    */
+  function answer(callback: AsyncCallback<void>): void;
   function answerCall(callback: AsyncCallback<void>): void;
 
   /**
@@ -223,6 +226,8 @@ declare namespace call {
    * @systemapi Hide this for inner system use.
    * @since 7
    */
+  function hangup(callId: number, callback: AsyncCallback<void>): void;
+  function hangup(callId?: number): Promise<void>;
   function hangUpCall(callId: number, callback: AsyncCallback<void>): void;
   function hangUpCall(callId?: number): Promise<void>;
 
@@ -239,6 +244,7 @@ declare namespace call {
    * @systemapi Hide this for inner system use.
    * @since 9
    */
+  function hangup(callback: AsyncCallback<void>): void;
   function hangUpCall(callback: AsyncCallback<void>): void;
 
   /**
@@ -256,6 +262,9 @@ declare namespace call {
    * @systemapi Hide this for inner system use.
    * @since 7
    */
+  function reject(callId: number, callback: AsyncCallback<void>): void;
+  function reject(callId: number, options: RejectMessageOptions, callback: AsyncCallback<void>): void;
+  function reject(callId?: number, options?: RejectMessageOptions): Promise<void>;
   function rejectCall(callId: number, callback: AsyncCallback<void>): void;
   function rejectCall(callId: number, options: RejectMessageOptions, callback: AsyncCallback<void>): void;
   function rejectCall(callId?: number, options?: RejectMessageOptions): Promise<void>;
@@ -274,6 +283,8 @@ declare namespace call {
    * @systemapi Hide this for inner system use.
    * @since 9
    */
+  function reject(callback: AsyncCallback<void>): void;
+  function reject(options: RejectMessageOptions, callback: AsyncCallback<void>): void;
   function rejectCall(callback: AsyncCallback<void>): void;
   function rejectCall(options: RejectMessageOptions, callback: AsyncCallback<void>): void;
 
