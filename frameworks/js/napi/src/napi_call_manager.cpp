@@ -185,7 +185,13 @@ napi_value NapiCallManager::DeclareCallMediaEnum(napi_env env, napi_value export
         DECLARE_NAPI_STATIC_PROPERTY(
             "CALL_MODE_AUDIO_ONLY", NapiCallManagerUtils::ToInt32Value(env, CALL_MODE_AUDIO_ONLY)),
         DECLARE_NAPI_STATIC_PROPERTY(
+            "CALL_MODE_SEND_ONLY", NapiCallManagerUtils::ToInt32Value(env, CALL_MODE_SEND_ONLY)),
+        DECLARE_NAPI_STATIC_PROPERTY(
+            "CALL_MODE_RECEIVE_ONLY", NapiCallManagerUtils::ToInt32Value(env, CALL_MODE_RECEIVE_ONLY)),
+        DECLARE_NAPI_STATIC_PROPERTY(
             "CALL_MODE_SEND_RECEIVE", NapiCallManagerUtils::ToInt32Value(env, CALL_MODE_SEND_RECEIVE)),
+        DECLARE_NAPI_STATIC_PROPERTY(
+            "CALL_MODE_VIDEO_PAUSED", NapiCallManagerUtils::ToInt32Value(env, CALL_MODE_VIDEO_PAUSED)),
     };
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc));
     return exports;
