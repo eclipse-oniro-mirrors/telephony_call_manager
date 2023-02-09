@@ -734,7 +734,7 @@ declare namespace call {
   function canSetCallTransferTime(slotId: number): Promise<boolean>;
 
   /**
-   * Judge whether the bell is ringing.
+   * Jduge whether there is a ringing call.
    *
    * @permission ohos.permission.SET_TELEPHONY_STATE
    * @param callback Returns {@code true} if the device is ringing; returns {@code false} otherwise.
