@@ -64,6 +64,9 @@ napi_value NapiCallManager::DeclareCallBasisInterface(napi_env env, napi_value e
         DECLARE_NAPI_FUNCTION("answer", AnswerCall),
         DECLARE_NAPI_FUNCTION("reject", RejectCall),
         DECLARE_NAPI_FUNCTION("hangup", HangUpCall),
+        DECLARE_NAPI_FUNCTION("answerCall", AnswerCall),
+        DECLARE_NAPI_FUNCTION("rejectCall", RejectCall),
+        DECLARE_NAPI_FUNCTION("hangUpCall", HangUpCall),
         DECLARE_NAPI_FUNCTION("holdCall", HoldCall),
         DECLARE_NAPI_FUNCTION("unHoldCall", UnHoldCall),
         DECLARE_NAPI_FUNCTION("switchCall", SwitchCall),
@@ -182,7 +185,13 @@ napi_value NapiCallManager::DeclareCallMediaEnum(napi_env env, napi_value export
         DECLARE_NAPI_STATIC_PROPERTY(
             "CALL_MODE_AUDIO_ONLY", NapiCallManagerUtils::ToInt32Value(env, CALL_MODE_AUDIO_ONLY)),
         DECLARE_NAPI_STATIC_PROPERTY(
+            "CALL_MODE_SEND_ONLY", NapiCallManagerUtils::ToInt32Value(env, CALL_MODE_SEND_ONLY)),
+        DECLARE_NAPI_STATIC_PROPERTY(
+            "CALL_MODE_RECEIVE_ONLY", NapiCallManagerUtils::ToInt32Value(env, CALL_MODE_RECEIVE_ONLY)),
+        DECLARE_NAPI_STATIC_PROPERTY(
             "CALL_MODE_SEND_RECEIVE", NapiCallManagerUtils::ToInt32Value(env, CALL_MODE_SEND_RECEIVE)),
+        DECLARE_NAPI_STATIC_PROPERTY(
+            "CALL_MODE_VIDEO_PAUSED", NapiCallManagerUtils::ToInt32Value(env, CALL_MODE_VIDEO_PAUSED)),
     };
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc));
     return exports;
