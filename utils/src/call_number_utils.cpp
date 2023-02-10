@@ -79,7 +79,7 @@ int32_t CallNumberUtils::FormatNumberBase(const std::string phoneNumber, std::st
     if (phoneUtils_->IsValidNumber(parseResult)) {
         phoneUtils_->Format(parseResult, formatInfo, &formatNumber);
     }
-    if (formatNumber.empty() || formatNumber == "0" || phoneNumber == formatNumber) {
+    if (formatNumber.empty() || formatNumber == "0") {
         TELEPHONY_LOGE("FormatPhoneNumber failed!");
         return CALL_ERR_FORMAT_PHONE_NUMBER_FAILED;
     }
