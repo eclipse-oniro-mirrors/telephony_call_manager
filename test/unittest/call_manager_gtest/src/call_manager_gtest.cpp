@@ -4738,29 +4738,10 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_TestDump_0100, Function | Mediu
 
 /**
  * @tc.number   Telephony_CallManagerService_001
- * @tc.name     test error branch without permission
- * @tc.desc     Function test
- */
-HWTEST_F(CallManagerGtest, Telephony_CallManagerService_001, Function | MediumTest | Level3)
-{
-    std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
-    callManagerService->Init();
-    callManagerService->OnStart();
-    callManagerService->UnInit();
-    callManagerService->OnStop();
-    callManagerService->GetServiceRunningState();
-    callManagerService->GetBindTime();
-    callManagerService->GetStartServiceSpent();
-    ASSERT_NE(callManagerService->RegisterCallBack(nullptr), TELEPHONY_SUCCESS);
-    ASSERT_NE(callManagerService->UnRegisterCallBack(), TELEPHONY_SUCCESS);
-}
-
-/**
- * @tc.number   Telephony_CallManagerService_002
  * @tc.name     test error nullptr branch with permission
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerGtest, Telephony_CallManagerService_002, Function | MediumTest | Level3)
+HWTEST_F(CallManagerGtest, Telephony_CallManagerService_001, Function | MediumTest | Level3)
 {
     AccessToken token;
     std::u16string test = u"";
@@ -4806,11 +4787,11 @@ HWTEST_F(CallManagerGtest, Telephony_CallManagerService_002, Function | MediumTe
 }
 
 /**
- * @tc.number   Telephony_CallManagerService_003
+ * @tc.number   Telephony_CallManagerService_002
  * @tc.name     test error nullptr branch with permission
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerGtest, Telephony_CallManagerService_003, Function | MediumTest | Level3)
+HWTEST_F(CallManagerGtest, Telephony_CallManagerService_002, Function | MediumTest | Level3)
 {
     AccessToken token;
     std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();

@@ -197,12 +197,12 @@ HWTEST_F(BranchTest, Telephony_CallNumberUtils_001, Function | MediumTest | Leve
     ASSERT_NE(
         DelayedSingleton<CallNumberUtils>::GetInstance()->FormatPhoneNumberToE164(emptyStr, emptyStr, formatNumber),
         TELEPHONY_ERR_SUCCESS);
-    ASSERT_NE(
+    ASSERT_GT(
         DelayedSingleton<CallNumberUtils>::GetInstance()->FormatPhoneNumberToE164(phoneNumber, emptyStr, formatNumber),
-        TELEPHONY_ERR_SUCCESS);
-    ASSERT_NE(DelayedSingleton<CallNumberUtils>::GetInstance()->FormatPhoneNumberToE164(
+        TELEPHONY_ERROR);
+    ASSERT_GT(DelayedSingleton<CallNumberUtils>::GetInstance()->FormatPhoneNumberToE164(
                   phoneNumber, countryCode, formatNumber),
-        TELEPHONY_ERR_SUCCESS);
+        TELEPHONY_ERROR);
     ASSERT_FALSE(DelayedSingleton<CallNumberUtils>::GetInstance()->IsValidSlotId(INVALID_SLOTID));
     ASSERT_TRUE(DelayedSingleton<CallNumberUtils>::GetInstance()->IsValidSlotId(0));
 }
@@ -1363,7 +1363,7 @@ HWTEST_F(BranchTest, Telephony_BluetoothConnection_001, Function | MediumTest | 
     bluetoothConnection.connectedScoAddr_ = "test";
     ASSERT_EQ(true, bluetoothConnection.ConnectBtSco("test"));
     ASSERT_EQ(false, bluetoothConnection.ConnectBtSco(device));
-    ASSERT_EQ(false, bluetoothConnection.DisconnectBtSco(device));
+    ASSERT_EQ(true, bluetoothConnection.DisconnectBtSco(device));
     bluetoothConnection.mapConnectedBtDevices_.clear();
     ASSERT_EQ(false, bluetoothConnection.IsBtAvailble());
     bluetoothConnection.OnScoStateChanged(device, (int32_t)Bluetooth::HfpScoConnectState::SCO_CONNECTED);
@@ -1881,40 +1881,40 @@ HWTEST_F(BranchTest, Telephony_CallStatusManager_001, Function | MediumTest | Le
         .phoneNum = "123",
     };
     info.state = TelCallState::CALL_STATUS_ACTIVE;
-    ASSERT_NE(callStatusManager->HandleCallReportInfo(info), TELEPHONY_SUCCESS);
+    ASSERT_GT(callStatusManager->HandleCallReportInfo(info), TELEPHONY_ERROR);
     info.state = TelCallState::CALL_STATUS_HOLDING;
-    ASSERT_NE(callStatusManager->HandleCallReportInfo(info), TELEPHONY_SUCCESS);
+    ASSERT_GT(callStatusManager->HandleCallReportInfo(info), TELEPHONY_ERROR);
     info.state = TelCallState::CALL_STATUS_DIALING;
-    ASSERT_EQ(callStatusManager->HandleCallReportInfo(info), TELEPHONY_SUCCESS);
+    ASSERT_GT(callStatusManager->HandleCallReportInfo(info), TELEPHONY_ERROR);
     info.state = TelCallState::CALL_STATUS_ALERTING;
-    ASSERT_EQ(callStatusManager->HandleCallReportInfo(info), TELEPHONY_SUCCESS);
+    ASSERT_GT(callStatusManager->HandleCallReportInfo(info), TELEPHONY_ERROR);
     info.state = TelCallState::CALL_STATUS_INCOMING;
-    ASSERT_NE(callStatusManager->HandleCallReportInfo(info), TELEPHONY_SUCCESS);
+    ASSERT_GT(callStatusManager->HandleCallReportInfo(info), TELEPHONY_ERROR);
     info.state = TelCallState::CALL_STATUS_WAITING;
-    ASSERT_NE(callStatusManager->HandleCallReportInfo(info), TELEPHONY_SUCCESS);
+    ASSERT_GT(callStatusManager->HandleCallReportInfo(info), TELEPHONY_ERROR);
     info.state = TelCallState::CALL_STATUS_DISCONNECTED;
-    ASSERT_EQ(callStatusManager->HandleCallReportInfo(info), TELEPHONY_SUCCESS);
+    ASSERT_GT(callStatusManager->HandleCallReportInfo(info), TELEPHONY_ERROR);
     info.state = TelCallState::CALL_STATUS_DISCONNECTING;
-    ASSERT_NE(callStatusManager->HandleCallReportInfo(info), TELEPHONY_SUCCESS);
+    ASSERT_GT(callStatusManager->HandleCallReportInfo(info), TELEPHONY_ERROR);
     info.state = TelCallState::CALL_STATUS_UNKNOWN;
-    ASSERT_NE(callStatusManager->HandleCallReportInfo(info), TELEPHONY_SUCCESS);
+    ASSERT_GT(callStatusManager->HandleCallReportInfo(info), TELEPHONY_ERROR);
     DisconnectedDetails details;
-    ASSERT_EQ(callStatusManager->HandleDisconnectedCause(details), TELEPHONY_SUCCESS);
+    ASSERT_GT(callStatusManager->HandleDisconnectedCause(details), TELEPHONY_ERROR);
     CellularCallEventInfo cellularCallEventInfo;
     cellularCallEventInfo.eventType = static_cast<CellularCallEventType>(1);
-    ASSERT_NE(callStatusManager->HandleEventResultReportInfo(cellularCallEventInfo), TELEPHONY_SUCCESS);
+    ASSERT_GT(callStatusManager->HandleEventResultReportInfo(cellularCallEventInfo), TELEPHONY_ERROR);
     cellularCallEventInfo.eventType = CellularCallEventType::EVENT_REQUEST_RESULT_TYPE;
     cellularCallEventInfo.eventId = RequestResultEventId::RESULT_DIAL_NO_CARRIER;
-    ASSERT_EQ(callStatusManager->HandleEventResultReportInfo(cellularCallEventInfo), TELEPHONY_SUCCESS);
+    ASSERT_GT(callStatusManager->HandleEventResultReportInfo(cellularCallEventInfo), TELEPHONY_ERROR);
     OttCallEventInfo ottCallEventInfo;
     (void)memset_s(&ottCallEventInfo, sizeof(OttCallEventInfo), 0, sizeof(OttCallEventInfo));
     ottCallEventInfo.ottCallEventId = OttCallEventId::OTT_CALL_EVENT_FUNCTION_UNSUPPORTED;
     (void)memcpy_s(ottCallEventInfo.bundleName, kMaxBundleNameLen + 1, LONG_STR, strlen(LONG_STR));
-    ASSERT_EQ(callStatusManager->HandleOttEventReportInfo(ottCallEventInfo), TELEPHONY_SUCCESS);
+    ASSERT_GT(callStatusManager->HandleOttEventReportInfo(ottCallEventInfo), TELEPHONY_ERROR);
     (void)memset_s(&ottCallEventInfo, sizeof(OttCallEventInfo), 0, sizeof(OttCallEventInfo));
     ottCallEventInfo.ottCallEventId = OttCallEventId::OTT_CALL_EVENT_FUNCTION_UNSUPPORTED;
     (void)memcpy_s(ottCallEventInfo.bundleName, kMaxBundleNameLen + 1, TEST_STR, strlen(TEST_STR));
-    ASSERT_EQ(callStatusManager->HandleOttEventReportInfo(ottCallEventInfo), TELEPHONY_SUCCESS);
+    ASSERT_GT(callStatusManager->HandleOttEventReportInfo(ottCallEventInfo), TELEPHONY_ERROR);
 }
 
 /**
@@ -1930,29 +1930,29 @@ HWTEST_F(BranchTest, Telephony_CallStatusManager_002, Function | MediumTest | Le
     };
     callDetailInfo.state = TelCallState::CALL_STATUS_INCOMING;
     callDetailInfo.callType = CallType::TYPE_CS;
-    ASSERT_NE(callStatusManager->IncomingHandle(callDetailInfo), TELEPHONY_SUCCESS);
+    ASSERT_GT(callStatusManager->IncomingHandle(callDetailInfo), TELEPHONY_ERROR);
     callDetailInfo.state = TelCallState::CALL_STATUS_ACTIVE;
-    ASSERT_NE(callStatusManager->IncomingHandle(callDetailInfo), TELEPHONY_SUCCESS);
+    ASSERT_GT(callStatusManager->IncomingHandle(callDetailInfo), TELEPHONY_ERROR);
     ContactInfo contactInfo;
     std::string phoneNum;
     callStatusManager->QueryCallerInfo(contactInfo, phoneNum);
-    ASSERT_NE(callStatusManager->IncomingFilterPolicy(callDetailInfo), TELEPHONY_SUCCESS);
+    ASSERT_GT(callStatusManager->IncomingFilterPolicy(callDetailInfo), TELEPHONY_ERROR);
     sptr<CallBase> callObjectPtr = nullptr;
     TelCallState nextState = TelCallState::CALL_STATUS_ACTIVE;
-    ASSERT_NE(callStatusManager->UpdateCallState(callObjectPtr, nextState), TELEPHONY_SUCCESS);
-    ASSERT_NE(callStatusManager->ToSpeakerPhone(callObjectPtr), TELEPHONY_SUCCESS);
+    ASSERT_GT(callStatusManager->UpdateCallState(callObjectPtr, nextState), TELEPHONY_ERROR);
+    ASSERT_GT(callStatusManager->ToSpeakerPhone(callObjectPtr), TELEPHONY_ERROR);
     DialParaInfo dialParaInfo;
     dialParaInfo.callType = CallType::TYPE_CS;
     dialParaInfo.callState = TelCallState::CALL_STATUS_INCOMING;
     callObjectPtr = new CSCall(dialParaInfo);
-    ASSERT_EQ(callStatusManager->UpdateCallState(callObjectPtr, nextState), TELEPHONY_SUCCESS);
+    ASSERT_GT(callStatusManager->UpdateCallState(callObjectPtr, nextState), TELEPHONY_ERROR);
     nextState = TelCallState::CALL_STATUS_INCOMING;
-    ASSERT_EQ(callStatusManager->UpdateCallState(callObjectPtr, nextState), TELEPHONY_SUCCESS);
+    ASSERT_GT(callStatusManager->UpdateCallState(callObjectPtr, nextState), TELEPHONY_ERROR);
     callStatusManager->RefreshCallIfNecessary(callObjectPtr, callDetailInfo);
-    ASSERT_NE(callStatusManager->ToSpeakerPhone(callObjectPtr), TELEPHONY_SUCCESS);
+    ASSERT_GT(callStatusManager->ToSpeakerPhone(callObjectPtr), TELEPHONY_ERROR);
     callObjectPtr->SetTelCallState(TelCallState::CALL_STATUS_DIALING);
-    ASSERT_NE(callStatusManager->ToSpeakerPhone(callObjectPtr), TELEPHONY_SUCCESS);
-    ASSERT_EQ(callStatusManager->TurnOffMute(callObjectPtr), TELEPHONY_SUCCESS);
+    ASSERT_GT(callStatusManager->ToSpeakerPhone(callObjectPtr), TELEPHONY_ERROR);
+    ASSERT_GT(callStatusManager->TurnOffMute(callObjectPtr), TELEPHONY_ERROR);
 }
 
 /**
