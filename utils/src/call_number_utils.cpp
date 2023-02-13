@@ -49,7 +49,7 @@ int32_t CallNumberUtils::FormatPhoneNumber(
     }
     phoneUtils_->ParseAndKeepRawInput(phoneNumber, tmpCode, &parseResult);
     phoneUtils_->FormatInOriginalFormat(parseResult, tmpCode, &formatNumber);
-    if (formatNumber.empty() || formatNumber == "0" || phoneNumber == formatNumber) {
+    if (formatNumber.empty() || formatNumber == "0") {
         TELEPHONY_LOGE("FormatPhoneNumber failed!");
         return CALL_ERR_FORMAT_PHONE_NUMBER_FAILED;
     }
