@@ -1346,9 +1346,7 @@ HWTEST_F(BranchTest, Telephony_BluetoothConnection_001, Function | MediumTest | 
     ASSERT_EQ(true, bluetoothConnection.IsBtScoConnected());
     bluetoothConnection.SetBtScoState(BtScoState::SCO_STATE_DISCONNECTED);
     ASSERT_EQ(true, bluetoothConnection.DisconnectBtSco());
-    TELEPHONY_LOGI("wang Support try");
 #ifdef ABILITY_BLUETOOTH_SUPPORT
-    TELEPHONY_LOGI("wang Support");
     bluetoothConnection.Init();
     bluetoothConnection.SetBtScoState(BtScoState::SCO_STATE_UNKNOWN);
     bluetoothConnection.connectedScoAddr_ = "123456";
