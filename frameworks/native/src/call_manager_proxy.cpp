@@ -154,10 +154,13 @@ int32_t CallManagerProxy::RegisterCallBack(std::unique_ptr<CallManagerCallback> 
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     int32_t ret = callManagerServicePtr_->RegisterCallBack(callAbilityCallbackPtr_);
-    if (ret != TELEPHONY_SUCCESS && ret != TELEPHONY_ERR_PERMISSION_ERR) {
+    if (ret != TELEPHONY_SUCCESS) {
         callAbilityCallbackPtr_.clear();
         callAbilityCallbackPtr_ = nullptr;
         TELEPHONY_LOGE("register callback to call manager service failed,result: %{public}d", ret);
+        if (ret == TELEPHONY_ERR_PERMISSION_ERR) {
+            return TELEPHONY_ERR_PERMISSION_ERR;
+        }
         return TELEPHONY_ERR_REGISTER_CALLBACK_FAIL;
     }
     TELEPHONY_LOGI("register call ability callback success!");
