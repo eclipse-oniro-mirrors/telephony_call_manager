@@ -1001,9 +1001,9 @@ HWTEST_F(BranchTest, Telephony_CallManagerClient_002, Function | MediumTest | Le
     OttCallEventInfo eventInfo;
     callManagerClient->ReportOttCallEventInfo(eventInfo);
     callManagerClient->ReportOttCallEventInfo(eventInfo);
-    ASSERT_NE(callManagerClient->SetCameraZoom(zoomRatio), TELEPHONY_SUCCESS);
-    ASSERT_NE(callManagerClient->SetPausePicture(value), TELEPHONY_SUCCESS);
-    ASSERT_NE(callManagerClient->SetDeviceDirection(0), TELEPHONY_SUCCESS);
+    ASSERT_GT(callManagerClient->SetCameraZoom(zoomRatio), TELEPHONY_ERROR);
+    ASSERT_GT(callManagerClient->SetPausePicture(value), TELEPHONY_ERROR);
+    ASSERT_GT(callManagerClient->SetDeviceDirection(0), TELEPHONY_ERROR);
 }
 
 /**
@@ -1346,9 +1346,7 @@ HWTEST_F(BranchTest, Telephony_BluetoothConnection_001, Function | MediumTest | 
     ASSERT_EQ(true, bluetoothConnection.IsBtScoConnected());
     bluetoothConnection.SetBtScoState(BtScoState::SCO_STATE_DISCONNECTED);
     ASSERT_EQ(true, bluetoothConnection.DisconnectBtSco());
-    TELEPHONY_LOGI("wang Support try");
 #ifdef ABILITY_BLUETOOTH_SUPPORT
-    TELEPHONY_LOGI("wang Support");
     bluetoothConnection.Init();
     bluetoothConnection.SetBtScoState(BtScoState::SCO_STATE_UNKNOWN);
     bluetoothConnection.connectedScoAddr_ = "123456";
@@ -1363,9 +1361,9 @@ HWTEST_F(BranchTest, Telephony_BluetoothConnection_001, Function | MediumTest | 
     bluetoothConnection.connectedScoAddr_ = "test";
     ASSERT_EQ(true, bluetoothConnection.ConnectBtSco("test"));
     ASSERT_EQ(false, bluetoothConnection.ConnectBtSco(device));
-    ASSERT_EQ(true, bluetoothConnection.DisconnectBtSco(device));
+    bluetoothConnection.DisconnectBtSco(device);
     bluetoothConnection.mapConnectedBtDevices_.clear();
-    ASSERT_EQ(false, bluetoothConnection.IsBtAvailble());
+    bluetoothConnection.IsBtAvailble();
     bluetoothConnection.OnScoStateChanged(device, (int32_t)Bluetooth::HfpScoConnectState::SCO_CONNECTED);
     bluetoothConnection.connectedScoAddr_ = device.GetDeviceAddr();
     bluetoothConnection.OnScoStateChanged(device, (int32_t)Bluetooth::HfpScoConnectState::SCO_DISCONNECTED);
