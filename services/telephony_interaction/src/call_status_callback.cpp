@@ -53,6 +53,7 @@ int32_t CallStatusCallback::UpdateCallsReportInfo(const CallsReportInfo &info)
 {
     CallDetailsInfo detailsInfo;
     CallDetailInfo detailInfo;
+    detailInfo.index = 0;
     detailInfo.state = TelCallState::CALL_STATUS_UNKNOWN;
     CallsReportInfo callsInfo = info;
     std::vector<CallReportInfo>::iterator it = callsInfo.callVec.begin();

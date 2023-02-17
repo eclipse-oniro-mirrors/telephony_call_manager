@@ -105,12 +105,12 @@ public:
     virtual int32_t UnHoldCall(int32_t callId) = 0;
     virtual int32_t SwitchCall(int32_t callId) = 0;
     virtual bool HasCall() = 0;
-    virtual bool IsNewCallAllowed() = 0;
+    virtual int32_t IsNewCallAllowed(bool &enabled) = 0;
     virtual int32_t SetMuted(bool isMute) = 0;
     virtual int32_t MuteRinger() = 0;
     virtual int32_t SetAudioDevice(AudioDevice deviceType, const std::string &bluetoothAddress) = 0;
-    virtual bool IsRinging() = 0;
-    virtual bool IsInEmergencyCall() = 0;
+    virtual int32_t IsRinging(bool &enabled) = 0;
+    virtual int32_t IsInEmergencyCall(bool &enabled) = 0;
     virtual int32_t StartDtmf(int32_t callId, char str) = 0;
     virtual int32_t StopDtmf(int32_t callId) = 0;
     virtual int32_t GetCallWaiting(int32_t slotId) = 0;
@@ -121,14 +121,14 @@ public:
     virtual int32_t SetCallTransferInfo(int32_t slotId, CallTransferInfo &info) = 0;
     virtual int32_t CombineConference(int32_t mainCallId) = 0;
     virtual int32_t SeparateConference(int32_t callId) = 0;
-    virtual bool IsEmergencyPhoneNumber(std::u16string &number, int32_t slotId, int32_t &errorCode) = 0;
+    virtual int32_t IsEmergencyPhoneNumber(std::u16string &number, int32_t slotId, bool &enabled) = 0;
     virtual int32_t FormatPhoneNumber(
         std::u16string &number, std::u16string &countryCode, std::u16string &formatNumber) = 0;
     virtual int32_t FormatPhoneNumberToE164(
         std::u16string &number, std::u16string &countryCode, std::u16string &formatNumber) = 0;
-    virtual int32_t GetMainCallId(int32_t callId) = 0;
-    virtual std::vector<std::u16string> GetSubCallIdList(int32_t callId) = 0;
-    virtual std::vector<std::u16string> GetCallIdListForConference(int32_t callId) = 0;
+    virtual int32_t GetMainCallId(int32_t callId, int32_t &mainCallId) = 0;
+    virtual int32_t GetSubCallIdList(int32_t callId, std::vector<std::u16string> &callIdList) = 0;
+    virtual int32_t GetCallIdListForConference(int32_t callId, std::vector<std::u16string> &callIdList) = 0;
     virtual int32_t ControlCamera(std::u16string cameraId) = 0;
     virtual int32_t SetPreviewWindow(VideoWindow &window) = 0;
     virtual int32_t SetDisplayWindow(VideoWindow &window) = 0;

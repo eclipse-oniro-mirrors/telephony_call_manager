@@ -19,9 +19,9 @@
 #include <securec.h>
 
 #include "call_manager_errors.h"
-#include "telephony_log_wrapper.h"
-
 #include "napi_call_manager_utils.h"
+#include "napi_util.h"
+#include "telephony_log_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -398,7 +398,7 @@ int32_t NapiCallAbilityCallback::ReportCallState(CallAttributeInfo &info, EventC
 {
     napi_value callbackFunc = nullptr;
     napi_env env = stateCallback.env;
-    napi_value callbackValues[ARRAY_INDEX_THIRD] = {0};
+    napi_value callbackValues[ARRAY_INDEX_THIRD] = { 0 };
     napi_create_object(env, &callbackValues[ARRAY_INDEX_FIRST]);
     NapiCallManagerUtils::SetPropertyStringUtf8(
         env, callbackValues[ARRAY_INDEX_FIRST], "accountNumber", info.accountNumber);
@@ -473,14 +473,12 @@ int32_t NapiCallAbilityCallback::ReportCallEvent(CallEventInfo &info, EventCallb
 {
     napi_value callbackFunc = nullptr;
     napi_env env = eventCallback.env;
-    napi_value callbackValues[ARRAY_INDEX_THIRD] = {0};
+    napi_value callbackValues[ARRAY_INDEX_THIRD] = { 0 };
     napi_create_object(env, &callbackValues[ARRAY_INDEX_FIRST]);
     NapiCallManagerUtils::SetPropertyInt32(
         env, callbackValues[ARRAY_INDEX_FIRST], "eventId", static_cast<int32_t>(info.eventId));
-    NapiCallManagerUtils::SetPropertyStringUtf8(
-        env, callbackValues[ARRAY_INDEX_FIRST], "accountNumber", info.phoneNum);
-    NapiCallManagerUtils::SetPropertyStringUtf8(
-        env, callbackValues[ARRAY_INDEX_FIRST], "bundleName", info.bundleName);
+    NapiCallManagerUtils::SetPropertyStringUtf8(env, callbackValues[ARRAY_INDEX_FIRST], "accountNumber", info.phoneNum);
+    NapiCallManagerUtils::SetPropertyStringUtf8(env, callbackValues[ARRAY_INDEX_FIRST], "bundleName", info.bundleName);
     napi_get_reference_value(env, eventCallback.callbackRef, &callbackFunc);
     if (callbackFunc == nullptr) {
         TELEPHONY_LOGE("callbackFunc is null!");
@@ -625,13 +623,12 @@ int32_t NapiCallAbilityCallback::ReportMmiCode(MmiCodeInfo &info, EventCallback 
 {
     napi_value callbackFunc = nullptr;
     napi_env env = eventCallback.env;
-    napi_value callbackValues[ARRAY_INDEX_THIRD] = {0};
+    napi_value callbackValues[ARRAY_INDEX_THIRD] = { 0 };
     callbackValues[ARRAY_INDEX_FIRST] = NapiCallManagerUtils::CreateUndefined(env);
     napi_create_object(env, &callbackValues[ARRAY_INDEX_SECOND]);
     NapiCallManagerUtils::SetPropertyInt32(
         env, callbackValues[ARRAY_INDEX_SECOND], "result", static_cast<int32_t>(info.result));
-    NapiCallManagerUtils::SetPropertyStringUtf8(
-        env, callbackValues[ARRAY_INDEX_SECOND], "message", info.message);
+    NapiCallManagerUtils::SetPropertyStringUtf8(env, callbackValues[ARRAY_INDEX_SECOND], "message", info.message);
     napi_get_reference_value(env, eventCallback.callbackRef, &callbackFunc);
     if (callbackFunc == nullptr) {
         TELEPHONY_LOGE("callbackFunc is null!");
@@ -880,7 +877,7 @@ void NapiCallAbilityCallback::ReportWaitAndLimitInfo(AppExecFwk::PacMap &resultI
     int32_t result = resultInfo.GetIntValue("result");
     int32_t status = resultInfo.GetIntValue("status");
     if (supplementInfo.callbackRef != nullptr) {
-        napi_value callbackValues[ARRAY_INDEX_THIRD] = {0};
+        napi_value callbackValues[ARRAY_INDEX_THIRD] = { 0 };
         if (result == TELEPHONY_SUCCESS) {
             callbackValues[ARRAY_INDEX_FIRST] = NapiCallManagerUtils::CreateUndefined(env);
             napi_create_int32(env, status, &callbackValues[ARRAY_INDEX_SECOND]);
@@ -904,8 +901,7 @@ void NapiCallAbilityCallback::ReportWaitAndLimitInfo(AppExecFwk::PacMap &resultI
             napi_resolve_deferred(env, supplementInfo.deferred, promiseValue);
         } else {
             std::string errTip = std::to_string(CALL_ERR_NAPI_INTERFACE_FAILED);
-            napi_reject_deferred(
-                env, supplementInfo.deferred, NapiCallManagerUtils::CreateErrorMessage(env, errTip));
+            napi_reject_deferred(env, supplementInfo.deferred, NapiCallManagerUtils::CreateErrorMessage(env, errTip));
         }
     }
 }
@@ -933,7 +929,7 @@ void NapiCallAbilityCallback::ReportSupplementInfo(AppExecFwk::PacMap &resultInf
     NapiCallManagerUtils::SetPropertyStringUtf8(env, callbackValue, "number", resultInfo.GetStringValue("number"));
     int32_t result = resultInfo.GetIntValue("result");
     if (supplementInfo.callbackRef != nullptr) {
-        napi_value callbackValues[ARRAY_INDEX_THIRD] = {0};
+        napi_value callbackValues[ARRAY_INDEX_THIRD] = { 0 };
         if (result == TELEPHONY_SUCCESS) {
             callbackValues[ARRAY_INDEX_FIRST] = NapiCallManagerUtils::CreateUndefined(env);
             callbackValues[ARRAY_INDEX_SECOND] = callbackValue;
@@ -982,13 +978,14 @@ void NapiCallAbilityCallback::ReportExecutionResult(EventCallback &settingInfo, 
     napi_create_object(env, &callbackValue);
     int32_t result = resultInfo.GetIntValue("result");
     if (settingInfo.callbackRef != nullptr) {
-        napi_value callbackValues[ARRAY_INDEX_THIRD] = {0};
+        napi_value callbackValues[ARRAY_INDEX_THIRD] = { 0 };
         if (result == TELEPHONY_SUCCESS) {
             callbackValues[ARRAY_INDEX_FIRST] = NapiCallManagerUtils::CreateUndefined(env);
             napi_get_null(env, &callbackValues[ARRAY_INDEX_SECOND]);
         } else {
-            std::string errTip = std::to_string(CALL_ERR_NAPI_INTERFACE_FAILED);
-            callbackValues[ARRAY_INDEX_FIRST] = NapiCallManagerUtils::CreateErrorMessage(env, errTip);
+            JsError error = NapiUtil::ConverErrorMessageForJs(result);
+            callbackValues[ARRAY_INDEX_FIRST] =
+                NapiCallManagerUtils::CreateErrorMessageWithErrorCode(env, error.errorMessage, error.errorCode);
             callbackValues[ARRAY_INDEX_SECOND] = NapiCallManagerUtils::CreateUndefined(env);
         }
         napi_value callbackFunc = nullptr;
@@ -1005,8 +1002,9 @@ void NapiCallAbilityCallback::ReportExecutionResult(EventCallback &settingInfo, 
             napi_get_null(env, &promiseValue);
             napi_resolve_deferred(env, settingInfo.deferred, promiseValue);
         } else {
-            std::string errTip = std::to_string(CALL_ERR_NAPI_INTERFACE_FAILED);
-            napi_reject_deferred(env, settingInfo.deferred, NapiCallManagerUtils::CreateErrorMessage(env, errTip));
+            JsError error = NapiUtil::ConverErrorMessageForJs(result);
+            napi_reject_deferred(env, settingInfo.deferred,
+                NapiCallManagerUtils::CreateErrorMessageWithErrorCode(env, error.errorMessage, error.errorCode));
         }
     }
 }
@@ -1030,7 +1028,7 @@ void NapiCallAbilityCallback::ReportStartRttInfo(AppExecFwk::PacMap &resultInfo,
     napi_env env = supplementInfo.env;
     int32_t result = resultInfo.GetIntValue("result");
     if (supplementInfo.callbackRef != nullptr) {
-        napi_value callbackValues[ARRAY_INDEX_THIRD] = {0};
+        napi_value callbackValues[ARRAY_INDEX_THIRD] = { 0 };
         if (result == TELEPHONY_SUCCESS) {
             callbackValues[ARRAY_INDEX_FIRST] = NapiCallManagerUtils::CreateUndefined(env);
         } else {
@@ -1053,8 +1051,7 @@ void NapiCallAbilityCallback::ReportStartRttInfo(AppExecFwk::PacMap &resultInfo,
             napi_resolve_deferred(env, supplementInfo.deferred, promiseValue);
         } else {
             std::string errTip = std::to_string(CALL_ERR_NAPI_INTERFACE_FAILED);
-            napi_reject_deferred(
-                env, supplementInfo.deferred, NapiCallManagerUtils::CreateErrorMessage(env, errTip));
+            napi_reject_deferred(env, supplementInfo.deferred, NapiCallManagerUtils::CreateErrorMessage(env, errTip));
         }
     }
 }
@@ -1078,7 +1075,7 @@ void NapiCallAbilityCallback::ReportStopRttInfo(AppExecFwk::PacMap &resultInfo, 
     napi_env env = supplementInfo.env;
     int32_t result = resultInfo.GetIntValue("result");
     if (supplementInfo.callbackRef != nullptr) {
-        napi_value callbackValues[ARRAY_INDEX_THIRD] = {0};
+        napi_value callbackValues[ARRAY_INDEX_THIRD] = { 0 };
         if (result == TELEPHONY_SUCCESS) {
             callbackValues[ARRAY_INDEX_FIRST] = NapiCallManagerUtils::CreateUndefined(env);
         } else {
@@ -1101,8 +1098,7 @@ void NapiCallAbilityCallback::ReportStopRttInfo(AppExecFwk::PacMap &resultInfo, 
             napi_resolve_deferred(env, supplementInfo.deferred, promiseValue);
         } else {
             std::string errTip = std::to_string(CALL_ERR_NAPI_INTERFACE_FAILED);
-            napi_reject_deferred(
-                env, supplementInfo.deferred, NapiCallManagerUtils::CreateErrorMessage(env, errTip));
+            napi_reject_deferred(env, supplementInfo.deferred, NapiCallManagerUtils::CreateErrorMessage(env, errTip));
         }
     }
 }
@@ -1126,7 +1122,7 @@ void NapiCallAbilityCallback::ReportCallMediaModeInfo(AppExecFwk::PacMap &result
     napi_env env = supplementInfo.env;
     int32_t result = resultInfo.GetIntValue("result");
     if (supplementInfo.callbackRef != nullptr) {
-        napi_value callbackValues[ARRAY_INDEX_THIRD] = {0};
+        napi_value callbackValues[ARRAY_INDEX_THIRD] = { 0 };
         if (result == TELEPHONY_SUCCESS) {
             callbackValues[ARRAY_INDEX_FIRST] = NapiCallManagerUtils::CreateUndefined(env);
         } else {
@@ -1149,8 +1145,7 @@ void NapiCallAbilityCallback::ReportCallMediaModeInfo(AppExecFwk::PacMap &result
             napi_resolve_deferred(env, supplementInfo.deferred, promiseValue);
         } else {
             std::string errTip = std::to_string(result);
-            napi_reject_deferred(
-                env, supplementInfo.deferred, NapiCallManagerUtils::CreateErrorMessage(env, errTip));
+            napi_reject_deferred(env, supplementInfo.deferred, NapiCallManagerUtils::CreateErrorMessage(env, errTip));
         }
     }
 }
@@ -1174,7 +1169,7 @@ int32_t NapiCallAbilityCallback::ReportCallOtt(
 {
     napi_value callbackFunc = nullptr;
     napi_env env = settingInfo.env;
-    napi_value callbackValues[ARRAY_INDEX_THIRD] = {0};
+    napi_value callbackValues[ARRAY_INDEX_THIRD] = { 0 };
     napi_create_object(env, &callbackValues[ARRAY_INDEX_FIRST]);
     NapiCallManagerUtils::SetPropertyInt32(
         env, callbackValues[ARRAY_INDEX_FIRST], "requestId", static_cast<int32_t>(requestId));

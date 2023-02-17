@@ -58,9 +58,9 @@ public:
     virtual int32_t LaunchConference() = 0;
     virtual int32_t ExitConference() = 0;
     virtual int32_t HoldConference() = 0;
-    virtual int32_t GetMainCallId() = 0;
-    virtual std::vector<std::u16string> GetSubCallIdList() = 0;
-    virtual std::vector<std::u16string> GetCallIdListForConference() = 0;
+    virtual int32_t GetMainCallId(int32_t &mainCallId) = 0;
+    virtual int32_t GetSubCallIdList(std::vector<std::u16string> &callIdList) = 0;
+    virtual int32_t GetCallIdListForConference(std::vector<std::u16string> &callIdList) = 0;
     virtual int32_t IsSupportConferenceable() = 0;
     virtual int32_t SetMute(int32_t mute, int32_t slotId) = 0;
     int32_t DialCallBase();

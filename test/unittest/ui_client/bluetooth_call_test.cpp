@@ -126,7 +126,7 @@ public:
     AccessToken()
     {
         currentID_ = GetSelfTokenID();
-        AccessTokenIDEx tokenIdEx = AccessTokenKit::AllocHapToken(testInfoParamss, testPolicyParamss);
+        AccessTokenIDEx tokenIdEx = AccessTokenKit::AllocHapToken(testInfoParamsCase, testPolicyParamsCase);
         accessID_ = tokenIdEx.tokenIdExStruct.tokenID;
         SetSelfTokenID(accessID_);
     }
@@ -410,8 +410,10 @@ void BluetoothCallTest::IsNewCallAllowed()
         std::cout << "g_bluetoothCallPtr is nullptr" << std::endl;
         return;
     }
-    int32_t ret = g_bluetoothCallPtr->IsNewCallAllowed();
-    std::cout << "return value:" << ret << std::endl;
+    bool enabled = false;
+    int32_t ret = g_bluetoothCallPtr->IsNewCallAllowed(enabled);
+    std::cout << "ret:" << ret << std::endl;
+    std::cout << "enabled value:" << enabled << std::endl;
 }
 
 void BluetoothCallTest::IsRinging()
@@ -422,8 +424,10 @@ void BluetoothCallTest::IsRinging()
         std::cout << "g_bluetoothCallPtr is nullptr" << std::endl;
         return;
     }
-    int32_t ret = g_bluetoothCallPtr->IsRinging();
-    std::cout << "return value:" << ret << std::endl;
+    bool enabled = false;
+    int32_t ret = g_bluetoothCallPtr->IsRinging(enabled);
+    std::cout << "ret:" << ret << std::endl;
+    std::cout << "enabled value:" << enabled << std::endl;
 }
 
 void BluetoothCallTest::IsInEmergencyCall()
@@ -434,8 +438,10 @@ void BluetoothCallTest::IsInEmergencyCall()
         std::cout << "g_bluetoothCallPtr is nullptr" << std::endl;
         return;
     }
-    int32_t ret = g_bluetoothCallPtr->IsInEmergencyCall();
-    std::cout << "return value:" << ret << std::endl;
+    bool enabled = false;
+    int32_t ret = g_bluetoothCallPtr->IsInEmergencyCall(enabled);
+    std::cout << "ret:" << ret << std::endl;
+    std::cout << "enabled value:" << enabled << std::endl;
 }
 
 void BluetoothCallTest::StartDtmf()

@@ -174,37 +174,35 @@ int32_t CallManagerClient::SeparateConference(int32_t callId)
     }
 }
 
-int32_t CallManagerClient::GetMainCallId(int32_t &callId)
+int32_t CallManagerClient::GetMainCallId(int32_t &callId, int32_t &mainCallId)
 {
     if (g_callManagerProxy != nullptr) {
-        return g_callManagerProxy->GetMainCallId(callId);
+        return g_callManagerProxy->GetMainCallId(callId, mainCallId);
     } else {
         TELEPHONY_LOGE("init first please!");
         return TELEPHONY_ERR_UNINIT;
     }
 }
 
-std::vector<std::u16string> CallManagerClient::GetSubCallIdList(int32_t callId)
+int32_t CallManagerClient::GetSubCallIdList(int32_t callId, std::vector<std::u16string> &callIdList)
 {
     if (g_callManagerProxy != nullptr) {
-        return g_callManagerProxy->GetSubCallIdList(callId);
+        return g_callManagerProxy->GetSubCallIdList(callId, callIdList);
     } else {
         TELEPHONY_LOGE("init first please!");
-        std::vector<std::u16string> vec;
-        vec.clear();
-        return vec;
+        callIdList.clear();
+        return TELEPHONY_ERR_UNINIT;
     }
 }
 
-std::vector<std::u16string> CallManagerClient::GetCallIdListForConference(int32_t callId)
+int32_t CallManagerClient::GetCallIdListForConference(int32_t callId, std::vector<std::u16string> &callIdList)
 {
     if (g_callManagerProxy != nullptr) {
-        return g_callManagerProxy->GetCallIdListForConference(callId);
+        return g_callManagerProxy->GetCallIdListForConference(callId, callIdList);
     } else {
         TELEPHONY_LOGE("init first please!");
-        std::vector<std::u16string> vec;
-        vec.clear();
-        return vec;
+        callIdList.clear();
+        return TELEPHONY_ERR_UNINIT;
     }
 }
 
@@ -213,7 +211,7 @@ int32_t CallManagerClient::GetCallWaiting(int32_t slotId)
     if (g_callManagerProxy != nullptr) {
         return g_callManagerProxy->GetCallWaiting(slotId);
     } else {
-        TELEPHONY_LOGE("init first please!");
+        TELEPHONY_LOGE("[slot%{public}d] init first please!", slotId);
         return TELEPHONY_ERR_UNINIT;
     }
 }
@@ -223,7 +221,7 @@ int32_t CallManagerClient::SetCallWaiting(int32_t slotId, bool activate)
     if (g_callManagerProxy != nullptr) {
         return g_callManagerProxy->SetCallWaiting(slotId, activate);
     } else {
-        TELEPHONY_LOGE("init first please!");
+        TELEPHONY_LOGE("[slot%{public}d] init first please!", slotId);
         return TELEPHONY_ERR_UNINIT;
     }
 }
@@ -233,7 +231,7 @@ int32_t CallManagerClient::GetCallRestriction(int32_t slotId, CallRestrictionTyp
     if (g_callManagerProxy != nullptr) {
         return g_callManagerProxy->GetCallRestriction(slotId, type);
     } else {
-        TELEPHONY_LOGE("init first please!");
+        TELEPHONY_LOGE("[slot%{public}d] init first please!", slotId);
         return TELEPHONY_ERR_UNINIT;
     }
 }
@@ -243,7 +241,7 @@ int32_t CallManagerClient::SetCallRestriction(int32_t slotId, CallRestrictionInf
     if (g_callManagerProxy != nullptr) {
         return g_callManagerProxy->SetCallRestriction(slotId, info);
     } else {
-        TELEPHONY_LOGE("init first please!");
+        TELEPHONY_LOGE("[slot%{public}d] init first please!", slotId);
         return TELEPHONY_ERR_UNINIT;
     }
 }
@@ -253,7 +251,7 @@ int32_t CallManagerClient::GetCallTransferInfo(int32_t slotId, CallTransferType 
     if (g_callManagerProxy != nullptr) {
         return g_callManagerProxy->GetCallTransferInfo(slotId, type);
     } else {
-        TELEPHONY_LOGE("init first please!");
+        TELEPHONY_LOGE("[slot%{public}d] init first please!", slotId);
         return TELEPHONY_ERR_UNINIT;
     }
 }
@@ -263,7 +261,7 @@ int32_t CallManagerClient::SetCallTransferInfo(int32_t slotId, CallTransferInfo 
     if (g_callManagerProxy != nullptr) {
         return g_callManagerProxy->SetCallTransferInfo(slotId, info);
     } else {
-        TELEPHONY_LOGE("init first please!");
+        TELEPHONY_LOGE("[slot%{public}d] init first please!", slotId);
         return TELEPHONY_ERR_UNINIT;
     }
 }
@@ -273,7 +271,7 @@ int32_t CallManagerClient::SetCallPreferenceMode(int32_t slotId, int32_t mode)
     if (g_callManagerProxy != nullptr) {
         return g_callManagerProxy->SetCallPreferenceMode(slotId, mode);
     } else {
-        TELEPHONY_LOGE("init first please!");
+        TELEPHONY_LOGE("[slot%{public}d] init first please!", slotId);
         return TELEPHONY_ERR_UNINIT;
     }
 }
@@ -298,13 +296,13 @@ int32_t CallManagerClient::StopDtmf(int32_t callId)
     }
 }
 
-bool CallManagerClient::IsRinging()
+int32_t CallManagerClient::IsRinging(bool &enabled)
 {
     if (g_callManagerProxy != nullptr) {
-        return g_callManagerProxy->IsRinging();
+        return g_callManagerProxy->IsRinging(enabled);
     } else {
         TELEPHONY_LOGE("init first please!");
-        return false;
+        return TELEPHONY_ERR_UNINIT;
     }
 }
 
@@ -318,33 +316,33 @@ bool CallManagerClient::HasCall()
     }
 }
 
-bool CallManagerClient::IsNewCallAllowed()
+int32_t CallManagerClient::IsNewCallAllowed(bool &enabled)
 {
     if (g_callManagerProxy != nullptr) {
-        return g_callManagerProxy->IsNewCallAllowed();
+        return g_callManagerProxy->IsNewCallAllowed(enabled);
     } else {
         TELEPHONY_LOGE("init first please!");
-        return false;
+        return TELEPHONY_ERR_UNINIT;
     }
 }
 
-bool CallManagerClient::IsInEmergencyCall()
+int32_t CallManagerClient::IsInEmergencyCall(bool &enabled)
 {
     if (g_callManagerProxy != nullptr) {
-        return g_callManagerProxy->IsInEmergencyCall();
+        return g_callManagerProxy->IsInEmergencyCall(enabled);
     } else {
         TELEPHONY_LOGE("init first please!");
-        return false;
+        return TELEPHONY_ERR_UNINIT;
     }
 }
 
-bool CallManagerClient::IsEmergencyPhoneNumber(std::u16string &number, int32_t slotId, int32_t &errorCode)
+int32_t CallManagerClient::IsEmergencyPhoneNumber(std::u16string &number, int32_t slotId, bool &enabled)
 {
     if (g_callManagerProxy != nullptr) {
-        return g_callManagerProxy->IsEmergencyPhoneNumber(number, slotId, errorCode);
+        return g_callManagerProxy->IsEmergencyPhoneNumber(number, slotId, enabled);
     } else {
-        TELEPHONY_LOGE("init first please!");
-        return false;
+        TELEPHONY_LOGE("[slot%{public}d] init first please!", slotId);
+        return TELEPHONY_ERR_UNINIT;
     }
 }
 
@@ -465,7 +463,7 @@ int32_t CallManagerClient::GetImsConfig(int32_t slotId, ImsConfigItem item)
     if (g_callManagerProxy != nullptr) {
         return g_callManagerProxy->GetImsConfig(slotId, item);
     } else {
-        TELEPHONY_LOGE("init first please!");
+        TELEPHONY_LOGE("[slot%{public}d] init first please!", slotId);
         return TELEPHONY_ERR_UNINIT;
     }
 }
@@ -475,7 +473,7 @@ int32_t CallManagerClient::SetImsConfig(int32_t slotId, ImsConfigItem item, std:
     if (g_callManagerProxy != nullptr) {
         return g_callManagerProxy->SetImsConfig(slotId, item, value);
     } else {
-        TELEPHONY_LOGE("init first please!");
+        TELEPHONY_LOGE("[slot%{public}d] init first please!", slotId);
         return TELEPHONY_ERR_UNINIT;
     }
 }
@@ -485,7 +483,7 @@ int32_t CallManagerClient::GetImsFeatureValue(int32_t slotId, FeatureType type)
     if (g_callManagerProxy != nullptr) {
         return g_callManagerProxy->GetImsFeatureValue(slotId, type);
     } else {
-        TELEPHONY_LOGE("init first please!");
+        TELEPHONY_LOGE("[slot%{public}d] init first please!", slotId);
         return TELEPHONY_ERR_UNINIT;
     }
 }
@@ -495,7 +493,7 @@ int32_t CallManagerClient::SetImsFeatureValue(int32_t slotId, FeatureType type, 
     if (g_callManagerProxy != nullptr) {
         return g_callManagerProxy->SetImsFeatureValue(slotId, type, value);
     } else {
-        TELEPHONY_LOGE("init first please!");
+        TELEPHONY_LOGE("[slot%{public}d] init first please!", slotId);
         return TELEPHONY_ERR_UNINIT;
     }
 }
@@ -515,7 +513,7 @@ int32_t CallManagerClient::EnableImsSwitch(int32_t slotId)
     if (g_callManagerProxy != nullptr) {
         return g_callManagerProxy->EnableImsSwitch(slotId);
     } else {
-        TELEPHONY_LOGE("init first please!");
+        TELEPHONY_LOGE("[slot%{public}d] init first please!", slotId);
         return TELEPHONY_ERR_UNINIT;
     }
 }
@@ -525,7 +523,7 @@ int32_t CallManagerClient::DisableImsSwitch(int32_t slotId)
     if (g_callManagerProxy != nullptr) {
         return g_callManagerProxy->DisableImsSwitch(slotId);
     } else {
-        TELEPHONY_LOGE("init first please!");
+        TELEPHONY_LOGE("[slot%{public}d] init first please!", slotId);
         return TELEPHONY_ERR_UNINIT;
     }
 }
@@ -535,7 +533,7 @@ int32_t CallManagerClient::IsImsSwitchEnabled(int32_t slotId, bool &enabled)
     if (g_callManagerProxy != nullptr) {
         return g_callManagerProxy->IsImsSwitchEnabled(slotId, enabled);
     } else {
-        TELEPHONY_LOGE("init first please!");
+        TELEPHONY_LOGE("[slot%{public}d] init first please!", slotId);
         return TELEPHONY_ERR_UNINIT;
     }
 }

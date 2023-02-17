@@ -206,10 +206,10 @@ int32_t BluetoothCallClient::StopDtmf()
     }
 }
 
-bool BluetoothCallClient::IsRinging()
+int32_t BluetoothCallClient::IsRinging(bool &enabled)
 {
     if (g_callManagerProxyPtr != nullptr) {
-        return g_callManagerProxyPtr->IsRinging();
+        return g_callManagerProxyPtr->IsRinging(enabled);
     } else {
         TELEPHONY_LOGE("init first please!");
         return TELEPHONY_ERR_UNINIT;
@@ -226,20 +226,20 @@ bool BluetoothCallClient::HasCall()
     }
 }
 
-bool BluetoothCallClient::IsNewCallAllowed()
+int32_t BluetoothCallClient::IsNewCallAllowed(bool &enabled)
 {
     if (g_callManagerProxyPtr != nullptr) {
-        return g_callManagerProxyPtr->IsNewCallAllowed();
+        return g_callManagerProxyPtr->IsNewCallAllowed(enabled);
     } else {
         TELEPHONY_LOGE("init first please!");
         return TELEPHONY_ERR_UNINIT;
     }
 }
 
-bool BluetoothCallClient::IsInEmergencyCall()
+int32_t BluetoothCallClient::IsInEmergencyCall(bool &enabled)
 {
     if (g_callManagerProxyPtr != nullptr) {
-        return g_callManagerProxyPtr->IsInEmergencyCall();
+        return g_callManagerProxyPtr->IsInEmergencyCall(enabled);
     } else {
         TELEPHONY_LOGE("init first please!");
         return TELEPHONY_ERR_UNINIT;

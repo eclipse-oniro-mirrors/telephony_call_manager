@@ -55,9 +55,9 @@ public:
     int32_t SwitchCall(int32_t callId);
     int32_t CombineConference(int32_t callId);
     int32_t SeparateConference(int32_t callId);
-    int32_t GetMainCallId(int32_t &callId);
-    std::vector<std::u16string> GetSubCallIdList(int32_t callId);
-    std::vector<std::u16string> GetCallIdListForConference(int32_t callId);
+    int32_t GetMainCallId(int32_t &callId, int32_t &mainCallId);
+    int32_t GetSubCallIdList(int32_t callId, std::vector<std::u16string> &callIdList);
+    int32_t GetCallIdListForConference(int32_t callId, std::vector<std::u16string> &callIdList);
     int32_t GetCallWaiting(int32_t slotId);
     int32_t SetCallWaiting(int32_t slotId, bool activate);
     int32_t GetCallRestriction(int32_t slotId, CallRestrictionType type);
@@ -67,11 +67,11 @@ public:
     int32_t SetCallPreferenceMode(int32_t slotId, int32_t mode);
     int32_t StartDtmf(int32_t callId, char str);
     int32_t StopDtmf(int32_t callId);
-    bool IsRinging();
+    int32_t IsRinging(bool &enabled);
     bool HasCall();
-    bool IsNewCallAllowed();
-    bool IsInEmergencyCall();
-    bool IsEmergencyPhoneNumber(std::u16string &number, int32_t slotId, int32_t &errorCode);
+    int32_t IsNewCallAllowed(bool &enabled);
+    int32_t IsInEmergencyCall(bool &enabled);
+    int32_t IsEmergencyPhoneNumber(std::u16string &number, int32_t slotId, bool &enabled);
     int32_t FormatPhoneNumber(std::u16string &number, std::u16string &countryCode, std::u16string &formatNumber);
     int32_t FormatPhoneNumberToE164(
         std::u16string &number, std::u16string &countryCode, std::u16string &formatNumber);
