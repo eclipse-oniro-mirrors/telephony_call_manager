@@ -305,13 +305,21 @@ int32_t CallManagerServiceStub::OnHasCall(MessageParcel &data, MessageParcel &re
 
 int32_t CallManagerServiceStub::OnIsNewCallAllowed(MessageParcel &data, MessageParcel &reply)
 {
-    bool result = IsNewCallAllowed();
-    TELEPHONY_LOGI("result:%{public}d", result);
-    if (!reply.WriteBool(result)) {
-        TELEPHONY_LOGE("fail to write parcel");
+    bool enabled = false;
+    int32_t result = IsNewCallAllowed(enabled);
+    TELEPHONY_LOGI("OnIsNewCallAllowed result:%{public}d enabled:%{public}d", result, enabled);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("OnIsNewCallAllowed write reply failed.");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    return TELEPHONY_SUCCESS;
+    if (result != TELEPHONY_ERR_SUCCESS) {
+        return result;
+    }
+    if (!reply.WriteBool(enabled)) {
+        TELEPHONY_LOGE("OnIsNewCallAllowed fail to write parcel");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return result;
 }
 
 int32_t CallManagerServiceStub::OnSetMute(MessageParcel &data, MessageParcel &reply)
@@ -352,24 +360,40 @@ int32_t CallManagerServiceStub::OnSetAudioDevice(MessageParcel &data, MessagePar
 
 int32_t CallManagerServiceStub::OnIsRinging(MessageParcel &data, MessageParcel &reply)
 {
-    bool result = IsRinging();
-    TELEPHONY_LOGI("result:%{public}d", result);
-    if (!reply.WriteBool(result)) {
-        TELEPHONY_LOGE("fail to write parcel");
+    bool enabled = false;
+    int32_t result = IsRinging(enabled);
+    TELEPHONY_LOGI("result:%{public}d enabled:%{public}d", result, enabled);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("OnIsRinging write reply failed.");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    return TELEPHONY_SUCCESS;
+    if (result != TELEPHONY_ERR_SUCCESS) {
+        return result;
+    }
+    if (!reply.WriteBool(enabled)) {
+        TELEPHONY_LOGE("OnIsRinging fail to write parcel");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return result;
 }
 
 int32_t CallManagerServiceStub::OnIsInEmergencyCall(MessageParcel &data, MessageParcel &reply)
 {
-    bool result = IsInEmergencyCall();
-    TELEPHONY_LOGI("result:%{public}d", result);
-    if (!reply.WriteBool(result)) {
-        TELEPHONY_LOGE("fail to write parcel");
+    bool enabled = false;
+    int32_t result = IsInEmergencyCall(enabled);
+    TELEPHONY_LOGI("result:%{public}d enabled:%{public}d", result, enabled);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("OnIsInEmergencyCall write reply failed.");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    return TELEPHONY_SUCCESS;
+    if (result != TELEPHONY_ERR_SUCCESS) {
+        return result;
+    }
+    if (!reply.WriteBool(enabled)) {
+        TELEPHONY_LOGE("OnIsInEmergencyCall fail to write parcel");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return result;
 }
 
 int32_t CallManagerServiceStub::OnStartDtmf(MessageParcel &data, MessageParcel &reply)
@@ -644,11 +668,18 @@ int32_t CallManagerServiceStub::OnIsEmergencyPhoneNumber(MessageParcel &data, Me
 {
     std::u16string callNumber = data.ReadString16();
     int32_t slotId = data.ReadInt32();
-    int32_t errorCode = TELEPHONY_ERR_FAIL;
-    bool result = IsEmergencyPhoneNumber(callNumber, slotId, errorCode);
-    TELEPHONY_LOGI("result:%{public}d", result);
-    if (!reply.WriteBool(result) || !reply.WriteInt32(errorCode)) {
-        TELEPHONY_LOGE("fail to write parcel");
+    bool enabled = false;
+    int32_t result = IsEmergencyPhoneNumber(callNumber, slotId, enabled);
+    TELEPHONY_LOGI("OnIsEmergencyPhoneNumber result:%{public}d enabled:%{public}d", result, enabled);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("OnIsEmergencyPhoneNumber write reply failed.");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    if (result != TELEPHONY_ERR_SUCCESS) {
+        return result;
+    }
+    if (!reply.WriteBool(enabled)) {
+        TELEPHONY_LOGE("OnIsEmergencyPhoneNumber fail to write parcel");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
     return TELEPHONY_SUCCESS;
@@ -661,8 +692,15 @@ int32_t CallManagerServiceStub::OnFormatPhoneNumber(MessageParcel &data, Message
     std::u16string formatNumber;
     int32_t result = FormatPhoneNumber(callNumber, countryCode, formatNumber);
     TELEPHONY_LOGI("result:%{public}d", result);
-    if (!reply.WriteString16(formatNumber) || !reply.WriteInt32(result)) {
-        TELEPHONY_LOGE("fail to write parcel");
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("OnFormatPhoneNumber write reply failed.");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    if (result != TELEPHONY_ERR_SUCCESS) {
+        return result;
+    }
+    if (!reply.WriteString16(formatNumber)) {
+        TELEPHONY_LOGE("OnFormatPhoneNumber fail to write parcel");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
     return TELEPHONY_SUCCESS;
@@ -675,8 +713,15 @@ int32_t CallManagerServiceStub::OnFormatPhoneNumberToE164(MessageParcel &data, M
     std::u16string formatNumber;
     int32_t result = FormatPhoneNumberToE164(callNumber, countryCode, formatNumber);
     TELEPHONY_LOGI("result:%{public}d", result);
-    if (!reply.WriteString16(formatNumber) || !reply.WriteInt32(result)) {
-        TELEPHONY_LOGE("fail to write parcel");
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("OnFormatPhoneNumberToE164 write reply failed.");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    if (result != TELEPHONY_ERR_SUCCESS) {
+        return result;
+    }
+    if (!reply.WriteString16(formatNumber)) {
+        TELEPHONY_LOGE("OnFormatPhoneNumberToE164 fail to write parcel");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
     return TELEPHONY_SUCCESS;
@@ -685,10 +730,18 @@ int32_t CallManagerServiceStub::OnFormatPhoneNumberToE164(MessageParcel &data, M
 int32_t CallManagerServiceStub::OnGetMainCallId(MessageParcel &data, MessageParcel &reply)
 {
     int32_t callId = data.ReadInt32();
-    int32_t result = GetMainCallId(callId);
-    TELEPHONY_LOGI("result:%{public}d", result);
+    int32_t mainCallId = 0;
+    int32_t result = GetMainCallId(callId, mainCallId);
+    TELEPHONY_LOGI("result:%{public}d mainCallId:%{public}d", result, mainCallId);
     if (!reply.WriteInt32(result)) {
         TELEPHONY_LOGE("fail to write parcel");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    if (result != TELEPHONY_ERR_SUCCESS) {
+        return result;
+    }
+    if (!reply.WriteInt32(mainCallId)) {
+        TELEPHONY_LOGE("OnIsNewCallAllowed fail to write parcel");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
     return TELEPHONY_SUCCESS;
@@ -697,23 +750,39 @@ int32_t CallManagerServiceStub::OnGetMainCallId(MessageParcel &data, MessageParc
 int32_t CallManagerServiceStub::OnGetSubCallIdList(MessageParcel &data, MessageParcel &reply)
 {
     int32_t callId = data.ReadInt32();
-    std::vector<std::u16string> result = GetSubCallIdList(callId);
-    if (!reply.WriteString16Vector(result)) {
+    std::vector<std::u16string> callIdList;
+    int32_t result = GetSubCallIdList(callId, callIdList);
+    if (!reply.WriteInt32(result)) {
         TELEPHONY_LOGE("fail to write parcel");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    return TELEPHONY_SUCCESS;
+    if (result != TELEPHONY_ERR_SUCCESS) {
+        return result;
+    }
+    if (!reply.WriteString16Vector(callIdList)) {
+        TELEPHONY_LOGE("OnIsNewCallAllowed fail to write parcel");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return result;
 }
 
 int32_t CallManagerServiceStub::OnGetCallIdListForConference(MessageParcel &data, MessageParcel &reply)
 {
     int32_t callId = data.ReadInt32();
-    std::vector<std::u16string> result = GetCallIdListForConference(callId);
-    if (!reply.WriteString16Vector(result)) {
+    std::vector<std::u16string> callIdList;
+    int32_t result = GetCallIdListForConference(callId, callIdList);
+    if (!reply.WriteInt32(result)) {
         TELEPHONY_LOGE("fail to write parcel");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    return TELEPHONY_SUCCESS;
+    if (result != TELEPHONY_ERR_SUCCESS) {
+        return result;
+    }
+    if (!reply.WriteString16Vector(callIdList)) {
+        TELEPHONY_LOGE("OnIsNewCallAllowed fail to write parcel");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return result;
 }
 
 int32_t CallManagerServiceStub::OnGetImsConfig(MessageParcel &data, MessageParcel &reply)

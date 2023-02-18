@@ -181,9 +181,10 @@ int32_t IMSCall::CanSeparateConference()
     return DelayedSingleton<ImsConference>::GetInstance()->CanSeparateConference();
 }
 
-int32_t IMSCall::GetMainCallId()
+int32_t IMSCall::GetMainCallId(int32_t &mainCallId)
 {
-    return DelayedSingleton<ImsConference>::GetInstance()->GetMainCall();
+    mainCallId = DelayedSingleton<ImsConference>::GetInstance()->GetMainCall();
+    return TELEPHONY_SUCCESS;
 }
 
 int32_t IMSCall::LaunchConference()
@@ -209,14 +210,14 @@ int32_t IMSCall::HoldConference()
     return ret;
 }
 
-std::vector<std::u16string> IMSCall::GetSubCallIdList()
+int32_t IMSCall::GetSubCallIdList(std::vector<std::u16string> &callIdList)
 {
-    return DelayedSingleton<ImsConference>::GetInstance()->GetSubCallIdList(GetCallID());
+    return DelayedSingleton<ImsConference>::GetInstance()->GetSubCallIdList(GetCallID(), callIdList);
 }
 
-std::vector<std::u16string> IMSCall::GetCallIdListForConference()
+int32_t IMSCall::GetCallIdListForConference(std::vector<std::u16string> &callIdList)
 {
-    return DelayedSingleton<ImsConference>::GetInstance()->GetCallIdListForConference(GetCallID());
+    return DelayedSingleton<ImsConference>::GetInstance()->GetCallIdListForConference(GetCallID(), callIdList);
 }
 
 int32_t IMSCall::IsSupportConferenceable()

@@ -24,6 +24,28 @@
 
 namespace OHOS {
 namespace Telephony {
+enum {
+    CALL_MANAGER_UNKNOWN_EVENT = 0,
+    CALL_MANAGER_DIAL_CALL,
+    CALL_MANAGER_ANSWER_CALL,
+    CALL_MANAGER_REJECT_CALL,
+    CALL_MANAGER_DISCONNECT_CALL,
+    CALL_MANAGER_HOLD_CALL,
+    CALL_MANAGER_UNHOLD_CALL,
+    CALL_MANAGER_SWITCH_CALL,
+    CALL_MANAGER_GET_CALL_WAITING,
+    CALL_MANAGER_SET_CALL_WAITING,
+    CALL_MANAGER_GET_CALL_RESTRICTION,
+    CALL_MANAGER_SET_CALL_RESTRICTION,
+    CALL_MANAGER_GET_CALL_TRANSFER,
+    CALL_MANAGER_SET_CALL_TRANSFER,
+    CALL_MANAGER_ENABLE_IMS_SWITCH,
+    CALL_MANAGER_DISABLE_IMS_SWITCH,
+    CALL_MANAGER_IS_EMERGENCY_CALL,
+    CALL_MANAGER_IS_RINGING,
+    CALL_MANAGER_MUTE_RINGER,
+};
+
 /**
  * call_manager NAPI utility class.
  */
@@ -38,11 +60,19 @@ public:
     static napi_value GetNamedProperty(napi_env env, napi_value object, const std::string &propertyName);
     static std::string GetStringProperty(napi_env env, napi_value object, const std::string &propertyName);
     static int32_t GetIntProperty(napi_env env, napi_value object, const std::string &propertyName);
+    static bool GetUssdIntProperty(napi_env env, napi_value object, const std::string &propertyName, int32_t &result);
+    static bool GetUssdStringProperty(
+        napi_env env, napi_value object, const std::string &propertyName, std::string &result);
     static bool GetBoolProperty(napi_env env, napi_value object, const std::string &propertyName);
     static void SetPropertyInt32(napi_env env, napi_value object, std::string name, int32_t value);
     static void SetPropertyStringUtf8(napi_env env, napi_value object, std::string name, std::string value);
     static void SetPropertyBoolean(napi_env env, napi_value object, std::string name, int32_t value);
     static napi_value CreateEnumConstructor(napi_env env, napi_callback_info info);
+    static napi_value CreateErrorCodeAndMessageForJs(napi_env env, int32_t errorCode, int32_t eventId);
+
+private:
+    static std::string GetEventName(int32_t eventId);
+    static std::string GetEventPermission(int32_t eventId);
 };
 } // namespace Telephony
 } // namespace OHOS

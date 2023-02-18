@@ -72,7 +72,9 @@ public:
 
     bool HasSimCard(int32_t slotId)
     {
-        return DelayedRefSingleton<CoreServiceClient>::GetInstance().HasSimCard(slotId);
+        bool hasSimCard = false;
+        DelayedRefSingleton<CoreServiceClient>::GetInstance().HasSimCard(slotId, hasSimCard);
+        return hasSimCard;
     }
 
     static bool IsServiceConnected()

@@ -70,48 +70,48 @@ void ConferenceBase::SetConferenceState(ConferenceState state)
     state_ = state;
 }
 
-std::vector<std::u16string> ConferenceBase::GetSubCallIdList(int32_t callId)
+int32_t ConferenceBase::GetSubCallIdList(int32_t callId, std::vector<std::u16string> &callIdList)
 {
-    std::vector<std::u16string> vec;
     bool flag = false;
-    vec.clear();
+    callIdList.clear();
     std::lock_guard<std::mutex> lock(conferenceMutex_);
     for (auto it = subCallIdSet_.begin(); it != subCallIdSet_.end(); ++it) {
         if (*it == callId) {
             flag = true;
         }
-        vec.push_back(Str8ToStr16(std::to_string(*it)));
+        callIdList.push_back(Str8ToStr16(std::to_string(*it)));
         TELEPHONY_LOGI("subCallId_:%{public}d", *it);
     }
     if (!flag) {
-        vec.clear();
+        callIdList.clear();
         TELEPHONY_LOGW("the call is not in the conference, callId:%{public}d", callId);
+        return CALL_ERR_THE_CALL_IS_NOT_IN_THE_CONFERENCE;
     }
-    return vec;
+    return TELEPHONY_SUCCESS;
 }
 
-std::vector<std::u16string> ConferenceBase::GetCallIdListForConference(int32_t callId)
+int32_t ConferenceBase::GetCallIdListForConference(int32_t callId, std::vector<std::u16string> &callIdList)
 {
-    std::vector<std::u16string> vec;
     bool flag = false;
-    vec.clear();
+    callIdList.clear();
     std::lock_guard<std::mutex> lock(conferenceMutex_);
     for (auto it = subCallIdSet_.begin(); it != subCallIdSet_.end(); ++it) {
         if (*it == callId) {
             flag = true;
         }
-        vec.push_back(Str8ToStr16(std::to_string(*it)));
+        callIdList.push_back(Str8ToStr16(std::to_string(*it)));
         TELEPHONY_LOGI("subCallId_:%{public}d", *it);
     }
     if (mainCallId_ == callId) {
         flag = true;
     }
-    vec.push_back(Str8ToStr16(std::to_string(mainCallId_)));
+    callIdList.push_back(Str8ToStr16(std::to_string(mainCallId_)));
     if (!flag) {
-        vec.clear();
+        callIdList.clear();
         TELEPHONY_LOGW("the call is not in the conference, callId:%{public}d", callId);
+        return CALL_ERR_THE_CALL_IS_NOT_IN_THE_CONFERENCE;
     }
-    return vec;
+    return TELEPHONY_SUCCESS;
 }
 } // namespace Telephony
 } // namespace OHOS

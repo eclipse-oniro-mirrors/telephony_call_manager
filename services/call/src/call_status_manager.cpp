@@ -366,7 +366,8 @@ int32_t CallStatusManager::ActiveHandle(const CallDetailInfo &info)
     // call state change active, need to judge if launching a conference
     int32_t ret = call->LaunchConference();
     if (ret == TELEPHONY_SUCCESS) {
-        int32_t mainCallId = call->GetMainCallId();
+        int32_t mainCallId = ERR_ID;
+        call->GetMainCallId(mainCallId);
         sptr<CallBase> mainCall = GetOneCallObject(mainCallId);
         if (mainCall != nullptr) {
             mainCall->SetTelConferenceState(TelConferenceState::TEL_CONFERENCE_ACTIVE);
@@ -559,7 +560,11 @@ int32_t CallStatusManager::ToSpeakerPhone(sptr<CallBase> &call)
 
 int32_t CallStatusManager::TurnOffMute(sptr<CallBase> &call)
 {
-    if (call->GetEmergencyState() || HasEmergencyCall()) {
+    bool enabled = true;
+    if (HasEmergencyCall(enabled) != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGI("CallStatusManager::TurnOffMute HasEmergencyCall failed.");
+    }
+    if (call->GetEmergencyState() || enabled) {
         DelayedSingleton<AudioControlManager>::GetInstance()->SetMute(false);
     } else {
         DelayedSingleton<AudioControlManager>::GetInstance()->SetMute(true);

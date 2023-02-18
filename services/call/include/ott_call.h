@@ -46,9 +46,9 @@ public:
     int32_t LaunchConference() override;
     int32_t ExitConference() override;
     int32_t HoldConference() override;
-    int32_t GetMainCallId() override;
-    std::vector<std::u16string> GetSubCallIdList() override;
-    std::vector<std::u16string> GetCallIdListForConference() override;
+    int32_t GetMainCallId(int32_t &mainCallId) override;
+    int32_t GetSubCallIdList(std::vector<std::u16string> &callIdList) override;
+    int32_t GetCallIdListForConference(std::vector<std::u16string> &callIdList) override;
     int32_t IsSupportConferenceable() override;
     int32_t SendUpdateCallMediaModeRequest(ImsCallMode mode) override;
     int32_t RecieveUpdateCallMediaModeRequest(ImsCallMode mode) override;

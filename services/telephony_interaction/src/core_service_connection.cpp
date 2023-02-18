@@ -25,9 +25,9 @@ std::vector<std::u16string> CoreServiceConnection::GetFdnNumberList(int slotId)
 {
     std::vector<std::u16string> numberVec;
     numberVec.clear();
-    std::vector<std::shared_ptr<DiallingNumbersInfo>> diallingNumbers =
-        DelayedRefSingleton<CoreServiceClient>::GetInstance().QueryIccDiallingNumbers(
-            slotId, DiallingNumbersInfo::SIM_FDN);
+    std::vector<std::shared_ptr<DiallingNumbersInfo>> diallingNumbers;
+    DelayedRefSingleton<CoreServiceClient>::GetInstance().QueryIccDiallingNumbers(
+        slotId, DiallingNumbersInfo::SIM_FDN, diallingNumbers);
     if (diallingNumbers.empty()) {
         TELEPHONY_LOGE("fdn number list is empty");
         return numberVec;
@@ -41,8 +41,10 @@ std::vector<std::u16string> CoreServiceConnection::GetFdnNumberList(int slotId)
 
 bool CoreServiceConnection::IsFdnEnabled(int slotId)
 {
-    int32_t ret = DelayedRefSingleton<CoreServiceClient>::GetInstance().GetLockState(slotId, LockType::FDN_LOCK);
-    if (ret == static_cast<int32_t>(LockState::LOCK_ON)) {
+    LockState lockState = LockState::LOCK_ERROR;
+    int32_t ret =
+        DelayedRefSingleton<CoreServiceClient>::GetInstance().GetLockState(slotId, LockType::FDN_LOCK, lockState);
+    if (ret == TELEPHONY_ERR_SUCCESS && lockState == LockState::LOCK_ON) {
         TELEPHONY_LOGI("Fdn is enabled");
         return true;
     }

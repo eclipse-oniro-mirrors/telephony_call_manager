@@ -35,7 +35,9 @@ CallManagerDumpHelper::CallManagerDumpHelper()
 
 bool CallManagerDumpHelper::WhetherHasSimCard(const int32_t slotId) const
 {
-    return DelayedRefSingleton<CoreServiceClient>::GetInstance().HasSimCard(slotId);
+    bool hasSimCard = false;
+    DelayedRefSingleton<CoreServiceClient>::GetInstance().HasSimCard(slotId, hasSimCard);
+    return hasSimCard;
 }
 
 void CallManagerDumpHelper::ShowHelp(std::string &result) const
@@ -80,7 +82,9 @@ void CallManagerDumpHelper::ShowCallManagerInfo(std::string &result) const
     result.append(std::to_string(DelayedSingleton<CallManagerService>::GetInstance()->GetCallState()));
     result.append("\n");
     result.append("RingingCallState:");
-    result.append(std::to_string(DelayedSingleton<CallManagerService>::GetInstance()->IsRinging()));
+    bool enabled = false;
+    DelayedSingleton<CallManagerService>::GetInstance()->IsRinging(enabled);
+    result.append(std::to_string(enabled));
     result.append("\n");
     result.append("HasCall:");
     result.append(std::to_string(DelayedSingleton<CallManagerService>::GetInstance()->HasCall()));

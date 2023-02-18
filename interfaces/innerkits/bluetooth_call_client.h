@@ -42,10 +42,10 @@ public:
     int32_t SeparateConference();
     int32_t StartDtmf(char str);
     int32_t StopDtmf();
-    bool IsRinging();
+    int32_t IsRinging(bool &enabled);
     bool HasCall();
-    bool IsNewCallAllowed();
-    bool IsInEmergencyCall();
+    int32_t IsNewCallAllowed(bool &enabled);
+    int32_t IsInEmergencyCall(bool &enabled);
     int32_t SetMuted(bool isMute);
     int32_t MuteRinger();
     int32_t SetAudioDevice(AudioDevice deviceType, const std::string &bluetoothAddress);

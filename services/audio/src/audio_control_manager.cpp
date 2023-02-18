@@ -363,7 +363,8 @@ int32_t AudioControlManager::SetMute(bool isMute)
         TELEPHONY_LOGE("no call exists, set mute failed");
         return CALL_ERR_AUDIO_SETTING_MUTE_FAILED;
     }
-    if (DelayedSingleton<CallControlManager>::GetInstance()->HasEmergency()) {
+    bool enabled = false;
+    if ((DelayedSingleton<CallControlManager>::GetInstance()->HasEmergency(enabled) == TELEPHONY_SUCCESS) && enabled) {
         isMute = false;
     }
     if (DelayedSingleton<AudioProxy>::GetInstance()->SetMicrophoneMute(isMute)) {

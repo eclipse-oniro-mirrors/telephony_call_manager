@@ -142,9 +142,9 @@ int32_t CallObjectManager::HasNewCall()
     return TELEPHONY_SUCCESS;
 }
 
-bool CallObjectManager::IsNewCallAllowedCreate()
+int32_t CallObjectManager::IsNewCallAllowedCreate(bool &enabled)
 {
-    bool ret = true;
+    enabled = true;
     std::lock_guard<std::mutex> lock(listMutex_);
     std::list<sptr<CallBase>>::iterator it;
     for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
@@ -153,11 +153,12 @@ bool CallObjectManager::IsNewCallAllowedCreate()
             (*it)->GetCallRunningState() == CallRunningState::CALL_RUNNING_STATE_DIALING ||
             (*it)->GetCallRunningState() == CallRunningState::CALL_RUNNING_STATE_RINGING) {
             TELEPHONY_LOGE("there is already a new call, please redial later");
-            ret = false;
+            enabled = false;
             break;
         }
     }
-    return ret;
+
+    return TELEPHONY_ERR_SUCCESS;
 }
 
 int32_t CallObjectManager::GetCarrierCallList(std::list<int32_t> &list)
@@ -207,16 +208,17 @@ bool CallObjectManager::HasDialingMaximum()
     return false;
 }
 
-bool CallObjectManager::HasEmergencyCall()
+int32_t CallObjectManager::HasEmergencyCall(bool &enabled)
 {
+    enabled = false;
     std::lock_guard<std::mutex> lock(listMutex_);
     std::list<sptr<CallBase>>::iterator it;
     for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
         if ((*it)->GetEmergencyState()) {
-            return true;
+            enabled = true;
         }
     }
-    return false;
+    return TELEPHONY_ERR_SUCCESS;
 }
 
 int32_t CallObjectManager::GetNewCallId()
@@ -266,19 +268,19 @@ bool CallObjectManager::HasCallExist()
     return true;
 }
 
-bool CallObjectManager::HasRingingCall()
+int32_t CallObjectManager::HasRingingCall(bool &enabled)
 {
-    bool ret = false;
+    enabled = false;
     std::lock_guard<std::mutex> lock(listMutex_);
     std::list<sptr<CallBase>>::iterator it;
     for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
         // Count the number of calls in the ringing state
         if ((*it)->GetCallRunningState() == CallRunningState::CALL_RUNNING_STATE_RINGING) {
-            ret = true;
+            enabled = true;
             break;
         }
     }
-    return ret;
+    return TELEPHONY_ERR_SUCCESS;
 }
 
 TelCallState CallObjectManager::GetCallState(int32_t callId)
