@@ -763,14 +763,14 @@ napi_value NapiCallManager::RegisterCallManagerFunc(napi_env env, napi_value exp
 napi_value NapiCallManager::Dial(napi_env env, napi_callback_info info)
 {
     GET_PARAMS(env, info, VALUE_MAXIMUM_LIMIT);
-    if (!MatchStringAndVariableObjectParameters(env, argv, argc)) {
-        TELEPHONY_LOGE("NapiCallManager::Dial MatchStringAndVariableObjectParameters failed.");
-        NapiUtil::ThrowParameterError(env);
-        return nullptr;
-    }
+    NAPI_ASSERT(env, argc <= VALUE_MAXIMUM_LIMIT, "parameter error!");
+    bool matchFlag = NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_FIRST], napi_string);
+    NAPI_ASSERT(env, matchFlag, "Dial type error, should be string type");
     auto asyncContext = (std::make_unique<DialAsyncContext>());
     if (asyncContext == nullptr) {
-        NapiUtil::ThrowParameterError(env);
+        std::string errorCode = std::to_string(napi_generic_failure);
+        std::string errorMessage = "Dial error at baseContext is nullptr";
+        NAPI_CALL(env, napi_throw_error(env, errorCode.c_str(), errorMessage.c_str()));
         return nullptr;
     }
     napi_get_value_string_utf8(
