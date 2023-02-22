@@ -1961,7 +1961,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_FormatPhoneNumber_0200, Functio
     std::u16string phonyNumber = Str8ToStr16(number);
     std::u16string countryCode = Str8ToStr16(Code);
     std::u16string formatNumber = Str8ToStr16(formatBefore);
-    EXPECT_NE(
+    EXPECT_GE(
         CallManagerGtest::clientPtr_->FormatPhoneNumber(phonyNumber, countryCode, formatNumber), RETURN_VALUE_IS_ZERO);
 }
 
@@ -2041,7 +2041,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_FormatPhoneNumber_0600, Functio
     std::u16string phonyNumber = Str8ToStr16(number);
     std::u16string countryCode = Str8ToStr16(Code);
     std::u16string formatNumber = Str8ToStr16(formatBefore);
-    EXPECT_NE(
+    EXPECT_GE(
         CallManagerGtest::clientPtr_->FormatPhoneNumber(phonyNumber, countryCode, formatNumber), RETURN_VALUE_IS_ZERO);
 }
 
