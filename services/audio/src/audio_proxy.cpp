@@ -22,7 +22,7 @@
 namespace OHOS {
 namespace Telephony {
 AudioProxy::AudioProxy()
-    : context_(nullptr), audioSoundManager_(std::make_unique<AudioStandard::RingtoneSoundManager>()),
+    : context_(nullptr), audioSoundManager_(std::make_unique<Media::RingtoneSoundManager>()),
       deviceCallback_(std::make_shared<AudioDeviceChangeCallback>())
 {}
 
@@ -197,7 +197,7 @@ std::string AudioProxy::GetSystemRingtoneUri() const
         TELEPHONY_LOGE("context nullptr");
         return "";
     }
-    AudioStandard::RingtoneType rinigtoneType = AudioStandard::RingtoneType::RINGTONE_TYPE_DEFAULT;
+    Media::RingtoneType rinigtoneType = Media::RingtoneType::RINGTONE_TYPE_DEFAULT;
     return audioSoundManager_->GetSystemRingtoneUri(context_, rinigtoneType);
 }
 
