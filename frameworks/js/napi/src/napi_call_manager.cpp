@@ -2194,7 +2194,7 @@ napi_value NapiCallManager::JoinConference(napi_env env, napi_callback_info info
     }
     uint32_t arrayLength = 0;
     NAPI_CALL(env, napi_get_array_length(env, argv[ARRAY_INDEX_SECOND], &arrayLength));
-    if (!NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_FIRST], napi_number) || arrayLength <= 0) {
+    if (!NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_FIRST], napi_number) || arrayLength == 0) {
         TELEPHONY_LOGE("NapiCallManager::JoinConference parameter type matching failed.");
         NapiUtil::ThrowParameterError(env);
         return nullptr;
