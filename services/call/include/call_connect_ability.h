@@ -15,6 +15,10 @@
 
 #ifndef CALL_CONNECT_ABILITY_H
 #define CALL_CONNECT_ABILITY_H
+
+#include <condition_variable>
+#include <mutex>
+
 #include "ability_connect_callback_interface.h"
 #include "call_manager_inner_type.h"
 #include "singleton.h"
@@ -27,10 +31,13 @@ public:
     void ConnectAbility(const CallAttributeInfo &info);
     void DisconnectAbility();
     void SetConnectFlag(bool isConnected);
+    void NotifyAll();
 
 private:
     sptr<AAFwk::IAbilityConnection> connectCallback_ = nullptr;
     bool isConnected_ = false;
+    static std::condition_variable cv_;
+    std::mutex mutex_;
 };
 } // namespace Telephony
 } // namespace OHOS

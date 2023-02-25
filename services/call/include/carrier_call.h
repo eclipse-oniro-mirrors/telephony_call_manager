@@ -42,6 +42,8 @@ public:
     int32_t CarrierCombineConference();
     int32_t CarrierSeparateConference();
     int32_t IsSupportConferenceable() override;
+    void SetSlotId(int32_t slotId) override;
+    void SetCallIndex(int32_t index) override;
 
 protected:
     int32_t PackCellularCallInfo(CellularCallInfo &callInfo);

@@ -175,6 +175,11 @@ int32_t CallStatusManager::HandleEventResultReportInfo(const CellularCallEventIn
         return CALL_ERR_PHONE_TYPE_UNEXPECTED;
     }
     TELEPHONY_LOGI("recv one Event, eventId:%{public}d", info.eventId);
+    sptr<CallBase> call = GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_DIALING);
+    if (call != nullptr) {
+        int ret = DealFailDial(call);
+        TELEPHONY_LOGI("DealFailDial ret:%{public}d", ret);
+    }
     CallEventInfo eventInfo;
     (void)memset_s(&eventInfo, sizeof(CallEventInfo), 0, sizeof(CallEventInfo));
     if (mEventIdTransferMap_.find(info.eventId) != mEventIdTransferMap_.end()) {
@@ -328,13 +333,34 @@ void CallStatusManager::CallFilterCompleteResult(const CallDetailInfo &info)
     }
 }
 
+int32_t CallStatusManager::UpdateDialingCallInfo(const CallDetailInfo &info)
+{
+    std::string tmpStr(info.phoneNum);
+    sptr<CallBase> call = GetOneCallObject(tmpStr);
+    if (call == nullptr) {
+        TELEPHONY_LOGE("Call is NULL");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    call->SetCallIndex(info.index);
+    call->SetBundleName(info.bundleName);
+    call->SetSlotId(info.accountId);
+    call->SetTelCallState(info.state);
+    call->SetVideoStateType(info.callMode);
+    call->SetCallType(info.callType);
+    return TELEPHONY_SUCCESS;
+}
+
 int32_t CallStatusManager::DialingHandle(const CallDetailInfo &info)
 {
     TELEPHONY_LOGI("handle dialing state");
     int32_t ret = DialingHandlePolicy(info);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("DialingHandlePolicy failed!");
-        return ret;
+        ret = UpdateDialingCallInfo(info);
+        if (ret != TELEPHONY_SUCCESS) {
+            return ret;
+        }
+        return TELEPHONY_SUCCESS;
     }
     sptr<CallBase> call = CreateNewCall(info, CallDirection::CALL_DIRECTION_OUT);
     if (call == nullptr) {

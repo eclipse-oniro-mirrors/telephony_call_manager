@@ -99,6 +99,10 @@ public:
     void SetAudio();
     bool CheckVoicemailNumber(std::string phoneNumber);
     bool IsAliveState();
+    void SetBundleName(const char *bundleName);
+    void SetCallType(CallType callType);
+    virtual void SetSlotId(int32_t slotId) {}
+    virtual void SetCallIndex(int32_t index) {}
 
 protected:
     int32_t callId_;

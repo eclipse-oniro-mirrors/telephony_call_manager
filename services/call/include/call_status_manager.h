@@ -66,6 +66,7 @@ private:
     int32_t TurnOffMute(sptr<CallBase> &call);
     int32_t IncomingFilterPolicy(const CallDetailInfo &info);
     void QueryCallerInfo(ContactInfo &contactInfo, std::string phoneNum);
+    int32_t UpdateDialingCallInfo(const CallDetailInfo &info);
 
 private:
     CallDetailInfo callReportInfo_;

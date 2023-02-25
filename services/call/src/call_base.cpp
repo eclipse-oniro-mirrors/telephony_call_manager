@@ -135,7 +135,8 @@ CallRunningState CallBase::GetCallRunningState()
 int32_t CallBase::SetTelCallState(TelCallState nextState)
 {
     std::lock_guard<std::mutex> lock(mutex_);
-    if (callRunningState_ != CallRunningState::CALL_RUNNING_STATE_CREATE && callState_ == nextState) {
+    if (callRunningState_ != CallRunningState::CALL_RUNNING_STATE_CREATE && callState_ == nextState &&
+        nextState != TelCallState::CALL_STATUS_DIALING) {
         TELEPHONY_LOGI("Call state duplication %{public}d", nextState);
         return CALL_ERR_NOT_NEW_STATE;
     }
@@ -415,6 +416,16 @@ bool CallBase::IsAliveState()
 {
     return !(callState_ == TelCallState::CALL_STATUS_IDLE || callState_ == TelCallState::CALL_STATUS_DISCONNECTED ||
         callState_ == TelCallState::CALL_STATUS_DISCONNECTING);
+}
+
+void CallBase::SetBundleName(const char *bundleName)
+{
+    bundleName_ = bundleName;
+}
+
+void CallBase::SetCallType(CallType callType)
+{
+    callType_ = callType;
 }
 } // namespace Telephony
 } // namespace OHOS

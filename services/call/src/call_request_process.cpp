@@ -19,12 +19,14 @@
 #include "call_control_manager.h"
 #include "call_manager_errors.h"
 #include "call_manager_hisysevent.h"
+#include "call_number_utils.h"
 #include "cellular_call_connection.h"
 #include "common_type.h"
 #include "core_service_connection.h"
 #include "cs_call.h"
 #include "ims_call.h"
 #include "ott_call.h"
+#include "report_call_info_handler.h"
 #include "telephony_log_wrapper.h"
 
 namespace OHOS {
@@ -274,8 +276,43 @@ void CallRequestProcess::JoinConference(int32_t callId, std::vector<std::string>
     }
 }
 
+int32_t CallRequestProcess::UpdateCallReportInfo(const DialParaInfo &info, TelCallState state)
+{
+    CallDetailInfo callDetatilInfo;
+    if (memset_s(&callDetatilInfo, sizeof(CallDetailInfo), 0, sizeof(CallDetailInfo)) != EOK) {
+        TELEPHONY_LOGE("memset_s callDetatilInfo fail");
+        return TELEPHONY_ERR_MEMSET_FAIL;
+    }
+    callDetatilInfo.callType = info.callType;
+    callDetatilInfo.accountId = info.accountId;
+    callDetatilInfo.index = info.index;
+    callDetatilInfo.state = state;
+    callDetatilInfo.callMode = info.videoState;
+    callDetatilInfo.voiceDomain = info.callType == CallType::TYPE_CS ? 0 : 1;
+    if (info.number.length() > kMaxNumberLen) {
+        TELEPHONY_LOGE("numbser length out of range");
+        return CALL_ERR_NUMBER_OUT_OF_RANGE;
+    }
+    if (memcpy_s(&callDetatilInfo.phoneNum, kMaxNumberLen, info.number.c_str(), info.number.length()) != EOK) {
+        TELEPHONY_LOGE("memcpy_s number failed!");
+        return TELEPHONY_ERR_MEMCPY_FAIL;
+    }
+    return DelayedSingleton<ReportCallInfoHandlerService>::GetInstance()->UpdateCallReportInfo(callDetatilInfo);
+}
+
 void CallRequestProcess::CarrierDialProcess(DialParaInfo &info)
 {
+    std::string newPhoneNumer =
+        DelayedSingleton<CallNumberUtils>::GetInstance()->RemoveSeparatorsPhoneNumber(info.number);
+    bool isMMiCode = DelayedSingleton<CallNumberUtils>::GetInstance()->IsMMICode(newPhoneNumer);
+    if (!isMMiCode) {
+        isFirstDialCallAdded_ = false;
+        info.number = newPhoneNumer;
+        if (UpdateCallReportInfo(info, TelCallState::CALL_STATUS_DIALING) != TELEPHONY_SUCCESS) {
+            TELEPHONY_LOGE("UpdateCallReportInfo failed!");
+            return;
+        }
+    }
     CellularCallInfo callInfo;
     int32_t ret = PackCellularCallInfo(info, callInfo);
     if (ret != TELEPHONY_SUCCESS) {
@@ -288,7 +325,28 @@ void CallRequestProcess::CarrierDialProcess(DialParaInfo &info)
     ret = DelayedSingleton<CellularCallConnection>::GetInstance()->Dial(callInfo);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("Dial failed!");
-        return;
+        if (isMMiCode) {
+            return;
+        }
+        std::unique_lock<std::mutex> lock(mutex_);
+        while (!isFirstDialCallAdded_) {
+            if (cv_.wait_for(lock, std::chrono::seconds(1)) == std::cv_status::timeout) {
+                TELEPHONY_LOGE("CarrierDialProcess call is not added");
+                return;
+            }
+        }
+        sptr<CallBase> call = nullptr;
+        if (GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_CREATE) != nullptr) {
+            call = GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_CREATE);
+        } else if (GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_CONNECTING) != nullptr) {
+            call = GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_CONNECTING);
+        } else if (GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_DIALING) != nullptr) {
+            call = GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_DIALING);
+        } else {
+            TELEPHONY_LOGE("can not find connect call or dialing call");
+            return;
+        }
+        DealFailDial(call);
     }
 }
 

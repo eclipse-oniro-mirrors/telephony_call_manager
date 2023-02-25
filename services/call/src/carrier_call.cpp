@@ -307,5 +307,15 @@ int32_t CarrierCall::StopDtmf()
     }
     return cellularCallConnectionPtr_->StopDtmf(callInfo);
 }
+
+void CarrierCall::SetSlotId(int32_t slotId)
+{
+    slotId_ = slotId;
+}
+
+void CarrierCall::SetCallIndex(int32_t index)
+{
+    index_ = index;
+}
 } // namespace Telephony
 } // namespace OHOS

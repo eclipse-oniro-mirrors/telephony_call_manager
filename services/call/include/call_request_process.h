@@ -16,6 +16,8 @@
 #ifndef CALL_REQUEST_PROCESS_H
 #define CALL_REQUEST_PROCESS_H
 
+#include <mutex>
+
 #include "call_object_manager.h"
 
 namespace OHOS {
@@ -46,6 +48,10 @@ private:
     int32_t UpdateImsCallMode(int32_t callId, ImsCallMode mode);
     int32_t PackCellularCallInfo(DialParaInfo &info, CellularCallInfo &callInfo);
     bool IsFdnNumber(std::vector<std::u16string> fdnNumberList, std::string phoneNumber);
+    int32_t UpdateCallReportInfo(const DialParaInfo &info, TelCallState state);
+
+private:
+    std::mutex mutex_;
 };
 } // namespace Telephony
 } // namespace OHOS

@@ -16,6 +16,7 @@
 #ifndef CALL_OBJECT_MANAGER_H
 #define CALL_OBJECT_MANAGER_H
 
+#include <condition_variable>
 #include <cstdio>
 #include <cstdlib>
 #include <list>
@@ -60,6 +61,12 @@ public:
     static int32_t GetCallNum(TelCallState callState);
     static std::string GetCallNumber(TelCallState callState);
     static std::vector<CallAttributeInfo> GetCallInfoList(int32_t slotId);
+    int32_t DealFailDial(sptr<CallBase> call);
+
+protected:
+    static std::condition_variable cv_;
+    static bool isFirstDialCallAdded_;
+
 private:
     static std::list<sptr<CallBase>> callObjectPtrList_;
     static std::mutex listMutex_;
