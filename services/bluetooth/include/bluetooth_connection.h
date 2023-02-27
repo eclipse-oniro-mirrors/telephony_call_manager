@@ -52,6 +52,7 @@ public:
     int32_t SendBtCallState(int32_t numActive, int32_t numHeld, int32_t callState, const std::string &number);
     void RemoveBtDevice(const std::string &address);
     bool IsBtAvailble();
+    std::string GetConnectedScoAddr();
 
 #ifdef ABILITY_BLUETOOTH_SUPPORT
     void OnScoStateChanged(const Bluetooth::BluetoothRemoteDevice &device, int32_t state) override;

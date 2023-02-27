@@ -372,7 +372,11 @@ void CallBase::SetAudio()
     // Confirm whether the speaker is turned on
     if (isSpeakerphoneOn_) {
         TELEPHONY_LOGI("set audio speaker");
-        DelayedSingleton<AudioControlManager>::GetInstance()->SetAudioDevice(AudioDevice::DEVICE_SPEAKER);
+        AudioDevice device = {
+            .deviceType = AudioDeviceType::DEVICE_SPEAKER,
+            .address = { 0 },
+        };
+        DelayedSingleton<AudioControlManager>::GetInstance()->SetAudioDevice(device);
     } else {
         TELEPHONY_LOGI("set audio bluetooth");
         std::shared_ptr<BluetoothCallManager> bluetoothCallManager = std::make_shared<BluetoothCallManager>();

@@ -85,6 +85,7 @@ enum CallManagerSurfaceCode {
     INTERFACE_REPORT_OTT_CALL_DETAIL_INFO,
     INTERFACE_REPORT_OTT_CALL_EVENT_INFO,
     INTERFACE_GET_PROXY_OBJECT_PTR,
+    INTERFACE_REPORT_AUDIO_DEVICE_INFO,
 };
 
 enum CallManagerProxyType {
@@ -109,7 +110,7 @@ public:
     virtual int32_t IsNewCallAllowed(bool &enabled) = 0;
     virtual int32_t SetMuted(bool isMute) = 0;
     virtual int32_t MuteRinger() = 0;
-    virtual int32_t SetAudioDevice(AudioDevice deviceType, const std::string &bluetoothAddress) = 0;
+    virtual int32_t SetAudioDevice(const AudioDevice &audioDevice) = 0;
     virtual int32_t IsRinging(bool &enabled) = 0;
     virtual int32_t IsInEmergencyCall(bool &enabled) = 0;
     virtual int32_t StartDtmf(int32_t callId, char str) = 0;
@@ -152,6 +153,7 @@ public:
     virtual int32_t ReportOttCallDetailsInfo(std::vector<OttCallDetailsInfo> &ottVec) = 0;
     virtual int32_t ReportOttCallEventInfo(OttCallEventInfo &eventInfo) = 0;
     virtual sptr<IRemoteObject> GetProxyObjectPtr(CallManagerProxyType proxyType) = 0;
+    virtual int32_t ReportAudioDeviceInfo() = 0;
 
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"OHOS.Telephony.ICallManagerService");

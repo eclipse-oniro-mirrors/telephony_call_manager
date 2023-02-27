@@ -36,7 +36,7 @@ class AudioControlManager : public CallStateListenerBase, public std::enable_sha
     DECLARE_DELAYED_SINGLETON(AudioControlManager)
 public:
     void Init();
-    int32_t SetAudioDevice(AudioDevice device);
+    int32_t SetAudioDevice(const AudioDevice &device);
     bool PlayRingtone(); // plays the default ringtone
     bool PlayRingtone(const std::string &phoneNum); // plays the default ringtone
     bool PlayRingtone(const std::string &phoneNum, const std::string &ringtonePath); // plays the specific ringtone
@@ -58,7 +58,7 @@ public:
     bool ShouldSwitchDialing() const;
     bool ShouldSwitchAlerting() const;
     bool ShouldSwitchIncoming() const;
-    AudioDevice GetInitAudioDevice() const;
+    AudioDeviceType GetInitAudioDeviceType() const;
     std::set<sptr<CallBase>> GetCallList();
     sptr<CallBase> GetCurrentActiveCall() const;
     AudioInterruptState GetAudioInterruptState();

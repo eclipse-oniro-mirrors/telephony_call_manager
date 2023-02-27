@@ -15,6 +15,7 @@
 
 #include "call_manager_service.h"
 
+#include "audio_device_manager.h"
 #include "bluetooth_call_service.h"
 #include "call_ability_report_proxy.h"
 #include "call_manager_dump_helper.h"
@@ -567,10 +568,10 @@ int32_t CallManagerService::MuteRinger()
     }
 }
 
-int32_t CallManagerService::SetAudioDevice(AudioDevice deviceType, const std::string &bluetoothAddress)
+int32_t CallManagerService::SetAudioDevice(const AudioDevice &audioDevice)
 {
     if (callControlManagerPtr_ != nullptr) {
-        if (callControlManagerPtr_->SetAudioDevice(deviceType, bluetoothAddress) == TELEPHONY_SUCCESS) {
+        if (callControlManagerPtr_->SetAudioDevice(audioDevice) == TELEPHONY_SUCCESS) {
             return TELEPHONY_SUCCESS;
         }
         TELEPHONY_LOGE("SetAudioDevice failed!");
@@ -878,6 +879,15 @@ std::string CallManagerService::GetBundleName()
         bundleName.append(std::to_string(IPCSkeleton::GetCallingPid()));
     }
     return bundleName;
+}
+
+int32_t CallManagerService::ReportAudioDeviceInfo()
+{
+    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_SET_TELEPHONY_STATE)) {
+        TELEPHONY_LOGE("Permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
+    return DelayedSingleton<AudioDeviceManager>::GetInstance()->ReportAudioDeviceChange();
 }
 } // namespace Telephony
 } // namespace OHOS

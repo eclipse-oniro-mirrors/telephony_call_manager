@@ -88,5 +88,16 @@ int32_t NapiCallManagerCallback::OnOttCallRequest(OttCallRequestId requestId, Ap
     }
     return ret;
 }
+
+int32_t NapiCallManagerCallback::OnReportAudioDeviceChange(const AudioDeviceInfo &info)
+{
+    int32_t ret = DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->UpdateAudioDeviceInfo(info);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("UpdateAudioDeviceInfo failed! errCode:%{public}d", ret);
+    } else {
+        TELEPHONY_LOGI("UpdateAudioDeviceInfo success!");
+    }
+    return ret;
+}
 } // namespace Telephony
 } // namespace OHOS

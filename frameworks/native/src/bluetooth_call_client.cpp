@@ -266,10 +266,25 @@ int32_t BluetoothCallClient::MuteRinger()
     }
 }
 
-int32_t BluetoothCallClient::SetAudioDevice(AudioDevice deviceType, const std::string &bluetoothAddress)
+int32_t BluetoothCallClient::SetAudioDevice(AudioDeviceType deviceType, const std::string &bluetoothAddress)
 {
+    AudioDevice device;
+    if (memset_s(&device, sizeof(AudioDevice), 0, sizeof(AudioDevice)) != EOK) {
+        TELEPHONY_LOGE("memset_s fail");
+        return TELEPHONY_ERR_MEMSET_FAIL;
+    }
+    device.deviceType = static_cast<AudioDeviceType>(deviceType);
+    if (bluetoothAddress.length() > kMaxAddressLen) {
+        TELEPHONY_LOGE("address is not too long");
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
+    }
+    if (memcpy_s(device.address, kMaxAddressLen, bluetoothAddress.c_str(), bluetoothAddress.length()) != EOK) {
+        TELEPHONY_LOGE("memcpy_s address fail");
+        return TELEPHONY_ERR_MEMCPY_FAIL;
+    }
+
     if (g_callManagerProxyPtr != nullptr) {
-        return g_callManagerProxyPtr->SetAudioDevice(deviceType, bluetoothAddress);
+        return g_callManagerProxyPtr->SetAudioDevice(device);
     } else {
         TELEPHONY_LOGE("init first please!");
         return TELEPHONY_ERR_UNINIT;

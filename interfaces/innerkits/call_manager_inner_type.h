@@ -25,6 +25,7 @@ namespace OHOS {
 namespace Telephony {
 constexpr int16_t kMaxNumberLen = 100;
 constexpr int16_t kMaxBundleNameLen = 100;
+constexpr int16_t kMaxAddressLen = 100;
 constexpr uint16_t REJECT_CALL_MSG_MAX_LEN = 300;
 constexpr uint16_t ACCOUNT_NUMBER_MAX_LENGTH = 100;
 constexpr uint16_t CONNECT_SERVICE_WAIT_TIME = 1000; // ms
@@ -314,7 +315,7 @@ struct DisconnectedDetails {
     std::string message;
 };
 
-enum class AudioDevice {
+enum class AudioDeviceType {
     DEVICE_EARPIECE = 0,
     DEVICE_SPEAKER,
     DEVICE_WIRED_HEADSET,
@@ -742,6 +743,17 @@ struct CallDetailsInfo {
     std::vector<CallDetailInfo> callVec;
     int32_t slotId;
     char bundleName[kMaxBundleNameLen + 1];
+};
+
+struct AudioDevice {
+    AudioDeviceType deviceType;
+    char address[kMaxAddressLen + 1];
+};
+
+struct AudioDeviceInfo {
+    std::vector<AudioDevice> audioDeviceList;
+    AudioDevice currentAudioDevice;
+    bool isMuted;
 };
 } // namespace Telephony
 } // namespace OHOS

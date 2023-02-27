@@ -741,14 +741,14 @@ int32_t CallManagerProxy::MuteRinger()
     return TELEPHONY_SUCCESS;
 }
 
-int32_t CallManagerProxy::SetAudioDevice(AudioDevice deviceType, const std::string &bluetoothAddress)
+int32_t CallManagerProxy::SetAudioDevice(const AudioDevice &audioDevice)
 {
     if (ReConnectService() != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     std::lock_guard<std::mutex> lock(mutex_);
-    int32_t errCode = callManagerServicePtr_->SetAudioDevice(deviceType, bluetoothAddress);
+    int32_t errCode = callManagerServicePtr_->SetAudioDevice(audioDevice);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("SetAudioDevice failed, errcode:%{public}d", errCode);
         return errCode;
@@ -1074,6 +1074,21 @@ void CallManagerProxy::OnRemoteDied(const wptr<IRemoteObject> &remote)
         initStatus_ = false;
         TELEPHONY_LOGE("on remote died");
     }
+}
+
+int32_t CallManagerProxy::ReportAudioDeviceInfo()
+{
+    if (ReConnectService() != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("ipc reconnect failed!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    std::lock_guard<std::mutex> lock(mutex_);
+    int32_t errCode = callManagerServicePtr_->ReportAudioDeviceInfo();
+    if (errCode != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("ReportAudioDeviceInfo failed, errcode:%{public}d", errCode);
+        return errCode;
+    }
+    return TELEPHONY_SUCCESS;
 }
 } // namespace Telephony
 } // namespace OHOS

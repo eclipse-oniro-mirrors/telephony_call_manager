@@ -14,12 +14,10 @@
  */
 
 #include "audio_control_manager.h"
-#include "audio_player.h"
-#include "call_state_processor.h"
-
-#include "telephony_log_wrapper.h"
 
 #include "call_control_manager.h"
+#include "call_state_processor.h"
+#include "telephony_log_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -27,12 +25,16 @@ AudioControlManager::AudioControlManager()
     : isTonePlaying_(false), isLocalRingbackNeeded_(false), ring_(nullptr), tone_(nullptr)
 {}
 
-AudioControlManager::~AudioControlManager() {}
+AudioControlManager::~AudioControlManager()
+{
+    DelayedSingleton<AudioProxy>::GetInstance()->UnsetDeviceChangeCallback();
+}
 
 void AudioControlManager::Init()
 {
     DelayedSingleton<AudioDeviceManager>::GetInstance()->Init();
     DelayedSingleton<AudioSceneProcessor>::GetInstance()->Init();
+    DelayedSingleton<AudioProxy>::GetInstance()->SetAudioDeviceChangeCallback();
 }
 
 void AudioControlManager::CallStateUpdated(
@@ -195,21 +197,22 @@ void AudioControlManager::HandleNewActiveCall(sptr<CallBase> &callObjectPtr)
  * @param device , audio device
  * usually called by the ui interaction , in purpose of switching to another audio device
  */
-int32_t AudioControlManager::SetAudioDevice(AudioDevice device)
+int32_t AudioControlManager::SetAudioDevice(const AudioDevice &device)
 {
-    AudioDevice audioDevice = AudioDevice::DEVICE_UNKNOWN;
-    switch (device) {
-        case AudioDevice::DEVICE_SPEAKER:
-        case AudioDevice::DEVICE_EARPIECE:
-        case AudioDevice::DEVICE_WIRED_HEADSET:
-        case AudioDevice::DEVICE_BLUETOOTH_SCO:
-            audioDevice = device;
+    AudioDeviceType audioDeviceType = AudioDeviceType::DEVICE_UNKNOWN;
+    switch (device.deviceType) {
+        case AudioDeviceType::DEVICE_SPEAKER:
+        case AudioDeviceType::DEVICE_EARPIECE:
+        case AudioDeviceType::DEVICE_WIRED_HEADSET:
+            audioDeviceType = device.deviceType;
             break;
+        case AudioDeviceType::DEVICE_BLUETOOTH_SCO:
+            return DelayedSingleton<AudioDeviceManager>::GetInstance()->ConnectBtScoWithAddress(device.address);
         default:
             break;
     }
-    if (audioDevice != AudioDevice::DEVICE_UNKNOWN &&
-        DelayedSingleton<AudioDeviceManager>::GetInstance()->SwitchDevice(audioDevice)) {
+    if (audioDeviceType != AudioDeviceType::DEVICE_UNKNOWN &&
+        DelayedSingleton<AudioDeviceManager>::GetInstance()->SwitchDevice(audioDeviceType)) {
         return TELEPHONY_SUCCESS;
     }
     return CALL_ERR_AUDIO_SET_AUDIO_DEVICE_FAILED;
@@ -326,29 +329,29 @@ void AudioControlManager::SetAudioInterruptState(AudioInterruptState state)
  * while audio state changed , maybe need to reinitialize the audio device
  * in order to get the initialization status of audio device , need to consider varieties of  audio conditions
  */
-AudioDevice AudioControlManager::GetInitAudioDevice() const
+AudioDeviceType AudioControlManager::GetInitAudioDeviceType() const
 {
     if (audioInterruptState_ == AudioInterruptState::INTERRUPT_STATE_DEACTIVATED) {
-        return AudioDevice::DEVICE_DISABLE;
+        return AudioDeviceType::DEVICE_DISABLE;
     } else {
         // interrupted or ringing , priority : bt sco , wired headset , speaker
         if (AudioDeviceManager::IsBtScoConnected()) {
-            return AudioDevice::DEVICE_BLUETOOTH_SCO;
+            return AudioDeviceType::DEVICE_BLUETOOTH_SCO;
         }
         if (AudioDeviceManager::IsWiredHeadsetConnected()) {
-            return AudioDevice::DEVICE_WIRED_HEADSET;
+            return AudioDeviceType::DEVICE_WIRED_HEADSET;
         }
         if (audioInterruptState_ == AudioInterruptState::INTERRUPT_STATE_RINGING) {
-            return AudioDevice::DEVICE_SPEAKER;
+            return AudioDeviceType::DEVICE_SPEAKER;
         }
         if (GetCurrentActiveCall() != nullptr && GetCurrentActiveCall()->IsSpeakerphoneOn()) {
             TELEPHONY_LOGI("current call speaker is active");
-            return AudioDevice::DEVICE_SPEAKER;
+            return AudioDeviceType::DEVICE_SPEAKER;
         }
         if (AudioDeviceManager::IsEarpieceAvailable()) {
-            return AudioDevice::DEVICE_EARPIECE;
+            return AudioDeviceType::DEVICE_EARPIECE;
         }
-        return AudioDevice::DEVICE_SPEAKER;
+        return AudioDeviceType::DEVICE_SPEAKER;
     }
 }
 
@@ -485,8 +488,7 @@ bool AudioControlManager::ShouldPlayRingtone() const
     auto processor = DelayedSingleton<CallStateProcessor>::GetInstance();
     int32_t alertingCallNum = processor->GetCallNumber(TelCallState::CALL_STATUS_ALERTING);
     int32_t incomingCallNum = processor->GetCallNumber(TelCallState::CALL_STATUS_INCOMING);
-    if (incomingCallNum != EXIST_ONLY_ONE_CALL || alertingCallNum > EMPTY_VALUE ||
-        ringState_ == RingState::RINGING) {
+    if (incomingCallNum != EXIST_ONLY_ONE_CALL || alertingCallNum > EMPTY_VALUE || ringState_ == RingState::RINGING) {
         return false;
     }
     return true;

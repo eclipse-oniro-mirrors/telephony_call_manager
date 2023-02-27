@@ -752,17 +752,20 @@ void MuteRinger()
 void SetAudioDevice()
 {
     int32_t deviceType = DEFAULT_VALUE;
+    AudioDevice audioDevice;
     std::cout << "------SetAudioDevice------" << std::endl;
     std::cout << "please input device type(0:earpiece 1:speaker 2:wired headset 3:bluetooth sco):" << std::endl;
     std::cin >> deviceType;
+    if (deviceType == static_cast<int32_t>(AudioDeviceType::DEVICE_BLUETOOTH_SCO)) {
+        std::cout << "please input bluetoothAddress:" << std::endl;
+        std::cin >> audioDevice.address;
+    }
+    audioDevice.deviceType = static_cast<AudioDeviceType>(deviceType);
     if (g_clientPtr == nullptr) {
         std::cout << "g_clientPtr is nullptr" << std::endl;
         return;
     }
-    AudioDevice device = AudioDevice::DEVICE_UNKNOWN;
-    device = static_cast<AudioDevice>(deviceType);
-    std::string address = "0C:D7:46:14:AA:33";
-    int32_t ret = g_clientPtr->SetAudioDevice(device, address);
+    int32_t ret = g_clientPtr->SetAudioDevice(audioDevice);
     std::cout << "return value:" << ret << std::endl;
 }
 

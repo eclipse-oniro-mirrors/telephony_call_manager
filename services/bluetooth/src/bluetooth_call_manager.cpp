@@ -94,5 +94,10 @@ bool BluetoothCallManager::IsBtAvailble()
 #endif
     return isBtAvailble;
 }
+
+std::string BluetoothCallManager::GetConnectedScoAddr()
+{
+    return btConnection_->GetConnectedScoAddr();
+}
 } // namespace Telephony
 } // namespace OHOS

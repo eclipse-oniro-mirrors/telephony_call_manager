@@ -137,7 +137,7 @@ struct EventCallback {
 struct AudioAsyncContext : AsyncContext {
     bool isMute;
     std::string address;
-    int32_t audioDevice;
+    int32_t deviceType;
 };
 
 struct VideoAsyncContext : AsyncContext {
@@ -206,6 +206,11 @@ struct CallOttWorker {
 
 struct MmiCodeWorker {
     MmiCodeInfo info;
+    EventCallback callback;
+};
+
+struct AudioDeviceWork {
+    AudioDeviceInfo info;
     EventCallback callback;
 };
 } // namespace Telephony

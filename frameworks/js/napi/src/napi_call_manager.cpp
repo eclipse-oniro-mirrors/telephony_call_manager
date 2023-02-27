@@ -163,19 +163,19 @@ napi_value NapiCallManager::DeclareCallImsInterface(napi_env env, napi_value exp
 napi_value NapiCallManager::DeclareCallMediaEnum(napi_env env, napi_value exports)
 {
     napi_property_descriptor desc[] = {
-        // AudioDevice
+        // AudioDeviceType
         DECLARE_NAPI_STATIC_PROPERTY("DEVICE_EARPIECE",
-            NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(AudioDevice::DEVICE_EARPIECE))),
+            NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(AudioDeviceType::DEVICE_EARPIECE))),
         DECLARE_NAPI_STATIC_PROPERTY("DEVICE_SPEAKER",
-            NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(AudioDevice::DEVICE_SPEAKER))),
+            NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(AudioDeviceType::DEVICE_SPEAKER))),
         DECLARE_NAPI_STATIC_PROPERTY("DEVICE_WIRED_HEADSET",
-            NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(AudioDevice::DEVICE_WIRED_HEADSET))),
+            NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(AudioDeviceType::DEVICE_WIRED_HEADSET))),
         DECLARE_NAPI_STATIC_PROPERTY("DEVICE_BLUETOOTH_SCO",
-            NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(AudioDevice::DEVICE_BLUETOOTH_SCO))),
+            NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(AudioDeviceType::DEVICE_BLUETOOTH_SCO))),
         DECLARE_NAPI_STATIC_PROPERTY("DEVICE_DISABLE",
-            NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(AudioDevice::DEVICE_DISABLE))),
+            NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(AudioDeviceType::DEVICE_DISABLE))),
         DECLARE_NAPI_STATIC_PROPERTY("DEVICE_UNKNOWN",
-            NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(AudioDevice::DEVICE_UNKNOWN))),
+            NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(AudioDeviceType::DEVICE_UNKNOWN))),
         // VideoStateType
         DECLARE_NAPI_STATIC_PROPERTY(
             "TYPE_VOICE", NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(VideoStateType::TYPE_VOICE))),
@@ -390,25 +390,25 @@ napi_value NapiCallManager::DeclareCallTransferEnum(napi_env env, napi_value exp
  */
 napi_value NapiCallManager::DeclareAudioDeviceEnum(napi_env env, napi_value exports)
 {
-    // AudioDevice
+    // AudioDeviceType
     napi_property_descriptor desc[] = {
         DECLARE_NAPI_STATIC_PROPERTY("DEVICE_EARPIECE",
-            NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(AudioDevice::DEVICE_EARPIECE))),
+            NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(AudioDeviceType::DEVICE_EARPIECE))),
         DECLARE_NAPI_STATIC_PROPERTY("DEVICE_SPEAKER",
-            NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(AudioDevice::DEVICE_SPEAKER))),
+            NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(AudioDeviceType::DEVICE_SPEAKER))),
         DECLARE_NAPI_STATIC_PROPERTY("DEVICE_WIRED_HEADSET",
-            NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(AudioDevice::DEVICE_WIRED_HEADSET))),
+            NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(AudioDeviceType::DEVICE_WIRED_HEADSET))),
         DECLARE_NAPI_STATIC_PROPERTY("DEVICE_BLUETOOTH_SCO",
-            NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(AudioDevice::DEVICE_BLUETOOTH_SCO))),
+            NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(AudioDeviceType::DEVICE_BLUETOOTH_SCO))),
         DECLARE_NAPI_STATIC_PROPERTY("DEVICE_DISABLE",
-            NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(AudioDevice::DEVICE_DISABLE))),
+            NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(AudioDeviceType::DEVICE_DISABLE))),
         DECLARE_NAPI_STATIC_PROPERTY("DEVICE_UNKNOWN",
-            NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(AudioDevice::DEVICE_UNKNOWN))),
+            NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(AudioDeviceType::DEVICE_UNKNOWN))),
     };
     napi_value result = nullptr;
-    napi_define_class(env, "AudioDevice", NAPI_AUTO_LENGTH, NapiCallManagerUtils::CreateEnumConstructor, nullptr,
+    napi_define_class(env, "AudioDeviceType", NAPI_AUTO_LENGTH, NapiCallManagerUtils::CreateEnumConstructor, nullptr,
         sizeof(desc) / sizeof(*desc), desc, &result);
-    napi_set_named_property(env, exports, "AudioDevice", result);
+    napi_set_named_property(env, exports, "AudioDeviceType", result);
     return exports;
 }
 
@@ -1264,12 +1264,9 @@ bool NapiCallManager::MatchAudioDeviceParameters(
     TELEPHONY_LOGI("Telephony_CallManager MatchNumberAndBoolParameters %{public}zu", parameterCount);
     switch (parameterCount) {
         case ONLY_ONE_VALUE:
-            return NapiUtil::MatchParameters(env, parameters, { napi_number });
+            return NapiUtil::MatchParameters(env, parameters, { napi_object });
         case TWO_VALUE_LIMIT:
-            return NapiUtil::MatchParameters(env, parameters, { napi_number, napi_object }) ||
-                   NapiUtil::MatchParameters(env, parameters, { napi_number, napi_function });
-        case THREE_VALUE_MAXIMUM_LIMIT:
-            return NapiUtil::MatchParameters(env, parameters, { napi_number, napi_object, napi_function });
+            return NapiUtil::MatchParameters(env, parameters, { napi_object, napi_function });
         default:
             return false;
     }
@@ -1824,6 +1821,10 @@ napi_value NapiCallManager::ObserverOn(napi_env env, napi_callback_info info)
         DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->RegisterDisconnectedCauseCallback(stateCallback);
     } else if (tmpStr == "mmiCodeResult") {
         DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->RegisterMmiCodeCallback(stateCallback);
+    } else if (tmpStr == "audioDeviceChange") {
+        DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->RegisterAudioDeviceCallback(stateCallback);
+        int32_t result = DelayedSingleton<CallManagerClient>::GetInstance()->ReportAudioDeviceInfo();
+        TELEPHONY_LOGI("result == %{public}d", result);
     }
     napi_value result = nullptr;
     return result;
@@ -1866,6 +1867,8 @@ napi_value NapiCallManager::ObserverOff(napi_env env, napi_callback_info info)
         DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->UnRegisterDisconnectedCauseCallback();
     } else if (tmpStr == "mmiCodeResult") {
         DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->UnRegisterMmiCodeCallback();
+    } else if (tmpStr == "audioDeviceChange") {
+        DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->UnRegisterAudioDeviceCallback();
     }
     if (argc == TWO_VALUE_LIMIT) {
         napi_create_reference(env, argv[ARRAY_INDEX_SECOND], DATA_LENGTH_ONE, &(asyncContext->callbackRef));
@@ -1950,21 +1953,10 @@ napi_value NapiCallManager::SetAudioDevice(napi_env env, napi_callback_info info
         NapiUtil::ThrowParameterError(env);
         return nullptr;
     }
-    if (argc == ONLY_ONE_VALUE) {
-        napi_get_value_int32(env, argv[ARRAY_INDEX_FIRST], &asyncContext->audioDevice);
-    } else if (argc == TWO_VALUE_LIMIT) {
-        napi_get_value_int32(env, argv[ARRAY_INDEX_FIRST], &asyncContext->audioDevice);
-        if (NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_SECOND], napi_function)) {
-            napi_create_reference(env, argv[ARRAY_INDEX_SECOND], DATA_LENGTH_ONE, &(asyncContext->callbackRef));
-        } else {
-            asyncContext->address =
-                NapiCallManagerUtils::GetStringProperty(env, argv[ARRAY_INDEX_SECOND], "bluetoothAddress");
-        }
-    } else {
-        napi_get_value_int32(env, argv[ARRAY_INDEX_FIRST], &asyncContext->audioDevice);
-        asyncContext->address =
-            NapiCallManagerUtils::GetStringProperty(env, argv[ARRAY_INDEX_SECOND], "bluetoothAddress");
-        napi_create_reference(env, argv[ARRAY_INDEX_THIRD], DATA_LENGTH_ONE, &(asyncContext->callbackRef));
+    asyncContext->deviceType = NapiCallManagerUtils::GetIntProperty(env, argv[ARRAY_INDEX_FIRST], "deviceType");
+    asyncContext->address = NapiCallManagerUtils::GetStringProperty(env, argv[ARRAY_INDEX_FIRST], "address");
+    if (argc == TWO_VALUE_LIMIT) {
+        napi_create_reference(env, argv[ARRAY_INDEX_SECOND], DATA_LENGTH_ONE, &(asyncContext->callbackRef));
     }
 
     return HandleAsyncWork(
@@ -3700,17 +3692,23 @@ void NapiCallManager::NativeSetAudioDevice(napi_env env, void *data)
         NapiUtil::ThrowParameterError(env);
         return;
     }
-    AudioDevice type;
     auto asyncContext = (AudioAsyncContext *)data;
-    type = static_cast<AudioDevice>(asyncContext->audioDevice);
-    // For interface compatibility, when AudioDevice::DEVICE_MIC is deleted, this code block should also be deleted
-    // When the parameter passed is DEVICE_MIC, point to DEVICE_EARPIECE
-    int32_t DEVICE_MIC = 4;
-    if (static_cast<int32_t>(type) == DEVICE_MIC) {
-        type = AudioDevice::DEVICE_EARPIECE;
+    AudioDevice device;
+    if (memset_s(&device, sizeof(AudioDevice), 0, sizeof(AudioDevice)) != EOK) {
+        TELEPHONY_LOGE("memset_s fail");
+        return;
     }
-    asyncContext->errorCode =
-        DelayedSingleton<CallManagerClient>::GetInstance()->SetAudioDevice(type, asyncContext->address);
+    device.deviceType = static_cast<AudioDeviceType>(asyncContext->deviceType);
+    if (asyncContext->address.length() > kMaxAddressLen) {
+        TELEPHONY_LOGE("address is not too long");
+        return;
+    }
+    if (memcpy_s(device.address, kMaxAddressLen, asyncContext->address.c_str(), asyncContext->address.length()) !=
+        EOK) {
+        TELEPHONY_LOGE("memcpy_s address fail");
+        return;
+    }
+    asyncContext->errorCode = DelayedSingleton<CallManagerClient>::GetInstance()->SetAudioDevice(device);
     if (asyncContext->errorCode == TELEPHONY_SUCCESS) {
         asyncContext->resolved = TELEPHONY_SUCCESS;
     }

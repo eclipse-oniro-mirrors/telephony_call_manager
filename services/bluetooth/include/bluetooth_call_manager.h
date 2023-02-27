@@ -33,6 +33,7 @@ public:
     int32_t SendBtCallState(int32_t numActive, int32_t numHeld, int32_t callState, const std::string &number);
     BtScoState GetBtScoState();
     bool IsBtAvailble();
+    std::string GetConnectedScoAddr();
 
 private:
     bool IsBtScoConnected();

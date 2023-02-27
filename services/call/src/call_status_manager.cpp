@@ -578,7 +578,11 @@ int32_t CallStatusManager::ToSpeakerPhone(sptr<CallBase> &call)
         return ret;
     }
     if (call->IsSpeakerphoneOn()) {
-        DelayedSingleton<AudioControlManager>::GetInstance()->SetAudioDevice(AudioDevice::DEVICE_SPEAKER);
+        AudioDevice device = {
+            .deviceType = AudioDeviceType::DEVICE_SPEAKER,
+            .address = { 0 },
+        };
+        DelayedSingleton<AudioControlManager>::GetInstance()->SetAudioDevice(device);
         ret = call->SetSpeakerphoneOn(false);
     }
     return ret;

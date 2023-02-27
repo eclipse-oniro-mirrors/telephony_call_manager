@@ -221,5 +221,35 @@ int32_t CallAbilityCallbackProxy::OnOttCallRequest(OttCallRequestId requestId, A
     }
     return replyParcel.ReadInt32();
 }
+
+int32_t CallAbilityCallbackProxy::OnReportAudioDeviceChange(const AudioDeviceInfo &info)
+{
+    MessageParcel dataParcel;
+    MessageParcel replyParcel;
+    MessageOption option;
+    if (!dataParcel.WriteInterfaceToken(CallAbilityCallbackProxy::GetDescriptor())) {
+        TELEPHONY_LOGE("write descriptor fail");
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    int32_t audioDeviceListLength = info.audioDeviceList.size();
+    dataParcel.WriteInt32(audioDeviceListLength);
+    for (auto &audioDevice : info.audioDeviceList) {
+        dataParcel.WriteRawData((const void *)&audioDevice, sizeof(AudioDevice));
+    }
+    dataParcel.WriteRawData((const void *)&info.currentAudioDevice, sizeof(AudioDevice));
+    dataParcel.WriteBool(info.isMuted);
+
+    TELEPHONY_LOGI("audioDeviceListLength=%{public}d", audioDeviceListLength);
+    if (Remote() == nullptr) {
+        TELEPHONY_LOGE("function Remote() return nullptr!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t error = Remote()->SendRequest(UPDATE_AUDIO_DEVICE_CHANGE_RESULT_REQUEST, dataParcel, replyParcel, option);
+    if (error != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("report audio device info failed, error: %{public}d", error);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return replyParcel.ReadInt32();
+}
 } // namespace Telephony
 } // namespace OHOS

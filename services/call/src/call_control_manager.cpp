@@ -873,13 +873,9 @@ int32_t CallControlManager::MuteRinger()
     return DelayedSingleton<AudioControlManager>::GetInstance()->MuteRinger();
 }
 
-int32_t CallControlManager::SetAudioDevice(AudioDevice deviceType, const std::string &bluetoothAddress)
+int32_t CallControlManager::SetAudioDevice(const AudioDevice &audioDevice)
 {
-    if (deviceType == AudioDevice::DEVICE_BLUETOOTH_SCO &&
-        DelayedSingleton<AudioDeviceManager>::GetInstance()->ConnectBtScoWithAddress(bluetoothAddress)) {
-        return TELEPHONY_SUCCESS;
-    }
-    return DelayedSingleton<AudioControlManager>::GetInstance()->SetAudioDevice(deviceType);
+    return DelayedSingleton<AudioControlManager>::GetInstance()->SetAudioDevice(audioDevice);
 }
 
 int32_t CallControlManager::ControlCamera(std::u16string cameraId, int32_t callingUid, int32_t callingPid)

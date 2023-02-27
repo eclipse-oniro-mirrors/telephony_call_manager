@@ -43,6 +43,15 @@ int32_t AudioProxy::SetAudioDeviceChangeCallback()
         AudioStandard::DeviceFlag::ALL_DEVICES_FLAG, deviceCallback_);
 }
 
+int32_t AudioProxy::UnsetDeviceChangeCallback()
+{
+    if (deviceCallback_ == nullptr) {
+        TELEPHONY_LOGI("device callback nullptr");
+        return TELEPHONY_SUCCESS;
+    }
+    return AudioStandard::AudioSystemManager::GetInstance()->UnsetDeviceChangeCallback();
+}
+
 bool AudioProxy::SetBluetoothDevActive()
 {
     if (AudioStandard::AudioSystemManager::GetInstance()->IsDeviceActive(
@@ -74,12 +83,54 @@ bool AudioProxy::SetSpeakerDevActive()
 
 bool AudioProxy::SetWiredHeadsetDevActive()
 {
-    return false;
+    if (!isWiredHeadsetConnected_) {
+        TELEPHONY_LOGI("SetWiredHeadsetDevActive wiredheadset is not connected");
+        return false;
+    }
+    if (AudioStandard::AudioSystemManager::GetInstance()->IsDeviceActive(AudioStandard::ActiveDeviceType::SPEAKER)) {
+        int32_t ret = AudioStandard::AudioSystemManager::GetInstance()->SetDeviceActive(
+            AudioStandard::ActiveDeviceType::SPEAKER, false);
+        if (ret != ERR_NONE) {
+            TELEPHONY_LOGI("SetWiredHeadsetDevActive speaker close fail");
+            return false;
+        }
+    }
+    if (AudioStandard::AudioSystemManager::GetInstance()->IsDeviceActive(
+            AudioStandard::ActiveDeviceType::BLUETOOTH_SCO)) {
+        int32_t ret = AudioStandard::AudioSystemManager::GetInstance()->SetDeviceActive(
+            AudioStandard::ActiveDeviceType::BLUETOOTH_SCO, false);
+        if (ret != ERR_NONE) {
+            TELEPHONY_LOGI("SetWiredHeadsetDevActive bluetooth sco close fail");
+            return false;
+        }
+    }
+    return true;
 }
 
 bool AudioProxy::SetEarpieceDevActive()
 {
-    return false;
+    if (isWiredHeadsetConnected_) {
+        TELEPHONY_LOGI("SetEarpieceDevActive wiredheadset is connected, no need set earpiece dev active");
+        return false;
+    }
+    if (AudioStandard::AudioSystemManager::GetInstance()->IsDeviceActive(AudioStandard::ActiveDeviceType::SPEAKER)) {
+        int32_t ret = AudioStandard::AudioSystemManager::GetInstance()->SetDeviceActive(
+            AudioStandard::ActiveDeviceType::SPEAKER, false);
+        if (ret != ERR_NONE) {
+            TELEPHONY_LOGI("SetEarpieceDevActive speaker close fail");
+            return false;
+        }
+    }
+    if (AudioStandard::AudioSystemManager::GetInstance()->IsDeviceActive(
+            AudioStandard::ActiveDeviceType::BLUETOOTH_SCO)) {
+        int32_t ret = AudioStandard::AudioSystemManager::GetInstance()->SetDeviceActive(
+            AudioStandard::ActiveDeviceType::BLUETOOTH_SCO, false);
+        if (ret != ERR_NONE) {
+            TELEPHONY_LOGI("SetEarpieceDevActive bluetooth sco close fail");
+            return false;
+        }
+    }
+    return true;
 }
 
 int32_t AudioProxy::GetVolume(AudioStandard::AudioVolumeType audioVolumeType)
@@ -152,38 +203,24 @@ bool AudioProxy::IsVibrateMode() const
 
 void AudioDeviceChangeCallback::OnDeviceChange(const AudioStandard::DeviceChangeAction &deviceChangeAction)
 {
-    AudioStandard::DeviceChangeType changeType = deviceChangeAction.type;
-    switch (changeType) {
-        case AudioStandard::DeviceChangeType::CONNECT:
-#ifdef ABILITY_AUDIO_SUPPORT
-            auto devices = deviceChangeAction.deviceDescriptors;
-            for (auto device : devices) {
-                if (device->getType() == AudioStandard::DeviceType::DEVICE_TYPE_BLUETOOTH_SCO) {
-                    DelayedSingleton<AudioDeviceManager>::GetInstance()->ProcessEvent(
-                        AudioEvent::BLUETOOTH_SCO_CONNECTED);
-                } else if (device->getType() == AudioStandard::DeviceType::DEVICE_TYPE_WIRED_HEADSET) {
-                    DelayedSingleton<AudioDeviceManager>::GetInstance()->ProcessEvent(
-                        AudioEvent::WIRED_HEADSET_CONNECTED);
-                }
+    TELEPHONY_LOGI("AudioDeviceChangeCallback::OnDeviceChange enter");
+    for (auto &audioDeviceDescriptor : deviceChangeAction.deviceDescriptors) {
+        if (audioDeviceDescriptor->deviceType_ == AudioStandard::DEVICE_TYPE_WIRED_HEADSET) {
+            if (deviceChangeAction.type == AudioStandard::CONNECT) {
+                TELEPHONY_LOGI("WiredHeadset connected");
+                DelayedSingleton<AudioProxy>::GetInstance()->SetWiredHeadsetState(true);
+                DelayedSingleton<AudioDeviceManager>::GetInstance()->AddAudioDeviceList(
+                    "", AudioDeviceType::DEVICE_EARPIECE);
+                DelayedSingleton<AudioDeviceManager>::GetInstance()->ProcessEvent(AudioEvent::WIRED_HEADSET_CONNECTED);
+            } else {
+                TELEPHONY_LOGI("WiredHeadset disConnected");
+                DelayedSingleton<AudioProxy>::GetInstance()->SetWiredHeadsetState(false);
+                DelayedSingleton<AudioDeviceManager>::GetInstance()->RemoveAudioDeviceList(
+                    "", AudioDeviceType::DEVICE_EARPIECE);
+                DelayedSingleton<AudioDeviceManager>::GetInstance()->ProcessEvent(
+                    AudioEvent::WIRED_HEADSET_DISCONNECTED);
             }
-#endif
-            break;
-        case AudioStandard::DeviceChangeType::DISCONNECT:
-#ifdef ABILITY_AUDIO_SUPPORT
-            auto devices = deviceChangeAction.deviceDescriptors;
-            for (auto device : devices) {
-                if (device->getType() == AudioStandard::DeviceType::DEVICE_TYPE_BLUETOOTH_SCO) {
-                    DelayedSingleton<AudioDeviceManager>::GetInstance()->ProcessEvent(
-                        AudioEvent::BLUETOOTH_SCO_DISCONNECTED);
-                } else if (device->getType() == AudioStandard::DeviceType::DEVICE_TYPE_WIRED_HEADSET) {
-                    DelayedSingleton<AudioDeviceManager>::GetInstance()->ProcessEvent(
-                        AudioEvent::WIRED_HEADSET_DISCONNECTED);
-                }
-            }
-#endif
-            break;
-        default:
-            break;
+        }
     }
 }
 
@@ -230,6 +267,11 @@ std::string AudioProxy::GetDefaultTonePath() const
 std::string AudioProxy::GetDefaultDtmfPath() const
 {
     return defaultDtmfPath_;
+}
+
+void AudioProxy::SetWiredHeadsetState(bool isConnected)
+{
+    isWiredHeadsetConnected_ = isConnected;
 }
 } // namespace Telephony
 } // namespace OHOS

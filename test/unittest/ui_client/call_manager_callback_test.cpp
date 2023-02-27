@@ -101,5 +101,19 @@ int32_t CallManagerCallbackTest::OnReportMmiCodeResult(const MmiCodeInfo &info)
               << "message:" << info.message << std::endl;
     return RETURN_SUCCESS;
 }
+
+int32_t CallManagerCallbackTest::OnReportAudioDeviceChange(const AudioDeviceInfo &info)
+{
+    std::cout << "----------OnReportAudioDeviceChange--------" << std::endl
+              << "currentAudioDeviceType:" << static_cast<int32_t>(info.currentAudioDevice.deviceType) << " "
+              << "address:" << info.currentAudioDevice.address << std::endl
+              << "isMute:" << info.isMuted << std::endl;
+    for (size_t i = 0; i < info.audioDeviceList.size(); i++) {
+        std::cout << "audioDeviceList[" << i
+                  << "] deviceType:" << static_cast<int32_t>(info.audioDeviceList[i].deviceType) << " "
+                  << "audioDeviceList[" << i << "] address:" << info.audioDeviceList[i].address << std::endl;
+    }
+    return RETURN_SUCCESS;
+}
 } // namespace Telephony
 } // namespace OHOS

@@ -71,6 +71,8 @@ public:
     std::string GetDefaultRingPath() const;
     std::string GetDefaultTonePath() const;
     std::string GetDefaultDtmfPath() const;
+    int32_t UnsetDeviceChangeCallback();
+    void SetWiredHeadsetState(bool isConnected);
 
 private:
     const std::string defaultRingPath_ = "/system/etc/telephony/rings/ring.wav";
@@ -79,6 +81,7 @@ private:
     std::shared_ptr<AbilityRuntime::Context> context_;
     std::unique_ptr<AudioStandard::RingtoneSoundManager> audioSoundManager_;
     std::shared_ptr<AudioStandard::AudioManagerDeviceChangeCallback> deviceCallback_;
+    bool isWiredHeadsetConnected_ = false;
 };
 } // namespace Telephony
 } // namespace OHOS

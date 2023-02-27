@@ -171,11 +171,10 @@ public:
      * SetAudioDevice
      *
      * @brief Setting the Audio Channel
-     * @param deviceType[in], audio device type
-     * @param bluetoothAddress[in], bluetooth device Address
+     * @param audioDevice[in], contain audioDeviceType and address
      * @return Returns 0 on success, others on failure.
      */
-    int32_t SetAudioDevice(AudioDevice deviceType, const std::string &bluetoothAddress) override;
+    int32_t SetAudioDevice(const AudioDevice &audioDevice) override;
 
     /**
      * IsRinging
@@ -565,6 +564,14 @@ public:
      * @return Returns nullptr on failure, others on success.
      */
     sptr<IRemoteObject> GetProxyObjectPtr(CallManagerProxyType proxyType) override;
+
+    /**
+     * ReportAudioDeviceInfo
+     *
+     * @brief report audio device info
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t ReportAudioDeviceInfo() override;
 
 private:
     static inline BrokerDelegator<CallManagerServiceProxy> delegator_;

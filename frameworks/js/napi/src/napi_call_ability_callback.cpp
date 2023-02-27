@@ -83,6 +83,18 @@ void NapiCallAbilityCallback::UnRegisterMmiCodeCallback()
     }
 }
 
+void NapiCallAbilityCallback::RegisterAudioDeviceCallback(EventCallback eventCallback)
+{
+    audioDeviceCallback_ = eventCallback;
+}
+
+void NapiCallAbilityCallback::UnRegisterAudioDeviceCallback()
+{
+    if (audioDeviceCallback_.callbackRef) {
+        (void)memset_s(&audioDeviceCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
+    }
+}
+
 void NapiCallAbilityCallback::RegisterCallEventCallback(EventCallback eventCallback)
 {
     eventCallback_ = eventCallback;
@@ -638,6 +650,93 @@ int32_t NapiCallAbilityCallback::ReportMmiCode(MmiCodeInfo &info, EventCallback 
     napi_get_reference_value(env, eventCallback.thisVar, &thisVar);
     napi_value callbackResult = nullptr;
     napi_call_function(env, thisVar, callbackFunc, DATA_LENGTH_TWO, callbackValues, &callbackResult);
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t NapiCallAbilityCallback::UpdateAudioDeviceInfo(const AudioDeviceInfo &info)
+{
+    if (audioDeviceCallback_.thisVar == nullptr) {
+        TELEPHONY_LOGE("audioDeviceCallback_ is null!");
+        return CALL_ERR_CALLBACK_NOT_EXIST;
+    }
+    uv_loop_s *loop = nullptr;
+#if NAPI_VERSION >= 2
+    napi_get_uv_event_loop(audioDeviceCallback_.env, &loop);
+#endif
+    AudioDeviceWork *dataWorker = std::make_unique<AudioDeviceWork>().release();
+    if (dataWorker == nullptr) {
+        TELEPHONY_LOGE("dataWorker is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    dataWorker->info = info;
+    dataWorker->callback = audioDeviceCallback_;
+    uv_work_t *work = std::make_unique<uv_work_t>().release();
+    if (work == nullptr) {
+        TELEPHONY_LOGE("work is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    work->data = (void *)dataWorker;
+    uv_queue_work(
+        loop, work, [](uv_work_t *work) {}, ReportAudioDeviceInfoWork);
+
+    return TELEPHONY_SUCCESS;
+}
+
+void NapiCallAbilityCallback::ReportAudioDeviceInfoWork(uv_work_t *work, int32_t status)
+{
+    AudioDeviceWork *dataWorkerData = (AudioDeviceWork *)work->data;
+    if (dataWorkerData == nullptr) {
+        TELEPHONY_LOGE("dataWorkerData is nullptr!");
+        return;
+    }
+    int32_t ret = ReportAudioDeviceInfo(dataWorkerData->info, dataWorkerData->callback);
+    TELEPHONY_LOGI("ReportAudioDeviceInfo result = %{public}d", ret);
+    delete dataWorkerData;
+    dataWorkerData = nullptr;
+    delete work;
+    work = nullptr;
+}
+
+int32_t NapiCallAbilityCallback::ReportAudioDeviceInfo(AudioDeviceInfo &info, EventCallback eventCallback)
+{
+    napi_value callbackFunc = nullptr;
+    napi_env env = eventCallback.env;
+    napi_value callbackValues[ARRAY_INDEX_SECOND] = { 0 };
+    napi_create_object(env, &callbackValues[ARRAY_INDEX_FIRST]);
+
+    NapiCallManagerUtils::SetPropertyBoolean(env, callbackValues[ARRAY_INDEX_FIRST], "isMuted", info.isMuted);
+
+    napi_value currentAudioDeviceValue = nullptr;
+    napi_create_object(env, &currentAudioDeviceValue);
+    NapiCallManagerUtils::SetPropertyInt32(env, currentAudioDeviceValue, "currentDeviceType",
+        static_cast<int32_t>(info.currentAudioDevice.deviceType));
+    NapiCallManagerUtils::SetPropertyStringUtf8(
+        env, currentAudioDeviceValue, "currentDeviceAddress", info.currentAudioDevice.address);
+    napi_set_named_property(env, callbackValues[ARRAY_INDEX_FIRST], "currentAudioDevice", currentAudioDeviceValue);
+
+    napi_value audioDeviceListValue = nullptr;
+    napi_create_array(env, &audioDeviceListValue);
+    std::vector<AudioDevice>::iterator it = info.audioDeviceList.begin();
+    int i = 0;
+    for (; it != info.audioDeviceList.end(); ++it) {
+        napi_value value = nullptr;
+        napi_create_object(env, &value);
+        NapiCallManagerUtils::SetPropertyInt32(env, value, "deviceType", static_cast<int32_t>(it->deviceType));
+        NapiCallManagerUtils::SetPropertyStringUtf8(env, value, "currentDeviceAddress", it->address);
+        napi_set_element(env, audioDeviceListValue, i, value);
+        ++i;
+    }
+    napi_set_named_property(env, callbackValues[ARRAY_INDEX_FIRST], "audioDeviceList", audioDeviceListValue);
+
+    napi_get_reference_value(env, eventCallback.callbackRef, &callbackFunc);
+    if (callbackFunc == nullptr) {
+        TELEPHONY_LOGE("callbackFunc is null!");
+        return CALL_ERR_CALLBACK_NOT_EXIST;
+    }
+    napi_value thisVar = nullptr;
+    napi_get_reference_value(env, eventCallback.thisVar, &thisVar);
+    napi_value callbackResult = nullptr;
+    napi_call_function(env, thisVar, callbackFunc, DATA_LENGTH_ONE, callbackValues, &callbackResult);
     return TELEPHONY_SUCCESS;
 }
 

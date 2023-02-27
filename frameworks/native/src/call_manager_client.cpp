@@ -398,10 +398,10 @@ int32_t CallManagerClient::MuteRinger()
     }
 }
 
-int32_t CallManagerClient::SetAudioDevice(AudioDevice deviceType, const std::string &bluetoothAddress)
+int32_t CallManagerClient::SetAudioDevice(const AudioDevice &audioDevice)
 {
     if (g_callManagerProxy != nullptr) {
-        return g_callManagerProxy->SetAudioDevice(deviceType, bluetoothAddress);
+        return g_callManagerProxy->SetAudioDevice(audioDevice);
     } else {
         TELEPHONY_LOGE("init first please!");
         return TELEPHONY_ERR_UNINIT;
@@ -607,6 +607,16 @@ bool CallManagerClient::HasVoiceCapability()
         return false;
     }
     return true;
+}
+
+int32_t CallManagerClient::ReportAudioDeviceInfo()
+{
+    if (g_callManagerProxy != nullptr) {
+        return g_callManagerProxy->ReportAudioDeviceInfo();
+    } else {
+        TELEPHONY_LOGE("init first please!");
+        return TELEPHONY_ERR_UNINIT;
+    }
 }
 } // namespace Telephony
 } // namespace OHOS

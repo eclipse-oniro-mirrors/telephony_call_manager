@@ -358,7 +358,7 @@ int32_t CallManagerServiceProxy::MuteRinger()
     return replyParcel.ReadInt32();
 }
 
-int32_t CallManagerServiceProxy::SetAudioDevice(AudioDevice deviceType, const std::string &bluetoothAddress)
+int32_t CallManagerServiceProxy::SetAudioDevice(const AudioDevice &audioDevice)
 {
     MessageOption option;
     MessageParcel dataParcel;
@@ -367,8 +367,7 @@ int32_t CallManagerServiceProxy::SetAudioDevice(AudioDevice deviceType, const st
         TELEPHONY_LOGE("write descriptor fail");
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
-    dataParcel.WriteInt32(static_cast<int32_t>(deviceType));
-    dataParcel.WriteString(bluetoothAddress);
+    dataParcel.WriteRawData((const void *)&audioDevice, sizeof(AudioDevice));
     auto remote = Remote();
     if (remote == nullptr) {
         TELEPHONY_LOGE("function Remote() return nullptr!");
@@ -1395,6 +1394,29 @@ sptr<IRemoteObject> CallManagerServiceProxy::GetProxyObjectPtr(CallManagerProxyT
         return nullptr;
     }
     return replyParcel.ReadRemoteObject();
+}
+
+int32_t CallManagerServiceProxy::ReportAudioDeviceInfo()
+{
+    MessageOption option;
+    MessageParcel dataParcel;
+    MessageParcel replyParcel;
+
+    if (!dataParcel.WriteInterfaceToken(CallManagerServiceProxy::GetDescriptor())) {
+        TELEPHONY_LOGE("write descriptor fail");
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("function Remote() return nullptr!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t error = remote->SendRequest(INTERFACE_REPORT_AUDIO_DEVICE_INFO, dataParcel, replyParcel, option);
+    if (error != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("function ReportAudioDeviceInfo errCode:%{public}d", error);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return replyParcel.ReadInt32();
 }
 } // namespace Telephony
 } // namespace OHOS

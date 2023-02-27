@@ -38,6 +38,7 @@ public:
     int32_t ReportAsyncResults(const CallResultReportId reportId, AppExecFwk::PacMap &resultInfo);
     int32_t OttCallRequest(OttCallRequestId requestId, AppExecFwk::PacMap &info);
     int32_t ReportMmiCodeResult(const MmiCodeInfo &info);
+    int32_t ReportAudioDeviceChange(const AudioDeviceInfo &info);
 
 private:
     int32_t ReportCallStateInfo(const CallAttributeInfo &info);
