@@ -630,7 +630,7 @@ declare namespace call {
    * @throws {BusinessError} 8300003 - System internal error.
    * @throws {BusinessError} 8300999 - Unknown error code.
    * @systemapi Hide this for inner system use.
-   * @since 9
+   * @since 10
    */
   function on(type: 'audioDeviceChange', callback: Callback<AudioDeviceInfo>): void;
 
@@ -647,7 +647,7 @@ declare namespace call {
    * @throws {BusinessError} 8300003 - System internal error.
    * @throws {BusinessError} 8300999 - Unknown error code.
    * @systemapi Hide this for inner system use.
-   * @since 9
+   * @since 10
    */
   function off(type: 'audioDeviceChange', callback?: Callback<AudioDeviceInfo>): void;
 
@@ -941,7 +941,7 @@ declare namespace call {
 
   /**
    * @systemapi Hide this for inner system use.
-   * @since 8
+   * @since 10
    */
   export enum AudioDeviceType {
     DEVICE_EARPIECE,
@@ -952,7 +952,7 @@ declare namespace call {
 
   /**
    * @systemapi Hide this for inner system use.
-   * @since 9
+   * @since 10
    */
   export interface AudioDevice {
     deviceType: AudioDeviceType;
@@ -961,7 +961,7 @@ declare namespace call {
 
   /**
    * @systemapi Hide this for inner system use.
-   * @since 9
+   * @since 10
    */
   export interface AudioDeviceInfo {
     /** Indicates the list of support audiodevice. */
