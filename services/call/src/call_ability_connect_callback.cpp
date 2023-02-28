@@ -26,6 +26,7 @@ void CallAbilityConnectCallback::OnAbilityConnectDone(
     TELEPHONY_LOGI("connect callui result code: %{public}d", resultCode);
     if (resultCode == CONNECT_ABILITY_SUCCESS) {
         DelayedSingleton<CallConnectAbility>::GetInstance()->SetConnectFlag(true);
+        DelayedSingleton<CallConnectAbility>::GetInstance()->NotifyAll();
     }
 }
 

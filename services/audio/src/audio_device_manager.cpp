@@ -15,15 +15,15 @@
 
 #include "audio_device_manager.h"
 
-#include "telephony_log_wrapper.h"
-
 #include "audio_control_manager.h"
-#include "inactive_device_state.h"
-#include "bluetooth_device_state.h"
-#include "earpiece_device_state.h"
-#include "speaker_device_state.h"
-#include "wired_headset_device_state.h"
 #include "bluetooth_call_manager.h"
+#include "bluetooth_device_state.h"
+#include "call_ability_report_proxy.h"
+#include "earpiece_device_state.h"
+#include "inactive_device_state.h"
+#include "speaker_device_state.h"
+#include "telephony_log_wrapper.h"
+#include "wired_headset_device_state.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -34,7 +34,7 @@ bool AudioDeviceManager::isWiredHeadsetConnected_ = false;
 bool AudioDeviceManager::isBtScoConnected_ = false;
 
 AudioDeviceManager::AudioDeviceManager()
-    : audioDevice_(AudioDevice::DEVICE_UNKNOWN), currentAudioDevice_(nullptr), isAudioActivated_(false)
+    : audioDeviceType_(AudioDeviceType::DEVICE_UNKNOWN), currentAudioDevice_(nullptr), isAudioActivated_(false)
 {}
 
 AudioDeviceManager::~AudioDeviceManager()
@@ -52,13 +52,113 @@ void AudioDeviceManager::Init()
     if (currentAudioDevice_ == nullptr) {
         TELEPHONY_LOGE("current audio device nullptr");
     }
+    if (memset_s(&info_, sizeof(AudioDeviceInfo), 0, sizeof(AudioDeviceInfo)) != EOK) {
+        TELEPHONY_LOGE("memset_s address fail");
+        return;
+    }
+    AudioDevice speaker = {
+        .deviceType = AudioDeviceType::DEVICE_SPEAKER,
+        .address = { 0 },
+    };
+    info_.audioDeviceList.push_back(speaker);
+#ifdef DEVICE_EARPIECE_SUPPORT
+    AudioDevice earpiece = {
+        .deviceType = AudioDeviceType::DEVICE_EARPIECE,
+        .address = { 0 },
+    };
+    info_.audioDeviceList.push_back(earpiece);
+#endif
+}
+
+void AudioDeviceManager::AddAudioDeviceList(const std::string &address, AudioDeviceType deviceType)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    std::vector<AudioDevice>::iterator it = info_.audioDeviceList.begin();
+    while (it != info_.audioDeviceList.end()) {
+        if (it->address == address && it->deviceType == deviceType) {
+            TELEPHONY_LOGI("device is already existenced");
+            return;
+        }
+        if (deviceType == AudioDeviceType::DEVICE_WIRED_HEADSET && it->deviceType == AudioDeviceType::DEVICE_EARPIECE) {
+            it = info_.audioDeviceList.erase(it);
+            TELEPHONY_LOGI("remove Earpiece device success");
+        } else {
+            it++;
+        }
+    }
+    AudioDevice audioDevice;
+    if (memset_s(&audioDevice, sizeof(AudioDevice), 0, sizeof(AudioDevice)) != EOK) {
+        TELEPHONY_LOGE("memset_s fail");
+        return;
+    }
+    audioDevice.deviceType = deviceType;
+    if (address.length() > kMaxAddressLen) {
+        TELEPHONY_LOGE("address is not too long");
+        return;
+    }
+    if (memcpy_s(audioDevice.address, kMaxAddressLen, address.c_str(), address.length()) != EOK) {
+        return;
+    }
+    info_.audioDeviceList.push_back(audioDevice);
+    if (deviceType == AudioDeviceType::DEVICE_WIRED_HEADSET) {
+        SetDeviceAvailable(AudioDeviceType::DEVICE_WIRED_HEADSET, true);
+    }
+    if (deviceType == AudioDeviceType::DEVICE_BLUETOOTH_SCO) {
+        SetDeviceAvailable(AudioDeviceType::DEVICE_BLUETOOTH_SCO, true);
+    }
+    TELEPHONY_LOGI("AddAudioDeviceList success");
+}
+
+void AudioDeviceManager::RemoveAudioDeviceList(const std::string &address, AudioDeviceType deviceType)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    bool needAddEarpiece = true;
+    std::vector<AudioDevice>::iterator it = info_.audioDeviceList.begin();
+    while (it != info_.audioDeviceList.end()) {
+        if (it->deviceType == AudioDeviceType::DEVICE_EARPIECE) {
+            needAddEarpiece = false;
+        }
+        if (it->address == address && it->deviceType == deviceType) {
+            it = info_.audioDeviceList.erase(it);
+        } else {
+            it++;
+        }
+    }
+
+    bool wiredHeadsetExist = false;
+    bool blueToothScoExist = false;
+    for (auto &elem : info_.audioDeviceList) {
+        if (elem.deviceType == AudioDeviceType::DEVICE_WIRED_HEADSET) {
+            wiredHeadsetExist = true;
+        }
+        if (elem.deviceType == AudioDeviceType::DEVICE_BLUETOOTH_SCO) {
+            blueToothScoExist = true;
+        }
+    }
+    if (deviceType == AudioDeviceType::DEVICE_WIRED_HEADSET && !wiredHeadsetExist) {
+        SetDeviceAvailable(AudioDeviceType::DEVICE_WIRED_HEADSET, false);
+    }
+    if (deviceType == AudioDeviceType::DEVICE_BLUETOOTH_SCO && !blueToothScoExist) {
+        SetDeviceAvailable(AudioDeviceType::DEVICE_BLUETOOTH_SCO, false);
+    }
+#ifdef DEVICE_EARPIECE_SUPPORT
+    if (needAddEarpiece && deviceType == AudioDeviceType::DEVICE_WIRED_HEADSET && !wiredHeadsetExist) {
+        AudioDevice audioDevice = {
+            .deviceType = AudioDeviceType::DEVICE_EARPIECE,
+            .address = { 0 },
+        };
+        info_.audioDeviceList.push_back(audioDevice);
+        TELEPHONY_LOGI("add Earpiece device success");
+    }
+#endif
+    TELEPHONY_LOGI("RemoveAudioDeviceList success");
 }
 
 bool AudioDeviceManager::InitAudioDevice()
 {
     // when audio deactivate interrupt , reinit
     // when external audio device connection state changed , reinit
-    auto device = DelayedSingleton<AudioControlManager>::GetInstance()->GetInitAudioDevice();
+    auto device = DelayedSingleton<AudioControlManager>::GetInstance()->GetInitAudioDeviceType();
     return SwitchDevice(device);
 }
 
@@ -134,24 +234,24 @@ bool AudioDeviceManager::ConnectBtScoWithAddress(const std::string &bluetoothAdd
     return false;
 }
 
-bool AudioDeviceManager::SwitchDevice(AudioDevice device)
+bool AudioDeviceManager::SwitchDevice(AudioDeviceType device)
 {
     bool result = false;
     std::lock_guard<std::mutex> lock(mutex_);
     switch (device) {
-        case AudioDevice::DEVICE_EARPIECE:
+        case AudioDeviceType::DEVICE_EARPIECE:
             result = EnableEarpiece();
             break;
-        case AudioDevice::DEVICE_SPEAKER:
+        case AudioDeviceType::DEVICE_SPEAKER:
             result = EnableSpeaker();
             break;
-        case AudioDevice::DEVICE_WIRED_HEADSET:
+        case AudioDeviceType::DEVICE_WIRED_HEADSET:
             result = EnableWiredHeadset();
             break;
-        case AudioDevice::DEVICE_BLUETOOTH_SCO:
+        case AudioDeviceType::DEVICE_BLUETOOTH_SCO:
             result = EnableBtSco();
             break;
-        case AudioDevice::DEVICE_DISABLE:
+        case AudioDeviceType::DEVICE_DISABLE:
             result = DisableAll();
             break;
         default:
@@ -170,8 +270,7 @@ bool AudioDeviceManager::EnableSpeaker()
             return false;
         }
         TELEPHONY_LOGI("speaker enabled , current audio device : speaker");
-        SetCurrentAudioDevice(AudioDevice::DEVICE_SPEAKER);
-        SetSpeakerDevEnable();
+        SetCurrentAudioDevice(AudioDeviceType::DEVICE_SPEAKER);
         return true;
     }
     TELEPHONY_LOGI("enable speaker device failed");
@@ -187,8 +286,7 @@ bool AudioDeviceManager::EnableEarpiece()
             return false;
         }
         TELEPHONY_LOGI("earpiece enabled , current audio device : earpiece");
-        SetCurrentAudioDevice(AudioDevice::DEVICE_EARPIECE);
-        SetEarpieceDevEnable();
+        SetCurrentAudioDevice(AudioDeviceType::DEVICE_EARPIECE);
         return true;
     }
     TELEPHONY_LOGI("enable earpiece device failed");
@@ -204,8 +302,7 @@ bool AudioDeviceManager::EnableWiredHeadset()
             return false;
         }
         TELEPHONY_LOGI("wired headset enabled , current audio device : wired headset");
-        SetCurrentAudioDevice(AudioDevice::DEVICE_WIRED_HEADSET);
-        SetWiredHeadsetDevEnable();
+        SetCurrentAudioDevice(AudioDeviceType::DEVICE_WIRED_HEADSET);
         return true;
     }
     TELEPHONY_LOGI("enable wired headset device failed");
@@ -221,8 +318,7 @@ bool AudioDeviceManager::EnableBtSco()
             return false;
         }
         TELEPHONY_LOGI("bluetooth sco enabled , current audio device : bluetooth sco");
-        SetCurrentAudioDevice(AudioDevice::DEVICE_BLUETOOTH_SCO);
-        SetBtScoDevEnable();
+        SetCurrentAudioDevice(AudioDeviceType::DEVICE_BLUETOOTH_SCO);
         return true;
     }
     TELEPHONY_LOGI("enable bluetooth sco device failed");
@@ -244,51 +340,41 @@ bool AudioDeviceManager::DisableAll()
     return true;
 }
 
-void AudioDeviceManager::SetCurrentAudioDevice(AudioDevice device)
+void AudioDeviceManager::SetCurrentAudioDevice(AudioDeviceType deviceType)
 {
-    if (audioDevice_ == AudioDevice::DEVICE_BLUETOOTH_SCO && audioDevice_ != device) {
+    if (audioDeviceType_ == AudioDeviceType::DEVICE_BLUETOOTH_SCO && audioDeviceType_ != deviceType) {
         DelayedSingleton<BluetoothConnection>::GetInstance()->SetBtScoState(SCO_STATE_DISCONNECTED);
-    } else if (audioDevice_ != AudioDevice::DEVICE_BLUETOOTH_SCO && device == AudioDevice::DEVICE_BLUETOOTH_SCO) {
+    } else if (audioDeviceType_ != AudioDeviceType::DEVICE_BLUETOOTH_SCO &&
+               deviceType == AudioDeviceType::DEVICE_BLUETOOTH_SCO) {
         DelayedSingleton<BluetoothConnection>::GetInstance()->SetBtScoState(SCO_STATE_CONNECTED);
     }
-    audioDevice_ = device;
+    audioDeviceType_ = deviceType;
+    ReportAudioDeviceChange();
 }
 
-AudioDevice AudioDeviceManager::GetCurrentAudioDevice()
+int32_t AudioDeviceManager::ReportAudioDeviceChange()
 {
-    return audioDevice_;
+    info_.currentAudioDevice.deviceType = audioDeviceType_;
+    std::string address = "";
+    if (audioDeviceType_ == AudioDeviceType::DEVICE_BLUETOOTH_SCO) {
+        std::shared_ptr<BluetoothCallManager> bluetoothCallManager = std::make_shared<BluetoothCallManager>();
+        std::string address = bluetoothCallManager->GetConnectedScoAddr();
+    }
+    if (address.length() > kMaxAddressLen) {
+        TELEPHONY_LOGE("address is not too long");
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
+    }
+    if (memcpy_s(info_.currentAudioDevice.address, kMaxAddressLen, address.c_str(), address.length()) != EOK) {
+        TELEPHONY_LOGE("memcpy_s address fail");
+        return TELEPHONY_ERR_MEMCPY_FAIL;
+    }
+    info_.isMuted = DelayedSingleton<AudioProxy>::GetInstance()->IsMicrophoneMute();
+    return DelayedSingleton<CallAbilityReportProxy>::GetInstance()->ReportAudioDeviceChange(info_);
 }
 
-void AudioDeviceManager::SetEarpieceDevEnable()
+AudioDeviceType AudioDeviceManager::GetCurrentAudioDevice()
 {
-    isEarpieceDevEnable_ = true;
-    isBtScoDevEnable_ = false;
-    isWiredHeadsetDevEnable_ = false;
-    isSpeakerDevEnable_ = false;
-}
-
-void AudioDeviceManager::SetSpeakerDevEnable()
-{
-    isSpeakerDevEnable_ = true;
-    isWiredHeadsetDevEnable_ = false;
-    isBtScoDevEnable_ = false;
-    isEarpieceDevEnable_ = false;
-}
-
-void AudioDeviceManager::SetBtScoDevEnable()
-{
-    isBtScoDevEnable_ = true;
-    isWiredHeadsetDevEnable_ = false;
-    isSpeakerDevEnable_ = false;
-    isEarpieceDevEnable_ = false;
-}
-
-void AudioDeviceManager::SetWiredHeadsetDevEnable()
-{
-    isWiredHeadsetDevEnable_ = true;
-    isBtScoDevEnable_ = false;
-    isSpeakerDevEnable_ = false;
-    isEarpieceDevEnable_ = false;
+    return audioDeviceType_;
 }
 
 bool AudioDeviceManager::IsEarpieceDevEnable()
@@ -316,19 +402,9 @@ bool AudioDeviceManager::IsBtScoConnected()
     return isBtScoConnected_;
 }
 
-void AudioDeviceManager::SetBtScoAvailable(bool connected)
-{
-    isBtScoConnected_ = connected;
-}
-
 bool AudioDeviceManager::IsWiredHeadsetConnected()
 {
     return isWiredHeadsetConnected_;
-}
-
-void AudioDeviceManager::SetWiredHeadsetAvailable(bool connected)
-{
-    isWiredHeadsetConnected_ = connected;
 }
 
 bool AudioDeviceManager::IsEarpieceAvailable()
@@ -341,9 +417,24 @@ bool AudioDeviceManager::IsSpeakerAvailable()
     return isSpeakerAvailable_;
 }
 
-void AudioDeviceManager::SetSpeakerAvailable(bool available)
+void AudioDeviceManager::SetDeviceAvailable(AudioDeviceType deviceType, bool available)
 {
-    isSpeakerAvailable_ = available;
+    switch (deviceType) {
+        case AudioDeviceType::DEVICE_SPEAKER:
+            isSpeakerAvailable_ = available;
+            break;
+        case AudioDeviceType::DEVICE_EARPIECE:
+            isEarpieceAvailable_ = available;
+            break;
+        case AudioDeviceType::DEVICE_BLUETOOTH_SCO:
+            isBtScoConnected_ = available;
+            break;
+        case AudioDeviceType::DEVICE_WIRED_HEADSET:
+            isWiredHeadsetConnected_ = available;
+            break;
+        default:
+            break;
+    }
 }
 } // namespace Telephony
 } // namespace OHOS

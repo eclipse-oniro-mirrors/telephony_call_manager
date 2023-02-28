@@ -15,11 +15,11 @@
 
 #include "call_number_utils.h"
 
-#include "phonenumbers/phonenumber.pb.h"
+#include <regex>
 
+#include "phonenumbers/phonenumber.pb.h"
 #include "telephony_log_wrapper.h"
 #include "telephony_types.h"
-
 #include "call_manager_errors.h"
 #include "cellular_call_connection.h"
 
@@ -103,6 +103,52 @@ bool CallNumberUtils::IsValidSlotId(int32_t slotId) const
         }
     }
     return false;
+}
+
+bool CallNumberUtils::IsMMICode(const std::string &number)
+{
+    if (number.empty()) {
+        TELEPHONY_LOGE("number is empty.");
+        return false;
+    }
+    if (RegexMatchMmi(number)) {
+        return true;
+    }
+
+    if (number.back() == '#') {
+        TELEPHONY_LOGI("number is end of #");
+        return true;
+    }
+
+    return false;
+}
+
+bool CallNumberUtils::RegexMatchMmi(const std::string &number) {
+    std::string symbols =
+        "((\\*|#|\\*#|\\*\\*|##)(\\d{2,3})(\\*([^*#]*)(\\*([^*#]*)(\\*([^*#]*)(\\*([^*#]*))?)?)?)?#)(.*)";
+    std::regex pattern(symbols);
+    std::smatch results;
+    if (regex_match(number, results, pattern)) {
+        TELEPHONY_LOGI("regex_match ture");
+        return true;
+    }
+    return false;
+}
+
+std::string CallNumberUtils::RemoveSeparatorsPhoneNumber(const std::string &phoneString)
+{
+    std::string newString;
+    if (phoneString.empty()) {
+        TELEPHONY_LOGE("RemoveSeparatorsPhoneNumber return, phoneStr is empty.");
+        return newString;
+    }
+    for (char c : phoneString) {
+        if ((c >= '0' && c <= '9') || c == '*' || c == '#' || c == '+' || c == 'N' || c == ',' || c == ';') {
+            newString += c;
+        }
+    }
+
+    return newString;
 }
 } // namespace Telephony
 } // namespace OHOS

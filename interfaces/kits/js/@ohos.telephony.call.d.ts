@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-import {AsyncCallback, Callback} from "./basic";
+import { AsyncCallback, Callback } from "./basic";
 
 /**
  * Provides methods related to call management.
@@ -618,6 +618,41 @@ declare namespace call {
   function off(type: 'mmiCodeResult', callback?: Callback<MmiCodeResults>): void;
 
   /**
+   * Subscribe to the audioDeviceChange event.
+   *
+   * @param type Indicates the observer type.
+   * @param callback Return the result of Current AudioDevice.
+   * @permission ohos.permission.SET_TELEPHONY_STATE
+   * @throws {BusinessError} 201 - Permission denied.
+   * @throws {BusinessError} 401 - Parameter error.
+   * @throws {BusinessError} 8300001 - Invalid parameter value.
+   * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
+   * @throws {BusinessError} 8300003 - System internal error.
+   * @throws {BusinessError} 8300999 - Unknown error code.
+   * @systemapi Hide this for inner system use.
+   * @since 10
+   */
+  function on(type: 'audioDeviceChange', callback: Callback<AudioDeviceInfo>): void;
+
+  /**
+   * Unsubscribe from the audioDeviceChange event.
+   *
+   * @param type Indicates the observer type.
+   * @param callback Return the result of Current AudioDevice.
+   * @permission ohos.permission.SET_TELEPHONY_STATE
+   * @throws {BusinessError} 201 - Permission denied.
+   * @throws {BusinessError} 401 - Parameter error.
+   * @throws {BusinessError} 8300001 - Invalid parameter value.
+   * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
+   * @throws {BusinessError} 8300003 - System internal error.
+   * @throws {BusinessError} 8300999 - Unknown error code.
+   * @systemapi Hide this for inner system use.
+   * @since 10
+   */
+  function off(type: 'audioDeviceChange', callback?: Callback<AudioDeviceInfo>): void;
+
+  /**
+   * @returns Returns {@code true} If the device currently allows new calls; returns {@code false} otherwise.
    * Judge whether to allow another new call.
    *
    * @param callback Returns {@code true} If the device currently allows new calls; returns {@code false} otherwise.
@@ -805,23 +840,7 @@ declare namespace call {
    * @since 8
    */
   function setAudioDevice(device: AudioDevice, callback: AsyncCallback<void>): void;
-
-  /**
-   * Set the audio device with options.
-   *
-   * @param device Indicates the device of audio.
-   * @param options Indicates additional information, such as address of bluetooth.
-   * @param callback Returns {@code true} if the request is successful; returns {@code false} otherwise.
-   * @throws {BusinessError} 401 - Parameter error.
-   * @throws {BusinessError} 8300001 - Invalid parameter value.
-   * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
-   * @throws {BusinessError} 8300003 - System internal error.
-   * @throws {BusinessError} 8300999 - Unknown error code.
-   * @systemapi Hide this for inner system use.
-   * @since 9
-   */
-  function setAudioDevice(device: AudioDevice, options: AudioDeviceOptions, callback: AsyncCallback<void>): void;
-  function setAudioDevice(device: AudioDevice, options?: AudioDeviceOptions): Promise<void>;
+  function setAudioDevice(device: AudioDevice): Promise<void>;
 
   /**
    * Join the conference call.
@@ -922,14 +941,35 @@ declare namespace call {
 
   /**
    * @systemapi Hide this for inner system use.
-   * @since 8
+   * @since 10
    */
-  export enum AudioDevice {
+  export enum AudioDeviceType {
     DEVICE_EARPIECE,
     DEVICE_SPEAKER,
     DEVICE_WIRED_HEADSET,
     DEVICE_BLUETOOTH_SCO,
-    DEVICE_MIC,
+  }
+
+  /**
+   * @systemapi Hide this for inner system use.
+   * @since 10
+   */
+  export interface AudioDevice {
+    deviceType: AudioDeviceType;
+    address?: string;
+  }
+
+  /**
+   * @systemapi Hide this for inner system use.
+   * @since 10
+   */
+  export interface AudioDeviceInfo {
+    /** Indicates the list of support audiodevice. */
+    audioDeviceList: Array<AudioDevice>;
+    /** Indicates the type of current audiodevice. */
+    currentAudioDevice: AudioDevice;
+    /** Indicates the status of mute. */
+    isMuted: boolean;
   }
 
   /**
@@ -1359,19 +1399,6 @@ declare namespace call {
      * @since 7
      */
     countryCode?: string;
-  }
-
-  /**
-   * @systemapi Hide this for inner system use.
-   * @since 9
-   */
-  export interface AudioDeviceOptions {
-    /**
-     * Indicates the bluetooth device address.
-     *
-     * @since 9
-     */
-    bluetoothAddress?: string;
   }
 
   /**

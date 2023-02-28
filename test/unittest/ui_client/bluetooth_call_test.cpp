@@ -505,8 +505,8 @@ void BluetoothCallTest::SetAudioDevice()
         std::cout << "g_bluetoothCallPtr is nullptr" << std::endl;
         return;
     }
-    AudioDevice device = AudioDevice::DEVICE_UNKNOWN;
-    device = static_cast<AudioDevice>(deviceType);
+    AudioDeviceType device = AudioDeviceType::DEVICE_UNKNOWN;
+    device = static_cast<AudioDeviceType>(deviceType);
     std::string address = "0C:D7:46:14:AA:33";
     int32_t ret = g_bluetoothCallPtr->SetAudioDevice(device, address);
     std::cout << "return value:" << ret << std::endl;

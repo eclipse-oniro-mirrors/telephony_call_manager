@@ -221,5 +221,24 @@ int32_t CallAbilityReportProxy::OttCallRequest(OttCallRequestId requestId, AppEx
     TELEPHONY_LOGI("OttCallRequest success, requestId:%{public}d", requestId);
     return ret;
 }
+
+int32_t CallAbilityReportProxy::ReportAudioDeviceChange(const AudioDeviceInfo &info)
+{
+    int32_t ret = TELEPHONY_ERR_FAIL;
+    std::lock_guard<std::mutex> lock(mutex_);
+    std::list<sptr<ICallAbilityCallback>>::iterator it = callbackPtrList_.begin();
+    for (; it != callbackPtrList_.end(); ++it) {
+        if ((*it)) {
+            ret = (*it)->OnReportAudioDeviceChange(info);
+            if (ret != TELEPHONY_SUCCESS) {
+                TELEPHONY_LOGW("ReportAudioDeviceChange failed, errcode:%{public}d, bundleName:%{public}s", ret,
+                    ((*it)->GetBundleName()).c_str());
+                continue;
+            }
+        }
+    }
+    TELEPHONY_LOGI("ReportAudioDeviceChange success");
+    return ret;
+}
 } // namespace Telephony
 } // namespace OHOS

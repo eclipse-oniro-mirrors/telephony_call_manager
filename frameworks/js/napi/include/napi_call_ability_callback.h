@@ -57,6 +57,8 @@ public:
     void UnRegisterStopRttCallback();
     void RegisterMmiCodeCallback(EventCallback eventCallback);
     void UnRegisterMmiCodeCallback();
+    void RegisterAudioDeviceCallback(EventCallback eventCallback);
+    void UnRegisterAudioDeviceCallback();
     int32_t UpdateCallStateInfo(const CallAttributeInfo &info);
     int32_t UpdateCallEvent(const CallEventInfo &info);
     int32_t UpdateCallDisconnectedCause(const DisconnectedDetails &details);
@@ -65,6 +67,7 @@ public:
     int32_t RegisterUpdateCallMediaModeCallback(EventCallback callback);
     void UnRegisterUpdateCallMediaModeCallback();
     int32_t UpdateMmiCodeResultsInfo(const MmiCodeInfo &info);
+    int32_t UpdateAudioDeviceInfo(const AudioDeviceInfo &info);
 
 private:
     static void ReportCallStateWork(uv_work_t *work, int32_t status);
@@ -99,6 +102,8 @@ private:
     static void ReportCallMediaModeInfo(AppExecFwk::PacMap &resultInfo, EventCallback supplementInfo);
     static void ReportMmiCodeWork(uv_work_t *work, int32_t status);
     static int32_t ReportMmiCode(MmiCodeInfo &info, EventCallback eventCallback);
+    static void ReportAudioDeviceInfoWork(uv_work_t *work, int32_t status);
+    static int32_t ReportAudioDeviceInfo(AudioDeviceInfo &info, EventCallback eventCallback);
 
 private:
     EventCallback stateCallback_;
@@ -115,6 +120,7 @@ private:
     EventCallback stopRttCallback_;
     EventCallback updateCallMediaModeCallback_;
     EventCallback mmiCodeCallback_;
+    EventCallback audioDeviceCallback_;
     using CallResultReportIdProcessorFunc = int32_t (NapiCallAbilityCallback::*)(AppExecFwk::PacMap &resultInfo);
     std::map<CallResultReportId, CallResultReportIdProcessorFunc> memberFuncMap_;
     std::mutex mutex_;

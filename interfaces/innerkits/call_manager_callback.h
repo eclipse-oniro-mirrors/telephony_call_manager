@@ -33,6 +33,7 @@ public:
     virtual int32_t OnReportAsyncResults(CallResultReportId reportId, AppExecFwk::PacMap &resultInfo) = 0;
     virtual int32_t OnOttCallRequest(OttCallRequestId requestId, AppExecFwk::PacMap &info) = 0;
     virtual int32_t OnReportMmiCodeResult(const MmiCodeInfo &info) = 0;
+    virtual int32_t OnReportAudioDeviceChange(const AudioDeviceInfo &info) = 0;
 };
 } // namespace Telephony
 } // namespace OHOS

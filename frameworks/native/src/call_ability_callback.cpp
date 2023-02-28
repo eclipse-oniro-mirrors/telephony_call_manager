@@ -88,5 +88,14 @@ int32_t CallAbilityCallback::OnOttCallRequest(OttCallRequestId requestId, AppExe
     }
     return TELEPHONY_SUCCESS;
 }
+
+int32_t CallAbilityCallback::OnReportAudioDeviceChange(const AudioDeviceInfo &info)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (callbackPtr_ != nullptr) {
+        return callbackPtr_->OnReportAudioDeviceChange(info);
+    }
+    return TELEPHONY_SUCCESS;
+}
 } // namespace Telephony
 } // namespace OHOS

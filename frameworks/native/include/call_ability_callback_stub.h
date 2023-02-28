@@ -41,6 +41,7 @@ private:
     int32_t OnUpdateAysncResults(MessageParcel &data, MessageParcel &reply);
     int32_t OnUpdateOttCallRequest(MessageParcel &data, MessageParcel &reply);
     int32_t OnUpdateMmiCodeResults(MessageParcel &data, MessageParcel &reply);
+    int32_t OnUpdateAudioDeviceChange(MessageParcel &data, MessageParcel &reply);
 
     std::map<uint32_t, CallAbilityCallbackFunc> memberFuncMap_;
 };

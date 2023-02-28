@@ -25,7 +25,7 @@
 using namespace OHOS::Telephony;
 namespace OHOS {
 static bool g_isInited = false;
-constexpr int32_t DEVICE_TYPE = 8;
+constexpr int32_t AUDIO_DEVICE_NUM = 6;
 
 bool IsServiceInited()
 {
@@ -39,20 +39,31 @@ bool IsServiceInited()
     return g_isInited;
 }
 
-int32_t SetAudioDevice(const uint8_t *data, size_t size)
+void SetAudioDevice(const uint8_t *data, size_t size)
 {
     if (!IsServiceInited()) {
-        return TELEPHONY_ERROR;
+        return;
     }
     std::string address(reinterpret_cast<const char *>(data), size);
-    int32_t deviceType = static_cast<int32_t>(size % DEVICE_TYPE);
+    AudioDevice audioDevice;
+    if (memset_s(&audioDevice, sizeof(AudioDevice), 0, sizeof(AudioDevice)) != EOK) {
+        TELEPHONY_LOGE("memset_s fail");
+        return;
+    }
+    audioDevice.deviceType = static_cast<AudioDeviceType>(size % AUDIO_DEVICE_NUM);
+    if (address.length() > kMaxAddressLen) {
+        TELEPHONY_LOGE("address is not too long");
+        return;
+    }
+    if (memcpy_s(audioDevice.address, kMaxAddressLen, address.c_str(), address.length()) != EOK) {
+        return;
+    }
     MessageParcel dataParcel;
-    dataParcel.WriteInt32(deviceType);
-    dataParcel.WriteString(address);
+    dataParcel.WriteRawData((const void *)&audioDevice, sizeof(AudioDevice));
     dataParcel.RewindRead(0);
 
     MessageParcel reply;
-    return DelayedSingleton<CallManagerService>::GetInstance()->OnSetAudioDevice(dataParcel, reply);
+    DelayedSingleton<CallManagerService>::GetInstance()->OnSetAudioDevice(dataParcel, reply);
 }
 
 void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)

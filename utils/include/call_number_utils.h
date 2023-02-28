@@ -35,6 +35,9 @@ public:
         const i18n::phonenumbers::PhoneNumberUtil::PhoneNumberFormat formatInfo, std::string &formatNumber);
     int32_t CheckNumberIsEmergency(const std::string &phoneNumber, const int32_t slotId, bool &enabled);
     bool IsValidSlotId(int32_t slotId) const;
+    bool IsMMICode(const std::string &number);
+    bool RegexMatchMmi(const std::string &number);
+    std::string RemoveSeparatorsPhoneNumber(const std::string &phoneString);
 
 private:
     i18n::phonenumbers::PhoneNumberUtil *phoneUtils_;

@@ -71,10 +71,13 @@ void AudioControlManagerFunc(const uint8_t *data, size_t size)
     DisconnectedDetails details;
     bool isMute = static_cast<bool>(size % BOOL_NUM);
     RingState ringState = static_cast<RingState>(size % RING_STATE_NUM);
-    AudioDevice device = static_cast<AudioDevice>(size % AUDIO_DEVICE_NUM);
+    AudioDevice audioDevice = {
+        .deviceType = static_cast<AudioDeviceType>(size % AUDIO_DEVICE_NUM),
+        .address = { 0 },
+    };
 
     audioControlManager->SetAudioInterruptState(state);
-    audioControlManager->SetAudioDevice(device);
+    audioControlManager->SetAudioDevice(audioDevice);
     audioControlManager->CallDestroyed(details);
     audioControlManager->NewCallCreated(callObjectPtr);
     audioControlManager->IncomingCallActivated(callObjectPtr);
@@ -85,7 +88,7 @@ void AudioControlManagerFunc(const uint8_t *data, size_t size)
     audioControlManager->HandleNextState(callObjectPtr, priorState);
     audioControlManager->HandleNewActiveCall(callObjectPtr);
     audioControlManager->StopRingtone();
-    audioControlManager->GetInitAudioDevice();
+    audioControlManager->GetInitAudioDeviceType();
     audioControlManager->SetMute(isMute);
     audioControlManager->MuteRinger();
     audioControlManager->GetCallList();
@@ -109,17 +112,16 @@ void AudioDeviceManagerFunc(const uint8_t *data, size_t size)
     }
 
     std::shared_ptr<AudioDeviceManager> audioDeviceManager = DelayedSingleton<AudioDeviceManager>::GetInstance();
-    AudioDevice device = static_cast<AudioDevice>(size % AUDIO_DEVICE_NUM);
+    AudioDeviceType deviceType = static_cast<AudioDeviceType>(size % AUDIO_DEVICE_NUM);
     AudioEvent event = static_cast<AudioEvent>(size % AUDIO_EVENT);
     std::string bluetoothAddress(reinterpret_cast<const char *>(data), size);
-    bool available = static_cast<bool>(size % BOOL_NUM);
 
     audioDeviceManager->Init();
     audioDeviceManager->InitAudioDevice();
     audioDeviceManager->ProcessEvent(event);
     audioDeviceManager->SwitchDevice(event);
     audioDeviceManager->ConnectBtScoWithAddress(bluetoothAddress);
-    audioDeviceManager->SwitchDevice(device);
+    audioDeviceManager->SwitchDevice(deviceType);
     audioDeviceManager->EnableBtSco();
     audioDeviceManager->EnableWiredHeadset();
     audioDeviceManager->EnableSpeaker();
@@ -129,19 +131,12 @@ void AudioDeviceManagerFunc(const uint8_t *data, size_t size)
     audioDeviceManager->IsSpeakerDevEnable();
     audioDeviceManager->IsEarpieceDevEnable();
     audioDeviceManager->IsWiredHeadsetDevEnable();
-    audioDeviceManager->SetBtScoDevEnable();
-    audioDeviceManager->SetSpeakerDevEnable();
-    audioDeviceManager->SetEarpieceDevEnable();
-    audioDeviceManager->SetWiredHeadsetDevEnable();
     audioDeviceManager->GetCurrentAudioDevice();
-    audioDeviceManager->SetCurrentAudioDevice(device);
+    audioDeviceManager->SetCurrentAudioDevice(deviceType);
     audioDeviceManager->IsEarpieceAvailable();
     audioDeviceManager->IsSpeakerAvailable();
     audioDeviceManager->IsBtScoConnected();
     audioDeviceManager->IsWiredHeadsetConnected();
-    audioDeviceManager->SetSpeakerAvailable(available);
-    audioDeviceManager->SetWiredHeadsetAvailable(available);
-    audioDeviceManager->SetBtScoAvailable(available);
 }
 
 void AudioProxyFunc(const uint8_t *data, size_t size)

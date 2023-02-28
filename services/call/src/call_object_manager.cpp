@@ -18,12 +18,15 @@
 #include "call_manager_errors.h"
 #include "telephony_log_wrapper.h"
 #include "call_connect_ability.h"
+#include "report_call_info_handler.h"
 
 namespace OHOS {
 namespace Telephony {
 std::list<sptr<CallBase>> CallObjectManager::callObjectPtrList_;
 std::mutex CallObjectManager::listMutex_;
 int32_t CallObjectManager::callId_ = CALL_START_ID;
+std::condition_variable CallObjectManager::cv_;
+bool CallObjectManager::isFirstDialCallAdded_ = false;
 
 CallObjectManager::CallObjectManager()
 {
@@ -57,6 +60,11 @@ int32_t CallObjectManager::AddOneCallObject(sptr<CallBase> &call)
         DelayedSingleton<CallConnectAbility>::GetInstance()->ConnectAbility(info);
     }
     callObjectPtrList_.emplace_back(call);
+    if (callObjectPtrList_.size() == 1 &&
+        callObjectPtrList_.front()->GetTelCallState() == TelCallState::CALL_STATUS_DIALING) {
+        isFirstDialCallAdded_ = true;
+        cv_.notify_all();
+    }
     TELEPHONY_LOGI("AddOneCallObject success! callId:%{public}d,call list size:%{public}zu", call->GetCallID(),
         callObjectPtrList_.size());
     return TELEPHONY_SUCCESS;
@@ -407,6 +415,31 @@ std::vector<CallAttributeInfo> CallObjectManager::GetCallInfoList(int32_t slotId
         }
     }
     return callVec;
+}
+
+int32_t CallObjectManager::DealFailDial(sptr<CallBase> call)
+{
+    CallDetailInfo callDetatilInfo;
+    if (memset_s(&callDetatilInfo, sizeof(CallDetailInfo), 0, sizeof(CallDetailInfo)) != EOK) {
+        TELEPHONY_LOGE("memset_s callDetatilInfo fail");
+        return TELEPHONY_ERR_MEMSET_FAIL;
+    }
+    std::string number = call->GetAccountNumber();
+    callDetatilInfo.callType = call->GetCallType();
+    callDetatilInfo.accountId = call->GetSlotId();
+    callDetatilInfo.state = TelCallState::CALL_STATUS_DISCONNECTED;
+    callDetatilInfo.callMode = call->GetVideoStateType();
+    callDetatilInfo.voiceDomain = call->GetCallType() == CallType::TYPE_CS ? 0 : 1;
+    if (number.length() > kMaxNumberLen) {
+        TELEPHONY_LOGE("numbser length out of range");
+        return CALL_ERR_NUMBER_OUT_OF_RANGE;
+    }
+    if (memcpy_s(&callDetatilInfo.phoneNum, kMaxNumberLen, number.c_str(), number.length()) != EOK) {
+        TELEPHONY_LOGE("memcpy_s number failed!");
+        return TELEPHONY_ERR_MEMCPY_FAIL;
+    }
+
+    return DelayedSingleton<ReportCallInfoHandlerService>::GetInstance()->UpdateCallReportInfo(callDetatilInfo);
 }
 } // namespace Telephony
 } // namespace OHOS

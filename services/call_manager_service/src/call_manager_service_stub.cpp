@@ -115,6 +115,7 @@ void CallManagerServiceStub::InitCallMultimediaRequest()
     memberFuncMap_[INTERFACE_SET_PAUSE_IMAGE] = &CallManagerServiceStub::OnSetPausePicture;
     memberFuncMap_[INTERFACE_SET_DEVICE_DIRECTION] = &CallManagerServiceStub::OnSetDeviceDirection;
     memberFuncMap_[INTERFACE_UPDATE_CALL_MEDIA_MODE] = &CallManagerServiceStub::OnUpdateCallMediaMode;
+    memberFuncMap_[INTERFACE_REPORT_AUDIO_DEVICE_INFO] = &CallManagerServiceStub::OnReportAudioDeviceInfo;
 }
 
 void CallManagerServiceStub::InitImsServiceRequest()
@@ -348,9 +349,8 @@ int32_t CallManagerServiceStub::OnMuteRinger(MessageParcel &data, MessageParcel 
 
 int32_t CallManagerServiceStub::OnSetAudioDevice(MessageParcel &data, MessageParcel &reply)
 {
-    int32_t deviceType = data.ReadInt32();
-    std::string bluetoothAddress = data.ReadString();
-    int32_t result = SetAudioDevice((AudioDevice)deviceType, bluetoothAddress);
+    AudioDevice *audioDevice = (AudioDevice *)data.ReadRawData(sizeof(AudioDevice));
+    int32_t result = SetAudioDevice(*audioDevice);
     TELEPHONY_LOGI("result:%{public}d", result);
     if (!reply.WriteInt32(result)) {
         TELEPHONY_LOGE("fail to write parcel");
@@ -997,6 +997,18 @@ int32_t CallManagerServiceStub::OnGetProxyObjectPtr(MessageParcel &data, Message
         TELEPHONY_LOGE("OnGetProxyObjectPtr fail to write parcel");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallManagerServiceStub::OnReportAudioDeviceInfo(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t result = ReportAudioDeviceInfo();
+    TELEPHONY_LOGI("OnReportAudioDeviceInfo result:%{public}d", result);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("OnReportAudioDeviceInfo write reply failed.");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+
     return TELEPHONY_SUCCESS;
 }
 } // namespace Telephony

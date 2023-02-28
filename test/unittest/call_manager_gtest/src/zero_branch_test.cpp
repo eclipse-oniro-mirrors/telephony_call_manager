@@ -929,7 +929,7 @@ HWTEST_F(BranchTest, Telephony_BluetoothCallClient_001, Function | MediumTest | 
     bluetoothCallClient->IsInEmergencyCall(enabled);
     bluetoothCallClient->SetMuted(false);
     bluetoothCallClient->MuteRinger();
-    bluetoothCallClient->SetAudioDevice(AudioDevice::DEVICE_BLUETOOTH_SCO, "test");
+    bluetoothCallClient->SetAudioDevice(AudioDeviceType::DEVICE_BLUETOOTH_SCO, "test");
     bluetoothCallClient->GetCurrentCallList(0).size();
     ASSERT_NE(bluetoothCallClient->DialCall(value, extras), TELEPHONY_SUCCESS);
     ASSERT_NE(bluetoothCallClient->AnswerCall(), TELEPHONY_SUCCESS);
@@ -1008,8 +1008,11 @@ HWTEST_F(BranchTest, Telephony_CallManagerClient_002, Function | MediumTest | Le
     ASSERT_NE(callManagerClient->FormatPhoneNumberToE164(value, value, value), TELEPHONY_SUCCESS);
     ASSERT_NE(callManagerClient->SetMuted(false), TELEPHONY_SUCCESS);
     ASSERT_NE(callManagerClient->MuteRinger(), TELEPHONY_SUCCESS);
-    std::string bluetoothAddress = "";
-    ASSERT_NE(callManagerClient->SetAudioDevice(AudioDevice::DEVICE_EARPIECE, bluetoothAddress), TELEPHONY_SUCCESS);
+    AudioDevice audioDevice = {
+        .deviceType = AudioDeviceType::DEVICE_EARPIECE,
+        .address = { 0 },
+    };
+    ASSERT_NE(callManagerClient->SetAudioDevice(audioDevice), TELEPHONY_SUCCESS);
     ASSERT_NE(callManagerClient->ControlCamera(value), TELEPHONY_SUCCESS);
     VideoWindow window;
     ASSERT_NE(callManagerClient->SetPreviewWindow(window), TELEPHONY_SUCCESS);
@@ -1865,9 +1868,13 @@ HWTEST_F(BranchTest, Telephony_CallControlManager_004, Function | MediumTest | L
     ASSERT_NE(callControlManager->UpdateImsCallMode(INVALID_CALLID, mode), TELEPHONY_SUCCESS);
     std::u16string str = u"";
     ASSERT_NE(callControlManager->StartRtt(INVALID_CALLID, str), TELEPHONY_SUCCESS);
-    std::string address = "";
-    callControlManager->SetAudioDevice(AudioDevice::DEVICE_BLUETOOTH_SCO, address);
-    callControlManager->SetAudioDevice(AudioDevice::DEVICE_SPEAKER, address);
+    AudioDevice audioDevice = {
+        .deviceType = AudioDeviceType::DEVICE_BLUETOOTH_SCO,
+        .address = { 0 },
+    };
+    callControlManager->SetAudioDevice(audioDevice);
+    audioDevice.deviceType = AudioDeviceType::DEVICE_SPEAKER;
+    callControlManager->SetAudioDevice(audioDevice);
     bool enabled = false;
     callControlManager->IsEmergencyPhoneNumber(str, SIM1_SLOTID, enabled);
     callControlManager->IsEmergencyPhoneNumber(str, INVALID_SLOTID, enabled);

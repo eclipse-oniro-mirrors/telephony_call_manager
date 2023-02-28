@@ -92,7 +92,7 @@ public:
     int32_t JoinConference(int32_t callId, std::vector<std::u16string> &numberList);
     int32_t SetMuted(bool isMute);
     int32_t MuteRinger();
-    int32_t SetAudioDevice(AudioDevice deviceType, const std::string &bluetoothAddress);
+    int32_t SetAudioDevice(const AudioDevice &audioDevice);
     int32_t ControlCamera(std::u16string cameraId, int32_t callingUid, int32_t callingPid);
     int32_t SetPreviewWindow(VideoWindow &window);
     int32_t SetDisplayWindow(VideoWindow &window);

@@ -16,13 +16,11 @@
 #ifndef TELEPHONY_AUDIO_DEVICE_MANAGER_H
 #define TELEPHONY_AUDIO_DEVICE_MANAGER_H
 
-#include "audio_base.h"
-
 #include <map>
 
-#include "singleton.h"
-
+#include "audio_base.h"
 #include "call_manager_inner_type.h"
+#include "singleton.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -40,15 +38,16 @@ public:
     static bool IsSpeakerAvailable();
     static bool IsBtScoConnected();
     static bool IsWiredHeadsetConnected();
-    static void SetSpeakerAvailable(bool available);
-    static void SetWiredHeadsetAvailable(bool available);
-    static void SetBtScoAvailable(bool available);
+    static void SetDeviceAvailable(AudioDeviceType deviceType, bool available);
     bool ConnectBtScoWithAddress(const std::string &bluetoothAddress);
-    bool SwitchDevice(AudioDevice device);
+    bool SwitchDevice(AudioDeviceType device);
+    void AddAudioDeviceList(const std::string &address, AudioDeviceType deviceType);
+    void RemoveAudioDeviceList(const std::string &address, AudioDeviceType deviceType);
+    int32_t ReportAudioDeviceChange();
 
 private:
     std::mutex mutex_;
-    AudioDevice audioDevice_;
+    AudioDeviceType audioDeviceType_;
     static bool isBtScoDevEnable_;
     bool isWiredHeadsetDevEnable_ = false;
     bool isSpeakerDevEnable_ = false;
@@ -61,6 +60,7 @@ private:
     bool isAudioActivated_;
     using AudioDeviceManagerFunc = bool (AudioDeviceManager::*)();
     std::map<uint32_t, AudioDeviceManagerFunc> memberFuncMap_;
+    AudioDeviceInfo info_;
     bool SwitchDevice(AudioEvent event);
     bool EnableBtSco();
     bool EnableWiredHeadset();
@@ -71,12 +71,8 @@ private:
     bool IsSpeakerDevEnable();
     bool IsEarpieceDevEnable();
     bool IsWiredHeadsetDevEnable();
-    void SetBtScoDevEnable();
-    void SetSpeakerDevEnable();
-    void SetEarpieceDevEnable();
-    void SetWiredHeadsetDevEnable();
-    AudioDevice GetCurrentAudioDevice();
-    void SetCurrentAudioDevice(AudioDevice device);
+    AudioDeviceType GetCurrentAudioDevice();
+    void SetCurrentAudioDevice(AudioDeviceType deviceType);
 };
 } // namespace Telephony
 } // namespace OHOS

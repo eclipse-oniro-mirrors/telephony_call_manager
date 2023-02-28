@@ -31,6 +31,7 @@ CallAbilityCallbackStub::CallAbilityCallbackStub()
     memberFuncMap_[UPDATE_CALL_ASYNC_RESULT_REQUEST] = &CallAbilityCallbackStub::OnUpdateAysncResults;
     memberFuncMap_[REPORT_OTT_CALL_REQUEST] = &CallAbilityCallbackStub::OnUpdateOttCallRequest;
     memberFuncMap_[UPDATE_MMI_CODE_RESULT_REQUEST] = &CallAbilityCallbackStub::OnUpdateMmiCodeResults;
+    memberFuncMap_[UPDATE_AUDIO_DEVICE_CHANGE_RESULT_REQUEST] = &CallAbilityCallbackStub::OnUpdateAudioDeviceChange;
 }
 
 CallAbilityCallbackStub::~CallAbilityCallbackStub()
@@ -188,6 +189,45 @@ int32_t CallAbilityCallbackStub::OnUpdateMmiCodeResults(MessageParcel &data, Mes
     }
 
     result = OnReportMmiCodeResult(*parcelPtr);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("writing parcel failed");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallAbilityCallbackStub::OnUpdateAudioDeviceChange(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t result = TELEPHONY_SUCCESS;
+    if (!data.ContainFileDescriptors()) {
+        TELEPHONY_LOGW("sent raw data is less than 32k");
+    }
+    AudioDeviceInfo info;
+    if (memset_s(&info, sizeof(AudioDeviceInfo), 0, sizeof(AudioDeviceInfo)) != EOK) {
+        TELEPHONY_LOGE("memset_s address fail");
+        return TELEPHONY_ERR_MEMSET_FAIL;
+    }
+    int32_t len = data.ReadInt32();
+    if (len <= 0) {
+        TELEPHONY_LOGE("Invalid parameter, len = %{public}d", len);
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
+    }
+    AudioDevice *audioDevicePtr = nullptr;
+    for (int32_t i = 0; i < len + 1; i++) {
+        audioDevicePtr = (AudioDevice *)(data.ReadRawData(sizeof(AudioDevice)));
+        if (audioDevicePtr == nullptr) {
+            TELEPHONY_LOGE("Invalid parameter audioDevicePtr");
+            return TELEPHONY_ERR_ARGUMENT_INVALID;
+        }
+        if (i < len) {
+            info.audioDeviceList.push_back(*audioDevicePtr);
+        } else {
+            info.currentAudioDevice = *audioDevicePtr;
+        }
+    }
+
+    info.isMuted = data.ReadBool();
+    result = OnReportAudioDeviceChange(info);
     if (!reply.WriteInt32(result)) {
         TELEPHONY_LOGE("writing parcel failed");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;

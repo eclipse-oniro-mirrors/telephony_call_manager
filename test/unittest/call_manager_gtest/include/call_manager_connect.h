@@ -248,6 +248,12 @@ public:
         return TELEPHONY_SUCCESS;
     }
 
+    int32_t OnReportAudioDeviceChange(const AudioDeviceInfo &info)
+    {
+        TELEPHONY_LOGI("OnReportAudioDeviceChange success!");
+        return TELEPHONY_SUCCESS;
+    }
+
 private:
     using CallAbilityCallbackFunc = int32_t (CallAbilityCallbackStub::*)(MessageParcel &data, MessageParcel &reply);
 
@@ -382,6 +388,11 @@ public:
     }
 
     int32_t OnReportMmiCodeResult(const MmiCodeInfo &info)
+    {
+        return TELEPHONY_SUCCESS;
+    }
+
+    int32_t OnReportAudioDeviceChange(const AudioDeviceInfo &info)
     {
         return TELEPHONY_SUCCESS;
     }
@@ -682,13 +693,13 @@ public:
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
 
-    int32_t SetAudioDevice(AudioDevice deviceType, const std::string &bluetoothAddress)
+    int32_t SetAudioDevice(const AudioDevice &audioDevice)
     {
         if (callManagerServicePtr_ == nullptr) {
             TELEPHONY_LOGE("callManagerServicePtr_ is nullptr!");
             return TELEPHONY_ERR_LOCAL_PTR_NULL;
         }
-        return callManagerServicePtr_->SetAudioDevice(deviceType, bluetoothAddress);
+        return callManagerServicePtr_->SetAudioDevice(audioDevice);
     }
 
     int32_t SetPreviewWindow(VideoWindow &window)

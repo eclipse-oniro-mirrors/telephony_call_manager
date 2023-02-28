@@ -34,6 +34,7 @@ public:
     int32_t OnReportAsyncResults(CallResultReportId reportId, AppExecFwk::PacMap &resultInfo) override;
     int32_t OnOttCallRequest(OttCallRequestId requestId, AppExecFwk::PacMap &info) override;
     int32_t OnReportMmiCodeResult(const MmiCodeInfo &info) override;
+    int32_t OnReportAudioDeviceChange(const AudioDeviceInfo &info) override;
 };
 } // namespace Telephony
 } // namespace OHOS

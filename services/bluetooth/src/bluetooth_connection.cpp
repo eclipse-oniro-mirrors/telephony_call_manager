@@ -215,6 +215,11 @@ bool BluetoothConnection::IsAudioActivated()
     return DelayedSingleton<AudioControlManager>::GetInstance()->IsAudioActivated();
 }
 
+std::string BluetoothConnection::GetConnectedScoAddr()
+{
+    return connectedScoAddr_;
+}
+
 #ifdef ABILITY_BLUETOOTH_SUPPORT
 void BluetoothConnection::OnScoStateChanged(const Bluetooth::BluetoothRemoteDevice &device, int32_t state)
 {
@@ -277,6 +282,8 @@ void BluetoothConnection::OnConnectionStateChanged(const Bluetooth::BluetoothRem
     std::string macAddress = device.GetDeviceAddr();
     switch (state) {
         case (int32_t)Bluetooth::BTConnectState::CONNECTED:
+            DelayedSingleton<AudioDeviceManager>::GetInstance()->AddAudioDeviceList(
+                macAddress, AudioDeviceType::DEVICE_BLUETOOTH_SCO);
             AddBtDevice(macAddress, device);
             /** try to connect sco while new bluetooth device connected
              *  if connect sco successfully , should switch current audio device to bluetooth sco
@@ -286,6 +293,8 @@ void BluetoothConnection::OnConnectionStateChanged(const Bluetooth::BluetoothRem
             }
             break;
         case (int32_t)Bluetooth::BTConnectState::DISCONNECTED:
+            DelayedSingleton<AudioDeviceManager>::GetInstance()->RemoveAudioDeviceList(
+                macAddress, AudioDeviceType::DEVICE_BLUETOOTH_SCO);
             RemoveBtDevice(macAddress);
             break;
         default:
