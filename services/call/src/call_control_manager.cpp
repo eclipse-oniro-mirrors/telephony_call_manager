@@ -937,6 +937,21 @@ int32_t CallControlManager::FormatPhoneNumberToE164(
     return ret;
 }
 
+int32_t CallControlManager::CloseUnFinishedUssd(int32_t slotId)
+{
+    int32_t ret = CallPolicy::CloseUnFinishedUssdPolicy(slotId);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("CloseUnFinishedUssd failed!");
+        return ret;
+    }
+    if (callSettingManagerPtr_ != nullptr) {
+        return callSettingManagerPtr_->CloseUnFinishedUssd(slotId);
+    } else {
+        TELEPHONY_LOGE("callSettingManagerPtr_ is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+}
+
 void CallControlManager::GetDialParaInfo(DialParaInfo &info)
 {
     std::lock_guard<std::mutex> lock(mutex_);

@@ -103,6 +103,7 @@ public:
     int32_t FormatPhoneNumber(std::u16string &number, std::u16string &countryCode, std::u16string &formatNumber);
     int32_t FormatPhoneNumberToE164(
         std::u16string &number, std::u16string &countryCode, std::u16string &formatNumber);
+    int32_t CloseUnFinishedUssd(int32_t slotId);
     void GetDialParaInfo(DialParaInfo &info);
     void GetDialParaInfo(DialParaInfo &info, AppExecFwk::PacMap &extras);
 

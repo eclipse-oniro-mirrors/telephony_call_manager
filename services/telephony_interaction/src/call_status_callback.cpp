@@ -348,5 +348,14 @@ int32_t CallStatusCallback::InviteToConferenceResult(const int32_t result)
     TELEPHONY_LOGI("InviteToConferenceResult result = %{public}d", result);
     return DelayedSingleton<CallAbilityReportProxy>::GetInstance()->ReportAsyncResults(reportId, resultInfo);
 }
+
+int32_t CallStatusCallback::CloseUnFinishedUssdResult(const int32_t result)
+{
+    CallResultReportId reportId = CallResultReportId::CLOSE_UNFINISHED_USSD_REPORT_ID;
+    AppExecFwk::PacMap resultInfo;
+    resultInfo.PutIntValue("result", result);
+    TELEPHONY_LOGI("CloseUnFinishedUssdResult result = %{public}d", result);
+    return DelayedSingleton<CallAbilityReportProxy>::GetInstance()->ReportAsyncResults(reportId, resultInfo);
+}
 } // namespace Telephony
 } // namespace OHOS

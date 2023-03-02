@@ -99,6 +99,7 @@ private:
     int32_t OnStopRtt(MessageParcel &data, MessageParcel &reply);
     int32_t OnReportOttCallDetailsInfo(MessageParcel &data, MessageParcel &reply);
     int32_t OnReportOttCallEventInfo(MessageParcel &data, MessageParcel &reply);
+    int32_t OnCloseUnFinishedUssd(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetProxyObjectPtr(MessageParcel &data, MessageParcel &reply);
     int32_t OnReportAudioDeviceInfo(MessageParcel &data, MessageParcel &reply);
     std::map<uint32_t, CallManagerServiceFunc> memberFuncMap_;

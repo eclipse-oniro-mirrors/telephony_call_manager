@@ -59,6 +59,7 @@ public:
         GET_CALL_WAITING,
         SET_CALL_RESTRICTION,
         GET_CALL_RESTRICTION,
+        CLOSE_UNFINISHED_USSD,
 
         /****************** config ******************/
         SET_DOMAIN_PREFERENCE_MODE = 300,
@@ -486,6 +487,14 @@ public:
      * @return Returns 0 on true, others on false.
      */
     virtual int32_t SetEmergencyCallList(int32_t slotId, std::vector<EmergencyCall>  &eccVec) = 0;
+
+    /**
+     * Close Unfinished ussd
+     *
+     * @param slotId
+     * @return Returns TELEPHONY_SUCCESS on success, others on failure.
+     */
+    virtual int32_t CloseUnFinishedUssd(int32_t slotId) = 0;
 
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"OHOS.Telephony.CellularCallInterface");

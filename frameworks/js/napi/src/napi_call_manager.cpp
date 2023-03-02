@@ -103,6 +103,7 @@ napi_value NapiCallManager::DeclareCallSupplementInterface(napi_env env, napi_va
         DECLARE_NAPI_FUNCTION("disableImsSwitch", DisableImsSwitch),
         DECLARE_NAPI_FUNCTION("isImsSwitchEnabled", IsImsSwitchEnabled),
         DECLARE_NAPI_FUNCTION("canSetCallTransferTime", CanSetCallTransferTime),
+        DECLARE_NAPI_FUNCTION("closeUnFinishedUssd", CloseUnFinishedUssd),
     };
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc));
     return exports;
@@ -2330,6 +2331,30 @@ napi_value NapiCallManager::ReportOttCallEventInfo(napi_env env, napi_callback_i
         env, asyncContext.release(), "ReportOttCallEventInfo", NativeReportOttCallEventInfo, NativeVoidCallBack);
 }
 
+napi_value NapiCallManager::CloseUnFinishedUssd(napi_env env, napi_callback_info info)
+{
+    GET_PARAMS(env, info, VALUE_MAXIMUM_LIMIT);
+    if (!MatchOneNumberParameter(env, argv, argc)) {
+        TELEPHONY_LOGE("NapiCallManager::CloseUnFinishedUssd MatchOneNumberParameter failed.");
+        NapiUtil::ThrowParameterError(env);
+        return nullptr;
+    }
+    auto asyncContext = std::make_unique<SupplementAsyncContext>();
+    if (asyncContext == nullptr) {
+        TELEPHONY_LOGE("NapiCallManager::CloseUnFinishedUssd asyncContext is nullptr.");
+        NapiUtil::ThrowParameterError(env);
+        return nullptr;
+    }
+    napi_get_value_int32(env, argv[ARRAY_INDEX_FIRST], &asyncContext->slotId);
+    if (argc == TWO_VALUE_LIMIT) {
+        napi_create_reference(env, argv[ARRAY_INDEX_SECOND], DATA_LENGTH_ONE, &(asyncContext->callbackRef));
+    }
+    asyncContext->env = env;
+    napi_create_reference(env, thisVar, DATA_LENGTH_ONE, &(asyncContext->thisVar));
+    return HandleAsyncWork(
+        env, asyncContext.release(), "CloseUnFinishedUssd", NativeCloseUnFinishedUssd, NativeVoidCallBackWithErrorCode);
+}
+
 napi_value NapiCallManager::HasVoiceCapability(napi_env env, napi_callback_info)
 {
     TELEPHONY_LOGI("napi_call HasVoiceCapability");
@@ -3926,6 +3951,45 @@ void NapiCallManager::NativeReportOttCallEventInfo(napi_env env, void *data)
     auto asyncContext = (OttEventAsyncContext *)data;
     asyncContext->resolved =
         DelayedSingleton<CallManagerClient>::GetInstance()->ReportOttCallEventInfo(asyncContext->eventInfo);
+}
+
+void NapiCallManager::NativeCloseUnFinishedUssd(napi_env env, void *data)
+{
+    if (data == nullptr) {
+        TELEPHONY_LOGE("NapiCallManager::NativeCloseUnFinishedUssd data is nullptr");
+        NapiUtil::ThrowParameterError(env);
+        return;
+    }
+
+    SupplementAsyncContext *asyncContext = (SupplementAsyncContext *)data;
+    if (!IsValidSlotId(asyncContext->slotId)) {
+        TELEPHONY_LOGE("NativeCloseUnFinishedUssd slotId is invalid");
+        asyncContext->errorCode = SLOT_ID_INVALID;
+        return;
+    }
+    EventCallback infoListener;
+    infoListener.env = asyncContext->env;
+    infoListener.thisVar = asyncContext->thisVar;
+    infoListener.callbackRef = asyncContext->callbackRef;
+    infoListener.deferred = asyncContext->deferred;
+    asyncContext->errorCode =
+        DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->RegisterCloseUnFinishedUssdCallback(infoListener);
+    if (asyncContext->errorCode != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("RegisterSetWaitingCallback failed!");
+        return;
+    }
+
+    asyncContext->errorCode =
+        DelayedSingleton<CallManagerClient>::GetInstance()->CloseUnFinishedUssd(asyncContext->slotId);
+    if (asyncContext->errorCode != TELEPHONY_SUCCESS) {
+        asyncContext->eventId = CALL_MANAGER_CLOSE_UNFINISHED_USSD;
+        DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->UnRegisterCloseUnFinishedUssdCallback();
+        TELEPHONY_LOGE("NativeCloseUnFinishedUssd failed!");
+        return;
+    }
+    asyncContext->resolved = TELEPHONY_SUCCESS;
+    asyncContext->callbackRef = nullptr;
+    asyncContext->deferred = nullptr;
 }
 
 void NapiCallManager::RegisterCallBack()

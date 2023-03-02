@@ -60,6 +60,7 @@ public:
     int32_t GetImsFeatureValuePolicy(int32_t slotId);
     int32_t SetImsFeatureValuePolicy(int32_t slotId);
     static int32_t InviteToConferencePolicy(int32_t callId, std::vector<std::string> &numberList);
+    int32_t CloseUnFinishedUssdPolicy(int32_t slotId);
 
 private:
     uint16_t onlyTwoCall_ = 2;

@@ -734,6 +734,20 @@ int32_t CellularCallConnection::SetMute(int32_t mute, int32_t slotId)
     return TELEPHONY_SUCCESS;
 }
 
+int CellularCallConnection::CloseUnFinishedUssd(int32_t slotId)
+{
+    if (ReConnectService() != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("ipc reconnect failed!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int errCode = cellularCallInterfacePtr_->CloseUnFinishedUssd(slotId);
+    if (errCode != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("CloseUnFinishedUssd failed, errcode:%{public}d", errCode);
+        return errCode;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
 void CellularCallConnection::SystemAbilityListener::OnAddSystemAbility(
     int32_t systemAbilityId, const std::string &deviceId)
 {

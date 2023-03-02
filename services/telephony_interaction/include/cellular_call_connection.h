@@ -433,6 +433,15 @@ public:
     int32_t SetMute(int32_t mute, int32_t slotId);
 
     /**
+     * CloseUnFinishedUssd
+     *
+     * @brief Close Unfinished Ussd function for the current account
+     * @param slotId[in], The slot id
+     * @return Returns 0 on success, others on failure.
+     */
+    int CloseUnFinishedUssd(int32_t slotId);
+
+    /**
      * Is Connect cellular call service Object
      *
      * @return result for Connect cellular call service
