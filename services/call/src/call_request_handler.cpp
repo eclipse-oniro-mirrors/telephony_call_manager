@@ -393,8 +393,7 @@ int32_t CallRequestHandlerService::RejectCall(int32_t callId, bool isSendSms, st
     para->callId = callId;
     para->isSendSms = isSendSms;
     (void)memset_s(para->content, REJECT_CALL_MSG_MAX_LEN + 1, 0, REJECT_CALL_MSG_MAX_LEN + 1);
-    errno_t result = memcpy_s(para->content, REJECT_CALL_MSG_MAX_LEN, content.c_str(),
-                              REJECT_CALL_MSG_MAX_LEN);
+    errno_t result = memcpy_s(para->content, REJECT_CALL_MSG_MAX_LEN, content.c_str(), content.length());
     if (para->isSendSms && result != EOK) {
         TELEPHONY_LOGE("memcpy_s rejectCall content failed!");
         CallManagerHisysevent::WriteHangUpFaultEvent(
