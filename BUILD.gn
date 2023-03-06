@@ -173,6 +173,7 @@ ohos_shared_library("tel_call_manager") {
     "-fno-rtti",
     "-O2",
     "-flto",
+    "-Wno-unused-but-set-variable",
   ]
 
   ldflags = [ "-flto" ]
