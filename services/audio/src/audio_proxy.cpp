@@ -84,23 +84,23 @@ bool AudioProxy::SetSpeakerDevActive()
 bool AudioProxy::SetWiredHeadsetDevActive()
 {
     if (!isWiredHeadsetConnected_) {
-        TELEPHONY_LOGI("SetWiredHeadsetDevActive wiredheadset is not connected");
+        TELEPHONY_LOGE("SetWiredHeadsetDevActive wiredheadset is not connected");
         return false;
     }
     if (AudioStandard::AudioSystemManager::GetInstance()->IsDeviceActive(AudioStandard::ActiveDeviceType::SPEAKER)) {
         int32_t ret = AudioStandard::AudioSystemManager::GetInstance()->SetDeviceActive(
             AudioStandard::ActiveDeviceType::SPEAKER, false);
         if (ret != ERR_NONE) {
-            TELEPHONY_LOGI("SetWiredHeadsetDevActive speaker close fail");
+            TELEPHONY_LOGE("SetWiredHeadsetDevActive speaker close fail");
             return false;
         }
     }
     if (AudioStandard::AudioSystemManager::GetInstance()->IsDeviceActive(
-            AudioStandard::ActiveDeviceType::BLUETOOTH_SCO)) {
+        AudioStandard::ActiveDeviceType::BLUETOOTH_SCO)) {
         int32_t ret = AudioStandard::AudioSystemManager::GetInstance()->SetDeviceActive(
             AudioStandard::ActiveDeviceType::BLUETOOTH_SCO, false);
         if (ret != ERR_NONE) {
-            TELEPHONY_LOGI("SetWiredHeadsetDevActive bluetooth sco close fail");
+            TELEPHONY_LOGE("SetWiredHeadsetDevActive bluetooth sco close fail");
             return false;
         }
     }
@@ -110,23 +110,23 @@ bool AudioProxy::SetWiredHeadsetDevActive()
 bool AudioProxy::SetEarpieceDevActive()
 {
     if (isWiredHeadsetConnected_) {
-        TELEPHONY_LOGI("SetEarpieceDevActive wiredheadset is connected, no need set earpiece dev active");
+        TELEPHONY_LOGE("SetEarpieceDevActive wiredheadset is connected, no need set earpiece dev active");
         return false;
     }
     if (AudioStandard::AudioSystemManager::GetInstance()->IsDeviceActive(AudioStandard::ActiveDeviceType::SPEAKER)) {
         int32_t ret = AudioStandard::AudioSystemManager::GetInstance()->SetDeviceActive(
             AudioStandard::ActiveDeviceType::SPEAKER, false);
         if (ret != ERR_NONE) {
-            TELEPHONY_LOGI("SetEarpieceDevActive speaker close fail");
+            TELEPHONY_LOGE("SetEarpieceDevActive speaker close fail");
             return false;
         }
     }
     if (AudioStandard::AudioSystemManager::GetInstance()->IsDeviceActive(
-            AudioStandard::ActiveDeviceType::BLUETOOTH_SCO)) {
+        AudioStandard::ActiveDeviceType::BLUETOOTH_SCO)) {
         int32_t ret = AudioStandard::AudioSystemManager::GetInstance()->SetDeviceActive(
             AudioStandard::ActiveDeviceType::BLUETOOTH_SCO, false);
         if (ret != ERR_NONE) {
-            TELEPHONY_LOGI("SetEarpieceDevActive bluetooth sco close fail");
+            TELEPHONY_LOGE("SetEarpieceDevActive bluetooth sco close fail");
             return false;
         }
     }

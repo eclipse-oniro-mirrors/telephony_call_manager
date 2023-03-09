@@ -177,7 +177,7 @@ int32_t CallStatusManager::HandleEventResultReportInfo(const CellularCallEventIn
     TELEPHONY_LOGI("recv one Event, eventId:%{public}d", info.eventId);
     sptr<CallBase> call = GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_DIALING);
     if (call != nullptr) {
-        int ret = DealFailDial(call);
+        int32_t ret = DealFailDial(call);
         TELEPHONY_LOGI("DealFailDial ret:%{public}d", ret);
     }
     CallEventInfo eventInfo;
@@ -338,7 +338,7 @@ int32_t CallStatusManager::UpdateDialingCallInfo(const CallDetailInfo &info)
     std::string tmpStr(info.phoneNum);
     sptr<CallBase> call = GetOneCallObject(tmpStr);
     if (call == nullptr) {
-        TELEPHONY_LOGE("Call is NULL");
+        TELEPHONY_LOGE("call is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     call->SetCallIndex(info.index);
@@ -358,6 +358,7 @@ int32_t CallStatusManager::DialingHandle(const CallDetailInfo &info)
         TELEPHONY_LOGE("DialingHandlePolicy failed!");
         ret = UpdateDialingCallInfo(info);
         if (ret != TELEPHONY_SUCCESS) {
+            TELEPHONY_LOGE("UpdateDialingCallInfo failed!");
             return ret;
         }
         return TELEPHONY_SUCCESS;

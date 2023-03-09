@@ -31,6 +31,7 @@ constexpr uint16_t ACCOUNT_NUMBER_MAX_LENGTH = 100;
 constexpr uint16_t CONNECT_SERVICE_WAIT_TIME = 1000; // ms
 constexpr int16_t ERR_ID = -1;
 constexpr int16_t INVALID_CALLID = 0;
+constexpr int16_t WAIT_TIME_ONE_SECOND = 1;
 // The follow hour and minute was use to confirm the set call transfer info time
 constexpr int16_t MIN_HOUR = 0;
 constexpr int16_t MAX_HOUR = 24;

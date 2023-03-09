@@ -288,7 +288,7 @@ int32_t CallRequestProcess::UpdateCallReportInfo(const DialParaInfo &info, TelCa
     callDetatilInfo.index = info.index;
     callDetatilInfo.state = state;
     callDetatilInfo.callMode = info.videoState;
-    callDetatilInfo.voiceDomain = info.callType == CallType::TYPE_CS ? 0 : 1;
+    callDetatilInfo.voiceDomain = static_cast<int32_t>(info.callType);
     if (info.number.length() > kMaxNumberLen) {
         TELEPHONY_LOGE("numbser length out of range");
         return CALL_ERR_NUMBER_OUT_OF_RANGE;
@@ -330,7 +330,7 @@ void CallRequestProcess::CarrierDialProcess(DialParaInfo &info)
         }
         std::unique_lock<std::mutex> lock(mutex_);
         while (!isFirstDialCallAdded_) {
-            if (cv_.wait_for(lock, std::chrono::seconds(1)) == std::cv_status::timeout) {
+            if (cv_.wait_for(lock, std::chrono::seconds(WAIT_TIME_ONE_SECOND)) == std::cv_status::timeout) {
                 TELEPHONY_LOGE("CarrierDialProcess call is not added");
                 return;
             }

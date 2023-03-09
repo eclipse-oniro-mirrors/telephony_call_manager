@@ -35,6 +35,7 @@ public:
     virtual int32_t OnOttCallRequest(OttCallRequestId requestId, AppExecFwk::PacMap &info) = 0;
     virtual int32_t OnReportMmiCodeResult(const MmiCodeInfo &info) = 0;
     virtual int32_t OnReportAudioDeviceChange(const AudioDeviceInfo &info) = 0;
+
     void SetBundleName(const std::string &name)
     {
         bundleName_ = name;
