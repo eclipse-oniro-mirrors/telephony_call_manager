@@ -135,6 +135,7 @@ private:
     time_t ringBeginTime_;
     time_t ringEndTime_;
     CallAnswerType answerType_;
+    int32_t accountId_;
     std::mutex mutex_;
 };
 } // namespace Telephony
