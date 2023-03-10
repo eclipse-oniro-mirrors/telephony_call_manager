@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-import { AsyncCallback, Callback } from "./basic";
+import {AsyncCallback, Callback} from "./basic";
 
 /**
  * Provides methods related to call management.
@@ -53,9 +53,9 @@ declare namespace call {
    * @systemapi Hide this for inner system use.
    * @since 9
    */
-   function dialCall(phoneNumber: string, callback: AsyncCallback<void>): void;
-   function dialCall(phoneNumber: string, options: DialCallOptions, callback: AsyncCallback<void>): void;
-   function dialCall(phoneNumber: string, options?: DialCallOptions): Promise<void>;
+  function dialCall(phoneNumber: string, callback: AsyncCallback<void>): void;
+  function dialCall(phoneNumber: string, options: DialCallOptions, callback: AsyncCallback<void>): void;
+  function dialCall(phoneNumber: string, options?: DialCallOptions): Promise<void>;
 
   /**
    * Go to the dial screen and the called number is displayed.
@@ -1680,7 +1680,7 @@ declare namespace call {
      *
      * @since 9
      */
-     ACM_EQUALTO_OR_GREATER_THAN_THE_MAXIMUM_VALUE = 68,
+    ACM_EQUALTO_OR_GREATER_THAN_THE_MAXIMUM_VALUE = 68,
 
     /**
      * Requested facility not implemented.

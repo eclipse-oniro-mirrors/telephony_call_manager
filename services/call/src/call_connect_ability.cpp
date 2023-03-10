@@ -62,7 +62,7 @@ void CallConnectAbility::DisconnectAbility()
     if (!isConnected_) {
         std::unique_lock<std::mutex> lock(mutex_);
         while (!isConnected_) {
-            if (cv_.wait_for(lock, std::chrono::seconds(1)) == std::cv_status::timeout) {
+            if (cv_.wait_for(lock, std::chrono::seconds(WAIT_TIME_ONE_SECOND)) == std::cv_status::timeout) {
                 TELEPHONY_LOGE("callui is not connected, no need to disconnect ability");
                 return;
             }

@@ -429,7 +429,7 @@ int32_t CallObjectManager::DealFailDial(sptr<CallBase> call)
     callDetatilInfo.accountId = call->GetSlotId();
     callDetatilInfo.state = TelCallState::CALL_STATUS_DISCONNECTED;
     callDetatilInfo.callMode = call->GetVideoStateType();
-    callDetatilInfo.voiceDomain = call->GetCallType() == CallType::TYPE_CS ? 0 : 1;
+    callDetatilInfo.voiceDomain = static_cast<int32_t>(call->GetCallType());
     if (number.length() > kMaxNumberLen) {
         TELEPHONY_LOGE("numbser length out of range");
         return CALL_ERR_NUMBER_OUT_OF_RANGE;

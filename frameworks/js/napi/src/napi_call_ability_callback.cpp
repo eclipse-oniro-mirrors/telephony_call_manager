@@ -717,7 +717,7 @@ int32_t NapiCallAbilityCallback::ReportAudioDeviceInfo(AudioDeviceInfo &info, Ev
     napi_value audioDeviceListValue = nullptr;
     napi_create_array(env, &audioDeviceListValue);
     std::vector<AudioDevice>::iterator it = info.audioDeviceList.begin();
-    int i = 0;
+    int32_t i = 0;
     for (; it != info.audioDeviceList.end(); ++it) {
         napi_value value = nullptr;
         napi_create_object(env, &value);

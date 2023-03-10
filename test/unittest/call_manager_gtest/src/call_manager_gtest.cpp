@@ -4141,6 +4141,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetAudioDevice_0100, Function |
         return;
     }
     if (memcpy_s(audioDevice.address, kMaxAddressLen, address.c_str(), address.length()) != EOK) {
+        TELEPHONY_LOGE("memcpy_s address fail");
         return;
     }
 

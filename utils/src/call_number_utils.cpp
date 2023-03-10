@@ -123,7 +123,8 @@ bool CallNumberUtils::IsMMICode(const std::string &number)
     return false;
 }
 
-bool CallNumberUtils::RegexMatchMmi(const std::string &number) {
+bool CallNumberUtils::RegexMatchMmi(const std::string &number)
+{
     std::string symbols =
         "((\\*|#|\\*#|\\*\\*|##)(\\d{2,3})(\\*([^*#]*)(\\*([^*#]*)(\\*([^*#]*)(\\*([^*#]*))?)?)?)?#)(.*)";
     std::regex pattern(symbols);

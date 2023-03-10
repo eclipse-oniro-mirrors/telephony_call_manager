@@ -97,6 +97,7 @@ void AudioDeviceManager::AddAudioDeviceList(const std::string &address, AudioDev
         return;
     }
     if (memcpy_s(audioDevice.address, kMaxAddressLen, address.c_str(), address.length()) != EOK) {
+        TELEPHONY_LOGE("memcpy_s address fail");
         return;
     }
     info_.audioDeviceList.push_back(audioDevice);
@@ -358,7 +359,7 @@ int32_t AudioDeviceManager::ReportAudioDeviceChange()
     std::string address = "";
     if (audioDeviceType_ == AudioDeviceType::DEVICE_BLUETOOTH_SCO) {
         std::shared_ptr<BluetoothCallManager> bluetoothCallManager = std::make_shared<BluetoothCallManager>();
-        std::string address = bluetoothCallManager->GetConnectedScoAddr();
+        address = bluetoothCallManager->GetConnectedScoAddr();
     }
     if (address.length() > kMaxAddressLen) {
         TELEPHONY_LOGE("address is not too long");
