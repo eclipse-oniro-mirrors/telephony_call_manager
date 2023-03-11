@@ -32,7 +32,7 @@ CallBase::CallBase(DialParaInfo &info)
     conferenceState_(TelConferenceState::TEL_CONFERENCE_IDLE), startTime_(0),
     direction_(CallDirection::CALL_DIRECTION_IN), policyFlag_(0), callState_(info.callState),
     isSpeakerphoneOn_(false), callEndedType_(CallEndedType::UNKNOWN), callBeginTime_(0), callEndTime_(0),
-    ringBeginTime_(0), ringEndTime_(0), answerType_(CallAnswerType::CALL_ANSWER_MISSED)
+    ringBeginTime_(0), ringEndTime_(0), answerType_(CallAnswerType::CALL_ANSWER_MISSED), accountId_(info.accountId)
 {
     (void)memset_s(&contactInfo_, sizeof(ContactInfo), 0, sizeof(ContactInfo));
 }
@@ -43,7 +43,7 @@ CallBase::CallBase(DialParaInfo &info, AppExecFwk::PacMap &extras)
     conferenceState_(TelConferenceState::TEL_CONFERENCE_IDLE), startTime_(0),
     direction_(CallDirection::CALL_DIRECTION_OUT), policyFlag_(0), callState_(info.callState),
     isSpeakerphoneOn_(false), callEndedType_(CallEndedType::UNKNOWN), callBeginTime_(0), callEndTime_(0),
-    ringBeginTime_(0), ringEndTime_(0), answerType_(CallAnswerType::CALL_ANSWER_MISSED)
+    ringBeginTime_(0), ringEndTime_(0), answerType_(CallAnswerType::CALL_ANSWER_MISSED), accountId_(info.accountId)
 {
     (void)memset_s(&contactInfo_, sizeof(ContactInfo), 0, sizeof(ContactInfo));
 }
@@ -103,6 +103,7 @@ void CallBase::GetCallAttributeBaseInfo(CallAttributeInfo &info)
         info.ringEndTime = ringEndTime_;
         info.callDirection = direction_;
         info.answerType = answerType_;
+        info.accountId = accountId_;
         if (bundleName_.length() > static_cast<size_t>(kMaxBundleNameLen)) {
             TELEPHONY_LOGE("Number out of limit!");
             return;
