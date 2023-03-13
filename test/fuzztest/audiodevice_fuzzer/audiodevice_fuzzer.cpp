@@ -64,8 +64,6 @@ void AudioControlManagerFunc(const uint8_t *data, size_t size)
     paraInfo.videoState = static_cast<VideoStateType>(size % VIDIO_TYPE_NUM);
     paraInfo.callState = static_cast<TelCallState>(size % TEL_CALL_STATE_NUM);
     sptr<CallBase> callObjectPtr = std::make_unique<CSCall>(paraInfo).release();
-    TelCallState priorState = static_cast<TelCallState>(size % TEL_CALL_STATE_NUM);
-    TelCallState nextState = static_cast<TelCallState>(size % TEL_CALL_STATE_NUM);
     std::string message(reinterpret_cast<const char *>(data), size);
     AudioInterruptState state = static_cast<AudioInterruptState>(size % AUDIO_INTERRUPT_STATE_NUM);
     DisconnectedDetails details;
@@ -82,10 +80,6 @@ void AudioControlManagerFunc(const uint8_t *data, size_t size)
     audioControlManager->NewCallCreated(callObjectPtr);
     audioControlManager->IncomingCallActivated(callObjectPtr);
     audioControlManager->IncomingCallHungUp(callObjectPtr, true, message);
-    audioControlManager->CallStateUpdated(callObjectPtr, priorState, nextState);
-    audioControlManager->HandleCallStateUpdated(callObjectPtr, priorState, nextState);
-    audioControlManager->HandleNextState(callObjectPtr, nextState);
-    audioControlManager->HandleNextState(callObjectPtr, priorState);
     audioControlManager->HandleNewActiveCall(callObjectPtr);
     audioControlManager->StopRingtone();
     audioControlManager->GetInitAudioDeviceType();
