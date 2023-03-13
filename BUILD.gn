@@ -192,8 +192,7 @@ ohos_shared_library("tel_call_manager") {
   if (defined(global_parts_info) &&
       defined(global_parts_info.communication_bluetooth) &&
       global_parts_info.communication_bluetooth) {
-    deps +=
-        [ "//foundation/communication/bluetooth/frameworks/inner:btframework" ]
+    external_deps += [ "bluetooth:btframework" ]
     defines += [ "ABILITY_BLUETOOTH_SUPPORT" ]
   }
 

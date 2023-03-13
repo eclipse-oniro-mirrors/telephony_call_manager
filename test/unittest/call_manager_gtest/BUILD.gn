@@ -54,7 +54,6 @@ ohos_unittest("tel_call_manager_gtest") {
     "//base/telephony/call_manager:tel_call_manager",
     "//base/telephony/call_manager/frameworks/native:tel_call_manager_api",
     "//base/telephony/core_service/utils:libtel_common",
-    "//foundation/communication/bluetooth/frameworks/inner:btframework",
     "//third_party/googletest:gtest_main",
     "//third_party/libphonenumber/cpp:phonenumber_standard",
   ]
@@ -87,6 +86,7 @@ ohos_unittest("tel_call_manager_gtest") {
   if (defined(global_parts_info) &&
       defined(global_parts_info.communication_bluetooth) &&
       global_parts_info.communication_bluetooth) {
+    external_deps += [ "bluetooth:btframework" ]
     defines += [ "ABILITY_BLUETOOTH_SUPPORT" ]
   }
 
