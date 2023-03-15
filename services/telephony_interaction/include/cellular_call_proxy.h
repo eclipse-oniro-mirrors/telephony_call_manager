@@ -146,6 +146,14 @@ public:
     int32_t HangUpAllConnection() override;
 
     /**
+     * Hang Up All Connection.
+     *
+     * @param slotId
+     * @return Returns TELEPHONY_SUCCESS on success, others on failure.
+     */
+    int32_t HangUpAllConnection(int32_t slotId) override;
+
+    /**
      * IMS Update Call Media Mode
      *
      * @param CellularCallInfo
