@@ -83,7 +83,7 @@ void AudioDeviceManager::AddAudioDeviceList(const std::string &address, AudioDev
             it = info_.audioDeviceList.erase(it);
             TELEPHONY_LOGI("remove Earpiece device success");
         } else {
-            it++;
+            ++it;
         }
     }
     AudioDevice audioDevice;
@@ -122,7 +122,7 @@ void AudioDeviceManager::RemoveAudioDeviceList(const std::string &address, Audio
         if (it->address == address && it->deviceType == deviceType) {
             it = info_.audioDeviceList.erase(it);
         } else {
-            it++;
+            ++it;
         }
     }
 

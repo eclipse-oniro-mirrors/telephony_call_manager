@@ -214,7 +214,7 @@ int32_t CallAbilityCallbackStub::OnUpdateAudioDeviceChange(MessageParcel &data, 
     }
     AudioDevice *audioDevicePtr = nullptr;
     for (int32_t i = 0; i < len + 1; i++) {
-        audioDevicePtr = (AudioDevice *)(data.ReadRawData(sizeof(AudioDevice)));
+        audioDevicePtr = static_cast<AudioDevice *>(const_cast<void *>(data.ReadRawData(sizeof(AudioDevice))));
         if (audioDevicePtr == nullptr) {
             TELEPHONY_LOGE("Invalid parameter audioDevicePtr");
             return TELEPHONY_ERR_ARGUMENT_INVALID;
