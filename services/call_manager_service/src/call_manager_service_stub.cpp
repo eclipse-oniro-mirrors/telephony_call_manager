@@ -349,7 +349,7 @@ int32_t CallManagerServiceStub::OnMuteRinger(MessageParcel &data, MessageParcel 
 
 int32_t CallManagerServiceStub::OnSetAudioDevice(MessageParcel &data, MessageParcel &reply)
 {
-    AudioDevice *audioDevice = (AudioDevice *)data.ReadRawData(sizeof(AudioDevice));
+    AudioDevice *audioDevice = static_cast<AudioDevice *>(const_cast<void *>(data.ReadRawData(sizeof(AudioDevice))));
     int32_t result = SetAudioDevice(*audioDevice);
     TELEPHONY_LOGI("result:%{public}d", result);
     if (!reply.WriteInt32(result)) {
