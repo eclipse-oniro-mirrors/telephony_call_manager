@@ -29,12 +29,12 @@ namespace OHOS {
 namespace Telephony {
 bool AudioDeviceManager::isBtScoDevEnable_ = false;
 bool AudioDeviceManager::isSpeakerAvailable_ = true; // default available
-bool AudioDeviceManager::isEarpieceAvailable_ = false;
+bool AudioDeviceManager::isEarpieceAvailable_ = true;
 bool AudioDeviceManager::isWiredHeadsetConnected_ = false;
 bool AudioDeviceManager::isBtScoConnected_ = false;
 
 AudioDeviceManager::AudioDeviceManager()
-    : audioDeviceType_(AudioDeviceType::DEVICE_UNKNOWN), currentAudioDevice_(nullptr), isAudioActivated_(false)
+    : audioDeviceType_(AudioDeviceType::DEVICE_EARPIECE), currentAudioDevice_(nullptr), isAudioActivated_(false)
 {}
 
 AudioDeviceManager::~AudioDeviceManager()
@@ -61,13 +61,11 @@ void AudioDeviceManager::Init()
         .address = { 0 },
     };
     info_.audioDeviceList.push_back(speaker);
-#ifdef DEVICE_EARPIECE_SUPPORT
     AudioDevice earpiece = {
         .deviceType = AudioDeviceType::DEVICE_EARPIECE,
         .address = { 0 },
     };
     info_.audioDeviceList.push_back(earpiece);
-#endif
 }
 
 void AudioDeviceManager::AddAudioDeviceList(const std::string &address, AudioDeviceType deviceType)
@@ -107,6 +105,7 @@ void AudioDeviceManager::AddAudioDeviceList(const std::string &address, AudioDev
     if (deviceType == AudioDeviceType::DEVICE_BLUETOOTH_SCO) {
         SetDeviceAvailable(AudioDeviceType::DEVICE_BLUETOOTH_SCO, true);
     }
+    DelayedSingleton<CallAbilityReportProxy>::GetInstance()->ReportAudioDeviceChange(info_);
     TELEPHONY_LOGI("AddAudioDeviceList success");
 }
 
@@ -142,7 +141,6 @@ void AudioDeviceManager::RemoveAudioDeviceList(const std::string &address, Audio
     if (deviceType == AudioDeviceType::DEVICE_BLUETOOTH_SCO && !blueToothScoExist) {
         SetDeviceAvailable(AudioDeviceType::DEVICE_BLUETOOTH_SCO, false);
     }
-#ifdef DEVICE_EARPIECE_SUPPORT
     if (needAddEarpiece && deviceType == AudioDeviceType::DEVICE_WIRED_HEADSET && !wiredHeadsetExist) {
         AudioDevice audioDevice = {
             .deviceType = AudioDeviceType::DEVICE_EARPIECE,
@@ -151,7 +149,7 @@ void AudioDeviceManager::RemoveAudioDeviceList(const std::string &address, Audio
         info_.audioDeviceList.push_back(audioDevice);
         TELEPHONY_LOGI("add Earpiece device success");
     }
-#endif
+    DelayedSingleton<CallAbilityReportProxy>::GetInstance()->ReportAudioDeviceChange(info_);
     TELEPHONY_LOGI("RemoveAudioDeviceList success");
 }
 
@@ -207,6 +205,7 @@ bool AudioDeviceManager::ProcessEvent(AudioEvent event)
             isBtScoConnected_ = false;
             result = currentAudioDevice_->ProcessEvent(event);
             break;
+        case AudioEvent::WIRED_HEADSET_CONNECTED:
         case AudioEvent::INIT_AUDIO_DEVICE:
             result = InitAudioDevice();
             break;
@@ -312,7 +311,7 @@ bool AudioDeviceManager::EnableWiredHeadset()
 
 bool AudioDeviceManager::EnableBtSco()
 {
-    if (isBtScoConnected_ && DelayedSingleton<AudioProxy>::GetInstance()->SetBluetoothDevActive()) {
+    if (isBtScoConnected_) {
         currentAudioDevice_ = std::make_unique<BluetoothDeviceState>();
         if (currentAudioDevice_ == nullptr) {
             TELEPHONY_LOGE("make_unique BluetoothDeviceState failed");
@@ -344,7 +343,7 @@ bool AudioDeviceManager::DisableAll()
 void AudioDeviceManager::SetCurrentAudioDevice(AudioDeviceType deviceType)
 {
     if (audioDeviceType_ == AudioDeviceType::DEVICE_BLUETOOTH_SCO && audioDeviceType_ != deviceType) {
-        DelayedSingleton<BluetoothConnection>::GetInstance()->SetBtScoState(SCO_STATE_DISCONNECTED);
+        DelayedSingleton<BluetoothConnection>::GetInstance()->DisconnectBtSco();
     } else if (audioDeviceType_ != AudioDeviceType::DEVICE_BLUETOOTH_SCO &&
                deviceType == AudioDeviceType::DEVICE_BLUETOOTH_SCO) {
         DelayedSingleton<BluetoothConnection>::GetInstance()->SetBtScoState(SCO_STATE_CONNECTED);

@@ -84,10 +84,6 @@ bool BluetoothConnection::ConnectBtSco()
         return false;
     }
     if (profile->SetActiveDevice(*device) && profile->ConnectSco()) {
-        btScoState_ = BtScoState::SCO_STATE_CONNECTED;
-        connectedScoAddr_ = device->GetDeviceAddr();
-        DelayedSingleton<AudioDeviceManager>::GetInstance()->ProcessEvent(AudioEvent::BLUETOOTH_SCO_CONNECTED);
-        TELEPHONY_LOGI("bluetooth sco connected successfully.");
         return true;
     }
 #endif

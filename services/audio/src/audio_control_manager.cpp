@@ -344,13 +344,6 @@ AudioDeviceType AudioControlManager::GetInitAudioDeviceType() const
         if (AudioDeviceManager::IsWiredHeadsetConnected()) {
             return AudioDeviceType::DEVICE_WIRED_HEADSET;
         }
-        if (audioInterruptState_ == AudioInterruptState::INTERRUPT_STATE_RINGING) {
-            return AudioDeviceType::DEVICE_SPEAKER;
-        }
-        if (GetCurrentActiveCall() != nullptr && GetCurrentActiveCall()->IsSpeakerphoneOn()) {
-            TELEPHONY_LOGI("current call speaker is active");
-            return AudioDeviceType::DEVICE_SPEAKER;
-        }
         if (AudioDeviceManager::IsEarpieceAvailable()) {
             return AudioDeviceType::DEVICE_EARPIECE;
         }
