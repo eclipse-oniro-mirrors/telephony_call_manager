@@ -410,7 +410,6 @@ enum class CallResultReportId {
     SET_IMS_FEATURE_VALUE_REPORT_ID,
     INVITE_TO_CONFERENCE_REPORT_ID,
     UPDATE_MEDIA_MODE_REPORT_ID,
-    CLOSE_UNFINISHED_USSD_REPORT_ID,
 };
 
 struct CellularCallEventInfo {

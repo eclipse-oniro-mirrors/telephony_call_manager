@@ -442,15 +442,6 @@ public:
 
     int32_t SetEmergencyCallList(int32_t slotId, std::vector<EmergencyCall>  &eccVec) override;
 
-    /**
-     * Close Unfinished ussd
-     *
-     * @brief Close Unfinished ussd function for the current account
-     * @param slotId[in], The slot id
-     * @return Returns 0 on success, others on failure.
-     */
-    int32_t CloseUnFinishedUssd(int32_t slotId) override;
-
 private:
     /**
      * SetCommonParamForMessageParcel, set common param for MessageParcel

@@ -55,8 +55,6 @@ NapiCallAbilityCallback::NapiCallAbilityCallback()
     memberFuncMap_[CallResultReportId::STOP_RTT_REPORT_ID] = &NapiCallAbilityCallback::ReportStopRttInfo;
     memberFuncMap_[CallResultReportId::UPDATE_MEDIA_MODE_REPORT_ID] =
         &NapiCallAbilityCallback::ReportCallMediaModeInfo;
-    memberFuncMap_[CallResultReportId::CLOSE_UNFINISHED_USSD_REPORT_ID] =
-        &NapiCallAbilityCallback::ReportCloseUnFinishedUssdInfo;
 }
 
 NapiCallAbilityCallback::~NapiCallAbilityCallback() {}
@@ -146,21 +144,6 @@ int32_t NapiCallAbilityCallback::RegisterGetWaitingCallback(EventCallback callba
 void NapiCallAbilityCallback::UnRegisterGetWaitingCallback()
 {
     (void)memset_s(&getWaitingCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
-}
-
-int32_t NapiCallAbilityCallback::RegisterCloseUnFinishedUssdCallback(EventCallback callback)
-{
-    if (closeUnfinishedUssdCallback_.thisVar) {
-        TELEPHONY_LOGE("callback already exist!");
-        return CALL_ERR_CALLBACK_ALREADY_EXIST;
-    }
-    closeUnfinishedUssdCallback_ = callback;
-    return TELEPHONY_SUCCESS;
-}
-
-void NapiCallAbilityCallback::UnRegisterCloseUnFinishedUssdCallback()
-{
-    (void)memset_s(&closeUnfinishedUssdCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
 }
 
 int32_t NapiCallAbilityCallback::RegisterSetWaitingCallback(EventCallback callback)
@@ -814,37 +797,6 @@ int32_t NapiCallAbilityCallback::ReportGetWaitingInfo(AppExecFwk::PacMap &result
         loop, work, [](uv_work_t *work) {}, ReportWaitAndLimitInfoWork);
     if (getWaitingCallback_.thisVar) {
         (void)memset_s(&getWaitingCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
-    }
-    return TELEPHONY_SUCCESS;
-}
-
-int32_t NapiCallAbilityCallback::ReportCloseUnFinishedUssdInfo(AppExecFwk::PacMap &resultInfo)
-{
-    if (closeUnfinishedUssdCallback_.thisVar == nullptr) {
-        TELEPHONY_LOGE("closeUnfinishedUssdCallback is null!");
-        return CALL_ERR_CALLBACK_NOT_EXIST;
-    }
-    uv_loop_s *loop = nullptr;
-#if NAPI_VERSION >= 2
-    napi_get_uv_event_loop(closeUnfinishedUssdCallback_.env, &loop);
-#endif
-    CallSupplementWorker *dataWorker = std::make_unique<CallSupplementWorker>().release();
-    if (dataWorker == nullptr) {
-        TELEPHONY_LOGE("dataWorker is nullptr!");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-    dataWorker->info = resultInfo;
-    dataWorker->callback = closeUnfinishedUssdCallback_;
-    uv_work_t *work = std::make_unique<uv_work_t>().release();
-    if (work == nullptr) {
-        TELEPHONY_LOGE("work is nullptr!");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-    work->data = (void *)dataWorker;
-    uv_queue_work(
-        loop, work, [](uv_work_t *work) {}, ReportExecutionResultWork);
-    if (closeUnfinishedUssdCallback_.thisVar) {
-        (void)memset_s(&closeUnfinishedUssdCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
     }
     return TELEPHONY_SUCCESS;
 }

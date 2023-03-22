@@ -45,7 +45,6 @@ public:
     int32_t EnableImsSwitch(int32_t slotId);
     int32_t DisableImsSwitch(int32_t slotId);
     int32_t IsImsSwitchEnabled(int32_t slotId, bool &enabled);
-    int32_t CloseUnFinishedUssd(int32_t slotId);
 
 private:
     int32_t CallWaitingPolicy(int32_t slotId);
@@ -53,7 +52,6 @@ private:
     int32_t SetCallRestrictionPolicy(int32_t slotId, CallRestrictionInfo &info);
     int32_t GetCallTransferInfoPolicy(int32_t slotId, CallTransferType type);
     int32_t SetCallTransferInfoPolicy(int32_t slotId, CallTransferInfo &info);
-    int32_t CloseUnFinishedUssdPolicy(int32_t slotId);
 
 private:
     std::shared_ptr<CellularCallConnection> cellularCallConnectionPtr_;

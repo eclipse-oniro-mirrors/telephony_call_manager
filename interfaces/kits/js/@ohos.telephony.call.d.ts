@@ -928,42 +928,6 @@ declare namespace call {
   function isImsSwitchEnabled(slotId: number): Promise<boolean>;
 
   /**
-   * Close Unfinished ussd.
-   *
-   * @permission ohos.permission.SET_TELEPHONY_STATE
-   * @param { number } slotId - Indicates the card slot index number,
-   * ranging from 0 to the maximum card slot index number supported by the device.
-   * @param { AsyncCallback<void> } callback - the callback of closeUnFinishedUssd.
-   * @throws {BusinessError} 201 - Permission denied.
-   * @throws {BusinessError} 401 - Parameter error.
-   * @throws {BusinessError} 8300001 - Invalid parameter value.
-   * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
-   * @throws {BusinessError} 8300003 - System internal error.
-   * @throws {BusinessError} 8300999 - Unknown error code.
-   * @systemapi Hide this for inner system use.
-   * @since 10
-   */
-  function closeUnFinishedUssd(slotId: number, callback: AsyncCallback<void>): void;
-
-  /**
-   * Close Unfinished ussd.
-   *
-   * @permission ohos.permission.SET_TELEPHONY_STATE
-   * @param { number } slotId - Indicates the card slot index number,
-   * ranging from 0 to the maximum card slot index number supported by the device.
-   * @returns { Promise<void> } the promise returned by the function.
-   * @throws {BusinessError} 201 - Permission denied.
-   * @throws {BusinessError} 401 - Parameter error.
-   * @throws {BusinessError} 8300001 - Invalid parameter value.
-   * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
-   * @throws {BusinessError} 8300003 - System internal error.
-   * @throws {BusinessError} 8300999 - Unknown error code.
-   * @systemapi Hide this for inner system use.
-   * @since 10
-   */
-  function closeUnFinishedUssd(slotId: number): Promise<void>;
-
-  /**
    * @systemapi Hide this for inner system use.
    * @since 8
    */

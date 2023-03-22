@@ -598,16 +598,6 @@ int32_t CallManagerClient::ReportOttCallEventInfo(OttCallEventInfo &eventInfo)
     }
 }
 
-int32_t CallManagerClient::CloseUnFinishedUssd(int32_t slotId)
-{
-    if (g_callManagerProxy != nullptr) {
-        return g_callManagerProxy->CloseUnFinishedUssd(slotId);
-    } else {
-        TELEPHONY_LOGE("[slot%{public}d] init first please!", slotId);
-        return TELEPHONY_ERR_UNINIT;
-    }
-}
-
 bool CallManagerClient::HasVoiceCapability()
 {
     char retValue[VOICECALL_CAP_VAL_LEN + 1] = {"true"};

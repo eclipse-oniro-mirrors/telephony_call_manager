@@ -83,7 +83,6 @@ public:
     int32_t JoinConference(int32_t callId, std::vector<std::u16string> &numberList);
     int32_t ReportOttCallDetailsInfo(std::vector<OttCallDetailsInfo> &ottVec);
     int32_t ReportOttCallEventInfo(OttCallEventInfo &eventInfo);
-    int32_t CloseUnFinishedUssd(int32_t slotId);
     bool HasVoiceCapability();
     int32_t ReportAudioDeviceInfo();
 };

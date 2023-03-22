@@ -53,7 +53,6 @@ public:
     int32_t SendUssdResult(const int32_t result) override;
     int32_t GetImsCallDataResult(const int32_t result) override;
     int32_t SendMmiCodeResult(const MmiCodeInfo &info) override;
-    int32_t CloseUnFinishedUssdResult(const int32_t result) override;
 
 private:
     static inline BrokerDelegator<CallStatusCallbackProxy> delegator_;

@@ -1041,21 +1041,6 @@ int32_t CallManagerProxy::ReportOttCallEventInfo(OttCallEventInfo &eventInfo)
     return TELEPHONY_SUCCESS;
 }
 
-int32_t CallManagerProxy::CloseUnFinishedUssd(int32_t slotId)
-{
-    if (ReConnectService() != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("[slot%{public}d] ipc reconnect failed!", slotId);
-        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
-    }
-    std::lock_guard<std::mutex> lock(mutex_);
-    int32_t errCode = callManagerServicePtr_->CloseUnFinishedUssd(slotId);
-    if (errCode != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("[slot%{public}d] failed, errcode:%{public}d", slotId, errCode);
-        return errCode;
-    }
-    return TELEPHONY_SUCCESS;
-}
-
 sptr<IRemoteObject> CallManagerProxy::GetProxyObjectPtr(CallManagerProxyType proxyType)
 {
     if (ReConnectService() != TELEPHONY_SUCCESS) {

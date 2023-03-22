@@ -52,7 +52,6 @@ CallStatusCallbackStub::CallStatusCallbackStub()
     memberFuncMap_[UPDATE_STOPRTT_STATUS] = &CallStatusCallbackStub::OnStopRttResult;
     memberFuncMap_[INVITE_TO_CONFERENCE] = &CallStatusCallbackStub::OnInviteToConferenceResult;
     memberFuncMap_[MMI_CODE_INFO_RESPONSE] = &CallStatusCallbackStub::OnSendMmiCodeResult;
-    memberFuncMap_[CLOSE_UNFINISHED_USSD] = &CallStatusCallbackStub::OnCloseUnFinishedUssdResult;
 }
 
 CallStatusCallbackStub::~CallStatusCallbackStub()
@@ -621,22 +620,6 @@ int32_t CallStatusCallbackStub::OnGetImsCallDataResult(MessageParcel &data, Mess
     }
     result = data.ReadInt32();
     error = GetImsCallDataResult(result);
-    if (!reply.WriteInt32(error)) {
-        TELEPHONY_LOGE("writing parcel failed");
-        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
-    }
-    return TELEPHONY_SUCCESS;
-}
-
-int32_t CallStatusCallbackStub::OnCloseUnFinishedUssdResult(MessageParcel &data, MessageParcel &reply)
-{
-    int32_t error = TELEPHONY_ERR_FAIL;
-    int32_t result = TELEPHONY_ERR_FAIL;
-    if (!data.ContainFileDescriptors()) {
-        TELEPHONY_LOGW("sent raw data is less than 32k");
-    }
-    result = data.ReadInt32();
-    error = CloseUnFinishedUssdResult(result);
     if (!reply.WriteInt32(error)) {
         TELEPHONY_LOGE("writing parcel failed");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;

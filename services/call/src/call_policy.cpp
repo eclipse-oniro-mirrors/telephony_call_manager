@@ -376,14 +376,5 @@ int32_t CallPolicy::InviteToConferencePolicy(int32_t callId, std::vector<std::st
     }
     return TELEPHONY_SUCCESS;
 }
-
-int32_t CallPolicy::CloseUnFinishedUssdPolicy(int32_t slotId)
-{
-    if (IsValidSlotId(slotId) != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("invalid slotId!");
-        return CALL_ERR_INVALID_SLOT_ID;
-    }
-    return TELEPHONY_SUCCESS;
-}
 } // namespace Telephony
 } // namespace OHOS

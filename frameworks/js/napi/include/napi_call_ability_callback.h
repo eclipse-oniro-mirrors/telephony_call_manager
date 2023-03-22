@@ -57,8 +57,6 @@ public:
     void UnRegisterStopRttCallback();
     void RegisterMmiCodeCallback(EventCallback eventCallback);
     void UnRegisterMmiCodeCallback();
-    int32_t RegisterCloseUnFinishedUssdCallback(EventCallback callback);
-    void UnRegisterCloseUnFinishedUssdCallback();
     void RegisterAudioDeviceCallback(EventCallback eventCallback);
     void UnRegisterAudioDeviceCallback();
     int32_t UpdateCallStateInfo(const CallAttributeInfo &info);
@@ -104,7 +102,6 @@ private:
     static void ReportCallMediaModeInfo(AppExecFwk::PacMap &resultInfo, EventCallback supplementInfo);
     static void ReportMmiCodeWork(uv_work_t *work, int32_t status);
     static int32_t ReportMmiCode(MmiCodeInfo &info, EventCallback eventCallback);
-    int32_t ReportCloseUnFinishedUssdInfo(AppExecFwk::PacMap &resultInfo);
     static void ReportAudioDeviceInfoWork(uv_work_t *work, int32_t status);
     static int32_t ReportAudioDeviceInfo(AudioDeviceInfo &info, EventCallback eventCallback);
 
@@ -123,7 +120,6 @@ private:
     EventCallback stopRttCallback_;
     EventCallback updateCallMediaModeCallback_;
     EventCallback mmiCodeCallback_;
-    EventCallback closeUnfinishedUssdCallback_;
     EventCallback audioDeviceCallback_;
     using CallResultReportIdProcessorFunc = int32_t (NapiCallAbilityCallback::*)(AppExecFwk::PacMap &resultInfo);
     std::map<CallResultReportId, CallResultReportIdProcessorFunc> memberFuncMap_;
