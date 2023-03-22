@@ -596,5 +596,25 @@ int32_t CallStatusCallbackProxy::GetImsCallDataResult(const int32_t result)
     }
     return replyParcel.ReadInt32();
 }
+
+int32_t CallStatusCallbackProxy::CloseUnFinishedUssdResult(const int32_t result)
+{
+    MessageParcel dataParcel;
+    MessageParcel replyParcel;
+    MessageOption option;
+    int32_t error = CALL_ERR_ILLEGAL_CALL_OPERATION;
+    if (!dataParcel.WriteInterfaceToken(CallStatusCallbackProxy::GetDescriptor())) {
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    dataParcel.WriteInt32(result);
+    if (Remote() == nullptr) {
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    error = Remote()->SendRequest(CLOSE_UNFINISHED_USSD, dataParcel, replyParcel, option);
+    if (error != TELEPHONY_SUCCESS) {
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return replyParcel.ReadInt32();
+}
 } // namespace Telephony
 } // namespace OHOS

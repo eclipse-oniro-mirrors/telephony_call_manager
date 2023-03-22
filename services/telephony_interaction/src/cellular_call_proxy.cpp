@@ -1270,5 +1270,27 @@ int32_t CellularCallProxy::SetCommonParamForMessageParcel(int32_t slotId, Messag
     }
     return TELEPHONY_SUCCESS;
 }
+
+int32_t CellularCallProxy::CloseUnFinishedUssd(int32_t slotId)
+{
+    MessageOption option;
+    MessageParcel in;
+    MessageParcel out;
+    int32_t result = TELEPHONY_SUCCESS;
+    result = SetCommonParamForMessageParcel(slotId, in);
+    if (result != TELEPHONY_SUCCESS) {
+        return result;
+    }
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("function Remote() return nullptr!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t error = remote->SendRequest(static_cast<uint32_t>(OperationType::CLOSE_UNFINISHED_USSD), in, out, option);
+    if (error == ERR_NONE) {
+        return out.ReadInt32();
+    }
+    return error;
+}
 } // namespace Telephony
 } // namespace OHOS

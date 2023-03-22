@@ -4756,6 +4756,28 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_HasVoiceCapability_0100, Functi
     EXPECT_EQ(CallManagerGtest::clientPtr_->HasVoiceCapability(), true);
 }
 
+/************************************* Test CloseUnFinishedUssd() ************************************/
+/**
+ * @tc.number   Telephony_CallManager_CloseUnFinishedUssd_0100
+ * @tc.name     test Close Unfinished ussd
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_CloseUnFinishedUssd_0100, Function | MediumTest | Level3)
+{
+    AccessToken token;
+    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+
+    if (HasSimCard(SIM1_SLOTID)) {
+        EXPECT_EQ(CallManagerGtest::clientPtr_->CloseUnFinishedUssd(SIM1_SLOTID), RETURN_VALUE_IS_ZERO);
+    }
+
+    if (HasSimCard(SIM2_SLOTID)) {
+        EXPECT_EQ(CallManagerGtest::clientPtr_->CloseUnFinishedUssd(SIM2_SLOTID), RETURN_VALUE_IS_ZERO);
+    }
+}
+
 /*********************************** Test Dump() ***************************************/
 /**
  * @tc.number   Telephony_CallManager_TestDump_0100

@@ -842,6 +842,20 @@ int32_t CallManagerService::ReportOttCallEventInfo(OttCallEventInfo &eventInfo)
     return ret;
 }
 
+int32_t CallManagerService::CloseUnFinishedUssd(int32_t slotId)
+{
+    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_SET_TELEPHONY_STATE)) {
+        TELEPHONY_LOGE("Permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
+    if (callControlManagerPtr_ != nullptr) {
+        return callControlManagerPtr_->CloseUnFinishedUssd(slotId);
+    } else {
+        TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+}
+
 sptr<IRemoteObject> CallManagerService::GetProxyObjectPtr(CallManagerProxyType proxyType)
 {
     auto it = proxyObjectPtrMap_.find(static_cast<uint32_t>(proxyType));

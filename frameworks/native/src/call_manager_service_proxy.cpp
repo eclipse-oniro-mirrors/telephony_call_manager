@@ -1373,6 +1373,30 @@ int32_t CallManagerServiceProxy::ReportOttCallEventInfo(OttCallEventInfo &eventI
     return replyParcel.ReadInt32();
 }
 
+int32_t CallManagerServiceProxy::CloseUnFinishedUssd(int32_t slotId)
+{
+    MessageOption option;
+    MessageParcel dataParcel;
+    MessageParcel replyParcel;
+    if (!dataParcel.WriteInterfaceToken(CallManagerServiceProxy::GetDescriptor())) {
+        TELEPHONY_LOGE("write descriptor fail");
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("function Remote() return nullptr!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    dataParcel.WriteInt32(slotId);
+    int32_t error =
+        remote->SendRequest(CallManagerSurfaceCode::INTERFACE_CLOSE_UNFINISHED_USSD, dataParcel, replyParcel, option);
+    if (error != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("Function CloseUnFinishedUssd! errCode:%{public}d", error);
+        return error;
+    }
+    return replyParcel.ReadInt32();
+}
+
 sptr<IRemoteObject> CallManagerServiceProxy::GetProxyObjectPtr(CallManagerProxyType proxyType)
 {
     MessageOption option;

@@ -93,6 +93,7 @@ void CallManagerServiceStub::InitCallSupplementRequest()
     memberFuncMap_[INTERFACE_GET_CALL_TRANSFER] = &CallManagerServiceStub::OnGetTransferNumber;
     memberFuncMap_[INTERFACE_SET_CALL_TRANSFER] = &CallManagerServiceStub::OnSetTransferNumber;
     memberFuncMap_[INTERFACE_CAN_SET_CALL_TRANSFER_TIME] = &CallManagerServiceStub::OnCanSetCallTransferTime;
+    memberFuncMap_[INTERFACE_CLOSE_UNFINISHED_USSD] = &CallManagerServiceStub::OnCloseUnFinishedUssd;
 }
 
 void CallManagerServiceStub::initCallConferenceExRequest()
@@ -984,6 +985,19 @@ int32_t CallManagerServiceStub::OnReportOttCallEventInfo(MessageParcel &data, Me
     result = ReportOttCallEventInfo(*pEventInfo);
     if (!reply.WriteInt32(result)) {
         TELEPHONY_LOGE("ReportOttCallDetailsInfo fail to write parcel");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallManagerServiceStub::OnCloseUnFinishedUssd(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t result = TELEPHONY_ERR_FAIL;
+    int32_t slotId = data.ReadInt32();
+    result = CloseUnFinishedUssd(slotId);
+    TELEPHONY_LOGI("result:%{public}d", result);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("fail to write parcel");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
     return TELEPHONY_SUCCESS;

@@ -202,6 +202,20 @@ int32_t CallSettingManager::IsImsSwitchEnabled(int32_t slotId, bool &enabled)
     return cellularCallConnectionPtr_->GetImsSwitchStatus(slotId, enabled);
 }
 
+int32_t CallSettingManager::CloseUnFinishedUssd(int32_t slotId)
+{
+    int32_t ret = CloseUnFinishedUssdPolicy(slotId);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("Invalid data!");
+        return ret;
+    }
+    if (cellularCallConnectionPtr_ == nullptr) {
+        TELEPHONY_LOGE("cellularCallConnectionPtr_ is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return cellularCallConnectionPtr_->CloseUnFinishedUssd(slotId);
+}
+
 int32_t CallSettingManager::CallWaitingPolicy(int32_t slotId)
 {
     if (!DelayedSingleton<CallNumberUtils>::GetInstance()->IsValidSlotId(slotId)) {
@@ -286,6 +300,15 @@ int32_t CallSettingManager::SetCallTransferInfoPolicy(int32_t slotId, CallTransf
     if (strlen(info.transferNum) > kMaxNumberLen) {
         TELEPHONY_LOGE("Number out of limit!");
         return CALL_ERR_NUMBER_OUT_OF_RANGE;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallSettingManager::CloseUnFinishedUssdPolicy(int32_t slotId)
+{
+    if (!DelayedSingleton<CallNumberUtils>::GetInstance()->IsValidSlotId(slotId)) {
+        TELEPHONY_LOGE("invalid slotId!");
+        return CALL_ERR_INVALID_SLOT_ID;
     }
     return TELEPHONY_SUCCESS;
 }

@@ -85,6 +85,7 @@ enum CallManagerSurfaceCode {
     INTERFACE_REPORT_OTT_CALL_DETAIL_INFO,
     INTERFACE_REPORT_OTT_CALL_EVENT_INFO,
     INTERFACE_GET_PROXY_OBJECT_PTR,
+    INTERFACE_CLOSE_UNFINISHED_USSD,
     INTERFACE_REPORT_AUDIO_DEVICE_INFO,
 };
 
@@ -152,6 +153,7 @@ public:
     virtual int32_t JoinConference(int32_t callId, std::vector<std::u16string> &numberList) = 0;
     virtual int32_t ReportOttCallDetailsInfo(std::vector<OttCallDetailsInfo> &ottVec) = 0;
     virtual int32_t ReportOttCallEventInfo(OttCallEventInfo &eventInfo) = 0;
+    virtual int32_t CloseUnFinishedUssd(int32_t slotId) = 0;
     virtual sptr<IRemoteObject> GetProxyObjectPtr(CallManagerProxyType proxyType) = 0;
     virtual int32_t ReportAudioDeviceInfo() = 0;
 
