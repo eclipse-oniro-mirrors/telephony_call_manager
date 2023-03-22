@@ -351,6 +351,10 @@ int32_t CallManagerServiceStub::OnMuteRinger(MessageParcel &data, MessageParcel 
 int32_t CallManagerServiceStub::OnSetAudioDevice(MessageParcel &data, MessageParcel &reply)
 {
     AudioDevice *audioDevice = static_cast<AudioDevice *>(const_cast<void *>(data.ReadRawData(sizeof(AudioDevice))));
+    if (audioDevice == nullptr) {
+        TELEPHONY_LOGE("audioDevice is nullptr");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     int32_t result = SetAudioDevice(*audioDevice);
     TELEPHONY_LOGI("result:%{public}d", result);
     if (!reply.WriteInt32(result)) {
