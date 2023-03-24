@@ -24,6 +24,7 @@
 #include "call_records_manager.h"
 #include "cellular_call_connection.h"
 #include "common_type.h"
+#include "core_manager_inner.h"
 #include "hitrace_meter.h"
 #include "ipc_skeleton.h"
 #include "report_call_info_handler.h"
@@ -32,10 +33,14 @@
 
 namespace OHOS {
 namespace Telephony {
-const std::string OHOS_PERMISSION_SET_TELEPHONY_STATE = "ohos.permission.SET_TELEPHONY_STATE";
-const std::string OHOS_PERMISSION_GET_TELEPHONY_STATE = "ohos.permission.GET_TELEPHONY_STATE";
-const std::string OHOS_PERMISSION_PLACE_CALL = "ohos.permission.PLACE_CALL";
-const std::string OHOS_PERMISSION_ANSWER_CALL = "ohos.permission.ANSWER_CALL";
+static constexpr const char *OHOS_PERMISSION_SET_TELEPHONY_STATE = "ohos.permission.SET_TELEPHONY_STATE";
+static constexpr const char *OHOS_PERMISSION_GET_TELEPHONY_STATE = "ohos.permission.GET_TELEPHONY_STATE";
+static constexpr const char *OHOS_PERMISSION_PLACE_CALL = "ohos.permission.PLACE_CALL";
+static constexpr const char *OHOS_PERMISSION_ANSWER_CALL = "ohos.permission.ANSWER_CALL";
+static constexpr const char *SLOT_ID = "accountId";
+static constexpr const char *CALL_TYPE = "callType";
+static constexpr const char *VIDEO_STATE = "videoState";
+static constexpr int32_t CLEAR_VOICE_MAIL_COUNT = 0;
 
 const bool g_registerResult =
     SystemAbility::MakeAndRegisterAbility(DelayedSingleton<CallManagerService>::GetInstance().get());
@@ -207,18 +212,24 @@ int32_t CallManagerService::DialCall(std::u16string number, AppExecFwk::PacMap &
     extras.PutStringValue("bundleName", bundleName);
     if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_PLACE_CALL)) {
         TELEPHONY_LOGE("Permission denied!");
-        CallManagerHisysevent::WriteDialCallFaultEvent(extras.GetIntValue("accountId"), extras.GetIntValue("callType"),
-            extras.GetIntValue("videoState"), TELEPHONY_ERR_PERMISSION_ERR, OHOS_PERMISSION_PLACE_CALL);
+        CallManagerHisysevent::WriteDialCallFaultEvent(extras.GetIntValue(SLOT_ID), extras.GetIntValue(CALL_TYPE),
+            extras.GetIntValue(VIDEO_STATE), TELEPHONY_ERR_PERMISSION_ERR, OHOS_PERMISSION_PLACE_CALL);
         FinishAsyncTrace(HITRACE_TAG_OHOS, "DialCall", getpid());
         return TELEPHONY_ERR_PERMISSION_ERR;
     }
     if (callControlManagerPtr_ != nullptr) {
         int32_t ret = callControlManagerPtr_->DialCall(number, extras);
-        if (ret != TELEPHONY_SUCCESS) {
+        if (ret == TELEPHONY_SUCCESS) {
+            std::u16string voiceMailNumber;
+            CoreManagerInner::GetInstance().GetVoiceMailNumber(extras.GetIntValue(SLOT_ID), voiceMailNumber);
+            if (voiceMailNumber == number) {
+                CoreManagerInner::GetInstance().SetVoiceMailCount(extras.GetIntValue(SLOT_ID), CLEAR_VOICE_MAIL_COUNT);
+            }
+        } else {
             std::string errordesc = "";
             DelayedSingleton<CallManagerHisysevent>::GetInstance()->GetErrorDescription(ret, errordesc);
-            CallManagerHisysevent::WriteDialCallFaultEvent(extras.GetIntValue("accountId"),
-                extras.GetIntValue("callType"), extras.GetIntValue("videoState"), ret, errordesc);
+            CallManagerHisysevent::WriteDialCallFaultEvent(extras.GetIntValue(SLOT_ID), extras.GetIntValue(CALL_TYPE),
+                extras.GetIntValue(VIDEO_STATE), ret, errordesc);
             FinishAsyncTrace(HITRACE_TAG_OHOS, "DialCall", getpid());
         }
         return ret;
