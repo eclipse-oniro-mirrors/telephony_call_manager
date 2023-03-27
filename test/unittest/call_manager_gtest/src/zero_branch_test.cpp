@@ -1344,7 +1344,7 @@ HWTEST_F(BranchTest, Telephony_BluetoothCallService_001, Function | MediumTest |
     bluetoothCallService.callObjectPtrList_.push_back(callBase1);
     bluetoothCallService.AnswerCall();
     bluetoothCallService.callControlManagerPtr_ = nullptr;
-    ASSERT_EQ(TELEPHONY_ERR_LOCAL_PTR_NULL, bluetoothCallService.AnswerCall());
+    ASSERT_EQ(TELEPHONY_ERR_PERMISSION_ERR, bluetoothCallService.AnswerCall());
     ASSERT_EQ(TELEPHONY_ERR_PERMISSION_ERR, bluetoothCallService.RejectCall());
     ASSERT_EQ(TELEPHONY_ERR_PERMISSION_ERR, bluetoothCallService.HangUpCall());
     ASSERT_EQ(TELEPHONY_ERR_PERMISSION_ERR, bluetoothCallService.HoldCall());
