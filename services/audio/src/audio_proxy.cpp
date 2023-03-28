@@ -95,6 +95,14 @@ bool AudioProxy::SetWiredHeadsetDevActive()
             return false;
         }
     }
+    if (AudioStandard::AudioSystemManager::GetInstance()->IsDeviceActive(AudioStandard::ActiveDeviceType::EARPIECE)) {
+        int32_t ret = AudioStandard::AudioSystemManager::GetInstance()->SetDeviceActive(
+            AudioStandard::ActiveDeviceType::EARPIECE, false);
+        if (ret != ERR_NONE) {
+            TELEPHONY_LOGE("SetWiredHeadsetDevActive bluetooth sco close fail");
+            return false;
+        }
+    }
     if (AudioStandard::AudioSystemManager::GetInstance()->IsDeviceActive(
         AudioStandard::ActiveDeviceType::BLUETOOTH_SCO)) {
         int32_t ret = AudioStandard::AudioSystemManager::GetInstance()->SetDeviceActive(
@@ -113,22 +121,14 @@ bool AudioProxy::SetEarpieceDevActive()
         TELEPHONY_LOGE("SetEarpieceDevActive wiredheadset is connected, no need set earpiece dev active");
         return false;
     }
-    if (AudioStandard::AudioSystemManager::GetInstance()->IsDeviceActive(AudioStandard::ActiveDeviceType::SPEAKER)) {
-        int32_t ret = AudioStandard::AudioSystemManager::GetInstance()->SetDeviceActive(
-            AudioStandard::ActiveDeviceType::SPEAKER, false);
-        if (ret != ERR_NONE) {
-            TELEPHONY_LOGE("SetEarpieceDevActive speaker close fail");
-            return false;
-        }
+    if (AudioStandard::AudioSystemManager::GetInstance()->IsDeviceActive(AudioStandard::ActiveDeviceType::EARPIECE)) {
+        TELEPHONY_LOGI("earpiece device is already active");
+        return true;
     }
-    if (AudioStandard::AudioSystemManager::GetInstance()->IsDeviceActive(
-        AudioStandard::ActiveDeviceType::BLUETOOTH_SCO)) {
-        int32_t ret = AudioStandard::AudioSystemManager::GetInstance()->SetDeviceActive(
-            AudioStandard::ActiveDeviceType::BLUETOOTH_SCO, false);
-        if (ret != ERR_NONE) {
-            TELEPHONY_LOGE("SetEarpieceDevActive bluetooth sco close fail");
-            return false;
-        }
+    if (AudioStandard::AudioSystemManager::GetInstance()->SetDeviceActive(
+        AudioStandard::ActiveDeviceType::EARPIECE, true) != ERR_NONE) {
+        TELEPHONY_LOGE("SetEarpieceDevActive earpiece active fail");
+        return false;
     }
     return true;
 }
@@ -205,20 +205,21 @@ void AudioDeviceChangeCallback::OnDeviceChange(const AudioStandard::DeviceChange
 {
     TELEPHONY_LOGI("AudioDeviceChangeCallback::OnDeviceChange enter");
     for (auto &audioDeviceDescriptor : deviceChangeAction.deviceDescriptors) {
-        if (audioDeviceDescriptor->deviceType_ == AudioStandard::DEVICE_TYPE_WIRED_HEADSET) {
+        if (audioDeviceDescriptor->deviceType_ == AudioStandard::DEVICE_TYPE_WIRED_HEADSET ||
+            audioDeviceDescriptor->deviceType_ == AudioStandard::DEVICE_TYPE_WIRED_HEADPHONES ||
+            audioDeviceDescriptor->deviceType_ == AudioStandard::DEVICE_TYPE_USB_HEADSET) {
             if (deviceChangeAction.type == AudioStandard::CONNECT) {
                 TELEPHONY_LOGI("WiredHeadset connected");
                 DelayedSingleton<AudioProxy>::GetInstance()->SetWiredHeadsetState(true);
                 DelayedSingleton<AudioDeviceManager>::GetInstance()->AddAudioDeviceList(
-                    "", AudioDeviceType::DEVICE_EARPIECE);
+                    "", AudioDeviceType::DEVICE_WIRED_HEADSET);
                 DelayedSingleton<AudioDeviceManager>::GetInstance()->ProcessEvent(AudioEvent::WIRED_HEADSET_CONNECTED);
             } else {
                 TELEPHONY_LOGI("WiredHeadset disConnected");
                 DelayedSingleton<AudioProxy>::GetInstance()->SetWiredHeadsetState(false);
                 DelayedSingleton<AudioDeviceManager>::GetInstance()->RemoveAudioDeviceList(
-                    "", AudioDeviceType::DEVICE_EARPIECE);
-                DelayedSingleton<AudioDeviceManager>::GetInstance()->ProcessEvent(
-                    AudioEvent::WIRED_HEADSET_DISCONNECTED);
+                    "", AudioDeviceType::DEVICE_WIRED_HEADSET);
+                DelayedSingleton<AudioDeviceManager>::GetInstance()->ProcessEvent(AudioEvent::INIT_AUDIO_DEVICE);
             }
         }
     }

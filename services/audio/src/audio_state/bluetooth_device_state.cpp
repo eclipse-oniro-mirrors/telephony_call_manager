@@ -26,11 +26,6 @@ bool BluetoothDeviceState::ProcessEvent(int32_t event)
     bool result = false;
     std::lock_guard<std::mutex> lock(mutex_);
     switch (event) {
-        case AudioEvent::WIRED_HEADSET_CONNECTED:
-            // should switch to wired headset route while wired headset connected
-            result = DelayedSingleton<AudioDeviceManager>::GetInstance()->ProcessEvent(
-                AudioEvent::ENABLE_DEVICE_WIRED_HEADSET);
-            break;
         case AudioEvent::BLUETOOTH_SCO_CONNECTED:
         case AudioEvent::AUDIO_ACTIVATED:
         case AudioEvent::AUDIO_RINGING:

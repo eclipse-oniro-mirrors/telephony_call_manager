@@ -55,7 +55,6 @@ int32_t CallBase::DialCallBase()
     callRunningState_ = CallRunningState::CALL_RUNNING_STATE_CONNECTING;
     TELEPHONY_LOGI("start to set audio");
     // Set audio, set hands-free
-    SetAudio();
     return TELEPHONY_SUCCESS;
 }
 
