@@ -726,9 +726,9 @@ napi_value NapiCallManager::DeclareMmiCodeResultEnum(napi_env env, napi_value ex
 {
     napi_property_descriptor desc[] = {
         DECLARE_NAPI_STATIC_PROPERTY("MMI_CODE_SUCCESS",
-            NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(MmiCodeResult::CALL_TRANSFER_ENABLE))),
+            NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(MmiCodeResult::MMI_CODE_SUCCESS))),
         DECLARE_NAPI_STATIC_PROPERTY("MMI_CODE_FAILED",
-            NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(MmiCodeResult::CALL_TRANSFER_DISABLE))),
+            NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(MmiCodeResult::MMI_CODE_FAILED))),
     };
     napi_value result = nullptr;
     napi_define_class(env, "MmiCodeResult", NAPI_AUTO_LENGTH, NapiCallManagerUtils::CreateEnumConstructor,
@@ -826,7 +826,7 @@ napi_value NapiCallManager::DeclareDisconnectedReasonEnum(napi_env env, napi_val
             static_cast<int32_t>(DisconnectedReason::BEARER_SERVICE_NOT_IMPLEMENTED))),
         DECLARE_NAPI_STATIC_PROPERTY("ACM_EQUALTO_OR_GREATER_THAN_THE_MAXIMUM_VALUE",
             NapiCallManagerUtils::ToInt32Value(env,
-            static_cast<int32_t>(DisconnectedReason::ACM_EQUALTO_OR_GREATER_THAN_THE_MAXIMUM_VALUE))),
+            static_cast<int32_t>(DisconnectedReason::ACM_EQUALTO_OR_GREATE_THAN_ACMMAX))),
         DECLARE_NAPI_STATIC_PROPERTY("REQUESTED_FACILITY_NOT_IMPLEMENTED",
             NapiCallManagerUtils::ToInt32Value(env,
             static_cast<int32_t>(DisconnectedReason::REQUESTED_FACILITY_NOT_IMPLEMENTED))),
@@ -932,7 +932,7 @@ napi_value NapiCallManager::DeclareDisconnectedReasonEnum(napi_env env, napi_val
         DECLARE_NAPI_STATIC_PROPERTY("SIM_INVALID",
             NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(DisconnectedReason::SIM_INVALID))),
         DECLARE_NAPI_STATIC_PROPERTY("UNKNOWN",
-            NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(DisconnectedReason::UNKNOWN))),
+            NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(DisconnectedReason::FAILED_UNKNOWN))),
     };
     napi_value result = nullptr;
     napi_define_class(env, "DisconnectedReason", NAPI_AUTO_LENGTH, NapiCallManagerUtils::CreateEnumConstructor,
