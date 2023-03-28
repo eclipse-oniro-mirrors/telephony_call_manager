@@ -747,15 +747,9 @@ struct CallDetailsInfo {
     char bundleName[kMaxBundleNameLen + 1];
 };
 
-struct AudioDevice {
-    AudioDeviceType deviceType;
-    char address[kMaxAddressLen + 1];
-};
-
-struct AudioDeviceInfo {
-    std::vector<AudioDevice> audioDeviceList;
-    AudioDevice currentAudioDevice;
-    bool isMuted;
+enum class MmiCodeResult {
+    MMI_CODE_SUCCESS = 0,
+    MMI_CODE_FAILED = 1
 };
 } // namespace Telephony
 } // namespace OHOS
