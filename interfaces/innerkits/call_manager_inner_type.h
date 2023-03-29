@@ -757,6 +757,11 @@ struct AudioDeviceInfo {
     AudioDevice currentAudioDevice;
     bool isMuted;
 };
+
+enum class MmiCodeResult {
+    MMI_CODE_SUCCESS = 0,
+    MMI_CODE_FAILED = 1
+};
 } // namespace Telephony
 } // namespace OHOS
 #endif // CALL_MANAGER_INNER_TYPE_H
