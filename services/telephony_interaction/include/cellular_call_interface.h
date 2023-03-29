@@ -190,6 +190,14 @@ public:
     virtual int32_t HangUpAllConnection() = 0;
 
     /**
+     * Hang Up All Connection.
+     *
+     *@param slotId
+     * @return Returns TELEPHONY_SUCCESS on success, others on failure.
+     */
+    virtual int32_t HangUpAllConnection(int32_t slotId) = 0;
+
+    /**
      * IMS Update Call Media Mode
      *
      * @param CellularCallInfo
