@@ -33,6 +33,10 @@ BluetoothCallService::~BluetoothCallService()
 
 int32_t BluetoothCallService::AnswerCall()
 {
+    if (!TelephonyPermission::CheckPermission(Permission::ANSWER_CALL)) {
+        TELEPHONY_LOGE("Permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
     int32_t callId = ERR_ID;
     int32_t ret = AnswerCallPolicy(callId);
     if (ret != TELEPHONY_SUCCESS) {
