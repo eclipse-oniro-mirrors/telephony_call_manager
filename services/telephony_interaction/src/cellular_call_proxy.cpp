@@ -414,6 +414,11 @@ int32_t CellularCallProxy::HangUpAllConnection()
     return error;
 }
 
+int32_t CellularCallProxy::HangUpAllConnection(int32_t slotId)
+{
+    return TELEPHONY_ERR_SUCCESS;
+}
+
 int32_t CellularCallProxy::UpdateImsCallMode(const CellularCallInfo &callInfo, ImsCallMode mode)
 {
     MessageOption option;
