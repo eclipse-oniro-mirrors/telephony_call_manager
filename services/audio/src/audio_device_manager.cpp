@@ -34,7 +34,7 @@ bool AudioDeviceManager::isWiredHeadsetConnected_ = false;
 bool AudioDeviceManager::isBtScoConnected_ = false;
 
 AudioDeviceManager::AudioDeviceManager()
-    : audioDeviceType_(AudioDeviceType::DEVICE_EARPIECE), currentAudioDevice_(nullptr), isAudioActivated_(false)
+    : audioDeviceType_(AudioDeviceType::DEVICE_UNKNOWN), currentAudioDevice_(nullptr), isAudioActivated_(false)
 {}
 
 AudioDeviceManager::~AudioDeviceManager()
@@ -327,6 +327,7 @@ bool AudioDeviceManager::EnableBtSco()
 
 bool AudioDeviceManager::DisableAll()
 {
+    audioDeviceType_ = AudioDeviceType::DEVICE_UNKNOWN;
     isBtScoDevEnable_ = false;
     isWiredHeadsetDevEnable_ = false;
     isSpeakerDevEnable_ = false;
@@ -345,7 +346,7 @@ void AudioDeviceManager::SetCurrentAudioDevice(AudioDeviceType deviceType)
     if (audioDeviceType_ == AudioDeviceType::DEVICE_BLUETOOTH_SCO && audioDeviceType_ != deviceType) {
         DelayedSingleton<BluetoothConnection>::GetInstance()->DisconnectBtSco();
     } else if (audioDeviceType_ != AudioDeviceType::DEVICE_BLUETOOTH_SCO &&
-               deviceType == AudioDeviceType::DEVICE_BLUETOOTH_SCO) {
+        deviceType == AudioDeviceType::DEVICE_BLUETOOTH_SCO) {
         DelayedSingleton<BluetoothConnection>::GetInstance()->SetBtScoState(SCO_STATE_CONNECTED);
     }
     audioDeviceType_ = deviceType;
@@ -354,7 +355,12 @@ void AudioDeviceManager::SetCurrentAudioDevice(AudioDeviceType deviceType)
 
 int32_t AudioDeviceManager::ReportAudioDeviceChange()
 {
-    info_.currentAudioDevice.deviceType = audioDeviceType_;
+    if (audioDeviceType_ == AudioDeviceType::DEVICE_UNKNOWN) {
+        audioDeviceType_ = DelayedSingleton<AudioControlManager>::GetInstance()->GetInitAudioDeviceType();
+        info_.currentAudioDevice.deviceType = audioDeviceType_;
+    } else {
+        info_.currentAudioDevice.deviceType = audioDeviceType_;
+    }
     std::string address = "";
     if (audioDeviceType_ == AudioDeviceType::DEVICE_BLUETOOTH_SCO) {
         std::shared_ptr<BluetoothCallManager> bluetoothCallManager = std::make_shared<BluetoothCallManager>();
