@@ -95,11 +95,11 @@ void AudioControlManager::HandleNextState(sptr<CallBase> &callObjectPtr, TelCall
     switch (nextState) {
         case TelCallState::CALL_STATUS_DIALING:
             event = AudioEvent::NEW_DIALING_CALL;
-            SetAudioInterruptState(AudioInterruptState::INTERRUPT_STATE_RINGING);
+            audioInterruptState_ = AudioInterruptState::INTERRUPT_STATE_RINGING;
             break;
         case TelCallState::CALL_STATUS_ALERTING:
             event = AudioEvent::NEW_ALERTING_CALL;
-            SetAudioInterruptState(AudioInterruptState::INTERRUPT_STATE_RINGING);
+            audioInterruptState_ = AudioInterruptState::INTERRUPT_STATE_RINGING;
             break;
         case TelCallState::CALL_STATUS_ACTIVE:
             HandleNewActiveCall(callObjectPtr);
@@ -107,8 +107,9 @@ void AudioControlManager::HandleNextState(sptr<CallBase> &callObjectPtr, TelCall
             break;
         case TelCallState::CALL_STATUS_INCOMING:
             event = AudioEvent::NEW_INCOMING_CALL;
-            SetAudioInterruptState(AudioInterruptState::INTERRUPT_STATE_RINGING);
+            audioInterruptState_ = AudioInterruptState::INTERRUPT_STATE_RINGING;
             break;
+        case TelCallState::CALL_STATUS_DISCONNECTING:
         case TelCallState::CALL_STATUS_DISCONNECTED:
             SetAudioInterruptState(AudioInterruptState::INTERRUPT_STATE_DEACTIVATED);
             break;
@@ -119,6 +120,10 @@ void AudioControlManager::HandleNextState(sptr<CallBase> &callObjectPtr, TelCall
         return;
     }
     DelayedSingleton<AudioSceneProcessor>::GetInstance()->ProcessEvent(event);
+    if (nextState == TelCallState::CALL_STATUS_DIALING || nextState == TelCallState::CALL_STATUS_ALERTING ||
+        nextState == TelCallState::CALL_STATUS_INCOMING) {
+        SetAudioInterruptState(AudioInterruptState::INTERRUPT_STATE_RINGING);
+    }
 }
 
 void AudioControlManager::HandlePriorState(sptr<CallBase> &callObjectPtr, TelCallState priorState)
