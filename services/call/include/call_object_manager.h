@@ -61,6 +61,7 @@ public:
     static int32_t GetCallNum(TelCallState callState);
     static std::string GetCallNumber(TelCallState callState);
     static std::vector<CallAttributeInfo> GetCallInfoList(int32_t slotId);
+    static sptr<CallBase> GetForegroundLiveCall();
     int32_t DealFailDial(sptr<CallBase> call);
 
 protected:

@@ -342,12 +342,21 @@ AudioDeviceType AudioControlManager::GetInitAudioDeviceType() const
     if (audioInterruptState_ == AudioInterruptState::INTERRUPT_STATE_DEACTIVATED) {
         return AudioDeviceType::DEVICE_DISABLE;
     } else {
-        // interrupted or ringing , priority : bt sco , wired headset , speaker
+        /**
+         * Init audio device type according to the priority in different call state:
+         * In voice call state, bluetooth sco > wired headset > earpiece > speaker
+         * In video call state, bluetooth sco > wired headset > speaker > earpiece
+         */
         if (AudioDeviceManager::IsBtScoConnected()) {
             return AudioDeviceType::DEVICE_BLUETOOTH_SCO;
         }
         if (AudioDeviceManager::IsWiredHeadsetConnected()) {
             return AudioDeviceType::DEVICE_WIRED_HEADSET;
+        }
+        sptr<CallBase> liveCall = CallObjectManager::GetForegroundLiveCall();
+        if (liveCall != nullptr && liveCall->GetVideoStateType() == VideoStateType::TYPE_VIDEO) {
+            TELEPHONY_LOGI("current video call speaker is active");
+            return AudioDeviceType::DEVICE_SPEAKER;
         }
         if (AudioDeviceManager::IsEarpieceAvailable()) {
             return AudioDeviceType::DEVICE_EARPIECE;

@@ -43,6 +43,7 @@ public:
     bool SwitchDevice(AudioDeviceType device);
     void AddAudioDeviceList(const std::string &address, AudioDeviceType deviceType);
     void RemoveAudioDeviceList(const std::string &address, AudioDeviceType deviceType);
+    void ResetBtAudioDevicesList();
     int32_t ReportAudioDeviceChange();
 
 private:
