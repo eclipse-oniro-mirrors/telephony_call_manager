@@ -112,10 +112,10 @@ enum class CallEndedType {
 };
 
 struct SIMCardInfo {
-    int32_t simId; // IccId
-    int32_t country;
-    int32_t state; // SIM card active status
-    PhoneNetType phoneNetType;
+    int32_t simId = 0; // IccId
+    int32_t country = 0;
+    int32_t state = 0; // SIM card active status
+    PhoneNetType phoneNetType = PhoneNetType::PHONE_TYPE_GSM;
 };
 
 enum class DialType {
@@ -154,38 +154,38 @@ enum class CallAnswerType {
 };
 
 struct CallAttributeInfo {
-    char accountNumber[kMaxNumberLen + 1];
-    char bundleName[kMaxBundleNameLen + 1];
-    bool speakerphoneOn;
-    int32_t accountId;
-    VideoStateType videoState;
-    int64_t startTime; // Call start time
-    bool isEcc;
-    CallType callType;
-    int32_t callId;
-    TelCallState callState;
-    TelConferenceState conferenceState;
-    time_t callBeginTime;
-    time_t callEndTime;
-    time_t ringBeginTime;
-    time_t ringEndTime;
-    CallDirection callDirection;
-    CallAnswerType answerType;
+    char accountNumber[kMaxNumberLen + 1] = { 0 };
+    char bundleName[kMaxBundleNameLen + 1] = { 0 };
+    bool speakerphoneOn = false;
+    int32_t accountId = 0;
+    VideoStateType videoState = VideoStateType::TYPE_VOICE;
+    int64_t startTime = 0; // Call start time
+    bool isEcc = false;
+    CallType callType = CallType::TYPE_ERR_CALL;
+    int32_t callId = 0;
+    TelCallState callState = TelCallState::CALL_STATUS_UNKNOWN;
+    TelConferenceState conferenceState = TelConferenceState::TEL_CONFERENCE_IDLE;
+    time_t callBeginTime = 0;
+    time_t callEndTime = 0;
+    time_t ringBeginTime = 0;
+    time_t ringEndTime = 0;
+    CallDirection callDirection = CallDirection::CALL_DIRECTION_UNKNOW;
+    CallAnswerType answerType = CallAnswerType::CALL_ANSWER_MISSED;
 };
 
 struct CallRecordInfo {
-    int32_t callId;
-    char phoneNumber[kMaxNumberLen + 1];
-    char formattedPhoneNumber[kMaxNumberLen + 1];
-    CallType callType;
-    time_t callBeginTime;
-    time_t callEndTime;
-    uint32_t ringDuration;
-    uint32_t callDuration;
-    CallDirection directionType;
-    CallAnswerType answerType;
-    int32_t countryCode;
-    int32_t slotId;
+    int32_t callId = 0;
+    char phoneNumber[kMaxNumberLen + 1] = { 0 };
+    char formattedPhoneNumber[kMaxNumberLen + 1] = { 0 };
+    CallType callType = CallType::TYPE_ERR_CALL;
+    time_t callBeginTime = 0;
+    time_t callEndTime = 0;
+    uint32_t ringDuration = 0;
+    uint32_t callDuration = 0;
+    CallDirection directionType = CallDirection::CALL_DIRECTION_UNKNOW;
+    CallAnswerType answerType = CallAnswerType::CALL_ANSWER_MISSED;
+    int32_t countryCode = 0;
+    int32_t slotId = 0;
 };
 
 enum class CallAbilityEventId {
@@ -195,31 +195,31 @@ enum class CallAbilityEventId {
 };
 
 struct CallEventInfo {
-    CallAbilityEventId eventId;
-    char phoneNum[kMaxNumberLen + 1];
-    char bundleName[kMaxBundleNameLen + 1];
+    CallAbilityEventId eventId = CallAbilityEventId::EVENT_DIAL_NO_CARRIER;
+    char phoneNum[kMaxNumberLen + 1] = { 0 };
+    char bundleName[kMaxBundleNameLen + 1] = { 0 };
 };
 
 struct AccountInfo {
-    int32_t accountId;
-    int32_t power;
-    char bundleName[kMaxNumberLen + 1];
-    bool isEnabled;
+    int32_t accountId = 0;
+    int32_t power = 0;
+    char bundleName[kMaxNumberLen + 1] = { 0 };
+    bool isEnabled = false;
 };
 
 struct CallReportInfo {
-    int32_t index;
-    char accountNum[kMaxNumberLen + 1]; // call phone number
-    int32_t accountId;
-    CallType callType; // call type: CS、IMS
-    VideoStateType callMode; // call mode: video or audio
-    TelCallState state; // call state
-    int32_t voiceDomain; // 0:CS、1:IMS
+    int32_t index = 0;
+    char accountNum[kMaxNumberLen + 1] = { 0 }; // call phone number
+    int32_t accountId = 0;
+    CallType callType = CallType::TYPE_ERR_CALL; // call type: CS、IMS
+    VideoStateType callMode = VideoStateType::TYPE_VOICE; // call mode: video or audio
+    TelCallState state = TelCallState::CALL_STATUS_UNKNOWN; // call state
+    int32_t voiceDomain = 0; // 0:CS、1:IMS
 };
 
 struct CallsReportInfo {
-    std::vector<CallReportInfo> callVec;
-    int32_t slotId;
+    std::vector<CallReportInfo> callVec {};
+    int32_t slotId = 0;
 };
 
 /*
@@ -312,8 +312,8 @@ enum class DisconnectedReason : int32_t {
 };
 
 struct DisconnectedDetails {
-    DisconnectedReason reason;
-    std::string message;
+    DisconnectedReason reason = DisconnectedReason::FAILED_UNKNOWN;
+    std::string message = "";
 };
 
 enum class AudioDeviceType {
@@ -414,8 +414,8 @@ enum class CallResultReportId {
 };
 
 struct CellularCallEventInfo {
-    CellularCallEventType eventType;
-    RequestResultEventId eventId;
+    CellularCallEventType eventType = CellularCallEventType::EVENT_REQUEST_RESULT_TYPE;
+    RequestResultEventId eventId = RequestResultEventId::INVALID_REQUEST_RESULT_EVENT_ID;
 };
 
 enum class RBTPlayInfo {
@@ -424,48 +424,48 @@ enum class RBTPlayInfo {
 };
 
 struct CallWaitResponse {
-    int32_t result; // 0: ok  other: error
-    int32_t status;
-    int32_t classCw;
+    int32_t result = 0; // 0: ok  other: error
+    int32_t status = 0;
+    int32_t classCw = 0;
 };
 
 struct ClipResponse {
-    int32_t result; // 0: ok  other: error
-    int32_t action;
-    int32_t clipStat;
+    int32_t result = 0; // 0: ok  other: error
+    int32_t action = 0;
+    int32_t clipStat = 0;
 };
 
 struct ClirResponse {
-    int32_t result; // 0: ok  other: error
-    int32_t action;
-    int32_t clirStat;
+    int32_t result = 0; // 0: ok  other: error
+    int32_t action = 0;
+    int32_t clirStat = 0;
 };
 
 struct ColrResponse {
-    int32_t result; // 0: ok  other: error
-    int32_t action;
-    int32_t colrStat;
+    int32_t result = 0; // 0: ok  other: error
+    int32_t action = 0;
+    int32_t colrStat = 0;
 };
 
 struct ColpResponse {
-    int32_t result; // 0: ok  other: error
-    int32_t action;
-    int32_t colpStat;
+    int32_t result = 0; // 0: ok  other: error
+    int32_t action = 0;
+    int32_t colpStat = 0;
 };
 
 struct MmiCodeInfo {
-    int32_t result;  // 0: ok  other: error
-    char message[kMaxNumberLen + 1];
+    int32_t result = 0; // 0: ok  other: error
+    char message[kMaxNumberLen + 1] = { 0 };
 };
 
 struct CallTransferResponse {
-    int32_t result; // 0: ok  other: error
-    int32_t status;
-    int32_t classx;
-    int32_t type;
-    char number[kMaxNumberLen + 1];
-    int32_t reason;
-    int32_t time;
+    int32_t result = 0; // 0: ok  other: error
+    int32_t status = 0;
+    int32_t classx = 0;
+    int32_t type = 0;
+    char number[kMaxNumberLen + 1] = { 0 };
+    int32_t reason = 0;
+    int32_t time = 0;
     int32_t startHour = INVALID_TIME;
     int32_t startMinute = INVALID_TIME;
     int32_t endHour = INVALID_TIME;
@@ -473,50 +473,50 @@ struct CallTransferResponse {
 };
 
 struct CallRestrictionResponse {
-    int32_t result; // 0: ok  other: error
-    int32_t status; // parameter sets/shows the result code presentation status in the TA
-    int32_t classCw; // parameter shows the subscriber CLIP service status in the network, <0-4>
+    int32_t result = 0; // 0: ok  other: error
+    int32_t status = 0; // parameter sets/shows the result code presentation status in the TA
+    int32_t classCw = 0; // parameter shows the subscriber CLIP service status in the network, <0-4>
 };
 
 struct CallPreferenceResponse {
-    int32_t result; // 0: ok  other: error
+    int32_t result = 0; // 0: ok  other: error
     /*
      * 1：CS Voice only
      * 2：CS Voice preferred, IMS PS Voice as secondary
      * 3：IMS PS Voice preferred, CS Voice as secondary
      * 4：IMS PS Voice only
      */
-    int32_t mode;
+    int32_t mode = 0;
 };
 
 struct GetImsConfigResponse {
-    int32_t result;
-    int32_t value;
+    int32_t result = 0;
+    int32_t value = 0;
 };
 
 struct GetImsFeatureValueResponse {
-    int32_t result;
-    int32_t value;
+    int32_t result = 0;
+    int32_t value = 0;
 };
 
 struct GetLteEnhanceModeResponse {
-    int32_t result;
-    int32_t value;
+    int32_t result = 0;
+    int32_t value = 0;
 };
 
 struct MuteControlResponse {
-    int32_t result;
-    int32_t value; // 0: Un mute 1: Set mute
+    int32_t result = 0;
+    int32_t value = 0; // 0: Un mute 1: Set mute
 };
 
 struct CellularCallInfo {
-    int32_t callId; // uuid
-    char phoneNum[kMaxNumberLen]; // call phone number
-    int32_t slotId; // del
-    int32_t accountId;
-    CallType callType; // call type: CS、IMS
-    int32_t videoState; // 0: audio 1:video
-    int32_t index; // CallInfo index
+    int32_t callId = 0; // uuid
+    char phoneNum[kMaxNumberLen] = { 0 }; // call phone number
+    int32_t slotId = 0; // del
+    int32_t accountId = 0;
+    CallType callType = CallType::TYPE_ERR_CALL; // call type: CS、IMS
+    int32_t videoState = 0; // 0: audio 1:video
+    int32_t index = 0; // CallInfo index
 };
 
 /**
@@ -552,13 +552,13 @@ enum class CallTransferType {
 };
 
 struct CallTransferInfo {
-    char transferNum[kMaxNumberLen + 1];
-    CallTransferSettingType settingType;
-    CallTransferType type;
-    int32_t startHour;
-    int32_t startMinute;
-    int32_t endHour;
-    int32_t endMinute;
+    char transferNum[kMaxNumberLen + 1] = { 0 };
+    CallTransferSettingType settingType = CallTransferSettingType::CALL_TRANSFER_DISABLE;
+    CallTransferType type = CallTransferType::TRANSFER_TYPE_UNCONDITIONAL;
+    int32_t startHour = 0;
+    int32_t startMinute = 0;
+    int32_t endHour = 0;
+    int32_t endMinute = 0;
 };
 
 enum class SsRequestType {
@@ -570,11 +570,11 @@ enum class SsRequestType {
 };
 
 struct VideoWindow {
-    int32_t x;
-    int32_t y;
-    int32_t z;
-    int32_t width;
-    int32_t height;
+    int32_t x = 0;
+    int32_t y = 0;
+    int32_t z = 0;
+    int32_t width = 0;
+    int32_t height = 0;
 };
 
 // 3GPP TS 22.030 V4.0.0 (2001-03)
@@ -597,9 +597,9 @@ enum class CallRestrictionMode {
 };
 
 struct CallRestrictionInfo {
-    char password[kMaxNumberLen + 1];
-    CallRestrictionType fac;
-    CallRestrictionMode mode;
+    char password[kMaxNumberLen + 1] = { 0 };
+    CallRestrictionType fac = CallRestrictionType::RESTRICTION_TYPE_ALL_INCOMING;
+    CallRestrictionMode mode = CallRestrictionMode::RESTRICTION_MODE_DEACTIVATION;
 };
 
 // 3GPP TS 27.007 V3.9.0 (2001-06) Call related supplementary services +CHLD
@@ -633,13 +633,13 @@ enum ImsCallMode {
 };
 
 struct CallMediaModeRequest {
-    char phoneNum[kMaxNumberLen + 1];
-    ImsCallMode mode;
+    char phoneNum[kMaxNumberLen + 1] = { 0 };
+    ImsCallMode mode = ImsCallMode::CALL_MODE_AUDIO_ONLY;
 };
 
 struct CallMediaModeResponse {
-    char phoneNum[kMaxNumberLen + 1];
-    int32_t result;
+    char phoneNum[kMaxNumberLen + 1] = { 0 };
+    int32_t result = 0;
 };
 
 enum ImsConfigItem {
@@ -709,16 +709,16 @@ enum class OttCallRequestId {
 };
 
 struct OttCallRequestInfo {
-    char phoneNum[kMaxNumberLen + 1]; // call phone number
-    char bundleName[kMaxBundleNameLen + 1];
-    VideoStateType videoState; // 0: audio 1:video
+    char phoneNum[kMaxNumberLen + 1] = { 0 }; // call phone number
+    char bundleName[kMaxBundleNameLen + 1] = { 0 };
+    VideoStateType videoState = VideoStateType::TYPE_VOICE; // 0: audio 1:video
 };
 
 struct OttCallDetailsInfo {
-    char phoneNum[kMaxNumberLen + 1]; // call phone number
-    char bundleName[kMaxBundleNameLen + 1];
-    VideoStateType videoState; // 0: audio 1:video
-    TelCallState callState;
+    char phoneNum[kMaxNumberLen + 1] = { 0 }; // call phone number
+    char bundleName[kMaxBundleNameLen + 1] = { 0 };
+    VideoStateType videoState = VideoStateType::TYPE_VOICE; // 0: audio 1:video
+    TelCallState callState = TelCallState::CALL_STATUS_UNKNOWN;
 };
 
 enum class OttCallEventId {
@@ -726,36 +726,36 @@ enum class OttCallEventId {
 };
 
 struct OttCallEventInfo {
-    OttCallEventId ottCallEventId;
-    char bundleName[kMaxBundleNameLen + 1];
+    OttCallEventId ottCallEventId = OttCallEventId::OTT_CALL_EVENT_FUNCTION_UNSUPPORTED;
+    char bundleName[kMaxBundleNameLen + 1] = { 0 };
 };
 
 struct CallDetailInfo {
-    int32_t index;
-    char phoneNum[kMaxNumberLen + 1]; // call phone number
-    char bundleName[kMaxBundleNameLen + 1];
-    int32_t accountId;
-    CallType callType; // call type: CS、IMS
-    VideoStateType callMode; // call mode: video or audio
-    TelCallState state; // call state
-    int32_t voiceDomain; // 0:CS、1:IMS
+    int32_t index = 0;
+    char phoneNum[kMaxNumberLen + 1] = { 0 }; // call phone number
+    char bundleName[kMaxBundleNameLen + 1] = { 0 };
+    int32_t accountId = 0;
+    CallType callType = CallType::TYPE_ERR_CALL; // call type: CS、IMS
+    VideoStateType callMode = VideoStateType::TYPE_VOICE; // call mode: video or audio
+    TelCallState state = TelCallState::CALL_STATUS_UNKNOWN; // call state
+    int32_t voiceDomain = 0; // 0:CS、1:IMS
 };
 
 struct CallDetailsInfo {
-    std::vector<CallDetailInfo> callVec;
-    int32_t slotId;
-    char bundleName[kMaxBundleNameLen + 1];
+    std::vector<CallDetailInfo> callVec {};
+    int32_t slotId = 0;
+    char bundleName[kMaxBundleNameLen + 1] = { 0 };
 };
 
 struct AudioDevice {
-    AudioDeviceType deviceType;
-    char address[kMaxAddressLen + 1];
+    AudioDeviceType deviceType = AudioDeviceType::DEVICE_UNKNOWN;
+    char address[kMaxAddressLen + 1] = { 0 };
 };
 
 struct AudioDeviceInfo {
-    std::vector<AudioDevice> audioDeviceList;
+    std::vector<AudioDevice> audioDeviceList {};
     AudioDevice currentAudioDevice;
-    bool isMuted;
+    bool isMuted = false;
 };
 
 enum class MmiCodeResult {

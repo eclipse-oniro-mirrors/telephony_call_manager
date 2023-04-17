@@ -35,17 +35,17 @@ struct DialParaInfo {
     DialParaInfo() : accountId(0), callId(0), index(0), dialType(DialType::DIAL_CARRIER_TYPE),
         videoState(VideoStateType::TYPE_VOICE), callType(CallType::TYPE_ERR_CALL),
         callState(TelCallState::CALL_STATUS_IDLE), isDialing(false), isEcc(false) {}
-    int32_t accountId;
-    int32_t callId;
-    int32_t index;
-    std::string number;
-    DialType dialType;
-    VideoStateType videoState;
-    CallType callType;
-    TelCallState callState;
-    bool isDialing;
-    bool isEcc;
-    std::string bundleName;
+    int32_t accountId = 0;
+    int32_t callId = 0;
+    int32_t index = 0;
+    std::string number = "";
+    DialType dialType = DialType::DIAL_CARRIER_TYPE;
+    VideoStateType videoState = VideoStateType::TYPE_VOICE;
+    CallType callType = CallType::TYPE_ERR_CALL;
+    TelCallState callState = TelCallState::CALL_STATUS_UNKNOWN;
+    bool isDialing = false;
+    bool isEcc = false;
+    std::string bundleName = "";
 };
 
 enum PolicyFlag : uint64_t {
@@ -74,13 +74,13 @@ enum PolicyFlag : uint64_t {
 };
 
 struct ContactInfo {
-    char name[CONTACT_NAME_LEN];
-    char number[kMaxNumberLen];
-    bool isContacterExists;
-    char ringtonePath[FILE_PATH_MAX_LEN];
-    bool isSendToVoicemail;
-    bool isEcc;
-    bool isVoiceMail;
+    char name[CONTACT_NAME_LEN] = { 0 };
+    char number[kMaxNumberLen] = { 0 };
+    bool isContacterExists = false;
+    char ringtonePath[FILE_PATH_MAX_LEN] = { 0 };
+    bool isSendToVoicemail = false;
+    bool isEcc = false;
+    bool isVoiceMail = false;
 };
 } // namespace Telephony
 } // namespace OHOS

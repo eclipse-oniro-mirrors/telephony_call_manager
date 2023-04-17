@@ -48,9 +48,9 @@ enum ToneDescriptor {
     TONE_DTMF_CHAR_W
 };
 struct ToneStream {
-    ToneDescriptor toneDescriptor;
-    int32_t duration;
-    int32_t volume;
+    ToneDescriptor toneDescriptor = ToneDescriptor::TONE_UNKNOWN;
+    int32_t duration = 0;
+    int32_t volume = 0;
 };
 
 /**

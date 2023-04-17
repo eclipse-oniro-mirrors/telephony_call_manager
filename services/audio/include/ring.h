@@ -26,8 +26,8 @@
 namespace OHOS {
 namespace Telephony {
 struct RingtoneStream {
-    std::string ringtonePath;
-    uint32_t playedPosition;
+    std::string ringtonePath = "";
+    uint32_t playedPosition = 0;
 };
 enum RingState {
     RINGING = 0,
