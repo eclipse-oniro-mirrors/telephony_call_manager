@@ -29,29 +29,29 @@
 namespace OHOS {
 namespace Telephony {
 struct AnswerCallPara {
-    int32_t callId;
-    int32_t videoState;
+    int32_t callId = 0;
+    int32_t videoState = 0;
 };
 
 struct RejectCallPara {
-    int32_t callId;
-    bool isSendSms;
-    char content[REJECT_CALL_MSG_MAX_LEN + 1];
+    int32_t callId = 0;
+    bool isSendSms = 0;
+    char content[REJECT_CALL_MSG_MAX_LEN + 1] = { 0 };
 };
 
 struct StartRttPara {
-    int32_t callId;
-    std::u16string msg;
+    int32_t callId = 0;
+    std::u16string msg = u"";
 };
 
 struct CallMediaUpdatePara {
-    int32_t callId;
-    ImsCallMode mode;
+    int32_t callId = 0;
+    ImsCallMode mode = ImsCallMode::CALL_MODE_AUDIO_ONLY;
 };
 
 struct JoinConferencePara {
-    int32_t callId;
-    std::vector<std::string> numberList;
+    int32_t callId = 0;
+    std::vector<std::string> numberList {};
 };
 
 /**

@@ -48,115 +48,115 @@ const int16_t UNKNOWN_EVENT = 0;
 
 struct AsyncContext {
     virtual ~AsyncContext() {}
-    napi_env env;
-    napi_async_work work;
-    napi_deferred deferred;
-    napi_ref callbackRef;
-    int32_t callId;
+    napi_env env = nullptr;
+    napi_async_work work = nullptr;
+    napi_deferred deferred = nullptr;
+    napi_ref callbackRef = nullptr;
+    int32_t callId = 0;
     int32_t resolved = TELEPHONY_ERROR;
-    char number[kMaxNumberLen + 1];
-    size_t numberLen;
-    napi_value value[VALUE_MAXIMUM_LIMIT];
-    size_t valueLen;
+    char number[kMaxNumberLen + 1] = { 0 };
+    size_t numberLen = 0;
+    napi_value value[VALUE_MAXIMUM_LIMIT] = { 0 };
+    size_t valueLen = 0;
     int32_t errorCode = TELEPHONY_SUCCESS;
     int32_t eventId = UNKNOWN_EVENT;
 };
 
 struct DialAsyncContext : AsyncContext {
-    int32_t accountId;
-    int32_t videoState;
-    int32_t dialScene;
-    int32_t dialType;
+    int32_t accountId = 0;
+    int32_t videoState = 0;
+    int32_t dialScene = 0;
+    int32_t dialType = 0;
 };
 
 struct AnswerAsyncContext : AsyncContext {
-    int32_t videoState;
+    int32_t videoState = 0;
 };
 
 struct BoolResultAsyncContext : AsyncContext {
-    int32_t slotId;
-    bool enabled;
+    int32_t slotId = 0;
+    bool enabled = false;
 };
 
 struct IntResultAsyncContext : AsyncContext {
-    int32_t result;
+    int32_t result = 0;
 };
 
 struct RejectAsyncContext : AsyncContext {
-    bool isSendSms;
-    std::string messageContent;
+    bool isSendSms = false;
+    std::string messageContent = "";
 };
 
 struct ListAsyncContext : AsyncContext {
-    std::vector<std::u16string> listResult;
+    std::vector<std::u16string> listResult {};
 };
 
 struct SupplementAsyncContext : AsyncContext {
-    int32_t slotId;
-    int32_t type;
-    int32_t mode;
-    std::string content;
-    bool flag;
-    napi_ref thisVar;
+    int32_t slotId = 0;
+    int32_t type = 0;
+    int32_t mode = 0;
+    std::string content = "";
+    bool flag = false;
+    napi_ref thisVar = nullptr;
 };
 
 struct ImsSwitchAsyncContext : AsyncContext {
-    int32_t slotId;
-    bool enabled;
+    int32_t slotId = 0;
+    bool enabled = false;
 };
 
 struct CallRestrictionAsyncContext : AsyncContext {
-    int32_t slotId;
+    int32_t slotId = 0;
     CallRestrictionInfo info;
-    napi_ref thisVar;
+    napi_ref thisVar = nullptr;
 };
 
 struct CallTransferAsyncContext : AsyncContext {
-    int32_t slotId;
+    int32_t slotId = 0;
     CallTransferInfo info;
-    napi_ref thisVar;
+    napi_ref thisVar = nullptr;
 };
 
 struct UtilsAsyncContext : AsyncContext {
-    int32_t slotId;
-    bool enabled;
-    std::u16string formatNumber;
-    std::string code;
+    int32_t slotId = 0;
+    bool enabled = false;
+    std::u16string formatNumber = u"";
+    std::string code = "";
 };
 
 struct EventCallback {
     EventCallback() : env(nullptr), thisVar(nullptr), callbackRef(nullptr), deferred(nullptr),
                       callbackBeginTime_(0) {}
-    napi_env env;
-    napi_ref thisVar;
-    napi_ref callbackRef;
-    napi_deferred deferred;
+    napi_env env = nullptr;
+    napi_ref thisVar = nullptr;
+    napi_ref callbackRef = nullptr;
+    napi_deferred deferred = nullptr;
     time_t callbackBeginTime_;
 };
 
 struct AudioAsyncContext : AsyncContext {
-    bool isMute;
-    std::string address;
-    int32_t deviceType;
+    bool isMute = false;
+    std::string address = "";
+    int32_t deviceType = 0;
 };
 
 struct VideoAsyncContext : AsyncContext {
-    int32_t x;
-    int32_t y;
-    int32_t z;
-    int32_t width;
-    int32_t height;
-    double zoomRatio;
-    int32_t rotation;
-    int32_t callingUid;
-    int32_t callingPid;
-    std::string cameraId;
-    std::u16string callingPackage;
-    char path[kMaxNumberLen + 1];
+    int32_t x = 0;
+    int32_t y = 0;
+    int32_t z = 0;
+    int32_t width = 0;
+    int32_t height = 0;
+    double zoomRatio = 0;
+    int32_t rotation = 0;
+    int32_t callingUid = 0;
+    int32_t callingPid = 0;
+    std::string cameraId = "";
+    std::u16string callingPackage = u"";
+    char path[kMaxNumberLen + 1] = { 0 };
 };
 
 struct OttCallAsyncContext : AsyncContext {
-    std::vector<OttCallDetailsInfo> ottVec;
+    std::vector<OttCallDetailsInfo> ottVec {};
 };
 
 struct OttEventAsyncContext : AsyncContext {
