@@ -160,6 +160,8 @@ int32_t CallManagerProxy::RegisterCallBack(std::unique_ptr<CallManagerCallback> 
         TELEPHONY_LOGE("register callback to call manager service failed,result: %{public}d", ret);
         if (ret == TELEPHONY_ERR_PERMISSION_ERR) {
             return TELEPHONY_ERR_PERMISSION_ERR;
+        } else if (ret == TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API) {
+            return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
         }
         return TELEPHONY_ERR_REGISTER_CALLBACK_FAIL;
     }
@@ -185,6 +187,8 @@ int32_t CallManagerProxy::UnRegisterCallBack()
         TELEPHONY_LOGE("UnRegisterCallBack failed,result: %{public}d", ret);
         if (ret == TELEPHONY_ERR_PERMISSION_ERR) {
             return TELEPHONY_ERR_PERMISSION_ERR;
+        } else if (ret == TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API) {
+            return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
         }
         return TELEPHONY_ERR_UNREGISTER_CALLBACK_FAIL;
     }

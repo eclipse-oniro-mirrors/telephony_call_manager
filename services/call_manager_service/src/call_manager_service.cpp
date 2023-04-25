@@ -188,6 +188,10 @@ std::string CallManagerService::GetStartServiceSpent()
 
 int32_t CallManagerService::RegisterCallBack(const sptr<ICallAbilityCallback> &callback)
 {
+    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
+        TELEPHONY_LOGE("Non-system applications use system APIs!");
+        return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
+    }
     if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_SET_TELEPHONY_STATE)) {
         TELEPHONY_LOGE("Permission denied!");
         return TELEPHONY_ERR_PERMISSION_ERR;
@@ -197,6 +201,10 @@ int32_t CallManagerService::RegisterCallBack(const sptr<ICallAbilityCallback> &c
 
 int32_t CallManagerService::UnRegisterCallBack()
 {
+    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
+        TELEPHONY_LOGE("Non-system applications use system APIs!");
+        return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
+    }
     if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_SET_TELEPHONY_STATE)) {
         TELEPHONY_LOGE("Permission denied!");
         return TELEPHONY_ERR_PERMISSION_ERR;
@@ -206,6 +214,10 @@ int32_t CallManagerService::UnRegisterCallBack()
 
 int32_t CallManagerService::DialCall(std::u16string number, AppExecFwk::PacMap &extras)
 {
+    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
+        TELEPHONY_LOGE("Non-system applications use system APIs!");
+        return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
+    }
     DelayedSingleton<CallManagerHisysevent>::GetInstance()->SetDialStartTime();
     StartAsyncTrace(HITRACE_TAG_OHOS, "DialCall", getpid());
     int32_t uid = IPCSkeleton::GetCallingUid();
@@ -244,6 +256,10 @@ int32_t CallManagerService::DialCall(std::u16string number, AppExecFwk::PacMap &
 
 int32_t CallManagerService::AnswerCall(int32_t callId, int32_t videoState)
 {
+    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
+        TELEPHONY_LOGE("Non-system applications use system APIs!");
+        return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
+    }
     if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_ANSWER_CALL)) {
         TELEPHONY_LOGE("Permission denied!");
         return TELEPHONY_ERR_PERMISSION_ERR;
@@ -259,6 +275,10 @@ int32_t CallManagerService::AnswerCall(int32_t callId, int32_t videoState)
 
 int32_t CallManagerService::RejectCall(int32_t callId, bool rejectWithMessage, std::u16string textMessage)
 {
+    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
+        TELEPHONY_LOGE("Non-system applications use system APIs!");
+        return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
+    }
     if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_ANSWER_CALL)) {
         TELEPHONY_LOGE("Permission denied!");
         return TELEPHONY_ERR_PERMISSION_ERR;
@@ -273,6 +293,10 @@ int32_t CallManagerService::RejectCall(int32_t callId, bool rejectWithMessage, s
 
 int32_t CallManagerService::HangUpCall(int32_t callId)
 {
+    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
+        TELEPHONY_LOGE("Non-system applications use system APIs!");
+        return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
+    }
     if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_ANSWER_CALL)) {
         TELEPHONY_LOGE("Permission denied!");
         return TELEPHONY_ERR_PERMISSION_ERR;
@@ -297,6 +321,10 @@ int32_t CallManagerService::GetCallState()
 
 int32_t CallManagerService::HoldCall(int32_t callId)
 {
+    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
+        TELEPHONY_LOGE("Non-system applications use system APIs!");
+        return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
+    }
     if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_ANSWER_CALL)) {
         TELEPHONY_LOGE("Permission denied!");
         return TELEPHONY_ERR_PERMISSION_ERR;
@@ -311,6 +339,10 @@ int32_t CallManagerService::HoldCall(int32_t callId)
 
 int32_t CallManagerService::UnHoldCall(int32_t callId)
 {
+    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
+        TELEPHONY_LOGE("Non-system applications use system APIs!");
+        return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
+    }
     if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_ANSWER_CALL)) {
         TELEPHONY_LOGE("Permission denied!");
         return TELEPHONY_ERR_PERMISSION_ERR;
@@ -325,6 +357,10 @@ int32_t CallManagerService::UnHoldCall(int32_t callId)
 
 int32_t CallManagerService::SwitchCall(int32_t callId)
 {
+    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
+        TELEPHONY_LOGE("Non-system applications use system APIs!");
+        return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
+    }
     if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_ANSWER_CALL)) {
         TELEPHONY_LOGE("Permission denied!");
         return TELEPHONY_ERR_PERMISSION_ERR;
@@ -353,6 +389,10 @@ bool CallManagerService::HasCall()
 
 int32_t CallManagerService::IsNewCallAllowed(bool &enabled)
 {
+    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
+        TELEPHONY_LOGE("Non-system applications use system APIs!");
+        return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
+    }
     if (callControlManagerPtr_ != nullptr) {
         return callControlManagerPtr_->IsNewCallAllowed(enabled);
     } else {
@@ -363,6 +403,10 @@ int32_t CallManagerService::IsNewCallAllowed(bool &enabled)
 
 int32_t CallManagerService::IsRinging(bool &enabled)
 {
+    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
+        TELEPHONY_LOGE("Non-system applications use system APIs!");
+        return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
+    }
     if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_SET_TELEPHONY_STATE)) {
         TELEPHONY_LOGE("Permission denied!");
         return TELEPHONY_ERR_PERMISSION_ERR;
@@ -377,6 +421,10 @@ int32_t CallManagerService::IsRinging(bool &enabled)
 
 int32_t CallManagerService::IsInEmergencyCall(bool &enabled)
 {
+    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
+        TELEPHONY_LOGE("Non-system applications use system APIs!");
+        return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
+    }
     if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_SET_TELEPHONY_STATE)) {
         TELEPHONY_LOGE("Permission denied!");
         return TELEPHONY_ERR_PERMISSION_ERR;
@@ -391,6 +439,10 @@ int32_t CallManagerService::IsInEmergencyCall(bool &enabled)
 
 int32_t CallManagerService::StartDtmf(int32_t callId, char str)
 {
+    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
+        TELEPHONY_LOGE("Non-system applications use system APIs!");
+        return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
+    }
     if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_SET_TELEPHONY_STATE)) {
         TELEPHONY_LOGE("Permission denied!");
         return TELEPHONY_ERR_PERMISSION_ERR;
@@ -405,6 +457,10 @@ int32_t CallManagerService::StartDtmf(int32_t callId, char str)
 
 int32_t CallManagerService::StopDtmf(int32_t callId)
 {
+    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
+        TELEPHONY_LOGE("Non-system applications use system APIs!");
+        return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
+    }
     if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_SET_TELEPHONY_STATE)) {
         TELEPHONY_LOGE("Permission denied!");
         return TELEPHONY_ERR_PERMISSION_ERR;
@@ -419,6 +475,10 @@ int32_t CallManagerService::StopDtmf(int32_t callId)
 
 int32_t CallManagerService::GetCallWaiting(int32_t slotId)
 {
+    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
+        TELEPHONY_LOGE("Non-system applications use system APIs!");
+        return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
+    }
     if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_GET_TELEPHONY_STATE)) {
         TELEPHONY_LOGE("Permission denied!");
         return TELEPHONY_ERR_PERMISSION_ERR;
@@ -433,6 +493,10 @@ int32_t CallManagerService::GetCallWaiting(int32_t slotId)
 
 int32_t CallManagerService::SetCallWaiting(int32_t slotId, bool activate)
 {
+    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
+        TELEPHONY_LOGE("Non-system applications use system APIs!");
+        return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
+    }
     if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_SET_TELEPHONY_STATE)) {
         TELEPHONY_LOGE("Permission denied!");
         return TELEPHONY_ERR_PERMISSION_ERR;
@@ -447,6 +511,10 @@ int32_t CallManagerService::SetCallWaiting(int32_t slotId, bool activate)
 
 int32_t CallManagerService::GetCallRestriction(int32_t slotId, CallRestrictionType type)
 {
+    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
+        TELEPHONY_LOGE("Non-system applications use system APIs!");
+        return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
+    }
     if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_GET_TELEPHONY_STATE)) {
         TELEPHONY_LOGE("Permission denied!");
         return TELEPHONY_ERR_PERMISSION_ERR;
@@ -461,6 +529,10 @@ int32_t CallManagerService::GetCallRestriction(int32_t slotId, CallRestrictionTy
 
 int32_t CallManagerService::SetCallRestriction(int32_t slotId, CallRestrictionInfo &info)
 {
+    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
+        TELEPHONY_LOGE("Non-system applications use system APIs!");
+        return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
+    }
     if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_SET_TELEPHONY_STATE)) {
         TELEPHONY_LOGE("Permission denied!");
         return TELEPHONY_ERR_PERMISSION_ERR;
@@ -475,6 +547,10 @@ int32_t CallManagerService::SetCallRestriction(int32_t slotId, CallRestrictionIn
 
 int32_t CallManagerService::GetCallTransferInfo(int32_t slotId, CallTransferType type)
 {
+    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
+        TELEPHONY_LOGE("Non-system applications use system APIs!");
+        return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
+    }
     if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_GET_TELEPHONY_STATE)) {
         TELEPHONY_LOGE("Permission denied!");
         return TELEPHONY_ERR_PERMISSION_ERR;
@@ -489,6 +565,10 @@ int32_t CallManagerService::GetCallTransferInfo(int32_t slotId, CallTransferType
 
 int32_t CallManagerService::SetCallTransferInfo(int32_t slotId, CallTransferInfo &info)
 {
+    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
+        TELEPHONY_LOGE("Non-system applications use system APIs!");
+        return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
+    }
     if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_SET_TELEPHONY_STATE)) {
         TELEPHONY_LOGE("Permission denied!");
         return TELEPHONY_ERR_PERMISSION_ERR;
@@ -503,6 +583,10 @@ int32_t CallManagerService::SetCallTransferInfo(int32_t slotId, CallTransferInfo
 
 int32_t CallManagerService::CanSetCallTransferTime(int32_t slotId, bool &result)
 {
+    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
+        TELEPHONY_LOGE("Non-system applications use system APIs!");
+        return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
+    }
     if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_GET_TELEPHONY_STATE)) {
         TELEPHONY_LOGE("Permission denied!");
         return TELEPHONY_ERR_PERMISSION_ERR;
@@ -551,6 +635,10 @@ int32_t CallManagerService::StopRtt(int32_t callId)
 
 int32_t CallManagerService::CombineConference(int32_t mainCallId)
 {
+    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
+        TELEPHONY_LOGE("Non-system applications use system APIs!");
+        return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
+    }
     if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_SET_TELEPHONY_STATE)) {
         TELEPHONY_LOGE("Permission denied!");
         return TELEPHONY_ERR_PERMISSION_ERR;
@@ -565,6 +653,10 @@ int32_t CallManagerService::CombineConference(int32_t mainCallId)
 
 int32_t CallManagerService::SeparateConference(int32_t callId)
 {
+    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
+        TELEPHONY_LOGE("Non-system applications use system APIs!");
+        return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
+    }
     if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_SET_TELEPHONY_STATE)) {
         TELEPHONY_LOGE("Permission denied!");
         return TELEPHONY_ERR_PERMISSION_ERR;
@@ -579,6 +671,10 @@ int32_t CallManagerService::SeparateConference(int32_t callId)
 
 int32_t CallManagerService::SetMuted(bool isMute)
 {
+    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
+        TELEPHONY_LOGE("Non-system applications use system APIs!");
+        return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
+    }
     if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_SET_TELEPHONY_STATE)) {
         TELEPHONY_LOGE("Permission denied!");
         return TELEPHONY_ERR_PERMISSION_ERR;
@@ -593,6 +689,10 @@ int32_t CallManagerService::SetMuted(bool isMute)
 
 int32_t CallManagerService::MuteRinger()
 {
+    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
+        TELEPHONY_LOGE("Non-system applications use system APIs!");
+        return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
+    }
     if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_SET_TELEPHONY_STATE)) {
         TELEPHONY_LOGE("Permission denied!");
         return TELEPHONY_ERR_PERMISSION_ERR;
@@ -607,6 +707,10 @@ int32_t CallManagerService::MuteRinger()
 
 int32_t CallManagerService::SetAudioDevice(const AudioDevice &audioDevice)
 {
+    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
+        TELEPHONY_LOGE("Non-system applications use system APIs!");
+        return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
+    }
     if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_SET_TELEPHONY_STATE)) {
         TELEPHONY_LOGE("Permission denied!");
         return TELEPHONY_ERR_PERMISSION_ERR;
@@ -718,6 +822,10 @@ int32_t CallManagerService::FormatPhoneNumberToE164(
 
 int32_t CallManagerService::GetMainCallId(int32_t callId, int32_t &mainCallId)
 {
+    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
+        TELEPHONY_LOGE("Non-system applications use system APIs!");
+        return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
+    }
     if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_GET_TELEPHONY_STATE)) {
         TELEPHONY_LOGE("Permission denied!");
         return TELEPHONY_ERR_PERMISSION_ERR;
@@ -732,6 +840,10 @@ int32_t CallManagerService::GetMainCallId(int32_t callId, int32_t &mainCallId)
 
 int32_t CallManagerService::GetSubCallIdList(int32_t callId, std::vector<std::u16string> &callIdList)
 {
+    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
+        TELEPHONY_LOGE("Non-system applications use system APIs!");
+        return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
+    }
     if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_GET_TELEPHONY_STATE)) {
         TELEPHONY_LOGE("Permission denied!");
         return TELEPHONY_ERR_PERMISSION_ERR;
@@ -745,6 +857,10 @@ int32_t CallManagerService::GetSubCallIdList(int32_t callId, std::vector<std::u1
 
 int32_t CallManagerService::GetCallIdListForConference(int32_t callId, std::vector<std::u16string> &callIdList)
 {
+    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
+        TELEPHONY_LOGE("Non-system applications use system APIs!");
+        return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
+    }
     if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_GET_TELEPHONY_STATE)) {
         TELEPHONY_LOGE("Permission denied!");
         return TELEPHONY_ERR_PERMISSION_ERR;
@@ -798,6 +914,10 @@ int32_t CallManagerService::SetImsFeatureValue(int32_t slotId, FeatureType type,
 
 int32_t CallManagerService::UpdateImsCallMode(int32_t callId, ImsCallMode mode)
 {
+    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
+        TELEPHONY_LOGE("Non-system applications use system APIs!");
+        return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
+    }
     if (callControlManagerPtr_ != nullptr) {
         return callControlManagerPtr_->UpdateImsCallMode(callId, mode);
     } else {
@@ -808,6 +928,10 @@ int32_t CallManagerService::UpdateImsCallMode(int32_t callId, ImsCallMode mode)
 
 int32_t CallManagerService::EnableImsSwitch(int32_t slotId)
 {
+    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
+        TELEPHONY_LOGE("Non-system applications use system APIs!");
+        return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
+    }
     if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_SET_TELEPHONY_STATE)) {
         TELEPHONY_LOGE("Permission denied!");
         return TELEPHONY_ERR_PERMISSION_ERR;
@@ -822,6 +946,10 @@ int32_t CallManagerService::EnableImsSwitch(int32_t slotId)
 
 int32_t CallManagerService::DisableImsSwitch(int32_t slotId)
 {
+    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
+        TELEPHONY_LOGE("Non-system applications use system APIs!");
+        return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
+    }
     if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_SET_TELEPHONY_STATE)) {
         TELEPHONY_LOGE("Permission denied!");
         return TELEPHONY_ERR_PERMISSION_ERR;
@@ -836,6 +964,10 @@ int32_t CallManagerService::DisableImsSwitch(int32_t slotId)
 
 int32_t CallManagerService::IsImsSwitchEnabled(int32_t slotId, bool &enabled)
 {
+    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
+        TELEPHONY_LOGE("Non-system applications use system APIs!");
+        return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
+    }
     if (callControlManagerPtr_ != nullptr) {
         return callControlManagerPtr_->IsImsSwitchEnabled(slotId, enabled);
     } else {
@@ -882,6 +1014,10 @@ int32_t CallManagerService::GetVoNRState(int32_t slotId, int32_t &state)
 
 int32_t CallManagerService::JoinConference(int32_t callId, std::vector<std::u16string> &numberList)
 {
+    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
+        TELEPHONY_LOGE("Non-system applications use system APIs!");
+        return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
+    }
     if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_PLACE_CALL)) {
         TELEPHONY_LOGE("Permission denied!");
         return TELEPHONY_ERR_PERMISSION_ERR;
@@ -937,6 +1073,10 @@ int32_t CallManagerService::ReportOttCallEventInfo(OttCallEventInfo &eventInfo)
 
 int32_t CallManagerService::CloseUnFinishedUssd(int32_t slotId)
 {
+    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
+        TELEPHONY_LOGE("Non system applications use system APIs!");
+        return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
+    }
     if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_SET_TELEPHONY_STATE)) {
         TELEPHONY_LOGE("Permission denied!");
         return TELEPHONY_ERR_PERMISSION_ERR;
