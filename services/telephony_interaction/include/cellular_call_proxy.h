@@ -153,6 +153,8 @@ public:
      */
     int32_t HangUpAllConnection(int32_t slotId) override;
 
+    int32_t SetReadyToCall(int32_t slotId, bool isReadyToCall) override;
+
     /**
      * IMS Update Call Media Mode
      *

@@ -76,6 +76,15 @@ void CallRequestHandler::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &eve
     }
 }
 
+int32_t CallRequestHandler::DialCall()
+{
+    if (callRequestProcessPtr_ == nullptr) {
+        TELEPHONY_LOGE("callRequestProcessPtr_ is nullptr");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return callRequestProcessPtr_->DialRequest();
+}
+
 void CallRequestHandler::DialCallEvent(const AppExecFwk::InnerEvent::Pointer &event)
 {
     if (event == nullptr) {
@@ -350,11 +359,7 @@ int32_t CallRequestHandlerService::DialCall()
         TELEPHONY_LOGE("handler_ is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    if (!handler_->SendEvent(HANDLER_DIAL_CALL_REQUEST)) {
-        TELEPHONY_LOGE("send dial event failed!");
-        return CALL_ERR_SYSTEM_EVENT_HANDLE_FAILURE;
-    }
-    return TELEPHONY_SUCCESS;
+    return handler_->DialCall();
 }
 
 int32_t CallRequestHandlerService::AnswerCall(int32_t callId, int32_t videoState)
