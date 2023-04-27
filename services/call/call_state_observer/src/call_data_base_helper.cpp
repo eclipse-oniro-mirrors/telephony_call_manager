@@ -123,7 +123,6 @@ bool CallDataBaseHelper::Query(std::vector<std::string> *phones, DataShare::Data
     std::vector<std::string> columns;
     columns.push_back("phone_number");
     auto resultSet = helper->Query(uri, predicates, columns);
-    helper->Release();
     if (resultSet == nullptr) {
         return false;
     }
@@ -139,6 +138,7 @@ bool CallDataBaseHelper::Query(std::vector<std::string> *phones, DataShare::Data
         resultSetNum = resultSet->GoToNextRow();
     }
     resultSet->Close();
+    helper->Release();
     TELEPHONY_LOGI("Query end");
     return true;
 }
@@ -153,7 +153,6 @@ bool CallDataBaseHelper::Query(ContactInfo &contactInfo, DataShare::DataSharePre
     Uri uri(CONTACT_DATA);
     std::vector<std::string> columns;
     auto resultSet = helper->Query(uri, predicates, columns);
-    helper->Release();
     if (resultSet == nullptr) {
         TELEPHONY_LOGE("resultSet is nullptr");
         return false;
@@ -177,6 +176,7 @@ bool CallDataBaseHelper::Query(ContactInfo &contactInfo, DataShare::DataSharePre
         resultSetNum = resultSet->GoToNextRow();
     }
     resultSet->Close();
+    helper->Release();
     TELEPHONY_LOGI("Query end");
     return true;
 }
