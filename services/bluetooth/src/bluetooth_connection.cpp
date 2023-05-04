@@ -38,19 +38,35 @@ BluetoothConnection::~BluetoothConnection()
     } else {
         profile->DeregisterObserver(this);
     }
+
+    if (statusChangeListener_ != nullptr) {
+        auto samgrProxy = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+        if (samgrProxy != nullptr) {
+            samgrProxy->UnSubscribeSystemAbility(BLUETOOTH_HOST_SYS_ABILITY_ID, statusChangeListener_);
+            statusChangeListener_ = nullptr;
+        }
+    }
 #endif
 }
 
 void BluetoothConnection::Init()
 {
 #ifdef ABILITY_BLUETOOTH_SUPPORT
-    Bluetooth::HandsFreeAudioGateway *profile = Bluetooth::HandsFreeAudioGateway::GetProfile();
-    if (profile == nullptr) {
-        TELEPHONY_LOGE("BluetoothConnection init fail!");
+    statusChangeListener_ = new (std::nothrow) SystemAbilityListener();
+    if (statusChangeListener_ == nullptr) {
+        TELEPHONY_LOGE("failed to create statusChangeListener");
         return;
     }
-
-    profile->RegisterObserver(this);
+    auto managerPtr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (managerPtr == nullptr) {
+        TELEPHONY_LOGE("get system ability manager error");
+        return;
+    }
+    int32_t ret = managerPtr->SubscribeSystemAbility(BLUETOOTH_HOST_SYS_ABILITY_ID, statusChangeListener_);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("failed to subscribe bluetooth service SA:%{public}d", BLUETOOTH_HOST_SYS_ABILITY_ID);
+        return;
+    }
     TELEPHONY_LOGI("BluetoothConnection init success!");
 #endif
 }
@@ -217,6 +233,24 @@ std::string BluetoothConnection::GetConnectedScoAddr()
 }
 
 #ifdef ABILITY_BLUETOOTH_SUPPORT
+void BluetoothConnection::ResetBtConnection()
+{
+    connectedScoAddr_ = "";
+    btScoState_ = BtScoState::SCO_STATE_DISCONNECTED;
+    mapConnectedBtDevices_.clear();
+}
+
+void BluetoothConnection::RegisterObserver()
+{
+    Bluetooth::HandsFreeAudioGateway *profile = Bluetooth::HandsFreeAudioGateway::GetProfile();
+    if (profile == nullptr) {
+        TELEPHONY_LOGE("BluetoothConnection RegisterObserver fail!");
+        return;
+    }
+
+    profile->RegisterObserver(this);
+}
+
 void BluetoothConnection::OnScoStateChanged(const Bluetooth::BluetoothRemoteDevice &device, int32_t state)
 {
     TELEPHONY_LOGI("BluetoothConnection::OnScoStateChanged state : %{public}d", state);
@@ -296,6 +330,41 @@ void BluetoothConnection::OnConnectionStateChanged(const Bluetooth::BluetoothRem
         default:
             break;
     }
+}
+
+void SystemAbilityListener::OnAddSystemAbility(int32_t systemAbilityId, const std::string &deviceId)
+{
+    TELEPHONY_LOGI("SA:%{public}d is added!", systemAbilityId);
+    if (!CheckInputSysAbilityId(systemAbilityId)) {
+        TELEPHONY_LOGE("added SA is invalid!");
+        return;
+    }
+    if (systemAbilityId != BLUETOOTH_HOST_SYS_ABILITY_ID) {
+        TELEPHONY_LOGE("added SA is not bluetooth service, ignored.");
+        return;
+    }
+
+    DelayedSingleton<BluetoothConnection>::GetInstance()->RegisterObserver();
+}
+
+void SystemAbilityListener::OnRemoveSystemAbility(int32_t systemAbilityId, const std::string &deviceId)
+{
+    TELEPHONY_LOGI("SA:%{public}d is removed!", systemAbilityId);
+    if (!CheckInputSysAbilityId(systemAbilityId)) {
+        TELEPHONY_LOGE("removed SA is invalid!");
+        return;
+    }
+    if (systemAbilityId != BLUETOOTH_HOST_SYS_ABILITY_ID) {
+        TELEPHONY_LOGE("removed SA is not bluetooth service, ignored.");
+        return;
+    }
+
+    DelayedSingleton<BluetoothConnection>::GetInstance()->ResetBtConnection();
+    std::shared_ptr<AudioDeviceManager> audioDeviceManager = DelayedSingleton<AudioDeviceManager>::GetInstance();
+    if (audioDeviceManager->IsBtScoConnected()) {
+        audioDeviceManager->ProcessEvent(AudioEvent::BLUETOOTH_SCO_DISCONNECTED);
+    }
+    audioDeviceManager->ResetBtAudioDevicesList();
 }
 #endif
 } // namespace Telephony

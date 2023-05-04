@@ -24,6 +24,9 @@
 
 #ifdef ABILITY_BLUETOOTH_SUPPORT
 #include "bluetooth_hfp_ag.h"
+#include "iservice_registry.h"
+#include "system_ability_definition.h"
+#include "system_ability_status_change_stub.h"
 #endif
 
 namespace OHOS {
@@ -53,6 +56,8 @@ public:
     void RemoveBtDevice(const std::string &address);
     bool IsBtAvailble();
     std::string GetConnectedScoAddr();
+    void ResetBtConnection();
+    void RegisterObserver();
 
 #ifdef ABILITY_BLUETOOTH_SUPPORT
     void OnScoStateChanged(const Bluetooth::BluetoothRemoteDevice &device, int32_t state) override;
@@ -71,9 +76,20 @@ private:
     bool DisconnectBtSco(const Bluetooth::BluetoothRemoteDevice &device);
 
 private:
+    sptr<ISystemAbilityStatusChange> statusChangeListener_ = nullptr;
     std::unordered_map<std::string, Bluetooth::BluetoothRemoteDevice> mapConnectedBtDevices_;
 #endif
 };
+
+#ifdef ABILITY_BLUETOOTH_SUPPORT
+class SystemAbilityListener : public SystemAbilityStatusChangeStub {
+public:
+    SystemAbilityListener() = default;
+    ~SystemAbilityListener() = default;
+    void OnAddSystemAbility(int32_t systemAbilityId, const std::string &deviceId) override;
+    void OnRemoveSystemAbility(int32_t systemAbilityId, const std::string &deviceId) override;
+};
+#endif
 } // namespace Telephony
 } // namespace OHOS
 #endif

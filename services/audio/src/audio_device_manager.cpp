@@ -153,6 +153,22 @@ void AudioDeviceManager::RemoveAudioDeviceList(const std::string &address, Audio
     TELEPHONY_LOGI("RemoveAudioDeviceList success");
 }
 
+void AudioDeviceManager::ResetBtAudioDevicesList()
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    std::vector<AudioDevice>::iterator it = info_.audioDeviceList.begin();
+    while (it != info_.audioDeviceList.end()) {
+        if (it->deviceType == AudioDeviceType::DEVICE_BLUETOOTH_SCO) {
+            it = info_.audioDeviceList.erase(it);
+        } else {
+            ++it;
+        }
+    }
+    SetDeviceAvailable(AudioDeviceType::DEVICE_BLUETOOTH_SCO, false);
+    DelayedSingleton<CallAbilityReportProxy>::GetInstance()->ReportAudioDeviceChange(info_);
+    TELEPHONY_LOGI("ResetBtAudioDevicesList success");
+}
+
 bool AudioDeviceManager::InitAudioDevice()
 {
     // when audio deactivate interrupt , reinit
