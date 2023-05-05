@@ -22,6 +22,7 @@
 #include <string>
 
 #include "bluetooth_hfp_ag.h"
+#include "call_manager_connect.h"
 #include "call_manager_service.h"
 #include "telephony_types.h"
 
@@ -4776,6 +4777,36 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_CloseUnFinishedUssd_0100, Funct
     if (HasSimCard(SIM2_SLOTID)) {
         EXPECT_EQ(CallManagerGtest::clientPtr_->CloseUnFinishedUssd(SIM2_SLOTID), RETURN_VALUE_IS_ZERO);
     }
+}
+
+/**************************** Test CancelMissedIncomingCallNotification() ****************************/
+/**
+ * @tc.number   Telephony_CallManager_CancelMissedIncomingCallNotification_0100
+ * @tc.name     test cancel missed incoming call and mark as read
+ * @tc.desc     Function test
+ */
+HWTEST_F(
+    CallManagerGtest, Telephony_CallManager_CancelMissedIncomingCallNotification_0100, Function | MediumTest | Level3)
+{
+    AccessToken token;
+    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+    EXPECT_EQ(CallManagerGtest::clientPtr_->CancelMissedIncomingCallNotification(), RETURN_VALUE_IS_ZERO);
+}
+
+/**
+ * @tc.number   Telephony_CallManager_CancelMissedIncomingCallNotification_0200
+ * @tc.name     test cancel missed incoming call and mark as read without permission
+ * @tc.desc     Function test
+ */
+HWTEST_F(
+    CallManagerGtest, Telephony_CallManager_CancelMissedIncomingCallNotification_0200, Function | MediumTest | Level3)
+{
+    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+    EXPECT_NE(CallManagerGtest::clientPtr_->CancelMissedIncomingCallNotification(), RETURN_VALUE_IS_ZERO);
 }
 
 /*********************************** Test Dump() ***************************************/

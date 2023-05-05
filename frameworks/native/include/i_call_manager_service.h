@@ -87,6 +87,7 @@ enum CallManagerSurfaceCode {
     INTERFACE_GET_PROXY_OBJECT_PTR,
     INTERFACE_CLOSE_UNFINISHED_USSD,
     INTERFACE_REPORT_AUDIO_DEVICE_INFO,
+    INTERFACE_CANCEL_MISSED_INCOMING_CALL_NOTIFICATION,
 };
 
 enum CallManagerProxyType {
@@ -154,6 +155,7 @@ public:
     virtual int32_t ReportOttCallDetailsInfo(std::vector<OttCallDetailsInfo> &ottVec) = 0;
     virtual int32_t ReportOttCallEventInfo(OttCallEventInfo &eventInfo) = 0;
     virtual int32_t CloseUnFinishedUssd(int32_t slotId) = 0;
+    virtual int32_t CancelMissedIncomingCallNotification() = 0;
     virtual sptr<IRemoteObject> GetProxyObjectPtr(CallManagerProxyType proxyType) = 0;
     virtual int32_t ReportAudioDeviceInfo() = 0;
 
