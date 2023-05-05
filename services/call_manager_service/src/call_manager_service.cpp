@@ -37,6 +37,8 @@ static constexpr const char *OHOS_PERMISSION_SET_TELEPHONY_STATE = "ohos.permiss
 static constexpr const char *OHOS_PERMISSION_GET_TELEPHONY_STATE = "ohos.permission.GET_TELEPHONY_STATE";
 static constexpr const char *OHOS_PERMISSION_PLACE_CALL = "ohos.permission.PLACE_CALL";
 static constexpr const char *OHOS_PERMISSION_ANSWER_CALL = "ohos.permission.ANSWER_CALL";
+static constexpr const char *OHOS_PERMISSION_READ_CALL_LOG = "ohos.permission.READ_CALL_LOG";
+static constexpr const char *OHOS_PERMISSION_WRITE_CALL_LOG = "ohos.permission.WRITE_CALL_LOG";
 static constexpr const char *SLOT_ID = "accountId";
 static constexpr const char *CALL_TYPE = "callType";
 static constexpr const char *VIDEO_STATE = "videoState";
@@ -69,6 +71,10 @@ bool CallManagerService::Init()
     DelayedSingleton<CellularCallConnection>::GetInstance()->Init(TELEPHONY_CELLULAR_CALL_SYS_ABILITY_ID);
     DelayedSingleton<CallRecordsManager>::GetInstance()->Init();
     DelayedSingleton<BluetoothConnection>::GetInstance()->Init();
+    int32_t ret = callControlManagerPtr_->QueryUnReadMissedCallLog();
+    if (ret == TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGI("Query unread missed call log success");
+    }
     return true;
 }
 
@@ -865,6 +871,25 @@ int32_t CallManagerService::CloseUnFinishedUssd(int32_t slotId)
         TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
+}
+
+int32_t CallManagerService::CancelMissedIncomingCallNotification()
+{
+    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
+        TELEPHONY_LOGE("Non-system applications use system APIs!");
+        return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
+    }
+    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_SET_TELEPHONY_STATE) ||
+        !TelephonyPermission::CheckPermission(OHOS_PERMISSION_READ_CALL_LOG) ||
+        !TelephonyPermission::CheckPermission(OHOS_PERMISSION_WRITE_CALL_LOG)) {
+        TELEPHONY_LOGE("Permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
+    if (callControlManagerPtr_ == nullptr) {
+        TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return callControlManagerPtr_->CancelMissedIncomingCallNotification();
 }
 
 sptr<IRemoteObject> CallManagerService::GetProxyObjectPtr(CallManagerProxyType proxyType)

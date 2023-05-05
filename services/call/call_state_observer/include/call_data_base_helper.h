@@ -53,6 +53,11 @@ constexpr const char *CALL_CONTENT_TYPE = "content_type";
 constexpr const char *CALL_PHONE = "phone";
 constexpr const char *CALL_SLOT_ID = "slot_id";
 
+enum class CallLogReadState {
+    CALL_IS_UNREAD,
+    CALL_IS_READ,
+};
+
 class CallDataRdbObserver : public AAFwk::DataAbilityObserverStub {
 public:
     CallDataRdbObserver(std::vector<std::string> *phones);
@@ -71,7 +76,13 @@ public:
     bool Insert(DataShare::DataShareValuesBucket &values);
     bool Query(std::vector<std::string> *phones, DataShare::DataSharePredicates &predicates);
     bool Query(ContactInfo &contactInfo, DataShare::DataSharePredicates &predicates);
+    bool Update(DataShare::DataSharePredicates &predicates, DataShare::DataShareValuesBucket &values);
     bool Delete(DataShare::DataSharePredicates &predicates);
+    bool QueryCallLog(std::map<std::string, int32_t> &phonesAndUnreadCountMap,
+                      DataShare::DataSharePredicates &predicates);
+
+public:
+    const int16_t CALL_LOG_DEFAULT_COUNT = 1;
 
 private:
     sptr<CallDataRdbObserver> callDataRdbObserverPtr_;

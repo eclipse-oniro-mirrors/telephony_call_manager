@@ -603,6 +603,13 @@ public:
     int32_t CloseUnFinishedUssd(int32_t slotId) override;
 
     /**
+     * Cancel missed incoming call notification.
+     *
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t CancelMissedIncomingCallNotification() override;
+
+    /**
      * GetProxyObjectPtr
      *
      * @brief get callManager proxy object ptr

@@ -110,5 +110,33 @@ void CallRecordsManager::AddOneCallRecord(CallAttributeInfo &info)
     }
     callRecordsHandlerServerPtr_->StoreCallRecord(data);
 }
+
+int32_t CallRecordsManager::CancelMissedIncomingCallNotification()
+{
+    if (callRecordsHandlerServerPtr_ == nullptr) {
+        TELEPHONY_LOGE("callRecordsHandlerServerPtr_ is nullptr");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    int32_t ret = callRecordsHandlerServerPtr_->CancelMissedIncomingCallNotification();
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("CancelMissedIncomingCallNotification failed!");
+        return ret;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallRecordsManager::QueryUnReadMissedCallLog()
+{
+    if (callRecordsHandlerServerPtr_ == nullptr) {
+        TELEPHONY_LOGE("callRecordsHandlerServerPtr_ is nullptr");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    int32_t ret = callRecordsHandlerServerPtr_->QueryUnReadMissedCallLog();
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("QueryUnReadMissedCallLog failed!");
+        return ret;
+    }
+    return TELEPHONY_SUCCESS;
+}
 } // namespace Telephony
 } // namespace OHOS
