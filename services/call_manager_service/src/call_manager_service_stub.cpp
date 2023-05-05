@@ -69,6 +69,8 @@ void CallManagerServiceStub::InitCallUtilsRequest()
     memberFuncMap_[INTERFACE_IS_EMERGENCY_NUMBER] = &CallManagerServiceStub::OnIsEmergencyPhoneNumber;
     memberFuncMap_[INTERFACE_IS_FORMAT_NUMBER] = &CallManagerServiceStub::OnFormatPhoneNumber;
     memberFuncMap_[INTERFACE_IS_FORMAT_NUMBER_E164] = &CallManagerServiceStub::OnFormatPhoneNumberToE164;
+    memberFuncMap_[INTERFACE_CANCEL_MISSED_INCOMING_CALL_NOTIFICATION] =
+        &CallManagerServiceStub::OnCancelMissedIncomingCallNotification;
 }
 
 void CallManagerServiceStub::InitCallConferenceRequest()
@@ -1002,6 +1004,16 @@ int32_t CallManagerServiceStub::OnCloseUnFinishedUssd(MessageParcel &data, Messa
     TELEPHONY_LOGI("result:%{public}d", result);
     if (!reply.WriteInt32(result)) {
         TELEPHONY_LOGE("fail to write parcel");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallManagerServiceStub::OnCancelMissedIncomingCallNotification(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t result = CancelMissedIncomingCallNotification();
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("OnCancelMissedIncomingCallNotification fail to write parcel");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
     return TELEPHONY_SUCCESS;

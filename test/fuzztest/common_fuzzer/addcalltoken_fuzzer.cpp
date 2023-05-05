@@ -21,7 +21,7 @@
 #include "token_setproc.h"
 
 namespace OHOS {
-const int PERMS_NUM = 4;
+const int PERMS_NUM = 6;
 
 AddCallTokenFuzzer::AddCallTokenFuzzer()
 {
@@ -30,6 +30,8 @@ AddCallTokenFuzzer::AddCallTokenFuzzer()
         "ohos.permission.ANSWER_CALL",
         "ohos.permission.SET_TELEPHONY_STATE",
         "ohos.permission.GET_TELEPHONY_STATE",
+        "ohos.permission.READ_CALL_LOG",
+        "ohos.permission.WRITE_CALL_LOG",
     };
 
     NativeTokenInfoParams testCallInfoParams = {

@@ -111,6 +111,34 @@ int32_t MissedCallNotification::CancelMissedCallsNotification(int32_t id)
     return TELEPHONY_SUCCESS;
 }
 
+int32_t MissedCallNotification::NotifyUnReadMissedCall(std::map<std::string, int32_t> &phoneNumAndUnreadCountMap)
+{
+    AAFwk::Want want;
+    want.SetParam("notificationId", INCOMING_CALL_MISSED_ID);
+    std::vector<std::string> phoneNumberList;
+    std::vector<int32_t> countList;
+    for (auto it = phoneNumAndUnreadCountMap.begin(); it != phoneNumAndUnreadCountMap.end(); it++) {
+        phoneNumberList.push_back(it->first);
+        countList.push_back(it->second);
+    }
+    want.SetParam("phoneNumberList", phoneNumberList);
+    want.SetParam("countList", countList);
+    want.SetAction(EventFwk::CommonEventSupport::COMMON_EVENT_INCOMING_CALL_MISSED);
+    EventFwk::CommonEventData data;
+    data.SetWant(want);
+    EventFwk::CommonEventPublishInfo publishInfo;
+    std::vector<std::string> callPermissions;
+    callPermissions.emplace_back(Permission::GET_TELEPHONY_STATE);
+    publishInfo.SetSubscriberPermissions(callPermissions);
+    bool resultWithNumber = EventFwk::CommonEventManager::PublishCommonEvent(data, publishInfo, nullptr);
+    TELEPHONY_LOGI("publish unread missed call event with number result : %{public}d", resultWithNumber);
+    if (!resultWithNumber) {
+        TELEPHONY_LOGE("publish unread missed call event with number error");
+        return TELEPHONY_ERR_PUBLISH_BROADCAST_FAIL;
+    }
+    return TELEPHONY_ERR_SUCCESS;
+}
+
 void MissedCallNotification::IncomingCallActivated(sptr<CallBase> &callObjectPtr)
 {
     if (callObjectPtr != nullptr && callObjectPtr->GetAccountNumber() == incomingCallNumber_) {

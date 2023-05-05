@@ -831,6 +831,9 @@ HWTEST_F(BranchTest, Telephony_MissedCallNotification_001, Function | MediumTest
     missedCallNotification->PublishMissedCallNotification(callObjectPtr);
     int32_t id = 1;
     ASSERT_EQ(missedCallNotification->CancelMissedCallsNotification(id), TELEPHONY_SUCCESS);
+    std::map<std::string, int32_t> phoneNumAndUnReadCountMap;
+    phoneNumAndUnReadCountMap.insert(pair<string, int>("000", 1));
+    ASSERT_EQ(missedCallNotification->NotifyUnReadMissedCall(phoneNumAndUnReadCountMap), TELEPHONY_SUCCESS);
 }
 
 /**
@@ -991,6 +994,7 @@ HWTEST_F(BranchTest, Telephony_CallManagerClient_001, Function | MediumTest | Le
     ASSERT_NE(callManagerClient->RejectCall(0, false, value), TELEPHONY_SUCCESS);
     ASSERT_NE(callManagerClient->HangUpCall(0), TELEPHONY_SUCCESS);
     ASSERT_GE(callManagerClient->GetCallState(), TELEPHONY_SUCCESS);
+    ASSERT_NE(callManagerClient->CancelMissedIncomingCallNotification(), TELEPHONY_SUCCESS);
 }
 
 /**
@@ -1691,6 +1695,8 @@ HWTEST_F(BranchTest, Telephony_CallRecordsManager_001, Function | MediumTest | L
     info.ringBeginTime = ONE_TIME;
     info.ringEndTime = ONE_TIME;
     callRecordsManager.AddOneCallRecord(info);
+    ASSERT_NE(callRecordsManager.CancelMissedIncomingCallNotification(), TELEPHONY_SUCCESS);
+    ASSERT_EQ(callRecordsManager.QueryUnReadMissedCallLog(), TELEPHONY_SUCCESS);
 }
 
 /**
@@ -1739,6 +1745,8 @@ HWTEST_F(BranchTest, Telephony_CallControlManager_001, Function | MediumTest | L
     ASSERT_TRUE(callControlManager->NotifyCallStateUpdated(callObjectPtr, priorState, nextState));
     ASSERT_TRUE(callControlManager->NotifyIncomingCallAnswered(callObjectPtr));
     ASSERT_TRUE(callControlManager->NotifyIncomingCallRejected(callObjectPtr, false, ""));
+    ASSERT_NE(callControlManager->CancelMissedIncomingCallNotification(), TELEPHONY_SUCCESS);
+    ASSERT_NE(callControlManager->QueryUnReadMissedCallLog(), TELEPHONY_SUCCESS);
 }
 
 /**

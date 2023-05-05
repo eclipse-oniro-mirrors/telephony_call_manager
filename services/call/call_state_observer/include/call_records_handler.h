@@ -23,6 +23,7 @@
 #include "call_status_manager.h"
 #include "event_handler.h"
 #include "event_runner.h"
+#include "missed_call_notification.h"
 #include "singleton.h"
 
 namespace OHOS {
@@ -32,12 +33,15 @@ public:
     CallRecordsHandler(const std::shared_ptr<AppExecFwk::EventRunner> &runner);
     virtual ~CallRecordsHandler() = default;
     void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event);
+    int32_t QueryAndNotifyUnReadMissedCall();
+    int32_t AddCallLogInfo(CallRecordInfo &info);
 
 private:
     void QueryCallerInfo(ContactInfo &contactInfo, std::string phoneNumber);
 
 private:
     std::shared_ptr<CallDataBaseHelper> callDataPtr_;
+    std::shared_ptr<MissedCallNotification> missedCallNotification_;
 };
 
 class CallRecordsHandlerService : public std::enable_shared_from_this<CallRecordsHandlerService> {
@@ -45,8 +49,13 @@ class CallRecordsHandlerService : public std::enable_shared_from_this<CallRecord
 public:
     void Start();
     int32_t StoreCallRecord(const CallRecordInfo &info);
+    int32_t CancelMissedIncomingCallNotification();
+    int32_t QueryUnReadMissedCallLog();
+
+public:
     enum {
         HANDLER_ADD_CALL_RECORD_INFO = 0,
+        HANDLER_QUERY_UNREAD_MISSED_CALL_LOG,
     };
 
 private:

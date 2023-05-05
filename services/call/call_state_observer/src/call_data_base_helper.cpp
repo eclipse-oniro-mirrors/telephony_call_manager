@@ -13,12 +13,10 @@
  * limitations under the License.
  */
 
-#include "call_data_base_helper.h"
-
-#include "iservice_registry.h"
-
 #include "ability_context.h"
-
+#include "call_data_base_helper.h"
+#include "call_manager_errors.h"
+#include "iservice_registry.h"
 #include "telephony_log_wrapper.h"
 
 namespace OHOS {
@@ -179,6 +177,55 @@ bool CallDataBaseHelper::Query(ContactInfo &contactInfo, DataShare::DataSharePre
     helper->Release();
     TELEPHONY_LOGI("Query end");
     return true;
+}
+
+bool CallDataBaseHelper::QueryCallLog(
+    std::map<std::string, int32_t> &phoneNumAndUnreadCountMap, DataShare::DataSharePredicates &predicates)
+{
+    std::shared_ptr<DataShare::DataShareHelper> helper = CreateDataShareHelper(CALLLOG_URI);
+    if (helper == nullptr) {
+        TELEPHONY_LOGE("helper is nullptr!");
+        return false;
+    }
+    Uri uri(CALL_SUBSECTION);
+    std::vector<std::string> columns;
+    columns.push_back(CALL_PHONE_NUMBER);
+    auto resultSet = helper->Query(uri, predicates, columns);
+    helper->Release();
+    if (resultSet == nullptr) {
+        return false;
+    }
+    int32_t operationResult = resultSet->GoToFirstRow();
+    while (operationResult == TELEPHONY_SUCCESS) {
+        std::string phoneNumber = "";
+        int32_t columnIndex = 0;
+        resultSet->GetColumnIndex(CALL_PHONE_NUMBER, columnIndex);
+        operationResult = resultSet->GetString(columnIndex, phoneNumber);
+        if (operationResult == TELEPHONY_SUCCESS && (!phoneNumber.empty())) {
+            auto iter = phoneNumAndUnreadCountMap.find(phoneNumber);
+            if (iter != phoneNumAndUnreadCountMap.end()) {
+                iter->second++;
+            } else {
+                phoneNumAndUnreadCountMap.insert(
+                    std::map<std::string, int32_t>::value_type(phoneNumber, CALL_LOG_DEFAULT_COUNT));
+            }
+        }
+        operationResult = resultSet->GoToNextRow();
+    }
+    resultSet->Close();
+    TELEPHONY_LOGI("QueryCallLog end");
+    return true;
+}
+
+bool CallDataBaseHelper::Update(DataShare::DataSharePredicates &predicates, DataShare::DataShareValuesBucket &values)
+{
+    std::shared_ptr<DataShare::DataShareHelper> helper = CreateDataShareHelper(CALLLOG_URI);
+    if (helper == nullptr) {
+        TELEPHONY_LOGE("helper is nullptr");
+        return true;
+    }
+    Uri uri(CALL_SUBSECTION);
+    return helper->Update(uri, predicates, values);
 }
 
 bool CallDataBaseHelper::Delete(DataShare::DataSharePredicates &predicates)

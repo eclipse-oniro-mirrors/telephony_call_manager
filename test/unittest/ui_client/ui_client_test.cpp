@@ -128,12 +128,70 @@ PermissionStateFull testAnswerCallState = {
     .grantFlags = { 2 }, // PERMISSION_USER_SET
 };
 
+PermissionDef testReadCallLogDef = {
+    .permissionName = "ohos.permission.READ_CALL_LOG",
+    .bundleName = "tel_call_manager_gtest",
+    .grantMode = 1, // SYSTEM_GRANT
+    .availableLevel = APL_SYSTEM_BASIC,
+    .label = "label",
+    .labelId = 1,
+    .description = "Test call manager",
+    .descriptionId = 1,
+};
+
+PermissionStateFull testPermReadCallLog = {
+    .permissionName = "ohos.permission.READ_CALL_LOG",
+    .isGeneral = true,
+    .resDeviceID = { "local" },
+    .grantStatus = { PermissionState::PERMISSION_GRANTED },
+    .grantFlags = { 2 }, // PERMISSION_USER_SET
+};
+
+PermissionDef testWriteCallLogDef = {
+    .permissionName = "ohos.permission.WRITE_CALL_LOG",
+    .bundleName = "tel_call_manager_gtest",
+    .grantMode = 1, // SYSTEM_GRANT
+    .availableLevel = APL_SYSTEM_BASIC,
+    .label = "label",
+    .labelId = 1,
+    .description = "Test call manager",
+    .descriptionId = 1,
+};
+
+PermissionStateFull testPermWriteCallLog = {
+    .permissionName = "ohos.permission.WRITE_CALL_LOG",
+    .isGeneral = true,
+    .resDeviceID = { "local" },
+    .grantStatus = { PermissionState::PERMISSION_GRANTED },
+    .grantFlags = { 2 }, // PERMISSION_USER_SET
+};
+
+PermissionDef testStartAbilityFromBGDef = {
+    .permissionName = "ohos.permission.START_ABILITIES_FROM_BACKGROUND",
+    .bundleName = "tel_call_manager_gtest",
+    .grantMode = 1, // SYSTEM_GRANT
+    .availableLevel = APL_SYSTEM_BASIC,
+    .label = "label",
+    .labelId = 1,
+    .description = "Test call manager",
+    .descriptionId = 1,
+};
+
+PermissionStateFull testPermStartAbilityFromBG = {
+    .permissionName = "ohos.permission.START_ABILITIES_FROM_BACKGROUND",
+    .isGeneral = true,
+    .resDeviceID = { "local" },
+    .grantStatus = { PermissionState::PERMISSION_GRANTED },
+    .grantFlags = { 2 }, // PERMISSION_USER_SET
+};
+
 HapPolicyParams testPolicyParams = {
     .apl = APL_SYSTEM_BASIC,
     .domain = "test.domain",
     .permList = { testPermPlaceCallDef, testPermSetTelephonyStateDef, testPermGetTelephonyStateDef,
-        testPermAnswerCallDef },
-    .permStateList = { testPlaceCallState, testSetTelephonyState, testGetTelephonyState, testAnswerCallState },
+        testPermAnswerCallDef, testReadCallLogDef, testWriteCallLogDef, testStartAbilityFromBGDef },
+    .permStateList = { testPlaceCallState, testSetTelephonyState, testGetTelephonyState, testAnswerCallState,
+        testPermReadCallLog, testPermWriteCallLog, testPermStartAbilityFromBG },
 };
 
 class AccessToken {
@@ -1222,6 +1280,18 @@ void StopRtt()
     std::cout << "return value:" << ret << std::endl;
 }
 
+void CancelMissedIncomingCallNotification()
+{
+    AccessToken token;
+    std::cout << "------CancelMissedIncomingCallNotification------" << std::endl;
+    if (g_clientPtr == nullptr) {
+        std::cout << "g_clientPtr is nullptr" << std::endl;
+        return;
+    }
+    int32_t ret = g_clientPtr->CancelMissedIncomingCallNotification();
+    std::cout << "return value:" << ret << std::endl;
+}
+
 void AddPermission()
 {
     return;
@@ -1260,6 +1330,8 @@ void InitCallUtils()
     g_memberFuncMap[OHOS::Telephony::INTERFACE_IS_EMERGENCY_NUMBER] = &OHOS::Telephony::IsEmergencyPhoneNumber;
     g_memberFuncMap[OHOS::Telephony::INTERFACE_IS_FORMAT_NUMBER] = &OHOS::Telephony::FormatPhoneNumber;
     g_memberFuncMap[OHOS::Telephony::INTERFACE_IS_FORMAT_NUMBER_E164] = &OHOS::Telephony::FormatPhoneNumberToE164;
+    g_memberFuncMap[OHOS::Telephony::INTERFACE_CANCEL_MISSED_INCOMING_CALL_NOTIFICATION] =
+        &OHOS::Telephony::CancelMissedIncomingCallNotification;
 }
 
 void InitCallConferencePower()
@@ -1376,7 +1448,8 @@ void PrintfCallUtilsInterface()
               << "13:isInEmergencyCall\n"
               << "14:isEmergencyPhoneNumber\n"
               << "15:formatPhoneNumber\n"
-              << "16:formatPhoneNumberToE164\n";
+              << "16:formatPhoneNumberToE164\n"
+              << "58:CancelMissedIncomingCallNotification\n";
 }
 
 void PrintfCallConferenceInterface()

@@ -84,6 +84,12 @@ public:
     int32_t ReportOttCallDetailsInfo(std::vector<OttCallDetailsInfo> &ottVec);
     int32_t ReportOttCallEventInfo(OttCallEventInfo &eventInfo);
     int32_t CloseUnFinishedUssd(int32_t slotId);
+    /**
+     * Cancel missed incoming call notification.
+     *
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t CancelMissedIncomingCallNotification();
     bool HasVoiceCapability();
     int32_t ReportAudioDeviceInfo();
 };

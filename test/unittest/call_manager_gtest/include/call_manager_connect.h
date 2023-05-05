@@ -129,12 +129,70 @@ PermissionStateFull testAnswerCallState = {
     .resDeviceID = { "local" },
 };
 
+PermissionDef testReadCallLogDef = {
+    .permissionName = "ohos.permission.READ_CALL_LOG",
+    .bundleName = "tel_call_manager_gtest",
+    .grantMode = 1, // SYSTEM_GRANT
+    .label = "label",
+    .labelId = 1,
+    .description = "Test call manager",
+    .descriptionId = 1,
+    .availableLevel = APL_SYSTEM_BASIC,
+};
+
+PermissionStateFull testPermReadCallLog = {
+    .grantFlags = { 2 }, // PERMISSION_USER_SET
+    .grantStatus = { PermissionState::PERMISSION_GRANTED },
+    .isGeneral = true,
+    .permissionName = "ohos.permission.READ_CALL_LOG",
+    .resDeviceID = { "local" },
+};
+
+PermissionDef testWriteCallLogDef = {
+    .permissionName = "ohos.permission.WRITE_CALL_LOG",
+    .bundleName = "tel_call_manager_gtest",
+    .grantMode = 1, // SYSTEM_GRANT
+    .label = "label",
+    .labelId = 1,
+    .description = "Test call manager",
+    .descriptionId = 1,
+    .availableLevel = APL_SYSTEM_BASIC,
+};
+
+PermissionStateFull testPermWriteCallLog = {
+    .grantFlags = { 2 }, // PERMISSION_USER_SET
+    .grantStatus = { PermissionState::PERMISSION_GRANTED },
+    .isGeneral = true,
+    .permissionName = "ohos.permission.WRITE_CALL_LOG",
+    .resDeviceID = { "local" },
+};
+
+PermissionDef testStartAbilityFromBGDef = {
+    .permissionName = "ohos.permission.START_ABILITIES_FROM_BACKGROUND",
+    .bundleName = "tel_call_manager_gtest",
+    .grantMode = 1, // SYSTEM_GRANT
+    .label = "label",
+    .labelId = 1,
+    .description = "Test call manager",
+    .descriptionId = 1,
+    .availableLevel = APL_SYSTEM_BASIC,
+};
+
+PermissionStateFull testPermStartAbilityFromBG = {
+    .grantFlags = { 2 }, // PERMISSION_USER_SET
+    .grantStatus = { PermissionState::PERMISSION_GRANTED },
+    .isGeneral = true,
+    .permissionName = "ohos.permission.START_ABILITIES_FROM_BACKGROUND",
+    .resDeviceID = { "local" },
+};
+
 HapPolicyParams testPolicyParams = {
     .apl = APL_SYSTEM_BASIC,
     .domain = "test.domain",
     .permList = { testPermPlaceCallDef, testPermSetTelephonyStateDef, testPermGetTelephonyStateDef,
-        testPermAnswerCallDef },
-    .permStateList = { testPlaceCallState, testSetTelephonyState, testGetTelephonyState, testAnswerCallState },
+        testPermAnswerCallDef, testReadCallLogDef, testWriteCallLogDef, testStartAbilityFromBGDef },
+    .permStateList = { testPlaceCallState, testSetTelephonyState, testGetTelephonyState, testAnswerCallState,
+        testPermReadCallLog, testPermWriteCallLog, testPermStartAbilityFromBG },
 };
 
 class AccessToken {

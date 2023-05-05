@@ -99,6 +99,7 @@ public:
     int32_t ReportOttCallDetailsInfo(std::vector<OttCallDetailsInfo> &ottVec);
     int32_t ReportOttCallEventInfo(OttCallEventInfo &eventInfo);
     int32_t CloseUnFinishedUssd(int32_t slotId);
+    int32_t CancelMissedIncomingCallNotification();
     sptr<IRemoteObject> GetProxyObjectPtr(CallManagerProxyType proxyType);
     void OnRemoteDied(const wptr<IRemoteObject> &remote);
     int32_t ReportAudioDeviceInfo();

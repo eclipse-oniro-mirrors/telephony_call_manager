@@ -608,6 +608,15 @@ int32_t CallManagerClient::CloseUnFinishedUssd(int32_t slotId)
     }
 }
 
+int32_t CallManagerClient::CancelMissedIncomingCallNotification()
+{
+    if (g_callManagerProxy == nullptr) {
+        TELEPHONY_LOGE("init first please!");
+        return TELEPHONY_ERR_UNINIT;
+    }
+    return g_callManagerProxy->CancelMissedIncomingCallNotification();
+}
+
 bool CallManagerClient::HasVoiceCapability()
 {
     char retValue[VOICECALL_CAP_VAL_LEN + 1] = {"true"};
