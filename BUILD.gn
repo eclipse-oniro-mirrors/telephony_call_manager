@@ -11,8 +11,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//base/telephony/call_manager/call_manager_aafwk.gni")
-import("//base/telephony/core_service/telephony.gni")
 import("//build/ohos.gni")
 
 ohos_shared_library("tel_call_manager") {
@@ -88,7 +86,6 @@ ohos_shared_library("tel_call_manager") {
     "services/telephony_interaction/src/call_status_callback.cpp",
     "services/telephony_interaction/src/call_status_callback_stub.cpp",
     "services/telephony_interaction/src/cellular_call_connection.cpp",
-    "services/telephony_interaction/src/cellular_call_proxy.cpp",
     "services/telephony_interaction/src/core_service_connection.cpp",
     "services/telephony_interaction/src/report_call_info_handler.cpp",
     "services/video/src/video_control_manager.cpp",
@@ -101,8 +98,6 @@ ohos_shared_library("tel_call_manager") {
     "//third_party/libphonenumber/cpp/src/phonenumbers",
     "//third_party/protobuf/src",
     "//third_party/protobuf/src/google/protobuf",
-    "//base/telephony/call_manager/interfaces/innerkits",
-    "//base/telephony/sms_mms/interfaces/innerkits/",
     "services/audio/include",
     "services/audio/include/audio_state",
     "services/video/include",
@@ -114,34 +109,13 @@ ohos_shared_library("tel_call_manager") {
     "services/call_report/include",
     "services/video/include",
     "services/call/call_state_observer/include",
-    "frameworks/native/include",
-    "//foundation/graphic/graphic_2d/interfaces/inner_api/surface",
-    "//foundation/graphic/graphic_2d/interfaces/inner_api/common",
-    "//drivers/peripheral/camera/interfaces/metadata/include",
-    "//drivers/hdf_core/framework/include/utils",
-    "//drivers/hdf_core/adapter/uhdf2/utils/include",
-    "//drivers/hdf_core/adapter/uhdf2/include/hdi",
-    "//drivers/peripheral/display/interfaces/include",
-    "//drivers/peripheral/camera/interfaces/include",
-    "//drivers/peripheral/camera/interfaces/include/server",
-    "//drivers/peripheral/camera/interfaces/include/callback/device",
-    "//drivers/peripheral/camera/interfaces/include/callback/operator",
-    "//drivers/peripheral/camera/interfaces/include/callback/host",
-    "${ability_runtime_inner_api_path}/dataobs_manager/include",
-    "${multimedia_player_framework_path}/frameworks/native/system_sound",
-    "${multimedia_player_framework_path}/interfaces/inner_api/native",
-    "${multimedia_player_framework_path}/interfaces/inner_api/native/audio_ringtone/include",
-    "${multimedia_player_framework_path}/services/utils/include",
-    "//foundation/multimedia/media_library/interfaces/innerkits/native/include",
   ]
 
-  configs = [ "//base/telephony/core_service/utils:telephony_log_config" ]
-
   deps = [
-    "${ability_runtime_inner_api_path}/dataobs_manager:dataobs_manager",
+    "frameworks/native:tel_call_manager_api",
     "//base/notification/distributed_notification_service/frameworks/ans:ans_innerkits",
-    "//base/telephony/core_service/utils:libtel_common",
     "//third_party/libphonenumber/cpp:phonenumber_standard",
+    "//third_party/protobuf:protobuf_lite_static",
   ]
 
   external_deps = [
@@ -149,10 +123,12 @@ ohos_shared_library("tel_call_manager") {
     "ability_base:want",
     "ability_base:zuri",
     "ability_runtime:ability_manager",
+    "ability_runtime:dataobs_manager",
     "audio_framework:audio_client",
     "audio_framework:audio_renderer",
     "c_utils:utils",
     "common_event_service:cesfwk_innerkits",
+    "core_service:libtel_common",
     "core_service:tel_core_service_api",
     "data_share:datashare_consumer",
     "eventhandler:libeventhandler",
@@ -162,6 +138,7 @@ ohos_shared_library("tel_call_manager") {
     "ipc:ipc_core",
     "multimedia_camera_framework:camera_framework",
     "multimedia_player_framework:audio_ringtone_client",
+    "multimedia_player_framework:media_client",
     "power_manager:powermgr_client",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
@@ -179,7 +156,7 @@ ohos_shared_library("tel_call_manager") {
 
   ldflags = [ "-flto" ]
 
-  defines += [
+  defines = [
     "TELEPHONY_LOG_TAG = \"CallManager\"",
     "LOG_DOMAIN = 0xD001F01",
   ]
@@ -200,9 +177,16 @@ ohos_shared_library("tel_call_manager") {
   if (defined(global_parts_info) &&
       defined(global_parts_info.telephony_sms_mms) &&
       global_parts_info.telephony_sms_mms) {
-    deps += [ "//base/telephony/sms_mms/frameworks/native:tel_sms_mms_api" ]
+    external_deps += [ "sms_mms:tel_sms_mms_api" ]
     defines += [ "ABILITY_SMS_SUPPORT" ]
   }
+
+  if (defined(global_parts_info) &&
+      defined(global_parts_info.telephony_cellular_call) &&
+      global_parts_info.telephony_cellular_call) {
+    defines += [ "CELLULAR_SUPPORT" ]
+  }
+
   part_name = "call_manager"
   subsystem_name = "telephony"
 }

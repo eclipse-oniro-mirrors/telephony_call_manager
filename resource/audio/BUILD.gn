@@ -14,7 +14,7 @@ import("//build/ohos.gni")
 
 ## Install ring.wav to /system/etc/telephony/rings/ring.wav
 ohos_prebuilt_etc("ring.wav") {
-  source = "//base/telephony/call_manager/resource/audio/ring.wav"
+  source = "ring.wav"
   module_install_dir = "etc/telephony/rings/"
   part_name = "call_manager"
   subsystem_name = "telephony"

@@ -12,34 +12,22 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
-SUBSYSTEM_DIR = "//base/telephony"
 
 config("call_manager_js_config") {
-  include_dirs = [
-    "//third_party/node/src",
-    "$SUBSYSTEM_DIR/call_manager/frameworks/js/napi/include",
-    "//commonlibrary/c_utils/base/include",
-    "$SUBSYSTEM_DIR/core_service/frameworks/js/napi",
-  ]
+  include_dirs = [ "napi/include" ]
 }
 
 ohos_shared_library("call") {
   sources = [
-    "$SUBSYSTEM_DIR/core_service/frameworks/js/napi/napi_util.cpp",
     "napi/src/napi_call_ability_callback.cpp",
     "napi/src/napi_call_manager.cpp",
     "napi/src/napi_call_manager_callback.cpp",
     "napi/src/napi_call_manager_utils.cpp",
   ]
 
-  configs = [ "//base/telephony/core_service/utils:telephony_log_config" ]
-
   public_configs = [ ":call_manager_js_config" ]
 
-  deps = [
-    "//foundation/arkui/napi:ace_napi",
-    "//third_party/libuv:uv",
-  ]
+  deps = [ "//third_party/libuv:uv" ]
 
   external_deps = [
     "ability_base:base",
@@ -47,8 +35,10 @@ ohos_shared_library("call") {
     "ability_runtime:ability_manager",
     "c_utils:utils",
     "call_manager:tel_call_manager_api",
+    "core_service:libtel_common",
     "core_service:tel_core_service_api",
     "init:libbegetutil",
+    "napi:ace_napi",
   ]
 
   defines = [

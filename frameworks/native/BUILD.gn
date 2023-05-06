@@ -11,17 +11,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//base/telephony/call_manager/call_manager_aafwk.gni")
 import("//build/ohos.gni")
-SUBSYSTEM_DIR = "//base/telephony"
 
+SUBSYSTEM_DIR = "../.."
 config("call_manager_config") {
   include_dirs = [
-    "$SUBSYSTEM_DIR/call_manager/frameworks/native/include",
-    "$SUBSYSTEM_DIR/call_manager/interfaces/innerkits",
-    "$SUBSYSTEM_DIR/call_manager/utils/include",
-    "${ability_runtime_inner_api_path}/ability_manager/include",
-    "${ability_runtime_inner_api_path}/app_manager/include/appmgr",
+    "include",
+    "${SUBSYSTEM_DIR}/interfaces/innerkits",
+    "${SUBSYSTEM_DIR}/utils/include",
   ]
 }
 
@@ -34,14 +31,16 @@ ohos_shared_library("tel_call_manager_api") {
     "src/call_manager_client.cpp",
     "src/call_manager_proxy.cpp",
     "src/call_manager_service_proxy.cpp",
+    "src/call_status_callback_proxy.cpp",
+    "src/cellular_call_proxy.cpp",
   ]
-
-  configs = [ "//base/telephony/core_service/utils:telephony_log_config" ]
 
   public_configs = [ ":call_manager_config" ]
 
   external_deps = [
     "ability_base:want",
+    "ability_runtime:ability_manager",
+    "ability_runtime:app_manager",
     "c_utils:utils",
     "common_event_service:cesfwk_innerkits",
     "core_service:tel_core_service_api",

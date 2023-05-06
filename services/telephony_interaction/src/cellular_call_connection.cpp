@@ -19,6 +19,7 @@
 
 #include "call_manager_errors.h"
 #include "call_manager_hisysevent.h"
+#include "cellular_call_proxy.h"
 #include "iservice_registry.h"
 #include "system_ability.h"
 #include "system_ability_definition.h"
