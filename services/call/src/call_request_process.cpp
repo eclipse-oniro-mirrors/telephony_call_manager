@@ -35,7 +35,7 @@ CallRequestProcess::CallRequestProcess() {}
 
 CallRequestProcess::~CallRequestProcess() {}
 
-void CallRequestProcess::DialRequest()
+int32_t CallRequestProcess::DialRequest()
 {
     DialParaInfo info;
     DelayedSingleton<CallControlManager>::GetInstance()->GetDialParaInfo(info);
@@ -44,11 +44,11 @@ void CallRequestProcess::DialRequest()
         CallManagerHisysevent::WriteDialCallFaultEvent(info.accountId, static_cast<int32_t>(info.callType),
             static_cast<int32_t>(info.videoState), static_cast<int32_t>(CallErrorCode::CALL_ERROR_DEVICE_NOT_DIALING),
             "the device is not dialing");
-        return;
+        return CALL_ERR_ILLEGAL_CALL_OPERATION;
     }
     if (info.number.length() > static_cast<size_t>(kMaxNumberLen)) {
         TELEPHONY_LOGE("Number out of limit!");
-        return;
+        return CALL_ERR_NUMBER_OUT_OF_RANGE;
     }
     if (info.dialType == DialType::DIAL_CARRIER_TYPE &&
         DelayedSingleton<CoreServiceConnection>::GetInstance()->IsFdnEnabled(info.accountId)) {
@@ -64,24 +64,26 @@ void CallRequestProcess::DialRequest()
             CallManagerHisysevent::WriteDialCallFaultEvent(info.accountId, static_cast<int32_t>(info.callType),
                 static_cast<int32_t>(info.videoState),
                 static_cast<int32_t>(CallErrorCode::CALL_ERROR_INVALID_FDN_NUMBER), "invalid fdn number!");
-            return;
+            return CALL_ERR_DIAL_FAILED;
         }
     }
     TELEPHONY_LOGI("dialType:%{public}d", info.dialType);
+    int32_t ret = CALL_ERR_UNKNOW_DIAL_TYPE;
     switch (info.dialType) {
         case DialType::DIAL_CARRIER_TYPE:
-            CarrierDialProcess(info);
+            ret = CarrierDialProcess(info);
             break;
         case DialType::DIAL_VOICE_MAIL_TYPE:
-            VoiceMailDialProcess(info);
+            ret = VoiceMailDialProcess(info);
             break;
         case DialType::DIAL_OTT_TYPE:
-            OttDialProcess(info);
+            ret = OttDialProcess(info);
             break;
         default:
             TELEPHONY_LOGE("invalid dialType:%{public}d", info.dialType);
             break;
     }
+    return ret;
 }
 
 void CallRequestProcess::AnswerRequest(int32_t callId, int32_t videoState)
@@ -300,57 +302,70 @@ int32_t CallRequestProcess::UpdateCallReportInfo(const DialParaInfo &info, TelCa
     return DelayedSingleton<ReportCallInfoHandlerService>::GetInstance()->UpdateCallReportInfo(callDetatilInfo);
 }
 
-void CallRequestProcess::CarrierDialProcess(DialParaInfo &info)
+int32_t CallRequestProcess::HandleDialFail()
+{
+    std::unique_lock<std::mutex> lock(mutex_);
+    while (!isFirstDialCallAdded_) {
+        if (cv_.wait_for(lock, std::chrono::seconds(WAIT_TIME_ONE_SECOND)) == std::cv_status::timeout) {
+            TELEPHONY_LOGE("CarrierDialProcess call is not added");
+            return CALL_ERR_DIAL_FAILED;
+        }
+    }
+    sptr<CallBase> call = nullptr;
+    if (GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_CREATE) != nullptr) {
+        call = GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_CREATE);
+    } else if (GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_CONNECTING) != nullptr) {
+        call = GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_CONNECTING);
+    } else if (GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_DIALING) != nullptr) {
+        call = GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_DIALING);
+    } else {
+        TELEPHONY_LOGE("can not find connect call or dialing call");
+        return CALL_ERR_CALL_STATE;
+    }
+    return DealFailDial(call);
+}
+
+int32_t CallRequestProcess::CarrierDialProcess(DialParaInfo &info)
 {
     std::string newPhoneNumer =
         DelayedSingleton<CallNumberUtils>::GetInstance()->RemoveSeparatorsPhoneNumber(info.number);
     bool isMMiCode = DelayedSingleton<CallNumberUtils>::GetInstance()->IsMMICode(newPhoneNumer);
+    int32_t ret = TELEPHONY_ERROR;
     if (!isMMiCode) {
         isFirstDialCallAdded_ = false;
         info.number = newPhoneNumer;
-        if (UpdateCallReportInfo(info, TelCallState::CALL_STATUS_DIALING) != TELEPHONY_SUCCESS) {
+        ret = UpdateCallReportInfo(info, TelCallState::CALL_STATUS_DIALING);
+        if (ret != TELEPHONY_SUCCESS) {
             TELEPHONY_LOGE("UpdateCallReportInfo failed!");
-            return;
+            return ret;
         }
     }
     CellularCallInfo callInfo;
-    int32_t ret = PackCellularCallInfo(info, callInfo);
+    ret = PackCellularCallInfo(info, callInfo);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGW("PackCellularCallInfo failed!");
         CallManagerHisysevent::WriteDialCallFaultEvent(info.accountId, static_cast<int32_t>(info.callType),
             static_cast<int32_t>(info.videoState), ret, "Carrier type PackCellularCallInfo failed");
-        return;
+        return ret;
     }
     // Obtain gateway information
     ret = DelayedSingleton<CellularCallConnection>::GetInstance()->Dial(callInfo);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("Dial failed!");
         if (isMMiCode) {
-            return;
+            return ret;
         }
-        std::unique_lock<std::mutex> lock(mutex_);
-        while (!isFirstDialCallAdded_) {
-            if (cv_.wait_for(lock, std::chrono::seconds(WAIT_TIME_ONE_SECOND)) == std::cv_status::timeout) {
-                TELEPHONY_LOGE("CarrierDialProcess call is not added");
-                return;
-            }
+        int32_t handleRet = HandleDialFail();
+        if (handleRet != TELEPHONY_SUCCESS) {
+            TELEPHONY_LOGE("HandleDialFail failed!");
+            return handleRet;
         }
-        sptr<CallBase> call = nullptr;
-        if (GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_CREATE) != nullptr) {
-            call = GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_CREATE);
-        } else if (GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_CONNECTING) != nullptr) {
-            call = GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_CONNECTING);
-        } else if (GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_DIALING) != nullptr) {
-            call = GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_DIALING);
-        } else {
-            TELEPHONY_LOGE("can not find connect call or dialing call");
-            return;
-        }
-        DealFailDial(call);
+        return ret;
     }
+    return TELEPHONY_SUCCESS;
 }
 
-void CallRequestProcess::VoiceMailDialProcess(DialParaInfo &info)
+int32_t CallRequestProcess::VoiceMailDialProcess(DialParaInfo &info)
 {
     CellularCallInfo callInfo;
     int32_t ret = PackCellularCallInfo(info, callInfo);
@@ -358,16 +373,17 @@ void CallRequestProcess::VoiceMailDialProcess(DialParaInfo &info)
         TELEPHONY_LOGW("PackCellularCallInfo failed!");
         CallManagerHisysevent::WriteDialCallFaultEvent(info.accountId, static_cast<int32_t>(info.callType),
             static_cast<int32_t>(info.videoState), ret, "Voice mail type PackCellularCallInfo failed");
-        return;
+        return ret;
     }
     ret = DelayedSingleton<CellularCallConnection>::GetInstance()->Dial(callInfo);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("Dial VoiceMail failed!");
-        return;
+        return ret;
     }
+    return TELEPHONY_SUCCESS;
 }
 
-void CallRequestProcess::OttDialProcess(DialParaInfo &info)
+int32_t CallRequestProcess::OttDialProcess(DialParaInfo &info)
 {
     AppExecFwk::PacMap callInfo;
     callInfo.PutStringValue("phoneNumber", info.number);
@@ -377,8 +393,9 @@ void CallRequestProcess::OttDialProcess(DialParaInfo &info)
         OttCallRequestId::OTT_REQUEST_DIAL, callInfo);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("OTT call Dial failed!");
-        return;
+        return ret;
     }
+    return TELEPHONY_SUCCESS;
 }
 
 int32_t CallRequestProcess::PackCellularCallInfo(DialParaInfo &info, CellularCallInfo &callInfo)

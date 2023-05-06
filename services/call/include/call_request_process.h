@@ -27,7 +27,7 @@ public:
     CallRequestProcess();
     ~CallRequestProcess();
 
-    void DialRequest();
+    int32_t DialRequest();
     void AnswerRequest(int32_t callId, int32_t videoState);
     void RejectRequest(int32_t callId, bool isSendSms, std::string &content);
     void HangUpRequest(int32_t callId);
@@ -42,13 +42,14 @@ public:
     void JoinConference(int32_t callId, std::vector<std::string> &numberList);
 
 private:
-    void CarrierDialProcess(DialParaInfo &info);
-    void VoiceMailDialProcess(DialParaInfo &info);
-    void OttDialProcess(DialParaInfo &info);
+    int32_t CarrierDialProcess(DialParaInfo &info);
+    int32_t VoiceMailDialProcess(DialParaInfo &info);
+    int32_t OttDialProcess(DialParaInfo &info);
     int32_t UpdateImsCallMode(int32_t callId, ImsCallMode mode);
     int32_t PackCellularCallInfo(DialParaInfo &info, CellularCallInfo &callInfo);
     bool IsFdnNumber(std::vector<std::u16string> fdnNumberList, std::string phoneNumber);
     int32_t UpdateCallReportInfo(const DialParaInfo &info, TelCallState state);
+    int32_t HandleDialFail();
 
 private:
     std::mutex mutex_;

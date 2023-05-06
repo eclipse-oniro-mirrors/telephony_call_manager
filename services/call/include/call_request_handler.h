@@ -66,6 +66,7 @@ public:
 
     void Init();
     void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event);
+    int32_t DialCall();
 
 private:
     using CallRequestFunc = void (CallRequestHandler::*)(const AppExecFwk::InnerEvent::Pointer &event);

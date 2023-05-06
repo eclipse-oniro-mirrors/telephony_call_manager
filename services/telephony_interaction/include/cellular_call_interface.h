@@ -40,6 +40,7 @@ public:
         INVITE_TO_CONFERENCE,
         KICK_OUT_CONFERENCE,
         HANG_UP_ALL_CONNECTION,
+        SET_READY_TO_CALL,
         UPDATE_CALL_MEDIA_MODE,
         REGISTER_CALLBACK,
         UNREGISTER_CALLBACK,
@@ -194,10 +195,12 @@ public:
     /**
      * Hang Up All Connection.
      *
-     *@param slotId
+     * @param slotId
      * @return Returns TELEPHONY_SUCCESS on success, others on failure.
      */
     virtual int32_t HangUpAllConnection(int32_t slotId) = 0;
+
+    virtual int32_t SetReadyToCall(int32_t slotId, bool isReadyToCall) = 0;
 
     /**
      * IMS Update Call Media Mode
