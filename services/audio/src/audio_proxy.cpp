@@ -22,7 +22,7 @@
 namespace OHOS {
 namespace Telephony {
 AudioProxy::AudioProxy()
-    : context_(nullptr), audioSoundManager_(std::make_unique<Media::RingtoneSoundManager>()),
+    : context_(nullptr), audioSoundManager_(Media::RingtoneFactory::CreateRingtoneManager()),
       deviceCallback_(std::make_shared<AudioDeviceChangeCallback>())
 {}
 

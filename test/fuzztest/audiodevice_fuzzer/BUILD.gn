@@ -11,67 +11,45 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//base/telephony/core_service/telephony.gni")
 import("//build/config/features.gni")
 import("//build/ohos.gni")
 import("//build/test.gni")
 
 #####################hydra-fuzz###################
-import("./../../../call_manager_aafwk.gni")
+CALL_MANAGER_PATH = "../../.."
 
 ##############################fuzztest##########################################
+
 ohos_fuzztest("AudioDeviceFuzzTest") {
   module_output_path = "call_manager/AudioDeviceFuzzTest"
   module_out_path = module_output_path
-  fuzz_config_file =
-      "//base/telephony/call_manager/test/fuzztest/audiodevice_fuzzer"
+  fuzz_config_file = "${CALL_MANAGER_PATH}/test/fuzztest/audiodevice_fuzzer"
   include_dirs = [
-    "//base/telephony/call_manager/frameworks/native/include",
-    "//base/telephony/call_manager/frameworks/native/include",
-    "//base/telephony/core_service/interfaces/innerkits/include",
     "utils/include",
     "//third_party/libphonenumber/cpp/src",
     "//third_party/libphonenumber/cpp/src/phonenumbers",
     "//third_party/protobuf/src",
     "//third_party/protobuf/src/google/protobuf",
-    "//base/telephony/call_manager/interfaces/innerkits",
-    "//base/telephony/sms_mms/interfaces/innerkits/",
-    "//base/telephony/call_manager/services/audio/include",
-    "//base/telephony/call_manager/services/audio/include/audio_state",
-    "//base/telephony/call_manager/services/video/include",
-    "//base/telephony/call_manager/services/bluetooth/include",
-    "//base/telephony/call_manager/services/call/include",
-    "//base/telephony/call_manager/services/call_manager_service/include",
-    "//base/telephony/call_manager/services/call_setting/include",
-    "//base/telephony/call_manager/services/telephony_interaction/include",
-    "//base/telephony/call_manager/services/call_report/include",
-    "//base/telephony/call_manager/services/video/include",
-    "//base/telephony/call_manager/services/call/call_state_observer/include",
-    "//base/telephony/call_manager/frameworks/native/include",
-    "//base/telephony/call_manager/test/fuzztest/common_fuzzer",
-    "//foundation/graphic/graphic_2d/interfaces/inner_api/surface",
-    "//foundation/graphic/graphic_2d/interfaces/inner_api/common",
-    "//drivers/peripheral/camera/interfaces/metadata/include",
-    "//drivers/hdf_core/framework/include/utils",
-    "//drivers/hdf_core/adapter/uhdf2/utils/include",
-    "//drivers/hdf_core/adapter/uhdf2/include/hdi",
-    "//drivers/peripheral/display/interfaces/include",
-    "//drivers/peripheral/camera/interfaces/include",
-    "//drivers/peripheral/camera/interfaces/include/server",
-    "//drivers/peripheral/camera/interfaces/include/callback/device",
-    "//drivers/peripheral/camera/interfaces/include/callback/operator",
-    "//drivers/peripheral/camera/interfaces/include/callback/host",
-    "//foundation/graphic/graphic_2d/utils/buffer_handle/export",
-    "${multimedia_player_framework_path}/frameworks/native/system_sound",
-    "${multimedia_player_framework_path}/interfaces/inner_api/native",
-    "${multimedia_player_framework_path}/interfaces/inner_api/native/audio_ringtone/include",
-    "${multimedia_player_framework_path}/services/utils/include",
-    "//foundation/multimedia/media_library/interfaces/innerkits/native/include",
+    "${CALL_MANAGER_PATH}/interfaces/innerkits",
+    "${CALL_MANAGER_PATH}/services/audio/include",
+    "${CALL_MANAGER_PATH}/services/audio/include/audio_state",
+    "${CALL_MANAGER_PATH}/services/video/include",
+    "${CALL_MANAGER_PATH}/services/bluetooth/include",
+    "${CALL_MANAGER_PATH}/services/call/include",
+    "${CALL_MANAGER_PATH}/services/call_manager_service/include",
+    "${CALL_MANAGER_PATH}/services/call_setting/include",
+    "${CALL_MANAGER_PATH}/services/telephony_interaction/include",
+    "${CALL_MANAGER_PATH}/services/call_report/include",
+    "${CALL_MANAGER_PATH}/services/video/include",
+    "${CALL_MANAGER_PATH}/services/call/call_state_observer/include",
+    "${CALL_MANAGER_PATH}/frameworks/native/include",
+    "${CALL_MANAGER_PATH}/test/fuzztest/common_fuzzer",
   ]
 
-  configs = [ "//base/telephony/core_service/utils:telephony_log_config" ]
-
-  deps = [ "//base/telephony/call_manager:tel_call_manager" ]
+  deps = [
+    "${CALL_MANAGER_PATH}:tel_call_manager",
+    "${CALL_MANAGER_PATH}/frameworks/native:tel_call_manager_api",
+  ]
 
   external_deps = [
     "ability_base:base",
@@ -94,11 +72,14 @@ ohos_fuzztest("AudioDeviceFuzzTest") {
     "ipc:ipc_core",
     "multimedia_camera_framework:camera_framework",
     "multimedia_player_framework:audio_ringtone_client",
+    "multimedia_player_framework:audio_ringtone_client",
+    "multimedia_player_framework:media_client",
     "power_manager:powermgr_client",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
+    "sms_mms:tel_sms_mms_api",
   ]
-  defines += [
+  defines = [
     "TELEPHONY_LOG_TAG = \"CallManagerFuzzTest\"",
     "LOG_DOMAIN = 0xD000F00",
   ]
@@ -109,7 +90,7 @@ ohos_fuzztest("AudioDeviceFuzzTest") {
     "-fno-omit-frame-pointer",
   ]
   sources = [
-    "//base/telephony/call_manager/test/fuzztest/common_fuzzer/addcalltoken_fuzzer.cpp",
+    "${CALL_MANAGER_PATH}/test/fuzztest/common_fuzzer/addcalltoken_fuzzer.cpp",
     "audiodevice_fuzzer.cpp",
   ]
   if (is_standard_system) {

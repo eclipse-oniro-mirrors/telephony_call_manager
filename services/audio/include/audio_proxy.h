@@ -22,7 +22,7 @@
 
 #include "audio_manager_proxy.h"
 #include "singleton.h"
-#include "audio_ringtone_manager.h"
+#include "./audio_ringtone/include/iringtone_sound_manager.h"
 
 #include "call_manager_errors.h"
 
@@ -79,7 +79,7 @@ private:
     const std::string defaultTonePath_ = "/system/etc/telephony/tones/tone.wav";
     const std::string defaultDtmfPath_ = "/system/etc/telephony/dtmfs/dtmf.wav";
     std::shared_ptr<AbilityRuntime::Context> context_;
-    std::unique_ptr<Media::RingtoneSoundManager> audioSoundManager_;
+    std::unique_ptr<Media::IRingtoneSoundManager> audioSoundManager_;
     std::shared_ptr<AudioStandard::AudioManagerDeviceChangeCallback> deviceCallback_;
     bool isWiredHeadsetConnected_ = false;
 };
