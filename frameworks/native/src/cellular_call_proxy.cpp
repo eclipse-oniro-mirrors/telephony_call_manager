@@ -414,7 +414,7 @@ int32_t CellularCallProxy::HangUpAllConnection()
     return error;
 }
 
-int32_t CellularCallProxy::SetReadyToCall(int32_t slotId, bool isReadyToCall)
+int32_t CellularCallProxy::SetReadyToCall(int32_t slotId, int32_t callType, bool isReadyToCall)
 {
     MessageOption option;
     MessageParcel in;
@@ -423,6 +423,9 @@ int32_t CellularCallProxy::SetReadyToCall(int32_t slotId, bool isReadyToCall)
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
     if (!in.WriteInt32(slotId)) {
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
+    if (!in.WriteInt32(callType)) {
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
     if (!in.WriteBool(isReadyToCall)) {
@@ -435,7 +438,7 @@ int32_t CellularCallProxy::SetReadyToCall(int32_t slotId, bool isReadyToCall)
     }
     int32_t error =
         remote->SendRequest(static_cast<uint32_t>(OperationType::SET_READY_TO_CALL), in, out, option);
-    if (error == ERR_NONE) {
+    if (error != ERR_NONE) {
         TELEPHONY_LOGE("Function SetReadyToCall! errCode:%{public}d", error);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
