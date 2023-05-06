@@ -29,7 +29,7 @@
 namespace OHOS {
 namespace Telephony {
 AudioSceneProcessor::AudioSceneProcessor()
-    : currentAudioScene_(AudioStandard::AudioScene::AUDIO_SCENE_DEFAULT), currentState_(nullptr)
+    : currentState_(nullptr)
 {}
 
 AudioSceneProcessor::~AudioSceneProcessor() {}
@@ -130,123 +130,91 @@ bool AudioSceneProcessor::SwitchState(CallStateType stateType)
 
 bool AudioSceneProcessor::SwitchDialing()
 {
-    if (DelayedSingleton<AudioProxy>::GetInstance()->SetAudioScene(
-        AudioStandard::AudioScene::AUDIO_SCENE_PHONE_CALL)) {
-        currentState_ = std::make_unique<DialingState>();
-        if (currentState_ == nullptr) {
-            TELEPHONY_LOGE("make_unique DialingState failed");
-            return false;
-        }
-        // play ringback tone while dialing state
-        currentAudioScene_ = AudioStandard::AudioScene::AUDIO_SCENE_PHONE_CALL;
-        DelayedSingleton<AudioDeviceManager>::GetInstance()->ProcessEvent(AudioEvent::AUDIO_ACTIVATED);
-        TELEPHONY_LOGI("current call state : dialing state");
-        return true;
+    if (!DelayedSingleton<AudioControlManager>::GetInstance()->PlaySoundtone()) {
+        TELEPHONY_LOGE("PlaySoundtone fail");
+        return false;
     }
-    return false;
+    currentState_ = std::make_unique<DialingState>();
+    if (currentState_ == nullptr) {
+        TELEPHONY_LOGE("make_unique DialingState failed");
+        return false;
+    }
+    DelayedSingleton<AudioDeviceManager>::GetInstance()->ProcessEvent(AudioEvent::AUDIO_ACTIVATED);
+    TELEPHONY_LOGI("current call state : dialing state");
+    return true;
 }
 
 bool AudioSceneProcessor::SwitchAlerting()
 {
-    if (DelayedSingleton<AudioProxy>::GetInstance()->SetAudioScene(
-        AudioStandard::AudioScene::AUDIO_SCENE_PHONE_CALL)) {
-        currentState_ = std::make_unique<AlertingState>();
-        if (currentState_ == nullptr) {
-            TELEPHONY_LOGE("make_unique AlertingState failed");
-            return false;
-        }
-        // play ringback tone while alerting state
-        DelayedSingleton<AudioControlManager>::GetInstance()->PlayRingback();
-        currentAudioScene_ = AudioStandard::AudioScene::AUDIO_SCENE_PHONE_CALL;
-        DelayedSingleton<AudioDeviceManager>::GetInstance()->ProcessEvent(AudioEvent::AUDIO_ACTIVATED);
-        TELEPHONY_LOGI("current call state : alerting state");
-        return true;
+    currentState_ = std::make_unique<AlertingState>();
+    if (currentState_ == nullptr) {
+        TELEPHONY_LOGE("make_unique AlertingState failed");
+        return false;
     }
-    return false;
+    // play ringback tone while alerting state
+    DelayedSingleton<AudioControlManager>::GetInstance()->PlayRingback();
+    TELEPHONY_LOGI("current call state : alerting state");
+    return true;
 }
 
 bool AudioSceneProcessor::SwitchIncoming()
 {
-    if (DelayedSingleton<AudioProxy>::GetInstance()->SetAudioScene(AudioStandard::AudioScene::AUDIO_SCENE_RINGING)) {
-        currentState_ = std::make_unique<IncomingState>();
-        if (currentState_ == nullptr) {
-            TELEPHONY_LOGE("make_unique IncomingState failed");
-            return false;
-        }
-        // play ringtone while incoming state
-        DelayedSingleton<AudioControlManager>::GetInstance()->PlayRingtone();
-        currentAudioScene_ = AudioStandard::AudioScene::AUDIO_SCENE_RINGING;
-        DelayedSingleton<AudioDeviceManager>::GetInstance()->ProcessEvent(AudioEvent::AUDIO_RINGING);
-        TELEPHONY_LOGI("current call state : incoming state");
-        return true;
+    currentState_ = std::make_unique<IncomingState>();
+    if (currentState_ == nullptr) {
+        TELEPHONY_LOGE("make_unique IncomingState failed");
+        return false;
     }
-    return false;
+    // play ringtone while incoming state
+    DelayedSingleton<AudioControlManager>::GetInstance()->PlayRingtone();
+    DelayedSingleton<AudioDeviceManager>::GetInstance()->ProcessEvent(AudioEvent::AUDIO_RINGING);
+    TELEPHONY_LOGI("current call state : incoming state");
+    return true;
 }
 
 bool AudioSceneProcessor::SwitchCS()
 {
-    if (DelayedSingleton<AudioProxy>::GetInstance()->SetAudioScene(
-        AudioStandard::AudioScene::AUDIO_SCENE_PHONE_CALL)) {
-        currentState_ = std::make_unique<CSCallState>();
-        if (currentState_ == nullptr) {
-            TELEPHONY_LOGE("make_unique CSCallState failed");
-            return false;
-        }
-        currentAudioScene_ = AudioStandard::AudioScene::AUDIO_SCENE_PHONE_CALL;
-        DelayedSingleton<AudioDeviceManager>::GetInstance()->ProcessEvent(AudioEvent::AUDIO_ACTIVATED);
-        TELEPHONY_LOGI("current call state : cs call state");
-        return true;
+    currentState_ = std::make_unique<CSCallState>();
+    if (currentState_ == nullptr) {
+        TELEPHONY_LOGE("make_unique CSCallState failed");
+        return false;
     }
-    return false;
+    TELEPHONY_LOGI("current call state : cs call state");
+    return true;
 }
 
 bool AudioSceneProcessor::SwitchIMS()
 {
-    if (DelayedSingleton<AudioProxy>::GetInstance()->SetAudioScene(
-        AudioStandard::AudioScene::AUDIO_SCENE_PHONE_CALL)) {
-        currentState_ = std::make_unique<IMSCallState>();
-        if (currentState_ == nullptr) {
-            TELEPHONY_LOGE("make_unique IMSCallState failed");
-            return false;
-        }
-        currentAudioScene_ = AudioStandard::AudioScene::AUDIO_SCENE_PHONE_CALL;
-        DelayedSingleton<AudioDeviceManager>::GetInstance()->ProcessEvent(AudioEvent::AUDIO_ACTIVATED);
-        TELEPHONY_LOGI("current call state : ims call state");
-        return true;
+    currentState_ = std::make_unique<IMSCallState>();
+    if (currentState_ == nullptr) {
+        TELEPHONY_LOGE("make_unique IMSCallState failed");
+        return false;
     }
-    return false;
+    TELEPHONY_LOGI("current call state : ims call state");
+    return true;
 }
 
 bool AudioSceneProcessor::SwitchHolding()
 {
-    // stay at current audio scene while holding state
-    if (DelayedSingleton<AudioProxy>::GetInstance()->SetAudioScene(currentAudioScene_)) {
-        currentState_ = std::make_unique<HoldingState>();
-        if (currentState_ == nullptr) {
-            TELEPHONY_LOGE("make_unique HoldingState failed");
-            return false;
-        }
-        DelayedSingleton<AudioDeviceManager>::GetInstance()->ProcessEvent(AudioEvent::AUDIO_ACTIVATED);
-        TELEPHONY_LOGI("current call state : holding state");
-        return true;
+    currentState_ = std::make_unique<HoldingState>();
+    if (currentState_ == nullptr) {
+        TELEPHONY_LOGE("make_unique HoldingState failed");
+        return false;
     }
-    return false;
+    TELEPHONY_LOGI("current call state : holding state");
+    return true;
 }
 
 bool AudioSceneProcessor::SwitchInactive()
 {
-    if (DelayedSingleton<AudioProxy>::GetInstance()->SetAudioScene(AudioStandard::AudioScene::AUDIO_SCENE_DEFAULT)) {
-        currentState_ = std::make_unique<InActiveState>();
-        if (currentState_ == nullptr) {
-            TELEPHONY_LOGE("make_unique InActiveState failed");
-            return false;
-        }
-        currentAudioScene_ = AudioStandard::AudioScene::AUDIO_SCENE_DEFAULT;
-        DelayedSingleton<AudioDeviceManager>::GetInstance()->ProcessEvent(AudioEvent::AUDIO_DEACTIVATED);
-        TELEPHONY_LOGI("current call state : inactive state");
-        return true;
+    DelayedSingleton<AudioControlManager>::GetInstance()->StopSoundtone();
+    currentState_ = std::make_unique<InActiveState>();
+    if (currentState_ == nullptr) {
+        TELEPHONY_LOGE("make_unique InActiveState failed");
+        return false;
     }
-    return false;
+    DelayedSingleton<AudioDeviceManager>::GetInstance()->ProcessEvent(AudioEvent::AUDIO_DEACTIVATED);
+    TELEPHONY_LOGI("current call state : inactive state");
+    return true;
 }
 
 bool AudioSceneProcessor::SwitchOTT()

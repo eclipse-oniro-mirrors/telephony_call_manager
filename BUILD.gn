@@ -35,6 +35,7 @@ ohos_shared_library("tel_call_manager") {
     "services/audio/src/audio_state/wired_headset_device_state.cpp",
     "services/audio/src/call_state_processor.cpp",
     "services/audio/src/ring.cpp",
+    "services/audio/src/sound.cpp",
     "services/audio/src/tone.cpp",
     "services/bluetooth/src/bluetooth_call_manager.cpp",
     "services/bluetooth/src/bluetooth_call_policy.cpp",

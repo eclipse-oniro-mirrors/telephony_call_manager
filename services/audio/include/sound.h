@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef TELEPHONY_AUDIO_RING_H
-#define TELEPHONY_AUDIO_RING_H
+#ifndef TELEPHONY_AUDIO_SOUND_H
+#define TELEPHONY_AUDIO_SOUND_H
 
 #include <memory>
 
@@ -25,40 +25,26 @@
 
 namespace OHOS {
 namespace Telephony {
-struct RingtoneStream {
-    std::string ringtonePath = "";
-    uint32_t playedPosition = 0;
-};
-enum class RingState {
-    RINGING = 0,
+enum class SoundState {
+    SOUNDING,
     STOPPED,
 };
-
 /**
- * @class Ring
- * plays the default or specific ringtone.
+ * @class Sound
+ * plays call sound.
  */
-class Ring {
+class Sound {
 public:
-    Ring();
-    explicit Ring(const std::string &path);
-    virtual ~Ring();
-    void Init(const std::string &ringtonePath);
+    Sound();
+    virtual ~Sound();
+    void Init();
     int32_t Play();
     int32_t Stop();
-    int32_t StartVibrate();
-    int32_t CancelVibrate();
     void ReleaseRenderer();
 
 private:
-    bool isVibrating_;
-    bool shouldRing_;
-    bool shouldVibrate_;
-    bool ShouldVibrate();
-    std::string ringtonePath_;
-    std::mutex mutex_;
     AudioPlayer *audioPlayer_ = nullptr;
 };
 } // namespace Telephony
 } // namespace OHOS
-#endif // TELEPHONY_AUDIO_RING_H
+#endif

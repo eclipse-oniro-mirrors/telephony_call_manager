@@ -26,6 +26,7 @@ enum PlayerType {
     TYPE_RING = 0,
     TYPE_TONE,
     TYPE_DTMF,
+    TYPE_SOUND,
 };
 
 struct wav_hdr {
@@ -62,22 +63,37 @@ struct wav_hdr {
 
 class AudioPlayer {
 public:
-    static bool InitRenderer(const wav_hdr &wavHeader, AudioStandard::AudioStreamType streamType);
-    static int32_t Play(const std::string &path, AudioStandard::AudioStreamType streamType, PlayerType playerType);
-    static void ReleaseRenderer();
-    static void SetStop(PlayerType playerType, bool state);
+    AudioPlayer() = default;
+    ~AudioPlayer() = default;
+    bool InitRenderer(const wav_hdr &wavHeader, AudioStandard::AudioStreamType streamType);
+    bool InitRenderer();
+    int32_t Play(const std::string &path, AudioStandard::AudioStreamType streamType, PlayerType playerType);
+    int32_t Play(PlayerType playerType);
+    void ReleaseRenderer();
+    void SetStop(PlayerType playerType, bool state);
+
+private:
+    class CallAudioRendererCallback : public AudioStandard::AudioRendererCallback {
+    public:
+        void OnInterrupt(const AudioStandard::InterruptEvent &interruptEvent) override;
+        void OnStateChange(const AudioStandard::RendererState state,
+            const AudioStandard::StateChangeCmdType cmdType) override {}
+    };
 
 private:
     static constexpr uint16_t READ_SIZE = 1;
     static constexpr uint16_t MIN_BYTES = 4;
-    static size_t bufferLen;
-    static bool isStop_;
-    static bool isRingStop_;
-    static bool isRenderInitialized_;
-    static bool isToneStop_;
-    static bool IsStop(PlayerType playerType);
-    static std::unique_ptr<AudioStandard::AudioRenderer> audioRenderer_;
-    static bool GetRealPath(const std::string &profilePath, std::string &realPath);
+    static constexpr uint16_t RENDERER_FLAG = 0;
+    size_t bufferLen = 0;
+    bool isStop_ = false;
+    bool isRingStop_ = false;
+    bool isRenderInitialized_ = false;
+    bool isToneStop_ = false;
+    bool isSoundStop_ = false;
+    std::shared_ptr<AudioStandard::AudioRendererCallback> callback_ = nullptr;
+    bool IsStop(PlayerType playerType);
+    std::unique_ptr<AudioStandard::AudioRenderer> audioRenderer_ = nullptr;
+    bool GetRealPath(const std::string &profilePath, std::string &realPath);
 };
 } // namespace Telephony
 } // namespace OHOS

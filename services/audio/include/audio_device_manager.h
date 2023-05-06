@@ -45,9 +45,11 @@ public:
     void RemoveAudioDeviceList(const std::string &address, AudioDeviceType deviceType);
     void ResetBtAudioDevicesList();
     int32_t ReportAudioDeviceChange();
+    void SetCurrentAudioDevice(AudioDeviceType deviceType);
 
 private:
     std::mutex mutex_;
+    std::mutex infoMutex_;
     AudioDeviceType audioDeviceType_;
     static bool isBtScoDevEnable_;
     bool isWiredHeadsetDevEnable_ = false;
@@ -73,7 +75,6 @@ private:
     bool IsEarpieceDevEnable();
     bool IsWiredHeadsetDevEnable();
     AudioDeviceType GetCurrentAudioDevice();
-    void SetCurrentAudioDevice(AudioDeviceType deviceType);
 };
 } // namespace Telephony
 } // namespace OHOS

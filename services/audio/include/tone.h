@@ -52,6 +52,10 @@ struct ToneStream {
     int32_t duration = 0;
     int32_t volume = 0;
 };
+enum class ToneState {
+    TONEING = 0,
+    STOPPED,
+};
 
 /**
  * @class Tone
@@ -66,12 +70,14 @@ public:
     int32_t Play();
     int32_t Stop();
     static ToneDescriptor ConvertDigitToTone(char digit);
+    void ReleaseRenderer();
 
 private:
     ToneDescriptor currentToneDescriptor_ = ToneDescriptor::TONE_UNKNOWN;
     std::string GetToneDescriptorPath(ToneDescriptor tone);
     bool IsDtmf(ToneDescriptor tone);
     std::mutex mutex_;
+    AudioPlayer *audioPlayer_ = nullptr;
 };
 } // namespace Telephony
 } // namespace OHOS

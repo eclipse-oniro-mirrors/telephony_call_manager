@@ -70,7 +70,7 @@ void AudioDeviceManager::Init()
 
 void AudioDeviceManager::AddAudioDeviceList(const std::string &address, AudioDeviceType deviceType)
 {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<std::mutex> lock(infoMutex_);
     std::vector<AudioDevice>::iterator it = info_.audioDeviceList.begin();
     while (it != info_.audioDeviceList.end()) {
         if (it->address == address && it->deviceType == deviceType) {
@@ -111,7 +111,7 @@ void AudioDeviceManager::AddAudioDeviceList(const std::string &address, AudioDev
 
 void AudioDeviceManager::RemoveAudioDeviceList(const std::string &address, AudioDeviceType deviceType)
 {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<std::mutex> lock(infoMutex_);
     bool needAddEarpiece = true;
     std::vector<AudioDevice>::iterator it = info_.audioDeviceList.begin();
     while (it != info_.audioDeviceList.end()) {
@@ -179,18 +179,8 @@ bool AudioDeviceManager::InitAudioDevice()
 
 bool AudioDeviceManager::ProcessEvent(AudioEvent event)
 {
-    if (currentAudioDevice_ == nullptr) {
-        TELEPHONY_LOGE("current audio device nullptr");
-        return false;
-    }
     bool result = false;
     switch (event) {
-        case AudioEvent::ENABLE_DEVICE_EARPIECE:
-        case AudioEvent::ENABLE_DEVICE_SPEAKER:
-        case AudioEvent::ENABLE_DEVICE_BLUETOOTH:
-        case AudioEvent::ENABLE_DEVICE_WIRED_HEADSET:
-            result = SwitchDevice(event);
-            break;
         case AudioEvent::AUDIO_ACTIVATED:
         case AudioEvent::AUDIO_RINGING:
             if (!isAudioActivated_) {
@@ -200,7 +190,16 @@ bool AudioDeviceManager::ProcessEvent(AudioEvent event)
                 if (bluetoothCallManager->IsBtAvailble()) {
                     return DelayedSingleton<BluetoothConnection>::GetInstance()->ConnectBtSco();
                 }
-                result = currentAudioDevice_->ProcessEvent(event);
+                AudioDevice device = {
+                    .deviceType = AudioDeviceType::DEVICE_EARPIECE,
+                    .address = { 0 },
+                };
+                if (DelayedSingleton<AudioProxy>::GetInstance()->GetPreferOutputAudioDevice(device) !=
+                    TELEPHONY_SUCCESS) {
+                    TELEPHONY_LOGE("current audio device nullptr");
+                    return false;
+                }
+                SetCurrentAudioDevice(device.deviceType);
             }
             break;
         case AudioEvent::AUDIO_DEACTIVATED:
@@ -209,19 +208,6 @@ bool AudioDeviceManager::ProcessEvent(AudioEvent event)
                 result = InitAudioDevice();
             }
             break;
-        case AudioEvent::BLUETOOTH_SCO_CONNECTED:
-            isBtScoConnected_ = true;
-            currentAudioDevice_ = std::make_unique<BluetoothDeviceState>();
-            if (currentAudioDevice_ == nullptr) {
-                return false;
-            }
-            result = currentAudioDevice_->ProcessEvent(event);
-            break;
-        case AudioEvent::BLUETOOTH_SCO_DISCONNECTED:
-            isBtScoConnected_ = false;
-            result = currentAudioDevice_->ProcessEvent(event);
-            break;
-        case AudioEvent::WIRED_HEADSET_CONNECTED:
         case AudioEvent::INIT_AUDIO_DEVICE:
             result = InitAudioDevice();
             break;
@@ -280,11 +266,6 @@ bool AudioDeviceManager::SwitchDevice(AudioDeviceType device)
 bool AudioDeviceManager::EnableSpeaker()
 {
     if (isSpeakerAvailable_ && DelayedSingleton<AudioProxy>::GetInstance()->SetSpeakerDevActive()) {
-        currentAudioDevice_ = std::make_unique<SpeakerDeviceState>();
-        if (currentAudioDevice_ == nullptr) {
-            TELEPHONY_LOGE("make_unique SpeakerDeviceState failed");
-            return false;
-        }
         TELEPHONY_LOGI("speaker enabled , current audio device : speaker");
         SetCurrentAudioDevice(AudioDeviceType::DEVICE_SPEAKER);
         return true;
@@ -296,11 +277,6 @@ bool AudioDeviceManager::EnableSpeaker()
 bool AudioDeviceManager::EnableEarpiece()
 {
     if (isEarpieceAvailable_ && DelayedSingleton<AudioProxy>::GetInstance()->SetEarpieceDevActive()) {
-        currentAudioDevice_ = std::make_unique<EarpieceDeviceState>();
-        if (currentAudioDevice_ == nullptr) {
-            TELEPHONY_LOGE("make_unique EarpieceDeviceState failed");
-            return false;
-        }
         TELEPHONY_LOGI("earpiece enabled , current audio device : earpiece");
         SetCurrentAudioDevice(AudioDeviceType::DEVICE_EARPIECE);
         return true;
@@ -312,11 +288,6 @@ bool AudioDeviceManager::EnableEarpiece()
 bool AudioDeviceManager::EnableWiredHeadset()
 {
     if (isWiredHeadsetConnected_ && DelayedSingleton<AudioProxy>::GetInstance()->SetWiredHeadsetDevActive()) {
-        currentAudioDevice_ = std::make_unique<WiredHeadsetDeviceState>();
-        if (currentAudioDevice_ == nullptr) {
-            TELEPHONY_LOGE("make_unique WiredHeadsetDeviceState failed");
-            return false;
-        }
         TELEPHONY_LOGI("wired headset enabled , current audio device : wired headset");
         SetCurrentAudioDevice(AudioDeviceType::DEVICE_WIRED_HEADSET);
         return true;
@@ -328,11 +299,6 @@ bool AudioDeviceManager::EnableWiredHeadset()
 bool AudioDeviceManager::EnableBtSco()
 {
     if (isBtScoConnected_) {
-        currentAudioDevice_ = std::make_unique<BluetoothDeviceState>();
-        if (currentAudioDevice_ == nullptr) {
-            TELEPHONY_LOGE("make_unique BluetoothDeviceState failed");
-            return false;
-        }
         TELEPHONY_LOGI("bluetooth sco enabled , current audio device : bluetooth sco");
         SetCurrentAudioDevice(AudioDeviceType::DEVICE_BLUETOOTH_SCO);
         return true;
@@ -391,6 +357,10 @@ int32_t AudioDeviceManager::ReportAudioDeviceChange()
         return TELEPHONY_ERR_MEMCPY_FAIL;
     }
     info_.isMuted = DelayedSingleton<AudioProxy>::GetInstance()->IsMicrophoneMute();
+    if (!DelayedSingleton<AudioControlManager>::GetInstance()->IsAudioActivated()) {
+        TELEPHONY_LOGE("call is not active, no need to report");
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
+    }
     return DelayedSingleton<CallAbilityReportProxy>::GetInstance()->ReportAudioDeviceChange(info_);
 }
 

@@ -21,9 +21,13 @@
 
 namespace OHOS {
 namespace Telephony {
+const int32_t NO_DEVICE_VALID = 0;
+const int32_t RENDERER_FLAG = 0;
+
 AudioProxy::AudioProxy()
     : context_(nullptr), audioSoundManager_(Media::RingtoneFactory::CreateRingtoneManager()),
-      deviceCallback_(std::make_shared<AudioDeviceChangeCallback>())
+      deviceCallback_(std::make_shared<AudioDeviceChangeCallback>()),
+      preferDeviceCallback_(std::make_shared<AudioPreferDeviceChangeCallback>())
 {}
 
 AudioProxy::~AudioProxy() {}
@@ -213,13 +217,11 @@ void AudioDeviceChangeCallback::OnDeviceChange(const AudioStandard::DeviceChange
                 DelayedSingleton<AudioProxy>::GetInstance()->SetWiredHeadsetState(true);
                 DelayedSingleton<AudioDeviceManager>::GetInstance()->AddAudioDeviceList(
                     "", AudioDeviceType::DEVICE_WIRED_HEADSET);
-                DelayedSingleton<AudioDeviceManager>::GetInstance()->ProcessEvent(AudioEvent::WIRED_HEADSET_CONNECTED);
             } else {
                 TELEPHONY_LOGI("WiredHeadset disConnected");
                 DelayedSingleton<AudioProxy>::GetInstance()->SetWiredHeadsetState(false);
                 DelayedSingleton<AudioDeviceManager>::GetInstance()->RemoveAudioDeviceList(
                     "", AudioDeviceType::DEVICE_WIRED_HEADSET);
-                DelayedSingleton<AudioDeviceManager>::GetInstance()->ProcessEvent(AudioEvent::INIT_AUDIO_DEVICE);
             }
         }
     }
@@ -273,6 +275,115 @@ std::string AudioProxy::GetDefaultDtmfPath() const
 void AudioProxy::SetWiredHeadsetState(bool isConnected)
 {
     isWiredHeadsetConnected_ = isConnected;
+}
+
+int32_t AudioProxy::GetPreferOutputAudioDevice(AudioDevice &device)
+{
+    AudioStandard::AudioRendererInfo rendererInfo;
+    rendererInfo.contentType = AudioStandard::ContentType::CONTENT_TYPE_SPEECH;
+    rendererInfo.streamUsage = AudioStandard::StreamUsage::STREAM_USAGE_VOICE_MODEM_COMMUNICATION;
+    rendererInfo.rendererFlags = RENDERER_FLAG;
+    std::vector<sptr<AudioStandard::AudioDeviceDescriptor>> desc;
+    int32_t ret =
+        AudioStandard::AudioRoutingManager::GetInstance()->GetPreferOutputDeviceForRendererInfo(rendererInfo, desc);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("GetPreferOutputDeviceForRendererInfo fail");
+        return CALL_ERR_AUDIO_OPERATE_FAILED;
+    }
+    if (desc.size() == NO_DEVICE_VALID) {
+        TELEPHONY_LOGE("desc size is zero");
+        return CALL_ERR_AUDIO_OPERATE_FAILED;
+    }
+    switch (desc[0]->deviceType_) {
+        case AudioStandard::DEVICE_TYPE_BLUETOOTH_SCO:
+            device.deviceType = AudioDeviceType::DEVICE_BLUETOOTH_SCO;
+            if (memset_s(&device.address, kMaxAddressLen + 1, 0, kMaxAddressLen + 1) != EOK) {
+                TELEPHONY_LOGE("memset_s address fail");
+                return TELEPHONY_ERR_MEMSET_FAIL;
+            }
+            if (memcpy_s(device.address, kMaxAddressLen, desc[0]->macAddress_.c_str(),
+                desc[0]->macAddress_.length()) != EOK) {
+                TELEPHONY_LOGE("memcpy_s address fail");
+                return TELEPHONY_ERR_MEMCPY_FAIL;
+            }
+            break;
+        case AudioStandard::DEVICE_TYPE_EARPIECE:
+            device.deviceType = AudioDeviceType::DEVICE_EARPIECE;
+            break;
+        case AudioStandard::DEVICE_TYPE_SPEAKER:
+            device.deviceType = AudioDeviceType::DEVICE_SPEAKER;
+            break;
+        case AudioStandard::DEVICE_TYPE_WIRED_HEADSET:
+        case AudioStandard::DEVICE_TYPE_WIRED_HEADPHONES:
+        case AudioStandard::DEVICE_TYPE_USB_HEADSET:
+            device.deviceType = AudioDeviceType::DEVICE_WIRED_HEADSET;
+            break;
+        default:
+            break;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t AudioProxy::SetAudioPreferDeviceChangeCallback()
+{
+    if (preferDeviceCallback_ == nullptr) {
+        TELEPHONY_LOGE("preferDeviceCallback_ is nullptr");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    AudioStandard::AudioRendererInfo rendererInfo;
+    rendererInfo.contentType = AudioStandard::ContentType::CONTENT_TYPE_SPEECH;
+    rendererInfo.streamUsage = AudioStandard::StreamUsage::STREAM_USAGE_VOICE_MODEM_COMMUNICATION;
+    rendererInfo.rendererFlags = RENDERER_FLAG;
+    int32_t ret = AudioStandard::AudioRoutingManager::GetInstance()->SetPreferOutputDeviceChangeCallback(rendererInfo,
+        preferDeviceCallback_);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("GetPreferOutputDeviceForRendererInfo fail");
+        return CALL_ERR_AUDIO_OPERATE_FAILED;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+void AudioPreferDeviceChangeCallback::OnPreferOutputDeviceUpdated(
+    const std::vector<sptr<AudioStandard::AudioDeviceDescriptor>> &desc)
+{
+    AudioDevice device;
+    if (desc.size() == NO_DEVICE_VALID) {
+        TELEPHONY_LOGE("desc size is zero");
+        return;
+    }
+    switch (desc[0]->deviceType_) {
+        case AudioStandard::DEVICE_TYPE_BLUETOOTH_SCO:
+            device.deviceType = AudioDeviceType::DEVICE_BLUETOOTH_SCO;
+            if (memset_s(&device.address, kMaxAddressLen + 1, 0, kMaxAddressLen + 1) != EOK) {
+                TELEPHONY_LOGE("memset_s address fail");
+                return;
+            }
+            if (memcpy_s(device.address, kMaxAddressLen, desc[0]->macAddress_.c_str(),
+                desc[0]->macAddress_.length()) != EOK) {
+                TELEPHONY_LOGE("memcpy_s address fail");
+                return;
+            }
+            DelayedSingleton<AudioDeviceManager>::GetInstance()->SetCurrentAudioDevice(device.deviceType);
+            break;
+        case AudioStandard::DEVICE_TYPE_EARPIECE:
+            device.deviceType = AudioDeviceType::DEVICE_EARPIECE;
+            DelayedSingleton<AudioDeviceManager>::GetInstance()->SetCurrentAudioDevice(device.deviceType);
+            break;
+        case AudioStandard::DEVICE_TYPE_SPEAKER:
+            device.deviceType = AudioDeviceType::DEVICE_SPEAKER;
+            DelayedSingleton<AudioDeviceManager>::GetInstance()->SetCurrentAudioDevice(device.deviceType);
+            break;
+        case AudioStandard::DEVICE_TYPE_WIRED_HEADSET:
+        case AudioStandard::DEVICE_TYPE_WIRED_HEADPHONES:
+        case AudioStandard::DEVICE_TYPE_USB_HEADSET:
+            device.deviceType = AudioDeviceType::DEVICE_WIRED_HEADSET;
+            DelayedSingleton<AudioDeviceManager>::GetInstance()->AddAudioDeviceList(
+                "", AudioDeviceType::DEVICE_WIRED_HEADSET);
+            DelayedSingleton<AudioDeviceManager>::GetInstance()->SetCurrentAudioDevice(device.deviceType);
+            break;
+        default:
+            break;
+    }
 }
 } // namespace Telephony
 } // namespace OHOS

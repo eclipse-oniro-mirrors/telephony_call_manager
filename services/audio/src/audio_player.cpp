@@ -22,13 +22,6 @@
 
 namespace OHOS {
 namespace Telephony {
-size_t AudioPlayer::bufferLen = 0;
-bool AudioPlayer::isStop_ = false;
-bool AudioPlayer::isRingStop_ = false;
-bool AudioPlayer::isToneStop_ = false;
-bool AudioPlayer::isRenderInitialized_ = false;
-std::unique_ptr<AudioStandard::AudioRenderer> AudioPlayer::audioRenderer_ = nullptr;
-
 bool AudioPlayer::InitRenderer(const wav_hdr &wavHeader, AudioStandard::AudioStreamType streamType)
 {
     AudioStandard::AudioRendererParams rendererParams;
@@ -41,16 +34,52 @@ bool AudioPlayer::InitRenderer(const wav_hdr &wavHeader, AudioStandard::AudioStr
         TELEPHONY_LOGE("audio renderer create failed");
         return false;
     }
+    audioRenderer_->SetInterruptMode(AudioStandard::INDEPENDENT_MODE);
     if (audioRenderer_->SetParams(rendererParams) != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("audio renderer set params failed");
         return false;
     }
+    callback_ = std::make_shared<CallAudioRendererCallback>();
+    if (callback_ == nullptr) {
+        TELEPHONY_LOGE("callback_ is nullptr");
+        return false;
+    }
+    audioRenderer_->SetRendererCallback(callback_);
     if (!audioRenderer_->Start()) {
         TELEPHONY_LOGE("audio renderer start failed");
         return false;
     }
     if (audioRenderer_->GetBufferSize(bufferLen)) {
         TELEPHONY_LOGE("audio renderer get buffer size failed");
+        return false;
+    }
+    uint32_t frameCount;
+    if (audioRenderer_->GetFrameCount(frameCount)) {
+        TELEPHONY_LOGE("audio renderer get frame count failed");
+        return false;
+    }
+    isRenderInitialized_ = true;
+    return true;
+}
+
+bool AudioPlayer::InitRenderer()
+{
+    AudioStandard::AudioRendererOptions rendererOptions;
+    rendererOptions.streamInfo.samplingRate = AudioStandard::AudioSamplingRate::SAMPLE_RATE_96000;
+    rendererOptions.streamInfo.encoding = AudioStandard::AudioEncodingType::ENCODING_PCM;
+    rendererOptions.streamInfo.format = AudioStandard::AudioSampleFormat::SAMPLE_U8;
+    rendererOptions.streamInfo.channels = AudioStandard::AudioChannel::MONO;
+    rendererOptions.rendererInfo.contentType = AudioStandard::ContentType::CONTENT_TYPE_SPEECH;
+    rendererOptions.rendererInfo.streamUsage = AudioStandard::StreamUsage::STREAM_USAGE_VOICE_MODEM_COMMUNICATION;
+    rendererOptions.rendererInfo.rendererFlags = RENDERER_FLAG;
+    audioRenderer_ = AudioStandard::AudioRenderer::Create(rendererOptions);
+    if (audioRenderer_ == nullptr) {
+        TELEPHONY_LOGE("audio renderer create failed");
+        return false;
+    }
+    audioRenderer_->SetInterruptMode(AudioStandard::INDEPENDENT_MODE);
+    if (!audioRenderer_->Start()) {
+        TELEPHONY_LOGE("audio renderer start failed");
         return false;
     }
     uint32_t frameCount;
@@ -113,6 +142,16 @@ int32_t AudioPlayer::Play(const std::string &path, AudioStandard::AudioStreamTyp
     return TELEPHONY_SUCCESS;
 }
 
+int32_t AudioPlayer::Play(PlayerType playerType)
+{
+    SetStop(playerType, false);
+    if (!InitRenderer()) {
+        TELEPHONY_LOGE("audio renderer init failed");
+        return TELEPHONY_ERR_UNINIT;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
 void AudioPlayer::SetStop(PlayerType playerType, bool state)
 {
     switch (playerType) {
@@ -126,6 +165,14 @@ void AudioPlayer::SetStop(PlayerType playerType, bool state)
             break;
         case PlayerType::TYPE_TONE:
             isToneStop_ = state;
+            break;
+        case PlayerType::TYPE_SOUND:
+            isSoundStop_ = state;
+            if (isSoundStop_) {
+                DelayedSingleton<AudioControlManager>::GetInstance()->SetSoundState(SoundState::STOPPED);
+            } else {
+                DelayedSingleton<AudioControlManager>::GetInstance()->SetSoundState(SoundState::SOUNDING);
+            }
             break;
         default:
             break;
@@ -141,6 +188,9 @@ bool AudioPlayer::IsStop(PlayerType playerType)
             break;
         case PlayerType::TYPE_TONE:
             ret = isToneStop_;
+            break;
+        case PlayerType::TYPE_SOUND:
+            ret = isSoundStop_;
             break;
         default:
             break;
@@ -173,6 +223,24 @@ bool AudioPlayer::GetRealPath(const std::string &profilePath, std::string &realP
     }
     realPath = path;
     return true;
+}
+
+void AudioPlayer::CallAudioRendererCallback::OnInterrupt(const AudioStandard::InterruptEvent &interruptEvent)
+{
+    if (interruptEvent.forceType == AudioStandard::INTERRUPT_FORCE) {
+        switch (interruptEvent.hintType) {
+            case AudioStandard::INTERRUPT_HINT_PAUSE:
+                break;
+            case AudioStandard::INTERRUPT_HINT_STOP:
+                if (DelayedSingleton<AudioControlManager>::GetInstance()->IsCurrentRinging() &&
+                    DelayedSingleton<AudioControlManager>::GetInstance()->IsSoundPlaying()) {
+                    DelayedSingleton<AudioControlManager>::GetInstance()->StopRingtone();
+                }
+                break;
+            default:
+                break;
+        }
+    }
 }
 } // namespace Telephony
 } // namespace OHOS
