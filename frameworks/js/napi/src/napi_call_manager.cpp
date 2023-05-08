@@ -104,6 +104,7 @@ napi_value NapiCallManager::DeclareCallSupplementInterface(napi_env env, napi_va
         DECLARE_NAPI_FUNCTION("isImsSwitchEnabled", IsImsSwitchEnabled),
         DECLARE_NAPI_FUNCTION("canSetCallTransferTime", CanSetCallTransferTime),
         DECLARE_NAPI_FUNCTION("closeUnFinishedUssd", CloseUnFinishedUssd),
+        DECLARE_NAPI_FUNCTION("inputDialerSpecialCode", InputDialerSpecialCode),
     };
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc));
     return exports;
@@ -2577,6 +2578,30 @@ napi_value NapiCallManager::CloseUnFinishedUssd(napi_env env, napi_callback_info
         env, asyncContext.release(), "CloseUnFinishedUssd", NativeCloseUnFinishedUssd, NativeVoidCallBackWithErrorCode);
 }
 
+napi_value NapiCallManager::InputDialerSpecialCode(napi_env env, napi_callback_info info)
+{
+    GET_PARAMS(env, info, VALUE_MAXIMUM_LIMIT);
+    if (!MatchOneStringParameter(env, argv, argc)) {
+        TELEPHONY_LOGE("NapiCallManager::InputDialerSpecialCode MatchOneStringParameter failed.");
+        NapiUtil::ThrowParameterError(env);
+        return nullptr;
+    }
+
+    auto asyncContext = std::make_unique<AsyncContext>();
+    if (asyncContext == nullptr) {
+        TELEPHONY_LOGE("NapiCallManager::InputDialerSpecialCode asyncContext is nullptr.");
+        NapiUtil::ThrowParameterError(env);
+        return nullptr;
+    }
+    napi_get_value_string_utf8(
+        env, argv[ARRAY_INDEX_FIRST], asyncContext->number, PHONE_NUMBER_MAXIMUM_LIMIT, &(asyncContext->numberLen));
+    if (argc == TWO_VALUE_LIMIT) {
+        napi_create_reference(env, argv[ARRAY_INDEX_SECOND], DATA_LENGTH_ONE, &(asyncContext->callbackRef));
+    }
+    return HandleAsyncWork(env, asyncContext.release(), "InputDialerSpecialCode", NativeInputDialerSpecialCode,
+        NativeVoidCallBackWithErrorCode);
+}
+
 napi_value NapiCallManager::CancelMissedIncomingCallNotification(napi_env env, napi_callback_info info)
 {
     GET_PARAMS(env, info, VALUE_MAXIMUM_LIMIT);
@@ -4237,6 +4262,21 @@ void NapiCallManager::NativeCloseUnFinishedUssd(napi_env env, void *data)
     asyncContext->resolved = TELEPHONY_SUCCESS;
     asyncContext->callbackRef = nullptr;
     asyncContext->deferred = nullptr;
+}
+
+void NapiCallManager::NativeInputDialerSpecialCode(napi_env env, void *data)
+{
+    if (data == nullptr) {
+        TELEPHONY_LOGE("NapiCallManager::NativeInputDialerSpecialCode data is nullptr");
+        NapiUtil::ThrowParameterError(env);
+        return;
+    }
+    AsyncContext *asyncContext = (AsyncContext *)data;
+    std::string specialCode(asyncContext->number, asyncContext->numberLen);
+    asyncContext->errorCode = DelayedSingleton<CallManagerClient>::GetInstance()->InputDialerSpecialCode(specialCode);
+    if (asyncContext->errorCode == TELEPHONY_SUCCESS) {
+        asyncContext->resolved = TELEPHONY_SUCCESS;
+    }
 }
 
 void NapiCallManager::NativeCancelMissedIncomingCallNotification(napi_env env, void *data)

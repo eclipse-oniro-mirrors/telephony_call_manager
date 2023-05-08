@@ -873,6 +873,35 @@ int32_t CallManagerService::CloseUnFinishedUssd(int32_t slotId)
     }
 }
 
+int32_t CallManagerService::InputDialerSpecialCode(const std::string &specialCode)
+{
+    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
+        TELEPHONY_LOGE("Non system applications use system APIs!");
+        return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
+    }
+    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_PLACE_CALL)) {
+        TELEPHONY_LOGE("Permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
+
+    auto it = find(supportSpecialCode_.begin(), supportSpecialCode_.end(), specialCode);
+    if (it == supportSpecialCode_.end()) {
+        TELEPHONY_LOGE("specialCode is not support");
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
+    }
+    AAFwk::Want want;
+    want.SetAction(EventFwk::CommonEventSupport::COMMON_EVENT_SPECIAL_CODE);
+    EventFwk::CommonEventData commonEventData;
+    commonEventData.SetWant(want);
+    commonEventData.SetData(specialCode);
+    EventFwk::CommonEventPublishInfo publishInfo;
+    if (!EventFwk::CommonEventManager::PublishCommonEvent(commonEventData, publishInfo, nullptr)) {
+        TELEPHONY_LOGE("PublishCommonEvent fail");
+        return TELEPHONY_ERR_PUBLISH_BROADCAST_FAIL;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
 int32_t CallManagerService::CancelMissedIncomingCallNotification()
 {
     if (!TelephonyPermission::CheckCallerIsSystemApp()) {

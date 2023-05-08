@@ -147,6 +147,19 @@ int32_t SetCallWaiting(const uint8_t *data, size_t size)
     return DelayedSingleton<CallManagerService>::GetInstance()->OnSetCallWaiting(dataParcel, reply);
 }
 
+int32_t InputDialerSpecialCode(const uint8_t *data, size_t size)
+{
+    if (!IsServiceInited()) {
+        return TELEPHONY_ERROR;
+    }
+    std::string specialCode(reinterpret_cast<const char *>(data), size);
+    MessageParcel dataParcel;
+    dataParcel.WriteString(specialCode);
+    dataParcel.RewindRead(0);
+    MessageParcel reply;
+    return DelayedSingleton<CallManagerService>::GetInstance()->OnInputDialerSpecialCode(dataParcel, reply);
+}
+
 void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
 {
     if (data == nullptr || size == 0) {
@@ -160,6 +173,7 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     IsInEmergencyCall(data, size);
     DialCall(data, size);
     SetCallWaiting(data, size);
+    InputDialerSpecialCode(data, size);
 }
 }  // namespace OHOS
 

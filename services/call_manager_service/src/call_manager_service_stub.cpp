@@ -58,6 +58,7 @@ void CallManagerServiceStub::InitCallBasicRequest()
     memberFuncMap_[INTERFACE_DISCONNECT_CALL] = &CallManagerServiceStub::OnHangUpCall;
     memberFuncMap_[INTERFACE_GET_CALL_STATE] = &CallManagerServiceStub::OnGetCallState;
     memberFuncMap_[INTERFACE_SWAP_CALL] = &CallManagerServiceStub::OnSwitchCall;
+    memberFuncMap_[INTERFACE_INPUT_DIALER_SPECIAL_CODE] = &CallManagerServiceStub::OnInputDialerSpecialCode;
 }
 
 void CallManagerServiceStub::InitCallUtilsRequest()
@@ -1001,6 +1002,19 @@ int32_t CallManagerServiceStub::OnCloseUnFinishedUssd(MessageParcel &data, Messa
     int32_t result = TELEPHONY_ERR_FAIL;
     int32_t slotId = data.ReadInt32();
     result = CloseUnFinishedUssd(slotId);
+    TELEPHONY_LOGI("result:%{public}d", result);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("fail to write parcel");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallManagerServiceStub::OnInputDialerSpecialCode(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t result = TELEPHONY_ERR_FAIL;
+    std::string specialCode = data.ReadString();
+    result = InputDialerSpecialCode(specialCode);
     TELEPHONY_LOGI("result:%{public}d", result);
     if (!reply.WriteInt32(result)) {
         TELEPHONY_LOGE("fail to write parcel");

@@ -1280,6 +1280,21 @@ void StopRtt()
     std::cout << "return value:" << ret << std::endl;
 }
 
+void InputDialerSpecialCode()
+{
+    AccessToken token;
+    std::string specialCode;
+    std::cout << "------InputDialerSpecialCode------" << std::endl;
+    std::cout << "please input special code:" << std::endl;
+    std::cin >> specialCode;
+    if (g_clientPtr == nullptr) {
+        std::cout << "g_clientPtr is nullptr" << std::endl;
+        return;
+    }
+    int32_t ret = g_clientPtr->InputDialerSpecialCode(specialCode);
+    std::cout << "return value:" << ret << std::endl;
+}
+
 void CancelMissedIncomingCallNotification()
 {
     AccessToken token;
@@ -1319,6 +1334,7 @@ void InitCallBasicPower()
     g_memberFuncMap[OHOS::Telephony::INTERFACE_SWAP_CALL] = &OHOS::Telephony::SwitchCall;
     g_memberFuncMap[OHOS::Telephony::INTERFACE_START_RTT] = &OHOS::Telephony::StartRtt;
     g_memberFuncMap[OHOS::Telephony::INTERFACE_STOP_RTT] = &OHOS::Telephony::StopRtt;
+    g_memberFuncMap[OHOS::Telephony::INTERFACE_INPUT_DIALER_SPECIAL_CODE] = &OHOS::Telephony::InputDialerSpecialCode;
 }
 
 void InitCallUtils()
@@ -1504,6 +1520,7 @@ void PrintfCallMultimediaInterface()
               << "48:IsImsSwitchEnabled\n"
               << "49:StartRtt\n"
               << "50:StopRtt\n"
+              << "57:InputDialerSpecialCode\n"
               << "93:InitPermission\n"
               << "94:VerifyPermission\n"
               << "95:SendConnectBluetoothScoBroadcast\n"

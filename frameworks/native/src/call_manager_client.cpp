@@ -608,6 +608,15 @@ int32_t CallManagerClient::CloseUnFinishedUssd(int32_t slotId)
     }
 }
 
+int32_t CallManagerClient::InputDialerSpecialCode(const std::string &specialCode)
+{
+    if (g_callManagerProxy == nullptr) {
+        TELEPHONY_LOGE("init first please!");
+        return TELEPHONY_ERR_UNINIT;
+    }
+    return g_callManagerProxy->InputDialerSpecialCode(specialCode);
+}
+
 int32_t CallManagerClient::CancelMissedIncomingCallNotification()
 {
     if (g_callManagerProxy == nullptr) {

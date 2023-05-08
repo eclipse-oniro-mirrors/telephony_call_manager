@@ -610,6 +610,14 @@ public:
     int32_t CancelMissedIncomingCallNotification() override;
 
     /**
+     * Handle special code from dialer.
+     *
+     * @param specialCode[in], special code
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t InputDialerSpecialCode(const std::string &specialCode) override;
+
+    /**
      * GetProxyObjectPtr
      *
      * @brief get callManager proxy object ptr
@@ -639,6 +647,7 @@ private:
 
     std::shared_ptr<CallControlManager> callControlManagerPtr_;
     std::map<uint32_t, sptr<IRemoteObject>> proxyObjectPtrMap_;
+    std::vector<std::string> supportSpecialCode_ { "2846579" };
     std::mutex lock_;
     const int32_t startTime_ = 1900;
     const int32_t extraMonth_ = 1;
