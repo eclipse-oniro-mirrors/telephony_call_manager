@@ -21,10 +21,11 @@
 #include <mutex>
 
 #include "audio_manager_proxy.h"
-#include "singleton.h"
+#include "audio_system_manager.h"
 #include "./audio_ringtone/include/iringtone_sound_manager.h"
-
 #include "call_manager_errors.h"
+#include "call_manager_inner_type.h"
+#include "singleton.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -39,6 +40,11 @@ enum AudioInterruptState {
 
 class AudioDeviceChangeCallback : public AudioStandard::AudioManagerDeviceChangeCallback {
     void OnDeviceChange(const AudioStandard::DeviceChangeAction &deviceChangeAction) override;
+};
+
+class AudioPreferDeviceChangeCallback : public AudioStandard::AudioPreferOutputDeviceChangeCallback {
+public:
+    void OnPreferOutputDeviceUpdated(const std::vector<sptr<AudioStandard::AudioDeviceDescriptor>> &desc) override;
 };
 
 class AudioProxy : public std::enable_shared_from_this<AudioProxy> {
@@ -73,6 +79,8 @@ public:
     std::string GetDefaultDtmfPath() const;
     int32_t UnsetDeviceChangeCallback();
     void SetWiredHeadsetState(bool isConnected);
+    int32_t GetPreferOutputAudioDevice(AudioDevice &device);
+    int32_t SetAudioPreferDeviceChangeCallback();
 
 private:
     const std::string defaultRingPath_ = "/system/etc/telephony/rings/ring.wav";
@@ -81,6 +89,7 @@ private:
     std::shared_ptr<AbilityRuntime::Context> context_;
     std::unique_ptr<Media::IRingtoneSoundManager> audioSoundManager_;
     std::shared_ptr<AudioStandard::AudioManagerDeviceChangeCallback> deviceCallback_;
+    std::shared_ptr<AudioStandard::AudioPreferOutputDeviceChangeCallback> preferDeviceCallback_;
     bool isWiredHeadsetConnected_ = false;
 };
 } // namespace Telephony

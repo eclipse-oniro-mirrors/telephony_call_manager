@@ -27,6 +27,7 @@
 #include "call_state_listener_base.h"
 #include "tone.h"
 #include "ring.h"
+#include "sound.h"
 #include "audio_device_manager.h"
 #include "audio_scene_processor.h"
 
@@ -64,13 +65,17 @@ public:
     AudioInterruptState GetAudioInterruptState();
     bool UpdateCurrentCallState();
     void SetRingState(RingState state);
+    void SetSoundState(SoundState state);
+    void SetToneState(ToneState state);
     void SetLocalRingbackNeeded(bool isNeeded);
-    void SetAudioInterruptState(AudioInterruptState state);
     void NewCallCreated(sptr<CallBase> &callObjectPtr) override;
     void CallDestroyed(const DisconnectedDetails &details) override;
     void IncomingCallActivated(sptr<CallBase> &callObjectPtr) override;
     void IncomingCallHungUp(sptr<CallBase> &callObjectPtr, bool isSendSms, std::string content) override;
     void CallStateUpdated(sptr<CallBase> &callObjectPtr, TelCallState priorState, TelCallState nextState) override;
+    bool IsSoundPlaying();
+    bool StopSoundtone();
+    bool PlaySoundtone();
 
 private:
     RingState ringState_ = RingState::STOPPED;
@@ -84,11 +89,13 @@ private:
     AudioInterruptState audioInterruptState_ = AudioInterruptState::INTERRUPT_STATE_DEACTIVATED;
     bool ShouldPlayRingtone() const;
     bool IsEmergencyCallExists() const;
-    bool isTonePlaying_;
+    ToneState toneState_ = ToneState::STOPPED;
+    SoundState soundState_ = SoundState::STOPPED;
     bool isLocalRingbackNeeded_;
     std::set<sptr<CallBase>> totalCalls_;
     std::unique_ptr<Ring> ring_;
     std::unique_ptr<Tone> tone_;
+    std::unique_ptr<Sound> sound_;
 };
 } // namespace Telephony
 } // namespace OHOS

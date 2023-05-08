@@ -23,7 +23,10 @@
 
 namespace OHOS {
 namespace Telephony {
-Ring::Ring() : isVibrating_(false), shouldRing_(false), shouldVibrate_(false), ringtonePath_("")
+using AudioPlay = int32_t (AudioPlayer::*)(const std::string &, AudioStandard::AudioStreamType, PlayerType);
+
+Ring::Ring() : isVibrating_(false), shouldRing_(false), shouldVibrate_(false), ringtonePath_(""),
+    audioPlayer_(new (std::nothrow) AudioPlayer())
 {
     Init(DelayedSingleton<AudioProxy>::GetInstance()->GetDefaultRingPath());
 }
@@ -34,7 +37,11 @@ Ring::Ring(const std::string &path)
     Init(path);
 }
 
-Ring::~Ring() {}
+Ring::~Ring()
+{
+    delete audioPlayer_;
+    audioPlayer_ = nullptr;
+}
 
 void Ring::Init(const std::string &ringtonePath)
 {
@@ -65,8 +72,9 @@ int32_t Ring::Play()
         return CALL_ERR_INVALID_PATH;
     }
     int32_t result = TELEPHONY_SUCCESS;
-    std::thread play(
-        AudioPlayer::Play, ringtonePath_, AudioStandard::AudioStreamType::STREAM_RING, PlayerType::TYPE_RING);
+    AudioPlay audioPlay = &AudioPlayer::Play;
+    std::thread play(audioPlay, audioPlayer_, ringtonePath_, AudioStandard::AudioStreamType::STREAM_RING,
+        PlayerType::TYPE_RING);
     play.detach();
     if (shouldVibrate_) {
         result = StartVibrate();
@@ -82,7 +90,7 @@ int32_t Ring::Stop()
         return CALL_ERR_INVALID_PATH;
     }
     int32_t result = TELEPHONY_SUCCESS;
-    AudioPlayer::SetStop(PlayerType::TYPE_RING, true);
+    audioPlayer_->SetStop(PlayerType::TYPE_RING, true);
     if (isVibrating_) {
         result = CancelVibrate();
     }
@@ -113,6 +121,11 @@ bool Ring::ShouldVibrate()
 {
     return DelayedSingleton<AudioProxy>::GetInstance()->GetRingerMode() !=
         AudioStandard::AudioRingerMode::RINGER_MODE_SILENT;
+}
+
+void Ring::ReleaseRenderer()
+{
+    audioPlayer_->ReleaseRenderer();
 }
 } // namespace Telephony
 } // namespace OHOS

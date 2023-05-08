@@ -258,14 +258,11 @@ void BluetoothConnection::OnScoStateChanged(const Bluetooth::BluetoothRemoteDevi
         case (int32_t)Bluetooth::HfpScoConnectState::SCO_CONNECTED:
             connectedScoAddr_ = device.GetDeviceAddr();
             btScoState_ = BtScoState::SCO_STATE_CONNECTED;
-            DelayedSingleton<AudioDeviceManager>::GetInstance()->ProcessEvent(AudioEvent::BLUETOOTH_SCO_CONNECTED);
             break;
         case (int32_t)Bluetooth::HfpScoConnectState::SCO_DISCONNECTED:
             if (device.GetDeviceAddr() == connectedScoAddr_) {
                 connectedScoAddr_ = "";
                 btScoState_ = BtScoState::SCO_STATE_DISCONNECTED;
-                DelayedSingleton<AudioDeviceManager>::GetInstance()->ProcessEvent(
-                    AudioEvent::BLUETOOTH_SCO_DISCONNECTED);
             }
             break;
         default:
@@ -361,10 +358,8 @@ void SystemAbilityListener::OnRemoveSystemAbility(int32_t systemAbilityId, const
 
     DelayedSingleton<BluetoothConnection>::GetInstance()->ResetBtConnection();
     std::shared_ptr<AudioDeviceManager> audioDeviceManager = DelayedSingleton<AudioDeviceManager>::GetInstance();
-    if (audioDeviceManager->IsBtScoConnected()) {
-        audioDeviceManager->ProcessEvent(AudioEvent::BLUETOOTH_SCO_DISCONNECTED);
-    }
     audioDeviceManager->ResetBtAudioDevicesList();
+    audioDeviceManager->ProcessEvent(AudioEvent::INIT_AUDIO_DEVICE);
 }
 #endif
 } // namespace Telephony

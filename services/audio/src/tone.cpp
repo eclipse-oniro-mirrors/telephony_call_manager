@@ -21,14 +21,20 @@
 
 namespace OHOS {
 namespace Telephony {
-Tone::Tone() {}
+using AudioPlay = int32_t (AudioPlayer::*)(const std::string &, AudioStandard::AudioStreamType, PlayerType);
+
+Tone::Tone() : audioPlayer_(new (std::nothrow) AudioPlayer()) {}
 
 Tone::Tone(ToneDescriptor tone)
 {
     currentToneDescriptor_ = tone;
 }
 
-Tone::~Tone() {}
+Tone::~Tone()
+{
+    delete audioPlayer_;
+    audioPlayer_ = nullptr;
+}
 
 void Tone::Init() {}
 
@@ -42,8 +48,9 @@ int32_t Tone::Play()
     if (IsDtmf(currentToneDescriptor_)) {
         playerType = PlayerType::TYPE_DTMF;
     }
-    std::thread play(AudioPlayer::Play, GetToneDescriptorPath(currentToneDescriptor_),
-        AudioStandard::AudioStreamType::STREAM_MUSIC, playerType);
+    AudioPlay audioPlay = &AudioPlayer::Play;
+    std::thread play(audioPlay, audioPlayer_,
+        GetToneDescriptorPath(currentToneDescriptor_), AudioStandard::AudioStreamType::STREAM_MUSIC, playerType);
     play.detach();
     return TELEPHONY_SUCCESS;
 }
@@ -59,7 +66,7 @@ int32_t Tone::Stop()
     if (IsDtmf(currentToneDescriptor_)) {
         playerType = PlayerType::TYPE_DTMF;
     }
-    AudioPlayer::SetStop(playerType, true);
+    audioPlayer_->SetStop(playerType, true);
     return TELEPHONY_SUCCESS;
 }
 
@@ -141,6 +148,11 @@ std::string Tone::GetToneDescriptorPath(ToneDescriptor tone)
     return DelayedSingleton<AudioProxy>::GetInstance()->GetToneDescriptorPath(tone);
 #endif
     return DelayedSingleton<AudioProxy>::GetInstance()->GetDefaultTonePath();
+}
+
+void Tone::ReleaseRenderer()
+{
+    audioPlayer_->ReleaseRenderer();
 }
 } // namespace Telephony
 } // namespace OHOS

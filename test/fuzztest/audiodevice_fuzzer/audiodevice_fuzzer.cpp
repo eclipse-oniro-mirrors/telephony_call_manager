@@ -27,7 +27,6 @@
 using namespace OHOS::Telephony;
 namespace OHOS {
 static bool g_isInited = false;
-constexpr int32_t AUDIO_INTERRUPT_STATE_NUM = 4;
 constexpr int32_t BOOL_NUM = 2;
 constexpr int32_t CALL_TYPE_NUM = 4;
 constexpr int32_t RING_STATE_NUM = 2;
@@ -65,7 +64,6 @@ void AudioControlManagerFunc(const uint8_t *data, size_t size)
     paraInfo.callState = static_cast<TelCallState>(size % TEL_CALL_STATE_NUM);
     sptr<CallBase> callObjectPtr = std::make_unique<CSCall>(paraInfo).release();
     std::string message(reinterpret_cast<const char *>(data), size);
-    AudioInterruptState state = static_cast<AudioInterruptState>(size % AUDIO_INTERRUPT_STATE_NUM);
     DisconnectedDetails details;
     bool isMute = static_cast<bool>(size % BOOL_NUM);
     RingState ringState = static_cast<RingState>(size % RING_STATE_NUM);
@@ -74,7 +72,6 @@ void AudioControlManagerFunc(const uint8_t *data, size_t size)
         .address = { 0 },
     };
 
-    audioControlManager->SetAudioInterruptState(state);
     audioControlManager->SetAudioDevice(audioDevice);
     audioControlManager->CallDestroyed(details);
     audioControlManager->NewCallCreated(callObjectPtr);
