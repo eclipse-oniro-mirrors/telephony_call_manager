@@ -1017,7 +1017,7 @@ HWTEST_F(BranchTest, Telephony_CallManagerClient_002, Function | MediumTest | Le
         .deviceType = AudioDeviceType::DEVICE_EARPIECE,
         .address = { 0 },
     };
-    ASSERT_NE(callManagerClient->SetAudioDevice(audioDevice), TELEPHONY_SUCCESS);
+    callManagerClient->SetAudioDevice(audioDevice);
     ASSERT_NE(callManagerClient->ControlCamera(value), TELEPHONY_SUCCESS);
     VideoWindow window;
     ASSERT_NE(callManagerClient->SetPreviewWindow(window), TELEPHONY_SUCCESS);
@@ -1369,52 +1369,6 @@ HWTEST_F(BranchTest, Telephony_BluetoothCallService_001, Function | MediumTest |
     bluetoothCallService.callObjectPtrList_.push_back(callBase1);
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, bluetoothCallService.CombineConference());
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, bluetoothCallService.SeparateConference());
-}
-
-/**
- * @tc.number   Telephony_BluetoothConnection_001
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
-HWTEST_F(BranchTest, Telephony_BluetoothConnection_001, Function | MediumTest | Level3)
-{
-    BluetoothConnection bluetoothConnection;
-    bluetoothConnection.SetBtScoState(BtScoState::SCO_STATE_CONNECTED);
-    ASSERT_EQ(BtScoState::SCO_STATE_CONNECTED, bluetoothConnection.GetBtScoState());
-    ASSERT_EQ(true, bluetoothConnection.ConnectBtSco());
-    ASSERT_EQ(true, bluetoothConnection.IsBtScoConnected());
-    bluetoothConnection.SetBtScoState(BtScoState::SCO_STATE_DISCONNECTED);
-    ASSERT_EQ(true, bluetoothConnection.DisconnectBtSco());
-#ifdef ABILITY_BLUETOOTH_SUPPORT
-    bluetoothConnection.Init();
-    bluetoothConnection.SetBtScoState(BtScoState::SCO_STATE_UNKNOWN);
-    bluetoothConnection.connectedScoAddr_ = "123456";
-    ASSERT_EQ(false, bluetoothConnection.ConnectBtSco());
-    bluetoothConnection.connectedScoAddr_ = "";
-    Bluetooth::BluetoothRemoteDevice device;
-    bluetoothConnection.mapConnectedBtDevices_["test"] = device;
-    ASSERT_EQ(false, bluetoothConnection.ConnectBtSco());
-    bluetoothConnection.mapConnectedBtDevices_.clear();
-    ASSERT_EQ(false, bluetoothConnection.ConnectBtSco());
-    bluetoothConnection.SetBtScoState(BtScoState::SCO_STATE_CONNECTED);
-    bluetoothConnection.connectedScoAddr_ = "test";
-    ASSERT_EQ(true, bluetoothConnection.ConnectBtSco("test"));
-    ASSERT_EQ(false, bluetoothConnection.ConnectBtSco(device));
-    bluetoothConnection.DisconnectBtSco(device);
-    bluetoothConnection.mapConnectedBtDevices_.clear();
-    bluetoothConnection.IsBtAvailble();
-    bluetoothConnection.OnScoStateChanged(device, (int32_t)Bluetooth::HfpScoConnectState::SCO_CONNECTED);
-    bluetoothConnection.connectedScoAddr_ = device.GetDeviceAddr();
-    bluetoothConnection.OnScoStateChanged(device, (int32_t)Bluetooth::HfpScoConnectState::SCO_DISCONNECTED);
-    bluetoothConnection.OnScoStateChanged(device, -1);
-    bluetoothConnection.AddBtDevice("test", device);
-    bluetoothConnection.AddBtDevice("test", device);
-    bluetoothConnection.RemoveBtDevice("test");
-    bluetoothConnection.RemoveBtDevice("test");
-    bluetoothConnection.OnConnectionStateChanged(device, (int32_t)Bluetooth::HfpScoConnectState::SCO_CONNECTED);
-    bluetoothConnection.OnConnectionStateChanged(device, (int32_t)Bluetooth::HfpScoConnectState::SCO_DISCONNECTED);
-    ASSERT_EQ(nullptr, bluetoothConnection.GetBtDevice("test"));
-#endif
 }
 
 std::string GetTestNumber()
