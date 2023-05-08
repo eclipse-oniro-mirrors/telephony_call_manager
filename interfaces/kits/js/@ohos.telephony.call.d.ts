@@ -1007,6 +1007,43 @@ declare namespace call {
   function closeUnFinishedUssd(slotId: number): Promise<void>;
 
   /**
+  /**
+   * Handle special code from dialer.
+   *
+   * @permission ohos.permission.PLACE_CALL
+   * @param { string } inputCode - Indicates the special code entered.
+   * @param { AsyncCallback<void> } callback - The callback of inputDialerSpecialCode.
+   * @throws { BusinessError } 201 - Permission denied.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @syscap SystemCapability.Telephony.CallManager
+   * @systemapi Hide this for inner system use.
+   * @since 10
+   */
+  function inputDialerSpecialCode(inputCode: string, callback: AsyncCallback<void>): void;
+
+  /**
+   * Handle special code from dialer.
+   *
+   * @permission ohos.permission.PLACE_CALL
+   * @param { string } inputCode - Indicates the special code entered.
+   * @returns { Promise<void> } The promise returned by the function.
+   * @throws { BusinessError } 201 - Permission denied.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @syscap SystemCapability.Telephony.CallManager
+   * @systemapi Hide this for inner system use.
+   * @since 10
+   */
+  function inputDialerSpecialCode(inputCode: string): Promise<void>;
+
+  /**
    * Cancel missed incoming call notification.
    *
    * @permission ohos.permission.SET_TELEPHONY_STATE

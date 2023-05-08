@@ -566,6 +566,14 @@ public:
     int32_t CloseUnFinishedUssd(int32_t slotId) override;
 
     /**
+     * Handle special code from dialer.
+     *
+     * @param specialCode[in], special code
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t InputDialerSpecialCode(const std::string &specialCode) override;
+
+    /**
      * Cancel missed incoming call notification.
      *
      * @return Returns 0 on success, others on failure.

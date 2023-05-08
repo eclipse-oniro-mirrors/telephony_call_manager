@@ -4779,6 +4779,51 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_CloseUnFinishedUssd_0100, Funct
     }
 }
 
+/************************************* Test InputDialerSpecialCode() ************************************/
+/**
+ * @tc.number   Telephony_CallManager_InputDialerSpecialCode_0100
+ * @tc.name     test Input Dialer Special Code with support code
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_InputDialerSpecialCode_0100, Function | MediumTest | Level3)
+{
+    AccessToken token;
+    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+    std::string specialCode = "2846579";
+    EXPECT_EQ(CallManagerGtest::clientPtr_->InputDialerSpecialCode(specialCode), RETURN_VALUE_IS_ZERO);
+}
+
+/**
+ * @tc.number   Telephony_CallManager_InputDialerSpecialCode_0200
+ * @tc.name     test Input Dialer Special Code with unsupport code
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_InputDialerSpecialCode_0200, Function | MediumTest | Level3)
+{
+    AccessToken token;
+    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+    std::string specialCode = "1234";
+    EXPECT_NE(CallManagerGtest::clientPtr_->InputDialerSpecialCode(specialCode), RETURN_VALUE_IS_ZERO);
+}
+
+/**
+ * @tc.number   Telephony_CallManager_InputDialerSpecialCode_0300
+ * @tc.name     test Input Dialer Special Code without permission
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_InputDialerSpecialCode_0300, Function | MediumTest | Level3)
+{
+    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+    std::string specialCode = "2846579";
+    EXPECT_NE(CallManagerGtest::clientPtr_->InputDialerSpecialCode(specialCode), RETURN_VALUE_IS_ZERO);
+}
+
 /**************************** Test CancelMissedIncomingCallNotification() ****************************/
 /**
  * @tc.number   Telephony_CallManager_CancelMissedIncomingCallNotification_0100
