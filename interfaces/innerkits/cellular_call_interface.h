@@ -200,7 +200,7 @@ public:
      */
     virtual int32_t HangUpAllConnection(int32_t slotId) = 0;
 
-    virtual int32_t SetReadyToCall(int32_t slotId, bool isReadyToCall) = 0;
+    virtual int32_t SetReadyToCall(int32_t slotId, int32_t callType, bool isReadyToCall) = 0;
 
     /**
      * IMS Update Call Media Mode
