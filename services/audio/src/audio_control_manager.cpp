@@ -508,6 +508,11 @@ void AudioControlManager::SetSoundState(SoundState state)
     soundState_ = state;
 }
 
+void AudioControlManager::SetToneState(ToneState state)
+{
+    toneState_ = state;
+}
+
 void AudioControlManager::SetLocalRingbackNeeded(bool isNeeded)
 {
     isLocalRingbackNeeded_ = isNeeded;
@@ -545,12 +550,12 @@ int32_t AudioControlManager::PlayCallTone(ToneDescriptor type)
             return TELEPHONY_ERR_LOCAL_PTR_NULL;
         }
     }
-    if (tone_->Play() == TELEPHONY_SUCCESS) {
-        toneState_ = ToneState::TONEING;
-        return TELEPHONY_SUCCESS;
+    if (tone_->Play() != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("play calltone failed");
+        return CALL_ERR_AUDIO_TONE_PLAY_FAILED;
     }
-    TELEPHONY_LOGE("play call tone failed");
-    return CALL_ERR_AUDIO_TONE_PLAY_FAILED;
+    TELEPHONY_LOGI("play calltone success");
+    return TELEPHONY_SUCCESS;
 }
 
 int32_t AudioControlManager::StopCallTone()
@@ -564,7 +569,7 @@ int32_t AudioControlManager::StopCallTone()
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     if (tone_->Stop() != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("mute ring failed");
+        TELEPHONY_LOGE("stop calltone failed");
         return CALL_ERR_AUDIO_TONE_STOP_FAILED;
     }
     tone_->ReleaseRenderer();

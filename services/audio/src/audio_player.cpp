@@ -165,6 +165,11 @@ void AudioPlayer::SetStop(PlayerType playerType, bool state)
             break;
         case PlayerType::TYPE_TONE:
             isToneStop_ = state;
+            if (isToneStop_) {
+                DelayedSingleton<AudioControlManager>::GetInstance()->SetToneState(ToneState::STOPPED);
+            } else {
+                DelayedSingleton<AudioControlManager>::GetInstance()->SetToneState(ToneState::TONEING);
+            }
             break;
         case PlayerType::TYPE_SOUND:
             isSoundStop_ = state;

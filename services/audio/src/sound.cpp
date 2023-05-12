@@ -27,13 +27,19 @@ Sound::Sound() : audioPlayer_(new (std::nothrow) AudioPlayer()) {}
 
 Sound::~Sound()
 {
-    delete audioPlayer_;
-    audioPlayer_ = nullptr;
+    if (audioPlayer_ != nullptr) {
+        delete audioPlayer_;
+        audioPlayer_ = nullptr;
+    }
 }
 
 int32_t Sound::Play()
 {
     AudioPlay audioPlay = &AudioPlayer::Play;
+    if (audioPlayer_ == nullptr) {
+        TELEPHONY_LOGE("audioPlayer_ is nullptr");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     std::thread play(audioPlay, audioPlayer_, TYPE_SOUND);
     play.detach();
     return TELEPHONY_SUCCESS;
@@ -41,12 +47,20 @@ int32_t Sound::Play()
 
 int32_t Sound::Stop()
 {
+    if (audioPlayer_ == nullptr) {
+        TELEPHONY_LOGE("audioPlayer_ is nullptr");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     audioPlayer_->SetStop(PlayerType::TYPE_SOUND, true);
     return TELEPHONY_SUCCESS;
 }
 
 void Sound::ReleaseRenderer()
 {
+    if (audioPlayer_ == nullptr) {
+        TELEPHONY_LOGE("audioPlayer_ is nullptr");
+        return;
+    }
     audioPlayer_->ReleaseRenderer();
 }
 } // namespace Telephony
