@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,24 +18,59 @@ import {AsyncCallback, Callback} from "./basic";
 /**
  * Provides methods related to call management.
  *
- * @since 6
+ * @namespace call
  * @syscap SystemCapability.Telephony.CallManager
+ * @since 6
  */
 declare namespace call {
   /**
    * Makes a call.
    *
-   * @param phoneNumber Indicates the called number.
-   * @param options Indicates additional information carried in the call.
-   * @param callback Returns {@code true} if the call request is successful; returns {@code false} otherwise.
+   * @permission ohos.permission.PLACE_CALL
+   * @param { string } phoneNumber - Indicates the called number.
+   * @param { AsyncCallback<boolean> } callback - Indicates the callback for getting the result of the call.
+   * Returns {@code true} if the call request is successful; returns {@code false} otherwise.
    * Note that the value {@code true} indicates only the successful processing of the request; it does not mean
    * that the call is or can be connected.
-   * @permission ohos.permission.PLACE_CALL
+   * @syscap SystemCapability.Telephony.CallManager
+   * @since 6
    * @deprecated since 9
    * @useinstead telephony.call#dialCall
    */
   function dial(phoneNumber: string, callback: AsyncCallback<boolean>): void;
+
+  /**
+   * Makes a call.
+   *
+   * @permission ohos.permission.PLACE_CALL
+   * @param { string } phoneNumber - Indicates the called number.
+   * @param { DialOptions } options - Indicates additional information carried in the call.
+   * @param { AsyncCallback<boolean> } callback - Indicates the callback for getting the result of the call.
+   * Returns {@code true} if the call request is successful; returns {@code false} otherwise.
+   * Note that the value {@code true} indicates only the successful processing of the request; it does not mean
+   * that the call is or can be connected.
+   * @syscap SystemCapability.Telephony.CallManager
+   * @since 6
+   * @deprecated since 9
+   * @useinstead telephony.call#dialCall
+   */
   function dial(phoneNumber: string, options: DialOptions, callback: AsyncCallback<boolean>): void;
+
+  /**
+   * Makes a call.
+   *
+   * @permission ohos.permission.PLACE_CALL
+   * @param { string } phoneNumber - Indicates the called number.
+   * @param { DialOptions } options - Indicates additional information carried in the call.
+   * @returns { Promise<boolean> } Returns the result of the call.
+   * Returns {@code true} if the call request is successful; returns {@code false} otherwise.
+   * Note that the value {@code true} indicates only the successful processing of the request; it does not mean
+   * that the call is or can be connected.
+   * @syscap SystemCapability.Telephony.CallManager
+   * @since 6
+   * @deprecated since 9
+   * @useinstead telephony.call#dialCall
+   */
   function dial(phoneNumber: string, options?: DialOptions): Promise<boolean>;
 
   /**
@@ -103,25 +138,51 @@ declare namespace call {
   /**
    * Go to the dial screen and the called number is displayed.
    *
-   * @param phoneNumber Indicates the called number.
-   * @throws {BusinessError} 401 - Parameter error.
-   * @throws {BusinessError} 8300001 - Invalid parameter value.
-   * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
-   * @throws {BusinessError} 8300003 - System internal error.
-   * @throws {BusinessError} 8300999 - Unknown error code.
+   * @param { string } phoneNumber - Indicates the called number.
+   * @param { AsyncCallback<void> } callback - The callback of makeCall.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @throws { BusinessError } 8300999 - Unknown error code.
    * @syscap SystemCapability.Applications.Contacts
    * @since 7
    */
   function makeCall(phoneNumber: string, callback: AsyncCallback<void>): void;
+
+  /**
+   * Go to the dial screen and the called number is displayed.
+   *
+   * @param { string } phoneNumber - Indicates the called number.
+   * @returns { Promise<void> } The promise returned by the makeCall.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @throws { BusinessError } 8300999 - Unknown error code.
+   * @syscap SystemCapability.Applications.Contacts
+   * @since 7
+   */
   function makeCall(phoneNumber: string): Promise<void>;
 
   /**
    * Checks whether a call is ongoing.
    *
-   * @param callback Returns {@code true} if at least one call is not in the {@link CallState#CALL_STATE_IDLE}
-   * state; returns {@code false} otherwise.
+   * @param { AsyncCallback<boolean> } callback - The callback of hasCall. Returns {@code true} if at least one call is
+   * not in the {@link CallState#CALL_STATE_IDLE} state; returns {@code false} otherwise.
+   * @syscap SystemCapability.Telephony.CallManager
+   * @since 6
    */
   function hasCall(callback: AsyncCallback<boolean>): void;
+
+  /**
+   * Checks whether a call is ongoing.
+   *
+   * @returns { Promise<boolean> } Returns {@code true} if at least one call is not
+   * in the {@link CallState#CALL_STATE_IDLE} state; returns {@code false} otherwise.
+   * @syscap SystemCapability.Telephony.CallManager
+   * @since 6
+   */
   function hasCall(): Promise<boolean>;
 
   /**
@@ -132,9 +193,24 @@ declare namespace call {
    * {@code CallState#CALL_STATE_OFFHOOK}.
    * In other cases, the system returns {@code CallState#CALL_STATE_IDLE}.
    *
-   * @param callback Returns the call state.
+   * @param { AsyncCallback<CallState> } callback - Indicates the callback for getting the call state.
+   * @syscap SystemCapability.Telephony.CallManager
+   * @since 6
    */
   function getCallState(callback: AsyncCallback<CallState>): void;
+
+  /**
+   * Obtains the call state.
+   *
+   * <p>If an incoming call is ringing or waiting, the system returns {@code CallState#CALL_STATE_RINGING}.
+   * If at least one call is in the active, hold, or dialing state, the system returns
+   * {@code CallState#CALL_STATE_OFFHOOK}.
+   * In other cases, the system returns {@code CallState#CALL_STATE_IDLE}.
+   *
+   * @returns { Promise<CallState> } Returns the call state.
+   * @syscap SystemCapability.Telephony.CallManager
+   * @since 6
+   */
   function getCallState(): Promise<CallState>;
 
   /**
@@ -143,16 +219,36 @@ declare namespace call {
    * <p>If an incoming call is ringing, the phone stops ringing. Otherwise, this method does not function.
    *
    * @permission ohos.permission.SET_TELEPHONY_STATE
-   * @throws {BusinessError} 201 - Permission denied.
-   * @throws {BusinessError} 401 - Parameter error.
-   * @throws {BusinessError} 8300001 - Invalid parameter value.
-   * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
-   * @throws {BusinessError} 8300003 - System internal error.
-   * @throws {BusinessError} 8300999 - Unknown error code.
+   * @param { AsyncCallback<void> } callback - The callback of muteRinger.
+   * @throws { BusinessError } 201 - Permission denied.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @throws { BusinessError } 8300999 - Unknown error code.
+   * @syscap SystemCapability.Telephony.CallManager
    * @systemapi Hide this for inner system use.
    * @since 8
    */
   function muteRinger(callback: AsyncCallback<void>): void;
+
+  /**
+   * Stops the ringtone.
+   *
+   * <p>If an incoming call is ringing, the phone stops ringing. Otherwise, this method does not function.
+   *
+   * @permission ohos.permission.SET_TELEPHONY_STATE
+   * @returns { Promise<void> } The promise returned by the muteRinger.
+   * @throws { BusinessError } 201 - Permission denied.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @throws { BusinessError } 8300999 - Unknown error code.
+   * @syscap SystemCapability.Telephony.CallManager
+   * @systemapi Hide this for inner system use.
+   * @since 8
+   */
   function muteRinger(): Promise<void>;
 
   /**
@@ -162,7 +258,8 @@ declare namespace call {
    * subsystem domain (IMS) call on a telephone service network. If the device supports only packet switching
    * (even if the device supports OTT calls), {@code false} is returned.
    *
-   * @returns Returns {@code true} if the device supports voice calls; returns {@code false} otherwise.
+   * @returns { boolean } Returns {@code true} if the device supports voice calls; returns {@code false} otherwise.
+   * @syscap SystemCapability.Telephony.CallManager
    * @since 7
    */
   function hasVoiceCapability(): boolean;
@@ -170,18 +267,51 @@ declare namespace call {
   /**
    * Checks whether a phone number is on the emergency number list.
    *
-   * @param phoneNumber Indicates the phone number to check.
-   * @param callback Returns {@code true} if the phone number is on the emergency number list;
-   * returns {@code false} otherwise.
-   * @throws {BusinessError} 401 - Parameter error.
-   * @throws {BusinessError} 8300001 - Invalid parameter value.
-   * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
-   * @throws {BusinessError} 8300003 - System internal error.
-   * @throws {BusinessError} 8300999 - Unknown error code.
+   * @param { string } phoneNumber - Indicates the phone number to check.
+   * @param { AsyncCallback<boolean> } callback - Indicates the callback for isEmergencyPhoneNumber.
+   * Returns {@code true} if the phone number is on the emergency number list. Returns {@code false} otherwise.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @throws { BusinessError } 8300999 - Unknown error code.
+   * @syscap SystemCapability.Telephony.CallManager
    * @since 7
    */
   function isEmergencyPhoneNumber(phoneNumber: string, callback: AsyncCallback<boolean>): void;
+
+  /**
+   * Checks whether a phone number is on the emergency number list.
+   *
+   * @param { string } phoneNumber - Indicates the phone number to check.
+   * @param { EmergencyNumberOptions } options - Indicates the additional information for emergency numbers.
+   * @param { AsyncCallback<boolean> } callback - Indicates the callback for isEmergencyPhoneNumber.
+   * Returns {@code true} if the phone number is on the emergency number list. Returns {@code false} otherwise.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @throws { BusinessError } 8300999 - Unknown error code.
+   * @syscap SystemCapability.Telephony.CallManager
+   * @since 7
+   */
   function isEmergencyPhoneNumber(phoneNumber: string, options: EmergencyNumberOptions, callback: AsyncCallback<boolean>): void;
+
+  /**
+   * Checks whether a phone number is on the emergency number list.
+   *
+   * @param { string } phoneNumber - Indicates the phone number to check.
+   * @param { EmergencyNumberOptions } options - Indicates the additional information for emergency numbers.
+   * @returns { Promise<boolean> } Returns {@code true} if the phone number is on the emergency number list.
+   * Returns {@code false} otherwise.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @throws { BusinessError } 8300999 - Unknown error code.
+   * @syscap SystemCapability.Telephony.CallManager
+   * @since 7
+   */
   function isEmergencyPhoneNumber(phoneNumber: string, options?: EmergencyNumberOptions): Promise<boolean>;
 
   /**
@@ -190,65 +320,145 @@ declare namespace call {
    * + 4-digit area code + 4-digit subscriber number. After the formatting,
    * each part is separated by a space.
    *
-   * @param phoneNumber Indicates the phone number to format.
-   * @param options countryCode option
-   * @param callback Returns the phone number after being formatted; returns an empty string if the input phone number is invalid.
-   * @throws {BusinessError} 401 - Parameter error.
-   * @throws {BusinessError} 8300001 - Invalid parameter value.
-   * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
-   * @throws {BusinessError} 8300003 - System internal error.
-   * @throws {BusinessError} 8300999 - Unknown error code.
+   * @param { string } phoneNumber - Indicates the phone number to format.
+   * @param { AsyncCallback<string> } callback - Indicates the callback to obtain a formatted phone number.
+   * Returns an empty string if the input phone number is invalid.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @throws { BusinessError } 8300999 - Unknown error code.
+   * @syscap SystemCapability.Telephony.CallManager
    * @since 7
    */
   function formatPhoneNumber(phoneNumber: string, callback: AsyncCallback<string>): void;
+
+  /**
+   * Formats a phone number according to the Chinese Telephone Code Plan. Before the formatting,
+   * a phone number is in the format of country code (if any) + 3-digit service provider code
+   * + 4-digit area code + 4-digit subscriber number. After the formatting,
+   * each part is separated by a space.
+   *
+   * @param { string } phoneNumber - Indicates the phone number to format.
+   * @param { NumberFormatOptions } options - Indicates the country code option.
+   * @param { AsyncCallback<string> } callback - Indicates the callback to obtain a formatted phone number.
+   * Returns an empty string if the input phone number is invalid.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @throws { BusinessError } 8300999 - Unknown error code.
+   * @syscap SystemCapability.Telephony.CallManager
+   * @since 7
+   */
   function formatPhoneNumber(phoneNumber: string, options: NumberFormatOptions, callback: AsyncCallback<string>): void;
+
+  /**
+   * Formats a phone number according to the Chinese Telephone Code Plan. Before the formatting,
+   * a phone number is in the format of country code (if any) + 3-digit service provider code
+   * + 4-digit area code + 4-digit subscriber number. After the formatting,
+   * each part is separated by a space.
+   *
+   * @param { string } phoneNumber - Indicates the phone number to format.
+   * @param { NumberFormatOptions } options - Indicates the country code option.
+   * @returns { Promise<string> } Returns the phone number after being formatted.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @throws { BusinessError } 8300999 - Unknown error code.
+   * @syscap SystemCapability.Telephony.CallManager
+   * @since 7
+   */
   function formatPhoneNumber(phoneNumber: string, options?: NumberFormatOptions): Promise<string>;
 
   /**
    * Formats a phone number into an E.164 representation.
    *
-   * @param phoneNumber Indicates the phone number to format.
-   * @param countryCode Indicates a two-digit country code defined in ISO 3166-1.
-   * @param callback Returns an E.164 number; returns an empty string if the input phone number is invalid.
-   * @throws {BusinessError} 401 - Parameter error.
-   * @throws {BusinessError} 8300001 - Invalid parameter value.
-   * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
-   * @throws {BusinessError} 8300003 - System internal error.
-   * @throws {BusinessError} 8300999 - Unknown error code.
+   * @param { string } phoneNumber - Indicates the phone number to format.
+   * @param { string } countryCode - Indicates a two-digit country code defined in ISO 3166-1.
+   * @param { AsyncCallback<string> } callback - Returns an E.164 number.
+   * Returns an empty string if the input phone number is invalid.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @throws { BusinessError } 8300999 - Unknown error code.
+   * @syscap SystemCapability.Telephony.CallManager
    * @since 7
    */
   function formatPhoneNumberToE164(phoneNumber: string, countryCode: string, callback: AsyncCallback<string>): void;
+
+  /**
+   * Formats a phone number into an E.164 representation.
+   *
+   * @param { string } phoneNumber - Indicates the phone number to format.
+   * @param { string } countryCode - Indicates a two-digit country code defined in ISO 3166-1.
+   * @returns { Promise<string> } Returns an E.164 number.
+   * Returns an empty string if the input phone number is invalid.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @throws { BusinessError } 8300999 - Unknown error code.
+   * @syscap SystemCapability.Telephony.CallManager
+   * @since 7
+   */
   function formatPhoneNumberToE164(phoneNumber: string, countryCode: string): Promise<string>;
 
   /**
    * Answers the incoming call.
    *
-   * @param callId Indicates the identifier of the call to answer.
    * @permission ohos.permission.ANSWER_CALL
-   * @throws {BusinessError} 201 - Permission denied.
-   * @throws {BusinessError} 401 - Parameter error.
-   * @throws {BusinessError} 8300001 - Invalid parameter value.
-   * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
-   * @throws {BusinessError} 8300003 - System internal error.
-   * @throws {BusinessError} 8300999 - Unknown error code.
+   * @param { number } callId - Indicates the identifier of the call to answer.
+   * @param { AsyncCallback<void> } callback - The callback of answerCall.
+   * @throws { BusinessError } 201 - Permission denied.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @throws { BusinessError } 8300999 - Unknown error code.
+   * @syscap SystemCapability.Telephony.CallManager
    * @systemapi Hide this for inner system use.
-   * @since 7
+   * @since 9
    */
   function answer(callId: number, callback: AsyncCallback<void>): void;
-  function answer(callId?: number): Promise<void>;
   function answerCall(callId: number, callback: AsyncCallback<void>): void;
+
+  /**
+   * Answers the incoming call.
+   *
+   * @permission ohos.permission.ANSWER_CALL
+   * @param { number } callId - Indicates the identifier of the call to answer.
+   * @returns { Promise<void> } The promise returned by the answerCall.
+   * @throws { BusinessError } 201 - Permission denied.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @throws { BusinessError } 8300999 - Unknown error code.
+   * @syscap SystemCapability.Telephony.CallManager
+   * @systemapi Hide this for inner system use.
+   * @since 9
+   */
+  function answer(callId?: number): Promise<void>;
   function answerCall(callId?: number): Promise<void>;
 
   /**
    * Answers the incoming call without callId.
    *
    * @permission ohos.permission.ANSWER_CALL
-   * @throws {BusinessError} 201 - Permission denied.
-   * @throws {BusinessError} 401 - Parameter error.
-   * @throws {BusinessError} 8300001 - Invalid parameter value.
-   * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
-   * @throws {BusinessError} 8300003 - System internal error.
-   * @throws {BusinessError} 8300999 - Unknown error code.
+   * @param { AsyncCallback<void> } callback - The callback of answerCall.
+   * @throws { BusinessError } 201 - Permission denied.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @throws { BusinessError } 8300999 - Unknown error code.
+   * @syscap SystemCapability.Telephony.CallManager
    * @systemapi Hide this for inner system use.
    * @since 9
    */
@@ -258,32 +468,56 @@ declare namespace call {
   /**
    * Hang up the foreground call.
    *
-   * @param callId Indicates the identifier of the call to hangup.
    * @permission ohos.permission.ANSWER_CALL
-   * @throws {BusinessError} 201 - Permission denied.
-   * @throws {BusinessError} 401 - Parameter error.
-   * @throws {BusinessError} 8300001 - Invalid parameter value.
-   * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
-   * @throws {BusinessError} 8300003 - System internal error.
-   * @throws {BusinessError} 8300999 - Unknown error code.
+   * @param { number } callId - Indicates the identifier of the call to hangup.
+   * @param { AsyncCallback<void> } callback - The callback of hangUpCall.
+   * @throws { BusinessError } 201 - Permission denied.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @throws { BusinessError } 8300999 - Unknown error code.
+   * @syscap SystemCapability.Telephony.CallManager
    * @systemapi Hide this for inner system use.
-   * @since 7
+   * @since 9
    */
   function hangup(callId: number, callback: AsyncCallback<void>): void;
-  function hangup(callId?: number): Promise<void>;
   function hangUpCall(callId: number, callback: AsyncCallback<void>): void;
+
+  /**
+   * Hang up the foreground call.
+   *
+   * @permission ohos.permission.ANSWER_CALL
+   * @param { number } callId - Indicates the identifier of the call to hangup.
+   * @returns { Promise<void> } The promise returned by the hangUpCall.
+   * @throws { BusinessError } 201 - Permission denied.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @throws { BusinessError } 8300999 - Unknown error code.
+   * @syscap SystemCapability.Telephony.CallManager
+   * @systemapi Hide this for inner system use.
+   * @since 9
+   */
+  function hangup(callId?: number): Promise<void>;
   function hangUpCall(callId?: number): Promise<void>;
 
   /**
    * Hang up the foreground call without callId.
    *
    * @permission ohos.permission.ANSWER_CALL
-   * @throws {BusinessError} 201 - Permission denied.
-   * @throws {BusinessError} 401 - Parameter error.
-   * @throws {BusinessError} 8300001 - Invalid parameter value.
-   * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
-   * @throws {BusinessError} 8300003 - System internal error.
-   * @throws {BusinessError} 8300999 - Unknown error code.
+   * @param { AsyncCallback<void> } callback - The callback of hangUpCall.
+   * @throws { BusinessError } 201 - Permission denied.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @throws { BusinessError } 8300999 - Unknown error code.
+   * @syscap SystemCapability.Telephony.CallManager
    * @systemapi Hide this for inner system use.
    * @since 9
    */
@@ -293,254 +527,556 @@ declare namespace call {
   /**
    * Reject the incoming call.
    *
-   * @param callId Indicates the identifier of the call to reject.
-   * @param options Indicates the text message to reject.
    * @permission ohos.permission.ANSWER_CALL
-   * @throws {BusinessError} 201 - Permission denied.
-   * @throws {BusinessError} 401 - Parameter error.
-   * @throws {BusinessError} 8300001 - Invalid parameter value.
-   * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
-   * @throws {BusinessError} 8300003 - System internal error.
-   * @throws {BusinessError} 8300999 - Unknown error code.
+   * @param { number } callId - Indicates the identifier of the call to reject.
+   * @param { AsyncCallback<void> } callback - The callback of rejectCall.
+   * @throws { BusinessError } 201 - Permission denied.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @throws { BusinessError } 8300999 - Unknown error code.
+   * @syscap SystemCapability.Telephony.CallManager
    * @systemapi Hide this for inner system use.
-   * @since 7
+   * @since 9
    */
   function reject(callId: number, callback: AsyncCallback<void>): void;
-  function reject(callId: number, options: RejectMessageOptions, callback: AsyncCallback<void>): void;
-  function reject(callId?: number, options?: RejectMessageOptions): Promise<void>;
   function rejectCall(callId: number, callback: AsyncCallback<void>): void;
+
+  /**
+   * Reject the incoming call.
+   *
+   * @permission ohos.permission.ANSWER_CALL
+   * @param { number } callId - Indicates the identifier of the call to reject.
+   * @param { RejectMessageOptions } options - Indicates the text message to reject.
+   * @param { AsyncCallback<void> } callback - The callback of rejectCall.
+   * @throws { BusinessError } 201 - Permission denied.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @throws { BusinessError } 8300999 - Unknown error code.
+   * @syscap SystemCapability.Telephony.CallManager
+   * @systemapi Hide this for inner system use.
+   * @since 9
+   */
+  function reject(callId: number, options: RejectMessageOptions, callback: AsyncCallback<void>): void;
   function rejectCall(callId: number, options: RejectMessageOptions, callback: AsyncCallback<void>): void;
+
+  /**
+   * Reject the incoming call.
+   *
+   * @permission ohos.permission.ANSWER_CALL
+   * @param { number } callId - Indicates the identifier of the call to reject.
+   * @param { RejectMessageOptions } options - Indicates the text message to reject.
+   * @returns { Promise<void> } The promise returned by the rejectCall.
+   * @throws { BusinessError } 201 - Permission denied.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @throws { BusinessError } 8300999 - Unknown error code.
+   * @syscap SystemCapability.Telephony.CallManager
+   * @systemapi Hide this for inner system use.
+   * @since 9
+   */
+  function reject(callId?: number, options?: RejectMessageOptions): Promise<void>;
   function rejectCall(callId?: number, options?: RejectMessageOptions): Promise<void>;
 
   /**
    * Reject the incoming call without callId.
    *
-   * @param options Indicates the text message to reject.
    * @permission ohos.permission.ANSWER_CALL
-   * @throws {BusinessError} 201 - Permission denied.
-   * @throws {BusinessError} 401 - Parameter error.
-   * @throws {BusinessError} 8300001 - Invalid parameter value.
-   * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
-   * @throws {BusinessError} 8300003 - System internal error.
-   * @throws {BusinessError} 8300999 - Unknown error code.
+   * @param { AsyncCallback<void> } callback - The callback of rejectCall.
+   * @throws { BusinessError } 201 - Permission denied.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @throws { BusinessError } 8300999 - Unknown error code.
+   * @syscap SystemCapability.Telephony.CallManager
    * @systemapi Hide this for inner system use.
    * @since 9
    */
   function reject(callback: AsyncCallback<void>): void;
-  function reject(options: RejectMessageOptions, callback: AsyncCallback<void>): void;
   function rejectCall(callback: AsyncCallback<void>): void;
+
+  /**
+   * Reject the incoming call without callId.
+   *
+   * @permission ohos.permission.ANSWER_CALL
+   * @param { RejectMessageOptions } options - Indicates the text message to reject.
+   * @param { AsyncCallback<void> } callback - The callback of rejectCall.
+   * @throws { BusinessError } 201 - Permission denied.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @throws { BusinessError } 8300999 - Unknown error code.
+   * @syscap SystemCapability.Telephony.CallManager
+   * @systemapi Hide this for inner system use.
+   * @since 9
+   */
+  function reject(options: RejectMessageOptions, callback: AsyncCallback<void>): void;
   function rejectCall(options: RejectMessageOptions, callback: AsyncCallback<void>): void;
 
   /**
    * Keep a call on hold.
    *
    * @permission ohos.permission.ANSWER_CALL
-   * @param callId Indicates the identifier of the call.
-   * @throws {BusinessError} 201 - Permission denied.
-   * @throws {BusinessError} 401 - Parameter error.
-   * @throws {BusinessError} 8300001 - Invalid parameter value.
-   * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
-   * @throws {BusinessError} 8300003 - System internal error.
-   * @throws {BusinessError} 8300999 - Unknown error code.
+   * @param { number } callId - Indicates the identifier of the call.
+   * @param { AsyncCallback<void> } callback - The callback of holdCall.
+   * @throws { BusinessError } 201 - Permission denied.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @throws { BusinessError } 8300999 - Unknown error code.
+   * @syscap SystemCapability.Telephony.CallManager
    * @systemapi Hide this for inner system use.
    * @since 7
    */
   function holdCall(callId: number, callback: AsyncCallback<void>): void;
+
+  /**
+   * Keep a call on hold.
+   *
+   * @permission ohos.permission.ANSWER_CALL
+   * @param { number } callId - Indicates the identifier of the call.
+   * @returns { Promise<void> } The promise returned by the holdCall.
+   * @throws { BusinessError } 201 - Permission denied.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @throws { BusinessError } 8300999 - Unknown error code.
+   * @syscap SystemCapability.Telephony.CallManager
+   * @systemapi Hide this for inner system use.
+   * @since 7
+   */
   function holdCall(callId: number): Promise<void>;
 
   /**
    * Cancel call hold status.
    *
    * @permission ohos.permission.ANSWER_CALL
-   * @param callId Indicates the identifier of the call.
-   * @throws {BusinessError} 201 - Permission denied.
-   * @throws {BusinessError} 401 - Parameter error.
-   * @throws {BusinessError} 8300001 - Invalid parameter value.
-   * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
-   * @throws {BusinessError} 8300003 - System internal error.
-   * @throws {BusinessError} 8300999 - Unknown error code.
+   * @param { number } callId - Indicates the identifier of the call.
+   * @param { AsyncCallback<void> } callback - The callback of unHoldCall.
+   * @throws { BusinessError } 201 - Permission denied.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @throws { BusinessError } 8300999 - Unknown error code.
+   * @syscap SystemCapability.Telephony.CallManager
    * @systemapi Hide this for inner system use.
    * @since 7
    */
   function unHoldCall(callId: number, callback: AsyncCallback<void>): void;
+
+  /**
+   * Keep a call on hold.
+   *
+   * @permission ohos.permission.ANSWER_CALL
+   * @param { number } callId - Indicates the identifier of the call.
+   * @returns { Promise<void> } The promise returned by the unHoldCall.
+   * @throws { BusinessError } 201 - Permission denied.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @throws { BusinessError } 8300999 - Unknown error code.
+   * @syscap SystemCapability.Telephony.CallManager
+   * @systemapi Hide this for inner system use.
+   * @since 7
+   */
   function unHoldCall(callId: number): Promise<void>;
 
   /**
    * Switch call.
    *
    * @permission ohos.permission.ANSWER_CALL
-   * @param callId Indicates the identifier of the call.
-   * @throws {BusinessError} 201 - Permission denied.
-   * @throws {BusinessError} 401 - Parameter error.
-   * @throws {BusinessError} 8300001 - Invalid parameter value.
-   * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
-   * @throws {BusinessError} 8300003 - System internal error.
-   * @throws {BusinessError} 8300999 - Unknown error code.
+   * @param { number } callId - Indicates the identifier of the call.
+   * @param { AsyncCallback<void> } callback - The callback of switchCall.
+   * @throws { BusinessError } 201 - Permission denied.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @throws { BusinessError } 8300999 - Unknown error code.
+   * @syscap SystemCapability.Telephony.CallManager
    * @systemapi Hide this for inner system use.
    * @since 7
    */
   function switchCall(callId: number, callback: AsyncCallback<void>): void;
+
+  /**
+   * Switch call.
+   *
+   * @permission ohos.permission.ANSWER_CALL
+   * @param { number } callId - Indicates the identifier of the call.
+   * @returns { Promise<void> } The promise returned by the switchCall.
+   * @throws { BusinessError } 201 - Permission denied.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @throws { BusinessError } 8300999 - Unknown error code.
+   * @syscap SystemCapability.Telephony.CallManager
+   * @systemapi Hide this for inner system use.
+   * @since 7
+   */
   function switchCall(callId: number): Promise<void>;
 
   /**
    * Merge calls, merge two calls into conference calls.
    *
-   * @param callId Indicates the identifier of the call.
-   * @throws {BusinessError} 401 - Parameter error.
-   * @throws {BusinessError} 801 - Capability not supported.
-   * @throws {BusinessError} 8300001 - Invalid parameter value.
-   * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
-   * @throws {BusinessError} 8300003 - System internal error.
+   * @param { number } callId - Indicates the identifier of the call.
+   * @param { AsyncCallback<void> } callback - The callback of combineConference.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 801 - Capability not supported.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @syscap SystemCapability.Telephony.CallManager
    * @systemapi Hide this for inner system use.
    * @since 7
    */
   function combineConference(callId: number, callback: AsyncCallback<void>): void;
+
+  /**
+   * Merge calls, merge two calls into conference calls.
+   *
+   * @param { number } callId - Indicates the identifier of the call.
+   * @returns { Promise<void> } The promise returned by the combineConference.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 801 - Capability not supported.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @syscap SystemCapability.Telephony.CallManager
+   * @systemapi Hide this for inner system use.
+   * @since 7
+   */
   function combineConference(callId: number): Promise<void>;
 
   /**
    * Get the main call Id.
    *
-   * @param callId Indicates the identifier of the call.
-   * @returns Returns the main call id.
-   * @throws {BusinessError} 401 - Parameter error.
-   * @throws {BusinessError} 801 - Capability not supported.
-   * @throws {BusinessError} 8300001 - Invalid parameter value.
-   * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
-   * @throws {BusinessError} 8300003 - System internal error.
+   * @param { number } callId - Indicates the identifier of the call.
+   * @param { AsyncCallback<number> } callback - Indicates the callback for getting the main call id.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 801 - Capability not supported.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @syscap SystemCapability.Telephony.CallManager
    * @systemapi Hide this for inner system use.
    * @since 7
    */
   function getMainCallId(callId: number, callback: AsyncCallback<number>): void;
+
+  /**
+   * Get the main call Id.
+   *
+   * @param { number } callId - Indicates the identifier of the call.
+   * @returns { Promise<number> } Returns the main call id.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 801 - Capability not supported.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @syscap SystemCapability.Telephony.CallManager
+   * @systemapi Hide this for inner system use.
+   * @since 7
+   */
   function getMainCallId(callId: number): Promise<number>;
 
   /**
    * Get the list of sub-call Ids.
    *
-   * @param callId Indicates the identifier of the call.
-   * @returns Returns the list of sub call ids.
-   * @throws {BusinessError} 401 - Parameter error.
-   * @throws {BusinessError} 801 - Capability not supported.
-   * @throws {BusinessError} 8300001 - Invalid parameter value.
-   * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
-   * @throws {BusinessError} 8300003 - System internal error.
+   * @param { number } callId - Indicates the identifier of the call.
+   * @param { AsyncCallback<Array<string>> } callback - Indicates the callback for getting the list of sub call ids.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 801 - Capability not supported.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @syscap SystemCapability.Telephony.CallManager
    * @systemapi Hide this for inner system use.
    * @since 7
    */
   function getSubCallIdList(callId: number, callback: AsyncCallback<Array<string>>): void;
+
+  /**
+   * Get the list of sub-call Ids.
+   *
+   * @param { number } callId - Indicates the identifier of the call.
+   * @returns { Promise<Array<string>> } Returns the list of sub call ids.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 801 - Capability not supported.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @syscap SystemCapability.Telephony.CallManager
+   * @systemapi Hide this for inner system use.
+   * @since 7
+   */
   function getSubCallIdList(callId: number): Promise<Array<string>>;
 
   /**
    * Get the call Id list of the conference.
    *
-   * @param callId Indicates the identifier of the call.
-   * @param callback Returns the call id list of conference calls.
-   * @throws {BusinessError} 401 - Parameter error.
-   * @throws {BusinessError} 801 - Capability not supported.
-   * @throws {BusinessError} 8300001 - Invalid parameter value.
-   * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
-   * @throws {BusinessError} 8300003 - System internal error.
+   * @param { number } callId - Indicates the identifier of the call.
+   * @param { AsyncCallback<Array<string>> } callback - Indicates the callback for getting
+   * the call id list of conference calls.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 801 - Capability not supported.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @syscap SystemCapability.Telephony.CallManager
    * @systemapi Hide this for inner system use.
    * @since 7
    */
   function getCallIdListForConference(callId: number, callback: AsyncCallback<Array<string>>): void;
+
+  /**
+   * Get the call Id list of the conference.
+   *
+   * @param { number } callId - Indicates the identifier of the call.
+   * @returns { Promise<Array<string>> } Returns the call id list of conference calls.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 801 - Capability not supported.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @syscap SystemCapability.Telephony.CallManager
+   * @systemapi Hide this for inner system use.
+   * @since 7
+   */
   function getCallIdListForConference(callId: number): Promise<Array<string>>;
 
   /**
    * Get call waiting status.
    *
    * @permission ohos.permission.GET_TELEPHONY_STATE
-   * @param slotId Indicates the card slot index number,
+   * @param { number } slotId - Indicates the card slot index number,
    * ranging from 0 to the maximum card slot index number supported by the device.
-   * @param callback Returns call waiting status.
-   * @throws {BusinessError} 201 - Permission denied.
-   * @throws {BusinessError} 401 - Parameter error.
-   * @throws {BusinessError} 801 - Capability not supported.
-   * @throws {BusinessError} 8300001 - Invalid parameter value.
-   * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
-   * @throws {BusinessError} 8300003 - System internal error.
+   * @param { AsyncCallback<CallWaitingStatus> } callback - Indicates the callback for getting the call waiting status.
+   * @throws { BusinessError } 201 - Permission denied.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 801 - Capability not supported.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @syscap SystemCapability.Telephony.CallManager
    * @systemapi Hide this for inner system use.
    * @since 7
    */
   function getCallWaitingStatus(slotId: number, callback: AsyncCallback<CallWaitingStatus>): void;
+
+  /**
+   * Get call waiting status.
+   *
+   * @permission ohos.permission.GET_TELEPHONY_STATE
+   * @param { number } slotId - Indicates the card slot index number,
+   * ranging from 0 to the maximum card slot index number supported by the device.
+   * @returns { Promise<CallWaitingStatus> } Returns the callback for getting the call waiting status.
+   * @throws { BusinessError } 201 - Permission denied.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 801 - Capability not supported.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @syscap SystemCapability.Telephony.CallManager
+   * @systemapi Hide this for inner system use.
+   * @since 7
+   */
   function getCallWaitingStatus(slotId: number): Promise<CallWaitingStatus>;
 
   /**
    * Set call waiting.
    *
    * @permission ohos.permission.SET_TELEPHONY_STATE
-   * @param slotId Indicates the card slot index number,
+   * @param { number } slotId - Indicates the card slot index number,
    * ranging from 0 to the maximum card slot index number supported by the device.
-   * @param activate Indicates whether to activate or call wait.
-   * @throws {BusinessError} 201 - Permission denied.
-   * @throws {BusinessError} 401 - Parameter error.
-   * @throws {BusinessError} 801 - Capability not supported.
-   * @throws {BusinessError} 8300001 - Invalid parameter value.
-   * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
-   * @throws {BusinessError} 8300003 - System internal error.
+   * @param { boolean } activate - Indicates whether to activate or call wait.
+   * @param { AsyncCallback<void> } callback - The callback of setCallWaiting.
+   * @throws { BusinessError } 201 - Permission denied.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 801 - Capability not supported.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @syscap SystemCapability.Telephony.CallManager
    * @systemapi Hide this for inner system use.
    * @since 7
    */
   function setCallWaiting(slotId: number, activate: boolean, callback: AsyncCallback<void>): void;
+
+  /**
+   * Set call waiting.
+   *
+   * @permission ohos.permission.SET_TELEPHONY_STATE
+   * @param { number } slotId - Indicates the card slot index number,
+   * ranging from 0 to the maximum card slot index number supported by the device.
+   * @param { boolean } activate - Indicates whether to activate or call wait.
+   * @returns { Promise<void> } The promise returned by the setCallWaiting.
+   * @throws { BusinessError } 201 - Permission denied.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 801 - Capability not supported.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @syscap SystemCapability.Telephony.CallManager
+   * @systemapi Hide this for inner system use.
+   * @since 7
+   */
   function setCallWaiting(slotId: number, activate: boolean): Promise<void>;
 
   /**
    * Start DTMF(Dual Tone Multi Frequency).
    *
-   * @param callId Indicates the identifier of the call.
-   * @throws {BusinessError} 401 - Parameter error.
-   * @throws {BusinessError} 801 - Capability not supported.
-   * @throws {BusinessError} 8300001 - Invalid parameter value.
-   * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
-   * @throws {BusinessError} 8300003 - System internal error.
+   * @param { number } callId - Indicates the identifier of the call.
+   * @param { string } character - Indicates the characters sent.
+   * @param { AsyncCallback<void> } callback - The callback of startDTMF.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 801 - Capability not supported.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @syscap SystemCapability.Telephony.CallManager
    * @systemapi Hide this for inner system use.
    * @since 7
    */
   function startDTMF(callId: number, character: string, callback: AsyncCallback<void>): void;
+
+  /**
+   * Start DTMF(Dual Tone Multi Frequency).
+   *
+   * @param { number } callId - Indicates the identifier of the call.
+   * @param { string } character - Indicates the characters sent.
+   * @returns { Promise<void> } The promise returned by the startDTMF.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 801 - Capability not supported.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @syscap SystemCapability.Telephony.CallManager
+   * @systemapi Hide this for inner system use.
+   * @since 7
+   */
   function startDTMF(callId: number, character: string): Promise<void>;
 
   /**
    * Stop DTMF(Dual Tone Multi Frequency).
    *
-   * @param callId Indicates the identifier of the call.
-   * @throws {BusinessError} 401 - Parameter error.
-   * @throws {BusinessError} 801 - Capability not supported.
-   * @throws {BusinessError} 8300001 - Invalid parameter value.
-   * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
-   * @throws {BusinessError} 8300003 - System internal error.
+   * @param { number } callId - Indicates the identifier of the call.
+   * @param { AsyncCallback<void> } callback - The callback of stopDTMF.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 801 - Capability not supported.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @syscap SystemCapability.Telephony.CallManager
    * @systemapi Hide this for inner system use.
    * @since 7
    */
   function stopDTMF(callId: number, callback: AsyncCallback<void>): void;
+
+  /**
+   * Stop DTMF(Dual Tone Multi Frequency).
+   *
+   * @param { number } callId - Indicates the identifier of the call.
+   * @returns { Promise<void> } The promise returned by the stopDTMF.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 801 - Capability not supported.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @syscap SystemCapability.Telephony.CallManager
+   * @systemapi Hide this for inner system use.
+   * @since 7
+   */
   function stopDTMF(callId: number): Promise<void>;
 
   /**
    * Judge whether the emergency call is in progress.
    *
    * @permission ohos.permission.SET_TELEPHONY_STATE
-   * @param callback Returns {@code true} if the call is in emergency; returns {@code false} otherwise.
-   * @throws {BusinessError} 201 - Permission denied.
-   * @throws {BusinessError} 401 - Parameter error.
-   * @throws {BusinessError} 8300001 - Invalid parameter value.
-   * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
-   * @throws {BusinessError} 8300003 - System internal error.
-   * @throws {BusinessError} 8300999 - Unknown error code.
+   * @param { AsyncCallback<boolean> } callback - The callback of isInEmergencyCall.
+   * Returns {@code true} if the call is in emergency; returns {@code false} otherwise.
+   * @throws { BusinessError } 201 - Permission denied.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @throws { BusinessError } 8300999 - Unknown error code.
+   * @syscap SystemCapability.Telephony.CallManager
    * @systemapi Hide this for inner system use.
    * @since 7
    */
   function isInEmergencyCall(callback: AsyncCallback<boolean>): void;
+
+  /**
+   * Judge whether the emergency call is in progress.
+   *
+   * @permission ohos.permission.SET_TELEPHONY_STATE
+   * @returns { Promise<boolean> } Returns {@code true} if the call is in emergency; returns {@code false} otherwise.
+   * @throws { BusinessError } 201 - Permission denied.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @throws { BusinessError } 8300999 - Unknown error code.
+   * @syscap SystemCapability.Telephony.CallManager
+   * @systemapi Hide this for inner system use.
+   * @since 7
+   */
   function isInEmergencyCall(): Promise<boolean>;
 
   /**
    * Subscribe to the callDetailsChange event.
    *
    * @permission ohos.permission.SET_TELEPHONY_STATE
-   * @param callback Return the result of call details.
-   * @throws {BusinessError} 201 - Permission denied.
-   * @throws {BusinessError} 401 - Parameter error.
-   * @throws {BusinessError} 8300001 - Invalid parameter value.
-   * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
-   * @throws {BusinessError} 8300003 - System internal error.
-   * @throws {BusinessError} 8300999 - Unknown error code.
+   * @param { string } type - callDetailsChange.
+   * @param { Callback<CallAttributeOptions> } callback - Indicates the callback for getting the result of call details.
+   * @throws { BusinessError } 201 - Permission denied.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @throws { BusinessError } 8300999 - Unknown error code.
+   * @syscap SystemCapability.Telephony.CallManager
    * @systemapi Hide this for inner system use.
    * @since 7
    */
@@ -550,13 +1086,17 @@ declare namespace call {
    * Unsubscribe from the callDetailsChange event.
    *
    * @permission ohos.permission.SET_TELEPHONY_STATE
-   * @param callback Cancel call details registration.
-   * @throws {BusinessError} 201 - Permission denied.
-   * @throws {BusinessError} 401 - Parameter error.
-   * @throws {BusinessError} 8300001 - Invalid parameter value.
-   * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
-   * @throws {BusinessError} 8300003 - System internal error.
-   * @throws {BusinessError} 8300999 - Unknown error code.
+   * @param { string } type - callDetailsChange.
+   * @param { Callback<CallAttributeOptions> } callback - Indicates the callback to unsubscribe from
+   * the callDetailsChange event.
+   * @throws { BusinessError } 201 - Permission denied.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @throws { BusinessError } 8300999 - Unknown error code.
+   * @syscap SystemCapability.Telephony.CallManager
    * @systemapi Hide this for inner system use.
    * @since 7
    */
@@ -566,13 +1106,16 @@ declare namespace call {
    * Subscribe to the callEventChange event.
    *
    * @permission ohos.permission.SET_TELEPHONY_STATE
-   * @param callback Return the call event id.
-   * @throws {BusinessError} 201 - Permission denied.
-   * @throws {BusinessError} 401 - Parameter error.
-   * @throws {BusinessError} 8300001 - Invalid parameter value.
-   * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
-   * @throws {BusinessError} 8300003 - System internal error.
-   * @throws {BusinessError} 8300999 - Unknown error code.
+   * @param { string } type - callEventChange.
+   * @param { Callback<CallEventOptions> } callback - Indicates the callback for getting the call event id.
+   * @throws { BusinessError } 201 - Permission denied.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @throws { BusinessError } 8300999 - Unknown error code.
+   * @syscap SystemCapability.Telephony.CallManager
    * @systemapi Hide this for inner system use.
    * @since 8
    */
@@ -582,13 +1125,16 @@ declare namespace call {
    * Unsubscribe from the callEventChange event.
    *
    * @permission ohos.permission.SET_TELEPHONY_STATE
-   * @param callback Cancel call event registration.
-   * @throws {BusinessError} 201 - Permission denied.
-   * @throws {BusinessError} 401 - Parameter error.
-   * @throws {BusinessError} 8300001 - Invalid parameter value.
-   * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
-   * @throws {BusinessError} 8300003 - System internal error.
-   * @throws {BusinessError} 8300999 - Unknown error code.
+   * @param { string } type - callEventChange.
+   * @param { Callback<CallEventOptions> } callback - Indicates the callback to unsubscribe from the callEventChange event.
+   * @throws { BusinessError } 201 - Permission denied.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @throws { BusinessError } 8300999 - Unknown error code.
+   * @syscap SystemCapability.Telephony.CallManager
    * @systemapi Hide this for inner system use.
    * @since 8
    */
@@ -598,13 +1144,16 @@ declare namespace call {
    * Subscribe to the callDisconnectedCause event.
    *
    * @permission ohos.permission.SET_TELEPHONY_STATE
-   * @param callback Return the call disconnection reason.
-   * @throws {BusinessError} 201 - Permission denied.
-   * @throws {BusinessError} 401 - Parameter error.
-   * @throws {BusinessError} 8300001 - Invalid parameter value.
-   * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
-   * @throws {BusinessError} 8300003 - System internal error.
-   * @throws {BusinessError} 8300999 - Unknown error code.
+   * @param { string } type - callDisconnectedCause.
+   * @param { Callback<MmiCodeResults> } callback - Indicates the callback for getting the call disconnection reason.
+   * @throws { BusinessError } 201 - Permission denied.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @throws { BusinessError } 8300999 - Unknown error code.
+   * @syscap SystemCapability.Telephony.CallManager
    * @systemapi Hide this for inner system use.
    * @since 8
    */
@@ -614,13 +1163,17 @@ declare namespace call {
    * Unsubscribe from the callDisconnectedCause event.
    *
    * @permission ohos.permission.SET_TELEPHONY_STATE
-   * @param callback Cancel the call disconnection reason registration.
-   * @throws {BusinessError} 201 - Permission denied.
-   * @throws {BusinessError} 401 - Parameter error.
-   * @throws {BusinessError} 8300001 - Invalid parameter value.
-   * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
-   * @throws {BusinessError} 8300003 - System internal error.
-   * @throws {BusinessError} 8300999 - Unknown error code.
+   * @param { string } type - callDisconnectedCause.
+   * @param { Callback<MmiCodeResults> } callback - Indicates the callback used to cancel
+   * the registration monitoring for obtaining the call end reason.
+   * @throws { BusinessError } 201 - Permission denied.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @throws { BusinessError } 8300999 - Unknown error code.
+   * @syscap SystemCapability.Telephony.CallManager
    * @systemapi Hide this for inner system use.
    * @since 8
    */
@@ -629,15 +1182,17 @@ declare namespace call {
   /**
    * Subscribe to the mmiCodeResult event.
    *
-   * @param type Indicates the observer type.
-   * @param callback Return the result of MMI code.
    * @permission ohos.permission.SET_TELEPHONY_STATE
-   * @throws {BusinessError} 201 - Permission denied.
-   * @throws {BusinessError} 401 - Parameter error.
-   * @throws {BusinessError} 8300001 - Invalid parameter value.
-   * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
-   * @throws {BusinessError} 8300003 - System internal error.
-   * @throws {BusinessError} 8300999 - Unknown error code.
+   * @param { string } type - mmiCodeResult.
+   * @param { Callback<MmiCodeResults> } callback - Indicates the callback for getting the result of MMI code.
+   * @throws { BusinessError } 201 - Permission denied.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @throws { BusinessError } 8300999 - Unknown error code.
+   * @syscap SystemCapability.Telephony.CallManager
    * @systemapi Hide this for inner system use.
    * @since 9
    */
@@ -646,15 +1201,17 @@ declare namespace call {
   /**
    * Unsubscribe from the mmiCodeResult event.
    *
-   * @param type Indicates the observer type.
-   * @param callback Return the result of MMI code.
    * @permission ohos.permission.SET_TELEPHONY_STATE
-   * @throws {BusinessError} 201 - Permission denied.
-   * @throws {BusinessError} 401 - Parameter error.
-   * @throws {BusinessError} 8300001 - Invalid parameter value.
-   * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
-   * @throws {BusinessError} 8300003 - System internal error.
-   * @throws {BusinessError} 8300999 - Unknown error code.
+   * @param { string } type - mmiCodeResult.
+   * @param { Callback<MmiCodeResults> } callback - Indicates the callback used to cancel getting mmicode registered listening.
+   * @throws { BusinessError } 201 - Permission denied.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @throws { BusinessError } 8300999 - Unknown error code.
+   * @syscap SystemCapability.Telephony.CallManager
    * @systemapi Hide this for inner system use.
    * @since 9
    */
@@ -663,15 +1220,17 @@ declare namespace call {
   /**
    * Subscribe to the audioDeviceChange event.
    *
-   * @param type Indicates the observer type.
-   * @param callback Return the result of Current AudioDevice.
    * @permission ohos.permission.SET_TELEPHONY_STATE
-   * @throws {BusinessError} 201 - Permission denied.
-   * @throws {BusinessError} 401 - Parameter error.
-   * @throws {BusinessError} 8300001 - Invalid parameter value.
-   * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
-   * @throws {BusinessError} 8300003 - System internal error.
-   * @throws {BusinessError} 8300999 - Unknown error code.
+   * @param { string } type - audioDeviceChange.
+   * @param { Callback<AudioDeviceInfo> } callback - Indicates the callback for getting the result of Current AudioDevice.
+   * @throws { BusinessError } 201 - Permission denied.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @throws { BusinessError } 8300999 - Unknown error code.
+   * @syscap SystemCapability.Telephony.CallManager
    * @systemapi Hide this for inner system use.
    * @since 10
    */
@@ -680,127 +1239,254 @@ declare namespace call {
   /**
    * Unsubscribe from the audioDeviceChange event.
    *
-   * @param type Indicates the observer type.
-   * @param callback Return the result of Current AudioDevice.
    * @permission ohos.permission.SET_TELEPHONY_STATE
-   * @throws {BusinessError} 201 - Permission denied.
-   * @throws {BusinessError} 401 - Parameter error.
-   * @throws {BusinessError} 8300001 - Invalid parameter value.
-   * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
-   * @throws {BusinessError} 8300003 - System internal error.
-   * @throws {BusinessError} 8300999 - Unknown error code.
+   * @param { string } type - audioDeviceChange.
+   * @param { Callback<AudioDeviceInfo> } callback - Indicates the callback for getting the result of Current AudioDevice.
+   * @throws { BusinessError } 201 - Permission denied.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @throws { BusinessError } 8300999 - Unknown error code.
+   * @syscap SystemCapability.Telephony.CallManager
    * @systemapi Hide this for inner system use.
    * @since 10
    */
   function off(type: 'audioDeviceChange', callback?: Callback<AudioDeviceInfo>): void;
 
   /**
-   * @returns Returns {@code true} If the device currently allows new calls; returns {@code false} otherwise.
    * Judge whether to allow another new call.
    *
-   * @param callback Returns {@code true} If the device currently allows new calls; returns {@code false} otherwise.
-   * @throws {BusinessError} 401 - Parameter error.
-   * @throws {BusinessError} 8300001 - Invalid parameter value.
-   * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
-   * @throws {BusinessError} 8300003 - System internal error.
-   * @throws {BusinessError} 8300999 - Unknown error code.
+   * @param { AsyncCallback<boolean> } callback - The callback of isNewCallAllowed. Returns {@code true} if
+   * the device currently allows new calls; returns {@code false} otherwise.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @throws { BusinessError } 8300999 - Unknown error code.
+   * @syscap SystemCapability.Telephony.CallManager
    * @systemapi Hide this for inner system use.
    * @since 8
    */
   function isNewCallAllowed(callback: AsyncCallback<boolean>): void;
+
+  /**
+   * Judge whether to allow another new call.
+   *
+   * @returns { Promise<boolean> } Returns {@code true} If the device currently allows new calls.
+   * Returns {@code false} otherwise.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @throws { BusinessError } 8300999 - Unknown error code.
+   * @syscap SystemCapability.Telephony.CallManager
+   * @systemapi Hide this for inner system use.
+   * @since 8
+   */
   function isNewCallAllowed(): Promise<boolean>;
 
   /**
    * Split conference call.
    *
-   * @param callId Indicates the identifier of the call.
-   * @throws {BusinessError} 401 - Parameter error.
-   * @throws {BusinessError} 8300001 - Invalid parameter value.
-   * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
-   * @throws {BusinessError} 8300003 - System internal error.
-   * @throws {BusinessError} 8300999 - Unknown error code.
+   * @param { number } callId - Indicates the identifier of the call.
+   * @param { AsyncCallback<void> } callback - The callback of separateConference.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @throws { BusinessError } 8300999 - Unknown error code.
+   * @syscap SystemCapability.Telephony.CallManager
    * @systemapi Hide this for inner system use.
    * @since 8
    */
   function separateConference(callId: number, callback: AsyncCallback<void>): void;
+
+  /**
+   * Split conference call.
+   *
+   * @param { number } callId - Indicates the identifier of the call.
+   * @returns { Promise<void> } The promise returned by the separateConference.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @throws { BusinessError } 8300999 - Unknown error code.
+   * @syscap SystemCapability.Telephony.CallManager
+   * @systemapi Hide this for inner system use.
+   * @since 8
+   */
   function separateConference(callId: number): Promise<void>;
 
   /**
    * Get call barring status.
    *
    * @permission ohos.permission.GET_TELEPHONY_STATE
-   * @param slotId Indicates the card slot index number,
+   * @param { number } slotId - Indicates the card slot index number,
    * ranging from 0 to the maximum card slot index number supported by the device.
-   * @param type Indicates which type of call restriction to obtain.
-   * @param callback Returns call restriction status.
-   * @throws {BusinessError} 201 - Permission denied.
-   * @throws {BusinessError} 401 - Parameter error.
-   * @throws {BusinessError} 801 - Capability not supported.
-   * @throws {BusinessError} 8300001 - Invalid parameter value.
-   * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
-   * @throws {BusinessError} 8300003 - System internal error.
+   * @param { CallRestrictionType } type - Indicates which type of call restriction to obtain.
+   * @param { AsyncCallback<RestrictionStatus> } callback - Indicates the callback for getting the call restriction status.
+   * @throws { BusinessError } 201 - Permission denied.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 801 - Capability not supported.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @syscap SystemCapability.Telephony.CallManager
    * @systemapi Hide this for inner system use.
    * @since 8
    */
   function getCallRestrictionStatus(slotId: number, type: CallRestrictionType, callback: AsyncCallback<RestrictionStatus>): void;
+
+  /**
+   * Get call barring status.
+   *
+   * @permission ohos.permission.GET_TELEPHONY_STATE
+   * @param { number } slotId - Indicates the card slot index number,
+   * ranging from 0 to the maximum card slot index number supported by the device.
+   * @param { CallRestrictionType } type - Indicates which type of call restriction to obtain.
+   * @returns { Promise<RestrictionStatus> } Returns the call restriction status.
+   * @throws { BusinessError } 201 - Permission denied.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 801 - Capability not supported.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @syscap SystemCapability.Telephony.CallManager
+   * @systemapi Hide this for inner system use.
+   * @since 8
+   */
   function getCallRestrictionStatus(slotId: number, type: CallRestrictionType): Promise<RestrictionStatus>;
 
   /**
    * Set call barring status.
    *
    * @permission ohos.permission.SET_TELEPHONY_STATE
-   * @param slotId Indicates the card slot index number,
+   * @param { number } slotId - Indicates the card slot index number,
    * ranging from 0 to the maximum card slot index number supported by the device.
-   * @param info Indicates the set call restriction information.
-   * @throws {BusinessError} 201 - Permission denied.
-   * @throws {BusinessError} 401 - Parameter error.
-   * @throws {BusinessError} 801 - Capability not supported.
-   * @throws {BusinessError} 8300001 - Invalid parameter value.
-   * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
-   * @throws {BusinessError} 8300003 - System internal error.
+   * @param { CallRestrictionInfo } info - Indicates the set call restriction information.
+   * @param { AsyncCallback<void> } callback - The callback of setCallRestriction.
+   * @throws { BusinessError } 201 - Permission denied.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 801 - Capability not supported.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @syscap SystemCapability.Telephony.CallManager
    * @systemapi Hide this for inner system use.
    * @since 8
    */
   function setCallRestriction(slotId: number, info: CallRestrictionInfo, callback: AsyncCallback<void>): void;
+
+  /**
+   * Set call barring status.
+   *
+   * @permission ohos.permission.SET_TELEPHONY_STATE
+   * @param { number } slotId - Indicates the card slot index number,
+   * ranging from 0 to the maximum card slot index number supported by the device.
+   * @param { CallRestrictionInfo } info - Indicates the set call restriction information.
+   * @returns { Promise<void> } The promise returned by the setCallRestriction.
+   * @throws { BusinessError } 201 - Permission denied.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 801 - Capability not supported.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @syscap SystemCapability.Telephony.CallManager
+   * @systemapi Hide this for inner system use.
+   * @since 8
+   */
   function setCallRestriction(slotId: number, info: CallRestrictionInfo): Promise<void>;
 
   /**
    * Get call forwarding information.
    *
    * @permission ohos.permission.GET_TELEPHONY_STATE
-   * @param slotId Indicates the card slot index number,
+   * @param { number } slotId - Indicates the card slot index number,
    * ranging from 0 to the maximum card slot index number supported by the device.
-   * @param type Indicates which type of call forwarding to obtain.
-   * @param callback Returns call forwarding status.
-   * @throws {BusinessError} 201 - Permission denied.
-   * @throws {BusinessError} 401 - Parameter error.
-   * @throws {BusinessError} 801 - Capability not supported.
-   * @throws {BusinessError} 8300001 - Invalid parameter value.
-   * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
-   * @throws {BusinessError} 8300003 - System internal error.
+   * @param { CallTransferType } type - Indicates which type of call forwarding to obtain.
+   * @param { AsyncCallback<CallTransferResult> } callback - Indicates the callback for getting the call forwarding status.
+   * @throws { BusinessError } 201 - Permission denied.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 801 - Capability not supported.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @syscap SystemCapability.Telephony.CallManager
    * @systemapi Hide this for inner system use.
    * @since 8
    */
   function getCallTransferInfo(slotId: number, type: CallTransferType, callback: AsyncCallback<CallTransferResult>): void;
+
+  /**
+   * Get call forwarding information.
+   *
+   * @permission ohos.permission.GET_TELEPHONY_STATE
+   * @param { number } slotId - Indicates the card slot index number,
+   * ranging from 0 to the maximum card slot index number supported by the device.
+   * @param { CallTransferType } type - Indicates which type of call forwarding to obtain.
+   * @returns { Promise<CallTransferResult> } Returns the call forwarding status.
+   * @throws { BusinessError } 201 - Permission denied.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 801 - Capability not supported.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @syscap SystemCapability.Telephony.CallManager
+   * @systemapi Hide this for inner system use.
+   * @since 8
+   */
   function getCallTransferInfo(slotId: number, type: CallTransferType): Promise<CallTransferResult>;
 
   /**
    * Set call forwarding information.
    *
    * @permission ohos.permission.SET_TELEPHONY_STATE
-   * @param slotId Indicates the card slot index number,
+   * @param { number } slotId - Indicates the card slot index number,
    * ranging from 0 to the maximum card slot index number supported by the device.
-   * @param info Indicates the set call forwarding information.
-   * @throws {BusinessError} 201 - Permission denied.
-   * @throws {BusinessError} 401 - Parameter error.
-   * @throws {BusinessError} 801 - Capability not supported.
-   * @throws {BusinessError} 8300001 - Invalid parameter value.
-   * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
-   * @throws {BusinessError} 8300003 - System internal error.
+   * @param { CallTransferInfo } info - Indicates the set call forwarding information.
+   * @param { AsyncCallback<void> } callback - The callback of setCallTransfer.
+   * @throws { BusinessError } 201 - Permission denied.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 801 - Capability not supported.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @syscap SystemCapability.Telephony.CallManager
    * @systemapi Hide this for inner system use.
    * @since 8
    */
   function setCallTransfer(slotId: number, info: CallTransferInfo, callback: AsyncCallback<void>): void;
+
+  /**
+   * Set call forwarding information.
+   *
+   * @permission ohos.permission.SET_TELEPHONY_STATE
+   * @param { number } slotId - Indicates the card slot index number,
+   * ranging from 0 to the maximum card slot index number supported by the device.
+   * @param { CallTransferInfo } info - Indicates the set call forwarding information.
+   * @returns { Promise<void> } The promise returned by the setCallTransfer.
+   * @throws { BusinessError } 201 - Permission denied.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 801 - Capability not supported.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @syscap SystemCapability.Telephony.CallManager
+   * @systemapi Hide this for inner system use.
+   * @since 8
+   */
   function setCallTransfer(slotId: number, info: CallTransferInfo): Promise<void>;
 
   /**
@@ -809,165 +1495,362 @@ declare namespace call {
    * <p>The system checks whether IP multimedia subsystem domain (IMS) can set call transfer time.
    *
    * @permission ohos.permission.GET_TELEPHONY_STATE
-   * @param slotId Indicates the card slot index number,
+   * @param { number } slotId - Indicates the card slot index number,
    * ranging from 0 to the maximum card slot index number supported by the device.
-   * @param callback Returns {@code true} if the device can set call transfer time; returns {@code false} otherwise.
-   * @throws {BusinessError} 201 - Permission denied.
-   * @throws {BusinessError} 401 - Parameter error.
-   * @throws {BusinessError} 8300001 - Invalid parameter value.
-   * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
-   * @throws {BusinessError} 8300003 - System internal error.
-   * @throws {BusinessError} 8300999 - Unknown error code.
+   * @param { AsyncCallback<boolean> } - Returns {@code true} if the device can set call transfer time.
+   * Returns {@code false} otherwise.
+   * @throws { BusinessError } 201 - Permission denied.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @throws { BusinessError } 8300999 - Unknown error code.
+   * @syscap SystemCapability.Telephony.CallManager
    * @systemapi Hide this for inner system use.
    * @since 10
    */
   function canSetCallTransferTime(slotId: number, callback: AsyncCallback<boolean>): void;
+
+  /**
+   * Checks whether can set call transfer time.
+   *
+   * <p>The system checks whether IP multimedia subsystem domain (IMS) can set call transfer time.
+   *
+   * @permission ohos.permission.GET_TELEPHONY_STATE
+   * @param { number } slotId - Indicates the card slot index number,
+   * ranging from 0 to the maximum card slot index number supported by the device.
+   * @returns { Promise<boolean> } Returns {@code true} if the device can set call transfer time.
+   * Returns {@code false} otherwise.
+   * @throws { BusinessError } 201 - Permission denied.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @throws { BusinessError } 8300999 - Unknown error code.
+   * @syscap SystemCapability.Telephony.CallManager
+   * @systemapi Hide this for inner system use.
+   * @since 10
+   */
   function canSetCallTransferTime(slotId: number): Promise<boolean>;
 
   /**
-   * Jduge whether there is a ringing call.
+   * Judge whether there is a ringing call.
    *
    * @permission ohos.permission.SET_TELEPHONY_STATE
-   * @param callback Returns {@code true} if the device is ringing; returns {@code false} otherwise.
-   * @throws {BusinessError} 201 - Permission denied.
-   * @throws {BusinessError} 401 - Parameter error.
-   * @throws {BusinessError} 8300001 - Invalid parameter value.
-   * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
-   * @throws {BusinessError} 8300003 - System internal error.
-   * @throws {BusinessError} 8300999 - Unknown error code.
+   * @param { AsyncCallback<boolean> } callback - The callback of isRinging.
+   * Returns {@code true} if the device is ringing; returns {@code false} otherwise.
+   * @throws { BusinessError } 201 - Permission denied.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @throws { BusinessError } 8300999 - Unknown error code.
+   * @syscap SystemCapability.Telephony.CallManager
    * @systemapi Hide this for inner system use.
    * @since 8
    */
   function isRinging(callback: AsyncCallback<boolean>): void;
+
+  /**
+   * Judge whether there is a ringing call.
+   *
+   * @permission ohos.permission.SET_TELEPHONY_STATE
+   * @returns { Promise<boolean> } Returns {@code true} if the device is ringing; returns {@code false} otherwise.
+   * @throws { BusinessError } 201 - Permission denied.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @throws { BusinessError } 8300999 - Unknown error code.
+   * @syscap SystemCapability.Telephony.CallManager
+   * @systemapi Hide this for inner system use.
+   * @since 8
+   */
   function isRinging(): Promise<boolean>;
 
   /**
    * Set mute during a call.
    *
-   * @throws {BusinessError} 401 - Parameter error.
-   * @throws {BusinessError} 8300001 - Invalid parameter value.
-   * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
-   * @throws {BusinessError} 8300003 - System internal error.
-   * @throws {BusinessError} 8300999 - Unknown error code.
+   * @param { AsyncCallback<void> } callback - The callback of setMuted.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @throws { BusinessError } 8300999 - Unknown error code.
+   * @syscap SystemCapability.Telephony.CallManager
    * @systemapi Hide this for inner system use.
    * @since 8
    */
   function setMuted(callback: AsyncCallback<void>): void;
+
+  /**
+   * Set mute during a call.
+   *
+   * @returns { Promise<void> } The promise returned by the setMuted.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @throws { BusinessError } 8300999 - Unknown error code.
+   * @syscap SystemCapability.Telephony.CallManager
+   * @systemapi Hide this for inner system use.
+   * @since 8
+   */
   function setMuted(): Promise<void>;
 
   /**
    * Unmute during a call.
    *
-   * @throws {BusinessError} 401 - Parameter error.
-   * @throws {BusinessError} 8300001 - Invalid parameter value.
-   * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
-   * @throws {BusinessError} 8300003 - System internal error.
-   * @throws {BusinessError} 8300999 - Unknown error code.
+   * @param { AsyncCallback<void> } callback - The callback of cancelMuted.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @throws { BusinessError } 8300999 - Unknown error code.
+   * @syscap SystemCapability.Telephony.CallManager
    * @systemapi Hide this for inner system use.
    * @since 8
    */
   function cancelMuted(callback: AsyncCallback<void>): void;
+
+  /**
+   * Unmute during a call.
+   *
+   * @returns { Promise<void> } The promise returned by the cancelMuted.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @throws { BusinessError } 8300999 - Unknown error code.
+   * @syscap SystemCapability.Telephony.CallManager
+   * @systemapi Hide this for inner system use.
+   * @since 8
+   */
   function cancelMuted(): Promise<void>;
 
   /**
    * Set the audio device.
    *
-   * @param device Indicates the device of audio.
-   * @param callback Returns {@code true} if the request is successful; returns {@code false} otherwise.
-   * @throws {BusinessError} 401 - Parameter error.
-   * @throws {BusinessError} 8300001 - Invalid parameter value.
-   * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
-   * @throws {BusinessError} 8300003 - System internal error.
-   * @throws {BusinessError} 8300999 - Unknown error code.
+   * @param { AudioDevice } device - Indicates the device of audio.
+   * @param { AsyncCallback<void> } callback - The callback of setAudioDevice.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @throws { BusinessError } 8300999 - Unknown error code.
+   * @syscap SystemCapability.Telephony.CallManager
    * @systemapi Hide this for inner system use.
    * @since 8
    */
   function setAudioDevice(device: AudioDevice, callback: AsyncCallback<void>): void;
+
+  /**
+   * Set the audio device with options.
+   *
+   * @param { AudioDevice } device - Indicates the device of audio.
+   * @returns { Promise<void> } The promise returned by the setAudioDevice.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @throws { BusinessError } 8300999 - Unknown error code.
+   * @syscap SystemCapability.Telephony.CallManager
+   * @systemapi Hide this for inner system use.
+   * @since 8
+   */
   function setAudioDevice(device: AudioDevice): Promise<void>;
 
   /**
    * Join the conference call.
    *
-   * @param mainCallId Indicates the identifier of the main call.
-   * @param callNumberList Indicates a call list.
-   * @throws {BusinessError} 401 - Parameter error.
-   * @throws {BusinessError} 8300001 - Invalid parameter value.
-   * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
-   * @throws {BusinessError} 8300003 - System internal error.
-   * @throws {BusinessError} 8300999 - Unknown error code.
+   * @param { number } mainCallId - Indicates the identifier of the main call.
+   * @param { Array<string> } callNumberList - Indicates a call list.
+   * @param { AsyncCallback<void> } callback - The callback of joinConference.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @throws { BusinessError } 8300999 - Unknown error code.
+   * @syscap SystemCapability.Telephony.CallManager
    * @systemapi Hide this for inner system use.
    * @since 8
    */
   function joinConference(mainCallId: number, callNumberList: Array<string>, callback: AsyncCallback<void>): void;
+
+  /**
+   * Join the conference call.
+   *
+   * @param { number } mainCallId - Indicates the identifier of the main call.
+   * @param { Array<string> } callNumberList - Indicates a call list.
+   * @returns { Promise<void> } The promise returned by the joinConference.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @throws { BusinessError } 8300999 - Unknown error code.
+   * @syscap SystemCapability.Telephony.CallManager
+   * @systemapi Hide this for inner system use.
+   * @since 8
+   */
   function joinConference(mainCallId: number, callNumberList: Array<string>): Promise<void>;
 
   /**
    * Update Ims call mode.
    *
-   * @param callId Indicates the identifier of the call.
-   * @param mode Indicates the mode of the ims call.
-   * @throws {BusinessError} 401 - Parameter error.
-   * @throws {BusinessError} 8300001 - Invalid parameter value.
-   * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
-   * @throws {BusinessError} 8300003 - System internal error.
-   * @throws {BusinessError} 8300999 - Unknown error code.
+   * @param { number } callId - Indicates the identifier of the call.
+   * @param { ImsCallMode } mode - Indicates the mode of the ims call.
+   * @param { AsyncCallback<void> } callback - The callback of updateImsCallMode.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @throws { BusinessError } 8300999 - Unknown error code.
+   * @syscap SystemCapability.Telephony.CallManager
    * @systemapi Hide this for inner system use.
    * @since 8
    */
   function updateImsCallMode(callId: number, mode: ImsCallMode, callback: AsyncCallback<void>): void;
+
+  /**
+   * Update Ims call mode.
+   *
+   * @param { number } callId - Indicates the identifier of the call.
+   * @param { ImsCallMode } mode - Indicates the mode of the ims call.
+   * @returns { Promise<void> } The promise returned by the updateImsCallMode.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @throws { BusinessError } 8300999 - Unknown error code.
+   * @syscap SystemCapability.Telephony.CallManager
+   * @systemapi Hide this for inner system use.
+   * @since 8
+   */
   function updateImsCallMode(callId: number, mode: ImsCallMode): Promise<void>;
 
   /**
    * Turn on Ims switch.
    *
    * @permission ohos.permission.SET_TELEPHONY_STATE
-   * @param slotId Indicates the card slot index number,
+   * @param { number } slotId - Indicates the card slot index number,
    * ranging from 0 to the maximum card slot index number supported by the device.
-   * @throws {BusinessError} 201 - Permission denied.
-   * @throws {BusinessError} 401 - Parameter error.
-   * @throws {BusinessError} 8300001 - Invalid parameter value.
-   * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
-   * @throws {BusinessError} 8300003 - System internal error.
-   * @throws {BusinessError} 8300999 - Unknown error code.
+   * @param { AsyncCallback<void> } callback - The callback of enableImsSwitch.
+   * @throws { BusinessError } 201 - Permission denied.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @throws { BusinessError } 8300999 - Unknown error code.
+   * @syscap SystemCapability.Telephony.CallManager
    * @systemapi Hide this for inner system use.
    * @since 8
    */
   function enableImsSwitch(slotId: number, callback: AsyncCallback<void>): void;
+
+  /**
+   * Turn on Ims switch.
+   *
+   * @permission ohos.permission.SET_TELEPHONY_STATE
+   * @param { number } slotId - Indicates the card slot index number,
+   * ranging from 0 to the maximum card slot index number supported by the device.
+   * @returns { Promise<void> } The promise returned by the enableImsSwitch.
+   * @throws { BusinessError } 201 - Permission denied.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @throws { BusinessError } 8300999 - Unknown error code.
+   * @syscap SystemCapability.Telephony.CallManager
+   * @systemapi Hide this for inner system use.
+   * @since 8
+   */
   function enableImsSwitch(slotId: number): Promise<void>;
 
   /**
    * Turn off Ims switch.
    *
    * @permission ohos.permission.SET_TELEPHONY_STATE
-   * @param slotId Indicates the card slot index number,
+   * @param { number } slotId - Indicates the card slot index number,
    * ranging from 0 to the maximum card slot index number supported by the device.
-   * @throws {BusinessError} 201 - Permission denied.
-   * @throws {BusinessError} 401 - Parameter error.
-   * @throws {BusinessError} 8300001 - Invalid parameter value.
-   * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
-   * @throws {BusinessError} 8300003 - System internal error.
-   * @throws {BusinessError} 8300999 - Unknown error code.
+   * @param { AsyncCallback<void> } callback - The callback of disableImsSwitch.
+   * @throws { BusinessError } 201 - Permission denied.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @throws { BusinessError } 8300999 - Unknown error code.
+   * @syscap SystemCapability.Telephony.CallManager
    * @systemapi Hide this for inner system use.
    * @since 8
    */
   function disableImsSwitch(slotId: number, callback: AsyncCallback<void>): void;
+
+  /**
+   * Turn off Ims switch.
+   *
+   * @permission ohos.permission.SET_TELEPHONY_STATE
+   * @param { number } slotId - Indicates the card slot index number,
+   * ranging from 0 to the maximum card slot index number supported by the device.
+   * @returns { Promise<void> } The promise returned by the disableImsSwitch.
+   * @throws { BusinessError } 201 - Permission denied.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @throws { BusinessError } 8300999 - Unknown error code.
+   * @syscap SystemCapability.Telephony.CallManager
+   * @systemapi Hide this for inner system use.
+   * @since 8
+   */
   function disableImsSwitch(slotId: number): Promise<void>;
 
   /**
    * Judge whether the Ims switch is enabled.
    *
-   * @param slotId Indicates the card slot index number,
+   * @param { number } slotId - Indicates the card slot index number,
    * ranging from 0 to the maximum card slot index number supported by the device.
-   * @param callback Returns {@code true} If the ims switch is on; returns {@code false} otherwise.
-   * @throws {BusinessError} 401 - Parameter error.
-   * @throws {BusinessError} 8300001 - Invalid parameter value.
-   * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
-   * @throws {BusinessError} 8300003 - System internal error.
-   * @throws {BusinessError} 8300999 - Unknown error code.
+   * @param { AsyncCallback<boolean> } callback - The callback of isImsSwitchEnabled.
+   * Returns {@code true} If the ims switch is on; returns {@code false} otherwise.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @throws { BusinessError } 8300999 - Unknown error code.
+   * @syscap SystemCapability.Telephony.CallManager
    * @systemapi Hide this for inner system use.
    * @since 8
    */
   function isImsSwitchEnabled(slotId: number, callback: AsyncCallback<boolean>): void;
+
+  /**
+   * Judge whether the Ims switch is enabled.
+   *
+   * @param { number } slotId - Indicates the card slot index number,
+   * ranging from 0 to the maximum card slot index number supported by the device.
+   * @returns { Promise<boolean> } Returns {@code true} If the ims switch is on; returns {@code false} otherwise.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @throws { BusinessError } 8300999 - Unknown error code.
+   * @syscap SystemCapability.Telephony.CallManager
+   * @systemapi Hide this for inner system use.
+   * @since 8
+   */
   function isImsSwitchEnabled(slotId: number): Promise<boolean>;
 
   /**
@@ -976,13 +1859,15 @@ declare namespace call {
    * @permission ohos.permission.SET_TELEPHONY_STATE
    * @param { number } slotId - Indicates the card slot index number,
    * ranging from 0 to the maximum card slot index number supported by the device.
-   * @param { AsyncCallback<void> } callback - the callback of closeUnFinishedUssd.
-   * @throws {BusinessError} 201 - Permission denied.
-   * @throws {BusinessError} 401 - Parameter error.
-   * @throws {BusinessError} 8300001 - Invalid parameter value.
-   * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
-   * @throws {BusinessError} 8300003 - System internal error.
-   * @throws {BusinessError} 8300999 - Unknown error code.
+   * @param { AsyncCallback<void> } callback - The callback of closeUnFinishedUssd.
+   * @throws { BusinessError } 201 - Permission denied.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @throws { BusinessError } 8300999 - Unknown error code.
+   * @syscap SystemCapability.Telephony.CallManager
    * @systemapi Hide this for inner system use.
    * @since 10
    */
@@ -994,19 +1879,20 @@ declare namespace call {
    * @permission ohos.permission.SET_TELEPHONY_STATE
    * @param { number } slotId - Indicates the card slot index number,
    * ranging from 0 to the maximum card slot index number supported by the device.
-   * @returns { Promise<void> } the promise returned by the function.
-   * @throws {BusinessError} 201 - Permission denied.
-   * @throws {BusinessError} 401 - Parameter error.
-   * @throws {BusinessError} 8300001 - Invalid parameter value.
-   * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
-   * @throws {BusinessError} 8300003 - System internal error.
-   * @throws {BusinessError} 8300999 - Unknown error code.
+   * @returns { Promise<void> } The promise returned by the function.
+   * @throws { BusinessError } 201 - Permission denied.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @throws { BusinessError } 8300999 - Unknown error code.
+   * @syscap SystemCapability.Telephony.CallManager
    * @systemapi Hide this for inner system use.
    * @since 10
    */
   function closeUnFinishedUssd(slotId: number): Promise<void>;
 
-  /**
   /**
    * Handle special code from dialer.
    *
@@ -1053,6 +1939,7 @@ declare namespace call {
    * @throws { BusinessError } 201 - Permission denied.
    * @throws { BusinessError } 202 - Non-system applications use system APIs.
    * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
    * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
    * @throws { BusinessError } 8300003 - System internal error.
    * @throws { BusinessError } 8300999 - Unknown error code.
@@ -1068,7 +1955,7 @@ declare namespace call {
    * @permission ohos.permission.SET_TELEPHONY_STATE
    * @permission ohos.permission.READ_CALL_LOG
    * @permission ohos.permission.WRITE_CALL_LOG
-   * @returns { Promise<void> } The promise returned by the function..
+   * @returns { Promise<void> } The promise returned by the function.
    * @throws { BusinessError } 201 - Permission denied.
    * @throws { BusinessError } 202 - Non-system applications use system APIs.
    * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
@@ -1089,62 +1976,252 @@ declare namespace call {
    * @since 8
    */
   export enum ImsCallMode {
+    /**
+     * Indicates audio only calls.
+     *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
+     * @since 8
+     */
     CALL_MODE_AUDIO_ONLY = 0,
+
+    /**
+     * Indicates that only calls are sent.
+     *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
+     * @since 8
+     */
     CALL_MODE_SEND_ONLY,
+
+    /**
+     * Indicates receiving only calls.
+     *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
+     * @since 8
+     */
     CALL_MODE_RECEIVE_ONLY,
+
+    /**
+     * Indicates permission to send and receive calls.
+     *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
+     * @since 8
+     */
     CALL_MODE_SEND_RECEIVE,
+
+    /**
+     * Indicates a pause in video calls.
+     *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
+     * @since 8
+     */
     CALL_MODE_VIDEO_PAUSED,
   }
 
   /**
+   * Indicates the device type of the audio device.
+   *
+   * @enum { number }
    * @systemapi Hide this for inner system use.
    * @since 10
    */
   export enum AudioDeviceType {
+    /**
+     * Indicates device earpiece.
+     *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
+     * @since 10
+     */
     DEVICE_EARPIECE,
+
+    /**
+     * Indicator device speaker.
+     *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
+     * @since 10
+     */
     DEVICE_SPEAKER,
+
+    /**
+     * Indicates a wired headset device.
+     *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
+     * @since 10
+     */
     DEVICE_WIRED_HEADSET,
+
+    /**
+     * Indicates a Bluetooth device.
+     *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
+     * @since 10
+     */
     DEVICE_BLUETOOTH_SCO,
   }
 
   /**
+   * Indicates the device of audio.
+   *
+   * @interface AudioDevice
+   * @syscap SystemCapability.Telephony.CallManager
    * @systemapi Hide this for inner system use.
    * @since 10
    */
   export interface AudioDevice {
+    /**
+     * Indicates the device type of the audio device.
+     *
+     * @type { AudioDeviceType }
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
+     * @since 10
+     */
     deviceType: AudioDeviceType;
+
+    /**
+     * Indicates the device address of the audio device.
+     *
+     * @type { ?string }
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
+     * @since 10
+     */
     address?: string;
   }
 
   /**
+   * Indicates the information of the audio device.
+   *
+   * @interface AudioDeviceInfo
+   * @syscap SystemCapability.Telephony.CallManager
    * @systemapi Hide this for inner system use.
    * @since 10
    */
   export interface AudioDeviceInfo {
-    /** Indicates the list of support audiodevice. */
+    /**
+     * Indicates the list of support audiodevice.
+     *
+     * @type { Array<AudioDevice> }
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
+     * @since 10
+     */
     audioDeviceList: Array<AudioDevice>;
-    /** Indicates the type of current audiodevice. */
+
+    /**
+     * Indicates the type of current audiodevice.
+     *
+     * @type { AudioDevice }
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
+     * @since 10
+     */
     currentAudioDevice: AudioDevice;
-    /** Indicates the status of mute. */
+    /**
+     * Indicates the status of mute.
+     *
+     * @type { boolean }
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
+     */
     isMuted: boolean;
   }
 
   /**
+   * Indicates the type of call restriction.
+   *
+   * @enum { number }
+   * @syscap SystemCapability.Telephony.CallManager
    * @systemapi Hide this for inner system use.
    * @since 8
    */
   export enum CallRestrictionType {
+    /**
+     * Indicates restrict all incoming calls.
+     *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
+     * @since 8
+     */
     RESTRICTION_TYPE_ALL_INCOMING = 0,
+
+    /**
+     * Indicates restrict all outgoing calls.
+     *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
+     * @since 8
+     */
     RESTRICTION_TYPE_ALL_OUTGOING,
+
+    /**
+     * Indicates restrict international calls.
+     *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
+     * @since 8
+     */
     RESTRICTION_TYPE_INTERNATIONAL,
+
+    /**
+     * Indicates restrict international roaming calls.
+     *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
+     * @since 8
+     */
     RESTRICTION_TYPE_INTERNATIONAL_EXCLUDING_HOME,
+
+    /**
+     * Indicates restrict roaming calls.
+     *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
+     * @since 8
+     */
     RESTRICTION_TYPE_ROAMING_INCOMING,
+
+    /**
+     * Indicates restrict all calls.
+     *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
+     * @since 8
+     */
     RESTRICTION_TYPE_ALL_CALLS,
+
+    /**
+     * Indicates restrict all outgoing services.
+     *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
+     * @since 8
+     */
     RESTRICTION_TYPE_OUTGOING_SERVICES,
+
+    /**
+     * Indicates restrict all incoming services.
+     *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
+     * @since 8
+     */
     RESTRICTION_TYPE_INCOMING_SERVICES,
   }
 
   /**
+   * Indicates the information of call transfer.
+   *
+   * @interface CallTransferInfo
+   * @syscap SystemCapability.Telephony.CallManager
    * @systemapi Hide this for inner system use.
    * @since 8
    */
@@ -1152,6 +2229,9 @@ declare namespace call {
     /**
      * Phone number.
      *
+     * @type { string }
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
      * @since 8
      */
     transferNum: string;
@@ -1159,6 +2239,9 @@ declare namespace call {
     /**
      * Call forwarding type.
      *
+     * @type { CallTransferType }
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
      * @since 8
      */
     type: CallTransferType;
@@ -1166,6 +2249,9 @@ declare namespace call {
     /**
      * Call forwarding setting type.
      *
+     * @type { CallTransferSettingType }
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
      * @since 8
      */
     settingType: CallTransferSettingType;
@@ -1173,6 +2259,9 @@ declare namespace call {
     /**
      * Start time hours.
      *
+     * @type { ?number }
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
      * @since 9
      */
     startHour?: number;
@@ -1180,6 +2269,9 @@ declare namespace call {
     /**
      * Start time minutes.
      *
+     * @type { ?number }
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
      * @since 9
      */
     startMinute?: number;
@@ -1187,6 +2279,9 @@ declare namespace call {
     /**
      * End time hours.
      *
+     * @type { ?number }
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
      * @since 9
      */
     endHour?: number;
@@ -1194,287 +2289,858 @@ declare namespace call {
     /**
      * End time minutes.
      *
+     * @type { ?number }
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
      * @since 9
      */
     endMinute?: number;
   }
 
   /**
+   * Indicates the type of call transfer.
+   *
+   * @enum { number }
+   * @syscap SystemCapability.Telephony.CallManager
    * @systemapi Hide this for inner system use.
    * @since 8
    */
   export enum CallTransferType {
+    /**
+     * Indicates transfer the call unconditionally.
+     *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
+     * @since 8
+     */
     TRANSFER_TYPE_UNCONDITIONAL = 0,
+
+    /**
+     * Indicates transfer the call when busy.
+     *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
+     * @since 8
+     */
     TRANSFER_TYPE_BUSY,
+
+    /**
+     * Indicates transfer the call when no reply.
+     *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
+     * @since 8
+     */
     TRANSFER_TYPE_NO_REPLY,
+
+    /**
+     * Indicates transfer the call when unreachable.
+     *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
+     * @since 8
+     */
     TRANSFER_TYPE_NOT_REACHABLE,
   }
 
   /**
+   * Indicates the type of call transfer setting.
+   *
+   * @enum { number }
+   * @syscap SystemCapability.Telephony.CallManager
    * @systemapi Hide this for inner system use.
    * @since 8
    */
   export enum CallTransferSettingType {
+    /**
+     * Indicates disable the call transfer.
+     *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
+     * @since 8
+     */
     CALL_TRANSFER_DISABLE = 0,
+
+    /**
+     * Indicates enable the call transfer.
+     *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
+     * @since 8
+     */
     CALL_TRANSFER_ENABLE = 1,
+
+    /**
+     * Indicates register the call transfer.
+     *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
+     * @since 8
+     */
     CALL_TRANSFER_REGISTRATION = 3,
+
+    /**
+     * Indicates erasure the call transfer.
+     *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
+     * @since 8
+     */
     CALL_TRANSFER_ERASURE = 4,
   }
 
   /**
+   * Indicates the options of call attribute.
+   *
+   * @interface CallAttributeOptions
+   * @syscap SystemCapability.Telephony.CallManager
    * @systemapi Hide this for inner system use.
    * @since 7
    */
   export interface CallAttributeOptions {
+    /**
+     * Indicates the number of account.
+     *
+     * @type { string }
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
+     * @since 7
+     */
     accountNumber: string;
+
+    /**
+     * Indicates if the call is start with speaker.
+     *
+     * @type { boolean }
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
+     * @since 7
+     */
     speakerphoneOn: boolean;
+
+    /**
+     * Indicates the id of account.
+     *
+     * @type { number }
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
+     * @since 7
+     */
     accountId: number;
+
+    /**
+     * Indicates the type of video state.
+     *
+     * @type { VideoStateType }
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
+     * @since 7
+     */
     videoState: VideoStateType;
+
+    /**
+     * Indicates the start time.
+     *
+     * @type { number }
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
+     * @since 7
+     */
     startTime: number;
+
+    /**
+     * Indicates if this is an emergency call.
+     *
+     * @type { boolean }
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
+     * @since 7
+     */
     isEcc: boolean;
+
+    /**
+     * Indicates the type of call.
+     *
+     * @type { CallType }
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
+     * @since 7
+     */
     callType: CallType;
+
+    /**
+     * Indicates the id of call.
+     *
+     * @type { number }
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
+     * @since 7
+     */
     callId: number;
+
+    /**
+     * Indicates the detailed state of call.
+     *
+     * @type { DetailedCallState }
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
+     * @since 7
+     */
     callState: DetailedCallState;
+
+    /**
+     * Indicates the state of conference.
+     *
+     * @type { ConferenceState }
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
+     * @since 7
+     */
     conferenceState: ConferenceState;
   }
 
   /**
+   * Indicates the state of conference call.
+   *
+   * @enum { number }
+   * @syscap SystemCapability.Telephony.CallManager
    * @systemapi Hide this for inner system use.
    * @since 7
    */
   export enum ConferenceState {
+    /**
+     * Indicates the state is idle.
+     *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
+     * @since 7
+     */
     TEL_CONFERENCE_IDLE = 0,
+
+    /**
+     * Indicates the state is active.
+     *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
+     * @since 7
+     */
     TEL_CONFERENCE_ACTIVE,
+
+    /**
+     * Indicates the state is disconnecting.
+     *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
+     * @since 7
+     */
     TEL_CONFERENCE_DISCONNECTING,
+
+    /**
+     * Indicates the state is disconnected.
+     *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
+     * @since 7
+     */
     TEL_CONFERENCE_DISCONNECTED,
   }
 
   /**
+   * Indicates the type of call.
+   *
+   * @enum { number }
+   * @syscap SystemCapability.Telephony.CallManager
    * @systemapi Hide this for inner system use.
    * @since 7
    */
   export enum CallType {
-    TYPE_CS = 0, // CS
-    TYPE_IMS = 1, // IMS
-    TYPE_OTT = 2, // OTT
-    TYPE_ERR_CALL = 3, // OTHER
+    /**
+     * Indicates the call type is CS.
+     *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
+     * @since 7
+     */
+    TYPE_CS = 0,
+
+    /**
+     * Indicates the call type is IMS.
+     *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
+     * @since 7
+     */
+    TYPE_IMS = 1,
+
+    /**
+     * Indicates the call type is OTT.
+     *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
+     * @since 7
+     */
+    TYPE_OTT = 2,
+
+    /**
+     * Indicates the call type is OTHER.
+     *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
+     * @since 7
+     */
+    TYPE_ERR_CALL = 3,
   }
 
   /**
+   * Indicates the type of video state.
+   *
+   * @enum { number }
+   * @syscap SystemCapability.Telephony.CallManager
    * @systemapi Hide this for inner system use.
    * @since 7
    */
   export enum VideoStateType {
-    TYPE_VOICE = 0, // Voice
-    TYPE_VIDEO, // Video
+    /**
+     * Indicates the call is in voice state.
+     *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
+     * @since 7
+     */
+    TYPE_VOICE = 0,
+
+    /**
+     * Indicates the call is in video state.
+     *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
+     * @since 7
+     */
+    TYPE_VIDEO,
   }
 
   /**
+   * Indicates the detailed state of call.
+   *
+   * @enum { number }
+   * @syscap SystemCapability.Telephony.CallManager
    * @systemapi Hide this for inner system use.
    * @since 7
    */
   export enum DetailedCallState {
+    /**
+     * Indicates the call is active.
+     *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
+     * @since 7
+     */
     CALL_STATUS_ACTIVE = 0,
+
+    /**
+     * Indicates the call is holding.
+     *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
+     * @since 7
+     */
     CALL_STATUS_HOLDING,
+
+    /**
+     * Indicates the call is dialing.
+     *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
+     * @since 7
+     */
     CALL_STATUS_DIALING,
+
+    /**
+     * Indicates the call is alerting.
+     *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
+     * @since 7
+     */
     CALL_STATUS_ALERTING,
+
+    /**
+     * Indicates the call is incoming.
+     *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
+     * @since 7
+     */
     CALL_STATUS_INCOMING,
+
+    /**
+     * Indicates the call is waiting.
+     *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
+     * @since 7
+     */
     CALL_STATUS_WAITING,
+
+    /**
+     * Indicates the call is disconnected.
+     *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
+     * @since 7
+     */
     CALL_STATUS_DISCONNECTED,
+
+    /**
+     * Indicates the call is disconnecting.
+     *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
+     * @since 7
+     */
     CALL_STATUS_DISCONNECTING,
+
+    /**
+     * Indicates the call is idle.
+     *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
+     * @since 7
+     */
     CALL_STATUS_IDLE,
   }
 
   /**
+   * Indicates the information of call restriction.
+   *
+   * @interface CallRestrictionInfo
+   * @syscap SystemCapability.Telephony.CallManager
    * @systemapi Hide this for inner system use.
    * @since 8
    */
   export interface CallRestrictionInfo {
+    /**
+     * Indicates the type of call restriction.
+     *
+     * @type { CallRestrictionType }
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
+     * @since 8
+     */
     type: CallRestrictionType;
+
+    /**
+     * Indicates the password required to set call restrictions.
+     *
+     * @type { string }
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
+     * @since 8
+     */
     password: string;
+
+    /**
+     * Indicates the mode of call restriction.
+     *
+     * @type { CallRestrictionMode }
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
+     * @since 8
+     */
     mode: CallRestrictionMode;
   }
 
   /**
+   * Indicates the mode of call restriction.
+   *
+   * @enum { number }
+   * @syscap SystemCapability.Telephony.CallManager
    * @systemapi Hide this for inner system use.
    * @since 8
    */
   export enum CallRestrictionMode {
+    /**
+     * Indicates call restriction is deactivated.
+     *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
+     * @since 8
+     */
     RESTRICTION_MODE_DEACTIVATION = 0,
+
+    /**
+     * Indicates call restriction is activated.
+     *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
+     * @since 8
+     */
     RESTRICTION_MODE_ACTIVATION,
   }
 
   /**
+   * Indicates the options of call event.
+   *
+   * @interface CallEventOptions
+   * @syscap SystemCapability.Telephony.CallManager
    * @systemapi Hide this for inner system use.
    * @since 8
    */
   export interface CallEventOptions {
+    /**
+     * Indicates the event ID of call ability.
+     *
+     * @type { CallAbilityEventId }
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
+     * @since 8
+     */
     eventId: CallAbilityEventId,
   }
 
   /**
+   * Indicates the event ID of call ability.
+   *
+   * @enum { number }
+   * @syscap SystemCapability.Telephony.CallManager
    * @systemapi Hide this for inner system use.
    * @since 8
    */
   export enum CallAbilityEventId {
+    /**
+     * Indicates there is no available carrier during dialing.
+     *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
+     * @since 8
+     */
     EVENT_DIAL_NO_CARRIER = 1,
+
+    /**
+     * Indicates invalid FDN.
+     *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
+     * @since 8
+     */
     EVENT_INVALID_FDN_NUMBER,
   }
 
+  /**
+   * Indicates the states of call.
+   *
+   * @enum { number }
+   * @syscap SystemCapability.Telephony.CallManager
+   * @since 6
+   */
   export enum CallState {
     /**
      * Indicates an invalid state, which is used when the call state fails to be obtained.
+     *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @since 6
      */
     CALL_STATE_UNKNOWN = -1,
 
     /**
      * Indicates that there is no ongoing call.
+     *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @since 6
      */
     CALL_STATE_IDLE = 0,
 
     /**
      * Indicates that an incoming call is ringing or waiting.
+     *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @since 6
      */
     CALL_STATE_RINGING = 1,
 
     /**
-     * Indicates that a least one call is in the dialing, active, or hold state, and there is no new incoming call
-     * ringing or waiting.
+     * Indicates that a least one call is in the dialing, active, or hold state, and there is no new
+     * incoming call ringing or waiting.
+     *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @since 6
      */
     CALL_STATE_OFFHOOK = 2
   }
 
+  /**
+   * Indicates the options of placing a call.
+   *
+   * @interface DialOptions
+   * @syscap SystemCapability.Telephony.CallManager
+   * @since 6
+   */
   export interface DialOptions {
     /**
-     * boolean means whether the call to be made is a video call. The value {@code false} indicates a voice call.
+     * Indicates whether the call to be made is a video call. The value {@code false} indicates
+     * a voice call.
+     *
+     * @type { ?boolean }
+     * @syscap SystemCapability.Telephony.CallManager
+     * @since 6
      */
     extras?: boolean;
 
     /**
-     * @systemapi Hide this for inner system use.
+     * Indicates the card slot index number, ranging from 0 to the maximum card slot index number
+     * supported by the device.
+     *
+     * @type { ?number }
+     * @syscap SystemCapability.Telephony.CallManager
      * @since 8
      */
     accountId?: number;
 
     /**
-     * @systemapi Hide this for inner system use.
+     * Indicates the type of Video state.
+     *
+     * @type { ?VideoStateType }
+     * @syscap SystemCapability.Telephony.CallManager
      * @since 8
      */
     videoState?: VideoStateType;
 
     /**
-     * @systemapi Hide this for inner system use.
+     * Indicates the scenario of the call to be made.
+     *
+     * @type { ?DialScene }
+     * @syscap SystemCapability.Telephony.CallManager
      * @since 8
      */
     dialScene?: DialScene;
 
     /**
-     * @systemapi Hide this for inner system use.
+     * Indicates the type of the call to be made.
+     *
+     * @type { ?DialType }
+     * @syscap SystemCapability.Telephony.CallManager
      * @since 8
      */
     dialType?: DialType;
   }
 
   /**
+   * Indicates the options for initiating a call.
+   *
+   * @interface DialCallOptions
+   * @syscap SystemCapability.Telephony.CallManager
    * @systemapi Hide this for inner system use.
    * @since 9
    */
-   export interface DialCallOptions {
+  export interface DialCallOptions {
     /**
+     * Indicates the card slot index number, ranging from 0 to the maximum card slot index number
+     * supported by the device.
+     *
+     * @type { ?number }
+     * @syscap SystemCapability.Telephony.CallManager
      * @systemapi Hide this for inner system use.
+     * @since 9
      */
     accountId?: number;
     /**
+     * Indicates the type of Video state.
+     *
+     * @type { ?VideoStateType }
+     * @syscap SystemCapability.Telephony.CallManager
      * @systemapi Hide this for inner system use.
+     * @since 9
      */
     videoState?: VideoStateType;
     /**
+     * Indicates the scenario of the call.
+     *
+     * @type { ?DialScene }
+     * @syscap SystemCapability.Telephony.CallManager
      * @systemapi Hide this for inner system use.
+     * @since 9
      */
     dialScene?: DialScene;
     /**
+     * Indicates the type of the call.
+     *
+     * @type { ?DialType }
+     * @syscap SystemCapability.Telephony.CallManager
      * @systemapi Hide this for inner system use.
+     * @since 9
      */
     dialType?: DialType;
   }
 
   /**
+   * Indicates the scenarios of the call to be made.
+   *
+   * @enum {number}
+   * @syscap SystemCapability.Telephony.CallManager
    * @systemapi Hide this for inner system use.
    * @since 8
    */
   export enum DialScene {
+    /**
+     * Indicates this is a common call.
+     *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
+     * @since 8
+     */
     CALL_NORMAL = 0,
+
+    /**
+     * Indicates this is a privileged call.
+     *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
+     * @since 8
+     */
     CALL_PRIVILEGED = 1,
+
+    /**
+     * Indicates this is an emergency call.
+     *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
+     * @since 8
+     */
     CALL_EMERGENCY = 2,
   }
 
   /**
+   * Indicates the types of the call to be made.
+   *
+   * @enum {number}
+   * @syscap SystemCapability.Telephony.CallManager
    * @systemapi Hide this for inner system use.
    * @since 8
    */
   export enum DialType {
+    /**
+     * Indicates this is a carrier call.
+     *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
+     * @since 8
+     */
     DIAL_CARRIER_TYPE = 0,
+
+    /**
+     * Indicates this is a call to play voice mail.
+     *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
+     * @since 8
+     */
     DIAL_VOICE_MAIL_TYPE = 1,
+
+    /**
+     * Indicates this is an OTT call.
+     *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
+     * @since 8
+     */
     DIAL_OTT_TYPE = 2,
   }
 
   /**
+   * Indicates the options for call rejection message.
+   *
+   * @interface RejectMessageOptions
+   * @syscap SystemCapability.Telephony.CallManager
    * @systemapi Hide this for inner system use.
    * @since 7
    */
   export interface RejectMessageOptions {
+    /**
+     * Indicates the content of call rejection message.
+     *
+     * @type { string }
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
+     * @since 7
+     */
     messageContent: string;
   }
 
   /**
+   * Indicates the result of call transfer.
+   *
+   * @interface CallTransferResult
+   * @syscap SystemCapability.Telephony.CallManager
    * @systemapi Hide this for inner system use.
    * @since 8
    */
   export interface CallTransferResult {
     /**
-     * Call forwarding status.
+     * Indicates the status of call forwarding.
      *
+     * @type { TransferStatus }
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
      * @since 8
      */
     status: TransferStatus;
 
     /**
-     * Call forwarding phone number.
+     * Indicates the phone number of call forwarding.
      *
+     * @type { string }
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
      * @since 8
      */
     number: string;
 
     /**
-     * Start time hours.
+     * Indicates the start time hours of call forwarding.
      *
+     * @type { number }
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
      * @since 9
      */
     startHour: number;
 
     /**
-     * Start time minutes.
+     * Indicates the start time minutes of call forwarding.
      *
+     * @type { number }
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
      * @since 9
      */
     startMinute: number;
 
     /**
-     * End time hours.
+     * Indicates the end time hours of call forwarding.
      *
+     * @type { number }
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
      * @since 9
      */
     endHour: number;
 
     /**
-     * End time minutes.
+     * Indicates the end time minutes of call forwarding.
      *
+     * @type { number }
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
      * @since 9
      */
     endMinute: number;
   }
 
   /**
+   * Indicates the status of call waiting.
+   *
+   * @enum { number }
+   * @syscap SystemCapability.Telephony.CallManager
    * @systemapi Hide this for inner system use.
    * @since 7
    */
@@ -1482,6 +3148,8 @@ declare namespace call {
     /**
      * Indicates that call waiting is not enabled.
      *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
      * @since 7
      */
     CALL_WAITING_DISABLE = 0,
@@ -1489,12 +3157,18 @@ declare namespace call {
     /**
      * Indicates that call waiting is enabled.
      *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
      * @since 7
      */
     CALL_WAITING_ENABLE = 1
   }
 
   /**
+   * Indicates the status of call restriction.
+   *
+   * @enum { number }
+   * @syscap SystemCapability.Telephony.CallManager
    * @systemapi Hide this for inner system use.
    * @since 8
    */
@@ -1502,6 +3176,8 @@ declare namespace call {
     /**
      * Indicates that call barring is not enabled.
      *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
      * @since 8
      */
     RESTRICTION_DISABLE = 0,
@@ -1509,12 +3185,18 @@ declare namespace call {
     /**
      * Indicates that call barring is enabled.
      *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
      * @since 8
      */
     RESTRICTION_ENABLE = 1
   }
 
   /**
+   * Indicates the status of call transfer.
+   *
+   * @enum { number }
+   * @syscap SystemCapability.Telephony.CallManager
    * @systemapi Hide this for inner system use.
    * @since 8
    */
@@ -1522,6 +3204,8 @@ declare namespace call {
     /**
      * Indicates that call forwarding is not enabled.
      *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
      * @since 8
      */
     TRANSFER_DISABLE = 0,
@@ -1529,36 +3213,55 @@ declare namespace call {
     /**
      * Indicates that call forwarding is enabled.
      *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
      * @since 8
      */
     TRANSFER_ENABLE = 1
   }
 
   /**
+   * Indicates the option for determining if a number is an emergency number for specified slot.
+   *
+   * @interface EmergencyNumberOptions
+   * @syscap SystemCapability.Telephony.CallManager
    * @since 7
    */
   export interface EmergencyNumberOptions {
     /**
-     * Indicates sim card slot number.
+     * Indicates the card slot index number, ranging from 0 to the
+     * maximum card slot index number supported by the device.
      *
+     * @type { ?number }
+     * @syscap SystemCapability.Telephony.CallManager
      * @since 7
      */
     slotId?: number;
   }
 
   /**
+   * Indicates the option for number formatting.
+   *
+   * @interface NumberFormatOptions
+   * @syscap SystemCapability.Telephony.CallManager
    * @since 7
    */
   export interface NumberFormatOptions {
     /**
      * Indicates the country code.
      *
+     * @type { ?string }
+     * @syscap SystemCapability.Telephony.CallManager
      * @since 7
      */
     countryCode?: string;
   }
 
   /**
+   * Indicates the MMI code result.
+   *
+   * @interface MmiCodeResults
+   * @syscap SystemCapability.Telephony.CallManager
    * @systemapi Hide this for inner system use.
    * @since 9
    */
@@ -1566,6 +3269,9 @@ declare namespace call {
     /**
      * Indicates the result of MMI code.
      *
+     * @type { MmiCodeResult }
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
      * @since 9
      */
     result: MmiCodeResult;
@@ -1573,599 +3279,786 @@ declare namespace call {
     /**
      * Indicates the message of MMI code.
      *
+     * @type { string }
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
      * @since 9
      */
     message: string;
   }
 
   /**
+   * Indicates the MMI code result.
+   *
+   * @enum { number }
+   * @syscap SystemCapability.Telephony.CallManager
    * @systemapi Hide this for inner system use.
    * @since 9
    */
   export enum MmiCodeResult {
     /** Indicates the result of MMI code with successfully.
      *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
      * @since 9
      */
     MMI_CODE_SUCCESS = 0,
 
     /** Indicates the result of MMI code with failed.
      *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
      * @since 9
      */
     MMI_CODE_FAILED = 1
   }
 
   /**
+   * Indicates the causes of call disconnection.
+   *
+   * @enum { number }
+   * @syscap SystemCapability.Telephony.CallManager
    * @systemapi Hide this for inner system use.
    * @since 8
    */
   export enum DisconnectedReason {
     /**
-     * Unassigned number.
+     * Indicates the call disconnect due to unassigned number.
      *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
      * @since 8
      */
     UNASSIGNED_NUMBER = 1,
 
     /**
-     * No route to destination.
+     * Indicates the call disconnect due to no route to destination.
      *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
      * @since 8
      */
     NO_ROUTE_TO_DESTINATION = 3,
 
     /**
-     * Channel unacceptable.
+     * Indicates the call disconnect due to channel unacceptable.
      *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
      * @since 8
      */
     CHANNEL_UNACCEPTABLE = 6,
 
     /**
-     * Operator determined barring.
+     * Indicates the call disconnect due to operator determined barring.
      *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
      * @since 8
      */
     OPERATOR_DETERMINED_BARRING = 8,
 
     /**
-     * Call completed elsewhere.
+     * Indicates the call disconnect due to call completed elsewhere.
      *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
      * @since 9
      */
     CALL_COMPLETED_ELSEWHERE = 13,
 
     /**
-     * Normal call clearing.
+     * Indicates the call disconnect due to normal call clearing.
      *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
      * @since 8
      */
     NORMAL_CALL_CLEARING = 16,
 
     /**
-     * User busy.
+     * Indicates the call disconnect due to user busy.
      *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
      * @since 8
      */
     USER_BUSY = 17,
 
     /**
-     * No user responding.
+     * Indicates the call disconnect due to no user responding.
      *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
      * @since 8
      */
     NO_USER_RESPONDING = 18,
 
     /**
-     * User alerting, no answer.
+     * Indicates the call disconnect due to user alerting, no answer.
      *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
      * @since 8
      */
     USER_ALERTING_NO_ANSWER = 19,
 
     /**
-     * Call rejected.
+     * Indicates the call disconnect due to call rejected.
      *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
      * @since 8
      */
     CALL_REJECTED = 21,
 
     /**
-     * Number changed.
+     * Indicates the call disconnect due to number changed.
      *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
      * @since 8
      */
     NUMBER_CHANGED = 22,
 
     /**
-     * Call rejected due to feature at the destination.
+     * Indicates the call rejected due to feature at the destination.
      *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
      * @since 9
      */
     CALL_REJECTED_DUE_TO_FEATURE_AT_THE_DESTINATION = 24,
 
     /**
-     * Pre-emption.
+     * Indicates the call disconnect due to pre-emption.
      *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
      * @since 9
      */
     FAILED_PRE_EMPTION = 25,
 
     /**
-     * Non selected user clearing.
+     * Indicates the call disconnect due to non selected user clearing.
      *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
      * @since 9
      */
     NON_SELECTED_USER_CLEARING = 26,
 
     /**
-     * Destination out of order.
+     * Indicates the call disconnect due to destination out of order.
      *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
      * @since 8
      */
     DESTINATION_OUT_OF_ORDER = 27,
 
     /**
-     * Invalid number format.
+     * Indicates the call disconnect due to invalid number format.
      *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
      * @since 8
      */
     INVALID_NUMBER_FORMAT = 28,
 
     /**
-     * Facility rejected.
+     * Indicates the call disconnect due to facility rejected.
      *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
      * @since 9
      */
     FACILITY_REJECTED = 29,
 
     /**
-     * Response to status enquiry.
+     * Indicates the call disconnect due to response to status enquiry.
      *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
      * @since 9
      */
     RESPONSE_TO_STATUS_ENQUIRY = 30,
 
     /**
-     * Normal, unspecified.
+     * Indicates the call disconnected normally, no specified cause.
      *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
      * @since 9
      */
     NORMAL_UNSPECIFIED = 31,
 
     /**
-     * No circuit/channel available.
+     * Indicates the call disconnect due to no circuit/channel available.
      *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
      * @since 9
      */
     NO_CIRCUIT_CHANNEL_AVAILABLE = 34,
 
     /**
-     * Network out of order.
+     * Indicates the call disconnect due to network out of order.
      *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
      * @since 8
      */
     NETWORK_OUT_OF_ORDER = 38,
 
     /**
-     * Temporary failure.
+     * Indicates the call disconnect due to temporary failure.
      *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
      * @since 8
      */
     TEMPORARY_FAILURE = 41,
 
     /**
-     * Switching equipment congestion.
+     * Indicates the call disconnect due to switching equipment congestion.
      *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
      * @since 9
      */
     SWITCHING_EQUIPMENT_CONGESTION = 42,
 
     /**
-     * Access information discarded.
+     * Indicates the call disconnect due to access information discarded.
      *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
      * @since 9
      */
     ACCESS_INFORMATION_DISCARDED = 43,
 
     /**
-     * Requested circuit/channel not available.
+     * Indicates the call disconnect due to requested circuit/channel not available.
      *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
      * @since 9
      */
     REQUEST_CIRCUIT_CHANNEL_NOT_AVAILABLE = 44,
 
     /**
-     * Resources unavailable unspecified.
+     * Indicates the call disconnect due to resources unavailable unspecified.
      *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
      * @since 9
      */
     RESOURCES_UNAVAILABLE_UNSPECIFIED = 47,
 
     /**
-     * Quality of service unavailable.
+     * Indicates the call disconnect due to quality of service unavailable.
      *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
      * @since 9
      */
     QUALITY_OF_SERVICE_UNAVAILABLE = 49,
 
     /**
-     * Requested facility not subscribed.
+     * Indicates the call disconnect due to requested facility not subscribed.
      *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
      * @since 9
      */
     REQUESTED_FACILITY_NOT_SUBSCRIBED = 50,
 
     /**
-     * Incoming calls barred within the CUG.
+     * Indicates the call disconnect due to incoming calls barred within the CUG.
      *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
      * @since 9
      */
     INCOMING_CALLS_BARRED_WITHIN_THE_CUG = 55,
 
     /**
-     * Bearer capability not authorized.
+     * Indicates the call disconnect due to bearer capability not authorized.
      *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
      * @since 9
      */
     BEARER_CAPABILITY_NOT_AUTHORIZED = 57,
 
     /**
-     * Bearer capability not presently available.
+     * Indicates the call disconnect due to bearer capability not presently available.
      *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
      * @since 9
      */
     BEARER_CAPABILITY_NOT_PRESENTLY_AVAILABLE = 58,
 
     /**
-     * Service or option not available, unspecified.
+     * Indicates the call disconnect due to service or option not available, unspecified.
      *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
      * @since 9
      */
     SERVICE_OR_OPTION_NOT_AVAILABLE_UNSPECIFIED = 63,
 
     /**
-     * Bearer service not implemented.
+     * Indicates the call disconnect due to bearer service not implemented.
      *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
      * @since 9
      */
     BEARER_SERVICE_NOT_IMPLEMENTED = 65,
 
     /**
-     * ACM equal to or greater than the maximum value.
+     * Indicates the call disconnect due to ACM equal to or greater than the maximum value.
      *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
      * @since 9
      */
     ACM_EQUALTO_OR_GREATER_THAN_THE_MAXIMUM_VALUE = 68,
 
     /**
-     * Requested facility not implemented.
+     * Indicates the call disconnect due to requested facility not implemented.
      *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
      * @since 9
      */
     REQUESTED_FACILITY_NOT_IMPLEMENTED = 69,
 
     /**
-     * Only restricted digital info BC available.
+     * Indicates the call disconnect due to only restricted digital info BC available.
      *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
      * @since 9
      */
     ONLY_RESTRICTED_DIGITAL_INFO_BEARER_CAPABILITY_IS_AVAILABLE = 70,
 
     /**
-     * Service or option not implemented, unspecified.
+     * Indicates the call disconnect due to service or option not implemented, unspecified.
      *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
      * @since 9
      */
     SERVICE_OR_OPTION_NOT_IMPLEMENTED_UNSPECIFIED = 79,
 
     /**
-     * Invalid transaction identifier value.
+     * Indicates the call disconnect due to invalid transaction identifier value.
      *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
      * @since 9
      */
     INVALID_TRANSACTION_IDENTIFIER_VALUE = 81,
 
     /**
-     * User not member of CUG.
+     * Indicates the call disconnect due to user not member of CUG.
      *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
      * @since 9
      */
     USER_NOT_MEMBER_OF_CUG = 87,
 
     /**
-     * Incompatible destination.
+     * Indicates the call disconnect due to incompatible destination.
      *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
      * @since 9
      */
     INCOMPATIBLE_DESTINATION = 88,
 
     /**
-     * Invalid transit network selection.
+     * Indicates the call disconnect due to invalid transit network selection.
      *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
      * @since 9
      */
     INVALID_TRANSIT_NETWORK_SELECTION = 91,
 
     /**
-     * Semantically incorrect message.
+     * Indicates the call disconnect due to semantically incorrect message.
      *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
      * @since 9
      */
     SEMANTICALLY_INCORRECT_MESSAGE = 95,
 
     /**
-     * Invalid mandatory information.
+     * Indicates the call disconnect due to invalid mandatory information.
      *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
      * @since 9
      */
     INVALID_MANDATORY_INFORMATION = 96,
 
     /**
-     * Msg type non-existent or not implemented.
+     * Indicates the call disconnect due to msg type non-existent or not implemented.
      *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
      * @since 9
      */
     MESSAGE_TYPE_NON_EXISTENT_OR_NOT_IMPLEMENTED = 97,
 
     /**
-     * Msg type not compatible with protocol state.
+     * Indicates the call disconnect due to msg type not compatible with protocol state.
      *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
      * @since 9
      */
     MESSAGE_TYPE_NOT_COMPATIBLE_WITH_PROTOCOL_STATE = 98,
 
     /**
-     * IE non-existent or not implemented.
+     * Indicates the call disconnect due to IE non-existent or not implemented.
      *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
      * @since 9
      */
     INFORMATION_ELEMENT_NON_EXISTENT_OR_NOT_IMPLEMENTED = 99,
 
     /**
-     * Conditional IE error.
+     * Indicates the call disconnect due to conditional IE error.
      *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
      * @since 9
      */
     CONDITIONAL_IE_ERROR = 100,
 
     /**
-     * Message not compatible with protocol state.
+     * Indicates the call disconnect due to message not compatible with protocol state.
      *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
      * @since 9
      */
     MESSAGE_NOT_COMPATIBLE_WITH_PROTOCOL_STATE = 101,
 
     /**
-     * Recovery on timer expiry timer number.
+     * Indicates the call disconnect due to recovery on timer expiry timer number.
      *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
      * @since 9
      */
     RECOVERY_ON_TIMER_EXPIRED = 102,
 
     /**
-     * Protocol error, unspecified.
+     * Indicates the call disconnect due to protocol error, unspecified.
      *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
      * @since 9
      */
     PROTOCOL_ERROR_UNSPECIFIED = 111,
 
     /**
-     * Interworking, unspecified.
+     * Indicates the call disconnect due to interworking, unspecified.
      *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
      * @since 9
      */
     INTERWORKING_UNSPECIFIED = 127,
 
     /**
-     * Call barred.
+     * Indicates the call disconnect due to call barred.
      *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
      * @since 9
      */
     CALL_BARRED = 240,
 
     /**
-     * FDN blocked.
+     * Indicates the call disconnect due to FDN blocked.
      *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
      * @since 9
      */
     FDN_BLOCKED = 241,
 
     /**
-     * IMSI in VLR is unknown.
+     * Indicates the call disconnect due to IMSI in VLR is unknown.
      *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
      * @since 9
      */
     IMSI_UNKNOWN_IN_VLR = 242,
 
     /**
-     * IMEI not accepted.
+     * Indicates the call disconnect due to IMEI not accepted.
      *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
      * @since 9
      */
     IMEI_NOT_ACCEPTED = 243,
 
     /**
-     * Dial modified to USSD.
+     * Indicates the call disconnect due to dial modified to USSD.
      *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
      * @since 9
      */
     DIAL_MODIFIED_TO_USSD = 244,
 
     /**
-     * Dial modified to SS.
+     * Indicates the call disconnect due to dial modified to SS.
      *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
      * @since 9
      */
     DIAL_MODIFIED_TO_SS = 245,
 
     /**
-     * Dial modified to dial.
+     * Indicates the call disconnect due to dial modified to dial.
      *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
      * @since 9
      */
     DIAL_MODIFIED_TO_DIAL = 246,
 
     /**
-     * Radio off.
+     * Indicates the call disconnect due to Radio off.
      *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
      * @since 9
      */
     RADIO_OFF = 247,
 
     /**
-     * Out of service.
+     * Indicates the call disconnect due to out of service.
      *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
      * @since 9
      */
     OUT_OF_SERVICE = 248,
 
     /**
-     * Invalid SIM.
+     * Indicates the call disconnect due to invalid SIM.
      *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
      * @since 9
      */
     NO_VALID_SIM = 249,
 
     /**
-     * Radio internal error.
+     * Indicates the call disconnect due to radio internal error.
      *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
      * @since 9
      */
     RADIO_INTERNAL_ERROR = 250,
 
     /**
-     * Network response timeout.
+     * Indicates the call disconnect due to network response timeout.
      *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
      * @since 9
      */
     NETWORK_RESP_TIMEOUT = 251,
 
     /**
-     * Network reject.
+     * Indicates the call disconnect due to network reject.
      *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
      * @since 9
      */
     NETWORK_REJECT = 252,
 
     /**
-     * Radio access failure.
+     * Indicates the call disconnect due to radio access failure.
      *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
      * @since 9
      */
     RADIO_ACCESS_FAILURE = 253,
 
     /**
-     * Radio link failure.
+     * Indicates the call disconnect due to radio link failure.
      *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
      * @since 9
      */
     RADIO_LINK_FAILURE = 254,
 
     /**
-     * Radio link lost.
+     * Indicates the call disconnect due to radio link lost.
      *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
      * @since 9
      */
     RADIO_LINK_LOST = 255,
 
     /**
-     * Radio uplink failure.
+     * Indicates the call disconnect due to radio uplink failure.
      *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
      * @since 9
      */
     RADIO_UPLINK_FAILURE = 256,
 
     /**
-     * Radio setup failure.
+     * Indicates the call disconnect due to radio setup failure.
      *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
      * @since 9
      */
     RADIO_SETUP_FAILURE = 257,
 
     /**
-     * Radio release normal.
+     * Indicates the call disconnect due to radio release normal.
      *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
      * @since 9
      */
     RADIO_RELEASE_NORMAL = 258,
 
     /**
-     * Radio release abnormal.
+     * Indicates the call disconnect due to radio release abnormal.
      *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
      * @since 9
      */
     RADIO_RELEASE_ABNORMAL = 259,
 
     /**
-     * Access class blocked.
+     * Indicates the call disconnect due to access class blocked.
      *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
      * @since 9
      */
     ACCESS_CLASS_BLOCKED = 260,
 
     /**
-     * Network detach.
+     * Indicates the call disconnect due to network detach.
      *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
      * @since 9
      */
     NETWORK_DETACH = 261,
 
     /**
-     * Invalid parameter.
+     * Indicates the call disconnect due to invalid parameter.
      *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
      * @since 8
      */
     INVALID_PARAMETER = 1025,
 
     /**
-     * Sim not exit.
+     * Indicates the call disconnect due to sim not exit.
      *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
      * @since 8
      */
     SIM_NOT_EXIT = 1026,
 
     /**
-     * Sim pin need.
+     * Indicates the call disconnect due to sim pin need.
      *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
      * @since 8
      */
     SIM_PIN_NEED = 1027,
 
     /**
-     * Call Not allow.
+     * Indicates the call disconnect due to call not allow.
      *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
      * @since 8
      */
     CALL_NOT_ALLOW = 1029,
 
     /**
-     * Sim invalid.
+     * Indicates the call disconnect due to sim invalid.
      *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
      * @since 8
      */
     SIM_INVALID = 1045,
 
     /**
-     * Unknown error.
+     * Indicates the call disconnect due to unknown error.
      *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
      * @since 8
      */
     UNKNOWN = 1279,
   }
 
   /**
+   * Indicates the cause of a call disconnection.
+   *
+   * @interface DisconnectedDetails
+   * @syscap SystemCapability.Telephony.CallManager
    * @systemapi Hide this for inner system use.
    * @since 9
    */
   export interface DisconnectedDetails {
     /**
      * Indicates the reason for ending the call.
+     *
+     * @type { DisconnectedReason }
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
+     * @since 9
      */
     reason: DisconnectedReason;
     /**
      * Indicates the message for ending the call.
+     *
+     * @type { string }
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
+     * @since 9
      */
     message: string;
   }
