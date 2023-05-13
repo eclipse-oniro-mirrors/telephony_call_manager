@@ -296,6 +296,10 @@ bool AudioControlManager::PlayRingtone(const std::string &phoneNum, const std::s
 
 bool AudioControlManager::PlaySoundtone()
 {
+    if (soundState_ == SoundState:: SOUNDING) {
+        TELEPHONY_LOGE("should not play soundTone");
+        return false;
+    }
     if (sound_ == nullptr) {
         sound_ = std::make_unique<Sound>();
         if (sound_ == nullptr) {
@@ -543,6 +547,10 @@ bool AudioControlManager::IsAudioActivated() const
 
 int32_t AudioControlManager::PlayCallTone(ToneDescriptor type)
 {
+    if (toneState_ == ToneState::TONEING) {
+        TELEPHONY_LOGE("should not play callTone");
+        return CALL_ERR_AUDIO_TONE_PLAY_FAILED;
+    }
     if (tone_ == nullptr) {
         tone_ = std::make_unique<Tone>(type);
         if (tone_ == nullptr) {

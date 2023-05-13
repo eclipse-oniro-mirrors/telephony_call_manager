@@ -21,8 +21,6 @@
 
 namespace OHOS {
 namespace Telephony {
-using AudioPlay = int32_t (AudioPlayer::*)(PlayerType);
-
 Sound::Sound() : audioPlayer_(new (std::nothrow) AudioPlayer()) {}
 
 Sound::~Sound()
@@ -40,9 +38,7 @@ int32_t Sound::Play()
         TELEPHONY_LOGE("audioPlayer_ is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    std::thread play(audioPlay, audioPlayer_, TYPE_SOUND);
-    play.detach();
-    return TELEPHONY_SUCCESS;
+    return audioPlayer_->Play(TYPE_SOUND);
 }
 
 int32_t Sound::Stop()
