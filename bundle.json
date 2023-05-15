@@ -48,7 +48,7 @@
                 "ipc",
                 "audio_framework",
                 "multimedia_camera_framework",
-                "multimedia_player_framework",
+                "player_framework",
                 "napi",
                 "power_manager",
                 "safwk",
