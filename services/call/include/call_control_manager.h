@@ -107,7 +107,6 @@ public:
     void GetDialParaInfo(DialParaInfo &info);
     void GetDialParaInfo(DialParaInfo &info, AppExecFwk::PacMap &extras);
     int32_t CancelMissedIncomingCallNotification();
-    int32_t QueryUnReadMissedCallLog();
 
 private:
     void CallStateObserve();

@@ -975,16 +975,6 @@ int32_t CallControlManager::CancelMissedIncomingCallNotification()
     return TELEPHONY_SUCCESS;
 }
 
-int32_t CallControlManager::QueryUnReadMissedCallLog()
-{
-    int32_t ret = DelayedSingleton<CallRecordsManager>::GetInstance()->QueryUnReadMissedCallLog();
-    if (ret != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("QueryUnReadMissedCallLog failed!");
-        return ret;
-    }
-    return TELEPHONY_SUCCESS;
-}
-
 void CallControlManager::CallStateObserve()
 {
     if (callStateListenerPtr_ == nullptr) {

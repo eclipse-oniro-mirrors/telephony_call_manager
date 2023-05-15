@@ -15,17 +15,30 @@
 
 #include "call_records_manager.h"
 
-#include "securec.h"
 #include "call_manager_inner_type.h"
 #include "call_number_utils.h"
+#include "common_event_manager.h"
+#include "common_event_support.h"
+#include "os_account_manager_wrapper.h"
+#include "securec.h"
 
 namespace OHOS {
 namespace Telephony {
 constexpr int16_t DEFAULT_COUNTRY_CODE = 0;
 constexpr int16_t DEFAULT_TIME = 0;
+const int32_t ACTIVE_USER_ID = 100;
 CallRecordsManager::CallRecordsManager() : callRecordsHandlerServerPtr_(nullptr) {}
 
-CallRecordsManager::~CallRecordsManager() {}
+CallRecordsManager::~CallRecordsManager()
+{
+    if (statusChangeListener_ != nullptr) {
+        auto samgrProxy = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+        if (samgrProxy != nullptr) {
+            samgrProxy->UnSubscribeSystemAbility(OHOS::SUBSYS_ACCOUNT_SYS_ABILITY_ID_BEGIN, statusChangeListener_);
+            statusChangeListener_ = nullptr;
+        }
+    }
+}
 
 void CallRecordsManager::Init()
 {
@@ -35,6 +48,21 @@ void CallRecordsManager::Init()
         return;
     }
     callRecordsHandlerServerPtr_->Start();
+    statusChangeListener_ = new (std::nothrow) AccountSystemAbilityListener();
+    if (statusChangeListener_ == nullptr) {
+        TELEPHONY_LOGE("failed to create statusChangeListener");
+        return;
+    }
+    auto managerPtr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (managerPtr == nullptr) {
+        TELEPHONY_LOGE("get system ability manager error");
+        return;
+    }
+    int32_t ret = managerPtr->SubscribeSystemAbility(OHOS::SUBSYS_ACCOUNT_SYS_ABILITY_ID_BEGIN, statusChangeListener_);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("failed to subscribe account manager service SA!");
+        return;
+    }
 }
 
 void CallRecordsManager::CallStateUpdated(
@@ -125,18 +153,71 @@ int32_t CallRecordsManager::CancelMissedIncomingCallNotification()
     return TELEPHONY_SUCCESS;
 }
 
-int32_t CallRecordsManager::QueryUnReadMissedCallLog()
+void AccountSystemAbilityListener::OnAddSystemAbility(int32_t systemAbilityId, const std::string &deviceId)
 {
-    if (callRecordsHandlerServerPtr_ == nullptr) {
-        TELEPHONY_LOGE("callRecordsHandlerServerPtr_ is nullptr");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    TELEPHONY_LOGI("SA:%{public}d is added!", systemAbilityId);
+    if (!CheckInputSysAbilityId(systemAbilityId)) {
+        TELEPHONY_LOGE("added SA is invalid!");
+        return;
     }
-    int32_t ret = callRecordsHandlerServerPtr_->QueryUnReadMissedCallLog();
-    if (ret != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("QueryUnReadMissedCallLog failed!");
-        return ret;
+    if (systemAbilityId != OHOS::SUBSYS_ACCOUNT_SYS_ABILITY_ID_BEGIN) {
+        TELEPHONY_LOGE("added SA is not accoubt manager service, ignored.");
+        return;
     }
-    return TELEPHONY_SUCCESS;
+    std::vector<int32_t> activeList = { 0 };
+    DelayedSingleton<AppExecFwk::OsAccountManagerWrapper>::GetInstance()->QueryActiveOsAccountIds(activeList);
+    TELEPHONY_LOGI("current active user id is :%{public}d", activeList[0]);
+    if (activeList[0] == ACTIVE_USER_ID) {
+        int32_t ret = DelayedSingleton<CallRecordsHandlerService>::GetInstance()->QueryUnReadMissedCallLog();
+        if (ret != TELEPHONY_SUCCESS) {
+            TELEPHONY_LOGE("QueryUnReadMissedCallLog failed!");
+        }
+    } else {
+        MatchingSkills matchingSkills;
+        matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_USER_SWITCHED);
+        CommonEventSubscribeInfo subscriberInfo(matchingSkills);
+        userSwitchSubscriber_ = std::make_shared<UserSwitchEventSubscriber>(subscriberInfo);
+        bool subRet = CommonEventManager::SubscribeCommonEvent(userSwitchSubscriber_);
+        if (!subRet) {
+            TELEPHONY_LOGE("Subscribe user switched event failed!");
+        }
+    }
+}
+
+void AccountSystemAbilityListener::OnRemoveSystemAbility(int32_t systemAbilityId, const std::string &deviceId)
+{
+    TELEPHONY_LOGI("SA:%{public}d is removed!", systemAbilityId);
+    if (!CheckInputSysAbilityId(systemAbilityId)) {
+        TELEPHONY_LOGE("removed SA is invalid!");
+        return;
+    }
+    if (systemAbilityId != OHOS::SUBSYS_ACCOUNT_SYS_ABILITY_ID_BEGIN) {
+        TELEPHONY_LOGE("removed SA is not account manager service,, ignored.");
+        return;
+    }
+    if (userSwitchSubscriber_ != nullptr) {
+        bool subRet = CommonEventManager::UnSubscribeCommonEvent(userSwitchSubscriber_);
+        if (!subRet) {
+            TELEPHONY_LOGE("UnSubscribe user switched event failed!");
+        }
+        userSwitchSubscriber_ = nullptr;
+    }
+}
+
+void UserSwitchEventSubscriber::OnReceiveEvent(const CommonEventData &data)
+{
+    OHOS::EventFwk::Want want = data.GetWant();
+    std::string action = data.GetWant().GetAction();
+    TELEPHONY_LOGI("action = %{public}s", action.c_str());
+    if (action == CommonEventSupport::COMMON_EVENT_USER_SWITCHED) {
+        int32_t userId = data.GetCode();
+        if (userId == ACTIVE_USER_ID) {
+            int32_t ret = DelayedSingleton<CallRecordsHandlerService>::GetInstance()->QueryUnReadMissedCallLog();
+            if (ret != TELEPHONY_SUCCESS) {
+                TELEPHONY_LOGE("Query unread missed call log failed!");
+            }
+        }
+    }
 }
 } // namespace Telephony
 } // namespace OHOS

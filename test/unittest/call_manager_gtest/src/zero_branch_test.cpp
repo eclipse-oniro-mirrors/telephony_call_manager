@@ -1697,7 +1697,6 @@ HWTEST_F(BranchTest, Telephony_CallRecordsManager_001, Function | MediumTest | L
     info.ringEndTime = ONE_TIME;
     callRecordsManager.AddOneCallRecord(info);
     ASSERT_NE(callRecordsManager.CancelMissedIncomingCallNotification(), TELEPHONY_SUCCESS);
-    ASSERT_EQ(callRecordsManager.QueryUnReadMissedCallLog(), TELEPHONY_SUCCESS);
 }
 
 /**
@@ -1747,7 +1746,6 @@ HWTEST_F(BranchTest, Telephony_CallControlManager_001, Function | MediumTest | L
     ASSERT_TRUE(callControlManager->NotifyIncomingCallAnswered(callObjectPtr));
     ASSERT_TRUE(callControlManager->NotifyIncomingCallRejected(callObjectPtr, false, ""));
     ASSERT_NE(callControlManager->CancelMissedIncomingCallNotification(), TELEPHONY_SUCCESS);
-    ASSERT_NE(callControlManager->QueryUnReadMissedCallLog(), TELEPHONY_SUCCESS);
 }
 
 /**
