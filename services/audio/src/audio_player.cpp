@@ -144,11 +144,11 @@ int32_t AudioPlayer::Play(const std::string &path, AudioStandard::AudioStreamTyp
 
 int32_t AudioPlayer::Play(PlayerType playerType)
 {
-    SetStop(playerType, false);
     if (!InitRenderer()) {
         TELEPHONY_LOGE("audio renderer init failed");
         return TELEPHONY_ERR_UNINIT;
     }
+    SetStop(playerType, false);
     return TELEPHONY_SUCCESS;
 }
 

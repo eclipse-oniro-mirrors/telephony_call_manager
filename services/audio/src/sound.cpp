@@ -33,7 +33,6 @@ Sound::~Sound()
 
 int32_t Sound::Play()
 {
-    AudioPlay audioPlay = &AudioPlayer::Play;
     if (audioPlayer_ == nullptr) {
         TELEPHONY_LOGE("audioPlayer_ is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;

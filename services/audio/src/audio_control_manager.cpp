@@ -296,7 +296,7 @@ bool AudioControlManager::PlayRingtone(const std::string &phoneNum, const std::s
 
 bool AudioControlManager::PlaySoundtone()
 {
-    if (soundState_ == SoundState:: SOUNDING) {
+    if (soundState_ == SoundState::SOUNDING) {
         TELEPHONY_LOGE("should not play soundTone");
         return false;
     }
