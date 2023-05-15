@@ -357,7 +357,7 @@ int32_t AudioDeviceManager::ReportAudioDeviceChange()
         return TELEPHONY_ERR_MEMCPY_FAIL;
     }
     info_.isMuted = DelayedSingleton<AudioProxy>::GetInstance()->IsMicrophoneMute();
-    if (!DelayedSingleton<AudioControlManager>::GetInstance()->IsAudioActivated()) {
+    if (!isAudioActivated_) {
         TELEPHONY_LOGE("call is not active, no need to report");
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }

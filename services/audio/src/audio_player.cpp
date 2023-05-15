@@ -144,11 +144,11 @@ int32_t AudioPlayer::Play(const std::string &path, AudioStandard::AudioStreamTyp
 
 int32_t AudioPlayer::Play(PlayerType playerType)
 {
-    SetStop(playerType, false);
     if (!InitRenderer()) {
         TELEPHONY_LOGE("audio renderer init failed");
         return TELEPHONY_ERR_UNINIT;
     }
+    SetStop(playerType, false);
     return TELEPHONY_SUCCESS;
 }
 
@@ -165,6 +165,11 @@ void AudioPlayer::SetStop(PlayerType playerType, bool state)
             break;
         case PlayerType::TYPE_TONE:
             isToneStop_ = state;
+            if (isToneStop_) {
+                DelayedSingleton<AudioControlManager>::GetInstance()->SetToneState(ToneState::STOPPED);
+            } else {
+                DelayedSingleton<AudioControlManager>::GetInstance()->SetToneState(ToneState::TONEING);
+            }
             break;
         case PlayerType::TYPE_SOUND:
             isSoundStop_ = state;

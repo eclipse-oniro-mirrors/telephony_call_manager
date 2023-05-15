@@ -39,8 +39,10 @@ Ring::Ring(const std::string &path)
 
 Ring::~Ring()
 {
-    delete audioPlayer_;
-    audioPlayer_ = nullptr;
+    if (audioPlayer_ != nullptr) {
+        delete audioPlayer_;
+        audioPlayer_ = nullptr;
+    }
 }
 
 void Ring::Init(const std::string &ringtonePath)
@@ -71,6 +73,10 @@ int32_t Ring::Play()
         TELEPHONY_LOGE("should not ring or ringtone path empty");
         return CALL_ERR_INVALID_PATH;
     }
+    if (audioPlayer_ == nullptr) {
+        TELEPHONY_LOGE("audioPlayer_ is nullptr");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     int32_t result = TELEPHONY_SUCCESS;
     AudioPlay audioPlay = &AudioPlayer::Play;
     std::thread play(audioPlay, audioPlayer_, ringtonePath_, AudioStandard::AudioStreamType::STREAM_RING,
@@ -88,6 +94,10 @@ int32_t Ring::Stop()
     if (!shouldRing_ || ringtonePath_.empty()) {
         TELEPHONY_LOGE("should not ring or ringtone path empty");
         return CALL_ERR_INVALID_PATH;
+    }
+    if (audioPlayer_ == nullptr) {
+        TELEPHONY_LOGE("audioPlayer_ is nullptr");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     int32_t result = TELEPHONY_SUCCESS;
     audioPlayer_->SetStop(PlayerType::TYPE_RING, true);
@@ -125,6 +135,10 @@ bool Ring::ShouldVibrate()
 
 void Ring::ReleaseRenderer()
 {
+    if (audioPlayer_ == nullptr) {
+        TELEPHONY_LOGE("audioPlayer_ is nullptr");
+        return;
+    }
     audioPlayer_->ReleaseRenderer();
 }
 } // namespace Telephony

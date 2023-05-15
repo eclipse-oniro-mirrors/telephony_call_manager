@@ -32,8 +32,10 @@ Tone::Tone(ToneDescriptor tone)
 
 Tone::~Tone()
 {
-    delete audioPlayer_;
-    audioPlayer_ = nullptr;
+    if (audioPlayer_ != nullptr) {
+        delete audioPlayer_;
+        audioPlayer_ = nullptr;
+    }
 }
 
 void Tone::Init() {}
@@ -49,6 +51,10 @@ int32_t Tone::Play()
         playerType = PlayerType::TYPE_DTMF;
     }
     AudioPlay audioPlay = &AudioPlayer::Play;
+    if (audioPlayer_ == nullptr) {
+        TELEPHONY_LOGE("audioPlayer_ is nullptr");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     std::thread play(audioPlay, audioPlayer_,
         GetToneDescriptorPath(currentToneDescriptor_), AudioStandard::AudioStreamType::STREAM_MUSIC, playerType);
     play.detach();
@@ -65,6 +71,10 @@ int32_t Tone::Stop()
     PlayerType playerType = PlayerType::TYPE_TONE;
     if (IsDtmf(currentToneDescriptor_)) {
         playerType = PlayerType::TYPE_DTMF;
+    }
+    if (audioPlayer_ == nullptr) {
+        TELEPHONY_LOGE("audioPlayer_ is nullptr");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     audioPlayer_->SetStop(playerType, true);
     return TELEPHONY_SUCCESS;
@@ -152,6 +162,10 @@ std::string Tone::GetToneDescriptorPath(ToneDescriptor tone)
 
 void Tone::ReleaseRenderer()
 {
+    if (audioPlayer_ == nullptr) {
+        TELEPHONY_LOGE("audioPlayer_ is nullptr");
+        return;
+    }
     audioPlayer_->ReleaseRenderer();
 }
 } // namespace Telephony
