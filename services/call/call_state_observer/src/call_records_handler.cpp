@@ -221,6 +221,5 @@ int32_t CallRecordsHandlerService::QueryUnReadMissedCallLog()
     handler_->SendEvent(HANDLER_QUERY_UNREAD_MISSED_CALL_LOG, 0);
     return TELEPHONY_SUCCESS;
 }
-
 } // namespace Telephony
 } // namespace OHOS

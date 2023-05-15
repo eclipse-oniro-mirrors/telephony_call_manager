@@ -71,10 +71,6 @@ bool CallManagerService::Init()
     DelayedSingleton<CellularCallConnection>::GetInstance()->Init(TELEPHONY_CELLULAR_CALL_SYS_ABILITY_ID);
     DelayedSingleton<CallRecordsManager>::GetInstance()->Init();
     DelayedSingleton<BluetoothConnection>::GetInstance()->Init();
-    int32_t ret = callControlManagerPtr_->QueryUnReadMissedCallLog();
-    if (ret == TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGI("Query unread missed call log success");
-    }
     return true;
 }
 

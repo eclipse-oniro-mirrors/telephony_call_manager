@@ -19,13 +19,38 @@
 #include <mutex>
 #include <set>
 
-#include "singleton.h"
-
-#include "call_state_listener_base.h"
 #include "call_records_handler.h"
+#include "call_state_listener_base.h"
+#include "common_event_subscriber.h"
+#include "iservice_registry.h"
+#include "singleton.h"
+#include "system_ability_definition.h"
+#include "system_ability_status_change_stub.h"
 
 namespace OHOS {
 namespace Telephony {
+using namespace OHOS::EventFwk;
+using CommonEventSubscribeInfo = OHOS::EventFwk::CommonEventSubscribeInfo;
+using CommonEventSubscriber = OHOS::EventFwk::CommonEventSubscriber;
+
+class UserSwitchEventSubscriber : public CommonEventSubscriber {
+public:
+    explicit UserSwitchEventSubscriber(const CommonEventSubscribeInfo &info) : CommonEventSubscriber(info) {}
+    ~UserSwitchEventSubscriber() = default;
+    void OnReceiveEvent(const OHOS::EventFwk::CommonEventData &data) override;
+};
+
+class AccountSystemAbilityListener : public SystemAbilityStatusChangeStub {
+public:
+    AccountSystemAbilityListener() = default;
+    ~AccountSystemAbilityListener() = default;
+    void OnAddSystemAbility(int32_t systemAbilityId, const std::string &deviceId) override;
+    void OnRemoveSystemAbility(int32_t systemAbilityId, const std::string &deviceId) override;
+
+private:
+    std::shared_ptr<UserSwitchEventSubscriber> userSwitchSubscriber_ = nullptr;
+};
+
 /**
  * @class CallRecordsManager
  * Responsible for recording calls. Logging operations will be performed in a background thread
@@ -39,11 +64,11 @@ public:
     void AddOneCallRecord(CallAttributeInfo &info);
     void AddOneCallRecord(sptr<CallBase> call, CallAnswerType answerType);
     int32_t CancelMissedIncomingCallNotification();
-    int32_t QueryUnReadMissedCallLog();
 
 private:
     std::shared_ptr<CallRecordsHandlerService> callRecordsHandlerServerPtr_;
     std::mutex mutex_;
+    sptr<ISystemAbilityStatusChange> statusChangeListener_ = nullptr;
 };
 } // namespace Telephony
 } // namespace OHOS

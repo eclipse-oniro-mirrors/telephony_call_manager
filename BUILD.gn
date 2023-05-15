@@ -123,6 +123,7 @@ ohos_shared_library("tel_call_manager") {
     "ability_base:base",
     "ability_base:want",
     "ability_base:zuri",
+    "ability_runtime:ability_deps_wrapper",
     "ability_runtime:ability_manager",
     "ability_runtime:dataobs_manager",
     "audio_framework:audio_client",

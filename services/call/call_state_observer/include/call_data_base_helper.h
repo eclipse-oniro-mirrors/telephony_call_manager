@@ -78,8 +78,8 @@ public:
     bool Query(ContactInfo &contactInfo, DataShare::DataSharePredicates &predicates);
     bool Update(DataShare::DataSharePredicates &predicates, DataShare::DataShareValuesBucket &values);
     bool Delete(DataShare::DataSharePredicates &predicates);
-    bool QueryCallLog(std::map<std::string, int32_t> &phonesAndUnreadCountMap,
-                      DataShare::DataSharePredicates &predicates);
+    bool QueryCallLog(
+        std::map<std::string, int32_t> &phonesAndUnreadCountMap, DataShare::DataSharePredicates &predicates);
 
 public:
     const int16_t CALL_LOG_DEFAULT_COUNT = 1;
