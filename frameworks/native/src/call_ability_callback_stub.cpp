@@ -110,8 +110,13 @@ int32_t CallAbilityCallbackStub::OnUpdateCallEvent(MessageParcel &data, MessageP
 
 int32_t CallAbilityCallbackStub::OnUpdateCallDisconnectedCause(MessageParcel &data, MessageParcel &reply)
 {
-    auto info = (DisconnectedDetails *)data.ReadRawData(sizeof(DisconnectedDetails));
-    int32_t result = OnCallDisconnectedCause(*info);
+    const DisconnectedDetails *dcDetails = nullptr;
+    dcDetails = reinterpret_cast<const DisconnectedDetails *>(data.ReadRawData(sizeof(DisconnectedDetails)));
+    if (dcDetails == nullptr) {
+        TELEPHONY_LOGE("reading raw data failed");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    int32_t result = OnCallDisconnectedCause(*dcDetails);
     if (!reply.WriteInt32(result)) {
         TELEPHONY_LOGE("writing parcel failed");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
