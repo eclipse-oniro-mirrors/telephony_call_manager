@@ -919,6 +919,7 @@ int32_t CallManagerService::CancelMissedIncomingCallNotification()
 
 sptr<IRemoteObject> CallManagerService::GetProxyObjectPtr(CallManagerProxyType proxyType)
 {
+    std::lock_guard<std::mutex> guard(lock_);
     auto it = proxyObjectPtrMap_.find(static_cast<uint32_t>(proxyType));
     if (it != proxyObjectPtrMap_.end()) {
         TELEPHONY_LOGI("GetProxyObjectPtr success! proxyType:%{public}d", proxyType);
