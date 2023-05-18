@@ -1245,6 +1245,43 @@ void IsImsSwitchEnabled()
     std::cout << "return value:" << ret << std::endl;
 }
 
+void SetVoNRState()
+{
+    AccessToken token;
+    int32_t slotId = SIM1_SLOTID;
+    int32_t state = 0;
+    std::cout << "------SetVoNRState------" << std::endl;
+    std::cout << "please input slot id:" << std::endl;
+    std::cin >> slotId;
+    std::cout << "please input state:" << std::endl;
+    std::cin >> state;
+    int32_t ret = TELEPHONY_SUCCESS;
+    if (g_clientPtr == nullptr) {
+        std::cout << "g_clientPtr is nullptr" << std::endl;
+        return;
+    }
+    ret = g_clientPtr->SetVoNRState(slotId, state);
+    std::cout << "return value:" << ret << std::endl;
+}
+
+void GetVoNRState()
+{
+    AccessToken token;
+    int32_t slotId = SIM1_SLOTID;
+    std::cout << "------GetVoNRState------" << std::endl;
+    std::cout << "please input slot id:" << std::endl;
+    std::cin >> slotId;
+    int32_t ret = TELEPHONY_SUCCESS;
+    if (g_clientPtr == nullptr) {
+        std::cout << "g_clientPtr is nullptr" << std::endl;
+        return;
+    }
+    int32_t state;
+    ret = g_clientPtr->GetVoNRState(slotId, state);
+    std::cout << "state:" << state << std::endl;
+    std::cout << "return value:" << ret << std::endl;
+}
+
 void StartRtt()
 {
     int32_t callId = DEFAULT_CALL_ID;
@@ -1409,6 +1446,8 @@ void InitImsServicePower()
     g_memberFuncMap[OHOS::Telephony::INTERFACE_ENABLE_VOLTE] = &OHOS::Telephony::EnableImsSwitch;
     g_memberFuncMap[OHOS::Telephony::INTERFACE_DISABLE_VOLTE] = &OHOS::Telephony::DisableImsSwitch;
     g_memberFuncMap[OHOS::Telephony::INTERFACE_IS_VOLTE_ENABLED] = &OHOS::Telephony::IsImsSwitchEnabled;
+    g_memberFuncMap[OHOS::Telephony::INTERFACE_SET_VONR_STATE] = &OHOS::Telephony::SetVoNRState;
+    g_memberFuncMap[OHOS::Telephony::INTERFACE_GET_VONR_STATE] = &OHOS::Telephony::GetVoNRState;
 }
 
 int32_t Init()
@@ -1521,6 +1560,8 @@ void PrintfCallMultimediaInterface()
               << "49:StartRtt\n"
               << "50:StopRtt\n"
               << "57:InputDialerSpecialCode\n"
+              << "59:SetVoNRState\n"
+              << "60:GetVoNRState\n"
               << "93:InitPermission\n"
               << "94:VerifyPermission\n"
               << "95:SendConnectBluetoothScoBroadcast\n"

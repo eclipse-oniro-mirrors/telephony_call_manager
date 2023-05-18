@@ -57,6 +57,22 @@ void IsImsSwitchEnabled(const uint8_t *data, size_t size)
     DelayedSingleton<CallManagerService>::GetInstance()->OnIsVoLteEnabled(dataMessageParcel, reply);
 }
 
+void GetVoNRState(const uint8_t *data, size_t size)
+{
+    if (!IsServiceInited()) {
+        return;
+    }
+
+    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
+    MessageParcel dataMessageParcel;
+    dataMessageParcel.WriteInt32(slotId);
+    size_t dataSize = size - sizeof(int32_t);
+    dataMessageParcel.WriteBuffer(data + sizeof(int32_t), dataSize);
+    dataMessageParcel.RewindRead(0);
+    MessageParcel reply;
+    DelayedSingleton<CallManagerService>::GetInstance()->OnGetVoNRState(dataMessageParcel, reply);
+}
+
 void GetImsConfig(const uint8_t *data, size_t size)
 {
     if (!IsServiceInited()) {
@@ -134,6 +150,7 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     }
 
     IsImsSwitchEnabled(data, size);
+    GetVoNRState(data, size);
     GetImsConfig(data, size);
     GetImsFeatureValue(data, size);
     GetCallTransferInfo(data, size);
