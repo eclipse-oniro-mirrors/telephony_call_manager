@@ -548,6 +548,26 @@ int32_t CallManagerClient::IsImsSwitchEnabled(int32_t slotId, bool &enabled)
     }
 }
 
+int32_t CallManagerClient::SetVoNRState(int32_t slotId, int32_t state)
+{
+    if (g_callManagerProxy != nullptr) {
+        return g_callManagerProxy->SetVoNRState(slotId, state);
+    } else {
+        TELEPHONY_LOGE("[slot%{public}d] init first please!", slotId);
+        return TELEPHONY_ERR_UNINIT;
+    }
+}
+
+int32_t CallManagerClient::GetVoNRState(int32_t slotId, int32_t &state)
+{
+    if (g_callManagerProxy != nullptr) {
+        return g_callManagerProxy->GetVoNRState(slotId, state);
+    } else {
+        TELEPHONY_LOGE("[slot%{public}d] init first please!", slotId);
+        return TELEPHONY_ERR_UNINIT;
+    }
+}
+
 int32_t CallManagerClient::StartRtt(int32_t callId, std::u16string &msg)
 {
     if (g_callManagerProxy != nullptr) {

@@ -54,6 +54,7 @@ public:
     static napi_value DeclareCallWaitingEnum(napi_env env, napi_value exports);
     static napi_value DeclareCallTransferEnum(napi_env env, napi_value exports);
     // Enumeration type extension
+    static napi_value DeclareVoNRStateEnum(napi_env env, napi_value exports);
     static napi_value DeclareAudioDeviceEnum(napi_env env, napi_value exports);
     static napi_value DeclareVideoStateTypeEnum(napi_env env, napi_value exports);
     static napi_value DeclareImsCallModeEnum(napi_env env, napi_value exports);
@@ -121,6 +122,8 @@ public:
     static napi_value EnableImsSwitch(napi_env env, napi_callback_info info);
     static napi_value DisableImsSwitch(napi_env env, napi_callback_info info);
     static napi_value IsImsSwitchEnabled(napi_env env, napi_callback_info info);
+    static napi_value SetVoNRState(napi_env env, napi_callback_info info);
+    static napi_value GetVoNRState(napi_env env, napi_callback_info info);
     static napi_value StartRTT(napi_env env, napi_callback_info info);
     static napi_value StopRTT(napi_env env, napi_callback_info info);
     static napi_value JoinConference(napi_env env, napi_callback_info info);
@@ -141,6 +144,7 @@ private:
     static void NativePropertyCallBack(napi_env env, napi_status status, void *data);
     static void NativeGetMainCallIdCallBack(napi_env env, napi_status status, void *data);
     static void NativeIsImsSwitchEnabledCallBack(napi_env env, napi_status status, void *data);
+    static void NativeGetVoNRStateCallBack(napi_env env, napi_status status, void *data);
     static void NativeBoolCallBack(napi_env env, napi_status status, void *data);
     static void NativeBoolCallBackWithErrorCode(napi_env env, napi_status status, void *data);
     static void NativeIsEmergencyPhoneNumberCallBack(napi_env env, napi_status status, void *data);
@@ -195,6 +199,8 @@ private:
     static void NativeIsImsSwitchEnabled(napi_env env, void *data);
     static void NativeEnableImsSwitch(napi_env env, void *data);
     static void NativeDisableImsSwitch(napi_env env, void *data);
+    static void NativeSetVoNRState(napi_env env, void *data);
+    static void NativeGetVoNRState(napi_env env, void *data);
     static void NativeStartRTT(napi_env env, void *data);
     static void NativeStopRTT(napi_env env, void *data);
     static void NativeJoinConference(napi_env env, void *data);

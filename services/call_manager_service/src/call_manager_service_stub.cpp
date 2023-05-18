@@ -132,6 +132,8 @@ void CallManagerServiceStub::InitImsServiceRequest()
     memberFuncMap_[INTERFACE_ENABLE_VOLTE] = &CallManagerServiceStub::OnEnableVoLte;
     memberFuncMap_[INTERFACE_DISABLE_VOLTE] = &CallManagerServiceStub::OnDisableVoLte;
     memberFuncMap_[INTERFACE_IS_VOLTE_ENABLED] = &CallManagerServiceStub::OnIsVoLteEnabled;
+    memberFuncMap_[INTERFACE_SET_VONR_STATE] = &CallManagerServiceStub::OnSetVoNRState;
+    memberFuncMap_[INTERFACE_GET_VONR_STATE] = &CallManagerServiceStub::OnGetVoNRState;
     memberFuncMap_[INTERFACE_START_RTT] = &CallManagerServiceStub::OnStartRtt;
     memberFuncMap_[INTERFACE_STOP_RTT] = &CallManagerServiceStub::OnStopRtt;
 }
@@ -920,6 +922,36 @@ int32_t CallManagerServiceStub::OnIsVoLteEnabled(MessageParcel &data, MessagePar
     }
     if (!reply.WriteInt32(result)) {
         TELEPHONY_LOGE("IsImsSwitchEnabled fail to write parcel");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallManagerServiceStub::OnSetVoNRState(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t result = TELEPHONY_ERR_FAIL;
+    int32_t slotId = data.ReadInt32();
+    int32_t state = data.ReadInt32();
+    result = SetVoNRState(slotId, state);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("SetVoNRState fail to write parcel");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallManagerServiceStub::OnGetVoNRState(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t result = TELEPHONY_ERR_FAIL;
+    int32_t slotId = data.ReadInt32();
+    int32_t state;
+    result = GetVoNRState(slotId, state);
+    if (!reply.WriteInt32(state)) {
+        TELEPHONY_LOGE("GetVoNRState fail to write parcel");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("GetVoNRState fail to write parcel");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
     return TELEPHONY_SUCCESS;

@@ -89,6 +89,8 @@ enum CallManagerSurfaceCode {
     INTERFACE_REPORT_AUDIO_DEVICE_INFO,
     INTERFACE_INPUT_DIALER_SPECIAL_CODE,
     INTERFACE_CANCEL_MISSED_INCOMING_CALL_NOTIFICATION,
+    INTERFACE_SET_VONR_STATE,
+    INTERFACE_GET_VONR_STATE,
 };
 
 enum CallManagerProxyType {
@@ -150,6 +152,8 @@ public:
     virtual int32_t EnableImsSwitch(int32_t slotId) = 0;
     virtual int32_t DisableImsSwitch(int32_t slotId) = 0;
     virtual int32_t IsImsSwitchEnabled(int32_t slotId, bool &enabled) = 0;
+    virtual int32_t SetVoNRState(int32_t slotId, int32_t state) = 0;
+    virtual int32_t GetVoNRState(int32_t slotId, int32_t &state) = 0;
     virtual int32_t StartRtt(int32_t callId, std::u16string &msg) = 0;
     virtual int32_t StopRtt(int32_t callId) = 0;
     virtual int32_t JoinConference(int32_t callId, std::vector<std::u16string> &numberList) = 0;

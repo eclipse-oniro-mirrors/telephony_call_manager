@@ -45,6 +45,8 @@ public:
     int32_t EnableImsSwitch(int32_t slotId);
     int32_t DisableImsSwitch(int32_t slotId);
     int32_t IsImsSwitchEnabled(int32_t slotId, bool &enabled);
+    int32_t SetVoNRState(int32_t slotId, int32_t state);
+    int32_t GetVoNRState(int32_t slotId, int32_t &state);
     int32_t CloseUnFinishedUssd(int32_t slotId);
 
 private:

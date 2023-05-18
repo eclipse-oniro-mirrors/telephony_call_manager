@@ -74,6 +74,8 @@ public:
         GET_IMS_FEATURE,
         SET_MUTE,
         GET_MUTE,
+        SET_VONR_SWITCH_STATUS,
+        GET_VONR_SWITCH_STATUS,
 
         /****************** video settings ******************/
         CTRL_CAMERA = 400,
@@ -365,6 +367,24 @@ public:
      * @return Returns TELEPHONY_SUCCESS on success, others on failure.
      */
     virtual int32_t GetImsSwitchStatus(int32_t slotId, bool &enabled) = 0;
+
+    /**
+     * Set VoNR Switch Status
+     *
+     * @param state
+     * @param slotId
+     * @return Returns TELEPHONY_SUCCESS on success, others on failure.
+     */
+    virtual int32_t SetVoNRState(int32_t slotId, int32_t state) = 0;
+
+    /**
+     * Get VoNR Switch Status
+     *
+     * @param slotId
+     * @param state
+     * @return Returns TELEPHONY_SUCCESS on success, others on failure.
+     */
+    virtual int32_t GetVoNRState(int32_t slotId, int32_t &state) = 0;
 
     /**
      * Set Ims Config

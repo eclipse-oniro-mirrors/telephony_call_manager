@@ -105,6 +105,11 @@ struct ImsSwitchAsyncContext : AsyncContext {
     bool enabled = false;
 };
 
+struct VoNRSwitchAsyncContext : AsyncContext {
+    int32_t slotId = 0;
+    int32_t state = 0;
+};
+
 struct CallRestrictionAsyncContext : AsyncContext {
     int32_t slotId = 0;
     CallRestrictionInfo info;

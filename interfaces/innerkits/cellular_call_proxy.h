@@ -320,6 +320,24 @@ public:
     int32_t GetImsSwitchStatus(int32_t slotId, bool &enabled) override;
 
     /**
+     * Set VoNR Switch Status
+     *
+     * @param state
+     * @param slot Id
+     * @return Returns TELEPHONY_SUCCESS on success, others on failure.
+     */
+    int32_t SetVoNRState(int32_t slotId, int32_t state) override;
+
+    /**
+     * Get VoNR Switch Status
+     *
+     * @param slot Id
+     * @param state
+     * @return Returns TELEPHONY_SUCCESS on success, others on failure.
+     */
+    int32_t GetVoNRState(int32_t slotId, int32_t &state) override;
+
+    /**
      * Set Ims Config
      *
      * @param ImsConfigItem

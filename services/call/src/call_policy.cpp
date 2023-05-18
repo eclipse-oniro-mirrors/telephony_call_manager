@@ -250,6 +250,21 @@ int32_t CallPolicy::IsVoLteEnabledPolicy(int32_t slotId)
     return TELEPHONY_SUCCESS;
 }
 
+int32_t CallPolicy::VoNRStatePolicy(int32_t slotId, int32_t& state)
+{
+    if (IsValidSlotId(slotId) != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("invalid slotId!");
+        return CALL_ERR_INVALID_SLOT_ID;
+    }
+    if (state == static_cast<int32_t>(VoNRState::VONR_STATE_ON) ||
+        state == static_cast<int32_t>(VoNRState::VONR_STATE_OFF)) {
+        state = !state;
+    } else {
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
 int32_t CallPolicy::GetCallWaitingPolicy(int32_t slotId)
 {
     if (IsValidSlotId(slotId) != TELEPHONY_SUCCESS) {

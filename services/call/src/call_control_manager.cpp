@@ -771,6 +771,40 @@ int32_t CallControlManager::IsImsSwitchEnabled(int32_t slotId, bool &enabled)
     }
 }
 
+int32_t CallControlManager::SetVoNRState(int32_t slotId, int32_t state)
+{
+    int32_t ret = CallPolicy::VoNRStatePolicy(slotId, state);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("SetVoNRState failed!");
+        return ret;
+    }
+    if (callSettingManagerPtr_ != nullptr) {
+        return callSettingManagerPtr_->SetVoNRState(slotId, state);
+    } else {
+        TELEPHONY_LOGE("callSettingManagerPtr_ is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+}
+
+int32_t CallControlManager::GetVoNRState(int32_t slotId, int32_t &state)
+{
+    int32_t ret = CallPolicy::IsValidSlotId(slotId);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("SetVoNRState failed!");
+        return ret;
+    }
+    if (callSettingManagerPtr_ != nullptr) {
+        ret = callSettingManagerPtr_->GetVoNRState(slotId, state);
+        if (ret == TELEPHONY_SUCCESS) {
+            ret = CallPolicy::VoNRStatePolicy(slotId, state);
+        }
+        return ret;
+    } else {
+        TELEPHONY_LOGE("callSettingManagerPtr_ is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+}
+
 int32_t CallControlManager::UpdateImsCallMode(int32_t callId, ImsCallMode mode)
 {
     int32_t ret = TELEPHONY_ERR_FAIL;
