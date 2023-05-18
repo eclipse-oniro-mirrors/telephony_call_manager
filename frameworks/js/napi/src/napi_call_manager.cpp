@@ -2992,9 +2992,9 @@ void NapiCallManager::NativeGetVoNRStateCallBack(napi_env env, napi_status statu
             napi_create_int32(env, asyncContext->state, &promiseValue);
             napi_resolve_deferred(env, asyncContext->deferred, promiseValue);
         } else {
-            JsError error = NapiUtil::ConverErrorMessageForJs(asyncContext->errorCode);
             napi_reject_deferred(env, asyncContext->deferred,
-                NapiCallManagerUtils::CreateErrorMessageWithErrorCode(env, error.errorMessage, error.errorCode));
+                NapiCallManagerUtils::CreateErrorCodeAndMessageForJs(
+                    env, asyncContext->errorCode, asyncContext->eventId));
         }
     } else {
         napi_value callbackValue[ARRAY_INDEX_THIRD] = { 0 };
@@ -3002,9 +3002,8 @@ void NapiCallManager::NativeGetVoNRStateCallBack(napi_env env, napi_status statu
             callbackValue[ARRAY_INDEX_FIRST] = NapiCallManagerUtils::CreateUndefined(env);
             napi_create_int32(env, asyncContext->state, &callbackValue[ARRAY_INDEX_SECOND]);
         } else {
-            JsError error = NapiUtil::ConverErrorMessageForJs(asyncContext->errorCode);
-            callbackValue[ARRAY_INDEX_FIRST] =
-                NapiCallManagerUtils::CreateErrorMessageWithErrorCode(env, error.errorMessage, error.errorCode);
+            callbackValue[ARRAY_INDEX_FIRST] = NapiCallManagerUtils::CreateErrorCodeAndMessageForJs(
+                env, asyncContext->errorCode, asyncContext->eventId);
             callbackValue[ARRAY_INDEX_SECOND] = NapiCallManagerUtils::CreateUndefined(env);
         }
         napi_value callback = nullptr;
