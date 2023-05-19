@@ -77,6 +77,7 @@ private:
 
 private:
     sptr<ISystemAbilityStatusChange> statusChangeListener_ = nullptr;
+    std::mutex bluetoothMutex_;
     std::unordered_map<std::string, Bluetooth::BluetoothRemoteDevice> mapConnectedBtDevices_;
 #endif
 };
