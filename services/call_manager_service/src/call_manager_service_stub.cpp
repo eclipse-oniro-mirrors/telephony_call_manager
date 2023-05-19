@@ -957,7 +957,7 @@ int32_t CallManagerServiceStub::OnReportOttCallDetailsInfo(MessageParcel &data, 
         TELEPHONY_LOGW("sent raw data is less than 32k");
     }
     int32_t vecCnt = data.ReadInt32();
-    if (vecCnt <= 0) {
+    if (vecCnt <= 0 || vecCnt > 5) {
         TELEPHONY_LOGE("vector is empty");
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
