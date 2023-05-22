@@ -4233,7 +4233,7 @@ void NapiCallManager::NativeCloseUnFinishedUssd(napi_env env, void *data)
         return;
     }
 
-    SupplementAsyncContext *asyncContext = (SupplementAsyncContext *)data;
+    SupplementAsyncContext *asyncContext = static_cast<SupplementAsyncContext *>(data);
     if (!IsValidSlotId(asyncContext->slotId)) {
         TELEPHONY_LOGE("NativeCloseUnFinishedUssd slotId is invalid");
         asyncContext->errorCode = SLOT_ID_INVALID;
@@ -4271,7 +4271,7 @@ void NapiCallManager::NativeInputDialerSpecialCode(napi_env env, void *data)
         NapiUtil::ThrowParameterError(env);
         return;
     }
-    AsyncContext *asyncContext = (AsyncContext *)data;
+    AsyncContext *asyncContext = static_cast<AsyncContext *>(data);
     std::string specialCode(asyncContext->number, asyncContext->numberLen);
     asyncContext->errorCode = DelayedSingleton<CallManagerClient>::GetInstance()->InputDialerSpecialCode(specialCode);
     if (asyncContext->errorCode == TELEPHONY_SUCCESS) {
@@ -4287,7 +4287,7 @@ void NapiCallManager::NativeCancelMissedIncomingCallNotification(napi_env env, v
         NapiUtil::ThrowParameterError(env);
         return;
     }
-    AsyncContext *asyncContext = (AsyncContext *)data;
+    AsyncContext *asyncContext = static_cast<AsyncContext *>(data);
     asyncContext->errorCode =
         DelayedSingleton<CallManagerClient>::GetInstance()->CancelMissedIncomingCallNotification();
     if (asyncContext->errorCode == TELEPHONY_SUCCESS) {
