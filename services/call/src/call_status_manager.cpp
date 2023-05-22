@@ -543,6 +543,7 @@ sptr<CallBase> CallStatusManager::RefreshCallIfNecessary(const sptr<CallBase> &c
         TELEPHONY_LOGI("RefreshCallIfNecessary not need Refresh");
         return call;
     }
+    TelCallState priorState = call->GetTelCallState();
     CallAttributeInfo attrInfo;
     (void)memset_s(&attrInfo, sizeof(CallAttributeInfo), 0, sizeof(CallAttributeInfo));
     call->GetCallAttributeBaseInfo(attrInfo);
@@ -564,6 +565,7 @@ sptr<CallBase> CallStatusManager::RefreshCallIfNecessary(const sptr<CallBase> &c
     newCall->SetAnswerType(attrInfo.answerType);
     DeleteOneCallObject(call->GetCallID());
     newCall->SetCallId(call->GetCallID());
+    newCall->SetTelCallState(priorState);
     return newCall;
 }
 
