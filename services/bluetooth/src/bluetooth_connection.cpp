@@ -272,6 +272,7 @@ void BluetoothConnection::OnScoStateChanged(const Bluetooth::BluetoothRemoteDevi
 
 void BluetoothConnection::AddBtDevice(const std::string &address, Bluetooth::BluetoothRemoteDevice device)
 {
+    std::lock_guard<std::mutex> lock(bluetoothMutex_);
     auto iter = mapConnectedBtDevices_.find(address);
     if (iter != mapConnectedBtDevices_.end()) {
         TELEPHONY_LOGI("device is existenced");
@@ -283,6 +284,7 @@ void BluetoothConnection::AddBtDevice(const std::string &address, Bluetooth::Blu
 
 void BluetoothConnection::RemoveBtDevice(const std::string &address)
 {
+    std::lock_guard<std::mutex> lock(bluetoothMutex_);
     if (mapConnectedBtDevices_.count(address) > 0) {
         mapConnectedBtDevices_.erase(address);
         TELEPHONY_LOGI("RemoveBtDevice success");
