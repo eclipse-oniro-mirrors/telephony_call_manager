@@ -1,0 +1,12 @@
+{
+    "process": "foundation",
+    "systemability": [
+        {
+            "name": 4005,
+            "libpath": "libtel_call_manager.z.so",
+            "run-on-create": false,
+            "distributed": false,
+            "dump_level": 1
+        }
+    ]
+}
