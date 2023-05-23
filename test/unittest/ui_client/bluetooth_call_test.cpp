@@ -34,6 +34,7 @@ HapInfoParams testInfoParamsCase = {
     .bundleName = "tel_call_manager_ui_test",
     .instIndex = 0,
     .appIDDesc = "test",
+    .isSystemApp = true,
 };
 
 PermissionDef testPermPlaceCallDefCase = {
@@ -128,7 +129,7 @@ public:
         currentID_ = GetSelfTokenID();
         AccessTokenIDEx tokenIdEx = AccessTokenKit::AllocHapToken(testInfoParamsCase, testPolicyParamsCase);
         accessID_ = tokenIdEx.tokenIdExStruct.tokenID;
-        SetSelfTokenID(accessID_);
+        SetSelfTokenID(tokenIdEx.tokenIDEx);
     }
     ~AccessToken()
     {
