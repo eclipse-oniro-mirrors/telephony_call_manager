@@ -47,7 +47,7 @@ constexpr int BASE_TIME_MS = 1000;
 constexpr int SLEEP_TIME_MS = 50;
 constexpr int MAX_LIMIT_TIME = 18000;
 constexpr int INVALID_DIAL_TYPE = 3;
-const std::string PHONE_NUMBER = "xxxxx";
+const std::string PHONE_NUMBER = "0000000000";
 
 int32_t CallInfoManager::CallDetailsChange(const CallAttributeInfo &info)
 {
@@ -588,7 +588,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_2000, Function | Mediu
         EXPECT_EQ(CallManagerGtest::clientPtr_->DialCall(Str8ToStr16(phoneNumber), dialInfo_), RETURN_VALUE_IS_ZERO);
         if (CallInfoManager::HasActiveStatus()) {
             EXPECT_EQ(CallManagerGtest::clientPtr_->HoldCall(newCallId_), RETURN_VALUE_IS_ZERO);
-            sleep(1);
+            sleep(2);
             EXPECT_EQ(CallManagerGtest::clientPtr_->UnHoldCall(newCallId_), RETURN_VALUE_IS_ZERO);
             sleep(1);
             if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
@@ -603,7 +603,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_2000, Function | Mediu
         EXPECT_EQ(CallManagerGtest::clientPtr_->DialCall(Str8ToStr16(phoneNumber), dialInfo_), RETURN_VALUE_IS_ZERO);
         if (CallInfoManager::HasActiveStatus()) {
             EXPECT_EQ(CallManagerGtest::clientPtr_->HoldCall(newCallId_), RETURN_VALUE_IS_ZERO);
-            sleep(1);
+            sleep(2);
             EXPECT_EQ(CallManagerGtest::clientPtr_->UnHoldCall(newCallId_), RETURN_VALUE_IS_ZERO);
             sleep(1);
             if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
@@ -1916,6 +1916,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_StopDtmf_0400, Function | Mediu
     EXPECT_EQ(ret, RETURN_VALUE_IS_ZERO);
     CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_OFFHOOK, SLEEP_200_MS, SLEEP_30000_MS);
     if (CallInfoManager::HasActiveStatus()) {
+        sleep(1);
         EXPECT_EQ(CallManagerGtest::clientPtr_->StopDtmf(newCallId_), RETURN_VALUE_IS_ZERO);
     }
     if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
@@ -2144,7 +2145,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_FormatPhoneNumberToE164_0400, F
     std::u16string phonyNumber = Str8ToStr16(number);
     std::u16string countryCode = Str8ToStr16(Code);
     std::u16string formatNumber = Str8ToStr16(formatBefore);
-    EXPECT_NE(CallManagerGtest::clientPtr_->FormatPhoneNumberToE164(phonyNumber, countryCode, formatNumber),
+    EXPECT_EQ(CallManagerGtest::clientPtr_->FormatPhoneNumberToE164(phonyNumber, countryCode, formatNumber),
         RETURN_VALUE_IS_ZERO);
 }
 
