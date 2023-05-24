@@ -742,8 +742,10 @@ declare namespace call {
   /**
    * Merge calls, merge two calls into conference calls.
    *
+   * @permission ohos.permission.SET_TELEPHONY_STATE
    * @param { number } callId - Indicates the identifier of the call.
    * @param { AsyncCallback<void> } callback - The callback of combineConference.
+   * @throws { BusinessError } 201 - Permission denied.
    * @throws { BusinessError } 202 - Non-system applications use system APIs.
    * @throws { BusinessError } 401 - Parameter error.
    * @throws { BusinessError } 801 - Capability not supported.
@@ -759,8 +761,10 @@ declare namespace call {
   /**
    * Merge calls, merge two calls into conference calls.
    *
+   * @permission ohos.permission.SET_TELEPHONY_STATE
    * @param { number } callId - Indicates the identifier of the call.
    * @returns { Promise<void> } The promise returned by the combineConference.
+   * @throws { BusinessError } 201 - Permission denied.
    * @throws { BusinessError } 202 - Non-system applications use system APIs.
    * @throws { BusinessError } 401 - Parameter error.
    * @throws { BusinessError } 801 - Capability not supported.
@@ -776,8 +780,10 @@ declare namespace call {
   /**
    * Get the main call Id.
    *
+   * @permission ohos.permission.GET_TELEPHONY_STATE
    * @param { number } callId - Indicates the identifier of the call.
    * @param { AsyncCallback<number> } callback - Indicates the callback for getting the main call id.
+   * @throws { BusinessError } 201 - Permission denied.
    * @throws { BusinessError } 202 - Non-system applications use system APIs.
    * @throws { BusinessError } 401 - Parameter error.
    * @throws { BusinessError } 801 - Capability not supported.
@@ -793,8 +799,10 @@ declare namespace call {
   /**
    * Get the main call Id.
    *
+   * @permission ohos.permission.GET_TELEPHONY_STATE
    * @param { number } callId - Indicates the identifier of the call.
    * @returns { Promise<number> } Returns the main call id.
+   * @throws { BusinessError } 201 - Permission denied.
    * @throws { BusinessError } 202 - Non-system applications use system APIs.
    * @throws { BusinessError } 401 - Parameter error.
    * @throws { BusinessError } 801 - Capability not supported.
@@ -810,8 +818,10 @@ declare namespace call {
   /**
    * Get the list of sub-call Ids.
    *
+   * @permission ohos.permission.GET_TELEPHONY_STATE
    * @param { number } callId - Indicates the identifier of the call.
    * @param { AsyncCallback<Array<string>> } callback - Indicates the callback for getting the list of sub call ids.
+   * @throws { BusinessError } 201 - Permission denied.
    * @throws { BusinessError } 202 - Non-system applications use system APIs.
    * @throws { BusinessError } 401 - Parameter error.
    * @throws { BusinessError } 801 - Capability not supported.
@@ -827,8 +837,10 @@ declare namespace call {
   /**
    * Get the list of sub-call Ids.
    *
+   * @permission ohos.permission.GET_TELEPHONY_STATE
    * @param { number } callId - Indicates the identifier of the call.
    * @returns { Promise<Array<string>> } Returns the list of sub call ids.
+   * @throws { BusinessError } 201 - Permission denied.
    * @throws { BusinessError } 202 - Non-system applications use system APIs.
    * @throws { BusinessError } 401 - Parameter error.
    * @throws { BusinessError } 801 - Capability not supported.
@@ -844,9 +856,11 @@ declare namespace call {
   /**
    * Get the call Id list of the conference.
    *
+   * @permission ohos.permission.GET_TELEPHONY_STATE
    * @param { number } callId - Indicates the identifier of the call.
    * @param { AsyncCallback<Array<string>> } callback - Indicates the callback for getting
    * the call id list of conference calls.
+   * @throws { BusinessError } 201 - Permission denied.
    * @throws { BusinessError } 202 - Non-system applications use system APIs.
    * @throws { BusinessError } 401 - Parameter error.
    * @throws { BusinessError } 801 - Capability not supported.
@@ -862,8 +876,10 @@ declare namespace call {
   /**
    * Get the call Id list of the conference.
    *
+   * @permission ohos.permission.GET_TELEPHONY_STATE
    * @param { number } callId - Indicates the identifier of the call.
    * @returns { Promise<Array<string>> } Returns the call id list of conference calls.
+   * @throws { BusinessError } 201 - Permission denied.
    * @throws { BusinessError } 202 - Non-system applications use system APIs.
    * @throws { BusinessError } 401 - Parameter error.
    * @throws { BusinessError } 801 - Capability not supported.
@@ -961,9 +977,11 @@ declare namespace call {
   /**
    * Start DTMF(Dual Tone Multi Frequency).
    *
+   * @permission ohos.permission.SET_TELEPHONY_STATE
    * @param { number } callId - Indicates the identifier of the call.
    * @param { string } character - Indicates the characters sent.
    * @param { AsyncCallback<void> } callback - The callback of startDTMF.
+   * @throws { BusinessError } 201 - Permission denied.
    * @throws { BusinessError } 202 - Non-system applications use system APIs.
    * @throws { BusinessError } 401 - Parameter error.
    * @throws { BusinessError } 801 - Capability not supported.
@@ -979,9 +997,11 @@ declare namespace call {
   /**
    * Start DTMF(Dual Tone Multi Frequency).
    *
+   * @permission ohos.permission.SET_TELEPHONY_STATE
    * @param { number } callId - Indicates the identifier of the call.
    * @param { string } character - Indicates the characters sent.
    * @returns { Promise<void> } The promise returned by the startDTMF.
+   * @throws { BusinessError } 201 - Permission denied.
    * @throws { BusinessError } 202 - Non-system applications use system APIs.
    * @throws { BusinessError } 401 - Parameter error.
    * @throws { BusinessError } 801 - Capability not supported.
@@ -997,8 +1017,10 @@ declare namespace call {
   /**
    * Stop DTMF(Dual Tone Multi Frequency).
    *
+   * @permission ohos.permission.SET_TELEPHONY_STATE
    * @param { number } callId - Indicates the identifier of the call.
    * @param { AsyncCallback<void> } callback - The callback of stopDTMF.
+   * @throws { BusinessError } 201 - Permission denied.
    * @throws { BusinessError } 202 - Non-system applications use system APIs.
    * @throws { BusinessError } 401 - Parameter error.
    * @throws { BusinessError } 801 - Capability not supported.
@@ -1014,8 +1036,10 @@ declare namespace call {
   /**
    * Stop DTMF(Dual Tone Multi Frequency).
    *
+   * @permission ohos.permission.SET_TELEPHONY_STATE
    * @param { number } callId - Indicates the identifier of the call.
    * @returns { Promise<void> } The promise returned by the stopDTMF.
+   * @throws { BusinessError } 201 - Permission denied.
    * @throws { BusinessError } 202 - Non-system applications use system APIs.
    * @throws { BusinessError } 401 - Parameter error.
    * @throws { BusinessError } 801 - Capability not supported.
@@ -1290,8 +1314,10 @@ declare namespace call {
   /**
    * Split conference call.
    *
+   * @permission ohos.permission.SET_TELEPHONY_STATE
    * @param { number } callId - Indicates the identifier of the call.
    * @param { AsyncCallback<void> } callback - The callback of separateConference.
+   * @throws { BusinessError } 201 - Permission denied.
    * @throws { BusinessError } 202 - Non-system applications use system APIs.
    * @throws { BusinessError } 401 - Parameter error.
    * @throws { BusinessError } 8300001 - Invalid parameter value.
@@ -1307,8 +1333,10 @@ declare namespace call {
   /**
    * Split conference call.
    *
+   * @permission ohos.permission.SET_TELEPHONY_STATE
    * @param { number } callId - Indicates the identifier of the call.
    * @returns { Promise<void> } The promise returned by the separateConference.
+   * @throws { BusinessError } 201 - Permission denied.
    * @throws { BusinessError } 202 - Non-system applications use system APIs.
    * @throws { BusinessError } 401 - Parameter error.
    * @throws { BusinessError } 8300001 - Invalid parameter value.
@@ -1573,7 +1601,9 @@ declare namespace call {
   /**
    * Set mute during a call.
    *
+   * @permission ohos.permission.SET_TELEPHONY_STATE
    * @param { AsyncCallback<void> } callback - The callback of setMuted.
+   * @throws { BusinessError } 201 - Permission denied.
    * @throws { BusinessError } 202 - Non-system applications use system APIs.
    * @throws { BusinessError } 401 - Parameter error.
    * @throws { BusinessError } 8300001 - Invalid parameter value.
@@ -1589,7 +1619,9 @@ declare namespace call {
   /**
    * Set mute during a call.
    *
+   * @permission ohos.permission.SET_TELEPHONY_STATE
    * @returns { Promise<void> } The promise returned by the setMuted.
+   * @throws { BusinessError } 201 - Permission denied.
    * @throws { BusinessError } 202 - Non-system applications use system APIs.
    * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
    * @throws { BusinessError } 8300003 - System internal error.
@@ -1667,9 +1699,11 @@ declare namespace call {
   /**
    * Join the conference call.
    *
+   * @permission ohos.permission.PLACE_CALL
    * @param { number } mainCallId - Indicates the identifier of the main call.
    * @param { Array<string> } callNumberList - Indicates a call list.
    * @param { AsyncCallback<void> } callback - The callback of joinConference.
+   * @throws { BusinessError } 201 - Permission denied.
    * @throws { BusinessError } 202 - Non-system applications use system APIs.
    * @throws { BusinessError } 401 - Parameter error.
    * @throws { BusinessError } 8300001 - Invalid parameter value.
@@ -1685,9 +1719,11 @@ declare namespace call {
   /**
    * Join the conference call.
    *
+   * @permission ohos.permission.PLACE_CALL
    * @param { number } mainCallId - Indicates the identifier of the main call.
    * @param { Array<string> } callNumberList - Indicates a call list.
    * @returns { Promise<void> } The promise returned by the joinConference.
+   * @throws { BusinessError } 201 - Permission denied.
    * @throws { BusinessError } 202 - Non-system applications use system APIs.
    * @throws { BusinessError } 401 - Parameter error.
    * @throws { BusinessError } 8300001 - Invalid parameter value.
