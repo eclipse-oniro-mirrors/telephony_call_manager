@@ -1271,8 +1271,11 @@ int32_t CellularCallProxy::SetEmergencyCallList(int32_t slotId, std::vector<Emer
     }
 
     for (auto ecc : eccVec) {
-        if (!in.WriteRawData((const void *)&ecc, sizeof(EmergencyCall))) {
-        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+        if (!(in.WriteString(ecc.eccNum) && in.WriteString(ecc.mcc) &&
+                in.WriteInt32(static_cast<int32_t>(ecc.eccType)) &&
+                in.WriteInt32(static_cast<int32_t>(ecc.simpresent)) &&
+                in.WriteInt32(static_cast<int32_t>(ecc.abnormalService)))) {
+            return TELEPHONY_ERR_WRITE_DATA_FAIL;
         }
     }
 
