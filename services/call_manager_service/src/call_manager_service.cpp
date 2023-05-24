@@ -339,6 +339,10 @@ int32_t CallManagerService::SwitchCall(int32_t callId)
 
 bool CallManagerService::HasCall()
 {
+    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_GET_TELEPHONY_STATE)) {
+        TELEPHONY_LOGE("Permission denied!");
+        return false;
+    }
     if (callControlManagerPtr_ != nullptr) {
         return callControlManagerPtr_->HasCall();
     } else {
@@ -387,6 +391,10 @@ int32_t CallManagerService::IsInEmergencyCall(bool &enabled)
 
 int32_t CallManagerService::StartDtmf(int32_t callId, char str)
 {
+    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_SET_TELEPHONY_STATE)) {
+        TELEPHONY_LOGE("Permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
     if (callControlManagerPtr_ != nullptr) {
         return callControlManagerPtr_->StartDtmf(callId, str);
     } else {
@@ -397,6 +405,10 @@ int32_t CallManagerService::StartDtmf(int32_t callId, char str)
 
 int32_t CallManagerService::StopDtmf(int32_t callId)
 {
+    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_SET_TELEPHONY_STATE)) {
+        TELEPHONY_LOGE("Permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
     if (callControlManagerPtr_ != nullptr) {
         return callControlManagerPtr_->StopDtmf(callId);
     } else {
@@ -539,6 +551,10 @@ int32_t CallManagerService::StopRtt(int32_t callId)
 
 int32_t CallManagerService::CombineConference(int32_t mainCallId)
 {
+    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_SET_TELEPHONY_STATE)) {
+        TELEPHONY_LOGE("Permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
     if (callControlManagerPtr_ != nullptr) {
         return callControlManagerPtr_->CombineConference(mainCallId);
     } else {
@@ -549,6 +565,10 @@ int32_t CallManagerService::CombineConference(int32_t mainCallId)
 
 int32_t CallManagerService::SeparateConference(int32_t callId)
 {
+    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_SET_TELEPHONY_STATE)) {
+        TELEPHONY_LOGE("Permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
     if (callControlManagerPtr_ != nullptr) {
         return callControlManagerPtr_->SeparateConference(callId);
     } else {
@@ -559,6 +579,10 @@ int32_t CallManagerService::SeparateConference(int32_t callId)
 
 int32_t CallManagerService::SetMuted(bool isMute)
 {
+    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_SET_TELEPHONY_STATE)) {
+        TELEPHONY_LOGE("Permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
     if (callControlManagerPtr_ != nullptr) {
         return callControlManagerPtr_->SetMuted(isMute);
     } else {
@@ -690,6 +714,10 @@ int32_t CallManagerService::FormatPhoneNumberToE164(
 
 int32_t CallManagerService::GetMainCallId(int32_t callId, int32_t &mainCallId)
 {
+    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_GET_TELEPHONY_STATE)) {
+        TELEPHONY_LOGE("Permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
     if (callControlManagerPtr_ != nullptr) {
         return callControlManagerPtr_->GetMainCallId(callId, mainCallId);
     } else {
@@ -700,6 +728,10 @@ int32_t CallManagerService::GetMainCallId(int32_t callId, int32_t &mainCallId)
 
 int32_t CallManagerService::GetSubCallIdList(int32_t callId, std::vector<std::u16string> &callIdList)
 {
+    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_GET_TELEPHONY_STATE)) {
+        TELEPHONY_LOGE("Permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
     if (callControlManagerPtr_ != nullptr) {
         return callControlManagerPtr_->GetSubCallIdList(callId, callIdList);
     }
@@ -709,6 +741,10 @@ int32_t CallManagerService::GetSubCallIdList(int32_t callId, std::vector<std::u1
 
 int32_t CallManagerService::GetCallIdListForConference(int32_t callId, std::vector<std::u16string> &callIdList)
 {
+    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_GET_TELEPHONY_STATE)) {
+        TELEPHONY_LOGE("Permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
     if (callControlManagerPtr_ != nullptr) {
         return callControlManagerPtr_->GetCallIdListForConference(callId, callIdList);
     }
@@ -806,6 +842,10 @@ int32_t CallManagerService::IsImsSwitchEnabled(int32_t slotId, bool &enabled)
 
 int32_t CallManagerService::JoinConference(int32_t callId, std::vector<std::u16string> &numberList)
 {
+    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_PLACE_CALL)) {
+        TELEPHONY_LOGE("Permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
     if (callControlManagerPtr_ != nullptr) {
         return callControlManagerPtr_->JoinConference(callId, numberList);
     }
