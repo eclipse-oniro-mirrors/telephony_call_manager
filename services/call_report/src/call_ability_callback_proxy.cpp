@@ -83,8 +83,12 @@ int32_t CallAbilityCallbackProxy::OnCallDisconnectedCause(const DisconnectedDeta
         TELEPHONY_LOGE("write descriptor fail");
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
-    if (!dataParcel.WriteRawData((const void *)&details, sizeof(DisconnectedDetails))) {
-        TELEPHONY_LOGE("write DisconnectedDetails fail");
+    if (!dataParcel.WriteInt32(static_cast<int32_t>(details.reason))) {
+        TELEPHONY_LOGE("write reason fail");
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
+    if (!dataParcel.WriteString(details.message)) {
+        TELEPHONY_LOGE("write message fail");
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
     if (Remote() == nullptr) {

@@ -211,6 +211,13 @@ bool AudioDeviceManager::ProcessEvent(AudioEvent event)
         case AudioEvent::INIT_AUDIO_DEVICE:
             result = InitAudioDevice();
             break;
+        case AudioEvent::WIRED_HEADSET_DISCONNECTED: {
+            std::shared_ptr<BluetoothCallManager> bluetoothCallManager = std::make_shared<BluetoothCallManager>();
+            if (bluetoothCallManager->IsBtAvailble()) {
+                return DelayedSingleton<BluetoothConnection>::GetInstance()->ConnectBtSco();
+            }
+            break;
+        }
         default:
             break;
     }

@@ -222,6 +222,8 @@ void AudioDeviceChangeCallback::OnDeviceChange(const AudioStandard::DeviceChange
                 DelayedSingleton<AudioProxy>::GetInstance()->SetWiredHeadsetState(false);
                 DelayedSingleton<AudioDeviceManager>::GetInstance()->RemoveAudioDeviceList(
                     "", AudioDeviceType::DEVICE_WIRED_HEADSET);
+                DelayedSingleton<AudioDeviceManager>::GetInstance()->ProcessEvent(
+                    AudioEvent::WIRED_HEADSET_DISCONNECTED);
             }
         }
     }
