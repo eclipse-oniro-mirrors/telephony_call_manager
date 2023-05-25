@@ -40,7 +40,6 @@ static constexpr const char *OBSERVER_ON_JS_PERMISSION_ERROR_STRING =
 static constexpr const char *OBSERVER_OFF_JS_PERMISSION_ERROR_STRING =
     "BusinessError 201: Permission denied. An attempt was made to Off forbidden by permission: "
     "ohos.permission.SET_TELEPHONY_STATE.";
-
 int32_t NapiCallManager::registerStatus_ = TELEPHONY_ERROR;
 
 NapiCallManager::NapiCallManager() {}
@@ -749,16 +748,16 @@ napi_value NapiCallManager::DeclareDisconnectedReasonEnum(napi_env env, napi_val
             NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(DisconnectedReason::NO_ROUTE_TO_DESTINATION))),
         DECLARE_NAPI_STATIC_PROPERTY("CHANNEL_UNACCEPTABLE",
             NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(DisconnectedReason::CHANNEL_UNACCEPTABLE))),
-        DECLARE_NAPI_STATIC_PROPERTY(
-            "OPERATOR_DETERMINED_BARRING", NapiCallManagerUtils::ToInt32Value(env,
-                                               static_cast<int32_t>(DisconnectedReason::OPERATOR_DETERMINED_BARRING))),
-        DECLARE_NAPI_STATIC_PROPERTY(
-            "CALL_COMPLETED_ELSEWHERE", NapiCallManagerUtils::ToInt32Value(
-                                            env, static_cast<int32_t>(DisconnectedReason::CALL_COMPLETED_ELSEWHERE))),
+        DECLARE_NAPI_STATIC_PROPERTY("OPERATOR_DETERMINED_BARRING",
+            NapiCallManagerUtils::ToInt32Value(env,
+            static_cast<int32_t>(DisconnectedReason::OPERATOR_DETERMINED_BARRING))),
+        DECLARE_NAPI_STATIC_PROPERTY("CALL_COMPLETED_ELSEWHERE",
+            NapiCallManagerUtils::ToInt32Value(env,
+            static_cast<int32_t>(DisconnectedReason::CALL_COMPLETED_ELSEWHERE))),
         DECLARE_NAPI_STATIC_PROPERTY("NORMAL_CALL_CLEARING",
             NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(DisconnectedReason::NORMAL_CALL_CLEARING))),
-        DECLARE_NAPI_STATIC_PROPERTY(
-            "USER_BUSY", NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(DisconnectedReason::USER_BUSY))),
+        DECLARE_NAPI_STATIC_PROPERTY("USER_BUSY",
+            NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(DisconnectedReason::USER_BUSY))),
         DECLARE_NAPI_STATIC_PROPERTY("NO_USER_RESPONDING",
             NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(DisconnectedReason::NO_USER_RESPONDING))),
         DECLARE_NAPI_STATIC_PROPERTY("USER_ALERTING_NO_ANSWER",
@@ -768,117 +767,118 @@ napi_value NapiCallManager::DeclareDisconnectedReasonEnum(napi_env env, napi_val
         DECLARE_NAPI_STATIC_PROPERTY("NUMBER_CHANGED",
             NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(DisconnectedReason::NUMBER_CHANGED))),
         DECLARE_NAPI_STATIC_PROPERTY("CALL_REJECTED_DUE_TO_FEATURE_AT_THE_DESTINATION",
-            NapiCallManagerUtils::ToInt32Value(
-                env, static_cast<int32_t>(DisconnectedReason::CALL_REJECTED_DUE_TO_FEATURE_AT_THE_DESTINATION))),
+            NapiCallManagerUtils::ToInt32Value(env,
+            static_cast<int32_t>(DisconnectedReason::CALL_REJECTED_DUE_TO_FEATURE_AT_THE_DESTINATION))),
         DECLARE_NAPI_STATIC_PROPERTY("FAILED_PRE_EMPTION",
             NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(DisconnectedReason::FAILED_PRE_EMPTION))),
-        DECLARE_NAPI_STATIC_PROPERTY(
-            "NON_SELECTED_USER_CLEARING", NapiCallManagerUtils::ToInt32Value(env,
-                                              static_cast<int32_t>(DisconnectedReason::NON_SELECTED_USER_CLEARING))),
-        DECLARE_NAPI_STATIC_PROPERTY(
-            "DESTINATION_OUT_OF_ORDER", NapiCallManagerUtils::ToInt32Value(
-                                            env, static_cast<int32_t>(DisconnectedReason::DESTINATION_OUT_OF_ORDER))),
+        DECLARE_NAPI_STATIC_PROPERTY("NON_SELECTED_USER_CLEARING",
+            NapiCallManagerUtils::ToInt32Value(env,
+            static_cast<int32_t>(DisconnectedReason::NON_SELECTED_USER_CLEARING))),
+        DECLARE_NAPI_STATIC_PROPERTY("DESTINATION_OUT_OF_ORDER",
+            NapiCallManagerUtils::ToInt32Value(env,
+            static_cast<int32_t>(DisconnectedReason::DESTINATION_OUT_OF_ORDER))),
         DECLARE_NAPI_STATIC_PROPERTY("INVALID_NUMBER_FORMAT",
             NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(DisconnectedReason::INVALID_NUMBER_FORMAT))),
         DECLARE_NAPI_STATIC_PROPERTY("FACILITY_REJECTED",
             NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(DisconnectedReason::FACILITY_REJECTED))),
-        DECLARE_NAPI_STATIC_PROPERTY(
-            "RESPONSE_TO_STATUS_ENQUIRY", NapiCallManagerUtils::ToInt32Value(env,
-                                              static_cast<int32_t>(DisconnectedReason::RESPONSE_TO_STATUS_ENQUIRY))),
+        DECLARE_NAPI_STATIC_PROPERTY("RESPONSE_TO_STATUS_ENQUIRY",
+            NapiCallManagerUtils::ToInt32Value(env,
+            static_cast<int32_t>(DisconnectedReason::RESPONSE_TO_STATUS_ENQUIRY))),
         DECLARE_NAPI_STATIC_PROPERTY("NORMAL_UNSPECIFIED",
             NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(DisconnectedReason::NORMAL_UNSPECIFIED))),
         DECLARE_NAPI_STATIC_PROPERTY("NO_CIRCUIT_CHANNEL_AVAILABLE",
-            NapiCallManagerUtils::ToInt32Value(
-                env, static_cast<int32_t>(DisconnectedReason::NO_CIRCUIT_CHANNEL_AVAILABLE))),
+            NapiCallManagerUtils::ToInt32Value(env,
+            static_cast<int32_t>(DisconnectedReason::NO_CIRCUIT_CHANNEL_AVAILABLE))),
         DECLARE_NAPI_STATIC_PROPERTY("NETWORK_OUT_OF_ORDER",
             NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(DisconnectedReason::NETWORK_OUT_OF_ORDER))),
         DECLARE_NAPI_STATIC_PROPERTY("TEMPORARY_FAILURE",
             NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(DisconnectedReason::TEMPORARY_FAILURE))),
         DECLARE_NAPI_STATIC_PROPERTY("SWITCHING_EQUIPMENT_CONGESTION",
-            NapiCallManagerUtils::ToInt32Value(
-                env, static_cast<int32_t>(DisconnectedReason::SWITCHING_EQUIPMENT_CONGESTION))),
+            NapiCallManagerUtils::ToInt32Value(env,
+            static_cast<int32_t>(DisconnectedReason::SWITCHING_EQUIPMENT_CONGESTION))),
         DECLARE_NAPI_STATIC_PROPERTY("ACCESS_INFORMATION_DISCARDED",
-            NapiCallManagerUtils::ToInt32Value(
-                env, static_cast<int32_t>(DisconnectedReason::ACCESS_INFORMATION_DISCARDED))),
+            NapiCallManagerUtils::ToInt32Value(env,
+            static_cast<int32_t>(DisconnectedReason::ACCESS_INFORMATION_DISCARDED))),
         DECLARE_NAPI_STATIC_PROPERTY("REQUEST_CIRCUIT_CHANNEL_NOT_AVAILABLE",
-            NapiCallManagerUtils::ToInt32Value(
-                env, static_cast<int32_t>(DisconnectedReason::REQUEST_CIRCUIT_CHANNEL_NOT_AVAILABLE))),
+            NapiCallManagerUtils::ToInt32Value(env,
+            static_cast<int32_t>(DisconnectedReason::REQUEST_CIRCUIT_CHANNEL_NOT_AVAILABLE))),
         DECLARE_NAPI_STATIC_PROPERTY("RESOURCES_UNAVAILABLE_UNSPECIFIED",
-            NapiCallManagerUtils::ToInt32Value(
-                env, static_cast<int32_t>(DisconnectedReason::RESOURCES_UNAVAILABLE_UNSPECIFIED))),
+            NapiCallManagerUtils::ToInt32Value(env,
+            static_cast<int32_t>(DisconnectedReason::RESOURCES_UNAVAILABLE_UNSPECIFIED))),
         DECLARE_NAPI_STATIC_PROPERTY("QUALITY_OF_SERVICE_UNAVAILABLE",
-            NapiCallManagerUtils::ToInt32Value(
-                env, static_cast<int32_t>(DisconnectedReason::QUALITY_OF_SERVICE_UNAVAILABLE))),
+            NapiCallManagerUtils::ToInt32Value(env,
+            static_cast<int32_t>(DisconnectedReason::QUALITY_OF_SERVICE_UNAVAILABLE))),
         DECLARE_NAPI_STATIC_PROPERTY("REQUESTED_FACILITY_NOT_SUBSCRIBED",
-            NapiCallManagerUtils::ToInt32Value(
-                env, static_cast<int32_t>(DisconnectedReason::REQUESTED_FACILITY_NOT_SUBSCRIBED))),
+            NapiCallManagerUtils::ToInt32Value(env,
+            static_cast<int32_t>(DisconnectedReason::REQUESTED_FACILITY_NOT_SUBSCRIBED))),
         DECLARE_NAPI_STATIC_PROPERTY("INCOMING_CALLS_BARRED_WITHIN_THE_CUG",
-            NapiCallManagerUtils::ToInt32Value(
-                env, static_cast<int32_t>(DisconnectedReason::INCOMING_CALLS_BARRED_WITHIN_THE_CUG))),
+            NapiCallManagerUtils::ToInt32Value(env,
+            static_cast<int32_t>(DisconnectedReason::INCOMING_CALLS_BARRED_WITHIN_THE_CUG))),
         DECLARE_NAPI_STATIC_PROPERTY("BEARER_CAPABILITY_NOT_AUTHORIZED",
-            NapiCallManagerUtils::ToInt32Value(
-                env, static_cast<int32_t>(DisconnectedReason::BEARER_CAPABILITY_NOT_AUTHORIZED))),
+            NapiCallManagerUtils::ToInt32Value(env,
+            static_cast<int32_t>(DisconnectedReason::BEARER_CAPABILITY_NOT_AUTHORIZED))),
         DECLARE_NAPI_STATIC_PROPERTY("BEARER_CAPABILITY_NOT_PRESENTLY_AVAILABLE",
-            NapiCallManagerUtils::ToInt32Value(
-                env, static_cast<int32_t>(DisconnectedReason::BEARER_CAPABILITY_NOT_PRESENTLY_AVAILABLE))),
+            NapiCallManagerUtils::ToInt32Value(env,
+            static_cast<int32_t>(DisconnectedReason::BEARER_CAPABILITY_NOT_PRESENTLY_AVAILABLE))),
         DECLARE_NAPI_STATIC_PROPERTY("SERVICE_OR_OPTION_NOT_AVAILABLE_UNSPECIFIED",
-            NapiCallManagerUtils::ToInt32Value(
-                env, static_cast<int32_t>(DisconnectedReason::SERVICE_OR_OPTION_NOT_AVAILABLE_UNSPECIFIED))),
+            NapiCallManagerUtils::ToInt32Value(env,
+            static_cast<int32_t>(DisconnectedReason::SERVICE_OR_OPTION_NOT_AVAILABLE_UNSPECIFIED))),
         DECLARE_NAPI_STATIC_PROPERTY("BEARER_SERVICE_NOT_IMPLEMENTED",
-            NapiCallManagerUtils::ToInt32Value(
-                env, static_cast<int32_t>(DisconnectedReason::BEARER_SERVICE_NOT_IMPLEMENTED))),
+            NapiCallManagerUtils::ToInt32Value(env,
+            static_cast<int32_t>(DisconnectedReason::BEARER_SERVICE_NOT_IMPLEMENTED))),
         DECLARE_NAPI_STATIC_PROPERTY("ACM_EQUALTO_OR_GREATER_THAN_THE_MAXIMUM_VALUE",
-            NapiCallManagerUtils::ToInt32Value(
-                env, static_cast<int32_t>(DisconnectedReason::ACM_EQUALTO_OR_GREATE_THAN_ACMMAX))),
+            NapiCallManagerUtils::ToInt32Value(env,
+            static_cast<int32_t>(DisconnectedReason::ACM_EQUALTO_OR_GREATE_THAN_ACMMAX))),
         DECLARE_NAPI_STATIC_PROPERTY("REQUESTED_FACILITY_NOT_IMPLEMENTED",
-            NapiCallManagerUtils::ToInt32Value(
-                env, static_cast<int32_t>(DisconnectedReason::REQUESTED_FACILITY_NOT_IMPLEMENTED))),
+            NapiCallManagerUtils::ToInt32Value(env,
+            static_cast<int32_t>(DisconnectedReason::REQUESTED_FACILITY_NOT_IMPLEMENTED))),
         DECLARE_NAPI_STATIC_PROPERTY("ONLY_RESTRICTED_DIGITAL_INFO_BEARER_CAPABILITY_IS_AVAILABLE",
             NapiCallManagerUtils::ToInt32Value(env,
-                static_cast<int32_t>(DisconnectedReason::ONLY_RESTRICTED_DIGITAL_INFO_BEARER_CAPABILITY_IS_AVAILABLE))),
+            static_cast<int32_t>(DisconnectedReason::ONLY_RESTRICTED_DIGITAL_INFO_BEARER_CAPABILITY_IS_AVAILABLE))),
         DECLARE_NAPI_STATIC_PROPERTY("SERVICE_OR_OPTION_NOT_IMPLEMENTED_UNSPECIFIED",
-            NapiCallManagerUtils::ToInt32Value(
-                env, static_cast<int32_t>(DisconnectedReason::SERVICE_OR_OPTION_NOT_IMPLEMENTED_UNSPECIFIED))),
+            NapiCallManagerUtils::ToInt32Value(env,
+            static_cast<int32_t>(DisconnectedReason::SERVICE_OR_OPTION_NOT_IMPLEMENTED_UNSPECIFIED))),
         DECLARE_NAPI_STATIC_PROPERTY("INVALID_TRANSACTION_IDENTIFIER_VALUE",
-            NapiCallManagerUtils::ToInt32Value(
-                env, static_cast<int32_t>(DisconnectedReason::INVALID_TRANSACTION_IDENTIFIER_VALUE))),
+            NapiCallManagerUtils::ToInt32Value(env,
+            static_cast<int32_t>(DisconnectedReason::INVALID_TRANSACTION_IDENTIFIER_VALUE))),
         DECLARE_NAPI_STATIC_PROPERTY("USER_NOT_MEMBER_OF_CUG",
-            NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(DisconnectedReason::USER_NOT_MEMBER_OF_CUG))),
-        DECLARE_NAPI_STATIC_PROPERTY(
-            "INCOMPATIBLE_DESTINATION", NapiCallManagerUtils::ToInt32Value(
-                                            env, static_cast<int32_t>(DisconnectedReason::INCOMPATIBLE_DESTINATION))),
+            NapiCallManagerUtils::ToInt32Value(env,
+            static_cast<int32_t>(DisconnectedReason::USER_NOT_MEMBER_OF_CUG))),
+        DECLARE_NAPI_STATIC_PROPERTY("INCOMPATIBLE_DESTINATION",
+            NapiCallManagerUtils::ToInt32Value(env,
+            static_cast<int32_t>(DisconnectedReason::INCOMPATIBLE_DESTINATION))),
         DECLARE_NAPI_STATIC_PROPERTY("INVALID_TRANSIT_NETWORK_SELECTION",
-            NapiCallManagerUtils::ToInt32Value(
-                env, static_cast<int32_t>(DisconnectedReason::INVALID_TRANSIT_NETWORK_SELECTION))),
+            NapiCallManagerUtils::ToInt32Value(env,
+            static_cast<int32_t>(DisconnectedReason::INVALID_TRANSIT_NETWORK_SELECTION))),
         DECLARE_NAPI_STATIC_PROPERTY("SEMANTICALLY_INCORRECT_MESSAGE",
-            NapiCallManagerUtils::ToInt32Value(
-                env, static_cast<int32_t>(DisconnectedReason::SEMANTICALLY_INCORRECT_MESSAGE))),
+            NapiCallManagerUtils::ToInt32Value(env,
+            static_cast<int32_t>(DisconnectedReason::SEMANTICALLY_INCORRECT_MESSAGE))),
         DECLARE_NAPI_STATIC_PROPERTY("INVALID_MANDATORY_INFORMATION",
-            NapiCallManagerUtils::ToInt32Value(
-                env, static_cast<int32_t>(DisconnectedReason::INVALID_MANDATORY_INFORMATION))),
+            NapiCallManagerUtils::ToInt32Value(env,
+            static_cast<int32_t>(DisconnectedReason::INVALID_MANDATORY_INFORMATION))),
         DECLARE_NAPI_STATIC_PROPERTY("MESSAGE_TYPE_NON_EXISTENT_OR_NOT_IMPLEMENTED",
-            NapiCallManagerUtils::ToInt32Value(
-                env, static_cast<int32_t>(DisconnectedReason::MESSAGE_TYPE_NON_EXISTENT_OR_NOT_IMPLEMENTED))),
+            NapiCallManagerUtils::ToInt32Value(env,
+            static_cast<int32_t>(DisconnectedReason::MESSAGE_TYPE_NON_EXISTENT_OR_NOT_IMPLEMENTED))),
         DECLARE_NAPI_STATIC_PROPERTY("MESSAGE_TYPE_NOT_COMPATIBLE_WITH_PROTOCOL_STATE",
-            NapiCallManagerUtils::ToInt32Value(
-                env, static_cast<int32_t>(DisconnectedReason::MESSAGE_TYPE_NOT_COMPATIBLE_WITH_PROTOCOL_STATE))),
+            NapiCallManagerUtils::ToInt32Value(env,
+            static_cast<int32_t>(DisconnectedReason::MESSAGE_TYPE_NOT_COMPATIBLE_WITH_PROTOCOL_STATE))),
         DECLARE_NAPI_STATIC_PROPERTY("INFORMATION_ELEMENT_NON_EXISTENT_OR_NOT_IMPLEMENTED",
-            NapiCallManagerUtils::ToInt32Value(
-                env, static_cast<int32_t>(DisconnectedReason::INFORMATION_ELEMENT_NON_EXISTENT_OR_NOT_IMPLEMENTED))),
+            NapiCallManagerUtils::ToInt32Value(env,
+            static_cast<int32_t>(DisconnectedReason::INFORMATION_ELEMENT_NON_EXISTENT_OR_NOT_IMPLEMENTED))),
         DECLARE_NAPI_STATIC_PROPERTY("CONDITIONAL_IE_ERROR",
             NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(DisconnectedReason::CONDITIONAL_IE_ERROR))),
         DECLARE_NAPI_STATIC_PROPERTY("MESSAGE_NOT_COMPATIBLE_WITH_PROTOCOL_STATE",
-            NapiCallManagerUtils::ToInt32Value(
-                env, static_cast<int32_t>(DisconnectedReason::MESSAGE_NOT_COMPATIBLE_WITH_PROTOCOL_STATE))),
-        DECLARE_NAPI_STATIC_PROPERTY(
-            "RECOVERY_ON_TIMER_EXPIRED", NapiCallManagerUtils::ToInt32Value(
-                                             env, static_cast<int32_t>(DisconnectedReason::RECOVERY_ON_TIMER_EXPIRED))),
-        DECLARE_NAPI_STATIC_PROPERTY(
-            "PROTOCOL_ERROR_UNSPECIFIED", NapiCallManagerUtils::ToInt32Value(env,
-                                              static_cast<int32_t>(DisconnectedReason::PROTOCOL_ERROR_UNSPECIFIED))),
-        DECLARE_NAPI_STATIC_PROPERTY(
-            "INTERWORKING_UNSPECIFIED", NapiCallManagerUtils::ToInt32Value(
-                                            env, static_cast<int32_t>(DisconnectedReason::INTERWORKING_UNSPECIFIED))),
+            NapiCallManagerUtils::ToInt32Value(env,
+            static_cast<int32_t>(DisconnectedReason::MESSAGE_NOT_COMPATIBLE_WITH_PROTOCOL_STATE))),
+        DECLARE_NAPI_STATIC_PROPERTY("RECOVERY_ON_TIMER_EXPIRED",
+            NapiCallManagerUtils::ToInt32Value(env,
+            static_cast<int32_t>(DisconnectedReason::RECOVERY_ON_TIMER_EXPIRED))),
+        DECLARE_NAPI_STATIC_PROPERTY("PROTOCOL_ERROR_UNSPECIFIED",
+            NapiCallManagerUtils::ToInt32Value(env,
+            static_cast<int32_t>(DisconnectedReason::PROTOCOL_ERROR_UNSPECIFIED))),
+        DECLARE_NAPI_STATIC_PROPERTY("INTERWORKING_UNSPECIFIED",
+            NapiCallManagerUtils::ToInt32Value(env,
+            static_cast<int32_t>(DisconnectedReason::INTERWORKING_UNSPECIFIED))),
         DECLARE_NAPI_STATIC_PROPERTY("CALL_BARRED",
             NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(DisconnectedReason::CALL_BARRED))),
         DECLARE_NAPI_STATIC_PROPERTY("FDN_BLOCKED",
@@ -893,8 +893,8 @@ napi_value NapiCallManager::DeclareDisconnectedReasonEnum(napi_env env, napi_val
             NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(DisconnectedReason::DIAL_MODIFIED_TO_SS))),
         DECLARE_NAPI_STATIC_PROPERTY("DIAL_MODIFIED_TO_DIAL",
             NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(DisconnectedReason::DIAL_MODIFIED_TO_DIAL))),
-        DECLARE_NAPI_STATIC_PROPERTY(
-            "RADIO_OFF", NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(DisconnectedReason::RADIO_OFF))),
+        DECLARE_NAPI_STATIC_PROPERTY("RADIO_OFF",
+            NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(DisconnectedReason::RADIO_OFF))),
         DECLARE_NAPI_STATIC_PROPERTY("OUT_OF_SERVICE",
             NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(DisconnectedReason::OUT_OF_SERVICE))),
         DECLARE_NAPI_STATIC_PROPERTY("NO_VALID_SIM",
