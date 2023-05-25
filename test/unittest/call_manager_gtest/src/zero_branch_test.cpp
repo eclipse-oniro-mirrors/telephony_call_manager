@@ -134,8 +134,7 @@ HWTEST_F(BranchTest, Telephony_CallRequestHandler_001, Function | MediumTest | L
     call_request_handler->StopRttEvent(event);
     call_request_handler->JoinConferenceEvent(event);
     call_request_handler->DialCall();
-    std::unique_ptr<CallRequestHandlerService> callRequestHandlerService =
-        std::make_unique<CallRequestHandlerService>();
+    auto callRequestHandlerService = std::make_unique<CallRequestHandlerService>();
     ASSERT_NE(callRequestHandlerService->DialCall(), TELEPHONY_ERR_SUCCESS);
     ASSERT_NE(callRequestHandlerService->AnswerCall(1, 1), TELEPHONY_ERR_SUCCESS);
     std::string content = "";

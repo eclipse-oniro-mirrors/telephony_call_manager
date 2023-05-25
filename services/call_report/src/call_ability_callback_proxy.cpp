@@ -235,8 +235,8 @@ int32_t CallAbilityCallbackProxy::OnReportAudioDeviceChange(const AudioDeviceInf
         TELEPHONY_LOGE("write descriptor fail");
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
-    int32_t audioDeviceListLength = info.audioDeviceList.size();
-    dataParcel.WriteInt32(audioDeviceListLength);
+    size_t audioDeviceListLength = info.audioDeviceList.size();
+    dataParcel.WriteInt32(static_cast<int32_t>(audioDeviceListLength));
     for (auto &audioDevice : info.audioDeviceList) {
         dataParcel.WriteRawData((const void *)&audioDevice, sizeof(AudioDevice));
     }
