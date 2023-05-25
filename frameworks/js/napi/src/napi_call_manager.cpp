@@ -741,7 +741,7 @@ napi_value NapiCallManager::DeclareMmiCodeResultEnum(napi_env env, napi_value ex
 
 napi_value NapiCallManager::DeclareDisconnectedReasonEnum(napi_env env, napi_value exports)
 {
-    napi_property_descriptor g_desc[] = {
+    napi_property_descriptor desc[] = {
         DECLARE_NAPI_STATIC_PROPERTY("UNASSIGNED_NUMBER",
             NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(DisconnectedReason::UNASSIGNED_NUMBER))),
         DECLARE_NAPI_STATIC_PROPERTY("NO_ROUTE_TO_DESTINATION",
@@ -938,7 +938,7 @@ napi_value NapiCallManager::DeclareDisconnectedReasonEnum(napi_env env, napi_val
     };
     napi_value result = nullptr;
     napi_define_class(env, "DisconnectedReason", NAPI_AUTO_LENGTH, NapiCallManagerUtils::CreateEnumConstructor,
-        nullptr, sizeof(g_desc) / sizeof(*g_desc), g_desc, &result);
+        nullptr, sizeof(desc) / sizeof(*desc), desc, &result);
     napi_set_named_property(env, exports, "DisconnectedReason", result);
     return exports;
 }
