@@ -243,7 +243,7 @@ int32_t CallAbilityCallbackProxy::OnReportAudioDeviceChange(const AudioDeviceInf
     dataParcel.WriteRawData((const void *)&info.currentAudioDevice, sizeof(AudioDevice));
     dataParcel.WriteBool(info.isMuted);
 
-    TELEPHONY_LOGI("audioDeviceListLength=%{public}d", audioDeviceListLength);
+    TELEPHONY_LOGI("audioDeviceListLength=%{public}zu", audioDeviceListLength);
     if (Remote() == nullptr) {
         TELEPHONY_LOGE("function Remote() return nullptr!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
