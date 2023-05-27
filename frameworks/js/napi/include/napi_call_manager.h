@@ -207,6 +207,7 @@ private:
         napi_env env, const napi_value parameters[], const size_t parameterCount);
     static bool MatchOneNumberParameter(napi_env env, const napi_value parameters[], const size_t parameterCount);
     static bool MatchOneStringParameter(napi_env env, const napi_value parameters[], const size_t parameterCount);
+    static bool MatchObserverOffParameter(napi_env env, const napi_value parameters[], const size_t parameterCount);
     static bool MatchTwoNumberParameters(napi_env env, const napi_value parameters[], const size_t parameterCount);
     static bool MatchNumberAndObjectParameters(
         napi_env env, const napi_value parameters[], const size_t parameterCount);
@@ -215,6 +216,9 @@ private:
         napi_env env, const napi_value parameters[], const size_t parameterCount);
     static bool MatchAudioDeviceParameters(napi_env env, const napi_value parameters[], const size_t parameterCount);
     static bool MatchRejectCallParameters(napi_env env, const napi_value parameters[], const size_t parameterCount);
+    static bool MatchRejectCallFirstIllegalParameters(napi_env env, const napi_value parameters[]);
+    static bool MatchRejectCallSecondIllegalParameters(napi_env env, const napi_value parameters[]);
+    static bool MatchRejectCallTwoIllegalParameters(napi_env env, const napi_value parameters[]);
     static void NativeReportOttCallDetailsInfo(napi_env env, void *data);
     static void NativeReportOttCallEventInfo(napi_env env, void *data);
     static napi_value HandleAsyncWork(napi_env env, AsyncContext *context, std::string workName,
