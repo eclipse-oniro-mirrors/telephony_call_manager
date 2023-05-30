@@ -16,6 +16,7 @@
 #ifndef TELEPHONY_BLUETOOTH_CONNECTION_H
 #define TELEPHONY_BLUETOOTH_CONNECTION_H
 
+#include <atomic>
 #include <memory>
 #include <string>
 
@@ -68,10 +69,12 @@ public:
 
 private:
     bool IsAudioActivated();
-    BtScoState btScoState_ = BtScoState::SCO_STATE_DISCONNECTED;
+    std::atomic<BtScoState> btScoState_{BtScoState::SCO_STATE_DISCONNECTED};
+    std::mutex scoAddrMutex_;
     std::string connectedScoAddr_;
 
 #ifdef ABILITY_BLUETOOTH_SUPPORT
+    void SetConnectedScoAddr(std::string connectedScoAddr);
     bool ConnectBtSco(const Bluetooth::BluetoothRemoteDevice &device);
     bool DisconnectBtSco(const Bluetooth::BluetoothRemoteDevice &device);
 
