@@ -32,6 +32,7 @@ public:
     void DisconnectAbility();
     void SetConnectFlag(bool isConnected);
     void NotifyAll();
+    bool WaitForConnectResult();
 
 private:
     sptr<AAFwk::IAbilityConnection> connectCallback_ = nullptr;

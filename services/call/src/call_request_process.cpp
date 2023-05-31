@@ -312,17 +312,20 @@ int32_t CallRequestProcess::HandleDialFail()
         }
     }
     sptr<CallBase> call = nullptr;
-    if (GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_CREATE) != nullptr) {
-        call = GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_CREATE);
-    } else if (GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_CONNECTING) != nullptr) {
-        call = GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_CONNECTING);
-    } else if (GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_DIALING) != nullptr) {
-        call = GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_DIALING);
-    } else {
-        TELEPHONY_LOGE("can not find connect call or dialing call");
-        return CALL_ERR_CALL_STATE;
+    call = GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_CREATE);
+    if (call != nullptr) {
+        return DealFailDial(call);
     }
-    return DealFailDial(call);
+    call = GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_CONNECTING);
+    if (call != nullptr) {
+        return DealFailDial(call);
+    }
+    call = GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_DIALING);
+    if (call != nullptr) {
+        return DealFailDial(call);
+    }
+    TELEPHONY_LOGE("can not find connect call or dialing call");
+    return CALL_ERR_CALL_STATE;
 }
 
 int32_t CallRequestProcess::CarrierDialProcess(DialParaInfo &info)

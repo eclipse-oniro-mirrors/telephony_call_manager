@@ -19,7 +19,9 @@
 #include "bluetooth_call_service.h"
 #include "bluetooth_connection.h"
 #include "call_ability_callback.h"
+#include "call_ability_connect_callback.h"
 #include "call_ability_report_proxy.h"
+#include "call_connect_ability.h"
 #include "call_control_manager.h"
 #include "call_manager_client.h"
 #include "call_manager_hisysevent.h"
@@ -2104,6 +2106,10 @@ HWTEST_F(BranchTest, Telephony_ConferenceBase_001, Function | MediumTest | Level
  */
 HWTEST_F(BranchTest, Telephony_CallAbilityReportProxy_001, Function | MediumTest | Level3)
 {
+    CallAbilityConnectCallback callAbilityConnectCallback;
+    callAbilityConnectCallback.ReConnectAbility();
+    CallConnectAbility callConnectAbility;
+    ASSERT_FALSE(callConnectAbility.WaitForConnectResult());
     std::shared_ptr<CallAbilityReportProxy> callAbilityReportProxy = std::make_shared<CallAbilityReportProxy>();
     sptr<ICallAbilityCallback> callAbilityCallbackPtr = nullptr;
     std::string bundleName = "test";
