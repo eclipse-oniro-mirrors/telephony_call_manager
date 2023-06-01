@@ -47,7 +47,7 @@
                 "init",
                 "ipc",
                 "audio_framework",
-                "multimedia_camera_framework",
+                "camera_framework",
                 "napi",
                 "player_framework",
                 "power_manager",
