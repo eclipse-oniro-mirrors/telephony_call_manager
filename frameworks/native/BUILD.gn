@@ -66,5 +66,6 @@ ohos_shared_library("tel_call_manager_api") {
   }
 
   part_name = "call_manager"
+  innerapi_tags = [ "platformsdk" ]
   subsystem_name = "telephony"
 }
