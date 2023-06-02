@@ -665,9 +665,9 @@ enum ImsConfigItem {
 
 enum class VoNRState {
     /** Indicates the VoNR switch is on */
-    VONR_STATE_ON = 0,
+    VONR_STATE_OFF = 0,
     /** Indicates the VoNR switch is off */
-    VONR_STATE_OFF = 1,
+    VONR_STATE_ON = 1,
 };
 
 enum VideoQualityValue {

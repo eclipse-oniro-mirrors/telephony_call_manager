@@ -48,7 +48,7 @@ public:
     int32_t EnableVoLtePolicy(int32_t slotId);
     int32_t DisableVoLtePolicy(int32_t slotId);
     int32_t IsVoLteEnabledPolicy(int32_t slotId);
-    int32_t VoNRStatePolicy(int32_t slotId, int32_t &state);
+    int32_t VoNRStatePolicy(int32_t slotId, int32_t state);
     int32_t GetCallWaitingPolicy(int32_t slotId);
     int32_t SetCallWaitingPolicy(int32_t slotId);
     int32_t GetCallRestrictionPolicy(int32_t slotId);

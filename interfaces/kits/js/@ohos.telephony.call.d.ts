@@ -1970,18 +1970,19 @@ declare namespace call {
   /**
    * Set switch state for voice over NR.
    *
-   * @param slotId Indicates the card slot index number,
-   * ranging from 0 to the maximum card slot index number supported by the device.
-   * @param state Indicates the VoNR state.
-   * @param { AsyncCallback<void> } callback - The callback of setVoNRState.
    * @permission ohos.permission.SET_TELEPHONY_STATE
-   * @throws {BusinessError} 201 - Permission denied.
-   * @throws {BusinessError} 202 - Non-system applications use system APIs.
-   * @throws {BusinessError} 401 - Parameter error.
-   * @throws {BusinessError} 8300001 - Invalid parameter value.
-   * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
-   * @throws {BusinessError} 8300003 - System internal error.
-   * @throws {BusinessError} 8300999 - Unknown error code.
+   * @param { number } slotId - Indicates the card slot index number,
+   * ranging from 0 to the maximum card slot index number supported by the device.
+   * @param { VoNRState } state - Indicates the VoNR state.
+   * @param { AsyncCallback<void> } callback - The callback of setVoNRState.
+   * @throws { BusinessError } 201 - Permission denied.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @throws { BusinessError } 8300999 - Unknown error code.
+   * @syscap SystemCapability.Telephony.CallManager
    * @systemapi Hide this for inner system use.
    * @since 10
    */
@@ -1990,18 +1991,19 @@ declare namespace call {
   /**
    * Set switch state for voice over NR.
    *
-   * @param slotId Indicates the card slot index number,
-   * ranging from 0 to the maximum card slot index number supported by the device.
-   * @param state Indicates the VoNR state.
-   * @returns { Promise<void> } The promise returned by the setVoNRState.
    * @permission ohos.permission.SET_TELEPHONY_STATE
-   * @throws {BusinessError} 201 - Permission denied.
-   * @throws {BusinessError} 202 - Non-system applications use system APIs.
-   * @throws {BusinessError} 401 - Parameter error.
-   * @throws {BusinessError} 8300001 - Invalid parameter value.
-   * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
-   * @throws {BusinessError} 8300003 - System internal error.
-   * @throws {BusinessError} 8300999 - Unknown error code.
+   * @param { number } slotId - Indicates the card slot index number,
+   * ranging from 0 to the maximum card slot index number supported by the device.
+   * @param { VoNRState } state - Indicates the VoNR state.
+   * @returns { Promise<void> } The promise returned by the setVoNRState.
+   * @throws { BusinessError } 201 - Permission denied.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @throws { BusinessError } 8300999 - Unknown error code.
+   * @syscap SystemCapability.Telephony.CallManager
    * @systemapi Hide this for inner system use.
    * @since 10
    */
@@ -2010,18 +2012,18 @@ declare namespace call {
   /**
    * Get switch state for voice over NR.
    *
-   * @param slotId Indicates the card slot index number,
-   * ranging from 0 to the maximum card slot index number supported by the device.
-   * @param state Indicates the VoNR state.
-   * @param {AsyncCallback <VoNRState>} callback - VoNR state
    * @permission ohos.permission.GET_TELEPHONY_STATE
-   * @throws {BusinessError} 201 - Permission denied.
-   * @throws {BusinessError} 202 - Non-system applications use system APIs.
-   * @throws {BusinessError} 401 - Parameter error.
-   * @throws {BusinessError} 8300001 - Invalid parameter value.
-   * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
-   * @throws {BusinessError} 8300003 - System internal error.
-   * @throws {BusinessError} 8300999 - Unknown error code.
+   * @param { number } slotId - Indicates the card slot index number,
+   * ranging from 0 to the maximum card slot index number supported by the device.
+   * @param { AsyncCallback<VoNRState> } callback - Indicates the callback for getVoNRState.
+   * @throws { BusinessError } 201 - Permission denied.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @throws { BusinessError } 8300999 - Unknown error code.
+   * @syscap SystemCapability.Telephony.CallManager
    * @systemapi Hide this for inner system use.
    * @since 10
    */
@@ -2030,17 +2032,18 @@ declare namespace call {
   /**
    * Get switch state for voice over NR.
    *
-   * @param slotId Indicates the card slot index number,
-   * ranging from 0 to the maximum card slot index number supported by the device.
-   * @returns {Promise <VoNRState>} the VoNR state.
    * @permission ohos.permission.GET_TELEPHONY_STATE
-   * @throws {BusinessError} 201 - Permission denied.
-   * @throws {BusinessError} 202 - Non-system applications use system APIs.
-   * @throws {BusinessError} 401 - Parameter error.
-   * @throws {BusinessError} 8300001 - Invalid parameter value.
-   * @throws {BusinessError} 8300002 - Operation failed. Cannot connect to service.
-   * @throws {BusinessError} 8300003 - System internal error.
-   * @throws {BusinessError} 8300999 - Unknown error code.
+   * @param { number } slotId - Indicates the card slot index number,
+   * ranging from 0 to the maximum card slot index number supported by the device.
+   * @returns { Promise<VoNRState> } Returns the VoNR state.
+   * @throws { BusinessError } 201 - Permission denied.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @throws { BusinessError } 8300999 - Unknown error code.
+   * @syscap SystemCapability.Telephony.CallManager
    * @systemapi Hide this for inner system use.
    * @since 10
    */
@@ -2102,7 +2105,7 @@ declare namespace call {
   }
 
   /**
-   * Indicates the state of the VoNR.
+   * Indicates the VoNR state.
    *
    * @enum { number }
    * @syscap SystemCapability.Telephony.CallManager
@@ -2111,22 +2114,22 @@ declare namespace call {
    */
   export enum VoNRState {
     /**
-     * Indicates the VoNR switch is on.
-     *
-     * @syscap SystemCapability.Telephony.CallManager
-     * @systemapi Hide this for inner system use.
-     * @since 10
-     */
-    VONR_STATE_ON = 0,
-
-    /**
      * Indicates the VoNR switch is off.
      *
      * @syscap SystemCapability.Telephony.CallManager
      * @systemapi Hide this for inner system use.
      * @since 10
      */
-    VONR_STATE_OFF,
+    VONR_STATE_OFF = 0,
+
+    /**
+     * Indicates the VoNR switch is on.
+     *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
+     * @since 10
+     */
+    VONR_STATE_ON = 1,
   }
 
   /**
