@@ -202,6 +202,24 @@ int32_t CallSettingManager::IsImsSwitchEnabled(int32_t slotId, bool &enabled)
     return cellularCallConnectionPtr_->GetImsSwitchStatus(slotId, enabled);
 }
 
+int32_t CallSettingManager::SetVoNRState(int32_t slotId, int32_t state)
+{
+    if (cellularCallConnectionPtr_ == nullptr) {
+        TELEPHONY_LOGE("cellularCallConnectionPtr_ is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return cellularCallConnectionPtr_->SetVoNRState(slotId, state);
+}
+
+int32_t CallSettingManager::GetVoNRState(int32_t slotId, int32_t &state)
+{
+    if (cellularCallConnectionPtr_ == nullptr) {
+        TELEPHONY_LOGE("cellularCallConnectionPtr_ is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return cellularCallConnectionPtr_->GetVoNRState(slotId, state);
+}
+
 int32_t CallSettingManager::CloseUnFinishedUssd(int32_t slotId)
 {
     int32_t ret = CloseUnFinishedUssdPolicy(slotId);

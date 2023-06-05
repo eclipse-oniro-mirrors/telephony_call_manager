@@ -1295,6 +1295,54 @@ int32_t CallManagerServiceProxy::IsImsSwitchEnabled(int32_t slotId, bool &enable
     return replyParcel.ReadInt32();
 }
 
+int32_t CallManagerServiceProxy::SetVoNRState(int32_t slotId, int32_t state)
+{
+    MessageOption option;
+    MessageParcel dataParcel;
+    MessageParcel replyParcel;
+    if (!dataParcel.WriteInterfaceToken(CallManagerServiceProxy::GetDescriptor())) {
+        TELEPHONY_LOGE("write descriptor fail");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    dataParcel.WriteInt32(slotId);
+    dataParcel.WriteInt32(state);
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("function Remote() return nullptr!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t error = remote->SendRequest(INTERFACE_SET_VONR_STATE, dataParcel, replyParcel, option);
+    if (error != ERR_NONE) {
+        TELEPHONY_LOGE("function SetVoNRState failed! errCode:%{public}d", error);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return replyParcel.ReadInt32();
+}
+
+int32_t CallManagerServiceProxy::GetVoNRState(int32_t slotId, int32_t &state)
+{
+    MessageParcel dataParcel;
+    MessageParcel replyParcel;
+    MessageOption option;
+    if (!dataParcel.WriteInterfaceToken(CallManagerServiceProxy::GetDescriptor())) {
+        TELEPHONY_LOGE("write descriptor fail");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    dataParcel.WriteInt32(slotId);
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("function Remote() return nullptr!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t error = remote->SendRequest(INTERFACE_GET_VONR_STATE, dataParcel, replyParcel, option);
+    if (error != ERR_NONE) {
+        TELEPHONY_LOGE("function GetVoNRState failed! errCode:%{public}d", error);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    state = replyParcel.ReadInt32();
+    return replyParcel.ReadInt32();
+}
+
 int32_t CallManagerServiceProxy::JoinConference(int32_t callId, std::vector<std::u16string> &numberList)
 {
     MessageOption option;

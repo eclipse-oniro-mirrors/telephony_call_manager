@@ -547,6 +547,26 @@ public:
     int32_t IsImsSwitchEnabled(int32_t slotId, bool &enabled) override;
 
     /**
+     * SetVoNRState
+     *
+     * @brief Set VoNR State
+     * @param slotId[in], The slot id
+     * @param state[in], The state of VoNR
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t SetVoNRState(int32_t slotId, int32_t state) override;
+
+    /**
+     * GetVoNRState
+     *
+     * @brief Get VoNR State
+     * @param slotId[in], The slot id
+     * @param state[out], The result of VoNR state ON or OFF
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t GetVoNRState(int32_t slotId, int32_t &state) override;
+
+    /**
      * StartRtt
      *
      * @brief Enable and send RTT information

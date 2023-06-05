@@ -95,6 +95,8 @@ private:
     int32_t OnEnableVoLte(MessageParcel &data, MessageParcel &reply);
     int32_t OnDisableVoLte(MessageParcel &data, MessageParcel &reply);
     int32_t OnIsVoLteEnabled(MessageParcel &data, MessageParcel &reply);
+    int32_t OnSetVoNRState(MessageParcel &data, MessageParcel &reply);
+    int32_t OnGetVoNRState(MessageParcel &data, MessageParcel &reply);
     int32_t OnStartRtt(MessageParcel &data, MessageParcel &reply);
     int32_t OnStopRtt(MessageParcel &data, MessageParcel &reply);
     int32_t OnReportOttCallDetailsInfo(MessageParcel &data, MessageParcel &reply);

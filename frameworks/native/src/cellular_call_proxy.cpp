@@ -884,6 +884,56 @@ int32_t CellularCallProxy::GetImsSwitchStatus(int32_t slotId, bool &enabled)
     return out.ReadInt32();
 }
 
+int32_t CellularCallProxy::SetVoNRState(int32_t slotId, int32_t state)
+{
+    MessageOption option;
+    MessageParcel in;
+    MessageParcel out;
+    int32_t result = TELEPHONY_SUCCESS;
+    result = SetCommonParamForMessageParcel(slotId, in);
+    if (result != TELEPHONY_SUCCESS) {
+        return result;
+    }
+    if (!in.WriteInt32(state)) {
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("function Remote() return nullptr!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t error = remote->SendRequest(static_cast<uint32_t>(OperationType::SET_VONR_SWITCH_STATUS), in, out, option);
+    if (error != ERR_NONE) {
+        TELEPHONY_LOGE("function SetVoNRState failed! errCode:%{public}d", error);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return out.ReadInt32();
+}
+
+int32_t CellularCallProxy::GetVoNRState(int32_t slotId, int32_t &state)
+{
+    MessageOption option;
+    MessageParcel out;
+    MessageParcel in;
+    int32_t result = TELEPHONY_SUCCESS;
+    result = SetCommonParamForMessageParcel(slotId, in);
+    if (result != TELEPHONY_SUCCESS) {
+        return result;
+    }
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("function Remote() return nullptr!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t error = remote->SendRequest(static_cast<uint32_t>(OperationType::GET_VONR_SWITCH_STATUS), in, out, option);
+    if (error != ERR_NONE) {
+        TELEPHONY_LOGE("function GetImsSwitchStatus failed! errCode:%{public}d", error);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    state = out.ReadInt32();
+    return out.ReadInt32();
+}
+
 int32_t CellularCallProxy::SetImsConfig(int32_t slotId, ImsConfigItem item, const std::string &value)
 {
     MessageOption option;

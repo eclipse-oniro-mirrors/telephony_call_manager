@@ -623,6 +623,34 @@ int32_t CellularCallConnection::GetImsSwitchStatus(int32_t slotId, bool &enabled
     return TELEPHONY_SUCCESS;
 }
 
+int32_t CellularCallConnection::SetVoNRState(int32_t slotId, int32_t state)
+{
+    if (ReConnectService() != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("ipc reconnect failed!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int errCode = cellularCallInterfacePtr_->SetVoNRState(slotId, state);
+    if (errCode != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("SetVoNRState failed, errcode:%{public}d", errCode);
+        return errCode;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CellularCallConnection::GetVoNRState(int32_t slotId, int32_t &state)
+{
+    if (ReConnectService() != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("ipc reconnect failed!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int errCode = cellularCallInterfacePtr_->GetVoNRState(slotId, state);
+    if (errCode != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("GetVoNRState failed, errcode:%{public}d", errCode);
+        return errCode;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
 int32_t CellularCallConnection::SendUpdateCallMediaModeRequest(const CellularCallInfo &callInfo, ImsCallMode mode)
 {
     if (ReConnectService() != TELEPHONY_SUCCESS) {

@@ -93,6 +93,8 @@ public:
     int32_t EnableImsSwitch(int32_t slotId);
     int32_t DisableImsSwitch(int32_t slotId);
     int32_t IsImsSwitchEnabled(int32_t slotId, bool &enabled);
+    int32_t SetVoNRState(int32_t slotId, int32_t state);
+    int32_t GetVoNRState(int32_t slotId, int32_t &state);
     int32_t StartRtt(int32_t callId, std::u16string &msg);
     int32_t StopRtt(int32_t callId);
     int32_t JoinConference(int32_t callId, std::vector<std::u16string> &numberList);

@@ -357,6 +357,26 @@ public:
     int32_t GetImsSwitchStatus(int32_t slotId, bool &enabled);
 
     /**
+     * SetVoNRState
+     *
+     * @brief Setting VoNR Switch
+     * @param slotId[in], The slot id
+     * @param state[in],  On or off
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t SetVoNRState(int32_t slotId, int32_t state);
+
+    /**
+     * GetVoNRState
+     *
+     * @brief Getting VoNR Switch
+     * @param slotId[in], The slot id
+     * @param state[out], The result of ON or OFF
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t GetVoNRState(int32_t slotId, int32_t &state);
+
+    /**
      * SendUpdateCallMediaModeRequest
      *
      * @brief send update call media request

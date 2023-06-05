@@ -102,6 +102,8 @@ napi_value NapiCallManager::DeclareCallSupplementInterface(napi_env env, napi_va
         DECLARE_NAPI_FUNCTION("enableImsSwitch", EnableImsSwitch),
         DECLARE_NAPI_FUNCTION("disableImsSwitch", DisableImsSwitch),
         DECLARE_NAPI_FUNCTION("isImsSwitchEnabled", IsImsSwitchEnabled),
+        DECLARE_NAPI_FUNCTION("setVoNRState", SetVoNRState),
+        DECLARE_NAPI_FUNCTION("getVoNRState", GetVoNRState),
         DECLARE_NAPI_FUNCTION("canSetCallTransferTime", CanSetCallTransferTime),
         DECLARE_NAPI_FUNCTION("closeUnFinishedUssd", CloseUnFinishedUssd),
         DECLARE_NAPI_FUNCTION("inputDialerSpecialCode", InputDialerSpecialCode),
@@ -391,6 +393,21 @@ napi_value NapiCallManager::DeclareCallTransferEnum(napi_env env, napi_value exp
 /**
  * Enumeration type extension.
  */
+napi_value NapiCallManager::DeclareVoNRStateEnum(napi_env env, napi_value exports)
+{
+    napi_property_descriptor desc[] = {
+        DECLARE_NAPI_STATIC_PROPERTY("VONR_STATE_ON",
+            NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(VoNRState::VONR_STATE_ON))),
+        DECLARE_NAPI_STATIC_PROPERTY("VONR_STATE_OFF",
+            NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(VoNRState::VONR_STATE_OFF))),
+    };
+    napi_value result = nullptr;
+    napi_define_class(env, "VoNRState", NAPI_AUTO_LENGTH, NapiCallManagerUtils::CreateEnumConstructor, nullptr,
+        sizeof(desc) / sizeof(*desc), desc, &result);
+    napi_set_named_property(env, exports, "VoNRState", result);
+    return exports;
+}
+
 napi_value NapiCallManager::DeclareAudioDeviceEnum(napi_env env, napi_value exports)
 {
     // AudioDeviceType
@@ -964,6 +981,7 @@ napi_value NapiCallManager::RegisterCallManagerFunc(napi_env env, napi_value exp
     DeclareCallTransferEnum(env, exports);
     DeclareCallImsInterface(env, exports);
     // Enumeration class extension initialization
+    DeclareVoNRStateEnum(env, exports);
     DeclareAudioDeviceEnum(env, exports);
     DeclareVideoStateTypeEnum(env, exports);
     DeclareImsCallModeEnum(env, exports);
@@ -1837,6 +1855,51 @@ napi_value NapiCallManager::IsImsSwitchEnabled(napi_env env, napi_callback_info 
     }
     return HandleAsyncWork(
         env, asyncContext.release(), "IsImsSwitchEnabled", NativeIsImsSwitchEnabled, NativeIsImsSwitchEnabledCallBack);
+}
+
+napi_value NapiCallManager::SetVoNRState(napi_env env, napi_callback_info info)
+{
+    GET_PARAMS(env, info, THREE_VALUE_MAXIMUM_LIMIT);
+    if (!MatchTwoNumberParameters(env, argv, argc)) {
+        TELEPHONY_LOGE("NapiCallManager::SetVoNRState MatchTwoNumberParameters failed.");
+        NapiUtil::ThrowParameterError(env);
+        return nullptr;
+    }
+    auto asyncContext = std::make_unique<VoNRSwitchAsyncContext>();
+    if (asyncContext == nullptr) {
+        TELEPHONY_LOGE("NapiCallManager::SetVoNRState asyncContext is nullptr.");
+        NapiUtil::ThrowParameterError(env);
+        return nullptr;
+    }
+    napi_get_value_int32(env, argv[ARRAY_INDEX_FIRST], &asyncContext->slotId);
+    napi_get_value_int32(env, argv[ARRAY_INDEX_SECOND], &asyncContext->state);
+    if (argc == VALUE_MAXIMUM_LIMIT) {
+        napi_create_reference(env, argv[ARRAY_INDEX_THIRD], DATA_LENGTH_ONE, &(asyncContext->callbackRef));
+    }
+    return HandleAsyncWork(
+        env, asyncContext.release(), "SetVoNRState", NativeSetVoNRState, NativeVoidCallBackWithErrorCode);
+}
+
+napi_value NapiCallManager::GetVoNRState(napi_env env, napi_callback_info info)
+{
+    GET_PARAMS(env, info, TWO_VALUE_LIMIT);
+    if (!MatchOneNumberParameter(env, argv, argc)) {
+        TELEPHONY_LOGE("NapiCallManager::GetVoNRState MatchOneNumberParameter failed.");
+        NapiUtil::ThrowParameterError(env);
+        return nullptr;
+    }
+    auto asyncContext = std::make_unique<VoNRSwitchAsyncContext>();
+    if (asyncContext == nullptr) {
+        TELEPHONY_LOGE("NapiCallManager::GetVoNRState asyncContext is nullptr.");
+        NapiUtil::ThrowParameterError(env);
+        return nullptr;
+    }
+    napi_get_value_int32(env, argv[ARRAY_INDEX_FIRST], &asyncContext->slotId);
+    if (argc == TWO_VALUE_LIMIT) {
+        napi_create_reference(env, argv[ARRAY_INDEX_SECOND], DATA_LENGTH_ONE, &(asyncContext->callbackRef));
+    }
+    return HandleAsyncWork(
+        env, asyncContext.release(), "GetVoNRState", NativeGetVoNRState, NativeGetVoNRStateCallBack);
 }
 
 napi_value NapiCallManager::StartDTMF(napi_env env, napi_callback_info info)
@@ -2984,6 +3047,45 @@ void NapiCallManager::NativeIsImsSwitchEnabledCallBack(napi_env env, napi_status
     asyncContext = nullptr;
 }
 
+void NapiCallManager::NativeGetVoNRStateCallBack(napi_env env, napi_status status, void *data)
+{
+    if (data == nullptr) {
+        TELEPHONY_LOGE("NapiCallManager::NativeGetVoNRStateCallBack data is nullptr");
+        NapiUtil::ThrowParameterError(env);
+        return;
+    }
+    auto asyncContext = (VoNRSwitchAsyncContext *)data;
+    if (asyncContext->deferred != nullptr) {
+        if (asyncContext->errorCode == TELEPHONY_SUCCESS) {
+            napi_value promiseValue = nullptr;
+            napi_create_int32(env, asyncContext->state, &promiseValue);
+            napi_resolve_deferred(env, asyncContext->deferred, promiseValue);
+        } else {
+            napi_reject_deferred(env, asyncContext->deferred,
+                NapiCallManagerUtils::CreateErrorCodeAndMessageForJs(
+                    env, asyncContext->errorCode, asyncContext->eventId));
+        }
+    } else {
+        napi_value callbackValue[ARRAY_INDEX_THIRD] = { 0 };
+        if (asyncContext->errorCode == TELEPHONY_SUCCESS) {
+            callbackValue[ARRAY_INDEX_FIRST] = NapiCallManagerUtils::CreateUndefined(env);
+            napi_create_int32(env, asyncContext->state, &callbackValue[ARRAY_INDEX_SECOND]);
+        } else {
+            callbackValue[ARRAY_INDEX_FIRST] = NapiCallManagerUtils::CreateErrorCodeAndMessageForJs(
+                env, asyncContext->errorCode, asyncContext->eventId);
+            callbackValue[ARRAY_INDEX_SECOND] = NapiCallManagerUtils::CreateUndefined(env);
+        }
+        napi_value callback = nullptr;
+        napi_value result = nullptr;
+        napi_get_reference_value(env, asyncContext->callbackRef, &callback);
+        napi_call_function(env, nullptr, callback, std::size(callbackValue), callbackValue, &result);
+        napi_delete_reference(env, asyncContext->callbackRef);
+    }
+    napi_delete_async_work(env, asyncContext->work);
+    delete asyncContext;
+    asyncContext = nullptr;
+}
+
 void NapiCallManager::NativeBoolCallBack(napi_env env, napi_status status, void *data)
 {
     if (data == nullptr) {
@@ -3848,6 +3950,45 @@ void NapiCallManager::NativeIsImsSwitchEnabled(napi_env env, void *data)
     if (asyncContext->enabled) {
         asyncContext->resolved = BOOL_VALUE_IS_TRUE;
     }
+}
+
+void NapiCallManager::NativeSetVoNRState(napi_env env, void *data)
+{
+    if (data == nullptr) {
+        TELEPHONY_LOGE("NapiCallManager::NativeSetVoNRState data is nullptr");
+        NapiUtil::ThrowParameterError(env);
+        return;
+    }
+    auto asyncContext = (VoNRSwitchAsyncContext *)data;
+    if (!IsValidSlotId(asyncContext->slotId)) {
+        TELEPHONY_LOGE("NativeSetVoNRState slotId is invalid");
+        asyncContext->errorCode = SLOT_ID_INVALID;
+        return;
+    }
+    asyncContext->errorCode = DelayedSingleton<CallManagerClient>::GetInstance()->SetVoNRState(
+        asyncContext->slotId, asyncContext->state);
+    if (asyncContext->errorCode == TELEPHONY_SUCCESS) {
+        asyncContext->resolved = TELEPHONY_SUCCESS;
+    }
+    asyncContext->eventId = CALL_MANAGER_SET_VONR_STATE;
+}
+
+void NapiCallManager::NativeGetVoNRState(napi_env env, void *data)
+{
+    if (data == nullptr) {
+        TELEPHONY_LOGE("NapiCallManager::NativeGetVoNRState data is nullptr");
+        NapiUtil::ThrowParameterError(env);
+        return;
+    }
+    auto asyncContext = (VoNRSwitchAsyncContext *)data;
+    if (!IsValidSlotId(asyncContext->slotId)) {
+        TELEPHONY_LOGE("NativeIsImsSwitchEnabled slotId is invalid");
+        asyncContext->errorCode = SLOT_ID_INVALID;
+        return;
+    }
+    asyncContext->errorCode = DelayedSingleton<CallManagerClient>::GetInstance()->GetVoNRState(
+        asyncContext->slotId, asyncContext->state);
+    asyncContext->eventId = CALL_MANAGER_GET_VONR_STATE;
 }
 
 void NapiCallManager::NativeStartDTMF(napi_env env, void *data)
