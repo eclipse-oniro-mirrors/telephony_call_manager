@@ -212,6 +212,10 @@ bool AudioDeviceManager::ProcessEvent(AudioEvent event)
             result = InitAudioDevice();
             break;
         case AudioEvent::WIRED_HEADSET_DISCONNECTED: {
+            if (!isAudioActivated_) {
+                TELEPHONY_LOGE("call is not active, no need to connect sco");
+                return TELEPHONY_ERR_ARGUMENT_INVALID;
+            }
             std::shared_ptr<BluetoothCallManager> bluetoothCallManager = std::make_shared<BluetoothCallManager>();
             if (bluetoothCallManager->IsBtAvailble()) {
                 return DelayedSingleton<BluetoothConnection>::GetInstance()->ConnectBtSco();
