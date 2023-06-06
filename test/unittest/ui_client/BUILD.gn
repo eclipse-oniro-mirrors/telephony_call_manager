@@ -40,7 +40,7 @@ ohos_executable("tel_call_manager_ui_test") {
     "core_service:tel_core_service_api",
     "drivers_interface_camera:metadata",
     "eventhandler:libeventhandler",
-    "ipc:ipc_core",
+    "ipc:ipc_single",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
   ]

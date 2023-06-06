@@ -28,6 +28,8 @@
 
 namespace OHOS {
 namespace Telephony {
+static constexpr const char* TIMER_START_THREAD = "timerStartThread";
+
 class Timer {
 public:
     Timer() : stopStatus_(true), tryStopFlag_(false) {}
@@ -50,6 +52,7 @@ public:
         }
         stopStatus_ = false;
         std::thread([this, interval, taskFun]() {
+            pthread_setname_np(pthread_self(), TIMER_START_THREAD);
             while (!tryStopFlag_) {
                 std::this_thread::sleep_for(std::chrono::milliseconds(interval));
                 taskFun();

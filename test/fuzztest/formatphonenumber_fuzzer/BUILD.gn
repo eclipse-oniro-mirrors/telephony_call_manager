@@ -54,7 +54,7 @@ ohos_fuzztest("FormatPhoneNumberFuzzTest") {
     "core_service:tel_core_service_api",
     "data_share:datashare_consumer",
     "init:libbegetutil",
-    "ipc:ipc_core",
+    "ipc:ipc_single",
     "samgr:samgr_proxy",
   ]
   defines = [
