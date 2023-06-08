@@ -339,7 +339,21 @@ int32_t AudioProxy::SetAudioPreferDeviceChangeCallback()
     int32_t ret = AudioStandard::AudioRoutingManager::GetInstance()->SetPreferOutputDeviceChangeCallback(rendererInfo,
         preferDeviceCallback_);
     if (ret != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("GetPreferOutputDeviceForRendererInfo fail");
+        TELEPHONY_LOGE("SetPreferOutputDeviceChangeCallback fail");
+        return CALL_ERR_AUDIO_OPERATE_FAILED;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t AudioProxy::UnsetAudioPreferDeviceChangeCallback()
+{
+    if (preferDeviceCallback_ == nullptr) {
+        TELEPHONY_LOGE("preferDeviceCallback_ is nullptr");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    int32_t ret = AudioStandard::AudioRoutingManager::GetInstance()->UnsetPreferOutputDeviceChangeCallback();
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("UnsetPreferOutputDeviceChangeCallback fail");
         return CALL_ERR_AUDIO_OPERATE_FAILED;
     }
     return TELEPHONY_SUCCESS;

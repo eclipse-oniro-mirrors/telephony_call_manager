@@ -28,6 +28,7 @@ AudioControlManager::AudioControlManager()
 AudioControlManager::~AudioControlManager()
 {
     DelayedSingleton<AudioProxy>::GetInstance()->UnsetDeviceChangeCallback();
+    DelayedSingleton<AudioProxy>::GetInstance()->UnsetAudioPreferDeviceChangeCallback();
 }
 
 void AudioControlManager::Init()
@@ -414,15 +415,10 @@ int32_t AudioControlManager::MuteRinger()
         TELEPHONY_LOGI("ring already stopped");
         return TELEPHONY_SUCCESS;
     }
-    if (ring_ == nullptr) {
-        TELEPHONY_LOGE("ring_ is nullptr");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-    if (ring_->Stop() != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("mute ring failed");
+    if (!PlaySoundtone()) {
+        TELEPHONY_LOGE("PlaySoundtone fail");
         return CALL_ERR_AUDIO_SETTING_MUTE_FAILED;
     }
-    ring_->ReleaseRenderer();
     TELEPHONY_LOGI("mute ring success");
     return TELEPHONY_SUCCESS;
 }
