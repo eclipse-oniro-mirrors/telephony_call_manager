@@ -34,6 +34,8 @@ enum class RingState {
     STOPPED,
 };
 
+static constexpr const char* RING_PLAY_THREAD = "ringPlayThread";
+
 /**
  * @class Ring
  * plays the default or specific ringtone.

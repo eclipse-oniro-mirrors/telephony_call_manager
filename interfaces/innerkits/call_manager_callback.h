@@ -24,15 +24,73 @@ namespace OHOS {
 namespace Telephony {
 class CallManagerCallback {
 public:
+    /**
+     * @brief Construct a new Call Manager Callback object
+     */
     CallManagerCallback() {}
+
+    /**
+     * @brief Destroy the Call Manager Callback object
+     */
     virtual ~CallManagerCallback() {}
 
+    /**
+     * @brief indicate the call detail informaion while the call state is changed
+     *
+     * @param info[in] call detail infomation, contains call type, account number, call state,
+     * call start or end time .etc
+     * @return Returns 0 on success, others on failure.
+     */
     virtual int32_t OnCallDetailsChange(const CallAttributeInfo &info) = 0;
+
+    /**
+     * @brief indicate the call event informaion while the call event is changed
+     *
+     * @param info[in] call event information, contains event id, phone number, bundle name.
+     * @return Returns 0 on success, others on failure.
+     */
     virtual int32_t OnCallEventChange(const CallEventInfo &info) = 0;
+
+    /**
+     * @brief indicate the call disconnected detail information while the call disconnected
+     *
+     * @param details[in], call disconnected information, contains disconnected reason and message.
+     * @return Returns 0 on success, others on failure.
+     */
     virtual int32_t OnCallDisconnectedCause(const DisconnectedDetails &details) = 0;
+
+    /**
+     * @brief report the result infomation for the specific call event
+     *
+     * @param reportId[in] the event id, indicate the specific event that the report information about
+     * @param resultInfo[in] the detail information corresponding specific event
+     * @return Returns 0 on success, others on failure.
+     */
     virtual int32_t OnReportAsyncResults(CallResultReportId reportId, AppExecFwk::PacMap &resultInfo) = 0;
+
+    /**
+     * @brief report the result infomation for the specific ott call event
+     *
+     * @param requestId[in] the event id, indicate the specific ott call event that the report information about
+     * @param info[in] the detail information corresponding specific event
+     * @return Returns 0 on success, others on failure.
+     */
     virtual int32_t OnOttCallRequest(OttCallRequestId requestId, AppExecFwk::PacMap &info) = 0;
+
+    /**
+     * @brief report the mmi code result
+     *
+     * @param info[out] the mmi code result, contains result(success or fail) and the corresponding message.
+     * @return Returns 0 on success, others on failure.
+     */
     virtual int32_t OnReportMmiCodeResult(const MmiCodeInfo &info) = 0;
+
+    /**
+     * @brief report the audio device detail information
+     *
+     * @param info[out] the audio information, contains the audio device list, current audio device and ismuted.
+     * @return Returns 0 on success, others on failure.
+     */
     virtual int32_t OnReportAudioDeviceChange(const AudioDeviceInfo &info) = 0;
 };
 } // namespace Telephony

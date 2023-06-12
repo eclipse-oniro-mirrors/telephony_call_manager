@@ -81,6 +81,7 @@ int32_t Ring::Play()
     AudioPlay audioPlay = &AudioPlayer::Play;
     std::thread play(audioPlay, audioPlayer_, ringtonePath_, AudioStandard::AudioStreamType::STREAM_RING,
         PlayerType::TYPE_RING);
+    pthread_setname_np(play.native_handle(), RING_PLAY_THREAD);
     play.detach();
     if (shouldVibrate_) {
         result = StartVibrate();
