@@ -191,7 +191,7 @@ declare namespace call {
   /**
    * Obtains the call state.
    *
-   * <p>If an incoming call is ringing or waiting, the system returns {@code CallState#CALL_STATE_RINGING}.
+   * If an incoming call is ringing or waiting, the system returns {@code CallState#CALL_STATE_RINGING}.
    * If at least one call is in the active, hold, or dialing state, the system returns
    * {@code CallState#CALL_STATE_OFFHOOK}.
    * In other cases, the system returns {@code CallState#CALL_STATE_IDLE}.
@@ -205,7 +205,7 @@ declare namespace call {
   /**
    * Obtains the call state.
    *
-   * <p>If an incoming call is ringing or waiting, the system returns {@code CallState#CALL_STATE_RINGING}.
+   * If an incoming call is ringing or waiting, the system returns {@code CallState#CALL_STATE_RINGING}.
    * If at least one call is in the active, hold, or dialing state, the system returns
    * {@code CallState#CALL_STATE_OFFHOOK}.
    * In other cases, the system returns {@code CallState#CALL_STATE_IDLE}.
@@ -219,7 +219,7 @@ declare namespace call {
   /**
    * Stops the ringtone.
    *
-   * <p>If an incoming call is ringing, the phone stops ringing. Otherwise, this method does not function.
+   * If an incoming call is ringing, the phone stops ringing. Otherwise, this method does not function.
    *
    * @permission ohos.permission.SET_TELEPHONY_STATE
    * @param { AsyncCallback<void> } callback - The callback of muteRinger.
@@ -239,7 +239,7 @@ declare namespace call {
   /**
    * Stops the ringtone.
    *
-   * <p>If an incoming call is ringing, the phone stops ringing. Otherwise, this method does not function.
+   * If an incoming call is ringing, the phone stops ringing. Otherwise, this method does not function.
    *
    * @permission ohos.permission.SET_TELEPHONY_STATE
    * @returns { Promise<void> } The promise returned by the muteRinger.
@@ -257,7 +257,7 @@ declare namespace call {
   /**
    * Checks whether a device supports voice calls.
    *
-   * <p>The system checks whether the device has the capability to initiate a circuit switching (CS) or IP multimedia
+   * The system checks whether the device has the capability to initiate a circuit switching (CS) or IP multimedia
    * subsystem domain (IMS) call on a telephone service network. If the device supports only packet switching
    * (even if the device supports OTT calls), {@code false} is returned.
    *
@@ -426,7 +426,6 @@ declare namespace call {
    * @systemapi Hide this for inner system use.
    * @since 9
    */
-  function answer(callId: number, callback: AsyncCallback<void>): void;
   function answerCall(callId: number, callback: AsyncCallback<void>): void;
 
   /**
@@ -446,7 +445,6 @@ declare namespace call {
    * @systemapi Hide this for inner system use.
    * @since 9
    */
-  function answer(callId?: number): Promise<void>;
   function answerCall(callId?: number): Promise<void>;
 
   /**
@@ -465,7 +463,6 @@ declare namespace call {
    * @systemapi Hide this for inner system use.
    * @since 9
    */
-  function answer(callback: AsyncCallback<void>): void;
   function answerCall(callback: AsyncCallback<void>): void;
 
   /**
@@ -485,7 +482,6 @@ declare namespace call {
    * @systemapi Hide this for inner system use.
    * @since 9
    */
-  function hangup(callId: number, callback: AsyncCallback<void>): void;
   function hangUpCall(callId: number, callback: AsyncCallback<void>): void;
 
   /**
@@ -505,7 +501,6 @@ declare namespace call {
    * @systemapi Hide this for inner system use.
    * @since 9
    */
-  function hangup(callId?: number): Promise<void>;
   function hangUpCall(callId?: number): Promise<void>;
 
   /**
@@ -524,7 +519,6 @@ declare namespace call {
    * @systemapi Hide this for inner system use.
    * @since 9
    */
-  function hangup(callback: AsyncCallback<void>): void;
   function hangUpCall(callback: AsyncCallback<void>): void;
 
   /**
@@ -545,7 +539,6 @@ declare namespace call {
    * @systemapi Hide this for inner system use.
    * @since 9
    */
-  function reject(callId: number, options: RejectMessageOptions, callback: AsyncCallback<void>): void;
   function rejectCall(callId: number, options: RejectMessageOptions, callback: AsyncCallback<void>): void;
 
   /**
@@ -566,7 +559,6 @@ declare namespace call {
    * @systemapi Hide this for inner system use.
    * @since 9
    */
-  function reject(callId?: number, options?: RejectMessageOptions): Promise<void>;
   function rejectCall(callId?: number, options?: RejectMessageOptions): Promise<void>;
 
   /**
@@ -586,7 +578,6 @@ declare namespace call {
    * @systemapi Hide this for inner system use.
    * @since 9
    */
-  function reject(callId: number, callback: AsyncCallback<void>): void;
   function rejectCall(callId: number, callback: AsyncCallback<void>): void;
 
   /**
@@ -605,7 +596,6 @@ declare namespace call {
    * @systemapi Hide this for inner system use.
    * @since 9
    */
-  function reject(callback: AsyncCallback<void>): void;
   function rejectCall(callback: AsyncCallback<void>): void;
 
   /**
@@ -625,7 +615,6 @@ declare namespace call {
    * @systemapi Hide this for inner system use.
    * @since 9
    */
-  function reject(options: RejectMessageOptions, callback: AsyncCallback<void>): void;
   function rejectCall(options: RejectMessageOptions, callback: AsyncCallback<void>): void;
 
   /**
@@ -1094,7 +1083,7 @@ declare namespace call {
    * Subscribe to the callDetailsChange event.
    *
    * @permission ohos.permission.SET_TELEPHONY_STATE
-   * @param { string } type - callDetailsChange.
+   * @param { 'callDetailsChange' } type - Event type. Indicates the callDetailsChange event to be subscribed to.
    * @param { Callback<CallAttributeOptions> } callback - Indicates the callback for getting the result of call details.
    * @throws { BusinessError } 201 - Permission denied.
    * @throws { BusinessError } 202 - Non-system applications use system APIs.
@@ -1113,7 +1102,7 @@ declare namespace call {
    * Unsubscribe from the callDetailsChange event.
    *
    * @permission ohos.permission.SET_TELEPHONY_STATE
-   * @param { string } type - callDetailsChange.
+   * @param { 'callDetailsChange' } type - Event type. Indicates the callDetailsChange event to unsubscribe from.
    * @param { Callback<CallAttributeOptions> } callback - Indicates the callback to unsubscribe from
    * the callDetailsChange event.
    * @throws { BusinessError } 201 - Permission denied.
@@ -1133,7 +1122,7 @@ declare namespace call {
    * Subscribe to the callEventChange event.
    *
    * @permission ohos.permission.SET_TELEPHONY_STATE
-   * @param { string } type - callEventChange.
+   * @param { 'callEventChange' } type - Event type. Indicates the callEventChange event to be subscribed to.
    * @param { Callback<CallEventOptions> } callback - Indicates the callback for getting the call event id.
    * @throws { BusinessError } 201 - Permission denied.
    * @throws { BusinessError } 202 - Non-system applications use system APIs.
@@ -1152,7 +1141,7 @@ declare namespace call {
    * Unsubscribe from the callEventChange event.
    *
    * @permission ohos.permission.SET_TELEPHONY_STATE
-   * @param { string } type - callEventChange.
+   * @param { 'callEventChange' } type - Event type. Indicates the callEventChange event to unsubscribe from.
    * @param { Callback<CallEventOptions> } callback - Indicates the callback to unsubscribe from the callEventChange event.
    * @throws { BusinessError } 201 - Permission denied.
    * @throws { BusinessError } 202 - Non-system applications use system APIs.
@@ -1171,8 +1160,8 @@ declare namespace call {
    * Subscribe to the callDisconnectedCause event.
    *
    * @permission ohos.permission.SET_TELEPHONY_STATE
-   * @param { string } type - callDisconnectedCause.
-   * @param { Callback<MmiCodeResults> } callback - Indicates the callback for getting the call disconnection reason.
+   * @param { 'callDisconnectedCause' } type - Event type. Indicates the callDisconnectedCause event to be subscribed to.
+   * @param { Callback<DisconnectedDetails> } callback - Indicates the callback for getting the call disconnection reason.
    * @throws { BusinessError } 201 - Permission denied.
    * @throws { BusinessError } 202 - Non-system applications use system APIs.
    * @throws { BusinessError } 401 - Parameter error.
@@ -1190,8 +1179,8 @@ declare namespace call {
    * Unsubscribe from the callDisconnectedCause event.
    *
    * @permission ohos.permission.SET_TELEPHONY_STATE
-   * @param { string } type - callDisconnectedCause.
-   * @param { Callback<MmiCodeResults> } callback - Indicates the callback used to cancel
+   * @param { 'callDisconnectedCause' } type - Event type. Indicates the callDisconnectedCause event to unsubscribe from.
+   * @param { Callback<DisconnectedDetails> } callback - Indicates the callback used to cancel
    * the registration monitoring for obtaining the call end reason.
    * @throws { BusinessError } 201 - Permission denied.
    * @throws { BusinessError } 202 - Non-system applications use system APIs.
@@ -1210,7 +1199,7 @@ declare namespace call {
    * Subscribe to the mmiCodeResult event.
    *
    * @permission ohos.permission.SET_TELEPHONY_STATE
-   * @param { string } type - mmiCodeResult.
+   * @param { 'mmiCodeResult' } type - Event type. Indicates the mmiCodeResult event to be subscribed to.
    * @param { Callback<MmiCodeResults> } callback - Indicates the callback for getting the result of MMI code.
    * @throws { BusinessError } 201 - Permission denied.
    * @throws { BusinessError } 202 - Non-system applications use system APIs.
@@ -1229,7 +1218,7 @@ declare namespace call {
    * Unsubscribe from the mmiCodeResult event.
    *
    * @permission ohos.permission.SET_TELEPHONY_STATE
-   * @param { string } type - mmiCodeResult.
+   * @param { 'mmiCodeResult' } type - Event type. Indicates the mmiCodeResult event to unsubscribe from.
    * @param { Callback<MmiCodeResults> } callback - Indicates the callback used to cancel getting mmicode registered listening.
    * @throws { BusinessError } 201 - Permission denied.
    * @throws { BusinessError } 202 - Non-system applications use system APIs.
@@ -1248,7 +1237,7 @@ declare namespace call {
    * Subscribe to the audioDeviceChange event.
    *
    * @permission ohos.permission.SET_TELEPHONY_STATE
-   * @param { string } type - audioDeviceChange.
+   * @param { 'audioDeviceChange' } type - Event type. Indicates the audioDeviceChange event to be subscribed to.
    * @param { Callback<AudioDeviceInfo> } callback - Indicates the callback for getting the result of Current AudioDevice.
    * @throws { BusinessError } 201 - Permission denied.
    * @throws { BusinessError } 202 - Non-system applications use system APIs.
@@ -1267,7 +1256,7 @@ declare namespace call {
    * Unsubscribe from the audioDeviceChange event.
    *
    * @permission ohos.permission.SET_TELEPHONY_STATE
-   * @param { string } type - audioDeviceChange.
+   * @param { 'audioDeviceChange' } type - Event type. Indicates the audioDeviceChange event to unsubscribe from.
    * @param { Callback<AudioDeviceInfo> } callback - Indicates the callback for getting the result of Current AudioDevice.
    * @throws { BusinessError } 201 - Permission denied.
    * @throws { BusinessError } 202 - Non-system applications use system APIs.
@@ -1521,52 +1510,6 @@ declare namespace call {
   function setCallTransfer(slotId: number, info: CallTransferInfo): Promise<void>;
 
   /**
-   * Checks whether can set call transfer time.
-   *
-   * <p>The system checks whether IP multimedia subsystem domain (IMS) can set call transfer time.
-   *
-   * @permission ohos.permission.GET_TELEPHONY_STATE
-   * @param { number } slotId - Indicates the card slot index number,
-   * ranging from 0 to the maximum card slot index number supported by the device.
-   * @param { AsyncCallback<boolean> } - Returns {@code true} if the device can set call transfer time.
-   * Returns {@code false} otherwise.
-   * @throws { BusinessError } 201 - Permission denied.
-   * @throws { BusinessError } 202 - Non-system applications use system APIs.
-   * @throws { BusinessError } 401 - Parameter error.
-   * @throws { BusinessError } 8300001 - Invalid parameter value.
-   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
-   * @throws { BusinessError } 8300003 - System internal error.
-   * @throws { BusinessError } 8300999 - Unknown error code.
-   * @syscap SystemCapability.Telephony.CallManager
-   * @systemapi Hide this for inner system use.
-   * @since 10
-   */
-  function canSetCallTransferTime(slotId: number, callback: AsyncCallback<boolean>): void;
-
-  /**
-   * Checks whether can set call transfer time.
-   *
-   * <p>The system checks whether IP multimedia subsystem domain (IMS) can set call transfer time.
-   *
-   * @permission ohos.permission.GET_TELEPHONY_STATE
-   * @param { number } slotId - Indicates the card slot index number,
-   * ranging from 0 to the maximum card slot index number supported by the device.
-   * @returns { Promise<boolean> } Returns {@code true} if the device can set call transfer time.
-   * Returns {@code false} otherwise.
-   * @throws { BusinessError } 201 - Permission denied.
-   * @throws { BusinessError } 202 - Non-system applications use system APIs.
-   * @throws { BusinessError } 401 - Parameter error.
-   * @throws { BusinessError } 8300001 - Invalid parameter value.
-   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
-   * @throws { BusinessError } 8300003 - System internal error.
-   * @throws { BusinessError } 8300999 - Unknown error code.
-   * @syscap SystemCapability.Telephony.CallManager
-   * @systemapi Hide this for inner system use.
-   * @since 10
-   */
-  function canSetCallTransferTime(slotId: number): Promise<boolean>;
-
-  /**
    * Judge whether there is a ringing call.
    *
    * @permission ohos.permission.SET_TELEPHONY_STATE
@@ -1685,7 +1628,7 @@ declare namespace call {
   function setAudioDevice(device: AudioDevice, callback: AsyncCallback<void>): void;
 
   /**
-   * Set the audio device with options.
+   * Set the audio device.
    *
    * @permission ohos.permission.SET_TELEPHONY_STATE
    * @param { AudioDevice } device - Indicates the device of audio.
@@ -1699,9 +1642,49 @@ declare namespace call {
    * @throws { BusinessError } 8300999 - Unknown error code.
    * @syscap SystemCapability.Telephony.CallManager
    * @systemapi Hide this for inner system use.
-   * @since 8
+   * @since 10
    */
   function setAudioDevice(device: AudioDevice): Promise<void>;
+
+  /**
+   * Set the audio device with options.
+   *
+   * @permission ohos.permission.SET_TELEPHONY_STATE
+   * @param { AudioDevice } device - Indicates the device of audio.
+   * @param { AudioDeviceOptions } options - Indicates additional information, such as address of bluetooth.
+   * @param { AsyncCallback<void> } callback - The callback of setAudioDevice.
+   * @throws { BusinessError } 201 - Permission denied.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @throws { BusinessError } 8300999 - Unknown error code.
+   * @syscap SystemCapability.Telephony.CallManager
+   * @systemapi Hide this for inner system use.
+   * @since 9
+   */
+  function setAudioDevice(device: AudioDevice, options: AudioDeviceOptions, callback: AsyncCallback<void>): void;
+
+  /**
+   * Set the audio device with options.
+   *
+   * @permission ohos.permission.SET_TELEPHONY_STATE
+   * @param { AudioDevice } device - Indicates the device of audio.
+   * @param { AudioDeviceOptions } options - Indicates additional information, such as address of bluetooth.
+   * @returns { Promise<void> } The promise returned by the setAudioDevice.
+   * @throws { BusinessError } 201 - Permission denied.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @throws { BusinessError } 8300999 - Unknown error code.
+   * @syscap SystemCapability.Telephony.CallManager
+   * @systemapi Hide this for inner system use.
+   * @since 9
+   */
+  function setAudioDevice(device: AudioDevice, options?: AudioDeviceOptions): Promise<void>;
 
   /**
    * Join the conference call.
@@ -1897,12 +1880,12 @@ declare namespace call {
   function isImsSwitchEnabled(slotId: number): Promise<boolean>;
 
   /**
-   * Close Unfinished ussd.
+   * Close unfinished ussd.
    *
    * @permission ohos.permission.SET_TELEPHONY_STATE
    * @param { number } slotId - Indicates the card slot index number,
    * ranging from 0 to the maximum card slot index number supported by the device.
-   * @param { AsyncCallback<void> } callback - The callback of closeUnFinishedUssd.
+   * @param { AsyncCallback<void> } callback - The callback of closeUnfinishedUssd.
    * @throws { BusinessError } 201 - Permission denied.
    * @throws { BusinessError } 202 - Non-system applications use system APIs.
    * @throws { BusinessError } 401 - Parameter error.
@@ -1914,15 +1897,15 @@ declare namespace call {
    * @systemapi Hide this for inner system use.
    * @since 10
    */
-  function closeUnFinishedUssd(slotId: number, callback: AsyncCallback<void>): void;
+  function closeUnfinishedUssd(slotId: number, callback: AsyncCallback<void>): void;
 
   /**
-   * Close Unfinished ussd.
+   * Close unfinished ussd.
    *
    * @permission ohos.permission.SET_TELEPHONY_STATE
    * @param { number } slotId - Indicates the card slot index number,
    * ranging from 0 to the maximum card slot index number supported by the device.
-   * @returns { Promise<void> } The promise returned by the function.
+   * @returns { Promise<void> } The promise returned by the closeUnfinishedUssd.
    * @throws { BusinessError } 201 - Permission denied.
    * @throws { BusinessError } 202 - Non-system applications use system APIs.
    * @throws { BusinessError } 401 - Parameter error.
@@ -1934,13 +1917,141 @@ declare namespace call {
    * @systemapi Hide this for inner system use.
    * @since 10
    */
-  function closeUnFinishedUssd(slotId: number): Promise<void>;
+  function closeUnfinishedUssd(slotId: number): Promise<void>;
 
   /**
-   * Handle special code from dialer.
+   * Set switch state for voice over NR.
+   *
+   * @permission ohos.permission.SET_TELEPHONY_STATE
+   * @param { number } slotId - Indicates the card slot index number,
+   * ranging from 0 to the maximum card slot index number supported by the device.
+   * @param { VoNRState } state - Indicates the VoNR state.
+   * @param { AsyncCallback<void> } callback - The callback of setVoNRState.
+   * @throws { BusinessError } 201 - Permission denied.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @throws { BusinessError } 8300999 - Unknown error code.
+   * @syscap SystemCapability.Telephony.CallManager
+   * @systemapi Hide this for inner system use.
+   * @since 10
+   */
+  function setVoNRState(slotId: number, state: VoNRState, callback: AsyncCallback<void>): void;
+
+  /**
+   * Set switch state for voice over NR.
+   *
+   * @permission ohos.permission.SET_TELEPHONY_STATE
+   * @param { number } slotId - Indicates the card slot index number,
+   * ranging from 0 to the maximum card slot index number supported by the device.
+   * @param { VoNRState } state - Indicates the VoNR state.
+   * @returns { Promise<void> } The promise returned by the setVoNRState.
+   * @throws { BusinessError } 201 - Permission denied.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @throws { BusinessError } 8300999 - Unknown error code.
+   * @syscap SystemCapability.Telephony.CallManager
+   * @systemapi Hide this for inner system use.
+   * @since 10
+   */
+  function setVoNRState(slotId: number, state: VoNRState): Promise<void>;
+
+  /**
+   * Get switch state for voice over NR.
+   *
+   * @permission ohos.permission.GET_TELEPHONY_STATE
+   * @param { number } slotId - Indicates the card slot index number,
+   * ranging from 0 to the maximum card slot index number supported by the device.
+   * @param { AsyncCallback<VoNRState> } callback - Indicates the callback for getVoNRState.
+   * @throws { BusinessError } 201 - Permission denied.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @throws { BusinessError } 8300999 - Unknown error code.
+   * @syscap SystemCapability.Telephony.CallManager
+   * @systemapi Hide this for inner system use.
+   * @since 10
+   */
+  function getVoNRState(slotId: number, callback: AsyncCallback<VoNRState>): void;
+
+  /**
+   * Get switch state for voice over NR.
+   *
+   * @permission ohos.permission.GET_TELEPHONY_STATE
+   * @param { number } slotId - Indicates the card slot index number,
+   * ranging from 0 to the maximum card slot index number supported by the device.
+   * @returns { Promise<VoNRState> } Returns the VoNR state.
+   * @throws { BusinessError } 201 - Permission denied.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @throws { BusinessError } 8300999 - Unknown error code.
+   * @syscap SystemCapability.Telephony.CallManager
+   * @systemapi Hide this for inner system use.
+   * @since 10
+   */
+  function getVoNRState(slotId: number): Promise<VoNRState>;
+
+  /**
+   * Checks whether can set call transfer time.
+   *
+   * The system checks whether IP multimedia subsystem domain (IMS) can set call transfer time.
+   *
+   * @permission ohos.permission.GET_TELEPHONY_STATE
+   * @param { number } slotId - Indicates the card slot index number,
+   * ranging from 0 to the maximum card slot index number supported by the device.
+   * @param { AsyncCallback<boolean> } callback - Returns {@code true} if the device can set call transfer time;
+   * returns {@code false} otherwise.
+   * @throws { BusinessError } 201 - Permission denied.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @throws { BusinessError } 8300999 - Unknown error code.
+   * @syscap SystemCapability.Telephony.CallManager
+   * @systemapi Hide this for inner system use.
+   * @since 10
+   */
+  function canSetCallTransferTime(slotId: number, callback: AsyncCallback<boolean>): void;
+
+  /**
+   * Checks whether can set call transfer time.
+   *
+   * The system checks whether IP multimedia subsystem domain (IMS) can set call transfer time.
+   *
+   * @permission ohos.permission.GET_TELEPHONY_STATE
+   * @param { number } slotId - Indicates the card slot index number,
+   * ranging from 0 to the maximum card slot index number supported by the device.
+   * @returns { Promise<boolean> } Returns {@code true} if the device can set call transfer time;
+   * returns {@code false} otherwise.
+   * @throws { BusinessError } 201 - Permission denied.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @throws { BusinessError } 8300999 - Unknown error code.
+   * @syscap SystemCapability.Telephony.CallManager
+   * @systemapi Hide this for inner system use.
+   * @since 10
+   */
+  function canSetCallTransferTime(slotId: number): Promise<boolean>;
+
+  /**
+   * Enters the secret code on the keypad.
    *
    * @permission ohos.permission.PLACE_CALL
-   * @param { string } inputCode - Indicates the special code entered.
+   * @param { string } inputCode - Indicates the secret code to enter.
    * @param { AsyncCallback<void> } callback - The callback of inputDialerSpecialCode.
    * @throws { BusinessError } 201 - Permission denied.
    * @throws { BusinessError } 202 - Non-system applications use system APIs.
@@ -1955,11 +2066,11 @@ declare namespace call {
   function inputDialerSpecialCode(inputCode: string, callback: AsyncCallback<void>): void;
 
   /**
-   * Handle special code from dialer.
+   * Enters the secret code on the keypad.
    *
    * @permission ohos.permission.PLACE_CALL
-   * @param { string } inputCode - Indicates the special code entered.
-   * @returns { Promise<void> } The promise returned by the function.
+   * @param { string } inputCode - Indicates the secret code to enter.
+   * @returns { Promise<void> } The promise returned by the inputDialerSpecialCode.
    * @throws { BusinessError } 201 - Permission denied.
    * @throws { BusinessError } 202 - Non-system applications use system APIs.
    * @throws { BusinessError } 401 - Parameter error.
@@ -1998,7 +2109,7 @@ declare namespace call {
    * @permission ohos.permission.SET_TELEPHONY_STATE
    * @permission ohos.permission.READ_CALL_LOG
    * @permission ohos.permission.WRITE_CALL_LOG
-   * @returns { Promise<void> } The promise returned by the function.
+   * @returns { Promise<void> } The promise returned by the cancelMissedIncomingCallNotification.
    * @throws { BusinessError } 201 - Permission denied.
    * @throws { BusinessError } 202 - Non-system applications use system APIs.
    * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
@@ -2179,12 +2290,13 @@ declare namespace call {
    * Indicates the device type of the audio device.
    *
    * @enum { number }
+   * @syscap SystemCapability.Telephony.CallManager
    * @systemapi Hide this for inner system use.
    * @since 10
    */
   export enum AudioDeviceType {
     /**
-     * Indicates device earpiece.
+     * Indicates the audio device is earpiece.
      *
      * @syscap SystemCapability.Telephony.CallManager
      * @systemapi Hide this for inner system use.
@@ -2193,7 +2305,7 @@ declare namespace call {
     DEVICE_EARPIECE,
 
     /**
-     * Indicator device speaker.
+     * Indicates the audio device is speaker.
      *
      * @syscap SystemCapability.Telephony.CallManager
      * @systemapi Hide this for inner system use.
@@ -2202,7 +2314,7 @@ declare namespace call {
     DEVICE_SPEAKER,
 
     /**
-     * Indicates a wired headset device.
+     * Indicates the audio device is wired headset.
      *
      * @syscap SystemCapability.Telephony.CallManager
      * @systemapi Hide this for inner system use.
@@ -2211,7 +2323,7 @@ declare namespace call {
     DEVICE_WIRED_HEADSET,
 
     /**
-     * Indicates a Bluetooth device.
+     * Indicates the audio device is bluetooth headset.
      *
      * @syscap SystemCapability.Telephony.CallManager
      * @systemapi Hide this for inner system use.
@@ -2221,7 +2333,7 @@ declare namespace call {
   }
 
   /**
-   * Indicates the device of audio.
+   * Indicates the audio device.
    *
    * @interface AudioDevice
    * @syscap SystemCapability.Telephony.CallManager
@@ -2240,7 +2352,7 @@ declare namespace call {
     deviceType: AudioDeviceType;
 
     /**
-     * Indicates the device address of the audio device.
+     * Indicates the address of the audio device.
      *
      * @type { ?string }
      * @syscap SystemCapability.Telephony.CallManager
@@ -2260,7 +2372,7 @@ declare namespace call {
    */
   export interface AudioDeviceInfo {
     /**
-     * Indicates the list of support audiodevice.
+     * Indicates the list of support audio device.
      *
      * @type { Array<AudioDevice> }
      * @syscap SystemCapability.Telephony.CallManager
@@ -2270,7 +2382,7 @@ declare namespace call {
     audioDeviceList: Array<AudioDevice>;
 
     /**
-     * Indicates the type of current audiodevice.
+     * Indicates the type of current audio device.
      *
      * @type { AudioDevice }
      * @syscap SystemCapability.Telephony.CallManager
@@ -2278,12 +2390,14 @@ declare namespace call {
      * @since 10
      */
     currentAudioDevice: AudioDevice;
+
     /**
      * Indicates the status of mute.
      *
      * @type { boolean }
      * @syscap SystemCapability.Telephony.CallManager
      * @systemapi Hide this for inner system use.
+     * @since 10
      */
     isMuted: boolean;
   }
@@ -2460,7 +2574,7 @@ declare namespace call {
    */
   export enum CallTransferType {
     /**
-     * Indicates transfer the call unconditionally.
+     * Indicates unconditional transfer of a call.
      *
      * @syscap SystemCapability.Telephony.CallManager
      * @systemapi Hide this for inner system use.
@@ -3045,6 +3159,7 @@ declare namespace call {
      *
      * @type { ?number }
      * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
      * @since 8
      */
     accountId?: number;
@@ -3054,6 +3169,7 @@ declare namespace call {
      *
      * @type { ?VideoStateType }
      * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
      * @since 8
      */
     videoState?: VideoStateType;
@@ -3063,6 +3179,7 @@ declare namespace call {
      *
      * @type { ?DialScene }
      * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
      * @since 8
      */
     dialScene?: DialScene;
@@ -3072,6 +3189,7 @@ declare namespace call {
      *
      * @type { ?DialType }
      * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
      * @since 8
      */
     dialType?: DialType;
@@ -3128,7 +3246,7 @@ declare namespace call {
   /**
    * Indicates the scenarios of the call to be made.
    *
-   * @enum {number}
+   * @enum { number }
    * @syscap SystemCapability.Telephony.CallManager
    * @systemapi Hide this for inner system use.
    * @since 8
@@ -3165,7 +3283,7 @@ declare namespace call {
   /**
    * Indicates the types of the call to be made.
    *
-   * @enum {number}
+   * @enum { number }
    * @syscap SystemCapability.Telephony.CallManager
    * @systemapi Hide this for inner system use.
    * @since 8
@@ -3411,6 +3529,26 @@ declare namespace call {
   }
 
   /**
+   * The option for audio device.
+   *
+   * @interface AudioDeviceOptions
+   * @syscap SystemCapability.Telephony.CallManager
+   * @systemapi Hide this for inner system use.
+   * @since 9
+   */
+  export interface AudioDeviceOptions {
+    /**
+     * Indicates the bluetooth device address.
+     *
+     * @type { ?string }
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
+     * @since 9
+     */
+    bluetoothAddress?: string;
+  }
+
+  /**
    * Indicates the MMI code result.
    *
    * @interface MmiCodeResults
@@ -3449,7 +3587,8 @@ declare namespace call {
    * @since 9
    */
   export enum MmiCodeResult {
-    /** Indicates the result of MMI code with successfully.
+    /**
+     * Indicates the result of MMI code with successfully.
      *
      * @syscap SystemCapability.Telephony.CallManager
      * @systemapi Hide this for inner system use.
@@ -3457,7 +3596,8 @@ declare namespace call {
      */
     MMI_CODE_SUCCESS = 0,
 
-    /** Indicates the result of MMI code with failed.
+    /**
+     * Indicates the result of MMI code with failed.
      *
      * @syscap SystemCapability.Telephony.CallManager
      * @systemapi Hide this for inner system use.

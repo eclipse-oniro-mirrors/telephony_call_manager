@@ -15,7 +15,6 @@
 
 #include "call_object_manager.h"
 
-#include "call_ability_report_proxy.h"
 #include "call_manager_errors.h"
 #include "telephony_log_wrapper.h"
 #include "call_connect_ability.h"

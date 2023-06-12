@@ -57,6 +57,7 @@ int32_t Tone::Play()
     }
     std::thread play(audioPlay, audioPlayer_,
         GetToneDescriptorPath(currentToneDescriptor_), AudioStandard::AudioStreamType::STREAM_MUSIC, playerType);
+    pthread_setname_np(play.native_handle(), TONE_PLAY_THREAD);
     play.detach();
     return TELEPHONY_SUCCESS;
 }

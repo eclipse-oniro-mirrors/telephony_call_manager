@@ -57,6 +57,8 @@ enum class ToneState {
     STOPPED,
 };
 
+static constexpr const char* TONE_PLAY_THREAD = "tonePlayThread";
+
 /**
  * @class Tone
  * plays the specific tone.
