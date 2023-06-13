@@ -54,13 +54,13 @@ int32_t CallObjectManager::AddOneCallObject(sptr<CallBase> &call)
             return CALL_ERR_PHONE_CALL_ALREADY_EXISTS;
         }
     }
-    if (callObjectPtrList_.size() == 0) {
+    if (callObjectPtrList_.size() == NO_CALL_EXIST) {
         CallAttributeInfo info;
         call->GetCallAttributeInfo(info);
         DelayedSingleton<CallConnectAbility>::GetInstance()->ConnectAbility(info);
     }
     callObjectPtrList_.emplace_back(call);
-    if (callObjectPtrList_.size() == 1 &&
+    if (callObjectPtrList_.size() == ONE_CALL_EXIST &&
         callObjectPtrList_.front()->GetTelCallState() == TelCallState::CALL_STATUS_DIALING) {
         isFirstDialCallAdded_ = true;
         cv_.notify_all();
@@ -81,7 +81,7 @@ int32_t CallObjectManager::DeleteOneCallObject(int32_t callId)
             break;
         }
     }
-    if (callObjectPtrList_.size() == 0) {
+    if (callObjectPtrList_.size() == NO_CALL_EXIST) {
         DelayedSingleton<CallConnectAbility>::GetInstance()->DisconnectAbility();
     }
     return TELEPHONY_SUCCESS;
@@ -468,6 +468,26 @@ int32_t CallObjectManager::DealFailDial(sptr<CallBase> call)
     }
 
     return DelayedSingleton<ReportCallInfoHandlerService>::GetInstance()->UpdateCallReportInfo(callDetatilInfo);
+}
+
+std::vector<CallAttributeInfo> CallObjectManager::GetCarrierCallInfoList()
+{
+    std::vector<CallAttributeInfo> callVec;
+    callVec.clear();
+    std::lock_guard<std::mutex> lock(listMutex_);
+    std::list<sptr<CallBase>>::iterator it;
+    for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
+        CallAttributeInfo info;
+        if ((*it) == nullptr) {
+            TELEPHONY_LOGE("call is nullptr");
+            continue;
+        }
+        (*it)->GetCallAttributeInfo(info);
+        if (info.callType != CallType::TYPE_OTT) {
+            callVec.emplace_back(info);
+        }
+    }
+    return callVec;
 }
 } // namespace Telephony
 } // namespace OHOS

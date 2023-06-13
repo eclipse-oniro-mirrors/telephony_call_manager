@@ -60,6 +60,14 @@ constexpr int16_t INVALID_CALLID = 0;
  */
 constexpr int16_t WAIT_TIME_ONE_SECOND = 1;
 /**
+ * @brief Indicates No Call Exist.
+ */
+constexpr int16_t NO_CALL_EXIST = 0;
+/**
+ * @brief Indicates One Call Exist.
+ */
+constexpr int16_t ONE_CALL_EXIST = 1;
+/**
  * @brief  The follow hour and minute was use to confirm the set
  * call transfer beginning and ending time restriction.
  *

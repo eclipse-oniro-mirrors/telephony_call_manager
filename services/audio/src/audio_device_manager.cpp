@@ -214,7 +214,7 @@ bool AudioDeviceManager::ProcessEvent(AudioEvent event)
         case AudioEvent::WIRED_HEADSET_DISCONNECTED: {
             if (!isAudioActivated_) {
                 TELEPHONY_LOGE("call is not active, no need to connect sco");
-                return TELEPHONY_ERR_ARGUMENT_INVALID;
+                return false;
             }
             std::shared_ptr<BluetoothCallManager> bluetoothCallManager = std::make_shared<BluetoothCallManager>();
             if (bluetoothCallManager->IsBtAvailble()) {

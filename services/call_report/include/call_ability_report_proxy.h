@@ -39,9 +39,9 @@ public:
     int32_t OttCallRequest(OttCallRequestId requestId, AppExecFwk::PacMap &info);
     int32_t ReportMmiCodeResult(const MmiCodeInfo &info);
     int32_t ReportAudioDeviceChange(const AudioDeviceInfo &info);
+    int32_t ReportCallStateInfo(const CallAttributeInfo &info);
 
 private:
-    int32_t ReportCallStateInfo(const CallAttributeInfo &info);
     int32_t ReportCallEvent(const CallEventInfo &info);
 
 private:

@@ -59,14 +59,8 @@ void CallConnectAbility::ConnectAbility(const CallAttributeInfo &info)
 
 void CallConnectAbility::DisconnectAbility()
 {
-    if (!isConnected_) {
-        std::unique_lock<std::mutex> lock(mutex_);
-        while (!isConnected_) {
-            if (cv_.wait_for(lock, std::chrono::seconds(WAIT_TIME_ONE_SECOND)) == std::cv_status::timeout) {
-                TELEPHONY_LOGE("callui is not connected, no need to disconnect ability");
-                return;
-            }
-        }
+    if (!WaitForConnectResult()) {
+        return;
     }
     if (connectCallback_ != nullptr) {
         TELEPHONY_LOGI("Disconnect callui ability");
@@ -83,6 +77,20 @@ void CallConnectAbility::SetConnectFlag(bool isConnected)
 void CallConnectAbility::NotifyAll()
 {
     cv_.notify_all();
+}
+
+bool CallConnectAbility::WaitForConnectResult()
+{
+    if (!isConnected_) {
+        std::unique_lock<std::mutex> lock(mutex_);
+        while (!isConnected_) {
+            if (cv_.wait_for(lock, std::chrono::seconds(WAIT_TIME_ONE_SECOND)) == std::cv_status::timeout) {
+                TELEPHONY_LOGE("callui is not connected, no need to disconnect ability");
+                return false;
+            }
+        }
+    }
+    return true;
 }
 } // namespace Telephony
 } // namespace OHOS
