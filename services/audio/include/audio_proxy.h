@@ -81,6 +81,7 @@ public:
     void SetWiredHeadsetState(bool isConnected);
     int32_t GetPreferOutputAudioDevice(AudioDevice &device);
     int32_t SetAudioPreferDeviceChangeCallback();
+    int32_t UnsetAudioPreferDeviceChangeCallback();
 
 private:
     const std::string defaultRingPath_ = "/system/etc/telephony/rings/ring.wav";

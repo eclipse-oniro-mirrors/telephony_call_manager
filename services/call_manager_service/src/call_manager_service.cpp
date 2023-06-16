@@ -76,6 +76,7 @@ bool CallManagerService::Init()
 
 void CallManagerService::UnInit()
 {
+    DelayedSingleton<CellularCallConnection>::GetInstance()->UnInit();
     callControlManagerPtr_ = nullptr;
 }
 

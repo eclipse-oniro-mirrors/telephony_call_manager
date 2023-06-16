@@ -158,6 +158,7 @@ int32_t CellularCallConnection::ReConnectService()
 void CellularCallConnection::Clean()
 {
     Utils::UniqueWriteGuard<Utils::RWLock> guard(rwClientLock_);
+    UnRegisterCallBack();
     if (cellularCallInterfacePtr_ != nullptr) {
         cellularCallInterfacePtr_.clear();
         cellularCallInterfacePtr_ = nullptr;
@@ -505,6 +506,20 @@ int CellularCallConnection::RegisterCallBack(const sptr<ICallStatusCallback> &ca
     int errCode = cellularCallInterfacePtr_->RegisterCallManagerCallBack(callback);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("registerCallBack failed, errcode:%{public}d", errCode);
+        return errCode;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CellularCallConnection::UnRegisterCallBack()
+{
+    if (cellularCallInterfacePtr_ == nullptr) {
+        TELEPHONY_LOGE("cellularCallInterfacePtr_ is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    int errCode = cellularCallInterfacePtr_->UnRegisterCallManagerCallBack();
+    if (errCode != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("UnRegisterCallBack failed, errcode:%{public}d", errCode);
         return errCode;
     }
     return TELEPHONY_SUCCESS;

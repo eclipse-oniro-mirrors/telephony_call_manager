@@ -279,6 +279,12 @@ public:
     int RegisterCallBack(const sptr<ICallStatusCallback> &callback);
 
     /**
+     * @brief UnRegister callback
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t UnRegisterCallBack();
+
+    /**
      * ControlCamera
      *
      * @brief Open or close camera

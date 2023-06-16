@@ -372,6 +372,8 @@ int32_t AudioDeviceManager::ReportAudioDeviceChange()
         TELEPHONY_LOGE("call is not active, no need to report");
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
+    TELEPHONY_LOGI("report audio device info, currentAudioDeviceType:%{public}d, currentAddress:%{public}s",
+        info_.currentAudioDevice.deviceType, info_.currentAudioDevice.address);
     return DelayedSingleton<CallAbilityReportProxy>::GetInstance()->ReportAudioDeviceChange(info_);
 }
 
