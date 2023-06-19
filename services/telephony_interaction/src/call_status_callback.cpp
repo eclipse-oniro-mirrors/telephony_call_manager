@@ -40,7 +40,7 @@ int32_t CallStatusCallback::UpdateCallReportInfo(const CallReportInfo &info)
     detailInfo.voiceDomain = info.voiceDomain;
     (void)memcpy_s(detailInfo.phoneNum, kMaxNumberLen, info.accountNum, kMaxNumberLen);
     (void)memset_s(detailInfo.bundleName, kMaxBundleNameLen, 0, kMaxBundleNameLen);
-    int32_t ret = DelayedSingleton<ReportCallInfoHandlerService>::GetInstance()->UpdateCallReportInfo(detailInfo);
+    int32_t ret = DelayedSingleton<ReportCallInfoHandler>::GetInstance()->UpdateCallReportInfo(detailInfo);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("UpdateCallReportInfo failed! errCode:%{public}d", ret);
     } else {
@@ -80,7 +80,7 @@ int32_t CallStatusCallback::UpdateCallsReportInfo(const CallsReportInfo &info)
         DelayedSingleton<CallManagerHisysevent>::GetInstance()->SetIncomingStartTime();
         StartAsyncTrace(HITRACE_TAG_OHOS, "InComingCall", getpid());
     }
-    int32_t ret = DelayedSingleton<ReportCallInfoHandlerService>::GetInstance()->UpdateCallsReportInfo(detailsInfo);
+    int32_t ret = DelayedSingleton<ReportCallInfoHandler>::GetInstance()->UpdateCallsReportInfo(detailsInfo);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("UpdateCallsReportInfo failed! errCode:%{public}d", ret);
     } else {
@@ -91,7 +91,7 @@ int32_t CallStatusCallback::UpdateCallsReportInfo(const CallsReportInfo &info)
 
 int32_t CallStatusCallback::UpdateDisconnectedCause(const DisconnectedDetails &details)
 {
-    int32_t ret = DelayedSingleton<ReportCallInfoHandlerService>::GetInstance()->UpdateDisconnectedCause(details);
+    int32_t ret = DelayedSingleton<ReportCallInfoHandler>::GetInstance()->UpdateDisconnectedCause(details);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("UpdateDisconnectedCause failed! errCode:%{public}d", ret);
     } else {
@@ -102,7 +102,7 @@ int32_t CallStatusCallback::UpdateDisconnectedCause(const DisconnectedDetails &d
 
 int32_t CallStatusCallback::UpdateEventResultInfo(const CellularCallEventInfo &info)
 {
-    int32_t ret = DelayedSingleton<ReportCallInfoHandlerService>::GetInstance()->UpdateEventResultInfo(info);
+    int32_t ret = DelayedSingleton<ReportCallInfoHandler>::GetInstance()->UpdateEventResultInfo(info);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("UpdateEventResultInfo failed! errCode:%{public}d", ret);
     } else {
@@ -336,7 +336,7 @@ int32_t CallStatusCallback::ReceiveUpdateCallMediaModeResponse(const CallMediaMo
     AppExecFwk::PacMap resultInfo;
     resultInfo.PutIntValue("result", response.result);
     TELEPHONY_LOGI("UpdateImsCallMode result = %{public}d", response.result);
-    (void)DelayedSingleton<ReportCallInfoHandlerService>::GetInstance()->UpdateMediaModeResponse(response);
+    (void)DelayedSingleton<ReportCallInfoHandler>::GetInstance()->UpdateMediaModeResponse(response);
     return DelayedSingleton<CallAbilityReportProxy>::GetInstance()->ReportAsyncResults(reportId, resultInfo);
 }
 

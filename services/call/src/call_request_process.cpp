@@ -299,7 +299,7 @@ int32_t CallRequestProcess::UpdateCallReportInfo(const DialParaInfo &info, TelCa
         TELEPHONY_LOGE("memcpy_s number failed!");
         return TELEPHONY_ERR_MEMCPY_FAIL;
     }
-    return DelayedSingleton<ReportCallInfoHandlerService>::GetInstance()->UpdateCallReportInfo(callDetatilInfo);
+    return DelayedSingleton<ReportCallInfoHandler>::GetInstance()->UpdateCallReportInfo(callDetatilInfo);
 }
 
 int32_t CallRequestProcess::HandleDialFail()

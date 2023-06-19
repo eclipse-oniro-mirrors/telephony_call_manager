@@ -15,10 +15,10 @@
 
 #include "call_object_manager.h"
 
-#include "call_manager_errors.h"
-#include "telephony_log_wrapper.h"
 #include "call_connect_ability.h"
+#include "call_manager_errors.h"
 #include "report_call_info_handler.h"
+#include "telephony_log_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -467,7 +467,7 @@ int32_t CallObjectManager::DealFailDial(sptr<CallBase> call)
         return TELEPHONY_ERR_MEMCPY_FAIL;
     }
 
-    return DelayedSingleton<ReportCallInfoHandlerService>::GetInstance()->UpdateCallReportInfo(callDetatilInfo);
+    return DelayedSingleton<ReportCallInfoHandler>::GetInstance()->UpdateCallReportInfo(callDetatilInfo);
 }
 
 std::vector<CallAttributeInfo> CallObjectManager::GetCarrierCallInfoList()

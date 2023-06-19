@@ -71,6 +71,7 @@ void CallManagerProxy::Init(int32_t systemAbilityId)
         EventFwk::MatchingSkills matchingSkills;
         matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_RADIO_STATE_CHANGE);
         EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
+        subscriberInfo.SetThreadMode(EventFwk::CommonEventSubscribeInfo::COMMON);
         std::shared_ptr<CallManagerProxySubcribed> subscriberPtr =
             std::make_shared<CallManagerProxySubcribed>(subscriberInfo);
 

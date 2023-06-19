@@ -176,6 +176,7 @@ void AccountSystemAbilityListener::OnAddSystemAbility(int32_t systemAbilityId, c
         MatchingSkills matchingSkills;
         matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_USER_SWITCHED);
         CommonEventSubscribeInfo subscriberInfo(matchingSkills);
+        subscriberInfo.SetThreadMode(EventFwk::CommonEventSubscribeInfo::COMMON);
         userSwitchSubscriber_ = std::make_shared<UserSwitchEventSubscriber>(subscriberInfo);
         bool subRet = CommonEventManager::SubscribeCommonEvent(userSwitchSubscriber_);
         if (!subRet) {

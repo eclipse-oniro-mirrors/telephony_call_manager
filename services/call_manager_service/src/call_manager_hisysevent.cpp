@@ -138,7 +138,7 @@ void CallManagerHisysevent::GetErrorDescription(const int32_t errCode, std::stri
             errordesc = "DialPolicy failed";
             break;
         case TELEPHONY_ERR_LOCAL_PTR_NULL:
-            errordesc = errordesc = "callRequestHandlerServicePtr_ or handler_ is nullptr";
+            errordesc = errordesc = "CallRequestHandlerPtr_ or handler_ is nullptr";
             break;
         case CALL_ERR_SYSTEM_EVENT_HANDLE_FAILURE:
             errordesc = "Send HANDLER_DIAL_CALL_REQUEST event failed";

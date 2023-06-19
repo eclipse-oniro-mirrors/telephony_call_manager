@@ -39,6 +39,7 @@
                 "data_share",
                 "distributed_notification_service",
                 "eventhandler",
+                "ffrt",
                 "hilog",
                 "hisysevent_native",
                 "hitrace_native",

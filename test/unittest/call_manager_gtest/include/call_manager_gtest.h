@@ -123,6 +123,7 @@ public:
     }
 
     void HangUpCall();
+    void DialCall(const std::string &phoneNumber);
 
 public:
     static bool isConnected_;

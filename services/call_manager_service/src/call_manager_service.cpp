@@ -67,7 +67,7 @@ bool CallManagerService::Init()
         TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");
         return false;
     }
-    DelayedSingleton<ReportCallInfoHandlerService>::GetInstance()->Start();
+    DelayedSingleton<ReportCallInfoHandler>::GetInstance()->Init();
     DelayedSingleton<CellularCallConnection>::GetInstance()->Init(TELEPHONY_CELLULAR_CALL_SYS_ABILITY_ID);
     DelayedSingleton<CallRecordsManager>::GetInstance()->Init();
     DelayedSingleton<BluetoothConnection>::GetInstance()->Init();
@@ -1052,7 +1052,7 @@ int32_t CallManagerService::ReportOttCallDetailsInfo(std::vector<OttCallDetailsI
         (void)memcpy_s(detailInfo.bundleName, kMaxBundleNameLen, (*it).bundleName, kMaxBundleNameLen);
         detailsInfo.callVec.push_back(detailInfo);
     }
-    int32_t ret = DelayedSingleton<ReportCallInfoHandlerService>::GetInstance()->UpdateCallsReportInfo(detailsInfo);
+    int32_t ret = DelayedSingleton<ReportCallInfoHandler>::GetInstance()->UpdateCallsReportInfo(detailsInfo);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("UpdateCallsReportInfo failed! errCode:%{public}d", ret);
     } else {
@@ -1063,7 +1063,7 @@ int32_t CallManagerService::ReportOttCallDetailsInfo(std::vector<OttCallDetailsI
 
 int32_t CallManagerService::ReportOttCallEventInfo(OttCallEventInfo &eventInfo)
 {
-    int32_t ret = DelayedSingleton<ReportCallInfoHandlerService>::GetInstance()->UpdateOttEventInfo(eventInfo);
+    int32_t ret = DelayedSingleton<ReportCallInfoHandler>::GetInstance()->UpdateOttEventInfo(eventInfo);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("UpdateOttEventInfo failed! errCode:%{public}d", ret);
     } else {
