@@ -150,6 +150,7 @@ private:
     static void NativeIsEmergencyPhoneNumberCallBack(napi_env env, napi_status status, void *data);
     static void NativeFormatNumberCallBack(napi_env env, napi_status status, void *data);
     static void NativeListCallBack(napi_env env, napi_status status, void *data);
+    static void NativeOffCallBack(napi_env env, napi_status status, void *data);
     static void GetDialInfo(napi_env env, napi_value objValue, DialAsyncContext &asyncContext);
     static void GetSmsInfo(napi_env env, napi_value objValue, RejectAsyncContext &asyncContext);
     static int32_t GetRestrictionInfo(napi_env env, napi_value objValue, CallRestrictionAsyncContext &asyncContext);

@@ -2200,13 +2200,15 @@ napi_value NapiCallManager::ObserverOff(napi_env env, napi_callback_info info)
         NapiUtil::ThrowParameterError(env);
         return nullptr;
     }
-    asyncContext->errorCode = registerStatus_;
-    if (asyncContext->errorCode == TELEPHONY_ERR_PERMISSION_ERR) {
-        NapiUtil::ThrowError(env, JS_ERROR_TELEPHONY_PERMISSION_DENIED, OBSERVER_OFF_JS_PERMISSION_ERROR_STRING);
+    if (registerStatus_ != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("RegisterCallBack failed!");
+        if (registerStatus_ == TELEPHONY_ERR_PERMISSION_ERR) {
+            NapiUtil::ThrowError(env, JS_ERROR_TELEPHONY_PERMISSION_DENIED, OBSERVER_OFF_JS_PERMISSION_ERROR_STRING);
+            return nullptr;
+        }
+        JsError error = NapiUtil::ConverErrorMessageForJs(registerStatus_);
+        NapiUtil::ThrowError(env, error.errorCode, error.errorMessage);
         return nullptr;
-    }
-    if (asyncContext->errorCode == TELEPHONY_SUCCESS) {
-        asyncContext->resolved = TELEPHONY_SUCCESS;
     }
     char listenerType[PHONE_NUMBER_MAXIMUM_LIMIT + 1] = { 0 };
     size_t strLength = 0;
@@ -2230,7 +2232,7 @@ napi_value NapiCallManager::ObserverOff(napi_env env, napi_callback_info info)
         napi_create_reference(env, argv[ARRAY_INDEX_SECOND], DATA_LENGTH_ONE, &(asyncContext->callbackRef));
     }
     return HandleAsyncWork(
-        env, asyncContext.release(), "Off", [](napi_env env, void *data) {}, NativeVoidCallBackWithErrorCode);
+        env, asyncContext.release(), "Off", [](napi_env env, void *data) {}, NativeOffCallBack);
 }
 
 napi_value NapiCallManager::SetMuted(napi_env env, napi_callback_info info)
@@ -3310,6 +3312,34 @@ void NapiCallManager::NativeListCallBack(napi_env env, napi_status status, void 
         napi_value result = nullptr;
         napi_get_reference_value(env, asyncContext->callbackRef, &callback);
         napi_call_function(env, nullptr, callback, std::size(callbackValue), callbackValue, &result);
+        napi_delete_reference(env, asyncContext->callbackRef);
+    }
+    napi_delete_async_work(env, asyncContext->work);
+    delete asyncContext;
+    asyncContext = nullptr;
+}
+
+void NapiCallManager::NativeOffCallBack(napi_env env, napi_status status, void *data)
+{
+    if (data == nullptr) {
+        TELEPHONY_LOGE("NapiCallManager::NativeOffCallBack data is nullptr");
+        NapiUtil::ThrowParameterError(env);
+        return;
+    }
+    auto asyncContext = (AsyncContext *)data;
+    if (asyncContext->deferred != nullptr) {
+        napi_value promiseValue = nullptr;
+        napi_get_null(env, &promiseValue);
+        napi_status ret = napi_resolve_deferred(env, asyncContext->deferred, promiseValue);
+        TELEPHONY_LOGI("promise result = %{public}d", ret);
+    } else if (asyncContext->callbackRef != nullptr) {
+        napi_value callbackValue[ARRAY_INDEX_THIRD] = { 0 };
+        callbackValue[ARRAY_INDEX_FIRST] = NapiCallManagerUtils::CreateUndefined(env);
+        napi_value callback = nullptr;
+        napi_value result = nullptr;
+        napi_get_reference_value(env, asyncContext->callbackRef, &callback);
+        napi_status ret = napi_call_function(env, nullptr, callback, DATA_LENGTH_ONE, callbackValue, &result);
+        TELEPHONY_LOGI("callback result = %{public}d", ret);
         napi_delete_reference(env, asyncContext->callbackRef);
     }
     napi_delete_async_work(env, asyncContext->work);
