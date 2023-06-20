@@ -41,7 +41,7 @@
                 "eventhandler",
                 "hilog",
                 "hisysevent_native",
-                "hitrace_native",
+                "hitrace",
                 "hiviewdfx_hilog_native",
                 "init",
                 "ipc",
