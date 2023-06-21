@@ -21,15 +21,15 @@
 #include <memory>
 #include <mutex>
 
+#include "call_broadcast_subscriber.h"
+#include "call_policy.h"
+#include "call_request_handler.h"
+#include "call_setting_manager.h"
+#include "call_state_listener.h"
+#include "incoming_call_wake_up.h"
+#include "missed_call_notification.h"
 #include "pac_map.h"
 #include "singleton.h"
-#include "call_broadcast_subscriber.h"
-#include "call_setting_manager.h"
-#include "call_policy.h"
-#include "call_state_listener.h"
-#include "call_request_handler.h"
-#include "missed_call_notification.h"
-#include "incoming_call_wake_up.h"
 #include "system_ability_status_change_stub.h"
 
 /**
@@ -129,7 +129,7 @@ private:
 
 private:
     std::unique_ptr<CallStateListener> callStateListenerPtr_;
-    std::unique_ptr<CallRequestHandlerService> callRequestHandlerServicePtr_;
+    std::unique_ptr<CallRequestHandler> CallRequestHandlerPtr_;
     // notify when incoming calls are ignored, not rejected or answered
     std::shared_ptr<IncomingCallWakeup> incomingCallWakeup_;
     std::shared_ptr<MissedCallNotification> missedCallNotification_;

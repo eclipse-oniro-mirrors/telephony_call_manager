@@ -28,13 +28,12 @@
 
 namespace OHOS {
 namespace Telephony {
-class CallRecordsHandler : public AppExecFwk::EventHandler {
+class CallRecordsHandler {
 public:
-    CallRecordsHandler(const std::shared_ptr<AppExecFwk::EventRunner> &runner);
+    CallRecordsHandler();
     virtual ~CallRecordsHandler() = default;
-    void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event);
     int32_t QueryAndNotifyUnReadMissedCall();
-    int32_t AddCallLogInfo(CallRecordInfo &info);
+    int32_t AddCallLogInfo(const CallRecordInfo &info);
 
 private:
     void QueryCallerInfo(ContactInfo &contactInfo, std::string phoneNumber);
@@ -52,14 +51,7 @@ public:
     int32_t CancelMissedIncomingCallNotification();
     int32_t QueryUnReadMissedCallLog();
 
-public:
-    enum {
-        HANDLER_ADD_CALL_RECORD_INFO = 0,
-        HANDLER_QUERY_UNREAD_MISSED_CALL_LOG,
-    };
-
 private:
-    std::shared_ptr<AppExecFwk::EventRunner> eventLoop_;
     std::shared_ptr<CallRecordsHandler> handler_;
 };
 } // namespace Telephony

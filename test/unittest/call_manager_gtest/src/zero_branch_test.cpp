@@ -104,56 +104,23 @@ void BranchTest::TearDown() {}
  */
 HWTEST_F(BranchTest, Telephony_CallRequestHandler_001, Function | MediumTest | Level1)
 {
-    auto runner = AppExecFwk::EventRunner::Create("test");
-    auto call_request_handler = std::make_shared<CallRequestHandler>(runner);
-    auto event = AppExecFwk::InnerEvent::Get(0);
-    call_request_handler->DialCallEvent(event);
-    call_request_handler->AcceptCallEvent(event);
-    call_request_handler->RejectCallEvent(event);
-    call_request_handler->HangUpCallEvent(event);
-    call_request_handler->HoldCallEvent(event);
-    call_request_handler->UnHoldCallEvent(event);
-    call_request_handler->SwitchCallEvent(event);
-    call_request_handler->CombineConferenceEvent(event);
-    call_request_handler->SeparateConferenceEvent(event);
-    call_request_handler->UpdateCallMediaModeEvent(event);
-    call_request_handler->StartRttEvent(event);
-    call_request_handler->StopRttEvent(event);
-    call_request_handler->JoinConferenceEvent(event);
-    event = nullptr;
-    call_request_handler->ProcessEvent(event);
-    call_request_handler->DialCallEvent(event);
-    call_request_handler->AcceptCallEvent(event);
-    call_request_handler->RejectCallEvent(event);
-    call_request_handler->HangUpCallEvent(event);
-    call_request_handler->HoldCallEvent(event);
-    call_request_handler->UnHoldCallEvent(event);
-    call_request_handler->SwitchCallEvent(event);
-    call_request_handler->CombineConferenceEvent(event);
-    call_request_handler->SeparateConferenceEvent(event);
-    call_request_handler->UpdateCallMediaModeEvent(event);
-    call_request_handler->StartRttEvent(event);
-    call_request_handler->StopRttEvent(event);
-    call_request_handler->JoinConferenceEvent(event);
-    call_request_handler->DialCall();
-    auto callRequestHandlerService = std::make_unique<CallRequestHandlerService>();
-    ASSERT_NE(callRequestHandlerService->DialCall(), TELEPHONY_ERR_SUCCESS);
-    ASSERT_NE(callRequestHandlerService->AnswerCall(1, 1), TELEPHONY_ERR_SUCCESS);
+    std::unique_ptr<CallRequestHandler> callRequestHandler = std::make_unique<CallRequestHandler>();
+    ASSERT_NE(callRequestHandler->DialCall(), TELEPHONY_ERR_SUCCESS);
+    ASSERT_NE(callRequestHandler->AnswerCall(1, 1), TELEPHONY_ERR_SUCCESS);
     std::string content = "";
-    ASSERT_NE(callRequestHandlerService->RejectCall(1, true, content), TELEPHONY_ERR_SUCCESS);
-    ASSERT_NE(callRequestHandlerService->HangUpCall(1), TELEPHONY_ERR_SUCCESS);
-    ASSERT_NE(callRequestHandlerService->HoldCall(1), TELEPHONY_ERR_SUCCESS);
-    ASSERT_NE(callRequestHandlerService->UnHoldCall(1), TELEPHONY_ERR_SUCCESS);
-    ASSERT_NE(callRequestHandlerService->SwitchCall(1), TELEPHONY_ERR_SUCCESS);
-    ASSERT_NE(callRequestHandlerService->CombineConference(1), TELEPHONY_ERR_SUCCESS);
-    ASSERT_NE(callRequestHandlerService->SeparateConference(1), TELEPHONY_ERR_SUCCESS);
-    ASSERT_NE(
-        callRequestHandlerService->UpdateImsCallMode(1, ImsCallMode::CALL_MODE_AUDIO_ONLY), TELEPHONY_ERR_SUCCESS);
+    ASSERT_NE(callRequestHandler->RejectCall(1, true, content), TELEPHONY_ERR_SUCCESS);
+    ASSERT_NE(callRequestHandler->HangUpCall(1), TELEPHONY_ERR_SUCCESS);
+    ASSERT_NE(callRequestHandler->HoldCall(1), TELEPHONY_ERR_SUCCESS);
+    ASSERT_NE(callRequestHandler->UnHoldCall(1), TELEPHONY_ERR_SUCCESS);
+    ASSERT_NE(callRequestHandler->SwitchCall(1), TELEPHONY_ERR_SUCCESS);
+    ASSERT_NE(callRequestHandler->CombineConference(1), TELEPHONY_ERR_SUCCESS);
+    ASSERT_NE(callRequestHandler->SeparateConference(1), TELEPHONY_ERR_SUCCESS);
+    ASSERT_NE(callRequestHandler->UpdateImsCallMode(1, ImsCallMode::CALL_MODE_AUDIO_ONLY), TELEPHONY_ERR_SUCCESS);
     std::u16string test = u"";
-    ASSERT_NE(callRequestHandlerService->StartRtt(1, test), TELEPHONY_ERR_SUCCESS);
-    ASSERT_NE(callRequestHandlerService->StopRtt(1), TELEPHONY_ERR_SUCCESS);
+    ASSERT_NE(callRequestHandler->StartRtt(1, test), TELEPHONY_ERR_SUCCESS);
+    ASSERT_NE(callRequestHandler->StopRtt(1), TELEPHONY_ERR_SUCCESS);
     std::vector<std::string> emptyRecords = {};
-    ASSERT_NE(callRequestHandlerService->JoinConference(1, emptyRecords), TELEPHONY_ERR_SUCCESS);
+    ASSERT_NE(callRequestHandler->JoinConference(1, emptyRecords), TELEPHONY_ERR_SUCCESS);
 }
 
 /**
@@ -428,45 +395,34 @@ HWTEST_F(BranchTest, Telephony_CallPolicy_002, Function | MediumTest | Level1)
  */
 HWTEST_F(BranchTest, Telephony_ReportCallInfoHandler_001, Function | MediumTest | Level1)
 {
-    auto runner = AppExecFwk::EventRunner::Create("test");
-    auto report_callinfo_handler = std::make_shared<ReportCallInfoHandler>(runner);
-    auto event = AppExecFwk::InnerEvent::Get(0);
-    report_callinfo_handler->ProcessEvent(event);
-    report_callinfo_handler->ReportCallInfo(event);
-    report_callinfo_handler->ReportCallsInfo(event);
-    report_callinfo_handler->ReportDisconnectedCause(event);
-    report_callinfo_handler->ReportEventInfo(event);
-    report_callinfo_handler->ReportOttEvent(event);
-    report_callinfo_handler->OnUpdateMediaModeResponse(event);
-    event = nullptr;
-    report_callinfo_handler->ProcessEvent(event);
-    report_callinfo_handler->ReportCallInfo(event);
-    report_callinfo_handler->ReportCallsInfo(event);
-    report_callinfo_handler->ReportDisconnectedCause(event);
-    report_callinfo_handler->ReportEventInfo(event);
-    report_callinfo_handler->ReportOttEvent(event);
-    report_callinfo_handler->OnUpdateMediaModeResponse(event);
-    DelayedSingleton<ReportCallInfoHandlerService>::GetInstance()->Start();
     CallDetailInfo mCallDetailInfo;
-    ASSERT_EQ(DelayedSingleton<ReportCallInfoHandlerService>::GetInstance()->UpdateCallReportInfo(mCallDetailInfo),
+    ASSERT_NE(DelayedSingleton<ReportCallInfoHandler>::GetInstance()->UpdateCallReportInfo(mCallDetailInfo),
         TELEPHONY_ERR_SUCCESS);
     CallDetailsInfo mCallDetailsInfo;
-    ASSERT_EQ(DelayedSingleton<ReportCallInfoHandlerService>::GetInstance()->UpdateCallsReportInfo(mCallDetailsInfo),
+    ASSERT_NE(DelayedSingleton<ReportCallInfoHandler>::GetInstance()->UpdateCallsReportInfo(mCallDetailsInfo),
         TELEPHONY_ERR_SUCCESS);
     DisconnectedDetails mDisconnectedDetails;
-    ASSERT_EQ(
-        DelayedSingleton<ReportCallInfoHandlerService>::GetInstance()->UpdateDisconnectedCause(mDisconnectedDetails),
+    ASSERT_NE(DelayedSingleton<ReportCallInfoHandler>::GetInstance()->UpdateDisconnectedCause(mDisconnectedDetails),
         TELEPHONY_ERR_SUCCESS);
     CellularCallEventInfo mCellularCallEventInfo;
-    ASSERT_EQ(
-        DelayedSingleton<ReportCallInfoHandlerService>::GetInstance()->UpdateEventResultInfo(mCellularCallEventInfo),
+    ASSERT_NE(DelayedSingleton<ReportCallInfoHandler>::GetInstance()->UpdateEventResultInfo(mCellularCallEventInfo),
         TELEPHONY_ERR_SUCCESS);
     OttCallEventInfo mOttCallEventInfo;
-    ASSERT_NE(DelayedSingleton<ReportCallInfoHandlerService>::GetInstance()->UpdateOttEventInfo(mOttCallEventInfo),
+    ASSERT_NE(DelayedSingleton<ReportCallInfoHandler>::GetInstance()->UpdateOttEventInfo(mOttCallEventInfo),
         TELEPHONY_ERR_SUCCESS);
     CallMediaModeResponse mCallMediaModeResponse;
-    ASSERT_NE(
-        DelayedSingleton<ReportCallInfoHandlerService>::GetInstance()->UpdateMediaModeResponse(mCallMediaModeResponse),
+    DelayedSingleton<ReportCallInfoHandler>::GetInstance()->Init();
+    ASSERT_EQ(DelayedSingleton<ReportCallInfoHandler>::GetInstance()->UpdateCallReportInfo(mCallDetailInfo),
+        TELEPHONY_ERR_SUCCESS);
+    ASSERT_EQ(DelayedSingleton<ReportCallInfoHandler>::GetInstance()->UpdateCallsReportInfo(mCallDetailsInfo),
+        TELEPHONY_ERR_SUCCESS);
+    ASSERT_EQ(DelayedSingleton<ReportCallInfoHandler>::GetInstance()->UpdateDisconnectedCause(mDisconnectedDetails),
+        TELEPHONY_ERR_SUCCESS);
+    ASSERT_EQ(DelayedSingleton<ReportCallInfoHandler>::GetInstance()->UpdateEventResultInfo(mCellularCallEventInfo),
+        TELEPHONY_ERR_SUCCESS);
+    ASSERT_EQ(DelayedSingleton<ReportCallInfoHandler>::GetInstance()->UpdateOttEventInfo(mOttCallEventInfo),
+        TELEPHONY_ERR_SUCCESS);
+    ASSERT_EQ(DelayedSingleton<ReportCallInfoHandler>::GetInstance()->UpdateMediaModeResponse(mCallMediaModeResponse),
         TELEPHONY_ERR_SUCCESS);
 }
 

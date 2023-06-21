@@ -17,42 +17,15 @@
 
 #include "call_manager_errors.h"
 #include "call_manager_inner_type.h"
+#include "ffrt.h"
 
 namespace OHOS {
 namespace Telephony {
-CallRecordsHandler::CallRecordsHandler(const std::shared_ptr<AppExecFwk::EventRunner> &runner)
-    : AppExecFwk::EventHandler(runner), callDataPtr_(nullptr)
+CallRecordsHandler::CallRecordsHandler() : callDataPtr_(nullptr)
 {
     callDataPtr_ = DelayedSingleton<CallDataBaseHelper>::GetInstance();
     if (callDataPtr_ == nullptr) {
         TELEPHONY_LOGE("callDataPtr_ is nullptr!");
-    }
-}
-
-void CallRecordsHandler::ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event)
-{
-    if (event == nullptr) {
-        TELEPHONY_LOGE("CallRecordsHandler::ProcessEvent parameter error");
-        return;
-    }
-    if (event->GetInnerEventId() == CallRecordsHandlerService::HANDLER_ADD_CALL_RECORD_INFO) {
-        auto object = event->GetUniqueObject<CallRecordInfo>();
-        if (object == nullptr) {
-            TELEPHONY_LOGE("object is nullptr!");
-            return;
-        }
-        CallRecordInfo info = *object;
-        int32_t ret = AddCallLogInfo(info);
-        if (ret != TELEPHONY_SUCCESS) {
-            TELEPHONY_LOGE("Add Call log fail!");
-        }
-    } else if (event->GetInnerEventId() == CallRecordsHandlerService::HANDLER_QUERY_UNREAD_MISSED_CALL_LOG) {
-        int32_t ret = QueryAndNotifyUnReadMissedCall();
-        if (ret != TELEPHONY_SUCCESS) {
-            TELEPHONY_LOGE("Query or notify unread missed call fail!");
-        }
-    } else {
-        TELEPHONY_LOGI("Above all event are not handled.");
     }
 }
 
@@ -73,7 +46,7 @@ void CallRecordsHandler::QueryCallerInfo(ContactInfo &contactInfo, std::string p
     }
 }
 
-int32_t CallRecordsHandler::AddCallLogInfo(CallRecordInfo &info)
+int32_t CallRecordsHandler::AddCallLogInfo(const CallRecordInfo &info)
 {
     if (callDataPtr_ == nullptr) {
         TELEPHONY_LOGE("callDataPtr is nullptr!");
@@ -152,23 +125,13 @@ int32_t CallRecordsHandler::QueryAndNotifyUnReadMissedCall()
     return TELEPHONY_SUCCESS;
 }
 
-CallRecordsHandlerService::CallRecordsHandlerService() : eventLoop_(nullptr), handler_(nullptr) {}
+CallRecordsHandlerService::CallRecordsHandlerService() : handler_(nullptr) {}
 
 CallRecordsHandlerService::~CallRecordsHandlerService() {}
 
 void CallRecordsHandlerService::Start()
 {
-    eventLoop_ = AppExecFwk::EventRunner::Create("CallRecordsHandlerService");
-    if (eventLoop_.get() == nullptr) {
-        TELEPHONY_LOGE("failed to create EventRunner");
-        return;
-    }
-    handler_ = std::make_shared<CallRecordsHandler>(eventLoop_);
-    if (handler_.get() == nullptr) {
-        TELEPHONY_LOGE("failed to create CallRecordsHandler");
-        return;
-    }
-    eventLoop_->Run();
+    handler_ = std::make_shared<CallRecordsHandler>();
     return;
 }
 
@@ -178,13 +141,7 @@ int32_t CallRecordsHandlerService::StoreCallRecord(const CallRecordInfo &info)
         TELEPHONY_LOGE("handler_ is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    std::unique_ptr<CallRecordInfo> para = std::make_unique<CallRecordInfo>();
-    if (para.get() == nullptr) {
-        TELEPHONY_LOGE("make_unique CallRecordInfo failed!");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-    *para = info;
-    handler_->SendEvent(HANDLER_ADD_CALL_RECORD_INFO, std::move(para));
+    ffrt::submit([=]() { handler_->AddCallLogInfo(info); });
     return TELEPHONY_SUCCESS;
 }
 
@@ -218,7 +175,7 @@ int32_t CallRecordsHandlerService::QueryUnReadMissedCallLog()
         TELEPHONY_LOGE("handler_ is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    handler_->SendEvent(HANDLER_QUERY_UNREAD_MISSED_CALL_LOG, 0);
+    ffrt::submit([=]() { handler_->QueryAndNotifyUnReadMissedCall(); });
     return TELEPHONY_SUCCESS;
 }
 } // namespace Telephony

@@ -38,7 +38,7 @@ namespace OHOS {
 namespace Telephony {
 using namespace OHOS::EventFwk;
 CallControlManager::CallControlManager()
-    : callStateListenerPtr_(nullptr), callRequestHandlerServicePtr_(nullptr), incomingCallWakeup_(nullptr),
+    : callStateListenerPtr_(nullptr), CallRequestHandlerPtr_(nullptr), incomingCallWakeup_(nullptr),
       missedCallNotification_(nullptr), callSettingManagerPtr_(nullptr)
 {
     dialSrcInfo_.callId = ERR_ID;
@@ -65,12 +65,12 @@ bool CallControlManager::Init()
         TELEPHONY_LOGE("callStateListenerPtr_ is null");
         return false;
     }
-    callRequestHandlerServicePtr_ = std::make_unique<CallRequestHandlerService>();
-    if (callRequestHandlerServicePtr_ == nullptr) {
-        TELEPHONY_LOGE("callRequestHandlerServicePtr_ is null");
+    CallRequestHandlerPtr_ = std::make_unique<CallRequestHandler>();
+    if (CallRequestHandlerPtr_ == nullptr) {
+        TELEPHONY_LOGE("CallRequestHandlerPtr_ is null");
         return false;
     }
-    callRequestHandlerServicePtr_->Start();
+    CallRequestHandlerPtr_->Init();
     incomingCallWakeup_ = std::make_shared<IncomingCallWakeup>();
     if (incomingCallWakeup_ == nullptr) {
         TELEPHONY_LOGE("incomingCallWakeup_ is null");
@@ -136,11 +136,11 @@ int32_t CallControlManager::DialCall(std::u16string &number, AppExecFwk::PacMap 
         extras_.Clear();
         extras_ = extras;
     }
-    if (callRequestHandlerServicePtr_ == nullptr) {
-        TELEPHONY_LOGE("callRequestHandlerServicePtr_ is nullptr!");
+    if (CallRequestHandlerPtr_ == nullptr) {
+        TELEPHONY_LOGE("CallRequestHandlerPtr_ is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    ret = callRequestHandlerServicePtr_->DialCall();
+    ret = CallRequestHandlerPtr_->DialCall();
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("DialCall failed!");
         return ret;
@@ -168,11 +168,11 @@ int32_t CallControlManager::AnswerCall(int32_t callId, int32_t videoState)
             INVALID_PARAMETER, callId, videoState, ret, "AnswerCallPolicy failed");
         return ret;
     }
-    if (callRequestHandlerServicePtr_ == nullptr) {
-        TELEPHONY_LOGE("callRequestHandlerServicePtr_ is nullptr!");
+    if (CallRequestHandlerPtr_ == nullptr) {
+        TELEPHONY_LOGE("CallRequestHandlerPtr_ is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    ret = callRequestHandlerServicePtr_->AnswerCall(callId, videoState);
+    ret = CallRequestHandlerPtr_->AnswerCall(callId, videoState);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("AnswerCall failed!");
         return ret;
@@ -182,8 +182,8 @@ int32_t CallControlManager::AnswerCall(int32_t callId, int32_t videoState)
 
 int32_t CallControlManager::RejectCall(int32_t callId, bool rejectWithMessage, std::u16string textMessage)
 {
-    if (callRequestHandlerServicePtr_ == nullptr) {
-        TELEPHONY_LOGE("callRequestHandlerServicePtr_ is nullptr!");
+    if (CallRequestHandlerPtr_ == nullptr) {
+        TELEPHONY_LOGE("CallRequestHandlerPtr_ is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
 
@@ -205,7 +205,7 @@ int32_t CallControlManager::RejectCall(int32_t callId, bool rejectWithMessage, s
         return ret;
     }
     std::string messageStr(Str16ToStr8(textMessage));
-    ret = callRequestHandlerServicePtr_->RejectCall(callId, rejectWithMessage, messageStr);
+    ret = CallRequestHandlerPtr_->RejectCall(callId, rejectWithMessage, messageStr);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("RejectCall failed!");
         return ret;
@@ -237,8 +237,8 @@ int32_t CallControlManager::HangUpCall(int32_t callId)
         }
     }
 
-    if (callRequestHandlerServicePtr_ == nullptr) {
-        TELEPHONY_LOGE("callRequestHandlerServicePtr_ is nullptr!");
+    if (CallRequestHandlerPtr_ == nullptr) {
+        TELEPHONY_LOGE("CallRequestHandlerPtr_ is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     int32_t ret = HangUpPolicy(callId);
@@ -247,7 +247,7 @@ int32_t CallControlManager::HangUpCall(int32_t callId)
         CallManagerHisysevent::WriteHangUpFaultEvent(INVALID_PARAMETER, callId, ret, "HangUp HangUpPolicy failed");
         return ret;
     }
-    ret = callRequestHandlerServicePtr_->HangUpCall(callId);
+    ret = CallRequestHandlerPtr_->HangUpCall(callId);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("HangUpCall failed!");
         return ret;
@@ -277,11 +277,11 @@ int32_t CallControlManager::HoldCall(int32_t callId)
         TELEPHONY_LOGE("HoldCall failed!");
         return ret;
     }
-    if (callRequestHandlerServicePtr_ == nullptr) {
-        TELEPHONY_LOGE("callRequestHandlerServicePtr_ is nullptr!");
+    if (CallRequestHandlerPtr_ == nullptr) {
+        TELEPHONY_LOGE("CallRequestHandlerPtr_ is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    ret = callRequestHandlerServicePtr_->HoldCall(callId);
+    ret = CallRequestHandlerPtr_->HoldCall(callId);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("HoldCall failed!");
         return ret;
@@ -296,11 +296,11 @@ int32_t CallControlManager::UnHoldCall(const int32_t callId)
         TELEPHONY_LOGE("UnHoldCall failed!");
         return ret;
     }
-    if (callRequestHandlerServicePtr_ == nullptr) {
-        TELEPHONY_LOGE("callRequestHandlerServicePtr_ is nullptr!");
+    if (CallRequestHandlerPtr_ == nullptr) {
+        TELEPHONY_LOGE("CallRequestHandlerPtr_ is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    ret = callRequestHandlerServicePtr_->UnHoldCall(callId);
+    ret = CallRequestHandlerPtr_->UnHoldCall(callId);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("UnHoldCall failed!");
         return ret;
@@ -316,11 +316,11 @@ int32_t CallControlManager::SwitchCall(int32_t callId)
         TELEPHONY_LOGE("SwitchCall failed!");
         return ret;
     }
-    if (callRequestHandlerServicePtr_ == nullptr) {
-        TELEPHONY_LOGE("callRequestHandlerServicePtr_ is nullptr!");
+    if (CallRequestHandlerPtr_ == nullptr) {
+        TELEPHONY_LOGE("CallRequestHandlerPtr_ is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    ret = callRequestHandlerServicePtr_->SwitchCall(callId);
+    ret = CallRequestHandlerPtr_->SwitchCall(callId);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("SwitchCall failed!");
         return ret;
@@ -601,11 +601,11 @@ int32_t CallControlManager::CombineConference(int32_t mainCallId)
         TELEPHONY_LOGE("CanCombineConference failed");
         return ret;
     }
-    if (callRequestHandlerServicePtr_ == nullptr) {
-        TELEPHONY_LOGE("callRequestHandlerServicePtr_ is nullptr!");
+    if (CallRequestHandlerPtr_ == nullptr) {
+        TELEPHONY_LOGE("CallRequestHandlerPtr_ is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    ret = callRequestHandlerServicePtr_->CombineConference(mainCallId);
+    ret = CallRequestHandlerPtr_->CombineConference(mainCallId);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("CombineConference failed!");
     }
@@ -624,11 +624,11 @@ int32_t CallControlManager::SeparateConference(int32_t callId)
         TELEPHONY_LOGE("CanSeparateConference failed");
         return ret;
     }
-    if (callRequestHandlerServicePtr_ == nullptr) {
-        TELEPHONY_LOGE("callRequestHandlerServicePtr_ is nullptr!");
+    if (CallRequestHandlerPtr_ == nullptr) {
+        TELEPHONY_LOGE("CallRequestHandlerPtr_ is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    ret = callRequestHandlerServicePtr_->SeparateConference(callId);
+    ret = CallRequestHandlerPtr_->SeparateConference(callId);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("CombineConference failed!");
         return ret;
@@ -813,11 +813,11 @@ int32_t CallControlManager::UpdateImsCallMode(int32_t callId, ImsCallMode mode)
         TELEPHONY_LOGE("check prerequisites failed !");
         return ret;
     }
-    if (callRequestHandlerServicePtr_ == nullptr) {
-        TELEPHONY_LOGE("callRequestHandlerServicePtr_ is nullptr!");
+    if (CallRequestHandlerPtr_ == nullptr) {
+        TELEPHONY_LOGE("CallRequestHandlerPtr_ is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    ret = callRequestHandlerServicePtr_->UpdateImsCallMode(callId, mode);
+    ret = CallRequestHandlerPtr_->UpdateImsCallMode(callId, mode);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("UpdateImsCallMode failed!");
         return ret;
@@ -832,11 +832,11 @@ int32_t CallControlManager::StartRtt(int32_t callId, std::u16string &msg)
         TELEPHONY_LOGE("NO IMS call,can not StartRtt!");
         return ret;
     }
-    if (callRequestHandlerServicePtr_ == nullptr) {
-        TELEPHONY_LOGE("callRequestHandlerServicePtr_ is nullptr!");
+    if (CallRequestHandlerPtr_ == nullptr) {
+        TELEPHONY_LOGE("CallRequestHandlerPtr_ is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    ret = callRequestHandlerServicePtr_->StartRtt(callId, msg);
+    ret = CallRequestHandlerPtr_->StartRtt(callId, msg);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("StartRtt failed!");
         return ret;
@@ -851,11 +851,11 @@ int32_t CallControlManager::StopRtt(int32_t callId)
         TELEPHONY_LOGE("NO IMS call,no need StopRtt!");
         return ret;
     }
-    if (callRequestHandlerServicePtr_ == nullptr) {
-        TELEPHONY_LOGE("callRequestHandlerServicePtr_ is nullptr!");
+    if (CallRequestHandlerPtr_ == nullptr) {
+        TELEPHONY_LOGE("CallRequestHandlerPtr_ is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    ret = callRequestHandlerServicePtr_->StopRtt(callId);
+    ret = CallRequestHandlerPtr_->StopRtt(callId);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("StopRtt failed!");
         return ret;
@@ -865,8 +865,8 @@ int32_t CallControlManager::StopRtt(int32_t callId)
 
 int32_t CallControlManager::JoinConference(int32_t callId, std::vector<std::u16string> &numberList)
 {
-    if (callRequestHandlerServicePtr_ == nullptr) {
-        TELEPHONY_LOGE("callRequestHandlerServicePtr_ is nullptr!");
+    if (CallRequestHandlerPtr_ == nullptr) {
+        TELEPHONY_LOGE("CallRequestHandlerPtr_ is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     std::vector<std::string> phoneNumberList(numberList.size());
@@ -878,7 +878,7 @@ int32_t CallControlManager::JoinConference(int32_t callId, std::vector<std::u16s
         TELEPHONY_LOGE("check InviteToConference Policy failed!");
         return ret;
     }
-    ret = callRequestHandlerServicePtr_->JoinConference(callId, phoneNumberList);
+    ret = CallRequestHandlerPtr_->JoinConference(callId, phoneNumberList);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("JoinConference failed!");
         return ret;
@@ -1090,6 +1090,7 @@ int32_t CallControlManager::BroadcastSubscriber()
     EventFwk::MatchingSkills matchingSkills;
     matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_SIM_STATE_CHANGED);
     EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
+    subscriberInfo.SetThreadMode(EventFwk::CommonEventSubscribeInfo::COMMON);
     std::shared_ptr<CallBroadcastSubscriber> subscriberPtr = std::make_shared<CallBroadcastSubscriber>(subscriberInfo);
     if (subscriberPtr == nullptr) {
         TELEPHONY_LOGE("CallControlManager::BroadcastSubscriber subscriberPtr is nullptr");

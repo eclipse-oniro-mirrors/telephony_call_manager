@@ -135,6 +135,7 @@ ohos_shared_library("tel_call_manager") {
     "data_share:datashare_consumer",
     "distributed_notification_service:ans_innerkits",
     "eventhandler:libeventhandler",
+    "ffrt:libffrt",
     "hisysevent_native:libhisysevent",
     "hitrace:hitrace_meter",
     "init:libbegetutil",

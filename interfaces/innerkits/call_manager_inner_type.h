@@ -16,10 +16,11 @@
 #ifndef CALL_MANAGER_INNER_TYPE_H
 #define CALL_MANAGER_INNER_TYPE_H
 
+#include <algorithm>
 #include <cstdio>
+#include <ctime>
 #include <string>
 #include <vector>
-#include <ctime>
 
 namespace OHOS {
 namespace Telephony {
@@ -500,6 +501,23 @@ struct CallRecordInfo {
      * Indicates the slot id.
      */
     int32_t slotId = 0;
+    CallRecordInfo operator=(const CallRecordInfo &temp)
+    {
+        callId = temp.callId;
+        std::copy(std::begin(temp.phoneNumber), std::end(temp.phoneNumber), std::begin(phoneNumber));
+        std::copy(std::begin(temp.formattedPhoneNumber), std::end(temp.formattedPhoneNumber),
+            std::begin(formattedPhoneNumber));
+        callType = temp.callType;
+        callBeginTime = temp.callBeginTime;
+        callEndTime = temp.callEndTime;
+        ringDuration = temp.ringDuration;
+        callDuration = temp.callDuration;
+        directionType = temp.directionType;
+        answerType = temp.answerType;
+        countryCode = temp.countryCode;
+        slotId = temp.slotId;
+        return *this;
+    }
 };
 
 /**
@@ -939,6 +957,12 @@ struct DisconnectedDetails {
      * Indicates the detail message for the ending call reason.
      */
     std::string message = "";
+    DisconnectedDetails operator=(const DisconnectedDetails &temp)
+    {
+        reason = temp.reason;
+        message = temp.message;
+        return *this;
+    }
 };
 
 /**
@@ -1670,6 +1694,12 @@ struct CallMediaModeResponse {
      * Indicates the response result.
      */
     int32_t result = 0;
+    CallMediaModeResponse operator=(const CallMediaModeResponse &temp)
+    {
+        std::copy(std::begin(temp.phoneNum), std::end(temp.phoneNum), std::begin(phoneNum));
+        result = temp.result;
+        return *this;
+    }
 };
 
 /**
@@ -1830,6 +1860,12 @@ struct OttCallEventInfo {
      * Indicates the bundle name.
      */
     char bundleName[kMaxBundleNameLen + 1] = { 0 };
+    OttCallEventInfo operator=(const OttCallEventInfo &temp)
+    {
+        ottCallEventId = temp.ottCallEventId;
+        std::copy(std::begin(temp.bundleName), std::end(temp.bundleName), std::begin(bundleName));
+        return *this;
+    }
 };
 
 /**
@@ -1868,6 +1904,19 @@ struct CallDetailInfo {
      * Indicates the voice domain. 0: CS, 1: IMS
      */
     int32_t voiceDomain = 0;
+    
+    CallDetailInfo operator=(const CallDetailInfo &temp)
+    {
+        index = temp.index;
+        std::copy(std::begin(temp.phoneNum), std::end(temp.phoneNum), std::begin(phoneNum));
+        std::copy(std::begin(temp.bundleName), std::end(temp.bundleName), std::begin(bundleName));
+        accountId = temp.accountId;
+        callType = temp.callType;
+        callMode = temp.callMode;
+        state = temp.state;
+        voiceDomain = temp.voiceDomain;
+        return *this;
+    }
 };
 
 /**
