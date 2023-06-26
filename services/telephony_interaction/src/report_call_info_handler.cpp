@@ -22,6 +22,10 @@
 
 namespace OHOS {
 namespace Telephony {
+namespace {
+ffrt::queue reportCallInfoQueue { "report_call_info_queue" };
+}
+
 ReportCallInfoHandler::ReportCallInfoHandler() {}
 
 ReportCallInfoHandler::~ReportCallInfoHandler() {}
@@ -39,7 +43,7 @@ int32_t ReportCallInfoHandler::UpdateCallReportInfo(const CallDetailInfo &info)
         TELEPHONY_LOGE("callStatusManagerPtr_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    ffrt::submit([=]() {
+    reportCallInfoQueue.submit([=]() {
         auto ret = callStatusManagerPtr_->HandleCallReportInfo(info);
         if (ret != TELEPHONY_SUCCESS) {
             TELEPHONY_LOGE("HandleCallReportInfo failed! ret:%{public}d", ret);
@@ -54,7 +58,7 @@ int32_t ReportCallInfoHandler::UpdateCallsReportInfo(CallDetailsInfo &info)
         TELEPHONY_LOGE("callStatusManagerPtr_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    ffrt::submit([=]() {
+    reportCallInfoQueue.submit([=]() {
         int32_t ret = callStatusManagerPtr_->HandleCallsReportInfo(info);
         if (ret != TELEPHONY_SUCCESS) {
             TELEPHONY_LOGE("HandleCallsReportInfo failed! ret:%{public}d", ret);
@@ -84,7 +88,7 @@ int32_t ReportCallInfoHandler::UpdateDisconnectedCause(const DisconnectedDetails
         TELEPHONY_LOGE("callStatusManagerPtr_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    ffrt::submit([=]() {
+    reportCallInfoQueue.submit([=]() {
         int32_t ret = callStatusManagerPtr_->HandleDisconnectedCause(details);
         if (ret != TELEPHONY_SUCCESS) {
             TELEPHONY_LOGE("HandleDisconnectedCause failed! ret:%{public}d", ret);
@@ -99,7 +103,7 @@ int32_t ReportCallInfoHandler::UpdateEventResultInfo(const CellularCallEventInfo
         TELEPHONY_LOGE("callStatusManagerPtr_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    ffrt::submit([=]() {
+    reportCallInfoQueue.submit([=]() {
         int32_t ret = callStatusManagerPtr_->HandleEventResultReportInfo(info);
         if (ret != TELEPHONY_SUCCESS) {
             TELEPHONY_LOGE("HandleEventResultReportInfo failed! ret:%{public}d", ret);
@@ -114,7 +118,7 @@ int32_t ReportCallInfoHandler::UpdateOttEventInfo(const OttCallEventInfo &info)
         TELEPHONY_LOGE("callStatusManagerPtr_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    ffrt::submit([=]() {
+    reportCallInfoQueue.submit([=]() {
         int32_t ret = callStatusManagerPtr_->HandleOttEventReportInfo(info);
         if (ret != TELEPHONY_SUCCESS) {
             TELEPHONY_LOGE("HandleOttEventReportInfo failed! ret:%{public}d", ret);
@@ -125,7 +129,7 @@ int32_t ReportCallInfoHandler::UpdateOttEventInfo(const OttCallEventInfo &info)
 
 int32_t ReportCallInfoHandler::UpdateMediaModeResponse(const CallMediaModeResponse &response)
 {
-    ffrt::submit([=]() {
+    reportCallInfoQueue.submit([=]() {
         sptr<CallBase> call = CallObjectManager::GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_ACTIVE);
         if (call == nullptr) {
             TELEPHONY_LOGE("call not exists");
