@@ -60,6 +60,7 @@ ohos_unittest("tel_call_manager_gtest") {
     "core_service:tel_core_service_api",
     "data_share:datashare_consumer",
     "eventhandler:libeventhandler",
+    "hilog:libhilog",
     "init:libbegetutil",
     "ipc:ipc_single",
     "safwk:system_ability_fwk",
@@ -78,11 +79,5 @@ ohos_unittest("tel_call_manager_gtest") {
 
   if (device_name == "rk3568") {
     defines += [ "CALL_MANAGER_IMS_LITE_UNSUPPORT" ]
-  }
-
-  if (is_standard_system) {
-    external_deps += [ "hiviewdfx_hilog_native:libhilog" ]
-  } else {
-    external_deps += [ "hilog:libhilog" ]
   }
 }

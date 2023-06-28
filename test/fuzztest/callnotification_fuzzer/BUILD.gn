@@ -52,6 +52,7 @@ ohos_fuzztest("CallNotificationFuzzTest") {
     "common_event_service:cesfwk_innerkits",
     "core_service:tel_core_service_api",
     "data_share:datashare_consumer",
+    "hilog:libhilog",
     "init:libbegetutil",
     "ipc:ipc_single",
     "power_manager:powermgr_client",
@@ -71,11 +72,6 @@ ohos_fuzztest("CallNotificationFuzzTest") {
     "${CALL_MANAGER_PATH}/test/fuzztest/common_fuzzer/addcalltoken_fuzzer.cpp",
     "callnotification_fuzzer.cpp",
   ]
-  if (is_standard_system) {
-    external_deps += [ "hiviewdfx_hilog_native:libhilog" ]
-  } else {
-    external_deps += [ "hilog:libhilog" ]
-  }
 }
 
 ###############################################################################

@@ -37,6 +37,7 @@ ohos_shared_library("call") {
     "call_manager:tel_call_manager_api",
     "core_service:libtel_common",
     "core_service:tel_core_service_api",
+    "hilog:libhilog",
     "init:libbegetutil",
     "napi:ace_napi",
   ]
@@ -45,12 +46,6 @@ ohos_shared_library("call") {
     "TELEPHONY_LOG_TAG = \"CallManagerJsApi\"",
     "LOG_DOMAIN = 0xD001F01",
   ]
-
-  if (is_standard_system) {
-    external_deps += [ "hiviewdfx_hilog_native:libhilog" ]
-  } else {
-    external_deps += [ "hilog:libhilog" ]
-  }
 
   part_name = "call_manager"
   subsystem_name = "telephony"

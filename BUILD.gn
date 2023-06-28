@@ -136,7 +136,8 @@ ohos_shared_library("tel_call_manager") {
     "distributed_notification_service:ans_innerkits",
     "eventhandler:libeventhandler",
     "ffrt:libffrt",
-    "hisysevent_native:libhisysevent",
+    "hilog:libhilog",
+    "hisysevent:libhisysevent",
     "hitrace:hitrace_meter",
     "init:libbegetutil",
     "ipc:ipc_single",
@@ -163,12 +164,6 @@ ohos_shared_library("tel_call_manager") {
     "TELEPHONY_LOG_TAG = \"CallManager\"",
     "LOG_DOMAIN = 0xD001F01",
   ]
-
-  if (is_standard_system) {
-    external_deps += [ "hiviewdfx_hilog_native:libhilog" ]
-  } else {
-    external_deps += [ "hilog:libhilog" ]
-  }
 
   if (defined(global_parts_info) &&
       defined(global_parts_info.communication_bluetooth) &&
