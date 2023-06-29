@@ -132,6 +132,19 @@ int32_t DialCall(const uint8_t *data, size_t size)
     return DelayedSingleton<CallManagerService>::GetInstance()->OnDialCall(dataParcel, reply);
 }
 
+void CancelMissedIncomingCallNotification(const uint8_t *data, size_t size)
+{
+    if (!IsServiceInited()) {
+        return;
+    }
+    MessageParcel dataMessageParcel;
+    dataMessageParcel.WriteBuffer(data, size);
+    dataMessageParcel.RewindRead(0);
+    MessageParcel reply;
+    DelayedSingleton<CallManagerService>::GetInstance()->OnCancelMissedIncomingCallNotification(
+        dataMessageParcel, reply);
+}
+
 int32_t SetCallWaiting(const uint8_t *data, size_t size)
 {
     if (!IsServiceInited()) {
@@ -172,6 +185,7 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     IsRinging(data, size);
     IsInEmergencyCall(data, size);
     DialCall(data, size);
+    CancelMissedIncomingCallNotification(data, size);
     SetCallWaiting(data, size);
     InputDialerSpecialCode(data, size);
 }
