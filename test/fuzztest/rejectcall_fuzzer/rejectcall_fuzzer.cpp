@@ -59,18 +59,6 @@ void RejectCall(const uint8_t *data, size_t size)
     DelayedSingleton<CallManagerService>::GetInstance()->OnRejectCall(dataMessageParcel, reply);
 }
 
-void CancelMissedIncomingCallNotification(const uint8_t *data, size_t size)
-{
-    if (!IsServiceInited()) {
-        return;
-    }
-    MessageParcel dataMessageParcel;
-    dataMessageParcel.RewindRead(0);
-    MessageParcel reply;
-    DelayedSingleton<CallManagerService>::GetInstance()->OnCancelMissedIncomingCallNotification(
-        dataMessageParcel, reply);
-}
-
 void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
 {
     if (data == nullptr || size == 0) {
@@ -78,7 +66,6 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     }
 
     RejectCall(data, size);
-    CancelMissedIncomingCallNotification(data, size);
 }
 } // namespace OHOS
 
