@@ -29,18 +29,30 @@ namespace OHOS {
 namespace Telephony {
 BluetoothCallStub::BluetoothCallStub()
 {
-    memberFuncMap_[BluetoothCallInterfaceCode::INTERFACE_BT_ANSWER_CALL] = &BluetoothCallStub::OnAnswerCall;
-    memberFuncMap_[BluetoothCallInterfaceCode::INTERFACE_BT_REJECT_CALL] = &BluetoothCallStub::OnRejectCall;
-    memberFuncMap_[BluetoothCallInterfaceCode::INTERFACE_BT_HOLD_CALL] = &BluetoothCallStub::OnHoldCall;
-    memberFuncMap_[BluetoothCallInterfaceCode::INTERFACE_BT_UNHOLD_CALL] = &BluetoothCallStub::OnUnHoldCall;
-    memberFuncMap_[BluetoothCallInterfaceCode::INTERFACE_BT_DISCONNECT_CALL] = &BluetoothCallStub::OnHangUpCall;
-    memberFuncMap_[BluetoothCallInterfaceCode::INTERFACE_BT_GET_CALL_STATE] = &BluetoothCallStub::OnGetBtCallState;
-    memberFuncMap_[BluetoothCallInterfaceCode::INTERFACE_BT_SWAP_CALL] = &BluetoothCallStub::OnSwitchCall;
-    memberFuncMap_[BluetoothCallInterfaceCode::INTERFACE_BT_COMBINE_CONFERENCE] = &BluetoothCallStub::OnCombineConference;
-    memberFuncMap_[BluetoothCallInterfaceCode::INTERFACE_BT_SEPARATE_CONFERENCE] = &BluetoothCallStub::OnSeparateConference;
-    memberFuncMap_[BluetoothCallInterfaceCode::INTERFACE_BT_START_DTMF] = &BluetoothCallStub::OnStartDtmf;
-    memberFuncMap_[BluetoothCallInterfaceCode::INTERFACE_BT_STOP_DTMF] = &BluetoothCallStub::OnStopDtmf;
-    memberFuncMap_[BluetoothCallInterfaceCode::INTERFACE_BT_GET_CURRENT_CALL_LIST] = &BluetoothCallStub::OnGetCurrentCallList;
+    memberFuncMap_[static_cast<uint32_t>(BluetoothCallInterfaceCode::INTERFACE_BT_ANSWER_CALL)] =
+        &BluetoothCallStub::OnAnswerCall;
+    memberFuncMap_[static_cast<uint32_t>(BluetoothCallInterfaceCode::INTERFACE_BT_REJECT_CALL)] =
+        &BluetoothCallStub::OnRejectCall;
+    memberFuncMap_[static_cast<uint32_t>(BluetoothCallInterfaceCode::INTERFACE_BT_HOLD_CALL)] =
+        &BluetoothCallStub::OnHoldCall;
+    memberFuncMap_[static_cast<uint32_t>(BluetoothCallInterfaceCode::INTERFACE_BT_UNHOLD_CALL)] =
+        &BluetoothCallStub::OnUnHoldCall;
+    memberFuncMap_[static_cast<uint32_t>(BluetoothCallInterfaceCode::INTERFACE_BT_DISCONNECT_CALL)] =
+        &BluetoothCallStub::OnHangUpCall;
+    memberFuncMap_[static_cast<uint32_t>(BluetoothCallInterfaceCode::INTERFACE_BT_GET_CALL_STATE)] =
+        &BluetoothCallStub::OnGetBtCallState;
+    memberFuncMap_[static_cast<uint32_t>(BluetoothCallInterfaceCode::INTERFACE_BT_SWAP_CALL)] =
+        &BluetoothCallStub::OnSwitchCall;
+    memberFuncMap_[static_cast<uint32_t>(BluetoothCallInterfaceCode::INTERFACE_BT_COMBINE_CONFERENCE)] =
+        &BluetoothCallStub::OnCombineConference;
+    memberFuncMap_[static_cast<uint32_t>(BluetoothCallInterfaceCode::INTERFACE_BT_SEPARATE_CONFERENCE)] =
+        &BluetoothCallStub::OnSeparateConference;
+    memberFuncMap_[static_cast<uint32_t>(BluetoothCallInterfaceCode::INTERFACE_BT_START_DTMF)] =
+        &BluetoothCallStub::OnStartDtmf;
+    memberFuncMap_[static_cast<uint32_t>(BluetoothCallInterfaceCode::INTERFACE_BT_STOP_DTMF)] =
+        &BluetoothCallStub::OnStopDtmf;
+    memberFuncMap_[static_cast<uint32_t>(BluetoothCallInterfaceCode::INTERFACE_BT_GET_CURRENT_CALL_LIST)] =
+        &BluetoothCallStub::OnGetCurrentCallList;
 }
 
 BluetoothCallStub::~BluetoothCallStub()
