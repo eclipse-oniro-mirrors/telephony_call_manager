@@ -17,6 +17,7 @@
 #define CELLULAR_CALL_PROXY_H
 
 #include "cellular_call_interface.h"
+#include "cellular_call_ipc_interface_code.h"
 #include "iremote_proxy.h"
 
 namespace OHOS {
