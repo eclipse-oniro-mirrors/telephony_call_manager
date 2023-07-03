@@ -252,45 +252,6 @@ public:
      */
     virtual int32_t CloseUnFinishedUssdResult(const int32_t result) = 0;
 
-    /**
-     * @brief indicates the service id to map the function in ipc,
-     * one id corresponds one service
-     */
-    enum CallManagerCallStatusCode {
-        UPDATE_CALL_INFO = 0,
-        UPDATE_CALLS_INFO,
-        UPDATE_DISCONNECTED_CAUSE,
-        UPDATE_EVENT_RESULT_INFO,
-        UPDATE_RBT_PLAY_INFO,
-        UPDATE_GET_WAITING,
-        UPDATE_SET_WAITING,
-        UPDATE_GET_RESTRICTION,
-        UPDATE_SET_RESTRICTION,
-        UPDATE_GET_TRANSFER,
-        UPDATE_SET_TRANSFER,
-        UPDATE_GET_CALL_CLIP,
-        UPDATE_GET_CALL_CLIR,
-        UPDATE_SET_CALL_CLIR,
-        GET_IMS_SWITCH_STATUS,
-        SET_IMS_SWITCH_STATUS,
-        UPDATE_STARTRTT_STATUS,
-        UPDATE_STOPRTT_STATUS,
-        GET_IMS_CONFIG,
-        SET_IMS_CONFIG,
-        GET_IMS_FEATURE_VALUE,
-        SET_IMS_FEATURE_VALUE,
-        GET_LTE_ENHANCE_MODE,
-        SET_LTE_ENHANCE_MODE,
-        RECEIVE_UPDATE_MEDIA_MODE_RESPONSE,
-        INVITE_TO_CONFERENCE,
-        START_DTMF,
-        STOP_DTMF,
-        SEND_USSD,
-        GET_IMS_CALL_DATA,
-        MMI_CODE_INFO_RESPONSE,
-        CLOSE_UNFINISHED_USSD,
-    };
-
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"OHOS.Telephony.ICallStatusCallback");
 };

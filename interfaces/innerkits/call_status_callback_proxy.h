@@ -16,6 +16,7 @@
 #ifndef CALL_STATUS_CALLBACK_PROXY_H
 #define CALL_STATUS_CALLBACK_PROXY_H
 
+#include "call_status_callback_ipc_interface_code.h"
 #include "iremote_proxy.h"
 #include "i_call_status_callback.h"
 

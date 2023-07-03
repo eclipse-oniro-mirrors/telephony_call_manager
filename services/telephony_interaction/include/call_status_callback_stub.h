@@ -21,6 +21,7 @@
 #include "iremote_object.h"
 #include "iremote_stub.h"
 
+#include "call_status_callback_ipc_interface_code.h"
 #include "i_call_status_callback.h"
 
 namespace OHOS {
