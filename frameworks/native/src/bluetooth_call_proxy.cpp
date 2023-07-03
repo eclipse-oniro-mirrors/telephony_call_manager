@@ -40,7 +40,8 @@ int32_t BluetoothCallProxy::AnswerCall()
         TELEPHONY_LOGE("function Remote() return nullptr!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int32_t error = Remote()->SendRequest(INTERFACE_BT_ANSWER_CALL, dataParcel, replyParcel, option);
+    int32_t error = Remote()->SendRequest(static_cast<int32_t>(BluetoothCallInterfaceCode::INTERFACE_BT_ANSWER_CALL),
+        dataParcel, replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("function AnswerCall call failed! errCode:%{public}d", error);
         return error;
@@ -61,7 +62,8 @@ int32_t BluetoothCallProxy::RejectCall()
         TELEPHONY_LOGE("function Remote() return nullptr!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int32_t error = Remote()->SendRequest(INTERFACE_BT_REJECT_CALL, dataParcel, replyParcel, option);
+    int32_t error = Remote()->SendRequest(static_cast<int32_t>(BluetoothCallInterfaceCode::INTERFACE_BT_REJECT_CALL),
+        dataParcel, replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("function RejectCall call failed! errCode:%{public}d", error);
         return error;
@@ -82,7 +84,8 @@ int32_t BluetoothCallProxy::HangUpCall()
         TELEPHONY_LOGE("function Remote() return nullptr!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int32_t error = Remote()->SendRequest(INTERFACE_BT_DISCONNECT_CALL, dataParcel, replyParcel, option);
+    int32_t error = Remote()->SendRequest(
+        static_cast<int32_t>(BluetoothCallInterfaceCode::INTERFACE_BT_DISCONNECT_CALL), dataParcel, replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("function HangUpCall call failed! errCode:%{public}d", error);
         return error;
@@ -103,7 +106,8 @@ int32_t BluetoothCallProxy::GetCallState()
         TELEPHONY_LOGE("function Remote() return nullptr!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int32_t error = Remote()->SendRequest(INTERFACE_BT_GET_CALL_STATE, dataParcel, replyParcel, option);
+    int32_t error = Remote()->SendRequest(static_cast<int32_t>(BluetoothCallInterfaceCode::INTERFACE_BT_GET_CALL_STATE),
+        dataParcel, replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("function GetCallState! errCode:%{public}d", error);
         return error;
@@ -124,7 +128,8 @@ int32_t BluetoothCallProxy::HoldCall()
         TELEPHONY_LOGE("function Remote() return nullptr!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int32_t error = Remote()->SendRequest(INTERFACE_BT_HOLD_CALL, dataParcel, replyParcel, option);
+    int32_t error = Remote()->SendRequest(static_cast<int32_t>(BluetoothCallInterfaceCode::INTERFACE_BT_HOLD_CALL),
+        dataParcel, replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("Function HoldCall call failed! errCode:%{public}d", error);
         return error;
@@ -145,7 +150,8 @@ int32_t BluetoothCallProxy::UnHoldCall()
         TELEPHONY_LOGE("function Remote() return nullptr!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int32_t error = Remote()->SendRequest(INTERFACE_BT_UNHOLD_CALL, dataParcel, replyParcel, option);
+    int32_t error = Remote()->SendRequest(static_cast<int32_t>(BluetoothCallInterfaceCode::INTERFACE_BT_UNHOLD_CALL),
+        dataParcel, replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("Function UnHoldCall call failed! errCode:%{public}d", error);
         return error;
@@ -166,7 +172,8 @@ int32_t BluetoothCallProxy::SwitchCall()
         TELEPHONY_LOGE("function Remote() return nullptr!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int32_t error = Remote()->SendRequest(INTERFACE_BT_SWAP_CALL, dataParcel, replyParcel, option);
+    int32_t error = Remote()->SendRequest(static_cast<int32_t>(BluetoothCallInterfaceCode::INTERFACE_BT_SWAP_CALL),
+        dataParcel, replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("Function UnHoldCall call failed! errCode:%{public}d", error);
         return error;
@@ -188,8 +195,8 @@ int32_t BluetoothCallProxy::StartDtmf(char str)
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     dataParcel.WriteInt8(str);
-    int32_t error =
-            Remote()->SendRequest(INTERFACE_BT_START_DTMF, dataParcel, replyParcel, option);
+    int32_t error = Remote()->SendRequest(static_cast<int32_t>(BluetoothCallInterfaceCode::INTERFACE_BT_START_DTMF),
+        dataParcel, replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("Function StartDtmf! errCode:%{public}d", error);
         return error;
@@ -210,8 +217,8 @@ int32_t BluetoothCallProxy::StopDtmf()
         TELEPHONY_LOGE("function Remote() return nullptr!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int32_t error =
-            Remote()->SendRequest(INTERFACE_BT_STOP_DTMF, dataParcel, replyParcel, option);
+    int32_t error = Remote()->SendRequest(static_cast<int32_t>(BluetoothCallInterfaceCode::INTERFACE_BT_STOP_DTMF),
+        dataParcel, replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("Function StopDtmf! errCode:%{public}d", error);
         return error;
@@ -232,7 +239,9 @@ int32_t BluetoothCallProxy::CombineConference()
         TELEPHONY_LOGE("function Remote() return nullptr!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int32_t error = Remote()->SendRequest(INTERFACE_BT_COMBINE_CONFERENCE, dataParcel, replyParcel, option);
+    int32_t error = Remote()->SendRequest(
+        static_cast<int32_t>(BluetoothCallInterfaceCode::INTERFACE_BT_COMBINE_CONFERENCE), dataParcel,
+            replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("Function CombineConference failed! errCode:%{public}d", error);
         return error;
@@ -253,7 +262,9 @@ int32_t BluetoothCallProxy::SeparateConference()
         TELEPHONY_LOGE("function Remote() return nullptr!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int32_t error = Remote()->SendRequest(INTERFACE_BT_SEPARATE_CONFERENCE, dataParcel, replyParcel, option);
+    int32_t error = Remote()->SendRequest(
+        static_cast<int32_t>(BluetoothCallInterfaceCode::INTERFACE_BT_SEPARATE_CONFERENCE), dataParcel,
+            replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("Function SeparateConference call failed! errCode:%{public}d", error);
         return error;
@@ -276,7 +287,9 @@ std::vector<CallAttributeInfo> BluetoothCallProxy::GetCurrentCallList(int32_t sl
         TELEPHONY_LOGE("function Remote() return nullptr!");
         return callVec;
     }
-    int32_t error = Remote()->SendRequest(INTERFACE_BT_GET_CURRENT_CALL_LIST, dataParcel, replyParcel, option);
+    int32_t error = Remote()->SendRequest(
+        static_cast<int32_t>(BluetoothCallInterfaceCode::INTERFACE_BT_GET_CURRENT_CALL_LIST), dataParcel,
+            replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("Function GetCurrentCallList call failed! errCode:%{public}d", error);
         return callVec;

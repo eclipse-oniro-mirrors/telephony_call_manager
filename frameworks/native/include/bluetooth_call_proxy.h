@@ -23,6 +23,7 @@
 #include "iremote_proxy.h"
 #include "pac_map.h"
 
+#include "bluetooth_call_ipc_interface_code.h"
 #include "call_manager_inner_type.h"
 #include "i_bluetooth_call.h"
 #include "telephony_log_wrapper.h"

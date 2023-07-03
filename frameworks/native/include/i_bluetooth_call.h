@@ -27,23 +27,6 @@
 
 namespace OHOS {
 namespace Telephony {
-extern "C" {
-enum BluetoothCallSurfaceCode {
-    INTERFACE_BT_ANSWER_CALL = 0,
-    INTERFACE_BT_REJECT_CALL,
-    INTERFACE_BT_HOLD_CALL,
-    INTERFACE_BT_UNHOLD_CALL,
-    INTERFACE_BT_DISCONNECT_CALL,
-    INTERFACE_BT_GET_CALL_STATE,
-    INTERFACE_BT_SWAP_CALL,
-    INTERFACE_BT_COMBINE_CONFERENCE,
-    INTERFACE_BT_SEPARATE_CONFERENCE,
-    INTERFACE_BT_START_DTMF,
-    INTERFACE_BT_STOP_DTMF,
-    INTERFACE_BT_GET_CURRENT_CALL_LIST,
-};
-} // end extern
-
 class IBluetoothCall : public IRemoteBroker {
 public:
     virtual ~IBluetoothCall() = default;

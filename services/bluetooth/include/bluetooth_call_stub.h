@@ -21,6 +21,7 @@
 #include "iremote_object.h"
 #include "iremote_stub.h"
 
+#include "bluetooth_call_ipc_interface_code.h"
 #include "i_bluetooth_call.h"
 
 namespace OHOS {
