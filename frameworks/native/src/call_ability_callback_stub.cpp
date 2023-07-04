@@ -210,7 +210,7 @@ int32_t CallAbilityCallbackStub::OnUpdateAudioDeviceChange(MessageParcel &data, 
         return TELEPHONY_ERR_MEMSET_FAIL;
     }
     int32_t len = data.ReadInt32();
-    if (len <= 0) {
+    if (len <= 0 || len >= MAX_LEN) {
         TELEPHONY_LOGE("Invalid parameter, len = %{public}d", len);
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
