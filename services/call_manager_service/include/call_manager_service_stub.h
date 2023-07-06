@@ -22,7 +22,6 @@
 #include "iremote_stub.h"
 
 #include "i_call_manager_service.h"
-#include "call_manager_service_ipc_interface_code.h"
 
 namespace OHOS {
 namespace Telephony {
