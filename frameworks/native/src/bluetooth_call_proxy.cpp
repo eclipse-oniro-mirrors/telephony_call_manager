@@ -86,7 +86,7 @@ int32_t BluetoothCallProxy::HangUpCall()
     }
     int32_t error = Remote()->SendRequest(
         static_cast<int32_t>(BluetoothCallInterfaceCode::INTERFACE_BT_DISCONNECT_CALL), dataParcel,
-            replyParcel, option);
+        replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("function HangUpCall call failed! errCode:%{public}d", error);
         return error;
@@ -242,7 +242,7 @@ int32_t BluetoothCallProxy::CombineConference()
     }
     int32_t error = Remote()->SendRequest(
         static_cast<int32_t>(BluetoothCallInterfaceCode::INTERFACE_BT_COMBINE_CONFERENCE), dataParcel,
-            replyParcel, option);
+        replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("Function CombineConference failed! errCode:%{public}d", error);
         return error;
@@ -265,7 +265,7 @@ int32_t BluetoothCallProxy::SeparateConference()
     }
     int32_t error = Remote()->SendRequest(
         static_cast<int32_t>(BluetoothCallInterfaceCode::INTERFACE_BT_SEPARATE_CONFERENCE), dataParcel,
-            replyParcel, option);
+        replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("Function SeparateConference call failed! errCode:%{public}d", error);
         return error;
@@ -290,7 +290,7 @@ std::vector<CallAttributeInfo> BluetoothCallProxy::GetCurrentCallList(int32_t sl
     }
     int32_t error = Remote()->SendRequest(
         static_cast<int32_t>(BluetoothCallInterfaceCode::INTERFACE_BT_GET_CURRENT_CALL_LIST), dataParcel,
-            replyParcel, option);
+        replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("Function GetCurrentCallList call failed! errCode:%{public}d", error);
         return callVec;
