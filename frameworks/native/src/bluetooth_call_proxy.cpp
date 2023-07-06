@@ -85,7 +85,8 @@ int32_t BluetoothCallProxy::HangUpCall()
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     int32_t error = Remote()->SendRequest(
-        static_cast<int32_t>(BluetoothCallInterfaceCode::INTERFACE_BT_DISCONNECT_CALL), dataParcel, replyParcel, option);
+        static_cast<int32_t>(BluetoothCallInterfaceCode::INTERFACE_BT_DISCONNECT_CALL), dataParcel,
+            replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("function HangUpCall call failed! errCode:%{public}d", error);
         return error;
