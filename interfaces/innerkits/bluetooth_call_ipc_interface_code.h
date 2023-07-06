@@ -13,9 +13,10 @@
  * limitations under the License.
  */
 
-#ifndef I_BLUETOOTH_CALL_IPC_INTERFACE_CODE_H
-#define I_BLUETOOTH_CALL_IPC_INTERFACE_CODE_H
+#ifndef BLUETOOTH_CALL_IPC_INTERFACE_CODE_H
+#define BLUETOOTH_CALL_IPC_INTERFACE_CODE_H
 
+/* SAID:4005 */
 namespace OHOS {
 namespace Telephony {
 extern "C" {
@@ -36,4 +37,4 @@ enum class BluetoothCallInterfaceCode {
 } // end extern
 } // namespace Telephony
 } // namespace OHOS
-#endif // I_BLUETOOTH_CALL_IPC_INTERFACE_CODE_H
+#endif // BLUETOOTH_CALL_IPC_INTERFACE_CODE_H

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef I_CALL_STATUS_CALLBACK_IPC_INTERFACE_CODE_H
-#define I_CALL_STATUS_CALLBACK_IPC_INTERFACE_CODE_H
+#ifndef CALL_STATUS_CALLBACK_IPC_INTERFACE_CODE_H
+#define CALL_STATUS_CALLBACK_IPC_INTERFACE_CODE_H
 
 /* SAID:4005 */
 namespace OHOS {
@@ -55,4 +55,4 @@ enum CallStatusInterfaceCode {
 };
 } // namespace Telephony
 } // namespace OHOS
-#endif // I_CALL_STATUS_CALLBACK_IPC_INTERFACE_CODE_H
+#endif // CALL_STATUS_CALLBACK_IPC_INTERFACE_CODE_H
