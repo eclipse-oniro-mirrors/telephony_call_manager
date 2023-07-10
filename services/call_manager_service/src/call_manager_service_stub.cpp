@@ -95,6 +95,7 @@ void CallManagerServiceStub::InitCallSupplementRequest()
     memberFuncMap_[INTERFACE_SET_CALL_WAITING] = &CallManagerServiceStub::OnSetCallWaiting;
     memberFuncMap_[INTERFACE_GET_CALL_RESTRICTION] = &CallManagerServiceStub::OnGetCallRestriction;
     memberFuncMap_[INTERFACE_SET_CALL_RESTRICTION] = &CallManagerServiceStub::OnSetCallRestriction;
+    memberFuncMap_[INTERFACE_SET_CALL_RESTRICTION_PASSWORD] = &CallManagerServiceStub::OnSetCallRestrictionPassword;
     memberFuncMap_[INTERFACE_GET_CALL_TRANSFER] = &CallManagerServiceStub::OnGetTransferNumber;
     memberFuncMap_[INTERFACE_SET_CALL_TRANSFER] = &CallManagerServiceStub::OnSetTransferNumber;
     memberFuncMap_[INTERFACE_CAN_SET_CALL_TRANSFER_TIME] = &CallManagerServiceStub::OnCanSetCallTransferTime;
@@ -490,6 +491,25 @@ int32_t CallManagerServiceStub::OnSetCallRestriction(MessageParcel &data, Messag
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     result = SetCallRestriction(slotId, *pCRInfo);
+    TELEPHONY_LOGI("result:%{public}d", result);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("fail to write parcel");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallManagerServiceStub::OnSetCallRestrictionPassword(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t result = TELEPHONY_ERR_FAIL;
+    if (!data.ContainFileDescriptors()) {
+        TELEPHONY_LOGW("sent raw data is less than 32k");
+    }
+    int32_t slotId = data.ReadInt32();
+    CallRestrictionType fac = static_cast<CallRestrictionType>(data.ReadInt32());
+    auto oldPassword = data.ReadCString();
+    auto newPassword = data.ReadCString();
+    result = SetCallRestrictionPassword(slotId, fac, oldPassword, newPassword);
     TELEPHONY_LOGI("result:%{public}d", result);
     if (!reply.WriteInt32(result)) {
         TELEPHONY_LOGE("fail to write parcel");

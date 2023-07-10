@@ -228,6 +228,26 @@ int32_t CallStatusCallbackProxy::UpdateSetRestrictionResult(const int32_t result
     return replyParcel.ReadInt32();
 }
 
+int32_t CallStatusCallbackProxy::UpdateSetRestrictionPasswordResult(const int32_t result)
+{
+    MessageParcel dataParcel;
+    MessageParcel replyParcel;
+    MessageOption option;
+    int32_t error = TELEPHONY_ERR_FAIL;
+    if (!dataParcel.WriteInterfaceToken(CallStatusCallbackProxy::GetDescriptor())) {
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    dataParcel.WriteInt32(result);
+    if (Remote() == nullptr) {
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    error = Remote()->SendRequest(static_cast<int32_t>(UPDATE_SET_RESTRICTION_PWD), dataParcel, replyParcel, option);
+    if (error != TELEPHONY_SUCCESS) {
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return replyParcel.ReadInt32();
+}
+
 int32_t CallStatusCallbackProxy::UpdateGetTransferResult(const CallTransferResponse &callTransferResponse)
 {
     MessageParcel dataParcel;

@@ -34,6 +34,7 @@ NapiCallAbilityCallback::NapiCallAbilityCallback()
     (void)memset_s(&setWaitingCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
     (void)memset_s(&getRestrictionCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
     (void)memset_s(&setRestrictionCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
+    (void)memset_s(&setRestrictionPasswordCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
     (void)memset_s(&getTransferCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
     (void)memset_s(&setTransferCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
     (void)memset_s(&startRttCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
@@ -47,6 +48,8 @@ NapiCallAbilityCallback::NapiCallAbilityCallback()
         &NapiCallAbilityCallback::ReportGetRestrictionInfo;
     memberFuncMap_[CallResultReportId::SET_CALL_RESTRICTION_REPORT_ID] =
         &NapiCallAbilityCallback::ReportSetRestrictionInfo;
+    memberFuncMap_[CallResultReportId::SET_CALL_RESTRICTION_PWD_REPORT_ID] =
+        &NapiCallAbilityCallback::ReportSetRestrictionPassword;
     memberFuncMap_[CallResultReportId::GET_CALL_TRANSFER_REPORT_ID] =
         &NapiCallAbilityCallback::ReportGetTransferInfo;
     memberFuncMap_[CallResultReportId::SET_CALL_TRANSFER_REPORT_ID] =
@@ -206,6 +209,21 @@ int32_t NapiCallAbilityCallback::RegisterSetRestrictionCallback(EventCallback ca
 void NapiCallAbilityCallback::UnRegisterSetRestrictionCallback()
 {
     (void)memset_s(&setRestrictionCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
+}
+
+int32_t NapiCallAbilityCallback::RegisterSetRestrictionPasswordCallback(EventCallback callback)
+{
+    if (setRestrictionPasswordCallback_.thisVar) {
+        TELEPHONY_LOGE("callback already exist!");
+        return CALL_ERR_CALLBACK_ALREADY_EXIST;
+    }
+    setRestrictionPasswordCallback_ = callback;
+    return TELEPHONY_SUCCESS;
+}
+
+void NapiCallAbilityCallback::UnRegisterSetRestrictionPasswordCallback()
+{
+    (void)memset_s(&setRestrictionPasswordCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
 }
 
 int32_t NapiCallAbilityCallback::RegisterGetTransferCallback(EventCallback callback)
@@ -983,6 +1001,37 @@ int32_t NapiCallAbilityCallback::ReportSetRestrictionInfo(AppExecFwk::PacMap &re
         loop, work, [](uv_work_t *work) {}, ReportExecutionResultWork);
     if (setRestrictionCallback_.thisVar) {
         (void)memset_s(&setRestrictionCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t NapiCallAbilityCallback::ReportSetRestrictionPassword(AppExecFwk::PacMap &resultInfo)
+{
+    if (setRestrictionPasswordCallback_.thisVar == nullptr) {
+        TELEPHONY_LOGE("setRestrictionPasswordCallback is null!");
+        return CALL_ERR_CALLBACK_NOT_EXIST;
+    }
+    uv_loop_s *loop = nullptr;
+#if NAPI_VERSION >= 2
+    napi_get_uv_event_loop(setRestrictionPasswordCallback_.env, &loop);
+#endif
+    CallSupplementWorker *dataWorker = std::make_unique<CallSupplementWorker>().release();
+    if (dataWorker == nullptr) {
+        TELEPHONY_LOGE("dataWorker is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    dataWorker->info = resultInfo;
+    dataWorker->callback = setRestrictionPasswordCallback_;
+    uv_work_t *work = std::make_unique<uv_work_t>().release();
+    if (work == nullptr) {
+        TELEPHONY_LOGE("work is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    work->data = (void *)dataWorker;
+    uv_queue_work(
+        loop, work, [](uv_work_t *work) {}, ReportExecutionResultWork);
+    if (setRestrictionPasswordCallback_.thisVar) {
+        (void)memset_s(&setRestrictionPasswordCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
     }
     return TELEPHONY_SUCCESS;
 }

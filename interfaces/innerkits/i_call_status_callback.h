@@ -101,6 +101,14 @@ public:
     virtual int32_t UpdateSetRestrictionResult(int32_t result) = 0;
 
     /**
+     * @brief update the response of Set Restriction Password
+     *
+     * @param result[in], 0 means the result is success, others is failure
+     * @return Returns 0 on success, others on failure.
+     */
+    virtual int32_t UpdateSetRestrictionPasswordResult(int32_t result) = 0;
+
+    /**
      * @brief update the response of Get Transfer
      *
      * @param callTransferResponse[in], contains result, status, calssx, reason, number, time .etc

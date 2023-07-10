@@ -257,6 +257,18 @@ public:
     virtual int32_t SetCallRestriction(int32_t slotId, const CallRestrictionInfo &cRInfo) = 0;
 
     /**
+     * @brief Set the call restriction password of the specified account
+     *
+     * @param slotId[in] the slot id
+     * @param fac[in] indicate the call restriction type, just like all incoming, all outgoing .etc
+     * @param oldPassword[in] indicate the call restriction old password
+     * @param newPassword[in] indicate the call restriction new password
+     * @return Returns TELEPHONY_SUCCESS on success, others on failure.
+     */
+    virtual int32_t SetCallRestrictionPassword(
+        int32_t slotId, CallRestrictionType fac, const char *oldPassword, const char *newPassword) = 0;
+
+    /**
      * @brief Gets the call restriction information of the specified account
      *
      * @param facType[in] indicate the call restriction type, just like all incoming, all outgoing .etc

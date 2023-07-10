@@ -65,6 +65,9 @@ int32_t CallManagerCallbackTest::OnReportAsyncResults(CallResultReportId reportI
         case CallResultReportId::SET_CALL_RESTRICTION_REPORT_ID:
             std::cout << "result:" << (int32_t)resultInfo.GetIntValue("result", -1) << std::endl;
             break;
+        case CallResultReportId::SET_CALL_RESTRICTION_PWD_REPORT_ID:
+            std::cout << "result:" << (int32_t)resultInfo.GetIntValue("result", -1) << std::endl;
+            break;
         case CallResultReportId::GET_CALL_TRANSFER_REPORT_ID:
             std::cout << "result:" << (int32_t)resultInfo.GetIntValue("result", -1) << std::endl
                       << "status:" << (int32_t)resultInfo.GetIntValue("status", -1) << std::endl

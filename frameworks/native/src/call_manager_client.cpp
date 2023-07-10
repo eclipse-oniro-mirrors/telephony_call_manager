@@ -246,6 +246,17 @@ int32_t CallManagerClient::SetCallRestriction(int32_t slotId, CallRestrictionInf
     }
 }
 
+int32_t CallManagerClient::SetCallRestrictionPassword(
+    int32_t slotId, CallRestrictionType fac, const char *oldPassword, const char *newPassword)
+{
+    if (g_callManagerProxy != nullptr) {
+        return g_callManagerProxy->SetCallRestrictionPassword(slotId, fac, oldPassword, newPassword);
+    } else {
+        TELEPHONY_LOGE("[slot%{public}d] init first please!", slotId);
+        return TELEPHONY_ERR_UNINIT;
+    }
+}
+
 int32_t CallManagerClient::GetCallTransferInfo(int32_t slotId, CallTransferType type)
 {
     if (g_callManagerProxy != nullptr) {

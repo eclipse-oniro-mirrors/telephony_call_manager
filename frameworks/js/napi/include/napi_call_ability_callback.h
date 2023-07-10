@@ -47,6 +47,8 @@ public:
     void UnRegisterGetRestrictionCallback();
     int32_t RegisterSetRestrictionCallback(EventCallback callback);
     void UnRegisterSetRestrictionCallback();
+    int32_t RegisterSetRestrictionPasswordCallback(EventCallback callback);
+    void UnRegisterSetRestrictionPasswordCallback();
     int32_t RegisterGetTransferCallback(EventCallback callback);
     void UnRegisterGetTransferCallback();
     int32_t RegisterSetTransferCallback(EventCallback callback);
@@ -82,6 +84,7 @@ private:
     int32_t ReportSetWaitingInfo(AppExecFwk::PacMap &resultInfo);
     int32_t ReportGetRestrictionInfo(AppExecFwk::PacMap &resultInfo);
     int32_t ReportSetRestrictionInfo(AppExecFwk::PacMap &resultInfo);
+    int32_t ReportSetRestrictionPassword(AppExecFwk::PacMap &resultInfo);
     int32_t ReportGetTransferInfo(AppExecFwk::PacMap &resultInfo);
     int32_t ReportSetTransferInfo(AppExecFwk::PacMap &resultInfo);
     static void ReportWaitAndLimitInfoWork(uv_work_t *work, int32_t status);
@@ -117,6 +120,7 @@ private:
     EventCallback setWaitingCallback_;
     EventCallback getRestrictionCallback_;
     EventCallback setRestrictionCallback_;
+    EventCallback setRestrictionPasswordCallback_;
     EventCallback getTransferCallback_;
     EventCallback setTransferCallback_;
     EventCallback startRttCallback_;

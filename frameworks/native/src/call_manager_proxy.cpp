@@ -549,6 +549,22 @@ int32_t CallManagerProxy::SetCallRestriction(int32_t slotId, CallRestrictionInfo
     return TELEPHONY_SUCCESS;
 }
 
+int32_t CallManagerProxy::SetCallRestrictionPassword(
+    int32_t slotId, CallRestrictionType fac, const char *oldPassword, const char *newPassword)
+{
+    if (ReConnectService() != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("[slot%{public}d] ipc reconnect failed!", slotId);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    std::lock_guard<std::mutex> lock(mutex_);
+    int32_t errCode = callManagerServicePtr_->SetCallRestrictionPassword(slotId, fac, oldPassword, newPassword);
+    if (errCode != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("[slot%{public}d] failed, errcode:%{public}d", slotId, errCode);
+        return errCode;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
 int32_t CallManagerProxy::GetCallTransferInfo(int32_t slotId, CallTransferType type)
 {
     if (ReConnectService() != TELEPHONY_SUCCESS) {

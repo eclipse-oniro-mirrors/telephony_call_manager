@@ -56,6 +56,7 @@ enum class CellularCallInterfaceCode {
     SET_CALL_RESTRICTION,
     GET_CALL_RESTRICTION,
     CLOSE_UNFINISHED_USSD,
+    SET_CALL_RESTRICTION_PWD,
 
     /****************** config ******************/
     SET_DOMAIN_PREFERENCE_MODE = 300,
