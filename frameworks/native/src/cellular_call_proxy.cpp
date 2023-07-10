@@ -801,6 +801,39 @@ int32_t CellularCallProxy::GetCallRestriction(int32_t slotId, CallRestrictionTyp
     return error;
 }
 
+int32_t CellularCallProxy::SetCallRestrictionPassword(
+    int32_t slotId, CallRestrictionType fac, const char *oldPassword, const char *newPassword)
+{
+    MessageOption option;
+    MessageParcel in;
+    MessageParcel out;
+    int32_t result = TELEPHONY_SUCCESS;
+    result = SetCommonParamForMessageParcel(slotId, in);
+    if (result != TELEPHONY_SUCCESS) {
+        return result;
+    }
+    if (!in.WriteInt32(static_cast<int32_t>(fac))) {
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
+    if (!in.WriteCString(oldPassword)) {
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
+    if (!in.WriteCString(newPassword)) {
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("function Remote() return nullptr!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t error = remote->SendRequest(
+        static_cast<uint32_t>(CellularCallInterfaceCode::SET_CALL_RESTRICTION_PWD), in, out, option);
+    if (error == ERR_NONE) {
+        return out.ReadInt32();
+    }
+    return error;
+}
+
 int32_t CellularCallProxy::SetDomainPreferenceMode(int32_t slotId, int32_t mode)
 {
     MessageOption option;

@@ -41,6 +41,7 @@ public:
     int32_t UpdateSetWaitingResult(const int32_t result) override;
     int32_t UpdateGetRestrictionResult(const CallRestrictionResponse &result) override;
     int32_t UpdateSetRestrictionResult(const int32_t result) override;
+    int32_t UpdateSetRestrictionPasswordResult(const int32_t result) override;
     int32_t UpdateGetTransferResult(const CallTransferResponse &response) override;
     int32_t UpdateSetTransferResult(const int32_t result) override;
     int32_t UpdateGetCallClipResult(const ClipResponse &clipResponse) override;

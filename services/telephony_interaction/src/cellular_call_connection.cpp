@@ -453,6 +453,16 @@ int CellularCallConnection::GetCallRestriction(CallRestrictionType facType, int3
     return cellularCallInterfacePtr_->GetCallRestriction(slotId, facType);
 }
 
+int CellularCallConnection::SetCallRestrictionPassword(
+    int32_t slotId, CallRestrictionType fac, const char *oldPassword, const char *newPassword)
+{
+    if (ReConnectService() != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("ipc reconnect failed!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return cellularCallInterfacePtr_->SetCallRestrictionPassword(slotId, fac, oldPassword, newPassword);
+}
+
 int CellularCallConnection::SetCallPreferenceMode(int32_t slotId, int32_t mode)
 {
     if (ReConnectService() != TELEPHONY_SUCCESS) {

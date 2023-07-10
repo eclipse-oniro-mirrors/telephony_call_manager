@@ -93,6 +93,7 @@ public:
     static napi_value SetCallWaiting(napi_env env, napi_callback_info info);
     static napi_value GetCallRestriction(napi_env env, napi_callback_info info);
     static napi_value SetCallRestriction(napi_env env, napi_callback_info info);
+    static napi_value SetCallRestrictionPassword(napi_env env, napi_callback_info info);
     static napi_value GetCallTransferInfo(napi_env env, napi_callback_info info);
     static napi_value SetCallTransferInfo(napi_env env, napi_callback_info info);
     static napi_value CanSetCallTransferTime(napi_env env, napi_callback_info info);
@@ -173,6 +174,7 @@ private:
     static void NativeSetCallWaiting(napi_env env, void *data);
     static void NativeGetCallRestriction(napi_env env, void *data);
     static void NativeSetCallRestriction(napi_env env, void *data);
+    static void NativeSetCallRestrictionPassword(napi_env env, void *data);
     static void NativeGetTransferNumber(napi_env env, void *data);
     static void NativeSetTransferNumber(napi_env env, void *data);
     static void NativeCanSetCallTransferTime(napi_env env, void *data);
@@ -233,6 +235,8 @@ private:
     static bool MatchStringAndVariableObjectParameters(
         napi_env env, const napi_value parameters[], const size_t parameterCount);
     static bool MatchTwoStringParameter(napi_env env, const napi_value parameters[], const size_t parameterCount);
+    static bool MatchCallRestrictionPasswordParameter(
+        napi_env env, const napi_value parameters[], const size_t parameterCount);
 
 private:
     static int32_t registerStatus_;

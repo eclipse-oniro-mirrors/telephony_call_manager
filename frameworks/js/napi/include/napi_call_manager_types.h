@@ -116,6 +116,13 @@ struct CallRestrictionAsyncContext : AsyncContext {
     napi_ref thisVar = nullptr;
 };
 
+struct CallBarringPasswordAsyncContext : AsyncContext {
+    int32_t slotId = 0;
+    char oldPassword[kMaxNumberLen + 1] = { 0 };
+    char newPassword[kMaxNumberLen + 1] = { 0 };
+    napi_ref thisVar = nullptr;
+};
+
 struct CallTransferAsyncContext : AsyncContext {
     int32_t slotId = 0;
     CallTransferInfo info;

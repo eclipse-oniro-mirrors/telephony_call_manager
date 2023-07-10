@@ -42,6 +42,8 @@ CallStatusCallbackStub::CallStatusCallbackStub()
         &CallStatusCallbackStub::OnUpdateGetRestrictionResult;
     memberFuncMap_[static_cast<uint32_t>(UPDATE_SET_RESTRICTION)] =
         &CallStatusCallbackStub::OnUpdateSetRestrictionResult;
+    memberFuncMap_[static_cast<uint32_t>(UPDATE_SET_RESTRICTION_PWD)] =
+        &CallStatusCallbackStub::OnUpdateSetRestrictionPasswordResult;
     memberFuncMap_[static_cast<uint32_t>(UPDATE_GET_TRANSFER)] = &CallStatusCallbackStub::OnUpdateGetTransferResult;
     memberFuncMap_[static_cast<uint32_t>(UPDATE_SET_TRANSFER)] = &CallStatusCallbackStub::OnUpdateSetTransferResult;
     memberFuncMap_[static_cast<uint32_t>(UPDATE_GET_CALL_CLIP)] = &CallStatusCallbackStub::OnUpdateGetCallClipResult;
@@ -279,6 +281,22 @@ int32_t CallStatusCallbackStub::OnUpdateSetRestrictionResult(MessageParcel &data
     }
     result = data.ReadInt32();
     error = UpdateSetRestrictionResult(result);
+    if (!reply.WriteInt32(error)) {
+        TELEPHONY_LOGE("writing parcel failed");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallStatusCallbackStub::OnUpdateSetRestrictionPasswordResult(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t error = TELEPHONY_ERR_FAIL;
+    int32_t result = TELEPHONY_ERR_FAIL;
+    if (!data.ContainFileDescriptors()) {
+        TELEPHONY_LOGW("sent raw data is less than 32k");
+    }
+    result = data.ReadInt32();
+    error = UpdateSetRestrictionPasswordResult(result);
     if (!reply.WriteInt32(error)) {
         TELEPHONY_LOGE("writing parcel failed");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;

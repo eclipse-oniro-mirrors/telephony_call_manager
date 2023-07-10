@@ -34,6 +34,8 @@ public:
     int32_t SetCallWaiting(int32_t slotId, bool activate);
     int32_t GetCallRestriction(int32_t slotId, CallRestrictionType type);
     int32_t SetCallRestriction(int32_t slotId, CallRestrictionInfo &info);
+    int32_t SetCallRestrictionPassword(
+        int32_t slotId, CallRestrictionType fac, const char *oldPassword, const char *newPassword);
     int32_t GetCallTransferInfo(int32_t slotId, CallTransferType type);
     int32_t SetCallTransferInfo(int32_t slotId, CallTransferInfo &info);
     int32_t CanSetCallTransferTime(int32_t slotId, bool &result);

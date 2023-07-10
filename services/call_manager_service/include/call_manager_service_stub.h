@@ -68,6 +68,7 @@ private:
     int32_t OnSetCallWaiting(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetCallRestriction(MessageParcel &data, MessageParcel &reply);
     int32_t OnSetCallRestriction(MessageParcel &data, MessageParcel &reply);
+    int32_t OnSetCallRestrictionPassword(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetTransferNumber(MessageParcel &data, MessageParcel &reply);
     int32_t OnSetTransferNumber(MessageParcel &data, MessageParcel &reply);
     int32_t OnCanSetCallTransferTime(MessageParcel &data, MessageParcel &reply);

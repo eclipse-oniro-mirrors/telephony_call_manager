@@ -87,6 +87,22 @@ int32_t CallSettingManager::SetCallRestriction(int32_t slotId, CallRestrictionIn
     return cellularCallConnectionPtr_->SetCallRestriction(info, slotId);
 }
 
+int32_t CallSettingManager::SetCallRestrictionPassword(
+    int32_t slotId, CallRestrictionType fac, const char *oldPassword, const char *newPassword)
+{
+    TELEPHONY_LOGI("slotId = %{public}d, fac = %{public}d", slotId, fac);
+    int32_t ret = GetCallRestrictionPolicy(slotId, fac);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("Invalid data!");
+        return ret;
+    }
+    if (cellularCallConnectionPtr_ == nullptr) {
+        TELEPHONY_LOGE("cellularCallConnectionPtr_ is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return cellularCallConnectionPtr_->SetCallRestrictionPassword(slotId, fac, oldPassword, newPassword);
+}
+
 int32_t CallSettingManager::GetCallTransferInfo(int32_t slotId, CallTransferType type)
 {
     int32_t ret = GetCallTransferInfoPolicy(slotId, type);

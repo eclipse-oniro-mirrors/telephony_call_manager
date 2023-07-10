@@ -189,6 +189,18 @@ public:
     int32_t SetCallRestriction(int32_t slotId, CallRestrictionInfo &info);
 
     /**
+     * @brief Set the call restriction password function for the current account
+     *
+     * @param slotId[in], The slot id
+     * @param fac[in], Call restriction type
+     * @param oldPassword[in], Old password of call restriction type
+     * @param newPassword[in], New password of call restriction type
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t SetCallRestrictionPassword(
+        int32_t slotId, CallRestrictionType fac, const char *oldPassword, const char *newPassword);
+
+    /**
      * @brief Gets the call transfer information of the current account
      *
      * @param slotId[in], The slot id

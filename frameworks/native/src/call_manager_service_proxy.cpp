@@ -579,6 +579,38 @@ int32_t CallManagerServiceProxy::SetCallRestriction(int32_t slotId, CallRestrict
     return replyParcel.ReadInt32();
 }
 
+int32_t CallManagerServiceProxy::SetCallRestrictionPassword(
+    int32_t slotId, CallRestrictionType fac, const char *oldPassword, const char *newPassword)
+{
+    MessageOption option;
+    MessageParcel dataParcel;
+    MessageParcel replyParcel;
+    if (!dataParcel.WriteInterfaceToken(CallManagerServiceProxy::GetDescriptor())) {
+        TELEPHONY_LOGE("write descriptor fail");
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("function Remote() return nullptr!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    if (oldPassword == nullptr || newPassword == nullptr || oldPassword[0] == '\0' || newPassword[0] == '\0') {
+        TELEPHONY_LOGE("oldPassword or newPassword is empty");
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
+    }
+    dataParcel.WriteInt32(slotId);
+    dataParcel.WriteInt32(static_cast<int32_t>(fac));
+    dataParcel.WriteCString(oldPassword);
+    dataParcel.WriteCString(newPassword);
+    int32_t error = remote->SendRequest(
+        CallManagerSurfaceCode::INTERFACE_SET_CALL_RESTRICTION_PASSWORD, dataParcel, replyParcel, option);
+    if (error != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("Function SetCallRestrictionPassword! errCode:%{public}d", error);
+        return error;
+    }
+    return replyParcel.ReadInt32();
+}
+
 int32_t CallManagerServiceProxy::GetCallTransferInfo(int32_t slotId, CallTransferType type)
 {
     MessageOption option;

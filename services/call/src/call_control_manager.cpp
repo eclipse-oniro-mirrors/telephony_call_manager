@@ -514,6 +514,22 @@ int32_t CallControlManager::SetCallRestriction(int32_t slotId, CallRestrictionIn
     }
 }
 
+int32_t CallControlManager::SetCallRestrictionPassword(
+    int32_t slotId, CallRestrictionType fac, const char *oldPassword, const char *newPassword)
+{
+    int32_t ret = CallPolicy::SetCallRestrictionPolicy(slotId);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("policy check failed!");
+        return ret;
+    }
+    if (callSettingManagerPtr_ != nullptr) {
+        return callSettingManagerPtr_->SetCallRestrictionPassword(slotId, fac, oldPassword, newPassword);
+    } else {
+        TELEPHONY_LOGE("callSettingManagerPtr_ is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+}
+
 int32_t CallControlManager::GetCallTransferInfo(int32_t slotId, CallTransferType type)
 {
     int32_t ret = CallPolicy::GetCallTransferInfoPolicy(slotId);

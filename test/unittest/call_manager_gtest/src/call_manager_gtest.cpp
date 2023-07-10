@@ -2679,6 +2679,149 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallRestriction_0400, Functi
     }
 }
 
+/**************************************** Test SetCallRestrictionPassword() *****************************************/
+/**
+ * @tc.number   Telephony_CallManager_SetCallRestrictionPassword_0100
+ * @tc.name     input slotId 0, CallRestrictionType RESTRICTION_TYPE_ALL_CALLS,
+ *              old pasword, new password, test SetCallRestrictionPassword()
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallRestrictionPassword_0100, Function | MediumTest | Level3)
+{
+    AccessToken token;
+    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+    const char oldPassword[kMaxNumberLen + 1] = "1111";
+    const char newPassword[kMaxNumberLen + 1] = "2222";
+    CallRestrictionType fac = CallRestrictionType::RESTRICTION_TYPE_ALL_CALLS;
+
+    if (HasSimCard(SIM1_SLOTID)) {
+        EXPECT_EQ(CallManagerGtest::clientPtr_->SetCallRestrictionPassword(SIM1_SLOTID, fac, oldPassword, newPassword),
+            RETURN_VALUE_IS_ZERO);
+    }
+    if (HasSimCard(SIM2_SLOTID)) {
+        EXPECT_EQ(CallManagerGtest::clientPtr_->SetCallRestrictionPassword(SIM2_SLOTID, fac, oldPassword, newPassword),
+            RETURN_VALUE_IS_ZERO);
+    }
+}
+
+/**
+ * @tc.number   Telephony_CallManager_SetCallRestrictionPassword_0200
+ * @tc.name     input invalid slotId, CallRestrictionType RESTRICTION_TYPE_ALL_CALLS,
+ *              old pasword, new password, test SetCallRestrictionPassword() return failed
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallRestrictionPassword_0200, Function | MediumTest | Level3)
+{
+    AccessToken token;
+    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+    const char oldPassword[kMaxNumberLen + 1] = "1111";
+    const char newPassword[kMaxNumberLen + 1] = "2222";
+    CallRestrictionType fac = CallRestrictionType::RESTRICTION_TYPE_ALL_CALLS;
+
+    EXPECT_EQ(CallManagerGtest::clientPtr_->SetCallRestrictionPassword(INVALID_SLOT_ID, fac, oldPassword, newPassword),
+        CALL_ERR_INVALID_SLOT_ID);
+}
+
+/**
+ * @tc.number   Telephony_CallManager_SetCallRestrictionPassword_0300
+ * @tc.name     input slotId was out of count, CallRestrictionType RESTRICTION_TYPE_ALL_CALLS,
+ *              old pasword, new password, test SetCallRestrictionPassword() return failed
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallRestrictionPassword_0300, Function | MediumTest | Level3)
+{
+    AccessToken token;
+    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+    const char oldPassword[kMaxNumberLen + 1] = "1111";
+    const char newPassword[kMaxNumberLen + 1] = "2222";
+    CallRestrictionType fac = CallRestrictionType::RESTRICTION_TYPE_ALL_CALLS;
+
+    int32_t slotId = SIM_SLOT_COUNT; // out of the count
+    EXPECT_EQ(CallManagerGtest::clientPtr_->SetCallRestrictionPassword(slotId, fac, oldPassword, newPassword),
+        CALL_ERR_INVALID_SLOT_ID);
+}
+
+/**
+ * @tc.number   Telephony_CallManager_SetCallRestrictionPassword_0400
+ * @tc.name     input slotId 0, CallRestrictionType invalid, test SetCallRestrictionPassword() return failed
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallRestrictionPassword_0400, Function | MediumTest | Level3)
+{
+    AccessToken token;
+    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+    const char oldPassword[kMaxNumberLen + 1] = "1111";
+    const char newPassword[kMaxNumberLen + 1] = "2222";
+    CallRestrictionType fac = (CallRestrictionType)FALSE_DEFAULT;
+
+    if (HasSimCard(SIM1_SLOTID)) {
+        EXPECT_EQ(CallManagerGtest::clientPtr_->SetCallRestrictionPassword(SIM1_SLOTID, fac, oldPassword, newPassword),
+            CALL_ERR_INVALID_RESTRICTION_TYPE);
+    }
+    if (HasSimCard(SIM2_SLOTID)) {
+        EXPECT_EQ(CallManagerGtest::clientPtr_->SetCallRestrictionPassword(SIM2_SLOTID, fac, oldPassword, newPassword),
+            CALL_ERR_INVALID_RESTRICTION_TYPE);
+    }
+}
+
+/**
+ * @tc.number   Telephony_CallManager_SetCallRestrictionPassword_0500
+ * @tc.name     input slotId 0, CallRestrictionType RESTRICTION_TYPE_ALL_CALLS,
+ *              pasword invalid, test SetCallRestrictionPassword() return failed
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallRestrictionPassword_0500, Function | MediumTest | Level3)
+{
+    AccessToken token;
+    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+    const char oldPassword[kMaxNumberLen + 1] = { 0 };
+    const char newPassword[kMaxNumberLen + 1] = { 0 };
+    CallRestrictionType fac = CallRestrictionType::RESTRICTION_TYPE_ALL_CALLS;
+
+    if (HasSimCard(SIM1_SLOTID)) {
+        EXPECT_EQ(CallManagerGtest::clientPtr_->SetCallRestrictionPassword(SIM1_SLOTID, fac, oldPassword, newPassword),
+            TELEPHONY_ERR_ARGUMENT_INVALID);
+    }
+    if (HasSimCard(SIM2_SLOTID)) {
+        EXPECT_EQ(CallManagerGtest::clientPtr_->SetCallRestrictionPassword(SIM2_SLOTID, fac, oldPassword, newPassword),
+            TELEPHONY_ERR_ARGUMENT_INVALID);
+    }
+}
+
+/**
+ * @tc.number   Telephony_CallManager_SetCallRestrictionPassword_0600
+ * @tc.name     test SetCallRestrictionPassword() without permission
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallRestrictionPassword_0600, Function | MediumTest | Level3)
+{
+    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+    const char oldPassword[kMaxNumberLen + 1] = "1111";
+    const char newPassword[kMaxNumberLen + 1] = "2222";
+    CallRestrictionType fac = CallRestrictionType::RESTRICTION_TYPE_ALL_CALLS;
+
+    if (HasSimCard(SIM1_SLOTID)) {
+        EXPECT_EQ(CallManagerGtest::clientPtr_->SetCallRestrictionPassword(SIM1_SLOTID, fac, oldPassword, newPassword),
+            TELEPHONY_ERR_PERMISSION_ERR);
+    }
+    if (HasSimCard(SIM2_SLOTID)) {
+        EXPECT_EQ(CallManagerGtest::clientPtr_->SetCallRestrictionPassword(SIM2_SLOTID, fac, oldPassword, newPassword),
+            TELEPHONY_ERR_PERMISSION_ERR);
+    }
+}
+
 /******************************************* Test GetCallTransferInfo() ********************************************/
 /**
  * @tc.number   Telephony_CallManager_GetCallTransferInfo_0100
@@ -5158,6 +5301,9 @@ HWTEST_F(CallManagerGtest, Telephony_CallManagerService_001, Function | MediumTe
         TELEPHONY_SUCCESS);
     CallRestrictionInfo callRestrictionInfo;
     ASSERT_NE(callManagerService->SetCallRestriction(0, callRestrictionInfo), TELEPHONY_SUCCESS);
+    ASSERT_NE(
+        callManagerService->SetCallRestrictionPassword(0, CallRestrictionType::RESTRICTION_TYPE_ALL_CALLS, "11", "22"),
+        TELEPHONY_SUCCESS);
     ASSERT_NE(
         callManagerService->GetCallTransferInfo(0, CallTransferType::TRANSFER_TYPE_UNCONDITIONAL), TELEPHONY_SUCCESS);
     CallTransferInfo callTransferInfo;

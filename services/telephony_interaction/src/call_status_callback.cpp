@@ -214,6 +214,15 @@ int32_t CallStatusCallback::UpdateSetRestrictionResult(const int32_t result)
     return DelayedSingleton<CallAbilityReportProxy>::GetInstance()->ReportAsyncResults(reportId, resultInfo);
 }
 
+int32_t CallStatusCallback::UpdateSetRestrictionPasswordResult(const int32_t result)
+{
+    TELEPHONY_LOGI("SetRestrictionPassword result = %{public}d", result);
+    CallResultReportId reportId = CallResultReportId::SET_CALL_RESTRICTION_PWD_REPORT_ID;
+    AppExecFwk::PacMap resultInfo;
+    resultInfo.PutIntValue("result", result);
+    return DelayedSingleton<CallAbilityReportProxy>::GetInstance()->ReportAsyncResults(reportId, resultInfo);
+}
+
 int32_t CallStatusCallback::UpdateGetTransferResult(const CallTransferResponse &response)
 {
     CallResultReportId reportId = CallResultReportId::GET_CALL_TRANSFER_REPORT_ID;

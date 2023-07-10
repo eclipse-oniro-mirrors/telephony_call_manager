@@ -91,6 +91,7 @@ enum CallManagerSurfaceCode {
     INTERFACE_CANCEL_MISSED_INCOMING_CALL_NOTIFICATION,
     INTERFACE_SET_VONR_STATE,
     INTERFACE_GET_VONR_STATE,
+    INTERFACE_SET_CALL_RESTRICTION_PASSWORD,
 };
 
 enum CallManagerProxyType {
@@ -124,6 +125,8 @@ public:
     virtual int32_t SetCallWaiting(int32_t slotId, bool activate) = 0;
     virtual int32_t GetCallRestriction(int32_t slotId, CallRestrictionType type) = 0;
     virtual int32_t SetCallRestriction(int32_t slotId, CallRestrictionInfo &info) = 0;
+    virtual int32_t SetCallRestrictionPassword(
+        int32_t slotId, CallRestrictionType fac, const char *oldPassword, const char *newPassword) = 0;
     virtual int32_t GetCallTransferInfo(int32_t slotId, CallTransferType type) = 0;
     virtual int32_t SetCallTransferInfo(int32_t slotId, CallTransferInfo &info) = 0;
     virtual int32_t CanSetCallTransferTime(int32_t slotId, bool &result) = 0;

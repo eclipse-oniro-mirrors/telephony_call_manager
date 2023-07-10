@@ -97,6 +97,7 @@ napi_value NapiCallManager::DeclareCallSupplementInterface(napi_env env, napi_va
         DECLARE_NAPI_FUNCTION("setCallWaiting", SetCallWaiting),
         DECLARE_NAPI_FUNCTION("getCallRestrictionStatus", GetCallRestriction),
         DECLARE_NAPI_FUNCTION("setCallRestriction", SetCallRestriction),
+        DECLARE_NAPI_FUNCTION("setCallRestrictionPassword", SetCallRestrictionPassword),
         DECLARE_NAPI_FUNCTION("getCallTransferInfo", GetCallTransferInfo),
         DECLARE_NAPI_FUNCTION("setCallTransfer", SetCallTransferInfo),
         DECLARE_NAPI_FUNCTION("enableImsSwitch", EnableImsSwitch),
@@ -1615,6 +1616,20 @@ bool NapiCallManager::MatchNumberAndObjectParameters(
     }
 }
 
+bool NapiCallManager::MatchCallRestrictionPasswordParameter(
+    napi_env env, const napi_value parameters[], const size_t parameterCount)
+{
+    TELEPHONY_LOGI("Match parmameter count %{public}zu", parameterCount);
+    switch (parameterCount) {
+        case THREE_VALUE_MAXIMUM_LIMIT:
+            return NapiUtil::MatchParameters(env, parameters, { napi_number, napi_string, napi_string });
+        case FOUR_VALUE_MAXIMUM_LIMIT:
+            return NapiUtil::MatchParameters(env, parameters, { napi_number, napi_string, napi_string, napi_function });
+        default:
+            return false;
+    }
+}
+
 napi_value NapiCallManager::GetCallWaiting(napi_env env, napi_callback_info info)
 {
     GET_PARAMS(env, info, TWO_VALUE_LIMIT);
@@ -1712,6 +1727,35 @@ napi_value NapiCallManager::SetCallRestriction(napi_env env, napi_callback_info 
     asyncContext->env = env;
     napi_create_reference(env, thisVar, DATA_LENGTH_ONE, &(asyncContext->thisVar));
     return HandleAsyncWork(env, asyncContext.release(), "SetCallRestriction", NativeSetCallRestriction, NativeCallBack);
+}
+
+napi_value NapiCallManager::SetCallRestrictionPassword(napi_env env, napi_callback_info info)
+{
+    GET_PARAMS(env, info, FOUR_VALUE_MAXIMUM_LIMIT);
+    if (!MatchCallRestrictionPasswordParameter(env, argv, argc)) {
+        TELEPHONY_LOGE("MatchCallRestrictionPasswordParameter failed.");
+        NapiUtil::ThrowParameterError(env);
+        return nullptr;
+    }
+    auto asyncContext = std::make_unique<CallBarringPasswordAsyncContext>();
+    if (asyncContext == nullptr) {
+        TELEPHONY_LOGE("CallBarringPasswordAsyncContext is nullptr.");
+        NapiUtil::ThrowParameterError(env);
+        return nullptr;
+    }
+    napi_get_value_int32(env, argv[ARRAY_INDEX_FIRST], &asyncContext->slotId);
+    size_t strLen = 0;
+    napi_get_value_string_utf8(
+        env, argv[ARRAY_INDEX_SECOND], asyncContext->oldPassword, PHONE_NUMBER_MAXIMUM_LIMIT, &strLen);
+    napi_get_value_string_utf8(
+        env, argv[ARRAY_INDEX_THIRD], asyncContext->newPassword, PHONE_NUMBER_MAXIMUM_LIMIT, &strLen);
+    if (argc == FOUR_VALUE_MAXIMUM_LIMIT) {
+        napi_create_reference(env, argv[ARRAY_INDEX_FOURTH], DATA_LENGTH_ONE, &(asyncContext->callbackRef));
+    }
+    asyncContext->env = env;
+    napi_create_reference(env, thisVar, DATA_LENGTH_ONE, &(asyncContext->thisVar));
+    return HandleAsyncWork(
+        env, asyncContext.release(), "SetCallRestrictionPassword", NativeSetCallRestrictionPassword, NativeCallBack);
 }
 
 napi_value NapiCallManager::GetCallTransferInfo(napi_env env, napi_callback_info info)
@@ -3822,6 +3866,46 @@ void NapiCallManager::NativeSetCallRestriction(napi_env env, void *data)
     asyncContext->resolved = TELEPHONY_SUCCESS;
     asyncContext->callbackRef = nullptr;
     asyncContext->deferred = nullptr;
+}
+
+void NapiCallManager::NativeSetCallRestrictionPassword(napi_env env, void *data)
+{
+    if (data == nullptr) {
+        TELEPHONY_LOGE("data is nullptr");
+        NapiUtil::ThrowParameterError(env);
+        return;
+    }
+    auto asyncContext = (CallBarringPasswordAsyncContext *)data;
+    if (!IsValidSlotId(asyncContext->slotId)) {
+        TELEPHONY_LOGE("slotId is invalid");
+        asyncContext->errorCode = SLOT_ID_INVALID;
+        return;
+    }
+    EventCallback infoListener;
+    infoListener.env = asyncContext->env;
+    infoListener.thisVar = asyncContext->thisVar;
+    infoListener.callbackRef = asyncContext->callbackRef;
+    infoListener.deferred = asyncContext->deferred;
+    asyncContext->errorCode =
+        DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->RegisterSetRestrictionPasswordCallback(infoListener);
+    if (asyncContext->errorCode != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("RegisterSetRestrictionPasswordCallback failed!");
+        return;
+    }
+    asyncContext->errorCode =
+        DelayedSingleton<CallManagerClient>::GetInstance()->SetCallRestrictionPassword(asyncContext->slotId,
+        CallRestrictionType::RESTRICTION_TYPE_ALL_CALLS, asyncContext->oldPassword, asyncContext->newPassword);
+    if (asyncContext->errorCode != TELEPHONY_SUCCESS) {
+        asyncContext->eventId = CALL_MANAGER_SET_CALL_RESTRICTION_PASSWORD;
+        DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->UnRegisterSetRestrictionPasswordCallback();
+        TELEPHONY_LOGE("SetCallRestrictionPassword failed!");
+        return;
+    }
+    asyncContext->resolved = TELEPHONY_SUCCESS;
+    asyncContext->callbackRef = nullptr;
+    asyncContext->deferred = nullptr;
+    (void)memset_s(asyncContext->oldPassword, sizeof(asyncContext->oldPassword), 0, sizeof(asyncContext->oldPassword));
+    (void)memset_s(asyncContext->newPassword, sizeof(asyncContext->newPassword), 0, sizeof(asyncContext->newPassword));
 }
 
 void NapiCallManager::NativeGetTransferNumber(napi_env env, void *data)

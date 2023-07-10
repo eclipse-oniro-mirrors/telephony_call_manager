@@ -105,6 +105,14 @@ public:
     int32_t UpdateSetRestrictionResult(const int32_t result) override;
 
     /**
+     * @brief update the response of Set Restriction Password
+     *
+     * @param result[in], 0 means the result is success, others is failure
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t UpdateSetRestrictionPasswordResult(const int32_t result) override;
+
+    /**
      * @brief update the response of Get Transfer
      *
      * @param callTransferResponse[in], contains result, status, calssx, reason, number, time .etc

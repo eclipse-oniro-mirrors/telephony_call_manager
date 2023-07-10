@@ -555,6 +555,30 @@ void SetCallRestriction()
     std::cout << "return value:" << ret << std::endl;
 }
 
+void SetCallRestrictionPassword()
+{
+    AccessToken token;
+    int32_t slotId = SIM1_SLOTID;
+    char oldPassword[kMaxNumberLen + 1] = { 0 };
+    char newPassword[kMaxNumberLen + 1] = { 0 };
+    CallRestrictionType fac = CallRestrictionType::RESTRICTION_TYPE_ALL_CALLS;
+    std::cout << "------SetCallRestrictionPassword------" << std::endl;
+    std::cout << "please input slotId:" << std::endl;
+    std::cin >> slotId;
+    std::cout << "please input old password:" << std::endl;
+    std::cin >> oldPassword;
+    std::cout << "please input new password:" << std::endl;
+    std::cin >> newPassword;
+    if (g_clientPtr == nullptr) {
+        std::cout << "g_clientPtr is nullptr" << std::endl;
+        return;
+    }
+    int32_t ret = g_clientPtr->SetCallRestrictionPassword(slotId, fac, oldPassword, newPassword);
+    std::cout << "return value:" << ret << std::endl;
+    (void)memset_s(oldPassword, sizeof(oldPassword), 0, sizeof(oldPassword));
+    (void)memset_s(newPassword, sizeof(newPassword), 0, sizeof(newPassword));
+}
+
 void SetCallPreferenceMode()
 {
     AccessToken token;
@@ -1406,6 +1430,8 @@ void InitCallSupplementPower()
     g_memberFuncMap[OHOS::Telephony::INTERFACE_SET_CALL_WAITING] = &OHOS::Telephony::SetCallWaiting;
     g_memberFuncMap[OHOS::Telephony::INTERFACE_GET_CALL_RESTRICTION] = &OHOS::Telephony::GetCallRestriction;
     g_memberFuncMap[OHOS::Telephony::INTERFACE_SET_CALL_RESTRICTION] = &OHOS::Telephony::SetCallRestriction;
+    g_memberFuncMap[OHOS::Telephony::INTERFACE_SET_CALL_RESTRICTION_PASSWORD] =
+        &OHOS::Telephony::SetCallRestrictionPassword;
     g_memberFuncMap[OHOS::Telephony::INTERFACE_GET_CALL_TRANSFER] = &OHOS::Telephony::GetCallTransferInfo;
     g_memberFuncMap[OHOS::Telephony::INTERFACE_SET_CALL_TRANSFER] = &OHOS::Telephony::SetCallTransferInfo;
     g_memberFuncMap[OHOS::Telephony::INTERFACE_CAN_SET_CALL_TRANSFER_TIME] = &OHOS::Telephony::CanSetCallTransferTime;
@@ -1528,7 +1554,8 @@ void PrintfCallSupplementInterface()
               << "24:setCallRestriction\n"
               << "25:getCallTransferInfo\n"
               << "26:setCallTransferInfo\n"
-              << "27:CanSetCallTransferTime\n";
+              << "27:CanSetCallTransferTime\n"
+              << "61:setCallRestrictionPassword\n";
 }
 
 void PrintfCallConferenceExInterface()
