@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -23,6 +23,7 @@
 #include "iremote_proxy.h"
 #include "pac_map.h"
 
+#include "bluetooth_call_ipc_interface_code.h"
 #include "call_manager_inner_type.h"
 #include "i_bluetooth_call.h"
 #include "telephony_log_wrapper.h"

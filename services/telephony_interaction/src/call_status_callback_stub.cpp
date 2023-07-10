@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -26,34 +26,38 @@ const int32_t MAX_LEN = 100000;
 const int32_t MAX_CALLS_NUM = 5;
 CallStatusCallbackStub::CallStatusCallbackStub()
 {
-    memberFuncMap_[UPDATE_CALL_INFO] = &CallStatusCallbackStub::OnUpdateCallReportInfo;
-    memberFuncMap_[UPDATE_CALLS_INFO] = &CallStatusCallbackStub::OnUpdateCallsReportInfo;
-    memberFuncMap_[UPDATE_DISCONNECTED_CAUSE] = &CallStatusCallbackStub::OnUpdateDisconnectedCause;
-    memberFuncMap_[UPDATE_EVENT_RESULT_INFO] = &CallStatusCallbackStub::OnUpdateEventReport;
-    memberFuncMap_[UPDATE_RBT_PLAY_INFO] = &CallStatusCallbackStub::OnUpdateRBTPlayInfo;
-    memberFuncMap_[START_DTMF] = &CallStatusCallbackStub::OnStartDtmfResult;
-    memberFuncMap_[STOP_DTMF] = &CallStatusCallbackStub::OnStopDtmfResult;
-    memberFuncMap_[SEND_USSD] = &CallStatusCallbackStub::OnSendUssdResult;
-    memberFuncMap_[GET_IMS_CALL_DATA] = &CallStatusCallbackStub::OnGetImsCallDataResult;
-    memberFuncMap_[UPDATE_GET_WAITING] = &CallStatusCallbackStub::OnUpdateGetWaitingResult;
-    memberFuncMap_[UPDATE_SET_WAITING] = &CallStatusCallbackStub::OnUpdateSetWaitingResult;
-    memberFuncMap_[UPDATE_GET_RESTRICTION] = &CallStatusCallbackStub::OnUpdateGetRestrictionResult;
-    memberFuncMap_[UPDATE_SET_RESTRICTION] = &CallStatusCallbackStub::OnUpdateSetRestrictionResult;
-    memberFuncMap_[UPDATE_GET_TRANSFER] = &CallStatusCallbackStub::OnUpdateGetTransferResult;
-    memberFuncMap_[UPDATE_SET_TRANSFER] = &CallStatusCallbackStub::OnUpdateSetTransferResult;
-    memberFuncMap_[UPDATE_GET_CALL_CLIP] = &CallStatusCallbackStub::OnUpdateGetCallClipResult;
-    memberFuncMap_[UPDATE_GET_CALL_CLIR] = &CallStatusCallbackStub::OnUpdateGetCallClirResult;
-    memberFuncMap_[UPDATE_SET_CALL_CLIR] = &CallStatusCallbackStub::OnUpdateSetCallClirResult;
-    memberFuncMap_[GET_IMS_CONFIG] = &CallStatusCallbackStub::OnGetImsConfigResult;
-    memberFuncMap_[SET_IMS_CONFIG] = &CallStatusCallbackStub::OnSetImsConfigResult;
-    memberFuncMap_[GET_IMS_FEATURE_VALUE] = &CallStatusCallbackStub::OnGetImsFeatureValueResult;
-    memberFuncMap_[SET_IMS_FEATURE_VALUE] = &CallStatusCallbackStub::OnSetImsFeatureValueResult;
-    memberFuncMap_[RECEIVE_UPDATE_MEDIA_MODE_RESPONSE] = &CallStatusCallbackStub::OnReceiveUpdateMediaModeResponse;
-    memberFuncMap_[UPDATE_STARTRTT_STATUS] = &CallStatusCallbackStub::OnStartRttResult;
-    memberFuncMap_[UPDATE_STOPRTT_STATUS] = &CallStatusCallbackStub::OnStopRttResult;
-    memberFuncMap_[INVITE_TO_CONFERENCE] = &CallStatusCallbackStub::OnInviteToConferenceResult;
-    memberFuncMap_[MMI_CODE_INFO_RESPONSE] = &CallStatusCallbackStub::OnSendMmiCodeResult;
-    memberFuncMap_[CLOSE_UNFINISHED_USSD] = &CallStatusCallbackStub::OnCloseUnFinishedUssdResult;
+    memberFuncMap_[static_cast<uint32_t>(UPDATE_CALL_INFO)] = &CallStatusCallbackStub::OnUpdateCallReportInfo;
+    memberFuncMap_[static_cast<uint32_t>(UPDATE_CALLS_INFO)] = &CallStatusCallbackStub::OnUpdateCallsReportInfo;
+    memberFuncMap_[static_cast<uint32_t>(UPDATE_DISCONNECTED_CAUSE)] =
+        &CallStatusCallbackStub::OnUpdateDisconnectedCause;
+    memberFuncMap_[static_cast<uint32_t>(UPDATE_EVENT_RESULT_INFO)] = &CallStatusCallbackStub::OnUpdateEventReport;
+    memberFuncMap_[static_cast<uint32_t>(UPDATE_RBT_PLAY_INFO)] = &CallStatusCallbackStub::OnUpdateRBTPlayInfo;
+    memberFuncMap_[static_cast<uint32_t>(START_DTMF)] = &CallStatusCallbackStub::OnStartDtmfResult;
+    memberFuncMap_[static_cast<uint32_t>(STOP_DTMF)] = &CallStatusCallbackStub::OnStopDtmfResult;
+    memberFuncMap_[static_cast<uint32_t>(SEND_USSD)] = &CallStatusCallbackStub::OnSendUssdResult;
+    memberFuncMap_[static_cast<uint32_t>(GET_IMS_CALL_DATA)] = &CallStatusCallbackStub::OnGetImsCallDataResult;
+    memberFuncMap_[static_cast<uint32_t>(UPDATE_GET_WAITING)] = &CallStatusCallbackStub::OnUpdateGetWaitingResult;
+    memberFuncMap_[static_cast<uint32_t>(UPDATE_SET_WAITING)] = &CallStatusCallbackStub::OnUpdateSetWaitingResult;
+    memberFuncMap_[static_cast<uint32_t>(UPDATE_GET_RESTRICTION)] =
+        &CallStatusCallbackStub::OnUpdateGetRestrictionResult;
+    memberFuncMap_[static_cast<uint32_t>(UPDATE_SET_RESTRICTION)] =
+        &CallStatusCallbackStub::OnUpdateSetRestrictionResult;
+    memberFuncMap_[static_cast<uint32_t>(UPDATE_GET_TRANSFER)] = &CallStatusCallbackStub::OnUpdateGetTransferResult;
+    memberFuncMap_[static_cast<uint32_t>(UPDATE_SET_TRANSFER)] = &CallStatusCallbackStub::OnUpdateSetTransferResult;
+    memberFuncMap_[static_cast<uint32_t>(UPDATE_GET_CALL_CLIP)] = &CallStatusCallbackStub::OnUpdateGetCallClipResult;
+    memberFuncMap_[static_cast<uint32_t>(UPDATE_GET_CALL_CLIR)] = &CallStatusCallbackStub::OnUpdateGetCallClirResult;
+    memberFuncMap_[static_cast<uint32_t>(UPDATE_SET_CALL_CLIR)] = &CallStatusCallbackStub::OnUpdateSetCallClirResult;
+    memberFuncMap_[static_cast<uint32_t>(GET_IMS_CONFIG)] = &CallStatusCallbackStub::OnGetImsConfigResult;
+    memberFuncMap_[static_cast<uint32_t>(SET_IMS_CONFIG)] = &CallStatusCallbackStub::OnSetImsConfigResult;
+    memberFuncMap_[static_cast<uint32_t>(GET_IMS_FEATURE_VALUE)] = &CallStatusCallbackStub::OnGetImsFeatureValueResult;
+    memberFuncMap_[static_cast<uint32_t>(SET_IMS_FEATURE_VALUE)] = &CallStatusCallbackStub::OnSetImsFeatureValueResult;
+    memberFuncMap_[static_cast<uint32_t>(RECEIVE_UPDATE_MEDIA_MODE_RESPONSE)] =
+        &CallStatusCallbackStub::OnReceiveUpdateMediaModeResponse;
+    memberFuncMap_[static_cast<uint32_t>(UPDATE_STARTRTT_STATUS)] = &CallStatusCallbackStub::OnStartRttResult;
+    memberFuncMap_[static_cast<uint32_t>(UPDATE_STOPRTT_STATUS)] = &CallStatusCallbackStub::OnStopRttResult;
+    memberFuncMap_[static_cast<uint32_t>(INVITE_TO_CONFERENCE)] = &CallStatusCallbackStub::OnInviteToConferenceResult;
+    memberFuncMap_[static_cast<uint32_t>(MMI_CODE_INFO_RESPONSE)] = &CallStatusCallbackStub::OnSendMmiCodeResult;
+    memberFuncMap_[static_cast<uint32_t>(CLOSE_UNFINISHED_USSD)] = &CallStatusCallbackStub::OnCloseUnFinishedUssdResult;
 }
 
 CallStatusCallbackStub::~CallStatusCallbackStub()
