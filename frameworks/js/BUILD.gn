@@ -12,7 +12,7 @@
 # limitations under the License.
 
 import("//build/ohos.gni")
-
+SUBSYSTEM_DIR = "../../.."
 config("call_manager_js_config") {
   include_dirs = [ "napi/include" ]
 }
@@ -27,14 +27,16 @@ ohos_shared_library("call") {
 
   public_configs = [ ":call_manager_js_config" ]
 
-  deps = [ "//third_party/libuv:uv" ]
+  deps = [
+    "$SUBSYSTEM_DIR/call_manager/frameworks/native:tel_call_manager_api",
+    "//third_party/libuv:uv",
+  ]
 
   external_deps = [
     "ability_base:base",
     "ability_base:want",
     "ability_runtime:ability_manager",
     "c_utils:utils",
-    "call_manager:tel_call_manager_api",
     "core_service:libtel_common",
     "core_service:tel_core_service_api",
     "hilog:libhilog",
