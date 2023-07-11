@@ -26,6 +26,7 @@
 #include "pac_map.h"
 
 #include "call_manager_inner_type.h"
+#include "call_manager_service_ipc_interface_code.h"
 #include "i_call_manager_service.h"
 #include "telephony_log_wrapper.h"
 

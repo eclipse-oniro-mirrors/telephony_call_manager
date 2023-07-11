@@ -42,7 +42,7 @@ int32_t CallAbilityCallbackProxy::OnCallDetailsChange(const CallAttributeInfo &i
         TELEPHONY_LOGE("function Remote() return nullptr!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int32_t error = Remote()->SendRequest(UPDATE_CALL_STATE_INFO, dataParcel, replyParcel, option);
+    int32_t error = Remote()->SendRequest(static_cast<uint32_t>(CallManagerCallAbilityInterfaceCode::UPDATE_CALL_STATE_INFO), dataParcel, replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("update call state info failed, error: %{public}d", error);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
@@ -66,7 +66,7 @@ int32_t CallAbilityCallbackProxy::OnCallEventChange(const CallEventInfo &info)
         TELEPHONY_LOGE("function Remote() return nullptr!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int32_t error = Remote()->SendRequest(UPDATE_CALL_EVENT, dataParcel, replyParcel, option);
+    int32_t error = Remote()->SendRequest(static_cast<uint32_t>(CallManagerCallAbilityInterfaceCode::UPDATE_CALL_EVENT), dataParcel, replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("update call event failed, error: %{public}d", error);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
@@ -95,7 +95,7 @@ int32_t CallAbilityCallbackProxy::OnCallDisconnectedCause(const DisconnectedDeta
         TELEPHONY_LOGE("function Remote() return nullptr!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int32_t error = Remote()->SendRequest(UPDATE_CALL_DISCONNECTED_CAUSE, dataParcel, replyParcel, option);
+    int32_t error = Remote()->SendRequest(static_cast<uint32_t>(CallManagerCallAbilityInterfaceCode::UPDATE_CALL_DISCONNECTED_CAUSE), dataParcel, replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("report call disconnected cause failed, error: %{public}d", error);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
@@ -117,7 +117,7 @@ int32_t CallAbilityCallbackProxy::OnReportAsyncResults(CallResultReportId report
         TELEPHONY_LOGE("function Remote() return nullptr!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int32_t error = Remote()->SendRequest(UPDATE_CALL_ASYNC_RESULT_REQUEST, dataParcel, replyParcel, option);
+    int32_t error = Remote()->SendRequest(static_cast<uint32_t>(CallManagerCallAbilityInterfaceCode::UPDATE_CALL_ASYNC_RESULT_REQUEST), dataParcel, replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("report async results failed, error: %{public}d", error);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
@@ -141,7 +141,7 @@ int32_t CallAbilityCallbackProxy::OnReportMmiCodeResult(const MmiCodeInfo &info)
         TELEPHONY_LOGE("function Remote() return nullptr!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int32_t error = Remote()->SendRequest(UPDATE_MMI_CODE_RESULT_REQUEST, dataParcel, replyParcel, option);
+    int32_t error = Remote()->SendRequest(static_cast<uint32_t>(CallManagerCallAbilityInterfaceCode::UPDATE_MMI_CODE_RESULT_REQUEST), dataParcel, replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("report async results failed, error: %{public}d", error);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
@@ -218,7 +218,7 @@ int32_t CallAbilityCallbackProxy::OnOttCallRequest(OttCallRequestId requestId, A
         TELEPHONY_LOGE("function Remote() return nullptr!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int32_t error = Remote()->SendRequest(REPORT_OTT_CALL_REQUEST, dataParcel, replyParcel, option);
+    int32_t error = Remote()->SendRequest(static_cast<uint32_t>(CallManagerCallAbilityInterfaceCode::REPORT_OTT_CALL_REQUEST), dataParcel, replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("report ott call request failed, error: %{public}d", error);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
@@ -248,7 +248,7 @@ int32_t CallAbilityCallbackProxy::OnReportAudioDeviceChange(const AudioDeviceInf
         TELEPHONY_LOGE("function Remote() return nullptr!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int32_t error = Remote()->SendRequest(UPDATE_AUDIO_DEVICE_CHANGE_RESULT_REQUEST, dataParcel, replyParcel, option);
+    int32_t error = Remote()->SendRequest(static_cast<uint32_t>(CallManagerCallAbilityInterfaceCode::UPDATE_AUDIO_DEVICE_CHANGE_RESULT_REQUEST), dataParcel, replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("report audio device info failed, error: %{public}d", error);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;

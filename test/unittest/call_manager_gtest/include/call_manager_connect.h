@@ -242,9 +242,9 @@ class CallAbilityCallbackStub : public IRemoteStub<ICallAbilityCallback> {
 public:
     CallAbilityCallbackStub()
     {
-        memberFuncMap_[UPDATE_CALL_STATE_INFO] = &CallAbilityCallbackStub::OnUpdateCallStateInfoRequest;
-        memberFuncMap_[UPDATE_CALL_EVENT] = &CallAbilityCallbackStub::OnUpdateCallEventRequest;
-        memberFuncMap_[UPDATE_CALL_ASYNC_RESULT_REQUEST] = &CallAbilityCallbackStub::OnUpdateAsyncResultRequest;
+        memberFuncMap_[static_cast<uint32_t>(CallManagerCallAbilityInterfaceCode::UPDATE_CALL_STATE_INFO)] = &CallAbilityCallbackStub::OnUpdateCallStateInfoRequest;
+        memberFuncMap_[static_cast<uint32_t>(CallManagerCallAbilityInterfaceCode::UPDATE_CALL_EVENT)] = &CallAbilityCallbackStub::OnUpdateCallEventRequest;
+        memberFuncMap_[static_cast<uint32_t>(CallManagerCallAbilityInterfaceCode::UPDATE_CALL_ASYNC_RESULT_REQUEST)] = &CallAbilityCallbackStub::OnUpdateAsyncResultRequest;
     }
 
     ~CallAbilityCallbackStub()

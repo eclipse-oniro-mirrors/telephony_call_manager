@@ -50,101 +50,101 @@ CallManagerServiceStub::~CallManagerServiceStub()
 
 void CallManagerServiceStub::InitCallBasicRequest()
 {
-    memberFuncMap_[INTERFACE_REGISTER_CALLBACK] = &CallManagerServiceStub::OnRegisterCallBack;
-    memberFuncMap_[INTERFACE_UNREGISTER_CALLBACK] = &CallManagerServiceStub::OnUnRegisterCallBack;
-    memberFuncMap_[INTERFACE_DIAL_CALL] = &CallManagerServiceStub::OnDialCall;
-    memberFuncMap_[INTERFACE_ANSWER_CALL] = &CallManagerServiceStub::OnAcceptCall;
-    memberFuncMap_[INTERFACE_REJECT_CALL] = &CallManagerServiceStub::OnRejectCall;
-    memberFuncMap_[INTERFACE_HOLD_CALL] = &CallManagerServiceStub::OnHoldCall;
-    memberFuncMap_[INTERFACE_UNHOLD_CALL] = &CallManagerServiceStub::OnUnHoldCall;
-    memberFuncMap_[INTERFACE_DISCONNECT_CALL] = &CallManagerServiceStub::OnHangUpCall;
-    memberFuncMap_[INTERFACE_GET_CALL_STATE] = &CallManagerServiceStub::OnGetCallState;
-    memberFuncMap_[INTERFACE_SWAP_CALL] = &CallManagerServiceStub::OnSwitchCall;
-    memberFuncMap_[INTERFACE_INPUT_DIALER_SPECIAL_CODE] = &CallManagerServiceStub::OnInputDialerSpecialCode;
+    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_REGISTER_CALLBACK)] = &CallManagerServiceStub::OnRegisterCallBack;
+    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_UNREGISTER_CALLBACK)] = &CallManagerServiceStub::OnUnRegisterCallBack;
+    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_DIAL_CALL)] = &CallManagerServiceStub::OnDialCall;
+    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_ANSWER_CALL)] = &CallManagerServiceStub::OnAcceptCall;
+    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_REJECT_CALL)] = &CallManagerServiceStub::OnRejectCall;
+    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_HOLD_CALL)] = &CallManagerServiceStub::OnHoldCall;
+    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_UNHOLD_CALL)] = &CallManagerServiceStub::OnUnHoldCall;
+    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_DISCONNECT_CALL)] = &CallManagerServiceStub::OnHangUpCall;
+    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_GET_CALL_STATE)] = &CallManagerServiceStub::OnGetCallState;
+    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_SWAP_CALL)] = &CallManagerServiceStub::OnSwitchCall;
+    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_INPUT_DIALER_SPECIAL_CODE)] = &CallManagerServiceStub::OnInputDialerSpecialCode;
 }
 
 void CallManagerServiceStub::InitCallUtilsRequest()
 {
-    memberFuncMap_[INTERFACE_HAS_CALL] = &CallManagerServiceStub::OnHasCall;
-    memberFuncMap_[INTERFACE_IS_NEW_CALL_ALLOWED] = &CallManagerServiceStub::OnIsNewCallAllowed;
-    memberFuncMap_[INTERFACE_IS_RINGING] = &CallManagerServiceStub::OnIsRinging;
-    memberFuncMap_[INTERFACE_IS_EMERGENCY_CALL] = &CallManagerServiceStub::OnIsInEmergencyCall;
-    memberFuncMap_[INTERFACE_IS_EMERGENCY_NUMBER] = &CallManagerServiceStub::OnIsEmergencyPhoneNumber;
-    memberFuncMap_[INTERFACE_IS_FORMAT_NUMBER] = &CallManagerServiceStub::OnFormatPhoneNumber;
-    memberFuncMap_[INTERFACE_IS_FORMAT_NUMBER_E164] = &CallManagerServiceStub::OnFormatPhoneNumberToE164;
-    memberFuncMap_[INTERFACE_REMOVE_MISSED_INCOMING_CALL_NOTIFICATION] =
-        &CallManagerServiceStub::OnRemoveMissedIncomingCallNotification;
+    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_HAS_CALL)] = &CallManagerServiceStub::OnHasCall;
+    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_IS_NEW_CALL_ALLOWED)] = &CallManagerServiceStub::OnIsNewCallAllowed;
+    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_IS_RINGING)] = &CallManagerServiceStub::OnIsRinging;
+    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_IS_EMERGENCY_CALL)] = &CallManagerServiceStub::OnIsInEmergencyCall;
+    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_IS_EMERGENCY_NUMBER)] = &CallManagerServiceStub::OnIsEmergencyPhoneNumber;
+    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_IS_FORMAT_NUMBER)] = &CallManagerServiceStub::OnFormatPhoneNumber;
+    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_IS_FORMAT_NUMBER_E164)] = &CallManagerServiceStub::OnFormatPhoneNumberToE164;
+    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_CANCEL_MISSED_INCOMING_CALL_NOTIFICATION)] =
+        &CallManagerServiceStub::OnCancelMissedIncomingCallNotification;
 }
 
 void CallManagerServiceStub::InitCallConferenceRequest()
 {
-    memberFuncMap_[INTERFACE_COMBINE_CONFERENCE] = &CallManagerServiceStub::OnCombineConference;
-    memberFuncMap_[INTERFACE_SEPARATE_CONFERENCE] = &CallManagerServiceStub::OnSeparateConference;
-    memberFuncMap_[INTERFACE_JOIN_CONFERENCE] = &CallManagerServiceStub::OnJoinConference;
+    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_COMBINE_CONFERENCE)] = &CallManagerServiceStub::OnCombineConference;
+    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_SEPARATE_CONFERENCE)] = &CallManagerServiceStub::OnSeparateConference;
+    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_JOIN_CONFERENCE)] = &CallManagerServiceStub::OnJoinConference;
 }
 
 void CallManagerServiceStub::InitCallDtmfRequest()
 {
-    memberFuncMap_[INTERFACE_START_DTMF] = &CallManagerServiceStub::OnStartDtmf;
-    memberFuncMap_[INTERFACE_STOP_DTMF] = &CallManagerServiceStub::OnStopDtmf;
+    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_START_DTMF)] = &CallManagerServiceStub::OnStartDtmf;
+    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_STOP_DTMF)] = &CallManagerServiceStub::OnStopDtmf;
 }
 
 void CallManagerServiceStub::InitCallSupplementRequest()
 {
-    memberFuncMap_[INTERFACE_GET_CALL_WAITING] = &CallManagerServiceStub::OnGetCallWaiting;
-    memberFuncMap_[INTERFACE_SET_CALL_WAITING] = &CallManagerServiceStub::OnSetCallWaiting;
-    memberFuncMap_[INTERFACE_GET_CALL_RESTRICTION] = &CallManagerServiceStub::OnGetCallRestriction;
-    memberFuncMap_[INTERFACE_SET_CALL_RESTRICTION] = &CallManagerServiceStub::OnSetCallRestriction;
-    memberFuncMap_[INTERFACE_SET_CALL_RESTRICTION_PASSWORD] = &CallManagerServiceStub::OnSetCallRestrictionPassword;
-    memberFuncMap_[INTERFACE_GET_CALL_TRANSFER] = &CallManagerServiceStub::OnGetTransferNumber;
-    memberFuncMap_[INTERFACE_SET_CALL_TRANSFER] = &CallManagerServiceStub::OnSetTransferNumber;
-    memberFuncMap_[INTERFACE_CAN_SET_CALL_TRANSFER_TIME] = &CallManagerServiceStub::OnCanSetCallTransferTime;
-    memberFuncMap_[INTERFACE_CLOSE_UNFINISHED_USSD] = &CallManagerServiceStub::OnCloseUnFinishedUssd;
+    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_GET_CALL_WAITING)] = &CallManagerServiceStub::OnGetCallWaiting;
+    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_SET_CALL_WAITING)] = &CallManagerServiceStub::OnSetCallWaiting;
+    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_GET_CALL_RESTRICTION)] = &CallManagerServiceStub::OnGetCallRestriction;
+    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_SET_CALL_RESTRICTION)] = &CallManagerServiceStub::OnSetCallRestriction;
+    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_SET_CALL_RESTRICTION_PASSWORD)] = &CallManagerServiceStub::OnSetCallRestrictionPassword;
+    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_GET_CALL_TRANSFER)] = &CallManagerServiceStub::OnGetTransferNumber;
+    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_SET_CALL_TRANSFER)] = &CallManagerServiceStub::OnSetTransferNumber;
+    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_CAN_SET_CALL_TRANSFER_TIME)] = &CallManagerServiceStub::OnCanSetCallTransferTime;
+    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_CLOSE_UNFINISHED_USSD)] = &CallManagerServiceStub::OnCloseUnFinishedUssd;
 }
 
 void CallManagerServiceStub::initCallConferenceExRequest()
 {
-    memberFuncMap_[INTERFACE_GET_MAINID] = &CallManagerServiceStub::OnGetMainCallId;
-    memberFuncMap_[INTERFACE_GET_SUBCALL_LIST_ID] = &CallManagerServiceStub::OnGetSubCallIdList;
-    memberFuncMap_[INTERFACE_GET_CALL_LIST_ID_FOR_CONFERENCE] =
+    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_GET_MAINID)] = &CallManagerServiceStub::OnGetMainCallId;
+    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_GET_SUBCALL_LIST_ID)] = &CallManagerServiceStub::OnGetSubCallIdList;
+    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_GET_CALL_LIST_ID_FOR_CONFERENCE)] =
         &CallManagerServiceStub::OnGetCallIdListForConference;
 }
 
 void CallManagerServiceStub::InitCallMultimediaRequest()
 {
-    memberFuncMap_[INTERFACE_SET_MUTE] = &CallManagerServiceStub::OnSetMute;
-    memberFuncMap_[INTERFACE_MUTE_RINGER] = &CallManagerServiceStub::OnMuteRinger;
-    memberFuncMap_[INTERFACE_SET_AUDIO_DEVICE] = &CallManagerServiceStub::OnSetAudioDevice;
-    memberFuncMap_[INTERFACE_CTRL_CAMERA] = &CallManagerServiceStub::OnControlCamera;
-    memberFuncMap_[INTERFACE_SET_PREVIEW_WINDOW] = &CallManagerServiceStub::OnSetPreviewWindow;
-    memberFuncMap_[INTERFACE_SET_DISPLAY_WINDOW] = &CallManagerServiceStub::OnSetDisplayWindow;
-    memberFuncMap_[INTERFACE_SET_CAMERA_ZOOM] = &CallManagerServiceStub::OnSetCameraZoom;
-    memberFuncMap_[INTERFACE_SET_PAUSE_IMAGE] = &CallManagerServiceStub::OnSetPausePicture;
-    memberFuncMap_[INTERFACE_SET_DEVICE_DIRECTION] = &CallManagerServiceStub::OnSetDeviceDirection;
-    memberFuncMap_[INTERFACE_UPDATE_CALL_MEDIA_MODE] = &CallManagerServiceStub::OnUpdateCallMediaMode;
-    memberFuncMap_[INTERFACE_REPORT_AUDIO_DEVICE_INFO] = &CallManagerServiceStub::OnReportAudioDeviceInfo;
+    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_SET_MUTE)] = &CallManagerServiceStub::OnSetMute;
+    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_MUTE_RINGER)] = &CallManagerServiceStub::OnMuteRinger;
+    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_SET_AUDIO_DEVICE)] = &CallManagerServiceStub::OnSetAudioDevice;
+    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_CTRL_CAMERA)] = &CallManagerServiceStub::OnControlCamera;
+    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_SET_PREVIEW_WINDOW)] = &CallManagerServiceStub::OnSetPreviewWindow;
+    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_SET_DISPLAY_WINDOW)] = &CallManagerServiceStub::OnSetDisplayWindow;
+    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_SET_CAMERA_ZOOM)] = &CallManagerServiceStub::OnSetCameraZoom;
+    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_SET_PAUSE_IMAGE)] = &CallManagerServiceStub::OnSetPausePicture;
+    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_SET_DEVICE_DIRECTION)] = &CallManagerServiceStub::OnSetDeviceDirection;
+    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_UPDATE_CALL_MEDIA_MODE)] = &CallManagerServiceStub::OnUpdateCallMediaMode;
+    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_REPORT_AUDIO_DEVICE_INFO)] = &CallManagerServiceStub::OnReportAudioDeviceInfo;
 }
 
 void CallManagerServiceStub::InitImsServiceRequest()
 {
-    memberFuncMap_[INTERFACE_SETCALL_PREFERENCEMODE] = &CallManagerServiceStub::OnSetCallPreferenceMode;
-    memberFuncMap_[INTERFACE_GET_IMS_CONFIG] = &CallManagerServiceStub::OnGetImsConfig;
-    memberFuncMap_[INTERFACE_SET_IMS_CONFIG] = &CallManagerServiceStub::OnSetImsConfig;
-    memberFuncMap_[INTERFACE_GET_IMS_FEATURE_VALUE] = &CallManagerServiceStub::OnGetImsFeatureValue;
-    memberFuncMap_[INTERFACE_SET_IMS_FEATURE_VALUE] = &CallManagerServiceStub::OnSetImsFeatureValue;
-    memberFuncMap_[INTERFACE_ENABLE_VOLTE] = &CallManagerServiceStub::OnEnableVoLte;
-    memberFuncMap_[INTERFACE_DISABLE_VOLTE] = &CallManagerServiceStub::OnDisableVoLte;
-    memberFuncMap_[INTERFACE_IS_VOLTE_ENABLED] = &CallManagerServiceStub::OnIsVoLteEnabled;
-    memberFuncMap_[INTERFACE_SET_VONR_STATE] = &CallManagerServiceStub::OnSetVoNRState;
-    memberFuncMap_[INTERFACE_GET_VONR_STATE] = &CallManagerServiceStub::OnGetVoNRState;
-    memberFuncMap_[INTERFACE_START_RTT] = &CallManagerServiceStub::OnStartRtt;
-    memberFuncMap_[INTERFACE_STOP_RTT] = &CallManagerServiceStub::OnStopRtt;
+    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_SETCALL_PREFERENCEMODE)] = &CallManagerServiceStub::OnSetCallPreferenceMode;
+    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_GET_IMS_CONFIG)] = &CallManagerServiceStub::OnGetImsConfig;
+    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_SET_IMS_CONFIG)] = &CallManagerServiceStub::OnSetImsConfig;
+    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_GET_IMS_FEATURE_VALUE)] = &CallManagerServiceStub::OnGetImsFeatureValue;
+    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_SET_IMS_FEATURE_VALUE)] = &CallManagerServiceStub::OnSetImsFeatureValue;
+    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_ENABLE_VOLTE)] = &CallManagerServiceStub::OnEnableVoLte;
+    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_DISABLE_VOLTE)] = &CallManagerServiceStub::OnDisableVoLte;
+    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_IS_VOLTE_ENABLED)] = &CallManagerServiceStub::OnIsVoLteEnabled;
+    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_SET_VONR_STATE)] = &CallManagerServiceStub::OnSetVoNRState;
+    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_GET_VONR_STATE)] = &CallManagerServiceStub::OnGetVoNRState;
+    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_START_RTT)] = &CallManagerServiceStub::OnStartRtt;
+    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_STOP_RTT)] = &CallManagerServiceStub::OnStopRtt;
 }
 
 void CallManagerServiceStub::InitOttServiceRequest()
 {
-    memberFuncMap_[INTERFACE_REPORT_OTT_CALL_DETAIL_INFO] = &CallManagerServiceStub::OnReportOttCallDetailsInfo;
-    memberFuncMap_[INTERFACE_REPORT_OTT_CALL_EVENT_INFO] = &CallManagerServiceStub::OnReportOttCallEventInfo;
+    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_REPORT_OTT_CALL_DETAIL_INFO)] = &CallManagerServiceStub::OnReportOttCallDetailsInfo;
+    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_REPORT_OTT_CALL_EVENT_INFO)] = &CallManagerServiceStub::OnReportOttCallEventInfo;
 }
 
 int32_t CallManagerServiceStub::OnRemoteRequest(
