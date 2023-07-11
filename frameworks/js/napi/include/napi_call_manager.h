@@ -133,7 +133,7 @@ public:
     static napi_value HasVoiceCapability(napi_env env, napi_callback_info info);
     static napi_value CloseUnFinishedUssd(napi_env env, napi_callback_info info);
     static napi_value InputDialerSpecialCode(napi_env env, napi_callback_info info);
-    static napi_value CancelMissedIncomingCallNotification(napi_env env, napi_callback_info info);
+    static napi_value RemoveMissedIncomingCallNotification(napi_env env, napi_callback_info info);
 
 private:
     static void RegisterCallBack();
@@ -208,7 +208,7 @@ private:
     static void NativeUpdateImsCallMode(napi_env env, void *data);
     static void NativeCloseUnFinishedUssd(napi_env env, void *data);
     static void NativeInputDialerSpecialCode(napi_env env, void *data);
-    static void NativeCancelMissedIncomingCallNotification(napi_env env, void *data);
+    static void NativeRemoveMissedIncomingCallNotification(napi_env env, void *data);
     static bool MatchEmptyParameter(napi_env env, const napi_value parameters[], const size_t parameterCount);
     static bool MatchOneOptionalNumberParameter(
         napi_env env, const napi_value parameters[], const size_t parameterCount);

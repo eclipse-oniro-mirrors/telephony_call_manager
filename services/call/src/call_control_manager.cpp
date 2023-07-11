@@ -999,11 +999,11 @@ void CallControlManager::GetDialParaInfo(DialParaInfo &info, AppExecFwk::PacMap 
     extras = extras_;
 }
 
-int32_t CallControlManager::CancelMissedIncomingCallNotification()
+int32_t CallControlManager::RemoveMissedIncomingCallNotification()
 {
-    int32_t ret = DelayedSingleton<CallRecordsManager>::GetInstance()->CancelMissedIncomingCallNotification();
+    int32_t ret = DelayedSingleton<CallRecordsManager>::GetInstance()->RemoveMissedIncomingCallNotification();
     if (ret != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("CancelMissedIncomingCallNotification failed!");
+        TELEPHONY_LOGE("RemoveMissedIncomingCallNotification failed!");
         return ret;
     }
     return TELEPHONY_SUCCESS;

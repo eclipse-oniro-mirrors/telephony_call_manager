@@ -63,7 +63,7 @@ public:
     void CallStateUpdated(sptr<CallBase> &callObjectPtr, TelCallState priorState, TelCallState nextState) override;
     void AddOneCallRecord(CallAttributeInfo &info);
     void AddOneCallRecord(sptr<CallBase> call, CallAnswerType answerType);
-    int32_t CancelMissedIncomingCallNotification();
+    int32_t RemoveMissedIncomingCallNotification();
 
 private:
     std::shared_ptr<CallRecordsHandlerService> callRecordsHandlerServerPtr_;

@@ -594,11 +594,11 @@ public:
     int32_t InputDialerSpecialCode(const std::string &specialCode) override;
 
     /**
-     * Cancel missed incoming call notification.
+     * Remove missed incoming call notification.
      *
      * @return Returns 0 on success, others on failure.
      */
-    int32_t CancelMissedIncomingCallNotification() override;
+    int32_t RemoveMissedIncomingCallNotification() override;
 
     /**
      * GetProxyObjectPtr

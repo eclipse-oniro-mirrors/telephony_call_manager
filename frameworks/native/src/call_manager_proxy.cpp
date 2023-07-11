@@ -1107,7 +1107,7 @@ int32_t CallManagerProxy::InputDialerSpecialCode(const std::string &specialCode)
     return TELEPHONY_SUCCESS;
 }
 
-int32_t CallManagerProxy::CancelMissedIncomingCallNotification()
+int32_t CallManagerProxy::RemoveMissedIncomingCallNotification()
 {
     if (ReConnectService() != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("ipc reconnect failed!");
@@ -1115,9 +1115,9 @@ int32_t CallManagerProxy::CancelMissedIncomingCallNotification()
     }
 
     std::lock_guard<std::mutex> lock(mutex_);
-    int32_t errCode = callManagerServicePtr_->CancelMissedIncomingCallNotification();
+    int32_t errCode = callManagerServicePtr_->RemoveMissedIncomingCallNotification();
     if (errCode != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("CancelMissedIncomingCallNotification failed, errcode:%{public}d", errCode);
+        TELEPHONY_LOGE("RemoveMissedIncomingCallNotification failed, errcode:%{public}d", errCode);
         return errCode;
     }
     return TELEPHONY_SUCCESS;

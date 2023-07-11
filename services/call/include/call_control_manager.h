@@ -108,7 +108,7 @@ public:
     int32_t CloseUnFinishedUssd(int32_t slotId);
     void GetDialParaInfo(DialParaInfo &info);
     void GetDialParaInfo(DialParaInfo &info, AppExecFwk::PacMap &extras);
-    int32_t CancelMissedIncomingCallNotification();
+    int32_t RemoveMissedIncomingCallNotification();
 
 private:
     void CallStateObserve();

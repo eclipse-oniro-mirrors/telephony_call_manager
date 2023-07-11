@@ -48,7 +48,7 @@ class CallRecordsHandlerService : public std::enable_shared_from_this<CallRecord
 public:
     void Start();
     int32_t StoreCallRecord(const CallRecordInfo &info);
-    int32_t CancelMissedIncomingCallNotification();
+    int32_t RemoveMissedIncomingCallNotification();
     int32_t QueryUnReadMissedCallLog();
 
 private:

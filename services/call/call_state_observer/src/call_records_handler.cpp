@@ -145,7 +145,7 @@ int32_t CallRecordsHandlerService::StoreCallRecord(const CallRecordInfo &info)
     return TELEPHONY_SUCCESS;
 }
 
-int32_t CallRecordsHandlerService::CancelMissedIncomingCallNotification()
+int32_t CallRecordsHandlerService::RemoveMissedIncomingCallNotification()
 {
     std::shared_ptr<CallDataBaseHelper> callDataPtr = DelayedSingleton<CallDataBaseHelper>::GetInstance();
     if (callDataPtr == nullptr) {

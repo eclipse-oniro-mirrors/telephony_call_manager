@@ -524,11 +524,11 @@ public:
     int32_t InputDialerSpecialCode(const std::string &specialCode);
 
     /**
-     * @brief Cancel missed incoming call notification.
+     * @brief Remove missed incoming call notification.
      *
      * @return Returns 0 on success, others on failure.
      */
-    int32_t CancelMissedIncomingCallNotification();
+    int32_t RemoveMissedIncomingCallNotification();
 
     /**
      * @brief Checks whether a device supports voice calls

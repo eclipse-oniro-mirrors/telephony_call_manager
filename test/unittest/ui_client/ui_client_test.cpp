@@ -1333,15 +1333,15 @@ void InputDialerSpecialCode()
     std::cout << "return value:" << ret << std::endl;
 }
 
-void CancelMissedIncomingCallNotification()
+void RemoveMissedIncomingCallNotification()
 {
     AccessToken token;
-    std::cout << "------CancelMissedIncomingCallNotification------" << std::endl;
+    std::cout << "------RemoveMissedIncomingCallNotification------" << std::endl;
     if (g_clientPtr == nullptr) {
         std::cout << "g_clientPtr is nullptr" << std::endl;
         return;
     }
-    int32_t ret = g_clientPtr->CancelMissedIncomingCallNotification();
+    int32_t ret = g_clientPtr->RemoveMissedIncomingCallNotification();
     std::cout << "return value:" << ret << std::endl;
 }
 
@@ -1384,8 +1384,8 @@ void InitCallUtils()
     g_memberFuncMap[OHOS::Telephony::INTERFACE_IS_EMERGENCY_NUMBER] = &OHOS::Telephony::IsEmergencyPhoneNumber;
     g_memberFuncMap[OHOS::Telephony::INTERFACE_IS_FORMAT_NUMBER] = &OHOS::Telephony::FormatPhoneNumber;
     g_memberFuncMap[OHOS::Telephony::INTERFACE_IS_FORMAT_NUMBER_E164] = &OHOS::Telephony::FormatPhoneNumberToE164;
-    g_memberFuncMap[OHOS::Telephony::INTERFACE_CANCEL_MISSED_INCOMING_CALL_NOTIFICATION] =
-        &OHOS::Telephony::CancelMissedIncomingCallNotification;
+    g_memberFuncMap[OHOS::Telephony::INTERFACE_REMOVE_MISSED_INCOMING_CALL_NOTIFICATION] =
+        &OHOS::Telephony::RemoveMissedIncomingCallNotification;
 }
 
 void InitCallConferencePower()
@@ -1505,7 +1505,7 @@ void PrintfCallUtilsInterface()
               << "14:isEmergencyPhoneNumber\n"
               << "15:formatPhoneNumber\n"
               << "16:formatPhoneNumberToE164\n"
-              << "58:CancelMissedIncomingCallNotification\n";
+              << "58:RemoveMissedIncomingCallNotification\n";
 }
 
 void PrintfCallConferenceInterface()

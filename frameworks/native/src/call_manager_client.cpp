@@ -637,13 +637,13 @@ int32_t CallManagerClient::InputDialerSpecialCode(const std::string &specialCode
     return g_callManagerProxy->InputDialerSpecialCode(specialCode);
 }
 
-int32_t CallManagerClient::CancelMissedIncomingCallNotification()
+int32_t CallManagerClient::RemoveMissedIncomingCallNotification()
 {
     if (g_callManagerProxy == nullptr) {
         TELEPHONY_LOGE("init first please!");
         return TELEPHONY_ERR_UNINIT;
     }
-    return g_callManagerProxy->CancelMissedIncomingCallNotification();
+    return g_callManagerProxy->RemoveMissedIncomingCallNotification();
 }
 
 bool CallManagerClient::HasVoiceCapability()

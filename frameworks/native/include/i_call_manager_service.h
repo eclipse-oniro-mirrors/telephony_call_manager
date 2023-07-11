@@ -88,7 +88,7 @@ enum CallManagerSurfaceCode {
     INTERFACE_CLOSE_UNFINISHED_USSD,
     INTERFACE_REPORT_AUDIO_DEVICE_INFO,
     INTERFACE_INPUT_DIALER_SPECIAL_CODE,
-    INTERFACE_CANCEL_MISSED_INCOMING_CALL_NOTIFICATION,
+    INTERFACE_REMOVE_MISSED_INCOMING_CALL_NOTIFICATION,
     INTERFACE_SET_VONR_STATE,
     INTERFACE_GET_VONR_STATE,
 };
@@ -161,7 +161,7 @@ public:
     virtual int32_t ReportOttCallEventInfo(OttCallEventInfo &eventInfo) = 0;
     virtual int32_t CloseUnFinishedUssd(int32_t slotId) = 0;
     virtual int32_t InputDialerSpecialCode(const std::string &specialCode) = 0;
-    virtual int32_t CancelMissedIncomingCallNotification() = 0;
+    virtual int32_t RemoveMissedIncomingCallNotification() = 0;
     virtual sptr<IRemoteObject> GetProxyObjectPtr(CallManagerProxyType proxyType) = 0;
     virtual int32_t ReportAudioDeviceInfo() = 0;
 
