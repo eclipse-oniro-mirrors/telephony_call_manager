@@ -5226,34 +5226,34 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_InputDialerSpecialCode_0300, Fu
     EXPECT_NE(CallManagerGtest::clientPtr_->InputDialerSpecialCode(specialCode), RETURN_VALUE_IS_ZERO);
 }
 
-/**************************** Test CancelMissedIncomingCallNotification() ****************************/
+/**************************** Test RemoveMissedIncomingCallNotification() ****************************/
 /**
- * @tc.number   Telephony_CallManager_CancelMissedIncomingCallNotification_0100
- * @tc.name     test cancel missed incoming call and mark as read
+ * @tc.number   Telephony_CallManager_RemoveMissedIncomingCallNotification_0100
+ * @tc.name     test remove missed incoming call and mark as read
  * @tc.desc     Function test
  */
 HWTEST_F(
-    CallManagerGtest, Telephony_CallManager_CancelMissedIncomingCallNotification_0100, Function | MediumTest | Level3)
+    CallManagerGtest, Telephony_CallManager_RemoveMissedIncomingCallNotification_0100, Function | MediumTest | Level3)
 {
     AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
     }
-    EXPECT_EQ(CallManagerGtest::clientPtr_->CancelMissedIncomingCallNotification(), RETURN_VALUE_IS_ZERO);
+    EXPECT_EQ(CallManagerGtest::clientPtr_->RemoveMissedIncomingCallNotification(), RETURN_VALUE_IS_ZERO);
 }
 
 /**
- * @tc.number   Telephony_CallManager_CancelMissedIncomingCallNotification_0200
+ * @tc.number   Telephony_CallManager_RemoveMissedIncomingCallNotification_0200
  * @tc.name     test cancel missed incoming call and mark as read without permission
  * @tc.desc     Function test
  */
 HWTEST_F(
-    CallManagerGtest, Telephony_CallManager_CancelMissedIncomingCallNotification_0200, Function | MediumTest | Level3)
+    CallManagerGtest, Telephony_CallManager_RemoveMissedIncomingCallNotification_0200, Function | MediumTest | Level3)
 {
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
     }
-    EXPECT_NE(CallManagerGtest::clientPtr_->CancelMissedIncomingCallNotification(), RETURN_VALUE_IS_ZERO);
+    EXPECT_NE(CallManagerGtest::clientPtr_->RemoveMissedIncomingCallNotification(), RETURN_VALUE_IS_ZERO);
 }
 
 /*********************************** Test Dump() ***************************************/

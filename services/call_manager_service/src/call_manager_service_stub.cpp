@@ -72,8 +72,8 @@ void CallManagerServiceStub::InitCallUtilsRequest()
     memberFuncMap_[INTERFACE_IS_EMERGENCY_NUMBER] = &CallManagerServiceStub::OnIsEmergencyPhoneNumber;
     memberFuncMap_[INTERFACE_IS_FORMAT_NUMBER] = &CallManagerServiceStub::OnFormatPhoneNumber;
     memberFuncMap_[INTERFACE_IS_FORMAT_NUMBER_E164] = &CallManagerServiceStub::OnFormatPhoneNumberToE164;
-    memberFuncMap_[INTERFACE_CANCEL_MISSED_INCOMING_CALL_NOTIFICATION] =
-        &CallManagerServiceStub::OnCancelMissedIncomingCallNotification;
+    memberFuncMap_[INTERFACE_REMOVE_MISSED_INCOMING_CALL_NOTIFICATION] =
+        &CallManagerServiceStub::OnRemoveMissedIncomingCallNotification;
 }
 
 void CallManagerServiceStub::InitCallConferenceRequest()
@@ -1077,11 +1077,11 @@ int32_t CallManagerServiceStub::OnInputDialerSpecialCode(MessageParcel &data, Me
     return TELEPHONY_SUCCESS;
 }
 
-int32_t CallManagerServiceStub::OnCancelMissedIncomingCallNotification(MessageParcel &data, MessageParcel &reply)
+int32_t CallManagerServiceStub::OnRemoveMissedIncomingCallNotification(MessageParcel &data, MessageParcel &reply)
 {
-    int32_t result = CancelMissedIncomingCallNotification();
+    int32_t result = RemoveMissedIncomingCallNotification();
     if (!reply.WriteInt32(result)) {
-        TELEPHONY_LOGE("OnCancelMissedIncomingCallNotification fail to write parcel");
+        TELEPHONY_LOGE("OnRemoveMissedIncomingCallNotification fail to write parcel");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
     return TELEPHONY_SUCCESS;

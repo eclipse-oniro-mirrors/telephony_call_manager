@@ -1501,7 +1501,7 @@ int32_t CallManagerServiceProxy::InputDialerSpecialCode(const std::string &speci
     return replyParcel.ReadInt32();
 }
 
-int32_t CallManagerServiceProxy::CancelMissedIncomingCallNotification()
+int32_t CallManagerServiceProxy::RemoveMissedIncomingCallNotification()
 {
     MessageOption option;
     MessageParcel dataParcel;
@@ -1516,9 +1516,9 @@ int32_t CallManagerServiceProxy::CancelMissedIncomingCallNotification()
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     int32_t error = remote->SendRequest(
-        CallManagerSurfaceCode::INTERFACE_CANCEL_MISSED_INCOMING_CALL_NOTIFICATION, dataParcel, replyParcel, option);
+        CallManagerSurfaceCode::INTERFACE_REMOVE_MISSED_INCOMING_CALL_NOTIFICATION, dataParcel, replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("Function CancelMissedIncomingCallNotification! errCode:%{public}d", error);
+        TELEPHONY_LOGE("Function RemoveMissedIncomingCallNotification! errCode:%{public}d", error);
         return error;
     }
     return replyParcel.ReadInt32();

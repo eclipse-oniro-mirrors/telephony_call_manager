@@ -130,7 +130,7 @@ napi_value NapiCallManager::DeclareCallExtendInterface(napi_env env, napi_value 
         DECLARE_NAPI_FUNCTION("off", ObserverOff),
         DECLARE_NAPI_FUNCTION("reportOttCallDetailsInfo", ReportOttCallDetailsInfo),
         DECLARE_NAPI_FUNCTION("reportOttCallEventInfo", ReportOttCallEventInfo),
-        DECLARE_NAPI_FUNCTION("cancelMissedIncomingCallNotification", CancelMissedIncomingCallNotification),
+        DECLARE_NAPI_FUNCTION("removeMissedIncomingCallNotification", RemoveMissedIncomingCallNotification),
     };
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc));
     return exports;
@@ -2780,11 +2780,11 @@ napi_value NapiCallManager::InputDialerSpecialCode(napi_env env, napi_callback_i
         NativeVoidCallBackWithErrorCode);
 }
 
-napi_value NapiCallManager::CancelMissedIncomingCallNotification(napi_env env, napi_callback_info info)
+napi_value NapiCallManager::RemoveMissedIncomingCallNotification(napi_env env, napi_callback_info info)
 {
     GET_PARAMS(env, info, VALUE_MAXIMUM_LIMIT);
     if (!MatchEmptyParameter(env, argv, argc)) {
-        TELEPHONY_LOGE("NapiCallManager::CancelMissedIncomingCallNotification "
+        TELEPHONY_LOGE("NapiCallManager::RemoveMissedIncomingCallNotification "
                        "MatchEmptyParameter failed.");
         NapiUtil::ThrowParameterError(env);
         return nullptr;
@@ -2792,7 +2792,7 @@ napi_value NapiCallManager::CancelMissedIncomingCallNotification(napi_env env, n
 
     auto asyncContext = std::make_unique<AsyncContext>();
     if (asyncContext == nullptr) {
-        TELEPHONY_LOGE("NapiCallManager::CancelMissedIncomingCallNotification "
+        TELEPHONY_LOGE("NapiCallManager::RemoveMissedIncomingCallNotification "
                        "asyncContext is nullptr.");
         NapiUtil::ThrowParameterError(env);
         return nullptr;
@@ -2801,8 +2801,8 @@ napi_value NapiCallManager::CancelMissedIncomingCallNotification(napi_env env, n
     if (argc == ONLY_ONE_VALUE) {
         napi_create_reference(env, argv[ARRAY_INDEX_FIRST], DATA_LENGTH_ONE, &(asyncContext->callbackRef));
     }
-    return HandleAsyncWork(env, asyncContext.release(), "CancelMissedIncomingCallNotification",
-        NativeCancelMissedIncomingCallNotification, NativeVoidCallBackWithErrorCode);
+    return HandleAsyncWork(env, asyncContext.release(), "RemoveMissedIncomingCallNotification",
+        NativeRemoveMissedIncomingCallNotification, NativeVoidCallBackWithErrorCode);
 }
 
 napi_value NapiCallManager::HasVoiceCapability(napi_env env, napi_callback_info)
@@ -4603,17 +4603,16 @@ void NapiCallManager::NativeInputDialerSpecialCode(napi_env env, void *data)
     }
 }
 
-void NapiCallManager::NativeCancelMissedIncomingCallNotification(napi_env env, void *data)
+void NapiCallManager::NativeRemoveMissedIncomingCallNotification(napi_env env, void *data)
 {
     if (data == nullptr) {
-        TELEPHONY_LOGE("NapiCallManager::NativeCancelMissedIncomingCallNotification data is "
-                       "nullptr");
+        TELEPHONY_LOGE("NapiCallManager::NativeRemoveMissedIncomingCallNotification data is nullptr");
         NapiUtil::ThrowParameterError(env);
         return;
     }
     AsyncContext *asyncContext = static_cast<AsyncContext *>(data);
     asyncContext->errorCode =
-        DelayedSingleton<CallManagerClient>::GetInstance()->CancelMissedIncomingCallNotification();
+        DelayedSingleton<CallManagerClient>::GetInstance()->RemoveMissedIncomingCallNotification();
     if (asyncContext->errorCode == TELEPHONY_SUCCESS) {
         asyncContext->resolved = TELEPHONY_SUCCESS;
     }

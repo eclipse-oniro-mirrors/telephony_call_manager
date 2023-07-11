@@ -104,7 +104,7 @@ private:
     int32_t OnReportOttCallEventInfo(MessageParcel &data, MessageParcel &reply);
     int32_t OnCloseUnFinishedUssd(MessageParcel &data, MessageParcel &reply);
     int32_t OnInputDialerSpecialCode(MessageParcel &data, MessageParcel &reply);
-    int32_t OnCancelMissedIncomingCallNotification(MessageParcel &data, MessageParcel &reply);
+    int32_t OnRemoveMissedIncomingCallNotification(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetProxyObjectPtr(MessageParcel &data, MessageParcel &reply);
     int32_t OnReportAudioDeviceInfo(MessageParcel &data, MessageParcel &reply);
     std::map<uint32_t, CallManagerServiceFunc> memberFuncMap_;

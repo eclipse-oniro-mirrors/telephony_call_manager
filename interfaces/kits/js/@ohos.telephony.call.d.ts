@@ -2088,12 +2088,11 @@ declare namespace call {
   function inputDialerSpecialCode(inputCode: string): Promise<void>;
 
   /**
-   * Cancel missed incoming call notification.
+   * Remove missed incoming call notification.
    *
-   * @permission ohos.permission.SET_TELEPHONY_STATE
-   * @permission ohos.permission.READ_CALL_LOG
-   * @permission ohos.permission.WRITE_CALL_LOG
-   * @param { AsyncCallback<void> } callback - The callback of cancelMissedIncomingCallNotification.
+   * @permission ohos.permission.SET_TELEPHONY_STATE and ohos.permission.READ_CALL_LOG and
+   * ohos.permission.WRITE_CALL_LOG
+   * @param { AsyncCallback<void> } callback - The callback of removeMissedIncomingCallNotification.
    * @throws { BusinessError } 201 - Permission denied.
    * @throws { BusinessError } 202 - Non-system applications use system APIs.
    * @throws { BusinessError } 401 - Parameter error.
@@ -2105,15 +2104,14 @@ declare namespace call {
    * @systemapi Hide this for inner system use.
    * @since 10
    */
-  function cancelMissedIncomingCallNotification(callback: AsyncCallback<void>): void;
+  function removeMissedIncomingCallNotification(callback: AsyncCallback<void>): void;
 
   /**
-   * Cancel missed incoming call notification.
+   * Remove missed incoming call notification.
    *
-   * @permission ohos.permission.SET_TELEPHONY_STATE
-   * @permission ohos.permission.READ_CALL_LOG
-   * @permission ohos.permission.WRITE_CALL_LOG
-   * @returns { Promise<void> } The promise returned by the cancelMissedIncomingCallNotification.
+   * @permission ohos.permission.SET_TELEPHONY_STATE and ohos.permission.READ_CALL_LOG and
+   * ohos.permission.WRITE_CALL_LOG
+   * @returns { Promise<void> } The promise returned by the removeMissedIncomingCallNotification.
    * @throws { BusinessError } 201 - Permission denied.
    * @throws { BusinessError } 202 - Non-system applications use system APIs.
    * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
@@ -2123,7 +2121,7 @@ declare namespace call {
    * @systemapi Hide this for inner system use.
    * @since 10
    */
-  function cancelMissedIncomingCallNotification(): Promise<void>;
+  function removeMissedIncomingCallNotification(): Promise<void>;
 
   /**
    * Set switch state for voice over NR.

@@ -104,7 +104,7 @@ public:
     int32_t ReportOttCallEventInfo(OttCallEventInfo &eventInfo);
     int32_t CloseUnFinishedUssd(int32_t slotId);
     int32_t InputDialerSpecialCode(const std::string &specialCode);
-    int32_t CancelMissedIncomingCallNotification();
+    int32_t RemoveMissedIncomingCallNotification();
     sptr<IRemoteObject> GetProxyObjectPtr(CallManagerProxyType proxyType);
     void OnRemoteDied(const wptr<IRemoteObject> &remote);
     int32_t ReportAudioDeviceInfo();

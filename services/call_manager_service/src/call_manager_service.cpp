@@ -1138,7 +1138,7 @@ int32_t CallManagerService::InputDialerSpecialCode(const std::string &specialCod
     return TELEPHONY_SUCCESS;
 }
 
-int32_t CallManagerService::CancelMissedIncomingCallNotification()
+int32_t CallManagerService::RemoveMissedIncomingCallNotification()
 {
     if (!TelephonyPermission::CheckCallerIsSystemApp()) {
         TELEPHONY_LOGE("Non-system applications use system APIs!");
@@ -1154,7 +1154,7 @@ int32_t CallManagerService::CancelMissedIncomingCallNotification()
         TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return callControlManagerPtr_->CancelMissedIncomingCallNotification();
+    return callControlManagerPtr_->RemoveMissedIncomingCallNotification();
 }
 
 sptr<IRemoteObject> CallManagerService::GetProxyObjectPtr(CallManagerProxyType proxyType)
