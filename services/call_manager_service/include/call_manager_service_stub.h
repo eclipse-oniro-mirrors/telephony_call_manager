@@ -21,6 +21,7 @@
 #include "iremote_object.h"
 #include "iremote_stub.h"
 
+#include "call_manager_service_ipc_interface_code.h"
 #include "i_call_manager_service.h"
 
 namespace OHOS {

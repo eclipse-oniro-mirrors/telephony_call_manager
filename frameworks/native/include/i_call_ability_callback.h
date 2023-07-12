@@ -46,16 +46,6 @@ public:
         return bundleName_;
     }
 
-    enum CallManagerCallAbilityCode {
-        UPDATE_CALL_STATE_INFO = 0,
-        UPDATE_CALL_EVENT,
-        UPDATE_CALL_DISCONNECTED_CAUSE,
-        UPDATE_CALL_ASYNC_RESULT_REQUEST,
-        REPORT_OTT_CALL_REQUEST,
-        UPDATE_MMI_CODE_RESULT_REQUEST,
-        UPDATE_AUDIO_DEVICE_CHANGE_RESULT_REQUEST,
-    };
-
 public:
     std::string bundleName_;
     DECLARE_INTERFACE_DESCRIPTOR(u"OHOS.Telephony.ICallAbilityCallback");

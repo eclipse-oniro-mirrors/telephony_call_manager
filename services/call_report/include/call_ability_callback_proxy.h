@@ -18,6 +18,7 @@
 
 #include "iremote_proxy.h"
 
+#include "call_ability_callback_ipc_interface_code.h"
 #include "i_call_ability_callback.h"
 #include "telephony_log_wrapper.h"
 

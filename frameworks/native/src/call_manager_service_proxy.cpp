@@ -449,7 +449,8 @@ int32_t CallManagerServiceProxy::StartDtmf(int32_t callId, char str)
     }
     dataParcel.WriteInt32(callId);
     dataParcel.WriteInt8(str);
-    int32_t error = remote->SendRequest(CallManagerSurfaceCode::INTERFACE_START_DTMF, dataParcel, replyParcel, option);
+    int32_t error =
+        remote->SendRequest(CallManagerInterfaceCode::INTERFACE_START_DTMF, dataParcel, replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("Function StartDtmf! errCode:%{public}d", error);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
@@ -472,7 +473,7 @@ int32_t CallManagerServiceProxy::StopDtmf(int32_t callId)
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     dataParcel.WriteInt32(callId);
-    int32_t error = remote->SendRequest(CallManagerSurfaceCode::INTERFACE_STOP_DTMF, dataParcel, replyParcel, option);
+    int32_t error = remote->SendRequest(CallManagerInterfaceCode::INTERFACE_STOP_DTMF, dataParcel, replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("Function StopDtmf! errCode:%{public}d", error);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
@@ -496,7 +497,7 @@ int32_t CallManagerServiceProxy::GetCallWaiting(int32_t slotId)
     }
     dataParcel.WriteInt32(slotId);
     int32_t error =
-        remote->SendRequest(CallManagerSurfaceCode::INTERFACE_GET_CALL_WAITING, dataParcel, replyParcel, option);
+        remote->SendRequest(CallManagerInterfaceCode::INTERFACE_GET_CALL_WAITING, dataParcel, replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("Function GetCallWaiting! errCode:%{public}d", error);
         return error;
@@ -521,7 +522,7 @@ int32_t CallManagerServiceProxy::SetCallWaiting(int32_t slotId, bool activate)
     dataParcel.WriteInt32(slotId);
     dataParcel.WriteBool(activate);
     int32_t error =
-        remote->SendRequest(CallManagerSurfaceCode::INTERFACE_SET_CALL_WAITING, dataParcel, replyParcel, option);
+        remote->SendRequest(CallManagerInterfaceCode::INTERFACE_SET_CALL_WAITING, dataParcel, replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("Function SetCallWaiting! errCode:%{public}d", error);
         return error;
@@ -546,7 +547,7 @@ int32_t CallManagerServiceProxy::GetCallRestriction(int32_t slotId, CallRestrict
     dataParcel.WriteInt32(slotId);
     dataParcel.WriteInt32(static_cast<int32_t>(type));
     int32_t error =
-        remote->SendRequest(CallManagerSurfaceCode::INTERFACE_GET_CALL_RESTRICTION, dataParcel, replyParcel, option);
+        remote->SendRequest(CallManagerInterfaceCode::INTERFACE_GET_CALL_RESTRICTION, dataParcel, replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("Function GetCallRestriction! errCode:%{public}d", error);
         return error;
@@ -571,7 +572,7 @@ int32_t CallManagerServiceProxy::SetCallRestriction(int32_t slotId, CallRestrict
     dataParcel.WriteInt32(slotId);
     dataParcel.WriteRawData((const void *)&info, sizeof(CallRestrictionInfo));
     int32_t error =
-        remote->SendRequest(CallManagerSurfaceCode::INTERFACE_SET_CALL_RESTRICTION, dataParcel, replyParcel, option);
+        remote->SendRequest(CallManagerInterfaceCode::INTERFACE_SET_CALL_RESTRICTION, dataParcel, replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("Function SetCallRestriction! errCode:%{public}d", error);
         return error;
@@ -602,8 +603,8 @@ int32_t CallManagerServiceProxy::SetCallRestrictionPassword(
     dataParcel.WriteInt32(static_cast<int32_t>(fac));
     dataParcel.WriteCString(oldPassword);
     dataParcel.WriteCString(newPassword);
-    int32_t error = remote->SendRequest(
-        CallManagerSurfaceCode::INTERFACE_SET_CALL_RESTRICTION_PASSWORD, dataParcel, replyParcel, option);
+    int32_t error = remote->SendRequest(CallManagerInterfaceCode::INTERFACE_SET_CALL_RESTRICTION_PASSWORD, dataParcel,
+        replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("Function SetCallRestrictionPassword! errCode:%{public}d", error);
         return error;
@@ -628,7 +629,7 @@ int32_t CallManagerServiceProxy::GetCallTransferInfo(int32_t slotId, CallTransfe
     dataParcel.WriteInt32(slotId);
     dataParcel.WriteInt32(static_cast<int32_t>(type));
     int32_t error =
-        remote->SendRequest(CallManagerSurfaceCode::INTERFACE_GET_CALL_TRANSFER, dataParcel, replyParcel, option);
+        remote->SendRequest(CallManagerInterfaceCode::INTERFACE_GET_CALL_TRANSFER, dataParcel, replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("Function GetCallTransfer! errCode:%{public}d", error);
         return error;
@@ -653,7 +654,7 @@ int32_t CallManagerServiceProxy::SetCallTransferInfo(int32_t slotId, CallTransfe
     dataParcel.WriteInt32(slotId);
     dataParcel.WriteRawData((const void *)&info, sizeof(CallTransferInfo));
     int32_t error =
-        remote->SendRequest(CallManagerSurfaceCode::INTERFACE_SET_CALL_TRANSFER, dataParcel, replyParcel, option);
+        remote->SendRequest(CallManagerInterfaceCode::INTERFACE_SET_CALL_TRANSFER, dataParcel, replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("Function SetCallTransfer! errCode:%{public}d", error);
         return error;
@@ -683,8 +684,8 @@ int32_t CallManagerServiceProxy::CanSetCallTransferTime(int32_t slotId, bool &re
         TELEPHONY_LOGE("[slot%{public}d] write result fail", slotId);
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
-    int32_t error = remote->SendRequest(
-        CallManagerSurfaceCode::INTERFACE_CAN_SET_CALL_TRANSFER_TIME, dataParcel, replyParcel, option);
+    int32_t error = remote->SendRequest(CallManagerInterfaceCode::INTERFACE_CAN_SET_CALL_TRANSFER_TIME, dataParcel,
+        replyParcel, option);
     if (error == ERR_NONE) {
         result = replyParcel.ReadBool();
         return replyParcel.ReadInt32();
@@ -708,8 +709,8 @@ int32_t CallManagerServiceProxy::SetCallPreferenceMode(int32_t slotId, int32_t m
     }
     dataParcel.WriteInt32(slotId);
     dataParcel.WriteInt32(mode);
-    int32_t error =
-        remote->SendRequest(CallManagerSurfaceCode::INTERFACE_SETCALL_PREFERENCEMODE, dataParcel, replyParcel, option);
+    int32_t error = remote->SendRequest(CallManagerInterfaceCode::INTERFACE_SETCALL_PREFERENCEMODE, dataParcel,
+        replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("Function SetCallPreferenceMode! errCode:%{public}d", error);
         return error;
@@ -737,7 +738,7 @@ int32_t CallManagerServiceProxy::StartRtt(int32_t callId, std::u16string &msg)
     }
     dataParcel.WriteInt32(callId);
     dataParcel.WriteString16(msg);
-    int32_t error = remote->SendRequest(CallManagerSurfaceCode::INTERFACE_START_RTT, dataParcel, replyParcel, option);
+    int32_t error = remote->SendRequest(CallManagerInterfaceCode::INTERFACE_START_RTT, dataParcel, replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("Function StartRtt errCode:%{public}d", error);
         return error;
@@ -760,7 +761,7 @@ int32_t CallManagerServiceProxy::StopRtt(int32_t callId)
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     dataParcel.WriteInt32(callId);
-    int32_t error = remote->SendRequest(CallManagerSurfaceCode::INTERFACE_STOP_RTT, dataParcel, replyParcel, option);
+    int32_t error = remote->SendRequest(CallManagerInterfaceCode::INTERFACE_STOP_RTT, dataParcel, replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("Function StopRtt errCode:%{public}d", error);
         return error;
@@ -1469,7 +1470,7 @@ int32_t CallManagerServiceProxy::CloseUnFinishedUssd(int32_t slotId)
     }
     dataParcel.WriteInt32(slotId);
     int32_t error =
-        remote->SendRequest(CallManagerSurfaceCode::INTERFACE_CLOSE_UNFINISHED_USSD, dataParcel, replyParcel, option);
+        remote->SendRequest(CallManagerInterfaceCode::INTERFACE_CLOSE_UNFINISHED_USSD, dataParcel, replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("Function CloseUnFinishedUssd! errCode:%{public}d", error);
         return error;
@@ -1492,8 +1493,8 @@ int32_t CallManagerServiceProxy::InputDialerSpecialCode(const std::string &speci
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     dataParcel.WriteString(specialCode);
-    int32_t error = remote->SendRequest(CallManagerSurfaceCode::INTERFACE_INPUT_DIALER_SPECIAL_CODE,
-        dataParcel, replyParcel, option);
+    int32_t error = remote->SendRequest(CallManagerInterfaceCode::INTERFACE_INPUT_DIALER_SPECIAL_CODE, dataParcel,
+        replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("Function InputDialerSpecialCode! errCode:%{public}d", error);
         return error;
@@ -1515,8 +1516,8 @@ int32_t CallManagerServiceProxy::RemoveMissedIncomingCallNotification()
         TELEPHONY_LOGE("function Remote() return nullptr!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int32_t error = remote->SendRequest(
-        CallManagerSurfaceCode::INTERFACE_REMOVE_MISSED_INCOMING_CALL_NOTIFICATION, dataParcel, replyParcel, option);
+    int32_t error = remote->SendRequest(CallManagerInterfaceCode::INTERFACE_CANCEL_MISSED_INCOMING_CALL_NOTIFICATION,
+        dataParcel, replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("Function RemoveMissedIncomingCallNotification! errCode:%{public}d", error);
         return error;
