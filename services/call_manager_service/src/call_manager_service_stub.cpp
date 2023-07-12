@@ -73,7 +73,7 @@ void CallManagerServiceStub::InitCallUtilsRequest()
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_IS_FORMAT_NUMBER)] = &CallManagerServiceStub::OnFormatPhoneNumber;
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_IS_FORMAT_NUMBER_E164)] = &CallManagerServiceStub::OnFormatPhoneNumberToE164;
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_CANCEL_MISSED_INCOMING_CALL_NOTIFICATION)] =
-        &CallManagerServiceStub::OnCancelMissedIncomingCallNotification;
+        &CallManagerServiceStub::OnRemoveMissedIncomingCallNotification;
 }
 
 void CallManagerServiceStub::InitCallConferenceRequest()
