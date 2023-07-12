@@ -496,7 +496,8 @@ int32_t CallManagerServiceProxy::GetCallWaiting(int32_t slotId)
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     dataParcel.WriteInt32(slotId);
-    int32_t error = remote->SendRequest(CallManagerInterfaceCode::INTERFACE_GET_CALL_WAITING, dataParcel, replyParcel, option);
+    int32_t error =
+        remote->SendRequest(CallManagerInterfaceCode::INTERFACE_GET_CALL_WAITING, dataParcel, replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("Function GetCallWaiting! errCode:%{public}d", error);
         return error;

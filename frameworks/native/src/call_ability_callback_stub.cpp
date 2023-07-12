@@ -37,7 +37,8 @@ CallAbilityCallbackStub::CallAbilityCallbackStub()
         &CallAbilityCallbackStub::OnUpdateOttCallRequest;
     memberFuncMap_[static_cast<uint32_t>(CallManagerCallAbilityInterfaceCode::UPDATE_MMI_CODE_RESULT_REQUEST)] =
         &CallAbilityCallbackStub::OnUpdateMmiCodeResults;
-    memberFuncMap_[static_cast<uint32_t>(CallManagerCallAbilityInterfaceCode::UPDATE_AUDIO_DEVICE_CHANGE_RESULT_REQUEST)] =
+    memberFuncMap_[static_cast<uint32_t>(
+        CallManagerCallAbilityInterfaceCode::UPDATE_AUDIO_DEVICE_CHANGE_RESULT_REQUEST)] =
         &CallAbilityCallbackStub::OnUpdateAudioDeviceChange;
 }
 
