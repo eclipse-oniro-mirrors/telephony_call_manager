@@ -25,13 +25,20 @@ namespace Telephony {
 const int32_t MAX_LEN = 100000;
 CallAbilityCallbackStub::CallAbilityCallbackStub()
 {
-    memberFuncMap_[static_cast<uint32_t>(CallManagerCallAbilityInterfaceCode::UPDATE_CALL_STATE_INFO)] = &CallAbilityCallbackStub::OnUpdateCallStateInfo;
-    memberFuncMap_[static_cast<uint32_t>(CallManagerCallAbilityInterfaceCode::UPDATE_CALL_EVENT)] = &CallAbilityCallbackStub::OnUpdateCallEvent;
-    memberFuncMap_[static_cast<uint32_t>(CallManagerCallAbilityInterfaceCode::UPDATE_CALL_DISCONNECTED_CAUSE)] = &CallAbilityCallbackStub::OnUpdateCallDisconnectedCause;
-    memberFuncMap_[static_cast<uint32_t>(CallManagerCallAbilityInterfaceCode::UPDATE_CALL_ASYNC_RESULT_REQUEST)] = &CallAbilityCallbackStub::OnUpdateAysncResults;
-    memberFuncMap_[static_cast<uint32_t>(CallManagerCallAbilityInterfaceCode::REPORT_OTT_CALL_REQUEST)] = &CallAbilityCallbackStub::OnUpdateOttCallRequest;
-    memberFuncMap_[static_cast<uint32_t>(CallManagerCallAbilityInterfaceCode::UPDATE_MMI_CODE_RESULT_REQUEST)] = &CallAbilityCallbackStub::OnUpdateMmiCodeResults;
-    memberFuncMap_[static_cast<uint32_t>(CallManagerCallAbilityInterfaceCode::UPDATE_AUDIO_DEVICE_CHANGE_RESULT_REQUEST)] = &CallAbilityCallbackStub::OnUpdateAudioDeviceChange;
+    memberFuncMap_[static_cast<uint32_t>(CallManagerCallAbilityInterfaceCode::UPDATE_CALL_STATE_INFO)] =
+        &CallAbilityCallbackStub::OnUpdateCallStateInfo;
+    memberFuncMap_[static_cast<uint32_t>(CallManagerCallAbilityInterfaceCode::UPDATE_CALL_EVENT)] =
+        &CallAbilityCallbackStub::OnUpdateCallEvent;
+    memberFuncMap_[static_cast<uint32_t>(CallManagerCallAbilityInterfaceCode::UPDATE_CALL_DISCONNECTED_CAUSE)] =
+        &CallAbilityCallbackStub::OnUpdateCallDisconnectedCause;
+    memberFuncMap_[static_cast<uint32_t>(CallManagerCallAbilityInterfaceCode::UPDATE_CALL_ASYNC_RESULT_REQUEST)] =
+        &CallAbilityCallbackStub::OnUpdateAysncResults;
+    memberFuncMap_[static_cast<uint32_t>(CallManagerCallAbilityInterfaceCode::REPORT_OTT_CALL_REQUEST)] =
+        &CallAbilityCallbackStub::OnUpdateOttCallRequest;
+    memberFuncMap_[static_cast<uint32_t>(CallManagerCallAbilityInterfaceCode::UPDATE_MMI_CODE_RESULT_REQUEST)] =
+        &CallAbilityCallbackStub::OnUpdateMmiCodeResults;
+    memberFuncMap_[static_cast<uint32_t>(CallManagerCallAbilityInterfaceCode::UPDATE_AUDIO_DEVICE_CHANGE_RESULT_REQUEST)] =
+        &CallAbilityCallbackStub::OnUpdateAudioDeviceChange;
 }
 
 CallAbilityCallbackStub::~CallAbilityCallbackStub()
