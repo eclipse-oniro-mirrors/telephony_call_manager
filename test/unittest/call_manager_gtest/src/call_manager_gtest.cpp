@@ -1448,6 +1448,78 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SeparateConference_0400, Functi
     }
 }
 
+/***************************************** Test KickOutFromConference() ********************************************/
+/**
+ * @tc.number   Telephony_CallManager_KickOutFromConference_0100
+ * @tc.name     Import callId " -100", test KickOutFromConference(), return non 0
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_KickOutFromConference_0100, Function | MediumTest | Level2)
+{
+    AccessToken token;
+    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+    int32_t callId = INVALID_NEGATIVE_ID;
+    EXPECT_NE(CallManagerGtest::clientPtr_->KickOutFromConference(callId), RETURN_VALUE_IS_ZERO);
+}
+
+/**
+ * @tc.number   Telephony_CallManager_KickOutFromConference_0200
+ * @tc.name     Import callId "100", test KickOutFromConference(), return non 0
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_KickOutFromConference_0200, Function | MediumTest | Level2)
+{
+    AccessToken token;
+    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+    int32_t callId = INVALID_POSITIVE_ID;
+    EXPECT_NE(CallManagerGtest::clientPtr_->KickOutFromConference(callId), RETURN_VALUE_IS_ZERO);
+}
+
+/**
+ * @tc.number   Telephony_CallManager_KickOutFromConference_0300
+ * @tc.name     Import callId " -100", test KickOutFromConference(), return non 0
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_KickOutFromConference_0300, Function | MediumTest | Level2)
+{
+    AccessToken token;
+    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+    ASSERT_TRUE(blueToothClientPtr_ != nullptr);
+    EXPECT_NE(CallManagerGtest::blueToothClientPtr_->KickOutFromConference(), RETURN_VALUE_IS_ZERO);
+}
+
+/**
+ * @tc.number   Telephony_CallManager_KickOutFromConference_0400
+ * @tc.name     Import callId normal, test KickOutFromConference(), return non 0
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_KickOutFromConference_0400, Function | MediumTest | Level2)
+{
+    AccessToken token;
+    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+
+    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_200_MS, SLEEP_30000_MS);
+    std::string phoneNumber = "10086";
+    InitDialInfo(
+        0, (int32_t)VideoStateType::TYPE_VOICE, (int32_t)DialScene::CALL_NORMAL, (int32_t)DialType::DIAL_CARRIER_TYPE);
+    EXPECT_EQ(CallManagerGtest::clientPtr_->DialCall(Str8ToStr16(phoneNumber), dialInfo_), RETURN_VALUE_IS_ZERO);
+    if (CallInfoManager::HasActiveStatus()) {
+        EXPECT_NE(CallManagerGtest::clientPtr_->KickOutFromConference(newCallId_), RETURN_VALUE_IS_ZERO);
+        sleep(1);
+        if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
+            HangUpCall();
+        }
+    }
+}
+
 /********************************************* Test GetMainCallId() ***********************************************/
 /**
  * @tc.number   Telephony_CallManager_GetMainCallId_0100
@@ -5314,6 +5386,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManagerService_001, Function | MediumTe
     ASSERT_NE(callManagerService->StopRtt(0), TELEPHONY_SUCCESS);
     ASSERT_NE(callManagerService->CombineConference(0), TELEPHONY_SUCCESS);
     ASSERT_NE(callManagerService->SeparateConference(0), TELEPHONY_SUCCESS);
+    ASSERT_NE(callManagerService->KickOutFromConference(0), TELEPHONY_SUCCESS);
     ASSERT_NE(callManagerService->SetMuted(false), TELEPHONY_SUCCESS);
     ASSERT_NE(callManagerService->MuteRinger(), TELEPHONY_SUCCESS);
     AudioDevice audioDevice = {

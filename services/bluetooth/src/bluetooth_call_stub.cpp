@@ -47,6 +47,8 @@ BluetoothCallStub::BluetoothCallStub()
         &BluetoothCallStub::OnCombineConference;
     memberFuncMap_[static_cast<uint32_t>(BluetoothCallInterfaceCode::INTERFACE_BT_SEPARATE_CONFERENCE)] =
         &BluetoothCallStub::OnSeparateConference;
+    memberFuncMap_[static_cast<uint32_t>(BluetoothCallInterfaceCode::INTERFACE_BT_KICK_OUT_CONFERENCE)] =
+        &BluetoothCallStub::OnKickOutFromConference;
     memberFuncMap_[static_cast<uint32_t>(BluetoothCallInterfaceCode::INTERFACE_BT_START_DTMF)] =
         &BluetoothCallStub::OnStartDtmf;
     memberFuncMap_[static_cast<uint32_t>(BluetoothCallInterfaceCode::INTERFACE_BT_STOP_DTMF)] =
@@ -171,6 +173,17 @@ int32_t BluetoothCallStub::OnCombineConference(MessageParcel &data, MessageParce
 int32_t BluetoothCallStub::OnSeparateConference(MessageParcel &data, MessageParcel &reply)
 {
     int32_t result = SeparateConference();
+    TELEPHONY_LOGI("result:%{public}d", result);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("fail to write parcel");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t BluetoothCallStub::OnKickOutFromConference(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t result = KickOutFromConference();
     TELEPHONY_LOGI("result:%{public}d", result);
     if (!reply.WriteInt32(result)) {
         TELEPHONY_LOGE("fail to write parcel");

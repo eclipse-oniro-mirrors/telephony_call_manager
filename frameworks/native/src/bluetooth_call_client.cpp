@@ -186,6 +186,16 @@ int32_t BluetoothCallClient::SeparateConference()
     }
 }
 
+int32_t BluetoothCallClient::KickOutFromConference()
+{
+    if (g_bluetoothCallProxyPtr != nullptr) {
+        return g_bluetoothCallProxyPtr->KickOutFromConference();
+    } else {
+        TELEPHONY_LOGE("init first please!");
+        return TELEPHONY_ERR_UNINIT;
+    }
+}
+
 int32_t BluetoothCallClient::StartDtmf(char str)
 {
     if (g_bluetoothCallProxyPtr != nullptr) {

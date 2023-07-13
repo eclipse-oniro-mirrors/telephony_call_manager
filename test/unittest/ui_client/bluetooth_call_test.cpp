@@ -212,6 +212,7 @@ void BluetoothCallTest::PrintfUsage()
     std::cout << "17:muteRinger\n";
     std::cout << "18:setAudioDevice\n";
     std::cout << "19:GetCurrentCallList\n";
+    std::cout << "20:kickOutFromConference\n";
     std::cout << "1000:exit\n";
 }
 
@@ -230,6 +231,8 @@ void BluetoothCallTest::InitFunMap()
         &BluetoothCallTest::CombineConference;
     memberFuncMap_[static_cast<uint32_t>(BluetoothCallFuncCode::TEST_SEPARATE_CONFERENCE)] =
         &BluetoothCallTest::SeparateConference;
+    memberFuncMap_[static_cast<uint32_t>(BluetoothCallFuncCode::TEST_KICK_OUT_CONFERENCE)] =
+        &BluetoothCallTest::KickOutFromConference;
     memberFuncMap_[static_cast<uint32_t>(BluetoothCallFuncCode::TEST_START_DTMF)] = &BluetoothCallTest::StartDtmf;
     memberFuncMap_[static_cast<uint32_t>(BluetoothCallFuncCode::TEST_STOP_DTMF)] = &BluetoothCallTest::StopDtmf;
     memberFuncMap_[static_cast<uint32_t>(BluetoothCallFuncCode::TEST_IS_RINGING)] = &BluetoothCallTest::IsRinging;
@@ -378,6 +381,17 @@ void BluetoothCallTest::SeparateConference()
         return;
     }
     int32_t ret = g_bluetoothCallPtr->SeparateConference();
+    std::cout << "return value:" << ret << std::endl;
+}
+
+void BluetoothCallTest::KickOutFromConference()
+{
+    std::cout << "------KickOutFromConference------" << std::endl;
+    if (g_bluetoothCallPtr == nullptr) {
+        std::cout << "g_bluetoothCallPtr is nullptr" << std::endl;
+        return;
+    }
+    int32_t ret = g_bluetoothCallPtr->KickOutFromConference();
     std::cout << "return value:" << ret << std::endl;
 }
 

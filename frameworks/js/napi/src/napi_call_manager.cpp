@@ -82,6 +82,7 @@ napi_value NapiCallManager::DeclareCallConferenceInterface(napi_env env, napi_va
     napi_property_descriptor desc[] = {
         DECLARE_NAPI_FUNCTION("combineConference", CombineConference),
         DECLARE_NAPI_FUNCTION("separateConference", SeparateConference),
+        DECLARE_NAPI_FUNCTION("kickOutFromConference", KickOutFromConference),
         DECLARE_NAPI_FUNCTION("getMainCallId", GetMainCallId),
         DECLARE_NAPI_FUNCTION("getSubCallIdList", GetSubCallIdList),
         DECLARE_NAPI_FUNCTION("getCallIdListForConference", GetCallIdListForConference),
@@ -1345,6 +1346,28 @@ napi_value NapiCallManager::SeparateConference(napi_env env, napi_callback_info 
     }
     return HandleAsyncWork(
         env, asyncContext.release(), "SeparateConference", NativeSeparateConference, NativeVoidCallBackWithErrorCode);
+}
+
+napi_value NapiCallManager::KickOutFromConference(napi_env env, napi_callback_info info)
+{
+    GET_PARAMS(env, info, TWO_VALUE_LIMIT);
+    if (!MatchOneNumberParameter(env, argv, argc)) {
+        TELEPHONY_LOGE("NapiCallManager::KickoutFromConference MatchOneNumberParameter failed.");
+        NapiUtil::ThrowParameterError(env);
+        return nullptr;
+    }
+    auto asyncContext = std::make_unique<AsyncContext>();
+    if (asyncContext == nullptr) {
+        TELEPHONY_LOGE("NapiCallManager::KickoutFromConference asyncContext is nullptr.");
+        NapiUtil::ThrowParameterError(env);
+        return nullptr;
+    }
+    napi_get_value_int32(env, argv[ARRAY_INDEX_FIRST], &asyncContext->callId);
+    if (argc == TWO_VALUE_LIMIT) {
+        napi_create_reference(env, argv[ARRAY_INDEX_SECOND], DATA_LENGTH_ONE, &(asyncContext->callbackRef));
+    }
+    return HandleAsyncWork(env, asyncContext.release(), "KickoutFromConference", NativeKickOutFromConference,
+        NativeVoidCallBackWithErrorCode);
 }
 
 napi_value NapiCallManager::GetMainCallId(napi_env env, napi_callback_info info)
@@ -3659,6 +3682,21 @@ void NapiCallManager::NativeSeparateConference(napi_env env, void *data)
     auto asyncContext = (AsyncContext *)data;
     asyncContext->errorCode =
         DelayedSingleton<CallManagerClient>::GetInstance()->SeparateConference(asyncContext->callId);
+    if (asyncContext->errorCode == TELEPHONY_SUCCESS) {
+        asyncContext->resolved = TELEPHONY_SUCCESS;
+    }
+}
+
+void NapiCallManager::NativeKickOutFromConference(napi_env env, void *data)
+{
+    if (data == nullptr) {
+        TELEPHONY_LOGE("NapiCallManager::NativeKickOutFromConference data is nullptr");
+        NapiUtil::ThrowParameterError(env);
+        return;
+    }
+    auto asyncContext = (AsyncContext *)data;
+    asyncContext->errorCode =
+        DelayedSingleton<CallManagerClient>::GetInstance()->KickOutFromConference(asyncContext->callId);
     if (asyncContext->errorCode == TELEPHONY_SUCCESS) {
         asyncContext->resolved = TELEPHONY_SUCCESS;
     }

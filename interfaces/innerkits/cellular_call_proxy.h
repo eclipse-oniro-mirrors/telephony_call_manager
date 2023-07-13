@@ -131,11 +131,10 @@ public:
     /**
      * @brief Kick out someone from the conference call
      *
-     * @param numberList[in] kick out member from conference
-     * @param slotId[in] the slot id
+     * @param callInfo[in] the call detail info which contains phone number, call type, slot id .etc
      * @return Returns TELEPHONY_SUCCESS on success, others on failure.
      */
-    int32_t KickOutFromConference(int32_t slotId, const std::vector<std::string> &numberList) override;
+    int32_t KickOutFromConference(const CellularCallInfo &callInfo) override;
 
     /**
      * @brief Hang Up All Connection

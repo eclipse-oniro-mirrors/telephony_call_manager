@@ -126,10 +126,15 @@ void CallRequestProcess::HangUpRequest(int32_t callId)
         return;
     }
     TelCallState state = call->GetTelCallState();
-    if ((state == TelCallState::CALL_STATUS_ACTIVE) &&
-        (CallObjectManager::IsCallExist(call->GetCallType(), TelCallState::CALL_STATUS_HOLDING))) {
+    TelConferenceState confState = call->GetTelConferenceState();
+    if (((state == TelCallState::CALL_STATUS_ACTIVE) &&
+        (CallObjectManager::IsCallExist(call->GetCallType(), TelCallState::CALL_STATUS_HOLDING))) ||
+        (confState == TelConferenceState::TEL_CONFERENCE_ACTIVE)) {
         TELEPHONY_LOGI("release the active call and recover the held call");
         call->SetPolicyFlag(PolicyFlag::POLICY_FLAG_HANG_UP_ACTIVE);
+    } else if (confState == TelConferenceState::TEL_CONFERENCE_HOLDING) {
+        TELEPHONY_LOGI("release the held call and the wait call");
+        call->SetPolicyFlag(PolicyFlag::POLICY_FLAG_HANG_UP_HOLD_WAIT);
     }
     call->HangUpCall();
     if (state == TelCallState::CALL_STATUS_DIALING || state == TelCallState::CALL_STATUS_ALERTING) {
@@ -194,6 +199,19 @@ void CallRequestProcess::SeparateConferenceRequest(int32_t callId)
     int32_t ret = call->SeparateConference();
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("SeparateConference failed");
+    }
+}
+
+void CallRequestProcess::KickOutFromConferenceRequest(int32_t callId)
+{
+    sptr<CallBase> call = GetOneCallObject(callId);
+    if (call == nullptr) {
+        TELEPHONY_LOGE("the call object is nullptr, callId:%{public}d", callId);
+        return;
+    }
+    int32_t ret = call->KickOutFromConference();
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("KickOutFormConference failed");
     }
 }
 

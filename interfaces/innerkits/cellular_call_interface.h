@@ -118,11 +118,10 @@ public:
     /**
      * @brief Kick out someone from conference
      *
-     * @param numberList[in] the number list to kick out from conference
-     * @param slotId[in] the slot id
+     * @param callInfo[in] the call detail info which contains phone number, call type, slot id .etc
      * @return Returns TELEPHONY_SUCCESS on success, others on failure.
      */
-    virtual int32_t KickOutFromConference(int32_t slotId, const std::vector<std::string> &numberList) = 0;
+    virtual int32_t KickOutFromConference(const CellularCallInfo &callInfo) = 0;
 
     /**
      * @brief Hang Up All Connection

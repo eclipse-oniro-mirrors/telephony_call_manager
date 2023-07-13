@@ -116,8 +116,10 @@ void DialingProcess(const uint8_t *data, size_t size)
     callObjectPtr->DialingProcess();
     callObjectPtr->CombineConference(); // merge calls
     callObjectPtr->SeparateConference();
+    callObjectPtr->KickOutFromConference();
     callObjectPtr->CanCombineConference();
     callObjectPtr->CanSeparateConference();
+    callObjectPtr->CanKickOutFromConference();
     callObjectPtr->LaunchConference();
     callObjectPtr->ExitConference();
     callObjectPtr->HoldConference();
@@ -211,8 +213,10 @@ void IMSCallFunc(const uint8_t *data, size_t size)
     callObjectPtr->SwitchCall();
     callObjectPtr->CombineConference();
     callObjectPtr->SeparateConference();
+    callObjectPtr->KickOutFromConference();
     callObjectPtr->CanCombineConference();
     callObjectPtr->CanSeparateConference();
+    callObjectPtr->CanKickOutFromConference();
     callObjectPtr->LaunchConference();
     callObjectPtr->ExitConference();
     callObjectPtr->HoldConference();
@@ -266,8 +270,10 @@ void OttCallFunc(const uint8_t *data, size_t size)
     callObjectPtr->GetSlotId();
     callObjectPtr->CombineConference();
     callObjectPtr->SeparateConference();
+    callObjectPtr->KickOutFromConference();
     callObjectPtr->CanCombineConference();
     callObjectPtr->CanSeparateConference();
+    callObjectPtr->CanKickOutFromConference();
     callObjectPtr->LaunchConference();
     callObjectPtr->ExitConference();
     callObjectPtr->HoldConference();

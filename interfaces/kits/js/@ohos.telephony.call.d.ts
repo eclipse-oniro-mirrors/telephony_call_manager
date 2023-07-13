@@ -1731,6 +1731,44 @@ declare namespace call {
   function joinConference(mainCallId: number, callNumberList: Array<string>): Promise<void>;
 
   /**
+   * Kickout call from the conference call.
+   *
+   * @permission ohos.permission.PLACE_CALL
+   * @param { number } callId - Indicates the identifier of the call which kicked out.
+   * @param { AsyncCallback<void> } callback - The callback of joinConference.
+   * @throws { BusinessError } 201 - Permission denied.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @throws { BusinessError } 8300999 - Unknown error code.
+   * @syscap SystemCapability.Telephony.CallManager
+   * @systemapi Hide this for inner system use.
+   * @since 10
+   */
+  function kickOutFromConference(callId: number, callback: AsyncCallback<void>): void;
+
+  /**
+   * Kickout call from the conference call.
+   *
+   * @permission ohos.permission.PLACE_CALL
+   * @param { number } callId - Indicates the identifier of the call which kicked out.
+   * @returns { Promise<void> } The promise returned by the joinConference.
+   * @throws { BusinessError } 201 - Permission denied.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @throws { BusinessError } 8300999 - Unknown error code.
+   * @syscap SystemCapability.Telephony.CallManager
+   * @systemapi Hide this for inner system use.
+   * @since 10
+   */
+  function kickOutFromConference(callId: number): Promise<void>;
+
+  /**
    * Update Ims call mode.
    *
    * @param { number } callId - Indicates the identifier of the call.

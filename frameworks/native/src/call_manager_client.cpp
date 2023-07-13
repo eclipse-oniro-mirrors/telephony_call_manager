@@ -174,6 +174,16 @@ int32_t CallManagerClient::SeparateConference(int32_t callId)
     }
 }
 
+int32_t CallManagerClient::KickOutFromConference(int32_t callId)
+{
+    if (g_callManagerProxy != nullptr) {
+        return g_callManagerProxy->KickOutFromConference(callId);
+    } else {
+        TELEPHONY_LOGE("init first please!");
+        return TELEPHONY_ERR_UNINIT;
+    }
+}
+
 int32_t CallManagerClient::GetMainCallId(int32_t &callId, int32_t &mainCallId)
 {
     if (g_callManagerProxy != nullptr) {

@@ -33,6 +33,7 @@ enum class BluetoothCallInterfaceCode {
     INTERFACE_BT_START_DTMF,
     INTERFACE_BT_STOP_DTMF,
     INTERFACE_BT_GET_CURRENT_CALL_LIST,
+    INTERFACE_BT_KICK_OUT_CONFERENCE,
 };
 } // end extern
 } // namespace Telephony

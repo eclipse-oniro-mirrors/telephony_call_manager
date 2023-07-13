@@ -117,6 +117,13 @@ public:
     int32_t SeparateConference();
 
     /**
+     * @brief Kick out a specified call from a conference call
+     *
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t KickOutFromConference();
+
+    /**
      * @brief Enable and send DTMF
      *
      * @param str[in], Characters sent

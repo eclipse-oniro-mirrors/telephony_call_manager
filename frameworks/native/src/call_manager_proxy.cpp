@@ -444,6 +444,21 @@ int32_t CallManagerProxy::SeparateConference(int32_t callId)
     return TELEPHONY_SUCCESS;
 }
 
+int32_t CallManagerProxy::KickOutFromConference(int32_t callId)
+{
+    if (ReConnectService() != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("ipc reconnect failed!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    std::lock_guard<std::mutex> lock(mutex_);
+    int32_t errCode = callManagerServicePtr_->KickOutFromConference(callId);
+    if (errCode != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("KickOutFromConference failed, errcode:%{public}d", errCode);
+        return errCode;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
 int32_t CallManagerProxy::GetMainCallId(int32_t &callId, int32_t &mainCallId)
 {
     if (ReConnectService() != TELEPHONY_SUCCESS) {

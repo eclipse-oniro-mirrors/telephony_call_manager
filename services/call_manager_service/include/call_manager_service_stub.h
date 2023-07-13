@@ -75,6 +75,7 @@ private:
     int32_t OnCanSetCallTransferTime(MessageParcel &data, MessageParcel &reply);
     int32_t OnCombineConference(MessageParcel &data, MessageParcel &reply);
     int32_t OnSeparateConference(MessageParcel &data, MessageParcel &reply);
+    int32_t OnKickOutFromConference(MessageParcel &data, MessageParcel &reply);
     int32_t OnJoinConference(MessageParcel &data, MessageParcel &reply);
     int32_t OnSetCallPreferenceMode(MessageParcel &data, MessageParcel &reply);
     int32_t OnControlCamera(MessageParcel &data, MessageParcel &reply);

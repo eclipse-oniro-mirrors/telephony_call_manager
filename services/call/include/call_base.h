@@ -53,8 +53,10 @@ public:
     virtual int32_t GetSlotId() = 0;
     virtual int32_t CombineConference() = 0;
     virtual int32_t SeparateConference() = 0;
+    virtual int32_t KickOutFromConference() = 0;
     virtual int32_t CanCombineConference() = 0;
     virtual int32_t CanSeparateConference() = 0;
+    virtual int32_t CanKickOutFromConference() = 0;
     virtual int32_t LaunchConference() = 0;
     virtual int32_t ExitConference() = 0;
     virtual int32_t HoldConference() = 0;

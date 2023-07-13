@@ -99,6 +99,15 @@ public:
     int32_t SeparateConference(const OttCallRequestInfo &requestInfo);
 
     /**
+     * KickOutFromConference
+     *
+     * @brief Hangup a specified call from a conference call
+     * @param requestInfo[in], Call request information.
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t KickOutFromConference(const OttCallRequestInfo &requestInfo);
+
+    /**
      * InviteToConference interface
      *
      * @param numberList

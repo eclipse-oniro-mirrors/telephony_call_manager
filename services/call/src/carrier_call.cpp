@@ -123,6 +123,8 @@ int32_t CarrierCall::CarrierHangUpCall()
     }
     if (policyFlag & POLICY_FLAG_HANG_UP_ACTIVE) {
         ret = cellularCallConnectionPtr_->HangUp(callInfo, CallSupplementType::TYPE_HANG_UP_ACTIVE);
+    } else if (policyFlag & POLICY_FLAG_HANG_UP_HOLD_WAIT) {
+        ret = cellularCallConnectionPtr_->HangUp(callInfo, CallSupplementType::TYPE_HANG_UP_HOLD_WAIT);
     } else {
         ret = cellularCallConnectionPtr_->HangUp(callInfo, CallSupplementType::TYPE_DEFAULT);
     }
@@ -249,6 +251,20 @@ int32_t CarrierCall::CarrierSeparateConference()
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     return cellularCallConnectionPtr_->SeparateConference(callInfo);
+}
+
+int32_t CarrierCall::CarrierKickOutFromConference()
+{
+    CellularCallInfo callInfo;
+    int32_t ret = PackCellularCallInfo(callInfo);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGW("PackCellularCallInfo failed!");
+    }
+    if (cellularCallConnectionPtr_ == nullptr) {
+        TELEPHONY_LOGE("cellularCallConnectionPtr_ is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return cellularCallConnectionPtr_->KickOutFromConference(callInfo);
 }
 
 int32_t CarrierCall::IsSupportConferenceable()

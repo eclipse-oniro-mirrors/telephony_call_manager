@@ -689,6 +689,24 @@ int32_t CallManagerService::SeparateConference(int32_t callId)
     }
 }
 
+int32_t CallManagerService::KickOutFromConference(int32_t callId)
+{
+    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
+        TELEPHONY_LOGE("Non-system applications use system APIs!");
+        return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
+    }
+    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_PLACE_CALL)) {
+        TELEPHONY_LOGE("Permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
+    if (callControlManagerPtr_ != nullptr) {
+        return callControlManagerPtr_->KickOutFromConference(callId);
+    } else {
+        TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+}
+
 int32_t CallManagerService::SetMuted(bool isMute)
 {
     if (!TelephonyPermission::CheckCallerIsSystemApp()) {

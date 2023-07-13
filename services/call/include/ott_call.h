@@ -41,8 +41,10 @@ public:
     int32_t GetSlotId() override;
     int32_t CombineConference() override;
     int32_t SeparateConference() override;
+    int32_t KickOutFromConference() override;
     int32_t CanCombineConference() override;
     int32_t CanSeparateConference() override;
+    int32_t CanKickOutFromConference() override;
     int32_t LaunchConference() override;
     int32_t ExitConference() override;
     int32_t HoldConference() override;

@@ -646,7 +646,31 @@ int32_t CallControlManager::SeparateConference(int32_t callId)
     }
     ret = CallRequestHandlerPtr_->SeparateConference(callId);
     if (ret != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("CombineConference failed!");
+        TELEPHONY_LOGE("SeparateConference failed!");
+        return ret;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallControlManager::KickOutFromConference(int32_t callId)
+{
+    sptr<CallBase> call = GetOneCallObject(callId);
+    if (call == nullptr) {
+        TELEPHONY_LOGE("GetOneCallObject failed, callId:%{public}d", callId);
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
+    }
+    int32_t ret = call->CanKickOutFromConference();
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("CanKickOutFromConference failed");
+        return ret;
+    }
+    if (CallRequestHandlerPtr_ == nullptr) {
+        TELEPHONY_LOGE("CallRequestHandlerPtr_ is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    ret = CallRequestHandlerPtr_->KickOutFromConference(callId);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("KickOutFromConference failed!");
         return ret;
     }
     return TELEPHONY_SUCCESS;

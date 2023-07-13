@@ -38,6 +38,7 @@ int32_t CallStatusCallback::UpdateCallReportInfo(const CallReportInfo &info)
     detailInfo.state = info.state;
     detailInfo.callMode = info.callMode;
     detailInfo.voiceDomain = info.voiceDomain;
+    detailInfo.mpty = info.mpty;
     (void)memcpy_s(detailInfo.phoneNum, kMaxNumberLen, info.accountNum, kMaxNumberLen);
     (void)memset_s(detailInfo.bundleName, kMaxBundleNameLen, 0, kMaxBundleNameLen);
     int32_t ret = DelayedSingleton<ReportCallInfoHandler>::GetInstance()->UpdateCallReportInfo(detailInfo);
@@ -64,6 +65,7 @@ int32_t CallStatusCallback::UpdateCallsReportInfo(const CallsReportInfo &info)
         detailInfo.state = (*it).state;
         detailInfo.callMode = (*it).callMode;
         detailInfo.voiceDomain = (*it).voiceDomain;
+        detailInfo.mpty = (*it).mpty;
         (void)memcpy_s(detailInfo.phoneNum, kMaxNumberLen, (*it).accountNum, kMaxNumberLen);
         (void)memset_s(detailInfo.bundleName, kMaxBundleNameLen, 0, kMaxBundleNameLen);
         detailsInfo.callVec.push_back(detailInfo);

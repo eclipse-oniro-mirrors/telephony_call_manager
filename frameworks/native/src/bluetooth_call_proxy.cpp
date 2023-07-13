@@ -273,6 +273,29 @@ int32_t BluetoothCallProxy::SeparateConference()
     return replyParcel.ReadInt32();
 }
 
+int32_t BluetoothCallProxy::KickOutFromConference()
+{
+    MessageOption option;
+    MessageParcel dataParcel;
+    MessageParcel replyParcel;
+    if (!dataParcel.WriteInterfaceToken(BluetoothCallProxy::GetDescriptor())) {
+        TELEPHONY_LOGE("write descriptor fail");
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    if (Remote() == nullptr) {
+        TELEPHONY_LOGE("function Remote() return nullptr!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t error = Remote()->SendRequest(
+        static_cast<int32_t>(BluetoothCallInterfaceCode::INTERFACE_BT_KICK_OUT_CONFERENCE), dataParcel,
+        replyParcel, option);
+    if (error != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("Function KickOutFromConference call failed! errCode:%{public}d", error);
+        return error;
+    }
+    return replyParcel.ReadInt32();
+}
+
 std::vector<CallAttributeInfo> BluetoothCallProxy::GetCurrentCallList(int32_t slotId)
 {
     std::vector<CallAttributeInfo> callVec;

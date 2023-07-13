@@ -37,6 +37,7 @@ public:
     int32_t StartDtmfPolicy(int32_t &callId);
     int32_t CombineConferencePolicy(int32_t &callId);
     int32_t SeparateConferencePolicy(int32_t &callId);
+    int32_t KickOutFromConferencePolicy(int32_t &callId);
 };
 } // namespace Telephony
 } // namespace OHOS

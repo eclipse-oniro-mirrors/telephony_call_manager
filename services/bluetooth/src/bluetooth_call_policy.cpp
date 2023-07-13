@@ -156,5 +156,16 @@ int32_t BluetoothCallPolicy::SeparateConferencePolicy(int32_t &callId)
     TELEPHONY_LOGW("SeparateConferencePolicy failed");
     return CALL_ERR_ILLEGAL_CALL_OPERATION;
 }
+
+int32_t BluetoothCallPolicy::KickOutFromConferencePolicy(int32_t &callId)
+{
+    if (IsConferenceCallExist(TelConferenceState::TEL_CONFERENCE_ACTIVE, callId) ||
+        IsConferenceCallExist(TelConferenceState::TEL_CONFERENCE_HOLDING, callId)) {
+        TELEPHONY_LOGI("conference call is exist, callId:%{public}d", callId);
+        return TELEPHONY_SUCCESS;
+    }
+    TELEPHONY_LOGW("KickOutFromConferencePolicy failed");
+    return CALL_ERR_ILLEGAL_CALL_OPERATION;
+}
 } // namespace Telephony
 } // namespace OHOS

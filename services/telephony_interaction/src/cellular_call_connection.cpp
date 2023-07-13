@@ -316,6 +316,20 @@ int CellularCallConnection::SeparateConference(const CellularCallInfo &callInfo)
     return TELEPHONY_SUCCESS;
 }
 
+int CellularCallConnection::KickOutFromConference(const CellularCallInfo &callInfo)
+{
+    if (ReConnectService() != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("ipc reconnect failed!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int errCode = cellularCallInterfacePtr_->KickOutFromConference(callInfo);
+    if (errCode != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("Kick out from conference failed, errcode:%{public}d", errCode);
+        return errCode;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
 int CellularCallConnection::StartDtmf(char cDTMFCode, const CellularCallInfo &callInfo)
 {
     if (ReConnectService() != TELEPHONY_SUCCESS) {

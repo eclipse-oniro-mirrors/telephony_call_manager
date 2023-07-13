@@ -44,6 +44,7 @@ enum class BluetoothCallFuncCode {
     TEST_MUTE_RINGER,
     TEST_SET_AUDIO_DEVICE,
     TEST_GET_CURRENT_CALL_LIST,
+    TEST_KICK_OUT_CONFERENCE,
 };
 
 class BluetoothCallTest {
@@ -68,6 +69,7 @@ private:
     void SwitchCall();
     void CombineConference();
     void SeparateConference();
+    void KickOutFromConference();
     void StartDtmf();
     void StopDtmf();
     void IsRinging();

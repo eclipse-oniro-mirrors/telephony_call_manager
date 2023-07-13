@@ -373,17 +373,18 @@ int32_t CellularCallProxy::InviteToConference(int32_t slotId, const std::vector<
     return error;
 }
 
-int32_t CellularCallProxy::KickOutFromConference(int32_t slotId, const std::vector<std::string> &numberList)
+int32_t CellularCallProxy::KickOutFromConference(const CellularCallInfo &callInfo)
 {
     MessageOption option;
     MessageParcel in;
     MessageParcel out;
-    int32_t result = TELEPHONY_SUCCESS;
-    result = SetCommonParamForMessageParcel(slotId, in);
-    if (result != TELEPHONY_SUCCESS) {
-        return result;
+    if (!in.WriteInterfaceToken(CellularCallProxy::GetDescriptor())) {
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
-    if (!in.WriteStringVector(numberList)) {
+    if (!in.WriteInt32(MAX_SIZE)) {
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
+    if (!in.WriteRawData((const void *)&callInfo, sizeof(CellularCallInfo))) {
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
     auto remote = Remote();

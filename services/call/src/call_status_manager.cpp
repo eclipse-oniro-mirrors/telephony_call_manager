@@ -123,7 +123,7 @@ int32_t CallStatusManager::HandleCallsReportInfo(const CallDetailsInfo &info)
         for (const auto &it1 : callDetailsInfo_.callVec) {
             if (strcmp(it.phoneNum, it1.phoneNum) == 0) {
                 // call state changes
-                if (it.state != it1.state) {
+                if (it.state != it1.state || it.mpty != it1.mpty) {
                     TELEPHONY_LOGI("handle updated call state:%{public}d", it.state);
                     HandleCallReportInfo(it);
                 }
@@ -391,16 +391,20 @@ int32_t CallStatusManager::ActiveHandle(const CallDetailInfo &info)
     }
     call = RefreshCallIfNecessary(call, info);
     // call state change active, need to judge if launching a conference
-    int32_t ret = call->LaunchConference();
-    if (ret == TELEPHONY_SUCCESS) {
+    if (info.mpty == 1) {
         int32_t mainCallId = ERR_ID;
+        call->LaunchConference();
         call->GetMainCallId(mainCallId);
         sptr<CallBase> mainCall = GetOneCallObject(mainCallId);
         if (mainCall != nullptr) {
             mainCall->SetTelConferenceState(TelConferenceState::TEL_CONFERENCE_ACTIVE);
         }
+    } else if (call->ExitConference() == TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGI("SubCallSeparateFromConference success!");
+    } else {
+        TELEPHONY_LOGI("SubCallSeparateFromConference fail!");
     }
-    ret = UpdateCallState(call, TelCallState::CALL_STATUS_ACTIVE);
+    int32_t ret = UpdateCallState(call, TelCallState::CALL_STATUS_ACTIVE);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("UpdateCallState failed, errCode:%{public}d", ret);
         return ret;
@@ -493,6 +497,11 @@ int32_t CallStatusManager::DisconnectedHandle(const CallDetailInfo &info)
     int32_t ret = call->ExitConference();
     if (ret == TELEPHONY_SUCCESS) {
         TELEPHONY_LOGI("SubCallSeparateFromConference success");
+    }
+    sptr<CallBase> holdCall = CallObjectManager::GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_HOLD);
+    if (holdCall) {
+        TELEPHONY_LOGI("release the call and recover the held call");
+        holdCall->UnHoldCall();
     }
     ret = UpdateCallState(call, TelCallState::CALL_STATUS_DISCONNECTED);
     if (ret != TELEPHONY_SUCCESS) {
