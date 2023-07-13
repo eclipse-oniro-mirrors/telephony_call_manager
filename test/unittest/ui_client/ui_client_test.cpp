@@ -378,6 +378,20 @@ void SeparateConference()
     std::cout << "return value:" << ret << std::endl;
 }
 
+void KickOutFromConference()
+{
+    int32_t callId = DEFAULT_CALL_ID;
+    std::cout << "------KickOutFromConference------" << std::endl;
+    std::cout << "please input callId:" << std::endl;
+    std::cin >> callId;
+    if (g_clientPtr == nullptr) {
+        std::cout << "g_clientPtr is nullptr" << std::endl;
+        return;
+    }
+    int32_t ret = g_clientPtr->KickOutFromConference(callId);
+    std::cout << "return value:" << ret << std::endl;
+}
+
 void GetCallState()
 {
     std::cout << "------GetCallState------" << std::endl;
@@ -1416,6 +1430,7 @@ void InitCallConferencePower()
 {
     g_memberFuncMap[OHOS::Telephony::INTERFACE_COMBINE_CONFERENCE] = &OHOS::Telephony::CombineConference;
     g_memberFuncMap[OHOS::Telephony::INTERFACE_SEPARATE_CONFERENCE] = &OHOS::Telephony::SeparateConference;
+    g_memberFuncMap[OHOS::Telephony::INTERFACE_KICK_OUT_CONFERENCE] = &OHOS::Telephony::KickOutFromConference;
 }
 
 void InitCallDtmfPower()
@@ -1537,7 +1552,8 @@ void PrintfCallUtilsInterface()
 void PrintfCallConferenceInterface()
 {
     std::cout << "17:combine conference\n"
-              << "18:separate conference\n";
+              << "18:separate conference\n"
+              << "62:kick out conference\n";
 }
 
 void PrintfCallDtmfInterface()

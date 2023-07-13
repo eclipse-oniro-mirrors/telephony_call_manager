@@ -273,6 +273,17 @@ int32_t BluetoothCallService::SeparateConference()
     }
 }
 
+int32_t BluetoothCallService::KickOutFromConference()
+{
+    int32_t callId = ERR_ID;
+    if (callControlManagerPtr_ != nullptr) {
+        return callControlManagerPtr_->KickOutFromConference(callId);
+    } else {
+        TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+}
+
 std::vector<CallAttributeInfo> BluetoothCallService::GetCurrentCallList(int32_t slotId)
 {
     if (!TelephonyPermission::CheckPermission(Permission::GET_TELEPHONY_STATE)) {

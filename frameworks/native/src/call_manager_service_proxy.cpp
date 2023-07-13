@@ -815,6 +815,29 @@ int32_t CallManagerServiceProxy::SeparateConference(int32_t callId)
     return replyParcel.ReadInt32();
 }
 
+int32_t CallManagerServiceProxy::KickOutFromConference(int32_t callId)
+{
+    MessageOption option;
+    MessageParcel dataParcel;
+    MessageParcel replyParcel;
+    if (!dataParcel.WriteInterfaceToken(CallManagerServiceProxy::GetDescriptor())) {
+        TELEPHONY_LOGE("write descriptor fail");
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    dataParcel.WriteInt32(callId);
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("function Remote() return nullptr!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t error = remote->SendRequest(INTERFACE_KICK_OUT_CONFERENCE, dataParcel, replyParcel, option);
+    if (error != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("Function KickOutFromConference call failed! errCode:%{public}d", error);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return replyParcel.ReadInt32();
+}
+
 int32_t CallManagerServiceProxy::ControlCamera(std::u16string cameraId)
 {
     MessageOption option;

@@ -158,6 +158,19 @@ void SeparateConference(const uint8_t *data, size_t size)
     DelayedSingleton<BluetoothCallService>::GetInstance()->OnSeparateConference(dataParcel, reply);
 }
 
+void KickOutFromConference(const uint8_t *data, size_t size)
+{
+    if (!IsServiceInited()) {
+        return;
+    }
+
+    MessageParcel dataParcel;
+    dataParcel.WriteBuffer(data, size);
+    dataParcel.RewindRead(0);
+    MessageParcel reply;
+    DelayedSingleton<BluetoothCallService>::GetInstance()->OnKickOutFromConference(dataParcel, reply);
+}
+
 void StartDtmf(const uint8_t *data, size_t size)
 {
     if (!IsServiceInited()) {
@@ -216,6 +229,7 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     SwitchCall(data, size);
     CombineConference(data, size);
     SeparateConference(data, size);
+    KickOutFromConference(data, size);
     StartDtmf(data, size);
     StopDtmf(data, size);
     GetCurrentCallList(data, size);

@@ -86,6 +86,14 @@ int32_t OTTCallConnection::SeparateConference(const OttCallRequestInfo &requestI
         OttCallRequestId::OTT_REQUEST_SEPARATE_CONFERENCE, info);
 }
 
+int32_t OTTCallConnection::KickOutFromConference(const OttCallRequestInfo &requestInfo)
+{
+    AppExecFwk::PacMap info;
+    PackCellularCallInfo(requestInfo, info);
+    return DelayedSingleton<CallAbilityReportProxy>::GetInstance()->OttCallRequest(
+        OttCallRequestId::OTT_REQUEST_KICK_OUT_CONFERENCE, info);
+}
+
 int32_t OTTCallConnection::InviteToConference(
     const OttCallRequestInfo &requestInfo, const std::vector<std::string> &numberList)
 {

@@ -55,6 +55,7 @@ public:
     int32_t SwitchCall(int32_t callId);
     int32_t CombineConference(int32_t callId);
     int32_t SeparateConference(int32_t callId);
+    int32_t KickOutFromConference(int32_t callId);
     int32_t GetMainCallId(int32_t &callId, int32_t &mainCallId);
     int32_t GetSubCallIdList(int32_t callId, std::vector<std::u16string> &callIdList);
     int32_t GetCallIdListForConference(int32_t callId, std::vector<std::u16string> &callIdList);

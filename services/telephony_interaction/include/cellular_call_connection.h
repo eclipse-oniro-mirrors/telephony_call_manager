@@ -129,6 +129,15 @@ public:
     int SeparateConference(const CellularCallInfo &callInfo);
 
     /**
+     * KickOutFromConference
+     *
+     * @brief Hangup a specified call from a conference call
+     * @param callInfo[in], Call information.
+     * @return Returns 0 on success, others on failure.
+     */
+    int KickOutFromConference(const CellularCallInfo &callInfo);
+
+    /**
      * StartDtmf
      *
      * @brief Enable and send DTMF

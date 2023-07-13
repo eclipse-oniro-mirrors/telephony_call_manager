@@ -316,6 +316,15 @@ public:
     int32_t SeparateConference(int32_t callId) override;
 
     /**
+     * KickOutFromConference
+     *
+     * @brief Hangup a specified call from a conference call
+     * @param callId[in], call id
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t KickOutFromConference(int32_t callId) override;
+
+    /**
      * JoinConference
      *
      * @brief Bring someone into a meeting

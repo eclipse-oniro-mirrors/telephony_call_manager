@@ -36,6 +36,7 @@ public:
     void SwitchRequest(int32_t callId);
     void CombineConferenceRequest(int32_t mainCallId);
     void SeparateConferenceRequest(int32_t callId);
+    void KickOutFromConferenceRequest(int32_t callId);
     void UpdateCallMediaModeRequest(int32_t callId, ImsCallMode mode);
     void StartRttRequest(int32_t callId, std::u16string &msg);
     void StopRttRequest(int32_t callId);

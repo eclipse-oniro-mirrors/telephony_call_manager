@@ -93,6 +93,11 @@ int32_t CSCall::SeparateConference()
     return CarrierSeparateConference();
 }
 
+int32_t CSCall::KickOutFromConference()
+{
+    return CarrierKickOutFromConference();
+}
+
 int32_t CSCall::CanCombineConference()
 {
     int32_t ret = IsSupportConferenceable();
@@ -108,6 +113,11 @@ int32_t CSCall::CanSeparateConference()
     return DelayedSingleton<CsConference>::GetInstance()->CanSeparateConference();
 }
 
+int32_t CSCall::CanKickOutFromConference()
+{
+    return DelayedSingleton<CsConference>::GetInstance()->CanKickOutFromConference();
+}
+
 int32_t CSCall::LaunchConference()
 {
     int32_t ret = DelayedSingleton<CsConference>::GetInstance()->JoinToConference(GetCallID());
@@ -119,7 +129,11 @@ int32_t CSCall::LaunchConference()
 
 int32_t CSCall::ExitConference()
 {
-    return DelayedSingleton<CsConference>::GetInstance()->LeaveFromConference(GetCallID());
+    int32_t ret = DelayedSingleton<CsConference>::GetInstance()->LeaveFromConference(GetCallID());
+    if (ret == TELEPHONY_SUCCESS) {
+        SetTelConferenceState(TelConferenceState::TEL_CONFERENCE_IDLE);
+    }
+    return ret;
 }
 
 int32_t CSCall::HoldConference()

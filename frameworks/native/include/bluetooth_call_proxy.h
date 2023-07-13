@@ -130,6 +130,14 @@ public:
     int32_t SeparateConference() override;
 
     /**
+     * KickOutFromConference
+     *
+     * @brief Hangup a specified call from a conference call
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t KickOutFromConference() override;
+
+    /**
      * GetCurrentCallList
      *
      * @brief Get current call list

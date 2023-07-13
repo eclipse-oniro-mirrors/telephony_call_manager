@@ -62,6 +62,9 @@ int32_t ImsConference::LeaveFromConference(int32_t callId)
     std::lock_guard<std::mutex> lock(conferenceMutex_);
     if (subCallIdSet_.find(callId) != subCallIdSet_.end()) {
         subCallIdSet_.erase(callId);
+        if (mainCallId_ == callId) {
+            mainCallId_ = *subCallIdSet_.begin();
+        }
     } else {
         TELEPHONY_LOGE("separate conference failed, callId %{public}d not in conference", callId);
         return CALL_ERR_CONFERENCE_SEPERATE_FAILED;
@@ -81,9 +84,7 @@ int32_t ImsConference::HoldConference(int32_t callId)
         TELEPHONY_LOGI("HoldConference success");
         return TELEPHONY_SUCCESS;
     }
-    if (subCallIdSet_.find(callId) != subCallIdSet_.end()) {
-        subCallIdSet_.erase(callId);
-    } else {
+    if (subCallIdSet_.find(callId) == subCallIdSet_.end()) {
         TELEPHONY_LOGE("separate conference failed, callId %{public}d not in conference", callId);
         return CALL_ERR_CONFERENCE_SEPERATE_FAILED;
     }
@@ -91,6 +92,7 @@ int32_t ImsConference::HoldConference(int32_t callId)
         mainCallId_ = ERR_ID;
         state_ = CONFERENCE_STATE_IDLE;
         beginTime_ = 0;
+        return CALL_ERR_CONFERENCE_SEPERATE_FAILED;
     }
     return TELEPHONY_SUCCESS;
 }
@@ -106,6 +108,16 @@ int32_t ImsConference::CanCombineConference()
 }
 
 int32_t ImsConference::CanSeparateConference()
+{
+    std::lock_guard<std::mutex> lock(conferenceMutex_);
+    if (subCallIdSet_.empty() || state_ != CONFERENCE_STATE_ACTIVE) {
+        TELEPHONY_LOGE("no call is currently in the conference!");
+        return CALL_ERR_CONFERENCE_NOT_EXISTS;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t ImsConference::CanKickOutFromConference()
 {
     std::lock_guard<std::mutex> lock(conferenceMutex_);
     if (subCallIdSet_.empty() || state_ != CONFERENCE_STATE_ACTIVE) {

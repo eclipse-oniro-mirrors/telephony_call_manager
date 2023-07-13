@@ -86,6 +86,7 @@ public:
     static napi_value SwitchCall(napi_env env, napi_callback_info info);
     static napi_value CombineConference(napi_env env, napi_callback_info info);
     static napi_value SeparateConference(napi_env env, napi_callback_info info);
+    static napi_value KickOutFromConference(napi_env env, napi_callback_info info);
     static napi_value GetMainCallId(napi_env env, napi_callback_info info);
     static napi_value GetSubCallIdList(napi_env env, napi_callback_info info);
     static napi_value GetCallIdListForConference(napi_env env, napi_callback_info info);
@@ -167,6 +168,7 @@ private:
     static void NativeSwitchCall(napi_env env, void *data);
     static void NativeCombineConference(napi_env env, void *data);
     static void NativeSeparateConference(napi_env env, void *data);
+    static void NativeKickOutFromConference(napi_env env, void *data);
     static void NativeGetMainCallId(napi_env env, void *data);
     static void NativeGetSubCallIdList(napi_env env, void *data);
     static void NativeGetCallIdListForConference(napi_env env, void *data);

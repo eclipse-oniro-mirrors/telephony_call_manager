@@ -589,6 +589,12 @@ struct CallReportInfo {
      * Indicates the voica domain, 0: CS, 1: IMS
      */
     int32_t voiceDomain = 0;
+    /**
+     * Indicates the Multi-party call status:
+     * 0: not a multi-party(conference) call
+     * 1: a multi-party(conference) call
+     */
+    int32_t mpty = 0;
 };
 
 /**
@@ -1018,6 +1024,7 @@ enum class RequestResultEventId {
     RESULT_HOLD_SEND_FAILED,
     RESULT_ACTIVE_SEND_FAILED,
     RESULT_SWAP_SEND_FAILED,
+    RESULT_COMBINE_SEND_FAILED,
     RESULT_JOIN_SEND_FAILED,
     RESULT_SPLIT_SEND_FAILED,
     RESULT_SUPPLEMENT_SEND_FAILED,
@@ -1798,6 +1805,7 @@ enum class OttCallRequestId {
     OTT_REQUEST_SWITCH,
     OTT_REQUEST_COMBINE_CONFERENCE,
     OTT_REQUEST_SEPARATE_CONFERENCE,
+    OTT_REQUEST_KICK_OUT_CONFERENCE,
     OTT_REQUEST_INVITE_TO_CONFERENCE,
     OTT_REQUEST_UPDATE_CALL_MEDIA_MODE,
 };
@@ -1905,7 +1913,12 @@ struct CallDetailInfo {
      * Indicates the voice domain. 0: CS, 1: IMS
      */
     int32_t voiceDomain = 0;
-    
+    /**
+     * Indicates the Multi-party call status:
+     * 0: not a multi-party(conference) call
+     * 1: a multi-party(conference) call
+     */
+    int32_t mpty = 0;
     CallDetailInfo operator=(const CallDetailInfo &temp)
     {
         index = temp.index;
@@ -1916,8 +1929,10 @@ struct CallDetailInfo {
         callMode = temp.callMode;
         state = temp.state;
         voiceDomain = temp.voiceDomain;
+        mpty = temp.mpty;
         return *this;
     }
+
 };
 
 /**

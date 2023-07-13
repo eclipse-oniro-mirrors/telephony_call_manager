@@ -690,6 +690,15 @@ public:
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
 
+    int32_t KickOutFromConference(int32_t callId) const
+    {
+        if (callManagerServicePtr_ != nullptr) {
+            return callManagerServicePtr_->KickOutFromConference(callId);
+        }
+        TELEPHONY_LOGE("callManagerServicePtr_ is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+
     int32_t IsEmergencyPhoneNumber(std::u16string &number, int32_t slotId, bool &enabled) const
     {
         if (callManagerServicePtr_ != nullptr) {

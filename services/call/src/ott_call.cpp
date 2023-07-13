@@ -229,9 +229,29 @@ int32_t OTTCall::SeparateConference()
     return ottCallConnectionPtr_->SeparateConference(requestInfo);
 }
 
+int32_t OTTCall::KickOutFromConference()
+{
+    OttCallRequestInfo requestInfo;
+    int32_t ret = PackOttCallRequestInfo(requestInfo);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("PackOttCallRequestInfo failed, error%{public}d", ret);
+        return ret;
+    }
+    if (ottCallConnectionPtr_ == nullptr) {
+        TELEPHONY_LOGE("ottCallConnectionPtr_ is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return ottCallConnectionPtr_->KickOutFromConference(requestInfo);
+}
+
 int32_t OTTCall::CanSeparateConference()
 {
     return DelayedSingleton<OttConference>::GetInstance()->CanSeparateConference();
+}
+
+int32_t OTTCall::CanKickOutFromConference()
+{
+    return DelayedSingleton<OttConference>::GetInstance()->CanKickOutFromConference();
 }
 
 int32_t OTTCall::LaunchConference()
@@ -245,7 +265,11 @@ int32_t OTTCall::LaunchConference()
 
 int32_t OTTCall::ExitConference()
 {
-    return DelayedSingleton<OttConference>::GetInstance()->LeaveFromConference(GetCallID());
+    int32_t ret = DelayedSingleton<OttConference>::GetInstance()->LeaveFromConference(GetCallID());
+    if (ret == TELEPHONY_SUCCESS) {
+        SetTelConferenceState(TelConferenceState::TEL_CONFERENCE_IDLE);
+    }
+    return ret;
 }
 
 int32_t OTTCall::HoldConference()

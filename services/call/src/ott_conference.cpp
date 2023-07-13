@@ -62,6 +62,9 @@ int32_t OttConference::LeaveFromConference(int32_t callId)
     std::lock_guard<std::mutex> lock(conferenceMutex_);
     if (subCallIdSet_.find(callId) != subCallIdSet_.end()) {
         subCallIdSet_.erase(callId);
+        if (mainCallId_ == callId) {
+            mainCallId_ = *subCallIdSet_.begin();
+        }
     } else {
         TELEPHONY_LOGE("separate conference failed, callId %{public}d not in conference", callId);
         return CALL_ERR_CONFERENCE_SEPERATE_FAILED;
@@ -106,6 +109,16 @@ int32_t OttConference::CanCombineConference()
 }
 
 int32_t OttConference::CanSeparateConference()
+{
+    std::lock_guard<std::mutex> lock(conferenceMutex_);
+    if (subCallIdSet_.empty() || state_ != CONFERENCE_STATE_ACTIVE) {
+        TELEPHONY_LOGE("no call is currently in the conference!");
+        return CALL_ERR_CONFERENCE_NOT_EXISTS;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t OttConference::CanKickOutFromConference()
 {
     std::lock_guard<std::mutex> lock(conferenceMutex_);
     if (subCallIdSet_.empty() || state_ != CONFERENCE_STATE_ACTIVE) {

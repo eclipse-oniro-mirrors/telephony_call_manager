@@ -39,6 +39,7 @@ public:
     virtual int32_t SwitchCall() = 0;
     virtual int32_t CombineConference() = 0;
     virtual int32_t SeparateConference() = 0;
+    virtual int32_t KickOutFromConference() = 0;
     virtual int32_t StartDtmf(char str) = 0;
     virtual int32_t StopDtmf() = 0;
     virtual std::vector<CallAttributeInfo> GetCurrentCallList(int32_t slotId) = 0;

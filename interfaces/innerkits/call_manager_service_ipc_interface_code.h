@@ -83,6 +83,7 @@ enum CallManagerInterfaceCode {
     INTERFACE_CANCEL_MISSED_INCOMING_CALL_NOTIFICATION,
     INTERFACE_SET_VONR_STATE,
     INTERFACE_GET_VONR_STATE,
+    INTERFACE_KICK_OUT_CONFERENCE,
 };
 } // end extern
 } // namespace Telephony

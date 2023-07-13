@@ -102,6 +102,8 @@ void CallManagerServiceStub::InitCallConferenceRequest()
         &CallManagerServiceStub::OnSeparateConference;
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_JOIN_CONFERENCE)] =
         &CallManagerServiceStub::OnJoinConference;
+    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_KICK_OUT_CONFERENCE)] =
+        &CallManagerServiceStub::OnKickOutFromConference;
 }
 
 void CallManagerServiceStub::InitCallDtmfRequest()
@@ -668,6 +670,18 @@ int32_t CallManagerServiceStub::OnJoinConference(MessageParcel &data, MessagePar
     result = JoinConference(callId, numberList);
     if (!reply.WriteInt32(result)) {
         TELEPHONY_LOGE("JoinConference fail to write parcel");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallManagerServiceStub::OnKickOutFromConference(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t callId = data.ReadInt32();
+    int32_t result = KickOutFromConference(callId);
+    TELEPHONY_LOGI("result:%{public}d", result);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("fail to write parcel");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
     return TELEPHONY_SUCCESS;

@@ -47,6 +47,7 @@ private:
     int32_t OnStopDtmf(MessageParcel &data, MessageParcel &reply);
     int32_t OnCombineConference(MessageParcel &data, MessageParcel &reply);
     int32_t OnSeparateConference(MessageParcel &data, MessageParcel &reply);
+    int32_t OnKickOutFromConference(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetCurrentCallList(MessageParcel &data, MessageParcel &reply);
     std::map<uint32_t, BluetoothCallFunc> memberFuncMap_;
 };

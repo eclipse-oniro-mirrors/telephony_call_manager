@@ -115,6 +115,7 @@ HWTEST_F(BranchTest, Telephony_CallRequestHandler_001, Function | MediumTest | L
     ASSERT_NE(callRequestHandler->SwitchCall(1), TELEPHONY_ERR_SUCCESS);
     ASSERT_NE(callRequestHandler->CombineConference(1), TELEPHONY_ERR_SUCCESS);
     ASSERT_NE(callRequestHandler->SeparateConference(1), TELEPHONY_ERR_SUCCESS);
+    ASSERT_NE(callRequestHandler->KickOutFromConference(1), TELEPHONY_ERR_SUCCESS);
     ASSERT_NE(callRequestHandler->UpdateImsCallMode(1, ImsCallMode::CALL_MODE_AUDIO_ONLY), TELEPHONY_ERR_SUCCESS);
     std::u16string test = u"";
     ASSERT_NE(callRequestHandler->StartRtt(1, test), TELEPHONY_ERR_SUCCESS);
@@ -141,6 +142,7 @@ HWTEST_F(BranchTest, Telephony_CallRequestProcess_001, Function | MediumTest | L
     callRequestProcess->SwitchRequest(1);
     callRequestProcess->CombineConferenceRequest(1);
     callRequestProcess->SeparateConferenceRequest(1);
+    callRequestProcess->KickOutFromConferenceRequest(1);
     callRequestProcess->UpdateCallMediaModeRequest(1, ImsCallMode::CALL_MODE_AUDIO_ONLY);
     std::u16string test = u"";
     callRequestProcess->StartRttRequest(1, test);
@@ -217,6 +219,8 @@ HWTEST_F(BranchTest, Telephony_CellularCallConnection_001, Function | MediumTest
     ASSERT_NE(DelayedSingleton<CellularCallConnection>::GetInstance()->CombineConference(mCellularCallInfo),
         TELEPHONY_ERR_SUCCESS);
     ASSERT_NE(DelayedSingleton<CellularCallConnection>::GetInstance()->SeparateConference(mCellularCallInfo),
+        TELEPHONY_ERR_SUCCESS);
+    ASSERT_NE(DelayedSingleton<CellularCallConnection>::GetInstance()->KickOutFromConference(mCellularCallInfo),
         TELEPHONY_ERR_SUCCESS);
     ASSERT_NE(DelayedSingleton<CellularCallConnection>::GetInstance()->StartDtmf('a', mCellularCallInfo),
         TELEPHONY_ERR_SUCCESS);
@@ -902,6 +906,7 @@ HWTEST_F(BranchTest, Telephony_BluetoothCallClient_001, Function | MediumTest | 
     ASSERT_NE(bluetoothCallClient->SwitchCall(), TELEPHONY_SUCCESS);
     ASSERT_NE(bluetoothCallClient->CombineConference(), TELEPHONY_SUCCESS);
     ASSERT_NE(bluetoothCallClient->SeparateConference(), TELEPHONY_SUCCESS);
+    ASSERT_NE(bluetoothCallClient->KickOutFromConference(), TELEPHONY_SUCCESS);
     ASSERT_NE(bluetoothCallClient->StartDtmf('a'), TELEPHONY_SUCCESS);
     ASSERT_NE(bluetoothCallClient->StopDtmf(), TELEPHONY_SUCCESS);
     ASSERT_NE(bluetoothCallClient->IsRinging(enabled), TELEPHONY_SUCCESS);
@@ -925,6 +930,7 @@ HWTEST_F(BranchTest, Telephony_CallManagerClient_001, Function | MediumTest | Le
     callManagerClient->SwitchCall(0);
     callManagerClient->CombineConference(0);
     callManagerClient->SeparateConference(0);
+    callManagerClient->KickOutFromConference(0);
     int32_t intValue;
     callManagerClient->GetMainCallId(intValue, intValue);
     std::vector<std::u16string> callIdList;
@@ -1137,7 +1143,9 @@ HWTEST_F(BranchTest, Telephony_OTTCall_001, Function | MediumTest | Level3)
     ASSERT_NE(ottCall->CombineConference(), TELEPHONY_SUCCESS);
     ASSERT_EQ(ottCall->CanCombineConference(), TELEPHONY_SUCCESS);
     ASSERT_NE(ottCall->SeparateConference(), TELEPHONY_SUCCESS);
+    ASSERT_NE(ottCall->KickOutFromConference(), TELEPHONY_SUCCESS);
     ASSERT_NE(ottCall->CanSeparateConference(), TELEPHONY_SUCCESS);
+    ASSERT_NE(ottCall->CanKickOutFromConference(), TELEPHONY_SUCCESS);
     ASSERT_EQ(ottCall->LaunchConference(), TELEPHONY_SUCCESS);
     ASSERT_EQ(ottCall->ExitConference(), TELEPHONY_SUCCESS);
     ASSERT_NE(ottCall->HoldConference(), TELEPHONY_SUCCESS);
@@ -1215,8 +1223,10 @@ HWTEST_F(BranchTest, Telephony_Ott_Conference_001, Function | MediumTest | Level
     ottConference.subCallIdSet_.insert(1);
     ottConference.state_ = CONFERENCE_STATE_ACTIVE;
     ASSERT_EQ(ottConference.CanSeparateConference(), TELEPHONY_SUCCESS);
+    ASSERT_EQ(ottConference.CanKickOutFromConference(), TELEPHONY_SUCCESS);
     ottConference.subCallIdSet_.clear();
     ASSERT_EQ(ottConference.CanSeparateConference(), CALL_ERR_CONFERENCE_NOT_EXISTS);
+    ASSERT_EQ(ottConference.CanKickOutFromConference(), CALL_ERR_CONFERENCE_NOT_EXISTS);
 }
 
 /**
@@ -1250,8 +1260,10 @@ HWTEST_F(BranchTest, Telephony_Cs_Conference_001, Function | MediumTest | Level3
     csConference.subCallIdSet_.insert(1);
     csConference.state_ = CONFERENCE_STATE_ACTIVE;
     ASSERT_EQ(csConference.CanSeparateConference(), TELEPHONY_SUCCESS);
+    ASSERT_EQ(csConference.CanKickOutFromConference(), TELEPHONY_SUCCESS);
     csConference.subCallIdSet_.clear();
     ASSERT_EQ(csConference.CanSeparateConference(), CALL_ERR_CONFERENCE_NOT_EXISTS);
+    ASSERT_EQ(csConference.CanKickOutFromConference(), CALL_ERR_CONFERENCE_NOT_EXISTS);
 }
 
 /**
@@ -1285,8 +1297,10 @@ HWTEST_F(BranchTest, Telephony_Ims_Conference_001, Function | MediumTest | Level
     imsConference.subCallIdSet_.insert(1);
     imsConference.state_ = CONFERENCE_STATE_ACTIVE;
     ASSERT_EQ(imsConference.CanSeparateConference(), TELEPHONY_SUCCESS);
+    ASSERT_EQ(imsConference.CanKickOutFromConference(), TELEPHONY_SUCCESS);
     imsConference.subCallIdSet_.clear();
     ASSERT_EQ(imsConference.CanSeparateConference(), CALL_ERR_CONFERENCE_NOT_EXISTS);
+    ASSERT_EQ(imsConference.CanKickOutFromConference(), CALL_ERR_CONFERENCE_NOT_EXISTS);
 }
 
 /**
@@ -1326,6 +1340,7 @@ HWTEST_F(BranchTest, Telephony_BluetoothCallService_001, Function | MediumTest |
     bluetoothCallService.callObjectPtrList_.push_back(callBase1);
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, bluetoothCallService.CombineConference());
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, bluetoothCallService.SeparateConference());
+    ASSERT_NE(TELEPHONY_ERR_SUCCESS, bluetoothCallService.KickOutFromConference());
 }
 
 std::string GetTestNumber()
@@ -1383,6 +1398,7 @@ HWTEST_F(BranchTest, Telephony_CarrierCall_001, Function | MediumTest | Level3)
     call.cellularCallConnectionPtr_ = nullptr;
     ASSERT_EQ(TELEPHONY_ERR_LOCAL_PTR_NULL, call.CarrierCombineConference());
     ASSERT_EQ(TELEPHONY_ERR_LOCAL_PTR_NULL, call.CarrierSeparateConference());
+    ASSERT_EQ(TELEPHONY_ERR_LOCAL_PTR_NULL, call.CarrierKickOutFromConference());
     ASSERT_EQ(TELEPHONY_ERR_LOCAL_PTR_NULL, call.StartDtmf('c'));
     ASSERT_EQ(TELEPHONY_ERR_LOCAL_PTR_NULL, call.StopDtmf());
 }
@@ -1517,10 +1533,13 @@ HWTEST_F(BranchTest, Telephony_BluetoothCallPolicy_002, Function | MediumTest | 
     ASSERT_NE(TELEPHONY_SUCCESS, callPolicy.CombineConferencePolicy(policy));
     callBase1->conferenceState_ = TelConferenceState::TEL_CONFERENCE_ACTIVE;
     ASSERT_EQ(TELEPHONY_SUCCESS, callPolicy.SeparateConferencePolicy(policy));
+    ASSERT_EQ(TELEPHONY_SUCCESS, callPolicy.KickOutFromConferencePolicy(policy));
     callBase1->conferenceState_ = TelConferenceState::TEL_CONFERENCE_HOLDING;
     ASSERT_EQ(TELEPHONY_SUCCESS, callPolicy.SeparateConferencePolicy(policy));
+    ASSERT_EQ(TELEPHONY_SUCCESS, callPolicy.KickOutFromConferencePolicy(policy));
     callBase1->conferenceState_ = TelConferenceState::TEL_CONFERENCE_IDLE;
     ASSERT_NE(TELEPHONY_SUCCESS, callPolicy.SeparateConferencePolicy(policy));
+    ASSERT_EQ(TELEPHONY_SUCCESS, callPolicy.KickOutFromConferencePolicy(policy));
 }
 
 /**
@@ -1546,8 +1565,10 @@ HWTEST_F(BranchTest, Telephony_ImsCall_001, Function | MediumTest | Level3)
     std::u16string msg;
     call.SetMute(0, 0);
     call.SeparateConference();
+    call.KickOutFromConference();
     call.CanCombineConference();
     call.CanSeparateConference();
+    call.CanKickOutFromConference();
     call.LaunchConference();
     call.ExitConference();
     call.HoldConference();
@@ -1694,6 +1715,7 @@ HWTEST_F(BranchTest, Telephony_CallControlManager_002, Function | MediumTest | L
     ASSERT_NE(callControlManager->SetCallPreferenceMode(slotId, mode), TELEPHONY_SUCCESS);
     ASSERT_NE(callControlManager->CombineConference(INVALID_CALLID), TELEPHONY_SUCCESS);
     ASSERT_NE(callControlManager->SeparateConference(INVALID_CALLID), TELEPHONY_SUCCESS);
+    ASSERT_NE(callControlManager->KickOutFromConference(INVALID_CALLID), TELEPHONY_SUCCESS);
     int32_t mainCallId = VALID_CALLID;
     ASSERT_NE(callControlManager->GetMainCallId(INVALID_CALLID, mainCallId), TELEPHONY_SUCCESS);
     std::vector<std::u16string> callIdList;
@@ -2042,13 +2064,16 @@ HWTEST_F(BranchTest, Telephony_ConferenceBase_001, Function | MediumTest | Level
     ASSERT_NE(conference->LeaveFromConference(VALID_CALLID), TELEPHONY_SUCCESS);
     ASSERT_NE(conference->HoldConference(VALID_CALLID), TELEPHONY_SUCCESS);
     ASSERT_NE(conference->CanSeparateConference(), TELEPHONY_SUCCESS);
+    ASSERT_NE(conference->CanKickOutFromConference(), TELEPHONY_SUCCESS);
     ASSERT_NE(conference->SetMainCall(ERROR_CALLID), TELEPHONY_SUCCESS);
     ASSERT_EQ(conference->SetMainCall(VALID_CALLID), TELEPHONY_SUCCESS);
     ASSERT_NE(conference->CanSeparateConference(), TELEPHONY_SUCCESS);
+    ASSERT_NE(conference->CanKickOutFromConference(), TELEPHONY_SUCCESS);
     ASSERT_EQ(conference->JoinToConference(VALID_CALLID), TELEPHONY_SUCCESS);
     ASSERT_EQ(conference->GetSubCallIdList(VALID_CALLID, callIdList), TELEPHONY_SUCCESS);
     ASSERT_EQ(conference->GetCallIdListForConference(VALID_CALLID, callIdList), TELEPHONY_SUCCESS);
     ASSERT_EQ(conference->CanSeparateConference(), TELEPHONY_SUCCESS);
+    ASSERT_EQ(conference->CanKickOutFromConference(), TELEPHONY_SUCCESS);
     ASSERT_EQ(conference->HoldConference(VALID_CALLID), TELEPHONY_SUCCESS);
     ASSERT_EQ(conference->SetMainCall(VALID_CALLID), TELEPHONY_SUCCESS);
     ASSERT_EQ(conference->JoinToConference(VALID_CALLID), TELEPHONY_SUCCESS);
