@@ -63,7 +63,10 @@ int32_t SetPreviewWindow(const uint8_t *data, size_t size)
     window.z = static_cast<int32_t>(size);
     window.width = static_cast<int32_t>(size);
     window.height = static_cast<int32_t>(size);
-    return DelayedSingleton<CallManagerService>::GetInstance()->SetPreviewWindow(window);
+    MessageParcel dataParcel;
+    MessageParcel reply;
+    dataParcel.WriteRawData(static_cast<const void *>(&window), sizeof(VideoWindow));
+    return DelayedSingleton<CallManagerService>::GetInstance()->OnSetPreviewWindow(dataParcel, reply);
 }
 
 int32_t SetDisplayWindow(const uint8_t *data, size_t size)
@@ -77,7 +80,10 @@ int32_t SetDisplayWindow(const uint8_t *data, size_t size)
     window.z = static_cast<int32_t>(size);
     window.width = static_cast<int32_t>(size);
     window.height = static_cast<int32_t>(size);
-    return DelayedSingleton<CallManagerService>::GetInstance()->SetDisplayWindow(window);
+    MessageParcel dataParcel;
+    MessageParcel reply;
+    dataParcel.WriteRawData(static_cast<const void *>(&window), sizeof(VideoWindow));
+    return DelayedSingleton<CallManagerService>::GetInstance()->OnSetDisplayWindow(dataParcel, reply);
 }
 
 int32_t SetCameraZoom(const uint8_t *data, size_t size)

@@ -27,6 +27,7 @@ namespace OHOS {
 static bool g_isInited = false;
 constexpr int32_t SLOT_NUM = 2;
 constexpr int32_t TWO_INT_NUM = 2;
+constexpr int32_t CALLS_NUM = 5;
 
 bool IsServiceInited()
 {
@@ -103,6 +104,56 @@ int32_t GetCallRestriction(const uint8_t *data, size_t size)
     return DelayedSingleton<CallManagerService>::GetInstance()->OnGetCallRestriction(dataParcel, reply);
 }
 
+int32_t ReportOttCallDetailsInfo(const uint8_t *data, size_t size)
+{
+    if (!IsServiceInited()) {
+        return TELEPHONY_ERROR;
+    }
+    int32_t vecCnt = static_cast<int32_t>(size % CALLS_NUM);
+    OttCallDetailsInfo info;
+    memcpy_s(info.phoneNum, kMaxNumberLen, reinterpret_cast<const char *>(data),
+        strlen(reinterpret_cast<const char *>(data)));
+    memcpy_s(info.bundleName, kMaxNumberLen, reinterpret_cast<const char *>(data),
+        strlen(reinterpret_cast<const char *>(data)));
+    info.callState = TelCallState::CALL_STATUS_DIALING;
+    info.videoState = VideoStateType::TYPE_VOICE;
+    MessageParcel dataParcel;
+    dataParcel.WriteInt32(vecCnt);
+    dataParcel.WriteRawData((const void *)&info, sizeof(OttCallDetailsInfo));
+    dataParcel.RewindRead(0);
+    MessageParcel reply;
+    return DelayedSingleton<CallManagerService>::GetInstance()->OnReportOttCallDetailsInfo(dataParcel, reply);
+}
+
+int32_t ReportOttCallEventInfo(const uint8_t *data, size_t size)
+{
+    if (!IsServiceInited()) {
+        return TELEPHONY_ERROR;
+    }
+    OttCallEventInfo info;
+    info.ottCallEventId = OttCallEventId::OTT_CALL_EVENT_FUNCTION_UNSUPPORTED;
+    memcpy_s(info.bundleName, kMaxNumberLen, reinterpret_cast<const char *>(data),
+        strlen(reinterpret_cast<const char *>(data)));
+    MessageParcel dataParcel;
+    dataParcel.WriteRawData((const void *)&info, sizeof(OttCallEventInfo));
+    dataParcel.RewindRead(0);
+    MessageParcel reply;
+    return DelayedSingleton<CallManagerService>::GetInstance()->OnReportOttCallEventInfo(dataParcel, reply);
+}
+
+int32_t CloseUnFinishedUssd(const uint8_t *data, size_t size)
+{
+    if (!IsServiceInited()) {
+        return TELEPHONY_ERROR;
+    }
+    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
+    MessageParcel dataParcel;
+    dataParcel.WriteInt32(slotId);
+    dataParcel.RewindRead(0);
+    MessageParcel reply;
+    return DelayedSingleton<CallManagerService>::GetInstance()->OnCloseUnFinishedUssd(dataParcel, reply);
+}
+
 int32_t FormatPhoneNumber(const uint8_t *data, size_t size)
 {
     if (!IsServiceInited()) {
@@ -130,6 +181,9 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     GetSubCallIdList(data, size);
     GetCallIdListForConference(data, size);
     GetCallRestriction(data, size);
+    ReportOttCallDetailsInfo(data, size);
+    ReportOttCallEventInfo(data, size);
+    CloseUnFinishedUssd(data, size);
     FormatPhoneNumber(data, size);
 }
 }  // namespace OHOS
