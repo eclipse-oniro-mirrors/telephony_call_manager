@@ -1,0 +1,87 @@
+# Copyright (c) 2023 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+#####################hydra-fuzz###################
+import("//build/config/features.gni")
+import("//build/ohos.gni")
+import("//build/test.gni")
+
+##############################fuzztest##########################################
+CALL_MANAGER_PATH = "../../.."
+ohos_fuzztest("CallAbilityCallbackFuzzTest") {
+  module_output_path = "call_manager/CallAbilityCallback"
+  module_out_path = module_output_path
+  fuzz_config_file =
+      "${CALL_MANAGER_PATH}/test/fuzztest/callabilitycallback_fuzzer"
+  include_dirs = [
+    "${CALL_MANAGER_PATH}/frameworks/native/include/",
+    "${CALL_MANAGER_PATH}/test/fuzztest/common_fuzzer",
+    "${CALL_MANAGER_PATH}/services/audio/include",
+    "${CALL_MANAGER_PATH}/services/audio/include/audio_state",
+    "${CALL_MANAGER_PATH}/services/video/include",
+    "${CALL_MANAGER_PATH}/services/bluetooth/include",
+    "${CALL_MANAGER_PATH}/services/call/include",
+    "${CALL_MANAGER_PATH}/services/call_manager_service/include",
+    "${CALL_MANAGER_PATH}/services/call_setting/include",
+    "${CALL_MANAGER_PATH}/services/telephony_interaction/include",
+    "${CALL_MANAGER_PATH}/services/call_report/include",
+    "${CALL_MANAGER_PATH}/services/video/include",
+    "${CALL_MANAGER_PATH}/services/call/call_state_observer/include",
+  ]
+
+  deps = [
+    "${CALL_MANAGER_PATH}:tel_call_manager",
+    "${CALL_MANAGER_PATH}/frameworks/native:tel_call_manager_api",
+  ]
+
+  external_deps = [
+    "ability_runtime:ability_manager",
+    "access_token:libaccesstoken_sdk",
+    "access_token:libnativetoken",
+    "access_token:libtoken_setproc",
+    "c_utils:utils",
+    "common_event_service:cesfwk_innerkits",
+    "core_service:tel_core_service_api",
+    "data_share:datashare_consumer",
+    "hilog:libhilog",
+    "init:libbegetutil",
+    "ipc:ipc_single",
+    "napi:ace_napi",
+    "samgr:samgr_proxy",
+  ]
+  defines = [
+    "TELEPHONY_LOG_TAG = \"CallManagerFuzzTest\"",
+    "LOG_DOMAIN = 0xD000F00",
+  ]
+  cflags = [
+    "-g",
+    "-O0",
+    "-Wno-unused-variable",
+    "-fno-omit-frame-pointer",
+  ]
+  sources = [
+    "${CALL_MANAGER_PATH}/test/fuzztest/common_fuzzer/addcalltoken_fuzzer.cpp",
+    "callabilitycallback_fuzzer.cpp",
+  ]
+}
+
+###############################################################################
+group("fuzztest") {
+  testonly = true
+  deps = []
+  deps += [
+    # deps file
+    ":CallAbilityCallbackFuzzTest",
+  ]
+}
+###############################################################################

@@ -31,6 +31,7 @@ constexpr int32_t VEDIO_STATE_NUM = 2;
 constexpr int32_t DIAL_SCENE_NUM = 3;
 constexpr int32_t DIAL_TYPE_NUM = 3;
 constexpr int32_t CALL_TYPE_NUM = 3;
+constexpr int32_t CALL_ID_NUM = 10;
 
 bool IsServiceInited()
 {
@@ -42,6 +43,42 @@ bool IsServiceInited()
         }
     }
     return g_isInited;
+}
+
+void OnRemoteRequest(const uint8_t *data, size_t size)
+{
+    if (!IsServiceInited()) {
+        return;
+    }
+
+    MessageParcel dataMessageParcel;
+    if (!dataMessageParcel.WriteInterfaceToken(CallManagerServiceStub::GetDescriptor())) {
+        return;
+    }
+    size_t dataSize = size - sizeof(uint32_t);
+    dataMessageParcel.WriteBuffer(data + sizeof(uint32_t), dataSize);
+    dataMessageParcel.RewindRead(0);
+    uint32_t code = static_cast<uint32_t>(size);
+    MessageParcel reply;
+    MessageOption option;
+    DelayedSingleton<CallManagerService>::GetInstance()->OnRemoteRequest(code, dataMessageParcel, reply, option);
+}
+
+int32_t OnRegisterCallBack(const uint8_t *data, size_t size)
+{
+    if (!IsServiceInited()) {
+        return TELEPHONY_ERROR;
+    }
+    MessageParcel dataMessageParcel;
+    if (!dataMessageParcel.WriteInterfaceToken(CallManagerServiceStub::GetDescriptor())) {
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    sptr<ICallAbilityCallback> callbackWrap = nullptr;
+    if (!dataMessageParcel.WriteRemoteObject(callbackWrap->AsObject())) {
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
+    MessageParcel reply;
+    return DelayedSingleton<CallManagerService>::GetInstance()->OnRegisterCallBack(dataMessageParcel, reply);
 }
 
 bool HasCall(const uint8_t *data, size_t size)
@@ -160,6 +197,54 @@ int32_t SetCallWaiting(const uint8_t *data, size_t size)
     return DelayedSingleton<CallManagerService>::GetInstance()->OnSetCallWaiting(dataParcel, reply);
 }
 
+int32_t SetCallRestriction(const uint8_t *data, size_t size)
+{
+    if (!IsServiceInited()) {
+        return TELEPHONY_ERROR;
+    }
+    CallRestrictionInfo info;
+    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
+    memcpy_s(info.password, kMaxNumberLen, reinterpret_cast<const char *>(data),
+        strlen(reinterpret_cast<const char *>(data)));
+    MessageParcel dataParcel;
+    dataParcel.WriteInt32(slotId);
+    dataParcel.WriteRawData((const void *)&info, sizeof(CallRestrictionInfo));
+    dataParcel.RewindRead(0);
+    MessageParcel reply;
+    return DelayedSingleton<CallManagerService>::GetInstance()->OnSetCallRestriction(dataParcel, reply);
+}
+
+int32_t JoinConference(const uint8_t *data, size_t size)
+{
+    if (!IsServiceInited()) {
+        return TELEPHONY_ERROR;
+    }
+    int32_t callId = static_cast<int32_t>(size % CALL_ID_NUM);
+    std::vector<std::u16string> numberList { u"0000000000" };
+    MessageParcel dataParcel;
+    dataParcel.WriteInt32(callId);
+    dataParcel.WriteString16Vector(numberList);
+    dataParcel.RewindRead(0);
+    MessageParcel reply;
+    return DelayedSingleton<CallManagerService>::GetInstance()->OnJoinConference(dataParcel, reply);
+}
+
+int32_t StartRtt(const uint8_t *data, size_t size)
+{
+    if (!IsServiceInited()) {
+        return TELEPHONY_ERROR;
+    }
+
+    int32_t callId = static_cast<int32_t>(size % CALL_ID_NUM);
+    std::string msg(reinterpret_cast<const char *>(data), size);
+    MessageParcel dataParcel;
+    dataParcel.WriteInt32(callId);
+    dataParcel.WriteString(msg);
+    dataParcel.RewindRead(0);
+    MessageParcel reply;
+    return DelayedSingleton<CallManagerService>::GetInstance()->OnStartRtt(dataParcel, reply);
+}
+
 int32_t InputDialerSpecialCode(const uint8_t *data, size_t size)
 {
     if (!IsServiceInited()) {
@@ -178,7 +263,8 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     if (data == nullptr || size == 0) {
         return;
     }
-
+    OnRemoteRequest(data, size);
+    OnRegisterCallBack(data, size);
     HasCall(data, size);
     GetCallState(data, size);
     GetCallWaiting(data, size);
@@ -187,6 +273,9 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     DialCall(data, size);
     RemoveMissedIncomingCallNotification(data, size);
     SetCallWaiting(data, size);
+    SetCallRestriction(data, size);
+    JoinConference(data, size);
+    StartRtt(data, size);
     InputDialerSpecialCode(data, size);
 }
 }  // namespace OHOS

@@ -32,4 +32,6 @@ group("fuzztest") {
   deps += [ "callnotification_fuzzer:fuzztest" ]
   deps += [ "audiodevice_fuzzer:fuzztest" ]
   deps += [ "call_fuzzer:fuzztest" ]
+  deps += [ "callabilitycallback_fuzzer:fuzztest" ]
+  deps += [ "telephonyinteraction_fuzzer:fuzztest" ]
 }
