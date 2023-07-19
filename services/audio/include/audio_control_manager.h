@@ -35,6 +35,7 @@ namespace OHOS {
 namespace Telephony {
 class AudioControlManager : public CallStateListenerBase, public std::enable_shared_from_this<AudioControlManager> {
     DECLARE_DELAYED_SINGLETON(AudioControlManager)
+
 public:
     void Init();
     int32_t SetAudioDevice(const AudioDevice &device);
@@ -46,6 +47,9 @@ public:
     int32_t StopRingback();
     int32_t PlayWaitingTone();
     int32_t StopWaitingTone();
+    int32_t PlayDtmfTone(char str);
+    int32_t StopDtmfTone();
+    int32_t OnPostDialNextChar(char str);
     int32_t PlayCallTone(ToneDescriptor type);
     int32_t StopCallTone();
     int32_t MuteRinger();

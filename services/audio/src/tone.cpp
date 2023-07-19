@@ -25,7 +25,7 @@ using AudioPlay = int32_t (AudioPlayer::*)(const std::string &, AudioStandard::A
 
 Tone::Tone() : audioPlayer_(new (std::nothrow) AudioPlayer()) {}
 
-Tone::Tone(ToneDescriptor tone)
+Tone::Tone(ToneDescriptor tone) : audioPlayer_(new (std::nothrow) AudioPlayer())
 {
     currentToneDescriptor_ = tone;
 }
@@ -49,16 +49,25 @@ int32_t Tone::Play()
     PlayerType playerType = PlayerType::TYPE_TONE;
     if (IsDtmf(currentToneDescriptor_)) {
         playerType = PlayerType::TYPE_DTMF;
+        if (!InitTonePlayer()) {
+            return TELEPHONY_ERROR;
+        }
+        std::thread play([&]() {
+            pthread_setname_np(pthread_self(), TONE_PLAY_THREAD);
+            dtmfTonePlayer_->StartTone();
+        });
+        play.detach();
+    } else {
+        AudioPlay audioPlay = &AudioPlayer::Play;
+        if (audioPlayer_ == nullptr) {
+            TELEPHONY_LOGE("audioPlayer_ is nullptr");
+            return TELEPHONY_ERR_LOCAL_PTR_NULL;
+        }
+        std::thread play(audioPlay, audioPlayer_,
+            GetToneDescriptorPath(currentToneDescriptor_), AudioStandard::AudioStreamType::STREAM_MUSIC, playerType);
+        pthread_setname_np(play.native_handle(), TONE_PLAY_THREAD);
+        play.detach();
     }
-    AudioPlay audioPlay = &AudioPlayer::Play;
-    if (audioPlayer_ == nullptr) {
-        TELEPHONY_LOGE("audioPlayer_ is nullptr");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-    std::thread play(audioPlay, audioPlayer_,
-        GetToneDescriptorPath(currentToneDescriptor_), AudioStandard::AudioStreamType::STREAM_MUSIC, playerType);
-    pthread_setname_np(play.native_handle(), TONE_PLAY_THREAD);
-    play.detach();
     return TELEPHONY_SUCCESS;
 }
 
@@ -72,13 +81,38 @@ int32_t Tone::Stop()
     PlayerType playerType = PlayerType::TYPE_TONE;
     if (IsDtmf(currentToneDescriptor_)) {
         playerType = PlayerType::TYPE_DTMF;
+        if (InitTonePlayer()) {
+            dtmfTonePlayer_->StopTone();
+            dtmfTonePlayer_->Release();
+        }
+    } else {
+        if (audioPlayer_ == nullptr) {
+            TELEPHONY_LOGE("audioPlayer_ is nullptr");
+            return TELEPHONY_ERR_LOCAL_PTR_NULL;
+        }
+        audioPlayer_->SetStop(playerType, true);
     }
-    if (audioPlayer_ == nullptr) {
-        TELEPHONY_LOGE("audioPlayer_ is nullptr");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-    audioPlayer_->SetStop(playerType, true);
     return TELEPHONY_SUCCESS;
+}
+
+bool Tone::InitTonePlayer()
+{
+    using namespace OHOS::AudioStandard;
+    if (dtmfTonePlayer_ == nullptr) {
+        AudioRendererInfo rendererInfo = {};
+        rendererInfo.contentType = ContentType::CONTENT_TYPE_UNKNOWN;
+        rendererInfo.streamUsage = StreamUsage::STREAM_USAGE_DTMF;
+        rendererInfo.rendererFlags = 0;
+        dtmfTonePlayer_ = TonePlayer::Create(rendererInfo);
+        if (dtmfTonePlayer_ == nullptr) {
+            return false;
+        }
+        ToneType dtmfType = ConvertToneDescriptorToToneType(currentToneDescriptor_);
+        if (!dtmfTonePlayer_->LoadTone(dtmfType)) {
+            return false;
+        }
+    }
+    return true;
 }
 
 ToneDescriptor Tone::ConvertDigitToTone(char digit)
@@ -115,13 +149,58 @@ ToneDescriptor Tone::ConvertDigitToTone(char digit)
         case '9':
             dtmf = ToneDescriptor::TONE_DTMF_CHAR_9;
             break;
-        case 'p':
-        case 'P':
+        case '*':
             dtmf = ToneDescriptor::TONE_DTMF_CHAR_P;
             break;
-        case 'w':
-        case 'W':
+        case '#':
             dtmf = ToneDescriptor::TONE_DTMF_CHAR_W;
+            break;
+        default:
+            break;
+    }
+    return dtmf;
+}
+
+AudioStandard::ToneType Tone::ConvertToneDescriptorToToneType(ToneDescriptor tone)
+{
+    using namespace OHOS::AudioStandard;
+    ToneType dtmf = ToneType::NUM_TONES;
+    switch (tone) {
+        case ToneDescriptor::TONE_DTMF_CHAR_0:
+            dtmf = ToneType::TONE_TYPE_DIAL_0;
+            break;
+        case ToneDescriptor::TONE_DTMF_CHAR_1:
+            dtmf = ToneType::TONE_TYPE_DIAL_1;
+            break;
+        case ToneDescriptor::TONE_DTMF_CHAR_2:
+            dtmf = ToneType::TONE_TYPE_DIAL_2;
+            break;
+        case ToneDescriptor::TONE_DTMF_CHAR_3:
+            dtmf = ToneType::TONE_TYPE_DIAL_3;
+            break;
+        case ToneDescriptor::TONE_DTMF_CHAR_4:
+            dtmf = ToneType::TONE_TYPE_DIAL_4;
+            break;
+        case ToneDescriptor::TONE_DTMF_CHAR_5:
+            dtmf = ToneType::TONE_TYPE_DIAL_5;
+            break;
+        case ToneDescriptor::TONE_DTMF_CHAR_6:
+            dtmf = ToneType::TONE_TYPE_DIAL_6;
+            break;
+        case ToneDescriptor::TONE_DTMF_CHAR_7:
+            dtmf = ToneType::TONE_TYPE_DIAL_7;
+            break;
+        case ToneDescriptor::TONE_DTMF_CHAR_8:
+            dtmf = ToneType::TONE_TYPE_DIAL_8;
+            break;
+        case ToneDescriptor::TONE_DTMF_CHAR_9:
+            dtmf = ToneType::TONE_TYPE_DIAL_9;
+            break;
+        case ToneDescriptor::TONE_DTMF_CHAR_P:
+            dtmf = ToneType::TONE_TYPE_DIAL_S;
+            break;
+        case ToneDescriptor::TONE_DTMF_CHAR_W:
+            dtmf = ToneType::TONE_TYPE_DIAL_P;
             break;
         default:
             break;

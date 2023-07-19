@@ -24,7 +24,7 @@ namespace OHOS {
 namespace Telephony {
 class OTTCall : public CallBase, public NetCallBase {
 public:
-    OTTCall(DialParaInfo &info);
+    explicit OTTCall(DialParaInfo &info);
     OTTCall(DialParaInfo &info, AppExecFwk::PacMap &extras);
     ~OTTCall();
     int32_t DialingProcess() override;
@@ -38,6 +38,7 @@ public:
     bool GetEmergencyState() override;
     int32_t StartDtmf(char str) override;
     int32_t StopDtmf() override;
+    int32_t PostDialProceed(bool proceed) override;
     int32_t GetSlotId() override;
     int32_t CombineConference() override;
     int32_t SeparateConference() override;

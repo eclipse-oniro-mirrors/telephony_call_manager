@@ -240,5 +240,24 @@ int32_t CallAbilityReportProxy::ReportAudioDeviceChange(const AudioDeviceInfo &i
     TELEPHONY_LOGI("ReportAudioDeviceChange success");
     return ret;
 }
+
+int32_t CallAbilityReportProxy::ReportPostDialDelay(const std::string &str)
+{
+    int32_t ret = TELEPHONY_ERR_FAIL;
+    std::lock_guard<std::mutex> lock(mutex_);
+    std::list<sptr<ICallAbilityCallback>>::iterator it = callbackPtrList_.begin();
+    for (; it != callbackPtrList_.end(); ++it) {
+        if ((*it)) {
+            ret = (*it)->OnReportPostDialDelay(str);
+            if (ret != TELEPHONY_SUCCESS) {
+                TELEPHONY_LOGW("ReportPostDialDelay failed, errcode:%{public}d, bundleName:%{public}s", ret,
+                    ((*it)->GetBundleName()).c_str());
+                continue;
+            }
+        }
+    }
+    TELEPHONY_LOGI("ReportPostDialDelay success");
+    return ret;
+}
 } // namespace Telephony
 } // namespace OHOS

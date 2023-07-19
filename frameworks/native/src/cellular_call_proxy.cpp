@@ -545,6 +545,39 @@ int32_t CellularCallProxy::StopDtmf(const CellularCallInfo &callInfo)
     return error;
 }
 
+int32_t CellularCallProxy::PostDialProceed(const CellularCallInfo &callInfo, const bool proceed)
+{
+    MessageOption option;
+    MessageParcel in;
+    MessageParcel out;
+    if (!in.WriteInterfaceToken(CellularCallProxy::GetDescriptor())) {
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    if (!in.WriteInt32(MAX_SIZE)) {
+        TELEPHONY_LOGE("WriteInt32 fail!");
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
+    if (!in.WriteRawData((const void *)&callInfo, sizeof(CellularCallInfo))) {
+        TELEPHONY_LOGE("WriteRawData fail!");
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
+    if (!in.WriteBool(proceed)) {
+        TELEPHONY_LOGE("WriteBool fail!");
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("function Remote() return nullptr!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t error = remote->SendRequest(static_cast<uint32_t>(CellularCallInterfaceCode::POST_DIAL_PROCEED),
+        in, out, option);
+    if (error == ERR_NONE) {
+        return out.ReadInt32();
+    }
+    return error;
+}
+
 int32_t CellularCallProxy::SendDtmf(char cDtmfCode, const CellularCallInfo &callInfo)
 {
     MessageOption option;

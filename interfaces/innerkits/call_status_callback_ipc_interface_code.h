@@ -53,6 +53,8 @@ enum CallStatusInterfaceCode {
     MMI_CODE_INFO_RESPONSE,
     CLOSE_UNFINISHED_USSD,
     UPDATE_SET_RESTRICTION_PWD,
+    POST_DIAL_CHAR,
+    POST_DIAL_DELAY,
 };
 } // namespace Telephony
 } // namespace OHOS

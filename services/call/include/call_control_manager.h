@@ -42,6 +42,7 @@ namespace OHOS {
 namespace Telephony {
 class CallControlManager : public CallPolicy {
     DECLARE_DELAYED_SINGLETON(CallControlManager)
+
 public:
     bool Init();
     int32_t DialCall(std::u16string &number, AppExecFwk::PacMap &extras);
@@ -64,6 +65,7 @@ public:
     bool NotifyCallEventUpdated(CallEventInfo &info);
     int32_t StartDtmf(int32_t callId, char str);
     int32_t StopDtmf(int32_t callId);
+    int32_t PostDialProceed(int32_t callId, bool proceed);
     int32_t GetCallWaiting(int32_t slotId);
     int32_t SetCallWaiting(int32_t slotId, bool activate);
     int32_t GetCallRestriction(int32_t slotId, CallRestrictionType type);

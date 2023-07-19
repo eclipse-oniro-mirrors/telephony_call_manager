@@ -60,6 +60,8 @@ CallStatusCallbackStub::CallStatusCallbackStub()
     memberFuncMap_[static_cast<uint32_t>(INVITE_TO_CONFERENCE)] = &CallStatusCallbackStub::OnInviteToConferenceResult;
     memberFuncMap_[static_cast<uint32_t>(MMI_CODE_INFO_RESPONSE)] = &CallStatusCallbackStub::OnSendMmiCodeResult;
     memberFuncMap_[static_cast<uint32_t>(CLOSE_UNFINISHED_USSD)] = &CallStatusCallbackStub::OnCloseUnFinishedUssdResult;
+    memberFuncMap_[static_cast<uint32_t>(POST_DIAL_CHAR)] = &CallStatusCallbackStub::OnPostDialNextChar;
+    memberFuncMap_[static_cast<uint32_t>(POST_DIAL_DELAY)] = &CallStatusCallbackStub::OnReportPostDialDelay;
 }
 
 CallStatusCallbackStub::~CallStatusCallbackStub()
@@ -658,6 +660,36 @@ int32_t CallStatusCallbackStub::OnCloseUnFinishedUssdResult(MessageParcel &data,
     }
     result = data.ReadInt32();
     error = CloseUnFinishedUssdResult(result);
+    if (!reply.WriteInt32(error)) {
+        TELEPHONY_LOGE("writing parcel failed");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallStatusCallbackStub::OnPostDialNextChar(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t error = TELEPHONY_ERR_FAIL;
+    if (!data.ContainFileDescriptors()) {
+        TELEPHONY_LOGW("sent raw data is less than 32k");
+    }
+    std::string c = data.ReadString();
+    error = ReportPostDialChar(c);
+    if (!reply.WriteInt32(error)) {
+        TELEPHONY_LOGE("writing parcel failed");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallStatusCallbackStub::OnReportPostDialDelay(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t error = TELEPHONY_ERR_FAIL;
+    if (!data.ContainFileDescriptors()) {
+        TELEPHONY_LOGW("sent raw data is less than 32k");
+    }
+    std::string remainPostDial = data.ReadString();
+    error = ReportPostDialDelay(remainPostDial);
     if (!reply.WriteInt32(error)) {
         TELEPHONY_LOGE("writing parcel failed");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;

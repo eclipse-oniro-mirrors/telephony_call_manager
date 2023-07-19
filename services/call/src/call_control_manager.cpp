@@ -434,6 +434,7 @@ int32_t CallControlManager::StartDtmf(int32_t callId, char str)
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("StartDtmf failed, return:%{public}d", ret);
     }
+    DelayedSingleton<AudioControlManager>::GetInstance()->PlayDtmfTone(str);
     return ret;
 }
 
@@ -450,6 +451,24 @@ int32_t CallControlManager::StopDtmf(int32_t callId)
     int32_t ret = call->StopDtmf();
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("StopDtmf failed, return:%{public}d", ret);
+    }
+    DelayedSingleton<AudioControlManager>::GetInstance()->StopDtmfTone();
+    return ret;
+}
+
+int32_t CallControlManager::PostDialProceed(int32_t callId, bool proceed)
+{
+    sptr<CallBase> call = GetOneCallObject(callId);
+    if (call == nullptr) {
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
+    }
+    if (!call->IsAliveState()) {
+        return CALL_ERR_CALL_STATE_MISMATCH_OPERATION;
+    }
+
+    int32_t ret = call->PostDialProceed(proceed);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("PostDialProceed failed, return:%{public}d", ret);
     }
     return ret;
 }

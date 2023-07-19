@@ -44,6 +44,7 @@ enum class CellularCallInterfaceCode {
     START_DTMF = 100,
     STOP_DTMF,
     SEND_DTMF,
+    POST_DIAL_PROCEED,
     START_RTT,
     STOP_RTT,
 

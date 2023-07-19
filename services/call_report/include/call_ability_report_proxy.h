@@ -40,6 +40,7 @@ public:
     int32_t ReportMmiCodeResult(const MmiCodeInfo &info);
     int32_t ReportAudioDeviceChange(const AudioDeviceInfo &info);
     int32_t ReportCallStateInfo(const CallAttributeInfo &info);
+    int32_t ReportPostDialDelay(const std::string &str);
 
 private:
     int32_t ReportCallEvent(const CallEventInfo &info);

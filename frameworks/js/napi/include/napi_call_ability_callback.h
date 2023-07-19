@@ -30,6 +30,7 @@ namespace Telephony {
  */
 class NapiCallAbilityCallback {
     DECLARE_DELAYED_SINGLETON(NapiCallAbilityCallback)
+
 public:
     void RegisterCallStateCallback(EventCallback stateCallback);
     void UnRegisterCallStateCallback();
@@ -63,6 +64,8 @@ public:
     void UnRegisterCloseUnFinishedUssdCallback();
     void RegisterAudioDeviceCallback(EventCallback eventCallback);
     void UnRegisterAudioDeviceCallback();
+    void RegisterPostDialDelay(EventCallback eventCallback);
+    void UnRegisterPostDialDelayCallback();
     int32_t UpdateCallStateInfo(const CallAttributeInfo &info);
     int32_t UpdateCallEvent(const CallEventInfo &info);
     int32_t UpdateCallDisconnectedCause(const DisconnectedDetails &details);
@@ -72,6 +75,7 @@ public:
     void UnRegisterUpdateCallMediaModeCallback();
     int32_t UpdateMmiCodeResultsInfo(const MmiCodeInfo &info);
     int32_t UpdateAudioDeviceInfo(const AudioDeviceInfo &info);
+    int32_t UpdatePostDialDelay(const std::string str);
 
 private:
     static void ReportCallStateWork(uv_work_t *work, int32_t status);
@@ -110,6 +114,8 @@ private:
     int32_t ReportCloseUnFinishedUssdInfo(AppExecFwk::PacMap &resultInfo);
     static void ReportAudioDeviceInfoWork(uv_work_t *work, int32_t status);
     static int32_t ReportAudioDeviceInfo(AudioDeviceInfo &info, EventCallback eventCallback);
+    static void ReportPostDialDelayWork(uv_work_t *work, int32_t status);
+    static int32_t ReportPostDialDelay(std::string postDialStr, EventCallback eventCallback);
 
 private:
     EventCallback stateCallback_;
@@ -129,6 +135,7 @@ private:
     EventCallback mmiCodeCallback_;
     EventCallback closeUnfinishedUssdCallback_;
     EventCallback audioDeviceCallback_;
+    EventCallback postDialDelayCallback_;
     using CallResultReportIdProcessorFunc = int32_t (NapiCallAbilityCallback::*)(AppExecFwk::PacMap &resultInfo);
     std::map<CallResultReportId, CallResultReportIdProcessorFunc> memberFuncMap_;
     std::mutex mutex_;

@@ -665,6 +665,21 @@ int32_t CallManagerProxy::StopDtmf(int32_t callId)
     return TELEPHONY_SUCCESS;
 }
 
+int32_t CallManagerProxy::PostDialProceed(int32_t callId, bool proceed)
+{
+    if (ReConnectService() != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("ipc reconnect failed!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    std::lock_guard<std::mutex> lock(mutex_);
+    int32_t errCode = callManagerServicePtr_->PostDialProceed(callId, proceed);
+    if (errCode != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("PostDialProceed failed, errcode:%{public}d", errCode);
+        return errCode;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
 int32_t CallManagerProxy::IsRinging(bool &enabled)
 {
     if (ReConnectService() != TELEPHONY_SUCCESS) {

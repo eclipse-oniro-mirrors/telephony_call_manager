@@ -65,6 +65,8 @@ private:
     int32_t OnGetImsCallDataResult(MessageParcel &data, MessageParcel &reply);
     int32_t OnSendMmiCodeResult(MessageParcel &data, MessageParcel &reply);
     int32_t OnCloseUnFinishedUssdResult(MessageParcel &data, MessageParcel &reply);
+    int32_t OnPostDialNextChar(MessageParcel &data, MessageParcel &reply);
+    int32_t OnReportPostDialDelay(MessageParcel &data, MessageParcel &reply);
 
     std::map<uint32_t, CallStatusCallbackFunc> memberFuncMap_;
 };

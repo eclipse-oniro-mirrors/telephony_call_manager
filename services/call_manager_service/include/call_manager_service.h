@@ -250,6 +250,8 @@ public:
      */
     int32_t StopDtmf(int32_t callId) override;
 
+    int32_t PostDialProceed(int32_t callId, bool proceed) override;
+
     /**
      * GetCallWaiting
      *

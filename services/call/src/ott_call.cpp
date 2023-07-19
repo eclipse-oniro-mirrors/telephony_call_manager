@@ -179,6 +179,11 @@ int32_t OTTCall::StopDtmf()
     return CALL_ERR_FUNCTION_NOT_SUPPORTED;
 }
 
+int32_t OTTCall::PostDialProceed(bool proceed)
+{
+    return CALL_ERR_FUNCTION_NOT_SUPPORTED;
+}
+
 int32_t OTTCall::GetSlotId()
 {
     return CALL_ERR_ILLEGAL_CALL_OPERATION;

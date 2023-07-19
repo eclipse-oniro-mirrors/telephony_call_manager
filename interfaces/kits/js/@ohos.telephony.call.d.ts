@@ -1045,6 +1045,46 @@ declare namespace call {
   function stopDTMF(callId: number): Promise<void>;
 
   /**
+   * Continue post-dial DTMF(Dual Tone Multi Frequency).
+   *
+   * @permission ohos.permission.SET_TELEPHONY_STATE
+   * @param { number } callId - Indicates the identifier of the call.
+   * @param { boolean } proceed - Indicates whether to continue the post-dial DTMF.
+   * @param { AsyncCallback<void> } callback - The callback of postDialProceed.
+   * @throws { BusinessError } 201 - Permission denied.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 801 - Capability not supported.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @syscap SystemCapability.Telephony.CallManager
+   * @systemapi Hide this for inner system use.
+   * @since 11
+   */
+  function postDialProceed(callId: number, proceed: boolean, callback: AsyncCallback<void>): void;
+
+  /**
+   * Continue post-dial DTMF(Dual Tone Multi Frequency).
+   *
+   * @permission ohos.permission.SET_TELEPHONY_STATE
+   * @param { number } callId - Indicates the identifier of the call.
+   * @param { boolean } proceed - Indicates whether to continue the post-dial DTMF.
+   * @returns { Promise<void> } The promise returned by the postDialProceed.
+   * @throws { BusinessError } 201 - Permission denied.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 801 - Capability not supported.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @syscap SystemCapability.Telephony.CallManager
+   * @systemapi Hide this for inner system use.
+   * @since 11
+   */
+  function postDialProceed(callId: number, proceed: boolean): Promise<void>;
+
+  /**
    * Judge whether the emergency call is in progress.
    *
    * @permission ohos.permission.SET_TELEPHONY_STATE
@@ -1270,6 +1310,44 @@ declare namespace call {
    * @since 10
    */
   function off(type: 'audioDeviceChange', callback?: Callback<AudioDeviceInfo>): void;
+
+  /**
+   * Subscribe to the postDialDelay event.
+   *
+   * @permission ohos.permission.SET_TELEPHONY_STATE
+   * @param { 'postDialDelay' } type - Event type. Indicates the postDialDelay event to be subscribed to.
+   * @param { Callback<string> } callback - Indicates the callback for getting the result of post-dial string.
+   * @throws { BusinessError } 201 - Permission denied.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @throws { BusinessError } 8300999 - Unknown error code.
+   * @syscap SystemCapability.Telephony.CallManager
+   * @systemapi Hide this for inner system use.
+   * @since 11
+   */
+  function on(type: 'postDialDelay', callback: Callback<string>): void;
+
+  /**
+   * Unsubscribe from the postDialDelay event.
+   *
+   * @permission ohos.permission.SET_TELEPHONY_STATE
+   * @param { 'postDialDelay' } type - Event type. Indicates the postDialDelay event to unsubscribe from.
+   * @param { Callback<string> } callback - Indicates the callback for getting the result of post-dial string.
+   * @throws { BusinessError } 201 - Permission denied.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @throws { BusinessError } 8300999 - Unknown error code.
+   * @syscap SystemCapability.Telephony.CallManager
+   * @systemapi Hide this for inner system use.
+   * @since 11
+   */
+  function off(type: 'postDialDelay', callback?: Callback<string>): void;
 
   /**
    * Judge whether to allow another new call.

@@ -31,6 +31,7 @@ namespace OHOS {
 namespace Telephony {
 class CellularCallConnection : public std::enable_shared_from_this<CellularCallConnection> {
     DECLARE_DELAYED_SINGLETON(CellularCallConnection)
+
 public:
     void Init(int32_t systemAbilityId);
     void UnInit();
@@ -155,6 +156,8 @@ public:
      * @return Returns 0 on success, others on failure.
      */
     int StopDtmf(const CellularCallInfo &callInfo);
+
+    int PostDialProceed(const CellularCallInfo &callInfo, const bool proceed);
 
     /**
      * SendDtmf

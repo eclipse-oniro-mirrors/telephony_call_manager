@@ -201,8 +201,7 @@ HWTEST_F(BranchTest, Telephony_CellularCallConnection_001, Function | MediumTest
     CellularCallInfo mCellularCallInfo;
     ASSERT_NE(DelayedSingleton<CellularCallConnection>::GetInstance()->Dial(mCellularCallInfo), TELEPHONY_ERR_SUCCESS);
     ASSERT_NE(DelayedSingleton<CellularCallConnection>::GetInstance()->HangUp(
-                  mCellularCallInfo, CallSupplementType::TYPE_DEFAULT),
-        TELEPHONY_ERR_SUCCESS);
+        mCellularCallInfo, CallSupplementType::TYPE_DEFAULT), TELEPHONY_ERR_SUCCESS);
     ASSERT_NE(
         DelayedSingleton<CellularCallConnection>::GetInstance()->Reject(mCellularCallInfo), TELEPHONY_ERR_SUCCESS);
     ASSERT_NE(
@@ -227,16 +226,14 @@ HWTEST_F(BranchTest, Telephony_CellularCallConnection_001, Function | MediumTest
     ASSERT_NE(
         DelayedSingleton<CellularCallConnection>::GetInstance()->StopDtmf(mCellularCallInfo), TELEPHONY_ERR_SUCCESS);
     ASSERT_NE(DelayedSingleton<CellularCallConnection>::GetInstance()->GetCallTransferInfo(
-                  CallTransferType::TRANSFER_TYPE_BUSY, 0),
-        TELEPHONY_ERR_SUCCESS);
+        CallTransferType::TRANSFER_TYPE_BUSY, 0), TELEPHONY_ERR_SUCCESS);
     ASSERT_NE(DelayedSingleton<CellularCallConnection>::GetInstance()->SetCallWaiting(true, 0), TELEPHONY_ERR_SUCCESS);
     ASSERT_NE(DelayedSingleton<CellularCallConnection>::GetInstance()->GetCallWaiting(0), TELEPHONY_ERR_SUCCESS);
     CallRestrictionInfo mCallRestrictionInfo;
     ASSERT_NE(DelayedSingleton<CellularCallConnection>::GetInstance()->SetCallRestriction(mCallRestrictionInfo, 0),
         TELEPHONY_ERR_SUCCESS);
     ASSERT_NE(DelayedSingleton<CellularCallConnection>::GetInstance()->GetCallRestriction(
-                  CallRestrictionType::RESTRICTION_TYPE_ALL_INCOMING, 0),
-        TELEPHONY_ERR_SUCCESS);
+        CallRestrictionType::RESTRICTION_TYPE_ALL_INCOMING, 0), TELEPHONY_ERR_SUCCESS);
     ASSERT_NE(
         DelayedSingleton<CellularCallConnection>::GetInstance()->SetCallPreferenceMode(0, 1), TELEPHONY_ERR_SUCCESS);
     std::u16string test = u"";
@@ -245,10 +242,11 @@ HWTEST_F(BranchTest, Telephony_CellularCallConnection_001, Function | MediumTest
     ASSERT_NE(
         DelayedSingleton<CellularCallConnection>::GetInstance()->StopRtt(mCellularCallInfo), TELEPHONY_ERR_SUCCESS);
     ASSERT_NE(DelayedSingleton<CellularCallConnection>::GetInstance()->SendUpdateCallMediaModeRequest(
-                  mCellularCallInfo, ImsCallMode::CALL_MODE_AUDIO_ONLY),
-        TELEPHONY_ERR_SUCCESS);
+        mCellularCallInfo, ImsCallMode::CALL_MODE_AUDIO_ONLY), TELEPHONY_ERR_SUCCESS);
     ASSERT_NE(DelayedSingleton<CellularCallConnection>::GetInstance()->RegisterCallBackFun(), TELEPHONY_ERR_SUCCESS);
     ASSERT_NE(DelayedSingleton<CellularCallConnection>::GetInstance()->ReConnectService(), TELEPHONY_ERR_SUCCESS);
+    ASSERT_NE(DelayedSingleton<CellularCallConnection>::GetInstance()->PostDialProceed(mCellularCallInfo, true),
+        TELEPHONY_ERR_SUCCESS);
 }
 
 /**
@@ -1126,11 +1124,10 @@ HWTEST_F(BranchTest, Telephony_OTTCall_001, Function | MediumTest | Level3)
     DialParaInfo info;
     info.number = TEST_STR;
     std::shared_ptr<OTTCall> ottCall = std::make_shared<OTTCall>(info);
-    int32_t videoState = static_cast<int32_t>(VideoStateType::TYPE_VOICE);
     CallAttributeInfo callAttributeInfo;
     ottCall->GetCallAttributeInfo(callAttributeInfo);
     ASSERT_EQ(ottCall->DialingProcess(), TELEPHONY_SUCCESS);
-    ASSERT_NE(ottCall->AnswerCall(videoState), TELEPHONY_SUCCESS);
+    ASSERT_NE(ottCall->AnswerCall(static_cast<int32_t>(VideoStateType::TYPE_VOICE)), TELEPHONY_SUCCESS);
     ASSERT_NE(ottCall->RejectCall(), TELEPHONY_SUCCESS);
     ASSERT_NE(ottCall->HangUpCall(), TELEPHONY_SUCCESS);
     ASSERT_NE(ottCall->HoldCall(), TELEPHONY_SUCCESS);
@@ -1164,14 +1161,14 @@ HWTEST_F(BranchTest, Telephony_OTTCall_001, Function | MediumTest | Level3)
     ASSERT_NE(ottCall->ReceiveUpdateCallMediaModeResponse(response), TELEPHONY_SUCCESS);
     ASSERT_NE(ottCall->DispatchUpdateVideoRequest(mode), TELEPHONY_SUCCESS);
     ASSERT_NE(ottCall->DispatchUpdateVideoResponse(mode), TELEPHONY_SUCCESS);
-    int32_t mute = 0;
-    ASSERT_NE(ottCall->SetMute(mute, SIM1_SLOTID), TELEPHONY_SUCCESS);
+    ASSERT_NE(ottCall->SetMute(0, SIM1_SLOTID), TELEPHONY_SUCCESS);
     OttCallRequestInfo requestInfo = {
         .phoneNum = "",
         .bundleName = "",
         .videoState = VideoStateType::TYPE_VOICE,
     };
     ASSERT_EQ(ottCall->PackOttCallRequestInfo(requestInfo), TELEPHONY_SUCCESS);
+    ASSERT_NE(ottCall->PostDialProceed(true), TELEPHONY_SUCCESS);
 }
 
 /**
@@ -1395,7 +1392,9 @@ HWTEST_F(BranchTest, Telephony_CarrierCall_001, Function | MediumTest | Level3)
     ASSERT_EQ(TELEPHONY_ERR_LOCAL_PTR_NULL, call.CarrierSwitchCall());
     call.cellularCallConnectionPtr_ = DelayedSingleton<CellularCallConnection>::GetInstance();
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, call.CarrierSwitchCall());
+    ASSERT_NE(TELEPHONY_ERR_SUCCESS, call.PostDialProceed(true));
     call.cellularCallConnectionPtr_ = nullptr;
+    ASSERT_EQ(TELEPHONY_ERR_LOCAL_PTR_NULL, call.PostDialProceed(true));
     ASSERT_EQ(TELEPHONY_ERR_LOCAL_PTR_NULL, call.CarrierCombineConference());
     ASSERT_EQ(TELEPHONY_ERR_LOCAL_PTR_NULL, call.CarrierSeparateConference());
     ASSERT_EQ(TELEPHONY_ERR_LOCAL_PTR_NULL, call.CarrierKickOutFromConference());
@@ -1660,6 +1659,7 @@ HWTEST_F(BranchTest, Telephony_CallControlManager_001, Function | MediumTest | L
     ASSERT_FALSE(callControlManager->NotifyCallDestroyed(details));
     ASSERT_FALSE(callControlManager->NotifyIncomingCallAnswered(callObjectPtr));
     ASSERT_FALSE(callControlManager->NotifyIncomingCallRejected(callObjectPtr, false, ""));
+    ASSERT_NE(callControlManager->PostDialProceed(VALID_CALLID, true), TELEPHONY_SUCCESS);
     CallEventInfo info;
     ASSERT_FALSE(callControlManager->NotifyCallEventUpdated(info));
     DialParaInfo dialParaInfo;
@@ -2114,6 +2114,7 @@ HWTEST_F(BranchTest, Telephony_CallAbilityReportProxy_001, Function | MediumTest
     callAbilityReportProxy->ReportMmiCodeResult(mmiCodeInfo);
     OttCallRequestId ottReportId = OttCallRequestId::OTT_REQUEST_ANSWER;
     callAbilityReportProxy->OttCallRequest(ottReportId, resultInfo);
+    callAbilityReportProxy->ReportPostDialDelay(TEST_STR);
     std::string ottBundleName = "com.ohos.callservice";
     sptr<CallAbilityCallback> ottCallAbilityCallbackPtr = new CallAbilityCallback();
     ASSERT_EQ(callAbilityReportProxy->RegisterCallBack(ottCallAbilityCallbackPtr, ottBundleName), TELEPHONY_SUCCESS);

@@ -99,5 +99,16 @@ int32_t NapiCallManagerCallback::OnReportAudioDeviceChange(const AudioDeviceInfo
     }
     return ret;
 }
+
+int32_t NapiCallManagerCallback::OnReportPostDialDelay(const std::string &str)
+{
+    int32_t ret = DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->UpdatePostDialDelay(str);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("OnReportPostDialDelay failed! errCode:%{public}d", ret);
+    } else {
+        TELEPHONY_LOGI("OnReportPostDialDelay success!");
+    }
+    return ret;
+}
 } // namespace Telephony
 } // namespace OHOS

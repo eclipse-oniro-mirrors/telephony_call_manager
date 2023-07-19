@@ -324,6 +324,20 @@ int32_t CarrierCall::StopDtmf()
     return cellularCallConnectionPtr_->StopDtmf(callInfo);
 }
 
+int32_t CarrierCall::PostDialProceed(bool proceed)
+{
+    CellularCallInfo callInfo;
+    int32_t ret = PackCellularCallInfo(callInfo);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGW("PackCellularCallInfo failed!");
+    }
+    if (cellularCallConnectionPtr_ == nullptr) {
+        TELEPHONY_LOGE("cellularCallConnectionPtr_ is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return cellularCallConnectionPtr_->PostDialProceed(callInfo, proceed);
+}
+
 void CarrierCall::SetSlotId(int32_t slotId)
 {
     slotId_ = slotId;

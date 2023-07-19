@@ -358,6 +358,20 @@ int CellularCallConnection::StopDtmf(const CellularCallInfo &callInfo)
     return TELEPHONY_SUCCESS;
 }
 
+int CellularCallConnection::PostDialProceed(const CellularCallInfo &callInfo, const bool proceed)
+{
+    if (ReConnectService() != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("ipc reconnect failed!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int errCode = cellularCallInterfacePtr_->PostDialProceed(callInfo, proceed);
+    if (errCode != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("post dial continue failed, errcode:%{public}d", errCode);
+        return errCode;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
 int CellularCallConnection::SendDtmf(char cDTMFCode, const std::string &phoneNum)
 {
     if (ReConnectService() != TELEPHONY_SUCCESS) {

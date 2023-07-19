@@ -260,6 +260,9 @@ public:
      */
     virtual int32_t CloseUnFinishedUssdResult(const int32_t result) = 0;
 
+    virtual int32_t ReportPostDialChar(const std::string &c) = 0;
+
+    virtual int32_t ReportPostDialDelay(const std::string &str) = 0;
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"OHOS.Telephony.ICallStatusCallback");
 };

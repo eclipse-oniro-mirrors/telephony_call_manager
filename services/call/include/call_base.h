@@ -35,7 +35,7 @@ namespace OHOS {
 namespace Telephony {
 class CallBase : public virtual RefBase {
 public:
-    CallBase(DialParaInfo &info);
+    explicit CallBase(DialParaInfo &info);
     CallBase(DialParaInfo &info, AppExecFwk::PacMap &extras);
     virtual ~CallBase();
 
@@ -50,6 +50,7 @@ public:
     virtual bool GetEmergencyState() = 0;
     virtual int32_t StartDtmf(char str) = 0;
     virtual int32_t StopDtmf() = 0;
+    virtual int32_t PostDialProceed(bool proceed) = 0;
     virtual int32_t GetSlotId() = 0;
     virtual int32_t CombineConference() = 0;
     virtual int32_t SeparateConference() = 0;

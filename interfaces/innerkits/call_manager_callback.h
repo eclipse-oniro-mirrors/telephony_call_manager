@@ -92,6 +92,8 @@ public:
      * @return Returns 0 on success, others on failure.
      */
     virtual int32_t OnReportAudioDeviceChange(const AudioDeviceInfo &info) = 0;
+
+    virtual int32_t OnReportPostDialDelay(const std::string &str) = 0;
 };
 } // namespace Telephony
 } // namespace OHOS

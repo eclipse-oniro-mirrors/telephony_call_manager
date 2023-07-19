@@ -15,11 +15,11 @@
 
 #ifndef CALL_MANAGER_CONNECT_H
 #define CALL_MANAGER_CONNECT_H
+#include <string_ex.h>
 #include <string>
 #include <map>
 #include <list>
 #include <mutex>
-#include <string_ex.h>
 
 #include "accesstoken_kit.h"
 #include "iservice_registry.h"
@@ -316,6 +316,12 @@ public:
         return TELEPHONY_SUCCESS;
     }
 
+    int32_t OnReportPostDialDelay(const std::string &str)
+    {
+        TELEPHONY_LOGI("OnReportPostDialDelay success!");
+        return TELEPHONY_SUCCESS;
+    }
+
 private:
     using CallAbilityCallbackFunc = int32_t (CallAbilityCallbackStub::*)(MessageParcel &data, MessageParcel &reply);
 
@@ -455,6 +461,11 @@ public:
     }
 
     int32_t OnReportAudioDeviceChange(const AudioDeviceInfo &info)
+    {
+        return TELEPHONY_SUCCESS;
+    }
+
+    int32_t OnReportPostDialDelay(const std::string &str)
     {
         return TELEPHONY_SUCCESS;
     }

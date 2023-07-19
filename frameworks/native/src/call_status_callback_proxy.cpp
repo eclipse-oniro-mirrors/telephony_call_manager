@@ -642,5 +642,43 @@ int32_t CallStatusCallbackProxy::CloseUnFinishedUssdResult(const int32_t result)
     }
     return replyParcel.ReadInt32();
 }
+
+int32_t CallStatusCallbackProxy::ReportPostDialChar(const std::string &c)
+{
+    MessageParcel dataParcel;
+    MessageParcel replyParcel;
+    MessageOption option;
+    if (!dataParcel.WriteInterfaceToken(CallStatusCallbackProxy::GetDescriptor())) {
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    dataParcel.WriteString(c);
+    if (Remote() == nullptr) {
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t error = Remote()->SendRequest(POST_DIAL_CHAR, dataParcel, replyParcel, option);
+    if (error != TELEPHONY_SUCCESS) {
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return replyParcel.ReadInt32();
+}
+
+int32_t CallStatusCallbackProxy::ReportPostDialDelay(const std::string &str)
+{
+    MessageParcel dataParcel;
+    MessageParcel replyParcel;
+    MessageOption option;
+    if (!dataParcel.WriteInterfaceToken(CallStatusCallbackProxy::GetDescriptor())) {
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    dataParcel.WriteString(str);
+    if (Remote() == nullptr) {
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t error = Remote()->SendRequest(POST_DIAL_DELAY, dataParcel, replyParcel, option);
+    if (error != TELEPHONY_SUCCESS) {
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return replyParcel.ReadInt32();
+}
 } // namespace Telephony
 } // namespace OHOS

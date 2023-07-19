@@ -56,6 +56,7 @@ public:
     virtual int32_t IsInEmergencyCall(bool &enabled) = 0;
     virtual int32_t StartDtmf(int32_t callId, char str) = 0;
     virtual int32_t StopDtmf(int32_t callId) = 0;
+    virtual int32_t PostDialProceed(int32_t callId, bool proceed) = 0;
     virtual int32_t GetCallWaiting(int32_t slotId) = 0;
     virtual int32_t SetCallWaiting(int32_t slotId, bool activate) = 0;
     virtual int32_t GetCallRestriction(int32_t slotId, CallRestrictionType type) = 0;
