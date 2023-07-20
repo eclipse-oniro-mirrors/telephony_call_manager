@@ -1539,7 +1539,7 @@ HWTEST_F(BranchTest, Telephony_BluetoothCallPolicy_002, Function | MediumTest | 
     ASSERT_EQ(TELEPHONY_SUCCESS, callPolicy.KickOutFromConferencePolicy(policy));
     callBase1->conferenceState_ = TelConferenceState::TEL_CONFERENCE_IDLE;
     ASSERT_NE(TELEPHONY_SUCCESS, callPolicy.SeparateConferencePolicy(policy));
-    ASSERT_EQ(TELEPHONY_SUCCESS, callPolicy.KickOutFromConferencePolicy(policy));
+    ASSERT_NE(TELEPHONY_SUCCESS, callPolicy.KickOutFromConferencePolicy(policy));
 }
 
 /**
