@@ -107,7 +107,7 @@ napi_value NapiCallManager::DeclareCallSupplementInterface(napi_env env, napi_va
         DECLARE_NAPI_FUNCTION("setVoNRState", SetVoNRState),
         DECLARE_NAPI_FUNCTION("getVoNRState", GetVoNRState),
         DECLARE_NAPI_FUNCTION("canSetCallTransferTime", CanSetCallTransferTime),
-        DECLARE_NAPI_FUNCTION("closeUnFinishedUssd", CloseUnFinishedUssd),
+        DECLARE_NAPI_FUNCTION("closeUnfinishedUssd", CloseUnFinishedUssd),
         DECLARE_NAPI_FUNCTION("inputDialerSpecialCode", InputDialerSpecialCode),
     };
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc));
