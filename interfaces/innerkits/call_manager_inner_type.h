@@ -501,7 +501,15 @@ struct CallRecordInfo {
      * Indicates the slot id.
      */
     int32_t slotId = 0;
-    CallRecordInfo operator=(const CallRecordInfo &temp)
+
+    CallRecordInfo() {}
+
+    CallRecordInfo(const CallRecordInfo &temp)
+    {
+        *this = temp;
+    }
+
+    CallRecordInfo &operator=(const CallRecordInfo &temp)
     {
         callId = temp.callId;
         std::copy(std::begin(temp.phoneNumber), std::end(temp.phoneNumber), std::begin(phoneNumber));
@@ -963,7 +971,15 @@ struct DisconnectedDetails {
      * Indicates the detail message for the ending call reason.
      */
     std::string message = "";
-    DisconnectedDetails operator=(const DisconnectedDetails &temp)
+
+    DisconnectedDetails() {}
+
+    DisconnectedDetails(const DisconnectedDetails &temp)
+    {
+        *this = temp;
+    }
+
+    DisconnectedDetails &operator=(const DisconnectedDetails &temp)
     {
         reason = temp.reason;
         message = temp.message;
@@ -1702,7 +1718,15 @@ struct CallMediaModeResponse {
      * Indicates the response result.
      */
     int32_t result = 0;
-    CallMediaModeResponse operator=(const CallMediaModeResponse &temp)
+
+    CallMediaModeResponse() {}
+
+    CallMediaModeResponse(const CallMediaModeResponse &temp)
+    {
+        *this = temp;
+    }
+
+    CallMediaModeResponse &operator=(const CallMediaModeResponse &temp)
     {
         std::copy(std::begin(temp.phoneNum), std::end(temp.phoneNum), std::begin(phoneNum));
         result = temp.result;
@@ -1869,7 +1893,15 @@ struct OttCallEventInfo {
      * Indicates the bundle name.
      */
     char bundleName[kMaxBundleNameLen + 1] = { 0 };
-    OttCallEventInfo operator=(const OttCallEventInfo &temp)
+
+    OttCallEventInfo() {}
+
+    OttCallEventInfo(const OttCallEventInfo &temp)
+    {
+        *this = temp;
+    }
+
+    OttCallEventInfo &operator=(const OttCallEventInfo &temp)
     {
         ottCallEventId = temp.ottCallEventId;
         std::copy(std::begin(temp.bundleName), std::end(temp.bundleName), std::begin(bundleName));
@@ -1919,7 +1951,15 @@ struct CallDetailInfo {
      * 1: a multi-party(conference) call
      */
     int32_t mpty = 0;
-    CallDetailInfo operator=(const CallDetailInfo &temp)
+
+    CallDetailInfo() {}
+
+    CallDetailInfo(const CallDetailInfo &temp)
+    {
+        *this = temp;
+    }
+
+    CallDetailInfo &operator=(const CallDetailInfo &temp)
     {
         index = temp.index;
         std::copy(std::begin(temp.phoneNum), std::end(temp.phoneNum), std::begin(phoneNum));

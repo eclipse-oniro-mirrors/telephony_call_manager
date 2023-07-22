@@ -1853,9 +1853,9 @@ HWTEST_F(BranchTest, Telephony_CallControlManager_004, Function | MediumTest | L
 HWTEST_F(BranchTest, Telephony_CallStatusManager_001, Function | MediumTest | Level3)
 {
     std::shared_ptr<CallStatusManager> callStatusManager = std::make_shared<CallStatusManager>();
-    CallDetailInfo info = {
-        .phoneNum = "123",
-    };
+    CallDetailInfo info;
+    std::string number = "123";
+    memcpy_s(&info.phoneNum, kMaxNumberLen, number.c_str(), number.length());
     info.state = TelCallState::CALL_STATUS_ACTIVE;
     ASSERT_GT(callStatusManager->HandleCallReportInfo(info), TELEPHONY_ERROR);
     info.state = TelCallState::CALL_STATUS_HOLDING;
@@ -1901,9 +1901,9 @@ HWTEST_F(BranchTest, Telephony_CallStatusManager_001, Function | MediumTest | Le
 HWTEST_F(BranchTest, Telephony_CallStatusManager_002, Function | MediumTest | Level3)
 {
     std::shared_ptr<CallStatusManager> callStatusManager = std::make_shared<CallStatusManager>();
-    CallDetailInfo callDetailInfo = {
-        .phoneNum = "",
-    };
+    CallDetailInfo callDetailInfo;
+    std::string number = "";
+    memcpy_s(&callDetailInfo.phoneNum, kMaxNumberLen, number.c_str(), number.length());
     callDetailInfo.state = TelCallState::CALL_STATUS_INCOMING;
     callDetailInfo.callType = CallType::TYPE_CS;
     ASSERT_GT(callStatusManager->IncomingHandle(callDetailInfo), TELEPHONY_ERROR);
@@ -1954,9 +1954,9 @@ HWTEST_F(BranchTest, Telephony_CallStatusManager_003, Function | MediumTest | Le
     ottCallEventInfo.ottCallEventId = OttCallEventId::OTT_CALL_EVENT_FUNCTION_UNSUPPORTED;
     (void)memcpy_s(ottCallEventInfo.bundleName, kMaxBundleNameLen + 1, TEST_STR, strlen(TEST_STR));
     ASSERT_EQ(callStatusManager->HandleOttEventReportInfo(ottCallEventInfo), TELEPHONY_SUCCESS);
-    CallDetailInfo callDetailInfo = {
-        .phoneNum = "",
-    };
+    CallDetailInfo callDetailInfo;
+    std::string number = "";
+    memcpy_s(&callDetailInfo.phoneNum, kMaxNumberLen, number.c_str(), number.length());
     callDetailInfo.state = TelCallState::CALL_STATUS_INCOMING;
     callDetailInfo.callType = CallType::TYPE_CS;
     ASSERT_EQ(callStatusManager->IncomingFilterPolicy(callDetailInfo), TELEPHONY_SUCCESS);

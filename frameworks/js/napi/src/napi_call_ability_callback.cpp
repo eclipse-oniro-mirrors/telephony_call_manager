@@ -1012,7 +1012,7 @@ int32_t NapiCallAbilityCallback::ReportSetRestrictionPassword(AppExecFwk::PacMap
         return CALL_ERR_CALLBACK_NOT_EXIST;
     }
     uv_loop_s *loop = nullptr;
-#if NAPI_VERSION >= 2
+#if defined(NAPI_VERSION) && NAPI_VERSION >= 2
     napi_get_uv_event_loop(setRestrictionPasswordCallback_.env, &loop);
 #endif
     CallSupplementWorker *dataWorker = std::make_unique<CallSupplementWorker>().release();
