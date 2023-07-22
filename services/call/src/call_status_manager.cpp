@@ -32,6 +32,7 @@
 
 namespace OHOS {
 namespace Telephony {
+constexpr int32_t INIT_INDEX = 0;
 CallStatusManager::CallStatusManager()
 {
     (void)memset_s(&callReportInfo_, sizeof(CallDetailInfo), 0, sizeof(CallDetailInfo));
@@ -121,7 +122,7 @@ int32_t CallStatusManager::HandleCallsReportInfo(const CallDetailsInfo &info)
     TELEPHONY_LOGI("call list size:%{public}zu,slotId:%{public}d", info.callVec.size(), info.slotId);
     for (auto &it : info.callVec) {
         for (const auto &it1 : callDetailsInfo_.callVec) {
-            if (strcmp(it.phoneNum, it1.phoneNum) == 0) {
+            if (it.index == it1.index) {
                 // call state changes
                 if (it.state != it1.state || it.mpty != it1.mpty) {
                     TELEPHONY_LOGI("handle updated call state:%{public}d", it.state);
@@ -141,7 +142,7 @@ int32_t CallStatusManager::HandleCallsReportInfo(const CallDetailsInfo &info)
     // disconnected calls handle
     for (auto &it2 : callDetailsInfo_.callVec) {
         for (const auto &it3 : info.callVec) {
-            if (strcmp(it2.phoneNum, it3.phoneNum) == 0) {
+            if (it2.index == it3.index) {
                 TELEPHONY_LOGI("state:%{public}d", it2.state);
                 flag = true;
                 break;
@@ -335,11 +336,16 @@ void CallStatusManager::CallFilterCompleteResult(const CallDetailInfo &info)
 
 int32_t CallStatusManager::UpdateDialingCallInfo(const CallDetailInfo &info)
 {
-    std::string tmpStr(info.phoneNum);
-    sptr<CallBase> call = GetOneCallObject(tmpStr);
+    sptr<CallBase> call = GetOneCallObjectByIndex(INIT_INDEX);
     if (call == nullptr) {
         TELEPHONY_LOGE("call is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+
+    std::string phoneNum(info.phoneNum);
+    if (call->GetAccountNumber() != phoneNum) {
+        TELEPHONY_LOGE("phoneNum is not match");
+        return CALL_ERR_DIAL_FAILED;
     }
     call->SetCallIndex(info.index);
     call->SetBundleName(info.bundleName);
@@ -353,22 +359,16 @@ int32_t CallStatusManager::UpdateDialingCallInfo(const CallDetailInfo &info)
 int32_t CallStatusManager::DialingHandle(const CallDetailInfo &info)
 {
     TELEPHONY_LOGI("handle dialing state");
-    int32_t ret = DialingHandlePolicy(info);
-    if (ret != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("DialingHandlePolicy failed!");
-        ret = UpdateDialingCallInfo(info);
-        if (ret != TELEPHONY_SUCCESS) {
-            TELEPHONY_LOGE("UpdateDialingCallInfo failed!");
-            return ret;
-        }
-        return TELEPHONY_SUCCESS;
+    if (info.index > 0) {
+        TELEPHONY_LOGI("need update call info");
+        return UpdateDialingCallInfo(info);
     }
     sptr<CallBase> call = CreateNewCall(info, CallDirection::CALL_DIRECTION_OUT);
     if (call == nullptr) {
         TELEPHONY_LOGE("CreateNewCall failed!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    ret = call->DialingProcess();
+    int32_t ret = call->DialingProcess();
     if (ret != TELEPHONY_SUCCESS) {
         return ret;
     }
@@ -383,8 +383,7 @@ int32_t CallStatusManager::DialingHandle(const CallDetailInfo &info)
 int32_t CallStatusManager::ActiveHandle(const CallDetailInfo &info)
 {
     TELEPHONY_LOGI("handle active state");
-    std::string tmpStr(info.phoneNum);
-    sptr<CallBase> call = GetOneCallObject(tmpStr);
+    sptr<CallBase> call = GetOneCallObjectByIndex(info.index);
     if (call == nullptr) {
         TELEPHONY_LOGE("Call is NULL");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -421,7 +420,7 @@ int32_t CallStatusManager::HoldingHandle(const CallDetailInfo &info)
 {
     TELEPHONY_LOGI("handle holding state");
     std::string tmpStr(info.phoneNum);
-    sptr<CallBase> call = GetOneCallObject(tmpStr);
+    sptr<CallBase> call = GetOneCallObjectByIndex(info.index);
     if (call == nullptr) {
         TELEPHONY_LOGE("Call is NULL");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -448,7 +447,7 @@ int32_t CallStatusManager::AlertHandle(const CallDetailInfo &info)
 {
     TELEPHONY_LOGI("handle alerting state");
     std::string tmpStr(info.phoneNum);
-    sptr<CallBase> call = GetOneCallObject(tmpStr);
+    sptr<CallBase> call = GetOneCallObjectByIndex(info.index);
     if (call == nullptr) {
         TELEPHONY_LOGE("Call is NULL");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -471,7 +470,7 @@ int32_t CallStatusManager::DisconnectingHandle(const CallDetailInfo &info)
 {
     TELEPHONY_LOGI("handle disconnecting state");
     std::string tmpStr(info.phoneNum);
-    sptr<CallBase> call = GetOneCallObject(tmpStr);
+    sptr<CallBase> call = GetOneCallObjectByIndex(info.index);
     if (call == nullptr) {
         TELEPHONY_LOGE("Call is NULL");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -488,7 +487,7 @@ int32_t CallStatusManager::DisconnectedHandle(const CallDetailInfo &info)
 {
     TELEPHONY_LOGI("handle disconnected state");
     std::string tmpStr(info.phoneNum);
-    sptr<CallBase> call = GetOneCallObject(tmpStr);
+    sptr<CallBase> call = GetOneCallObjectByIndex(info.index);
     if (call == nullptr) {
         TELEPHONY_LOGE("Call is NULL");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;

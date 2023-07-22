@@ -317,6 +317,18 @@ sptr<CallBase> CallObjectManager::GetOneCallObject(CallRunningState callState)
     return nullptr;
 }
 
+sptr<CallBase> CallObjectManager::GetOneCallObjectByIndex(int32_t index)
+{
+    std::lock_guard<std::mutex> lock(listMutex_);
+    std::list<sptr<CallBase>>::iterator it = callObjectPtrList_.begin();
+    for (; it != callObjectPtrList_.end(); ++it) {
+        if ((*it)->GetCallIndex() == index) {
+            return (*it);
+        }
+    }
+    return nullptr;
+}
+
 bool CallObjectManager::IsCallExist(CallType callType, TelCallState callState)
 {
     std::lock_guard<std::mutex> lock(listMutex_);

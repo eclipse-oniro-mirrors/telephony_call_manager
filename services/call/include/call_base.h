@@ -105,6 +105,7 @@ public:
     void SetCallType(CallType callType);
     virtual void SetSlotId(int32_t slotId) {}
     virtual void SetCallIndex(int32_t index) {}
+    virtual int32_t GetCallIndex() {return 0;}
 
 protected:
     int32_t callId_;

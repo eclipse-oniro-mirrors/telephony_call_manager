@@ -333,5 +333,10 @@ void CarrierCall::SetCallIndex(int32_t index)
 {
     index_ = index;
 }
+
+int32_t CarrierCall::GetCallIndex()
+{
+    return index_;
+}
 } // namespace Telephony
 } // namespace OHOS
