@@ -97,5 +97,14 @@ int32_t CallAbilityCallback::OnReportAudioDeviceChange(const AudioDeviceInfo &in
     }
     return TELEPHONY_SUCCESS;
 }
+
+int32_t CallAbilityCallback::OnReportPostDialDelay(const std::string &str)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (callbackPtr_ != nullptr) {
+        return callbackPtr_->OnReportPostDialDelay(str);
+    }
+    return TELEPHONY_SUCCESS;
+}
 } // namespace Telephony
 } // namespace OHOS

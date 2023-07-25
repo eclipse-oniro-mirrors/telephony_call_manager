@@ -25,7 +25,7 @@ namespace OHOS {
 namespace Telephony {
 class CallStatusCallback : public CallStatusCallbackStub {
 public:
-    explicit CallStatusCallback();
+    CallStatusCallback();
     ~CallStatusCallback();
 
     int32_t UpdateCallReportInfo(const CallReportInfo &info) override;
@@ -57,6 +57,8 @@ public:
     int32_t InviteToConferenceResult(const int32_t result) override;
     int32_t SendMmiCodeResult(const MmiCodeInfo &info) override;
     int32_t CloseUnFinishedUssdResult(const int32_t result) override;
+    int32_t ReportPostDialChar(const std::string &c) override;
+    int32_t ReportPostDialDelay(const std::string &str) override;
 };
 } // namespace Telephony
 } // namespace OHOS

@@ -65,6 +65,7 @@ private:
     int32_t OnIsInEmergencyCall(MessageParcel &data, MessageParcel &reply);
     int32_t OnStartDtmf(MessageParcel &data, MessageParcel &reply);
     int32_t OnStopDtmf(MessageParcel &data, MessageParcel &reply);
+    int32_t OnPostDialProceed(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetCallWaiting(MessageParcel &data, MessageParcel &reply);
     int32_t OnSetCallWaiting(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetCallRestriction(MessageParcel &data, MessageParcel &reply);

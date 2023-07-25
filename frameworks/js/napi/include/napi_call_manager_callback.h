@@ -35,6 +35,7 @@ public:
     int32_t OnOttCallRequest(OttCallRequestId requestId, AppExecFwk::PacMap &info) override;
     int32_t OnReportMmiCodeResult(const MmiCodeInfo &info) override;
     int32_t OnReportAudioDeviceChange(const AudioDeviceInfo &info) override;
+    int32_t OnReportPostDialDelay(const std::string &str) override;
 };
 } // namespace Telephony
 } // namespace OHOS

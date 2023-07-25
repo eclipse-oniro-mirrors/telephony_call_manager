@@ -22,6 +22,7 @@
 
 #include "audio_player.h"
 #include "audio_proxy.h"
+#include "tone_player.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -66,7 +67,7 @@ static constexpr const char* TONE_PLAY_THREAD = "tonePlayThread";
 class Tone {
 public:
     Tone();
-    Tone(ToneDescriptor tone);
+    explicit Tone(ToneDescriptor tone);
     virtual ~Tone();
     void Init();
     int32_t Play();
@@ -76,10 +77,13 @@ public:
 
 private:
     ToneDescriptor currentToneDescriptor_ = ToneDescriptor::TONE_UNKNOWN;
+    bool InitTonePlayer();
+    AudioStandard::ToneType ConvertToneDescriptorToToneType(ToneDescriptor tone);
     std::string GetToneDescriptorPath(ToneDescriptor tone);
     bool IsDtmf(ToneDescriptor tone);
     std::mutex mutex_;
     AudioPlayer *audioPlayer_ = nullptr;
+    std::shared_ptr<AudioStandard::TonePlayer> dtmfTonePlayer_;
 };
 } // namespace Telephony
 } // namespace OHOS

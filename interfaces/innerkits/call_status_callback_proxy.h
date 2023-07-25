@@ -264,6 +264,10 @@ public:
      */
     int32_t CloseUnFinishedUssdResult(const int32_t result) override;
 
+    int32_t ReportPostDialChar(const std::string &c) override;
+
+    int32_t ReportPostDialDelay(const std::string &str) override;
+
 private:
     static inline BrokerDelegator<CallStatusCallbackProxy> delegator_;
 };

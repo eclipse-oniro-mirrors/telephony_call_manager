@@ -17,6 +17,7 @@
 
 #include "call_connect_ability.h"
 #include "call_manager_errors.h"
+#include "call_number_utils.h"
 #include "report_call_info_handler.h"
 #include "telephony_log_wrapper.h"
 
@@ -125,7 +126,9 @@ sptr<CallBase> CallObjectManager::GetOneCallObject(std::string &phoneNumber)
     std::lock_guard<std::mutex> lock(listMutex_);
     std::list<sptr<CallBase>>::iterator it = callObjectPtrList_.begin();
     for (; it != callObjectPtrList_.end(); ++it) {
-        if ((*it)->GetAccountNumber() == phoneNumber) {
+        std::string networkAddress = DelayedSingleton<CallNumberUtils>::GetInstance()->RemovePostDailPhoneNumber(
+            (*it)->GetAccountNumber());
+        if (networkAddress == phoneNumber) {
             TELEPHONY_LOGI("GetOneCallObject success!");
             retPtr = *it;
             break;
@@ -258,7 +261,9 @@ bool CallObjectManager::IsCallExist(std::string &phoneNumber)
     std::lock_guard<std::mutex> lock(listMutex_);
     std::list<sptr<CallBase>>::iterator it = callObjectPtrList_.begin();
     for (; it != callObjectPtrList_.end(); ++it) {
-        if ((*it)->GetAccountNumber() == phoneNumber) {
+        std::string networkAddress = DelayedSingleton<CallNumberUtils>::GetInstance()->RemovePostDailPhoneNumber(
+            (*it)->GetAccountNumber());
+        if (networkAddress == phoneNumber) {
             return true;
         }
     }

@@ -112,6 +112,8 @@ void CallManagerServiceStub::InitCallDtmfRequest()
         &CallManagerServiceStub::OnStartDtmf;
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_STOP_DTMF)] =
         &CallManagerServiceStub::OnStopDtmf;
+    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_POST_DIAL_PROCEED)] =
+        &CallManagerServiceStub::OnPostDialProceed;
 }
 
 void CallManagerServiceStub::InitCallSupplementRequest()
@@ -490,6 +492,21 @@ int32_t CallManagerServiceStub::OnStopDtmf(MessageParcel &data, MessageParcel &r
     int32_t result = TELEPHONY_ERR_FAIL;
     int32_t callId = data.ReadInt32();
     result = StopDtmf(callId);
+    TELEPHONY_LOGI("result:%{public}d", result);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("fail to write parcel");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallManagerServiceStub::OnPostDialProceed(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t result = TELEPHONY_ERR_FAIL;
+    int32_t callId = data.ReadInt32();
+    bool proceed = data.ReadBool();
+
+    result = PostDialProceed(callId, proceed);
     TELEPHONY_LOGI("result:%{public}d", result);
     if (!reply.WriteInt32(result)) {
         TELEPHONY_LOGE("fail to write parcel");

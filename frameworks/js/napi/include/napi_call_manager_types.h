@@ -175,6 +175,10 @@ struct OttEventAsyncContext : AsyncContext {
     OttCallEventInfo eventInfo;
 };
 
+struct PostDialAsyncContext : AsyncContext {
+    bool proceed = false;
+};
+
 enum CallWaitingStatus {
     CALL_WAITING_DISABLE = 0,
     CALL_WAITING_ENABLE,
@@ -223,6 +227,11 @@ struct MmiCodeWorker {
 
 struct AudioDeviceWork {
     AudioDeviceInfo info;
+    EventCallback callback;
+};
+
+struct PostDialDelayWorker {
+    std::string postDialStr;
     EventCallback callback;
 };
 } // namespace Telephony

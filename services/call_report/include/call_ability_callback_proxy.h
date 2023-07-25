@@ -36,6 +36,7 @@ public:
     int32_t OnOttCallRequest(OttCallRequestId requestId, AppExecFwk::PacMap &info) override;
     int32_t OnReportMmiCodeResult(const MmiCodeInfo &info) override;
     int32_t OnReportAudioDeviceChange(const AudioDeviceInfo &info) override;
+    int32_t OnReportPostDialDelay(const std::string &str) override;
 
 private:
     void PackDataParcel(CallResultReportId reportId, AppExecFwk::PacMap &resultInfo, MessageParcel &dataParcel);

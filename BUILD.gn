@@ -127,6 +127,7 @@ ohos_shared_library("tel_call_manager") {
     "ability_runtime:dataobs_manager",
     "audio_framework:audio_client",
     "audio_framework:audio_renderer",
+    "audio_framework:audio_toneplayer",
     "c_utils:utils",
     "camera_framework:camera_framework",
     "common_event_service:cesfwk_innerkits",

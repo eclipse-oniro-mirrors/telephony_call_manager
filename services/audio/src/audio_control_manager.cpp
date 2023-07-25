@@ -21,6 +21,8 @@
 
 namespace OHOS {
 namespace Telephony {
+constexpr int32_t DTMF_PLAY_TIME = 30;
+
 AudioControlManager::AudioControlManager()
     : isLocalRingbackNeeded_(false), ring_(nullptr), tone_(nullptr), sound_(nullptr)
 {}
@@ -158,6 +160,7 @@ void AudioControlManager::HandlePriorState(sptr<CallBase> &callObjectPtr, TelCal
                 DelayedSingleton<AudioProxy>::GetInstance()->SetMicrophoneMute(false);
                 event = AudioEvent::NO_MORE_ACTIVE_CALL;
             }
+            StopRingback();
             break;
         default:
             break;
@@ -547,12 +550,11 @@ int32_t AudioControlManager::PlayCallTone(ToneDescriptor type)
         TELEPHONY_LOGE("should not play callTone");
         return CALL_ERR_AUDIO_TONE_PLAY_FAILED;
     }
+    toneState_ = ToneState::TONEING;
+    tone_ = std::make_unique<Tone>(type);
     if (tone_ == nullptr) {
-        tone_ = std::make_unique<Tone>(type);
-        if (tone_ == nullptr) {
-            TELEPHONY_LOGE("create tone failed");
-            return TELEPHONY_ERR_LOCAL_PTR_NULL;
-        }
+        TELEPHONY_LOGE("create tone failed");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     if (tone_->Play() != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("play calltone failed");
@@ -577,6 +579,7 @@ int32_t AudioControlManager::StopCallTone()
         return CALL_ERR_AUDIO_TONE_STOP_FAILED;
     }
     tone_->ReleaseRenderer();
+    tone_ = nullptr;
     toneState_ = ToneState::STOPPED;
     TELEPHONY_LOGI("stop call tone success");
     return TELEPHONY_SUCCESS;
@@ -613,6 +616,31 @@ int32_t AudioControlManager::PlayWaitingTone()
 int32_t AudioControlManager::StopWaitingTone()
 {
     return StopCallTone();
+}
+
+int32_t AudioControlManager::PlayDtmfTone(char str)
+{
+    ToneDescriptor dtmfTone = Tone::ConvertDigitToTone(str);
+    return PlayCallTone(dtmfTone);
+}
+
+int32_t AudioControlManager::StopDtmfTone()
+{
+    return StopCallTone();
+}
+
+int32_t AudioControlManager::OnPostDialNextChar(char str)
+{
+    int32_t result = PlayDtmfTone(str);
+    if (result != TELEPHONY_SUCCESS) {
+        return result;
+    }
+    std::this_thread::sleep_for(std::chrono::milliseconds(DTMF_PLAY_TIME));
+    result = StopDtmfTone();
+    if (result != TELEPHONY_SUCCESS) {
+        return result;
+    }
+    return TELEPHONY_SUCCESS;
 }
 
 void AudioControlManager::NewCallCreated(sptr<CallBase> &callObjectPtr) {}

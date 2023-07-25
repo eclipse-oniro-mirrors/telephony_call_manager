@@ -119,6 +119,7 @@ napi_value NapiCallManager::DeclareCallExtendInterface(napi_env env, napi_value 
     napi_property_descriptor desc[] = {
         DECLARE_NAPI_FUNCTION("startDTMF", StartDTMF),
         DECLARE_NAPI_FUNCTION("stopDTMF", StopDTMF),
+        DECLARE_NAPI_FUNCTION("postDialProceed", PostDialProceed),
         DECLARE_NAPI_FUNCTION("getCallState", GetCallState),
         DECLARE_NAPI_FUNCTION("isRinging", IsRinging),
         DECLARE_NAPI_FUNCTION("hasCall", HasCall),
@@ -2013,6 +2014,29 @@ napi_value NapiCallManager::StopDTMF(napi_env env, napi_callback_info info)
     return HandleAsyncWork(env, asyncContext.release(), "StopDTMF", NativeStopDTMF, NativeVoidCallBackWithErrorCode);
 }
 
+napi_value NapiCallManager::PostDialProceed(napi_env env, napi_callback_info info)
+{
+    GET_PARAMS(env, info, THREE_VALUE_MAXIMUM_LIMIT);
+    if (!MatchNumberAndBoolParameters(env, argv, argc)) {
+        TELEPHONY_LOGE("NapiCallManager::PostDialProceed MatchNumberAndBoolParameters failed.");
+        NapiUtil::ThrowParameterError(env);
+        return nullptr;
+    }
+    auto asyncContext = std::make_unique<PostDialAsyncContext>();
+    if (asyncContext == nullptr) {
+        TELEPHONY_LOGE("NapiCallManager::PostDialProceed asyncContext is nullptr.");
+        NapiUtil::ThrowParameterError(env);
+        return nullptr;
+    }
+    napi_get_value_int32(env, argv[ARRAY_INDEX_FIRST], &asyncContext->callId);
+    napi_get_value_bool(env, argv[ARRAY_INDEX_SECOND], &asyncContext->proceed);
+    if (argc == VALUE_MAXIMUM_LIMIT) {
+        napi_create_reference(env, argv[ARRAY_INDEX_THIRD], DATA_LENGTH_ONE, &(asyncContext->callbackRef));
+    }
+    return HandleAsyncWork(env, asyncContext.release(), "PostDialProceed", NativePostDialProceed,
+        NativeVoidCallBackWithErrorCode);
+}
+
 napi_value NapiCallManager::GetCallState(napi_env env, napi_callback_info info)
 {
     GET_PARAMS(env, info, TWO_VALUE_LIMIT);
@@ -2248,6 +2272,8 @@ napi_value NapiCallManager::ObserverOn(napi_env env, napi_callback_info info)
         DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->RegisterAudioDeviceCallback(stateCallback);
         int32_t result = DelayedSingleton<CallManagerClient>::GetInstance()->ReportAudioDeviceInfo();
         TELEPHONY_LOGI("result == %{public}d", result);
+    } else if (tmpStr == "postDialDelay") {
+        DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->RegisterPostDialDelay(stateCallback);
     }
     napi_value result = nullptr;
     return result;
@@ -2294,6 +2320,8 @@ napi_value NapiCallManager::ObserverOff(napi_env env, napi_callback_info info)
         DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->UnRegisterMmiCodeCallback();
     } else if (tmpStr == "audioDeviceChange") {
         DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->UnRegisterAudioDeviceCallback();
+    } else if (tmpStr == "postDialDelay") {
+        DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->UnRegisterPostDialDelayCallback();
     }
     if (argc == TWO_VALUE_LIMIT) {
         napi_create_reference(env, argv[ARRAY_INDEX_SECOND], DATA_LENGTH_ONE, &(asyncContext->callbackRef));
@@ -4171,6 +4199,21 @@ void NapiCallManager::NativeStopDTMF(napi_env env, void *data)
     }
     auto asyncContext = (AsyncContext *)data;
     asyncContext->errorCode = DelayedSingleton<CallManagerClient>::GetInstance()->StopDtmf(asyncContext->callId);
+    if (asyncContext->errorCode == TELEPHONY_SUCCESS) {
+        asyncContext->resolved = TELEPHONY_SUCCESS;
+    }
+}
+
+void NapiCallManager::NativePostDialProceed(napi_env env, void *data)
+{
+    if (data == nullptr) {
+        TELEPHONY_LOGE("NapiCallManager::NativePostDialProceed data is nullptr");
+        NapiUtil::ThrowParameterError(env);
+        return;
+    }
+    auto asyncContext = (PostDialAsyncContext *)data;
+    asyncContext->errorCode = DelayedSingleton<CallManagerClient>::GetInstance()->PostDialProceed(
+        asyncContext->callId, asyncContext->proceed);
     if (asyncContext->errorCode == TELEPHONY_SUCCESS) {
         asyncContext->resolved = TELEPHONY_SUCCESS;
     }

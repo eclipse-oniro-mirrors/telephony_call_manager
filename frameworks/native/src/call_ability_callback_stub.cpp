@@ -40,6 +40,8 @@ CallAbilityCallbackStub::CallAbilityCallbackStub()
     memberFuncMap_[static_cast<uint32_t>(
         CallManagerCallAbilityInterfaceCode::UPDATE_AUDIO_DEVICE_CHANGE_RESULT_REQUEST)] =
         &CallAbilityCallbackStub::OnUpdateAudioDeviceChange;
+    memberFuncMap_[static_cast<uint32_t>(CallManagerCallAbilityInterfaceCode::REPORT_POST_DIAL_DELAY)] =
+        &CallAbilityCallbackStub::OnUpdatePostDialDelay;
 }
 
 CallAbilityCallbackStub::~CallAbilityCallbackStub()
@@ -267,6 +269,17 @@ int32_t CallAbilityCallbackStub::OnUpdateOttCallRequest(MessageParcel &data, Mes
         TELEPHONY_LOGW("sent raw data is less than 32k");
     }
     result = OnOttCallRequest(requestId, resultInfo);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("writing parcel failed");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallAbilityCallbackStub::OnUpdatePostDialDelay(MessageParcel &data, MessageParcel &reply)
+{
+    std::string remainPostDial = data.ReadString();
+    int32_t result = OnReportPostDialDelay(remainPostDial);
     if (!reply.WriteInt32(result)) {
         TELEPHONY_LOGE("writing parcel failed");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;

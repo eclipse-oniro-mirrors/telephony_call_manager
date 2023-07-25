@@ -327,6 +327,16 @@ int32_t CallManagerClient::StopDtmf(int32_t callId)
     }
 }
 
+int32_t CallManagerClient::PostDialProceed(int32_t callId, bool proceed)
+{
+    if (g_callManagerProxy != nullptr) {
+        return g_callManagerProxy->PostDialProceed(callId, proceed);
+    } else {
+        TELEPHONY_LOGE("init first please!");
+        return TELEPHONY_ERR_UNINIT;
+    }
+}
+
 int32_t CallManagerClient::IsRinging(bool &enabled)
 {
     if (g_callManagerProxy != nullptr) {

@@ -175,6 +175,8 @@ public:
      */
     virtual int32_t StopDtmf(const CellularCallInfo &callInfo) = 0;
 
+    virtual int32_t PostDialProceed(const CellularCallInfo &callInfo, const bool proceed) = 0;
+
     /**
      * @brief play a dtmf tone
      *

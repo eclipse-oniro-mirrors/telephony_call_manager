@@ -27,6 +27,7 @@ enum CallManagerCallAbilityInterfaceCode {
     REPORT_OTT_CALL_REQUEST,
     UPDATE_MMI_CODE_RESULT_REQUEST,
     UPDATE_AUDIO_DEVICE_CHANGE_RESULT_REQUEST,
+    REPORT_POST_DIAL_DELAY,
 };
 } // namespace Telephony
 } // namespace OHOS

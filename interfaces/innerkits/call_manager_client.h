@@ -25,6 +25,7 @@ namespace OHOS {
 namespace Telephony {
 class CallManagerClient : public std::enable_shared_from_this<CallManagerClient> {
     DECLARE_DELAYED_SINGLETON(CallManagerClient)
+
 public:
     void Init(int32_t systemAbilityId);
     void UnInit();
@@ -261,6 +262,7 @@ public:
      */
     int32_t StopDtmf(int32_t callId);
 
+    int32_t PostDialProceed(int32_t callId, bool proceed);
     /**
      * @brief Whether the ringing
      *

@@ -100,6 +100,7 @@ public:
     static napi_value CanSetCallTransferTime(napi_env env, napi_callback_info info);
     static napi_value StartDTMF(napi_env env, napi_callback_info info);
     static napi_value StopDTMF(napi_env env, napi_callback_info info);
+    static napi_value PostDialProceed(napi_env env, napi_callback_info info);
     static napi_value GetCallState(napi_env env, napi_callback_info info);
     static napi_value IsRinging(napi_env env, napi_callback_info info);
     static napi_value HasCall(napi_env env, napi_callback_info info);
@@ -232,6 +233,7 @@ private:
     static bool MatchRejectCallTwoIllegalParameters(napi_env env, const napi_value parameters[]);
     static void NativeReportOttCallDetailsInfo(napi_env env, void *data);
     static void NativeReportOttCallEventInfo(napi_env env, void *data);
+    static void NativePostDialProceed(napi_env env, void *data);
     static napi_value HandleAsyncWork(napi_env env, AsyncContext *context, std::string workName,
         napi_async_execute_callback execute, napi_async_complete_callback complete);
     static bool MatchStringAndVariableObjectParameters(

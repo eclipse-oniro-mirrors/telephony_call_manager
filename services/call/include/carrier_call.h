@@ -23,7 +23,7 @@ namespace OHOS {
 namespace Telephony {
 class CarrierCall : public CallBase {
 public:
-    CarrierCall(DialParaInfo &info);
+    explicit CarrierCall(DialParaInfo &info);
     CarrierCall(DialParaInfo &info, AppExecFwk::PacMap &extras);
     ~CarrierCall();
     int32_t CarrierDialingProcess();
@@ -38,6 +38,7 @@ public:
     int32_t CarrierSwitchCall();
     int32_t StartDtmf(char str) override;
     int32_t StopDtmf() override;
+    int32_t PostDialProceed(bool proceed) override;
     int32_t GetSlotId() override;
     int32_t CarrierCombineConference();
     int32_t CarrierSeparateConference();

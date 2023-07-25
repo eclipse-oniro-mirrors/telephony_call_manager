@@ -40,6 +40,7 @@ namespace OHOS {
 namespace Telephony {
 class CallManagerProxy : public std::enable_shared_from_this<CallManagerProxy> {
     DECLARE_DELAYED_SINGLETON(CallManagerProxy)
+
 public:
     void Init(int32_t systemAbilityId);
     void UnInit();
@@ -71,6 +72,7 @@ public:
     int32_t SetCallPreferenceMode(int32_t slotId, int32_t mode);
     int32_t StartDtmf(int32_t callId, char str);
     int32_t StopDtmf(int32_t callId);
+    int32_t PostDialProceed(int32_t callId, bool proceed);
     int32_t IsRinging(bool &enabled);
     bool HasCall();
     int32_t IsNewCallAllowed(bool &enabled);

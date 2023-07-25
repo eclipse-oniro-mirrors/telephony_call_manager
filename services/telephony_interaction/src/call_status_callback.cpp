@@ -25,6 +25,8 @@
 
 namespace OHOS {
 namespace Telephony {
+constexpr size_t CHAR_INDEX = 0;
+
 CallStatusCallback::CallStatusCallback() {}
 
 CallStatusCallback::~CallStatusCallback() {}
@@ -367,6 +369,22 @@ int32_t CallStatusCallback::CloseUnFinishedUssdResult(const int32_t result)
     resultInfo.PutIntValue("result", result);
     TELEPHONY_LOGI("CloseUnFinishedUssdResult result = %{public}d", result);
     return DelayedSingleton<CallAbilityReportProxy>::GetInstance()->ReportAsyncResults(reportId, resultInfo);
+}
+
+int32_t CallStatusCallback::ReportPostDialChar(const std::string &c)
+{
+    TELEPHONY_LOGI("CallStatusCallback::ReportPostDialChar");
+    char nextDtmf = ' ';
+    if (!c.empty() && c.length() > CHAR_INDEX) {
+        nextDtmf = c[CHAR_INDEX];
+    }
+    return DelayedSingleton<AudioControlManager>::GetInstance()->OnPostDialNextChar(nextDtmf);
+}
+
+int32_t CallStatusCallback::ReportPostDialDelay(const std::string &str)
+{
+    TELEPHONY_LOGI("CallStatusCallback::ReportPostDialDelay");
+    return DelayedSingleton<CallAbilityReportProxy>::GetInstance()->ReportPostDialDelay(str);
 }
 } // namespace Telephony
 } // namespace OHOS
