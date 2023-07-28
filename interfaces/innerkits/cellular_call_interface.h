@@ -486,6 +486,14 @@ public:
      */
     virtual int32_t CloseUnFinishedUssd(int32_t slotId) = 0;
 
+    /**
+     * @brief clear all call if cellular call service restart
+     *
+     * @param infos[in] the call detail info vector which contains phone number, call type, slot id .etc
+     * @return Returns TELEPHONY_SUCCESS on success, others on failure.
+     */
+    virtual int32_t ClearAllCalls(const std::vector<CellularCallInfo> &infos) = 0;
+
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"OHOS.Telephony.CellularCallInterface");
 };

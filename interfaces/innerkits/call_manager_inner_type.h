@@ -447,6 +447,10 @@ struct CallAttributeInfo {
      * Indicates the cause when the call is answered. {@link CallAnswerType}
      */
     CallAnswerType answerType = CallAnswerType::CALL_ANSWER_MISSED;
+    /*
+     * Indicates the call index in cellular call
+     */
+    int32_t index = 0;
 };
 
 /**

@@ -39,6 +39,7 @@ enum class CellularCallInterfaceCode {
     UPDATE_CALL_MEDIA_MODE,
     REGISTER_CALLBACK,
     UNREGISTER_CALLBACK,
+    CLEAR_ALL_CALLS,
 
     /****************** dtmf rtt ******************/
     START_DTMF = 100,

@@ -1475,5 +1475,39 @@ int32_t CellularCallProxy::CloseUnFinishedUssd(int32_t slotId)
     }
     return error;
 }
+
+int32_t CellularCallProxy::ClearAllCalls(const std::vector<CellularCallInfo> &infos)
+{
+    MessageOption option;
+    MessageParcel in;
+    MessageParcel out;
+    if (!in.WriteInterfaceToken(CellularCallProxy::GetDescriptor())) {
+        TELEPHONY_LOGE("WriteInterfaceToken fail!");
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+
+    int32_t infoSize = static_cast<int32_t>(infos.size());
+    if (!in.WriteInt32(infoSize)) {
+        TELEPHONY_LOGE("WriteInt32 fail!");
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
+    for (auto &info : infos) {
+        if (!in.WriteRawData(static_cast<const void *>(&info), sizeof(CellularCallInfo))) {
+            TELEPHONY_LOGE("WriteRawData fail!");
+            return TELEPHONY_ERR_WRITE_DATA_FAIL;
+        }
+    }
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("function Remote() return nullptr!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t error = remote->SendRequest(static_cast<uint32_t>(CellularCallInterfaceCode::CLEAR_ALL_CALLS),
+        in, out, option);
+    if (error == ERR_NONE) {
+        return out.ReadInt32();
+    }
+    return error;
+}
 } // namespace Telephony
 } // namespace OHOS

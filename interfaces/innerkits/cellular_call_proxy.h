@@ -499,6 +499,14 @@ public:
      */
     int32_t CloseUnFinishedUssd(int32_t slotId) override;
 
+    /**
+     * @brief clear all call if cellular call service restart
+     *
+     * @param infos[in] the call detail info vector which contains phone number, call type, slot id .etc
+     * @return Returns TELEPHONY_SUCCESS on success, others on failure.
+     */
+    int32_t ClearAllCalls(const std::vector<CellularCallInfo> &infos) override;
+
 private:
     /**
      * @brief SetCommonParamForMessageParcel, set common param for MessageParcel

@@ -507,6 +507,7 @@ private:
     void OnDeath();
     void Clean();
     void NotifyDeath();
+    int32_t ClearAllCalls();
 
 private:
     class SystemAbilityListener : public SystemAbilityStatusChangeStub {
