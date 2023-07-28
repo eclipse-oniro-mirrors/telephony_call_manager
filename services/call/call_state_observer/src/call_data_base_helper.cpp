@@ -70,33 +70,35 @@ std::shared_ptr<DataShare::DataShareHelper> CallDataBaseHelper::CreateDataShareH
 
 void CallDataBaseHelper::RegisterObserver(std::vector<std::string> *phones)
 {
-    std::shared_ptr<DataShare::DataShareHelper> helper = CreateDataShareHelper(CONTACT_URI);
-    if (helper == nullptr) {
-        TELEPHONY_LOGE("helper_ is null");
-        return;
-    }
-    Uri uri(CALL_BLOCK);
     callDataRdbObserverPtr_ = new (std::nothrow) CallDataRdbObserver(phones);
     if (callDataRdbObserverPtr_ == nullptr) {
         TELEPHONY_LOGE("callDataRdbObserverPtr_ is null");
         return;
     }
+    std::shared_ptr<DataShare::DataShareHelper> helper = CreateDataShareHelper(CONTACT_URI);
+    if (helper == nullptr) {
+        TELEPHONY_LOGE("helper is null");
+        return;
+    }
+    Uri uri(CALL_BLOCK);
     helper->RegisterObserver(uri, callDataRdbObserverPtr_);
+    helper->Release();
 }
 
 void CallDataBaseHelper::UnRegisterObserver()
 {
+    if (callDataRdbObserverPtr_ == nullptr) {
+        TELEPHONY_LOGE("callDataRdbObserverPtr_ is null");
+        return;
+    }
     std::shared_ptr<DataShare::DataShareHelper> helper = CreateDataShareHelper(CONTACT_URI);
     if (helper == nullptr) {
         TELEPHONY_LOGE("helper_ is null");
         return;
     }
     Uri uri(CALL_BLOCK);
-    if (callDataRdbObserverPtr_ == nullptr) {
-        TELEPHONY_LOGE("callDataRdbObserverPtr_ is null");
-        return;
-    }
     helper->UnregisterObserver(uri, callDataRdbObserverPtr_);
+    helper->Release();
 }
 
 bool CallDataBaseHelper::Insert(DataShare::DataShareValuesBucket &values)
@@ -107,7 +109,9 @@ bool CallDataBaseHelper::Insert(DataShare::DataShareValuesBucket &values)
         return false;
     }
     Uri uri(CALL_SUBSECTION);
-    return helper->Insert(uri, values);
+    bool result = (helper->Insert(uri, values) > 0);
+    helper->Release();
+    return result;
 }
 
 bool CallDataBaseHelper::Query(std::vector<std::string> *phones, DataShare::DataSharePredicates &predicates)
@@ -122,6 +126,7 @@ bool CallDataBaseHelper::Query(std::vector<std::string> *phones, DataShare::Data
     columns.push_back("phone_number");
     auto resultSet = helper->Query(uri, predicates, columns);
     if (resultSet == nullptr) {
+        helper->Release();
         return false;
     }
     int32_t resultSetNum = resultSet->GoToFirstRow();
@@ -153,6 +158,7 @@ bool CallDataBaseHelper::Query(ContactInfo &contactInfo, DataShare::DataSharePre
     auto resultSet = helper->Query(uri, predicates, columns);
     if (resultSet == nullptr) {
         TELEPHONY_LOGE("resultSet is nullptr");
+        helper->Release();
         return false;
     }
     int32_t resultSetNum = resultSet->GoToFirstRow();
@@ -164,10 +170,14 @@ bool CallDataBaseHelper::Query(ContactInfo &contactInfo, DataShare::DataSharePre
         if (ret == 0 && (!displayName.empty())) {
             size_t cpyLen = displayName.length() + 1;
             if (displayName.length() > static_cast<size_t>(CONTACT_NAME_LEN)) {
+                resultSet->Close();
+                helper->Release();
                 return false;
             }
             if (strcpy_s(contactInfo.name, cpyLen, displayName.c_str()) != EOK) {
                 TELEPHONY_LOGE("strcpy_s fail.");
+                resultSet->Close();
+                helper->Release();
                 return false;
             }
         }
@@ -191,8 +201,8 @@ bool CallDataBaseHelper::QueryCallLog(
     std::vector<std::string> columns;
     columns.push_back(CALL_PHONE_NUMBER);
     auto resultSet = helper->Query(uri, predicates, columns);
-    helper->Release();
     if (resultSet == nullptr) {
+        helper->Release();
         return false;
     }
     int32_t operationResult = resultSet->GoToFirstRow();
@@ -213,6 +223,7 @@ bool CallDataBaseHelper::QueryCallLog(
         operationResult = resultSet->GoToNextRow();
     }
     resultSet->Close();
+    helper->Release();
     TELEPHONY_LOGI("QueryCallLog end");
     return true;
 }
@@ -225,7 +236,9 @@ bool CallDataBaseHelper::Update(DataShare::DataSharePredicates &predicates, Data
         return true;
     }
     Uri uri(CALL_SUBSECTION);
-    return helper->Update(uri, predicates, values);
+    bool result = (helper->Update(uri, predicates, values) > 0);
+    helper->Release();
+    return result;
 }
 
 bool CallDataBaseHelper::Delete(DataShare::DataSharePredicates &predicates)
@@ -236,7 +249,9 @@ bool CallDataBaseHelper::Delete(DataShare::DataSharePredicates &predicates)
         return false;
     }
     Uri uri(CALL_SUBSECTION);
-    return helper->Delete(uri, predicates);
+    bool result = (helper->Delete(uri, predicates) > 0);
+    helper->Release();
+    return result;
 }
 } // namespace Telephony
 } // namespace OHOS
