@@ -25,7 +25,7 @@
 
 namespace OHOS {
 namespace Telephony {
-CallNumberUtils::CallNumberUtils() : phoneUtils_(i18n::phonenumbers::PhoneNumberUtil::GetInstance()) {}
+CallNumberUtils::CallNumberUtils() {}
 
 CallNumberUtils::~CallNumberUtils() {}
 
@@ -40,15 +40,16 @@ int32_t CallNumberUtils::FormatPhoneNumber(
         formatNumber = phoneNumber;
         return TELEPHONY_SUCCESS;
     }
+    i18n::phonenumbers::PhoneNumberUtil *phoneUtils = i18n::phonenumbers::PhoneNumberUtil::GetInstance();
+    if (phoneUtils == nullptr) {
+        TELEPHONY_LOGE("phoneUtils is nullptr");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     std::string tmpCode = countryCode;
     transform(tmpCode.begin(), tmpCode.end(), tmpCode.begin(), ::toupper);
     i18n::phonenumbers::PhoneNumber parseResult;
-    if (phoneUtils_ == nullptr) {
-        TELEPHONY_LOGE("phoneUtils_ is nullptr");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-    phoneUtils_->ParseAndKeepRawInput(phoneNumber, tmpCode, &parseResult);
-    phoneUtils_->FormatInOriginalFormat(parseResult, tmpCode, &formatNumber);
+    phoneUtils->ParseAndKeepRawInput(phoneNumber, tmpCode, &parseResult);
+    phoneUtils->FormatInOriginalFormat(parseResult, tmpCode, &formatNumber);
     if (formatNumber.empty() || formatNumber == "0") {
         TELEPHONY_LOGE("FormatPhoneNumber failed!");
         return CALL_ERR_FORMAT_PHONE_NUMBER_FAILED;
@@ -69,15 +70,16 @@ int32_t CallNumberUtils::FormatNumberBase(const std::string phoneNumber, std::st
         TELEPHONY_LOGE("phoneNumber is nullptr!");
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
-    transform(countryCode.begin(), countryCode.end(), countryCode.begin(), ::toupper);
-    i18n::phonenumbers::PhoneNumber parseResult;
-    if (phoneUtils_ == nullptr) {
-        TELEPHONY_LOGE("phoneUtils_ is nullptr");
+    i18n::phonenumbers::PhoneNumberUtil *phoneUtils = i18n::phonenumbers::PhoneNumberUtil::GetInstance();
+    if (phoneUtils == nullptr) {
+        TELEPHONY_LOGE("phoneUtils is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    phoneUtils_->Parse(phoneNumber, countryCode, &parseResult);
-    if (phoneUtils_->IsValidNumber(parseResult)) {
-        phoneUtils_->Format(parseResult, formatInfo, &formatNumber);
+    transform(countryCode.begin(), countryCode.end(), countryCode.begin(), ::toupper);
+    i18n::phonenumbers::PhoneNumber parseResult;
+    phoneUtils->Parse(phoneNumber, countryCode, &parseResult);
+    if (phoneUtils->IsValidNumber(parseResult)) {
+        phoneUtils->Format(parseResult, formatInfo, &formatNumber);
     }
     if (formatNumber.empty() || formatNumber == "0") {
         TELEPHONY_LOGE("FormatPhoneNumber failed!");

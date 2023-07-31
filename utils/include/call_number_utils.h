@@ -41,7 +41,6 @@ public:
     std::string RemovePostDailPhoneNumber(const std::string &phoneString);
 
 private:
-    i18n::phonenumbers::PhoneNumberUtil *phoneUtils_;
     static const int16_t HAS_A_SLOT = 1;
     static const int16_t HAS_TWO_SLOT = 2;
 };
