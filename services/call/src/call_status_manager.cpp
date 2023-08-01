@@ -347,6 +347,7 @@ int32_t CallStatusManager::UpdateDialingCallInfo(const CallDetailInfo &info)
         TELEPHONY_LOGE("phoneNum is not match");
         return CALL_ERR_DIAL_FAILED;
     }
+    call = RefreshCallIfNecessary(call, info);
     call->SetCallIndex(info.index);
     call->SetBundleName(info.bundleName);
     call->SetSlotId(info.accountId);
@@ -493,14 +494,22 @@ int32_t CallStatusManager::DisconnectedHandle(const CallDetailInfo &info)
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     call = RefreshCallIfNecessary(call, info);
+    bool isNeedUnHold = false;
+    std::vector<std::u16string> callIdList;
+    call->GetSubCallIdList(callIdList);
+    if (callIdList.size() == 0 || callIdList.size() == 1) {
+        isNeedUnHold = true;
+    }
+    sptr<CallBase> holdCall = CallObjectManager::GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_HOLD);
+    if (call->GetCallRunningState() != CallRunningState::CALL_RUNNING_STATE_HOLD) {
+        if (holdCall != nullptr && isNeedUnHold) {
+            TELEPHONY_LOGI("release the call and recover the held call");
+            holdCall->UnHoldCall();
+        }
+    }
     int32_t ret = call->ExitConference();
     if (ret == TELEPHONY_SUCCESS) {
         TELEPHONY_LOGI("SubCallSeparateFromConference success");
-    }
-    sptr<CallBase> holdCall = CallObjectManager::GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_HOLD);
-    if (holdCall) {
-        TELEPHONY_LOGI("release the call and recover the held call");
-        holdCall->UnHoldCall();
     }
     ret = UpdateCallState(call, TelCallState::CALL_STATUS_DISCONNECTED);
     if (ret != TELEPHONY_SUCCESS) {

@@ -48,19 +48,11 @@ int32_t CSCall::HangUpCall()
 
 int32_t CSCall::HoldCall()
 {
-    ConferenceState conferenceState = DelayedSingleton<CsConference>::GetInstance()->GetConferenceState();
-    if (conferenceState == CONFERENCE_STATE_ACTIVE) {
-        DelayedSingleton<CsConference>::GetInstance()->SetConferenceState(CONFERENCE_STATE_HOLDING);
-    }
     return CarrierHoldCall();
 }
 
 int32_t CSCall::UnHoldCall()
 {
-    ConferenceState conferenceState = DelayedSingleton<CsConference>::GetInstance()->GetConferenceState();
-    if (conferenceState == CONFERENCE_STATE_HOLDING) {
-        DelayedSingleton<CsConference>::GetInstance()->SetConferenceState(CONFERENCE_STATE_ACTIVE);
-    }
     return CarrierUnHoldCall();
 }
 
