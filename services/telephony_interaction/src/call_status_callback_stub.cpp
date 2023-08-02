@@ -23,7 +23,6 @@
 namespace OHOS {
 namespace Telephony {
 const int32_t MAX_LEN = 100000;
-const int32_t MAX_CALLS_NUM = 5;
 CallStatusCallbackStub::CallStatusCallbackStub()
 {
     memberFuncMap_[static_cast<uint32_t>(UPDATE_CALL_INFO)] = &CallStatusCallbackStub::OnUpdateCallReportInfo;
@@ -121,7 +120,7 @@ int32_t CallStatusCallbackStub::OnUpdateCallsReportInfo(MessageParcel &data, Mes
         TELEPHONY_LOGW("sent raw data is less than 32k");
     }
     int32_t cnt = data.ReadInt32();
-    if (cnt <= 0 || cnt > MAX_CALLS_NUM) {
+    if (cnt <= 0) {
         TELEPHONY_LOGE("invalid parameter, cnt = %{public}d", cnt);
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
