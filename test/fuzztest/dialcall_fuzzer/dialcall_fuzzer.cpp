@@ -73,8 +73,12 @@ int32_t OnRegisterCallBack(const uint8_t *data, size_t size)
     if (!dataMessageParcel.WriteInterfaceToken(CallManagerServiceStub::GetDescriptor())) {
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
-    sptr<ICallAbilityCallback> callbackWrap = nullptr;
-    if (!dataMessageParcel.WriteRemoteObject(callbackWrap->AsObject())) {
+    sptr<ICallAbilityCallback> callbackWrap;
+    memcpy_s(callbackWrap, sizeof(callbackWrap), data, sizeof(callbackWrap));
+    if (callbackWrap == nullptr) {
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    if (!dataMessageParcel.WriteRemoteObject(callbackWrap->AsObject().GetRefPtr())) {
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
     MessageParcel reply;
