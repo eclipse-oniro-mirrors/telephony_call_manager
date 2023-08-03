@@ -208,8 +208,9 @@ int32_t SetCallRestriction(const uint8_t *data, size_t size)
     }
     CallRestrictionInfo info;
     int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
-    memcpy_s(info.password, kMaxNumberLen, reinterpret_cast<const char *>(data),
-        strlen(reinterpret_cast<const char *>(data)));
+    std::string msg(reinterpret_cast<const char *>(data), size);
+    int32_t length = msg.length() > kMaxNumberLen ? kMaxNumberLen : msg.length();
+    memcpy_s(info.password, kMaxNumberLen, msg.c_str(), length);
     MessageParcel dataParcel;
     dataParcel.WriteInt32(slotId);
     dataParcel.WriteRawData((const void *)&info, sizeof(CallRestrictionInfo));

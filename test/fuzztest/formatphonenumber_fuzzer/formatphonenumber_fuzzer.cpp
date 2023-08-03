@@ -111,10 +111,11 @@ int32_t ReportOttCallDetailsInfo(const uint8_t *data, size_t size)
     }
     int32_t vecCnt = static_cast<int32_t>(size % CALLS_NUM);
     OttCallDetailsInfo info;
-    memcpy_s(info.phoneNum, kMaxNumberLen, reinterpret_cast<const char *>(data),
-        strlen(reinterpret_cast<const char *>(data)));
-    memcpy_s(info.bundleName, kMaxNumberLen, reinterpret_cast<const char *>(data),
-        strlen(reinterpret_cast<const char *>(data)));
+    std::string msg(reinterpret_cast<const char *>(data), size);
+    int32_t phoneLength = msg.length() > kMaxNumberLen ? kMaxNumberLen : msg.length();
+    int32_t bundleLength = msg.length() > kMaxBundleNameLen ? kMaxBundleNameLen : msg.length();
+    memcpy_s(info.phoneNum, kMaxNumberLen, msg.c_str(), phoneLength);
+    memcpy_s(info.bundleName, kMaxBundleNameLen, msg.c_str(), bundleLength);
     info.callState = TelCallState::CALL_STATUS_DIALING;
     info.videoState = VideoStateType::TYPE_VOICE;
     MessageParcel dataParcel;
@@ -132,8 +133,9 @@ int32_t ReportOttCallEventInfo(const uint8_t *data, size_t size)
     }
     OttCallEventInfo info;
     info.ottCallEventId = OttCallEventId::OTT_CALL_EVENT_FUNCTION_UNSUPPORTED;
-    memcpy_s(info.bundleName, kMaxNumberLen, reinterpret_cast<const char *>(data),
-        strlen(reinterpret_cast<const char *>(data)));
+    std::string msg(reinterpret_cast<const char *>(data), size);
+    int32_t bundleLength = msg.length() > kMaxBundleNameLen ? kMaxBundleNameLen : msg.length();
+    memcpy_s(info.bundleName, kMaxBundleNameLen, msg.c_str(), bundleLength);
     MessageParcel dataParcel;
     dataParcel.WriteRawData((const void *)&info, sizeof(OttCallEventInfo));
     dataParcel.RewindRead(0);
