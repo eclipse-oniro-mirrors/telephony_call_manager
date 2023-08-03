@@ -32,37 +32,37 @@ CallStateProcessor::~CallStateProcessor()
     dialingCalls_.clear();
 }
 
-void CallStateProcessor::AddCall(const std::string &phoneNum, TelCallState state)
+void CallStateProcessor::AddCall(int32_t callId, TelCallState state)
 {
     switch (state) {
         case TelCallState::CALL_STATUS_DIALING:
-            if (dialingCalls_.count(phoneNum) == EMPTY_VALUE) {
+            if (dialingCalls_.count(callId) == EMPTY_VALUE) {
                 TELEPHONY_LOGI("add call , state : dialing");
-                dialingCalls_.insert(phoneNum);
+                dialingCalls_.insert(callId);
             }
             break;
         case TelCallState::CALL_STATUS_ALERTING:
-            if (alertingCalls_.count(phoneNum) == EMPTY_VALUE) {
+            if (alertingCalls_.count(callId) == EMPTY_VALUE) {
                 TELEPHONY_LOGI("add call , state : alerting");
-                alertingCalls_.insert(phoneNum);
+                alertingCalls_.insert(callId);
             }
             break;
         case TelCallState::CALL_STATUS_INCOMING:
-            if (incomingCalls_.count(phoneNum) == EMPTY_VALUE) {
+            if (incomingCalls_.count(callId) == EMPTY_VALUE) {
                 TELEPHONY_LOGI("add call , state : incoming");
-                incomingCalls_.insert(phoneNum);
+                incomingCalls_.insert(callId);
             }
             break;
         case TelCallState::CALL_STATUS_ACTIVE:
-            if (activeCalls_.count(phoneNum) == EMPTY_VALUE) {
+            if (activeCalls_.count(callId) == EMPTY_VALUE) {
                 TELEPHONY_LOGI("add call , state : active");
-                activeCalls_.insert(phoneNum);
+                activeCalls_.insert(callId);
             }
             break;
         case TelCallState::CALL_STATUS_HOLDING:
-            if (holdingCalls_.count(phoneNum) == EMPTY_VALUE) {
+            if (holdingCalls_.count(callId) == EMPTY_VALUE) {
                 TELEPHONY_LOGI("add call , state : holding");
-                holdingCalls_.insert(phoneNum);
+                holdingCalls_.insert(callId);
             }
             break;
         default:
@@ -70,37 +70,37 @@ void CallStateProcessor::AddCall(const std::string &phoneNum, TelCallState state
     }
 }
 
-void CallStateProcessor::DeleteCall(const std::string &phoneNum, TelCallState state)
+void CallStateProcessor::DeleteCall(int32_t callId, TelCallState state)
 {
     switch (state) {
         case TelCallState::CALL_STATUS_DIALING:
-            if (dialingCalls_.count(phoneNum) > EMPTY_VALUE) {
+            if (dialingCalls_.count(callId) > EMPTY_VALUE) {
                 TELEPHONY_LOGI("erase call , state : dialing");
-                dialingCalls_.erase(phoneNum);
+                dialingCalls_.erase(callId);
             }
             break;
         case TelCallState::CALL_STATUS_ALERTING:
-            if (alertingCalls_.count(phoneNum) > EMPTY_VALUE) {
+            if (alertingCalls_.count(callId) > EMPTY_VALUE) {
                 TELEPHONY_LOGI("erase call , state : alerting");
-                alertingCalls_.erase(phoneNum);
+                alertingCalls_.erase(callId);
             }
             break;
         case TelCallState::CALL_STATUS_INCOMING:
-            if (incomingCalls_.count(phoneNum) > EMPTY_VALUE) {
+            if (incomingCalls_.count(callId) > EMPTY_VALUE) {
                 TELEPHONY_LOGI("erase call , state : incoming");
-                incomingCalls_.erase(phoneNum);
+                incomingCalls_.erase(callId);
             }
             break;
         case TelCallState::CALL_STATUS_ACTIVE:
-            if (activeCalls_.count(phoneNum) > EMPTY_VALUE) {
+            if (activeCalls_.count(callId) > EMPTY_VALUE) {
                 TELEPHONY_LOGI("erase call , state : active");
-                activeCalls_.erase(phoneNum);
+                activeCalls_.erase(callId);
             }
             break;
         case TelCallState::CALL_STATUS_HOLDING:
-            if (holdingCalls_.count(phoneNum) > EMPTY_VALUE) {
+            if (holdingCalls_.count(callId) > EMPTY_VALUE) {
                 TELEPHONY_LOGI("erase call , state : holding");
-                holdingCalls_.erase(phoneNum);
+                holdingCalls_.erase(callId);
             }
             break;
         default:
@@ -179,12 +179,12 @@ bool CallStateProcessor::UpdateCurrentCallState()
     return DelayedSingleton<AudioSceneProcessor>::GetInstance()->ProcessEvent(event);
 }
 
-std::string CallStateProcessor::GetCurrentActiveCall() const
+int32_t CallStateProcessor::GetCurrentActiveCall() const
 {
     if (activeCalls_.size() > EMPTY_VALUE) {
         return (*activeCalls_.begin());
     }
-    return "";
+    return INVALID_CALLID;
 }
 } // namespace Telephony
 } // namespace OHOS

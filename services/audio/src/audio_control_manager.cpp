@@ -93,8 +93,7 @@ void AudioControlManager::HandleCallStateUpdated(
 void AudioControlManager::HandleNextState(sptr<CallBase> &callObjectPtr, TelCallState nextState)
 {
     AudioEvent event = AudioEvent::UNKNOWN_EVENT;
-    std::string number = callObjectPtr->GetAccountNumber();
-    DelayedSingleton<CallStateProcessor>::GetInstance()->AddCall(number, nextState);
+    DelayedSingleton<CallStateProcessor>::GetInstance()->AddCall(callObjectPtr->GetCallID(), nextState);
     switch (nextState) {
         case TelCallState::CALL_STATUS_DIALING:
             event = AudioEvent::NEW_DIALING_CALL;
@@ -128,8 +127,7 @@ void AudioControlManager::HandleNextState(sptr<CallBase> &callObjectPtr, TelCall
 void AudioControlManager::HandlePriorState(sptr<CallBase> &callObjectPtr, TelCallState priorState)
 {
     AudioEvent event = AudioEvent::UNKNOWN_EVENT;
-    std::string number = callObjectPtr->GetAccountNumber();
-    DelayedSingleton<CallStateProcessor>::GetInstance()->DeleteCall(number, priorState);
+    DelayedSingleton<CallStateProcessor>::GetInstance()->DeleteCall(callObjectPtr->GetCallID(), priorState);
     int32_t stateNumber = DelayedSingleton<CallStateProcessor>::GetInstance()->GetCallNumber(priorState);
     switch (priorState) {
         case TelCallState::CALL_STATUS_DIALING:
@@ -459,21 +457,18 @@ std::set<sptr<CallBase>> AudioControlManager::GetCallList()
 
 sptr<CallBase> AudioControlManager::GetCurrentActiveCall() const
 {
-    std::string number = DelayedSingleton<CallStateProcessor>::GetInstance()->GetCurrentActiveCall();
-    if (!number.empty()) {
-        return GetCallBase(number);
+    int32_t callId = DelayedSingleton<CallStateProcessor>::GetInstance()->GetCurrentActiveCall();
+    if (callId != INVALID_CALLID) {
+        return GetCallBase(callId);
     }
     return nullptr;
 }
 
-sptr<CallBase> AudioControlManager::GetCallBase(const std::string &phoneNum) const
+sptr<CallBase> AudioControlManager::GetCallBase(int32_t callId) const
 {
     sptr<CallBase> callBase = nullptr;
-    if (phoneNum.empty()) {
-        return callBase;
-    }
     for (auto &call : totalCalls_) {
-        if (call->GetAccountNumber() == phoneNum) {
+        if (call->GetCallID() == callId) {
             callBase = call;
             break;
         }

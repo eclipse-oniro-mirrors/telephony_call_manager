@@ -343,7 +343,11 @@ int32_t CallStatusManager::UpdateDialingCallInfo(const CallDetailInfo &info)
     }
 
     std::string phoneNum(info.phoneNum);
-    if (call->GetAccountNumber() != phoneNum) {
+    std::string oriNum = call->GetAccountNumber();
+    if (oriNum.length() > phoneNum.length()) {
+        oriNum = oriNum.substr(INIT_INDEX, phoneNum.length());
+    }
+    if (oriNum != phoneNum) {
         TELEPHONY_LOGE("phoneNum is not match");
         return CALL_ERR_DIAL_FAILED;
     }

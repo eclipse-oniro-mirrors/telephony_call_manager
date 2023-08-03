@@ -31,19 +31,19 @@ constexpr uint16_t EXIST_ONLY_ONE_CALL = 1;
 class CallStateProcessor : public std::enable_shared_from_this<CallStateProcessor> {
     DECLARE_DELAYED_SINGLETON(CallStateProcessor)
 public:
-    void AddCall(const std::string &phoneNum, TelCallState state);
-    void DeleteCall(const std::string &phoneNum, TelCallState state);
+    void AddCall(int32_t callId, TelCallState state);
+    void DeleteCall(int32_t callId, TelCallState state);
     bool UpdateCurrentCallState();
-    std::string GetCurrentActiveCall() const;
+    int32_t GetCurrentActiveCall() const;
     int32_t GetCallNumber(TelCallState state);
     bool ShouldSwitchState(TelCallState callState);
 
 private:
-    std::set<std::string> activeCalls_;
-    std::set<std::string> holdingCalls_;
-    std::set<std::string> alertingCalls_;
-    std::set<std::string> incomingCalls_;
-    std::set<std::string> dialingCalls_;
+    std::set<int32_t> activeCalls_;
+    std::set<int32_t> holdingCalls_;
+    std::set<int32_t> alertingCalls_;
+    std::set<int32_t> incomingCalls_;
+    std::set<int32_t> dialingCalls_;
 };
 } // namespace Telephony
 } // namespace OHOS
