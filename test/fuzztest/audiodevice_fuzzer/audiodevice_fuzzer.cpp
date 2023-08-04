@@ -141,11 +141,11 @@ void AudioProxyFunc(const uint8_t *data, size_t size)
     AudioStandard::AudioScene audioScene = static_cast<AudioStandard::AudioScene>(size % AUDIO_SCENE_NUM);
     AudioStandard::AudioVolumeType audioVolumeType =
         static_cast<AudioStandard::AudioVolumeType>(size % AUDIO_VOLUME_TYPE_NUM);
-    std::string phoneNum(reinterpret_cast<const char *>(data), size);
     int32_t volume = static_cast<int32_t>(size);
+    int32_t callId = static_cast<int32_t>(size);
     bool isMute = static_cast<bool>(size % BOOL_NUM);
 
-    audioControlManager->GetCallBase(phoneNum);
+    audioControlManager->GetCallBase(callId);
     audioProxy->SetAudioScene(audioScene);
     audioProxy->SetVolumeAudible();
     audioProxy->IsMicrophoneMute();

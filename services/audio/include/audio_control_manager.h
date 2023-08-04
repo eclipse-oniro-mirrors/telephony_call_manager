@@ -89,7 +89,7 @@ private:
     void HandleNewActiveCall(sptr<CallBase> &callObjectPtr);
     bool IsNumberAllowed(const std::string &phoneNum);
     void PlayCallEndedTone(TelCallState priorState, TelCallState nextState, CallEndedType type);
-    sptr<CallBase> GetCallBase(const std::string &phoneNum) const;
+    sptr<CallBase> GetCallBase(int32_t callId) const;
     AudioInterruptState audioInterruptState_ = AudioInterruptState::INTERRUPT_STATE_DEACTIVATED;
     bool ShouldPlayRingtone() const;
     bool IsEmergencyCallExists() const;
