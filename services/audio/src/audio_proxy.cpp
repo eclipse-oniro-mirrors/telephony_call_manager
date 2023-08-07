@@ -25,8 +25,7 @@ const int32_t NO_DEVICE_VALID = 0;
 const int32_t RENDERER_FLAG = 0;
 
 AudioProxy::AudioProxy()
-    : context_(nullptr), audioSoundManager_(Media::RingtoneFactory::CreateRingtoneManager()),
-      deviceCallback_(std::make_shared<AudioDeviceChangeCallback>()),
+    : deviceCallback_(std::make_shared<AudioDeviceChangeCallback>()),
       preferDeviceCallback_(std::make_shared<AudioPreferDeviceChangeCallback>())
 {}
 
@@ -227,20 +226,6 @@ void AudioDeviceChangeCallback::OnDeviceChange(const AudioStandard::DeviceChange
             }
         }
     }
-}
-
-std::string AudioProxy::GetSystemRingtoneUri() const
-{
-    if (audioSoundManager_ == nullptr) {
-        TELEPHONY_LOGE("audio sound manager nullptr");
-        return "";
-    }
-    if (context_ == nullptr) {
-        TELEPHONY_LOGE("context nullptr");
-        return "";
-    }
-    Media::RingtoneType rinigtoneType = Media::RingtoneType::RINGTONE_TYPE_DEFAULT;
-    return audioSoundManager_->GetSystemRingtoneUri(context_, rinigtoneType);
 }
 
 int32_t AudioProxy::StartVibrate()

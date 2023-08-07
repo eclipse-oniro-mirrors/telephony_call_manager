@@ -22,7 +22,6 @@
 
 #include "audio_manager_proxy.h"
 #include "audio_system_manager.h"
-#include "./audio_ringtone/include/iringtone_sound_manager.h"
 #include "call_manager_errors.h"
 #include "call_manager_inner_type.h"
 #include "singleton.h"
@@ -73,7 +72,6 @@ public:
     bool IsVibrateMode() const;
     int32_t StartVibrate();
     int32_t CancelVibrate();
-    std::string GetSystemRingtoneUri() const;
     std::string GetDefaultRingPath() const;
     std::string GetDefaultTonePath() const;
     std::string GetDefaultDtmfPath() const;
@@ -87,8 +85,6 @@ private:
     const std::string defaultRingPath_ = "/system/etc/telephony/rings/ring.wav";
     const std::string defaultTonePath_ = "/system/etc/telephony/tones/tone.wav";
     const std::string defaultDtmfPath_ = "/system/etc/telephony/dtmfs/dtmf.wav";
-    std::shared_ptr<AbilityRuntime::Context> context_;
-    std::unique_ptr<Media::IRingtoneSoundManager> audioSoundManager_;
     std::shared_ptr<AudioStandard::AudioManagerDeviceChangeCallback> deviceCallback_;
     std::shared_ptr<AudioStandard::AudioPreferOutputDeviceChangeCallback> preferDeviceCallback_;
     bool isWiredHeadsetConnected_ = false;

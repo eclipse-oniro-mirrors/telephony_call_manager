@@ -12,17 +12,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#include "video_control_manager.h"
+
 #include <algorithm>
 
+#include "cellular_call_connection.h"
+#include "file_ex.h"
 #include "telephony_errors.h"
-
 #include "telephony_log_wrapper.h"
 
+#ifdef ABILITY_CAMERA_SUPPORT
 #include "input/camera_manager.h"
-#include "file_ex.h"
-
-#include "cellular_call_connection.h"
-#include "video_control_manager.h"
+#endif
 
 namespace OHOS {
 namespace Telephony {
@@ -127,10 +128,12 @@ int32_t VideoControlManager::CloseCamera(std::u16string cameraId, int32_t callin
 
 bool VideoControlManager::ContainCameraID(std::string id)
 {
+    bool bRet = false;
+#ifdef ABILITY_CAMERA_SUPPORT
     using namespace OHOS::CameraStandard;
     sptr<CameraManager> camManagerObj = CameraManager::GetInstance();
     std::vector<sptr<CameraStandard::CameraDevice>> cameraObjList = camManagerObj->GetSupportedCameras();
-    bool bRet = false;
+
     for (auto &it : cameraObjList) {
         if (id.compare(it->GetID()) == 0) {
             bRet = true;
@@ -138,6 +141,7 @@ bool VideoControlManager::ContainCameraID(std::string id)
             break;
         }
     }
+#endif
     return bRet;
 }
 

@@ -166,7 +166,6 @@ void AudioProxyFunc(const uint8_t *data, size_t size)
     audioProxy->IsVibrateMode();
     audioProxy->StartVibrate();
     audioProxy->CancelVibrate();
-    audioProxy->GetSystemRingtoneUri();
     audioProxy->GetDefaultRingPath();
     audioProxy->GetDefaultTonePath();
     audioProxy->GetDefaultDtmfPath();
