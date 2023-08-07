@@ -82,8 +82,9 @@ int32_t UpdateCallReportInfo(const uint8_t *data, size_t size)
     info.callType = CallType::TYPE_ERR_CALL;
     info.callMode = VideoStateType::TYPE_VOICE;
     info.state = TelCallState::CALL_STATUS_UNKNOWN;
-    memcpy_s(info.accountNum, kMaxNumberLen, reinterpret_cast<const char *>(data),
-        strlen(reinterpret_cast<const char *>(data)));
+    std::string msg(reinterpret_cast<const char *>(data), size);
+    int32_t accountLength = msg.length() > kMaxNumberLen ? kMaxNumberLen : msg.length();
+    memcpy_s(info.accountNum, kMaxNumberLen, msg.c_str(), accountLength);
     dataParcel.WriteInt32(length);
     dataParcel.WriteRawData((const void *)&info, length);
     dataParcel.RewindRead(0);
@@ -111,8 +112,9 @@ int32_t UpdateCallsReportInfo(const uint8_t *data, size_t size)
     info.callType = CallType::TYPE_ERR_CALL;
     info.callMode = VideoStateType::TYPE_VOICE;
     info.state = TelCallState::CALL_STATUS_UNKNOWN;
-    memcpy_s(info.accountNum, kMaxNumberLen, reinterpret_cast<const char *>(data),
-        strlen(reinterpret_cast<const char *>(data)));
+    std::string msg(reinterpret_cast<const char *>(data), size);
+    int32_t accountLength = msg.length() > kMaxNumberLen ? kMaxNumberLen : msg.length();
+    memcpy_s(info.accountNum, kMaxNumberLen, msg.c_str(), accountLength);
     dataParcel.WriteInt32(vecSize);
     dataParcel.WriteInt32(length);
     dataParcel.WriteRawData((const void *)&info, length);
@@ -200,8 +202,9 @@ int32_t UpdateGetTransferResult(const uint8_t *data, size_t size)
     callTransferResponse.status = static_cast<int32_t>(size);
     callTransferResponse.classx = static_cast<int32_t>(size);
     callTransferResponse.type = static_cast<int32_t>(size);
-    memcpy_s(callTransferResponse.number, kMaxNumberLen, reinterpret_cast<const char *>(data),
-        strlen(reinterpret_cast<const char *>(data)));
+    std::string msg(reinterpret_cast<const char *>(data), size);
+    int32_t accountLength = msg.length() > kMaxNumberLen ? kMaxNumberLen : msg.length();
+    memcpy_s(callTransferResponse.number, kMaxNumberLen, msg.c_str(), accountLength);
     callTransferResponse.reason = static_cast<int32_t>(size);
     callTransferResponse.time = static_cast<int32_t>(size);
     callTransferResponse.startHour = static_cast<int32_t>(size);
@@ -288,8 +291,9 @@ int32_t ReceiveUpdateMediaModeResponse(const uint8_t *data, size_t size)
     int32_t length = sizeof(CallMediaModeResponse);
     dataParcel.WriteInt32(length);
     response.result = static_cast<int32_t>(size);
-    memcpy_s(response.phoneNum, kMaxNumberLen, reinterpret_cast<const char *>(data),
-        strlen(reinterpret_cast<const char *>(data)));
+    std::string msg(reinterpret_cast<const char *>(data), size);
+    int32_t phoneLength = msg.length() > kMaxNumberLen ? kMaxNumberLen : msg.length();
+    memcpy_s(response.phoneNum, kMaxNumberLen, msg.c_str(), phoneLength);
     dataParcel.WriteRawData((const void *)&response, length);
     dataParcel.RewindRead(0);
     MessageParcel reply;
@@ -309,8 +313,9 @@ int32_t SendMmiCodeResult(const uint8_t *data, size_t size)
     int32_t length = sizeof(MmiCodeInfo);
     dataParcel.WriteInt32(length);
     info.result = static_cast<int32_t>(size);
-    memcpy_s(info.message, kMaxNumberLen, reinterpret_cast<const char *>(data),
-        strlen(reinterpret_cast<const char *>(data)));
+    std::string msg(reinterpret_cast<const char *>(data), size);
+    int32_t msgLength = msg.length() > kMaxNumberLen ? kMaxNumberLen : msg.length();
+    memcpy_s(info.message, kMaxNumberLen, msg.c_str(), msgLength);
     dataParcel.WriteRawData((const void *)&info, length);
     dataParcel.RewindRead(0);
     MessageParcel reply;

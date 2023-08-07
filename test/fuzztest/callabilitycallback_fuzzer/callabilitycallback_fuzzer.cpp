@@ -75,10 +75,11 @@ int32_t UpdateCallStateInfo(const uint8_t *data, size_t size)
         return TELEPHONY_ERROR;
     }
     CallAttributeInfo info;
-    memcpy_s(info.accountNumber, kMaxNumberLen, reinterpret_cast<const char *>(data),
-        strlen(reinterpret_cast<const char *>(data)));
-    memcpy_s(info.bundleName, kMaxNumberLen, reinterpret_cast<const char *>(data),
-        strlen(reinterpret_cast<const char *>(data)));
+    std::string msg(reinterpret_cast<const char *>(data), size);
+    int32_t accountLength = msg.length() > kMaxNumberLen ? kMaxNumberLen : msg.length();
+    int32_t bundleLength = msg.length() > kMaxBundleNameLen ? kMaxBundleNameLen : msg.length();
+    memcpy_s(info.accountNumber, kMaxNumberLen, msg.c_str(), accountLength);
+    memcpy_s(info.bundleName, kMaxBundleNameLen, msg.c_str(), bundleLength);
     info.accountId = static_cast<int32_t>(size % ACCOUNT_ID_NUM);
     info.startTime = static_cast<uint32_t>(size);
     info.callId = static_cast<int32_t>(size % CALL_ID_NUM);
@@ -102,10 +103,11 @@ int32_t UpdateCallEvent(const uint8_t *data, size_t size)
         return TELEPHONY_ERROR;
     }
     CallEventInfo info;
-    memcpy_s(info.phoneNum, kMaxNumberLen, reinterpret_cast<const char *>(data),
-        strlen(reinterpret_cast<const char *>(data)));
-    memcpy_s(info.bundleName, kMaxNumberLen, reinterpret_cast<const char *>(data),
-        strlen(reinterpret_cast<const char *>(data)));
+    std::string msg(reinterpret_cast<const char *>(data), size);
+    int32_t phoneLength = msg.length() > kMaxNumberLen ? kMaxNumberLen : msg.length();
+    int32_t bundleLength = msg.length() > kMaxBundleNameLen ? kMaxBundleNameLen : msg.length();
+    memcpy_s(info.phoneNum, kMaxNumberLen, msg.c_str(), phoneLength);
+    memcpy_s(info.bundleName, kMaxBundleNameLen, msg.c_str(), bundleLength);
     int32_t length = sizeof(CallEventInfo);
     MessageParcel dataMessageParcel;
     dataMessageParcel.WriteInt32(length);
@@ -176,8 +178,9 @@ int32_t UpdateMmiCodeResults(const uint8_t *data, size_t size)
     MmiCodeInfo info;
     int32_t length = sizeof(MmiCodeInfo);
     info.result = static_cast<uint32_t>(size);
-    memcpy_s(info.message, kMaxNumberLen, reinterpret_cast<const char *>(data),
-        strlen(reinterpret_cast<const char *>(data)));
+    std::string msg(reinterpret_cast<const char *>(data), size);
+    int32_t msgLength = msg.length() > kMaxNumberLen ? kMaxNumberLen : msg.length();
+    memcpy_s(info.message, kMaxNumberLen, msg.c_str(), msgLength);
     MessageParcel dataMessageParcel;
     dataMessageParcel.WriteInt32(length);
     dataMessageParcel.WriteRawData((const void *)&info, length);
@@ -199,8 +202,9 @@ int32_t UpdateAudioDeviceChange(const uint8_t *data, size_t size)
     }
     AudioDevice device;
     device.deviceType = AudioDeviceType::DEVICE_UNKNOWN;
-    memcpy_s(device.address, kMaxNumberLen, reinterpret_cast<const char *>(data),
-        strlen(reinterpret_cast<const char *>(data)));
+    std::string msg(reinterpret_cast<const char *>(data), size);
+    int32_t length = msg.length() > kMaxAddressLen ? kMaxAddressLen : msg.length();
+    memcpy_s(device.address, kMaxAddressLen, msg.c_str(), length);
     int32_t dataSize = static_cast<uint32_t>(size);
     dataMessageParcel.WriteInt32(dataSize);
     dataMessageParcel.WriteRawData((const void *)&device, sizeof(AudioDevice));
