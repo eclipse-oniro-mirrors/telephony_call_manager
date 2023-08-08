@@ -142,7 +142,7 @@ void CellularCallConnection::DisconnectService()
 
 int32_t CellularCallConnection::ReConnectService()
 {
-#ifdef CELLULAR_SUPPORT
+#ifdef ABILITY_CELLULAR_SUPPORT
     if (cellularCallInterfacePtr_ == nullptr) {
         TELEPHONY_LOGI("try to reconnect cellular call service now...");
         int32_t result = ConnectService();

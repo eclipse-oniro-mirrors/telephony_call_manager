@@ -129,7 +129,6 @@ ohos_shared_library("tel_call_manager") {
     "audio_framework:audio_renderer",
     "audio_framework:audio_toneplayer",
     "c_utils:utils",
-    "camera_framework:camera_framework",
     "common_event_service:cesfwk_innerkits",
     "core_service:libtel_common",
     "core_service:tel_core_service_api",
@@ -142,8 +141,6 @@ ohos_shared_library("tel_call_manager") {
     "hitrace:hitrace_meter",
     "init:libbegetutil",
     "ipc:ipc_single",
-    "player_framework:audio_ringtone_client",
-    "player_framework:media_client",
     "power_manager:powermgr_client",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
@@ -183,7 +180,14 @@ ohos_shared_library("tel_call_manager") {
   if (defined(global_parts_info) &&
       defined(global_parts_info.telephony_cellular_call) &&
       global_parts_info.telephony_cellular_call) {
-    defines += [ "CELLULAR_SUPPORT" ]
+    defines += [ "ABILITY_CELLULAR_SUPPORT" ]
+  }
+
+  if (defined(global_parts_info) &&
+      defined(global_parts_info.multimedia_camera_framework) &&
+      global_parts_info.multimedia_camera_framework) {
+    external_deps += [ "camera_framework:camera_framework" ]
+    defines += [ "ABILITY_CAMERA_SUPPORT" ]
   }
 
   part_name = "call_manager"
