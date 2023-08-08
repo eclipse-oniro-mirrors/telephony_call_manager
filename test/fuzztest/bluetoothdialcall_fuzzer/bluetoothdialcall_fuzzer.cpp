@@ -179,7 +179,7 @@ void StartDtmf(const uint8_t *data, size_t size)
 
     MessageParcel dataParcel;
     dataParcel.WriteInt8(*data);
-    dataParcel.WriteBuffer(data + sizeof(char), size - sizeof(char));
+    dataParcel.WriteBuffer(data, size);
     dataParcel.RewindRead(0);
     MessageParcel reply;
     DelayedSingleton<BluetoothCallService>::GetInstance()->OnStartDtmf(dataParcel, reply);
@@ -207,8 +207,7 @@ void GetCurrentCallList(const uint8_t *data, size_t size)
     int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
     MessageParcel dataParcel;
     dataParcel.WriteInt32(slotId);
-    size_t dataSize = size - sizeof(int32_t);
-    dataParcel.WriteBuffer(data + sizeof(int32_t), dataSize);
+    dataParcel.WriteBuffer(data, size);
     dataParcel.RewindRead(0);
     MessageParcel reply;
     DelayedSingleton<BluetoothCallService>::GetInstance()->OnGetCurrentCallList(dataParcel, reply);

@@ -94,8 +94,7 @@ int32_t SetCameraZoom(const uint8_t *data, size_t size)
     float zoomRatio = static_cast<float>(size);
     MessageParcel dataParcel;
     dataParcel.WriteFloat(zoomRatio);
-    size_t dataSize = size - sizeof(float);
-    dataParcel.WriteBuffer(data + sizeof(float), dataSize);
+    dataParcel.WriteBuffer(data, size);
     dataParcel.RewindRead(0);
     MessageParcel reply;
     return DelayedSingleton<CallManagerService>::GetInstance()->OnSetCameraZoom(dataParcel, reply);
