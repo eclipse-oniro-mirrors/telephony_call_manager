@@ -192,6 +192,7 @@ void CarrierCall::GetCallAttributeCarrierInfo(CallAttributeInfo &info)
     std::lock_guard<std::mutex> lock(mutex_);
     info.isEcc = isEcc_;
     info.accountId = slotId_;
+    info.index = index_;
     GetCallAttributeBaseInfo(info);
 }
 

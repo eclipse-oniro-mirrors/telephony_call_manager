@@ -30,6 +30,8 @@ namespace Telephony {
 #ifdef RECONNECT_MAX_TRY_COUNT
 constexpr uint16_t CONNECT_MAX_TRY_COUNT = 5;
 #endif
+constexpr uint16_t DELAY_TIME = 10;
+
 CellularCallConnection::CellularCallConnection()
     : systemAbilityId_(TELEPHONY_CELLULAR_CALL_SYS_ABILITY_ID), cellularCallCallbackPtr_(nullptr),
     cellularCallInterfacePtr_(nullptr), connectState_(false)
@@ -830,6 +832,48 @@ int CellularCallConnection::CloseUnFinishedUssd(int32_t slotId)
     return TELEPHONY_SUCCESS;
 }
 
+int32_t CellularCallConnection::ClearAllCalls()
+{
+    if (!CallObjectManager::HasCallExist()) {
+        TELEPHONY_LOGI("no call exist, no need to clear");
+        return TELEPHONY_SUCCESS;
+    }
+    std::vector<CellularCallInfo> callsInfo;
+    std::vector<CallAttributeInfo> infos = CallObjectManager::GetCarrierCallInfoList();
+    for (auto &info : infos) {
+        CellularCallInfo callInfo;
+        callInfo.callId = info.callId;
+        if (memset_s(callInfo.phoneNum, kMaxNumberLen, 0, kMaxNumberLen) != EOK) {
+            TELEPHONY_LOGE("memset_s fail");
+            return TELEPHONY_ERR_MEMSET_FAIL;
+        }
+        if (memcpy_s(callInfo.phoneNum, kMaxNumberLen, info.accountNumber, strlen(info.accountNumber)) != EOK) {
+            TELEPHONY_LOGE("memcpy_s fail");
+            return TELEPHONY_ERR_MEMCPY_FAIL;
+        }
+        callInfo.slotId = info.accountId;
+        callInfo.accountId = info.accountId;
+        callInfo.callType = info.callType;
+        callInfo.videoState = static_cast<int32_t>(info.videoState);
+        callInfo.index = info.index;
+        callsInfo.push_back(callInfo);
+    }
+    if (callsInfo.empty()) {
+        TELEPHONY_LOGE("callsInfo is empty");
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
+    }
+    std::this_thread::sleep_for(std::chrono::milliseconds(DELAY_TIME));
+    if (ReConnectService() != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("ipc reconnect failed!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t errCode = cellularCallInterfacePtr_->ClearAllCalls(callsInfo);
+    if (errCode != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("ClearAllCalls fail, errcode:%{public}d", errCode);
+    }
+    return errCode;
+}
+
 void CellularCallConnection::SystemAbilityListener::OnAddSystemAbility(
     int32_t systemAbilityId, const std::string &deviceId)
 {
@@ -856,6 +900,7 @@ void CellularCallConnection::SystemAbilityListener::OnAddSystemAbility(
         TELEPHONY_LOGE("SA:%{public}d reconnect service failed!", systemAbilityId);
         return;
     }
+    cellularCallConnection->ClearAllCalls();
     TELEPHONY_LOGI("SA:%{public}d reconnect service successfully!", systemAbilityId);
 }
 
