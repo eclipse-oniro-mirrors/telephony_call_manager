@@ -26,7 +26,6 @@ using namespace OHOS::Telephony;
 namespace OHOS {
 static bool g_isInited = false;
 constexpr int32_t SLOT_NUM = 2;
-constexpr int32_t TWO_INT_NUM = 2;
 constexpr int32_t CALLS_NUM = 5;
 
 bool IsServiceInited()
@@ -51,8 +50,7 @@ int32_t GetMainCallId(const uint8_t *data, size_t size)
     dataParcel.WriteInt32(callId);
     size_t mainCallId = static_cast<int32_t>(size);
     dataParcel.WriteInt32(mainCallId);
-    size_t dataSize = size - sizeof(int32_t) * TWO_INT_NUM;
-    dataParcel.WriteBuffer(data + sizeof(int32_t) * TWO_INT_NUM, dataSize);
+    dataParcel.WriteBuffer(data, size);
     dataParcel.RewindRead(0);
     MessageParcel reply;
     return DelayedSingleton<CallManagerService>::GetInstance()->OnGetMainCallId(dataParcel, reply);
@@ -66,8 +64,7 @@ int32_t GetSubCallIdList(const uint8_t *data, size_t size)
     MessageParcel dataParcel;
     int32_t callId = static_cast<int32_t>(size);
     dataParcel.WriteInt32(callId);
-    size_t dataSize = size - sizeof(int32_t);
-    dataParcel.WriteBuffer(data + sizeof(int32_t), dataSize);
+    dataParcel.WriteBuffer(data, size);
     dataParcel.RewindRead(0);
     MessageParcel reply;
     return DelayedSingleton<CallManagerService>::GetInstance()->OnGetSubCallIdList(dataParcel, reply);
@@ -81,8 +78,7 @@ int32_t GetCallIdListForConference(const uint8_t *data, size_t size)
     MessageParcel dataParcel;
     int32_t callId = static_cast<int32_t>(size);
     dataParcel.WriteInt32(callId);
-    size_t dataSize = size - sizeof(int32_t);
-    dataParcel.WriteBuffer(data + sizeof(int32_t), dataSize);
+    dataParcel.WriteBuffer(data, size);
     dataParcel.RewindRead(0);
     MessageParcel reply;
     return DelayedSingleton<CallManagerService>::GetInstance()->OnGetCallIdListForConference(dataParcel, reply);
@@ -97,8 +93,7 @@ int32_t GetCallRestriction(const uint8_t *data, size_t size)
     MessageParcel dataParcel;
     dataParcel.WriteInt32(slotId);
     dataParcel.WriteInt32(static_cast<int32_t>(size));
-    size_t dataSize = size - sizeof(int32_t) * TWO_INT_NUM;
-    dataParcel.WriteBuffer(data + sizeof(int32_t) * TWO_INT_NUM, dataSize);
+    dataParcel.WriteBuffer(data, size);
     dataParcel.RewindRead(0);
     MessageParcel reply;
     return DelayedSingleton<CallManagerService>::GetInstance()->OnGetCallRestriction(dataParcel, reply);

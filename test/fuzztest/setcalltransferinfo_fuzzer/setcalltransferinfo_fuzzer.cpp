@@ -27,7 +27,6 @@ using namespace OHOS::Telephony;
 namespace OHOS {
 static bool g_isInited = false;
 constexpr int32_t SLOT_NUM = 2;
-constexpr int32_t TWO_INT_NUM = 2;
 
 bool IsServiceInited()
 {
@@ -50,8 +49,7 @@ void IsImsSwitchEnabled(const uint8_t *data, size_t size)
     int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
     MessageParcel dataMessageParcel;
     dataMessageParcel.WriteInt32(slotId);
-    size_t dataSize = size - sizeof(int32_t);
-    dataMessageParcel.WriteBuffer(data + sizeof(int32_t), dataSize);
+    dataMessageParcel.WriteBuffer(data, size);
     dataMessageParcel.RewindRead(0);
     MessageParcel reply;
     DelayedSingleton<CallManagerService>::GetInstance()->OnIsVoLteEnabled(dataMessageParcel, reply);
@@ -66,8 +64,7 @@ void GetVoNRState(const uint8_t *data, size_t size)
     int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
     MessageParcel dataMessageParcel;
     dataMessageParcel.WriteInt32(slotId);
-    size_t dataSize = size - sizeof(int32_t);
-    dataMessageParcel.WriteBuffer(data + sizeof(int32_t), dataSize);
+    dataMessageParcel.WriteBuffer(data, size);
     dataMessageParcel.RewindRead(0);
     MessageParcel reply;
     DelayedSingleton<CallManagerService>::GetInstance()->OnGetVoNRState(dataMessageParcel, reply);
@@ -83,8 +80,7 @@ void GetImsConfig(const uint8_t *data, size_t size)
     MessageParcel dataMessageParcel;
     dataMessageParcel.WriteInt32(slotId);
     dataMessageParcel.WriteInt32(static_cast<ImsConfigItem>(size));
-    size_t dataSize = size - sizeof(int32_t) - sizeof(ImsConfigItem);
-    dataMessageParcel.WriteBuffer(data + sizeof(int32_t) + sizeof(ImsConfigItem), dataSize);
+    dataMessageParcel.WriteBuffer(data, size);
     dataMessageParcel.RewindRead(0);
     MessageParcel reply;
     DelayedSingleton<CallManagerService>::GetInstance()->OnGetImsConfig(dataMessageParcel, reply);
@@ -100,8 +96,7 @@ void GetImsFeatureValue(const uint8_t *data, size_t size)
     MessageParcel dataMessageParcel;
     dataMessageParcel.WriteInt32(slotId);
     dataMessageParcel.WriteInt32(static_cast<FeatureType>(size));
-    size_t dataSize = size - sizeof(int32_t) * TWO_INT_NUM;
-    dataMessageParcel.WriteBuffer(data + sizeof(int32_t) * TWO_INT_NUM, dataSize);
+    dataMessageParcel.WriteBuffer(data, size);
     dataMessageParcel.RewindRead(0);
     MessageParcel reply;
     DelayedSingleton<CallManagerService>::GetInstance()->OnGetImsFeatureValue(dataMessageParcel, reply);
@@ -117,8 +112,7 @@ void GetCallTransferInfo(const uint8_t *data, size_t size)
     MessageParcel dataMessageParcel;
     dataMessageParcel.WriteInt32(slotId);
     dataMessageParcel.WriteInt32(static_cast<int32_t>(size));
-    size_t dataSize = size - sizeof(int32_t) * TWO_INT_NUM;
-    dataMessageParcel.WriteBuffer(data + sizeof(int32_t) * TWO_INT_NUM, dataSize);
+    dataMessageParcel.WriteBuffer(data, size);
     dataMessageParcel.RewindRead(0);
     MessageParcel reply;
     DelayedSingleton<CallManagerService>::GetInstance()->OnGetTransferNumber(dataMessageParcel, reply);
