@@ -43,6 +43,8 @@ void BluetoothCallClient::Init()
             return;
         }
         g_callManagerProxyPtr->Init(TELEPHONY_CALL_MANAGER_SYS_ABILITY_ID);
+    }
+    if (g_callManagerProxyPtr != nullptr) {
         sptr<IRemoteObject> iRemoteObjectPtr = g_callManagerProxyPtr->GetProxyObjectPtr(PROXY_BLUETOOTH_CALL);
         if (iRemoteObjectPtr == nullptr) {
             TELEPHONY_LOGE("GetProxyObjectPtr failed!");
@@ -53,8 +55,8 @@ void BluetoothCallClient::Init()
             TELEPHONY_LOGE("iface_cast<ICallManagerService> failed!");
             return;
         }
-        TELEPHONY_LOGI("BluetoothCallClient init success!");
     }
+    TELEPHONY_LOGI("BluetoothCallClient init success!");
 }
 
 void BluetoothCallClient::UnInit()
