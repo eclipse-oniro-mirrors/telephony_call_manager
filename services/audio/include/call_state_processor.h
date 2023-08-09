@@ -16,12 +16,12 @@
 #ifndef TELEPHONY_CALL_STATE_PROCESSOR_H
 #define TELEPHONY_CALL_STATE_PROCESSOR_H
 
+#include <mutex>
 #include <set>
 #include <string>
 
-#include "singleton.h"
-
 #include "call_manager_inner_type.h"
+#include "singleton.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -34,7 +34,7 @@ public:
     void AddCall(int32_t callId, TelCallState state);
     void DeleteCall(int32_t callId, TelCallState state);
     bool UpdateCurrentCallState();
-    int32_t GetCurrentActiveCall() const;
+    int32_t GetCurrentActiveCall();
     int32_t GetCallNumber(TelCallState state);
     bool ShouldSwitchState(TelCallState callState);
 
@@ -44,6 +44,7 @@ private:
     std::set<int32_t> alertingCalls_;
     std::set<int32_t> incomingCalls_;
     std::set<int32_t> dialingCalls_;
+    std::mutex mutex_;
 };
 } // namespace Telephony
 } // namespace OHOS

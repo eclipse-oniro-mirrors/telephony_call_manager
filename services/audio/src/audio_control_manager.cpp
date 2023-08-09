@@ -452,10 +452,11 @@ void AudioControlManager::PlayCallEndedTone(TelCallState priorState, TelCallStat
 
 std::set<sptr<CallBase>> AudioControlManager::GetCallList()
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     return totalCalls_;
 }
 
-sptr<CallBase> AudioControlManager::GetCurrentActiveCall() const
+sptr<CallBase> AudioControlManager::GetCurrentActiveCall()
 {
     int32_t callId = DelayedSingleton<CallStateProcessor>::GetInstance()->GetCurrentActiveCall();
     if (callId != INVALID_CALLID) {
@@ -464,9 +465,10 @@ sptr<CallBase> AudioControlManager::GetCurrentActiveCall() const
     return nullptr;
 }
 
-sptr<CallBase> AudioControlManager::GetCallBase(int32_t callId) const
+sptr<CallBase> AudioControlManager::GetCallBase(int32_t callId)
 {
     sptr<CallBase> callBase = nullptr;
+    std::lock_guard<std::mutex> lock(mutex_);
     for (auto &call : totalCalls_) {
         if (call->GetCallID() == callId) {
             callBase = call;
