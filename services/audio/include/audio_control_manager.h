@@ -19,17 +19,15 @@
 #include <mutex>
 #include <set>
 
-#include "singleton.h"
-
-#include "call_manager_inner_type.h"
-
-#include "audio_proxy.h"
-#include "call_state_listener_base.h"
-#include "tone.h"
-#include "ring.h"
-#include "sound.h"
 #include "audio_device_manager.h"
+#include "audio_proxy.h"
 #include "audio_scene_processor.h"
+#include "call_manager_inner_type.h"
+#include "call_state_listener_base.h"
+#include "ring.h"
+#include "singleton.h"
+#include "sound.h"
+#include "tone.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -65,7 +63,7 @@ public:
     bool ShouldSwitchIncoming() const;
     AudioDeviceType GetInitAudioDeviceType() const;
     std::set<sptr<CallBase>> GetCallList();
-    sptr<CallBase> GetCurrentActiveCall() const;
+    sptr<CallBase> GetCurrentActiveCall();
     AudioInterruptState GetAudioInterruptState();
     bool UpdateCurrentCallState();
     void SetRingState(RingState state);
@@ -89,7 +87,7 @@ private:
     void HandleNewActiveCall(sptr<CallBase> &callObjectPtr);
     bool IsNumberAllowed(const std::string &phoneNum);
     void PlayCallEndedTone(TelCallState priorState, TelCallState nextState, CallEndedType type);
-    sptr<CallBase> GetCallBase(int32_t callId) const;
+    sptr<CallBase> GetCallBase(int32_t callId);
     AudioInterruptState audioInterruptState_ = AudioInterruptState::INTERRUPT_STATE_DEACTIVATED;
     bool ShouldPlayRingtone() const;
     bool IsEmergencyCallExists() const;
@@ -100,6 +98,7 @@ private:
     std::unique_ptr<Ring> ring_;
     std::unique_ptr<Tone> tone_;
     std::unique_ptr<Sound> sound_;
+    std::mutex mutex_;
 };
 } // namespace Telephony
 } // namespace OHOS

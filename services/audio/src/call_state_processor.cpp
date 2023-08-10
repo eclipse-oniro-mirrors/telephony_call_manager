@@ -34,6 +34,7 @@ CallStateProcessor::~CallStateProcessor()
 
 void CallStateProcessor::AddCall(int32_t callId, TelCallState state)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     switch (state) {
         case TelCallState::CALL_STATUS_DIALING:
             if (dialingCalls_.count(callId) == EMPTY_VALUE) {
@@ -72,6 +73,7 @@ void CallStateProcessor::AddCall(int32_t callId, TelCallState state)
 
 void CallStateProcessor::DeleteCall(int32_t callId, TelCallState state)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     switch (state) {
         case TelCallState::CALL_STATUS_DIALING:
             if (dialingCalls_.count(callId) > EMPTY_VALUE) {
@@ -110,6 +112,7 @@ void CallStateProcessor::DeleteCall(int32_t callId, TelCallState state)
 
 int32_t CallStateProcessor::GetCallNumber(TelCallState state)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     int32_t number = EMPTY_VALUE;
     switch (state) {
         case TelCallState::CALL_STATUS_DIALING:
@@ -179,8 +182,9 @@ bool CallStateProcessor::UpdateCurrentCallState()
     return DelayedSingleton<AudioSceneProcessor>::GetInstance()->ProcessEvent(event);
 }
 
-int32_t CallStateProcessor::GetCurrentActiveCall() const
+int32_t CallStateProcessor::GetCurrentActiveCall()
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     if (activeCalls_.size() > EMPTY_VALUE) {
         return (*activeCalls_.begin());
     }
