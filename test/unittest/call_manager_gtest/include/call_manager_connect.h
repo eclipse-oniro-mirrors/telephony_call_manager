@@ -187,13 +187,33 @@ PermissionStateFull testPermStartAbilityFromBG = {
     .resDeviceID = { "local" },
 };
 
+PermissionDef testConCellularCallDef = {
+    .permissionName = "ohos.permission.CONNECT_CELLULAR_CALL_SERVICE",
+    .bundleName = "tel_cellular_call_cs_gtest",
+    .grantMode = 1, // SYSTEM_GRANT
+    .label = "label",
+    .labelId = 1,
+    .description = "Test cellular call",
+    .descriptionId = 1,
+    .availableLevel = APL_SYSTEM_BASIC,
+};
+
+PermissionStateFull testPermConCellularCall = {
+    .grantFlags = { 2 }, // PERMISSION_USER_SET
+    .grantStatus = { PermissionState::PERMISSION_GRANTED },
+    .isGeneral = true,
+    .permissionName = "ohos.permission.CONNECT_CELLULAR_CALL_SERVICE",
+    .resDeviceID = { "local" },
+};
+
 HapPolicyParams testPolicyParams = {
     .apl = APL_SYSTEM_BASIC,
     .domain = "test.domain",
     .permList = { testPermPlaceCallDef, testPermSetTelephonyStateDef, testPermGetTelephonyStateDef,
-        testPermAnswerCallDef, testReadCallLogDef, testWriteCallLogDef, testStartAbilityFromBGDef },
+        testPermAnswerCallDef, testReadCallLogDef, testWriteCallLogDef, testStartAbilityFromBGDef,
+        testConCellularCallDef },
     .permStateList = { testPlaceCallState, testSetTelephonyState, testGetTelephonyState, testAnswerCallState,
-        testPermReadCallLog, testPermWriteCallLog, testPermStartAbilityFromBG },
+        testPermReadCallLog, testPermWriteCallLog, testPermStartAbilityFromBG, testPermConCellularCall },
 };
 
 class AccessToken {
