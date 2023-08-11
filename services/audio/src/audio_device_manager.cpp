@@ -194,7 +194,7 @@ bool AudioDeviceManager::ProcessEvent(AudioEvent event)
                     .deviceType = AudioDeviceType::DEVICE_EARPIECE,
                     .address = { 0 },
                 };
-                if (DelayedSingleton<AudioProxy>::GetInstance()->GetPreferOutputAudioDevice(device) !=
+                if (DelayedSingleton<AudioProxy>::GetInstance()->GetPreferredOutputAudioDevice(device) !=
                     TELEPHONY_SUCCESS) {
                     TELEPHONY_LOGE("current audio device nullptr");
                     return false;

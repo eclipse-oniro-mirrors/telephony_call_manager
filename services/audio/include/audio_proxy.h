@@ -41,9 +41,9 @@ class AudioDeviceChangeCallback : public AudioStandard::AudioManagerDeviceChange
     void OnDeviceChange(const AudioStandard::DeviceChangeAction &deviceChangeAction) override;
 };
 
-class AudioPreferDeviceChangeCallback : public AudioStandard::AudioPreferOutputDeviceChangeCallback {
+class AudioPreferDeviceChangeCallback : public AudioStandard::AudioPreferredOutputDeviceChangeCallback {
 public:
-    void OnPreferOutputDeviceUpdated(const std::vector<sptr<AudioStandard::AudioDeviceDescriptor>> &desc) override;
+    void OnPreferredOutputDeviceUpdated(const std::vector<sptr<AudioStandard::AudioDeviceDescriptor>> &desc) override;
 };
 
 class AudioProxy : public std::enable_shared_from_this<AudioProxy> {
@@ -77,7 +77,7 @@ public:
     std::string GetDefaultDtmfPath() const;
     int32_t UnsetDeviceChangeCallback();
     void SetWiredHeadsetState(bool isConnected);
-    int32_t GetPreferOutputAudioDevice(AudioDevice &device);
+    int32_t GetPreferredOutputAudioDevice(AudioDevice &device);
     int32_t SetAudioPreferDeviceChangeCallback();
     int32_t UnsetAudioPreferDeviceChangeCallback();
 
@@ -86,7 +86,7 @@ private:
     const std::string defaultTonePath_ = "/system/etc/telephony/tones/tone.wav";
     const std::string defaultDtmfPath_ = "/system/etc/telephony/dtmfs/dtmf.wav";
     std::shared_ptr<AudioStandard::AudioManagerDeviceChangeCallback> deviceCallback_;
-    std::shared_ptr<AudioStandard::AudioPreferOutputDeviceChangeCallback> preferDeviceCallback_;
+    std::shared_ptr<AudioStandard::AudioPreferredOutputDeviceChangeCallback> preferredDeviceCallback_;
     bool isWiredHeadsetConnected_ = false;
 };
 } // namespace Telephony

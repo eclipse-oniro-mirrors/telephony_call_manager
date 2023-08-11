@@ -26,7 +26,7 @@ const int32_t RENDERER_FLAG = 0;
 
 AudioProxy::AudioProxy()
     : deviceCallback_(std::make_shared<AudioDeviceChangeCallback>()),
-      preferDeviceCallback_(std::make_shared<AudioPreferDeviceChangeCallback>())
+      preferredDeviceCallback_(std::make_shared<AudioPreferDeviceChangeCallback>())
 {}
 
 AudioProxy::~AudioProxy() {}
@@ -264,7 +264,7 @@ void AudioProxy::SetWiredHeadsetState(bool isConnected)
     isWiredHeadsetConnected_ = isConnected;
 }
 
-int32_t AudioProxy::GetPreferOutputAudioDevice(AudioDevice &device)
+int32_t AudioProxy::GetPreferredOutputAudioDevice(AudioDevice &device)
 {
     AudioStandard::AudioRendererInfo rendererInfo;
     rendererInfo.contentType = AudioStandard::ContentType::CONTENT_TYPE_SPEECH;
@@ -272,9 +272,9 @@ int32_t AudioProxy::GetPreferOutputAudioDevice(AudioDevice &device)
     rendererInfo.rendererFlags = RENDERER_FLAG;
     std::vector<sptr<AudioStandard::AudioDeviceDescriptor>> desc;
     int32_t ret =
-        AudioStandard::AudioRoutingManager::GetInstance()->GetPreferOutputDeviceForRendererInfo(rendererInfo, desc);
+        AudioStandard::AudioRoutingManager::GetInstance()->GetPreferredOutputDeviceForRendererInfo(rendererInfo, desc);
     if (ret != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("GetPreferOutputDeviceForRendererInfo fail");
+        TELEPHONY_LOGE("GetPreferredOutputDeviceForRendererInfo fail");
         return CALL_ERR_AUDIO_OPERATE_FAILED;
     }
     if (desc.size() == NO_DEVICE_VALID) {
@@ -313,18 +313,18 @@ int32_t AudioProxy::GetPreferOutputAudioDevice(AudioDevice &device)
 
 int32_t AudioProxy::SetAudioPreferDeviceChangeCallback()
 {
-    if (preferDeviceCallback_ == nullptr) {
-        TELEPHONY_LOGE("preferDeviceCallback_ is nullptr");
+    if (preferredDeviceCallback_ == nullptr) {
+        TELEPHONY_LOGE("preferredDeviceCallback_ is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AudioStandard::AudioRendererInfo rendererInfo;
     rendererInfo.contentType = AudioStandard::ContentType::CONTENT_TYPE_SPEECH;
     rendererInfo.streamUsage = AudioStandard::StreamUsage::STREAM_USAGE_VOICE_MODEM_COMMUNICATION;
     rendererInfo.rendererFlags = RENDERER_FLAG;
-    int32_t ret = AudioStandard::AudioRoutingManager::GetInstance()->SetPreferOutputDeviceChangeCallback(rendererInfo,
-        preferDeviceCallback_);
+    int32_t ret = AudioStandard::AudioRoutingManager::GetInstance()->SetPreferredOutputDeviceChangeCallback(
+        rendererInfo, preferredDeviceCallback_);
     if (ret != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("SetPreferOutputDeviceChangeCallback fail");
+        TELEPHONY_LOGE("SetPreferredOutputDeviceChangeCallback fail");
         return CALL_ERR_AUDIO_OPERATE_FAILED;
     }
     return TELEPHONY_SUCCESS;
@@ -332,19 +332,19 @@ int32_t AudioProxy::SetAudioPreferDeviceChangeCallback()
 
 int32_t AudioProxy::UnsetAudioPreferDeviceChangeCallback()
 {
-    if (preferDeviceCallback_ == nullptr) {
-        TELEPHONY_LOGE("preferDeviceCallback_ is nullptr");
+    if (preferredDeviceCallback_ == nullptr) {
+        TELEPHONY_LOGE("preferredDeviceCallback_ is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    int32_t ret = AudioStandard::AudioRoutingManager::GetInstance()->UnsetPreferOutputDeviceChangeCallback();
+    int32_t ret = AudioStandard::AudioRoutingManager::GetInstance()->UnsetPreferredOutputDeviceChangeCallback();
     if (ret != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("UnsetPreferOutputDeviceChangeCallback fail");
+        TELEPHONY_LOGE("UnsetPreferredOutputDeviceChangeCallback fail");
         return CALL_ERR_AUDIO_OPERATE_FAILED;
     }
     return TELEPHONY_SUCCESS;
 }
 
-void AudioPreferDeviceChangeCallback::OnPreferOutputDeviceUpdated(
+void AudioPreferDeviceChangeCallback::OnPreferredOutputDeviceUpdated(
     const std::vector<sptr<AudioStandard::AudioDeviceDescriptor>> &desc)
 {
     AudioDevice device;
