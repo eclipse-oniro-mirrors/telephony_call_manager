@@ -4731,7 +4731,7 @@ napi_value NapiCallManager::HandleAsyncWork(napi_env env, AsyncContext *context,
     napi_value resourceName = nullptr;
     napi_create_string_utf8(env, workName.data(), NAPI_AUTO_LENGTH, &resourceName);
     napi_create_async_work(env, resource, resourceName, execute, complete, (void *)context, &context->work);
-    napi_queue_async_work(env, context->work);
+    napi_queue_async_work_with_qos(env, context->work, napi_qos_default);
     return result;
 }
 
