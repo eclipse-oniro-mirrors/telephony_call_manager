@@ -337,8 +337,7 @@ int32_t NapiCallAbilityCallback::ReportStartRttInfo(AppExecFwk::PacMap &resultIn
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     work->data = (void *)dataWorker;
-    uv_queue_work(
-        loop, work, [](uv_work_t *work) {}, ReportStartRttInfoWork);
+    uv_queue_work_with_qos(loop, work, [](uv_work_t *work) {}, ReportStartRttInfoWork, uv_qos_default);
     if (startRttCallback_.thisVar) {
         (void)memset_s(&startRttCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
     }
@@ -368,8 +367,7 @@ int32_t NapiCallAbilityCallback::ReportStopRttInfo(AppExecFwk::PacMap &resultInf
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     work->data = (void *)dataWorker;
-    uv_queue_work(
-        loop, work, [](uv_work_t *work) {}, ReportStopRttInfoWork);
+    uv_queue_work_with_qos(loop, work, [](uv_work_t *work) {}, ReportStopRttInfoWork, uv_qos_default);
     if (stopRttCallback_.thisVar) {
         (void)memset_s(&stopRttCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
     }
@@ -399,8 +397,7 @@ int32_t NapiCallAbilityCallback::ReportCallMediaModeInfo(AppExecFwk::PacMap &res
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     work->data = (void *)dataWorker;
-    uv_queue_work(
-        loop, work, [](uv_work_t *work) {}, ReportCallMediaModeInfoWork);
+    uv_queue_work_with_qos(loop, work, [](uv_work_t *work) {}, ReportCallMediaModeInfoWork, uv_qos_default);
     if (updateCallMediaModeCallback_.thisVar) {
         (void)memset_s(&updateCallMediaModeCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
     }
@@ -430,9 +427,7 @@ int32_t NapiCallAbilityCallback::UpdateCallStateInfo(const CallAttributeInfo &in
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     work->data = (void *)dataWorker;
-    uv_queue_work(
-        loop, work, [](uv_work_t *work) {}, ReportCallStateWork);
-
+    uv_queue_work_with_qos(loop, work, [](uv_work_t *work) {}, ReportCallStateWork, uv_qos_default);
     return TELEPHONY_SUCCESS;
 }
 
@@ -518,8 +513,7 @@ int32_t NapiCallAbilityCallback::UpdateCallEvent(const CallEventInfo &info)
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     work->data = (void *)dataWorker;
-    uv_queue_work(
-        loop, work, [](uv_work_t *work) {}, ReportCallEventWork);
+    uv_queue_work_with_qos(loop, work, [](uv_work_t *work) {}, ReportCallEventWork, uv_qos_default);
     return TELEPHONY_SUCCESS;
 }
 
@@ -592,8 +586,7 @@ int32_t NapiCallAbilityCallback::UpdateCallDisconnectedCause(const DisconnectedD
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     work->data = (void *)dataWorker;
-    uv_queue_work(
-        loop, work, [](uv_work_t *work) {}, ReportCallDisconnectedCauseWork);
+    uv_queue_work_with_qos(loop, work, [](uv_work_t *work) {}, ReportCallDisconnectedCauseWork, uv_qos_default);
     if (callDisconnectCauseCallback_.thisVar) {
         (void)memset_s(&callDisconnectCauseCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
     }
@@ -682,9 +675,7 @@ int32_t NapiCallAbilityCallback::UpdateMmiCodeResultsInfo(const MmiCodeInfo &inf
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     work->data = (void *)dataWorker;
-    uv_queue_work(
-        loop, work, [](uv_work_t *work) {}, ReportMmiCodeWork);
-
+    uv_queue_work_with_qos(loop, work, [](uv_work_t *work) {}, ReportMmiCodeWork, uv_qos_default);
     return TELEPHONY_SUCCESS;
 }
 
@@ -760,9 +751,7 @@ int32_t NapiCallAbilityCallback::UpdateAudioDeviceInfo(const AudioDeviceInfo &in
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     work->data = (void *)dataWorker;
-    uv_queue_work(
-        loop, work, [](uv_work_t *work) {}, ReportAudioDeviceInfoWork);
-
+    uv_queue_work_with_qos(loop, work, [](uv_work_t *work) {}, ReportAudioDeviceInfoWork, uv_qos_default);
     return TELEPHONY_SUCCESS;
 }
 
@@ -857,8 +846,7 @@ int32_t NapiCallAbilityCallback::OttCallRequest(OttCallRequestId requestId, AppE
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     work->data = (void *)dataWorker;
-    uv_queue_work(
-        loop, work, [](uv_work_t *work) {}, ReportCallOttWork);
+    uv_queue_work_with_qos(loop, work, [](uv_work_t *work) {}, ReportCallOttWork, uv_qos_default);
 
     return TELEPHONY_SUCCESS;
 }
@@ -886,8 +874,7 @@ int32_t NapiCallAbilityCallback::ReportGetWaitingInfo(AppExecFwk::PacMap &result
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     work->data = (void *)dataWorker;
-    uv_queue_work(
-        loop, work, [](uv_work_t *work) {}, ReportWaitAndLimitInfoWork);
+    uv_queue_work_with_qos(loop, work, [](uv_work_t *work) {}, ReportWaitAndLimitInfoWork, uv_qos_default);
     if (getWaitingCallback_.thisVar) {
         (void)memset_s(&getWaitingCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
     }
@@ -917,8 +904,7 @@ int32_t NapiCallAbilityCallback::ReportCloseUnFinishedUssdInfo(AppExecFwk::PacMa
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     work->data = (void *)dataWorker;
-    uv_queue_work(
-        loop, work, [](uv_work_t *work) {}, ReportExecutionResultWork);
+    uv_queue_work_with_qos(loop, work, [](uv_work_t *work) {}, ReportExecutionResultWork, uv_qos_default);
     if (closeUnfinishedUssdCallback_.thisVar) {
         (void)memset_s(&closeUnfinishedUssdCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
     }
@@ -948,8 +934,7 @@ int32_t NapiCallAbilityCallback::ReportSetWaitingInfo(AppExecFwk::PacMap &result
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     work->data = (void *)dataWorker;
-    uv_queue_work(
-        loop, work, [](uv_work_t *work) {}, ReportExecutionResultWork);
+    uv_queue_work_with_qos(loop, work, [](uv_work_t *work) {}, ReportExecutionResultWork, uv_qos_default);
     if (setWaitingCallback_.thisVar) {
         (void)memset_s(&setWaitingCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
     }
@@ -979,8 +964,7 @@ int32_t NapiCallAbilityCallback::ReportGetRestrictionInfo(AppExecFwk::PacMap &re
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     work->data = (void *)dataWorker;
-    uv_queue_work(
-        loop, work, [](uv_work_t *work) {}, ReportWaitAndLimitInfoWork);
+    uv_queue_work_with_qos(loop, work, [](uv_work_t *work) {}, ReportWaitAndLimitInfoWork, uv_qos_default);
     if (getRestrictionCallback_.thisVar) {
         (void)memset_s(&getRestrictionCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
     }
@@ -1010,8 +994,7 @@ int32_t NapiCallAbilityCallback::ReportSetRestrictionInfo(AppExecFwk::PacMap &re
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     work->data = (void *)dataWorker;
-    uv_queue_work(
-        loop, work, [](uv_work_t *work) {}, ReportExecutionResultWork);
+    uv_queue_work_with_qos(loop, work, [](uv_work_t *work) {}, ReportExecutionResultWork, uv_qos_default);
     if (setRestrictionCallback_.thisVar) {
         (void)memset_s(&setRestrictionCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
     }
@@ -1041,8 +1024,7 @@ int32_t NapiCallAbilityCallback::ReportSetRestrictionPassword(AppExecFwk::PacMap
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     work->data = (void *)dataWorker;
-    uv_queue_work(
-        loop, work, [](uv_work_t *work) {}, ReportExecutionResultWork);
+    uv_queue_work_with_qos(loop, work, [](uv_work_t *work) {}, ReportExecutionResultWork, uv_qos_default);
     if (setRestrictionPasswordCallback_.thisVar) {
         (void)memset_s(&setRestrictionPasswordCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
     }
@@ -1072,8 +1054,7 @@ int32_t NapiCallAbilityCallback::ReportGetTransferInfo(AppExecFwk::PacMap &resul
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     work->data = (void *)dataWorker;
-    uv_queue_work(
-        loop, work, [](uv_work_t *work) {}, ReportSupplementInfoWork);
+    uv_queue_work_with_qos(loop, work, [](uv_work_t *work) {}, ReportSupplementInfoWork, uv_qos_default);
     if (getTransferCallback_.thisVar) {
         (void)memset_s(&getTransferCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
     }
@@ -1103,8 +1084,7 @@ int32_t NapiCallAbilityCallback::ReportSetTransferInfo(AppExecFwk::PacMap &resul
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     work->data = (void *)dataWorker;
-    uv_queue_work(
-        loop, work, [](uv_work_t *work) {}, ReportExecutionResultWork);
+    uv_queue_work_with_qos(loop, work, [](uv_work_t *work) {}, ReportExecutionResultWork, uv_qos_default);
     if (setTransferCallback_.thisVar) {
         (void)memset_s(&setTransferCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
     }
@@ -1538,9 +1518,7 @@ int32_t NapiCallAbilityCallback::UpdatePostDialDelay(const std::string str)
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     work->data = (void *)dataWorker;
-    uv_queue_work(
-        loop, work, [](uv_work_t *work) {}, ReportPostDialDelayWork);
-
+    uv_queue_work_with_qos(loop, work, [](uv_work_t *work) {}, ReportPostDialDelayWork, uv_qos_default);
     return TELEPHONY_SUCCESS;
 }
 
