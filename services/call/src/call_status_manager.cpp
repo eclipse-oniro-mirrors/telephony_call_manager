@@ -498,19 +498,10 @@ int32_t CallStatusManager::DisconnectedHandle(const CallDetailInfo &info)
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     call = RefreshCallIfNecessary(call, info);
-    bool isNeedUnHold = false;
+    bool canUnHold = false;
     std::vector<std::u16string> callIdList;
     call->GetSubCallIdList(callIdList);
-    if (callIdList.size() == 0 || callIdList.size() == 1) {
-        isNeedUnHold = true;
-    }
-    sptr<CallBase> holdCall = CallObjectManager::GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_HOLD);
-    if (call->GetCallRunningState() != CallRunningState::CALL_RUNNING_STATE_HOLD) {
-        if (holdCall != nullptr && isNeedUnHold) {
-            TELEPHONY_LOGI("release the call and recover the held call");
-            holdCall->UnHoldCall();
-        }
-    }
+    CallRunningState previousState = call->GetCallRunningState();
     int32_t ret = call->ExitConference();
     if (ret == TELEPHONY_SUCCESS) {
         TELEPHONY_LOGI("SubCallSeparateFromConference success");
@@ -519,6 +510,18 @@ int32_t CallStatusManager::DisconnectedHandle(const CallDetailInfo &info)
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("UpdateCallState failed, errCode:%{public}d", ret);
         return ret;
+    }
+    int32_t activeCallNum = GetCallNum(TelCallState::CALL_STATUS_ACTIVE);
+    int32_t waitingCallNum = GetCallNum(TelCallState::CALL_STATUS_WAITING);
+    if ((callIdList.size() == 0 || callIdList.size() == 1) && activeCallNum == 0 && waitingCallNum == 0) {
+        canUnHold = true;
+    }
+    sptr<CallBase> holdCall = CallObjectManager::GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_HOLD);
+    if (previousState != CallRunningState::CALL_RUNNING_STATE_HOLD) {
+        if (holdCall != nullptr && canUnHold) {
+            TELEPHONY_LOGI("release call and recover the held call");
+            holdCall->UnHoldCall();
+        }
     }
     DeleteOneCallObject(call->GetCallID());
     return ret;
