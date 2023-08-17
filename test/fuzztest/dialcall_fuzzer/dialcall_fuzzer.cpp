@@ -19,6 +19,7 @@
 #include <cstdint>
 #define private public
 #include "addcalltoken_fuzzer.h"
+#include "call_ability_callback.h"
 #include "call_manager_service.h"
 #include "system_ability_definition.h"
 
@@ -69,17 +70,11 @@ int32_t OnRegisterCallBack(const uint8_t *data, size_t size)
         return TELEPHONY_ERROR;
     }
     MessageParcel dataMessageParcel;
-    if (!dataMessageParcel.WriteInterfaceToken(CallManagerServiceStub::GetDescriptor())) {
-        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
-    }
-    sptr<ICallAbilityCallback> callbackWrap;
-    memcpy_s(callbackWrap, sizeof(callbackWrap), data, sizeof(callbackWrap));
+    std::unique_ptr<CallAbilityCallback> callbackWrap = std::make_unique<CallAbilityCallback>();
     if (callbackWrap == nullptr) {
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    if (!dataMessageParcel.WriteRemoteObject(callbackWrap->AsObject().GetRefPtr())) {
-        return TELEPHONY_ERR_WRITE_DATA_FAIL;
-    }
+    dataMessageParcel.WriteRemoteObject(callbackWrap.release()->AsObject().GetRefPtr());
     MessageParcel reply;
     return DelayedSingleton<CallManagerService>::GetInstance()->OnRegisterCallBack(dataMessageParcel, reply);
 }
