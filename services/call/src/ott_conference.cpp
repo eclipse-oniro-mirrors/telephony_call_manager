@@ -121,7 +121,7 @@ int32_t OttConference::CanSeparateConference()
 int32_t OttConference::CanKickOutFromConference()
 {
     std::lock_guard<std::mutex> lock(conferenceMutex_);
-    if (subCallIdSet_.empty() || state_ != CONFERENCE_STATE_ACTIVE) {
+    if (subCallIdSet_.empty()) {
         TELEPHONY_LOGE("no call is currently in the conference!");
         return CALL_ERR_CONFERENCE_NOT_EXISTS;
     }
