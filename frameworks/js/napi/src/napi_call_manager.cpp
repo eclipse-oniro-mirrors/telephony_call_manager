@@ -19,6 +19,7 @@
 #include <string_ex.h>
 
 #include "ability_manager_client.h"
+#include "bool_wrapper.h"
 #include "call_manager_client.h"
 #include "call_manager_errors.h"
 #include "napi_call_ability_callback.h"
@@ -3583,6 +3584,7 @@ void NapiCallManager::NativeMakeCall(napi_env env, void *data)
     AAFwk::WantParams wantParams;
     wantParams.SetParam("phoneNumber", AAFwk::String::Box(phoneNumber));
     wantParams.SetParam("pageFlag", AAFwk::String::Box("page_flag_edit_before_calling"));
+    wantParams.SetParam(AAFwk::Want::PARAM_BACK_TO_OTHER_MISSION_STACK, AAFwk::Boolean::Box(true));
     want.SetParams(wantParams);
     ErrCode err = AAFwk::AbilityManagerClient::GetInstance()->StartAbility(want);
     if (err != ERR_OK) {
