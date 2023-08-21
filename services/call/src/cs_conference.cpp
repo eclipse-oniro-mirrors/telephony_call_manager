@@ -94,6 +94,7 @@ int32_t CsConference::HoldConference(int32_t callId)
         beginTime_ = 0;
         return CALL_ERR_CONFERENCE_SEPERATE_FAILED;
     }
+    state_ = CONFERENCE_STATE_HOLDING;
     return TELEPHONY_SUCCESS;
 }
 
@@ -110,9 +111,13 @@ int32_t CsConference::CanCombineConference()
 int32_t CsConference::CanSeparateConference()
 {
     std::lock_guard<std::mutex> lock(conferenceMutex_);
-    if (subCallIdSet_.empty() || state_ != CONFERENCE_STATE_ACTIVE) {
+    if (subCallIdSet_.empty()) {
         TELEPHONY_LOGE("no call is currently in the conference!");
         return CALL_ERR_CONFERENCE_NOT_EXISTS;
+    }
+    if (state_ != CONFERENCE_STATE_ACTIVE) {
+        TELEPHONY_LOGE("call is not active!");
+        return CALL_ERR_CONFERENCE_CALL_IS_NOT_ACTIVE;
     }
     return TELEPHONY_SUCCESS;
 }

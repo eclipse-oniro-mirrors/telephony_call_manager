@@ -304,6 +304,12 @@ napi_value NapiCallManager::DeclareCallEventEnum(napi_env env, napi_value export
         DECLARE_NAPI_STATIC_PROPERTY("EVENT_SWAP_CALL_FAILED",
             NapiCallManagerUtils::ToInt32Value(
                 env, static_cast<int32_t>(CallAbilityEventId::EVENT_SWAP_CALL_FAILED))),
+        DECLARE_NAPI_STATIC_PROPERTY("EVENT_COMBINE_CALL_FAILED",
+            NapiCallManagerUtils::ToInt32Value(
+                env, static_cast<int32_t>(CallAbilityEventId::EVENT_COMBINE_CALL_FAILED))),
+        DECLARE_NAPI_STATIC_PROPERTY("EVENT_SPLIT_CALL_FAILED",
+            NapiCallManagerUtils::ToInt32Value(
+                env, static_cast<int32_t>(CallAbilityEventId::EVENT_SPLIT_CALL_FAILED))),
     };
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc));
     return exports;
@@ -612,6 +618,12 @@ napi_value NapiCallManager::DeclareCallEventEnumEx(napi_env env, napi_value expo
         DECLARE_NAPI_STATIC_PROPERTY("EVENT_SWAP_CALL_FAILED",
             NapiCallManagerUtils::ToInt32Value(
                 env, static_cast<int32_t>(CallAbilityEventId::EVENT_SWAP_CALL_FAILED))),
+        DECLARE_NAPI_STATIC_PROPERTY("EVENT_COMBINE_CALL_FAILED",
+            NapiCallManagerUtils::ToInt32Value(
+                env, static_cast<int32_t>(CallAbilityEventId::EVENT_COMBINE_CALL_FAILED))),
+        DECLARE_NAPI_STATIC_PROPERTY("EVENT_SPLIT_CALL_FAILED",
+            NapiCallManagerUtils::ToInt32Value(
+                env, static_cast<int32_t>(CallAbilityEventId::EVENT_SPLIT_CALL_FAILED))),
     };
     napi_value result = nullptr;
     napi_define_class(env, "CallAbilityEventId", NAPI_AUTO_LENGTH, NapiCallManagerUtils::CreateEnumConstructor, nullptr,

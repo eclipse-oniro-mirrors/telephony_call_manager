@@ -553,6 +553,14 @@ enum class CallAbilityEventId {
      */
     EVENT_SWAP_CALL_FAILED,
     /**
+     * Indicates that the combine call failed.
+     */
+    EVENT_COMBINE_CALL_FAILED,
+    /**
+     * Indicates that the split call failed.
+     */
+    EVENT_SPLIT_CALL_FAILED,
+    /**
      * Indicates that the OTT is not supported.
      */
     EVENT_OTT_FUNCTION_UNSUPPORTED,

@@ -185,6 +185,10 @@ enum CallManagerErrorCode {
      */
     CALL_ERR_CONFERENCE_SEPERATE_FAILED,
     /**
+     * Indicates conference call is not active.
+     */
+    CALL_ERR_CONFERENCE_CALL_IS_NOT_ACTIVE,
+    /**
      * Indicates the call is not in the conference.
      */
     CALL_ERR_THE_CALL_IS_NOT_IN_THE_CONFERENCE,
