@@ -46,9 +46,7 @@ int32_t Tone::Play()
         TELEPHONY_LOGE("tone descriptor unknown");
         return CALL_ERR_AUDIO_UNKNOWN_TONE;
     }
-    PlayerType playerType = PlayerType::TYPE_TONE;
     if (IsDtmf(currentToneDescriptor_)) {
-        playerType = PlayerType::TYPE_DTMF;
         if (!InitTonePlayer()) {
             return TELEPHONY_ERROR;
         }
@@ -63,8 +61,8 @@ int32_t Tone::Play()
             TELEPHONY_LOGE("audioPlayer_ is nullptr");
             return TELEPHONY_ERR_LOCAL_PTR_NULL;
         }
-        std::thread play(audioPlay, audioPlayer_,
-            GetToneDescriptorPath(currentToneDescriptor_), AudioStandard::AudioStreamType::STREAM_MUSIC, playerType);
+        std::thread play(audioPlay, audioPlayer_, GetToneDescriptorPath(currentToneDescriptor_),
+            AudioStandard::AudioStreamType::STREAM_MUSIC, PlayerType::TYPE_TONE);
         pthread_setname_np(play.native_handle(), TONE_PLAY_THREAD);
         play.detach();
     }
@@ -78,9 +76,7 @@ int32_t Tone::Stop()
         TELEPHONY_LOGE("tone descriptor unknown");
         return CALL_ERR_AUDIO_UNKNOWN_TONE;
     }
-    PlayerType playerType = PlayerType::TYPE_TONE;
     if (IsDtmf(currentToneDescriptor_)) {
-        playerType = PlayerType::TYPE_DTMF;
         if (InitTonePlayer()) {
             dtmfTonePlayer_->StopTone();
             dtmfTonePlayer_->Release();
@@ -90,7 +86,7 @@ int32_t Tone::Stop()
             TELEPHONY_LOGE("audioPlayer_ is nullptr");
             return TELEPHONY_ERR_LOCAL_PTR_NULL;
         }
-        audioPlayer_->SetStop(playerType, true);
+        audioPlayer_->SetStop(PlayerType::TYPE_TONE, true);
     }
     return TELEPHONY_SUCCESS;
 }
