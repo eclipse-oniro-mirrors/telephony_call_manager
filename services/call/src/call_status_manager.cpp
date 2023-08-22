@@ -351,6 +351,7 @@ int32_t CallStatusManager::UpdateDialingCallInfo(const CallDetailInfo &info)
         TELEPHONY_LOGE("phoneNum is not match");
         return CALL_ERR_DIAL_FAILED;
     }
+    oriNum = call->GetAccountNumber();
     call = RefreshCallIfNecessary(call, info);
     call->SetCallIndex(info.index);
     call->SetBundleName(info.bundleName);
@@ -358,6 +359,7 @@ int32_t CallStatusManager::UpdateDialingCallInfo(const CallDetailInfo &info)
     call->SetTelCallState(info.state);
     call->SetVideoStateType(info.callMode);
     call->SetCallType(info.callType);
+    call->SetAccountNumber(oriNum);
     return TELEPHONY_SUCCESS;
 }
 

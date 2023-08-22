@@ -126,9 +126,9 @@ void CallRecordsManager::AddOneCallRecord(CallAttributeInfo &info)
     data.slotId = info.accountId;
     data.callType = info.callType;
     std::string tmpStr("");
-    auto callNumberUtils = DelayedSingleton<CallNumberUtils>::GetInstance();
-    std::string numberWithoutPostDial = callNumberUtils->RemovePostDailPhoneNumber(data.phoneNumber);
-    callNumberUtils->FormatPhoneNumber(numberWithoutPostDial, "CN", tmpStr);
+    (void)DelayedSingleton<CallNumberUtils>::GetInstance()->FormatPhoneNumber(
+        std::string(data.phoneNumber), "CN", tmpStr);
+
     if (tmpStr.length() > static_cast<size_t>(kMaxNumberLen)) {
         TELEPHONY_LOGE("Number out of limit!");
         return;

@@ -97,6 +97,7 @@ public:
     bool IsSpeakerphoneEnabled();
     bool IsCurrentRinging();
     std::string GetAccountNumber();
+    void SetAccountNumber(const std::string accountNumber);
     int32_t SetSpeakerphoneOn(bool speakerphoneOn);
     bool IsSpeakerphoneOn();
     void SetAudio();

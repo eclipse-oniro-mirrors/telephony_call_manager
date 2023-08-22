@@ -405,6 +405,11 @@ std::string CallBase::GetAccountNumber()
     return accountNumber_;
 }
 
+void CallBase::SetAccountNumber(const std::string accountNumber)
+{
+    accountNumber_ = accountNumber;
+}
+
 int32_t CallBase::SetSpeakerphoneOn(bool speakerphoneOn)
 {
     isSpeakerphoneOn_ = speakerphoneOn;
