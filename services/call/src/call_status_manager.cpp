@@ -538,7 +538,7 @@ int32_t CallStatusManager::DisconnectedHandle(const CallDetailInfo &info)
     }
     if (!DelayedSingleton<CallControlManager>::GetInstance()->getUserHangUp()
         && !CallObjectManager::HasCallExist()) {
-            DelayedSingleton<AudioControlManager>::GetInstance()->PlayEndtone();
+            DelayedSingleton<AudioControlManager>::GetInstance()->PlayEndTone();
         }
     DelayedSingleton<CallControlManager>::GetInstance()->setUserHangUp(false);
     return ret;
