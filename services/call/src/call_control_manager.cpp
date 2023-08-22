@@ -247,12 +247,21 @@ int32_t CallControlManager::HangUpCall(int32_t callId)
         CallManagerHisysevent::WriteHangUpFaultEvent(INVALID_PARAMETER, callId, ret, "HangUp HangUpPolicy failed");
         return ret;
     }
+    userHangup_ = true;
     ret = CallRequestHandlerPtr_->HangUpCall(callId);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("HangUpCall failed!");
         return ret;
     }
     return TELEPHONY_SUCCESS;
+}
+
+bool CallControlManager::getUserHangUp() {
+    return userHangup_;
+}
+
+void CallControlManager::setUserHangUp() {
+    return userHangup_;
 }
 
 int32_t CallControlManager::GetCallState()

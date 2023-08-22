@@ -114,6 +114,8 @@ public:
     void GetDialParaInfo(DialParaInfo &info);
     void GetDialParaInfo(DialParaInfo &info, AppExecFwk::PacMap &extras);
     int32_t RemoveMissedIncomingCallNotification();
+    bool getUserHangUp();
+    void setUserHangUp(bool status);
 
 private:
     void CallStateObserve();
@@ -143,6 +145,7 @@ private:
     DialParaInfo dialSrcInfo_;
     AppExecFwk::PacMap extras_;
     std::mutex mutex_;
+    bool userHangup_ = false;
 };
 } // namespace Telephony
 } // namespace OHOS
