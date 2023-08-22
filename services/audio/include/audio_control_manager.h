@@ -78,7 +78,7 @@ public:
     bool IsSoundPlaying();
     bool StopSoundtone();
     bool PlaySoundtone();
-    void PlayEndtone();
+    void PlayEndTone();
     void PlayWaitTone();
 
 private:
