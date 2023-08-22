@@ -260,8 +260,8 @@ bool CallControlManager::getUserHangUp() {
     return userHangup_;
 }
 
-void CallControlManager::setUserHangUp() {
-    return userHangup_;
+void CallControlManager::setUserHangUp(bool status) {
+    userHangup_ = status;
 }
 
 int32_t CallControlManager::GetCallState()
