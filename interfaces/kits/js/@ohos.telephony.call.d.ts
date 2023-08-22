@@ -189,6 +189,16 @@ declare namespace call {
   function hasCall(): Promise<boolean>;
 
   /**
+   * Checks whether a call is ongoing.
+   *
+   * @returns Returns {@code true} if at least one call is not in the {@link CallState#CALL_STATE_IDLE} state;
+   * returns {@code false} otherwise.
+   * @syscap SystemCapability.Telephony.CallManager
+   * @since 10
+   */
+  function hasCallSync(): boolean;
+
+  /**
    * Obtains the call state.
    *
    * If an incoming call is ringing or waiting, the system returns {@code CallState#CALL_STATE_RINGING}.
@@ -215,6 +225,19 @@ declare namespace call {
    * @since 6
    */
   function getCallState(): Promise<CallState>;
+
+  /**
+   * Obtains the call state.
+   *
+   * If an incoming call is ringing or waiting, the system returns {@code CallState#CALL_STATE_RINGING}.
+   * If at least one call is in the active, hold, or dialing state, the system returns
+   * {@code CallState#CALL_STATE_OFFHOOK}. In other cases, the system returns {@code CallState#CALL_STATE_IDLE}.
+   *
+   * @returns Returns the call state.
+   * @syscap SystemCapability.Telephony.CallManager
+   * @since 10
+   */
+  function getCallStateSync(): CallState;
 
   /**
    * Stops the ringtone.

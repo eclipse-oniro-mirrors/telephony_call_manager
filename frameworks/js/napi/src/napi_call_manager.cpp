@@ -122,8 +122,10 @@ napi_value NapiCallManager::DeclareCallExtendInterface(napi_env env, napi_value 
         DECLARE_NAPI_FUNCTION("stopDTMF", StopDTMF),
         DECLARE_NAPI_FUNCTION("postDialProceed", PostDialProceed),
         DECLARE_NAPI_FUNCTION("getCallState", GetCallState),
+        DECLARE_NAPI_FUNCTION("getCallStateSync", GetCallStateSync),
         DECLARE_NAPI_FUNCTION("isRinging", IsRinging),
         DECLARE_NAPI_FUNCTION("hasCall", HasCall),
+        DECLARE_NAPI_FUNCTION("hasCallSync", HasCallSync),
         DECLARE_NAPI_FUNCTION("isNewCallAllowed", IsNewCallAllowed),
         DECLARE_NAPI_FUNCTION("isInEmergencyCall", IsInEmergencyCall),
         DECLARE_NAPI_FUNCTION("isEmergencyPhoneNumber", IsEmergencyPhoneNumber),
@@ -2055,6 +2057,20 @@ napi_value NapiCallManager::GetCallState(napi_env env, napi_callback_info info)
     return HandleAsyncWork(env, asyncContext.release(), "GetCallState", NativeGetCallState, NativePropertyCallBack);
 }
 
+napi_value NapiCallManager::GetCallStateSync(napi_env env, napi_callback_info info)
+{
+    size_t parameterCount = 0;
+    napi_value parameters[] = { nullptr };
+    napi_get_cb_info(env, info, &parameterCount, parameters, nullptr, nullptr);
+    CallState callState = CallStateToApp::CALL_STATE_UNKNOWN;
+    if (parameterCount == 0) {
+        callState = DelayedSingleton<CallManagerClient>::GetInstance()->GetCallState()
+    }
+    napi_value value = nullptr;
+    NAPI_CALL(env, napi_create_int32(env, static_cast<int32_t>(callState), &value));
+    return value;
+}
+
 napi_value NapiCallManager::IsRinging(napi_env env, napi_callback_info info)
 {
     GET_PARAMS(env, info, ONLY_ONE_VALUE);
@@ -2090,6 +2106,20 @@ napi_value NapiCallManager::HasCall(napi_env env, napi_callback_info info)
         napi_create_reference(env, argv[ARRAY_INDEX_FIRST], DATA_LENGTH_ONE, &(asyncContext->callbackRef));
     }
     return HandleAsyncWork(env, asyncContext.release(), "HasCall", NativeHasCall, NativeBoolCallBack);
+}
+
+napi_value NapiCallManager::HasCallSync(napi_env env, napi_callback_info info)
+{
+    size_t parameterCount = 0;
+    napi_value parameters[] = { nullptr };
+    napi_get_cb_info(env, info, &parameterCount, parameters, nullptr, nullptr);
+    bool hasCall = false;
+    if (parameterCount == 0) {
+        hasCall = DelayedSingleton<CallManagerClient>::GetInstance()->HasCall()
+    }
+    napi_value value = nullptr;
+    NAPI_CALL(env, napi_create_int32(env, hasCall, &value));
+    return value;
 }
 
 napi_value NapiCallManager::IsNewCallAllowed(napi_env env, napi_callback_info info)
