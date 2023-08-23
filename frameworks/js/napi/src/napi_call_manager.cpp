@@ -2062,12 +2062,12 @@ napi_value NapiCallManager::GetCallStateSync(napi_env env, napi_callback_info in
     size_t parameterCount = 0;
     napi_value parameters[] = { nullptr };
     napi_get_cb_info(env, info, &parameterCount, parameters, nullptr, nullptr);
-    CallState callState = CallStateToApp::CALL_STATE_UNKNOWN;
+    int32_t callState = static_cast<int32_t>(CallStateToApp::CALL_STATE_UNKNOWN);
     if (parameterCount == 0) {
-        callState = DelayedSingleton<CallManagerClient>::GetInstance()->GetCallState()
+        callState = DelayedSingleton<CallManagerClient>::GetInstance()->GetCallState();
     }
     napi_value value = nullptr;
-    NAPI_CALL(env, napi_create_int32(env, static_cast<int32_t>(callState), &value));
+    NAPI_CALL(env, napi_create_int32(env, callState, &value));
     return value;
 }
 
@@ -2115,7 +2115,7 @@ napi_value NapiCallManager::HasCallSync(napi_env env, napi_callback_info info)
     napi_get_cb_info(env, info, &parameterCount, parameters, nullptr, nullptr);
     bool hasCall = false;
     if (parameterCount == 0) {
-        hasCall = DelayedSingleton<CallManagerClient>::GetInstance()->HasCall()
+        hasCall = DelayedSingleton<CallManagerClient>::GetInstance()->HasCall();
     }
     napi_value value = nullptr;
     NAPI_CALL(env, napi_create_int32(env, hasCall, &value));
