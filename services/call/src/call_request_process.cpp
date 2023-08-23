@@ -128,15 +128,16 @@ void CallRequestProcess::HangUpRequest(int32_t callId)
     int32_t waitingCallNum = GetCallNum(TelCallState::CALL_STATUS_WAITING);
     TelCallState state = call->GetTelCallState();
     TelConferenceState confState = call->GetTelConferenceState();
-    if (((state == TelCallState::CALL_STATUS_ACTIVE) &&
-        (CallObjectManager::IsCallExist(call->GetCallType(), TelCallState::CALL_STATUS_HOLDING)) &&
-        waitingCallNum == 0) || (confState == TelConferenceState::TEL_CONFERENCE_ACTIVE)) {
+    if ((((state == TelCallState::CALL_STATUS_ACTIVE) &&
+        (CallObjectManager::IsCallExist(call->GetCallType(), TelCallState::CALL_STATUS_HOLDING))) ||
+        (confState == TelConferenceState::TEL_CONFERENCE_ACTIVE)) && waitingCallNum == 0) {
         TELEPHONY_LOGI("release the active call and recover the held call");
         call->SetPolicyFlag(PolicyFlag::POLICY_FLAG_HANG_UP_ACTIVE);
     } else if (confState == TelConferenceState::TEL_CONFERENCE_HOLDING && waitingCallNum == 0) {
         TELEPHONY_LOGI("release the held call and the wait call");
         call->SetPolicyFlag(PolicyFlag::POLICY_FLAG_HANG_UP_HOLD_WAIT);
-    } else if (confState == TelConferenceState::TEL_CONFERENCE_HOLDING && waitingCallNum != 0) {
+    } else if (((confState == TelConferenceState::TEL_CONFERENCE_HOLDING) ||
+        (confState == TelConferenceState::TEL_CONFERENCE_ACTIVE)) && waitingCallNum != 0) {
         TELEPHONY_LOGI("conference call and holding state, hangup conference call");
         std::vector<std::u16string> callIdList;
         call->GetSubCallIdList(callIdList);
