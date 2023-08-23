@@ -78,6 +78,8 @@ public:
     bool IsSoundPlaying();
     bool StopSoundtone();
     bool PlaySoundtone();
+    void PlayEndTone();
+    void PlayWaitTone();
 
 private:
     RingState ringState_ = RingState::STOPPED;

@@ -45,6 +45,7 @@
                 "hitrace",
                 "init",
                 "ipc",
+                "miscdevice",
                 "audio_framework",
                 "camera_framework",
                 "napi",

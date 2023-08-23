@@ -141,6 +141,7 @@ ohos_shared_library("tel_call_manager") {
     "hitrace:hitrace_meter",
     "init:libbegetutil",
     "ipc:ipc_single",
+    "miscdevice:vibrator_interface_native",
     "power_manager:powermgr_client",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
