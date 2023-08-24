@@ -147,6 +147,10 @@ public:
     std::vector<CallAttributeInfo> GetCurrentCallList(int32_t slotId) override;
 
 private:
+    int32_t SendRequest(BluetoothCallInterfaceCode code);
+    int32_t SendRequest(BluetoothCallInterfaceCode code, MessageParcel &dataParcel, MessageParcel &replyParcel);
+
+private:
     static inline BrokerDelegator<BluetoothCallProxy> delegator_;
 };
 } // namespace Telephony

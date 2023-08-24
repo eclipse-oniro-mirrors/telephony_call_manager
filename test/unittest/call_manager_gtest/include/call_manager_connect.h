@@ -277,16 +277,16 @@ public:
 
     int32_t OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
     {
-        std::u16string myDescriptor = CallAbilityCallbackStub::GetDescriptor();
-        std::u16string remoteDescriptor = data.ReadInterfaceToken();
-        if (myDescriptor != remoteDescriptor) {
+        std::u16string myDesc = CallAbilityCallbackStub::GetDescriptor();
+        std::u16string remoteDesc = data.ReadInterfaceToken();
+        if (myDesc != remoteDesc) {
             TELEPHONY_LOGE("descriptor checked failed");
             return TELEPHONY_ERR_DESCRIPTOR_MISMATCH;
         }
-        TELEPHONY_LOGI("OnReceived, cmd = %{public}u", code);
-        auto itFunc = memberFuncMap_.find(code);
-        if (itFunc != memberFuncMap_.end()) {
-            auto memberFunc = itFunc->second;
+        TELEPHONY_LOGI("OnReceived, code = %{public}u", code);
+        auto itFunction = memberFuncMap_.find(code);
+        if (itFunction != memberFuncMap_.end()) {
+            auto memberFunc = itFunction->second;
             if (memberFunc != nullptr) {
                 return (this->*memberFunc)(data, reply);
             }
@@ -348,16 +348,16 @@ private:
     int32_t OnUpdateCallStateInfoRequest(MessageParcel &data, MessageParcel &reply)
     {
         const CallAttributeInfo *parcelPtr = nullptr;
-        int32_t len = data.ReadInt32();
-        if (len <= 0 || len >= MAX_LEN) {
-            TELEPHONY_LOGE("Invalid parameter, len = %{public}d", len);
+        int32_t length = data.ReadInt32();
+        if (length <= 0 || length >= MAX_LEN) {
+            TELEPHONY_LOGE("Invalid parameter, length = %{public}d", length);
             return TELEPHONY_ERR_ARGUMENT_INVALID;
         }
         if (!data.ContainFileDescriptors()) {
             TELEPHONY_LOGW("sent raw data is less than 32k");
         }
-        if ((parcelPtr = reinterpret_cast<const CallAttributeInfo *>(data.ReadRawData(len))) == nullptr) {
-            TELEPHONY_LOGE("reading raw data failed, length = %{public}d", len);
+        if ((parcelPtr = reinterpret_cast<const CallAttributeInfo *>(data.ReadRawData(length))) == nullptr) {
+            TELEPHONY_LOGE("reading raw data failed, length = %{public}d", length);
             return TELEPHONY_ERR_LOCAL_PTR_NULL;
         }
 
@@ -372,16 +372,16 @@ private:
     int32_t OnUpdateCallEventRequest(MessageParcel &data, MessageParcel &reply)
     {
         const CallEventInfo *parcelPtr = nullptr;
-        int32_t len = data.ReadInt32();
-        if (len <= 0 || len >= MAX_LEN) {
-            TELEPHONY_LOGE("Invalid parameter, len = %{public}d", len);
+        int32_t length = data.ReadInt32();
+        if (length <= 0 || length >= MAX_LEN) {
+            TELEPHONY_LOGE("Invalid parameter, length = %{public}d", length);
             return TELEPHONY_ERR_ARGUMENT_INVALID;
         }
         if (!data.ContainFileDescriptors()) {
             TELEPHONY_LOGW("sent raw data is less than 32k");
         }
-        if ((parcelPtr = reinterpret_cast<const CallEventInfo *>(data.ReadRawData(len))) == nullptr) {
-            TELEPHONY_LOGE("reading raw data failed, length = %d", len);
+        if ((parcelPtr = reinterpret_cast<const CallEventInfo *>(data.ReadRawData(length))) == nullptr) {
+            TELEPHONY_LOGE("reading raw data failed, length = %d", length);
             return TELEPHONY_ERR_LOCAL_PTR_NULL;
         }
 
@@ -395,40 +395,40 @@ private:
 
     int32_t OnUpdateAsyncResultRequest(MessageParcel &data, MessageParcel &reply)
     {
-        AppExecFwk::PacMap resultInfo;
+        AppExecFwk::PacMap info;
         CallResultReportId reportId = static_cast<CallResultReportId>(data.ReadInt32());
-        resultInfo.PutIntValue("result", data.ReadInt32());
+        info.PutIntValue("result", data.ReadInt32());
         switch (reportId) {
             case CallResultReportId::GET_CALL_WAITING_REPORT_ID:
             case CallResultReportId::GET_CALL_RESTRICTION_REPORT_ID:
-                resultInfo.PutIntValue("status", data.ReadInt32());
-                resultInfo.PutIntValue("classCw", data.ReadInt32());
+                info.PutIntValue("status", data.ReadInt32());
+                info.PutIntValue("classCw", data.ReadInt32());
                 break;
             case CallResultReportId::GET_CALL_TRANSFER_REPORT_ID:
-                resultInfo.PutIntValue("status", data.ReadInt32());
-                resultInfo.PutIntValue("classx", data.ReadInt32());
-                resultInfo.PutStringValue("number", data.ReadString());
-                resultInfo.PutIntValue("type", data.ReadInt32());
-                resultInfo.PutIntValue("reason", data.ReadInt32());
-                resultInfo.PutIntValue("time", data.ReadInt32());
+                info.PutIntValue("status", data.ReadInt32());
+                info.PutIntValue("classx", data.ReadInt32());
+                info.PutStringValue("number", data.ReadString());
+                info.PutIntValue("type", data.ReadInt32());
+                info.PutIntValue("reason", data.ReadInt32());
+                info.PutIntValue("time", data.ReadInt32());
                 break;
             case CallResultReportId::GET_CALL_CLIP_ID:
-                resultInfo.PutIntValue("action", data.ReadInt32());
-                resultInfo.PutIntValue("clipStat", data.ReadInt32());
+                info.PutIntValue("action", data.ReadInt32());
+                info.PutIntValue("clipStat", data.ReadInt32());
                 break;
             case CallResultReportId::GET_CALL_CLIR_ID:
-                resultInfo.PutIntValue("action", data.ReadInt32());
-                resultInfo.PutIntValue("clirStat", data.ReadInt32());
+                info.PutIntValue("action", data.ReadInt32());
+                info.PutIntValue("clirStat", data.ReadInt32());
                 break;
             case CallResultReportId::START_RTT_REPORT_ID:
-                resultInfo.PutIntValue("active", data.ReadInt32());
+                info.PutIntValue("active", data.ReadInt32());
                 break;
             case CallResultReportId::GET_IMS_CONFIG_REPORT_ID:
             case CallResultReportId::GET_IMS_FEATURE_VALUE_REPORT_ID:
-                resultInfo.PutIntValue("value", data.ReadInt32());
+                info.PutIntValue("value", data.ReadInt32());
                 break;
             case CallResultReportId::STOP_RTT_REPORT_ID:
-                resultInfo.PutIntValue("inactive", data.ReadInt32());
+                info.PutIntValue("inactive", data.ReadInt32());
                 break;
             default:
                 break;
@@ -436,7 +436,7 @@ private:
         if (!data.ContainFileDescriptors()) {
             TELEPHONY_LOGW("sent raw data is less than 32k");
         }
-        int32_t result = OnReportAsyncResults(reportId, resultInfo);
+        int32_t result = OnReportAsyncResults(reportId, info);
         if (!reply.WriteInt32(result)) {
             TELEPHONY_LOGE("writing parcel failed");
             return TELEPHONY_ERR_WRITE_REPLY_FAIL;
