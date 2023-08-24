@@ -27,11 +27,11 @@ bool CSCallState::ProcessEvent(int32_t event)
     bool result = false;
     std::lock_guard<std::mutex> lock(mutex_);
     switch (event) {
-        case AudioEvent::NO_MORE_ACTIVE_CALL:
-            result = DelayedSingleton<CallStateProcessor>::GetInstance()->UpdateCurrentCallState();
-            break;
         case AudioEvent::NEW_INCOMING_CALL:
             result = DelayedSingleton<AudioControlManager>::GetInstance()->PlayWaitingTone();
+            break;
+        case AudioEvent::NO_MORE_ACTIVE_CALL:
+            result = DelayedSingleton<CallStateProcessor>::GetInstance()->UpdateCurrentCallState();
             break;
         case AudioEvent::CALL_TYPE_CS_CHANGE_IMS:
             result = DelayedSingleton<AudioSceneProcessor>::GetInstance()->ProcessEvent(

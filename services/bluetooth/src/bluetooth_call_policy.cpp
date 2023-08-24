@@ -78,20 +78,20 @@ int32_t BluetoothCallPolicy::HangUpPolicy(int32_t &callId)
         TELEPHONY_LOGI("incoming call is exist, callId:%{public}d", callId);
         return TELEPHONY_SUCCESS;
     }
-    if (IsCallExist(TelCallState::CALL_STATUS_WAITING, callId)) {
-        TELEPHONY_LOGI("waiting call is exist, callId:%{public}d", callId);
-        return TELEPHONY_SUCCESS;
-    }
-    if (IsCallExist(TelCallState::CALL_STATUS_ACTIVE, callId)) {
-        TELEPHONY_LOGI("active call is exist, callId:%{public}d", callId);
-        return TELEPHONY_SUCCESS;
-    }
     if (IsCallExist(TelCallState::CALL_STATUS_ALERTING, callId)) {
         TELEPHONY_LOGI("alerting call is exist, callId:%{public}d", callId);
         return TELEPHONY_SUCCESS;
     }
+    if (IsCallExist(TelCallState::CALL_STATUS_WAITING, callId)) {
+        TELEPHONY_LOGI("waiting call is exist, callId:%{public}d", callId);
+        return TELEPHONY_SUCCESS;
+    }
     if (IsCallExist(TelCallState::CALL_STATUS_DIALING, callId)) {
         TELEPHONY_LOGI("dialing call is exist, callId:%{public}d", callId);
+        return TELEPHONY_SUCCESS;
+    }
+    if (IsCallExist(TelCallState::CALL_STATUS_ACTIVE, callId)) {
+        TELEPHONY_LOGI("active call is exist, callId:%{public}d", callId);
         return TELEPHONY_SUCCESS;
     }
     if (IsCallExist(TelCallState::CALL_STATUS_HOLDING, callId)) {

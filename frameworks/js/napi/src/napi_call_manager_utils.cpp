@@ -144,11 +144,11 @@ napi_value NapiCallManagerUtils::CreateErrorMessage(napi_env env, std::string ms
 
 napi_value NapiCallManagerUtils::CreateErrorMessageWithErrorCode(napi_env env, std::string msg, int32_t errorCode)
 {
-    napi_value result = nullptr;
     napi_value message = nullptr;
     NAPI_CALL(env, napi_create_string_utf8(env, msg.c_str(), msg.length(), &message));
     napi_value codeValue = nullptr;
     NAPI_CALL(env, napi_create_int32(env, errorCode, &codeValue));
+    napi_value result = nullptr;
     NAPI_CALL(env, napi_create_object(env, &result));
     NAPI_CALL(env, napi_set_named_property(env, result, "code", codeValue));
     NAPI_CALL(env, napi_set_named_property(env, result, "message", message));

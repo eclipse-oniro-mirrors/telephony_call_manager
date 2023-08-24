@@ -305,30 +305,30 @@ napi_value NapiCallManager::DeclareCallRestrictionEnum(napi_env env, napi_value 
 {
     napi_property_descriptor desc[] = {
         // CallRestrictionType
-        DECLARE_NAPI_STATIC_PROPERTY("RESTRICTION_TYPE_ALL_OUTGOING",
-            NapiCallManagerUtils::ToInt32Value(
-                env, static_cast<int32_t>(CallRestrictionType::RESTRICTION_TYPE_ALL_OUTGOING))),
-        DECLARE_NAPI_STATIC_PROPERTY("RESTRICTION_TYPE_INTERNATIONAL",
-            NapiCallManagerUtils::ToInt32Value(
-                env, static_cast<int32_t>(CallRestrictionType::RESTRICTION_TYPE_INTERNATIONAL))),
-        DECLARE_NAPI_STATIC_PROPERTY("RESTRICTION_TYPE_INTERNATIONAL_EXCLUDING_HOME",
-            NapiCallManagerUtils::ToInt32Value(
-                env, static_cast<int32_t>(CallRestrictionType::RESTRICTION_TYPE_INTERNATIONAL_EXCLUDING_HOME))),
-        DECLARE_NAPI_STATIC_PROPERTY("RESTRICTION_TYPE_ALL_INCOMING",
-            NapiCallManagerUtils::ToInt32Value(
-                env, static_cast<int32_t>(CallRestrictionType::RESTRICTION_TYPE_ALL_INCOMING))),
-        DECLARE_NAPI_STATIC_PROPERTY("RESTRICTION_TYPE_ROAMING_INCOMING",
-            NapiCallManagerUtils::ToInt32Value(
-                env, static_cast<int32_t>(CallRestrictionType::RESTRICTION_TYPE_ROAMING_INCOMING))),
-        DECLARE_NAPI_STATIC_PROPERTY("RESTRICTION_TYPE_ALL_CALLS",
-            NapiCallManagerUtils::ToInt32Value(
-                env, static_cast<int32_t>(CallRestrictionType::RESTRICTION_TYPE_ALL_CALLS))),
-        DECLARE_NAPI_STATIC_PROPERTY("RESTRICTION_TYPE_OUTGOING_SERVICES",
-            NapiCallManagerUtils::ToInt32Value(
-                env, static_cast<int32_t>(CallRestrictionType::RESTRICTION_TYPE_OUTGOING_SERVICES))),
         DECLARE_NAPI_STATIC_PROPERTY("RESTRICTION_TYPE_INCOMING_SERVICES",
             NapiCallManagerUtils::ToInt32Value(
                 env, static_cast<int32_t>(CallRestrictionType::RESTRICTION_TYPE_INCOMING_SERVICES))),
+        DECLARE_NAPI_STATIC_PROPERTY("RESTRICTION_TYPE_OUTGOING_SERVICES",
+            NapiCallManagerUtils::ToInt32Value(
+                env, static_cast<int32_t>(CallRestrictionType::RESTRICTION_TYPE_OUTGOING_SERVICES))),
+        DECLARE_NAPI_STATIC_PROPERTY("RESTRICTION_TYPE_ALL_CALLS",
+            NapiCallManagerUtils::ToInt32Value(
+                env, static_cast<int32_t>(CallRestrictionType::RESTRICTION_TYPE_ALL_CALLS))),
+        DECLARE_NAPI_STATIC_PROPERTY("RESTRICTION_TYPE_ROAMING_INCOMING",
+            NapiCallManagerUtils::ToInt32Value(
+                env, static_cast<int32_t>(CallRestrictionType::RESTRICTION_TYPE_ROAMING_INCOMING))),
+        DECLARE_NAPI_STATIC_PROPERTY("RESTRICTION_TYPE_ALL_INCOMING",
+            NapiCallManagerUtils::ToInt32Value(
+                env, static_cast<int32_t>(CallRestrictionType::RESTRICTION_TYPE_ALL_INCOMING))),
+        DECLARE_NAPI_STATIC_PROPERTY("RESTRICTION_TYPE_INTERNATIONAL_EXCLUDING_HOME",
+            NapiCallManagerUtils::ToInt32Value(
+                env, static_cast<int32_t>(CallRestrictionType::RESTRICTION_TYPE_INTERNATIONAL_EXCLUDING_HOME))),
+        DECLARE_NAPI_STATIC_PROPERTY("RESTRICTION_TYPE_INTERNATIONAL",
+            NapiCallManagerUtils::ToInt32Value(
+                env, static_cast<int32_t>(CallRestrictionType::RESTRICTION_TYPE_INTERNATIONAL))),
+        DECLARE_NAPI_STATIC_PROPERTY("RESTRICTION_TYPE_ALL_OUTGOING",
+            NapiCallManagerUtils::ToInt32Value(
+                env, static_cast<int32_t>(CallRestrictionType::RESTRICTION_TYPE_ALL_OUTGOING))),
         // CallRestrictionMode
         DECLARE_NAPI_STATIC_PROPERTY("RESTRICTION_MODE_DEACTIVATION",
             NapiCallManagerUtils::ToInt32Value(
@@ -339,8 +339,7 @@ napi_value NapiCallManager::DeclareCallRestrictionEnum(napi_env env, napi_value 
         // RestrictionStatus
         DECLARE_NAPI_STATIC_PROPERTY(
             "RESTRICTION_DISABLE", NapiCallManagerUtils::ToInt32Value(env, RESTRICTION_DISABLE)),
-        DECLARE_NAPI_STATIC_PROPERTY(
-            "RESTRICTION_ENABLE", NapiCallManagerUtils::ToInt32Value(env, RESTRICTION_ENABLE)),
+        DECLARE_NAPI_STATIC_PROPERTY("RESTRICTION_ENABLE", NapiCallManagerUtils::ToInt32Value(env, RESTRICTION_ENABLE)),
     };
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc));
     return exports;
@@ -416,18 +415,18 @@ napi_value NapiCallManager::DeclareAudioDeviceEnum(napi_env env, napi_value expo
 {
     // AudioDeviceType
     napi_property_descriptor desc[] = {
-        DECLARE_NAPI_STATIC_PROPERTY("DEVICE_EARPIECE",
-            NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(AudioDeviceType::DEVICE_EARPIECE))),
-        DECLARE_NAPI_STATIC_PROPERTY("DEVICE_SPEAKER",
-            NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(AudioDeviceType::DEVICE_SPEAKER))),
-        DECLARE_NAPI_STATIC_PROPERTY("DEVICE_WIRED_HEADSET",
-            NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(AudioDeviceType::DEVICE_WIRED_HEADSET))),
-        DECLARE_NAPI_STATIC_PROPERTY("DEVICE_BLUETOOTH_SCO",
-            NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(AudioDeviceType::DEVICE_BLUETOOTH_SCO))),
-        DECLARE_NAPI_STATIC_PROPERTY("DEVICE_DISABLE",
-            NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(AudioDeviceType::DEVICE_DISABLE))),
         DECLARE_NAPI_STATIC_PROPERTY("DEVICE_UNKNOWN",
             NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(AudioDeviceType::DEVICE_UNKNOWN))),
+        DECLARE_NAPI_STATIC_PROPERTY("DEVICE_DISABLE",
+            NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(AudioDeviceType::DEVICE_DISABLE))),
+        DECLARE_NAPI_STATIC_PROPERTY("DEVICE_BLUETOOTH_SCO",
+            NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(AudioDeviceType::DEVICE_BLUETOOTH_SCO))),
+        DECLARE_NAPI_STATIC_PROPERTY("DEVICE_WIRED_HEADSET",
+            NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(AudioDeviceType::DEVICE_WIRED_HEADSET))),
+        DECLARE_NAPI_STATIC_PROPERTY("DEVICE_SPEAKER",
+            NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(AudioDeviceType::DEVICE_SPEAKER))),
+        DECLARE_NAPI_STATIC_PROPERTY("DEVICE_EARPIECE",
+            NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(AudioDeviceType::DEVICE_EARPIECE))),
     };
     napi_value result = nullptr;
     napi_define_class(env, "AudioDeviceType", NAPI_AUTO_LENGTH, NapiCallManagerUtils::CreateEnumConstructor, nullptr,
@@ -522,24 +521,24 @@ napi_value NapiCallManager::DeclareDialTypeEnum(napi_env env, napi_value exports
 napi_value NapiCallManager::DeclareTelCallStateEnum(napi_env env, napi_value exports)
 {
     napi_property_descriptor desc[] = {
-        DECLARE_NAPI_STATIC_PROPERTY("CALL_STATUS_ACTIVE",
-            NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(TelCallState::CALL_STATUS_ACTIVE))),
-        DECLARE_NAPI_STATIC_PROPERTY("CALL_STATUS_HOLDING",
-            NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(TelCallState::CALL_STATUS_HOLDING))),
-        DECLARE_NAPI_STATIC_PROPERTY("CALL_STATUS_DIALING",
-            NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(TelCallState::CALL_STATUS_DIALING))),
-        DECLARE_NAPI_STATIC_PROPERTY("CALL_STATUS_ALERTING",
-            NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(TelCallState::CALL_STATUS_ALERTING))),
-        DECLARE_NAPI_STATIC_PROPERTY("CALL_STATUS_INCOMING",
-            NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(TelCallState::CALL_STATUS_INCOMING))),
-        DECLARE_NAPI_STATIC_PROPERTY("CALL_STATUS_WAITING",
-            NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(TelCallState::CALL_STATUS_WAITING))),
-        DECLARE_NAPI_STATIC_PROPERTY("CALL_STATUS_DISCONNECTED",
-            NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(TelCallState::CALL_STATUS_DISCONNECTED))),
-        DECLARE_NAPI_STATIC_PROPERTY("CALL_STATUS_DISCONNECTING",
-            NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(TelCallState::CALL_STATUS_DISCONNECTING))),
         DECLARE_NAPI_STATIC_PROPERTY("CALL_STATUS_IDLE",
             NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(TelCallState::CALL_STATUS_IDLE))),
+        DECLARE_NAPI_STATIC_PROPERTY("CALL_STATUS_DISCONNECTING",
+            NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(TelCallState::CALL_STATUS_DISCONNECTING))),
+        DECLARE_NAPI_STATIC_PROPERTY("CALL_STATUS_DISCONNECTED",
+            NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(TelCallState::CALL_STATUS_DISCONNECTED))),
+        DECLARE_NAPI_STATIC_PROPERTY("CALL_STATUS_WAITING",
+            NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(TelCallState::CALL_STATUS_WAITING))),
+        DECLARE_NAPI_STATIC_PROPERTY("CALL_STATUS_INCOMING",
+            NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(TelCallState::CALL_STATUS_INCOMING))),
+        DECLARE_NAPI_STATIC_PROPERTY("CALL_STATUS_ALERTING",
+            NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(TelCallState::CALL_STATUS_ALERTING))),
+        DECLARE_NAPI_STATIC_PROPERTY("CALL_STATUS_DIALING",
+            NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(TelCallState::CALL_STATUS_DIALING))),
+        DECLARE_NAPI_STATIC_PROPERTY("CALL_STATUS_HOLDING",
+            NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(TelCallState::CALL_STATUS_HOLDING))),
+        DECLARE_NAPI_STATIC_PROPERTY("CALL_STATUS_ACTIVE",
+            NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(TelCallState::CALL_STATUS_ACTIVE))),
     };
     napi_value result = nullptr;
     napi_define_class(env, "TelCallState", NAPI_AUTO_LENGTH, NapiCallManagerUtils::CreateEnumConstructor, nullptr,
@@ -551,18 +550,18 @@ napi_value NapiCallManager::DeclareTelCallStateEnum(napi_env env, napi_value exp
 napi_value NapiCallManager::DeclareConferenceStateEnum(napi_env env, napi_value exports)
 {
     napi_property_descriptor desc[] = {
-        DECLARE_NAPI_STATIC_PROPERTY("TEL_CONFERENCE_IDLE",
-            NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(TelConferenceState::TEL_CONFERENCE_IDLE))),
-        DECLARE_NAPI_STATIC_PROPERTY("TEL_CONFERENCE_ACTIVE",
-            NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(TelConferenceState::TEL_CONFERENCE_ACTIVE))),
-        DECLARE_NAPI_STATIC_PROPERTY("TEL_CONFERENCE_HOLDING",
-            NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(TelConferenceState::TEL_CONFERENCE_HOLDING))),
-        DECLARE_NAPI_STATIC_PROPERTY("TEL_CONFERENCE_DISCONNECTING",
-            NapiCallManagerUtils::ToInt32Value(
-                env, static_cast<int32_t>(TelConferenceState::TEL_CONFERENCE_DISCONNECTING))),
         DECLARE_NAPI_STATIC_PROPERTY("TEL_CONFERENCE_DISCONNECTED",
             NapiCallManagerUtils::ToInt32Value(
                 env, static_cast<int32_t>(TelConferenceState::TEL_CONFERENCE_DISCONNECTED))),
+        DECLARE_NAPI_STATIC_PROPERTY("TEL_CONFERENCE_DISCONNECTING",
+            NapiCallManagerUtils::ToInt32Value(
+                env, static_cast<int32_t>(TelConferenceState::TEL_CONFERENCE_DISCONNECTING))),
+        DECLARE_NAPI_STATIC_PROPERTY("TEL_CONFERENCE_HOLDING",
+            NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(TelConferenceState::TEL_CONFERENCE_HOLDING))),
+        DECLARE_NAPI_STATIC_PROPERTY("TEL_CONFERENCE_ACTIVE",
+            NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(TelConferenceState::TEL_CONFERENCE_ACTIVE))),
+        DECLARE_NAPI_STATIC_PROPERTY("TEL_CONFERENCE_IDLE",
+            NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(TelConferenceState::TEL_CONFERENCE_IDLE))),
     };
     napi_value result = nullptr;
     napi_define_class(env, "ConferenceState", NAPI_AUTO_LENGTH, NapiCallManagerUtils::CreateEnumConstructor, nullptr,
@@ -704,16 +703,16 @@ napi_value NapiCallManager::DeclareTransferStatusEnum(napi_env env, napi_value e
 napi_value NapiCallManager::DeclareTransferTypeEnum(napi_env env, napi_value exports)
 {
     napi_property_descriptor desc[] = {
-        DECLARE_NAPI_STATIC_PROPERTY("TRANSFER_TYPE_UNCONDITIONAL",
-            NapiCallManagerUtils::ToInt32Value(
-                env, static_cast<int32_t>(CallTransferType::TRANSFER_TYPE_UNCONDITIONAL))),
-        DECLARE_NAPI_STATIC_PROPERTY("TRANSFER_TYPE_BUSY",
-            NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(CallTransferType::TRANSFER_TYPE_BUSY))),
-        DECLARE_NAPI_STATIC_PROPERTY("TRANSFER_TYPE_NO_REPLY",
-            NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(CallTransferType::TRANSFER_TYPE_NO_REPLY))),
         DECLARE_NAPI_STATIC_PROPERTY("TRANSFER_TYPE_NOT_REACHABLE",
             NapiCallManagerUtils::ToInt32Value(
                 env, static_cast<int32_t>(CallTransferType::TRANSFER_TYPE_NOT_REACHABLE))),
+        DECLARE_NAPI_STATIC_PROPERTY("TRANSFER_TYPE_NO_REPLY",
+            NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(CallTransferType::TRANSFER_TYPE_NO_REPLY))),
+        DECLARE_NAPI_STATIC_PROPERTY("TRANSFER_TYPE_BUSY",
+            NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(CallTransferType::TRANSFER_TYPE_BUSY))),
+        DECLARE_NAPI_STATIC_PROPERTY("TRANSFER_TYPE_UNCONDITIONAL",
+            NapiCallManagerUtils::ToInt32Value(
+                env, static_cast<int32_t>(CallTransferType::TRANSFER_TYPE_UNCONDITIONAL))),
     };
     napi_value result = nullptr;
     napi_define_class(env, "CallTransferType", NAPI_AUTO_LENGTH, NapiCallManagerUtils::CreateEnumConstructor, nullptr,
@@ -725,18 +724,18 @@ napi_value NapiCallManager::DeclareTransferTypeEnum(napi_env env, napi_value exp
 napi_value NapiCallManager::DeclareTransferSettingTypeEnum(napi_env env, napi_value exports)
 {
     napi_property_descriptor desc[] = {
-        DECLARE_NAPI_STATIC_PROPERTY("CALL_TRANSFER_ENABLE",
-            NapiCallManagerUtils::ToInt32Value(
-                env, static_cast<int32_t>(CallTransferSettingType::CALL_TRANSFER_ENABLE))),
-        DECLARE_NAPI_STATIC_PROPERTY("CALL_TRANSFER_DISABLE",
-            NapiCallManagerUtils::ToInt32Value(
-                env, static_cast<int32_t>(CallTransferSettingType::CALL_TRANSFER_DISABLE))),
-        DECLARE_NAPI_STATIC_PROPERTY("CALL_TRANSFER_REGISTRATION",
-            NapiCallManagerUtils::ToInt32Value(
-                env, static_cast<int32_t>(CallTransferSettingType::CALL_TRANSFER_REGISTRATION))),
         DECLARE_NAPI_STATIC_PROPERTY("CALL_TRANSFER_ERASURE",
             NapiCallManagerUtils::ToInt32Value(
                 env, static_cast<int32_t>(CallTransferSettingType::CALL_TRANSFER_ERASURE))),
+        DECLARE_NAPI_STATIC_PROPERTY("CALL_TRANSFER_REGISTRATION",
+            NapiCallManagerUtils::ToInt32Value(
+                env, static_cast<int32_t>(CallTransferSettingType::CALL_TRANSFER_REGISTRATION))),
+        DECLARE_NAPI_STATIC_PROPERTY("CALL_TRANSFER_DISABLE",
+            NapiCallManagerUtils::ToInt32Value(
+                env, static_cast<int32_t>(CallTransferSettingType::CALL_TRANSFER_DISABLE))),
+        DECLARE_NAPI_STATIC_PROPERTY("CALL_TRANSFER_ENABLE",
+            NapiCallManagerUtils::ToInt32Value(
+                env, static_cast<int32_t>(CallTransferSettingType::CALL_TRANSFER_ENABLE))),
     };
     napi_value result = nullptr;
     napi_define_class(env, "CallTransferSettingType", NAPI_AUTO_LENGTH, NapiCallManagerUtils::CreateEnumConstructor,
@@ -1119,9 +1118,9 @@ napi_value NapiCallManager::AnswerCall(napi_env env, napi_callback_info info)
         NapiUtil::ThrowParameterError(env);
         return nullptr;
     }
-    auto asyncContext = std::make_unique<AnswerAsyncContext>();
-    if (asyncContext == nullptr) {
-        TELEPHONY_LOGE("asyncContext is nullptr.");
+    auto answerAsyncContext = std::make_unique<AnswerAsyncContext>();
+    if (answerAsyncContext == nullptr) {
+        TELEPHONY_LOGE("answerAsyncContext is nullptr.");
         NapiUtil::ThrowParameterError(env);
         return nullptr;
     }
@@ -1133,17 +1132,17 @@ napi_value NapiCallManager::AnswerCall(napi_env env, napi_callback_info info)
             NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_FIRST], napi_null)) {
             TELEPHONY_LOGI("undefined or null param is detected, treating as no param input.");
         } else if (NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_FIRST], napi_function)) {
-            napi_create_reference(env, argv[ARRAY_INDEX_FIRST], DATA_LENGTH_ONE, &(asyncContext->callbackRef));
+            napi_create_reference(env, argv[ARRAY_INDEX_FIRST], DATA_LENGTH_ONE, &(answerAsyncContext->callbackRef));
         } else {
-            napi_get_value_int32(env, argv[ARRAY_INDEX_FIRST], &asyncContext->callId);
+            napi_get_value_int32(env, argv[ARRAY_INDEX_FIRST], &answerAsyncContext->callId);
         }
     } else {
-        napi_get_value_int32(env, argv[ARRAY_INDEX_FIRST], &asyncContext->callId);
-        napi_create_reference(env, argv[ARRAY_INDEX_SECOND], DATA_LENGTH_ONE, &(asyncContext->callbackRef));
+        napi_get_value_int32(env, argv[ARRAY_INDEX_FIRST], &answerAsyncContext->callId);
+        napi_create_reference(env, argv[ARRAY_INDEX_SECOND], DATA_LENGTH_ONE, &(answerAsyncContext->callbackRef));
     }
 
     return HandleAsyncWork(
-        env, asyncContext.release(), "AnswerCall", NativeAnswerCall, NativeVoidCallBackWithErrorCode);
+        env, answerAsyncContext.release(), "AnswerCall", NativeAnswerCall, NativeVoidCallBackWithErrorCode);
 }
 
 napi_value NapiCallManager::RejectCall(napi_env env, napi_callback_info info)
@@ -1710,20 +1709,21 @@ napi_value NapiCallManager::GetCallRestriction(napi_env env, napi_callback_info 
         NapiUtil::ThrowParameterError(env);
         return nullptr;
     }
-    auto asyncContext = std::make_unique<SupplementAsyncContext>();
-    if (asyncContext == nullptr) {
+    auto restrictionAsyncContext = std::make_unique<SupplementAsyncContext>();
+    if (restrictionAsyncContext == nullptr) {
         TELEPHONY_LOGE("NapiCallManager::GetCallRestriction asyncContext is nullptr.");
         NapiUtil::ThrowParameterError(env);
         return nullptr;
     }
-    napi_get_value_int32(env, argv[ARRAY_INDEX_FIRST], &asyncContext->slotId);
-    napi_get_value_int32(env, argv[ARRAY_INDEX_SECOND], &asyncContext->type);
+    napi_get_value_int32(env, argv[ARRAY_INDEX_FIRST], &restrictionAsyncContext->slotId);
+    napi_get_value_int32(env, argv[ARRAY_INDEX_SECOND], &restrictionAsyncContext->type);
     if (argc == VALUE_MAXIMUM_LIMIT) {
-        napi_create_reference(env, argv[ARRAY_INDEX_THIRD], DATA_LENGTH_ONE, &(asyncContext->callbackRef));
+        napi_create_reference(env, argv[ARRAY_INDEX_THIRD], DATA_LENGTH_ONE, &(restrictionAsyncContext->callbackRef));
     }
-    asyncContext->env = env;
-    napi_create_reference(env, thisVar, DATA_LENGTH_ONE, &(asyncContext->thisVar));
-    return HandleAsyncWork(env, asyncContext.release(), "GetCallRestriction", NativeGetCallRestriction, NativeCallBack);
+    restrictionAsyncContext->env = env;
+    napi_create_reference(env, thisVar, DATA_LENGTH_ONE, &(restrictionAsyncContext->thisVar));
+    return HandleAsyncWork(
+        env, restrictionAsyncContext.release(), "GetCallRestriction", NativeGetCallRestriction, NativeCallBack);
 }
 
 napi_value NapiCallManager::SetCallRestriction(napi_env env, napi_callback_info info)
@@ -2142,27 +2142,29 @@ napi_value NapiCallManager::IsEmergencyPhoneNumber(napi_env env, napi_callback_i
         NapiUtil::ThrowParameterError(env);
         return nullptr;
     }
-    auto asyncContext = std::make_unique<UtilsAsyncContext>();
-    if (asyncContext == nullptr) {
-        TELEPHONY_LOGE("asyncContext is nullptr.");
+    auto emergencyAsyncContext = std::make_unique<UtilsAsyncContext>();
+    if (emergencyAsyncContext == nullptr) {
+        TELEPHONY_LOGE("emergencyAsyncContext is nullptr.");
         NapiUtil::ThrowParameterError(env);
         return nullptr;
     }
-    napi_get_value_string_utf8(
-        env, argv[ARRAY_INDEX_FIRST], asyncContext->number, PHONE_NUMBER_MAXIMUM_LIMIT, &(asyncContext->numberLen));
-    asyncContext->slotId = 0;
+    napi_get_value_string_utf8(env, argv[ARRAY_INDEX_FIRST], emergencyAsyncContext->number, PHONE_NUMBER_MAXIMUM_LIMIT,
+        &(emergencyAsyncContext->numberLen));
+    emergencyAsyncContext->slotId = 0;
     if (argc == TWO_VALUE_LIMIT) {
         if (NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_SECOND], napi_function)) {
-            napi_create_reference(env, argv[ARRAY_INDEX_SECOND], DATA_LENGTH_ONE, &(asyncContext->callbackRef));
+            napi_create_reference(
+                env, argv[ARRAY_INDEX_SECOND], DATA_LENGTH_ONE, &(emergencyAsyncContext->callbackRef));
         } else {
-            asyncContext->slotId = NapiCallManagerUtils::GetIntProperty(env, argv[ARRAY_INDEX_SECOND], "slotId");
+            emergencyAsyncContext->slotId =
+                NapiCallManagerUtils::GetIntProperty(env, argv[ARRAY_INDEX_SECOND], "slotId");
         }
     }
     if (argc == VALUE_MAXIMUM_LIMIT) {
-        asyncContext->slotId = NapiCallManagerUtils::GetIntProperty(env, argv[ARRAY_INDEX_SECOND], "slotId");
-        napi_create_reference(env, argv[ARRAY_INDEX_THIRD], DATA_LENGTH_ONE, &(asyncContext->callbackRef));
+        emergencyAsyncContext->slotId = NapiCallManagerUtils::GetIntProperty(env, argv[ARRAY_INDEX_SECOND], "slotId");
+        napi_create_reference(env, argv[ARRAY_INDEX_THIRD], DATA_LENGTH_ONE, &(emergencyAsyncContext->callbackRef));
     }
-    return HandleAsyncWork(env, asyncContext.release(), "IsEmergencyPhoneNumber", NativeIsEmergencyPhoneNumber,
+    return HandleAsyncWork(env, emergencyAsyncContext.release(), "IsEmergencyPhoneNumber", NativeIsEmergencyPhoneNumber,
         NativeIsEmergencyPhoneNumberCallBack);
 }
 
@@ -2449,22 +2451,23 @@ napi_value NapiCallManager::SetPreviewWindow(napi_env env, napi_callback_info in
     bool matchFlag = NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_FIRST], napi_object);
     NAPI_ASSERT(env, matchFlag, "SetPreviewWindow type error, should be object type");
 
-    auto asyncContext = std::make_unique<VideoAsyncContext>();
-    if (asyncContext == nullptr) {
+    auto previwWindowContext = std::make_unique<VideoAsyncContext>();
+    if (previwWindowContext == nullptr) {
         std::string errorCode = std::to_string(napi_generic_failure);
         std::string errorMessage = "SetPreviewWindow error at baseContext is nullptr";
         NAPI_CALL(env, napi_throw_error(env, errorCode.c_str(), errorMessage.c_str()));
         return nullptr;
     }
-    asyncContext->x = NapiCallManagerUtils::GetIntProperty(env, argv[ARRAY_INDEX_FIRST], "x");
-    asyncContext->y = NapiCallManagerUtils::GetIntProperty(env, argv[ARRAY_INDEX_FIRST], "y");
-    asyncContext->z = NapiCallManagerUtils::GetIntProperty(env, argv[ARRAY_INDEX_FIRST], "z");
-    asyncContext->width = NapiCallManagerUtils::GetIntProperty(env, argv[ARRAY_INDEX_FIRST], "width");
-    asyncContext->height = NapiCallManagerUtils::GetIntProperty(env, argv[ARRAY_INDEX_FIRST], "height");
+    previwWindowContext->x = NapiCallManagerUtils::GetIntProperty(env, argv[ARRAY_INDEX_FIRST], "x");
+    previwWindowContext->y = NapiCallManagerUtils::GetIntProperty(env, argv[ARRAY_INDEX_FIRST], "y");
+    previwWindowContext->z = NapiCallManagerUtils::GetIntProperty(env, argv[ARRAY_INDEX_FIRST], "z");
+    previwWindowContext->width = NapiCallManagerUtils::GetIntProperty(env, argv[ARRAY_INDEX_FIRST], "width");
+    previwWindowContext->height = NapiCallManagerUtils::GetIntProperty(env, argv[ARRAY_INDEX_FIRST], "height");
     if (argc == TWO_VALUE_LIMIT) {
-        napi_create_reference(env, argv[ARRAY_INDEX_SECOND], DATA_LENGTH_ONE, &(asyncContext->callbackRef));
+        napi_create_reference(env, argv[ARRAY_INDEX_SECOND], DATA_LENGTH_ONE, &(previwWindowContext->callbackRef));
     }
-    return HandleAsyncWork(env, asyncContext.release(), "SetPreviewWindow", NativeSetPreviewWindow, NativeVoidCallBack);
+    return HandleAsyncWork(
+        env, previwWindowContext.release(), "SetPreviewWindow", NativeSetPreviewWindow, NativeVoidCallBack);
 }
 
 napi_value NapiCallManager::SetDisplayWindow(napi_env env, napi_callback_info info)
@@ -2474,22 +2477,23 @@ napi_value NapiCallManager::SetDisplayWindow(napi_env env, napi_callback_info in
     bool matchFlag = NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_FIRST], napi_object);
     NAPI_ASSERT(env, matchFlag, "SetDisplayWindow type error, should be object type");
 
-    auto asyncContext = std::make_unique<VideoAsyncContext>();
-    if (asyncContext == nullptr) {
+    auto dislpayWindowContext = std::make_unique<VideoAsyncContext>();
+    if (dislpayWindowContext == nullptr) {
         std::string errorCode = std::to_string(napi_generic_failure);
         std::string errorMessage = "SetDisplayWindow error at baseContext is nullptr";
         NAPI_CALL(env, napi_throw_error(env, errorCode.c_str(), errorMessage.c_str()));
         return nullptr;
     }
-    asyncContext->x = NapiCallManagerUtils::GetIntProperty(env, argv[ARRAY_INDEX_FIRST], "x");
-    asyncContext->y = NapiCallManagerUtils::GetIntProperty(env, argv[ARRAY_INDEX_FIRST], "y");
-    asyncContext->z = NapiCallManagerUtils::GetIntProperty(env, argv[ARRAY_INDEX_FIRST], "z");
-    asyncContext->width = NapiCallManagerUtils::GetIntProperty(env, argv[ARRAY_INDEX_FIRST], "width");
-    asyncContext->height = NapiCallManagerUtils::GetIntProperty(env, argv[ARRAY_INDEX_FIRST], "height");
+    dislpayWindowContext->x = NapiCallManagerUtils::GetIntProperty(env, argv[ARRAY_INDEX_FIRST], "x");
+    dislpayWindowContext->y = NapiCallManagerUtils::GetIntProperty(env, argv[ARRAY_INDEX_FIRST], "y");
+    dislpayWindowContext->z = NapiCallManagerUtils::GetIntProperty(env, argv[ARRAY_INDEX_FIRST], "z");
+    dislpayWindowContext->width = NapiCallManagerUtils::GetIntProperty(env, argv[ARRAY_INDEX_FIRST], "width");
+    dislpayWindowContext->height = NapiCallManagerUtils::GetIntProperty(env, argv[ARRAY_INDEX_FIRST], "height");
     if (argc == TWO_VALUE_LIMIT) {
-        napi_create_reference(env, argv[ARRAY_INDEX_SECOND], DATA_LENGTH_ONE, &(asyncContext->callbackRef));
+        napi_create_reference(env, argv[ARRAY_INDEX_SECOND], DATA_LENGTH_ONE, &(dislpayWindowContext->callbackRef));
     }
-    return HandleAsyncWork(env, asyncContext.release(), "SetDisplayWindow", NativeSetDisplayWindow, NativeVoidCallBack);
+    return HandleAsyncWork(
+        env, dislpayWindowContext.release(), "SetDisplayWindow", NativeSetDisplayWindow, NativeVoidCallBack);
 }
 
 napi_value NapiCallManager::SetCameraZoom(napi_env env, napi_callback_info info)
@@ -2872,36 +2876,36 @@ void NapiCallManager::NativeCallBack(napi_env env, napi_status status, void *dat
         NapiUtil::ThrowParameterError(env);
         return;
     }
-    auto asyncContext = (AsyncContext *)data;
-    if (asyncContext->deferred != nullptr) {
-        if (asyncContext->resolved == TELEPHONY_SUCCESS) {
+    auto callBackContext = (AsyncContext *)data;
+    if (callBackContext->deferred != nullptr) {
+        if (callBackContext->resolved == TELEPHONY_SUCCESS) {
             napi_value promiseValue = nullptr;
-            napi_create_int32(env, asyncContext->resolved, &promiseValue);
-            napi_resolve_deferred(env, asyncContext->deferred, promiseValue);
+            napi_create_int32(env, callBackContext->resolved, &promiseValue);
+            napi_resolve_deferred(env, callBackContext->deferred, promiseValue);
         } else {
-            napi_reject_deferred(env, asyncContext->deferred,
+            napi_reject_deferred(env, callBackContext->deferred,
                 NapiCallManagerUtils::CreateErrorCodeAndMessageForJs(
-                    env, asyncContext->errorCode, asyncContext->eventId));
+                    env, callBackContext->errorCode, callBackContext->eventId));
         }
-    } else if (asyncContext->callbackRef != nullptr) {
+    } else if (callBackContext->callbackRef != nullptr) {
         napi_value callbackValue[ARRAY_INDEX_THIRD] = { 0 };
-        if (asyncContext->resolved == TELEPHONY_SUCCESS) {
+        if (callBackContext->resolved == TELEPHONY_SUCCESS) {
             callbackValue[ARRAY_INDEX_FIRST] = NapiCallManagerUtils::CreateUndefined(env);
-            napi_create_int32(env, asyncContext->resolved, &callbackValue[ARRAY_INDEX_SECOND]);
+            napi_create_int32(env, callBackContext->resolved, &callbackValue[ARRAY_INDEX_SECOND]);
         } else {
             callbackValue[ARRAY_INDEX_FIRST] = NapiCallManagerUtils::CreateErrorCodeAndMessageForJs(
-                env, asyncContext->errorCode, asyncContext->eventId);
+                env, callBackContext->errorCode, callBackContext->eventId);
             callbackValue[ARRAY_INDEX_SECOND] = NapiCallManagerUtils::CreateUndefined(env);
         }
         napi_value callback = nullptr;
         napi_value result = nullptr;
-        napi_get_reference_value(env, asyncContext->callbackRef, &callback);
+        napi_get_reference_value(env, callBackContext->callbackRef, &callback);
         napi_call_function(env, nullptr, callback, std::size(callbackValue), callbackValue, &result);
-        napi_delete_reference(env, asyncContext->callbackRef);
+        napi_delete_reference(env, callBackContext->callbackRef);
     }
-    napi_delete_async_work(env, asyncContext->work);
-    delete asyncContext;
-    asyncContext = nullptr;
+    napi_delete_async_work(env, callBackContext->work);
+    delete callBackContext;
+    callBackContext = nullptr;
 }
 
 void NapiCallManager::NativeDialCallBack(napi_env env, napi_status status, void *data)
@@ -2959,39 +2963,39 @@ void NapiCallManager::NativeVoidCallBack(napi_env env, napi_status status, void 
         TELEPHONY_LOGE("data is nullptr");
         return;
     }
-    auto asyncContext = (AsyncContext *)data;
-    if (asyncContext->deferred != nullptr) {
-        if (asyncContext->resolved == TELEPHONY_SUCCESS) {
+    auto voidCallBackContext = (AsyncContext *)data;
+    if (voidCallBackContext->deferred != nullptr) {
+        if (voidCallBackContext->resolved == TELEPHONY_SUCCESS) {
             napi_value promiseValue = nullptr;
             napi_get_null(env, &promiseValue);
-            napi_status ret = napi_resolve_deferred(env, asyncContext->deferred, promiseValue);
+            napi_status ret = napi_resolve_deferred(env, voidCallBackContext->deferred, promiseValue);
             TELEPHONY_LOGI("promise successful result = %{public}d", ret);
         } else {
-            std::string errTip = std::to_string(asyncContext->resolved);
+            std::string errTip = std::to_string(voidCallBackContext->resolved);
             napi_status ret = napi_reject_deferred(
-                env, asyncContext->deferred, NapiCallManagerUtils::CreateErrorMessage(env, errTip));
+                env, voidCallBackContext->deferred, NapiCallManagerUtils::CreateErrorMessage(env, errTip));
             TELEPHONY_LOGI("promise failed result = %{public}d", ret);
         }
-    } else if (asyncContext->callbackRef != nullptr) {
+    } else if (voidCallBackContext->callbackRef != nullptr) {
         napi_value callbackValue[ARRAY_INDEX_THIRD] = { 0 };
-        if (asyncContext->resolved == TELEPHONY_SUCCESS) {
+        if (voidCallBackContext->resolved == TELEPHONY_SUCCESS) {
             callbackValue[ARRAY_INDEX_FIRST] = NapiCallManagerUtils::CreateUndefined(env);
             napi_get_null(env, &callbackValue[ARRAY_INDEX_SECOND]);
         } else {
-            std::string errTip = std::to_string(asyncContext->resolved);
+            std::string errTip = std::to_string(voidCallBackContext->resolved);
             callbackValue[ARRAY_INDEX_FIRST] = NapiCallManagerUtils::CreateErrorMessage(env, errTip);
             callbackValue[ARRAY_INDEX_SECOND] = NapiCallManagerUtils::CreateUndefined(env);
         }
         napi_value callback = nullptr;
         napi_value result = nullptr;
-        napi_get_reference_value(env, asyncContext->callbackRef, &callback);
+        napi_get_reference_value(env, voidCallBackContext->callbackRef, &callback);
         napi_status ret = napi_call_function(env, nullptr, callback, std::size(callbackValue), callbackValue, &result);
         TELEPHONY_LOGI("callback result = %{public}d", ret);
-        napi_delete_reference(env, asyncContext->callbackRef);
+        napi_delete_reference(env, voidCallBackContext->callbackRef);
     }
-    napi_delete_async_work(env, asyncContext->work);
-    delete asyncContext;
-    asyncContext = nullptr;
+    napi_delete_async_work(env, voidCallBackContext->work);
+    delete voidCallBackContext;
+    voidCallBackContext = nullptr;
 }
 
 void NapiCallManager::NativeVoidCallBackWithErrorCode(napi_env env, napi_status status, void *data)
@@ -3025,8 +3029,8 @@ void NapiCallManager::NativeVoidCallBackWithErrorCode(napi_env env, napi_status 
             callbackValue[ARRAY_INDEX_SECOND] = NapiCallManagerUtils::CreateUndefined(env);
         }
         napi_value callback = nullptr;
-        napi_value result = nullptr;
         napi_get_reference_value(env, asyncContext->callbackRef, &callback);
+        napi_value result = nullptr;
         napi_status ret = napi_call_function(env, nullptr, callback, std::size(callbackValue), callbackValue, &result);
         TELEPHONY_LOGI("callback result = %{public}d", ret);
         napi_delete_reference(env, asyncContext->callbackRef);
@@ -3094,8 +3098,8 @@ void NapiCallManager::NativeGetMainCallIdCallBack(napi_env env, napi_status stat
             callbackValue[ARRAY_INDEX_SECOND] = NapiCallManagerUtils::CreateUndefined(env);
         }
         napi_value callback = nullptr;
-        napi_value result = nullptr;
         napi_get_reference_value(env, asyncContext->callbackRef, &callback);
+        napi_value result = nullptr;
         napi_status ret = napi_call_function(env, nullptr, callback, std::size(callbackValue), callbackValue, &result);
         TELEPHONY_LOGI("callback result = %{public}d", ret);
         napi_delete_reference(env, asyncContext->callbackRef);
@@ -3152,36 +3156,36 @@ void NapiCallManager::NativeGetVoNRStateCallBack(napi_env env, napi_status statu
         NapiUtil::ThrowParameterError(env);
         return;
     }
-    auto asyncContext = (VoNRSwitchAsyncContext *)data;
-    if (asyncContext->deferred != nullptr) {
-        if (asyncContext->errorCode == TELEPHONY_SUCCESS) {
+    auto getVoNRStateContext = (VoNRSwitchAsyncContext *)data;
+    if (getVoNRStateContext->deferred != nullptr) {
+        if (getVoNRStateContext->errorCode == TELEPHONY_SUCCESS) {
             napi_value promiseValue = nullptr;
-            napi_create_int32(env, asyncContext->state, &promiseValue);
-            napi_resolve_deferred(env, asyncContext->deferred, promiseValue);
+            napi_create_int32(env, getVoNRStateContext->state, &promiseValue);
+            napi_resolve_deferred(env, getVoNRStateContext->deferred, promiseValue);
         } else {
-            napi_reject_deferred(env, asyncContext->deferred,
+            napi_reject_deferred(env, getVoNRStateContext->deferred,
                 NapiCallManagerUtils::CreateErrorCodeAndMessageForJs(
-                    env, asyncContext->errorCode, asyncContext->eventId));
+                    env, getVoNRStateContext->errorCode, getVoNRStateContext->eventId));
         }
     } else {
         napi_value callbackValue[ARRAY_INDEX_THIRD] = { 0 };
-        if (asyncContext->errorCode == TELEPHONY_SUCCESS) {
+        if (getVoNRStateContext->errorCode == TELEPHONY_SUCCESS) {
             callbackValue[ARRAY_INDEX_FIRST] = NapiCallManagerUtils::CreateUndefined(env);
-            napi_create_int32(env, asyncContext->state, &callbackValue[ARRAY_INDEX_SECOND]);
+            napi_create_int32(env, getVoNRStateContext->state, &callbackValue[ARRAY_INDEX_SECOND]);
         } else {
             callbackValue[ARRAY_INDEX_FIRST] = NapiCallManagerUtils::CreateErrorCodeAndMessageForJs(
-                env, asyncContext->errorCode, asyncContext->eventId);
+                env, getVoNRStateContext->errorCode, getVoNRStateContext->eventId);
             callbackValue[ARRAY_INDEX_SECOND] = NapiCallManagerUtils::CreateUndefined(env);
         }
         napi_value callback = nullptr;
         napi_value result = nullptr;
-        napi_get_reference_value(env, asyncContext->callbackRef, &callback);
+        napi_get_reference_value(env, getVoNRStateContext->callbackRef, &callback);
         napi_call_function(env, nullptr, callback, std::size(callbackValue), callbackValue, &result);
-        napi_delete_reference(env, asyncContext->callbackRef);
+        napi_delete_reference(env, getVoNRStateContext->callbackRef);
     }
-    napi_delete_async_work(env, asyncContext->work);
-    delete asyncContext;
-    asyncContext = nullptr;
+    napi_delete_async_work(env, getVoNRStateContext->work);
+    delete getVoNRStateContext;
+    getVoNRStateContext = nullptr;
 }
 
 void NapiCallManager::NativeBoolCallBack(napi_env env, napi_status status, void *data)
@@ -3190,49 +3194,50 @@ void NapiCallManager::NativeBoolCallBack(napi_env env, napi_status status, void 
         TELEPHONY_LOGE("data is nullptr");
         return;
     }
-    auto asyncContext = (AsyncContext *)data;
-    if (asyncContext->deferred != nullptr) {
-        if (asyncContext->resolved == BOOL_VALUE_IS_TRUE) {
+    auto boolCallBackContext = (AsyncContext *)data;
+    if (boolCallBackContext->deferred != nullptr) {
+        if (boolCallBackContext->resolved == BOOL_VALUE_IS_TRUE) {
             napi_value promiseValue = nullptr;
             napi_get_boolean(env, true, &promiseValue);
-            napi_resolve_deferred(env, asyncContext->deferred, promiseValue);
-        } else if (asyncContext->errorCode == TELEPHONY_SUCCESS) {
+            napi_resolve_deferred(env, boolCallBackContext->deferred, promiseValue);
+        } else if (boolCallBackContext->errorCode == TELEPHONY_SUCCESS) {
             napi_value promiseValue = nullptr;
             napi_get_boolean(env, false, &promiseValue);
-            napi_resolve_deferred(env, asyncContext->deferred, promiseValue);
-        } else if (asyncContext->errorCode == SLOT_ID_INVALID) {
-            napi_reject_deferred(env, asyncContext->deferred,
+            napi_resolve_deferred(env, boolCallBackContext->deferred, promiseValue);
+        } else if (boolCallBackContext->errorCode == SLOT_ID_INVALID) {
+            napi_reject_deferred(env, boolCallBackContext->deferred,
                 NapiCallManagerUtils::CreateErrorMessageWithErrorCode(env, "slotId is invalid", SLOT_ID_INVALID));
         } else {
-            std::string errTip = std::to_string(asyncContext->errorCode);
-            napi_reject_deferred(env, asyncContext->deferred, NapiCallManagerUtils::CreateErrorMessage(env, errTip));
+            std::string errTip = std::to_string(boolCallBackContext->errorCode);
+            napi_reject_deferred(
+                env, boolCallBackContext->deferred, NapiCallManagerUtils::CreateErrorMessage(env, errTip));
         }
     } else {
         napi_value callbackValue[ARRAY_INDEX_THIRD] = { 0 };
-        if (asyncContext->resolved == BOOL_VALUE_IS_TRUE) {
+        if (boolCallBackContext->resolved == BOOL_VALUE_IS_TRUE) {
             callbackValue[ARRAY_INDEX_FIRST] = NapiCallManagerUtils::CreateUndefined(env);
             napi_get_boolean(env, true, &callbackValue[ARRAY_INDEX_SECOND]);
-        } else if (asyncContext->errorCode == TELEPHONY_SUCCESS) {
+        } else if (boolCallBackContext->errorCode == TELEPHONY_SUCCESS) {
             callbackValue[ARRAY_INDEX_FIRST] = NapiCallManagerUtils::CreateUndefined(env);
             napi_get_boolean(env, false, &callbackValue[ARRAY_INDEX_SECOND]);
-        } else if (asyncContext->errorCode == SLOT_ID_INVALID) {
+        } else if (boolCallBackContext->errorCode == SLOT_ID_INVALID) {
             callbackValue[ARRAY_INDEX_FIRST] =
                 NapiCallManagerUtils::CreateErrorMessageWithErrorCode(env, "slotId is invalid", SLOT_ID_INVALID);
             callbackValue[ARRAY_INDEX_SECOND] = NapiCallManagerUtils::CreateUndefined(env);
         } else {
-            std::string errTip = std::to_string(asyncContext->errorCode);
+            std::string errTip = std::to_string(boolCallBackContext->errorCode);
             callbackValue[ARRAY_INDEX_FIRST] = NapiCallManagerUtils::CreateErrorMessage(env, errTip);
             callbackValue[ARRAY_INDEX_SECOND] = NapiCallManagerUtils::CreateUndefined(env);
         }
         napi_value callback = nullptr;
         napi_value result = nullptr;
-        napi_get_reference_value(env, asyncContext->callbackRef, &callback);
+        napi_get_reference_value(env, boolCallBackContext->callbackRef, &callback);
         napi_call_function(env, nullptr, callback, std::size(callbackValue), callbackValue, &result);
-        napi_delete_reference(env, asyncContext->callbackRef);
+        napi_delete_reference(env, boolCallBackContext->callbackRef);
     }
-    napi_delete_async_work(env, asyncContext->work);
-    delete asyncContext;
-    asyncContext = nullptr;
+    napi_delete_async_work(env, boolCallBackContext->work);
+    delete boolCallBackContext;
+    boolCallBackContext = nullptr;
 }
 
 void NapiCallManager::NativeIsEmergencyPhoneNumberCallBack(napi_env env, napi_status status, void *data)
@@ -3327,41 +3332,41 @@ void NapiCallManager::NativeFormatNumberCallBack(napi_env env, napi_status statu
         NapiUtil::ThrowParameterError(env);
         return;
     }
-    auto asyncContext = (UtilsAsyncContext *)data;
-    if (asyncContext->deferred != nullptr) {
-        if (asyncContext->resolved == TELEPHONY_SUCCESS) {
+    auto formatNumberContext = (UtilsAsyncContext *)data;
+    if (formatNumberContext->deferred != nullptr) {
+        if (formatNumberContext->resolved == TELEPHONY_SUCCESS) {
             napi_value promiseValue = nullptr;
-            napi_create_string_utf8(env, Str16ToStr8(asyncContext->formatNumber).data(),
-                asyncContext->formatNumber.length(), &promiseValue);
-            napi_status ret = napi_resolve_deferred(env, asyncContext->deferred, promiseValue);
+            napi_create_string_utf8(env, Str16ToStr8(formatNumberContext->formatNumber).data(),
+                formatNumberContext->formatNumber.length(), &promiseValue);
+            napi_status ret = napi_resolve_deferred(env, formatNumberContext->deferred, promiseValue);
             TELEPHONY_LOGI("promise successful result = %{public}d", ret);
         } else {
-            JsError error = NapiUtil::ConverErrorMessageForJs(asyncContext->errorCode);
-            napi_status ret = napi_reject_deferred(env, asyncContext->deferred,
+            JsError error = NapiUtil::ConverErrorMessageForJs(formatNumberContext->errorCode);
+            napi_status ret = napi_reject_deferred(env, formatNumberContext->deferred,
                 NapiCallManagerUtils::CreateErrorMessageWithErrorCode(env, error.errorMessage, error.errorCode));
             TELEPHONY_LOGI("promise failed result = %{public}d", ret);
         }
-    } else if (asyncContext->callbackRef != nullptr) {
+    } else if (formatNumberContext->callbackRef != nullptr) {
         napi_value callbackValue[ARRAY_INDEX_THIRD] = { 0 };
-        if (asyncContext->resolved == TELEPHONY_SUCCESS) {
+        if (formatNumberContext->resolved == TELEPHONY_SUCCESS) {
             callbackValue[ARRAY_INDEX_FIRST] = NapiCallManagerUtils::CreateUndefined(env);
-            napi_create_string_utf8(env, Str16ToStr8(asyncContext->formatNumber).data(),
-                asyncContext->formatNumber.length(), &callbackValue[ARRAY_INDEX_SECOND]);
+            napi_create_string_utf8(env, Str16ToStr8(formatNumberContext->formatNumber).data(),
+                formatNumberContext->formatNumber.length(), &callbackValue[ARRAY_INDEX_SECOND]);
         } else {
-            JsError error = NapiUtil::ConverErrorMessageForJs(asyncContext->errorCode);
+            JsError error = NapiUtil::ConverErrorMessageForJs(formatNumberContext->errorCode);
             callbackValue[ARRAY_INDEX_FIRST] =
                 NapiCallManagerUtils::CreateErrorMessageWithErrorCode(env, error.errorMessage, error.errorCode);
             callbackValue[ARRAY_INDEX_SECOND] = NapiCallManagerUtils::CreateUndefined(env);
         }
         napi_value callback = nullptr;
         napi_value result = nullptr;
-        napi_get_reference_value(env, asyncContext->callbackRef, &callback);
+        napi_get_reference_value(env, formatNumberContext->callbackRef, &callback);
         napi_call_function(env, nullptr, callback, std::size(callbackValue), callbackValue, &result);
-        napi_delete_reference(env, asyncContext->callbackRef);
+        napi_delete_reference(env, formatNumberContext->callbackRef);
     }
-    napi_delete_async_work(env, asyncContext->work);
-    delete asyncContext;
-    asyncContext = nullptr;
+    napi_delete_async_work(env, formatNumberContext->work);
+    delete formatNumberContext;
+    formatNumberContext = nullptr;
 }
 
 void NapiCallManager::NativeListCallBack(napi_env env, napi_status status, void *data)
@@ -3372,47 +3377,47 @@ void NapiCallManager::NativeListCallBack(napi_env env, napi_status status, void 
     }
     int32_t i = 0;
     napi_value info = nullptr;
-    auto asyncContext = (ListAsyncContext *)data;
-    std::vector<std::u16string>::iterator it = asyncContext->listResult.begin();
-    if (asyncContext->deferred != nullptr) {
-        if (asyncContext->resolved == TELEPHONY_SUCCESS) {
+    auto listCallBakcContext = (ListAsyncContext *)data;
+    std::vector<std::u16string>::iterator it = listCallBakcContext->listResult.begin();
+    if (listCallBakcContext->deferred != nullptr) {
+        if (listCallBakcContext->resolved == TELEPHONY_SUCCESS) {
             napi_value promiseValue = nullptr;
             napi_create_array(env, &promiseValue);
-            for (; it != asyncContext->listResult.end(); ++it) {
+            for (; it != listCallBakcContext->listResult.end(); ++it) {
                 napi_create_string_utf8(env, Str16ToStr8(*it).data(), (*it).length(), &info);
                 napi_set_element(env, promiseValue, i, info);
                 ++i;
             }
-            napi_resolve_deferred(env, asyncContext->deferred, promiseValue);
+            napi_resolve_deferred(env, listCallBakcContext->deferred, promiseValue);
         } else {
-            napi_reject_deferred(env, asyncContext->deferred,
+            napi_reject_deferred(env, listCallBakcContext->deferred,
                 NapiCallManagerUtils::CreateErrorCodeAndMessageForJs(
-                    env, asyncContext->errorCode, asyncContext->eventId));
+                    env, listCallBakcContext->errorCode, listCallBakcContext->eventId));
         }
-    } else if (asyncContext->callbackRef != nullptr) {
+    } else if (listCallBakcContext->callbackRef != nullptr) {
         napi_value callbackValue[ARRAY_INDEX_THIRD] = { 0 };
-        if (asyncContext->resolved == TELEPHONY_SUCCESS) {
+        if (listCallBakcContext->resolved == TELEPHONY_SUCCESS) {
             callbackValue[ARRAY_INDEX_FIRST] = NapiCallManagerUtils::CreateUndefined(env);
             napi_create_array(env, &callbackValue[ARRAY_INDEX_SECOND]);
-            for (; it != asyncContext->listResult.end(); ++it) {
+            for (; it != listCallBakcContext->listResult.end(); ++it) {
                 napi_create_string_utf8(env, Str16ToStr8(*it).data(), (*it).length(), &info);
                 napi_set_element(env, callbackValue[ARRAY_INDEX_SECOND], i, info);
                 ++i;
             }
         } else {
             callbackValue[ARRAY_INDEX_FIRST] = NapiCallManagerUtils::CreateErrorCodeAndMessageForJs(
-                env, asyncContext->errorCode, asyncContext->eventId);
+                env, listCallBakcContext->errorCode, listCallBakcContext->eventId);
             callbackValue[ARRAY_INDEX_SECOND] = NapiCallManagerUtils::CreateUndefined(env);
         }
         napi_value callback = nullptr;
         napi_value result = nullptr;
-        napi_get_reference_value(env, asyncContext->callbackRef, &callback);
+        napi_get_reference_value(env, listCallBakcContext->callbackRef, &callback);
         napi_call_function(env, nullptr, callback, std::size(callbackValue), callbackValue, &result);
-        napi_delete_reference(env, asyncContext->callbackRef);
+        napi_delete_reference(env, listCallBakcContext->callbackRef);
     }
-    napi_delete_async_work(env, asyncContext->work);
-    delete asyncContext;
-    asyncContext = nullptr;
+    napi_delete_async_work(env, listCallBakcContext->work);
+    delete listCallBakcContext;
+    listCallBakcContext = nullptr;
 }
 
 void NapiCallManager::NativeOffCallBack(napi_env env, napi_status status, void *data)
@@ -4437,13 +4442,13 @@ void NapiCallManager::NativeSetPreviewWindow(napi_env env, void *data)
     }
 
     auto asyncContext = (VideoAsyncContext *)data;
-    VideoWindow window;
-    window.x = asyncContext->x;
-    window.y = asyncContext->y;
-    window.z = asyncContext->z;
-    window.width = asyncContext->width;
-    window.height = asyncContext->height;
-    asyncContext->resolved = DelayedSingleton<CallManagerClient>::GetInstance()->SetPreviewWindow(window);
+    VideoWindow previewWindow;
+    previewWindow.x = asyncContext->x;
+    previewWindow.y = asyncContext->y;
+    previewWindow.z = asyncContext->z;
+    previewWindow.width = asyncContext->width;
+    previewWindow.height = asyncContext->height;
+    asyncContext->resolved = DelayedSingleton<CallManagerClient>::GetInstance()->SetPreviewWindow(previewWindow);
 }
 
 void NapiCallManager::NativeSetDisplayWindow(napi_env env, void *data)
@@ -4454,13 +4459,13 @@ void NapiCallManager::NativeSetDisplayWindow(napi_env env, void *data)
     }
 
     auto asyncContext = (VideoAsyncContext *)data;
-    VideoWindow window;
-    window.x = asyncContext->x;
-    window.y = asyncContext->y;
-    window.z = asyncContext->z;
-    window.width = asyncContext->width;
-    window.height = asyncContext->height;
-    asyncContext->resolved = DelayedSingleton<CallManagerClient>::GetInstance()->SetDisplayWindow(window);
+    VideoWindow displayWindow;
+    displayWindow.x = asyncContext->x;
+    displayWindow.y = asyncContext->y;
+    displayWindow.z = asyncContext->z;
+    displayWindow.width = asyncContext->width;
+    displayWindow.height = asyncContext->height;
+    asyncContext->resolved = DelayedSingleton<CallManagerClient>::GetInstance()->SetDisplayWindow(displayWindow);
 }
 
 void NapiCallManager::NativeSetCameraZoom(napi_env env, void *data)
@@ -4512,28 +4517,29 @@ void NapiCallManager::NativeStartRTT(napi_env env, void *data)
         TELEPHONY_LOGE("data is nullptr");
         return;
     }
-    auto asyncContext = (SupplementAsyncContext *)data;
+    auto startRTTContext = (SupplementAsyncContext *)data;
     EventCallback infoListener;
-    infoListener.env = asyncContext->env;
-    infoListener.thisVar = asyncContext->thisVar;
-    infoListener.callbackRef = asyncContext->callbackRef;
-    infoListener.deferred = asyncContext->deferred;
-    asyncContext->resolved =
+    infoListener.env = startRTTContext->env;
+    infoListener.thisVar = startRTTContext->thisVar;
+    infoListener.callbackRef = startRTTContext->callbackRef;
+    infoListener.deferred = startRTTContext->deferred;
+    startRTTContext->resolved =
         DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->RegisterStartRttCallback(infoListener);
-    if (asyncContext->resolved != TELEPHONY_SUCCESS) {
+    if (startRTTContext->resolved != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("RegisterStartRttCallback failed!");
         return;
     }
 
-    std::u16string msg = Str8ToStr16(asyncContext->content);
-    asyncContext->resolved = DelayedSingleton<CallManagerClient>::GetInstance()->StartRtt(asyncContext->callId, msg);
-    if (asyncContext->resolved != TELEPHONY_SUCCESS) {
+    std::u16string msg = Str8ToStr16(startRTTContext->content);
+    startRTTContext->resolved =
+        DelayedSingleton<CallManagerClient>::GetInstance()->StartRtt(startRTTContext->callId, msg);
+    if (startRTTContext->resolved != TELEPHONY_SUCCESS) {
         DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->UnRegisterStartRttCallback();
         TELEPHONY_LOGE("StartRtt failed!");
         return;
     }
-    asyncContext->callbackRef = nullptr;
-    asyncContext->deferred = nullptr;
+    startRTTContext->callbackRef = nullptr;
+    startRTTContext->deferred = nullptr;
 }
 
 void NapiCallManager::NativeStopRTT(napi_env env, void *data)
@@ -4542,26 +4548,26 @@ void NapiCallManager::NativeStopRTT(napi_env env, void *data)
         TELEPHONY_LOGE("data is nullptr");
         return;
     }
-    auto asyncContext = (SupplementAsyncContext *)data;
+    auto stopRTTContext = (SupplementAsyncContext *)data;
     EventCallback infoListener;
-    infoListener.env = asyncContext->env;
-    infoListener.thisVar = asyncContext->thisVar;
-    infoListener.callbackRef = asyncContext->callbackRef;
-    infoListener.deferred = asyncContext->deferred;
-    asyncContext->resolved =
+    infoListener.env = stopRTTContext->env;
+    infoListener.thisVar = stopRTTContext->thisVar;
+    infoListener.callbackRef = stopRTTContext->callbackRef;
+    infoListener.deferred = stopRTTContext->deferred;
+    stopRTTContext->resolved =
         DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->RegisterStopRttCallback(infoListener);
-    if (asyncContext->resolved != TELEPHONY_SUCCESS) {
+    if (stopRTTContext->resolved != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("RegisterStopRttCallback failed!");
         return;
     }
-    asyncContext->resolved = DelayedSingleton<CallManagerClient>::GetInstance()->StopRtt(asyncContext->callId);
-    if (asyncContext->resolved != TELEPHONY_SUCCESS) {
+    stopRTTContext->resolved = DelayedSingleton<CallManagerClient>::GetInstance()->StopRtt(stopRTTContext->callId);
+    if (stopRTTContext->resolved != TELEPHONY_SUCCESS) {
         DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->UnRegisterStopRttCallback();
         TELEPHONY_LOGE("StopRtt failed!");
         return;
     }
-    asyncContext->callbackRef = nullptr;
-    asyncContext->deferred = nullptr;
+    stopRTTContext->callbackRef = nullptr;
+    stopRTTContext->deferred = nullptr;
 }
 
 void NapiCallManager::NativeJoinConference(napi_env env, void *data)

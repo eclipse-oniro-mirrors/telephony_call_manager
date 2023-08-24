@@ -644,6 +644,10 @@ public:
     int32_t ReportAudioDeviceInfo() override;
 
 private:
+    int32_t SendRequest(CallManagerInterfaceCode code);
+    int32_t SendRequest(CallManagerInterfaceCode code, MessageParcel &dataParcel, MessageParcel &replyParcel);
+
+private:
     static inline BrokerDelegator<CallManagerServiceProxy> delegator_;
 };
 } // namespace Telephony

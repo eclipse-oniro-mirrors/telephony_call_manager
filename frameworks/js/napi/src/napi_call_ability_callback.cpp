@@ -535,31 +535,33 @@ void NapiCallAbilityCallback::ReportCallEventWork(uv_work_t *work, int32_t statu
 int32_t NapiCallAbilityCallback::ReportCallEvent(CallEventInfo &info, EventCallback eventCallback)
 {
     napi_env env = eventCallback.env;
-    napi_handle_scope scope = nullptr;
-    napi_open_handle_scope(env, &scope);
-    if (scope == nullptr) {
-        TELEPHONY_LOGE("scope is nullptr");
-        napi_close_handle_scope(env, scope);
+    napi_handle_scope scopeCallEvent = nullptr;
+    napi_open_handle_scope(env, &scopeCallEvent);
+    if (scopeCallEvent == nullptr) {
+        TELEPHONY_LOGE("scopeCallEvent is nullptr");
+        napi_close_handle_scope(env, scopeCallEvent);
         return TELEPHONY_ERROR;
     }
-    napi_value callbackFunc = nullptr;
-    napi_value callbackValues[ARRAY_INDEX_THIRD] = { 0 };
-    napi_create_object(env, &callbackValues[ARRAY_INDEX_FIRST]);
+    napi_value callEventCallbackFunc = nullptr;
+    napi_value callEventCallbackValues[ARRAY_INDEX_THIRD] = { 0 };
+    napi_create_object(env, &callEventCallbackValues[ARRAY_INDEX_FIRST]);
     NapiCallManagerUtils::SetPropertyInt32(
-        env, callbackValues[ARRAY_INDEX_FIRST], "eventId", static_cast<int32_t>(info.eventId));
-    NapiCallManagerUtils::SetPropertyStringUtf8(env, callbackValues[ARRAY_INDEX_FIRST], "accountNumber", info.phoneNum);
-    NapiCallManagerUtils::SetPropertyStringUtf8(env, callbackValues[ARRAY_INDEX_FIRST], "bundleName", info.bundleName);
-    napi_get_reference_value(env, eventCallback.callbackRef, &callbackFunc);
-    if (callbackFunc == nullptr) {
-        TELEPHONY_LOGE("callbackFunc is null!");
-        napi_close_handle_scope(env, scope);
+        env, callEventCallbackValues[ARRAY_INDEX_FIRST], "eventId", static_cast<int32_t>(info.eventId));
+    NapiCallManagerUtils::SetPropertyStringUtf8(
+        env, callEventCallbackValues[ARRAY_INDEX_FIRST], "accountNumber", info.phoneNum);
+    NapiCallManagerUtils::SetPropertyStringUtf8(
+        env, callEventCallbackValues[ARRAY_INDEX_FIRST], "bundleName", info.bundleName);
+    napi_get_reference_value(env, eventCallback.callbackRef, &callEventCallbackFunc);
+    if (callEventCallbackFunc == nullptr) {
+        TELEPHONY_LOGE("callEventCallbackFunc is null!");
+        napi_close_handle_scope(env, scopeCallEvent);
         return CALL_ERR_CALLBACK_NOT_EXIST;
     }
     napi_value thisVar = nullptr;
     napi_get_reference_value(env, eventCallback.thisVar, &thisVar);
     napi_value callbackResult = nullptr;
-    napi_call_function(env, thisVar, callbackFunc, DATA_LENGTH_ONE, callbackValues, &callbackResult);
-    napi_close_handle_scope(env, scope);
+    napi_call_function(env, thisVar, callEventCallbackFunc, DATA_LENGTH_ONE, callEventCallbackValues, &callbackResult);
+    napi_close_handle_scope(env, scopeCallEvent);
     return TELEPHONY_SUCCESS;
 }
 
@@ -612,11 +614,11 @@ int32_t NapiCallAbilityCallback::ReportDisconnectedCause(
     const DisconnectedDetails &details, EventCallback eventCallback)
 {
     napi_env env = eventCallback.env;
-    napi_handle_scope scope = nullptr;
-    napi_open_handle_scope(env, &scope);
-    if (scope == nullptr) {
-        TELEPHONY_LOGE("scope is nullptr");
-        napi_close_handle_scope(env, scope);
+    napi_handle_scope disconnectedScope = nullptr;
+    napi_open_handle_scope(env, &disconnectedScope);
+    if (disconnectedScope == nullptr) {
+        TELEPHONY_LOGE("disconnectedScope is nullptr");
+        napi_close_handle_scope(env, disconnectedScope);
         return TELEPHONY_ERROR;
     }
     napi_value callbackFunc = nullptr;
@@ -628,14 +630,14 @@ int32_t NapiCallAbilityCallback::ReportDisconnectedCause(
     napi_get_reference_value(env, eventCallback.callbackRef, &callbackFunc);
     if (callbackFunc == nullptr) {
         TELEPHONY_LOGE("callbackFunc is null!");
-        napi_close_handle_scope(env, scope);
+        napi_close_handle_scope(env, disconnectedScope);
         return CALL_ERR_CALLBACK_NOT_EXIST;
     }
     napi_value thisVar = nullptr;
     napi_get_reference_value(env, eventCallback.thisVar, &thisVar);
     napi_value callbackResult = nullptr;
     napi_call_function(env, thisVar, callbackFunc, DATA_LENGTH_ONE, callbackValues, &callbackResult);
-    napi_close_handle_scope(env, scope);
+    napi_close_handle_scope(env, disconnectedScope);
     return TELEPHONY_SUCCESS;
 }
 
@@ -700,11 +702,11 @@ void NapiCallAbilityCallback::ReportMmiCodeWork(uv_work_t *work, int32_t status)
 int32_t NapiCallAbilityCallback::ReportMmiCode(MmiCodeInfo &info, EventCallback eventCallback)
 {
     napi_env env = eventCallback.env;
-    napi_handle_scope scope = nullptr;
-    napi_open_handle_scope(env, &scope);
-    if (scope == nullptr) {
-        TELEPHONY_LOGE("scope is nullptr");
-        napi_close_handle_scope(env, scope);
+    napi_handle_scope mmiCodeScope = nullptr;
+    napi_open_handle_scope(env, &mmiCodeScope);
+    if (mmiCodeScope == nullptr) {
+        TELEPHONY_LOGE("mmiCodeScope is nullptr");
+        napi_close_handle_scope(env, mmiCodeScope);
         return TELEPHONY_ERROR;
     }
     napi_value callbackFunc = nullptr;
@@ -717,14 +719,14 @@ int32_t NapiCallAbilityCallback::ReportMmiCode(MmiCodeInfo &info, EventCallback 
     napi_get_reference_value(env, eventCallback.callbackRef, &callbackFunc);
     if (callbackFunc == nullptr) {
         TELEPHONY_LOGE("callbackFunc is null!");
-        napi_close_handle_scope(env, scope);
+        napi_close_handle_scope(env, mmiCodeScope);
         return CALL_ERR_CALLBACK_NOT_EXIST;
     }
     napi_value thisVar = nullptr;
     napi_get_reference_value(env, eventCallback.thisVar, &thisVar);
     napi_value callbackResult = nullptr;
     napi_call_function(env, thisVar, callbackFunc, DATA_LENGTH_TWO, callbackValues, &callbackResult);
-    napi_close_handle_scope(env, scope);
+    napi_close_handle_scope(env, mmiCodeScope);
     return TELEPHONY_SUCCESS;
 }
 
@@ -773,11 +775,11 @@ void NapiCallAbilityCallback::ReportAudioDeviceInfoWork(uv_work_t *work, int32_t
 int32_t NapiCallAbilityCallback::ReportAudioDeviceInfo(AudioDeviceInfo &info, EventCallback eventCallback)
 {
     napi_env env = eventCallback.env;
-    napi_handle_scope scope = nullptr;
-    napi_open_handle_scope(env, &scope);
-    if (scope == nullptr) {
-        TELEPHONY_LOGE("scope is nullptr");
-        napi_close_handle_scope(env, scope);
+    napi_handle_scope AudioDeviceInfoScope = nullptr;
+    napi_open_handle_scope(env, &AudioDeviceInfoScope);
+    if (AudioDeviceInfoScope == nullptr) {
+        TELEPHONY_LOGE("AudioDeviceInfoScope is nullptr");
+        napi_close_handle_scope(env, AudioDeviceInfoScope);
         return TELEPHONY_ERROR;
     }
     napi_value callbackFunc = nullptr;
@@ -811,14 +813,14 @@ int32_t NapiCallAbilityCallback::ReportAudioDeviceInfo(AudioDeviceInfo &info, Ev
     napi_get_reference_value(env, eventCallback.callbackRef, &callbackFunc);
     if (callbackFunc == nullptr) {
         TELEPHONY_LOGE("callbackFunc is null!");
-        napi_close_handle_scope(env, scope);
+        napi_close_handle_scope(env, AudioDeviceInfoScope);
         return CALL_ERR_CALLBACK_NOT_EXIST;
     }
     napi_value thisVar = nullptr;
     napi_get_reference_value(env, eventCallback.thisVar, &thisVar);
     napi_value callbackResult = nullptr;
     napi_call_function(env, thisVar, callbackFunc, DATA_LENGTH_ONE, callbackValues, &callbackResult);
-    napi_close_handle_scope(env, scope);
+    napi_close_handle_scope(env, AudioDeviceInfoScope);
     return TELEPHONY_SUCCESS;
 }
 
@@ -1110,11 +1112,11 @@ void NapiCallAbilityCallback::ReportWaitAndLimitInfo(AppExecFwk::PacMap &resultI
     napi_env env = supplementInfo.env;
     int32_t result = resultInfo.GetIntValue("result");
     int32_t status = resultInfo.GetIntValue("status");
-    napi_handle_scope scope = nullptr;
-    napi_open_handle_scope(env, &scope);
-    if (scope == nullptr) {
-        TELEPHONY_LOGE("scope is nullptr");
-        napi_close_handle_scope(env, scope);
+    napi_handle_scope limitScope = nullptr;
+    napi_open_handle_scope(env, &limitScope);
+    if (limitScope == nullptr) {
+        TELEPHONY_LOGE("limitScope is nullptr");
+        napi_close_handle_scope(env, limitScope);
         return;
     }
     if (supplementInfo.callbackRef != nullptr) {
@@ -1145,7 +1147,7 @@ void NapiCallAbilityCallback::ReportWaitAndLimitInfo(AppExecFwk::PacMap &resultI
             napi_reject_deferred(env, supplementInfo.deferred, NapiCallManagerUtils::CreateErrorMessage(env, errTip));
         }
     }
-    napi_close_handle_scope(env, scope);
+    napi_close_handle_scope(env, limitScope);
 }
 
 void NapiCallAbilityCallback::ReportSupplementInfoWork(uv_work_t *work, int32_t status)
@@ -1165,11 +1167,11 @@ void NapiCallAbilityCallback::ReportSupplementInfoWork(uv_work_t *work, int32_t 
 void NapiCallAbilityCallback::ReportSupplementInfo(AppExecFwk::PacMap &resultInfo, EventCallback supplementInfo)
 {
     napi_env env = supplementInfo.env;
-    napi_handle_scope scope = nullptr;
-    napi_open_handle_scope(env, &scope);
-    if (scope == nullptr) {
-        TELEPHONY_LOGE("scope is nullptr");
-        napi_close_handle_scope(env, scope);
+    napi_handle_scope supplementScope = nullptr;
+    napi_open_handle_scope(env, &supplementScope);
+    if (supplementScope == nullptr) {
+        TELEPHONY_LOGE("supplementScope is nullptr");
+        napi_close_handle_scope(env, supplementScope);
         return;
     }
     napi_value callbackValue = nullptr;
@@ -1204,7 +1206,7 @@ void NapiCallAbilityCallback::ReportSupplementInfo(AppExecFwk::PacMap &resultInf
                 env, supplementInfo.deferred, NapiCallManagerUtils::CreateErrorMessage(env, errTip));
         }
     }
-    napi_close_handle_scope(env, scope);
+    napi_close_handle_scope(env, supplementScope);
 }
 
 void NapiCallAbilityCallback::ReportExecutionResultWork(uv_work_t *work, int32_t status)
@@ -1224,11 +1226,11 @@ void NapiCallAbilityCallback::ReportExecutionResultWork(uv_work_t *work, int32_t
 void NapiCallAbilityCallback::ReportExecutionResult(EventCallback &settingInfo, AppExecFwk::PacMap &resultInfo)
 {
     napi_env env = settingInfo.env;
-    napi_handle_scope scope = nullptr;
-    napi_open_handle_scope(env, &scope);
-    if (scope == nullptr) {
-        TELEPHONY_LOGE("scope is nullptr");
-        napi_close_handle_scope(env, scope);
+    napi_handle_scope executionScope = nullptr;
+    napi_open_handle_scope(env, &executionScope);
+    if (executionScope == nullptr) {
+        TELEPHONY_LOGE("executionScope is nullptr");
+        napi_close_handle_scope(env, executionScope);
         return;
     }
     napi_value callbackValue = nullptr;
@@ -1264,7 +1266,7 @@ void NapiCallAbilityCallback::ReportExecutionResult(EventCallback &settingInfo, 
                 NapiCallManagerUtils::CreateErrorMessageWithErrorCode(env, error.errorMessage, error.errorCode));
         }
     }
-    napi_close_handle_scope(env, scope);
+    napi_close_handle_scope(env, executionScope);
 }
 
 void NapiCallAbilityCallback::ReportStartRttInfoWork(uv_work_t *work, int32_t status)
@@ -1285,11 +1287,11 @@ void NapiCallAbilityCallback::ReportStartRttInfo(AppExecFwk::PacMap &resultInfo,
 {
     napi_env env = supplementInfo.env;
     int32_t result = resultInfo.GetIntValue("result");
-    napi_handle_scope scope = nullptr;
-    napi_open_handle_scope(env, &scope);
-    if (scope == nullptr) {
-        TELEPHONY_LOGE("scope is nullptr");
-        napi_close_handle_scope(env, scope);
+    napi_handle_scope startRttScope = nullptr;
+    napi_open_handle_scope(env, &startRttScope);
+    if (startRttScope == nullptr) {
+        TELEPHONY_LOGE("startRttScope is nullptr");
+        napi_close_handle_scope(env, startRttScope);
         return;
     }
     if (supplementInfo.callbackRef != nullptr) {
@@ -1319,7 +1321,7 @@ void NapiCallAbilityCallback::ReportStartRttInfo(AppExecFwk::PacMap &resultInfo,
             napi_reject_deferred(env, supplementInfo.deferred, NapiCallManagerUtils::CreateErrorMessage(env, errTip));
         }
     }
-    napi_close_handle_scope(env, scope);
+    napi_close_handle_scope(env, startRttScope);
 }
 
 void NapiCallAbilityCallback::ReportStopRttInfoWork(uv_work_t *work, int32_t status)
@@ -1340,11 +1342,11 @@ void NapiCallAbilityCallback::ReportStopRttInfo(AppExecFwk::PacMap &resultInfo, 
 {
     napi_env env = supplementInfo.env;
     int32_t result = resultInfo.GetIntValue("result");
-    napi_handle_scope scope = nullptr;
-    napi_open_handle_scope(env, &scope);
-    if (scope == nullptr) {
-        TELEPHONY_LOGE("scope is nullptr");
-        napi_close_handle_scope(env, scope);
+    napi_handle_scope stopRttScope = nullptr;
+    napi_open_handle_scope(env, &stopRttScope);
+    if (stopRttScope == nullptr) {
+        TELEPHONY_LOGE("stopRttScope is nullptr");
+        napi_close_handle_scope(env, stopRttScope);
         return;
     }
     if (supplementInfo.callbackRef != nullptr) {
@@ -1374,7 +1376,7 @@ void NapiCallAbilityCallback::ReportStopRttInfo(AppExecFwk::PacMap &resultInfo, 
             napi_reject_deferred(env, supplementInfo.deferred, NapiCallManagerUtils::CreateErrorMessage(env, errTip));
         }
     }
-    napi_close_handle_scope(env, scope);
+    napi_close_handle_scope(env, stopRttScope);
 }
 
 void NapiCallAbilityCallback::ReportCallMediaModeInfoWork(uv_work_t *work, int32_t status)
@@ -1395,11 +1397,11 @@ void NapiCallAbilityCallback::ReportCallMediaModeInfo(AppExecFwk::PacMap &result
 {
     napi_env env = supplementInfo.env;
     int32_t result = resultInfo.GetIntValue("result");
-    napi_handle_scope scope = nullptr;
-    napi_open_handle_scope(env, &scope);
-    if (scope == nullptr) {
-        TELEPHONY_LOGE("scope is nullptr");
-        napi_close_handle_scope(env, scope);
+    napi_handle_scope CallMediaModeScope = nullptr;
+    napi_open_handle_scope(env, &CallMediaModeScope);
+    if (CallMediaModeScope == nullptr) {
+        TELEPHONY_LOGE("CallMediaModeScope is nullptr");
+        napi_close_handle_scope(env, CallMediaModeScope);
         return;
     }
     if (supplementInfo.callbackRef != nullptr) {
@@ -1429,7 +1431,7 @@ void NapiCallAbilityCallback::ReportCallMediaModeInfo(AppExecFwk::PacMap &result
             napi_reject_deferred(env, supplementInfo.deferred, NapiCallManagerUtils::CreateErrorMessage(env, errTip));
         }
     }
-    napi_close_handle_scope(env, scope);
+    napi_close_handle_scope(env, CallMediaModeScope);
 }
 
 void NapiCallAbilityCallback::ReportCallOttWork(uv_work_t *work, int32_t status)
@@ -1450,11 +1452,11 @@ int32_t NapiCallAbilityCallback::ReportCallOtt(
     EventCallback &settingInfo, AppExecFwk::PacMap &resultInfo, OttCallRequestId requestId)
 {
     napi_env env = settingInfo.env;
-    napi_handle_scope scope = nullptr;
-    napi_open_handle_scope(env, &scope);
-    if (scope == nullptr) {
-        TELEPHONY_LOGE("scope is nullptr");
-        napi_close_handle_scope(env, scope);
+    napi_handle_scope callOttscope = nullptr;
+    napi_open_handle_scope(env, &callOttscope);
+    if (callOttscope == nullptr) {
+        TELEPHONY_LOGE("callOttscope is nullptr");
+        napi_close_handle_scope(env, callOttscope);
         return TELEPHONY_ERROR;
     }
     napi_value callbackFunc = nullptr;
@@ -1484,14 +1486,14 @@ int32_t NapiCallAbilityCallback::ReportCallOtt(
     napi_get_reference_value(env, settingInfo.callbackRef, &callbackFunc);
     if (callbackFunc == nullptr) {
         TELEPHONY_LOGE("callbackFunc is null!");
-        napi_close_handle_scope(env, scope);
+        napi_close_handle_scope(env, callOttscope);
         return CALL_ERR_CALLBACK_NOT_EXIST;
     }
     napi_value thisVar = nullptr;
     napi_get_reference_value(env, settingInfo.thisVar, &thisVar);
     napi_value callbackResult = nullptr;
     napi_call_function(env, thisVar, callbackFunc, DATA_LENGTH_ONE, callbackValues, &callbackResult);
-    napi_close_handle_scope(env, scope);
+    napi_close_handle_scope(env, callOttscope);
     return TELEPHONY_SUCCESS;
 }
 
