@@ -221,18 +221,18 @@ void DialCall()
     int32_t accountId = DEFAULT_ACCOUNT_ID;
     int32_t videoState = DEFAULT_VIDEO_STATE;
     int32_t dialScene = DEFAULT_DIAL_SCENE;
-    int32_t dialType = DEFAULT_DIAL_TYPE;
+    int32_t callDialType = DEFAULT_DIAL_TYPE;
     int32_t callType = DEFAULT_CALL_TYPE;
     std::u16string phoneNumber;
-    std::string tmpStr;
+    std::string numberStr;
     AppExecFwk::PacMap dialInfo;
-    std::cout << "------Dial------" << std::endl;
+    std::cout << "---------Dial---------" << std::endl;
     std::cout << "please input phone number:" << std::endl;
     phoneNumber.clear();
-    tmpStr.clear();
-    std::cin >> tmpStr;
-    phoneNumber = Str8ToStr16(tmpStr);
-    std::cout << "you want to call " << tmpStr << std::endl;
+    numberStr.clear();
+    std::cin >> numberStr;
+    phoneNumber = Str8ToStr16(numberStr);
+    std::cout << "phone number: " << numberStr << std::endl;
     std::cout << "please input accountId:" << std::endl;
     std::cin >> accountId;
     std::cout << "please input videoState[0:audio,1:video]:" << std::endl;
@@ -240,14 +240,14 @@ void DialCall()
     std::cout << "please input dialScene[0:normal,1:privileged,2:emergency]:" << std::endl;
     std::cin >> dialScene;
     std::cout << "please input dialType[0:carrier,1:voice mail,2:ott]:" << std::endl;
-    std::cin >> dialType;
+    std::cin >> callDialType;
     std::cout << "please input callType[0:cs,1:ims,2:ott]:" << std::endl;
     std::cin >> callType;
 
     dialInfo.PutIntValue("accountId", accountId);
     dialInfo.PutIntValue("videoState", videoState);
     dialInfo.PutIntValue("dialScene", dialScene);
-    dialInfo.PutIntValue("dialType", dialType);
+    dialInfo.PutIntValue("dialType", callDialType);
     dialInfo.PutIntValue("callType", callType);
     if (g_clientPtr == nullptr) {
         std::cout << "g_clientPtr is nullptr" << std::endl;
@@ -731,18 +731,18 @@ void FormatPhoneNumber()
 
 void FormatPhoneNumberToE164()
 {
-    std::u16string phoneNumber;
+    std::u16string phoneNumberE164;
     std::u16string countryCode;
     std::u16string formatNumber;
     std::string tmpStr;
     std::cout << "------FormatPhoneNumberToE164------" << std::endl;
     std::cout << "please input phone number:" << std::endl;
-    phoneNumber.clear();
+    phoneNumberE164.clear();
     countryCode.clear();
     formatNumber.clear();
     tmpStr.clear();
     std::cin >> tmpStr;
-    phoneNumber = Str8ToStr16(tmpStr);
+    phoneNumberE164 = Str8ToStr16(tmpStr);
     std::cout << "The number is " << tmpStr << std::endl;
     tmpStr.clear();
     std::cout << "please input countryCode:" << std::endl;
@@ -752,7 +752,7 @@ void FormatPhoneNumberToE164()
         std::cout << "g_clientPtr is nullptr" << std::endl;
         return;
     }
-    int32_t ret = g_clientPtr->FormatPhoneNumberToE164(phoneNumber, countryCode, formatNumber);
+    int32_t ret = g_clientPtr->FormatPhoneNumberToE164(phoneNumberE164, countryCode, formatNumber);
     std::cout << "return value:" << ret << std::endl;
     std::cout << "return number:" << Str16ToStr8(formatNumber) << std::endl;
 }
@@ -872,20 +872,19 @@ void GetVolume()
     std::cout << "------GetVolume------" << std::endl;
     std::cout << "please input volume type(3:ring 4:music)" << std::endl;
     std::cin >> type;
-    AudioStandard::AudioVolumeType volumeType =
-        AudioStandard::AudioVolumeType::STREAM_MUSIC;
+    AudioStandard::AudioVolumeType audioVolumeType = AudioStandard::AudioVolumeType::STREAM_MUSIC;
     switch (type) {
         case AudioStandard::AudioVolumeType::STREAM_RING:
-            volumeType = AudioStandard::AudioVolumeType::STREAM_RING;
+            audioVolumeType = AudioStandard::AudioVolumeType::STREAM_RING;
             break;
         case AudioStandard::AudioVolumeType::STREAM_MUSIC:
-            volumeType = AudioStandard::AudioVolumeType::STREAM_MUSIC;
+            audioVolumeType = AudioStandard::AudioVolumeType::STREAM_MUSIC;
             break;
         default:
             break;
     }
     AudioStandard::AudioSystemManager *audioSystemMgr = AudioStandard::AudioSystemManager::GetInstance();
-    int32_t ret = audioSystemMgr->GetVolume(volumeType);
+    int32_t ret = audioSystemMgr->GetVolume(audioVolumeType);
     std::cout << "return value:" << ret << std::endl;
 }
 

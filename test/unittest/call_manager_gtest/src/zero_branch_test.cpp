@@ -77,25 +77,27 @@ constexpr const char *LONG_STR =
 
 class DemoHandler : public AppExecFwk::EventHandler {
 public:
-    explicit DemoHandler(std::shared_ptr<AppExecFwk::EventRunner> &runner) : AppExecFwk::EventHandler(runner) {}
+    explicit DemoHandler(std::shared_ptr<AppExecFwk::EventRunner> &eventRunner) : AppExecFwk::EventHandler(eventRunner)
+    {}
     virtual ~DemoHandler() {}
     void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event) {}
 };
 
 class BranchTest : public testing::Test {
 public:
-    static void SetUpTestCase();
-    static void TearDownTestCase();
     void SetUp();
     void TearDown();
+    static void SetUpTestCase();
+    static void TearDownTestCase();
 };
-void BranchTest::SetUpTestCase() {}
-
-void BranchTest::TearDownTestCase() {}
 
 void BranchTest::SetUp() {}
 
 void BranchTest::TearDown() {}
+
+void BranchTest::SetUpTestCase() {}
+
+void BranchTest::TearDownTestCase() {}
 
 /**
  * @tc.number   Telephony_CallRequestHandler_001
