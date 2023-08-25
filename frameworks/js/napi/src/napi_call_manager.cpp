@@ -2118,7 +2118,7 @@ napi_value NapiCallManager::HasCallSync(napi_env env, napi_callback_info info)
         hasCall = DelayedSingleton<CallManagerClient>::GetInstance()->HasCall();
     }
     napi_value value = nullptr;
-    NAPI_CALL(env, napi_create_int32(env, hasCall, &value));
+    NAPI_CALL(env, napi_get_boolean(env, hasCall, &value));
     return value;
 }
 
