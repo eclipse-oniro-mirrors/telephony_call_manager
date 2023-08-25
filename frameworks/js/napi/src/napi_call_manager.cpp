@@ -296,6 +296,12 @@ napi_value NapiCallManager::DeclareCallEventEnum(napi_env env, napi_value export
         DECLARE_NAPI_STATIC_PROPERTY("EVENT_INVALID_FDN_NUMBER",
             NapiCallManagerUtils::ToInt32Value(
                 env, static_cast<int32_t>(CallAbilityEventId::EVENT_INVALID_FDN_NUMBER))),
+        DECLARE_NAPI_STATIC_PROPERTY("EVENT_HOLD_SEND_FAILED",
+            NapiCallManagerUtils::ToInt32Value(
+                env, static_cast<int32_t>(CallAbilityEventId::EVENT_HOLD_SEND_FAILED))),
+        DECLARE_NAPI_STATIC_PROPERTY("EVENT_SWAP_SEND_FAILED",
+            NapiCallManagerUtils::ToInt32Value(
+                env, static_cast<int32_t>(CallAbilityEventId::EVENT_SWAP_SEND_FAILED))),
     };
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc));
     return exports;
@@ -598,6 +604,12 @@ napi_value NapiCallManager::DeclareCallEventEnumEx(napi_env env, napi_value expo
         DECLARE_NAPI_STATIC_PROPERTY("EVENT_INVALID_FDN_NUMBER",
             NapiCallManagerUtils::ToInt32Value(
                 env, static_cast<int32_t>(CallAbilityEventId::EVENT_INVALID_FDN_NUMBER))),
+        DECLARE_NAPI_STATIC_PROPERTY("EVENT_HOLD_SEND_FAILED",
+            NapiCallManagerUtils::ToInt32Value(
+                env, static_cast<int32_t>(CallAbilityEventId::EVENT_HOLD_SEND_FAILED))),
+        DECLARE_NAPI_STATIC_PROPERTY("EVENT_SWAP_SEND_FAILED",
+            NapiCallManagerUtils::ToInt32Value(
+                env, static_cast<int32_t>(CallAbilityEventId::EVENT_SWAP_SEND_FAILED))),
     };
     napi_value result = nullptr;
     napi_define_class(env, "CallAbilityEventId", NAPI_AUTO_LENGTH, NapiCallManagerUtils::CreateEnumConstructor, nullptr,
