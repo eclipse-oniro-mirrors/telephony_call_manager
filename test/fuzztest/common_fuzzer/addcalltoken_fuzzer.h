@@ -17,8 +17,13 @@
 #define ADD_CALL_TOKEN_FUZZER
 
 #include "accesstoken_kit.h"
+#include "call_manager_service.h"
+#include "system_ability_definition.h"
 
 namespace OHOS {
+
+bool IsServiceInited();
+
 class AddCallTokenFuzzer {
 public:
     AddCallTokenFuzzer();

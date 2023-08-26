@@ -19,24 +19,9 @@
 #include <cstdint>
 #define private public
 #include "addcalltoken_fuzzer.h"
-#include "call_manager_service.h"
-#include "system_ability_definition.h"
 
 using namespace OHOS::Telephony;
 namespace OHOS {
-static bool g_isInited = false;
-
-bool IsServiceInited()
-{
-    if (!g_isInited) {
-        DelayedSingleton<CallManagerService>::GetInstance()->OnStart();
-        if (DelayedSingleton<CallManagerService>::GetInstance()->GetServiceRunningState() ==
-            static_cast<int32_t>(CallManagerService::ServiceRunningState::STATE_RUNNING)) {
-            g_isInited = true;
-        }
-    }
-    return g_isInited;
-}
 
 int32_t ControlCamera(const uint8_t *data, size_t size)
 {
@@ -57,15 +42,15 @@ int32_t SetPreviewWindow(const uint8_t *data, size_t size)
     if (!IsServiceInited()) {
         return TELEPHONY_ERROR;
     }
-    VideoWindow window;
-    window.x = static_cast<int32_t>(size);
-    window.y = static_cast<int32_t>(size);
-    window.z = static_cast<int32_t>(size);
-    window.width = static_cast<int32_t>(size);
-    window.height = static_cast<int32_t>(size);
+    VideoWindow previewWindow;
+    previewWindow.x = static_cast<int32_t>(size);
+    previewWindow.y = static_cast<int32_t>(size);
+    previewWindow.z = static_cast<int32_t>(size);
+    previewWindow.width = static_cast<int32_t>(size);
+    previewWindow.height = static_cast<int32_t>(size);
     MessageParcel dataParcel;
     MessageParcel reply;
-    dataParcel.WriteRawData(static_cast<const void *>(&window), sizeof(VideoWindow));
+    dataParcel.WriteRawData(static_cast<const void *>(&previewWindow), sizeof(VideoWindow));
     return DelayedSingleton<CallManagerService>::GetInstance()->OnSetPreviewWindow(dataParcel, reply);
 }
 

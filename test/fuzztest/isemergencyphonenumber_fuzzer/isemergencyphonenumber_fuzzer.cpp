@@ -19,25 +19,10 @@
 #include <cstdint>
 #define private public
 #include "addcalltoken_fuzzer.h"
-#include "call_manager_service.h"
-#include "system_ability_definition.h"
 
 using namespace OHOS::Telephony;
 namespace OHOS {
-static bool g_isInited = false;
 constexpr int32_t SLOT_NUM = 2;
-
-bool IsServiceInited()
-{
-    if (!g_isInited) {
-        DelayedSingleton<CallManagerService>::GetInstance()->OnStart();
-        if (DelayedSingleton<CallManagerService>::GetInstance()->GetServiceRunningState() ==
-            static_cast<int32_t>(CallManagerService::ServiceRunningState::STATE_RUNNING)) {
-            g_isInited = true;
-        }
-    }
-    return g_isInited;
-}
 
 bool IsEmergencyPhoneNumber(const uint8_t *data, size_t size)
 {
@@ -64,7 +49,7 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
 
     IsEmergencyPhoneNumber(data, size);
 }
-}  // namespace OHOS
+} // namespace OHOS
 
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)

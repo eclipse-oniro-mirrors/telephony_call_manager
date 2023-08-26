@@ -21,7 +21,6 @@
 #define private public
 #include "addcalltoken_fuzzer.h"
 #include "call_data_base_helper.h"
-#include "call_manager_service.h"
 #include "cs_call.h"
 #include "incoming_call_notification.h"
 #include "incoming_call_wake_up.h"
@@ -29,26 +28,12 @@
 #include "proximity_sensor.h"
 #include "reject_call_sms.h"
 #include "status_bar.h"
-#include "system_ability_definition.h"
 #include "wired_headset.h"
 
 using namespace OHOS::Telephony;
 namespace OHOS {
-static bool g_isInited = false;
 constexpr int32_t CALL_STATE_NUM = 8;
 constexpr int32_t BOOL_NUM = 2;
-
-bool IsServiceInited()
-{
-    if (!g_isInited) {
-        DelayedSingleton<CallManagerService>::GetInstance()->OnStart();
-        if (DelayedSingleton<CallManagerService>::GetInstance()->GetServiceRunningState() ==
-            static_cast<int32_t>(CallManagerService::ServiceRunningState::STATE_RUNNING)) {
-            g_isInited = true;
-        }
-    }
-    return g_isInited;
-}
 
 void IncomingCallNotificationFunc(const uint8_t *data, size_t size)
 {

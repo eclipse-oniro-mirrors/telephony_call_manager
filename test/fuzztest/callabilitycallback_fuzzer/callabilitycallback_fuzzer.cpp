@@ -22,12 +22,9 @@
 #include "call_ability_callback.h"
 #include "call_ability_callback_proxy.h"
 #include "call_manager_callback.h"
-#include "call_manager_service.h"
-#include "system_ability_definition.h"
 
 using namespace OHOS::Telephony;
 namespace OHOS {
-static bool g_isInited = false;
 constexpr int32_t ACCOUNT_ID_NUM = 10;
 constexpr int32_t BOOL_NUM = 2;
 constexpr int32_t CALL_ID_NUM = 10;
@@ -37,25 +34,21 @@ constexpr int32_t OTT_ID_NUM = 11;
 constexpr int32_t VEDIO_STATE_NUM = 2;
 sptr<CallAbilityCallback> callAbilityCallbackPtr_ = nullptr;
 
-bool IsServiceInited()
+bool ServiceInited()
 {
-    if (!g_isInited) {
-        DelayedSingleton<CallManagerService>::GetInstance()->OnStart();
-        if (DelayedSingleton<CallManagerService>::GetInstance()->GetServiceRunningState() ==
-            static_cast<int32_t>(CallManagerService::ServiceRunningState::STATE_RUNNING)) {
-            g_isInited = true;
-        }
+    if (!IsServiceInited()) {
+        return false;
     }
     callAbilityCallbackPtr_ = new (std::nothrow) CallAbilityCallback();
     if (callAbilityCallbackPtr_ == nullptr) {
-        g_isInited = false;
+        return false;
     }
-    return g_isInited;
+    return true;
 }
 
 int32_t OnRemoteRequest(const uint8_t *data, size_t size)
 {
-    if (!IsServiceInited()) {
+    if (!ServiceInited()) {
         return TELEPHONY_ERROR;
     }
     MessageParcel dataMessageParcel;
@@ -71,7 +64,7 @@ int32_t OnRemoteRequest(const uint8_t *data, size_t size)
 
 int32_t UpdateCallStateInfo(const uint8_t *data, size_t size)
 {
-    if (!IsServiceInited()) {
+    if (!ServiceInited()) {
         return TELEPHONY_ERROR;
     }
     CallAttributeInfo info;
@@ -99,7 +92,7 @@ int32_t UpdateCallStateInfo(const uint8_t *data, size_t size)
 
 int32_t UpdateCallEvent(const uint8_t *data, size_t size)
 {
-    if (!IsServiceInited()) {
+    if (!ServiceInited()) {
         return TELEPHONY_ERROR;
     }
     CallEventInfo info;
@@ -120,7 +113,7 @@ int32_t UpdateCallEvent(const uint8_t *data, size_t size)
 
 int32_t UpdateCallDisconnectedCause(const uint8_t *data, size_t size)
 {
-    if (!IsServiceInited()) {
+    if (!ServiceInited()) {
         return TELEPHONY_ERROR;
     }
     int32_t reason = static_cast<uint32_t>(size);
@@ -136,7 +129,7 @@ int32_t UpdateCallDisconnectedCause(const uint8_t *data, size_t size)
 
 int32_t UpdateAysncResults(const uint8_t *data, size_t size)
 {
-    if (!IsServiceInited()) {
+    if (!ServiceInited()) {
         return TELEPHONY_ERROR;
     }
     int32_t reportId = static_cast<uint32_t>(size % REPORT_ID_NUM);
@@ -152,7 +145,7 @@ int32_t UpdateAysncResults(const uint8_t *data, size_t size)
 
 int32_t UpdateOttCallRequest(const uint8_t *data, size_t size)
 {
-    if (!IsServiceInited()) {
+    if (!ServiceInited()) {
         return TELEPHONY_ERROR;
     }
     int32_t requestId = static_cast<uint32_t>(size % OTT_ID_NUM);
@@ -172,7 +165,7 @@ int32_t UpdateOttCallRequest(const uint8_t *data, size_t size)
 
 int32_t UpdateMmiCodeResults(const uint8_t *data, size_t size)
 {
-    if (!IsServiceInited()) {
+    if (!ServiceInited()) {
         return TELEPHONY_ERROR;
     }
     MmiCodeInfo info;
@@ -192,7 +185,7 @@ int32_t UpdateMmiCodeResults(const uint8_t *data, size_t size)
 
 int32_t UpdateAudioDeviceChange(const uint8_t *data, size_t size)
 {
-    if (!IsServiceInited()) {
+    if (!ServiceInited()) {
         return TELEPHONY_ERROR;
     }
     MessageParcel dataMessageParcel;

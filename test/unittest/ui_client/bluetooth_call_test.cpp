@@ -126,7 +126,7 @@ class AccessToken {
 public:
     AccessToken()
     {
-        currentID_ = GetSelfTokenID();
+        currentTokenID_ = GetSelfTokenID();
         AccessTokenIDEx tokenIdEx = AccessTokenKit::AllocHapToken(testInfoParamsCase, testPolicyParamsCase);
         accessID_ = tokenIdEx.tokenIdExStruct.tokenID;
         SetSelfTokenID(tokenIdEx.tokenIDEx);
@@ -134,11 +134,11 @@ public:
     ~AccessToken()
     {
         AccessTokenKit::DeleteToken(accessID_);
-        SetSelfTokenID(currentID_);
+        SetSelfTokenID(currentTokenID_);
     }
 
 private:
-    AccessTokenID currentID_ = 0;
+    AccessTokenID currentTokenID_ = 0;
     AccessTokenID accessID_ = 0;
 };
 
@@ -253,24 +253,24 @@ void BluetoothCallTest::DialCall()
 {
     AccessToken token;
     int32_t accountId = DEFAULT_ACCOUNT_ID;
-    int32_t videoState = DEFAULT_VIDEO_STATE;
+    int32_t videoCallState = DEFAULT_VIDEO_STATE;
     int32_t dialScene = DEFAULT_DIAL_SCENE;
     int32_t dialType = DEFAULT_DIAL_TYPE;
     int32_t callType = DEFAULT_CALL_TYPE;
-    std::u16string phoneNumber;
+    std::u16string u16PhoneNumber;
     std::string tmpStr;
     AppExecFwk::PacMap dialInfo;
-    std::cout << "------Dial------" << std::endl;
+    std::cout << "-------Dial-------" << std::endl;
     std::cout << "please input phone number:" << std::endl;
-    phoneNumber.clear();
+    u16PhoneNumber.clear();
     tmpStr.clear();
     std::cin >> tmpStr;
-    phoneNumber = Str8ToStr16(tmpStr);
+    u16PhoneNumber = Str8ToStr16(tmpStr);
     std::cout << "you want to call " << tmpStr << std::endl;
     std::cout << "please input accountId:" << std::endl;
     std::cin >> accountId;
     std::cout << "please input videoState[0:audio,1:video]:" << std::endl;
-    std::cin >> videoState;
+    std::cin >> videoCallState;
     std::cout << "please input dialScene[0:normal,1:privileged,2:emergency]:" << std::endl;
     std::cin >> dialScene;
     std::cout << "please input dialType[0:carrier,1:voice mail,2:ott]:" << std::endl;
@@ -279,7 +279,7 @@ void BluetoothCallTest::DialCall()
     std::cin >> callType;
 
     dialInfo.PutIntValue("accountId", accountId);
-    dialInfo.PutIntValue("videoState", videoState);
+    dialInfo.PutIntValue("videoState", videoCallState);
     dialInfo.PutIntValue("dialScene", dialScene);
     dialInfo.PutIntValue("dialType", dialType);
     dialInfo.PutIntValue("callType", callType);
@@ -287,7 +287,7 @@ void BluetoothCallTest::DialCall()
         std::cout << "g_bluetoothCallPtr is nullptr" << std::endl;
         return;
     }
-    int32_t ret = g_bluetoothCallPtr->DialCall(phoneNumber, dialInfo);
+    int32_t ret = g_bluetoothCallPtr->DialCall(u16PhoneNumber, dialInfo);
     std::cout << "return value:" << ret << std::endl;
 }
 

@@ -19,15 +19,12 @@
 #include <cstdint>
 #define private public
 #include "addcalltoken_fuzzer.h"
-#include "call_manager_service.h"
 #include "cs_call.h"
 #include "ims_call.h"
 #include "ott_call.h"
-#include "system_ability_definition.h"
 
 using namespace OHOS::Telephony;
 namespace OHOS {
-static bool g_isInited = false;
 constexpr int32_t SLOT_NUM = 2;
 constexpr int32_t BOOL_NUM = 2;
 constexpr int32_t DIAL_TYPE = 3;
@@ -40,30 +37,18 @@ constexpr int32_t CALL_ENDED_TYPE_NUM = 4;
 constexpr int32_t CALL_ANSWER_TYPE_NUM = 3;
 constexpr int32_t INVALID_CALL_ID = -1;
 
-bool IsServiceInited()
-{
-    if (!g_isInited) {
-        DelayedSingleton<CallManagerService>::GetInstance()->OnStart();
-        if (DelayedSingleton<CallManagerService>::GetInstance()->GetServiceRunningState() ==
-            static_cast<int32_t>(CallManagerService::ServiceRunningState::STATE_RUNNING)) {
-            g_isInited = true;
-        }
-    }
-    return g_isInited;
-}
-
 void CSCallFunc(const uint8_t *data, size_t size)
 {
     if (!IsServiceInited()) {
         return;
     }
 
-    DialParaInfo paraInfo;
-    paraInfo.dialType = static_cast<DialType>(size % DIAL_TYPE);
-    paraInfo.callType = static_cast<CallType>(size % CALL_TYPE_NUM);
-    paraInfo.videoState = static_cast<VideoStateType>(size % VIDIO_TYPE_NUM);
-    paraInfo.callState = static_cast<TelCallState>(size % TEL_CALL_STATE_NUM);
-    sptr<CallBase> callObjectPtr = std::make_unique<CSCall>(paraInfo).release();
+    DialParaInfo dialParaInfo;
+    dialParaInfo.dialType = static_cast<DialType>(size % DIAL_TYPE);
+    dialParaInfo.callType = static_cast<CallType>(size % CALL_TYPE_NUM);
+    dialParaInfo.videoState = static_cast<VideoStateType>(size % VIDIO_TYPE_NUM);
+    dialParaInfo.callState = static_cast<TelCallState>(size % TEL_CALL_STATE_NUM);
+    sptr<CallBase> callObjectPtr = std::make_unique<CSCall>(dialParaInfo).release();
     int32_t videoState = static_cast<int32_t>(size % VIDIO_TYPE_NUM);
     int32_t mute = static_cast<int32_t>(size % BOOL_NUM);
     int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
@@ -117,8 +102,8 @@ void DialingProcess(const uint8_t *data, size_t size)
     callObjectPtr->CombineConference(); // merge calls
     callObjectPtr->SeparateConference();
     callObjectPtr->KickOutFromConference();
-    callObjectPtr->CanCombineConference();
     callObjectPtr->CanSeparateConference();
+    callObjectPtr->CanCombineConference();
     callObjectPtr->CanKickOutFromConference();
     callObjectPtr->LaunchConference();
     callObjectPtr->ExitConference();
@@ -139,12 +124,12 @@ void GetCallerInfo(const uint8_t *data, size_t size)
         return;
     }
 
-    DialParaInfo paraInfo;
-    paraInfo.dialType = static_cast<DialType>(size % DIAL_TYPE);
-    paraInfo.callType = static_cast<CallType>(size % CALL_TYPE_NUM);
-    paraInfo.videoState = static_cast<VideoStateType>(size % VIDIO_TYPE_NUM);
-    paraInfo.callState = static_cast<TelCallState>(size % TEL_CALL_STATE_NUM);
-    sptr<CallBase> callObjectPtr = std::make_unique<CSCall>(paraInfo).release();
+    DialParaInfo info;
+    info.dialType = static_cast<DialType>(size % DIAL_TYPE);
+    info.callType = static_cast<CallType>(size % CALL_TYPE_NUM);
+    info.videoState = static_cast<VideoStateType>(size % VIDIO_TYPE_NUM);
+    info.callState = static_cast<TelCallState>(size % TEL_CALL_STATE_NUM);
+    sptr<CallBase> callObjectPtr = std::make_unique<CSCall>(info).release();
     ContactInfo contactInfo;
     CallRunningState callRunningState = static_cast<CallRunningState>(size % CALL_RUNNING_STATE_NUM);
     bool speakerphoneOn = static_cast<bool>(size % BOOL_NUM);
@@ -208,15 +193,15 @@ void IMSCallFunc(const uint8_t *data, size_t size)
     callObjectPtr->AnswerCall(videoState);
     callObjectPtr->RejectCall();
     callObjectPtr->HangUpCall();
-    callObjectPtr->HoldCall();
     callObjectPtr->UnHoldCall();
+    callObjectPtr->HoldCall();
     callObjectPtr->SwitchCall();
     callObjectPtr->CombineConference();
     callObjectPtr->SeparateConference();
     callObjectPtr->KickOutFromConference();
+    callObjectPtr->CanKickOutFromConference();
     callObjectPtr->CanCombineConference();
     callObjectPtr->CanSeparateConference();
-    callObjectPtr->CanKickOutFromConference();
     callObjectPtr->LaunchConference();
     callObjectPtr->ExitConference();
     callObjectPtr->HoldConference();

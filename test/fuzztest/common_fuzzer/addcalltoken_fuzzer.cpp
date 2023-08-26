@@ -13,15 +13,28 @@
  * limitations under the License.
  */
 
+#define private public
 #include "addcalltoken_fuzzer.h"
-
-#include <iostream>
 
 #include "nativetoken_kit.h"
 #include "token_setproc.h"
 
+using namespace OHOS::Telephony;
 namespace OHOS {
 const int PERMS_NUM = 6;
+static bool g_isInited = false;
+
+bool IsServiceInited()
+{
+    if (!g_isInited) {
+        DelayedSingleton<CallManagerService>::GetInstance()->OnStart();
+        if (DelayedSingleton<CallManagerService>::GetInstance()->GetServiceRunningState() ==
+            static_cast<int32_t>(CallManagerService::ServiceRunningState::STATE_RUNNING)) {
+            g_isInited = true;
+        }
+    }
+    return g_isInited;
+}
 
 AddCallTokenFuzzer::AddCallTokenFuzzer()
 {

@@ -19,38 +19,32 @@
 #include <cstdint>
 #define private public
 #include "addcalltoken_fuzzer.h"
-#include "call_manager_service.h"
 #include "call_status_callback_proxy.h"
-#include "system_ability_definition.h"
 
 using namespace OHOS::Telephony;
 namespace OHOS {
-static bool g_isInited = false;
 constexpr int32_t SLOT_NUM = 2;
 constexpr int32_t ACCOUNT_ID_NUM = 10;
 constexpr int32_t MULTI_PARTY_NUM = 10;
 constexpr int32_t VOICE_DOMAIN_NUM = 10;
 std::unique_ptr<CallStatusCallback> CallStatusCallbackPtr_ = nullptr;
 
-bool IsServiceInited()
+bool ServiceInited()
 {
-    if (!g_isInited) {
-        DelayedSingleton<CallManagerService>::GetInstance()->OnStart();
-        if (DelayedSingleton<CallManagerService>::GetInstance()->GetServiceRunningState() ==
-            static_cast<int32_t>(CallManagerService::ServiceRunningState::STATE_RUNNING)) {
-            g_isInited = true;
-        }
+    bool result = true;
+    if (!IsServiceInited()) {
+        return false;
     }
     CallStatusCallbackPtr_ = std::make_unique<CallStatusCallback>();
     if (CallStatusCallbackPtr_ == nullptr) {
-        g_isInited = false;
+        result = false;
     }
-    return g_isInited;
+    return result;
 }
 
 int32_t OnRemoteRequest(const uint8_t *data, size_t size)
 {
-    if (!IsServiceInited()) {
+    if (!ServiceInited()) {
         return TELEPHONY_ERROR;
     }
     MessageParcel dataMessageParcel;
@@ -66,27 +60,27 @@ int32_t OnRemoteRequest(const uint8_t *data, size_t size)
 
 int32_t UpdateCallReportInfo(const uint8_t *data, size_t size)
 {
-    if (!IsServiceInited()) {
+    if (!ServiceInited()) {
         return TELEPHONY_ERROR;
     }
     MessageParcel dataParcel;
     if (!dataParcel.WriteInterfaceToken(CallStatusCallbackProxy::GetDescriptor())) {
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
-    CallReportInfo info;
+    CallReportInfo callReportInfo;
     int32_t length = sizeof(CallReportInfo);
-    info.index = static_cast<int32_t>(size);
-    info.accountId = static_cast<int32_t>(size % ACCOUNT_ID_NUM);
-    info.voiceDomain = static_cast<int32_t>(size % VOICE_DOMAIN_NUM);
-    info.mpty = static_cast<int32_t>(size % MULTI_PARTY_NUM);
-    info.callType = CallType::TYPE_ERR_CALL;
-    info.callMode = VideoStateType::TYPE_VOICE;
-    info.state = TelCallState::CALL_STATUS_UNKNOWN;
+    callReportInfo.index = static_cast<int32_t>(size);
+    callReportInfo.accountId = static_cast<int32_t>(size % ACCOUNT_ID_NUM);
+    callReportInfo.voiceDomain = static_cast<int32_t>(size % VOICE_DOMAIN_NUM);
+    callReportInfo.mpty = static_cast<int32_t>(size % MULTI_PARTY_NUM);
+    callReportInfo.callType = CallType::TYPE_ERR_CALL;
+    callReportInfo.callMode = VideoStateType::TYPE_VOICE;
+    callReportInfo.state = TelCallState::CALL_STATUS_UNKNOWN;
     std::string msg(reinterpret_cast<const char *>(data), size);
     int32_t accountLength = msg.length() > kMaxNumberLen ? kMaxNumberLen : msg.length();
-    memcpy_s(info.accountNum, kMaxNumberLen, msg.c_str(), accountLength);
+    memcpy_s(callReportInfo.accountNum, kMaxNumberLen, msg.c_str(), accountLength);
     dataParcel.WriteInt32(length);
-    dataParcel.WriteRawData((const void *)&info, length);
+    dataParcel.WriteRawData((const void *)&callReportInfo, length);
     dataParcel.RewindRead(0);
     MessageParcel reply;
     return CallStatusCallbackPtr_->OnUpdateCallReportInfo(dataParcel, reply);
@@ -94,7 +88,7 @@ int32_t UpdateCallReportInfo(const uint8_t *data, size_t size)
 
 int32_t UpdateCallsReportInfo(const uint8_t *data, size_t size)
 {
-    if (!IsServiceInited()) {
+    if (!ServiceInited()) {
         return TELEPHONY_ERROR;
     }
     MessageParcel dataParcel;
@@ -126,7 +120,7 @@ int32_t UpdateCallsReportInfo(const uint8_t *data, size_t size)
 
 int32_t UpdateEventReport(const uint8_t *data, size_t size)
 {
-    if (!IsServiceInited()) {
+    if (!ServiceInited()) {
         return TELEPHONY_ERROR;
     }
     MessageParcel dataParcel;
@@ -146,7 +140,7 @@ int32_t UpdateEventReport(const uint8_t *data, size_t size)
 
 int32_t UpdateGetWaitingResult(const uint8_t *data, size_t size)
 {
-    if (!IsServiceInited()) {
+    if (!ServiceInited()) {
         return TELEPHONY_ERROR;
     }
     MessageParcel dataParcel;
@@ -167,7 +161,7 @@ int32_t UpdateGetWaitingResult(const uint8_t *data, size_t size)
 
 int32_t UpdateGetRestrictionResult(const uint8_t *data, size_t size)
 {
-    if (!IsServiceInited()) {
+    if (!ServiceInited()) {
         return TELEPHONY_ERROR;
     }
     MessageParcel dataParcel;
@@ -188,7 +182,7 @@ int32_t UpdateGetRestrictionResult(const uint8_t *data, size_t size)
 
 int32_t UpdateGetTransferResult(const uint8_t *data, size_t size)
 {
-    if (!IsServiceInited()) {
+    if (!ServiceInited()) {
         return TELEPHONY_ERROR;
     }
     MessageParcel dataParcel;
@@ -219,7 +213,7 @@ int32_t UpdateGetTransferResult(const uint8_t *data, size_t size)
 
 int32_t UpdateGetCallClipResult(const uint8_t *data, size_t size)
 {
-    if (!IsServiceInited()) {
+    if (!ServiceInited()) {
         return TELEPHONY_ERROR;
     }
     MessageParcel dataParcel;
@@ -240,7 +234,7 @@ int32_t UpdateGetCallClipResult(const uint8_t *data, size_t size)
 
 int32_t GetImsConfigResult(const uint8_t *data, size_t size)
 {
-    if (!IsServiceInited()) {
+    if (!ServiceInited()) {
         return TELEPHONY_ERROR;
     }
     MessageParcel dataParcel;
@@ -260,7 +254,7 @@ int32_t GetImsConfigResult(const uint8_t *data, size_t size)
 
 int32_t GetImsFeatureValueResult(const uint8_t *data, size_t size)
 {
-    if (!IsServiceInited()) {
+    if (!ServiceInited()) {
         return TELEPHONY_ERROR;
     }
     MessageParcel dataParcel;
@@ -280,7 +274,7 @@ int32_t GetImsFeatureValueResult(const uint8_t *data, size_t size)
 
 int32_t ReceiveUpdateMediaModeResponse(const uint8_t *data, size_t size)
 {
-    if (!IsServiceInited()) {
+    if (!ServiceInited()) {
         return TELEPHONY_ERROR;
     }
     MessageParcel dataParcel;
@@ -302,7 +296,7 @@ int32_t ReceiveUpdateMediaModeResponse(const uint8_t *data, size_t size)
 
 int32_t SendMmiCodeResult(const uint8_t *data, size_t size)
 {
-    if (!IsServiceInited()) {
+    if (!ServiceInited()) {
         return TELEPHONY_ERROR;
     }
     MessageParcel dataParcel;

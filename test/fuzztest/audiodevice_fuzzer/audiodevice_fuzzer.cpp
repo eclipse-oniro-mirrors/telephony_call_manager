@@ -20,13 +20,10 @@
 #define private public
 #include "addcalltoken_fuzzer.h"
 #include "audio_control_manager.h"
-#include "call_manager_service.h"
 #include "cs_call.h"
-#include "system_ability_definition.h"
 
 using namespace OHOS::Telephony;
 namespace OHOS {
-static bool g_isInited = false;
 constexpr int32_t BOOL_NUM = 2;
 constexpr int32_t CALL_TYPE_NUM = 4;
 constexpr int32_t RING_STATE_NUM = 2;
@@ -37,18 +34,6 @@ constexpr int32_t AUDIO_DEVICE_NUM = 6;
 constexpr int32_t AUDIO_EVENT = 30;
 constexpr int32_t AUDIO_SCENE_NUM = 4;
 constexpr int32_t AUDIO_VOLUME_TYPE_NUM = 13;
-
-bool IsServiceInited()
-{
-    if (!g_isInited) {
-        DelayedSingleton<CallManagerService>::GetInstance()->OnStart();
-        if (DelayedSingleton<CallManagerService>::GetInstance()->GetServiceRunningState() ==
-            static_cast<int32_t>(CallManagerService::ServiceRunningState::STATE_RUNNING)) {
-            g_isInited = true;
-        }
-    }
-    return g_isInited;
-}
 
 void AudioControlManagerFunc(const uint8_t *data, size_t size)
 {

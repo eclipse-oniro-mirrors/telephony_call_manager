@@ -19,26 +19,11 @@
 #include <cstdint>
 #define private public
 #include "addcalltoken_fuzzer.h"
-#include "call_manager_service.h"
-#include "system_ability_definition.h"
 
 using namespace OHOS::Telephony;
 namespace OHOS {
-static bool g_isInited = false;
 constexpr int32_t SLOT_NUM = 2;
 constexpr int32_t CALLS_NUM = 5;
-
-bool IsServiceInited()
-{
-    if (!g_isInited) {
-        DelayedSingleton<CallManagerService>::GetInstance()->OnStart();
-        if (DelayedSingleton<CallManagerService>::GetInstance()->GetServiceRunningState() ==
-            static_cast<int32_t>(CallManagerService::ServiceRunningState::STATE_RUNNING)) {
-            g_isInited = true;
-        }
-    }
-    return g_isInited;
-}
 
 int32_t GetMainCallId(const uint8_t *data, size_t size)
 {
@@ -62,8 +47,8 @@ int32_t GetSubCallIdList(const uint8_t *data, size_t size)
         return TELEPHONY_ERROR;
     }
     MessageParcel dataParcel;
-    int32_t callId = static_cast<int32_t>(size);
-    dataParcel.WriteInt32(callId);
+    int32_t id = static_cast<int32_t>(size);
+    dataParcel.WriteInt32(id);
     dataParcel.WriteBuffer(data, size);
     dataParcel.RewindRead(0);
     MessageParcel reply;
@@ -183,7 +168,7 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     CloseUnFinishedUssd(data, size);
     FormatPhoneNumber(data, size);
 }
-}  // namespace OHOS
+} // namespace OHOS
 
 /* Fuzzer entry point */
 extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size)
