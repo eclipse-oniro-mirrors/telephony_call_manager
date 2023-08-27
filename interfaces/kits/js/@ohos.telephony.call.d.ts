@@ -191,8 +191,8 @@ declare namespace call {
   /**
    * Checks whether a call is ongoing.
    *
-   * @returns Returns {@code true} if at least one call is not in the {@link CallState#CALL_STATE_IDLE} state;
-   * returns {@code false} otherwise.
+   * @returns { boolean } Returns {@code true} if at least one call is not in the {@link CallState#CALL_STATE_IDLE}
+   * state; returns {@code false} otherwise.
    * @syscap SystemCapability.Telephony.CallManager
    * @since 10
    */
@@ -233,7 +233,7 @@ declare namespace call {
    * If at least one call is in the active, hold, or dialing state, the system returns
    * {@code CallState#CALL_STATE_OFFHOOK}. In other cases, the system returns {@code CallState#CALL_STATE_IDLE}.
    *
-   * @returns Returns the call state.
+   * @returns { CallState } Returns the call state.
    * @syscap SystemCapability.Telephony.CallManager
    * @since 10
    */
