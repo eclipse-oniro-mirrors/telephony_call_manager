@@ -102,8 +102,10 @@ public:
     static napi_value StopDTMF(napi_env env, napi_callback_info info);
     static napi_value PostDialProceed(napi_env env, napi_callback_info info);
     static napi_value GetCallState(napi_env env, napi_callback_info info);
+    static napi_value GetCallStateSync(napi_env env, napi_callback_info info);
     static napi_value IsRinging(napi_env env, napi_callback_info info);
     static napi_value HasCall(napi_env env, napi_callback_info info);
+    static napi_value HasCallSync(napi_env env, napi_callback_info info);
     static napi_value IsNewCallAllowed(napi_env env, napi_callback_info info);
     static napi_value IsInEmergencyCall(napi_env env, napi_callback_info info);
     static napi_value IsEmergencyPhoneNumber(napi_env env, napi_callback_info info);
