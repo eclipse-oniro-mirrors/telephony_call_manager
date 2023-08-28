@@ -545,10 +545,6 @@ enum class CallAbilityEventId {
      */
     EVENT_INVALID_FDN_NUMBER,
     /**
-     * Indicates that the OTT is not supported.
-     */
-    EVENT_OTT_FUNCTION_UNSUPPORTED,
-    /**
      * Indicates hold call fail.
      */
     EVENT_HOLD_SEND_FAILED,
@@ -556,6 +552,10 @@ enum class CallAbilityEventId {
      * Indicates swap call fail.
      */
     EVENT_SWAP_SEND_FAILED,
+    /**
+     * Indicates that the OTT is not supported.
+     */
+    EVENT_OTT_FUNCTION_UNSUPPORTED,
 };
 
 /**
