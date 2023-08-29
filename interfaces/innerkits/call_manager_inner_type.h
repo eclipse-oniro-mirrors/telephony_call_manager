@@ -547,11 +547,11 @@ enum class CallAbilityEventId {
     /**
      * Indicates hold call fail.
      */
-    EVENT_HOLD_SEND_FAILED,
+    EVENT_HOLD_CALL_FAILED,
     /**
      * Indicates swap call fail.
      */
-    EVENT_SWAP_SEND_FAILED,
+    EVENT_SWAP_CALL_FAILED,
     /**
      * Indicates that the OTT is not supported.
      */
