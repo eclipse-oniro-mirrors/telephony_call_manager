@@ -1185,8 +1185,9 @@ void NapiCallAbilityCallback::ReportSupplementInfo(AppExecFwk::PacMap &resultInf
             callbackValues[ARRAY_INDEX_FIRST] = NapiCallManagerUtils::CreateUndefined(env);
             callbackValues[ARRAY_INDEX_SECOND] = callbackValue;
         } else {
-            std::string errTip = std::to_string(CALL_ERR_NAPI_INTERFACE_FAILED);
-            callbackValues[ARRAY_INDEX_FIRST] = NapiCallManagerUtils::CreateErrorMessage(env, errTip);
+            JsError error = NapiUtil::ConverErrorMessageForJs(result);
+            callbackValues[ARRAY_INDEX_FIRST] =
+                NapiCallManagerUtils::CreateErrorMessageWithErrorCode(env, error.errorMessage, error.errorCode);
             callbackValues[ARRAY_INDEX_SECOND] = NapiCallManagerUtils::CreateUndefined(env);
         }
         napi_value callbackFunc = nullptr;
@@ -1201,9 +1202,9 @@ void NapiCallAbilityCallback::ReportSupplementInfo(AppExecFwk::PacMap &resultInf
         if (result == TELEPHONY_SUCCESS) {
             napi_resolve_deferred(env, supplementInfo.deferred, callbackValue);
         } else {
-            std::string errTip = std::to_string(CALL_ERR_NAPI_INTERFACE_FAILED);
-            napi_reject_deferred(
-                env, supplementInfo.deferred, NapiCallManagerUtils::CreateErrorMessage(env, errTip));
+            JsError error = NapiUtil::ConverErrorMessageForJs(result);
+            napi_reject_deferred(env, supplementInfo.deferred,
+                NapiCallManagerUtils::CreateErrorMessageWithErrorCode(env, error.errorMessage, error.errorCode));
         }
     }
     napi_close_handle_scope(env, supplementScope);
