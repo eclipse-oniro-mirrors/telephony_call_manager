@@ -1504,7 +1504,7 @@ int32_t NapiCallAbilityCallback::UpdatePostDialDelay(const std::string str)
         return CALL_ERR_CALLBACK_NOT_EXIST;
     }
     uv_loop_s *loop = nullptr;
-#if NAPI_VERSION >= 2
+#if defined(NAPI_VERSION) && NAPI_VERSION >= 2
     napi_get_uv_event_loop(postDialDelayCallback_.env, &loop);
 #endif
     PostDialDelayWorker *dataWorker = std::make_unique<PostDialDelayWorker>().release();
@@ -1551,10 +1551,7 @@ int32_t NapiCallAbilityCallback::ReportPostDialDelay(std::string postDialStr, Ev
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     napi_value callbackValues[ARRAY_INDEX_SECOND] = { 0 };
-    callbackValues[ARRAY_INDEX_FIRST] = NapiCallManagerUtils::CreateUndefined(env);
-    napi_create_object(env, &callbackValues[ARRAY_INDEX_FIRST]);
-    NapiCallManagerUtils::SetPropertyStringUtf8(
-        env, callbackValues[ARRAY_INDEX_FIRST], "postDialStr", postDialStr);
+    napi_create_string_utf8(env, postDialStr.c_str(), postDialStr.length(), &callbackValues[ARRAY_INDEX_FIRST]);
     napi_get_reference_value(env, eventCallback.callbackRef, &callbackFunc);
     if (callbackFunc == nullptr) {
         TELEPHONY_LOGE("callbackFunc is null!");
