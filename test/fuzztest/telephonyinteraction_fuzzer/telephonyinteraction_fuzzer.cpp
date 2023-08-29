@@ -98,7 +98,7 @@ int32_t UpdateCallsReportInfo(const uint8_t *data, size_t size)
     CallReportInfo info;
     int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
     int32_t length = sizeof(CallReportInfo);
-    int32_t vecSize = static_cast<int32_t>(size);
+    int32_t vecSize = 1;
     info.index = static_cast<int32_t>(size);
     info.accountId = static_cast<int32_t>(size % ACCOUNT_ID_NUM);
     info.voiceDomain = static_cast<int32_t>(size % VOICE_DOMAIN_NUM);
