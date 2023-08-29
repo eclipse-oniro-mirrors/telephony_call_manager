@@ -615,22 +615,6 @@ int32_t AudioControlManager::StopWaitingTone()
     return StopCallTone();
 }
 
-void AudioControlManager::PlayEndTone()
-{
-    bool shouldVibrate = DelayedSingleton<AudioProxy>::GetInstance()->IsVibrateMode();
-    if (shouldVibrate) {
-        DelayedSingleton<AudioProxy>::GetInstance()->StartVibrate();
-    } else {
-        PlayCallTone(ToneDescriptor::TONE_TYPE_COMMON_PROPRIETARY_PROMPT);
-        usleep(30000);
-        StopCallTone();
-    }
-}
-void AudioControlManager::PlayWaitTone()
-{
-    PlayCallTone(ToneDescriptor::TONE_TYPE_COMMON_SUPERVISORY_CALL_WAITING);
-}
-
 int32_t AudioControlManager::PlayDtmfTone(char str)
 {
     ToneDescriptor dtmfTone = Tone::ConvertDigitToTone(str);

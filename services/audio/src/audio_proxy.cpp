@@ -18,7 +18,6 @@
 #include "telephony_log_wrapper.h"
 #include "bluetooth_call_manager.h"
 #include "audio_control_manager.h"
-#include "vibrator_agent.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -234,7 +233,6 @@ int32_t AudioProxy::StartVibrate()
 #ifdef ABILITY_SENSOR_SUPPORT
     return VibratorManager::GetInstance()->StartVibrate();
 #endif
-    OHOS::Sensors::StartVibratorOnce(VIBRATE_DURATION);
     return TELEPHONY_SUCCESS;
 }
 

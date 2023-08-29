@@ -55,16 +55,6 @@ int32_t Tone::Play()
             dtmfTonePlayer_->StartTone();
         });
         play.detach();
-    } else if (currentToneDescriptor_ ==TONE_TYPE_COMMON_PROPRIETARY_PROMPT ||
-        currentToneDescriptor_ ==TONE_TYPE_COMMON_SUPERVISORY_CALL_WAITING) {
-        if (!InitTonePlayer()) {
-            return TELEPHONY_ERROR;
-        }
-        std::thread play([&]() {
-            pthread_setname_np(pthread_self(), TONE_PLAY_THREAD);
-            dtmfTonePlayer_->StartTone();
-        });
-        play.detach();
     } else {
         AudioPlay audioPlay = &AudioPlayer::Play;
         if (audioPlayer_ == nullptr) {
@@ -208,10 +198,6 @@ AudioStandard::ToneType Tone::ConvertToneDescriptorToToneType(ToneDescriptor ton
         case ToneDescriptor::TONE_DTMF_CHAR_W:
             dtmf = ToneType::TONE_TYPE_DIAL_P;
             break;
-        case ToneDescriptor::TONE_TYPE_COMMON_PROPRIETARY_PROMPT:
-            dtmf = ToneType::TONE_TYPE_COMMON_PROPRIETARY_PROMPT;
-        case ToneDescriptor::TONE_TYPE_COMMON_SUPERVISORY_CALL_WAITING:
-            dtmf = ToneType::TONE_TYPE_COMMON_SUPERVISORY_CALL_WAITING;
         default:
             break;
     }
