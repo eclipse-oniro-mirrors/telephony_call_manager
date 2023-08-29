@@ -40,6 +40,7 @@
 namespace OHOS {
 namespace Telephony {
 using namespace testing::ext;
+constexpr int WAIT_TIME = 3;
 
 class CallStateTest : public testing::Test {
 public:
@@ -314,10 +315,12 @@ HWTEST_F(CallStateTest, Telephony_Ring_001, Function | MediumTest | Level3)
     std::string path = "test";
     auto testRing = std::make_shared<Ring>(path);
     testRing->Play();
+    sleep(WAIT_TIME);
     testRing->Stop();
 
     auto ring = std::make_shared<Ring>();
     ring->Play();
+    sleep(WAIT_TIME);
     ring->Stop();
     ring->StartVibrate();
     ring->CancelVibrate();
@@ -328,6 +331,7 @@ HWTEST_F(CallStateTest, Telephony_Ring_001, Function | MediumTest | Level3)
     auto emptyRing = std::make_shared<Ring>(emptyPath);
     emptyRing->ReleaseRenderer();
     ASSERT_EQ(emptyRing->Play(), CALL_ERR_INVALID_PATH);
+    sleep(WAIT_TIME);
     ASSERT_EQ(emptyRing->Stop(), CALL_ERR_INVALID_PATH);
 }
 
@@ -341,11 +345,13 @@ HWTEST_F(CallStateTest, Telephony_Tone_001, Function | MediumTest | Level3)
     auto unknownTone = std::make_shared<Tone>(ToneDescriptor::TONE_UNKNOWN);
     unknownTone->Init();
     unknownTone->Play();
+    sleep(WAIT_TIME);
     unknownTone->Stop();
     unknownTone->ReleaseRenderer();
 
     auto ringbackTone = std::make_shared<Tone>(ToneDescriptor::TONE_RINGBACK);
     ringbackTone->Play();
+    sleep(WAIT_TIME);
     ringbackTone->Stop();
 
     auto tone = std::make_shared<Tone>(ToneDescriptor::TONE_DTMF_CHAR_1);
