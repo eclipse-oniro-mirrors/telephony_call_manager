@@ -417,11 +417,6 @@ int32_t CallStatusManager::ActiveHandle(const CallDetailInfo &info)
         TELEPHONY_LOGE("UpdateCallState failed, errCode:%{public}d", ret);
         return ret;
     }
-    if (isExistWaitTone_) {
-        DelayedSingleton<AudioControlManager>::GetInstance()->StopWaitingTone();
-        isExistWaitTone_ = false;
-    }
-    DelayedSingleton<AudioProxy>::GetInstance()->StartVibrate();
 #ifdef AUDIO_SUPPORT
     ToSpeakerPhone(call);
     DelayedSingleton<AudioControlManager>::GetInstance()->SetVolumeAudible();
@@ -454,8 +449,6 @@ int32_t CallStatusManager::HoldingHandle(const CallDetailInfo &info)
 
 int32_t CallStatusManager::WaitingHandle(const CallDetailInfo &info)
 {
-    DelayedSingleton<AudioControlManager>::GetInstance()->PlayWaitTone();
-    isExistWaitTone_ = true;
     return IncomingHandle(info);
 }
 
@@ -535,16 +528,6 @@ int32_t CallStatusManager::DisconnectedHandle(const CallDetailInfo &info)
         }
     }
     DeleteOneCallObject(call->GetCallID());
-
-    if (isExistWaitTone_) {
-        DelayedSingleton<AudioControlManager>::GetInstance()->StopWaitingTone();
-        isExistWaitTone_ = false;
-    }
-    if (!DelayedSingleton<CallControlManager>::GetInstance()->getUserHangUp()
-        && !CallObjectManager::HasCallExist()) {
-            DelayedSingleton<AudioControlManager>::GetInstance()->PlayEndTone();
-        }
-    DelayedSingleton<CallControlManager>::GetInstance()->setUserHangUp(false);
     return ret;
 }
 

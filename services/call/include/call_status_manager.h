@@ -77,7 +77,6 @@ private:
     const std::string DETAIL_INFO = "detail_info";
     const std::string CONTENT_TYPE = "content_type";
     const std::string PHONE = "phone";
-    bool isExistWaitTone_ = false;
 };
 } // namespace Telephony
 } // namespace OHOS

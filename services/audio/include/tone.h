@@ -46,10 +46,7 @@ enum ToneDescriptor {
     TONE_DTMF_CHAR_8,
     TONE_DTMF_CHAR_9,
     TONE_DTMF_CHAR_P,
-    TONE_DTMF_CHAR_W,
-
-    TONE_TYPE_COMMON_SUPERVISORY_CALL_WAITING = 106,
-    TONE_TYPE_COMMON_PROPRIETARY_PROMPT = 203
+    TONE_DTMF_CHAR_W
 };
 struct ToneStream {
     ToneDescriptor toneDescriptor = ToneDescriptor::TONE_UNKNOWN;

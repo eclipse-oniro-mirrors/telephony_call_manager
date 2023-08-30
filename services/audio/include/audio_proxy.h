@@ -29,7 +29,6 @@
 namespace OHOS {
 namespace Telephony {
 constexpr uint16_t VOLUME_AUDIBLE_DIVISOR = 2;
-constexpr uint16_t VIBRATE_DURATION = 30;
 
 enum AudioInterruptState {
     INTERRUPT_STATE_UNKNOWN = 0,
