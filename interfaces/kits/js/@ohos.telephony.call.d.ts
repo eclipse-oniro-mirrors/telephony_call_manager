@@ -3240,7 +3240,7 @@ declare namespace call {
      * @systemapi Hide this for inner system use.
      * @since 11
      */
-    EVENT_HOLD_SEND_FAILED,
+    EVENT_HOLD_CALL_FAILED,
 
     /**
      * Indicates swap call fail.
@@ -3249,7 +3249,7 @@ declare namespace call {
      * @systemapi Hide this for inner system use.
      * @since 11
      */
-    EVENT_SWAP_SEND_FAILED,
+    EVENT_SWAP_CALL_FAILED,
   }
 
   /**
