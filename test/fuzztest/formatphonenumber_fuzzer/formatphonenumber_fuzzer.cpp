@@ -23,7 +23,6 @@
 using namespace OHOS::Telephony;
 namespace OHOS {
 constexpr int32_t SLOT_NUM = 2;
-constexpr int32_t CALLS_NUM = 5;
 
 int32_t GetMainCallId(const uint8_t *data, size_t size)
 {
@@ -89,7 +88,7 @@ int32_t ReportOttCallDetailsInfo(const uint8_t *data, size_t size)
     if (!IsServiceInited()) {
         return TELEPHONY_ERROR;
     }
-    int32_t vecCnt = static_cast<int32_t>(size % CALLS_NUM);
+    int32_t vecCnt = 1;
     OttCallDetailsInfo info;
     std::string msg(reinterpret_cast<const char *>(data), size);
     int32_t phoneLength = msg.length() > kMaxNumberLen ? kMaxNumberLen : msg.length();
