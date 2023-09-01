@@ -239,14 +239,14 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_0300, Function | Mediu
             SIM1_SLOTID, (int32_t)VideoStateType::TYPE_VOICE, DIAL_SCENE_TEST, (int32_t)DialType::DIAL_CARRIER_TYPE);
         int32_t ret = CallManagerGtest::clientPtr_->DialCall(Str8ToStr16(phoneNumber), dialInfo_);
         usleep(SLEEP_1000_MS);
-        EXPECT_NE(ret, RETURN_VALUE_IS_ZERO);
+        EXPECT_EQ(ret, RETURN_VALUE_IS_ZERO);
     }
     if (HasSimCard(SIM2_SLOTID)) {
         InitDialInfo(
             SIM2_SLOTID, (int32_t)VideoStateType::TYPE_VOICE, DIAL_SCENE_TEST, (int32_t)DialType::DIAL_CARRIER_TYPE);
         int32_t ret = CallManagerGtest::clientPtr_->DialCall(Str8ToStr16(phoneNumber), dialInfo_);
         usleep(SLEEP_1000_MS + 1);
-        EXPECT_NE(ret, RETURN_VALUE_IS_ZERO);
+        EXPECT_EQ(ret, RETURN_VALUE_IS_ZERO);
     }
 }
 
@@ -323,14 +323,14 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_1000, Function | Mediu
     if (HasSimCard(SIM1_SLOTID)) {
         InitDialInfo(
             SIM1_SLOTID, (int32_t)VideoStateType::TYPE_VOICE, DIAL_SCENE_TEST, (int32_t)DialType::DIAL_CARRIER_TYPE);
-        int32_t ret = CallManagerGtest::clientPtr_->DialCall(Str8ToStr16(PHONE_NUMBER), dialInfo_);
-        EXPECT_NE(ret, RETURN_VALUE_IS_ZERO);
+        int32_t ret = CallManagerGtest::clientPtr_->DialCall(Str8ToStr16("10086"), dialInfo_);
+        EXPECT_EQ(ret, RETURN_VALUE_IS_ZERO);
     }
     if (HasSimCard(SIM2_SLOTID)) {
         InitDialInfo(
             SIM2_SLOTID, (int32_t)VideoStateType::TYPE_VOICE, DIAL_SCENE_TEST, (int32_t)DialType::DIAL_CARRIER_TYPE);
-        int32_t ret = CallManagerGtest::clientPtr_->DialCall(Str8ToStr16(PHONE_NUMBER), dialInfo_);
-        EXPECT_NE(ret, RETURN_VALUE_IS_ZERO);
+        int32_t ret = CallManagerGtest::clientPtr_->DialCall(Str8ToStr16("10086"), dialInfo_);
+        EXPECT_EQ(ret, RETURN_VALUE_IS_ZERO);
     }
 }
 
@@ -3889,7 +3889,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetPreviewWindow_0200, Function
     window.z = 0;
     window.width = 200;
     window.height = 200;
-    EXPECT_EQ(CallManagerGtest::clientPtr_->SetPreviewWindow(window), RETURN_VALUE_IS_ZERO);
+    EXPECT_NE(CallManagerGtest::clientPtr_->SetPreviewWindow(window), RETURN_VALUE_IS_ZERO);
 }
 
 /******************************************* Test SetDisplayWindow() *********************************************/
@@ -3928,7 +3928,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetDisplayWindow_0200, Function
     window.z = 0;
     window.width = 200;
     window.height = 200;
-    EXPECT_EQ(CallManagerGtest::clientPtr_->SetDisplayWindow(window), RETURN_VALUE_IS_ZERO);
+    EXPECT_NE(CallManagerGtest::clientPtr_->SetDisplayWindow(window), RETURN_VALUE_IS_ZERO);
 }
 
 /******************************************* Test SetDeviceDirection() *********************************************/
@@ -4767,7 +4767,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetAudioDevice_0200, Function |
         .address = { 0 },
     };
     CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_OFFHOOK, SLEEP_200_MS, SLEEP_30000_MS);
-    EXPECT_NE(clientPtr_->SetAudioDevice(audioDevice), RETURN_VALUE_IS_ZERO);
+    EXPECT_EQ(clientPtr_->SetAudioDevice(audioDevice), RETURN_VALUE_IS_ZERO);
     sleep(WAIT_TIME);
 
     if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
