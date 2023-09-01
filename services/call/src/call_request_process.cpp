@@ -400,20 +400,7 @@ int32_t CallRequestProcess::CarrierDialProcess(DialParaInfo &info)
 
 int32_t CallRequestProcess::VoiceMailDialProcess(DialParaInfo &info)
 {
-    CellularCallInfo callInfo;
-    int32_t ret = PackCellularCallInfo(info, callInfo);
-    if (ret != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGW("PackCellularCallInfo failed!");
-        CallManagerHisysevent::WriteDialCallFaultEvent(info.accountId, static_cast<int32_t>(info.callType),
-            static_cast<int32_t>(info.videoState), ret, "Voice mail type PackCellularCallInfo failed");
-        return ret;
-    }
-    ret = DelayedSingleton<CellularCallConnection>::GetInstance()->Dial(callInfo);
-    if (ret != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("Dial VoiceMail failed!");
-        return ret;
-    }
-    return TELEPHONY_SUCCESS;
+    return CarrierDialProcess(info);
 }
 
 int32_t CallRequestProcess::OttDialProcess(DialParaInfo &info)
