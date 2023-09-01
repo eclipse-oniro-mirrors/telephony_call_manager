@@ -126,7 +126,7 @@ int32_t CallStatusManager::HandleCallsReportInfo(const CallDetailsInfo &info)
         for (const auto &it1 : callDetailsInfo_.callVec) {
             if (it.index == it1.index) {
                 // call state changes
-                if (it.state != it1.state || it.mpty != it1.mpty) {
+                if (it.state != it1.state || it.mpty != it1.mpty || it.callType != it1.callType) {
                     TELEPHONY_LOGI("handle updated call state:%{public}d", it.state);
                     HandleCallReportInfo(it);
                 }
@@ -230,6 +230,11 @@ int32_t CallStatusManager::HandleOttEventReportInfo(const OttCallEventInfo &info
 
 int32_t CallStatusManager::IncomingHandle(const CallDetailInfo &info)
 {
+    sptr<CallBase> call = GetOneCallObjectByIndex(info.index);
+    if (call != nullptr && call->GetCallType() != info.callType) {
+        call = RefreshCallIfNecessary(call, info);
+        return TELEPHONY_SUCCESS;
+    }
     int32_t ret = IncomingHandlePolicy(info);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("IncomingHandlePolicy failed!");
@@ -246,7 +251,7 @@ int32_t CallStatusManager::IncomingHandle(const CallDetailInfo &info)
             return ret;
         }
     }
-    sptr<CallBase> call = CreateNewCall(info, CallDirection::CALL_DIRECTION_IN);
+    call = CreateNewCall(info, CallDirection::CALL_DIRECTION_IN);
     if (call == nullptr) {
         TELEPHONY_LOGE("CreateNewCall failed!");
         return CALL_ERR_CALL_OBJECT_IS_NULL;
