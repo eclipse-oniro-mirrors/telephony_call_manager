@@ -38,7 +38,7 @@ public:
     bool IsMMICode(const std::string &number);
     bool RegexMatchMmi(const std::string &number);
     std::string RemoveSeparatorsPhoneNumber(const std::string &phoneString);
-    std::string RemovePostDailPhoneNumber(const std::string &phoneString);
+    std::string RemovePostDialPhoneNumber(const std::string &phoneString);
 
 private:
     static const int16_t HAS_A_SLOT = 1;

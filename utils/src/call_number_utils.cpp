@@ -154,11 +154,11 @@ std::string CallNumberUtils::RemoveSeparatorsPhoneNumber(const std::string &phon
     return newString;
 }
 
-std::string CallNumberUtils::RemovePostDailPhoneNumber(const std::string &phoneString)
+std::string CallNumberUtils::RemovePostDialPhoneNumber(const std::string &phoneString)
 {
     std::string newString = "";
     if (phoneString.empty()) {
-        TELEPHONY_LOGE("RemovePostDailPhoneNumber return, phoneStr is empty.");
+        TELEPHONY_LOGE("RemovePostDialPhoneNumber return, phoneStr is empty.");
         return newString;
     }
     for (char c : phoneString) {
