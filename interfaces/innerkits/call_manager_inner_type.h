@@ -37,6 +37,10 @@ constexpr int16_t kMaxBundleNameLen = 100;
  */
 constexpr int16_t kMaxAddressLen = 100;
 /**
+ * @brief Indicates Maximum length of a MMI code message.
+ */
+constexpr int16_t kMaxMessageLen = 500;
+/**
  * @brief Indicates Maximum length of the reject call message.
  */
 constexpr uint16_t REJECT_CALL_MSG_MAX_LEN = 300;
@@ -1262,7 +1266,7 @@ struct MmiCodeInfo {
     /**
      * Indicates the specific message of MMI code response.
      */
-    char message[kMaxNumberLen + 1] = { 0 };
+    char message[kMaxMessageLen + 1] = { 0 };
 };
 
 /**
