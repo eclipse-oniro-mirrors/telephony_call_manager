@@ -126,8 +126,8 @@ sptr<CallBase> CallObjectManager::GetOneCallObject(std::string &phoneNumber)
     std::lock_guard<std::mutex> lock(listMutex_);
     std::list<sptr<CallBase>>::iterator it = callObjectPtrList_.begin();
     for (; it != callObjectPtrList_.end(); ++it) {
-        std::string networkAddress = DelayedSingleton<CallNumberUtils>::GetInstance()->RemovePostDailPhoneNumber(
-            (*it)->GetAccountNumber());
+        std::string networkAddress =
+            DelayedSingleton<CallNumberUtils>::GetInstance()->RemovePostDialPhoneNumber((*it)->GetAccountNumber());
         if (networkAddress == phoneNumber) {
             TELEPHONY_LOGI("GetOneCallObject success!");
             retPtr = *it;
@@ -261,8 +261,8 @@ bool CallObjectManager::IsCallExist(std::string &phoneNumber)
     std::lock_guard<std::mutex> lock(listMutex_);
     std::list<sptr<CallBase>>::iterator it = callObjectPtrList_.begin();
     for (; it != callObjectPtrList_.end(); ++it) {
-        std::string networkAddress = DelayedSingleton<CallNumberUtils>::GetInstance()->RemovePostDailPhoneNumber(
-            (*it)->GetAccountNumber());
+        std::string networkAddress =
+            DelayedSingleton<CallNumberUtils>::GetInstance()->RemovePostDialPhoneNumber((*it)->GetAccountNumber());
         if (networkAddress == phoneNumber) {
             return true;
         }

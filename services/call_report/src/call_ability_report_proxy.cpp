@@ -95,6 +95,16 @@ void CallAbilityReportProxy::CallStateUpdated(
     }
     CallAttributeInfo info;
     callObjectPtr->GetCallAttributeInfo(info);
+    size_t accountLen = strlen(info.accountNumber);
+    if (accountLen > static_cast<size_t>(kMaxNumberLen)) {
+        accountLen = kMaxNumberLen;
+    }
+    for (size_t i = 0; i < accountLen; i++) {
+        if (info.accountNumber[i] == ',' || info.accountNumber[i] == ';') {
+            info.accountNumber[i] = '\0';
+            break;
+        }
+    }
     ReportCallStateInfo(info);
 }
 

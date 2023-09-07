@@ -14,12 +14,14 @@
  */
 
 #include "call_connect_ability.h"
-#include "call_ability_connect_callback.h"
+
 #include "ability_manager_client.h"
-#include "want.h"
-#include "string_wrapper.h"
+#include "call_ability_connect_callback.h"
+#include "call_number_utils.h"
 #include "int_wrapper.h"
+#include "string_wrapper.h"
 #include "telephony_log_wrapper.h"
+#include "want.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -40,7 +42,9 @@ void CallConnectAbility::ConnectAbility(const CallAttributeInfo &info)
     AppExecFwk::ElementName element("", "com.ohos.callui", "com.ohos.callui.ServiceAbility");
     want.SetElement(element);
     AAFwk::WantParams wantParams;
-    wantParams.SetParam("accountNumber", AAFwk::String::Box(std::string(info.accountNumber)));
+    std::string accountNumber =
+        DelayedSingleton<CallNumberUtils>::GetInstance()->RemovePostDialPhoneNumber(std::string(info.accountNumber));
+    wantParams.SetParam("accountNumber", AAFwk::String::Box(accountNumber));
     wantParams.SetParam("videoState", AAFwk::Integer::Box(static_cast<int32_t>(info.videoState)));
     wantParams.SetParam("callType", AAFwk::Integer::Box(static_cast<int32_t>(info.callType)));
     wantParams.SetParam("callState", AAFwk::Integer::Box(static_cast<int32_t>(info.callState)));
