@@ -321,7 +321,7 @@ int32_t NapiCallAbilityCallback::ReportStartRttInfo(AppExecFwk::PacMap &resultIn
         return CALL_ERR_CALLBACK_NOT_EXIST;
     }
     uv_loop_s *loop = nullptr;
-#if NAPI_VERSION >= 2
+#if defined(NAPI_VERSION) && NAPI_VERSION >= 2
     napi_get_uv_event_loop(startRttCallback_.env, &loop);
 #endif
     CallSupplementWorker *dataWorker = std::make_unique<CallSupplementWorker>().release();
@@ -351,7 +351,7 @@ int32_t NapiCallAbilityCallback::ReportStopRttInfo(AppExecFwk::PacMap &resultInf
         return CALL_ERR_CALLBACK_NOT_EXIST;
     }
     uv_loop_s *loop = nullptr;
-#if NAPI_VERSION >= 2
+#if defined(NAPI_VERSION) && NAPI_VERSION >= 2
     napi_get_uv_event_loop(stopRttCallback_.env, &loop);
 #endif
     CallSupplementWorker *dataWorker = std::make_unique<CallSupplementWorker>().release();
@@ -381,7 +381,7 @@ int32_t NapiCallAbilityCallback::ReportCallMediaModeInfo(AppExecFwk::PacMap &res
         return CALL_ERR_CALLBACK_NOT_EXIST;
     }
     uv_loop_s *loop = nullptr;
-#if NAPI_VERSION >= 2
+#if defined(NAPI_VERSION) && NAPI_VERSION >= 2
     napi_get_uv_event_loop(updateCallMediaModeCallback_.env, &loop);
 #endif
     CallSupplementWorker *dataWorker = std::make_unique<CallSupplementWorker>().release();
@@ -411,7 +411,7 @@ int32_t NapiCallAbilityCallback::UpdateCallStateInfo(const CallAttributeInfo &in
         return CALL_ERR_CALLBACK_NOT_EXIST;
     }
     uv_loop_s *loop = nullptr;
-#if NAPI_VERSION >= 2
+#if defined(NAPI_VERSION) && NAPI_VERSION >= 2
     napi_get_uv_event_loop(stateCallback_.env, &loop);
 #endif
     CallStateWorker *dataWorker = std::make_unique<CallStateWorker>().release();
@@ -497,7 +497,7 @@ int32_t NapiCallAbilityCallback::UpdateCallEvent(const CallEventInfo &info)
         return CALL_ERR_CALLBACK_NOT_EXIST;
     }
     uv_loop_s *loop = nullptr;
-#if NAPI_VERSION >= 2
+#if defined(NAPI_VERSION) && NAPI_VERSION >= 2
     napi_get_uv_event_loop(eventCallback_.env, &loop);
 #endif
     CallEventWorker *dataWorker = std::make_unique<CallEventWorker>().release();
@@ -572,7 +572,7 @@ int32_t NapiCallAbilityCallback::UpdateCallDisconnectedCause(const DisconnectedD
         return CALL_ERR_CALLBACK_NOT_EXIST;
     }
     uv_loop_s *loop = nullptr;
-#if NAPI_VERSION >= 2
+#if defined(NAPI_VERSION) && NAPI_VERSION >= 2
     napi_get_uv_event_loop(callDisconnectCauseCallback_.env, &loop);
 #endif
     CallDisconnectedCauseWorker *dataWorker = std::make_unique<CallDisconnectedCauseWorker>().release();
@@ -661,7 +661,7 @@ int32_t NapiCallAbilityCallback::UpdateMmiCodeResultsInfo(const MmiCodeInfo &inf
         return CALL_ERR_CALLBACK_NOT_EXIST;
     }
     uv_loop_s *loop = nullptr;
-#if NAPI_VERSION >= 2
+#if defined(NAPI_VERSION) && NAPI_VERSION >= 2
     napi_get_uv_event_loop(mmiCodeCallback_.env, &loop);
 #endif
     MmiCodeWorker *dataWorker = std::make_unique<MmiCodeWorker>().release();
@@ -737,7 +737,7 @@ int32_t NapiCallAbilityCallback::UpdateAudioDeviceInfo(const AudioDeviceInfo &in
         return CALL_ERR_CALLBACK_NOT_EXIST;
     }
     uv_loop_s *loop = nullptr;
-#if NAPI_VERSION >= 2
+#if defined(NAPI_VERSION) && NAPI_VERSION >= 2
     napi_get_uv_event_loop(audioDeviceCallback_.env, &loop);
 #endif
     AudioDeviceWork *dataWorker = std::make_unique<AudioDeviceWork>().release();
@@ -831,7 +831,7 @@ int32_t NapiCallAbilityCallback::OttCallRequest(OttCallRequestId requestId, AppE
         return CALL_ERR_CALLBACK_NOT_EXIST;
     }
     uv_loop_s *loop = nullptr;
-#if NAPI_VERSION >= 2
+#if defined(NAPI_VERSION) && NAPI_VERSION >= 2
     napi_get_uv_event_loop(ottRequestCallback_.env, &loop);
 #endif
     CallOttWorker *dataWorker = std::make_unique<CallOttWorker>().release();
@@ -860,7 +860,7 @@ int32_t NapiCallAbilityCallback::ReportGetWaitingInfo(AppExecFwk::PacMap &result
         return CALL_ERR_CALLBACK_NOT_EXIST;
     }
     uv_loop_s *loop = nullptr;
-#if NAPI_VERSION >= 2
+#if defined(NAPI_VERSION) && NAPI_VERSION >= 2
     napi_get_uv_event_loop(getWaitingCallback_.env, &loop);
 #endif
     CallSupplementWorker *dataWorker = std::make_unique<CallSupplementWorker>().release();
@@ -890,7 +890,7 @@ int32_t NapiCallAbilityCallback::ReportCloseUnFinishedUssdInfo(AppExecFwk::PacMa
         return CALL_ERR_CALLBACK_NOT_EXIST;
     }
     uv_loop_s *loop = nullptr;
-#if NAPI_VERSION >= 2
+#if defined(NAPI_VERSION) && NAPI_VERSION >= 2
     napi_get_uv_event_loop(closeUnfinishedUssdCallback_.env, &loop);
 #endif
     CallSupplementWorker *dataWorker = std::make_unique<CallSupplementWorker>().release();
@@ -920,7 +920,7 @@ int32_t NapiCallAbilityCallback::ReportSetWaitingInfo(AppExecFwk::PacMap &result
         return CALL_ERR_CALLBACK_NOT_EXIST;
     }
     uv_loop_s *loop = nullptr;
-#if NAPI_VERSION >= 2
+#if defined(NAPI_VERSION) && NAPI_VERSION >= 2
     napi_get_uv_event_loop(setWaitingCallback_.env, &loop);
 #endif
     CallSupplementWorker *dataWorker = std::make_unique<CallSupplementWorker>().release();
@@ -950,7 +950,7 @@ int32_t NapiCallAbilityCallback::ReportGetRestrictionInfo(AppExecFwk::PacMap &re
         return CALL_ERR_CALLBACK_NOT_EXIST;
     }
     uv_loop_s *loop = nullptr;
-#if NAPI_VERSION >= 2
+#if defined(NAPI_VERSION) && NAPI_VERSION >= 2
     napi_get_uv_event_loop(getRestrictionCallback_.env, &loop);
 #endif
     CallSupplementWorker *dataWorker = std::make_unique<CallSupplementWorker>().release();
@@ -980,7 +980,7 @@ int32_t NapiCallAbilityCallback::ReportSetRestrictionInfo(AppExecFwk::PacMap &re
         return CALL_ERR_CALLBACK_NOT_EXIST;
     }
     uv_loop_s *loop = nullptr;
-#if NAPI_VERSION >= 2
+#if defined(NAPI_VERSION) && NAPI_VERSION >= 2
     napi_get_uv_event_loop(setRestrictionCallback_.env, &loop);
 #endif
     CallSupplementWorker *dataWorker = std::make_unique<CallSupplementWorker>().release();
@@ -1040,7 +1040,7 @@ int32_t NapiCallAbilityCallback::ReportGetTransferInfo(AppExecFwk::PacMap &resul
         return CALL_ERR_CALLBACK_NOT_EXIST;
     }
     uv_loop_s *loop = nullptr;
-#if NAPI_VERSION >= 2
+#if defined(NAPI_VERSION) && NAPI_VERSION >= 2
     napi_get_uv_event_loop(getTransferCallback_.env, &loop);
 #endif
     CallSupplementWorker *dataWorker = std::make_unique<CallSupplementWorker>().release();
@@ -1070,7 +1070,7 @@ int32_t NapiCallAbilityCallback::ReportSetTransferInfo(AppExecFwk::PacMap &resul
         return CALL_ERR_CALLBACK_NOT_EXIST;
     }
     uv_loop_s *loop = nullptr;
-#if NAPI_VERSION >= 2
+#if defined(NAPI_VERSION) && NAPI_VERSION >= 2
     napi_get_uv_event_loop(setTransferCallback_.env, &loop);
 #endif
     CallSupplementWorker *dataWorker = std::make_unique<CallSupplementWorker>().release();
