@@ -374,6 +374,11 @@ int32_t CallStatusManager::DialingHandle(const CallDetailInfo &info)
 {
     TELEPHONY_LOGI("handle dialing state");
     if (info.index > 0) {
+        sptr<CallBase> curCall = GetOneCallObjectByIndex(info.index);
+        if (curCall != nullptr) {
+            curCall = RefreshCallIfNecessary(curCall, info);
+            return TELEPHONY_SUCCESS;
+        }
         TELEPHONY_LOGI("need update call info");
         return UpdateDialingCallInfo(info);
     }
