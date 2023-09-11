@@ -50,7 +50,7 @@ public:
     void UnRegisterSetRestrictionCallback();
     int32_t RegisterSetRestrictionPasswordCallback(EventCallback callback);
     void UnRegisterSetRestrictionPasswordCallback();
-    int32_t RegisterGetTransferCallback(EventCallback callback);
+    int32_t RegisterGetTransferCallback(EventCallback callback, int32_t type);
     void UnRegisterGetTransferCallback();
     int32_t RegisterSetTransferCallback(EventCallback callback);
     void UnRegisterSetTransferCallback();
@@ -139,6 +139,7 @@ private:
     using CallResultReportIdProcessorFunc = int32_t (NapiCallAbilityCallback::*)(AppExecFwk::PacMap &resultInfo);
     std::map<CallResultReportId, CallResultReportIdProcessorFunc> memberFuncMap_;
     std::mutex mutex_;
+    int32_t getCallTransferReason_ = -1;
 };
 } // namespace Telephony
 } // namespace OHOS

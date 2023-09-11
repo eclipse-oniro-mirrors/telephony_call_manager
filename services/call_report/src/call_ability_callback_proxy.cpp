@@ -174,6 +174,7 @@ void CallAbilityCallbackProxy::PackDataParcel(
             dataParcel.WriteInt32(resultInfo.GetIntValue("classx"));
             dataParcel.WriteString(resultInfo.GetStringValue("number"));
             dataParcel.WriteInt32(resultInfo.GetIntValue("type"));
+            dataParcel.WriteInt32(resultInfo.GetIntValue("reason"));
             break;
         case CallResultReportId::GET_CALL_CLIP_ID:
             dataParcel.WriteInt32(resultInfo.GetIntValue("action"));
