@@ -239,13 +239,10 @@ void NapiCallAbilityCallback::UnRegisterSetRestrictionPasswordCallback()
     (void)memset_s(&setRestrictionPasswordCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
 }
 
-int32_t NapiCallAbilityCallback::RegisterGetTransferCallback(EventCallback callback)
+int32_t NapiCallAbilityCallback::RegisterGetTransferCallback(EventCallback callback, int32_t type)
 {
-    if (getTransferCallback_.thisVar) {
-        TELEPHONY_LOGE("callback already exist!");
-        return CALL_ERR_CALLBACK_ALREADY_EXIST;
-    }
     getTransferCallback_ = callback;
+    getCallTransferReason_ = type;
     return TELEPHONY_SUCCESS;
 }
 
@@ -1037,6 +1034,11 @@ int32_t NapiCallAbilityCallback::ReportGetTransferInfo(AppExecFwk::PacMap &resul
 {
     if (getTransferCallback_.thisVar == nullptr) {
         TELEPHONY_LOGE("getTransferCallback is null!");
+        return CALL_ERR_CALLBACK_NOT_EXIST;
+    }
+    if (getCallTransferReason_ != resultInfo.GetIntValue("reason")) {
+        TELEPHONY_LOGE("Transfer reason is different, require is %{public}d, now is %{public}d", getCallTransferReason_,
+            resultInfo.GetIntValue("reason"));
         return CALL_ERR_CALLBACK_NOT_EXIST;
     }
     uv_loop_s *loop = nullptr;

@@ -4041,8 +4041,8 @@ void NapiCallManager::NativeGetTransferNumber(napi_env env, void *data)
     infoListener.thisVar = asyncContext->thisVar;
     infoListener.callbackRef = asyncContext->callbackRef;
     infoListener.deferred = asyncContext->deferred;
-    asyncContext->errorCode =
-        DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->RegisterGetTransferCallback(infoListener);
+    asyncContext->errorCode = DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->RegisterGetTransferCallback(
+        infoListener, asyncContext->type);
     if (asyncContext->errorCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("RegisterGetTransferCallback failed!");
         return;
