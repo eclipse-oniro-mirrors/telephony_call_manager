@@ -343,7 +343,12 @@ void CallStatusManager::CallFilterCompleteResult(const CallDetailInfo &info)
 
 int32_t CallStatusManager::UpdateDialingCallInfo(const CallDetailInfo &info)
 {
-    sptr<CallBase> call = GetOneCallObjectByIndex(INIT_INDEX);
+    sptr<CallBase> call = GetOneCallObjectByIndex(info.index);
+    if (call != nullptr) {
+        call = RefreshCallIfNecessary(call, info);
+        return TELEPHONY_SUCCESS;
+    }
+    call = GetOneCallObjectByIndex(INIT_INDEX);
     if (call == nullptr) {
         TELEPHONY_LOGE("call is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -374,11 +379,6 @@ int32_t CallStatusManager::DialingHandle(const CallDetailInfo &info)
 {
     TELEPHONY_LOGI("handle dialing state");
     if (info.index > 0) {
-        sptr<CallBase> curCall = GetOneCallObjectByIndex(info.index);
-        if (curCall != nullptr) {
-            curCall = RefreshCallIfNecessary(curCall, info);
-            return TELEPHONY_SUCCESS;
-        }
         TELEPHONY_LOGI("need update call info");
         return UpdateDialingCallInfo(info);
     }
