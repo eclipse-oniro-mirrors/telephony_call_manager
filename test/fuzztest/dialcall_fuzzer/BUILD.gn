@@ -19,7 +19,7 @@ CALL_MANAGER_PATH = "../../.."
 
 ##############################fuzztest##########################################
 ohos_fuzztest("DialCallFuzzTest") {
-  module_output_path = "call_manager/DialCallFuzzTest"
+  module_output_path = "call_manager/call_manager"
   module_out_path = module_output_path
   fuzz_config_file = "${CALL_MANAGER_PATH}/test/fuzztest/dialcall_fuzzer"
   include_dirs = [

@@ -19,7 +19,7 @@ import("//build/test.gni")
 ##############################fuzztest##########################################
 CALL_MANAGER_PATH = "../../.."
 ohos_fuzztest("TelephonyInteractionFuzzTest") {
-  module_output_path = "call_manager/TelephonyInteraction"
+  module_output_path = "call_manager/call_manager"
   module_out_path = module_output_path
   fuzz_config_file =
       "${CALL_MANAGER_PATH}/test/fuzztest/telephonyinteraction_fuzzer"
