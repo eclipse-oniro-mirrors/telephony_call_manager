@@ -77,6 +77,7 @@ bool AudioSceneProcessor::ProcessEvent(AudioEvent event)
         case AudioEvent::NO_MORE_DIALING_CALL:
         case AudioEvent::NO_MORE_ALERTING_CALL:
         case AudioEvent::NO_MORE_INCOMING_CALL:
+        case AudioEvent::NO_MORE_HOLDING_CALL:
             result = currentState_->ProcessEvent(event);
             break;
         default:
