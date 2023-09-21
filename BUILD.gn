@@ -151,7 +151,9 @@ ohos_shared_library("tel_call_manager") {
     "-Wunreachable-code",
     "-fno-exceptions",
     "-fno-rtti",
+    "-fstack-protector-all",
     "-O2",
+    "-D_FORTIFY_SOURCE=2",
     "-flto",
     "-Wno-unused-but-set-variable",
   ]
