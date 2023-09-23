@@ -160,6 +160,10 @@ void AudioControlManager::HandlePriorState(sptr<CallBase> &callObjectPtr, TelCal
             }
             StopRingback();
             break;
+        case TelCallState::CALL_STATUS_HOLDING:
+            if (stateNumber == EMPTY_VALUE) {
+                event = AudioEvent::NO_MORE_HOLDING_CALL;
+            }
         default:
             break;
     }

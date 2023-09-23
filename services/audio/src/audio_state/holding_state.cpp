@@ -52,6 +52,9 @@ bool HoldingState::ProcessEvent(int32_t event)
                     AudioEvent::SWITCH_INCOMING_STATE); // switch to incoming state
             }
             break;
+        case AudioEvent::NO_MORE_HOLDING_CALL:
+            result = DelayedSingleton<CallStateProcessor>::GetInstance()->UpdateCurrentCallState();
+            break;
         default:
             break;
     }

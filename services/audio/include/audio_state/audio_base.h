@@ -46,6 +46,7 @@ enum AudioEvent {
     NO_MORE_DIALING_CALL,
     NO_MORE_ALERTING_CALL,
     NO_MORE_INCOMING_CALL,
+    NO_MORE_HOLDING_CALL,
     CALL_TYPE_CS_CHANGE_IMS,
     CALL_TYPE_IMS_CHANGE_CS,
     // audio device event
