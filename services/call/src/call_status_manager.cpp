@@ -531,7 +531,8 @@ int32_t CallStatusManager::DisconnectedHandle(const CallDetailInfo &info)
         canUnHold = true;
     }
     sptr<CallBase> holdCall = CallObjectManager::GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_HOLD);
-    if (previousState != CallRunningState::CALL_RUNNING_STATE_HOLD) {
+    if (previousState != CallRunningState::CALL_RUNNING_STATE_HOLD &&
+        previousState != CallRunningState::CALL_RUNNING_STATE_ACTIVE) {
         if (holdCall != nullptr && canUnHold) {
             TELEPHONY_LOGI("release call and recover the held call");
             holdCall->UnHoldCall();
