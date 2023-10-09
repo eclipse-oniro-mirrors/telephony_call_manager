@@ -354,16 +354,7 @@ int32_t CallStatusManager::UpdateDialingCallInfo(const CallDetailInfo &info)
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
 
-    std::string phoneNum(info.phoneNum);
     std::string oriNum = call->GetAccountNumber();
-    if (oriNum.length() > phoneNum.length()) {
-        oriNum = oriNum.substr(INIT_INDEX, phoneNum.length());
-    }
-    if (oriNum != phoneNum) {
-        TELEPHONY_LOGE("phoneNum is not match");
-        return CALL_ERR_DIAL_FAILED;
-    }
-    oriNum = call->GetAccountNumber();
     call = RefreshCallIfNecessary(call, info);
     call->SetCallIndex(info.index);
     call->SetBundleName(info.bundleName);
