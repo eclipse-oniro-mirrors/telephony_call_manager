@@ -182,9 +182,9 @@ bool AudioDeviceManager::ProcessEvent(AudioEvent event)
     bool result = false;
     std::shared_ptr<BluetoothCallManager> bluetoothCallManager = std::make_shared<BluetoothCallManager>();
     AudioDevice device = {
-                    .deviceType = AudioDeviceType::DEVICE_EARPIECE,
-                    .address = { 0 },
-                };
+        .deviceType = AudioDeviceType::DEVICE_EARPIECE,
+        .address = { 0 },
+    };
     switch (event) {
         case AudioEvent::AUDIO_ACTIVATED:
         case AudioEvent::AUDIO_RINGING:
