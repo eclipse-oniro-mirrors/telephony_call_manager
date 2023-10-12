@@ -61,6 +61,10 @@ void CallStatusManager::InitCallBaseEvent()
     mEventIdTransferMap_[RequestResultEventId::RESULT_SWAP_SEND_FAILED] = CallAbilityEventId::EVENT_SWAP_CALL_FAILED;
     mOttEventIdTransferMap_[OttCallEventId::OTT_CALL_EVENT_FUNCTION_UNSUPPORTED] =
         CallAbilityEventId::EVENT_OTT_FUNCTION_UNSUPPORTED;
+    mEventIdTransferMap_[RequestResultEventId::RESULT_COMBINE_SEND_FAILED] =
+        CallAbilityEventId::EVENT_COMBINE_CALL_FAILED;
+    mEventIdTransferMap_[RequestResultEventId::RESULT_SPLIT_SEND_FAILED] =
+        CallAbilityEventId::EVENT_SPLIT_CALL_FAILED;
 }
 
 int32_t CallStatusManager::UnInit()

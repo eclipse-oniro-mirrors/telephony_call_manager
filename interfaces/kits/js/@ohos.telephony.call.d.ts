@@ -771,6 +771,24 @@ declare namespace call {
    * @systemapi Hide this for inner system use.
    * @since 7
    */
+  /**
+   * Merge calls, merge two calls into conference calls.
+   *
+   * @permission ohos.permission.SET_TELEPHONY_STATE
+   * @param { number } callId - Indicates the identifier of the call.
+   * @param { AsyncCallback<void> } callback - The callback of combineConference.
+   * @throws { BusinessError } 201 - Permission denied.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 801 - Capability not supported.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @throws { BusinessError } 8300007 - The number of conference calls exceeds the limit.
+   * @syscap SystemCapability.Telephony.CallManager
+   * @systemapi Hide this for inner system use.
+   * @since 11
+   */
   function combineConference(callId: number, callback: AsyncCallback<void>): void;
 
   /**
@@ -789,6 +807,24 @@ declare namespace call {
    * @syscap SystemCapability.Telephony.CallManager
    * @systemapi Hide this for inner system use.
    * @since 7
+   */
+  /**
+   * Merge calls, merge two calls into conference calls.
+   *
+   * @permission ohos.permission.SET_TELEPHONY_STATE
+   * @param { number } callId - Indicates the identifier of the call.
+   * @returns { Promise<void> } The promise returned by the combineConference.
+   * @throws { BusinessError } 201 - Permission denied.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 801 - Capability not supported.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @throws { BusinessError } 8300007 - The number of conference calls exceeds the limit.
+   * @syscap SystemCapability.Telephony.CallManager
+   * @systemapi Hide this for inner system use.
+   * @since 11
    */
   function combineConference(callId: number): Promise<void>;
 
@@ -1421,6 +1457,24 @@ declare namespace call {
    * @systemapi Hide this for inner system use.
    * @since 8
    */
+  /**
+   * Split conference call.
+   *
+   * @permission ohos.permission.SET_TELEPHONY_STATE
+   * @param { number } callId - Indicates the identifier of the call.
+   * @param { AsyncCallback<void> } callback - The callback of separateConference.
+   * @throws { BusinessError } 201 - Permission denied.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @throws { BusinessError } 8300008 - Conference call is not active.
+   * @throws { BusinessError } 8300999 - Unknown error code.
+   * @syscap SystemCapability.Telephony.CallManager
+   * @systemapi Hide this for inner system use.
+   * @since 11
+   */
   function separateConference(callId: number, callback: AsyncCallback<void>): void;
 
   /**
@@ -1439,6 +1493,24 @@ declare namespace call {
    * @syscap SystemCapability.Telephony.CallManager
    * @systemapi Hide this for inner system use.
    * @since 8
+   */
+  /**
+   * Split conference call.
+   *
+   * @permission ohos.permission.SET_TELEPHONY_STATE
+   * @param { number } callId - Indicates the identifier of the call.
+   * @returns { Promise<void> } The promise returned by the separateConference.
+   * @throws { BusinessError } 201 - Permission denied.
+   * @throws { BusinessError } 202 - Non-system applications use system APIs.
+   * @throws { BusinessError } 401 - Parameter error.
+   * @throws { BusinessError } 8300001 - Invalid parameter value.
+   * @throws { BusinessError } 8300002 - Operation failed. Cannot connect to service.
+   * @throws { BusinessError } 8300003 - System internal error.
+   * @throws { BusinessError } 8300008 - Conference call is not active.
+   * @throws { BusinessError } 8300999 - Unknown error code.
+   * @syscap SystemCapability.Telephony.CallManager
+   * @systemapi Hide this for inner system use.
+   * @since 11
    */
   function separateConference(callId: number): Promise<void>;
 
@@ -3250,6 +3322,24 @@ declare namespace call {
      * @since 11
      */
     EVENT_SWAP_CALL_FAILED,
+  
+    /**
+     * Indicates combine call failed.
+     *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
+     * @since 11
+     */
+    EVENT_COMBINE_CALL_FAILED,
+  
+    /**
+     * Indicates split call failed.
+     *
+     * @syscap SystemCapability.Telephony.CallManager
+     * @systemapi Hide this for inner system use.
+     * @since 11
+     */
+    EVENT_SPLIT_CALL_FAILED,
   }
 
   /**
