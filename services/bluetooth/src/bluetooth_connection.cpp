@@ -68,6 +68,22 @@ void BluetoothConnection::Init()
         TELEPHONY_LOGE("failed to subscribe bluetooth service SA:%{public}d", BLUETOOTH_HOST_SYS_ABILITY_ID);
         return;
     }
+    std::vector<Bluetooth::BluetoothRemoteDevice> devices;
+    Bluetooth::HandsFreeAudioGateway *profile = Bluetooth::HandsFreeAudioGateway::GetProfile();
+    if (profile == nullptr) {
+        TELEPHONY_LOGE("profile is nullptr");
+        return false;
+    }
+    int32_t result = profile->GetConnectedDevices(devices);
+    if (result != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("get connected devices fail");
+        return;
+    }
+    for (auto device : devices) {
+        if (profile->GetScoState(device) == (int32_t)Bluetooth::HfpScoConnectState::SCO_CONNECTED) {
+            SetConnectedScoAddr(device.GetDeviceAddr());
+        }
+    }
     TELEPHONY_LOGI("BluetoothConnection init success!");
 #endif
 }
