@@ -72,7 +72,7 @@ void BluetoothConnection::Init()
     Bluetooth::HandsFreeAudioGateway *profile = Bluetooth::HandsFreeAudioGateway::GetProfile();
     if (profile == nullptr) {
         TELEPHONY_LOGE("profile is nullptr");
-        return false;
+        return;
     }
     int32_t result = profile->GetConnectedDevices(devices);
     if (result != TELEPHONY_SUCCESS) {
