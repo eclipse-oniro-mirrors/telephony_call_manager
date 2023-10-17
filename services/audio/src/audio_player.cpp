@@ -91,6 +91,33 @@ bool AudioPlayer::InitRenderer()
     return true;
 }
 
+bool AudioPlayer::InitCapturer()
+{
+    AudioStandard::AudioCapturerOptions capturerOptions;
+    capturerOptions.streamInfo.samplingRate = AudioStandard::AudioSamplingRate::SAMPLE_RATE_96000;
+    capturerOptions.streamInfo.encoding = AudioStandard::AudioEncodingType::ENCODING_PCM;
+    capturerOptions.streamInfo.format = AudioStandard::AudioSampleFormat::SAMPLE_U8;
+    capturerOptions.streamInfo.channels = AudioStandard::AudioChannel::MONO;
+    capturerOptions.capturerInfo.sourceType = AudioStandard::SourceType::SOURCE_TYPE_VOICE_MODEM_COMMUNICATION;
+    capturerOptions.capturerInfo.capturerFlags = CAPTURER_FLAG;
+    audioCapturer_ = AudioStandard::AudioCapturer::Create(capturerOptions);
+    if (audioCapturer_ == nullptr) {
+        TELEPHONY_LOGE("audio capturer create failed");
+        return false;
+    }
+    if (!audioCapturer_->Start()) {
+        TELEPHONY_LOGE("audio capturer start failed");
+        return false;
+    }
+    uint32_t frameCount;
+    if (audioCapturer_->GetFrameCount(frameCount)) {
+        TELEPHONY_LOGE("audio capturer get frame count failed");
+        return false;
+    }
+    isCapturerInitialized_ = true;
+    return true;
+}
+
 int32_t AudioPlayer::Play(const std::string &path, AudioStandard::AudioStreamType streamType, PlayerType playerType)
 {
     wav_hdr wavHeader;
@@ -105,8 +132,8 @@ int32_t AudioPlayer::Play(const std::string &path, AudioStandard::AudioStreamTyp
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     (void)fread(&wavHeader, READ_SIZE, sizeof(wav_hdr), wavFile);
-    if (!InitRenderer(wavHeader, streamType)) {
-        TELEPHONY_LOGE("audio renderer init failed");
+    if (!InitRenderer(wavHeader, streamType) || !InitCapturer()) {
+        TELEPHONY_LOGE("audio renderer and capturer init failed");
         (void)fclose(wavFile);
         return TELEPHONY_ERR_UNINIT;
     }
@@ -145,8 +172,8 @@ int32_t AudioPlayer::Play(const std::string &path, AudioStandard::AudioStreamTyp
 int32_t AudioPlayer::Play(PlayerType playerType)
 {
     SetStop(playerType, false);
-    if (!InitRenderer()) {
-        TELEPHONY_LOGE("audio renderer init failed");
+    if (!InitRenderer() || !InitCapturer()) {
+        TELEPHONY_LOGE("audio renderer and capturer init failed");
         return TELEPHONY_ERR_UNINIT;
     }
     return TELEPHONY_SUCCESS;
@@ -212,6 +239,16 @@ void AudioPlayer::ReleaseRenderer()
     audioRenderer_->Drain();
     audioRenderer_->Stop();
     audioRenderer_->Release();
+}
+
+void AudioPlayer::ReleaseCapturer()
+{
+    if (!isCapturerInitialized_) {
+        return;
+    }
+    audioCapturer_->Flush();
+    audioCapturer_->Stop();
+    audioCapturer_->Release();
 }
 
 bool AudioPlayer::GetRealPath(const std::string &profilePath, std::string &realPath)
