@@ -41,7 +41,7 @@ int32_t ImsConference::JoinToConference(int32_t callId)
 {
     std::lock_guard<std::mutex> lock(conferenceMutex_);
     if (state_ != CONFERENCE_STATE_CREATING && state_ != CONFERENCE_STATE_ACTIVE &&
-        state_ != CONFERENCE_STATE_LEAVING) {
+        state_ != CONFERENCE_STATE_LEAVING && state_ != CONFERENCE_STATE_HOLDING) {
         TELEPHONY_LOGE("the current conference status does not allow CombineConference");
         return CALL_ERR_ILLEGAL_CALL_OPERATION;
     }
