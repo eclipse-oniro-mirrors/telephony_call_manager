@@ -58,7 +58,9 @@ void CallConnectAbility::ConnectAbility(const CallAttributeInfo &info)
         connectCallback_ = new CallAbilityConnectCallback();
     }
     int32_t userId = 0;
+    std::string identity = IPCSkeleton::ResetCallingIdentity();
     AAFwk::AbilityManagerClient::GetInstance()->ConnectAbility(want, connectCallback_, userId);
+    IPCSkeleton::SetCallingIdentity(identity);
 }
 
 void CallConnectAbility::DisconnectAbility()
@@ -68,7 +70,9 @@ void CallConnectAbility::DisconnectAbility()
     }
     if (connectCallback_ != nullptr) {
         TELEPHONY_LOGI("Disconnect callui ability");
+        std::string identity = IPCSkeleton::ResetCallingIdentity();
         AAFwk::AbilityManagerClient::GetInstance()->DisconnectAbility(connectCallback_);
+        IPCSkeleton::SetCallingIdentity(identity);
         connectCallback_ = nullptr;
     }
 }
