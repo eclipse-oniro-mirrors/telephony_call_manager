@@ -21,6 +21,7 @@
 
 #include "ability_connect_callback_interface.h"
 #include "call_manager_inner_type.h"
+#include "ipc_skeleton.h"
 #include "singleton.h"
 
 namespace OHOS {
