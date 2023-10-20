@@ -18,6 +18,7 @@
 #include <cstdint>
 #include <string>
 
+#include "audio_capturer.h"
 #include "audio_renderer.h"
 
 namespace OHOS {
@@ -67,9 +68,11 @@ public:
     ~AudioPlayer() = default;
     bool InitRenderer(const wav_hdr &wavHeader, AudioStandard::AudioStreamType streamType);
     bool InitRenderer();
+    bool InitCapturer();
     int32_t Play(const std::string &path, AudioStandard::AudioStreamType streamType, PlayerType playerType);
     int32_t Play(PlayerType playerType);
     void ReleaseRenderer();
+    void ReleaseCapturer();
     void SetStop(PlayerType playerType, bool state);
 
 private:
@@ -84,15 +87,18 @@ private:
     static constexpr uint16_t READ_SIZE = 1;
     static constexpr uint16_t MIN_BYTES = 4;
     static constexpr uint16_t RENDERER_FLAG = 0;
+    static constexpr uint16_t CAPTURER_FLAG = 0;
     size_t bufferLen = 0;
     bool isStop_ = false;
     bool isRingStop_ = false;
     bool isRenderInitialized_ = false;
+    bool isCapturerInitialized_ = false;
     bool isToneStop_ = false;
     bool isSoundStop_ = false;
     std::shared_ptr<AudioStandard::AudioRendererCallback> callback_ = nullptr;
     bool IsStop(PlayerType playerType);
     std::unique_ptr<AudioStandard::AudioRenderer> audioRenderer_ = nullptr;
+    std::unique_ptr<AudioStandard::AudioCapturer> audioCapturer_ = nullptr;
     bool GetRealPath(const std::string &profilePath, std::string &realPath);
 };
 } // namespace Telephony

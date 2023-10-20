@@ -57,6 +57,7 @@ void Sound::ReleaseRenderer()
         return;
     }
     audioPlayer_->ReleaseRenderer();
+    audioPlayer_->ReleaseCapturer();
 }
 } // namespace Telephony
 } // namespace OHOS
