@@ -15,11 +15,12 @@
 
 #include "incoming_call_wake_up.h"
 
+#ifdef ABILITY_POWER_SUPPORT
 #include "power_mgr_client.h"
+#endif
 #include "iservice_registry.h"
 #include "system_ability.h"
 #include "system_ability_definition.h"
-
 #include "telephony_log_wrapper.h"
 
 namespace OHOS {
@@ -38,13 +39,19 @@ void IncomingCallWakeup::WakeupDevice()
         TELEPHONY_LOGI("screen already up");
         return;
     }
+#ifdef ABILITY_POWER_SUPPORT
     PowerMgr::PowerMgrClient::GetInstance().WakeupDevice(
         PowerMgr::WakeupDeviceType::WAKEUP_DEVICE_APPLICATION, wakeupReason_);
+#endif
 }
 
 bool IncomingCallWakeup::IsScreenOn()
 {
-    return PowerMgr::PowerMgrClient::GetInstance().IsScreenOn();
+    bool isScreenOn = true;
+#ifdef ABILITY_POWER_SUPPORT
+    isScreenOn = PowerMgr::PowerMgrClient::GetInstance().IsScreenOn();
+#endif
+    return isScreenOn;
 }
 
 bool IncomingCallWakeup::IsPowerAbilityExist()
