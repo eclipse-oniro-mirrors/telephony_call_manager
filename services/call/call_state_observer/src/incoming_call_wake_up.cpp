@@ -47,7 +47,7 @@ void IncomingCallWakeup::WakeupDevice()
 
 bool IncomingCallWakeup::IsScreenOn()
 {
-    bool isScreenOn = true;
+    bool isScreenOn = false;
 #ifdef ABILITY_POWER_SUPPORT
     isScreenOn = PowerMgr::PowerMgrClient::GetInstance().IsScreenOn();
 #endif
