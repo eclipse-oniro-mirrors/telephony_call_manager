@@ -119,7 +119,7 @@ int32_t ReportCallInfoHandler::UpdateMediaModeResponse(const CallMediaModeRespon
     sptr<CallBase> call = CallObjectManager::GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_ACTIVE);
     if (call == nullptr) {
         TELEPHONY_LOGE("call not exists");
-        return;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     if (call->GetCallType() == CallType::TYPE_IMS) {
         sptr<IMSCall> imsCall = reinterpret_cast<IMSCall *>(call.GetRefPtr());
