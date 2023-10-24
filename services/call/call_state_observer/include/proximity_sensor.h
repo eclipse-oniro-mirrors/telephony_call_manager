@@ -18,20 +18,26 @@
 
 #include "singleton.h"
 #include "call_state_listener_base.h"
+#ifdef ABILITY_POWER_SUPPORT
 #include "power_mgr_client.h"
+#endif
 
 namespace OHOS {
 namespace Telephony {
 class ProximitySensor : public CallStateListenerBase {
     DECLARE_DELAYED_SINGLETON(ProximitySensor)
 public:
-    void ShutDown(PowerMgr::SuspendDeviceType operationType, bool suspendImmed);
-    void StartUp(PowerMgr::WakeupDeviceType operationType, std::string wakeupReason);
     void NewCallCreated(sptr<CallBase> &callObjectPtr) override;
     void CallDestroyed(const DisconnectedDetails &details) override;
     void CallStateUpdated(sptr<CallBase> &callObjectPtr, TelCallState priorState, TelCallState nextState) override;
     void IncomingCallHungUp(sptr<CallBase> &callObjectPtr, bool isSendSms, std::string content) override;
     void IncomingCallActivated(sptr<CallBase> &callObjectPtr) override;
+
+private:
+#ifdef ABILITY_POWER_SUPPORT
+    void ShutDown(PowerMgr::SuspendDeviceType operationType, bool suspendImmed);
+    void StartUp(PowerMgr::WakeupDeviceType operationType, std::string wakeupReason);
+#endif
 };
 } // namespace Telephony
 } // namespace OHOS

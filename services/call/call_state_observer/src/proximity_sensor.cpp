@@ -22,6 +22,7 @@ ProximitySensor::ProximitySensor() {}
 
 ProximitySensor::~ProximitySensor() {}
 
+#ifdef ABILITY_POWER_SUPPORT
 void ProximitySensor::ShutDown(PowerMgr::SuspendDeviceType operationType, bool suspendImmed)
 {
     PowerMgr::PowerMgrClient::GetInstance().SuspendDevice(operationType, suspendImmed);
@@ -31,11 +32,14 @@ void ProximitySensor::StartUp(PowerMgr::WakeupDeviceType operationType, std::str
 {
     PowerMgr::PowerMgrClient::GetInstance().WakeupDevice(operationType, wakeupReason);
 }
+#endif
 
 void ProximitySensor::CallDestroyed(const DisconnectedDetails &details)
 {
     if (CallObjectManager::HasCallExist()) {
+#ifdef ABILITY_POWER_SUPPORT
         ShutDown(PowerMgr::SuspendDeviceType::SUSPEND_DEVICE_REASON_APPLICATION, true);
+#endif
     }
 }
 
