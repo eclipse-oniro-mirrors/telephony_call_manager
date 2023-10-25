@@ -79,11 +79,14 @@ void BluetoothConnection::Init()
         TELEPHONY_LOGE("get connected devices fail");
         return;
     }
+    std::string macAddress = "";
     for (auto device : devices) {
         if (profile->GetScoState(device) == (int32_t)Bluetooth::HfpScoConnectState::SCO_CONNECTED) {
-            SetConnectedScoAddr(device.GetDeviceAddr());
+            macAddress = device.GetDeviceAddr()
         }
     }
+    SetConnectedScoAddr(device.GetDeviceAddr());
+    DelayedSingleton<AudioDeviceManager>::GetInstance()->AddAudioDeviceList(macAddress, AudioDeviceType::DEVICE_BLUETOOTH_SCO);
     TELEPHONY_LOGI("BluetoothConnection init success!");
 #endif
 }
