@@ -85,7 +85,7 @@ void BluetoothConnection::Init()
             macAddress = device.GetDeviceAddr();
         }
     }
-    SetConnectedScoAddr(device.GetDeviceAddr());
+    SetConnectedScoAddr(macAddress);
     DelayedSingleton<AudioDeviceManager>::GetInstance()->AddAudioDeviceList(macAddress, AudioDeviceType::DEVICE_BLUETOOTH_SCO);
     TELEPHONY_LOGI("BluetoothConnection init success!");
 #endif
