@@ -36,7 +36,7 @@ int32_t CallNumberUtils::FormatPhoneNumber(
         TELEPHONY_LOGE("phoneNumber is nullptr!");
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
-    if (phoneNumber.front() == '#' || phoneNumber.front() == '*') {
+    if (phoneNumber.front() == '#' || phoneNumber.front() == '*' || phoneNumber.length() == PHONE_NUMBER_LENGTH_ONE) {
         formatNumber = phoneNumber;
         return TELEPHONY_SUCCESS;
     }

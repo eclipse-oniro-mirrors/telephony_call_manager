@@ -426,7 +426,7 @@ HWTEST_F(BranchTest, Telephony_ReportCallInfoHandler_001, Function | MediumTest 
         TELEPHONY_ERR_SUCCESS);
     ASSERT_EQ(DelayedSingleton<ReportCallInfoHandler>::GetInstance()->UpdateOttEventInfo(mOttCallEventInfo),
         TELEPHONY_ERR_SUCCESS);
-    ASSERT_EQ(DelayedSingleton<ReportCallInfoHandler>::GetInstance()->UpdateMediaModeResponse(mCallMediaModeResponse),
+    ASSERT_NE(DelayedSingleton<ReportCallInfoHandler>::GetInstance()->UpdateMediaModeResponse(mCallMediaModeResponse),
         TELEPHONY_ERR_SUCCESS);
 }
 

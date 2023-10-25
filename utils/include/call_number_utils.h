@@ -43,6 +43,7 @@ public:
 private:
     static const int16_t HAS_A_SLOT = 1;
     static const int16_t HAS_TWO_SLOT = 2;
+    static const int16_t PHONE_NUMBER_LENGTH_ONE = 1;
 };
 } // namespace Telephony
 } // namespace OHOS
