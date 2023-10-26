@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,26 +16,27 @@
 #ifndef CALL_MANAGER_CONNECT_H
 #define CALL_MANAGER_CONNECT_H
 #include <string_ex.h>
-#include <string>
-#include <map>
 #include <list>
+#include <map>
 #include <mutex>
+#include <string>
+#include <unordered_set>
 
 #include "accesstoken_kit.h"
-#include "iservice_registry.h"
-#include "system_ability.h"
-#include "system_ability_definition.h"
+#include "call_manager_client.h"
+#include "call_manager_errors.h"
+#include "call_manager_service_proxy.h"
+#include "i_call_ability_callback.h"
 #include "if_system_ability_manager.h"
+#include "iremote_object.h"
+#include "iremote_stub.h"
+#include "iservice_registry.h"
 #include "pac_map.h"
 #include "refbase.h"
 #include "rwlock.h"
-#include "iremote_object.h"
-#include "iremote_stub.h"
-
-#include "call_manager_errors.h"
+#include "system_ability.h"
+#include "system_ability_definition.h"
 #include "telephony_log_wrapper.h"
-#include "call_manager_service_proxy.h"
-#include "i_call_ability_callback.h"
 #include "token_setproc.h"
 
 namespace OHOS {
@@ -43,10 +44,8 @@ namespace Telephony {
 const int32_t MAX_LEN = 100000;
 using namespace Security::AccessToken;
 using Security::AccessToken::AccessTokenID;
-std::unordered_map<int32_t, std::unordered_set<int32_t>> g_callStateMap;
-int32_t newCallId_ = -1;
 
-HapInfoParams testInfoParams = {
+inline HapInfoParams testInfoParams = {
     .bundleName = "tel_call_manager_gtest",
     .userID = 1,
     .instIndex = 0,
@@ -54,7 +53,7 @@ HapInfoParams testInfoParams = {
     .isSystemApp = true,
 };
 
-PermissionDef testPermPlaceCallDef = {
+inline PermissionDef testPermPlaceCallDef = {
     .permissionName = "ohos.permission.PLACE_CALL",
     .bundleName = "tel_call_manager_gtest",
     .grantMode = 1, // SYSTEM_GRANT
@@ -65,7 +64,7 @@ PermissionDef testPermPlaceCallDef = {
     .availableLevel = APL_SYSTEM_BASIC,
 };
 
-PermissionStateFull testPlaceCallState = {
+inline PermissionStateFull testPlaceCallState = {
     .grantFlags = { 2 }, // PERMISSION_USER_SET
     .grantStatus = { PermissionState::PERMISSION_GRANTED },
     .isGeneral = true,
@@ -73,7 +72,7 @@ PermissionStateFull testPlaceCallState = {
     .resDeviceID = { "local" },
 };
 
-PermissionDef testPermSetTelephonyStateDef = {
+inline PermissionDef testPermSetTelephonyStateDef = {
     .permissionName = "ohos.permission.SET_TELEPHONY_STATE",
     .bundleName = "tel_call_manager_gtest",
     .grantMode = 1, // SYSTEM_GRANT
@@ -84,7 +83,7 @@ PermissionDef testPermSetTelephonyStateDef = {
     .availableLevel = APL_SYSTEM_BASIC,
 };
 
-PermissionStateFull testSetTelephonyState = {
+inline PermissionStateFull testSetTelephonyState = {
     .grantFlags = { 2 }, // PERMISSION_USER_SET
     .grantStatus = { PermissionState::PERMISSION_GRANTED },
     .isGeneral = true,
@@ -92,7 +91,7 @@ PermissionStateFull testSetTelephonyState = {
     .resDeviceID = { "local" },
 };
 
-PermissionDef testPermGetTelephonyStateDef = {
+inline PermissionDef testPermGetTelephonyStateDef = {
     .permissionName = "ohos.permission.GET_TELEPHONY_STATE",
     .bundleName = "tel_call_manager_gtest",
     .grantMode = 1, // SYSTEM_GRANT
@@ -103,7 +102,7 @@ PermissionDef testPermGetTelephonyStateDef = {
     .availableLevel = APL_SYSTEM_BASIC,
 };
 
-PermissionStateFull testGetTelephonyState = {
+inline PermissionStateFull testGetTelephonyState = {
     .grantFlags = { 2 }, // PERMISSION_USER_SET
     .grantStatus = { PermissionState::PERMISSION_GRANTED },
     .isGeneral = true,
@@ -111,7 +110,7 @@ PermissionStateFull testGetTelephonyState = {
     .resDeviceID = { "local" },
 };
 
-PermissionDef testPermAnswerCallDef = {
+inline PermissionDef testPermAnswerCallDef = {
     .permissionName = "ohos.permission.ANSWER_CALL",
     .bundleName = "tel_call_manager_gtest",
     .grantMode = 1, // SYSTEM_GRANT
@@ -122,7 +121,7 @@ PermissionDef testPermAnswerCallDef = {
     .availableLevel = APL_SYSTEM_BASIC,
 };
 
-PermissionStateFull testAnswerCallState = {
+inline PermissionStateFull testAnswerCallState = {
     .grantFlags = { 2 }, // PERMISSION_USER_SET
     .grantStatus = { PermissionState::PERMISSION_GRANTED },
     .isGeneral = true,
@@ -130,7 +129,7 @@ PermissionStateFull testAnswerCallState = {
     .resDeviceID = { "local" },
 };
 
-PermissionDef testReadCallLogDef = {
+inline PermissionDef testReadCallLogDef = {
     .permissionName = "ohos.permission.READ_CALL_LOG",
     .bundleName = "tel_call_manager_gtest",
     .grantMode = 1, // SYSTEM_GRANT
@@ -141,7 +140,7 @@ PermissionDef testReadCallLogDef = {
     .availableLevel = APL_SYSTEM_BASIC,
 };
 
-PermissionStateFull testPermReadCallLog = {
+inline PermissionStateFull testPermReadCallLog = {
     .grantFlags = { 2 }, // PERMISSION_USER_SET
     .grantStatus = { PermissionState::PERMISSION_GRANTED },
     .isGeneral = true,
@@ -149,7 +148,7 @@ PermissionStateFull testPermReadCallLog = {
     .resDeviceID = { "local" },
 };
 
-PermissionDef testWriteCallLogDef = {
+inline PermissionDef testWriteCallLogDef = {
     .permissionName = "ohos.permission.WRITE_CALL_LOG",
     .bundleName = "tel_call_manager_gtest",
     .grantMode = 1, // SYSTEM_GRANT
@@ -160,7 +159,7 @@ PermissionDef testWriteCallLogDef = {
     .availableLevel = APL_SYSTEM_BASIC,
 };
 
-PermissionStateFull testPermWriteCallLog = {
+inline PermissionStateFull testPermWriteCallLog = {
     .grantFlags = { 2 }, // PERMISSION_USER_SET
     .grantStatus = { PermissionState::PERMISSION_GRANTED },
     .isGeneral = true,
@@ -168,7 +167,7 @@ PermissionStateFull testPermWriteCallLog = {
     .resDeviceID = { "local" },
 };
 
-PermissionDef testStartAbilityFromBGDef = {
+inline PermissionDef testStartAbilityFromBGDef = {
     .permissionName = "ohos.permission.START_ABILITIES_FROM_BACKGROUND",
     .bundleName = "tel_call_manager_gtest",
     .grantMode = 1, // SYSTEM_GRANT
@@ -179,7 +178,7 @@ PermissionDef testStartAbilityFromBGDef = {
     .availableLevel = APL_SYSTEM_BASIC,
 };
 
-PermissionStateFull testPermStartAbilityFromBG = {
+inline PermissionStateFull testPermStartAbilityFromBG = {
     .grantFlags = { 2 }, // PERMISSION_USER_SET
     .grantStatus = { PermissionState::PERMISSION_GRANTED },
     .isGeneral = true,
@@ -187,7 +186,7 @@ PermissionStateFull testPermStartAbilityFromBG = {
     .resDeviceID = { "local" },
 };
 
-PermissionDef testConCellularCallDef = {
+inline PermissionDef testConCellularCallDef = {
     .permissionName = "ohos.permission.CONNECT_CELLULAR_CALL_SERVICE",
     .bundleName = "tel_cellular_call_cs_gtest",
     .grantMode = 1, // SYSTEM_GRANT
@@ -198,7 +197,7 @@ PermissionDef testConCellularCallDef = {
     .availableLevel = APL_SYSTEM_BASIC,
 };
 
-PermissionStateFull testPermConCellularCall = {
+inline PermissionStateFull testPermConCellularCall = {
     .grantFlags = { 2 }, // PERMISSION_USER_SET
     .grantStatus = { PermissionState::PERMISSION_GRANTED },
     .isGeneral = true,
@@ -206,7 +205,7 @@ PermissionStateFull testPermConCellularCall = {
     .resDeviceID = { "local" },
 };
 
-HapPolicyParams testPolicyParams = {
+inline HapPolicyParams testPolicyParams = {
     .apl = APL_SYSTEM_BASIC,
     .domain = "test.domain",
     .permList = { testPermPlaceCallDef, testPermSetTelephonyStateDef, testPermGetTelephonyStateDef,
@@ -252,11 +251,6 @@ private:
     static CallAttributeInfo updateCallInfo_;
     static std::unordered_set<int32_t> callIdSet_;
 };
-
-std::mutex CallInfoManager::mutex_;
-int16_t CallInfoManager::newCallState_;
-CallAttributeInfo CallInfoManager::updateCallInfo_;
-std::unordered_set<int32_t> CallInfoManager::callIdSet_;
 
 class CallAbilityCallbackStub : public IRemoteStub<ICallAbilityCallback> {
 public:
@@ -344,105 +338,9 @@ public:
 
 private:
     using CallAbilityCallbackFunc = int32_t (CallAbilityCallbackStub::*)(MessageParcel &data, MessageParcel &reply);
-
-    int32_t OnUpdateCallStateInfoRequest(MessageParcel &data, MessageParcel &reply)
-    {
-        const CallAttributeInfo *parcelPtr = nullptr;
-        int32_t length = data.ReadInt32();
-        if (length <= 0 || length >= MAX_LEN) {
-            TELEPHONY_LOGE("Invalid parameter, length = %{public}d", length);
-            return TELEPHONY_ERR_ARGUMENT_INVALID;
-        }
-        if (!data.ContainFileDescriptors()) {
-            TELEPHONY_LOGW("sent raw data is less than 32k");
-        }
-        if ((parcelPtr = reinterpret_cast<const CallAttributeInfo *>(data.ReadRawData(length))) == nullptr) {
-            TELEPHONY_LOGE("reading raw data failed, length = %{public}d", length);
-            return TELEPHONY_ERR_LOCAL_PTR_NULL;
-        }
-
-        int32_t result = OnCallDetailsChange(*parcelPtr);
-        if (!reply.WriteInt32(result)) {
-            TELEPHONY_LOGE("writing parcel failed");
-            return TELEPHONY_ERR_WRITE_REPLY_FAIL;
-        }
-        return TELEPHONY_SUCCESS;
-    }
-
-    int32_t OnUpdateCallEventRequest(MessageParcel &data, MessageParcel &reply)
-    {
-        const CallEventInfo *parcelPtr = nullptr;
-        int32_t length = data.ReadInt32();
-        if (length <= 0 || length >= MAX_LEN) {
-            TELEPHONY_LOGE("Invalid parameter, length = %{public}d", length);
-            return TELEPHONY_ERR_ARGUMENT_INVALID;
-        }
-        if (!data.ContainFileDescriptors()) {
-            TELEPHONY_LOGW("sent raw data is less than 32k");
-        }
-        if ((parcelPtr = reinterpret_cast<const CallEventInfo *>(data.ReadRawData(length))) == nullptr) {
-            TELEPHONY_LOGE("reading raw data failed, length = %d", length);
-            return TELEPHONY_ERR_LOCAL_PTR_NULL;
-        }
-
-        int32_t result = OnCallEventChange(*parcelPtr);
-        if (!reply.WriteInt32(result)) {
-            TELEPHONY_LOGE("writing parcel failed");
-            return TELEPHONY_ERR_WRITE_REPLY_FAIL;
-        }
-        return TELEPHONY_SUCCESS;
-    }
-
-    int32_t OnUpdateAsyncResultRequest(MessageParcel &data, MessageParcel &reply)
-    {
-        AppExecFwk::PacMap info;
-        CallResultReportId reportId = static_cast<CallResultReportId>(data.ReadInt32());
-        info.PutIntValue("result", data.ReadInt32());
-        switch (reportId) {
-            case CallResultReportId::GET_CALL_WAITING_REPORT_ID:
-            case CallResultReportId::GET_CALL_RESTRICTION_REPORT_ID:
-                info.PutIntValue("status", data.ReadInt32());
-                info.PutIntValue("classCw", data.ReadInt32());
-                break;
-            case CallResultReportId::GET_CALL_TRANSFER_REPORT_ID:
-                info.PutIntValue("status", data.ReadInt32());
-                info.PutIntValue("classx", data.ReadInt32());
-                info.PutStringValue("number", data.ReadString());
-                info.PutIntValue("type", data.ReadInt32());
-                info.PutIntValue("reason", data.ReadInt32());
-                info.PutIntValue("time", data.ReadInt32());
-                break;
-            case CallResultReportId::GET_CALL_CLIP_ID:
-                info.PutIntValue("action", data.ReadInt32());
-                info.PutIntValue("clipStat", data.ReadInt32());
-                break;
-            case CallResultReportId::GET_CALL_CLIR_ID:
-                info.PutIntValue("action", data.ReadInt32());
-                info.PutIntValue("clirStat", data.ReadInt32());
-                break;
-            case CallResultReportId::START_RTT_REPORT_ID:
-                info.PutIntValue("active", data.ReadInt32());
-                break;
-            case CallResultReportId::GET_IMS_CONFIG_REPORT_ID:
-            case CallResultReportId::GET_IMS_FEATURE_VALUE_REPORT_ID:
-                info.PutIntValue("value", data.ReadInt32());
-                break;
-            case CallResultReportId::STOP_RTT_REPORT_ID:
-                info.PutIntValue("inactive", data.ReadInt32());
-                break;
-            default:
-                break;
-        }
-        if (!data.ContainFileDescriptors()) {
-            TELEPHONY_LOGW("sent raw data is less than 32k");
-        }
-        int32_t result = OnReportAsyncResults(reportId, info);
-        if (!reply.WriteInt32(result)) {
-            TELEPHONY_LOGE("writing parcel failed");
-            return TELEPHONY_ERR_WRITE_REPLY_FAIL;
-        }
-        return TELEPHONY_SUCCESS;
-    }
+    int32_t OnUpdateCallStateInfoRequest(MessageParcel &data, MessageParcel &reply);
+    int32_t OnUpdateCallEventRequest(MessageParcel &data, MessageParcel &reply);
+    int32_t OnUpdateAsyncResultRequest(MessageParcel &data, MessageParcel &reply);
 
 private:
     std::map<uint32_t, CallAbilityCallbackFunc> memberFuncMap_;
@@ -493,462 +391,56 @@ public:
 
 class CallManagerConnect {
 public:
-    CallManagerConnect()
-    {
-        callAbilityCallbackPtr_ = nullptr;
-        callManagerServicePtr_ = nullptr;
-        systemAbilityId_ = TELEPHONY_CALL_MANAGER_SYS_ABILITY_ID;
-    }
-
-    ~CallManagerConnect()
-    {
-        if (callManagerServicePtr_) {
-            callManagerServicePtr_.clear();
-            callManagerServicePtr_ = nullptr;
-        }
-    }
-
-    int32_t Init(int32_t systemAbilityId)
-    {
-        AccessToken token;
-        TELEPHONY_LOGI("Enter CallManagerIpcClient::Init,systemAbilityId:%d\n", systemAbilityId);
-        systemAbilityId_ = systemAbilityId;
-        int32_t result = ConnectService();
-        TELEPHONY_LOGI("Connect service: %X\n", result);
-        return result;
-    }
-
-    void UnInit()
-    {
-        DisconnectService();
-    }
-
-    int32_t DialCall(std::u16string number, AppExecFwk::PacMap &extras) const
-    {
-        if (callManagerServicePtr_ != nullptr) {
-            return callManagerServicePtr_->DialCall(number, extras);
-        }
-        TELEPHONY_LOGE("callManagerServicePtr_ is nullptr!");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-
-    int32_t AnswerCall(int32_t callId, int32_t videoState) const
-    {
-        if (callManagerServicePtr_ != nullptr) {
-            return callManagerServicePtr_->AnswerCall(callId, videoState);
-        }
-        TELEPHONY_LOGE("callManagerServicePtr_ is nullptr!");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-
-    int32_t RejectCall(int32_t callId, bool isSendSms, std::u16string content) const
-    {
-        if (callManagerServicePtr_ != nullptr) {
-            return callManagerServicePtr_->RejectCall(callId, isSendSms, content);
-        }
-        TELEPHONY_LOGE("callManagerServicePtr_ is nullptr!");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-
-    int32_t HoldCall(int32_t callId) const
-    {
-        if (callManagerServicePtr_ != nullptr) {
-            return callManagerServicePtr_->HoldCall(callId);
-        }
-        TELEPHONY_LOGE("callManagerServicePtr_ is nullptr!");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-
-    int32_t UnHoldCall(int32_t callId) const
-    {
-        if (callManagerServicePtr_ != nullptr) {
-            return callManagerServicePtr_->UnHoldCall(callId);
-        }
-        TELEPHONY_LOGE("callManagerServicePtr_ is nullptr!");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-
-    int32_t HangUpCall(int32_t callId) const
-    {
-        if (callManagerServicePtr_ != nullptr) {
-            return callManagerServicePtr_->HangUpCall(callId);
-        }
-        TELEPHONY_LOGE("callManagerServicePtr_ is nullptr!");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-
-    int32_t GetCallState() const
-    {
-        if (callManagerServicePtr_ != nullptr) {
-            return callManagerServicePtr_->GetCallState();
-        }
-        TELEPHONY_LOGE("callManagerServicePtr_ is nullptr!");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-
-    int32_t SwitchCall(int32_t callId) const
-    {
-        if (callManagerServicePtr_ != nullptr) {
-            return callManagerServicePtr_->SwitchCall(callId);
-        }
-        TELEPHONY_LOGE("callManagerServicePtr_ is nullptr!");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-
-    bool HasCall() const
-    {
-        if (callManagerServicePtr_ != nullptr) {
-            return callManagerServicePtr_->HasCall();
-        }
-        TELEPHONY_LOGE("callManagerServicePtr_ is nullptr!");
-        return false;
-    }
-
-    int32_t IsNewCallAllowed(bool &enabled) const
-    {
-        if (callManagerServicePtr_ != nullptr) {
-            return callManagerServicePtr_->IsNewCallAllowed(enabled);
-        }
-        TELEPHONY_LOGE("callManagerServicePtr_ is nullptr!");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-
-    int32_t IsRinging(bool &enabled) const
-    {
-        if (callManagerServicePtr_ != nullptr) {
-            return callManagerServicePtr_->IsRinging(enabled);
-        }
-        TELEPHONY_LOGE("callManagerServicePtr_ is nullptr!");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-
-    int32_t IsInEmergencyCall(bool &enabled) const
-    {
-        if (callManagerServicePtr_ != nullptr) {
-            return callManagerServicePtr_->IsInEmergencyCall(enabled);
-        }
-        TELEPHONY_LOGE("callManagerServicePtr_ is nullptr!");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-
-    int32_t StartDtmf(int32_t callId, char c) const
-    {
-        if (callManagerServicePtr_ != nullptr) {
-            return callManagerServicePtr_->StartDtmf(callId, c);
-        }
-        TELEPHONY_LOGE("callManagerServicePtr_ is nullptr!");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-
-    int32_t StopDtmf(int32_t callId) const
-    {
-        if (callManagerServicePtr_ != nullptr) {
-            return callManagerServicePtr_->StopDtmf(callId);
-        }
-        TELEPHONY_LOGE("callManagerServicePtr_ is nullptr!");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-
-    int32_t GetCallWaiting(int32_t slotId) const
-    {
-        if (callManagerServicePtr_ != nullptr) {
-            return callManagerServicePtr_->GetCallWaiting(slotId);
-        }
-        TELEPHONY_LOGE("callManagerServicePtr_ is nullptr!");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-
-    int32_t SetCallWaiting(int32_t slotId, bool activate) const
-    {
-        if (callManagerServicePtr_ != nullptr) {
-            return callManagerServicePtr_->SetCallWaiting(slotId, activate);
-        }
-        TELEPHONY_LOGE("callManagerServicePtr_ is nullptr!");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-
-    int32_t GetCallRestriction(int32_t slotId, CallRestrictionType type)
-    {
-        if (callManagerServicePtr_ != nullptr) {
-            return callManagerServicePtr_->GetCallRestriction(slotId, type);
-        }
-        TELEPHONY_LOGE("callManagerServicePtr_ is nullptr!");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-
-    int32_t SetCallRestriction(int32_t slotId, CallRestrictionInfo &info)
-    {
-        if (callManagerServicePtr_ != nullptr) {
-            return callManagerServicePtr_->SetCallRestriction(slotId, info);
-        }
-        TELEPHONY_LOGE("callManagerServicePtr_ is nullptr!");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-
-    int32_t GetCallTransferInfo(int32_t slotId, CallTransferType type)
-    {
-        if (callManagerServicePtr_ != nullptr) {
-            return callManagerServicePtr_->GetCallTransferInfo(slotId, type);
-        }
-        TELEPHONY_LOGE("callManagerServicePtr_ is nullptr!");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-
-    int32_t SetCallTransferInfo(int32_t slotId, CallTransferInfo &info)
-    {
-        if (callManagerServicePtr_ != nullptr) {
-            return callManagerServicePtr_->SetCallTransferInfo(slotId, info);
-        }
-        TELEPHONY_LOGE("callManagerServicePtr_ is nullptr!");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-
-    int32_t CombineConference(int32_t mainCallId) const
-    {
-        if (callManagerServicePtr_ != nullptr) {
-            return callManagerServicePtr_->CombineConference(mainCallId);
-        }
-        TELEPHONY_LOGE("callManagerServicePtr_ is nullptr!");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-
-    int32_t SeparateConference(int32_t callId) const
-    {
-        if (callManagerServicePtr_ != nullptr) {
-            return callManagerServicePtr_->SeparateConference(callId);
-        }
-        TELEPHONY_LOGE("callManagerServicePtr_ is nullptr!");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-
-    int32_t KickOutFromConference(int32_t callId) const
-    {
-        if (callManagerServicePtr_ != nullptr) {
-            return callManagerServicePtr_->KickOutFromConference(callId);
-        }
-        TELEPHONY_LOGE("callManagerServicePtr_ is nullptr!");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-
-    int32_t IsEmergencyPhoneNumber(std::u16string &number, int32_t slotId, bool &enabled) const
-    {
-        if (callManagerServicePtr_ != nullptr) {
-            return callManagerServicePtr_->IsEmergencyPhoneNumber(number, slotId, enabled);
-        }
-        TELEPHONY_LOGE("callManagerServicePtr_ is nullptr!");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-
-    int32_t FormatPhoneNumber(
-        std::u16string &number, std::u16string &countryCode, std::u16string &formatNumber) const
-    {
-        if (callManagerServicePtr_ != nullptr) {
-            return callManagerServicePtr_->FormatPhoneNumber(number, countryCode, formatNumber);
-        }
-        TELEPHONY_LOGE("callManagerServicePtr_ is nullptr!");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-
+    CallManagerConnect();
+    ~CallManagerConnect();
+    int32_t Init(int32_t systemAbilityId);
+    void UnInit();
+    int32_t DialCall(std::u16string number, AppExecFwk::PacMap &extras) const;
+    int32_t AnswerCall(int32_t callId, int32_t videoState) const;
+    int32_t RejectCall(int32_t callId, bool isSendSms, std::u16string content) const;
+    int32_t HoldCall(int32_t callId) const;
+    int32_t UnHoldCall(int32_t callId) const;
+    int32_t HangUpCall(int32_t callId) const;
+    int32_t GetCallState() const;
+    int32_t SwitchCall(int32_t callId) const;
+    bool HasCall() const;
+    int32_t IsNewCallAllowed(bool &enabled) const;
+    int32_t IsRinging(bool &enabled) const;
+    int32_t IsInEmergencyCall(bool &enabled) const;
+    int32_t StartDtmf(int32_t callId, char c) const;
+    int32_t StopDtmf(int32_t callId) const;
+    int32_t GetCallWaiting(int32_t slotId) const;
+    int32_t SetCallWaiting(int32_t slotId, bool activate) const;
+    int32_t GetCallRestriction(int32_t slotId, CallRestrictionType type);
+    int32_t SetCallRestriction(int32_t slotId, CallRestrictionInfo &info);
+    int32_t GetCallTransferInfo(int32_t slotId, CallTransferType type);
+    int32_t SetCallTransferInfo(int32_t slotId, CallTransferInfo &info);
+    int32_t CombineConference(int32_t mainCallId) const;
+    int32_t SeparateConference(int32_t callId) const;
+    int32_t KickOutFromConference(int32_t callId) const;
+    int32_t IsEmergencyPhoneNumber(std::u16string &number, int32_t slotId, bool &enabled) const;
+    int32_t FormatPhoneNumber(std::u16string &number, std::u16string &countryCode, std::u16string &formatNumber) const;
     int32_t FormatPhoneNumberToE164(
-        std::u16string &number, std::u16string &countryCode, std::u16string &formatNumber) const
-    {
-        if (callManagerServicePtr_ != nullptr) {
-            return callManagerServicePtr_->FormatPhoneNumberToE164(number, countryCode, formatNumber);
-        }
-        TELEPHONY_LOGE("callManagerServicePtr_ is nullptr!");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-
-    int32_t GetMainCallId(int32_t callId, int32_t &mainCallId)
-    {
-        if (callManagerServicePtr_ != nullptr) {
-            return callManagerServicePtr_->GetMainCallId(callId, mainCallId);
-        }
-        TELEPHONY_LOGE("callManagerServicePtr_ is nullptr!");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-
-    int32_t GetSubCallIdList(int32_t callId, std::vector<std::u16string> &callIdList)
-    {
-        if (callManagerServicePtr_ != nullptr) {
-            return callManagerServicePtr_->GetSubCallIdList(callId, callIdList);
-        }
-        callIdList.clear();
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-
-    int32_t GetCallIdListForConference(int32_t callId, std::vector<std::u16string> &callIdList)
-    {
-        if (callManagerServicePtr_ != nullptr) {
-            return callManagerServicePtr_->GetCallIdListForConference(callId, callIdList);
-        }
-        callIdList.clear();
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-
-    int32_t ControlCamera(std::u16string cameraId)
-    {
-        if (callManagerServicePtr_ != nullptr) {
-            return callManagerServicePtr_->ControlCamera(cameraId);
-        }
-        TELEPHONY_LOGE("callManagerServicePtr_ is nullptr!");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-
-    int32_t SetAudioDevice(const AudioDevice &audioDevice)
-    {
-        if (callManagerServicePtr_ == nullptr) {
-            TELEPHONY_LOGE("callManagerServicePtr_ is nullptr!");
-            return TELEPHONY_ERR_LOCAL_PTR_NULL;
-        }
-        return callManagerServicePtr_->SetAudioDevice(audioDevice);
-    }
-
-    int32_t SetPreviewWindow(VideoWindow &window)
-    {
-        if (callManagerServicePtr_ != nullptr) {
-            return callManagerServicePtr_->SetPreviewWindow(window);
-        }
-        TELEPHONY_LOGE("callManagerServicePtr_ is nullptr!");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-
-    int32_t SetDisplayWindow(VideoWindow &window)
-    {
-        if (callManagerServicePtr_ != nullptr) {
-            return callManagerServicePtr_->SetDisplayWindow(window);
-        }
-        TELEPHONY_LOGE("callManagerServicePtr_ is nullptr!");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-
-    int32_t SetCameraZoom(float zoomRatio)
-    {
-        if (callManagerServicePtr_ != nullptr) {
-            return callManagerServicePtr_->SetCameraZoom(zoomRatio);
-        }
-        TELEPHONY_LOGE("callManagerServicePtr_ is nullptr!");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-
-    int32_t SetPausePicture(std::u16string path)
-    {
-        if (callManagerServicePtr_ != nullptr) {
-            return callManagerServicePtr_->SetPausePicture(path);
-        }
-        TELEPHONY_LOGE("callManagerServicePtr_ is nullptr!");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-
-    int32_t SetDeviceDirection(int32_t rotation)
-    {
-        if (callManagerServicePtr_ != nullptr) {
-            return callManagerServicePtr_->SetDeviceDirection(rotation);
-        }
-        TELEPHONY_LOGE("callManagerServicePtr_ is nullptr!");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-
-    int32_t EnableImsSwitch(int32_t slotId)
-    {
-        if (callManagerServicePtr_ != nullptr) {
-            return callManagerServicePtr_->EnableImsSwitch(slotId);
-        }
-        TELEPHONY_LOGE("callManagerServicePtr_ is nullptr!");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-
-    int32_t DisableImsSwitch(int32_t slotId)
-    {
-        if (callManagerServicePtr_ != nullptr) {
-            return callManagerServicePtr_->DisableImsSwitch(slotId);
-        }
-        TELEPHONY_LOGE("callManagerServicePtr_ is nullptr!");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-
-    int32_t IsImsSwitchEnabled(int32_t slotId)
-    {
-        if (callManagerServicePtr_ != nullptr) {
-            bool enabled;
-            return callManagerServicePtr_->IsImsSwitchEnabled(slotId, enabled);
-        }
-        TELEPHONY_LOGE("callManagerServicePtr_ is nullptr!");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-
-    int32_t SetMuted(bool isMuted) const
-    {
-        if (callManagerServicePtr_ != nullptr) {
-            return callManagerServicePtr_->SetMuted(isMuted);
-        }
-        TELEPHONY_LOGE("callManagerServicePtr_ is nullptr!");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-
-    int32_t RegisterCallBack()
-    {
-        if (callManagerServicePtr_ == nullptr) {
-            TELEPHONY_LOGE("callManagerServicePtr_ is null");
-            return TELEPHONY_ERR_LOCAL_PTR_NULL;
-        }
-        callAbilityCallbackPtr_ = (std::make_unique<CallAbilityCallbackStub>()).release();
-        if (callAbilityCallbackPtr_ == nullptr) {
-            DisconnectService();
-            TELEPHONY_LOGE("create CallAbilityCallbackStub object failed!");
-            return TELEPHONY_ERR_LOCAL_PTR_NULL;
-        }
-        int32_t ret = callManagerServicePtr_->RegisterCallBack(callAbilityCallbackPtr_);
-        if (ret != TELEPHONY_SUCCESS) {
-            DisconnectService();
-            TELEPHONY_LOGE("register callback to call manager service failed,result: %{public}d", ret);
-            return TELEPHONY_ERR_REGISTER_CALLBACK_FAIL;
-        }
-        TELEPHONY_LOGI("register call ability callback success!");
-        return TELEPHONY_SUCCESS;
-    }
+        std::u16string &number, std::u16string &countryCode, std::u16string &formatNumber) const;
+    int32_t GetMainCallId(int32_t callId, int32_t &mainCallId);
+    int32_t GetSubCallIdList(int32_t callId, std::vector<std::u16string> &callIdList);
+    int32_t GetCallIdListForConference(int32_t callId, std::vector<std::u16string> &callIdList);
+    int32_t ControlCamera(std::u16string cameraId);
+    int32_t SetAudioDevice(const AudioDevice &audioDevice);
+    int32_t SetPreviewWindow(VideoWindow &window);
+    int32_t SetDisplayWindow(VideoWindow &window);
+    int32_t SetCameraZoom(float zoomRatio);
+    int32_t SetPausePicture(std::u16string path);
+    int32_t SetDeviceDirection(int32_t rotation);
+    int32_t EnableImsSwitch(int32_t slotId);
+    int32_t DisableImsSwitch(int32_t slotId);
+    int32_t IsImsSwitchEnabled(int32_t slotId);
+    int32_t SetMuted(bool isMuted) const;
+    int32_t RegisterCallBack();
 
 private:
-    int32_t ConnectService()
-    {
-        Utils::UniqueWriteGuard<Utils::RWLock> guard(rwClientLock_);
-        if (callManagerServicePtr_ != nullptr) {
-            return TELEPHONY_SUCCESS;
-        }
-        sptr<ISystemAbilityManager> managerPtr =
-            SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-        if (managerPtr == nullptr) {
-            return TELEPHONY_ERR_LOCAL_PTR_NULL;
-        }
-        sptr<ICallManagerService> callManagerServicePtr = nullptr;
-        sptr<IRemoteObject> iRemoteObjectPtr = managerPtr->GetSystemAbility(systemAbilityId_);
-        if (iRemoteObjectPtr == nullptr) {
-            return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
-        }
-        callManagerServicePtr = iface_cast<ICallManagerService>(iRemoteObjectPtr);
-        if (!callManagerServicePtr) {
-            return TELEPHONY_ERR_LOCAL_PTR_NULL;
-        }
-        callManagerServicePtr_ = callManagerServicePtr;
-        int32_t ret = RegisterCallBack();
-        if (ret != TELEPHONY_SUCCESS) {
-            return ret;
-        }
-        return TELEPHONY_SUCCESS;
-    }
-
-    void DisconnectService()
-    {
-        Utils::UniqueWriteGuard<Utils::RWLock> guard(rwClientLock_);
-        if (callManagerServicePtr_) {
-            callManagerServicePtr_.clear();
-            callManagerServicePtr_ = nullptr;
-        }
-        if (callAbilityCallbackPtr_) {
-            callAbilityCallbackPtr_.clear();
-            callAbilityCallbackPtr_ = nullptr;
-        }
-    }
+    int32_t ConnectService();
+    void DisconnectService();
 
 private:
     int32_t systemAbilityId_;
