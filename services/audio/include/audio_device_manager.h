@@ -60,6 +60,7 @@ private:
     static bool isSpeakerAvailable_;
     static bool isWiredHeadsetConnected_;
     static bool isBtScoConnected_;
+    bool isAudioActivated_;
     using AudioDeviceManagerFunc = bool (AudioDeviceManager::*)();
     std::map<uint32_t, AudioDeviceManagerFunc> memberFuncMap_;
     AudioDeviceInfo info_;
