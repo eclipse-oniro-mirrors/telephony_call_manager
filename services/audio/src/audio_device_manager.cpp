@@ -179,6 +179,7 @@ bool AudioDeviceManager::InitAudioDevice()
 
 bool AudioDeviceManager::ProcessEvent(AudioEvent event)
 {
+    bool result = false;
     switch (event) {
         case AudioEvent::AUDIO_ACTIVATED:
         case AudioEvent::AUDIO_RINGING:
