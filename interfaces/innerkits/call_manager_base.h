@@ -456,6 +456,10 @@ enum class AudioDeviceType {
      * Indicates the device type is an unknown or uninitialized.
      */
     DEVICE_UNKNOWN,
+    /**
+     * Indicates the device type is a distributed car device.
+     */
+    DEVICE_DISTRIBUTED_CAR,
 };
 
 /**
