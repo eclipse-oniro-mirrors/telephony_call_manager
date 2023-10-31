@@ -174,19 +174,6 @@ napi_value NapiCallManager::DeclareCallImsInterface(napi_env env, napi_value exp
 napi_value NapiCallManager::DeclareCallMediaEnum(napi_env env, napi_value exports)
 {
     napi_property_descriptor desc[] = {
-        // AudioDeviceType
-        DECLARE_NAPI_STATIC_PROPERTY("DEVICE_EARPIECE",
-            NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(AudioDeviceType::DEVICE_EARPIECE))),
-        DECLARE_NAPI_STATIC_PROPERTY("DEVICE_SPEAKER",
-            NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(AudioDeviceType::DEVICE_SPEAKER))),
-        DECLARE_NAPI_STATIC_PROPERTY("DEVICE_WIRED_HEADSET",
-            NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(AudioDeviceType::DEVICE_WIRED_HEADSET))),
-        DECLARE_NAPI_STATIC_PROPERTY("DEVICE_BLUETOOTH_SCO",
-            NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(AudioDeviceType::DEVICE_BLUETOOTH_SCO))),
-        DECLARE_NAPI_STATIC_PROPERTY("DEVICE_DISABLE",
-            NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(AudioDeviceType::DEVICE_DISABLE))),
-        DECLARE_NAPI_STATIC_PROPERTY("DEVICE_UNKNOWN",
-            NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(AudioDeviceType::DEVICE_UNKNOWN))),
         // VideoStateType
         DECLARE_NAPI_STATIC_PROPERTY(
             "TYPE_VOICE", NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(VideoStateType::TYPE_VOICE))),
@@ -435,6 +422,8 @@ napi_value NapiCallManager::DeclareAudioDeviceEnum(napi_env env, napi_value expo
             NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(AudioDeviceType::DEVICE_DISABLE))),
         DECLARE_NAPI_STATIC_PROPERTY("DEVICE_BLUETOOTH_SCO",
             NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(AudioDeviceType::DEVICE_BLUETOOTH_SCO))),
+        DECLARE_NAPI_STATIC_PROPERTY("DEVICE_DISTRIBUTED_CAR",
+            NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(AudioDeviceType::DEVICE_DISTRIBUTED_CAR))),
         DECLARE_NAPI_STATIC_PROPERTY("DEVICE_WIRED_HEADSET",
             NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(AudioDeviceType::DEVICE_WIRED_HEADSET))),
         DECLARE_NAPI_STATIC_PROPERTY("DEVICE_SPEAKER",
