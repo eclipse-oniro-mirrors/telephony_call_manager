@@ -109,7 +109,7 @@ void CallRequestProcess::RejectRequest(int32_t callId, bool isSendSms, std::stri
         return;
     }
 
-    int32_t ret = call->HangUpCall();
+    int32_t ret = call->RejectCall();
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("RejectCall failed!");
         return;
