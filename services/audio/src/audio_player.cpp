@@ -132,7 +132,7 @@ int32_t AudioPlayer::Play(const std::string &path, AudioStandard::AudioStreamTyp
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     (void)fread(&wavHeader, READ_SIZE, sizeof(wav_hdr), wavFile);
-    if (!InitRenderer(wavHeader, streamType) || !InitCapturer()) {
+    if (!InitRenderer(wavHeader, streamType)) {
         TELEPHONY_LOGE("audio renderer and capturer init failed");
         (void)fclose(wavFile);
         return TELEPHONY_ERR_UNINIT;
