@@ -74,6 +74,7 @@ public:
     void ReleaseRenderer();
     void ReleaseCapturer();
     void SetStop(PlayerType playerType, bool state);
+    int32_t SetMute();
 
 private:
     class CallAudioRendererCallback : public AudioStandard::AudioRendererCallback {
