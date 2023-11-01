@@ -284,5 +284,15 @@ void AudioPlayer::CallAudioRendererCallback::OnInterrupt(const AudioStandard::In
         }
     }
 }
+
+int32_t AudioPlayer::SetMute()
+{
+    if (audioRenderer_ == nullptr) {
+        TELEPHONY_LOGE("audioRenderer_ is nullptr");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    float volume = 0.0f;
+    return audioRenderer_->SetVolume(volume);
+}
 } // namespace Telephony
 } // namespace OHOS

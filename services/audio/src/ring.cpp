@@ -142,5 +142,14 @@ void Ring::ReleaseRenderer()
     }
     audioPlayer_->ReleaseRenderer();
 }
+
+int32_t Ring::SetMute()
+{
+    if (audioPlayer_ == nullptr) {
+        TELEPHONY_LOGE("audioPlayer_ is nullptr");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return audioPlayer_->SetMute();
+}
 } // namespace Telephony
 } // namespace OHOS

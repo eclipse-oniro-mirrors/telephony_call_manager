@@ -422,8 +422,12 @@ int32_t AudioControlManager::MuteRinger()
         TELEPHONY_LOGI("ring already stopped");
         return TELEPHONY_SUCCESS;
     }
-    if (!PlaySoundtone()) {
-        TELEPHONY_LOGE("PlaySoundtone fail");
+    if (ring_ == nullptr) {
+        TELEPHONY_LOGE("ring is nullptr");
+        return CALL_ERR_AUDIO_SETTING_MUTE_FAILED;
+    }
+    if (ring_->SetMute() != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("SetMute fail");
         return CALL_ERR_AUDIO_SETTING_MUTE_FAILED;
     }
     TELEPHONY_LOGI("mute ring success");

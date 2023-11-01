@@ -51,6 +51,7 @@ public:
     int32_t StartVibrate();
     int32_t CancelVibrate();
     void ReleaseRenderer();
+    int32_t SetMute();
 
 private:
     bool isVibrating_;
