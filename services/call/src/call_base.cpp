@@ -70,7 +70,6 @@ int32_t CallBase::AnswerCallBase()
         TELEPHONY_LOGW("the device is currently not ringing");
         return CALL_ERR_PHONE_ANSWER_IS_BUSY;
     }
-    DelayedSingleton<AudioControlManager>::GetInstance()->SetVolumeAudible();
     return TELEPHONY_SUCCESS;
 }
 
