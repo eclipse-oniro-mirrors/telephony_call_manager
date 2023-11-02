@@ -37,6 +37,7 @@ public:
     int32_t SwitchCall() override;
     void GetCallAttributeInfo(CallAttributeInfo &info) override;
     int32_t CombineConference() override;
+    void HandleCombineConferenceFailEvent() override;
     int32_t SeparateConference() override;
     int32_t KickOutFromConference() override;
     int32_t CanCombineConference() override;

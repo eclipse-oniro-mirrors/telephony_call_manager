@@ -1174,6 +1174,19 @@ HWTEST_F(BranchTest, Telephony_OTTCall_001, Function | MediumTest | Level3)
 }
 
 /**
+ * @tc.number   Telephony_OTTCall_002
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_OTTCall_002, Function | MediumTest | Level3)
+{
+    DialParaInfo info;
+    info.number = TEST_STR;
+    std::shared_ptr<OTTCall> ottCall = std::make_shared<OTTCall>(info);
+    ottCall->HandleCombineConferenceFailEvent();
+}
+
+/**
  * @tc.number   Telephony_Bluetooth_Call_Manager_001
  * @tc.name     test error branch
  * @tc.desc     Function test
@@ -1576,12 +1589,25 @@ HWTEST_F(BranchTest, Telephony_ImsCall_001, Function | MediumTest | Level3)
     ASSERT_NE(TELEPHONY_SUCCESS, call.StartRtt(msg));
     call.AcceptVideoCall();
     call.RefuseVideoCall();
+    call.HandleCombineConferenceFailEvent();
     ASSERT_NE(TELEPHONY_SUCCESS, call.StopRtt());
     call.callState_ = TelCallState::CALL_STATUS_UNKNOWN;
     ASSERT_EQ(CALL_ERR_CALL_STATE, call.SendUpdateCallMediaModeRequest(ImsCallMode::CALL_MODE_AUDIO_ONLY));
     call.callState_ = TelCallState::CALL_STATUS_ACTIVE;
     call.videoCallState_ = nullptr;
     ASSERT_EQ(TELEPHONY_ERR_LOCAL_PTR_NULL, call.SendUpdateCallMediaModeRequest(ImsCallMode::CALL_MODE_AUDIO_ONLY));
+}
+
+/**
+ * @tc.number   Telephony_CSCall_001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_CSCall_001, Function | MediumTest | Level3)
+{
+    DialParaInfo dialParaInfo;
+    CSCall call { dialParaInfo };
+    call.HandleCombineConferenceFailEvent();
 }
 
 /**
@@ -2067,7 +2093,7 @@ HWTEST_F(BranchTest, Telephony_ConferenceBase_001, Function | MediumTest | Level
     ASSERT_NE(conference->HoldConference(VALID_CALLID), TELEPHONY_SUCCESS);
     ASSERT_NE(conference->CanSeparateConference(), TELEPHONY_SUCCESS);
     ASSERT_NE(conference->CanKickOutFromConference(), TELEPHONY_SUCCESS);
-    ASSERT_NE(conference->SetMainCall(ERROR_CALLID), TELEPHONY_SUCCESS);
+    ASSERT_EQ(conference->SetMainCall(ERROR_CALLID), TELEPHONY_SUCCESS);
     ASSERT_EQ(conference->SetMainCall(VALID_CALLID), TELEPHONY_SUCCESS);
     ASSERT_NE(conference->CanSeparateConference(), TELEPHONY_SUCCESS);
     ASSERT_NE(conference->CanKickOutFromConference(), TELEPHONY_SUCCESS);

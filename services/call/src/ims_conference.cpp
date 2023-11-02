@@ -52,6 +52,7 @@ int32_t ImsConference::JoinToConference(int32_t callId)
 
     subCallIdSet_.insert(callId);
     state_ = CONFERENCE_STATE_ACTIVE;
+    oldState_ = state_;
     beginTime_ = time(nullptr);
     TELEPHONY_LOGI("JoinToConference success, callId:%{public}d", callId);
     return TELEPHONY_SUCCESS;
@@ -72,6 +73,7 @@ int32_t ImsConference::LeaveFromConference(int32_t callId)
     if (subCallIdSet_.empty()) {
         mainCallId_ = ERR_ID;
         state_ = CONFERENCE_STATE_IDLE;
+        oldState_ = state_;
         beginTime_ = 0;
     }
     return TELEPHONY_SUCCESS;
@@ -91,10 +93,12 @@ int32_t ImsConference::HoldConference(int32_t callId)
     if (subCallIdSet_.empty()) {
         mainCallId_ = ERR_ID;
         state_ = CONFERENCE_STATE_IDLE;
+        oldState_ = state_;
         beginTime_ = 0;
         return CALL_ERR_CONFERENCE_SEPERATE_FAILED;
     }
     state_ = CONFERENCE_STATE_HOLDING;
+    oldState_ = state_;
     return TELEPHONY_SUCCESS;
 }
 

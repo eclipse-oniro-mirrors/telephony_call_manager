@@ -158,7 +158,25 @@ int32_t IMSCall::CombineConference()
         TELEPHONY_LOGE("SetMainCall failed,  error%{public}d", ret);
         return ret;
     }
+    ConferenceState currentState = DelayedSingleton<ImsConference>::GetInstance()->GetConferenceState();
+    if (currentState == ConferenceState::CONFERENCE_STATE_CREATING) {
+        TELEPHONY_LOGE("skip combine, a process of combine already exsists");
+        return TELEPHONY_SUCCESS;
+    }
+    DelayedSingleton<ImsConference>::GetInstance()->SetConferenceState(ConferenceState::CONFERENCE_STATE_CREATING);
     return CarrierCombineConference();
+}
+
+void IMSCall::HandleCombineConferenceFailEvent()
+{
+    std::set<std::int32_t> subCallIdList = DelayedSingleton<ImsConference>::GetInstance()->GetSubCallIdList();
+    if (subCallIdList.empty()) {
+        DelayedSingleton<ImsConference>::GetInstance()->SetMainCall(ERR_ID);
+    } else {
+        DelayedSingleton<ImsConference>::GetInstance()->SetMainCall(*subCallIdList.begin());
+    }
+    ConferenceState oldState = DelayedSingleton<ImsConference>::GetInstance()->GetOldConferenceState();
+    DelayedSingleton<ImsConference>::GetInstance()->SetConferenceState(oldState);
 }
 
 int32_t IMSCall::SeparateConference()

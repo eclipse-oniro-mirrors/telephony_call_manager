@@ -77,7 +77,25 @@ int32_t CSCall::CombineConference()
     if (ret != TELEPHONY_SUCCESS) {
         return ret;
     }
+    ConferenceState currentState = DelayedSingleton<CsConference>::GetInstance()->GetConferenceState();
+    if (currentState == ConferenceState::CONFERENCE_STATE_CREATING) {
+        TELEPHONY_LOGE("skip combine, a process of combine already exsists");
+        return TELEPHONY_SUCCESS;
+    }
+    DelayedSingleton<CsConference>::GetInstance()->SetConferenceState(ConferenceState::CONFERENCE_STATE_CREATING);
     return CarrierCombineConference();
+}
+
+void CSCall::HandleCombineConferenceFailEvent()
+{
+    std::set<std::int32_t> subCallIdList = DelayedSingleton<CsConference>::GetInstance()->GetSubCallIdList();
+    if (subCallIdList.empty()) {
+        DelayedSingleton<CsConference>::GetInstance()->SetMainCall(ERR_ID);
+    } else {
+        DelayedSingleton<CsConference>::GetInstance()->SetMainCall(*subCallIdList.begin());
+    }
+    ConferenceState oldState = DelayedSingleton<CsConference>::GetInstance()->GetOldConferenceState();
+    DelayedSingleton<CsConference>::GetInstance()->SetConferenceState(oldState);
 }
 
 int32_t CSCall::SeparateConference()

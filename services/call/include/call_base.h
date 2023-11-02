@@ -53,6 +53,7 @@ public:
     virtual int32_t PostDialProceed(bool proceed) = 0;
     virtual int32_t GetSlotId() = 0;
     virtual int32_t CombineConference() = 0;
+    virtual void HandleCombineConferenceFailEvent() = 0;
     virtual int32_t SeparateConference() = 0;
     virtual int32_t KickOutFromConference() = 0;
     virtual int32_t CanCombineConference() = 0;
