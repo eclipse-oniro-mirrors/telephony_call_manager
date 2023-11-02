@@ -202,6 +202,11 @@ int32_t CallStatusManager::HandleEventResultReportInfo(const CellularCallEventIn
                 TELEPHONY_LOGE("memcpy_s failed!");
                 return TELEPHONY_ERR_MEMCPY_FAIL;
             }
+        } else if (eventInfo.eventId == CallAbilityEventId::EVENT_COMBINE_CALL_FAILED) {
+            sptr<CallBase> activeCall = GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_ACTIVE);
+            if (activeCall != nullptr) {
+                activeCall->HandleCombineConferenceFailEvent();
+            }
         }
         DelayedSingleton<CallControlManager>::GetInstance()->NotifyCallEventUpdated(eventInfo);
     } else {

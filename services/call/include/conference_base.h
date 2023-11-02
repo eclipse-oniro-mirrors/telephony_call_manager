@@ -54,12 +54,16 @@ public:
     virtual int32_t CanKickOutFromConference() = 0;
     int32_t GetSubCallIdList(
         int32_t callId, std::vector<std::u16string> &callIdList); // get participant list except host
+    std::set<int32_t> GetSubCallIdList();
     int32_t GetCallIdListForConference(
         int32_t callId, std::vector<std::u16string> &callIdList); // get participant list besides host
+    ConferenceState GetOldConferenceState();
+    void SetOldConferenceState(ConferenceState state);
 
 protected:
     int32_t mainCallId_;
     ConferenceState state_;
+    ConferenceState oldState_;
     std::set<int32_t> subCallIdSet_;
     std::mutex conferenceMutex_;
     time_t beginTime_;

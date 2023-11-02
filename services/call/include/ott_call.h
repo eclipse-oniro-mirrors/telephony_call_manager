@@ -41,6 +41,7 @@ public:
     int32_t PostDialProceed(bool proceed) override;
     int32_t GetSlotId() override;
     int32_t CombineConference() override;
+    void HandleCombineConferenceFailEvent() override;
     int32_t SeparateConference() override;
     int32_t KickOutFromConference() override;
     int32_t CanCombineConference() override;

@@ -36,6 +36,7 @@ public:
     void GetCallAttributeInfo(CallAttributeInfo &info) override;
     int32_t SetMute(int32_t mute, int32_t slotId) override;
     int32_t CombineConference() override; // merge calls
+    void HandleCombineConferenceFailEvent() override;
     int32_t SeparateConference() override;
     int32_t KickOutFromConference() override;
     int32_t CanCombineConference() override;

@@ -206,7 +206,25 @@ int32_t OTTCall::CombineConference()
         TELEPHONY_LOGE("ottCallConnectionPtr_ is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
+    ConferenceState currentState = DelayedSingleton<OttConference>::GetInstance()->GetConferenceState();
+    if (currentState == ConferenceState::CONFERENCE_STATE_CREATING) {
+        TELEPHONY_LOGE("skip combine, a process of combine already exsists");
+        return TELEPHONY_SUCCESS;
+    }
+    DelayedSingleton<OttConference>::GetInstance()->SetConferenceState(ConferenceState::CONFERENCE_STATE_CREATING);
     return ottCallConnectionPtr_->CombineConference(requestInfo);
+}
+
+void OTTCall::HandleCombineConferenceFailEvent()
+{
+    std::set<std::int32_t> subCallIdList = DelayedSingleton<OttConference>::GetInstance()->GetSubCallIdList();
+    if (subCallIdList.empty()) {
+        DelayedSingleton<OttConference>::GetInstance()->SetMainCall(ERR_ID);
+    } else {
+        DelayedSingleton<OttConference>::GetInstance()->SetMainCall(*subCallIdList.begin());
+    }
+    ConferenceState oldState = DelayedSingleton<OttConference>::GetInstance()->GetOldConferenceState();
+    DelayedSingleton<OttConference>::GetInstance()->SetConferenceState(oldState);
 }
 
 int32_t OTTCall::CanCombineConference()

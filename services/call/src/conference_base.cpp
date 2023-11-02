@@ -24,7 +24,8 @@
 namespace OHOS {
 namespace Telephony {
 ConferenceBase::ConferenceBase()
-    : mainCallId_(ERR_ID), state_(CONFERENCE_STATE_IDLE), beginTime_(0), conferenceType_(CallType::TYPE_CS)
+    : mainCallId_(ERR_ID), state_(CONFERENCE_STATE_IDLE), oldState_(CONFERENCE_STATE_IDLE), beginTime_(0),
+      conferenceType_(CallType::TYPE_CS)
 {
     subCallIdSet_.clear();
 }
@@ -43,18 +44,12 @@ int32_t ConferenceBase::GetMainCall()
 
 int32_t ConferenceBase::SetMainCall(int32_t callId)
 {
-    if (callId <= ERR_ID) {
+    if (callId < ERR_ID) {
         TELEPHONY_LOGE("callId is invalid:%{public}d", callId);
         return CALL_ERR_INVALID_CALLID;
     }
-    int32_t ret = CanCombineConference();
-    if (ret != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("join conference failed, errorCode:%{public}d", ret);
-        return ret;
-    }
     std::lock_guard<std::mutex> lock(conferenceMutex_);
     mainCallId_ = callId;
-    state_ = CONFERENCE_STATE_CREATING;
     return TELEPHONY_SUCCESS;
 }
 
@@ -68,6 +63,18 @@ void ConferenceBase::SetConferenceState(ConferenceState state)
 {
     std::lock_guard<std::mutex> lock(conferenceMutex_);
     state_ = state;
+}
+
+void ConferenceBase::SetOldConferenceState(ConferenceState state)
+{
+    std::lock_guard<std::mutex> lock(conferenceMutex_);
+    oldState_ = state;
+}
+
+ConferenceState ConferenceBase::GetOldConferenceState()
+{
+    std::lock_guard<std::mutex> lock(conferenceMutex_);
+    return oldState_;
 }
 
 int32_t ConferenceBase::GetSubCallIdList(int32_t callId, std::vector<std::u16string> &callIdList)
@@ -88,6 +95,12 @@ int32_t ConferenceBase::GetSubCallIdList(int32_t callId, std::vector<std::u16str
         return CALL_ERR_THE_CALL_IS_NOT_IN_THE_CONFERENCE;
     }
     return TELEPHONY_SUCCESS;
+}
+
+std::set<int32_t> ConferenceBase::GetSubCallIdList()
+{
+    std::lock_guard<std::mutex> lock(conferenceMutex_);
+    return subCallIdSet_;
 }
 
 int32_t ConferenceBase::GetCallIdListForConference(int32_t callId, std::vector<std::u16string> &callIdList)
