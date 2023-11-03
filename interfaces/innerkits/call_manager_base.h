@@ -27,7 +27,7 @@ namespace Telephony {
 /**
  * @brief Indicates Maximum length of a string.
  */
-constexpr int16_t kMaxNumberLen = 100;
+constexpr int16_t kMaxNumberLen = 255;
 /**
  * @brief Indicates Maximum length of a bundle name.
  */
@@ -47,7 +47,7 @@ constexpr uint16_t REJECT_CALL_MSG_MAX_LEN = 300;
 /**
  * @brief Indicates Maximum length of the account number.
  */
-constexpr uint16_t ACCOUNT_NUMBER_MAX_LENGTH = 100;
+constexpr uint16_t ACCOUNT_NUMBER_MAX_LENGTH = 255;
 /**
  * @brief Indicates Maximum duration(ms) when connect service.
  */
