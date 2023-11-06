@@ -2097,6 +2097,7 @@ HWTEST_F(BranchTest, Telephony_ConferenceBase_001, Function | MediumTest | Level
     ASSERT_EQ(conference->SetMainCall(VALID_CALLID), TELEPHONY_SUCCESS);
     ASSERT_NE(conference->CanSeparateConference(), TELEPHONY_SUCCESS);
     ASSERT_NE(conference->CanKickOutFromConference(), TELEPHONY_SUCCESS);
+    conference->SetConferenceState(ConferenceState::CONFERENCE_STATE_CREATING);
     ASSERT_EQ(conference->JoinToConference(VALID_CALLID), TELEPHONY_SUCCESS);
     ASSERT_EQ(conference->GetSubCallIdList(VALID_CALLID, callIdList), TELEPHONY_SUCCESS);
     ASSERT_EQ(conference->GetCallIdListForConference(VALID_CALLID, callIdList), TELEPHONY_SUCCESS);
