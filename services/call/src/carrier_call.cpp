@@ -89,16 +89,11 @@ int32_t CarrierCall::CarrierRejectCall()
         CallManagerHisysevent::WriteHangUpFaultEvent(
             slotId_, callInfo.callId, ret, "Reject PackCellularCallInfo failed");
     }
-    TelCallState state = GetTelCallState();
     if (cellularCallConnectionPtr_ == nullptr) {
         TELEPHONY_LOGE("cellularCallConnectionPtr_ is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    if (state == TelCallState::CALL_STATUS_INCOMING) {
-        ret = cellularCallConnectionPtr_->Reject(callInfo);
-    } else {
-        ret = cellularCallConnectionPtr_->HangUp(callInfo, CallSupplementType::TYPE_DEFAULT);
-    }
+    ret = cellularCallConnectionPtr_->HangUp(callInfo, CallSupplementType::TYPE_DEFAULT);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("Reject failed!");
         return CALL_ERR_REJECT_FAILED;
