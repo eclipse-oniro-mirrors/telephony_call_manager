@@ -57,13 +57,12 @@ int32_t CallIncomingFilterManager::doIncomingFilter(const CallDetailInfo &info)
     if (callDataPtr->QueryIsBlockPhoneNumber(info.phoneNum, IsBlockNumber)) {
         TELEPHONY_LOGI("Query database failed.");
     }
-    TELEPHONY_LOGE("IsBlockNumber = %{public}d", IsBlockNumber);
     if (IsBlockNumber) {
         CellularCallInfo callInfo;
         if (PackCellularCallInfo(callInfo, info) != TELEPHONY_SUCCESS) {
             TELEPHONY_LOGW("PackCellularCallInfo failed!");
         }
-        DelayedSingleton<CellularCallConnection>::GetInstance()->Reject(callInfo);
+        DelayedSingleton<CellularCallConnection>::GetInstance()->HangUp(callInfo, CallSupplementType::TYPE_DEFAULT);
         TELEPHONY_LOGI("start to Reject");
         return TELEPHONY_ERR_FAIL;
     }
