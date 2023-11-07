@@ -31,8 +31,7 @@ static constexpr const char *CALL_SUBSECTION = "datashare:///com.ohos.calllogabi
 static constexpr const char *CONTACT_URI = "datashare:///com.ohos.contactsdataability";
 static constexpr const char *CALL_BLOCK = "datashare:///com.ohos.contactsdataability/contacts/contact_blocklist";
 static constexpr const char *CONTACT_DATA = "datashare:///com.ohos.contactsdataability/contacts/contact_data";
-static constexpr const char * ISO_COUNTRY_CODE = "CN";
-static constexpr const char * PHONE_NUMBER = "phone_number";
+static constexpr const char *ISO_COUNTRY_CODE = "CN";
 constexpr int32_t E_OK = 0;
 
 CallDataRdbObserver::CallDataRdbObserver(std::vector<std::string> *phones)
@@ -286,7 +285,7 @@ int32_t CallDataBaseHelper::QueryIsBlockPhoneNumber(const std::string &phoneNum,
         TELEPHONY_LOGE("Format phone number failed.");
         internationalNumber = phoneNum;
     }
-    predicates.EqualTo(PHONE_NUMBER, nationalNumber)->Or()->EqualTo(PHONE_NUMBER, internationalNumber);
+    predicates.EqualTo(CALL_PHONE_NUMBER, nationalNumber)->Or()->EqualTo(CALL_PHONE_NUMBER, internationalNumber);
     auto resultSet = callDataHelper->Query(uri, predicates, columns);
     if (resultSet == nullptr) {
         TELEPHONY_LOGE("Query Result Set nullptr Failed.");
