@@ -29,16 +29,6 @@ CallIncomingFilterManager::CallIncomingFilterManager() : isFirstIncoming(true) {
 
 CallIncomingFilterManager::~CallIncomingFilterManager() {}
 
-void CallIncomingFilterManager::SetFirstIncomingFlag()
-{
-    isFirstIncoming = false;
-}
-
-bool CallIncomingFilterManager::IsFirstIncoming()
-{
-    return isFirstIncoming;
-}
-
 int32_t CallIncomingFilterManager::PackCellularCallInfo(CellularCallInfo &callInfo, const CallDetailInfo &info)
 {
     callInfo.callType = info.callType;
@@ -56,27 +46,19 @@ int32_t CallIncomingFilterManager::PackCellularCallInfo(CellularCallInfo &callIn
     return TELEPHONY_SUCCESS;
 }
 
-void CallIncomingFilterManager::UpdateIncomingFilterData()
+int32_t CallIncomingFilterManager::doIncomingFilter(const CallDetailInfo &info)
 {
-    isFirstIncoming = true;
     std::shared_ptr<CallDataBaseHelper> callDataPtr = DelayedSingleton<CallDataBaseHelper>::GetInstance();
     if (callDataPtr == nullptr) {
         TELEPHONY_LOGE("callDataPtr is nullptr!");
-        return;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    DataShare::DataSharePredicates predicates;
-    predicates.NotEqualTo("phone_number", std::string(""));
-    phones_.clear();
-    callDataPtr->Query(&phones_, predicates);
-    callDataPtr->RegisterObserver(&phones_);
-}
-
-int32_t CallIncomingFilterManager::doIncomingFilter(const CallDetailInfo &info)
-{
-    if (phones_.empty()) {
-        return TELEPHONY_SUCCESS;
+    bool IsBlockNumber = false;
+    if (callDataPtr->QueryIsBlockPhoneNumber(info.phoneNum, IsBlockNumber)) {
+        TELEPHONY_LOGI("Query database failed.");
     }
-    if (std::find(phones_.begin(), phones_.end(), std::string(info.phoneNum)) != phones_.end()) {
+    TELEPHONY_LOGE("IsBlockNumber = %{public}d", IsBlockNumber);
+    if (IsBlockNumber) {
         CellularCallInfo callInfo;
         if (PackCellularCallInfo(callInfo, info) != TELEPHONY_SUCCESS) {
             TELEPHONY_LOGW("PackCellularCallInfo failed!");

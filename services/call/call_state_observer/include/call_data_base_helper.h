@@ -80,6 +80,7 @@ public:
     bool Delete(DataShare::DataSharePredicates &predicates);
     bool QueryCallLog(
         std::map<std::string, int32_t> &phonesAndUnreadCountMap, DataShare::DataSharePredicates &predicates);
+    int32_t QueryIsBlockPhoneNumber(const std::string &phoneNum, bool &result);
 
 public:
     const int16_t CALL_LOG_DEFAULT_COUNT = 1;
