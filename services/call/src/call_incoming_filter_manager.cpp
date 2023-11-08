@@ -48,6 +48,13 @@ int32_t CallIncomingFilterManager::PackCellularCallInfo(CellularCallInfo &callIn
 
 int32_t CallIncomingFilterManager::DoIncomingFilter(const CallDetailInfo &info)
 {
+    bool isEcc = false;
+    DelayedSingleton<CellularCallConnection>::GetInstance()->IsEmergencyPhoneNumber(
+        info.phoneNum, info.accountId, isEcc);
+    if (isEcc) {
+        TELEPHONY_LOGI("incoming phoneNumber is ecc.");
+        return TELEPHONY_SUCCESS;
+    }
     std::shared_ptr<CallDataBaseHelper> callDataPtr = DelayedSingleton<CallDataBaseHelper>::GetInstance();
     if (callDataPtr == nullptr) {
         TELEPHONY_LOGE("callDataPtr is nullptr!");
