@@ -41,6 +41,9 @@ public:
     std::string RemovePostDialPhoneNumber(const std::string &phoneString);
 
 private:
+    void ProcessSpace(std::string &number);
+
+private:
     static const int16_t HAS_A_SLOT = 1;
     static const int16_t HAS_TWO_SLOT = 2;
     static const int16_t PHONE_NUMBER_LENGTH_ONE = 1;

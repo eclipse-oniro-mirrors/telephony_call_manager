@@ -13,10 +13,14 @@
  * limitations under the License.
  */
 
-#include "ability_context.h"
 #include "call_data_base_helper.h"
+
+#include "ability_context.h"
 #include "call_manager_errors.h"
+#include "call_number_utils.h"
 #include "iservice_registry.h"
+#include "phonenumbers/phonenumber.pb.h"
+#include "phonenumberutil.h"
 #include "telephony_log_wrapper.h"
 
 namespace OHOS {
@@ -27,6 +31,8 @@ static constexpr const char *CALL_SUBSECTION = "datashare:///com.ohos.calllogabi
 static constexpr const char *CONTACT_URI = "datashare:///com.ohos.contactsdataability";
 static constexpr const char *CALL_BLOCK = "datashare:///com.ohos.contactsdataability/contacts/contact_blocklist";
 static constexpr const char *CONTACT_DATA = "datashare:///com.ohos.contactsdataability/contacts/contact_data";
+static constexpr const char *ISO_COUNTRY_CODE = "CN";
+constexpr int32_t E_OK = 0;
 
 CallDataRdbObserver::CallDataRdbObserver(std::vector<std::string> *phones)
 {
@@ -252,6 +258,50 @@ bool CallDataBaseHelper::Delete(DataShare::DataSharePredicates &predicates)
     bool result = (helper->Delete(uri, predicates) > 0);
     helper->Release();
     return result;
+}
+
+int32_t CallDataBaseHelper::QueryIsBlockPhoneNumber(const std::string &phoneNum, bool &result)
+{
+    result = false;
+    std::shared_ptr<DataShare::DataShareHelper> callDataHelper = CreateDataShareHelper(CALLLOG_URI);
+    if (callDataHelper == nullptr) {
+        TELEPHONY_LOGE("callDataHelper is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    Uri uri(CALL_BLOCK);
+    DataShare::DataSharePredicates predicates;
+    std::vector<std::string> columns;
+    std::string internationalNumber;
+    std::string nationalNumber;
+    int32_t ret = DelayedSingleton<CallNumberUtils>::GetInstance()->FormatNumberBase(
+        phoneNum, ISO_COUNTRY_CODE, i18n::phonenumbers::PhoneNumberUtil::PhoneNumberFormat::NATIONAL, nationalNumber);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("Format phone number failed.");
+        nationalNumber = phoneNum;
+    }
+    ret = DelayedSingleton<CallNumberUtils>::GetInstance()->FormatNumberBase(phoneNum, ISO_COUNTRY_CODE,
+        i18n::phonenumbers::PhoneNumberUtil::PhoneNumberFormat::INTERNATIONAL, internationalNumber);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("Format phone number failed.");
+        internationalNumber = phoneNum;
+    }
+    predicates.EqualTo(CALL_PHONE_NUMBER, nationalNumber)->Or()->EqualTo(CALL_PHONE_NUMBER, internationalNumber);
+    auto resultSet = callDataHelper->Query(uri, predicates, columns);
+    if (resultSet == nullptr) {
+        TELEPHONY_LOGE("Query Result Set nullptr Failed.");
+        callDataHelper->Release();
+        callDataHelper = nullptr;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    int32_t count = 0;
+    if (resultSet->GetRowCount(count) == E_OK && count != 0) {
+        result = true;
+    }
+    TELEPHONY_LOGI("count: %{public}d", count);
+    resultSet->Close();
+    callDataHelper->Release();
+    callDataHelper = nullptr;
+    return TELEPHONY_SUCCESS;
 }
 } // namespace Telephony
 } // namespace OHOS

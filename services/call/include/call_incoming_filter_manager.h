@@ -30,11 +30,8 @@ class CallIncomingFilterManager : public RefBase {
 public:
     CallIncomingFilterManager();
     ~CallIncomingFilterManager();
-    void SetFirstIncomingFlag();
-    bool IsFirstIncoming();
-    void UpdateIncomingFilterData();
     int32_t PackCellularCallInfo(CellularCallInfo &callInfo, const CallDetailInfo &info);
-    int32_t doIncomingFilter(const CallDetailInfo &info);
+    int32_t DoIncomingFilter(const CallDetailInfo &info);
 
 private:
     bool isFirstIncoming;

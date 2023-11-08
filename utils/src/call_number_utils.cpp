@@ -85,7 +85,19 @@ int32_t CallNumberUtils::FormatNumberBase(const std::string phoneNumber, std::st
         TELEPHONY_LOGE("FormatPhoneNumber failed!");
         return CALL_ERR_FORMAT_PHONE_NUMBER_FAILED;
     }
+    ProcessSpace(formatNumber);
     return TELEPHONY_SUCCESS;
+}
+
+void CallNumberUtils::ProcessSpace(std::string &number)
+{
+    std::string word;
+    std::stringstream streamNum(number);
+    std::string store;
+    while (streamNum >> word) {
+        store += word;
+    }
+    number = store;
 }
 
 int32_t CallNumberUtils::CheckNumberIsEmergency(const std::string &phoneNumber, const int32_t slotId, bool &enabled)
