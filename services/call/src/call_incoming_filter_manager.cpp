@@ -46,7 +46,7 @@ int32_t CallIncomingFilterManager::PackCellularCallInfo(CellularCallInfo &callIn
     return TELEPHONY_SUCCESS;
 }
 
-int32_t CallIncomingFilterManager::doIncomingFilter(const CallDetailInfo &info)
+int32_t CallIncomingFilterManager::DoIncomingFilter(const CallDetailInfo &info)
 {
     std::shared_ptr<CallDataBaseHelper> callDataPtr = DelayedSingleton<CallDataBaseHelper>::GetInstance();
     if (callDataPtr == nullptr) {
@@ -54,8 +54,8 @@ int32_t CallIncomingFilterManager::doIncomingFilter(const CallDetailInfo &info)
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     bool IsBlockNumber = false;
-    if (callDataPtr->QueryIsBlockPhoneNumber(info.phoneNum, IsBlockNumber)) {
-        TELEPHONY_LOGI("Query database failed.");
+    if (callDataPtr->QueryIsBlockPhoneNumber(info.phoneNum, IsBlockNumber) != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("QueryIsBlockPhoneNumber fail.");
     }
     if (IsBlockNumber) {
         CellularCallInfo callInfo;

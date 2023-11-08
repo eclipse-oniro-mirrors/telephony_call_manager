@@ -317,7 +317,7 @@ int32_t CallStatusManager::IncomingFilterPolicy(const CallDetailInfo &info)
         TELEPHONY_LOGE("CallIncomingFilterManagerPtr_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return CallIncomingFilterManagerPtr_->doIncomingFilter(info);
+    return CallIncomingFilterManagerPtr_->DoIncomingFilter(info);
 }
 
 void CallStatusManager::CallFilterCompleteResult(const CallDetailInfo &info)

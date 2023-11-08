@@ -301,7 +301,7 @@ int32_t CallDataBaseHelper::QueryIsBlockPhoneNumber(const std::string &phoneNum,
     resultSet->Close();
     callDataHelper->Release();
     callDataHelper = nullptr;
-    return (result == true) ? TELEPHONY_SUCCESS : TELEPHONY_ERR_DATABASE_READ_FAIL;
+    return TELEPHONY_SUCCESS;
 }
 } // namespace Telephony
 } // namespace OHOS
