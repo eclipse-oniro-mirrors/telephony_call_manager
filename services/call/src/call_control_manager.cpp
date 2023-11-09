@@ -1088,17 +1088,17 @@ int32_t CallControlManager::SetCaasCallState(int32_t state)
         }
         for (auto call : callIdList) {
             ret = HangUpCall(call);
-            if (ret ! = TELEPHONY_SUCCESS) {
+            if (ret != TELEPHONY_SUCCESS) {
                 TELEPHONY_LOGE("hangup call %{public}d failed!", call);
                 return ret;
             }
-        } 
+        }
     }
-    if (state == TelCallState::CALL_STATUS_IDLE ||
-        state == TelCallState::CALL_STATUS_DISCONNECTED) {
+    if (CaasCallState_ == TelCallState::CALL_STATUS_IDLE ||
+        CaasCallState_ == TelCallState::CALL_STATUS_DISCONNECTED) {
             TELEPHONY_LOGI("CAAS call state is not active");
             if (AnsweredCallQueue_.hasCall == true) {
-                TELEPHONY_LOGI("hangup call %{public}d failed!");
+                TELEPHONY_LOGI("answer call now");
                 AnsweredCallQueue_.hasCall = false;
                 return AnswerCall(AnsweredCallQueue_.callId, AnsweredCallQueue_.videoState);
             }

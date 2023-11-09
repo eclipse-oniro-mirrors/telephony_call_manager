@@ -1213,7 +1213,7 @@ int32_t CallManagerService::SetCaasCallState(int32_t state)
     }
 }
 
-int32_t CallManagerService::GetCaasCallState(int32_t slotId, int32_t &state)
+int32_t CallManagerService::GetCaasCallState(int32_t &state)
 {
     if (!TelephonyPermission::CheckCallerIsSystemApp()) {
         TELEPHONY_LOGE("Non-system applications use system APIs!");

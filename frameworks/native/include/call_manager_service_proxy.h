@@ -633,7 +633,7 @@ public:
      * @param state[in], The state of Caas Call
      * @return Returns 0 on success, others on failure.
      */
-    int32_t SetVoNRState(int32_t state) override;
+    int32_t SetCaasCallState(int32_t state) override;
 
     /**
      * GetVoNRState
@@ -642,7 +642,7 @@ public:
      * @param state[out], The Caas Call state
      * @return Returns 0 on success, others on failure.
      */
-    int32_t GetVoNRState(int32_t &state) override;
+    int32_t GetCaasCallState(int32_t &state) override;
 
     /**
      * GetProxyObjectPtr

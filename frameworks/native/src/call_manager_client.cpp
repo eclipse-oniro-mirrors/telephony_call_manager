@@ -680,7 +680,7 @@ int32_t CallManagerClient::RemoveMissedIncomingCallNotification()
 int32_t CallManagerClient::SetCaasCallState(int32_t state)
 {
     if (g_callManagerProxy != nullptr) {
-        return g_callManagerProxy->SetCaasCallState(slotId, state);
+        return g_callManagerProxy->SetCaasCallState(state);
     } else {
         TELEPHONY_LOGE("init first please!");
         return TELEPHONY_ERR_UNINIT;
