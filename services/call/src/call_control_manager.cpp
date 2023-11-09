@@ -31,6 +31,7 @@
 #include "ims_call.h"
 #include "iservice_registry.h"
 #include "reject_call_sms.h"
+#include "report_call_info_handler.h"
 #include "telephony_log_wrapper.h"
 #include "video_control_manager.h"
 
@@ -156,6 +157,16 @@ int32_t CallControlManager::AnswerCall(int32_t callId, int32_t videoState)
         }
         callId = call->GetCallID();
     }
+    TELEPHONY_LOGI("report answered state");
+    NotifyCallStateUpdated(call, TelCallState::CALL_STATUS_INCOMING, TelCallState::CALL_STATUS_ANSWERED);
+    if (CaasCallState_ != TelCallState::CALL_STATUS_IDLE &&
+        CaasCallState_ != TelCallState::CALL_STATUS_DISCONNECTED) {
+            TELEPHONY_LOGW("caas call is active, waiting for caas to disconnect");
+            AnsweredCallQueue_.hasCall = true;
+            AnsweredCallQueue_.callId = callId;
+            AnsweredCallQueue_.videoState = videoState;
+            return TELEPHONY_ERR_LOCAL_PTR_NULL;
+        }
 
     int32_t ret = AnswerCallPolicy(callId, videoState);
     if (ret != TELEPHONY_SUCCESS) {
@@ -1061,6 +1072,43 @@ int32_t CallControlManager::RemoveMissedIncomingCallNotification()
         TELEPHONY_LOGE("RemoveMissedIncomingCallNotification failed!");
         return ret;
     }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallControlManager::SetCaasCallState(int32_t state)
+{
+    CaasCallState_ = (TelCallState)state;
+    if (CaasCallState_ == TelCallState::CALL_STATUS_ANSWERED) {
+        TELEPHONY_LOGI("CAAS answered the call, should hangup sim calls");
+        std::list<int32_t> callIdList;
+        int32_t ret = GetCarrierCallList(callIdList);
+        if (ret != TELEPHONY_SUCCESS) {
+            TELEPHONY_LOGE("GetCarrierCallList failed!");
+            return ret;
+        }
+        for (auto call : callIdList) {
+            ret = HangUpCall(call);
+            if (ret ! = TELEPHONY_SUCCESS) {
+                TELEPHONY_LOGE("hangup call %{public}d failed!", call);
+                return ret;
+            }
+        } 
+    }
+    if (state == TelCallState::CALL_STATUS_IDLE ||
+        state == TelCallState::CALL_STATUS_DISCONNECTED) {
+            TELEPHONY_LOGI("CAAS call state is not active");
+            if (AnsweredCallQueue_.hasCall == true) {
+                TELEPHONY_LOGI("hangup call %{public}d failed!");
+                AnsweredCallQueue_.hasCall = false;
+                return AnswerCall(AnsweredCallQueue_.callId, AnsweredCallQueue_.videoState);
+            }
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallControlManager::GetCaasCallState(int32_t &state)
+{
+    state = (int32_t)CaasCallState_;
     return TELEPHONY_SUCCESS;
 }
 

@@ -136,6 +136,7 @@ napi_value NapiCallManager::DeclareCallExtendInterface(napi_env env, napi_value 
         DECLARE_NAPI_FUNCTION("reportOttCallDetailsInfo", ReportOttCallDetailsInfo),
         DECLARE_NAPI_FUNCTION("reportOttCallEventInfo", ReportOttCallEventInfo),
         DECLARE_NAPI_FUNCTION("removeMissedIncomingCallNotification", RemoveMissedIncomingCallNotification),
+        DECLARE_NAPI_FUNCTION("setCaasCallState", SetCaasCallState),
     };
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc));
     return exports;
@@ -248,6 +249,8 @@ napi_value NapiCallManager::DeclareCallStateEnum(napi_env env, napi_value export
             NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(TelCallState::CALL_STATUS_DISCONNECTING))),
         DECLARE_NAPI_STATIC_PROPERTY("CALL_STATUS_IDLE",
             NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(TelCallState::CALL_STATUS_IDLE))),
+        DECLARE_NAPI_STATIC_PROPERTY("CALL_STATUS_ANSWERED",
+            NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(TelCallState::CALL_STATUS_ANSWERED))),
         // TelConferenceState
         DECLARE_NAPI_STATIC_PROPERTY("TEL_CONFERENCE_IDLE",
             NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(TelConferenceState::TEL_CONFERENCE_IDLE))),
@@ -542,6 +545,8 @@ napi_value NapiCallManager::DeclareTelCallStateEnum(napi_env env, napi_value exp
             NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(TelCallState::CALL_STATUS_HOLDING))),
         DECLARE_NAPI_STATIC_PROPERTY("CALL_STATUS_ACTIVE",
             NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(TelCallState::CALL_STATUS_ACTIVE))),
+        DECLARE_NAPI_STATIC_PROPERTY("CALL_STATUS_ANSWERED",
+            NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(TelCallState::CALL_STATUS_ANSWERED))),
     };
     napi_value result = nullptr;
     napi_define_class(env, "TelCallState", NAPI_AUTO_LENGTH, NapiCallManagerUtils::CreateEnumConstructor, nullptr,
@@ -2904,6 +2909,28 @@ napi_value NapiCallManager::RemoveMissedIncomingCallNotification(napi_env env, n
         NativeRemoveMissedIncomingCallNotification, NativeVoidCallBackWithErrorCode);
 }
 
+napi_value NapiCallManager::SetCaasCallState(napi_env env, napi_callback_info info)
+{
+    GET_PARAMS(env, info, TWO_VALUE_LIMIT);
+    if (!MatchOneNumberParameter(env, argv, argc)) {
+        TELEPHONY_LOGE("NapiCallManager::SetCaasCallState MatchEmptyParameter failed.");
+        NapiUtil::ThrowParameterError(env);
+        return nullptr;
+    }
+    auto asyncContext = std::make_unique<CaasCallStateAsyncContext>();
+    if (asyncContext == nullptr) {
+        TELEPHONY_LOGE("NapiCallManager::SetCaasCallState asyncContext is nullptr.");
+        NapiUtil::ThrowParameterError(env);
+        return nullptr;
+    }
+    napi_get_value_int32(env, argv[ARRAY_INDEX_SECOND], &asyncContext->state);
+    if (argc == TWO_VALUE_LIMIT) {
+        napi_create_reference(env, argv[ARRAY_INDEX_THIRD], DATA_LENGTH_ONE, &(asyncContext->callbackRef));
+    }
+    return HandleAsyncWork(
+        env, asyncContext.release(), "SetCaasCallState", NativeSetCaasCallState, NativeVoidCallBackWithErrorCode);
+}
+
 napi_value NapiCallManager::HasVoiceCapability(napi_env env, napi_callback_info)
 {
     TELEPHONY_LOGI("napi_call HasVoiceCapability");
@@ -4748,6 +4775,22 @@ void NapiCallManager::NativeRemoveMissedIncomingCallNotification(napi_env env, v
     if (asyncContext->errorCode == TELEPHONY_SUCCESS) {
         asyncContext->resolved = TELEPHONY_SUCCESS;
     }
+}
+
+void NapiCallManager::NativeSetCaasCallState(napi_env env, void *data)
+{
+    if (data == nullptr) {
+        TELEPHONY_LOGE("NapiCallManager::NativeSetCaasCallState data is nullptr");
+        NapiUtil::ThrowParameterError(env);
+        return;
+    }
+    auto asyncContext = (CaasCallStateAsyncContext *)data;
+    asyncContext->errorCode = DelayedSingleton<CallManagerClient>::GetInstance()->SetCaasCallState(
+        asyncContext->state);
+    if (asyncContext->errorCode == TELEPHONY_SUCCESS) {
+        asyncContext->resolved = TELEPHONY_SUCCESS;
+    }
+    asyncContext->eventId = CALL_MANAGER_SET_CAAS_CALL_STATE;
 }
 
 void NapiCallManager::RegisterCallBack()

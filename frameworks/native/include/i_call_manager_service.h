@@ -102,6 +102,8 @@ public:
     virtual int32_t CloseUnFinishedUssd(int32_t slotId) = 0;
     virtual int32_t InputDialerSpecialCode(const std::string &specialCode) = 0;
     virtual int32_t RemoveMissedIncomingCallNotification() = 0;
+    virtual int32_t SetCaasCallState(int32_t state) = 0;
+    virtual int32_t GetCaasCallState(int32_t &state) = 0;
     virtual sptr<IRemoteObject> GetProxyObjectPtr(CallManagerProxyType proxyType) = 0;
     virtual int32_t ReportAudioDeviceInfo() = 0;
 

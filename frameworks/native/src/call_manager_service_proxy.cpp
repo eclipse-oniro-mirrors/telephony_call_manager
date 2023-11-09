@@ -1157,6 +1157,40 @@ int32_t CallManagerServiceProxy::RemoveMissedIncomingCallNotification()
     return replyParcel.ReadInt32();
 }
 
+int32_t CallManagerServiceProxy::SetCaasCallState(int32_t state)
+{
+    MessageParcel dataParcel;
+    if (!dataParcel.WriteInterfaceToken(CallManagerServiceProxy::GetDescriptor())) {
+        TELEPHONY_LOGE("write descriptor fail");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    dataParcel.WriteInt32(state);
+    MessageParcel replyParcel;
+    int32_t error = SendRequest(INTERFACE_SET_CAAS_CALL_STATE, dataParcel, replyParcel);
+    if (error != ERR_NONE) {
+        TELEPHONY_LOGE("function SetCaasCallState failed! errCode:%{public}d", error);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return replyParcel.ReadInt32();
+}
+
+int32_t CallManagerServiceProxy::GetCaasCallState(int32_t &state)
+{
+    MessageParcel dataParcel;
+    if (!dataParcel.WriteInterfaceToken(CallManagerServiceProxy::GetDescriptor())) {
+        TELEPHONY_LOGE("write descriptor fail");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    MessageParcel replyParcel;
+    int32_t error = SendRequest(INTERFACE_GET_CAAS_CALL_STATE, dataParcel, replyParcel);
+    if (error != ERR_NONE) {
+        TELEPHONY_LOGE("function GetCaasCallState failed! errCode:%{public}d", error);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    state = replyParcel.ReadInt32();
+    return replyParcel.ReadInt32();
+}
+
 sptr<IRemoteObject> CallManagerServiceProxy::GetProxyObjectPtr(CallManagerProxyType proxyType)
 {
     MessageParcel dataParcel;

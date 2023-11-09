@@ -654,6 +654,24 @@ public:
     int32_t RemoveMissedIncomingCallNotification() override;
 
     /**
+     * SetCaasCallState
+     *
+     * @brief Set Caas Call State
+     * @param state[in], The state of Caas Call
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t SetCaasCallState(int32_t state) override;
+
+    /**
+     * GetCaasCallState
+     *
+     * @brief Get Caas Call State
+     * @param state[out], The result of Caas Call
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t GetCaasCallState(int32_t &state) override;
+
+    /**
      * Handle special code from dialer.
      *
      * @param specialCode[in], special code

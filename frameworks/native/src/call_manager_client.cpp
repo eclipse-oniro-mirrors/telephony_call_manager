@@ -677,6 +677,26 @@ int32_t CallManagerClient::RemoveMissedIncomingCallNotification()
     return g_callManagerProxy->RemoveMissedIncomingCallNotification();
 }
 
+int32_t CallManagerClient::SetCaasCallState(int32_t state)
+{
+    if (g_callManagerProxy != nullptr) {
+        return g_callManagerProxy->SetCaasCallState(slotId, state);
+    } else {
+        TELEPHONY_LOGE("init first please!");
+        return TELEPHONY_ERR_UNINIT;
+    }
+}
+
+int32_t CallManagerClient::GetCaasCallState(int32_t &state)
+{
+    if (g_callManagerProxy != nullptr) {
+        return g_callManagerProxy->GetCaasCallState(state);
+    } else {
+        TELEPHONY_LOGE("init first please!");
+        return TELEPHONY_ERR_UNINIT;
+    }
+}
+
 bool CallManagerClient::HasVoiceCapability()
 {
     char retValue[VOICECALL_CAP_VAL_LEN + 1] = {"true"};

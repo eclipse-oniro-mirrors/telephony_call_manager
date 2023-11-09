@@ -49,6 +49,7 @@ static std::unordered_map<int32_t, const char *> eventNameMap_ = {
     { CALL_MANAGER_MUTE_RINGER, "muteRinger" },
     { CALL_MANAGER_SET_VONR_STATE, "setVoNRState" },
     { CALL_MANAGER_GET_VONR_STATE, "getVoNRState" },
+    { CALL_MANAGER_SET_CAAS_CALL_STATE, "setCaasCallState" },
 };
 
 static std::unordered_map<int32_t, const char *> eventPermissionMap_ = {
@@ -74,6 +75,7 @@ static std::unordered_map<int32_t, const char *> eventPermissionMap_ = {
     { CALL_MANAGER_MUTE_RINGER, SET_TELEPHONY_STATE },
     { CALL_MANAGER_SET_VONR_STATE, SET_TELEPHONY_STATE },
     { CALL_MANAGER_GET_VONR_STATE, GET_TELEPHONY_STATE },
+    { CALL_MANAGER_SET_VONR_STATE, SET_TELEPHONY_STATE },
 };
 
 std::string NapiCallManagerUtils::GetEventName(int32_t eventId)

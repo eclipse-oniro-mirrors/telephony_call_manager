@@ -627,6 +627,24 @@ public:
     int32_t RemoveMissedIncomingCallNotification() override;
 
     /**
+     * SetCaasCallState
+     *
+     * @brief Set Caas Call State
+     * @param state[in], The state of Caas Call
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t SetVoNRState(int32_t state) override;
+
+    /**
+     * GetVoNRState
+     *
+     * @brief Get Caas Call State
+     * @param state[out], The Caas Call state
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t GetVoNRState(int32_t &state) override;
+
+    /**
      * GetProxyObjectPtr
      *
      * @brief get callManager proxy object ptr

@@ -553,6 +553,22 @@ public:
     int32_t RemoveMissedIncomingCallNotification();
 
     /**
+     * @brief Set Caas Call state
+     *
+     * @param state[in] Indicates the Caas Call state
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t SetCaasCallState(int32_t state);
+
+    /**
+     * @brief Get Caas Call Switch Status
+     *
+     * @param state[out] Indicates the Caas Call state
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t GetCaasCallState(int32_t &state);
+
+    /**
      * @brief Checks whether a device supports voice calls
      *
      * @return true on support voice calls, false on not support.
