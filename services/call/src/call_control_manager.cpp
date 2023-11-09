@@ -147,14 +147,14 @@ int32_t CallControlManager::DialCall(std::u16string &number, AppExecFwk::PacMap 
 
 int32_t CallControlManager::AnswerCall(int32_t callId, int32_t videoState)
 {
-    if (callId == INVALID_CALLID) {
-        sptr<CallBase> call = GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_RINGING);
-        if (call == nullptr) {
+    sptr<CallBase> call = GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_RINGING);
+    if (call == nullptr) {
             TELEPHONY_LOGE("call is nullptr");
             CallManagerHisysevent::WriteAnswerCallFaultEvent(
                 INVALID_PARAMETER, callId, videoState, TELEPHONY_ERR_LOCAL_PTR_NULL, "call is nullptr");
             return TELEPHONY_ERROR;
-        }
+    }
+    if (callId == INVALID_CALLID) {
         callId = call->GetCallID();
     }
     TELEPHONY_LOGI("report answered state");
@@ -166,8 +166,7 @@ int32_t CallControlManager::AnswerCall(int32_t callId, int32_t videoState)
             AnsweredCallQueue_.callId = callId;
             AnsweredCallQueue_.videoState = videoState;
             return TELEPHONY_ERR_LOCAL_PTR_NULL;
-        }
-
+    }
     int32_t ret = AnswerCallPolicy(callId, videoState);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("AnswerCallPolicy failed!");
