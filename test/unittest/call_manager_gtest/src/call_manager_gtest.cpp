@@ -5441,6 +5441,58 @@ HWTEST_F(
     EXPECT_NE(CallManagerGtest::clientPtr_->RemoveMissedIncomingCallNotification(), RETURN_VALUE_IS_ZERO);
 }
 
+/******************************************* Test SetVoIPCallState() ********************************************/
+/**
+ * @tc.number   Telephony_CallManager_SetVoIPCallState_0100
+ * @tc.name     input VoIP call state 0 test SetVoIPCallState
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_SetVoIPCallState_0100, Function | MediumTest | Level3)
+{
+    AccessToken token;
+    int32_t state = 0;
+    EXPECT_EQ(CallManagerGtest::clientPtr_->SetVoIPCallState(state), RETURN_VALUE_IS_ZERO);
+}
+
+/******************************************* Test SetVoIPCallState() ********************************************/
+/**
+ * @tc.number   Telephony_CallManager_SetVoIPCallState_0100
+ * @tc.name     input VoIP call state 0 test SetVoIPCallState
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_SetVoIPCallState_0100, Function | MediumTest | Level3)
+{
+    AccessToken token;
+    int32_t state = 1;
+    EXPECT_EQ(CallManagerGtest::clientPtr_->SetVoIPCallState(state), RETURN_VALUE_IS_ZERO);
+}
+
+/******************************************* Test SetVoIPCallState() ********************************************/
+/**
+ * @tc.number   Telephony_CallManager_SetVoIPCallState_0100
+ * @tc.name     input VoIP call state 0 test SetVoIPCallState
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_SetVoIPCallState_0100, Function | MediumTest | Level3)
+{
+    AccessToken token;
+    int32_t state = 2;
+    EXPECT_EQ(CallManagerGtest::clientPtr_->SetVoIPCallState(state), RETURN_VALUE_IS_ZERO);
+}
+
+/******************************************* Test SetVoIPCallState() ********************************************/
+/**
+ * @tc.number   Telephony_CallManager_SetVoIPCallState_0100
+ * @tc.name     input VoIP call state 0 test SetVoIPCallState
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_SetVoIPCallState_0100, Function | MediumTest | Level3)
+{
+    AccessToken token;
+    int32_t state = 3;
+    EXPECT_EQ(CallManagerGtest::clientPtr_->SetVoIPCallState(state), RETURN_VALUE_IS_ZERO);
+}
+
 /*********************************** Test Dump() ***************************************/
 /**
  * @tc.number   Telephony_CallManager_TestDump_0100
