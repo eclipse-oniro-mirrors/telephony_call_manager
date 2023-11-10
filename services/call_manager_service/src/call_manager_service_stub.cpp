@@ -200,9 +200,9 @@ void CallManagerServiceStub::InitImsServiceRequest()
         &CallManagerServiceStub::OnStartRtt;
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_STOP_RTT)] =
         &CallManagerServiceStub::OnStopRtt;
-    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_SET_VoIP_CALL_STATE)] =
+    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_SET_VOIP_CALL_STATE)] =
         &CallManagerServiceStub::OnSetVoIPCallState;
-    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_GET_VoIP_CALL_STATE)] =
+    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_GET_VOIP_CALL_STATE)] =
         &CallManagerServiceStub::OnGetVoIPCallState;
 }
 
