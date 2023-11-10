@@ -28,22 +28,23 @@ namespace OHOS {
 namespace Telephony {
 CallBase::CallBase(DialParaInfo &info)
     : callId_(info.callId), callType_(info.callType), videoState_(info.videoState), accountNumber_(info.number),
-    bundleName_(info.bundleName), callRunningState_(CallRunningState::CALL_RUNNING_STATE_CREATE),
-    conferenceState_(TelConferenceState::TEL_CONFERENCE_IDLE), startTime_(0),
-    direction_(CallDirection::CALL_DIRECTION_IN), policyFlag_(0), callState_(info.callState),
-    isSpeakerphoneOn_(false), callEndedType_(CallEndedType::UNKNOWN), callBeginTime_(0), callEndTime_(0),
-    ringBeginTime_(0), ringEndTime_(0), answerType_(CallAnswerType::CALL_ANSWER_MISSED), accountId_(info.accountId)
+      bundleName_(info.bundleName), callRunningState_(CallRunningState::CALL_RUNNING_STATE_CREATE),
+      conferenceState_(TelConferenceState::TEL_CONFERENCE_IDLE), startTime_(0),
+      direction_(CallDirection::CALL_DIRECTION_IN), policyFlag_(0), callState_(info.callState), autoAnswerState_(false),
+      isSpeakerphoneOn_(false), callEndedType_(CallEndedType::UNKNOWN), callBeginTime_(0), callEndTime_(0),
+      ringBeginTime_(0), ringEndTime_(0), answerType_(CallAnswerType::CALL_ANSWER_MISSED), accountId_(info.accountId)
 {
     (void)memset_s(&contactInfo_, sizeof(ContactInfo), 0, sizeof(ContactInfo));
 }
 
 CallBase::CallBase(DialParaInfo &info, AppExecFwk::PacMap &extras)
     : callId_(info.callId), callType_(info.callType), videoState_(info.videoState), accountNumber_(info.number),
-    bundleName_(info.bundleName), callRunningState_(CallRunningState::CALL_RUNNING_STATE_CREATE),
-    conferenceState_(TelConferenceState::TEL_CONFERENCE_IDLE), startTime_(0),
-    direction_(CallDirection::CALL_DIRECTION_OUT), policyFlag_(0), callState_(info.callState),
-    isSpeakerphoneOn_(false), callEndedType_(CallEndedType::UNKNOWN), callBeginTime_(0), callEndTime_(0),
-    ringBeginTime_(0), ringEndTime_(0), answerType_(CallAnswerType::CALL_ANSWER_MISSED), accountId_(info.accountId)
+      bundleName_(info.bundleName), callRunningState_(CallRunningState::CALL_RUNNING_STATE_CREATE),
+      conferenceState_(TelConferenceState::TEL_CONFERENCE_IDLE), startTime_(0),
+      direction_(CallDirection::CALL_DIRECTION_OUT), policyFlag_(0), callState_(info.callState),
+      autoAnswerState_(false), isSpeakerphoneOn_(false), callEndedType_(CallEndedType::UNKNOWN), callBeginTime_(0),
+      callEndTime_(0), ringBeginTime_(0), ringEndTime_(0), answerType_(CallAnswerType::CALL_ANSWER_MISSED),
+      accountId_(info.accountId)
 {
     (void)memset_s(&contactInfo_, sizeof(ContactInfo), 0, sizeof(ContactInfo));
 }
@@ -240,6 +241,19 @@ TelCallState CallBase::GetTelCallState()
 {
     std::lock_guard<std::mutex> lock(mutex_);
     return callState_;
+}
+
+void CallBase::SetAutoAnswerState(bool flag)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    autoAnswerState_ = flag;
+    TELEPHONY_LOGI("NeedAutoAnswer:%{public}d", autoAnswerState_);
+}
+
+bool CallBase::GetAutoAnswerState()
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    return autoAnswerState_;
 }
 
 void CallBase::SetTelConferenceState(TelConferenceState state)

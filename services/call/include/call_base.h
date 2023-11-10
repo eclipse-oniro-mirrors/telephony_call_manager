@@ -102,6 +102,8 @@ public:
     int32_t SetSpeakerphoneOn(bool speakerphoneOn);
     bool IsSpeakerphoneOn();
     void SetAudio();
+    void SetAutoAnswerState(bool flag);
+    bool GetAutoAnswerState();
     bool CheckVoicemailNumber(std::string phoneNumber);
     bool IsAliveState();
     void SetBundleName(const char *bundleName);
@@ -133,6 +135,7 @@ private:
     CallDirection direction_;
     uint64_t policyFlag_;
     TelCallState callState_;
+    bool autoAnswerState_;
     bool isSpeakerphoneOn_;
     CallEndedType callEndedType_;
     ContactInfo contactInfo_;

@@ -36,7 +36,9 @@ constexpr int32_t INIT_INDEX = 0;
 CallStatusManager::CallStatusManager()
 {
     (void)memset_s(&callReportInfo_, sizeof(CallDetailInfo), 0, sizeof(CallDetailInfo));
-    (void)memset_s(&callDetailsInfo_, sizeof(CallDetailsInfo), 0, sizeof(CallDetailsInfo));
+    for (int32_t i = 0; i < SLOT_NUM; i++) {
+        (void)memset_s(&callDetailsInfo_[i], sizeof(CallDetailsInfo), 0, sizeof(CallDetailsInfo));
+    }
 }
 
 CallStatusManager::~CallStatusManager()
@@ -46,7 +48,9 @@ CallStatusManager::~CallStatusManager()
 
 int32_t CallStatusManager::Init()
 {
-    callDetailsInfo_.callVec.clear();
+    for (int32_t i = 0; i < SLOT_NUM; i++) {
+        callDetailsInfo_[i].callVec.clear();
+    }
     mEventIdTransferMap_.clear();
     mOttEventIdTransferMap_.clear();
     InitCallBaseEvent();
@@ -69,7 +73,9 @@ void CallStatusManager::InitCallBaseEvent()
 
 int32_t CallStatusManager::UnInit()
 {
-    callDetailsInfo_.callVec.clear();
+    for (int32_t i = 0; i < SLOT_NUM; i++) {
+        callDetailsInfo_[i].callVec.clear();
+    }
     mEventIdTransferMap_.clear();
     mOttEventIdTransferMap_.clear();
     return TELEPHONY_SUCCESS;
@@ -126,8 +132,9 @@ int32_t CallStatusManager::HandleCallsReportInfo(const CallDetailsInfo &info)
 {
     bool flag = false;
     TELEPHONY_LOGI("call list size:%{public}zu,slotId:%{public}d", info.callVec.size(), info.slotId);
+    int32_t curSlotId = info.slotId;
     for (auto &it : info.callVec) {
-        for (const auto &it1 : callDetailsInfo_.callVec) {
+        for (const auto &it1 : callDetailsInfo_[curSlotId].callVec) {
             if (it.index == it1.index) {
                 // call state changes
                 if (it.state != it1.state || it.mpty != it1.mpty || it.callType != it1.callType) {
@@ -139,14 +146,14 @@ int32_t CallStatusManager::HandleCallsReportInfo(const CallDetailsInfo &info)
             }
         }
         // incoming/outgoing call handle
-        if (!flag || callDetailsInfo_.callVec.empty()) {
+        if (!flag || callDetailsInfo_[curSlotId].callVec.empty()) {
             TELEPHONY_LOGI("handle new call state:%{public}d", it.state);
             HandleCallReportInfo(it);
         }
         flag = false;
     }
     // disconnected calls handle
-    for (auto &it2 : callDetailsInfo_.callVec) {
+    for (auto &it2 : callDetailsInfo_[curSlotId].callVec) {
         for (const auto &it3 : info.callVec) {
             if (it2.index == it3.index) {
                 TELEPHONY_LOGI("state:%{public}d", it2.state);
@@ -160,8 +167,8 @@ int32_t CallStatusManager::HandleCallsReportInfo(const CallDetailsInfo &info)
         }
         flag = false;
     }
-    callDetailsInfo_.callVec.clear();
-    callDetailsInfo_ = info;
+    callDetailsInfo_[curSlotId].callVec.clear();
+    callDetailsInfo_[curSlotId] = info;
     return TELEPHONY_SUCCESS;
 }
 
@@ -399,11 +406,14 @@ int32_t CallStatusManager::DialingHandle(const CallDetailInfo &info)
 int32_t CallStatusManager::ActiveHandle(const CallDetailInfo &info)
 {
     TELEPHONY_LOGI("handle active state");
-    sptr<CallBase> call = GetOneCallObjectByIndex(info.index);
-    if (call == nullptr) {
+    std::string tmpStr(info.phoneNum);
+    sptr<CallBase> firstCall = GetOneCallObjectByIndex(info.index);
+    sptr<CallBase> secondCall = GetOneCallObject(tmpStr);
+    if (firstCall != secondCall || firstCall == nullptr) {
         TELEPHONY_LOGE("Call is NULL");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
+    sptr<CallBase> call = firstCall;
     call = RefreshCallIfNecessary(call, info);
     // call state change active, need to judge if launching a conference
     if (info.mpty == 1) {
@@ -436,11 +446,13 @@ int32_t CallStatusManager::HoldingHandle(const CallDetailInfo &info)
 {
     TELEPHONY_LOGI("handle holding state");
     std::string tmpStr(info.phoneNum);
-    sptr<CallBase> call = GetOneCallObjectByIndex(info.index);
-    if (call == nullptr) {
+    sptr<CallBase> firstCall = GetOneCallObjectByIndex(info.index);
+    sptr<CallBase> secondCall = GetOneCallObject(tmpStr);
+    if (firstCall != secondCall || firstCall == nullptr) {
         TELEPHONY_LOGE("Call is NULL");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
+    sptr<CallBase> call = firstCall;
     // if the call is in a conference, it will exit, otherwise just set it holding
     call = RefreshCallIfNecessary(call, info);
     int32_t ret = call->HoldConference();
@@ -463,11 +475,13 @@ int32_t CallStatusManager::AlertHandle(const CallDetailInfo &info)
 {
     TELEPHONY_LOGI("handle alerting state");
     std::string tmpStr(info.phoneNum);
-    sptr<CallBase> call = GetOneCallObjectByIndex(info.index);
-    if (call == nullptr) {
+    sptr<CallBase> firstCall = GetOneCallObjectByIndex(info.index);
+    sptr<CallBase> secondCall = GetOneCallObject(tmpStr);
+    if (firstCall != secondCall || firstCall == nullptr) {
         TELEPHONY_LOGE("Call is NULL");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
+    sptr<CallBase> call = firstCall;
     call = RefreshCallIfNecessary(call, info);
     int32_t ret = UpdateCallState(call, TelCallState::CALL_STATUS_ALERTING);
     if (ret != TELEPHONY_SUCCESS) {
@@ -486,11 +500,13 @@ int32_t CallStatusManager::DisconnectingHandle(const CallDetailInfo &info)
 {
     TELEPHONY_LOGI("handle disconnecting state");
     std::string tmpStr(info.phoneNum);
-    sptr<CallBase> call = GetOneCallObjectByIndex(info.index);
-    if (call == nullptr) {
+    sptr<CallBase> firstCall = GetOneCallObjectByIndex(info.index);
+    sptr<CallBase> secondCall = GetOneCallObject(tmpStr);
+    if (firstCall != secondCall || firstCall == nullptr) {
         TELEPHONY_LOGE("Call is NULL");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
+    sptr<CallBase> call = firstCall;
     call = RefreshCallIfNecessary(call, info);
     int32_t ret = UpdateCallState(call, TelCallState::CALL_STATUS_DISCONNECTING);
     if (ret != TELEPHONY_SUCCESS) {
@@ -503,11 +519,13 @@ int32_t CallStatusManager::DisconnectedHandle(const CallDetailInfo &info)
 {
     TELEPHONY_LOGI("handle disconnected state");
     std::string tmpStr(info.phoneNum);
-    sptr<CallBase> call = GetOneCallObjectByIndex(info.index);
-    if (call == nullptr) {
+    sptr<CallBase> firstCall = GetOneCallObjectByIndex(info.index);
+    sptr<CallBase> secondCall = GetOneCallObject(tmpStr);
+    if (firstCall != secondCall || firstCall == nullptr) {
         TELEPHONY_LOGE("Call is NULL");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
+    sptr<CallBase> call = firstCall;
     call = RefreshCallIfNecessary(call, info);
     bool canUnHold = false;
     std::vector<std::u16string> callIdList;
@@ -536,7 +554,33 @@ int32_t CallStatusManager::DisconnectedHandle(const CallDetailInfo &info)
         }
     }
     DeleteOneCallObject(call->GetCallID());
+    AutoAnswer(activeCallNum, waitingCallNum);
     return ret;
+}
+
+void CallStatusManager::AutoAnswer(int32_t activeCallNum, int32_t waitingCallNum)
+{
+    bool flag = false;
+    int32_t holdingCallNum = GetCallNum(TelCallState::CALL_STATUS_HOLDING);
+    int32_t dialingCallNum = GetCallNum(TelCallState::CALL_STATUS_DIALING);
+    int32_t alertingCallNum = GetCallNum(TelCallState::CALL_STATUS_ALERTING);
+    if (activeCallNum == 0 && waitingCallNum == 0 && holdingCallNum == 0 && dialingCallNum == 0 &&
+        alertingCallNum == 0) {
+        std::list<int32_t> ringCallIdList;
+        GetCarrierCallList(ringCallIdList);
+        for (int32_t ringingCallId : ringCallIdList) {
+            sptr<CallBase> ringingCall = GetOneCallObject(ringingCallId);
+            CallRunningState ringingCallState = ringingCall->GetCallRunningState();
+            if ((ringingCallState == CallRunningState::CALL_RUNNING_STATE_RINGING &&
+                    (ringingCall->GetAutoAnswerState()))) {
+                ringingCall->SetAutoAnswerState(flag);
+                int32_t videoState = static_cast<int32_t>(ringingCall->GetVideoStateType());
+                int ret = ringingCall->AnswerCall(videoState);
+                TELEPHONY_LOGI("ret = %{public}d", ret);
+                break;
+            }
+        }
+    }
 }
 
 int32_t CallStatusManager::UpdateCallState(sptr<CallBase> &call, TelCallState nextState)

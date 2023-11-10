@@ -160,6 +160,8 @@ HWTEST_F(BranchTest, Telephony_CallRequestProcess_001, Function | MediumTest | L
     callRequestProcess->PackCellularCallInfo(mDialParaInfo, mCellularCallInfo);
     std::vector<std::u16string> testList = {};
     callRequestProcess->IsFdnNumber(testList, content);
+    callRequestProcess->IsDsdsMode3();
+    callRequestProcess->DisconnectOtherSubIdCall(1, 0, 0);
 }
 
 /**
@@ -1957,6 +1959,9 @@ HWTEST_F(BranchTest, Telephony_CallStatusManager_002, Function | MediumTest | Le
     callObjectPtr->SetTelCallState(TelCallState::CALL_STATUS_DIALING);
     ASSERT_GT(callStatusManager->ToSpeakerPhone(callObjectPtr), TELEPHONY_ERROR);
     ASSERT_GT(callStatusManager->TurnOffMute(callObjectPtr), TELEPHONY_ERROR);
+    int32_t activeCallNum = 0;
+    int32_t waitingCallNum = 0;
+    callStatusManager->AutoAnswer(activeCallNum, waitingCallNum);
 }
 
 /**
@@ -2149,6 +2154,24 @@ HWTEST_F(BranchTest, Telephony_CallAbilityReportProxy_001, Function | MediumTest
     ASSERT_EQ(callAbilityReportProxy->RegisterCallBack(ottCallAbilityCallbackPtr, ottBundleName), TELEPHONY_SUCCESS);
     callAbilityReportProxy->OttCallRequest(ottReportId, resultInfo);
     ASSERT_EQ(callAbilityReportProxy->UnRegisterCallBack(bundleName), TELEPHONY_SUCCESS);
+}
+
+/**
+ * @tc.number   Telephony_AutoAnswerState_001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_AutoAnswerState_001, Function | MediumTest | Level3)
+{
+    bool flag = true;
+    sptr<CallBase> callObjectPtr = nullptr;
+    DialParaInfo dialParaInfo;
+    dialParaInfo.callType = CallType::TYPE_IMS;
+    dialParaInfo.callState = TelCallState::CALL_STATUS_INCOMING;
+    callObjectPtr = new IMSCall(dialParaInfo);
+    ASSERT_TRUE(callObjectPtr != nullptr);
+    callObjectPtr->SetAutoAnswerState(flag);
+    ASSERT_EQ(callObjectPtr->GetAutoAnswerState(), true);
 }
 } // namespace Telephony
 } // namespace OHOS

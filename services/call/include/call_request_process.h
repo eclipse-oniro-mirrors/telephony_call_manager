@@ -41,6 +41,8 @@ public:
     void StartRttRequest(int32_t callId, std::u16string &msg);
     void StopRttRequest(int32_t callId);
     void JoinConference(int32_t callId, std::vector<std::string> &numberList);
+    bool IsDsdsMode3();
+    void DisconnectOtherSubIdCall(int32_t callId, int32_t slotId, int32_t videoState);
 
 private:
     int32_t CarrierDialProcess(DialParaInfo &info);
