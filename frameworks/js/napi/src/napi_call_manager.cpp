@@ -3638,8 +3638,9 @@ void NapiCallManager::NativeDialCall(napi_env env, void *data)
     int32_t state;
     DelayedSingleton<CallManagerClient>::GetInstance()->GetVoIPCallState(state);
     if (state == (int32_t)CallStateToApp::CALL_STATE_OFFHOOK) {
-        TELEPHONY_LOGE("NativeDialCall slotId is invalid");
-        asyncContext->errorCode = SLOT_ID_INVALID;
+        TELEPHONY_LOGE("VoIP CALL is active, cannot dial now");
+        JsError error = NapiUtil::ConverErrorMessageForJs(CALL_ERR_CALL_COUNTS_EXCEED_LIMIT);
+        asyncContext->errorCode = error.errorCode;
         return;
     }
     std::string phoneNumber(asyncContext->number, asyncContext->numberLen);
