@@ -49,7 +49,7 @@ static std::unordered_map<int32_t, const char *> eventNameMap_ = {
     { CALL_MANAGER_MUTE_RINGER, "muteRinger" },
     { CALL_MANAGER_SET_VONR_STATE, "setVoNRState" },
     { CALL_MANAGER_GET_VONR_STATE, "getVoNRState" },
-    { CALL_MANAGER_SET_CAAS_CALL_STATE, "setCaasCallState" },
+    { CALL_MANAGER_SET_VOIP_CALL_STATE, "setVoIPCallState" },
 };
 
 static std::unordered_map<int32_t, const char *> eventPermissionMap_ = {

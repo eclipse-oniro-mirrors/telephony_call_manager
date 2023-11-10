@@ -1194,7 +1194,7 @@ int32_t CallManagerService::RemoveMissedIncomingCallNotification()
     return callControlManagerPtr_->RemoveMissedIncomingCallNotification();
 }
 
-int32_t CallManagerService::SetCaasCallState(int32_t state)
+int32_t CallManagerService::SetVoIPCallState(int32_t state)
 {
     if (!TelephonyPermission::CheckCallerIsSystemApp()) {
         TELEPHONY_LOGE("Non-system applications use system APIs!");
@@ -1206,21 +1206,21 @@ int32_t CallManagerService::SetCaasCallState(int32_t state)
         return TELEPHONY_ERR_PERMISSION_ERR;
     }
     if (callControlManagerPtr_ != nullptr) {
-        return callControlManagerPtr_->SetCaasCallState(state);
+        return callControlManagerPtr_->SetVoIPCallState(state);
     } else {
         TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
 }
 
-int32_t CallManagerService::GetCaasCallState(int32_t &state)
+int32_t CallManagerService::GetVoIPCallState(int32_t &state)
 {
     if (!TelephonyPermission::CheckCallerIsSystemApp()) {
         TELEPHONY_LOGE("Non-system applications use system APIs!");
         return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
     }
     if (callControlManagerPtr_ != nullptr) {
-        return callControlManagerPtr_->GetCaasCallState(state);
+        return callControlManagerPtr_->GetVoIPCallState(state);
     } else {
         TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;

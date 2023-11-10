@@ -179,7 +179,7 @@ struct PostDialAsyncContext : AsyncContext {
     bool proceed = false;
 };
 
-struct CaasCallStateAsyncContext : AsyncContext {
+struct VoIPCallStateAsyncContext : AsyncContext {
     int32_t state = 0;
 };
 

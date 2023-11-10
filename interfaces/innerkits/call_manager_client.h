@@ -553,20 +553,20 @@ public:
     int32_t RemoveMissedIncomingCallNotification();
 
     /**
-     * @brief Set Caas Call state
+     * @brief Set VoIP Call state
      *
-     * @param state[in] Indicates the Caas Call state
+     * @param state[in] Indicates the VoIP Call state
      * @return Returns 0 on success, others on failure.
      */
-    int32_t SetCaasCallState(int32_t state);
+    int32_t SetVoIPCallState(int32_t state);
 
     /**
-     * @brief Get Caas Call Switch Status
+     * @brief Get VoIP Call Switch Status
      *
-     * @param state[out] Indicates the Caas Call state
+     * @param state[out] Indicates the VoIP Call state
      * @return Returns 0 on success, others on failure.
      */
-    int32_t GetCaasCallState(int32_t &state);
+    int32_t GetVoIPCallState(int32_t &state);
 
     /**
      * @brief Checks whether a device supports voice calls

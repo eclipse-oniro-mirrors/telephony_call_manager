@@ -677,20 +677,20 @@ int32_t CallManagerClient::RemoveMissedIncomingCallNotification()
     return g_callManagerProxy->RemoveMissedIncomingCallNotification();
 }
 
-int32_t CallManagerClient::SetCaasCallState(int32_t state)
+int32_t CallManagerClient::SetVoIPCallState(int32_t state)
 {
     if (g_callManagerProxy != nullptr) {
-        return g_callManagerProxy->SetCaasCallState(state);
+        return g_callManagerProxy->SetVoIPCallState(state);
     } else {
         TELEPHONY_LOGE("init first please!");
         return TELEPHONY_ERR_UNINIT;
     }
 }
 
-int32_t CallManagerClient::GetCaasCallState(int32_t &state)
+int32_t CallManagerClient::GetVoIPCallState(int32_t &state)
 {
     if (g_callManagerProxy != nullptr) {
-        return g_callManagerProxy->GetCaasCallState(state);
+        return g_callManagerProxy->GetVoIPCallState(state);
     } else {
         TELEPHONY_LOGE("init first please!");
         return TELEPHONY_ERR_UNINIT;

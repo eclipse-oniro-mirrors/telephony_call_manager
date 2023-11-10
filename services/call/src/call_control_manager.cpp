@@ -159,9 +159,8 @@ int32_t CallControlManager::AnswerCall(int32_t callId, int32_t videoState)
     }
     TELEPHONY_LOGI("report answered state");
     NotifyCallStateUpdated(call, TelCallState::CALL_STATUS_INCOMING, TelCallState::CALL_STATUS_ANSWERED);
-    if (CaasCallState_ != TelCallState::CALL_STATUS_IDLE &&
-        CaasCallState_ != TelCallState::CALL_STATUS_DISCONNECTED) {
-            TELEPHONY_LOGW("caas call is active, waiting for caas to disconnect");
+    if (VoIPCallState_ != CallStateToApp::CALL_STATE_IDLE) {
+            TELEPHONY_LOGW("VoIP call is active, waiting for VoIP to disconnect");
             AnsweredCallQueue_.hasCall = true;
             AnsweredCallQueue_.callId = callId;
             AnsweredCallQueue_.videoState = videoState;
@@ -1074,11 +1073,11 @@ int32_t CallControlManager::RemoveMissedIncomingCallNotification()
     return TELEPHONY_SUCCESS;
 }
 
-int32_t CallControlManager::SetCaasCallState(int32_t state)
+int32_t CallControlManager::SetVoIPCallState(int32_t state)
 {
-    CaasCallState_ = (TelCallState)state;
-    if (CaasCallState_ == TelCallState::CALL_STATUS_ANSWERED) {
-        TELEPHONY_LOGI("CAAS answered the call, should hangup sim calls");
+    VoIPCallState_ = (CallStateToApp)state;
+    if (VoIPCallState_ == CallStateToApp::CALL_STATE_ANSWERED) {
+        TELEPHONY_LOGI("VoIP answered the call, should hangup sim calls");
         std::list<int32_t> callIdList;
         int32_t ret = GetCarrierCallList(callIdList);
         if (ret != TELEPHONY_SUCCESS) {
@@ -1093,9 +1092,8 @@ int32_t CallControlManager::SetCaasCallState(int32_t state)
             }
         }
     }
-    if (CaasCallState_ == TelCallState::CALL_STATUS_IDLE ||
-        CaasCallState_ == TelCallState::CALL_STATUS_DISCONNECTED) {
-            TELEPHONY_LOGI("CAAS call state is not active");
+    if (VoIPCallState_ == CallStateToApp::CALL_STATE_IDLE) {
+            TELEPHONY_LOGI("VoIP call state is not active");
             if (AnsweredCallQueue_.hasCall == true) {
                 TELEPHONY_LOGI("answer call now");
                 AnsweredCallQueue_.hasCall = false;
@@ -1105,9 +1103,9 @@ int32_t CallControlManager::SetCaasCallState(int32_t state)
     return TELEPHONY_SUCCESS;
 }
 
-int32_t CallControlManager::GetCaasCallState(int32_t &state)
+int32_t CallControlManager::GetVoIPCallState(int32_t &state)
 {
-    state = (int32_t)CaasCallState_;
+    state = (int32_t)VoIPCallState_;
     return TELEPHONY_SUCCESS;
 }
 

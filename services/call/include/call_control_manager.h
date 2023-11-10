@@ -114,8 +114,8 @@ public:
     void GetDialParaInfo(DialParaInfo &info);
     void GetDialParaInfo(DialParaInfo &info, AppExecFwk::PacMap &extras);
     int32_t RemoveMissedIncomingCallNotification();
-    int32_t SetCaasCallState(int32_t state);
-    int32_t GetCaasCallState(int32_t &state);
+    int32_t SetVoIPCallState(int32_t state);
+    int32_t GetVoIPCallState(int32_t &state);
 
 private:
     void CallStateObserve();
@@ -145,7 +145,7 @@ private:
     DialParaInfo dialSrcInfo_;
     AppExecFwk::PacMap extras_;
     std::mutex mutex_;
-    TelCallState CaasCallState_ = TelCallState::CALL_STATUS_IDLE;
+    CallStateToApp VoIPCallState_ = CallStateToApp::CALL_STATE_IDLE;
     struct AnsweredCallQueue {
         bool hasCall = false;
         int32_t callId = 0;

@@ -200,10 +200,10 @@ void CallManagerServiceStub::InitImsServiceRequest()
         &CallManagerServiceStub::OnStartRtt;
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_STOP_RTT)] =
         &CallManagerServiceStub::OnStopRtt;
-    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_SET_CAAS_CALL_STATE)] =
-        &CallManagerServiceStub::OnSetCaasCallState;
-    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_GET_CAAS_CALL_STATE)] =
-        &CallManagerServiceStub::OnGetCaasCallState;
+    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_SET_VoIP_CALL_STATE)] =
+        &CallManagerServiceStub::OnSetVoIPCallState;
+    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_GET_VoIP_CALL_STATE)] =
+        &CallManagerServiceStub::OnGetVoIPCallState;
 }
 
 void CallManagerServiceStub::InitOttServiceRequest()
@@ -1181,29 +1181,29 @@ int32_t CallManagerServiceStub::OnRemoveMissedIncomingCallNotification(MessagePa
     return TELEPHONY_SUCCESS;
 }
 
-int32_t CallManagerServiceStub::OnSetCaasCallState(MessageParcel &data, MessageParcel &reply)
+int32_t CallManagerServiceStub::OnSetVoIPCallState(MessageParcel &data, MessageParcel &reply)
 {
     int32_t result = TELEPHONY_ERR_FAIL;
     int32_t state = data.ReadInt32();
-    result = SetCaasCallState(state);
+    result = SetVoIPCallState(state);
     if (!reply.WriteInt32(result)) {
-        TELEPHONY_LOGE("SetCaasCallState fail to write parcel");
+        TELEPHONY_LOGE("SetVoIPCallState fail to write parcel");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
     return TELEPHONY_SUCCESS;
 }
 
-int32_t CallManagerServiceStub::OnGetCaasCallState(MessageParcel &data, MessageParcel &reply)
+int32_t CallManagerServiceStub::OnGetVoIPCallState(MessageParcel &data, MessageParcel &reply)
 {
     int32_t result = TELEPHONY_ERR_FAIL;
     int32_t state;
-    result = GetCaasCallState(state);
+    result = GetVoIPCallState(state);
     if (!reply.WriteInt32(state)) {
-        TELEPHONY_LOGE("GetCaasCallState fail to write parcel");
+        TELEPHONY_LOGE("GetVoIPCallState fail to write parcel");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
     if (!reply.WriteInt32(result)) {
-        TELEPHONY_LOGE("GetCaasCallState fail to write parcel");
+        TELEPHONY_LOGE("GetVoIPCallState fail to write parcel");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
     return TELEPHONY_SUCCESS;

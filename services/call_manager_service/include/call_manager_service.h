@@ -654,22 +654,22 @@ public:
     int32_t RemoveMissedIncomingCallNotification() override;
 
     /**
-     * SetCaasCallState
+     * SetVoIPCallState
      *
-     * @brief Set Caas Call State
-     * @param state[in], The state of Caas Call
+     * @brief Set VoIP Call State
+     * @param state[in], The state of VoIP Call
      * @return Returns 0 on success, others on failure.
      */
-    int32_t SetCaasCallState(int32_t state) override;
+    int32_t SetVoIPCallState(int32_t state) override;
 
     /**
-     * GetCaasCallState
+     * GetVoIPCallState
      *
-     * @brief Get Caas Call State
-     * @param state[out], The result of Caas Call
+     * @brief Get VoIP Call State
+     * @param state[out], The result of VoIP Call
      * @return Returns 0 on success, others on failure.
      */
-    int32_t GetCaasCallState(int32_t &state) override;
+    int32_t GetVoIPCallState(int32_t &state) override;
 
     /**
      * Handle special code from dialer.
