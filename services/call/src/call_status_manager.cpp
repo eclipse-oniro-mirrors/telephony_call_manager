@@ -22,6 +22,7 @@
 #include "call_control_manager.h"
 #include "call_manager_errors.h"
 #include "call_manager_hisysevent.h"
+#include "core_service_client.h"
 #include "cs_call.h"
 #include "datashare_predicates.h"
 #include "hitrace_meter.h"
@@ -463,6 +464,14 @@ int32_t CallStatusManager::HoldingHandle(const CallDetailInfo &info)
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("UpdateCallState failed, errCode:%{public}d", ret);
     }
+    int32_t dsdsMode = DSDS_MODE_V2;
+    DelayedRefSingleton<CoreServiceClient>::GetInstance().GetDsdsMode(dsdsMode);
+    TELEPHONY_LOGE("HoldingHandle dsdsMode:%{public}d", dsdsMode);
+    if (dsdsMode == static_cast<int32_t>(DsdsMode::DSDS_MODE_V5) ||
+        dsdsMode == static_cast<int32_t>(DsdsMode::DSDS_MODE_TDM)) {
+        int32_t activeCallNum = GetCallNum(TelCallState::CALL_STATUS_ACTIVE);
+        AutoAnswerForDsda(activeCallNum);
+    }
     return ret;
 }
 
@@ -554,8 +563,31 @@ int32_t CallStatusManager::DisconnectedHandle(const CallDetailInfo &info)
         }
     }
     DeleteOneCallObject(call->GetCallID());
-    AutoAnswer(activeCallNum, waitingCallNum);
+    int32_t dsdsMode = DSDS_MODE_V2;
+    DelayedRefSingleton<CoreServiceClient>::GetInstance().GetDsdsMode(dsdsMode);
+    TELEPHONY_LOGE("DisconnectedHandle dsdsMode:%{public}d", dsdsMode);
+    if (dsdsMode == DSDS_MODE_V3) {
+        AutoAnswer(activeCallNum, waitingCallNum);
+    } else if (dsdsMode == static_cast<int32_t>(DsdsMode::DSDS_MODE_V5) ||
+               dsdsMode == static_cast<int32_t>(DsdsMode::DSDS_MODE_TDM)) {
+        AutoAnswerForDsda(activeCallNum);
+    }
     return ret;
+}
+
+void CallStatusManager::AutoAnswerForDsda(int32_t activeCallNum)
+{
+    int32_t dialingCallNum = GetCallNum(TelCallState::CALL_STATUS_DIALING);
+    int32_t alertingCallNum = GetCallNum(TelCallState::CALL_STATUS_ALERTING);
+    sptr<CallBase> ringCall = GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_RINGING);
+    TELEPHONY_LOGE("ringCall is not null  =:%{public}d", ringCall != nullptr);
+    if (ringCall != nullptr && dialingCallNum == 0 && alertingCallNum == 0 && activeCallNum == 0 &&
+        ringCall->GetAutoAnswerState()) {
+        int32_t videoState = static_cast<int32_t>(ringCall->GetVideoStateType());
+        int ret = ringCall->AnswerCall(videoState);
+        TELEPHONY_LOGI("ret = %{public}d", ret);
+        ringCall->SetAutoAnswerState(false);
+    }
 }
 
 void CallStatusManager::AutoAnswer(int32_t activeCallNum, int32_t waitingCallNum)
