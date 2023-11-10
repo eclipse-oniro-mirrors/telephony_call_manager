@@ -60,6 +60,7 @@ private:
     int32_t DisconnectingHandle(const CallDetailInfo &info);
     int32_t DisconnectedHandle(const CallDetailInfo &info);
     void AutoAnswer(int32_t activeCallNum, int32_t waitingCallNum);
+    void AutoAnswerForDsda(int32_t activeCallNum);
     sptr<CallBase> CreateNewCall(const CallDetailInfo &info, CallDirection dir);
     sptr<CallBase> RefreshCallIfNecessary(const sptr<CallBase> &call, const CallDetailInfo &info);
     void PackParaInfo(

@@ -18,12 +18,14 @@
 #include "audio_proxy.h"
 #include "bluetooth_device_state.h"
 #include "call_ability_callback_stub.h"
+#include "call_policy.h"
+#include "call_request_process.h"
 #include "call_status_callback_proxy.h"
 #include "cs_call_state.h"
 #include "dialing_state.h"
 #include "earpiece_device_state.h"
-#include "gtest/gtest.h"
 #include "holding_state.h"
+#include "ims_call.h"
 #include "ims_call_state.h"
 #include "inactive_device_state.h"
 #include "inactive_state.h"
@@ -36,6 +38,7 @@
 #include "telephony_log_wrapper.h"
 #include "tone.h"
 #include "wired_headset_device_state.h"
+#include "gtest/gtest.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -565,6 +568,56 @@ HWTEST_F(CallStateTest, Telephony_CallStatusCallbackProxy_003, Function | Medium
     ASSERT_EQ(callStatusCallbackProxy->SendMmiCodeResult(mmiCodeInfo), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
     ASSERT_EQ(callStatusCallbackProxy->GetImsCallDataResult(result), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
     ASSERT_EQ(callStatusCallbackProxy->CloseUnFinishedUssdResult(result), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+}
+
+/**
+ * @tc.number   Telephony_CallRequestProcess_002
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallStateTest, Telephony_CallRequestProcess_002, Function | MediumTest | Level3)
+{
+    std::unique_ptr<CallRequestProcess> callRequestProcess = std::make_unique<CallRequestProcess>();
+    DialParaInfo mDialParaInfo;
+    mDialParaInfo.accountId = 0;
+    sptr<OHOS::Telephony::CallBase> callBase1 = new IMSCall(mDialParaInfo);
+    callBase1->callState_ = TelCallState::CALL_STATUS_ACTIVE;
+    callBase1->callId_ = 1;
+    mDialParaInfo.accountId = 1;
+    sptr<OHOS::Telephony::CallBase> callBase2 = new IMSCall(mDialParaInfo);
+    callBase2->callState_ = TelCallState::CALL_STATUS_INCOMING;
+    callBase2->callId_ = 2;
+    bool enabled = false;
+    callRequestProcess->HandleCallWaitingNumZero(callBase1, 1, 1, enabled);
+    mDialParaInfo.accountId = 0;
+    sptr<OHOS::Telephony::CallBase> callBase5 = new IMSCall(mDialParaInfo);
+    callBase5->callState_ = TelCallState::CALL_STATUS_HOLDING;
+    callBase5->callId_ = 1;
+    mDialParaInfo.accountId = 1;
+    sptr<OHOS::Telephony::CallBase> callBase6 = new IMSCall(mDialParaInfo);
+    callBase6->callState_ = TelCallState::CALL_STATUS_ACTIVE;
+    callBase6->callId_ = 2;
+    sptr<OHOS::Telephony::CallBase> callBase7 = new IMSCall(mDialParaInfo);
+    callBase7->callState_ = TelCallState::CALL_STATUS_INCOMING;
+    callBase7->callId_ = 3;
+    bool enabled1 = false;
+    callRequestProcess->HandleCallWaitingNumOne(callBase5, 1, 1, enabled1);
+    mDialParaInfo.accountId = 0;
+    sptr<OHOS::Telephony::CallBase> callBase8 = new IMSCall(mDialParaInfo);
+    callBase8->callState_ = TelCallState::CALL_STATUS_HOLDING;
+    callBase8->callId_ = 1;
+    sptr<OHOS::Telephony::CallBase> callBase9 = new IMSCall(mDialParaInfo);
+    callBase9->callState_ = TelCallState::CALL_STATUS_WAITING;
+    callBase9->callId_ = 2;
+    mDialParaInfo.accountId = 1;
+    sptr<OHOS::Telephony::CallBase> callBase10 = new IMSCall(mDialParaInfo);
+    callBase10->callState_ = TelCallState::CALL_STATUS_ACTIVE;
+    callBase10->callId_ = 3;
+    sptr<OHOS::Telephony::CallBase> callBase11 = new IMSCall(mDialParaInfo);
+    callBase11->callState_ = TelCallState::CALL_STATUS_WAITING;
+    callBase11->callId_ = 4;
+    bool enabled2 = false;
+    callRequestProcess->HandleCallWaitingNumTwo(callBase8, 1, enabled2);
 }
 } // namespace Telephony
 } // namespace OHOS

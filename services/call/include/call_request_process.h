@@ -42,7 +42,12 @@ public:
     void StopRttRequest(int32_t callId);
     void JoinConference(int32_t callId, std::vector<std::string> &numberList);
     bool IsDsdsMode3();
+    bool IsDsdsMode5();
     void DisconnectOtherSubIdCall(int32_t callId, int32_t slotId, int32_t videoState);
+    void HandleCallWaitingNumTwo(sptr<CallBase> call, int32_t slotId, bool &flagForConference);
+    void HandleCallWaitingNumOne(sptr<CallBase> call, int32_t slotId, int32_t activeCallNum, bool &flagForConference);
+    void HandleCallWaitingNumZero(sptr<CallBase> call, int32_t slotId, int32_t activeCallNum, bool &flagForConference);
+    void HoldOrDisconnectedCall(int32_t callId, int32_t slotId, int32_t videoState);
 
 private:
     int32_t CarrierDialProcess(DialParaInfo &info);
