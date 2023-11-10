@@ -22,6 +22,7 @@
 #include "call_number_utils.h"
 #include "cellular_call_connection.h"
 #include "common_type.h"
+#include "core_service_client.h"
 #include "core_service_connection.h"
 #include "cs_call.h"
 #include "ims_call.h"
@@ -93,12 +94,59 @@ void CallRequestProcess::AnswerRequest(int32_t callId, int32_t videoState)
         TELEPHONY_LOGE("the call object is nullptr, callId:%{public}d", callId);
         return;
     }
-    int32_t ret = call->AnswerCall(videoState);
-    if (ret != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("AnswerCall failed!");
+    int32_t slotId = call->GetSlotId();
+    if (IsDsdsMode3()) {
+        DisconnectOtherSubIdCall(callId, slotId, videoState);
+    } else {
+        int32_t ret = call->AnswerCall(videoState);
+        if (ret != TELEPHONY_SUCCESS) {
+            TELEPHONY_LOGE("AnswerCall failed!");
+            return;
+        }
+        DelayedSingleton<CallControlManager>::GetInstance()->NotifyIncomingCallAnswered(call);
+    }
+}
+
+bool CallRequestProcess::IsDsdsMode3()
+{
+    int32_t dsdsMode = DSDS_MODE_V2;
+    DelayedRefSingleton<CoreServiceClient>::GetInstance().GetDsdsMode(dsdsMode);
+    TELEPHONY_LOGI("dsdsMode:%{public}d", dsdsMode);
+    if (dsdsMode == DSDS_MODE_V3) {
+        return true;
+    }
+    return false;
+}
+
+void CallRequestProcess::DisconnectOtherSubIdCall(int32_t callId, int32_t slotId, int32_t videoState)
+{
+    sptr<CallBase> incomingCall = GetOneCallObject(callId);
+    if (incomingCall == nullptr) {
+        TELEPHONY_LOGE("the call object is nullptr, callId:%{public}d", callId);
         return;
     }
-    DelayedSingleton<CallControlManager>::GetInstance()->NotifyIncomingCallAnswered(call);
+    std::list<int32_t> callIdList;
+    bool flag = true;
+    bool noOtherCall = true;
+    GetCarrierCallList(callIdList);
+    if (callIdList.size() > 1) {
+        for (int32_t otherCallId : callIdList) {
+            sptr<CallBase> call = GetOneCallObject(otherCallId);
+            if (call->GetSlotId() != slotId) {
+                incomingCall->SetAutoAnswerState(flag);
+                TELEPHONY_LOGI("Hangup call SLOTID:%{public}d", call->GetSlotId());
+                call->HangUpCall();
+                noOtherCall = false;
+            }
+        }
+    }
+    if (noOtherCall == true) {
+        int32_t ret = incomingCall->AnswerCall(videoState);
+        if (ret != TELEPHONY_SUCCESS) {
+            return;
+        }
+        DelayedSingleton<CallControlManager>::GetInstance()->NotifyIncomingCallAnswered(incomingCall);
+    }
 }
 
 void CallRequestProcess::RejectRequest(int32_t callId, bool isSendSms, std::string &content)

@@ -56,6 +56,7 @@ void CSCallFunc(const uint8_t *data, size_t size)
     TelConferenceState telConferenceState = static_cast<TelConferenceState>(size % TEL_CONFERENCE_STATE_NUM);
     VideoStateType mediaType = static_cast<VideoStateType>(size % VIDIO_TYPE_NUM);
     PolicyFlag flag = static_cast<PolicyFlag>(size);
+    bool needAutoAnswer = static_cast<bool>(size);
 
     callObjectPtr->AnswerCall(videoState);
     callObjectPtr->SetMute(mute, slotId);
@@ -77,6 +78,8 @@ void CSCallFunc(const uint8_t *data, size_t size)
     callObjectPtr->SetVideoStateType(mediaType);
     callObjectPtr->SetPolicyFlag(flag);
     callObjectPtr->GetPolicyFlag();
+    callObjectPtr->SetAutoAnswerState(needAutoAnswer);
+    callObjectPtr->GetAutoAnswerState();
 }
 
 void DialingProcess(const uint8_t *data, size_t size)

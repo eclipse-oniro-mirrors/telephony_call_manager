@@ -34,6 +34,8 @@
  */
 namespace OHOS {
 namespace Telephony {
+const int32_t SLOT_NUM = 2;
+
 class CallStatusManager : public CallStatusPolicy {
 public:
     CallStatusManager();
@@ -57,6 +59,7 @@ private:
     int32_t AlertHandle(const CallDetailInfo &info);
     int32_t DisconnectingHandle(const CallDetailInfo &info);
     int32_t DisconnectedHandle(const CallDetailInfo &info);
+    void AutoAnswer(int32_t activeCallNum, int32_t waitingCallNum);
     sptr<CallBase> CreateNewCall(const CallDetailInfo &info, CallDirection dir);
     sptr<CallBase> RefreshCallIfNecessary(const sptr<CallBase> &call, const CallDetailInfo &info);
     void PackParaInfo(
@@ -70,7 +73,7 @@ private:
 
 private:
     CallDetailInfo callReportInfo_;
-    CallDetailsInfo callDetailsInfo_;
+    CallDetailsInfo callDetailsInfo_[SLOT_NUM];
     sptr<CallIncomingFilterManager> CallIncomingFilterManagerPtr_;
     std::map<RequestResultEventId, CallAbilityEventId> mEventIdTransferMap_;
     std::map<OttCallEventId, CallAbilityEventId> mOttEventIdTransferMap_;
