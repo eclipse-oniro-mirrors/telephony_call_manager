@@ -150,7 +150,7 @@ int32_t CallAbilityReportProxy::ReportCallStateInfo(const CallAttributeInfo &inf
                     bundleName.c_str());
                 continue;
             } else {
-                TELEPHONY_LOGW("OnCallDetailsChange success, bundleName:%{public}s",bundleName.c_str());
+                TELEPHONY_LOGW("OnCallDetailsChange success, bundleName:%{public}s", bundleName.c_str());
             }
         }
     }

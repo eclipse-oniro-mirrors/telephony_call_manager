@@ -5456,11 +5456,11 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetVoIPCallState_0100, Function
 
 /******************************************* Test SetVoIPCallState() ********************************************/
 /**
- * @tc.number   Telephony_CallManager_SetVoIPCallState_0100
+ * @tc.number   Telephony_CallManager_SetVoIPCallState_0200
  * @tc.name     input VoIP call state 0 test SetVoIPCallState
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_SetVoIPCallState_0100, Function | MediumTest | Level3)
+HWTEST_F(CallManagerGtest, Telephony_CallManager_SetVoIPCallState_0200, Function | MediumTest | Level3)
 {
     AccessToken token;
     int32_t state = 1;
@@ -5469,11 +5469,11 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetVoIPCallState_0100, Function
 
 /******************************************* Test SetVoIPCallState() ********************************************/
 /**
- * @tc.number   Telephony_CallManager_SetVoIPCallState_0100
+ * @tc.number   Telephony_CallManager_SetVoIPCallState_0300
  * @tc.name     input VoIP call state 0 test SetVoIPCallState
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_SetVoIPCallState_0100, Function | MediumTest | Level3)
+HWTEST_F(CallManagerGtest, Telephony_CallManager_SetVoIPCallState_0300, Function | MediumTest | Level3)
 {
     AccessToken token;
     int32_t state = 2;
@@ -5482,11 +5482,11 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetVoIPCallState_0100, Function
 
 /******************************************* Test SetVoIPCallState() ********************************************/
 /**
- * @tc.number   Telephony_CallManager_SetVoIPCallState_0100
+ * @tc.number   Telephony_CallManager_SetVoIPCallState_0400
  * @tc.name     input VoIP call state 0 test SetVoIPCallState
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_SetVoIPCallState_0100, Function | MediumTest | Level3)
+HWTEST_F(CallManagerGtest, Telephony_CallManager_SetVoIPCallState_0400, Function | MediumTest | Level3)
 {
     AccessToken token;
     int32_t state = 3;

@@ -151,7 +151,6 @@ private:
         int32_t callId = 0;
         int32_t videoState = 0;
     } AnsweredCallQueue_;
-    
 };
 } // namespace Telephony
 } // namespace OHOS
