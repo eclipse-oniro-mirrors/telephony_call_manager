@@ -179,6 +179,10 @@ struct PostDialAsyncContext : AsyncContext {
     bool proceed = false;
 };
 
+struct VoIPCallStateAsyncContext : AsyncContext {
+    int32_t state = 0;
+};
+
 enum CallWaitingStatus {
     CALL_WAITING_DISABLE = 0,
     CALL_WAITING_ENABLE,

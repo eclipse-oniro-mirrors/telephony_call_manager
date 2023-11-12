@@ -154,6 +154,10 @@ enum class TelCallState {
      * Indicates the call is idle.
      */
     CALL_STATUS_IDLE,
+    /**
+     * Indicates the call is answered.
+     */
+    CALL_STATUS_ANSWERED,
 };
 
 /**
@@ -370,7 +374,8 @@ enum class CallStateToApp {
      * Indicates that a least one call is in the dialing, active, or hold
      * state, and there is no new incoming call ringing or waiting.
      */
-    CALL_STATE_OFFHOOK = 2
+    CALL_STATE_OFFHOOK = 2,
+    CALL_STATE_ANSWERED = 3
 };
 
 /**

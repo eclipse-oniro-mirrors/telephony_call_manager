@@ -85,6 +85,8 @@ enum CallManagerInterfaceCode {
     INTERFACE_SET_VONR_STATE,
     INTERFACE_GET_VONR_STATE,
     INTERFACE_KICK_OUT_CONFERENCE,
+    INTERFACE_SET_VOIP_CALL_STATE,
+    INTERFACE_GET_VOIP_CALL_STATE,
 };
 } // end extern
 } // namespace Telephony

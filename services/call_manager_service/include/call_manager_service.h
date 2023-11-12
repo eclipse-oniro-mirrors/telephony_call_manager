@@ -654,6 +654,24 @@ public:
     int32_t RemoveMissedIncomingCallNotification() override;
 
     /**
+     * SetVoIPCallState
+     *
+     * @brief Set VoIP Call State
+     * @param state[in], The state of VoIP Call
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t SetVoIPCallState(int32_t state) override;
+
+    /**
+     * GetVoIPCallState
+     *
+     * @brief Get VoIP Call State
+     * @param state[out], The result of VoIP Call
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t GetVoIPCallState(int32_t &state) override;
+
+    /**
      * Handle special code from dialer.
      *
      * @param specialCode[in], special code

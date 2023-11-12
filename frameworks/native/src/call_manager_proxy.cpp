@@ -1169,6 +1169,36 @@ int32_t CallManagerProxy::RemoveMissedIncomingCallNotification()
     return TELEPHONY_SUCCESS;
 }
 
+int32_t CallManagerProxy::SetVoIPCallState(int32_t state)
+{
+    if (ReConnectService() != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("ipc reconnect failed!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    std::lock_guard<std::mutex> lock(mutex_);
+    int32_t errCode = callManagerServicePtr_->SetVoIPCallState(state);
+    if (errCode != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("failed, errcode:%{public}d", errCode);
+        return errCode;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallManagerProxy::GetVoIPCallState(int32_t &state)
+{
+    if (ReConnectService() != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("ipc reconnect failed!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    std::lock_guard<std::mutex> lock(mutex_);
+    int32_t errCode = callManagerServicePtr_->GetVoIPCallState(state);
+    if (errCode != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("failed, errcode:%{public}d", errCode);
+        return errCode;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
 sptr<IRemoteObject> CallManagerProxy::GetProxyObjectPtr(CallManagerProxyType proxyType)
 {
     if (ReConnectService() != TELEPHONY_SUCCESS) {

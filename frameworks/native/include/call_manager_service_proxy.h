@@ -627,6 +627,24 @@ public:
     int32_t RemoveMissedIncomingCallNotification() override;
 
     /**
+     * SetVoIPCallState
+     *
+     * @brief Set VoIP Call State
+     * @param state[in], The state of VoIP Call
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t SetVoIPCallState(int32_t state) override;
+
+    /**
+     * GetVoNRState
+     *
+     * @brief Get VoIP Call State
+     * @param state[out], The VoIP Call state
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t GetVoIPCallState(int32_t &state) override;
+
+    /**
      * GetProxyObjectPtr
      *
      * @brief get callManager proxy object ptr

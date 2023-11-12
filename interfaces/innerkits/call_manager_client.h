@@ -553,6 +553,22 @@ public:
     int32_t RemoveMissedIncomingCallNotification();
 
     /**
+     * @brief Set VoIP Call state
+     *
+     * @param state[in] Indicates the VoIP Call state
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t SetVoIPCallState(int32_t state);
+
+    /**
+     * @brief Get VoIP Call Switch Status
+     *
+     * @param state[out] Indicates the VoIP Call state
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t GetVoIPCallState(int32_t &state);
+
+    /**
      * @brief Checks whether a device supports voice calls
      *
      * @return true on support voice calls, false on not support.

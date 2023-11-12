@@ -105,6 +105,10 @@ void CallAbilityReportProxy::CallStateUpdated(
             break;
         }
     }
+    if (nextState == TelCallState::CALL_STATUS_ANSWERED) {
+        TELEPHONY_LOGI("report answered state");
+        info.callState = TelCallState::CALL_STATUS_ANSWERED;
+    }
     ReportCallStateInfo(info);
 }
 
@@ -145,6 +149,8 @@ int32_t CallAbilityReportProxy::ReportCallStateInfo(const CallAttributeInfo &inf
                 TELEPHONY_LOGW("OnCallDetailsChange failed, errcode:%{public}d, bundleName:%{public}s", ret,
                     bundleName.c_str());
                 continue;
+            } else {
+                TELEPHONY_LOGW("OnCallDetailsChange success, bundleName:%{public}s", bundleName.c_str());
             }
         }
     }

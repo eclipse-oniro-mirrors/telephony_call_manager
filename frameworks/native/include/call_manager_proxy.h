@@ -108,6 +108,8 @@ public:
     int32_t CloseUnFinishedUssd(int32_t slotId);
     int32_t InputDialerSpecialCode(const std::string &specialCode);
     int32_t RemoveMissedIncomingCallNotification();
+    int32_t SetVoIPCallState(int32_t state);
+    int32_t GetVoIPCallState(int32_t &state);
     sptr<IRemoteObject> GetProxyObjectPtr(CallManagerProxyType proxyType);
     void OnRemoteDied(const wptr<IRemoteObject> &remote);
     int32_t ReportAudioDeviceInfo();

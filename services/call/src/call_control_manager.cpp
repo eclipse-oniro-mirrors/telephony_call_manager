@@ -31,6 +31,7 @@
 #include "ims_call.h"
 #include "iservice_registry.h"
 #include "reject_call_sms.h"
+#include "report_call_info_handler.h"
 #include "telephony_log_wrapper.h"
 #include "video_control_manager.h"
 
@@ -146,17 +147,25 @@ int32_t CallControlManager::DialCall(std::u16string &number, AppExecFwk::PacMap 
 
 int32_t CallControlManager::AnswerCall(int32_t callId, int32_t videoState)
 {
-    if (callId == INVALID_CALLID) {
-        sptr<CallBase> call = GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_RINGING);
-        if (call == nullptr) {
+    sptr<CallBase> call = GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_RINGING);
+    if (call == nullptr) {
             TELEPHONY_LOGE("call is nullptr");
             CallManagerHisysevent::WriteAnswerCallFaultEvent(
                 INVALID_PARAMETER, callId, videoState, TELEPHONY_ERR_LOCAL_PTR_NULL, "call is nullptr");
             return TELEPHONY_ERROR;
-        }
+    }
+    if (callId == INVALID_CALLID) {
         callId = call->GetCallID();
     }
-
+    TELEPHONY_LOGI("report answered state");
+    NotifyCallStateUpdated(call, TelCallState::CALL_STATUS_INCOMING, TelCallState::CALL_STATUS_ANSWERED);
+    if (VoIPCallState_ != CallStateToApp::CALL_STATE_IDLE) {
+            TELEPHONY_LOGW("VoIP call is active, waiting for VoIP to disconnect");
+            AnsweredCallQueue_.hasCall = true;
+            AnsweredCallQueue_.callId = callId;
+            AnsweredCallQueue_.videoState = videoState;
+            return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     int32_t ret = AnswerCallPolicy(callId, videoState);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("AnswerCallPolicy failed!");
@@ -1061,6 +1070,42 @@ int32_t CallControlManager::RemoveMissedIncomingCallNotification()
         TELEPHONY_LOGE("RemoveMissedIncomingCallNotification failed!");
         return ret;
     }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallControlManager::SetVoIPCallState(int32_t state)
+{
+    VoIPCallState_ = (CallStateToApp)state;
+    if (VoIPCallState_ == CallStateToApp::CALL_STATE_ANSWERED) {
+        TELEPHONY_LOGI("VoIP answered the call, should hangup sim calls");
+        std::list<int32_t> callIdList;
+        int32_t ret = GetCarrierCallList(callIdList);
+        if (ret != TELEPHONY_SUCCESS) {
+            TELEPHONY_LOGE("GetCarrierCallList failed!");
+            return ret;
+        }
+        for (auto call : callIdList) {
+            ret = HangUpCall(call);
+            if (ret != TELEPHONY_SUCCESS) {
+                TELEPHONY_LOGE("hangup call %{public}d failed!", call);
+                return ret;
+            }
+        }
+    }
+    if (VoIPCallState_ == CallStateToApp::CALL_STATE_IDLE) {
+            TELEPHONY_LOGI("VoIP call state is not active");
+            if (AnsweredCallQueue_.hasCall == true) {
+                TELEPHONY_LOGI("answer call now");
+                AnsweredCallQueue_.hasCall = false;
+                return AnswerCall(AnsweredCallQueue_.callId, AnsweredCallQueue_.videoState);
+            }
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallControlManager::GetVoIPCallState(int32_t &state)
+{
+    state = (int32_t)VoIPCallState_;
     return TELEPHONY_SUCCESS;
 }
 
