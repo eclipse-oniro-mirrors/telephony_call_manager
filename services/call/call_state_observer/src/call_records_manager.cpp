@@ -70,7 +70,6 @@ void CallRecordsManager::CallStateUpdated(
 {
     CallAttributeInfo info;
     if (nextState != TelCallState::CALL_STATUS_DISCONNECTED) {
-        TELEPHONY_LOGE("nextState not CALL_STATUS_DISCONNECTED");
         return;
     }
     if (callObjectPtr == nullptr) {

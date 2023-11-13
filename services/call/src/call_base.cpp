@@ -260,7 +260,7 @@ void CallBase::SetTelConferenceState(TelConferenceState state)
 {
     std::lock_guard<std::mutex> lock(mutex_);
     conferenceState_ = state;
-    TELEPHONY_LOGI("SetTelConferenceState, state:%{public}d", state);
+    TELEPHONY_LOGI("SetTelConferenceState, callId:%{public}d, state:%{public}d", callId_, state);
 }
 
 TelConferenceState CallBase::GetTelConferenceState()

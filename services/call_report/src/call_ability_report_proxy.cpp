@@ -154,8 +154,8 @@ int32_t CallAbilityReportProxy::ReportCallStateInfo(const CallAttributeInfo &inf
             }
         }
     }
-    TELEPHONY_LOGI("report call state[%{public}d] conferenceState[%{public}d] info success", info.callState,
-        info.conferenceState);
+    TELEPHONY_LOGI("report call state info success, callId[%{public}d] state[%{public}d] conferenceState[%{public}d]",
+        info.callId, info.callState, info.conferenceState);
     return ret;
 }
 

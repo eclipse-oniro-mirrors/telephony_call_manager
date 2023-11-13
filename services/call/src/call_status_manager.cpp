@@ -623,7 +623,8 @@ int32_t CallStatusManager::UpdateCallState(sptr<CallBase> &call, TelCallState ne
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     TelCallState priorState = call->GetTelCallState();
-    TELEPHONY_LOGI("priorState:%{public}d, nextState:%{public}d", priorState, nextState);
+    TELEPHONY_LOGI("callIndex:%{public}d, callId:%{public}d, priorState:%{public}d, nextState:%{public}d",
+        call->GetCallIndex(), call->GetCallID(), priorState, nextState);
     if (priorState == TelCallState::CALL_STATUS_INCOMING && nextState == TelCallState::CALL_STATUS_ACTIVE) {
         DelayedSingleton<CallManagerHisysevent>::GetInstance()->JudgingAnswerTimeOut(
             call->GetSlotId(), call->GetCallID(), static_cast<int32_t>(call->GetVideoStateType()));
