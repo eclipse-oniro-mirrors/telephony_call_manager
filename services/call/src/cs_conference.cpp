@@ -47,10 +47,6 @@ int32_t CsConference::JoinToConference(int32_t callId)
         TELEPHONY_LOGE("the current conference status does not allow CombineConference");
         return CALL_ERR_ILLEGAL_CALL_OPERATION;
     }
-    if (subCallIdSet_.size() >= maxSubCallLimits_) {
-        TELEPHONY_LOGE("already %{public}zu calls in the conference, exceed limits!", subCallIdSet_.size());
-        return CALL_ERR_CONFERENCE_CALL_EXCEED_LIMIT;
-    }
     subCallIdSet_.insert(callId);
     state_ = CONFERENCE_STATE_ACTIVE;
     oldState_ = state_;
