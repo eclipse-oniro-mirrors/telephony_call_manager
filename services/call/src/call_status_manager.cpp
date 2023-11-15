@@ -408,13 +408,11 @@ int32_t CallStatusManager::ActiveHandle(const CallDetailInfo &info)
 {
     TELEPHONY_LOGI("handle active state");
     std::string tmpStr(info.phoneNum);
-    sptr<CallBase> firstCall = GetOneCallObjectByIndex(info.index);
-    sptr<CallBase> secondCall = GetOneCallObject(tmpStr);
-    if (firstCall != secondCall || firstCall == nullptr) {
+    sptr<CallBase> call = GetOneCallObjectByIndexAndSlotId(info.index, info.accountId);
+    if (call == nullptr) {
         TELEPHONY_LOGE("Call is NULL");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    sptr<CallBase> call = firstCall;
     call = RefreshCallIfNecessary(call, info);
     // call state change active, need to judge if launching a conference
     if (info.mpty == 1) {
@@ -447,13 +445,11 @@ int32_t CallStatusManager::HoldingHandle(const CallDetailInfo &info)
 {
     TELEPHONY_LOGI("handle holding state");
     std::string tmpStr(info.phoneNum);
-    sptr<CallBase> firstCall = GetOneCallObjectByIndex(info.index);
-    sptr<CallBase> secondCall = GetOneCallObject(tmpStr);
-    if (firstCall != secondCall || firstCall == nullptr) {
+    sptr<CallBase> call = GetOneCallObjectByIndexAndSlotId(info.index, info.accountId);
+    if (call == nullptr) {
         TELEPHONY_LOGE("Call is NULL");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    sptr<CallBase> call = firstCall;
     // if the call is in a conference, it will exit, otherwise just set it holding
     call = RefreshCallIfNecessary(call, info);
     int32_t ret = call->HoldConference();
@@ -484,13 +480,11 @@ int32_t CallStatusManager::AlertHandle(const CallDetailInfo &info)
 {
     TELEPHONY_LOGI("handle alerting state");
     std::string tmpStr(info.phoneNum);
-    sptr<CallBase> firstCall = GetOneCallObjectByIndex(info.index);
-    sptr<CallBase> secondCall = GetOneCallObject(tmpStr);
-    if (firstCall != secondCall || firstCall == nullptr) {
+    sptr<CallBase> call = GetOneCallObjectByIndexAndSlotId(info.index, info.accountId);
+    if (call == nullptr) {
         TELEPHONY_LOGE("Call is NULL");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    sptr<CallBase> call = firstCall;
     call = RefreshCallIfNecessary(call, info);
     int32_t ret = UpdateCallState(call, TelCallState::CALL_STATUS_ALERTING);
     if (ret != TELEPHONY_SUCCESS) {
@@ -509,13 +503,11 @@ int32_t CallStatusManager::DisconnectingHandle(const CallDetailInfo &info)
 {
     TELEPHONY_LOGI("handle disconnecting state");
     std::string tmpStr(info.phoneNum);
-    sptr<CallBase> firstCall = GetOneCallObjectByIndex(info.index);
-    sptr<CallBase> secondCall = GetOneCallObject(tmpStr);
-    if (firstCall != secondCall || firstCall == nullptr) {
+    sptr<CallBase> call = GetOneCallObjectByIndexAndSlotId(info.index, info.accountId);
+    if (call == nullptr) {
         TELEPHONY_LOGE("Call is NULL");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    sptr<CallBase> call = firstCall;
     call = RefreshCallIfNecessary(call, info);
     int32_t ret = UpdateCallState(call, TelCallState::CALL_STATUS_DISCONNECTING);
     if (ret != TELEPHONY_SUCCESS) {
@@ -528,13 +520,11 @@ int32_t CallStatusManager::DisconnectedHandle(const CallDetailInfo &info)
 {
     TELEPHONY_LOGI("handle disconnected state");
     std::string tmpStr(info.phoneNum);
-    sptr<CallBase> firstCall = GetOneCallObjectByIndex(info.index);
-    sptr<CallBase> secondCall = GetOneCallObject(tmpStr);
-    if (firstCall != secondCall || firstCall == nullptr) {
+    sptr<CallBase> call = GetOneCallObjectByIndexAndSlotId(info.index, info.accountId);
+    if (call == nullptr) {
         TELEPHONY_LOGE("Call is NULL");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    sptr<CallBase> call = firstCall;
     call = RefreshCallIfNecessary(call, info);
     bool canUnHold = false;
     std::vector<std::u16string> callIdList;

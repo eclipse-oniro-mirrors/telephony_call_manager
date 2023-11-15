@@ -42,6 +42,7 @@ public:
     static sptr<CallBase> GetOneCallObject(int32_t callId);
     static sptr<CallBase> GetOneCallObject(std::string &phoneNumber);
     static sptr<CallBase> GetOneCallObjectByIndex(int32_t index);
+    static sptr<CallBase> GetOneCallObjectByIndexAndSlotId(int32_t index, int32_t slotId);
     static int32_t HasNewCall();
     static int32_t IsNewCallAllowedCreate(bool &enabled);
     static int32_t GetCarrierCallList(std::list<int32_t> &list);

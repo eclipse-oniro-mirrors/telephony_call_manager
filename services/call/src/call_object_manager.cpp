@@ -334,6 +334,20 @@ sptr<CallBase> CallObjectManager::GetOneCallObjectByIndex(int32_t index)
     return nullptr;
 }
 
+sptr<CallBase> CallObjectManager::GetOneCallObjectByIndexAndSlotId(int32_t index, int32_t slotId)
+{
+    std::lock_guard<std::mutex> lock(listMutex_);
+    std::list<sptr<CallBase>>::iterator it = callObjectPtrList_.begin();
+    for (; it != callObjectPtrList_.end(); ++it) {
+        if ((*it)->GetCallIndex() == index) {
+            if ((*it)->GetSlotId() == slotId) {
+                return (*it);
+            }
+        }
+    }
+    return nullptr;
+}
+
 bool CallObjectManager::IsCallExist(CallType callType, TelCallState callState)
 {
     std::lock_guard<std::mutex> lock(listMutex_);
