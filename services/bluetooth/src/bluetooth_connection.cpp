@@ -89,7 +89,6 @@ void BluetoothConnection::Init()
         DelayedSingleton<AudioDeviceManager>::GetInstance()->AddAudioDeviceList(macAddress,
             AudioDeviceType::DEVICE_BLUETOOTH_SCO);
     }
-    
     TELEPHONY_LOGI("BluetoothConnection init success!");
 #endif
 }
