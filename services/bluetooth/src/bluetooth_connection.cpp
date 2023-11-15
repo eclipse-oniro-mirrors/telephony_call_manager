@@ -86,8 +86,10 @@ void BluetoothConnection::Init()
         if (profile->GetScoState(device) == (int32_t)Bluetooth::HfpScoConnectState::SCO_CONNECTED) {
             SetConnectedScoAddr(macAddress);
         }
+        DelayedSingleton<AudioDeviceManager>::GetInstance()->AddAudioDeviceList(macAddress,
+            AudioDeviceType::DEVICE_BLUETOOTH_SCO);
     }
-    DelayedSingleton<AudioDeviceManager>::GetInstance()->AddAudioDeviceList(macAddress, AudioDeviceType::DEVICE_BLUETOOTH_SCO);
+    
     TELEPHONY_LOGI("BluetoothConnection init success!");
 #endif
 }
