@@ -39,6 +39,7 @@ public:
     bool RegexMatchMmi(const std::string &number);
     std::string RemoveSeparatorsPhoneNumber(const std::string &phoneString);
     std::string RemovePostDialPhoneNumber(const std::string &phoneString);
+    bool HasAlphabetInPhoneNum(const std::string &inputValue);
 
 private:
     void ProcessSpace(std::string &number);

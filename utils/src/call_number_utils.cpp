@@ -60,6 +60,10 @@ int32_t CallNumberUtils::FormatPhoneNumber(
 int32_t CallNumberUtils::FormatPhoneNumberToE164(
     const std::string phoneNumber, const std::string countryCode, std::string &formatNumber)
 {
+    if (HasAlphabetInPhoneNum(phoneNumber)) {
+        TELEPHONY_LOGE("phoneNumber is invalid!");
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
+    }
     return FormatNumberBase(phoneNumber, countryCode, i18n::phonenumbers::PhoneNumberUtil::E164, formatNumber);
 }
 
@@ -182,6 +186,22 @@ std::string CallNumberUtils::RemovePostDialPhoneNumber(const std::string &phoneS
     }
 
     return newString;
+}
+
+bool CallNumberUtils::HasAlphabetInPhoneNum(const std::string &inputValue)
+{
+    if (inputValue.empty()) {
+        TELEPHONY_LOGE("HasAlphabetInPhoneNum return, input is empty.");
+        return true;
+    }
+    for (char c : inputValue) {
+        if (((c >= 'a') && (c <= 'z')) || ((c >= 'A') && (c <= 'Z'))) {
+            TELEPHONY_LOGE("The Phone Number contains letter");
+            return true;
+        }
+    }
+    TELEPHONY_LOGI("The Phone Number is valid");
+    return false;
 }
 } // namespace Telephony
 } // namespace OHOS
