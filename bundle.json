@@ -48,6 +48,7 @@
                 "audio_framework",
                 "camera_framework",
                 "napi",
+                "player_framework",
                 "power_manager",
                 "safwk",
                 "samgr",

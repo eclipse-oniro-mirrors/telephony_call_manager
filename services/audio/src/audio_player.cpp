@@ -285,6 +285,37 @@ void AudioPlayer::CallAudioRendererCallback::OnInterrupt(const AudioStandard::In
     }
 }
 
+void AudioPlayer::RingCallback::OnInterrupt(const AudioStandard::InterruptEvent &interruptEvent)
+{
+    if (interruptEvent.forceType == AudioStandard::INTERRUPT_FORCE) {
+        switch (interruptEvent.hintType) {
+            case AudioStandard::INTERRUPT_HINT_PAUSE:
+                break;
+            case AudioStandard::INTERRUPT_HINT_STOP:
+                if (DelayedSingleton<AudioControlManager>::GetInstance()->IsCurrentRinging() &&
+                    DelayedSingleton<AudioControlManager>::GetInstance()->IsSoundPlaying()) {
+                    DelayedSingleton<AudioControlManager>::GetInstance()->StopRingtone();
+                }
+                break;
+            default:
+                break;
+        }
+    }
+}
+
+void AudioPlayer::RegisterRingCallback(std::shared_ptr<Media::RingtonePlayer> &RingtonePlayer) {
+    ringCallback_ = std::make_shared<RingCallback>();
+    if (ringCallback_ == nullptr) {
+        TELEPHONY_LOGE("ringCallback_ is nullptr");
+        return;
+    }
+    if (RingtonePlayer == nullptr) {
+        TELEPHONY_LOGE("RingtonePlayer is nullptr");
+        return;
+    }
+    RingtonePlayer->SetRingtonePlayerInterruptCallback(ringCallback_);
+}
+
 int32_t AudioPlayer::SetMute()
 {
     if (audioRenderer_ == nullptr) {

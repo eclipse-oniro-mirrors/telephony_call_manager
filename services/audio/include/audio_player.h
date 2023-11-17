@@ -20,6 +20,8 @@
 
 #include "audio_capturer.h"
 #include "audio_renderer.h"
+#include "ringtone_player.h"
+#include "system_sound_manager.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -75,6 +77,7 @@ public:
     void ReleaseCapturer();
     void SetStop(PlayerType playerType, bool state);
     int32_t SetMute();
+    void RegisterRingCallback(std::shared_ptr<Media::RingtonePlayer> &RingtonePlayer);
 
 private:
     class CallAudioRendererCallback : public AudioStandard::AudioRendererCallback {
@@ -82,6 +85,10 @@ private:
         void OnInterrupt(const AudioStandard::InterruptEvent &interruptEvent) override;
         void OnStateChange(const AudioStandard::RendererState state,
             const AudioStandard::StateChangeCmdType cmdType) override {}
+    };
+    class RingCallback : public Media::RingtonePlayerInterruptCallback {
+    public:
+        void OnInterrupt(const AudioStandard::InterruptEvent &interruptEvent) override;
     };
 
 private:
@@ -97,6 +104,7 @@ private:
     bool isToneStop_ = false;
     bool isSoundStop_ = false;
     std::shared_ptr<AudioStandard::AudioRendererCallback> callback_ = nullptr;
+    std::shared_ptr<Media::RingtonePlayerInterruptCallback> ringCallback_ = nullptr;
     bool IsStop(PlayerType playerType);
     std::unique_ptr<AudioStandard::AudioRenderer> audioRenderer_ = nullptr;
     std::unique_ptr<AudioStandard::AudioCapturer> audioCapturer_ = nullptr;

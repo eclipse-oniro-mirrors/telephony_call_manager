@@ -65,46 +65,40 @@ void Ring::Init(const std::string &ringtonePath)
         shouldVibrate_ = false;
     }
     ringtonePath_ = ringtonePath;
+
+    SystemSoundManager_ = Media::SystemSoundManagerFactory::CreateSystemSoundManager();
+    if (SystemSoundManager_ == nullptr) {
+        TELEPHONY_LOGE("get systemSoundManager failed");
+        return;
+    }
 }
 
 int32_t Ring::Play()
 {
-    if (!shouldRing_ || ringtonePath_.empty()) {
-        TELEPHONY_LOGE("should not ring or ringtone path empty");
-        return CALL_ERR_INVALID_PATH;
+    const std::shared_ptr<AbilityRuntime::Context> context;
+    RingtonePlayer_ = SystemSoundManager_->GetRingtonePlayer(context, Media::RingtoneType::RINGTONE_TYPE_SIM_CARD_0);
+    if (RingtonePlayer_ == nullptr) {
+        TELEPHONY_LOGE("get RingtonePlayer failed");
     }
-    if (audioPlayer_ == nullptr) {
-        TELEPHONY_LOGE("audioPlayer_ is nullptr");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    audioPlayer_->RegisterRingCallback(RingtonePlayer_);
+    int32_t result = RingtonePlayer_->Configure(defaultVolume_, true);
+    if (result != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("configure failed");
     }
-    int32_t result = TELEPHONY_SUCCESS;
-    AudioPlay audioPlay = &AudioPlayer::Play;
-    std::thread play(audioPlay, audioPlayer_, ringtonePath_, AudioStandard::AudioStreamType::STREAM_RING,
-        PlayerType::TYPE_RING);
-    pthread_setname_np(play.native_handle(), RING_PLAY_THREAD);
-    play.detach();
-    if (shouldVibrate_) {
-        result = StartVibrate();
-    }
-    return result;
+    audioPlayer_->SetStop(PlayerType::TYPE_RING, false);
+    return audioPlayer_->Start();
 }
 
 int32_t Ring::Stop()
 {
     std::lock_guard<std::mutex> lock(mutex_);
-    if (!shouldRing_ || ringtonePath_.empty()) {
-        TELEPHONY_LOGE("should not ring or ringtone path empty");
-        return CALL_ERR_INVALID_PATH;
-    }
     if (audioPlayer_ == nullptr) {
         TELEPHONY_LOGE("audioPlayer_ is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     int32_t result = TELEPHONY_SUCCESS;
     audioPlayer_->SetStop(PlayerType::TYPE_RING, true);
-    if (isVibrating_) {
-        result = CancelVibrate();
-    }
+    result = RingtonePlayer_->Stop();
     return result;
 }
 
@@ -136,11 +130,11 @@ bool Ring::ShouldVibrate()
 
 void Ring::ReleaseRenderer()
 {
-    if (audioPlayer_ == nullptr) {
-        TELEPHONY_LOGE("audioPlayer_ is nullptr");
+    if (RingtonePlayer_ == nullptr) {
+        TELEPHONY_LOGE("RingtonePlayer_ is nullptr");
         return;
     }
-    audioPlayer_->ReleaseRenderer();
+    RingtonePlayer_->Release();
 }
 
 int32_t Ring::SetMute()

@@ -61,6 +61,9 @@ private:
     std::string ringtonePath_;
     std::mutex mutex_;
     AudioPlayer *audioPlayer_ = nullptr;
+    std::shared_ptr<Media::SystemSoundManager> SystemSoundManager_ = nullptr;
+    std::shared_ptr<Media::RingtonePlayer> RingtonePlayer_ = nullptr;
+    int32_t defaultVolume = 1;
 };
 } // namespace Telephony
 } // namespace OHOS
