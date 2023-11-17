@@ -51,6 +51,7 @@ public:
 
 private:
     int32_t CarrierDialProcess(DialParaInfo &info);
+    int32_t IsDialCallForDsda(DialParaInfo &info);
     int32_t VoiceMailDialProcess(DialParaInfo &info);
     int32_t OttDialProcess(DialParaInfo &info);
     int32_t UpdateImsCallMode(int32_t callId, ImsCallMode mode);

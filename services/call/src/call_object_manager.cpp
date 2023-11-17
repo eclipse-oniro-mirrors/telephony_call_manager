@@ -156,7 +156,6 @@ int32_t CallObjectManager::HasNewCall()
 int32_t CallObjectManager::IsNewCallAllowedCreate(bool &enabled)
 {
     enabled = true;
-    std::lock_guard<std::mutex> lock(listMutex_);
     std::list<sptr<CallBase>>::iterator it;
     for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
         if ((*it)->GetCallRunningState() == CallRunningState::CALL_RUNNING_STATE_CREATE ||
@@ -165,10 +164,30 @@ int32_t CallObjectManager::IsNewCallAllowedCreate(bool &enabled)
             (*it)->GetCallRunningState() == CallRunningState::CALL_RUNNING_STATE_RINGING) {
             TELEPHONY_LOGE("there is already a new call, please redial later");
             enabled = false;
-            break;
+            return TELEPHONY_ERR_SUCCESS;
         }
     }
-
+    int32_t count = 0;
+    int32_t callNum = 2;
+    int32_t conferenceCallId = -1;
+    std::list<int32_t> callIdList;
+    GetCarrierCallList(callIdList);
+    for (int32_t otherCallId : callIdList) {
+        sptr<CallBase> call = GetOneCallObject(otherCallId);
+        if (call != nullptr) {
+            int32_t tempMainId = -1;
+            call->GetMainCallId(tempMainId);
+            if (tempMainId != conferenceCallId) {
+                TELEPHONY_LOGI("there is conference");
+            } else {
+                count++;
+            }
+        }
+    }
+    TELEPHONY_LOGI("the count is:%{public}d", count);
+    if (count >= callNum) {
+        enabled = false;
+    }
     return TELEPHONY_ERR_SUCCESS;
 }
 

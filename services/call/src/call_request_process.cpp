@@ -148,7 +148,8 @@ void CallRequestProcess::HoldOrDisconnectedCall(int32_t callId, int32_t slotId, 
         sptr<CallBase> call = GetOneCallObject(otherCallId);
         TELEPHONY_LOGI("other Call State =:%{public}d", call->GetTelCallState());
         if (call != nullptr && call != incomingCall) {
-            if (call->GetTelCallState() == TelCallState::CALL_STATUS_DISCONNECTING) {
+            if (call->GetTelCallState() == TelCallState::CALL_STATUS_DISCONNECTING ||
+                (activeCallNum == 0 && call->GetTelCallState() == TelCallState::CALL_STATUS_HOLDING)) {
                 continue;
             }
             if (call->GetSlotId() != slotId) {
@@ -562,13 +563,26 @@ int32_t CallRequestProcess::HandleDialFail()
 
 int32_t CallRequestProcess::CarrierDialProcess(DialParaInfo &info)
 {
-    std::string newPhoneNumer =
+    std::string newPhoneNum =
         DelayedSingleton<CallNumberUtils>::GetInstance()->RemoveSeparatorsPhoneNumber(info.number);
-    bool isMMiCode = DelayedSingleton<CallNumberUtils>::GetInstance()->IsMMICode(newPhoneNumer);
     int32_t ret = TELEPHONY_ERROR;
+    bool isEcc = false;
+    ret = DelayedSingleton<CallNumberUtils>::GetInstance()->CheckNumberIsEmergency(newPhoneNum, info.accountId, isEcc);
+    if (ret != TELEPHONY_SUCCESS) {
+        return ret;
+    }
+    if (!isEcc && IsDsdsMode5()) {
+        bool canDial = true;
+        IsNewCallAllowedCreate(canDial);
+        if (!canDial) {
+            return CALL_ERR_DIAL_IS_BUSY;
+        }
+        ret = IsDialCallForDsda(info);
+    }
+    bool isMMiCode = DelayedSingleton<CallNumberUtils>::GetInstance()->IsMMICode(newPhoneNum);
     if (!isMMiCode) {
         isFirstDialCallAdded_ = false;
-        info.number = newPhoneNumer;
+        info.number = newPhoneNum;
         ret = UpdateCallReportInfo(info, TelCallState::CALL_STATUS_DIALING);
         if (ret != TELEPHONY_SUCCESS) {
             TELEPHONY_LOGE("UpdateCallReportInfo failed!");
@@ -583,14 +597,6 @@ int32_t CallRequestProcess::CarrierDialProcess(DialParaInfo &info)
             static_cast<int32_t>(info.videoState), ret, "Carrier type PackCellularCallInfo failed");
         return ret;
     }
-    if (IsDsdsMode5()) {
-        sptr<CallBase> activeCall = GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_ACTIVE);
-        TELEPHONY_LOGI("is dsdsmode5 dial call info.accountId = %{public}d", info.accountId);
-        if (activeCall != nullptr && activeCall->GetSlotId() != info.accountId) {
-            activeCall->HoldCall();
-        }
-    }
-    // Obtain gateway information
     ret = DelayedSingleton<CellularCallConnection>::GetInstance()->Dial(callInfo);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("Dial failed!");
@@ -603,6 +609,16 @@ int32_t CallRequestProcess::CarrierDialProcess(DialParaInfo &info)
             return handleRet;
         }
         return ret;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallRequestProcess::IsDialCallForDsda(DialParaInfo &info)
+{
+    sptr<CallBase> activeCall = GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_ACTIVE);
+    TELEPHONY_LOGI("Is dsdsmode5 dial call info.accountId = %{public}d", info.accountId);
+    if (activeCall != nullptr && activeCall->GetSlotId() != info.accountId) {
+        return activeCall->HoldCall();
     }
     return TELEPHONY_SUCCESS;
 }

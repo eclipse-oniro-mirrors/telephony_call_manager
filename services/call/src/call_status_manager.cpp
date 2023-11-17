@@ -357,7 +357,7 @@ void CallStatusManager::CallFilterCompleteResult(const CallDetailInfo &info)
 
 int32_t CallStatusManager::UpdateDialingCallInfo(const CallDetailInfo &info)
 {
-    sptr<CallBase> call = GetOneCallObjectByIndex(info.index);
+    sptr<CallBase> call = GetOneCallObjectByIndexAndSlotId(info.index, info.accountId);
     if (call != nullptr) {
         call = RefreshCallIfNecessary(call, info);
         return TELEPHONY_SUCCESS;
@@ -539,23 +539,24 @@ int32_t CallStatusManager::DisconnectedHandle(const CallDetailInfo &info)
         TELEPHONY_LOGE("UpdateCallState failed, errCode:%{public}d", ret);
         return ret;
     }
+    int32_t size = callIdList.size();
     int32_t activeCallNum = GetCallNum(TelCallState::CALL_STATUS_ACTIVE);
     int32_t waitingCallNum = GetCallNum(TelCallState::CALL_STATUS_WAITING);
-    if ((callIdList.size() == 0 || callIdList.size() == 1) && activeCallNum == 0 && waitingCallNum == 0) {
-        canUnHold = true;
-    }
+    IsCanUnHold(activeCallNum, waitingCallNum, size, canUnHold);
     sptr<CallBase> holdCall = CallObjectManager::GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_HOLD);
     if (previousState != CallRunningState::CALL_RUNNING_STATE_HOLD &&
         previousState != CallRunningState::CALL_RUNNING_STATE_ACTIVE) {
         if (holdCall != nullptr && canUnHold) {
-            TELEPHONY_LOGI("release call and recover the held call");
-            holdCall->UnHoldCall();
+            if (holdCall->GetSlotId() == call->GetSlotId()) {
+                TELEPHONY_LOGI("release call and recover the held call");
+                holdCall->UnHoldCall();
+            }
         }
     }
     DeleteOneCallObject(call->GetCallID());
     int32_t dsdsMode = DSDS_MODE_V2;
     DelayedRefSingleton<CoreServiceClient>::GetInstance().GetDsdsMode(dsdsMode);
-    TELEPHONY_LOGE("DisconnectedHandle dsdsMode:%{public}d", dsdsMode);
+    TELEPHONY_LOGI("DisconnectedHandle dsdsMode:%{public}d", dsdsMode);
     if (dsdsMode == DSDS_MODE_V3) {
         AutoAnswer(activeCallNum, waitingCallNum);
     } else if (dsdsMode == static_cast<int32_t>(DsdsMode::DSDS_MODE_V5) ||
@@ -563,6 +564,17 @@ int32_t CallStatusManager::DisconnectedHandle(const CallDetailInfo &info)
         AutoAnswerForDsda(activeCallNum);
     }
     return ret;
+}
+
+void CallStatusManager::IsCanUnHold(int32_t activeCallNum, int32_t waitingCallNum, int32_t size, bool &canUnHold)
+{
+    int32_t incomingCallNum = GetCallNum(TelCallState::CALL_STATUS_INCOMING);
+    int32_t answeredCallNum = GetCallNum(TelCallState::CALL_STATUS_ANSWERED);
+    if (answeredCallNum == 0 && incomingCallNum == 0 && (size == 0 || size == 1) && activeCallNum == 0 &&
+        waitingCallNum == 0) {
+        canUnHold = true;
+    }
+    TELEPHONY_LOGI("CanUnHold state: %{public}d", canUnHold);
 }
 
 void CallStatusManager::AutoAnswerForDsda(int32_t activeCallNum)
