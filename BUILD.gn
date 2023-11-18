@@ -95,7 +95,6 @@ ohos_shared_library("tel_call_manager") {
 
   include_dirs = [
     "utils/include",
-    "//foundation/multimedia/player_framework/interfaces/inner_api/native/system_sound_manager/include",
     "//third_party/libphonenumber/cpp/src",
     "//third_party/libphonenumber/cpp/src/phonenumbers",
     "//third_party/protobuf/src",
