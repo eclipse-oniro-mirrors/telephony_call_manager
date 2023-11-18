@@ -63,7 +63,7 @@ private:
     AudioPlayer *audioPlayer_ = nullptr;
     std::shared_ptr<Media::SystemSoundManager> SystemSoundManager_ = nullptr;
     std::shared_ptr<Media::RingtonePlayer> RingtonePlayer_ = nullptr;
-    int32_t defaultVolume = 1;
+    int32_t defaultVolume_ = 1;
 };
 } // namespace Telephony
 } // namespace OHOS
