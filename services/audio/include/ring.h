@@ -22,6 +22,8 @@
 
 #include "audio_player.h"
 #include "audio_proxy.h"
+#include "ringtone_player.h"
+#include "system_sound_manager.h"
 
 namespace OHOS {
 namespace Telephony {
