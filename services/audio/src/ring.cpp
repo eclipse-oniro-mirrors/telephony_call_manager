@@ -86,7 +86,7 @@ int32_t Ring::Play()
         TELEPHONY_LOGE("configure failed");
     }
     audioPlayer_->SetStop(PlayerType::TYPE_RING, false);
-    return RingTonePlayer_->Start();
+    return RingtonePlayer_->Start();
 }
 
 int32_t Ring::Stop()
