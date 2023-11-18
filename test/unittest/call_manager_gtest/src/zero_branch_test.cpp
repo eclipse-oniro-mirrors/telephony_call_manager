@@ -1219,6 +1219,9 @@ HWTEST_F(BranchTest, Telephony_Ott_Conference_001, Function | MediumTest | Level
     ASSERT_EQ(ottConference.JoinToConference(1), CALL_ERR_ILLEGAL_CALL_OPERATION);
     ottConference.state_ = CONFERENCE_STATE_CREATING;
     ASSERT_EQ(ottConference.JoinToConference(1), TELEPHONY_SUCCESS);
+    for (uint16_t i = 0; i <= CS_CONFERENCE_MAX_CALLS_CNT + 1; ++i) {
+        imsConference.subCallIdSet_.insert(i);
+    }
     ASSERT_EQ(ottConference.CanCombineConference(), CALL_ERR_CONFERENCE_CALL_EXCEED_LIMIT);
     ottConference.subCallIdSet_.clear();
     ottConference.subCallIdSet_.insert(1);
@@ -1252,6 +1255,9 @@ HWTEST_F(BranchTest, Telephony_Cs_Conference_001, Function | MediumTest | Level3
     ASSERT_EQ(csConference.JoinToConference(1), CALL_ERR_ILLEGAL_CALL_OPERATION);
     csConference.state_ = CONFERENCE_STATE_CREATING;
     ASSERT_EQ(csConference.JoinToConference(1), TELEPHONY_SUCCESS);
+    for (uint16_t i = 0; i <= CS_CONFERENCE_MAX_CALLS_CNT + 1; ++i) {
+        imsConference.subCallIdSet_.insert(i);
+    }
     ASSERT_EQ(csConference.CanCombineConference(), CALL_ERR_CONFERENCE_CALL_EXCEED_LIMIT);
     csConference.subCallIdSet_.clear();
     csConference.subCallIdSet_.insert(1);
@@ -1285,6 +1291,9 @@ HWTEST_F(BranchTest, Telephony_Ims_Conference_001, Function | MediumTest | Level
     ASSERT_EQ(imsConference.JoinToConference(1), CALL_ERR_ILLEGAL_CALL_OPERATION);
     imsConference.state_ = CONFERENCE_STATE_CREATING;
     ASSERT_EQ(imsConference.JoinToConference(1), TELEPHONY_SUCCESS);
+    for (uint16_t i = 0; i <= CS_CONFERENCE_MAX_CALLS_CNT + 1; ++i) {
+        imsConference.subCallIdSet_.insert(i);
+    }
     ASSERT_EQ(imsConference.CanCombineConference(), CALL_ERR_CONFERENCE_CALL_EXCEED_LIMIT);
     imsConference.subCallIdSet_.clear();
     imsConference.subCallIdSet_.insert(1);
