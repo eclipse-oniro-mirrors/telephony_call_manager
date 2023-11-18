@@ -40,7 +40,8 @@ enum BtScoState {
 };
 
 #ifdef ABILITY_BLUETOOTH_SUPPORT
-class BluetoothConnection : public OHOS::Bluetooth::HandsFreeAudioGatewayObserver {
+class BluetoothConnection : public OHOS::Bluetooth::HandsFreeAudioGatewayObserver,
+    public std::enable_shared_from_this<BluetoothConnection> {
 #else
 class BluetoothConnection {
 #endif
