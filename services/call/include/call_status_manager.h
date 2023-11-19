@@ -59,6 +59,7 @@ private:
     int32_t AlertHandle(const CallDetailInfo &info);
     int32_t DisconnectingHandle(const CallDetailInfo &info);
     int32_t DisconnectedHandle(const CallDetailInfo &info);
+    void IsCanUnHold(int32_t activeCallNum, int32_t waitingCallNum, int32_t size, bool &canUnHold);
     void AutoAnswer(int32_t activeCallNum, int32_t waitingCallNum);
     void AutoAnswerForDsda(int32_t activeCallNum);
     sptr<CallBase> CreateNewCall(const CallDetailInfo &info, CallDirection dir);
