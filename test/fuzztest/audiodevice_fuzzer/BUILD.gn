@@ -73,6 +73,7 @@ ohos_fuzztest("AudioDeviceFuzzTest") {
     "hitrace:hitrace_meter",
     "init:libbegetutil",
     "ipc:ipc_single",
+    "player_framework:system_sound_client",
     "power_manager:powermgr_client",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",

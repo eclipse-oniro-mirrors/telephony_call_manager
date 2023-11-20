@@ -22,6 +22,8 @@
 
 #include "audio_player.h"
 #include "audio_proxy.h"
+#include "ringtone_player.h"
+#include "system_sound_manager.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -61,6 +63,9 @@ private:
     std::string ringtonePath_;
     std::mutex mutex_;
     AudioPlayer *audioPlayer_ = nullptr;
+    std::shared_ptr<Media::SystemSoundManager> SystemSoundManager_ = nullptr;
+    std::shared_ptr<Media::RingtonePlayer> RingtonePlayer_ = nullptr;
+    int32_t defaultVolume_ = 1;
 };
 } // namespace Telephony
 } // namespace OHOS
