@@ -82,9 +82,7 @@ int32_t CallNumberUtils::FormatNumberBase(const std::string phoneNumber, std::st
     transform(countryCode.begin(), countryCode.end(), countryCode.begin(), ::toupper);
     i18n::phonenumbers::PhoneNumber parseResult;
     phoneUtils->Parse(phoneNumber, countryCode, &parseResult);
-    if (phoneUtils->IsValidNumber(parseResult)) {
-        phoneUtils->Format(parseResult, formatInfo, &formatNumber);
-    }
+    phoneUtils->Format(parseResult, formatInfo, &formatNumber);
     if (formatNumber.empty() || formatNumber == "0") {
         TELEPHONY_LOGE("FormatPhoneNumber failed!");
         return CALL_ERR_FORMAT_PHONE_NUMBER_FAILED;
