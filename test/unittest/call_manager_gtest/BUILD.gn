@@ -69,6 +69,7 @@ ohos_unittest("tel_call_manager_gtest") {
     "hilog:libhilog",
     "init:libbegetutil",
     "ipc:ipc_single",
+    "player_framework:system_sound_client",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
   ]
