@@ -56,6 +56,9 @@ int32_t CallAbilityReportProxy::RegisterCallBack(
     std::list<sptr<ICallAbilityCallback>>::iterator it = callbackPtrList_.begin();
     for (; it != callbackPtrList_.end(); ++it) {
         if ((*it)->GetBundleName() == bundleName) {
+            if (bundleName == "com.huawei.hmos.meetimeservice") {
+                break;
+            }
             (*it).clear();
             (*it) = callAbilityCallbackPtr;
             TELEPHONY_LOGI("%{public}s RegisterCallBack success", bundleName.c_str());
