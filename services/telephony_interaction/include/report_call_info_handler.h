@@ -19,6 +19,7 @@
 #include <memory>
 
 #include "call_status_manager.h"
+#include "mutex"
 #include "singleton.h"
 
 namespace OHOS {
@@ -35,7 +36,12 @@ public:
     int32_t UpdateMediaModeResponse(const CallMediaModeResponse &response);
 
 private:
+    template<typename Function>
+    void Submit(const std::string &taskName, Function &&func);
+
+private:
     std::shared_ptr<CallStatusManager> callStatusManagerPtr_;
+    std::mutex mtx;
 };
 } // namespace Telephony
 } // namespace OHOS
