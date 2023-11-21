@@ -35,7 +35,7 @@ BluetoothConnection::~BluetoothConnection()
     if (profile == nullptr) {
         TELEPHONY_LOGE("profile is nullptr");
     } else {
-        profile->DeregisterObserver(this);
+        profile->DeregisterObserver(shared_from_this());
     }
 
     if (statusChangeListener_ != nullptr) {
@@ -284,7 +284,7 @@ void BluetoothConnection::RegisterObserver()
         return;
     }
 
-    profile->RegisterObserver(this);
+    profile->RegisterObserver(shared_from_this());
 }
 
 void BluetoothConnection::OnScoStateChanged(const Bluetooth::BluetoothRemoteDevice &device, int32_t state)
