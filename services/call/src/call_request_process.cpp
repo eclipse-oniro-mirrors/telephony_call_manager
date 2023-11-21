@@ -140,6 +140,17 @@ void CallRequestProcess::HoldOrDisconnectedCall(int32_t callId, int32_t slotId, 
     bool noOtherCall = true;
     bool flagForConference = false;
     GetCarrierCallList(callIdList);
+    IsExistCallOtherSlot(callIdList, slotId, noOtherCall);
+    if (noOtherCall) {
+        TELEPHONY_LOGI("no Other Slot Call");
+        sptr<CallBase> call = GetOneCallObject(callId);
+        int32_t ret = call->AnswerCall(videoState);
+        if (ret != TELEPHONY_SUCCESS) {
+            return;
+        }
+        DelayedSingleton<CallControlManager>::GetInstance()->NotifyIncomingCallAnswered(call);
+        return;
+    }
     sptr<CallBase> incomingCall = GetOneCallObject(callId);
     int32_t waitingCallNum = GetCallNum(TelCallState::CALL_STATUS_WAITING);
     int32_t activeCallNum = GetCallNum(TelCallState::CALL_STATUS_ACTIVE);
@@ -166,15 +177,17 @@ void CallRequestProcess::HoldOrDisconnectedCall(int32_t callId, int32_t slotId, 
             }
         }
     }
+}
 
-    if (noOtherCall) {
-        TELEPHONY_LOGI("no Other Slot Call");
-        sptr<CallBase> call = GetOneCallObject(callId);
-        int32_t ret = call->AnswerCall(videoState);
-        if (ret != TELEPHONY_SUCCESS) {
-            return;
+void CallRequestProcess::IsExistCallOtherSlot(std::list<int32_t> &list, int32_t slotId, bool &noOtherCall)
+{
+    if (list.size() > 1) {
+        for (int32_t otherCallId : list) {
+            sptr<CallBase> call = GetOneCallObject(otherCallId);
+            if (call->GetSlotId() != slotId) {
+                noOtherCall = false;
+            }
         }
-        DelayedSingleton<CallControlManager>::GetInstance()->NotifyIncomingCallAnswered(call);
     }
 }
 

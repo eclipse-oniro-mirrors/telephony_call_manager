@@ -48,6 +48,7 @@ public:
     void HandleCallWaitingNumOne(sptr<CallBase> call, int32_t slotId, int32_t activeCallNum, bool &flagForConference);
     void HandleCallWaitingNumZero(sptr<CallBase> call, int32_t slotId, int32_t activeCallNum, bool &flagForConference);
     void HoldOrDisconnectedCall(int32_t callId, int32_t slotId, int32_t videoState);
+    void IsExistCallOtherSlot(std::list<int32_t> &list, int32_t slotId, bool &noOtherCall);
 
 private:
     int32_t CarrierDialProcess(DialParaInfo &info);
