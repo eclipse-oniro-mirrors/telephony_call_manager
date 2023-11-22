@@ -67,6 +67,32 @@ int32_t CallNumberUtils::FormatPhoneNumberToE164(
     return FormatNumberBase(phoneNumber, countryCode, i18n::phonenumbers::PhoneNumberUtil::E164, formatNumber);
 }
 
+int32_t CallNumberUtils::FormatPhoneNumberToNational(
+    const std::string phoneNumber, const std::string countryCode, std::string &formatNumber)
+{
+    if (HasAlphabetInPhoneNum(phoneNumber)) {
+        TELEPHONY_LOGE("phoneNumber is invalid!");
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
+    }
+    int32_t ret = FormatNumberBase(phoneNumber, countryCode,
+        i18n::phonenumbers::PhoneNumberUtil::PhoneNumberFormat::NATIONAL, formatNumber);
+    ProcessSpace(formatNumber);
+    return ret;
+}
+
+int32_t CallNumberUtils::FormatPhoneNumberToInternational(
+    const std::string phoneNumber, const std::string countryCode, std::string &formatNumber);
+{
+    if (HasAlphabetInPhoneNum(phoneNumber)) {
+        TELEPHONY_LOGE("phoneNumber is invalid!");
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
+    }
+    int32_t ret = FormatNumberBase(phoneNumber, countryCode,
+        i18n::phonenumbers::PhoneNumberUtil::PhoneNumberFormat::INTERNATIONAL, formatNumber);
+    ProcessSpace(formatNumber);
+    return ret;
+}
+
 int32_t CallNumberUtils::FormatNumberBase(const std::string phoneNumber, std::string countryCode,
     const i18n::phonenumbers::PhoneNumberUtil::PhoneNumberFormat formatInfo, std::string &formatNumber)
 {
@@ -87,7 +113,6 @@ int32_t CallNumberUtils::FormatNumberBase(const std::string phoneNumber, std::st
         TELEPHONY_LOGE("FormatPhoneNumber failed!");
         return CALL_ERR_FORMAT_PHONE_NUMBER_FAILED;
     }
-    ProcessSpace(formatNumber);
     return TELEPHONY_SUCCESS;
 }
 

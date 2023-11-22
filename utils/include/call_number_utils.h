@@ -31,6 +31,10 @@ public:
         const std::string &phoneNumber, const std::string &countryCode, std::string &formatNumber);
     int32_t FormatPhoneNumberToE164(
         const std::string phoneNumber, const std::string countryCode, std::string &formatNumber);
+    int32_t FormatPhoneNumberToNational(
+        const std::string phoneNumber, const std::string countryCode, std::string &formatNumber);
+    int32_t FormatPhoneNumberToInternational(
+        const std::string phoneNumber, const std::string countryCode, std::string &formatNumber);
     int32_t FormatNumberBase(const std::string phoneNumber, std::string countryCode,
         const i18n::phonenumbers::PhoneNumberUtil::PhoneNumberFormat formatInfo, std::string &formatNumber);
     int32_t CheckNumberIsEmergency(const std::string &phoneNumber, const int32_t slotId, bool &enabled);
