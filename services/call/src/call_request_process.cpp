@@ -184,7 +184,7 @@ void CallRequestProcess::IsExistCallOtherSlot(std::list<int32_t> &list, int32_t 
     if (list.size() > 1) {
         for (int32_t otherCallId : list) {
             sptr<CallBase> call = GetOneCallObject(otherCallId);
-            if (call->GetSlotId() != slotId) {
+            if (call != nullptr && call->GetSlotId() != slotId) {
                 noOtherCall = false;
                 break;
             }
@@ -301,7 +301,7 @@ void CallRequestProcess::DisconnectOtherSubIdCall(int32_t callId, int32_t slotId
     if (callIdList.size() > 1) {
         for (int32_t otherCallId : callIdList) {
             sptr<CallBase> call = GetOneCallObject(otherCallId);
-            if (call->GetSlotId() != slotId) {
+            if (call != nullptr && call->GetSlotId() != slotId) {
                 incomingCall->SetAutoAnswerState(flag);
                 TELEPHONY_LOGI("Hangup call SLOTID:%{public}d", call->GetSlotId());
                 call->HangUpCall();
