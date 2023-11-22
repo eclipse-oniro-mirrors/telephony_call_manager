@@ -192,6 +192,10 @@ HWTEST_F(BranchTest, Telephony_CallNumberUtils_001, Function | MediumTest | Leve
     ASSERT_GT(DelayedSingleton<CallNumberUtils>::GetInstance()->FormatPhoneNumberToE164(
                   phoneNumber, countryCode, formatNumber),
         TELEPHONY_ERROR);
+    ASSERT_GE(DelayedSingleton<CallNumberUtils>::GetInstance()->FormatPhoneNumberToNational(
+        emptyStr, emptyStr, formatNumber), TELEPHONY_ERR_SUCCESS);
+    ASSERT_GE(DelayedSingleton<CallNumberUtils>::GetInstance()->FormatPhoneNumberToInternational(
+        emptyStr, emptyStr, formatNumber), TELEPHONY_ERR_SUCCESS);
     ASSERT_FALSE(DelayedSingleton<CallNumberUtils>::GetInstance()->IsValidSlotId(INVALID_SLOTID));
     ASSERT_TRUE(DelayedSingleton<CallNumberUtils>::GetInstance()->IsValidSlotId(0));
 }

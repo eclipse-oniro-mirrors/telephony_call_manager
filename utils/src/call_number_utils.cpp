@@ -81,7 +81,7 @@ int32_t CallNumberUtils::FormatPhoneNumberToNational(
 }
 
 int32_t CallNumberUtils::FormatPhoneNumberToInternational(
-    const std::string phoneNumber, const std::string countryCode, std::string &formatNumber);
+    const std::string phoneNumber, const std::string countryCode, std::string &formatNumber)
 {
     if (HasAlphabetInPhoneNum(phoneNumber)) {
         TELEPHONY_LOGE("phoneNumber is invalid!");
