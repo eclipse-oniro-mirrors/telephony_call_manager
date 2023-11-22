@@ -164,7 +164,7 @@ int32_t CallControlManager::AnswerCall(int32_t callId, int32_t videoState)
             AnsweredCallQueue_.hasCall = true;
             AnsweredCallQueue_.callId = callId;
             AnsweredCallQueue_.videoState = videoState;
-            return TELEPHONY_ERR_LOCAL_PTR_NULL;
+            return TELEPHONY_SUCCESS;
     }
     int32_t ret = AnswerCallPolicy(callId, videoState);
     if (ret != TELEPHONY_SUCCESS) {
@@ -1075,6 +1075,7 @@ int32_t CallControlManager::RemoveMissedIncomingCallNotification()
 
 int32_t CallControlManager::SetVoIPCallState(int32_t state)
 {
+    TELEPHONY_LOGI("VoIP state is %{public}d", state);
     VoIPCallState_ = (CallStateToApp)state;
     if (VoIPCallState_ == CallStateToApp::CALL_STATE_ANSWERED) {
         TELEPHONY_LOGI("VoIP answered the call, should hangup sim calls");
@@ -1094,7 +1095,7 @@ int32_t CallControlManager::SetVoIPCallState(int32_t state)
     }
     if (VoIPCallState_ == CallStateToApp::CALL_STATE_IDLE) {
             TELEPHONY_LOGI("VoIP call state is not active");
-            if (AnsweredCallQueue_.hasCall == true) {
+            if (AnsweredCallQueue_.hasCall) {
                 TELEPHONY_LOGI("answer call now");
                 AnsweredCallQueue_.hasCall = false;
                 return AnswerCall(AnsweredCallQueue_.callId, AnsweredCallQueue_.videoState);
