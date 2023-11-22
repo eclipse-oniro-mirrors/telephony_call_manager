@@ -186,6 +186,7 @@ void CallRequestProcess::IsExistCallOtherSlot(std::list<int32_t> &list, int32_t 
             sptr<CallBase> call = GetOneCallObject(otherCallId);
             if (call->GetSlotId() != slotId) {
                 noOtherCall = false;
+                break;
             }
         }
     }
