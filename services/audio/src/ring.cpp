@@ -139,11 +139,11 @@ void Ring::ReleaseRenderer()
 
 int32_t Ring::SetMute()
 {
-    if (audioPlayer_ == nullptr) {
-        TELEPHONY_LOGE("audioPlayer_ is nullptr");
+    if (RingtonePlayer_ == nullptr) {
+        TELEPHONY_LOGE("RingtonePlayer_ is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return audioPlayer_->SetMute();
+    return RingtonePlayer_->Stop();
 }
 } // namespace Telephony
 } // namespace OHOS
