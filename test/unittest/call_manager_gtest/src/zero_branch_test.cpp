@@ -309,6 +309,7 @@ HWTEST_F(BranchTest, Telephony_CellularCallConnection_002, Function | MediumTest
     ASSERT_NE(
         DelayedSingleton<CellularCallConnection>::GetInstance()->SetImsSwitchStatus(0, true), TELEPHONY_ERR_SUCCESS);
     ASSERT_NE(DelayedSingleton<CellularCallConnection>::GetInstance()->ConnectService(), TELEPHONY_ERR_SUCCESS);
+    ASSERT_EQ(DelayedSingleton<CellularCallConnection>::GetInstance()->ClearAllCalls(), TELEPHONY_ERR_SUCCESS);
 }
 
 /**

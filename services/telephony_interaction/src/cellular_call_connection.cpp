@@ -30,7 +30,7 @@ namespace Telephony {
 #ifdef RECONNECT_MAX_TRY_COUNT
 constexpr uint16_t CONNECT_MAX_TRY_COUNT = 5;
 #endif
-constexpr uint16_t DELAY_TIME = 10;
+constexpr uint16_t DELAY_TIME = 100;
 
 CellularCallConnection::CellularCallConnection()
     : systemAbilityId_(TELEPHONY_CELLULAR_CALL_SYS_ABILITY_ID), cellularCallCallbackPtr_(nullptr),
