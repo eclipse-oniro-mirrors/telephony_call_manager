@@ -52,7 +52,17 @@ int32_t Tone::Play()
         }
         std::thread play([&]() {
             pthread_setname_np(pthread_self(), TONE_PLAY_THREAD);
-            dtmfTonePlayer_->StartTone();
+            tonePlayer_->StartTone();
+        });
+        play.detach();
+    } else if (currentToneDescriptor_ == TONE_RINGBACK) {
+        using namespace OHOS::AudioStandard;
+        if (!InitTonePlayer(StreamUsage::STREAM_USAGE_VOICE_MODEM_COMMUNICATION)) {
+            return TELEPHONY_ERROR;
+        }
+        std::thread play([&]() {
+            pthread_setname_np(pthread_self(), TONE_PLAY_THREAD);
+            tonePlayer_->StartTone();
         });
         play.detach();
     } else {
@@ -78,8 +88,13 @@ int32_t Tone::Stop()
     }
     if (IsDtmf(currentToneDescriptor_)) {
         if (InitTonePlayer()) {
-            dtmfTonePlayer_->StopTone();
-            dtmfTonePlayer_->Release();
+            tonePlayer_->StopTone();
+            tonePlayer_->Release();
+        }
+    } else if (currentToneDescriptor_ = TONE_RINGBACK) {
+        if (InitTonePlayer(AudioStandard::StreamUsage::STREAM_USAGE_VOICE_MODEM_COMMUNICATION)) {
+            tonePlayer_->StopTone();
+            tonePlayer_->Release();
         }
     } else {
         if (audioPlayer_ == nullptr) {
@@ -94,17 +109,23 @@ int32_t Tone::Stop()
 bool Tone::InitTonePlayer()
 {
     using namespace OHOS::AudioStandard;
-    if (dtmfTonePlayer_ == nullptr) {
+    return InitTonePlayer(StreamUsage::STREAM_ISAGE_DTMF)
+}
+
+bool Tone::InitTonePlayer(AudioStandard::StreamUsage streamUsage)
+{
+    using namespace OHOS::AudioStandard;
+    if (tonePlayer_ == nullptr) {
         AudioRendererInfo rendererInfo = {};
         rendererInfo.contentType = ContentType::CONTENT_TYPE_UNKNOWN;
-        rendererInfo.streamUsage = StreamUsage::STREAM_USAGE_DTMF;
+        rendererInfo.streamUsage = streamUsage;
         rendererInfo.rendererFlags = 0;
-        dtmfTonePlayer_ = TonePlayer::Create(rendererInfo);
-        if (dtmfTonePlayer_ == nullptr) {
+        tonePlayer_ = TonePlayer::Create(rendererInfo);
+        if (tonePlayer_ == nullptr) {
             return false;
         }
-        ToneType dtmfType = ConvertToneDescriptorToToneType(currentToneDescriptor_);
-        if (!dtmfTonePlayer_->LoadTone(dtmfType)) {
+        ToneType toneType = ConvertToneDescriptorToToneType(currentToneDescriptor_);
+        if (!tonePlayer_->LoadTone(toneType)) {
             return false;
         }
     }
@@ -160,48 +181,51 @@ ToneDescriptor Tone::ConvertDigitToTone(char digit)
 AudioStandard::ToneType Tone::ConvertToneDescriptorToToneType(ToneDescriptor tone)
 {
     using namespace OHOS::AudioStandard;
-    ToneType dtmf = ToneType::NUM_TONES;
+    ToneType tonType = ToneType::NUM_TONES;
     switch (tone) {
         case ToneDescriptor::TONE_DTMF_CHAR_0:
-            dtmf = ToneType::TONE_TYPE_DIAL_0;
+            tonType = ToneType::TONE_TYPE_DIAL_0;
             break;
         case ToneDescriptor::TONE_DTMF_CHAR_1:
-            dtmf = ToneType::TONE_TYPE_DIAL_1;
+            tonType = ToneType::TONE_TYPE_DIAL_1;
             break;
         case ToneDescriptor::TONE_DTMF_CHAR_2:
-            dtmf = ToneType::TONE_TYPE_DIAL_2;
+            tonType = ToneType::TONE_TYPE_DIAL_2;
             break;
         case ToneDescriptor::TONE_DTMF_CHAR_3:
-            dtmf = ToneType::TONE_TYPE_DIAL_3;
+            tonType = ToneType::TONE_TYPE_DIAL_3;
             break;
         case ToneDescriptor::TONE_DTMF_CHAR_4:
-            dtmf = ToneType::TONE_TYPE_DIAL_4;
+            tonType = ToneType::TONE_TYPE_DIAL_4;
             break;
         case ToneDescriptor::TONE_DTMF_CHAR_5:
-            dtmf = ToneType::TONE_TYPE_DIAL_5;
+            tonType = ToneType::TONE_TYPE_DIAL_5;
             break;
         case ToneDescriptor::TONE_DTMF_CHAR_6:
-            dtmf = ToneType::TONE_TYPE_DIAL_6;
+            tonType = ToneType::TONE_TYPE_DIAL_6;
             break;
         case ToneDescriptor::TONE_DTMF_CHAR_7:
-            dtmf = ToneType::TONE_TYPE_DIAL_7;
+            tonType = ToneType::TONE_TYPE_DIAL_7;
             break;
         case ToneDescriptor::TONE_DTMF_CHAR_8:
-            dtmf = ToneType::TONE_TYPE_DIAL_8;
+            tonType = ToneType::TONE_TYPE_DIAL_8;
             break;
         case ToneDescriptor::TONE_DTMF_CHAR_9:
-            dtmf = ToneType::TONE_TYPE_DIAL_9;
+            tonType = ToneType::TONE_TYPE_DIAL_9;
             break;
         case ToneDescriptor::TONE_DTMF_CHAR_P:
-            dtmf = ToneType::TONE_TYPE_DIAL_S;
+            tonType = ToneType::TONE_TYPE_DIAL_S;
             break;
         case ToneDescriptor::TONE_DTMF_CHAR_W:
-            dtmf = ToneType::TONE_TYPE_DIAL_P;
+            tonType = ToneType::TONE_TYPE_DIAL_P;
+            break;
+        case ToneDescriptor::TONE_RINGBACK:
+            tonType = ToneType::TONE_TYPE_COMMON_SUPERVISORY_RINGTONE;
             break;
         default:
             break;
     }
-    return dtmf;
+    return tonType;
 }
 
 bool Tone::IsDtmf(ToneDescriptor tone)
