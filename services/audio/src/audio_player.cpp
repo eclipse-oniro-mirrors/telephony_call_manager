@@ -34,7 +34,6 @@ bool AudioPlayer::InitRenderer(const wav_hdr &wavHeader, AudioStandard::AudioStr
         TELEPHONY_LOGE("audio renderer create failed");
         return false;
     }
-    audioRenderer_->SetInterruptMode(AudioStandard::INDEPENDENT_MODE);
     if (audioRenderer_->SetParams(rendererParams) != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("audio renderer set params failed");
         return false;
@@ -77,7 +76,6 @@ bool AudioPlayer::InitRenderer()
         TELEPHONY_LOGE("audio renderer create failed");
         return false;
     }
-    audioRenderer_->SetInterruptMode(AudioStandard::INDEPENDENT_MODE);
     if (!audioRenderer_->Start()) {
         TELEPHONY_LOGE("audio renderer start failed");
         return false;
