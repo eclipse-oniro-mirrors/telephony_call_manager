@@ -47,7 +47,7 @@ int32_t Tone::Play()
         return CALL_ERR_AUDIO_UNKNOWN_TONE;
     }
     if (IsDtmf(currentToneDescriptor_)) {
-        if (!InitTonePlayer()) {
+        if (!InitTonePlayer(AudioStandard::StreamUsage::STREAM_USAGE_DTMF)) {
             return TELEPHONY_ERROR;
         }
         std::thread play([&]() {
@@ -56,8 +56,7 @@ int32_t Tone::Play()
         });
         play.detach();
     } else if (currentToneDescriptor_ == TONE_RINGBACK) {
-        using namespace OHOS::AudioStandard;
-        if (!InitTonePlayer(StreamUsage::STREAM_USAGE_VOICE_MODEM_COMMUNICATION)) {
+        if (!InitTonePlayer(AudioStandard::StreamUsage::STREAM_USAGE_VOICE_MODEM_COMMUNICATION)) {
             return TELEPHONY_ERROR;
         }
         std::thread play([&]() {
@@ -86,13 +85,8 @@ int32_t Tone::Stop()
         TELEPHONY_LOGE("tone descriptor unknown");
         return CALL_ERR_AUDIO_UNKNOWN_TONE;
     }
-    if (IsDtmf(currentToneDescriptor_)) {
-        if (InitTonePlayer()) {
-            tonePlayer_->StopTone();
-            tonePlayer_->Release();
-        }
-    } else if (currentToneDescriptor_ == TONE_RINGBACK) {
-        if (InitTonePlayer(AudioStandard::StreamUsage::STREAM_USAGE_VOICE_MODEM_COMMUNICATION)) {
+    if (IsDtmf(currentToneDescriptor_) || currentToneDescriptor_ == TONE_RINGBACK) {
+        if (tonePlayer_ != nullptr) {
             tonePlayer_->StopTone();
             tonePlayer_->Release();
         }
@@ -104,12 +98,6 @@ int32_t Tone::Stop()
         audioPlayer_->SetStop(PlayerType::TYPE_TONE, true);
     }
     return TELEPHONY_SUCCESS;
-}
-
-bool Tone::InitTonePlayer()
-{
-    using namespace OHOS::AudioStandard;
-    return InitTonePlayer(StreamUsage::STREAM_USAGE_DTMF);
 }
 
 bool Tone::InitTonePlayer(AudioStandard::StreamUsage streamUsage)

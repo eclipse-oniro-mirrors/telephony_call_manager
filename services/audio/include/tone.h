@@ -77,7 +77,6 @@ public:
 
 private:
     ToneDescriptor currentToneDescriptor_ = ToneDescriptor::TONE_UNKNOWN;
-    bool InitTonePlayer();
     bool InitTonePlayer(AudioStandard::StreamUsage streamUsage);
     AudioStandard::ToneType ConvertToneDescriptorToToneType(ToneDescriptor tone);
     std::string GetToneDescriptorPath(ToneDescriptor tone);
