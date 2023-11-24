@@ -2233,7 +2233,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_FormatPhoneNumber_0200, Functio
     std::u16string phonyNumber = Str8ToStr16(number);
     std::u16string countryCode = Str8ToStr16(Code);
     std::u16string formatNumber = Str8ToStr16(formatBefore);
-    EXPECT_GE(
+    EXPECT_EQ(
         CallManagerGtest::clientPtr_->FormatPhoneNumber(phonyNumber, countryCode, formatNumber), RETURN_VALUE_IS_ZERO);
 }
 
@@ -2313,7 +2313,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_FormatPhoneNumber_0600, Functio
     std::u16string phonyNumber = Str8ToStr16(number);
     std::u16string countryCode = Str8ToStr16(Code);
     std::u16string formatNumber = Str8ToStr16(formatBefore);
-    EXPECT_GE(
+    EXPECT_EQ(
         CallManagerGtest::clientPtr_->FormatPhoneNumber(phonyNumber, countryCode, formatNumber), RETURN_VALUE_IS_ZERO);
 }
 
@@ -2333,7 +2333,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_FormatPhoneNumber_0700, Functio
     std::u16string phonyNumber = Str8ToStr16(number);
     std::u16string countryCode = Str8ToStr16(Code);
     std::u16string formatNumber = Str8ToStr16(formatBefore);
-    EXPECT_NE(
+    EXPECT_EQ(
         CallManagerGtest::clientPtr_->FormatPhoneNumber(phonyNumber, countryCode, formatNumber), RETURN_VALUE_IS_ZERO);
 }
 
@@ -2455,7 +2455,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_FormatPhoneNumberToE164_0600, F
     std::u16string phonyNumber = Str8ToStr16(number);
     std::u16string countryCode = Str8ToStr16(Code);
     std::u16string formatNumber = Str8ToStr16(formatBefore);
-    EXPECT_NE(CallManagerGtest::clientPtr_->FormatPhoneNumberToE164(phonyNumber, countryCode, formatNumber),
+    EXPECT_EQ(CallManagerGtest::clientPtr_->FormatPhoneNumberToE164(phonyNumber, countryCode, formatNumber),
         RETURN_VALUE_IS_ZERO);
 }
 
@@ -2475,7 +2475,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_FormatPhoneNumberToE164_0700, F
     std::u16string phonyNumber = Str8ToStr16(number);
     std::u16string countryCode = Str8ToStr16(Code);
     std::u16string formatNumber = Str8ToStr16(formatBefore);
-    EXPECT_NE(CallManagerGtest::clientPtr_->FormatPhoneNumberToE164(phonyNumber, countryCode, formatNumber),
+    EXPECT_EQ(CallManagerGtest::clientPtr_->FormatPhoneNumberToE164(phonyNumber, countryCode, formatNumber),
         RETURN_VALUE_IS_ZERO);
 }
 
@@ -2495,7 +2495,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_FormatPhoneNumberToE164_0800, F
     std::u16string phonyNumber = Str8ToStr16(number);
     std::u16string countryCode = Str8ToStr16(Code);
     std::u16string formatNumber = Str8ToStr16(formatBefore);
-    EXPECT_NE(CallManagerGtest::clientPtr_->FormatPhoneNumberToE164(phonyNumber, countryCode, formatNumber),
+    EXPECT_EQ(CallManagerGtest::clientPtr_->FormatPhoneNumberToE164(phonyNumber, countryCode, formatNumber),
         RETURN_VALUE_IS_ZERO);
 }
 

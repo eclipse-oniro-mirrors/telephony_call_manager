@@ -178,23 +178,22 @@ HWTEST_F(BranchTest, Telephony_CallNumberUtils_001, Function | MediumTest | Leve
     std::string formatNumber = "";
     ASSERT_NE(DelayedSingleton<CallNumberUtils>::GetInstance()->FormatPhoneNumber(emptyStr, emptyStr, formatNumber),
         TELEPHONY_ERR_SUCCESS);
-    ASSERT_NE(DelayedSingleton<CallNumberUtils>::GetInstance()->FormatPhoneNumber(phoneNumber, emptyStr, formatNumber),
+    EXPECT_EQ(DelayedSingleton<CallNumberUtils>::GetInstance()->FormatPhoneNumber(phoneNumber, emptyStr, formatNumber),
         TELEPHONY_ERR_SUCCESS);
-    ASSERT_GE(
+    EXPECT_EQ(
         DelayedSingleton<CallNumberUtils>::GetInstance()->FormatPhoneNumber(phoneNumber, countryCode, formatNumber),
         TELEPHONY_ERR_SUCCESS);
     ASSERT_GE(
         DelayedSingleton<CallNumberUtils>::GetInstance()->FormatPhoneNumberToE164(emptyStr, emptyStr, formatNumber),
         TELEPHONY_ERR_SUCCESS);
-    ASSERT_GT(
+    EXPECT_EQ(
         DelayedSingleton<CallNumberUtils>::GetInstance()->FormatPhoneNumberToE164(phoneNumber, emptyStr, formatNumber),
         TELEPHONY_ERROR);
-    ASSERT_GT(DelayedSingleton<CallNumberUtils>::GetInstance()->FormatPhoneNumberToE164(
-                  phoneNumber, countryCode, formatNumber),
-        TELEPHONY_ERROR);
-    ASSERT_GE(DelayedSingleton<CallNumberUtils>::GetInstance()->FormatPhoneNumberToNational(
+    EXPECT_EQ(DelayedSingleton<CallNumberUtils>::GetInstance()->FormatPhoneNumberToE164(
+        phoneNumber, countryCode, formatNumber), TELEPHONY_ERROR);
+    ASSERT_NE(DelayedSingleton<CallNumberUtils>::GetInstance()->FormatPhoneNumberToNational(
         emptyStr, emptyStr, formatNumber), TELEPHONY_ERR_SUCCESS);
-    ASSERT_GE(DelayedSingleton<CallNumberUtils>::GetInstance()->FormatPhoneNumberToInternational(
+    ASSERT_NE(DelayedSingleton<CallNumberUtils>::GetInstance()->FormatPhoneNumberToInternational(
         emptyStr, emptyStr, formatNumber), TELEPHONY_ERR_SUCCESS);
     ASSERT_FALSE(DelayedSingleton<CallNumberUtils>::GetInstance()->IsValidSlotId(INVALID_SLOTID));
     ASSERT_TRUE(DelayedSingleton<CallNumberUtils>::GetInstance()->IsValidSlotId(0));
