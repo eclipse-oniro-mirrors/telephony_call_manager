@@ -91,7 +91,7 @@ int32_t Tone::Stop()
             tonePlayer_->StopTone();
             tonePlayer_->Release();
         }
-    } else if (currentToneDescriptor_ = TONE_RINGBACK) {
+    } else if (currentToneDescriptor_ == TONE_RINGBACK) {
         if (InitTonePlayer(AudioStandard::StreamUsage::STREAM_USAGE_VOICE_MODEM_COMMUNICATION)) {
             tonePlayer_->StopTone();
             tonePlayer_->Release();
@@ -109,7 +109,7 @@ int32_t Tone::Stop()
 bool Tone::InitTonePlayer()
 {
     using namespace OHOS::AudioStandard;
-    return InitTonePlayer(StreamUsage::STREAM_ISAGE_DTMF)
+    return InitTonePlayer(StreamUsage::STREAM_USAGE_DTMF);
 }
 
 bool Tone::InitTonePlayer(AudioStandard::StreamUsage streamUsage)
