@@ -44,6 +44,7 @@ public:
     std::string RemoveSeparatorsPhoneNumber(const std::string &phoneString);
     std::string RemovePostDialPhoneNumber(const std::string &phoneString);
     bool HasAlphabetInPhoneNum(const std::string &inputValue);
+    bool HasBCPhoneNumber(const std::string &phoneNumber);
 
 private:
     void ProcessSpace(std::string &number);
