@@ -262,54 +262,37 @@ HWTEST_F(BranchTest, Telephony_CellularCallConnection_001, Function | MediumTest
 HWTEST_F(BranchTest, Telephony_CellularCallConnection_002, Function | MediumTest | Level1)
 {
     CallTransferInfo mCallTransferInfo;
-    ASSERT_NE(DelayedSingleton<CellularCallConnection>::GetInstance()->SetCallTransferInfo(mCallTransferInfo, 0),
-        TELEPHONY_ERR_SUCCESS);
+    std::shared_ptr<CellularCallConnection> cellularCallConnection =
+        DelayedSingleton<CellularCallConnection>::GetInstance();
+    ASSERT_NE(cellularCallConnection->SetCallTransferInfo(mCallTransferInfo, 0), TELEPHONY_ERR_SUCCESS);
     bool result;
-    ASSERT_NE(DelayedSingleton<CellularCallConnection>::GetInstance()->CanSetCallTransferTime(0, result),
-        TELEPHONY_ERR_SUCCESS);
+    ASSERT_NE(cellularCallConnection->CanSetCallTransferTime(0, result), TELEPHONY_ERR_SUCCESS);
+    ASSERT_NE(cellularCallConnection->GetImsSwitchStatus(0, result), TELEPHONY_ERR_SUCCESS);
+    ASSERT_NE(cellularCallConnection->SetImsConfig(ImsConfigItem::ITEM_VIDEO_QUALITY, "", 0), TELEPHONY_ERR_SUCCESS);
+    ASSERT_NE(cellularCallConnection->SetImsConfig(ImsConfigItem::ITEM_VIDEO_QUALITY, 1, 0), TELEPHONY_ERR_SUCCESS);
+    ASSERT_NE(cellularCallConnection->GetImsConfig(ImsConfigItem::ITEM_VIDEO_QUALITY, 0), TELEPHONY_ERR_SUCCESS);
     ASSERT_NE(
-        DelayedSingleton<CellularCallConnection>::GetInstance()->GetImsSwitchStatus(0, result), TELEPHONY_ERR_SUCCESS);
-    ASSERT_NE(
-        DelayedSingleton<CellularCallConnection>::GetInstance()->SetImsConfig(ImsConfigItem::ITEM_VIDEO_QUALITY, "", 0),
-        TELEPHONY_ERR_SUCCESS);
-    ASSERT_NE(
-        DelayedSingleton<CellularCallConnection>::GetInstance()->SetImsConfig(ImsConfigItem::ITEM_VIDEO_QUALITY, 1, 0),
-        TELEPHONY_ERR_SUCCESS);
-    ASSERT_NE(
-        DelayedSingleton<CellularCallConnection>::GetInstance()->GetImsConfig(ImsConfigItem::ITEM_VIDEO_QUALITY, 0),
-        TELEPHONY_ERR_SUCCESS);
-    ASSERT_NE(DelayedSingleton<CellularCallConnection>::GetInstance()->SetImsFeatureValue(
-                  FeatureType::TYPE_VOICE_OVER_LTE, 1, 0),
-        TELEPHONY_ERR_SUCCESS);
-    ASSERT_NE(DelayedSingleton<CellularCallConnection>::GetInstance()->GetImsFeatureValue(
-                  FeatureType::TYPE_VOICE_OVER_LTE, 0),
-        TELEPHONY_ERR_SUCCESS);
+        cellularCallConnection->SetImsFeatureValue(FeatureType::TYPE_VOICE_OVER_LTE, 1, 0), TELEPHONY_ERR_SUCCESS);
+    ASSERT_NE(cellularCallConnection->GetImsFeatureValue(FeatureType::TYPE_VOICE_OVER_LTE, 0), TELEPHONY_ERR_SUCCESS);
     std::vector<std::string> numberList = {};
-    ASSERT_NE(DelayedSingleton<CellularCallConnection>::GetInstance()->InviteToConference(numberList, 0),
-        TELEPHONY_ERR_SUCCESS);
-    ASSERT_NE(DelayedSingleton<CellularCallConnection>::GetInstance()->SetMute(0, 0), TELEPHONY_ERR_SUCCESS);
-    ASSERT_NE(DelayedSingleton<CellularCallConnection>::GetInstance()->SendDtmf('a', ""), TELEPHONY_ERR_SUCCESS);
-    ASSERT_NE(DelayedSingleton<CellularCallConnection>::GetInstance()->SendDtmfString(
-                  "", "", PhoneNetType::PHONE_TYPE_GSM, 1, 0),
-        TELEPHONY_ERR_SUCCESS);
+    ASSERT_NE(cellularCallConnection->InviteToConference(numberList, 0), TELEPHONY_ERR_SUCCESS);
+    ASSERT_NE(cellularCallConnection->SetMute(0, 0), TELEPHONY_ERR_SUCCESS);
+    ASSERT_NE(cellularCallConnection->SendDtmf('a', ""), TELEPHONY_ERR_SUCCESS);
     ASSERT_NE(
-        DelayedSingleton<CellularCallConnection>::GetInstance()->RegisterCallBack(nullptr), TELEPHONY_ERR_SUCCESS);
+        cellularCallConnection->SendDtmfString("", "", PhoneNetType::PHONE_TYPE_GSM, 1, 0), TELEPHONY_ERR_SUCCESS);
+    ASSERT_NE(cellularCallConnection->RegisterCallBack(nullptr), TELEPHONY_ERR_SUCCESS);
     std::u16string testStr = u"";
-    ASSERT_NE(
-        DelayedSingleton<CellularCallConnection>::GetInstance()->ControlCamera(testStr, 1, 1), TELEPHONY_ERR_SUCCESS);
+    ASSERT_NE(cellularCallConnection->ControlCamera(testStr, 1, 1), TELEPHONY_ERR_SUCCESS);
     VideoWindow mVideoWindow;
-    ASSERT_NE(
-        DelayedSingleton<CellularCallConnection>::GetInstance()->SetPreviewWindow(mVideoWindow), TELEPHONY_ERR_SUCCESS);
-    ASSERT_NE(
-        DelayedSingleton<CellularCallConnection>::GetInstance()->SetDisplayWindow(mVideoWindow), TELEPHONY_ERR_SUCCESS);
+    ASSERT_NE(cellularCallConnection->SetPreviewWindow(mVideoWindow), TELEPHONY_ERR_SUCCESS);
+    ASSERT_NE(cellularCallConnection->SetDisplayWindow(mVideoWindow), TELEPHONY_ERR_SUCCESS);
     float zoomRatio = 1;
-    ASSERT_NE(DelayedSingleton<CellularCallConnection>::GetInstance()->SetCameraZoom(zoomRatio), TELEPHONY_ERR_SUCCESS);
-    ASSERT_NE(DelayedSingleton<CellularCallConnection>::GetInstance()->SetPausePicture(testStr), TELEPHONY_ERR_SUCCESS);
-    ASSERT_NE(DelayedSingleton<CellularCallConnection>::GetInstance()->SetDeviceDirection(1), TELEPHONY_ERR_SUCCESS);
-    ASSERT_NE(
-        DelayedSingleton<CellularCallConnection>::GetInstance()->SetImsSwitchStatus(0, true), TELEPHONY_ERR_SUCCESS);
-    ASSERT_NE(DelayedSingleton<CellularCallConnection>::GetInstance()->ConnectService(), TELEPHONY_ERR_SUCCESS);
-    ASSERT_EQ(DelayedSingleton<CellularCallConnection>::GetInstance()->ClearAllCalls(), TELEPHONY_ERR_SUCCESS);
+    ASSERT_NE(cellularCallConnection->SetCameraZoom(zoomRatio), TELEPHONY_ERR_SUCCESS);
+    ASSERT_NE(cellularCallConnection->SetPausePicture(testStr), TELEPHONY_ERR_SUCCESS);
+    ASSERT_NE(cellularCallConnection->SetDeviceDirection(1), TELEPHONY_ERR_SUCCESS);
+    ASSERT_NE(cellularCallConnection->SetImsSwitchStatus(0, true), TELEPHONY_ERR_SUCCESS);
+    ASSERT_NE(cellularCallConnection->ConnectService(), TELEPHONY_ERR_SUCCESS);
+    ASSERT_EQ(cellularCallConnection->ClearAllCalls(), TELEPHONY_ERR_SUCCESS);
 }
 
 /**
