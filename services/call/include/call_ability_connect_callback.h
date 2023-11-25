@@ -30,6 +30,7 @@ public:
         const AppExecFwk::ElementName &element, const sptr<IRemoteObject> &remoteObject, int resultCode);
     void OnAbilityDisconnectDone(const AppExecFwk::ElementName &element, int resultCode);
 
+private:
     void ReConnectAbility();
 };
 } // namespace Telephony
