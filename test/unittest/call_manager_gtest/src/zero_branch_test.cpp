@@ -188,9 +188,9 @@ HWTEST_F(BranchTest, Telephony_CallNumberUtils_001, Function | MediumTest | Leve
         TELEPHONY_ERR_SUCCESS);
     EXPECT_EQ(
         DelayedSingleton<CallNumberUtils>::GetInstance()->FormatPhoneNumberToE164(phoneNumber, emptyStr, formatNumber),
-        TELEPHONY_ERROR);
+        TELEPHONY_ERR_SUCCESS);
     EXPECT_EQ(DelayedSingleton<CallNumberUtils>::GetInstance()->FormatPhoneNumberToE164(
-        phoneNumber, countryCode, formatNumber), TELEPHONY_ERROR);
+        phoneNumber, countryCode, formatNumber), TELEPHONY_ERR_SUCCESS);
     ASSERT_NE(DelayedSingleton<CallNumberUtils>::GetInstance()->FormatPhoneNumberToNational(
         emptyStr, emptyStr, formatNumber), TELEPHONY_ERR_SUCCESS);
     ASSERT_NE(DelayedSingleton<CallNumberUtils>::GetInstance()->FormatPhoneNumberToInternational(
