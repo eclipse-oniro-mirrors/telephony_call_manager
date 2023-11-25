@@ -54,7 +54,7 @@ ohos_shared_library("tel_call_manager_api") {
 
   defines = [
     "TELEPHONY_LOG_TAG = \"CallManagerApi\"",
-    "LOG_DOMAIN = 0xD001F01",
+    "LOG_DOMAIN = 0xD001F10",
   ]
 
   if (device_name == "rk3568") {
