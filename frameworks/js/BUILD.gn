@@ -46,7 +46,7 @@ ohos_shared_library("call") {
 
   defines = [
     "TELEPHONY_LOG_TAG = \"CallManagerJsApi\"",
-    "LOG_DOMAIN = 0xD001F01",
+    "LOG_DOMAIN = 0xD001F10",
   ]
 
   part_name = "call_manager"

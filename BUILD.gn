@@ -163,7 +163,7 @@ ohos_shared_library("tel_call_manager") {
 
   defines = [
     "TELEPHONY_LOG_TAG = \"CallManager\"",
-    "LOG_DOMAIN = 0xD001F01",
+    "LOG_DOMAIN = 0xD001F10",
   ]
 
   if (defined(global_parts_info) &&
