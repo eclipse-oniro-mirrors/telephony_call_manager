@@ -17,7 +17,6 @@
 
 #include <securec.h>
 
-#include "call_ability_connect_callback.h"
 #include "call_manager_errors.h"
 #include "telephony_log_wrapper.h"
 
@@ -126,8 +125,6 @@ int32_t CallStatusCallbackStub::OnUpdateCallsReportInfo(MessageParcel &data, Mes
         TELEPHONY_LOGE("invalid parameter, cnt = %{public}d", cnt);
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
-    CallAbilityConnectCallback callAbilityConnectCallback;
-    callAbilityConnectCallback.ReConnectAbility();
     TELEPHONY_LOGI("call list size:%{public}d", cnt);
     CallsReportInfo callReportInfo;
     int32_t len = 0;
