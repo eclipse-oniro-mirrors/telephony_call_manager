@@ -267,7 +267,7 @@ void AudioProxy::SetWiredHeadsetState(bool isConnected)
 int32_t AudioProxy::GetPreferredOutputAudioDevice(AudioDevice &device)
 {
     AudioStandard::AudioRendererInfo rendererInfo;
-    rendererInfo.contentType = AudioStandard::ContentType::CONTENT_TYPE_SPEECH;
+    rendererInfo.contentType = AudioStandard::ContentType::CONTENT_TYPE_UNKNOWN;
     rendererInfo.streamUsage = AudioStandard::StreamUsage::STREAM_USAGE_VOICE_MODEM_COMMUNICATION;
     rendererInfo.rendererFlags = RENDERER_FLAG;
     std::vector<sptr<AudioStandard::AudioDeviceDescriptor>> desc;
