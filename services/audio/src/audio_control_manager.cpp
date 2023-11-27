@@ -82,6 +82,10 @@ void AudioControlManager::IncomingCallHungUp(sptr<CallBase> &callObjectPtr, bool
 void AudioControlManager::HandleCallStateUpdated(
     sptr<CallBase> &callObjectPtr, TelCallState priorState, TelCallState nextState)
 {
+	if(nextState ==TelCallState::CALL_STATUS_ANSWERED) {
+		TELEPHONY_LOGI("NO NEED TO UPDATE");
+		return;
+	}
     HandleNextState(callObjectPtr, nextState);
     if (priorState == nextState) {
         TELEPHONY_LOGI("prior state equals next state");
