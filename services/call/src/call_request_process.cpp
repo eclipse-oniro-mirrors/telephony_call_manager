@@ -125,8 +125,8 @@ bool CallRequestProcess::IsDsdsMode5()
     int32_t dsdsMode = DSDS_MODE_V2;
     DelayedRefSingleton<CoreServiceClient>::GetInstance().GetDsdsMode(dsdsMode);
     TELEPHONY_LOGI("IsDsdsMode5:%{public}d", dsdsMode);
-    if (dsdsMode == static_cast<int32_t>(DsdsMode::DSDS_MODE_V5) ||
-        dsdsMode == static_cast<int32_t>(DsdsMode::DSDS_MODE_TDM)) {
+    if (dsdsMode == static_cast<int32_t>(DsdsMode::DSDS_MODE_V5_DSDA) ||
+        dsdsMode == static_cast<int32_t>(DsdsMode::DSDS_MODE_V5_TDM)) {
         return true;
     }
     return false;
