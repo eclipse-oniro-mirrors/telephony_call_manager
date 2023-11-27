@@ -31,6 +31,10 @@ public:
         const std::string &phoneNumber, const std::string &countryCode, std::string &formatNumber);
     int32_t FormatPhoneNumberToE164(
         const std::string phoneNumber, const std::string countryCode, std::string &formatNumber);
+    int32_t FormatPhoneNumberToNational(
+        const std::string phoneNumber, const std::string countryCode, std::string &formatNumber);
+    int32_t FormatPhoneNumberToInternational(
+        const std::string phoneNumber, const std::string countryCode, std::string &formatNumber);
     int32_t FormatNumberBase(const std::string phoneNumber, std::string countryCode,
         const i18n::phonenumbers::PhoneNumberUtil::PhoneNumberFormat formatInfo, std::string &formatNumber);
     int32_t CheckNumberIsEmergency(const std::string &phoneNumber, const int32_t slotId, bool &enabled);
@@ -40,6 +44,7 @@ public:
     std::string RemoveSeparatorsPhoneNumber(const std::string &phoneString);
     std::string RemovePostDialPhoneNumber(const std::string &phoneString);
     bool HasAlphabetInPhoneNum(const std::string &inputValue);
+    bool HasBCPhoneNumber(const std::string &phoneNumber);
 
 private:
     void ProcessSpace(std::string &number);
@@ -47,7 +52,6 @@ private:
 private:
     static const int16_t HAS_A_SLOT = 1;
     static const int16_t HAS_TWO_SLOT = 2;
-    static const int16_t PHONE_NUMBER_LENGTH_ONE = 1;
 };
 } // namespace Telephony
 } // namespace OHOS

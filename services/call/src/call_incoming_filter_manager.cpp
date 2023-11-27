@@ -60,11 +60,11 @@ int32_t CallIncomingFilterManager::DoIncomingFilter(const CallDetailInfo &info)
         TELEPHONY_LOGE("callDataPtr is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    bool IsBlockNumber = false;
-    if (callDataPtr->QueryIsBlockPhoneNumber(info.phoneNum, IsBlockNumber) != TELEPHONY_SUCCESS) {
+    bool isBlockNumber = false;
+    if (callDataPtr->QueryIsBlockPhoneNumber(info.phoneNum, isBlockNumber) != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("QueryIsBlockPhoneNumber fail.");
     }
-    if (IsBlockNumber) {
+    if (isBlockNumber) {
         CellularCallInfo callInfo;
         if (PackCellularCallInfo(callInfo, info) != TELEPHONY_SUCCESS) {
             TELEPHONY_LOGW("PackCellularCallInfo failed!");

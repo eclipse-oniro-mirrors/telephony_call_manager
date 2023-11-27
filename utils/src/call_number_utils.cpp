@@ -36,7 +36,7 @@ int32_t CallNumberUtils::FormatPhoneNumber(
         TELEPHONY_LOGE("phoneNumber is nullptr!");
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
-    if (phoneNumber.front() == '#' || phoneNumber.front() == '*' || phoneNumber.length() == PHONE_NUMBER_LENGTH_ONE) {
+    if (phoneNumber.front() == '#' || phoneNumber.front() == '*') {
         formatNumber = phoneNumber;
         return TELEPHONY_SUCCESS;
     }
@@ -51,8 +51,7 @@ int32_t CallNumberUtils::FormatPhoneNumber(
     phoneUtils->ParseAndKeepRawInput(phoneNumber, tmpCode, &parseResult);
     phoneUtils->FormatInOriginalFormat(parseResult, tmpCode, &formatNumber);
     if (formatNumber.empty() || formatNumber == "0") {
-        TELEPHONY_LOGE("FormatPhoneNumber failed!");
-        return CALL_ERR_FORMAT_PHONE_NUMBER_FAILED;
+        formatNumber = "";
     }
     return TELEPHONY_SUCCESS;
 }
@@ -60,11 +59,25 @@ int32_t CallNumberUtils::FormatPhoneNumber(
 int32_t CallNumberUtils::FormatPhoneNumberToE164(
     const std::string phoneNumber, const std::string countryCode, std::string &formatNumber)
 {
-    if (HasAlphabetInPhoneNum(phoneNumber)) {
-        TELEPHONY_LOGE("phoneNumber is invalid!");
-        return TELEPHONY_ERR_ARGUMENT_INVALID;
-    }
     return FormatNumberBase(phoneNumber, countryCode, i18n::phonenumbers::PhoneNumberUtil::E164, formatNumber);
+}
+
+int32_t CallNumberUtils::FormatPhoneNumberToNational(
+    const std::string phoneNumber, const std::string countryCode, std::string &formatNumber)
+{
+    int32_t ret = FormatNumberBase(phoneNumber, countryCode,
+        i18n::phonenumbers::PhoneNumberUtil::PhoneNumberFormat::NATIONAL, formatNumber);
+    ProcessSpace(formatNumber);
+    return ret;
+}
+
+int32_t CallNumberUtils::FormatPhoneNumberToInternational(
+    const std::string phoneNumber, const std::string countryCode, std::string &formatNumber)
+{
+    int32_t ret = FormatNumberBase(phoneNumber, countryCode,
+        i18n::phonenumbers::PhoneNumberUtil::PhoneNumberFormat::INTERNATIONAL, formatNumber);
+    ProcessSpace(formatNumber);
+    return ret;
 }
 
 int32_t CallNumberUtils::FormatNumberBase(const std::string phoneNumber, std::string countryCode,
@@ -82,12 +95,9 @@ int32_t CallNumberUtils::FormatNumberBase(const std::string phoneNumber, std::st
     transform(countryCode.begin(), countryCode.end(), countryCode.begin(), ::toupper);
     i18n::phonenumbers::PhoneNumber parseResult;
     phoneUtils->Parse(phoneNumber, countryCode, &parseResult);
-    phoneUtils->Format(parseResult, formatInfo, &formatNumber);
-    if (formatNumber.empty() || formatNumber == "0") {
-        TELEPHONY_LOGE("FormatPhoneNumber failed!");
-        return CALL_ERR_FORMAT_PHONE_NUMBER_FAILED;
+    if (phoneUtils->IsValidNumber(parseResult) || HasBCPhoneNumber(phoneNumber)) {
+        phoneUtils->Format(parseResult, formatInfo, &formatNumber);
     }
-    ProcessSpace(formatNumber);
     return TELEPHONY_SUCCESS;
 }
 
@@ -199,6 +209,19 @@ bool CallNumberUtils::HasAlphabetInPhoneNum(const std::string &inputValue)
         }
     }
     TELEPHONY_LOGI("The Phone Number is valid");
+    return false;
+}
+
+bool CallNumberUtils::HasBCPhoneNumber(const std::string &phoneNumber)
+{
+    int32_t phoneNumberStart = 0;
+    int32_t phoneNumberStartLength = 3;
+    int32_t bCNumberLength = 11;
+    std::string bCNumberStart = "192";
+    if (phoneNumber.length() == bCNumberLength &&
+        phoneNumber.substr(phoneNumberStart, phoneNumberStartLength) == bCNumberStart) {
+        return true;
+    }
     return false;
 }
 } // namespace Telephony

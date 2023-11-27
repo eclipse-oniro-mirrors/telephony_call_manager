@@ -273,14 +273,14 @@ int32_t CallDataBaseHelper::QueryIsBlockPhoneNumber(const std::string &phoneNum,
     std::vector<std::string> columns;
     std::string internationalNumber;
     std::string nationalNumber;
-    int32_t ret = DelayedSingleton<CallNumberUtils>::GetInstance()->FormatNumberBase(
-        phoneNum, ISO_COUNTRY_CODE, i18n::phonenumbers::PhoneNumberUtil::PhoneNumberFormat::NATIONAL, nationalNumber);
+    int32_t ret = DelayedSingleton<CallNumberUtils>::GetInstance()->FormatPhoneNumberToNational(
+        phoneNum, ISO_COUNTRY_CODE, nationalNumber);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("Format phone number failed.");
         nationalNumber = phoneNum;
     }
-    ret = DelayedSingleton<CallNumberUtils>::GetInstance()->FormatNumberBase(phoneNum, ISO_COUNTRY_CODE,
-        i18n::phonenumbers::PhoneNumberUtil::PhoneNumberFormat::INTERNATIONAL, internationalNumber);
+    ret = DelayedSingleton<CallNumberUtils>::GetInstance()->FormatPhoneNumberToInternational(
+        phoneNum, ISO_COUNTRY_CODE, internationalNumber);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("Format phone number failed.");
         internationalNumber = phoneNum;

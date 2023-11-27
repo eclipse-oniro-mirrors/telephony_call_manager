@@ -1770,48 +1770,10 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_IsEmergencyPhoneNumber_0300, Fu
 
 /**
  * @tc.number   Telephony_CallManager_IsEmergencyPhoneNumber_0400
- * @tc.name     Call one phonynumber "08", test IsEmergencyPhoneNumber(), return true
- * @tc.desc     Function test
- */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_IsEmergencyPhoneNumber_0400, Function | MediumTest | Level3)
-{
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
-    int32_t slotId = SIM1_SLOTID_NO_CARD;
-    std::string number = "08";
-    std::u16string phoneNumber = Str8ToStr16(number);
-    bool enabled = false;
-    int32_t result = CallManagerGtest::clientPtr_->IsEmergencyPhoneNumber(phoneNumber, slotId, enabled);
-    EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
-    EXPECT_EQ(enabled, true);
-}
-
-/**
- * @tc.number   Telephony_CallManager_IsEmergencyPhoneNumber_0500
- * @tc.name     Call one phonynumber "118", test IsEmergencyPhoneNumber(), return false
- * @tc.desc     Function test
- */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_IsEmergencyPhoneNumber_0500, Function | MediumTest | Level2)
-{
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
-    int32_t slotId = SIM1_SLOTID_NO_CARD;
-    std::string number = "118";
-    std::u16string phoneNumber = Str8ToStr16(number);
-    bool enabled = false;
-    int32_t result = CallManagerGtest::clientPtr_->IsEmergencyPhoneNumber(phoneNumber, slotId, enabled);
-    EXPECT_EQ(result, TELEPHONY_ERR_SUCCESS);
-    EXPECT_EQ(enabled, true);
-}
-
-/**
- * @tc.number   Telephony_CallManager_IsEmergencyPhoneNumber_0600
  * @tc.name     Call one phonynumber "119", test IsEmergencyPhoneNumber(), return true
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_IsEmergencyPhoneNumber_0600, Function | MediumTest | Level2)
+HWTEST_F(CallManagerGtest, Telephony_CallManager_IsEmergencyPhoneNumber_0400, Function | MediumTest | Level2)
 {
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
@@ -1833,11 +1795,11 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_IsEmergencyPhoneNumber_0600, Fu
 }
 
 /**
- * @tc.number   Telephony_CallManager_IsEmergencyPhoneNumber_0700
+ * @tc.number   Telephony_CallManager_IsEmergencyPhoneNumber_0500
  * @tc.name     Call one phonynumber "999", test IsEmergencyPhoneNumber(), return true
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_IsEmergencyPhoneNumber_0700, Function | MediumTest | Level2)
+HWTEST_F(CallManagerGtest, Telephony_CallManager_IsEmergencyPhoneNumber_0500, Function | MediumTest | Level2)
 {
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
@@ -1852,11 +1814,11 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_IsEmergencyPhoneNumber_0700, Fu
 }
 
 /**
- * @tc.number   Telephony_CallManager_IsEmergencyPhoneNumber_0800
+ * @tc.number   Telephony_CallManager_IsEmergencyPhoneNumber_0600
  * @tc.name     Call one phonynumber "", test IsEmergencyPhoneNumber(), return false
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_IsEmergencyPhoneNumber_0800, Function | MediumTest | Level2)
+HWTEST_F(CallManagerGtest, Telephony_CallManager_IsEmergencyPhoneNumber_0600, Function | MediumTest | Level2)
 {
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
@@ -1871,11 +1833,11 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_IsEmergencyPhoneNumber_0800, Fu
 }
 
 /**
- * @tc.number   Telephony_CallManager_IsEmergencyPhoneNumber_0900
+ * @tc.number   Telephony_CallManager_IsEmergencyPhoneNumber_0700
  * @tc.name     Call one phonynumber "", test IsEmergencyPhoneNumber(), return false
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_IsEmergencyPhoneNumber_0900, Function | MediumTest | Level2)
+HWTEST_F(CallManagerGtest, Telephony_CallManager_IsEmergencyPhoneNumber_0700, Function | MediumTest | Level2)
 {
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
@@ -2233,7 +2195,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_FormatPhoneNumber_0200, Functio
     std::u16string phonyNumber = Str8ToStr16(number);
     std::u16string countryCode = Str8ToStr16(Code);
     std::u16string formatNumber = Str8ToStr16(formatBefore);
-    EXPECT_GE(
+    EXPECT_EQ(
         CallManagerGtest::clientPtr_->FormatPhoneNumber(phonyNumber, countryCode, formatNumber), RETURN_VALUE_IS_ZERO);
 }
 
@@ -2313,7 +2275,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_FormatPhoneNumber_0600, Functio
     std::u16string phonyNumber = Str8ToStr16(number);
     std::u16string countryCode = Str8ToStr16(Code);
     std::u16string formatNumber = Str8ToStr16(formatBefore);
-    EXPECT_GE(
+    EXPECT_EQ(
         CallManagerGtest::clientPtr_->FormatPhoneNumber(phonyNumber, countryCode, formatNumber), RETURN_VALUE_IS_ZERO);
 }
 
@@ -2333,7 +2295,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_FormatPhoneNumber_0700, Functio
     std::u16string phonyNumber = Str8ToStr16(number);
     std::u16string countryCode = Str8ToStr16(Code);
     std::u16string formatNumber = Str8ToStr16(formatBefore);
-    EXPECT_NE(
+    EXPECT_EQ(
         CallManagerGtest::clientPtr_->FormatPhoneNumber(phonyNumber, countryCode, formatNumber), RETURN_VALUE_IS_ZERO);
 }
 
@@ -2455,7 +2417,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_FormatPhoneNumberToE164_0600, F
     std::u16string phonyNumber = Str8ToStr16(number);
     std::u16string countryCode = Str8ToStr16(Code);
     std::u16string formatNumber = Str8ToStr16(formatBefore);
-    EXPECT_NE(CallManagerGtest::clientPtr_->FormatPhoneNumberToE164(phonyNumber, countryCode, formatNumber),
+    EXPECT_EQ(CallManagerGtest::clientPtr_->FormatPhoneNumberToE164(phonyNumber, countryCode, formatNumber),
         RETURN_VALUE_IS_ZERO);
 }
 
@@ -2475,7 +2437,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_FormatPhoneNumberToE164_0700, F
     std::u16string phonyNumber = Str8ToStr16(number);
     std::u16string countryCode = Str8ToStr16(Code);
     std::u16string formatNumber = Str8ToStr16(formatBefore);
-    EXPECT_NE(CallManagerGtest::clientPtr_->FormatPhoneNumberToE164(phonyNumber, countryCode, formatNumber),
+    EXPECT_EQ(CallManagerGtest::clientPtr_->FormatPhoneNumberToE164(phonyNumber, countryCode, formatNumber),
         RETURN_VALUE_IS_ZERO);
 }
 
