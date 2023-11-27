@@ -463,8 +463,8 @@ int32_t CallStatusManager::HoldingHandle(const CallDetailInfo &info)
     int32_t dsdsMode = DSDS_MODE_V2;
     DelayedRefSingleton<CoreServiceClient>::GetInstance().GetDsdsMode(dsdsMode);
     TELEPHONY_LOGE("HoldingHandle dsdsMode:%{public}d", dsdsMode);
-    if (dsdsMode == static_cast<int32_t>(DsdsMode::DSDS_MODE_V5) ||
-        dsdsMode == static_cast<int32_t>(DsdsMode::DSDS_MODE_TDM)) {
+    if (dsdsMode == static_cast<int32_t>(DsdsMode::DSDS_MODE_V5_DSDA) ||
+        dsdsMode == static_cast<int32_t>(DsdsMode::DSDS_MODE_V5_TDM)) {
         int32_t activeCallNum = GetCallNum(TelCallState::CALL_STATUS_ACTIVE);
         AutoAnswerForDsda(activeCallNum);
     }
@@ -559,8 +559,8 @@ int32_t CallStatusManager::DisconnectedHandle(const CallDetailInfo &info)
     TELEPHONY_LOGI("DisconnectedHandle dsdsMode:%{public}d", dsdsMode);
     if (dsdsMode == DSDS_MODE_V3) {
         AutoAnswer(activeCallNum, waitingCallNum);
-    } else if (dsdsMode == static_cast<int32_t>(DsdsMode::DSDS_MODE_V5) ||
-               dsdsMode == static_cast<int32_t>(DsdsMode::DSDS_MODE_TDM)) {
+    } else if (dsdsMode == static_cast<int32_t>(DsdsMode::DSDS_MODE_V5_DSDA) ||
+               dsdsMode == static_cast<int32_t>(DsdsMode::DSDS_MODE_V5_TDM)) {
         AutoAnswerForDsda(activeCallNum);
     }
     return ret;
