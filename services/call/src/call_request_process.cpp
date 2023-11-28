@@ -276,8 +276,9 @@ void CallRequestProcess::HandleCallWaitingNumZero(
     } else {
         TELEPHONY_LOGI("enter zero holdcall is null");
         if (call->GetTelCallState() == TelCallState ::CALL_STATUS_DIALING ||
-            call->GetTelCallState() == TelCallState ::CALL_STATUS_ALERTING) {
-            TELEPHONY_LOGI("enter zero  dialing call hangup");
+            call->GetTelCallState() == TelCallState ::CALL_STATUS_ALERTING ||
+            call->GetTelCallState() == TelCallState ::CALL_STATUS_INCOMING) {
+            TELEPHONY_LOGI("enter zero dialing incoming call hangup");
             call->HangUpCall();
         } else if (call->GetCallRunningState() == CallRunningState::CALL_RUNNING_STATE_ACTIVE && !flagForConference) {
             TELEPHONY_LOGI("enter zero active call hold");
