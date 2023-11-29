@@ -48,7 +48,7 @@ public:
     explicit Ring(const std::string &path);
     virtual ~Ring();
     void Init(const std::string &ringtonePath);
-    int32_t Play();
+    int32_t Play(int32_t slotId);
     int32_t Stop();
     int32_t StartVibrate();
     int32_t CancelVibrate();

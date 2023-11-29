@@ -73,10 +73,10 @@ void Ring::Init(const std::string &ringtonePath)
     }
 }
 
-int32_t Ring::Play()
+int32_t Ring::Play(int32_t slotId)
 {
     const std::shared_ptr<AbilityRuntime::Context> context;
-    RingtonePlayer_ = SystemSoundManager_->GetRingtonePlayer(context, Media::RingtoneType::RINGTONE_TYPE_SIM_CARD_0);
+    RingtonePlayer_ = SystemSoundManager_->GetRingtonePlayer(context, static_cast<Media::RingtoneType>(slotId));
     if (RingtonePlayer_ == nullptr) {
         TELEPHONY_LOGE("get RingtonePlayer failed");
     }

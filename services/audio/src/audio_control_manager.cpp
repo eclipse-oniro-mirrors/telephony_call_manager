@@ -248,57 +248,14 @@ bool AudioControlManager::PlayRingtone()
             return false;
         }
     }
-    if (ring_->Play() != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("play ringtone failed");
+    sptr<CallBase> liveCall = CallObjectManager::GetForegroundLiveCall();
+    if (liveCall == nullptr) {
+        TELEPHONY_LOGE("liveCall is nullptr");
         return false;
     }
-    TELEPHONY_LOGI("play ringtone success");
-    return true;
-}
-
-bool AudioControlManager::PlayRingtone(const std::string &phoneNum)
-{
-    if (!IsNumberAllowed(phoneNum)) {
-        TELEPHONY_LOGE("number is not allowed");
-        return false;
-    }
-    if (!ShouldPlayRingtone()) {
-        TELEPHONY_LOGE("should not play ringtone");
-        return false;
-    }
-    if (ring_ == nullptr) {
-        ring_ = std::make_unique<Ring>();
-        if (ring_ == nullptr) {
-            TELEPHONY_LOGE("create ring failed");
-            return false;
-        }
-    }
-    if (ring_->Play() != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("play ringtone failed");
-        return false;
-    }
-    TELEPHONY_LOGI("play ringtone success");
-    return true;
-}
-
-bool AudioControlManager::PlayRingtone(const std::string &phoneNum, const std::string &ringtonePath)
-{
-    if (!IsNumberAllowed(phoneNum)) {
-        TELEPHONY_LOGE("number is not allowed");
-        return false;
-    }
-    if (!ShouldPlayRingtone()) {
-        TELEPHONY_LOGE("should not play ringtone");
-        return false;
-    }
-    if (ring_ == nullptr) {
-        ring_ = std::make_unique<Ring>(ringtonePath);
-        if (ring_ == nullptr) {
-            TELEPHONY_LOGE("create ring failed");
-            return false;
-        }
-    }
-    if (ring_->Play() == TELEPHONY_SUCCESS) {
+    CallAttributeInfo info;
+    liveCall->GetCallAttributeBaseInfo(info);
+    if (ring_->Play(info.accountId) != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("play ringtone failed");
         return false;
     }
