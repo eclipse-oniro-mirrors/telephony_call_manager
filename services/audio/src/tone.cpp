@@ -56,7 +56,7 @@ int32_t Tone::Play()
         });
         play.detach();
     } else if (currentToneDescriptor_ == TONE_RINGBACK) {
-        if (!InitTonePlayer(AudioStandard::StreamUsage::STREAM_USAGE_VOICE_MODEM_COMMUNICATION)) {
+        if (!InitTonePlayer(AudioStandard::StreamUsage::STREAM_USAGE_VOICE_COMMUNICATION)) {
             return TELEPHONY_ERROR;
         }
         std::thread play([&]() {
