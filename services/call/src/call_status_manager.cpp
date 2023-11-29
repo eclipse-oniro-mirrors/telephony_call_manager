@@ -30,6 +30,7 @@
 #include "ott_call.h"
 #include "report_call_info_handler.h"
 #include "telephony_log_wrapper.h"
+#include "call_number_utils.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -134,6 +135,10 @@ int32_t CallStatusManager::HandleCallsReportInfo(const CallDetailsInfo &info)
     bool flag = false;
     TELEPHONY_LOGI("call list size:%{public}zu,slotId:%{public}d", info.callVec.size(), info.slotId);
     int32_t curSlotId = info.slotId;
+    if (!DelayedSingleton<CallNumberUtils>::GetInstance()->IsValidSlotId(curSlotId)) {
+        TELEPHONY_LOGE("invalid slotId!");
+        return CALL_ERR_INVALID_SLOT_ID;
+    }
     for (auto &it : info.callVec) {
         for (const auto &it1 : callDetailsInfo_[curSlotId].callVec) {
             if (it.index == it1.index) {
