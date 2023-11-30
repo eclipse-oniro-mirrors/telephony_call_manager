@@ -539,7 +539,7 @@ int32_t CallStatusManager::DisconnectedHandle(const CallDetailInfo &info)
         TELEPHONY_LOGE("UpdateCallState failed, errCode:%{public}d", ret);
         return ret;
     }
-    int32_t size = callIdList.size();
+    size_t size = callIdList.size();
     int32_t activeCallNum = GetCallNum(TelCallState::CALL_STATUS_ACTIVE);
     int32_t waitingCallNum = GetCallNum(TelCallState::CALL_STATUS_WAITING);
     IsCanUnHold(activeCallNum, waitingCallNum, size, canUnHold);
