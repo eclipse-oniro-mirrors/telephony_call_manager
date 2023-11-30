@@ -582,7 +582,7 @@ HWTEST_F(BranchTest, Telephony_VideoCallState_002, Function | MediumTest | Level
     ASSERT_EQ(
         videoSendState.SendUpdateCallMediaModeResponse(ImsCallMode::CALL_MODE_SEND_ONLY), TELEPHONY_ERR_SUCCESS);
     ASSERT_EQ(
-        ideoSendState.SendUpdateCallMediaModeResponse(ImsCallMode::CALL_MODE_SEND_RECEIVE), TELEPHONY_ERR_SUCCESS);
+        videoSendState.SendUpdateCallMediaModeResponse(ImsCallMode::CALL_MODE_SEND_RECEIVE), TELEPHONY_ERR_SUCCESS);
     ASSERT_EQ(
         videoSendState.SendUpdateCallMediaModeResponse(ImsCallMode::CALL_MODE_VIDEO_PAUSED), TELEPHONY_ERR_SUCCESS);
 }
