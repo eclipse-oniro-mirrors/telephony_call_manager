@@ -48,6 +48,7 @@ class BluetoothConnection {
     DECLARE_DELAYED_SINGLETON(BluetoothConnection)
 public:
     void Init();
+    void UnInit();
     bool ConnectBtSco();
     bool ConnectBtSco(const std::string &bluetoothAddress);
     bool DisconnectBtSco();

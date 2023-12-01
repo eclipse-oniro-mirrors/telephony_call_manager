@@ -77,6 +77,7 @@ bool CallManagerService::Init()
 void CallManagerService::UnInit()
 {
     DelayedSingleton<CellularCallConnection>::GetInstance()->UnInit();
+    DelayedSingleton<BluetoothConnection>::GetInstance()->UnInit();
     callControlManagerPtr_ = nullptr;
 }
 

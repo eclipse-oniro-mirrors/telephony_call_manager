@@ -32,7 +32,8 @@ Ring::Ring() : isVibrating_(false), shouldRing_(false), shouldVibrate_(false), r
 }
 
 Ring::Ring(const std::string &path)
-    : isVibrating_(false), shouldRing_(false), shouldVibrate_(false), ringtonePath_("")
+    : isVibrating_(false), shouldRing_(false), shouldVibrate_(false), ringtonePath_("")，
+    audioPlayer_(new (std::nothrow) AudioPlayer())
 {
     Init(path);
 }
@@ -76,9 +77,18 @@ void Ring::Init(const std::string &ringtonePath)
 int32_t Ring::Play()
 {
     const std::shared_ptr<AbilityRuntime::Context> context;
+    if (SystemSoundManager_ == nullptr) {
+        TELEPHONY_LOGE("SystemSoundManager_ is nullptr");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     RingtonePlayer_ = SystemSoundManager_->GetRingtonePlayer(context, Media::RingtoneType::RINGTONE_TYPE_SIM_CARD_0);
     if (RingtonePlayer_ == nullptr) {
         TELEPHONY_LOGE("get RingtonePlayer failed");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    if (audioPlayer_ == nullptr) {
+        TELEPHONY_LOGE("audioPlayer_ is nullptr");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     audioPlayer_->RegisterRingCallback(RingtonePlayer_);
     int32_t result = RingtonePlayer_->Configure(defaultVolume_, true);
@@ -98,6 +108,10 @@ int32_t Ring::Stop()
     }
     int32_t result = TELEPHONY_SUCCESS;
     audioPlayer_->SetStop(PlayerType::TYPE_RING, true);
+    if (RingtonePlayer_ == nullptr) {
+        TELEPHONY_LOGE("RingtonePlayer_ is nullptr");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     result = RingtonePlayer_->Stop();
     return result;
 }
