@@ -333,9 +333,9 @@ HWTEST_F(CallStateTest, Telephony_Ring_001, Function | MediumTest | Level3)
     std::string emptyPath = "";
     auto emptyRing = std::make_shared<Ring>(emptyPath);
     emptyRing->ReleaseRenderer();
-    ASSERT_EQ(emptyRing->Play(), CALL_ERR_INVALID_PATH);
+    ASSERT_EQ(emptyRing->Play(), TELEPHONY_ERR_LOCAL_PTR_NULL);
     sleep(WAIT_TIME);
-    ASSERT_EQ(emptyRing->Stop(), CALL_ERR_INVALID_PATH);
+    ASSERT_EQ(emptyRing->Stop(), TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
 
 /**
