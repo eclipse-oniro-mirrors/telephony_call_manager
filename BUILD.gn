@@ -14,6 +14,12 @@
 import("//build/ohos.gni")
 
 ohos_shared_library("tel_call_manager") {
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+  branch_protector_ret = "pac_ret"
   sources = [
     "services/audio/src/audio_control_manager.cpp",
     "services/audio/src/audio_device_manager.cpp",
@@ -115,7 +121,6 @@ ohos_shared_library("tel_call_manager") {
   deps = [
     "frameworks/native:tel_call_manager_api",
     "//third_party/libphonenumber/cpp:phonenumber_standard",
-    "//third_party/protobuf:protobuf_lite_static",
   ]
 
   external_deps = [

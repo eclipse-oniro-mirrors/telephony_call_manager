@@ -81,11 +81,13 @@ int32_t CallAbilityCallbackStub::OnUpdateCallStateInfo(MessageParcel &data, Mess
     if (!data.ContainFileDescriptors()) {
         TELEPHONY_LOGW("sent raw data is less than 32k");
     }
-    if ((parcelPtr = reinterpret_cast<const CallAttributeInfo *>(data.ReadRawData(len))) == nullptr) {
+    if ((parcelPtr = reinterpret_cast<const CallAttributeInfo *>(data.ReadRawData(sizeof(CallAttributeInfo)))) ==
+        nullptr) {
         TELEPHONY_LOGE("reading raw data failed, length = %{public}d", len);
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    result = OnCallDetailsChange(*parcelPtr);
+    CallAttributeInfo info = *parcelPtr;
+    result = OnCallDetailsChange(info);
     if (!reply.WriteInt32(result)) {
         TELEPHONY_LOGE("writing parcel failed");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
@@ -105,12 +107,13 @@ int32_t CallAbilityCallbackStub::OnUpdateCallEvent(MessageParcel &data, MessageP
     if (!data.ContainFileDescriptors()) {
         TELEPHONY_LOGW("sent raw data is less than 32k");
     }
-    if ((parcelPtr = reinterpret_cast<const CallEventInfo *>(data.ReadRawData(len))) == nullptr) {
+    if ((parcelPtr = reinterpret_cast<const CallEventInfo *>(data.ReadRawData(sizeof(CallEventInfo)))) == nullptr) {
         TELEPHONY_LOGE("reading raw data failed, length = %d", len);
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
 
-    result = OnCallEventChange(*parcelPtr);
+    CallEventInfo info = *parcelPtr;
+    result = OnCallEventChange(info);
     if (!reply.WriteInt32(result)) {
         TELEPHONY_LOGE("writing parcel failed");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
@@ -195,12 +198,13 @@ int32_t CallAbilityCallbackStub::OnUpdateMmiCodeResults(MessageParcel &data, Mes
     if (!data.ContainFileDescriptors()) {
         TELEPHONY_LOGW("sent raw data is less than 32k");
     }
-    if ((parcelPtr = reinterpret_cast<const MmiCodeInfo *>(data.ReadRawData(len))) == nullptr) {
+    if ((parcelPtr = reinterpret_cast<const MmiCodeInfo *>(data.ReadRawData(sizeof(MmiCodeInfo)))) == nullptr) {
         TELEPHONY_LOGE("reading raw data failed, length = %d", len);
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
 
-    result = OnReportMmiCodeResult(*parcelPtr);
+    MmiCodeInfo info = *parcelPtr;
+    result = OnReportMmiCodeResult(info);
     if (!reply.WriteInt32(result)) {
         TELEPHONY_LOGE("writing parcel failed");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;

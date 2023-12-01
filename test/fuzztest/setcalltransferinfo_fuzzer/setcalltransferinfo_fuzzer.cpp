@@ -24,6 +24,8 @@
 using namespace OHOS::Telephony;
 namespace OHOS {
 constexpr int32_t SLOT_NUM = 2;
+constexpr int32_t IMS_CONFIG_ITEM_NUM = 2;
+constexpr int32_t FEATURE_TYPE_NUM = 3;
 
 void IsImsSwitchEnabled(const uint8_t *data, size_t size)
 {
@@ -61,9 +63,10 @@ void GetImsConfig(const uint8_t *data, size_t size)
     }
 
     int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
+    int32_t item = static_cast<int32_t>(size % IMS_CONFIG_ITEM_NUM);
     MessageParcel dataMessageParcel;
     dataMessageParcel.WriteInt32(slotId);
-    dataMessageParcel.WriteInt32(static_cast<ImsConfigItem>(size));
+    dataMessageParcel.WriteInt32(static_cast<ImsConfigItem>(item));
     dataMessageParcel.WriteBuffer(data, size);
     dataMessageParcel.RewindRead(0);
     MessageParcel reply;
@@ -77,9 +80,10 @@ void GetImsFeatureValue(const uint8_t *data, size_t size)
     }
 
     int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
+    int32_t type = static_cast<int32_t>(size % FEATURE_TYPE_NUM);
     MessageParcel dataMessageParcel;
     dataMessageParcel.WriteInt32(slotId);
-    dataMessageParcel.WriteInt32(static_cast<FeatureType>(size));
+    dataMessageParcel.WriteInt32(static_cast<FeatureType>(type));
     dataMessageParcel.WriteBuffer(data, size);
     dataMessageParcel.RewindRead(0);
     MessageParcel reply;

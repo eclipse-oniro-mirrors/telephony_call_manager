@@ -75,6 +75,10 @@ void Ring::Init(const std::string &ringtonePath)
 
 int32_t Ring::Play()
 {
+    if (SystemSoundManager_ == nullptr || audioPlayer_ == nullptr) {
+        TELEPHONY_LOGE("SystemSoundManager_ or audioPlayer_ is nullptr");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     const std::shared_ptr<AbilityRuntime::Context> context;
     RingtonePlayer_ = SystemSoundManager_->GetRingtonePlayer(context, Media::RingtoneType::RINGTONE_TYPE_SIM_CARD_0);
     if (RingtonePlayer_ == nullptr) {

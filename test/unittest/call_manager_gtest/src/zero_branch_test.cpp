@@ -68,6 +68,7 @@ const int32_t INVALID_MODE = 0;
 const int32_t VALID_CALLID = 1;
 const int32_t ERROR_CALLID = -1;
 const int32_t ONE_TIME = 1;
+const int32_t STEP_1 = 1;
 constexpr int16_t DEFAULT_TIME = 0;
 constexpr const char *TEST_STR = "123";
 constexpr const char *LONG_STR =
@@ -1013,13 +1014,14 @@ HWTEST_F(BranchTest, Telephony_CallManagerHisysevent_001, Function | MediumTest 
     callManagerHisysevent->WriteIncomingCallBehaviorEvent(0, 0, 0);
     callManagerHisysevent->WriteIncomingCallBehaviorEvent(0, -1, -1);
     callManagerHisysevent->WriteIncomingCallFaultEvent(0, 0, 0, static_cast<int32_t>(TELEPHONY_ERR_MEMCPY_FAIL), desc);
-    callManagerHisysevent->WriteIncomingCallFaultEvent(0, 0, 0, -1, desc);
+    auto errCode = static_cast<int32_t>(TELEPHONY_ERR_VCARD_FILE_INVALID) + STEP_1;
+    callManagerHisysevent->WriteIncomingCallFaultEvent(0, 0, 0, errCode, desc);
     callManagerHisysevent->WriteDialCallFaultEvent(0, 0, 0, static_cast<int32_t>(CALL_ERR_INVALID_SLOT_ID), desc);
-    callManagerHisysevent->WriteDialCallFaultEvent(0, 0, 0, -1, desc);
+    callManagerHisysevent->WriteDialCallFaultEvent(0, 0, 0, errCode, desc);
     callManagerHisysevent->WriteAnswerCallFaultEvent(0, 0, 0, static_cast<int32_t>(CALL_ERR_INVALID_SLOT_ID), desc);
-    callManagerHisysevent->WriteAnswerCallFaultEvent(0, 0, 0, -1, desc);
+    callManagerHisysevent->WriteAnswerCallFaultEvent(0, 0, 0, errCode, desc);
     callManagerHisysevent->WriteHangUpFaultEvent(0, 0, static_cast<int32_t>(CALL_ERR_INVALID_SLOT_ID), desc);
-    callManagerHisysevent->WriteHangUpFaultEvent(0, 0, -1, desc);
+    callManagerHisysevent->WriteHangUpFaultEvent(0, 0, errCode, desc);
     CallErrorCode eventValue;
     callManagerHisysevent->CallDataErrorCodeConversion(-1, eventValue);
     callManagerHisysevent->CallDataErrorCodeConversion(static_cast<int32_t>(CALL_ERR_INVALID_SLOT_ID), eventValue);

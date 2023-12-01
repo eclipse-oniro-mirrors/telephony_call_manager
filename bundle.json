@@ -56,8 +56,7 @@
             ],
             "third_party": [
                 "libphonenumber",
-                "libuv",
-                "protobuf"
+                "libuv"
             ]
         },
         "build": {
