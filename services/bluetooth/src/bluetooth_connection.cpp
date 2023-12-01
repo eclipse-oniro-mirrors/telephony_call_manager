@@ -28,7 +28,27 @@ namespace OHOS {
 namespace Telephony {
 BluetoothConnection::BluetoothConnection() : connectedScoAddr_("") {}
 
-BluetoothConnection::~BluetoothConnection() {}
+BluetoothConnection::~BluetoothConnection()
+{
+#ifdef ABILITY_BLUETOOTH_SUPPORT
+    Bluetooth::HandsFreeAudioGateway *profile = Bluetooth::HandsFreeAudioGateway::GetProfile();
+    if (profile == nullptr) {
+        TELEPHONY_LOGE("profile is nullptr");
+    } else {
+        profile->DeregisterObserver(shared_from_this());
+    }
+
+    if (statusChangeListener_ != nullptr) {
+        auto samgrProxy = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+        if (samgrProxy != nullptr) {
+            samgrProxy->UnSubscribeSystemAbility(BLUETOOTH_HOST_SYS_ABILITY_ID, statusChangeListener_);
+            statusChangeListener_ = nullptr;
+        }
+    }
+    std::lock_guard<std::mutex> lock(bluetoothMutex_);
+    mapConnectedBtDevices_.clear();
+#endif
+}
 
 void BluetoothConnection::Init()
 {
@@ -70,28 +90,6 @@ void BluetoothConnection::Init()
             AudioDeviceType::DEVICE_BLUETOOTH_SCO);
     }
     TELEPHONY_LOGI("BluetoothConnection init success!");
-#endif
-}
-
-void BluetoothConnection::UnInit()
-{
-#ifdef ABILITY_BLUETOOTH_SUPPORT
-    Bluetooth::HandsFreeAudioGateway *profile = Bluetooth::HandsFreeAudioGateway::GetProfile();
-    if (profile == nullptr) {
-        TELEPHONY_LOGE("profile is nullptr");
-    } else {
-        profile->DeregisterObserver(shared_from_this());
-    }
-
-    if (statusChangeListener_ != nullptr) {
-        auto samgrProxy = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-        if (samgrProxy != nullptr) {
-            samgrProxy->UnSubscribeSystemAbility(BLUETOOTH_HOST_SYS_ABILITY_ID, statusChangeListener_);
-            statusChangeListener_ = nullptr;
-        }
-    }
-    std::lock_guard<std::mutex> lock(bluetoothMutex_);
-    mapConnectedBtDevices_.clear();
 #endif
 }
 

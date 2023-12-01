@@ -32,7 +32,7 @@ Ring::Ring() : isVibrating_(false), shouldRing_(false), shouldVibrate_(false), r
 }
 
 Ring::Ring(const std::string &path)
-    : isVibrating_(false), shouldRing_(false), shouldVibrate_(false), ringtonePath_("")，
+    : isVibrating_(false), shouldRing_(false), shouldVibrate_(false), ringtonePath_(""),
     audioPlayer_(new (std::nothrow) AudioPlayer())
 {
     Init(path);
