@@ -69,7 +69,7 @@ bool AudioPlayer::InitRenderer()
     rendererOptions.streamInfo.format = AudioStandard::AudioSampleFormat::SAMPLE_U8;
     rendererOptions.streamInfo.channels = AudioStandard::AudioChannel::MONO;
     rendererOptions.rendererInfo.contentType = AudioStandard::ContentType::CONTENT_TYPE_SPEECH;
-    rendererOptions.rendererInfo.streamUsage = AudioStandard::StreamUsage::STREAM_USAGE_VOICE_MODEM_COMMUNICATION;
+    rendererOptions.rendererInfo.streamUsage = AudioStandard::StreamUsage::SOURCE_TYPE_VIRTUAL_CAPTURE;
     rendererOptions.rendererInfo.rendererFlags = RENDERER_FLAG;
     audioRenderer_ = AudioStandard::AudioRenderer::Create(rendererOptions);
     if (audioRenderer_ == nullptr) {
@@ -96,7 +96,7 @@ bool AudioPlayer::InitCapturer()
     capturerOptions.streamInfo.encoding = AudioStandard::AudioEncodingType::ENCODING_PCM;
     capturerOptions.streamInfo.format = AudioStandard::AudioSampleFormat::SAMPLE_U8;
     capturerOptions.streamInfo.channels = AudioStandard::AudioChannel::MONO;
-    capturerOptions.capturerInfo.sourceType = AudioStandard::SourceType::SOURCE_TYPE_VOICE_MODEM_COMMUNICATION;
+    capturerOptions.capturerInfo.sourceType = AudioStandard::SourceType::SOURCE_TYPE_VIRTUAL_CAPTURE;
     capturerOptions.capturerInfo.capturerFlags = CAPTURER_FLAG;
     audioCapturer_ = AudioStandard::AudioCapturer::Create(capturerOptions);
     if (audioCapturer_ == nullptr) {

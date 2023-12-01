@@ -273,7 +273,7 @@ int32_t AudioProxy::GetPreferredOutputAudioDevice(AudioDevice &device)
 {
     AudioStandard::AudioRendererInfo rendererInfo;
     rendererInfo.contentType = AudioStandard::ContentType::CONTENT_TYPE_UNKNOWN;
-    rendererInfo.streamUsage = AudioStandard::StreamUsage::STREAM_USAGE_VOICE_MODEM_COMMUNICATION;
+    rendererInfo.streamUsage = AudioStandard::StreamUsage::SOURCE_TYPE_VIRTUAL_CAPTURE;
     rendererInfo.rendererFlags = RENDERER_FLAG;
     std::vector<sptr<AudioStandard::AudioDeviceDescriptor>> desc;
     int32_t ret =
@@ -324,7 +324,7 @@ int32_t AudioProxy::SetAudioPreferDeviceChangeCallback()
     }
     AudioStandard::AudioRendererInfo rendererInfo;
     rendererInfo.contentType = AudioStandard::ContentType::CONTENT_TYPE_SPEECH;
-    rendererInfo.streamUsage = AudioStandard::StreamUsage::STREAM_USAGE_VOICE_MODEM_COMMUNICATION;
+    rendererInfo.streamUsage = AudioStandard::StreamUsage::SOURCE_TYPE_VIRTUAL_CAPTURE;
     rendererInfo.rendererFlags = RENDERER_FLAG;
     int32_t ret = AudioStandard::AudioRoutingManager::GetInstance()->SetPreferredOutputDeviceChangeCallback(
         rendererInfo, preferredDeviceCallback_);
