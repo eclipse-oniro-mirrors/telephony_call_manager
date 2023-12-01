@@ -31,13 +31,6 @@ BluetoothConnection::BluetoothConnection() : connectedScoAddr_("") {}
 BluetoothConnection::~BluetoothConnection()
 {
 #ifdef ABILITY_BLUETOOTH_SUPPORT
-    Bluetooth::HandsFreeAudioGateway *profile = Bluetooth::HandsFreeAudioGateway::GetProfile();
-    if (profile == nullptr) {
-        TELEPHONY_LOGE("profile is nullptr");
-    } else {
-        profile->DeregisterObserver(shared_from_this());
-    }
-
     if (statusChangeListener_ != nullptr) {
         auto samgrProxy = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
         if (samgrProxy != nullptr) {
