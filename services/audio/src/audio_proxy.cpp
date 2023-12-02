@@ -18,6 +18,7 @@
 #include "telephony_log_wrapper.h"
 #include "bluetooth_call_manager.h"
 #include "audio_control_manager.h"
+#include "audio_group_manager.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -181,7 +182,9 @@ int32_t AudioProxy::GetMinVolume(AudioStandard::AudioVolumeType audioVolumeType)
 
 bool AudioProxy::IsMicrophoneMute()
 {
-    return AudioStandard::AudioSystemManager::GetInstance()->IsMicrophoneMute();
+    std::shared_ptr<AudioStandard::AudioGroupManager> AudioGroupManager =
+        AudioStandard::AudioSystemManager::GetInstance()->GetGroupManager(AudioStandard::DEFAULT_VOLUME_GROUP_ID);
+    return AudioGroupManager->IsMicrophoneMute();
 }
 
 bool AudioProxy::SetMicrophoneMute(bool mute)
@@ -189,7 +192,9 @@ bool AudioProxy::SetMicrophoneMute(bool mute)
     if (mute == IsMicrophoneMute()) {
         return true;
     }
-    int32_t muteResult = AudioStandard::AudioSystemManager::GetInstance()->SetMicrophoneMute(mute);
+    std::shared_ptr<AudioStandard::AudioGroupManager> AudioGroupManager =
+        AudioStandard::AudioSystemManager::GetInstance()->GetGroupManager(AudioStandard::DEFAULT_VOLUME_GROUP_ID);
+    int32_t muteResult = AudioGroupManager->SetMicrophoneMute(mute);
     TELEPHONY_LOGI("set microphone mute result : %{public}d", muteResult);
     return (muteResult == TELEPHONY_SUCCESS);
 }
