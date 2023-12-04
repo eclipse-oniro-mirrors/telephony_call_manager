@@ -36,10 +36,11 @@ enum class CellularCallInterfaceCode {
     KICK_OUT_CONFERENCE,
     HANG_UP_ALL_CONNECTION,
     SET_READY_TO_CALL,
-    UPDATE_CALL_MEDIA_MODE,
+    SEND_CALL_MEDIA_MODE_REQUEST,
     REGISTER_CALLBACK,
     UNREGISTER_CALLBACK,
     CLEAR_ALL_CALLS,
+    SEND_CALL_MEDIA_MODE_RESPONSE,
 
     /****************** dtmf rtt ******************/
     START_DTMF = 100,
@@ -82,6 +83,8 @@ enum class CellularCallInterfaceCode {
     SET_CAMERA_ZOOM,
     SET_PAUSE_IMAGE,
     SET_DEVICE_DIRECTION,
+    CANCEL_CALL_UPGRADE,
+    REQUEST_CAMERA_CAPABILITY,
 };
 } // namespace Telephony
 } // namespace OHOS

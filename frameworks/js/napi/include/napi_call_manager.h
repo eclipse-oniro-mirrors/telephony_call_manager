@@ -58,6 +58,8 @@ public:
     static napi_value DeclareAudioDeviceEnum(napi_env env, napi_value exports);
     static napi_value DeclareVideoStateTypeEnum(napi_env env, napi_value exports);
     static napi_value DeclareImsCallModeEnum(napi_env env, napi_value exports);
+    static napi_value DeclareDeviceDirectionEnum(napi_env env, napi_value exports);
+    static napi_value DeclareVideoRequestResultEnum(napi_env env, napi_value exports);
     static napi_value DeclareDialSceneEnum(napi_env env, napi_value exports);
     static napi_value DeclareCallTypeEnum(napi_env env, napi_value exports);
     static napi_value DeclareDialTypeEnum(napi_env env, napi_value exports);
@@ -65,6 +67,7 @@ public:
     static napi_value DeclareConferenceStateEnum(napi_env env, napi_value exports);
     static napi_value DeclareCallStateToAppEnum(napi_env env, napi_value exports);
     static napi_value DeclareCallEventEnumEx(napi_env env, napi_value exports);
+    static napi_value DeclareCallSessionEventEnumEx(napi_env env, napi_value exports);
     static napi_value DeclareRestrictionTypeEnum(napi_env env, napi_value exports);
     static napi_value DeclareRestrictionModeEnum(napi_env env, napi_value exports);
     static napi_value DeclareRestrictionStatusEnum(napi_env env, napi_value exports);
@@ -79,6 +82,7 @@ public:
     static napi_value DialCall(napi_env env, napi_callback_info info);
     static napi_value MakeCall(napi_env env, napi_callback_info info);
     static napi_value AnswerCall(napi_env env, napi_callback_info info);
+    static napi_value AnswerVideoCall(napi_env env, napi_callback_info info);
     static napi_value RejectCall(napi_env env, napi_callback_info info);
     static napi_value HangUpCall(napi_env env, napi_callback_info info);
     static napi_value HoldCall(napi_env env, napi_callback_info info);
@@ -123,6 +127,7 @@ public:
     static napi_value SetCameraZoom(napi_env env, napi_callback_info info);
     static napi_value SetPausePicture(napi_env env, napi_callback_info info);
     static napi_value SetDeviceDirection(napi_env env, napi_callback_info info);
+    static napi_value RequestCameraCapabilities(napi_env env, napi_callback_info info);
     static napi_value SetCallPreferenceMode(napi_env env, napi_callback_info info);
     static napi_value EnableImsSwitch(napi_env env, napi_callback_info info);
     static napi_value DisableImsSwitch(napi_env env, napi_callback_info info);
@@ -140,6 +145,7 @@ public:
     static napi_value InputDialerSpecialCode(napi_env env, napi_callback_info info);
     static napi_value RemoveMissedIncomingCallNotification(napi_env env, napi_callback_info info);
     static napi_value SetVoIPCallState(napi_env env, napi_callback_info info);
+    static napi_value CancelCallUpgrade(napi_env env, napi_callback_info info);
 
 private:
     static void RegisterCallBack();
@@ -204,6 +210,7 @@ private:
     static void NativeSetCameraZoom(napi_env env, void *data);
     static void NativeSetPausePicture(napi_env env, void *data);
     static void NativeSetDeviceDirection(napi_env env, void *data);
+    static void NativeRequestCameraCapabilities(napi_env env, void *data);
     static void NativeSetCallPreferenceMode(napi_env env, void *data);
     static void NativeIsImsSwitchEnabled(napi_env env, void *data);
     static void NativeEnableImsSwitch(napi_env env, void *data);
@@ -218,8 +225,11 @@ private:
     static void NativeInputDialerSpecialCode(napi_env env, void *data);
     static void NativeRemoveMissedIncomingCallNotification(napi_env env, void *data);
     static void NativeSetVoIPCallState(napi_env env, void *data);
+    static void NativeCancelCallUpgrade(napi_env env, void *data);
     static bool MatchEmptyParameter(napi_env env, const napi_value parameters[], const size_t parameterCount);
     static bool MatchOneOptionalNumberParameter(
+        napi_env env, const napi_value parameters[], const size_t parameterCount);
+    static bool MatchAnswerCallParameter(
         napi_env env, const napi_value parameters[], const size_t parameterCount);
     static bool MatchOneNumberParameter(napi_env env, const napi_value parameters[], const size_t parameterCount);
     static bool MatchOneStringParameter(napi_env env, const napi_value parameters[], const size_t parameterCount);
@@ -240,6 +250,8 @@ private:
     static void NativePostDialProceed(napi_env env, void *data);
     static napi_value HandleAsyncWork(napi_env env, AsyncContext *context, std::string workName,
         napi_async_execute_callback execute, napi_async_complete_callback complete);
+    static void RegisterImsVideoCallFuncCallback(std::string tmpStr, EventCallback stateCallback);
+    static void UnRegisterCallbackWithListenerType(std::string tmpStr);
     static bool MatchStringAndVariableObjectParameters(
         napi_env env, const napi_value parameters[], const size_t parameterCount);
     static bool MatchTwoStringParameter(napi_env env, const napi_value parameters[], const size_t parameterCount);

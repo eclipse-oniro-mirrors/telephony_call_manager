@@ -53,12 +53,17 @@ public:
     int32_t SetImsConfigResult(const int32_t result) override;
     int32_t GetImsFeatureValueResult(const GetImsFeatureValueResponse &response) override;
     int32_t SetImsFeatureValueResult(const int32_t result) override;
-    int32_t ReceiveUpdateCallMediaModeResponse(const CallMediaModeResponse &response) override;
+    int32_t ReceiveUpdateCallMediaModeRequest(const CallModeReportInfo &response) override;
+    int32_t ReceiveUpdateCallMediaModeResponse(const CallModeReportInfo &response) override;
     int32_t InviteToConferenceResult(const int32_t result) override;
     int32_t SendMmiCodeResult(const MmiCodeInfo &info) override;
     int32_t CloseUnFinishedUssdResult(const int32_t result) override;
     int32_t ReportPostDialChar(const std::string &c) override;
     int32_t ReportPostDialDelay(const std::string &str) override;
+    int32_t HandleCallSessionEventChanged(const CallSessionReportInfo &reportInfo) override;
+    int32_t HandlePeerDimensionsChanged(const PeerDimensionsReportInfo &dimensionsDetail) override;
+    int32_t HandleCallDataUsageChanged(const int64_t result) override;
+    int32_t HandleCameraCapabilitiesChanged(const CameraCapabilitiesReportInfo &cameraCapabilities) override;
 };
 } // namespace Telephony
 } // namespace OHOS

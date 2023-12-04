@@ -209,6 +209,14 @@ enum class VideoStateType {
      */
     TYPE_VOICE = 0,
     /**
+     * Indicates the call is in send only state.
+     */
+    TYPE_SEND_ONLY,
+    /**
+     * Indicates the call is in send only state.
+     */
+    TYPE_RECEIVE_ONLY,
+    /**
      * Indicates the call is in video state.
      */
     TYPE_VIDEO,
@@ -428,6 +436,50 @@ enum class CallAbilityEventId {
      * Indicates that the OTT is not supported.
      */
     EVENT_OTT_FUNCTION_UNSUPPORTED,
+};
+
+/**
+ * @brief Indicates the event ID of call ability.
+ */
+enum class CallSessionEventId {
+    /**
+     * Indicates the camera event failure type.
+     */
+    EVENT_CAMERA_FAILURE = 0,
+    /**
+     * Indicates the camera event ready type.
+     */
+    EVENT_CAMERA_READY,
+    /**
+     * Indicates the display surface release type.
+     */
+    EVENT_RELEASE_DISPLAY_SURFACE = 100,
+    /**
+     * Indicates the preview surface release type.
+     */
+    EVENT_RELEASE_PREVIEW_SURFACE,
+};
+
+/**
+ * @brief Indicates the type of device direction.
+ */
+enum DeviceDirection {
+    /**
+     * Indicates the device direction is 0 degree.
+     */
+    DEVICE_DIRECTION_0 = 0,
+    /**
+     * Indicates the device direction is 90 degree.
+     */
+    DEVICE_DIRECTION_90 = 90,
+    /**
+     * Indicates the device direction is 180 degree.
+     */
+    DEVICE_DIRECTION_180 = 180,
+    /**
+     * Indicates the device direction is 270 degree.
+     */
+    DEVICE_DIRECTION_270 = 270,
 };
 
 /**

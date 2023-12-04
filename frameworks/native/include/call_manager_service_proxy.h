@@ -350,28 +350,33 @@ public:
      * ControlCamera
      *
      * @brief Open or close camera
+     * @param callId[in], The call id
      * @param cameraId[in], The camera id
      * @return Returns 0 on success, others on failure.
      */
-    int32_t ControlCamera(std::u16string cameraId) override;
+    int32_t ControlCamera(int32_t callId, std::u16string &cameraId) override;
 
     /**
      * SetPreviewWindow
      *
      * @brief Set the location and size of the preview window for videos captured by the local camera.
-     * @param window[in], Window information
+     * @param callId[in], The call id
+     * @param surfaceId[in], Window information
+     * @param surface[in], Window information
      * @return Returns 0 on success, others on failure.
      */
-    int32_t SetPreviewWindow(VideoWindow &window) override;
+    int32_t SetPreviewWindow(int32_t callId, std::string &surfaceId, sptr<Surface> surface) override;
 
     /**
      * SetDisplayWindow
      *
      * @brief Sets the location and size of the remote video window.
-     * @param window[in], Window information
+     * @param callId[in], The call id
+     * @param surfaceId[in], Window information
+     * @param surface[in], Window information
      * @return Returns 0 on success, others on failure.
      */
-    int32_t SetDisplayWindow(VideoWindow &window) override;
+    int32_t SetDisplayWindow(int32_t callId, std::string &surfaceId, sptr<Surface> surface) override;
 
     /**
      * SetCameraZoom
@@ -388,19 +393,21 @@ public:
      * @brief APP sets the screen of the remote video freeze immediately.
      * If the APP does not call this interface when making a video call,
      * the last frame before the remote video freeze is displayed by default
+     * @param callId[in], The call id
      * @param path[in], Local Picture address
      * @return Returns 0 on success, others on failure.
      */
-    int32_t SetPausePicture(std::u16string path) override;
+    int32_t SetPausePicture(int32_t callId, std::u16string &path) override;
 
     /**
      * SetDeviceDirection
      *
      * @brief Set the rotation Angle of the local device. The default value is 0
+     * @param callId[in], The call id
      * @param rotation[in], Rotation Angle
      * @return Returns 0 on success, others on failure.
      */
-    int32_t SetDeviceDirection(int32_t rotation) override;
+    int32_t SetDeviceDirection(int32_t callId, int32_t rotation) override;
 
     /**
      * IsEmergencyPhoneNumber
@@ -660,6 +667,26 @@ public:
      * @return Returns 0 on success, others on failure.
      */
     int32_t ReportAudioDeviceInfo() override;
+
+    /**
+     * CancelCallUpgrade
+     *
+     * @brief cancel upgrade to video call
+     * @param callId[in], The call id
+     *
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t CancelCallUpgrade(int32_t callId) override;
+
+    /**
+     * RequestCameraCapabilities
+     *
+     * @brief request camera capabilities
+     * @param callId[in], The call id
+     *
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t RequestCameraCapabilities(int32_t callId) override;
 
 private:
     int32_t SendRequest(CallManagerInterfaceCode code);

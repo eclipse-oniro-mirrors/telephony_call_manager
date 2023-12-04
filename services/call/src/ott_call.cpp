@@ -342,7 +342,12 @@ int32_t OTTCall::SendUpdateCallMediaModeRequest(ImsCallMode mode)
     return CALL_ERR_FUNCTION_NOT_SUPPORTED;
 }
 
-int32_t OTTCall::RecieveUpdateCallMediaModeRequest(ImsCallMode mode)
+int32_t OTTCall::InitVideoCall()
+{
+    return CALL_ERR_FUNCTION_NOT_SUPPORTED;
+}
+
+int32_t OTTCall::RecieveUpdateCallMediaModeRequest(CallModeReportInfo &imsCallModeInfo)
 {
     return CALL_ERR_FUNCTION_NOT_SUPPORTED;
 }
@@ -352,17 +357,52 @@ int32_t OTTCall::SendUpdateCallMediaModeResponse(ImsCallMode mode)
     return CALL_ERR_FUNCTION_NOT_SUPPORTED;
 }
 
-int32_t OTTCall::ReceiveUpdateCallMediaModeResponse(CallMediaModeResponse &response)
+int32_t OTTCall::ReceiveUpdateCallMediaModeResponse(CallModeReportInfo &response)
 {
     return CALL_ERR_FUNCTION_NOT_SUPPORTED;
 }
 
-int32_t OTTCall::DispatchUpdateVideoRequest(ImsCallMode mode)
+int32_t OTTCall::UpdateImsCallMode(ImsCallMode mode)
 {
     return CALL_ERR_FUNCTION_NOT_SUPPORTED;
 }
 
-int32_t OTTCall::DispatchUpdateVideoResponse(ImsCallMode mode)
+int32_t OTTCall::ReportImsCallModeInfo(CallMediaModeInfo &response)
+{
+    return CALL_ERR_FUNCTION_NOT_SUPPORTED;
+}
+
+int32_t OTTCall::ControlCamera(std::string &cameraId, int32_t callingUid, int32_t callingPid)
+{
+    return CALL_ERR_FUNCTION_NOT_SUPPORTED;
+}
+
+int32_t OTTCall::SetPreviewWindow(std::string &surfaceId, sptr<Surface> surface)
+{
+    return CALL_ERR_FUNCTION_NOT_SUPPORTED;
+}
+
+int32_t OTTCall::SetDisplayWindow(std::string &surfaceId, sptr<Surface> surface)
+{
+    return CALL_ERR_FUNCTION_NOT_SUPPORTED;
+}
+
+int32_t OTTCall::SetPausePicture(std::string &path)
+{
+    return CALL_ERR_FUNCTION_NOT_SUPPORTED;
+}
+
+int32_t OTTCall::SetDeviceDirection(int32_t rotation)
+{
+    return CALL_ERR_FUNCTION_NOT_SUPPORTED;
+}
+
+int32_t OTTCall::CancelCallUpgrade()
+{
+    return CALL_ERR_FUNCTION_NOT_SUPPORTED;
+}
+
+int32_t OTTCall::RequestCameraCapabilities()
 {
     return CALL_ERR_FUNCTION_NOT_SUPPORTED;
 }

@@ -240,6 +240,32 @@ int32_t InputDialerSpecialCode(const uint8_t *data, size_t size)
     return DelayedSingleton<CallManagerService>::GetInstance()->OnInputDialerSpecialCode(dataParcel, reply);
 }
 
+int32_t CancelCallUpgrade(const uint8_t *data, size_t size)
+{
+    if (!IsServiceInited()) {
+        return TELEPHONY_ERROR;
+    }
+    MessageParcel dataParcel;
+    MessageParcel replyParcel;
+    int32_t callId = static_cast<int32_t>(size % CALL_ID_NUM);
+    dataParcel.WriteInt32(callId);
+    dataParcel.RewindRead(0);
+    return DelayedSingleton<CallManagerService>::GetInstance()->OnCancelCallUpgrade(dataParcel, replyParcel);
+}
+
+int32_t RequestCameraCapabilities(const uint8_t *data, size_t size)
+{
+    if (!IsServiceInited()) {
+        return TELEPHONY_ERROR;
+    }
+    MessageParcel dataParcel;
+    MessageParcel replyParcel;
+    int32_t callId = static_cast<int32_t>(size % CALL_ID_NUM);
+    dataParcel.WriteInt32(callId);
+    dataParcel.RewindRead(0);
+    return DelayedSingleton<CallManagerService>::GetInstance()->OnRequestCameraCapabilities(dataParcel, replyParcel);
+}
+
 void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
 {
     if (data == nullptr || size == 0) {
@@ -259,6 +285,8 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     JoinConference(data, size);
     StartRtt(data, size);
     InputDialerSpecialCode(data, size);
+    CancelCallUpgrade(data, size);
+    RequestCameraCapabilities(data, size);
 }
 } // namespace OHOS
 

@@ -439,30 +439,30 @@ int32_t CallManagerClient::SetAudioDevice(const AudioDevice &audioDevice)
     }
 }
 
-int32_t CallManagerClient::ControlCamera(std::u16string cameraId)
+int32_t CallManagerClient::ControlCamera(int32_t callId, std::u16string cameraId)
 {
     if (g_callManagerProxy != nullptr) {
-        return g_callManagerProxy->ControlCamera(cameraId);
+        return g_callManagerProxy->ControlCamera(callId, cameraId);
     } else {
         TELEPHONY_LOGE("init first please!");
         return TELEPHONY_ERR_UNINIT;
     }
 }
 
-int32_t CallManagerClient::SetPreviewWindow(VideoWindow &window)
+int32_t CallManagerClient::SetPreviewWindow(int32_t callId, std::string &surfaceId)
 {
     if (g_callManagerProxy != nullptr) {
-        return g_callManagerProxy->SetPreviewWindow(window);
+        return g_callManagerProxy->SetPreviewWindow(callId, surfaceId);
     } else {
         TELEPHONY_LOGE("init first please!");
         return TELEPHONY_ERR_UNINIT;
     }
 }
 
-int32_t CallManagerClient::SetDisplayWindow(VideoWindow &window)
+int32_t CallManagerClient::SetDisplayWindow(int32_t callId, std::string &surfaceId)
 {
     if (g_callManagerProxy != nullptr) {
-        return g_callManagerProxy->SetDisplayWindow(window);
+        return g_callManagerProxy->SetDisplayWindow(callId, surfaceId);
     } else {
         TELEPHONY_LOGE("init first please!");
         return TELEPHONY_ERR_UNINIT;
@@ -479,20 +479,20 @@ int32_t CallManagerClient::SetCameraZoom(float zoomRatio)
     }
 }
 
-int32_t CallManagerClient::SetPausePicture(std::u16string path)
+int32_t CallManagerClient::SetPausePicture(int32_t callId, std::u16string path)
 {
     if (g_callManagerProxy != nullptr) {
-        return g_callManagerProxy->SetPausePicture(path);
+        return g_callManagerProxy->SetPausePicture(callId, path);
     } else {
         TELEPHONY_LOGE("init first please!");
         return TELEPHONY_ERR_UNINIT;
     }
 }
 
-int32_t CallManagerClient::SetDeviceDirection(int32_t rotation)
+int32_t CallManagerClient::SetDeviceDirection(int32_t callId, int32_t rotation)
 {
     if (g_callManagerProxy != nullptr) {
-        return g_callManagerProxy->SetDeviceDirection(rotation);
+        return g_callManagerProxy->SetDeviceDirection(callId, rotation);
     } else {
         TELEPHONY_LOGE("init first please!");
         return TELEPHONY_ERR_UNINIT;
@@ -712,6 +712,26 @@ int32_t CallManagerClient::ReportAudioDeviceInfo()
 {
     if (g_callManagerProxy != nullptr) {
         return g_callManagerProxy->ReportAudioDeviceInfo();
+    } else {
+        TELEPHONY_LOGE("init first please!");
+        return TELEPHONY_ERR_UNINIT;
+    }
+}
+
+int32_t CallManagerClient::CancelCallUpgrade(int32_t callId)
+{
+    if (g_callManagerProxy != nullptr) {
+        return g_callManagerProxy->CancelCallUpgrade(callId);
+    } else {
+        TELEPHONY_LOGE("init first please!");
+        return TELEPHONY_ERR_UNINIT;
+    }
+}
+
+int32_t CallManagerClient::RequestCameraCapabilities(int32_t callId)
+{
+    if (g_callManagerProxy != nullptr) {
+        return g_callManagerProxy->RequestCameraCapabilities(callId);
     } else {
         TELEPHONY_LOGE("init first please!");
         return TELEPHONY_ERR_UNINIT;

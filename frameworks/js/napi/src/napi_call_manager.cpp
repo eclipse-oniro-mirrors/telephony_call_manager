@@ -66,6 +66,7 @@ napi_value NapiCallManager::DeclareCallBasisInterface(napi_env env, napi_value e
         DECLARE_NAPI_FUNCTION("reject", RejectCall),
         DECLARE_NAPI_FUNCTION("hangup", HangUpCall),
         DECLARE_NAPI_FUNCTION("answerCall", AnswerCall),
+        DECLARE_NAPI_FUNCTION("answerVideoCall", AnswerVideoCall),
         DECLARE_NAPI_FUNCTION("rejectCall", RejectCall),
         DECLARE_NAPI_FUNCTION("hangUpCall", HangUpCall),
         DECLARE_NAPI_FUNCTION("holdCall", HoldCall),
@@ -155,6 +156,9 @@ napi_value NapiCallManager::DeclareCallMultimediaInterface(napi_env env, napi_va
         DECLARE_NAPI_FUNCTION("setCameraZoom", SetCameraZoom),
         DECLARE_NAPI_FUNCTION("setPausePicture", SetPausePicture),
         DECLARE_NAPI_FUNCTION("setDeviceDirection", SetDeviceDirection),
+        DECLARE_NAPI_FUNCTION("queryCameraCapabilities", RequestCameraCapabilities),
+        DECLARE_NAPI_FUNCTION("updateImsCallMode", UpdateImsCallMode),
+        DECLARE_NAPI_FUNCTION("cancelCallUpgrade", CancelCallUpgrade),
     };
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc));
     return exports;
@@ -166,7 +170,6 @@ napi_value NapiCallManager::DeclareCallImsInterface(napi_env env, napi_value exp
         DECLARE_NAPI_FUNCTION("startRTT", StartRTT),
         DECLARE_NAPI_FUNCTION("stopRTT", StopRTT),
         DECLARE_NAPI_FUNCTION("joinConference", JoinConference),
-        DECLARE_NAPI_FUNCTION("updateImsCallMode", UpdateImsCallMode),
     };
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc));
     return exports;
@@ -176,10 +179,14 @@ napi_value NapiCallManager::DeclareCallMediaEnum(napi_env env, napi_value export
 {
     napi_property_descriptor desc[] = {
         // VideoStateType
-        DECLARE_NAPI_STATIC_PROPERTY(
-            "TYPE_VOICE", NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(VideoStateType::TYPE_VOICE))),
-        DECLARE_NAPI_STATIC_PROPERTY(
-            "TYPE_VIDEO", NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(VideoStateType::TYPE_VIDEO))),
+        DECLARE_NAPI_STATIC_PROPERTY("TYPE_VOICE",
+            NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(VideoStateType::TYPE_VOICE))),
+        DECLARE_NAPI_STATIC_PROPERTY("TYPE_SEND_ONLY",
+            NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(VideoStateType::TYPE_SEND_ONLY))),
+        DECLARE_NAPI_STATIC_PROPERTY("TYPE_RECEIVE_ONLY",
+            NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(VideoStateType::TYPE_RECEIVE_ONLY))),
+        DECLARE_NAPI_STATIC_PROPERTY("TYPE_VIDEO",
+            NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(VideoStateType::TYPE_VIDEO))),
         // ImsCallMode
         DECLARE_NAPI_STATIC_PROPERTY(
             "CALL_MODE_AUDIO_ONLY", NapiCallManagerUtils::ToInt32Value(env, CALL_MODE_AUDIO_ONLY)),
@@ -191,6 +198,32 @@ napi_value NapiCallManager::DeclareCallMediaEnum(napi_env env, napi_value export
             "CALL_MODE_SEND_RECEIVE", NapiCallManagerUtils::ToInt32Value(env, CALL_MODE_SEND_RECEIVE)),
         DECLARE_NAPI_STATIC_PROPERTY(
             "CALL_MODE_VIDEO_PAUSED", NapiCallManagerUtils::ToInt32Value(env, CALL_MODE_VIDEO_PAUSED)),
+        // VideoRequestResultType
+        DECLARE_NAPI_STATIC_PROPERTY(
+            "TYPE_REQUEST_SUCCESS", NapiCallManagerUtils::ToInt32Value(env, TYPE_REQUEST_SUCCESS)),
+        DECLARE_NAPI_STATIC_PROPERTY(
+            "TYPE_REQUEST_FAIL", NapiCallManagerUtils::ToInt32Value(env, TYPE_REQUEST_FAIL)),
+        DECLARE_NAPI_STATIC_PROPERTY(
+            "TYPE_REQUEST_INVALID", NapiCallManagerUtils::ToInt32Value(env, TYPE_REQUEST_INVALID)),
+        DECLARE_NAPI_STATIC_PROPERTY(
+            "TYPE_REQUEST_TIMED_OUT", NapiCallManagerUtils::ToInt32Value(env, TYPE_REQUEST_TIMED_OUT)),
+        DECLARE_NAPI_STATIC_PROPERTY(
+            "REQUEST_REJECTED_BY_REMOTE", NapiCallManagerUtils::ToInt32Value(env, REQUEST_REJECTED_BY_REMOTE)),
+        DECLARE_NAPI_STATIC_PROPERTY(
+            "TYPE_MODIFY_DOWNGRADE_RTP_OR_RTCP_TIMEOUT",
+            NapiCallManagerUtils::ToInt32Value(env, TYPE_MODIFY_DOWNGRADE_RTP_OR_RTCP_TIMEOUT)),
+        DECLARE_NAPI_STATIC_PROPERTY(
+            "TYPE_MODIFY_DOWNGRADE_RTP_AND_RTCP_TIMEOUT",
+            NapiCallManagerUtils::ToInt32Value(env, TYPE_MODIFY_DOWNGRADE_RTP_AND_RTCP_TIMEOUT)),
+        // DeviceDirection
+        DECLARE_NAPI_STATIC_PROPERTY(
+            "DEVICE_DIRECTION_0", NapiCallManagerUtils::ToInt32Value(env, DEVICE_DIRECTION_0)),
+        DECLARE_NAPI_STATIC_PROPERTY(
+            "DEVICE_DIRECTIO_90", NapiCallManagerUtils::ToInt32Value(env, DEVICE_DIRECTION_90)),
+        DECLARE_NAPI_STATIC_PROPERTY(
+            "DEVICE_DIRECTIO_180", NapiCallManagerUtils::ToInt32Value(env, DEVICE_DIRECTION_180)),
+        DECLARE_NAPI_STATIC_PROPERTY(
+            "DEVICE_DIRECTIO_270", NapiCallManagerUtils::ToInt32Value(env, DEVICE_DIRECTION_270)),
     };
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc));
     return exports;
@@ -302,6 +335,18 @@ napi_value NapiCallManager::DeclareCallEventEnum(napi_env env, napi_value export
         DECLARE_NAPI_STATIC_PROPERTY("EVENT_SPLIT_CALL_FAILED",
             NapiCallManagerUtils::ToInt32Value(
                 env, static_cast<int32_t>(CallAbilityEventId::EVENT_SPLIT_CALL_FAILED))),
+        // CallSessionEventId
+        DECLARE_NAPI_STATIC_PROPERTY("EVENT_CAMERA_FAILURE",
+            NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(CallSessionEventId::EVENT_CAMERA_FAILURE))),
+        DECLARE_NAPI_STATIC_PROPERTY("EVENT_CAMERA_READY",
+            NapiCallManagerUtils::ToInt32Value(
+                env, static_cast<int32_t>(CallSessionEventId::EVENT_CAMERA_READY))),
+        DECLARE_NAPI_STATIC_PROPERTY("EVENT_RELEASE_DISPLAY_SURFACE",
+            NapiCallManagerUtils::ToInt32Value(
+                env, static_cast<int32_t>(CallSessionEventId::EVENT_RELEASE_DISPLAY_SURFACE))),
+        DECLARE_NAPI_STATIC_PROPERTY("EVENT_RELEASE_PREVIEW_SURFACE",
+            NapiCallManagerUtils::ToInt32Value(
+                env, static_cast<int32_t>(CallSessionEventId::EVENT_RELEASE_PREVIEW_SURFACE))),
     };
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc));
     return exports;
@@ -448,6 +493,10 @@ napi_value NapiCallManager::DeclareVideoStateTypeEnum(napi_env env, napi_value e
     napi_property_descriptor desc[] = {
         DECLARE_NAPI_STATIC_PROPERTY("TYPE_VOICE",
             NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(VideoStateType::TYPE_VOICE))),
+        DECLARE_NAPI_STATIC_PROPERTY("TYPE_SEND_ONLY",
+            NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(VideoStateType::TYPE_SEND_ONLY))),
+        DECLARE_NAPI_STATIC_PROPERTY("TYPE_RECEIVE_ONLY",
+            NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(VideoStateType::TYPE_RECEIVE_ONLY))),
         DECLARE_NAPI_STATIC_PROPERTY("TYPE_VIDEO",
             NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(VideoStateType::TYPE_VIDEO))),
     };
@@ -458,18 +507,71 @@ napi_value NapiCallManager::DeclareVideoStateTypeEnum(napi_env env, napi_value e
     return exports;
 }
 
+napi_value NapiCallManager::DeclareVideoRequestResultEnum(napi_env env, napi_value exports)
+{
+    napi_property_descriptor desc[] = {
+        DECLARE_NAPI_STATIC_PROPERTY(
+            "TYPE_REQUEST_SUCCESS", NapiCallManagerUtils::ToInt32Value(env, TYPE_REQUEST_SUCCESS)),
+        DECLARE_NAPI_STATIC_PROPERTY(
+            "TYPE_REQUEST_FAIL", NapiCallManagerUtils::ToInt32Value(env, TYPE_REQUEST_FAIL)),
+        DECLARE_NAPI_STATIC_PROPERTY(
+            "TYPE_REQUEST_INVALID", NapiCallManagerUtils::ToInt32Value(env, TYPE_REQUEST_INVALID)),
+        DECLARE_NAPI_STATIC_PROPERTY(
+            "TYPE_REQUEST_TIMED_OUT", NapiCallManagerUtils::ToInt32Value(env, TYPE_REQUEST_TIMED_OUT)),
+        DECLARE_NAPI_STATIC_PROPERTY(
+            "REQUEST_REJECTED_BY_REMOTE", NapiCallManagerUtils::ToInt32Value(env, REQUEST_REJECTED_BY_REMOTE)),
+        DECLARE_NAPI_STATIC_PROPERTY(
+            "TYPE_MODIFY_DOWNGRADE_RTP_OR_RTCP_TIMEOUT",
+            NapiCallManagerUtils::ToInt32Value(env, TYPE_MODIFY_DOWNGRADE_RTP_OR_RTCP_TIMEOUT)),
+        DECLARE_NAPI_STATIC_PROPERTY(
+            "TYPE_MODIFY_DOWNGRADE_RTP_AND_RTCP_TIMEOUT",
+            NapiCallManagerUtils::ToInt32Value(env, TYPE_MODIFY_DOWNGRADE_RTP_AND_RTCP_TIMEOUT)),
+    };
+    napi_value result = nullptr;
+    napi_define_class(env, "VideoRequestResultType", NAPI_AUTO_LENGTH, NapiCallManagerUtils::CreateEnumConstructor,
+        nullptr, sizeof(desc) / sizeof(*desc), desc, &result);
+    napi_set_named_property(env, exports, "VideoRequestResultType", result);
+    return exports;
+}
+
 napi_value NapiCallManager::DeclareImsCallModeEnum(napi_env env, napi_value exports)
 {
     napi_property_descriptor desc[] = {
         DECLARE_NAPI_STATIC_PROPERTY(
             "CALL_MODE_AUDIO_ONLY", NapiCallManagerUtils::ToInt32Value(env, CALL_MODE_AUDIO_ONLY)),
         DECLARE_NAPI_STATIC_PROPERTY(
+            "CALL_MODE_SEND_ONLY", NapiCallManagerUtils::ToInt32Value(env, CALL_MODE_SEND_ONLY)),
+        DECLARE_NAPI_STATIC_PROPERTY(
+            "CALL_MODE_RECEIVE_ONLY", NapiCallManagerUtils::ToInt32Value(env, CALL_MODE_RECEIVE_ONLY)),
+        DECLARE_NAPI_STATIC_PROPERTY(
             "CALL_MODE_SEND_RECEIVE", NapiCallManagerUtils::ToInt32Value(env, CALL_MODE_SEND_RECEIVE)),
+        DECLARE_NAPI_STATIC_PROPERTY(
+            "CALL_MODE_VIDEO_PAUSED", NapiCallManagerUtils::ToInt32Value(env, CALL_MODE_VIDEO_PAUSED)),
     };
     napi_value result = nullptr;
     napi_define_class(env, "ImsCallMode", NAPI_AUTO_LENGTH, NapiCallManagerUtils::CreateEnumConstructor, nullptr,
         sizeof(desc) / sizeof(*desc), desc, &result);
     napi_set_named_property(env, exports, "ImsCallMode", result);
+    return exports;
+}
+
+napi_value NapiCallManager::DeclareDeviceDirectionEnum(napi_env env, napi_value exports)
+{
+    napi_property_descriptor desc[] = {
+        // DeviceDirection
+        DECLARE_NAPI_STATIC_PROPERTY(
+            "DEVICE_DIRECTION_0", NapiCallManagerUtils::ToInt32Value(env, DEVICE_DIRECTION_0)),
+        DECLARE_NAPI_STATIC_PROPERTY(
+            "DEVICE_DIRECTIO_90", NapiCallManagerUtils::ToInt32Value(env, DEVICE_DIRECTION_90)),
+        DECLARE_NAPI_STATIC_PROPERTY(
+            "DEVICE_DIRECTIO_180", NapiCallManagerUtils::ToInt32Value(env, DEVICE_DIRECTION_180)),
+        DECLARE_NAPI_STATIC_PROPERTY(
+            "DEVICE_DIRECTIO_270", NapiCallManagerUtils::ToInt32Value(env, DEVICE_DIRECTION_270)),
+    };
+    napi_value result = nullptr;
+    napi_define_class(env, "DeviceDirection", NAPI_AUTO_LENGTH, NapiCallManagerUtils::CreateEnumConstructor, nullptr,
+        sizeof(desc) / sizeof(*desc), desc, &result);
+    napi_set_named_property(env, exports, "DeviceDirection", result);
     return exports;
 }
 
@@ -627,6 +729,29 @@ napi_value NapiCallManager::DeclareCallEventEnumEx(napi_env env, napi_value expo
     napi_define_class(env, "CallAbilityEventId", NAPI_AUTO_LENGTH, NapiCallManagerUtils::CreateEnumConstructor, nullptr,
         sizeof(desc) / sizeof(*desc), desc, &result);
     napi_set_named_property(env, exports, "CallAbilityEventId", result);
+    return exports;
+}
+
+napi_value NapiCallManager::DeclareCallSessionEventEnumEx(napi_env env, napi_value exports)
+{
+    napi_property_descriptor desc[] = {
+        // CallSessionEventId
+        DECLARE_NAPI_STATIC_PROPERTY("EVENT_CAMERA_FAILURE",
+            NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(CallSessionEventId::EVENT_CAMERA_FAILURE))),
+        DECLARE_NAPI_STATIC_PROPERTY("EVENT_CAMERA_READY",
+            NapiCallManagerUtils::ToInt32Value(
+                env, static_cast<int32_t>(CallSessionEventId::EVENT_CAMERA_READY))),
+        DECLARE_NAPI_STATIC_PROPERTY("EVENT_RELEASE_DISPLAY_SURFACE",
+            NapiCallManagerUtils::ToInt32Value(
+                env, static_cast<int32_t>(CallSessionEventId::EVENT_RELEASE_DISPLAY_SURFACE))),
+        DECLARE_NAPI_STATIC_PROPERTY("EVENT_RELEASE_PREVIEW_SURFACE",
+            NapiCallManagerUtils::ToInt32Value(
+                env, static_cast<int32_t>(CallSessionEventId::EVENT_RELEASE_PREVIEW_SURFACE))),
+    };
+    napi_value result = nullptr;
+    napi_define_class(env, "CallSessionEventId", NAPI_AUTO_LENGTH, NapiCallManagerUtils::CreateEnumConstructor, nullptr,
+        sizeof(desc) / sizeof(*desc), desc, &result);
+    napi_set_named_property(env, exports, "CallSessionEventId", result);
     return exports;
 }
 
@@ -1011,7 +1136,9 @@ napi_value NapiCallManager::RegisterCallManagerFunc(napi_env env, napi_value exp
     DeclareVoNRStateEnum(env, exports);
     DeclareAudioDeviceEnum(env, exports);
     DeclareVideoStateTypeEnum(env, exports);
+    DeclareVideoRequestResultEnum(env, exports);
     DeclareImsCallModeEnum(env, exports);
+    DeclareDeviceDirectionEnum(env, exports);
     DeclareDialSceneEnum(env, exports);
     DeclareCallTypeEnum(env, exports);
     DeclareDialTypeEnum(env, exports);
@@ -1019,6 +1146,7 @@ napi_value NapiCallManager::RegisterCallManagerFunc(napi_env env, napi_value exp
     DeclareConferenceStateEnum(env, exports);
     DeclareCallStateToAppEnum(env, exports);
     DeclareCallEventEnumEx(env, exports);
+    DeclareCallSessionEventEnumEx(env, exports);
     DeclareRestrictionTypeEnum(env, exports);
     DeclareRestrictionModeEnum(env, exports);
     DeclareRestrictionStatusEnum(env, exports);
@@ -1163,6 +1291,38 @@ napi_value NapiCallManager::AnswerCall(napi_env env, napi_callback_info info)
     } else {
         napi_get_value_int32(env, argv[ARRAY_INDEX_FIRST], &answerAsyncContext->callId);
         napi_create_reference(env, argv[ARRAY_INDEX_SECOND], DATA_LENGTH_ONE, &(answerAsyncContext->callbackRef));
+    }
+
+    return HandleAsyncWork(
+        env, answerAsyncContext.release(), "AnswerCall", NativeAnswerCall, NativeVoidCallBackWithErrorCode);
+}
+
+napi_value NapiCallManager::AnswerVideoCall(napi_env env, napi_callback_info info)
+{
+    GET_PARAMS(env, info, THREE_VALUE_MAXIMUM_LIMIT);
+    if (!MatchAnswerCallParameter(env, argv, argc)) {
+        TELEPHONY_LOGE("MatchOneOptionalNumberParameter failed.");
+        NapiUtil::ThrowParameterError(env);
+        return nullptr;
+    }
+    auto answerAsyncContext = std::make_unique<AnswerAsyncContext>();
+    if (answerAsyncContext == nullptr) {
+        TELEPHONY_LOGE("answerAsyncContext is nullptr.");
+        NapiUtil::ThrowParameterError(env);
+        return nullptr;
+    }
+    if (argc == ZERO_VALUE) {
+        TELEPHONY_LOGI("no param input");
+    } else if (argc == ONLY_ONE_VALUE) {
+        napi_get_value_int32(env, argv[ARRAY_INDEX_FIRST], &answerAsyncContext->videoState);
+    } else if (argc == TWO_VALUE_LIMIT) {
+        if (NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_SECOND], napi_function)) {
+            napi_get_value_int32(env, argv[ARRAY_INDEX_FIRST], &answerAsyncContext->videoState);
+            napi_create_reference(env, argv[ARRAY_INDEX_SECOND], DATA_LENGTH_ONE, &(answerAsyncContext->callbackRef));
+        } else {
+            napi_get_value_int32(env, argv[ARRAY_INDEX_FIRST], &answerAsyncContext->videoState);
+            napi_get_value_int32(env, argv[ARRAY_INDEX_SECOND], &answerAsyncContext->callId);
+        }
     }
 
     return HandleAsyncWork(
@@ -1487,6 +1647,25 @@ bool NapiCallManager::MatchOneOptionalNumberParameter(
                    NapiUtil::MatchParameters(env, parameters, { napi_undefined });
         case TWO_VALUE_LIMIT:
             return NapiUtil::MatchParameters(env, parameters, { napi_number, napi_function });
+        default:
+            return false;
+    }
+}
+
+bool NapiCallManager::MatchAnswerCallParameter(
+    napi_env env, const napi_value parameters[], const size_t parameterCount)
+{
+    TELEPHONY_LOGI("Telephony_CallManager MatchAnswerParameters %{public}zu", parameterCount);
+    switch (parameterCount) {
+        case ZERO_VALUE:
+            return true;
+        case ONLY_ONE_VALUE:
+            return NapiUtil::MatchParameters(env, parameters, { napi_number });
+        case TWO_VALUE_LIMIT:
+            return NapiUtil::MatchParameters(env, parameters, { napi_number, napi_number }) ||
+                   NapiUtil::MatchParameters(env, parameters, { napi_number, napi_function});
+        case THREE_VALUE_MAXIMUM_LIMIT:
+            return NapiUtil::MatchParameters(env, parameters, { napi_number, napi_number, napi_function });
         default:
             return false;
     }
@@ -2329,9 +2508,28 @@ napi_value NapiCallManager::ObserverOn(napi_env env, napi_callback_info info)
         TELEPHONY_LOGI("result == %{public}d", result);
     } else if (tmpStr == "postDialDelay") {
         DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->RegisterPostDialDelay(stateCallback);
+    } else {
+        RegisterImsVideoCallFuncCallback(tmpStr, stateCallback);
     }
     napi_value result = nullptr;
     return result;
+}
+
+void NapiCallManager::RegisterImsVideoCallFuncCallback(std::string tmpStr, EventCallback stateCallback)
+{
+    if (tmpStr == "imsCallModeChange") {
+        DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->RegisterImsCallModeChangeCallback(stateCallback);
+    } else if (tmpStr == "callSessionEventChange") {
+        DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->RegisterCallSessionEventChangeCallback(
+            stateCallback);
+    } else if (tmpStr == "peerDimensionsChange") {
+        DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->RegisterPeerDimensionsChangeCallback(stateCallback);
+    } else if (tmpStr == "callDataUsageChange") {
+        DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->RegisterCallDataUsageChangeCallback(stateCallback);
+    } else if (tmpStr == "cameraCapabilitiesChange") {
+        DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->RegisterCameraCapabilitiesChangeCallback(
+            stateCallback);
+    }
 }
 
 napi_value NapiCallManager::ObserverOff(napi_env env, napi_callback_info info)
@@ -2363,6 +2561,16 @@ napi_value NapiCallManager::ObserverOff(napi_env env, napi_callback_info info)
     napi_get_value_string_utf8(env, argv[ARRAY_INDEX_FIRST], listenerType, PHONE_NUMBER_MAXIMUM_LIMIT, &strLength);
     std::string tmpStr = listenerType;
     TELEPHONY_LOGI("listenerType == %{public}s", tmpStr.c_str());
+    UnRegisterCallbackWithListenerType(tmpStr);
+    if (argc == TWO_VALUE_LIMIT) {
+        napi_create_reference(env, argv[ARRAY_INDEX_SECOND], DATA_LENGTH_ONE, &(asyncContext->callbackRef));
+    }
+    return HandleAsyncWork(
+        env, asyncContext.release(), "Off", [](napi_env env, void *data) {}, NativeOffCallBack);
+}
+
+void NapiCallManager::UnRegisterCallbackWithListenerType(std::string tmpStr)
+{
     if (tmpStr == "callDetailsChange") {
         DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->UnRegisterCallStateCallback();
     } else if (tmpStr == "callEventChange") {
@@ -2377,12 +2585,17 @@ napi_value NapiCallManager::ObserverOff(napi_env env, napi_callback_info info)
         DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->UnRegisterAudioDeviceCallback();
     } else if (tmpStr == "postDialDelay") {
         DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->UnRegisterPostDialDelayCallback();
+    } else if (tmpStr == "imsCallModeChange") {
+        DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->UnRegisterImsCallModeChangeCallback();
+    } else if (tmpStr == "callSessionEventChange") {
+        DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->UnRegisterCallSessionEventChangeCallback();
+    } else if (tmpStr == "peerDimensionsChange") {
+        DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->UnRegisterPeerDimensionsChangeCallback();
+    } else if (tmpStr == "callDataUsageChange") {
+        DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->UnRegisterCallDataUsageChangeCallback();
+    } else if (tmpStr == "cameraCapabilitiesChange") {
+        DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->UnRegisterCameraCapabilitiesChangeCallback();
     }
-    if (argc == TWO_VALUE_LIMIT) {
-        napi_create_reference(env, argv[ARRAY_INDEX_SECOND], DATA_LENGTH_ONE, &(asyncContext->callbackRef));
-    }
-    return HandleAsyncWork(
-        env, asyncContext.release(), "Off", [](napi_env env, void *data) {}, NativeOffCallBack);
 }
 
 napi_value NapiCallManager::SetMuted(napi_env env, napi_callback_info info)
@@ -2473,11 +2686,12 @@ napi_value NapiCallManager::SetAudioDevice(napi_env env, napi_callback_info info
 
 napi_value NapiCallManager::ControlCamera(napi_env env, napi_callback_info info)
 {
-    GET_PARAMS(env, info, VALUE_MAXIMUM_LIMIT);
-    NAPI_ASSERT(env, argc < VALUE_MAXIMUM_LIMIT, "parameter error!");
-    bool matchFlag = NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_FIRST], napi_string);
-    NAPI_ASSERT(env, matchFlag, "ControlCamera type error, should be string type");
-
+    GET_PARAMS(env, info, THREE_VALUE_MAXIMUM_LIMIT);
+    if (!MatchNumberAndStringParameters(env, argv, argc)) {
+        TELEPHONY_LOGE("NapiCallManager::ControlCamera MatchNumberAndStringParameters failed.");
+        NapiUtil::ThrowParameterError(env);
+        return nullptr;
+    }
     auto asyncContext = std::make_unique<VideoAsyncContext>();
     if (asyncContext == nullptr) {
         std::string errorCode = std::to_string(napi_generic_failure);
@@ -2485,9 +2699,10 @@ napi_value NapiCallManager::ControlCamera(napi_env env, napi_callback_info info)
         NAPI_CALL(env, napi_throw_error(env, errorCode.c_str(), errorMessage.c_str()));
         return nullptr;
     }
+    napi_get_value_int32(env, argv[ARRAY_INDEX_FIRST], &asyncContext->callId);
     char tmpStr[kMaxNumberLen + 1] = {0};
     size_t strLen = 0;
-    napi_get_value_string_utf8(env, argv[ARRAY_INDEX_FIRST], tmpStr, PHONE_NUMBER_MAXIMUM_LIMIT, &strLen);
+    napi_get_value_string_utf8(env, argv[ARRAY_INDEX_SECOND], tmpStr, PHONE_NUMBER_MAXIMUM_LIMIT, &strLen);
     std::string tmpCode(tmpStr, strLen);
     asyncContext->cameraId = tmpCode;
     if (argc == TWO_VALUE_LIMIT) {
@@ -2498,10 +2713,12 @@ napi_value NapiCallManager::ControlCamera(napi_env env, napi_callback_info info)
 
 napi_value NapiCallManager::SetPreviewWindow(napi_env env, napi_callback_info info)
 {
-    GET_PARAMS(env, info, VALUE_MAXIMUM_LIMIT);
-    NAPI_ASSERT(env, argc < VALUE_MAXIMUM_LIMIT, "parameter error!");
-    bool matchFlag = NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_FIRST], napi_object);
-    NAPI_ASSERT(env, matchFlag, "SetPreviewWindow type error, should be object type");
+    GET_PARAMS(env, info, THREE_VALUE_MAXIMUM_LIMIT);
+    if (!MatchNumberAndStringParameters(env, argv, argc)) {
+        TELEPHONY_LOGE("NapiCallManager::ControlCamera MatchNumberAndStringParameters failed.");
+        NapiUtil::ThrowParameterError(env);
+        return nullptr;
+    }
 
     auto previwWindowContext = std::make_unique<VideoAsyncContext>();
     if (previwWindowContext == nullptr) {
@@ -2510,24 +2727,27 @@ napi_value NapiCallManager::SetPreviewWindow(napi_env env, napi_callback_info in
         NAPI_CALL(env, napi_throw_error(env, errorCode.c_str(), errorMessage.c_str()));
         return nullptr;
     }
-    previwWindowContext->x = NapiCallManagerUtils::GetIntProperty(env, argv[ARRAY_INDEX_FIRST], "x");
-    previwWindowContext->y = NapiCallManagerUtils::GetIntProperty(env, argv[ARRAY_INDEX_FIRST], "y");
-    previwWindowContext->z = NapiCallManagerUtils::GetIntProperty(env, argv[ARRAY_INDEX_FIRST], "z");
-    previwWindowContext->width = NapiCallManagerUtils::GetIntProperty(env, argv[ARRAY_INDEX_FIRST], "width");
-    previwWindowContext->height = NapiCallManagerUtils::GetIntProperty(env, argv[ARRAY_INDEX_FIRST], "height");
+    napi_get_value_int32(env, argv[ARRAY_INDEX_FIRST], &previwWindowContext->callId);
+    char tmpStr[kMaxNumberLen + 1] = { 0 };
+    size_t strLen = 0;
+    napi_get_value_string_utf8(env, argv[ARRAY_INDEX_SECOND], tmpStr, MESSAGE_CONTENT_MAXIMUM_LIMIT, &strLen);
+    std::string tmpCode(tmpStr, strLen);
+    previwWindowContext->surfaceId = tmpCode;
     if (argc == TWO_VALUE_LIMIT) {
         napi_create_reference(env, argv[ARRAY_INDEX_SECOND], DATA_LENGTH_ONE, &(previwWindowContext->callbackRef));
     }
-    return HandleAsyncWork(
-        env, previwWindowContext.release(), "SetPreviewWindow", NativeSetPreviewWindow, NativeVoidCallBack);
+    return HandleAsyncWork(env, previwWindowContext.release(), "SetPreviewWindow", NativeSetPreviewWindow,
+        NativeVoidCallBackWithErrorCode);
 }
 
 napi_value NapiCallManager::SetDisplayWindow(napi_env env, napi_callback_info info)
 {
-    GET_PARAMS(env, info, VALUE_MAXIMUM_LIMIT);
-    NAPI_ASSERT(env, argc < VALUE_MAXIMUM_LIMIT, "parameter error!");
-    bool matchFlag = NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_FIRST], napi_object);
-    NAPI_ASSERT(env, matchFlag, "SetDisplayWindow type error, should be object type");
+    GET_PARAMS(env, info, THREE_VALUE_MAXIMUM_LIMIT);
+    if (!MatchNumberAndStringParameters(env, argv, argc)) {
+        TELEPHONY_LOGE("NapiCallManager::ControlCamera MatchNumberAndStringParameters failed.");
+        NapiUtil::ThrowParameterError(env);
+        return nullptr;
+    }
 
     auto dislpayWindowContext = std::make_unique<VideoAsyncContext>();
     if (dislpayWindowContext == nullptr) {
@@ -2536,16 +2756,17 @@ napi_value NapiCallManager::SetDisplayWindow(napi_env env, napi_callback_info in
         NAPI_CALL(env, napi_throw_error(env, errorCode.c_str(), errorMessage.c_str()));
         return nullptr;
     }
-    dislpayWindowContext->x = NapiCallManagerUtils::GetIntProperty(env, argv[ARRAY_INDEX_FIRST], "x");
-    dislpayWindowContext->y = NapiCallManagerUtils::GetIntProperty(env, argv[ARRAY_INDEX_FIRST], "y");
-    dislpayWindowContext->z = NapiCallManagerUtils::GetIntProperty(env, argv[ARRAY_INDEX_FIRST], "z");
-    dislpayWindowContext->width = NapiCallManagerUtils::GetIntProperty(env, argv[ARRAY_INDEX_FIRST], "width");
-    dislpayWindowContext->height = NapiCallManagerUtils::GetIntProperty(env, argv[ARRAY_INDEX_FIRST], "height");
+    napi_get_value_int32(env, argv[ARRAY_INDEX_FIRST], &dislpayWindowContext->callId);
+    char tmpStr[kMaxNumberLen + 1] = { 0 };
+    size_t strLen = 0;
+    napi_get_value_string_utf8(env, argv[ARRAY_INDEX_SECOND], tmpStr, MESSAGE_CONTENT_MAXIMUM_LIMIT, &strLen);
+    std::string tmpCode(tmpStr, strLen);
+    dislpayWindowContext->surfaceId = tmpCode;
     if (argc == TWO_VALUE_LIMIT) {
         napi_create_reference(env, argv[ARRAY_INDEX_SECOND], DATA_LENGTH_ONE, &(dislpayWindowContext->callbackRef));
     }
-    return HandleAsyncWork(
-        env, dislpayWindowContext.release(), "SetDisplayWindow", NativeSetDisplayWindow, NativeVoidCallBack);
+    return HandleAsyncWork(env, dislpayWindowContext.release(), "SetDisplayWindow", NativeSetDisplayWindow,
+        NativeVoidCallBackWithErrorCode);
 }
 
 napi_value NapiCallManager::SetCameraZoom(napi_env env, napi_callback_info info)
@@ -2571,11 +2792,13 @@ napi_value NapiCallManager::SetCameraZoom(napi_env env, napi_callback_info info)
 
 napi_value NapiCallManager::SetPausePicture(napi_env env, napi_callback_info info)
 {
-    GET_PARAMS(env, info, VALUE_MAXIMUM_LIMIT);
-    NAPI_ASSERT(env, argc <= VALUE_MAXIMUM_LIMIT, "parameter error!");
-    bool matchFlag = NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_FIRST], napi_string);
-    NAPI_ASSERT(env, matchFlag, "SetPausePicture type error, should be string type");
-    size_t result = 0;
+    GET_PARAMS(env, info, THREE_VALUE_MAXIMUM_LIMIT);
+    if (!MatchNumberAndStringParameters(env, argv, argc)) {
+        TELEPHONY_LOGE("NapiCallManager::ControlCamera MatchNumberAndStringParameters failed.");
+        NapiUtil::ThrowParameterError(env);
+        return nullptr;
+    }
+
     auto asyncContext = std::make_unique<VideoAsyncContext>();
     if (asyncContext == nullptr) {
         std::string errorCode = std::to_string(napi_generic_failure);
@@ -2583,7 +2806,12 @@ napi_value NapiCallManager::SetPausePicture(napi_env env, napi_callback_info inf
         NAPI_CALL(env, napi_throw_error(env, errorCode.c_str(), errorMessage.c_str()));
         return nullptr;
     }
-    napi_get_value_string_utf8(env, argv[ARRAY_INDEX_FIRST], asyncContext->path, PHONE_NUMBER_MAXIMUM_LIMIT, &result);
+    napi_get_value_int32(env, argv[ARRAY_INDEX_FIRST], &asyncContext->callId);
+    char tmpStr[kMaxNumberLen + 1] = {0};
+    size_t strLen = 0;
+    napi_get_value_string_utf8(env, argv[ARRAY_INDEX_SECOND], tmpStr, MESSAGE_CONTENT_MAXIMUM_LIMIT, &strLen);
+    std::string tmpCode(tmpStr, strLen);
+    asyncContext->picturePath = tmpCode;
     if (argc == TWO_VALUE_LIMIT) {
         napi_create_reference(env, argv[ARRAY_INDEX_SECOND], DATA_LENGTH_ONE, &(asyncContext->callbackRef));
     }
@@ -2592,10 +2820,13 @@ napi_value NapiCallManager::SetPausePicture(napi_env env, napi_callback_info inf
 
 napi_value NapiCallManager::SetDeviceDirection(napi_env env, napi_callback_info info)
 {
-    GET_PARAMS(env, info, VALUE_MAXIMUM_LIMIT);
-    NAPI_ASSERT(env, argc < VALUE_MAXIMUM_LIMIT, "parameter error!");
-    bool matchFlag = NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_FIRST], napi_number);
-    NAPI_ASSERT(env, matchFlag, "SetDeviceDirection type error, should be number type");
+    GET_PARAMS(env, info, THREE_VALUE_MAXIMUM_LIMIT);
+    if (!MatchTwoNumberParameters(env, argv, argc)) {
+        TELEPHONY_LOGE("NapiCallManager::SetDeviceDirection MatchTwoNumberParameters failed.");
+        NapiUtil::ThrowParameterError(env);
+        return nullptr;
+    }
+
     auto asyncContext = std::make_unique<VideoAsyncContext>();
     if (asyncContext == nullptr) {
         std::string errorCode = std::to_string(napi_generic_failure);
@@ -2603,12 +2834,57 @@ napi_value NapiCallManager::SetDeviceDirection(napi_env env, napi_callback_info 
         NAPI_CALL(env, napi_throw_error(env, errorCode.c_str(), errorMessage.c_str()));
         return nullptr;
     }
-    napi_get_value_int32(env, argv[ARRAY_INDEX_FIRST], &asyncContext->rotation);
+    napi_get_value_int32(env, argv[ARRAY_INDEX_FIRST], &asyncContext->callId);
+    napi_get_value_int32(env, argv[ARRAY_INDEX_SECOND], &asyncContext->rotation);
     if (argc == TWO_VALUE_LIMIT) {
         napi_create_reference(env, argv[ARRAY_INDEX_SECOND], DATA_LENGTH_ONE, &(asyncContext->callbackRef));
     }
     return HandleAsyncWork(
         env, asyncContext.release(), "SetDeviceDirection", NativeSetDeviceDirection, NativeVoidCallBack);
+}
+
+napi_value NapiCallManager::RequestCameraCapabilities(napi_env env, napi_callback_info info)
+{
+    GET_PARAMS(env, info, TWO_VALUE_LIMIT);
+    if (!MatchOneNumberParameter(env, argv, argc)) {
+        TELEPHONY_LOGE("NapiCallManager::RequestCameraCapabilities MatchOneNumberParameter failed.");
+        NapiUtil::ThrowParameterError(env);
+        return nullptr;
+    }
+    auto asyncContext = std::make_unique<AsyncContext>();
+    if (asyncContext == nullptr) {
+        TELEPHONY_LOGE("NapiCallManager::RequestCameraCapabilities asyncContext is nullptr.");
+        NapiUtil::ThrowParameterError(env);
+        return nullptr;
+    }
+    napi_get_value_int32(env, argv[ARRAY_INDEX_FIRST], &asyncContext->callId);
+    if (argc == TWO_VALUE_LIMIT) {
+        napi_create_reference(env, argv[ARRAY_INDEX_SECOND], DATA_LENGTH_ONE, &(asyncContext->callbackRef));
+    }
+    return HandleAsyncWork(env, asyncContext.release(), "RequestCameraCapabilities",
+        NativeRequestCameraCapabilities, NativeVoidCallBackWithErrorCode);
+}
+
+napi_value NapiCallManager::CancelCallUpgrade(napi_env env, napi_callback_info info)
+{
+    GET_PARAMS(env, info, TWO_VALUE_LIMIT);
+    if (!MatchOneNumberParameter(env, argv, argc)) {
+        TELEPHONY_LOGE("NapiCallManager::CancelCallUpgrade MatchOneNumberParameter failed.");
+        NapiUtil::ThrowParameterError(env);
+        return nullptr;
+    }
+    auto asyncContext = std::make_unique<AsyncContext>();
+    if (asyncContext == nullptr) {
+        TELEPHONY_LOGE("NapiCallManager::CancelCallUpgrade asyncContext is nullptr.");
+        NapiUtil::ThrowParameterError(env);
+        return nullptr;
+    }
+    napi_get_value_int32(env, argv[ARRAY_INDEX_FIRST], &asyncContext->callId);
+    if (argc == TWO_VALUE_LIMIT) {
+        napi_create_reference(env, argv[ARRAY_INDEX_SECOND], DATA_LENGTH_ONE, &(asyncContext->callbackRef));
+    }
+    return HandleAsyncWork(env, asyncContext.release(), "CancelCallUpgrade", NativeCancelCallUpgrade,
+        NativeVoidCallBackWithErrorCode);
 }
 
 napi_value NapiCallManager::SetCallPreferenceMode(napi_env env, napi_callback_info info)
@@ -4505,6 +4781,21 @@ void NapiCallManager::NativeSetAudioDevice(napi_env env, void *data)
     }
 }
 
+void NapiCallManager::NativeUpdateImsCallMode(napi_env env, void *data)
+{
+    if (data == nullptr) {
+        TELEPHONY_LOGE("NapiCallManager::NativeUpdateImsCallMode data is nullptr");
+        NapiUtil::ThrowParameterError(env);
+        return;
+    }
+    auto asyncContext = (SupplementAsyncContext *)data;
+    asyncContext->errorCode = DelayedSingleton<CallManagerClient>::GetInstance()->UpdateImsCallMode(
+        asyncContext->callId, (ImsCallMode)asyncContext->type);
+    if (asyncContext->errorCode == TELEPHONY_SUCCESS) {
+        asyncContext->resolved = TELEPHONY_SUCCESS;
+    }
+}
+
 void NapiCallManager::NativeControlCamera(napi_env env, void *data)
 {
     if (data == nullptr) {
@@ -4512,8 +4803,11 @@ void NapiCallManager::NativeControlCamera(napi_env env, void *data)
         return;
     }
     auto asyncContext = (VideoAsyncContext *)data;
-    asyncContext->resolved =
-        DelayedSingleton<CallManagerClient>::GetInstance()->ControlCamera(Str8ToStr16(asyncContext->cameraId));
+    asyncContext->resolved = DelayedSingleton<CallManagerClient>::GetInstance()->ControlCamera(
+        asyncContext->callId, Str8ToStr16(asyncContext->cameraId));
+    if (asyncContext->errorCode == TELEPHONY_SUCCESS) {
+        asyncContext->resolved = TELEPHONY_SUCCESS;
+    }
 }
 
 void NapiCallManager::NativeSetPreviewWindow(napi_env env, void *data)
@@ -4522,15 +4816,13 @@ void NapiCallManager::NativeSetPreviewWindow(napi_env env, void *data)
         TELEPHONY_LOGE("data is nullptr");
         return;
     }
-
     auto asyncContext = (VideoAsyncContext *)data;
-    VideoWindow previewWindow;
-    previewWindow.x = asyncContext->x;
-    previewWindow.y = asyncContext->y;
-    previewWindow.z = asyncContext->z;
-    previewWindow.width = asyncContext->width;
-    previewWindow.height = asyncContext->height;
-    asyncContext->resolved = DelayedSingleton<CallManagerClient>::GetInstance()->SetPreviewWindow(previewWindow);
+    TELEPHONY_LOGI("surfaceId: %{public}s", asyncContext->surfaceId.c_str());
+    asyncContext->errorCode = DelayedSingleton<CallManagerClient>::GetInstance()->SetPreviewWindow(
+        asyncContext->callId, asyncContext->surfaceId);
+    if (asyncContext->errorCode == TELEPHONY_SUCCESS) {
+        asyncContext->resolved = TELEPHONY_SUCCESS;
+    }
 }
 
 void NapiCallManager::NativeSetDisplayWindow(napi_env env, void *data)
@@ -4539,15 +4831,13 @@ void NapiCallManager::NativeSetDisplayWindow(napi_env env, void *data)
         TELEPHONY_LOGE("data is nullptr");
         return;
     }
-
     auto asyncContext = (VideoAsyncContext *)data;
-    VideoWindow displayWindow;
-    displayWindow.x = asyncContext->x;
-    displayWindow.y = asyncContext->y;
-    displayWindow.z = asyncContext->z;
-    displayWindow.width = asyncContext->width;
-    displayWindow.height = asyncContext->height;
-    asyncContext->resolved = DelayedSingleton<CallManagerClient>::GetInstance()->SetDisplayWindow(displayWindow);
+    TELEPHONY_LOGI("surfaceId: %{public}s", asyncContext->surfaceId.c_str());
+    asyncContext->errorCode = DelayedSingleton<CallManagerClient>::GetInstance()->SetDisplayWindow(
+        asyncContext->callId, asyncContext->surfaceId);
+    if (asyncContext->errorCode == TELEPHONY_SUCCESS) {
+        asyncContext->resolved = TELEPHONY_SUCCESS;
+    }
 }
 
 void NapiCallManager::NativeSetCameraZoom(napi_env env, void *data)
@@ -4568,7 +4858,11 @@ void NapiCallManager::NativeSetPausePicture(napi_env env, void *data)
     }
     auto asyncContext = (VideoAsyncContext *)data;
     asyncContext->resolved =
-        DelayedSingleton<CallManagerClient>::GetInstance()->SetPausePicture(Str8ToStr16(asyncContext->path));
+        DelayedSingleton<CallManagerClient>::GetInstance()->SetPausePicture(
+            asyncContext->callId, Str8ToStr16(asyncContext->path));
+    if (asyncContext->errorCode == TELEPHONY_SUCCESS) {
+        asyncContext->resolved = TELEPHONY_SUCCESS;
+    }
 }
 
 void NapiCallManager::NativeSetDeviceDirection(napi_env env, void *data)
@@ -4579,7 +4873,40 @@ void NapiCallManager::NativeSetDeviceDirection(napi_env env, void *data)
     }
     auto asyncContext = (VideoAsyncContext *)data;
     asyncContext->resolved =
-        DelayedSingleton<CallManagerClient>::GetInstance()->SetDeviceDirection(asyncContext->rotation);
+        DelayedSingleton<CallManagerClient>::GetInstance()->SetDeviceDirection(
+            asyncContext->callId, asyncContext->rotation);
+    if (asyncContext->errorCode == TELEPHONY_SUCCESS) {
+        asyncContext->resolved = TELEPHONY_SUCCESS;
+    }
+}
+
+void NapiCallManager::NativeRequestCameraCapabilities(napi_env env, void *data)
+{
+    if (data == nullptr) {
+        TELEPHONY_LOGE("data is nullptr");
+        return;
+    }
+    auto asyncContext = (AsyncContext *)data;
+    asyncContext->resolved =
+        DelayedSingleton<CallManagerClient>::GetInstance()->RequestCameraCapabilities(asyncContext->callId);
+    if (asyncContext->errorCode == TELEPHONY_SUCCESS) {
+        asyncContext->resolved = TELEPHONY_SUCCESS;
+    }
+}
+
+void NapiCallManager::NativeCancelCallUpgrade(napi_env env, void *data)
+{
+    if (data == nullptr) {
+        TELEPHONY_LOGE("NapiCallManager::NativeCancelCallUpgrade data is nullptr");
+        NapiUtil::ThrowParameterError(env);
+        return;
+    }
+    auto asyncContext = (AsyncContext *)data;
+    asyncContext->errorCode =
+        DelayedSingleton<CallManagerClient>::GetInstance()->CancelCallUpgrade(asyncContext->callId);
+    if (asyncContext->errorCode == TELEPHONY_SUCCESS) {
+        asyncContext->resolved = TELEPHONY_SUCCESS;
+    }
 }
 
 void NapiCallManager::NativeSetCallPreferenceMode(napi_env env, void *data)
@@ -4665,37 +4992,6 @@ void NapiCallManager::NativeJoinConference(napi_env env, void *data)
     if (asyncContext->errorCode == TELEPHONY_SUCCESS) {
         asyncContext->resolved = TELEPHONY_SUCCESS;
     }
-}
-
-void NapiCallManager::NativeUpdateImsCallMode(napi_env env, void *data)
-{
-    if (data == nullptr) {
-        TELEPHONY_LOGE("NapiCallManager::NativeUpdateImsCallMode data is nullptr");
-        NapiUtil::ThrowParameterError(env);
-        return;
-    }
-    auto asyncContext = (SupplementAsyncContext *)data;
-    EventCallback infoListener;
-    infoListener.env = asyncContext->env;
-    infoListener.thisVar = asyncContext->thisVar;
-    infoListener.callbackRef = asyncContext->callbackRef;
-    infoListener.deferred = asyncContext->deferred;
-    asyncContext->errorCode =
-        DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->RegisterUpdateCallMediaModeCallback(infoListener);
-    if (asyncContext->errorCode != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("RegisterUpdateCallMediaModeCallback failed!");
-        return;
-    }
-    asyncContext->errorCode = DelayedSingleton<CallManagerClient>::GetInstance()->UpdateImsCallMode(
-        asyncContext->callId, (ImsCallMode)asyncContext->type);
-    if (asyncContext->errorCode != TELEPHONY_SUCCESS) {
-        DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->UnRegisterUpdateCallMediaModeCallback();
-        TELEPHONY_LOGE("UnRegisterUpdateCallMediaModeCallback failed!");
-        return;
-    }
-    asyncContext->resolved = TELEPHONY_SUCCESS;
-    asyncContext->callbackRef = nullptr;
-    asyncContext->deferred = nullptr;
 }
 
 void NapiCallManager::NativeReportOttCallDetailsInfo(napi_env env, void *data)

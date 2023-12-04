@@ -445,40 +445,6 @@ void CallRequestProcess::KickOutFromConferenceRequest(int32_t callId)
     }
 }
 
-int32_t CallRequestProcess::UpdateImsCallMode(int32_t callId, ImsCallMode mode)
-{
-    int32_t ret = TELEPHONY_ERR_FAIL;
-    sptr<CallBase> call = GetOneCallObject(callId);
-    if (call == nullptr) {
-        TELEPHONY_LOGE("the call object is nullptr, callId:%{public}d", callId);
-        return ret;
-    }
-    // only netcall type support update call media mode
-    if (call->GetCallType() == CallType::TYPE_IMS) {
-        sptr<IMSCall> netCall = reinterpret_cast<IMSCall *>(call.GetRefPtr());
-        TELEPHONY_LOGI("ims call update media request");
-        ret = netCall->SendUpdateCallMediaModeRequest(mode);
-        if (ret != TELEPHONY_SUCCESS) {
-            TELEPHONY_LOGE("SendUpdateCallMediaModeRequest failed. %{public}d", ret);
-        }
-    } else {
-        TELEPHONY_LOGE("the call object not support upgrade/downgrad media, callId:%{public}d", callId);
-    }
-    return ret;
-}
-
-void CallRequestProcess::UpdateCallMediaModeRequest(int32_t callId, ImsCallMode mode)
-{
-    int32_t ret = TELEPHONY_ERR_FAIL;
-    AppExecFwk::PacMap resultInfo;
-    ret = UpdateImsCallMode(callId, mode);
-    if (ret != TELEPHONY_SUCCESS) {
-        resultInfo.PutIntValue("result", ret);
-        DelayedSingleton<CallAbilityReportProxy>::GetInstance()->ReportAsyncResults(
-            CallResultReportId::UPDATE_MEDIA_MODE_REPORT_ID, resultInfo);
-    }
-}
-
 void CallRequestProcess::StartRttRequest(int32_t callId, std::u16string &msg)
 {
     sptr<CallBase> call = GetOneCallObject(callId);

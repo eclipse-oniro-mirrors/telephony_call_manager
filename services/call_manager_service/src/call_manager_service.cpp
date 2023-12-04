@@ -30,6 +30,7 @@
 #include "report_call_info_handler.h"
 #include "telephony_log_wrapper.h"
 #include "telephony_permission.h"
+#include "video_control_manager.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -784,33 +785,60 @@ int32_t CallManagerService::SetAudioDevice(const AudioDevice &audioDevice)
     }
 }
 
-int32_t CallManagerService::ControlCamera(std::u16string cameraId)
+int32_t CallManagerService::ControlCamera(int32_t callId, std::u16string &cameraId)
 {
-    if (callControlManagerPtr_ != nullptr) {
-        return callControlManagerPtr_->ControlCamera(
-            cameraId, IPCSkeleton::GetCallingUid(), IPCSkeleton::GetCallingPid());
-    } else {
-        TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");
+    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
+        TELEPHONY_LOGE("Non-system applications use system APIs!");
+        return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
+    }
+    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_SET_TELEPHONY_STATE)) {
+        TELEPHONY_LOGE("Permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
+    auto videoControlManager = DelayedSingleton<VideoControlManager>::GetInstance();
+    if (videoControlManager != nullptr) {
+        return videoControlManager->ControlCamera(
+            callId, cameraId, IPCSkeleton::GetCallingUid(), IPCSkeleton::GetCallingPid());
+    }  else {
+        TELEPHONY_LOGE("videoControlManager is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
 }
 
-int32_t CallManagerService::SetPreviewWindow(VideoWindow &window)
+int32_t CallManagerService::SetPreviewWindow(int32_t callId, std::string &surfaceId, sptr<Surface> surface)
 {
-    if (callControlManagerPtr_ != nullptr) {
-        return callControlManagerPtr_->SetPreviewWindow(window);
+    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
+        TELEPHONY_LOGE("Non-system applications use system APIs!");
+        return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
+    }
+    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_SET_TELEPHONY_STATE)) {
+        TELEPHONY_LOGE("Permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
+    auto videoControlManager = DelayedSingleton<VideoControlManager>::GetInstance();
+    if (videoControlManager != nullptr) {
+        return videoControlManager->SetPreviewWindow(callId, surfaceId, surface);
     } else {
-        TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");
+        TELEPHONY_LOGE("videoControlManager is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
 }
 
-int32_t CallManagerService::SetDisplayWindow(VideoWindow &window)
+int32_t CallManagerService::SetDisplayWindow(int32_t callId, std::string &surfaceId, sptr<Surface> surface)
 {
-    if (callControlManagerPtr_ != nullptr) {
-        return callControlManagerPtr_->SetDisplayWindow(window);
+    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
+        TELEPHONY_LOGE("Non-system applications use system APIs!");
+        return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
+    }
+    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_SET_TELEPHONY_STATE)) {
+        TELEPHONY_LOGE("Permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
+    auto videoControlManager = DelayedSingleton<VideoControlManager>::GetInstance();
+    if (videoControlManager != nullptr) {
+        return videoControlManager->SetDisplayWindow(callId, surfaceId, surface);
     } else {
-        TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");
+        TELEPHONY_LOGE("videoControlManager is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
 }
@@ -825,22 +853,40 @@ int32_t CallManagerService::SetCameraZoom(float zoomRatio)
     }
 }
 
-int32_t CallManagerService::SetPausePicture(std::u16string path)
+int32_t CallManagerService::SetPausePicture(int32_t callId, std::u16string &path)
 {
-    if (callControlManagerPtr_ != nullptr) {
-        return callControlManagerPtr_->SetPausePicture(path);
+    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
+        TELEPHONY_LOGE("Non-system applications use system APIs!");
+        return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
+    }
+    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_SET_TELEPHONY_STATE)) {
+        TELEPHONY_LOGE("Permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
+    auto videoControlManager = DelayedSingleton<VideoControlManager>::GetInstance();
+    if (videoControlManager != nullptr) {
+        return videoControlManager->SetPausePicture(callId, path);
     } else {
-        TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");
+        TELEPHONY_LOGE("videoControlManager is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
 }
 
-int32_t CallManagerService::SetDeviceDirection(int32_t rotation)
+int32_t CallManagerService::SetDeviceDirection(int32_t callId, int32_t rotation)
 {
-    if (callControlManagerPtr_ != nullptr) {
-        return callControlManagerPtr_->SetDeviceDirection(rotation);
+    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
+        TELEPHONY_LOGE("Non-system applications use system APIs!");
+        return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
+    }
+    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_SET_TELEPHONY_STATE)) {
+        TELEPHONY_LOGE("Permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
+    auto videoControlManager = DelayedSingleton<VideoControlManager>::GetInstance();
+    if (videoControlManager != nullptr) {
+        return videoControlManager->SetDeviceDirection(callId, rotation);
     } else {
-        TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");
+        TELEPHONY_LOGE("videoControlManager is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
 }
@@ -975,10 +1021,15 @@ int32_t CallManagerService::UpdateImsCallMode(int32_t callId, ImsCallMode mode)
         TELEPHONY_LOGE("Non-system applications use system APIs!");
         return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
     }
-    if (callControlManagerPtr_ != nullptr) {
-        return callControlManagerPtr_->UpdateImsCallMode(callId, mode);
+    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_SET_TELEPHONY_STATE)) {
+        TELEPHONY_LOGE("Permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
+    auto videoControlManager = DelayedSingleton<VideoControlManager>::GetInstance();
+    if (videoControlManager != nullptr) {
+        return videoControlManager->UpdateImsCallMode(callId, mode);
     } else {
-        TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");
+        TELEPHONY_LOGE("videoControlManager is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
 }
@@ -1274,6 +1325,44 @@ int32_t CallManagerService::ReportAudioDeviceInfo()
         return TELEPHONY_ERR_PERMISSION_ERR;
     }
     return DelayedSingleton<AudioDeviceManager>::GetInstance()->ReportAudioDeviceChange();
+}
+
+int32_t CallManagerService::CancelCallUpgrade(int32_t callId)
+{
+    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
+        TELEPHONY_LOGE("Non-system applications use system APIs!");
+        return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
+    }
+    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_PLACE_CALL)) {
+        TELEPHONY_LOGE("Permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
+    auto videoControlManager = DelayedSingleton<VideoControlManager>::GetInstance();
+    if (videoControlManager != nullptr) {
+        return DelayedSingleton<VideoControlManager>::GetInstance()->CancelCallUpgrade(callId);
+    } else {
+        TELEPHONY_LOGE("videoControlManager is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+}
+
+int32_t CallManagerService::RequestCameraCapabilities(int32_t callId)
+{
+    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
+        TELEPHONY_LOGE("Non-system applications use system APIs!");
+        return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
+    }
+    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_GET_TELEPHONY_STATE)) {
+        TELEPHONY_LOGE("Permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
+    auto videoControlManager = DelayedSingleton<VideoControlManager>::GetInstance();
+    if (videoControlManager != nullptr) {
+        return DelayedSingleton<VideoControlManager>::GetInstance()->RequestCameraCapabilities(callId);
+    } else {
+        TELEPHONY_LOGE("videoControlManager is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
 }
 } // namespace Telephony
 } // namespace OHOS

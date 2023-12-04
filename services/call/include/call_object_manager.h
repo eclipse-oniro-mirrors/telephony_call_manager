@@ -66,6 +66,7 @@ public:
     static sptr<CallBase> GetForegroundLiveCall();
     static std::vector<CallAttributeInfo> GetCarrierCallInfoList();
     int32_t DealFailDial(sptr<CallBase> call);
+    static bool HasVideoCall();
 
 protected:
     static std::condition_variable cv_;

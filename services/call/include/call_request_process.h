@@ -37,7 +37,6 @@ public:
     void CombineConferenceRequest(int32_t mainCallId);
     void SeparateConferenceRequest(int32_t callId);
     void KickOutFromConferenceRequest(int32_t callId);
-    void UpdateCallMediaModeRequest(int32_t callId, ImsCallMode mode);
     void StartRttRequest(int32_t callId, std::u16string &msg);
     void StopRttRequest(int32_t callId);
     void JoinConference(int32_t callId, std::vector<std::string> &numberList);
@@ -55,7 +54,6 @@ private:
     int32_t IsDialCallForDsda(DialParaInfo &info);
     int32_t VoiceMailDialProcess(DialParaInfo &info);
     int32_t OttDialProcess(DialParaInfo &info);
-    int32_t UpdateImsCallMode(int32_t callId, ImsCallMode mode);
     int32_t PackCellularCallInfo(DialParaInfo &info, CellularCallInfo &callInfo);
     bool IsFdnNumber(std::vector<std::u16string> fdnNumberList, std::string phoneNumber);
     int32_t UpdateCallReportInfo(const DialParaInfo &info, TelCallState state);

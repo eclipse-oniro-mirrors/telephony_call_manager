@@ -153,16 +153,13 @@ struct AudioAsyncContext : AsyncContext {
 };
 
 struct VideoAsyncContext : AsyncContext {
-    int32_t x = 0;
-    int32_t y = 0;
-    int32_t z = 0;
-    int32_t width = 0;
-    int32_t height = 0;
     double zoomRatio = 0;
     int32_t rotation = 0;
     int32_t callingUid = 0;
     int32_t callingPid = 0;
     std::string cameraId = "";
+    std::string surfaceId = "";
+    std::string picturePath = "";
     std::u16string callingPackage = u"";
     char path[kMaxNumberLen + 1] = { 0 };
 };
@@ -236,6 +233,31 @@ struct AudioDeviceWork {
 
 struct PostDialDelayWorker {
     std::string postDialStr;
+    EventCallback callback;
+};
+
+struct ImsCallModeInfoWorker {
+    CallMediaModeInfo callModeInfo;
+    EventCallback callback;
+};
+
+struct CallSessionEventWorker {
+    CallSessionEvent sessionEvent;
+    EventCallback callback;
+};
+
+struct PeerDimensionsWorker {
+    PeerDimensionsDetail peerDimensionsDetail;
+    EventCallback callback;
+};
+
+struct CallDataUsageWorker {
+    int64_t callDataUsage;
+    EventCallback callback;
+};
+
+struct CameraCapbilitiesWorker {
+    CameraCapabilities cameraCapabilities;
     EventCallback callback;
 };
 } // namespace Telephony

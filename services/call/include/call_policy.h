@@ -41,7 +41,7 @@ public:
     int32_t UnHoldCallPolicy(int32_t callId);
     int32_t HangUpPolicy(int32_t callId);
     int32_t SwitchCallPolicy(int32_t callId);
-    static int32_t UpdateCallMediaModePolicy(int32_t callId, ImsCallMode mode);
+    static int32_t VideoCallPolicy(int32_t callId);
     static int32_t StartRttPolicy(int32_t callId);
     static int32_t StopRttPolicy(int32_t callId);
     int32_t IsValidSlotId(int32_t slotId);
@@ -62,6 +62,8 @@ public:
     int32_t SetImsFeatureValuePolicy(int32_t slotId);
     static int32_t InviteToConferencePolicy(int32_t callId, std::vector<std::string> &numberList);
     int32_t CloseUnFinishedUssdPolicy(int32_t slotId);
+    bool IsSupportVideoCall(AppExecFwk::PacMap &extras);
+    int32_t CanDialMulityCall(AppExecFwk::PacMap &extras);
 
 private:
     uint16_t onlyTwoCall_ = 2;

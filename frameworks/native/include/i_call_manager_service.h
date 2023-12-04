@@ -21,6 +21,7 @@
 #include <vector>
 
 #include "iremote_broker.h"
+#include "surface.h"
 #include "pac_map.h"
 
 #include "call_manager_inner_type.h"
@@ -77,12 +78,12 @@ public:
     virtual int32_t GetMainCallId(int32_t callId, int32_t &mainCallId) = 0;
     virtual int32_t GetSubCallIdList(int32_t callId, std::vector<std::u16string> &callIdList) = 0;
     virtual int32_t GetCallIdListForConference(int32_t callId, std::vector<std::u16string> &callIdList) = 0;
-    virtual int32_t ControlCamera(std::u16string cameraId) = 0;
-    virtual int32_t SetPreviewWindow(VideoWindow &window) = 0;
-    virtual int32_t SetDisplayWindow(VideoWindow &window) = 0;
+    virtual int32_t ControlCamera(int32_t callId, std::u16string &cameraId) = 0;
+    virtual int32_t SetPreviewWindow(int32_t callId, std::string &surfaceId, sptr<Surface> surface) = 0;
+    virtual int32_t SetDisplayWindow(int32_t callId, std::string &surfaceId, sptr<Surface> surface) = 0;
     virtual int32_t SetCameraZoom(float zoomRatio) = 0;
-    virtual int32_t SetPausePicture(std::u16string path) = 0;
-    virtual int32_t SetDeviceDirection(int32_t rotation) = 0;
+    virtual int32_t SetPausePicture(int32_t callId, std::u16string &path) = 0;
+    virtual int32_t SetDeviceDirection(int32_t callId, int32_t rotation) = 0;
     virtual int32_t SetCallPreferenceMode(int32_t slotId, int32_t mode) = 0;
     virtual int32_t GetImsConfig(int32_t slotId, ImsConfigItem item) = 0;
     virtual int32_t SetImsConfig(int32_t slotId, ImsConfigItem item, std::u16string &value) = 0;
@@ -106,6 +107,8 @@ public:
     virtual int32_t GetVoIPCallState(int32_t &state) = 0;
     virtual sptr<IRemoteObject> GetProxyObjectPtr(CallManagerProxyType proxyType) = 0;
     virtual int32_t ReportAudioDeviceInfo() = 0;
+    virtual int32_t CancelCallUpgrade(int32_t callId) = 0;
+    virtual int32_t RequestCameraCapabilities(int32_t callId) = 0;
 
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"OHOS.Telephony.ICallManagerService");

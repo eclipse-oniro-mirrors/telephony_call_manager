@@ -50,6 +50,13 @@ static std::unordered_map<int32_t, const char *> eventNameMap_ = {
     { CALL_MANAGER_SET_VONR_STATE, "setVoNRState" },
     { CALL_MANAGER_GET_VONR_STATE, "getVoNRState" },
     { CALL_MANAGER_SET_VOIP_CALL_STATE, "setVoIPCallState" },
+    { CALL_MANAGER_CONTROL_CAMERA, "controlCamera" },
+    { CALL_MANAGER_SET_PREVIEW_WINDOW, "setPreviewWindow" },
+    { CALL_MANAGER_SET_DISPLAY_WINDOW, "setDisplayWindow" },
+    { CALL_MANAGER_SET_PAUSE_PICTURE, "setPausePicture" },
+    { CALL_MANAGER_SET_DEVICE_DIRECTION, "setDeviceDirection" },
+    { CALL_MANAGER_QUERY_CAMERA_CAPABILITIES, "queryCameraCapabilities" },
+    { CALL_MANAGER_CANCEL_CALL_UPGRADE, "cancelCallUpgrade" },
 };
 
 static std::unordered_map<int32_t, const char *> eventPermissionMap_ = {
@@ -75,7 +82,13 @@ static std::unordered_map<int32_t, const char *> eventPermissionMap_ = {
     { CALL_MANAGER_MUTE_RINGER, SET_TELEPHONY_STATE },
     { CALL_MANAGER_SET_VONR_STATE, SET_TELEPHONY_STATE },
     { CALL_MANAGER_GET_VONR_STATE, GET_TELEPHONY_STATE },
-    { CALL_MANAGER_SET_VONR_STATE, SET_TELEPHONY_STATE },
+    { CALL_MANAGER_CONTROL_CAMERA, SET_TELEPHONY_STATE },
+    { CALL_MANAGER_SET_PREVIEW_WINDOW, SET_TELEPHONY_STATE },
+    { CALL_MANAGER_SET_DISPLAY_WINDOW, SET_TELEPHONY_STATE },
+    { CALL_MANAGER_SET_PAUSE_PICTURE, SET_TELEPHONY_STATE },
+    { CALL_MANAGER_SET_DEVICE_DIRECTION, SET_TELEPHONY_STATE },
+    { CALL_MANAGER_QUERY_CAMERA_CAPABILITIES, GET_TELEPHONY_STATE },
+    { CALL_MANAGER_CANCEL_CALL_UPGRADE, PLACE_CALL },
 };
 
 std::string NapiCallManagerUtils::GetEventName(int32_t eventId)

@@ -206,7 +206,15 @@ public:
      * @param response[in], indicates the Call Media mode response information
      * @return Returns 0 on success, others on failure.
      */
-    int32_t ReceiveUpdateCallMediaModeResponse(const CallMediaModeResponse &response) override;
+    int32_t ReceiveUpdateCallMediaModeRequest(const CallModeReportInfo &response) override;
+
+    /**
+     * @brief update the result of ReceiveUpdateCallMediaMode
+     *
+     * @param response[in], indicates the Call Media mode response information
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t ReceiveUpdateCallMediaModeResponse(const CallModeReportInfo &response) override;
 
     /**
      * @brief update the result of invite to conference
@@ -267,6 +275,38 @@ public:
     int32_t ReportPostDialChar(const std::string &c) override;
 
     int32_t ReportPostDialDelay(const std::string &str) override;
+
+    /**
+     * @brief handle call session event changed
+     *
+     * @param eventOptions[in], call session event info
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t HandleCallSessionEventChanged(const CallSessionReportInfo &eventOptions) override;
+
+    /**
+     * @brief handle peer dimensions changed
+     *
+     * @param dimensionsDetail[in], peer dimensions info
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t HandlePeerDimensionsChanged(const PeerDimensionsReportInfo &dimensionsDetail) override;
+
+    /**
+     * @brief handle call data usage changed
+     *
+     * @param result[in], call data usage
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t HandleCallDataUsageChanged(const int64_t result) override;
+
+    /**
+     * @brief handle camera capabilities changed
+     *
+     * @param cameraCapabilities[in], camera capabilities info
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t HandleCameraCapabilitiesChanged(const CameraCapabilitiesReportInfo &cameraCapabilities) override;
 
 private:
     static inline BrokerDelegator<CallStatusCallbackProxy> delegator_;

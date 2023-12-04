@@ -121,6 +121,7 @@ private:
     void CallStateObserve();
     int32_t NumberLegalityCheck(std::string &number);
     int32_t BroadcastSubscriber();
+    void PackageDialInformation(AppExecFwk::PacMap &extras, std::string accountNumber, bool isEcc);
 
 private:
     class SystemAbilityListener : public SystemAbilityStatusChangeStub {

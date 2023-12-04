@@ -172,6 +172,10 @@ void CallManagerServiceStub::InitCallMultimediaRequest()
         &CallManagerServiceStub::OnUpdateCallMediaMode;
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_REPORT_AUDIO_DEVICE_INFO)] =
         &CallManagerServiceStub::OnReportAudioDeviceInfo;
+    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_CANCEL_CALL_UPGRADE)] =
+        &CallManagerServiceStub::OnCancelCallUpgrade;
+    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_REQUEST_CAMERA_CAPABILITIES)] =
+        &CallManagerServiceStub::OnRequestCameraCapabilities;
 }
 
 void CallManagerServiceStub::InitImsServiceRequest()
@@ -724,8 +728,9 @@ int32_t CallManagerServiceStub::OnSetCallPreferenceMode(MessageParcel &data, Mes
 int32_t CallManagerServiceStub::OnControlCamera(MessageParcel &data, MessageParcel &reply)
 {
     int32_t result = TELEPHONY_ERR_FAIL;
+    int32_t callId = data.ReadInt32();
     std::u16string cameraId = data.ReadString16();
-    result = ControlCamera(cameraId);
+    result = ControlCamera(callId, cameraId);
     TELEPHONY_LOGI("result:%{public}d", result);
     if (!reply.WriteInt32(result)) {
         TELEPHONY_LOGE("ControlCamera fail to write parcel");
@@ -737,15 +742,16 @@ int32_t CallManagerServiceStub::OnControlCamera(MessageParcel &data, MessageParc
 int32_t CallManagerServiceStub::OnSetPreviewWindow(MessageParcel &data, MessageParcel &reply)
 {
     int32_t result = TELEPHONY_ERR_FAIL;
-    if (!data.ContainFileDescriptors()) {
-        TELEPHONY_LOGW("sent raw data is less than 32k");
+    int32_t callId = data.ReadInt32();
+    std::string surfaceId = data.ReadString();
+    sptr<Surface> surface = nullptr;
+    sptr<IRemoteObject> object = data.ReadRemoteObject();
+    if (object != nullptr) {
+        sptr<IBufferProducer> producer = iface_cast<IBufferProducer>(object);
+        surface = Surface::CreateSurfaceAsProducer(producer);
     }
-    VideoWindow *pSurface = (VideoWindow *)data.ReadRawData(sizeof(VideoWindow));
-    if (pSurface == nullptr) {
-        TELEPHONY_LOGE("data error");
-        return result;
-    }
-    result = SetPreviewWindow(*pSurface);
+    TELEPHONY_LOGI("surfaceId:%{public}s", surfaceId.c_str());
+    result = SetPreviewWindow(callId, surfaceId, surface);
     if (!reply.WriteInt32(result)) {
         TELEPHONY_LOGE("SetPreviewWindow fail to write parcel");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
@@ -756,15 +762,16 @@ int32_t CallManagerServiceStub::OnSetPreviewWindow(MessageParcel &data, MessageP
 int32_t CallManagerServiceStub::OnSetDisplayWindow(MessageParcel &data, MessageParcel &reply)
 {
     int32_t result = TELEPHONY_ERR_FAIL;
-    if (!data.ContainFileDescriptors()) {
-        TELEPHONY_LOGW("sent raw data is less than 32k");
+    int32_t callId = data.ReadInt32();
+    std::string surfaceId = data.ReadString();
+    sptr<Surface> surface = nullptr;
+    sptr<IRemoteObject> object = data.ReadRemoteObject();
+    if (object != nullptr) {
+        sptr<IBufferProducer> producer = iface_cast<IBufferProducer>(object);
+        surface = Surface::CreateSurfaceAsProducer(producer);
     }
-    VideoWindow *pSurface = (VideoWindow *)data.ReadRawData(sizeof(VideoWindow));
-    if (pSurface == nullptr) {
-        TELEPHONY_LOGE("data error");
-        return result;
-    }
-    result = SetDisplayWindow(*pSurface);
+    TELEPHONY_LOGI("surfaceId:%{public}s", surfaceId.c_str());
+    result = SetDisplayWindow(callId, surfaceId, surface);
     if (!reply.WriteInt32(result)) {
         TELEPHONY_LOGE("SetDisplayWindow fail to write parcel");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
@@ -788,8 +795,9 @@ int32_t CallManagerServiceStub::OnSetCameraZoom(MessageParcel &data, MessageParc
 int32_t CallManagerServiceStub::OnSetPausePicture(MessageParcel &data, MessageParcel &reply)
 {
     int32_t result = TELEPHONY_ERR_FAIL;
+    int32_t callId = data.ReadInt32();
     std::u16string path = data.ReadString16();
-    result = SetPausePicture(path);
+    result = SetPausePicture(callId, path);
     TELEPHONY_LOGI("result:%{public}d", result);
     if (!reply.WriteInt32(result)) {
         TELEPHONY_LOGE("SetPausePicture fail to write parcel");
@@ -801,8 +809,9 @@ int32_t CallManagerServiceStub::OnSetPausePicture(MessageParcel &data, MessagePa
 int32_t CallManagerServiceStub::OnSetDeviceDirection(MessageParcel &data, MessageParcel &reply)
 {
     int32_t result = TELEPHONY_ERR_FAIL;
+    int32_t callId = data.ReadInt32();
     int32_t rotation = data.ReadInt32();
-    result = SetDeviceDirection(rotation);
+    result = SetDeviceDirection(callId, rotation);
     TELEPHONY_LOGI("result:%{public}d", result);
     if (!reply.WriteInt32(result)) {
         TELEPHONY_LOGE("SetDeviceDirection fail to write parcel");
@@ -1229,6 +1238,30 @@ int32_t CallManagerServiceStub::OnReportAudioDeviceInfo(MessageParcel &data, Mes
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
 
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallManagerServiceStub::OnCancelCallUpgrade(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t result = TELEPHONY_ERR_FAIL;
+    int32_t callId = data.ReadInt32();
+    result = CancelCallUpgrade(callId);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("fail to write parcel");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallManagerServiceStub::OnRequestCameraCapabilities(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t result = TELEPHONY_ERR_FAIL;
+    int32_t callId = data.ReadInt32();
+    result = RequestCameraCapabilities(callId);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("fail to write parcel");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
     return TELEPHONY_SUCCESS;
 }
 } // namespace Telephony

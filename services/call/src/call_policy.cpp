@@ -63,6 +63,34 @@ int32_t CallPolicy::DialPolicy(std::u16string &number, AppExecFwk::PacMap &extra
     return HasNewCall();
 }
 
+int32_t CallPolicy::CanDialMulityCall(AppExecFwk::PacMap &extras)
+{
+    VideoStateType videoState = (VideoStateType)extras.GetIntValue("videoState");
+    if (videoState == VideoStateType::TYPE_VIDEO && HasCallExist()) {
+        TELEPHONY_LOGE("can not dial video call when any call exist!");
+        return CALL_ERR_DIAL_FAILED;
+    }
+    if (videoState == VideoStateType::TYPE_VOICE && HasVideoCall()) {
+        TELEPHONY_LOGE("can not dial video call when any call exist!");
+        return CALL_ERR_DIAL_FAILED;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+bool CallPolicy::IsSupportVideoCall(AppExecFwk::PacMap &extras)
+{
+    bool isSupportVideoCall = true;
+#ifdef ABILITY_CONFIG_SUPPORT
+    isSupportVideoCall = GetCarrierConfig(ITEM_VIDEO_CALL);
+#endif
+    DialScene dialScene = (DialScene)extras.GetIntValue("dialScene");
+    if (dialScene != DialScene::CALL_NORMAL) {
+        TELEPHONY_LOGW("emergency call not support video upgrade");
+        isSupportVideoCall = false;
+    }
+    return isSupportVideoCall;
+}
+
 int32_t CallPolicy::AnswerCallPolicy(int32_t callId, int32_t videoState)
 {
     if (videoState != static_cast<int32_t>(VideoStateType::TYPE_VOICE) &&
@@ -160,17 +188,13 @@ int32_t CallPolicy::SwitchCallPolicy(int32_t callId)
     return TELEPHONY_SUCCESS;
 }
 
-int32_t CallPolicy::UpdateCallMediaModePolicy(int32_t callId, ImsCallMode mode)
+int32_t CallPolicy::VideoCallPolicy(int32_t callId)
 {
-    TELEPHONY_LOGI("callid %{public}d, mode:%{public}d", callId, mode);
+    TELEPHONY_LOGI("callid %{public}d", callId);
     sptr<CallBase> callPtr = CallObjectManager::GetOneCallObject(callId);
     if (callPtr == nullptr) {
         TELEPHONY_LOGE("callId is invalid, callId:%{public}d", callId);
         return TELEPHONY_ERR_ARGUMENT_INVALID;
-    }
-    if (callPtr->GetCallType() != CallType::TYPE_IMS && callPtr->GetCallType() != CallType::TYPE_OTT) {
-        TELEPHONY_LOGE("calltype is illegal, calltype:%{public}d", callPtr->GetCallType());
-        return CALL_ERR_VIDEO_ILLEGAL_CALL_TYPE;
     }
     return TELEPHONY_SUCCESS;
 }

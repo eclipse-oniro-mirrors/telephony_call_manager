@@ -25,6 +25,7 @@
 #include "refbase.h"
 #include "rwlock.h"
 #include "singleton.h"
+#include "surface.h"
 #include "system_ability_status_change_stub.h"
 
 namespace OHOS {
@@ -313,30 +314,39 @@ public:
      * ControlCamera
      *
      * @brief Open or close camera
-     * @param cameraId[in], The camera id
-     * @param callingUid[in]
-     * @param callingPid[in]
+     * @param slotId[in] the slot id
+     * @param index[in] the index of call
+     * @param cameraId[in] the id of camera
+     * @param callingUid[in] the Uid of call
+     * @param callingPid[in] the Pid of call
      * @return Returns 0 on success, others on failure.
      */
-    int32_t ControlCamera(std::u16string cameraId, int32_t callingUid, int32_t);
+    int32_t ControlCamera(
+        int32_t slotId, int32_t index, std::string &cameraId, int32_t callingUid, int32_t callingPid);
 
     /**
      * SetPreviewWindow
      *
      * @brief Set the location and size of the preview window for videos captured by the local camera.
-     * @param window[in], Window information
+     * @param slotId[in] the slot id
+     * @param index[in] the index of call
+     * @param surfaceId[in], Window information
+     * @param surface[in], Window information
      * @return Returns 0 on success, others on failure.
      */
-    int32_t SetPreviewWindow(VideoWindow &window);
+    int32_t SetPreviewWindow(int32_t slotId, int32_t index, std::string &surfaceId, sptr<Surface> surface);
 
     /**
      * SetDisplayWindow
      *
      * @brief Sets the location and size of the remote video window.
-     * @param window[in], Window information
+     * @param slotId[in] the slot id
+     * @param index[in] the index of call
+     * @param surfaceId[in], Window information
+     * @param surface[in], Window information
      * @return Returns 0 on success, others on failure.
      */
-    int32_t SetDisplayWindow(VideoWindow &window);
+    int32_t SetDisplayWindow(int32_t slotId, int32_t index, std::string &surfaceId, sptr<Surface> surface);
 
     /**
      * SetCameraZoom
@@ -353,19 +363,23 @@ public:
      * @brief APP sets the screen of the remote video freeze immediately.
      * If the APP does not call this interface when making a video call,
      * the last frame before the remote video freeze is displayed by default
+     * @param slotId[in] the slot id
+     * @param index[in] the index of call
      * @param path[in], Local Picture address
      * @return Returns 0 on success, others on failure.
      */
-    int32_t SetPausePicture(std::u16string path);
+    int32_t SetPausePicture(int32_t slotId, int32_t index, std::string &path);
 
     /**
      * SetDeviceDirection
      *
      * @brief Set the rotation Angle of the local device. The default value is 0
+     * @param slotId[in] the slot id
+     * @param index[in] the index of call
      * @param rotation[in], Rotation Angle
      * @return Returns 0 on success, others on failure.
      */
-    int32_t SetDeviceDirection(int32_t rotation);
+    int32_t SetDeviceDirection(int32_t slotId, int32_t index, int32_t rotation);
 
     /**
      * SetImsSwitchStatus
@@ -416,6 +430,16 @@ public:
      * @return Returns 0 on success, others on failure.
      */
     int32_t SendUpdateCallMediaModeRequest(const CellularCallInfo &callInfo, ImsCallMode mode);
+
+    /**
+     * SendUpdateCallMediaModeResponse
+     *
+     * @brief send update call media response
+     * @param callInfo[in], Call information.
+     * @param mode[in], Calling patterns
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t SendUpdateCallMediaModeResponse(const CellularCallInfo &callInfo, ImsCallMode mode);
 
     /**
      * Set Ims Config
@@ -498,6 +522,26 @@ public:
      * @return result for Connect cellular call service
      */
     bool IsConnect() const;
+
+    /**
+     * CancelCallUpgrade
+     *
+     * @brief cancel call upgrade
+     * @param slotId[in] the slot id
+     * @param index[in] the index of call
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t CancelCallUpgrade(int32_t slotId, int32_t index);
+
+    /**
+     * RequestCameraCapabilities
+     *
+     * @brief request camera capabilities
+     * @param slotId[in] the slot id
+     * @param index[in] the index of call
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t RequestCameraCapabilities(int32_t slotId, int32_t index);
 
 private:
     int32_t ConnectService();

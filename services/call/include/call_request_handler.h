@@ -73,7 +73,6 @@ public:
     int32_t CombineConference(int32_t mainCallId);
     int32_t SeparateConference(int32_t callId);
     int32_t KickOutFromConference(int32_t callId);
-    int32_t UpdateImsCallMode(int32_t callId, ImsCallMode mode);
     int32_t StartRtt(int32_t callId, std::u16string &msg);
     int32_t StopRtt(int32_t callId);
     int32_t JoinConference(int32_t callId, std::vector<std::string> &numberList);

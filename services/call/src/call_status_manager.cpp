@@ -143,7 +143,8 @@ int32_t CallStatusManager::HandleCallsReportInfo(const CallDetailsInfo &info)
         for (const auto &it1 : callDetailsInfo_[curSlotId].callVec) {
             if (it.index == it1.index) {
                 // call state changes
-                if (it.state != it1.state || it.mpty != it1.mpty || it.callType != it1.callType) {
+                if (it.state != it1.state || it.mpty != it1.mpty ||
+                    it.callType != it1.callType || it.callMode != it1.callMode) {
                     TELEPHONY_LOGI("handle updated call state:%{public}d", it.state);
                     HandleCallReportInfo(it);
                 }
@@ -630,8 +631,10 @@ int32_t CallStatusManager::UpdateCallState(sptr<CallBase> &call, TelCallState ne
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     TelCallState priorState = call->GetTelCallState();
-    TELEPHONY_LOGI("callIndex:%{public}d, callId:%{public}d, priorState:%{public}d, nextState:%{public}d",
-        call->GetCallIndex(), call->GetCallID(), priorState, nextState);
+    VideoStateType videoState = call->GetVideoStateType();
+    TELEPHONY_LOGI(
+        "callIndex:%{public}d, callId:%{public}d, priorState:%{public}d, nextState:%{public}d, videoState:%{public}d",
+        call->GetCallIndex(), call->GetCallID(), priorState, nextState, videoState);
     if (priorState == TelCallState::CALL_STATUS_INCOMING && nextState == TelCallState::CALL_STATUS_ACTIVE) {
         DelayedSingleton<CallManagerHisysevent>::GetInstance()->JudgingAnswerTimeOut(
             call->GetSlotId(), call->GetCallID(), static_cast<int32_t>(call->GetVideoStateType()));
@@ -659,6 +662,9 @@ int32_t CallStatusManager::UpdateCallState(sptr<CallBase> &call, TelCallState ne
 sptr<CallBase> CallStatusManager::RefreshCallIfNecessary(const sptr<CallBase> &call, const CallDetailInfo &info)
 {
     TELEPHONY_LOGI("RefreshCallIfNecessary");
+    if (call->GetVideoStateType() != info.callMode) {
+        call->SetVideoStateType(info.callMode);
+    }
     if (call->GetCallType() == info.callType) {
         TELEPHONY_LOGI("RefreshCallIfNecessary not need Refresh");
         return call;
@@ -747,6 +753,10 @@ sptr<CallBase> CallStatusManager::CreateNewCall(const CallDetailInfo &info, Call
             } else {
                 callPtr = (std::make_unique<IMSCall>(paraInfo)).release();
             }
+            if (callPtr->GetCallType() == CallType::TYPE_IMS) {
+                sptr<IMSCall> imsCall = reinterpret_cast<IMSCall *>(callPtr.GetRefPtr());
+                imsCall->InitVideoCall();
+            }
             break;
         }
         case CallType::TYPE_OTT: {
@@ -779,7 +789,7 @@ void CallStatusManager::PackParaInfo(
     paraInfo.number = info.phoneNum;
     paraInfo.callId = GetNewCallId();
     paraInfo.index = info.index;
-    paraInfo.videoState = VideoStateType::TYPE_VOICE;
+    paraInfo.videoState = info.callMode;
     paraInfo.accountId = info.accountId;
     paraInfo.callType = info.callType;
     paraInfo.callState = info.state;

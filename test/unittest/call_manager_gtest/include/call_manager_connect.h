@@ -34,6 +34,7 @@
 #include "pac_map.h"
 #include "refbase.h"
 #include "rwlock.h"
+#include "surface_utils.h"
 #include "system_ability.h"
 #include "system_ability_definition.h"
 #include "telephony_log_wrapper.h"
@@ -336,6 +337,36 @@ public:
         return TELEPHONY_SUCCESS;
     }
 
+    int32_t OnReportImsCallModeChange(const CallMediaModeInfo &imsCallModeInfo)
+    {
+        TELEPHONY_LOGI("OnReportImsCallModeChange success!");
+        return TELEPHONY_SUCCESS;
+    }
+
+    int32_t OnReportCallSessionEventChange(const CallSessionEvent &callSessionEventOptions)
+    {
+        TELEPHONY_LOGI("OnReportCallSessionEventChange success!");
+        return TELEPHONY_SUCCESS;
+    }
+
+    int32_t OnReportPeerDimensionsChange(const PeerDimensionsDetail &peerDimensionsDetail)
+    {
+        TELEPHONY_LOGI("OnReportPeerDimensionsChange success!");
+        return TELEPHONY_SUCCESS;
+    }
+
+    int32_t OnReportCallDataUsageChange(const int64_t dataUsage)
+    {
+        TELEPHONY_LOGI("OnReportCallDataUsageChange success!");
+        return TELEPHONY_SUCCESS;
+    }
+
+    int32_t OnReportCameraCapabilities(const CameraCapabilities &cameraCapabilities)
+    {
+        TELEPHONY_LOGI("OnReportCameraCapabilities success!");
+        return TELEPHONY_SUCCESS;
+    }
+
 private:
     using CallAbilityCallbackFunc = int32_t (CallAbilityCallbackStub::*)(MessageParcel &data, MessageParcel &reply);
     int32_t OnUpdateCallStateInfoRequest(MessageParcel &data, MessageParcel &reply);
@@ -387,6 +418,31 @@ public:
     {
         return TELEPHONY_SUCCESS;
     }
+
+    int32_t OnUpdateImsCallModeChange(const CallMediaModeInfo &imsCallModeInfo)
+    {
+        return TELEPHONY_SUCCESS;
+    }
+
+    int32_t OnCallSessionEventChange(const CallSessionEvent &callSessionEventOptions)
+    {
+        return TELEPHONY_SUCCESS;
+    }
+
+    int32_t OnPeerDimensionsChange(const PeerDimensionsDetail &peerDimensionsDetail)
+    {
+        return TELEPHONY_SUCCESS;
+    }
+
+    int32_t OnCallDataUsageChange(const int64_t dataUsage)
+    {
+        return TELEPHONY_SUCCESS;
+    }
+
+    int32_t OnUpdateCameraCapabilities(const CameraCapabilities &cameraCapabilities)
+    {
+        return TELEPHONY_SUCCESS;
+    }
 };
 
 class CallManagerConnect {
@@ -425,13 +481,15 @@ public:
     int32_t GetMainCallId(int32_t callId, int32_t &mainCallId);
     int32_t GetSubCallIdList(int32_t callId, std::vector<std::u16string> &callIdList);
     int32_t GetCallIdListForConference(int32_t callId, std::vector<std::u16string> &callIdList);
-    int32_t ControlCamera(std::u16string cameraId);
+    int32_t ControlCamera(int32_t callId, std::u16string cameraId);
     int32_t SetAudioDevice(const AudioDevice &audioDevice);
-    int32_t SetPreviewWindow(VideoWindow &window);
-    int32_t SetDisplayWindow(VideoWindow &window);
+    int32_t SetPreviewWindow(int32_t callId, std::string surfaceId);
+    int32_t SetDisplayWindow(int32_t callId, std::string surfaceId);
     int32_t SetCameraZoom(float zoomRatio);
-    int32_t SetPausePicture(std::u16string path);
-    int32_t SetDeviceDirection(int32_t rotation);
+    int32_t SetPausePicture(int32_t callId, std::u16string path);
+    int32_t SetDeviceDirection(int32_t callId, int32_t rotation);
+    int32_t CancelCallUpgrade(int32_t callId);
+    int32_t RequestCameraCapabilities(int32_t callId);
     int32_t EnableImsSwitch(int32_t slotId);
     int32_t DisableImsSwitch(int32_t slotId);
     int32_t IsImsSwitchEnabled(int32_t slotId);
