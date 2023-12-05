@@ -20,7 +20,8 @@
         "name": "call_manager",
         "subsystem": "telephony",
         "syscap": [
-            "SystemCapability.Telephony.CallManager"
+            "SystemCapability.Telephony.CallManager",
+	    "SystemCapability.Applications.Contacts"
         ],
         "features": [],
         "adapted_system_type": [
