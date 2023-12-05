@@ -19,6 +19,7 @@
 #include <cstdint>
 #define private public
 #include "addcalltoken_fuzzer.h"
+#include "surface_utils.h"
 
 using namespace OHOS::Telephony;
 namespace OHOS {
@@ -28,9 +29,11 @@ int32_t ControlCamera(const uint8_t *data, size_t size)
     if (!IsServiceInited()) {
         return TELEPHONY_ERROR;
     }
+    int32_t callId = static_cast<int32_t>(size);
     std::string cameraId(reinterpret_cast<const char *>(data), size);
     auto cameraIdU16 = Str8ToStr16(cameraId);
     MessageParcel dataParcel;
+    dataParcel.WriteInt32(callId);
     dataParcel.WriteString16(cameraIdU16);
     dataParcel.RewindRead(0);
     MessageParcel reply;
@@ -42,15 +45,30 @@ int32_t SetPreviewWindow(const uint8_t *data, size_t size)
     if (!IsServiceInited()) {
         return TELEPHONY_ERROR;
     }
-    VideoWindow previewWindow;
-    previewWindow.x = static_cast<int32_t>(size);
-    previewWindow.y = static_cast<int32_t>(size);
-    previewWindow.z = static_cast<int32_t>(size);
-    previewWindow.width = static_cast<int32_t>(size);
-    previewWindow.height = static_cast<int32_t>(size);
+    int32_t callId = static_cast<int32_t>(size);
+    std::string surfaceId(reinterpret_cast<const char *>(data), size);
     MessageParcel dataParcel;
+    dataParcel.WriteInt32(callId);
+    if (surfaceId.empty() || surfaceId[0] < '0' || surfaceId[0] > '9') {
+        surfaceId = "";
+        dataParcel.WriteString(surfaceId);
+    } else {
+        int len = static_cast<int>(surfaceId.length());
+        std::string subSurfaceId = surfaceId;
+        if (len >= 1) {
+            subSurfaceId = surfaceId.substr(0, 1);
+        }
+        dataParcel.WriteString(subSurfaceId);
+        uint64_t tmpSurfaceId = std::stoull(subSurfaceId);
+        auto surface = SurfaceUtils::GetInstance()->GetSurface(tmpSurfaceId);
+        if (surface != nullptr) {
+            sptr<IBufferProducer> producer = surface->GetProducer();
+            if (producer != nullptr) {
+                dataParcel.WriteRemoteObject(producer->AsObject());
+            }
+        }
+    }
     MessageParcel reply;
-    dataParcel.WriteRawData(static_cast<const void *>(&previewWindow), sizeof(VideoWindow));
     return DelayedSingleton<CallManagerService>::GetInstance()->OnSetPreviewWindow(dataParcel, reply);
 }
 
@@ -59,15 +77,30 @@ int32_t SetDisplayWindow(const uint8_t *data, size_t size)
     if (!IsServiceInited()) {
         return TELEPHONY_ERROR;
     }
-    VideoWindow window;
-    window.x = static_cast<int32_t>(size);
-    window.y = static_cast<int32_t>(size);
-    window.z = static_cast<int32_t>(size);
-    window.width = static_cast<int32_t>(size);
-    window.height = static_cast<int32_t>(size);
+    int32_t callId = static_cast<int32_t>(size);
+    std::string surfaceId(reinterpret_cast<const char *>(data), size);
     MessageParcel dataParcel;
+    dataParcel.WriteInt32(callId);
+    if (surfaceId.empty() || surfaceId[0] < '0' || surfaceId[0] > '9') {
+        surfaceId = "";
+        dataParcel.WriteString(surfaceId);
+    } else {
+        int len = static_cast<int>(surfaceId.length());
+        std::string subSurfaceId = surfaceId;
+        if (len >= 1) {
+            subSurfaceId = surfaceId.substr(0, 1);
+        }
+        dataParcel.WriteString(subSurfaceId);
+        uint64_t tmpSurfaceId = std::stoull(subSurfaceId);
+        auto surface = SurfaceUtils::GetInstance()->GetSurface(tmpSurfaceId);
+        if (surface != nullptr) {
+            sptr<IBufferProducer> producer = surface->GetProducer();
+            if (producer != nullptr) {
+                dataParcel.WriteRemoteObject(producer->AsObject());
+            }
+        }
+    }
     MessageParcel reply;
-    dataParcel.WriteRawData(static_cast<const void *>(&window), sizeof(VideoWindow));
     return DelayedSingleton<CallManagerService>::GetInstance()->OnSetDisplayWindow(dataParcel, reply);
 }
 
@@ -85,16 +118,73 @@ int32_t SetCameraZoom(const uint8_t *data, size_t size)
     return DelayedSingleton<CallManagerService>::GetInstance()->OnSetCameraZoom(dataParcel, reply);
 }
 
+int32_t SetPausePicture(const uint8_t *data, size_t size)
+{
+    if (!IsServiceInited()) {
+        return TELEPHONY_ERROR;
+    }
+    int32_t callId = static_cast<int32_t>(size);
+    std::string path(reinterpret_cast<const char *>(data), size);
+    auto pathU16 = Str8ToStr16(path);
+    MessageParcel dataParcel;
+    dataParcel.WriteInt32(callId);
+    dataParcel.WriteString16(pathU16);
+    dataParcel.RewindRead(0);
+    MessageParcel reply;
+    return DelayedSingleton<CallManagerService>::GetInstance()->OnSetPausePicture(dataParcel, reply);
+}
+
+int32_t SetDeviceDirection(const uint8_t *data, size_t size)
+{
+    if (!IsServiceInited()) {
+        return TELEPHONY_ERROR;
+    }
+    int32_t callId = static_cast<int32_t>(size);
+    int32_t rotation = static_cast<int32_t>(size);
+    MessageParcel dataParcel;
+    dataParcel.WriteInt32(callId);
+    dataParcel.WriteInt32(rotation);
+    MessageParcel reply;
+    return DelayedSingleton<CallManagerService>::GetInstance()->OnSetDeviceDirection(dataParcel, reply);
+}
+
+int32_t CancelCallUpgrade(const uint8_t *data, size_t size)
+{
+    if (!IsServiceInited()) {
+        return TELEPHONY_ERROR;
+    }
+    int32_t callId = static_cast<int32_t>(size);
+    MessageParcel dataParcel;
+    dataParcel.WriteInt32(callId);
+    MessageParcel reply;
+    return DelayedSingleton<CallManagerService>::GetInstance()->OnCancelCallUpgrade(dataParcel, reply);
+}
+
+int32_t RequestCameraCapabilities(const uint8_t *data, size_t size)
+{
+    if (!IsServiceInited()) {
+        return TELEPHONY_ERROR;
+    }
+    int32_t callId = static_cast<int32_t>(size);
+    MessageParcel dataParcel;
+    dataParcel.WriteInt32(callId);
+    MessageParcel reply;
+    return DelayedSingleton<CallManagerService>::GetInstance()->OnRequestCameraCapabilities(dataParcel, reply);
+}
+
 void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
 {
     if (data == nullptr || size == 0) {
         return;
     }
-
     ControlCamera(data, size);
     SetPreviewWindow(data, size);
     SetDisplayWindow(data, size);
     SetCameraZoom(data, size);
+    SetPausePicture(data, size);
+    SetDeviceDirection(data, size);
+    CancelCallUpgrade(data, size);
+    RequestCameraCapabilities(data, size);
 }
 } // namespace OHOS
 

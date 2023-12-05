@@ -409,10 +409,10 @@ int32_t CallManagerConnect::GetCallIdListForConference(int32_t callId, std::vect
     return TELEPHONY_ERR_LOCAL_PTR_NULL;
 }
 
-int32_t CallManagerConnect::ControlCamera(std::u16string cameraId)
+int32_t CallManagerConnect::ControlCamera(int32_t callId, std::u16string cameraId)
 {
     if (callManagerServicePtr_ != nullptr) {
-        return callManagerServicePtr_->ControlCamera(cameraId);
+        return callManagerServicePtr_->ControlCamera(callId, cameraId);
     }
     TELEPHONY_LOGE("callManagerServicePtr_ is nullptr!");
     return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -427,19 +427,43 @@ int32_t CallManagerConnect::SetAudioDevice(const AudioDevice &audioDevice)
     return callManagerServicePtr_->SetAudioDevice(audioDevice);
 }
 
-int32_t CallManagerConnect::SetPreviewWindow(VideoWindow &window)
+int32_t CallManagerConnect::SetPreviewWindow(int32_t callId, std::string surfaceId)
 {
     if (callManagerServicePtr_ != nullptr) {
-        return callManagerServicePtr_->SetPreviewWindow(window);
+        if (surfaceId.empty() || surfaceId[0] < '0' || surfaceId[0] > '9') {
+            surfaceId = "";
+            return callManagerServicePtr_->SetPreviewWindow(callId, surfaceId, nullptr);
+        } else {
+            int len = static_cast<int>(surfaceId.length());
+            std::string subSurfaceId = surfaceId;
+            if (len >= 1) {
+                subSurfaceId = surfaceId.substr(0, 1);
+            }
+            uint64_t tmpSurfaceId = std::stoull(subSurfaceId);
+            auto surface = SurfaceUtils::GetInstance()->GetSurface(tmpSurfaceId);
+            return callManagerServicePtr_->SetPreviewWindow(callId, subSurfaceId, surface);
+        }
     }
     TELEPHONY_LOGE("callManagerServicePtr_ is nullptr!");
     return TELEPHONY_ERR_LOCAL_PTR_NULL;
 }
 
-int32_t CallManagerConnect::SetDisplayWindow(VideoWindow &window)
+int32_t CallManagerConnect::SetDisplayWindow(int32_t callId, std::string surfaceId)
 {
     if (callManagerServicePtr_ != nullptr) {
-        return callManagerServicePtr_->SetDisplayWindow(window);
+        if (surfaceId.empty() || surfaceId[0] < '0' || surfaceId[0] > '9') {
+            surfaceId = "";
+            return callManagerServicePtr_->SetPreviewWindow(callId, surfaceId, nullptr);
+        } else {
+            int len = static_cast<int>(surfaceId.length());
+            std::string subSurfaceId = surfaceId;
+            if (len >= 1) {
+                subSurfaceId = surfaceId.substr(0, 1);
+            }
+            uint64_t tmpSurfaceId = std::stoull(subSurfaceId);
+            auto surface = SurfaceUtils::GetInstance()->GetSurface(tmpSurfaceId);
+            return callManagerServicePtr_->SetPreviewWindow(callId, subSurfaceId, surface);
+        }
     }
     TELEPHONY_LOGE("callManagerServicePtr_ is nullptr!");
     return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -454,19 +478,37 @@ int32_t CallManagerConnect::SetCameraZoom(float zoomRatio)
     return TELEPHONY_ERR_LOCAL_PTR_NULL;
 }
 
-int32_t CallManagerConnect::SetPausePicture(std::u16string path)
+int32_t CallManagerConnect::SetPausePicture(int32_t callId, std::u16string path)
 {
     if (callManagerServicePtr_ != nullptr) {
-        return callManagerServicePtr_->SetPausePicture(path);
+        return callManagerServicePtr_->SetPausePicture(callId, path);
     }
     TELEPHONY_LOGE("callManagerServicePtr_ is nullptr!");
     return TELEPHONY_ERR_LOCAL_PTR_NULL;
 }
 
-int32_t CallManagerConnect::SetDeviceDirection(int32_t rotation)
+int32_t CallManagerConnect::SetDeviceDirection(int32_t callId, int32_t rotation)
 {
     if (callManagerServicePtr_ != nullptr) {
-        return callManagerServicePtr_->SetDeviceDirection(rotation);
+        return callManagerServicePtr_->SetDeviceDirection(callId, rotation);
+    }
+    TELEPHONY_LOGE("callManagerServicePtr_ is nullptr!");
+    return TELEPHONY_ERR_LOCAL_PTR_NULL;
+}
+
+int32_t CallManagerConnect::CancelCallUpgrade(int32_t callId)
+{
+    if (callManagerServicePtr_ != nullptr) {
+        return callManagerServicePtr_->CancelCallUpgrade(callId);
+    }
+    TELEPHONY_LOGE("callManagerServicePtr_ is nullptr!");
+    return TELEPHONY_ERR_LOCAL_PTR_NULL;
+}
+
+int32_t CallManagerConnect::RequestCameraCapabilities(int32_t callId)
+{
+    if (callManagerServicePtr_ != nullptr) {
+        return callManagerServicePtr_->RequestCameraCapabilities(callId);
     }
     TELEPHONY_LOGE("callManagerServicePtr_ is nullptr!");
     return TELEPHONY_ERR_LOCAL_PTR_NULL;

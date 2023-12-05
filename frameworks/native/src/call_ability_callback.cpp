@@ -106,5 +106,50 @@ int32_t CallAbilityCallback::OnReportPostDialDelay(const std::string &str)
     }
     return TELEPHONY_SUCCESS;
 }
+
+int32_t CallAbilityCallback::OnReportImsCallModeChange(const CallMediaModeInfo &imsCallModeInfo)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (callbackPtr_ != nullptr) {
+        return callbackPtr_->OnUpdateImsCallModeChange(imsCallModeInfo);
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallAbilityCallback::OnReportCallSessionEventChange(const CallSessionEvent &callSessionEventOptions)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (callbackPtr_ != nullptr) {
+        return callbackPtr_->OnCallSessionEventChange(callSessionEventOptions);
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallAbilityCallback::OnReportPeerDimensionsChange(const PeerDimensionsDetail &peerDimensionsDetail)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (callbackPtr_ != nullptr) {
+        return callbackPtr_->OnPeerDimensionsChange(peerDimensionsDetail);
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallAbilityCallback::OnReportCallDataUsageChange(const int64_t dataUsage)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (callbackPtr_ != nullptr) {
+        return callbackPtr_->OnCallDataUsageChange(dataUsage);
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallAbilityCallback::OnReportCameraCapabilities(const CameraCapabilities &cameraCapabilities)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (callbackPtr_ != nullptr) {
+        return callbackPtr_->OnUpdateCameraCapabilities(cameraCapabilities);
+    }
+    return TELEPHONY_SUCCESS;
+}
 } // namespace Telephony
 } // namespace OHOS

@@ -19,27 +19,36 @@
 #include "singleton.h"
 
 #include "call_manager_inner_type.h"
-
+#include "call_policy.h"
 #include "call_state_listener_base.h"
+#include "ims_call.h"
+#include "surface.h"
 
 namespace OHOS {
 namespace Telephony {
 class VideoControlManager : public std::enable_shared_from_this<VideoControlManager> {
     DECLARE_DELAYED_SINGLETON(VideoControlManager)
+
 public:
-    int32_t ControlCamera(std::u16string cameraId, int32_t callingUid, int32_t callingPid);
-    int32_t SetPreviewWindow(VideoWindow &window);
-    int32_t SetDisplayWindow(VideoWindow &window);
+    int32_t ControlCamera(int32_t callId, std::u16string &cameraId, int32_t callingUid, int32_t callingPid);
+    int32_t SetPreviewWindow(int32_t callId, std::string &surfaceId, sptr<Surface> surface);
+    int32_t SetDisplayWindow(int32_t callId, std::string &surfaceId, sptr<Surface> surface);
     int32_t SetCameraZoom(float zoomRatio);
-    int32_t SetPausePicture(std::u16string path);
-    int32_t SetDeviceDirection(int32_t rotation);
+    int32_t SetPausePicture(int32_t callId, std::u16string &path);
+    int32_t SetDeviceDirection(int32_t callId, int32_t rotation);
+    int32_t ReportImsCallModeInfo(CallMediaModeInfo &imsCallModeInfo);
+    int32_t UpdateImsCallMode(int32_t callId, ImsCallMode mode);
+    int32_t CancelCallUpgrade(int32_t callId);
+    int32_t RequestCameraCapabilities(int32_t callId);
 
 private:
-    int32_t OpenCamera(std::u16string cameraId, int32_t callingUid, int32_t callingPid);
-    int32_t CloseCamera(std::u16string cameraId, int32_t callingUid, int32_t callingPid);
+    int32_t OpenCamera(int32_t callId, std::u16string &cameraId, int32_t callingUid, int32_t callingPid);
+    int32_t CloseCamera(int32_t callId, std::u16string &cameraId, int32_t callingUid, int32_t callingPid);
     bool CheckWindow(VideoWindow &window);
     bool ContainCameraID(std::string id);
     bool IsPngFile(std::string fileName);
+
+private:
     bool isOpenCamera_;
 };
 } // namespace Telephony

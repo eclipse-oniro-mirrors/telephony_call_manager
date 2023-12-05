@@ -369,6 +369,19 @@ enum ImsCallMode {
 };
 
 /**
+ * @brief Indicates the IMS call mode request result.
+ */
+enum VideoRequestResultType {
+    TYPE_REQUEST_SUCCESS = 0,
+    TYPE_REQUEST_FAIL,
+    TYPE_REQUEST_INVALID,
+    TYPE_REQUEST_TIMED_OUT,
+    REQUEST_REJECTED_BY_REMOTE,
+    TYPE_MODIFY_DOWNGRADE_RTP_OR_RTCP_TIMEOUT = 100,
+    TYPE_MODIFY_DOWNGRADE_RTP_AND_RTCP_TIMEOUT,
+};
+
+/**
  * @brief Indicates the request call media mode.
  */
 struct CallMediaModeRequest {
@@ -385,29 +398,189 @@ struct CallMediaModeRequest {
 /**
  * @brief Indicates the response of the call media mode request.
  */
-struct CallMediaModeResponse {
+struct CallMediaModeInfo {
     /**
-     * Indicates the call phone number.
+     * Indicates the call id.
      */
-    char phoneNum[kMaxNumberLen + 1] = { 0 };
+    int32_t callId = 0;
+    /**
+     * Indicates if the ims call info is request which received from remote.
+     */
+    bool isRequestInfo = false;
     /**
      * Indicates the response result.
      */
-    int32_t result = 0;
+    VideoRequestResultType result = VideoRequestResultType::TYPE_REQUEST_SUCCESS;
+    /**
+     * Indicates the call mode result.
+     */
+    ImsCallMode callMode = ImsCallMode::CALL_MODE_AUDIO_ONLY;
 
-    CallMediaModeResponse() {}
+    CallMediaModeInfo() {}
 
-    CallMediaModeResponse(const CallMediaModeResponse &temp)
+    CallMediaModeInfo(const CallMediaModeInfo &temp)
     {
         *this = temp;
     }
 
-    CallMediaModeResponse &operator=(const CallMediaModeResponse &temp)
+    CallMediaModeInfo &operator=(const CallMediaModeInfo &temp)
     {
-        std::copy(std::begin(temp.phoneNum), std::end(temp.phoneNum), std::begin(phoneNum));
+        callId = temp.callId;
+        isRequestInfo = temp.isRequestInfo;
         result = temp.result;
+        callMode = temp.callMode;
         return *this;
     }
+};
+
+/**
+ * @brief Indicates the ImsCallMode report information from cellular call.
+ */
+struct CallModeReportInfo {
+    /**
+     * Indicates the call index.
+     */
+    int32_t callIndex = 0;
+    /**
+     * Indicates the response result.
+     */
+    VideoRequestResultType result = VideoRequestResultType::TYPE_REQUEST_SUCCESS;
+    /**
+     * Indicates the response result.
+     */
+    ImsCallMode callMode = ImsCallMode::CALL_MODE_AUDIO_ONLY;
+};
+
+/**
+ * @brief Indicates the response of the call media mode request.
+ */
+struct CallSessionEvent {
+    /**
+     * Indicates the event ID of call ability. {@link CallAbilityEventId}
+     */
+    CallSessionEventId eventId = CallSessionEventId::EVENT_CAMERA_FAILURE;
+    /**
+     * Indicates the call phone number.
+     */
+    int32_t callId = 0;
+
+    CallSessionEvent() {}
+
+    CallSessionEvent(const CallSessionEvent &temp)
+    {
+        *this = temp;
+    }
+
+    CallSessionEvent &operator=(const CallSessionEvent &temp)
+    {
+        callId = temp.callId;
+        eventId = temp.eventId;
+        return *this;
+    }
+};
+
+/**
+ * @brief Indicates the detail information of some calls record.
+ */
+struct CallSessionReportInfo {
+    /**
+     * Indicates call index.
+     */
+    int32_t index = 0;
+    /**
+     * Indicates the response result.
+     */
+    CallSessionEventId eventId = CallSessionEventId::EVENT_CAMERA_FAILURE;
+};
+
+struct PeerDimensionsDetail {
+    /**
+     * Indicates the call phone number.
+     */
+    int32_t callId = 0;
+    /**
+     * Indicates the call phone number.
+     */
+    int32_t width = 0;
+    /**
+     * Indicates the response result.
+     */
+    int32_t height = 0;
+
+    PeerDimensionsDetail() {}
+
+    PeerDimensionsDetail(const PeerDimensionsDetail &temp)
+    {
+        *this = temp;
+    }
+
+    PeerDimensionsDetail &operator=(const PeerDimensionsDetail &temp)
+    {
+        callId = temp.callId;
+        width = temp.width;
+        height = temp.height;
+        return *this;
+    }
+};
+
+struct PeerDimensionsReportInfo {
+    /**
+     * Indicates call index.
+     */
+    int32_t index = 0;
+    /**
+     * Indicates the peer window width.
+     */
+    int32_t width = 0;
+    /**
+     * Indicates the peer window height.
+     */
+    int32_t height = 0;
+};
+
+struct CameraCapabilities {
+    /**
+     * Indicates the call phone number.
+     */
+    int32_t callId = 0;
+    /**
+     * Indicates the call phone number.
+     */
+    int32_t width = 0;
+    /**
+     * Indicates the response result.
+     */
+    int32_t height = 0;
+
+    CameraCapabilities() {}
+
+    CameraCapabilities(const CameraCapabilities &temp)
+    {
+        *this = temp;
+    }
+
+    CameraCapabilities &operator=(const CameraCapabilities &temp)
+    {
+        callId = temp.callId;
+        width = temp.width;
+        height = temp.height;
+        return *this;
+    }
+};
+
+struct CameraCapabilitiesReportInfo {
+    /**
+     * Indicates call index.
+     */
+    int32_t index = 0;
+    /**
+     * Indicates the camera width.
+     */
+    int32_t width = 0;
+    /**
+     * Indicates the camera height.
+     */
+    int32_t height = 0;
 };
 
 /**

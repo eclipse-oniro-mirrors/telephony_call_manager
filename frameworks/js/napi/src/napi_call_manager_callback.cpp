@@ -28,7 +28,8 @@ int32_t NapiCallManagerCallback::OnCallDetailsChange(const CallAttributeInfo &in
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("UpdateCallStateInfoHandler failed! errCode:%{public}d", ret);
     } else {
-        TELEPHONY_LOGI("UpdateCallStateInfoHandler success! state:%{public}d", info.callState);
+        TELEPHONY_LOGI("UpdateCallStateInfoHandler success! state:%{public}d, videoState:%{public}d", info.callState,
+            info.videoState);
     }
     return ret;
 }
@@ -107,6 +108,66 @@ int32_t NapiCallManagerCallback::OnReportPostDialDelay(const std::string &str)
         TELEPHONY_LOGE("OnReportPostDialDelay failed! errCode:%{public}d", ret);
     } else {
         TELEPHONY_LOGI("OnReportPostDialDelay success!");
+    }
+    return ret;
+}
+
+int32_t NapiCallManagerCallback::OnUpdateImsCallModeChange(const CallMediaModeInfo &imsCallModeInfo)
+{
+    TELEPHONY_LOGE("OnUpdateImsCallModeChange, callMode:%{public}d", imsCallModeInfo.callMode);
+    int32_t ret =
+        DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->UpdateImsCallModeChange(imsCallModeInfo);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("OnUpdateImsCallModeReceive failed! errCode:%{public}d", ret);
+    } else {
+        TELEPHONY_LOGI("OnUpdateImsCallModeReceive success!");
+    }
+    return ret;
+}
+
+int32_t NapiCallManagerCallback::OnCallSessionEventChange(const CallSessionEvent &callSessionEventOptions)
+{
+    int32_t ret =
+        DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->CallSessionEventChange(callSessionEventOptions);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("OnCallSessionEventChange failed! errCode:%{public}d", ret);
+    } else {
+        TELEPHONY_LOGI("OnCallSessionEventChange success!");
+    }
+    return ret;
+}
+
+int32_t NapiCallManagerCallback::OnPeerDimensionsChange(const PeerDimensionsDetail &peerDimensionsDetail)
+{
+    int32_t ret =
+        DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->PeerDimensionsChange(peerDimensionsDetail);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("OnPeerDimensionsChange failed! errCode:%{public}d", ret);
+    } else {
+        TELEPHONY_LOGI("OnPeerDimensionsChange success!");
+    }
+    return ret;
+}
+
+int32_t NapiCallManagerCallback::OnCallDataUsageChange(const int64_t dataUsage)
+{
+    int32_t ret = DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->CallDataUsageChange(dataUsage);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("OnCallDataUsageChange failed! errCode:%{public}d", ret);
+    } else {
+        TELEPHONY_LOGI("OnCallDataUsageChange success!");
+    }
+    return ret;
+}
+
+int32_t NapiCallManagerCallback::OnUpdateCameraCapabilities(const CameraCapabilities &cameraCapabilities)
+{
+    int32_t ret =
+        DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->UpdateCameraCapabilities(cameraCapabilities);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("OnUpdateCameraCapabilities failed! errCode:%{public}d", ret);
+    } else {
+        TELEPHONY_LOGI("OnUpdateCameraCapabilities success!");
     }
     return ret;
 }

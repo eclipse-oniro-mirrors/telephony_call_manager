@@ -22,6 +22,7 @@
 #include "if_system_ability_manager.h"
 #include "refbase.h"
 #include "singleton.h"
+#include "surface_utils.h"
 #include "rwlock.h"
 #include "pac_map.h"
 
@@ -84,12 +85,12 @@ public:
     int32_t SetMuted(bool isMute);
     int32_t MuteRinger();
     int32_t SetAudioDevice(const AudioDevice &audioDevice);
-    int32_t ControlCamera(std::u16string cameraId);
-    int32_t SetPreviewWindow(VideoWindow &window);
-    int32_t SetDisplayWindow(VideoWindow &window);
+    int32_t ControlCamera(int32_t callId, std::u16string &cameraId);
+    int32_t SetPreviewWindow(int32_t callId, std::string &surfaceId);
+    int32_t SetDisplayWindow(int32_t callId, std::string &surfaceId);
     int32_t SetCameraZoom(float zoomRatio);
-    int32_t SetPausePicture(std::u16string path);
-    int32_t SetDeviceDirection(int32_t rotation);
+    int32_t SetPausePicture(int32_t callId, std::u16string &path);
+    int32_t SetDeviceDirection(int32_t callId, int32_t rotation);
     int32_t GetImsConfig(int32_t slotId, ImsConfigItem item);
     int32_t SetImsConfig(int32_t slotId, ImsConfigItem item, std::u16string &value);
     int32_t GetImsFeatureValue(int32_t slotId, FeatureType type);
@@ -113,6 +114,8 @@ public:
     sptr<IRemoteObject> GetProxyObjectPtr(CallManagerProxyType proxyType);
     void OnRemoteDied(const wptr<IRemoteObject> &remote);
     int32_t ReportAudioDeviceInfo();
+    int32_t CancelCallUpgrade(int32_t callId);
+    int32_t RequestCameraCapabilities(int32_t callId);
 
 private:
     int32_t ConnectService();

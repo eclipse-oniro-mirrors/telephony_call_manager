@@ -22,6 +22,8 @@
 #include "cs_call.h"
 #include "ims_call.h"
 #include "ott_call.h"
+#include "surface_utils.h"
+
 
 using namespace OHOS::Telephony;
 namespace OHOS {
@@ -36,6 +38,9 @@ constexpr int32_t CALL_RUNNING_STATE_NUM = 8;
 constexpr int32_t CALL_ENDED_TYPE_NUM = 4;
 constexpr int32_t CALL_ANSWER_TYPE_NUM = 3;
 constexpr int32_t INVALID_CALL_ID = -1;
+constexpr int32_t IMS_CALL_MODE_NUM = 5;
+constexpr int32_t CALL_INDEX_MAX_NUM = 8;
+constexpr int32_t VIDEO_REQUEST_RESULT_TYPE_NUM = 102;
 
 void CSCallFunc(const uint8_t *data, size_t size)
 {
@@ -186,12 +191,6 @@ void IMSCallFunc(const uint8_t *data, size_t size)
     int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
     std::string msg(reinterpret_cast<const char *>(data), size);
     std::u16string msgU16 = Str8ToStr16(msg);
-    CallMediaModeResponse response;
-    response.result = static_cast<int32_t>(size % BOOL_NUM);
-    int32_t length = msg.length() > kMaxNumberLen ? kMaxNumberLen : msg.length();
-    if (memcpy_s(response.phoneNum, kMaxNumberLen, msg.c_str(), length) != EOK) {
-        return;
-    }
 
     callObjectPtr->InitVideoCall();
     callObjectPtr->DialingProcess();
@@ -220,9 +219,78 @@ void IMSCallFunc(const uint8_t *data, size_t size)
     callObjectPtr->StartRtt(msgU16);
     callObjectPtr->StopRtt();
     callObjectPtr->SetMute(mute, slotId);
-    callObjectPtr->AcceptVideoCall();
-    callObjectPtr->RefuseVideoCall();
+}
+
+void IMSVideoCallFunc(const uint8_t *data, size_t size)
+{
+    if (!IsServiceInited()) {
+        return;
+    }
+
+    DialParaInfo paraInfo;
+    paraInfo.dialType = static_cast<DialType>(size % DIAL_TYPE);
+    paraInfo.callType = static_cast<CallType>(size % CALL_TYPE_NUM);
+    paraInfo.videoState = static_cast<VideoStateType>(size % VIDIO_TYPE_NUM);
+    paraInfo.callState = static_cast<TelCallState>(size % TEL_CALL_STATE_NUM);
+    sptr<IMSCall> callObjectPtr = std::make_unique<IMSCall>(paraInfo).release();
+    std::string msg(reinterpret_cast<const char *>(data), size);
+    int32_t callingUid = static_cast<int32_t>(size);
+    int32_t callingPid = static_cast<int32_t>(size);
+    int32_t rotation = static_cast<int32_t>(size);
+    ImsCallMode mode = static_cast<ImsCallMode>(size % IMS_CALL_MODE_NUM);
+    CallModeReportInfo callModeReportInfo;
+    callModeReportInfo.callIndex = static_cast<int32_t>(size % CALL_INDEX_MAX_NUM);
+    callModeReportInfo.callMode = static_cast<ImsCallMode>(size % IMS_CALL_MODE_NUM);
+    callModeReportInfo.result = static_cast<VideoRequestResultType>(size % VIDEO_REQUEST_RESULT_TYPE_NUM);
+    callObjectPtr->UpdateImsCallMode(mode);
+    callObjectPtr->SendUpdateCallMediaModeRequest(mode);
+    callObjectPtr->RecieveUpdateCallMediaModeRequest(callModeReportInfo);
+    callObjectPtr->SendUpdateCallMediaModeResponse(mode);
+    callObjectPtr->ReceiveUpdateCallMediaModeResponse(callModeReportInfo);
+    CallMediaModeInfo callMediaModeInfo;
+    callMediaModeInfo.callId = static_cast<int32_t>(size);
+    callMediaModeInfo.isRequestInfo = static_cast<bool>(size % BOOL_NUM);
+    callMediaModeInfo.result = static_cast<VideoRequestResultType>(size % VIDEO_REQUEST_RESULT_TYPE_NUM);
+    callMediaModeInfo.callMode = static_cast<ImsCallMode>(size % IMS_CALL_MODE_NUM);
+    callObjectPtr->ReportImsCallModeInfo(callMediaModeInfo);
+    callObjectPtr->SwitchVideoState(mode);
     callObjectPtr->IsSupportVideoCall();
+    callObjectPtr->GetCallVideoState(mode);
+    callObjectPtr->ControlCamera(msg, callingUid, callingPid);
+    callObjectPtr->SetPausePicture(msg);
+    callObjectPtr->SetDeviceDirection(rotation);
+    callObjectPtr->CancelCallUpgrade();
+    callObjectPtr->RequestCameraCapabilities();
+}
+
+void IMSVideoCallWindowFunc(const uint8_t *data, size_t size)
+{
+    if (!IsServiceInited()) {
+        return;
+    }
+
+    DialParaInfo paraInfo;
+    paraInfo.dialType = static_cast<DialType>(size % DIAL_TYPE);
+    paraInfo.callType = static_cast<CallType>(size % CALL_TYPE_NUM);
+    paraInfo.videoState = static_cast<VideoStateType>(size % VIDIO_TYPE_NUM);
+    paraInfo.callState = static_cast<TelCallState>(size % TEL_CALL_STATE_NUM);
+    sptr<IMSCall> callObjectPtr = std::make_unique<IMSCall>(paraInfo).release();
+    std::string msg(reinterpret_cast<const char *>(data), size);
+    if (msg.empty() || msg[0] < '0' || msg[0] > '9') {
+        msg = "";
+        callObjectPtr->SetPreviewWindow(msg, nullptr);
+        callObjectPtr->SetDisplayWindow(msg, nullptr);
+    } else {
+        int len = static_cast<int>(msg.length());
+        std::string subSurfaceId = msg;
+        if (len >= 1) {
+            subSurfaceId = msg.substr(0, 1);
+        }
+        uint64_t tmpSurfaceId = std::stoull(subSurfaceId);
+        auto surface = SurfaceUtils::GetInstance()->GetSurface(tmpSurfaceId);
+        callObjectPtr->SetPreviewWindow(subSurfaceId, surface);
+        callObjectPtr->SetDisplayWindow(subSurfaceId, surface);
+    }
 }
 
 void OttCallFunc(const uint8_t *data, size_t size)
@@ -241,12 +309,6 @@ void OttCallFunc(const uint8_t *data, size_t size)
     int32_t mute = static_cast<int32_t>(size % BOOL_NUM);
     int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
     std::string msg(reinterpret_cast<const char *>(data), size);
-    CallMediaModeResponse response;
-    response.result = static_cast<int32_t>(size % BOOL_NUM);
-    int32_t length = msg.length() > kMaxNumberLen ? kMaxNumberLen : msg.length();
-    if (memcpy_s(response.phoneNum, kMaxNumberLen, msg.c_str(), length) != EOK) {
-        return;
-    }
 
     callObjectPtr->DialingProcess();
     callObjectPtr->AnswerCall(videoState);
@@ -274,8 +336,56 @@ void OttCallFunc(const uint8_t *data, size_t size)
     std::vector<std::u16string> callIdList;
     callObjectPtr->GetCallIdListForConference(callIdList);
     callObjectPtr->IsSupportConferenceable();
-    callObjectPtr->ReceiveUpdateCallMediaModeResponse(response);
     callObjectPtr->SetMute(mute, slotId);
+}
+
+void OttVideoCallFunc(const uint8_t *data, size_t size)
+{
+    if (!IsServiceInited()) {
+        return;
+    }
+
+    DialParaInfo paraInfo;
+    paraInfo.dialType = static_cast<DialType>(size % DIAL_TYPE);
+    paraInfo.callType = static_cast<CallType>(size % CALL_TYPE_NUM);
+    paraInfo.videoState = static_cast<VideoStateType>(size % VIDIO_TYPE_NUM);
+    paraInfo.callState = static_cast<TelCallState>(size % TEL_CALL_STATE_NUM);
+    sptr<OTTCall> callObjectPtr = std::make_unique<OTTCall>(paraInfo).release();
+    std::string msg(reinterpret_cast<const char *>(data), size);
+    int32_t callingUid = static_cast<int32_t>(size);
+    int32_t callingPid = static_cast<int32_t>(size);
+    int32_t rotation = static_cast<int32_t>(size);
+    callObjectPtr->InitVideoCall();
+    ImsCallMode mode = static_cast<ImsCallMode>(size % IMS_CALL_MODE_NUM);
+    CallModeReportInfo callModeReportInfo;
+    callModeReportInfo.callIndex = static_cast<int32_t>(size % CALL_INDEX_MAX_NUM);
+    callModeReportInfo.callMode = static_cast<ImsCallMode>(size % IMS_CALL_MODE_NUM);
+    callModeReportInfo.result = static_cast<VideoRequestResultType>(size % VIDEO_REQUEST_RESULT_TYPE_NUM);
+    callObjectPtr->UpdateImsCallMode(mode);
+    callObjectPtr->SendUpdateCallMediaModeRequest(mode);
+    callObjectPtr->RecieveUpdateCallMediaModeRequest(callModeReportInfo);
+    callObjectPtr->SendUpdateCallMediaModeResponse(mode);
+    callObjectPtr->ReceiveUpdateCallMediaModeResponse(callModeReportInfo);
+    CallMediaModeInfo callMediaModeInfo;
+    callMediaModeInfo.callId = static_cast<int32_t>(size);
+    callMediaModeInfo.isRequestInfo = static_cast<bool>(size % BOOL_NUM);
+    callMediaModeInfo.result = static_cast<VideoRequestResultType>(size % VIDEO_REQUEST_RESULT_TYPE_NUM);
+    callMediaModeInfo.callMode = static_cast<ImsCallMode>(size % IMS_CALL_MODE_NUM);
+    callObjectPtr->ReportImsCallModeInfo(callMediaModeInfo);
+    callObjectPtr->ControlCamera(msg, callingUid, callingPid);
+    callObjectPtr->SetPausePicture(msg);
+    int len = static_cast<int>(msg.length());
+    std::string subSurfaceId = msg;
+    if (len >= 1) {
+        subSurfaceId = msg.substr(0, 1);
+    }
+    uint64_t tmpSurfaceId = std::stoull(subSurfaceId);
+    auto surface = SurfaceUtils::GetInstance()->GetSurface(tmpSurfaceId);
+    callObjectPtr->SetPreviewWindow(subSurfaceId, surface);
+    callObjectPtr->SetDisplayWindow(subSurfaceId, surface);
+    callObjectPtr->SetDeviceDirection(rotation);
+    callObjectPtr->CancelCallUpgrade();
+    callObjectPtr->RequestCameraCapabilities();
 }
 
 void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
@@ -288,7 +398,10 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     DialingProcess(data, size);
     GetCallerInfo(data, size);
     IMSCallFunc(data, size);
+    IMSVideoCallFunc(data, size);
+    IMSVideoCallWindowFunc(data, size);
     OttCallFunc(data, size);
+    OttVideoCallFunc(data, size);
 }
 } // namespace OHOS
 

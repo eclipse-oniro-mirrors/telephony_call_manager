@@ -118,21 +118,20 @@ int32_t CallControlManager::DialCall(std::u16string &number, AppExecFwk::PacMap 
         TELEPHONY_LOGE("dial policy result:%{public}d", ret);
         return ret;
     }
-    // temporarily save dial information
-    {
-        std::lock_guard<std::mutex> lock(mutex_);
-        dialSrcInfo_.callId = ERR_ID;
-        dialSrcInfo_.number = accountNumber;
-        dialSrcInfo_.isDialing = true;
-        dialSrcInfo_.isEcc = isEcc;
-        dialSrcInfo_.callType = (CallType)extras.GetIntValue("callType");
-        dialSrcInfo_.accountId = extras.GetIntValue("accountId");
-        dialSrcInfo_.dialType = (DialType)extras.GetIntValue("dialType");
-        dialSrcInfo_.videoState = (VideoStateType)extras.GetIntValue("videoState");
-        dialSrcInfo_.bundleName = extras.GetStringValue("bundleName");
-        extras_.Clear();
-        extras_ = extras;
+    ret = CanDialMulityCall(extras);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("dial policy result:%{public}d", ret);
+        return ret;
     }
+    if (!IsSupportVideoCall(extras)) {
+        extras.PutIntValue("videoState", (int32_t)VideoStateType::TYPE_VOICE);
+    }
+    VideoStateType videoState = (VideoStateType)extras.GetIntValue("videoState");
+    if (videoState == VideoStateType::TYPE_VIDEO) {
+        extras.PutIntValue("callType", (int32_t)CallType::TYPE_IMS);
+    }
+    // temporarily save dial information
+    PackageDialInformation(extras, accountNumber, isEcc);
     if (CallRequestHandlerPtr_ == nullptr) {
         TELEPHONY_LOGE("CallRequestHandlerPtr_ is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -143,6 +142,22 @@ int32_t CallControlManager::DialCall(std::u16string &number, AppExecFwk::PacMap 
         return ret;
     }
     return TELEPHONY_SUCCESS;
+}
+
+void CallControlManager::PackageDialInformation(AppExecFwk::PacMap &extras, std::string accountNumber, bool isEcc)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    dialSrcInfo_.callId = ERR_ID;
+    dialSrcInfo_.number = accountNumber;
+    dialSrcInfo_.isDialing = true;
+    dialSrcInfo_.isEcc = isEcc;
+    dialSrcInfo_.callType = (CallType)extras.GetIntValue("callType");
+    dialSrcInfo_.accountId = extras.GetIntValue("accountId");
+    dialSrcInfo_.dialType = (DialType)extras.GetIntValue("dialType");
+    dialSrcInfo_.videoState = (VideoStateType)extras.GetIntValue("videoState");
+    dialSrcInfo_.bundleName = extras.GetStringValue("bundleName");
+    extras_.Clear();
+    extras_ = extras;
 }
 
 int32_t CallControlManager::AnswerCall(int32_t callId, int32_t videoState)
@@ -871,21 +886,6 @@ int32_t CallControlManager::GetVoNRState(int32_t slotId, int32_t &state)
 
 int32_t CallControlManager::UpdateImsCallMode(int32_t callId, ImsCallMode mode)
 {
-    int32_t ret = TELEPHONY_ERR_FAIL;
-    ret = UpdateCallMediaModePolicy(callId, mode);
-    if (ret != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("check prerequisites failed !");
-        return ret;
-    }
-    if (CallRequestHandlerPtr_ == nullptr) {
-        TELEPHONY_LOGE("CallRequestHandlerPtr_ is nullptr!");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-    ret = CallRequestHandlerPtr_->UpdateImsCallMode(callId, mode);
-    if (ret != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("UpdateImsCallMode failed!");
-        return ret;
-    }
     return TELEPHONY_SUCCESS;
 }
 
@@ -978,32 +978,32 @@ int32_t CallControlManager::SetAudioDevice(const AudioDevice &audioDevice)
 
 int32_t CallControlManager::ControlCamera(std::u16string cameraId, int32_t callingUid, int32_t callingPid)
 {
-    return DelayedSingleton<VideoControlManager>::GetInstance()->ControlCamera(cameraId, callingUid, callingPid);
+    return TELEPHONY_SUCCESS;
 }
 
 int32_t CallControlManager::SetPreviewWindow(VideoWindow &window)
 {
-    return DelayedSingleton<VideoControlManager>::GetInstance()->SetPreviewWindow(window);
+    return TELEPHONY_SUCCESS;
 }
 
 int32_t CallControlManager::SetDisplayWindow(VideoWindow &window)
 {
-    return DelayedSingleton<VideoControlManager>::GetInstance()->SetDisplayWindow(window);
+    return TELEPHONY_SUCCESS;
 }
 
 int32_t CallControlManager::SetCameraZoom(float zoomRatio)
 {
-    return DelayedSingleton<VideoControlManager>::GetInstance()->SetCameraZoom(zoomRatio);
+    return TELEPHONY_SUCCESS;
 }
 
 int32_t CallControlManager::SetPausePicture(std::u16string path)
 {
-    return DelayedSingleton<VideoControlManager>::GetInstance()->SetPausePicture(path);
+    return TELEPHONY_SUCCESS;
 }
 
 int32_t CallControlManager::SetDeviceDirection(int32_t rotation)
 {
-    return DelayedSingleton<VideoControlManager>::GetInstance()->SetDeviceDirection(rotation);
+    return TELEPHONY_SUCCESS;
 }
 
 int32_t CallControlManager::IsEmergencyPhoneNumber(std::u16string &number, int32_t slotId, bool &enabled)

@@ -54,13 +54,21 @@ public:
     int32_t GetSubCallIdList(std::vector<std::u16string> &callIdList) override;
     int32_t GetCallIdListForConference(std::vector<std::u16string> &callIdList) override;
     int32_t IsSupportConferenceable() override;
+    int32_t InitVideoCall() override;
+    int32_t UpdateImsCallMode(ImsCallMode mode) override;
+    int32_t ReportImsCallModeInfo(CallMediaModeInfo &response) override;
     int32_t SendUpdateCallMediaModeRequest(ImsCallMode mode) override;
-    int32_t RecieveUpdateCallMediaModeRequest(ImsCallMode mode) override;
+    int32_t RecieveUpdateCallMediaModeRequest(CallModeReportInfo &imsCallModeInfo) override;
     int32_t SendUpdateCallMediaModeResponse(ImsCallMode mode) override;
-    int32_t ReceiveUpdateCallMediaModeResponse(CallMediaModeResponse &reponse) override;
-    int32_t DispatchUpdateVideoRequest(ImsCallMode mode) override;
-    int32_t DispatchUpdateVideoResponse(ImsCallMode mode) override;
+    int32_t ReceiveUpdateCallMediaModeResponse(CallModeReportInfo &reponse) override;
     int32_t SetMute(int32_t mute, int32_t slotId) override;
+    int32_t ControlCamera(std::string &cameraId, int32_t callingUid, int32_t callingPid) override;
+    int32_t SetPreviewWindow(std::string &surfaceId, sptr<Surface> surface) override;
+    int32_t SetDisplayWindow(std::string &surfaceId, sptr<Surface> surface) override;
+    int32_t SetPausePicture(std::string &path) override;
+    int32_t SetDeviceDirection(int32_t rotation) override;
+    int32_t CancelCallUpgrade() override;
+    int32_t RequestCameraCapabilities() override;
 
 private:
     int32_t PackOttCallRequestInfo(OttCallRequestInfo &requestInfo);

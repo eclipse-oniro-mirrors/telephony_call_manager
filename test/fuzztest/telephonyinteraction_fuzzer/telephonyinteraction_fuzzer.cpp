@@ -27,6 +27,10 @@ constexpr int32_t SLOT_NUM = 2;
 constexpr int32_t ACCOUNT_ID_NUM = 10;
 constexpr int32_t MULTI_PARTY_NUM = 10;
 constexpr int32_t VOICE_DOMAIN_NUM = 10;
+constexpr int32_t IMS_CALL_MODE_NUM = 5;
+constexpr int32_t CALL_INDEX_MAX_NUM = 8;
+constexpr int32_t VIDEO_REQUEST_RESULT_TYPE_NUM = 102;
+constexpr int32_t CALL_SESSION_EVENT_ID_NUM = 4;
 std::unique_ptr<CallStatusCallback> CallStatusCallbackPtr_ = nullptr;
 
 bool ServiceInited()
@@ -272,28 +276,6 @@ int32_t GetImsFeatureValueResult(const uint8_t *data, size_t size)
     return CallStatusCallbackPtr_->OnGetImsFeatureValueResult(dataParcel, reply);
 }
 
-int32_t ReceiveUpdateMediaModeResponse(const uint8_t *data, size_t size)
-{
-    if (!ServiceInited()) {
-        return TELEPHONY_ERROR;
-    }
-    MessageParcel dataParcel;
-    if (!dataParcel.WriteInterfaceToken(CallStatusCallbackProxy::GetDescriptor())) {
-        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
-    }
-    CallMediaModeResponse response;
-    int32_t length = sizeof(CallMediaModeResponse);
-    dataParcel.WriteInt32(length);
-    response.result = static_cast<int32_t>(size);
-    std::string msg(reinterpret_cast<const char *>(data), size);
-    int32_t phoneLength = msg.length() > kMaxNumberLen ? kMaxNumberLen : msg.length();
-    memcpy_s(response.phoneNum, kMaxNumberLen, msg.c_str(), phoneLength);
-    dataParcel.WriteRawData((const void *)&response, length);
-    dataParcel.RewindRead(0);
-    MessageParcel reply;
-    return CallStatusCallbackPtr_->OnReceiveUpdateMediaModeResponse(dataParcel, reply);
-}
-
 int32_t SendMmiCodeResult(const uint8_t *data, size_t size)
 {
     if (!ServiceInited()) {
@@ -316,6 +298,132 @@ int32_t SendMmiCodeResult(const uint8_t *data, size_t size)
     return CallStatusCallbackPtr_->OnSendMmiCodeResult(dataParcel, reply);
 }
 
+int32_t ReceiveUpdateCallMediaModeRequest(const uint8_t *data, size_t size)
+{
+    if (!ServiceInited()) {
+        return TELEPHONY_ERROR;
+    }
+    MessageParcel dataParcel;
+    if (!dataParcel.WriteInterfaceToken(CallStatusCallbackProxy::GetDescriptor())) {
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+
+    int32_t length = sizeof(CallModeReportInfo);
+    dataParcel.WriteInt32(length);
+    CallModeReportInfo callModeReportInfo;
+    callModeReportInfo.callIndex = static_cast<int32_t>(size % CALL_INDEX_MAX_NUM);
+    callModeReportInfo.callMode = static_cast<ImsCallMode>(size % IMS_CALL_MODE_NUM);
+    callModeReportInfo.result = static_cast<VideoRequestResultType>(size % VIDEO_REQUEST_RESULT_TYPE_NUM);
+    dataParcel.WriteRawData((const void *)&callModeReportInfo, length);
+    dataParcel.RewindRead(0);
+    MessageParcel reply;
+    return CallStatusCallbackPtr_->OnReceiveImsCallModeRequest(dataParcel, reply);
+}
+
+int32_t ReceiveUpdateCallMediaModeResponse(const uint8_t *data, size_t size)
+{
+    if (!ServiceInited()) {
+        return TELEPHONY_ERROR;
+    }
+    MessageParcel dataParcel;
+    if (!dataParcel.WriteInterfaceToken(CallStatusCallbackProxy::GetDescriptor())) {
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+
+    int32_t length = sizeof(CallModeReportInfo);
+    dataParcel.WriteInt32(length);
+    CallModeReportInfo callModeReportInfo;
+    callModeReportInfo.callIndex = static_cast<int32_t>(size % CALL_INDEX_MAX_NUM);
+    callModeReportInfo.callMode = static_cast<ImsCallMode>(size % IMS_CALL_MODE_NUM);
+    callModeReportInfo.result = static_cast<VideoRequestResultType>(size % VIDEO_REQUEST_RESULT_TYPE_NUM);
+    dataParcel.WriteRawData((const void *)&callModeReportInfo, length);
+    dataParcel.RewindRead(0);
+    MessageParcel reply;
+    return CallStatusCallbackPtr_->OnReceiveImsCallModeResponse(dataParcel, reply);
+}
+
+int32_t HandleCallSessionEventChanged(const uint8_t *data, size_t size)
+{
+    if (!ServiceInited()) {
+        return TELEPHONY_ERROR;
+    }
+    MessageParcel dataParcel;
+    if (!dataParcel.WriteInterfaceToken(CallStatusCallbackProxy::GetDescriptor())) {
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+
+    int32_t length = sizeof(CallSessionReportInfo);
+    dataParcel.WriteInt32(length);
+    CallSessionReportInfo callSessionReportInfo;
+    callSessionReportInfo.index = static_cast<int32_t>(size % CALL_INDEX_MAX_NUM);
+    callSessionReportInfo.eventId = static_cast<CallSessionEventId>(size % CALL_SESSION_EVENT_ID_NUM);
+    dataParcel.WriteRawData((const void *)&callSessionReportInfo, length);
+    dataParcel.RewindRead(0);
+    MessageParcel reply;
+    return CallStatusCallbackPtr_->OnCallSessionEventChange(dataParcel, reply);
+}
+
+int32_t HandlePeerDimensionsChanged(const uint8_t *data, size_t size)
+{
+    if (!ServiceInited()) {
+        return TELEPHONY_ERROR;
+    }
+    MessageParcel dataParcel;
+    if (!dataParcel.WriteInterfaceToken(CallStatusCallbackProxy::GetDescriptor())) {
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+
+    int32_t length = sizeof(PeerDimensionsReportInfo);
+    dataParcel.WriteInt32(length);
+    PeerDimensionsReportInfo dimensionsReportInfo;
+    dimensionsReportInfo.index = static_cast<int32_t>(size % CALL_INDEX_MAX_NUM);
+    dimensionsReportInfo.width = static_cast<int32_t>(size);
+    dimensionsReportInfo.height = static_cast<int32_t>(size);
+    dataParcel.WriteRawData((const void *)&dimensionsReportInfo, length);
+    dataParcel.RewindRead(0);
+    MessageParcel reply;
+    return CallStatusCallbackPtr_->OnPeerDimensionsChange(dataParcel, reply);
+}
+
+int32_t HandleCallDataUsageChanged(const uint8_t *data, size_t size)
+{
+    if (!ServiceInited()) {
+        return TELEPHONY_ERROR;
+    }
+    MessageParcel dataParcel;
+    if (!dataParcel.WriteInterfaceToken(CallStatusCallbackProxy::GetDescriptor())) {
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+
+    int64_t reportInfo = static_cast<int64_t>(size);
+    dataParcel.WriteInt64(reportInfo);
+    dataParcel.RewindRead(0);
+    MessageParcel reply;
+    return CallStatusCallbackPtr_->OnCallDataUsageChange(dataParcel, reply);
+}
+
+int32_t HandleCameraCapabilitiesChanged(const uint8_t *data, size_t size)
+{
+    if (!ServiceInited()) {
+        return TELEPHONY_ERROR;
+    }
+    MessageParcel dataParcel;
+    if (!dataParcel.WriteInterfaceToken(CallStatusCallbackProxy::GetDescriptor())) {
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+
+    int32_t length = sizeof(CameraCapabilitiesReportInfo);
+    dataParcel.WriteInt32(length);
+    CameraCapabilitiesReportInfo cameraCapabilitiesReportInfo;
+    cameraCapabilitiesReportInfo.index = static_cast<int32_t>(size % CALL_INDEX_MAX_NUM);
+    cameraCapabilitiesReportInfo.width = static_cast<int32_t>(size);
+    cameraCapabilitiesReportInfo.height = static_cast<int32_t>(size);
+    dataParcel.WriteRawData((const void *)&cameraCapabilitiesReportInfo, length);
+    dataParcel.RewindRead(0);
+    MessageParcel reply;
+    return CallStatusCallbackPtr_->OnCameraCapabilitiesChange(dataParcel, reply);
+}
+
 void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
 {
     if (data == nullptr || size == 0) {
@@ -331,8 +439,13 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     UpdateGetCallClipResult(data, size);
     GetImsConfigResult(data, size);
     GetImsFeatureValueResult(data, size);
-    ReceiveUpdateMediaModeResponse(data, size);
     SendMmiCodeResult(data, size);
+    ReceiveUpdateCallMediaModeRequest(data, size);
+    ReceiveUpdateCallMediaModeResponse(data, size);
+    HandleCallSessionEventChanged(data, size);
+    HandlePeerDimensionsChanged(data, size);
+    HandleCallDataUsageChanged(data, size);
+    HandleCameraCapabilitiesChanged(data, size);
 }
 } // namespace OHOS
 

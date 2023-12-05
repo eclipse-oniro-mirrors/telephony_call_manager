@@ -162,13 +162,22 @@ public:
     int32_t SetReadyToCall(int32_t slotId, int32_t callType, bool isReadyToCall) override;
 
     /**
-     * @brief IMS Update Call Media Mode
+     * @brief IMS Send Call Media Mode Request
      *
      * @param callInfo[in] the call detail info which contains phone number, call type, slot id .etc
      * @param mode[in] indicate the call mode just like audio only, receive only .etc
      * @return Returns TELEPHONY_SUCCESS on success, others on failure.
      */
-    int32_t UpdateImsCallMode(const CellularCallInfo &callInfo, ImsCallMode mode) override;
+    int32_t SendUpdateCallMediaModeRequest(const CellularCallInfo &callInfo, ImsCallMode mode) override;
+
+    /**
+     * @brief IMS Send Call Media Mode Response
+     *
+     * @param callInfo[in] the call detail info which contains phone number, call type, slot id .etc
+     * @param mode[in] indicate the call mode just like audio only, receive only .etc
+     * @return Returns TELEPHONY_SUCCESS on success, others on failure.
+     */
+    int32_t SendUpdateCallMediaModeResponse(const CellularCallInfo &callInfo, ImsCallMode mode) override;
 
     /**
      * @brief start to paly a dtmf tone
@@ -410,36 +419,36 @@ public:
     /**
      * @brief set camara to be enabled for video call
      *
+     * @param slotId[in] the slot id
+     * @param index[in] the index of call
      * @param cameraId[in] The id of the camera
-     * @param callingUid[in] the UID of call
-     * @param callingPid[in] the PID if call
      * @return Returns TELEPHONY_SUCCESS on success, others on failure.
      */
-    int32_t CtrlCamera(const std::u16string &cameraId, int32_t callingUid, int32_t callingPid) override;
+    int32_t ControlCamera(int32_t slotId, int32_t index, const std::string &cameraId) override;
 
     /**
      * @brief set a window which used to display a preview of camera capturing
      *
-     * @param x[in] X coordinate of window
-     * @param y[in] Y coordinate of window
-     * @param z[in] Z coordinate of window
-     * @param width[in] the width of window
-     * @param height[in] the height of window
+     * @param slotId[in] the slot id
+     * @param index[in] the index of call
+     * @param surfaceId[in] the window information
+     * @param surface[in] the window information
      * @return Returns TELEPHONY_SUCCESS on success, others on failure.
      */
-    int32_t SetPreviewWindow(int32_t x, int32_t y, int32_t z, int32_t width, int32_t height) override;
+    int32_t SetPreviewWindow(
+        int32_t slotId, int32_t index, const std::string &surfaceId, sptr<Surface> surface) override;
 
     /**
      * @brief set a window which used to display the viedo which is received from remote
      *
-     * @param x[in] X coordinate of window
-     * @param y[in] Y coordinate of window
-     * @param z[in] Z coordinate of window
-     * @param width[in] the width of window
-     * @param height[in] the height of window
+     * @param slotId[in] the slot id
+     * @param index[in] the index of call
+     * @param surfaceId[in] the window information
+     * @param surface[in] the window information
      * @return Returns TELEPHONY_SUCCESS on success, others on failure.
      */
-    int32_t SetDisplayWindow(int32_t x, int32_t y, int32_t z, int32_t width, int32_t height) override;
+    int32_t SetDisplayWindow(
+        int32_t slotId, int32_t index, const std::string &surfaceId, sptr<Surface> surface) override;
 
     /**
      * @brief set camera zoom ratio
@@ -452,18 +461,22 @@ public:
     /**
      * @brief set a image which will be displayed when the video signal is paused
      *
+     * @param slotId[in] the slot id
+     * @param index[in] the index of call
      * @param path[in] the dispalyed image path
      * @return Returns TELEPHONY_SUCCESS on success, others on failure.
      */
-    int32_t SetPauseImage(const std::u16string &path) override;
+    int32_t SetPausePicture(int32_t slotId, int32_t index, const std::string &path) override;
 
     /**
      * @brief set the device orientation
      *
+     * @param slotId[in] the slot id
+     * @param index[in] the index of call
      * @param rotation[in] The device orientation, in degrees
      * @return Returns TELEPHONY_SUCCESS on success, others on failure.
      */
-    int32_t SetDeviceDirection(int32_t rotation) override;
+    int32_t SetDeviceDirection(int32_t slotId, int32_t index, int32_t rotation) override;
 
     /**
      * @brief Set the mute state of the call
@@ -506,6 +519,24 @@ public:
      * @return Returns TELEPHONY_SUCCESS on success, others on failure.
      */
     int32_t ClearAllCalls(const std::vector<CellularCallInfo> &infos) override;
+
+    /**
+     * @brief cancel call upgrade
+     *
+     * @param slotId[in] the slot id
+     * @param index[in] the index of call
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t CancelCallUpgrade(int32_t slotId, int32_t index) override;
+
+    /**
+     * @brief request camera capabilities
+     *
+     * @param slotId[in] the slot id
+     * @param index[in] the index of call
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t RequestCameraCapabilities(int32_t slotId, int32_t index) override;
 
 private:
     /**

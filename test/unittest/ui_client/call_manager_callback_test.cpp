@@ -118,5 +118,54 @@ int32_t CallManagerCallbackTest::OnReportAudioDeviceChange(const AudioDeviceInfo
     }
     return RETURN_SUCCESS;
 }
+
+int32_t CallManagerCallbackTest::OnReportPostDialDelay(const std::string &str)
+{
+    std::cout << "----------OnReportPostDialDelay--------" << std::endl << "str:" << str << std::endl;
+    return RETURN_SUCCESS;
+}
+
+int32_t CallManagerCallbackTest::OnUpdateImsCallModeChange(const CallMediaModeInfo &imsCallModeInfo)
+{
+    std::cout << "----------OnUpdateImsCallModeChange--------" << std::endl
+              << "callId:" << imsCallModeInfo.callId << std::endl
+              << "isRequestInfo:" << imsCallModeInfo.isRequestInfo << std::endl
+              << "result:" << (int32_t)imsCallModeInfo.result << std::endl
+              << "callMode:" << (int32_t)imsCallModeInfo.callMode << std::endl;
+    return RETURN_SUCCESS;
+}
+
+int32_t CallManagerCallbackTest::OnCallSessionEventChange(const CallSessionEvent &callSessionEventOptions)
+{
+    std::cout << "----------OnCallSessionEventChange--------" << std::endl
+              << "callId:" << callSessionEventOptions.callId << std::endl
+              << "eventId:" << (int32_t)callSessionEventOptions.eventId << std::endl;
+    return RETURN_SUCCESS;
+}
+
+int32_t CallManagerCallbackTest::OnPeerDimensionsChange(const PeerDimensionsDetail &peerDimensionsDetail)
+{
+    std::cout << "----------OnPeerDimensionsChange--------" << std::endl
+              << "callId:" << peerDimensionsDetail.callId << std::endl
+              << "width:" << peerDimensionsDetail.width << std::endl
+              << "height:" << peerDimensionsDetail.height << std::endl;
+    return RETURN_SUCCESS;
+}
+
+int32_t CallManagerCallbackTest::OnCallDataUsageChange(const int64_t dataUsage)
+{
+    std::cout << "----------OnCallDataUsageChange--------" << std::endl
+              << "dataUsage:" << dataUsage << std::endl;
+    return RETURN_SUCCESS;
+}
+
+int32_t CallManagerCallbackTest::OnUpdateCameraCapabilities(const CameraCapabilities &cameraCapabilities)
+{
+    std::cout << "----------OnUpdateCameraCapabilities--------" << std::endl
+              << "callId:" << cameraCapabilities.callId << std::endl
+              << "width:" << cameraCapabilities.width << std::endl
+              << "height:" << cameraCapabilities.height << std::endl;
+    return RETURN_SUCCESS;
+}
 } // namespace Telephony
 } // namespace OHOS

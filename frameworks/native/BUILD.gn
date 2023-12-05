@@ -51,6 +51,7 @@ ohos_shared_library("tel_call_manager_api") {
     "c_utils:utils",
     "common_event_service:cesfwk_innerkits",
     "core_service:tel_core_service_api",
+    "graphic_2d:surface",
     "hilog:libhilog",
     "init:libbegetutil",
     "ipc:ipc_single",

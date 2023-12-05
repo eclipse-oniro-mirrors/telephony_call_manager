@@ -42,7 +42,7 @@ struct CellularCallInfo {
      */
     CallType callType = CallType::TYPE_ERR_CALL;
     /**
-     * Indicates whether the call is video. 0: audio 1:video
+     * Indicates whether the call is video. 0: audio 1: send only 2: revive ony 3:video
      */
     int32_t videoState = 0;
     int32_t index = 0;

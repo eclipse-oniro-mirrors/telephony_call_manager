@@ -30,6 +30,8 @@ enum VideoUpdateStatus {
     STATUS_NONE,
     STATUS_SEND_REQUEST,
     STATUS_RECV_REQUEST,
+    STATUS_RECV_RESPONSE,
+    STATUS_SEND_RESPONSE,
 };
 
 class VideoCallState : public virtual RefBase {
@@ -42,10 +44,11 @@ public:
     int32_t SwitchCallVideoState(ImsCallMode mode);
     int32_t DispatchUpdateVideoRequest(ImsCallMode mode);
     int32_t DispatchUpdateVideoResponse(ImsCallMode mode);
+    int32_t DispatchReportVideoCallInfo(CallMediaModeInfo &imsCallModeInfo);
     virtual int32_t SendUpdateCallMediaModeRequest(ImsCallMode mode) = 0;
-    virtual int32_t RecieveUpdateCallMediaModeRequest(ImsCallMode mode) = 0;
+    virtual int32_t RecieveUpdateCallMediaModeRequest(CallMediaModeInfo &imsCallModeInfo) = 0;
     virtual int32_t SendUpdateCallMediaModeResponse(ImsCallMode mode) = 0;
-    virtual int32_t ReceiveUpdateCallMediaModeResponse(ImsCallMode mode) = 0;
+    virtual int32_t ReceiveUpdateCallMediaModeResponse(CallMediaModeInfo &imsCallModeInfo) = 0;
     sptr<VideoCallState> GetCallVideoState(ImsCallMode mode);
 
 protected:
@@ -58,9 +61,9 @@ public:
     AudioOnlyState(sptr<NetCallBase> callPtr);
     ~AudioOnlyState() = default;
     int32_t SendUpdateCallMediaModeRequest(ImsCallMode mode) override;
-    int32_t RecieveUpdateCallMediaModeRequest(ImsCallMode mode) override;
+    int32_t RecieveUpdateCallMediaModeRequest(CallMediaModeInfo &imsCallModeInfo) override;
     int32_t SendUpdateCallMediaModeResponse(ImsCallMode mode) override;
-    int32_t ReceiveUpdateCallMediaModeResponse(ImsCallMode mode) override;
+    int32_t ReceiveUpdateCallMediaModeResponse(CallMediaModeInfo &imsCallModeInfo) override;
 };
 
 class VideoSendState : public VideoCallState {
@@ -68,9 +71,9 @@ public:
     VideoSendState(sptr<NetCallBase> callPtr);
     ~VideoSendState() = default;
     int32_t SendUpdateCallMediaModeRequest(ImsCallMode mode) override;
-    int32_t RecieveUpdateCallMediaModeRequest(ImsCallMode mode) override;
+    int32_t RecieveUpdateCallMediaModeRequest(CallMediaModeInfo &imsCallModeInfo) override;
     int32_t SendUpdateCallMediaModeResponse(ImsCallMode mode) override;
-    int32_t ReceiveUpdateCallMediaModeResponse(ImsCallMode mode) override;
+    int32_t ReceiveUpdateCallMediaModeResponse(CallMediaModeInfo &imsCallModeInfo) override;
 };
 
 class VideoReceiveState : public VideoCallState {
@@ -78,9 +81,9 @@ public:
     VideoReceiveState(sptr<NetCallBase> callPtr);
     ~VideoReceiveState() = default;
     int32_t SendUpdateCallMediaModeRequest(ImsCallMode mode) override;
-    int32_t RecieveUpdateCallMediaModeRequest(ImsCallMode mode) override;
+    int32_t RecieveUpdateCallMediaModeRequest(CallMediaModeInfo &imsCallModeInfo) override;
     int32_t SendUpdateCallMediaModeResponse(ImsCallMode mode) override;
-    int32_t ReceiveUpdateCallMediaModeResponse(ImsCallMode mode) override;
+    int32_t ReceiveUpdateCallMediaModeResponse(CallMediaModeInfo &imsCallModeInfo) override;
 };
 
 class VideoSendReceiveState : public VideoCallState {
@@ -88,9 +91,9 @@ public:
     VideoSendReceiveState(sptr<NetCallBase> callPtr);
     ~VideoSendReceiveState() = default;
     int32_t SendUpdateCallMediaModeRequest(ImsCallMode mode) override;
-    int32_t RecieveUpdateCallMediaModeRequest(ImsCallMode mode) override;
+    int32_t RecieveUpdateCallMediaModeRequest(CallMediaModeInfo &imsCallModeInfo) override;
     int32_t SendUpdateCallMediaModeResponse(ImsCallMode mode) override;
-    int32_t ReceiveUpdateCallMediaModeResponse(ImsCallMode mode) override;
+    int32_t ReceiveUpdateCallMediaModeResponse(CallMediaModeInfo &imsCallModeInfo) override;
 };
 
 class VideoPauseState : public VideoCallState {
@@ -98,9 +101,9 @@ public:
     VideoPauseState(sptr<NetCallBase> callPtr);
     ~VideoPauseState() = default;
     int32_t SendUpdateCallMediaModeRequest(ImsCallMode mode) override;
-    int32_t RecieveUpdateCallMediaModeRequest(ImsCallMode mode) override;
+    int32_t RecieveUpdateCallMediaModeRequest(CallMediaModeInfo &imsCallModeInfo) override;
     int32_t SendUpdateCallMediaModeResponse(ImsCallMode mode) override;
-    int32_t ReceiveUpdateCallMediaModeResponse(ImsCallMode mode) override;
+    int32_t ReceiveUpdateCallMediaModeResponse(CallMediaModeInfo &imsCallModeInfo) override;
 };
 } // namespace Telephony
 } // namespace OHOS

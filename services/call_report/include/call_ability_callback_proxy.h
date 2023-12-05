@@ -37,6 +37,11 @@ public:
     int32_t OnReportMmiCodeResult(const MmiCodeInfo &info) override;
     int32_t OnReportAudioDeviceChange(const AudioDeviceInfo &info) override;
     int32_t OnReportPostDialDelay(const std::string &str) override;
+    int32_t OnReportImsCallModeChange(const CallMediaModeInfo &imsCallModeInfo) override;
+    int32_t OnReportCallSessionEventChange(const CallSessionEvent &callSessionEventOptions) override;
+    int32_t OnReportPeerDimensionsChange(const PeerDimensionsDetail &peerDimensionsDetail) override;
+    int32_t OnReportCallDataUsageChange(const int64_t dataUsage) override;
+    int32_t OnReportCameraCapabilities(const CameraCapabilities &cameraCapabilities) override;
 
 private:
     void PackDataParcel(CallResultReportId reportId, AppExecFwk::PacMap &resultInfo, MessageParcel &dataParcel);

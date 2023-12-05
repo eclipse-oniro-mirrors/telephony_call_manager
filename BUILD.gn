@@ -142,6 +142,7 @@ ohos_shared_library("tel_call_manager") {
     "distributed_notification_service:ans_innerkits",
     "eventhandler:libeventhandler",
     "ffrt:libffrt",
+    "graphic_2d:surface",
     "hilog:libhilog",
     "hisysevent:libhisysevent",
     "hitrace:hitrace_meter",
@@ -189,13 +190,6 @@ ohos_shared_library("tel_call_manager") {
       defined(global_parts_info.telephony_cellular_call) &&
       global_parts_info.telephony_cellular_call) {
     defines += [ "ABILITY_CELLULAR_SUPPORT" ]
-  }
-
-  if (defined(global_parts_info) &&
-      defined(global_parts_info.multimedia_camera_framework) &&
-      global_parts_info.multimedia_camera_framework) {
-    external_deps += [ "camera_framework:camera_framework" ]
-    defines += [ "ABILITY_CAMERA_SUPPORT" ]
   }
 
   if (defined(global_parts_info) &&

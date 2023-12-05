@@ -44,6 +44,11 @@ private:
     int32_t OnUpdateMmiCodeResults(MessageParcel &data, MessageParcel &reply);
     int32_t OnUpdateAudioDeviceChange(MessageParcel &data, MessageParcel &reply);
     int32_t OnUpdatePostDialDelay(MessageParcel &data, MessageParcel &reply);
+    int32_t OnUpdateImsCallModeChange(MessageParcel &data, MessageParcel &reply);
+    int32_t OnUpdateCallSessionEventChange(MessageParcel &data, MessageParcel &reply);
+    int32_t OnUpdatePeerDimensionsChange(MessageParcel &data, MessageParcel &reply);
+    int32_t OnUpdateCallDataUsageChange(MessageParcel &data, MessageParcel &reply);
+    int32_t OnUpdateCameraCapabilities(MessageParcel &data, MessageParcel &reply);
 
     std::map<uint32_t, CallAbilityCallbackFunc> memberFuncMap_;
 };

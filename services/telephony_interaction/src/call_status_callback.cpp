@@ -26,6 +26,7 @@
 namespace OHOS {
 namespace Telephony {
 constexpr size_t CHAR_INDEX = 0;
+constexpr int32_t ERR_CALL_ID = 0;
 
 CallStatusCallback::CallStatusCallback() {}
 
@@ -343,14 +344,28 @@ int32_t CallStatusCallback::SetImsFeatureValueResult(const int32_t result)
     return DelayedSingleton<CallAbilityReportProxy>::GetInstance()->ReportAsyncResults(reportId, resultInfo);
 }
 
-int32_t CallStatusCallback::ReceiveUpdateCallMediaModeResponse(const CallMediaModeResponse &response)
+int32_t CallStatusCallback::ReceiveUpdateCallMediaModeRequest(const CallModeReportInfo &response)
 {
-    CallResultReportId reportId = CallResultReportId::UPDATE_MEDIA_MODE_REPORT_ID;
-    AppExecFwk::PacMap resultInfo;
-    resultInfo.PutIntValue("result", response.result);
-    TELEPHONY_LOGI("UpdateImsCallMode result = %{public}d", response.result);
-    (void)DelayedSingleton<ReportCallInfoHandler>::GetInstance()->UpdateMediaModeResponse(response);
-    return DelayedSingleton<CallAbilityReportProxy>::GetInstance()->ReportAsyncResults(reportId, resultInfo);
+    TELEPHONY_LOGI("ReceiveUpdateCallMediaModeRequest result = %{public}d", response.result);
+    int32_t ret = DelayedSingleton<ReportCallInfoHandler>::GetInstance()->ReceiveImsCallModeRequest(response);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("ReceiveUpdateCallMediaModeRequest failed! errCode:%{public}d", ret);
+    } else {
+        TELEPHONY_LOGI("ReceiveUpdateCallMediaModeRequest success!");
+    }
+    return ret;
+}
+
+int32_t CallStatusCallback::ReceiveUpdateCallMediaModeResponse(const CallModeReportInfo &response)
+{
+    TELEPHONY_LOGI("ReceiveUpdateCallMediaModeResponse result = %{public}d", response.result);
+    int32_t ret = DelayedSingleton<ReportCallInfoHandler>::GetInstance()->ReceiveImsCallModeResponse(response);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("ReceiveUpdateCallMediaModeResponse failed! errCode:%{public}d", ret);
+    } else {
+        TELEPHONY_LOGI("ReceiveUpdateCallMediaModeResponse success!");
+    }
+    return ret;
 }
 
 int32_t CallStatusCallback::InviteToConferenceResult(const int32_t result)
@@ -373,7 +388,7 @@ int32_t CallStatusCallback::CloseUnFinishedUssdResult(const int32_t result)
 
 int32_t CallStatusCallback::ReportPostDialChar(const std::string &c)
 {
-    TELEPHONY_LOGI("CallStatusCallback::ReportPostDialChar");
+    TELEPHONY_LOGI("ReportPostDialChar");
     char nextDtmf = ' ';
     if (!c.empty() && c.length() > CHAR_INDEX) {
         nextDtmf = c[CHAR_INDEX];
@@ -383,8 +398,60 @@ int32_t CallStatusCallback::ReportPostDialChar(const std::string &c)
 
 int32_t CallStatusCallback::ReportPostDialDelay(const std::string &str)
 {
-    TELEPHONY_LOGI("CallStatusCallback::ReportPostDialDelay");
+    TELEPHONY_LOGI("ReportPostDialDelay");
     return DelayedSingleton<CallAbilityReportProxy>::GetInstance()->ReportPostDialDelay(str);
+}
+
+int32_t CallStatusCallback::HandleCallSessionEventChanged(const CallSessionReportInfo &reportInfo)
+{
+    TELEPHONY_LOGI("HandleCallSessionEventChanged");
+    sptr<CallBase> callPtr = CallObjectManager::GetOneCallObjectByIndex(reportInfo.index);
+    CallSessionEvent sessionEvent;
+    if (callPtr == nullptr) {
+        sessionEvent.callId = ERR_CALL_ID;
+    } else {
+        sessionEvent.callId = callPtr->GetCallID();
+    }
+    sessionEvent.eventId = reportInfo.eventId;
+    return DelayedSingleton<CallAbilityReportProxy>::GetInstance()->ReportCallSessionEventChange(sessionEvent);
+}
+
+int32_t CallStatusCallback::HandlePeerDimensionsChanged(const PeerDimensionsReportInfo &dimensionsReportInfo)
+{
+    TELEPHONY_LOGI("HandlePeerDimensionsChanged");
+    sptr<CallBase> callPtr = CallObjectManager::GetOneCallObjectByIndex(dimensionsReportInfo.index);
+    PeerDimensionsDetail detail;
+    if (callPtr == nullptr) {
+        detail.callId = ERR_CALL_ID;
+    } else {
+        detail.callId = callPtr->GetCallID();
+    }
+    detail.width = dimensionsReportInfo.width;
+    detail.height = dimensionsReportInfo.height;
+    return DelayedSingleton<CallAbilityReportProxy>::GetInstance()->ReportPeerDimensionsChange(detail);
+}
+
+int32_t CallStatusCallback::HandleCallDataUsageChanged(const int64_t dataUsage)
+{
+    TELEPHONY_LOGI("HandleCallDataUsageChanged");
+    return DelayedSingleton<CallAbilityReportProxy>::GetInstance()->ReportCallDataUsageChange(dataUsage);
+}
+
+int32_t CallStatusCallback::HandleCameraCapabilitiesChanged(
+    const CameraCapabilitiesReportInfo &cameraCapabilitiesReportInfo)
+{
+    TELEPHONY_LOGI("CameraCapabilitiesChange");
+    sptr<CallBase> callPtr = CallObjectManager::GetOneCallObjectByIndex(cameraCapabilitiesReportInfo.index);
+    CameraCapabilities cameraCapabilities;
+    if (callPtr == nullptr) {
+        TELEPHONY_LOGI("callPtr is null, set callId as ERR_CALL_ID");
+        cameraCapabilities.callId = ERR_CALL_ID;
+    } else {
+        cameraCapabilities.callId = callPtr->GetCallID();
+    }
+    cameraCapabilities.width = cameraCapabilitiesReportInfo.width;
+    cameraCapabilities.height = cameraCapabilitiesReportInfo.height;
+    return DelayedSingleton<CallAbilityReportProxy>::GetInstance()->ReportCameraCapabilities(cameraCapabilities);
 }
 } // namespace Telephony
 } // namespace OHOS

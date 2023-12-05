@@ -27,7 +27,7 @@ public:
     IMSCall(DialParaInfo &info);
     IMSCall(DialParaInfo &info, AppExecFwk::PacMap &extras);
     ~IMSCall();
-    int32_t InitVideoCall();
+    int32_t InitVideoCall() override;
     int32_t DialingProcess() override;
     int32_t AnswerCall(int32_t videoState) override;
     int32_t RejectCall() override;
@@ -53,17 +53,25 @@ public:
     int32_t StartRtt(std::u16string &msg);
     int32_t StopRtt();
     int32_t SetMute(int32_t mute, int32_t slotId) override;
-    int32_t AcceptVideoCall();
-    int32_t RefuseVideoCall();
+    int32_t UpdateImsCallMode(ImsCallMode mode) override;
     int32_t SendUpdateCallMediaModeRequest(ImsCallMode mode) override;
-    int32_t RecieveUpdateCallMediaModeRequest(ImsCallMode mode) override;
+    int32_t RecieveUpdateCallMediaModeRequest(CallModeReportInfo &response) override;
     int32_t SendUpdateCallMediaModeResponse(ImsCallMode mode) override;
-    int32_t ReceiveUpdateCallMediaModeResponse(CallMediaModeResponse &response) override;
+    int32_t ReceiveUpdateCallMediaModeResponse(CallModeReportInfo &response) override;
+    int32_t ReportImsCallModeInfo(CallMediaModeInfo &imsCallModeInfo) override;
     void SwitchVideoState(ImsCallMode mode);
     bool IsSupportVideoCall();
-    int32_t DispatchUpdateVideoRequest(ImsCallMode mode) override;
-    int32_t DispatchUpdateVideoResponse(ImsCallMode mode) override;
     sptr<VideoCallState> GetCallVideoState(ImsCallMode mode);
+    int32_t ControlCamera(std::string &cameraId, int32_t callingUid, int32_t callingPid) override;
+    int32_t SetPreviewWindow(std::string &surfaceId, sptr<Surface> surface) override;
+    int32_t SetDisplayWindow(std::string &surfaceId, sptr<Surface> surface) override;
+    int32_t SetPausePicture(std::string &path) override;
+    int32_t SetDeviceDirection(int32_t rotation) override;
+    int32_t CancelCallUpgrade() override;
+    int32_t RequestCameraCapabilities() override;
+
+private:
+    void AssignVideoCallState(VideoStateType videoStateType);
 
 private:
     std::mutex videoUpdateMutex_;

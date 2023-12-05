@@ -460,7 +460,7 @@ int32_t CellularCallProxy::HangUpAllConnection(int32_t slotId)
     return TELEPHONY_ERR_SUCCESS;
 }
 
-int32_t CellularCallProxy::UpdateImsCallMode(const CellularCallInfo &callInfo, ImsCallMode mode)
+int32_t CellularCallProxy::SendUpdateCallMediaModeRequest(const CellularCallInfo &callInfo, ImsCallMode mode)
 {
     MessageOption option;
     MessageParcel in;
@@ -474,7 +474,7 @@ int32_t CellularCallProxy::UpdateImsCallMode(const CellularCallInfo &callInfo, I
     if (!in.WriteRawData((const void *)&callInfo, sizeof(CellularCallInfo))) {
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
-    if (!in.WriteInt32((int32_t)mode)) {
+    if (!in.WriteInt32(static_cast<int32_t>(mode))) {
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
     auto remote = Remote();
@@ -482,8 +482,38 @@ int32_t CellularCallProxy::UpdateImsCallMode(const CellularCallInfo &callInfo, I
         TELEPHONY_LOGE("function Remote() return nullptr!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int32_t error = remote->SendRequest(static_cast<uint32_t>(CellularCallInterfaceCode::UPDATE_CALL_MEDIA_MODE), in,
-        out, option);
+    int32_t error = remote->SendRequest(
+        static_cast<uint32_t>(CellularCallInterfaceCode::SEND_CALL_MEDIA_MODE_REQUEST), in, out, option);
+    if (error == ERR_NONE) {
+        return out.ReadInt32();
+    }
+    return error;
+}
+
+int32_t CellularCallProxy::SendUpdateCallMediaModeResponse(const CellularCallInfo &callInfo, ImsCallMode mode)
+{
+    MessageOption option;
+    MessageParcel in;
+    MessageParcel out;
+    if (!in.WriteInterfaceToken(CellularCallProxy::GetDescriptor())) {
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    if (!in.WriteInt32(MAX_SIZE)) {
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
+    if (!in.WriteRawData((const void *)&callInfo, sizeof(CellularCallInfo))) {
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
+    if (!in.WriteInt32(static_cast<int32_t>(mode))) {
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("function Remote() return nullptr!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t error = remote->SendRequest(
+        static_cast<uint32_t>(CellularCallInterfaceCode::SEND_CALL_MEDIA_MODE_RESPONSE), in, out, option);
     if (error == ERR_NONE) {
         return out.ReadInt32();
     }
@@ -1160,7 +1190,7 @@ int32_t CellularCallProxy::GetImsFeatureValue(int32_t slotId, FeatureType type)
     return error;
 }
 
-int32_t CellularCallProxy::CtrlCamera(const std::u16string &cameraId, int32_t callingUid, int32_t callingPid)
+int32_t CellularCallProxy::ControlCamera(int32_t slotId, int32_t index, const std::string &cameraId)
 {
     MessageOption option;
     MessageParcel in;
@@ -1171,13 +1201,13 @@ int32_t CellularCallProxy::CtrlCamera(const std::u16string &cameraId, int32_t ca
     if (!in.WriteInt32(MAX_SIZE)) {
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
-    if (!in.WriteString16(cameraId)) {
+    if (!in.WriteInt32(slotId)) {
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
-    if (!in.WriteInt32(callingUid)) {
+    if (!in.WriteInt32(index)) {
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
-    if (!in.WriteInt32(callingPid)) {
+    if (!in.WriteString(cameraId)) {
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
     auto remote = Remote();
@@ -1192,7 +1222,8 @@ int32_t CellularCallProxy::CtrlCamera(const std::u16string &cameraId, int32_t ca
     return error;
 }
 
-int32_t CellularCallProxy::SetPreviewWindow(int32_t x, int32_t y, int32_t z, int32_t width, int32_t height)
+int32_t CellularCallProxy::SetPreviewWindow(
+    int32_t slotId, int32_t index, const std::string &surfaceId, sptr<Surface> surface)
 {
     MessageOption option;
     MessageParcel in;
@@ -1203,35 +1234,36 @@ int32_t CellularCallProxy::SetPreviewWindow(int32_t x, int32_t y, int32_t z, int
     if (!in.WriteInt32(MAX_SIZE)) {
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
-    if (!in.WriteInt32(x)) {
+    if (!in.WriteInt32(slotId)) {
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
-    if (!in.WriteInt32(y)) {
+    if (!in.WriteInt32(index)) {
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
-    if (!in.WriteInt32(z)) {
+    if (!in.WriteString(surfaceId)) {
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
-    if (!in.WriteInt32(width)) {
-        return TELEPHONY_ERR_WRITE_DATA_FAIL;
-    }
-    if (!in.WriteInt32(height)) {
-        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    if (surface != nullptr) {
+        sptr<IBufferProducer> producer = surface->GetProducer();
+        if (producer != nullptr) {
+            in.WriteRemoteObject(producer->AsObject());
+        }
     }
     auto remote = Remote();
     if (remote == nullptr) {
         TELEPHONY_LOGE("function Remote() return nullptr!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int32_t error = remote->SendRequest(static_cast<uint32_t>(CellularCallInterfaceCode::SET_PREVIEW_WINDOW), in,
-        out, option);
+    int32_t error =
+        remote->SendRequest(static_cast<uint32_t>(CellularCallInterfaceCode::SET_PREVIEW_WINDOW), in, out, option);
     if (error == ERR_NONE) {
         return out.ReadInt32();
     }
     return error;
 }
 
-int32_t CellularCallProxy::SetDisplayWindow(int32_t x, int32_t y, int32_t z, int32_t width, int32_t height)
+int32_t CellularCallProxy::SetDisplayWindow(
+    int32_t slotId, int32_t index, const std::string &surfaceId, sptr<Surface> surface)
 {
     MessageOption option;
     MessageParcel in;
@@ -1242,28 +1274,28 @@ int32_t CellularCallProxy::SetDisplayWindow(int32_t x, int32_t y, int32_t z, int
     if (!in.WriteInt32(MAX_SIZE)) {
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
-    if (!in.WriteInt32(x)) {
+    if (!in.WriteInt32(slotId)) {
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
-    if (!in.WriteInt32(y)) {
+    if (!in.WriteInt32(index)) {
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
-    if (!in.WriteInt32(z)) {
+    if (!in.WriteString(surfaceId)) {
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
-    if (!in.WriteInt32(width)) {
-        return TELEPHONY_ERR_WRITE_DATA_FAIL;
-    }
-    if (!in.WriteInt32(height)) {
-        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    if (surface != nullptr) {
+        sptr<IBufferProducer> producer = surface->GetProducer();
+        if (producer != nullptr) {
+            in.WriteRemoteObject(producer->AsObject());
+        }
     }
     auto remote = Remote();
     if (remote == nullptr) {
         TELEPHONY_LOGE("function Remote() return nullptr!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    int32_t error = remote->SendRequest(static_cast<uint32_t>(CellularCallInterfaceCode::SET_DISPLAY_WINDOW), in,
-        out, option);
+    int32_t error =
+        remote->SendRequest(static_cast<uint32_t>(CellularCallInterfaceCode::SET_DISPLAY_WINDOW), in, out, option);
     if (error == ERR_NONE) {
         return out.ReadInt32();
     }
@@ -1297,7 +1329,7 @@ int32_t CellularCallProxy::SetCameraZoom(float zoomRatio)
     return error;
 }
 
-int32_t CellularCallProxy::SetPauseImage(const std::u16string &path)
+int32_t CellularCallProxy::SetPausePicture(int32_t slotId, int32_t index, const std::string &path)
 {
     MessageOption option;
     MessageParcel in;
@@ -1308,7 +1340,13 @@ int32_t CellularCallProxy::SetPauseImage(const std::u16string &path)
     if (!in.WriteInt32(MAX_SIZE)) {
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
-    if (!in.WriteString16(path)) {
+    if (!in.WriteInt32(slotId)) {
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
+    if (!in.WriteInt32(index)) {
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
+    if (!in.WriteString(path)) {
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
     auto remote = Remote();
@@ -1324,7 +1362,7 @@ int32_t CellularCallProxy::SetPauseImage(const std::u16string &path)
     return error;
 }
 
-int32_t CellularCallProxy::SetDeviceDirection(int32_t rotation)
+int32_t CellularCallProxy::SetDeviceDirection(int32_t slotId, int32_t index, int32_t rotation)
 {
     MessageOption option;
     MessageParcel in;
@@ -1333,6 +1371,12 @@ int32_t CellularCallProxy::SetDeviceDirection(int32_t rotation)
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
     if (!in.WriteInt32(MAX_SIZE)) {
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
+    if (!in.WriteInt32(slotId)) {
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
+    if (!in.WriteInt32(index)) {
         return TELEPHONY_ERR_WRITE_DATA_FAIL;
     }
     if (!in.WriteInt32(rotation)) {
@@ -1504,6 +1548,66 @@ int32_t CellularCallProxy::ClearAllCalls(const std::vector<CellularCallInfo> &in
     }
     int32_t error = remote->SendRequest(static_cast<uint32_t>(CellularCallInterfaceCode::CLEAR_ALL_CALLS),
         in, out, option);
+    if (error == ERR_NONE) {
+        return out.ReadInt32();
+    }
+    return error;
+}
+
+int32_t CellularCallProxy::CancelCallUpgrade(int32_t slotId, int32_t index)
+{
+    MessageOption option;
+    MessageParcel in;
+    MessageParcel out;
+    if (!in.WriteInterfaceToken(CellularCallProxy::GetDescriptor())) {
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    if (!in.WriteInt32(MAX_SIZE)) {
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
+    if (!in.WriteInt32(slotId)) {
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
+    if (!in.WriteInt32(index)) {
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("function Remote() return nullptr!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t error = remote->SendRequest(
+        static_cast<uint32_t>(CellularCallInterfaceCode::CANCEL_CALL_UPGRADE), in, out, option);
+    if (error == ERR_NONE) {
+        return out.ReadInt32();
+    }
+    return error;
+}
+
+int32_t CellularCallProxy::RequestCameraCapabilities(int32_t slotId, int32_t index)
+{
+    MessageOption option;
+    MessageParcel in;
+    MessageParcel out;
+    if (!in.WriteInterfaceToken(CellularCallProxy::GetDescriptor())) {
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    if (!in.WriteInt32(MAX_SIZE)) {
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
+    if (!in.WriteInt32(slotId)) {
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
+    if (!in.WriteInt32(index)) {
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("function Remote() return nullptr!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t error = remote->SendRequest(
+        static_cast<uint32_t>(CellularCallInterfaceCode::REQUEST_CAMERA_CAPABILITY), in, out, option);
     if (error == ERR_NONE) {
         return out.ReadInt32();
     }

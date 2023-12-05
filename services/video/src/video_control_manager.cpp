@@ -16,6 +16,7 @@
 
 #include <algorithm>
 
+#include "call_ability_report_proxy.h"
 #include "cellular_call_connection.h"
 #include "file_ex.h"
 #include "telephony_errors.h"
@@ -43,23 +44,58 @@ VideoControlManager::VideoControlManager() : isOpenCamera_(false) {}
 
 VideoControlManager::~VideoControlManager() {}
 
-int32_t VideoControlManager::ControlCamera(std::u16string cameraId, int32_t callingUid, int32_t callingPid)
+int32_t VideoControlManager::ControlCamera(
+    int32_t callId, std::u16string &cameraId, int32_t callingUid, int32_t callingPid)
 {
     if (cameraId.empty()) {
-        return CloseCamera(cameraId, callingUid, callingPid);
+        return CloseCamera(callId, cameraId, callingUid, callingPid);
     } else {
-        return OpenCamera(cameraId, callingUid, callingPid);
+        return OpenCamera(callId, cameraId, callingUid, callingPid);
     }
 }
 
-int32_t VideoControlManager::SetPreviewWindow(VideoWindow &window)
+int32_t VideoControlManager::SetPreviewWindow(int32_t callId, std::string &surfaceId, sptr<Surface> surface)
 {
-    return CALL_ERR_VIDEO_INVALID_COORDINATES;
+    int32_t ret = TELEPHONY_ERR_FAIL;
+    ret = CallPolicy::VideoCallPolicy(callId);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("check prerequisites failed !");
+        return ret;
+    }
+    sptr<CallBase> callPtr = CallObjectManager::GetOneCallObject(callId);
+    if (callPtr == nullptr) {
+        TELEPHONY_LOGE("the call object is nullptr, callId:%{public}d", callId);
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    sptr<IMSCall> netCall = reinterpret_cast<IMSCall *>(callPtr.GetRefPtr());
+    ret = netCall->SetPreviewWindow(surfaceId, surface);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("SetPreviewWindow failed!");
+        return ret;
+    }
+    return TELEPHONY_SUCCESS;
 }
 
-int32_t VideoControlManager::SetDisplayWindow(VideoWindow &window)
+int32_t VideoControlManager::SetDisplayWindow(int32_t callId, std::string &surfaceId, sptr<Surface> surface)
 {
-    return CALL_ERR_VIDEO_INVALID_COORDINATES;
+    int32_t ret = TELEPHONY_ERR_FAIL;
+    ret = CallPolicy::VideoCallPolicy(callId);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("check prerequisites failed !");
+        return ret;
+    }
+    sptr<CallBase> callPtr = CallObjectManager::GetOneCallObject(callId);
+    if (callPtr == nullptr) {
+        TELEPHONY_LOGE("the call object is nullptr, callId:%{public}d", callId);
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    sptr<IMSCall> netCall = reinterpret_cast<IMSCall *>(callPtr.GetRefPtr());
+    ret = netCall->SetDisplayWindow(surfaceId, surface);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("SetPreviewWindow failed!");
+        return ret;
+    }
+    return TELEPHONY_SUCCESS;
 }
 
 int32_t VideoControlManager::SetCameraZoom(float zoomRatio)
@@ -72,55 +108,131 @@ int32_t VideoControlManager::SetCameraZoom(float zoomRatio)
     return DelayedSingleton<CellularCallConnection>::GetInstance()->SetCameraZoom(zoomRatio);
 }
 
-int32_t VideoControlManager::SetPausePicture(std::u16string path)
+int32_t VideoControlManager::SetPausePicture(int32_t callId, std::u16string &path)
 {
-    std::string tempPath(Str16ToStr8(path));
-    // param check
-    if (FileExists(tempPath) && IsPngFile(tempPath)) {
-        return DelayedSingleton<CellularCallConnection>::GetInstance()->SetPausePicture(path);
-    } else {
-        TELEPHONY_LOGE("invalid path");
-        return CALL_ERR_INVALID_PATH;
+    int32_t ret = TELEPHONY_ERR_FAIL;
+    ret = CallPolicy::VideoCallPolicy(callId);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("check prerequisites failed !");
+        return ret;
     }
+    std::string tempPath(Str16ToStr8(path));
+    sptr<CallBase> callPtr = CallObjectManager::GetOneCallObject(callId);
+    if (callPtr == nullptr) {
+        TELEPHONY_LOGE("the call object is nullptr, callId:%{public}d", callId);
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    sptr<IMSCall> netCall = reinterpret_cast<IMSCall *>(callPtr.GetRefPtr());
+    ret = netCall->SetPausePicture(tempPath);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("SetPreviewWindow failed!");
+        return ret;
+    }
+    return TELEPHONY_SUCCESS;
 }
 
-int32_t VideoControlManager::SetDeviceDirection(int32_t rotation)
+int32_t VideoControlManager::SetDeviceDirection(int32_t callId, int32_t rotation)
 {
+    int32_t ret = TELEPHONY_ERR_FAIL;
+    ret = CallPolicy::VideoCallPolicy(callId);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("check prerequisites failed !");
+        return ret;
+    }
     // param check
     if (rotation == CAMERA_ROTATION_0 || rotation == CAMERA_ROTATION_90 || rotation == CAMERA_ROTATION_180 ||
         rotation == CAMERA_ROTATION_270) {
-        return DelayedSingleton<CellularCallConnection>::GetInstance()->SetDeviceDirection(rotation);
+        sptr<CallBase> callPtr = CallObjectManager::GetOneCallObject(callId);
+        if (callPtr == nullptr) {
+            TELEPHONY_LOGE("the call object is nullptr, callId:%{public}d", callId);
+            return TELEPHONY_ERR_LOCAL_PTR_NULL;
+        }
+        sptr<IMSCall> netCall = reinterpret_cast<IMSCall *>(callPtr.GetRefPtr());
+        ret = netCall->SetDeviceDirection(rotation);
+        if (ret != TELEPHONY_SUCCESS) {
+            TELEPHONY_LOGE("SetPreviewWindow failed!");
+            return ret;
+        }
+        return TELEPHONY_SUCCESS;
     }
     TELEPHONY_LOGE("error rotation:%{public}d", rotation);
     return CALL_ERR_VIDEO_INVALID_ROTATION;
 }
 
-int32_t VideoControlManager::OpenCamera(std::u16string cameraId, int32_t callingUid, int32_t callingPid)
+int32_t VideoControlManager::UpdateImsCallMode(int32_t callId, ImsCallMode callMode)
+{
+    int32_t ret = TELEPHONY_ERR_FAIL;
+    ret = CallPolicy::VideoCallPolicy(callId);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("check prerequisites failed !");
+        return ret;
+    }
+    sptr<CallBase> callPtr = CallObjectManager::GetOneCallObject(callId);
+    if (callPtr == nullptr) {
+        TELEPHONY_LOGE("the call object is nullptr, callId:%{public}d", callId);
+        return ret;
+    }
+    // only netcall type support update call media mode
+    sptr<IMSCall> netCall = reinterpret_cast<IMSCall *>(callPtr.GetRefPtr());
+    TELEPHONY_LOGI("ims call update media request");
+    ret = netCall->UpdateImsCallMode(callMode);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("UpdateImsCallMode failed!. %{public}d", ret);
+    }
+    return ret;
+}
+
+int32_t VideoControlManager::ReportImsCallModeInfo(CallMediaModeInfo &imsCallModeInfo)
+{
+    return DelayedSingleton<CallAbilityReportProxy>::GetInstance()->ReportImsCallModeChange(imsCallModeInfo);
+}
+
+int32_t VideoControlManager::OpenCamera(
+    int32_t callId, std::u16string &cameraId, int32_t callingUid, int32_t callingPid)
 {
     // cameraId check
     std::string id(Str16ToStr8(cameraId));
-    bool bRet = ContainCameraID(id);
-    if (!bRet) {
-        TELEPHONY_LOGE("camera id is error!!");
-        return CALL_ERR_VIDEO_INVALID_CAMERA_ID;
+    int32_t ret = TELEPHONY_ERR_FAIL;
+    ret = CallPolicy::VideoCallPolicy(callId);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("check prerequisites failed !");
+        return ret;
     }
-    int32_t errCode =
-        DelayedSingleton<CellularCallConnection>::GetInstance()->ControlCamera(cameraId, callingUid, callingPid);
-    if (errCode == TELEPHONY_SUCCESS) {
+    sptr<CallBase> callPtr = CallObjectManager::GetOneCallObject(callId);
+    if (callPtr == nullptr) {
+        TELEPHONY_LOGE("the call object is nullptr, callId:%{public}d", callId);
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    sptr<IMSCall> netCall = reinterpret_cast<IMSCall *>(callPtr.GetRefPtr());
+    ret = netCall->ControlCamera(id, callingUid, callingPid);
+    if (ret == TELEPHONY_SUCCESS) {
         isOpenCamera_ = true;
     }
-    return errCode;
+    return ret;
 }
 
-int32_t VideoControlManager::CloseCamera(std::u16string cameraId, int32_t callingUid, int32_t callingPid)
+int32_t VideoControlManager::CloseCamera(
+    int32_t callId, std::u16string &cameraId, int32_t callingUid, int32_t callingPid)
 {
+    std::string id(Str16ToStr8(cameraId));
+    int32_t ret = TELEPHONY_ERR_FAIL;
+    ret = CallPolicy::VideoCallPolicy(callId);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("check prerequisites failed !");
+        return ret;
+    }
     if (isOpenCamera_) {
-        int32_t errCode = DelayedSingleton<CellularCallConnection>::GetInstance()->ControlCamera(
-            cameraId, callingUid, callingPid);
-        if (errCode == TELEPHONY_SUCCESS) {
-            isOpenCamera_ = false;
+        sptr<CallBase> callPtr = CallObjectManager::GetOneCallObject(callId);
+        if (callPtr == nullptr) {
+            TELEPHONY_LOGE("the call object is nullptr, callId:%{public}d", callId);
+            return TELEPHONY_ERR_LOCAL_PTR_NULL;
         }
-        return errCode;
+        sptr<IMSCall> netCall = reinterpret_cast<IMSCall *>(callPtr.GetRefPtr());
+        ret = netCall->ControlCamera(id, callingUid, callingPid);
+        if (ret == TELEPHONY_SUCCESS) {
+            isOpenCamera_ = true;
+        }
+        return ret;
     }
     TELEPHONY_LOGE("Camera not turned on");
     return CALL_ERR_CAMERA_NOT_TURNED_ON;
@@ -159,6 +271,50 @@ bool VideoControlManager::IsPngFile(std::string fileName)
         return false;
     }
     return true;
+}
+
+int32_t VideoControlManager::CancelCallUpgrade(int32_t callId)
+{
+    int32_t ret = TELEPHONY_ERR_FAIL;
+    ret = CallPolicy::VideoCallPolicy(callId);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("check prerequisites failed !");
+        return ret;
+    }
+    sptr<CallBase> callPtr = CallObjectManager::GetOneCallObject(callId);
+    if (callPtr == nullptr) {
+        TELEPHONY_LOGE("the call object is nullptr, callId:%{public}d", callId);
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    sptr<IMSCall> netCall = reinterpret_cast<IMSCall *>(callPtr.GetRefPtr());
+    ret = netCall->CancelCallUpgrade();
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("SetPreviewWindow failed!");
+        return ret;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t VideoControlManager::RequestCameraCapabilities(int32_t callId)
+{
+    int32_t ret = TELEPHONY_ERR_FAIL;
+    ret = CallPolicy::VideoCallPolicy(callId);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("check prerequisites failed !");
+        return ret;
+    }
+    sptr<CallBase> callPtr = CallObjectManager::GetOneCallObject(callId);
+    if (callPtr == nullptr) {
+        TELEPHONY_LOGE("the call object is nullptr, callId:%{public}d", callId);
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    sptr<IMSCall> netCall = reinterpret_cast<IMSCall *>(callPtr.GetRefPtr());
+    ret = netCall->RequestCameraCapabilities();
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("SetPreviewWindow failed!");
+        return ret;
+    }
+    return TELEPHONY_SUCCESS;
 }
 
 bool VideoControlManager::CheckWindow(VideoWindow &window)

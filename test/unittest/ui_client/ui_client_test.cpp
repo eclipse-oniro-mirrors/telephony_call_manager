@@ -19,7 +19,6 @@
 
 #include "audio_system_manager.h"
 #include "system_ability_definition.h"
-#include "input/camera_manager.h"
 #include "i_call_manager_service.h"
 #include "call_manager_client.h"
 
@@ -28,8 +27,10 @@
 #include "call_manager_inner_type.h"
 #include "call_manager_errors.h"
 #include "call_manager_callback_test.h"
+#include "call_manager_service_ipc_interface_code.h"
 #include "call_manager_test_types.h"
 #include "common_event_subscriber_test.h"
+#include "surface_utils.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -901,8 +902,7 @@ void SetVolume()
         std::cout << "volume value error" << std::endl;
         return;
     }
-    AudioStandard::AudioVolumeType volumeType =
-        AudioStandard::AudioVolumeType::STREAM_MUSIC;
+    AudioStandard::AudioVolumeType volumeType = AudioStandard::AudioVolumeType::STREAM_MUSIC;
     switch (type) {
         case AudioStandard::AudioVolumeType::STREAM_RING:
             volumeType = AudioStandard::AudioVolumeType::STREAM_RING;
@@ -995,76 +995,80 @@ bool PlayRingtone()
 
 void ControlCamera()
 {
+    AccessToken token;
     std::cout << "------ControlCamera test------" << std::endl;
-    std::string tmpStr = "";
-    sptr<CameraStandard::CameraManager> camManagerObj = CameraStandard::CameraManager::GetInstance();
-    std::vector<sptr<CameraStandard::CameraDevice>> cameraObjList = camManagerObj->GetSupportedCameras();
-
-    for (auto &it : cameraObjList) {
-        tmpStr = it->GetID();
-        std::cout << "camManagerObj->GetCameras Camera ID:" << tmpStr.c_str() << std::endl;
-        if (!tmpStr.empty()) {
-            break;
-        }
-    }
-
+    std::cout << "please input callId:" << std::endl;
+    int32_t callId = DEFAULT_CALL_ID;
+    std::cin >> callId;
+    std::cout << "please input cameraId(1~3):" << std::endl;
+    std::string cameraId = "";
+    std::cin >> cameraId;
     std::u16string CameraID;
     CameraID.clear();
-    CameraID = Str8ToStr16(tmpStr);
-    int32_t ret = g_clientPtr->ControlCamera(CameraID);
-    std::cout << "ok return value:" << ret << std::endl;
+    CameraID = Str8ToStr16(cameraId);
+
+    int32_t ret = g_clientPtr->ControlCamera(callId, CameraID);
+    std::cout << "return value:" << ret << std::endl;
 
     std::cout << "ControlCamera done" << std::endl;
 }
 
 void SetPreviewWindow()
 {
+    AccessToken token;
     std::cout << "------SetPreviewWindow test------" << std::endl;
-    VideoWindow window;
-    window.x = WINDOWS_X_START;
-    window.y = WINDOWS_Y_START;
-    window.z = WINDOWS_Z_ERROR;
-    window.width = WINDOWS_WIDTH;
-    window.height = WINDOWS_HEIGHT;
-    int32_t ret = g_clientPtr->SetPreviewWindow(window);
-    std::cout << "error return value:" << ret << std::endl;
-
-    window.z = WINDOWS_Z_BOTTOM;
-    ret = g_clientPtr->SetPreviewWindow(window);
+    std::cout << "please input callId:" << std::endl;
+    int32_t ret = -1;
+    int32_t callId = DEFAULT_CALL_ID;
+    std::cin >> callId;
+    std::cout << "please input surfaceId:" << std::endl;
+    std::string surfaceId = "";
+    std::cin >> surfaceId;
+    if (surfaceId.empty() || surfaceId[0] < '0' || surfaceId[0] > '9') {
+        surfaceId = "";
+        ret = g_clientPtr->SetPreviewWindow(callId, surfaceId);
+    } else {
+        int len = static_cast<int>(surfaceId.length());
+        std::string subSurfaceId = surfaceId;
+        if (len >= 1) {
+            subSurfaceId = surfaceId.substr(0, 1);
+        }
+        ret = g_clientPtr->SetPreviewWindow(callId, subSurfaceId);
+    }
     std::cout << "return value:" << ret << std::endl;
-
-    window.z = WINDOWS_Z_TOP;
-    ret = g_clientPtr->SetPreviewWindow(window);
-    std::cout << "return value:" << ret << std::endl;
-
     std::cout << "SetPreviewWindow done" << std::endl;
 }
 
 void SetDisplayWindow()
 {
+    AccessToken token;
     std::cout << "------SetDisplayWindow test------" << std::endl;
-    VideoWindow window;
-    window.x = WINDOWS_X_START;
-    window.y = WINDOWS_Y_START;
-    window.z = WINDOWS_WIDTH;
-    window.width = WINDOWS_WIDTH;
-    window.height = WINDOWS_HEIGHT;
-    int32_t ret = g_clientPtr->SetDisplayWindow(window);
-    std::cout << "error return value:" << ret << std::endl;
-
-    window.z = WINDOWS_Z_TOP;
-    ret = g_clientPtr->SetDisplayWindow(window);
-    std::cout << "ok return value:" << ret << std::endl;
-
-    window.z = WINDOWS_Z_BOTTOM;
-    ret = g_clientPtr->SetDisplayWindow(window);
-    std::cout << "ok return value:" << ret << std::endl;
-
+    std::cout << "please input callId:" << std::endl;
+    int32_t ret = -1;
+    int32_t callId = DEFAULT_CALL_ID;
+    std::cin >> callId;
+    std::cout << "please input surfaceId:" << std::endl;
+    std::string surfaceId = "";
+    std::cin >> surfaceId;
+    if (surfaceId.empty() || surfaceId[0] < '0' || surfaceId[0] > '9') {
+        surfaceId = "";
+        ret = g_clientPtr->SetDisplayWindow(callId, surfaceId);
+    } else {
+        int len = static_cast<int>(surfaceId.length());
+        std::string subSurfaceId = surfaceId;
+        if (len >= 1) {
+            subSurfaceId = surfaceId.substr(0, 1);
+        }
+        ret = g_clientPtr->SetDisplayWindow(callId, subSurfaceId);
+    }
+    std::cout << "return value:" << ret << std::endl;
     std::cout << "SetDisplayWindow done" << std::endl;
 }
 
 void SetCameraZoom()
 {
+    AccessToken token;
+    std::cout << "------SetCameraZoom test------" << std::endl;
     const float CameraZoomMax = 12.0;
     const float CameraZoomMin = -0.1;
     const float CameraZoom = 2.0;
@@ -1082,29 +1086,37 @@ void SetCameraZoom()
 
 void SetPausePicture()
 {
+    AccessToken token;
     std::cout << "------SetPausePicture test------" << std::endl;
+    std::cout << "please input callId:" << std::endl;
+    int32_t callId = DEFAULT_CALL_ID;
+    std::cin >> callId;
     std::u16string path;
     std::string tmpStr = "/system/bin/1.png";
     path.clear();
     path = Str8ToStr16(tmpStr);
-    int32_t ret = g_clientPtr->SetPausePicture(path);
-    std::cout << "\n return value:" << ret << std::endl;
+    int32_t ret = g_clientPtr->SetPausePicture(callId, path);
+    std::cout << "return value:" << ret << std::endl;
     std::cout << "SetPausePicture done" << std::endl;
 }
 
 void SetDeviceDirection()
 {
+    AccessToken token;
     const int32_t DeviceDirectionError1 = 50;
     const int32_t DeviceDirectionError2 = 350;
     const int32_t DeviceDirection90 = 90;
     std::cout << "------SetDeviceDirection test------" << std::endl;
-    int32_t ret = g_clientPtr->SetDeviceDirection(DeviceDirectionError1);
+    std::cout << "please input callId:" << std::endl;
+    int32_t callId = DEFAULT_CALL_ID;
+    std::cin >> callId;
+    int32_t ret = g_clientPtr->SetDeviceDirection(callId, DeviceDirectionError1);
     std::cout << "\n return value:" << ret << std::endl;
 
-    ret = g_clientPtr->SetDeviceDirection(DeviceDirectionError2);
+    ret = g_clientPtr->SetDeviceDirection(callId, DeviceDirectionError2);
     std::cout << "\n return value:" << ret << std::endl;
 
-    ret = g_clientPtr->SetDeviceDirection(DeviceDirection90);
+    ret = g_clientPtr->SetDeviceDirection(callId, DeviceDirection90);
     std::cout << "\n return value:" << ret << std::endl;
     std::cout << "SetDeviceDirection done" << std::endl;
 }
@@ -1382,6 +1394,34 @@ void RemoveMissedIncomingCallNotification()
     std::cout << "return value:" << ret << std::endl;
 }
 
+void CancelCallUpgrade()
+{
+    int32_t callId = DEFAULT_CALL_ID;
+    std::cout << "------CancelCallUpgrade------" << std::endl;
+    std::cout << "please input call id:" << std::endl;
+    std::cin >> callId;
+    if (g_clientPtr == nullptr) {
+        std::cout << "g_clientPtr is nullptr" << std::endl;
+        return;
+    }
+    int32_t ret = g_clientPtr->CancelCallUpgrade(callId);
+    std::cout << "return value:" << ret << std::endl;
+}
+
+void RequestCameraCapabilities()
+{
+    int32_t callId = DEFAULT_CALL_ID;
+    std::cout << "------RequestCameraCapabilities------" << std::endl;
+    std::cout << "please input call id:" << std::endl;
+    std::cin >> callId;
+    if (g_clientPtr == nullptr) {
+        std::cout << "g_clientPtr is nullptr" << std::endl;
+        return;
+    }
+    int32_t ret = g_clientPtr->RequestCameraCapabilities(callId);
+    std::cout << "return value:" << ret << std::endl;
+}
+
 void AddPermission()
 {
     return;
@@ -1399,96 +1439,146 @@ void VerifyPermission()
 
 void InitCallBasicPower()
 {
-    g_memberFuncMap[OHOS::Telephony::INTERFACE_DIAL_CALL] = &OHOS::Telephony::DialCall;
-    g_memberFuncMap[OHOS::Telephony::INTERFACE_ANSWER_CALL] = &OHOS::Telephony::AnswerCall;
-    g_memberFuncMap[OHOS::Telephony::INTERFACE_REJECT_CALL] = &OHOS::Telephony::RejectCall;
-    g_memberFuncMap[OHOS::Telephony::INTERFACE_HOLD_CALL] = &OHOS::Telephony::HoldCall;
-    g_memberFuncMap[OHOS::Telephony::INTERFACE_UNHOLD_CALL] = &OHOS::Telephony::UnHoldCall;
-    g_memberFuncMap[OHOS::Telephony::INTERFACE_DISCONNECT_CALL] = &OHOS::Telephony::HangUpCall;
-    g_memberFuncMap[OHOS::Telephony::INTERFACE_GET_CALL_STATE] = &OHOS::Telephony::GetCallState;
-    g_memberFuncMap[OHOS::Telephony::INTERFACE_SWAP_CALL] = &OHOS::Telephony::SwitchCall;
-    g_memberFuncMap[OHOS::Telephony::INTERFACE_START_RTT] = &OHOS::Telephony::StartRtt;
-    g_memberFuncMap[OHOS::Telephony::INTERFACE_STOP_RTT] = &OHOS::Telephony::StopRtt;
-    g_memberFuncMap[OHOS::Telephony::INTERFACE_INPUT_DIALER_SPECIAL_CODE] = &OHOS::Telephony::InputDialerSpecialCode;
+    g_memberFuncMap[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_DIAL_CALL)] = &OHOS::Telephony::DialCall;
+    g_memberFuncMap[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_ANSWER_CALL)] =
+        &OHOS::Telephony::AnswerCall;
+    g_memberFuncMap[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_REJECT_CALL)] =
+        &OHOS::Telephony::RejectCall;
+    g_memberFuncMap[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_HOLD_CALL)] = &OHOS::Telephony::HoldCall;
+    g_memberFuncMap[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_UNHOLD_CALL)] =
+        &OHOS::Telephony::UnHoldCall;
+    g_memberFuncMap[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_DISCONNECT_CALL)] =
+        &OHOS::Telephony::HangUpCall;
+    g_memberFuncMap[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_GET_CALL_STATE)] =
+        &OHOS::Telephony::GetCallState;
+    g_memberFuncMap[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_SWAP_CALL)] =
+        &OHOS::Telephony::SwitchCall;
+    g_memberFuncMap[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_START_RTT)] = &OHOS::Telephony::StartRtt;
+    g_memberFuncMap[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_STOP_RTT)] = &OHOS::Telephony::StopRtt;
+    g_memberFuncMap[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_INPUT_DIALER_SPECIAL_CODE)] =
+        &OHOS::Telephony::InputDialerSpecialCode;
 }
 
 void InitCallUtils()
 {
-    g_memberFuncMap[OHOS::Telephony::INTERFACE_HAS_CALL] = &OHOS::Telephony::HasCall;
-    g_memberFuncMap[OHOS::Telephony::INTERFACE_IS_NEW_CALL_ALLOWED] = &OHOS::Telephony::IsNewCallAllowed;
-    g_memberFuncMap[OHOS::Telephony::INTERFACE_IS_RINGING] = &OHOS::Telephony::IsRinging;
-    g_memberFuncMap[OHOS::Telephony::INTERFACE_IS_EMERGENCY_CALL] = &OHOS::Telephony::IsInEmergencyCall;
-    g_memberFuncMap[OHOS::Telephony::INTERFACE_IS_EMERGENCY_NUMBER] = &OHOS::Telephony::IsEmergencyPhoneNumber;
-    g_memberFuncMap[OHOS::Telephony::INTERFACE_IS_FORMAT_NUMBER] = &OHOS::Telephony::FormatPhoneNumber;
-    g_memberFuncMap[OHOS::Telephony::INTERFACE_IS_FORMAT_NUMBER_E164] = &OHOS::Telephony::FormatPhoneNumberToE164;
-    g_memberFuncMap[OHOS::Telephony::INTERFACE_REMOVE_MISSED_INCOMING_CALL_NOTIFICATION] =
+    g_memberFuncMap[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_HAS_CALL)] = &OHOS::Telephony::HasCall;
+    g_memberFuncMap[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_IS_NEW_CALL_ALLOWED)] =
+        &OHOS::Telephony::IsNewCallAllowed;
+    g_memberFuncMap[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_IS_RINGING)] =
+        &OHOS::Telephony::IsRinging;
+    g_memberFuncMap[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_IS_EMERGENCY_CALL)] =
+        &OHOS::Telephony::IsInEmergencyCall;
+    g_memberFuncMap[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_IS_EMERGENCY_NUMBER)] =
+        &OHOS::Telephony::IsEmergencyPhoneNumber;
+    g_memberFuncMap[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_IS_FORMAT_NUMBER)] =
+        &OHOS::Telephony::FormatPhoneNumber;
+    g_memberFuncMap[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_IS_FORMAT_NUMBER_E164)] =
+        &OHOS::Telephony::FormatPhoneNumberToE164;
+    g_memberFuncMap[static_cast<int32_t>(
+        CallManagerInterfaceCode::INTERFACE_CANCEL_MISSED_INCOMING_CALL_NOTIFICATION)] =
         &OHOS::Telephony::RemoveMissedIncomingCallNotification;
 }
 
 void InitCallConferencePower()
 {
-    g_memberFuncMap[OHOS::Telephony::INTERFACE_COMBINE_CONFERENCE] = &OHOS::Telephony::CombineConference;
-    g_memberFuncMap[OHOS::Telephony::INTERFACE_SEPARATE_CONFERENCE] = &OHOS::Telephony::SeparateConference;
-    g_memberFuncMap[OHOS::Telephony::INTERFACE_KICK_OUT_CONFERENCE] = &OHOS::Telephony::KickOutFromConference;
+    g_memberFuncMap[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_COMBINE_CONFERENCE)] =
+        &OHOS::Telephony::CombineConference;
+    g_memberFuncMap[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_SEPARATE_CONFERENCE)] =
+        &OHOS::Telephony::SeparateConference;
+    g_memberFuncMap[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_KICK_OUT_CONFERENCE)] =
+        &OHOS::Telephony::KickOutFromConference;
 }
 
 void InitCallDtmfPower()
 {
-    g_memberFuncMap[OHOS::Telephony::INTERFACE_START_DTMF] = &OHOS::Telephony::StartDtmf;
-    g_memberFuncMap[OHOS::Telephony::INTERFACE_STOP_DTMF] = &OHOS::Telephony::StopDtmf;
+    g_memberFuncMap[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_START_DTMF)] =
+        &OHOS::Telephony::StartDtmf;
+    g_memberFuncMap[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_STOP_DTMF)] = &OHOS::Telephony::StopDtmf;
 }
 
 void InitCallSupplementPower()
 {
-    g_memberFuncMap[OHOS::Telephony::INTERFACE_GET_CALL_WAITING] = &OHOS::Telephony::GetCallWaiting;
-    g_memberFuncMap[OHOS::Telephony::INTERFACE_SET_CALL_WAITING] = &OHOS::Telephony::SetCallWaiting;
-    g_memberFuncMap[OHOS::Telephony::INTERFACE_GET_CALL_RESTRICTION] = &OHOS::Telephony::GetCallRestriction;
-    g_memberFuncMap[OHOS::Telephony::INTERFACE_SET_CALL_RESTRICTION] = &OHOS::Telephony::SetCallRestriction;
-    g_memberFuncMap[OHOS::Telephony::INTERFACE_SET_CALL_RESTRICTION_PASSWORD] =
+    g_memberFuncMap[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_GET_CALL_WAITING)] =
+        &OHOS::Telephony::GetCallWaiting;
+    g_memberFuncMap[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_SET_CALL_WAITING)] =
+        &OHOS::Telephony::SetCallWaiting;
+    g_memberFuncMap[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_GET_CALL_RESTRICTION)] =
+        &OHOS::Telephony::GetCallRestriction;
+    g_memberFuncMap[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_SET_CALL_RESTRICTION)] =
+        &OHOS::Telephony::SetCallRestriction;
+    g_memberFuncMap[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_SET_CALL_RESTRICTION_PASSWORD)] =
         &OHOS::Telephony::SetCallRestrictionPassword;
-    g_memberFuncMap[OHOS::Telephony::INTERFACE_GET_CALL_TRANSFER] = &OHOS::Telephony::GetCallTransferInfo;
-    g_memberFuncMap[OHOS::Telephony::INTERFACE_SET_CALL_TRANSFER] = &OHOS::Telephony::SetCallTransferInfo;
-    g_memberFuncMap[OHOS::Telephony::INTERFACE_CAN_SET_CALL_TRANSFER_TIME] = &OHOS::Telephony::CanSetCallTransferTime;
-    g_memberFuncMap[OHOS::Telephony::INTERFACE_SETCALL_PREFERENCEMODE] = &OHOS::Telephony::SetCallPreferenceMode;
+    g_memberFuncMap[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_GET_CALL_TRANSFER)] =
+        &OHOS::Telephony::GetCallTransferInfo;
+    g_memberFuncMap[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_SET_CALL_TRANSFER)] =
+        &OHOS::Telephony::SetCallTransferInfo;
+    g_memberFuncMap[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_CAN_SET_CALL_TRANSFER_TIME)] =
+        &OHOS::Telephony::CanSetCallTransferTime;
+    g_memberFuncMap[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_SETCALL_PREFERENCEMODE)] =
+        &OHOS::Telephony::SetCallPreferenceMode;
 }
 
 void initCallConferenceExPower()
 {
-    g_memberFuncMap[OHOS::Telephony::INTERFACE_GET_MAINID] = &OHOS::Telephony::GetMainCallId;
-    g_memberFuncMap[OHOS::Telephony::INTERFACE_GET_SUBCALL_LIST_ID] = &OHOS::Telephony::GetSubCallIdList;
-    g_memberFuncMap[OHOS::Telephony::INTERFACE_GET_CALL_LIST_ID_FOR_CONFERENCE] =
+    g_memberFuncMap[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_GET_MAINID)] =
+        &OHOS::Telephony::GetMainCallId;
+    g_memberFuncMap[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_GET_SUBCALL_LIST_ID)] =
+        &OHOS::Telephony::GetSubCallIdList;
+    g_memberFuncMap[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_GET_CALL_LIST_ID_FOR_CONFERENCE)] =
         &OHOS::Telephony::GetCallIdListForConference;
-    g_memberFuncMap[OHOS::Telephony::INTERFACE_JOIN_CONFERENCE] = &OHOS::Telephony::InviteToConference;
+    g_memberFuncMap[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_JOIN_CONFERENCE)] =
+        &OHOS::Telephony::InviteToConference;
 }
 
 void InitCallMultimediaPower()
 {
-    g_memberFuncMap[OHOS::Telephony::INTERFACE_SET_MUTE] = &OHOS::Telephony::SetMute;
-    g_memberFuncMap[OHOS::Telephony::INTERFACE_MUTE_RINGER] = &OHOS::Telephony::MuteRinger;
-    g_memberFuncMap[OHOS::Telephony::INTERFACE_SET_AUDIO_DEVICE] = &OHOS::Telephony::SetAudioDevice;
-    g_memberFuncMap[OHOS::Telephony::INTERFACE_CTRL_CAMERA] = &OHOS::Telephony::ControlCamera;
-    g_memberFuncMap[OHOS::Telephony::INTERFACE_SET_PREVIEW_WINDOW] = &OHOS::Telephony::SetPreviewWindow;
-    g_memberFuncMap[OHOS::Telephony::INTERFACE_SET_DISPLAY_WINDOW] = &OHOS::Telephony::SetDisplayWindow;
-    g_memberFuncMap[OHOS::Telephony::INTERFACE_SET_CAMERA_ZOOM] = &OHOS::Telephony::SetCameraZoom;
-    g_memberFuncMap[OHOS::Telephony::INTERFACE_SET_PAUSE_IMAGE] = &OHOS::Telephony::SetPausePicture;
-    g_memberFuncMap[OHOS::Telephony::INTERFACE_SET_DEVICE_DIRECTION] = &OHOS::Telephony::SetDeviceDirection;
-    g_memberFuncMap[OHOS::Telephony::INTERFACE_UPDATE_CALL_MEDIA_MODE] = &OHOS::Telephony::UpdateImsCallMode;
-
+    g_memberFuncMap[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_SET_MUTE)] = &OHOS::Telephony::SetMute;
+    g_memberFuncMap[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_MUTE_RINGER)] =
+        &OHOS::Telephony::MuteRinger;
+    g_memberFuncMap[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_SET_AUDIO_DEVICE)] =
+        &OHOS::Telephony::SetAudioDevice;
+    g_memberFuncMap[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_CTRL_CAMERA)] =
+        &OHOS::Telephony::ControlCamera;
+    g_memberFuncMap[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_SET_PREVIEW_WINDOW)] =
+        &OHOS::Telephony::SetPreviewWindow;
+    g_memberFuncMap[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_SET_DISPLAY_WINDOW)] =
+        &OHOS::Telephony::SetDisplayWindow;
+    g_memberFuncMap[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_SET_CAMERA_ZOOM)] =
+        &OHOS::Telephony::SetCameraZoom;
+    g_memberFuncMap[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_SET_PAUSE_IMAGE)] =
+        &OHOS::Telephony::SetPausePicture;
+    g_memberFuncMap[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_SET_DEVICE_DIRECTION)] =
+        &OHOS::Telephony::SetDeviceDirection;
+    g_memberFuncMap[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_UPDATE_CALL_MEDIA_MODE)] =
+        &OHOS::Telephony::UpdateImsCallMode;
+    g_memberFuncMap[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_CANCEL_CALL_UPGRADE)] =
+        &OHOS::Telephony::CancelCallUpgrade;
+    g_memberFuncMap[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_REQUEST_CAMERA_CAPABILITIES)] =
+        &OHOS::Telephony::RequestCameraCapabilities;
     g_memberFuncMap[DEFINE_INIT_PERMISSIONS] = &OHOS::Telephony::InitPermission;
     g_memberFuncMap[DEFINE_VERIFY_PERMISSIONS] = &OHOS::Telephony::VerifyPermission;
 }
 
 void InitImsServicePower()
 {
-    g_memberFuncMap[OHOS::Telephony::INTERFACE_GET_IMS_CONFIG] = &OHOS::Telephony::GetImsConfig;
-    g_memberFuncMap[OHOS::Telephony::INTERFACE_SET_IMS_CONFIG] = &OHOS::Telephony::SetImsConfig;
-    g_memberFuncMap[OHOS::Telephony::INTERFACE_GET_IMS_FEATURE_VALUE] = &OHOS::Telephony::GetImsFeatureValue;
-    g_memberFuncMap[OHOS::Telephony::INTERFACE_SET_IMS_FEATURE_VALUE] = &OHOS::Telephony::SetImsFeatureValue;
-    g_memberFuncMap[OHOS::Telephony::INTERFACE_ENABLE_VOLTE] = &OHOS::Telephony::EnableImsSwitch;
-    g_memberFuncMap[OHOS::Telephony::INTERFACE_DISABLE_VOLTE] = &OHOS::Telephony::DisableImsSwitch;
-    g_memberFuncMap[OHOS::Telephony::INTERFACE_IS_VOLTE_ENABLED] = &OHOS::Telephony::IsImsSwitchEnabled;
-    g_memberFuncMap[OHOS::Telephony::INTERFACE_SET_VONR_STATE] = &OHOS::Telephony::SetVoNRState;
-    g_memberFuncMap[OHOS::Telephony::INTERFACE_GET_VONR_STATE] = &OHOS::Telephony::GetVoNRState;
+    g_memberFuncMap[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_GET_IMS_CONFIG)] =
+        &OHOS::Telephony::GetImsConfig;
+    g_memberFuncMap[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_SET_IMS_CONFIG)] =
+        &OHOS::Telephony::SetImsConfig;
+    g_memberFuncMap[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_GET_IMS_FEATURE_VALUE)] =
+        &OHOS::Telephony::GetImsFeatureValue;
+    g_memberFuncMap[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_SET_IMS_FEATURE_VALUE)] =
+        &OHOS::Telephony::SetImsFeatureValue;
+    g_memberFuncMap[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_ENABLE_VOLTE)] =
+        &OHOS::Telephony::EnableImsSwitch;
+    g_memberFuncMap[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_DISABLE_VOLTE)] =
+        &OHOS::Telephony::DisableImsSwitch;
+    g_memberFuncMap[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_IS_VOLTE_ENABLED)] =
+        &OHOS::Telephony::IsImsSwitchEnabled;
+    g_memberFuncMap[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_SET_VONR_STATE)] =
+        &OHOS::Telephony::SetVoNRState;
+    g_memberFuncMap[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_GET_VONR_STATE)] =
+        &OHOS::Telephony::GetVoNRState;
 }
 
 int32_t Init()
@@ -1605,6 +1695,8 @@ void PrintfCallMultimediaInterface()
               << "57:InputDialerSpecialCode\n"
               << "59:SetVoNRState\n"
               << "60:GetVoNRState\n"
+              << "62:CancelCallUpgrade\n"
+              << "63:RequestCameraCapabilities\n"
               << "93:InitPermission\n"
               << "94:VerifyPermission\n"
               << "95:SendConnectBluetoothScoBroadcast\n"
@@ -1687,8 +1779,8 @@ int32_t main()
     std::cout << "Please select interface type...." << std::endl;
     while (true) {
         std::cout << "1:callManager interface\n"
-            << "2:bluetooth call interface\n"
-            << "1000:exit\n";
+                  << "2:bluetooth call interface\n"
+                  << "1000:exit\n";
         std::cin >> code;
         switch (code) {
             case static_cast<int32_t>(OHOS::Telephony::CallManagerInterfaceType::INTERFACE_CALL_MANAGER_TYPE):

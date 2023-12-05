@@ -172,15 +172,5 @@ int32_t CallRequestHandler::KickOutFromConference(int32_t callId)
     ffrt::submit([=]() { callRequestProcessPtr_->KickOutFromConferenceRequest(callId); });
     return TELEPHONY_SUCCESS;
 }
-
-int32_t CallRequestHandler::UpdateImsCallMode(int32_t callId, ImsCallMode mode)
-{
-    if (callRequestProcessPtr_ == nullptr) {
-        TELEPHONY_LOGE("callRequestProcessPtr_ is nullptr");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-    ffrt::submit([=]() { callRequestProcessPtr_->UpdateCallMediaModeRequest(callId, mode); });
-    return TELEPHONY_SUCCESS;
-}
 } // namespace Telephony
 } // namespace OHOS

@@ -112,6 +112,8 @@ private:
     int32_t OnGetVoIPCallState(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetProxyObjectPtr(MessageParcel &data, MessageParcel &reply);
     int32_t OnReportAudioDeviceInfo(MessageParcel &data, MessageParcel &reply);
+    int32_t OnCancelCallUpgrade(MessageParcel &data, MessageParcel &reply);
+    int32_t OnRequestCameraCapabilities(MessageParcel &data, MessageParcel &reply);
     std::map<uint32_t, CallManagerServiceFunc> memberFuncMap_;
 };
 } // namespace Telephony

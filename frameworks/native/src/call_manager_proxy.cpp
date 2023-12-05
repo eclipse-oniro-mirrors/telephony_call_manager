@@ -807,14 +807,14 @@ int32_t CallManagerProxy::SetAudioDevice(const AudioDevice &audioDevice)
     return TELEPHONY_SUCCESS;
 }
 
-int32_t CallManagerProxy::ControlCamera(std::u16string cameraId)
+int32_t CallManagerProxy::ControlCamera(int32_t callId, std::u16string &cameraId)
 {
     if (ReConnectService() != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     std::lock_guard<std::mutex> lock(mutex_);
-    int32_t errCode = callManagerServicePtr_->ControlCamera(cameraId);
+    int32_t errCode = callManagerServicePtr_->ControlCamera(callId, cameraId);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("ControlCamera failed, errcode:%{public}d", errCode);
         return errCode;
@@ -822,14 +822,27 @@ int32_t CallManagerProxy::ControlCamera(std::u16string cameraId)
     return TELEPHONY_SUCCESS;
 }
 
-int32_t CallManagerProxy::SetPreviewWindow(VideoWindow &window)
+int32_t CallManagerProxy::SetPreviewWindow(int32_t callId, std::string &surfaceId)
 {
     if (ReConnectService() != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     std::lock_guard<std::mutex> lock(mutex_);
-    int32_t errCode = callManagerServicePtr_->SetPreviewWindow(window);
+    int32_t errCode = TELEPHONY_SUCCESS;
+    if (surfaceId.empty() || surfaceId[0] < '0' || surfaceId[0] > '9') {
+        TELEPHONY_LOGI("surfaceId is invalid, set surface nullptr");
+        surfaceId = "";
+        errCode = callManagerServicePtr_->SetPreviewWindow(callId, surfaceId, nullptr);
+    } else {
+        uint64_t previewSurfaceId = std::stoull(surfaceId);
+        auto surface = SurfaceUtils::GetInstance()->GetSurface(previewSurfaceId);
+        if (surface == nullptr) {
+            TELEPHONY_LOGI("surface is null");
+            surfaceId = "";
+        }
+        errCode = callManagerServicePtr_->SetPreviewWindow(callId, surfaceId, surface);
+    }
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("SetPreviewWindow failed, errcode:%{public}d", errCode);
         return errCode;
@@ -837,14 +850,27 @@ int32_t CallManagerProxy::SetPreviewWindow(VideoWindow &window)
     return TELEPHONY_SUCCESS;
 }
 
-int32_t CallManagerProxy::SetDisplayWindow(VideoWindow &window)
+int32_t CallManagerProxy::SetDisplayWindow(int32_t callId, std::string &surfaceId)
 {
     if (ReConnectService() != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     std::lock_guard<std::mutex> lock(mutex_);
-    int32_t errCode = callManagerServicePtr_->SetDisplayWindow(window);
+    int32_t errCode = TELEPHONY_SUCCESS;
+    if (surfaceId.empty() || surfaceId[0] < '0' || surfaceId[0] > '9') {
+        TELEPHONY_LOGI("surfaceId is invalid, set surface nullptr");
+        surfaceId = "";
+        errCode = callManagerServicePtr_->SetDisplayWindow(callId, surfaceId, nullptr);
+    } else {
+        uint64_t displaySurfaceId = std::stoull(surfaceId);
+        auto surface = SurfaceUtils::GetInstance()->GetSurface(displaySurfaceId);
+        if (surface == nullptr) {
+            TELEPHONY_LOGI("surface is null");
+            surfaceId = "";
+        }
+        errCode = callManagerServicePtr_->SetDisplayWindow(callId, surfaceId, surface);
+    }
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("SetDisplayWindow failed, errcode:%{public}d", errCode);
         return errCode;
@@ -867,14 +893,14 @@ int32_t CallManagerProxy::SetCameraZoom(float zoomRatio)
     return TELEPHONY_SUCCESS;
 }
 
-int32_t CallManagerProxy::SetPausePicture(std::u16string path)
+int32_t CallManagerProxy::SetPausePicture(int32_t callId, std::u16string &path)
 {
     if (ReConnectService() != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     std::lock_guard<std::mutex> lock(mutex_);
-    int32_t errCode = callManagerServicePtr_->SetPausePicture(path);
+    int32_t errCode = callManagerServicePtr_->SetPausePicture(callId, path);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("SetPausePicture failed, errcode:%{public}d", errCode);
         return errCode;
@@ -882,14 +908,14 @@ int32_t CallManagerProxy::SetPausePicture(std::u16string path)
     return TELEPHONY_SUCCESS;
 }
 
-int32_t CallManagerProxy::SetDeviceDirection(int32_t rotation)
+int32_t CallManagerProxy::SetDeviceDirection(int32_t callId, int32_t rotation)
 {
     if (ReConnectService() != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     std::lock_guard<std::mutex> lock(mutex_);
-    int32_t errCode = callManagerServicePtr_->SetDeviceDirection(rotation);
+    int32_t errCode = callManagerServicePtr_->SetDeviceDirection(callId, rotation);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("SetDeviceDirection failed, errcode:%{public}d", errCode);
         return errCode;
@@ -1242,6 +1268,36 @@ int32_t CallManagerProxy::ReportAudioDeviceInfo()
     }
     std::lock_guard<std::mutex> lock(mutex_);
     int32_t errCode = callManagerServicePtr_->ReportAudioDeviceInfo();
+    if (errCode != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("ReportAudioDeviceInfo failed, errcode:%{public}d", errCode);
+        return errCode;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallManagerProxy::CancelCallUpgrade(int32_t callId)
+{
+    if (ReConnectService() != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("ipc reconnect failed!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    std::lock_guard<std::mutex> lock(mutex_);
+    int32_t errCode = callManagerServicePtr_->CancelCallUpgrade(callId);
+    if (errCode != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("ReportAudioDeviceInfo failed, errcode:%{public}d", errCode);
+        return errCode;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallManagerProxy::RequestCameraCapabilities(int32_t callId)
+{
+    if (ReConnectService() != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("ipc reconnect failed!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    std::lock_guard<std::mutex> lock(mutex_);
+    int32_t errCode = callManagerServicePtr_->RequestCameraCapabilities(callId);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("ReportAudioDeviceInfo failed, errcode:%{public}d", errCode);
         return errCode;

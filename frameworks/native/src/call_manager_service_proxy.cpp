@@ -617,13 +617,14 @@ int32_t CallManagerServiceProxy::KickOutFromConference(int32_t callId)
     return replyParcel.ReadInt32();
 }
 
-int32_t CallManagerServiceProxy::ControlCamera(std::u16string cameraId)
+int32_t CallManagerServiceProxy::ControlCamera(int32_t callId, std::u16string &cameraId)
 {
     MessageParcel dataParcel;
     if (!dataParcel.WriteInterfaceToken(CallManagerServiceProxy::GetDescriptor())) {
         TELEPHONY_LOGE("write descriptor fail");
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
+    dataParcel.WriteInt32(callId);
     dataParcel.WriteString16(cameraId);
     MessageParcel replyParcel;
     int32_t error = SendRequest(INTERFACE_CTRL_CAMERA, dataParcel, replyParcel);
@@ -634,14 +635,21 @@ int32_t CallManagerServiceProxy::ControlCamera(std::u16string cameraId)
     return replyParcel.ReadInt32();
 }
 
-int32_t CallManagerServiceProxy::SetPreviewWindow(VideoWindow &window)
+int32_t CallManagerServiceProxy::SetPreviewWindow(int32_t callId, std::string &surfaceId, sptr<Surface> surface)
 {
     MessageParcel dataParcel;
     if (!dataParcel.WriteInterfaceToken(CallManagerServiceProxy::GetDescriptor())) {
         TELEPHONY_LOGE("write descriptor fail");
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
-    dataParcel.WriteRawData((const void *)&window, sizeof(VideoWindow));
+    dataParcel.WriteInt32(callId);
+    dataParcel.WriteString(surfaceId);
+    if (surface != nullptr) {
+        sptr<IBufferProducer> producer = surface->GetProducer();
+        if (producer != nullptr) {
+            dataParcel.WriteRemoteObject(producer->AsObject());
+        }
+    }
     MessageParcel replyParcel;
     int32_t error = SendRequest(INTERFACE_SET_PREVIEW_WINDOW, dataParcel, replyParcel);
     if (error != TELEPHONY_SUCCESS) {
@@ -651,14 +659,21 @@ int32_t CallManagerServiceProxy::SetPreviewWindow(VideoWindow &window)
     return replyParcel.ReadInt32();
 }
 
-int32_t CallManagerServiceProxy::SetDisplayWindow(VideoWindow &window)
+int32_t CallManagerServiceProxy::SetDisplayWindow(int32_t callId, std::string &surfaceId, sptr<Surface> surface)
 {
     MessageParcel dataParcel;
     if (!dataParcel.WriteInterfaceToken(CallManagerServiceProxy::GetDescriptor())) {
         TELEPHONY_LOGE("write descriptor fail");
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
-    dataParcel.WriteRawData((const void *)&window, sizeof(VideoWindow));
+    dataParcel.WriteInt32(callId);
+    dataParcel.WriteString(surfaceId);
+    if (surface != nullptr) {
+        sptr<IBufferProducer> producer = surface->GetProducer();
+        if (producer != nullptr) {
+            dataParcel.WriteRemoteObject(producer->AsObject());
+        }
+    }
     MessageParcel replyParcel;
     int32_t error = SendRequest(INTERFACE_SET_DISPLAY_WINDOW, dataParcel, replyParcel);
     if (error != TELEPHONY_SUCCESS) {
@@ -685,7 +700,7 @@ int32_t CallManagerServiceProxy::SetCameraZoom(float zoomRatio)
     return replyParcel.ReadInt32();
 }
 
-int32_t CallManagerServiceProxy::SetPausePicture(std::u16string path)
+int32_t CallManagerServiceProxy::SetPausePicture(int32_t callId, std::u16string &path)
 {
     MessageParcel dataParcel;
     if (!dataParcel.WriteInterfaceToken(CallManagerServiceProxy::GetDescriptor())) {
@@ -696,6 +711,7 @@ int32_t CallManagerServiceProxy::SetPausePicture(std::u16string path)
         TELEPHONY_LOGE("path is empty");
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
+    dataParcel.WriteInt32(callId);
     dataParcel.WriteString16(path);
     MessageParcel replyParcel;
     int32_t error = SendRequest(INTERFACE_SET_PAUSE_IMAGE, dataParcel, replyParcel);
@@ -706,13 +722,14 @@ int32_t CallManagerServiceProxy::SetPausePicture(std::u16string path)
     return replyParcel.ReadInt32();
 }
 
-int32_t CallManagerServiceProxy::SetDeviceDirection(int32_t rotation)
+int32_t CallManagerServiceProxy::SetDeviceDirection(int32_t callId, int32_t rotation)
 {
     MessageParcel dataParcel;
     if (!dataParcel.WriteInterfaceToken(CallManagerServiceProxy::GetDescriptor())) {
         TELEPHONY_LOGE("write descriptor fail");
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
+    dataParcel.WriteInt32(callId);
     dataParcel.WriteInt32(rotation);
     MessageParcel replyParcel;
     int32_t error = SendRequest(INTERFACE_SET_DEVICE_DIRECTION, dataParcel, replyParcel);
@@ -1211,6 +1228,41 @@ sptr<IRemoteObject> CallManagerServiceProxy::GetProxyObjectPtr(CallManagerProxyT
 int32_t CallManagerServiceProxy::ReportAudioDeviceInfo()
 {
     return SendRequest(INTERFACE_REPORT_AUDIO_DEVICE_INFO);
+}
+
+int32_t CallManagerServiceProxy::CancelCallUpgrade(int32_t callId)
+{
+    MessageParcel dataParcel;
+    if (!dataParcel.WriteInterfaceToken(CallManagerServiceProxy::GetDescriptor())) {
+        TELEPHONY_LOGE("write descriptor fail");
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    dataParcel.WriteInt32(callId);
+    MessageParcel replyParcel;
+    int32_t error = SendRequest(CallManagerInterfaceCode::INTERFACE_CANCEL_CALL_UPGRADE, dataParcel, replyParcel);
+    if (error != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("Function CloseUnFinishedUssd! errCode:%{public}d", error);
+        return error;
+    }
+    return replyParcel.ReadInt32();
+}
+
+int32_t CallManagerServiceProxy::RequestCameraCapabilities(int32_t callId)
+{
+    MessageParcel dataParcel;
+    if (!dataParcel.WriteInterfaceToken(CallManagerServiceProxy::GetDescriptor())) {
+        TELEPHONY_LOGE("write descriptor fail");
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    dataParcel.WriteInt32(callId);
+    MessageParcel replyParcel;
+    int32_t error = SendRequest(
+        CallManagerInterfaceCode::INTERFACE_REQUEST_CAMERA_CAPABILITIES, dataParcel, replyParcel);
+    if (error != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("Function CloseUnFinishedUssd! errCode:%{public}d", error);
+        return error;
+    }
+    return replyParcel.ReadInt32();
 }
 
 int32_t CallManagerServiceProxy::SendRequest(CallManagerInterfaceCode code)

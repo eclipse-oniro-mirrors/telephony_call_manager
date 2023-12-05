@@ -303,6 +303,19 @@ bool CallObjectManager::HasCallExist()
     return true;
 }
 
+bool CallObjectManager::HasVideoCall()
+{
+    std::lock_guard<std::mutex> lock(listMutex_);
+    std::list<sptr<CallBase>>::iterator it;
+    for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
+        // Count the number of calls in the ringing state
+        if ((*it)->GetVideoStateType() == VideoStateType::TYPE_VIDEO) {
+            return true;
+        }
+    }
+    return false;
+}
+
 int32_t CallObjectManager::HasRingingCall(bool &enabled)
 {
     enabled = false;

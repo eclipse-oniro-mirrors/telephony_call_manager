@@ -57,7 +57,8 @@ private:
     int32_t OnSetImsConfigResult(MessageParcel &data, MessageParcel &reply);
     int32_t OnGetImsFeatureValueResult(MessageParcel &data, MessageParcel &reply);
     int32_t OnSetImsFeatureValueResult(MessageParcel &data, MessageParcel &reply);
-    int32_t OnReceiveUpdateMediaModeResponse(MessageParcel &data, MessageParcel &reply);
+    int32_t OnReceiveImsCallModeRequest(MessageParcel &data, MessageParcel &reply);
+    int32_t OnReceiveImsCallModeResponse(MessageParcel &data, MessageParcel &reply);
     int32_t OnInviteToConferenceResult(MessageParcel &data, MessageParcel &reply);
     int32_t OnStartDtmfResult(MessageParcel &data, MessageParcel &reply);
     int32_t OnStopDtmfResult(MessageParcel &data, MessageParcel &reply);
@@ -67,6 +68,10 @@ private:
     int32_t OnCloseUnFinishedUssdResult(MessageParcel &data, MessageParcel &reply);
     int32_t OnPostDialNextChar(MessageParcel &data, MessageParcel &reply);
     int32_t OnReportPostDialDelay(MessageParcel &data, MessageParcel &reply);
+    int32_t OnCallSessionEventChange(MessageParcel &data, MessageParcel &reply);
+    int32_t OnPeerDimensionsChange(MessageParcel &data, MessageParcel &reply);
+    int32_t OnCallDataUsageChange(MessageParcel &data, MessageParcel &reply);
+    int32_t OnCameraCapabilitiesChange(MessageParcel &data, MessageParcel &reply);
 
     std::map<uint32_t, CallStatusCallbackFunc> memberFuncMap_;
 };
