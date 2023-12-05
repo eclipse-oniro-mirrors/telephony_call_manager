@@ -220,11 +220,6 @@ int32_t AudioControlManager::SetAudioDevice(const AudioDevice &device)
         case AudioDeviceType::DEVICE_WIRED_HEADSET:
             audioDeviceType = device.deviceType;
             break;
-        case AudioDeviceType::DEVICE_BLUETOOTH_SCO:
-            if (!DelayedSingleton<AudioDeviceManager>::GetInstance()->ConnectBtScoWithAddress(device.address)) {
-                return CALL_ERR_AUDIO_SET_AUDIO_DEVICE_FAILED;
-            }
-            return TELEPHONY_SUCCESS;
         default:
             break;
     }

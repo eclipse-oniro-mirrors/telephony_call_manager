@@ -101,7 +101,6 @@ public:
     void SetAccountNumber(const std::string accountNumber);
     int32_t SetSpeakerphoneOn(bool speakerphoneOn);
     bool IsSpeakerphoneOn();
-    void SetAudio();
     void SetAutoAnswerState(bool flag);
     bool GetAutoAnswerState();
     void SetCanUnHoldState(bool flag);
