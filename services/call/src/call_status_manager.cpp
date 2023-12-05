@@ -22,15 +22,17 @@
 #include "call_control_manager.h"
 #include "call_manager_errors.h"
 #include "call_manager_hisysevent.h"
+#include "call_number_utils.h"
+#include "conference_base.h"
 #include "core_service_client.h"
 #include "cs_call.h"
 #include "datashare_predicates.h"
 #include "hitrace_meter.h"
 #include "ims_call.h"
+#include "ims_conference.h"
 #include "ott_call.h"
 #include "report_call_info_handler.h"
 #include "telephony_log_wrapper.h"
-#include "call_number_utils.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -457,21 +459,39 @@ int32_t CallStatusManager::HoldingHandle(const CallDetailInfo &info)
     }
     // if the call is in a conference, it will exit, otherwise just set it holding
     call = RefreshCallIfNecessary(call, info);
-    int32_t ret = call->HoldConference();
-    if (ret == TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGI("HoldConference success");
+    int32_t callId = call->GetCallID();
+    int32_t dsdsMode = DSDS_MODE_V2;
+    int32_t ret = DelayedSingleton<ImsConference>::GetInstance()->IsConferenceCallForMutiSim(callId);
+    DelayedRefSingleton<CoreServiceClient>::GetInstance().GetDsdsMode(dsdsMode);
+    if (dsdsMode == static_cast<int32_t>(DsdsMode::DSDS_MODE_V5_DSDA) ||
+        dsdsMode == static_cast<int32_t>(DsdsMode::DSDS_MODE_V5_TDM)) {
+        if (ret == TELEPHONY_SUCCESS) {
+            int32_t ret = call->HoldConference();
+            if (ret == TELEPHONY_SUCCESS) {
+                TELEPHONY_LOGI("HoldConference success");
+            }
+        }
+    } else {
+        int32_t ret = call->HoldConference();
+        if (ret == TELEPHONY_SUCCESS) {
+            TELEPHONY_LOGI("HoldConference success");
+        }
     }
     ret = UpdateCallState(call, TelCallState::CALL_STATUS_HOLDING);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("UpdateCallState failed, errCode:%{public}d", ret);
     }
-    int32_t dsdsMode = DSDS_MODE_V2;
-    DelayedRefSingleton<CoreServiceClient>::GetInstance().GetDsdsMode(dsdsMode);
     TELEPHONY_LOGE("HoldingHandle dsdsMode:%{public}d", dsdsMode);
     if (dsdsMode == static_cast<int32_t>(DsdsMode::DSDS_MODE_V5_DSDA) ||
         dsdsMode == static_cast<int32_t>(DsdsMode::DSDS_MODE_V5_TDM)) {
         int32_t activeCallNum = GetCallNum(TelCallState::CALL_STATUS_ACTIVE);
-        AutoAnswerForDsda(activeCallNum);
+        TelConferenceState confState = call->GetTelConferenceState();
+        int32_t conferenceId = DelayedSingleton<ImsConference>::GetInstance()->GetMainCall();
+        if (confState != TelConferenceState::TEL_CONFERENCE_IDLE && conferenceId == callId) {
+            AutoAnswerForDsda(activeCallNum, call->GetSlotId());
+        } else if (confState == TelConferenceState::TEL_CONFERENCE_IDLE) {
+            AutoAnswerForDsda(activeCallNum, call->GetSlotId());
+        }
     }
     return ret;
 }
@@ -551,7 +571,7 @@ int32_t CallStatusManager::DisconnectedHandle(const CallDetailInfo &info)
     sptr<CallBase> holdCall = CallObjectManager::GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_HOLD);
     if (previousState != CallRunningState::CALL_RUNNING_STATE_HOLD &&
         previousState != CallRunningState::CALL_RUNNING_STATE_ACTIVE) {
-        if (holdCall != nullptr && canUnHold) {
+        if (holdCall != nullptr && canUnHold && holdCall->GetCanUnHoldState()) {
             if (holdCall->GetSlotId() == call->GetSlotId()) {
                 TELEPHONY_LOGI("release call and recover the held call");
                 holdCall->UnHoldCall();
@@ -566,7 +586,7 @@ int32_t CallStatusManager::DisconnectedHandle(const CallDetailInfo &info)
         AutoAnswer(activeCallNum, waitingCallNum);
     } else if (dsdsMode == static_cast<int32_t>(DsdsMode::DSDS_MODE_V5_DSDA) ||
                dsdsMode == static_cast<int32_t>(DsdsMode::DSDS_MODE_V5_TDM)) {
-        AutoAnswerForDsda(activeCallNum);
+        AutoAnswerForDsda(activeCallNum, call->GetSlotId());
     }
     return ret;
 }
@@ -575,14 +595,15 @@ void CallStatusManager::IsCanUnHold(int32_t activeCallNum, int32_t waitingCallNu
 {
     int32_t incomingCallNum = GetCallNum(TelCallState::CALL_STATUS_INCOMING);
     int32_t answeredCallNum = GetCallNum(TelCallState::CALL_STATUS_ANSWERED);
+    int32_t dialingCallNum = GetCallNum(TelCallState::CALL_STATUS_ALERTING);
     if (answeredCallNum == 0 && incomingCallNum == 0 && (size == 0 || size == 1) && activeCallNum == 0 &&
-        waitingCallNum == 0) {
+        waitingCallNum == 0 && dialingCallNum == 0) {
         canUnHold = true;
     }
     TELEPHONY_LOGI("CanUnHold state: %{public}d", canUnHold);
 }
 
-void CallStatusManager::AutoAnswerForDsda(int32_t activeCallNum)
+void CallStatusManager::AutoAnswerForDsda(int32_t activeCallNum, int32_t slotId)
 {
     int32_t dialingCallNum = GetCallNum(TelCallState::CALL_STATUS_DIALING);
     int32_t alertingCallNum = GetCallNum(TelCallState::CALL_STATUS_ALERTING);
@@ -594,6 +615,25 @@ void CallStatusManager::AutoAnswerForDsda(int32_t activeCallNum)
         int ret = ringCall->AnswerCall(videoState);
         TELEPHONY_LOGI("ret = %{public}d", ret);
         ringCall->SetAutoAnswerState(false);
+        return;
+    }
+    std::list<int32_t> callIdList;
+    GetCarrierCallList(callIdList);
+    for (int32_t otherCallId : callIdList) {
+        sptr<CallBase> otherCall = GetOneCallObject(otherCallId);
+        TelCallState state = otherCall->GetTelCallState();
+        TelConferenceState confState = otherCall->GetTelConferenceState();
+        int32_t conferenceId = DelayedSingleton<ImsConference>::GetInstance()->GetMainCall();
+        if (slotId != otherCall->GetSlotId() && state == TelCallState::CALL_STATUS_HOLDING &&
+            otherCall->GetCanUnHoldState()) {
+            if (confState != TelConferenceState::TEL_CONFERENCE_IDLE && conferenceId == otherCallId) {
+                otherCall->UnHoldCall();
+                return;
+            } else if (confState == TelConferenceState::TEL_CONFERENCE_IDLE) {
+                otherCall->UnHoldCall();
+                return;
+            }
+        }
     }
 }
 

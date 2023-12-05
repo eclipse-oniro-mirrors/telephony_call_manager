@@ -2056,8 +2056,9 @@ HWTEST_F(BranchTest, Telephony_CallStatusManager_002, Function | MediumTest | Le
     ASSERT_GT(callStatusManager->TurnOffMute(callObjectPtr), TELEPHONY_ERROR);
     int32_t activeCallNum = 0;
     int32_t waitingCallNum = 0;
+    int32_t slotId = 0;
     callStatusManager->AutoAnswer(activeCallNum, waitingCallNum);
-    callStatusManager->AutoAnswerForDsda(activeCallNum);
+    callStatusManager->AutoAnswerForDsda(activeCallNum, slotId);
 }
 
 /**
@@ -2271,6 +2272,24 @@ HWTEST_F(BranchTest, Telephony_AutoAnswerState_001, Function | MediumTest | Leve
     ASSERT_TRUE(callObjectPtr != nullptr);
     callObjectPtr->SetAutoAnswerState(flag);
     ASSERT_EQ(callObjectPtr->GetAutoAnswerState(), true);
+}
+
+/**
+ * @tc.number   Telephony_CanUnHoldState_001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_CanUnHoldState_001, Function | MediumTest | Level3)
+{
+    bool flag = true;
+    sptr<CallBase> callObjectPtr = nullptr;
+    DialParaInfo dialParaInfo;
+    dialParaInfo.callType = CallType::TYPE_IMS;
+    dialParaInfo.callState = TelCallState::CALL_STATUS_INCOMING;
+    callObjectPtr = new IMSCall(dialParaInfo);
+    ASSERT_TRUE(callObjectPtr != nullptr);
+    callObjectPtr->SetCanUnHoldState(flag);
+    ASSERT_EQ(callObjectPtr->GetCanUnHoldState(), true);
 }
 } // namespace Telephony
 } // namespace OHOS

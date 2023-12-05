@@ -65,6 +65,25 @@ void ConferenceBase::SetConferenceState(ConferenceState state)
     state_ = state;
 }
 
+int32_t ConferenceBase::IsConferenceCallForMutiSim(int32_t callId)
+{
+    std::lock_guard<std::mutex> lock(conferenceMutex_);
+    bool flag = false;
+    for (auto it = subCallIdSet_.begin(); it != subCallIdSet_.end(); ++it) {
+        if (*it == callId) {
+            flag = true;
+        }
+    }
+    if (mainCallId_ == callId) {
+        flag = true;
+    }
+    if (!flag) {
+        TELEPHONY_LOGI("the call is not in the conference, callId:%{public}d", callId);
+        return CALL_ERR_THE_CALL_IS_NOT_IN_THE_CONFERENCE;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
 void ConferenceBase::SetOldConferenceState(ConferenceState state)
 {
     std::lock_guard<std::mutex> lock(conferenceMutex_);
