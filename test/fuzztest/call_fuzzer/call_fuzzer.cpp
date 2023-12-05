@@ -57,6 +57,7 @@ void CSCallFunc(const uint8_t *data, size_t size)
     VideoStateType mediaType = static_cast<VideoStateType>(size % VIDIO_TYPE_NUM);
     PolicyFlag flag = static_cast<PolicyFlag>(size);
     bool needAutoAnswer = static_cast<bool>(size);
+    bool canUnHoldState = static_cast<bool>(size);
 
     callObjectPtr->AnswerCall(videoState);
     callObjectPtr->SetMute(mute, slotId);
@@ -80,6 +81,8 @@ void CSCallFunc(const uint8_t *data, size_t size)
     callObjectPtr->GetPolicyFlag();
     callObjectPtr->SetAutoAnswerState(needAutoAnswer);
     callObjectPtr->GetAutoAnswerState();
+    callObjectPtr->SetCanUnHoldState(canUnHoldState);
+    callObjectPtr->GetCanUnHoldState();
 }
 
 void DialingProcess(const uint8_t *data, size_t size)

@@ -59,6 +59,7 @@ public:
         int32_t callId, std::vector<std::u16string> &callIdList); // get participant list besides host
     ConferenceState GetOldConferenceState();
     void SetOldConferenceState(ConferenceState state);
+    int32_t IsConferenceCallForMutiSim(int32_t callId);
 
 protected:
     int32_t mainCallId_;

@@ -48,6 +48,8 @@ public:
     void HandleCallWaitingNumOne(sptr<CallBase> call, int32_t slotId, int32_t activeCallNum, bool &flagForConference);
     void HandleCallWaitingNumZero(sptr<CallBase> call, int32_t slotId, int32_t activeCallNum, bool &flagForConference);
     void HoldOrDisconnectedCall(int32_t callId, int32_t slotId, int32_t videoState);
+    bool IsExistCallOtherSlot(
+        sptr<CallBase> call, int32_t activeCallNum, int32_t slotId, int32_t videoState, sptr<CallBase> incomingCall);
     void IsExistCallOtherSlot(std::list<int32_t> &list, int32_t slotId, bool &noOtherCall);
 
 private:

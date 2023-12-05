@@ -18,6 +18,8 @@
 #include "call_connect_ability.h"
 #include "call_manager_errors.h"
 #include "call_number_utils.h"
+#include "conference_base.h"
+#include "ims_conference.h"
 #include "report_call_info_handler.h"
 #include "telephony_log_wrapper.h"
 
@@ -174,12 +176,13 @@ int32_t CallObjectManager::IsNewCallAllowedCreate(bool &enabled)
     GetCarrierCallList(callIdList);
     for (int32_t otherCallId : callIdList) {
         sptr<CallBase> call = GetOneCallObject(otherCallId);
+        TelConferenceState confState = call->GetTelConferenceState();
+        int32_t conferenceId = DelayedSingleton<ImsConference>::GetInstance()->GetMainCall();
         if (call != nullptr) {
-            int32_t tempMainId = -1;
-            call->GetMainCallId(tempMainId);
-            if (tempMainId != conferenceCallId) {
-                TELEPHONY_LOGI("there is conference");
-            } else {
+            if (confState != TelConferenceState::TEL_CONFERENCE_IDLE && conferenceId == otherCallId) {
+                TELEPHONY_LOGI("there is conference call");
+                count++;
+            } else if (confState == TelConferenceState::TEL_CONFERENCE_IDLE) {
                 count++;
             }
         }

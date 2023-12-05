@@ -31,8 +31,9 @@ CallBase::CallBase(DialParaInfo &info)
       bundleName_(info.bundleName), callRunningState_(CallRunningState::CALL_RUNNING_STATE_CREATE),
       conferenceState_(TelConferenceState::TEL_CONFERENCE_IDLE), startTime_(0),
       direction_(CallDirection::CALL_DIRECTION_IN), policyFlag_(0), callState_(info.callState), autoAnswerState_(false),
-      isSpeakerphoneOn_(false), callEndedType_(CallEndedType::UNKNOWN), callBeginTime_(0), callEndTime_(0),
-      ringBeginTime_(0), ringEndTime_(0), answerType_(CallAnswerType::CALL_ANSWER_MISSED), accountId_(info.accountId)
+      canUnHoldState_(true), isSpeakerphoneOn_(false), callEndedType_(CallEndedType::UNKNOWN), callBeginTime_(0),
+      callEndTime_(0), ringBeginTime_(0), ringEndTime_(0), answerType_(CallAnswerType::CALL_ANSWER_MISSED),
+      accountId_(info.accountId)
 {
     (void)memset_s(&contactInfo_, sizeof(ContactInfo), 0, sizeof(ContactInfo));
 }
@@ -42,9 +43,9 @@ CallBase::CallBase(DialParaInfo &info, AppExecFwk::PacMap &extras)
       bundleName_(info.bundleName), callRunningState_(CallRunningState::CALL_RUNNING_STATE_CREATE),
       conferenceState_(TelConferenceState::TEL_CONFERENCE_IDLE), startTime_(0),
       direction_(CallDirection::CALL_DIRECTION_OUT), policyFlag_(0), callState_(info.callState),
-      autoAnswerState_(false), isSpeakerphoneOn_(false), callEndedType_(CallEndedType::UNKNOWN), callBeginTime_(0),
-      callEndTime_(0), ringBeginTime_(0), ringEndTime_(0), answerType_(CallAnswerType::CALL_ANSWER_MISSED),
-      accountId_(info.accountId)
+      autoAnswerState_(false), canUnHoldState_(true), isSpeakerphoneOn_(false), callEndedType_(CallEndedType::UNKNOWN),
+      callBeginTime_(0), callEndTime_(0), ringBeginTime_(0), ringEndTime_(0),
+      answerType_(CallAnswerType::CALL_ANSWER_MISSED), accountId_(info.accountId)
 {
     (void)memset_s(&contactInfo_, sizeof(ContactInfo), 0, sizeof(ContactInfo));
 }
@@ -254,6 +255,20 @@ bool CallBase::GetAutoAnswerState()
 {
     std::lock_guard<std::mutex> lock(mutex_);
     return autoAnswerState_;
+}
+
+void CallBase::SetCanUnHoldState(bool flag)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    canUnHoldState_ = flag;
+    TELEPHONY_LOGI("CanUnHoldState:%{public}d", canUnHoldState_);
+}
+
+bool CallBase::GetCanUnHoldState()
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    TELEPHONY_LOGI("CanUnHoldState:%{public}d", canUnHoldState_);
+    return canUnHoldState_;
 }
 
 void CallBase::SetTelConferenceState(TelConferenceState state)
