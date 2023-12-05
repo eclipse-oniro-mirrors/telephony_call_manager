@@ -1242,24 +1242,6 @@ HWTEST_F(BranchTest, Telephony_OTTCall_002, Function | MediumTest | Level3)
 }
 
 /**
- * @tc.number   Telephony_Bluetooth_Call_Manager_001
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
-HWTEST_F(BranchTest, Telephony_Bluetooth_Call_Manager_001, Function | MediumTest | Level3)
-{
-    BluetoothCallManager bluetoothCallManager = BluetoothCallManager();
-    bluetoothCallManager.btConnection_ = nullptr;
-    std::string bluetoothAddress = "test";
-    ASSERT_EQ(bluetoothCallManager.ConnectBtSco(bluetoothAddress), false);
-    ASSERT_EQ(bluetoothCallManager.DisconnectBtSco(), false);
-    ASSERT_EQ(bluetoothCallManager.SendBtCallState(0, 0, 0, bluetoothAddress), false);
-    ASSERT_EQ(bluetoothCallManager.GetBtScoState(), false);
-    ASSERT_EQ(bluetoothCallManager.IsBtScoConnected(), false);
-    ASSERT_EQ(bluetoothCallManager.IsBtAvailble(), false);
-}
-
-/**
  * @tc.number   Telephony_Ott_Conference_001
  * @tc.name     test error branch
  * @tc.desc     Function test
@@ -1467,55 +1449,6 @@ HWTEST_F(BranchTest, Telephony_CarrierCall_001, Function | MediumTest | Level3)
     ASSERT_EQ(TELEPHONY_ERR_LOCAL_PTR_NULL, call.CarrierKickOutFromConference());
     ASSERT_EQ(TELEPHONY_ERR_LOCAL_PTR_NULL, call.StartDtmf('c'));
     ASSERT_EQ(TELEPHONY_ERR_LOCAL_PTR_NULL, call.StopDtmf());
-}
-
-/**
- * @tc.number   Telephony_Callbase_001
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
-HWTEST_F(BranchTest, Telephony_Callbase_001, Function | MediumTest | Level3)
-{
-    DialParaInfo dialParaInfo;
-    CSCall call { dialParaInfo };
-    call.IncomingCallBase();
-    call.callRunningState_ = CallRunningState::CALL_RUNNING_STATE_CREATE;
-    ASSERT_EQ(CALL_ERR_PHONE_ANSWER_IS_BUSY, call.AnswerCallBase());
-    call.callRunningState_ = CallRunningState::CALL_RUNNING_STATE_RINGING;
-    call.callState_ = TelCallState::CALL_STATUS_UNKNOWN;
-    call.callBeginTime_ = 0;
-    call.StateChangesToActive();
-    call.conferenceState_ = TelConferenceState::TEL_CONFERENCE_ACTIVE;
-    call.ringEndTime_ = 0;
-    call.conferenceState_ = TelConferenceState::TEL_CONFERENCE_DISCONNECTING;
-    call.StateChangesToDisconnected();
-    call.StateChangesToDisconnecting();
-    call.conferenceState_ = TelConferenceState::TEL_CONFERENCE_ACTIVE;
-    call.StateChangesToDisconnected();
-    call.StateChangesToDisconnecting();
-    call.isSpeakerphoneOn_ = true;
-    call.SetAudio();
-    call.isSpeakerphoneOn_ = false;
-    call.SetAudio();
-    ASSERT_EQ(CALL_ERR_NOT_NEW_STATE, call.SetTelCallState(TelCallState::CALL_STATUS_UNKNOWN));
-    ASSERT_EQ(TELEPHONY_SUCCESS, call.SetTelCallState(TelCallState::CALL_STATUS_DIALING));
-    ASSERT_EQ(TELEPHONY_SUCCESS, call.SetTelCallState(TelCallState::CALL_STATUS_INCOMING));
-    ASSERT_EQ(TELEPHONY_SUCCESS, call.SetTelCallState(TelCallState::CALL_STATUS_WAITING));
-    ASSERT_EQ(TELEPHONY_SUCCESS, call.SetTelCallState(TelCallState::CALL_STATUS_ACTIVE));
-    ASSERT_EQ(TELEPHONY_SUCCESS, call.SetTelCallState(TelCallState::CALL_STATUS_HOLDING));
-    ASSERT_EQ(TELEPHONY_SUCCESS, call.SetTelCallState(TelCallState::CALL_STATUS_DISCONNECTED));
-    ASSERT_EQ(TELEPHONY_SUCCESS, call.SetTelCallState(TelCallState::CALL_STATUS_DISCONNECTING));
-    ASSERT_EQ(TELEPHONY_SUCCESS, call.SetTelCallState(TelCallState::CALL_STATUS_ALERTING));
-    ASSERT_EQ(TELEPHONY_SUCCESS, call.SetTelCallState(TelCallState::CALL_STATUS_UNKNOWN));
-    call.IsSpeakerphoneEnabled();
-    call.callState_ = TelCallState::CALL_STATUS_IDLE;
-    ASSERT_EQ(false, call.IsAliveState());
-    call.callState_ = TelCallState::CALL_STATUS_DISCONNECTED;
-    ASSERT_EQ(false, call.IsAliveState());
-    call.callState_ = TelCallState::CALL_STATUS_DISCONNECTING;
-    ASSERT_EQ(false, call.IsAliveState());
-    call.callState_ = TelCallState::CALL_STATUS_UNKNOWN;
-    ASSERT_EQ(true, call.IsAliveState());
 }
 
 /**

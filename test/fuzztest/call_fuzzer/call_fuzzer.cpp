@@ -165,7 +165,6 @@ void GetCallerInfo(const uint8_t *data, size_t size)
     callObjectPtr->GetAccountNumber();
     callObjectPtr->SetSpeakerphoneOn(speakerphoneOn);
     callObjectPtr->IsSpeakerphoneOn();
-    callObjectPtr->SetAudio();
     callObjectPtr->CheckVoicemailNumber(phoneNumber);
     callObjectPtr->IsAliveState();
 }

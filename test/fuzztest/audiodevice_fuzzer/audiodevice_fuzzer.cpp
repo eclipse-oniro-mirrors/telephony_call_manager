@@ -96,7 +96,6 @@ void AudioDeviceManagerFunc(const uint8_t *data, size_t size)
     audioDeviceManager->InitAudioDevice();
     audioDeviceManager->ProcessEvent(event);
     audioDeviceManager->SwitchDevice(event);
-    audioDeviceManager->ConnectBtScoWithAddress(bluetoothAddress);
     audioDeviceManager->SwitchDevice(deviceType);
     audioDeviceManager->EnableBtSco();
     audioDeviceManager->EnableWiredHeadset();

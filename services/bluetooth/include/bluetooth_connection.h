@@ -48,9 +48,6 @@ class BluetoothConnection {
     DECLARE_DELAYED_SINGLETON(BluetoothConnection)
 public:
     void Init();
-    bool ConnectBtSco();
-    bool ConnectBtSco(const std::string &bluetoothAddress);
-    bool DisconnectBtSco();
     bool IsBtScoConnected();
     BtScoState GetBtScoState();
     void SetBtScoState(BtScoState state);
@@ -76,8 +73,6 @@ private:
 
 #ifdef ABILITY_BLUETOOTH_SUPPORT
     void SetConnectedScoAddr(std::string connectedScoAddr);
-    bool ConnectBtSco(const Bluetooth::BluetoothRemoteDevice &device);
-    bool DisconnectBtSco(const Bluetooth::BluetoothRemoteDevice &device);
 
 private:
     sptr<ISystemAbilityStatusChange> statusChangeListener_ = nullptr;

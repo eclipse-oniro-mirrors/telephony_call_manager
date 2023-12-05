@@ -386,33 +386,6 @@ bool CallBase::CheckVoicemailNumber(std::string phoneNumber)
     return false;
 }
 
-void CallBase::SetAudio()
-{
-    // Get from the configuration file
-    bool useSpeakerWhenDocked = true;
-    /**
-     * Determine if hands-free should be enabled during docking.
-     * When the device is docked and the Bluetooth or wired headset is not in use,
-     * please turn on the hands-free
-     */
-    bool useSpeakerForDock = IsSpeakerphoneEnabled();
-    SetSpeakerphoneOn(useSpeakerWhenDocked && useSpeakerForDock);
-    // Confirm whether the speaker is turned on
-    if (isSpeakerphoneOn_) {
-        TELEPHONY_LOGI("set audio speaker");
-        AudioDevice device = {
-            .deviceType = AudioDeviceType::DEVICE_SPEAKER,
-            .address = { 0 },
-        };
-        DelayedSingleton<AudioControlManager>::GetInstance()->SetAudioDevice(device);
-    } else {
-        TELEPHONY_LOGI("set audio bluetooth");
-        std::shared_ptr<BluetoothCallManager> bluetoothCallManager = std::make_shared<BluetoothCallManager>();
-        std::string address;
-        bluetoothCallManager->ConnectBtSco(address);
-    }
-}
-
 bool CallBase::IsSpeakerphoneEnabled()
 {
     std::shared_ptr<BluetoothCallManager> bluetoothCallManager = std::make_shared<BluetoothCallManager>();
