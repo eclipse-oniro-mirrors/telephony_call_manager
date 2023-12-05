@@ -131,15 +131,16 @@ bool AudioSceneProcessor::SwitchState(CallStateType stateType)
 
 bool AudioSceneProcessor::SwitchDialing()
 {
-    if (!DelayedSingleton<AudioControlManager>::GetInstance()->PlaySoundtone()) {
-        TELEPHONY_LOGE("PlaySoundtone fail");
-        return false;
-    }
     currentState_ = std::make_unique<DialingState>();
     if (currentState_ == nullptr) {
         TELEPHONY_LOGE("make_unique DialingState failed");
         return false;
     }
+    if (!DelayedSingleton<AudioControlManager>::GetInstance()->PlaySoundtone()) {
+        TELEPHONY_LOGE("PlaySoundtone fail");
+        return false;
+    }
+    
     DelayedSingleton<AudioDeviceManager>::GetInstance()->ProcessEvent(AudioEvent::AUDIO_ACTIVATED);
     TELEPHONY_LOGI("current call state : dialing state");
     return true;
