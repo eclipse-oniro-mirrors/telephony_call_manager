@@ -152,7 +152,7 @@ int32_t CallControlManager::AnswerCall(int32_t callId, int32_t videoState)
             TELEPHONY_LOGE("call is nullptr");
             CallManagerHisysevent::WriteAnswerCallFaultEvent(
                 INVALID_PARAMETER, callId, videoState, TELEPHONY_ERR_LOCAL_PTR_NULL, "call is nullptr");
-            return TELEPHONY_ERROR;
+            return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     if (callId == INVALID_CALLID) {
         callId = call->GetCallID();
