@@ -161,7 +161,7 @@ void CallRequestProcess::HoldOrDisconnectedCall(int32_t callId, int32_t slotId, 
         sptr<CallBase> call = GetOneCallObject(otherCallId);
         TELEPHONY_LOGI("other Call State =:%{public}d", call->GetTelCallState());
         if (call != nullptr && call != incomingCall) {
-            if (IsExistCallOtherSlot(call, activeCallNum, slotId, videoState, incomingCall)) {
+            if (HandleDsdaIncomingCall(call, activeCallNum, slotId, videoState, incomingCall)) {
                 continue;
             }
             if (call->GetSlotId() != slotId) {
@@ -180,7 +180,7 @@ void CallRequestProcess::HoldOrDisconnectedCall(int32_t callId, int32_t slotId, 
     }
 }
 
-bool CallRequestProcess::IsExistCallOtherSlot(
+bool CallRequestProcess::HandleDsdaIncomingCall(
     sptr<CallBase> call, int32_t activeCallNum, int32_t slotId, int32_t videoState, sptr<CallBase> incomingCall)
 {
     if (call->GetTelCallState() == TelCallState::CALL_STATUS_DISCONNECTING ||
@@ -425,6 +425,7 @@ void CallRequestProcess::UnHoldRequest(int32_t callId)
         TELEPHONY_LOGE("the call object is nullptr, callId:%{public}d", callId);
         return;
     }
+    call->SetCanUnHoldState(true);
     if (IsDsdsMode5()) {
         bool noOtherCall = true;
         std::list<int32_t> callIdList;
@@ -433,9 +434,7 @@ void CallRequestProcess::UnHoldRequest(int32_t callId)
         for (int32_t otherCallId : callIdList) {
             sptr<CallBase> otherCall = GetOneCallObject(otherCallId);
             TelCallState state = otherCall->GetTelCallState();
-            TelConferenceState confState = otherCall->GetTelConferenceState();
-            if (call->GetSlotId() != otherCall->GetSlotId() && !noOtherCall &&
-                state == TelCallState::CALL_STATUS_ACTIVE) {
+            if (!noOtherCall && state == TelCallState::CALL_STATUS_ACTIVE) {
                 TELEPHONY_LOGE("Hold other call in other slotId");
                 otherCall->HoldCall();
                 return;
@@ -443,7 +442,6 @@ void CallRequestProcess::UnHoldRequest(int32_t callId)
         }
     }
     call->UnHoldCall();
-    call->SetCanUnHoldState(true);
 }
 
 void CallRequestProcess::SwitchRequest(int32_t callId)
