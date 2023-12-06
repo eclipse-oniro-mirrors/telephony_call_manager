@@ -21,7 +21,7 @@
         "subsystem": "telephony",
         "syscap": [
             "SystemCapability.Telephony.CallManager",
-	    "SystemCapability.Applications.Contacts"
+            "SystemCapability.Applications.Contacts"
         ],
         "features": [],
         "adapted_system_type": [
