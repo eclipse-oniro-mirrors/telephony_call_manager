@@ -595,11 +595,7 @@ int32_t CallRequestProcess::CarrierDialProcess(DialParaInfo &info)
     std::string newPhoneNum =
         DelayedSingleton<CallNumberUtils>::GetInstance()->RemoveSeparatorsPhoneNumber(info.number);
     int32_t ret = TELEPHONY_ERROR;
-    bool isEcc = false;
-    ret = DelayedSingleton<CallNumberUtils>::GetInstance()->CheckNumberIsEmergency(newPhoneNum, info.accountId, isEcc);
-    if (ret != TELEPHONY_SUCCESS) {
-        return ret;
-    }
+    bool isEcc = HandleEccCallForDsda(newPhoneNum, info);
     if (!isEcc && IsDsdsMode5()) {
         bool canDial = true;
         IsNewCallAllowedCreate(canDial);
@@ -607,6 +603,10 @@ int32_t CallRequestProcess::CarrierDialProcess(DialParaInfo &info)
             return CALL_ERR_DIAL_IS_BUSY;
         }
         ret = IsDialCallForDsda(info);
+        if (ret != TELEPHONY_SUCCESS) {
+            TELEPHONY_LOGE("IsDialCallForDsda failed!");
+            return ret;
+        }
     }
     bool isMMiCode = DelayedSingleton<CallNumberUtils>::GetInstance()->IsMMICode(newPhoneNum);
     if (!isMMiCode) {
@@ -650,6 +650,26 @@ int32_t CallRequestProcess::IsDialCallForDsda(DialParaInfo &info)
         return activeCall->HoldCall();
     }
     return TELEPHONY_SUCCESS;
+}
+
+bool CallRequestProcess::HandleEccCallForDsda(std::string newPhoneNum, DialParaInfo &info)
+{
+    bool isEcc = false;
+    int32_t ret =
+        DelayedSingleton<CallNumberUtils>::GetInstance()->CheckNumberIsEmergency(newPhoneNum, info.accountId, isEcc);
+    TELEPHONY_LOGE("CheckNumberIsEmergency ret is %{public}d", ret);
+    if (isEcc && IsDsdsMode5()) {
+        std::list<int32_t> callIdList;
+        GetCarrierCallList(callIdList);
+        for (int32_t otherCallId : callIdList) {
+            sptr<CallBase> call = GetOneCallObject(otherCallId);
+            if (call != nullptr && call->GetSlotId() != info.accountId) {
+                TELEPHONY_LOGI("Hangup call SLOTID:%{public}d", call->GetSlotId());
+                call->HangUpCall();
+            }
+        }
+    }
+    return isEcc;
 }
 
 int32_t CallRequestProcess::VoiceMailDialProcess(DialParaInfo &info)
