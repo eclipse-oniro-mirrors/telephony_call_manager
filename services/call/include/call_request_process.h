@@ -54,6 +54,7 @@ public:
 private:
     int32_t CarrierDialProcess(DialParaInfo &info);
     int32_t IsDialCallForDsda(DialParaInfo &info);
+    bool HandleEccCallForDsda(std::string newPhoneNum, DialParaInfo &info);
     int32_t VoiceMailDialProcess(DialParaInfo &info);
     int32_t OttDialProcess(DialParaInfo &info);
     int32_t PackCellularCallInfo(DialParaInfo &info, CellularCallInfo &callInfo);
