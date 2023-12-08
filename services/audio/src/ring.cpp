@@ -161,7 +161,7 @@ int32_t Ring::SetMute()
         TELEPHONY_LOGE("RingtonePlayer_ is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return RingtonePlayer_->Stop();
+    return RingtonePlayer_->Configure(0, true);
 }
 } // namespace Telephony
 } // namespace OHOS
