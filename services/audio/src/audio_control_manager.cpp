@@ -243,13 +243,13 @@ bool AudioControlManager::PlayRingtone()
             return false;
         }
     }
-    sptr<CallBase> liveCall = CallObjectManager::GetForegroundLiveCall();
-    if (liveCall == nullptr) {
-        TELEPHONY_LOGE("liveCall is nullptr");
+    sptr<CallBase> incomingCall = CallObjectManager::GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_RINGING);
+    if (incomingCall == nullptr) {
+        TELEPHONY_LOGE("incomingCall is nullptr");
         return false;
     }
     CallAttributeInfo info;
-    liveCall->GetCallAttributeBaseInfo(info);
+    incomingCall->GetCallAttributeBaseInfo(info);
     if (ring_->Play(info.accountId) != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("play ringtone failed");
         return false;
