@@ -188,7 +188,7 @@ bool AudioDeviceManager::ProcessEvent(AudioEvent event)
                 std::shared_ptr<BluetoothCallManager> bluetoothCallManager = std::make_shared<BluetoothCallManager>();
                 // Gets whether the device can be started from the configuration
                 if (bluetoothCallManager->IsBtAvailble()) {
-                    return DelayedSingleton<BluetoothConnection>::GetInstance()->ConnectBtSco();
+                    return true;
                 }
                 AudioDevice device = {
                     .deviceType = AudioDeviceType::DEVICE_EARPIECE,
@@ -216,10 +216,6 @@ bool AudioDeviceManager::ProcessEvent(AudioEvent event)
                 TELEPHONY_LOGE("call is not active, no need to connect sco");
                 return false;
             }
-            std::shared_ptr<BluetoothCallManager> bluetoothCallManager = std::make_shared<BluetoothCallManager>();
-            if (bluetoothCallManager->IsBtAvailble()) {
-                return DelayedSingleton<BluetoothConnection>::GetInstance()->ConnectBtSco();
-            }
             break;
         }
         default:
@@ -234,15 +230,6 @@ bool AudioDeviceManager::SwitchDevice(AudioEvent event)
     if (itFunc != memberFuncMap_.end() && itFunc->second != nullptr) {
         auto memberFunc = itFunc->second;
         return (this->*memberFunc)();
-    }
-    return false;
-}
-
-bool AudioDeviceManager::ConnectBtScoWithAddress(const std::string &bluetoothAddress)
-{
-    std::shared_ptr<BluetoothCallManager> bluetoothCallManager = std::make_shared<BluetoothCallManager>();
-    if (bluetoothCallManager->ConnectBtSco(bluetoothAddress)) {
-        return true;
     }
     return false;
 }
@@ -336,12 +323,6 @@ bool AudioDeviceManager::DisableAll()
 
 void AudioDeviceManager::SetCurrentAudioDevice(AudioDeviceType deviceType)
 {
-    if (audioDeviceType_ == AudioDeviceType::DEVICE_BLUETOOTH_SCO && audioDeviceType_ != deviceType) {
-        DelayedSingleton<BluetoothConnection>::GetInstance()->DisconnectBtSco();
-    } else if (audioDeviceType_ != AudioDeviceType::DEVICE_BLUETOOTH_SCO &&
-        deviceType == AudioDeviceType::DEVICE_BLUETOOTH_SCO) {
-        DelayedSingleton<BluetoothConnection>::GetInstance()->SetBtScoState(SCO_STATE_CONNECTED);
-    }
     audioDeviceType_ = deviceType;
     ReportAudioDeviceChange();
 }

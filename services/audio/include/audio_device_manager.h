@@ -39,7 +39,6 @@ public:
     static bool IsBtScoConnected();
     static bool IsWiredHeadsetConnected();
     static void SetDeviceAvailable(AudioDeviceType deviceType, bool available);
-    bool ConnectBtScoWithAddress(const std::string &bluetoothAddress);
     bool SwitchDevice(AudioDeviceType device);
     void AddAudioDeviceList(const std::string &address, AudioDeviceType deviceType);
     void RemoveAudioDeviceList(const std::string &address, AudioDeviceType deviceType);

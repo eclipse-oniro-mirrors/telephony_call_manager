@@ -54,7 +54,9 @@ CallStatusCallbackStub::CallStatusCallbackStub()
     memberFuncMap_[static_cast<uint32_t>(GET_IMS_FEATURE_VALUE)] = &CallStatusCallbackStub::OnGetImsFeatureValueResult;
     memberFuncMap_[static_cast<uint32_t>(SET_IMS_FEATURE_VALUE)] = &CallStatusCallbackStub::OnSetImsFeatureValueResult;
     memberFuncMap_[static_cast<uint32_t>(RECEIVE_UPDATE_MEDIA_MODE_RESPONSE)] =
-        &CallStatusCallbackStub::OnReceiveUpdateMediaModeResponse;
+        &CallStatusCallbackStub::OnReceiveImsCallModeResponse;
+    memberFuncMap_[static_cast<uint32_t>(RECEIVE_UPDATE_MEDIA_MODE_REQUEST)] =
+        &CallStatusCallbackStub::OnReceiveImsCallModeRequest;
     memberFuncMap_[static_cast<uint32_t>(UPDATE_STARTRTT_STATUS)] = &CallStatusCallbackStub::OnStartRttResult;
     memberFuncMap_[static_cast<uint32_t>(UPDATE_STOPRTT_STATUS)] = &CallStatusCallbackStub::OnStopRttResult;
     memberFuncMap_[static_cast<uint32_t>(INVITE_TO_CONFERENCE)] = &CallStatusCallbackStub::OnInviteToConferenceResult;
@@ -62,6 +64,11 @@ CallStatusCallbackStub::CallStatusCallbackStub()
     memberFuncMap_[static_cast<uint32_t>(CLOSE_UNFINISHED_USSD)] = &CallStatusCallbackStub::OnCloseUnFinishedUssdResult;
     memberFuncMap_[static_cast<uint32_t>(POST_DIAL_CHAR)] = &CallStatusCallbackStub::OnPostDialNextChar;
     memberFuncMap_[static_cast<uint32_t>(POST_DIAL_DELAY)] = &CallStatusCallbackStub::OnReportPostDialDelay;
+    memberFuncMap_[static_cast<uint32_t>(CALL_SESSION_EVENT)] = &CallStatusCallbackStub::OnCallSessionEventChange;
+    memberFuncMap_[static_cast<uint32_t>(PEER_DIMENSION_CHANGE)] = &CallStatusCallbackStub::OnPeerDimensionsChange;
+    memberFuncMap_[static_cast<uint32_t>(CALL_DATA_USAGE)] = &CallStatusCallbackStub::OnCallDataUsageChange;
+    memberFuncMap_[static_cast<uint32_t>(CAMERA_CAPBILITIES_CHANGE)] =
+        &CallStatusCallbackStub::OnCameraCapabilitiesChange;
 }
 
 CallStatusCallbackStub::~CallStatusCallbackStub()
@@ -522,19 +529,43 @@ int32_t CallStatusCallbackStub::OnSetImsFeatureValueResult(MessageParcel &data, 
     return TELEPHONY_SUCCESS;
 }
 
-int32_t CallStatusCallbackStub::OnReceiveUpdateMediaModeResponse(MessageParcel &data, MessageParcel &reply)
+int32_t CallStatusCallbackStub::OnReceiveImsCallModeRequest(MessageParcel &data, MessageParcel &reply)
 {
     int32_t error = TELEPHONY_ERR_FAIL;
     if (!data.ContainFileDescriptors()) {
         TELEPHONY_LOGW("sent raw data is less than 32k");
     }
-    const CallMediaModeResponse *parcelPtr = nullptr;
+    const CallModeReportInfo *parcelPtr = nullptr;
     int32_t len = data.ReadInt32();
     if (len <= 0 || len >= MAX_LEN) {
         TELEPHONY_LOGE("Invalid parameter, len = %{public}d", len);
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
-    if ((parcelPtr = reinterpret_cast<const CallMediaModeResponse *>(data.ReadRawData(len))) == nullptr) {
+    if ((parcelPtr = reinterpret_cast<const CallModeReportInfo *>(data.ReadRawData(len))) == nullptr) {
+        TELEPHONY_LOGE("reading raw data failed, length = %d", len);
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    error = ReceiveUpdateCallMediaModeRequest(*parcelPtr);
+    if (!reply.WriteInt32(error)) {
+        TELEPHONY_LOGE("writing parcel failed");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallStatusCallbackStub::OnReceiveImsCallModeResponse(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t error = TELEPHONY_ERR_FAIL;
+    if (!data.ContainFileDescriptors()) {
+        TELEPHONY_LOGW("sent raw data is less than 32k");
+    }
+    const CallModeReportInfo *parcelPtr = nullptr;
+    int32_t len = data.ReadInt32();
+    if (len <= 0 || len >= MAX_LEN) {
+        TELEPHONY_LOGE("Invalid parameter, len = %{public}d", len);
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
+    }
+    if ((parcelPtr = reinterpret_cast<const CallModeReportInfo *>(data.ReadRawData(len))) == nullptr) {
         TELEPHONY_LOGE("reading raw data failed, length = %d", len);
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
@@ -690,6 +721,93 @@ int32_t CallStatusCallbackStub::OnReportPostDialDelay(MessageParcel &data, Messa
     }
     std::string remainPostDial = data.ReadString();
     error = ReportPostDialDelay(remainPostDial);
+    if (!reply.WriteInt32(error)) {
+        TELEPHONY_LOGE("writing parcel failed");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallStatusCallbackStub::OnCallSessionEventChange(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t error = TELEPHONY_ERR_FAIL;
+    if (!data.ContainFileDescriptors()) {
+        TELEPHONY_LOGW("sent raw data is less than 32k");
+    }
+    const CallSessionReportInfo *parcelPtr = nullptr;
+    int32_t len = data.ReadInt32();
+    if (len <= 0 || len >= MAX_LEN) {
+        TELEPHONY_LOGE("Invalid parameter, len = %{public}d", len);
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
+    }
+    if ((parcelPtr = reinterpret_cast<const CallSessionReportInfo *>(data.ReadRawData(len))) == nullptr) {
+        TELEPHONY_LOGE("reading raw data failed, length = %d", len);
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    error = HandleCallSessionEventChanged(*parcelPtr);
+    if (!reply.WriteInt32(error)) {
+        TELEPHONY_LOGE("writing parcel failed");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallStatusCallbackStub::OnPeerDimensionsChange(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t error = TELEPHONY_ERR_FAIL;
+    if (!data.ContainFileDescriptors()) {
+        TELEPHONY_LOGW("sent raw data is less than 32k");
+    }
+    const PeerDimensionsReportInfo *parcelPtr = nullptr;
+    int32_t len = data.ReadInt32();
+    if (len <= 0 || len >= MAX_LEN) {
+        TELEPHONY_LOGE("Invalid parameter, len = %{public}d", len);
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
+    }
+    if ((parcelPtr = reinterpret_cast<const PeerDimensionsReportInfo *>(data.ReadRawData(len))) == nullptr) {
+        TELEPHONY_LOGE("reading raw data failed, length = %d", len);
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    error = HandlePeerDimensionsChanged(*parcelPtr);
+    if (!reply.WriteInt32(error)) {
+        TELEPHONY_LOGE("writing parcel failed");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallStatusCallbackStub::OnCallDataUsageChange(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t error = TELEPHONY_ERR_FAIL;
+    if (!data.ContainFileDescriptors()) {
+        TELEPHONY_LOGW("sent raw data is less than 32k");
+    }
+    int64_t result = data.ReadInt64();
+    error = HandleCallDataUsageChanged(result);
+    if (!reply.WriteInt32(error)) {
+        TELEPHONY_LOGE("writing parcel failed");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallStatusCallbackStub::OnCameraCapabilitiesChange(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t error = TELEPHONY_ERR_FAIL;
+    if (!data.ContainFileDescriptors()) {
+        TELEPHONY_LOGW("sent raw data is less than 32k");
+    }
+    const CameraCapabilitiesReportInfo *parcelPtr = nullptr;
+    int32_t len = data.ReadInt32();
+    if (len <= 0 || len >= MAX_LEN) {
+        TELEPHONY_LOGE("Invalid parameter, len = %{public}d", len);
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
+    }
+    if ((parcelPtr = reinterpret_cast<const CameraCapabilitiesReportInfo *>(data.ReadRawData(len))) == nullptr) {
+        TELEPHONY_LOGE("reading raw data failed, length = %d", len);
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    error = HandleCameraCapabilitiesChanged(*parcelPtr);
     if (!reply.WriteInt32(error)) {
         TELEPHONY_LOGE("writing parcel failed");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;

@@ -39,10 +39,14 @@ NapiCallAbilityCallback::NapiCallAbilityCallback()
     (void)memset_s(&setTransferCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
     (void)memset_s(&startRttCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
     (void)memset_s(&stopRttCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
-    (void)memset_s(&updateCallMediaModeCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
     (void)memset_s(&callDisconnectCauseCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
     (void)memset_s(&mmiCodeCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
     (void)memset_s(&postDialDelayCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
+    (void)memset_s(&imsCallModeCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
+    (void)memset_s(&peerDimensionsCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
+    (void)memset_s(&callDataUsageCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
+    (void)memset_s(&cameraCapabilitiesCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
+    (void)memset_s(&callSessionEventCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
     memberFuncMap_[CallResultReportId::GET_CALL_WAITING_REPORT_ID] = &NapiCallAbilityCallback::ReportGetWaitingInfo;
     memberFuncMap_[CallResultReportId::SET_CALL_WAITING_REPORT_ID] = &NapiCallAbilityCallback::ReportSetWaitingInfo;
     memberFuncMap_[CallResultReportId::GET_CALL_RESTRICTION_REPORT_ID] =
@@ -57,8 +61,6 @@ NapiCallAbilityCallback::NapiCallAbilityCallback()
         &NapiCallAbilityCallback::ReportSetTransferInfo;
     memberFuncMap_[CallResultReportId::START_RTT_REPORT_ID] = &NapiCallAbilityCallback::ReportStartRttInfo;
     memberFuncMap_[CallResultReportId::STOP_RTT_REPORT_ID] = &NapiCallAbilityCallback::ReportStopRttInfo;
-    memberFuncMap_[CallResultReportId::UPDATE_MEDIA_MODE_REPORT_ID] =
-        &NapiCallAbilityCallback::ReportCallMediaModeInfo;
     memberFuncMap_[CallResultReportId::CLOSE_UNFINISHED_USSD_REPORT_ID] =
         &NapiCallAbilityCallback::ReportCloseUnFinishedUssdInfo;
 }
@@ -122,6 +124,66 @@ void NapiCallAbilityCallback::UnRegisterCallEventCallback()
 {
     if (eventCallback_.callbackRef) {
         (void)memset_s(&eventCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
+    }
+}
+
+void NapiCallAbilityCallback::RegisterImsCallModeChangeCallback(EventCallback eventCallback)
+{
+    imsCallModeCallback_ = eventCallback;
+}
+
+void NapiCallAbilityCallback::UnRegisterImsCallModeChangeCallback()
+{
+    if (eventCallback_.callbackRef) {
+        (void)memset_s(&imsCallModeCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
+    }
+}
+
+void NapiCallAbilityCallback::RegisterPeerDimensionsChangeCallback(EventCallback eventCallback)
+{
+    peerDimensionsCallback_ = eventCallback;
+}
+
+void NapiCallAbilityCallback::UnRegisterPeerDimensionsChangeCallback()
+{
+    if (eventCallback_.callbackRef) {
+        (void)memset_s(&peerDimensionsCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
+    }
+}
+
+void NapiCallAbilityCallback::RegisterCallDataUsageChangeCallback(EventCallback eventCallback)
+{
+    callDataUsageCallback_ = eventCallback;
+}
+
+void NapiCallAbilityCallback::UnRegisterCallDataUsageChangeCallback()
+{
+    if (eventCallback_.callbackRef) {
+        (void)memset_s(&callDataUsageCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
+    }
+}
+
+void NapiCallAbilityCallback::RegisterCameraCapabilitiesChangeCallback(EventCallback eventCallback)
+{
+    cameraCapabilitiesCallback_ = eventCallback;
+}
+
+void NapiCallAbilityCallback::UnRegisterCameraCapabilitiesChangeCallback()
+{
+    if (eventCallback_.callbackRef) {
+        (void)memset_s(&cameraCapabilitiesCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
+    }
+}
+
+void NapiCallAbilityCallback::RegisterCallSessionEventChangeCallback(EventCallback eventCallback)
+{
+    callSessionEventCallback_ = eventCallback;
+}
+
+void NapiCallAbilityCallback::UnRegisterCallSessionEventChangeCallback()
+{
+    if (eventCallback_.callbackRef) {
+        (void)memset_s(&callSessionEventCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
     }
 }
 
@@ -296,21 +358,6 @@ void NapiCallAbilityCallback::UnRegisterStopRttCallback()
     (void)memset_s(&stopRttCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
 }
 
-int32_t NapiCallAbilityCallback::RegisterUpdateCallMediaModeCallback(EventCallback callback)
-{
-    if (updateCallMediaModeCallback_.thisVar) {
-        TELEPHONY_LOGE("callback already exist!");
-        return CALL_ERR_CALLBACK_ALREADY_EXIST;
-    }
-    updateCallMediaModeCallback_ = callback;
-    return TELEPHONY_SUCCESS;
-}
-
-void NapiCallAbilityCallback::UnRegisterUpdateCallMediaModeCallback()
-{
-    (void)memset_s(&updateCallMediaModeCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
-}
-
 int32_t NapiCallAbilityCallback::ReportStartRttInfo(AppExecFwk::PacMap &resultInfo)
 {
     if (startRttCallback_.thisVar == nullptr) {
@@ -367,36 +414,6 @@ int32_t NapiCallAbilityCallback::ReportStopRttInfo(AppExecFwk::PacMap &resultInf
     uv_queue_work_with_qos(loop, work, [](uv_work_t *work) {}, ReportStopRttInfoWork, uv_qos_default);
     if (stopRttCallback_.thisVar) {
         (void)memset_s(&stopRttCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
-    }
-    return TELEPHONY_SUCCESS;
-}
-
-int32_t NapiCallAbilityCallback::ReportCallMediaModeInfo(AppExecFwk::PacMap &resultInfo)
-{
-    if (updateCallMediaModeCallback_.thisVar == nullptr) {
-        TELEPHONY_LOGE("updateCallMediaModeCallback_ is null!");
-        return CALL_ERR_CALLBACK_NOT_EXIST;
-    }
-    uv_loop_s *loop = nullptr;
-#if defined(NAPI_VERSION) && NAPI_VERSION >= 2
-    napi_get_uv_event_loop(updateCallMediaModeCallback_.env, &loop);
-#endif
-    CallSupplementWorker *dataWorker = std::make_unique<CallSupplementWorker>().release();
-    if (dataWorker == nullptr) {
-        TELEPHONY_LOGE("dataWorker is nullptr!");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-    dataWorker->info = resultInfo;
-    dataWorker->callback = updateCallMediaModeCallback_;
-    uv_work_t *work = std::make_unique<uv_work_t>().release();
-    if (work == nullptr) {
-        TELEPHONY_LOGE("work is nullptr!");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-    work->data = (void *)dataWorker;
-    uv_queue_work_with_qos(loop, work, [](uv_work_t *work) {}, ReportCallMediaModeInfoWork, uv_qos_default);
-    if (updateCallMediaModeCallback_.thisVar) {
-        (void)memset_s(&updateCallMediaModeCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
     }
     return TELEPHONY_SUCCESS;
 }
@@ -1382,61 +1399,6 @@ void NapiCallAbilityCallback::ReportStopRttInfo(AppExecFwk::PacMap &resultInfo, 
     napi_close_handle_scope(env, stopRttScope);
 }
 
-void NapiCallAbilityCallback::ReportCallMediaModeInfoWork(uv_work_t *work, int32_t status)
-{
-    CallSupplementWorker *dataWorkerData = (CallSupplementWorker *)work->data;
-    if (dataWorkerData == nullptr) {
-        TELEPHONY_LOGE("dataWorkerData is nullptr!");
-        return;
-    }
-    ReportCallMediaModeInfo(dataWorkerData->info, dataWorkerData->callback);
-    delete dataWorkerData;
-    dataWorkerData = nullptr;
-    delete work;
-    work = nullptr;
-}
-
-void NapiCallAbilityCallback::ReportCallMediaModeInfo(AppExecFwk::PacMap &resultInfo, EventCallback supplementInfo)
-{
-    napi_env env = supplementInfo.env;
-    int32_t result = resultInfo.GetIntValue("result");
-    napi_handle_scope CallMediaModeScope = nullptr;
-    napi_open_handle_scope(env, &CallMediaModeScope);
-    if (CallMediaModeScope == nullptr) {
-        TELEPHONY_LOGE("CallMediaModeScope is nullptr");
-        napi_close_handle_scope(env, CallMediaModeScope);
-        return;
-    }
-    if (supplementInfo.callbackRef != nullptr) {
-        napi_value callbackValues[ARRAY_INDEX_THIRD] = { 0 };
-        if (result == TELEPHONY_SUCCESS) {
-            callbackValues[ARRAY_INDEX_FIRST] = NapiCallManagerUtils::CreateUndefined(env);
-        } else {
-            std::string errTip = std::to_string(result);
-            callbackValues[ARRAY_INDEX_FIRST] = NapiCallManagerUtils::CreateErrorMessage(env, errTip);
-            callbackValues[ARRAY_INDEX_SECOND] = NapiCallManagerUtils::CreateUndefined(env);
-        }
-        napi_value callbackFunc = nullptr;
-        napi_get_reference_value(env, supplementInfo.callbackRef, &callbackFunc);
-        napi_value thisVar = nullptr;
-        napi_get_reference_value(env, supplementInfo.thisVar, &thisVar);
-        napi_value callbackResult = nullptr;
-        napi_call_function(env, thisVar, callbackFunc, DATA_LENGTH_TWO, callbackValues, &callbackResult);
-        napi_delete_reference(env, supplementInfo.callbackRef);
-        napi_delete_reference(env, supplementInfo.thisVar);
-    } else if (supplementInfo.deferred != nullptr) {
-        if (result == TELEPHONY_SUCCESS) {
-            napi_value promiseValue = nullptr;
-            napi_get_null(env, &promiseValue);
-            napi_resolve_deferred(env, supplementInfo.deferred, promiseValue);
-        } else {
-            std::string errTip = std::to_string(result);
-            napi_reject_deferred(env, supplementInfo.deferred, NapiCallManagerUtils::CreateErrorMessage(env, errTip));
-        }
-    }
-    napi_close_handle_scope(env, CallMediaModeScope);
-}
-
 void NapiCallAbilityCallback::ReportCallOttWork(uv_work_t *work, int32_t status)
 {
     CallOttWorker *dataWorkerData = (CallOttWorker *)work->data;
@@ -1566,6 +1528,385 @@ int32_t NapiCallAbilityCallback::ReportPostDialDelay(std::string postDialStr, Ev
     napi_value callbackResult = nullptr;
     napi_call_function(env, thisVar, callbackFunc, DATA_LENGTH_ONE, callbackValues, &callbackResult);
     napi_close_handle_scope(env, scope);
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t NapiCallAbilityCallback::UpdateImsCallModeChange(const CallMediaModeInfo &imsCallModeInfo)
+{
+    if (imsCallModeCallback_.thisVar == nullptr) {
+        TELEPHONY_LOGE("thisVar is nullptr!");
+        return CALL_ERR_CALLBACK_NOT_EXIST;
+    }
+    uv_loop_s *loop = nullptr;
+#if defined(NAPI_VERSION) && NAPI_VERSION >= 2
+    napi_get_uv_event_loop(imsCallModeCallback_.env, &loop);
+#endif
+    ImsCallModeInfoWorker *dataWorker = std::make_unique<ImsCallModeInfoWorker>().release();
+    if (dataWorker == nullptr) {
+        TELEPHONY_LOGE("dataWorker is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    dataWorker->callModeInfo = imsCallModeInfo;
+    dataWorker->callback = imsCallModeCallback_;
+    uv_work_t *work = std::make_unique<uv_work_t>().release();
+    if (work == nullptr) {
+        TELEPHONY_LOGE("work is nullptr");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    work->data = (void *)dataWorker;
+    uv_queue_work_with_qos(loop, work, [](uv_work_t *work) {}, ReportCallMediaModeInfoWork, uv_qos_default);
+    return TELEPHONY_SUCCESS;
+}
+
+void NapiCallAbilityCallback::ReportCallMediaModeInfoWork(uv_work_t *work, int32_t status)
+{
+    ImsCallModeInfoWorker *dataWorkerData = (ImsCallModeInfoWorker *)work->data;
+    if (dataWorkerData == nullptr) {
+        TELEPHONY_LOGE("dataWorkerData is nullptr!");
+        return;
+    }
+    int32_t ret = ReportCallMediaModeInfo(dataWorkerData->callModeInfo, dataWorkerData->callback);
+    TELEPHONY_LOGI("ReportPostDialDelay result = %{public}d", ret);
+    delete dataWorkerData;
+    dataWorkerData = nullptr;
+    delete work;
+    work = nullptr;
+}
+
+int32_t NapiCallAbilityCallback::ReportCallMediaModeInfo(
+    CallMediaModeInfo &imsCallModeInfo, EventCallback eventCallback)
+{
+    napi_env env = eventCallback.env;
+    napi_handle_scope CallMediaModeInfoScope = nullptr;
+    napi_open_handle_scope(env, &CallMediaModeInfoScope);
+    if (CallMediaModeInfoScope == nullptr) {
+        TELEPHONY_LOGE("CallMediaModeInfoScope is nullptr");
+        napi_close_handle_scope(env, CallMediaModeInfoScope);
+        return TELEPHONY_ERROR;
+    }
+    napi_value callbackFunc = nullptr;
+    napi_value callbackValues[ARRAY_INDEX_SECOND] = { 0 };
+
+    napi_create_object(env, &callbackValues[ARRAY_INDEX_FIRST]);
+    NapiCallManagerUtils::SetPropertyInt32(env, callbackValues[ARRAY_INDEX_FIRST], "callId", imsCallModeInfo.callId);
+    NapiCallManagerUtils::SetPropertyBoolean(
+        env, callbackValues[ARRAY_INDEX_FIRST], "isRequestInfo", imsCallModeInfo.isRequestInfo);
+    NapiCallManagerUtils::SetPropertyInt32(env, callbackValues[ARRAY_INDEX_FIRST], "result", imsCallModeInfo.result);
+    NapiCallManagerUtils::SetPropertyInt32(
+        env, callbackValues[ARRAY_INDEX_FIRST], "imsCallMode", static_cast<int32_t>(imsCallModeInfo.callMode));
+
+    napi_get_reference_value(env, eventCallback.callbackRef, &callbackFunc);
+    if (callbackFunc == nullptr) {
+        TELEPHONY_LOGE("callbackFunc is null!");
+        napi_close_handle_scope(env, CallMediaModeInfoScope);
+        return CALL_ERR_CALLBACK_NOT_EXIST;
+    }
+    napi_value thisVar = nullptr;
+    napi_get_reference_value(env, eventCallback.thisVar, &thisVar);
+    napi_value callbackResult = nullptr;
+    napi_call_function(env, thisVar, callbackFunc, DATA_LENGTH_ONE, callbackValues, &callbackResult);
+    napi_close_handle_scope(env, CallMediaModeInfoScope);
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t NapiCallAbilityCallback::CallSessionEventChange(const CallSessionEvent &callSessionEvent)
+{
+    if (callSessionEventCallback_.thisVar == nullptr) {
+        TELEPHONY_LOGE("thisVar is nullptr!");
+        return CALL_ERR_CALLBACK_NOT_EXIST;
+    }
+    uv_loop_s *loop = nullptr;
+#if defined(NAPI_VERSION) && NAPI_VERSION >= 2
+    napi_get_uv_event_loop(callSessionEventCallback_.env, &loop);
+#endif
+    CallSessionEventWorker *dataWorker = std::make_unique<CallSessionEventWorker>().release();
+    if (dataWorker == nullptr) {
+        TELEPHONY_LOGE("dataWorker is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    dataWorker->sessionEvent = callSessionEvent;
+    dataWorker->callback = callSessionEventCallback_;
+    uv_work_t *work = std::make_unique<uv_work_t>().release();
+    if (work == nullptr) {
+        TELEPHONY_LOGE("work is nullptr");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    work->data = (void *)dataWorker;
+    uv_queue_work_with_qos(loop, work, [](uv_work_t *work) {}, ReportCallSessionEventWork, uv_qos_default);
+    return TELEPHONY_SUCCESS;
+}
+
+void NapiCallAbilityCallback::ReportCallSessionEventWork(uv_work_t *work, int32_t status)
+{
+    CallSessionEventWorker *dataWorkerData = (CallSessionEventWorker *)work->data;
+    if (dataWorkerData == nullptr) {
+        TELEPHONY_LOGE("dataWorkerData is nullptr!");
+        return;
+    }
+    int32_t ret = ReportCallSessionEvent(dataWorkerData->sessionEvent, dataWorkerData->callback);
+    TELEPHONY_LOGI("ReportPostDialDelay result = %{public}d", ret);
+    delete dataWorkerData;
+    dataWorkerData = nullptr;
+    delete work;
+    work = nullptr;
+}
+
+int32_t NapiCallAbilityCallback::ReportCallSessionEvent(
+    CallSessionEvent &sessionEvent, EventCallback eventCallback)
+{
+    napi_env env = eventCallback.env;
+    napi_handle_scope CallSessionEventScope = nullptr;
+    napi_open_handle_scope(env, &CallSessionEventScope);
+    if (CallSessionEventScope == nullptr) {
+        TELEPHONY_LOGE("CallMediaModeInfoScope is nullptr");
+        napi_close_handle_scope(env, CallSessionEventScope);
+        return TELEPHONY_ERROR;
+    }
+    napi_value callbackFunc = nullptr;
+    napi_value callbackValues[ARRAY_INDEX_SECOND] = { 0 };
+
+    napi_create_object(env, &callbackValues[ARRAY_INDEX_FIRST]);
+    NapiCallManagerUtils::SetPropertyInt32(env, callbackValues[ARRAY_INDEX_FIRST], "callId", sessionEvent.callId);
+    NapiCallManagerUtils::SetPropertyInt32(
+        env, callbackValues[ARRAY_INDEX_FIRST], "eventId", static_cast<int32_t>(sessionEvent.eventId));
+
+    napi_get_reference_value(env, eventCallback.callbackRef, &callbackFunc);
+    if (callbackFunc == nullptr) {
+        TELEPHONY_LOGE("callbackFunc is null!");
+        napi_close_handle_scope(env, CallSessionEventScope);
+        return CALL_ERR_CALLBACK_NOT_EXIST;
+    }
+    napi_value thisVar = nullptr;
+    napi_get_reference_value(env, eventCallback.thisVar, &thisVar);
+    napi_value callbackResult = nullptr;
+    napi_call_function(env, thisVar, callbackFunc, DATA_LENGTH_ONE, callbackValues, &callbackResult);
+    napi_close_handle_scope(env, CallSessionEventScope);
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t NapiCallAbilityCallback::PeerDimensionsChange(const PeerDimensionsDetail &peerDimensionsDetail)
+{
+    if (peerDimensionsCallback_.thisVar == nullptr) {
+        TELEPHONY_LOGE("thisVar is nullptr!");
+        return CALL_ERR_CALLBACK_NOT_EXIST;
+    }
+    uv_loop_s *loop = nullptr;
+#if defined(NAPI_VERSION) && NAPI_VERSION >= 2
+    napi_get_uv_event_loop(peerDimensionsCallback_.env, &loop);
+#endif
+    PeerDimensionsWorker *dataWorker = std::make_unique<PeerDimensionsWorker>().release();
+    if (dataWorker == nullptr) {
+        TELEPHONY_LOGE("dataWorker is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    dataWorker->peerDimensionsDetail = peerDimensionsDetail;
+    dataWorker->callback = peerDimensionsCallback_;
+    uv_work_t *work = std::make_unique<uv_work_t>().release();
+    if (work == nullptr) {
+        TELEPHONY_LOGE("work is nullptr");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    work->data = (void *)dataWorker;
+    uv_queue_work_with_qos(loop, work, [](uv_work_t *work) {}, ReportPeerDimensionsWork, uv_qos_default);
+    return TELEPHONY_SUCCESS;
+}
+
+void NapiCallAbilityCallback::ReportPeerDimensionsWork(uv_work_t *work, int32_t status)
+{
+    PeerDimensionsWorker *dataWorkerData = (PeerDimensionsWorker *)work->data;
+    if (dataWorkerData == nullptr) {
+        TELEPHONY_LOGE("dataWorkerData is nullptr!");
+        return;
+    }
+    int32_t ret = ReportPeerDimensions(dataWorkerData->peerDimensionsDetail, dataWorkerData->callback);
+    TELEPHONY_LOGI("ReportPostDialDelay result = %{public}d", ret);
+    delete dataWorkerData;
+    dataWorkerData = nullptr;
+    delete work;
+    work = nullptr;
+}
+
+int32_t NapiCallAbilityCallback::ReportPeerDimensions(
+    PeerDimensionsDetail &peerDimensionsDetail, EventCallback eventCallback)
+{
+    napi_env env = eventCallback.env;
+    napi_handle_scope PeerDimensionsDetailScope = nullptr;
+    napi_open_handle_scope(env, &PeerDimensionsDetailScope);
+    if (PeerDimensionsDetailScope == nullptr) {
+        TELEPHONY_LOGE("CallMediaModeInfoScope is nullptr");
+        napi_close_handle_scope(env, PeerDimensionsDetailScope);
+        return TELEPHONY_ERROR;
+    }
+    napi_value callbackFunc = nullptr;
+    napi_value callbackValues[ARRAY_INDEX_SECOND] = { 0 };
+
+    napi_create_object(env, &callbackValues[ARRAY_INDEX_FIRST]);
+    NapiCallManagerUtils::SetPropertyInt32(
+        env, callbackValues[ARRAY_INDEX_FIRST], "callId", peerDimensionsDetail.callId);
+    NapiCallManagerUtils::SetPropertyInt32(
+        env, callbackValues[ARRAY_INDEX_FIRST], "width", peerDimensionsDetail.width);
+    NapiCallManagerUtils::SetPropertyInt32(
+        env, callbackValues[ARRAY_INDEX_FIRST], "height", peerDimensionsDetail.height);
+
+    napi_get_reference_value(env, eventCallback.callbackRef, &callbackFunc);
+    if (callbackFunc == nullptr) {
+        TELEPHONY_LOGE("callbackFunc is null!");
+        napi_close_handle_scope(env, PeerDimensionsDetailScope);
+        return CALL_ERR_CALLBACK_NOT_EXIST;
+    }
+    napi_value thisVar = nullptr;
+    napi_get_reference_value(env, eventCallback.thisVar, &thisVar);
+    napi_value callbackResult = nullptr;
+    napi_call_function(env, thisVar, callbackFunc, DATA_LENGTH_ONE, callbackValues, &callbackResult);
+    napi_close_handle_scope(env, PeerDimensionsDetailScope);
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t NapiCallAbilityCallback::CallDataUsageChange(const int64_t dataUsage)
+{
+    if (callDataUsageCallback_.thisVar == nullptr) {
+        TELEPHONY_LOGE("thisVar is nullptr!");
+        return CALL_ERR_CALLBACK_NOT_EXIST;
+    }
+    uv_loop_s *loop = nullptr;
+#if defined(NAPI_VERSION) && NAPI_VERSION >= 2
+    napi_get_uv_event_loop(callDataUsageCallback_.env, &loop);
+#endif
+    CallDataUsageWorker *dataWorker = std::make_unique<CallDataUsageWorker>().release();
+    if (dataWorker == nullptr) {
+        TELEPHONY_LOGE("dataWorker is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    dataWorker->callDataUsage = dataUsage;
+    dataWorker->callback = callDataUsageCallback_;
+    uv_work_t *work = std::make_unique<uv_work_t>().release();
+    if (work == nullptr) {
+        TELEPHONY_LOGE("work is nullptr");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    work->data = (void *)dataWorker;
+    uv_queue_work_with_qos(loop, work, [](uv_work_t *work) {}, ReportCallDataUsageWork, uv_qos_default);
+    return TELEPHONY_SUCCESS;
+}
+
+void NapiCallAbilityCallback::ReportCallDataUsageWork(uv_work_t *work, int32_t status)
+{
+    CallDataUsageWorker *dataWorkerData = (CallDataUsageWorker *)work->data;
+    if (dataWorkerData == nullptr) {
+        TELEPHONY_LOGE("dataWorkerData is nullptr!");
+        return;
+    }
+    int32_t ret = ReportCallDataUsage(dataWorkerData->callDataUsage, dataWorkerData->callback);
+    TELEPHONY_LOGI("ReportPostDialDelay result = %{public}d", ret);
+    delete dataWorkerData;
+    dataWorkerData = nullptr;
+    delete work;
+    work = nullptr;
+}
+
+int32_t NapiCallAbilityCallback::ReportCallDataUsage(int64_t dataUsage, EventCallback eventCallback)
+{
+    napi_env env = eventCallback.env;
+    napi_handle_scope CallDataUsageScope = nullptr;
+    napi_open_handle_scope(env, &CallDataUsageScope);
+    if (CallDataUsageScope == nullptr) {
+        TELEPHONY_LOGE("CallMediaModeInfoScope is nullptr");
+        napi_close_handle_scope(env, CallDataUsageScope);
+        return TELEPHONY_ERROR;
+    }
+    napi_value callbackFunc = nullptr;
+    napi_value callbackValues[ARRAY_INDEX_SECOND] = { 0 };
+    napi_create_int64(env, dataUsage, &callbackValues[ARRAY_INDEX_FIRST]);
+
+    napi_get_reference_value(env, eventCallback.callbackRef, &callbackFunc);
+    if (callbackFunc == nullptr) {
+        TELEPHONY_LOGE("callbackFunc is null!");
+        napi_close_handle_scope(env, CallDataUsageScope);
+        return CALL_ERR_CALLBACK_NOT_EXIST;
+    }
+    napi_value thisVar = nullptr;
+    napi_get_reference_value(env, eventCallback.thisVar, &thisVar);
+    napi_value callbackResult = nullptr;
+    napi_call_function(env, thisVar, callbackFunc, DATA_LENGTH_ONE, callbackValues, &callbackResult);
+    napi_close_handle_scope(env, CallDataUsageScope);
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t NapiCallAbilityCallback::UpdateCameraCapabilities(const CameraCapabilities &cameraCapabilities)
+{
+    if (cameraCapabilitiesCallback_.thisVar == nullptr) {
+        TELEPHONY_LOGE("thisVar is nullptr!");
+        return CALL_ERR_CALLBACK_NOT_EXIST;
+    }
+    uv_loop_s *loop = nullptr;
+#if defined(NAPI_VERSION) && NAPI_VERSION >= 2
+    napi_get_uv_event_loop(cameraCapabilitiesCallback_.env, &loop);
+#endif
+    CameraCapbilitiesWorker *dataWorker = std::make_unique<CameraCapbilitiesWorker>().release();
+    if (dataWorker == nullptr) {
+        TELEPHONY_LOGE("dataWorker is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    dataWorker->cameraCapabilities = cameraCapabilities;
+    dataWorker->callback = cameraCapabilitiesCallback_;
+    uv_work_t *work = std::make_unique<uv_work_t>().release();
+    if (work == nullptr) {
+        TELEPHONY_LOGE("work is nullptr");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    work->data = (void *)dataWorker;
+    uv_queue_work_with_qos(loop, work, [](uv_work_t *work) {}, ReportCameraCapabilitiesInfoWork, uv_qos_default);
+    return TELEPHONY_SUCCESS;
+}
+
+void NapiCallAbilityCallback::ReportCameraCapabilitiesInfoWork(uv_work_t *work, int32_t status)
+{
+    CameraCapbilitiesWorker *dataWorkerData = (CameraCapbilitiesWorker *)work->data;
+    if (dataWorkerData == nullptr) {
+        TELEPHONY_LOGE("dataWorkerData is nullptr!");
+        return;
+    }
+    int32_t ret = ReportCameraCapabilitiesInfo(dataWorkerData->cameraCapabilities, dataWorkerData->callback);
+    TELEPHONY_LOGI("ReportPostDialDelay result = %{public}d", ret);
+    delete dataWorkerData;
+    dataWorkerData = nullptr;
+    delete work;
+    work = nullptr;
+}
+
+int32_t NapiCallAbilityCallback::ReportCameraCapabilitiesInfo(
+    CameraCapabilities &cameraCapabilities, EventCallback eventCallback)
+{
+    napi_env env = eventCallback.env;
+    napi_handle_scope cameraCapabilitiesScope = nullptr;
+    napi_open_handle_scope(env, &cameraCapabilitiesScope);
+    if (cameraCapabilitiesScope == nullptr) {
+        TELEPHONY_LOGE("CallMediaModeInfoScope is nullptr");
+        napi_close_handle_scope(env, cameraCapabilitiesScope);
+        return TELEPHONY_ERROR;
+    }
+    napi_value callbackFunc = nullptr;
+    napi_value callbackValues[ARRAY_INDEX_SECOND] = { 0 };
+
+    napi_create_object(env, &callbackValues[ARRAY_INDEX_FIRST]);
+    NapiCallManagerUtils::SetPropertyInt32(
+        env, callbackValues[ARRAY_INDEX_FIRST], "callId", cameraCapabilities.callId);
+    NapiCallManagerUtils::SetPropertyInt32(
+        env, callbackValues[ARRAY_INDEX_FIRST], "width", cameraCapabilities.width);
+    NapiCallManagerUtils::SetPropertyInt32(
+        env, callbackValues[ARRAY_INDEX_FIRST], "height", cameraCapabilities.height);
+
+    napi_get_reference_value(env, eventCallback.callbackRef, &callbackFunc);
+    if (callbackFunc == nullptr) {
+        TELEPHONY_LOGE("callbackFunc is null!");
+        napi_close_handle_scope(env, cameraCapabilitiesScope);
+        return CALL_ERR_CALLBACK_NOT_EXIST;
+    }
+    napi_value thisVar = nullptr;
+    napi_get_reference_value(env, eventCallback.thisVar, &thisVar);
+    napi_value callbackResult = nullptr;
+    napi_call_function(env, thisVar, callbackFunc, DATA_LENGTH_ONE, callbackValues, &callbackResult);
+    napi_close_handle_scope(env, cameraCapabilitiesScope);
     return TELEPHONY_SUCCESS;
 }
 } // namespace Telephony

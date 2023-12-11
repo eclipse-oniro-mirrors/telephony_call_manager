@@ -333,9 +333,9 @@ HWTEST_F(CallStateTest, Telephony_Ring_001, Function | MediumTest | Level3)
     std::string emptyPath = "";
     auto emptyRing = std::make_shared<Ring>(emptyPath);
     emptyRing->ReleaseRenderer();
-    ASSERT_EQ(emptyRing->Play(), CALL_ERR_INVALID_PATH);
+    ASSERT_EQ(emptyRing->Play(), TELEPHONY_ERR_LOCAL_PTR_NULL);
     sleep(WAIT_TIME);
-    ASSERT_EQ(emptyRing->Stop(), CALL_ERR_INVALID_PATH);
+    ASSERT_EQ(emptyRing->Stop(), TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
 
 /**
@@ -472,8 +472,6 @@ HWTEST_F(CallStateTest, Telephony_CallStatusCallbackProxy_001, Function | Medium
     GetImsFeatureValueResponse imsFeatureValueResponse;
     callStatusCallbackProxy->GetImsFeatureValueResult(imsFeatureValueResponse);
     callStatusCallbackProxy->SetImsFeatureValueResult(result);
-    CallMediaModeResponse callMediaModeResponse;
-    callStatusCallbackProxy->ReceiveUpdateCallMediaModeResponse(callMediaModeResponse);
     callStatusCallbackProxy->InviteToConferenceResult(result);
     callStatusCallbackProxy->StartDtmfResult(result);
     callStatusCallbackProxy->StopDtmfResult(result);
@@ -558,8 +556,6 @@ HWTEST_F(CallStateTest, Telephony_CallStatusCallbackProxy_003, Function | Medium
     GetImsFeatureValueResponse imsFeatureValueResponse;
     callStatusCallbackProxy->GetImsFeatureValueResult(imsFeatureValueResponse);
     callStatusCallbackProxy->SetImsFeatureValueResult(result);
-    CallMediaModeResponse callMediaModeResponse;
-    callStatusCallbackProxy->ReceiveUpdateCallMediaModeResponse(callMediaModeResponse);
     callStatusCallbackProxy->InviteToConferenceResult(result);
     callStatusCallbackProxy->StartDtmfResult(result);
     callStatusCallbackProxy->StopDtmfResult(result);
@@ -568,6 +564,17 @@ HWTEST_F(CallStateTest, Telephony_CallStatusCallbackProxy_003, Function | Medium
     ASSERT_EQ(callStatusCallbackProxy->SendMmiCodeResult(mmiCodeInfo), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
     ASSERT_EQ(callStatusCallbackProxy->GetImsCallDataResult(result), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
     ASSERT_EQ(callStatusCallbackProxy->CloseUnFinishedUssdResult(result), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+    CallModeReportInfo callModeRequestInfo;
+    callStatusCallbackProxy->ReceiveUpdateCallMediaModeRequest(callModeRequestInfo);
+    CallModeReportInfo callModeResponseInfo;
+    callStatusCallbackProxy->ReceiveUpdateCallMediaModeResponse(callModeResponseInfo);
+    CallSessionReportInfo sessionReportInfo;
+    callStatusCallbackProxy->HandleCallSessionEventChanged(sessionReportInfo);
+    PeerDimensionsReportInfo peerDimensionsReportInfo;
+    callStatusCallbackProxy->HandlePeerDimensionsChanged(peerDimensionsReportInfo);
+    callStatusCallbackProxy->HandleCallDataUsageChanged(static_cast<int64_t>(result));
+    CameraCapabilitiesReportInfo cameraCapabilitiesInfo;
+    callStatusCallbackProxy->HandleCameraCapabilitiesChanged(cameraCapabilitiesInfo);
 }
 
 /**

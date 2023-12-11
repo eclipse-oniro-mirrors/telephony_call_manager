@@ -63,7 +63,7 @@ int32_t VideoCallState::DispatchUpdateVideoRequest(ImsCallMode mode)
         TELEPHONY_LOGE("unexpected null pointer.");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return call_->DispatchUpdateVideoRequest(mode);
+    return call_->SendUpdateCallMediaModeRequest(mode);
 }
 
 int32_t VideoCallState::DispatchUpdateVideoResponse(ImsCallMode mode)
@@ -72,7 +72,16 @@ int32_t VideoCallState::DispatchUpdateVideoResponse(ImsCallMode mode)
         TELEPHONY_LOGE("unexpected null pointer.");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return call_->DispatchUpdateVideoResponse(mode);
+    return call_->SendUpdateCallMediaModeResponse(mode);
+}
+
+int32_t VideoCallState::DispatchReportVideoCallInfo(CallMediaModeInfo &imsCallModeInfo)
+{
+    if (call_ == nullptr) {
+        TELEPHONY_LOGE("unexpected null pointer.");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return call_->ReportImsCallModeInfo(imsCallModeInfo);
 }
 
 sptr<VideoCallState> VideoCallState::GetCallVideoState(ImsCallMode mode)
@@ -89,17 +98,12 @@ AudioOnlyState::AudioOnlyState(sptr<NetCallBase> callPtr) : VideoCallState(callP
 
 int32_t AudioOnlyState::SendUpdateCallMediaModeRequest(ImsCallMode mode)
 {
-    TELEPHONY_LOGI("AudioOnlyState send update video request. mode:%{public}d", mode);
     int ret = TELEPHONY_SUCCESS;
     VideoUpdateStatus status = GetVideoUpdateStatus();
+    TELEPHONY_LOGI("AudioOnlyState send update video request. mode:%{public}d, status %{public}d", mode, status);
     switch (mode) {
         case ImsCallMode::CALL_MODE_SEND_ONLY:
         case ImsCallMode::CALL_MODE_RECEIVE_ONLY:
-            ret = DispatchUpdateVideoRequest(mode);
-            if (ret != TELEPHONY_SUCCESS) {
-                TELEPHONY_LOGE("error occur when send updateRequest to call");
-                return ret;
-            }
             break;
         case ImsCallMode::CALL_MODE_AUDIO_ONLY:
         case ImsCallMode::CALL_MODE_VIDEO_PAUSED:
@@ -129,13 +133,72 @@ int32_t AudioOnlyState::SendUpdateCallMediaModeRequest(ImsCallMode mode)
     return ret;
 }
 
-int32_t AudioOnlyState::RecieveUpdateCallMediaModeRequest(ImsCallMode mode)
+int32_t AudioOnlyState::RecieveUpdateCallMediaModeRequest(CallMediaModeInfo &imsCallModeInfo)
 {
-    TELEPHONY_LOGI("AudioOnlyState receive update video request. mode:%{public}d", mode);
     int32_t ret = TELEPHONY_SUCCESS;
     VideoUpdateStatus status = GetVideoUpdateStatus();
+    TELEPHONY_LOGI("AudioOnlyState receive update video request. mode:%{public}d, status %{public}d",
+        imsCallModeInfo.callMode, status);
+    switch (imsCallModeInfo.callMode) {
+        case ImsCallMode::CALL_MODE_AUDIO_ONLY:
+        case ImsCallMode::CALL_MODE_VIDEO_PAUSED:
+            TELEPHONY_LOGI("invalid media state request.");
+            ret = CALL_ERR_VIDEO_ILLEAGAL_SCENARIO;
+            break;
+        case ImsCallMode::CALL_MODE_RECEIVE_ONLY:
+            if (status != VideoUpdateStatus::STATUS_NONE) {
+                TELEPHONY_LOGE("video update in progress");
+                return CALL_ERR_VIDEO_IN_PROGRESS;
+            }
+            // notify app to accept or refuse, assume always accept here
+            (void)DispatchReportVideoCallInfo(imsCallModeInfo);
+            SetVideoUpdateStatus(VideoUpdateStatus::STATUS_RECV_REQUEST);
+            break;
+        case ImsCallMode::CALL_MODE_SEND_ONLY:
+            TELEPHONY_LOGI("receive request.");
+            break;
+        case ImsCallMode::CALL_MODE_SEND_RECEIVE:
+            if (!IsCallSupportVideoCall()) {
+                TELEPHONY_LOGE("not support video, refuse");
+                (void)DispatchUpdateVideoResponse(ImsCallMode::CALL_MODE_AUDIO_ONLY);
+                return CALL_ERR_VIDEO_ILLEAGAL_SCENARIO;
+            }
+            if (status != VideoUpdateStatus::STATUS_NONE) {
+                TELEPHONY_LOGE("video update in progress");
+                return CALL_ERR_VIDEO_IN_PROGRESS;
+            }
+            // notify app to accept or refuse, assume always accept here
+            (void)DispatchReportVideoCallInfo(imsCallModeInfo);
+            SetVideoUpdateStatus(VideoUpdateStatus::STATUS_RECV_REQUEST);
+            break;
+        default:
+            TELEPHONY_LOGE("unknown call media type.");
+            ret = CALL_ERR_VIDEO_ILLEGAL_MEDIA_TYPE;
+            break;
+    }
+    return ret;
+}
+
+int32_t AudioOnlyState::SendUpdateCallMediaModeResponse(ImsCallMode mode)
+{
+    int32_t ret = TELEPHONY_SUCCESS;
+    VideoUpdateStatus status = GetVideoUpdateStatus();
+    TELEPHONY_LOGI("AudioOnlyState send update video response. mode:%{public}d, status %{public}d", mode, status);
     switch (mode) {
         case ImsCallMode::CALL_MODE_AUDIO_ONLY:
+            if (!IsCallSupportVideoCall()) {
+                TELEPHONY_LOGE("not support video, refuse");
+                (void)DispatchUpdateVideoResponse(ImsCallMode::CALL_MODE_AUDIO_ONLY);
+                return CALL_ERR_VIDEO_ILLEAGAL_SCENARIO;
+            }
+            if (status != VideoUpdateStatus::STATUS_RECV_REQUEST) {
+                TELEPHONY_LOGE("video update in progress");
+                return CALL_ERR_VIDEO_IN_PROGRESS;
+            }
+            // notify app to accept or refuse, assume always accept here
+            (void)DispatchUpdateVideoResponse(ImsCallMode::CALL_MODE_AUDIO_ONLY);
+            SetVideoUpdateStatus(VideoUpdateStatus::STATUS_NONE);
+            break;
         case ImsCallMode::CALL_MODE_VIDEO_PAUSED:
             TELEPHONY_LOGI("invalid media state request.");
             ret = CALL_ERR_VIDEO_ILLEAGAL_SCENARIO;
@@ -150,23 +213,14 @@ int32_t AudioOnlyState::RecieveUpdateCallMediaModeRequest(ImsCallMode mode)
                 (void)DispatchUpdateVideoResponse(ImsCallMode::CALL_MODE_AUDIO_ONLY);
                 return CALL_ERR_VIDEO_ILLEAGAL_SCENARIO;
             }
-            if (status != VideoUpdateStatus::STATUS_NONE) {
+            if (status != VideoUpdateStatus::STATUS_RECV_REQUEST) {
                 TELEPHONY_LOGE("video update in progress");
                 return CALL_ERR_VIDEO_IN_PROGRESS;
             }
-            SetVideoUpdateStatus(VideoUpdateStatus::STATUS_RECV_REQUEST);
-            if (call_) {
-                // notify app to accept or refuse, assume always accept here
-                sptr<IMSCall> netCall = static_cast<IMSCall *>(call_.GetRefPtr());
-                if (netCall == nullptr) {
-                    TELEPHONY_LOGE("unexpected null pointer.");
-                    return TELEPHONY_ERR_LOCAL_PTR_NULL;
-                }
-                (void)netCall->AcceptVideoCall();
-            } else {
-                TELEPHONY_LOGE("unexpected null pointer.");
-                ret = TELEPHONY_ERR_LOCAL_PTR_NULL;
-            }
+            // notify app to accept or refuse, assume always accept here
+            (void)DispatchUpdateVideoResponse(ImsCallMode::CALL_MODE_SEND_RECEIVE);
+            (void)SwitchCallVideoState(ImsCallMode::CALL_MODE_SEND_RECEIVE);
+            SetVideoUpdateStatus(VideoUpdateStatus::STATUS_NONE);
             break;
         default:
             TELEPHONY_LOGE("unknown call media type.");
@@ -176,24 +230,35 @@ int32_t AudioOnlyState::RecieveUpdateCallMediaModeRequest(ImsCallMode mode)
     return ret;
 }
 
-int32_t AudioOnlyState::SendUpdateCallMediaModeResponse(ImsCallMode mode)
+int32_t AudioOnlyState::ReceiveUpdateCallMediaModeResponse(CallMediaModeInfo &imsCallModeInfo)
 {
-    TELEPHONY_LOGI("AudioOnlyState send response ignored, mode %{public}d", mode);
-    return TELEPHONY_SUCCESS;
-}
-
-int32_t AudioOnlyState::ReceiveUpdateCallMediaModeResponse(ImsCallMode mode)
-{
-    TELEPHONY_LOGI("AudioOnlyState receive response, mode %{public}d", mode);
     int32_t ret = TELEPHONY_SUCCESS;
     VideoUpdateStatus status = GetVideoUpdateStatus();
-    switch (mode) {
+    TELEPHONY_LOGI(
+        "AudioOnlyState receive response, mode %{public}d, status %{public}d", imsCallModeInfo.callMode, status);
+    switch (imsCallModeInfo.callMode) {
         case ImsCallMode::CALL_MODE_SEND_RECEIVE:
-            if (status == VideoUpdateStatus::STATUS_SEND_REQUEST) {
-                (void)SwitchCallVideoState(ImsCallMode::CALL_MODE_SEND_RECEIVE);
-                SetVideoUpdateStatus(VideoUpdateStatus::STATUS_NONE);
+            if (status != VideoUpdateStatus::STATUS_SEND_REQUEST) {
+                return CALL_ERR_VIDEO_ILLEAGAL_SCENARIO;
             }
+            (void)SwitchCallVideoState(ImsCallMode::CALL_MODE_SEND_RECEIVE);
             SetVideoUpdateStatus(VideoUpdateStatus::STATUS_NONE);
+            // notify app to accept or refuse, assume always accept here
+            DispatchReportVideoCallInfo(imsCallModeInfo);
+            break;
+        case ImsCallMode::CALL_MODE_AUDIO_ONLY:
+            SetVideoUpdateStatus(VideoUpdateStatus::STATUS_NONE);
+            // notify app to accept or refuse, assume always accept here
+            DispatchReportVideoCallInfo(imsCallModeInfo);
+            break;
+        case ImsCallMode::CALL_MODE_RECEIVE_ONLY:
+            if (status != VideoUpdateStatus::STATUS_SEND_REQUEST) {
+                return CALL_ERR_VIDEO_ILLEAGAL_SCENARIO;
+            }
+            (void)SwitchCallVideoState(ImsCallMode::CALL_MODE_RECEIVE_ONLY);
+            SetVideoUpdateStatus(VideoUpdateStatus::STATUS_NONE);
+            // notify app to accept or refuse, assume always accept here
+            DispatchReportVideoCallInfo(imsCallModeInfo);
             break;
         default:
             TELEPHONY_LOGI("other media type, ignored");
@@ -237,15 +302,16 @@ int32_t VideoSendState::SendUpdateCallMediaModeRequest(ImsCallMode mode)
     return ret;
 }
 
-int32_t VideoSendState::RecieveUpdateCallMediaModeRequest(ImsCallMode mode)
+int32_t VideoSendState::RecieveUpdateCallMediaModeRequest(CallMediaModeInfo &imsCallModeInfo)
 {
-    TELEPHONY_LOGI("VideoSendState receive update video request. mode:%{public}d", mode);
     int32_t ret = TELEPHONY_SUCCESS;
     VideoUpdateStatus status = GetVideoUpdateStatus();
-    switch (mode) {
+    TELEPHONY_LOGI("VideoSendState receive update video request. mode:%{public}d, status:%{public}d",
+        imsCallModeInfo.callMode, status);
+    switch (imsCallModeInfo.callMode) {
         case ImsCallMode::CALL_MODE_AUDIO_ONLY:
         case ImsCallMode::CALL_MODE_VIDEO_PAUSED:
-            ret = SwitchCallVideoState(mode);
+            ret = SwitchCallVideoState(imsCallModeInfo.callMode);
             if (ret != TELEPHONY_SUCCESS) {
                 TELEPHONY_LOGE("error occurs when switch call state.");
                 return ret;
@@ -277,15 +343,16 @@ int32_t VideoSendState::SendUpdateCallMediaModeResponse(ImsCallMode mode)
     return TELEPHONY_SUCCESS;
 }
 
-int32_t VideoSendState::ReceiveUpdateCallMediaModeResponse(ImsCallMode mode)
+int32_t VideoSendState::ReceiveUpdateCallMediaModeResponse(CallMediaModeInfo &imsCallModeInfo)
 {
-    TELEPHONY_LOGI("VideoSendState receive update video response. mode:%{public}d", mode);
     int32_t ret = TELEPHONY_SUCCESS;
     VideoUpdateStatus status = GetVideoUpdateStatus();
-    switch (mode) {
+    TELEPHONY_LOGI("VideoSendState receive update video response. mode:%{public}d, status:%{public}d",
+        imsCallModeInfo.callMode, status);
+    switch (imsCallModeInfo.callMode) {
         case ImsCallMode::CALL_MODE_AUDIO_ONLY:
         case ImsCallMode::CALL_MODE_VIDEO_PAUSED:
-            ret = SwitchCallVideoState(mode);
+            ret = SwitchCallVideoState(imsCallModeInfo.callMode);
             if (ret != TELEPHONY_SUCCESS) {
                 TELEPHONY_LOGE("error occurs when switch call state");
                 return ret;
@@ -305,7 +372,7 @@ int32_t VideoSendState::ReceiveUpdateCallMediaModeResponse(ImsCallMode mode)
             if (ret != TELEPHONY_SUCCESS) {
                 return ret;
             }
-            ret = SwitchCallVideoState(mode);
+            ret = SwitchCallVideoState(imsCallModeInfo.callMode);
             if (ret != TELEPHONY_SUCCESS) {
                 TELEPHONY_LOGE("error occurs when switch call");
                 return ret;
@@ -324,9 +391,9 @@ VideoReceiveState::VideoReceiveState(sptr<NetCallBase> callPtr) : VideoCallState
 
 int32_t VideoReceiveState::SendUpdateCallMediaModeRequest(ImsCallMode mode)
 {
-    TELEPHONY_LOGI("VideoReceiveState send update video response. mode:%{public}d", mode);
     int32_t ret = TELEPHONY_SUCCESS;
     VideoUpdateStatus status = GetVideoUpdateStatus();
+    TELEPHONY_LOGI("VideoReceiveState send update video request. mode:%{public}d, status:%{public}d", mode, status);
     switch (mode) {
         case ImsCallMode::CALL_MODE_AUDIO_ONLY:
         case ImsCallMode::CALL_MODE_VIDEO_PAUSED:
@@ -358,27 +425,32 @@ int32_t VideoReceiveState::SendUpdateCallMediaModeRequest(ImsCallMode mode)
     return ret;
 }
 
-int32_t VideoReceiveState::RecieveUpdateCallMediaModeRequest(ImsCallMode mode)
+int32_t VideoReceiveState::RecieveUpdateCallMediaModeRequest(CallMediaModeInfo &imsCallModeInfo)
 {
-    TELEPHONY_LOGI("VideoReceiveState send update video response. mode:%{public}d", mode);
     int32_t ret = TELEPHONY_SUCCESS;
     VideoUpdateStatus status = GetVideoUpdateStatus();
-    switch (mode) {
+    TELEPHONY_LOGI("VideoReceiveState receive update video request. mode:%{public}d, status:%{public}d",
+        imsCallModeInfo.callMode, status);
+    switch (imsCallModeInfo.callMode) {
         case ImsCallMode::CALL_MODE_AUDIO_ONLY:
         case ImsCallMode::CALL_MODE_VIDEO_PAUSED:
-            ret = SwitchCallVideoState(mode);
+            ret = SwitchCallVideoState(imsCallModeInfo.callMode);
             if (ret != TELEPHONY_SUCCESS) {
                 return ret;
             }
+            DispatchReportVideoCallInfo(imsCallModeInfo);
             SetVideoUpdateStatus(VideoUpdateStatus::STATUS_NONE);
             break;
         case ImsCallMode::CALL_MODE_SEND_ONLY:
+            break;
         case ImsCallMode::CALL_MODE_RECEIVE_ONLY:
         case ImsCallMode::CALL_MODE_SEND_RECEIVE:
             if (status != VideoUpdateStatus::STATUS_NONE) {
                 TELEPHONY_LOGE("already in progress.");
                 ret = CALL_ERR_VIDEO_IN_PROGRESS;
             }
+            DispatchReportVideoCallInfo(imsCallModeInfo);
+            SetVideoUpdateStatus(VideoUpdateStatus::STATUS_RECV_REQUEST);
             break;
         default:
             TELEPHONY_LOGE("unknown media type.");
@@ -390,9 +462,9 @@ int32_t VideoReceiveState::RecieveUpdateCallMediaModeRequest(ImsCallMode mode)
 
 int32_t VideoReceiveState::SendUpdateCallMediaModeResponse(ImsCallMode mode)
 {
-    TELEPHONY_LOGI("VideoReceiveState send update video response. mode:%{public}d", mode);
     int32_t ret = TELEPHONY_SUCCESS;
     VideoUpdateStatus status = GetVideoUpdateStatus();
+    TELEPHONY_LOGI("VideoReceiveState send update video response. mode:%{public}d, status:%{public}d", mode, status);
     switch (mode) {
         case ImsCallMode::CALL_MODE_AUDIO_ONLY:
         case ImsCallMode::CALL_MODE_VIDEO_PAUSED:
@@ -404,14 +476,33 @@ int32_t VideoReceiveState::SendUpdateCallMediaModeResponse(ImsCallMode mode)
             SetVideoUpdateStatus(VideoUpdateStatus::STATUS_NONE);
             break;
         case ImsCallMode::CALL_MODE_SEND_ONLY:
+            break;
         case ImsCallMode::CALL_MODE_RECEIVE_ONLY:
-            if (status != VideoUpdateStatus::STATUS_NONE) {
-                TELEPHONY_LOGW("already in progress.");
-                ret = CALL_ERR_VIDEO_IN_PROGRESS;
+            if (status != VideoUpdateStatus::STATUS_RECV_REQUEST) {
+                return CALL_ERR_VIDEO_ILLEAGAL_SCENARIO;
             }
+            ret = DispatchUpdateVideoRequest(mode);
+            if (ret != TELEPHONY_SUCCESS) {
+                TELEPHONY_LOGE("error occurs when dispatch request");
+                return ret;
+            }
+            SetVideoUpdateStatus(VideoUpdateStatus::STATUS_NONE);
             break;
         case ImsCallMode::CALL_MODE_SEND_RECEIVE:
-            ret = DispatchUpdateVideoResponse(mode);
+            if (status != VideoUpdateStatus::STATUS_RECV_REQUEST) {
+                return CALL_ERR_VIDEO_ILLEAGAL_SCENARIO;
+            }
+            ret = DispatchUpdateVideoRequest(mode);
+            if (ret != TELEPHONY_SUCCESS) {
+                TELEPHONY_LOGE("error occurs when dispatch request");
+                return ret;
+            }
+            ret = SwitchCallVideoState(mode);
+            if (ret) {
+                TELEPHONY_LOGE("error occur when switch call state");
+                return ret;
+            }
+            SetVideoUpdateStatus(VideoUpdateStatus::STATUS_NONE);
             break;
         default:
             TELEPHONY_LOGE("unknown media type.");
@@ -421,15 +512,15 @@ int32_t VideoReceiveState::SendUpdateCallMediaModeResponse(ImsCallMode mode)
     return ret;
 }
 
-int32_t VideoReceiveState::ReceiveUpdateCallMediaModeResponse(ImsCallMode mode)
+int32_t VideoReceiveState::ReceiveUpdateCallMediaModeResponse(CallMediaModeInfo &imsCallModeInfo)
 {
-    TELEPHONY_LOGI("VideoReceiveState receive update video response. mode:%{public}d", mode);
+    TELEPHONY_LOGI("VideoReceiveState receive update video response. mode:%{public}d", imsCallModeInfo.callMode);
     int32_t ret = TELEPHONY_SUCCESS;
-    switch (mode) {
+    switch (imsCallModeInfo.callMode) {
         case ImsCallMode::CALL_MODE_AUDIO_ONLY:
         case ImsCallMode::CALL_MODE_SEND_RECEIVE:
         case ImsCallMode::CALL_MODE_VIDEO_PAUSED:
-            ret = SwitchCallVideoState(mode);
+            ret = SwitchCallVideoState(imsCallModeInfo.callMode);
             if (ret != TELEPHONY_SUCCESS) {
                 TELEPHONY_LOGE("error occur when switch call state");
                 return ret;
@@ -438,8 +529,14 @@ int32_t VideoReceiveState::ReceiveUpdateCallMediaModeResponse(ImsCallMode mode)
             break;
         case ImsCallMode::CALL_MODE_SEND_ONLY:
         case ImsCallMode::CALL_MODE_RECEIVE_ONLY:
-            TELEPHONY_LOGE("already in progress.");
-            ret = CALL_ERR_VIDEO_IN_PROGRESS;
+            ret = DispatchReportVideoCallInfo(imsCallModeInfo);
+            if (ret != TELEPHONY_SUCCESS) {
+                TELEPHONY_LOGE("error occur when switch call state");
+                return ret;
+            }
+            if (GetVideoUpdateStatus() != VideoUpdateStatus::STATUS_NONE) {
+                SetVideoUpdateStatus(VideoUpdateStatus::STATUS_NONE);
+            }
             break;
         default:
             TELEPHONY_LOGE("unknown media type.");
@@ -489,27 +586,32 @@ int32_t VideoSendReceiveState::SendUpdateCallMediaModeRequest(ImsCallMode mode)
     return ret;
 }
 
-int32_t VideoSendReceiveState::RecieveUpdateCallMediaModeRequest(ImsCallMode mode)
+int32_t VideoSendReceiveState::RecieveUpdateCallMediaModeRequest(CallMediaModeInfo &imsCallModeInfo)
 {
-    TELEPHONY_LOGI("VideoSendReceiveState receive update video response. mode:%{public}d", mode);
     int32_t ret = TELEPHONY_SUCCESS;
-    switch (mode) {
+    VideoUpdateStatus status = GetVideoUpdateStatus();
+    TELEPHONY_LOGI("VideoSendReceiveState receive update video request. mode:%{public}d, status:%{public}d",
+        imsCallModeInfo.callMode, status);
+    switch (imsCallModeInfo.callMode) {
         case ImsCallMode::CALL_MODE_AUDIO_ONLY:
-        case ImsCallMode::CALL_MODE_VIDEO_PAUSED:
-            ret = SwitchCallVideoState(mode); // support send downgrade & pause video request
+            ret = SwitchCallVideoState(imsCallModeInfo.callMode); // support send downgrade & pause video request
             if (ret != TELEPHONY_SUCCESS) {
                 TELEPHONY_LOGE("error occurs when switch call state");
                 return ret;
             }
-            SetVideoUpdateStatus(VideoUpdateStatus::STATUS_NONE);
+            (void)DispatchReportVideoCallInfo(imsCallModeInfo);
+            if (status != VideoUpdateStatus::STATUS_NONE) {
+                SetVideoUpdateStatus(VideoUpdateStatus::STATUS_NONE);
+            }
             break;
+        case ImsCallMode::CALL_MODE_VIDEO_PAUSED:
         case ImsCallMode::CALL_MODE_SEND_ONLY:
         case ImsCallMode::CALL_MODE_RECEIVE_ONLY:
             TELEPHONY_LOGI("receive update video request");
             break;
         case ImsCallMode::CALL_MODE_SEND_RECEIVE:
-            TELEPHONY_LOGE("illegal media type.");
-            ret = CALL_ERR_VIDEO_ILLEAGAL_SCENARIO;
+            (void)DispatchReportVideoCallInfo(imsCallModeInfo);
+            SetVideoUpdateStatus(VideoUpdateStatus::STATUS_RECV_REQUEST);
             break;
         default:
             TELEPHONY_LOGE("unknown media type.");
@@ -525,17 +627,50 @@ int32_t VideoSendReceiveState::SendUpdateCallMediaModeResponse(ImsCallMode mode)
     return TELEPHONY_SUCCESS;
 }
 
-int32_t VideoSendReceiveState::ReceiveUpdateCallMediaModeResponse(ImsCallMode mode)
+int32_t VideoSendReceiveState::ReceiveUpdateCallMediaModeResponse(CallMediaModeInfo &imsCallModeInfo)
 {
-    TELEPHONY_LOGI("VideoSendReceiveState ignore response");
-    return TELEPHONY_SUCCESS;
+    int32_t ret = TELEPHONY_SUCCESS;
+    VideoUpdateStatus status = GetVideoUpdateStatus();
+    TELEPHONY_LOGI("VideoSendReceiveState receive update video response. mode:%{public}d, status:%{public}d",
+        imsCallModeInfo.callMode, status);
+    switch (imsCallModeInfo.callMode) {
+        case ImsCallMode::CALL_MODE_RECEIVE_ONLY:
+            TELEPHONY_LOGI("receive update video request");
+            if (status != VideoUpdateStatus::STATUS_RECV_REQUEST) {
+                return CALL_ERR_VIDEO_ILLEAGAL_SCENARIO;
+            }
+            ret = DispatchReportVideoCallInfo(imsCallModeInfo);
+            if (ret != TELEPHONY_SUCCESS) {
+                TELEPHONY_LOGE("error occurs when switch call state");
+                return ret;
+            }
+            ret = SwitchCallVideoState(imsCallModeInfo.callMode); // support send downgrade & pause video request
+            if (ret != TELEPHONY_SUCCESS) {
+                TELEPHONY_LOGE("error occurs when switch call state");
+                return ret;
+            }
+            SetVideoUpdateStatus(VideoUpdateStatus::STATUS_NONE);
+            break;
+        case ImsCallMode::CALL_MODE_SEND_RECEIVE:
+            if (status != VideoUpdateStatus::STATUS_RECV_REQUEST) {
+                return CALL_ERR_VIDEO_ILLEAGAL_SCENARIO;
+            }
+            ret = DispatchReportVideoCallInfo(imsCallModeInfo);
+            SetVideoUpdateStatus(VideoUpdateStatus::STATUS_NONE);
+            break;
+        default:
+            TELEPHONY_LOGE("unknown media type.");
+            ret = CALL_ERR_VIDEO_ILLEGAL_MEDIA_TYPE;
+            break;
+    }
+    return ret;
 }
 
 VideoPauseState::VideoPauseState(sptr<NetCallBase> callPtr) : VideoCallState(callPtr) {}
 
 int32_t VideoPauseState::SendUpdateCallMediaModeRequest(ImsCallMode mode)
 {
-    TELEPHONY_LOGI("VideoPauseState receive update video response. mode:%{public}d", mode);
+    TELEPHONY_LOGI("VideoPauseState send update video request. mode:%{public}d", mode);
     int32_t ret = TELEPHONY_SUCCESS;
     switch (mode) {
         case ImsCallMode::CALL_MODE_AUDIO_ONLY:
@@ -569,14 +704,14 @@ int32_t VideoPauseState::SendUpdateCallMediaModeRequest(ImsCallMode mode)
     return ret;
 }
 
-int32_t VideoPauseState::RecieveUpdateCallMediaModeRequest(ImsCallMode mode)
+int32_t VideoPauseState::RecieveUpdateCallMediaModeRequest(CallMediaModeInfo &imsCallModeInfo)
 {
-    TELEPHONY_LOGI("VideoPauseState receive update video response. mode:%{public}d", mode);
+    TELEPHONY_LOGI("VideoPauseState receive update video request. mode:%{public}d", imsCallModeInfo.callMode);
     int32_t ret = TELEPHONY_SUCCESS;
-    switch (mode) {
+    switch (imsCallModeInfo.callMode) {
         case ImsCallMode::CALL_MODE_AUDIO_ONLY:
         case ImsCallMode::CALL_MODE_SEND_RECEIVE:
-            ret = SwitchCallVideoState(mode);
+            ret = SwitchCallVideoState(imsCallModeInfo.callMode);
             if (ret == TELEPHONY_SUCCESS) {
                 TELEPHONY_LOGE("error occur when switch call state");
                 return ret;
@@ -601,13 +736,13 @@ int32_t VideoPauseState::RecieveUpdateCallMediaModeRequest(ImsCallMode mode)
 
 int32_t VideoPauseState::SendUpdateCallMediaModeResponse(ImsCallMode mode)
 {
-    TELEPHONY_LOGI("VideoPauseState receive update video response. mode:%{public}d", mode);
+    TELEPHONY_LOGI("VideoPauseState send update video response. mode:%{public}d", mode);
     return TELEPHONY_SUCCESS;
 }
 
-int32_t VideoPauseState::ReceiveUpdateCallMediaModeResponse(ImsCallMode mode)
+int32_t VideoPauseState::ReceiveUpdateCallMediaModeResponse(CallMediaModeInfo &imsCallModeInfo)
 {
-    TELEPHONY_LOGI("VideoPauseState receive update video response. mode:%{public}d", mode);
+    TELEPHONY_LOGI("VideoPauseState receive update video response. mode:%{public}d", imsCallModeInfo.callMode);
     return TELEPHONY_SUCCESS;
 }
 } // namespace Telephony

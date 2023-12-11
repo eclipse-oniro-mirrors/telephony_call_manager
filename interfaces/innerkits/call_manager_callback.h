@@ -94,6 +94,12 @@ public:
     virtual int32_t OnReportAudioDeviceChange(const AudioDeviceInfo &info) = 0;
 
     virtual int32_t OnReportPostDialDelay(const std::string &str) = 0;
+
+    virtual int32_t OnUpdateImsCallModeChange(const CallMediaModeInfo &imsCallModeInfo) = 0;
+    virtual int32_t OnCallSessionEventChange(const CallSessionEvent &callSessionEventOptions) = 0;
+    virtual int32_t OnPeerDimensionsChange(const PeerDimensionsDetail &peerDimensionsDetail) = 0;
+    virtual int32_t OnCallDataUsageChange(const int64_t dataUsage) = 0;
+    virtual int32_t OnUpdateCameraCapabilities(const CameraCapabilities &cameraCapabilities) = 0;
 };
 } // namespace Telephony
 } // namespace OHOS

@@ -133,7 +133,7 @@ int32_t BluetoothCallService::GetCallState()
         number = GetCallNumber(TelCallState::CALL_STATUS_INCOMING);
     }
     if (numWait > 0) {
-        callState = static_cast<int32_t>(TelCallState::CALL_STATUS_IDLE);
+        callState = static_cast<int32_t>(TelCallState::CALL_STATUS_INCOMING);
         number = GetCallNumber(TelCallState::CALL_STATUS_WAITING);
     }
     if (numDisconnected > 0) {

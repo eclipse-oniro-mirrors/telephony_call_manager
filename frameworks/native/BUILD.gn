@@ -23,6 +23,12 @@ config("call_manager_config") {
 }
 
 ohos_shared_library("tel_call_manager_api") {
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+  branch_protector_ret = "pac_ret"
   version_script = "tel_call_manager_api.versionscript"
   sources = [
     "src/bluetooth_call_client.cpp",
@@ -45,6 +51,7 @@ ohos_shared_library("tel_call_manager_api") {
     "c_utils:utils",
     "common_event_service:cesfwk_innerkits",
     "core_service:tel_core_service_api",
+    "graphic_2d:surface",
     "hilog:libhilog",
     "init:libbegetutil",
     "ipc:ipc_single",

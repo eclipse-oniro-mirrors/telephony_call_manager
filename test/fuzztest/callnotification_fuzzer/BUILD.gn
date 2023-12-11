@@ -52,6 +52,7 @@ ohos_fuzztest("CallNotificationFuzzTest") {
     "common_event_service:cesfwk_innerkits",
     "core_service:tel_core_service_api",
     "data_share:datashare_consumer",
+    "graphic_2d:surface",
     "hilog:libhilog",
     "init:libbegetutil",
     "ipc:ipc_single",
@@ -67,7 +68,18 @@ ohos_fuzztest("CallNotificationFuzzTest") {
     "-O0",
     "-Wno-unused-variable",
     "-fno-omit-frame-pointer",
+    "-flto",
+    "-fsanitize=cfi",
+    "-fsanitize-cfi-cross-dso",
+    "-fvisibility=hidden",
   ]
+
+  ldflags = [
+    "-flto",
+    "-fsanitize=cfi",
+    "-fsanitize-cfi-cross-dso",
+  ]
+
   sources = [
     "${CALL_MANAGER_PATH}/test/fuzztest/common_fuzzer/addcalltoken_fuzzer.cpp",
     "callnotification_fuzzer.cpp",

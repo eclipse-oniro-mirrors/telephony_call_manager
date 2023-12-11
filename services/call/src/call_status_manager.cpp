@@ -22,11 +22,14 @@
 #include "call_control_manager.h"
 #include "call_manager_errors.h"
 #include "call_manager_hisysevent.h"
+#include "call_number_utils.h"
+#include "conference_base.h"
 #include "core_service_client.h"
 #include "cs_call.h"
 #include "datashare_predicates.h"
 #include "hitrace_meter.h"
 #include "ims_call.h"
+#include "ims_conference.h"
 #include "ott_call.h"
 #include "report_call_info_handler.h"
 #include "telephony_log_wrapper.h"
@@ -134,11 +137,16 @@ int32_t CallStatusManager::HandleCallsReportInfo(const CallDetailsInfo &info)
     bool flag = false;
     TELEPHONY_LOGI("call list size:%{public}zu,slotId:%{public}d", info.callVec.size(), info.slotId);
     int32_t curSlotId = info.slotId;
+    if (!DelayedSingleton<CallNumberUtils>::GetInstance()->IsValidSlotId(curSlotId)) {
+        TELEPHONY_LOGE("invalid slotId!");
+        return CALL_ERR_INVALID_SLOT_ID;
+    }
     for (auto &it : info.callVec) {
         for (const auto &it1 : callDetailsInfo_[curSlotId].callVec) {
             if (it.index == it1.index) {
                 // call state changes
-                if (it.state != it1.state || it.mpty != it1.mpty || it.callType != it1.callType) {
+                if (it.state != it1.state || it.mpty != it1.mpty ||
+                    it.callType != it1.callType || it.callMode != it1.callMode) {
                     TELEPHONY_LOGI("handle updated call state:%{public}d", it.state);
                     HandleCallReportInfo(it);
                 }
@@ -452,21 +460,39 @@ int32_t CallStatusManager::HoldingHandle(const CallDetailInfo &info)
     }
     // if the call is in a conference, it will exit, otherwise just set it holding
     call = RefreshCallIfNecessary(call, info);
-    int32_t ret = call->HoldConference();
-    if (ret == TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGI("HoldConference success");
+    int32_t callId = call->GetCallID();
+    int32_t dsdsMode = DSDS_MODE_V2;
+    int32_t ret = DelayedSingleton<ImsConference>::GetInstance()->IsConferenceCallForMutiSim(callId);
+    DelayedRefSingleton<CoreServiceClient>::GetInstance().GetDsdsMode(dsdsMode);
+    if (dsdsMode == static_cast<int32_t>(DsdsMode::DSDS_MODE_V5_DSDA) ||
+        dsdsMode == static_cast<int32_t>(DsdsMode::DSDS_MODE_V5_TDM)) {
+        if (ret == TELEPHONY_SUCCESS) {
+            int32_t ret = call->HoldConference();
+            if (ret == TELEPHONY_SUCCESS) {
+                TELEPHONY_LOGI("HoldConference success");
+            }
+        }
+    } else {
+        int32_t ret = call->HoldConference();
+        if (ret == TELEPHONY_SUCCESS) {
+            TELEPHONY_LOGI("HoldConference success");
+        }
     }
     ret = UpdateCallState(call, TelCallState::CALL_STATUS_HOLDING);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("UpdateCallState failed, errCode:%{public}d", ret);
     }
-    int32_t dsdsMode = DSDS_MODE_V2;
-    DelayedRefSingleton<CoreServiceClient>::GetInstance().GetDsdsMode(dsdsMode);
     TELEPHONY_LOGE("HoldingHandle dsdsMode:%{public}d", dsdsMode);
     if (dsdsMode == static_cast<int32_t>(DsdsMode::DSDS_MODE_V5_DSDA) ||
         dsdsMode == static_cast<int32_t>(DsdsMode::DSDS_MODE_V5_TDM)) {
         int32_t activeCallNum = GetCallNum(TelCallState::CALL_STATUS_ACTIVE);
-        AutoAnswerForDsda(activeCallNum);
+        TelConferenceState confState = call->GetTelConferenceState();
+        int32_t conferenceId = DelayedSingleton<ImsConference>::GetInstance()->GetMainCall();
+        if (confState != TelConferenceState::TEL_CONFERENCE_IDLE && conferenceId == callId) {
+            AutoAnswerForDsda(activeCallNum, call->GetSlotId());
+        } else if (confState == TelConferenceState::TEL_CONFERENCE_IDLE) {
+            AutoAnswerForDsda(activeCallNum, call->GetSlotId());
+        }
     }
     return ret;
 }
@@ -539,14 +565,14 @@ int32_t CallStatusManager::DisconnectedHandle(const CallDetailInfo &info)
         TELEPHONY_LOGE("UpdateCallState failed, errCode:%{public}d", ret);
         return ret;
     }
-    int32_t size = callIdList.size();
+    size_t size = callIdList.size();
     int32_t activeCallNum = GetCallNum(TelCallState::CALL_STATUS_ACTIVE);
     int32_t waitingCallNum = GetCallNum(TelCallState::CALL_STATUS_WAITING);
     IsCanUnHold(activeCallNum, waitingCallNum, size, canUnHold);
     sptr<CallBase> holdCall = CallObjectManager::GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_HOLD);
     if (previousState != CallRunningState::CALL_RUNNING_STATE_HOLD &&
         previousState != CallRunningState::CALL_RUNNING_STATE_ACTIVE) {
-        if (holdCall != nullptr && canUnHold) {
+        if (holdCall != nullptr && canUnHold && holdCall->GetCanUnHoldState()) {
             if (holdCall->GetSlotId() == call->GetSlotId()) {
                 TELEPHONY_LOGI("release call and recover the held call");
                 holdCall->UnHoldCall();
@@ -561,7 +587,7 @@ int32_t CallStatusManager::DisconnectedHandle(const CallDetailInfo &info)
         AutoAnswer(activeCallNum, waitingCallNum);
     } else if (dsdsMode == static_cast<int32_t>(DsdsMode::DSDS_MODE_V5_DSDA) ||
                dsdsMode == static_cast<int32_t>(DsdsMode::DSDS_MODE_V5_TDM)) {
-        AutoAnswerForDsda(activeCallNum);
+        AutoAnswerForDsda(activeCallNum, call->GetSlotId());
     }
     return ret;
 }
@@ -570,14 +596,15 @@ void CallStatusManager::IsCanUnHold(int32_t activeCallNum, int32_t waitingCallNu
 {
     int32_t incomingCallNum = GetCallNum(TelCallState::CALL_STATUS_INCOMING);
     int32_t answeredCallNum = GetCallNum(TelCallState::CALL_STATUS_ANSWERED);
+    int32_t dialingCallNum = GetCallNum(TelCallState::CALL_STATUS_ALERTING);
     if (answeredCallNum == 0 && incomingCallNum == 0 && (size == 0 || size == 1) && activeCallNum == 0 &&
-        waitingCallNum == 0) {
+        waitingCallNum == 0 && dialingCallNum == 0) {
         canUnHold = true;
     }
     TELEPHONY_LOGI("CanUnHold state: %{public}d", canUnHold);
 }
 
-void CallStatusManager::AutoAnswerForDsda(int32_t activeCallNum)
+void CallStatusManager::AutoAnswerForDsda(int32_t activeCallNum, int32_t slotId)
 {
     int32_t dialingCallNum = GetCallNum(TelCallState::CALL_STATUS_DIALING);
     int32_t alertingCallNum = GetCallNum(TelCallState::CALL_STATUS_ALERTING);
@@ -589,6 +616,25 @@ void CallStatusManager::AutoAnswerForDsda(int32_t activeCallNum)
         int ret = ringCall->AnswerCall(videoState);
         TELEPHONY_LOGI("ret = %{public}d", ret);
         ringCall->SetAutoAnswerState(false);
+        return;
+    }
+    std::list<int32_t> callIdList;
+    GetCarrierCallList(callIdList);
+    for (int32_t otherCallId : callIdList) {
+        sptr<CallBase> otherCall = GetOneCallObject(otherCallId);
+        TelCallState state = otherCall->GetTelCallState();
+        TelConferenceState confState = otherCall->GetTelConferenceState();
+        int32_t conferenceId = DelayedSingleton<ImsConference>::GetInstance()->GetMainCall();
+        if (slotId != otherCall->GetSlotId() && state == TelCallState::CALL_STATUS_HOLDING &&
+            otherCall->GetCanUnHoldState()) {
+            if (confState != TelConferenceState::TEL_CONFERENCE_IDLE && conferenceId == otherCallId) {
+                otherCall->UnHoldCall();
+                return;
+            } else if (confState == TelConferenceState::TEL_CONFERENCE_IDLE) {
+                otherCall->UnHoldCall();
+                return;
+            }
+        }
     }
 }
 
@@ -625,8 +671,10 @@ int32_t CallStatusManager::UpdateCallState(sptr<CallBase> &call, TelCallState ne
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     TelCallState priorState = call->GetTelCallState();
-    TELEPHONY_LOGI("callIndex:%{public}d, callId:%{public}d, priorState:%{public}d, nextState:%{public}d",
-        call->GetCallIndex(), call->GetCallID(), priorState, nextState);
+    VideoStateType videoState = call->GetVideoStateType();
+    TELEPHONY_LOGI(
+        "callIndex:%{public}d, callId:%{public}d, priorState:%{public}d, nextState:%{public}d, videoState:%{public}d",
+        call->GetCallIndex(), call->GetCallID(), priorState, nextState, videoState);
     if (priorState == TelCallState::CALL_STATUS_INCOMING && nextState == TelCallState::CALL_STATUS_ACTIVE) {
         DelayedSingleton<CallManagerHisysevent>::GetInstance()->JudgingAnswerTimeOut(
             call->GetSlotId(), call->GetCallID(), static_cast<int32_t>(call->GetVideoStateType()));
@@ -654,6 +702,9 @@ int32_t CallStatusManager::UpdateCallState(sptr<CallBase> &call, TelCallState ne
 sptr<CallBase> CallStatusManager::RefreshCallIfNecessary(const sptr<CallBase> &call, const CallDetailInfo &info)
 {
     TELEPHONY_LOGI("RefreshCallIfNecessary");
+    if (call->GetVideoStateType() != info.callMode) {
+        call->SetVideoStateType(info.callMode);
+    }
     if (call->GetCallType() == info.callType) {
         TELEPHONY_LOGI("RefreshCallIfNecessary not need Refresh");
         return call;
@@ -742,6 +793,10 @@ sptr<CallBase> CallStatusManager::CreateNewCall(const CallDetailInfo &info, Call
             } else {
                 callPtr = (std::make_unique<IMSCall>(paraInfo)).release();
             }
+            if (callPtr->GetCallType() == CallType::TYPE_IMS) {
+                sptr<IMSCall> imsCall = reinterpret_cast<IMSCall *>(callPtr.GetRefPtr());
+                imsCall->InitVideoCall();
+            }
             break;
         }
         case CallType::TYPE_OTT: {
@@ -774,7 +829,7 @@ void CallStatusManager::PackParaInfo(
     paraInfo.number = info.phoneNum;
     paraInfo.callId = GetNewCallId();
     paraInfo.index = info.index;
-    paraInfo.videoState = VideoStateType::TYPE_VOICE;
+    paraInfo.videoState = info.callMode;
     paraInfo.accountId = info.accountId;
     paraInfo.callType = info.callType;
     paraInfo.callState = info.state;

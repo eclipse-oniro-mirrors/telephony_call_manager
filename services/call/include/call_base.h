@@ -101,9 +101,10 @@ public:
     void SetAccountNumber(const std::string accountNumber);
     int32_t SetSpeakerphoneOn(bool speakerphoneOn);
     bool IsSpeakerphoneOn();
-    void SetAudio();
     void SetAutoAnswerState(bool flag);
     bool GetAutoAnswerState();
+    void SetCanUnHoldState(bool flag);
+    bool GetCanUnHoldState();
     bool CheckVoicemailNumber(std::string phoneNumber);
     bool IsAliveState();
     void SetBundleName(const char *bundleName);
@@ -136,6 +137,7 @@ private:
     uint64_t policyFlag_;
     TelCallState callState_;
     bool autoAnswerState_;
+    bool canUnHoldState_;
     bool isSpeakerphoneOn_;
     CallEndedType callEndedType_;
     ContactInfo contactInfo_;

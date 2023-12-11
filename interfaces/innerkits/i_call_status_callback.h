@@ -197,12 +197,20 @@ public:
     virtual int32_t SetImsFeatureValueResult(const int32_t result) = 0;
 
     /**
-     * @brief update the result of ReceiveUpdateCallMediaMode
+     * @brief update the result of ReceiveUpdateCallMediaModeRequest
      *
      * @param response[in], indicates the Call Media mode response information
      * @return Returns 0 on success, others on failure.
      */
-    virtual int32_t ReceiveUpdateCallMediaModeResponse(const CallMediaModeResponse &response) = 0;
+    virtual int32_t ReceiveUpdateCallMediaModeRequest(const CallModeReportInfo &response) = 0;
+
+    /**
+     * @brief update the result of ReceiveUpdateCallMediaModeResponse
+     *
+     * @param response[in], indicates the Call Media mode response information
+     * @return Returns 0 on success, others on failure.
+     */
+    virtual int32_t ReceiveUpdateCallMediaModeResponse(const CallModeReportInfo &response) = 0;
 
     /**
      * @brief update the result of invite to conference
@@ -263,6 +271,39 @@ public:
     virtual int32_t ReportPostDialChar(const std::string &c) = 0;
 
     virtual int32_t ReportPostDialDelay(const std::string &str) = 0;
+
+    /**
+     * @brief handle call session event changed
+     *
+     * @param eventOptions[in], call session event info
+     * @return Returns 0 on success, others on failure.
+     */
+    virtual int32_t HandleCallSessionEventChanged(const CallSessionReportInfo &reportInfo) = 0;
+
+    /**
+     * @brief handle peer dimensions changed
+     *
+     * @param dimensionsDetail[in], peer dimensions info
+     * @return Returns 0 on success, others on failure.
+     */
+    virtual int32_t HandlePeerDimensionsChanged(const PeerDimensionsReportInfo &dimensionsDetail) = 0;
+
+    /**
+     * @brief handle call data usage changed
+     *
+     * @param result[in], data usage info
+     * @return Returns 0 on success, others on failure.
+     */
+    virtual int32_t HandleCallDataUsageChanged(const int64_t result) = 0;
+
+    /**
+     * @brief handle camera capabilities changed
+     *
+     * @param cameraCapabilities[in], camera capabilities info
+     * @return Returns 0 on success, others on failure.
+     */
+    virtual int32_t HandleCameraCapabilitiesChanged(const CameraCapabilitiesReportInfo &cameraCapabilities) = 0;
+
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"OHOS.Telephony.ICallStatusCallback");
 };

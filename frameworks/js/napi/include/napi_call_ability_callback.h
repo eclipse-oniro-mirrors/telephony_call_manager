@@ -66,16 +66,30 @@ public:
     void UnRegisterAudioDeviceCallback();
     void RegisterPostDialDelay(EventCallback eventCallback);
     void UnRegisterPostDialDelayCallback();
+    void RegisterImsCallModeChangeCallback(EventCallback eventCallback);
+    void UnRegisterImsCallModeChangeCallback();
+    void RegisterCallSessionEventChangeCallback(EventCallback eventCallback);
+    void UnRegisterCallSessionEventChangeCallback();
+    void RegisterPeerDimensionsChangeCallback(EventCallback eventCallback);
+    void UnRegisterPeerDimensionsChangeCallback();
+    void RegisterCallDataUsageChangeCallback(EventCallback eventCallback);
+    void UnRegisterCallDataUsageChangeCallback();
+    void RegisterCameraCapabilitiesChangeCallback(EventCallback eventCallback);
+    void UnRegisterCameraCapabilitiesChangeCallback();
     int32_t UpdateCallStateInfo(const CallAttributeInfo &info);
     int32_t UpdateCallEvent(const CallEventInfo &info);
     int32_t UpdateCallDisconnectedCause(const DisconnectedDetails &details);
     int32_t UpdateAsyncResultsInfo(const CallResultReportId reportId, AppExecFwk::PacMap &resultInfo);
     int32_t OttCallRequest(OttCallRequestId requestId, AppExecFwk::PacMap &info);
-    int32_t RegisterUpdateCallMediaModeCallback(EventCallback callback);
     void UnRegisterUpdateCallMediaModeCallback();
     int32_t UpdateMmiCodeResultsInfo(const MmiCodeInfo &info);
     int32_t UpdateAudioDeviceInfo(const AudioDeviceInfo &info);
     int32_t UpdatePostDialDelay(const std::string str);
+    int32_t UpdateImsCallModeChange(const CallMediaModeInfo &imsCallModeInfo);
+    int32_t CallSessionEventChange(const CallSessionEvent &callSessionEvent);
+    int32_t PeerDimensionsChange(const PeerDimensionsDetail &peerDimensionsDetail);
+    int32_t CallDataUsageChange(const int64_t dataUsage);
+    int32_t UpdateCameraCapabilities(const CameraCapabilities &cameraCapabilities);
 
 private:
     static void ReportCallStateWork(uv_work_t *work, int32_t status);
@@ -106,9 +120,6 @@ private:
     static void ReportCallOttWork(uv_work_t *work, int32_t status);
     static int32_t ReportCallOtt(
         EventCallback &settingInfo, AppExecFwk::PacMap &resultInfo, OttCallRequestId requestId);
-    int32_t ReportCallMediaModeInfo(AppExecFwk::PacMap &resultInfo);
-    static void ReportCallMediaModeInfoWork(uv_work_t *work, int32_t status);
-    static void ReportCallMediaModeInfo(AppExecFwk::PacMap &resultInfo, EventCallback supplementInfo);
     static void ReportMmiCodeWork(uv_work_t *work, int32_t status);
     static int32_t ReportMmiCode(MmiCodeInfo &info, EventCallback eventCallback);
     int32_t ReportCloseUnFinishedUssdInfo(AppExecFwk::PacMap &resultInfo);
@@ -116,6 +127,17 @@ private:
     static int32_t ReportAudioDeviceInfo(AudioDeviceInfo &info, EventCallback eventCallback);
     static void ReportPostDialDelayWork(uv_work_t *work, int32_t status);
     static int32_t ReportPostDialDelay(std::string postDialStr, EventCallback eventCallback);
+
+    static void ReportCallMediaModeInfoWork(uv_work_t *work, int32_t status);
+    static int32_t ReportCallMediaModeInfo(CallMediaModeInfo &imsCallModeInfo, EventCallback eventCallback);
+    static void ReportCallSessionEventWork(uv_work_t *work, int32_t status);
+    static int32_t ReportCallSessionEvent(CallSessionEvent &sessionEventOptions, EventCallback eventCallback);
+    static void ReportPeerDimensionsWork(uv_work_t *work, int32_t status);
+    static int32_t ReportPeerDimensions(PeerDimensionsDetail &peerDimensionsDetail, EventCallback eventCallback);
+    static void ReportCallDataUsageWork(uv_work_t *work, int32_t status);
+    static int32_t ReportCallDataUsage(int64_t dataUsage, EventCallback eventCallback);
+    static void ReportCameraCapabilitiesInfoWork(uv_work_t *work, int32_t status);
+    static int32_t ReportCameraCapabilitiesInfo(CameraCapabilities &cameraCapabilities, EventCallback eventCallback);
 
 private:
     EventCallback stateCallback_;
@@ -131,11 +153,15 @@ private:
     EventCallback setTransferCallback_;
     EventCallback startRttCallback_;
     EventCallback stopRttCallback_;
-    EventCallback updateCallMediaModeCallback_;
     EventCallback mmiCodeCallback_;
     EventCallback closeUnfinishedUssdCallback_;
     EventCallback audioDeviceCallback_;
     EventCallback postDialDelayCallback_;
+    EventCallback imsCallModeCallback_;
+    EventCallback peerDimensionsCallback_;
+    EventCallback callDataUsageCallback_;
+    EventCallback cameraCapabilitiesCallback_;
+    EventCallback callSessionEventCallback_;
     using CallResultReportIdProcessorFunc = int32_t (NapiCallAbilityCallback::*)(AppExecFwk::PacMap &resultInfo);
     std::map<CallResultReportId, CallResultReportIdProcessorFunc> memberFuncMap_;
     std::mutex mutex_;

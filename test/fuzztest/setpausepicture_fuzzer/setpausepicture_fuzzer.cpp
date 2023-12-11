@@ -29,13 +29,15 @@ void SetPausePicture(const uint8_t *data, size_t size)
     if (!IsServiceInited()) {
         return;
     }
-
+    int32_t callId = static_cast<int32_t>(size);
     std::string path(reinterpret_cast<const char *>(data), size);
-    MessageParcel dataMessageParcel;
-    dataMessageParcel.WriteString16(Str8ToStr16(path));
-    dataMessageParcel.RewindRead(0);
+    auto pathU16 = Str8ToStr16(path);
+    MessageParcel dataParcel;
+    dataParcel.WriteInt32(callId);
+    dataParcel.WriteString16(pathU16);
+    dataParcel.RewindRead(0);
     MessageParcel reply;
-    DelayedSingleton<CallManagerService>::GetInstance()->OnSetPausePicture(dataMessageParcel, reply);
+    DelayedSingleton<CallManagerService>::GetInstance()->OnSetPausePicture(dataParcel, reply);
 }
 
 void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)

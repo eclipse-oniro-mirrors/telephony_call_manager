@@ -24,6 +24,7 @@
 #include "bluetooth_hfp_ag.h"
 #include "call_manager_connect.h"
 #include "call_manager_service.h"
+#include "surface_utils.h"
 #include "telephony_types.h"
 
 using namespace OHOS::Bluetooth;
@@ -3759,14 +3760,16 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_GetVoNRState_0400, Function | M
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_ControlCamera_0100, Function | MediumTest | Level0)
 {
+    AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
     }
+    int32_t callId = 1;
     // 3516DV300 camera id string is "lcam001"
     std::string id = "lcam001";
 
     std::u16string cameraID = Str8ToStr16(id);
-    EXPECT_EQ(CallManagerGtest::clientPtr_->ControlCamera(cameraID), RETURN_VALUE_IS_ZERO);
+    EXPECT_EQ(CallManagerGtest::clientPtr_->ControlCamera(callId, cameraID), RETURN_VALUE_IS_ZERO);
 }
 
 /**
@@ -3776,13 +3779,15 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_ControlCamera_0100, Function | 
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_ControlCamera_0200, Function | MediumTest | Level2)
 {
+    AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
     }
+    int32_t callId = 1;
     std::string id = "xtsautotest123456";
 
     std::u16string cameraID = Str8ToStr16(id);
-    EXPECT_NE(CallManagerGtest::clientPtr_->ControlCamera(cameraID), RETURN_VALUE_IS_ZERO);
+    EXPECT_NE(CallManagerGtest::clientPtr_->ControlCamera(callId, cameraID), RETURN_VALUE_IS_ZERO);
 }
 
 /**
@@ -3793,17 +3798,19 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_ControlCamera_0200, Function | 
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_ControlCamera_0300, Function | MediumTest | Level2)
 {
+    AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
     }
+    int32_t callId = 1;
     std::string id = "lcam001";
 
     std::u16string cameraID = Str8ToStr16(id);
-    EXPECT_EQ(CallManagerGtest::clientPtr_->ControlCamera(cameraID), RETURN_VALUE_IS_ZERO);
+    EXPECT_EQ(CallManagerGtest::clientPtr_->ControlCamera(callId, cameraID), RETURN_VALUE_IS_ZERO);
 
     id = "";
     cameraID = Str8ToStr16(id);
-    EXPECT_EQ(CallManagerGtest::clientPtr_->ControlCamera(cameraID), RETURN_VALUE_IS_ZERO);
+    EXPECT_EQ(CallManagerGtest::clientPtr_->ControlCamera(callId, cameraID), RETURN_VALUE_IS_ZERO);
 }
 
 /**
@@ -3813,91 +3820,81 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_ControlCamera_0300, Function | 
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_ControlCamera_0600, Function | MediumTest | Level2)
 {
+    AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
     }
+    int32_t callId = 1;
     std::string id = "";
 
     std::u16string cameraID = Str8ToStr16(id);
-    EXPECT_NE(CallManagerGtest::clientPtr_->ControlCamera(cameraID), RETURN_VALUE_IS_ZERO);
+    EXPECT_NE(CallManagerGtest::clientPtr_->ControlCamera(callId, cameraID), RETURN_VALUE_IS_ZERO);
 }
 
 /******************************************* Test SetPreviewWindow() *********************************************/
 /**
  * @tc.number   Telephony_CallManager_SetPreviewWindow_0100
- * @tc.name     input x:0, y:0, z:-1, width:200, height:200, Test set preview window
+ * @tc.name     input previewSurfaceId:"", Test set preview window
  * @tc.desc     Function test
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_SetPreviewWindow_0100, Function | MediumTest | Level2)
 {
+    AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
     }
-    VideoWindow window;
-    window.x = 0;
-    window.y = 0;
-    window.z = -1;
-    window.width = 200;
-    window.height = 200;
-    EXPECT_NE(CallManagerGtest::clientPtr_->SetPreviewWindow(window), RETURN_VALUE_IS_ZERO);
+    int32_t callId = 1;
+    std::string previewSurfaceId = "";
+    EXPECT_NE(CallManagerGtest::clientPtr_->SetPreviewWindow(callId, previewSurfaceId), RETURN_VALUE_IS_ZERO);
 }
 
 /**
  * @tc.number   Telephony_CallManager_SetPreviewWindow_0200
- * @tc.name     input x:0, y:0, z:0, width:200, height:200, Test set preview window
+ * @tc.name     input previewSurfaceId:123, Test set preview window
  * @tc.desc     Function test
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_SetPreviewWindow_0200, Function | MediumTest | Level2)
 {
+    AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
     }
-    VideoWindow window;
-    window.x = 0;
-    window.y = 0;
-    window.z = 0;
-    window.width = 200;
-    window.height = 200;
-    EXPECT_NE(CallManagerGtest::clientPtr_->SetPreviewWindow(window), RETURN_VALUE_IS_ZERO);
+    int32_t callId = 1;
+    std::string previewSurfaceId = "123";
+    EXPECT_NE(CallManagerGtest::clientPtr_->SetPreviewWindow(callId, previewSurfaceId), RETURN_VALUE_IS_ZERO);
 }
 
 /******************************************* Test SetDisplayWindow() *********************************************/
 /**
  * @tc.number   Telephony_CallManager_SetDisplayWindow_0100
- * @tc.name     input x:10, y:10, z:10, width:100, height:200, Test set display window
+ * @tc.name     input displaySurfaceId:"", Test set display window
  * @tc.desc     Function test
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_SetDisplayWindow_0100, Function | MediumTest | Level2)
 {
+    AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
     }
-    VideoWindow window;
-    window.x = 10;
-    window.y = 10;
-    window.z = 10;
-    window.width = 100;
-    window.height = 200;
-    EXPECT_NE(CallManagerGtest::clientPtr_->SetDisplayWindow(window), RETURN_VALUE_IS_ZERO);
+    int32_t callId = 1;
+    std::string displaySurfaceId = "";
+    EXPECT_NE(CallManagerGtest::clientPtr_->SetDisplayWindow(callId, displaySurfaceId), RETURN_VALUE_IS_ZERO);
 }
 
 /**
  * @tc.number   Telephony_CallManager_SetDisplayWindow_0200
- * @tc.name     input x:10, y:10, z:0, width:200, height:200, Test set display window
+ * @tc.name     input displaySurfaceId:123, Test set display window
  * @tc.desc     Function test
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_SetDisplayWindow_0200, Function | MediumTest | Level2)
 {
+    AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
     }
-    VideoWindow window;
-    window.x = 10;
-    window.y = 10;
-    window.z = 0;
-    window.width = 200;
-    window.height = 200;
-    EXPECT_NE(CallManagerGtest::clientPtr_->SetDisplayWindow(window), RETURN_VALUE_IS_ZERO);
+    int32_t callId = 1;
+    std::string displaySurfaceId = "123";
+    EXPECT_NE(CallManagerGtest::clientPtr_->SetDisplayWindow(callId, displaySurfaceId), RETURN_VALUE_IS_ZERO);
 }
 
 /******************************************* Test SetDeviceDirection() *********************************************/
@@ -3908,11 +3905,13 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetDisplayWindow_0200, Function
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_SetDeviceDirection_0100, Function | MediumTest | Level2)
 {
+    AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
     }
+    int32_t callId = 1;
     int32_t rotation = CAMERA_ROTATION_ERROR;
-    EXPECT_NE(CallManagerGtest::clientPtr_->SetDeviceDirection(rotation), RETURN_VALUE_IS_ZERO);
+    EXPECT_NE(CallManagerGtest::clientPtr_->SetDeviceDirection(callId, rotation), RETURN_VALUE_IS_ZERO);
 }
 
 /**
@@ -3922,11 +3921,13 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetDeviceDirection_0100, Functi
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_SetDeviceDirection_0200, Function | MediumTest | Level2)
 {
+    AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
     }
+    int32_t callId = 1;
     int32_t rotation = 0;
-    EXPECT_EQ(CallManagerGtest::clientPtr_->SetDeviceDirection(rotation), RETURN_VALUE_IS_ZERO);
+    EXPECT_EQ(CallManagerGtest::clientPtr_->SetDeviceDirection(callId, rotation), RETURN_VALUE_IS_ZERO);
 }
 
 /**
@@ -3936,21 +3937,24 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetDeviceDirection_0200, Functi
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_SetDeviceDirection_0300, Function | MediumTest | Level2)
 {
+    AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
     }
+    int32_t callId = 1;
     int32_t rotation = CAMERA_ROTATION_90;
-    EXPECT_EQ(CallManagerGtest::clientPtr_->SetDeviceDirection(rotation), RETURN_VALUE_IS_ZERO);
+    EXPECT_EQ(CallManagerGtest::clientPtr_->SetDeviceDirection(callId, rotation), RETURN_VALUE_IS_ZERO);
 }
 
 /******************************************* Test SetCameraZoom() *********************************************/
 /**
- * @tc.number   Telephony_CallManager_SetDeviceDirection_0100
+ * @tc.number   Telephony_CallManager_SetCameraZoom_0100
  * @tc.name     input zoomRatio 5.0, Test SetCameraZoom
  * @tc.desc     Function test
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCameraZoom_0100, Function | MediumTest | Level2)
 {
+    AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
     }
@@ -3959,12 +3963,13 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCameraZoom_0100, Function | 
 }
 
 /**
- * @tc.number   Telephony_CallManager_SetDeviceDirection_0200
+ * @tc.number   Telephony_CallManager_SetCameraZoom_0200
  * @tc.name     input zoomRatio 0.1, Test SetCameraZoom
  * @tc.desc     Function test
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCameraZoom_0200, Function | MediumTest | Level2)
 {
+    AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
     }
@@ -3973,12 +3978,13 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCameraZoom_0200, Function | 
 }
 
 /**
- * @tc.number   Telephony_CallManager_SetDeviceDirection_0300
+ * @tc.number   Telephony_CallManager_SetCameraZoom_0300
  * @tc.name     input zoomRatio 10.0, Test SetCameraZoom
  * @tc.desc     Function test
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCameraZoom_0300, Function | MediumTest | Level2)
 {
+    AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
     }
@@ -3987,59 +3993,63 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCameraZoom_0300, Function | 
 }
 
 /**
- * @tc.number   Telephony_CallManager_SetDeviceDirection_0400
+ * @tc.number   Telephony_CallManager_SetCameraZoom_0400
  * @tc.name     input invalid para zoomRatio 15.0, Test SetCameraZoom, return error code if failed
  * @tc.desc     Function test
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCameraZoom_0400, Function | MediumTest | Level2)
 {
+    AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
     }
     float zoomRatio = 15.0;
-    EXPECT_NE(CallManagerGtest::clientPtr_->SetCameraZoom(zoomRatio), RETURN_VALUE_IS_ZERO);
+    EXPECT_EQ(CallManagerGtest::clientPtr_->SetCameraZoom(zoomRatio), RETURN_VALUE_IS_ZERO);
 }
 
 /**
- * @tc.number   Telephony_CallManager_SetDeviceDirection_0500
+ * @tc.number   Telephony_CallManager_SetCameraZoom_0500
  * @tc.name     input invalid para zoomRatio 0.0, Test SetCameraZoom, return error code if failed
  * @tc.desc     Function test
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCameraZoom_0500, Function | MediumTest | Level2)
 {
+    AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
     }
     float zoomRatio = 0.0;
-    EXPECT_NE(CallManagerGtest::clientPtr_->SetCameraZoom(zoomRatio), RETURN_VALUE_IS_ZERO);
+    EXPECT_EQ(CallManagerGtest::clientPtr_->SetCameraZoom(zoomRatio), RETURN_VALUE_IS_ZERO);
 }
 
 /**
- * @tc.number   Telephony_CallManager_SetDeviceDirection_0600
+ * @tc.number   Telephony_CallManager_SetCameraZoom_0600
  * @tc.name     input invalid para zoomRatio -1.0, Test SetCameraZoom, return error code if failed
  * @tc.desc     Function test
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCameraZoom_0600, Function | MediumTest | Level2)
 {
+    AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
     }
     float zoomRatio = -1.0;
-    EXPECT_NE(CallManagerGtest::clientPtr_->SetCameraZoom(zoomRatio), RETURN_VALUE_IS_ZERO);
+    EXPECT_EQ(CallManagerGtest::clientPtr_->SetCameraZoom(zoomRatio), RETURN_VALUE_IS_ZERO);
 }
 
 /**
- * @tc.number   Telephony_CallManager_SetDeviceDirection_0700
+ * @tc.number   Telephony_CallManager_SetCameraZoom_0700
  * @tc.name     input invalid para zoomRatio 10.1, Test SetCameraZoom, return error code if failed
  * @tc.desc     Function test
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCameraZoom_0700, Function | MediumTest | Level2)
 {
+    AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
     }
     float zoomRatio = 10.1;
-    EXPECT_NE(CallManagerGtest::clientPtr_->SetCameraZoom(zoomRatio), RETURN_VALUE_IS_ZERO);
+    EXPECT_EQ(CallManagerGtest::clientPtr_->SetCameraZoom(zoomRatio), RETURN_VALUE_IS_ZERO);
 }
 /******************************************* Test SetPausePicture() *********************************************/
 /**
@@ -4050,12 +4060,14 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCameraZoom_0700, Function | 
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_SetPausePicture_0100, Function | MediumTest | Level2)
 {
+    AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
     }
+    int32_t callId = 1;
     std::string pathTemp = "/system/bin/test.png";
     std::u16string path = Str8ToStr16(pathTemp);
-    EXPECT_NE(CallManagerGtest::clientPtr_->SetPausePicture(path), RETURN_VALUE_IS_ZERO);
+    EXPECT_NE(CallManagerGtest::clientPtr_->SetPausePicture(callId, path), RETURN_VALUE_IS_ZERO);
 }
 
 /**
@@ -4065,12 +4077,14 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetPausePicture_0100, Function 
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_SetPausePicture_0200, Function | MediumTest | Level2)
 {
+    AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
     }
+    int32_t callId = 1;
     std::string pathTemp = "/system/bin/test.jpg";
     std::u16string path = Str8ToStr16(pathTemp);
-    EXPECT_NE(CallManagerGtest::clientPtr_->SetPausePicture(path), RETURN_VALUE_IS_ZERO);
+    EXPECT_NE(CallManagerGtest::clientPtr_->SetPausePicture(callId, path), RETURN_VALUE_IS_ZERO);
 }
 
 /**
@@ -4080,12 +4094,14 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetPausePicture_0200, Function 
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_SetPausePicture_0300, Function | MediumTest | Level2)
 {
+    AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
     }
+    int32_t callId = 1;
     std::string pathTemp = "/system/bin/test.bmp";
     std::u16string path = Str8ToStr16(pathTemp);
-    EXPECT_NE(CallManagerGtest::clientPtr_->SetPausePicture(path), RETURN_VALUE_IS_ZERO);
+    EXPECT_NE(CallManagerGtest::clientPtr_->SetPausePicture(callId, path), RETURN_VALUE_IS_ZERO);
 }
 
 /**
@@ -4095,12 +4111,14 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetPausePicture_0300, Function 
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_SetPausePicture_0400, Function | MediumTest | Level2)
 {
+    AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
     }
+    int32_t callId = 1;
     std::string pathTemp = "/system/bin/test.webp";
     std::u16string path = Str8ToStr16(pathTemp);
-    EXPECT_NE(CallManagerGtest::clientPtr_->SetPausePicture(path), RETURN_VALUE_IS_ZERO);
+    EXPECT_NE(CallManagerGtest::clientPtr_->SetPausePicture(callId, path), RETURN_VALUE_IS_ZERO);
 }
 
 /**
@@ -4111,12 +4129,14 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetPausePicture_0400, Function 
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_SetPausePicture_0500, Function | MediumTest | Level2)
 {
+    AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
     }
+    int32_t callId = 1;
     std::string pathTemp = "http://callManager.jpg";
     std::u16string path = Str8ToStr16(pathTemp);
-    EXPECT_NE(CallManagerGtest::clientPtr_->SetPausePicture(path), RETURN_VALUE_IS_ZERO);
+    EXPECT_NE(CallManagerGtest::clientPtr_->SetPausePicture(callId, path), RETURN_VALUE_IS_ZERO);
 }
 
 /**
@@ -4126,12 +4146,44 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetPausePicture_0500, Function 
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_SetPausePicture_0600, Function | MediumTest | Level2)
 {
+    AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
     }
+    int32_t callId = 1;
     std::string pathTemp = "";
     std::u16string path = Str8ToStr16(pathTemp);
-    EXPECT_NE(CallManagerGtest::clientPtr_->SetPausePicture(path), RETURN_VALUE_IS_ZERO);
+    EXPECT_NE(CallManagerGtest::clientPtr_->SetPausePicture(callId, path), RETURN_VALUE_IS_ZERO);
+}
+
+/**
+ * @tc.number   Telephony_CallManager_CancelCallUpgrade_0100
+ * @tc.name     input callId:1, Test CancelCallUpgrade, return error code if failed
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_CancelCallUpgrade_0100, Function | MediumTest | Level2)
+{
+    AccessToken token;
+    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+    int32_t callId = 1;
+    EXPECT_NE(CallManagerGtest::clientPtr_->CancelCallUpgrade(callId), RETURN_VALUE_IS_ZERO);
+}
+
+/**
+ * @tc.number   Telephony_CallManager_RequestCameraCapabilities_0100
+ * @tc.name     input callId:1, Test RequestCameraCapabilities, return error code if failed
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_RequestCameraCapabilities_0100, Function | MediumTest | Level2)
+{
+    AccessToken token;
+    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+    int32_t callId = 1;
+    EXPECT_NE(CallManagerGtest::clientPtr_->RequestCameraCapabilities(callId), RETURN_VALUE_IS_ZERO);
 }
 
 /********************************************* Test GetImsConfig() ************************************************/
@@ -5479,6 +5531,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManagerService_001, Function | MediumTe
 {
     AccessToken token;
     std::u16string test = u"";
+    std::string test_ = "";
     bool enabled;
     std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
     ASSERT_NE(callManagerService->DialCall(test, dialInfo_), TELEPHONY_SUCCESS);
@@ -5521,10 +5574,9 @@ HWTEST_F(CallManagerGtest, Telephony_CallManagerService_001, Function | MediumTe
         .address = { 0 },
     };
     ASSERT_NE(callManagerService->SetAudioDevice(audioDevice), TELEPHONY_SUCCESS);
-    ASSERT_NE(callManagerService->ControlCamera(test), TELEPHONY_SUCCESS);
-    VideoWindow window;
-    ASSERT_NE(callManagerService->SetPreviewWindow(window), TELEPHONY_SUCCESS);
-    ASSERT_NE(callManagerService->SetDisplayWindow(window), TELEPHONY_SUCCESS);
+    ASSERT_NE(callManagerService->ControlCamera(1, test), TELEPHONY_SUCCESS);
+    ASSERT_NE(callManagerService->SetPreviewWindow(1, test_, nullptr), TELEPHONY_SUCCESS);
+    ASSERT_NE(callManagerService->SetDisplayWindow(1, test_, nullptr), TELEPHONY_SUCCESS);
 }
 
 /**
@@ -5538,11 +5590,14 @@ HWTEST_F(CallManagerGtest, Telephony_CallManagerService_002, Function | MediumTe
     std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
     float zoomRatio = 1;
     std::u16string test = u"";
+    int32_t callId = 1;
     int32_t value = 1;
     bool enabled;
     ASSERT_NE(callManagerService->SetCameraZoom(zoomRatio), TELEPHONY_SUCCESS);
-    ASSERT_NE(callManagerService->SetPausePicture(test), TELEPHONY_SUCCESS);
-    ASSERT_NE(callManagerService->SetDeviceDirection(value), TELEPHONY_SUCCESS);
+    ASSERT_NE(callManagerService->SetPausePicture(callId, test), TELEPHONY_SUCCESS);
+    ASSERT_NE(callManagerService->SetDeviceDirection(callId, value), TELEPHONY_SUCCESS);
+    ASSERT_NE(callManagerService->CancelCallUpgrade(callId), TELEPHONY_SUCCESS);
+    ASSERT_NE(callManagerService->RequestCameraCapabilities(callId), TELEPHONY_SUCCESS);
     ASSERT_NE(callManagerService->IsEmergencyPhoneNumber(test, 0, enabled), TELEPHONY_SUCCESS);
     ASSERT_NE(callManagerService->FormatPhoneNumber(test, test, test), TELEPHONY_SUCCESS);
     ASSERT_NE(callManagerService->FormatPhoneNumberToE164(test, test, test), TELEPHONY_SUCCESS);

@@ -28,31 +28,6 @@ BluetoothCallManager::BluetoothCallManager() : btConnection_(DelayedSingleton<Bl
 
 BluetoothCallManager::~BluetoothCallManager() {}
 
-bool BluetoothCallManager::ConnectBtSco(const std::string &bluetoothAddress)
-{
-    if (btConnection_ == nullptr) {
-        TELEPHONY_LOGE("bluetooth connection nullptr");
-        return false;
-    }
-
-#ifdef ABILITY_BLUETOOTH_SUPPORT
-    if (!bluetoothAddress.empty()) {
-        return btConnection_->ConnectBtSco(bluetoothAddress);
-    }
-#endif
-
-    return btConnection_->ConnectBtSco();
-}
-
-bool BluetoothCallManager::DisconnectBtSco()
-{
-    if (btConnection_ == nullptr) {
-        TELEPHONY_LOGE("bluetooth connection nullptr");
-        return false;
-    }
-    return btConnection_->DisconnectBtSco();
-}
-
 int32_t BluetoothCallManager::SendBtCallState(
     int32_t numActive, int32_t numHeld, int32_t callState, const std::string &number)
 {

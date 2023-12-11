@@ -133,17 +133,35 @@ int32_t ReportCallInfoHandler::UpdateOttEventInfo(const OttCallEventInfo &info)
     return TELEPHONY_SUCCESS;
 }
 
-int32_t ReportCallInfoHandler::UpdateMediaModeResponse(const CallMediaModeResponse &response)
+int32_t ReportCallInfoHandler::ReceiveImsCallModeRequest(const CallModeReportInfo &response)
 {
-    Submit("UpdateMediaModeResponse", [=]() {
-        sptr<CallBase> call = CallObjectManager::GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_ACTIVE);
+    Submit("ReceiveImsCallModeRequest", [=]() {
+        CallModeReportInfo reportInfo = response;
+        sptr<CallBase> call = CallObjectManager::GetOneCallObjectByIndex(response.callIndex);
         if (call == nullptr) {
             TELEPHONY_LOGE("call not exists");
             return;
         }
         if (call->GetCallType() == CallType::TYPE_IMS) {
             sptr<IMSCall> imsCall = reinterpret_cast<IMSCall *>(call.GetRefPtr());
-            imsCall->ReceiveUpdateCallMediaModeResponse(*const_cast<CallMediaModeResponse *>(&response));
+            imsCall->RecieveUpdateCallMediaModeRequest(reportInfo);
+        }
+    });
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t ReportCallInfoHandler::ReceiveImsCallModeResponse(const CallModeReportInfo &response)
+{
+    Submit("ReceiveImsCallModeResponse", [=]() {
+        CallModeReportInfo reportInfo = response;
+        sptr<CallBase> call = CallObjectManager::GetOneCallObjectByIndex(response.callIndex);
+        if (call == nullptr) {
+            TELEPHONY_LOGE("call not exists");
+            return;
+        }
+        if (call->GetCallType() == CallType::TYPE_IMS) {
+            sptr<IMSCall> imsCall = reinterpret_cast<IMSCall *>(call.GetRefPtr());
+            imsCall->ReceiveUpdateCallMediaModeResponse(reportInfo);
         }
     });
     return TELEPHONY_SUCCESS;

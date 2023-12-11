@@ -36,6 +36,11 @@ public:
     virtual int32_t OnReportMmiCodeResult(const MmiCodeInfo &info) = 0;
     virtual int32_t OnReportAudioDeviceChange(const AudioDeviceInfo &info) = 0;
     virtual int32_t OnReportPostDialDelay(const std::string &str) = 0;
+    virtual int32_t OnReportImsCallModeChange(const CallMediaModeInfo &imsCallModeInfo) = 0;
+    virtual int32_t OnReportCallSessionEventChange(const CallSessionEvent &callSessionEventOptions) = 0;
+    virtual int32_t OnReportPeerDimensionsChange(const PeerDimensionsDetail &peerDimensionsDetail) = 0;
+    virtual int32_t OnReportCallDataUsageChange(const int64_t dataUsage) = 0;
+    virtual int32_t OnReportCameraCapabilities(const CameraCapabilities &cameraCapabilities) = 0;
 
     void SetBundleName(const std::string &name)
     {

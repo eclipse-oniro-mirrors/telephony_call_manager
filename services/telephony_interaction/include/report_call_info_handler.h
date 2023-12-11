@@ -33,7 +33,8 @@ public:
     int32_t UpdateDisconnectedCause(const DisconnectedDetails &details);
     int32_t UpdateEventResultInfo(const CellularCallEventInfo &info);
     int32_t UpdateOttEventInfo(const OttCallEventInfo &info);
-    int32_t UpdateMediaModeResponse(const CallMediaModeResponse &response);
+    int32_t ReceiveImsCallModeRequest(const CallModeReportInfo &response);
+    int32_t ReceiveImsCallModeResponse(const CallModeReportInfo &response);
 
 private:
     template<typename Function>

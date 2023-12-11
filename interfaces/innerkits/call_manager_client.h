@@ -351,26 +351,29 @@ public:
     /**
      * @brief Open or close camera
      *
+     * @param callId[in], The call id
      * @param cameraId[in], The camera id
      * @return Returns 0 on success, others on failure.
      */
-    int32_t ControlCamera(std::u16string cameraId);
+    int32_t ControlCamera(int32_t callId, std::u16string cameraId);
 
     /**
      * @brief Set the location and size of the preview window for videos captured by the local camera.
      *
-     * @param window[in], Window information
+     * @param callId[in], The call id
+     * @param surfaceId[in], Window information
      * @return Returns 0 on success, others on failure.
      */
-    int32_t SetPreviewWindow(VideoWindow &window);
+    int32_t SetPreviewWindow(int32_t callId, std::string &surfaceId);
 
     /**
      * @brief Sets the location and size of the remote video window.
      *
-     * @param window[in], Window information
+     * @param callId[in], The call id
+     * @param surfaceId[in], Window information
      * @return Returns 0 on success, others on failure.
      */
-    int32_t SetDisplayWindow(VideoWindow &window);
+    int32_t SetDisplayWindow(int32_t callId, std::string &surfaceId);
 
     /**
      * @brief Sets the local camera zoom scale
@@ -385,10 +388,11 @@ public:
      * If the APP does not call this interface when making a video call,
      * the last frame before the remote video freeze is displayed by default
      *
+     * @param callId[in], The call id
      * @param path[in], Local Picture address
      * @return Returns 0 on success, others on failure.
      */
-    int32_t SetPausePicture(std::u16string path);
+    int32_t SetPausePicture(int32_t callId, std::u16string path);
 
     /**
      * @brief Set the rotation Angle of the local device. The default value is 0
@@ -396,7 +400,7 @@ public:
      * @param rotation[in], Rotation Angle
      * @return Returns 0 on success, others on failure.
      */
-    int32_t SetDeviceDirection(int32_t rotation);
+    int32_t SetDeviceDirection(int32_t callId, int32_t rotation);
 
     /**
      * @brief Obtain the IMS service configuration
@@ -581,6 +585,22 @@ public:
      * @return Returns 0 on success, others on failure.
      */
     int32_t ReportAudioDeviceInfo();
+
+    /**
+     * @brief cancel upgrade to video call
+     *
+     * @param callId[in], The call id
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t CancelCallUpgrade(int32_t callId);
+
+    /**
+     * @brief request camera capabilities
+     *
+     * @param callId[in], The call id
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t RequestCameraCapabilities(int32_t callId);
 };
 } // namespace Telephony
 } // namespace OHOS

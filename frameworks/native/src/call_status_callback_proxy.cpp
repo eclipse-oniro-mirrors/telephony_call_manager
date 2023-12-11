@@ -478,7 +478,7 @@ int32_t CallStatusCallbackProxy::SetImsFeatureValueResult(const int32_t result)
     return replyParcel.ReadInt32();
 }
 
-int32_t CallStatusCallbackProxy::ReceiveUpdateCallMediaModeResponse(const CallMediaModeResponse &response)
+int32_t CallStatusCallbackProxy::ReceiveUpdateCallMediaModeRequest(const CallModeReportInfo &response)
 {
     MessageParcel dataParcel;
     MessageParcel replyParcel;
@@ -487,7 +487,30 @@ int32_t CallStatusCallbackProxy::ReceiveUpdateCallMediaModeResponse(const CallMe
     if (!dataParcel.WriteInterfaceToken(CallStatusCallbackProxy::GetDescriptor())) {
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
-    int32_t length = sizeof(CallMediaModeResponse);
+    int32_t length = sizeof(CallModeReportInfo);
+    dataParcel.WriteInt32(length);
+    dataParcel.WriteRawData((const void *)&response, length);
+    if (Remote() == nullptr) {
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    error = Remote()->SendRequest(static_cast<int32_t>(RECEIVE_UPDATE_MEDIA_MODE_REQUEST), dataParcel,
+        replyParcel, option);
+    if (error != TELEPHONY_SUCCESS) {
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return replyParcel.ReadInt32();
+}
+
+int32_t CallStatusCallbackProxy::ReceiveUpdateCallMediaModeResponse(const CallModeReportInfo &response)
+{
+    MessageParcel dataParcel;
+    MessageParcel replyParcel;
+    MessageOption option;
+    int32_t error = TELEPHONY_ERR_FAIL;
+    if (!dataParcel.WriteInterfaceToken(CallStatusCallbackProxy::GetDescriptor())) {
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    int32_t length = sizeof(CallModeReportInfo);
     dataParcel.WriteInt32(length);
     dataParcel.WriteRawData((const void *)&response, length);
     if (Remote() == nullptr) {
@@ -675,6 +698,88 @@ int32_t CallStatusCallbackProxy::ReportPostDialDelay(const std::string &str)
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     int32_t error = Remote()->SendRequest(POST_DIAL_DELAY, dataParcel, replyParcel, option);
+    if (error != TELEPHONY_SUCCESS) {
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return replyParcel.ReadInt32();
+}
+
+int32_t CallStatusCallbackProxy::HandleCallSessionEventChanged(const CallSessionReportInfo &eventOptions)
+{
+    MessageParcel dataParcel;
+    MessageParcel replyParcel;
+    MessageOption option;
+    if (!dataParcel.WriteInterfaceToken(CallStatusCallbackProxy::GetDescriptor())) {
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    int32_t length = sizeof(CallSessionReportInfo);
+    dataParcel.WriteInt32(length);
+    dataParcel.WriteRawData((const void *)&eventOptions, length);
+    if (Remote() == nullptr) {
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t error = Remote()->SendRequest(CALL_SESSION_EVENT, dataParcel, replyParcel, option);
+    if (error != TELEPHONY_SUCCESS) {
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return replyParcel.ReadInt32();
+}
+
+int32_t CallStatusCallbackProxy::HandlePeerDimensionsChanged(const PeerDimensionsReportInfo &dimensionsDetail)
+{
+    MessageParcel dataParcel;
+    MessageParcel replyParcel;
+    MessageOption option;
+    if (!dataParcel.WriteInterfaceToken(CallStatusCallbackProxy::GetDescriptor())) {
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    int32_t length = sizeof(PeerDimensionsReportInfo);
+    dataParcel.WriteInt32(length);
+    dataParcel.WriteRawData((const void *)&dimensionsDetail, length);
+    if (Remote() == nullptr) {
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t error = Remote()->SendRequest(PEER_DIMENSION_CHANGE, dataParcel, replyParcel, option);
+    if (error != TELEPHONY_SUCCESS) {
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return replyParcel.ReadInt32();
+}
+
+int32_t CallStatusCallbackProxy::HandleCallDataUsageChanged(const int64_t result)
+{
+    MessageParcel dataParcel;
+    MessageParcel replyParcel;
+    MessageOption option;
+    if (!dataParcel.WriteInterfaceToken(CallStatusCallbackProxy::GetDescriptor())) {
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    dataParcel.WriteInt64(result);
+    if (Remote() == nullptr) {
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t error = Remote()->SendRequest(CALL_DATA_USAGE, dataParcel, replyParcel, option);
+    if (error != TELEPHONY_SUCCESS) {
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return replyParcel.ReadInt32();
+}
+
+int32_t CallStatusCallbackProxy::HandleCameraCapabilitiesChanged(const CameraCapabilitiesReportInfo &cameraCapabilities)
+{
+    MessageParcel dataParcel;
+    MessageParcel replyParcel;
+    MessageOption option;
+    if (!dataParcel.WriteInterfaceToken(CallStatusCallbackProxy::GetDescriptor())) {
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    int32_t length = sizeof(CameraCapabilitiesReportInfo);
+    dataParcel.WriteInt32(length);
+    dataParcel.WriteRawData((const void *)&cameraCapabilities, length);
+    if (Remote() == nullptr) {
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t error = Remote()->SendRequest(CAMERA_CAPBILITIES_CHANGE, dataParcel, replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }

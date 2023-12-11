@@ -22,6 +22,7 @@
 
 #include "refbase.h"
 #include "call_manager_inner_type.h"
+#include "surface.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -37,16 +38,23 @@ public:
 
     int32_t GetNetCallType();
     int32_t ChangeNetCallType();
-    // send call media mode modify request to peer
+    virtual int32_t InitVideoCall() = 0;
+    virtual int32_t UpdateImsCallMode(ImsCallMode mode) = 0;
+    virtual int32_t ReportImsCallModeInfo(CallMediaModeInfo &imsCallModeInfo) = 0;
     virtual int32_t SendUpdateCallMediaModeRequest(ImsCallMode mode) = 0;
     // receive call media mode modify request from peer
-    virtual int32_t RecieveUpdateCallMediaModeRequest(ImsCallMode mode) = 0;
+    virtual int32_t RecieveUpdateCallMediaModeRequest(CallModeReportInfo &response) = 0;
     // send call media mode modify response to peer
     virtual int32_t SendUpdateCallMediaModeResponse(ImsCallMode mode) = 0;
     // receive call media mode modify response to peer
-    virtual int32_t ReceiveUpdateCallMediaModeResponse(CallMediaModeResponse &response) = 0;
-    virtual int32_t DispatchUpdateVideoRequest(ImsCallMode mode) = 0;
-    virtual int32_t DispatchUpdateVideoResponse(ImsCallMode mode) = 0;
+    virtual int32_t ReceiveUpdateCallMediaModeResponse(CallModeReportInfo &response) = 0;
+    virtual int32_t ControlCamera(std::string &cameraId, int32_t callingUid, int32_t callingPid) = 0;
+    virtual int32_t SetPreviewWindow(std::string &surfaceId, sptr<Surface> surface) = 0;
+    virtual int32_t SetDisplayWindow(std::string &surfaceId, sptr<Surface> surface) = 0;
+    virtual int32_t SetPausePicture(std::string &path) = 0;
+    virtual int32_t SetDeviceDirection(int32_t rotation) = 0;
+    virtual int32_t CancelCallUpgrade() = 0;
+    virtual int32_t RequestCameraCapabilities() = 0;
 };
 } // namespace Telephony
 } // namespace OHOS

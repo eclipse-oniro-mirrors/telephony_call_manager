@@ -57,7 +57,7 @@ void CallConnectAbility::ConnectAbility(const CallAttributeInfo &info)
     if (connectCallback_ == nullptr) {
         connectCallback_ = new CallAbilityConnectCallback();
     }
-    int32_t userId = 0;
+    int32_t userId = -1;
     std::string identity = IPCSkeleton::ResetCallingIdentity();
     AAFwk::AbilityManagerClient::GetInstance()->ConnectAbility(want, connectCallback_, userId);
     IPCSkeleton::SetCallingIdentity(identity);

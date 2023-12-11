@@ -28,8 +28,6 @@ class BluetoothCallManager : public std::enable_shared_from_this<BluetoothCallMa
 public:
     BluetoothCallManager();
     ~BluetoothCallManager();
-    bool ConnectBtSco(const std::string &bluetoothAddress);
-    bool DisconnectBtSco();
     int32_t SendBtCallState(int32_t numActive, int32_t numHeld, int32_t callState, const std::string &number);
     BtScoState GetBtScoState();
     bool IsBtAvailble();

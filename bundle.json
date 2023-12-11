@@ -20,7 +20,8 @@
         "name": "call_manager",
         "subsystem": "telephony",
         "syscap": [
-            "SystemCapability.Telephony.CallManager"
+            "SystemCapability.Telephony.CallManager",
+            "SystemCapability.Applications.Contacts"
         ],
         "features": [],
         "adapted_system_type": [
@@ -32,6 +33,7 @@
             "components": [
                 "ability_base",
                 "ability_runtime",
+                "access_token",
                 "bluetooth",
                 "c_utils",
                 "common_event_service",
@@ -40,6 +42,7 @@
                 "distributed_notification_service",
                 "eventhandler",
                 "ffrt",
+                "graphic_2d",
                 "hilog",
                 "hisysevent",
                 "hitrace",
@@ -56,8 +59,7 @@
             ],
             "third_party": [
                 "libphonenumber",
-                "libuv",
-                "protobuf"
+                "libuv"
             ]
         },
         "build": {

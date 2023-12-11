@@ -216,7 +216,7 @@ bool CallNumberUtils::HasBCPhoneNumber(const std::string &phoneNumber)
 {
     int32_t phoneNumberStart = 0;
     int32_t phoneNumberStartLength = 3;
-    int32_t bCNumberLength = 11;
+    size_t bCNumberLength = 11;
     std::string bCNumberStart = "192";
     if (phoneNumber.length() == bCNumberLength &&
         phoneNumber.substr(phoneNumberStart, phoneNumberStartLength) == bCNumberStart) {

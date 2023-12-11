@@ -220,11 +220,6 @@ int32_t AudioControlManager::SetAudioDevice(const AudioDevice &device)
         case AudioDeviceType::DEVICE_WIRED_HEADSET:
             audioDeviceType = device.deviceType;
             break;
-        case AudioDeviceType::DEVICE_BLUETOOTH_SCO:
-            if (!DelayedSingleton<AudioDeviceManager>::GetInstance()->ConnectBtScoWithAddress(device.address)) {
-                return CALL_ERR_AUDIO_SET_AUDIO_DEVICE_FAILED;
-            }
-            return TELEPHONY_SUCCESS;
         default:
             break;
     }
@@ -519,10 +514,12 @@ int32_t AudioControlManager::PlayCallTone(ToneDescriptor type)
         return CALL_ERR_AUDIO_TONE_PLAY_FAILED;
     }
     toneState_ = ToneState::TONEING;
-    tone_ = std::make_unique<Tone>(type);
     if (tone_ == nullptr) {
-        TELEPHONY_LOGE("create tone failed");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+        tone_ = std::make_unique<Tone>(type);
+        if (tone_ == nullptr) {
+            TELEPHONY_LOGE("create tone failed");
+            return TELEPHONY_ERR_LOCAL_PTR_NULL;
+        }
     }
     if (tone_->Play() != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("play calltone failed");

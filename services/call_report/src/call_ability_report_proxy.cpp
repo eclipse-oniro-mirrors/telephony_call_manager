@@ -157,8 +157,8 @@ int32_t CallAbilityReportProxy::ReportCallStateInfo(const CallAttributeInfo &inf
             }
         }
     }
-    TELEPHONY_LOGI("report call state info success, callId[%{public}d] state[%{public}d] conferenceState[%{public}d]",
-        info.callId, info.callState, info.conferenceState);
+    TELEPHONY_LOGI("report call state info success, callId[%{public}d] state[%{public}d] conferenceState[%{public}d] "
+        "videoState[%{public}d]", info.callId, info.callState, info.conferenceState, info.videoState);
     return ret;
 }
 
@@ -276,6 +276,102 @@ int32_t CallAbilityReportProxy::ReportPostDialDelay(const std::string &str)
         }
     }
     TELEPHONY_LOGI("ReportPostDialDelay success");
+    return ret;
+}
+
+int32_t CallAbilityReportProxy::ReportImsCallModeChange(const CallMediaModeInfo &imsCallModeInfo)
+{
+    int32_t ret = TELEPHONY_ERR_FAIL;
+    std::lock_guard<std::mutex> lock(mutex_);
+    std::list<sptr<ICallAbilityCallback>>::iterator it = callbackPtrList_.begin();
+    for (; it != callbackPtrList_.end(); ++it) {
+        if ((*it)) {
+            ret = (*it)->OnReportImsCallModeChange(imsCallModeInfo);
+            if (ret != TELEPHONY_SUCCESS) {
+                TELEPHONY_LOGW("ReportImsCallModeReceive failed, errcode:%{public}d, bundleName:%{public}s", ret,
+                    ((*it)->GetBundleName()).c_str());
+                continue;
+            }
+        }
+    }
+    TELEPHONY_LOGI("ReportImsCallModeReceive success");
+    return ret;
+}
+
+int32_t CallAbilityReportProxy::ReportCallSessionEventChange(
+    const CallSessionEvent &callSessionEventOptions)
+{
+    int32_t ret = TELEPHONY_ERR_FAIL;
+    std::lock_guard<std::mutex> lock(mutex_);
+    std::list<sptr<ICallAbilityCallback>>::iterator it = callbackPtrList_.begin();
+    for (; it != callbackPtrList_.end(); ++it) {
+        if ((*it)) {
+            ret = (*it)->OnReportCallSessionEventChange(callSessionEventOptions);
+            if (ret != TELEPHONY_SUCCESS) {
+                TELEPHONY_LOGW("ReportCallSessionEventChange failed, errcode:%{public}d, bundleName:%{public}s", ret,
+                    ((*it)->GetBundleName()).c_str());
+                continue;
+            }
+        }
+    }
+    TELEPHONY_LOGI("ReportCallSessionEventChange success");
+    return ret;
+}
+
+int32_t CallAbilityReportProxy::ReportPeerDimensionsChange(const PeerDimensionsDetail &peerDimensionsDetail)
+{
+    int32_t ret = TELEPHONY_ERR_FAIL;
+    std::lock_guard<std::mutex> lock(mutex_);
+    std::list<sptr<ICallAbilityCallback>>::iterator it = callbackPtrList_.begin();
+    for (; it != callbackPtrList_.end(); ++it) {
+        if ((*it)) {
+            ret = (*it)->OnReportPeerDimensionsChange(peerDimensionsDetail);
+            if (ret != TELEPHONY_SUCCESS) {
+                TELEPHONY_LOGW("ReportPeerDimensionsChange failed, errcode:%{public}d, bundleName:%{public}s", ret,
+                    ((*it)->GetBundleName()).c_str());
+                continue;
+            }
+        }
+    }
+    TELEPHONY_LOGI("ReportPeerDimensionsChange success");
+    return ret;
+}
+
+int32_t CallAbilityReportProxy::ReportCallDataUsageChange(const int64_t dataUsage)
+{
+    int32_t ret = TELEPHONY_ERR_FAIL;
+    std::lock_guard<std::mutex> lock(mutex_);
+    std::list<sptr<ICallAbilityCallback>>::iterator it = callbackPtrList_.begin();
+    for (; it != callbackPtrList_.end(); ++it) {
+        if ((*it)) {
+            ret = (*it)->OnReportCallDataUsageChange(dataUsage);
+            if (ret != TELEPHONY_SUCCESS) {
+                TELEPHONY_LOGW("ReportCallDataUsageChange failed, errcode:%{public}d, bundleName:%{public}s", ret,
+                    ((*it)->GetBundleName()).c_str());
+                continue;
+            }
+        }
+    }
+    TELEPHONY_LOGI("ReportCallDataUsageChange success");
+    return ret;
+}
+
+int32_t CallAbilityReportProxy::ReportCameraCapabilities(const CameraCapabilities &cameraCapabilities)
+{
+    int32_t ret = TELEPHONY_ERR_FAIL;
+    std::lock_guard<std::mutex> lock(mutex_);
+    std::list<sptr<ICallAbilityCallback>>::iterator it = callbackPtrList_.begin();
+    for (; it != callbackPtrList_.end(); ++it) {
+        if ((*it)) {
+            ret = (*it)->OnReportCameraCapabilities(cameraCapabilities);
+            if (ret != TELEPHONY_SUCCESS) {
+                TELEPHONY_LOGW("ReportCameraCapabilities failed, errcode:%{public}d, bundleName:%{public}s", ret,
+                    ((*it)->GetBundleName()).c_str());
+                continue;
+            }
+        }
+    }
+    TELEPHONY_LOGI("ReportCameraCapabilities success");
     return ret;
 }
 } // namespace Telephony
