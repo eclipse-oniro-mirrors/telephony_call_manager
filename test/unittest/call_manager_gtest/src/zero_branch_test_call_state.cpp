@@ -44,6 +44,7 @@ namespace OHOS {
 namespace Telephony {
 using namespace testing::ext;
 constexpr int WAIT_TIME = 3;
+constexpr int DEFAULT_SLOT_ID = 0;
 
 class CallStateTest : public testing::Test {
 public:
@@ -317,12 +318,12 @@ HWTEST_F(CallStateTest, Telephony_Ring_001, Function | MediumTest | Level3)
 {
     std::string path = "test";
     auto testRing = std::make_shared<Ring>(path);
-    testRing->Play();
+    testRing->Play(DEFAULT_SLOT_ID);
     sleep(WAIT_TIME);
     testRing->Stop();
 
     auto ring = std::make_shared<Ring>();
-    ring->Play();
+    ring->Play(DEFAULT_SLOT_ID);
     sleep(WAIT_TIME);
     ring->Stop();
     ring->StartVibrate();
@@ -333,7 +334,7 @@ HWTEST_F(CallStateTest, Telephony_Ring_001, Function | MediumTest | Level3)
     std::string emptyPath = "";
     auto emptyRing = std::make_shared<Ring>(emptyPath);
     emptyRing->ReleaseRenderer();
-    ASSERT_EQ(emptyRing->Play(), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    ASSERT_EQ(emptyRing->Play(DEFAULT_SLOT_ID), TELEPHONY_ERR_LOCAL_PTR_NULL);
     sleep(WAIT_TIME);
     ASSERT_EQ(emptyRing->Stop(), TELEPHONY_ERR_LOCAL_PTR_NULL);
 }

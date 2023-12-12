@@ -38,8 +38,6 @@ public:
     void Init();
     int32_t SetAudioDevice(const AudioDevice &device);
     bool PlayRingtone(); // plays the default ringtone
-    bool PlayRingtone(const std::string &phoneNum); // plays the default ringtone
-    bool PlayRingtone(const std::string &phoneNum, const std::string &ringtonePath); // plays the specific ringtone
     bool StopRingtone();
     int32_t PlayRingback();
     int32_t StopRingback();

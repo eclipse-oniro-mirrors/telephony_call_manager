@@ -23,7 +23,7 @@
 
 namespace OHOS {
 namespace Telephony {
-using AudioPlay = int32_t (AudioPlayer::*)(const std::string &, AudioStandard::AudioStreamType, PlayerType);
+static constexpr int32_t DEFAULT_SIM_SLOT_ID = 0;
 
 Ring::Ring() : isVibrating_(false), shouldRing_(false), shouldVibrate_(false), ringtonePath_(""),
     audioPlayer_(new (std::nothrow) AudioPlayer())
@@ -74,24 +74,18 @@ void Ring::Init(const std::string &ringtonePath)
     }
 }
 
-int32_t Ring::Play()
+int32_t Ring::Play(int32_t slotId)
 {
     if (SystemSoundManager_ == nullptr || audioPlayer_ == nullptr) {
         TELEPHONY_LOGE("SystemSoundManager_ or audioPlayer_ is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     const std::shared_ptr<AbilityRuntime::Context> context;
-    if (SystemSoundManager_ == nullptr) {
-        TELEPHONY_LOGE("SystemSoundManager_ is nullptr");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-    RingtonePlayer_ = SystemSoundManager_->GetRingtonePlayer(context, Media::RingtoneType::RINGTONE_TYPE_SIM_CARD_0);
+    Media::RingtoneType type = slotId == DEFAULT_SIM_SLOT_ID ? Media::RingtoneType::RINGTONE_TYPE_SIM_CARD_0 :
+        Media::RingtoneType::RINGTONE_TYPE_SIM_CARD_1;
+    RingtonePlayer_ = SystemSoundManager_->GetRingtonePlayer(context, type);
     if (RingtonePlayer_ == nullptr) {
         TELEPHONY_LOGE("get RingtonePlayer failed");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-    if (audioPlayer_ == nullptr) {
-        TELEPHONY_LOGE("audioPlayer_ is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     audioPlayer_->RegisterRingCallback(RingtonePlayer_);
