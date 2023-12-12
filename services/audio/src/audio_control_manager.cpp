@@ -83,7 +83,8 @@ void AudioControlManager::HandleCallStateUpdated(
     sptr<CallBase> &callObjectPtr, TelCallState priorState, TelCallState nextState)
 {
     if(nextState == TelCallState::CALL_STATUS_ANSWERED) {
-        TELEPHONY_LOGI("NO NEED TO UPDATE");
+        TELEPHONY_LOGI("user answered, mute ringer instead of release renderer");
+        MuteRinger();
         return;
     }
     HandleNextState(callObjectPtr, nextState);
@@ -151,6 +152,7 @@ void AudioControlManager::HandlePriorState(sptr<CallBase> &callObjectPtr, TelCal
             if (stateNumber == EMPTY_VALUE) {
                 if (callObjectPtr->GetCallRunningState() == CallRunningState::CALL_RUNNING_STATE_ACTIVE) {
                     PlaySoundtone();
+                    StopRingtone();
                 } else {
                     StopRingtone();
                 }
