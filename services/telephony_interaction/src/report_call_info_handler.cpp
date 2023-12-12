@@ -123,7 +123,7 @@ int32_t ReportCallInfoHandler::UpdateEventResultInfo(const CellularCallEventInfo
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     std::weak_ptr<CallStatusManager> callSatusManagerPtr = callStatusManagerPtr_;
-    Submit("UpdateEventResultInfo", [callSatusManagerPtr, &info]() {
+    Submit("UpdateEventResultInfo", [callSatusManagerPtr, info]() {
         std::shared_ptr<CallStatusManager> managerPtr = callSatusManagerPtr.lock();
         if (managerPtr == nullptr) {
             TELEPHONY_LOGE("managerPtr is null");
