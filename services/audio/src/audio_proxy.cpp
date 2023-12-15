@@ -182,9 +182,13 @@ int32_t AudioProxy::GetMinVolume(AudioStandard::AudioVolumeType audioVolumeType)
 
 bool AudioProxy::IsMicrophoneMute()
 {
-    std::shared_ptr<AudioStandard::AudioGroupManager> AudioGroupManager =
+    std::shared_ptr<AudioStandard::AudioGroupManager> audioGroupManager =
         AudioStandard::AudioSystemManager::GetInstance()->GetGroupManager(AudioStandard::DEFAULT_VOLUME_GROUP_ID);
-    return AudioGroupManager->IsMicrophoneMute();
+    if (audioGroupManager == nullptr) {
+        TELEPHONY_LOGE("IsMicrophoneMute fail, audioGroupManager is nullptr");
+        return false;
+    }
+    return audioGroupManager->IsMicrophoneMute();
 }
 
 bool AudioProxy::SetMicrophoneMute(bool mute)
@@ -192,9 +196,9 @@ bool AudioProxy::SetMicrophoneMute(bool mute)
     if (mute == IsMicrophoneMute()) {
         return true;
     }
-    std::shared_ptr<AudioStandard::AudioGroupManager> AudioGroupManager =
+    std::shared_ptr<AudioStandard::AudioGroupManager> audioGroupManager =
         AudioStandard::AudioSystemManager::GetInstance()->GetGroupManager(AudioStandard::DEFAULT_VOLUME_GROUP_ID);
-    int32_t muteResult = AudioGroupManager->SetMicrophoneMute(mute);
+    int32_t muteResult = audioGroupManager->SetMicrophoneMute(mute);
     TELEPHONY_LOGI("set microphone mute result : %{public}d", muteResult);
     return (muteResult == TELEPHONY_SUCCESS);
 }
