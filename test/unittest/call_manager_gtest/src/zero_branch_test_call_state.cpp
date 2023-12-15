@@ -596,7 +596,7 @@ HWTEST_F(CallStateTest, Telephony_CallRequestProcess_002, Function | MediumTest 
     callBase2->callState_ = TelCallState::CALL_STATUS_INCOMING;
     callBase2->callId_ = 2;
     bool enabled = false;
-    callRequestProcess->HandleCallWaitingNumZero(callBase1, 1, 1, enabled);
+    callRequestProcess->HandleCallWaitingNumZero(callBase2, callBase1, 1, 1, enabled);
     mDialParaInfo.accountId = 0;
     sptr<OHOS::Telephony::CallBase> callBase5 = new IMSCall(mDialParaInfo);
     callBase5->callState_ = TelCallState::CALL_STATUS_HOLDING;
@@ -609,7 +609,7 @@ HWTEST_F(CallStateTest, Telephony_CallRequestProcess_002, Function | MediumTest 
     callBase7->callState_ = TelCallState::CALL_STATUS_INCOMING;
     callBase7->callId_ = 3;
     bool enabled1 = false;
-    callRequestProcess->HandleCallWaitingNumOne(callBase5, 1, 1, enabled1);
+    callRequestProcess->HandleCallWaitingNumOne(callBase7, callBase5, 1, 1, enabled1);
     mDialParaInfo.accountId = 0;
     sptr<OHOS::Telephony::CallBase> callBase8 = new IMSCall(mDialParaInfo);
     callBase8->callState_ = TelCallState::CALL_STATUS_HOLDING;
@@ -626,6 +626,30 @@ HWTEST_F(CallStateTest, Telephony_CallRequestProcess_002, Function | MediumTest 
     callBase11->callId_ = 4;
     bool enabled2 = false;
     callRequestProcess->HandleCallWaitingNumTwo(callBase8, 1, enabled2);
+}
+
+/**
+ * @tc.number   Telephony_CallRequestProcess_003
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallStateTest, Telephony_CallRequestProcess_003, Function | MediumTest | Level3)
+{
+    std::unique_ptr<CallRequestProcess> callRequestProcess = std::make_unique<CallRequestProcess>();
+    DialParaInfo mDialParaInfo;
+    mDialParaInfo.accountId = 0;
+    sptr<OHOS::Telephony::CallBase> callBase1 = new IMSCall(mDialParaInfo);
+    callBase1->callState_ = TelCallState::CALL_STATUS_HOLDING;
+    callBase1->callId_ = 1;
+    mDialParaInfo.accountId = 1;
+    sptr<OHOS::Telephony::CallBase> callBase2 = new IMSCall(mDialParaInfo);
+    callBase2->callState_ = TelCallState::CALL_STATUS_ACTIVE;
+    callBase2->callId_ = 2;
+    sptr<OHOS::Telephony::CallBase> callBase3 = new IMSCall(mDialParaInfo);
+    callBase3->callState_ = TelCallState::CALL_STATUS_INCOMING;
+    callBase3->callId_ = 3;
+    bool enabled = false;
+    callRequestProcess->HandleCallWaitingNumOneNext(callBase3, callBase2, callBase1, 1, enabled);
 }
 } // namespace Telephony
 } // namespace OHOS

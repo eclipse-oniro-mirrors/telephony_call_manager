@@ -44,8 +44,12 @@ public:
     bool IsDsdsMode5();
     void DisconnectOtherSubIdCall(int32_t callId, int32_t slotId, int32_t videoState);
     void HandleCallWaitingNumTwo(sptr<CallBase> call, int32_t slotId, bool &flagForConference);
-    void HandleCallWaitingNumOne(sptr<CallBase> call, int32_t slotId, int32_t activeCallNum, bool &flagForConference);
-    void HandleCallWaitingNumZero(sptr<CallBase> call, int32_t slotId, int32_t activeCallNum, bool &flagForConference);
+    void HandleCallWaitingNumOne(sptr<CallBase> incomingCall, sptr<CallBase> call, int32_t slotId,
+        int32_t activeCallNum, bool &flagForConference);
+    void HandleCallWaitingNumOneNext(sptr<CallBase> incomingCall, sptr<CallBase> call, sptr<CallBase> holdCall,
+        int32_t slotId, bool &flagForConference);
+    void HandleCallWaitingNumZero(sptr<CallBase> incomingCall, sptr<CallBase> call, int32_t slotId,
+        int32_t activeCallNum, bool &flagForConference);
     void HoldOrDisconnectedCall(int32_t callId, int32_t slotId, int32_t videoState);
     bool HandleDsdaIncomingCall(
         sptr<CallBase> call, int32_t activeCallNum, int32_t slotId, int32_t videoState, sptr<CallBase> incomingCall);

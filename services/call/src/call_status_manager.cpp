@@ -125,8 +125,28 @@ int32_t CallStatusManager::HandleCallReportInfo(const CallDetailInfo &info)
             break;
     }
     TELEPHONY_LOGI("Entry CallStatusManager HandleCallReportInfo");
+    HandleDsdaInfo(info.accountId);
     DelayedSingleton<BluetoothCallService>::GetInstance()->GetCallState();
     return ret;
+}
+
+void CallStatusManager::HandleDsdaInfo(int32_t slotId)
+{
+    int32_t dsdsMode = DSDS_MODE_V2;
+    bool noOtherCall = true;
+    std::list<int32_t> callIdList;
+    GetCarrierCallList(callIdList);
+    DelayedSingleton<CallRequestProcess>::GetInstance()->IsExistCallOtherSlot(callIdList, slotId, noOtherCall);
+    DelayedRefSingleton<CoreServiceClient>::GetInstance().GetDsdsMode(dsdsMode);
+    if ((dsdsMode == static_cast<int32_t>(DsdsMode::DSDS_MODE_V5_DSDA) ||
+            dsdsMode == static_cast<int32_t>(DsdsMode::DSDS_MODE_V5_TDM)) &&
+        !noOtherCall) {
+        TELEPHONY_LOGI("Handle DsdaCallInfo");
+        sptr<CallBase> holdCall = GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_HOLD);
+        if (holdCall != nullptr) {
+            holdCall->SetCanUnHoldState(false);
+        }
+    }
 }
 
 // handle call state changes, incoming call, outgoing call.
@@ -598,18 +618,25 @@ void CallStatusManager::AutoAnswerForDsda(int32_t activeCallNum, int32_t slotId)
 {
     int32_t dialingCallNum = GetCallNum(TelCallState::CALL_STATUS_DIALING);
     int32_t alertingCallNum = GetCallNum(TelCallState::CALL_STATUS_ALERTING);
+    int32_t waitingCallNum = GetCallNum(TelCallState::CALL_STATUS_WAITING);
     sptr<CallBase> ringCall = GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_RINGING);
     TELEPHONY_LOGE("ringCall is not null  =:%{public}d", ringCall != nullptr);
-    if (ringCall != nullptr && dialingCallNum == 0 && alertingCallNum == 0 && activeCallNum == 0 &&
-        ringCall->GetAutoAnswerState()) {
-        int32_t videoState = static_cast<int32_t>(ringCall->GetVideoStateType());
-        int ret = ringCall->AnswerCall(videoState);
-        TELEPHONY_LOGI("ret = %{public}d", ret);
-        ringCall->SetAutoAnswerState(false);
-        return;
-    }
     std::list<int32_t> callIdList;
     GetCarrierCallList(callIdList);
+    for (int32_t ringCallId : callIdList) {
+        sptr<CallBase> ringCall = GetOneCallObject(ringCallId);
+        if (ringCall->GetCallRunningState() == CallRunningState::CALL_RUNNING_STATE_RINGING) {
+            TELEPHONY_LOGE("ringCall is not null  =:%{public}d", ringCall != nullptr);
+            if (ringCall != nullptr && dialingCallNum == 0 && alertingCallNum == 0 && activeCallNum == 0 &&
+                ringCall->GetAutoAnswerState()) {
+                int32_t videoState = static_cast<int32_t>(ringCall->GetVideoStateType());
+                int ret = ringCall->AnswerCall(videoState);
+                TELEPHONY_LOGI("ret = %{public}d", ret);
+                ringCall->SetAutoAnswerState(false);
+                return;
+            }
+        }
+    }
     for (int32_t otherCallId : callIdList) {
         sptr<CallBase> otherCall = GetOneCallObject(otherCallId);
         TelCallState state = otherCall->GetTelCallState();
@@ -617,7 +644,7 @@ void CallStatusManager::AutoAnswerForDsda(int32_t activeCallNum, int32_t slotId)
         int32_t conferenceId = ERR_ID;
         otherCall->GetMainCallId(conferenceId);
         if (slotId != otherCall->GetSlotId() && state == TelCallState::CALL_STATUS_HOLDING &&
-            otherCall->GetCanUnHoldState()) {
+            otherCall->GetCanUnHoldState() && waitingCallNum == 0) {
             if (confState != TelConferenceState::TEL_CONFERENCE_IDLE && conferenceId == otherCallId) {
                 otherCall->UnHoldCall();
                 return;

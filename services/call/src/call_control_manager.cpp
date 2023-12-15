@@ -162,7 +162,7 @@ void CallControlManager::PackageDialInformation(AppExecFwk::PacMap &extras, std:
 
 int32_t CallControlManager::AnswerCall(int32_t callId, int32_t videoState)
 {
-    sptr<CallBase> call = GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_RINGING);
+    sptr<CallBase> call = GetOneCallObject(callId);
     if (call == nullptr) {
             TELEPHONY_LOGE("call is nullptr");
             CallManagerHisysevent::WriteAnswerCallFaultEvent(
