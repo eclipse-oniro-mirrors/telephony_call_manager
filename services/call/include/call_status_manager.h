@@ -43,6 +43,7 @@ public:
     int32_t Init();
     int32_t UnInit();
     int32_t HandleCallReportInfo(const CallDetailInfo &info);
+    void HandleDsdaInfo(int32_t slotId);
     int32_t HandleCallsReportInfo(const CallDetailsInfo &info);
     int32_t HandleDisconnectedCause(const DisconnectedDetails &details);
     int32_t HandleEventResultReportInfo(const CellularCallEventInfo &info);

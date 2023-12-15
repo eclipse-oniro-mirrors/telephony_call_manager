@@ -149,13 +149,13 @@ void AudioControlManager::HandlePriorState(sptr<CallBase> &callObjectPtr, TelCal
             break;
         case TelCallState::CALL_STATUS_INCOMING:
         case TelCallState::CALL_STATUS_WAITING:
+            if (callObjectPtr->GetCallRunningState() == CallRunningState::CALL_RUNNING_STATE_ACTIVE) {
+                PlaySoundtone();
+                StopRingtone();
+            } else {
+                StopRingtone();
+            }
             if (stateNumber == EMPTY_VALUE) {
-                if (callObjectPtr->GetCallRunningState() == CallRunningState::CALL_RUNNING_STATE_ACTIVE) {
-                    PlaySoundtone();
-                    StopRingtone();
-                } else {
-                    StopRingtone();
-                }
                 event = AudioEvent::NO_MORE_INCOMING_CALL;
             }
             break;

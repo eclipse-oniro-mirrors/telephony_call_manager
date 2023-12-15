@@ -100,6 +100,7 @@ void CallRequestProcess::AnswerRequest(int32_t callId, int32_t videoState)
     if (IsDsdsMode3()) {
         DisconnectOtherSubIdCall(callId, slotId, videoState);
     } else if (IsDsdsMode5()) {
+        call->SetAutoAnswerState(true);
         HoldOrDisconnectedCall(callId, slotId, videoState);
     } else {
         int32_t ret = call->AnswerCall(videoState);
@@ -147,6 +148,7 @@ void CallRequestProcess::HoldOrDisconnectedCall(int32_t callId, int32_t slotId, 
         TELEPHONY_LOGI("no Other Slot Call");
         sptr<CallBase> call = GetOneCallObject(callId);
         int32_t ret = call->AnswerCall(videoState);
+        call->SetAutoAnswerState(false);
         if (ret != TELEPHONY_SUCCESS) {
             return;
         }
@@ -156,7 +158,6 @@ void CallRequestProcess::HoldOrDisconnectedCall(int32_t callId, int32_t slotId, 
     sptr<CallBase> incomingCall = GetOneCallObject(callId);
     int32_t waitingCallNum = GetCallNum(TelCallState::CALL_STATUS_WAITING);
     int32_t activeCallNum = GetCallNum(TelCallState::CALL_STATUS_ACTIVE);
-    int32_t incomingCallNum = GetCallNum(TelCallState::CALL_STATUS_INCOMING);
     for (int32_t otherCallId : callIdList) {
         sptr<CallBase> call = GetOneCallObject(otherCallId);
         TELEPHONY_LOGI("other Call State =:%{public}d", call->GetTelCallState());
@@ -167,14 +168,13 @@ void CallRequestProcess::HoldOrDisconnectedCall(int32_t callId, int32_t slotId, 
             if (call->GetSlotId() != slotId) {
                 TELEPHONY_LOGI("exist other slot call");
                 noOtherCall = false;
-                incomingCall->SetAutoAnswerState(flag);
             }
             if (waitingCallNum > 1) {
                 HandleCallWaitingNumTwo(call, slotId, flagForConference);
             } else if (waitingCallNum == 1) {
-                HandleCallWaitingNumOne(call, slotId, activeCallNum, flagForConference);
+                HandleCallWaitingNumOne(incomingCall, call, slotId, activeCallNum, flagForConference);
             } else {
-                HandleCallWaitingNumZero(call, slotId, activeCallNum, flagForConference);
+                HandleCallWaitingNumZero(incomingCall, call, slotId, activeCallNum, flagForConference);
             }
         }
     }
@@ -183,8 +183,11 @@ void CallRequestProcess::HoldOrDisconnectedCall(int32_t callId, int32_t slotId, 
 bool CallRequestProcess::HandleDsdaIncomingCall(
     sptr<CallBase> call, int32_t activeCallNum, int32_t slotId, int32_t videoState, sptr<CallBase> incomingCall)
 {
+    int32_t alertingCallNum = GetCallNum(TelCallState::CALL_STATUS_ALERTING);
+    int32_t dialingCallNum = GetCallNum(TelCallState::CALL_STATUS_DIALING);
     if (call->GetTelCallState() == TelCallState::CALL_STATUS_DISCONNECTING ||
-        (activeCallNum == 0 && call->GetTelCallState() == TelCallState::CALL_STATUS_HOLDING)) {
+        (activeCallNum == 0 && alertingCallNum == 0 && dialingCallNum == 0 &&
+            call->GetTelCallState() == TelCallState::CALL_STATUS_HOLDING)) {
         if (call->GetSlotId() != slotId) {
             incomingCall->AnswerCall(videoState);
         }
@@ -228,53 +231,72 @@ void CallRequestProcess::HandleCallWaitingNumTwo(sptr<CallBase> call, int32_t sl
 }
 
 void CallRequestProcess::HandleCallWaitingNumOne(
-    sptr<CallBase> call, int32_t slotId, int32_t activeCallNum, bool &flagForConference)
+    sptr<CallBase> incomingCall, sptr<CallBase> call, int32_t slotId, int32_t activeCallNum, bool &flagForConference)
 {
     TELEPHONY_LOGI("enter HandleCallWaitingNumOne");
     sptr<CallBase> holdCall = GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_HOLD);
     TELEPHONY_LOGI("enter one GetTelCallState =:%{public}d", call->GetTelCallState());
+    int32_t callNum = 2;
+    std::list<int32_t> callIdList;
+    GetCarrierCallList(callIdList);
     if (holdCall != nullptr) {
-        if (call->GetTelCallState() == TelCallState ::CALL_STATUS_DIALING ||
-            call->GetTelCallState() == TelCallState ::CALL_STATUS_ALERTING) {
-            TELEPHONY_LOGI("enter one dialing call hangup");
+        HandleCallWaitingNumOneNext(incomingCall, call, holdCall, slotId, flagForConference);
+    } else if (callIdList.size() == callNum) {
+        TELEPHONY_LOGI("enter two call process");
+        HandleCallWaitingNumZero(incomingCall, call, slotId, activeCallNum, flagForConference);
+    } else if (call->GetCallRunningState() == CallRunningState::CALL_RUNNING_STATE_ACTIVE && !flagForConference) {
+        if (call->GetSlotId() != slotId && g_flagForDsda == true) {
+            TELEPHONY_LOGI("enter one hold call is null active call hold");
+            call->HoldCall();
+            flagForConference = true;
+            g_flagForDsda = false;
+        } else if (call->GetSlotId() != slotId) {
+            TELEPHONY_LOGI("enter one hold call is null active call hangup");
             call->HangUpCall();
-        } else if (activeCallNum > 0) {
-            TELEPHONY_LOGI("enter one hold call hangup");
-            holdCall->HangUpCall();
-            g_flagForDsda = true;
-        }
-        if (call->GetCallRunningState() == CallRunningState::CALL_RUNNING_STATE_ACTIVE && !flagForConference) {
-            if (CallObjectManager::IsCallExist(call->GetCallType(), TelCallState::CALL_STATUS_INCOMING) &&
-                call->GetSlotId() != slotId) {
-                TELEPHONY_LOGI("enter one active call hangup");
-                call->HangUpCall();
-            } else {
-                TELEPHONY_LOGI("enter one active call hold");
-                call->HoldCall();
-                flagForConference = true;
-            }
-        }
-    } else {
-        if (call->GetCallRunningState() == CallRunningState::CALL_RUNNING_STATE_ACTIVE && !flagForConference) {
-            if (call->GetSlotId() != slotId && g_flagForDsda == true) {
-                TELEPHONY_LOGI("enter one hold call is null active call hold");
-                call->HoldCall();
-                flagForConference = true;
-                g_flagForDsda = false;
-            } else if (call->GetSlotId() != slotId) {
-                TELEPHONY_LOGI("enter one hold call is null active call hangup");
-                call->HangUpCall();
-            } else {
-                TELEPHONY_LOGI("enter one hold call is null active call hold");
-                call->HoldCall();
-                flagForConference = true;
-            }
+        } else {
+            TELEPHONY_LOGI("enter one hold call is null active call hold");
+            call->HoldCall();
+            flagForConference = true;
         }
     }
 }
 
+void CallRequestProcess::HandleCallWaitingNumOneNext(
+    sptr<CallBase> incomingCall, sptr<CallBase> call, sptr<CallBase> holdCall, int32_t slotId, bool &flagForConference)
+{
+    TELEPHONY_LOGI("enter HandleCallWaitingNumOneNext");
+    int32_t activeCallNum = GetCallNum(TelCallState::CALL_STATUS_ACTIVE);
+    int32_t dialingCallNum = GetCallNum(TelCallState::CALL_STATUS_DIALING);
+    int32_t alertingCallNum = GetCallNum(TelCallState::CALL_STATUS_ALERTING);
+    if (call->GetTelCallState() == TelCallState ::CALL_STATUS_DIALING ||
+        call->GetTelCallState() == TelCallState ::CALL_STATUS_ALERTING) {
+        TELEPHONY_LOGI("enter one dialing call hangup");
+        call->HangUpCall();
+    } else if (activeCallNum > 0) {
+        TELEPHONY_LOGI("enter one hold call hangup");
+        holdCall->HangUpCall();
+        g_flagForDsda = true;
+    }
+    if (call->GetCallRunningState() == CallRunningState::CALL_RUNNING_STATE_ACTIVE && !flagForConference) {
+        if (CallObjectManager::IsCallExist(call->GetCallType(), TelCallState::CALL_STATUS_INCOMING) &&
+            call->GetSlotId() != slotId) {
+            TELEPHONY_LOGI("enter one active call hangup");
+            call->HangUpCall();
+        } else {
+            TELEPHONY_LOGI("enter one active call hold");
+            call->HoldCall();
+            flagForConference = true;
+        }
+    } else if (activeCallNum == 0 && incomingCall->GetAutoAnswerState() && alertingCallNum == 0 &&
+               dialingCallNum == 0) {
+        TELEPHONY_LOGI("enter one active with two incoming call");
+        incomingCall->AnswerCall(static_cast<int32_t>(incomingCall->GetVideoStateType()));
+        incomingCall->SetAutoAnswerState(false);
+    }
+}
+
 void CallRequestProcess::HandleCallWaitingNumZero(
-    sptr<CallBase> call, int32_t slotId, int32_t activeCallNum, bool &flagForConference)
+    sptr<CallBase> incomingCall, sptr<CallBase> call, int32_t slotId, int32_t activeCallNum, bool &flagForConference)
 {
     TELEPHONY_LOGI("enter HandleCallWaitingNumZero");
     sptr<CallBase> holdCall = GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_HOLD);
@@ -289,21 +311,26 @@ void CallRequestProcess::HandleCallWaitingNumZero(
             holdCall->HangUpCall();
         }
         if (call->GetCallRunningState() == CallRunningState::CALL_RUNNING_STATE_ACTIVE && !flagForConference) {
-            TELEPHONY_LOGI("enter zero  active call hangup");
+            TELEPHONY_LOGI("enter active call hangup");
             call->HoldCall();
             flagForConference = true;
         }
     } else {
         TELEPHONY_LOGI("enter zero holdcall is null");
         if (call->GetTelCallState() == TelCallState ::CALL_STATUS_DIALING ||
-            call->GetTelCallState() == TelCallState ::CALL_STATUS_ALERTING ||
-            call->GetTelCallState() == TelCallState ::CALL_STATUS_INCOMING) {
+            call->GetTelCallState() == TelCallState ::CALL_STATUS_ALERTING) {
             TELEPHONY_LOGI("enter zero dialing incoming call hangup");
             call->HangUpCall();
         } else if (call->GetCallRunningState() == CallRunningState::CALL_RUNNING_STATE_ACTIVE && !flagForConference) {
             TELEPHONY_LOGI("enter zero active call hold");
             call->HoldCall();
             flagForConference = true;
+        } else if (incomingCall->GetAutoAnswerState() &&
+                   (call->GetTelCallState() == TelCallState ::CALL_STATUS_INCOMING ||
+                       call->GetTelCallState() == TelCallState ::CALL_STATUS_WAITING)) {
+            TELEPHONY_LOGI("enter two incoming call active");
+            incomingCall->AnswerCall(static_cast<int32_t>(incomingCall->GetVideoStateType()));
+            incomingCall->SetAutoAnswerState(false);
         }
     }
 }
@@ -352,13 +379,12 @@ void CallRequestProcess::RejectRequest(int32_t callId, bool isSendSms, std::stri
         TELEPHONY_LOGE("RejectCall failed!");
         return;
     }
-    bool flag = false;
     std::list<int32_t> callIdList;
     GetCarrierCallList(callIdList);
     for (int32_t otherCallId : callIdList) {
         sptr<CallBase> call = GetOneCallObject(otherCallId);
         if (call->GetCallRunningState() == CallRunningState::CALL_RUNNING_STATE_HOLD) {
-            call->SetCanUnHoldState(flag);
+            call->SetCanUnHoldState(false);
         }
     }
     TELEPHONY_LOGI("start to send reject message...");
@@ -396,7 +422,7 @@ void CallRequestProcess::HangUpRequest(int32_t callId)
     }
     call->HangUpCall();
     if ((state == TelCallState::CALL_STATUS_DIALING || state == TelCallState::CALL_STATUS_ALERTING) &&
-        waitingCallNum == 0) {
+        waitingCallNum == 0 && call->GetCanUnHoldState()) {
         sptr<CallBase> holdCall = CallObjectManager::GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_HOLD);
         if (holdCall) {
             TELEPHONY_LOGI("release the dialing/alerting call and recover the held call");
@@ -413,8 +439,7 @@ void CallRequestProcess::HoldRequest(int32_t callId)
         return;
     }
     call->HoldCall();
-    bool flag = false;
-    call->SetCanUnHoldState(flag);
+    call->SetCanUnHoldState(false);
 }
 
 void CallRequestProcess::UnHoldRequest(int32_t callId)
