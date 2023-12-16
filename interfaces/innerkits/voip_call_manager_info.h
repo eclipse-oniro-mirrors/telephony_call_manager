@@ -40,13 +40,13 @@ enum class VoipCallState {
      */
     VOIP_CALL_STATE_ACTIVE,
     /**
+     * Indicates the call state is holding.
+     */
+    VOIP_CALL_STATE_HOLDING,
+    /**
      * Indicates the call state of disconnected.
      */
     VOIP_CALL_STATE_DISCONNECTED,
-    /**
-     * Indicates the call state of reject.
-     */
-    VOIP_CALL_STATE_REJECT,
 };
 
 /**
@@ -184,17 +184,17 @@ struct VoipCallEvents {
  */
 enum class ReportVoipCallFailedCause {
     /**
-     * Indicates application failed to establish connect.
+     * Indicates other failed cause.
      */
-    CONNECT_FAILED,
+    OTHER_CAUSED,
     /**
      * Indicates application line is busy.
      */
     ROUTE_BUSY,
     /**
-     * Indicates other failed cause.
+     * Indicates application failed to establish connect.
      */
-    OTHER_CAUSED,
+    CONNECT_FAILED,
 };
 
 /**
@@ -215,7 +215,6 @@ struct ReportVoipCallFailedCauses {
     ReportVoipCallFailedCause reportVoipCallFailedCause = ReportVoipCallFailedCause::OTHER_CAUSED;
 };
 
-// todo delte pushSA struct
 struct ReportVoIPCallParams {
     std::string callId = "";
     int32_t status;
@@ -225,7 +224,6 @@ enum VoipCallErrorCode {
     VOIP_ERR_CALLBACK_NOT_EXIST,
 };
 
-// todo delte VoIPCallStatus struct
 enum class VoIPCallStatus : uint32_t {
     ORIGINAL_STATE = 0,
 
