@@ -21,6 +21,8 @@
 #include "call_manager_errors.h"
 #include "napi_call_manager_utils.h"
 #include "napi_util.h"
+#include "pixel_map.h"
+#include "pixel_map_napi.h"
 #include "telephony_log_wrapper.h"
 
 namespace OHOS {
@@ -490,6 +492,11 @@ int32_t NapiCallAbilityCallback::ReportCallState(CallAttributeInfo &info, EventC
         env, callbackValues[ARRAY_INDEX_FIRST], "callState", static_cast<int32_t>(info.callState));
     NapiCallManagerUtils::SetPropertyInt32(
         env, callbackValues[ARRAY_INDEX_FIRST], "conferenceState", static_cast<int32_t>(info.conferenceState));
+    if (info.callType == CallType::TYPE_VOIP) {
+        napi_value voipObject = nullptr;
+        CreateVoipNapiValue(env, voipObject, info);
+        napi_set_named_property(env, callbackValues[ARRAY_INDEX_FIRST], "voipCallAttribute", voipObject);
+    }
     napi_get_reference_value(env, stateCallback.callbackRef, &callbackFunc);
     if (callbackFunc == nullptr) {
         TELEPHONY_LOGE("callbackFunc is null!");
@@ -502,6 +509,18 @@ int32_t NapiCallAbilityCallback::ReportCallState(CallAttributeInfo &info, EventC
     napi_call_function(env, thisVar, callbackFunc, DATA_LENGTH_ONE, callbackValues, &callbackResult);
     napi_close_handle_scope(env, scope);
     return TELEPHONY_SUCCESS;
+}
+
+void NapiCallAbilityCallback::CreateVoipNapiValue(napi_env &env, napi_value &voipObject, CallAttributeInfo &info)
+{
+    napi_create_object(env, &voipObject);
+    NapiCallManagerUtils::SetPropertyStringUtf8(env, voipObject, "userName", info.voipCallInfo.userName);
+    NapiCallManagerUtils::SetPropertyStringUtf8(env, voipObject, "abilityName", info.voipCallInfo.abilityName);
+    NapiCallManagerUtils::SetPropertyStringUtf8(env, voipObject, "extensionId", info.voipCallInfo.extensionId);
+    NapiCallManagerUtils::SetPropertyStringUtf8(env, voipObject, "voipBundleName", info.voipCallInfo.voipBundleName);
+    NapiCallManagerUtils::SetPropertyStringUtf8(env, voipObject, "callId", info.voipCallInfo.voipCallId);
+    napi_value pixelMapObject = Media::PixelMapNapi::CreatePixelMap(env, info.voipCallInfo.pixelMap);
+    napi_set_named_property(env, voipObject, "userProfile", pixelMapObject);
 }
 
 int32_t NapiCallAbilityCallback::UpdateCallEvent(const CallEventInfo &info)

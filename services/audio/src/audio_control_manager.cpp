@@ -494,6 +494,11 @@ bool AudioControlManager::IsNumberAllowed(const std::string &phoneNum)
 
 bool AudioControlManager::ShouldPlayRingtone() const
 {
+    sptr<CallBase> call = CallObjectManager::GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_RINGING);
+    if (call != nullptr && call->GetCallType() == CallType::TYPE_VOIP) {
+        TELEPHONY_LOGI("Voip call controls the ringtone playback on its own, no need to use cellular ringtone");
+        return false;
+    }
     auto processor = DelayedSingleton<CallStateProcessor>::GetInstance();
     int32_t alertingCallNum = processor->GetCallNumber(TelCallState::CALL_STATUS_ALERTING);
     int32_t incomingCallNum = processor->GetCallNumber(TelCallState::CALL_STATUS_INCOMING);

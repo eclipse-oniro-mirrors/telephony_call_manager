@@ -77,6 +77,8 @@ public:
     int32_t IsRinging(bool &enabled);
     bool HasCall();
     int32_t IsNewCallAllowed(bool &enabled);
+    int32_t RegisterVoipCallManagerCallback();
+    int32_t UnRegisterVoipCallManagerCallback();
     int32_t IsInEmergencyCall(bool &enabled);
     int32_t IsEmergencyPhoneNumber(std::u16string &number, int32_t slotId, bool &enabled);
     int32_t FormatPhoneNumber(std::u16string &number, std::u16string &countryCode, std::u16string &formatNumber);

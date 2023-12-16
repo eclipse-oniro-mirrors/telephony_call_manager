@@ -19,6 +19,9 @@
 #include "call_manager_base.h"
 
 namespace OHOS {
+namespace Media {
+class PixelMap;
+}
 namespace Telephony {
 /**
  * @brief Indicates the cellular call detail information.
@@ -77,6 +80,15 @@ enum class RBTPlayInfo {
     LOCAL_ALERTING,
 };
 
+struct VoipCallReportInfo {
+    std::string voipCallId = "";
+    std::string userName = "";
+    std::shared_ptr<Media::PixelMap> pixelMap = nullptr;
+    std::string abilityName = "";
+    std::string extensionId = "";
+    std::string voipBundleName = "";
+};
+
 /**
  * @brief Indicates the call event detail information.
  */
@@ -93,6 +105,10 @@ struct CallEventInfo {
      * Indicates the bundle name.
      */
     char bundleName[kMaxBundleNameLen + 1] = { 0 };
+    /**
+     * Indicates the VoIP call specific information
+     */
+    VoipCallReportInfo voipCallInfo;
 };
 
 struct AccountInfo {
@@ -134,6 +150,10 @@ struct CallReportInfo {
      * 1: a multi-party(conference) call
      */
     int32_t mpty = 0;
+    /**
+     * Indicates the VoIP call specific information
+     */
+    VoipCallReportInfo voipCallInfo;
 };
 
 /**
@@ -214,6 +234,10 @@ struct CallAttributeInfo {
      * Indicates the call index in cellular call
      */
     int32_t index = 0;
+    /**
+     * Indicates the VoIP call specific information
+     */
+    VoipCallReportInfo voipCallInfo;
 };
 
 /**
@@ -337,6 +361,10 @@ struct CallDetailInfo {
      * 1: a multi-party(conference) call
      */
     int32_t mpty = 0;
+    /**
+     * Indicates the VoIP call specific information
+     */
+    VoipCallReportInfo voipCallInfo;
 
     CallDetailInfo() {}
 
@@ -356,6 +384,12 @@ struct CallDetailInfo {
         state = temp.state;
         voiceDomain = temp.voiceDomain;
         mpty = temp.mpty;
+        voipCallInfo.voipCallId = temp.voipCallInfo.voipCallId;
+        voipCallInfo.extensionId = temp.voipCallInfo.extensionId;
+        voipCallInfo.userName = temp.voipCallInfo.userName;
+        voipCallInfo.pixelMap = temp.voipCallInfo.pixelMap;
+        voipCallInfo.abilityName = temp.voipCallInfo.abilityName;
+        voipCallInfo.voipBundleName = temp.voipCallInfo.voipBundleName;
         return *this;
     }
 };

@@ -98,21 +98,25 @@ void CallAbilityReportProxy::CallStateUpdated(
     }
     CallAttributeInfo info;
     callObjectPtr->GetCallAttributeInfo(info);
-    size_t accountLen = strlen(info.accountNumber);
-    if (accountLen > static_cast<size_t>(kMaxNumberLen)) {
-        accountLen = kMaxNumberLen;
-    }
-    for (size_t i = 0; i < accountLen; i++) {
-        if (info.accountNumber[i] == ',' || info.accountNumber[i] == ';') {
-            info.accountNumber[i] = '\0';
-            break;
+    if (info.callType == CallType::TYPE_VOIP) {
+        ReportCallStateInfo(info);
+    } else {
+        size_t accountLen = strlen(info.accountNumber);
+        if (accountLen > static_cast<size_t>(kMaxNumberLen)) {
+            accountLen = kMaxNumberLen;
         }
+        for (size_t i = 0; i < accountLen; i++) {
+            if (info.accountNumber[i] == ',' || info.accountNumber[i] == ';') {
+                info.accountNumber[i] = '\0';
+                break;
+            }
+        }
+        if (nextState == TelCallState::CALL_STATUS_ANSWERED) {
+            TELEPHONY_LOGI("report answered state");
+            info.callState = TelCallState::CALL_STATUS_ANSWERED;
+        }
+        ReportCallStateInfo(info);
     }
-    if (nextState == TelCallState::CALL_STATUS_ANSWERED) {
-        TELEPHONY_LOGI("report answered state");
-        info.callState = TelCallState::CALL_STATUS_ANSWERED;
-    }
-    ReportCallStateInfo(info);
 }
 
 void CallAbilityReportProxy::CallEventUpdated(CallEventInfo &info)

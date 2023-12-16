@@ -18,16 +18,16 @@
 
 #include <memory>
 
+#include "bluetooth_call_manager.h"
+#include "call_control_manager.h"
+#include "call_manager_service_stub.h"
+#include "call_state_report_proxy.h"
+#include "i_call_status_callback.h"
 #include "iremote_stub.h"
 #include "iservice_registry.h"
 #include "singleton.h"
 #include "system_ability.h"
 #include "system_ability_definition.h"
-
-#include "call_state_report_proxy.h"
-#include "call_manager_service_stub.h"
-#include "call_control_manager.h"
-#include "bluetooth_call_manager.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -723,6 +723,21 @@ public:
      */
     int32_t RequestCameraCapabilities(int32_t callId) override;
 
+    /**
+     * RegisterVoipCallManagerCallback
+     *
+     * @brief notify voip register callstatus callback
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t RegisterVoipCallManagerCallback() override;
+
+    /**
+     * @brief notify voip unregister callstatus callback
+     *
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t UnRegisterVoipCallManagerCallback() override;
+
 private:
     std::string GetBundleName();
 
@@ -732,11 +747,14 @@ private:
         STATE_RUNNING,
     };
 
-    ServiceRunningState state_ {ServiceRunningState::STATE_STOPPED};
-
+    ServiceRunningState state_ { ServiceRunningState::STATE_STOPPED };
+#ifndef TELEPHONY_VOIP_CALL_MANAGER_SYS_ABILITY_ID
+#define TELEPHONY_VOIP_CALL_MANAGER_SYS_ABILITY_ID 65968
+#endif
     std::shared_ptr<CallControlManager> callControlManagerPtr_;
     std::map<uint32_t, sptr<IRemoteObject>> proxyObjectPtrMap_;
     std::vector<std::string> supportSpecialCode_ { "2846579" };
+    sptr<ICallStatusCallback> voipCallCallbackPtr_;
     std::mutex lock_;
     const int32_t startTime_ = 1900;
     const int32_t extraMonth_ = 1;

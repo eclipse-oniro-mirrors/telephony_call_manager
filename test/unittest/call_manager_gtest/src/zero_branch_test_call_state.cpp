@@ -37,6 +37,7 @@
 #include "system_ability_definition.h"
 #include "telephony_log_wrapper.h"
 #include "tone.h"
+#include "voip_call_connection.h"
 #include "wired_headset_device_state.h"
 #include "gtest/gtest.h"
 
@@ -650,6 +651,25 @@ HWTEST_F(CallStateTest, Telephony_CallRequestProcess_003, Function | MediumTest 
     callBase3->callId_ = 3;
     bool enabled = false;
     callRequestProcess->HandleCallWaitingNumOneNext(callBase3, callBase2, callBase1, 1, enabled);
+}
+
+/**
+ * @tc.number   Telephony_VoipCallConnection_001
+ * @tc.name     test error nullptr branch with permission
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallStateTest, Telephony_VoipCallConnection_001, Function | MediumTest | Level3)
+{
+    std::shared_ptr<VoipCallConnection> voipCallConnection = std::make_shared<VoipCallConnection>();
+    int32_t systemAbilityId = 1;
+    voipCallConnection->Init(systemAbilityId);
+    voipCallConnection->UnInit();
+    voipCallConnection->GetCallManagerProxy();
+    VoipCallEvents voipcallevents;
+    voipCallConnection->ReportVoipCallEventChange(voipcallevents);
+    sptr<ICallStatusCallback> callStatusCallback = nullptr;
+    voipCallConnection->RegisterCallManagerCallBack(callStatusCallback);
+    voipCallConnection->UnRegisterCallManagerCallBack();
 }
 } // namespace Telephony
 } // namespace OHOS

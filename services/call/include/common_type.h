@@ -46,6 +46,7 @@ struct DialParaInfo {
     bool isDialing = false;
     bool isEcc = false;
     std::string bundleName = "";
+    VoipCallReportInfo voipCallInfo;
 };
 
 enum PolicyFlag : uint64_t {

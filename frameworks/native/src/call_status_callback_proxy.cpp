@@ -15,11 +15,11 @@
 
 #include "call_status_callback_proxy.h"
 
+#include "call_manager_errors.h"
 #include "message_option.h"
 #include "message_parcel.h"
-
+#include "pixel_map.h"
 #include "telephony_log_wrapper.h"
-#include "call_manager_errors.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -36,9 +36,20 @@ int32_t CallStatusCallbackProxy::UpdateCallReportInfo(const CallReportInfo &info
     if (!dataParcel.WriteInterfaceToken(CallStatusCallbackProxy::GetDescriptor())) {
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
-    int32_t length = sizeof(CallReportInfo);
-    dataParcel.WriteInt32(length);
-    dataParcel.WriteRawData((const void *)&info, length);
+    dataParcel.WriteInt32(info.index);
+    dataParcel.WriteCString(info.accountNum);
+    dataParcel.WriteInt32(info.accountId);
+    dataParcel.WriteInt32(static_cast<int32_t>(info.callType));
+    dataParcel.WriteInt32(static_cast<int32_t>(info.callMode));
+    dataParcel.WriteInt32(static_cast<int32_t>(info.state));
+    dataParcel.WriteInt32(info.voiceDomain);
+    dataParcel.WriteInt32(info.mpty);
+    dataParcel.WriteString(info.voipCallInfo.voipCallId);
+    dataParcel.WriteString(info.voipCallInfo.userName);
+    dataParcel.WriteString(info.voipCallInfo.abilityName);
+    dataParcel.WriteString(info.voipCallInfo.extensionId);
+    dataParcel.WriteString(info.voipCallInfo.voipBundleName);
+    dataParcel.WriteParcelable(info.voipCallInfo.pixelMap.get());
     if (Remote() == nullptr) {
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }

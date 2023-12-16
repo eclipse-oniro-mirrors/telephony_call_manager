@@ -124,6 +124,26 @@ int32_t CallManagerClient::GetCallState()
     }
 }
 
+int32_t CallManagerClient::RegisterVoipCallManagerCallback()
+{
+    if (g_callManagerProxy != nullptr) {
+        return g_callManagerProxy->RegisterVoipCallManagerCallback();
+    } else {
+        TELEPHONY_LOGE("init first please!");
+        return TELEPHONY_ERR_UNINIT;
+    }
+}
+
+int32_t CallManagerClient::UnRegisterVoipCallManagerCallback()
+{
+    if (g_callManagerProxy != nullptr) {
+        return g_callManagerProxy->UnRegisterVoipCallManagerCallback();
+    } else {
+        TELEPHONY_LOGE("init first please!");
+        return TELEPHONY_ERR_UNINIT;
+    }
+}
+
 int32_t CallManagerClient::HoldCall(int32_t callId)
 {
     if (g_callManagerProxy != nullptr) {

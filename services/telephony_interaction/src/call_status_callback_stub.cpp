@@ -18,6 +18,7 @@
 #include <securec.h>
 
 #include "call_manager_errors.h"
+#include "pixel_map.h"
 #include "telephony_log_wrapper.h"
 
 namespace OHOS {
@@ -99,21 +100,25 @@ int32_t CallStatusCallbackStub::OnRemoteRequest(
 int32_t CallStatusCallbackStub::OnUpdateCallReportInfo(MessageParcel &data, MessageParcel &reply)
 {
     int32_t result = TELEPHONY_ERR_FAIL;
-    const CallReportInfo *parcelPtr = nullptr;
+    CallReportInfo parcelPtr;
     if (!data.ContainFileDescriptors()) {
         TELEPHONY_LOGW("sent raw data is less than 32k");
     }
-    int32_t len = data.ReadInt32();
-    if (len <= 0 || len >= MAX_LEN) {
-        TELEPHONY_LOGE("Invalid parameter, len = %{public}d", len);
-        return TELEPHONY_ERR_ARGUMENT_INVALID;
-    }
-    if ((parcelPtr = reinterpret_cast<const CallReportInfo *>(data.ReadRawData(len))) == nullptr) {
-        TELEPHONY_LOGE("reading raw data failed, length = %d", len);
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-
-    result = UpdateCallReportInfo(*parcelPtr);
+    parcelPtr.index = data.ReadInt32();
+    strncpy_s(parcelPtr.accountNum, kMaxNumberLen + 1, data.ReadCString(), kMaxNumberLen + 1);
+    parcelPtr.accountId = data.ReadInt32();
+    parcelPtr.callType = static_cast<CallType>(data.ReadInt32());
+    parcelPtr.callMode = static_cast<VideoStateType>(data.ReadInt32());
+    parcelPtr.state = static_cast<TelCallState>(data.ReadInt32());
+    parcelPtr.voiceDomain = data.ReadInt32();
+    parcelPtr.mpty = data.ReadInt32();
+    parcelPtr.voipCallInfo.voipCallId = data.ReadString();
+    parcelPtr.voipCallInfo.userName = data.ReadString();
+    parcelPtr.voipCallInfo.abilityName = data.ReadString();
+    parcelPtr.voipCallInfo.extensionId = data.ReadString();
+    parcelPtr.voipCallInfo.voipBundleName = data.ReadString();
+    parcelPtr.voipCallInfo.pixelMap = std::shared_ptr<Media::PixelMap>(data.ReadParcelable<Media::PixelMap>());
+    result = UpdateCallReportInfo(parcelPtr);
     if (!reply.WriteInt32(result)) {
         TELEPHONY_LOGE("writing parcel failed");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;

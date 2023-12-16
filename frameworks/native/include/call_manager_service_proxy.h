@@ -688,6 +688,21 @@ public:
      */
     int32_t RequestCameraCapabilities(int32_t callId) override;
 
+    /**
+     * RegisterVoipCallManagerCallback
+     *
+     * @brief notify voip register callstatus call back
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t RegisterVoipCallManagerCallback() override;
+
+    /**
+     * @brief notify voip unregister callstatus callback
+     *
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t UnRegisterVoipCallManagerCallback() override;
+
 private:
     int32_t SendRequest(CallManagerInterfaceCode code);
     int32_t SendRequest(CallManagerInterfaceCode code, MessageParcel &dataParcel, MessageParcel &replyParcel);

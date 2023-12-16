@@ -20,6 +20,7 @@
 #define private public
 #include "addcalltoken_fuzzer.h"
 #include "call_status_callback_proxy.h"
+#include "pixel_map.h"
 
 using namespace OHOS::Telephony;
 namespace OHOS {
@@ -72,7 +73,6 @@ int32_t UpdateCallReportInfo(const uint8_t *data, size_t size)
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
     CallReportInfo callReportInfo;
-    int32_t length = sizeof(CallReportInfo);
     callReportInfo.index = static_cast<int32_t>(size);
     callReportInfo.accountId = static_cast<int32_t>(size % ACCOUNT_ID_NUM);
     callReportInfo.voiceDomain = static_cast<int32_t>(size % VOICE_DOMAIN_NUM);
@@ -83,8 +83,20 @@ int32_t UpdateCallReportInfo(const uint8_t *data, size_t size)
     std::string msg(reinterpret_cast<const char *>(data), size);
     int32_t accountLength = msg.length() > kMaxNumberLen ? kMaxNumberLen : msg.length();
     memcpy_s(callReportInfo.accountNum, kMaxNumberLen, msg.c_str(), accountLength);
-    dataParcel.WriteInt32(length);
-    dataParcel.WriteRawData((const void *)&callReportInfo, length);
+    dataParcel.WriteInt32(callReportInfo.index);
+    dataParcel.WriteCString(callReportInfo.accountNum);
+    dataParcel.WriteInt32(callReportInfo.accountId);
+    dataParcel.WriteInt32(static_cast<int32_t>(callReportInfo.callType));
+    dataParcel.WriteInt32(static_cast<int32_t>(callReportInfo.callMode));
+    dataParcel.WriteInt32(static_cast<int32_t>(callReportInfo.state));
+    dataParcel.WriteInt32(callReportInfo.voiceDomain);
+    dataParcel.WriteInt32(callReportInfo.mpty);
+    dataParcel.WriteString(callReportInfo.voipCallInfo.voipCallId);
+    dataParcel.WriteString(callReportInfo.voipCallInfo.userName);
+    dataParcel.WriteString(callReportInfo.voipCallInfo.abilityName);
+    dataParcel.WriteString(callReportInfo.voipCallInfo.extensionId);
+    dataParcel.WriteString(callReportInfo.voipCallInfo.voipBundleName);
+    dataParcel.WriteParcelable(callReportInfo.voipCallInfo.pixelMap.get());
     dataParcel.RewindRead(0);
     MessageParcel reply;
     return CallStatusCallbackPtr_->OnUpdateCallReportInfo(dataParcel, reply);

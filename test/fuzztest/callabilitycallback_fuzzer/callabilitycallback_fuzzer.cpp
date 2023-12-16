@@ -22,6 +22,7 @@
 #include "call_ability_callback.h"
 #include "call_ability_callback_proxy.h"
 #include "call_manager_callback.h"
+#include "pixel_map.h"
 
 using namespace OHOS::Telephony;
 namespace OHOS {
@@ -83,10 +84,31 @@ int32_t UpdateCallStateInfo(const uint8_t *data, size_t size)
     info.callEndTime = static_cast<time_t>(size);
     info.ringBeginTime = static_cast<time_t>(size);
     info.ringEndTime = static_cast<time_t>(size);
-    int32_t length = sizeof(CallAttributeInfo);
     MessageParcel dataMessageParcel;
-    dataMessageParcel.WriteInt32(length);
-    dataMessageParcel.WriteRawData((const void *)&info, length);
+    dataMessageParcel.WriteCString(info.accountNumber);
+    dataMessageParcel.WriteCString(info.bundleName);
+    dataMessageParcel.WriteBool(info.speakerphoneOn);
+    dataMessageParcel.WriteInt32(info.accountId);
+    dataMessageParcel.WriteInt32(static_cast<int32_t>(info.videoState));
+    dataMessageParcel.WriteInt64(info.startTime);
+    dataMessageParcel.WriteBool(info.isEcc);
+    dataMessageParcel.WriteInt32(static_cast<int32_t>(info.callType));
+    dataMessageParcel.WriteInt32(info.callId);
+    dataMessageParcel.WriteInt32(static_cast<int32_t>(info.callState));
+    dataMessageParcel.WriteInt32(static_cast<int32_t>(info.conferenceState));
+    dataMessageParcel.WriteInt64(info.callBeginTime);
+    dataMessageParcel.WriteInt64(info.callEndTime);
+    dataMessageParcel.WriteInt64(info.ringBeginTime);
+    dataMessageParcel.WriteInt64(info.ringEndTime);
+    dataMessageParcel.WriteInt32(static_cast<int32_t>(info.callDirection));
+    dataMessageParcel.WriteInt32(static_cast<int32_t>(info.answerType));
+    dataMessageParcel.WriteInt32(info.index);
+    dataMessageParcel.WriteString(info.voipCallInfo.voipCallId);
+    dataMessageParcel.WriteString(info.voipCallInfo.userName);
+    dataMessageParcel.WriteString(info.voipCallInfo.abilityName);
+    dataMessageParcel.WriteString(info.voipCallInfo.extensionId);
+    dataMessageParcel.WriteString(info.voipCallInfo.voipBundleName);
+    dataMessageParcel.WriteParcelable(info.voipCallInfo.pixelMap.get());
     dataMessageParcel.RewindRead(0);
     MessageParcel reply;
     MessageOption option;
