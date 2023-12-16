@@ -59,6 +59,7 @@ int32_t CarrierCall::CarrierAnswerCall(int32_t videoState)
         return CALL_ERR_ANSWER_FAILED;
     }
     ret = PackCellularCallInfo(callInfo);
+    callInfo.videoState = videoState;
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGW("PackCellularCallInfo failed!");
         CallManagerHisysevent::WriteAnswerCallFaultEvent(

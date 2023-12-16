@@ -109,6 +109,10 @@ public:
     bool IsAliveState();
     void SetBundleName(const char *bundleName);
     void SetCallType(CallType callType);
+    void SetCrsType(int32_t crsType);
+    int32_t GetCrsType();
+    void SetOriginalCallType(int32_t originalCallType);
+    int32_t GetOriginalCallType();
     virtual void SetSlotId(int32_t slotId) {}
     virtual void SetCallIndex(int32_t index) {}
     virtual int32_t GetCallIndex() {return 0;}
@@ -147,6 +151,8 @@ private:
     time_t ringEndTime_;
     CallAnswerType answerType_;
     int32_t accountId_;
+    int32_t crsType_;
+    int32_t originalCallType_;
     std::mutex mutex_;
 };
 } // namespace Telephony

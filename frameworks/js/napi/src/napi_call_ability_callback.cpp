@@ -492,6 +492,11 @@ int32_t NapiCallAbilityCallback::ReportCallState(CallAttributeInfo &info, EventC
         env, callbackValues[ARRAY_INDEX_FIRST], "callState", static_cast<int32_t>(info.callState));
     NapiCallManagerUtils::SetPropertyInt32(
         env, callbackValues[ARRAY_INDEX_FIRST], "conferenceState", static_cast<int32_t>(info.conferenceState));
+    NapiCallManagerUtils::SetPropertyInt32(
+        env, callbackValues[ARRAY_INDEX_FIRST], "crsType", info.crsType);
+    NapiCallManagerUtils::SetPropertyInt32(
+        env, callbackValues[ARRAY_INDEX_FIRST], "originalCallType", info.originalCallType);
+    TELEPHONY_LOGI("ReportCallState crsType = %{public}d", info.crsType);
     if (info.callType == CallType::TYPE_VOIP) {
         napi_value voipObject = nullptr;
         CreateVoipNapiValue(env, voipObject, info);

@@ -46,6 +46,8 @@ struct DialParaInfo {
     bool isDialing = false;
     bool isEcc = false;
     std::string bundleName = "";
+    int32_t crsType = 0;
+    int32_t originalCallType = 0;
     VoipCallReportInfo voipCallInfo;
 };
 

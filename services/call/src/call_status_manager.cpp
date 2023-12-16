@@ -808,8 +808,14 @@ int32_t CallStatusManager::UpdateCallState(sptr<CallBase> &call, TelCallState ne
 sptr<CallBase> CallStatusManager::RefreshCallIfNecessary(const sptr<CallBase> &call, const CallDetailInfo &info)
 {
     TELEPHONY_LOGI("RefreshCallIfNecessary");
-    if (call->GetVideoStateType() != info.callMode) {
+    if (call->GetCallType() == CallType::TYPE_IMS && call->GetVideoStateType() != info.callMode) {
         call->SetVideoStateType(info.callMode);
+        sptr<IMSCall> imsCall = reinterpret_cast<IMSCall *>(call.GetRefPtr());
+        imsCall->InitVideoCall();
+    }
+    if (call->GetCallType() == CallType::TYPE_IMS) {
+        call->SetCrsType(info.crsType);
+        call->SetOriginalCallType(info.originalCallType);
     }
     if (call->GetCallType() == info.callType) {
         TELEPHONY_LOGI("RefreshCallIfNecessary not need Refresh");
@@ -952,6 +958,8 @@ void CallStatusManager::PackParaInfo(
     paraInfo.callType = info.callType;
     paraInfo.callState = info.state;
     paraInfo.bundleName = info.bundleName;
+    paraInfo.crsType = info.crsType;
+    paraInfo.originalCallType = info.originalCallType;
 }
 } // namespace Telephony
 } // namespace OHOS

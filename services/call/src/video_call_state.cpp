@@ -252,7 +252,7 @@ int32_t AudioOnlyState::ReceiveUpdateCallMediaModeResponse(CallMediaModeInfo &im
             DispatchReportVideoCallInfo(imsCallModeInfo);
             break;
         case ImsCallMode::CALL_MODE_RECEIVE_ONLY:
-            if (status != VideoUpdateStatus::STATUS_SEND_REQUEST) {
+            if (status != VideoUpdateStatus::STATUS_RECV_REQUEST) {
                 return CALL_ERR_VIDEO_ILLEAGAL_SCENARIO;
             }
             (void)SwitchCallVideoState(ImsCallMode::CALL_MODE_RECEIVE_ONLY);

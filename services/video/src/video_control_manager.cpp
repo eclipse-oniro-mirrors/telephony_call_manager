@@ -208,6 +208,11 @@ int32_t VideoControlManager::OpenCamera(
     if (ret == TELEPHONY_SUCCESS) {
         isOpenCamera_ = true;
     }
+    ret = netCall->RequestCameraCapabilities();
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("RequestCameraCapabilities failed!");
+        return ret;
+    }
     return ret;
 }
 

@@ -37,6 +37,8 @@ IMSCall::~IMSCall() {}
 int32_t IMSCall::InitVideoCall()
 {
     if (isInitialized_) {
+        VideoStateType videoStateType = GetVideoStateType();
+        AssignVideoCallState(videoStateType);
         TELEPHONY_LOGI("video call initialize ok!");
         return TELEPHONY_SUCCESS;
     }
@@ -315,10 +317,6 @@ int32_t IMSCall::UpdateImsCallMode(ImsCallMode mode)
 
 int32_t IMSCall::ReportImsCallModeInfo(CallMediaModeInfo &imsCallModeInfo)
 {
-    if (GetTelCallState() != TelCallState::CALL_STATUS_ACTIVE) {
-        TELEPHONY_LOGE("call state is not active");
-        return CALL_ERR_CALL_STATE;
-    }
     TELEPHONY_LOGI("callMode:%{public}d", imsCallModeInfo.callMode);
     return DelayedSingleton<VideoControlManager>::GetInstance()->ReportImsCallModeInfo(imsCallModeInfo);
 }
@@ -360,10 +358,6 @@ int32_t IMSCall::SendUpdateCallMediaModeResponse(ImsCallMode mode)
 int32_t IMSCall::RecieveUpdateCallMediaModeRequest(CallModeReportInfo &response)
 {
     std::lock_guard<std::mutex> lock(videoUpdateMutex_);
-    if (GetTelCallState() != TelCallState::CALL_STATUS_ACTIVE) {
-        TELEPHONY_LOGE("call state is not active");
-        return CALL_ERR_CALL_STATE;
-    }
     if (videoCallState_ == nullptr) {
         TELEPHONY_LOGE("unexpected null pointer");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -380,10 +374,6 @@ int32_t IMSCall::RecieveUpdateCallMediaModeRequest(CallModeReportInfo &response)
 int32_t IMSCall::ReceiveUpdateCallMediaModeResponse(CallModeReportInfo &response)
 {
     std::lock_guard<std::mutex> lock(videoUpdateMutex_);
-    if (GetTelCallState() != TelCallState::CALL_STATUS_ACTIVE) {
-        TELEPHONY_LOGE("call state is not active");
-        return CALL_ERR_CALL_STATE;
-    }
     if (videoCallState_ == nullptr) {
         TELEPHONY_LOGE("unexpected null pointer");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;

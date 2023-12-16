@@ -33,7 +33,7 @@ CallBase::CallBase(DialParaInfo &info)
       direction_(CallDirection::CALL_DIRECTION_IN), policyFlag_(0), callState_(info.callState), autoAnswerState_(false),
       canUnHoldState_(true), isSpeakerphoneOn_(false), callEndedType_(CallEndedType::UNKNOWN), callBeginTime_(0),
       callEndTime_(0), ringBeginTime_(0), ringEndTime_(0), answerType_(CallAnswerType::CALL_ANSWER_MISSED),
-      accountId_(info.accountId)
+      accountId_(info.accountId), crsType_(info.crsType), originalCallType_(info.originalCallType)
 {
     (void)memset_s(&contactInfo_, sizeof(ContactInfo), 0, sizeof(ContactInfo));
 }
@@ -45,7 +45,8 @@ CallBase::CallBase(DialParaInfo &info, AppExecFwk::PacMap &extras)
       direction_(CallDirection::CALL_DIRECTION_OUT), policyFlag_(0), callState_(info.callState),
       autoAnswerState_(false), canUnHoldState_(true), isSpeakerphoneOn_(false), callEndedType_(CallEndedType::UNKNOWN),
       callBeginTime_(0), callEndTime_(0), ringBeginTime_(0), ringEndTime_(0),
-      answerType_(CallAnswerType::CALL_ANSWER_MISSED), accountId_(info.accountId)
+      answerType_(CallAnswerType::CALL_ANSWER_MISSED), accountId_(info.accountId), crsType_(info.crsType),
+      originalCallType_(info.originalCallType)
 {
     (void)memset_s(&contactInfo_, sizeof(ContactInfo), 0, sizeof(ContactInfo));
 }
@@ -104,6 +105,8 @@ void CallBase::GetCallAttributeBaseInfo(CallAttributeInfo &info)
         info.callDirection = direction_;
         info.answerType = answerType_;
         info.accountId = accountId_;
+        info.crsType = crsType_;
+        info.originalCallType = originalCallType_;
         if (bundleName_.length() > static_cast<size_t>(kMaxBundleNameLen)) {
             TELEPHONY_LOGE("Number out of limit!");
             return;
@@ -294,6 +297,30 @@ void CallBase::SetVideoStateType(VideoStateType mediaType)
 {
     std::lock_guard<std::mutex> lock(mutex_);
     videoState_ = mediaType;
+}
+
+int32_t CallBase::GetCrsType()
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    return crsType_;
+}
+
+void CallBase::SetCrsType(int32_t crsType)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    crsType_ = crsType;
+}
+
+int32_t CallBase::GetOriginalCallType()
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    return originalCallType_;
+}
+
+void CallBase::SetOriginalCallType(int32_t originalCallType)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    originalCallType_ = originalCallType;
 }
 
 void CallBase::SetPolicyFlag(PolicyFlag flag)
