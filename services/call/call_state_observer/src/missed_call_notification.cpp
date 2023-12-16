@@ -34,6 +34,9 @@ MissedCallNotification::MissedCallNotification() : isIncomingCallMissed_(true), 
 
 void MissedCallNotification::NewCallCreated(sptr<CallBase> &callObjectPtr)
 {
+    if (callObjectPtr != nullptr && callObjectPtr->GetCallType() == CallType::TYPE_VOIP) {
+        return;
+    }
     if (callObjectPtr != nullptr && callObjectPtr->GetTelCallState() == TelCallState::CALL_STATUS_INCOMING &&
         !callObjectPtr->GetAccountNumber().empty()) {
         incomingCallNumber_ = callObjectPtr->GetAccountNumber();
@@ -46,6 +49,10 @@ void MissedCallNotification::NewCallCreated(sptr<CallBase> &callObjectPtr)
 void MissedCallNotification::CallStateUpdated(
     sptr<CallBase> &callObjectPtr, TelCallState priorState, TelCallState nextState)
 {
+    if (callObjectPtr != nullptr && callObjectPtr->GetCallType() == CallType::TYPE_VOIP) {
+        TELEPHONY_LOGI("Voip call should not save  missed notification");
+        return;
+    }
     if (callObjectPtr != nullptr && nextState == TelCallState::CALL_STATUS_DISCONNECTED &&
         callObjectPtr->GetAccountNumber() == incomingCallNumber_ && isIncomingCallMissed_) {
         PublishMissedCallEvent(callObjectPtr);

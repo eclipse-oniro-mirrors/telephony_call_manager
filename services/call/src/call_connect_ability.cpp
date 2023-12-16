@@ -53,6 +53,14 @@ void CallConnectAbility::ConnectAbility(const CallAttributeInfo &info)
     wantParams.SetParam("accountId", AAFwk::Integer::Box(static_cast<int32_t>(info.accountId)));
     wantParams.SetParam("isEcc", AAFwk::Integer::Box(static_cast<bool>(info.isEcc)));
     wantParams.SetParam("conferenceState", AAFwk::Integer::Box(static_cast<int32_t>(info.conferenceState)));
+    if (info.callType == CallType::TYPE_VOIP) {
+        TELEPHONY_LOGI("Connect callui ability voip call");
+        wantParams.SetParam("userName", AAFwk::String::Box(std::string(info.voipCallInfo.userName)));
+        wantParams.SetParam("extensionId", AAFwk::String::Box(std::string(info.voipCallInfo.extensionId)));
+        wantParams.SetParam("voipBundleName", AAFwk::String::Box(std::string(info.voipCallInfo.voipBundleName)));
+        wantParams.SetParam("abilityName", AAFwk::String::Box(std::string(info.voipCallInfo.abilityName)));
+        wantParams.SetParam("voipCallId", AAFwk::String::Box(std::string(info.voipCallInfo.voipCallId)));
+    }
     want.SetParams(wantParams);
     if (connectCallback_ == nullptr) {
         connectCallback_ = new CallAbilityConnectCallback();

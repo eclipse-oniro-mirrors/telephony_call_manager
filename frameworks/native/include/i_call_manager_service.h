@@ -109,6 +109,8 @@ public:
     virtual int32_t ReportAudioDeviceInfo() = 0;
     virtual int32_t CancelCallUpgrade(int32_t callId) = 0;
     virtual int32_t RequestCameraCapabilities(int32_t callId) = 0;
+    virtual int32_t RegisterVoipCallManagerCallback() = 0;
+    virtual int32_t UnRegisterVoipCallManagerCallback() = 0;
 
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"OHOS.Telephony.ICallManagerService");

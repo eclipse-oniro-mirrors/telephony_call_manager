@@ -601,6 +601,20 @@ public:
      * @return Returns 0 on success, others on failure.
      */
     int32_t RequestCameraCapabilities(int32_t callId);
+
+    /**
+     * @brief notify voip register callstatus callback
+     *
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t RegisterVoipCallManagerCallback();
+
+    /**
+     * @brief notify voip unregister callstatus callback
+     *
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t UnRegisterVoipCallManagerCallback();
 };
 } // namespace Telephony
 } // namespace OHOS

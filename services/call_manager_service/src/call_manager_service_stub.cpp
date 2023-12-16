@@ -40,6 +40,7 @@ CallManagerServiceStub::CallManagerServiceStub()
     InitCallMultimediaRequest();
     InitImsServiceRequest();
     InitOttServiceRequest();
+    InitVoipOperationRequest();
     memberFuncMap_[INTERFACE_GET_PROXY_OBJECT_PTR] = &CallManagerServiceStub::OnGetProxyObjectPtr;
 }
 
@@ -216,6 +217,37 @@ void CallManagerServiceStub::InitOttServiceRequest()
         &CallManagerServiceStub::OnReportOttCallDetailsInfo;
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_REPORT_OTT_CALL_EVENT_INFO)] =
         &CallManagerServiceStub::OnReportOttCallEventInfo;
+}
+
+void CallManagerServiceStub::InitVoipOperationRequest()
+{
+    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_VOIP_REGISTER_CALLBACK)] =
+        &CallManagerServiceStub::OnRegisterVoipCallManagerCallback;
+    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_VOIP_UNREGISTER_CALLBACK)] =
+        &CallManagerServiceStub::OnUnRegisterVoipCallManagerCallback;
+}
+
+int32_t CallManagerServiceStub::OnRegisterVoipCallManagerCallback(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t result = RegisterVoipCallManagerCallback();
+    TELEPHONY_LOGI("OnRegisterVoipCallManagerCallback result:%{public}d", result);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("OnRegisterVoipCallManagerCallback write reply failed.");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallManagerServiceStub::OnUnRegisterVoipCallManagerCallback(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t result = TELEPHONY_ERR_FAIL;
+    result = UnRegisterVoipCallManagerCallback();
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("fail to write parcel");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return result;
 }
 
 int32_t CallManagerServiceStub::OnRemoteRequest(

@@ -20,6 +20,7 @@
 #include "call_manager_errors.h"
 #include "call_manager_hisysevent.h"
 #include "hitrace_meter.h"
+#include "pixel_map.h"
 #include "report_call_info_handler.h"
 #include "telephony_log_wrapper.h"
 
@@ -35,6 +36,14 @@ CallStatusCallback::~CallStatusCallback() {}
 int32_t CallStatusCallback::UpdateCallReportInfo(const CallReportInfo &info)
 {
     CallDetailInfo detailInfo;
+    if (info.callType == CallType::TYPE_VOIP) {
+        detailInfo.voipCallInfo.voipCallId = info.voipCallInfo.voipCallId;
+        detailInfo.voipCallInfo.userName = info.voipCallInfo.userName;
+        detailInfo.voipCallInfo.pixelMap = info.voipCallInfo.pixelMap;
+        detailInfo.voipCallInfo.extensionId = info.voipCallInfo.extensionId;
+        detailInfo.voipCallInfo.voipBundleName = info.voipCallInfo.voipBundleName;
+        detailInfo.voipCallInfo.abilityName = info.voipCallInfo.abilityName;
+    }
     detailInfo.callType = info.callType;
     detailInfo.accountId = info.accountId;
     detailInfo.index = info.index;

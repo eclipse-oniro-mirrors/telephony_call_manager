@@ -48,17 +48,21 @@ public:
     int32_t HandleDisconnectedCause(const DisconnectedDetails &details);
     int32_t HandleEventResultReportInfo(const CellularCallEventInfo &info);
     int32_t HandleOttEventReportInfo(const OttCallEventInfo &info);
+    int32_t HandleVoipCallReportInfo(const CallDetailInfo &info);
     void CallFilterCompleteResult(const CallDetailInfo &info);
 
 private:
     void InitCallBaseEvent();
     int32_t IncomingHandle(const CallDetailInfo &info);
+    int32_t IncomingVoipCallHandle(const CallDetailInfo &info);
     int32_t DialingHandle(const CallDetailInfo &info);
     int32_t ActiveHandle(const CallDetailInfo &info);
+    int32_t ActiveVoipCallHandle(const CallDetailInfo &info);
     int32_t HoldingHandle(const CallDetailInfo &info);
     int32_t WaitingHandle(const CallDetailInfo &info);
     int32_t AlertHandle(const CallDetailInfo &info);
     int32_t DisconnectingHandle(const CallDetailInfo &info);
+    int32_t DisconnectedVoipCallHandle(const CallDetailInfo &info);
     int32_t DisconnectedHandle(const CallDetailInfo &info);
     void IsCanUnHold(int32_t activeCallNum, int32_t waitingCallNum, int32_t size, bool &canUnHold);
     void AutoAnswer(int32_t activeCallNum, int32_t waitingCallNum);

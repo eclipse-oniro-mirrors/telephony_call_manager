@@ -31,6 +31,21 @@ constexpr int32_t DIAL_TYPE_NUM = 3;
 constexpr int32_t CALL_TYPE_NUM = 3;
 constexpr int32_t CALL_ID_NUM = 10;
 
+void OnRegisterVoipCallManagerCallback(const uint8_t *data, size_t size)
+{
+    if (!IsServiceInited()) {
+        return;
+    }
+    MessageParcel dataMessageParcel;
+    std::unique_ptr<CallAbilityCallback> callbackWrap = std::make_unique<CallAbilityCallback>();
+    if (callbackWrap == nullptr) {
+        return;
+    }
+    dataMessageParcel.WriteRemoteObject(callbackWrap.release()->AsObject().GetRefPtr());
+    MessageParcel reply;
+    DelayedSingleton<CallManagerService>::GetInstance()->OnRegisterVoipCallManagerCallback(dataMessageParcel, reply);
+}
+
 void OnRemoteRequest(const uint8_t *data, size_t size)
 {
     if (!IsServiceInited()) {
@@ -271,6 +286,7 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     if (data == nullptr || size == 0) {
         return;
     }
+    OnRegisterVoipCallManagerCallback(data, size);
     OnRemoteRequest(data, size);
     OnRegisterCallBack(data, size);
     HasCall(data, size);

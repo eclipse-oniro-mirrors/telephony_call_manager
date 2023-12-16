@@ -68,6 +68,10 @@ void CallRecordsManager::Init()
 void CallRecordsManager::CallStateUpdated(
     sptr<CallBase> &callObjectPtr, TelCallState priorState, TelCallState nextState)
 {
+    if (callObjectPtr != nullptr && callObjectPtr->GetCallType() == CallType::TYPE_VOIP) {
+        TELEPHONY_LOGI("Voip call should not save cellular call records");
+        return;
+    }
     CallAttributeInfo info;
     if (nextState != TelCallState::CALL_STATUS_DISCONNECTED) {
         return;

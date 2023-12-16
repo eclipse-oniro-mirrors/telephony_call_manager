@@ -17,6 +17,9 @@
 
 #include <thread>
 
+#include "audio_player.h"
+#include "call_base.h"
+#include "call_object_manager.h"
 #include "telephony_log_wrapper.h"
 
 #include "audio_player.h"
@@ -116,6 +119,11 @@ int32_t Ring::Stop()
 
 int32_t Ring::StartVibrate()
 {
+    sptr<CallBase> call = CallObjectManager::GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_RINGING);
+    if (call != nullptr && call->GetCallType() == CallType::TYPE_VOIP) {
+        TELEPHONY_LOGI("Voip call controls the start vibrate on its own, no need to use cellular vibrate");
+        return false;
+    }
     if (DelayedSingleton<AudioProxy>::GetInstance()->StartVibrate() == TELEPHONY_SUCCESS) {
         isVibrating_ = true;
         return TELEPHONY_SUCCESS;

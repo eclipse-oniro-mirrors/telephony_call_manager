@@ -31,6 +31,7 @@
 #include "telephony_log_wrapper.h"
 #include "telephony_permission.h"
 #include "video_control_manager.h"
+#include "voip_call_connection.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -402,6 +403,23 @@ int32_t CallManagerService::IsNewCallAllowed(bool &enabled)
         TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
+}
+
+int32_t CallManagerService::RegisterVoipCallManagerCallback()
+{
+    DelayedSingleton<VoipCallConnection>::GetInstance()->Init(TELEPHONY_VOIP_CALL_MANAGER_SYS_ABILITY_ID);
+    voipCallCallbackPtr_ = (std::make_unique<CallStatusCallback>()).release();
+    if (voipCallCallbackPtr_ == nullptr) {
+        TELEPHONY_LOGE("voipCallCallbackPtr_ is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    DelayedSingleton<VoipCallConnection>::GetInstance()->RegisterCallManagerCallBack(voipCallCallbackPtr_);
+    return 0;
+}
+
+int32_t CallManagerService::UnRegisterVoipCallManagerCallback()
+{
+    return DelayedSingleton<VoipCallConnection>::GetInstance()->UnRegisterCallManagerCallBack();
 }
 
 int32_t CallManagerService::IsRinging(bool &enabled)

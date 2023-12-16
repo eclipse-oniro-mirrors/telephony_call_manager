@@ -18,12 +18,13 @@
 #include <cstddef>
 #include <cstdint>
 #define private public
+#define protected public
 #include "addcalltoken_fuzzer.h"
 #include "cs_call.h"
 #include "ims_call.h"
 #include "ott_call.h"
 #include "surface_utils.h"
-
+#include "voip_call.h"
 
 using namespace OHOS::Telephony;
 namespace OHOS {
@@ -221,6 +222,45 @@ void IMSCallFunc(const uint8_t *data, size_t size)
     callObjectPtr->SetMute(mute, slotId);
 }
 
+void VoIPCallFunc(const uint8_t *data, size_t size)
+{
+    if (!IsServiceInited()) {
+        return;
+    }
+    CallAttributeInfo info;
+    DialParaInfo dialParaInfo;
+    int32_t mainCallId = 0;
+    VoipCallEvents voipcallInfo;
+    std::vector<std::u16string> callIdList;
+    int32_t videoState = static_cast<int32_t>(size % VIDIO_TYPE_NUM);
+    sptr<VoIPCall> voipCall = std::make_unique<VoIPCall>(dialParaInfo).release();
+
+    voipCall->DialingProcess();
+    voipCall->AnswerCall(videoState);
+    voipCall->PackVoipCallInfo(voipcallInfo);
+    voipCall->RejectCall();
+    voipCall->HangUpCall();
+    voipCall->HoldCall();
+    voipCall->UnHoldCall();
+    voipCall->SwitchCall();
+    voipCall->SetMute(0, 0);
+    voipCall->GetCallAttributeInfo(info);
+    voipCall->CombineConference();
+    voipCall->HandleCombineConferenceFailEvent();
+    voipCall->SeparateConference();
+    voipCall->KickOutFromConference();
+    voipCall->CanCombineConference();
+    voipCall->CanSeparateConference();
+    voipCall->CanKickOutFromConference();
+    voipCall->GetMainCallId(mainCallId);
+    voipCall->GetSubCallIdList(callIdList);
+    voipCall->GetCallIdListForConference(callIdList);
+    voipCall->IsSupportConferenceable();
+    voipCall->LaunchConference();
+    voipCall->ExitConference();
+    voipCall->HoldConference();
+}
+
 void IMSVideoCallFunc(const uint8_t *data, size_t size)
 {
     if (!IsServiceInited()) {
@@ -401,6 +441,7 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     IMSVideoCallFunc(data, size);
     IMSVideoCallWindowFunc(data, size);
     OttCallFunc(data, size);
+    VoIPCallFunc(data, size);
     OttVideoCallFunc(data, size);
 }
 } // namespace OHOS

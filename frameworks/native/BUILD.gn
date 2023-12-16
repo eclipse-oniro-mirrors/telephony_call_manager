@@ -40,6 +40,7 @@ ohos_shared_library("tel_call_manager_api") {
     "src/call_manager_service_proxy.cpp",
     "src/call_status_callback_proxy.cpp",
     "src/cellular_call_proxy.cpp",
+    "src/voip_call_manager_proxy.cpp",
   ]
 
   public_configs = [ ":call_manager_config" ]
@@ -53,6 +54,8 @@ ohos_shared_library("tel_call_manager_api") {
     "core_service:tel_core_service_api",
     "graphic_2d:surface",
     "hilog:libhilog",
+    "image_framework:image",
+    "image_framework:image_native",
     "init:libbegetutil",
     "ipc:ipc_single",
     "safwk:system_ability_fwk",

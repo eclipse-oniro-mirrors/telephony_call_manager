@@ -31,6 +31,7 @@
 #include "ott_call.h"
 #include "report_call_info_handler.h"
 #include "telephony_log_wrapper.h"
+#include "voip_call.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -87,6 +88,10 @@ int32_t CallStatusManager::HandleCallReportInfo(const CallDetailInfo &info)
 {
     int32_t ret = TELEPHONY_ERR_FAIL;
     callReportInfo_ = info;
+    if (info.callType == CallType::TYPE_VOIP) {
+        ret = HandleVoipCallReportInfo(info);
+        return ret;
+    }
     switch (info.state) {
         case TelCallState::CALL_STATUS_ACTIVE:
             ret = ActiveHandle(info);
@@ -197,6 +202,30 @@ int32_t CallStatusManager::HandleCallsReportInfo(const CallDetailsInfo &info)
     callDetailsInfo_[curSlotId].callVec.clear();
     callDetailsInfo_[curSlotId] = info;
     return TELEPHONY_SUCCESS;
+}
+
+int32_t CallStatusManager::HandleVoipCallReportInfo(const CallDetailInfo &info)
+{
+    TELEPHONY_LOGI("Entry CallStatusManager HandleVoipCallReportInfo");
+    int32_t ret = TELEPHONY_ERR_FAIL;
+    callReportInfo_ = info;
+    switch (info.state) {
+        case TelCallState::CALL_STATUS_ACTIVE:
+            ret = ActiveVoipCallHandle(info);
+            break;
+        case TelCallState::CALL_STATUS_INCOMING: {
+            ret = IncomingVoipCallHandle(info);
+            break;
+        }
+        case TelCallState::CALL_STATUS_DISCONNECTED:
+            ret = DisconnectedVoipCallHandle(info);
+            break;
+        default:
+            TELEPHONY_LOGE("Invalid call state!");
+            break;
+    }
+    DelayedSingleton<BluetoothCallService>::GetInstance()->GetCallState();
+    return ret;
 }
 
 int32_t CallStatusManager::HandleDisconnectedCause(const DisconnectedDetails &details)
@@ -323,6 +352,28 @@ int32_t CallStatusManager::IncomingHandle(const CallDetailInfo &info)
     ret = FilterResultsDispose(call);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("FilterResultsDispose failed!");
+    }
+    return ret;
+}
+
+int32_t CallStatusManager::IncomingVoipCallHandle(const CallDetailInfo &info)
+{
+    int32_t ret = TELEPHONY_ERROR;
+    sptr<CallBase> call = GetOneCallObjectByIndex(info.index);
+    if (call != nullptr && call->GetCallType() != info.callType) {
+        call = RefreshCallIfNecessary(call, info);
+        return TELEPHONY_SUCCESS;
+    }
+    call = CreateNewCall(info, CallDirection::CALL_DIRECTION_IN);
+    if (call == nullptr) {
+        TELEPHONY_LOGE("CreateVoipCall failed!");
+        return CALL_ERR_CALL_OBJECT_IS_NULL;
+    }
+    DelayedSingleton<CallControlManager>::GetInstance()->NotifyNewCallCreated(call);
+    ret = UpdateCallState(call, info.state);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("UpdateCallState failed!");
+        return ret;
     }
     return ret;
 }
@@ -467,6 +518,24 @@ int32_t CallStatusManager::ActiveHandle(const CallDetailInfo &info)
     return ret;
 }
 
+int32_t CallStatusManager::ActiveVoipCallHandle(const CallDetailInfo &info)
+{
+    TELEPHONY_LOGI("handle active state");
+    sptr<CallBase> call = GetOneCallObjectByIndexAndSlotId(info.index, info.accountId);
+    if (call == nullptr) {
+        TELEPHONY_LOGE("voip Call is NULL");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    call = RefreshCallIfNecessary(call, info);
+    int32_t ret = UpdateCallState(call, TelCallState::CALL_STATUS_ACTIVE);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("UpdateCallState failed, errCode:%{public}d", ret);
+        return ret;
+    }
+    TELEPHONY_LOGI("handle active state success");
+    return ret;
+}
+
 int32_t CallStatusManager::HoldingHandle(const CallDetailInfo &info)
 {
     TELEPHONY_LOGI("handle holding state");
@@ -549,6 +618,25 @@ int32_t CallStatusManager::DisconnectingHandle(const CallDetailInfo &info)
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("UpdateCallState failed, errCode:%{public}d", ret);
     }
+    return ret;
+}
+
+int32_t CallStatusManager::DisconnectedVoipCallHandle(const CallDetailInfo &info)
+{
+    TELEPHONY_LOGI("handle disconnected voip call state");
+    sptr<CallBase> call = GetOneCallObjectByIndexAndSlotId(info.index, info.accountId);
+    if (call == nullptr) {
+        TELEPHONY_LOGE("voip Call is NULL");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    call = RefreshCallIfNecessary(call, info);
+    int32_t ret = UpdateCallState(call, TelCallState::CALL_STATUS_DISCONNECTED);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("UpdateCallState failed, errCode:%{public}d", ret);
+        return ret;
+    }
+    DeleteOneCallObject(call->GetCallID());
+    TELEPHONY_LOGI("handle disconnected voip call state success");
     return ret;
 }
 
@@ -825,6 +913,10 @@ sptr<CallBase> CallStatusManager::CreateNewCall(const CallDetailInfo &info, Call
             }
             break;
         }
+        case CallType::TYPE_VOIP: {
+            callPtr = (std::make_unique<VoIPCall>(paraInfo)).release();
+            break;
+        }
         default:
             return nullptr;
     }
@@ -843,6 +935,14 @@ void CallStatusManager::PackParaInfo(
     paraInfo.dialType = DialType::DIAL_CARRIER_TYPE;
     if (dir == CallDirection::CALL_DIRECTION_OUT) {
         DelayedSingleton<CallControlManager>::GetInstance()->GetDialParaInfo(paraInfo, extras);
+    }
+    if (info.callType == CallType::TYPE_VOIP) {
+        paraInfo.voipCallInfo.voipCallId = info.voipCallInfo.voipCallId;
+        paraInfo.voipCallInfo.userName = info.voipCallInfo.userName;
+        paraInfo.voipCallInfo.pixelMap = info.voipCallInfo.pixelMap;
+        paraInfo.voipCallInfo.abilityName = info.voipCallInfo.abilityName;
+        paraInfo.voipCallInfo.extensionId = info.voipCallInfo.extensionId;
+        paraInfo.voipCallInfo.voipBundleName = info.voipCallInfo.voipBundleName;
     }
     paraInfo.number = info.phoneNum;
     paraInfo.callId = GetNewCallId();

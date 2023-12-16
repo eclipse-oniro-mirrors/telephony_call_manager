@@ -45,6 +45,7 @@ private:
     void InitCallMultimediaRequest();
     void InitImsServiceRequest();
     void InitOttServiceRequest();
+    void InitVoipOperationRequest();
 
     int32_t OnRegisterCallBack(MessageParcel &data, MessageParcel &reply);
     int32_t OnUnRegisterCallBack(MessageParcel &data, MessageParcel &reply);
@@ -114,6 +115,8 @@ private:
     int32_t OnReportAudioDeviceInfo(MessageParcel &data, MessageParcel &reply);
     int32_t OnCancelCallUpgrade(MessageParcel &data, MessageParcel &reply);
     int32_t OnRequestCameraCapabilities(MessageParcel &data, MessageParcel &reply);
+    int32_t OnRegisterVoipCallManagerCallback(MessageParcel &data, MessageParcel &reply);
+    int32_t OnUnRegisterVoipCallManagerCallback(MessageParcel &data, MessageParcel &reply);
     std::map<uint32_t, CallManagerServiceFunc> memberFuncMap_;
 };
 } // namespace Telephony

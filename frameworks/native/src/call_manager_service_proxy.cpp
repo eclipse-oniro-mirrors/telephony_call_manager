@@ -149,6 +149,21 @@ int32_t CallManagerServiceProxy::HoldCall(int32_t callId)
     return replyParcel.ReadInt32();
 }
 
+int32_t CallManagerServiceProxy::RegisterVoipCallManagerCallback()
+{
+    int32_t error = SendRequest(INTERFACE_VOIP_REGISTER_CALLBACK);
+    if (error != ERR_NONE) {
+        TELEPHONY_LOGE("function RegisterVoipCallManagerCallback failed! errCode:%{public}d", error);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return 0;
+}
+
+int32_t CallManagerServiceProxy::UnRegisterVoipCallManagerCallback()
+{
+    return SendRequest(INTERFACE_VOIP_UNREGISTER_CALLBACK);
+}
+
 int32_t CallManagerServiceProxy::UnHoldCall(int32_t callId)
 {
     MessageParcel dataParcel;

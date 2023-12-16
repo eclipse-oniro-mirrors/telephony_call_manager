@@ -108,6 +108,10 @@ enum class CallType {
      * Indicates the call type is OTHER.
      */
     TYPE_ERR_CALL = 3,
+    /**
+     * Indicates the call type is VoIP.
+     */
+    TYPE_VOIP = 4,
 };
 
 /**

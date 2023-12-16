@@ -55,7 +55,8 @@
                 "power_manager",
                 "safwk",
                 "samgr",
-                "sms_mms"
+                "sms_mms",
+                "image_framework"
             ],
             "third_party": [
                 "libphonenumber",

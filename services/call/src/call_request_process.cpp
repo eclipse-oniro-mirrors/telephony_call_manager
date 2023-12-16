@@ -96,6 +96,25 @@ void CallRequestProcess::AnswerRequest(int32_t callId, int32_t videoState)
         TELEPHONY_LOGE("the call object is nullptr, callId:%{public}d", callId);
         return;
     }
+    if (call->GetCallType() == CallType::TYPE_VOIP) {
+        int32_t ret = call->AnswerCall(videoState);
+        if (ret != TELEPHONY_SUCCESS) {
+            TELEPHONY_LOGE("AnswerCall failed!");
+            return;
+        }
+        DelayedSingleton<CallControlManager>::GetInstance()->NotifyIncomingCallAnswered(call);
+        return;
+    } else {
+        std::list<int32_t> callIdList;
+        GetCarrierCallList(callIdList);
+        for (int32_t otherCallId : callIdList) {
+            sptr<CallBase> call = GetOneCallObject(otherCallId);
+            if (call->GetCallType() == CallType::TYPE_VOIP) {
+                TELEPHONY_LOGI("Hangup voip call");
+                call->HangUpCall();
+            }
+        }
+    }
     int32_t slotId = call->GetSlotId();
     if (IsDsdsMode3()) {
         DisconnectOtherSubIdCall(callId, slotId, videoState);

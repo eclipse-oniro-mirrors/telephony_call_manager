@@ -26,6 +26,7 @@
 #include "call_manager_service.h"
 #include "surface_utils.h"
 #include "telephony_types.h"
+#include "voip_call.h"
 
 using namespace OHOS::Bluetooth;
 namespace OHOS {
@@ -1027,6 +1028,21 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_HoldCall_0400, Function | Mediu
     CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_200_MS, SLEEP_30000_MS);
     ASSERT_TRUE(blueToothClientPtr_ != nullptr);
     EXPECT_NE(CallManagerGtest::blueToothClientPtr_->HoldCall(), RETURN_VALUE_IS_ZERO);
+}
+
+/**
+ * @tc.number   Telephony_CallManager_RegisterVoipCallManagerCallback_0100
+ * @tc.name     register callback to call manager service
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_RegisterVoipCallManagerCallback_0100, Function | MediumTest | Level2)
+{
+    AccessToken token;
+    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_200_MS, SLEEP_30000_MS);
+    EXPECT_NE(CallManagerGtest::clientPtr_->RegisterVoipCallManagerCallback(), RETURN_VALUE_IS_ZERO);
 }
 
 /******************************************* Test UnHoldCall() *********************************************/
@@ -5619,6 +5635,46 @@ HWTEST_F(CallManagerGtest, Telephony_CallManagerService_002, Function | MediumTe
     ASSERT_NE(callManagerService->JoinConference(false, numberList), TELEPHONY_SUCCESS);
     std::vector<OttCallDetailsInfo> ottVec;
     ASSERT_NE(callManagerService->ReportOttCallDetailsInfo(ottVec), TELEPHONY_SUCCESS);
+}
+
+/**
+ * @tc.number   Telephony_VoipCall_001
+ * @tc.name     test error nullptr branch with permission
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_VoipCall_001, Function | MediumTest | Level3)
+{
+    AccessToken token;
+    DialParaInfo dialInfo;
+    std::shared_ptr<VoIPCall> voIPCall = std::make_shared<VoIPCall>(dialInfo);
+    EXPECT_EQ(voIPCall->DialingProcess(), TELEPHONY_SUCCESS);
+    EXPECT_EQ(voIPCall->AnswerCall(0), TELEPHONY_SUCCESS);
+    VoipCallEvents voipcallInfo;
+    EXPECT_EQ(voIPCall->PackVoipCallInfo(voipcallInfo), TELEPHONY_SUCCESS);
+    EXPECT_EQ(voIPCall->RejectCall(), TELEPHONY_SUCCESS);
+    EXPECT_EQ(voIPCall->HangUpCall(), TELEPHONY_SUCCESS);
+    EXPECT_EQ(voIPCall->HoldCall(), TELEPHONY_SUCCESS);
+    EXPECT_EQ(voIPCall->UnHoldCall(), TELEPHONY_SUCCESS);
+    EXPECT_EQ(voIPCall->SwitchCall(), TELEPHONY_SUCCESS);
+    EXPECT_EQ(voIPCall->SetMute(0, 0), TELEPHONY_SUCCESS);
+    CallAttributeInfo info;
+    voIPCall->GetCallAttributeInfo(info);
+    EXPECT_EQ(voIPCall->CombineConference(), TELEPHONY_SUCCESS);
+    voIPCall->HandleCombineConferenceFailEvent();
+    EXPECT_EQ(voIPCall->SeparateConference(), TELEPHONY_SUCCESS);
+    EXPECT_EQ(voIPCall->KickOutFromConference(), TELEPHONY_SUCCESS);
+    EXPECT_EQ(voIPCall->CanCombineConference(), TELEPHONY_SUCCESS);
+    EXPECT_EQ(voIPCall->CanSeparateConference(), TELEPHONY_SUCCESS);
+    EXPECT_EQ(voIPCall->CanKickOutFromConference(), TELEPHONY_SUCCESS);
+    int32_t mainCallId = 0;
+    EXPECT_EQ(voIPCall->GetMainCallId(mainCallId), TELEPHONY_SUCCESS);
+    std::vector<std::u16string> callIdList;
+    EXPECT_EQ(voIPCall->GetSubCallIdList(callIdList), TELEPHONY_SUCCESS);
+    EXPECT_EQ(voIPCall->GetCallIdListForConference(callIdList), TELEPHONY_SUCCESS);
+    EXPECT_EQ(voIPCall->IsSupportConferenceable(), TELEPHONY_SUCCESS);
+    EXPECT_EQ(voIPCall->LaunchConference(), TELEPHONY_SUCCESS);
+    EXPECT_EQ(voIPCall->ExitConference(), TELEPHONY_SUCCESS);
+    EXPECT_EQ(voIPCall->HoldConference(), TELEPHONY_SUCCESS);
 }
 
 #else // TEL_TEST_UNSUPPORT

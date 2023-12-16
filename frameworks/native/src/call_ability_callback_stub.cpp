@@ -18,6 +18,7 @@
 #include <securec.h>
 
 #include "call_manager_errors.h"
+#include "pixel_map.h"
 #include "telephony_log_wrapper.h"
 
 namespace OHOS {
@@ -82,22 +83,35 @@ int32_t CallAbilityCallbackStub::OnRemoteRequest(
 int32_t CallAbilityCallbackStub::OnUpdateCallStateInfo(MessageParcel &data, MessageParcel &reply)
 {
     int32_t result = TELEPHONY_SUCCESS;
-    const CallAttributeInfo *parcelPtr = nullptr;
-    int32_t len = data.ReadInt32();
-    if (len <= 0 || len >= MAX_LEN) {
-        TELEPHONY_LOGE("Invalid parameter, len = %{public}d", len);
-        return TELEPHONY_ERR_ARGUMENT_INVALID;
-    }
+    CallAttributeInfo parcelPtr;
     if (!data.ContainFileDescriptors()) {
         TELEPHONY_LOGW("sent raw data is less than 32k");
     }
-    if ((parcelPtr = reinterpret_cast<const CallAttributeInfo *>(data.ReadRawData(sizeof(CallAttributeInfo)))) ==
-        nullptr) {
-        TELEPHONY_LOGE("reading raw data failed, length = %{public}d", len);
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-    CallAttributeInfo info = *parcelPtr;
-    result = OnCallDetailsChange(info);
+    strncpy_s(parcelPtr.accountNumber, kMaxNumberLen + 1, data.ReadCString(), kMaxNumberLen + 1);
+    strncpy_s(parcelPtr.bundleName, kMaxNumberLen + 1, data.ReadCString(), kMaxNumberLen + 1);
+    parcelPtr.speakerphoneOn = data.ReadBool();
+    parcelPtr.accountId = data.ReadInt32();
+    parcelPtr.videoState = static_cast<VideoStateType>(data.ReadInt32());
+    parcelPtr.startTime = data.ReadInt64();
+    parcelPtr.isEcc = data.ReadBool();
+    parcelPtr.callType = static_cast<CallType>(data.ReadInt32());
+    parcelPtr.callId = data.ReadInt32();
+    parcelPtr.callState = static_cast<TelCallState>(data.ReadInt32());
+    parcelPtr.conferenceState = static_cast<TelConferenceState>(data.ReadInt32());
+    parcelPtr.callBeginTime = data.ReadInt64();
+    parcelPtr.callEndTime = data.ReadInt64();
+    parcelPtr.ringBeginTime = data.ReadInt64();
+    parcelPtr.ringEndTime = data.ReadInt64();
+    parcelPtr.callDirection = static_cast<CallDirection>(data.ReadInt32());
+    parcelPtr.answerType = static_cast<CallAnswerType>(data.ReadInt32());
+    parcelPtr.index = data.ReadInt32();
+    parcelPtr.voipCallInfo.voipCallId = data.ReadString();
+    parcelPtr.voipCallInfo.userName = data.ReadString();
+    parcelPtr.voipCallInfo.abilityName = data.ReadString();
+    parcelPtr.voipCallInfo.extensionId = data.ReadString();
+    parcelPtr.voipCallInfo.voipBundleName = data.ReadString();
+    parcelPtr.voipCallInfo.pixelMap = std::shared_ptr<Media::PixelMap>(data.ReadParcelable<Media::PixelMap>());
+    result = OnCallDetailsChange(parcelPtr);
     if (!reply.WriteInt32(result)) {
         TELEPHONY_LOGE("writing parcel failed");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;

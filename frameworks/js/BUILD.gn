@@ -46,6 +46,8 @@ ohos_shared_library("call") {
     "core_service:libtel_common",
     "core_service:tel_core_service_api",
     "hilog:libhilog",
+    "image_framework:image",
+    "image_framework:image_native",
     "init:libbegetutil",
     "napi:ace_napi",
   ]

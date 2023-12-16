@@ -294,6 +294,34 @@ int32_t CallManagerProxy::ReRegisterCallBack()
     return TELEPHONY_SUCCESS;
 }
 
+int32_t CallManagerProxy::RegisterVoipCallManagerCallback()
+{
+    if (callManagerServicePtr_ == nullptr) {
+        TELEPHONY_LOGE("callManagerServicePtr_ is null");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    int32_t ret = callManagerServicePtr_->RegisterVoipCallManagerCallback();
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("register callback to call manager service failed,result: %{public}d", ret);
+        return TELEPHONY_ERR_REGISTER_CALLBACK_FAIL;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallManagerProxy::UnRegisterVoipCallManagerCallback()
+{
+    if (callManagerServicePtr_ == nullptr) {
+        TELEPHONY_LOGE("callManagerServicePtr_ is null");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    int32_t ret = callManagerServicePtr_->UnRegisterVoipCallManagerCallback();
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("unregister callback to call manager service failed,result: %{public}d", ret);
+        return TELEPHONY_ERR_REGISTER_CALLBACK_FAIL;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
 int32_t CallManagerProxy::DialCall(std::u16string number, AppExecFwk::PacMap &extras)
 {
     if (ReConnectService() != TELEPHONY_SUCCESS) {

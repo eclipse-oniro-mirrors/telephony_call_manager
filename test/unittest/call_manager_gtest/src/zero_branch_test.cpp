@@ -39,12 +39,14 @@
 #include "cs_call.h"
 #include "cs_conference.h"
 #include "gtest/gtest.h"
+#include "i_voip_call_manager_service.h"
 #include "ims_call.h"
 #include "ims_conference.h"
 #include "incoming_call_notification.h"
 #include "missed_call_notification.h"
 #include "ott_call.h"
 #include "ott_conference.h"
+#include "pixel_map.h"
 #include "reject_call_sms.h"
 #include "report_call_info_handler.h"
 #include "surface_utils.h"
@@ -53,6 +55,7 @@
 #include "telephony_log_wrapper.h"
 #include "video_call_state.h"
 #include "video_control_manager.h"
+#include "voip_call_manager_proxy.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -2029,8 +2032,10 @@ HWTEST_F(BranchTest, Telephony_CallStatusManager_002, Function | MediumTest | Le
     callDetailInfo.state = TelCallState::CALL_STATUS_INCOMING;
     callDetailInfo.callType = CallType::TYPE_CS;
     ASSERT_GT(callStatusManager->IncomingHandle(callDetailInfo), TELEPHONY_ERROR);
+    ASSERT_GT(callStatusManager->IncomingVoipCallHandle(callDetailInfo), TELEPHONY_ERROR);
     callDetailInfo.state = TelCallState::CALL_STATUS_ACTIVE;
     ASSERT_GT(callStatusManager->IncomingHandle(callDetailInfo), TELEPHONY_ERROR);
+    ASSERT_GT(callStatusManager->IncomingVoipCallHandle(callDetailInfo), TELEPHONY_ERROR);
     ContactInfo contactInfo;
     std::string phoneNum;
     callStatusManager->QueryCallerInfo(contactInfo, phoneNum);
@@ -2298,6 +2303,43 @@ HWTEST_F(BranchTest, Telephony_CanUnHoldState_001, Function | MediumTest | Level
     ASSERT_TRUE(callObjectPtr != nullptr);
     callObjectPtr->SetCanUnHoldState(flag);
     ASSERT_EQ(callObjectPtr->GetCanUnHoldState(), true);
+}
+
+/**
+ * @tc.number   Telephony_VoipCallManagerProxy_001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_VoipCallManagerProxy_001, Function | MediumTest | Level3)
+{
+    sptr<ISystemAbilityManager> managerPtr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    sptr<IVoipCallManagerService> voipCallManagerInterfacePtr = nullptr;
+    if (managerPtr != nullptr) {
+        sptr<IRemoteObject> iRemoteObjectPtr = managerPtr->GetSystemAbility(TELEPHONY_CALL_MANAGER_SYS_ABILITY_ID);
+        if (iRemoteObjectPtr != nullptr) {
+            voipCallManagerInterfacePtr = iface_cast<IVoipCallManagerService>(iRemoteObjectPtr);
+        }
+    }
+    AppExecFwk::PacMap mPacMap;
+    ErrorReason error = ErrorReason::VOIP_CALL_EXISTS;
+    if (voipCallManagerInterfacePtr != nullptr) {
+        std::shared_ptr<Media::PixelMap> pixelMap = nullptr;
+        voipCallManagerInterfacePtr->ReportIncomingCall(mPacMap, pixelMap, error);
+        voipCallManagerInterfacePtr->ReportIncomingCallError(mPacMap);
+        VoipCallState voipCallState = VoipCallState::VOIP_CALL_STATE_ACTIVE;
+        std::string callId = "123";
+        voipCallManagerInterfacePtr->ReportCallStateChange(callId, voipCallState);
+        voipCallManagerInterfacePtr->UnRegisterCallBack();
+        std::string bundleName = " ";
+        voipCallManagerInterfacePtr->ReportVoipIncomingCall(callId, bundleName);
+        std::string extensionId = " ";
+        voipCallManagerInterfacePtr->ReportVoipCallExtensionId(callId, bundleName, extensionId);
+        VoipCallEvents voipCallEvents;
+        voipCallManagerInterfacePtr->ReportVoipCallEventChange(voipCallEvents);
+        sptr<ICallStatusCallback> statusCallback = (std::make_unique<CallStatusCallback>()).release();
+        voipCallManagerInterfacePtr->RegisterCallManagerCallBack(statusCallback);
+        voipCallManagerInterfacePtr->UnRegisterCallManagerCallBack();
+    }
 }
 } // namespace Telephony
 } // namespace OHOS
