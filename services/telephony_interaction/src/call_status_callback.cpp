@@ -78,6 +78,8 @@ int32_t CallStatusCallback::UpdateCallsReportInfo(const CallsReportInfo &info)
         detailInfo.callMode = (*it).callMode;
         detailInfo.voiceDomain = (*it).voiceDomain;
         detailInfo.mpty = (*it).mpty;
+        detailInfo.crsType = (*it).crsType;
+        detailInfo.originalCallType = (*it).originalCallType;
         (void)memcpy_s(detailInfo.phoneNum, kMaxNumberLen, (*it).accountNum, kMaxNumberLen);
         (void)memset_s(detailInfo.bundleName, kMaxBundleNameLen, 0, kMaxBundleNameLen);
         detailsInfo.callVec.push_back(detailInfo);

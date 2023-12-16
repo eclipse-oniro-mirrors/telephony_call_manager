@@ -857,6 +857,7 @@ int32_t CallManagerProxy::SetPreviewWindow(int32_t callId, std::string &surfaceI
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     std::lock_guard<std::mutex> lock(mutex_);
+    TELEPHONY_LOGI("surfaceId is %{public}s", surfaceId.c_str());
     int32_t errCode = TELEPHONY_SUCCESS;
     if (surfaceId.empty() || surfaceId[0] < '0' || surfaceId[0] > '9') {
         TELEPHONY_LOGI("surfaceId is invalid, set surface nullptr");
@@ -885,6 +886,7 @@ int32_t CallManagerProxy::SetDisplayWindow(int32_t callId, std::string &surfaceI
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     std::lock_guard<std::mutex> lock(mutex_);
+    TELEPHONY_LOGI("surfaceId is %{public}s", surfaceId.c_str());
     int32_t errCode = TELEPHONY_SUCCESS;
     if (surfaceId.empty() || surfaceId[0] < '0' || surfaceId[0] > '9') {
         TELEPHONY_LOGI("surfaceId is invalid, set surface nullptr");

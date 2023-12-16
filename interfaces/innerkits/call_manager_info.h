@@ -151,6 +151,14 @@ struct CallReportInfo {
      */
     int32_t mpty = 0;
     /**
+     * Indicates the color tone type.
+     */
+    int32_t crsType = 0;
+    /**
+     * Indicates the initial type of this call.
+     */
+    int32_t originalCallType = 0;
+    /**
      * Indicates the VoIP call specific information
      */
     VoipCallReportInfo voipCallInfo;
@@ -234,6 +242,14 @@ struct CallAttributeInfo {
      * Indicates the call index in cellular call
      */
     int32_t index = 0;
+    /**
+     * Indicates the color tone type.
+     */
+    int32_t crsType = 0;
+    /**
+     * Indicates the initial type of this call.
+     */
+    int32_t originalCallType = 0;
     /**
      * Indicates the VoIP call specific information
      */
@@ -362,6 +378,14 @@ struct CallDetailInfo {
      */
     int32_t mpty = 0;
     /**
+     * Indicates the color tone type.
+     */
+    int32_t crsType = 0;
+    /**
+     * Indicates the initial type of this call.
+     */
+    int32_t originalCallType = 0;
+    /**
      * Indicates the VoIP call specific information
      */
     VoipCallReportInfo voipCallInfo;
@@ -384,6 +408,8 @@ struct CallDetailInfo {
         state = temp.state;
         voiceDomain = temp.voiceDomain;
         mpty = temp.mpty;
+        crsType = temp.crsType;
+        originalCallType = temp.originalCallType;
         voipCallInfo.voipCallId = temp.voipCallInfo.voipCallId;
         voipCallInfo.extensionId = temp.voipCallInfo.extensionId;
         voipCallInfo.userName = temp.voipCallInfo.userName;
