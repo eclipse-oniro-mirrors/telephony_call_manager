@@ -42,9 +42,9 @@ int32_t ReportCallInfoHandler::UpdateCallReportInfo(const CallDetailInfo &info)
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     CallDetailInfo callDetailInfo = info;
-    std::weak_ptr<CallStatusManager> callSatusManagerPtr = callStatusManagerPtr_;
-    Submit("UpdateCallReportInfo", [callSatusManagerPtr, callDetailInfo]() {
-        std::shared_ptr<CallStatusManager> managerPtr = callSatusManagerPtr.lock();
+    std::weak_ptr<CallStatusManager> callStatusManagerPtr = callStatusManagerPtr_;
+    Submit("UpdateCallReportInfo", [callStatusManagerPtr, callDetailInfo]() {
+        std::shared_ptr<CallStatusManager> managerPtr = callStatusManagerPtr.lock();
         if (managerPtr == nullptr) {
             TELEPHONY_LOGE("managerPtr is null");
             return;
@@ -63,14 +63,31 @@ int32_t ReportCallInfoHandler::UpdateCallsReportInfo(CallDetailsInfo &info)
         TELEPHONY_LOGE("callStatusManagerPtr_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    std::weak_ptr<CallStatusManager> callSatusManagerPtr = callStatusManagerPtr_;
-    Submit("UpdateCallsReportInfo", [callSatusManagerPtr, info]() {
-        std::shared_ptr<CallStatusManager> managerPtr = callSatusManagerPtr.lock();
+    CallDetailsInfo callDetailsInfo;
+    CallDetailInfo callDetailInfo;
+    callDetailsInfo.slotId = info.slotId;
+    (void)memcpy_s(callDetailsInfo.bundleName, kMaxBundleNameLen, info.bundleName, kMaxBundleNameLen);
+    std::vector<CallDetailInfo>::iterator iter = info.callVec.begin();
+    for(; iter != info.callVec.end(); ++iter) {
+        callDetailInfo.callType = (*iter).callType;
+        callDetailInfo.accountId = (*iter).accountId;
+        callDetailInfo.state = (*iter).state;
+        callDetailInfo.callMode = (*iter).callMode;
+        callDetailInfo.index = (*iter).index;
+        callDetailInfo.voiceDomain = (*iter).voiceDomain;
+        callDetailInfo.mpty = (*iter).mpty;
+        (void)memcpy_s(callDetailInfo.phoneNum, kMaxNumberLen, (*iter).phoneNum, kMaxNumberLen);
+        (void)memcpy_s(callDetailInfo.bundleName, kMaxBundleNameLen, (*iter).phonebundleName, kMaxBundleNameLen);
+        callDetailsInfo.callVec.push_back(callDetailInfo);
+    }
+    std::weak_ptr<CallStatusManager> callStatusManagerPtr = callStatusManagerPtr_;
+    Submit("UpdateCallsReportInfo", [callStatusManagerPtr, callDetailsInfo]() {
+        std::shared_ptr<CallStatusManager> managerPtr = callStatusManagerPtr.lock();
         if (managerPtr == nullptr) {
             TELEPHONY_LOGE("managerPtr is null");
             return;
         }
-        int32_t ret = managerPtr->HandleCallsReportInfo(info);
+        int32_t ret = managerPtr->HandleCallsReportInfo(callDetailsInfo);
         if (ret != TELEPHONY_SUCCESS) {
             TELEPHONY_LOGE("HandleCallsReportInfo failed! ret:%{public}d", ret);
         }
@@ -100,9 +117,9 @@ int32_t ReportCallInfoHandler::UpdateDisconnectedCause(const DisconnectedDetails
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     DisconnectedDetails disconnectedDetails = details;
-    std::weak_ptr<CallStatusManager> callSatusManagerPtr = callStatusManagerPtr_;
-    Submit("UpdateDisconnectedCause", [callSatusManagerPtr, disconnectedDetails]() {
-        std::shared_ptr<CallStatusManager> managerPtr = callSatusManagerPtr.lock();
+    std::weak_ptr<CallStatusManager> callStatusManagerPtr = callStatusManagerPtr_;
+    Submit("UpdateDisconnectedCause", [callStatusManagerPtr, disconnectedDetails]() {
+        std::shared_ptr<CallStatusManager> managerPtr = callStatusManagerPtr.lock();
         if (managerPtr == nullptr) {
             TELEPHONY_LOGE("managerPtr is null");
             return;
@@ -122,9 +139,9 @@ int32_t ReportCallInfoHandler::UpdateEventResultInfo(const CellularCallEventInfo
         TELEPHONY_LOGE("callStatusManagerPtr_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    std::weak_ptr<CallStatusManager> callSatusManagerPtr = callStatusManagerPtr_;
-    Submit("UpdateEventResultInfo", [callSatusManagerPtr, info]() {
-        std::shared_ptr<CallStatusManager> managerPtr = callSatusManagerPtr.lock();
+    std::weak_ptr<CallStatusManager> callStatusManagerPtr = callStatusManagerPtr_;
+    Submit("UpdateEventResultInfo", [callStatusManagerPtr, info]() {
+        std::shared_ptr<CallStatusManager> managerPtr = callStatusManagerPtr.lock();
         if (managerPtr == nullptr) {
             TELEPHONY_LOGE("managerPtr is null");
             return;
@@ -145,9 +162,9 @@ int32_t ReportCallInfoHandler::UpdateOttEventInfo(const OttCallEventInfo &info)
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     OttCallEventInfo ottCallEventInfo = info;
-    std::weak_ptr<CallStatusManager> callSatusManagerPtr = callStatusManagerPtr_;
-    Submit("UpdateOttEventInfo", [callSatusManagerPtr, ottCallEventInfo]() {
-        std::shared_ptr<CallStatusManager> managerPtr = callSatusManagerPtr.lock();
+    std::weak_ptr<CallStatusManager> callStatusManagerPtr = callStatusManagerPtr_;
+    Submit("UpdateOttEventInfo", [callStatusManagerPtr, ottCallEventInfo]() {
+        std::shared_ptr<CallStatusManager> managerPtr = callStatusManagerPtr.lock();
         if (managerPtr == nullptr) {
             TELEPHONY_LOGE("managerPtr is null");
             return;
