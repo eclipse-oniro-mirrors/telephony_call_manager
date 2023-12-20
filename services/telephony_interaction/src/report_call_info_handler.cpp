@@ -77,7 +77,7 @@ int32_t ReportCallInfoHandler::UpdateCallsReportInfo(CallDetailsInfo &info)
         callDetailInfo.voiceDomain = (*iter).voiceDomain;
         callDetailInfo.mpty = (*iter).mpty;
         (void)memcpy_s(callDetailInfo.phoneNum, kMaxNumberLen, (*iter).phoneNum, kMaxNumberLen);
-        (void)memcpy_s(callDetailInfo.bundleName, kMaxBundleNameLen, (*iter).phonebundleName, kMaxBundleNameLen);
+        (void)memcpy_s(callDetailInfo.bundleName, kMaxBundleNameLen, (*iter).bundleName, kMaxBundleNameLen);
         callDetailsInfo.callVec.push_back(callDetailInfo);
     }
     std::weak_ptr<CallStatusManager> callStatusManagerPtr = callStatusManagerPtr_;
