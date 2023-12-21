@@ -238,12 +238,10 @@ bool AudioControlManager::PlayRingtone()
         TELEPHONY_LOGE("should not play ringtone");
         return false;
     }
+    ring_ = std::make_unique<Ring>();
     if (ring_ == nullptr) {
-        ring_ = std::make_unique<Ring>();
-        if (ring_ == nullptr) {
-            TELEPHONY_LOGE("create ring object failed");
-            return false;
-        }
+        TELEPHONY_LOGE("create ring object failed");
+        return false;
     }
     sptr<CallBase> incomingCall = CallObjectManager::GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_RINGING);
     if (incomingCall == nullptr) {
