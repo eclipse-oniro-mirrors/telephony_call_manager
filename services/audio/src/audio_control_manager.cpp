@@ -521,12 +521,10 @@ int32_t AudioControlManager::PlayCallTone(ToneDescriptor type)
         return CALL_ERR_AUDIO_TONE_PLAY_FAILED;
     }
     toneState_ = ToneState::TONEING;
+    tone_ = std::make_unique<Tone>(type);
     if (tone_ == nullptr) {
-        tone_ = std::make_unique<Tone>(type);
-        if (tone_ == nullptr) {
-            TELEPHONY_LOGE("create tone failed");
-            return TELEPHONY_ERR_LOCAL_PTR_NULL;
-        }
+        TELEPHONY_LOGE("create tone failed");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     if (tone_->Play() != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("play calltone failed");
