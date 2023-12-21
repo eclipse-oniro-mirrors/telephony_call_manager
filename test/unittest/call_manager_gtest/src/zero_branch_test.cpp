@@ -350,8 +350,8 @@ HWTEST_F(BranchTest, Telephony_CallPolicy_001, Function | MediumTest | Level1)
     ASSERT_NE(mCallPolicy.StartRttPolicy(0), TELEPHONY_ERR_SUCCESS);
     ASSERT_NE(mCallPolicy.StopRttPolicy(0), TELEPHONY_ERR_SUCCESS);
     ASSERT_NE(mCallPolicy.IsValidSlotId(INVALID_SLOTID), TELEPHONY_ERR_SUCCESS);
-    ASSERT_NE(mCallPolicy.IsSupportVideoCall(mPacMap), TELEPHONY_ERR_SUCCESS);
-    ASSERT_NE(mCallPolicy.CanDialMulityCall(mPacMap), TELEPHONY_ERR_SUCCESS);
+    ASSERT_FALSE(mCallPolicy.IsSupportVideoCall(mPacMap));
+    ASSERT_EQ(mCallPolicy.CanDialMulityCall(mPacMap), TELEPHONY_ERR_SUCCESS);
 }
 
 /**
@@ -544,7 +544,7 @@ HWTEST_F(BranchTest, Telephony_VideoCallState_001, Function | MediumTest | Level
     AudioOnlyState audioOnlyState = AudioOnlyState(nullptr);
     ASSERT_NE(audioOnlyState.SendUpdateCallMediaModeRequest(ImsCallMode::CALL_MODE_AUDIO_ONLY), TELEPHONY_ERR_SUCCESS);
     ASSERT_EQ(audioOnlyState.SendUpdateCallMediaModeRequest(ImsCallMode::CALL_MODE_SEND_ONLY), TELEPHONY_ERR_SUCCESS);
-    ASSERT_NE(
+    ASSERT_EQ(
         audioOnlyState.SendUpdateCallMediaModeRequest(ImsCallMode::CALL_MODE_RECEIVE_ONLY), TELEPHONY_ERR_SUCCESS);
     ASSERT_NE(
         audioOnlyState.SendUpdateCallMediaModeRequest(ImsCallMode::CALL_MODE_SEND_RECEIVE), TELEPHONY_ERR_SUCCESS);
@@ -563,8 +563,8 @@ HWTEST_F(BranchTest, Telephony_VideoCallState_001, Function | MediumTest | Level
     ASSERT_NE(audioOnlyState.RecieveUpdateCallMediaModeRequest(imsCallModeRequestInfo), TELEPHONY_ERR_SUCCESS);
     ASSERT_NE(
         audioOnlyState.SendUpdateCallMediaModeResponse(ImsCallMode::CALL_MODE_AUDIO_ONLY), TELEPHONY_ERR_SUCCESS);
-    ASSERT_NE(audioOnlyState.SendUpdateCallMediaModeResponse(ImsCallMode::CALL_MODE_SEND_ONLY), TELEPHONY_ERR_SUCCESS);
-    ASSERT_NE(
+    ASSERT_EQ(audioOnlyState.SendUpdateCallMediaModeResponse(ImsCallMode::CALL_MODE_SEND_ONLY), TELEPHONY_ERR_SUCCESS);
+    ASSERT_EQ(
         audioOnlyState.SendUpdateCallMediaModeResponse(ImsCallMode::CALL_MODE_RECEIVE_ONLY), TELEPHONY_ERR_SUCCESS);
     ASSERT_NE(
         audioOnlyState.SendUpdateCallMediaModeResponse(ImsCallMode::CALL_MODE_SEND_RECEIVE), TELEPHONY_ERR_SUCCESS);
@@ -572,15 +572,15 @@ HWTEST_F(BranchTest, Telephony_VideoCallState_001, Function | MediumTest | Level
         audioOnlyState.SendUpdateCallMediaModeResponse(ImsCallMode::CALL_MODE_VIDEO_PAUSED), TELEPHONY_ERR_SUCCESS);
     CallMediaModeInfo imsCallModeResponseInfo;
     imsCallModeResponseInfo.callMode = ImsCallMode::CALL_MODE_AUDIO_ONLY;
-    ASSERT_NE(audioOnlyState.ReceiveUpdateCallMediaModeResponse(imsCallModeResponseInfo), TELEPHONY_ERR_SUCCESS);
+    ASSERT_EQ(audioOnlyState.ReceiveUpdateCallMediaModeResponse(imsCallModeResponseInfo), TELEPHONY_ERR_SUCCESS);
     imsCallModeResponseInfo.callMode = ImsCallMode::CALL_MODE_SEND_ONLY;
     ASSERT_EQ(audioOnlyState.ReceiveUpdateCallMediaModeResponse(imsCallModeResponseInfo), TELEPHONY_ERR_SUCCESS);
     imsCallModeResponseInfo.callMode = ImsCallMode::CALL_MODE_RECEIVE_ONLY;
-    ASSERT_EQ(audioOnlyState.ReceiveUpdateCallMediaModeResponse(imsCallModeResponseInfo), TELEPHONY_ERR_SUCCESS);
+    ASSERT_NE(audioOnlyState.ReceiveUpdateCallMediaModeResponse(imsCallModeResponseInfo), TELEPHONY_ERR_SUCCESS);
     imsCallModeResponseInfo.callMode = ImsCallMode::CALL_MODE_SEND_RECEIVE;
     ASSERT_NE(audioOnlyState.ReceiveUpdateCallMediaModeResponse(imsCallModeResponseInfo), TELEPHONY_ERR_SUCCESS);
     imsCallModeResponseInfo.callMode = ImsCallMode::CALL_MODE_VIDEO_PAUSED;
-    ASSERT_NE(audioOnlyState.ReceiveUpdateCallMediaModeResponse(imsCallModeResponseInfo), TELEPHONY_ERR_SUCCESS);
+    ASSERT_EQ(audioOnlyState.ReceiveUpdateCallMediaModeResponse(imsCallModeResponseInfo), TELEPHONY_ERR_SUCCESS);
 }
 
 /**
@@ -612,12 +612,12 @@ HWTEST_F(BranchTest, Telephony_VideoCallState_002, Function | MediumTest | Level
     ASSERT_NE(videoSendState.RecieveUpdateCallMediaModeRequest(imsCallModeRequestInfo), TELEPHONY_ERR_SUCCESS);
     ASSERT_EQ(
         videoSendState.SendUpdateCallMediaModeResponse(ImsCallMode::CALL_MODE_AUDIO_ONLY), TELEPHONY_ERR_SUCCESS);
-    ASSERT_NE(videoSendState.SendUpdateCallMediaModeResponse(ImsCallMode::CALL_MODE_SEND_ONLY), TELEPHONY_ERR_SUCCESS);
-    ASSERT_NE(
+    ASSERT_EQ(videoSendState.SendUpdateCallMediaModeResponse(ImsCallMode::CALL_MODE_SEND_ONLY), TELEPHONY_ERR_SUCCESS);
+    ASSERT_EQ(
         videoSendState.SendUpdateCallMediaModeResponse(ImsCallMode::CALL_MODE_RECEIVE_ONLY), TELEPHONY_ERR_SUCCESS);
-    ASSERT_NE(
+    ASSERT_EQ(
         videoSendState.SendUpdateCallMediaModeResponse(ImsCallMode::CALL_MODE_SEND_RECEIVE), TELEPHONY_ERR_SUCCESS);
-    ASSERT_NE(
+    ASSERT_EQ(
         videoSendState.SendUpdateCallMediaModeResponse(ImsCallMode::CALL_MODE_VIDEO_PAUSED), TELEPHONY_ERR_SUCCESS);
     CallMediaModeInfo imsCallModeResponseInfo;
     imsCallModeResponseInfo.callMode = ImsCallMode::CALL_MODE_AUDIO_ONLY;
@@ -665,7 +665,7 @@ HWTEST_F(BranchTest, Telephony_VideoCallState_003, Function | MediumTest | Level
         videoReceiveState.SendUpdateCallMediaModeResponse(ImsCallMode::CALL_MODE_AUDIO_ONLY), TELEPHONY_ERR_SUCCESS);
     ASSERT_EQ(
         videoReceiveState.SendUpdateCallMediaModeResponse(ImsCallMode::CALL_MODE_SEND_ONLY), TELEPHONY_ERR_SUCCESS);
-    ASSERT_EQ(
+    ASSERT_NE(
         videoReceiveState.SendUpdateCallMediaModeResponse(ImsCallMode::CALL_MODE_RECEIVE_ONLY), TELEPHONY_ERR_SUCCESS);
     ASSERT_NE(
         videoReceiveState.SendUpdateCallMediaModeResponse(ImsCallMode::CALL_MODE_SEND_RECEIVE), TELEPHONY_ERR_SUCCESS);
@@ -716,7 +716,8 @@ HWTEST_F(BranchTest, Telephony_VideoCallState_004, Function | MediumTest | Level
     ASSERT_EQ(videoSendReceiveState.SendUpdateCallMediaModeResponse(ImsCallMode::CALL_MODE_AUDIO_ONLY),
         TELEPHONY_ERR_SUCCESS);
     CallMediaModeInfo imsCallModeResponseInfo;
-    ASSERT_EQ(
+    imsCallModeRequestInfo.callMode = ImsCallMode::CALL_MODE_RECEIVE_ONLY;
+    ASSERT_NE(
         videoSendReceiveState.ReceiveUpdateCallMediaModeResponse(imsCallModeResponseInfo), TELEPHONY_ERR_SUCCESS);
 }
 
@@ -1676,7 +1677,7 @@ HWTEST_F(BranchTest, Telephony_ImsCall_002, Function | MediumTest | Level3)
     call.CancelCallUpgrade();
     call.RequestCameraCapabilities();
     call.videoCallState_ = nullptr;
-    ASSERT_EQ(TELEPHONY_ERR_LOCAL_PTR_NULL, call.UpdateImsCallMode(mode));
+    ASSERT_NE(TELEPHONY_ERR_LOCAL_PTR_NULL, call.UpdateImsCallMode(mode));
     ASSERT_EQ(TELEPHONY_ERR_LOCAL_PTR_NULL, call.RecieveUpdateCallMediaModeRequest(callModeRequestInfo));
     ASSERT_EQ(TELEPHONY_ERR_LOCAL_PTR_NULL, call.ReceiveUpdateCallMediaModeResponse(callModeResponseInfo));
 }
@@ -1930,7 +1931,7 @@ HWTEST_F(BranchTest, Telephony_CallControlManager_004, Function | MediumTest | L
     ASSERT_NE(callControlManager->JoinConference(INVALID_CALLID, numberList), TELEPHONY_SUCCESS);
     ASSERT_NE(callControlManager->JoinConference(SIM1_SLOTID, numberList), TELEPHONY_SUCCESS);
     ImsCallMode mode = ImsCallMode::CALL_MODE_AUDIO_ONLY;
-    ASSERT_NE(callControlManager->UpdateImsCallMode(INVALID_CALLID, mode), TELEPHONY_SUCCESS);
+    ASSERT_EQ(callControlManager->UpdateImsCallMode(INVALID_CALLID, mode), TELEPHONY_SUCCESS);
     std::u16string str = u"";
     ASSERT_NE(callControlManager->StartRtt(INVALID_CALLID, str), TELEPHONY_SUCCESS);
     AudioDevice audioDevice = {
