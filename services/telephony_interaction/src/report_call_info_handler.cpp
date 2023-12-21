@@ -68,7 +68,7 @@ int32_t ReportCallInfoHandler::UpdateCallsReportInfo(CallDetailsInfo &info)
     callDetailsInfo.slotId = info.slotId;
     (void)memcpy_s(callDetailsInfo.bundleName, kMaxBundleNameLen, info.bundleName, kMaxBundleNameLen);
     std::vector<CallDetailInfo>::iterator iter = info.callVec.begin();
-    for(; iter != info.callVec.end(); ++iter) {
+    for (; iter != info.callVec.end(); ++iter) {
         callDetailInfo.callType = (*iter).callType;
         callDetailInfo.accountId = (*iter).accountId;
         callDetailInfo.state = (*iter).state;
