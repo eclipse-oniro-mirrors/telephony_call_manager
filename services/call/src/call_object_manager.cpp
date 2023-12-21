@@ -171,14 +171,13 @@ int32_t CallObjectManager::IsNewCallAllowedCreate(bool &enabled)
     }
     int32_t count = 0;
     int32_t callNum = 2;
-    int32_t conferenceCallId = -1;
     std::list<int32_t> callIdList;
     GetCarrierCallList(callIdList);
     for (int32_t otherCallId : callIdList) {
         sptr<CallBase> call = GetOneCallObject(otherCallId);
-        TelConferenceState confState = call->GetTelConferenceState();
-        int32_t conferenceId = DelayedSingleton<ImsConference>::GetInstance()->GetMainCall();
         if (call != nullptr) {
+            TelConferenceState confState = call->GetTelConferenceState();
+            int32_t conferenceId = DelayedSingleton<ImsConference>::GetInstance()->GetMainCall();
             if (confState != TelConferenceState::TEL_CONFERENCE_IDLE && conferenceId == otherCallId) {
                 TELEPHONY_LOGI("there is conference call");
                 count++;

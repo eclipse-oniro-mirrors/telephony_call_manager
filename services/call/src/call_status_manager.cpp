@@ -707,14 +707,12 @@ void CallStatusManager::AutoAnswerForDsda(int32_t activeCallNum, int32_t slotId)
     int32_t dialingCallNum = GetCallNum(TelCallState::CALL_STATUS_DIALING);
     int32_t alertingCallNum = GetCallNum(TelCallState::CALL_STATUS_ALERTING);
     int32_t waitingCallNum = GetCallNum(TelCallState::CALL_STATUS_WAITING);
-    sptr<CallBase> ringCall = GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_RINGING);
-    TELEPHONY_LOGE("ringCall is not null  =:%{public}d", ringCall != nullptr);
     std::list<int32_t> callIdList;
     GetCarrierCallList(callIdList);
     for (int32_t ringCallId : callIdList) {
         sptr<CallBase> ringCall = GetOneCallObject(ringCallId);
-        if (ringCall->GetCallRunningState() == CallRunningState::CALL_RUNNING_STATE_RINGING) {
-            TELEPHONY_LOGE("ringCall is not null  =:%{public}d", ringCall != nullptr);
+        if (ringCall != nullptr && ringCall->GetCallRunningState() == CallRunningState::CALL_RUNNING_STATE_RINGING) {
+            TELEPHONY_LOGI("ringCall is not null  =:%{public}d", ringCall != nullptr);
             if (ringCall != nullptr && dialingCallNum == 0 && alertingCallNum == 0 && activeCallNum == 0 &&
                 ringCall->GetAutoAnswerState()) {
                 int32_t videoState = static_cast<int32_t>(ringCall->GetVideoStateType());
@@ -746,7 +744,6 @@ void CallStatusManager::AutoAnswerForDsda(int32_t activeCallNum, int32_t slotId)
 
 void CallStatusManager::AutoAnswer(int32_t activeCallNum, int32_t waitingCallNum)
 {
-    bool flag = false;
     int32_t holdingCallNum = GetCallNum(TelCallState::CALL_STATUS_HOLDING);
     int32_t dialingCallNum = GetCallNum(TelCallState::CALL_STATUS_DIALING);
     int32_t alertingCallNum = GetCallNum(TelCallState::CALL_STATUS_ALERTING);
@@ -759,7 +756,7 @@ void CallStatusManager::AutoAnswer(int32_t activeCallNum, int32_t waitingCallNum
             CallRunningState ringingCallState = ringingCall->GetCallRunningState();
             if ((ringingCallState == CallRunningState::CALL_RUNNING_STATE_RINGING &&
                     (ringingCall->GetAutoAnswerState()))) {
-                ringingCall->SetAutoAnswerState(flag);
+                ringingCall->SetAutoAnswerState(false);
                 int32_t videoState = static_cast<int32_t>(ringingCall->GetVideoStateType());
                 int ret = ringingCall->AnswerCall(videoState);
                 TELEPHONY_LOGI("ret = %{public}d", ret);

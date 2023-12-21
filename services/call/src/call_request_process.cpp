@@ -158,7 +158,6 @@ void CallRequestProcess::HoldOrDisconnectedCall(int32_t callId, int32_t slotId, 
 {
     TELEPHONY_LOGI("Enter HoldOrDisconnectedCall");
     std::list<int32_t> callIdList;
-    bool flag = true;
     bool noOtherCall = true;
     bool flagForConference = false;
     GetCarrierCallList(callIdList);
@@ -362,14 +361,13 @@ void CallRequestProcess::DisconnectOtherSubIdCall(int32_t callId, int32_t slotId
         return;
     }
     std::list<int32_t> callIdList;
-    bool flag = true;
     bool noOtherCall = true;
     GetCarrierCallList(callIdList);
     if (callIdList.size() > 1) {
         for (int32_t otherCallId : callIdList) {
             sptr<CallBase> call = GetOneCallObject(otherCallId);
             if (call != nullptr && call->GetSlotId() != slotId) {
-                incomingCall->SetAutoAnswerState(flag);
+                incomingCall->SetAutoAnswerState(true);
                 TELEPHONY_LOGI("Hangup call SLOTID:%{public}d", call->GetSlotId());
                 call->HangUpCall();
                 noOtherCall = false;

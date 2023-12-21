@@ -90,7 +90,6 @@ void AudioDeviceManagerFunc(const uint8_t *data, size_t size)
     std::shared_ptr<AudioDeviceManager> audioDeviceManager = DelayedSingleton<AudioDeviceManager>::GetInstance();
     AudioDeviceType deviceType = static_cast<AudioDeviceType>(size % AUDIO_DEVICE_NUM);
     AudioEvent event = static_cast<AudioEvent>(size % AUDIO_EVENT);
-    std::string bluetoothAddress(reinterpret_cast<const char *>(data), size);
 
     audioDeviceManager->Init();
     audioDeviceManager->InitAudioDevice();
