@@ -712,9 +712,8 @@ void CallStatusManager::AutoAnswerForDsda(int32_t activeCallNum, int32_t slotId)
     for (int32_t ringCallId : callIdList) {
         sptr<CallBase> ringCall = GetOneCallObject(ringCallId);
         if (ringCall != nullptr && ringCall->GetCallRunningState() == CallRunningState::CALL_RUNNING_STATE_RINGING) {
-            TELEPHONY_LOGI("ringCall is not null  =:%{public}d", ringCall != nullptr);
-            if (ringCall != nullptr && dialingCallNum == 0 && alertingCallNum == 0 && activeCallNum == 0 &&
-                ringCall->GetAutoAnswerState()) {
+            TELEPHONY_LOGI("ringCall is not nullptr");
+            if (dialingCallNum == 0 && alertingCallNum == 0 && activeCallNum == 0 && ringCall->GetAutoAnswerState()) {
                 int32_t videoState = static_cast<int32_t>(ringCall->GetVideoStateType());
                 int ret = ringCall->AnswerCall(videoState);
                 TELEPHONY_LOGI("ret = %{public}d", ret);
