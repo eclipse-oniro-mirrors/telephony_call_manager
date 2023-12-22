@@ -230,7 +230,7 @@ void VoIPCallFunc(const uint8_t *data, size_t size)
     CallAttributeInfo info;
     DialParaInfo dialParaInfo;
     int32_t mainCallId = 0;
-    VoipCallEvents voipcallInfo;
+    VoipCallEventInfo voipcallInfo;
     std::vector<std::u16string> callIdList;
     int32_t videoState = static_cast<int32_t>(size % VIDIO_TYPE_NUM);
     sptr<VoIPCall> voipCall = std::make_unique<VoIPCall>(dialParaInfo).release();

@@ -535,7 +535,7 @@ int32_t CallObjectManager::DealFailDial(sptr<CallBase> call)
     return DelayedSingleton<ReportCallInfoHandler>::GetInstance()->UpdateCallReportInfo(callDetatilInfo);
 }
 
-std::vector<CallAttributeInfo> CallObjectManager::GetCarrierCallInfoList()
+std::vector<CallAttributeInfo> CallObjectManager::GetAllCallInfoList()
 {
     std::vector<CallAttributeInfo> callVec;
     callVec.clear();
@@ -548,9 +548,7 @@ std::vector<CallAttributeInfo> CallObjectManager::GetCarrierCallInfoList()
             continue;
         }
         (*it)->GetCallAttributeInfo(info);
-        if (info.callType != CallType::TYPE_OTT) {
-            callVec.emplace_back(info);
-        }
+        callVec.emplace_back(info);
     }
     return callVec;
 }

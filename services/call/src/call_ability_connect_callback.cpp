@@ -50,7 +50,7 @@ void CallAbilityConnectCallback::ReConnectAbility()
         return;
     }
     bool connectFlag = false;
-    std::vector<CallAttributeInfo> callAttributeInfo = CallObjectManager::GetCarrierCallInfoList();
+    std::vector<CallAttributeInfo> callAttributeInfo = CallObjectManager::GetAllCallInfoList();
     std::vector<CallAttributeInfo>::iterator it = callAttributeInfo.begin();
     while (it != callAttributeInfo.end()) {
         CallAttributeInfo info = (*it);

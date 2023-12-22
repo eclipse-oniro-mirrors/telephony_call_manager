@@ -711,8 +711,11 @@ HWTEST_F(CallStateTest, Telephony_VoipCallConnection_001, Function | MediumTest 
     voipCallConnection->Init(systemAbilityId);
     voipCallConnection->UnInit();
     voipCallConnection->GetCallManagerProxy();
-    VoipCallEvents voipcallevents;
-    voipCallConnection->ReportVoipCallEventChange(voipcallevents);
+    VoipCallEventInfo voipCallEventInfo;
+    voipCallEventInfo.voipCallId = "123";
+    voipCallConnection->AnswerCall(voipCallEventInfo, static_cast<int32_t>(VideoStateType::TYPE_VOICE));
+    voipCallConnection->HangUpCall(voipCallEventInfo);
+    voipCallConnection->RejectCall(voipCallEventInfo);
     sptr<ICallStatusCallback> callStatusCallback = nullptr;
     voipCallConnection->RegisterCallManagerCallBack(callStatusCallback);
     voipCallConnection->UnRegisterCallManagerCallBack();

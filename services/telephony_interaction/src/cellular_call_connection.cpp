@@ -885,7 +885,7 @@ int32_t CellularCallConnection::ClearAllCalls()
         return TELEPHONY_SUCCESS;
     }
     std::vector<CellularCallInfo> callsInfo;
-    std::vector<CallAttributeInfo> infos = CallObjectManager::GetCarrierCallInfoList();
+    std::vector<CallAttributeInfo> infos = CallObjectManager::GetAllCallInfoList();
     for (auto &info : infos) {
         CellularCallInfo callInfo;
         callInfo.callId = info.callId;

@@ -247,6 +247,8 @@ napi_value NapiCallManager::DeclareCallDialEnum(napi_env env, napi_value exports
         DECLARE_NAPI_STATIC_PROPERTY(
             "TYPE_OTT", NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(CallType::TYPE_OTT))),
         DECLARE_NAPI_STATIC_PROPERTY(
+            "TYPE_VOIP", NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(CallType::TYPE_VOIP))),
+        DECLARE_NAPI_STATIC_PROPERTY(
             "TYPE_ERR_CALL", NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(CallType::TYPE_ERR_CALL))),
         // DialType
         DECLARE_NAPI_STATIC_PROPERTY("DIAL_CARRIER_TYPE",
@@ -603,8 +605,10 @@ napi_value NapiCallManager::DeclareCallTypeEnum(napi_env env, napi_value exports
             "TYPE_IMS", NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(CallType::TYPE_IMS))),
         DECLARE_NAPI_STATIC_PROPERTY(
             "TYPE_OTT", NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(CallType::TYPE_OTT))),
-        DECLARE_NAPI_STATIC_PROPERTY("TYPE_ERR_CALL",
-            NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(CallType::TYPE_ERR_CALL))),
+        DECLARE_NAPI_STATIC_PROPERTY(
+            "TYPE_VOIP", NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(CallType::TYPE_VOIP))),
+        DECLARE_NAPI_STATIC_PROPERTY(
+            "TYPE_ERR_CALL", NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(CallType::TYPE_ERR_CALL))),
     };
     napi_value result = nullptr;
     napi_define_class(env, "CallType", NAPI_AUTO_LENGTH, NapiCallManagerUtils::CreateEnumConstructor, nullptr,

@@ -37,7 +37,9 @@ public:
     void Init(int32_t systemAbilityId);
     void UnInit();
     int32_t GetCallManagerProxy();
-    int32_t ReportVoipCallEventChange(const VoipCallEvents &events);
+    int32_t AnswerCall(const VoipCallEventInfo &events, int32_t videoState);
+    int32_t RejectCall(const VoipCallEventInfo &events);
+    int32_t HangUpCall(const VoipCallEventInfo &events);
 
     int32_t RegisterCallManagerCallBack(const sptr<ICallStatusCallback> &callback);
 

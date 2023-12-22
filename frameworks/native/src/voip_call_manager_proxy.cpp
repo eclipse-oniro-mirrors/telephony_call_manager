@@ -207,7 +207,7 @@ int32_t VoipCallManagerProxy::ReportVoipCallExtensionId(
     return replyParcel.ReadInt32();
 }
 
-int32_t VoipCallManagerProxy::ReportVoipCallEventChange(const VoipCallEvents &events)
+int32_t VoipCallManagerProxy::Answer(const VoipCallEventInfo &events, int32_t videoState)
 {
     MessageParcel dataParcel;
     if (!dataParcel.WriteInterfaceToken(VoipCallManagerProxy::GetDescriptor())) {
@@ -216,19 +216,68 @@ int32_t VoipCallManagerProxy::ReportVoipCallEventChange(const VoipCallEvents &ev
     }
     dataParcel.WriteString(events.voipCallId);
     dataParcel.WriteString(events.bundleName);
-    dataParcel.WriteInt32(static_cast<int32_t>(events.voipCallEvent));
-    dataParcel.WriteInt32(static_cast<int32_t>(events.errorReason));
+    dataParcel.WriteInt32(videoState);
     auto remote = Remote();
     if (remote == nullptr) {
-        TELEPHONY_LOGE("ReportVoipCallEventChange Remote is null");
+        TELEPHONY_LOGE("Answer voip Remote is null");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     MessageOption option;
     MessageParcel replyParcel;
     int32_t error = remote->SendRequest(
-        static_cast<int32_t>(INTERFACE_REPORT_VOIP_CALL_EVENT_CHANGE), dataParcel, replyParcel, option);
+        static_cast<int32_t>(INTERFACE_ANSWER_VOIP_CALL), dataParcel, replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("function ReportVoipCallEventChange call failed! errCode:%{public}d", error);
+        TELEPHONY_LOGE("function Answer voip call failed! errCode:%{public}d", error);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return replyParcel.ReadInt32();
+}
+
+int32_t VoipCallManagerProxy::HangUp(const VoipCallEventInfo &events)
+{
+    MessageParcel dataParcel;
+    if (!dataParcel.WriteInterfaceToken(VoipCallManagerProxy::GetDescriptor())) {
+        TELEPHONY_LOGE("write descriptor fail");
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    dataParcel.WriteString(events.voipCallId);
+    dataParcel.WriteString(events.bundleName);
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("HangUp voip Remote is null");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    MessageOption option;
+    MessageParcel replyParcel;
+    int32_t error = remote->SendRequest(
+        static_cast<int32_t>(INTERFACE_HANGUP_VOIP_CALL), dataParcel, replyParcel, option);
+    if (error != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("function HangUp voip call failed! errCode:%{public}d", error);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return replyParcel.ReadInt32();
+}
+
+int32_t VoipCallManagerProxy::Reject(const VoipCallEventInfo &events)
+{
+    MessageParcel dataParcel;
+    if (!dataParcel.WriteInterfaceToken(VoipCallManagerProxy::GetDescriptor())) {
+        TELEPHONY_LOGE("write descriptor fail");
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    dataParcel.WriteString(events.voipCallId);
+    dataParcel.WriteString(events.bundleName);
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("Reject voip  Remote is null");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    MessageOption option;
+    MessageParcel replyParcel;
+    int32_t error = remote->SendRequest(
+        static_cast<int32_t>(INTERFACE_REJECT_VOIP_CALL), dataParcel, replyParcel, option);
+    if (error != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("function Reject voip call failed! errCode:%{public}d", error);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     return replyParcel.ReadInt32();

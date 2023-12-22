@@ -45,19 +45,14 @@ int32_t VoIPCall::DialingProcess()
 int32_t VoIPCall::AnswerCall(int32_t videoState)
 {
     TELEPHONY_LOGI("VoIPCall::AnswerCall");
-    VoipCallEvents voipcallInfo;
+    VoipCallEventInfo voipcallInfo;
     int32_t ret = TELEPHONY_ERROR;
     ret = PackVoipCallInfo(voipcallInfo);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGW("PackVoipCallInfo failed!");
     }
-    voipcallInfo.voipCallEvent = VoipCallEvent::VOIP_CALL_EVENT_ANSWER_VOICE;
-    if (videoState == 1) {
-        TELEPHONY_LOGI("VoIPCall::AnswerCall VOIP VIDEO");
-        voipcallInfo.voipCallEvent = VoipCallEvent::VOIP_CALL_EVENT_ANSWER_VIDEO;
-    }
     voipcallInfo.bundleName = voipBundleName_;
-    DelayedSingleton<VoipCallConnection>::GetInstance()->ReportVoipCallEventChange(voipcallInfo);
+    DelayedSingleton<VoipCallConnection>::GetInstance()->AnswerCall(voipcallInfo, videoState);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("answer call failed!");
         return CALL_ERR_ANSWER_FAILED;
@@ -65,7 +60,7 @@ int32_t VoIPCall::AnswerCall(int32_t videoState)
     return TELEPHONY_SUCCESS;
 }
 
-int32_t VoIPCall::PackVoipCallInfo(VoipCallEvents &voipcallInfo)
+int32_t VoIPCall::PackVoipCallInfo(VoipCallEventInfo &voipcallInfo)
 {
     voipcallInfo.voipCallId = voipCallId_;
     voipcallInfo.bundleName = voipBundleName_;
@@ -75,15 +70,14 @@ int32_t VoIPCall::PackVoipCallInfo(VoipCallEvents &voipcallInfo)
 int32_t VoIPCall::RejectCall()
 {
     TELEPHONY_LOGI("VoIPCall::RejectCall enter");
-    VoipCallEvents voipcallInfo;
+    VoipCallEventInfo voipcallInfo;
     int32_t ret = TELEPHONY_ERROR;
     ret = PackVoipCallInfo(voipcallInfo);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGW("PackVoipCallInfo failed!");
     }
-    voipcallInfo.voipCallEvent = VoipCallEvent::VOIP_CALL_EVENT_REJECT;
     voipcallInfo.bundleName = voipBundleName_;
-    DelayedSingleton<VoipCallConnection>::GetInstance()->ReportVoipCallEventChange(voipcallInfo);
+    DelayedSingleton<VoipCallConnection>::GetInstance()->RejectCall(voipcallInfo);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("reject call failed!");
         return CALL_ERR_ANSWER_FAILED;
@@ -94,16 +88,14 @@ int32_t VoIPCall::RejectCall()
 int32_t VoIPCall::HangUpCall()
 {
     TELEPHONY_LOGI("VoIPCall::HangUpCall enter");
-    VoipCallEvents voipcallInfo;
+    VoipCallEventInfo voipcallInfo;
     int32_t ret = TELEPHONY_ERROR;
     ret = PackVoipCallInfo(voipcallInfo);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGW("PackVoipCallInfo failed!");
     }
-    voipcallInfo.voipCallEvent = VoipCallEvent::VOIP_CALL_EVENT_HANGUP;
     voipcallInfo.bundleName = voipBundleName_;
-    voipcallInfo.errorReason = ErrorReason::USER_ANSWER_CELLULAR_FIRST;
-    DelayedSingleton<VoipCallConnection>::GetInstance()->ReportVoipCallEventChange(voipcallInfo);
+    DelayedSingleton<VoipCallConnection>::GetInstance()->HangUpCall(voipcallInfo);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("hangup call failed!");
         return CALL_ERR_ANSWER_FAILED;
