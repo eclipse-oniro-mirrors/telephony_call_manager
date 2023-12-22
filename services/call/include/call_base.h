@@ -105,6 +105,8 @@ public:
     bool GetAutoAnswerState();
     void SetCanUnHoldState(bool flag);
     bool GetCanUnHoldState();
+    void SetCanSwitchCallState(bool flag);
+    bool GetCanSwitchCallState();
     bool CheckVoicemailNumber(std::string phoneNumber);
     bool IsAliveState();
     void SetBundleName(const char *bundleName);
@@ -142,6 +144,7 @@ private:
     TelCallState callState_;
     bool autoAnswerState_;
     bool canUnHoldState_;
+    bool canSwitchCallState_;
     bool isSpeakerphoneOn_;
     CallEndedType callEndedType_;
     ContactInfo contactInfo_;
