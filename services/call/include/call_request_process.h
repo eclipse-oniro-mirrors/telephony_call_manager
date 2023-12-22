@@ -31,6 +31,7 @@ public:
     void AnswerRequest(int32_t callId, int32_t videoState);
     void RejectRequest(int32_t callId, bool isSendSms, std::string &content);
     void HangUpRequest(int32_t callId);
+    void HandleHoldAfterHangUp(TelCallState state, int32_t waitingCallNum);
     void HoldRequest(int32_t callId);
     void UnHoldRequest(int32_t callId);
     void SwitchRequest(int32_t callId);
@@ -43,7 +44,8 @@ public:
     bool IsDsdsMode3();
     bool IsDsdsMode5();
     void DisconnectOtherSubIdCall(int32_t callId, int32_t slotId, int32_t videoState);
-    void HandleCallWaitingNumTwo(sptr<CallBase> call, int32_t slotId, bool &flagForConference);
+    void HandleCallWaitingNumTwo(sptr<CallBase> incomingCall, sptr<CallBase> call, int32_t slotId,
+        int32_t activeCallNum, bool &flagForConference);
     void HandleCallWaitingNumOne(sptr<CallBase> incomingCall, sptr<CallBase> call, int32_t slotId,
         int32_t activeCallNum, bool &flagForConference);
     void HandleCallWaitingNumOneNext(sptr<CallBase> incomingCall, sptr<CallBase> call, sptr<CallBase> holdCall,

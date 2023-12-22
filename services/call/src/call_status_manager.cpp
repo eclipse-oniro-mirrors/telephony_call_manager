@@ -510,6 +510,11 @@ int32_t CallStatusManager::ActiveHandle(const CallDetailInfo &info)
         TELEPHONY_LOGE("UpdateCallState failed, errCode:%{public}d", ret);
         return ret;
     }
+    sptr<CallBase> holdCall = GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_HOLD);
+    if (holdCall != nullptr) {
+        holdCall->SetCanSwitchCallState(true);
+        TELEPHONY_LOGI("holdcall:%{public}d can swap", holdCall->GetCallID());
+    }
 #ifdef AUDIO_SUPPORT
     ToSpeakerPhone(call);
     DelayedSingleton<AudioControlManager>::GetInstance()->SetVolumeAudible();
@@ -707,13 +712,15 @@ void CallStatusManager::AutoAnswerForDsda(int32_t activeCallNum, int32_t slotId)
     int32_t dialingCallNum = GetCallNum(TelCallState::CALL_STATUS_DIALING);
     int32_t alertingCallNum = GetCallNum(TelCallState::CALL_STATUS_ALERTING);
     int32_t waitingCallNum = GetCallNum(TelCallState::CALL_STATUS_WAITING);
+    int32_t answeredCallNum = GetCallNum(TelCallState::CALL_STATUS_ANSWERED);
     std::list<int32_t> callIdList;
     GetCarrierCallList(callIdList);
     for (int32_t ringCallId : callIdList) {
         sptr<CallBase> ringCall = GetOneCallObject(ringCallId);
         if (ringCall != nullptr && ringCall->GetCallRunningState() == CallRunningState::CALL_RUNNING_STATE_RINGING) {
             TELEPHONY_LOGI("ringCall is not nullptr");
-            if (dialingCallNum == 0 && alertingCallNum == 0 && activeCallNum == 0 && ringCall->GetAutoAnswerState()) {
+            if (dialingCallNum == 0 && alertingCallNum == 0 && activeCallNum == 0 && answeredCallNum == 0 &&
+                ringCall->GetAutoAnswerState()) {
                 int32_t videoState = static_cast<int32_t>(ringCall->GetVideoStateType());
                 int ret = ringCall->AnswerCall(videoState);
                 TELEPHONY_LOGI("ret = %{public}d", ret);
@@ -729,7 +736,8 @@ void CallStatusManager::AutoAnswerForDsda(int32_t activeCallNum, int32_t slotId)
         int32_t conferenceId = ERR_ID;
         otherCall->GetMainCallId(conferenceId);
         if (slotId != otherCall->GetSlotId() && state == TelCallState::CALL_STATUS_HOLDING &&
-            otherCall->GetCanUnHoldState() && waitingCallNum == 0) {
+            otherCall->GetCanUnHoldState() && answeredCallNum == 0 && activeCallNum == 0 && waitingCallNum == 0 &&
+            dialingCallNum == 0) {
             if (confState != TelConferenceState::TEL_CONFERENCE_IDLE && conferenceId == otherCallId) {
                 otherCall->UnHoldCall();
                 return;

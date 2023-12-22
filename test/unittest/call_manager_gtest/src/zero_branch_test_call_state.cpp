@@ -625,8 +625,11 @@ HWTEST_F(CallStateTest, Telephony_CallRequestProcess_002, Function | MediumTest 
     sptr<OHOS::Telephony::CallBase> callBase11 = new IMSCall(mDialParaInfo);
     callBase11->callState_ = TelCallState::CALL_STATUS_WAITING;
     callBase11->callId_ = 4;
+    sptr<OHOS::Telephony::CallBase> callBase12 = new IMSCall(mDialParaInfo);
+    callBase12->callState_ = TelCallState::CALL_STATUS_INCOMING;
+    callBase12->callId_ = 5;
     bool enabled2 = false;
-    callRequestProcess->HandleCallWaitingNumTwo(callBase8, 1, enabled2);
+    callRequestProcess->HandleCallWaitingNumTwo(callBase12, callBase8, 1, 1, enabled2);
 }
 
 /**
