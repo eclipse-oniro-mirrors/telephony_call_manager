@@ -77,13 +77,15 @@ public:
 
 private:
     ToneDescriptor currentToneDescriptor_ = ToneDescriptor::TONE_UNKNOWN;
-    bool InitTonePlayer(AudioStandard::StreamUsage streamUsage);
+    bool InitTonePlayer();
     AudioStandard::ToneType ConvertToneDescriptorToToneType(ToneDescriptor tone);
     std::string GetToneDescriptorPath(ToneDescriptor tone);
-    bool IsDtmf(ToneDescriptor tone);
+    bool IsUseTonePlayer(ToneDescriptor tone);
     std::mutex mutex_;
     AudioPlayer *audioPlayer_ = nullptr;
     std::shared_ptr<AudioStandard::TonePlayer> tonePlayer_;
+    AudioStandard::StreamUsage GetStreamUsageByToneType(ToneDescriptor tone);
+    AudioStandard::ToneType ConvertCallToneDescriptorToToneType(ToneDescriptor tone);
 };
 } // namespace Telephony
 } // namespace OHOS

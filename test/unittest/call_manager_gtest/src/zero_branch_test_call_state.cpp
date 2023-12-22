@@ -360,19 +360,20 @@ HWTEST_F(CallStateTest, Telephony_Tone_001, Function | MediumTest | Level3)
     ringbackTone->Stop();
 
     auto tone = std::make_shared<Tone>(ToneDescriptor::TONE_DTMF_CHAR_1);
-    ASSERT_TRUE(tone->IsDtmf(ToneDescriptor::TONE_DTMF_CHAR_0));
-    ASSERT_TRUE(tone->IsDtmf(ToneDescriptor::TONE_DTMF_CHAR_1));
-    ASSERT_TRUE(tone->IsDtmf(ToneDescriptor::TONE_DTMF_CHAR_2));
-    ASSERT_TRUE(tone->IsDtmf(ToneDescriptor::TONE_DTMF_CHAR_3));
-    ASSERT_TRUE(tone->IsDtmf(ToneDescriptor::TONE_DTMF_CHAR_4));
-    ASSERT_TRUE(tone->IsDtmf(ToneDescriptor::TONE_DTMF_CHAR_5));
-    ASSERT_TRUE(tone->IsDtmf(ToneDescriptor::TONE_DTMF_CHAR_6));
-    ASSERT_TRUE(tone->IsDtmf(ToneDescriptor::TONE_DTMF_CHAR_7));
-    ASSERT_TRUE(tone->IsDtmf(ToneDescriptor::TONE_DTMF_CHAR_8));
-    ASSERT_TRUE(tone->IsDtmf(ToneDescriptor::TONE_DTMF_CHAR_9));
-    ASSERT_TRUE(tone->IsDtmf(ToneDescriptor::TONE_DTMF_CHAR_P));
-    ASSERT_TRUE(tone->IsDtmf(ToneDescriptor::TONE_DTMF_CHAR_W));
-    ASSERT_FALSE(tone->IsDtmf(ToneDescriptor::TONE_RINGBACK));
+    ASSERT_TRUE(tone->IsUseTonePlayer(ToneDescriptor::TONE_DTMF_CHAR_0));
+    ASSERT_TRUE(tone->IsUseTonePlayer(ToneDescriptor::TONE_DTMF_CHAR_1));
+    ASSERT_TRUE(tone->IsUseTonePlayer(ToneDescriptor::TONE_DTMF_CHAR_2));
+    ASSERT_TRUE(tone->IsUseTonePlayer(ToneDescriptor::TONE_DTMF_CHAR_3));
+    ASSERT_TRUE(tone->IsUseTonePlayer(ToneDescriptor::TONE_DTMF_CHAR_4));
+    ASSERT_TRUE(tone->IsUseTonePlayer(ToneDescriptor::TONE_DTMF_CHAR_5));
+    ASSERT_TRUE(tone->IsUseTonePlayer(ToneDescriptor::TONE_DTMF_CHAR_6));
+    ASSERT_TRUE(tone->IsUseTonePlayer(ToneDescriptor::TONE_DTMF_CHAR_7));
+    ASSERT_TRUE(tone->IsUseTonePlayer(ToneDescriptor::TONE_DTMF_CHAR_8));
+    ASSERT_TRUE(tone->IsUseTonePlayer(ToneDescriptor::TONE_DTMF_CHAR_9));
+    ASSERT_TRUE(tone->IsUseTonePlayer(ToneDescriptor::TONE_DTMF_CHAR_P));
+    ASSERT_TRUE(tone->IsUseTonePlayer(ToneDescriptor::TONE_DTMF_CHAR_W));
+    ASSERT_TRUE(tone->IsUseTonePlayer(ToneDescriptor::TONE_RINGBACK));
+    ASSERT_TRUE(tone->IsUseTonePlayer(ToneDescriptor::TONE_WAITING));
 }
 
 /**
@@ -429,7 +430,49 @@ HWTEST_F(CallStateTest, Telephony_Tone_003, Function | MediumTest | Level3)
         AudioStandard::ToneType::TONE_TYPE_DIAL_S);
     ASSERT_EQ(tone->ConvertToneDescriptorToToneType(ToneDescriptor::TONE_DTMF_CHAR_W),
         AudioStandard::ToneType::TONE_TYPE_DIAL_P);
+    ASSERT_EQ(tone->ConvertToneDescriptorToToneType(ToneDescriptor::TONE_RINGBACK),
+        AudioStandard::ToneType::TONE_TYPE_COMMON_SUPERVISORY_RINGTONE);
+    ASSERT_EQ(tone->ConvertToneDescriptorToToneType(ToneDescriptor::TONE_WAITING),
+        AudioStandard::ToneType::TONE_TYPE_COMMON_SUPERVISORY_CALL_WAITING);
     ASSERT_EQ(tone->ConvertToneDescriptorToToneType(ToneDescriptor::TONE_UNKNOWN), AudioStandard::ToneType::NUM_TONES);
+}
+
+/**
+ * @tc.number   Telephony_Tone_004
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallStateTest, Telephony_Tone_004, Function | MediumTest | Level3)
+{
+    auto tone = std::make_shared<Tone>();
+    ASSERT_EQ(tone->GetStreamUsageByToneType(ToneDescriptor::TONE_DTMF_CHAR_0),
+        AudioStandard::StreamUsage::STREAM_USAGE_DTMF);
+    ASSERT_EQ(tone->GetStreamUsageByToneType(ToneDescriptor::TONE_DTMF_CHAR_1),
+        AudioStandard::StreamUsage::STREAM_USAGE_DTMF);
+    ASSERT_EQ(tone->GetStreamUsageByToneType(ToneDescriptor::TONE_DTMF_CHAR_2),
+        AudioStandard::StreamUsage::STREAM_USAGE_DTMF);
+    ASSERT_EQ(tone->GetStreamUsageByToneType(ToneDescriptor::TONE_DTMF_CHAR_3),
+        AudioStandard::StreamUsage::STREAM_USAGE_DTMF);
+    ASSERT_EQ(tone->GetStreamUsageByToneType(ToneDescriptor::TONE_DTMF_CHAR_4),
+        AudioStandard::StreamUsage::STREAM_USAGE_DTMF);
+    ASSERT_EQ(tone->GetStreamUsageByToneType(ToneDescriptor::TONE_DTMF_CHAR_5),
+        AudioStandard::StreamUsage::STREAM_USAGE_DTMF);
+    ASSERT_EQ(tone->GetStreamUsageByToneType(ToneDescriptor::TONE_DTMF_CHAR_6),
+        AudioStandard::StreamUsage::STREAM_USAGE_DTMF);
+    ASSERT_EQ(tone->GetStreamUsageByToneType(ToneDescriptor::TONE_DTMF_CHAR_7),
+        AudioStandard::StreamUsage::STREAM_USAGE_DTMF);
+    ASSERT_EQ(tone->GetStreamUsageByToneType(ToneDescriptor::TONE_DTMF_CHAR_8),
+        AudioStandard::StreamUsage::STREAM_USAGE_DTMF);
+    ASSERT_EQ(tone->GetStreamUsageByToneType(ToneDescriptor::TONE_DTMF_CHAR_9),
+        AudioStandard::StreamUsage::STREAM_USAGE_DTMF);
+    ASSERT_EQ(tone->GetStreamUsageByToneType(ToneDescriptor::TONE_DTMF_CHAR_P),
+        AudioStandard::StreamUsage::STREAM_USAGE_DTMF);
+    ASSERT_EQ(tone->GetStreamUsageByToneType(ToneDescriptor::TONE_DTMF_CHAR_W),
+        AudioStandard::StreamUsage::STREAM_USAGE_DTMF);
+    ASSERT_EQ(tone->GetStreamUsageByToneType(ToneDescriptor::TONE_RINGBACK),
+        AudioStandard::StreamUsage::STREAM_USAGE_VOICE_COMMUNICATION);
+    ASSERT_EQ(tone->GetStreamUsageByToneType(ToneDescriptor::TONE_WAITING),
+        AudioStandard::StreamUsage::STREAM_USAGE_VOICE_COMMUNICATION);
 }
 
 /**
