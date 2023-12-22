@@ -238,12 +238,10 @@ bool AudioControlManager::PlayRingtone()
         TELEPHONY_LOGE("should not play ringtone");
         return false;
     }
+    ring_ = std::make_unique<Ring>();
     if (ring_ == nullptr) {
-        ring_ = std::make_unique<Ring>();
-        if (ring_ == nullptr) {
-            TELEPHONY_LOGE("create ring object failed");
-            return false;
-        }
+        TELEPHONY_LOGE("create ring object failed");
+        return false;
     }
     sptr<CallBase> incomingCall = CallObjectManager::GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_RINGING);
     if (incomingCall == nullptr) {
@@ -521,12 +519,10 @@ int32_t AudioControlManager::PlayCallTone(ToneDescriptor type)
         return CALL_ERR_AUDIO_TONE_PLAY_FAILED;
     }
     toneState_ = ToneState::TONEING;
+    tone_ = std::make_unique<Tone>(type);
     if (tone_ == nullptr) {
-        tone_ = std::make_unique<Tone>(type);
-        if (tone_ == nullptr) {
-            TELEPHONY_LOGE("create tone failed");
-            return TELEPHONY_ERR_LOCAL_PTR_NULL;
-        }
+        TELEPHONY_LOGE("create tone failed");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     if (tone_->Play() != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("play calltone failed");
@@ -551,7 +547,6 @@ int32_t AudioControlManager::StopCallTone()
         return CALL_ERR_AUDIO_TONE_STOP_FAILED;
     }
     tone_->ReleaseRenderer();
-    tone_ = nullptr;
     toneState_ = ToneState::STOPPED;
     TELEPHONY_LOGI("stop call tone success");
     return TELEPHONY_SUCCESS;
