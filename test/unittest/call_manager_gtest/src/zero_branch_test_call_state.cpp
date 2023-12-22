@@ -465,9 +465,9 @@ HWTEST_F(CallStateTest, Telephony_Tone_004, Function | MediumTest | Level3)
         AudioStandard::StreamUsage::STREAM_USAGE_DTMF);
     ASSERT_EQ(tone->GetStreamUsageByToneType(ToneDescriptor::TONE_DTMF_CHAR_9),
         AudioStandard::StreamUsage::STREAM_USAGE_DTMF);
-    ASSERT_EQ(tone->GetStreamUsageByToneType(ToneDescriptor::TONE_DTMF_CHAR_p),
+    ASSERT_EQ(tone->GetStreamUsageByToneType(ToneDescriptor::TONE_DTMF_CHAR_P),
         AudioStandard::StreamUsage::STREAM_USAGE_DTMF);
-    ASSERT_EQ(tone->GetStreamUsageByToneType(ToneDescriptor::TONE_DTMF_CHAR_w),
+    ASSERT_EQ(tone->GetStreamUsageByToneType(ToneDescriptor::TONE_DTMF_CHAR_W),
         AudioStandard::StreamUsage::STREAM_USAGE_DTMF);
     ASSERT_EQ(tone->GetStreamUsageByToneType(ToneDescriptor::TONE_RINGBACK),
         AudioStandard::StreamUsage::STREAM_USAGE_VOICE_COMMUNICATION);
