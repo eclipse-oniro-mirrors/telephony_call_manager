@@ -48,7 +48,7 @@ int32_t Tone::Play()
     }
     if (IsUseTonePlayer(currentToneDescriptor_)) {
         TELEPHONY_LOGI("currentToneDescriptor = %{public}d", currentToneDescriptor_);
-        if (!InitTonePlayer(AudioStandard::StreamUsage::STREAM_USAGE_DTMF)) {
+        if (!InitTonePlayer()) {
             return TELEPHONY_ERROR;
         }
         std::thread play([&]() {
@@ -216,7 +216,7 @@ AudioStandard::ToneType Tone::ConvertCallToneDescriptorToToneType(ToneDescriptor
             tonType = ToneType::TONE_TYPE_COMMON_SUPERVISORY_RINGTONE;
             break;
         case ToneDescriptor::TONE_WAITING:
-            tonType = ToneType::TONE_TYPE_COMMON_SUPERVISORY_CALL_WATTING;
+            tonType = ToneType::TONE_TYPE_COMMON_SUPERVISORY_CALL_WAITING;
             break;
         default:
             break;
@@ -245,11 +245,11 @@ AudioStandard::StreamUsage Tone::GetStreamUsageByToneType(ToneDescriptor descrip
         case ToneDescriptor::TONE_RINGBACK:
         case ToneDescriptor::TONE_WAITING:
             streamUsage = AudioStandard::StreamUsage::STREAM_USAGE_VOICE_COMMUNICATION;
-            break
+            break;
         default:
             break;
     }
-    return ret;
+    return streamUsage;
 }
 
 bool Tone::IsUseTonePlayer(ToneDescriptor tone)
