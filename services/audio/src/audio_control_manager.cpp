@@ -18,9 +18,14 @@
 #include "call_control_manager.h"
 #include "call_state_processor.h"
 #include "telephony_log_wrapper.h"
+#include "audio_system_manager.h"
+#include "audio_routing_manager.h"
+#include "audio_device_info.h"
+#include "audio_info.h"
 
 namespace OHOS {
 namespace Telephony {
+using namespace AudioStandard;
 constexpr int32_t DTMF_PLAY_TIME = 30;
 
 AudioControlManager::AudioControlManager()
@@ -222,6 +227,25 @@ int32_t AudioControlManager::SetAudioDevice(const AudioDevice &device)
         case AudioDeviceType::DEVICE_WIRED_HEADSET:
             audioDeviceType = device.deviceType;
             break;
+        case AudioDeviceType::DEVICE_BLUETOOTH_SCO: {
+            AudioRoutingManager* audioRoutingManager = AudioRoutingManager::GetInstance();
+            std::vector<std::unique_ptr<AudioDeviceDescriptor>> desc =
+                audioRoutingManager->GetAvailableDevices(AudioDeviceUsage::CALL_OUTPUT_DEVICES);
+            std::vector<sptr<AudioDeviceDescriptor>> bluetoothDeviceDesc = {};
+            for (auto &dev : desc) {
+                if (dev->macAddress_ == device.address) {
+                    bluetoothDeviceDesc.push_back(new(std::nothrow) AudioDeviceDescriptor(*dev));
+                }
+            }
+            sptr<AudioRendererFilter> audioRendererFilter = new(std::nothrow) AudioRendererFilter();
+            AudioRendererInfo rendererInfo;
+            rendererInfo.streamUsage = StreamUsage::STREAM_USAGE_VOICE_COMMUNICATION;
+            rendererInfo.rendererFlags = 1;
+            audioRendererFilter->rendererInfo = rendererInfo;
+            AudioSystemManager* audioSystemManager = AudioSystemManager::GetInstance();
+            audioSystemManager->SelectOutputDevice(audioRendererFilter, bluetoothDeviceDesc);
+            break;
+        }
         default:
             break;
     }

@@ -24,9 +24,12 @@
 #include "speaker_device_state.h"
 #include "telephony_log_wrapper.h"
 #include "wired_headset_device_state.h"
+#include "audio_system_manager.h"
+#include "audio_device_info.h"
 
 namespace OHOS {
 namespace Telephony {
+using namespace AudioStandard;
 bool AudioDeviceManager::isBtScoDevEnable_ = false;
 bool AudioDeviceManager::isSpeakerAvailable_ = true; // default available
 bool AudioDeviceManager::isEarpieceAvailable_ = true;
@@ -188,7 +191,9 @@ bool AudioDeviceManager::ProcessEvent(AudioEvent event)
                 std::shared_ptr<BluetoothCallManager> bluetoothCallManager = std::make_shared<BluetoothCallManager>();
                 // Gets whether the device can be started from the configuration
                 if (bluetoothCallManager->IsBtAvailble()) {
-                    return true;
+                    AudioSystemManager* audioSystemManager = AudioSystemManager::GetInstance();
+                    int32_t ret = audioSystemManager->SetDeviceActive(ActiveDeviceType::BLUETOOTH_SCO, true);
+                    return ret == 0 ? true : false;
                 }
                 AudioDevice device = {
                     .deviceType = AudioDeviceType::DEVICE_EARPIECE,
