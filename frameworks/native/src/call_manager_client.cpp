@@ -42,7 +42,7 @@ void CallManagerClient::Init(int32_t systemAbilityId)
         }
         g_callManagerProxy->Init(systemAbilityId);
     }
-    TELEPHONY_LOGI("CallManagerClient init success!");
+    TELEPHONY_LOGD("CallManagerClient init success!");
 }
 
 void CallManagerClient::UnInit()

@@ -259,7 +259,7 @@ int32_t CallManagerServiceStub::OnRemoteRequest(
         TELEPHONY_LOGE("descriptor checked fail !");
         return TELEPHONY_ERR_DESCRIPTOR_MISMATCH;
     }
-    TELEPHONY_LOGI("OnReceived, cmd = %{public}u", code);
+    TELEPHONY_LOGD("OnReceived, cmd = %{public}u", code);
     auto itFunc = memberFuncMap_.find(code);
     if (itFunc != memberFuncMap_.end()) {
         auto memberFunc = itFunc->second;
@@ -900,7 +900,7 @@ int32_t CallManagerServiceStub::OnFormatPhoneNumberToE164(MessageParcel &data, M
     std::u16string countryCode = data.ReadString16();
     std::u16string formatNumber;
     int32_t result = FormatPhoneNumberToE164(callNumber, countryCode, formatNumber);
-    TELEPHONY_LOGI("result:%{public}d", result);
+    TELEPHONY_LOGD("result:%{public}d", result);
     if (!reply.WriteInt32(result)) {
         TELEPHONY_LOGE("OnFormatPhoneNumberToE164 write reply failed.");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
