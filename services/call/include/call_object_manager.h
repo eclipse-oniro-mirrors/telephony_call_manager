@@ -54,6 +54,7 @@ public:
     static bool IsCallExist(std::string &phoneNumber);
     static bool HasCallExist();
     static int32_t HasRingingCall(bool &enabled);
+    static int32_t HasConferenceCall(bool &enabled);
     static TelCallState GetCallState(int32_t callId);
     static sptr<CallBase> GetOneCallObject(CallRunningState callState);
     static bool IsCallExist(CallType type, TelCallState callState);

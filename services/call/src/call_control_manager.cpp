@@ -172,6 +172,10 @@ int32_t CallControlManager::AnswerCall(int32_t callId, int32_t videoState)
     if (callId == INVALID_CALLID) {
         callId = call->GetCallID();
     }
+    if (videoState != static_cast<int32_t>(call->GetVideoStateType())) {
+        call->SetVideoStateType(static_cast<VideoStateType>(videoState));
+        TELEPHONY_LOGI("videoState has changed");
+    }
     TELEPHONY_LOGI("report answered state");
     NotifyCallStateUpdated(call, TelCallState::CALL_STATUS_INCOMING, TelCallState::CALL_STATUS_ANSWERED);
     if (VoIPCallState_ != CallStateToApp::CALL_STATE_IDLE) {
