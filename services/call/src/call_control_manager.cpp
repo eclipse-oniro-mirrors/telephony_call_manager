@@ -213,7 +213,7 @@ int32_t CallControlManager::RejectCall(int32_t callId, bool rejectWithMessage, s
             TELEPHONY_LOGE("call is nullptr");
             CallManagerHisysevent::WriteHangUpFaultEvent(
                 INVALID_PARAMETER, callId, TELEPHONY_ERR_LOCAL_PTR_NULL, "Reject call is nullptr");
-            return TELEPHONY_ERROR;
+            return TELEPHONY_ERR_LOCAL_PTR_NULL;
         }
         callId = call->GetCallID();
     }
@@ -253,7 +253,7 @@ int32_t CallControlManager::HangUpCall(int32_t callId)
             TELEPHONY_LOGE("callId is INVALID_CALLID!");
             CallManagerHisysevent::WriteHangUpFaultEvent(
                 INVALID_PARAMETER, callId, TELEPHONY_ERR_LOCAL_PTR_NULL, "HangUp callId is INVALID_CALLID");
-            return TELEPHONY_ERROR;
+            return TELEPHONY_ERR_ARGUMENT_INVALID;
         }
     }
 
