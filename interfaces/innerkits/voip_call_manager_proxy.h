@@ -96,15 +96,31 @@ public:
      * @return Returns 0 on success, others on failure.
      */
     int32_t ReportVoipCallExtensionId(std::string &callId, std::string &bundleName, std::string &extensionId) override;
+
     /**
-     * @brief callmanager report call event change.
+     * @brief hang up a call
      *
-     * @param callId[in], The call id
-     * @param bundleName[in], The bundleName
-     * @param event[in], The VoipCallEvent
-     * @return Returns 0 on success, others on failure.
+     * @param events[in], The VoipCallEventInfo
+     * @return Returns TELEPHONY_SUCCESS on success, others on failure.
      */
-    int32_t ReportVoipCallEventChange(const VoipCallEvents &events) override;
+    int32_t HangUp(const VoipCallEventInfo &events) override;
+
+    /**
+     * @brief reject a call
+     *
+     * @param events[in], The VoipCallEventInfo
+     * @return Returns TELEPHONY_SUCCESS on success, others on failure.
+     */
+    int32_t Reject(const VoipCallEventInfo &events) override;
+
+    /**
+     * @brief answer a call
+     *
+     * @param events[in], The VoipCallEventInfo
+     * @param videoState[in], The videoState
+     * @return Returns TELEPHONY_SUCCESS on success, others on failure.
+     */
+    int32_t Answer(const VoipCallEventInfo &events, int32_t videoState) override;
 
     /**
      * @brief Register CallManager CallBack ptr

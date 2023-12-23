@@ -160,7 +160,7 @@ enum class ErrorReason {
 /**
  * @brief Indicates the voip call Events.
  */
-struct VoipCallEvents {
+struct VoipCallEventInfo {
     /**
      * Indicates the callid
      */

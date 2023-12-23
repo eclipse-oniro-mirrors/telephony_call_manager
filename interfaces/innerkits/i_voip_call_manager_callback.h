@@ -31,7 +31,7 @@ public:
             INTERFACE_REPORT_VOIP_CALL_EVENT_CHANGE = 0,
         };
 
-    virtual int32_t OnVoipCallEventChange(const VoipCallEvents &event) = 0;
+    virtual int32_t OnVoipCallEventChange(const VoipCallEventInfo &event) = 0;
 
     void SetBundleName(const std::string &name)
     {

@@ -41,7 +41,9 @@ public:
         INTERFACE_REPORT_VOIP_CALL_EXTENSIONID,
         INTERFACE_REGISTER_CALL_MANAGER_CALLBACK,
         INTERFACE_UNREGISTER_CALL_MANAGER_CALLBACK,
-        INTERFACE_REPORT_VOIP_CALL_EVENT_CHANGE,
+        INTERFACE_ANSWER_VOIP_CALL,
+        INTERFACE_HANGUP_VOIP_CALL,
+        INTERFACE_REJECT_VOIP_CALL
     };
     virtual ~IVoipCallManagerService() = default;
     virtual int32_t ReportIncomingCall(
@@ -57,7 +59,9 @@ public:
 
     virtual int32_t RegisterCallManagerCallBack(const sptr<ICallStatusCallback> &callback) = 0;
     virtual int32_t UnRegisterCallManagerCallBack() = 0;
-    virtual int32_t ReportVoipCallEventChange(const VoipCallEvents &events) = 0;
+    virtual int32_t Answer(const VoipCallEventInfo &events, int32_t videoState) = 0;
+    virtual int32_t Reject(const VoipCallEventInfo &events) = 0;
+    virtual int32_t HangUp(const VoipCallEventInfo &events) = 0;
 
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"OHOS.Telephony.IVoipCallManagerService");

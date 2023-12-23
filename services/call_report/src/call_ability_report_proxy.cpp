@@ -19,6 +19,7 @@
 
 #include "iservice_registry.h"
 #include "system_ability.h"
+#include "call_object_manager.h"
 #include "system_ability_definition.h"
 
 #include "call_manager_errors.h"
@@ -66,6 +67,14 @@ int32_t CallAbilityReportProxy::RegisterCallBack(
         }
     }
     callbackPtrList_.emplace_back(callAbilityCallbackPtr);
+    std::vector<CallAttributeInfo> callAttributeInfo = CallObjectManager::GetAllCallInfoList();
+    std::vector<CallAttributeInfo>::iterator iterator = callAttributeInfo.begin();
+    while (iterator != callAttributeInfo.end()) {
+        CallAttributeInfo info = (*iterator);
+        iterator++;
+        TELEPHONY_LOGI("first time register callback success report call info");
+        ReportCallStateInfo(info);
+    }
     TELEPHONY_LOGI("%{public}s successfully registered the callback for the first time!", bundleName.c_str());
     return TELEPHONY_SUCCESS;
 }
@@ -98,25 +107,21 @@ void CallAbilityReportProxy::CallStateUpdated(
     }
     CallAttributeInfo info;
     callObjectPtr->GetCallAttributeInfo(info);
-    if (info.callType == CallType::TYPE_VOIP) {
-        ReportCallStateInfo(info);
-    } else {
-        size_t accountLen = strlen(info.accountNumber);
-        if (accountLen > static_cast<size_t>(kMaxNumberLen)) {
-            accountLen = kMaxNumberLen;
-        }
-        for (size_t i = 0; i < accountLen; i++) {
-            if (info.accountNumber[i] == ',' || info.accountNumber[i] == ';') {
-                info.accountNumber[i] = '\0';
-                break;
-            }
-        }
-        if (nextState == TelCallState::CALL_STATUS_ANSWERED) {
-            TELEPHONY_LOGI("report answered state");
-            info.callState = TelCallState::CALL_STATUS_ANSWERED;
-        }
-        ReportCallStateInfo(info);
+    size_t accountLen = strlen(info.accountNumber);
+    if (accountLen > static_cast<size_t>(kMaxNumberLen)) {
+        accountLen = kMaxNumberLen;
     }
+    for (size_t i = 0; i < accountLen; i++) {
+        if (info.accountNumber[i] == ',' || info.accountNumber[i] == ';') {
+            info.accountNumber[i] = '\0';
+            break;
+        }
+    }
+    if (nextState == TelCallState::CALL_STATUS_ANSWERED) {
+        TELEPHONY_LOGI("report answered state");
+        info.callState = TelCallState::CALL_STATUS_ANSWERED;
+    }
+    ReportCallStateInfo(info);
 }
 
 void CallAbilityReportProxy::CallEventUpdated(CallEventInfo &info)

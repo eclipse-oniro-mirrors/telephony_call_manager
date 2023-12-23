@@ -17,7 +17,6 @@
 #define CALL_BASE_VOIP_CALL_OBJECT_H
 
 #include "carrier_call.h"
-#include "pixel_map.h"
 #include "voip_call_manager_info.h"
 
 namespace OHOS {
@@ -51,7 +50,7 @@ public:
     int32_t SetMute(int32_t mute, int32_t slotId) override;
 
 protected:
-    int32_t PackVoipCallInfo(VoipCallEvents &voipcallInfo);
+    int32_t PackVoipCallInfo(VoipCallEventInfo &voipcallInfo);
 
 private:
     std::string voipCallId_ = "";

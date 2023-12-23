@@ -80,14 +80,34 @@ int32_t VoipCallConnection::GetCallManagerProxy()
     return TELEPHONY_SUCCESS;
 }
 
-int32_t VoipCallConnection::ReportVoipCallEventChange(const VoipCallEvents &events)
+int32_t VoipCallConnection::AnswerCall(const VoipCallEventInfo &events, int32_t videoState)
 {
     GetCallManagerProxy();
     if (voipCallManagerInterfacePtr_ == nullptr) {
-        TELEPHONY_LOGI("Voipconnect ReportVoipCallEventChange voipCallManagerInterfacePtr_ is null");
+        TELEPHONY_LOGI("Voipconnect AnswerCall voipCallManagerInterfacePtr_ is null");
         return TELEPHONY_ERROR;
     }
-    return voipCallManagerInterfacePtr_->ReportVoipCallEventChange(events);
+    return voipCallManagerInterfacePtr_->Answer(events, videoState);
+}
+
+int32_t VoipCallConnection::RejectCall(const VoipCallEventInfo &events)
+{
+    GetCallManagerProxy();
+    if (voipCallManagerInterfacePtr_ == nullptr) {
+        TELEPHONY_LOGI("Voipconnect RejectCall voipCallManagerInterfacePtr_ is null");
+        return TELEPHONY_ERROR;
+    }
+    return voipCallManagerInterfacePtr_->Reject(events);
+}
+
+int32_t VoipCallConnection::HangUpCall(const VoipCallEventInfo &events)
+{
+    GetCallManagerProxy();
+    if (voipCallManagerInterfacePtr_ == nullptr) {
+        TELEPHONY_LOGI("Voipconnect HangUpCall voipCallManagerInterfacePtr_ is null");
+        return TELEPHONY_ERROR;
+    }
+    return voipCallManagerInterfacePtr_->HangUp(events);
 }
 
 int32_t VoipCallConnection::RegisterCallManagerCallBack(const sptr<ICallStatusCallback> &callback)

@@ -2335,8 +2335,11 @@ HWTEST_F(BranchTest, Telephony_VoipCallManagerProxy_001, Function | MediumTest |
         voipCallManagerInterfacePtr->ReportVoipIncomingCall(callId, bundleName);
         std::string extensionId = " ";
         voipCallManagerInterfacePtr->ReportVoipCallExtensionId(callId, bundleName, extensionId);
-        VoipCallEvents voipCallEvents;
-        voipCallManagerInterfacePtr->ReportVoipCallEventChange(voipCallEvents);
+        VoipCallEventInfo voipCallEventInfo;
+        voipCallEventInfo.voipCallId = "123";
+        voipCallManagerInterfacePtr->Answer(voipCallEventInfo, static_cast<int32_t>(VideoStateType::TYPE_VOICE));
+        voipCallManagerInterfacePtr->HangUp(voipCallEventInfo);
+        voipCallManagerInterfacePtr->Reject(voipCallEventInfo);
         sptr<ICallStatusCallback> statusCallback = (std::make_unique<CallStatusCallback>()).release();
         voipCallManagerInterfacePtr->RegisterCallManagerCallBack(statusCallback);
         voipCallManagerInterfacePtr->UnRegisterCallManagerCallBack();

@@ -5649,7 +5649,7 @@ HWTEST_F(CallManagerGtest, Telephony_VoipCall_001, Function | MediumTest | Level
     std::shared_ptr<VoIPCall> voIPCall = std::make_shared<VoIPCall>(dialInfo);
     EXPECT_EQ(voIPCall->DialingProcess(), TELEPHONY_SUCCESS);
     EXPECT_EQ(voIPCall->AnswerCall(0), TELEPHONY_SUCCESS);
-    VoipCallEvents voipcallInfo;
+    VoipCallEventInfo voipcallInfo;
     EXPECT_EQ(voIPCall->PackVoipCallInfo(voipcallInfo), TELEPHONY_SUCCESS);
     EXPECT_EQ(voIPCall->RejectCall(), TELEPHONY_SUCCESS);
     EXPECT_EQ(voIPCall->HangUpCall(), TELEPHONY_SUCCESS);
