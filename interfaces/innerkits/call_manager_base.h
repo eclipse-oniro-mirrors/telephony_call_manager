@@ -35,7 +35,7 @@ constexpr int16_t kMaxBundleNameLen = 100;
 /**
  * @brief Indicates Maximum length of a address.
  */
-constexpr int16_t kMaxAddressLen = 100;
+constexpr int16_t kMaxAddressLen = 225;
 /**
  * @brief Indicates Maximum length of a MMI code message.
  */
@@ -520,7 +520,15 @@ enum class AudioDeviceType {
     /**
      * Indicates the device type is a distributed car device.
      */
-    DEVICE_DISTRIBUTED_CAR,
+    DEVICE_DISTRIBUTED_AUTOMOTIVE,
+    /**
+     * Indicates the device type is a distributed phone device.
+     */
+    DEVICE_DISTRIBUTED_PHONE,
+    /**
+     * Indicates the device type is a distributed pad device.
+     */
+    DEVICE_DISTRIBUTED_PAD,
 };
 
 /**

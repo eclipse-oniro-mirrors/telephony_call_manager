@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -24,6 +24,7 @@
 #include "speaker_device_state.h"
 #include "telephony_log_wrapper.h"
 #include "wired_headset_device_state.h"
+#include "distributed_call_manager.h"
 #include "audio_system_manager.h"
 #include "audio_device_info.h"
 
@@ -31,10 +32,12 @@ namespace OHOS {
 namespace Telephony {
 using namespace AudioStandard;
 bool AudioDeviceManager::isBtScoDevEnable_ = false;
+bool AudioDeviceManager::isDCallDevEnable_ = false;
 bool AudioDeviceManager::isSpeakerAvailable_ = true; // default available
 bool AudioDeviceManager::isEarpieceAvailable_ = true;
 bool AudioDeviceManager::isWiredHeadsetConnected_ = false;
 bool AudioDeviceManager::isBtScoConnected_ = false;
+bool AudioDeviceManager::isDCallDevConnected_ = false;
 
 AudioDeviceManager::AudioDeviceManager()
     : audioDeviceType_(AudioDeviceType::DEVICE_UNKNOWN), currentAudioDevice_(nullptr), isAudioActivated_(false)
@@ -170,6 +173,24 @@ void AudioDeviceManager::ResetBtAudioDevicesList()
     SetDeviceAvailable(AudioDeviceType::DEVICE_BLUETOOTH_SCO, false);
     DelayedSingleton<CallAbilityReportProxy>::GetInstance()->ReportAudioDeviceChange(info_);
     TELEPHONY_LOGI("ResetBtAudioDevicesList success");
+}
+
+void AudioDeviceManager::ResetDistributedCallDevicesList()
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    std::vector<AudioDevice>::iterator it = info_.audioDeviceList.begin();
+    while (it != info_.audioDeviceList.end()) {
+        if (IsDistributedAudioDeviceType(it->deviceType)) {
+            it = info_.audioDeviceList.erase(it);
+        } else {
+            ++it;
+        }
+    }
+    SetDeviceAvailable(AudioDeviceType::DEVICE_DISTRIBUTED_AUTOMOTIVE, false);
+    SetDeviceAvailable(AudioDeviceType::DEVICE_DISTRIBUTED_PHONE, false);
+    SetDeviceAvailable(AudioDeviceType::DEVICE_DISTRIBUTED_PAD, false);
+    DelayedSingleton<CallAbilityReportProxy>::GetInstance()->ReportAudioDeviceChange(info_);
+    TELEPHONY_LOGI("Reset Distributed Audio Devices List success");
 }
 
 bool AudioDeviceManager::InitAudioDevice()
@@ -310,10 +331,23 @@ bool AudioDeviceManager::EnableBtSco()
     return false;
 }
 
+bool AudioDeviceManager::EnableDistributedCall()
+{
+    if (isDCallDevConnected_) {
+        AudioDeviceType type = DelayedSingleton<DistributedCallManager>::GetInstance()->GetConnectedDCallType();
+        TELEPHONY_LOGI("distributed call enabled, current audio device: %d", static_cast<int32_t>(type));
+        SetCurrentAudioDevice(type);
+        return true;
+    }
+    TELEPHONY_LOGI("enable distributed call device failed");
+    return false;
+}
+
 bool AudioDeviceManager::DisableAll()
 {
     audioDeviceType_ = AudioDeviceType::DEVICE_UNKNOWN;
     isBtScoDevEnable_ = false;
+    isDCallDevEnable_ = false;
     isWiredHeadsetDevEnable_ = false;
     isSpeakerDevEnable_ = false;
     isEarpieceDevEnable_ = false;
@@ -328,8 +362,32 @@ bool AudioDeviceManager::DisableAll()
 
 void AudioDeviceManager::SetCurrentAudioDevice(AudioDeviceType deviceType)
 {
+    if (!IsDistributedAudioDeviceType(deviceType) && IsDistributedAudioDeviceType(audioDeviceType_)) {
+        DelayedSingleton<DistributedCallManager>::GetInstance()->DisconnectDCallDevice();
+    }
     audioDeviceType_ = deviceType;
     ReportAudioDeviceChange();
+}
+
+bool AudioDeviceManager::CheckAndSwitchDistributedAudioDevice()
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    DelayedSingleton<DistributedCallManager>::GetInstance()->SetCallState(true);
+    std::vector<AudioDevice>::iterator it = info_.audioDeviceList.begin();
+    while (it != info_.audioDeviceList.end()) {
+        if (it->deviceType == AudioDeviceType::DEVICE_DISTRIBUTED_AUTOMOTIVE) {
+            DelayedSingleton<DistributedCallManager>::GetInstance()->SwitchDCallDeviceAsync(*it);
+            return true;
+        } else {
+            ++it;
+        }
+    }
+    return false;
+}
+
+void AudioDeviceManager::OnActivedCallDisconnected()
+{
+    DelayedSingleton<DistributedCallManager>::GetInstance()->SetCallState(false);
 }
 
 int32_t AudioDeviceManager::ReportAudioDeviceChange()
@@ -344,14 +402,27 @@ int32_t AudioDeviceManager::ReportAudioDeviceChange()
     if (audioDeviceType_ == AudioDeviceType::DEVICE_BLUETOOTH_SCO) {
         std::shared_ptr<BluetoothCallManager> bluetoothCallManager = std::make_shared<BluetoothCallManager>();
         address = bluetoothCallManager->GetConnectedScoAddr();
+    } else if (IsDistributedAudioDeviceType(audioDeviceType_)) {
+        address = DelayedSingleton<DistributedCallManager>::GetInstance()->GetConnectedDCallAddr();
     }
     if (address.length() > kMaxAddressLen) {
         TELEPHONY_LOGE("address is not too long");
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
-    if (memcpy_s(info_.currentAudioDevice.address, kMaxAddressLen, address.c_str(), address.length()) != EOK) {
-        TELEPHONY_LOGE("memcpy_s address fail");
-        return TELEPHONY_ERR_MEMCPY_FAIL;
+    if (address.length() > 0) {
+        if (memset_s(info_.currentAudioDevice.address, kMaxAddressLen, 0, kMaxAddressLen) != EOK) {
+            TELEPHONY_LOGE("memset_s address fail");
+            return TELEPHONY_ERR_MEMCPY_FAIL;
+        }
+        if (memcpy_s(info_.currentAudioDevice.address, kMaxAddressLen, address.c_str(), address.length()) != EOK) {
+            TELEPHONY_LOGE("memcpy_s address fail");
+            return TELEPHONY_ERR_MEMCPY_FAIL;
+        }
+    } else {
+        if (memset_s(info_.currentAudioDevice.address, kMaxAddressLen, 0, kMaxAddressLen) != EOK) {
+            TELEPHONY_LOGE("memset_s address fail");
+            return TELEPHONY_ERR_MEMCPY_FAIL;
+        }
     }
     info_.isMuted = DelayedSingleton<AudioProxy>::GetInstance()->IsMicrophoneMute();
     TELEPHONY_LOGI("report audio device info, currentAudioDeviceType:%{public}d, currentAddress:%{public}s",
@@ -384,9 +455,19 @@ bool AudioDeviceManager::IsBtScoDevEnable()
     return isBtScoDevEnable_;
 }
 
+bool AudioDeviceManager::IsDCallDevEnable()
+{
+    return isDCallDevEnable_;
+}
+
 bool AudioDeviceManager::IsBtScoConnected()
 {
     return isBtScoConnected_;
+}
+
+bool AudioDeviceManager::IsDistributedCallConnected()
+{
+    return isDCallDevConnected_;
 }
 
 bool AudioDeviceManager::IsWiredHeadsetConnected()
@@ -404,6 +485,16 @@ bool AudioDeviceManager::IsSpeakerAvailable()
     return isSpeakerAvailable_;
 }
 
+bool AudioDeviceManager::IsDistributedAudioDeviceType(AudioDeviceType deviceType)
+{
+    if (((audioDeviceType_ == AudioDeviceType::DEVICE_DISTRIBUTED_AUTOMOTIVE) ||
+        (audioDeviceType_ == AudioDeviceType::DEVICE_DISTRIBUTED_PHONE) ||
+        (audioDeviceType_ == AudioDeviceType::DEVICE_DISTRIBUTED_PAD))) {
+        return true;
+    }
+    return false;
+}
+
 void AudioDeviceManager::SetDeviceAvailable(AudioDeviceType deviceType, bool available)
 {
     switch (deviceType) {
@@ -418,6 +509,11 @@ void AudioDeviceManager::SetDeviceAvailable(AudioDeviceType deviceType, bool ava
             break;
         case AudioDeviceType::DEVICE_WIRED_HEADSET:
             isWiredHeadsetConnected_ = available;
+            break;
+        case AudioDeviceType::DEVICE_DISTRIBUTED_AUTOMOTIVE:
+        case AudioDeviceType::DEVICE_DISTRIBUTED_PHONE:
+        case AudioDeviceType::DEVICE_DISTRIBUTED_PAD:
+            isDCallDevConnected_ = available;
             break;
         default:
             break;

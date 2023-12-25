@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -474,8 +474,13 @@ napi_value NapiCallManager::DeclareAudioDeviceEnum(napi_env env, napi_value expo
             NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(AudioDeviceType::DEVICE_DISABLE))),
         DECLARE_NAPI_STATIC_PROPERTY("DEVICE_BLUETOOTH_SCO",
             NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(AudioDeviceType::DEVICE_BLUETOOTH_SCO))),
-        DECLARE_NAPI_STATIC_PROPERTY("DEVICE_DISTRIBUTED_CAR",
-            NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(AudioDeviceType::DEVICE_DISTRIBUTED_CAR))),
+        DECLARE_NAPI_STATIC_PROPERTY("DEVICE_DISTRIBUTED_AUTOMOTIVE",
+            NapiCallManagerUtils::ToInt32Value(env,
+                static_cast<int32_t>(AudioDeviceType::DEVICE_DISTRIBUTED_AUTOMOTIVE))),
+        DECLARE_NAPI_STATIC_PROPERTY("DEVICE_DISTRIBUTED_PHONE",
+            NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(AudioDeviceType::DEVICE_DISTRIBUTED_PHONE))),
+        DECLARE_NAPI_STATIC_PROPERTY("DEVICE_DISTRIBUTED_PAD",
+            NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(AudioDeviceType::DEVICE_DISTRIBUTED_PAD))),
         DECLARE_NAPI_STATIC_PROPERTY("DEVICE_WIRED_HEADSET",
             NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(AudioDeviceType::DEVICE_WIRED_HEADSET))),
         DECLARE_NAPI_STATIC_PROPERTY("DEVICE_SPEAKER",

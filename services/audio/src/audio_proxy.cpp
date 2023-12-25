@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -19,6 +19,7 @@
 #include "bluetooth_call_manager.h"
 #include "audio_control_manager.h"
 #include "audio_group_manager.h"
+#include "distributed_call_manager.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -359,6 +360,10 @@ void AudioPreferDeviceChangeCallback::OnPreferredOutputDeviceUpdated(
     AudioDevice device;
     if (desc.size() == NO_DEVICE_VALID) {
         TELEPHONY_LOGE("desc size is zero");
+        return;
+    }
+    if (DelayedSingleton<DistributedCallManager>::GetInstance()->IsDAudioDeviceConnected()) {
+        TELEPHONY_LOGW("has already switch to distributed audio device");
         return;
     }
     switch (desc[0]->deviceType_) {
