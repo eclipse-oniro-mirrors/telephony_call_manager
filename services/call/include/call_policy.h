@@ -64,6 +64,7 @@ public:
     int32_t CloseUnFinishedUssdPolicy(int32_t slotId);
     bool IsSupportVideoCall(AppExecFwk::PacMap &extras);
     int32_t CanDialMulityCall(AppExecFwk::PacMap &extras);
+    int32_t IsValidCallType(CallType callType);
 
 private:
     uint16_t onlyTwoCall_ = 2;
