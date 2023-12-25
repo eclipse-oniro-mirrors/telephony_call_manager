@@ -43,6 +43,7 @@
                 "eventhandler",
                 "ffrt",
                 "graphic_2d",
+                "graphic_surface",
                 "hilog",
                 "hisysevent",
                 "hitrace",

@@ -144,7 +144,7 @@ ohos_shared_library("tel_call_manager") {
     "distributed_notification_service:ans_innerkits",
     "eventhandler:libeventhandler",
     "ffrt:libffrt",
-    "graphic_2d:surface",
+    "graphic_surface:surface",
     "hilog:libhilog",
     "hisysevent:libhisysevent",
     "hitrace:hitrace_meter",
