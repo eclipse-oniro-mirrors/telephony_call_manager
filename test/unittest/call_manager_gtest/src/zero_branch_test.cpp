@@ -170,6 +170,7 @@ HWTEST_F(BranchTest, Telephony_CallRequestProcess_001, Function | MediumTest | L
     callRequestProcess->IsFdnNumber(testList, content);
     callRequestProcess->IsDsdsMode3();
     callRequestProcess->DisconnectOtherSubIdCall(1, 0, 0);
+    callRequestProcess->DisconnectOtherCallForVideoCall(1, 0, 0);
     callRequestProcess->IsDsdsMode5();
 }
 
@@ -2062,6 +2063,7 @@ HWTEST_F(BranchTest, Telephony_CallStatusManager_002, Function | MediumTest | Le
     int32_t slotId = 0;
     callStatusManager->AutoAnswer(activeCallNum, waitingCallNum);
     callStatusManager->AutoAnswerForDsda(activeCallNum, slotId);
+    callStatusManager->AutoUnHoldForDsda(activeCallNum, slotId);
 }
 
 /**

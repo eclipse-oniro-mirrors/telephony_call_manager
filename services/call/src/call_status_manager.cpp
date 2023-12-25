@@ -717,11 +717,16 @@ void CallStatusManager::AutoAnswerForDsda(int32_t activeCallNum, int32_t slotId)
     GetCarrierCallList(callIdList);
     for (int32_t ringCallId : callIdList) {
         sptr<CallBase> ringCall = GetOneCallObject(ringCallId);
-        if (ringCall != nullptr && ringCall->GetCallRunningState() == CallRunningState::CALL_RUNNING_STATE_RINGING) {
+        if (ringCall != nullptr && ringCall->GetAutoAnswerState()) {
             TELEPHONY_LOGI("ringCall is not nullptr");
+            int32_t videoState = static_cast<int32_t>(ringCall->GetVideoStateType());
+            if (videoState == static_cast<int32_t>(VideoStateType::TYPE_VIDEO)) {
+                TELEPHONY_LOGI("AutoAnswer VideoCall for Dsda");
+                AutoAnswer(activeCallNum, waitingCallNum);
+                return;
+            }
             if (dialingCallNum == 0 && alertingCallNum == 0 && activeCallNum == 0 && answeredCallNum == 0 &&
-                ringCall->GetAutoAnswerState()) {
-                int32_t videoState = static_cast<int32_t>(ringCall->GetVideoStateType());
+                ringCall->GetCallRunningState() == CallRunningState::CALL_RUNNING_STATE_RINGING) {
                 int ret = ringCall->AnswerCall(videoState);
                 TELEPHONY_LOGI("ret = %{public}d", ret);
                 ringCall->SetAutoAnswerState(false);
@@ -729,13 +734,23 @@ void CallStatusManager::AutoAnswerForDsda(int32_t activeCallNum, int32_t slotId)
             }
         }
     }
+    AutoUnHoldForDsda(activeCallNum, slotId);
+}
+
+void CallStatusManager::AutoUnHoldForDsda(int32_t activeCallNum, int32_t slotId)
+{
+    int32_t dialingCallNum = GetCallNum(TelCallState::CALL_STATUS_DIALING);
+    int32_t waitingCallNum = GetCallNum(TelCallState::CALL_STATUS_WAITING);
+    int32_t answeredCallNum = GetCallNum(TelCallState::CALL_STATUS_ANSWERED);
+    std::list<int32_t> callIdList;
+    GetCarrierCallList(callIdList);
     for (int32_t otherCallId : callIdList) {
         sptr<CallBase> otherCall = GetOneCallObject(otherCallId);
         TelCallState state = otherCall->GetTelCallState();
         TelConferenceState confState = otherCall->GetTelConferenceState();
         int32_t conferenceId = ERR_ID;
         otherCall->GetMainCallId(conferenceId);
-        if (slotId != otherCall->GetSlotId() && state == TelCallState::CALL_STATUS_HOLDING &&
+        if (otherCall != nullptr && slotId != otherCall->GetSlotId() && state == TelCallState::CALL_STATUS_HOLDING &&
             otherCall->GetCanUnHoldState() && answeredCallNum == 0 && activeCallNum == 0 && waitingCallNum == 0 &&
             dialingCallNum == 0) {
             if (confState != TelConferenceState::TEL_CONFERENCE_IDLE && conferenceId == otherCallId) {

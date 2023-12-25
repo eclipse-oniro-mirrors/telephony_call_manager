@@ -119,8 +119,13 @@ void CallRequestProcess::AnswerRequest(int32_t callId, int32_t videoState)
     if (IsDsdsMode3()) {
         DisconnectOtherSubIdCall(callId, slotId, videoState);
     } else if (IsDsdsMode5()) {
-        call->SetAutoAnswerState(true);
-        HoldOrDisconnectedCall(callId, slotId, videoState);
+        if (videoState == static_cast<int32_t>(VideoStateType::TYPE_VIDEO)) {
+            TELEPHONY_LOGI("Answer videoCall for Dsda");
+            DisconnectOtherCallForVideoCall(callId, slotId, videoState);
+        } else {
+            call->SetAutoAnswerState(true);
+            HoldOrDisconnectedCall(callId, slotId, videoState);
+        }
     } else {
         int32_t ret = call->AnswerCall(videoState);
         if (ret != TELEPHONY_SUCCESS) {
@@ -177,10 +182,17 @@ void CallRequestProcess::HoldOrDisconnectedCall(int32_t callId, int32_t slotId, 
     int32_t waitingCallNum = GetCallNum(TelCallState::CALL_STATUS_WAITING);
     int32_t activeCallNum = GetCallNum(TelCallState::CALL_STATUS_ACTIVE);
     int32_t callNum = 4;
+    bool hasConferenceCall = false;
+    HasConferenceCall(hasConferenceCall);
     for (int32_t otherCallId : callIdList) {
         sptr<CallBase> call = GetOneCallObject(otherCallId);
         TELEPHONY_LOGI("other Call State =:%{public}d", call->GetTelCallState());
         if (call != nullptr && call != incomingCall) {
+            if (call->GetVideoStateType() == VideoStateType::TYPE_VIDEO) {
+                call->HangUpCall();
+                TELEPHONY_LOGI("Hangup Videocall for Incomingcall");
+                return;
+            }
             if (HandleDsdaIncomingCall(call, activeCallNum, slotId, videoState, incomingCall)) {
                 continue;
             }
@@ -188,7 +200,7 @@ void CallRequestProcess::HoldOrDisconnectedCall(int32_t callId, int32_t slotId, 
                 TELEPHONY_LOGI("exist other slot call");
                 noOtherCall = false;
             }
-            if (waitingCallNum > 1 || callIdList.size() == callNum) {
+            if (waitingCallNum > 1 || (callIdList.size() == callNum && (!hasConferenceCall))) {
                 HandleCallWaitingNumTwo(incomingCall, call, slotId, activeCallNum, flagForConference);
             } else if (waitingCallNum == 1) {
                 HandleCallWaitingNumOne(incomingCall, call, slotId, activeCallNum, flagForConference);
@@ -381,7 +393,38 @@ void CallRequestProcess::DisconnectOtherSubIdCall(int32_t callId, int32_t slotId
             sptr<CallBase> call = GetOneCallObject(otherCallId);
             if (call != nullptr && call->GetSlotId() != slotId) {
                 incomingCall->SetAutoAnswerState(true);
-                TELEPHONY_LOGI("Hangup call SLOTID:%{public}d", call->GetSlotId());
+                TELEPHONY_LOGI("Hangup call callid:%{public}d", call->GetCallID());
+                call->HangUpCall();
+                noOtherCall = false;
+            }
+        }
+    }
+    if (noOtherCall == true) {
+        int32_t ret = incomingCall->AnswerCall(videoState);
+        if (ret != TELEPHONY_SUCCESS) {
+            return;
+        }
+        DelayedSingleton<CallControlManager>::GetInstance()->NotifyIncomingCallAnswered(incomingCall);
+    }
+}
+
+void CallRequestProcess::DisconnectOtherCallForVideoCall(int32_t callId, int32_t slotId, int32_t videoState)
+{
+    sptr<CallBase> incomingCall = GetOneCallObject(callId);
+    if (incomingCall == nullptr) {
+        TELEPHONY_LOGE("the call object is nullptr, callId:%{public}d", callId);
+        return;
+    }
+    std::list<int32_t> callIdList;
+    bool noOtherCall = true;
+    GetCarrierCallList(callIdList);
+    if (callIdList.size() > 1) {
+        for (int32_t otherCallId : callIdList) {
+            sptr<CallBase> call = GetOneCallObject(otherCallId);
+            if (call != nullptr && call->GetSlotId() != slotId &&
+                call->GetCallRunningState() != CallRunningState::CALL_RUNNING_STATE_RINGING) {
+                incomingCall->SetAutoAnswerState(true);
+                TELEPHONY_LOGI("Hangup call callid:%{public}d", call->GetCallID());
                 call->HangUpCall();
                 noOtherCall = false;
             }
