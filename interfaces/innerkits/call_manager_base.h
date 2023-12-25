@@ -387,7 +387,13 @@ enum class CallStateToApp {
      * state, and there is no new incoming call ringing or waiting.
      */
     CALL_STATE_OFFHOOK = 2,
-    CALL_STATE_ANSWERED = 3
+
+    CALL_STATE_ANSWERED = 3,
+
+    /**
+     * Indicates that a least one call is in the dialing.
+     */
+    CALL_STATE_DIALING = 4,
 };
 
 /**

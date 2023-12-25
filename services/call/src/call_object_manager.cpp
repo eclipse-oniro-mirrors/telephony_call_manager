@@ -16,6 +16,7 @@
 #include "call_object_manager.h"
 
 #include "call_connect_ability.h"
+#include "call_control_manager.h"
 #include "call_manager_errors.h"
 #include "call_number_utils.h"
 #include "conference_base.h"
@@ -57,9 +58,17 @@ int32_t CallObjectManager::AddOneCallObject(sptr<CallBase> &call)
             return CALL_ERR_PHONE_CALL_ALREADY_EXISTS;
         }
     }
-    if (callObjectPtrList_.size() == NO_CALL_EXIST) {
-        CallAttributeInfo info;
-        call->GetCallAttributeInfo(info);
+    CallAttributeInfo info;
+    call->GetCallAttributeInfo(info);
+    int32_t state;
+    bool isVoIPCallExists = false;
+    DelayedSingleton<CallControlManager>::GetInstance()->GetVoIPCallState(state);
+    if(state == (int32_t)CallStateToApp::CALL_STATE_OFFHOOK
+        || state == (int32_t)CallStateToApp::CALL_STATE_DIALING
+        || state == (int32_t)CallStateToApp::CALL_STATE_RINGING) {
+        isVoIPCallExists = true;
+    }
+    if (callObjectPtrList_.size() == NO_CALL_EXIST && (!isVoIPCallExists || info.isEcc)) {
         DelayedSingleton<CallConnectAbility>::GetInstance()->ConnectAbility(info);
     }
     callObjectPtrList_.emplace_back(call);
