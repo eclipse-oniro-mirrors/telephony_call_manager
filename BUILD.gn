@@ -48,8 +48,6 @@ ohos_shared_library("tel_call_manager") {
     "services/bluetooth/src/bluetooth_call_service.cpp",
     "services/bluetooth/src/bluetooth_call_stub.cpp",
     "services/bluetooth/src/bluetooth_connection.cpp",
-    "services/distributed_call/src/distributed_call_proxy.cpp",
-    "services/distributed_call/src/distributed_call_manager.cpp",
     "services/call/call_state_observer/src/call_data_base_helper.cpp",
     "services/call/call_state_observer/src/call_records_handler.cpp",
     "services/call/call_state_observer/src/call_records_manager.cpp",
@@ -93,6 +91,8 @@ ohos_shared_library("tel_call_manager") {
     "services/call_report/src/call_ability_report_proxy.cpp",
     "services/call_report/src/call_state_report_proxy.cpp",
     "services/call_setting/src/call_setting_manager.cpp",
+    "services/distributed_call/src/distributed_call_manager.cpp",
+    "services/distributed_call/src/distributed_call_proxy.cpp",
     "services/telephony_interaction/src/call_status_callback.cpp",
     "services/telephony_interaction/src/call_status_callback_stub.cpp",
     "services/telephony_interaction/src/cellular_call_connection.cpp",
@@ -126,8 +126,8 @@ ohos_shared_library("tel_call_manager") {
 
   deps = [
     "frameworks/native:tel_call_manager_api",
-    "//third_party/libphonenumber/cpp:phonenumber_standard",
     "//third_party/cJSON:cjson",
+    "//third_party/libphonenumber/cpp:phonenumber_standard",
   ]
 
   external_deps = [
