@@ -62,6 +62,7 @@ public:
     void Init();
     void CallStateUpdated(sptr<CallBase> &callObjectPtr, TelCallState priorState, TelCallState nextState) override;
     void AddOneCallRecord(CallAttributeInfo &info);
+    void CopyCallInfoToRecord(CallAttributeInfo &info, CallRecordInfo &data);
     void AddOneCallRecord(sptr<CallBase> call, CallAnswerType answerType);
     int32_t RemoveMissedIncomingCallNotification();
 
