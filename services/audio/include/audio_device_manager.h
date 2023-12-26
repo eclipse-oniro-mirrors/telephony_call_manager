@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -37,20 +37,25 @@ public:
     static bool IsEarpieceAvailable();
     static bool IsSpeakerAvailable();
     static bool IsBtScoConnected();
+    static bool IsDistributedCallConnected();
     static bool IsWiredHeadsetConnected();
     static void SetDeviceAvailable(AudioDeviceType deviceType, bool available);
     bool SwitchDevice(AudioDeviceType device);
     void AddAudioDeviceList(const std::string &address, AudioDeviceType deviceType);
     void RemoveAudioDeviceList(const std::string &address, AudioDeviceType deviceType);
     void ResetBtAudioDevicesList();
+    void ResetDistributedCallDevicesList();
     int32_t ReportAudioDeviceChange();
     void SetCurrentAudioDevice(AudioDeviceType deviceType);
+    bool CheckAndSwitchDistributedAudioDevice();
+    void OnActivedCallDisconnected();
 
 private:
     std::mutex mutex_;
     std::mutex infoMutex_;
     AudioDeviceType audioDeviceType_;
     static bool isBtScoDevEnable_;
+    static bool isDCallDevEnable_;
     bool isWiredHeadsetDevEnable_ = false;
     bool isSpeakerDevEnable_ = false;
     bool isEarpieceDevEnable_ = false;
@@ -59,21 +64,25 @@ private:
     static bool isSpeakerAvailable_;
     static bool isWiredHeadsetConnected_;
     static bool isBtScoConnected_;
+    static bool isDCallDevConnected_;
     bool isAudioActivated_;
     using AudioDeviceManagerFunc = bool (AudioDeviceManager::*)();
     std::map<uint32_t, AudioDeviceManagerFunc> memberFuncMap_;
     AudioDeviceInfo info_;
     bool SwitchDevice(AudioEvent event);
     bool EnableBtSco();
+    bool EnableDistributedCall();
     bool EnableWiredHeadset();
     bool EnableSpeaker();
     bool EnableEarpiece();
     bool DisableAll();
     bool IsBtScoDevEnable();
+    bool IsDCallDevEnable();
     bool IsSpeakerDevEnable();
     bool IsEarpieceDevEnable();
     bool IsWiredHeadsetDevEnable();
     AudioDeviceType GetCurrentAudioDevice();
+    bool IsDistributedAudioDeviceType(AudioDeviceType deviceType);
 };
 } // namespace Telephony
 } // namespace OHOS

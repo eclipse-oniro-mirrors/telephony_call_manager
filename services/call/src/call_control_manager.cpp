@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -34,6 +34,7 @@
 #include "report_call_info_handler.h"
 #include "telephony_log_wrapper.h"
 #include "video_control_manager.h"
+#include "audio_device_manager.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -403,6 +404,14 @@ bool CallControlManager::NotifyCallStateUpdated(
     if (callStateListenerPtr_ != nullptr) {
         callStateListenerPtr_->CallStateUpdated(callObjectPtr, priorState, nextState);
         TELEPHONY_LOGI("NotifyCallStateUpdated priorState:%{public}d,nextState:%{public}d", priorState, nextState);
+        if (priorState == TelCallState::CALL_STATUS_ALERTING && nextState == TelCallState::CALL_STATUS_ACTIVE) {
+            TELEPHONY_LOGI("call is actived, now check and switch call to car");
+            DelayedSingleton<AudioDeviceManager>::GetInstance()->CheckAndSwitchDistributedAudioDevice();
+        } else if (priorState == TelCallState::CALL_STATUS_ACTIVE &&
+            nextState == TelCallState::CALL_STATUS_DISCONNECTED) {
+            TELEPHONY_LOGI("call is disconnected, let audio device manager know");
+            DelayedSingleton<AudioDeviceManager>::GetInstance()->OnActivedCallDisconnected();
+        }
         return true;
     }
     return false;
@@ -416,6 +425,8 @@ bool CallControlManager::NotifyIncomingCallAnswered(sptr<CallBase> &callObjectPt
     }
     if (callStateListenerPtr_ != nullptr) {
         callStateListenerPtr_->IncomingCallActivated(callObjectPtr);
+        TELEPHONY_LOGI("call is answered, now check and switch call to car");
+        DelayedSingleton<AudioDeviceManager>::GetInstance()->CheckAndSwitchDistributedAudioDevice();
         return true;
     }
     return false;

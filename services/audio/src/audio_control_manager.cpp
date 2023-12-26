@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2023 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -17,6 +17,7 @@
 
 #include "call_control_manager.h"
 #include "call_state_processor.h"
+#include "distributed_call_manager.h"
 #include "telephony_log_wrapper.h"
 #include "audio_system_manager.h"
 #include "audio_routing_manager.h"
@@ -220,6 +221,7 @@ void AudioControlManager::HandleNewActiveCall(sptr<CallBase> &callObjectPtr)
  */
 int32_t AudioControlManager::SetAudioDevice(const AudioDevice &device)
 {
+    TELEPHONY_LOGI("set audio device, type: %{public}d", static_cast<int32_t>(device.deviceType));
     AudioDeviceType audioDeviceType = AudioDeviceType::DEVICE_UNKNOWN;
     switch (device.deviceType) {
         case AudioDeviceType::DEVICE_SPEAKER:
@@ -246,12 +248,28 @@ int32_t AudioControlManager::SetAudioDevice(const AudioDevice &device)
             audioSystemManager->SelectOutputDevice(audioRendererFilter, bluetoothDeviceDesc);
             break;
         }
+        case AudioDeviceType::DEVICE_DISTRIBUTED_AUTOMOTIVE:
+        case AudioDeviceType::DEVICE_DISTRIBUTED_PHONE:
+        case AudioDeviceType::DEVICE_DISTRIBUTED_PAD:
+            TELEPHONY_LOGI("set audio device, address: %{public}s", device.address);
+            if (DelayedSingleton<DistributedCallManager>::GetInstance()->SwitchDCallDevice(device)) {
+                DelayedSingleton<AudioDeviceManager>::GetInstance()->SetDeviceAvailable(
+                    device.deviceType, true);
+                DelayedSingleton<AudioDeviceManager>::GetInstance()->SetCurrentAudioDevice(
+                    device.deviceType);
+                return TELEPHONY_SUCCESS;
+            }
+            return CALL_ERR_AUDIO_SET_AUDIO_DEVICE_FAILED;
         default:
             break;
     }
-    if (audioDeviceType != AudioDeviceType::DEVICE_UNKNOWN &&
-        DelayedSingleton<AudioDeviceManager>::GetInstance()->SwitchDevice(audioDeviceType)) {
-        return TELEPHONY_SUCCESS;
+    if (audioDeviceType != AudioDeviceType::DEVICE_UNKNOWN) {
+        if (DelayedSingleton<DistributedCallManager>::GetInstance()->IsDAudioDeviceConnected()) {
+            DelayedSingleton<DistributedCallManager>::GetInstance()->DisconnectDCallDevice();
+        }
+        if (DelayedSingleton<AudioDeviceManager>::GetInstance()->SwitchDevice(audioDeviceType)) {
+            return TELEPHONY_SUCCESS;
+        }
     }
     return CALL_ERR_AUDIO_SET_AUDIO_DEVICE_FAILED;
 }

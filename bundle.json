@@ -61,7 +61,9 @@
             ],
             "third_party": [
                 "libphonenumber",
-                "libuv"
+                "libuv",
+                "json",
+                "cJSON"
             ]
         },
         "build": {
