@@ -277,6 +277,10 @@ struct CallRecordInfo {
      */
     CallType callType = CallType::TYPE_ERR_CALL;
     /**
+     * Indicates the type of video state. {@link VideoStateType}
+     */
+    VideoStateType videoState = VideoStateType::TYPE_VOICE;
+    /**
      * Indicates the call beginning time.
      */
     time_t callBeginTime = 0;
@@ -331,6 +335,7 @@ struct CallRecordInfo {
         answerType = temp.answerType;
         countryCode = temp.countryCode;
         slotId = temp.slotId;
+        videoState = temp.videoState;
         return *this;
     }
 };

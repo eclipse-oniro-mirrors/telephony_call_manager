@@ -110,6 +110,24 @@ void CallRecordsManager::AddOneCallRecord(CallAttributeInfo &info)
         TELEPHONY_LOGE("memcpy_s failed!");
         return;
     }
+    CopyCallInfoToRecord(info, data);
+    std::string tmpStr("");
+    (void)DelayedSingleton<CallNumberUtils>::GetInstance()->FormatPhoneNumber(
+        std::string(data.phoneNumber), "CN", tmpStr);
+
+    if (tmpStr.length() > static_cast<size_t>(kMaxNumberLen)) {
+        TELEPHONY_LOGE("Number out of limit!");
+        return;
+    }
+    if (memcpy_s(data.formattedPhoneNumber, kMaxNumberLen, tmpStr.c_str(), tmpStr.length()) != 0) {
+        TELEPHONY_LOGE("memcpy_s failed!");
+        return;
+    }
+    callRecordsHandlerServerPtr_->StoreCallRecord(data);
+}
+
+void CallRecordsManager::CopyCallInfoToRecord(CallAttributeInfo &info, CallRecordInfo &data)
+{
     if ((info.callBeginTime == DEFAULT_TIME) || (info.callEndTime == DEFAULT_TIME)) {
         data.callDuration = DEFAULT_TIME;
     } else {
@@ -128,19 +146,12 @@ void CallRecordsManager::AddOneCallRecord(CallAttributeInfo &info)
     data.countryCode = DEFAULT_COUNTRY_CODE;
     data.slotId = info.accountId;
     data.callType = info.callType;
-    std::string tmpStr("");
-    (void)DelayedSingleton<CallNumberUtils>::GetInstance()->FormatPhoneNumber(
-        std::string(data.phoneNumber), "CN", tmpStr);
-
-    if (tmpStr.length() > static_cast<size_t>(kMaxNumberLen)) {
-        TELEPHONY_LOGE("Number out of limit!");
-        return;
+    if (info.videoState == VideoStateType::TYPE_VOICE) {
+        data.videoState = VideoStateType::TYPE_VOICE;
+    } else {
+        // SEND_ONLY/RECEIVE_ONLY/VIDEO should consider as video call
+        data.videoState = VideoStateType::TYPE_VIDEO;
     }
-    if (memcpy_s(data.formattedPhoneNumber, kMaxNumberLen, tmpStr.c_str(), tmpStr.length()) != 0) {
-        TELEPHONY_LOGE("memcpy_s failed!");
-        return;
-    }
-    callRecordsHandlerServerPtr_->StoreCallRecord(data);
 }
 
 int32_t CallRecordsManager::RemoveMissedIncomingCallNotification()

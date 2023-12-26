@@ -52,6 +52,7 @@ constexpr const char *CALL_DETAIL_INFO = "detail_info";
 constexpr const char *CALL_CONTENT_TYPE = "content_type";
 constexpr const char *CALL_PHONE = "phone";
 constexpr const char *CALL_SLOT_ID = "slot_id";
+constexpr const char *CALL_VIDEO_CALL = "features";
 
 enum class CallLogReadState {
     CALL_IS_UNREAD,
