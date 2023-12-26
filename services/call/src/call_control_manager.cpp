@@ -163,18 +163,21 @@ void CallControlManager::PackageDialInformation(AppExecFwk::PacMap &extras, std:
 
 int32_t CallControlManager::AnswerCall(int32_t callId, int32_t videoState)
 {
-    sptr<CallBase> call = GetOneCallObject(callId);
+    sptr<CallBase> call = GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_RINGING);
     if (call == nullptr) {
-            TELEPHONY_LOGE("call is nullptr");
-            CallManagerHisysevent::WriteAnswerCallFaultEvent(
-                INVALID_PARAMETER, callId, videoState, TELEPHONY_ERR_LOCAL_PTR_NULL, "call is nullptr");
-            return TELEPHONY_ERR_LOCAL_PTR_NULL;
+        TELEPHONY_LOGE("call is nullptr");
+        CallManagerHisysevent::WriteAnswerCallFaultEvent(
+            INVALID_PARAMETER, callId, videoState, TELEPHONY_ERR_LOCAL_PTR_NULL, "call is nullptr");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     if (callId == INVALID_CALLID) {
         callId = call->GetCallID();
     }
-    if (videoState != static_cast<int32_t>(call->GetVideoStateType())) {
+    call = GetOneCallObject(callId);
+    if (call->GetCallType() == CallType::TYPE_IMS && videoState != static_cast<int32_t>(call->GetVideoStateType())) {
         call->SetVideoStateType(static_cast<VideoStateType>(videoState));
+        sptr<IMSCall> imsCall = reinterpret_cast<IMSCall *>(call.GetRefPtr());
+        imsCall->InitVideoCall();
         TELEPHONY_LOGI("videoState has changed");
     }
     TELEPHONY_LOGI("report answered state");
