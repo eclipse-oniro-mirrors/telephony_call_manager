@@ -43,8 +43,7 @@ int32_t CallPolicy::DialPolicy(std::u16string &number, AppExecFwk::PacMap &extra
         }
     }
     CallType callType = (CallType)extras.GetIntValue("callType");
-    if (callType != CallType::TYPE_CS && callType != CallType::TYPE_IMS && callType != CallType::TYPE_OTT) {
-        TELEPHONY_LOGE("invalid call type!");
+    if (IsValidCallType(callType) != TELEPHONY_SUCCESS) {
         return CALL_ERR_UNKNOW_CALL_TYPE;
     }
     DialScene dialScene = (DialScene)extras.GetIntValue("dialScene");
@@ -61,6 +60,16 @@ int32_t CallPolicy::DialPolicy(std::u16string &number, AppExecFwk::PacMap &extra
         return CALL_ERR_INVALID_VIDEO_STATE;
     }
     return HasNewCall();
+}
+
+int32_t CallPolicy::IsValidCallType(CallType callType)
+{
+    if (callType != CallType::TYPE_CS && callType != CallType::TYPE_IMS && callType != CallType::TYPE_OTT &&
+        callType != CallType::TYPE_SATELLITE) {
+        TELEPHONY_LOGE("invalid call type!");
+        return CALL_ERR_UNKNOW_CALL_TYPE;
+    }
+    return TELEPHONY_SUCCESS;
 }
 
 int32_t CallPolicy::CanDialMulityCall(AppExecFwk::PacMap &extras)

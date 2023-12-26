@@ -112,6 +112,10 @@ enum class CallType {
      * Indicates the call type is VoIP.
      */
     TYPE_VOIP = 4,
+    /**
+     * Indicates the call type is SATELLITE.
+     */
+    TYPE_SATELLITE = 5,
 };
 
 /**
