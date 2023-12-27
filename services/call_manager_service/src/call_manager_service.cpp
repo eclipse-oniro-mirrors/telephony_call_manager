@@ -202,7 +202,18 @@ int32_t CallManagerService::RegisterCallBack(const sptr<ICallAbilityCallback> &c
         TELEPHONY_LOGE("Permission denied!");
         return TELEPHONY_ERR_PERMISSION_ERR;
     }
-    return DelayedSingleton<CallAbilityReportProxy>::GetInstance()->RegisterCallBack(callback, GetBundleName());
+    int32_t ret = DelayedSingleton<CallAbilityReportProxy>::GetInstance()->RegisterCallBack(callback, GetBundleName());
+    if (ret == TELEPHONY_SUCCESS) {
+        std::vector<CallAttributeInfo> callAttributeInfo = CallObjectManager::GetAllCallInfoList();
+        std::vector<CallAttributeInfo>::iterator iterator = callAttributeInfo.begin();
+        while (iterator != callAttributeInfo.end()) {
+            CallAttributeInfo info = (*iterator);
+            iterator++;
+            TELEPHONY_LOGI("first time register callback success report call info");
+            DelayedSingleton<CallAbilityReportProxy>::GetInstance()->ReportCallStateInfo(info);
+        }
+    }
+    return ret;
 }
 
 int32_t CallManagerService::UnRegisterCallBack()
