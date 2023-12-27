@@ -2701,7 +2701,7 @@ napi_value NapiCallManager::ControlCamera(napi_env env, napi_callback_info info)
 {
     GET_PARAMS(env, info, THREE_VALUE_MAXIMUM_LIMIT);
     if (!MatchNumberAndStringParameters(env, argv, argc)) {
-        TELEPHONY_LOGE("NapiCallManager::ControlCamera MatchNumberAndStringParameters failed.");
+        TELEPHONY_LOGE("MatchNumberAndStringParameters failed.");
         NapiUtil::ThrowParameterError(env);
         return nullptr;
     }
@@ -2718,17 +2718,18 @@ napi_value NapiCallManager::ControlCamera(napi_env env, napi_callback_info info)
     napi_get_value_string_utf8(env, argv[ARRAY_INDEX_SECOND], tmpStr, PHONE_NUMBER_MAXIMUM_LIMIT, &strLen);
     std::string tmpCode(tmpStr, strLen);
     asyncContext->cameraId = tmpCode;
-    if (argc == TWO_VALUE_LIMIT) {
+    if (argc == THREE_VALUE_MAXIMUM_LIMIT) {
         napi_create_reference(env, argv[ARRAY_INDEX_SECOND], DATA_LENGTH_ONE, &(asyncContext->callbackRef));
     }
-    return HandleAsyncWork(env, asyncContext.release(), "ControlCamera", NativeControlCamera, NativeVoidCallBack);
+    return HandleAsyncWork(
+        env, asyncContext.release(), "ControlCamera", NativeControlCamera, NativeVoidCallBackWithErrorCode);
 }
 
 napi_value NapiCallManager::SetPreviewWindow(napi_env env, napi_callback_info info)
 {
     GET_PARAMS(env, info, THREE_VALUE_MAXIMUM_LIMIT);
     if (!MatchNumberAndStringParameters(env, argv, argc)) {
-        TELEPHONY_LOGE("NapiCallManager::ControlCamera MatchNumberAndStringParameters failed.");
+        TELEPHONY_LOGE("MatchNumberAndStringParameters failed.");
         NapiUtil::ThrowParameterError(env);
         return nullptr;
     }
@@ -2746,7 +2747,7 @@ napi_value NapiCallManager::SetPreviewWindow(napi_env env, napi_callback_info in
     napi_get_value_string_utf8(env, argv[ARRAY_INDEX_SECOND], tmpStr, MESSAGE_CONTENT_MAXIMUM_LIMIT, &strLen);
     std::string tmpCode(tmpStr, strLen);
     previwWindowContext->surfaceId = tmpCode;
-    if (argc == TWO_VALUE_LIMIT) {
+    if (argc == THREE_VALUE_MAXIMUM_LIMIT) {
         napi_create_reference(env, argv[ARRAY_INDEX_SECOND], DATA_LENGTH_ONE, &(previwWindowContext->callbackRef));
     }
     return HandleAsyncWork(env, previwWindowContext.release(), "SetPreviewWindow", NativeSetPreviewWindow,
@@ -2757,7 +2758,7 @@ napi_value NapiCallManager::SetDisplayWindow(napi_env env, napi_callback_info in
 {
     GET_PARAMS(env, info, THREE_VALUE_MAXIMUM_LIMIT);
     if (!MatchNumberAndStringParameters(env, argv, argc)) {
-        TELEPHONY_LOGE("NapiCallManager::ControlCamera MatchNumberAndStringParameters failed.");
+        TELEPHONY_LOGE("MatchNumberAndStringParameters failed.");
         NapiUtil::ThrowParameterError(env);
         return nullptr;
     }
@@ -2775,7 +2776,7 @@ napi_value NapiCallManager::SetDisplayWindow(napi_env env, napi_callback_info in
     napi_get_value_string_utf8(env, argv[ARRAY_INDEX_SECOND], tmpStr, MESSAGE_CONTENT_MAXIMUM_LIMIT, &strLen);
     std::string tmpCode(tmpStr, strLen);
     dislpayWindowContext->surfaceId = tmpCode;
-    if (argc == TWO_VALUE_LIMIT) {
+    if (argc == THREE_VALUE_MAXIMUM_LIMIT) {
         napi_create_reference(env, argv[ARRAY_INDEX_SECOND], DATA_LENGTH_ONE, &(dislpayWindowContext->callbackRef));
     }
     return HandleAsyncWork(env, dislpayWindowContext.release(), "SetDisplayWindow", NativeSetDisplayWindow,
@@ -2807,7 +2808,7 @@ napi_value NapiCallManager::SetPausePicture(napi_env env, napi_callback_info inf
 {
     GET_PARAMS(env, info, THREE_VALUE_MAXIMUM_LIMIT);
     if (!MatchOneNumberParameter(env, argv, argc)) {
-        TELEPHONY_LOGE("NapiCallManager::ControlCamera MatchNumberAndStringParameters failed.");
+        TELEPHONY_LOGE("MatchNumberAndStringParameters failed.");
         NapiUtil::ThrowParameterError(env);
         return nullptr;
     }
@@ -2823,7 +2824,8 @@ napi_value NapiCallManager::SetPausePicture(napi_env env, napi_callback_info inf
     if (argc == TWO_VALUE_LIMIT) {
         napi_create_reference(env, argv[ARRAY_INDEX_SECOND], DATA_LENGTH_ONE, &(asyncContext->callbackRef));
     }
-    return HandleAsyncWork(env, asyncContext.release(), "SetPausePicture", NativeSetPausePicture, NativeVoidCallBack);
+    return HandleAsyncWork(
+        env, asyncContext.release(), "SetPausePicture", NativeSetPausePicture, NativeVoidCallBackWithErrorCode);
 }
 
 napi_value NapiCallManager::SetDeviceDirection(napi_env env, napi_callback_info info)
@@ -2844,11 +2846,11 @@ napi_value NapiCallManager::SetDeviceDirection(napi_env env, napi_callback_info 
     }
     napi_get_value_int32(env, argv[ARRAY_INDEX_FIRST], &asyncContext->callId);
     napi_get_value_int32(env, argv[ARRAY_INDEX_SECOND], &asyncContext->rotation);
-    if (argc == TWO_VALUE_LIMIT) {
+    if (argc == THREE_VALUE_MAXIMUM_LIMIT) {
         napi_create_reference(env, argv[ARRAY_INDEX_SECOND], DATA_LENGTH_ONE, &(asyncContext->callbackRef));
     }
     return HandleAsyncWork(
-        env, asyncContext.release(), "SetDeviceDirection", NativeSetDeviceDirection, NativeVoidCallBack);
+        env, asyncContext.release(), "SetDeviceDirection", NativeSetDeviceDirection, NativeVoidCallBackWithErrorCode);
 }
 
 napi_value NapiCallManager::RequestCameraCapabilities(napi_env env, napi_callback_info info)
@@ -4811,7 +4813,7 @@ void NapiCallManager::NativeControlCamera(napi_env env, void *data)
         return;
     }
     auto asyncContext = (VideoAsyncContext *)data;
-    asyncContext->resolved = DelayedSingleton<CallManagerClient>::GetInstance()->ControlCamera(
+    asyncContext->errorCode = DelayedSingleton<CallManagerClient>::GetInstance()->ControlCamera(
         asyncContext->callId, Str8ToStr16(asyncContext->cameraId));
     if (asyncContext->errorCode == TELEPHONY_SUCCESS) {
         asyncContext->resolved = TELEPHONY_SUCCESS;
@@ -4865,7 +4867,7 @@ void NapiCallManager::NativeSetPausePicture(napi_env env, void *data)
         return;
     }
     auto asyncContext = (VideoAsyncContext *)data;
-    asyncContext->resolved =
+    asyncContext->errorCode =
         DelayedSingleton<CallManagerClient>::GetInstance()->SetPausePicture(
             asyncContext->callId, Str8ToStr16(asyncContext->path));
     if (asyncContext->errorCode == TELEPHONY_SUCCESS) {
@@ -4880,7 +4882,7 @@ void NapiCallManager::NativeSetDeviceDirection(napi_env env, void *data)
         return;
     }
     auto asyncContext = (VideoAsyncContext *)data;
-    asyncContext->resolved =
+    asyncContext->errorCode =
         DelayedSingleton<CallManagerClient>::GetInstance()->SetDeviceDirection(
             asyncContext->callId, asyncContext->rotation);
     if (asyncContext->errorCode == TELEPHONY_SUCCESS) {
