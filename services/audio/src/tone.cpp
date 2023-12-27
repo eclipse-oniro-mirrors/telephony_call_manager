@@ -201,7 +201,7 @@ AudioStandard::ToneType Tone::ConvertToneDescriptorToToneType(ToneDescriptor ton
             tonType = ToneType::TONE_TYPE_DIAL_P;
             break;
         default:
-            ConvertCallToneDescriptorToToneType(tone);
+            tonType = ConvertCallToneDescriptorToToneType(tone);
             break;
     }
     return tonType;
