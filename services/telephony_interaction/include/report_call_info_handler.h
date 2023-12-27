@@ -39,6 +39,7 @@ public:
 private:
     template<typename Function>
     void Submit(const std::string &taskName, Function &&func);
+    void BuildCallDetailsInfo(CallDetailsInfo &info, CallDetailsInfo &callDetailsInfo);
 
 private:
     std::shared_ptr<CallStatusManager> callStatusManagerPtr_;
