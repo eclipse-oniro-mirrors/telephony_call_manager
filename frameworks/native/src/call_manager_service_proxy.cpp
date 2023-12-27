@@ -722,10 +722,6 @@ int32_t CallManagerServiceProxy::SetPausePicture(int32_t callId, std::u16string 
         TELEPHONY_LOGE("write descriptor fail");
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
-    if (path.empty()) {
-        TELEPHONY_LOGE("path is empty");
-        return TELEPHONY_ERR_ARGUMENT_INVALID;
-    }
     dataParcel.WriteInt32(callId);
     dataParcel.WriteString16(path);
     MessageParcel replyParcel;
