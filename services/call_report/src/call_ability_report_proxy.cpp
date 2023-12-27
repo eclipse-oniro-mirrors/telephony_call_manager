@@ -19,7 +19,6 @@
 
 #include "iservice_registry.h"
 #include "system_ability.h"
-#include "call_object_manager.h"
 #include "system_ability_definition.h"
 
 #include "call_manager_errors.h"
@@ -67,14 +66,6 @@ int32_t CallAbilityReportProxy::RegisterCallBack(
         }
     }
     callbackPtrList_.emplace_back(callAbilityCallbackPtr);
-    std::vector<CallAttributeInfo> callAttributeInfo = CallObjectManager::GetAllCallInfoList();
-    std::vector<CallAttributeInfo>::iterator iterator = callAttributeInfo.begin();
-    while (iterator != callAttributeInfo.end()) {
-        CallAttributeInfo info = (*iterator);
-        iterator++;
-        TELEPHONY_LOGI("first time register callback success report call info");
-        ReportCallStateInfo(info);
-    }
     TELEPHONY_LOGI("%{public}s successfully registered the callback for the first time!", bundleName.c_str());
     return TELEPHONY_SUCCESS;
 }
