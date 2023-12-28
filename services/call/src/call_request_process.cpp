@@ -182,8 +182,6 @@ void CallRequestProcess::HoldOrDisconnectedCall(int32_t callId, int32_t slotId, 
     int32_t waitingCallNum = GetCallNum(TelCallState::CALL_STATUS_WAITING);
     int32_t activeCallNum = GetCallNum(TelCallState::CALL_STATUS_ACTIVE);
     int32_t callNum = 4;
-    bool hasConferenceCall = false;
-    HasConferenceCall(hasConferenceCall);
     for (int32_t otherCallId : callIdList) {
         sptr<CallBase> call = GetOneCallObject(otherCallId);
         TELEPHONY_LOGI("other Call State =:%{public}d", call->GetTelCallState());
@@ -200,7 +198,8 @@ void CallRequestProcess::HoldOrDisconnectedCall(int32_t callId, int32_t slotId, 
                 TELEPHONY_LOGI("exist other slot call");
                 noOtherCall = false;
             }
-            if (waitingCallNum > 1 || (callIdList.size() == callNum && (!hasConferenceCall))) {
+            int32_t currentCallNum = GetCurrentCallNum();
+            if (waitingCallNum > 1 || currentCallNum == callNum) {
                 HandleCallWaitingNumTwo(incomingCall, call, slotId, activeCallNum, flagForConference);
             } else if (waitingCallNum == 1) {
                 HandleCallWaitingNumOne(incomingCall, call, slotId, activeCallNum, flagForConference);
@@ -248,10 +247,9 @@ void CallRequestProcess::HandleCallWaitingNumTwo(
 {
     TELEPHONY_LOGI("enter HandleCallWaitingNumTwo");
     sptr<CallBase> holdCall = GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_HOLD);
-    std::list<int32_t> callIdList;
-    GetCarrierCallList(callIdList);
     int32_t callNum = 3;
-    if (callIdList.size() == callNum) {
+    int32_t currentCallNum = GetCurrentCallNum();
+    if (currentCallNum == callNum) {
         TELEPHONY_LOGI("enter two waitingCall process");
         HandleCallWaitingNumOne(incomingCall, call, slotId, activeCallNum, flagForConference);
         return;
@@ -280,11 +278,10 @@ void CallRequestProcess::HandleCallWaitingNumOne(
     sptr<CallBase> holdCall = GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_HOLD);
     TELEPHONY_LOGI("enter one GetTelCallState =:%{public}d", call->GetTelCallState());
     int32_t callNum = 2;
-    std::list<int32_t> callIdList;
-    GetCarrierCallList(callIdList);
+    int32_t currentCallNum = GetCurrentCallNum();
     if (holdCall != nullptr) {
         HandleCallWaitingNumOneNext(incomingCall, call, holdCall, slotId, flagForConference);
-    } else if (callIdList.size() == callNum) {
+    } else if (currentCallNum == callNum) {
         TELEPHONY_LOGI("enter two call process");
         HandleCallWaitingNumZero(incomingCall, call, slotId, activeCallNum, flagForConference);
     } else if (call->GetCallRunningState() == CallRunningState::CALL_RUNNING_STATE_ACTIVE && !flagForConference) {
@@ -454,11 +451,10 @@ void CallRequestProcess::RejectRequest(int32_t callId, bool isSendSms, std::stri
     }
     std::list<int32_t> callIdList;
     GetCarrierCallList(callIdList);
-    for (int32_t otherCallId : callIdList) {
-        sptr<CallBase> call = GetOneCallObject(otherCallId);
-        if (call->GetCallRunningState() == CallRunningState::CALL_RUNNING_STATE_HOLD) {
-            call->SetCanUnHoldState(false);
-        }
+    sptr<CallBase> holdCall = CallObjectManager::GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_HOLD);
+    if (holdCall) {
+        TELEPHONY_LOGI("release the incoming/waiting call but can not recover the held call");
+        holdCall->SetCanUnHoldState(false);
     }
     TELEPHONY_LOGI("start to send reject message...");
     DelayedSingleton<CallControlManager>::GetInstance()->NotifyIncomingCallRejected(call, isSendSms, content);
@@ -506,20 +502,6 @@ void CallRequestProcess::HangUpRequest(int32_t callId)
         }
     }
     call->HangUpCall();
-    HandleHoldAfterHangUp(state, waitingCallNum);
-}
-
-void CallRequestProcess::HandleHoldAfterHangUp(TelCallState state, int32_t waitingCallNum)
-{
-    int32_t avtiveCallNum = GetCallNum(TelCallState::CALL_STATUS_ACTIVE);
-    sptr<CallBase> holdCall = CallObjectManager::GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_HOLD);
-    if (holdCall) {
-        if ((state == TelCallState::CALL_STATUS_DIALING || state == TelCallState::CALL_STATUS_ALERTING) &&
-            waitingCallNum == 0 && avtiveCallNum == 0 && holdCall->GetCanUnHoldState()) {
-            TELEPHONY_LOGI("release the dialing/alerting call and recover the held call");
-            holdCall->UnHoldCall();
-        }
-    }
 }
 
 void CallRequestProcess::HoldRequest(int32_t callId)
@@ -530,7 +512,6 @@ void CallRequestProcess::HoldRequest(int32_t callId)
         return;
     }
     call->HoldCall();
-    call->SetCanUnHoldState(false);
 }
 
 void CallRequestProcess::UnHoldRequest(int32_t callId)
@@ -549,15 +530,20 @@ void CallRequestProcess::UnHoldRequest(int32_t callId)
     for (int32_t otherCallId : callIdList) {
         sptr<CallBase> otherCall = GetOneCallObject(otherCallId);
         TelCallState state = otherCall->GetTelCallState();
-        TELEPHONY_LOGI("otherCall->GetTelCallState(): %{public}d", state);
-        if (IsDsdsMode5() && !noOtherCall && state == TelCallState::CALL_STATUS_ACTIVE) {
+        TelConferenceState confState = otherCall->GetTelConferenceState();
+        int32_t conferenceId = ERR_ID;
+        otherCall->GetMainCallId(conferenceId);
+        TELEPHONY_LOGI("otherCall->GetTelCallState(): %{public}d ,callid:%{public}d", state, otherCallId);
+        if (IsDsdsMode5() && !noOtherCall && state == TelCallState::CALL_STATUS_ACTIVE &&
+            ((confState != TelConferenceState::TEL_CONFERENCE_IDLE && conferenceId == otherCallId) ||
+                confState == TelConferenceState::TEL_CONFERENCE_IDLE)) {
             if (otherCall->GetCanSwitchCallState()) {
                 TELEPHONY_LOGI("Hold other call in other slotId for switch Dsda call");
                 otherCall->SetCanSwitchCallState(false);
                 otherCall->HoldCall();
                 return;
             } else {
-                TELEPHONY_LOGI("Currently can not swap calls because calls being swapped");
+                TELEPHONY_LOGI("Currently can not swap this call");
                 return;
             }
         }

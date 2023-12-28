@@ -193,6 +193,28 @@ int32_t CallObjectManager::IsNewCallAllowedCreate(bool &enabled)
     return TELEPHONY_ERR_SUCCESS;
 }
 
+int32_t CallObjectManager::GetCurrentCallNum()
+{
+    int32_t count = 0;
+    std::list<int32_t> callIdList;
+    GetCarrierCallList(callIdList);
+    for (int32_t otherCallId : callIdList) {
+        sptr<CallBase> call = GetOneCallObject(otherCallId);
+        if (call != nullptr) {
+            TelConferenceState confState = call->GetTelConferenceState();
+            int32_t conferenceId = DelayedSingleton<ImsConference>::GetInstance()->GetMainCall();
+            if (confState != TelConferenceState::TEL_CONFERENCE_IDLE && conferenceId == otherCallId) {
+                TELEPHONY_LOGI("there is conference call");
+                count++;
+            } else if (confState == TelConferenceState::TEL_CONFERENCE_IDLE) {
+                count++;
+            }
+        }
+    }
+    TELEPHONY_LOGI("the count is %{public}d", count);
+    return count;
+}
+
 int32_t CallObjectManager::GetCarrierCallList(std::list<int32_t> &list)
 {
     list.clear();
@@ -323,20 +345,6 @@ int32_t CallObjectManager::HasRingingCall(bool &enabled)
     for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
         // Count the number of calls in the ringing state
         if ((*it)->GetCallRunningState() == CallRunningState::CALL_RUNNING_STATE_RINGING) {
-            enabled = true;
-            break;
-        }
-    }
-    return TELEPHONY_ERR_SUCCESS;
-}
-
-int32_t CallObjectManager::HasConferenceCall(bool &enabled)
-{
-    enabled = false;
-    std::lock_guard<std::mutex> lock(listMutex_);
-    std::list<sptr<CallBase>>::iterator it;
-    for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
-        if ((*it)->GetTelConferenceState() != TelConferenceState::TEL_CONFERENCE_IDLE) {
             enabled = true;
             break;
         }

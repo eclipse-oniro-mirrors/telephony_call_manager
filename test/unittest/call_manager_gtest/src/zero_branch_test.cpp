@@ -2062,8 +2062,10 @@ HWTEST_F(BranchTest, Telephony_CallStatusManager_002, Function | MediumTest | Le
     int32_t waitingCallNum = 0;
     int32_t slotId = 0;
     callStatusManager->AutoAnswer(activeCallNum, waitingCallNum);
-    callStatusManager->AutoAnswerForDsda(activeCallNum, slotId);
-    callStatusManager->AutoUnHoldForDsda(activeCallNum, slotId);
+    bool canSwitchCallState = 1;
+    TelCallState priorState = TelCallState::CALL_STATUS_DISCONNECTING;
+    callStatusManager->AutoAnswerForDsda(canSwitchCallState, priorState, activeCallNum, slotId);
+    callStatusManager->AutoUnHoldForDsda(canSwitchCallState, priorState, activeCallNum, slotId);
 }
 
 /**
