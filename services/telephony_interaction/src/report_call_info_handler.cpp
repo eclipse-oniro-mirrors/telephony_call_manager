@@ -57,16 +57,9 @@ int32_t ReportCallInfoHandler::UpdateCallReportInfo(const CallDetailInfo &info)
     return TELEPHONY_SUCCESS;
 }
 
-int32_t ReportCallInfoHandler::UpdateCallsReportInfo(CallDetailsInfo &info)
+void ReportCallInfoHandler::BuildCallDetailsInfo(CallDetailsInfo &info, CallDetailsInfo &callDetailsInfo)
 {
-    if (callStatusManagerPtr_ == nullptr) {
-        TELEPHONY_LOGE("callStatusManagerPtr_ is null");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-    CallDetailsInfo callDetailsInfo;
     CallDetailInfo callDetailInfo;
-    callDetailsInfo.slotId = info.slotId;
-    (void)memcpy_s(callDetailsInfo.bundleName, kMaxBundleNameLen, info.bundleName, kMaxBundleNameLen);
     std::vector<CallDetailInfo>::iterator iter = info.callVec.begin();
     for (; iter != info.callVec.end(); ++iter) {
         callDetailInfo.callType = (*iter).callType;
@@ -76,10 +69,24 @@ int32_t ReportCallInfoHandler::UpdateCallsReportInfo(CallDetailsInfo &info)
         callDetailInfo.index = (*iter).index;
         callDetailInfo.voiceDomain = (*iter).voiceDomain;
         callDetailInfo.mpty = (*iter).mpty;
+        callDetailInfo.crsType = (*iter).crsType;
+        callDetailInfo.originalCallType = (*iter).originalCallType;
         (void)memcpy_s(callDetailInfo.phoneNum, kMaxNumberLen, (*iter).phoneNum, kMaxNumberLen);
         (void)memcpy_s(callDetailInfo.bundleName, kMaxBundleNameLen, (*iter).bundleName, kMaxBundleNameLen);
         callDetailsInfo.callVec.push_back(callDetailInfo);
     }
+}
+
+int32_t ReportCallInfoHandler::UpdateCallsReportInfo(CallDetailsInfo &info)
+{
+    if (callStatusManagerPtr_ == nullptr) {
+        TELEPHONY_LOGE("callStatusManagerPtr_ is null");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    CallDetailsInfo callDetailsInfo;
+    callDetailsInfo.slotId = info.slotId;
+    (void)memcpy_s(callDetailsInfo.bundleName, kMaxBundleNameLen, info.bundleName, kMaxBundleNameLen);
+    BuildCallDetailsInfo(info, callDetailsInfo);
     std::weak_ptr<CallStatusManager> callStatusManagerPtr = callStatusManagerPtr_;
     Submit("UpdateCallsReportInfo", [callStatusManagerPtr, callDetailsInfo]() {
         std::shared_ptr<CallStatusManager> managerPtr = callStatusManagerPtr.lock();
