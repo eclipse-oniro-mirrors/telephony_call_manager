@@ -242,10 +242,11 @@ int32_t AudioControlManager::SetAudioDevice(const AudioDevice &device)
             sptr<AudioRendererFilter> audioRendererFilter = new(std::nothrow) AudioRendererFilter();
             AudioRendererInfo rendererInfo;
             rendererInfo.streamUsage = StreamUsage::STREAM_USAGE_VOICE_COMMUNICATION;
-            rendererInfo.rendererFlags = 1;
+            rendererInfo.rendererFlags = 0;
             audioRendererFilter->rendererInfo = rendererInfo;
             AudioSystemManager* audioSystemManager = AudioSystemManager::GetInstance();
             audioSystemManager->SelectOutputDevice(audioRendererFilter, bluetoothDeviceDesc);
+            audioDeviceType = device.deviceType;
             break;
         }
         case AudioDeviceType::DEVICE_DISTRIBUTED_AUTOMOTIVE:
