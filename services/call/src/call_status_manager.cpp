@@ -139,8 +139,10 @@ void CallStatusManager::HandleDsdaInfo(int32_t slotId)
 {
     int32_t dsdsMode = DSDS_MODE_V2;
     bool noOtherCall = true;
+    int32_t callNum = 2;
     std::list<int32_t> callIdList;
     GetCarrierCallList(callIdList);
+    int32_t currentCallNum = GetCurrentCallNum();
     DelayedSingleton<CallRequestProcess>::GetInstance()->IsExistCallOtherSlot(callIdList, slotId, noOtherCall);
     DelayedRefSingleton<CoreServiceClient>::GetInstance().GetDsdsMode(dsdsMode);
     if ((dsdsMode == static_cast<int32_t>(DsdsMode::DSDS_MODE_V5_DSDA) ||
@@ -148,7 +150,7 @@ void CallStatusManager::HandleDsdaInfo(int32_t slotId)
         !noOtherCall) {
         TELEPHONY_LOGI("Handle DsdaCallInfo");
         sptr<CallBase> holdCall = GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_HOLD);
-        if (holdCall != nullptr) {
+        if (holdCall != nullptr && currentCallNum > callNum) {
             holdCall->SetCanUnHoldState(false);
         }
     }
@@ -558,6 +560,7 @@ int32_t CallStatusManager::HoldingHandle(const CallDetailInfo &info)
             TELEPHONY_LOGI("HoldConference success");
         }
     }
+    TelCallState priorState = call->GetTelCallState();
     int32_t ret = UpdateCallState(call, TelCallState::CALL_STATUS_HOLDING);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("UpdateCallState failed, errCode:%{public}d", ret);
@@ -566,6 +569,7 @@ int32_t CallStatusManager::HoldingHandle(const CallDetailInfo &info)
     int32_t dsdsMode = DSDS_MODE_V2;
     DelayedRefSingleton<CoreServiceClient>::GetInstance().GetDsdsMode(dsdsMode);
     TELEPHONY_LOGE("HoldingHandle dsdsMode:%{public}d", dsdsMode);
+    bool canSwitchCallState = call->GetCanSwitchCallState();
     if (dsdsMode == static_cast<int32_t>(DsdsMode::DSDS_MODE_V5_DSDA) ||
         dsdsMode == static_cast<int32_t>(DsdsMode::DSDS_MODE_V5_TDM)) {
         int32_t activeCallNum = GetCallNum(TelCallState::CALL_STATUS_ACTIVE);
@@ -573,9 +577,9 @@ int32_t CallStatusManager::HoldingHandle(const CallDetailInfo &info)
         int32_t conferenceId = ERR_ID;
         call->GetMainCallId(conferenceId);
         if (confState != TelConferenceState::TEL_CONFERENCE_IDLE && conferenceId == callId) {
-            AutoAnswerForDsda(activeCallNum, call->GetSlotId());
+            AutoAnswerForDsda(canSwitchCallState, priorState, activeCallNum, call->GetSlotId());
         } else if (confState == TelConferenceState::TEL_CONFERENCE_IDLE) {
-            AutoAnswerForDsda(activeCallNum, call->GetSlotId());
+            AutoAnswerForDsda(canSwitchCallState, priorState, activeCallNum, call->GetSlotId());
         }
     }
     return ret;
@@ -663,6 +667,7 @@ int32_t CallStatusManager::DisconnectedHandle(const CallDetailInfo &info)
     if (ret == TELEPHONY_SUCCESS) {
         TELEPHONY_LOGI("SubCallSeparateFromConference success");
     }
+    TelCallState priorState = call->GetTelCallState();
     ret = UpdateCallState(call, TelCallState::CALL_STATUS_DISCONNECTED);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("UpdateCallState failed, errCode:%{public}d", ret);
@@ -674,7 +679,8 @@ int32_t CallStatusManager::DisconnectedHandle(const CallDetailInfo &info)
     IsCanUnHold(activeCallNum, waitingCallNum, size, canUnHold);
     sptr<CallBase> holdCall = CallObjectManager::GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_HOLD);
     if (previousState != CallRunningState::CALL_RUNNING_STATE_HOLD &&
-        previousState != CallRunningState::CALL_RUNNING_STATE_ACTIVE) {
+        previousState != CallRunningState::CALL_RUNNING_STATE_ACTIVE &&
+        priorState == TelCallState::CALL_STATUS_DISCONNECTING) {
         if (holdCall != nullptr && canUnHold && holdCall->GetCanUnHoldState()) {
             if (holdCall->GetSlotId() == call->GetSlotId()) {
                 TELEPHONY_LOGI("release call and recover the held call");
@@ -685,12 +691,12 @@ int32_t CallStatusManager::DisconnectedHandle(const CallDetailInfo &info)
     DeleteOneCallObject(call->GetCallID());
     int32_t dsdsMode = DSDS_MODE_V2;
     DelayedRefSingleton<CoreServiceClient>::GetInstance().GetDsdsMode(dsdsMode);
-    TELEPHONY_LOGI("DisconnectedHandle dsdsMode:%{public}d", dsdsMode);
     if (dsdsMode == DSDS_MODE_V3) {
         AutoAnswer(activeCallNum, waitingCallNum);
     } else if (dsdsMode == static_cast<int32_t>(DsdsMode::DSDS_MODE_V5_DSDA) ||
                dsdsMode == static_cast<int32_t>(DsdsMode::DSDS_MODE_V5_TDM)) {
-        AutoAnswerForDsda(activeCallNum, call->GetSlotId());
+        bool canSwitchCallState = call->GetCanSwitchCallState();
+        AutoAnswerForDsda(canSwitchCallState, priorState, activeCallNum, call->GetSlotId());
     }
     return ret;
 }
@@ -707,7 +713,8 @@ void CallStatusManager::IsCanUnHold(int32_t activeCallNum, int32_t waitingCallNu
     TELEPHONY_LOGI("CanUnHold state: %{public}d", canUnHold);
 }
 
-void CallStatusManager::AutoAnswerForDsda(int32_t activeCallNum, int32_t slotId)
+void CallStatusManager::AutoAnswerForDsda(
+    bool canSwitchCallState, TelCallState priorState, int32_t activeCallNum, int32_t slotId)
 {
     int32_t dialingCallNum = GetCallNum(TelCallState::CALL_STATUS_DIALING);
     int32_t alertingCallNum = GetCallNum(TelCallState::CALL_STATUS_ALERTING);
@@ -734,16 +741,19 @@ void CallStatusManager::AutoAnswerForDsda(int32_t activeCallNum, int32_t slotId)
             }
         }
     }
-    AutoUnHoldForDsda(activeCallNum, slotId);
+    AutoUnHoldForDsda(canSwitchCallState, priorState, activeCallNum, slotId);
 }
 
-void CallStatusManager::AutoUnHoldForDsda(int32_t activeCallNum, int32_t slotId)
+void CallStatusManager::AutoUnHoldForDsda(
+    bool canSwitchCallState, TelCallState priorState, int32_t activeCallNum, int32_t slotId)
 {
     int32_t dialingCallNum = GetCallNum(TelCallState::CALL_STATUS_DIALING);
     int32_t waitingCallNum = GetCallNum(TelCallState::CALL_STATUS_WAITING);
     int32_t answeredCallNum = GetCallNum(TelCallState::CALL_STATUS_ANSWERED);
+    int32_t callNum = 2;
     std::list<int32_t> callIdList;
     GetCarrierCallList(callIdList);
+    int32_t currentCallNum = GetCurrentCallNum();
     for (int32_t otherCallId : callIdList) {
         sptr<CallBase> otherCall = GetOneCallObject(otherCallId);
         TelCallState state = otherCall->GetTelCallState();
@@ -752,13 +762,22 @@ void CallStatusManager::AutoUnHoldForDsda(int32_t activeCallNum, int32_t slotId)
         otherCall->GetMainCallId(conferenceId);
         if (otherCall != nullptr && slotId != otherCall->GetSlotId() && state == TelCallState::CALL_STATUS_HOLDING &&
             otherCall->GetCanUnHoldState() && answeredCallNum == 0 && activeCallNum == 0 && waitingCallNum == 0 &&
-            dialingCallNum == 0) {
-            if (confState != TelConferenceState::TEL_CONFERENCE_IDLE && conferenceId == otherCallId) {
+            dialingCallNum == 0 &&
+            ((confState != TelConferenceState::TEL_CONFERENCE_IDLE && conferenceId == otherCallId) ||
+                confState == TelConferenceState::TEL_CONFERENCE_IDLE)) {
+            // Actively hang up the processing unhold state or exchange call
+            if (priorState == TelCallState::CALL_STATUS_DISCONNECTING ||
+                (!canSwitchCallState && currentCallNum == callNum)) {
                 otherCall->UnHoldCall();
                 return;
-            } else if (confState == TelConferenceState::TEL_CONFERENCE_IDLE) {
-                otherCall->UnHoldCall();
-                return;
+            }
+        }
+    }
+    for (int32_t otherCallId : callIdList) {
+        sptr<CallBase> holdCall = GetOneCallObject(otherCallId);
+        if (holdCall != nullptr && holdCall->GetTelCallState() == TelCallState::CALL_STATUS_HOLDING) {
+            if (currentCallNum == callNum) {
+                holdCall->SetCanUnHoldState(true);
             }
         }
     }
