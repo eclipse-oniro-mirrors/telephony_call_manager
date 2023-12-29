@@ -407,8 +407,8 @@ bool CallControlManager::NotifyCallStateUpdated(
     if (callStateListenerPtr_ != nullptr) {
         callStateListenerPtr_->CallStateUpdated(callObjectPtr, priorState, nextState);
         TELEPHONY_LOGI("NotifyCallStateUpdated priorState:%{public}d,nextState:%{public}d", priorState, nextState);
-        if (priorState == TelCallState::CALL_STATUS_ALERTING && nextState == TelCallState::CALL_STATUS_ACTIVE) {
-            TELEPHONY_LOGI("call is actived, now check and switch call to car");
+        if (priorState == TelCallState::CALL_STATUS_DIALING && nextState == TelCallState::CALL_STATUS_ALERTING) {
+            TELEPHONY_LOGI("call is actived, now check and switch call to distributed audio device");
             DelayedSingleton<AudioDeviceManager>::GetInstance()->CheckAndSwitchDistributedAudioDevice();
         } else if (priorState == TelCallState::CALL_STATUS_ACTIVE &&
             nextState == TelCallState::CALL_STATUS_DISCONNECTED) {
@@ -428,7 +428,7 @@ bool CallControlManager::NotifyIncomingCallAnswered(sptr<CallBase> &callObjectPt
     }
     if (callStateListenerPtr_ != nullptr) {
         callStateListenerPtr_->IncomingCallActivated(callObjectPtr);
-        TELEPHONY_LOGI("call is answered, now check and switch call to car");
+        TELEPHONY_LOGI("call is answered, now check and switch call to distributed audio device");
         DelayedSingleton<AudioDeviceManager>::GetInstance()->CheckAndSwitchDistributedAudioDevice();
         return true;
     }

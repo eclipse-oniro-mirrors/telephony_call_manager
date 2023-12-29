@@ -111,6 +111,9 @@ void AudioDeviceManager::AddAudioDeviceList(const std::string &address, AudioDev
     if (deviceType == AudioDeviceType::DEVICE_BLUETOOTH_SCO) {
         SetDeviceAvailable(AudioDeviceType::DEVICE_BLUETOOTH_SCO, true);
     }
+    if (IsDistributedAudioDeviceType(deviceType)) {
+        SetDeviceAvailable(deviceType, true);
+    }
     DelayedSingleton<CallAbilityReportProxy>::GetInstance()->ReportAudioDeviceChange(info_);
     TELEPHONY_LOGI("AddAudioDeviceList success");
 }
@@ -146,6 +149,9 @@ void AudioDeviceManager::RemoveAudioDeviceList(const std::string &address, Audio
     }
     if (deviceType == AudioDeviceType::DEVICE_BLUETOOTH_SCO && !blueToothScoExist) {
         SetDeviceAvailable(AudioDeviceType::DEVICE_BLUETOOTH_SCO, false);
+    }
+    if (IsDistributedAudioDeviceType(deviceType)) {
+        SetDeviceAvailable(deviceType, false);
     }
     if (needAddEarpiece && deviceType == AudioDeviceType::DEVICE_WIRED_HEADSET && !wiredHeadsetExist) {
         AudioDevice audioDevice = {
@@ -412,7 +418,7 @@ int32_t AudioDeviceManager::ReportAudioDeviceChange()
     if (address.length() > 0) {
         if (memset_s(info_.currentAudioDevice.address, kMaxAddressLen, 0, kMaxAddressLen) != EOK) {
             TELEPHONY_LOGE("memset_s address fail");
-            return TELEPHONY_ERR_MEMCPY_FAIL;
+            return TELEPHONY_ERR_MEMSET_FAIL;
         }
         if (memcpy_s(info_.currentAudioDevice.address, kMaxAddressLen, address.c_str(), address.length()) != EOK) {
             TELEPHONY_LOGE("memcpy_s address fail");
@@ -421,7 +427,7 @@ int32_t AudioDeviceManager::ReportAudioDeviceChange()
     } else {
         if (memset_s(info_.currentAudioDevice.address, kMaxAddressLen, 0, kMaxAddressLen) != EOK) {
             TELEPHONY_LOGE("memset_s address fail");
-            return TELEPHONY_ERR_MEMCPY_FAIL;
+            return TELEPHONY_ERR_MEMSET_FAIL;
         }
     }
     info_.isMuted = DelayedSingleton<AudioProxy>::GetInstance()->IsMicrophoneMute();
@@ -487,9 +493,9 @@ bool AudioDeviceManager::IsSpeakerAvailable()
 
 bool AudioDeviceManager::IsDistributedAudioDeviceType(AudioDeviceType deviceType)
 {
-    if (((audioDeviceType_ == AudioDeviceType::DEVICE_DISTRIBUTED_AUTOMOTIVE) ||
-        (audioDeviceType_ == AudioDeviceType::DEVICE_DISTRIBUTED_PHONE) ||
-        (audioDeviceType_ == AudioDeviceType::DEVICE_DISTRIBUTED_PAD))) {
+    if (((deviceType == AudioDeviceType::DEVICE_DISTRIBUTED_AUTOMOTIVE) ||
+        (deviceType == AudioDeviceType::DEVICE_DISTRIBUTED_PHONE) ||
+        (deviceType == AudioDeviceType::DEVICE_DISTRIBUTED_PAD))) {
         return true;
     }
     return false;
