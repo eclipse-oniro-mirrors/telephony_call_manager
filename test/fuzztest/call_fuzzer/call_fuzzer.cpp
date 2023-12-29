@@ -316,16 +316,16 @@ void IMSVideoCallWindowFunc(const uint8_t *data, size_t size)
     paraInfo.callState = static_cast<TelCallState>(size % TEL_CALL_STATE_NUM);
     sptr<IMSCall> callObjectPtr = std::make_unique<IMSCall>(paraInfo).release();
     std::string msg(reinterpret_cast<const char *>(data), size);
-    if (msg.empty() || msg[0] < '0' || msg[0] > '9') {
-        msg = "";
-        callObjectPtr->SetPreviewWindow(msg, nullptr);
-        callObjectPtr->SetDisplayWindow(msg, nullptr);
+    int len = static_cast<int>(msg.length());
+    std::string subSurfaceId = msg;
+    if (len >= 1) {
+        subSurfaceId = msg.substr(0, 1);
+    }
+    if (subSurfaceId.empty() || subSurfaceId[0] < '0' || subSurfaceId[0] > '9') {
+        subSurfaceId = "";
+        callObjectPtr->SetPreviewWindow(subSurfaceId, nullptr);
+        callObjectPtr->SetDisplayWindow(subSurfaceId, nullptr);
     } else {
-        int len = static_cast<int>(msg.length());
-        std::string subSurfaceId = msg;
-        if (len >= 1) {
-            subSurfaceId = msg.substr(0, 1);
-        }
         uint64_t tmpSurfaceId = std::stoull(subSurfaceId);
         auto surface = SurfaceUtils::GetInstance()->GetSurface(tmpSurfaceId);
         callObjectPtr->SetPreviewWindow(subSurfaceId, surface);
@@ -383,7 +383,6 @@ void OttVideoCallFunc(const uint8_t *data, size_t size)
     if (!IsServiceInited()) {
         return;
     }
-
     DialParaInfo paraInfo;
     paraInfo.dialType = static_cast<DialType>(size % DIAL_TYPE);
     paraInfo.callType = static_cast<CallType>(size % CALL_TYPE_NUM);
@@ -413,18 +412,38 @@ void OttVideoCallFunc(const uint8_t *data, size_t size)
     callObjectPtr->ReportImsCallModeInfo(callMediaModeInfo);
     callObjectPtr->ControlCamera(msg, callingUid, callingPid);
     callObjectPtr->SetPausePicture(msg);
+    callObjectPtr->SetDeviceDirection(rotation);
+    callObjectPtr->CancelCallUpgrade();
+    callObjectPtr->RequestCameraCapabilities();
+}
+
+void OttVideoCallWindowFunc(const uint8_t *data, size_t size)
+{
+    if (!IsServiceInited()) {
+        return;
+    }
+    DialParaInfo paraInfo;
+    paraInfo.dialType = static_cast<DialType>(size % DIAL_TYPE);
+    paraInfo.callType = static_cast<CallType>(size % CALL_TYPE_NUM);
+    paraInfo.videoState = static_cast<VideoStateType>(size % VIDIO_TYPE_NUM);
+    paraInfo.callState = static_cast<TelCallState>(size % TEL_CALL_STATE_NUM);
+    sptr<OTTCall> callObjectPtr = std::make_unique<OTTCall>(paraInfo).release();
+    std::string msg(reinterpret_cast<const char *>(data), size);
     int len = static_cast<int>(msg.length());
     std::string subSurfaceId = msg;
     if (len >= 1) {
         subSurfaceId = msg.substr(0, 1);
     }
-    uint64_t tmpSurfaceId = std::stoull(subSurfaceId);
-    auto surface = SurfaceUtils::GetInstance()->GetSurface(tmpSurfaceId);
-    callObjectPtr->SetPreviewWindow(subSurfaceId, surface);
-    callObjectPtr->SetDisplayWindow(subSurfaceId, surface);
-    callObjectPtr->SetDeviceDirection(rotation);
-    callObjectPtr->CancelCallUpgrade();
-    callObjectPtr->RequestCameraCapabilities();
+    if (subSurfaceId.empty() || subSurfaceId[0] < '0' || subSurfaceId[0] > '9') {
+        subSurfaceId = "";
+        callObjectPtr->SetPreviewWindow(subSurfaceId, nullptr);
+        callObjectPtr->SetDisplayWindow(subSurfaceId, nullptr);
+    } else {
+        uint64_t tmpSurfaceId = std::stoull(subSurfaceId);
+        auto surface = SurfaceUtils::GetInstance()->GetSurface(tmpSurfaceId);
+        callObjectPtr->SetPreviewWindow(subSurfaceId, surface);
+        callObjectPtr->SetDisplayWindow(subSurfaceId, surface);
+    }
 }
 
 void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
@@ -442,6 +461,7 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     OttCallFunc(data, size);
     VoIPCallFunc(data, size);
     OttVideoCallFunc(data, size);
+    OttVideoCallWindowFunc(data, size);
 }
 } // namespace OHOS
 
