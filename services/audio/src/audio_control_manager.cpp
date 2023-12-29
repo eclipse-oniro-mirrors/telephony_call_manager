@@ -229,6 +229,15 @@ int32_t AudioControlManager::SetAudioDevice(const AudioDevice &device)
         case AudioDeviceType::DEVICE_WIRED_HEADSET:
             audioDeviceType = device.deviceType;
             break;
+        case AudioDeviceType::DEVICE_DISTRIBUTED_AUTOMOTIVE:
+        case AudioDeviceType::DEVICE_DISTRIBUTED_PHONE:
+        case AudioDeviceType::DEVICE_DISTRIBUTED_PAD:
+            TELEPHONY_LOGI("set audio device, address: %{public}s", device.address);
+            if (DelayedSingleton<DistributedCallManager>::GetInstance()->SwitchDCallDevice(device)) {
+                DelayedSingleton<AudioDeviceManager>::GetInstance()->SetCurrentAudioDevice(device.deviceType);
+                return TELEPHONY_SUCCESS;
+            }
+            return CALL_ERR_AUDIO_SET_AUDIO_DEVICE_FAILED;
         case AudioDeviceType::DEVICE_BLUETOOTH_SCO: {
             AudioRoutingManager* audioRoutingManager = AudioRoutingManager::GetInstance();
             std::vector<std::unique_ptr<AudioDeviceDescriptor>> desc =
@@ -249,18 +258,6 @@ int32_t AudioControlManager::SetAudioDevice(const AudioDevice &device)
             audioDeviceType = device.deviceType;
             break;
         }
-        case AudioDeviceType::DEVICE_DISTRIBUTED_AUTOMOTIVE:
-        case AudioDeviceType::DEVICE_DISTRIBUTED_PHONE:
-        case AudioDeviceType::DEVICE_DISTRIBUTED_PAD:
-            TELEPHONY_LOGI("set audio device, address: %{public}s", device.address);
-            if (DelayedSingleton<DistributedCallManager>::GetInstance()->SwitchDCallDevice(device)) {
-                DelayedSingleton<AudioDeviceManager>::GetInstance()->SetDeviceAvailable(
-                    device.deviceType, true);
-                DelayedSingleton<AudioDeviceManager>::GetInstance()->SetCurrentAudioDevice(
-                    device.deviceType);
-                return TELEPHONY_SUCCESS;
-            }
-            return CALL_ERR_AUDIO_SET_AUDIO_DEVICE_FAILED;
         default:
             break;
     }

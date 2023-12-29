@@ -70,7 +70,7 @@ private:
 
     void GetConnectedAudioDevice(AudioDevice& device);
     void SetConnectedAudioDevice(const AudioDevice& device);
-    void SwitchAudioDeviceToDistributedCar(std::unique_ptr<AudioDevice> carDevice);
+    void SwitchToDistributedCallDevice(std::unique_ptr<AudioDevice> device);
 
 private:
     std::atomic<bool> isCallActived_ = false;
