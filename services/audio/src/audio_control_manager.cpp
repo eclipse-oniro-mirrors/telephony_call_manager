@@ -28,6 +28,7 @@ namespace OHOS {
 namespace Telephony {
 using namespace AudioStandard;
 constexpr int32_t DTMF_PLAY_TIME = 30;
+constexpr int32_t CRS_TYPE = 2;
 
 AudioControlManager::AudioControlManager()
     : isLocalRingbackNeeded_(false), ring_(nullptr), tone_(nullptr), sound_(nullptr)
@@ -290,6 +291,13 @@ bool AudioControlManager::PlayRingtone()
     }
     CallAttributeInfo info;
     incomingCall->GetCallAttributeBaseInfo(info);
+    if (incomingCall->GetCrsType() == CRS_TYPE) {
+        if (PlaySoundtone()) {
+            TELEPHONY_LOGE("play soundtone success");
+            return true;
+        }
+        return false;
+    }
     if (ring_->Play(info.accountId) != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("play ringtone failed");
         return false;

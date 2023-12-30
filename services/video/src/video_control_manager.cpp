@@ -204,6 +204,10 @@ int32_t VideoControlManager::OpenCamera(
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     sptr<IMSCall> netCall = reinterpret_cast<IMSCall *>(callPtr.GetRefPtr());
+    if (netCall == nullptr) {
+        TELEPHONY_LOGE("the netCall is nullptr, callId:%{public}d", callId);
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     ret = netCall->ControlCamera(id, callingUid, callingPid);
     if (ret == TELEPHONY_SUCCESS) {
         isOpenCamera_ = true;

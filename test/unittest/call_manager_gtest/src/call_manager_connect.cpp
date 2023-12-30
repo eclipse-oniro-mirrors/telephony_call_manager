@@ -430,15 +430,15 @@ int32_t CallManagerConnect::SetAudioDevice(const AudioDevice &audioDevice)
 int32_t CallManagerConnect::SetPreviewWindow(int32_t callId, std::string surfaceId)
 {
     if (callManagerServicePtr_ != nullptr) {
-        if (surfaceId.empty() || surfaceId[0] < '0' || surfaceId[0] > '9') {
-            surfaceId = "";
-            return callManagerServicePtr_->SetPreviewWindow(callId, surfaceId, nullptr);
+        int len = static_cast<int>(surfaceId.length());
+        std::string subSurfaceId = surfaceId;
+        if (len >= 1) {
+            subSurfaceId = surfaceId.substr(0, 1);
+        }
+        if (subSurfaceId.empty() || subSurfaceId[0] < '0' || subSurfaceId[0] > '9') {
+            subSurfaceId = "";
+            return callManagerServicePtr_->SetPreviewWindow(callId, subSurfaceId, nullptr);
         } else {
-            int len = static_cast<int>(surfaceId.length());
-            std::string subSurfaceId = surfaceId;
-            if (len >= 1) {
-                subSurfaceId = surfaceId.substr(0, 1);
-            }
             uint64_t tmpSurfaceId = std::stoull(subSurfaceId);
             auto surface = SurfaceUtils::GetInstance()->GetSurface(tmpSurfaceId);
             return callManagerServicePtr_->SetPreviewWindow(callId, subSurfaceId, surface);
@@ -451,15 +451,15 @@ int32_t CallManagerConnect::SetPreviewWindow(int32_t callId, std::string surface
 int32_t CallManagerConnect::SetDisplayWindow(int32_t callId, std::string surfaceId)
 {
     if (callManagerServicePtr_ != nullptr) {
-        if (surfaceId.empty() || surfaceId[0] < '0' || surfaceId[0] > '9') {
-            surfaceId = "";
-            return callManagerServicePtr_->SetPreviewWindow(callId, surfaceId, nullptr);
+        int len = static_cast<int>(surfaceId.length());
+        std::string subSurfaceId = surfaceId;
+        if (len >= 1) {
+            subSurfaceId = surfaceId.substr(0, 1);
+        }
+        if (subSurfaceId.empty() || subSurfaceId[0] < '0' || subSurfaceId[0] > '9') {
+            subSurfaceId = "";
+            return callManagerServicePtr_->SetPreviewWindow(callId, subSurfaceId, nullptr);
         } else {
-            int len = static_cast<int>(surfaceId.length());
-            std::string subSurfaceId = surfaceId;
-            if (len >= 1) {
-                subSurfaceId = surfaceId.substr(0, 1);
-            }
             uint64_t tmpSurfaceId = std::stoull(subSurfaceId);
             auto surface = SurfaceUtils::GetInstance()->GetSurface(tmpSurfaceId);
             return callManagerServicePtr_->SetPreviewWindow(callId, subSurfaceId, surface);
