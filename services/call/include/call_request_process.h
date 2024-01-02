@@ -29,6 +29,7 @@ public:
 
     int32_t DialRequest();
     void AnswerRequest(int32_t callId, int32_t videoState);
+    void AnswerRequestForDsda(sptr<CallBase> call, int32_t callId, int32_t videoState);
     void RejectRequest(int32_t callId, bool isSendSms, std::string &content);
     void HangUpRequest(int32_t callId);
     void HandleHoldAfterHangUp(TelCallState state, int32_t waitingCallNum);
@@ -43,8 +44,11 @@ public:
     void JoinConference(int32_t callId, std::vector<std::string> &numberList);
     bool IsDsdsMode3();
     bool IsDsdsMode5();
+    bool HasActiveCall();
+    bool NeedAnswerVTAndEndActiveVO(int32_t callId, int32_t videoState);
+    bool NeedAnswerVOAndEndActiveVT(int32_t callId, int32_t videoState);
     void DisconnectOtherSubIdCall(int32_t callId, int32_t slotId, int32_t videoState);
-    void DisconnectOtherCallForVideoCall(int32_t callId, int32_t slotId, int32_t videoState);
+    void DisconnectOtherCallForVideoCall(int32_t callId);
     void HandleCallWaitingNumTwo(sptr<CallBase> incomingCall, sptr<CallBase> call, int32_t slotId,
         int32_t activeCallNum, bool &flagForConference);
     void HandleCallWaitingNumOne(sptr<CallBase> incomingCall, sptr<CallBase> call, int32_t slotId,
@@ -68,6 +72,7 @@ private:
     bool IsFdnNumber(std::vector<std::u16string> fdnNumberList, std::string phoneNumber);
     int32_t UpdateCallReportInfo(const DialParaInfo &info, TelCallState state);
     int32_t HandleDialFail();
+    int32_t GetOtherRingingCall(int32_t currentCallId);
 
 private:
     std::mutex mutex_;

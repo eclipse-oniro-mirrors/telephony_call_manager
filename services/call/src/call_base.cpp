@@ -31,7 +31,7 @@ CallBase::CallBase(DialParaInfo &info)
       bundleName_(info.bundleName), callRunningState_(CallRunningState::CALL_RUNNING_STATE_CREATE),
       conferenceState_(TelConferenceState::TEL_CONFERENCE_IDLE), startTime_(0),
       direction_(CallDirection::CALL_DIRECTION_IN), policyFlag_(0), callState_(info.callState), autoAnswerState_(false),
-      canUnHoldState_(true), canSwitchCallState_(true), isSpeakerphoneOn_(false),
+      canUnHoldState_(true), canSwitchCallState_(true), answerVideoState_(0), isSpeakerphoneOn_(false),
       callEndedType_(CallEndedType::UNKNOWN), callBeginTime_(0), callEndTime_(0), ringBeginTime_(0), ringEndTime_(0),
       answerType_(CallAnswerType::CALL_ANSWER_MISSED), accountId_(info.accountId), crsType_(info.crsType),
       originalCallType_(info.originalCallType)
@@ -44,10 +44,10 @@ CallBase::CallBase(DialParaInfo &info, AppExecFwk::PacMap &extras)
       bundleName_(info.bundleName), callRunningState_(CallRunningState::CALL_RUNNING_STATE_CREATE),
       conferenceState_(TelConferenceState::TEL_CONFERENCE_IDLE), startTime_(0),
       direction_(CallDirection::CALL_DIRECTION_OUT), policyFlag_(0), callState_(info.callState),
-      autoAnswerState_(false), canUnHoldState_(true), canSwitchCallState_(true), isSpeakerphoneOn_(false),
-      callEndedType_(CallEndedType::UNKNOWN), callBeginTime_(0), callEndTime_(0), ringBeginTime_(0), ringEndTime_(0),
-      answerType_(CallAnswerType::CALL_ANSWER_MISSED), accountId_(info.accountId), crsType_(info.crsType),
-      originalCallType_(info.originalCallType)
+      autoAnswerState_(false), canUnHoldState_(true), canSwitchCallState_(true), answerVideoState_(0),
+      isSpeakerphoneOn_(false), callEndedType_(CallEndedType::UNKNOWN), callBeginTime_(0), callEndTime_(0),
+      ringBeginTime_(0), ringEndTime_(0), answerType_(CallAnswerType::CALL_ANSWER_MISSED), accountId_(info.accountId),
+      crsType_(info.crsType), originalCallType_(info.originalCallType)
 {
     (void)memset_s(&contactInfo_, sizeof(ContactInfo), 0, sizeof(ContactInfo));
 }
@@ -259,6 +259,19 @@ bool CallBase::GetAutoAnswerState()
 {
     std::lock_guard<std::mutex> lock(mutex_);
     return autoAnswerState_;
+}
+
+void CallBase::SetAnswerVideoState(int32_t videoState)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    answerVideoState_ = videoState;
+    TELEPHONY_LOGI("set answer video state :%{public}d", answerVideoState_);
+}
+
+int32_t CallBase::GetAnswerVideoState()
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    return answerVideoState_;
 }
 
 void CallBase::SetCanUnHoldState(bool flag)

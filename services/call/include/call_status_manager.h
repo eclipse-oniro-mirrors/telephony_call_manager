@@ -67,6 +67,7 @@ private:
     void IsCanUnHold(int32_t activeCallNum, int32_t waitingCallNum, int32_t size, bool &canUnHold);
     void AutoAnswer(int32_t activeCallNum, int32_t waitingCallNum);
     void AutoAnswerForDsda(bool canSwitchCallState, TelCallState priorState, int32_t activeCallNum, int32_t slotId);
+    void AutoAnswerForVideoCall(int32_t activeCallNum);
     void AutoUnHoldForDsda(bool canSwitchCallState, TelCallState priorState, int32_t activeCallNum, int32_t slotId);
     sptr<CallBase> CreateNewCall(const CallDetailInfo &info, CallDirection dir);
     sptr<CallBase> RefreshCallIfNecessary(const sptr<CallBase> &call, const CallDetailInfo &info);

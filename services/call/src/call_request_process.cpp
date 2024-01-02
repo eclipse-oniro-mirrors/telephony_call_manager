@@ -96,6 +96,7 @@ void CallRequestProcess::AnswerRequest(int32_t callId, int32_t videoState)
         TELEPHONY_LOGE("the call object is nullptr, callId:%{public}d", callId);
         return;
     }
+    call->SetAnswerVideoState(videoState);
     if (call->GetCallType() == CallType::TYPE_VOIP) {
         int32_t ret = call->AnswerCall(videoState);
         if (ret != TELEPHONY_SUCCESS) {
@@ -115,17 +116,39 @@ void CallRequestProcess::AnswerRequest(int32_t callId, int32_t videoState)
             }
         }
     }
+    AnswerRequestForDsda(call, callId, videoState);
+}
+
+void CallRequestProcess::AnswerRequestForDsda(sptr<CallBase> call, int32_t callId, int32_t videoState)
+{
     int32_t slotId = call->GetSlotId();
+    int32_t callCrsType = 2;
     if (IsDsdsMode3()) {
         DisconnectOtherSubIdCall(callId, slotId, videoState);
     } else if (IsDsdsMode5()) {
-        if (videoState == static_cast<int32_t>(VideoStateType::TYPE_VIDEO)) {
+        if (NeedAnswerVTAndEndActiveVO(callId, videoState)) {
             TELEPHONY_LOGI("Answer videoCall for Dsda");
-            DisconnectOtherCallForVideoCall(callId, slotId, videoState);
-        } else {
+            DisconnectOtherCallForVideoCall(callId);
             call->SetAutoAnswerState(true);
-            HoldOrDisconnectedCall(callId, slotId, videoState);
+            return;
+        } else if (NeedAnswerVOAndEndActiveVT(callId, videoState)) {
+            TELEPHONY_LOGI("Answer voiceCall for Dsda, but has video call");
+            DisconnectOtherCallForVideoCall(callId);
+            call->SetAutoAnswerState(true);
+            return;
         }
+        // There is already an incoming call to the CRS.
+        int32_t otherRingCallId = GetOtherRingingCall(callId);
+        if (otherRingCallId != INVALID_CALLID) {
+            sptr<CallBase> ringingCall = GetOneCallObject(otherRingCallId);
+            if (ringingCall != nullptr && ringingCall->GetCrsType() == callCrsType) {
+                ringingCall->HangUpCall();
+                call->SetAutoAnswerState(true);
+                return;
+            }
+        }
+        call->SetAutoAnswerState(true);
+        HoldOrDisconnectedCall(callId, slotId, videoState);
     } else {
         int32_t ret = call->AnswerCall(videoState);
         if (ret != TELEPHONY_SUCCESS) {
@@ -159,6 +182,73 @@ bool CallRequestProcess::IsDsdsMode5()
     return false;
 }
 
+bool CallRequestProcess::HasActiveCall()
+{
+    int32_t activeCallNum = GetCallNum(TelCallState::CALL_STATUS_ACTIVE);
+    int32_t holdingCallNum = GetCallNum(TelCallState::CALL_STATUS_HOLDING);
+    int32_t answeredCallNum = GetCallNum(TelCallState::CALL_STATUS_ANSWERED);
+    if (activeCallNum == 0 && holdingCallNum == 0 && answeredCallNum == 0) {
+        return false;
+    }
+    return true;
+}
+
+bool CallRequestProcess::NeedAnswerVTAndEndActiveVO(int32_t callId, int32_t videoState)
+{
+    TELEPHONY_LOGI("Enter NeedAnswerVTAndEndActiveVO");
+    sptr<CallBase> activeCall = GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_ACTIVE);
+    sptr<CallBase> holdingCall = GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_HOLD);
+    // if this call is existed foreground or backgroud call, don't hang up it.
+    if ((activeCall != nullptr && activeCall->GetCallID() == callId) ||
+        (holdingCall != nullptr && holdingCall->GetCallID() == callId)) {
+        return false;
+    }
+    if (HasActiveCall()) {
+        if (videoState != static_cast<int32_t>(VideoStateType::TYPE_VOICE)) {
+            TELEPHONY_LOGI("answer a new video call, need to hang up the exist call");
+            return true;
+        }
+    }
+    return false;
+}
+
+bool CallRequestProcess::NeedAnswerVOAndEndActiveVT(int32_t callId, int32_t videoState)
+{
+    if (videoState != static_cast<int32_t>(VideoStateType::TYPE_VOICE)) {
+        return false;
+    }
+    if (HasActiveCall()) {
+        sptr<CallBase> activeCall = GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_ACTIVE);
+        sptr<CallBase> holdingCall = GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_HOLD);
+        if ((activeCall != nullptr && activeCall->GetVideoStateType() != VideoStateType::TYPE_VOICE &&
+                activeCall->GetCallID() != callId) ||
+            (holdingCall != nullptr && holdingCall->GetVideoStateType() != VideoStateType::TYPE_VOICE &&
+                holdingCall->GetCallID() != callId)) {
+            TELEPHONY_LOGI("answer a new voice call, need to hang up the exist video call");
+            return true;
+        }
+    }
+    return false;
+}
+
+int32_t CallRequestProcess::GetOtherRingingCall(int32_t currentCallId)
+{
+    int32_t otherRingCallId = INVALID_CALLID;
+    std::list<int32_t> callIdList;
+    GetCarrierCallList(callIdList);
+    for (int32_t otherCallId : callIdList) {
+        if (otherCallId == currentCallId) {
+            continue;
+        }
+        sptr<CallBase> call = GetOneCallObject(otherCallId);
+        if (call != nullptr && call->GetCallRunningState() == CallRunningState::CALL_RUNNING_STATE_RINGING) {
+            otherRingCallId = call->GetCallID();
+            break;
+        }
+    }
+    return otherRingCallId;
+}
+
 void CallRequestProcess::HoldOrDisconnectedCall(int32_t callId, int32_t slotId, int32_t videoState)
 {
     TELEPHONY_LOGI("Enter HoldOrDisconnectedCall");
@@ -186,11 +276,6 @@ void CallRequestProcess::HoldOrDisconnectedCall(int32_t callId, int32_t slotId, 
         sptr<CallBase> call = GetOneCallObject(otherCallId);
         TELEPHONY_LOGI("other Call State =:%{public}d", call->GetTelCallState());
         if (call != nullptr && call != incomingCall) {
-            if (call->GetVideoStateType() == VideoStateType::TYPE_VIDEO) {
-                call->HangUpCall();
-                TELEPHONY_LOGI("Hangup Videocall for Incomingcall");
-                return;
-            }
             if (HandleDsdaIncomingCall(call, activeCallNum, slotId, videoState, incomingCall)) {
                 continue;
             }
@@ -405,34 +490,18 @@ void CallRequestProcess::DisconnectOtherSubIdCall(int32_t callId, int32_t slotId
     }
 }
 
-void CallRequestProcess::DisconnectOtherCallForVideoCall(int32_t callId, int32_t slotId, int32_t videoState)
+void CallRequestProcess::DisconnectOtherCallForVideoCall(int32_t callId)
 {
-    sptr<CallBase> incomingCall = GetOneCallObject(callId);
-    if (incomingCall == nullptr) {
-        TELEPHONY_LOGE("the call object is nullptr, callId:%{public}d", callId);
-        return;
-    }
     std::list<int32_t> callIdList;
-    bool noOtherCall = true;
     GetCarrierCallList(callIdList);
-    if (callIdList.size() > 1) {
-        for (int32_t otherCallId : callIdList) {
-            sptr<CallBase> call = GetOneCallObject(otherCallId);
-            if (call != nullptr && call->GetSlotId() != slotId &&
-                call->GetCallRunningState() != CallRunningState::CALL_RUNNING_STATE_RINGING) {
-                incomingCall->SetAutoAnswerState(true);
-                TELEPHONY_LOGI("Hangup call callid:%{public}d", call->GetCallID());
-                call->HangUpCall();
-                noOtherCall = false;
-            }
+    for (int32_t otherCallId : callIdList) {
+        sptr<CallBase> call = GetOneCallObject(otherCallId);
+        if (call != nullptr && call->GetCallID() != callId &&
+            (call->GetCallRunningState() == CallRunningState::CALL_RUNNING_STATE_ACTIVE ||
+                call->GetCallRunningState() == CallRunningState::CALL_RUNNING_STATE_HOLD)) {
+            TELEPHONY_LOGI("Hangup call callid:%{public}d", call->GetCallID());
+            call->HangUpCall();
         }
-    }
-    if (noOtherCall == true) {
-        int32_t ret = incomingCall->AnswerCall(videoState);
-        if (ret != TELEPHONY_SUCCESS) {
-            return;
-        }
-        DelayedSingleton<CallControlManager>::GetInstance()->NotifyIncomingCallAnswered(incomingCall);
     }
 }
 
