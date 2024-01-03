@@ -166,6 +166,7 @@ bool AudioSceneProcessor::SwitchIncoming()
         TELEPHONY_LOGE("make_unique IncomingState failed");
         return false;
     }
+    DelayedSingleton<AudioControlManager>::GetInstance()->StopRingtone();
     // play ringtone while incoming state
     DelayedSingleton<AudioControlManager>::GetInstance()->PlayRingtone();
     DelayedSingleton<AudioDeviceManager>::GetInstance()->ProcessEvent(AudioEvent::AUDIO_RINGING);
