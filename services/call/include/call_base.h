@@ -103,6 +103,8 @@ public:
     bool IsSpeakerphoneOn();
     void SetAutoAnswerState(bool flag);
     bool GetAutoAnswerState();
+    void SetAnswerVideoState(int32_t videoState);
+    int32_t GetAnswerVideoState();
     void SetCanUnHoldState(bool flag);
     bool GetCanUnHoldState();
     void SetCanSwitchCallState(bool flag);
@@ -145,6 +147,7 @@ private:
     bool autoAnswerState_;
     bool canUnHoldState_;
     bool canSwitchCallState_;
+    int32_t answerVideoState_;
     bool isSpeakerphoneOn_;
     CallEndedType callEndedType_;
     ContactInfo contactInfo_;

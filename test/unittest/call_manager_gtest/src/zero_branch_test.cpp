@@ -158,6 +158,7 @@ HWTEST_F(BranchTest, Telephony_CallRequestProcess_001, Function | MediumTest | L
     DialParaInfo mDialParaInfo;
     callRequestProcess->UpdateCallReportInfo(mDialParaInfo, TelCallState::CALL_STATUS_INCOMING);
     callRequestProcess->HandleDialFail();
+    callRequestProcess->GetOtherRingingCall(1);
     callRequestProcess->CarrierDialProcess(mDialParaInfo);
     callRequestProcess->IsDialCallForDsda(mDialParaInfo);
     std::string phoneNumber = "123456789012";
@@ -170,7 +171,7 @@ HWTEST_F(BranchTest, Telephony_CallRequestProcess_001, Function | MediumTest | L
     callRequestProcess->IsFdnNumber(testList, content);
     callRequestProcess->IsDsdsMode3();
     callRequestProcess->DisconnectOtherSubIdCall(1, 0, 0);
-    callRequestProcess->DisconnectOtherCallForVideoCall(1, 0, 0);
+    callRequestProcess->DisconnectOtherCallForVideoCall(1);
     callRequestProcess->IsDsdsMode5();
 }
 
@@ -2066,6 +2067,7 @@ HWTEST_F(BranchTest, Telephony_CallStatusManager_002, Function | MediumTest | Le
     TelCallState priorState = TelCallState::CALL_STATUS_DISCONNECTING;
     callStatusManager->AutoAnswerForDsda(canSwitchCallState, priorState, activeCallNum, slotId);
     callStatusManager->AutoUnHoldForDsda(canSwitchCallState, priorState, activeCallNum, slotId);
+    callStatusManager->AutoAnswerForVideoCall(activeCallNum);
 }
 
 /**

@@ -697,6 +697,9 @@ HWTEST_F(CallStateTest, Telephony_CallRequestProcess_003, Function | MediumTest 
     callBase3->callId_ = 3;
     bool enabled = false;
     callRequestProcess->HandleCallWaitingNumOneNext(callBase3, callBase2, callBase1, 1, enabled);
+    callRequestProcess->HasActiveCall();
+    callRequestProcess->NeedAnswerVTAndEndActiveVO(1, 0);
+    callRequestProcess->NeedAnswerVOAndEndActiveVT(1, 0);
 }
 
 /**

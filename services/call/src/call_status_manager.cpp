@@ -729,12 +729,12 @@ void CallStatusManager::AutoAnswerForDsda(
             int32_t videoState = static_cast<int32_t>(ringCall->GetVideoStateType());
             if (videoState == static_cast<int32_t>(VideoStateType::TYPE_VIDEO)) {
                 TELEPHONY_LOGI("AutoAnswer VideoCall for Dsda");
-                AutoAnswer(activeCallNum, waitingCallNum);
+                AutoAnswerForVideoCall(activeCallNum);
                 return;
             }
             if (dialingCallNum == 0 && alertingCallNum == 0 && activeCallNum == 0 && answeredCallNum == 0 &&
                 ringCall->GetCallRunningState() == CallRunningState::CALL_RUNNING_STATE_RINGING) {
-                int ret = ringCall->AnswerCall(videoState);
+                int ret = ringCall->AnswerCall(ringCall->GetAnswerVideoState());
                 TELEPHONY_LOGI("ret = %{public}d", ret);
                 ringCall->SetAutoAnswerState(false);
                 return;
@@ -783,6 +783,29 @@ void CallStatusManager::AutoUnHoldForDsda(
     }
 }
 
+void CallStatusManager::AutoAnswerForVideoCall(int32_t activeCallNum)
+{
+    int32_t holdingCallNum = GetCallNum(TelCallState::CALL_STATUS_HOLDING);
+    int32_t dialingCallNum = GetCallNum(TelCallState::CALL_STATUS_DIALING);
+    int32_t alertingCallNum = GetCallNum(TelCallState::CALL_STATUS_ALERTING);
+    if (activeCallNum == 0 && holdingCallNum == 0 && dialingCallNum == 0 && alertingCallNum == 0) {
+        std::list<int32_t> ringCallIdList;
+        GetCarrierCallList(ringCallIdList);
+        for (int32_t ringingCallId : ringCallIdList) {
+            sptr<CallBase> ringingCall = GetOneCallObject(ringingCallId);
+            CallRunningState ringingCallState = ringingCall->GetCallRunningState();
+            if ((ringingCallState == CallRunningState::CALL_RUNNING_STATE_RINGING &&
+                    (ringingCall->GetAutoAnswerState()))) {
+                ringingCall->SetAutoAnswerState(false);
+                int32_t videoState = static_cast<int32_t>(ringingCall->GetVideoStateType());
+                int ret = ringingCall->AnswerCall(ringingCall->GetAnswerVideoState());
+                TELEPHONY_LOGI("ret = %{public}d", ret);
+                break;
+            }
+        }
+    }
+}
+
 void CallStatusManager::AutoAnswer(int32_t activeCallNum, int32_t waitingCallNum)
 {
     int32_t holdingCallNum = GetCallNum(TelCallState::CALL_STATUS_HOLDING);
@@ -799,7 +822,7 @@ void CallStatusManager::AutoAnswer(int32_t activeCallNum, int32_t waitingCallNum
                     (ringingCall->GetAutoAnswerState()))) {
                 ringingCall->SetAutoAnswerState(false);
                 int32_t videoState = static_cast<int32_t>(ringingCall->GetVideoStateType());
-                int ret = ringingCall->AnswerCall(videoState);
+                int ret = ringingCall->AnswerCall(ringingCall->GetAnswerVideoState());
                 TELEPHONY_LOGI("ret = %{public}d", ret);
                 break;
             }
