@@ -30,6 +30,7 @@
 #include "ims_call.h"
 #include "ott_call.h"
 #include "report_call_info_handler.h"
+#include "satellite_call.h"
 #include "telephony_log_wrapper.h"
 #include "voip_call.h"
 
@@ -318,10 +319,10 @@ int32_t CallStatusManager::IncomingHandle(const CallDetailInfo &info)
         }
         return ret;
     }
-    if (info.callType == CallType::TYPE_CS || info.callType == CallType::TYPE_IMS) {
+    if (info.callType == CallType::TYPE_CS || info.callType == CallType::TYPE_IMS ||
+        info.callType == CallType::TYPE_SATELLITE) {
         ret = IncomingFilterPolicy(info);
         if (ret != TELEPHONY_SUCCESS) {
-            TELEPHONY_LOGE("IncomingFilterPolicy failed!");
             return ret;
         }
     }
@@ -946,11 +947,24 @@ int32_t CallStatusManager::TurnOffMute(sptr<CallBase> &call)
 
 sptr<CallBase> CallStatusManager::CreateNewCall(const CallDetailInfo &info, CallDirection dir)
 {
-    sptr<CallBase> callPtr = nullptr;
     DialParaInfo paraInfo;
     AppExecFwk::PacMap extras;
     extras.Clear();
     PackParaInfo(paraInfo, info, dir, extras);
+
+    sptr<CallBase> callPtr = CreateNewCallByCallType(paraInfo, info, dir, extras);
+    if (callPtr == nullptr) {
+        TELEPHONY_LOGE("CreateNewCall failed!");
+        return nullptr;
+    }
+    AddOneCallObject(callPtr);
+    return callPtr;
+}
+
+sptr<CallBase> CallStatusManager::CreateNewCallByCallType(
+    DialParaInfo &paraInfo, const CallDetailInfo &info, CallDirection dir, AppExecFwk::PacMap &extras)
+{
+    sptr<CallBase> callPtr = nullptr;
     switch (info.callType) {
         case CallType::TYPE_CS: {
             if (dir == CallDirection::CALL_DIRECTION_OUT) {
@@ -984,14 +998,17 @@ sptr<CallBase> CallStatusManager::CreateNewCall(const CallDetailInfo &info, Call
             callPtr = (std::make_unique<VoIPCall>(paraInfo)).release();
             break;
         }
+        case CallType::TYPE_SATELLITE: {
+            if (dir == CallDirection::CALL_DIRECTION_OUT) {
+                callPtr = (std::make_unique<SatelliteCall>(paraInfo, extras)).release();
+            } else {
+                callPtr = (std::make_unique<SatelliteCall>(paraInfo)).release();
+            }
+            break;
+        }
         default:
             return nullptr;
     }
-    if (callPtr == nullptr) {
-        TELEPHONY_LOGE("CreateNewCall failed!");
-        return nullptr;
-    }
-    AddOneCallObject(callPtr);
     return callPtr;
 }
 

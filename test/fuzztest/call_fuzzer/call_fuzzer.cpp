@@ -23,6 +23,7 @@
 #include "cs_call.h"
 #include "ims_call.h"
 #include "ott_call.h"
+#include "satellite_call.h"
 #include "surface_utils.h"
 #include "voip_call.h"
 
@@ -446,6 +447,28 @@ void OttVideoCallWindowFunc(const uint8_t *data, size_t size)
     }
 }
 
+void SatelliteCallFunc(const uint8_t *data, size_t size)
+{
+    if (!IsServiceInited()) {
+        return;
+    }
+
+    DialParaInfo paraInfo;
+    paraInfo.dialType = static_cast<DialType>(size % DIAL_TYPE);
+    paraInfo.callType = static_cast<CallType>(size % CALL_TYPE_NUM);
+    paraInfo.videoState = static_cast<VideoStateType>(size % VIDIO_TYPE_NUM);
+    paraInfo.callState = static_cast<TelCallState>(size % TEL_CALL_STATE_NUM);
+    sptr<SatelliteCall> callObjectPtr = std::make_unique<SatelliteCall>(paraInfo).release();
+    int32_t videoState = static_cast<int32_t>(size % VIDIO_TYPE_NUM);
+    CallAttributeInfo info;
+
+    callObjectPtr->DialingProcess();
+    callObjectPtr->AnswerCall(videoState);
+    callObjectPtr->RejectCall();
+    callObjectPtr->HangUpCall();
+    callObjectPtr->GetCallAttributeInfo(info);
+}
+
 void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
 {
     if (data == nullptr || size == 0) {
@@ -462,6 +485,7 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     VoIPCallFunc(data, size);
     OttVideoCallFunc(data, size);
     OttVideoCallWindowFunc(data, size);
+    SatelliteCallFunc(data, size);
 }
 } // namespace OHOS
 

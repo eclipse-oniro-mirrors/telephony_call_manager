@@ -44,6 +44,7 @@ static constexpr const char *ERROR_MSG_KEY = "ERROR_MSG";
 static constexpr const char *CALL_MANAGER_MODULE = "CALL_MANAGER";
 static const int32_t CS_CALL_TYPE = 0;
 static const int32_t IMS_CALL_TYPE = 1;
+static const int32_t SATELLITE_CALL_TYPE = 5;
 static const int32_t VOICE_TYPE = 0;
 static const int32_t VIDEO_TYPE = 1;
 
@@ -59,7 +60,7 @@ void CallManagerHisysevent::WriteIncomingCallBehaviorEvent(const int32_t slotId,
         type = static_cast<int32_t>(IncomingCallType::IMS_VOICE_INCOMING);
     } else if (callType == IMS_CALL_TYPE && callMode == VIDEO_TYPE) {
         type = static_cast<int32_t>(IncomingCallType::IMS_VIDEO_INCOMING);
-    } else if (callType == CS_CALL_TYPE && callMode == VOICE_TYPE) {
+    } else if ((callType == CS_CALL_TYPE || callType == SATELLITE_CALL_TYPE) && callMode == VOICE_TYPE) {
         type = static_cast<int32_t>(IncomingCallType::CS_VOICE_INCOMING);
     } else {
         TELEPHONY_LOGE("WriteIncomingCallBehaviorEvent call incomming arges is out of range!");

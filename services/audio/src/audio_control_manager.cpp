@@ -199,6 +199,7 @@ void AudioControlManager::HandleNewActiveCall(sptr<CallBase> &callObjectPtr)
     AudioEvent event = AudioEvent::UNKNOWN_EVENT;
     switch (callType) {
         case CallType::TYPE_CS:
+        case CallType::TYPE_SATELLITE:
             event = AudioEvent::NEW_ACTIVE_CS_CALL;
             break;
         case CallType::TYPE_IMS:

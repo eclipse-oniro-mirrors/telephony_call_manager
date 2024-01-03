@@ -49,6 +49,7 @@
 #include "pixel_map.h"
 #include "reject_call_sms.h"
 #include "report_call_info_handler.h"
+#include "satellite_call.h"
 #include "surface_utils.h"
 #include "telephony_errors.h"
 #include "telephony_hisysevent.h"
@@ -2310,6 +2311,23 @@ HWTEST_F(BranchTest, Telephony_CanUnHoldState_001, Function | MediumTest | Level
     ASSERT_TRUE(callObjectPtr != nullptr);
     callObjectPtr->SetCanUnHoldState(flag);
     ASSERT_EQ(callObjectPtr->GetCanUnHoldState(), true);
+}
+
+/**
+ * @tc.number   Telephony_SatelliteCall_001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_SatelliteCall_001, Function | MediumTest | Level3)
+{
+    DialParaInfo dialParaInfo;
+    SatelliteCall call { dialParaInfo };
+    call.DialingProcess();
+    call.AnswerCall(0);
+    call.RejectCall();
+    call.HangUpCall();
+    CallAttributeInfo callAttributeInfo;
+    call.GetCallAttributeInfo(callAttributeInfo);
 }
 
 /**

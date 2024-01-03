@@ -81,6 +81,7 @@ ohos_shared_library("tel_call_manager") {
     "services/call/src/ott_call.cpp",
     "services/call/src/ott_call_connection.cpp",
     "services/call/src/ott_conference.cpp",
+    "services/call/src/satellite_call.cpp",
     "services/call/src/video_call_state.cpp",
     "services/call/src/voip_call.cpp",
     "services/call_manager_service/src/call_manager_dump_helper.cpp",
