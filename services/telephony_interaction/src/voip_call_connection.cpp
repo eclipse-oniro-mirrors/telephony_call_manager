@@ -127,7 +127,9 @@ int32_t VoipCallConnection::UnRegisterCallManagerCallBack()
     if (voipCallManagerInterfacePtr_ == nullptr) {
         return TELEPHONY_ERROR;
     }
-    return voipCallManagerInterfacePtr_->UnRegisterCallManagerCallBack();
+    int32_t ret = voipCallManagerInterfacePtr_->UnRegisterCallManagerCallBack();
+    UnInit();
+    return ret;
 }
 
 } // namespace Telephony

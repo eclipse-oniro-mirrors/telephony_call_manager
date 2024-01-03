@@ -123,6 +123,13 @@ public:
     int32_t Answer(const VoipCallEventInfo &events, int32_t videoState) override;
 
     /**
+     * @brief Unload voip SA
+     *
+     * @return Returns TELEPHONY_SUCCESS on success, others on failure.
+     */
+    int32_t UnloadVoipSa() override;
+
+    /**
      * @brief Register CallManager CallBack ptr
      *
      * @param callback callback ptr

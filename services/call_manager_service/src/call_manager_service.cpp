@@ -210,7 +210,7 @@ int32_t CallManagerService::RegisterCallBack(const sptr<ICallAbilityCallback> &c
             CallAttributeInfo info = (*iterator);
             iterator++;
             TELEPHONY_LOGI("first time register callback success report call info");
-            DelayedSingleton<CallAbilityReportProxy>::GetInstance()->ReportCallStateInfo(info);
+            DelayedSingleton<CallAbilityReportProxy>::GetInstance()->ReportCallStateInfo(info, callback);
         }
     }
     return ret;

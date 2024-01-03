@@ -162,6 +162,24 @@ int32_t CallAbilityReportProxy::ReportCallStateInfo(const CallAttributeInfo &inf
     return ret;
 }
 
+int32_t CallAbilityReportProxy::ReportCallStateInfo(const CallAttributeInfo &info, sptr<ICallAbilityCallback> callBack)
+{
+    if (callBack == nullptr) {
+        TELEPHONY_LOGI("callBack is null");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    int32_t ret = callBack->OnCallDetailsChange(info);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGW("OnCallDetailsChange failed, errcode:%{public}d", ret);
+    } else {
+        TELEPHONY_LOGW("OnCallDetailsChange success");
+    }
+    TELEPHONY_LOGI("callId[%{public}d] state[%{public}d] conferenceState[%{public}d] "
+                   "videoState[%{public}d]",
+        info.callId, info.callState, info.conferenceState, info.videoState);
+    return ret;
+}
+
 int32_t CallAbilityReportProxy::ReportCallEvent(const CallEventInfo &info)
 {
     int32_t ret = TELEPHONY_ERR_FAIL;

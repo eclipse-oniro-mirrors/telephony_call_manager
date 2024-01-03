@@ -335,5 +335,29 @@ int32_t VoipCallManagerProxy::UnRegisterCallManagerCallBack()
     return replyParcel.ReadInt32();
 }
 
+int32_t VoipCallManagerProxy::UnloadVoipSa()
+{
+    MessageParcel dataParcel;
+    if (!dataParcel.WriteInterfaceToken(VoipCallManagerProxy::GetDescriptor())) {
+        TELEPHONY_LOGE("write descriptor fail");
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("UnloadVoipSa Remote is null");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+
+    MessageOption option;
+    MessageParcel replyParcel;
+    int32_t error =
+        remote->SendRequest(static_cast<int32_t>(INTERFACE_UNLOAD_VOIP_SA), dataParcel, replyParcel, option);
+    if (error != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("function UnloadVoipSa failed! errCode:%{public}d", error);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return replyParcel.ReadInt32();
+}
+
 } // namespace Telephony
 } // namespace OHOS
