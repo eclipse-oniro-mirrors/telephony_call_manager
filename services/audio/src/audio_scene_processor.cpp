@@ -88,7 +88,7 @@ void AudioSceneProcessor::ProcessEventInner(AudioEvent event)
     }
 }
 
-bool AudioSceneProcessor::ProcessEventInner(AudioEvent event) {
+bool AudioSceneProcessor::ProcessEvent(AudioEvent event) {
     reportAudioStateChangeQueue.submit([=]() { ProcessEventInner(event); });
     return true;
 }
