@@ -210,7 +210,6 @@ bool AudioSceneProcessor::SwitchHolding()
 bool AudioSceneProcessor::SwitchInactive()
 {
     DelayedSingleton<AudioDeviceManager>::GetInstance()->ProcessEvent(AudioEvent::AUDIO_DEACTIVATED);
-    DelayedSingleton<AudioControlManager>::GetInstance()->StopSoundtone();
     currentState_ = std::make_unique<InActiveState>();
     if (currentState_ == nullptr) {
         TELEPHONY_LOGE("make_unique InActiveState failed");

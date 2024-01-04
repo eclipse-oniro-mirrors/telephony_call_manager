@@ -82,7 +82,6 @@ void AudioControlManager::IncomingCallHungUp(sptr<CallBase> &callObjectPtr, bool
         TELEPHONY_LOGE("call object ptr nullptr");
         return;
     }
-    StopRingtone();
     StopCallTone();
     DelayedSingleton<AudioProxy>::GetInstance()->SetMicrophoneMute(false); // unmute microphone
 }
@@ -546,7 +545,7 @@ bool AudioControlManager::ShouldPlayRingtone() const
     auto processor = DelayedSingleton<CallStateProcessor>::GetInstance();
     int32_t alertingCallNum = processor->GetCallNumber(TelCallState::CALL_STATUS_ALERTING);
     int32_t incomingCallNum = processor->GetCallNumber(TelCallState::CALL_STATUS_INCOMING);
-    if (incomingCallNum != EXIST_ONLY_ONE_CALL || alertingCallNum > EMPTY_VALUE || ringState_ == RingState::RINGING) {
+    if (incomingCallNum == EMPTY_VALUE || alertingCallNum > EMPTY_VALUE || ringState_ == RingState::RINGING) {
         return false;
     }
     return true;

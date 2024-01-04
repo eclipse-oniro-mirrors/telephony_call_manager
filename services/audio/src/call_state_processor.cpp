@@ -15,6 +15,7 @@
 
 #include "call_state_processor.h"
 
+#include "audio_control_manager.h"
 #include "audio_scene_processor.h"
 
 #include "telephony_log_wrapper.h"
@@ -178,6 +179,10 @@ bool CallStateProcessor::UpdateCurrentCallState()
         event = AudioEvent::SWITCH_ALERTING_STATE;
     } else {
         event = AudioEvent::SWITCH_AUDIO_INACTIVE_STATE;
+    }
+    if (holdingCalls_.size() == EMPTY_VALUE && dialingCalls_.size() == EMPTY_VALUE &&
+        alertingCalls_.size() == EMPTY_VALUE) {
+        DelayedSingleton<AudioControlManager>::GetInstance()->StopSoundtone();
     }
     return DelayedSingleton<AudioSceneProcessor>::GetInstance()->ProcessEvent(event);
 }
