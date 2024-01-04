@@ -23,11 +23,15 @@
 #include "ims_call_state.h"
 #include "inactive_state.h"
 #include "audio_control_manager.h"
+#include "ffrt.h"
 
 #include "telephony_log_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
+namespace {
+    ffrt::queue reportAudioStateChangeQueue { "report_audio_state_change" };
+}
 AudioSceneProcessor::AudioSceneProcessor()
     : currentState_(nullptr)
 {}
@@ -51,13 +55,12 @@ int32_t AudioSceneProcessor::Init()
     return TELEPHONY_SUCCESS;
 }
 
-bool AudioSceneProcessor::ProcessEvent(AudioEvent event)
+void AudioSceneProcessor::ProcessEventInner(AudioEvent event)
 {
     if (currentState_ == nullptr) {
         TELEPHONY_LOGE("current call state nullptr");
-        return false;
+        return;
     }
-    bool result = false;
     switch (event) {
         case AudioEvent::SWITCH_DIALING_STATE:
         case AudioEvent::SWITCH_ALERTING_STATE:
@@ -66,7 +69,7 @@ bool AudioSceneProcessor::ProcessEvent(AudioEvent event)
         case AudioEvent::SWITCH_IMS_CALL_STATE:
         case AudioEvent::SWITCH_HOLDING_STATE:
         case AudioEvent::SWITCH_AUDIO_INACTIVE_STATE:
-            result = SwitchState(event);
+            SwitchState(event);
             break;
         case AudioEvent::NEW_ACTIVE_CS_CALL:
         case AudioEvent::NEW_ACTIVE_IMS_CALL:
@@ -78,12 +81,16 @@ bool AudioSceneProcessor::ProcessEvent(AudioEvent event)
         case AudioEvent::NO_MORE_ALERTING_CALL:
         case AudioEvent::NO_MORE_INCOMING_CALL:
         case AudioEvent::NO_MORE_HOLDING_CALL:
-            result = currentState_->ProcessEvent(event);
+            currentState_->ProcessEvent(event);
             break;
         default:
             break;
     }
-    return result;
+}
+
+bool AudioSceneProcessor::ProcessEventInner(AudioEvent event) {
+    reportAudioStateChangeQueue.submit([=]() { ProcessEventInner(event); });
+    return true;
 }
 
 bool AudioSceneProcessor::SwitchState(AudioEvent event)

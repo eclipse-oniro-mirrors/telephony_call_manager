@@ -166,6 +166,7 @@ void AudioSceneProcessorFunc(const uint8_t *data, size_t size)
 
     audioControlManager->IsNumberAllowed(phoneNum);
     audioSceneProcessor->Init();
+    audioSceneProcessor->SwitchDialing();
     audioSceneProcessor->SwitchCS();
     audioSceneProcessor->SwitchIMS();
     audioSceneProcessor->SwitchOTT();
