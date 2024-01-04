@@ -60,6 +60,7 @@ private:
     bool SwitchInactive();
     bool ActivateAudioInterrupt(const AudioStandard::AudioStreamType &streamType);
     bool DeactivateAudioInterrupt();
+    void ProcessEventInner(AudioEvent event);
     std::unique_ptr<AudioBase> currentState_;
     using AudioSceneProcessorFunc = bool (AudioSceneProcessor::*)();
     std::map<uint32_t, AudioSceneProcessorFunc> memberFuncMap_;
