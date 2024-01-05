@@ -49,6 +49,7 @@ void CallStateProcessor::AddCall(int32_t callId, TelCallState state)
                 alertingCalls_.insert(callId);
             }
             break;
+        case TelCallState::CALL_STATUS_WAITING:
         case TelCallState::CALL_STATUS_INCOMING:
             if (incomingCalls_.count(callId) == EMPTY_VALUE) {
                 TELEPHONY_LOGI("add call , state : incoming");
@@ -88,6 +89,7 @@ void CallStateProcessor::DeleteCall(int32_t callId, TelCallState state)
                 alertingCalls_.erase(callId);
             }
             break;
+        case TelCallState::CALL_STATUS_WAITING:
         case TelCallState::CALL_STATUS_INCOMING:
             if (incomingCalls_.count(callId) > EMPTY_VALUE) {
                 TELEPHONY_LOGI("erase call , state : incoming");

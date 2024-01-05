@@ -119,6 +119,7 @@ void AudioControlManager::HandleNextState(sptr<CallBase> &callObjectPtr, TelCall
             HandleNewActiveCall(callObjectPtr);
             audioInterruptState_ = AudioInterruptState::INTERRUPT_STATE_ACTIVATED;
             break;
+        case TelCallState::CALL_STATUS_WAITING:
         case TelCallState::CALL_STATUS_INCOMING:
             event = AudioEvent::NEW_INCOMING_CALL;
             audioInterruptState_ = AudioInterruptState::INTERRUPT_STATE_RINGING;
