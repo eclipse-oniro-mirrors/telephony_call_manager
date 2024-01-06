@@ -67,11 +67,13 @@ int32_t VideoControlManager::SetPreviewWindow(int32_t callId, std::string &surfa
         TELEPHONY_LOGE("the call object is nullptr, callId:%{public}d", callId);
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    sptr<IMSCall> netCall = reinterpret_cast<IMSCall *>(callPtr.GetRefPtr());
-    ret = netCall->SetPreviewWindow(surfaceId, surface);
-    if (ret != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("SetPreviewWindow failed!");
-        return ret;
+    if (callPtr->GetCallType() == CallType::TYPE_IMS) {
+        sptr<IMSCall> netCall = reinterpret_cast<IMSCall *>(callPtr.GetRefPtr());
+        ret = netCall->SetPreviewWindow(surfaceId, surface);
+        if (ret != TELEPHONY_SUCCESS) {
+            TELEPHONY_LOGE("SetPreviewWindow failed!");
+            return ret;
+        }
     }
     return TELEPHONY_SUCCESS;
 }
@@ -89,11 +91,13 @@ int32_t VideoControlManager::SetDisplayWindow(int32_t callId, std::string &surfa
         TELEPHONY_LOGE("the call object is nullptr, callId:%{public}d", callId);
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    sptr<IMSCall> netCall = reinterpret_cast<IMSCall *>(callPtr.GetRefPtr());
-    ret = netCall->SetDisplayWindow(surfaceId, surface);
-    if (ret != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("SetPreviewWindow failed!");
-        return ret;
+    if (callPtr->GetCallType() == CallType::TYPE_IMS) {
+        sptr<IMSCall> netCall = reinterpret_cast<IMSCall *>(callPtr.GetRefPtr());
+        ret = netCall->SetDisplayWindow(surfaceId, surface);
+        if (ret != TELEPHONY_SUCCESS) {
+            TELEPHONY_LOGE("SetDisplayWindow failed!");
+            return ret;
+        }
     }
     return TELEPHONY_SUCCESS;
 }
@@ -122,11 +126,13 @@ int32_t VideoControlManager::SetPausePicture(int32_t callId, std::u16string &pat
         TELEPHONY_LOGE("the call object is nullptr, callId:%{public}d", callId);
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    sptr<IMSCall> netCall = reinterpret_cast<IMSCall *>(callPtr.GetRefPtr());
-    ret = netCall->SetPausePicture(tempPath);
-    if (ret != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("SetPreviewWindow failed!");
-        return ret;
+    if (callPtr->GetCallType() == CallType::TYPE_IMS) {
+        sptr<IMSCall> netCall = reinterpret_cast<IMSCall *>(callPtr.GetRefPtr());
+        ret = netCall->SetPausePicture(tempPath);
+        if (ret != TELEPHONY_SUCCESS) {
+            TELEPHONY_LOGE("SetPausePicture failed!");
+            return ret;
+        }
     }
     return TELEPHONY_SUCCESS;
 }
@@ -147,11 +153,13 @@ int32_t VideoControlManager::SetDeviceDirection(int32_t callId, int32_t rotation
             TELEPHONY_LOGE("the call object is nullptr, callId:%{public}d", callId);
             return TELEPHONY_ERR_LOCAL_PTR_NULL;
         }
-        sptr<IMSCall> netCall = reinterpret_cast<IMSCall *>(callPtr.GetRefPtr());
-        ret = netCall->SetDeviceDirection(rotation);
-        if (ret != TELEPHONY_SUCCESS) {
-            TELEPHONY_LOGE("SetPreviewWindow failed!");
-            return ret;
+        if (callPtr->GetCallType() == CallType::TYPE_IMS) {
+            sptr<IMSCall> netCall = reinterpret_cast<IMSCall *>(callPtr.GetRefPtr());
+            ret = netCall->SetDeviceDirection(rotation);
+            if (ret != TELEPHONY_SUCCESS) {
+                TELEPHONY_LOGE("SetDeviceDirection failed!");
+                return ret;
+            }
         }
         return TELEPHONY_SUCCESS;
     }
@@ -170,14 +178,16 @@ int32_t VideoControlManager::UpdateImsCallMode(int32_t callId, ImsCallMode callM
     sptr<CallBase> callPtr = CallObjectManager::GetOneCallObject(callId);
     if (callPtr == nullptr) {
         TELEPHONY_LOGE("the call object is nullptr, callId:%{public}d", callId);
-        return ret;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    // only netcall type support update call media mode
-    sptr<IMSCall> netCall = reinterpret_cast<IMSCall *>(callPtr.GetRefPtr());
-    TELEPHONY_LOGI("ims call update media request");
-    ret = netCall->UpdateImsCallMode(callMode);
-    if (ret != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("UpdateImsCallMode failed!. %{public}d", ret);
+    if (callPtr->GetCallType() == CallType::TYPE_IMS) {
+        // only netcall type support update call media mode
+        sptr<IMSCall> netCall = reinterpret_cast<IMSCall *>(callPtr.GetRefPtr());
+        TELEPHONY_LOGI("ims call update media request");
+        ret = netCall->UpdateImsCallMode(callMode);
+        if (ret != TELEPHONY_SUCCESS) {
+            TELEPHONY_LOGE("UpdateImsCallMode failed!. %{public}d", ret);
+        }
     }
     return ret;
 }
@@ -203,19 +213,21 @@ int32_t VideoControlManager::OpenCamera(
         TELEPHONY_LOGE("the call object is nullptr, callId:%{public}d", callId);
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    sptr<IMSCall> netCall = reinterpret_cast<IMSCall *>(callPtr.GetRefPtr());
-    if (netCall == nullptr) {
-        TELEPHONY_LOGE("the netCall is nullptr, callId:%{public}d", callId);
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-    ret = netCall->ControlCamera(id, callingUid, callingPid);
-    if (ret == TELEPHONY_SUCCESS) {
-        isOpenCamera_ = true;
-    }
-    ret = netCall->RequestCameraCapabilities();
-    if (ret != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("RequestCameraCapabilities failed!");
-        return ret;
+    if (callPtr->GetCallType() == CallType::TYPE_IMS) {
+        sptr<IMSCall> netCall = reinterpret_cast<IMSCall *>(callPtr.GetRefPtr());
+        if (netCall == nullptr) {
+            TELEPHONY_LOGE("the netCall is nullptr, callId:%{public}d", callId);
+            return TELEPHONY_ERR_LOCAL_PTR_NULL;
+        }
+        ret = netCall->ControlCamera(id, callingUid, callingPid);
+        if (ret == TELEPHONY_SUCCESS) {
+            isOpenCamera_ = true;
+        }
+        ret = netCall->RequestCameraCapabilities();
+        if (ret != TELEPHONY_SUCCESS) {
+            TELEPHONY_LOGE("RequestCameraCapabilities failed!");
+            return ret;
+        }
     }
     return ret;
 }
@@ -236,10 +248,12 @@ int32_t VideoControlManager::CloseCamera(
             TELEPHONY_LOGE("the call object is nullptr, callId:%{public}d", callId);
             return TELEPHONY_ERR_LOCAL_PTR_NULL;
         }
-        sptr<IMSCall> netCall = reinterpret_cast<IMSCall *>(callPtr.GetRefPtr());
-        ret = netCall->ControlCamera(id, callingUid, callingPid);
-        if (ret == TELEPHONY_SUCCESS) {
-            isOpenCamera_ = true;
+        if (callPtr->GetCallType() == CallType::TYPE_IMS) {
+            sptr<IMSCall> netCall = reinterpret_cast<IMSCall *>(callPtr.GetRefPtr());
+            ret = netCall->ControlCamera(id, callingUid, callingPid);
+            if (ret == TELEPHONY_SUCCESS) {
+                isOpenCamera_ = true;
+            }
         }
         return ret;
     }
@@ -295,11 +309,13 @@ int32_t VideoControlManager::CancelCallUpgrade(int32_t callId)
         TELEPHONY_LOGE("the call object is nullptr, callId:%{public}d", callId);
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    sptr<IMSCall> netCall = reinterpret_cast<IMSCall *>(callPtr.GetRefPtr());
-    ret = netCall->CancelCallUpgrade();
-    if (ret != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("SetPreviewWindow failed!");
-        return ret;
+    if (callPtr->GetCallType() == CallType::TYPE_IMS) {
+        sptr<IMSCall> netCall = reinterpret_cast<IMSCall *>(callPtr.GetRefPtr());
+        ret = netCall->CancelCallUpgrade();
+        if (ret != TELEPHONY_SUCCESS) {
+            TELEPHONY_LOGE("CancelCallUpgrade failed!");
+            return ret;
+        }
     }
     return TELEPHONY_SUCCESS;
 }
@@ -317,11 +333,13 @@ int32_t VideoControlManager::RequestCameraCapabilities(int32_t callId)
         TELEPHONY_LOGE("the call object is nullptr, callId:%{public}d", callId);
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    sptr<IMSCall> netCall = reinterpret_cast<IMSCall *>(callPtr.GetRefPtr());
-    ret = netCall->RequestCameraCapabilities();
-    if (ret != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("SetPreviewWindow failed!");
-        return ret;
+    if (callPtr->GetCallType() == CallType::TYPE_IMS) {
+        sptr<IMSCall> netCall = reinterpret_cast<IMSCall *>(callPtr.GetRefPtr());
+        ret = netCall->RequestCameraCapabilities();
+        if (ret != TELEPHONY_SUCCESS) {
+            TELEPHONY_LOGE("RequestCameraCapabilities failed!");
+            return ret;
+        }
     }
     return TELEPHONY_SUCCESS;
 }

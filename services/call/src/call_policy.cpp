@@ -77,11 +77,11 @@ int32_t CallPolicy::CanDialMulityCall(AppExecFwk::PacMap &extras)
     VideoStateType videoState = (VideoStateType)extras.GetIntValue("videoState");
     if (videoState == VideoStateType::TYPE_VIDEO && HasCallExist()) {
         TELEPHONY_LOGE("can not dial video call when any call exist!");
-        return CALL_ERR_DIAL_FAILED;
+        return CALL_ERR_DIAL_IS_BUSY;
     }
     if (videoState == VideoStateType::TYPE_VOICE && HasVideoCall()) {
         TELEPHONY_LOGE("can not dial video call when any call exist!");
-        return CALL_ERR_DIAL_FAILED;
+        return CALL_ERR_DIAL_IS_BUSY;
     }
     return TELEPHONY_SUCCESS;
 }
