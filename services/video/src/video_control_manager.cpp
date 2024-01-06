@@ -199,7 +199,7 @@ int32_t VideoControlManager::OpenCamera(
         return ret;
     }
     sptr<CallBase> callPtr = CallObjectManager::GetOneCallObject(callId);
-    if (callPtr == nullptr) {
+    if (callPtr == nullptr || callPtr.GetRefPtr() == nullptr) {
         TELEPHONY_LOGE("the call object is nullptr, callId:%{public}d", callId);
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
