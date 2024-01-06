@@ -150,10 +150,9 @@ napi_value NapiCallManager::DeclareCallMultimediaInterface(napi_env env, napi_va
         DECLARE_NAPI_FUNCTION("muteRinger", MuteRinger),
         DECLARE_NAPI_FUNCTION("setAudioDevice", SetAudioDevice),
         DECLARE_NAPI_FUNCTION("controlCamera", ControlCamera),
-        DECLARE_NAPI_FUNCTION("setPreviewWindow", SetPreviewWindow),
-        DECLARE_NAPI_FUNCTION("setDisplayWindow", SetDisplayWindow),
+        DECLARE_NAPI_FUNCTION("setPreviewSurface", SetPreviewWindow),
+        DECLARE_NAPI_FUNCTION("setDisplaySurface", SetDisplayWindow),
         DECLARE_NAPI_FUNCTION("setCameraZoom", SetCameraZoom),
-        DECLARE_NAPI_FUNCTION("setPausePicture", SetPausePicture),
         DECLARE_NAPI_FUNCTION("setDeviceDirection", SetDeviceDirection),
         DECLARE_NAPI_FUNCTION("updateImsCallMode", UpdateImsCallMode),
         DECLARE_NAPI_FUNCTION("cancelCallUpgrade", CancelCallUpgrade),
@@ -183,7 +182,7 @@ napi_value NapiCallManager::DeclareCallMediaEnum(napi_env env, napi_value export
             NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(VideoStateType::TYPE_SEND_ONLY))),
         DECLARE_NAPI_STATIC_PROPERTY("TYPE_VIDEO_RECEIVE_ONLY",
             NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(VideoStateType::TYPE_RECEIVE_ONLY))),
-        DECLARE_NAPI_STATIC_PROPERTY("TYPE_VIDEO",
+        DECLARE_NAPI_STATIC_PROPERTY("TYPE_VIDEO_BIDIRECTIONAL",
             NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(VideoStateType::TYPE_VIDEO))),
         // ImsCallMode
         DECLARE_NAPI_STATIC_PROPERTY(
@@ -504,7 +503,7 @@ napi_value NapiCallManager::DeclareVideoStateTypeEnum(napi_env env, napi_value e
             NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(VideoStateType::TYPE_SEND_ONLY))),
         DECLARE_NAPI_STATIC_PROPERTY("TYPE_VIDEO_RECEIVE_ONLY",
             NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(VideoStateType::TYPE_RECEIVE_ONLY))),
-        DECLARE_NAPI_STATIC_PROPERTY("TYPE_VIDEO",
+        DECLARE_NAPI_STATIC_PROPERTY("TYPE_VIDEO_BIDIRECTIONAL",
             NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(VideoStateType::TYPE_VIDEO))),
     };
     napi_value result = nullptr;
