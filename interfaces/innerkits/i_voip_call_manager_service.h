@@ -43,7 +43,8 @@ public:
         INTERFACE_UNREGISTER_CALL_MANAGER_CALLBACK,
         INTERFACE_ANSWER_VOIP_CALL,
         INTERFACE_HANGUP_VOIP_CALL,
-        INTERFACE_REJECT_VOIP_CALL
+        INTERFACE_REJECT_VOIP_CALL,
+        INTERFACE_UNLOAD_VOIP_SA
     };
     virtual ~IVoipCallManagerService() = default;
     virtual int32_t ReportIncomingCall(
@@ -62,6 +63,7 @@ public:
     virtual int32_t Answer(const VoipCallEventInfo &events, int32_t videoState) = 0;
     virtual int32_t Reject(const VoipCallEventInfo &events) = 0;
     virtual int32_t HangUp(const VoipCallEventInfo &events) = 0;
+    virtual int32_t UnloadVoipSa() = 0;
 
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"OHOS.Telephony.IVoipCallManagerService");

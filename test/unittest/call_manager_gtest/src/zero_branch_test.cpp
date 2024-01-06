@@ -2364,6 +2364,7 @@ HWTEST_F(BranchTest, Telephony_VoipCallManagerProxy_001, Function | MediumTest |
         voipCallManagerInterfacePtr->Answer(voipCallEventInfo, static_cast<int32_t>(VideoStateType::TYPE_VOICE));
         voipCallManagerInterfacePtr->HangUp(voipCallEventInfo);
         voipCallManagerInterfacePtr->Reject(voipCallEventInfo);
+        voipCallManagerInterfacePtr->UnloadVoipSa();
         sptr<ICallStatusCallback> statusCallback = (std::make_unique<CallStatusCallback>()).release();
         voipCallManagerInterfacePtr->RegisterCallManagerCallBack(statusCallback);
         voipCallManagerInterfacePtr->UnRegisterCallManagerCallBack();
