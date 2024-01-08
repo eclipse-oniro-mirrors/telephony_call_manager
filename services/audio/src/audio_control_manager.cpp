@@ -86,7 +86,6 @@ void AudioControlManager::IncomingCallHungUp(sptr<CallBase> &callObjectPtr, bool
         TELEPHONY_LOGE("call object ptr nullptr");
         return;
     }
-    StopRingtone();
     StopCallTone();
     DelayedSingleton<AudioProxy>::GetInstance()->SetMicrophoneMute(false); // unmute microphone
 }
@@ -124,6 +123,7 @@ void AudioControlManager::HandleNextState(sptr<CallBase> &callObjectPtr, TelCall
             HandleNewActiveCall(callObjectPtr);
             audioInterruptState_ = AudioInterruptState::INTERRUPT_STATE_ACTIVATED;
             break;
+        case TelCallState::CALL_STATUS_WAITING:
         case TelCallState::CALL_STATUS_INCOMING:
             event = AudioEvent::NEW_INCOMING_CALL;
             audioInterruptState_ = AudioInterruptState::INTERRUPT_STATE_RINGING;
@@ -166,9 +166,7 @@ void AudioControlManager::HandlePriorState(sptr<CallBase> &callObjectPtr, TelCal
             }
             StopRingtone();
             StopCallTone();
-            if (stateNumber == EMPTY_VALUE) {
-                event = AudioEvent::NO_MORE_INCOMING_CALL;
-            }
+            event = AudioEvent::NO_MORE_INCOMING_CALL;
             break;
         case TelCallState::CALL_STATUS_ACTIVE:
             if (stateNumber == EMPTY_VALUE) {
@@ -548,7 +546,7 @@ bool AudioControlManager::ShouldPlayRingtone() const
     auto processor = DelayedSingleton<CallStateProcessor>::GetInstance();
     int32_t alertingCallNum = processor->GetCallNumber(TelCallState::CALL_STATUS_ALERTING);
     int32_t incomingCallNum = processor->GetCallNumber(TelCallState::CALL_STATUS_INCOMING);
-    if (incomingCallNum != EXIST_ONLY_ONE_CALL || alertingCallNum > EMPTY_VALUE || ringState_ == RingState::RINGING) {
+    if (incomingCallNum == EMPTY_VALUE || alertingCallNum > EMPTY_VALUE || ringState_ == RingState::RINGING) {
         return false;
     }
     return true;

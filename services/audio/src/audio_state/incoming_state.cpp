@@ -48,6 +48,10 @@ bool IncomingState::ProcessEvent(int32_t event)
                     AudioEvent::SWITCH_IMS_CALL_STATE);
             }
             break;
+        case AudioEvent::NEW_INCOMING_CALL:
+            TELEPHONY_LOGI("incoming state switch incoming state");
+            result = DelayedSingleton<AudioSceneProcessor>::GetInstance()->ProcessEvent(
+                AudioEvent::SWITCH_INCOMING_STATE);
         default:
             break;
     }

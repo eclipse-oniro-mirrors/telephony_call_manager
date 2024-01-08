@@ -15,6 +15,7 @@
 
 #include "call_state_processor.h"
 
+#include "audio_control_manager.h"
 #include "audio_scene_processor.h"
 
 #include "telephony_log_wrapper.h"
@@ -48,6 +49,7 @@ void CallStateProcessor::AddCall(int32_t callId, TelCallState state)
                 alertingCalls_.insert(callId);
             }
             break;
+        case TelCallState::CALL_STATUS_WAITING:
         case TelCallState::CALL_STATUS_INCOMING:
             if (incomingCalls_.count(callId) == EMPTY_VALUE) {
                 TELEPHONY_LOGI("add call , state : incoming");
@@ -87,6 +89,7 @@ void CallStateProcessor::DeleteCall(int32_t callId, TelCallState state)
                 alertingCalls_.erase(callId);
             }
             break;
+        case TelCallState::CALL_STATUS_WAITING:
         case TelCallState::CALL_STATUS_INCOMING:
             if (incomingCalls_.count(callId) > EMPTY_VALUE) {
                 TELEPHONY_LOGI("erase call , state : incoming");
@@ -178,6 +181,10 @@ bool CallStateProcessor::UpdateCurrentCallState()
         event = AudioEvent::SWITCH_ALERTING_STATE;
     } else {
         event = AudioEvent::SWITCH_AUDIO_INACTIVE_STATE;
+    }
+    if (holdingCalls_.size() == EMPTY_VALUE && dialingCalls_.size() == EMPTY_VALUE &&
+        alertingCalls_.size() == EMPTY_VALUE) {
+        DelayedSingleton<AudioControlManager>::GetInstance()->StopSoundtone();
     }
     return DelayedSingleton<AudioSceneProcessor>::GetInstance()->ProcessEvent(event);
 }
