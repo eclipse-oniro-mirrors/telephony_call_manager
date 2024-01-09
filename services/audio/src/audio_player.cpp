@@ -63,7 +63,6 @@ bool AudioPlayer::InitRenderer(const wav_hdr &wavHeader, AudioStandard::AudioStr
 
 bool AudioPlayer::InitRenderer()
 {
-    std::lock_guard<std::mutex> lock(mutex_);
     AudioStandard::AudioRendererOptions rendererOptions;
     rendererOptions.streamInfo.samplingRate = AudioStandard::AudioSamplingRate::SAMPLE_RATE_96000;
     rendererOptions.streamInfo.encoding = AudioStandard::AudioEncodingType::ENCODING_PCM;
@@ -92,7 +91,6 @@ bool AudioPlayer::InitRenderer()
 
 bool AudioPlayer::InitCapturer()
 {
-    std::lock_guard<std::mutex> lock(mutex_);
     AudioStandard::AudioCapturerOptions capturerOptions;
     capturerOptions.streamInfo.samplingRate = AudioStandard::AudioSamplingRate::SAMPLE_RATE_96000;
     capturerOptions.streamInfo.encoding = AudioStandard::AudioEncodingType::ENCODING_PCM;
@@ -232,7 +230,6 @@ bool AudioPlayer::IsStop(PlayerType playerType)
 
 void AudioPlayer::ReleaseRenderer()
 {
-    std::lock_guard<std::mutex> lock(mutex_);
     if (!isRenderInitialized_) {
         return;
     }
@@ -241,12 +238,10 @@ void AudioPlayer::ReleaseRenderer()
     audioRenderer_->Stop();
     audioRenderer_->Release();
     isRenderInitialized_ = false;
-    audioRenderer_ = nullptr;
 }
 
 void AudioPlayer::ReleaseCapturer()
 {
-    std::lock_guard<std::mutex> lock(mutex_);
     if (!isCapturerInitialized_) {
         return;
     }
@@ -254,7 +249,6 @@ void AudioPlayer::ReleaseCapturer()
     audioCapturer_->Stop();
     audioCapturer_->Release();
     isCapturerInitialized_ = false;
-    audioCapturer_ = nullptr;
 }
 
 bool AudioPlayer::GetRealPath(const std::string &profilePath, std::string &realPath)
