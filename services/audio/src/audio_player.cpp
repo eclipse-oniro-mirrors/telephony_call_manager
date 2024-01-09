@@ -237,6 +237,7 @@ void AudioPlayer::ReleaseRenderer()
     audioRenderer_->Drain();
     audioRenderer_->Stop();
     audioRenderer_->Release();
+    isRenderInitialized_ = false;
 }
 
 void AudioPlayer::ReleaseCapturer()
@@ -247,6 +248,7 @@ void AudioPlayer::ReleaseCapturer()
     audioCapturer_->Flush();
     audioCapturer_->Stop();
     audioCapturer_->Release();
+    isCapturerInitialized_ = false;
 }
 
 bool AudioPlayer::GetRealPath(const std::string &profilePath, std::string &realPath)
