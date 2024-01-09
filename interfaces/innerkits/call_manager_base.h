@@ -388,12 +388,7 @@ enum class CallStateToApp {
      */
     CALL_STATE_OFFHOOK = 2,
 
-    CALL_STATE_ANSWERED = 3,
-
-    /**
-     * Indicates that a least one call is in the dialing.
-     */
-    CALL_STATE_DIALING = 4,
+    CALL_STATE_ANSWERED = 3
 };
 
 /**

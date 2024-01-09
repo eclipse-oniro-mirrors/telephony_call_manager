@@ -64,7 +64,6 @@ int32_t CallObjectManager::AddOneCallObject(sptr<CallBase> &call)
     bool isVoIPCallExists = false;
     DelayedSingleton<CallControlManager>::GetInstance()->GetVoIPCallState(state);
     if(state == (int32_t)CallStateToApp::CALL_STATE_OFFHOOK
-        || state == (int32_t)CallStateToApp::CALL_STATE_DIALING
         || state == (int32_t)CallStateToApp::CALL_STATE_RINGING) {
         isVoIPCallExists = true;
     }
@@ -158,7 +157,7 @@ int32_t CallObjectManager::HasNewCall()
             (*it)->GetCallRunningState() == CallRunningState::CALL_RUNNING_STATE_DIALING) {
             TELEPHONY_LOGE("there is already a new call[callId:%{public}d,state:%{public}d], please redial later",
                 (*it)->GetCallID(), (*it)->GetCallRunningState());
-            return CALL_ERR_DIAL_IS_BUSY;
+            return CALL_ERR_CALL_COUNTS_EXCEED_LIMIT;
         }
     }
     return TELEPHONY_SUCCESS;

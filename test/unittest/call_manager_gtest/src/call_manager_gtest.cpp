@@ -5523,18 +5523,6 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetVoIPCallState_0400, Function
     EXPECT_EQ(CallManagerGtest::clientPtr_->SetVoIPCallState(state), RETURN_VALUE_IS_ZERO);
 }
 
-/******************************************* Test SetVoIPCallState() ********************************************/
-/**
- * @tc.number   Telephony_CallManager_SetVoIPCallState_0400
- * @tc.name     input VoIP call state 4 test SetVoIPCallState
- * @tc.desc     Function test
- */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_SetVoIPCallState_0400, Function | MediumTest | Level3)
-{
-    AccessToken token;
-    int32_t state = 4;
-    EXPECT_EQ(CallManagerGtest::clientPtr_->SetVoIPCallState(state), RETURN_VALUE_IS_ZERO);
-}
 /*********************************** Test Dump() ***************************************/
 /**
  * @tc.number   Telephony_CallManager_TestDump_0100

@@ -723,7 +723,7 @@ int32_t CallRequestProcess::CarrierDialProcess(DialParaInfo &info)
         bool canDial = true;
         IsNewCallAllowedCreate(canDial);
         if (!canDial) {
-            return CALL_ERR_DIAL_IS_BUSY;
+            return CALL_ERR_CALL_COUNTS_EXCEED_LIMIT;
         }
         ret = IsDialCallForDsda(info);
         if (ret != TELEPHONY_SUCCESS) {
