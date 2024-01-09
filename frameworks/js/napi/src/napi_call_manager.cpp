@@ -3917,7 +3917,7 @@ void NapiCallManager::NativeDialCall(napi_env env, void *data)
     std::string phoneNumber(asyncContext->number, asyncContext->numberLen);
     std::u16string tmpPhoneNumber = Str8ToStr16(phoneNumber);
     bool isEmergencyNumber = false;
-    if(!(DelayedSingleton<CallManagerClient>::GetInstance()->IsEmergencyPhoneNumber(
+    if (!(DelayedSingleton<CallManagerClient>::GetInstance()->IsEmergencyPhoneNumber(
         tmpPhoneNumber, asyncContext->accountId, isEmergencyNumber) == TELEPHONY_SUCCESS && isEmergencyNumber)) {
         int32_t state;
         DelayedSingleton<CallManagerClient>::GetInstance()->GetVoIPCallState(state);

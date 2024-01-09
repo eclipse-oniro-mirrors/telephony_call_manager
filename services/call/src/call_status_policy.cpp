@@ -72,7 +72,7 @@ int32_t CallStatusPolicy::FilterResultsDispose(sptr<CallBase> call)
     }
     int32_t state;
     DelayedSingleton<CallControlManager>::GetInstance()->GetVoIPCallState(state);
-    if(state == (int32_t)CallStateToApp::CALL_STATE_OFFHOOK
+    if (state == (int32_t)CallStateToApp::CALL_STATE_OFFHOOK
         || state == (int32_t)CallStateToApp::CALL_STATE_RINGING) {
         ret = call->RejectCall();
         if (ret != TELEPHONY_SUCCESS) {
