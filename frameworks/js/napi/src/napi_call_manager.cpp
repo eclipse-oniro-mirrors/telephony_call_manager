@@ -3920,15 +3920,22 @@ void NapiCallManager::NativeDialCall(napi_env env, void *data)
         return;
     }
     asyncContext->eventId = CALL_MANAGER_DIAL_CALL;
-    int32_t state;
-    DelayedSingleton<CallManagerClient>::GetInstance()->GetVoIPCallState(state);
-    if (state == (int32_t)CallStateToApp::CALL_STATE_OFFHOOK) {
-        TELEPHONY_LOGE("VoIP CALL is active, cannot dial now");
-        JsError error = NapiUtil::ConverErrorMessageForJs(CALL_ERR_CALL_COUNTS_EXCEED_LIMIT);
-        asyncContext->errorCode = error.errorCode;
-        return;
-    }
     std::string phoneNumber(asyncContext->number, asyncContext->numberLen);
+    std::u16string tmpPhoneNumber = Str8ToStr16(phoneNumber);
+    bool isEmergencyNumber = false;
+    if (!(DelayedSingleton<CallManagerClient>::GetInstance()->IsEmergencyPhoneNumber(
+        tmpPhoneNumber, asyncContext->accountId, isEmergencyNumber) == TELEPHONY_SUCCESS && isEmergencyNumber)) {
+        int32_t state;
+        DelayedSingleton<CallManagerClient>::GetInstance()->GetVoIPCallState(state);
+        if (state == (int32_t)CallStateToApp::CALL_STATE_OFFHOOK
+            || state == (int32_t)CallStateToApp::CALL_STATE_RINGING) {
+            TELEPHONY_LOGE("VoIP CALL is active, cannot dial now");
+            JsError error = NapiUtil::ConverErrorMessageForJs(CALL_ERR_CALL_COUNTS_EXCEED_LIMIT);
+            asyncContext->errorCode = error.errorCode;
+            return;
+        }
+    }
+   
     OHOS::AppExecFwk::PacMap dialInfo;
     dialInfo.PutIntValue("accountId", asyncContext->accountId);
     dialInfo.PutIntValue("videoState", asyncContext->videoState);

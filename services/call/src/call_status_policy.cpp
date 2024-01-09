@@ -70,6 +70,17 @@ int32_t CallStatusPolicy::FilterResultsDispose(sptr<CallBase> call)
         // Print the log and record the information to the database
         return TELEPHONY_SUCCESS;
     }
+    int32_t state;
+    DelayedSingleton<CallControlManager>::GetInstance()->GetVoIPCallState(state);
+    if (state == (int32_t)CallStateToApp::CALL_STATE_OFFHOOK
+        || state == (int32_t)CallStateToApp::CALL_STATE_RINGING) {
+        ret = call->RejectCall();
+        if (ret != TELEPHONY_SUCCESS) {
+            TELEPHONY_LOGI("Reject call failed!");
+            return ret;
+        }
+        return TELEPHONY_SUCCESS;
+    }
     ret = call->IncomingCallBase();
     TELEPHONY_LOGI("IncomingCallBase ret : %{public}d", ret);
     DelayedSingleton<CallControlManager>::GetInstance()->NotifyNewCallCreated(call);

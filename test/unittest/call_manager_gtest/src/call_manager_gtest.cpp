@@ -5487,7 +5487,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetVoIPCallState_0100, Function
 /******************************************* Test SetVoIPCallState() ********************************************/
 /**
  * @tc.number   Telephony_CallManager_SetVoIPCallState_0200
- * @tc.name     input VoIP call state 0 test SetVoIPCallState
+ * @tc.name     input VoIP call state 1 test SetVoIPCallState
  * @tc.desc     Function test
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_SetVoIPCallState_0200, Function | MediumTest | Level3)
@@ -5500,7 +5500,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetVoIPCallState_0200, Function
 /******************************************* Test SetVoIPCallState() ********************************************/
 /**
  * @tc.number   Telephony_CallManager_SetVoIPCallState_0300
- * @tc.name     input VoIP call state 0 test SetVoIPCallState
+ * @tc.name     input VoIP call state 2 test SetVoIPCallState
  * @tc.desc     Function test
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_SetVoIPCallState_0300, Function | MediumTest | Level3)
@@ -5513,7 +5513,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetVoIPCallState_0300, Function
 /******************************************* Test SetVoIPCallState() ********************************************/
 /**
  * @tc.number   Telephony_CallManager_SetVoIPCallState_0400
- * @tc.name     input VoIP call state 0 test SetVoIPCallState
+ * @tc.name     input VoIP call state 3 test SetVoIPCallState
  * @tc.desc     Function test
  */
 HWTEST_F(CallManagerGtest, Telephony_CallManager_SetVoIPCallState_0400, Function | MediumTest | Level3)
