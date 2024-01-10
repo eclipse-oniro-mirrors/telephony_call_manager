@@ -202,18 +202,7 @@ int32_t CallManagerService::RegisterCallBack(const sptr<ICallAbilityCallback> &c
         TELEPHONY_LOGE("Permission denied!");
         return TELEPHONY_ERR_PERMISSION_ERR;
     }
-    int32_t ret = DelayedSingleton<CallAbilityReportProxy>::GetInstance()->RegisterCallBack(callback, GetBundleName());
-    if (ret == TELEPHONY_SUCCESS) {
-        std::vector<CallAttributeInfo> callAttributeInfo = CallObjectManager::GetAllCallInfoList();
-        std::vector<CallAttributeInfo>::iterator iterator = callAttributeInfo.begin();
-        while (iterator != callAttributeInfo.end()) {
-            CallAttributeInfo info = (*iterator);
-            iterator++;
-            TELEPHONY_LOGI("first time register callback success report call info");
-            DelayedSingleton<CallAbilityReportProxy>::GetInstance()->ReportCallStateInfo(info, callback);
-        }
-    }
-    return ret;
+    return DelayedSingleton<CallAbilityReportProxy>::GetInstance()->RegisterCallBack(callback, GetBundleName());
 }
 
 int32_t CallManagerService::UnRegisterCallBack()
@@ -227,6 +216,25 @@ int32_t CallManagerService::UnRegisterCallBack()
         return TELEPHONY_ERR_PERMISSION_ERR;
     }
     return DelayedSingleton<CallAbilityReportProxy>::GetInstance()->UnRegisterCallBack(GetBundleName());
+}
+
+int32_t CallManagerService::ObserverOnCallDetailsChange()
+{
+    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
+        TELEPHONY_LOGE("Non-system applications use system APIs!");
+        return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
+    }
+    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_SET_TELEPHONY_STATE) &&
+        !TelephonyPermission::CheckPermission(OHOS_PERMISSION_GET_TELEPHONY_STATE)) {
+        TELEPHONY_LOGE("Permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
+
+    std::vector<CallAttributeInfo> callAttributeInfo = CallObjectManager::GetAllCallInfoList();
+    for (auto info : callAttributeInfo) {
+        DelayedSingleton<CallAbilityReportProxy>::GetInstance()->ReportCallStateInfo(info, GetBundleName());
+    }
+    return TELEPHONY_SUCCESS;
 }
 
 int32_t CallManagerService::DialCall(std::u16string number, AppExecFwk::PacMap &extras)

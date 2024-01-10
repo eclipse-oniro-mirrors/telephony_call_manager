@@ -40,6 +40,7 @@ public:
     virtual ~ICallManagerService() = default;
     virtual int32_t RegisterCallBack(const sptr<ICallAbilityCallback> &callback) = 0;
     virtual int32_t UnRegisterCallBack() = 0;
+    virtual int32_t ObserverOnCallDetailsChange() = 0;
     virtual int32_t DialCall(std::u16string number, AppExecFwk::PacMap &extras) = 0;
     virtual int32_t AnswerCall(int32_t callId, int32_t videoState) = 0;
     virtual int32_t RejectCall(int32_t callId, bool rejectWithMessage, std::u16string textMessage) = 0;

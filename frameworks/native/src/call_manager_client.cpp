@@ -74,6 +74,16 @@ int32_t CallManagerClient::UnRegisterCallBack()
     }
 }
 
+int32_t CallManagerClient::ObserverOnCallDetailsChange()
+{
+    if (g_callManagerProxy != nullptr) {
+        return g_callManagerProxy->ObserverOnCallDetailsChange();
+    } else {
+        TELEPHONY_LOGE("init first please!");
+        return TELEPHONY_ERR_UNINIT;
+    }
+}
+
 int32_t CallManagerClient::DialCall(std::u16string number, AppExecFwk::PacMap &extras)
 {
     if (g_callManagerProxy != nullptr) {

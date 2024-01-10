@@ -106,13 +106,12 @@ void CallRequestProcess::AnswerRequest(int32_t callId, int32_t videoState)
         DelayedSingleton<CallControlManager>::GetInstance()->NotifyIncomingCallAnswered(call);
         return;
     } else {
-        std::list<int32_t> callIdList;
-        GetCarrierCallList(callIdList);
-        for (int32_t otherCallId : callIdList) {
-            sptr<CallBase> call = GetOneCallObject(otherCallId);
-            if (call->GetCallType() == CallType::TYPE_VOIP) {
-                TELEPHONY_LOGI("Hangup voip call");
+        std::vector<CallAttributeInfo> callAttributeInfo = CallObjectManager::GetAllCallInfoList();
+        for (auto info : callAttributeInfo) {
+            sptr<CallBase> call = GetOneCallObject(info.callId);
+            if (call != nullptr && info.callType == CallType::TYPE_VOIP) {
                 call->HangUpCall();
+                TELEPHONY_LOGI("hangup the voip call");
             }
         }
     }
