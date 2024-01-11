@@ -32,6 +32,7 @@ public:
     void AnswerRequestForDsda(sptr<CallBase> call, int32_t callId, int32_t videoState);
     void RejectRequest(int32_t callId, bool isSendSms, std::string &content);
     void HangUpRequest(int32_t callId);
+    bool HangUpForDsdaRequest(sptr<CallBase> call);
     void HandleHoldAfterHangUp(TelCallState state, int32_t waitingCallNum);
     void HoldRequest(int32_t callId);
     void UnHoldRequest(int32_t callId);
