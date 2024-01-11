@@ -35,11 +35,6 @@ int32_t CallStatusPolicy::IncomingHandlePolicy(const CallDetailInfo &info)
         TELEPHONY_LOGE("phone number is NULL!");
         return CALL_ERR_PHONE_NUMBER_EMPTY;
     }
-
-    if (IsCallExist(numberStr)) {
-        TELEPHONY_LOGE("the call already exists!");
-        return CALL_ERR_CALL_ALREADY_EXISTS;
-    }
     return TELEPHONY_SUCCESS;
 }
 
