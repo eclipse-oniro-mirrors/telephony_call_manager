@@ -542,16 +542,8 @@ void CallRequestProcess::HangUpRequest(int32_t callId)
     if ((((state == TelCallState::CALL_STATUS_ACTIVE) &&
         (CallObjectManager::IsCallExist(call->GetCallType(), TelCallState::CALL_STATUS_HOLDING))) ||
         (confState == TelConferenceState::TEL_CONFERENCE_ACTIVE)) && waitingCallNum == 0) {
-        int32_t dsdsMode = DSDS_MODE_V2;
-        DelayedRefSingleton<CoreServiceClient>::GetInstance().GetDsdsMode(dsdsMode);
-        bool noOtherCall = true;
-        std::list<int32_t> callIdList;
-        GetCarrierCallList(callIdList);
-        IsExistCallOtherSlot(callIdList, call->GetSlotId(), noOtherCall);
-        if ((dsdsMode == static_cast<int32_t>(DsdsMode::DSDS_MODE_V5_DSDA) ||
-                dsdsMode == static_cast<int32_t>(DsdsMode::DSDS_MODE_V5_TDM)) &&
-            (!noOtherCall)) {
-            TELEPHONY_LOGI("release the active call but not recover the held call for dsda");
+        if (HangUpForDsdaRequest(call)) {
+            TELEPHONY_LOGI("hangup for dsda Request success");
         } else {
             TELEPHONY_LOGI("release the active call and recover the held call");
             call->SetPolicyFlag(PolicyFlag::POLICY_FLAG_HANG_UP_ACTIVE);
@@ -571,6 +563,30 @@ void CallRequestProcess::HangUpRequest(int32_t callId)
         }
     }
     call->HangUpCall();
+}
+
+bool CallRequestProcess::HangUpForDsdaRequest(sptr<CallBase> call)
+{
+    int32_t dsdsMode = DSDS_MODE_V2;
+    DelayedRefSingleton<CoreServiceClient>::GetInstance().GetDsdsMode(dsdsMode);
+    bool noOtherCall = true;
+    std::list<int32_t> allCallIdList;
+    GetCarrierCallList(allCallIdList);
+    IsExistCallOtherSlot(allCallIdList, call->GetSlotId(), noOtherCall);
+    if ((dsdsMode == static_cast<int32_t>(DsdsMode::DSDS_MODE_V5_DSDA) ||
+            dsdsMode == static_cast<int32_t>(DsdsMode::DSDS_MODE_V5_TDM)) &&
+        (!noOtherCall)) {
+        TELEPHONY_LOGI("release the active call but not recover the held call for dsda");
+        std::vector<std::u16string> callIdList;
+        call->GetSubCallIdList(callIdList);
+        for (auto it = callIdList.begin(); it != callIdList.end(); ++it) {
+            int32_t callId = -1;
+            StrToInt(Str16ToStr8(*it), callId);
+            KickOutFromConferenceRequest(callId);
+        }
+        return true;
+    }
+    return false;
 }
 
 void CallRequestProcess::HoldRequest(int32_t callId)

@@ -798,7 +798,6 @@ void CallStatusManager::AutoAnswerForVideoCall(int32_t activeCallNum)
             if ((ringingCallState == CallRunningState::CALL_RUNNING_STATE_RINGING &&
                     (ringingCall->GetAutoAnswerState()))) {
                 ringingCall->SetAutoAnswerState(false);
-                int32_t videoState = static_cast<int32_t>(ringingCall->GetVideoStateType());
                 int ret = ringingCall->AnswerCall(ringingCall->GetAnswerVideoState());
                 TELEPHONY_LOGI("ret = %{public}d", ret);
                 break;
@@ -822,7 +821,6 @@ void CallStatusManager::AutoAnswer(int32_t activeCallNum, int32_t waitingCallNum
             if ((ringingCallState == CallRunningState::CALL_RUNNING_STATE_RINGING &&
                     (ringingCall->GetAutoAnswerState()))) {
                 ringingCall->SetAutoAnswerState(false);
-                int32_t videoState = static_cast<int32_t>(ringingCall->GetVideoStateType());
                 int ret = ringingCall->AnswerCall(ringingCall->GetAnswerVideoState());
                 TELEPHONY_LOGI("ret = %{public}d", ret);
                 break;
