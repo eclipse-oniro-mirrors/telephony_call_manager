@@ -19,21 +19,34 @@ namespace OHOS {
 namespace Telephony {
 int32_t CallAbilityCallbackStub::OnUpdateCallStateInfoRequest(MessageParcel &data, MessageParcel &reply)
 {
-    const CallAttributeInfo *parcelPtr = nullptr;
-    int32_t length = data.ReadInt32();
-    if (length <= 0 || length >= MAX_LEN) {
-        TELEPHONY_LOGE("Invalid parameter, length = %{public}d", length);
-        return TELEPHONY_ERR_ARGUMENT_INVALID;
-    }
+    CallAttributeInfo parcelPtr;
     if (!data.ContainFileDescriptors()) {
         TELEPHONY_LOGW("sent raw data is less than 32k");
     }
-    if ((parcelPtr = reinterpret_cast<const CallAttributeInfo *>(data.ReadRawData(length))) == nullptr) {
-        TELEPHONY_LOGE("reading raw data failed, length = %{public}d", length);
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-
-    int32_t result = OnCallDetailsChange(*parcelPtr);
+    strncpy_s(parcelPtr.accountNumber, kMaxNumberLen + 1, data.ReadCString(), kMaxNumberLen + 1);
+    strncpy_s(parcelPtr.bundleName, kMaxNumberLen + 1, data.ReadCString(), kMaxNumberLen + 1);
+    parcelPtr.speakerphoneOn = data.ReadBool();
+    parcelPtr.accountId = data.ReadInt32();
+    parcelPtr.videoState = static_cast<VideoStateType>(data.ReadInt32());
+    parcelPtr.startTime = data.ReadInt64();
+    parcelPtr.isEcc = data.ReadBool();
+    parcelPtr.callType = static_cast<CallType>(data.ReadInt32());
+    parcelPtr.callId = data.ReadInt32();
+    parcelPtr.callState = static_cast<TelCallState>(data.ReadInt32());
+    parcelPtr.conferenceState = static_cast<TelConferenceState>(data.ReadInt32());
+    parcelPtr.callBeginTime = data.ReadInt64();
+    parcelPtr.callEndTime = data.ReadInt64();
+    parcelPtr.ringBeginTime = data.ReadInt64();
+    parcelPtr.ringEndTime = data.ReadInt64();
+    parcelPtr.callDirection = static_cast<CallDirection>(data.ReadInt32());
+    parcelPtr.answerType = static_cast<CallAnswerType>(data.ReadInt32());
+    parcelPtr.index = data.ReadInt32();
+    parcelPtr.voipCallInfo.voipCallId = data.ReadString();
+    parcelPtr.voipCallInfo.userName = data.ReadString();
+    parcelPtr.voipCallInfo.abilityName = data.ReadString();
+    parcelPtr.voipCallInfo.extensionId = data.ReadString();
+    parcelPtr.voipCallInfo.voipBundleName = data.ReadString();
+    int32_t result = OnCallDetailsChange(parcelPtr);
     if (!reply.WriteInt32(result)) {
         TELEPHONY_LOGE("writing parcel failed");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
