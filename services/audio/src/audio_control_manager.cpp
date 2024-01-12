@@ -48,6 +48,28 @@ void AudioControlManager::Init()
     DelayedSingleton<AudioProxy>::GetInstance()->SetAudioPreferDeviceChangeCallback();
 }
 
+void AudioControlManager::UpdateForegroundLiveCall()
+{
+    sptr<CallBase> liveCall = CallObjectManager::GetForegroundLiveCall();
+    if (liveCall == nullptr) {
+        TELEPHONY_LOGE("caliveCall is nullptr");
+        return;
+    }
+    if (liveCall_ == nullptr) {
+        liveCall_ = liveCall;
+    }
+    int32_t oldCallId = liveCall_->GetCallID();
+    int32_t newCallId = liveCall->GetCallID();
+    if (oldCallId != newCallId) {
+        liveCall_ = liveCall;
+        bool isLiveCallMute = liveCall_->IsSpeakerphoneOn();
+        bool currentMute = DelayedSingleton<AudioProxy>::GetInstance()->IsMicrophoneMute();
+        if (isLiveCallMute != currentMute) {
+            SetMute(isLiveCallMute);
+        }
+    }
+}
+
 void AudioControlManager::CallStateUpdated(
     sptr<CallBase> &callObjectPtr, TelCallState priorState, TelCallState nextState)
 {
@@ -65,6 +87,7 @@ void AudioControlManager::CallStateUpdated(
         TELEPHONY_LOGI("add new call , call id : %{public}d , call state : %{public}d", callId, callState);
         totalCalls_.insert(callObjectPtr);
     }
+    UpdateForegroundLiveCall();
     HandleCallStateUpdated(callObjectPtr, priorState, nextState);
     if (nextState == TelCallState::CALL_STATUS_DISCONNECTED && totalCalls_.count(callObjectPtr) > 0) {
         totalCalls_.erase(callObjectPtr);
@@ -415,12 +438,19 @@ int32_t AudioControlManager::SetMute(bool isMute)
     if ((DelayedSingleton<CallControlManager>::GetInstance()->HasEmergency(enabled) == TELEPHONY_SUCCESS) && enabled) {
         isMute = false;
     }
-    if (DelayedSingleton<AudioProxy>::GetInstance()->SetMicrophoneMute(isMute)) {
-        TELEPHONY_LOGI("set mute success , current mute state : %{public}d", isMute);
-        return TELEPHONY_SUCCESS;
+    if (!DelayedSingleton<AudioProxy>::GetInstance()->SetMicrophoneMute(isMute)) {
+        TELEPHONY_LOGE("set mute failed");
+        return CALL_ERR_AUDIO_SETTING_MUTE_FAILED;
     }
-    TELEPHONY_LOGE("set mute failed");
-    return CALL_ERR_AUDIO_SETTING_MUTE_FAILED;
+    sptr<CallBase> liveCall = CallObjectManager::GetForegroundLiveCall();
+    if (liveCall == nullptr) {
+        TELEPHONY_LOGE("liveCall is nullptr");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    liveCall->SetSpeakerphoneOn(isMute);
+    DelayedSingleton<AudioDeviceManager>::GetInstance()->ReportAudioDeviceInfo();
+    TELEPHONY_LOGI("set mute success , current mute state : %{public}d", isMute);
+    return TELEPHONY_SUCCESS;
 }
 
 int32_t AudioControlManager::MuteRinger()

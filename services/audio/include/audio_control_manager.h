@@ -89,6 +89,7 @@ private:
     AudioInterruptState audioInterruptState_ = AudioInterruptState::INTERRUPT_STATE_DEACTIVATED;
     bool ShouldPlayRingtone() const;
     bool IsEmergencyCallExists() const;
+    void UpdateForegroundLiveCall();
     ToneState toneState_ = ToneState::STOPPED;
     SoundState soundState_ = SoundState::STOPPED;
     bool isLocalRingbackNeeded_;
@@ -97,6 +98,7 @@ private:
     std::unique_ptr<Tone> tone_;
     std::unique_ptr<Sound> sound_;
     std::mutex mutex_;
+    sptr<CallBase> liveCall_ = nullptr;
 };
 } // namespace Telephony
 } // namespace OHOS
