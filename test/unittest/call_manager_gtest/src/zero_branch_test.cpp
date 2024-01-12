@@ -1046,6 +1046,7 @@ HWTEST_F(BranchTest, Telephony_CallManagerClient_001, Function | MediumTest | Le
     callManagerClient->HasCall();
     callManagerClient->IsNewCallAllowed(result);
     callManagerClient->IsInEmergencyCall(result);
+    callManagerClient->ObserverOnCallDetailsChange();
     ASSERT_NE(callManagerClient->DialCall(value, extras), TELEPHONY_SUCCESS);
     ASSERT_NE(callManagerClient->AnswerCall(0, 0), TELEPHONY_SUCCESS);
     ASSERT_NE(callManagerClient->RejectCall(0, false, value), TELEPHONY_SUCCESS);

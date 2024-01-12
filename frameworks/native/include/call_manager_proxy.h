@@ -47,6 +47,7 @@ public:
     void UnInit();
     int32_t RegisterCallBack(std::unique_ptr<CallManagerCallback> callback);
     int32_t UnRegisterCallBack();
+    int32_t ObserverOnCallDetailsChange();
     int32_t DialCall(std::u16string number, AppExecFwk::PacMap &extras);
     int32_t AnswerCall(int32_t callId, int32_t videoState);
     int32_t RejectCall(int32_t callId, bool isSendSms, std::u16string content);

@@ -46,6 +46,13 @@ public:
     int32_t UnRegisterCallBack();
 
     /**
+     * @brief the application subscribe the OnCallDetailsChange event
+     *
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t ObserverOnCallDetailsChange();
+
+    /**
      * @brief Make a phone call
      *
      * @param number[in], dial param.

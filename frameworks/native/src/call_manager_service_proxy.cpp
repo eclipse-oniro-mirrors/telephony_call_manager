@@ -47,6 +47,16 @@ int32_t CallManagerServiceProxy::UnRegisterCallBack()
     return SendRequest(INTERFACE_UNREGISTER_CALLBACK);
 }
 
+int32_t CallManagerServiceProxy::ObserverOnCallDetailsChange()
+{
+    int32_t error = SendRequest(INTERFACE_OBSERVER_ON_CALL_DETAILS_CHANGE);
+    if (error != ERR_NONE) {
+        TELEPHONY_LOGE("function ObserverOnCallDetailsChange failed! errCode:%{public}d", error);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
 int32_t CallManagerServiceProxy::DialCall(std::u16string number, AppExecFwk::PacMap &extras)
 {
     MessageParcel dataParcel;

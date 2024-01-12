@@ -96,6 +96,14 @@ public:
     int32_t UnRegisterCallBack() override;
 
     /**
+     * ObserverOnCallDetailsChange
+     *
+     * @brief excute when observe OnCallDetailsChange
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t ObserverOnCallDetailsChange() override;
+
+    /**
      * DialCall
      *
      * @brief Make a phone call

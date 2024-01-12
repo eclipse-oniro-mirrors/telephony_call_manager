@@ -93,6 +93,8 @@ void CallManagerServiceStub::InitCallUtilsRequest()
         &CallManagerServiceStub::OnFormatPhoneNumberToE164;
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_CANCEL_MISSED_INCOMING_CALL_NOTIFICATION)] =
         &CallManagerServiceStub::OnRemoveMissedIncomingCallNotification;
+    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_OBSERVER_ON_CALL_DETAILS_CHANGE)] =
+        &CallManagerServiceStub::OnObserverOnCallDetailsChange;
 }
 
 void CallManagerServiceStub::InitCallConferenceRequest()
@@ -289,6 +291,17 @@ int32_t CallManagerServiceStub::OnUnRegisterCallBack(MessageParcel &data, Messag
 {
     int32_t result = TELEPHONY_ERR_FAIL;
     result = UnRegisterCallBack();
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("fail to write parcel");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return result;
+}
+
+int32_t CallManagerServiceStub::OnObserverOnCallDetailsChange(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t result = TELEPHONY_ERR_FAIL;
+    result = ObserverOnCallDetailsChange();
     if (!reply.WriteInt32(result)) {
         TELEPHONY_LOGE("fail to write parcel");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;

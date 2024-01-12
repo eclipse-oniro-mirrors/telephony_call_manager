@@ -250,7 +250,7 @@ private:
     static void NativePostDialProceed(napi_env env, void *data);
     static napi_value HandleAsyncWork(napi_env env, AsyncContext *context, std::string workName,
         napi_async_execute_callback execute, napi_async_complete_callback complete);
-    static void RegisterImsVideoCallFuncCallback(std::string tmpStr, EventCallback stateCallback);
+    static void RegisterNapiCallFuncCallback(std::string tmpStr, EventCallback stateCallback);
     static void UnRegisterCallbackWithListenerType(std::string tmpStr);
     static bool MatchStringAndVariableObjectParameters(
         napi_env env, const napi_value parameters[], const size_t parameterCount);

@@ -40,7 +40,7 @@ public:
     int32_t ReportMmiCodeResult(const MmiCodeInfo &info);
     int32_t ReportAudioDeviceChange(const AudioDeviceInfo &info);
     int32_t ReportCallStateInfo(const CallAttributeInfo &info);
-    int32_t ReportCallStateInfo(const CallAttributeInfo &info, sptr<ICallAbilityCallback> callBack);
+    int32_t ReportCallStateInfo(const CallAttributeInfo &info, std::string bundleName);
     int32_t ReportPostDialDelay(const std::string &str);
     int32_t ReportImsCallModeChange(const CallMediaModeInfo &imsCallModeInfo);
     int32_t ReportCallSessionEventChange(const CallSessionEvent &callSessionEventOptions);

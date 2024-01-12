@@ -2508,8 +2508,16 @@ napi_value NapiCallManager::ObserverOn(napi_env env, napi_callback_info info)
     stateCallback.env = env;
     napi_create_reference(env, thisVar, DATA_LENGTH_ONE, &stateCallback.thisVar);
     napi_create_reference(env, argv[ARRAY_INDEX_SECOND], DATA_LENGTH_ONE, &stateCallback.callbackRef);
+    RegisterNapiCallFuncCallback(tmpStr, stateCallback);
+    napi_value result = nullptr;
+    return result;
+}
+
+void NapiCallManager::RegisterNapiCallFuncCallback(std::string tmpStr, EventCallback stateCallback)
+{
     if (tmpStr == "callDetailsChange") {
         DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->RegisterCallStateCallback(stateCallback);
+        DelayedSingleton<CallManagerClient>::GetInstance()->ObserverOnCallDetailsChange();
     } else if (tmpStr == "callEventChange") {
         DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->RegisterCallEventCallback(stateCallback);
     } else if (tmpStr == "callOttRequest") {
@@ -2524,16 +2532,7 @@ napi_value NapiCallManager::ObserverOn(napi_env env, napi_callback_info info)
         TELEPHONY_LOGI("result == %{public}d", result);
     } else if (tmpStr == "postDialDelay") {
         DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->RegisterPostDialDelay(stateCallback);
-    } else {
-        RegisterImsVideoCallFuncCallback(tmpStr, stateCallback);
-    }
-    napi_value result = nullptr;
-    return result;
-}
-
-void NapiCallManager::RegisterImsVideoCallFuncCallback(std::string tmpStr, EventCallback stateCallback)
-{
-    if (tmpStr == "imsCallModeChange") {
+    } else if (tmpStr == "imsCallModeChange") {
         DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->RegisterImsCallModeChangeCallback(stateCallback);
     } else if (tmpStr == "callSessionEvent") {
         DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->RegisterCallSessionEventChangeCallback(

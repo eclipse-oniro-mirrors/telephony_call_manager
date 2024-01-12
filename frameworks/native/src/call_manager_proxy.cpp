@@ -294,6 +294,20 @@ int32_t CallManagerProxy::ReRegisterCallBack()
     return TELEPHONY_SUCCESS;
 }
 
+int32_t CallManagerProxy::ObserverOnCallDetailsChange()
+{
+    if (callManagerServicePtr_ == nullptr) {
+        TELEPHONY_LOGE("callManagerServicePtr_ is null");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    int32_t ret = callManagerServicePtr_->ObserverOnCallDetailsChange();
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("report call state info failed when observe OnCallDetailsChange, result: %{public}d", ret);
+        return TELEPHONY_ERR_REGISTER_CALLBACK_FAIL;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
 int32_t CallManagerProxy::RegisterVoipCallManagerCallback()
 {
     if (callManagerServicePtr_ == nullptr) {

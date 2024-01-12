@@ -162,21 +162,23 @@ int32_t CallAbilityReportProxy::ReportCallStateInfo(const CallAttributeInfo &inf
     return ret;
 }
 
-int32_t CallAbilityReportProxy::ReportCallStateInfo(const CallAttributeInfo &info, sptr<ICallAbilityCallback> callBack)
+int32_t CallAbilityReportProxy::ReportCallStateInfo(const CallAttributeInfo &info, std::string bundleName)
 {
-    if (callBack == nullptr) {
-        TELEPHONY_LOGI("callBack is null");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    int32_t ret = TELEPHONY_ERROR;
+    for (auto callback : callbackPtrList_) {
+        if (callback->GetBundleName() == bundleName) {
+            ret = callback->OnCallDetailsChange(info);
+            break;
+        }
     }
-    int32_t ret = callBack->OnCallDetailsChange(info);
     if (ret != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGW("OnCallDetailsChange failed, errcode:%{public}d", ret);
+        TELEPHONY_LOGE(
+            "OnCallDetailsChange failed, errcode:%{public}d, bundleName:%{publilc}s", ret, bundleName.c_str());
     } else {
-        TELEPHONY_LOGW("OnCallDetailsChange success");
+        TELEPHONY_LOGI("callId[%{public}d] state[%{public}d] conferenceState[%{public}d] "
+                       "videoState[%{public}d], report bundleName %{public}s success",
+            info.callId, info.callState, info.conferenceState, info.videoState, bundleName.c_str());
     }
-    TELEPHONY_LOGI("callId[%{public}d] state[%{public}d] conferenceState[%{public}d] "
-                   "videoState[%{public}d]",
-        info.callId, info.callState, info.conferenceState, info.videoState);
     return ret;
 }
 
