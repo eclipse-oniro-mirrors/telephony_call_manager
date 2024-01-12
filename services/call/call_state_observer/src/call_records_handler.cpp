@@ -86,7 +86,7 @@ int32_t CallRecordsHandler::AddCallLogInfo(const CallRecordInfo &info)
     bucket.Put(CALL_NUMBER_LOCATION, std::string(""));
     bucket.Put(CALL_PHOTO_ID, 0);
     bucket.Put(CALL_SLOT_ID, info.slotId);
-    bucket.Put(CALL_VIDEO_CALL, static_cast<int32_t>(info.videoState));
+    bucket.Put(CALL_FEATURES, info.features);
     bool ret = callDataPtr_->Insert(bucket);
     if (!ret) {
         TELEPHONY_LOGE("Add call log database fail!");

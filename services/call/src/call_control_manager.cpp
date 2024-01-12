@@ -156,6 +156,7 @@ void CallControlManager::PackageDialInformation(AppExecFwk::PacMap &extras, std:
     dialSrcInfo_.accountId = extras.GetIntValue("accountId");
     dialSrcInfo_.dialType = (DialType)extras.GetIntValue("dialType");
     dialSrcInfo_.videoState = (VideoStateType)extras.GetIntValue("videoState");
+    dialSrcInfo_.originalCallType = (int32_t)extras.GetIntValue("videoState");
     dialSrcInfo_.bundleName = extras.GetStringValue("bundleName");
     extras_.Clear();
     extras_ = extras;

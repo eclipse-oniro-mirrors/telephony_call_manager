@@ -27,6 +27,7 @@ namespace Telephony {
 constexpr int16_t DEFAULT_COUNTRY_CODE = 0;
 constexpr int16_t DEFAULT_TIME = 0;
 const int32_t ACTIVE_USER_ID = 100;
+const int32_t FEATURES_VIDEO = 1 << 0;
 CallRecordsManager::CallRecordsManager() : callRecordsHandlerServerPtr_(nullptr) {}
 
 CallRecordsManager::~CallRecordsManager()
@@ -146,12 +147,9 @@ void CallRecordsManager::CopyCallInfoToRecord(CallAttributeInfo &info, CallRecor
     data.countryCode = DEFAULT_COUNTRY_CODE;
     data.slotId = info.accountId;
     data.callType = info.callType;
-    if (info.videoState == VideoStateType::TYPE_VOICE) {
-        data.videoState = VideoStateType::TYPE_VOICE;
-    } else {
-        // SEND_ONLY/RECEIVE_ONLY/VIDEO should consider as video call
-        data.videoState = VideoStateType::TYPE_VIDEO;
-    }
+    // use original call type for video call record
+    int32_t callFeatures = GetCallFeatures(info.originalCallType);
+    data.features = callFeatures;
 }
 
 int32_t CallRecordsManager::RemoveMissedIncomingCallNotification()
@@ -166,6 +164,25 @@ int32_t CallRecordsManager::RemoveMissedIncomingCallNotification()
         return ret;
     }
     return TELEPHONY_SUCCESS;
+}
+
+int32_t CallRecordsManager::GetCallFeatures(int32_t videoState)
+{
+    int32_t features = 0;
+    if (IsVideoCall(videoState)) {
+        features |= FEATURES_VIDEO;
+    }
+    return features;
+}
+
+bool CallRecordsManager::IsVideoCall(int32_t videoState)
+{
+    if (static_cast<VideoStateType>(videoState) == VideoStateType::TYPE_SEND_ONLY ||
+        static_cast<VideoStateType>(videoState) == VideoStateType::TYPE_RECEIVE_ONLY ||
+        static_cast<VideoStateType>(videoState) == VideoStateType::TYPE_VIDEO) {
+        return true;
+    }
+    return false;
 }
 
 void AccountSystemAbilityListener::OnAddSystemAbility(int32_t systemAbilityId, const std::string &deviceId)

@@ -745,6 +745,7 @@ int32_t CallRequestProcess::UpdateCallReportInfo(const DialParaInfo &info, TelCa
     callDetatilInfo.index = info.index;
     callDetatilInfo.state = state;
     callDetatilInfo.callMode = info.videoState;
+    callDetatilInfo.originalCallType = info.originalCallType;
     callDetatilInfo.voiceDomain = static_cast<int32_t>(info.callType);
     if (info.number.length() > kMaxNumberLen) {
         TELEPHONY_LOGE("numbser length out of range");

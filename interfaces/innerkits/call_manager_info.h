@@ -312,6 +312,10 @@ struct CallRecordInfo {
      * Indicates the slot id.
      */
     int32_t slotId = 0;
+    /**
+     * Indicates the call features.
+     */
+    int32_t features = 0;
 
     CallRecordInfo() {}
 
@@ -336,6 +340,7 @@ struct CallRecordInfo {
         countryCode = temp.countryCode;
         slotId = temp.slotId;
         videoState = temp.videoState;
+        features = temp.features;
         return *this;
     }
 };
