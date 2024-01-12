@@ -1641,6 +1641,9 @@ HWTEST_F(BranchTest, Telephony_ImsCall_001, Function | MediumTest | Level3)
     std::vector<std::u16string> callIdList;
     call.GetSubCallIdList(callIdList);
     call.GetCallIdListForConference(callIdList);
+    int32_t videoState = 0;
+    call.SetOriginalCallType(videoState);
+    call.GetOriginalCallType();
 }
 
 
@@ -1758,6 +1761,8 @@ HWTEST_F(BranchTest, Telephony_CallRecordsManager_001, Function | MediumTest | L
     info.ringEndTime = ONE_TIME;
     callRecordsManager.AddOneCallRecord(info);
     ASSERT_NE(callRecordsManager.RemoveMissedIncomingCallNotification(), TELEPHONY_SUCCESS);
+    int32_t videoState = static_cast<int32_t>(VideoStateType::TYPE_VIDEO);
+    callRecordsManager.GetCallFeatures(videoState);
 }
 
 /**
@@ -2061,6 +2066,8 @@ HWTEST_F(BranchTest, Telephony_CallStatusManager_002, Function | MediumTest | Le
     callObjectPtr->SetTelCallState(TelCallState::CALL_STATUS_DIALING);
     ASSERT_GT(callStatusManager->ToSpeakerPhone(callObjectPtr), TELEPHONY_ERROR);
     ASSERT_GT(callStatusManager->TurnOffMute(callObjectPtr), TELEPHONY_ERROR);
+    callObjectPtr->SetTelCallState(TelCallState::CALL_STATUS_ALERTING);
+    callStatusManager->CheckAndSetOriginalCallType(callObjectPtr);
     int32_t activeCallNum = 0;
     int32_t waitingCallNum = 0;
     int32_t slotId = 0;

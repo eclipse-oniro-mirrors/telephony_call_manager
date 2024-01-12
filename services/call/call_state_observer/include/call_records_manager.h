@@ -65,6 +65,8 @@ public:
     void CopyCallInfoToRecord(CallAttributeInfo &info, CallRecordInfo &data);
     void AddOneCallRecord(sptr<CallBase> call, CallAnswerType answerType);
     int32_t RemoveMissedIncomingCallNotification();
+    int32_t GetCallFeatures(int32_t videoState);
+    bool IsVideoCall(int32_t videoState);
 
 private:
     std::shared_ptr<CallRecordsHandlerService> callRecordsHandlerServerPtr_;
