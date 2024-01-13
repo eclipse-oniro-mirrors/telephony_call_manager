@@ -70,7 +70,7 @@ void MissedCallNotification::PublishMissedCallEvent(sptr<CallBase> &callObjectPt
     data.SetWant(want);
     data.SetCode(INCOMING_CALL_MISSED_CODE);
     EventFwk::CommonEventPublishInfo publishInfo;
-    publishInfo.SetOrdered(false);
+    publishInfo.SetOrdered(true);
     bool result = EventFwk::CommonEventManager::PublishCommonEvent(data, publishInfo, nullptr);
     TELEPHONY_LOGI("publish missed call event result : %{public}d", result);
 
