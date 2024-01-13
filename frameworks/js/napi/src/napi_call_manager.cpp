@@ -3929,8 +3929,7 @@ void NapiCallManager::NativeDialCall(napi_env env, void *data)
         if (state == (int32_t)CallStateToApp::CALL_STATE_OFFHOOK
             || state == (int32_t)CallStateToApp::CALL_STATE_RINGING) {
             TELEPHONY_LOGE("VoIP CALL is active, cannot dial now");
-            JsError error = NapiUtil::ConverErrorMessageForJs(CALL_ERR_CALL_COUNTS_EXCEED_LIMIT);
-            asyncContext->errorCode = error.errorCode;
+            asyncContext->errorCode = CALL_ERR_CALL_COUNTS_EXCEED_LIMIT;
             return;
         }
     }

@@ -63,8 +63,7 @@ int32_t CallObjectManager::AddOneCallObject(sptr<CallBase> &call)
     int32_t state;
     bool isVoIPCallExists = false;
     DelayedSingleton<CallControlManager>::GetInstance()->GetVoIPCallState(state);
-    if (state == (int32_t)CallStateToApp::CALL_STATE_OFFHOOK
-        || state == (int32_t)CallStateToApp::CALL_STATE_RINGING) {
+    if (state == (int32_t)CallStateToApp::CALL_STATE_RINGING) {
         isVoIPCallExists = true;
     }
     if (callObjectPtrList_.size() == NO_CALL_EXIST && (!isVoIPCallExists || info.isEcc)) {
