@@ -51,7 +51,6 @@ int32_t VoIPCall::AnswerCall(int32_t videoState)
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGW("PackVoipCallInfo failed!");
     }
-    voipcallInfo.bundleName = voipBundleName_;
     DelayedSingleton<VoipCallConnection>::GetInstance()->AnswerCall(voipcallInfo, videoState);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("answer call failed!");
@@ -76,7 +75,6 @@ int32_t VoIPCall::RejectCall()
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGW("PackVoipCallInfo failed!");
     }
-    voipcallInfo.bundleName = voipBundleName_;
     DelayedSingleton<VoipCallConnection>::GetInstance()->RejectCall(voipcallInfo);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("reject call failed!");
@@ -94,7 +92,25 @@ int32_t VoIPCall::HangUpCall()
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGW("PackVoipCallInfo failed!");
     }
-    voipcallInfo.bundleName = voipBundleName_;
+    voipcallInfo.errorReason = ErrorReason::USER_ANSWER_CELLULAR_FIRST;
+    DelayedSingleton<VoipCallConnection>::GetInstance()->HangUpCall(voipcallInfo);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("hangup call failed!");
+        return CALL_ERR_ANSWER_FAILED;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t VoIPCall::HangUpCall(const ErrorReason &status)
+{
+    TELEPHONY_LOGI("VoIPCall::dial cellularcall HangUpvoipCall enter");
+    VoipCallEventInfo voipcallInfo;
+    int32_t ret = TELEPHONY_ERROR;
+    ret = PackVoipCallInfo(voipcallInfo);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGW("PackVoipCallInfo failed!");
+    }
+    voipcallInfo.errorReason = status;
     DelayedSingleton<VoipCallConnection>::GetInstance()->HangUpCall(voipcallInfo);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("hangup call failed!");
