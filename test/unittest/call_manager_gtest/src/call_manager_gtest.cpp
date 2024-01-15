@@ -159,15 +159,7 @@ void CallInfoManager::LockCallState(bool eq, int32_t targetState, int32_t slipMs
 
 void CallManagerGtest::HangUpCall()
 {
-    clientPtr_->HangUpCall(g_newCallId);
-    int useTimeMs = 0;
-    while ((CallInfoManager::HasState(g_newCallId, (int32_t)TelCallState::CALL_STATUS_DISCONNECTED) != true) &&
-           (useTimeMs < SLEEP_12000_MS)) {
-        usleep((SLEEP_50_MS * SLEEP_1000_MS));
-        useTimeMs += SLEEP_50_MS;
-    }
-    TELEPHONY_LOGI("===========wait %d ms target:%d==============", useTimeMs,
-        CallInfoManager::HasState(g_newCallId, (int32_t)TelCallState::CALL_STATUS_DISCONNECTED));
+    clientPtr_->HangUpCall(INVALID_CALLID);
 }
 
 #ifndef TEL_TEST_UNSUPPORT
@@ -191,6 +183,10 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_0100, Function | Mediu
             SIM1_SLOTID, (int32_t)VideoStateType::TYPE_VOICE, DIAL_SCENE_TEST, (int32_t)DialType::DIAL_CARRIER_TYPE);
         int32_t ret = CallManagerGtest::clientPtr_->DialCall(Str8ToStr16(phoneNumber), dialInfo_);
         EXPECT_EQ(ret, RETURN_VALUE_IS_ZERO);
+        sleep(WAIT_TIME);
+        if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
+            HangUpCall();
+        }
     }
 
     if (HasSimCard(SIM2_SLOTID)) {
@@ -198,6 +194,10 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_0100, Function | Mediu
             SIM2_SLOTID, (int32_t)VideoStateType::TYPE_VOICE, DIAL_SCENE_TEST, (int32_t)DialType::DIAL_CARRIER_TYPE);
         int32_t ret = CallManagerGtest::clientPtr_->DialCall(Str8ToStr16(phoneNumber), dialInfo_);
         EXPECT_EQ(ret, RETURN_VALUE_IS_ZERO);
+        sleep(WAIT_TIME);
+        if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
+            HangUpCall();
+        }
     }
 }
 
@@ -247,15 +247,21 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_0300, Function | Mediu
         InitDialInfo(
             SIM1_SLOTID, (int32_t)VideoStateType::TYPE_VOICE, DIAL_SCENE_TEST, (int32_t)DialType::DIAL_CARRIER_TYPE);
         int32_t ret = CallManagerGtest::clientPtr_->DialCall(Str8ToStr16(phoneNumber), dialInfo_);
-        usleep(SLEEP_1000_MS);
         EXPECT_EQ(ret, RETURN_VALUE_IS_ZERO);
+        sleep(WAIT_TIME);
+        if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
+            HangUpCall();
+        }
     }
     if (HasSimCard(SIM2_SLOTID)) {
         InitDialInfo(
             SIM2_SLOTID, (int32_t)VideoStateType::TYPE_VOICE, DIAL_SCENE_TEST, (int32_t)DialType::DIAL_CARRIER_TYPE);
         int32_t ret = CallManagerGtest::clientPtr_->DialCall(Str8ToStr16(phoneNumber), dialInfo_);
-        usleep(SLEEP_1000_MS + 1);
         EXPECT_EQ(ret, RETURN_VALUE_IS_ZERO);
+        sleep(WAIT_TIME);
+        if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
+            HangUpCall();
+        }
     }
 }
 
@@ -277,16 +283,22 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_0400, Function | Mediu
         InitDialInfo(
             SIM1_SLOTID, (int32_t)VideoStateType::TYPE_VOICE, DIAL_SCENE_TEST, (int32_t)DialType::DIAL_CARRIER_TYPE);
         int32_t ret = CallManagerGtest::clientPtr_->DialCall(Str8ToStr16(phoneNumber), dialInfo_);
-        usleep(SLEEP_1000_MS);
-        EXPECT_NE(ret, RETURN_VALUE_IS_ZERO);
+        EXPECT_EQ(ret, RETURN_VALUE_IS_ZERO);
+        sleep(WAIT_TIME);
+        if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
+            HangUpCall();
+        }
     }
 
     if (HasSimCard(SIM2_SLOTID)) {
         InitDialInfo(
             SIM2_SLOTID, (int32_t)VideoStateType::TYPE_VOICE, DIAL_SCENE_TEST, (int32_t)DialType::DIAL_CARRIER_TYPE);
         int32_t ret = CallManagerGtest::clientPtr_->DialCall(Str8ToStr16(phoneNumber), dialInfo_);
-        usleep(SLEEP_1000_MS);
-        EXPECT_NE(ret, RETURN_VALUE_IS_ZERO);
+        EXPECT_EQ(ret, RETURN_VALUE_IS_ZERO);
+        sleep(WAIT_TIME);
+        if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
+            HangUpCall();
+        }
     }
 }
 
@@ -307,13 +319,21 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_0500, Function | Mediu
         InitDialInfo(
             SIM1_SLOTID, (int32_t)VideoStateType::TYPE_VOICE, DIAL_SCENE_TEST, (int32_t)DialType::DIAL_CARRIER_TYPE);
         int32_t ret = CallManagerGtest::clientPtr_->DialCall(Str8ToStr16("19!@#$%^&*:"), dialInfo_);
-        EXPECT_NE(ret, RETURN_VALUE_IS_ZERO);
+        EXPECT_EQ(ret, RETURN_VALUE_IS_ZERO);
+        sleep(WAIT_TIME);
+        if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
+            HangUpCall();
+        }
     }
     if (HasSimCard(SIM2_SLOTID)) {
         InitDialInfo(
             SIM2_SLOTID, (int32_t)VideoStateType::TYPE_VOICE, DIAL_SCENE_TEST, (int32_t)DialType::DIAL_CARRIER_TYPE);
         int32_t ret = CallManagerGtest::clientPtr_->DialCall(Str8ToStr16("19!@#$%^&*:"), dialInfo_);
-        EXPECT_NE(ret, RETURN_VALUE_IS_ZERO);
+        EXPECT_EQ(ret, RETURN_VALUE_IS_ZERO);
+        sleep(WAIT_TIME);
+        if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
+            HangUpCall();
+        }
     }
 }
 
@@ -334,12 +354,20 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_1000, Function | Mediu
             SIM1_SLOTID, (int32_t)VideoStateType::TYPE_VOICE, DIAL_SCENE_TEST, (int32_t)DialType::DIAL_CARRIER_TYPE);
         int32_t ret = CallManagerGtest::clientPtr_->DialCall(Str8ToStr16("10086"), dialInfo_);
         EXPECT_EQ(ret, RETURN_VALUE_IS_ZERO);
+        sleep(WAIT_TIME);
+        if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
+            HangUpCall();
+        }
     }
     if (HasSimCard(SIM2_SLOTID)) {
         InitDialInfo(
             SIM2_SLOTID, (int32_t)VideoStateType::TYPE_VOICE, DIAL_SCENE_TEST, (int32_t)DialType::DIAL_CARRIER_TYPE);
         int32_t ret = CallManagerGtest::clientPtr_->DialCall(Str8ToStr16("10086"), dialInfo_);
         EXPECT_EQ(ret, RETURN_VALUE_IS_ZERO);
+        sleep(WAIT_TIME);
+        if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
+            HangUpCall();
+        }
     }
 }
 
@@ -511,14 +539,22 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_1700, Function | Mediu
         InitDialInfo(SIM1_SLOTID, (int32_t)VideoStateType::TYPE_VOICE, (int32_t)DialScene::CALL_NORMAL,
             (int32_t)DialType::DIAL_CARRIER_TYPE);
         int32_t ret = CallManagerGtest::blueToothClientPtr_->DialCall(Str8ToStr16(phoneNumber), dialInfo_);
-        EXPECT_NE(ret, RETURN_VALUE_IS_ZERO);
+        EXPECT_EQ(ret, RETURN_VALUE_IS_ZERO);
+        sleep(WAIT_TIME);
+        if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
+            HangUpCall();
+        }
     }
 
     if (HasSimCard(SIM2_SLOTID)) {
         InitDialInfo(SIM2_SLOTID, (int32_t)VideoStateType::TYPE_VOICE, (int32_t)DialScene::CALL_NORMAL,
             (int32_t)DialType::DIAL_CARRIER_TYPE);
         int32_t ret = CallManagerGtest::blueToothClientPtr_->DialCall(Str8ToStr16(phoneNumber), dialInfo_);
-        EXPECT_NE(ret, RETURN_VALUE_IS_ZERO);
+        EXPECT_EQ(ret, RETURN_VALUE_IS_ZERO);
+        sleep(WAIT_TIME);
+        if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
+            HangUpCall();
+        }
     }
 }
 
@@ -599,10 +635,10 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_2000, Function | Mediu
             EXPECT_EQ(CallManagerGtest::clientPtr_->HoldCall(g_newCallId), RETURN_VALUE_IS_ZERO);
             sleep(WAIT_TIME);
             EXPECT_EQ(CallManagerGtest::clientPtr_->UnHoldCall(g_newCallId), RETURN_VALUE_IS_ZERO);
-            sleep(WAIT_TIME + 1);
-            if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
-                HangUpCall();
-            }
+        }
+        sleep(WAIT_TIME);
+        if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
+            HangUpCall();
         }
     }
 
@@ -614,10 +650,10 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_2000, Function | Mediu
             EXPECT_EQ(CallManagerGtest::clientPtr_->HoldCall(g_newCallId), RETURN_VALUE_IS_ZERO);
             sleep(WAIT_TIME);
             EXPECT_EQ(CallManagerGtest::clientPtr_->UnHoldCall(g_newCallId), RETURN_VALUE_IS_ZERO);
-            sleep(WAIT_TIME);
-            if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
-                HangUpCall();
-            }
+        }
+        sleep(WAIT_TIME);
+        if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
+            HangUpCall();
         }
     }
 }
@@ -922,12 +958,10 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_ReportAudioDeviceInfo_0100, Fun
     CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_200_MS, SLEEP_30000_MS);
     EXPECT_EQ(CallManagerGtest::clientPtr_->DialCall(Str8ToStr16(phoneNumber), dialInfo_), RETURN_VALUE_IS_ZERO);
     CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_OFFHOOK, SLEEP_200_MS, SLEEP_30000_MS);
-    if (CallInfoManager::HasActiveStatus()) {
-        EXPECT_NE(CallManagerGtest::clientPtr_->ReportAudioDeviceInfo(), RETURN_VALUE_IS_ZERO);
-        sleep(1);
-        if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
-            HangUpCall();
-        }
+    EXPECT_EQ(CallManagerGtest::clientPtr_->ReportAudioDeviceInfo(), RETURN_VALUE_IS_ZERO);
+    sleep(1);
+    if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
+        HangUpCall();
     }
 }
 
@@ -1427,10 +1461,10 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_CombineConference_0400, Functio
     EXPECT_EQ(CallManagerGtest::clientPtr_->DialCall(Str8ToStr16(phoneNumber), dialInfo_), RETURN_VALUE_IS_ZERO);
     if (CallInfoManager::HasActiveStatus()) {
         EXPECT_NE(CallManagerGtest::clientPtr_->CombineConference(g_newCallId), RETURN_VALUE_IS_ZERO);
-        sleep(WAIT_TIME);
-        if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
-            HangUpCall();
-        }
+    }
+    sleep(WAIT_TIME);
+    if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
+        HangUpCall();
     }
 }
 
@@ -1498,10 +1532,10 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SeparateConference_0400, Functi
     EXPECT_EQ(CallManagerGtest::clientPtr_->DialCall(Str8ToStr16("10086"), dialInfo_), RETURN_VALUE_IS_ZERO);
     if (CallInfoManager::HasActiveStatus()) {
         EXPECT_NE(CallManagerGtest::clientPtr_->SeparateConference(g_newCallId), RETURN_VALUE_IS_ZERO);
-        sleep(WAIT_TIME);
-        if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
-            HangUpCall();
-        }
+    }
+    sleep(WAIT_TIME);
+    if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
+        HangUpCall();
     }
 }
 
@@ -1570,10 +1604,10 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_KickOutFromConference_0400, Fun
     EXPECT_EQ(CallManagerGtest::clientPtr_->DialCall(Str8ToStr16(number), dialInfo_), RETURN_VALUE_IS_ZERO);
     if (CallInfoManager::HasActiveStatus()) {
         EXPECT_NE(CallManagerGtest::clientPtr_->KickOutFromConference(g_newCallId), RETURN_VALUE_IS_ZERO);
-        sleep(1);
-        if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
-            HangUpCall();
-        }
+    }
+    sleep(WAIT_TIME);
+    if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
+        HangUpCall();
     }
 }
 

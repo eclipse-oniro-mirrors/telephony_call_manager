@@ -32,7 +32,7 @@
 
 namespace OHOS {
 namespace Telephony {
-constexpr int16_t SLEEP_THREE_SECONDS = 3;
+constexpr int16_t SLEEP_ONE_SECONDS = 1;
 
 class CallManagerGtest : public testing::Test {
 public:
@@ -101,7 +101,7 @@ public:
     // execute before each testcase
     void SetUp()
     {
-        std::this_thread::sleep_for(std::chrono::seconds(SLEEP_THREE_SECONDS));
+        std::this_thread::sleep_for(std::chrono::seconds(SLEEP_ONE_SECONDS));
     }
 
     // execute after each testcase
