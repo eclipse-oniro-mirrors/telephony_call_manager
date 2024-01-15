@@ -242,6 +242,7 @@ int32_t VoipCallManagerProxy::HangUp(const VoipCallEventInfo &events)
     }
     dataParcel.WriteString(events.voipCallId);
     dataParcel.WriteString(events.bundleName);
+    dataParcel.WriteInt32(static_cast<int32_t>(events.errorReason));
     auto remote = Remote();
     if (remote == nullptr) {
         TELEPHONY_LOGE("HangUp voip Remote is null");

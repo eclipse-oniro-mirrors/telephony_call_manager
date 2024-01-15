@@ -137,6 +137,7 @@ private:
     void StateChangesToDisconnected();
     void StateChangesToDisconnecting();
     void StateChangesToAlerting();
+    void HangUpVoipCall();
 
     CallRunningState callRunningState_;
     TelConferenceState conferenceState_;

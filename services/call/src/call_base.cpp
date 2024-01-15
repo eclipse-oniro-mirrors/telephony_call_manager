@@ -22,7 +22,10 @@
 #include "call_manager_errors.h"
 #include "cellular_call_connection.h"
 #include "common_type.h"
+#include "ffrt.h"
 #include "telephony_log_wrapper.h"
+#include "voip_call.h"
+#include "voip_call_connection.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -59,7 +62,29 @@ int32_t CallBase::DialCallBase()
     callRunningState_ = CallRunningState::CALL_RUNNING_STATE_CONNECTING;
     TELEPHONY_LOGI("start to set audio");
     // Set audio, set hands-free
+    ffrt::submit([=]() { HangUpVoipCall(); });
     return TELEPHONY_SUCCESS;
+}
+
+void CallBase::HangUpVoipCall()
+{
+    std::vector<CallAttributeInfo> callAttributeInfo = CallObjectManager::GetAllCallInfoList();
+    std::vector<CallAttributeInfo>::iterator it = callAttributeInfo.begin();
+    while (it != callAttributeInfo.end()) {
+        CallAttributeInfo callinfo = (*it);
+        TelCallState callState = callinfo.callState;
+        it++;
+        if (callinfo.callType == CallType::TYPE_VOIP &&
+            (callState == TelCallState::CALL_STATUS_ACTIVE || callState == TelCallState::CALL_STATUS_INCOMING)) {
+            sptr<CallBase> tempCall = CallObjectManager::GetOneCallObject(callinfo.callId);
+            sptr<VoIPCall> call = static_cast<VoIPCall *>(static_cast<void *>(tempCall.GetRefPtr()));
+            if (call == nullptr) {
+                TELEPHONY_LOGE("the call object is nullptr, callId:%{public}d", callinfo.callId);
+                break;
+            }
+            call->HangUpCall(ErrorReason::CELLULAR_CALL_EXISTS);
+        }
+    }
 }
 
 int32_t CallBase::IncomingCallBase()
