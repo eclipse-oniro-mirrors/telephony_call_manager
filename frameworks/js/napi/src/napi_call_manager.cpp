@@ -1244,7 +1244,9 @@ napi_value NapiCallManager::DialCall(napi_env env, napi_callback_info info)
         } else {
             GetDialInfo(env, argv[ARRAY_INDEX_SECOND], *asyncContext);
         }
-    } else {
+    } else if (argc == VALUE_MAXIMUM_LIMIT &&
+        NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_SECOND], napi_object) &&
+        NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_THIRD], napi_function)) {
         GetDialInfo(env, argv[ARRAY_INDEX_SECOND], *asyncContext);
         napi_create_reference(env, argv[ARRAY_INDEX_THIRD], DATA_LENGTH_ONE, &(asyncContext->callbackRef));
     }
