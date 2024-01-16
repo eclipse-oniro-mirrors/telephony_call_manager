@@ -892,7 +892,7 @@ int32_t CallManagerServiceStub::OnFormatPhoneNumber(MessageParcel &data, Message
     std::u16string countryCode = data.ReadString16();
     std::u16string formatNumber;
     int32_t result = FormatPhoneNumber(callNumber, countryCode, formatNumber);
-    TELEPHONY_LOGI("result:%{public}d", result);
+    TELEPHONY_LOGD("result:%{public}d", result);
     if (!reply.WriteInt32(result)) {
         TELEPHONY_LOGE("OnFormatPhoneNumber write reply failed.");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
