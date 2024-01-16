@@ -73,7 +73,7 @@ void AudioControlManager::UpdateForegroundLiveCall()
                 frontCall_ = liveCall;
             }
         }
-        bool frontCallMute = frontCall_->IsSpeakerphoneOn();
+        bool frontCallMute = frontCall_->IsMuted();
         bool currentMute = DelayedSingleton<AudioProxy>::GetInstance()->IsMicrophoneMute();
         if (frontCallMute != currentMute) {
             SetMute(frontCallMute);
@@ -448,7 +448,7 @@ int32_t AudioControlManager::SetMute(bool isMute)
         TELEPHONY_LOGE("frontCall_ is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    frontCall_->SetSpeakerphoneOn(isMute);
+    frontCall_->SetMicPhoneState(isMute);
     TELEPHONY_LOGI("SetMute success callId:%{public}d, mute:%{public}d", frontCall_->GetCallID(), isMute);
     return TELEPHONY_SUCCESS;
 }

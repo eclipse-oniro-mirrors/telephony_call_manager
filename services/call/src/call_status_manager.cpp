@@ -901,6 +901,7 @@ sptr<CallBase> CallStatusManager::RefreshCallIfNecessary(const sptr<CallBase> &c
     newCall->SetRingBeginTime(attrInfo.ringBeginTime);
     newCall->SetRingEndTime(attrInfo.ringEndTime);
     newCall->SetAnswerType(attrInfo.answerType);
+    newCall->SetMicPhoneState(call->IsMuted());
     DeleteOneCallObject(call->GetCallID());
     newCall->SetCallId(call->GetCallID());
     newCall->SetTelCallState(priorState);

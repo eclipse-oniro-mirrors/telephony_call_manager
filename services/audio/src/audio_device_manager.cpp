@@ -530,7 +530,5 @@ void AudioDeviceManager::SetDeviceAvailable(AudioDeviceType deviceType, bool ava
             break;
     }
 }
-
-
 } // namespace Telephony
 } // namespace OHOS
