@@ -98,7 +98,7 @@ private:
     std::unique_ptr<Tone> tone_;
     std::unique_ptr<Sound> sound_;
     std::mutex mutex_;
-    sptr<CallBase> liveCall_ = nullptr;
+    sptr<CallBase> frontCall_ = nullptr;
 };
 } // namespace Telephony
 } // namespace OHOS

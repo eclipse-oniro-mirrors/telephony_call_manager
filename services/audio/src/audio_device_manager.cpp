@@ -430,14 +430,14 @@ int32_t AudioDeviceManager::ReportAudioDeviceChange()
             return TELEPHONY_ERR_MEMSET_FAIL;
         }
     }
-    TELEPHONY_LOGI("report audio device info, currentAudioDeviceType:%{public}d, currentAddress:%{public}s, "
-        "mute:%{public}d", info_.currentAudioDevice.deviceType, info_.currentAudioDevice.address, info_.isMuted);
     return ReportAudioDeviceInfo();
 }
 
 int32_t AudioDeviceManager::ReportAudioDeviceInfo()
 {
     info_.isMuted = DelayedSingleton<AudioProxy>::GetInstance()->IsMicrophoneMute();
+    TELEPHONY_LOGI("report audio device info, currentAudioDeviceType:%{public}d, currentAddress:%{public}s, "
+        "mute:%{public}d", info_.currentAudioDevice.deviceType, info_.currentAudioDevice.address, info_.isMuted);
     return DelayedSingleton<CallAbilityReportProxy>::GetInstance()->ReportAudioDeviceChange(info_);
 }
 
