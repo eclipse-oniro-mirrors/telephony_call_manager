@@ -532,6 +532,9 @@ void AudioControlManager::SetToneState(ToneState state)
 
 void AudioControlManager::SetLocalRingbackNeeded(bool isNeeded)
 {
+    if (isLocalRingbackNeeded_ && !isNeeded) {
+        StopRingback();
+    }
     isLocalRingbackNeeded_ = isNeeded;
 }
 
