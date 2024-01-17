@@ -73,7 +73,8 @@ private:
     sptr<CallBase> CreateNewCallByCallType(
         DialParaInfo &paraInfo, const CallDetailInfo &info, CallDirection dir, AppExecFwk::PacMap &extras);
     sptr<CallBase> RefreshCallIfNecessary(const sptr<CallBase> &call, const CallDetailInfo &info);
-    void CheckAndSetOriginalCallType(sptr<CallBase> &call);
+    void SetOriginalCallTypeForActiveState(sptr<CallBase> &call);
+    void SetOriginalCallTypeForDisconnectState(sptr<CallBase> &call);
     void PackParaInfo(
         DialParaInfo &paraInfo, const CallDetailInfo &info, CallDirection dir, AppExecFwk::PacMap &extras);
     int32_t UpdateCallState(sptr<CallBase> &call, TelCallState nextState);

@@ -2067,7 +2067,8 @@ HWTEST_F(BranchTest, Telephony_CallStatusManager_002, Function | MediumTest | Le
     ASSERT_GT(callStatusManager->ToSpeakerPhone(callObjectPtr), TELEPHONY_ERROR);
     ASSERT_GT(callStatusManager->TurnOffMute(callObjectPtr), TELEPHONY_ERROR);
     callObjectPtr->SetTelCallState(TelCallState::CALL_STATUS_ALERTING);
-    callStatusManager->CheckAndSetOriginalCallType(callObjectPtr);
+    callStatusManager->SetOriginalCallTypeForActiveState(callObjectPtr);
+    callStatusManager->SetOriginalCallTypeForDisconnectState(callObjectPtr);
     int32_t activeCallNum = 0;
     int32_t waitingCallNum = 0;
     int32_t slotId = 0;
