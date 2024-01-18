@@ -120,6 +120,8 @@ public:
     virtual void SetSlotId(int32_t slotId) {}
     virtual void SetCallIndex(int32_t index) {}
     virtual int32_t GetCallIndex() {return 0;}
+    int32_t SetMicPhoneState(bool isMuted);
+    bool IsMuted();
 
 protected:
     int32_t callId_;
@@ -160,6 +162,7 @@ private:
     int32_t accountId_;
     int32_t crsType_;
     int32_t originalCallType_;
+    bool isMuted_;
     std::mutex mutex_;
 };
 } // namespace Telephony

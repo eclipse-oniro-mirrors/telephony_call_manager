@@ -37,6 +37,7 @@ public:
     int32_t GetCurrentActiveCall();
     int32_t GetCallNumber(TelCallState state);
     bool ShouldSwitchState(TelCallState callState);
+    int32_t GetAudioForegroundLiveCall();
 
 private:
     std::set<int32_t> activeCalls_;

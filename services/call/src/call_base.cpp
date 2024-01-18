@@ -37,7 +37,7 @@ CallBase::CallBase(DialParaInfo &info)
       canUnHoldState_(true), canSwitchCallState_(true), answerVideoState_(0), isSpeakerphoneOn_(false),
       callEndedType_(CallEndedType::UNKNOWN), callBeginTime_(0), callEndTime_(0), ringBeginTime_(0), ringEndTime_(0),
       answerType_(CallAnswerType::CALL_ANSWER_MISSED), accountId_(info.accountId), crsType_(info.crsType),
-      originalCallType_(info.originalCallType)
+      originalCallType_(info.originalCallType), isMuted_(false)
 {
     (void)memset_s(&contactInfo_, sizeof(ContactInfo), 0, sizeof(ContactInfo));
 }
@@ -50,7 +50,7 @@ CallBase::CallBase(DialParaInfo &info, AppExecFwk::PacMap &extras)
       autoAnswerState_(false), canUnHoldState_(true), canSwitchCallState_(true), answerVideoState_(0),
       isSpeakerphoneOn_(false), callEndedType_(CallEndedType::UNKNOWN), callBeginTime_(0), callEndTime_(0),
       ringBeginTime_(0), ringEndTime_(0), answerType_(CallAnswerType::CALL_ANSWER_MISSED), accountId_(info.accountId),
-      crsType_(info.crsType), originalCallType_(info.originalCallType)
+      crsType_(info.crsType), originalCallType_(info.originalCallType), isMuted_(false)
 {
     (void)memset_s(&contactInfo_, sizeof(ContactInfo), 0, sizeof(ContactInfo));
 }
@@ -516,6 +516,17 @@ void CallBase::SetBundleName(const char *bundleName)
 void CallBase::SetCallType(CallType callType)
 {
     callType_ = callType;
+}
+
+int32_t CallBase::SetMicPhoneState(bool isMuted)
+{
+    isMuted_ = isMuted;
+    return TELEPHONY_SUCCESS;
+}
+
+bool CallBase::IsMuted()
+{
+    return isMuted_;
 }
 } // namespace Telephony
 } // namespace OHOS

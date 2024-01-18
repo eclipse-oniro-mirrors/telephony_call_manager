@@ -46,9 +46,12 @@ public:
     void ResetBtAudioDevicesList();
     void ResetDistributedCallDevicesList();
     int32_t ReportAudioDeviceChange();
+    int32_t ReportAudioDeviceInfo();
     void SetCurrentAudioDevice(AudioDeviceType deviceType);
     bool CheckAndSwitchDistributedAudioDevice();
     void OnActivedCallDisconnected();
+    void SetMuteState(bool isMuted);
+    bool GetMuteState();
 
 private:
     std::mutex mutex_;

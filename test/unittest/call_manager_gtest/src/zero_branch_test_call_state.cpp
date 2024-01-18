@@ -633,6 +633,7 @@ HWTEST_F(CallStateTest, Telephony_CallRequestProcess_002, Function | MediumTest 
     DialParaInfo mDialParaInfo;
     mDialParaInfo.accountId = 0;
     sptr<OHOS::Telephony::CallBase> callBase1 = new IMSCall(mDialParaInfo);
+    callBase1->IsMuted();
     callBase1->callState_ = TelCallState::CALL_STATUS_ACTIVE;
     callBase1->callId_ = 1;
     mDialParaInfo.accountId = 1;

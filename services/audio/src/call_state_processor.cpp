@@ -189,6 +189,23 @@ bool CallStateProcessor::UpdateCurrentCallState()
     return DelayedSingleton<AudioSceneProcessor>::GetInstance()->ProcessEvent(event);
 }
 
+int32_t CallStateProcessor::GetAudioForegroundLiveCall()
+{
+    int32_t callId = INVALID_CALLID;
+    if (activeCalls_.size() > EMPTY_VALUE) {
+        callId = *activeCalls_.begin();
+    } else if (dialingCalls_.size() > EMPTY_VALUE) {
+        callId = *dialingCalls_.begin();
+    } else if (alertingCalls_.size() > EMPTY_VALUE) {
+        callId = *alertingCalls_.begin();
+    } else if (incomingCalls_.size() > EMPTY_VALUE) {
+        callId = *incomingCalls_.begin();
+    } else if (holdingCalls_.size() > EMPTY_VALUE) {
+        callId = *holdingCalls_.begin();
+    }
+    return callId;
+}
+
 int32_t CallStateProcessor::GetCurrentActiveCall()
 {
     std::lock_guard<std::mutex> lock(mutex_);

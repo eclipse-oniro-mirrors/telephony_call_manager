@@ -48,6 +48,39 @@ void AudioControlManager::Init()
     DelayedSingleton<AudioProxy>::GetInstance()->SetAudioPreferDeviceChangeCallback();
 }
 
+void AudioControlManager::UpdateForegroundLiveCall()
+{
+    int32_t callId = DelayedSingleton<CallStateProcessor>::GetInstance()->GetAudioForegroundLiveCall();
+    if (callId == INVALID_CALLID) {
+        frontCall_ = nullptr;
+        DelayedSingleton<AudioProxy>::GetInstance()->SetMicrophoneMute(false);
+        TELEPHONY_LOGE("callId is invalid");
+        return;
+    }
+
+    sptr<CallBase> liveCall = CallObjectManager::GetOneCallObject(callId);
+    if (liveCall == nullptr) {
+        TELEPHONY_LOGE("liveCall is nullptr");
+        return;
+    }
+    if (liveCall->GetTelCallState() == TelCallState::CALL_STATUS_ACTIVE) {
+        if (frontCall_ == nullptr) {
+            frontCall_ = liveCall;
+        } else {
+            int32_t frontCallId = frontCall_->GetCallID();
+            int32_t liveCallId = liveCall->GetCallID();
+            if (frontCallId != liveCallId) {
+                frontCall_ = liveCall;
+            }
+        }
+        bool frontCallMute = frontCall_->IsMuted();
+        bool currentMute = DelayedSingleton<AudioProxy>::GetInstance()->IsMicrophoneMute();
+        if (frontCallMute != currentMute) {
+            SetMute(frontCallMute);
+        }
+    }
+}
+
 void AudioControlManager::CallStateUpdated(
     sptr<CallBase> &callObjectPtr, TelCallState priorState, TelCallState nextState)
 {
@@ -69,16 +102,10 @@ void AudioControlManager::CallStateUpdated(
     if (nextState == TelCallState::CALL_STATUS_DISCONNECTED && totalCalls_.count(callObjectPtr) > 0) {
         totalCalls_.erase(callObjectPtr);
     }
+    UpdateForegroundLiveCall();
 }
 
-void AudioControlManager::IncomingCallActivated(sptr<CallBase> &callObjectPtr)
-{
-    if (callObjectPtr == nullptr) {
-        TELEPHONY_LOGE("call object ptr nullptr");
-        return;
-    }
-    DelayedSingleton<AudioProxy>::GetInstance()->SetMicrophoneMute(false); // unmute microphone
-}
+void AudioControlManager::IncomingCallActivated(sptr<CallBase> &callObjectPtr) {}
 
 void AudioControlManager::IncomingCallHungUp(sptr<CallBase> &callObjectPtr, bool isSendSms, std::string content)
 {
@@ -87,7 +114,6 @@ void AudioControlManager::IncomingCallHungUp(sptr<CallBase> &callObjectPtr, bool
         return;
     }
     StopCallTone();
-    DelayedSingleton<AudioProxy>::GetInstance()->SetMicrophoneMute(false); // unmute microphone
 }
 
 void AudioControlManager::HandleCallStateUpdated(
@@ -170,8 +196,6 @@ void AudioControlManager::HandlePriorState(sptr<CallBase> &callObjectPtr, TelCal
             break;
         case TelCallState::CALL_STATUS_ACTIVE:
             if (stateNumber == EMPTY_VALUE) {
-                // unmute microphone while no more active call
-                DelayedSingleton<AudioProxy>::GetInstance()->SetMicrophoneMute(false);
                 event = AudioEvent::NO_MORE_ACTIVE_CALL;
             }
             StopRingback();
@@ -415,12 +439,18 @@ int32_t AudioControlManager::SetMute(bool isMute)
     if ((DelayedSingleton<CallControlManager>::GetInstance()->HasEmergency(enabled) == TELEPHONY_SUCCESS) && enabled) {
         isMute = false;
     }
-    if (DelayedSingleton<AudioProxy>::GetInstance()->SetMicrophoneMute(isMute)) {
-        TELEPHONY_LOGI("set mute success , current mute state : %{public}d", isMute);
-        return TELEPHONY_SUCCESS;
+    if (!DelayedSingleton<AudioProxy>::GetInstance()->SetMicrophoneMute(isMute)) {
+        TELEPHONY_LOGE("set mute failed");
+        return CALL_ERR_AUDIO_SETTING_MUTE_FAILED;
     }
-    TELEPHONY_LOGE("set mute failed");
-    return CALL_ERR_AUDIO_SETTING_MUTE_FAILED;
+    DelayedSingleton<AudioDeviceManager>::GetInstance()->ReportAudioDeviceInfo();
+    if (frontCall_ == nullptr) {
+        TELEPHONY_LOGE("frontCall_ is nullptr");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    frontCall_->SetMicPhoneState(isMute);
+    TELEPHONY_LOGI("SetMute success callId:%{public}d, mute:%{public}d", frontCall_->GetCallID(), isMute);
+    return TELEPHONY_SUCCESS;
 }
 
 int32_t AudioControlManager::MuteRinger()

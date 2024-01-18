@@ -114,7 +114,7 @@ void AudioDeviceManager::AddAudioDeviceList(const std::string &address, AudioDev
     if (IsDistributedAudioDeviceType(deviceType)) {
         SetDeviceAvailable(deviceType, true);
     }
-    DelayedSingleton<CallAbilityReportProxy>::GetInstance()->ReportAudioDeviceChange(info_);
+    ReportAudioDeviceInfo();
     TELEPHONY_LOGI("AddAudioDeviceList success");
 }
 
@@ -161,7 +161,7 @@ void AudioDeviceManager::RemoveAudioDeviceList(const std::string &address, Audio
         info_.audioDeviceList.push_back(audioDevice);
         TELEPHONY_LOGI("add Earpiece device success");
     }
-    DelayedSingleton<CallAbilityReportProxy>::GetInstance()->ReportAudioDeviceChange(info_);
+    ReportAudioDeviceInfo();
     TELEPHONY_LOGI("RemoveAudioDeviceList success");
 }
 
@@ -177,7 +177,7 @@ void AudioDeviceManager::ResetBtAudioDevicesList()
         }
     }
     SetDeviceAvailable(AudioDeviceType::DEVICE_BLUETOOTH_SCO, false);
-    DelayedSingleton<CallAbilityReportProxy>::GetInstance()->ReportAudioDeviceChange(info_);
+    ReportAudioDeviceInfo();
     TELEPHONY_LOGI("ResetBtAudioDevicesList success");
 }
 
@@ -430,9 +430,14 @@ int32_t AudioDeviceManager::ReportAudioDeviceChange()
             return TELEPHONY_ERR_MEMSET_FAIL;
         }
     }
+    return ReportAudioDeviceInfo();
+}
+
+int32_t AudioDeviceManager::ReportAudioDeviceInfo()
+{
     info_.isMuted = DelayedSingleton<AudioProxy>::GetInstance()->IsMicrophoneMute();
-    TELEPHONY_LOGI("report audio device info, currentAudioDeviceType:%{public}d, currentAddress:%{public}s",
-        info_.currentAudioDevice.deviceType, info_.currentAudioDevice.address);
+    TELEPHONY_LOGI("report audio device info, currentAudioDeviceType:%{public}d, currentAddress:%{public}s, "
+        "mute:%{public}d", info_.currentAudioDevice.deviceType, info_.currentAudioDevice.address, info_.isMuted);
     return DelayedSingleton<CallAbilityReportProxy>::GetInstance()->ReportAudioDeviceChange(info_);
 }
 
