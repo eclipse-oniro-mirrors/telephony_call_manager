@@ -66,7 +66,9 @@ private:
     int32_t DisconnectedHandle(const CallDetailInfo &info);
     void IsCanUnHold(int32_t activeCallNum, int32_t waitingCallNum, int32_t size, bool &canUnHold);
     void AutoAnswer(int32_t activeCallNum, int32_t waitingCallNum);
-    void AutoAnswerForDsda(bool canSwitchCallState, TelCallState priorState, int32_t activeCallNum, int32_t slotId);
+    void AutoHandleForDsda(
+        bool canSwitchCallState, TelCallState priorState, int32_t activeCallNum, int32_t slotId, bool continueAnswer);
+    void AutoAnswerForVoiceCall(sptr<CallBase> ringCall, int32_t slotId, bool continueAnswer);
     void AutoAnswerForVideoCall(int32_t activeCallNum);
     void AutoUnHoldForDsda(bool canSwitchCallState, TelCallState priorState, int32_t activeCallNum, int32_t slotId);
     sptr<CallBase> CreateNewCall(const CallDetailInfo &info, CallDirection dir);

@@ -579,9 +579,9 @@ int32_t CallStatusManager::HoldingHandle(const CallDetailInfo &info)
         int32_t conferenceId = ERR_ID;
         call->GetMainCallId(conferenceId);
         if (confState != TelConferenceState::TEL_CONFERENCE_IDLE && conferenceId == callId) {
-            AutoAnswerForDsda(canSwitchCallState, priorState, activeCallNum, call->GetSlotId());
+            AutoHandleForDsda(canSwitchCallState, priorState, activeCallNum, call->GetSlotId(), false);
         } else if (confState == TelConferenceState::TEL_CONFERENCE_IDLE) {
-            AutoAnswerForDsda(canSwitchCallState, priorState, activeCallNum, call->GetSlotId());
+            AutoHandleForDsda(canSwitchCallState, priorState, activeCallNum, call->GetSlotId(), false);
         }
     }
     return ret;
@@ -700,7 +700,7 @@ int32_t CallStatusManager::DisconnectedHandle(const CallDetailInfo &info)
     } else if (dsdsMode == static_cast<int32_t>(DsdsMode::DSDS_MODE_V5_DSDA) ||
                dsdsMode == static_cast<int32_t>(DsdsMode::DSDS_MODE_V5_TDM)) {
         bool canSwitchCallState = call->GetCanSwitchCallState();
-        AutoAnswerForDsda(canSwitchCallState, priorState, activeCallNum, call->GetSlotId());
+        AutoHandleForDsda(canSwitchCallState, priorState, activeCallNum, call->GetSlotId(), true);
     }
     return ret;
 }
@@ -717,13 +717,11 @@ void CallStatusManager::IsCanUnHold(int32_t activeCallNum, int32_t waitingCallNu
     TELEPHONY_LOGI("CanUnHold state: %{public}d", canUnHold);
 }
 
-void CallStatusManager::AutoAnswerForDsda(
-    bool canSwitchCallState, TelCallState priorState, int32_t activeCallNum, int32_t slotId)
+void CallStatusManager::AutoHandleForDsda(
+    bool canSwitchCallState, TelCallState priorState, int32_t activeCallNum, int32_t slotId, bool continueAnswer)
 {
     int32_t dialingCallNum = GetCallNum(TelCallState::CALL_STATUS_DIALING);
     int32_t alertingCallNum = GetCallNum(TelCallState::CALL_STATUS_ALERTING);
-    int32_t waitingCallNum = GetCallNum(TelCallState::CALL_STATUS_WAITING);
-    int32_t answeredCallNum = GetCallNum(TelCallState::CALL_STATUS_ANSWERED);
     std::list<int32_t> callIdList;
     GetCarrierCallList(callIdList);
     for (int32_t ringCallId : callIdList) {
@@ -736,11 +734,9 @@ void CallStatusManager::AutoAnswerForDsda(
                 AutoAnswerForVideoCall(activeCallNum);
                 return;
             }
-            if (dialingCallNum == 0 && alertingCallNum == 0 && activeCallNum == 0 && answeredCallNum == 0 &&
+            if (dialingCallNum == 0 && alertingCallNum == 0 && activeCallNum == 0 &&
                 ringCall->GetCallRunningState() == CallRunningState::CALL_RUNNING_STATE_RINGING) {
-                int ret = ringCall->AnswerCall(ringCall->GetAnswerVideoState());
-                TELEPHONY_LOGI("ret = %{public}d", ret);
-                ringCall->SetAutoAnswerState(false);
+                AutoAnswerForVoiceCall(ringCall, slotId, continueAnswer);
                 return;
             }
         }
@@ -753,7 +749,6 @@ void CallStatusManager::AutoUnHoldForDsda(
 {
     int32_t dialingCallNum = GetCallNum(TelCallState::CALL_STATUS_DIALING);
     int32_t waitingCallNum = GetCallNum(TelCallState::CALL_STATUS_WAITING);
-    int32_t answeredCallNum = GetCallNum(TelCallState::CALL_STATUS_ANSWERED);
     int32_t callNum = 2;
     std::list<int32_t> callIdList;
     GetCarrierCallList(callIdList);
@@ -765,7 +760,7 @@ void CallStatusManager::AutoUnHoldForDsda(
         int32_t conferenceId = ERR_ID;
         otherCall->GetMainCallId(conferenceId);
         if (otherCall != nullptr && slotId != otherCall->GetSlotId() && state == TelCallState::CALL_STATUS_HOLDING &&
-            otherCall->GetCanUnHoldState() && answeredCallNum == 0 && activeCallNum == 0 && waitingCallNum == 0 &&
+            otherCall->GetCanUnHoldState() && activeCallNum == 0 && waitingCallNum == 0 &&
             dialingCallNum == 0 &&
             ((confState != TelConferenceState::TEL_CONFERENCE_IDLE && conferenceId == otherCallId) ||
                 confState == TelConferenceState::TEL_CONFERENCE_IDLE)) {
@@ -785,6 +780,18 @@ void CallStatusManager::AutoUnHoldForDsda(
             }
         }
     }
+}
+
+void CallStatusManager::AutoAnswerForVoiceCall(sptr<CallBase> ringCall, int32_t slotId, bool continueAnswer)
+{
+    /* Need to check whether the autoAnswer call and the holding call are on the same slotid
+     * To prevent repeated AT command delivery.
+     */
+    if (continueAnswer || (!continueAnswer && slotId != ringCall->GetSlotId())) {
+        int ret = ringCall->AnswerCall(ringCall->GetAnswerVideoState());
+        TELEPHONY_LOGI("ret = %{public}d", ret);
+    }
+    ringCall->SetAutoAnswerState(false);
 }
 
 void CallStatusManager::AutoAnswerForVideoCall(int32_t activeCallNum)
