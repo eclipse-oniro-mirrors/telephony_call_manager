@@ -494,10 +494,7 @@ int32_t CallStatusManager::ActiveHandle(const CallDetailInfo &info)
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     call = RefreshCallIfNecessary(call, info);
-
-    // save original call type when first time call active
-    CheckAndSetOriginalCallType(call);
-
+    SetOriginalCallTypeForActiveState(call);
     // call state change active, need to judge if launching a conference
     if (info.mpty == 1) {
         int32_t mainCallId = ERR_ID;
@@ -628,6 +625,7 @@ int32_t CallStatusManager::DisconnectingHandle(const CallDetailInfo &info)
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     call = RefreshCallIfNecessary(call, info);
+    SetOriginalCallTypeForDisconnectState(call);
     int32_t ret = UpdateCallState(call, TelCallState::CALL_STATUS_DISCONNECTING);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("UpdateCallState failed, errCode:%{public}d", ret);
@@ -644,6 +642,7 @@ int32_t CallStatusManager::DisconnectedVoipCallHandle(const CallDetailInfo &info
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     call = RefreshCallIfNecessary(call, info);
+    SetOriginalCallTypeForDisconnectState(call);
     int32_t ret = UpdateCallState(call, TelCallState::CALL_STATUS_DISCONNECTED);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("UpdateCallState failed, errCode:%{public}d", ret);
@@ -911,21 +910,42 @@ sptr<CallBase> CallStatusManager::RefreshCallIfNecessary(const sptr<CallBase> &c
     return newCall;
 }
 
-void CallStatusManager::CheckAndSetOriginalCallType(sptr<CallBase> &call)
+void CallStatusManager::SetOriginalCallTypeForActiveState(sptr<CallBase> &call)
 {
     if (call == nullptr) {
         TELEPHONY_LOGE("Call is NULL");
         return;
     }
-    // outgoing/incoming video call but answered with voice
     TelCallState priorState = call->GetTelCallState();
     VideoStateType videoState = call->GetVideoStateType();
+    int32_t videoStateHistory = call->GetOriginalCallType();
     if (priorState == TelCallState::CALL_STATUS_ALERTING || priorState == TelCallState::CALL_STATUS_INCOMING ||
         priorState == TelCallState::CALL_STATUS_WAITING) {
-        if (call->GetOriginalCallType() != static_cast<int32_t>(videoState)) {
-            TELEPHONY_LOGI("set current video state as original call type.");
+        // outgoing/incoming video call, but accepted/answered with voice call
+        if (videoStateHistory != static_cast<int32_t>(videoState)) {
+            TELEPHONY_LOGD("set videoState:%{public}d as original call type", static_cast<int32_t>(videoState));
             call->SetOriginalCallType(static_cast<int32_t>(videoState));
+        } else if (priorState == TelCallState::CALL_STATUS_ACTIVE || priorState == TelCallState::CALL_STATUS_HOLDING) {
+            int32_t videoStateCurrent = videoStateHistory | static_cast<int32_t>(videoState);
+            TELEPHONY_LOGD("maybe upgrade/downgrade operation, keep video record always, videoStateCurrent:%{public}d",
+                videoStateCurrent);
+            call->SetOriginalCallType(videoStateCurrent);
         }
+    }
+}
+
+void CallStatusManager::SetOriginalCallTypeForDisconnectState(sptr<CallBase> &call)
+{
+    if (call == nullptr) {
+        TELEPHONY_LOGE("Call is NULL");
+        return;
+    }
+    TelCallState priorState = call->GetTelCallState();
+    if (priorState == TelCallState::CALL_STATUS_ALERTING || priorState == TelCallState::CALL_STATUS_INCOMING ||
+        priorState == TelCallState::CALL_STATUS_WAITING) {
+        // outgoing/incoming video call, but canceled, rejected or missed
+        TELEPHONY_LOGD("canceled/rejected or missed call, set voice call as original call type");
+        call->SetOriginalCallType(static_cast<int32_t>(VideoStateType::TYPE_VOICE));
     }
 }
 
@@ -978,7 +998,7 @@ sptr<CallBase> CallStatusManager::CreateNewCall(const CallDetailInfo &info, Call
         return nullptr;
     }
     callPtr->SetOriginalCallType(info.originalCallType);
-    TELEPHONY_LOGI("CreateNewCall originalCallType:%{public}d", info.originalCallType);
+    TELEPHONY_LOGD("originalCallType:%{public}d", info.originalCallType);
     AddOneCallObject(callPtr);
     return callPtr;
 }

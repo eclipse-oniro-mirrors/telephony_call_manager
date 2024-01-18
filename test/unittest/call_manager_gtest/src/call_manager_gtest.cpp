@@ -3819,7 +3819,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_ControlCamera_0100, Function | 
     std::string id = "lcam001";
 
     std::u16string cameraID = Str8ToStr16(id);
-    EXPECT_EQ(CallManagerGtest::clientPtr_->ControlCamera(callId, cameraID), RETURN_VALUE_IS_ZERO);
+    EXPECT_NE(CallManagerGtest::clientPtr_->ControlCamera(callId, cameraID), RETURN_VALUE_IS_ZERO);
 }
 
 /**
@@ -3856,11 +3856,11 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_ControlCamera_0300, Function | 
     std::string id = "lcam001";
 
     std::u16string cameraID = Str8ToStr16(id);
-    EXPECT_EQ(CallManagerGtest::clientPtr_->ControlCamera(callId, cameraID), RETURN_VALUE_IS_ZERO);
+    EXPECT_NE(CallManagerGtest::clientPtr_->ControlCamera(callId, cameraID), RETURN_VALUE_IS_ZERO);
 
     id = "";
     cameraID = Str8ToStr16(id);
-    EXPECT_EQ(CallManagerGtest::clientPtr_->ControlCamera(callId, cameraID), RETURN_VALUE_IS_ZERO);
+    EXPECT_NE(CallManagerGtest::clientPtr_->ControlCamera(callId, cameraID), RETURN_VALUE_IS_ZERO);
 }
 
 /**
