@@ -1206,7 +1206,7 @@ napi_value NapiCallManager::Dial(napi_env env, napi_callback_info info)
 bool NapiCallManager::MatchStringAndVariableObjectParameters(
     napi_env env, const napi_value parameters[], const size_t parameterCount)
 {
-    TELEPHONY_LOGI("Telephony_CallManager MatchStringAndVariableObjectParameters %{public}zu", parameterCount);
+    TELEPHONY_LOGD("Telephony_CallManager MatchStringAndVariableObjectParameters %{public}zu", parameterCount);
     switch (parameterCount) {
         case ONLY_ONE_VALUE:
             return NapiUtil::MatchParameters(env, parameters, { napi_string });
@@ -3699,7 +3699,7 @@ void NapiCallManager::NativeFormatNumberCallBack(napi_env env, napi_status statu
             napi_create_string_utf8(env, Str16ToStr8(formatNumberContext->formatNumber).data(),
                 formatNumberContext->formatNumber.length(), &promiseValue);
             napi_status ret = napi_resolve_deferred(env, formatNumberContext->deferred, promiseValue);
-            TELEPHONY_LOGI("promise successful result = %{public}d", ret);
+            TELEPHONY_LOGD("promise successful result = %{public}d", ret);
         } else {
             JsError error = NapiUtil::ConverErrorMessageForJs(formatNumberContext->errorCode);
             napi_status ret = napi_reject_deferred(env, formatNumberContext->deferred,
