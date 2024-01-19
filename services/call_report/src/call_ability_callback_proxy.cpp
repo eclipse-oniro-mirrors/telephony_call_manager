@@ -53,6 +53,8 @@ int32_t CallAbilityCallbackProxy::OnCallDetailsChange(const CallAttributeInfo &i
     dataParcel.WriteInt32(static_cast<int32_t>(info.callDirection));
     dataParcel.WriteInt32(static_cast<int32_t>(info.answerType));
     dataParcel.WriteInt32(info.index);
+    dataParcel.WriteInt32(info.crsType);
+    dataParcel.WriteInt32(info.originalCallType);
     dataParcel.WriteString(info.voipCallInfo.voipCallId);
     dataParcel.WriteString(info.voipCallInfo.userName);
     dataParcel.WriteString(info.voipCallInfo.abilityName);

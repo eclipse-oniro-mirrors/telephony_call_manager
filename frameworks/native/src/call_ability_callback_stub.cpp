@@ -105,6 +105,8 @@ int32_t CallAbilityCallbackStub::OnUpdateCallStateInfo(MessageParcel &data, Mess
     parcelPtr.callDirection = static_cast<CallDirection>(data.ReadInt32());
     parcelPtr.answerType = static_cast<CallAnswerType>(data.ReadInt32());
     parcelPtr.index = data.ReadInt32();
+    parcelPtr.crsType = data.ReadInt32();
+    parcelPtr.originalCallType = data.ReadInt32();
     parcelPtr.voipCallInfo.voipCallId = data.ReadString();
     parcelPtr.voipCallInfo.userName = data.ReadString();
     parcelPtr.voipCallInfo.abilityName = data.ReadString();
