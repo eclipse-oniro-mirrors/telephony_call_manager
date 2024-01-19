@@ -55,6 +55,7 @@ void CallConnectAbility::ConnectAbility(const CallAttributeInfo &info)
     wantParams.SetParam("conferenceState", AAFwk::Integer::Box(static_cast<int32_t>(info.conferenceState)));
     wantParams.SetParam("crsType", AAFwk::Integer::Box(static_cast<int32_t>(info.crsType)));
     wantParams.SetParam("originalCallType", AAFwk::Integer::Box(static_cast<int32_t>(info.originalCallType)));
+    TELEPHONY_LOGI("ConnectAbility crsType = %{public}d", info.crsType);
     if (info.callType == CallType::TYPE_VOIP) {
         TELEPHONY_LOGI("Connect callui ability voip call");
         wantParams.SetParam("userName", AAFwk::String::Box(std::string(info.voipCallInfo.userName)));
