@@ -305,8 +305,8 @@ int32_t CallStatusManager::HandleOttEventReportInfo(const OttCallEventInfo &info
 
 int32_t CallStatusManager::IncomingHandle(const CallDetailInfo &info)
 {
-    sptr<CallBase> call = GetOneCallObjectByIndex(info.index);
-    if (call != nullptr && call->GetCallType() != info.callType) {
+    sptr<CallBase> call = GetOneCallObjectByIndexAndSlotId(info.index, info.accountId);
+    if (call != nullptr && (call->GetCallType() != info.callType || call->GetTelCallState() != info.state)) {
         call = RefreshCallIfNecessary(call, info);
         return TELEPHONY_SUCCESS;
     }
