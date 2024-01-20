@@ -36,7 +36,6 @@ VoipCallConnection::~VoipCallConnection()
 
 void VoipCallConnection::Init(int32_t systemAbilityId)
 {
-    TELEPHONY_LOGI("VoipCallConnection Init start");
     if (connectCallManagerState_) {
         TELEPHONY_LOGE("Init, connectState is true");
         return;
@@ -44,12 +43,36 @@ void VoipCallConnection::Init(int32_t systemAbilityId)
     systemAbilityId_ = systemAbilityId;
     TELEPHONY_LOGI("systemAbilityId_ = %{public}d", systemAbilityId);
     GetCallManagerProxy();
-    TELEPHONY_LOGI("connected to voip call proxy successfully!");
+    statusChangeListener_ = new (std::nothrow) SystemAbilityListener();
+    if (statusChangeListener_ == nullptr) {
+        TELEPHONY_LOGE("Init, failed to create statusChangeListener.");
+        return;
+    }
+    sptr<ISystemAbilityManager> managerPtr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (managerPtr == nullptr) {
+        TELEPHONY_LOGE("voipconnect managerPtr is null");
+        return;
+    }
+    int32_t ret = managerPtr->SubscribeSystemAbility(systemAbilityId_, statusChangeListener_);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("Init, failed to subscribe sa:%{public}d", systemAbilityId_);
+        return;
+    }
+    TELEPHONY_LOGI("subscribe voip call manager successfully!");
 }
 
 void VoipCallConnection::UnInit()
 {
     voipCallManagerInterfacePtr_ = nullptr;
+    connectCallManagerState_ = false;
+    if (statusChangeListener_ != nullptr) {
+        auto samgrProxy = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+        if (samgrProxy != nullptr) {
+            samgrProxy->UnSubscribeSystemAbility(systemAbilityId_, statusChangeListener_);
+            statusChangeListener_ = nullptr;
+        }
+    }
+    TELEPHONY_LOGI("voip call connection uninit");
 }
 
 int32_t VoipCallConnection::GetCallManagerProxy()
@@ -123,8 +146,8 @@ int32_t VoipCallConnection::RegisterCallManagerCallBack(const sptr<ICallStatusCa
 int32_t VoipCallConnection::UnRegisterCallManagerCallBack()
 {
     GetCallManagerProxy();
-    TELEPHONY_LOGI("Voipconnect UnRegisterCallManagerCallBack voipCallManagerInterfacePtr_ is null");
     if (voipCallManagerInterfacePtr_ == nullptr) {
+        TELEPHONY_LOGI("Voipconnect UnRegisterCallManagerCallBack voipCallManagerInterfacePtr_ is null");
         return TELEPHONY_ERROR;
     }
     int32_t ret = voipCallManagerInterfacePtr_->UnRegisterCallManagerCallBack();
@@ -132,5 +155,41 @@ int32_t VoipCallConnection::UnRegisterCallManagerCallBack()
     return ret;
 }
 
+void VoipCallConnection::SystemAbilityListener::OnAddSystemAbility(int32_t systemAbilityId, const std::string &deviceId)
+{
+    auto voipCallConnection = DelayedSingleton<VoipCallConnection>::GetInstance();
+    if (voipCallConnection == nullptr) {
+        TELEPHONY_LOGE("voipCallConnection is nullptr");
+        return;
+    }
+    voipCallConnection->Init(systemAbilityId);
+}
+
+void VoipCallConnection::SystemAbilityListener::OnRemoveSystemAbility(
+    int32_t systemAbilityId, const std::string &deviceId)
+{
+    auto voipCallConnection = DelayedSingleton<VoipCallConnection>::GetInstance();
+    if (voipCallConnection == nullptr) {
+        TELEPHONY_LOGE("voipCallConnection is nullptr");
+        return;
+    }
+    voipCallConnection->ClearVoipCall();
+    voipCallConnection->UnInit();
+}
+
+void VoipCallConnection::ClearVoipCall()
+{
+    if (!CallObjectManager::HasVoipCallExist()) {
+        TELEPHONY_LOGI("no voip call exist, no need to clear");
+        return;
+    }
+    std::list<sptr<CallBase>> allCallList = CallObjectManager::GetAllCallList();
+    for (auto call : allCallList) {
+        if (call != nullptr && call->GetCallType() == CallType::TYPE_VOIP) {
+            TELEPHONY_LOGI("clearVoipCall callId %{public}d", call->GetCallID());
+            CallObjectManager::DeleteOneCallObject(call);
+        }
+    }
+}
 } // namespace Telephony
 } // namespace OHOS
