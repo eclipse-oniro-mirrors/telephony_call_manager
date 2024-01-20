@@ -925,12 +925,12 @@ void CallStatusManager::SetOriginalCallTypeForActiveState(sptr<CallBase> &call)
         if (videoStateHistory != static_cast<int32_t>(videoState)) {
             TELEPHONY_LOGD("set videoState:%{public}d as original call type", static_cast<int32_t>(videoState));
             call->SetOriginalCallType(static_cast<int32_t>(videoState));
-        } else if (priorState == TelCallState::CALL_STATUS_ACTIVE || priorState == TelCallState::CALL_STATUS_HOLDING) {
-            int32_t videoStateCurrent = videoStateHistory | static_cast<int32_t>(videoState);
-            TELEPHONY_LOGD("maybe upgrade/downgrade operation, keep video record always, videoStateCurrent:%{public}d",
-                videoStateCurrent);
-            call->SetOriginalCallType(videoStateCurrent);
         }
+    } else if (priorState == TelCallState::CALL_STATUS_ACTIVE || priorState == TelCallState::CALL_STATUS_HOLDING) {
+        int32_t videoStateCurrent = videoStateHistory | static_cast<int32_t>(videoState);
+        TELEPHONY_LOGD("maybe upgrade/downgrade operation, keep video record always, videoStateCurrent:%{public}d",
+            videoStateCurrent);
+        call->SetOriginalCallType(videoStateCurrent);
     }
 }
 

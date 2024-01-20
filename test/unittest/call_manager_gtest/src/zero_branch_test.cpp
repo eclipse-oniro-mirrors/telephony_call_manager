@@ -2069,6 +2069,8 @@ HWTEST_F(BranchTest, Telephony_CallStatusManager_002, Function | MediumTest | Le
     callObjectPtr->SetTelCallState(TelCallState::CALL_STATUS_ALERTING);
     callStatusManager->SetOriginalCallTypeForActiveState(callObjectPtr);
     callStatusManager->SetOriginalCallTypeForDisconnectState(callObjectPtr);
+    callObjectPtr->SetTelCallState(TelCallState::CALL_STATUS_ACTIVE);
+    callStatusManager->SetOriginalCallTypeForActiveState(callObjectPtr);
     int32_t activeCallNum = 0;
     int32_t waitingCallNum = 0;
     int32_t slotId = 0;
