@@ -722,6 +722,7 @@ HWTEST_F(CallStateTest, Telephony_VoipCallConnection_001, Function | MediumTest 
     voipCallConnection->RejectCall(voipCallEventInfo);
     sptr<ICallStatusCallback> callStatusCallback = nullptr;
     voipCallConnection->RegisterCallManagerCallBack(callStatusCallback);
+    voipCallConnection->ClearVoipCall();
     voipCallConnection->UnRegisterCallManagerCallBack();
 }
 } // namespace Telephony

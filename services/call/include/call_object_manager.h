@@ -68,6 +68,9 @@ public:
     static std::vector<CallAttributeInfo> GetAllCallInfoList();
     int32_t DealFailDial(sptr<CallBase> call);
     static bool HasVideoCall();
+    static std::list<sptr<CallBase>> GetAllCallList();
+    static bool HasCellularCallExist();
+    static bool HasVoipCallExist();
 
 protected:
     static std::condition_variable cv_;

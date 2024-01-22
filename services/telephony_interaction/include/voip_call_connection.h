@@ -40,18 +40,25 @@ public:
     int32_t AnswerCall(const VoipCallEventInfo &events, int32_t videoState);
     int32_t RejectCall(const VoipCallEventInfo &events);
     int32_t HangUpCall(const VoipCallEventInfo &events);
-
+    void ClearVoipCall();
     int32_t RegisterCallManagerCallBack(const sptr<ICallStatusCallback> &callback);
-
     int32_t UnRegisterCallManagerCallBack();
 
 private:
+    class SystemAbilityListener : public SystemAbilityStatusChangeStub {
+    public:
+        SystemAbilityListener() = default;
+        ~SystemAbilityListener() = default;
+        void OnAddSystemAbility(int32_t systemAbilityId, const std::string &deviceId) override;
+        void OnRemoveSystemAbility(int32_t systemAbilityId, const std::string &deviceId) override;
+    };
 #ifndef TELEPHONY_VOIP_CALL_MANAGER_SYS_ABILITY_ID
 #define TELEPHONY_VOIP_CALL_MANAGER_SYS_ABILITY_ID 65968
 #endif
     int32_t systemAbilityId_ = TELEPHONY_VOIP_CALL_MANAGER_SYS_ABILITY_ID;
     sptr<ICallStatusCallback> voipCallCallbackPtr_;
     sptr<IVoipCallManagerService> voipCallManagerInterfacePtr_ = nullptr;
+    sptr<ISystemAbilityStatusChange> statusChangeListener_ = nullptr;
     bool connectCallManagerState_ = false;
     Utils::RWLock rwClientLock_;
 };

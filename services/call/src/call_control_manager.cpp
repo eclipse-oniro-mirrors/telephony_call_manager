@@ -287,7 +287,7 @@ int32_t CallControlManager::HangUpCall(int32_t callId)
 int32_t CallControlManager::GetCallState()
 {
     CallStateToApp callState = CallStateToApp::CALL_STATE_UNKNOWN;
-    if (!HasCallExist()) {
+    if (!HasCellularCallExist()) {
         callState = CallStateToApp::CALL_STATE_IDLE;
     } else {
         callState = CallStateToApp::CALL_STATE_OFFHOOK;

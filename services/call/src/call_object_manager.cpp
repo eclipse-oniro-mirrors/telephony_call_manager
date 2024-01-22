@@ -332,13 +332,43 @@ bool CallObjectManager::HasCallExist()
     return true;
 }
 
+std::list<sptr<CallBase>> CallObjectManager::GetAllCallList()
+{
+    std::lock_guard<std::mutex> lock(listMutex_);
+    return callObjectPtrList_;
+}
+
+bool CallObjectManager::HasCellularCallExist()
+{
+    std::lock_guard<std::mutex> lock(listMutex_);
+    std::list<sptr<CallBase>>::iterator it;
+    for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
+        if ((*it)->GetCallType() == CallType::TYPE_CS || (*it)->GetCallType() == CallType::TYPE_IMS ||
+            (*it)->GetCallType() == CallType::TYPE_SATELLITE) {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool CallObjectManager::HasVoipCallExist()
+{
+    std::lock_guard<std::mutex> lock(listMutex_);
+    std::list<sptr<CallBase>>::iterator it;
+    for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
+        if ((*it)->GetCallType() == CallType::TYPE_VOIP) {
+            return true;
+        }
+    }
+    return false;
+}
+
 bool CallObjectManager::HasVideoCall()
 {
     std::lock_guard<std::mutex> lock(listMutex_);
     std::list<sptr<CallBase>>::iterator it;
     for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
-        // Count the number of calls in the ringing state
-        if ((*it)->GetVideoStateType() == VideoStateType::TYPE_VIDEO) {
+        if ((*it)->GetVideoStateType() == VideoStateType::TYPE_VIDEO && (*it)->GetCallType() != CallType::TYPE_VOIP) {
             return true;
         }
     }
