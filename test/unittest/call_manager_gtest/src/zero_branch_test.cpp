@@ -2077,7 +2077,7 @@ HWTEST_F(BranchTest, Telephony_CallStatusManager_002, Function | MediumTest | Le
     callStatusManager->AutoAnswer(activeCallNum, waitingCallNum);
     bool canSwitchCallState = 1;
     TelCallState priorState = TelCallState::CALL_STATUS_DISCONNECTING;
-    callStatusManager->AutoAnswerForDsda(canSwitchCallState, priorState, activeCallNum, slotId);
+    callStatusManager->AutoHandleForDsda(canSwitchCallState, priorState, activeCallNum, slotId, true);
     callStatusManager->AutoUnHoldForDsda(canSwitchCallState, priorState, activeCallNum, slotId);
     callStatusManager->AutoAnswerForVideoCall(activeCallNum);
 }
