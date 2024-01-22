@@ -167,10 +167,11 @@ int32_t CallObjectManager::IsNewCallAllowedCreate(bool &enabled)
     enabled = true;
     std::list<sptr<CallBase>>::iterator it;
     for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
-        if ((*it)->GetCallRunningState() == CallRunningState::CALL_RUNNING_STATE_CREATE ||
+        if ((*it)->GetCallType() != CallType::TYPE_VOIP &&
+            ((*it)->GetCallRunningState() == CallRunningState::CALL_RUNNING_STATE_CREATE ||
             (*it)->GetCallRunningState() == CallRunningState::CALL_RUNNING_STATE_CONNECTING ||
             (*it)->GetCallRunningState() == CallRunningState::CALL_RUNNING_STATE_DIALING ||
-            (*it)->GetCallRunningState() == CallRunningState::CALL_RUNNING_STATE_RINGING) {
+            (*it)->GetCallRunningState() == CallRunningState::CALL_RUNNING_STATE_RINGING)) {
             TELEPHONY_LOGE("there is already a new call, please redial later");
             enabled = false;
             return TELEPHONY_ERR_SUCCESS;
