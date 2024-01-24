@@ -82,7 +82,7 @@ int32_t CallObjectManager::AddOneCallObject(sptr<CallBase> &call)
 
 int32_t CallObjectManager::DeleteOneCallObject(int32_t callId)
 {
-    std::lock_guard<std::mutex> lock(listMutex_);
+    std::unique_lock<std::mutex> lock(listMutex_);
     std::list<sptr<CallBase>>::iterator it;
     for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
         if ((*it)->GetCallID() == callId) {
@@ -92,6 +92,7 @@ int32_t CallObjectManager::DeleteOneCallObject(int32_t callId)
         }
     }
     if (callObjectPtrList_.size() == NO_CALL_EXIST) {
+        lock.unlock();
         DelayedSingleton<CallConnectAbility>::GetInstance()->DisconnectAbility();
     }
     return TELEPHONY_SUCCESS;
@@ -103,9 +104,10 @@ void CallObjectManager::DeleteOneCallObject(sptr<CallBase> &call)
         TELEPHONY_LOGE("call is null!");
         return;
     }
-    std::lock_guard<std::mutex> lock(listMutex_);
+    std::unique_lock<std::mutex> lock(listMutex_);
     callObjectPtrList_.remove(call);
     if (callObjectPtrList_.size() == 0) {
+        lock.unlock();
         DelayedSingleton<CallConnectAbility>::GetInstance()->DisconnectAbility();
     }
     TELEPHONY_LOGI("DeleteOneCallObject success! callList size:%{public}zu", callObjectPtrList_.size());
