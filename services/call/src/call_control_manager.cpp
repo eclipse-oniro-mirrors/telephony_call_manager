@@ -1160,7 +1160,6 @@ int32_t CallControlManager::AddCallLogAndNotification(sptr<CallBase> &callObject
         TELEPHONY_LOGE("callStateListenerPtr_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    callStateListenerPtr_->RemoveAllObserver();
     if (callObjectPtr == nullptr) {
         TELEPHONY_LOGE("callObjectPtr is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -1174,6 +1173,7 @@ int32_t CallControlManager::AddCallLogAndNotification(sptr<CallBase> &callObject
     }
     missedCallNotification_->PublishMissedCallEvent(callObjectPtr);
     missedCallNotification_->PublishMissedCallNotification(callObjectPtr);
+    DelayedSingleton<CallRecordsHandlerService>::GetInstance()->QueryUnReadMissedCallLog();
     return TELEPHONY_SUCCESS;
 }
 

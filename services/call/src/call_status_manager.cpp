@@ -337,6 +337,7 @@ int32_t CallStatusManager::IncomingHandle(const CallDetailInfo &info)
     if (state == (int32_t)CallStateToApp::CALL_STATE_RINGING) {
         return HandleRejectCall(call);
     }
+    AddOneCallObject(call);
     DelayedSingleton<CallControlManager>::GetInstance()->NotifyNewCallCreated(call);
     ret = UpdateCallState(call, info.state);
     if (ret != TELEPHONY_SUCCESS) {
@@ -400,6 +401,7 @@ int32_t CallStatusManager::IncomingVoipCallHandle(const CallDetailInfo &info)
         return TELEPHONY_SUCCESS;
     }
     call = CreateNewCall(info, CallDirection::CALL_DIRECTION_IN);
+    AddOneCallObject(call);
     if (call == nullptr) {
         TELEPHONY_LOGE("CreateVoipCall failed!");
         return CALL_ERR_CALL_OBJECT_IS_NULL;
@@ -444,6 +446,7 @@ void CallStatusManager::CallFilterCompleteResult(const CallDetailInfo &info)
 {
     int32_t ret = TELEPHONY_ERR_FAIL;
     sptr<CallBase> call = CreateNewCall(info, CallDirection::CALL_DIRECTION_IN);
+    AddOneCallObject(call);
     if (call == nullptr) {
         TELEPHONY_LOGE("CreateNewCall failed!");
         return;
@@ -500,6 +503,7 @@ int32_t CallStatusManager::DialingHandle(const CallDetailInfo &info)
         return UpdateDialingCallInfo(info);
     }
     sptr<CallBase> call = CreateNewCall(info, CallDirection::CALL_DIRECTION_OUT);
+    AddOneCallObject(call);
     if (call == nullptr) {
         TELEPHONY_LOGE("CreateNewCall failed!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -927,6 +931,7 @@ sptr<CallBase> CallStatusManager::RefreshCallIfNecessary(const sptr<CallBase> &c
     (void)memset_s(&attrInfo, sizeof(CallAttributeInfo), 0, sizeof(CallAttributeInfo));
     call->GetCallAttributeBaseInfo(attrInfo);
     sptr<CallBase> newCall = CreateNewCall(info, attrInfo.callDirection);
+    AddOneCallObject(newCall);
     if (newCall == nullptr) {
         TELEPHONY_LOGE("RefreshCallIfNecessary createCallFail");
         return call;
@@ -1038,7 +1043,6 @@ sptr<CallBase> CallStatusManager::CreateNewCall(const CallDetailInfo &info, Call
     }
     callPtr->SetOriginalCallType(info.originalCallType);
     TELEPHONY_LOGD("originalCallType:%{public}d", info.originalCallType);
-    AddOneCallObject(callPtr);
     return callPtr;
 }
 
