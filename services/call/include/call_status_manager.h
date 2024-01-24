@@ -85,6 +85,8 @@ private:
     int32_t IncomingFilterPolicy(const CallDetailInfo &info);
     void QueryCallerInfo(ContactInfo &contactInfo, std::string phoneNum);
     int32_t UpdateDialingCallInfo(const CallDetailInfo &info);
+    void SetContactInfo(sptr<CallBase> &call, std::string phoneNum);
+    int32_t HandleRejectCall(sptr<CallBase> &call);
 
 private:
     CallDetailInfo callReportInfo_;

@@ -331,35 +331,11 @@ int32_t CallStatusManager::IncomingHandle(const CallDetailInfo &info)
         TELEPHONY_LOGE("CreateNewCall failed!");
         return CALL_ERR_CALL_OBJECT_IS_NULL;
     }
-
-    // allow list filtering
-    // Get the contact data from the database
-    ContactInfo contactInfo = {
-        .name = "",
-        .number = "",
-        .isContacterExists = false,
-        .ringtonePath = "",
-        .isSendToVoicemail = false,
-        .isEcc = false,
-        .isVoiceMail = false,
-    };
-    QueryCallerInfo(contactInfo, std::string(info.phoneNum));
-    call->SetCallerInfo(contactInfo);
+    SetContactInfo(call, std::string(info.phoneNum));
     int32_t state;
     DelayedSingleton<CallControlManager>::GetInstance()->GetVoIPCallState(state);
     if (state == (int32_t)CallStateToApp::CALL_STATE_RINGING) {
-        ret = call->SetTelCallState(TelCallState::CALL_STATUS_INCOMING);
-        if (ret != TELEPHONY_SUCCESS && RET != CALL_ERR_NOT_NEW_STATE) {
-            TELEPHONY_LOGE("SatCallState failed!");
-            return ret;
-        }
-        ret = call->RejectCall();
-        if (ret != TELEPHONY_SUCCESS) {
-            TELEPHONY_LOGE("RejectCall failed!");
-            return ret;
-        }
-        ret = DelayedSingleton<CallControlManager>::GetInstance()->AddCallLogAndNotification(call);
-        return ret;
+        return HandleRejectCall(call);
     }
     DelayedSingleton<CallControlManager>::GetInstance()->NotifyNewCallCreated(call);
     ret = UpdateCallState(call, info.state);
@@ -372,6 +348,47 @@ int32_t CallStatusManager::IncomingHandle(const CallDetailInfo &info)
         TELEPHONY_LOGE("FilterResultsDispose failed!");
     }
     return ret;
+}
+
+void CallStatusManager::SetContactInfo(sptr<CallBase> &call, std::string phoneNum)
+{
+    if (call == nullptr) {
+        TELEPHONY_LOGE("CreateVoipCall failed!");
+        return;
+    }
+    // allow list filtering
+    // Get the contact data from the database
+    ContactInfo contactInfo = {
+        .name = "",
+        .number = "",
+        .isContacterExists = false,
+        .ringtonePath = "",
+        .isSendToVoicemail = false,
+        .isEcc = false,
+        .isVoiceMail = false,
+    };
+    QueryCallerInfo(contactInfo, phoneNum);
+    call->SetCallerInfo(contactInfo);
+}
+
+int32_t CallStatusManager::HandleRejectCall(sptr<CallBase> &call)
+{
+    if (call == nullptr) {
+        TELEPHONY_LOGE("CreateVoipCall failed!");
+        return;
+    }
+    call->SetTelCallState(TelCallState::CALL_STATUS_INCOMING);
+    int32_t ret = TELEPHONY_SUCCESS;
+    if (ret != TELEPHONY_SUCCESS && ret != CALL_ERR_NOT_NEW_STATE) {
+        TELEPHONY_LOGE("SatCallState failed!");
+        return ret;
+    }
+    ret = call->RejectCall();
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("RejectCall failed!");
+        return ret;
+    }
+    return DelayedSingleton<CallControlManager>::GetInstance()->AddCallLogAndNotification(call);
 }
 
 int32_t CallStatusManager::IncomingVoipCallHandle(const CallDetailInfo &info)
