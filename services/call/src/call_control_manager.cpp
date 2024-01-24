@@ -359,7 +359,7 @@ int32_t CallControlManager::SwitchCall(int32_t callId)
 
 bool CallControlManager::HasCall()
 {
-    return HasCallExist();
+    return HasCellularCallExist();
 }
 
 int32_t CallControlManager::IsNewCallAllowed(bool &enabled)
@@ -1097,20 +1097,18 @@ int32_t CallControlManager::SetVoIPCallState(int32_t state)
     TELEPHONY_LOGI("VoIP state is %{public}d", state);
     VoIPCallState_ = (CallStateToApp)state;
     if (VoIPCallState_ == CallStateToApp::CALL_STATE_ANSWERED) {
-        TELEPHONY_LOGI("VoIP answered the call, should hangup sim calls");
-        std::list<int32_t> callIdList;
-        int32_t ret = GetCarrierCallList(callIdList);
-        if (ret != TELEPHONY_SUCCESS) {
-            TELEPHONY_LOGE("GetCarrierCallList failed!");
-            return ret;
-        }
-        for (auto call : callIdList) {
-            ret = HangUpCall(call);
+        TELEPHONY_LOGI("VoIP answered the call, should hangup all calls");
+        std::list<sptr<CallBase>> allCallList = CallObjectManager::GetAllCallList();
+        for (auto call : allCallList) {
+            int32_t ret = HangUpCall(call->GetCallID());
             if (ret != TELEPHONY_SUCCESS) {
-                TELEPHONY_LOGE("hangup call %{public}d failed!", call);
+                TELEPHONY_LOGE("hangup call %{public}d failed!", call->GetCallID());
                 return ret;
             }
         }
+    }
+    if (VoIPCallState_ == CallStateToApp::CALL_STATE_OFFHOOK) {
+        HangUpVoipCall();
     }
     if (VoIPCallState_ == CallStateToApp::CALL_STATE_IDLE) {
             TELEPHONY_LOGI("VoIP call state is not active");
@@ -1118,7 +1116,23 @@ int32_t CallControlManager::SetVoIPCallState(int32_t state)
                 TELEPHONY_LOGI("answer call now");
                 AnsweredCallQueue_.hasCall = false;
                 return AnswerCall(AnsweredCallQueue_.callId, AnsweredCallQueue_.videoState);
+        }
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallControlManager::HangUpVoipCall()
+{
+    std::list<sptr<CallBase>> allCallList = CallObjectManager::GetAllCallList();
+    for (auto call : allCallList) {
+        if (call != nullptr && call->GetCallType() == CallType::TYPE_VOIP) {
+            TELEPHONY_LOGI("HangUp VoipCall callId %{public}d", call->GetCallID());
+            int32_t ret = HangUpCall(call->GetCallID());
+            if (ret != TELEPHONY_SUCCESS) {
+                TELEPHONY_LOGE("hangup voip call %{public}d failed!", call->GetCallID());
+                return ret;
             }
+        }
     }
     return TELEPHONY_SUCCESS;
 }
