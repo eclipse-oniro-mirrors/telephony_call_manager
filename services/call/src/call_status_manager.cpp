@@ -642,7 +642,6 @@ int32_t CallStatusManager::DisconnectedVoipCallHandle(const CallDetailInfo &info
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     call = RefreshCallIfNecessary(call, info);
-    SetOriginalCallTypeForDisconnectState(call);
     int32_t ret = UpdateCallState(call, TelCallState::CALL_STATUS_DISCONNECTED);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("UpdateCallState failed, errCode:%{public}d", ret);
@@ -659,10 +658,10 @@ int32_t CallStatusManager::DisconnectedHandle(const CallDetailInfo &info)
     std::string tmpStr(info.phoneNum);
     sptr<CallBase> call = GetOneCallObjectByIndexAndSlotId(info.index, info.accountId);
     if (call == nullptr) {
-        TELEPHONY_LOGE("Call is NULL");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     call = RefreshCallIfNecessary(call, info);
+    SetOriginalCallTypeForDisconnectState(call);
     bool canUnHold = false;
     std::vector<std::u16string> callIdList;
     call->GetSubCallIdList(callIdList);
