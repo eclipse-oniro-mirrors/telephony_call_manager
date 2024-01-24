@@ -1789,6 +1789,7 @@ HWTEST_F(BranchTest, Telephony_CallControlManager_001, Function | MediumTest | L
     TelCallState priorState = TelCallState::CALL_STATUS_HOLDING;
     TelCallState nextState = TelCallState::CALL_STATUS_HOLDING;
     ASSERT_FALSE(callControlManager->NotifyNewCallCreated(callObjectPtr));
+    ASSERT_FALSE(callControlManager->AddCallLogAndNotification(callObjectPtr));
     ASSERT_FALSE(callControlManager->NotifyCallStateUpdated(callObjectPtr, priorState, nextState));
     DisconnectedDetails details;
     ASSERT_FALSE(callControlManager->NotifyCallDestroyed(details));
@@ -1800,6 +1801,7 @@ HWTEST_F(BranchTest, Telephony_CallControlManager_001, Function | MediumTest | L
     DialParaInfo dialParaInfo;
     callObjectPtr = new CSCall(dialParaInfo);
     ASSERT_TRUE(callControlManager->NotifyNewCallCreated(callObjectPtr));
+    ASSERT_FALSE(callControlManager->AddCallLogAndNotification(callObjectPtr));
     ASSERT_FALSE(callControlManager->NotifyCallStateUpdated(callObjectPtr, priorState, nextState));
     ASSERT_FALSE(callControlManager->NotifyIncomingCallAnswered(callObjectPtr));
     ASSERT_FALSE(callControlManager->NotifyIncomingCallRejected(callObjectPtr, false, ""));
@@ -1809,6 +1811,7 @@ HWTEST_F(BranchTest, Telephony_CallControlManager_001, Function | MediumTest | L
     ASSERT_NE(callControlManager->RejectCall(INVALID_CALLID, false, u""), TELEPHONY_SUCCESS);
     ASSERT_NE(callControlManager->HangUpCall(VALID_CALLID), TELEPHONY_SUCCESS);
     ASSERT_TRUE(callControlManager->NotifyNewCallCreated(callObjectPtr));
+    ASSERT_FALSE(callControlManager->AddCallLogAndNotification(callObjectPtr));
     ASSERT_TRUE(callControlManager->NotifyCallStateUpdated(callObjectPtr, priorState, nextState));
     ASSERT_TRUE(callControlManager->NotifyIncomingCallAnswered(callObjectPtr));
     ASSERT_TRUE(callControlManager->NotifyIncomingCallRejected(callObjectPtr, false, ""));

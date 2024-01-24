@@ -116,6 +116,7 @@ public:
     int32_t RemoveMissedIncomingCallNotification();
     int32_t SetVoIPCallState(int32_t state);
     int32_t GetVoIPCallState(int32_t &state);
+    int32_t AddCallLogAndNotification(sptr<CallBase> &callObjectPtr);
 
 private:
     void CallStateObserve();

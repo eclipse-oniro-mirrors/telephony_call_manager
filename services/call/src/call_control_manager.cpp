@@ -1154,6 +1154,29 @@ void CallControlManager::CallStateObserve()
     callStateListenerPtr_->AddOneObserver(DelayedSingleton<CallRecordsManager>::GetInstance());
 }
 
+int32_t CallControlManager::AddCallLogAndNotification(sptr<CallBase> &callObjectPtr)
+{
+    if (callStateListenerPtr_ == nullptr) {
+        TELEPHONY_LOGE("callStateListenerPtr_ is null");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    callStateListenerPtr_->RemoveAllObserver();
+    if (callObjectPtr == nullptr) {
+        TELEPHONY_LOGE("callObjectPtr is null");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    callObjectPtr->SetAnswerType(CallAnswerType::CALL_ANSWER_MISSED);
+    DelayedSingleton<CallRecordsManager>::GetInstance()
+        ->CallStateUpdated(callObjectPtr, TelCallState::CALL_STATUS_INCOMING, TelCallState::CALL_STATUS_DISCONNECTED);
+    if (missedCallNotification_ == nullptr) {
+        TELEPHONY_LOGE("missedCallNotification is null");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    missedCallNotification_->PublishMissedCallEvent(callObjectPtr);
+    missedCallNotification_->PublishMissedCallNotification(callObjectPtr);
+    return TELEPHONY_SUCCESS;
+}
+
 int32_t CallControlManager::NumberLegalityCheck(std::string &number)
 {
     if (number.empty()) {

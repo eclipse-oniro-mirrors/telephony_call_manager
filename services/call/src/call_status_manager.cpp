@@ -345,7 +345,22 @@ int32_t CallStatusManager::IncomingHandle(const CallDetailInfo &info)
     };
     QueryCallerInfo(contactInfo, std::string(info.phoneNum));
     call->SetCallerInfo(contactInfo);
-
+    int32_t state;
+    DelayedSingleton<CallControlManager>::GetInstance()->GetVoIPCallState(state);
+    if (state == (int32_t)CallStateToApp::CALL_STATE_RINGING) {
+        ret = call->SetTelCallState(TelCallState::CALL_STATUS_INCOMING);
+        if (ret != TELEPHONY_SUCCESS && RET != CALL_ERR_NOT_NEW_STATE) {
+            TELEPHONY_LOGE("SatCallState failed!");
+            return ret;
+        }
+        ret = call->RejectCall();
+        if (ret != TELEPHONY_SUCCESS) {
+            TELEPHONY_LOGE("RejectCall failed!");
+            return ret;
+        }
+        ret = DelayedSingleton<CallControlManager>::GetInstance()->AddCallLogAndNotification(call);
+        return ret;
+    }
     DelayedSingleton<CallControlManager>::GetInstance()->NotifyNewCallCreated(call);
     ret = UpdateCallState(call, info.state);
     if (ret != TELEPHONY_SUCCESS) {
