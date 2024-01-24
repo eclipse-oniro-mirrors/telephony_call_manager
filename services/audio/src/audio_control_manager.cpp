@@ -271,7 +271,7 @@ int32_t AudioControlManager::SetAudioDevice(const AudioDevice &device)
             std::vector<std::unique_ptr<AudioDeviceDescriptor>> desc =
                 audioRoutingManager->GetAvailableDevices(AudioDeviceUsage::CALL_OUTPUT_DEVICES);
             std::vector<sptr<AudioDeviceDescriptor>> bluetoothDeviceDesc = {};
-            for (auto &dev : desc) {
+            for (const auto &dev : desc) {
                 if (dev->macAddress_ == device.address) {
                     bluetoothDeviceDesc.push_back(new(std::nothrow) AudioDeviceDescriptor(*dev));
                 }

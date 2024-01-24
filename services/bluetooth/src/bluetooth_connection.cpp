@@ -72,9 +72,8 @@ void BluetoothConnection::Init()
         TELEPHONY_LOGE("get connected devices fail");
         return;
     }
-    std::string macAddress = "";
     for (auto device : devices) {
-        macAddress = device.GetDeviceAddr();
+        std::string macAddress = device.GetDeviceAddr();
         AddBtDevice(macAddress, device);
         if (profile->GetScoState(device) == (int32_t)Bluetooth::HfpScoConnectState::SCO_CONNECTED) {
             SetConnectedScoAddr(macAddress);

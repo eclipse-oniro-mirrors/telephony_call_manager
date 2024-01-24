@@ -755,11 +755,15 @@ void CallStatusManager::AutoUnHoldForDsda(
     int32_t currentCallNum = GetCurrentCallNum();
     for (int32_t otherCallId : callIdList) {
         sptr<CallBase> otherCall = GetOneCallObject(otherCallId);
+        if (otherCall == nullptr) {
+            TELEPHONY_LOGE("otherCall is nullptr");
+            continue;
+        }
         TelCallState state = otherCall->GetTelCallState();
         TelConferenceState confState = otherCall->GetTelConferenceState();
         int32_t conferenceId = ERR_ID;
         otherCall->GetMainCallId(conferenceId);
-        if (otherCall != nullptr && slotId != otherCall->GetSlotId() && state == TelCallState::CALL_STATUS_HOLDING &&
+        if (slotId != otherCall->GetSlotId() && state == TelCallState::CALL_STATUS_HOLDING &&
             otherCall->GetCanUnHoldState() && activeCallNum == 0 && waitingCallNum == 0 &&
             dialingCallNum == 0 &&
             ((confState != TelConferenceState::TEL_CONFERENCE_IDLE && conferenceId == otherCallId) ||
