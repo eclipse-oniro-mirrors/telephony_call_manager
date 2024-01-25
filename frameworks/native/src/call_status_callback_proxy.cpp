@@ -44,6 +44,8 @@ int32_t CallStatusCallbackProxy::UpdateCallReportInfo(const CallReportInfo &info
     dataParcel.WriteInt32(static_cast<int32_t>(info.state));
     dataParcel.WriteInt32(info.voiceDomain);
     dataParcel.WriteInt32(info.mpty);
+    dataParcel.WriteInt32(info.crsType);
+    dataParcel.WriteInt32(info.originalCallType);
     dataParcel.WriteString(info.voipCallInfo.voipCallId);
     dataParcel.WriteString(info.voipCallInfo.userName);
     dataParcel.WriteString(info.voipCallInfo.abilityName);
@@ -73,7 +75,22 @@ int32_t CallStatusCallbackProxy::UpdateCallsReportInfo(const CallsReportInfo &in
     dataParcel.WriteInt32(info.callVec.size());
     for (auto &it : info.callVec) {
         dataParcel.WriteInt32(length);
-        dataParcel.WriteRawData((const void *)&it, length);
+        dataParcel.WriteInt32(it.index);
+        dataParcel.WriteCString(it.accountNum);
+        dataParcel.WriteInt32(it.accountId);
+        dataParcel.WriteInt32(static_cast<int32_t>(it.callType));
+        dataParcel.WriteInt32(static_cast<int32_t>(it.callMode));
+        dataParcel.WriteInt32(static_cast<int32_t>(it.state));
+        dataParcel.WriteInt32(it.voiceDomain);
+        dataParcel.WriteInt32(it.mpty);
+        dataParcel.WriteInt32(it.crsType);
+        dataParcel.WriteInt32(it.originalCallType);
+        dataParcel.WriteString(it.voipCallInfo.voipCallId);
+        dataParcel.WriteString(it.voipCallInfo.userName);
+        dataParcel.WriteString(it.voipCallInfo.abilityName);
+        dataParcel.WriteString(it.voipCallInfo.extensionId);
+        dataParcel.WriteString(it.voipCallInfo.voipBundleName);
+        dataParcel.WriteParcelable(it.voipCallInfo.pixelMap.get());
     }
     dataParcel.WriteInt32(info.slotId);
     if (Remote() == nullptr) {
