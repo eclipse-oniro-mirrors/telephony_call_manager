@@ -1183,7 +1183,6 @@ int32_t CallControlManager::AddCallLogAndNotification(sptr<CallBase> &callObject
     }
     missedCallNotification_->PublishMissedCallEvent(callObjectPtr);
     missedCallNotification_->PublishMissedCallNotification(callObjectPtr);
-    DelayedSingleton<CallRecordsHandlerService>::GetInstance()->QueryUnReadMissedCallLog();
     return TELEPHONY_SUCCESS;
 }
 

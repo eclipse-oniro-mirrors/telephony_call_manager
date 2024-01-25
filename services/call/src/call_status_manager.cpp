@@ -375,12 +375,12 @@ void CallStatusManager::SetContactInfo(sptr<CallBase> &call, std::string phoneNu
 int32_t CallStatusManager::HandleRejectCall(sptr<CallBase> &call)
 {
     if (call == nullptr) {
-        TELEPHONY_LOGE("CreateVoipCall failed!");
+        TELEPHONY_LOGE("call is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     int32_t ret = call->SetTelCallState(TelCallState::CALL_STATUS_INCOMING);
     if (ret != TELEPHONY_SUCCESS && ret != CALL_ERR_NOT_NEW_STATE) {
-        TELEPHONY_LOGE("SatCallState failed!");
+        TELEPHONY_LOGE("Set CallState failed!");
         return ret;
     }
     ret = call->RejectCall();
