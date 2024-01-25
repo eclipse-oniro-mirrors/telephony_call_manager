@@ -1170,10 +1170,6 @@ void CallControlManager::CallStateObserve()
 
 int32_t CallControlManager::AddCallLogAndNotification(sptr<CallBase> &callObjectPtr)
 {
-    if (callStateListenerPtr_ == nullptr) {
-        TELEPHONY_LOGE("callStateListenerPtr_ is null");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
     if (callObjectPtr == nullptr) {
         TELEPHONY_LOGE("callObjectPtr is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;

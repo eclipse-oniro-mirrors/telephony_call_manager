@@ -376,7 +376,7 @@ int32_t CallStatusManager::HandleRejectCall(sptr<CallBase> &call)
 {
     if (call == nullptr) {
         TELEPHONY_LOGE("CreateVoipCall failed!");
-        return;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     call->SetTelCallState(TelCallState::CALL_STATUS_INCOMING);
     int32_t ret = TELEPHONY_SUCCESS;
@@ -401,11 +401,11 @@ int32_t CallStatusManager::IncomingVoipCallHandle(const CallDetailInfo &info)
         return TELEPHONY_SUCCESS;
     }
     call = CreateNewCall(info, CallDirection::CALL_DIRECTION_IN);
-    AddOneCallObject(call);
     if (call == nullptr) {
         TELEPHONY_LOGE("CreateVoipCall failed!");
         return CALL_ERR_CALL_OBJECT_IS_NULL;
     }
+    AddOneCallObject(call);
     DelayedSingleton<CallControlManager>::GetInstance()->NotifyNewCallCreated(call);
     ret = UpdateCallState(call, info.state);
     if (ret != TELEPHONY_SUCCESS) {
@@ -446,11 +446,11 @@ void CallStatusManager::CallFilterCompleteResult(const CallDetailInfo &info)
 {
     int32_t ret = TELEPHONY_ERR_FAIL;
     sptr<CallBase> call = CreateNewCall(info, CallDirection::CALL_DIRECTION_IN);
-    AddOneCallObject(call);
     if (call == nullptr) {
         TELEPHONY_LOGE("CreateNewCall failed!");
         return;
     }
+    AddOneCallObject(call);
 #ifdef ABILITY_DATABASE_SUPPORT
     // allow list filtering
     // Get the contact data from the database
@@ -503,11 +503,11 @@ int32_t CallStatusManager::DialingHandle(const CallDetailInfo &info)
         return UpdateDialingCallInfo(info);
     }
     sptr<CallBase> call = CreateNewCall(info, CallDirection::CALL_DIRECTION_OUT);
-    AddOneCallObject(call);
     if (call == nullptr) {
         TELEPHONY_LOGE("CreateNewCall failed!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
+    AddOneCallObject(call);
     int32_t ret = call->DialingProcess();
     if (ret != TELEPHONY_SUCCESS) {
         return ret;
@@ -930,11 +930,11 @@ sptr<CallBase> CallStatusManager::RefreshCallIfNecessary(const sptr<CallBase> &c
     (void)memset_s(&attrInfo, sizeof(CallAttributeInfo), 0, sizeof(CallAttributeInfo));
     call->GetCallAttributeBaseInfo(attrInfo);
     sptr<CallBase> newCall = CreateNewCall(info, attrInfo.callDirection);
-    AddOneCallObject(newCall);
     if (newCall == nullptr) {
         TELEPHONY_LOGE("RefreshCallIfNecessary createCallFail");
         return call;
     }
+    AddOneCallObject(newCall);
     newCall->SetCallRunningState(call->GetCallRunningState());
     newCall->SetTelConferenceState(call->GetTelConferenceState());
     newCall->SetStartTime(attrInfo.startTime);
