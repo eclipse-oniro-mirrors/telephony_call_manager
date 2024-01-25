@@ -331,21 +331,13 @@ int32_t CallStatusManager::IncomingHandle(const CallDetailInfo &info)
         TELEPHONY_LOGE("CreateNewCall failed!");
         return CALL_ERR_CALL_OBJECT_IS_NULL;
     }
-
-    // allow list filtering
-    // Get the contact data from the database
-    ContactInfo contactInfo = {
-        .name = "",
-        .number = "",
-        .isContacterExists = false,
-        .ringtonePath = "",
-        .isSendToVoicemail = false,
-        .isEcc = false,
-        .isVoiceMail = false,
-    };
-    QueryCallerInfo(contactInfo, std::string(info.phoneNum));
-    call->SetCallerInfo(contactInfo);
-
+    SetContactInfo(call, std::string(info.phoneNum));
+    int32_t state;
+    DelayedSingleton<CallControlManager>::GetInstance()->GetVoIPCallState(state);
+    if (state == (int32_t)CallStateToApp::CALL_STATE_RINGING) {
+        return HandleRejectCall(call);
+    }
+    AddOneCallObject(call);
     DelayedSingleton<CallControlManager>::GetInstance()->NotifyNewCallCreated(call);
     ret = UpdateCallState(call, info.state);
     if (ret != TELEPHONY_SUCCESS) {
@@ -357,6 +349,46 @@ int32_t CallStatusManager::IncomingHandle(const CallDetailInfo &info)
         TELEPHONY_LOGE("FilterResultsDispose failed!");
     }
     return ret;
+}
+
+void CallStatusManager::SetContactInfo(sptr<CallBase> &call, std::string phoneNum)
+{
+    if (call == nullptr) {
+        TELEPHONY_LOGE("CreateVoipCall failed!");
+        return;
+    }
+    // allow list filtering
+    // Get the contact data from the database
+    ContactInfo contactInfo = {
+        .name = "",
+        .number = "",
+        .isContacterExists = false,
+        .ringtonePath = "",
+        .isSendToVoicemail = false,
+        .isEcc = false,
+        .isVoiceMail = false,
+    };
+    QueryCallerInfo(contactInfo, phoneNum);
+    call->SetCallerInfo(contactInfo);
+}
+
+int32_t CallStatusManager::HandleRejectCall(sptr<CallBase> &call)
+{
+    if (call == nullptr) {
+        TELEPHONY_LOGE("call is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    int32_t ret = call->SetTelCallState(TelCallState::CALL_STATUS_INCOMING);
+    if (ret != TELEPHONY_SUCCESS && ret != CALL_ERR_NOT_NEW_STATE) {
+        TELEPHONY_LOGE("Set CallState failed!");
+        return ret;
+    }
+    ret = call->RejectCall();
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("RejectCall failed!");
+        return ret;
+    }
+    return DelayedSingleton<CallControlManager>::GetInstance()->AddCallLogAndNotification(call);
 }
 
 int32_t CallStatusManager::IncomingVoipCallHandle(const CallDetailInfo &info)
@@ -372,6 +404,7 @@ int32_t CallStatusManager::IncomingVoipCallHandle(const CallDetailInfo &info)
         TELEPHONY_LOGE("CreateVoipCall failed!");
         return CALL_ERR_CALL_OBJECT_IS_NULL;
     }
+    AddOneCallObject(call);
     DelayedSingleton<CallControlManager>::GetInstance()->NotifyNewCallCreated(call);
     ret = UpdateCallState(call, info.state);
     if (ret != TELEPHONY_SUCCESS) {
@@ -416,6 +449,7 @@ void CallStatusManager::CallFilterCompleteResult(const CallDetailInfo &info)
         TELEPHONY_LOGE("CreateNewCall failed!");
         return;
     }
+    AddOneCallObject(call);
 #ifdef ABILITY_DATABASE_SUPPORT
     // allow list filtering
     // Get the contact data from the database
@@ -472,6 +506,7 @@ int32_t CallStatusManager::DialingHandle(const CallDetailInfo &info)
         TELEPHONY_LOGE("CreateNewCall failed!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
+    AddOneCallObject(call);
     int32_t ret = call->DialingProcess();
     if (ret != TELEPHONY_SUCCESS) {
         return ret;
@@ -898,6 +933,7 @@ sptr<CallBase> CallStatusManager::RefreshCallIfNecessary(const sptr<CallBase> &c
         TELEPHONY_LOGE("RefreshCallIfNecessary createCallFail");
         return call;
     }
+    AddOneCallObject(newCall);
     newCall->SetCallRunningState(call->GetCallRunningState());
     newCall->SetTelConferenceState(call->GetTelConferenceState());
     newCall->SetStartTime(attrInfo.startTime);
@@ -1005,7 +1041,6 @@ sptr<CallBase> CallStatusManager::CreateNewCall(const CallDetailInfo &info, Call
     }
     callPtr->SetOriginalCallType(info.originalCallType);
     TELEPHONY_LOGD("originalCallType:%{public}d", info.originalCallType);
-    AddOneCallObject(callPtr);
     return callPtr;
 }
 
