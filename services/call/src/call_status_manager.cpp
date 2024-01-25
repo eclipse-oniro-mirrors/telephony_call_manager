@@ -378,8 +378,7 @@ int32_t CallStatusManager::HandleRejectCall(sptr<CallBase> &call)
         TELEPHONY_LOGE("call is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    call->SetTelCallState(TelCallState::CALL_STATUS_INCOMING);
-    int32_t ret = TELEPHONY_SUCCESS;
+    int32_t ret = call->SetTelCallState(TelCallState::CALL_STATUS_INCOMING);
     if (ret != TELEPHONY_SUCCESS && ret != CALL_ERR_NOT_NEW_STATE) {
         TELEPHONY_LOGE("Set CallState failed!");
         return ret;
