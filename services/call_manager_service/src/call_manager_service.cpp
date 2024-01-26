@@ -1347,13 +1347,8 @@ sptr<IRemoteObject> CallManagerService::GetProxyObjectPtr(CallManagerProxyType p
 
 std::string CallManagerService::GetBundleName()
 {
-    int32_t uid = IPCSkeleton::GetCallingUid();
     std::string bundleName = "";
-    TelephonyPermission::GetBundleNameByUid(uid, bundleName);
-    if (bundleName.empty()) {
-        bundleName.append(std::to_string(uid));
-        bundleName.append(std::to_string(IPCSkeleton::GetCallingPid()));
-    }
+    bundleName.append(std::to_string(IPCSkeleton::GetCallingPid()));
     return bundleName;
 }
 
