@@ -73,7 +73,7 @@ void CallBase::HangUpVoipCall()
     while (it != callAttributeInfo.end()) {
         CallAttributeInfo callinfo = (*it);
         TelCallState callState = callinfo.callState;
-        it++;
+        ++it;
         if (callinfo.callType == CallType::TYPE_VOIP &&
             (callState == TelCallState::CALL_STATUS_ACTIVE || callState == TelCallState::CALL_STATUS_INCOMING)) {
             sptr<CallBase> tempCall = CallObjectManager::GetOneCallObject(callinfo.callId);
