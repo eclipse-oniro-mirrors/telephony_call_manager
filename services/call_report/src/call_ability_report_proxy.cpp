@@ -20,7 +20,8 @@
 #include "iservice_registry.h"
 #include "system_ability.h"
 #include "system_ability_definition.h"
-
+#include "app_state_observer.h"
+#include "app_mgr_interface.h"
 #include "call_manager_errors.h"
 #include "telephony_log_wrapper.h"
 
@@ -53,20 +54,31 @@ int32_t CallAbilityReportProxy::RegisterCallBack(
     }
     callAbilityCallbackPtr->SetBundleName(bundleName);
     std::lock_guard<std::mutex> lock(mutex_);
-    std::list<sptr<ICallAbilityCallback>>::iterator it = callbackPtrList_.begin();
-    for (; it != callbackPtrList_.end(); ++it) {
-        if ((*it)->GetBundleName() == bundleName) {
-            if (bundleName == "com.huawei.hmos.meetimeservice") {
-                break;
-            }
-            (*it).clear();
-            (*it) = callAbilityCallbackPtr;
-            TELEPHONY_LOGI("%{public}s RegisterCallBack success", bundleName.c_str());
-            return TELEPHONY_SUCCESS;
-        }
-    }
     callbackPtrList_.emplace_back(callAbilityCallbackPtr);
-    TELEPHONY_LOGI("%{public}s successfully registered the callback for the first time!", bundleName.c_str());
+    TELEPHONY_LOGI("%{public}s successfully registered the callback!", bundleName.c_str());
+    if (appStateObserver != nullptr) {
+        TELEPHONY_LOGE("AppStateObserver Instance already create");
+        return TELEPHONY_SUCCESS;
+    }
+    appStateObserver = new (std::nothrow) ApplicationStateObserver();
+    if (appStateObserver == nullptr) {
+        TELEPHONY_LOGE("Failed to Create AppStateObserver Instance");
+        return TELEPHONY_SUCCESS;
+    }
+    sptr<ISystemAbilityManager> samgrClient = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (samgrClient == nullptr) {
+        TELEPHONY_LOGE("Failed to get samgrClient");
+        appStateObserver = nullptr;
+        return TELEPHONY_SUCCESS;
+    }
+    appMgrProxy = iface_cast<AppExecFwk::IAppMgr>(samgrClient->GetSystemAbility(APP_MGR_SERVICE_ID));
+    if (appMgrProxy == nullptr) {
+        TELEPHONY_LOGE("Failed to get appMgrProxy");
+        appStateObserver = nullptr;
+        samgrClient = nullptr;
+        return TELEPHONY_SUCCESS;
+    }
+    appMgrProxy->RegisterApplicationStateObserver(appStateObserver);
     return TELEPHONY_SUCCESS;
 }
 
@@ -82,11 +94,18 @@ int32_t CallAbilityReportProxy::UnRegisterCallBack(const std::string &bundleName
         if ((*it)->GetBundleName() == bundleName) {
             callbackPtrList_.erase(it);
             TELEPHONY_LOGI("%{public}s UnRegisterCallBack success", bundleName.c_str());
-            return TELEPHONY_SUCCESS;
+            break;
         }
     }
-    TELEPHONY_LOGE("UnRegisterCallBack failure!");
-    return TELEPHONY_ERROR;
+    if (callbackPtrList_.empty()) {
+        TELEPHONY_LOGE("callbackPtrList_ is null!");
+        if (appMgrProxy != nullptr && appStateObserver != nullptr) {
+            appMgrProxy->UnregisterApplicationStateObserver(appStateObserver);
+            appMgrProxy = nullptr;
+            appStateObserver = nullptr;
+        }
+    }
+    return TELEPHONY_SUCCESS;
 }
 
 void CallAbilityReportProxy::CallStateUpdated(
