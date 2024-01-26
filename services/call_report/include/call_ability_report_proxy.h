@@ -23,6 +23,7 @@
 #include "i_call_ability_callback.h"
 
 #include "call_state_listener_base.h"
+#include "app_state_observer.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -54,6 +55,8 @@ private:
 private:
     std::list<sptr<ICallAbilityCallback>> callbackPtrList_;
     sptr<ICallAbilityCallback> callAbilityCallbackPtr_;
+    sptr<ApplicationStateObserver> appStateObserver;
+    sptr<AppExecFwk::IAppMgr> appMgrProxy = nullptr;
     std::mutex mutex_;
 };
 } // namespace Telephony

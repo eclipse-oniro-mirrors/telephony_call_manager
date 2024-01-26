@@ -2251,14 +2251,14 @@ HWTEST_F(BranchTest, Telephony_CallAbilityReportProxy_001, Function | MediumTest
     ASSERT_FALSE(callConnectAbility.WaitForConnectResult());
     std::shared_ptr<CallAbilityReportProxy> callAbilityReportProxy = std::make_shared<CallAbilityReportProxy>();
     sptr<ICallAbilityCallback> callAbilityCallbackPtr = nullptr;
-    std::string bundleName = "test";
-    ASSERT_NE(callAbilityReportProxy->RegisterCallBack(callAbilityCallbackPtr, bundleName), TELEPHONY_SUCCESS);
-    ASSERT_NE(callAbilityReportProxy->UnRegisterCallBack(bundleName), TELEPHONY_SUCCESS);
+    std::string pidName = "123";
+    ASSERT_NE(callAbilityReportProxy->RegisterCallBack(callAbilityCallbackPtr, pidName), TELEPHONY_SUCCESS);
+    ASSERT_NE(callAbilityReportProxy->UnRegisterCallBack(pidName), TELEPHONY_SUCCESS);
     sptr<CallBase> callObjectPtr = nullptr;
     callAbilityReportProxy->CallStateUpdated(
         callObjectPtr, TelCallState::CALL_STATUS_INCOMING, TelCallState::CALL_STATUS_INCOMING);
     callAbilityCallbackPtr = new CallAbilityCallback();
-    ASSERT_EQ(callAbilityReportProxy->RegisterCallBack(callAbilityCallbackPtr, bundleName), TELEPHONY_SUCCESS);
+    ASSERT_EQ(callAbilityReportProxy->RegisterCallBack(callAbilityCallbackPtr, pidName), TELEPHONY_SUCCESS);
     DisconnectedDetails disconnectedDetails;
     callAbilityReportProxy->CallDestroyed(disconnectedDetails);
     CallAttributeInfo callAttributeInfo;
@@ -2288,7 +2288,7 @@ HWTEST_F(BranchTest, Telephony_CallAbilityReportProxy_001, Function | MediumTest
     callAbilityReportProxy->ReportCallDataUsageChange(dataUsage);
     CameraCapabilities cameraCapabilities;
     callAbilityReportProxy->ReportCameraCapabilities(cameraCapabilities);
-    ASSERT_EQ(callAbilityReportProxy->UnRegisterCallBack(bundleName), TELEPHONY_SUCCESS);
+    ASSERT_EQ(callAbilityReportProxy->UnRegisterCallBack(pidName), TELEPHONY_SUCCESS);
 }
 
 /**
