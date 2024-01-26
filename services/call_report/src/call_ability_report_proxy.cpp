@@ -56,29 +56,27 @@ int32_t CallAbilityReportProxy::RegisterCallBack(
     std::lock_guard<std::mutex> lock(mutex_);
     callbackPtrList_.emplace_back(callAbilityCallbackPtr);
     TELEPHONY_LOGI("%{public}s successfully registered the callback!", bundleName.c_str());
-    if (appStateObserver != nullptr) {
-        TELEPHONY_LOGE("AppStateObserver Instance already create");
-        return TELEPHONY_SUCCESS;
-    }
-    appStateObserver = new (std::nothrow) ApplicationStateObserver();
     if (appStateObserver == nullptr) {
-        TELEPHONY_LOGE("Failed to Create AppStateObserver Instance");
-        return TELEPHONY_SUCCESS;
+        appStateObserver = new (std::nothrow) ApplicationStateObserver();
+        if (appStateObserver == nullptr) {
+            TELEPHONY_LOGE("Failed to Create AppStateObserver Instance");
+            return TELEPHONY_SUCCESS;
+        }
+        sptr<ISystemAbilityManager> samgrClient = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+        if (samgrClient == nullptr) {
+            TELEPHONY_LOGE("Failed to get samgrClient");
+            appStateObserver = nullptr;
+            return TELEPHONY_SUCCESS;
+        }
+        appMgrProxy = iface_cast<AppExecFwk::IAppMgr>(samgrClient->GetSystemAbility(APP_MGR_SERVICE_ID));
+        if (appMgrProxy == nullptr) {
+            TELEPHONY_LOGE("Failed to get appMgrProxy");
+            appStateObserver = nullptr;
+            samgrClient = nullptr;
+            return TELEPHONY_SUCCESS;
+        }
+        appMgrProxy->RegisterApplicationStateObserver(appStateObserver);
     }
-    sptr<ISystemAbilityManager> samgrClient = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    if (samgrClient == nullptr) {
-        TELEPHONY_LOGE("Failed to get samgrClient");
-        appStateObserver = nullptr;
-        return TELEPHONY_SUCCESS;
-    }
-    appMgrProxy = iface_cast<AppExecFwk::IAppMgr>(samgrClient->GetSystemAbility(APP_MGR_SERVICE_ID));
-    if (appMgrProxy == nullptr) {
-        TELEPHONY_LOGE("Failed to get appMgrProxy");
-        appStateObserver = nullptr;
-        samgrClient = nullptr;
-        return TELEPHONY_SUCCESS;
-    }
-    appMgrProxy->RegisterApplicationStateObserver(appStateObserver);
     return TELEPHONY_SUCCESS;
 }
 
