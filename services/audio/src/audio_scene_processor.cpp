@@ -73,7 +73,7 @@ void AudioSceneProcessor::ProcessEventInner(AudioEvent event)
             break;
         case AudioEvent::NO_MORE_INCOMING_CALL:
             DelayedSingleton<AudioControlManager>::GetInstance()->StopRingtone();
-            DelayedSingleton<AudioControlManager>::GetInstance()->StopCalltone();
+            DelayedSingleton<AudioControlManager>::GetInstance()->StopCallTone();
         case AudioEvent::NEW_ACTIVE_CS_CALL:
         case AudioEvent::NEW_ACTIVE_IMS_CALL:
         case AudioEvent::NEW_DIALING_CALL:
