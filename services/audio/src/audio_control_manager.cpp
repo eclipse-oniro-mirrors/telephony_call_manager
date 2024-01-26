@@ -190,8 +190,6 @@ void AudioControlManager::HandlePriorState(sptr<CallBase> &callObjectPtr, TelCal
             if (callObjectPtr->GetCallRunningState() == CallRunningState::CALL_RUNNING_STATE_ACTIVE) {
                 PlaySoundtone();
             }
-            StopRingtone();
-            StopCallTone();
             event = AudioEvent::NO_MORE_INCOMING_CALL;
             break;
         case TelCallState::CALL_STATUS_ACTIVE:
