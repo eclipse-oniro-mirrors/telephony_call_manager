@@ -1091,7 +1091,7 @@ int32_t NapiCallAbilityCallback::ReportGetRestrictionInfo(AppExecFwk::PacMap &re
         TELEPHONY_LOGE("callSupplementWorker is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    dataWocallSupplementWorkerrker->info = resultInfo;
+    callSupplementWorker->info = resultInfo;
     callSupplementWorker->callback = getRestrictionCallback_;
     uv_work_t *work = std::make_unique<uv_work_t>().release();
     if (work == nullptr) {
