@@ -370,26 +370,27 @@ int32_t NapiCallAbilityCallback::ReportStartRttInfo(AppExecFwk::PacMap &resultIn
 #if defined(NAPI_VERSION) && NAPI_VERSION >= 2
     napi_get_uv_event_loop(startRttCallback_.env, &loop);
 #endif
-    CallSupplementWorker *dataWorker = std::make_unique<CallSupplementWorker>().release();
-    if (dataWorker == nullptr) {
-        TELEPHONY_LOGE("dataWorker is nullptr!");
+    CallSupplementWorker *callSupplementWorker = std::make_unique<CallSupplementWorker>().release();
+    if (callSupplementWorker == nullptr) {
+        TELEPHONY_LOGE("callSupplementWorker is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    dataWorker->info = resultInfo;
-    dataWorker->callback = startRttCallback_;
+    callSupplementWorker->info = resultInfo;
+    callSupplementWorker->callback = startRttCallback_;
     uv_work_t *work = std::make_unique<uv_work_t>().release();
     if (work == nullptr) {
         TELEPHONY_LOGE("work is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    work->data = (void *)dataWorker;
+    work->data = (void *)callSupplementWorker;
     int32_t errCode = uv_queue_work_with_qos(
         loop, work, [](uv_work_t *work) {}, ReportStartRttInfoWork, uv_qos_default);
     if (errCode != 0) {
         TELEPHONY_LOGE("failed to uv_queue_work_with_qos, errCode: %{public}d", errCode);
-        delete dataWorker;
-        dataWorker = nullptr;
-        DeleteWorkIfFail(work);
+        delete callSupplementWorker;
+        callSupplementWorker = nullptr;
+        delete work;
+        work = nullptr;
         return TELEPHONY_ERROR;
     }
     if (startRttCallback_.thisVar) {
@@ -408,26 +409,27 @@ int32_t NapiCallAbilityCallback::ReportStopRttInfo(AppExecFwk::PacMap &resultInf
 #if defined(NAPI_VERSION) && NAPI_VERSION >= 2
     napi_get_uv_event_loop(stopRttCallback_.env, &loop);
 #endif
-    CallSupplementWorker *dataWorker = std::make_unique<CallSupplementWorker>().release();
-    if (dataWorker == nullptr) {
-        TELEPHONY_LOGE("dataWorker is nullptr!");
+    CallSupplementWorker *callSupplementWorker = std::make_unique<CallSupplementWorker>().release();
+    if (callSupplementWorker == nullptr) {
+        TELEPHONY_LOGE("callSupplementWorker is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    dataWorker->info = resultInfo;
-    dataWorker->callback = stopRttCallback_;
+    callSupplementWorker->info = resultInfo;
+    callSupplementWorker->callback = stopRttCallback_;
     uv_work_t *work = std::make_unique<uv_work_t>().release();
     if (work == nullptr) {
         TELEPHONY_LOGE("work is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    work->data = (void *)dataWorker;
+    work->data = (void *)callSupplementWorker;
     int32_t resultCode = uv_queue_work_with_qos(
         loop, work, [](uv_work_t *work) {}, ReportStopRttInfoWork, uv_qos_default);
     if (resultCode != 0) {
-        delete dataWorker;
-        dataWorker = nullptr;
+        delete callSupplementWorker;
+        callSupplementWorker = nullptr;
         TELEPHONY_LOGE("failed to add uv_queue_work_with_qos, resultCode: %{public}d", resultCode);
-        DeleteWorkIfFail(work);
+        delete work;
+        work = nullptr;
         return TELEPHONY_ERROR;
     }
     if (stopRttCallback_.thisVar) {
@@ -446,24 +448,25 @@ int32_t NapiCallAbilityCallback::UpdateCallStateInfo(const CallAttributeInfo &in
 #if defined(NAPI_VERSION) && NAPI_VERSION >= 2
     napi_get_uv_event_loop(stateCallback_.env, &loop);
 #endif
-    CallStateWorker *dataWorker = std::make_unique<CallStateWorker>().release();
-    if (dataWorker == nullptr) {
-        TELEPHONY_LOGE("dataWorker is nullptr!");
+    CallStateWorker *callStateWorker = std::make_unique<CallStateWorker>().release();
+    if (callStateWorker == nullptr) {
+        TELEPHONY_LOGE("callStateWorker is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    dataWorker->info = info;
-    dataWorker->callback = stateCallback_;
+    callStateWorker->info = info;
+    callStateWorker->callback = stateCallback_;
     uv_work_t *work = std::make_unique<uv_work_t>().release();
     if (work == nullptr) {
         TELEPHONY_LOGE("work is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    work->data = (void *)dataWorker;
+    work->data = (void *)callStateWorker;
     int32_t errCode = uv_queue_work_with_qos(loop, work, [](uv_work_t *work) {}, ReportCallStateWork, uv_qos_default);
     if (errCode != 0) {
-        delete dataWorker;
-        dataWorker = nullptr;
-        DeleteWorkIfFail(work);
+        delete callStateWorker;
+        callStateWorker = nullptr;
+        delete work;
+        work = nullptr;
         TELEPHONY_LOGE("failed to add uv_queue_work_with_qos, errCode: %{public}d", errCode);
         return TELEPHONY_ERROR;
     }
@@ -561,25 +564,26 @@ int32_t NapiCallAbilityCallback::UpdateCallEvent(const CallEventInfo &info)
 #if defined(NAPI_VERSION) && NAPI_VERSION >= 2
     napi_get_uv_event_loop(eventCallback_.env, &loop);
 #endif
-    CallEventWorker *dataWorker = std::make_unique<CallEventWorker>().release();
-    if (dataWorker == nullptr) {
-        TELEPHONY_LOGE("dataWorker is nullptr!");
+    CallEventWorker *callEventWorker = std::make_unique<CallEventWorker>().release();
+    if (callEventWorker == nullptr) {
+        TELEPHONY_LOGE("callEventWorker is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    dataWorker->info = info;
-    dataWorker->callback = eventCallback_;
+    callEventWorker->info = info;
+    callEventWorker->callback = eventCallback_;
     uv_work_t *work = std::make_unique<uv_work_t>().release();
     if (work == nullptr) {
         TELEPHONY_LOGE("work is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    work->data = (void *)dataWorker;
+    work->data = (void *)callEventWorker;
     int32_t errCode = uv_queue_work_with_qos(loop, work, [](uv_work_t *work) {}, ReportCallEventWork, uv_qos_default);
     if (errCode != 0) {
         TELEPHONY_LOGE("failed to uv_queue_work_with_qos, errCode: %{public}d", errCode);
-        delete dataWorker;
-        dataWorker = nullptr;
-        DeleteWorkIfFail(work);
+        delete callEventWorker;
+        callEventWorker = nullptr;
+        delete work;
+        work = nullptr;
         return TELEPHONY_ERROR;
     }
     return TELEPHONY_SUCCESS;
@@ -643,26 +647,28 @@ int32_t NapiCallAbilityCallback::UpdateCallDisconnectedCause(const DisconnectedD
 #if defined(NAPI_VERSION) && NAPI_VERSION >= 2
     napi_get_uv_event_loop(callDisconnectCauseCallback_.env, &loop);
 #endif
-    CallDisconnectedCauseWorker *dataWorker = std::make_unique<CallDisconnectedCauseWorker>().release();
-    if (dataWorker == nullptr) {
-        TELEPHONY_LOGE("dataWorker is nullptr!");
+    CallDisconnectedCauseWorker *callDisconnectedCauseWorker =
+        std::make_unique<CallDisconnectedCauseWorker>().release();
+    if (callDisconnectedCauseWorker == nullptr) {
+        TELEPHONY_LOGE("callDisconnectedCauseWorker is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    dataWorker->details = details;
-    dataWorker->callback = callDisconnectCauseCallback_;
+    callDisconnectedCauseWorker->details = details;
+    callDisconnectedCauseWorker->callback = callDisconnectCauseCallback_;
     uv_work_t *work = std::make_unique<uv_work_t>().release();
     if (work == nullptr) {
         TELEPHONY_LOGE("work is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    work->data = (void *)dataWorker;
+    work->data = (void *)callDisconnectedCauseWorker;
     int32_t errCode = uv_queue_work_with_qos(
         loop, work, [](uv_work_t *work) {}, ReportCallDisconnectedCauseWork, uv_qos_default);
     if (errCode != 0) {
-        delete dataWorker;
-        dataWorker = nullptr;
+        delete callDisconnectedCauseWorker;
+        callDisconnectedCauseWorker = nullptr;
         TELEPHONY_LOGE("failed to add uv_queue_work_with_qos, errCode: %{public}d", errCode);
-        DeleteWorkIfFail(work);
+        delete work;
+        work = nullptr;
         return TELEPHONY_ERROR;
     }
     if (callDisconnectCauseCallback_.thisVar) {
@@ -740,25 +746,26 @@ int32_t NapiCallAbilityCallback::UpdateMmiCodeResultsInfo(const MmiCodeInfo &inf
 #if defined(NAPI_VERSION) && NAPI_VERSION >= 2
     napi_get_uv_event_loop(mmiCodeCallback_.env, &loop);
 #endif
-    MmiCodeWorker *dataWorker = std::make_unique<MmiCodeWorker>().release();
-    if (dataWorker == nullptr) {
-        TELEPHONY_LOGE("dataWorker is nullptr!");
+    MmiCodeWorker *mmiCodeWorker = std::make_unique<MmiCodeWorker>().release();
+    if (mmiCodeWorker == nullptr) {
+        TELEPHONY_LOGE("mmiCodeWorker is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    dataWorker->info = info;
-    dataWorker->callback = mmiCodeCallback_;
+    mmiCodeWorker->info = info;
+    mmiCodeWorker->callback = mmiCodeCallback_;
     uv_work_t *work = std::make_unique<uv_work_t>().release();
     if (work == nullptr) {
         TELEPHONY_LOGE("work is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    work->data = (void *)dataWorker;
+    work->data = (void *)mmiCodeWorker;
     int32_t errCode = uv_queue_work_with_qos(loop, work, [](uv_work_t *work) {}, ReportMmiCodeWork, uv_qos_default);
     if (errCode != 0) {
         TELEPHONY_LOGE("failed to uv_queue_work_with_qos, errCode: %{public}d", errCode);
-        delete dataWorker;
-        dataWorker = nullptr;
-        DeleteWorkIfFail(work);
+        delete mmiCodeWorker;
+        mmiCodeWorker = nullptr;
+        delete work;
+        work = nullptr;
         return TELEPHONY_ERROR;
     }
     return TELEPHONY_SUCCESS;
@@ -823,26 +830,27 @@ int32_t NapiCallAbilityCallback::UpdateAudioDeviceInfo(const AudioDeviceInfo &in
 #if defined(NAPI_VERSION) && NAPI_VERSION >= 2
     napi_get_uv_event_loop(audioDeviceCallback_.env, &loop);
 #endif
-    AudioDeviceWork *dataWorker = std::make_unique<AudioDeviceWork>().release();
-    if (dataWorker == nullptr) {
-        TELEPHONY_LOGE("dataWorker is nullptr!");
+    AudioDeviceWork *audioDeviceWork = std::make_unique<AudioDeviceWork>().release();
+    if (audioDeviceWork == nullptr) {
+        TELEPHONY_LOGE("audioDeviceWork is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    dataWorker->info = info;
-    dataWorker->callback = audioDeviceCallback_;
+    audioDeviceWork->info = info;
+    audioDeviceWork->callback = audioDeviceCallback_;
     uv_work_t *work = std::make_unique<uv_work_t>().release();
     if (work == nullptr) {
         TELEPHONY_LOGE("work is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    work->data = (void *)dataWorker;
+    work->data = (void *)audioDeviceWork;
     int32_t errCode = uv_queue_work_with_qos(
         loop, work, [](uv_work_t *work) {}, ReportAudioDeviceInfoWork, uv_qos_default);
     if (errCode != 0) {
         TELEPHONY_LOGE("failed to uv_queue_work_with_qos, errCode: %{public}d", errCode);
-        delete dataWorker;
-        dataWorker = nullptr;
-        DeleteWorkIfFail(work);
+        delete audioDeviceWork;
+        audioDeviceWork = nullptr;
+        delete work;
+        work = nullptr;
         return TELEPHONY_ERROR;
     }
     return TELEPHONY_SUCCESS;
@@ -925,26 +933,27 @@ int32_t NapiCallAbilityCallback::OttCallRequest(OttCallRequestId requestId, AppE
 #if defined(NAPI_VERSION) && NAPI_VERSION >= 2
     napi_get_uv_event_loop(ottRequestCallback_.env, &loop);
 #endif
-    CallOttWorker *dataWorker = std::make_unique<CallOttWorker>().release();
-    if (dataWorker == nullptr) {
-        TELEPHONY_LOGE("dataWorker is nullptr!");
+    CallOttWorker *callOttWorker = std::make_unique<CallOttWorker>().release();
+    if (callOttWorker == nullptr) {
+        TELEPHONY_LOGE("callOttWorker is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    dataWorker->requestId = requestId;
-    dataWorker->info = info;
-    dataWorker->callback = ottRequestCallback_;
+    callOttWorker->requestId = requestId;
+    callOttWorker->info = info;
+    callOttWorker->callback = ottRequestCallback_;
     uv_work_t *work = std::make_unique<uv_work_t>().release();
     if (work == nullptr) {
         TELEPHONY_LOGE("work is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    work->data = (void *)dataWorker;
+    work->data = (void *)callOttWorker;
     int32_t errCode = uv_queue_work_with_qos(loop, work, [](uv_work_t *work) {}, ReportCallOttWork, uv_qos_default);
     if (errCode != 0) {
         TELEPHONY_LOGE("failed to uv_queue_work_with_qos, errCode: %{public}d", errCode);
-        delete dataWorker;
-        dataWorker = nullptr;
-        DeleteWorkIfFail(work);
+        delete callOttWorker;
+        callOttWorker = nullptr;
+        delete work;
+        work = nullptr;
         return TELEPHONY_ERROR;
     }
     return TELEPHONY_SUCCESS;
@@ -960,25 +969,26 @@ int32_t NapiCallAbilityCallback::ReportGetWaitingInfo(AppExecFwk::PacMap &result
 #if defined(NAPI_VERSION) && NAPI_VERSION >= 2
     napi_get_uv_event_loop(getWaitingCallback_.env, &loop);
 #endif
-    CallSupplementWorker *dataWorker = std::make_unique<CallSupplementWorker>().release();
-    if (dataWorker == nullptr) {
-        TELEPHONY_LOGE("dataWorker is nullptr!");
+    CallSupplementWorker *callSupplementWorkerData = std::make_unique<CallSupplementWorker>().release();
+    if (callSupplementWorkerData == nullptr) {
+        TELEPHONY_LOGE("callSupplementWorkerData is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    dataWorker->info = resultInfo;
-    dataWorker->callback = getWaitingCallback_;
+    callSupplementWorkerData->info = resultInfo;
+    callSupplementWorkerData->callback = getWaitingCallback_;
     uv_work_t *work = std::make_unique<uv_work_t>().release();
     if (work == nullptr) {
         TELEPHONY_LOGE("work is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    work->data = (void *)dataWorker;
+    work->data = (void *)callSupplementWorkerData;
     int32_t errorCode = uv_queue_work_with_qos(
         loop, work, [](uv_work_t *work) {}, ReportWaitAndLimitInfoWork, uv_qos_default);
     if (errorCode != 0) {
-        delete dataWorker;
-        dataWorker = nullptr;
-        DeleteWorkIfFail(work);
+        delete callSupplementWorkerData;
+        callSupplementWorkerData = nullptr;
+        delete work;
+        work = nullptr;
         TELEPHONY_LOGE("failed to uv_queue_work_with_qos, errorCode: %{public}d", errorCode);
         return TELEPHONY_ERROR;
     }
@@ -998,26 +1008,27 @@ int32_t NapiCallAbilityCallback::ReportCloseUnFinishedUssdInfo(AppExecFwk::PacMa
 #if defined(NAPI_VERSION) && NAPI_VERSION >= 2
     napi_get_uv_event_loop(closeUnfinishedUssdCallback_.env, &loop);
 #endif
-    CallSupplementWorker *dataWorker = std::make_unique<CallSupplementWorker>().release();
-    if (dataWorker == nullptr) {
-        TELEPHONY_LOGE("dataWorker is nullptr!");
+    CallSupplementWorker *callSupplementDataWorker = std::make_unique<CallSupplementWorker>().release();
+    if (callSupplementDataWorker == nullptr) {
+        TELEPHONY_LOGE("callSupplementDataWorker is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    dataWorker->info = resultInfo;
-    dataWorker->callback = closeUnfinishedUssdCallback_;
+    callSupplementDataWorker->info = resultInfo;
+    callSupplementDataWorker->callback = closeUnfinishedUssdCallback_;
     uv_work_t *work = std::make_unique<uv_work_t>().release();
     if (work == nullptr) {
         TELEPHONY_LOGE("work is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    work->data = (void *)dataWorker;
+    work->data = (void *)callSupplementDataWorker;
     int32_t errorCode = uv_queue_work_with_qos(
         loop, work, [](uv_work_t *work) {}, ReportExecutionResultWork, uv_qos_default);
     if (errorCode != 0) {
         TELEPHONY_LOGE("failed to uv_queue_work_with_qos, errorCode: %{public}d", errorCode);
-        delete dataWorker;
-        dataWorker = nullptr;
-        DeleteWorkIfFail(work);
+        delete callSupplementDataWorker;
+        callSupplementDataWorker = nullptr;
+        delete work;
+        work = nullptr;
         return TELEPHONY_ERROR;
     }
     if (closeUnfinishedUssdCallback_.thisVar) {
@@ -1036,26 +1047,27 @@ int32_t NapiCallAbilityCallback::ReportSetWaitingInfo(AppExecFwk::PacMap &result
 #if defined(NAPI_VERSION) && NAPI_VERSION >= 2
     napi_get_uv_event_loop(setWaitingCallback_.env, &loop);
 #endif
-    CallSupplementWorker *dataWorker = std::make_unique<CallSupplementWorker>().release();
-    if (dataWorker == nullptr) {
-        TELEPHONY_LOGE("dataWorker is nullptr!");
+    CallSupplementWorker *callSupplementWorker = std::make_unique<CallSupplementWorker>().release();
+    if (callSupplementWorker == nullptr) {
+        TELEPHONY_LOGE("callSupplementWorker is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    dataWorker->info = resultInfo;
-    dataWorker->callback = setWaitingCallback_;
+    callSupplementWorker->info = resultInfo;
+    callSupplementWorker->callback = setWaitingCallback_;
     uv_work_t *work = std::make_unique<uv_work_t>().release();
     if (work == nullptr) {
         TELEPHONY_LOGE("work is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    work->data = (void *)dataWorker;
+    work->data = (void *)callSupplementWorker;
     int32_t resultCode = uv_queue_work_with_qos(
         loop, work, [](uv_work_t *work) {}, ReportExecutionResultWork, uv_qos_default);
     if (resultCode != 0) {
-        delete dataWorker;
-        dataWorker = nullptr;
-        DeleteWorkIfFail(work);
-        TELEPHONY_LOGE("failed to uv_queue_work_with_qos, resultCode: %{public}d", resultCode);
+        delete callSupplementWorker;
+        callSupplementWorker = nullptr;
+        delete work;
+        work = nullptr;
+        TELEPHONY_LOGE("failed to add uv_queue_work_with_qos, resultCode: %{public}d", resultCode);
         return TELEPHONY_ERROR;
     }
     if (setWaitingCallback_.thisVar) {
@@ -1074,26 +1086,27 @@ int32_t NapiCallAbilityCallback::ReportGetRestrictionInfo(AppExecFwk::PacMap &re
 #if defined(NAPI_VERSION) && NAPI_VERSION >= 2
     napi_get_uv_event_loop(getRestrictionCallback_.env, &loop);
 #endif
-    CallSupplementWorker *dataWorker = std::make_unique<CallSupplementWorker>().release();
-    if (dataWorker == nullptr) {
-        TELEPHONY_LOGE("dataWorker is nullptr!");
+    CallSupplementWorker *callSupplementWorker = std::make_unique<CallSupplementWorker>().release();
+    if (callSupplementWorker == nullptr) {
+        TELEPHONY_LOGE("callSupplementWorker is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    dataWorker->info = resultInfo;
-    dataWorker->callback = getRestrictionCallback_;
+    dataWocallSupplementWorkerrker->info = resultInfo;
+    callSupplementWorker->callback = getRestrictionCallback_;
     uv_work_t *work = std::make_unique<uv_work_t>().release();
     if (work == nullptr) {
         TELEPHONY_LOGE("work is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    work->data = (void *)dataWorker;
+    work->data = (void *)callSupplementWorker;
     int32_t resultCode = uv_queue_work_with_qos(
         loop, work, [](uv_work_t *work) {}, ReportWaitAndLimitInfoWork, uv_qos_default);
     if (resultCode != 0) {
-        delete dataWorker;
-        dataWorker = nullptr;
+        delete callSupplementWorker;
+        callSupplementWorker = nullptr;
         TELEPHONY_LOGE("failed to uv_queue_work_with_qos, resultCode: %{public}d", resultCode);
-        DeleteWorkIfFail(work);
+        delete work;
+        work = nullptr;
         return TELEPHONY_ERROR;
     }
     if (getRestrictionCallback_.thisVar) {
@@ -1112,26 +1125,27 @@ int32_t NapiCallAbilityCallback::ReportSetRestrictionInfo(AppExecFwk::PacMap &re
 #if defined(NAPI_VERSION) && NAPI_VERSION >= 2
     napi_get_uv_event_loop(setRestrictionCallback_.env, &loop);
 #endif
-    CallSupplementWorker *dataWorker = std::make_unique<CallSupplementWorker>().release();
-    if (dataWorker == nullptr) {
-        TELEPHONY_LOGE("dataWorker is nullptr!");
+    CallSupplementWorker *callSupplementWorker = std::make_unique<CallSupplementWorker>().release();
+    if (callSupplementWorker == nullptr) {
+        TELEPHONY_LOGE("callSupplementWorker is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    dataWorker->info = resultInfo;
-    dataWorker->callback = setRestrictionCallback_;
+    callSupplementWorker->info = resultInfo;
+    callSupplementWorker->callback = setRestrictionCallback_;
     uv_work_t *work = std::make_unique<uv_work_t>().release();
     if (work == nullptr) {
         TELEPHONY_LOGE("work is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    work->data = (void *)dataWorker;
+    work->data = (void *)callSupplementWorker;
     int32_t resultCode = uv_queue_work_with_qos(
         loop, work, [](uv_work_t *work) {}, ReportExecutionResultWork, uv_qos_default);
     if (resultCode != 0) {
         TELEPHONY_LOGE("failed to uv_queue_work_with_qos, resultCode: %{public}d", resultCode);
-        delete dataWorker;
-        dataWorker = nullptr;
-        DeleteWorkIfFail(work);
+        delete callSupplementWorker;
+        callSupplementWorker = nullptr;
+        delete work;
+        work = nullptr;
         return TELEPHONY_ERROR;
     }
     if (setRestrictionCallback_.thisVar) {
@@ -1150,25 +1164,26 @@ int32_t NapiCallAbilityCallback::ReportSetRestrictionPassword(AppExecFwk::PacMap
 #if defined(NAPI_VERSION) && NAPI_VERSION >= 2
     napi_get_uv_event_loop(setRestrictionPasswordCallback_.env, &loop);
 #endif
-    CallSupplementWorker *dataWorker = std::make_unique<CallSupplementWorker>().release();
-    if (dataWorker == nullptr) {
-        TELEPHONY_LOGE("dataWorker is nullptr!");
+    CallSupplementWorker *callSupplementWorker = std::make_unique<CallSupplementWorker>().release();
+    if (callSupplementWorker == nullptr) {
+        TELEPHONY_LOGE("callSupplementWorker is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    dataWorker->info = resultInfo;
-    dataWorker->callback = setRestrictionPasswordCallback_;
+    callSupplementWorker->info = resultInfo;
+    callSupplementWorker->callback = setRestrictionPasswordCallback_;
     uv_work_t *work = std::make_unique<uv_work_t>().release();
     if (work == nullptr) {
         TELEPHONY_LOGE("work is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    work->data = (void *)dataWorker;
+    work->data = (void *)callSupplementWorker;
     int32_t errCode = uv_queue_work_with_qos(
         loop, work, [](uv_work_t *work) {}, ReportExecutionResultWork, uv_qos_default);
     if (errCode != 0) {
-        delete dataWorker;
-        dataWorker = nullptr;
-        DeleteWorkIfFail(work);
+        delete callSupplementWorker;
+        callSupplementWorker = nullptr;
+        delete work;
+        work = nullptr;
         TELEPHONY_LOGE("failed to uv_queue_work_with_qos, errCode: %{public}d", errCode);
         return TELEPHONY_ERROR;
     }
@@ -1193,26 +1208,27 @@ int32_t NapiCallAbilityCallback::ReportGetTransferInfo(AppExecFwk::PacMap &resul
 #if defined(NAPI_VERSION) && NAPI_VERSION >= 2
     napi_get_uv_event_loop(getTransferCallback_.env, &loop);
 #endif
-    CallSupplementWorker *dataWorker = std::make_unique<CallSupplementWorker>().release();
-    if (dataWorker == nullptr) {
-        TELEPHONY_LOGE("dataWorker is nullptr!");
+    CallSupplementWorker *callSupplementWorker = std::make_unique<CallSupplementWorker>().release();
+    if (callSupplementWorker == nullptr) {
+        TELEPHONY_LOGE("callSupplementWorker is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    dataWorker->info = resultInfo;
-    dataWorker->callback = getTransferCallback_;
+    callSupplementWorker->info = resultInfo;
+    callSupplementWorker->callback = getTransferCallback_;
     uv_work_t *work = std::make_unique<uv_work_t>().release();
     if (work == nullptr) {
         TELEPHONY_LOGE("work is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    work->data = (void *)dataWorker;
+    work->data = (void *)callSupplementWorker;
     int32_t errCode = uv_queue_work_with_qos(
         loop, work, [](uv_work_t *work) {}, ReportSupplementInfoWork, uv_qos_default);
     if (errCode != 0) {
         TELEPHONY_LOGE("failed add to uv_queue_work_with_qos, errCode: %{public}d", errCode);
-        delete dataWorker;
-        dataWorker = nullptr;
-        DeleteWorkIfFail(work);
+        delete callSupplementWorker;
+        callSupplementWorker = nullptr;
+        delete work;
+        work = nullptr;
         return TELEPHONY_ERROR;
     }
     if (getTransferCallback_.thisVar) {
@@ -1231,26 +1247,27 @@ int32_t NapiCallAbilityCallback::ReportSetTransferInfo(AppExecFwk::PacMap &resul
 #if defined(NAPI_VERSION) && NAPI_VERSION >= 2
     napi_get_uv_event_loop(setTransferCallback_.env, &loop);
 #endif
-    CallSupplementWorker *dataWorker = std::make_unique<CallSupplementWorker>().release();
-    if (dataWorker == nullptr) {
-        TELEPHONY_LOGE("dataWorker is nullptr!");
+    CallSupplementWorker *callSupplementWorker = std::make_unique<CallSupplementWorker>().release();
+    if (callSupplementWorker == nullptr) {
+        TELEPHONY_LOGE("callSupplementWorker is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    dataWorker->info = resultInfo;
-    dataWorker->callback = setTransferCallback_;
+    callSupplementWorker->info = resultInfo;
+    callSupplementWorker->callback = setTransferCallback_;
     uv_work_t *work = std::make_unique<uv_work_t>().release();
     if (work == nullptr) {
         TELEPHONY_LOGE("work is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    work->data = (void *)dataWorker;
+    work->data = (void *)callSupplementWorker;
     int32_t errCode = uv_queue_work_with_qos(
         loop, work, [](uv_work_t *work) {}, ReportExecutionResultWork, uv_qos_default);
     if (errCode != 0) {
-        delete dataWorker;
-        dataWorker = nullptr;
+        delete callSupplementWorker;
+        callSupplementWorker = nullptr;
         TELEPHONY_LOGE("failed to uv_queue_work_with_qos, errCode: %{public}d", errCode);
-        DeleteWorkIfFail(work);
+        delete work;
+        work = nullptr;
         return TELEPHONY_ERROR;
     }
     if (setTransferCallback_.thisVar) {
@@ -1619,26 +1636,27 @@ int32_t NapiCallAbilityCallback::UpdatePostDialDelay(const std::string str)
 #if defined(NAPI_VERSION) && NAPI_VERSION >= 2
     napi_get_uv_event_loop(postDialDelayCallback_.env, &loop);
 #endif
-    PostDialDelayWorker *dataWorker = std::make_unique<PostDialDelayWorker>().release();
-    if (dataWorker == nullptr) {
-        TELEPHONY_LOGE("dataWorker is nullptr!");
+    PostDialDelayWorker *postDialDelayWorker = std::make_unique<PostDialDelayWorker>().release();
+    if (postDialDelayWorker == nullptr) {
+        TELEPHONY_LOGE("postDialDelayWorker is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    dataWorker->postDialStr = str;
-    dataWorker->callback = postDialDelayCallback_;
+    postDialDelayWorker->postDialStr = str;
+    postDialDelayWorker->callback = postDialDelayCallback_;
     uv_work_t *work = std::make_unique<uv_work_t>().release();
     if (work == nullptr) {
         TELEPHONY_LOGE("work is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    work->data = (void *)dataWorker;
+    work->data = (void *)postDialDelayWorker;
     int32_t errCode = uv_queue_work_with_qos(
         loop, work, [](uv_work_t *work) {}, ReportPostDialDelayWork, uv_qos_default);
     if (errCode != 0) {
         TELEPHONY_LOGE("failed to uv_queue_work_with_qos, errCode: %{public}d", errCode);
-        delete dataWorker;
-        dataWorker = nullptr;
-        DeleteWorkIfFail(work);
+        delete postDialDelayWorker;
+        postDialDelayWorker = nullptr;
+        delete work;
+        work = nullptr;
         return TELEPHONY_ERROR;
     }
     return TELEPHONY_SUCCESS;
@@ -1696,26 +1714,27 @@ int32_t NapiCallAbilityCallback::UpdateImsCallModeChange(const CallMediaModeInfo
 #if defined(NAPI_VERSION) && NAPI_VERSION >= 2
     napi_get_uv_event_loop(imsCallModeCallback_.env, &loop);
 #endif
-    ImsCallModeInfoWorker *dataWorker = std::make_unique<ImsCallModeInfoWorker>().release();
-    if (dataWorker == nullptr) {
-        TELEPHONY_LOGE("dataWorker is nullptr!");
+    ImsCallModeInfoWorker *imsCallModeInfoWorker = std::make_unique<ImsCallModeInfoWorker>().release();
+    if (imsCallModeInfoWorker == nullptr) {
+        TELEPHONY_LOGE("imsCallModeInfoWorker is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    dataWorker->callModeInfo = imsCallModeInfo;
-    dataWorker->callback = imsCallModeCallback_;
+    imsCallModeInfoWorker->callModeInfo = imsCallModeInfo;
+    imsCallModeInfoWorker->callback = imsCallModeCallback_;
     uv_work_t *work = std::make_unique<uv_work_t>().release();
     if (work == nullptr) {
         TELEPHONY_LOGE("work is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    work->data = (void *)dataWorker;
+    work->data = (void *)imsCallModeInfoWorker;
     int32_t errCode = uv_queue_work_with_qos(
         loop, work, [](uv_work_t *work) {}, ReportCallMediaModeInfoWork, uv_qos_default);
     if (errCode != 0) {
         TELEPHONY_LOGE("failed to uv_queue_work_with_qos, errCode: %{public}d", errCode);
-        delete dataWorker;
-        dataWorker = nullptr;
-        DeleteWorkIfFail(work);
+        delete imsCallModeInfoWorker;
+        imsCallModeInfoWorker = nullptr;
+        delete work;
+        work = nullptr;
         return TELEPHONY_ERROR;
     }
     return TELEPHONY_SUCCESS;
@@ -1782,26 +1801,27 @@ int32_t NapiCallAbilityCallback::CallSessionEventChange(const CallSessionEvent &
 #if defined(NAPI_VERSION) && NAPI_VERSION >= 2
     napi_get_uv_event_loop(callSessionEventCallback_.env, &loop);
 #endif
-    CallSessionEventWorker *dataWorker = std::make_unique<CallSessionEventWorker>().release();
-    if (dataWorker == nullptr) {
-        TELEPHONY_LOGE("dataWorker is nullptr!");
+    CallSessionEventWorker *callSessionEventWorker = std::make_unique<CallSessionEventWorker>().release();
+    if (callSessionEventWorker == nullptr) {
+        TELEPHONY_LOGE("callSessionEventWorker is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    dataWorker->sessionEvent = callSessionEvent;
-    dataWorker->callback = callSessionEventCallback_;
+    callSessionEventWorker->sessionEvent = callSessionEvent;
+    callSessionEventWorker->callback = callSessionEventCallback_;
     uv_work_t *work = std::make_unique<uv_work_t>().release();
     if (work == nullptr) {
         TELEPHONY_LOGE("work is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    work->data = (void *)dataWorker;
+    work->data = (void *)callSessionEventWorker;
     int32_t errCode = uv_queue_work_with_qos(
         loop, work, [](uv_work_t *work) {}, ReportCallSessionEventWork, uv_qos_default);
     if (errCode != 0) {
         TELEPHONY_LOGE("failed to uv_queue_work_with_qos, errCode: %{public}d", errCode);
-        delete dataWorker;
-        dataWorker = nullptr;
-        DeleteWorkIfFail(work);
+        delete callSessionEventWorker;
+        callSessionEventWorker = nullptr;
+        delete work;
+        work = nullptr;
         return TELEPHONY_ERROR;
     }
     return TELEPHONY_SUCCESS;
@@ -1865,26 +1885,27 @@ int32_t NapiCallAbilityCallback::PeerDimensionsChange(const PeerDimensionsDetail
 #if defined(NAPI_VERSION) && NAPI_VERSION >= 2
     napi_get_uv_event_loop(peerDimensionsCallback_.env, &loop);
 #endif
-    PeerDimensionsWorker *dataWorker = std::make_unique<PeerDimensionsWorker>().release();
-    if (dataWorker == nullptr) {
-        TELEPHONY_LOGE("dataWorker is nullptr!");
+    PeerDimensionsWorker *peerDimensionsWorker = std::make_unique<PeerDimensionsWorker>().release();
+    if (peerDimensionsWorker == nullptr) {
+        TELEPHONY_LOGE("peerDimensionsWorker is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    dataWorker->peerDimensionsDetail = peerDimensionsDetail;
-    dataWorker->callback = peerDimensionsCallback_;
+    peerDimensionsWorker->peerDimensionsDetail = peerDimensionsDetail;
+    peerDimensionsWorker->callback = peerDimensionsCallback_;
     uv_work_t *work = std::make_unique<uv_work_t>().release();
     if (work == nullptr) {
         TELEPHONY_LOGE("work is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    work->data = (void *)dataWorker;
+    work->data = (void *)peerDimensionsWorker;
     int32_t errCode = uv_queue_work_with_qos(
         loop, work, [](uv_work_t *work) {}, ReportPeerDimensionsWork, uv_qos_default);
     if (errCode != 0) {
         TELEPHONY_LOGE("failed to uv_queue_work_with_qos, errCode: %{public}d", errCode);
-        delete dataWorker;
-        dataWorker = nullptr;
-        DeleteWorkIfFail(work);
+        delete peerDimensionsWorker;
+        peerDimensionsWorker = nullptr;
+        delete work;
+        work = nullptr;
         return TELEPHONY_ERROR;
     }
     return TELEPHONY_SUCCESS;
@@ -1951,26 +1972,27 @@ int32_t NapiCallAbilityCallback::CallDataUsageChange(const int64_t dataUsage)
 #if defined(NAPI_VERSION) && NAPI_VERSION >= 2
     napi_get_uv_event_loop(callDataUsageCallback_.env, &loop);
 #endif
-    CallDataUsageWorker *dataWorker = std::make_unique<CallDataUsageWorker>().release();
-    if (dataWorker == nullptr) {
-        TELEPHONY_LOGE("dataWorker is nullptr!");
+    CallDataUsageWorker *callDataUsageWorker = std::make_unique<CallDataUsageWorker>().release();
+    if (callDataUsageWorker == nullptr) {
+        TELEPHONY_LOGE("callDataUsageWorker is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    dataWorker->callDataUsage = dataUsage;
-    dataWorker->callback = callDataUsageCallback_;
+    callDataUsageWorker->callDataUsage = dataUsage;
+    callDataUsageWorker->callback = callDataUsageCallback_;
     uv_work_t *work = std::make_unique<uv_work_t>().release();
     if (work == nullptr) {
         TELEPHONY_LOGE("work is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    work->data = (void *)dataWorker;
+    work->data = (void *)callDataUsageWorker;
     int32_t errCode = uv_queue_work_with_qos(
         loop, work, [](uv_work_t *work) {}, ReportCallDataUsageWork, uv_qos_default);
     if (errCode != 0) {
         TELEPHONY_LOGE("failed to uv_queue_work_with_qos, errCode: %{public}d", errCode);
-        delete dataWorker;
-        dataWorker = nullptr;
-        DeleteWorkIfFail(work);
+        delete callDataUsageWorker;
+        callDataUsageWorker = nullptr;
+        delete work;
+        work = nullptr;
         return TELEPHONY_ERROR;
     }
     return TELEPHONY_SUCCESS;
@@ -2029,26 +2051,27 @@ int32_t NapiCallAbilityCallback::UpdateCameraCapabilities(const CameraCapabiliti
 #if defined(NAPI_VERSION) && NAPI_VERSION >= 2
     napi_get_uv_event_loop(cameraCapabilitiesCallback_.env, &loop);
 #endif
-    CameraCapbilitiesWorker *dataWorker = std::make_unique<CameraCapbilitiesWorker>().release();
-    if (dataWorker == nullptr) {
-        TELEPHONY_LOGE("dataWorker is nullptr!");
+    CameraCapbilitiesWorker *cameraCapbilitiesWorker = std::make_unique<CameraCapbilitiesWorker>().release();
+    if (cameraCapbilitiesWorker == nullptr) {
+        TELEPHONY_LOGE("cameraCapbilitiesWorker is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    dataWorker->cameraCapabilities = cameraCapabilities;
-    dataWorker->callback = cameraCapabilitiesCallback_;
+    cameraCapbilitiesWorker->cameraCapabilities = cameraCapabilities;
+    cameraCapbilitiesWorker->callback = cameraCapabilitiesCallback_;
     uv_work_t *work = std::make_unique<uv_work_t>().release();
     if (work == nullptr) {
         TELEPHONY_LOGE("work is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    work->data = (void *)dataWorker;
+    work->data = (void *)cameraCapbilitiesWorker;
     int32_t errCode = uv_queue_work_with_qos(
         loop, work, [](uv_work_t *work) {}, ReportCameraCapabilitiesInfoWork, uv_qos_default);
     if (errCode != 0) {
         TELEPHONY_LOGE("failed to uv_queue_work_with_qos, errCode: %{public}d", errCode);
-        delete dataWorker;
-        dataWorker = nullptr;
-        DeleteWorkIfFail(work);
+        delete cameraCapbilitiesWorker;
+        cameraCapbilitiesWorker = nullptr;
+        delete work;
+        work = nullptr;
         return TELEPHONY_ERROR;
     }
     return TELEPHONY_SUCCESS;
@@ -2065,15 +2088,6 @@ void NapiCallAbilityCallback::ReportCameraCapabilitiesInfoWork(uv_work_t *work, 
     TELEPHONY_LOGI("ReportPostDialDelay result = %{public}d", ret);
     delete dataWorkerData;
     dataWorkerData = nullptr;
-    delete work;
-    work = nullptr;
-}
-
-void NapiCallAbilityCallback::DeleteWorkIfFail(uv_work_t *work)
-{
-    if (work == nullptr) {
-        return;
-    }
     delete work;
     work = nullptr;
 }

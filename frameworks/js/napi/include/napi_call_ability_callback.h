@@ -139,7 +139,6 @@ private:
     static int32_t ReportCallDataUsage(int64_t dataUsage, EventCallback eventCallback);
     static void ReportCameraCapabilitiesInfoWork(uv_work_t *work, int32_t status);
     static int32_t ReportCameraCapabilitiesInfo(CameraCapabilities &cameraCapabilities, EventCallback eventCallback);
-    void DeleteWorkIfFail(uv_work_t *work);
 
 private:
     EventCallback stateCallback_;
