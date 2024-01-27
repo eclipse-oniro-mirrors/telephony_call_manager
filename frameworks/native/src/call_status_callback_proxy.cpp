@@ -46,12 +46,14 @@ int32_t CallStatusCallbackProxy::UpdateCallReportInfo(const CallReportInfo &info
     dataParcel.WriteInt32(info.mpty);
     dataParcel.WriteInt32(info.crsType);
     dataParcel.WriteInt32(info.originalCallType);
-    dataParcel.WriteString(info.voipCallInfo.voipCallId);
-    dataParcel.WriteString(info.voipCallInfo.userName);
-    dataParcel.WriteString(info.voipCallInfo.abilityName);
-    dataParcel.WriteString(info.voipCallInfo.extensionId);
-    dataParcel.WriteString(info.voipCallInfo.voipBundleName);
-    dataParcel.WriteParcelable(info.voipCallInfo.pixelMap.get());
+    if (info.callType == CallType::TYPE_VOIP) {
+        dataParcel.WriteString(info.voipCallInfo.voipCallId);
+        dataParcel.WriteString(info.voipCallInfo.userName);
+        dataParcel.WriteString(info.voipCallInfo.abilityName);
+        dataParcel.WriteString(info.voipCallInfo.extensionId);
+        dataParcel.WriteString(info.voipCallInfo.voipBundleName);
+        dataParcel.WriteParcelable(info.voipCallInfo.pixelMap.get());
+    }
     if (Remote() == nullptr) {
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
@@ -67,14 +69,12 @@ int32_t CallStatusCallbackProxy::UpdateCallsReportInfo(const CallsReportInfo &in
     MessageParcel dataParcel;
     MessageParcel replyParcel;
     MessageOption option;
-    int32_t length = sizeof(CallReportInfo);
     int32_t error = TELEPHONY_ERR_FAIL;
     if (!dataParcel.WriteInterfaceToken(CallStatusCallbackProxy::GetDescriptor())) {
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
     dataParcel.WriteInt32(info.callVec.size());
     for (auto &it : info.callVec) {
-        dataParcel.WriteInt32(length);
         dataParcel.WriteInt32(it.index);
         dataParcel.WriteCString(it.accountNum);
         dataParcel.WriteInt32(it.accountId);
@@ -85,12 +85,14 @@ int32_t CallStatusCallbackProxy::UpdateCallsReportInfo(const CallsReportInfo &in
         dataParcel.WriteInt32(it.mpty);
         dataParcel.WriteInt32(it.crsType);
         dataParcel.WriteInt32(it.originalCallType);
-        dataParcel.WriteString(it.voipCallInfo.voipCallId);
-        dataParcel.WriteString(it.voipCallInfo.userName);
-        dataParcel.WriteString(it.voipCallInfo.abilityName);
-        dataParcel.WriteString(it.voipCallInfo.extensionId);
-        dataParcel.WriteString(it.voipCallInfo.voipBundleName);
-        dataParcel.WriteParcelable(it.voipCallInfo.pixelMap.get());
+        if (it.callType == CallType::TYPE_VOIP) {
+            dataParcel.WriteString(it.voipCallInfo.voipCallId);
+            dataParcel.WriteString(it.voipCallInfo.userName);
+            dataParcel.WriteString(it.voipCallInfo.abilityName);
+            dataParcel.WriteString(it.voipCallInfo.extensionId);
+            dataParcel.WriteString(it.voipCallInfo.voipBundleName);
+            dataParcel.WriteParcelable(it.voipCallInfo.pixelMap.get());
+        }
     }
     dataParcel.WriteInt32(info.slotId);
     if (Remote() == nullptr) {

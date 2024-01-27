@@ -55,12 +55,14 @@ int32_t CallAbilityCallbackProxy::OnCallDetailsChange(const CallAttributeInfo &i
     dataParcel.WriteInt32(info.index);
     dataParcel.WriteInt32(info.crsType);
     dataParcel.WriteInt32(info.originalCallType);
-    dataParcel.WriteString(info.voipCallInfo.voipCallId);
-    dataParcel.WriteString(info.voipCallInfo.userName);
-    dataParcel.WriteString(info.voipCallInfo.abilityName);
-    dataParcel.WriteString(info.voipCallInfo.extensionId);
-    dataParcel.WriteString(info.voipCallInfo.voipBundleName);
-    dataParcel.WriteParcelable(info.voipCallInfo.pixelMap.get());
+    if (info.callType == CallType::TYPE_VOIP) {
+        dataParcel.WriteString(info.voipCallInfo.voipCallId);
+        dataParcel.WriteString(info.voipCallInfo.userName);
+        dataParcel.WriteString(info.voipCallInfo.abilityName);
+        dataParcel.WriteString(info.voipCallInfo.extensionId);
+        dataParcel.WriteString(info.voipCallInfo.voipBundleName);
+        dataParcel.WriteParcelable(info.voipCallInfo.pixelMap.get());
+    }
     if (Remote() == nullptr) {
         TELEPHONY_LOGE("function Remote() return nullptr!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;

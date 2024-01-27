@@ -112,12 +112,16 @@ int32_t CallStatusCallbackStub::OnUpdateCallReportInfo(MessageParcel &data, Mess
     parcelPtr.state = static_cast<TelCallState>(data.ReadInt32());
     parcelPtr.voiceDomain = data.ReadInt32();
     parcelPtr.mpty = data.ReadInt32();
-    parcelPtr.voipCallInfo.voipCallId = data.ReadString();
-    parcelPtr.voipCallInfo.userName = data.ReadString();
-    parcelPtr.voipCallInfo.abilityName = data.ReadString();
-    parcelPtr.voipCallInfo.extensionId = data.ReadString();
-    parcelPtr.voipCallInfo.voipBundleName = data.ReadString();
-    parcelPtr.voipCallInfo.pixelMap = std::shared_ptr<Media::PixelMap>(data.ReadParcelable<Media::PixelMap>());
+    parcelPtr.crsType = data.ReadInt32();
+    parcelPtr.originalCallType = data.ReadInt32();
+    if (parcelPtr.callType == CallType::TYPE_VOIP) {
+        parcelPtr.voipCallInfo.voipCallId = data.ReadString();
+        parcelPtr.voipCallInfo.userName = data.ReadString();
+        parcelPtr.voipCallInfo.abilityName = data.ReadString();
+        parcelPtr.voipCallInfo.extensionId = data.ReadString();
+        parcelPtr.voipCallInfo.voipBundleName = data.ReadString();
+        parcelPtr.voipCallInfo.pixelMap = std::shared_ptr<Media::PixelMap>(data.ReadParcelable<Media::PixelMap>());
+    }
     result = UpdateCallReportInfo(parcelPtr);
     if (!reply.WriteInt32(result)) {
         TELEPHONY_LOGE("writing parcel failed");
@@ -139,14 +143,8 @@ int32_t CallStatusCallbackStub::OnUpdateCallsReportInfo(MessageParcel &data, Mes
     }
     TELEPHONY_LOGI("call list size:%{public}d", cnt);
     CallsReportInfo callReportInfo;
-    int32_t len = 0;
     CallReportInfo parcelPtr;
     for (int32_t i = 0; i < cnt; i++) {
-        len = data.ReadInt32();
-        if (len <= 0 || len >= MAX_LEN) {
-            TELEPHONY_LOGE("invalid parameter, len = %d", len);
-            return TELEPHONY_ERR_ARGUMENT_INVALID;
-        }
         parcelPtr.index = data.ReadInt32();
         strncpy_s(parcelPtr.accountNum, kMaxNumberLen + 1, data.ReadCString(), kMaxNumberLen + 1);
         parcelPtr.accountId = data.ReadInt32();
@@ -157,12 +155,14 @@ int32_t CallStatusCallbackStub::OnUpdateCallsReportInfo(MessageParcel &data, Mes
         parcelPtr.mpty = data.ReadInt32();
         parcelPtr.crsType = data.ReadInt32();
         parcelPtr.originalCallType = data.ReadInt32();
-        parcelPtr.voipCallInfo.voipCallId = data.ReadString();
-        parcelPtr.voipCallInfo.userName = data.ReadString();
-        parcelPtr.voipCallInfo.abilityName = data.ReadString();
-        parcelPtr.voipCallInfo.extensionId = data.ReadString();
-        parcelPtr.voipCallInfo.voipBundleName = data.ReadString();
-        parcelPtr.voipCallInfo.pixelMap = std::shared_ptr<Media::PixelMap>(data.ReadParcelable<Media::PixelMap>());
+        if (parcelPtr.callType == CallType::TYPE_VOIP) {
+            parcelPtr.voipCallInfo.voipCallId = data.ReadString();
+            parcelPtr.voipCallInfo.userName = data.ReadString();
+            parcelPtr.voipCallInfo.abilityName = data.ReadString();
+            parcelPtr.voipCallInfo.extensionId = data.ReadString();
+            parcelPtr.voipCallInfo.voipBundleName = data.ReadString();
+            parcelPtr.voipCallInfo.pixelMap = std::shared_ptr<Media::PixelMap>(data.ReadParcelable<Media::PixelMap>());
+        }
         callReportInfo.callVec.push_back(parcelPtr);
         TELEPHONY_LOGI("accountId:%{public}d,state:%{public}d", parcelPtr.accountId, parcelPtr.state);
     }
