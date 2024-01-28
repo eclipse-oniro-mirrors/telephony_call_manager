@@ -175,6 +175,10 @@ int32_t CallControlManager::AnswerCall(int32_t callId, int32_t videoState)
         callId = call->GetCallID();
     }
     call = GetOneCallObject(callId);
+    if (call == nullptr) {
+        TELEPHONY_LOGE("call is nullptr");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     if (call->GetCallType() == CallType::TYPE_IMS && videoState != static_cast<int32_t>(call->GetVideoStateType())) {
         call->SetVideoStateType(static_cast<VideoStateType>(videoState));
         sptr<IMSCall> imsCall = reinterpret_cast<IMSCall *>(call.GetRefPtr());
