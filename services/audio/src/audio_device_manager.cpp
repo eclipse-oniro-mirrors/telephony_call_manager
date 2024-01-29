@@ -74,7 +74,8 @@ void AudioDeviceManager::Init()
     info_.audioDeviceList.push_back(earpiece);
 }
 
-void AudioDeviceManager::AddAudioDeviceList(const std::string &address, AudioDeviceType deviceType, const std::string &deviceName)
+void AudioDeviceManager::AddAudioDeviceList(const std::string &address, AudioDeviceType deviceType,
+    const std::string &deviceName)
 {
     std::lock_guard<std::mutex> lock(infoMutex_);
     std::vector<AudioDevice>::iterator it = info_.audioDeviceList.begin();
@@ -433,7 +434,8 @@ int32_t AudioDeviceManager::ReportAudioDeviceChange()
         TELEPHONY_LOGE("deviceName is not too long");
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
-    if (memcpy_s(info_.currentAudioDevice.deviceName, kMaxDeviceNameLen, deviceName.c_str(), deviceName.length()) != EOK) {
+    if (memcpy_s(info_.currentAudioDevice.deviceName, kMaxDeviceNameLen,
+        deviceName.c_str(), deviceName.length()) != EOK) {
         TELEPHONY_LOGE("memcpy_s deviceName fail");
         return TELEPHONY_ERR_MEMCPY_FAIL;
     }
