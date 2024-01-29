@@ -37,6 +37,10 @@ constexpr int16_t kMaxBundleNameLen = 100;
  */
 constexpr int16_t kMaxAddressLen = 225;
 /**
+ * @brief Indicates Maximum length of a sco device name.
+ */
+constexpr int16_t kMaxDeviceNameLen = 64;
+/**
  * @brief Indicates Maximum length of a MMI code message.
  */
 constexpr int16_t kMaxMessageLen = 500;

@@ -32,6 +32,7 @@ public:
     BtScoState GetBtScoState();
     bool IsBtAvailble();
     std::string GetConnectedScoAddr();
+    std::string GetConnectedScoName();
 
 private:
     bool IsBtScoConnected();

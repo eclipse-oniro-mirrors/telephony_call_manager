@@ -74,5 +74,10 @@ std::string BluetoothCallManager::GetConnectedScoAddr()
 {
     return btConnection_->GetConnectedScoAddr();
 }
+
+std::string BluetoothCallManager::GetConnectedScoName()
+{
+    return btConnection_->GetConnectedScoName();
+}
 } // namespace Telephony
 } // namespace OHOS

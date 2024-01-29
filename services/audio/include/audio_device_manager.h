@@ -41,7 +41,7 @@ public:
     static bool IsWiredHeadsetConnected();
     static void SetDeviceAvailable(AudioDeviceType deviceType, bool available);
     bool SwitchDevice(AudioDeviceType device);
-    void AddAudioDeviceList(const std::string &address, AudioDeviceType deviceType);
+    void AddAudioDeviceList(const std::string &address, AudioDeviceType deviceType, const std::string &deviceName);
     void RemoveAudioDeviceList(const std::string &address, AudioDeviceType deviceType);
     void ResetBtAudioDevicesList();
     void ResetDistributedCallDevicesList();

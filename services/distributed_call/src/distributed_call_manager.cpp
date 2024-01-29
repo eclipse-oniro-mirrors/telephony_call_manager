@@ -188,7 +188,7 @@ void DistributedCallManager::AddDCallDevice(const std::string& devId)
         return;
     }
 
-    DelayedSingleton<AudioDeviceManager>::GetInstance()->AddAudioDeviceList(device.address, device.deviceType);
+    DelayedSingleton<AudioDeviceManager>::GetInstance()->AddAudioDeviceList(device.address, device.deviceType, "");
     onlineDCallDevices_.emplace(devId, device);
 
     if (!isConnected_.load() && isCallActived_.load()) {

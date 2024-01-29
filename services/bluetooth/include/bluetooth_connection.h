@@ -55,6 +55,7 @@ public:
     void RemoveBtDevice(const std::string &address);
     bool IsBtAvailble();
     std::string GetConnectedScoAddr();
+    std::string GetConnectedScoName();
     void ResetBtConnection();
     void RegisterObserver();
 
@@ -69,10 +70,13 @@ private:
     bool IsAudioActivated();
     std::atomic<BtScoState> btScoState_{BtScoState::SCO_STATE_DISCONNECTED};
     std::mutex scoAddrMutex_;
+    std::mutex scoNameMutex_;
     std::string connectedScoAddr_;
+    std::string connectedScoName_;
 
 #ifdef ABILITY_BLUETOOTH_SUPPORT
     void SetConnectedScoAddr(std::string connectedScoAddr);
+    void SetConnectedScoName(std::string connectedScoName);
 
 private:
     sptr<ISystemAbilityStatusChange> statusChangeListener_ = nullptr;

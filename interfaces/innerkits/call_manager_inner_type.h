@@ -771,6 +771,10 @@ struct AudioDevice {
      * Indicates the device address.
      */
     char address[kMaxAddressLen + 1] = { 0 };
+    /**
+     * Indicates the device name.
+     */
+    char deviceName[kMaxDeviceNameLen + 1] = { 0 };
 };
 
 /**

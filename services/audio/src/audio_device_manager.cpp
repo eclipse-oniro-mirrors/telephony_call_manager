@@ -74,7 +74,7 @@ void AudioDeviceManager::Init()
     info_.audioDeviceList.push_back(earpiece);
 }
 
-void AudioDeviceManager::AddAudioDeviceList(const std::string &address, AudioDeviceType deviceType)
+void AudioDeviceManager::AddAudioDeviceList(const std::string &address, AudioDeviceType deviceType, const std::string &deviceName)
 {
     std::lock_guard<std::mutex> lock(infoMutex_);
     std::vector<AudioDevice>::iterator it = info_.audioDeviceList.begin();
@@ -102,6 +102,14 @@ void AudioDeviceManager::AddAudioDeviceList(const std::string &address, AudioDev
     }
     if (memcpy_s(audioDevice.address, kMaxAddressLen, address.c_str(), address.length()) != EOK) {
         TELEPHONY_LOGE("memcpy_s address fail");
+        return;
+    }
+    if (deviceName.length() > kMaxDeviceNameLen) {
+        TELEPHONY_LOGE("deviceName is not too long");
+        return;
+    }
+    if (memcpy_s(audioDevice.deviceName, kMaxDeviceNameLen, deviceName.c_str(), deviceName.length()) != EOK) {
+        TELEPHONY_LOGE("memcpy_s deviceName fail");
         return;
     }
     info_.audioDeviceList.push_back(audioDevice);
@@ -405,9 +413,11 @@ int32_t AudioDeviceManager::ReportAudioDeviceChange()
         info_.currentAudioDevice.deviceType = audioDeviceType_;
     }
     std::string address = "";
+    std::string deviceName = "";
     if (audioDeviceType_ == AudioDeviceType::DEVICE_BLUETOOTH_SCO) {
         std::shared_ptr<BluetoothCallManager> bluetoothCallManager = std::make_shared<BluetoothCallManager>();
         address = bluetoothCallManager->GetConnectedScoAddr();
+        deviceName = bluetoothCallManager->GetConnectedScoName();
     } else if (IsDistributedAudioDeviceType(audioDeviceType_)) {
         address = DelayedSingleton<DistributedCallManager>::GetInstance()->GetConnectedDCallAddr();
     }
@@ -415,20 +425,17 @@ int32_t AudioDeviceManager::ReportAudioDeviceChange()
         TELEPHONY_LOGE("address is not too long");
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
-    if (address.length() > 0) {
-        if (memset_s(info_.currentAudioDevice.address, kMaxAddressLen, 0, kMaxAddressLen) != EOK) {
-            TELEPHONY_LOGE("memset_s address fail");
-            return TELEPHONY_ERR_MEMSET_FAIL;
-        }
-        if (memcpy_s(info_.currentAudioDevice.address, kMaxAddressLen, address.c_str(), address.length()) != EOK) {
-            TELEPHONY_LOGE("memcpy_s address fail");
-            return TELEPHONY_ERR_MEMCPY_FAIL;
-        }
-    } else {
-        if (memset_s(info_.currentAudioDevice.address, kMaxAddressLen, 0, kMaxAddressLen) != EOK) {
-            TELEPHONY_LOGE("memset_s address fail");
-            return TELEPHONY_ERR_MEMSET_FAIL;
-        }
+    if (memcpy_s(info_.currentAudioDevice.address, kMaxAddressLen, address.c_str(), address.length()) != EOK) {
+        TELEPHONY_LOGE("memcpy_s address fail");
+        return TELEPHONY_ERR_MEMCPY_FAIL;
+    }
+    if (deviceName.length() > kMaxDeviceNameLen) {
+        TELEPHONY_LOGE("deviceName is not too long");
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
+    }
+    if (memcpy_s(info_.currentAudioDevice.deviceName, kMaxDeviceNameLen, deviceName.c_str(), deviceName.length()) != EOK) {
+        TELEPHONY_LOGE("memcpy_s deviceName fail");
+        return TELEPHONY_ERR_MEMCPY_FAIL;
     }
     return ReportAudioDeviceInfo();
 }
