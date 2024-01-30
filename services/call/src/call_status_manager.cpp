@@ -55,6 +55,9 @@ int32_t CallStatusManager::Init()
     for (int32_t i = 0; i < SLOT_NUM; i++) {
         callDetailsInfo_[i].callVec.clear();
     }
+    for (int32_t i = 0; i < SLOT_NUM; i++) {
+        priorVideoState_[i] = VideoStateType::TYPE_VOICE;
+    }
     mEventIdTransferMap_.clear();
     mOttEventIdTransferMap_.clear();
     InitCallBaseEvent();
@@ -913,6 +916,19 @@ int32_t CallStatusManager::UpdateCallState(sptr<CallBase> &call, TelCallState ne
                 "NotifyCallStateUpdated failed");
         }
         return CALL_ERR_PHONE_CALLSTATE_NOTIFY_FAILED;
+    }
+    int slotId = call->GetSlotId();
+    bool hasSimCard = false;
+    DelayedRefSingleton<CoreServiceClient>::GetInstance().HasSimCard(slotId, hasSimCard);
+    TELEPHONY_LOGI("nextVideoState:%{public}d, priorVideoState:%{public}d, hasSimCard:%{public}d", videoState,
+        priorVideoState_[slotId], hasSimCard);
+    if (priorVideoState_[slotId] != videoState && hasSimCard) {
+        DelayedSingleton<AudioControlManager>::GetInstance()->VideoStateUpdated(
+            call, priorVideoState_[slotId], videoState);
+        priorVideoState_[slotId] = videoState;
+    }
+    if (nextState == TelCallState::CALL_STATUS_DISCONNECTED && hasSimCard) {
+        priorVideoState_[slotId] = VideoStateType::TYPE_VOICE;
     }
     return TELEPHONY_SUCCESS;
 }

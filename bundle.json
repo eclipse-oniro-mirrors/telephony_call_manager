@@ -57,7 +57,8 @@
                 "safwk",
                 "samgr",
                 "sms_mms",
-                "image_framework"
+                "image_framework",
+                "miscdevice"
             ],
             "third_party": [
                 "libphonenumber",
