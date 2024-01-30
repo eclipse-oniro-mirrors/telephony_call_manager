@@ -225,7 +225,7 @@ void AudioDeviceChangeCallback::OnDeviceChange(const AudioStandard::DeviceChange
                 TELEPHONY_LOGI("WiredHeadset connected");
                 DelayedSingleton<AudioProxy>::GetInstance()->SetWiredHeadsetState(true);
                 DelayedSingleton<AudioDeviceManager>::GetInstance()->AddAudioDeviceList(
-                    "", AudioDeviceType::DEVICE_WIRED_HEADSET);
+                    "", AudioDeviceType::DEVICE_WIRED_HEADSET, "");
             } else {
                 TELEPHONY_LOGI("WiredHeadset disConnected");
                 DelayedSingleton<AudioProxy>::GetInstance()->SetWiredHeadsetState(false);
@@ -366,6 +366,7 @@ void AudioPreferDeviceChangeCallback::OnPreferredOutputDeviceUpdated(
         TELEPHONY_LOGW("has already switch to distributed audio device");
         return;
     }
+    TELEPHONY_LOGI("OnPreferredOutputDeviceUpdated type: %{public}d", desc[0]->deviceType_);
     switch (desc[0]->deviceType_) {
         case AudioStandard::DEVICE_TYPE_BLUETOOTH_SCO:
             device.deviceType = AudioDeviceType::DEVICE_BLUETOOTH_SCO;
@@ -393,7 +394,7 @@ void AudioPreferDeviceChangeCallback::OnPreferredOutputDeviceUpdated(
         case AudioStandard::DEVICE_TYPE_USB_HEADSET:
             device.deviceType = AudioDeviceType::DEVICE_WIRED_HEADSET;
             DelayedSingleton<AudioDeviceManager>::GetInstance()->AddAudioDeviceList(
-                "", AudioDeviceType::DEVICE_WIRED_HEADSET);
+                "", AudioDeviceType::DEVICE_WIRED_HEADSET, "");
             DelayedSingleton<AudioDeviceManager>::GetInstance()->SetCurrentAudioDevice(device.deviceType);
             break;
         default:

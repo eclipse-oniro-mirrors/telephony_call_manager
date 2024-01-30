@@ -2384,5 +2384,17 @@ HWTEST_F(BranchTest, Telephony_VoipCallManagerProxy_001, Function | MediumTest |
         voipCallManagerInterfacePtr->UnRegisterCallManagerCallBack();
     }
 }
+
+/**
+ * @tc.number   Telephony_BluetoothConnection_001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_BluetoothConnection_001, Function | MediumTest | Level3)
+{
+    std::shared_ptr<BluetoothConnection> bluetoothConnection = std::make_shared<BluetoothConnection>();
+    ASSERT_EQ(bluetoothConnection->GetConnectedScoAddr(), "");
+    ASSERT_EQ(bluetoothConnection->GetConnectedScoName(), "");
+}
 } // namespace Telephony
 } // namespace OHOS
