@@ -141,8 +141,8 @@ bool CallNumberUtils::IsMMICode(const std::string &number)
         return true;
     }
 
-    if (number.back() == '#') {
-        TELEPHONY_LOGI("number is end of #");
+    if ((number.find('*') == 0 || number.find('#') == 0) && number.back() == '#') {
+        TELEPHONY_LOGI("number start with * or # and end with #");
         return true;
     }
 
