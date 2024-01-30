@@ -161,6 +161,7 @@ void AudioDeviceManager::RemoveAudioDeviceList(const std::string &address, Audio
         info_.audioDeviceList.push_back(audioDevice);
         TELEPHONY_LOGI("add Earpiece device success");
     }
+    DelayedSingleton<AudioControlManager>::GetInstance()->UpdateDeviceTypeForVideoCall();
     ReportAudioDeviceInfo();
     TELEPHONY_LOGI("RemoveAudioDeviceList success");
 }

@@ -15,6 +15,10 @@
 
 #include "audio_proxy.h"
 
+#ifdef SUPPORT_VIBRATOR
+#include "vibrator_agent.h"
+#endif
+
 #include "telephony_log_wrapper.h"
 #include "bluetooth_call_manager.h"
 #include "audio_control_manager.h"
@@ -23,6 +27,25 @@
 
 namespace OHOS {
 namespace Telephony {
+#ifdef SUPPORT_VIBRATOR
+const std::unordered_map<VibrationType, VibratorUsage> VIBRATOR_USAGE_MAP = {
+    {VibrationType::VIBRATION_RINGTONE, USAGE_RING},
+    {VibrationType::VIBRATION_SYSTEM_TONE, USAGE_NOTIFICATION},
+};
+
+const std::unordered_map<VibrationType, int32_t> LOOP_COUNT_MAP = {
+    // Default loop count. Ringtone need be repeated.
+    {VibrationType::VIBRATION_RINGTONE, 10},
+    {VibrationType::VIBRATION_SYSTEM_TONE, 1},
+};
+
+const std::unordered_map<VibrationType, std::string> EFFECT_ID_MAP = {
+    // Default effectId
+    {VibrationType::VIBRATION_RINGTONE, "haptic.ringtone.Dream_It_Possible"},
+    {VibrationType::VIBRATION_SYSTEM_TONE, "haptic.pattern.type4"},
+};
+#endif
+
 const int32_t NO_DEVICE_VALID = 0;
 const int32_t RENDERER_FLAG = 0;
 
@@ -138,6 +161,30 @@ bool AudioProxy::SetEarpieceDevActive()
     return true;
 }
 
+int32_t AudioProxy::StartVibrator(VibrationType type)
+{
+    TELEPHONY_LOGE("StartVibrator: for vibration type %{public}d", type);
+    int32_t result = TELEPHONY_SUCCESS;
+#ifdef SUPPORT_VIBRATOR
+    bool setUsageRet = Sensors::SetUsage(VIBRATOR_USAGE_MAP.at(type));
+    bool setLoopRet = Sensors::SetLoopCount(LOOP_COUNT_MAP.at(type));
+    result = Sensors::StartVibrator(EFFECT_ID_MAP.at(type).c_str());
+    TELEPHONY_LOGE("StartVibrator: setUsageRet %{public}d, setLoopRet %{public}d, startRet %{public}d",
+        setUsageRet, setLoopRet, result);
+#endif
+    return result;
+}
+
+int32_t AudioProxy::StopVibrator()
+{
+    int32_t result = TELEPHONY_SUCCESS;
+#ifdef SUPPORT_VIBRATOR
+    result = Sensors::Cancel();
+    TELEPHONY_LOGE("StopVibrator: %{public}d", result);
+#endif
+    return result;
+}
+
 int32_t AudioProxy::GetVolume(AudioStandard::AudioVolumeType audioVolumeType)
 {
     return AudioStandard::AudioSystemManager::GetInstance()->GetVolume(audioVolumeType);
@@ -206,7 +253,9 @@ bool AudioProxy::SetMicrophoneMute(bool mute)
 
 AudioStandard::AudioRingerMode AudioProxy::GetRingerMode() const
 {
-    return AudioStandard::AudioSystemManager::GetInstance()->GetRingerMode();
+    std::shared_ptr<AudioStandard::AudioGroupManager> audioGroupManager =
+        AudioStandard::AudioSystemManager::GetInstance()->GetGroupManager(AudioStandard::DEFAULT_VOLUME_GROUP_ID);
+    return audioGroupManager->GetRingerMode();
 }
 
 bool AudioProxy::IsVibrateMode() const
@@ -398,6 +447,10 @@ void AudioPreferDeviceChangeCallback::OnPreferredOutputDeviceUpdated(
             break;
         default:
             break;
+    }
+    TELEPHONY_LOGI("OnPreferredOutputDeviceUpdated, type: %{public}d", static_cast<int32_t>(device.deviceType));
+    if (desc[0]->deviceType_ != AudioStandard::DEVICE_TYPE_SPEAKER) {
+        DelayedSingleton<AudioControlManager>::GetInstance()->UpdateDeviceTypeForCrs();
     }
 }
 } // namespace Telephony

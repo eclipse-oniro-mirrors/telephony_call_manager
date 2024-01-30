@@ -16,6 +16,7 @@
 #define protected public
 #include "alerting_state.h"
 #include "audio_proxy.h"
+#include "audio_control_manager.h"
 #include "bluetooth_device_state.h"
 #include "call_ability_callback_stub.h"
 #include "call_policy.h"
@@ -308,6 +309,23 @@ HWTEST_F(CallStateTest, Telephony_AudioProxy_002, Function | MediumTest | Level3
     ASSERT_FALSE(audioProxy->GetDefaultRingPath().empty());
     ASSERT_FALSE(audioProxy->GetDefaultTonePath().empty());
     ASSERT_FALSE(audioProxy->GetDefaultDtmfPath().empty());
+}
+
+/**
+ * @tc.number   Telephony_AudioControlManager_001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallStateTest, Telephony_AudioControlManager_001, Function | MediumTest | Level3)
+{
+    DialParaInfo mDialParaInfo;
+    mDialParaInfo.accountId = 0;
+    sptr<OHOS::Telephony::CallBase> callObjectPtr = new IMSCall(mDialParaInfo);
+    auto audioControl = DelayedSingleton<AudioControlManager>::GetInstance();
+    audioControl->VideoStateUpdated(callObjectPtr, VideoStateType::TYPE_VOICE, VideoStateType::TYPE_VIDEO);
+    audioControl->UpdateDeviceTypeForVideoCall();
+    audioControl->MuteNetWorkRingTone();
+    ASSERT_TRUE(audioControl->IsVideoCall(VideoStateType::TYPE_VIDEO));
 }
 
 /**
