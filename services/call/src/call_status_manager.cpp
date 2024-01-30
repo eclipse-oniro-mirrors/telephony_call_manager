@@ -308,6 +308,10 @@ int32_t CallStatusManager::IncomingHandle(const CallDetailInfo &info)
     sptr<CallBase> call = GetOneCallObjectByIndexAndSlotId(info.index, info.accountId);
     if (call != nullptr && (call->GetCallType() != info.callType || call->GetTelCallState() != info.state)) {
         call = RefreshCallIfNecessary(call, info);
+        int32_t result = UpdateCallState(call, info.state);
+        if (result != TELEPHONY_SUCCESS) {
+            return result;
+        }
         return TELEPHONY_SUCCESS;
     }
     int32_t ret = IncomingHandlePolicy(info);
@@ -332,6 +336,23 @@ int32_t CallStatusManager::IncomingHandle(const CallDetailInfo &info)
         return CALL_ERR_CALL_OBJECT_IS_NULL;
     }
 
+    BuildAndQueryCallerInfo(call, info);
+
+    DelayedSingleton<CallControlManager>::GetInstance()->NotifyNewCallCreated(call);
+    ret = UpdateCallState(call, info.state);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("UpdateCallState failed!");
+        return ret;
+    }
+    ret = FilterResultsDispose(call);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("FilterResultsDispose failed!");
+    }
+    return ret;
+}
+
+void CallStatusManager::BuildAndQueryCallerInfo(sptr<CallBase> &call, const CallDetailInfo &info)
+{
     // allow list filtering
     // Get the contact data from the database
     ContactInfo contactInfo = {
@@ -345,18 +366,6 @@ int32_t CallStatusManager::IncomingHandle(const CallDetailInfo &info)
     };
     QueryCallerInfo(contactInfo, std::string(info.phoneNum));
     call->SetCallerInfo(contactInfo);
-
-    DelayedSingleton<CallControlManager>::GetInstance()->NotifyNewCallCreated(call);
-    ret = UpdateCallState(call, info.state);
-    if (ret != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("UpdateCallState failed!");
-        return ret;
-    }
-    ret = FilterResultsDispose(call);
-    if (ret != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("FilterResultsDispose failed!");
-    }
-    return ret;
 }
 
 int32_t CallStatusManager::IncomingVoipCallHandle(const CallDetailInfo &info)
