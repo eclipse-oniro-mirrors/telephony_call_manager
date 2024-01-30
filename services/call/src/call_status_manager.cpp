@@ -888,12 +888,12 @@ int32_t CallStatusManager::UpdateCallState(sptr<CallBase> &call, TelCallState ne
     DelayedRefSingleton<CoreServiceClient>::GetInstance().HasSimCard(slotId, hasSimCard);
     TELEPHONY_LOGI("nextVideoState:%{public}d, priorVideoState:%{public}d, hasSimCard:%{public}d", videoState,
         priorVideoState_[slotId], hasSimCard);
-    if (priorVideoState_[slotId] != videoState && hasSimCard) {
+    if ((priorVideoState_[slotId] != videoState) && hasSimCard) {
         DelayedSingleton<AudioControlManager>::GetInstance()->VideoStateUpdated(
             call, priorVideoState_[slotId], videoState);
         priorVideoState_[slotId] = videoState;
     }
-    if (nextState == TelCallState::CALL_STATUS_DISCONNECTED && hasSimCard) {
+    if ((nextState == TelCallState::CALL_STATUS_DISCONNECTED) && hasSimCard) {
         priorVideoState_[slotId] = VideoStateType::TYPE_VOICE;
     }
     return TELEPHONY_SUCCESS;

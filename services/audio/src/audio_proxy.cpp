@@ -448,7 +448,7 @@ void AudioPreferDeviceChangeCallback::OnPreferredOutputDeviceUpdated(
         default:
             break;
     }
-    TELEPHONY_LOGI("OnPreferredOutputDeviceUpdated, type: %{public}d", static_cast<int32_t>(device.deviceType));
+    TELEPHONY_LOGI("OnPreferredOutputDeviceUpdated, type: %{public}d", static_cast<int32_t>(desc[0]->deviceType_));
     if (desc[0]->deviceType_ != AudioStandard::DEVICE_TYPE_SPEAKER) {
         DelayedSingleton<AudioControlManager>::GetInstance()->UpdateDeviceTypeForCrs();
     }

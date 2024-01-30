@@ -210,7 +210,7 @@ ohos_shared_library("tel_call_manager") {
   }
 
   if (defined(global_parts_info) &&
-      defined(global_parts_info.sensors_miscdevice) && 
+      defined(global_parts_info.sensors_miscdevice) &&
       global_parts_info.sensors_miscdevice) {
     external_deps += [ "miscdevice:vibrator_interface_native" ]
     defines += [ "SUPPORT_VIBRATOR" ]

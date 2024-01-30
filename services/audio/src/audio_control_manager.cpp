@@ -166,11 +166,6 @@ void AudioControlManager::UpdateDeviceTypeForVideoCall()
         .deviceType = AudioDeviceType::DEVICE_SPEAKER,
         .address = { 0 },
     };
-    if (foregroundCall->GetCrsType() == CRS_TYPE) {
-        TELEPHONY_LOGI("crs ring tone should be speaker");
-        SetAudioDevice(device);
-        return;
-    }
     AudioDeviceType initDeviceType = GetInitAudioDeviceType();
     if (IsVideoCall(foregroundCall->GetVideoStateType())) {
         if (initDeviceType == AudioDeviceType::DEVICE_WIRED_HEADSET ||
