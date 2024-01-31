@@ -1167,6 +1167,7 @@ napi_value NapiCallManager::RegisterCallManagerFunc(napi_env env, napi_value exp
     DeclareMmiCodeResultEnum(env, exports);
     DeclareDisconnectedReasonEnum(env, exports);
     Init();
+    RegisterCallBack();
     return exports;
 }
 
@@ -2488,14 +2489,6 @@ napi_value NapiCallManager::ObserverOn(napi_env env, napi_callback_info info)
         (!NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_SECOND], napi_function))) {
         NapiUtil::ThrowParameterError(env);
         return nullptr;
-    }
-    if (registerStatus_ != TELEPHONY_SUCCESS) {
-        std::unique_ptr<NapiCallManagerCallback> callbackPtr = std::make_unique<NapiCallManagerCallback>();
-        if (callbackPtr == nullptr) {
-            TELEPHONY_LOGE("make_unique NapiCallManagerCallback failed!");
-            return nullptr;
-        }
-        registerStatus_ = DelayedSingleton<CallManagerClient>::GetInstance()->RegisterCallBack(std::move(callbackPtr));
     }
     if (registerStatus_ != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("RegisterCallBack failed!");
@@ -5122,6 +5115,24 @@ void NapiCallManager::NativeSetVoIPCallState(napi_env env, void *data)
         asyncContext->resolved = TELEPHONY_SUCCESS;
     }
     asyncContext->eventId = CALL_MANAGER_SET_VOIP_CALL_STATE;
+}
+
+void NapiCallManager::RegisterCallBack()
+{
+    if (registerStatus_ == TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGW("you are already registered!");
+        return;
+    }
+    std::unique_ptr<NapiCallManagerCallback> callbackPtr = std::make_unique<NapiCallManagerCallback>();
+    if (callbackPtr == nullptr) {
+        TELEPHONY_LOGE("make_unique NapiCallManagerCallback failed!");
+        return;
+    }
+    registerStatus_ = DelayedSingleton<CallManagerClient>::GetInstance()->RegisterCallBack(std::move(callbackPtr));
+    if (registerStatus_ != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("RegisterCallBack failed!");
+        return;
+    }
 }
 
 napi_value NapiCallManager::HandleAsyncWork(napi_env env, AsyncContext *context, std::string workName,

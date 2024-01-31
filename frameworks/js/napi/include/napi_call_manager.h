@@ -148,6 +148,7 @@ public:
     static napi_value CancelCallUpgrade(napi_env env, napi_callback_info info);
 
 private:
+    static void RegisterCallBack();
     static void NativeCallBack(napi_env env, napi_status status, void *data);
     static void NativeDialCallBack(napi_env env, napi_status status, void *data);
     static void NativeVoidCallBack(napi_env env, napi_status status, void *data);
