@@ -222,5 +222,10 @@ int32_t VoIPCall::HoldConference()
     return TELEPHONY_SUCCESS;
 }
 
+std::string VoIPCall::GetVoipCallId()
+{
+    return voipCallId_;
+}
+
 } // namespace Telephony
 } // namespace OHOS
