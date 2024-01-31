@@ -31,6 +31,8 @@ std::mutex CallObjectManager::listMutex_;
 int32_t CallObjectManager::callId_ = CALL_START_ID;
 std::condition_variable CallObjectManager::cv_;
 bool CallObjectManager::isFirstDialCallAdded_ = false;
+bool CallObjectManager::needWaitHold_ = false;
+CellularCallInfo CallObjectManager::dialCallInfo_;
 
 CallObjectManager::CallObjectManager()
 {
@@ -571,6 +573,11 @@ sptr<CallBase> CallObjectManager::GetForegroundLiveCall()
         }
     }
     return liveCall;
+}
+
+CellularCallInfo CallObjectManager::GetDialCallInfo()
+{
+    return dialCallInfo_;
 }
 
 int32_t CallObjectManager::DealFailDial(sptr<CallBase> call)
