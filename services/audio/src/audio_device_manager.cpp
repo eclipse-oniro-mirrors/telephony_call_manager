@@ -215,11 +215,12 @@ bool AudioDeviceManager::ProcessEvent(AudioEvent event)
         case AudioEvent::AUDIO_RINGING:
             if (!isAudioActivated_) {
                 isAudioActivated_ = true;
-                std::shared_ptr<BluetoothCallManager> bluetoothCallManager = std::make_shared<BluetoothCallManager>();
-                // Gets whether the device can be started from the configuration
-                if (bluetoothCallManager->IsBtAvailble()) {
+                std::unique_ptr<AudioStandard::AudioDeviceDescriptor> activeBluetoothDevice =
+                    AudioStandard::AudioRoutingManager::GetInstance()->GetActiveBluetoothDevice();
+                if (activeBluetoothDevice != nullptr && !activeBluetoothDevice->macAddress_.empty()) {
                     AudioSystemManager* audioSystemManager = AudioSystemManager::GetInstance();
-                    int32_t ret = audioSystemManager->SetDeviceActive(ActiveDeviceType::BLUETOOTH_SCO, true);
+                    int32_t ret = audioSystemManager->SetCallDeviceActive(ActiveDeviceType::BLUETOOTH_SCO,
+                        true, activeBluetoothDevice->macAddress_);
                     return ret == 0 ? true : false;
                 }
                 AudioDevice device = {
