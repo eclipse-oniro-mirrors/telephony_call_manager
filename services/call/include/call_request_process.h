@@ -46,6 +46,7 @@ public:
     bool IsDsdsMode3();
     bool IsDsdsMode5();
     bool HasActiveCall();
+    bool HasDialingCall();
     bool NeedAnswerVTAndEndActiveVO(int32_t callId, int32_t videoState);
     bool NeedAnswerVOAndEndActiveVT(int32_t callId, int32_t videoState);
     void DisconnectOtherSubIdCall(int32_t callId, int32_t slotId, int32_t videoState);
@@ -72,6 +73,7 @@ private:
     int32_t PackCellularCallInfo(DialParaInfo &info, CellularCallInfo &callInfo);
     bool IsFdnNumber(std::vector<std::u16string> fdnNumberList, std::string phoneNumber);
     int32_t UpdateCallReportInfo(const DialParaInfo &info, TelCallState state);
+    int32_t HandleStartDial(bool isMMiCode, CellularCallInfo callInfo);
     int32_t HandleDialFail();
     int32_t GetOtherRingingCall(int32_t currentCallId);
 

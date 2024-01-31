@@ -683,6 +683,7 @@ HWTEST_F(CallStateTest, Telephony_CallRequestProcess_002, Function | MediumTest 
  */
 HWTEST_F(CallStateTest, Telephony_CallRequestProcess_003, Function | MediumTest | Level3)
 {
+    int32_t defaultCallId = 1;
     std::unique_ptr<CallRequestProcess> callRequestProcess = std::make_unique<CallRequestProcess>();
     DialParaInfo mDialParaInfo;
     mDialParaInfo.accountId = 0;
@@ -699,8 +700,9 @@ HWTEST_F(CallStateTest, Telephony_CallRequestProcess_003, Function | MediumTest 
     bool enabled = false;
     callRequestProcess->HandleCallWaitingNumOneNext(callBase3, callBase2, callBase1, 1, enabled);
     callRequestProcess->HasActiveCall();
-    callRequestProcess->NeedAnswerVTAndEndActiveVO(1, 0);
-    callRequestProcess->NeedAnswerVOAndEndActiveVT(1, 0);
+    callRequestProcess->HasDialingCall();
+    callRequestProcess->NeedAnswerVTAndEndActiveVO(defaultCallId, 0);
+    callRequestProcess->NeedAnswerVOAndEndActiveVT(defaultCallId, 0);
 }
 
 /**
