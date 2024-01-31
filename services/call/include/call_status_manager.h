@@ -96,6 +96,7 @@ private:
     sptr<CallIncomingFilterManager> CallIncomingFilterManagerPtr_;
     std::map<RequestResultEventId, CallAbilityEventId> mEventIdTransferMap_;
     std::map<OttCallEventId, CallAbilityEventId> mOttEventIdTransferMap_;
+    VideoStateType priorVideoState_[SLOT_NUM];
     const std::string DETAIL_INFO = "detail_info";
     const std::string CONTENT_TYPE = "content_type";
     const std::string PHONE = "phone";
