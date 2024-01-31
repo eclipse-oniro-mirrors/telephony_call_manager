@@ -149,7 +149,7 @@ bool AudioSceneProcessor::SwitchDialing()
     }
     
     if (!DelayedSingleton<AudioDeviceManager>::GetInstance()->ProcessEvent(AudioEvent::AUDIO_ACTIVATED)) {
-        TELEPHONY_LOGE("SetCallDeviceActive fialed");
+        TELEPHONY_LOGE("ProcessEvent AUDIO_ACTIVATED failed");
     }
     TELEPHONY_LOGI("current call state : dialing state");
     return true;

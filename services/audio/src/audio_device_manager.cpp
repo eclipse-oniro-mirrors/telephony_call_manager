@@ -216,8 +216,7 @@ bool AudioDeviceManager::ProcessEvent(AudioEvent event)
             if (!isAudioActivated_) {
                 isAudioActivated_ = true;
                 std::unique_ptr<AudioStandard::AudioDeviceDescriptor> activeBluetoothDevice =
-                    std::make_unique<AudioStandard::AudioDeviceDescriptor>();
-                activeBluetoothDevice = AudioStandard::AudioRoutingManager::GetInstance()->GetActiveBluetoothDevice();
+                    AudioStandard::AudioRoutingManager::GetInstance()->GetActiveBluetoothDevice();
                 if (activeBluetoothDevice != nullptr && !activeBluetoothDevice->macAddress_.empty()) {
                     AudioSystemManager* audioSystemManager = AudioSystemManager::GetInstance();
                     int32_t ret = audioSystemManager->SetCallDeviceActive(ActiveDeviceType::BLUETOOTH_SCO,
