@@ -30,7 +30,7 @@ int32_t CallAbilityCallbackProxy::OnCallDetailsChange(const CallAttributeInfo &i
 {
     MessageParcel dataParcel;
     MessageParcel replyParcel;
-    MessageOption option;
+    MessageOption option(MessageOption::TF_ASYNC);
     if (!dataParcel.WriteInterfaceToken(CallAbilityCallbackProxy::GetDescriptor())) {
         TELEPHONY_LOGE("write descriptor fail");
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
