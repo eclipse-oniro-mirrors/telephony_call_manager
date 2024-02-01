@@ -71,10 +71,13 @@ public:
     static std::list<sptr<CallBase>> GetAllCallList();
     static bool HasCellularCallExist();
     static bool HasVoipCallExist();
+    static CellularCallInfo GetDialCallInfo();
 
 protected:
     static std::condition_variable cv_;
     static bool isFirstDialCallAdded_;
+    static bool needWaitHold_;
+    static CellularCallInfo dialCallInfo_;
 
 private:
     static std::list<sptr<CallBase>> callObjectPtrList_;

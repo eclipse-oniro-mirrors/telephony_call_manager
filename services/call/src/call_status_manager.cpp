@@ -276,6 +276,8 @@ int32_t CallStatusManager::HandleEventResultReportInfo(const CellularCallEventIn
             if (activeCall != nullptr) {
                 activeCall->HandleCombineConferenceFailEvent();
             }
+        } else if (eventInfo.eventId == CallAbilityEventId::EVENT_HOLD_CALL_FAILED) {
+            needWaitHold_ = false;
         }
         DelayedSingleton<CallControlManager>::GetInstance()->NotifyCallEventUpdated(eventInfo);
     } else {
@@ -617,13 +619,23 @@ int32_t CallStatusManager::HoldingHandle(const CallDetailInfo &info)
     if (dsdsMode == static_cast<int32_t>(DsdsMode::DSDS_MODE_V5_DSDA) ||
         dsdsMode == static_cast<int32_t>(DsdsMode::DSDS_MODE_V5_TDM)) {
         int32_t activeCallNum = GetCallNum(TelCallState::CALL_STATUS_ACTIVE);
-        TelConferenceState confState = call->GetTelConferenceState();
-        int32_t conferenceId = ERR_ID;
-        call->GetMainCallId(conferenceId);
-        if (confState != TelConferenceState::TEL_CONFERENCE_IDLE && conferenceId == callId) {
-            AutoHandleForDsda(canSwitchCallState, priorState, activeCallNum, call->GetSlotId(), false);
-        } else if (confState == TelConferenceState::TEL_CONFERENCE_IDLE) {
-            AutoHandleForDsda(canSwitchCallState, priorState, activeCallNum, call->GetSlotId(), false);
+        if (needWaitHold_ && activeCallNum == 0) {
+            needWaitHold_ = false;
+            int32_t result = DelayedSingleton<CellularCallConnection>::GetInstance()->Dial(GetDialCallInfo());
+            sptr<CallBase> dialCall = GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_DIALING);
+            if (result != TELEPHONY_SUCCESS && dialCall != nullptr) {
+                DealFailDial(call);
+                TELEPHONY_LOGI("Dial call fail");
+            }
+        } else {
+            TelConferenceState confState = call->GetTelConferenceState();
+            int32_t conferenceId = ERR_ID;
+            call->GetMainCallId(conferenceId);
+            if (confState != TelConferenceState::TEL_CONFERENCE_IDLE && conferenceId == callId) {
+                AutoHandleForDsda(canSwitchCallState, priorState, activeCallNum, call->GetSlotId(), false);
+            } else if (confState == TelConferenceState::TEL_CONFERENCE_IDLE) {
+                AutoHandleForDsda(canSwitchCallState, priorState, activeCallNum, call->GetSlotId(), false);
+            }
         }
     }
     return ret;
@@ -1018,10 +1030,14 @@ void CallStatusManager::SetOriginalCallTypeForDisconnectState(sptr<CallBase> &ca
         return;
     }
     TelCallState priorState = call->GetTelCallState();
-    if (priorState == TelCallState::CALL_STATUS_ALERTING || priorState == TelCallState::CALL_STATUS_INCOMING ||
-        priorState == TelCallState::CALL_STATUS_WAITING) {
-        // outgoing/incoming video call, but canceled, rejected or missed
-        TELEPHONY_LOGD("canceled/rejected or missed call, set voice call as original call type");
+    CallAttributeInfo attrInfo;
+    (void)memset_s(&attrInfo, sizeof(CallAttributeInfo), 0, sizeof(CallAttributeInfo));
+    call->GetCallAttributeBaseInfo(attrInfo);
+    if (priorState == TelCallState::CALL_STATUS_ALERTING ||
+        ((priorState == TelCallState::CALL_STATUS_INCOMING || priorState == TelCallState::CALL_STATUS_WAITING) &&
+        attrInfo.answerType != CallAnswerType::CALL_ANSWER_REJECT)) {
+        // outgoing/incoming video call, but canceled or missed
+        TELEPHONY_LOGD("canceled or missed call, set voice type as original call type");
         call->SetOriginalCallType(static_cast<int32_t>(VideoStateType::TYPE_VOICE));
     }
 }

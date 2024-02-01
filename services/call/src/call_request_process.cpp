@@ -181,6 +181,16 @@ bool CallRequestProcess::IsDsdsMode5()
     return false;
 }
 
+bool CallRequestProcess::HasDialingCall()
+{
+    int32_t dialingCallNum = GetCallNum(TelCallState::CALL_STATUS_DIALING);
+    int32_t alertingCallNum = GetCallNum(TelCallState::CALL_STATUS_ALERTING);
+    if (dialingCallNum == 0 && alertingCallNum == 0) {
+        return false;
+    }
+    return true;
+}
+
 bool CallRequestProcess::HasActiveCall()
 {
     int32_t activeCallNum = GetCallNum(TelCallState::CALL_STATUS_ACTIVE);
@@ -202,7 +212,7 @@ bool CallRequestProcess::NeedAnswerVTAndEndActiveVO(int32_t callId, int32_t vide
         (holdingCall != nullptr && holdingCall->GetCallID() == callId)) {
         return false;
     }
-    if (HasActiveCall()) {
+    if (HasDialingCall() || HasActiveCall()) {
         if (videoState != static_cast<int32_t>(VideoStateType::TYPE_VOICE)) {
             TELEPHONY_LOGI("answer a new video call, need to hang up the exist call");
             return true;
@@ -496,6 +506,7 @@ void CallRequestProcess::DisconnectOtherCallForVideoCall(int32_t callId)
         sptr<CallBase> call = GetOneCallObject(otherCallId);
         if (call != nullptr && call->GetCallID() != callId &&
             (call->GetCallRunningState() == CallRunningState::CALL_RUNNING_STATE_ACTIVE ||
+                call->GetCallRunningState() == CallRunningState::CALL_RUNNING_STATE_DIALING ||
                 call->GetCallRunningState() == CallRunningState::CALL_RUNNING_STATE_HOLD)) {
             TELEPHONY_LOGI("Hangup call callid:%{public}d", call->GetCallID());
             call->HangUpCall();
@@ -819,7 +830,18 @@ int32_t CallRequestProcess::CarrierDialProcess(DialParaInfo &info)
             static_cast<int32_t>(info.videoState), ret, "Carrier type PackCellularCallInfo failed");
         return ret;
     }
-    ret = DelayedSingleton<CellularCallConnection>::GetInstance()->Dial(callInfo);
+    if (needWaitHold_ && !isMMiCode) {
+        TELEPHONY_LOGI("waitting for call hold");
+        dialCallInfo_ = callInfo;
+        return ret;
+    }
+    ret = HandleStartDial(isMMiCode, callInfo);
+    return ret;
+}
+
+int32_t CallRequestProcess::HandleStartDial(bool isMMiCode, CellularCallInfo callInfo)
+{
+    int32_t ret = DelayedSingleton<CellularCallConnection>::GetInstance()->Dial(callInfo);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("Dial failed!");
         if (isMMiCode) {
@@ -840,7 +862,11 @@ int32_t CallRequestProcess::IsDialCallForDsda(DialParaInfo &info)
     sptr<CallBase> activeCall = GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_ACTIVE);
     TELEPHONY_LOGI("Is dsdsmode5 dial call info.accountId = %{public}d", info.accountId);
     if (activeCall != nullptr && activeCall->GetSlotId() != info.accountId) {
-        return activeCall->HoldCall();
+        int32_t ret = activeCall->HoldCall();
+        if (ret == TELEPHONY_SUCCESS) {
+            needWaitHold_ = true;
+        }
+        return ret;
     }
     return TELEPHONY_SUCCESS;
 }
