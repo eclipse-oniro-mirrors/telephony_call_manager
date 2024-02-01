@@ -92,7 +92,7 @@ void AudioSceneProcessor::ProcessEventInner(AudioEvent event)
             break;
     }
     if (DelayedSingleton<CallStateProcessor>::GetInstance()->ShouldStopSoundtone()) {
-        DelayedSingleton<AudioControlManager>::GetInstance()->StopSoundTone;
+        DelayedSingleton<AudioControlManager>::GetInstance()->StopSoundtone;
     }
 }
 
