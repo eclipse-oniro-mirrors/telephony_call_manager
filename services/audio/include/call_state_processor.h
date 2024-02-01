@@ -34,6 +34,7 @@ public:
     void AddCall(int32_t callId, TelCallState state);
     void DeleteCall(int32_t callId, TelCallState state);
     bool UpdateCurrentCallState();
+    bool ShouldStopSoundtone();
     int32_t GetCurrentActiveCall();
     int32_t GetCallNumber(TelCallState state);
     bool ShouldSwitchState(TelCallState callState);

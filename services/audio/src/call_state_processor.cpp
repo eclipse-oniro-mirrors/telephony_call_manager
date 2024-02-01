@@ -182,11 +182,16 @@ bool CallStateProcessor::UpdateCurrentCallState()
     } else {
         event = AudioEvent::SWITCH_AUDIO_INACTIVE_STATE;
     }
+    return DelayedSingleton<AudioSceneProcessor>::GetInstance()->ProcessEvent(event);
+}
+
+bool CallStateProcessor::ShouldStopSoundtone()
+{
     if (holdingCalls_.size() == EMPTY_VALUE && dialingCalls_.size() == EMPTY_VALUE &&
         alertingCalls_.size() == EMPTY_VALUE) {
-        DelayedSingleton<AudioControlManager>::GetInstance()->StopSoundtone();
+        return true;
     }
-    return DelayedSingleton<AudioSceneProcessor>::GetInstance()->ProcessEvent(event);
+    return false;
 }
 
 int32_t CallStateProcessor::GetAudioForegroundLiveCall()

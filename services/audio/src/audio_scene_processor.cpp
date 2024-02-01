@@ -23,6 +23,7 @@
 #include "ims_call_state.h"
 #include "inactive_state.h"
 #include "audio_control_manager.h"
+#include "call_state_processor.h"
 #include "ffrt.h"
 
 #include "telephony_log_wrapper.h"
@@ -89,6 +90,9 @@ void AudioSceneProcessor::ProcessEventInner(AudioEvent event)
             break;
         default:
             break;
+    }
+    if (DelayedSingleton<CallStateProcessor>::GetInstance()->ShouldStopSoundtone()) {
+        DelayedSingleton<AudioControlManager>::GetInstance()->StopSoundtone();
     }
 }
 
