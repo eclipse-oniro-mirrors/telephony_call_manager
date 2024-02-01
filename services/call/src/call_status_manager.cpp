@@ -143,7 +143,6 @@ void CallStatusManager::HandleDsdaInfo(int32_t slotId)
 {
     int32_t dsdsMode = DSDS_MODE_V2;
     bool noOtherCall = true;
-    int32_t callNum = 2;
     std::list<int32_t> callIdList;
     GetCarrierCallList(callIdList);
     int32_t currentCallNum = GetCurrentCallNum();
@@ -154,7 +153,7 @@ void CallStatusManager::HandleDsdaInfo(int32_t slotId)
         !noOtherCall) {
         TELEPHONY_LOGI("Handle DsdaCallInfo");
         sptr<CallBase> holdCall = GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_HOLD);
-        if (holdCall != nullptr && currentCallNum > callNum) {
+        if (holdCall != nullptr && currentCallNum > CALL_NUMBER) {
             holdCall->SetCanUnHoldState(false);
         }
     }

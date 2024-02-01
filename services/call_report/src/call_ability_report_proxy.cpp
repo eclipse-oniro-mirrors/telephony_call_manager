@@ -17,12 +17,12 @@
 
 #include <string_ex.h>
 
+#include "app_mgr_interface.h"
+#include "app_state_observer.h"
+#include "call_manager_errors.h"
 #include "iservice_registry.h"
 #include "system_ability.h"
 #include "system_ability_definition.h"
-#include "app_state_observer.h"
-#include "app_mgr_interface.h"
-#include "call_manager_errors.h"
 #include "telephony_log_wrapper.h"
 
 namespace OHOS {
@@ -166,14 +166,15 @@ int32_t CallAbilityReportProxy::ReportCallStateInfo(const CallAttributeInfo &inf
             bundleName = (*it)->GetBundleName();
             ret = (*it)->OnCallDetailsChange(info);
             if (ret != TELEPHONY_SUCCESS) {
-                TELEPHONY_LOGW("OnCallDetailsChange failed, errcode:%{public}d, bundleName:%{public}s", ret,
-                    bundleName.c_str());
+                TELEPHONY_LOGW(
+                    "OnCallDetailsChange failed, errcode:%{public}d, bundleName:%{public}s", ret, bundleName.c_str());
                 continue;
             }
         }
     }
     TELEPHONY_LOGI("report call state info success, callId[%{public}d] state[%{public}d] conferenceState[%{public}d] "
-        "videoState[%{public}d]", info.callId, info.callState, info.conferenceState, info.videoState);
+                   "videoState[%{public}d]",
+        info.callId, info.callState, info.conferenceState, info.videoState);
     return ret;
 }
 
