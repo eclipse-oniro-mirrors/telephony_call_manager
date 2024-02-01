@@ -91,6 +91,8 @@ int32_t UpdateCallReportInfo(const uint8_t *data, size_t size)
     dataParcel.WriteInt32(static_cast<int32_t>(callReportInfo.state));
     dataParcel.WriteInt32(callReportInfo.voiceDomain);
     dataParcel.WriteInt32(callReportInfo.mpty);
+    dataParcel.WriteInt32(callReportInfo.crsType);
+    dataParcel.WriteInt32(callReportInfo.originalCallType);
     dataParcel.WriteString(callReportInfo.voipCallInfo.voipCallId);
     dataParcel.WriteString(callReportInfo.voipCallInfo.userName);
     dataParcel.WriteString(callReportInfo.voipCallInfo.abilityName);
@@ -113,7 +115,6 @@ int32_t UpdateCallsReportInfo(const uint8_t *data, size_t size)
     }
     CallReportInfo info;
     int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
-    int32_t length = sizeof(CallReportInfo);
     int32_t vecSize = 1;
     info.index = static_cast<int32_t>(size);
     info.accountId = static_cast<int32_t>(size % ACCOUNT_ID_NUM);
@@ -126,8 +127,22 @@ int32_t UpdateCallsReportInfo(const uint8_t *data, size_t size)
     int32_t accountLength = msg.length() > kMaxNumberLen ? kMaxNumberLen : msg.length();
     memcpy_s(info.accountNum, kMaxNumberLen, msg.c_str(), accountLength);
     dataParcel.WriteInt32(vecSize);
-    dataParcel.WriteInt32(length);
-    dataParcel.WriteRawData((const void *)&info, length);
+    dataParcel.WriteInt32(info.index);
+    dataParcel.WriteCString(info.accountNum);
+    dataParcel.WriteInt32(info.accountId);
+    dataParcel.WriteInt32(static_cast<int32_t>(info.callType));
+    dataParcel.WriteInt32(static_cast<int32_t>(info.callMode));
+    dataParcel.WriteInt32(static_cast<int32_t>(info.state));
+    dataParcel.WriteInt32(info.voiceDomain);
+    dataParcel.WriteInt32(info.mpty);
+    dataParcel.WriteInt32(info.crsType);
+    dataParcel.WriteInt32(info.originalCallType);
+    dataParcel.WriteString(info.voipCallInfo.voipCallId);
+    dataParcel.WriteString(info.voipCallInfo.userName);
+    dataParcel.WriteString(info.voipCallInfo.abilityName);
+    dataParcel.WriteString(info.voipCallInfo.extensionId);
+    dataParcel.WriteString(info.voipCallInfo.voipBundleName);
+    dataParcel.WriteParcelable(info.voipCallInfo.pixelMap.get());
     dataParcel.WriteInt32(slotId);
     dataParcel.RewindRead(0);
     MessageParcel reply;

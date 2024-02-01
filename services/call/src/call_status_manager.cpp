@@ -682,11 +682,11 @@ int32_t CallStatusManager::DisconnectedHandle(const CallDetailInfo &info)
     std::string tmpStr(info.phoneNum);
     sptr<CallBase> call = GetOneCallObjectByIndexAndSlotId(info.index, info.accountId);
     if (call == nullptr) {
+        TELEPHONY_LOGE("call is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     call = RefreshCallIfNecessary(call, info);
     SetOriginalCallTypeForDisconnectState(call);
-    bool canUnHold = false;
     std::vector<std::u16string> callIdList;
     call->GetSubCallIdList(callIdList);
     CallRunningState previousState = call->GetCallRunningState();
@@ -700,6 +700,18 @@ int32_t CallStatusManager::DisconnectedHandle(const CallDetailInfo &info)
         TELEPHONY_LOGE("UpdateCallState failed, errCode:%{public}d", ret);
         return ret;
     }
+    HandleHoldCallOrAutoAnswerCall(call, callIdList, previousState, priorState);
+    return ret;
+}
+
+void CallStatusManager::HandleHoldCallOrAutoAnswerCall(const sptr<CallBase> call,
+    std::vector<std::u16string> callIdList, CallRunningState previousState, TelCallState priorState)
+{
+    if (call == nullptr) {
+        TELEPHONY_LOGE("call is null");
+        return;
+    }
+    bool canUnHold = false;
     size_t size = callIdList.size();
     int32_t activeCallNum = GetCallNum(TelCallState::CALL_STATUS_ACTIVE);
     int32_t waitingCallNum = GetCallNum(TelCallState::CALL_STATUS_WAITING);
@@ -721,11 +733,10 @@ int32_t CallStatusManager::DisconnectedHandle(const CallDetailInfo &info)
     if (dsdsMode == DSDS_MODE_V3) {
         AutoAnswer(activeCallNum, waitingCallNum);
     } else if (dsdsMode == static_cast<int32_t>(DsdsMode::DSDS_MODE_V5_DSDA) ||
-               dsdsMode == static_cast<int32_t>(DsdsMode::DSDS_MODE_V5_TDM)) {
+        dsdsMode == static_cast<int32_t>(DsdsMode::DSDS_MODE_V5_TDM)) {
         bool canSwitchCallState = call->GetCanSwitchCallState();
         AutoHandleForDsda(canSwitchCallState, priorState, activeCallNum, call->GetSlotId(), true);
     }
-    return ret;
 }
 
 void CallStatusManager::IsCanUnHold(int32_t activeCallNum, int32_t waitingCallNum, int32_t size, bool &canUnHold)

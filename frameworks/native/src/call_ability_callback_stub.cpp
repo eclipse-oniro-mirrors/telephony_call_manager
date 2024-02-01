@@ -107,12 +107,14 @@ int32_t CallAbilityCallbackStub::OnUpdateCallStateInfo(MessageParcel &data, Mess
     parcelPtr.index = data.ReadInt32();
     parcelPtr.crsType = data.ReadInt32();
     parcelPtr.originalCallType = data.ReadInt32();
-    parcelPtr.voipCallInfo.voipCallId = data.ReadString();
-    parcelPtr.voipCallInfo.userName = data.ReadString();
-    parcelPtr.voipCallInfo.abilityName = data.ReadString();
-    parcelPtr.voipCallInfo.extensionId = data.ReadString();
-    parcelPtr.voipCallInfo.voipBundleName = data.ReadString();
-    parcelPtr.voipCallInfo.pixelMap = std::shared_ptr<Media::PixelMap>(data.ReadParcelable<Media::PixelMap>());
+    if (parcelPtr.callType == CallType::TYPE_VOIP) {
+        parcelPtr.voipCallInfo.voipCallId = data.ReadString();
+        parcelPtr.voipCallInfo.userName = data.ReadString();
+        parcelPtr.voipCallInfo.abilityName = data.ReadString();
+        parcelPtr.voipCallInfo.extensionId = data.ReadString();
+        parcelPtr.voipCallInfo.voipBundleName = data.ReadString();
+        parcelPtr.voipCallInfo.pixelMap = std::shared_ptr<Media::PixelMap>(data.ReadParcelable<Media::PixelMap>());
+    }
     result = OnCallDetailsChange(parcelPtr);
     if (!reply.WriteInt32(result)) {
         TELEPHONY_LOGE("writing parcel failed");

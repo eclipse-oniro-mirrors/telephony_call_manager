@@ -64,6 +64,8 @@ private:
     int32_t DisconnectingHandle(const CallDetailInfo &info);
     int32_t DisconnectedVoipCallHandle(const CallDetailInfo &info);
     int32_t DisconnectedHandle(const CallDetailInfo &info);
+    void HandleHoldCallOrAutoAnswerCall(const sptr<CallBase> call,
+        std::vector<std::u16string> callIdList, CallRunningState previousState, TelCallState priorState);
     void IsCanUnHold(int32_t activeCallNum, int32_t waitingCallNum, int32_t size, bool &canUnHold);
     void AutoAnswer(int32_t activeCallNum, int32_t waitingCallNum);
     void AutoHandleForDsda(
