@@ -576,7 +576,6 @@ int32_t AudioControlManager::StopCallTone()
         return CALL_ERR_AUDIO_TONE_STOP_FAILED;
     }
     tone_->ReleaseRenderer();
-    tone_ = nullptr;
     toneState_ = ToneState::STOPPED;
     TELEPHONY_LOGI("stop call tone success");
     return TELEPHONY_SUCCESS;
