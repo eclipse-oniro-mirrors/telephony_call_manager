@@ -187,6 +187,10 @@ bool CallStateProcessor::UpdateCurrentCallState()
 
 bool CallStateProcessor::ShouldStopSoundtone()
 {
+    if (activeCalls_.size() > EMPTY_VALUE) {
+        // no need to stop soundtone
+        return false;
+    }
     if (holdingCalls_.size() == EMPTY_VALUE && dialingCalls_.size() == EMPTY_VALUE &&
         alertingCalls_.size() == EMPTY_VALUE) {
         return true;
