@@ -100,6 +100,7 @@ private:
     const std::string DETAIL_INFO = "detail_info";
     const std::string CONTENT_TYPE = "content_type";
     const std::string PHONE = "phone";
+    const int32_t CALL_NUMBER = 2;
 };
 } // namespace Telephony
 } // namespace OHOS
