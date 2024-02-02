@@ -108,9 +108,9 @@ void CallRequestProcess::AnswerRequest(int32_t callId, int32_t videoState)
     } else {
         std::vector<CallAttributeInfo> callAttributeInfo = CallObjectManager::GetAllCallInfoList();
         for (auto info : callAttributeInfo) {
-            sptr<CallBase> call = GetOneCallObject(info.callId);
-            if (call != nullptr && info.callType == CallType::TYPE_VOIP) {
-                call->HangUpCall();
+            sptr<CallBase> tempCall = GetOneCallObject(info.callId);
+            if (tempCall != nullptr && info.callType == CallType::TYPE_VOIP) {
+                tempCall->HangUpCall();
                 TELEPHONY_LOGI("hangup the voip call");
             }
         }
