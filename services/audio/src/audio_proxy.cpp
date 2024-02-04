@@ -30,19 +30,16 @@ namespace Telephony {
 #ifdef SUPPORT_VIBRATOR
 const std::unordered_map<VibrationType, VibratorUsage> VIBRATOR_USAGE_MAP = {
     {VibrationType::VIBRATION_RINGTONE, USAGE_RING},
-    {VibrationType::VIBRATION_SYSTEM_TONE, USAGE_NOTIFICATION},
 };
 
 const std::unordered_map<VibrationType, int32_t> LOOP_COUNT_MAP = {
     // Default loop count. Ringtone need be repeated.
     {VibrationType::VIBRATION_RINGTONE, 10},
-    {VibrationType::VIBRATION_SYSTEM_TONE, 1},
 };
 
 const std::unordered_map<VibrationType, std::string> EFFECT_ID_MAP = {
     // Default effectId
     {VibrationType::VIBRATION_RINGTONE, "haptic.ringtone.Dream_It_Possible"},
-    {VibrationType::VIBRATION_SYSTEM_TONE, "haptic.pattern.type4"},
 };
 #endif
 
@@ -161,8 +158,9 @@ bool AudioProxy::SetEarpieceDevActive()
     return true;
 }
 
-int32_t AudioProxy::StartVibrator(VibrationType type)
+int32_t AudioProxy::StartVibrator()
 {
+    VibrationType type = VibrationType::VIBRATION_RINGTONE;
     TELEPHONY_LOGE("StartVibrator: for vibration type %{public}d", type);
     int32_t result = TELEPHONY_SUCCESS;
 #ifdef SUPPORT_VIBRATOR
