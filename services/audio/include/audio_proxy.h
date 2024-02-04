@@ -39,7 +39,6 @@ enum AudioInterruptState {
 
 enum class VibrationType {
     VIBRATION_RINGTONE = 0,
-    VIBRATION_SYSTEM_TONE,
 };
 
 class AudioDeviceChangeCallback : public AudioStandard::AudioManagerDeviceChangeCallback {
@@ -60,7 +59,7 @@ public:
     int32_t DeactivateAudioInterrupt();
     void SetVolumeAudible();
     bool IsMicrophoneMute();
-    int32_t StartVibrator(VibrationType type);
+    int32_t StartVibrator();
     int32_t StopVibrator();
     bool SetMicrophoneMute(bool mute);
     bool SetEarpieceDevActive();
