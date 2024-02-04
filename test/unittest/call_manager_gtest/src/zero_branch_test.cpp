@@ -1789,6 +1789,7 @@ HWTEST_F(BranchTest, Telephony_CallControlManager_001, Function | MediumTest | L
     TelCallState priorState = TelCallState::CALL_STATUS_HOLDING;
     TelCallState nextState = TelCallState::CALL_STATUS_HOLDING;
     ASSERT_FALSE(callControlManager->NotifyNewCallCreated(callObjectPtr));
+    callObjectPtr = nullptr;
     ASSERT_FALSE(callControlManager->NotifyCallStateUpdated(callObjectPtr, priorState, nextState));
     DisconnectedDetails details;
     ASSERT_FALSE(callControlManager->NotifyCallDestroyed(details));
