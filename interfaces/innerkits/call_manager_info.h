@@ -105,10 +105,6 @@ struct CallEventInfo {
      * Indicates the bundle name.
      */
     char bundleName[kMaxBundleNameLen + 1] = { 0 };
-    /**
-     * Indicates the VoIP call specific information
-     */
-    VoipCallReportInfo voipCallInfo;
 };
 
 struct AccountInfo {
