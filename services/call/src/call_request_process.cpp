@@ -819,6 +819,7 @@ int32_t CallRequestProcess::CarrierDialProcess(DialParaInfo &info)
         ret = UpdateCallReportInfo(info, TelCallState::CALL_STATUS_DIALING);
         if (ret != TELEPHONY_SUCCESS) {
             TELEPHONY_LOGE("UpdateCallReportInfo failed!");
+            needWaitHold_ = false;
             return ret;
         }
     }
@@ -828,6 +829,7 @@ int32_t CallRequestProcess::CarrierDialProcess(DialParaInfo &info)
         TELEPHONY_LOGW("PackCellularCallInfo failed!");
         CallManagerHisysevent::WriteDialCallFaultEvent(info.accountId, static_cast<int32_t>(info.callType),
             static_cast<int32_t>(info.videoState), ret, "Carrier type PackCellularCallInfo failed");
+        needWaitHold_ = false;
         return ret;
     }
     if (needWaitHold_ && !isMMiCode) {
