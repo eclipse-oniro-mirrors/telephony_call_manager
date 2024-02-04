@@ -312,9 +312,8 @@ int32_t CallStatusManager::IncomingHandle(const CallDetailInfo &info)
     sptr<CallBase> call = GetOneCallObjectByIndexAndSlotId(info.index, info.accountId);
     if (call != nullptr && (call->GetCallType() != info.callType || call->GetTelCallState() != info.state)) {
         call = RefreshCallIfNecessary(call, info);
-        int32_t result = UpdateCallState(call, info.state);
-        if (result != TELEPHONY_SUCCESS) {
-            return result;
+        if (call->GetCallType() != info.callType) {
+            return UpdateCallState(call, info.state);
         }
         return TELEPHONY_SUCCESS;
     }
