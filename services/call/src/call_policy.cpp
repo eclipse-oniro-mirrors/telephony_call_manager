@@ -59,6 +59,13 @@ int32_t CallPolicy::DialPolicy(std::u16string &number, AppExecFwk::PacMap &extra
         TELEPHONY_LOGE("invalid video state!");
         return CALL_ERR_INVALID_VIDEO_STATE;
     }
+    if (videoState == VideoStateType::TYPE_VOICE) {
+        sptr<CallBase> ringCall = GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_RINGING);
+        if (ringCall != nullptr && ringCall->GetVideoStateType() == VideoStateType::TYPE_VOICE) {
+            TELEPHONY_LOGE("already has new call ringing!");
+            return CALL_ERR_CALL_COUNTS_EXCEED_LIMIT;
+        }
+    }
     return HasNewCall();
 }
 
