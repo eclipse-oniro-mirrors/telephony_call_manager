@@ -997,7 +997,7 @@ void CallStatusManager::SetOriginalCallTypeForDisconnectState(sptr<CallBase> &ca
     CallAttributeInfo attrInfo;
     (void)memset_s(&attrInfo, sizeof(CallAttributeInfo), 0, sizeof(CallAttributeInfo));
     call->GetCallAttributeBaseInfo(attrInfo);
-    if (priorState == TelCallState::CALL_STATUS_ALERTING ||
+    if (priorState == TelCallState::CALL_STATUS_DIALING || priorState == TelCallState::CALL_STATUS_ALERTING ||
         ((priorState == TelCallState::CALL_STATUS_INCOMING || priorState == TelCallState::CALL_STATUS_WAITING) &&
         attrInfo.answerType != CallAnswerType::CALL_ANSWER_REJECT)) {
         // outgoing/incoming video call, but canceled or missed

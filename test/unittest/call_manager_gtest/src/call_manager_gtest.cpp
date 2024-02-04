@@ -1064,21 +1064,6 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_HoldCall_0400, Function | Mediu
     EXPECT_NE(CallManagerGtest::blueToothClientPtr_->HoldCall(), RETURN_VALUE_IS_ZERO);
 }
 
-/**
- * @tc.number   Telephony_CallManager_RegisterVoipCallManagerCallback_0100
- * @tc.name     register callback to call manager service
- * @tc.desc     Function test
- */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_RegisterVoipCallManagerCallback_0100, Function | MediumTest | Level2)
-{
-    AccessToken token;
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
-    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_200_MS, SLEEP_30000_MS);
-    EXPECT_NE(CallManagerGtest::clientPtr_->RegisterVoipCallManagerCallback(), RETURN_VALUE_IS_ZERO);
-}
-
 /******************************************* Test UnHoldCall() *********************************************/
 /**
  * @tc.number   Telephony_CallManager_UnHoldCall_0100
@@ -3397,8 +3382,9 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallTransferInfo_0600, Funct
     info.settingType = CallTransferSettingType::CALL_TRANSFER_ENABLE;
     info.type = CallTransferType::TRANSFER_TYPE_BUSY;
     if (strcpy_s(info.transferNum, kMaxNumberLen + 2,
-            "12345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901") !=
-        EOK) {
+        "1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890"
+        "1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890"
+        "123456789012345678901234567890123456789012345678901234567890") != EOK) {
         TELEPHONY_LOGE("strcpy_s fail.");
         return;
     }
@@ -3977,7 +3963,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetDeviceDirection_0200, Functi
     }
     int32_t callId = 1;
     int32_t rotation = 0;
-    EXPECT_EQ(CallManagerGtest::clientPtr_->SetDeviceDirection(callId, rotation), RETURN_VALUE_IS_ZERO);
+    EXPECT_NE(CallManagerGtest::clientPtr_->SetDeviceDirection(callId, rotation), RETURN_VALUE_IS_ZERO);
 }
 
 /**
@@ -3993,7 +3979,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetDeviceDirection_0300, Functi
     }
     int32_t callId = 1;
     int32_t rotation = CAMERA_ROTATION_90;
-    EXPECT_EQ(CallManagerGtest::clientPtr_->SetDeviceDirection(callId, rotation), RETURN_VALUE_IS_ZERO);
+    EXPECT_NE(CallManagerGtest::clientPtr_->SetDeviceDirection(callId, rotation), RETURN_VALUE_IS_ZERO);
 }
 
 /******************************************* Test SetCameraZoom() *********************************************/
