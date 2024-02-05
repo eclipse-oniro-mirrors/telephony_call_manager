@@ -28,7 +28,7 @@ VoIPCall::VoIPCall(DialParaInfo &info) : CarrierCall(info)
     callId_ = info.callId;
     voipCallId_ = info.voipCallInfo.voipCallId;
     userName_ = info.voipCallInfo.userName;
-    pixelMap_.assign((info.voipCallInfo.pixelMap).begin(), (info.voipCallInfo.pixelMap).end());
+    userProfile_.assign((info.voipCallInfo.userProfile).begin(), (info.voipCallInfo.userProfile).end());
     abilityName_ = info.voipCallInfo.abilityName;
     extensionId_ = info.voipCallInfo.extensionId;
     voipBundleName_ = info.voipCallInfo.voipBundleName;
@@ -144,7 +144,7 @@ void VoIPCall::GetCallAttributeInfo(CallAttributeInfo &info)
     info.callId = callId_;
     info.voipCallInfo.voipCallId = voipCallId_;
     info.voipCallInfo.userName = userName_;
-    (info.voipCallInfo.pixelMap).assign(pixelMap_.begin(), pixelMap_.end());
+    (info.voipCallInfo.userProfile).assign(userProfile_.begin(), userProfile_.end());
     info.voipCallInfo.extensionId = extensionId_;
     info.voipCallInfo.abilityName = abilityName_;
     info.voipCallInfo.voipBundleName = voipBundleName_;

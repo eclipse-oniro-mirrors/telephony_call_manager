@@ -51,7 +51,7 @@ int32_t CallStatusCallbackProxy::UpdateCallReportInfo(const CallReportInfo &info
         dataParcel.WriteString(info.voipCallInfo.abilityName);
         dataParcel.WriteString(info.voipCallInfo.extensionId);
         dataParcel.WriteString(info.voipCallInfo.voipBundleName);
-        dataParcel.WriteUInt8Vector(info.voipCallInfo.pixelMap);
+        dataParcel.WriteUInt8Vector(info.voipCallInfo.userProfile);
     }
     if (Remote() == nullptr) {
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
@@ -90,7 +90,7 @@ int32_t CallStatusCallbackProxy::UpdateCallsReportInfo(const CallsReportInfo &in
             dataParcel.WriteString(it.voipCallInfo.abilityName);
             dataParcel.WriteString(it.voipCallInfo.extensionId);
             dataParcel.WriteString(it.voipCallInfo.voipBundleName);
-            dataParcel.WriteUInt8Vector(it.voipCallInfo.pixelMap);
+            dataParcel.WriteUInt8Vector(it.voipCallInfo.userProfile);
         }
     }
     dataParcel.WriteInt32(info.slotId);
