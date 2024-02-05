@@ -18,7 +18,6 @@
 #include <securec.h>
 
 #include "call_manager_errors.h"
-#include "pixel_map.h"
 #include "telephony_log_wrapper.h"
 
 namespace OHOS {
@@ -113,7 +112,9 @@ int32_t CallAbilityCallbackStub::OnUpdateCallStateInfo(MessageParcel &data, Mess
         parcelPtr.voipCallInfo.abilityName = data.ReadString();
         parcelPtr.voipCallInfo.extensionId = data.ReadString();
         parcelPtr.voipCallInfo.voipBundleName = data.ReadString();
-        parcelPtr.voipCallInfo.pixelMap = std::shared_ptr<Media::PixelMap>(data.ReadParcelable<Media::PixelMap>());
+        std::vector<uint8_t> buff = {};
+        data.ReadUInt8Vector(&buff);
+        (parcelPtr.voipCallInfo.pixelMap).assign(buff.begin(), buff.end());
     }
     result = OnCallDetailsChange(parcelPtr);
     if (!reply.WriteInt32(result)) {

@@ -19,9 +19,6 @@
 #include "call_manager_base.h"
 
 namespace OHOS {
-namespace Media {
-class PixelMap;
-}
 namespace Telephony {
 /**
  * @brief Indicates the cellular call detail information.
@@ -83,7 +80,7 @@ enum class RBTPlayInfo {
 struct VoipCallReportInfo {
     std::string voipCallId = "";
     std::string userName = "";
-    std::shared_ptr<Media::PixelMap> pixelMap = nullptr;
+    std::vector<uint8_t> pixelMap = {};
     std::string abilityName = "";
     std::string extensionId = "";
     std::string voipBundleName = "";
@@ -419,7 +416,7 @@ struct CallDetailInfo {
         voipCallInfo.voipCallId = temp.voipCallInfo.voipCallId;
         voipCallInfo.extensionId = temp.voipCallInfo.extensionId;
         voipCallInfo.userName = temp.voipCallInfo.userName;
-        voipCallInfo.pixelMap = temp.voipCallInfo.pixelMap;
+        (voipCallInfo.pixelMap).assign((temp.voipCallInfo.pixelMap).begin(), (temp.voipCallInfo.pixelMap).end());
         voipCallInfo.abilityName = temp.voipCallInfo.abilityName;
         voipCallInfo.voipBundleName = temp.voipCallInfo.voipBundleName;
         return *this;
