@@ -213,7 +213,6 @@ int32_t CallStatusManager::HandleVoipCallReportInfo(const CallDetailInfo &info)
 {
     TELEPHONY_LOGI("Entry CallStatusManager HandleVoipCallReportInfo");
     int32_t ret = TELEPHONY_ERR_FAIL;
-    callReportInfo_ = info;
     switch (info.state) {
         case TelCallState::CALL_STATUS_ACTIVE:
             ret = ActiveVoipCallHandle(info);
@@ -401,9 +400,8 @@ int32_t CallStatusManager::HandleRejectCall(sptr<CallBase> &call)
 int32_t CallStatusManager::IncomingVoipCallHandle(const CallDetailInfo &info)
 {
     int32_t ret = TELEPHONY_ERROR;
-    sptr<CallBase> call = GetOneCallObjectByIndex(info.index);
-    if (call != nullptr && call->GetCallType() != info.callType) {
-        call = RefreshCallIfNecessary(call, info);
+    sptr<CallBase> call = GetOneCallObjectByVoipCallId(info.voipCallInfo.voipCallId);
+    if (call != nullptr) {
         return TELEPHONY_SUCCESS;
     }
     call = CreateNewCall(info, CallDirection::CALL_DIRECTION_IN);
@@ -572,12 +570,11 @@ int32_t CallStatusManager::ActiveHandle(const CallDetailInfo &info)
 int32_t CallStatusManager::ActiveVoipCallHandle(const CallDetailInfo &info)
 {
     TELEPHONY_LOGI("handle active state");
-    sptr<CallBase> call = GetOneCallObjectByIndexAndSlotId(info.index, info.accountId);
+    sptr<CallBase> call = GetOneCallObjectByVoipCallId(info.voipCallInfo.voipCallId);
     if (call == nullptr) {
         TELEPHONY_LOGE("voip Call is NULL");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    call = RefreshCallIfNecessary(call, info);
     int32_t ret = UpdateCallState(call, TelCallState::CALL_STATUS_ACTIVE);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("UpdateCallState failed, errCode:%{public}d", ret);
@@ -688,12 +685,11 @@ int32_t CallStatusManager::DisconnectingHandle(const CallDetailInfo &info)
 int32_t CallStatusManager::DisconnectedVoipCallHandle(const CallDetailInfo &info)
 {
     TELEPHONY_LOGI("handle disconnected voip call state");
-    sptr<CallBase> call = GetOneCallObjectByIndexAndSlotId(info.index, info.accountId);
+    sptr<CallBase> call = GetOneCallObjectByVoipCallId(info.voipCallInfo.voipCallId);
     if (call == nullptr) {
         TELEPHONY_LOGE("voip Call is NULL");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    call = RefreshCallIfNecessary(call, info);
     int32_t ret = UpdateCallState(call, TelCallState::CALL_STATUS_DISCONNECTED);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("UpdateCallState failed, errCode:%{public}d", ret);
@@ -853,7 +849,7 @@ void CallStatusManager::AutoAnswerForVoiceCall(sptr<CallBase> ringCall, int32_t 
     /* Need to check whether the autoAnswer call and the holding call are on the same slotid
      * To prevent repeated AT command delivery.
      */
-    if (continueAnswer || (!continueAnswer && slotId != ringCall->GetSlotId())) {
+    if (continueAnswer || slotId != ringCall->GetSlotId()) {
         int ret = ringCall->AnswerCall(ringCall->GetAnswerVideoState());
         TELEPHONY_LOGI("ret = %{public}d", ret);
     }

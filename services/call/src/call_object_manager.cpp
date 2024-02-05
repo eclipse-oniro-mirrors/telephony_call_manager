@@ -23,6 +23,7 @@
 #include "ims_conference.h"
 #include "report_call_info_handler.h"
 #include "telephony_log_wrapper.h"
+#include "voip_call.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -440,6 +441,21 @@ sptr<CallBase> CallObjectManager::GetOneCallObjectByIndexAndSlotId(int32_t index
     for (; it != callObjectPtrList_.end(); ++it) {
         if ((*it)->GetCallIndex() == index) {
             if ((*it)->GetSlotId() == slotId) {
+                return (*it);
+            }
+        }
+    }
+    return nullptr;
+}
+
+sptr<CallBase> CallObjectManager::GetOneCallObjectByVoipCallId(std::string voipCallId)
+{
+    std::lock_guard<std::mutex> lock(listMutex_);
+    std::list<sptr<CallBase>>::iterator it = callObjectPtrList_.begin();
+    for (; it != callObjectPtrList_.end(); ++it) {
+        if ((*it)->GetCallType() == CallType::TYPE_VOIP) {
+            sptr<VoIPCall> voipCall = reinterpret_cast<VoIPCall *>((*it).GetRefPtr());
+            if (voipCall->GetVoipCallId() == voipCallId) {
                 return (*it);
             }
         }
