@@ -22,7 +22,6 @@
 #include "call_ability_callback.h"
 #include "call_ability_callback_proxy.h"
 #include "call_manager_callback.h"
-#include "pixel_map.h"
 
 using namespace OHOS::Telephony;
 namespace OHOS {
@@ -108,7 +107,7 @@ int32_t UpdateCallStateInfo(const uint8_t *data, size_t size)
     dataMessageParcel.WriteString(info.voipCallInfo.abilityName);
     dataMessageParcel.WriteString(info.voipCallInfo.extensionId);
     dataMessageParcel.WriteString(info.voipCallInfo.voipBundleName);
-    dataMessageParcel.WriteParcelable(info.voipCallInfo.pixelMap.get());
+    dataMessageParcel.WriteUInt8Vector(info.voipCallInfo.userProfile);
     dataMessageParcel.RewindRead(0);
     MessageParcel reply;
     MessageOption option;

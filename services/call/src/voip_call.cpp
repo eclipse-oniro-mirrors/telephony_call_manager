@@ -18,7 +18,6 @@
 #include "call_control_manager.h"
 #include "call_manager_errors.h"
 #include "call_object_manager.h"
-#include "pixel_map.h"
 #include "telephony_log_wrapper.h"
 #include "voip_call_connection.h"
 
@@ -29,7 +28,7 @@ VoIPCall::VoIPCall(DialParaInfo &info) : CarrierCall(info)
     callId_ = info.callId;
     voipCallId_ = info.voipCallInfo.voipCallId;
     userName_ = info.voipCallInfo.userName;
-    pixelMap_ = info.voipCallInfo.pixelMap;
+    userProfile_.assign((info.voipCallInfo.userProfile).begin(), (info.voipCallInfo.userProfile).end());
     abilityName_ = info.voipCallInfo.abilityName;
     extensionId_ = info.voipCallInfo.extensionId;
     voipBundleName_ = info.voipCallInfo.voipBundleName;
@@ -145,7 +144,7 @@ void VoIPCall::GetCallAttributeInfo(CallAttributeInfo &info)
     info.callId = callId_;
     info.voipCallInfo.voipCallId = voipCallId_;
     info.voipCallInfo.userName = userName_;
-    info.voipCallInfo.pixelMap = pixelMap_;
+    (info.voipCallInfo.userProfile).assign(userProfile_.begin(), userProfile_.end());
     info.voipCallInfo.extensionId = extensionId_;
     info.voipCallInfo.abilityName = abilityName_;
     info.voipCallInfo.voipBundleName = voipBundleName_;

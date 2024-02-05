@@ -57,12 +57,10 @@ protected:
 private:
     std::string voipCallId_ = "";
     std::string userName_ = "";
-    std::string userProfilePath_ = "";
-    std::string packageProfilePath_ = "";
     std::string extensionId_ = "";
     std::string voipBundleName_ = "";
     std::string abilityName_ = "";
-    std::shared_ptr<Media::PixelMap> pixelMap_ = nullptr;
+    std::vector<uint8_t> userProfile_ = {};
 };
 } // namespace Telephony
 } // namespace OHOS
