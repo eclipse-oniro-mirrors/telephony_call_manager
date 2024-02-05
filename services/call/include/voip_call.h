@@ -61,7 +61,7 @@ private:
     std::string extensionId_ = "";
     std::string voipBundleName_ = "";
     std::string abilityName_ = "";
-    std::shared_ptr<Media::PixelMap> pixelMap_ = nullptr;
+    std::vector<uint8_t> pixelMap_ = {};
 };
 } // namespace Telephony
 } // namespace OHOS

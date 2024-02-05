@@ -18,7 +18,6 @@
 #include "call_manager_errors.h"
 #include "message_option.h"
 #include "message_parcel.h"
-#include "pixel_map.h"
 #include "telephony_log_wrapper.h"
 
 namespace OHOS {
@@ -52,7 +51,7 @@ int32_t CallStatusCallbackProxy::UpdateCallReportInfo(const CallReportInfo &info
         dataParcel.WriteString(info.voipCallInfo.abilityName);
         dataParcel.WriteString(info.voipCallInfo.extensionId);
         dataParcel.WriteString(info.voipCallInfo.voipBundleName);
-        dataParcel.WriteParcelable(info.voipCallInfo.pixelMap.get());
+        dataParcel.WriteUInt8Vector(info.voipCallInfo.pixelMap);
     }
     if (Remote() == nullptr) {
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
@@ -91,7 +90,7 @@ int32_t CallStatusCallbackProxy::UpdateCallsReportInfo(const CallsReportInfo &in
             dataParcel.WriteString(it.voipCallInfo.abilityName);
             dataParcel.WriteString(it.voipCallInfo.extensionId);
             dataParcel.WriteString(it.voipCallInfo.voipBundleName);
-            dataParcel.WriteParcelable(it.voipCallInfo.pixelMap.get());
+            dataParcel.WriteUInt8Vector(it.voipCallInfo.pixelMap);
         }
     }
     dataParcel.WriteInt32(info.slotId);

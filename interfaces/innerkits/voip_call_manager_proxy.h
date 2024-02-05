@@ -25,7 +25,6 @@
 #include "iremote_broker.h"
 #include "iremote_proxy.h"
 #include "pac_map.h"
-#include "pixel_map.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -46,7 +45,7 @@ public:
      * @return Returns 0 on success, others on failure.
      */
     int32_t ReportIncomingCall(
-        AppExecFwk::PacMap &extras, std::shared_ptr<OHOS::Media::PixelMap> &userProfile, ErrorReason &reason) override;
+        AppExecFwk::PacMap &extras, std::vector<uint8_t> &userProfile, ErrorReason &reason) override;
     /**
      * @brief thrid-party applications report incoming call failed causes.
      *

@@ -23,7 +23,6 @@
 #include "i_voip_call_manager_callback.h"
 #include "iremote_broker.h"
 #include "pac_map.h"
-#include "pixel_map.h"
 #include "voip_call_manager_info.h"
 
 namespace OHOS {
@@ -48,7 +47,7 @@ public:
     };
     virtual ~IVoipCallManagerService() = default;
     virtual int32_t ReportIncomingCall(
-        AppExecFwk::PacMap &extras, std::shared_ptr<OHOS::Media::PixelMap> &userProfile, ErrorReason &reason) = 0;
+        AppExecFwk::PacMap &extras, std::vector<uint8_t> &userProfile, ErrorReason &reason) = 0;
     virtual int32_t ReportIncomingCallError(AppExecFwk::PacMap &extras) = 0;
     virtual int32_t ReportCallStateChange(std::string &callId, const VoipCallState &state) = 0;
     virtual int32_t RegisterCallBack(const sptr<IVoipCallManagerCallback> &callback) = 0;
