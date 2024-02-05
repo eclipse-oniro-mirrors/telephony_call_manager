@@ -96,6 +96,7 @@ private:
     bool ShouldPlayRingtone() const;
     bool IsEmergencyCallExists() const;
     void UpdateForegroundLiveCall();
+    void ProcessAudioWhenCallActive(sptr<CallBase> &callObjectPtr);
     ToneState toneState_ = ToneState::STOPPED;
     SoundState soundState_ = SoundState::STOPPED;
     bool isLocalRingbackNeeded_;
