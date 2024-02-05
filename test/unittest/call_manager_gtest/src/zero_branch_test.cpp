@@ -2027,6 +2027,14 @@ HWTEST_F(BranchTest, Telephony_CallStatusManager_001, Function | MediumTest | Le
     ottCallEventInfo.ottCallEventId = OttCallEventId::OTT_CALL_EVENT_FUNCTION_UNSUPPORTED;
     (void)memcpy_s(ottCallEventInfo.bundleName, kMaxBundleNameLen + 1, TEST_STR, strlen(TEST_STR));
     ASSERT_GT(callStatusManager->HandleOttEventReportInfo(ottCallEventInfo), TELEPHONY_ERROR);
+    info.voipCallInfo.voipCallId = "123456789";
+    info.callType = CallType::TYPE_VOIP;
+    info.state = TelCallState::CALL_STATUS_INCOMING;
+    ASSERT_GT(callStatusManager->HandleCallReportInfo(info), TELEPHONY_ERROR);
+    info.state = TelCallState::CALL_STATUS_ACTIVE;
+    ASSERT_GT(callStatusManager->HandleCallReportInfo(info), TELEPHONY_ERROR);
+    info.state = TelCallState::CALL_STATUS_DISCONNECTED;
+    ASSERT_GT(callStatusManager->HandleCallReportInfo(info), TELEPHONY_ERROR);
 }
 
 /**

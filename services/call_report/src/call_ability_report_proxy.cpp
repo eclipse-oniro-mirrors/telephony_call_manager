@@ -173,7 +173,7 @@ int32_t CallAbilityReportProxy::ReportCallStateInfo(const CallAttributeInfo &inf
     }
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE(
-            "OnCallDetailsChange failed, errcode:%{public}d, bundleName:%{publilc}s", ret, bundleName.c_str());
+            "OnCallDetailsChange failed, errcode:%{public}d, bundleName:%{public}s", ret, bundleName.c_str());
     } else {
         TELEPHONY_LOGI("callId[%{public}d] state[%{public}d] conferenceState[%{public}d] "
                        "videoState[%{public}d], report bundleName %{public}s success",
