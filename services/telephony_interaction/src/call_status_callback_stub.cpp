@@ -18,7 +18,6 @@
 #include <securec.h>
 
 #include "call_manager_errors.h"
-#include "pixel_map.h"
 #include "telephony_log_wrapper.h"
 
 namespace OHOS {
@@ -120,7 +119,9 @@ int32_t CallStatusCallbackStub::OnUpdateCallReportInfo(MessageParcel &data, Mess
         parcelPtr.voipCallInfo.abilityName = data.ReadString();
         parcelPtr.voipCallInfo.extensionId = data.ReadString();
         parcelPtr.voipCallInfo.voipBundleName = data.ReadString();
-        parcelPtr.voipCallInfo.pixelMap = std::shared_ptr<Media::PixelMap>(data.ReadParcelable<Media::PixelMap>());
+        std::vector<uint8_t> userProfile = {};
+        data.ReadUInt8Vector(&userProfile);
+        (parcelPtr.voipCallInfo.userProfile).assign(userProfile.begin(), userProfile.end());
     }
     result = UpdateCallReportInfo(parcelPtr);
     if (!reply.WriteInt32(result)) {
@@ -161,7 +162,9 @@ int32_t CallStatusCallbackStub::OnUpdateCallsReportInfo(MessageParcel &data, Mes
             parcelPtr.voipCallInfo.abilityName = data.ReadString();
             parcelPtr.voipCallInfo.extensionId = data.ReadString();
             parcelPtr.voipCallInfo.voipBundleName = data.ReadString();
-            parcelPtr.voipCallInfo.pixelMap = std::shared_ptr<Media::PixelMap>(data.ReadParcelable<Media::PixelMap>());
+            std::vector<uint8_t> userProfile = {};
+            data.ReadUInt8Vector(&userProfile);
+            (parcelPtr.voipCallInfo.userProfile).assign(userProfile.begin(), userProfile.end());
         }
         callReportInfo.callVec.push_back(parcelPtr);
         TELEPHONY_LOGI("accountId:%{public}d,state:%{public}d", parcelPtr.accountId, parcelPtr.state);

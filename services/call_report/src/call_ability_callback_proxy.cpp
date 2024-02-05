@@ -18,7 +18,6 @@
 #include "call_manager_errors.h"
 #include "message_option.h"
 #include "message_parcel.h"
-#include "pixel_map.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -61,7 +60,7 @@ int32_t CallAbilityCallbackProxy::OnCallDetailsChange(const CallAttributeInfo &i
         dataParcel.WriteString(info.voipCallInfo.abilityName);
         dataParcel.WriteString(info.voipCallInfo.extensionId);
         dataParcel.WriteString(info.voipCallInfo.voipBundleName);
-        dataParcel.WriteParcelable(info.voipCallInfo.pixelMap.get());
+        dataParcel.WriteUInt8Vector(info.voipCallInfo.userProfile);
     }
     if (Remote() == nullptr) {
         TELEPHONY_LOGE("function Remote() return nullptr!");

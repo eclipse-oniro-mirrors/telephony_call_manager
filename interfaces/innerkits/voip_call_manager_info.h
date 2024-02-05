@@ -17,8 +17,7 @@
 #define VOIP_CALL_MANAGER_INFO_H
 #include <cstdint>
 #include <string>
-
-#include "pixel_map.h"
+#include <vector>
 
 namespace OHOS {
 namespace Telephony {
@@ -86,7 +85,7 @@ struct VoipCallAttribute {
     /**
      * Indicates the user Porfile.
      */
-    std::shared_ptr<Media::PixelMap> pixelMap = nullptr;
+    std::vector<uint8_t> userProfile = {};
     /**
      * Indicates the package Profile.
      */
