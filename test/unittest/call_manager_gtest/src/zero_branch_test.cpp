@@ -46,7 +46,6 @@
 #include "missed_call_notification.h"
 #include "ott_call.h"
 #include "ott_conference.h"
-#include "pixel_map.h"
 #include "reject_call_sms.h"
 #include "report_call_info_handler.h"
 #include "satellite_call.h"
@@ -2360,8 +2359,8 @@ HWTEST_F(BranchTest, Telephony_VoipCallManagerProxy_001, Function | MediumTest |
     AppExecFwk::PacMap mPacMap;
     ErrorReason error = ErrorReason::VOIP_CALL_EXISTS;
     if (voipCallManagerInterfacePtr != nullptr) {
-        std::shared_ptr<Media::PixelMap> pixelMap = nullptr;
-        voipCallManagerInterfacePtr->ReportIncomingCall(mPacMap, pixelMap, error);
+        std::vector<uint8_t> userProfile = { 0 };
+        voipCallManagerInterfacePtr->ReportIncomingCall(mPacMap, userProfile, error);
         voipCallManagerInterfacePtr->ReportIncomingCallError(mPacMap);
         VoipCallState voipCallState = VoipCallState::VOIP_CALL_STATE_ACTIVE;
         std::string callId = "123";

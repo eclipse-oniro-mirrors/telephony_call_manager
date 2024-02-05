@@ -85,7 +85,7 @@ struct VoipCallAttribute {
     /**
      * Indicates the user Porfile.
      */
-    std::vector<uint8_t> pixelMap = {};
+    std::vector<uint8_t> userProfile = {};
     /**
      * Indicates the package Profile.
      */

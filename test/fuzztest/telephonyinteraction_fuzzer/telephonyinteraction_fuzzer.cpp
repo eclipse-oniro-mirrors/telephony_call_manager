@@ -20,7 +20,6 @@
 #define private public
 #include "addcalltoken_fuzzer.h"
 #include "call_status_callback_proxy.h"
-#include "pixel_map.h"
 
 using namespace OHOS::Telephony;
 namespace OHOS {
@@ -98,7 +97,7 @@ int32_t UpdateCallReportInfo(const uint8_t *data, size_t size)
     dataParcel.WriteString(callReportInfo.voipCallInfo.abilityName);
     dataParcel.WriteString(callReportInfo.voipCallInfo.extensionId);
     dataParcel.WriteString(callReportInfo.voipCallInfo.voipBundleName);
-    dataParcel.WriteParcelable(callReportInfo.voipCallInfo.pixelMap.get());
+    dataParcel.WriteUInt8Vector(callReportInfo.voipCallInfo.userProfile);
     dataParcel.RewindRead(0);
     MessageParcel reply;
     return CallStatusCallbackPtr_->OnUpdateCallReportInfo(dataParcel, reply);
@@ -142,7 +141,7 @@ int32_t UpdateCallsReportInfo(const uint8_t *data, size_t size)
     dataParcel.WriteString(info.voipCallInfo.abilityName);
     dataParcel.WriteString(info.voipCallInfo.extensionId);
     dataParcel.WriteString(info.voipCallInfo.voipBundleName);
-    dataParcel.WriteParcelable(info.voipCallInfo.pixelMap.get());
+    dataParcel.WriteUInt8Vector(info.voipCallInfo.userProfile);
     dataParcel.WriteInt32(slotId);
     dataParcel.RewindRead(0);
     MessageParcel reply;

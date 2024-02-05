@@ -38,8 +38,8 @@ int32_t CallStatusCallback::UpdateCallReportInfo(const CallReportInfo &info)
     if (info.callType == CallType::TYPE_VOIP) {
         detailInfo.voipCallInfo.voipCallId = info.voipCallInfo.voipCallId;
         detailInfo.voipCallInfo.userName = info.voipCallInfo.userName;
-        (detailInfo.voipCallInfo.pixelMap).assign(
-            (info.voipCallInfo.pixelMap).begin(), (info.voipCallInfo.pixelMap).end());
+        (detailInfo.voipCallInfo.userProfile).assign(
+            (info.voipCallInfo.userProfile).begin(), (info.voipCallInfo.userProfile).end());
         detailInfo.voipCallInfo.extensionId = info.voipCallInfo.extensionId;
         detailInfo.voipCallInfo.voipBundleName = info.voipCallInfo.voipBundleName;
         detailInfo.voipCallInfo.abilityName = info.voipCallInfo.abilityName;

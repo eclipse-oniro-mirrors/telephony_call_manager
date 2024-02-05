@@ -80,7 +80,7 @@ enum class RBTPlayInfo {
 struct VoipCallReportInfo {
     std::string voipCallId = "";
     std::string userName = "";
-    std::vector<uint8_t> pixelMap = {};
+    std::vector<uint8_t> userProfile = {};
     std::string abilityName = "";
     std::string extensionId = "";
     std::string voipBundleName = "";
@@ -416,7 +416,8 @@ struct CallDetailInfo {
         voipCallInfo.voipCallId = temp.voipCallInfo.voipCallId;
         voipCallInfo.extensionId = temp.voipCallInfo.extensionId;
         voipCallInfo.userName = temp.voipCallInfo.userName;
-        (voipCallInfo.pixelMap).assign((temp.voipCallInfo.pixelMap).begin(), (temp.voipCallInfo.pixelMap).end());
+        (voipCallInfo.userProfile).assign(
+            (temp.voipCallInfo.userProfile).begin(), (temp.voipCallInfo.userProfile).end());
         voipCallInfo.abilityName = temp.voipCallInfo.abilityName;
         voipCallInfo.voipBundleName = temp.voipCallInfo.voipBundleName;
         return *this;

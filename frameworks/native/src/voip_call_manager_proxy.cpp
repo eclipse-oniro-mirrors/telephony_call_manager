@@ -27,7 +27,7 @@ VoipCallManagerProxy::VoipCallManagerProxy(const sptr<IRemoteObject> &impl)
 {}
 
 int32_t VoipCallManagerProxy::ReportIncomingCall(
-    AppExecFwk::PacMap &extras, std::shared_ptr<OHOS::Media::PixelMap> &userProfile, ErrorReason &reason)
+    AppExecFwk::PacMap &extras, std::vector<uint8_t> &userProfile, ErrorReason &reason)
 {
     MessageParcel dataParcel;
     if (!dataParcel.WriteInterfaceToken(VoipCallManagerProxy::GetDescriptor())) {
@@ -39,7 +39,7 @@ int32_t VoipCallManagerProxy::ReportIncomingCall(
     dataParcel.WriteString(extras.GetStringValue("userName"));
     dataParcel.WriteString(extras.GetStringValue("abilityName"));
     dataParcel.WriteInt32(extras.GetIntValue("voipCallState"));
-    dataParcel.WriteParcelable(userProfile.get());
+    dataParcel.WriteUInt8Vector(userProfile);
     auto remote = Remote();
     if (remote == nullptr) {
         TELEPHONY_LOGE("ReportIncomingCall Remote is null");

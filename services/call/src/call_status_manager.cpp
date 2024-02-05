@@ -1123,7 +1123,8 @@ void CallStatusManager::PackParaInfo(
     if (info.callType == CallType::TYPE_VOIP) {
         paraInfo.voipCallInfo.voipCallId = info.voipCallInfo.voipCallId;
         paraInfo.voipCallInfo.userName = info.voipCallInfo.userName;
-        paraInfo.voipCallInfo.pixelMap = info.voipCallInfo.pixelMap;
+        (paraInfo.voipCallInfo.userProfile).assign(
+            (info.voipCallInfo.userProfile).begin(), (info.voipCallInfo.userProfile).end());
         paraInfo.voipCallInfo.abilityName = info.voipCallInfo.abilityName;
         paraInfo.voipCallInfo.extensionId = info.voipCallInfo.extensionId;
         paraInfo.voipCallInfo.voipBundleName = info.voipCallInfo.voipBundleName;
