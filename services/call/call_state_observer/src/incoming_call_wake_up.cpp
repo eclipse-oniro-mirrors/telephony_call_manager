@@ -45,7 +45,7 @@ void IncomingCallWakeup::WakeupDevice()
     }
     if (screenRunningLock_ == nullptr) {
         screenRunningLock_ = PowerMgr::PowerMgrClient::GetInstance().
-            CreateRunningLock("screenonrunninglock", RunningLockType::RUNNINGLOCK_BACKGROUNG_PHONE);
+            CreateRunningLock("screenonrunninglock", RunningLockType::RUNNINGLOCK_SCREEN);
     }
 #endif
     if (IsScreenOn()) {
@@ -61,7 +61,7 @@ void IncomingCallWakeup::WakeupDevice()
     PowerMgr::PowerMgrClient::GetInstance().WakeupDevice(
         PowerMgr::WakeupDeviceType::WAKEUP_DEVICE_APPLICATION, wakeupReason_);
     if (screenRunningLock_ != nullptr) {
-        screenRunningLock_->UnLock();
+        screenRunningLock_->Lock();
     }
 #endif
 }
@@ -100,7 +100,10 @@ void IncomingCallWakeup::IncomingCallHungUp(sptr<CallBase> &callObjectPtr, bool 
 void IncomingCallWakeup::CallStateUpdated(
     sptr<CallBase> &callObjectPtr, TelCallState priorState, TelCallState nextState)
 {
-    if (priorState == TelCallState::CALL_STATUS_INCOMING && priorState != nextState) {
+    bool hasRingCall = false;
+    CallObjectManager::hasRingCall(hasRingCall);
+    if (!hasRingCall) {
+    #ifdef ABILITY_POWER_SUPPORT    
         if (screenRunningLock_ != nullptr) {
             screenRunningLock_->UnLock();
             screenRunningLock_ = nullptr;
@@ -109,6 +112,7 @@ void IncomingCallWakeup::CallStateUpdated(
             phoneRunningLock_->UnLock();
             phoneRunningLock_ = nullptr;
         }
+    #endif
     }
 }
 } // namespace Telephony

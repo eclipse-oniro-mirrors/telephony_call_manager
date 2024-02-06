@@ -19,12 +19,12 @@
 #include "power_mgr_client.h"
 #endif
 #include <mutex>
-
+#include "call_object_manager"
 #include "call_state_listener_base.h"
 
 namespace OHOS {
 namespace Telephony {
-class IncomingCallWakeup : public CallStateListenerBase {
+class IncomingCallWakeup : public CallStateListenerBase, public CallObjectManager{
 public:
     IncomingCallWakeup() = default;
     ~IncomingCallWakeup() = default;
