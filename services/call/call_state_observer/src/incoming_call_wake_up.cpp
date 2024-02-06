@@ -103,7 +103,7 @@ void IncomingCallWakeup::CallStateUpdated(
     bool hasRingCall = false;
     CallObjectManager::hasRingCall(hasRingCall);
     if (!hasRingCall) {
-    #ifdef ABILITY_POWER_SUPPORT    
+    #ifdef ABILITY_POWER_SUPPORT
         if (screenRunningLock_ != nullptr) {
             screenRunningLock_->UnLock();
             screenRunningLock_ = nullptr;
