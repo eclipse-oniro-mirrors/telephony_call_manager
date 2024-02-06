@@ -98,7 +98,8 @@ int32_t CallAbilityReportProxy::UnRegisterCallBack(const std::string &bundleName
     if (callbackPtrList_.empty()) {
         TELEPHONY_LOGE("callbackPtrList_ is null!");
         if (appMgrProxy != nullptr && appStateObserver != nullptr) {
-            appMgrProxy->UnregisterApplicationStateObserver(appStateObserver);
+            int ret = appMgrProxy->UnregisterApplicationStateObserver(appStateObserver);
+            TELEPHONY_LOGI("UnregisterApplicationStateObserver result = %{public}d", ret);
             appMgrProxy = nullptr;
             appStateObserver = nullptr;
         }

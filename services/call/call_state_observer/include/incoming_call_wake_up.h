@@ -15,14 +15,16 @@
 
 #ifndef TELEPHONY_INCOMING_CALL_WAKE_UP_H
 #define TELEPHONY_INCOMING_CALL_WAKE_UP_H
-
+#ifdef ABILITY_POWER_SUPPORT
+#include "power_mgr_client.h"
+#endif
 #include <mutex>
-
+#include "call_object_manager.h"
 #include "call_state_listener_base.h"
 
 namespace OHOS {
 namespace Telephony {
-class IncomingCallWakeup : public CallStateListenerBase {
+class IncomingCallWakeup : public CallStateListenerBase, public CallObjectManager {
 public:
     IncomingCallWakeup() = default;
     ~IncomingCallWakeup() = default;
@@ -44,6 +46,12 @@ private:
      */
     bool IsScreenOn();
     bool IsPowerAbilityExist();
+#ifdef ABILITY_POWER_SUPPORT
+    std::shared_ptr<PowerMgr::RunningLock> screenRunningLock_;
+    std::shared_ptr<PowerMgr::RunningLock> phoneRunningLock_;
+#endif
+    bool isPhoneLocked = false;
+    bool isScreenOnLocked = false;
 };
 } // namespace Telephony
 } // namespace OHOS
