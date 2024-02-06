@@ -116,11 +116,13 @@ void IncomingCallWakeup::CallStateUpdated(
         if (screenRunningLock_ != nullptr && isScreenOnLocked) {
             screenRunningLock_->UnLock();
             screenRunningLock_ = nullptr;
+            isScreenOnLocked = false;
             TELEPHONY_LOGI("screenRunningLock_ unlocked");
         }
         if (phoneRunningLock_ != nullptr && isPhoneLocked) {
             phoneRunningLock_->UnLock();
             phoneRunningLock_ = nullptr;
+            isPhoneLocked = false;
             TELEPHONY_LOGI("phoneRunningLock_ unlocked");
         }
     #endif
