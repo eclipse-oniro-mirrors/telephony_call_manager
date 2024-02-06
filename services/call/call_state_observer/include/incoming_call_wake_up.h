@@ -15,7 +15,9 @@
 
 #ifndef TELEPHONY_INCOMING_CALL_WAKE_UP_H
 #define TELEPHONY_INCOMING_CALL_WAKE_UP_H
-
+#ifdef ABILITY_POWER_SUPPORT
+#include "power_mgr_client.h"
+#endif
 #include <mutex>
 
 #include "call_state_listener_base.h"
@@ -44,6 +46,8 @@ private:
      */
     bool IsScreenOn();
     bool IsPowerAbilityExist();
+    std::unique_ptr<PowerMgr::RunningLock> screenRunningLock_;
+    std::unique_ptr<PowerMgr::RunningLock> phoneRunningLock_;
 };
 } // namespace Telephony
 } // namespace OHOS

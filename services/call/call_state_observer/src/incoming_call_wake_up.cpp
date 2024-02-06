@@ -34,14 +34,35 @@ void IncomingCallWakeup::NewCallCreated(sptr<CallBase> &callObjectPtr)
 }
 
 void IncomingCallWakeup::WakeupDevice()
-{
+{ 
+#ifdef ABILITY_POWER_SUPPORT
+    if (phoneRunningLock_ == nullptr) {
+        phoneRunningLock_ = PowerMgr::PowerMgrClient::GetInstance().
+            CreateRunningLock("phonerunninglock", RunningLockType::RUNNINGLOCK_BACKGROUNG_PHONE);
+    }
+    if (phoneRunningLock_ != nullptr) {
+        phoneRunningLock_->Lock();
+    }
+    if (screenRunningLock_ == nullptr) {
+        screenRunningLock_ = PowerMgr::PowerMgrClient::GetInstance().
+            CreateRunningLock("screenonrunninglock", RunningLockType::RUNNINGLOCK_BACKGROUNG_PHONE);
+    }
+#endif
     if (IsScreenOn()) {
         TELEPHONY_LOGI("screen already up");
+    #ifdef ABILITY_POWER_SUPPORT
+        if (screenRunningLock_ != nullptr) {
+            screenRunningLock_->Lock();
+        }
+    #endif
         return;
     }
 #ifdef ABILITY_POWER_SUPPORT
     PowerMgr::PowerMgrClient::GetInstance().WakeupDevice(
         PowerMgr::WakeupDeviceType::WAKEUP_DEVICE_APPLICATION, wakeupReason_);
+    if (screenRunningLock_ != nullptr) {
+        screenRunningLock_->UnLock();
+    }
 #endif
 }
 
@@ -78,6 +99,17 @@ void IncomingCallWakeup::IncomingCallHungUp(sptr<CallBase> &callObjectPtr, bool 
 
 void IncomingCallWakeup::CallStateUpdated(
     sptr<CallBase> &callObjectPtr, TelCallState priorState, TelCallState nextState)
-{}
+{
+    if (priorState == TelCallState::CALL_STATUS_INCOMING && priorState != nextState) {
+        if (screenRunningLock_ != nullptr) {
+            screenRunningLock_.UnLock();
+            screenRunningLock_ = nullptr;
+        }
+        if (phoneRunningLock_ != nullptr) {
+            phoneRunningLock_.UnLock();
+            phoneRunningLock_ = nullptr;
+        }
+    }
+}
 } // namespace Telephony
 } // namespace OHOS
