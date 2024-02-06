@@ -38,7 +38,7 @@ void IncomingCallWakeup::WakeupDevice()
 #ifdef ABILITY_POWER_SUPPORT
     if (phoneRunningLock_ == nullptr) {
         phoneRunningLock_ = PowerMgr::PowerMgrClient::GetInstance().
-            CreateRunningLock("phonerunninglock", PowerMgr::RunningLockType::RUNNINGLOCK_BACKGROUNG_PHONE);
+            CreateRunningLock("phonerunninglock", PowerMgr::RunningLockType::RUNNINGLOCK_BACKGROUND_PHONE);
     }
     if (phoneRunningLock_ != nullptr && !isPhoneLocked) {
         phoneRunningLock_->Lock();
@@ -115,13 +115,11 @@ void IncomingCallWakeup::CallStateUpdated(
     #ifdef ABILITY_POWER_SUPPORT
         if (screenRunningLock_ != nullptr && isScreenOnLocked) {
             screenRunningLock_->UnLock();
-            screenRunningLock_ = nullptr;
             isScreenOnLocked = false;
             TELEPHONY_LOGI("screenRunningLock_ unlocked");
         }
         if (phoneRunningLock_ != nullptr && isPhoneLocked) {
             phoneRunningLock_->UnLock();
-            phoneRunningLock_ = nullptr;
             isPhoneLocked = false;
             TELEPHONY_LOGI("phoneRunningLock_ unlocked");
         }
