@@ -820,6 +820,7 @@ HWTEST_F(BranchTest, Telephony_RejectCallSms_001, Function | MediumTest | Level3
     std::shared_ptr<RejectCallSms> rejectCallSms = std::make_shared<RejectCallSms>();
     sptr<CallBase> callObjectPtr = nullptr;
     rejectCallSms->IncomingCallHungUp(callObjectPtr, true, "");
+    rejectCallSms->IncomingCallHungUp(callObjectPtr, false, "");
     DialParaInfo info;
     info.number = TEST_STR;
     callObjectPtr = new CSCall(info);
