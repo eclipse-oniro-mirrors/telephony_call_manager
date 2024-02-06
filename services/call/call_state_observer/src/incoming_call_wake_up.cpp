@@ -55,7 +55,7 @@ void IncomingCallWakeup::WakeupDevice()
     #ifdef ABILITY_POWER_SUPPORT
         if (screenRunningLock_ != nullptr && !isScreenOnLocked) {
             screenRunningLock_->Lock();
-            isScreenOn = true;
+            isScreenOnLocked = true;
             TELEPHONY_LOGI("screenRunningLock_ locked");
         }
     #endif
@@ -66,7 +66,7 @@ void IncomingCallWakeup::WakeupDevice()
         PowerMgr::WakeupDeviceType::WAKEUP_DEVICE_APPLICATION, wakeupReason_);
     if (screenRunningLock_ != nullptr && !isScreenOnLocked) {
         screenRunningLock_->Lock();
-        isScreenOn = true;
+        isScreenOnLocked = true;
         TELEPHONY_LOGI("screenRunningLock_ locked");
     }
 #endif
