@@ -46,8 +46,8 @@ private:
      */
     bool IsScreenOn();
     bool IsPowerAbilityExist();
-    std::unique_ptr<PowerMgr::RunningLock> screenRunningLock_;
-    std::unique_ptr<PowerMgr::RunningLock> phoneRunningLock_;
+    std::shared_ptr<PowerMgr::RunningLock> screenRunningLock_;
+    std::shared_ptr<PowerMgr::RunningLock> phoneRunningLock_;
     bool isPhoneLocked = false;
     bool isScreenOnLocked = false;
 };
