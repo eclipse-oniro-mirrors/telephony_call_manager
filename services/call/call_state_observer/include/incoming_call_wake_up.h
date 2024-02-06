@@ -19,7 +19,7 @@
 #include "power_mgr_client.h"
 #endif
 #include <mutex>
-#include "call_object_manager"
+#include "call_object_manager.h"
 #include "call_state_listener_base.h"
 
 namespace OHOS {
