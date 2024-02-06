@@ -24,7 +24,7 @@
 
 namespace OHOS {
 namespace Telephony {
-class IncomingCallWakeup : public CallStateListenerBase, public CallObjectManager{
+class IncomingCallWakeup : public CallStateListenerBase, public CallObjectManager {
 public:
     IncomingCallWakeup() = default;
     ~IncomingCallWakeup() = default;
