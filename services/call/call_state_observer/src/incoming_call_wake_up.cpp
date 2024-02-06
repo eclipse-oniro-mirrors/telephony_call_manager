@@ -102,11 +102,11 @@ void IncomingCallWakeup::CallStateUpdated(
 {
     if (priorState == TelCallState::CALL_STATUS_INCOMING && priorState != nextState) {
         if (screenRunningLock_ != nullptr) {
-            screenRunningLock_.UnLock();
+            screenRunningLock_->UnLock();
             screenRunningLock_ = nullptr;
         }
         if (phoneRunningLock_ != nullptr) {
-            phoneRunningLock_.UnLock();
+            phoneRunningLock_->UnLock();
             phoneRunningLock_ = nullptr;
         }
     }
