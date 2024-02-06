@@ -34,7 +34,7 @@ void IncomingCallWakeup::NewCallCreated(sptr<CallBase> &callObjectPtr)
 }
 
 void IncomingCallWakeup::WakeupDevice()
-{ 
+{
 #ifdef ABILITY_POWER_SUPPORT
     if (phoneRunningLock_ == nullptr) {
         phoneRunningLock_ = PowerMgr::PowerMgrClient::GetInstance().
