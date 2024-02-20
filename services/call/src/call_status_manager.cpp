@@ -850,7 +850,12 @@ void CallStatusManager::AutoAnswerForVoiceCall(sptr<CallBase> ringCall, int32_t 
      * To prevent repeated AT command delivery.
      */
     if (continueAnswer || slotId != ringCall->GetSlotId()) {
+        DelayedSingleton<CallControlManager>::GetInstance()->NotifyCallStateUpdated(
+            ringCall, TelCallState::CALL_STATUS_INCOMING, TelCallState::CALL_STATUS_ANSWERED);
         int ret = ringCall->AnswerCall(ringCall->GetAnswerVideoState());
+        if (ret == TELEPHONY_SUCCESS) {
+            DelayedSingleton<CallControlManager>::GetInstance()->NotifyIncomingCallAnswered(ringCall);
+        }
         TELEPHONY_LOGI("ret = %{public}d", ret);
     }
     ringCall->SetAutoAnswerState(false);
