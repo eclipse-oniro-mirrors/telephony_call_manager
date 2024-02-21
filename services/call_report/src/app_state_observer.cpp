@@ -20,11 +20,13 @@
 #include "i_call_ability_callback.h"
 #include "call_ability_report_proxy.h"
 #include "call_control_manager.h"
+#include "ffrt.h"
 
 namespace OHOS {
 namespace Telephony {
 namespace {
-const std::string TAG = "AppStateObserver";
+    const std::string TAG = "AppStateObserver";
+    ffrt::queue unregisterCallbackQueue { "unregister_callback" };
 }
 ApplicationStateObserver::ApplicationStateObserver() {}
 
@@ -37,7 +39,7 @@ void ApplicationStateObserver::OnProcessDied(const AppExecFwk::ProcessData& proc
         TELEPHONY_LOGE("report is nullptr");
         return;
     }
-    report->UnRegisterCallBack(std::to_string(processData.pid));
+    unregisterCallbackQueue.submit([=]() { report->UnRegisterCallBack(std::to_string(processData.pid)); });
 }
 
 } //namespace Telephony
