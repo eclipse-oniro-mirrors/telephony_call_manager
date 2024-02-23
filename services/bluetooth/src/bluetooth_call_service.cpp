@@ -292,6 +292,9 @@ std::vector<CallAttributeInfo> BluetoothCallService::GetCurrentCallList(int32_t 
         vec.clear();
         return vec;
     }
+    if (slotId < 0) {
+        return GetAllCallInfoList();
+    }
     return GetCallInfoList(slotId);
 }
 } // namespace Telephony
