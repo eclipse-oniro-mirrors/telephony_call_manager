@@ -59,6 +59,14 @@ int32_t CallPolicy::DialPolicy(std::u16string &number, AppExecFwk::PacMap &extra
         TELEPHONY_LOGE("invalid video state!");
         return CALL_ERR_INVALID_VIDEO_STATE;
     }
+    if (IsVoiceCallValid(videoState) != TELEPHONY_SUCCESS) {
+        return CALL_ERR_CALL_COUNTS_EXCEED_LIMIT;
+    }
+    return HasNewCall();
+}
+
+int32_t CallPolicy::IsVoiceCallValid(VideoStateType videoState)
+{
     if (videoState == VideoStateType::TYPE_VOICE) {
         sptr<CallBase> ringCall = GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_RINGING);
         if (ringCall != nullptr && ringCall->GetVideoStateType() == VideoStateType::TYPE_VOICE) {
@@ -66,7 +74,7 @@ int32_t CallPolicy::DialPolicy(std::u16string &number, AppExecFwk::PacMap &extra
             return CALL_ERR_CALL_COUNTS_EXCEED_LIMIT;
         }
     }
-    return HasNewCall();
+    return TELEPHONY_SUCCESS;
 }
 
 int32_t CallPolicy::IsValidCallType(CallType callType)
