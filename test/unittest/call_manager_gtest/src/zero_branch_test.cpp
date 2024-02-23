@@ -974,7 +974,7 @@ HWTEST_F(BranchTest, Telephony_BluetoothCallClient_001, Function | MediumTest | 
     bluetoothCallClient->SetMuted(false);
     bluetoothCallClient->MuteRinger();
     bluetoothCallClient->SetAudioDevice(AudioDeviceType::DEVICE_BLUETOOTH_SCO, "test");
-    bluetoothCallClient->GetCurrentCallList(0).size();
+    bluetoothCallClient->GetCurrentCallList(-1).size();
     ASSERT_NE(bluetoothCallClient->DialCall(value, extras), TELEPHONY_SUCCESS);
     ASSERT_NE(bluetoothCallClient->AnswerCall(), TELEPHONY_SUCCESS);
     ASSERT_NE(bluetoothCallClient->RejectCall(), TELEPHONY_SUCCESS);
