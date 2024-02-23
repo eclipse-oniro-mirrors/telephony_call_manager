@@ -216,55 +216,41 @@ HWTEST_F(BranchTest, Telephony_CallNumberUtils_001, Function | MediumTest | Leve
  */
 HWTEST_F(BranchTest, Telephony_CellularCallConnection_001, Function | MediumTest | Level1)
 {
+    std::shared_ptr<CellularCallConnection> cellularCallConnection =
+        DelayedSingleton<CellularCallConnection>::GetInstance();
     CellularCallInfo mCellularCallInfo;
-    ASSERT_NE(DelayedSingleton<CellularCallConnection>::GetInstance()->Dial(mCellularCallInfo), TELEPHONY_ERR_SUCCESS);
-    ASSERT_NE(DelayedSingleton<CellularCallConnection>::GetInstance()->HangUp(
+    ASSERT_NE(cellularCallConnection->Dial(mCellularCallInfo), TELEPHONY_ERR_SUCCESS);
+    ASSERT_NE(cellularCallConnection->HangUp(
         mCellularCallInfo, CallSupplementType::TYPE_DEFAULT), TELEPHONY_ERR_SUCCESS);
-    ASSERT_NE(
-        DelayedSingleton<CellularCallConnection>::GetInstance()->Reject(mCellularCallInfo), TELEPHONY_ERR_SUCCESS);
-    ASSERT_NE(
-        DelayedSingleton<CellularCallConnection>::GetInstance()->Answer(mCellularCallInfo), TELEPHONY_ERR_SUCCESS);
-    ASSERT_NE(
-        DelayedSingleton<CellularCallConnection>::GetInstance()->HoldCall(mCellularCallInfo), TELEPHONY_ERR_SUCCESS);
-    ASSERT_NE(
-        DelayedSingleton<CellularCallConnection>::GetInstance()->UnHoldCall(mCellularCallInfo), TELEPHONY_ERR_SUCCESS);
-    ASSERT_NE(
-        DelayedSingleton<CellularCallConnection>::GetInstance()->SwitchCall(mCellularCallInfo), TELEPHONY_ERR_SUCCESS);
+    ASSERT_NE(cellularCallConnection->Reject(mCellularCallInfo), TELEPHONY_ERR_SUCCESS);
+    ASSERT_NE(cellularCallConnection->Answer(mCellularCallInfo), TELEPHONY_ERR_SUCCESS);
+    ASSERT_NE(cellularCallConnection->HoldCall(mCellularCallInfo), TELEPHONY_ERR_SUCCESS);
+    ASSERT_NE(cellularCallConnection->UnHoldCall(mCellularCallInfo), TELEPHONY_ERR_SUCCESS);
+    ASSERT_NE(cellularCallConnection->SwitchCall(mCellularCallInfo), TELEPHONY_ERR_SUCCESS);
     bool enabled = false;
-    ASSERT_NE(DelayedSingleton<CellularCallConnection>::GetInstance()->IsEmergencyPhoneNumber("", 0, enabled),
-        TELEPHONY_ERR_SUCCESS);
-    ASSERT_NE(DelayedSingleton<CellularCallConnection>::GetInstance()->CombineConference(mCellularCallInfo),
-        TELEPHONY_ERR_SUCCESS);
-    ASSERT_NE(DelayedSingleton<CellularCallConnection>::GetInstance()->SeparateConference(mCellularCallInfo),
-        TELEPHONY_ERR_SUCCESS);
-    ASSERT_NE(DelayedSingleton<CellularCallConnection>::GetInstance()->KickOutFromConference(mCellularCallInfo),
-        TELEPHONY_ERR_SUCCESS);
-    ASSERT_NE(DelayedSingleton<CellularCallConnection>::GetInstance()->StartDtmf('a', mCellularCallInfo),
-        TELEPHONY_ERR_SUCCESS);
-    ASSERT_NE(
-        DelayedSingleton<CellularCallConnection>::GetInstance()->StopDtmf(mCellularCallInfo), TELEPHONY_ERR_SUCCESS);
-    ASSERT_NE(DelayedSingleton<CellularCallConnection>::GetInstance()->GetCallTransferInfo(
+    ASSERT_NE(cellularCallConnection->IsEmergencyPhoneNumber("", 0, enabled), TELEPHONY_ERR_SUCCESS);
+    ASSERT_NE(cellularCallConnection->CombineConference(mCellularCallInfo), TELEPHONY_ERR_SUCCESS);
+    ASSERT_NE(cellularCallConnection->SeparateConference(mCellularCallInfo), TELEPHONY_ERR_SUCCESS);
+    ASSERT_NE(cellularCallConnection->KickOutFromConference(mCellularCallInfo), TELEPHONY_ERR_SUCCESS);
+    ASSERT_NE(cellularCallConnection->StartDtmf('a', mCellularCallInfo), TELEPHONY_ERR_SUCCESS);
+    ASSERT_NE(cellularCallConnection->StopDtmf(mCellularCallInfo), TELEPHONY_ERR_SUCCESS);
+    ASSERT_NE(cellularCallConnection->GetCallTransferInfo(
         CallTransferType::TRANSFER_TYPE_BUSY, 0), TELEPHONY_ERR_SUCCESS);
-    ASSERT_NE(DelayedSingleton<CellularCallConnection>::GetInstance()->SetCallWaiting(true, 0), TELEPHONY_ERR_SUCCESS);
-    ASSERT_NE(DelayedSingleton<CellularCallConnection>::GetInstance()->GetCallWaiting(0), TELEPHONY_ERR_SUCCESS);
+    ASSERT_NE(cellularCallConnection->SetCallWaiting(true, 0), TELEPHONY_ERR_SUCCESS);
+    ASSERT_NE(cellularCallConnection->GetCallWaiting(0), TELEPHONY_ERR_SUCCESS);
     CallRestrictionInfo mCallRestrictionInfo;
-    ASSERT_NE(DelayedSingleton<CellularCallConnection>::GetInstance()->SetCallRestriction(mCallRestrictionInfo, 0),
-        TELEPHONY_ERR_SUCCESS);
-    ASSERT_NE(DelayedSingleton<CellularCallConnection>::GetInstance()->GetCallRestriction(
+    ASSERT_NE(cellularCallConnection->SetCallRestriction(mCallRestrictionInfo, 0), TELEPHONY_ERR_SUCCESS);
+    ASSERT_NE(cellularCallConnection->GetCallRestriction(
         CallRestrictionType::RESTRICTION_TYPE_ALL_INCOMING, 0), TELEPHONY_ERR_SUCCESS);
-    ASSERT_NE(
-        DelayedSingleton<CellularCallConnection>::GetInstance()->SetCallPreferenceMode(0, 1), TELEPHONY_ERR_SUCCESS);
+    ASSERT_NE(cellularCallConnection->SetCallPreferenceMode(0, 1), TELEPHONY_ERR_SUCCESS);
     std::u16string test = u"";
-    ASSERT_NE(DelayedSingleton<CellularCallConnection>::GetInstance()->StartRtt(mCellularCallInfo, test),
-        TELEPHONY_ERR_SUCCESS);
-    ASSERT_NE(
-        DelayedSingleton<CellularCallConnection>::GetInstance()->StopRtt(mCellularCallInfo), TELEPHONY_ERR_SUCCESS);
-    ASSERT_NE(DelayedSingleton<CellularCallConnection>::GetInstance()->SendUpdateCallMediaModeRequest(
+    ASSERT_NE(cellularCallConnection->StartRtt(mCellularCallInfo, test), TELEPHONY_ERR_SUCCESS);
+    ASSERT_NE(cellularCallConnection->StopRtt(mCellularCallInfo), TELEPHONY_ERR_SUCCESS);
+    ASSERT_NE(cellularCallConnection->SendUpdateCallMediaModeRequest(
         mCellularCallInfo, ImsCallMode::CALL_MODE_AUDIO_ONLY), TELEPHONY_ERR_SUCCESS);
-    ASSERT_NE(DelayedSingleton<CellularCallConnection>::GetInstance()->RegisterCallBackFun(), TELEPHONY_ERR_SUCCESS);
-    ASSERT_NE(DelayedSingleton<CellularCallConnection>::GetInstance()->ReConnectService(), TELEPHONY_ERR_SUCCESS);
-    ASSERT_NE(DelayedSingleton<CellularCallConnection>::GetInstance()->PostDialProceed(mCellularCallInfo, true),
-        TELEPHONY_ERR_SUCCESS);
+    ASSERT_NE(cellularCallConnection->RegisterCallBackFun(), TELEPHONY_ERR_SUCCESS);
+    ASSERT_NE(cellularCallConnection->ReConnectService(), TELEPHONY_ERR_SUCCESS);
+    ASSERT_NE(cellularCallConnection->PostDialProceed(mCellularCallInfo, true), TELEPHONY_ERR_SUCCESS);
 }
 
 /**

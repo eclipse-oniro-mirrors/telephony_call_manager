@@ -290,7 +290,6 @@ int32_t CallDataBaseHelper::QueryIsBlockPhoneNumber(const std::string &phoneNum,
     if (resultSet == nullptr) {
         TELEPHONY_LOGE("Query Result Set nullptr Failed.");
         callDataHelper->Release();
-        callDataHelper = nullptr;
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     int32_t count = 0;
@@ -300,7 +299,6 @@ int32_t CallDataBaseHelper::QueryIsBlockPhoneNumber(const std::string &phoneNum,
     TELEPHONY_LOGI("count: %{public}d", count);
     resultSet->Close();
     callDataHelper->Release();
-    callDataHelper = nullptr;
     return TELEPHONY_SUCCESS;
 }
 } // namespace Telephony

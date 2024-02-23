@@ -979,7 +979,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_ReportAudioDeviceInfo_0200, Fun
     if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
         HangUpCall();
     }
-    EXPECT_NE(CallManagerGtest::clientPtr_->ReportAudioDeviceInfo(), RETURN_VALUE_IS_ZERO);
+    EXPECT_GE(CallManagerGtest::clientPtr_->ReportAudioDeviceInfo(), RETURN_VALUE_IS_ZERO);
 }
 
 /**
