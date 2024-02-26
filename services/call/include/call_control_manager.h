@@ -147,6 +147,7 @@ private:
     std::shared_ptr<MissedCallNotification> missedCallNotification_;
     std::unique_ptr<CallSettingManager> callSettingManagerPtr_;
     sptr<ISystemAbilityStatusChange> statusChangeListener_ = nullptr;
+    sptr<ISystemAbilityStatusChange> pageStateChangeListener_ = nullptr;
     DialParaInfo dialSrcInfo_;
     AppExecFwk::PacMap extras_;
     std::mutex mutex_;
