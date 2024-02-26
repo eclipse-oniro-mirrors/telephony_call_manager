@@ -31,7 +31,7 @@ CallConnectAbility::~CallConnectAbility() {}
 
 CallConnectAbility::CallConnectAbility() {}
 
-void CallConnectAbility::ConnectAbility(const CallAttributeInfo &info)
+void CallConnectAbility::ConnectAbility()
 {
     if (isConnected_) {
         TELEPHONY_LOGE("callui has already connected");
@@ -41,30 +41,6 @@ void CallConnectAbility::ConnectAbility(const CallAttributeInfo &info)
     AAFwk::Want want;
     AppExecFwk::ElementName element("", "com.ohos.callui", "com.ohos.callui.ServiceAbility");
     want.SetElement(element);
-    AAFwk::WantParams wantParams;
-    std::string accountNumber =
-        DelayedSingleton<CallNumberUtils>::GetInstance()->RemovePostDialPhoneNumber(std::string(info.accountNumber));
-    wantParams.SetParam("accountNumber", AAFwk::String::Box(accountNumber));
-    wantParams.SetParam("videoState", AAFwk::Integer::Box(static_cast<int32_t>(info.videoState)));
-    wantParams.SetParam("callType", AAFwk::Integer::Box(static_cast<int32_t>(info.callType)));
-    wantParams.SetParam("callState", AAFwk::Integer::Box(static_cast<int32_t>(info.callState)));
-    wantParams.SetParam("callId", AAFwk::Integer::Box(static_cast<int32_t>(info.callId)));
-    wantParams.SetParam("startTime", AAFwk::Integer::Box(static_cast<int32_t>(info.startTime)));
-    wantParams.SetParam("accountId", AAFwk::Integer::Box(static_cast<int32_t>(info.accountId)));
-    wantParams.SetParam("isEcc", AAFwk::Integer::Box(static_cast<bool>(info.isEcc)));
-    wantParams.SetParam("conferenceState", AAFwk::Integer::Box(static_cast<int32_t>(info.conferenceState)));
-    wantParams.SetParam("crsType", AAFwk::Integer::Box(static_cast<int32_t>(info.crsType)));
-    wantParams.SetParam("originalCallType", AAFwk::Integer::Box(static_cast<int32_t>(info.originalCallType)));
-    TELEPHONY_LOGI("ConnectAbility crsType = %{public}d", info.crsType);
-    if (info.callType == CallType::TYPE_VOIP) {
-        TELEPHONY_LOGI("Connect callui ability voip call");
-        wantParams.SetParam("userName", AAFwk::String::Box(std::string(info.voipCallInfo.userName)));
-        wantParams.SetParam("extensionId", AAFwk::String::Box(std::string(info.voipCallInfo.extensionId)));
-        wantParams.SetParam("voipBundleName", AAFwk::String::Box(std::string(info.voipCallInfo.voipBundleName)));
-        wantParams.SetParam("abilityName", AAFwk::String::Box(std::string(info.voipCallInfo.abilityName)));
-        wantParams.SetParam("voipCallId", AAFwk::String::Box(std::string(info.voipCallInfo.voipCallId)));
-    }
-    want.SetParams(wantParams);
     if (connectCallback_ == nullptr) {
         connectCallback_ = new CallAbilityConnectCallback();
     }

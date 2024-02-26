@@ -19,6 +19,7 @@
 
 #include "call_manager_errors.h"
 #include "telephony_log_wrapper.h"
+#include "call_control_manager"
 
 namespace OHOS {
 namespace Telephony {
@@ -28,6 +29,7 @@ CallBroadcastSubscriber::CallBroadcastSubscriber(const OHOS::EventFwk::CommonEve
 {
     memberFuncMap_[UNKNOWN_BROADCAST_EVENT] = &CallBroadcastSubscriber::UnknownBroadcast;
     memberFuncMap_[SIM_STATE_BROADCAST_EVENT] = &CallBroadcastSubscriber::SimStateBroadcast;
+    memberFuncMap_[BIND_CALLUI_SERVICE] = &CallBroadcastSubscriber::BindCallUiServiceBroadcast;
 }
 
 void CallBroadcastSubscriber::OnReceiveEvent(const EventFwk::CommonEventData &data)
@@ -38,6 +40,8 @@ void CallBroadcastSubscriber::OnReceiveEvent(const EventFwk::CommonEventData &da
     TELEPHONY_LOGI("receive one broadcast:%{public}s", action.c_str());
     if (action == EventFwk::CommonEventSupport::COMMON_EVENT_SIM_STATE_CHANGED) {
         code = SIM_STATE_BROADCAST_EVENT;
+    } else if (action == "event.custom.contacts.PAGE_STATE_CHANGE") {
+        code = BIND_CALLUI_SERVICE;
     } else {
         code = UNKNOWN_BROADCAST_EVENT;
     }
@@ -58,6 +62,13 @@ void CallBroadcastSubscriber::UnknownBroadcast(const EventFwk::CommonEventData &
 void CallBroadcastSubscriber::SimStateBroadcast(const EventFwk::CommonEventData &data)
 {
     TELEPHONY_LOGI("sim state broadcast code:%{public}d", data.GetCode());
+}
+
+void CallBroadcastSubscriber::BindCallUiServiceBroadcast(const EventFwk::CommonEventData &data)
+{
+    bool isBindService = data.GetWant().GetBoolParam("isShouldBind", false);
+    TELEPHONY_LOGI("isShouldBind:%{public}d", isBindService);
+    DelayedSingleton<CallControlManager>::GetInstance()->ExtraBindServices(isBindService);
 }
 } // namespace Telephony
 } // namespace OHOS

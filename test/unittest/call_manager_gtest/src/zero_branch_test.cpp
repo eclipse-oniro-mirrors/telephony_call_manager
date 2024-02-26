@@ -1804,6 +1804,7 @@ HWTEST_F(BranchTest, Telephony_CallControlManager_001, Function | MediumTest | L
     ASSERT_TRUE(callControlManager->NotifyIncomingCallAnswered(callObjectPtr));
     ASSERT_TRUE(callControlManager->NotifyIncomingCallRejected(callObjectPtr, false, ""));
     ASSERT_NE(callControlManager->RemoveMissedIncomingCallNotification(), TELEPHONY_SUCCESS);
+    callControlManager->ExtraBindServices(false);
 }
 
 /**
@@ -1917,6 +1918,7 @@ HWTEST_F(BranchTest, Telephony_CallControlManager_003, Function | MediumTest | L
     std::vector<std::u16string> numberList = { u"123", u"124" };
     ASSERT_NE(callControlManager->JoinConference(INVALID_CALLID, numberList), TELEPHONY_SUCCESS);
     ASSERT_NE(callControlManager->JoinConference(SIM1_SLOTID, numberList), TELEPHONY_SUCCESS);
+
 }
 
 /**

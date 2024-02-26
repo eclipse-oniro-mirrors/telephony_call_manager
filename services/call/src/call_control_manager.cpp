@@ -21,6 +21,8 @@
 #include "audio_control_manager.h"
 #include "bluetooth_call_manager.h"
 #include "call_ability_report_proxy.h"
+#include "call_connect_ability.h"
+#include "call_connect_ability.h"
 #include "call_manager_errors.h"
 #include "call_manager_hisysevent.h"
 #include "call_number_utils.h"
@@ -1086,6 +1088,24 @@ void CallControlManager::GetDialParaInfo(DialParaInfo &info, AppExecFwk::PacMap 
     extras = extras_;
 }
 
+void CallControlManager::ExtraBindServices(bool shouldBind)
+{
+    if (shouldBind) {
+        DelayedSingleton<CallConnectAbility>::GetInstance()->ConnectAbility();
+        shouldUnBind = false;
+    } else {
+        shouldUnBind = true;
+        if (!CallObjectManager::HasCallExist()) {
+            DelayedSingleton<CallConnectAbility>::GetInstance()->DisconnectAbility();
+        }
+    }
+}
+
+BOOL CallControlManager::ShouldUnBindService()
+{
+    return shouldUnBind;
+}
+
 int32_t CallControlManager::RemoveMissedIncomingCallNotification()
 {
     int32_t ret = DelayedSingleton<CallRecordsManager>::GetInstance()->RemoveMissedIncomingCallNotification();
@@ -1245,6 +1265,7 @@ int32_t CallControlManager::BroadcastSubscriber()
 {
     EventFwk::MatchingSkills matchingSkills;
     matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_SIM_STATE_CHANGED);
+    matchingSkills.AddEvent("event.custom.contacts.PAGE_STATE_CHANGE");
     EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
     subscriberInfo.SetThreadMode(EventFwk::CommonEventSubscribeInfo::COMMON);
     std::shared_ptr<CallBroadcastSubscriber> subscriberPtr = std::make_shared<CallBroadcastSubscriber>(subscriberInfo);

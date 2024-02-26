@@ -63,7 +63,7 @@ void CallAbilityConnectCallback::ReConnectAbility()
             continue;
         }
         if (!connectFlag) {
-            DelayedSingleton<CallConnectAbility>::GetInstance()->ConnectAbility(info);
+            DelayedSingleton<CallConnectAbility>::GetInstance()->ConnectAbility();
             connectFlag = true;
             continue;
         }
