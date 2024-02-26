@@ -102,6 +102,8 @@ ohos_shared_library("tel_call_manager") {
     "services/telephony_interaction/src/report_call_info_handler.cpp",
     "services/telephony_interaction/src/voip_call_connection.cpp",
     "services/video/src/video_control_manager.cpp",
+    "utils/src/call_ability_connection.cpp",
+    "utils/src/call_dialog.cpp",
     "utils/src/call_number_utils.cpp",
   ]
 
@@ -138,8 +140,10 @@ ohos_shared_library("tel_call_manager") {
     "ability_base:zuri",
     "ability_runtime:ability_deps_wrapper",
     "ability_runtime:ability_manager",
+    "ability_runtime:abilitykit_native",
     "ability_runtime:app_manager",
     "ability_runtime:dataobs_manager",
+    "ability_runtime:extension_manager",
     "audio_framework:audio_capturer",
     "audio_framework:audio_client",
     "audio_framework:audio_renderer",

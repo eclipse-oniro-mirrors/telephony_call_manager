@@ -17,6 +17,7 @@
 
 #include "call_ability_report_proxy.h"
 #include "call_control_manager.h"
+#include "call_dialog.h"
 #include "call_manager_errors.h"
 #include "call_manager_hisysevent.h"
 #include "call_number_utils.h"
@@ -67,6 +68,7 @@ int32_t CallRequestProcess::DialRequest()
             CallManagerHisysevent::WriteDialCallFaultEvent(info.accountId, static_cast<int32_t>(info.callType),
                 static_cast<int32_t>(info.videoState),
                 static_cast<int32_t>(CallErrorCode::CALL_ERROR_INVALID_FDN_NUMBER), "invalid fdn number!");
+            DelayedSingleton<CallDialog>::GetInstance()->DialogConnectExtension("CALL_FAILED_DUE_TO_FDN");
             return CALL_ERR_DIAL_FAILED;
         }
     }
@@ -854,6 +856,7 @@ int32_t CallRequestProcess::HandleStartDial(bool isMMiCode, CellularCallInfo cal
             TELEPHONY_LOGE("HandleDialFail failed!");
             return handleRet;
         }
+        DelayedSingleton<CallDialog>::GetInstance()->DialogConnectExtension("CALL_ERR_DIAL_FAILED");
         return ret;
     }
     return TELEPHONY_SUCCESS;
