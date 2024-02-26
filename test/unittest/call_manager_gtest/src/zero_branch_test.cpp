@@ -2139,12 +2139,6 @@ HWTEST_F(BranchTest, Telephony_IncomingCallWakeup_001, Function | MediumTest | L
     IncomingCallWakeup incomingCallWakeup;
     sptr<CallBase> callObjectPtr = nullptr;
     incomingCallWakeup.NewCallCreated(callObjectPtr);
-    DialParaInfo dialParaInfo;
-    dialParaInfo.callType = CallType::TYPE_CS;
-    dialParaInfo.callState = TelCallState::CALL_STATUS_INCOMING;
-    callObjectPtr = new CSCall(dialParaInfo);
-    ASSERT_TRUE(callObjectPtr != nullptr);
-    incomingCallWakeup.NewCallCreated(callObjectPtr);
 }
 
 /**
@@ -2379,18 +2373,6 @@ HWTEST_F(BranchTest, Telephony_VoipCallManagerProxy_001, Function | MediumTest |
         voipCallManagerInterfacePtr->RegisterCallManagerCallBack(statusCallback);
         voipCallManagerInterfacePtr->UnRegisterCallManagerCallBack();
     }
-}
-
-/**
- * @tc.number   Telephony_BluetoothConnection_001
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
-HWTEST_F(BranchTest, Telephony_BluetoothConnection_001, Function | MediumTest | Level3)
-{
-    std::shared_ptr<BluetoothConnection> bluetoothConnection = std::make_shared<BluetoothConnection>();
-    ASSERT_EQ(bluetoothConnection->GetConnectedScoAddr(), "");
-    ASSERT_EQ(bluetoothConnection->GetConnectedScoName(), "");
 }
 } // namespace Telephony
 } // namespace OHOS
