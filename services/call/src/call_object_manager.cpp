@@ -70,7 +70,7 @@ int32_t CallObjectManager::AddOneCallObject(sptr<CallBase> &call)
         isVoIPCallExists = true;
     }
     if (callObjectPtrList_.size() == NO_CALL_EXIST && (!isVoIPCallExists || info.isEcc)) {
-        DelayedSingleton<CallConnectAbility>::GetInstance()->ConnectAbility(info);
+        DelayedSingleton<CallConnectAbility>::GetInstance()->ConnectAbility();
     }
     callObjectPtrList_.emplace_back(call);
     if (callObjectPtrList_.size() == ONE_CALL_EXIST &&
@@ -94,7 +94,8 @@ int32_t CallObjectManager::DeleteOneCallObject(int32_t callId)
             break;
         }
     }
-    if (callObjectPtrList_.size() == NO_CALL_EXIST) {
+    if (callObjectPtrList_.size() == NO_CALL_EXIST
+        && DelayedSingleton<CallControlManager>::GetInstance()->ShouldDisconnectService()) {
         lock.unlock();
         DelayedSingleton<CallConnectAbility>::GetInstance()->DisconnectAbility();
     }
@@ -109,7 +110,8 @@ void CallObjectManager::DeleteOneCallObject(sptr<CallBase> &call)
     }
     std::unique_lock<std::mutex> lock(listMutex_);
     callObjectPtrList_.remove(call);
-    if (callObjectPtrList_.size() == 0) {
+    if (callObjectPtrList_.size() == 0
+        && DelayedSingleton<CallControlManager>::GetInstance()->ShouldDisconnectService()) {
         lock.unlock();
         DelayedSingleton<CallConnectAbility>::GetInstance()->DisconnectAbility();
     }

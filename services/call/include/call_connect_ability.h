@@ -29,7 +29,7 @@ namespace Telephony {
 class CallConnectAbility {
 DECLARE_DELAYED_SINGLETON(CallConnectAbility)
 public:
-    void ConnectAbility(const CallAttributeInfo &info);
+    void ConnectAbility();
     void DisconnectAbility();
     void SetConnectFlag(bool isConnected);
     void NotifyAll();

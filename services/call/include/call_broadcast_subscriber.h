@@ -36,11 +36,13 @@ private:
     enum {
         UNKNOWN_BROADCAST_EVENT = 0,
         SIM_STATE_BROADCAST_EVENT,
+        CONNECT_CALLUI_SERVICE
     };
     using broadcastSubscriberFunc = void (CallBroadcastSubscriber::*)(const EventFwk::CommonEventData &data);
 
     void UnknownBroadcast(const EventFwk::CommonEventData &data);
     void SimStateBroadcast(const EventFwk::CommonEventData &data);
+    void ConnectCallUiServiceBroadcast(const EventFwk::CommonEventData &data);
     std::map<uint32_t, broadcastSubscriberFunc> memberFuncMap_;
 };
 } // namespace Telephony
