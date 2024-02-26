@@ -1279,7 +1279,8 @@ int32_t CallControlManager::BroadcastSubscriber()
     EventFwk::CommonEventSubscribeInfo subscriberInfomation(matchingSkill);
     subscriberInfomation.SetThreadMode(EventFwk::CommonEventSubscribeInfo::COMMON);
     subscriberInfomation.SetPermission("OHOS.permission.SET_TELEPHONY_STATE");
-    std::shared_ptr<CallBroadcastSubscriber> subscriber = std::make_shared<CallBroadcastSubscriber>(subscriberInfomation);
+    std::shared_ptr<CallBroadcastSubscriber> subscriber =
+        std::make_shared<CallBroadcastSubscriber>(subscriberInfomation);
     if (subscriber == nullptr) {
         TELEPHONY_LOGE("CallControlManager::BroadcastSubscriber subscriberPtr is nullptr");
         return TELEPHONY_ERROR;
