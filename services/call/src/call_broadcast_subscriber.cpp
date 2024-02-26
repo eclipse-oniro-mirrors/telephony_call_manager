@@ -66,7 +66,7 @@ void CallBroadcastSubscriber::SimStateBroadcast(const EventFwk::CommonEventData 
 
 void CallBroadcastSubscriber::ConnectCallUiServiceBroadcast(const EventFwk::CommonEventData &data)
 {
-    bool isConnectService = data.GetWant().GetBoolParam("isShouldBind", false);
+    bool isConnectService = data.GetWant().GetBoolParam("isShouldConnect", false);
     TELEPHONY_LOGI("isConnectService:%{public}d", isConnectService);
     DelayedSingleton<CallControlManager>::GetInstance()->ConnectCallUiService(isConnectService);
 }
