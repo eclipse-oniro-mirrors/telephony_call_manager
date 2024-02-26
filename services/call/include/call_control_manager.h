@@ -113,8 +113,8 @@ public:
     int32_t CloseUnFinishedUssd(int32_t slotId);
     void GetDialParaInfo(DialParaInfo &info);
     void GetDialParaInfo(DialParaInfo &info, AppExecFwk::PacMap &extras);
-    void ExtraBindServices(bool shouldBind);
-    bool ShouldUnBindService();
+    void ConnectCallUiService(bool shouldBind);
+    bool ShouldDisconnectService();
     int32_t RemoveMissedIncomingCallNotification();
     int32_t SetVoIPCallState(int32_t state);
     int32_t GetVoIPCallState(int32_t &state);

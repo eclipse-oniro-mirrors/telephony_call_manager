@@ -1088,7 +1088,7 @@ void CallControlManager::GetDialParaInfo(DialParaInfo &info, AppExecFwk::PacMap 
     extras = extras_;
 }
 
-void CallControlManager::ExtraBindServices(bool shouldBind)
+void CallControlManager::ConnectCallUiService(bool shouldBind)
 {
     if (shouldBind) {
         DelayedSingleton<CallConnectAbility>::GetInstance()->ConnectAbility();
@@ -1101,7 +1101,7 @@ void CallControlManager::ExtraBindServices(bool shouldBind)
     }
 }
 
-bool CallControlManager::ShouldUnBindService()
+bool CallControlManager::ShouldDisconnectService()
 {
     return shouldUnBind;
 }

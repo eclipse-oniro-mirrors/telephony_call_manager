@@ -29,7 +29,7 @@ CallBroadcastSubscriber::CallBroadcastSubscriber(const OHOS::EventFwk::CommonEve
 {
     memberFuncMap_[UNKNOWN_BROADCAST_EVENT] = &CallBroadcastSubscriber::UnknownBroadcast;
     memberFuncMap_[SIM_STATE_BROADCAST_EVENT] = &CallBroadcastSubscriber::SimStateBroadcast;
-    memberFuncMap_[BIND_CALLUI_SERVICE] = &CallBroadcastSubscriber::BindCallUiServiceBroadcast;
+    memberFuncMap_[CONNECT_CALLUI_SERVICE] = &CallBroadcastSubscriber::ConnectCallUiServiceBroadcast;
 }
 
 void CallBroadcastSubscriber::OnReceiveEvent(const EventFwk::CommonEventData &data)
@@ -64,11 +64,11 @@ void CallBroadcastSubscriber::SimStateBroadcast(const EventFwk::CommonEventData 
     TELEPHONY_LOGI("sim state broadcast code:%{public}d", data.GetCode());
 }
 
-void CallBroadcastSubscriber::BindCallUiServiceBroadcast(const EventFwk::CommonEventData &data)
+void CallBroadcastSubscriber::ConnectCallUiServiceBroadcast(const EventFwk::CommonEventData &data)
 {
-    bool isBindService = data.GetWant().GetBoolParam("isShouldBind", false);
-    TELEPHONY_LOGI("isShouldBind:%{public}d", isBindService);
-    DelayedSingleton<CallControlManager>::GetInstance()->ExtraBindServices(isBindService);
+    bool isConnectService = data.GetWant().GetBoolParam("isShouldBind", false);
+    TELEPHONY_LOGI("isConnectService:%{public}d", isConnectService);
+    DelayedSingleton<CallControlManager>::GetInstance()->ConnectCallUiService(isConnectService);
 }
 } // namespace Telephony
 } // namespace OHOS
