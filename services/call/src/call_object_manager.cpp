@@ -94,7 +94,8 @@ int32_t CallObjectManager::DeleteOneCallObject(int32_t callId)
             break;
         }
     }
-    if (callObjectPtrList_.size() == NO_CALL_EXIST && DelayedSingleton<CallControlManager>::GetInstance()->ShouldUnBindService()) {
+    if (callObjectPtrList_.size() == NO_CALL_EXIST
+        && DelayedSingleton<CallControlManager>::GetInstance()->ShouldUnBindService()) {
         lock.unlock();
         DelayedSingleton<CallConnectAbility>::GetInstance()->DisconnectAbility();
     }
@@ -109,7 +110,8 @@ void CallObjectManager::DeleteOneCallObject(sptr<CallBase> &call)
     }
     std::unique_lock<std::mutex> lock(listMutex_);
     callObjectPtrList_.remove(call);
-    if (callObjectPtrList_.size() == 0 && DelayedSingleton<CallControlManager>::GetInstance()->ShouldUnBindService()) {
+    if (callObjectPtrList_.size() == 0
+        && DelayedSingleton<CallControlManager>::GetInstance()->ShouldUnBindService()) {
         lock.unlock();
         DelayedSingleton<CallConnectAbility>::GetInstance()->DisconnectAbility();
     }
