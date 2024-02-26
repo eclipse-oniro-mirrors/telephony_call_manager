@@ -114,7 +114,7 @@ public:
     void GetDialParaInfo(DialParaInfo &info);
     void GetDialParaInfo(DialParaInfo &info, AppExecFwk::PacMap &extras);
     void ExtraBindServices(bool shouldBind);
-    void ShouldUnBindService();
+    bool ShouldUnBindService();
     int32_t RemoveMissedIncomingCallNotification();
     int32_t SetVoIPCallState(int32_t state);
     int32_t GetVoIPCallState(int32_t &state);
