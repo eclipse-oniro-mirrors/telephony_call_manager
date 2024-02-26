@@ -1101,7 +1101,7 @@ void CallControlManager::ExtraBindServices(bool shouldBind)
     }
 }
 
-BOOL CallControlManager::ShouldUnBindService()
+bool CallControlManager::ShouldUnBindService()
 {
     return shouldUnBind;
 }
