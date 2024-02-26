@@ -856,7 +856,6 @@ int32_t CallRequestProcess::HandleStartDial(bool isMMiCode, CellularCallInfo cal
             TELEPHONY_LOGE("HandleDialFail failed!");
             return handleRet;
         }
-        DelayedSingleton<CallDialog>::GetInstance()->DialogConnectExtension("CALL_ERR_DIAL_FAILED");
         return ret;
     }
     return TELEPHONY_SUCCESS;
