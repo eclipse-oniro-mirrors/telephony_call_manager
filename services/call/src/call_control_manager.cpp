@@ -22,7 +22,6 @@
 #include "bluetooth_call_manager.h"
 #include "call_ability_report_proxy.h"
 #include "call_connect_ability.h"
-#include "call_connect_ability.h"
 #include "call_manager_errors.h"
 #include "call_manager_hisysevent.h"
 #include "call_number_utils.h"
@@ -1088,13 +1087,13 @@ void CallControlManager::GetDialParaInfo(DialParaInfo &info, AppExecFwk::PacMap 
     extras = extras_;
 }
 
-void CallControlManager::ConnectCallUiService(bool shouldBind)
+void CallControlManager::ConnectCallUiService(bool shouldConnect)
 {
     if (shouldBind) {
         DelayedSingleton<CallConnectAbility>::GetInstance()->ConnectAbility();
-        shouldUnBind = false;
+        shouldDisconnect = false;
     } else {
-        shouldUnBind = true;
+        shouldDisconnect = true;
         if (!CallObjectManager::HasCallExist()) {
             DelayedSingleton<CallConnectAbility>::GetInstance()->DisconnectAbility();
         }
@@ -1103,7 +1102,7 @@ void CallControlManager::ConnectCallUiService(bool shouldBind)
 
 bool CallControlManager::ShouldDisconnectService()
 {
-    return shouldUnBind;
+    return shouldDisconnect;
 }
 
 int32_t CallControlManager::RemoveMissedIncomingCallNotification()

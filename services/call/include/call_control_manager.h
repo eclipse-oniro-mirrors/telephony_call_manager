@@ -113,7 +113,7 @@ public:
     int32_t CloseUnFinishedUssd(int32_t slotId);
     void GetDialParaInfo(DialParaInfo &info);
     void GetDialParaInfo(DialParaInfo &info, AppExecFwk::PacMap &extras);
-    void ConnectCallUiService(bool shouldBind);
+    void ConnectCallUiService(bool shouldConnect);
     bool ShouldDisconnectService();
     int32_t RemoveMissedIncomingCallNotification();
     int32_t SetVoIPCallState(int32_t state);
@@ -151,7 +151,7 @@ private:
     AppExecFwk::PacMap extras_;
     std::mutex mutex_;
     CallStateToApp VoIPCallState_ = CallStateToApp::CALL_STATE_IDLE;
-    bool shouldUnBind = true;
+    bool shouldDisconnect = true;
     struct AnsweredCallQueue {
         bool hasCall = false;
         int32_t callId = 0;

@@ -41,7 +41,7 @@ void CallBroadcastSubscriber::OnReceiveEvent(const EventFwk::CommonEventData &da
     if (action == EventFwk::CommonEventSupport::COMMON_EVENT_SIM_STATE_CHANGED) {
         code = SIM_STATE_BROADCAST_EVENT;
     } else if (action == "event.custom.contacts.PAGE_STATE_CHANGE") {
-        code = BIND_CALLUI_SERVICE;
+        code = CONNECT_CALLUI_SERVICE;
     } else {
         code = UNKNOWN_BROADCAST_EVENT;
     }
