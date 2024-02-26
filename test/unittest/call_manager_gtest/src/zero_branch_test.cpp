@@ -1918,7 +1918,6 @@ HWTEST_F(BranchTest, Telephony_CallControlManager_003, Function | MediumTest | L
     std::vector<std::u16string> numberList = { u"123", u"124" };
     ASSERT_NE(callControlManager->JoinConference(INVALID_CALLID, numberList), TELEPHONY_SUCCESS);
     ASSERT_NE(callControlManager->JoinConference(SIM1_SLOTID, numberList), TELEPHONY_SUCCESS);
-
 }
 
 /**
