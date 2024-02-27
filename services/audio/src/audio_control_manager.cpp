@@ -775,7 +775,24 @@ int32_t AudioControlManager::StopWaitingTone()
 int32_t AudioControlManager::PlayDtmfTone(char str)
 {
     ToneDescriptor dtmfTone = Tone::ConvertDigitToTone(str);
-    return PlayCallTone(dtmfTone);
+    std::unique_ptr<Tone> tone = std::make_unique<Tone>(dtmfTone);
+    if (tone == nullptr) {
+        TELEPHONY_LOGE("create dtmf tone failed");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    if (tone->Play() != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("play dtmftone failed");
+        return CALL_ERR_AUDIO_TONE_PLAY_FAILED;
+    }
+    TELEPHONY_LOGI("play dtmftone success");
+    std::this_thread::sleep_for(std::chrono::milliseconds(DTMF_PLAY_TIME));
+    if (tone->Stop() != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("stop dtmftone failed");
+        return CALL_ERR_AUDIO_TONE_STOP_FAILED;
+    }
+    tone->ReleaseRenderer();
+    TELEPHONY_LOGI("stop dtmf tone success");
+    return TELEPHONY_SUCCESS;
 }
 
 int32_t AudioControlManager::StopDtmfTone()
@@ -786,11 +803,6 @@ int32_t AudioControlManager::StopDtmfTone()
 int32_t AudioControlManager::OnPostDialNextChar(char str)
 {
     int32_t result = PlayDtmfTone(str);
-    if (result != TELEPHONY_SUCCESS) {
-        return result;
-    }
-    std::this_thread::sleep_for(std::chrono::milliseconds(DTMF_PLAY_TIME));
-    result = StopDtmfTone();
     if (result != TELEPHONY_SUCCESS) {
         return result;
     }

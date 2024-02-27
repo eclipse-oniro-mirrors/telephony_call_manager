@@ -14,7 +14,7 @@
  */
 
 #include "call_control_manager.h"
-
+#include "ffrt.h"
 #include <securec.h>
 #include <string_ex.h>
 
@@ -480,7 +480,9 @@ int32_t CallControlManager::StartDtmf(int32_t callId, char str)
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("StartDtmf failed, return:%{public}d", ret);
     }
-    DelayedSingleton<AudioControlManager>::GetInstance()->PlayDtmfTone(str);
+    ffrt::submit([str]() {
+        DelayedSingleton<AudioControlManager>::GetInstance()->PlayDtmfTone(str);
+    });
     return ret;
 }
 
