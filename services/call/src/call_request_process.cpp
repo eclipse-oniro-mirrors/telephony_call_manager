@@ -813,7 +813,7 @@ int32_t CallRequestProcess::CarrierDialProcess(DialParaInfo &info)
             if (ret != TELEPHONY_SUCCESS) {
                 TELEPHONY_LOGE("IsDialCallForDsda failed!");
                 return ret;
-            } 
+            }
         }
     }
     bool isMMiCode = DelayedSingleton<CallNumberUtils>::GetInstance()->IsMMICode(newPhoneNum);
