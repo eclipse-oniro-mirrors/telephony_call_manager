@@ -1279,7 +1279,7 @@ int32_t CallControlManager::BroadcastSubscriber()
     matchingSkill.AddEvent("event.custom.contacts.PAGE_STATE_CHANGE");
     EventFwk::CommonEventSubscribeInfo subscriberInfomation(matchingSkill);
     subscriberInfomation.SetThreadMode(EventFwk::CommonEventSubscribeInfo::COMMON);
-    subscriberInfomation.SetPermission("OHOS.permission.SET_TELEPHONY_STATE");
+    subscriberInfomation.SetPermission("ohos.permission.SET_TELEPHONY_STATE");
     std::shared_ptr<CallBroadcastSubscriber> subscriber =
         std::make_shared<CallBroadcastSubscriber>(subscriberInfomation);
     if (subscriber == nullptr) {
