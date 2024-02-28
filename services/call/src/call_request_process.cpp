@@ -802,16 +802,18 @@ int32_t CallRequestProcess::CarrierDialProcess(DialParaInfo &info)
         DelayedSingleton<CallNumberUtils>::GetInstance()->RemoveSeparatorsPhoneNumber(info.number);
     int32_t ret = TELEPHONY_ERROR;
     bool isEcc = HandleEccCallForDsda(newPhoneNum, info);
-    if (!isEcc && IsDsdsMode5()) {
+    if (!isEcc) {
         bool canDial = true;
         IsNewCallAllowedCreate(canDial);
         if (!canDial) {
             return CALL_ERR_CALL_COUNTS_EXCEED_LIMIT;
         }
-        ret = IsDialCallForDsda(info);
-        if (ret != TELEPHONY_SUCCESS) {
-            TELEPHONY_LOGE("IsDialCallForDsda failed!");
-            return ret;
+        if (IsDsdsMode5()) {
+            ret = IsDialCallForDsda(info);
+            if (ret != TELEPHONY_SUCCESS) {
+                TELEPHONY_LOGE("IsDialCallForDsda failed!");
+                return ret;
+            }
         }
     }
     bool isMMiCode = DelayedSingleton<CallNumberUtils>::GetInstance()->IsMMICode(newPhoneNum);
