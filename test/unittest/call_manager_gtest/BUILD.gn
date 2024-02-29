@@ -74,6 +74,7 @@ ohos_unittest("tel_call_manager_gtest") {
     "player_framework:system_sound_client",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
+    "cellular_data:tel_cellular_data_api",
   ]
 
   deps = [

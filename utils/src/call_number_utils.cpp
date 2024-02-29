@@ -22,6 +22,9 @@
 #include "telephony_types.h"
 #include "call_manager_errors.h"
 #include "cellular_call_connection.h"
+#include "core_service_client.h"
+#include "cellular_data_client.h"
+
 
 namespace OHOS {
 namespace Telephony {
@@ -220,6 +223,23 @@ bool CallNumberUtils::HasBCPhoneNumber(const std::string &phoneNumber)
     std::string bCNumberStart = "192";
     if (phoneNumber.length() == bCNumberLength &&
         phoneNumber.substr(phoneNumberStart, phoneNumberStartLength) == bCNumberStart) {
+        return true;
+    }
+    return false;
+}
+
+bool SelectDefaultSlotId(int32_t slotId, AppExecFwk::PacMap &extras)
+{
+    if (IsValidSlotId(slotId)) {
+        return true;
+    }
+    int32_t defaultDataSlotId = DelayedRefSingleton<CellularDataClient>::GetInstance().GetDefaultCellularDataSlotId();
+    int32_t defaultVoiceSlotId = DelayedRefSingleton<CoreServiceClient>::GetInstance().GetDefaultVoiceSlotId();
+    if (defaultVoiceSlotId != TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL && IsValidSlotId(defaultVoiceSlotId)) {
+        extras.PutIntValue("accountId", defaultVoiceSlotId);
+        return true;
+    } else if (defaultDataSlotId != TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL && IsValidSlotId(defaultDataSlotId)) {
+        extras.PutIntValue("accountId", defaultDataSlotId);
         return true;
     }
     return false;
