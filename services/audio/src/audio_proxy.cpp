@@ -112,7 +112,8 @@ bool AudioProxy::SetWiredHeadsetDevActive()
         TELEPHONY_LOGE("SetWiredHeadsetDevActive wiredheadset is not connected");
         return false;
     }
-    if (AudioStandard::AudioSystemManager::GetInstance()->IsDeviceActive(AudioStandard::ActiveDeviceType::USB_HEADSET)) {
+    if (AudioStandard::AudioSystemManager::GetInstance()->
+        IsDeviceActive(AudioStandard::ActiveDeviceType::USB_HEADSET)) {
         TELEPHONY_LOGI("wired headset device is already active");
         return true;
     }
