@@ -112,32 +112,17 @@ bool AudioProxy::SetWiredHeadsetDevActive()
         TELEPHONY_LOGE("SetWiredHeadsetDevActive wiredheadset is not connected");
         return false;
     }
-    if (AudioStandard::AudioSystemManager::GetInstance()->IsDeviceActive(AudioStandard::ActiveDeviceType::SPEAKER)) {
-        int32_t ret = AudioStandard::AudioSystemManager::GetInstance()->SetDeviceActive(
-            AudioStandard::ActiveDeviceType::SPEAKER, false);
-        if (ret != ERR_NONE) {
-            TELEPHONY_LOGE("SetWiredHeadsetDevActive speaker close fail");
-            return false;
-        }
+    if (AudioStandard::AudioSystemManager::GetInstance()->
+        IsDeviceActive(AudioStandard::ActiveDeviceType::USB_HEADSET)) {
+        TELEPHONY_LOGI("wired headset device is already active");
+        return true;
     }
-    if (AudioStandard::AudioSystemManager::GetInstance()->IsDeviceActive(AudioStandard::ActiveDeviceType::EARPIECE)) {
-        int32_t ret = AudioStandard::AudioSystemManager::GetInstance()->SetDeviceActive(
-            AudioStandard::ActiveDeviceType::EARPIECE, false);
-        if (ret != ERR_NONE) {
-            TELEPHONY_LOGE("SetWiredHeadsetDevActive bluetooth sco close fail");
-            return false;
-        }
+    bool ret = AudioStandard::AudioSystemManager::GetInstance()->SetDeviceActive(
+        AudioStandard::ActiveDeviceType::USB_HEADSET, true);
+    if (ret == ERR_NONE) {
+        return true;
     }
-    if (AudioStandard::AudioSystemManager::GetInstance()->IsDeviceActive(
-        AudioStandard::ActiveDeviceType::BLUETOOTH_SCO)) {
-        int32_t ret = AudioStandard::AudioSystemManager::GetInstance()->SetDeviceActive(
-            AudioStandard::ActiveDeviceType::BLUETOOTH_SCO, false);
-        if (ret != ERR_NONE) {
-            TELEPHONY_LOGE("SetWiredHeadsetDevActive bluetooth sco close fail");
-            return false;
-        }
-    }
-    return true;
+    return false;
 }
 
 bool AudioProxy::SetEarpieceDevActive()
