@@ -228,18 +228,21 @@ bool CallNumberUtils::HasBCPhoneNumber(const std::string &phoneNumber)
     return false;
 }
 
-bool CallNumberUtils::SelectDefaultSlotId(int32_t slotId, AppExecFwk::PacMap &extras)
+bool CallNumberUtils::SelectAccountId(int32_t slotId, AppExecFwk::PacMap &extras)
 {
     if (IsValidSlotId(slotId)) {
         return true;
     }
-    int32_t defaultDataSlotId = DelayedRefSingleton<CellularDataClient>::GetInstance().GetDefaultCellularDataSlotId();
     int32_t defaultVoiceSlotId = DelayedRefSingleton<CoreServiceClient>::GetInstance().GetDefaultVoiceSlotId();
     if (defaultVoiceSlotId != TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL && IsValidSlotId(defaultVoiceSlotId)) {
         extras.PutIntValue("accountId", defaultVoiceSlotId);
+        TELEPHONY_LOGI("select accountId to defaultVoiceSlotId = %{public}d", defaultVoiceSlotId);
         return true;
-    } else if (defaultDataSlotId != TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL && IsValidSlotId(defaultDataSlotId)) {
+    }
+    int32_t defaultDataSlotId = DelayedRefSingleton<CellularDataClient>::GetInstance().GetDefaultCellularDataSlotId();
+    if (defaultDataSlotId != TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL && IsValidSlotId(defaultDataSlotId)) {
         extras.PutIntValue("accountId", defaultDataSlotId);
+        TELEPHONY_LOGI("select accountId to defaultDataSlotId = %{public}d", defaultDataSlotId);
         return true;
     }
     return false;

@@ -45,7 +45,7 @@ public:
     std::string RemovePostDialPhoneNumber(const std::string &phoneString);
     bool HasAlphabetInPhoneNum(const std::string &inputValue);
     bool HasBCPhoneNumber(const std::string &phoneNumber);
-    bool SelectDefaultSlotId(int32_t slotId, AppExecFwk::PacMap &extras);
+    bool SelectAccountId(int32_t slotId, AppExecFwk::PacMap &extras);
 
 private:
     void ProcessSpace(std::string &number);

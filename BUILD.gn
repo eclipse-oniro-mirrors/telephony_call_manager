@@ -148,6 +148,7 @@ ohos_shared_library("tel_call_manager") {
     "audio_framework:audio_client",
     "audio_framework:audio_renderer",
     "audio_framework:audio_toneplayer",
+    "cellular_data:tel_cellular_data_api"
     "c_utils:utils",
     "common_event_service:cesfwk_innerkits",
     "core_service:libtel_common",
@@ -165,7 +166,6 @@ ohos_shared_library("tel_call_manager") {
     "player_framework:system_sound_client",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
-    "cellular_data:tel_cellular_data_api"
   ]
 
   cflags_cc = [

@@ -37,7 +37,7 @@ int32_t CallPolicy::DialPolicy(std::u16string &number, AppExecFwk::PacMap &extra
     }
     if (dialType == DialType::DIAL_CARRIER_TYPE) {
         int32_t accountId = extras.GetIntValue("accountId");
-        if (!DelayedSingleton<CallNumberUtils>::GetInstance()->SelectDefaultSlotId(accountId, extras)) {
+        if (!DelayedSingleton<CallNumberUtils>::GetInstance()->SelectAccountId(accountId, extras)) {
             TELEPHONY_LOGE("invalid accountId!");
             return CALL_ERR_INVALID_SLOT_ID;
         }
