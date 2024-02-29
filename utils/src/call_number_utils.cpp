@@ -228,7 +228,7 @@ bool CallNumberUtils::HasBCPhoneNumber(const std::string &phoneNumber)
     return false;
 }
 
-bool SelectDefaultSlotId(int32_t slotId, AppExecFwk::PacMap &extras)
+bool CallNumberUtils::SelectDefaultSlotId(int32_t slotId, AppExecFwk::PacMap &extras)
 {
     if (IsValidSlotId(slotId)) {
         return true;
