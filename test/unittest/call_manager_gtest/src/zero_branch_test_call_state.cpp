@@ -325,6 +325,7 @@ HWTEST_F(CallStateTest, Telephony_AudioControlManager_001, Function | MediumTest
     audioControl->VideoStateUpdated(callObjectPtr, VideoStateType::TYPE_VOICE, VideoStateType::TYPE_VIDEO);
     audioControl->UpdateDeviceTypeForVideoCall();
     audioControl->MuteNetWorkRingTone();
+    audioControl->IsBtOrWireHeadPlugin();
     ASSERT_TRUE(audioControl->IsVideoCall(VideoStateType::TYPE_RECEIVE_ONLY));
 }
 

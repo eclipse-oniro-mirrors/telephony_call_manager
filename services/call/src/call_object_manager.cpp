@@ -565,6 +565,17 @@ std::vector<CallAttributeInfo> CallObjectManager::GetCallInfoList(int32_t slotId
     return callVec;
 }
 
+void CallObjectManager::UpdateOneCallObjectByCallId(int32_t callId, TelCallState nextCallState)
+{
+    std::lock_guard<std::mutex> lock(listMutex_);
+    std::list<sptr<CallBase>>::iterator it = callObjectPtrList_.begin();
+    for (; it != callObjectPtrList_.end(); ++it) {
+        if ((*it)->GetCallID() == callId) {
+            (*it)->SetTelCallState(nextCallState);
+        }
+    }
+}
+
 sptr<CallBase> CallObjectManager::GetForegroundLiveCall()
 {
     std::lock_guard<std::mutex> lock(listMutex_);

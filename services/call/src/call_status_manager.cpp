@@ -924,6 +924,7 @@ int32_t CallStatusManager::UpdateCallState(sptr<CallBase> &call, TelCallState ne
     }
     // need DTMF judge
     int32_t ret = call->SetTelCallState(nextState);
+    UpdateOneCallObjectByCallId(call->GetCallID(), nextState);
     if (ret != TELEPHONY_SUCCESS && ret != CALL_ERR_NOT_NEW_STATE) {
         TELEPHONY_LOGE("SetTelCallState failed");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
