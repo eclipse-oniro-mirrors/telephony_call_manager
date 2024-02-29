@@ -36,6 +36,7 @@
                 "access_token",
                 "bluetooth",
                 "c_utils",
+                "cellular_data",
                 "common_event_service",
                 "core_service",
                 "data_share",
@@ -59,7 +60,6 @@
                 "sms_mms",
                 "image_framework",
                 "miscdevice",
-                "cellular_data"
             ],
             "third_party": [
                 "libphonenumber",

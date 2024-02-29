@@ -62,6 +62,7 @@ ohos_unittest("tel_call_manager_gtest") {
     "audio_framework:audio_toneplayer",
     "bluetooth:btframework",
     "c_utils:utils",
+    "cellular_data:tel_cellular_data_api",
     "common_event_service:cesfwk_innerkits",
     "core_service:libtel_common",
     "core_service:tel_core_service_api",
@@ -74,7 +75,6 @@ ohos_unittest("tel_call_manager_gtest") {
     "player_framework:system_sound_client",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
-    "cellular_data:tel_cellular_data_api",
   ]
 
   deps = [
