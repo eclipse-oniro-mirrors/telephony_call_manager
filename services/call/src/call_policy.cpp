@@ -69,7 +69,8 @@ int32_t CallPolicy::IsVoiceCallValid(VideoStateType videoState)
 {
     if (videoState == VideoStateType::TYPE_VOICE) {
         sptr<CallBase> ringCall = GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_RINGING);
-        if (ringCall != nullptr && ringCall->GetVideoStateType() == VideoStateType::TYPE_VOICE) {
+        if (ringCall != nullptr && ringCall->GetVideoStateType() == VideoStateType::TYPE_VOICE &&
+            ringCall->GetCallType() != CallType::TYPE_VOIP) {
             TELEPHONY_LOGE("already has new call ringing!");
             return CALL_ERR_CALL_COUNTS_EXCEED_LIMIT;
         }

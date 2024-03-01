@@ -428,6 +428,7 @@ int32_t CallManagerService::IsNewCallAllowed(bool &enabled)
 
 int32_t CallManagerService::RegisterVoipCallManagerCallback()
 {
+    std::lock_guard<std::mutex> guard(lock_);
     DelayedSingleton<VoipCallConnection>::GetInstance()->Init(TELEPHONY_VOIP_CALL_MANAGER_SYS_ABILITY_ID);
     voipCallCallbackPtr_ = (std::make_unique<CallStatusCallback>()).release();
     if (voipCallCallbackPtr_ == nullptr) {
@@ -440,6 +441,7 @@ int32_t CallManagerService::RegisterVoipCallManagerCallback()
 
 int32_t CallManagerService::UnRegisterVoipCallManagerCallback()
 {
+    std::lock_guard<std::mutex> guard(lock_);
     return DelayedSingleton<VoipCallConnection>::GetInstance()->UnRegisterCallManagerCallBack();
 }
 
