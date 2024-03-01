@@ -25,7 +25,6 @@
 #include "core_service_client.h"
 #include "cellular_data_client.h"
 
-
 namespace OHOS {
 namespace Telephony {
 CallNumberUtils::CallNumberUtils() {}
