@@ -59,7 +59,7 @@
                 "samgr",
                 "sms_mms",
                 "image_framework",
-                "miscdevice",
+                "miscdevice"
             ],
             "third_party": [
                 "libphonenumber",
