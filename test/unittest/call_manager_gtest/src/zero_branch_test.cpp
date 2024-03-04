@@ -244,14 +244,6 @@ HWTEST_F(BranchTest, Telephony_CellularCallConnection_001, Function | MediumTest
     ASSERT_NE(cellularCallConnection->GetCallRestriction(
         CallRestrictionType::RESTRICTION_TYPE_ALL_INCOMING, 0), TELEPHONY_ERR_SUCCESS);
     ASSERT_NE(cellularCallConnection->SetCallPreferenceMode(0, 1), TELEPHONY_ERR_SUCCESS);
-    std::u16string test = u"";
-    ASSERT_NE(cellularCallConnection->StartRtt(mCellularCallInfo, test), TELEPHONY_ERR_SUCCESS);
-    ASSERT_NE(cellularCallConnection->StopRtt(mCellularCallInfo), TELEPHONY_ERR_SUCCESS);
-    ASSERT_NE(cellularCallConnection->SendUpdateCallMediaModeRequest(
-        mCellularCallInfo, ImsCallMode::CALL_MODE_AUDIO_ONLY), TELEPHONY_ERR_SUCCESS);
-    ASSERT_NE(cellularCallConnection->RegisterCallBackFun(), TELEPHONY_ERR_SUCCESS);
-    ASSERT_NE(cellularCallConnection->ReConnectService(), TELEPHONY_ERR_SUCCESS);
-    ASSERT_NE(cellularCallConnection->PostDialProceed(mCellularCallInfo, true), TELEPHONY_ERR_SUCCESS);
 }
 
 /**
@@ -296,6 +288,26 @@ HWTEST_F(BranchTest, Telephony_CellularCallConnection_002, Function | MediumTest
     ASSERT_NE(cellularCallConnection->SetDeviceDirection(SIM1_SLOTID, DEFAULT_INDEX, 1), TELEPHONY_ERR_SUCCESS);
     ASSERT_NE(cellularCallConnection->CancelCallUpgrade(SIM1_SLOTID, DEFAULT_INDEX), TELEPHONY_ERR_SUCCESS);
     ASSERT_NE(cellularCallConnection->RequestCameraCapabilities(SIM1_SLOTID, DEFAULT_INDEX), TELEPHONY_ERR_SUCCESS);
+}
+
+/**
+ * @tc.number   Telephony_CellularCallConnection_003
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_CellularCallConnection_003, Function | MediumTest | Level1)
+{
+    CellularCallInfo mCellularCallInfo;
+    std::shared_ptr<CellularCallConnection> cellularCallConnection =
+        DelayedSingleton<CellularCallConnection>::GetInstance();
+    std::u16string test = u"";
+    ASSERT_NE(cellularCallConnection->StartRtt(mCellularCallInfo, test), TELEPHONY_ERR_SUCCESS);
+    ASSERT_NE(cellularCallConnection->StopRtt(mCellularCallInfo), TELEPHONY_ERR_SUCCESS);
+    ASSERT_NE(cellularCallConnection->SendUpdateCallMediaModeRequest(
+        mCellularCallInfo, ImsCallMode::CALL_MODE_AUDIO_ONLY), TELEPHONY_ERR_SUCCESS);
+    ASSERT_NE(cellularCallConnection->RegisterCallBackFun(), TELEPHONY_ERR_SUCCESS);
+    ASSERT_NE(cellularCallConnection->ReConnectService(), TELEPHONY_ERR_SUCCESS);
+    ASSERT_NE(cellularCallConnection->PostDialProceed(mCellularCallInfo, true), TELEPHONY_ERR_SUCCESS);
 }
 
 /**
