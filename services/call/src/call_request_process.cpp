@@ -828,7 +828,6 @@ int32_t CallRequestProcess::CarrierDialProcess(DialParaInfo &info)
     } else {
         callRequestEventHandler->RestoreDialingFlag(false);
         callRequestEventHandler->RemoveEventHandlerTask();
-        needWaitHold_ = false;
     }
     CellularCallInfo callInfo;
     ret = PackCellularCallInfo(info, callInfo);
