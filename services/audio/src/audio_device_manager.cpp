@@ -177,7 +177,7 @@ void AudioDeviceManager::RemoveAudioDeviceList(const std::string &address, Audio
 
 void AudioDeviceManager::ResetBtAudioDevicesList()
 {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<std::mutex> lock(infoMutex_);
     std::vector<AudioDevice>::iterator it = info_.audioDeviceList.begin();
     while (it != info_.audioDeviceList.end()) {
         if (it->deviceType == AudioDeviceType::DEVICE_BLUETOOTH_SCO) {
@@ -193,7 +193,7 @@ void AudioDeviceManager::ResetBtAudioDevicesList()
 
 void AudioDeviceManager::ResetDistributedCallDevicesList()
 {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<std::mutex> lock(infoMutex_);
     std::vector<AudioDevice>::iterator it = info_.audioDeviceList.begin();
     while (it != info_.audioDeviceList.end()) {
         if (IsDistributedAudioDeviceType(it->deviceType)) {
@@ -388,7 +388,7 @@ void AudioDeviceManager::SetCurrentAudioDevice(AudioDeviceType deviceType)
 
 bool AudioDeviceManager::CheckAndSwitchDistributedAudioDevice()
 {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::lock_guard<std::mutex> lock(infoMutex_);
     DelayedSingleton<DistributedCallManager>::GetInstance()->SetCallState(true);
     std::vector<AudioDevice>::iterator it = info_.audioDeviceList.begin();
     while (it != info_.audioDeviceList.end()) {
