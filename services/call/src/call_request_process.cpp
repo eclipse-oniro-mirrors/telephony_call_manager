@@ -809,10 +809,10 @@ int32_t CallRequestProcess::CarrierDialProcess(DialParaInfo &info)
         DelayedSingleton<CallNumberUtils>::GetInstance()->RemoveSeparatorsPhoneNumber(info.number);
     int32_t ret = HandleDialingInfo(newPhoneNum, info);
     bool isMMiCode = DelayedSingleton<CallNumberUtils>::GetInstance()->IsMMICode(newPhoneNum);
-    if (ret != TELEPHONY_SUCCESS || isMMiCode) {
+    if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("HandleDialingInfo failed!");
         callRequestEventHandler->RestoreDialingFlag(false);
-        callRequestEventHandler->Re moveEventHandlerTask();
+        callRequestEventHandler->RemoveEventHandlerTask();
         needWaitHold_ = false;
         return ret;
     }
@@ -825,6 +825,10 @@ int32_t CallRequestProcess::CarrierDialProcess(DialParaInfo &info)
             needWaitHold_ = false;
             return ret;
         }
+    } else {
+        callRequestEventHandler->RestoreDialingFlag(false);
+        callRequestEventHandler->RemoveEventHandlerTask();
+        needWaitHold_ = false;
     }
     CellularCallInfo callInfo;
     ret = PackCellularCallInfo(info, callInfo);
