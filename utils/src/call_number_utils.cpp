@@ -238,12 +238,14 @@ bool CallNumberUtils::SelectAccountId(int32_t slotId, AppExecFwk::PacMap &extras
         TELEPHONY_LOGI("select accountId to defaultVoiceSlotId = %{public}d", defaultVoiceSlotId);
         return true;
     }
+#ifdef CELLULAR_DATA_SUPPORT
     int32_t defaultDataSlotId = DelayedRefSingleton<CellularDataClient>::GetInstance().GetDefaultCellularDataSlotId();
     if (defaultDataSlotId != TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL && IsValidSlotId(defaultDataSlotId)) {
         extras.PutIntValue("accountId", defaultDataSlotId);
         TELEPHONY_LOGI("select accountId to defaultDataSlotId = %{public}d", defaultDataSlotId);
         return true;
     }
+#endif
     return false;
 }
 } // namespace Telephony
