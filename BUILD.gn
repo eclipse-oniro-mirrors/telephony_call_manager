@@ -224,7 +224,7 @@ ohos_shared_library("tel_call_manager") {
       defined(global_parts_info.telephony_cellular_data) &&
       global_parts_info.telephony_cellular_data) {
     external_deps += [ "cellular_data:tel_cellular_data_api" ]
-    defines += [ "ABILITY_CELLULAR_DATA_SUPPORT" ]
+    defines += [ "CELLULAR_DATA_SUPPORT" ]
   }
 
   part_name = "call_manager"
