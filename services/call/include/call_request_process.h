@@ -63,6 +63,7 @@ public:
     bool HandleDsdaIncomingCall(
         sptr<CallBase> call, int32_t activeCallNum, int32_t slotId, int32_t videoState, sptr<CallBase> incomingCall);
     void IsExistCallOtherSlot(std::list<int32_t> &list, int32_t slotId, bool &noOtherCall);
+    int32_t HandleDialingInfo(std::string newPhoneNum, DialParaInfo &info);
 
 private:
     int32_t CarrierDialProcess(DialParaInfo &info);

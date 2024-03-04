@@ -23,6 +23,7 @@
 #include "call_manager_errors.h"
 #include "call_manager_hisysevent.h"
 #include "call_number_utils.h"
+#include "call_request_event_handler_helper.h"
 #include "core_service_client.h"
 #include "cs_call.h"
 #include "datashare_predicates.h"
@@ -512,6 +513,9 @@ int32_t CallStatusManager::DialingHandle(const CallDetailInfo &info)
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     AddOneCallObject(call);
+    auto callRequestEventHandler = DelayedSingleton<CallRequestEventHandlerHelper>::GetInstance();
+    callRequestEventHandler->RestoreDialingFlag(false);
+    callRequestEventHandler->RemoveEventHandlerTask();
     int32_t ret = call->DialingProcess();
     if (ret != TELEPHONY_SUCCESS) {
         return ret;
