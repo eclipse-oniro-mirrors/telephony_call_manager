@@ -808,7 +808,6 @@ int32_t CallRequestProcess::CarrierDialProcess(DialParaInfo &info)
     std::string newPhoneNum =
         DelayedSingleton<CallNumberUtils>::GetInstance()->RemoveSeparatorsPhoneNumber(info.number);
     int32_t ret = HandleDialingInfo(newPhoneNum, info);
-    bool isMMiCode = DelayedSingleton<CallNumberUtils>::GetInstance()->IsMMICode(newPhoneNum);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("HandleDialingInfo failed!");
         callRequestEventHandler->RestoreDialingFlag(false);
@@ -816,6 +815,7 @@ int32_t CallRequestProcess::CarrierDialProcess(DialParaInfo &info)
         needWaitHold_ = false;
         return ret;
     }
+    bool isMMiCode = DelayedSingleton<CallNumberUtils>::GetInstance()->IsMMICode(newPhoneNum);
     if (!isMMiCode) {
         isFirstDialCallAdded_ = false;
         info.number = newPhoneNum;
