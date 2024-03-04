@@ -257,7 +257,8 @@ private:
     static bool MatchTwoStringParameter(napi_env env, const napi_value parameters[], const size_t parameterCount);
     static bool MatchCallRestrictionPasswordParameter(
         napi_env env, const napi_value parameters[], const size_t parameterCount);
-
+    static void HandleRejectCall(napi_env env, RejectAsyncContext &asyncContext,
+        const napi_value parameters[], const size_t parameterCount);
 private:
     static int32_t registerStatus_;
 };

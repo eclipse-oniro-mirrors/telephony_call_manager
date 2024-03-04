@@ -1361,47 +1361,52 @@ napi_value NapiCallManager::RejectCall(napi_env env, napi_callback_info info)
         return nullptr;
     }
     asyncContext->isSendSms = false;
-    if (argc == ZERO_VALUE) {
-        TELEPHONY_LOGI("no param input.");
-    } else if (argc == ONLY_ONE_VALUE) {
-        if (NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_FIRST], napi_undefined)) {
-            TELEPHONY_LOGI("undefined or null param is detected, treating as no param input.");
-        } else if (NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_FIRST], napi_function)) {
-            napi_create_reference(env, argv[ARRAY_INDEX_FIRST], DATA_LENGTH_ONE, &(asyncContext->callbackRef));
-        } else if (NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_FIRST], napi_number)) {
-            napi_get_value_int32(env, argv[ARRAY_INDEX_FIRST], &asyncContext->callId);
-        } else {
-            GetSmsInfo(env, argv[ARRAY_INDEX_FIRST], *asyncContext);
-        }
-    } else if (argc == TWO_VALUE_LIMIT) {
-        if (MatchRejectCallTwoIllegalParameters(env, argv)) {
-            TELEPHONY_LOGI("undefined or null params are detected, treating as no param input.");
-        } else if (MatchRejectCallFirstIllegalParameters(env, argv)) {
-            TELEPHONY_LOGI("undefined or null param is detected, first param is ignored.");
-            GetSmsInfo(env, argv[ARRAY_INDEX_SECOND], *asyncContext);
-        } else if (MatchRejectCallSecondIllegalParameters(env, argv)) {
-            TELEPHONY_LOGI("undefined or null param is detected, second param is ignored.");
-            napi_get_value_int32(env, argv[ARRAY_INDEX_FIRST], &asyncContext->callId);
-        } else if (NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_FIRST], napi_object) &&
-            NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_SECOND], napi_function)) {
-            GetSmsInfo(env, argv[ARRAY_INDEX_FIRST], *asyncContext);
-            napi_create_reference(env, argv[ARRAY_INDEX_SECOND], DATA_LENGTH_ONE, &(asyncContext->callbackRef));
-        } else if (NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_FIRST], napi_number) &&
-                   NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_SECOND], napi_function)) {
-            napi_get_value_int32(env, argv[ARRAY_INDEX_FIRST], &asyncContext->callId);
-            napi_create_reference(env, argv[ARRAY_INDEX_SECOND], DATA_LENGTH_ONE, &(asyncContext->callbackRef));
-        } else {
-            napi_get_value_int32(env, argv[ARRAY_INDEX_FIRST], &asyncContext->callId);
-            GetSmsInfo(env, argv[ARRAY_INDEX_SECOND], *asyncContext);
-        }
-    } else {
-        napi_get_value_int32(env, argv[ARRAY_INDEX_FIRST], &asyncContext->callId);
-        GetSmsInfo(env, argv[ARRAY_INDEX_SECOND], *asyncContext);
-        napi_create_reference(env, argv[ARRAY_INDEX_THIRD], DATA_LENGTH_ONE, &(asyncContext->callbackRef));
-    }
-
+    HandleRejectCall(env, *asyncContext, argv, argc);
     return HandleAsyncWork(
         env, asyncContext.release(), "RejectCall", NativeRejectCall, NativeVoidCallBackWithErrorCode);
+}
+
+void NapiCallManager::HandleRejectCall(napi_env env, RejectAsyncContext &asyncContext,
+    const napi_value parameters[], const size_t parameterCount)
+{
+    if (parameterCount == ZERO_VALUE) {
+        TELEPHONY_LOGI("no param input.");
+    } else if (parameterCount == ONLY_ONE_VALUE) {
+        if (NapiCallManagerUtils::MatchValueType(env, parameters[ARRAY_INDEX_FIRST], napi_undefined)) {
+            TELEPHONY_LOGI("undefined or null param is detected, treating as no param input.");
+        } else if (NapiCallManagerUtils::MatchValueType(env, parameters[ARRAY_INDEX_FIRST], napi_function)) {
+            napi_create_reference(env, parameters[ARRAY_INDEX_FIRST], DATA_LENGTH_ONE, &(asyncContext.callbackRef));
+        } else if (NapiCallManagerUtils::MatchValueType(env, parameters[ARRAY_INDEX_FIRST], napi_number)) {
+            napi_get_value_int32(env, parameters[ARRAY_INDEX_FIRST], &asyncContext.callId);
+        } else {
+            GetSmsInfo(env, parameters[ARRAY_INDEX_FIRST], asyncContext);
+        }
+    } else if (parameterCount == TWO_VALUE_LIMIT) {
+        if (MatchRejectCallTwoIllegalParameters(env, parameters)) {
+            TELEPHONY_LOGI("undefined or null params are detected, treating as no param input.");
+        } else if (MatchRejectCallFirstIllegalParameters(env, parameters)) {
+            TELEPHONY_LOGI("undefined or null param is detected, first param is ignored.");
+            GetSmsInfo(env, parameters[ARRAY_INDEX_SECOND], asyncContext);
+        } else if (MatchRejectCallSecondIllegalParameters(env, parameters)) {
+            TELEPHONY_LOGI("undefined or null param is detected, second param is ignored.");
+            napi_get_value_int32(env, parameters[ARRAY_INDEX_FIRST], &asyncContext.callId);
+        } else if (NapiCallManagerUtils::MatchValueType(env, parameters[ARRAY_INDEX_FIRST], napi_object) &&
+            NapiCallManagerUtils::MatchValueType(env, parameters[ARRAY_INDEX_SECOND], napi_function)) {
+            GetSmsInfo(env, parameters[ARRAY_INDEX_FIRST], asyncContext);
+            napi_create_reference(env, parameters[ARRAY_INDEX_SECOND], DATA_LENGTH_ONE, &(asyncContext.callbackRef));
+        } else if (NapiCallManagerUtils::MatchValueType(env, parameters[ARRAY_INDEX_FIRST], napi_number) &&
+                   NapiCallManagerUtils::MatchValueType(env, parameters[ARRAY_INDEX_SECOND], napi_function)) {
+            napi_get_value_int32(env, parameters[ARRAY_INDEX_FIRST], &asyncContext.callId);
+            napi_create_reference(env, parameters[ARRAY_INDEX_SECOND], DATA_LENGTH_ONE, &(asyncContext.callbackRef));
+        } else {
+            napi_get_value_int32(env, parameters[ARRAY_INDEX_FIRST], &asyncContext.callId);
+            GetSmsInfo(env, parameters[ARRAY_INDEX_SECOND], asyncContext);
+        }
+    } else {
+        napi_get_value_int32(env, parameters[ARRAY_INDEX_FIRST], &asyncContext.callId);
+        GetSmsInfo(env, parameters[ARRAY_INDEX_SECOND], asyncContext);
+        napi_create_reference(env, parameters[ARRAY_INDEX_THIRD], DATA_LENGTH_ONE, &(asyncContext.callbackRef));
+    }
 }
 
 napi_value NapiCallManager::HangUpCall(napi_env env, napi_callback_info info)
