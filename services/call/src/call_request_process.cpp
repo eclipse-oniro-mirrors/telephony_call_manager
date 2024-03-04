@@ -21,6 +21,7 @@
 #include "call_manager_errors.h"
 #include "call_manager_hisysevent.h"
 #include "call_number_utils.h"
+#include "call_request_event_handler_helper.h"
 #include "cellular_call_connection.h"
 #include "common_type.h"
 #include "core_service_client.h"
@@ -798,23 +799,21 @@ int32_t CallRequestProcess::HandleDialFail()
 
 int32_t CallRequestProcess::CarrierDialProcess(DialParaInfo &info)
 {
+    auto callRequestEventHandler = DelayedSingleton<CallRequestEventHandlerHelper>::GetInstance();
+    if (callRequestEventHandler->IsDialingCallProcessing()) {
+        return CALL_ERR_CALL_COUNTS_EXCEED_LIMIT;
+    }
+    callRequestEventHandler->RestoreDialingFlag(true);
+    callRequestEventHandler->SetDialingCallProcessing();
     std::string newPhoneNum =
         DelayedSingleton<CallNumberUtils>::GetInstance()->RemoveSeparatorsPhoneNumber(info.number);
-    int32_t ret = TELEPHONY_ERROR;
-    bool isEcc = HandleEccCallForDsda(newPhoneNum, info);
-    if (!isEcc) {
-        bool canDial = true;
-        IsNewCallAllowedCreate(canDial);
-        if (!canDial) {
-            return CALL_ERR_CALL_COUNTS_EXCEED_LIMIT;
-        }
-        if (IsDsdsMode5()) {
-            ret = IsDialCallForDsda(info);
-            if (ret != TELEPHONY_SUCCESS) {
-                TELEPHONY_LOGE("IsDialCallForDsda failed!");
-                return ret;
-            }
-        }
+    int32_t ret = HandleDialingInfo(newPhoneNum, info);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("HandleDialingInfo failed!");
+        callRequestEventHandler->RestoreDialingFlag(false);
+        callRequestEventHandler->RemoveEventHandlerTask();
+        needWaitHold_ = false;
+        return ret;
     }
     bool isMMiCode = DelayedSingleton<CallNumberUtils>::GetInstance()->IsMMICode(newPhoneNum);
     if (!isMMiCode) {
@@ -826,6 +825,9 @@ int32_t CallRequestProcess::CarrierDialProcess(DialParaInfo &info)
             needWaitHold_ = false;
             return ret;
         }
+    } else {
+        callRequestEventHandler->RestoreDialingFlag(false);
+        callRequestEventHandler->RemoveEventHandlerTask();
     }
     CellularCallInfo callInfo;
     ret = PackCellularCallInfo(info, callInfo);
@@ -843,6 +845,27 @@ int32_t CallRequestProcess::CarrierDialProcess(DialParaInfo &info)
     }
     ret = HandleStartDial(isMMiCode, callInfo);
     return ret;
+}
+
+int32_t CallRequestProcess::HandleDialingInfo(std::string newPhoneNum, DialParaInfo &info)
+{
+    bool isEcc = HandleEccCallForDsda(newPhoneNum, info);
+    if (!isEcc) {
+        bool canDial = true;
+        IsNewCallAllowedCreate(canDial);
+        if (!canDial) {
+            return CALL_ERR_CALL_COUNTS_EXCEED_LIMIT;
+        }
+        int32_t ret = TELEPHONY_ERROR;
+        if (IsDsdsMode5()) {
+            ret = IsDialCallForDsda(info);
+            if (ret != TELEPHONY_SUCCESS) {
+                TELEPHONY_LOGE("IsDialCallForDsda failed!");
+                return ret;
+            }
+        }
+    }
+    return TELEPHONY_SUCCESS;
 }
 
 int32_t CallRequestProcess::HandleStartDial(bool isMMiCode, CellularCallInfo callInfo)

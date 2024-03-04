@@ -28,6 +28,7 @@
 #include "call_number_utils.h"
 #include "call_policy.h"
 #include "call_records_manager.h"
+#include "call_request_event_handler_helper.h"
 #include "call_request_handler.h"
 #include "call_request_process.h"
 #include "call_setting_manager.h"
@@ -2386,6 +2387,22 @@ HWTEST_F(BranchTest, Telephony_VoipCallManagerProxy_001, Function | MediumTest |
         voipCallManagerInterfacePtr->RegisterCallManagerCallBack(statusCallback);
         voipCallManagerInterfacePtr->UnRegisterCallManagerCallBack();
     }
+}
+
+/**
+ * @tc.number   Telephony_CallRequestEventHandlerHelper_001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_CallRequestEventHandlerHelper_001, Function | MediumTest | Level3)
+{
+    bool flag = true;
+    DelayedSingleton<CallRequestEventHandlerHelper>::GetInstance()->RestoreDialingFlag(flag);
+    ASSERT_EQ(DelayedSingleton<CallRequestEventHandlerHelper>::GetInstance()->SetDialingCallProcessing(),
+        TELEPHONY_ERR_SUCCESS);
+    DelayedSingleton<CallRequestEventHandlerHelper>::GetInstance()->RestoreDialingFlag(false);
+    EXPECT_EQ(DelayedSingleton<CallRequestEventHandlerHelper>::GetInstance()->IsDialingCallProcessing(),
+        true);
 }
 } // namespace Telephony
 } // namespace OHOS

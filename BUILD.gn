@@ -66,6 +66,7 @@ ohos_shared_library("tel_call_manager") {
     "services/call/src/call_incoming_filter_manager.cpp",
     "services/call/src/call_object_manager.cpp",
     "services/call/src/call_policy.cpp",
+    "services/call/src/call_request_event_handler_helper.cpp",
     "services/call/src/call_request_handler.cpp",
     "services/call/src/call_request_process.cpp",
     "services/call/src/call_state_listener.cpp",
