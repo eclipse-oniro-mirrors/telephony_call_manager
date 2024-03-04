@@ -93,6 +93,7 @@ void AudioControlManager::CallStateUpdated(
         TELEPHONY_LOGI("voip call not need control audio");
         return;
     }
+    std::lock_guard<std::mutex> lock(mutex_);
     if (totalCalls_.count(callObjectPtr) == 0) {
         int32_t callId = callObjectPtr->GetCallID();
         TelCallState callState = callObjectPtr->GetTelCallState();
