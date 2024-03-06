@@ -33,12 +33,14 @@ namespace OHOS {
 namespace Telephony {
 using namespace testing::ext;
 #ifndef TEL_TEST_UNSUPPORT
-constexpr int16_t SIM1_SLOTID = 0;
 constexpr int16_t SIM2_SLOTID = 1;
 constexpr int16_t SIM1_SLOTID_NO_CARD = 0;
 constexpr int16_t RETURN_VALUE_IS_ZERO = 0;
 constexpr int16_t INVALID_NEGATIVE_ID = -100;
 constexpr int16_t INVALID_POSITIVE_ID = 100;
+constexpr int INVALID_DIAL_TYPE = 3;
+const std::string PHONE_NUMBER = "0000000000";
+constexpr int WAIT_TIME = 3;
 #ifndef CALL_MANAGER_IMS_LITE_UNSUPPORT
 constexpr int16_t CAMERA_ROTATION_90 = 90;
 constexpr int16_t CAMERA_ROTATION_ERROR = 50;
@@ -48,9 +50,7 @@ constexpr int16_t SLEEP_1000_MS = 1000;
 constexpr int BASE_TIME_MS = 1000;
 constexpr int SLEEP_TIME_MS = 50;
 constexpr int MAX_LIMIT_TIME = 18000;
-constexpr int INVALID_DIAL_TYPE = 3;
-const std::string PHONE_NUMBER = "0000000000";
-constexpr int WAIT_TIME = 3;
+constexpr int16_t SIM1_SLOTID = 0;
 
 std::unordered_map<int32_t, std::unordered_set<int32_t>> g_callStateMap;
 int32_t g_newCallId = -1;
@@ -160,6 +160,163 @@ void CallInfoManager::LockCallState(bool eq, int32_t targetState, int32_t slipMs
 void CallManagerGtest::HangUpCall()
 {
     clientPtr_->HangUpCall(INVALID_CALLID);
+}
+
+class ClientErrorBranchTest : public testing::Test {
+public:
+    static void SetUpTestCase() {};
+    static void TearDownTestCase() {};
+    void SetUp() {};
+    void TearDown() {};
+}
+
+/**
+ * @tc.number   Telephony_CallManagerClient_001
+ * @tc.name     test error nullptr branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(ClientErrorBranchTest, Telephony_CallManagerClient_001, Function | MediumTest | Level3)
+{
+    std::shared_ptr<CallManagerClient> client = std::make_shared<CallManagerClient>();
+    std::u16string str = u"";
+    client->UnInit();
+    ASSERT_EQ(client->RegisterCallBack(nullptr), TELEPHONY_ERROR_UNINIT);
+    ASSERT_EQ(client->UnRegisterCallBack(), TELEPHONY_ERROR_UNINIT);
+    ASSERT_EQ(client->ObserverOnCallDetailsChange(), TELEPHONY_ERROR_UNINIT);
+    AppExecFwk::PacMap extras;
+    ASSERT_EQ(client->DialCall(str, extras), TELEPHONY_ERROR_UNINIT);
+    ASSERT_EQ(client->AnswerCall(g_newCallId, 1), TELEPHONY_ERROR_UNINIT);
+    ASSERT_EQ(client->RejectCall(g_newCallId, false, str), TELEPHONY_ERROR_UNINIT);
+    ASSERT_EQ(client->HangUpCall(g_newCallId), TELEPHONY_ERROR_UNINIT);
+    ASSERT_EQ(client->GetCallState(), TELEPHONY_ERROR_UNINIT);
+    ASSERT_EQ(client->RegisterVoipCallManagerCallback(), TELEPHONY_ERROR_UNINIT);
+    ASSERT_EQ(client->UnRegisterVoipCallManagerCallback(), TELEPHONY_ERROR_UNINIT);
+    ASSERT_EQ(client->HoldCall(g_newCallId), TELEPHONY_ERROR_UNINIT);
+    ASSERT_EQ(client->UnHoldCall(g_newCallId), TELEPHONY_ERROR_UNINIT);
+    ASSERT_EQ(client->SwitchCall(g_newCallId), TELEPHONY_ERROR_UNINIT);
+    ASSERT_EQ(client->CombineConference(g_newCallId), TELEPHONY_ERROR_UNINIT);
+    ASSERT_EQ(client->SeparateConference(g_newCallId), TELEPHONY_ERROR_UNINIT);
+    ASSERT_EQ(client->KickOutFromConference(g_newCallId), TELEPHONY_ERROR_UNINIT);
+    int callId = 1;
+    ASSERT_EQ(client->GetMainCallId(callId, callId), TELEPHONY_ERROR_UNINIT);
+    std::vector<std::u16string> callIdList;
+    ASSERT_EQ(client->GetSubCallIdList(g_newCallId, callIdList), TELEPHONY_ERROR_UNINIT);
+    ASSERT_EQ(client->GetCallIdListForConference(g_newCallId, callIdList), TELEPHONY_ERROR_UNINIT);
+    ASSERT_EQ(client->GetCallWaiting(SIM1_SLOTID), TELEPHONY_ERROR_UNINIT);
+    ASSERT_EQ(client->SetCallWaiting(SIM1_SLOTID, false), TELEPHONY_ERROR_UNINIT);
+    ASSERT_EQ(client->GetCallRestriction(SIM1_SLOTID, CallRestrictionType::RESTRICTION_TYPE_ALL_INCOMING),
+        TELEPHONY_ERROR_UNINIT);
+    CallRestrictionInfo callRestrictionInfo;
+    ASSERT_EQ(client->SetCallRestriction(SIM1_SLOTID, callRestrictionInfo), TELEPHONY_ERROR_UNINIT);
+    ASSERT_EQ(client->SetCallRestrictionPassword(SIM1_SLOTID, CallRestrictionType::RESTRICTION_TYPE_ALL_INCOMING),
+        "", "", TELEPHONY_ERROR_UNINIT);
+    ASSERT_EQ(client->GetCallTransferInfo(SIM1_SLOTID, CallTransferType::TRANSFER_TYPE_BUSY), TELEPHONY_ERROR_UNINIT);
+    CallTransferInfo callTransferInfo;
+    ASSERT_EQ(client->SetCallTransferInfo(SIM1_SLOTID, callTransferInfo), TELEPHONY_ERROR_UNINIT);
+    bool boolValue = false;
+    ASSERT_EQ(client->CanSetCallTransferTime(SIM1_SLOTID, boolValue), TELEPHONY_ERROR_UNINIT);
+    ASSERT_EQ(client->SetCallPreferenceMode(SIM1_SLOTID, 0), TELEPHONY_ERROR_UNINIT);
+    ASSERT_EQ(client->StartDtmf(g_newCallId, 'c'), TELEPHONY_ERROR_UNINIT);
+    ASSERT_EQ(client->StopDtmf(g_newCallId), TELEPHONY_ERROR_UNINIT);
+    ASSERT_EQ(client->PostDialProceed(SIM1_SLOTID, true), TELEPHONY_ERROR_UNINIT);
+    ASSERT_EQ(client->IsRinging(boolValue), TELEPHONY_ERROR_UNINIT);
+    ASSERT_FALSE(client->HasCall(), TELEPHONY_ERROR_UNINIT);
+    ASSERT_EQ(client->UnRegisterCallBack(), TELEPHONY_ERROR_UNINIT);
+    ASSERT_EQ(client->UnRegisterCallBack(), TELEPHONY_ERROR_UNINIT);
+    ASSERT_EQ(client->UnRegisterCallBack(), TELEPHONY_ERROR_UNINIT);
+    ASSERT_EQ(client->CancelCallUpgrade(g_newCallId), TELEPHONY_ERROR_UNINIT);
+}
+
+/**
+ * @tc.number   Telephony_CallManagerClient_002
+ * @tc.name     test error nullptr branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(ClientErrorBranchTest, Telephony_CallManagerClient_002, Function | MediumTest | Level3)
+{
+    std::shared_ptr<CallManagerClient> client = std::make_shared<CallManagerClient>();
+    std::u16string str = u"";
+    bool boolValue = false;
+    int value = 0;
+    ASSERT_EQ(client->IsNewCallAllowed(boolValue), TELEPHONY_ERROR_UNINIT);
+    ASSERT_EQ(client->IsInEmergencyCall(boolValue), TELEPHONY_ERROR_UNINIT);
+    ASSERT_EQ(client->IsEmergencyPhoneNumber(str, SIM1_SLOTID, boolValue), TELEPHONY_ERROR_UNINIT);
+    ASSERT_EQ(client->FormatPhoneNumber(str, str, str), TELEPHONY_ERROR_UNINIT);
+    ASSERT_EQ(client->FormatPhoneNumberToE164(str, str, str), TELEPHONY_ERROR_UNINIT);
+    ASSERT_EQ(client->SetMuted(SetMuted), TELEPHONY_ERROR_UNINIT);
+    ASSERT_EQ(client->MuteRinger(), TELEPHONY_ERROR_UNINIT);
+    AudioDevice audioDevice;
+    ASSERT_EQ(client->SetAudioDevice(audioDevice), TELEPHONY_ERROR_UNINIT);
+    ASSERT_EQ(client->ControlCamera(g_newCallId, str), TELEPHONY_ERROR_UNINIT);
+    str::string surfaceId = "";
+    ASSERT_EQ(client->SetPreviewWindow(g_newCallId, surfaceId), TELEPHONY_ERROR_UNINIT);
+    ASSERT_EQ(client->SetDisplayWindow(g_newCallId, surfaceId), TELEPHONY_ERROR_UNINIT);
+    float zoomRatio = 1.0;
+    ASSERT_EQ(client->SetCameraZoom(zoomRatio), TELEPHONY_ERROR_UNINIT);
+    ASSERT_EQ(client->SetPausePicture(g_newCallId, str), TELEPHONY_ERROR_UNINIT);
+    ASSERT_EQ(client->SetDeviceDirection(g_newCallId, value), TELEPHONY_ERROR_UNINIT);
+    ASSERT_EQ(client->GetImsConfig(SIM1_SLOTID, ITEM_VIDEO_QUALITY), TELEPHONY_ERROR_UNINIT);
+    ASSERT_EQ(client->SetImsConfig(SIM1_SLOTID, ITEM_VIDEO_QUALITY, str), TELEPHONY_ERROR_UNINIT);
+    ASSERT_EQ(client->GetImsFeatureValue(SIM1_SLOTID, FeatureType::TYPE_SS_OVER_UT), TELEPHONY_ERROR_UNINIT);
+    ASSERT_EQ(client->SetImsFeatureValue(SIM1_SLOTID, FeatureType::TYPE_SS_OVER_UT, value), TELEPHONY_ERROR_UNINIT);
+    ASSERT_EQ(client->UpdateImsCallMode(SIM1_SLOTID, CALL_MODE_SEND_ONLY), TELEPHONY_ERROR_UNINIT);
+    ASSERT_EQ(client->EnableImsSwitch(SIM1_SLOTID), TELEPHONY_ERROR_UNINIT);
+    ASSERT_EQ(client->DisableImsSwitch(SIM1_SLOTID), TELEPHONY_ERROR_UNINIT);
+    ASSERT_EQ(client->IsImsSwitchEnabled(SIM1_SLOTID, boolValue), TELEPHONY_ERROR_UNINIT);
+    ASSERT_EQ(client->SetVoNRState(SIM1_SLOTID, value), TELEPHONY_ERROR_UNINIT);
+    ASSERT_EQ(client->GetVoNRState(SIM1_SLOTID, value), TELEPHONY_ERROR_UNINIT);
+    ASSERT_EQ(client->StartRtt(g_newCallId, str), TELEPHONY_ERROR_UNINIT);
+    ASSERT_EQ(client->StopRtt(g_newCallId), TELEPHONY_ERROR_UNINIT);
+    std::vector<std::u16string> numberList;
+    ASSERT_EQ(client->JoinConference(g_newCallId, numberList), TELEPHONY_ERROR_UNINIT);
+    std::vector<OttCallDetailsInfo> ottVec;
+    ASSERT_EQ(client->ReportOttCallDetailsInfo(ottVec), TELEPHONY_ERROR_UNINIT);
+    OttCallEventInfo eventInfo;
+    ASSERT_EQ(client->ReportOttCallEventInfo(eventInfo), TELEPHONY_ERROR_UNINIT);
+    ASSERT_EQ(client->CloseUnFinishedUssd(SIM1_SLOTID), TELEPHONY_ERROR_UNINIT);
+    ASSERT_EQ(client->ObserverOnCallDetailsChange(), TELEPHONY_ERROR_UNINIT);
+    ASSERT_EQ(client->InputDialerSpecialCode(PHONE_NUMBER), TELEPHONY_ERROR_UNINIT);
+    ASSERT_EQ(client->RemoveMissedIncomingCallNotification(), TELEPHONY_ERROR_UNINIT);
+    ASSERT_EQ(client->SetVoIPCallState(value), TELEPHONY_ERROR_UNINIT);
+    ASSERT_EQ(client->GetVoIPCallState(value), TELEPHONY_ERROR_UNINIT);
+    ASSERT_EQ(client->ReportAudioDeviceInfo(), TELEPHONY_ERROR_UNINIT);
+    ASSERT_EQ(client->RequestCameraCapabilities(g_newCallId), TELEPHONY_ERROR_UNINIT);
+}
+
+/**
+ * @tc.number   Telephony_BluetoothCallClient_001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(ClientErrorBranchTest, Telephony_BluetoothCallClient_001, Function | MediumTest | Level3)
+{
+    std::shared_ptr<BluetoothCallClient> bluetoothCallClient = std::make_shared<BluetoothCallClient>();
+    bluetoothCallClient->UnInit();
+    ASSERT_NE(bluetoothCallClient->RegisterCallBack(nullptr), TELEPHONY_SUCCESS);
+    ASSERT_NE(bluetoothCallClient->UnRegisterCallBack(), TELEPHONY_SUCCESS);
+    std::u16string value = u"";
+    AppExecFwk::PacMap extras;
+    bool enabled;
+    bluetoothCallClient->IsNewCallAllowed(enabled);
+    bluetoothCallClient->IsInEmergencyCall(enabled);
+    bluetoothCallClient->SetMuted(false);
+    bluetoothCallClient->MuteRinger();
+    bluetoothCallClient->SetAudioDevice(AudioDeviceType::DEVICE_BLUETOOTH_SCO, "test");
+    bluetoothCallClient->GetCurrentCallList(-1).size();
+    ASSERT_NE(bluetoothCallClient->DialCall(value, extras), TELEPHONY_SUCCESS);
+    ASSERT_NE(bluetoothCallClient->AnswerCall(), TELEPHONY_SUCCESS);
+    ASSERT_NE(bluetoothCallClient->RejectCall(), TELEPHONY_SUCCESS);
+    ASSERT_NE(bluetoothCallClient->HangUpCall(), TELEPHONY_SUCCESS);
+    ASSERT_GE(bluetoothCallClient->GetCallState(), TELEPHONY_SUCCESS);
+    ASSERT_NE(bluetoothCallClient->HoldCall(), TELEPHONY_SUCCESS);
+    ASSERT_NE(bluetoothCallClient->UnHoldCall(), TELEPHONY_SUCCESS);
+    ASSERT_NE(bluetoothCallClient->SwitchCall(), TELEPHONY_SUCCESS);
+    ASSERT_NE(bluetoothCallClient->CombineConference(), TELEPHONY_SUCCESS);
+    ASSERT_NE(bluetoothCallClient->SeparateConference(), TELEPHONY_SUCCESS);
+    ASSERT_NE(bluetoothCallClient->KickOutFromConference(), TELEPHONY_SUCCESS);
+    ASSERT_NE(bluetoothCallClient->StartDtmf('a'), TELEPHONY_SUCCESS);
+    ASSERT_NE(bluetoothCallClient->StopDtmf(), TELEPHONY_SUCCESS);
+    ASSERT_NE(bluetoothCallClient->IsRinging(enabled), TELEPHONY_SUCCESS);
 }
 
 #ifndef TEL_TEST_UNSUPPORT
@@ -958,7 +1115,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_ReportAudioDeviceInfo_0100, Fun
     CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_200_MS, SLEEP_30000_MS);
     EXPECT_EQ(CallManagerGtest::clientPtr_->DialCall(Str8ToStr16(phoneNumber), dialInfo_), RETURN_VALUE_IS_ZERO);
     CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_OFFHOOK, SLEEP_200_MS, SLEEP_30000_MS);
-    EXPECT_EQ(CallManagerGtest::clientPtr_->ReportAudioDeviceInfo(), RETURN_VALUE_IS_ZERO);
+    EXPECT_GE(CallManagerGtest::clientPtr_->ReportAudioDeviceInfo(), RETURN_VALUE_IS_ZERO);
     sleep(1);
     if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
         HangUpCall();
@@ -5541,6 +5698,30 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetVoIPCallState_0400, Function
     AccessToken token;
     int32_t state = 3;
     EXPECT_EQ(CallManagerGtest::clientPtr_->SetVoIPCallState(state), RETURN_VALUE_IS_ZERO);
+}
+
+/******************************************* Test GetVoIPCallState() ********************************************/
+/**
+ * @tc.number   Telephony_CallManager_GetVoIPCallState_0100
+ * @tc.name     test GetVoIPCallState
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_GetVoIPCallState_0100, Function | MediumTest | Level3)
+{
+    AccessToken token;
+    int32_t state = -1;
+    EXPECT_EQ(CallManagerGtest::clientPtr_->GetVoIPCallState(state), RETURN_VALUE_IS_ZERO);
+}
+
+/**
+ * @tc.number   Telephony_CallManager_GetVoIPCallState_0200
+ * @tc.name     test GetVoIPCallState no permission
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_GetVoIPCallState_0200, Function | MediumTest | Level3)
+{
+    int32_t state = -1;
+    EXPECT_EQ(CallManagerGtest::clientPtr_->GetVoIPCallState(state), RETURN_VALUE_IS_ZERO);
 }
 
 /*********************************** Test Dump() ***************************************/

@@ -272,6 +272,10 @@ void CallRequestProcess::HoldOrDisconnectedCall(int32_t callId, int32_t slotId, 
     if (noOtherCall) {
         TELEPHONY_LOGI("no Other Slot Call");
         sptr<CallBase> call = GetOneCallObject(callId);
+        if (call == nullptr) {
+            TELEPHONY_LOGE("call is nullptr");
+            return;
+        }
         int32_t ret = call->AnswerCall(videoState);
         call->SetAutoAnswerState(false);
         if (ret != TELEPHONY_SUCCESS) {
@@ -286,7 +290,7 @@ void CallRequestProcess::HoldOrDisconnectedCall(int32_t callId, int32_t slotId, 
     int32_t callNum = 4;
     for (int32_t otherCallId : callIdList) {
         sptr<CallBase> call = GetOneCallObject(otherCallId);
-        if (call != nullptr && call != incomingCall) {
+        if (call != nullptr && incomingCall != nullptr && call != incomingCall) {
             if (HandleDsdaIncomingCall(call, activeCallNum, slotId, videoState, incomingCall)) {
                 continue;
             }

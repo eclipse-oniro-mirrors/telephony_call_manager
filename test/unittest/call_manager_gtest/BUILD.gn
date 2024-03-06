@@ -40,6 +40,8 @@ ohos_unittest("tel_call_manager_gtest") {
     "${CALL_MANAGER_PATH}/services/call_setting/include",
     "${CALL_MANAGER_PATH}/services/call/call_state_observer/include",
     "${CALL_MANAGER_PATH}/services/call/include",
+    "${CALL_MANAGER_PATH}/services/distributed_call/include",
+    "${CALL_MANAGER_PATH}/services/distributed_call/include/dcall",
     "${CALL_MANAGER_PATH}/services/telephony_interaction/include",
     "${CALL_MANAGER_PATH}/services/video/include",
     "${CALL_MANAGER_PATH}/test/unittest/call_manager_gtest/include",
