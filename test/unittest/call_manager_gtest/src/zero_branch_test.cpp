@@ -228,7 +228,7 @@ HWTEST_F(BranchTest, Telephony_CallRequestProcess_002, Function | MediumTest | L
     bool flagForConference = false;
     callRequestProcess->HandleCallWaitingNumZero(incomingCall, call, SIM1_SLOTID, 1, flagForConference);
     callRequestProcess->HandleCallWaitingNumZero(incomingCall, voipCall, SIM1_SLOTID, 2, flagForConference);
-    callRequestProcess->HandleCallWaitingNumZero(incomingCall, dialCall, SIM1_SLOTID, 3, flagForConference);
+    callRequestProcess->HandleCallWaitingNumZero(incomingCall, dialCall, SIM1_SLOTID, 2, flagForConference);
     callRequestProcess->DisconnectOtherCallForVideoCall(VALID_CALLID);
 }
 
@@ -240,11 +240,10 @@ HWTEST_F(BranchTest, Telephony_CallRequestProcess_002, Function | MediumTest | L
 HWTEST_F(BranchTest, Telephony_CallRequestProcess_003, Function | MediumTest | Level1)
 {
     std::unique_ptr<CallRequestProcess> callRequestProcess = std::make_unique<CallRequestProcess>();
-    callRequestProcess->HoldOrDisconnectedCall(VALID_CALLID, SIM1_SLOTID, 1);
     DialParaInfo mDialParaInfo;
     sptr<CallBase> call = nullptr;
     callRequestProcess->DeleteOneCallObject(call);
-    call = new CSCall(mDialParaInfo)
+    call = new CSCall(mDialParaInfo);
     call->SetCallId(VALID_CALLID);
     call->SetCallType(CallType::TYPE_VOIP);
     call->SetTelCallState(TelCallState::CALL_STATUS_INCOMING);
@@ -257,10 +256,9 @@ HWTEST_F(BranchTest, Telephony_CallRequestProcess_003, Function | MediumTest | L
     dialCall->SetCallType(CallType::TYPE_VOIP);
     dialCall->SetTelCallState(TelCallState::CALL_STATUS_DIALING);
     dialCall->SetCallRunningState(CallRunningState::CALL_RUNNING_STATE_DIALING);
-    allRequestProcess->AddOneCallObject(dialCall);
+    callRequestProcess->AddOneCallObject(dialCall);
     callRequestProcess->DisconnectOtherSubIdCall(VALID_CALLID, SIM1_SLOTID,
         static_cast<int>(VideoStateType::TYPE_VIDEO));
-    callRequestProcess->DisconnectOtherCallForVideoCall(VALID_CALLID, static_cast<int>(VideoStateType::TYPE_VIDEO));
     callRequestProcess->DisconnectOtherCallForVideoCall(VALID_CALLID);
     callRequestProcess->DisconnectOtherCallForVideoCall(ERROR_CALLID);
     std::string content = "";
@@ -272,10 +270,10 @@ HWTEST_F(BranchTest, Telephony_CallRequestProcess_003, Function | MediumTest | L
     callRequestProcess->SeparateConferenceRequest(VALID_CALLID);
     callRequestProcess->KickOutFromConferenceRequest(VALID_CALLID);
     std::u16string msg = u"";
-    callRequestProcess->StartRttRequest(VALID_CALLID,, msg);
-    callRequestProcess->StartRttRequest(2,, msg);
-    callRequestProcess->StopRttRequest(VALID_CALLID,, msg);
-    callRequestProcess->StopRttRequest(2,, msg);
+    callRequestProcess->StartRttRequest(VALID_CALLID, msg);
+    callRequestProcess->StartRttRequest(2, msg);
+    callRequestProcess->StopRttRequest(VALID_CALLID);
+    callRequestProcess->StopRttRequest(2);
     std::vector<std::string> numberList;
     callRequestProcess->JoinConference(VALID_CALLID, numberList);
     callRequestProcess->JoinConference(2, numberList);
@@ -305,14 +303,15 @@ HWTEST_F(BranchTest, Telephony_CallObjectManager_001, Function | MediumTest | Le
     CallObjectManager::HasRingingMaximum();
     csCall->SetCallRunningState(CallRunningState::CALL_RUNNING_STATE_RINGING);
     CallObjectManager::HasRingingMaximum();
+    CallObjectManager::HasDialingMaximum();
     csCall->SetCallRunningState(CallRunningState::CALL_RUNNING_STATE_ACTIVE);
-    CallObjectManager::HasRingingMaximum();
+    CallObjectManager::HasDialingMaximum();
     std::string number = "";
     CallObjectManager::IsCallExist(number);
     number = "test";
     CallObjectManager::IsCallExist(number);
     CallObjectManager::HasVideoCall();
-    csCall::SetVideoStateType(VideoStateType::TYPE_VIDEO);
+    csCall->SetVideoStateType(VideoStateType::TYPE_VIDEO);
     CallObjectManager::HasVideoCall();
     csCall->SetCallType(CallType::TYPE_VOIP);
     CallObjectManager::HasVideoCall();
@@ -2553,22 +2552,6 @@ HWTEST_F(BranchTest, Telephony_CallRequestEventHandlerHelper_001, Function | Med
 }
 
 /**
- * @tc.number   Telephony_CallRequestEventHandlerHelper_001
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
-HWTEST_F(BranchTest, Telephony_CallRequestEventHandlerHelper_001, Function | MediumTest | Level3)
-{
-    bool flag = true;
-    DelayedSingleton<CallRequestEventHandlerHelper>::GetInstance()->RestoreDialingFlag(flag);
-    ASSERT_EQ(DelayedSingleton<CallRequestEventHandlerHelper>::GetInstance()->SetDialingCallProcessing(),
-        TELEPHONY_ERR_SUCCESS);
-    DelayedSingleton<CallRequestEventHandlerHelper>::GetInstance()->RestoreDialingFlag(false);
-    EXPECT_EQ(DelayedSingleton<CallRequestEventHandlerHelper>::GetInstance()->IsDialingCallProcessing(),
-        true);
-}
-
-/**
  * @tc.number   Telephony_DistributedCallManager_001
  * @tc.name     test error branch
  * @tc.desc     Function test
@@ -2606,7 +2589,7 @@ HWTEST_F(BranchTest, Telephony_DistributedCallManager_001, Function | MediumTest
     std::unique_ptr<AudioDevice> deviceRarpiecePtr = std::make_unique<AudioDevice>();
     deviceRarpiecePtr->deviceType = AudioDeviceType::DEVICE_EARPIECE;
     manager.SwitchToDistributedCallDevice(std::move(deviceRarpiecePtr));
-    managr.OnDCallSystemAbilityAdded(TEST_STR);
+    manager.OnDCallSystemAbilityAdded(TEST_STR);
 }
 
 /**

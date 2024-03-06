@@ -347,9 +347,8 @@ HWTEST_F(CallStateTest, Telephony_AudioControlManager_001, Function | MediumTest
     audioControl->HandlePriorState(call, TelCallState::CALL_STATUS_ALERTING);
     audioControl->HandlePriorState(call, TelCallState::CALL_STATUS_INCOMING);
     audioControl->HandlePriorState(call, TelCallState::CALL_STATUS_WAITING);
-    audioControl->HandlePriorState(call, TelCallState::CALL_STATUS_ALERTING);
     audioControl->HandlePriorState(call, TelCallState::CALL_STATUS_HOLDING);
-    audioControl->SetCallRunningState(CallRunningState::CALL_RUNNING_STATE_ACTIVE);
+    call->SetCallRunningState(CallRunningState::CALL_RUNNING_STATE_ACTIVE);
     audioControl->HandlePriorState(call, TelCallState::CALL_STATUS_INCOMING);
     audioControl->HandlePriorState(call, TelCallState::CALL_STATUS_WAITING);
     audioControl->UpdateForegroundLiveCall();
@@ -452,7 +451,7 @@ HWTEST_F(CallStateTest, Telephony_AudioDeviceManager_001, Function | MediumTest 
     audioDeviceManager->RemoveAudioDeviceList(NAME, AudioDeviceType::DEVICE_BLUETOOTH_SCO);
     audioDeviceManager->ResetBtAudioDevicesList();
     audioDeviceManager->ResetDistributedCallDevicesList();
-    audioDeviceManager->ProcessEvent(AudioEvent::WIRED_HEADSET_CONNECTED);
+    audioDeviceManager->ProcessEvent(AudioEvent::WIRED_HEADSET_DISCONNECTED);
     audioDeviceManager->SwitchDevice(AUDIO_DEACTIVATED);
     audioDeviceManager->EnableBtSco();
     audioDeviceManager->EnableDistributedCall();
@@ -501,7 +500,6 @@ HWTEST_F(CallStateTest, Telephony_AudioSceneProcessor_001, Function | MediumTest
     audioSceneProcessor->SwitchState(CallStateType::HOLDING_STATE);
     audioSceneProcessor->SwitchState(CallStateType::UNKNOWN_STATE);
     audioSceneProcessor->SwitchState(CallStateType::INACTIVE_STATE);
-    audioSceneProcessor->SwitchState(CallStateType::DIALING_STATE);
     ASSERT_TRUE(audioSceneProcessor->SwitchIncoming());
 }
 
