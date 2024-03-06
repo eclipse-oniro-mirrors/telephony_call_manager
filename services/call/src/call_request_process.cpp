@@ -59,7 +59,7 @@ int32_t CallRequestProcess::DialRequest()
         DelayedSingleton<CoreServiceConnection>::GetInstance()->IsFdnEnabled(info.accountId)) {
         std::vector<std::u16string> fdnNumberList =
             DelayedSingleton<CoreServiceConnection>::GetInstance()->GetFdnNumberList(info.accountId);
-        if (!fdnNumberList.empty() && !IsFdnNumber(fdnNumberList, info.number)) {
+        if (fdnNumberList.empty() || !IsFdnNumber(fdnNumberList, info.number)) {
             CallEventInfo eventInfo;
             (void)memset_s(eventInfo.phoneNum, kMaxNumberLen, 0, kMaxNumberLen);
             eventInfo.eventId = CallAbilityEventId::EVENT_INVALID_FDN_NUMBER;
