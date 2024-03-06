@@ -298,7 +298,6 @@ void AudioControlManager::HandlePriorState(sptr<CallBase> &callObjectPtr, TelCal
             break;
         case TelCallState::CALL_STATUS_INCOMING:
         case TelCallState::CALL_STATUS_WAITING:
-            StopSoundtone();
             ProcessAudioWhenCallActive(callObjectPtr);
             event = AudioEvent::NO_MORE_INCOMING_CALL;
             break;
@@ -329,6 +328,7 @@ void AudioControlManager::ProcessAudioWhenCallActive(sptr<CallBase> &callObjectP
             DelayedSingleton<AudioProxy>::GetInstance()->StopVibrator();
             isCrsVibrating_ = false;
         }
+        StopSoundtone();
         PlaySoundtone();
         UpdateDeviceTypeForVideoCall();
     }
