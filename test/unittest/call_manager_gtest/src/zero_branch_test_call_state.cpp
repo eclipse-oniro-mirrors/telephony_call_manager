@@ -328,6 +328,7 @@ HWTEST_F(CallStateTest, Telephony_AudioControlManager_001, Function | MediumTest
     auto audioControl = DelayedSingleton<AudioControlManager>::GetInstance();
     audioControl->VideoStateUpdated(callObjectPtr, VideoStateType::TYPE_VOICE, VideoStateType::TYPE_VIDEO);
     callObjectPtr = new IMSCall(mDialParaInfo);
+    callObjectPtr->SetCallType(CallType::TYPE_IMS);
     audioControl->VideoStateUpdated(callObjectPtr, VideoStateType::TYPE_VOICE, VideoStateType::TYPE_VIDEO);
     callObjectPtr->SetCrsType(2);
     audioControl->VideoStateUpdated(callObjectPtr, VideoStateType::TYPE_VOICE, VideoStateType::TYPE_VIDEO);
@@ -339,6 +340,7 @@ HWTEST_F(CallStateTest, Telephony_AudioControlManager_001, Function | MediumTest
     audioControl->IncomingCallHungUp(call, false, "");
     audioControl->CallStateUpdated(call, TelCallState::CALL_STATUS_DIALING, TelCallState::CALL_STATUS_ALERTING);
     call = new VoIPCall(mDialParaInfo);
+    call->SetCallType(CallType::TYPE_VOIP);
     audioControl->CallStateUpdated(call, TelCallState::CALL_STATUS_DIALING, TelCallState::CALL_STATUS_ALERTING);
     audioControl->HandleCallStateUpdated(call, TelCallState::CALL_STATUS_DIALING, TelCallState::CALL_STATUS_ANSWERED);
     audioControl->HandleNextState(call, TelCallState::CALL_STATUS_ALERTING);

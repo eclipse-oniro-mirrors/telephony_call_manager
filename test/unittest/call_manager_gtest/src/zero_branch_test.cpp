@@ -202,6 +202,7 @@ HWTEST_F(BranchTest, Telephony_CallRequestProcess_002, Function | MediumTest | L
     callRequestProcess->NeedAnswerVOAndEndActiveVT(VALID_CALLID, static_cast<int>(VideoStateType::TYPE_VIDEO));
     sptr<CallBase> voipCall = new VoIPCall(mDialParaInfo);
     voipCall->SetCallId(VALID_CALLID);
+    voipCall->SetCallType(CallType::TYPE_VOIP);
     voipCall->SetTelCallState(TelCallState::CALL_STATUS_HOLDING);
     voipCall->SetCallRunningState(CallRunningState::CALL_RUNNING_STATE_HOLD);
     callRequestProcess->AddOneCallObject(voipCall);
@@ -213,7 +214,7 @@ HWTEST_F(BranchTest, Telephony_CallRequestProcess_002, Function | MediumTest | L
     callRequestProcess->GetOtherRingingCall(ERROR_CALLID);
     callRequestProcess->HoldOrDisconnectedCall(VALID_CALLID, SIM1_SLOTID,
         static_cast<int>(VideoStateType::TYPE_VIDEO));
-    callRequestProcess->HoldOrDisconnectedCall(VALID_CALLID, SIM1_SLOTID, 
+    callRequestProcess->HoldOrDisconnectedCall(VALID_CALLID, SIM1_SLOTID,
         static_cast<int>(VideoStateType::TYPE_VOICE));
     std::list<int32_t> list = {1, 2, -1, 0};
     bool noOtherCall = false;
@@ -225,6 +226,7 @@ HWTEST_F(BranchTest, Telephony_CallRequestProcess_002, Function | MediumTest | L
     dialCall->SetCallRunningState(CallRunningState::CALL_RUNNING_STATE_DIALING);
     callRequestProcess->AddOneCallObject(dialCall);
     sptr<CallBase> incomingCall = new CSCall(mDialParaInfo);
+    incomingCall->SetCallType(CallType::TYPE_CS);
     bool flagForConference = false;
     callRequestProcess->HandleCallWaitingNumZero(incomingCall, call, SIM1_SLOTID, 1, flagForConference);
     callRequestProcess->HandleCallWaitingNumZero(incomingCall, voipCall, SIM1_SLOTID, 2, flagForConference);
@@ -293,6 +295,7 @@ HWTEST_F(BranchTest, Telephony_CallObjectManager_001, Function | MediumTest | Le
     CallObjectManager::HasNewCall();
     DialParaInfo mDialParaInfo;
     sptr<CallBase> csCall = new CSCall(mDialParaInfo);
+    csCall->SetCallType(CallType::TYPE_CS);
     csCall->SetCallRunningState(CallRunningState::CALL_RUNNING_STATE_DIALING);
     CallObjectManager::AddOneCallObject(csCall);
     CallObjectManager::HasNewCall();
@@ -540,6 +543,142 @@ HWTEST_F(BranchTest, Telephony_CallPolicy_002, Function | MediumTest | Level1)
     ASSERT_EQ(mCallPolicy.SetImsFeatureValuePolicy(0), TELEPHONY_ERR_SUCCESS);
     std::vector<std::string> numberList = {};
     ASSERT_NE(mCallPolicy.InviteToConferencePolicy(0, numberList), TELEPHONY_ERR_SUCCESS);
+}
+
+/**
+ * @tc.number   Telephony_CallPolicy_003
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_CallPolicy_003, Function | MediumTest | Level1)
+{
+    CallPolicy callPolicy;
+    AppExecFwk::PacMap videoExtras;
+    videoExtras.PutIntValue("videoState", static_cast<int>(VideoStateType::TYPE_VIDEO));
+    callPolicy.CanDialMulityCall(videoExtras);
+    AppExecFwk::PacMap voiceExtras;
+    voiceExtras.PutIntValue("videoState", static_cast<int>(VideoStateType::TYPE_VOICE));
+    callPolicy.CanDialMulityCall(voiceExtras);
+    DialParaInfo info;
+    sptr<CallBase> call = new CSCall(info);
+    call->SetCallType(CallType::TYPE_CS);
+    call->SetCallRunningState(CallRunningState::CALL_RUNNING_STATE_RINGING);
+    callPolicy.AddOneCallObject(call);
+    callPolicy.IsVoiceCallValid(VideoStateType::TYPE_VIDEO);
+    callPolicy.IsVoiceCallValid(VideoStateType::TYPE_VOICE);
+    call->SetVideoStateType(VideoStateType::TYPE_VIDEO);
+    callPolicy.IsVoiceCallValid(VideoStateType::TYPE_VOICE);
+    call->SetCallType(CallType::TYPE_VOIP);
+    callPolicy.IsVoiceCallValid(VideoStateType::TYPE_VOICE);
+    call->SetVideoStateType(VideoStateType::TYPE_VOICE);
+    call->SetCallType(CallType::TYPE_CS);
+    callPolicy.IsVoiceCallValid(VideoStateType::TYPE_VOICE);
+    callPolicy.IsValidCallType(CallType::TYPE_CS);
+    callPolicy.IsValidCallType(CallType::TYPE_IMS);
+    callPolicy.IsValidCallType(CallType::TYPE_OTT);
+    callPolicy.IsValidCallType(CallType::TYPE_SATELLITE);
+    callPolicy.IsValidCallType(CallType::TYPE_VOIP);
+    callPolicy.CanDialMulityCall(videoExtras);
+    callPolicy.CanDialMulityCall(voiceExtras);
+    call->SetVideoStateType(VideoStateType::TYPE_VIDEO);
+    callPolicy.CanDialMulityCall(videoExtras);
+    callPolicy.CanDialMulityCall(voiceExtras);
+    call->SetCallId(VALID_CALLID);
+    call->SetTelCallState(TelCallState::CALL_STATUS_DIALING);
+    callPolicy.RejectCallPolicy(VALID_CALLID);
+    callPolicy.AnswerCallPolicy(VALID_CALLID, static_cast<int>(VideoStateType::TYPE_VOICE));
+    callPolicy.AnswerCallPolicy(VALID_CALLID, static_cast<int>(VideoStateType::TYPE_VIDEO));
+    call->SetTelCallState(TelCallState::CALL_STATUS_INCOMING);
+    callPolicy.RejectCallPolicy(VALID_CALLID);
+    callPolicy.AnswerCallPolicy(VALID_CALLID, static_cast<int>(VideoStateType::TYPE_VOICE));
+    callPolicy.AnswerCallPolicy(VALID_CALLID, static_cast<int>(VideoStateType::TYPE_VIDEO));
+    call->SetTelCallState(TelCallState::CALL_STATUS_WAITING);
+    callPolicy.RejectCallPolicy(VALID_CALLID);
+    callPolicy.AnswerCallPolicy(VALID_CALLID, static_cast<int>(VideoStateType::TYPE_VOICE));
+    callPolicy.AnswerCallPolicy(VALID_CALLID, static_cast<int>(VideoStateType::TYPE_VIDEO));
+    ASSERT_GE(callPolicy.RejectCallPolicy(VALID_CALLID), TELEPHONY_ERR_SUCCESS);
+}
+
+/**
+ * @tc.number   Telephony_CallPolicy_004
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_CallPolicy_004, Function | MediumTest | Level1)
+{
+    CallPolicy callPolicy;
+    DialParaInfo info;
+    sptr<CallBase> call = new CSCall(info);
+    call->SetCallType(CallType::TYPE_CS);
+    call->SetCallRunningState(CallRunningState::CALL_RUNNING_STATE_ACTIVE);
+    call->SetCallId(VALID_CALLID);
+    callPolicy.AddOneCallObject(call);
+    callPolicy.HoldCallPolicy(VALID_CALLID);
+    callPolicy.UnHoldCallPolicy(VALID_CALLID);
+    call->SetCallRunningState(CallRunningState::CALL_RUNNING_STATE_HOLD);
+    callPolicy.HoldCallPolicy(VALID_CALLID);
+    callPolicy.UnHoldCallPolicy(VALID_CALLID);
+    call->SetTelCallState(TelCallState::CALL_STATUS_IDLE);
+    callPolicy.HangUpPolicy(VALID_CALLID);
+    call->SetTelCallState(TelCallState::CALL_STATUS_DISCONNECTING);
+    callPolicy.HangUpPolicy(VALID_CALLID);
+    call->SetTelCallState(TelCallState::CALL_STATUS_DISCONNECTED);
+    callPolicy.HangUpPolicy(VALID_CALLID);
+    callPolicy.SwitchCallPolicy(VALID_CALLID);
+    sptr<CallBase> imsCall = new IMSCall(info);
+    imsCall->SetCallType(CallType::TYPE_IMS);
+    imsCall->SetCallId(2);
+    callPolicy.AddOneCallObject(imsCall);
+    imsCall->SetTelCallState(TelCallState::CALL_STATUS_DIALING);
+    ASSERT_EQ(callPolicy.SwitchCallPolicy(VALID_CALLID), CALL_ERR_ILLEGAL_CALL_OPERATION);
+    imsCall->SetTelCallState(TelCallState::CALL_STATUS_ALERTING);
+    ASSERT_EQ(callPolicy.SwitchCallPolicy(VALID_CALLID), CALL_ERR_ILLEGAL_CALL_OPERATION);
+    call->SetTelCallState(TelCallState::CALL_STATUS_HOLDING);
+    ASSERT_EQ(callPolicy.SwitchCallPolicy(VALID_CALLID), CALL_ERR_ILLEGAL_CALL_OPERATION);
+    imsCall->SetTelCallState(TelCallState::CALL_STATUS_ACTIVE);
+    ASSERT_EQ(callPolicy.SwitchCallPolicy(VALID_CALLID), TELEPHONY_ERR_SUCCESS);
+    callPolicy.VideoCallPolicy(VALID_CALLID);
+    callPolicy.StartRttPolicy(VALID_CALLID);
+    callPolicy.StartRttPolicy(2);
+    callPolicy.StopRttPolicy(VALID_CALLID);
+    callPolicy.StopRttPolicy(2);
+    call->SetTelCallState(TelCallState::CALL_STATUS_ACTIVE);
+    callPolicy.StartRttPolicy(VALID_CALLID);
+    callPolicy.StopRttPolicy(VALID_CALLID);
+    std::vector<std::string> numberList;
+    callPolicy.InviteToConferencePolicy(VALID_CALLID, numberList);
+    numberList.push_back("");
+    numberList.push_back("123");
+    numberList.push_back(
+        "19119080646435437102938190283912471651865851478647016881846814376871464810514786470168818468143768714648");
+    ASSERT_GE(callPolicy.InviteToConferencePolicy(VALID_CALLID, numberList), TELEPHONY_ERR_SUCCESS);
+}
+
+/**
+ * @tc.number   Telephony_CallPolicy_005
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_CallPolicy_005, Function | MediumTest | Level1)
+{
+    CallPolicy callPolicy;
+    ASSERT_EQ(callPolicy.IsValidSlotId(INVALID_SLOTID), CALL_ERR_INVALID_SLOT_ID);
+    ASSERT_EQ(callPolicy.EnableVoLtePolicy(INVALID_SLOTID), CALL_ERR_INVALID_SLOT_ID);
+    ASSERT_EQ(callPolicy.DisableVoLtePolicy(INVALID_SLOTID), CALL_ERR_INVALID_SLOT_ID);
+    ASSERT_EQ(callPolicy.IsVoLteEnabledPolicy(INVALID_SLOTID), CALL_ERR_INVALID_SLOT_ID);
+    ASSERT_EQ(callPolicy.VoNRStatePolicy(INVALID_SLOTID, -1), CALL_ERR_INVALID_SLOT_ID);
+    ASSERT_EQ(callPolicy.GetCallWaitingPolicy(INVALID_SLOTID), CALL_ERR_INVALID_SLOT_ID);
+    ASSERT_EQ(callPolicy.SetCallWaitingPolicy(INVALID_SLOTID), CALL_ERR_INVALID_SLOT_ID);
+    ASSERT_EQ(callPolicy.GetCallRestrictionPolicy(INVALID_SLOTID), CALL_ERR_INVALID_SLOT_ID);
+    ASSERT_EQ(callPolicy.SetCallRestrictionPolicy(INVALID_SLOTID), CALL_ERR_INVALID_SLOT_ID);
+    ASSERT_EQ(callPolicy.GetCallTransferInfoPolicy(INVALID_SLOTID), CALL_ERR_INVALID_SLOT_ID);
+    ASSERT_EQ(callPolicy.SetCallTransferInfoPolicy(INVALID_SLOTID), CALL_ERR_INVALID_SLOT_ID);
+    ASSERT_EQ(callPolicy.SetCallPreferenceModePolicy(INVALID_SLOTID), CALL_ERR_INVALID_SLOT_ID);
+    ASSERT_EQ(callPolicy.GetImsConfigPolicy(INVALID_SLOTID), CALL_ERR_INVALID_SLOT_ID);
+    ASSERT_EQ(callPolicy.SetImsConfigPolicy(INVALID_SLOTID), CALL_ERR_INVALID_SLOT_ID);
+    ASSERT_EQ(callPolicy.GetImsFeatureValuePolicy(INVALID_SLOTID), CALL_ERR_INVALID_SLOT_ID);
+    ASSERT_EQ(callPolicy.SetImsFeatureValuePolicy(INVALID_SLOTID), CALL_ERR_INVALID_SLOT_ID);
+    ASSERT_EQ(callPolicy.CloseUnFinishedUssdPolicy(INVALID_SLOTID), CALL_ERR_INVALID_SLOT_ID);
 }
 
 /**
