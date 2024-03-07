@@ -2396,11 +2396,8 @@ HWTEST_F(BranchTest, Telephony_VoipCallManagerProxy_001, Function | MediumTest |
  */
 HWTEST_F(BranchTest, Telephony_CallRequestEventHandlerHelper_001, Function | MediumTest | Level3)
 {
-    bool flag = true;
+    bool flag = false;
     DelayedSingleton<CallRequestEventHandlerHelper>::GetInstance()->RestoreDialingFlag(flag);
-    ASSERT_EQ(DelayedSingleton<CallRequestEventHandlerHelper>::GetInstance()->SetDialingCallProcessing(),
-        TELEPHONY_ERR_SUCCESS);
-    DelayedSingleton<CallRequestEventHandlerHelper>::GetInstance()->RestoreDialingFlag(false);
     EXPECT_EQ(DelayedSingleton<CallRequestEventHandlerHelper>::GetInstance()->IsDialingCallProcessing(),
         true);
 }

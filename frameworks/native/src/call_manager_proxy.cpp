@@ -60,7 +60,7 @@ std::unique_ptr<CallManagerCallback> CallManagerProxy::GetCallBack()
 
 void CallManagerProxy::Init(int32_t systemAbilityId)
 {
-    std::lock_guard<std::mutex> lock(mutex_);
+    std::unique_lock<std::mutex> lock(mutex_);
     if (initStatus_) {
         TELEPHONY_LOGW("you have already initialized");
         return;
@@ -85,6 +85,7 @@ void CallManagerProxy::Init(int32_t systemAbilityId)
         return;
     }
 #endif
+    lock.unlock();
     int32_t result = ConnectService();
     if (result != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("connect service failed,errCode: %{public}d", result);
@@ -127,7 +128,6 @@ void CallManagerProxy::CallManagerProxySubcribed::OnReceiveEvent(const EventFwk:
 void CallManagerProxy::UnInit()
 {
     DisconnectService();
-    std::lock_guard<std::mutex> lock(mutex_);
     initStatus_ = false;
     TELEPHONY_LOGI("disconnect service\n");
 }
@@ -342,7 +342,7 @@ int32_t CallManagerProxy::DialCall(std::u16string number, AppExecFwk::PacMap &ex
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
+    Utils::UniqueWriteGuard<Utils::RWLock> guard(rwClientLock_);
     int32_t errCode = callManagerServicePtr_->DialCall(number, extras);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("DialCall failed, errcode:%{public}d", errCode);
@@ -357,7 +357,7 @@ int32_t CallManagerProxy::AnswerCall(int32_t callId, int32_t videoState)
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
+    Utils::UniqueWriteGuard<Utils::RWLock> guard(rwClientLock_);
     int32_t errCode = callManagerServicePtr_->AnswerCall(callId, videoState);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("AnswerCall failed, errcode:%{public}d", errCode);
@@ -372,7 +372,7 @@ int32_t CallManagerProxy::RejectCall(int32_t callId, bool isSendSms, std::u16str
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
+    Utils::UniqueWriteGuard<Utils::RWLock> guard(rwClientLock_);
     int32_t errCode = callManagerServicePtr_->RejectCall(callId, isSendSms, content);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("RejectCall failed, errcode:%{public}d", errCode);
@@ -387,7 +387,7 @@ int32_t CallManagerProxy::HangUpCall(int32_t callId)
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
+    Utils::UniqueWriteGuard<Utils::RWLock> guard(rwClientLock_);
     int32_t errCode = callManagerServicePtr_->HangUpCall(callId);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("HangUpCall failed, errcode:%{public}d", errCode);
@@ -402,7 +402,7 @@ int32_t CallManagerProxy::GetCallState()
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
+    Utils::UniqueWriteGuard<Utils::RWLock> guard(rwClientLock_);
     int32_t errCode = callManagerServicePtr_->GetCallState();
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("GetCallState failed, errcode:%{public}d", errCode);
@@ -417,7 +417,7 @@ int32_t CallManagerProxy::HoldCall(int32_t callId)
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
+    Utils::UniqueWriteGuard<Utils::RWLock> guard(rwClientLock_);
     int32_t errCode = callManagerServicePtr_->HoldCall(callId);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("HoldCall failed, errcode:%{public}d", errCode);
@@ -432,7 +432,7 @@ int32_t CallManagerProxy::UnHoldCall(int32_t callId)
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
+    Utils::UniqueWriteGuard<Utils::RWLock> guard(rwClientLock_);
     int32_t errCode = callManagerServicePtr_->UnHoldCall(callId);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("UnHoldCall failed, errcode:%{public}d", errCode);
@@ -447,7 +447,7 @@ int32_t CallManagerProxy::SwitchCall(int32_t callId)
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
+    Utils::UniqueWriteGuard<Utils::RWLock> guard(rwClientLock_);
     int32_t errCode = callManagerServicePtr_->SwitchCall(callId);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("SwitchCall failed, errcode:%{public}d", errCode);
@@ -462,7 +462,7 @@ int32_t CallManagerProxy::CombineConference(int32_t callId)
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
+    Utils::UniqueWriteGuard<Utils::RWLock> guard(rwClientLock_);
     int32_t errCode = callManagerServicePtr_->CombineConference(callId);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("CombineConference failed, errcode:%{public}d", errCode);
@@ -477,7 +477,7 @@ int32_t CallManagerProxy::SeparateConference(int32_t callId)
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
+    Utils::UniqueWriteGuard<Utils::RWLock> guard(rwClientLock_);
     int32_t errCode = callManagerServicePtr_->SeparateConference(callId);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("SeparateConference failed, errcode:%{public}d", errCode);
@@ -492,7 +492,7 @@ int32_t CallManagerProxy::KickOutFromConference(int32_t callId)
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
+    Utils::UniqueWriteGuard<Utils::RWLock> guard(rwClientLock_);
     int32_t errCode = callManagerServicePtr_->KickOutFromConference(callId);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("KickOutFromConference failed, errcode:%{public}d", errCode);
@@ -507,7 +507,7 @@ int32_t CallManagerProxy::GetMainCallId(int32_t &callId, int32_t &mainCallId)
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
+    Utils::UniqueWriteGuard<Utils::RWLock> guard(rwClientLock_);
     int32_t errCode = callManagerServicePtr_->GetMainCallId(callId, mainCallId);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("GetMainCallId failed, errcode:%{public}d", errCode);
@@ -522,7 +522,7 @@ int32_t CallManagerProxy::GetSubCallIdList(int32_t callId, std::vector<std::u16s
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
+    Utils::UniqueWriteGuard<Utils::RWLock> guard(rwClientLock_);
     int32_t errCode = callManagerServicePtr_->GetSubCallIdList(callId, callIdList);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("GetMainCallId failed, errcode:%{public}d", errCode);
@@ -537,7 +537,7 @@ int32_t CallManagerProxy::GetCallIdListForConference(int32_t callId, std::vector
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
+    Utils::UniqueWriteGuard<Utils::RWLock> guard(rwClientLock_);
     int32_t errCode = callManagerServicePtr_->GetCallIdListForConference(callId, callIdList);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("GetMainCallId failed, errcode:%{public}d", errCode);
@@ -552,7 +552,7 @@ int32_t CallManagerProxy::GetCallWaiting(int32_t slotId)
         TELEPHONY_LOGE("[slot%{public}d] ipc reconnect failed!", slotId);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
+    Utils::UniqueWriteGuard<Utils::RWLock> guard(rwClientLock_);
     int32_t errCode = callManagerServicePtr_->GetCallWaiting(slotId);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("[slot%{public}d] failed, errcode:%{public}d", slotId, errCode);
@@ -567,7 +567,7 @@ int32_t CallManagerProxy::SetCallWaiting(int32_t slotId, bool activate)
         TELEPHONY_LOGE("[slot%{public}d] ipc reconnect failed!", slotId);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
+    Utils::UniqueWriteGuard<Utils::RWLock> guard(rwClientLock_);
     int32_t errCode = callManagerServicePtr_->SetCallWaiting(slotId, activate);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("[slot%{public}d] failed, errcode:%{public}d", slotId, errCode);
@@ -582,7 +582,7 @@ int32_t CallManagerProxy::GetCallRestriction(int32_t slotId, CallRestrictionType
         TELEPHONY_LOGE("[slot%{public}d] ipc reconnect failed!", slotId);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
+    Utils::UniqueWriteGuard<Utils::RWLock> guard(rwClientLock_);
     int32_t errCode = callManagerServicePtr_->GetCallRestriction(slotId, type);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("[slot%{public}d] failed, errcode:%{public}d", slotId, errCode);
@@ -597,7 +597,7 @@ int32_t CallManagerProxy::SetCallRestriction(int32_t slotId, CallRestrictionInfo
         TELEPHONY_LOGE("[slot%{public}d] ipc reconnect failed!", slotId);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
+    Utils::UniqueWriteGuard<Utils::RWLock> guard(rwClientLock_);
     int32_t errCode = callManagerServicePtr_->SetCallRestriction(slotId, info);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("[slot%{public}d] failed, errcode:%{public}d", slotId, errCode);
@@ -613,7 +613,7 @@ int32_t CallManagerProxy::SetCallRestrictionPassword(
         TELEPHONY_LOGE("[slot%{public}d] ipc reconnect failed!", slotId);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
+    Utils::UniqueWriteGuard<Utils::RWLock> guard(rwClientLock_);
     int32_t errCode = callManagerServicePtr_->SetCallRestrictionPassword(slotId, fac, oldPassword, newPassword);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("[slot%{public}d] failed, errcode:%{public}d", slotId, errCode);
@@ -628,7 +628,7 @@ int32_t CallManagerProxy::GetCallTransferInfo(int32_t slotId, CallTransferType t
         TELEPHONY_LOGE("[slot%{public}d] ipc reconnect failed!", slotId);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
+    Utils::UniqueWriteGuard<Utils::RWLock> guard(rwClientLock_);
     int32_t errCode = callManagerServicePtr_->GetCallTransferInfo(slotId, type);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("[slot%{public}d] failed, errcode:%{public}d", slotId, errCode);
@@ -643,7 +643,7 @@ int32_t CallManagerProxy::SetCallTransferInfo(int32_t slotId, CallTransferInfo &
         TELEPHONY_LOGE("[slot%{public}d] ipc reconnect failed!", slotId);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
+    Utils::UniqueWriteGuard<Utils::RWLock> guard(rwClientLock_);
     int32_t errCode = callManagerServicePtr_->SetCallTransferInfo(slotId, info);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("[slot%{public}d] failed, errcode:%{public}d", slotId, errCode);
@@ -658,7 +658,7 @@ int32_t CallManagerProxy::CanSetCallTransferTime(int32_t slotId, bool &result)
         TELEPHONY_LOGE("[slot%{public}d] ipc reconnect failed!", slotId);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
+    Utils::UniqueWriteGuard<Utils::RWLock> guard(rwClientLock_);
     return callManagerServicePtr_->CanSetCallTransferTime(slotId, result);
 }
 
@@ -668,7 +668,7 @@ int32_t CallManagerProxy::SetCallPreferenceMode(int32_t slotId, int32_t mode)
         TELEPHONY_LOGE("[slot%{public}d] ipc reconnect failed!", slotId);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
+    Utils::UniqueWriteGuard<Utils::RWLock> guard(rwClientLock_);
     int32_t errCode = callManagerServicePtr_->SetCallPreferenceMode(slotId, mode);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("[slot%{public}d] failed, errcode:%{public}d", slotId, errCode);
@@ -683,7 +683,7 @@ int32_t CallManagerProxy::StartDtmf(int32_t callId, char str)
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
+    Utils::UniqueWriteGuard<Utils::RWLock> guard(rwClientLock_);
     int32_t errCode = callManagerServicePtr_->StartDtmf(callId, str);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("StartDtmf failed, errcode:%{public}d", errCode);
@@ -698,7 +698,7 @@ int32_t CallManagerProxy::StopDtmf(int32_t callId)
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
+    Utils::UniqueWriteGuard<Utils::RWLock> guard(rwClientLock_);
     int32_t errCode = callManagerServicePtr_->StopDtmf(callId);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("StopDtmf failed, errcode:%{public}d", errCode);
@@ -713,7 +713,7 @@ int32_t CallManagerProxy::PostDialProceed(int32_t callId, bool proceed)
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
+    Utils::UniqueWriteGuard<Utils::RWLock> guard(rwClientLock_);
     int32_t errCode = callManagerServicePtr_->PostDialProceed(callId, proceed);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("PostDialProceed failed, errcode:%{public}d", errCode);
@@ -728,7 +728,7 @@ int32_t CallManagerProxy::IsRinging(bool &enabled)
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
+    Utils::UniqueWriteGuard<Utils::RWLock> guard(rwClientLock_);
     return callManagerServicePtr_->IsRinging(enabled);
 }
 
@@ -738,7 +738,7 @@ bool CallManagerProxy::HasCall()
         TELEPHONY_LOGE("ipc reconnect failed!");
         return false;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
+    Utils::UniqueWriteGuard<Utils::RWLock> guard(rwClientLock_);
     return callManagerServicePtr_->HasCall();
 }
 
@@ -748,7 +748,7 @@ int32_t CallManagerProxy::IsNewCallAllowed(bool &enabled)
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
+    Utils::UniqueWriteGuard<Utils::RWLock> guard(rwClientLock_);
     return callManagerServicePtr_->IsNewCallAllowed(enabled);
 }
 
@@ -758,7 +758,7 @@ int32_t CallManagerProxy::IsInEmergencyCall(bool &enabled)
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
+    Utils::UniqueWriteGuard<Utils::RWLock> guard(rwClientLock_);
     return callManagerServicePtr_->IsInEmergencyCall(enabled);
 }
 
@@ -768,7 +768,7 @@ int32_t CallManagerProxy::IsEmergencyPhoneNumber(std::u16string &number, int32_t
         TELEPHONY_LOGE("[slot%{public}d] ipc reconnect failed!", slotId);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
+    Utils::UniqueWriteGuard<Utils::RWLock> guard(rwClientLock_);
     return callManagerServicePtr_->IsEmergencyPhoneNumber(number, slotId, enabled);
 }
 
@@ -779,7 +779,7 @@ int32_t CallManagerProxy::FormatPhoneNumber(
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
+    Utils::UniqueWriteGuard<Utils::RWLock> guard(rwClientLock_);
     int32_t errCode = callManagerServicePtr_->FormatPhoneNumber(number, countryCode, formatNumber);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("FormatPhoneNumber failed, errcode:%{public}d", errCode);
@@ -795,7 +795,7 @@ int32_t CallManagerProxy::FormatPhoneNumberToE164(
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
+    Utils::UniqueWriteGuard<Utils::RWLock> guard(rwClientLock_);
     int32_t errCode = callManagerServicePtr_->FormatPhoneNumberToE164(number, countryCode, formatNumber);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("FormatPhoneNumberToE164 failed, errcode:%{public}d", errCode);
@@ -810,7 +810,7 @@ int32_t CallManagerProxy::SetMuted(bool isMute)
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
+    Utils::UniqueWriteGuard<Utils::RWLock> guard(rwClientLock_);
     int32_t errCode = callManagerServicePtr_->SetMuted(isMute);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("SetMute failed, errcode:%{public}d", errCode);
@@ -825,7 +825,7 @@ int32_t CallManagerProxy::MuteRinger()
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
+    Utils::UniqueWriteGuard<Utils::RWLock> guard(rwClientLock_);
     int32_t errCode = callManagerServicePtr_->MuteRinger();
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("MuteRinger failed, errcode:%{public}d", errCode);
@@ -840,7 +840,7 @@ int32_t CallManagerProxy::SetAudioDevice(const AudioDevice &audioDevice)
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
+    Utils::UniqueWriteGuard<Utils::RWLock> guard(rwClientLock_);
     int32_t errCode = callManagerServicePtr_->SetAudioDevice(audioDevice);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("SetAudioDevice failed, errcode:%{public}d", errCode);
@@ -855,7 +855,7 @@ int32_t CallManagerProxy::ControlCamera(int32_t callId, std::u16string &cameraId
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
+    Utils::UniqueWriteGuard<Utils::RWLock> guard(rwClientLock_);
     int32_t errCode = callManagerServicePtr_->ControlCamera(callId, cameraId);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("ControlCamera failed, errcode:%{public}d", errCode);
@@ -870,7 +870,7 @@ int32_t CallManagerProxy::SetPreviewWindow(int32_t callId, std::string &surfaceI
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
+    Utils::UniqueWriteGuard<Utils::RWLock> guard(rwClientLock_);
     TELEPHONY_LOGI("surfaceId is %{public}s", surfaceId.c_str());
     int32_t errCode = TELEPHONY_SUCCESS;
     if (surfaceId.empty() || surfaceId[0] < '0' || surfaceId[0] > '9') {
@@ -899,7 +899,7 @@ int32_t CallManagerProxy::SetDisplayWindow(int32_t callId, std::string &surfaceI
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
+    Utils::UniqueWriteGuard<Utils::RWLock> guard(rwClientLock_);
     TELEPHONY_LOGI("surfaceId is %{public}s", surfaceId.c_str());
     int32_t errCode = TELEPHONY_SUCCESS;
     if (surfaceId.empty() || surfaceId[0] < '0' || surfaceId[0] > '9') {
@@ -928,7 +928,7 @@ int32_t CallManagerProxy::SetCameraZoom(float zoomRatio)
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
+    Utils::UniqueWriteGuard<Utils::RWLock> guard(rwClientLock_);
     int32_t errCode = callManagerServicePtr_->SetCameraZoom(zoomRatio);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("SetCameraZoom failed, errcode:%{public}d", errCode);
@@ -943,7 +943,7 @@ int32_t CallManagerProxy::SetPausePicture(int32_t callId, std::u16string &path)
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
+    Utils::UniqueWriteGuard<Utils::RWLock> guard(rwClientLock_);
     int32_t errCode = callManagerServicePtr_->SetPausePicture(callId, path);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("SetPausePicture failed, errcode:%{public}d", errCode);
@@ -958,7 +958,7 @@ int32_t CallManagerProxy::SetDeviceDirection(int32_t callId, int32_t rotation)
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
+    Utils::UniqueWriteGuard<Utils::RWLock> guard(rwClientLock_);
     int32_t errCode = callManagerServicePtr_->SetDeviceDirection(callId, rotation);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("SetDeviceDirection failed, errcode:%{public}d", errCode);
@@ -973,7 +973,7 @@ int32_t CallManagerProxy::GetImsConfig(int32_t slotId, ImsConfigItem item)
         TELEPHONY_LOGE("[slot%{public}d] ipc reconnect failed!", slotId);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
+    Utils::UniqueWriteGuard<Utils::RWLock> guard(rwClientLock_);
     int32_t errCode = callManagerServicePtr_->GetImsConfig(slotId, item);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("[slot%{public}d] failed, errcode:%{public}d", slotId, errCode);
@@ -988,7 +988,7 @@ int32_t CallManagerProxy::SetImsConfig(int32_t slotId, ImsConfigItem item, std::
         TELEPHONY_LOGE("[slot%{public}d] ipc reconnect failed!", slotId);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
+    Utils::UniqueWriteGuard<Utils::RWLock> guard(rwClientLock_);
     int32_t errCode = callManagerServicePtr_->SetImsConfig(slotId, item, value);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("[slot%{public}d] failed, errcode:%{public}d", slotId, errCode);
@@ -1003,7 +1003,7 @@ int32_t CallManagerProxy::GetImsFeatureValue(int32_t slotId, FeatureType type)
         TELEPHONY_LOGE("[slot%{public}d] ipc reconnect failed!", slotId);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
+    Utils::UniqueWriteGuard<Utils::RWLock> guard(rwClientLock_);
     int32_t errCode = callManagerServicePtr_->GetImsFeatureValue(slotId, type);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("[slot%{public}d] failed, errcode:%{public}d", slotId, errCode);
@@ -1018,7 +1018,7 @@ int32_t CallManagerProxy::SetImsFeatureValue(int32_t slotId, FeatureType type, i
         TELEPHONY_LOGE("[slot%{public}d] ipc reconnect failed!", slotId);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
+    Utils::UniqueWriteGuard<Utils::RWLock> guard(rwClientLock_);
     int32_t errCode = callManagerServicePtr_->SetImsFeatureValue(slotId, type, value);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("[slot%{public}d] failed, errcode:%{public}d", slotId, errCode);
@@ -1033,7 +1033,7 @@ int32_t CallManagerProxy::UpdateImsCallMode(int32_t callId, ImsCallMode mode)
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
+    Utils::UniqueWriteGuard<Utils::RWLock> guard(rwClientLock_);
     int32_t errCode = callManagerServicePtr_->UpdateImsCallMode(callId, mode);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("UpdateImsCallMode failed, errcode:%{public}d", errCode);
@@ -1048,7 +1048,7 @@ int32_t CallManagerProxy::EnableImsSwitch(int32_t slotId)
         TELEPHONY_LOGE("[slot%{public}d] ipc reconnect failed!", slotId);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
+    Utils::UniqueWriteGuard<Utils::RWLock> guard(rwClientLock_);
     int32_t errCode = callManagerServicePtr_->EnableImsSwitch(slotId);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("[slot%{public}d] failed, errcode:%{public}d", slotId, errCode);
@@ -1063,7 +1063,7 @@ int32_t CallManagerProxy::DisableImsSwitch(int32_t slotId)
         TELEPHONY_LOGE("[slot%{public}d] ipc reconnect failed!", slotId);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
+    Utils::UniqueWriteGuard<Utils::RWLock> guard(rwClientLock_);
     int32_t errCode = callManagerServicePtr_->DisableImsSwitch(slotId);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("[slot%{public}d] failed, errcode:%{public}d", slotId, errCode);
@@ -1078,7 +1078,7 @@ int32_t CallManagerProxy::IsImsSwitchEnabled(int32_t slotId, bool &enabled)
         TELEPHONY_LOGE("[slot%{public}d] ipc reconnect failed!", slotId);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
+    Utils::UniqueWriteGuard<Utils::RWLock> guard(rwClientLock_);
     int32_t errCode = callManagerServicePtr_->IsImsSwitchEnabled(slotId, enabled);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("[slot%{public}d] failed, errcode:%{public}d", slotId, errCode);
@@ -1093,7 +1093,7 @@ int32_t CallManagerProxy::SetVoNRState(int32_t slotId, int32_t state)
         TELEPHONY_LOGE("[slot%{public}d] ipc reconnect failed!", slotId);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
+    Utils::UniqueWriteGuard<Utils::RWLock> guard(rwClientLock_);
     int32_t errCode = callManagerServicePtr_->SetVoNRState(slotId, state);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("[slot%{public}d] failed, errcode:%{public}d", slotId, errCode);
@@ -1108,7 +1108,7 @@ int32_t CallManagerProxy::GetVoNRState(int32_t slotId, int32_t &state)
         TELEPHONY_LOGE("[slot%{public}d] ipc reconnect failed!", slotId);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
+    Utils::UniqueWriteGuard<Utils::RWLock> guard(rwClientLock_);
     int32_t errCode = callManagerServicePtr_->GetVoNRState(slotId, state);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("[slot%{public}d] failed, errcode:%{public}d", slotId, errCode);
@@ -1123,7 +1123,7 @@ int32_t CallManagerProxy::StartRtt(int32_t callId, std::u16string &msg)
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
+    Utils::UniqueWriteGuard<Utils::RWLock> guard(rwClientLock_);
     int32_t errCode = callManagerServicePtr_->StartRtt(callId, msg);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("StartRtt failed, errcode:%{public}d", errCode);
@@ -1138,7 +1138,7 @@ int32_t CallManagerProxy::StopRtt(int32_t callId)
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
+    Utils::UniqueWriteGuard<Utils::RWLock> guard(rwClientLock_);
     int32_t errCode = callManagerServicePtr_->StopRtt(callId);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("StopRtt failed, errcode:%{public}d", errCode);
@@ -1153,7 +1153,7 @@ int32_t CallManagerProxy::JoinConference(int32_t callId, std::vector<std::u16str
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
+    Utils::UniqueWriteGuard<Utils::RWLock> guard(rwClientLock_);
     int32_t errCode = callManagerServicePtr_->JoinConference(callId, numberList);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("JoinConference failed, errcode:%{public}d", errCode);
@@ -1168,7 +1168,7 @@ int32_t CallManagerProxy::ReportOttCallDetailsInfo(std::vector<OttCallDetailsInf
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
+    Utils::UniqueWriteGuard<Utils::RWLock> guard(rwClientLock_);
     int32_t errCode = callManagerServicePtr_->ReportOttCallDetailsInfo(ottVec);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("ReportOttCallInfo failed, errcode:%{public}d", errCode);
@@ -1183,7 +1183,7 @@ int32_t CallManagerProxy::ReportOttCallEventInfo(OttCallEventInfo &eventInfo)
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
+    Utils::UniqueWriteGuard<Utils::RWLock> guard(rwClientLock_);
     int32_t errCode = callManagerServicePtr_->ReportOttCallEventInfo(eventInfo);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("ReportOttCallEventInfo failed, errcode:%{public}d", errCode);
@@ -1198,7 +1198,7 @@ int32_t CallManagerProxy::CloseUnFinishedUssd(int32_t slotId)
         TELEPHONY_LOGE("[slot%{public}d] ipc reconnect failed!", slotId);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
+    Utils::UniqueWriteGuard<Utils::RWLock> guard(rwClientLock_);
     int32_t errCode = callManagerServicePtr_->CloseUnFinishedUssd(slotId);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("[slot%{public}d] failed, errcode:%{public}d", slotId, errCode);
@@ -1214,7 +1214,7 @@ int32_t CallManagerProxy::InputDialerSpecialCode(const std::string &specialCode)
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
 
-    std::lock_guard<std::mutex> lock(mutex_);
+    Utils::UniqueWriteGuard<Utils::RWLock> guard(rwClientLock_);
     int32_t errCode = callManagerServicePtr_->InputDialerSpecialCode(specialCode);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("InputDialerSpecialCode failed, errcode:%{public}d", errCode);
@@ -1229,8 +1229,7 @@ int32_t CallManagerProxy::RemoveMissedIncomingCallNotification()
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-
-    std::lock_guard<std::mutex> lock(mutex_);
+    Utils::UniqueWriteGuard<Utils::RWLock> guard(rwClientLock_);
     int32_t errCode = callManagerServicePtr_->RemoveMissedIncomingCallNotification();
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("RemoveMissedIncomingCallNotification failed, errcode:%{public}d", errCode);
@@ -1245,7 +1244,7 @@ int32_t CallManagerProxy::SetVoIPCallState(int32_t state)
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
+    Utils::UniqueWriteGuard<Utils::RWLock> guard(rwClientLock_);
     int32_t errCode = callManagerServicePtr_->SetVoIPCallState(state);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("failed, errcode:%{public}d", errCode);
@@ -1260,7 +1259,7 @@ int32_t CallManagerProxy::GetVoIPCallState(int32_t &state)
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
+    Utils::UniqueWriteGuard<Utils::RWLock> guard(rwClientLock_);
     int32_t errCode = callManagerServicePtr_->GetVoIPCallState(state);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("failed, errcode:%{public}d", errCode);
@@ -1275,7 +1274,7 @@ sptr<IRemoteObject> CallManagerProxy::GetProxyObjectPtr(CallManagerProxyType pro
         TELEPHONY_LOGE("ipc reconnect failed!");
         return nullptr;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
+    Utils::UniqueWriteGuard<Utils::RWLock> guard(rwClientLock_);
     sptr<IRemoteObject> ptr = callManagerServicePtr_->GetProxyObjectPtr(proxyType);
     if (ptr == nullptr) {
         TELEPHONY_LOGE("GetProxyObjectPtr failed");
@@ -1290,7 +1289,7 @@ void CallManagerProxy::OnRemoteDied(const wptr<IRemoteObject> &remote)
         TELEPHONY_LOGE("OnRemoteDied failed, remote is nullptr");
         return;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
+    Utils::UniqueWriteGuard<Utils::RWLock> guard(rwClientLock_);
     if (callManagerServicePtr_ == nullptr) {
         TELEPHONY_LOGE("OnRemoteDied failed, callManagerServicePtr_ is nullptr");
         return;
@@ -1310,7 +1309,7 @@ int32_t CallManagerProxy::ReportAudioDeviceInfo()
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
+    Utils::UniqueWriteGuard<Utils::RWLock> guard(rwClientLock_);
     int32_t errCode = callManagerServicePtr_->ReportAudioDeviceInfo();
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("ReportAudioDeviceInfo failed, errcode:%{public}d", errCode);
@@ -1325,7 +1324,7 @@ int32_t CallManagerProxy::CancelCallUpgrade(int32_t callId)
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
+    Utils::UniqueWriteGuard<Utils::RWLock> guard(rwClientLock_);
     int32_t errCode = callManagerServicePtr_->CancelCallUpgrade(callId);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("ReportAudioDeviceInfo failed, errcode:%{public}d", errCode);
@@ -1340,7 +1339,7 @@ int32_t CallManagerProxy::RequestCameraCapabilities(int32_t callId)
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
+    Utils::UniqueWriteGuard<Utils::RWLock> guard(rwClientLock_);
     int32_t errCode = callManagerServicePtr_->RequestCameraCapabilities(callId);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("ReportAudioDeviceInfo failed, errcode:%{public}d", errCode);
