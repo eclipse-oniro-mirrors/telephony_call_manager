@@ -63,6 +63,9 @@ ohos_fuzztest("CallNotificationFuzzTest") {
     "TELEPHONY_LOG_TAG = \"CallManagerFuzzTest\"",
     "LOG_DOMAIN = 0xD000F00",
   ]
+
+  defines += [ "ABILITY_POWER_SUPPORT" ]
+
   cflags = [
     "-g",
     "-O0",
