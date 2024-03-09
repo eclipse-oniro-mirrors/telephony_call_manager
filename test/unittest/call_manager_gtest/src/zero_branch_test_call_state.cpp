@@ -39,6 +39,7 @@
 #include "telephony_log_wrapper.h"
 #include "tone.h"
 #include "voip_call_connection.h"
+#include "voip_call.h"
 #include "wired_headset_device_state.h"
 #include "gtest/gtest.h"
 
@@ -47,6 +48,9 @@ namespace Telephony {
 using namespace testing::ext;
 constexpr int WAIT_TIME = 3;
 constexpr int DEFAULT_SLOT_ID = 0;
+constexpr int VALID_CALL_ID = 1;
+constexpr const char* NUMBER = "10086";
+constexpr const char* NAME = "test";
 
 class CallStateTest : public testing::Test {
 public:
@@ -320,13 +324,185 @@ HWTEST_F(CallStateTest, Telephony_AudioControlManager_001, Function | MediumTest
 {
     DialParaInfo mDialParaInfo;
     mDialParaInfo.accountId = 0;
-    sptr<OHOS::Telephony::CallBase> callObjectPtr = new IMSCall(mDialParaInfo);
+    sptr<OHOS::Telephony::CallBase> callObjectPtr = nullptr;
     auto audioControl = DelayedSingleton<AudioControlManager>::GetInstance();
+    audioControl->VideoStateUpdated(callObjectPtr, VideoStateType::TYPE_VOICE, VideoStateType::TYPE_VIDEO);
+    callObjectPtr = new IMSCall(mDialParaInfo);
+    callObjectPtr->SetCallType(CallType::TYPE_IMS);
+    audioControl->VideoStateUpdated(callObjectPtr, VideoStateType::TYPE_VOICE, VideoStateType::TYPE_VIDEO);
+    callObjectPtr->SetCrsType(2);
     audioControl->VideoStateUpdated(callObjectPtr, VideoStateType::TYPE_VOICE, VideoStateType::TYPE_VIDEO);
     audioControl->UpdateDeviceTypeForVideoCall();
     audioControl->MuteNetWorkRingTone();
     audioControl->IsBtOrWireHeadPlugin();
     ASSERT_TRUE(audioControl->IsVideoCall(VideoStateType::TYPE_RECEIVE_ONLY));
+    sptr<CallBase> call = nullptr;
+    audioControl->IncomingCallHungUp(call, false, "");
+    audioControl->CallStateUpdated(call, TelCallState::CALL_STATUS_DIALING, TelCallState::CALL_STATUS_ALERTING);
+    call = new VoIPCall(mDialParaInfo);
+    call->SetCallType(CallType::TYPE_VOIP);
+    audioControl->CallStateUpdated(call, TelCallState::CALL_STATUS_DIALING, TelCallState::CALL_STATUS_ALERTING);
+    audioControl->HandleCallStateUpdated(call, TelCallState::CALL_STATUS_DIALING, TelCallState::CALL_STATUS_ANSWERED);
+    audioControl->HandleNextState(call, TelCallState::CALL_STATUS_ALERTING);
+    audioControl->HandleNextState(call, TelCallState::CALL_STATUS_INCOMING);
+    audioControl->HandleNextState(call, TelCallState::CALL_STATUS_WAITING);
+    audioControl->HandlePriorState(call, TelCallState::CALL_STATUS_ALERTING);
+    audioControl->HandlePriorState(call, TelCallState::CALL_STATUS_INCOMING);
+    audioControl->HandlePriorState(call, TelCallState::CALL_STATUS_WAITING);
+    audioControl->HandlePriorState(call, TelCallState::CALL_STATUS_HOLDING);
+    call->SetCallRunningState(CallRunningState::CALL_RUNNING_STATE_ACTIVE);
+    audioControl->HandlePriorState(call, TelCallState::CALL_STATUS_INCOMING);
+    audioControl->HandlePriorState(call, TelCallState::CALL_STATUS_WAITING);
+    audioControl->UpdateForegroundLiveCall();
+    audioControl->ProcessAudioWhenCallActive(call);
+    std::string emptyNumber = "";
+    call->SetAccountNumber(emptyNumber);
+    audioControl->HandleNewActiveCall(call);
+    call->SetAccountNumber(NUMBER);
+    call->SetCallType(CallType::TYPE_CS);
+    audioControl->HandleNewActiveCall(call);
+    call->SetCallType(CallType::TYPE_SATELLITE);
+    audioControl->HandleNewActiveCall(call);
+    call->SetCallType(CallType::TYPE_ERR_CALL);
+    audioControl->HandleNewActiveCall(call);
+    ASSERT_FALSE(audioControl->GetCallList().empty());
+    ASSERT_TRUE(audioControl->GetCurrentActiveCall() == nullptr);
+}
+
+/**
+ * @tc.number   Telephony_AudioControlManager_002
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallStateTest, Telephony_AudioControlManager_002, Function | MediumTest | Level3)
+{
+    auto audioControl = DelayedSingleton<AudioControlManager>::GetInstance();
+    AudioDevice device;
+    device.deviceType = AudioDeviceType::DEVICE_DISTRIBUTED_PAD;
+    if (memset_s(device.address, kMaxAddressLen + 1, 0, kMaxAddressLen + 1) != EOK) {
+        return;
+    }
+    audioControl->SetAudioDevice(device);
+    device.deviceType = AudioDeviceType::DEVICE_DISTRIBUTED_PHONE;
+    audioControl->SetAudioDevice(device);
+    device.deviceType = AudioDeviceType::DEVICE_DISTRIBUTED_AUTOMOTIVE;
+    audioControl->SetAudioDevice(device);
+    device.deviceType = AudioDeviceType::DEVICE_BLUETOOTH_SCO;
+    audioControl->SetAudioDevice(device);
+    audioControl->PlayRingtone();
+    audioControl->PlaySoundtone();
+    audioControl->StopSoundtone();
+    audioControl->StopRingtone();
+    audioControl->GetInitAudioDeviceType();
+    audioControl->SetMute(false);
+    audioControl->MuteRinger();
+    audioControl->PlayCallEndedTone(TelCallState::CALL_STATUS_ACTIVE, TelCallState::CALL_STATUS_HOLDING,
+        CallEndedType::PHONE_IS_BUSY);
+    audioControl->PlayCallEndedTone(TelCallState::CALL_STATUS_ACTIVE, TelCallState::CALL_STATUS_DISCONNECTED,
+        CallEndedType::PHONE_IS_BUSY);
+    audioControl->PlayCallEndedTone(TelCallState::CALL_STATUS_DIALING, TelCallState::CALL_STATUS_DISCONNECTED,
+        CallEndedType::PHONE_IS_BUSY);
+    audioControl->PlayCallEndedTone(TelCallState::CALL_STATUS_HOLDING, TelCallState::CALL_STATUS_DISCONNECTED,
+        CallEndedType::PHONE_IS_BUSY);
+    audioControl->PlayCallEndedTone(TelCallState::CALL_STATUS_HOLDING, TelCallState::CALL_STATUS_DISCONNECTED,
+        CallEndedType::CALL_ENDED_NORMALLY);
+    audioControl->PlayCallEndedTone(TelCallState::CALL_STATUS_HOLDING, TelCallState::CALL_STATUS_DISCONNECTED,
+        CallEndedType::UNKNOWN);
+    audioControl->PlayCallEndedTone(TelCallState::CALL_STATUS_HOLDING, TelCallState::CALL_STATUS_DISCONNECTED,
+        CallEndedType::INVALID_NUMBER);
+    audioControl->PlayCallEndedTone(TelCallState::CALL_STATUS_HOLDING, TelCallState::CALL_STATUS_DISCONNECTED,
+        static_cast<CallEndedType>(5));
+    audioControl->GetCallBase(VALID_CALL_ID);
+    audioControl->IsEmergencyCallExists();
+    audioControl->SetToneState(ToneState::TONEING);
+    audioControl->IsNumberAllowed(NUMBER);
+    ASSERT_TRUE(audioControl->IsAudioActivated());
+}
+
+/**
+ * @tc.number   Telephony_AudioControlManager_003
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallStateTest, Telephony_AudioControlManager_003, Function | MediumTest | Level3)
+{
+    auto audioControl = DelayedSingleton<AudioControlManager>::GetInstance();
+    audioControl->IsTonePlaying();
+    audioControl->IsCurrentRinging();
+    audioControl->PlayRingback();
+    audioControl->StopWaitingTone();
+    audioControl->PlayDtmfTone('a');
+    audioControl->StopDtmfTone();
+    audioControl->OnPostDialNextChar('a');
+    audioControl->IsSoundPlaying();
+    ASSERT_TRUE(audioControl->IsVideoCall(VideoStateType::TYPE_VIDEO));
+}
+
+/**
+ * @tc.number   Telephony_AudioDeviceManager_001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallStateTest, Telephony_AudioDeviceManager_001, Function | MediumTest | Level3)
+{
+    auto audioDeviceManager = DelayedSingleton<AudioDeviceManager>::GetInstance();
+    audioDeviceManager->AddAudioDeviceList(NAME, AudioDeviceType::DEVICE_SPEAKER, NAME);
+    audioDeviceManager->AddAudioDeviceList(NAME, AudioDeviceType::DEVICE_WIRED_HEADSET, NAME);
+    audioDeviceManager->AddAudioDeviceList(NAME, AudioDeviceType::DEVICE_BLUETOOTH_SCO, NAME);
+    audioDeviceManager->RemoveAudioDeviceList(NAME, AudioDeviceType::DEVICE_WIRED_HEADSET);
+    audioDeviceManager->RemoveAudioDeviceList(NAME, AudioDeviceType::DEVICE_BLUETOOTH_SCO);
+    audioDeviceManager->ResetBtAudioDevicesList();
+    audioDeviceManager->ResetDistributedCallDevicesList();
+    audioDeviceManager->ProcessEvent(AudioEvent::WIRED_HEADSET_DISCONNECTED);
+    audioDeviceManager->SwitchDevice(AUDIO_DEACTIVATED);
+    audioDeviceManager->EnableBtSco();
+    audioDeviceManager->EnableDistributedCall();
+    audioDeviceManager->GetCurrentAudioDevice();
+    audioDeviceManager->IsEarpieceDevEnable();
+    audioDeviceManager->SetDeviceAvailable(AudioDeviceType::DEVICE_SPEAKER, false);
+    audioDeviceManager->SetDeviceAvailable(AudioDeviceType::DEVICE_EARPIECE, false);
+    audioDeviceManager->SetDeviceAvailable(AudioDeviceType::DEVICE_BLUETOOTH_SCO, false);
+    audioDeviceManager->SetDeviceAvailable(AudioDeviceType::DEVICE_WIRED_HEADSET, false);
+    audioDeviceManager->SetDeviceAvailable(AudioDeviceType::DEVICE_DISTRIBUTED_AUTOMOTIVE, false);
+    audioDeviceManager->SetDeviceAvailable(AudioDeviceType::DEVICE_DISTRIBUTED_PHONE, false);
+    audioDeviceManager->SetDeviceAvailable(AudioDeviceType::DEVICE_UNKNOWN, false);
+    ASSERT_FALSE(audioDeviceManager->IsWiredHeadsetDevEnable());
+}
+
+/**
+ * @tc.number   Telephony_AudioPlayer_001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallStateTest, Telephony_AudioPlayer_001, Function | MediumTest | Level3)
+{
+    auto audioPlayer = DelayedSingleton<AudioPlayer>::GetInstance();
+    std::string profilePath = "";
+    std::string path = "";
+    audioPlayer->GetRealPath(profilePath, path);
+    ASSERT_FALSE(audioPlayer->IsStop(TYPE_RING));
+    ASSERT_FALSE(audioPlayer->IsStop(TYPE_TONE));
+    ASSERT_FALSE(audioPlayer->IsStop(TYPE_DTMF));
+    ASSERT_FALSE(audioPlayer->IsStop(TYPE_SOUND));
+}
+
+/**
+ * @tc.number   Telephony_AudioSceneProcessor_001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallStateTest, Telephony_AudioSceneProcessor_001, Function | MediumTest | Level3)
+{
+    auto audioSceneProcessor = DelayedSingleton<AudioSceneProcessor>::GetInstance();
+    audioSceneProcessor->SwitchState(CallStateType::DIALING_STATE);
+    audioSceneProcessor->SwitchState(CallStateType::ALERTING_STATE);
+    audioSceneProcessor->SwitchState(CallStateType::INCOMING_STATE);
+    audioSceneProcessor->SwitchState(CallStateType::CS_CALL_STATE);
+    audioSceneProcessor->SwitchState(CallStateType::IMS_CALL_STATE);
+    audioSceneProcessor->SwitchState(CallStateType::HOLDING_STATE);
+    audioSceneProcessor->SwitchState(CallStateType::UNKNOWN_STATE);
+    audioSceneProcessor->SwitchState(CallStateType::INACTIVE_STATE);
+    ASSERT_TRUE(audioSceneProcessor->SwitchIncoming());
 }
 
 /**
