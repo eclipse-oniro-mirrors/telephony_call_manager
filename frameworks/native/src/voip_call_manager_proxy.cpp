@@ -377,8 +377,8 @@ int32_t VoipCallManagerProxy::ReportWindowModeChange(AppExecFwk::PacMap &extras)
     }
     MessageOption option;
     MessageParcel replyParcel;
-    int32_t error = remote->SendRequest(
-            static_cast<int32_t>(INTERFACE_REPORT_WINDOW_MODE_CHANGE), dataParcel, replyParcel, option);
+    int32_t error =
+        remote->SendRequest(static_cast<int32_t>(INTERFACE_REPORT_WINDOW_MODE_CHANGE), dataParcel, replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("function ReportWindowModeChange call failed! errCode:%{public}d", error);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
@@ -402,8 +402,8 @@ int32_t VoipCallManagerProxy::SendCallUiEvent(std::string &voipCallId, Telephony
     }
     MessageOption option;
     MessageParcel replyParcel;
-    int32_t error = remote->SendRequest(
-            static_cast<int32_t>(INTERFACE_SEND_CALL_UI_EVENT), dataParcel, replyParcel, option);
+    int32_t error =
+        remote->SendRequest(static_cast<int32_t>(INTERFACE_SEND_CALL_UI_EVENT), dataParcel, replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("function SendCallUiEvent call failed! errCode:%{public}d", error);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;

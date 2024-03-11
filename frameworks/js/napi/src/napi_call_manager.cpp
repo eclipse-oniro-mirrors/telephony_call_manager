@@ -3269,7 +3269,7 @@ napi_value NapiCallManager::SendCallUiEvent(napi_env env, napi_callback_info inf
     std::string tmpName(tmpStr, strLen);
     asyncContext->eventName = tmpName;
     return HandleAsyncWork(
-            env, asyncContext.release(), "SendCallUiEvent", NativeSendCallUiEvent, NativeVoidCallBackWithErrorCode);
+        env, asyncContext.release(), "SendCallUiEvent", NativeSendCallUiEvent, NativeVoidCallBackWithErrorCode);
 }
 
 void NapiCallManager::NativeSendCallUiEvent(napi_env env, void *data)
@@ -3280,8 +3280,9 @@ void NapiCallManager::NativeSendCallUiEvent(napi_env env, void *data)
         return;
     }
     auto asyncContext = (SendCallUiEventAsyncContext *)data;
-    asyncContext->errorCode = DelayedSingleton<CallManagerClient>::GetInstance()->SendCallUiEvent(
-            asyncContext->callId, asyncContext->eventName);
+    asyncContext->errorCode =
+        DelayedSingleton<CallManagerClient>::GetInstance()->SendCallUiEvent(asyncContext->callId,
+                                                                            asyncContext->eventName);
     if (asyncContext->errorCode == TELEPHONY_SUCCESS) {
         asyncContext->resolved = TELEPHONY_SUCCESS;
     }

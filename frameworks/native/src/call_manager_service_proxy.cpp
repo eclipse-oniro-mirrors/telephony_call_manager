@@ -1314,7 +1314,7 @@ int32_t CallManagerServiceProxy::SendRequest(
     return remote->SendRequest(static_cast<int32_t>(code), dataParcel, replyParcel, option);
 }
 
-int32_t CallManagerServiceProxy::SendCallUiEvent(int32_t callId, std:string &eventName)
+int32_t CallManagerServiceProxy::SendCallUiEvent(int32_t callId, std::string &eventName)
 {
     MessageParcel dataParcel;
     if (!dataParcel.WriteInterfaceToken(CallManagerServiceProxy::GetDescriptor())) {
