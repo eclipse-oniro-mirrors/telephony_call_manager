@@ -119,6 +119,7 @@ public:
     int32_t ReportAudioDeviceInfo();
     int32_t CancelCallUpgrade(int32_t callId);
     int32_t RequestCameraCapabilities(int32_t callId);
+    int32_t SendCallUiEvent(int32_t callId, std::string &eventName);
 
 private:
     int32_t ConnectService();

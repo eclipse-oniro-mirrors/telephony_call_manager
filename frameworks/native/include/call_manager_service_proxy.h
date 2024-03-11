@@ -711,6 +711,14 @@ public:
      */
     int32_t UnRegisterVoipCallManagerCallback() override;
 
+    /**
+     * SendCallUiEvent
+     *
+     * @brief send call ui event
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t SendCallUiEvent(int32_t callId, std::string $eventName) override;
+
 private:
     int32_t SendRequest(CallManagerInterfaceCode code);
     int32_t SendRequest(CallManagerInterfaceCode code, MessageParcel &dataParcel, MessageParcel &replyParcel);

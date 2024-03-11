@@ -23,6 +23,20 @@ namespace OHOS {
 namespace Telephony {
 
 /**
+ * @brief Indicates the window mode of the voip call.
+ */
+enum class WindowMode {
+    /**
+     * Indicates the window mode of the voip call is full screen.
+     */
+    MODE_FULL_SCREEN = 0,
+    /**
+     * Indicates the window mode of the voip call is float window.
+     */
+    MODE_FLOAT_WINDOW = 1,
+};
+
+/**
  * @brief Indicates the voip call state.
  */
 enum class VoipCallState {
@@ -124,6 +138,14 @@ enum class VoipCallEvent {
      * Indicates the voip call was hung up by other cause.
      */
     VOIP_CALL_EVENT_HANGUP,
+    /**
+     * Indicates the window mode of the voip call is full screen.
+     */
+    VOIP_CALL_EVENT_SHOW_FULL_SCREEN,
+    /**
+     * Indicates the window mode of the voip call is float window.
+     */
+    VOIP_CALL_EVENT_SHOW_FLOAT_WINDOW,
 };
 
 /**

@@ -142,6 +142,20 @@ public:
      */
     int32_t UnRegisterCallManagerCallBack() override;
 
+    /**
+     * @brief Report window mode change
+     *
+     * @return Returns TELEPHONY_SUCCESS on success, others on failure.
+     */
+    int32_t ReportWindowModeChange(AppExecFwk::PacMap &extras) override;
+
+    /**
+     * @brief Send Call ui event
+     *
+     * @return Returns TELEPHONY_SUCCESS on success, others on failure.
+     */
+    int32_t SendCallUiEvent(std::string &voipCallId, Telephony::WindowMode window) override;
+
 private:
     static inline BrokerDelegator<VoipCallManagerProxy> delegator_;
 };

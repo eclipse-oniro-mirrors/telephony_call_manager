@@ -180,6 +180,10 @@ struct VoIPCallStateAsyncContext : AsyncContext {
     int32_t state = 0;
 };
 
+struct SendCallUiEventAsyncContext : AsyncContext {
+    std::string eventName = "";
+};
+
 enum CallWaitingStatus {
     CALL_WAITING_DISABLE = 0,
     CALL_WAITING_ENABLE,
