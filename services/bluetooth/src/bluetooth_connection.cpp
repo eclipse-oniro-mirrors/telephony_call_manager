@@ -186,7 +186,8 @@ void BluetoothConnection::RegisterObserver()
     profile->RegisterObserver(shared_from_this());
 }
 
-void BluetoothConnection::OnScoStateChanged(const Bluetooth::BluetoothRemoteDevice &device, int32_t state)
+void BluetoothConnection::OnScoStateChanged(
+    const Bluetooth::BluetoothRemoteDevice &device, int32_t state, int32_t reason)
 {
     TELEPHONY_LOGI("BluetoothConnection::OnScoStateChanged state : %{public}d", state);
     switch (state) {
