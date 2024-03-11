@@ -5655,6 +5655,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManagerService_002, Function | MediumTe
     ASSERT_NE(callManagerService->JoinConference(false, numberList), TELEPHONY_SUCCESS);
     std::vector<OttCallDetailsInfo> ottVec;
     ASSERT_NE(callManagerService->ReportOttCallDetailsInfo(ottVec), TELEPHONY_SUCCESS);
+    ASSERT_NE(callManagerService->GetMainCallId(value, value), TELEPHONY_SUCCESS);
 }
 
 /**

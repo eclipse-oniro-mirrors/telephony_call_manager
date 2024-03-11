@@ -767,5 +767,15 @@ int32_t CallManagerClient::RequestCameraCapabilities(int32_t callId)
         return TELEPHONY_ERR_UNINIT;
     }
 }
+
+int32_t CallManagerClient::SendCallUiEvent(int32_t callId, std::string &eventName)
+{
+    if (g_callManagerProxy != nullptr) {
+        return g_callManagerProxy->SendCallUiEvent(callId, eventName);
+    } else {
+        TELEPHONY_LOGE("init first please!");
+        return TELEPHONY_ERR_UNINIT;
+    }
+}
 } // namespace Telephony
 } // namespace OHOS

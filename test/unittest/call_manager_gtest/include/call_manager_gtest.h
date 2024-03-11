@@ -124,7 +124,6 @@ public:
 
     void HangUpCall();
     void DialCall(const std::string &phoneNumber);
-    void SendCallUiEvent();
 
 public:
     static bool isConnected_;

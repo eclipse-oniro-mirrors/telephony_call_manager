@@ -73,6 +73,7 @@ napi_value NapiCallManager::DeclareCallBasisInterface(napi_env env, napi_value e
         DECLARE_NAPI_FUNCTION("switchCall", SwitchCall),
         DECLARE_NAPI_FUNCTION("setCallPreferenceMode", SetCallPreferenceMode),
         DECLARE_NAPI_FUNCTION("hasVoiceCapability", HasVoiceCapability),
+        DECLARE_NAPI_FUNCTION("sendCallUiEvent", SendCallUiEvent),
     };
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc));
     return exports;
@@ -336,6 +337,12 @@ napi_value NapiCallManager::DeclareCallEventEnum(napi_env env, napi_value export
         DECLARE_NAPI_STATIC_PROPERTY("EVENT_SPLIT_CALL_FAILED",
             NapiCallManagerUtils::ToInt32Value(
                 env, static_cast<int32_t>(CallAbilityEventId::EVENT_SPLIT_CALL_FAILED))),
+        DECLARE_NAPI_STATIC_PROPERTY("EVENT_SHOW_FULL_SCREEN",
+            NapiCallManagerUtils::ToInt32Value(
+                env, static_cast<int32_t>(CallAbilityEventId::EVENT_SHOW_FULL_SCREEN))),
+        DECLARE_NAPI_STATIC_PROPERTY("EVENT_SHOW_FLOAT_WINDOW",
+            NapiCallManagerUtils::ToInt32Value(
+                env, static_cast<int32_t>(CallAbilityEventId::EVENT_SHOW_FLOAT_WINDOW))),
         // CallSessionEventId
         DECLARE_NAPI_STATIC_PROPERTY("EVENT_CONTROL_CAMERA_FAILURE",
             NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(CallSessionEventId::EVENT_CAMERA_FAILURE))),
@@ -734,6 +741,12 @@ napi_value NapiCallManager::DeclareCallEventEnumEx(napi_env env, napi_value expo
         DECLARE_NAPI_STATIC_PROPERTY("EVENT_SPLIT_CALL_FAILED",
             NapiCallManagerUtils::ToInt32Value(
                 env, static_cast<int32_t>(CallAbilityEventId::EVENT_SPLIT_CALL_FAILED))),
+        DECLARE_NAPI_STATIC_PROPERTY("EVENT_SHOW_FULL_SCREEN",
+            NapiCallManagerUtils::ToInt32Value(
+                env, static_cast<int32_t>(CallAbilityEventId::EVENT_SHOW_FULL_SCREEN))),
+        DECLARE_NAPI_STATIC_PROPERTY("EVENT_SHOW_FLOAT_WINDOW",
+            NapiCallManagerUtils::ToInt32Value(
+                env, static_cast<int32_t>(CallAbilityEventId::EVENT_SHOW_FLOAT_WINDOW))),
     };
     napi_value result = nullptr;
     napi_define_class(env, "CallAbilityEventId", NAPI_AUTO_LENGTH, NapiCallManagerUtils::CreateEnumConstructor, nullptr,
@@ -3232,6 +3245,46 @@ napi_value NapiCallManager::HasVoiceCapability(napi_env env, napi_callback_info)
     napi_value result = nullptr;
     napi_get_boolean(env, DelayedSingleton<CallManagerClient>::GetInstance()->HasVoiceCapability(), &result);
     return result;
+}
+
+napi_value NapiCallManager::SendCallUiEvent(napi_env env, napi_callback_info info)
+{
+    GET_PARAMS(env, info, TWO_VALUE_LIMIT);
+    if (!MatchNumberAndStringParameters(env, argv, argc)) {
+        TELEPHONY_LOGE("MatchNumberAndStringParameters failed.");
+        NapiUtil::ThrowParameterError(env);
+        return nullptr;
+    }
+    auto asyncContext = std::make_unique<SendCallUiEventAsyncContext>();
+    if (asyncContext == nullptr) {
+        std::string errorCode = std::to_string(napi_generic_failure);
+        std::string errorMessage = "SendCallUiEvent error at baseContext is nullptr";
+        NAPI_CALL(env, napi_throw_error(env, errorCode.c_str(), errorMessage.c_str()));
+        return nullptr;
+    }
+    napi_get_value_int32(env, argv[ARRAY_INDEX_FIRST], &asyncContext->callId);
+    char tmpStr[kMaxNumberLen + 1] = { 0 };
+    size_t strLen = 0;
+    napi_get_value_string_utf8(env, argv[ARRAY_INDEX_SECOND], tmpStr, MESSAGE_CONTENT_MAXIMUM_LIMIT, &strLen);
+    std::string tmpName(tmpStr, strLen);
+    asyncContext->eventName = tmpName;
+    return HandleAsyncWork(
+            env, asyncContext.release(), "SendCallUiEvent", NativeSendCallUiEvent, NativeVoidCallBackWithErrorCode);
+}
+
+void NapiCallManager::NativeSendCallUiEvent(napi_env env, void *data)
+{
+    if (data == nullptr) {
+        TELEPHONY_LOGE("NapiCallManager::NativeSendCallUiEvent data is nullptr");
+        NapiUtil::ThrowParameterError(env);
+        return;
+    }
+    auto asyncContext = (SendCallUiEventAsyncContext *)data;
+    asyncContext->errorCode = DelayedSingleton<CallManagerClient>::GetInstance()->SendCallUiEvent(
+            asyncContext->callId, asyncContext->eventName);
+    if (asyncContext->errorCode == TELEPHONY_SUCCESS) {
+        asyncContext->resolved = TELEPHONY_SUCCESS;
+    }
 }
 
 void NapiCallManager::NativeCallBack(napi_env env, napi_status status, void *data)

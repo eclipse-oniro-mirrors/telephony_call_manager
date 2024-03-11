@@ -775,6 +775,7 @@ private:
     const int32_t extraMonth_ = 1;
     int64_t bindTime_ = 0L;
     int32_t spendTime_ = 0;
+    const std::string eventShowFloatWindow_ = "EVENT_SHOW_FLOAT_WINDOW"
 };
 } // namespace Telephony
 } // namespace OHOS

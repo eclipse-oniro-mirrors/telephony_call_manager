@@ -1400,5 +1400,22 @@ int32_t CallManagerService::RequestCameraCapabilities(int32_t callId)
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
 }
+
+int32_t CallManagerService::SendCallUiEvent(int32_t callId, std::string &eventName)
+{
+    sptr<CallBase> callPtrl = CallObjectManager::GetOneCallObject(callId);
+    if (callPtrl == nullptr) {
+        TELEPHONY_LOGE("callId is invalid, callId:%{public}d", callId);
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
+    }
+    CallAttributeInfo info;
+    callPtrl->GetCallAttributeInfo(info);
+    std::string voipCallId = info.voipCallInfo.voipCallId;
+    Telephony::WindowMode window = eventName.compare(eventShowFloatWindow_) == 0 ?
+            Telephony::WindowMode::MODE_FLOAT_WINDOW : Telephony::WindowMode::MODE_FULL_SCREEN;
+    DelayedSingleton<VoipCallConnection>::GetInstance()->Init(TELEPHONY_VOIP_CALL_MANAGER_SYS_ABILITY_ID);
+    DelayedSingleton<VoipCallConnection>::GetInstance()->SendCallUiEvent(voipCallId, window);
+    return TELEPHONY_SUCCESS;
+}
 } // namespace Telephony
 } // namespace OHOS

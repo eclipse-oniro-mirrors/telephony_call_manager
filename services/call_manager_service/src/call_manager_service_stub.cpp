@@ -73,6 +73,8 @@ void CallManagerServiceStub::InitCallBasicRequest()
         &CallManagerServiceStub::OnSwitchCall;
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_INPUT_DIALER_SPECIAL_CODE)] =
         &CallManagerServiceStub::OnInputDialerSpecialCode;
+    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_SEND_CALLUI_EVENT)] =
+            &CallManagerServiceStub::OnSendCallUiEvent;
 }
 
 void CallManagerServiceStub::InitCallUtilsRequest()
@@ -1308,6 +1310,19 @@ int32_t CallManagerServiceStub::OnRequestCameraCapabilities(MessageParcel &data,
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
     return TELEPHONY_SUCCESS;
+}
+
+int32_t CallManagerServiceStub::OnSendCallUiEvent(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t callId = data.ReadInt32();
+    std::string eventName = data.ReadString();
+    int32_t result = SendCallUiEvent(callId, eventName);
+    TELEPHONY_LOGI("result:%{public}d", result);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("fail to write parcel");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return result;
 }
 } // namespace Telephony
 } // namespace OHOS
