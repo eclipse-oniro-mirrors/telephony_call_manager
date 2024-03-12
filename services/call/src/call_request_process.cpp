@@ -55,7 +55,9 @@ int32_t CallRequestProcess::DialRequest()
         TELEPHONY_LOGE("Number out of limit!");
         return CALL_ERR_NUMBER_OUT_OF_RANGE;
     }
-    if (info.dialType == DialType::DIAL_CARRIER_TYPE &&
+    bool isEmergencyNumber = false;
+    DelayedSingleton<CallNumberUtils>::GetInstance()->CheckNumberIsEmergency(info.number, info.accountId, isEmergencyNumber);
+    if (!isEmergencyNumber && info.dialType == DialType::DIAL_CARRIER_TYPE &&
         DelayedSingleton<CoreServiceConnection>::GetInstance()->IsFdnEnabled(info.accountId)) {
         std::vector<std::u16string> fdnNumberList =
             DelayedSingleton<CoreServiceConnection>::GetInstance()->GetFdnNumberList(info.accountId);
