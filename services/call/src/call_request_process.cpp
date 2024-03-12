@@ -56,7 +56,8 @@ int32_t CallRequestProcess::DialRequest()
         return CALL_ERR_NUMBER_OUT_OF_RANGE;
     }
     bool isEmergencyNumber = false;
-    DelayedSingleton<CallNumberUtils>::GetInstance()->CheckNumberIsEmergency(info.number, info.accountId, isEmergencyNumber);
+    DelayedSingleton<CallNumberUtils>::GetInstance()->CheckNumberIsEmergency(info.number,
+        info.accountId, isEmergencyNumber);
     if (!isEmergencyNumber && info.dialType == DialType::DIAL_CARRIER_TYPE &&
         DelayedSingleton<CoreServiceConnection>::GetInstance()->IsFdnEnabled(info.accountId)) {
         std::vector<std::u16string> fdnNumberList =
