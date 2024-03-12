@@ -21,6 +21,7 @@
 #include "call_ability_callback_stub.h"
 #include "call_policy.h"
 #include "call_request_process.h"
+#include "call_state_processor.h"
 #include "call_status_callback_proxy.h"
 #include "cs_call_state.h"
 #include "dialing_state.h"
@@ -325,6 +326,7 @@ HWTEST_F(CallStateTest, Telephony_AudioControlManager_001, Function | MediumTest
     DialParaInfo mDialParaInfo;
     mDialParaInfo.accountId = 0;
     sptr<OHOS::Telephony::CallBase> callObjectPtr = nullptr;
+    DelayedSingleton<CallStateProcessor>::GetInstance()->holdingCalls_.insert(1);
     auto audioControl = DelayedSingleton<AudioControlManager>::GetInstance();
     audioControl->VideoStateUpdated(callObjectPtr, VideoStateType::TYPE_VOICE, VideoStateType::TYPE_VIDEO);
     callObjectPtr = new IMSCall(mDialParaInfo);
@@ -391,7 +393,6 @@ HWTEST_F(CallStateTest, Telephony_AudioControlManager_002, Function | MediumTest
     audioControl->SetAudioDevice(device);
     audioControl->PlayRingtone();
     audioControl->PlaySoundtone();
-    audioControl->StopSoundtone();
     audioControl->StopRingtone();
     audioControl->GetInitAudioDeviceType();
     audioControl->SetMute(false);
