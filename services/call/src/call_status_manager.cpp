@@ -875,6 +875,10 @@ void CallStatusManager::AutoAnswerForVideoCall(int32_t activeCallNum)
         GetCarrierCallList(ringCallIdList);
         for (int32_t ringingCallId : ringCallIdList) {
             sptr<CallBase> ringingCall = GetOneCallObject(ringingCallId);
+            if (ringingCall == nullptr) {
+                TELEPHONY_LOGE("ringingCall is nullptr");
+                return;
+            }
             CallRunningState ringingCallState = ringingCall->GetCallRunningState();
             if ((ringingCallState == CallRunningState::CALL_RUNNING_STATE_RINGING &&
                     (ringingCall->GetAutoAnswerState()))) {
@@ -898,6 +902,10 @@ void CallStatusManager::AutoAnswer(int32_t activeCallNum, int32_t waitingCallNum
         GetCarrierCallList(ringCallIdList);
         for (int32_t ringingCallId : ringCallIdList) {
             sptr<CallBase> ringingCall = GetOneCallObject(ringingCallId);
+            if (ringingCall == nullptr) {
+                TELEPHONY_LOGE("ringingCall is nullptr");
+                return;
+            }
             CallRunningState ringingCallState = ringingCall->GetCallRunningState();
             if ((ringingCallState == CallRunningState::CALL_RUNNING_STATE_RINGING &&
                     (ringingCall->GetAutoAnswerState()))) {

@@ -631,6 +631,10 @@ void CallRequestProcess::UnHoldRequest(int32_t callId)
     for (int32_t otherCallId : callIdList) {
         sptr<CallBase> otherCall = GetOneCallObject(otherCallId);
         TelCallState state = otherCall->GetTelCallState();
+        if (otherCall == nullptr) {
+            TELEPHONY_LOGE("otherCall is nullptr");
+            return;
+        }
         TelConferenceState confState = otherCall->GetTelConferenceState();
         int32_t conferenceId = ERR_ID;
         otherCall->GetMainCallId(conferenceId);
@@ -860,9 +864,8 @@ int32_t CallRequestProcess::HandleDialingInfo(std::string newPhoneNum, DialParaI
         if (!canDial) {
             return CALL_ERR_CALL_COUNTS_EXCEED_LIMIT;
         }
-        int32_t ret = TELEPHONY_ERROR;
         if (IsDsdsMode5()) {
-            ret = IsDialCallForDsda(info);
+            int32_t ret = IsDialCallForDsda(info);
             if (ret != TELEPHONY_SUCCESS) {
                 TELEPHONY_LOGE("IsDialCallForDsda failed!");
                 return ret;
