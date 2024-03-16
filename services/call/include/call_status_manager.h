@@ -89,6 +89,7 @@ private:
     int32_t UpdateDialingCallInfo(const CallDetailInfo &info);
     void SetContactInfo(sptr<CallBase> &call, std::string phoneNum);
     int32_t HandleRejectCall(sptr<CallBase> &call);
+    bool ShouldRejectIncomingCall();
 
 private:
     CallDetailInfo callReportInfo_;

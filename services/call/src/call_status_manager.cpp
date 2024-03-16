@@ -29,11 +29,14 @@
 #include "datashare_predicates.h"
 #include "hitrace_meter.h"
 #include "ims_call.h"
+#include "os_account_manager.h"
 #include "ott_call.h"
 #include "report_call_info_handler.h"
 #include "satellite_call.h"
+#include "settings_datashare_helper.h"
 #include "telephony_log_wrapper.h"
 #include "voip_call.h"
+#include "uri.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -341,7 +344,7 @@ int32_t CallStatusManager::IncomingHandle(const CallDetailInfo &info)
     SetContactInfo(call, std::string(info.phoneNum));
     int32_t state;
     DelayedSingleton<CallControlManager>::GetInstance()->GetVoIPCallState(state);
-    if (state == (int32_t)CallStateToApp::CALL_STATE_RINGING) {
+    if (ShouldRejectIncomingCall() || state == (int32_t)CallStateToApp::CALL_STATE_RINGING) {
         return HandleRejectCall(call);
     }
     AddOneCallObject(call);
@@ -1158,6 +1161,43 @@ sptr<CallBase> CallStatusManager::CreateNewCallByCallType(
             return nullptr;
     }
     return callPtr;
+}
+
+bool CallStatusManager::ShouldRejectIncomingCall()
+{
+    auto datashareHelper = std::make_shared<SettingsDataShareHelper>();
+    std::string device_provisioned {""};
+    OHOS::Uri uri(
+        "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true&key=device_provisioned");
+    int resp = datashareHelper->Query(uri, "device_provisioned", device_provisioned);
+    if (resp == TELEPHONY_SUCCESS && device_provisioned == "0") {
+        TELEPHONY_LOGI("ShouldRejectIncomingCall: device_provisioned = 0");
+        return true;
+    }
+
+    std::string user_setup_complete {""};
+    std::vector<int> activedOsAccountIds;
+    OHOS::AccountSA::OsAccountManager::QueryActiveOsAccountIds(activedOsAccountIds);
+    int userId = activedOsAccountIds[0];
+    OHOS::Uri uri_setup(
+        "datashare:///com.ohos.settingsdata/entry/settingsdata/USER_SETTINGSDATA_SECURE_"
+        + std::to_string(userId) + "?Proxy=true&key=user_setup_complete");
+    int resp_userSetup = datashareHelper->Query(uri_setup, "user_setup_complete", user_setup_complete);
+    if (resp_userSetup == TELEPHONY_SUCCESS && user_setup_complete == "0") {
+        TELEPHONY_LOGI("ShouldRejectIncomingCall: user_setup_complete = 0");
+        return true;
+    }
+
+    std::string is_ota_finished {""};
+    OHOS::Uri uri_ota(
+        "datashare:///com.ohos.settingsdata/entry/settingsdata/USER_SETTINGSDATA_SECURE_"
+        + std::to_string(userId) + "?Proxy=true&key=is_ota_finished");
+    int resp_ota = datashareHelper->Query(uri_ota, "is_ota_finished", is_ota_finished);
+    if (resp_ota == TELEPHONY_SUCCESS && is_ota_finished == "0") {
+        TELEPHONY_LOGI("ShouldRejectIncomingCall: is_ota_finished = 0");
+        return true;
+    }
+    return false;
 }
 
 void CallStatusManager::PackParaInfo(
