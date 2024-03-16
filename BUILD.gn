@@ -106,6 +106,7 @@ ohos_shared_library("tel_call_manager") {
     "utils/src/call_ability_connection.cpp",
     "utils/src/call_dialog.cpp",
     "utils/src/call_number_utils.cpp",
+    "utils/src/settings_datashare_helper.cpp",
   ]
 
   include_dirs = [
@@ -163,6 +164,7 @@ ohos_shared_library("tel_call_manager") {
     "hitrace:hitrace_meter",
     "init:libbegetutil",
     "ipc:ipc_single",
+    "os_account:os_account_innerkits",
     "player_framework:system_sound_client",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",

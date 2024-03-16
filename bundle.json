@@ -53,6 +53,7 @@
                 "audio_framework",
                 "camera_framework",
                 "napi",
+                "os_account",
                 "player_framework",
                 "power_manager",
                 "safwk",
