@@ -1179,20 +1179,20 @@ bool CallStatusManager::ShouldRejectIncomingCall()
     std::vector<int> activedOsAccountIds;
     OHOS::AccountSA::OsAccountManager::QueryActiveOsAccountIds(activedOsAccountIds);
     int userId = activedOsAccountIds[0];
-    OHOS::Uri uri(
+    OHOS::Uri uri_setup(
         "datashare:///com.ohos.settingsdata/entry/settingsdata/USER_SETTINGSDATA_SECURE_"
         + std::to_string(userId) + "?Proxy=true&key=user_setup_complete");
-    int resp_userSetup = datashareHelper->Query(uri, "user_setup_complete", user_setup_complete);
+    int resp_userSetup = datashareHelper->Query(uri_setup, "user_setup_complete", user_setup_complete);
     if (resp_userSetup == TELEPHONY_SUCCESS && user_setup_complete == "0") {
         TELEPHONY_LOGI("ShouldRejectIncomingCall: user_setup_complete = 0");
         return true;
     }
 
     std::string is_ota_finished {""};
-    OHOS::Uri uri(
+    OHOS::Uri uri_ota(
         "datashare:///com.ohos.settingsdata/entry/settingsdata/USER_SETTINGSDATA_SECURE_"
         + std::to_string(userId) + "?Proxy=true&key=is_ota_finished");
-    int resp_ota = datashareHelper->Query(uri, "is_ota_finished", is_ota_finished);
+    int resp_ota = datashareHelper->Query(uri_ota, "is_ota_finished", is_ota_finished);
     if (resp_ota == TELEPHONY_SUCCESS && is_ota_finished == "0") {
         TELEPHONY_LOGI("ShouldRejectIncomingCall: is_ota_finished = 0");
         return true;
