@@ -1176,9 +1176,9 @@ bool CallStatusManager::ShouldRejectIncomingCall()
     }
 
     std::string user_setup_complete {""};
-    std::vector<int> activeedOsAccountIds;
-    OHOS::AccountSA::OsAccountManager::QueryActiveOsAccountIds(activeedOsAccountIds);
-    int userId = activeedOsAccountIds[0];
+    std::vector<int> activedOsAccountIds;
+    OHOS::AccountSA::OsAccountManager::QueryActiveOsAccountIds(activedOsAccountIds);
+    int userId = activedOsAccountIds[0];
     OHOS::Uri uri(
         "datashare:///com.ohos.settingsdata/entry/settingsdata/USER_SETTINGSDATA_SECURE_"
         + std::to_string(userId) + "?Proxy=true&key=user_setup_complete");
@@ -1189,7 +1189,6 @@ bool CallStatusManager::ShouldRejectIncomingCall()
     }
 
     std::string is_ota_finished {""};
-    std::vector<int> activeedOsAccountIds;
     OHOS::Uri uri(
         "datashare:///com.ohos.settingsdata/entry/settingsdata/USER_SETTINGSDATA_SECURE_"
         + std::to_string(userId) + "?Proxy=true&key=is_ota_finished");
