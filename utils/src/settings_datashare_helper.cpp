@@ -31,7 +31,7 @@ constexpr const char *SETTINGS_DATA_COLUMN_KEYWORD = "KEYWORD";
 constexpr const char *SETTINGS_DATA_COLUMN_VALUE = "VALUE";
 }
 
-SettingsDataShareHelper::SettingsDataShareHelper
+SettingsDataShareHelper::SettingsDataShareHelper()
 {
     datashareHelper_ = CreateDataShareHelper(DEVICE_STANDBY_SERVICE_SYSTEM_ABILITY_ID);
 }

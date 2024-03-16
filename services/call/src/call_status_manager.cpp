@@ -342,13 +342,9 @@ int32_t CallStatusManager::IncomingHandle(const CallDetailInfo &info)
         return CALL_ERR_CALL_OBJECT_IS_NULL;
     }
     SetContactInfo(call, std::string(info.phoneNum));
-    if (ShouldRejectIncomingCall()) {
-        TELEPHONY_LOGI("ShouldRejectIncomingCall: reject incoming call");
-        return HandleRejectCall(call);
-    }
     int32_t state;
     DelayedSingleton<CallControlManager>::GetInstance()->GetVoIPCallState(state);
-    if (state == (int32_t)CallStateToApp::CALL_STATE_RINGING) {
+    if (ShouldRejectIncomingCall() || state == (int32_t)CallStateToApp::CALL_STATE_RINGING) {
         return HandleRejectCall(call);
     }
     AddOneCallObject(call);
