@@ -30,7 +30,7 @@ public:
 private:
     std::shared_ptr<DataShare::DataShareHelper> CreateDataShareHelper(int systemAbilityId);
 private:
-std::shared_ptr<DataShare::DataShareHelper> datashareHelper_ = nullptr;
+    std::shared_ptr<DataShare::DataShareHelper> datashareHelper_ = nullptr;
 };
 } // namespace Telephony
 } // namespace OHOS

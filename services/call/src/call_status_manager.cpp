@@ -1197,6 +1197,7 @@ bool CallStatusManager::ShouldRejectIncomingCall()
         TELEPHONY_LOGI("ShouldRejectIncomingCall: is_ota_finished = 0");
         return true;
     }
+    return false;
 }
 
 void CallStatusManager::PackParaInfo(
