@@ -2659,7 +2659,8 @@ HWTEST_F(BranchTest, Telephony_VoipCallManagerProxy_001, Function | MediumTest |
         voipCallManagerInterfacePtr->ReportCallStateChange(callId, voipCallState);
         voipCallManagerInterfacePtr->UnRegisterCallBack();
         std::string bundleName = " ";
-        voipCallManagerInterfacePtr->ReportVoipIncomingCall(callId, bundleName);
+        std::string processMode = "0";
+        voipCallManagerInterfacePtr->ReportVoipIncomingCall(callId, bundleName, processMode);
         std::string extensionId = " ";
         voipCallManagerInterfacePtr->ReportVoipCallExtensionId(callId, bundleName, extensionId);
         VoipCallEventInfo voipCallEventInfo;

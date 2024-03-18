@@ -155,7 +155,8 @@ int32_t VoipCallManagerProxy::UnRegisterCallBack()
     return replyParcel.ReadInt32();
 }
 
-int32_t VoipCallManagerProxy::ReportVoipIncomingCall(std::string &callId, std::string &bundleName)
+int32_t VoipCallManagerProxy::ReportVoipIncomingCall(
+    std::string &callId, std::string &bundleName, std::string processMode)
 {
     MessageParcel dataParcel;
     if (!dataParcel.WriteInterfaceToken(VoipCallManagerProxy::GetDescriptor())) {
@@ -164,6 +165,7 @@ int32_t VoipCallManagerProxy::ReportVoipIncomingCall(std::string &callId, std::s
     }
     dataParcel.WriteString(callId);
     dataParcel.WriteString(bundleName);
+    dataParcel.WriteString(processMode);
     auto remote = Remote();
     if (remote == nullptr) {
         TELEPHONY_LOGE("ReportVoipIncomingCall Remote is null");

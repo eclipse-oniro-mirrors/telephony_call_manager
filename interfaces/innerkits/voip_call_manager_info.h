@@ -98,6 +98,10 @@ struct VoipCallAttribute {
      * Indicates the extensionId of voip call.
      */
     std::string extensionId = "";
+    /**
+     * Indicates the process mode of voip call.
+     */
+    std::string processMode = "0";
 };
 
 /**
