@@ -156,7 +156,7 @@ int32_t VoipCallManagerProxy::UnRegisterCallBack()
 }
 
 int32_t VoipCallManagerProxy::ReportVoipIncomingCall(
-    std::string &callId, std::string &bundleName, std::string processMode)
+    std::string &callId, std::string &bundleName, std::string &processMode)
 {
     MessageParcel dataParcel;
     if (!dataParcel.WriteInterfaceToken(VoipCallManagerProxy::GetDescriptor())) {
