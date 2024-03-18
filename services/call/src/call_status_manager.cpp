@@ -1166,7 +1166,7 @@ sptr<CallBase> CallStatusManager::CreateNewCallByCallType(
 bool CallStatusManager::ShouldRejectIncomingCall()
 {
     auto datashareHelper = std::make_shared<SettingsDataShareHelper>();
-    std::string device_provisioned {""};
+    std::string device_provisioned {"0"};
     OHOS::Uri uri(
         "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true&key=device_provisioned");
     int resp = datashareHelper->Query(uri, "device_provisioned", device_provisioned);
@@ -1175,7 +1175,7 @@ bool CallStatusManager::ShouldRejectIncomingCall()
         return true;
     }
 
-    std::string user_setup_complete {""};
+    std::string user_setup_complete {"1"};
     std::vector<int> activedOsAccountIds;
     OHOS::AccountSA::OsAccountManager::QueryActiveOsAccountIds(activedOsAccountIds);
     int userId = activedOsAccountIds[0];
@@ -1188,7 +1188,7 @@ bool CallStatusManager::ShouldRejectIncomingCall()
         return true;
     }
 
-    std::string is_ota_finished {""};
+    std::string is_ota_finished {"1"};
     OHOS::Uri uri_ota(
         "datashare:///com.ohos.settingsdata/entry/settingsdata/USER_SETTINGSDATA_SECURE_"
         + std::to_string(userId) + "?Proxy=true&key=is_ota_finished");
