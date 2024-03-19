@@ -71,7 +71,7 @@ int32_t SettingsDataShareHelper::Query(Uri& uri, const std::string& key, std::st
     }
 
     int rowCount= 0;
-    result->GetRowCount(rowCount)
+    result->GetRowCount(rowCount);
     if (rowCount == 0) {
         TELEPHONY_LOGI("query success, but rowCount is 0");
         datashareHelper_->Release();
