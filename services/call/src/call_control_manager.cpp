@@ -40,6 +40,7 @@
 
 namespace OHOS {
 namespace Telephony {
+alarmSeted = false;
 using namespace OHOS::EventFwk;
 CallControlManager::CallControlManager()
     : callStateListenerPtr_(nullptr), CallRequestHandlerPtr_(nullptr), incomingCallWakeup_(nullptr),
@@ -1092,7 +1093,7 @@ void CallControlManager::GetDialParaInfo(DialParaInfo &info, AppExecFwk::PacMap 
     extras = extras_;
 }
 
-void CallControlManager::handler()
+void CallControlManager::handler(int args)
 {
     alarmSeted = false;
     TELEPHONY_LOGE("handle DisconnectAbility");
@@ -1113,7 +1114,7 @@ void CallControlManager::ConnectCallUiService(bool shouldConnect)
     } else {
         shouldDisconnect = true;
         if (!alarmSeted) {
-            signal(SIGALRM, handler());
+            signal(SIGALRM, handler);
             alarm(1);
             alarmSeted = true;
         }  else {
