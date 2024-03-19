@@ -70,6 +70,14 @@ int32_t SettingsDataShareHelper::Query(Uri& uri, const std::string& key, std::st
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
 
+    int rowCount = 0;
+    result->GetRowCount(rowCount);
+    if (rowCount == 0) {
+        TELEPHONY_LOGI("query success, but rowCount is 0");
+        datashareHelper_->Release();
+        return TELEPHONY_SUCCESS;
+    }
+
     if (result->GoToFirstRow() != DataShare::E_OK) {
         TELEPHONY_LOGE("query error, go to first row error");
         result->Close();
