@@ -17,6 +17,7 @@
 #include "ffrt.h"
 #include <securec.h>
 #include <string_ex.h>
+#include <signal.h>
 
 #include "audio_control_manager.h"
 #include "bluetooth_call_manager.h"
@@ -36,11 +37,9 @@
 #include "telephony_log_wrapper.h"
 #include "video_control_manager.h"
 #include "audio_device_manager.h"
-#include "signal.h"
 
 namespace OHOS {
 namespace Telephony {
-bool alarmSeted = false;
 using namespace OHOS::EventFwk;
 CallControlManager::CallControlManager()
     : callStateListenerPtr_(nullptr), CallRequestHandlerPtr_(nullptr), incomingCallWakeup_(nullptr),
@@ -1093,7 +1092,8 @@ void CallControlManager::GetDialParaInfo(DialParaInfo &info, AppExecFwk::PacMap 
     extras = extras_;
 }
 
-void CallControlManager::handler(int sig) {
+void CallControlManager::handler(int sig)
+{
     alarmSeted = false;
     TELEPHONY_LOGE("handle DisconnectAbility");
     if (!CallObjectManager::HasCallExist()) {
