@@ -1255,7 +1255,7 @@ int32_t CallManagerService::InputDialerSpecialCode(const std::string &specialCod
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
     std::string tempSpecialCode = "";
-    if (specialCode = "*#2846#" || specialCode = "*#2846*" || specialCode = "#1#"
+    if (specialCode == "*#2846#" || specialCode == "*#2846*" || specialCode == "#1#"
         || specialCode == "*#28465#") {
         tempSpecialCode = specialCode;
     } else {
