@@ -16,7 +16,7 @@
 #include "call_control_manager.h"
 #include "ffrt.h"
 #include <securec.h>
-#include <signal.h>
+#include "csignal"
 #include <string_ex.h>
 
 #include "audio_control_manager.h"
