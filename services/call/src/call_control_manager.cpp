@@ -40,7 +40,7 @@
 
 namespace OHOS {
 namespace Telephony {
-alarmSeted = false;
+bool CallControlManager::alarmSeted = false;
 using namespace OHOS::EventFwk;
 CallControlManager::CallControlManager()
     : callStateListenerPtr_(nullptr), CallRequestHandlerPtr_(nullptr), incomingCallWakeup_(nullptr),
