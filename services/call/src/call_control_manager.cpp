@@ -16,8 +16,8 @@
 #include "call_control_manager.h"
 #include "ffrt.h"
 #include <securec.h>
-#include <string_ex.h>
 #include <signal.h>
+#include <string_ex.h>
 
 #include "audio_control_manager.h"
 #include "bluetooth_call_manager.h"
@@ -1092,7 +1092,7 @@ void CallControlManager::GetDialParaInfo(DialParaInfo &info, AppExecFwk::PacMap 
     extras = extras_;
 }
 
-void CallControlManager::handler(int sig)
+void CallControlManager::handler()
 {
     alarmSeted = false;
     TELEPHONY_LOGE("handle DisconnectAbility");
@@ -1113,7 +1113,7 @@ void CallControlManager::ConnectCallUiService(bool shouldConnect)
     } else {
         shouldDisconnect = true;
         if (!alarmSeted) {
-            signal(SIGALRM, handler);
+            signal(SIGALRM, handler());
             alarm(1);
             alarmSeted = true;
         }  else {
