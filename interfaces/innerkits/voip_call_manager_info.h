@@ -99,7 +99,7 @@ struct VoipCallAttribute {
      */
     std::string extensionId = "";
     /**
-     * Indicates the process mode of voip call.
+     * Indicates the process mode of voip call. 0: main process mode; 1: sub process mode
      */
     std::string processMode = "0";
 };
