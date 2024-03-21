@@ -49,7 +49,6 @@ ohos_unittest("tel_call_manager_gtest") {
     "//third_party/libphonenumber/cpp/src",
     "//third_party/libphonenumber/cpp/src/phonenumbers",
     "//third_party/protobuf/src",
-    "//third_party/protobuf/src/google/protobuf",
   ]
 
   external_deps = [
