@@ -140,6 +140,7 @@ int32_t CallStatusManager::HandleCallReportInfo(const CallDetailInfo &info)
     TELEPHONY_LOGI("Entry CallStatusManager HandleCallReportInfo");
     HandleDsdaInfo(info.accountId);
     DelayedSingleton<BluetoothCallService>::GetInstance()->GetCallState();
+    TELEPHONY_LOGI("End CallStatusManager HandleCallReportInfo");
     return ret;
 }
 
@@ -152,6 +153,7 @@ void CallStatusManager::HandleDsdaInfo(int32_t slotId)
     int32_t currentCallNum = GetCurrentCallNum();
     DelayedSingleton<CallRequestProcess>::GetInstance()->IsExistCallOtherSlot(callIdList, slotId, noOtherCall);
     DelayedRefSingleton<CoreServiceClient>::GetInstance().GetDsdsMode(dsdsMode);
+    TELEPHONY_LOGI("dsdsMode:%{public}d", dsdsMode);
     if ((dsdsMode == static_cast<int32_t>(DsdsMode::DSDS_MODE_V5_DSDA) ||
             dsdsMode == static_cast<int32_t>(DsdsMode::DSDS_MODE_V5_TDM)) &&
         !noOtherCall) {
@@ -210,6 +212,7 @@ int32_t CallStatusManager::HandleCallsReportInfo(const CallDetailsInfo &info)
     }
     callDetailsInfo_[curSlotId].callVec.clear();
     callDetailsInfo_[curSlotId] = info;
+    TELEPHONY_LOGI("End CallStatusManager HandleCallsReportInfo slotId:%{public}d", info.slotId);
     return TELEPHONY_SUCCESS;
 }
 
