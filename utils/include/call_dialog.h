@@ -25,9 +25,10 @@ namespace Telephony {
 class CallDialog {
 public:
     bool DialogConnectExtension(const std::string &dialogReason);
+    bool DialogConnectExtension(const std::string &dialogReason, int32_t ext);
 private:
     bool DialogConnectExtensionAbility(const AAFwk::Want &want, const std::string commandStr);
-    std::string BuildStartCommand(const std::string &dialogReason);
+    std::string BuildStartCommand(const std::string &dialogReason, int32_t ext);
     sptr<CallAbilityConnection> connection_ {nullptr};
 };
 } // namespace Telephony

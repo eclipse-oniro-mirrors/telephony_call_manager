@@ -82,6 +82,7 @@ public:
     bool QueryCallLog(
         std::map<std::string, int32_t> &phonesAndUnreadCountMap, DataShare::DataSharePredicates &predicates);
     int32_t QueryIsBlockPhoneNumber(const std::string &phoneNum, bool &result);
+    int32_t GetAirplaneMode(bool &isAirplaneModeOn);
 
 public:
     const int16_t CALL_LOG_DEFAULT_COUNT = 1;
@@ -89,6 +90,8 @@ public:
 private:
     sptr<CallDataRdbObserver> callDataRdbObserverPtr_;
     std::shared_ptr<DataShare::DataShareHelper> CreateDataShareHelper(std::string uri);
+    const std::string SETTING_KEY = "KEYWORD";
+    const std::string SETTING_VALUE = "VALUE";
 };
 } // namespace Telephony
 } // namespace OHOS
