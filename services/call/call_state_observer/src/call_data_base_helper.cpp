@@ -329,7 +329,7 @@ int32_t CallDataBaseHelper::GetAirplaneMode(bool &isAirplaneModeOn)
         callDataHelper->Release();
         return TELEPHONY_ERR_DATABASE_READ_FAIL;
     }
-    int columnindex = 0；
+    int columnindex = 0;
     std::string value = "";
     result->GetColumnIndex(SETTING_VALUE, columnindex);
     result->GetString(columnindex, value);
