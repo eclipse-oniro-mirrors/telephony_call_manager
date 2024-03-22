@@ -79,38 +79,38 @@ int32_t CallPolicy::HasNormalCall(bool isEcc, int32_t slotId)
         return TELEPHONY_SUCCESS;
     }
     bool hasSimCard = false;
-    DelayedSingleton<CoreServiceClient>::GetInstance().HasSimCard(slotId, hasSimCard);
+    DelayedRefSingleton<CoreServiceClient>::GetInstance().HasSimCard(slotId, hasSimCard);
     if (!hasSimCard) {
         TELEPHONY_LOGE("Call failed due to no sim card");
-        DelayedSingleton<CallDialog>::GetInstance()->DialogConnectionExtension("CALL_FAILED_NO_SIM_CARD");
+        DelayedSingleton<CallDialog>::GetInstance()->DialogConnectExtension("CALL_FAILED_NO_SIM_CARD");
         return CALL_ERR_DIAL_FAILED;
     }
     bool isAirplaneModeOn = false;
     int32_t ret = GetAirplaneMode(isAirplaneModeOn);
     if (ret == TELEPHONY_SUCCESS && isAirplaneModeOn) {
         TELEPHONY_LOGE("Call failed due to isAirplaneModeOn is true");
-        DelayedSingleton<CallDialog>::GetInstance()->DialogConnectionExtension("CALL_FAILED_IN_AIRPLANE_MODE");
+        DelayedSingleton<CallDialog>::GetInstance()->DialogConnectExtension("CALL_FAILED_IN_AIRPLANE_MODE");
         return CALL_ERR_DIAL_FAILED;
     }
     sptr<NetworkState> networkState = nullptr;
     RegServiceState regStatus = RegServiceState::REG_STATE_UNKNOWN;
-    DelayedSingleton<CoreServiceClient>::GetInstance().GetNetworkState(slotId, networkState);
+    DelayedRefSingleton<CoreServiceClient>::GetInstance().GetNetworkState(slotId, networkState);
     if (networkState != nullptr) {
         regStatus = networkState->GetRegStatus();
     }
     if (regStatus != RegServiceState::REG_STATE_IN_SERVICE) {
         TELEPHONY_LOGE("Call failed due to isAirplaneModeOn is true");
-        DelayedSingleton<CallDialog>::GetInstance()->DialogConnectionExtension("CALL_FAILED_IN_AIRPLANE_MODE");
+        DelayedSingleton<CallDialog>::GetInstance()->DialogConnectExtension("CALL_FAILED_IN_AIRPLANE_MODE");
         return CALL_ERR_DIAL_FAILED;
     }
     ImsRegInfo info;
-    DelayedSingleton<CoreServiceClient>::GetInstance().GetImsRegStatus(slotId, ImsServiceType::TYPE_VOICE, info);
+    DelayedRefSingleton<CoreServiceClient>::GetInstance().GetImsRegStatus(slotId, ImsServiceType::TYPE_VOICE, info);
     bool isImsRegistered = info.imsRegState == ImsRegState::IMS_REGISTERED;
     bool isCTSimCard = false;
-    DelayedSingleton<CoreServiceClient>::GetInstance().IsCTSimCard(slotId, isCTSimCard);
+    DelayedRefSingleton<CoreServiceClient>::GetInstance().IsCTSimCard(slotId, isCTSimCard);
     if (isCTSimCard && !isImsRegistered) {
         TELEPHONY_LOGE("Call failed due to CT card IMS is UNREGISTERED");
-        DelayedSingleton<CallDialog>::GetInstance()->DialogConnectionExtension("CALL_FAILED_CTCARD_NO_IMS", slotId);
+        DelayedSingleton<CallDialog>::GetInstance()->DialogConnectExtension("CALL_FAILED_CTCARD_NO_IMS", slotId);
         return CALL_ERR_DIAL_FAILED;
     }
     return TELEPHONY_SUCCESS;
