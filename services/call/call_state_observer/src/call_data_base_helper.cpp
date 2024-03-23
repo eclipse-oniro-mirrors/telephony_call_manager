@@ -306,6 +306,7 @@ int32_t CallDataBaseHelper::QueryIsBlockPhoneNumber(const std::string &phoneNum,
     callDataHelper->Release();
     return TELEPHONY_SUCCESS;
 }
+
 int32_t CallDataBaseHelper::GetAirplaneMode(bool &isAirplaneModeOn)
 {
     std::shared_ptr<DataShare::DataShareHelper> callDataHelper = CreateDataShareHelper(SETTINGS_DATA_URI);

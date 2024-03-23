@@ -29,9 +29,9 @@ bool CallDialog::DialogConnectExtension(const std::string &dialogReason)
     return DialogConnectExtension(dialogReason, -1);
 }
 
-bool CallDialog::DialogConnectExtension(const std::string &dialogReason, int32_t ext)
+bool CallDialog::DialogConnectExtension(const std::string &dialogReason, int32_t slotId)
 {
-    std::string commandStr = BuildStartCommand(dialogReason, ext);
+    std::string commandStr = BuildStartCommand(dialogReason, slotId);
     AAFwk::Want want;
     std::string bundleName = "com.ohos.sceneboard";
     std::string abilityName = "com.ohos.sceneboard.systemdialog";
@@ -63,13 +63,13 @@ bool CallDialog::DialogConnectExtensionAbility(const AAFwk::Want &want, const st
     return true;
 }
 
-std::string CallDialog::BuildStartCommand(const std::string &dialogReason, int32_t ext)
+std::string CallDialog::BuildStartCommand(const std::string &dialogReason, int32_t slotId)
 {
     nlohmann::json root;
     std::string uiExtensionType = "sysDialog/common";
     root["ability.want.params.uiExtensionType"] = uiExtensionType;
     root["dialogReason"] = dialogReason;
-    root["ext"] = ext;
+    root["slotId"] = slotId;
     std::string startCommand = root.dump();
     TELEPHONY_LOGI("startCommand is: %{public}s", startCommand.c_str());
     return startCommand;
