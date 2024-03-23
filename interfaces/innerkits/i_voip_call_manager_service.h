@@ -66,7 +66,7 @@ public:
     virtual int32_t Reject(const VoipCallEventInfo &events) = 0;
     virtual int32_t HangUp(const VoipCallEventInfo &events) = 0;
     virtual int32_t UnloadVoipSa() = 0;
-    virtual int32_t SendCallUiEvent(std::string &voipCallId, Telephony::WindowMode window) = 0;
+    virtual int32_t SendCallUiEvent(std::string &voipCallId, Telephony::WindowMode windowModeEvent) = 0;
 
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"OHOS.Telephony.IVoipCallManagerService");

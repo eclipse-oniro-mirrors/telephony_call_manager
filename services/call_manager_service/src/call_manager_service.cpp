@@ -1403,6 +1403,10 @@ int32_t CallManagerService::RequestCameraCapabilities(int32_t callId)
 
 int32_t CallManagerService::SendCallUiEvent(int32_t callId, std::string &eventName)
 {
+    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_SET_TELEPHONY_STATE)) {
+        TELEPHONY_LOGE("Permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
     sptr<CallBase> callPtrl = CallObjectManager::GetOneCallObject(callId);
     if (callPtrl == nullptr) {
         TELEPHONY_LOGE("callId is invalid, callId:%{public}d", callId);
@@ -1411,10 +1415,9 @@ int32_t CallManagerService::SendCallUiEvent(int32_t callId, std::string &eventNa
     CallAttributeInfo info;
     callPtrl->GetCallAttributeInfo(info);
     std::string voipCallId = info.voipCallInfo.voipCallId;
-    Telephony::WindowMode window = eventName.compare(eventShowFloatWindow_) == 0 ?
-            Telephony::WindowMode::MODE_FLOAT_WINDOW : Telephony::WindowMode::MODE_FULL_SCREEN;
-    DelayedSingleton<VoipCallConnection>::GetInstance()->Init(TELEPHONY_VOIP_CALL_MANAGER_SYS_ABILITY_ID);
-    DelayedSingleton<VoipCallConnection>::GetInstance()->SendCallUiEvent(voipCallId, window);
+    Telephony::WindowMode windowModeEvent = eventName.compare(eventShowFloatWindow_) == 0 ?
+        Telephony::WindowMode::MODE_FLOAT_WINDOW : Telephony::WindowMode::MODE_FULL_SCREEN;
+    DelayedSingleton<VoipCallConnection>::GetInstance()->SendCallUiEvent(voipCallId, windowModeEvent);
     return TELEPHONY_SUCCESS;
 }
 } // namespace Telephony

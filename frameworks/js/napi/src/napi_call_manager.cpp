@@ -3282,7 +3282,7 @@ void NapiCallManager::NativeSendCallUiEvent(napi_env env, void *data)
     auto asyncContext = (SendCallUiEventAsyncContext *)data;
     asyncContext->errorCode =
         DelayedSingleton<CallManagerClient>::GetInstance()->SendCallUiEvent(asyncContext->callId,
-                                                                            asyncContext->eventName);
+        asyncContext->eventName);
     if (asyncContext->errorCode == TELEPHONY_SUCCESS) {
         asyncContext->resolved = TELEPHONY_SUCCESS;
     }

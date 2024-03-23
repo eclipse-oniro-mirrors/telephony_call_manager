@@ -386,7 +386,7 @@ int32_t VoipCallManagerProxy::ReportWindowModeChange(AppExecFwk::PacMap &extras)
     return replyParcel.ReadInt32();
 }
 
-int32_t VoipCallManagerProxy::SendCallUiEvent(std::string &voipCallId, Telephony::WindowMode window)
+int32_t VoipCallManagerProxy::SendCallUiEvent(std::string &voipCallId, Telephony::WindowMode windowModeEvent)
 {
     MessageParcel dataParcel;
     if (!dataParcel.WriteInterfaceToken(VoipCallManagerProxy::GetDescriptor())) {
@@ -394,7 +394,7 @@ int32_t VoipCallManagerProxy::SendCallUiEvent(std::string &voipCallId, Telephony
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
     dataParcel.WriteString(voipCallId);
-    dataParcel.WriteInt32(static_cast<int32_t>(window));
+    dataParcel.WriteInt32(static_cast<int32_t>(windowModeEvent));
     auto remote = Remote();
     if (remote == nullptr) {
         TELEPHONY_LOGE("SendCallUiEvent Remote is null");
