@@ -100,7 +100,7 @@ int32_t CallPolicy::HasNormalCall(bool isEcc, int32_t slotId)
     }
     if (regStatus != RegServiceState::REG_STATE_IN_SERVICE) {
         TELEPHONY_LOGE("Call failed due to no service");
-        DelayedSingleton<CallDialog>::GetInstance()->DialogConnectExtension("CALL_FAILED_IN_AIRPLANE_MODE");
+        DelayedSingleton<CallDialog>::GetInstance()->DialogConnectExtension("CALL_FAILED_NO_SERVICE");
         return CALL_ERR_DIAL_FAILED;
     }
     ImsRegInfo info;
