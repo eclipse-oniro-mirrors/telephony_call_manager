@@ -146,6 +146,7 @@ public:
     static napi_value RemoveMissedIncomingCallNotification(napi_env env, napi_callback_info info);
     static napi_value SetVoIPCallState(napi_env env, napi_callback_info info);
     static napi_value CancelCallUpgrade(napi_env env, napi_callback_info info);
+    static napi_value SendCallUiEvent(napi_env env, napi_callback_info info);
 
 private:
     static void RegisterCallBack();
@@ -226,6 +227,7 @@ private:
     static void NativeRemoveMissedIncomingCallNotification(napi_env env, void *data);
     static void NativeSetVoIPCallState(napi_env env, void *data);
     static void NativeCancelCallUpgrade(napi_env env, void *data);
+    static void NativeSendCallUiEvent(napi_env env, void *data);
     static bool MatchEmptyParameter(napi_env env, const napi_value parameters[], const size_t parameterCount);
     static bool MatchOneOptionalNumberParameter(
         napi_env env, const napi_value parameters[], const size_t parameterCount);

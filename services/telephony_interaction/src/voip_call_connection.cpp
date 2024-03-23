@@ -191,5 +191,14 @@ void VoipCallConnection::ClearVoipCall()
         }
     }
 }
+
+int32_t VoipCallConnection::SendCallUiEvent(std::string &voipCallId, Telephony::WindowMode windowModeEvent)
+{
+    GetCallManagerProxy();
+    if (voipCallManagerInterfacePtr_ == nullptr) {
+        return TELEPHONY_ERROR;
+    }
+    return voipCallManagerInterfacePtr_->SendCallUiEvent(voipCallId, windowModeEvent);
+}
 } // namespace Telephony
 } // namespace OHOS

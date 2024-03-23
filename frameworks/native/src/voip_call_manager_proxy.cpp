@@ -39,6 +39,7 @@ int32_t VoipCallManagerProxy::ReportIncomingCall(
     dataParcel.WriteString(extras.GetStringValue("userName"));
     dataParcel.WriteString(extras.GetStringValue("abilityName"));
     dataParcel.WriteInt32(extras.GetIntValue("voipCallState"));
+    dataParcel.WriteBool(extras.GetBooleanValue("supportFloatWindow"));
     dataParcel.WriteUInt8Vector(userProfile);
     auto remote = Remote();
     if (remote == nullptr) {
@@ -357,6 +358,56 @@ int32_t VoipCallManagerProxy::UnloadVoipSa()
         remote->SendRequest(static_cast<int32_t>(INTERFACE_UNLOAD_VOIP_SA), dataParcel, replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("function UnloadVoipSa failed! errCode:%{public}d", error);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return replyParcel.ReadInt32();
+}
+
+int32_t VoipCallManagerProxy::ReportWindowModeChange(AppExecFwk::PacMap &extras)
+{
+    MessageParcel dataParcel;
+    if (!dataParcel.WriteInterfaceToken(VoipCallManagerProxy::GetDescriptor())) {
+        TELEPHONY_LOGE("write descriptor fail");
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    dataParcel.WriteString(extras.GetStringValue("callId"));
+    dataParcel.WriteInt32(static_cast<int32_t>(extras.GetIntValue("windowMode")));
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("ReportWindowModeChange Remote is null");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    MessageOption option;
+    MessageParcel replyParcel;
+    int32_t error =
+        remote->SendRequest(static_cast<int32_t>(INTERFACE_REPORT_WINDOW_MODE_CHANGE), dataParcel, replyParcel, option);
+    if (error != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("function ReportWindowModeChange call failed! errCode:%{public}d", error);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return replyParcel.ReadInt32();
+}
+
+int32_t VoipCallManagerProxy::SendCallUiEvent(std::string &voipCallId, Telephony::WindowMode windowModeEvent)
+{
+    MessageParcel dataParcel;
+    if (!dataParcel.WriteInterfaceToken(VoipCallManagerProxy::GetDescriptor())) {
+        TELEPHONY_LOGE("write descriptor fail");
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    dataParcel.WriteString(voipCallId);
+    dataParcel.WriteInt32(static_cast<int32_t>(windowModeEvent));
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("SendCallUiEvent Remote is null");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    MessageOption option;
+    MessageParcel replyParcel;
+    int32_t error =
+        remote->SendRequest(static_cast<int32_t>(INTERFACE_SEND_CALL_UI_EVENT), dataParcel, replyParcel, option);
+    if (error != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("function SendCallUiEvent call failed! errCode:%{public}d", error);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     return replyParcel.ReadInt32();

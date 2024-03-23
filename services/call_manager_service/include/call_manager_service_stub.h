@@ -118,6 +118,7 @@ private:
     int32_t OnRequestCameraCapabilities(MessageParcel &data, MessageParcel &reply);
     int32_t OnRegisterVoipCallManagerCallback(MessageParcel &data, MessageParcel &reply);
     int32_t OnUnRegisterVoipCallManagerCallback(MessageParcel &data, MessageParcel &reply);
+    int32_t OnSendCallUiEvent(MessageParcel &data, MessageParcel &reply);
     std::map<uint32_t, CallManagerServiceFunc> memberFuncMap_;
 };
 } // namespace Telephony

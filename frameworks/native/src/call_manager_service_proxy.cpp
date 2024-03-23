@@ -1313,5 +1313,23 @@ int32_t CallManagerServiceProxy::SendRequest(
     MessageOption option;
     return remote->SendRequest(static_cast<int32_t>(code), dataParcel, replyParcel, option);
 }
+
+int32_t CallManagerServiceProxy::SendCallUiEvent(int32_t callId, std::string &eventName)
+{
+    MessageParcel dataParcel;
+    if (!dataParcel.WriteInterfaceToken(CallManagerServiceProxy::GetDescriptor())) {
+        TELEPHONY_LOGE("write descriptor fail");
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    dataParcel.WriteInt32(callId);
+    dataParcel.WriteString(eventName);
+    MessageParcel replyParcel;
+    int32_t error = SendRequest(INTERFACE_SEND_CALLUI_EVENT, dataParcel, replyParcel);
+    if (error != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("function SendCallUiEvent call failed! errCode:%{public}d", error);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return replyParcel.ReadInt32();
+}
 } // namespace Telephony
 } // namespace OHOS
