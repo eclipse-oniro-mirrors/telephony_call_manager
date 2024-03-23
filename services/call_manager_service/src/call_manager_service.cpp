@@ -1254,24 +1254,11 @@ int32_t CallManagerService::InputDialerSpecialCode(const std::string &specialCod
         TELEPHONY_LOGE("specialCode is not support");
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
-    std::string tempSpecialCode = "";
-    if (specialCode == "*#2846#" || specialCode == "*#2846*" || specialCode == "#1#"
-        || specialCode == "*#28465#") {
-        tempSpecialCode = specialCode;
-    } else {
-        size_t minLength = 8;
-        size_t prefixLength = 4;
-        size_t sufffixLength = 4;
-        if (specialCode.length() > minLength && specialCode.substr(0, prefixLength) == "*#*#" &&
-            specialCode.substr(specialCode.length() - sufffixLength) == "#*#*") {
-            tempSpecialCode = specialCode.substr(prefixLength, specialCode.length() - sufffixLength);
-        }
-    }
     AAFwk::Want want;
     want.SetAction(EventFwk::CommonEventSupport::COMMON_EVENT_SPECIAL_CODE);
     EventFwk::CommonEventData commonEventData;
     commonEventData.SetWant(want);
-    commonEventData.SetData(tempSpecialCode);
+    commonEventData.SetData(specialCode);
     EventFwk::CommonEventPublishInfo publishInfo;
     if (!EventFwk::CommonEventManager::PublishCommonEvent(commonEventData, publishInfo, nullptr)) {
         TELEPHONY_LOGE("PublishCommonEvent fail");
