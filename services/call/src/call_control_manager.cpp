@@ -190,6 +190,7 @@ int32_t CallControlManager::AnswerCall(int32_t callId, int32_t videoState)
     }
     TELEPHONY_LOGI("report answered state");
     NotifyCallStateUpdated(call, TelCallState::CALL_STATUS_INCOMING, TelCallState::CALL_STATUS_ANSWERED);
+    CarrierAndVoipConflictProcess(callId);
     if (VoIPCallState_ != CallStateToApp::CALL_STATE_IDLE) {
             TELEPHONY_LOGW("VoIP call is active, waiting for VoIP to disconnect");
             AnsweredCallQueue_.hasCall = true;
@@ -212,6 +213,40 @@ int32_t CallControlManager::AnswerCall(int32_t callId, int32_t videoState)
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("AnswerCall failed!");
         return ret;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallControlManager::CarrierAndVoipConflictProcess(int32_t callId)
+{
+    sptr<CallBase> call = GetOneCallObject(callId);
+    if (call == nullptr) {
+        TELEPHONY_LOGE("CarrierAndVoipConflictProcess, call is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    if (call->GetCallType() == CallType::TYPE_CS ||
+        call->GetCallType() == CallType::TYPE_IMS ||
+        call->GetCallType() == CallType::TYPE_SATELLITE) {
+        std::list<int32_t> voipCallIdList;
+        int32_t ret = GetVoipCallList(voipCallIdList);
+        if (ret != TELEPHONY_SUCCESS) {
+            TELEPHONY_LOGE("GetVoipCallList failed!");
+            return ret;
+        }
+        for (auto voipCallId : voipCallIdList) {
+            sptr<CallBase> voipCall = GetOneCallObject(voipCallId);
+            if (voipCall->GetTelCallState() == TelCallState::CALL_STATUS_INCOMING ||
+                voipCall->GetTelCallState() == TelCallState::CALL_STATUS_WAITING) {
+                ret = RejectCall(voipCallId, true, u"CarrierAndVoipConflictProcess");
+            } else {
+                ret = HangUpCall(voipCallId);
+            }
+            if (ret != TELEPHONY_SUCCESS) {
+                TELEPHONY_LOGE("CarrierAndVoipConflictProcess failed!");
+                return ret;
+            }
+        }
+        return TELEPHONY_SUCCESS;
     }
     return TELEPHONY_SUCCESS;
 }

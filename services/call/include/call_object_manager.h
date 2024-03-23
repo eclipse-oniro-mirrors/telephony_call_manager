@@ -49,6 +49,7 @@ public:
     static int32_t IsNewCallAllowedCreate(bool &enabled);
     static int32_t GetCurrentCallNum();
     static int32_t GetCarrierCallList(std::list<int32_t> &list);
+    static int32_t GetVoipCallList(std::list<int32_t> &list);
     static bool HasRingingMaximum();
     static bool HasDialingMaximum();
     static int32_t HasEmergencyCall(bool &enabled);

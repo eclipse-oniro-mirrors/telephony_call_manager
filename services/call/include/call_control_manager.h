@@ -120,6 +120,7 @@ public:
     int32_t GetVoIPCallState(int32_t &state);
     int32_t AddCallLogAndNotification(sptr<CallBase> &callObjectPtr);
     int32_t HangUpVoipCall();
+    int32_t CarrierAndVoipConflictProcess(int32_t callId);
 
 private:
     void CallStateObserve();

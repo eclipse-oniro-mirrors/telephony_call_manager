@@ -349,6 +349,7 @@ int32_t CallStatusManager::IncomingHandle(const CallDetailInfo &info)
     }
     AddOneCallObject(call);
     DelayedSingleton<CallControlManager>::GetInstance()->NotifyNewCallCreated(call);
+    DelayedSingleton<CallControlManager>::GetInstance()->CarrierAndVoipConflictProcess(call->GetCallID());
     ret = UpdateCallState(call, info.state);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("UpdateCallState failed!");

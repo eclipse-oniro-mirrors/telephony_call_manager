@@ -244,6 +244,19 @@ int32_t CallObjectManager::GetCarrierCallList(std::list<int32_t> &list)
     return TELEPHONY_SUCCESS;
 }
 
+int32_t CallObjectManager::GetVoipCallList(std::list<int32_t> &list)
+{
+    list.clear();
+    std::lock_guard<std::mutex> lock(listMutex_);
+    std::list<sptr<CallBase>>::iterator it;
+    for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
+        if ((*it)->GetCallType() == CallType::TYPE_VOIP) {
+            list.emplace_back((*it)->GetCallID());
+        }
+    }
+    return TELEPHONY_SUCCESS;
+}
+
 bool CallObjectManager::HasRingingMaximum()
 {
     int32_t ringingCount = 0;
