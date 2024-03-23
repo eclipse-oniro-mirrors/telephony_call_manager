@@ -5873,6 +5873,7 @@ HWTEST_F(CallManagerGtest, Telephony_VoipCall_001, Function | MediumTest | Level
     EXPECT_EQ(voIPCall->LaunchConference(), TELEPHONY_SUCCESS);
     EXPECT_EQ(voIPCall->ExitConference(), TELEPHONY_SUCCESS);
     EXPECT_EQ(voIPCall->HoldConference(), TELEPHONY_SUCCESS);
+    EXPECT_EQ(voIPCall->AnswerCall(0), TELEPHONY_SUCCESS);
 }
 
 #else // TEL_TEST_UNSUPPORT
