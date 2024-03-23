@@ -1264,7 +1264,7 @@ int32_t CallManagerService::InputDialerSpecialCode(const std::string &specialCod
         size_t sufffixLength = 4;
         if (specialCode.length() > minLength && specialCode.substr(0, prefixLength) == "*#*#" &&
             specialCode.substr(specialCode.length() - sufffixLength) == "#*#*") {
-            tempSpecialCode = specialCode.substr(prefixLength, specialCode.length() - sufffixLength);
+            tempSpecialCode = specialCode.substr(prefixLength, specialCode.length() - minLength);
         }
     }
     AAFwk::Want want;
