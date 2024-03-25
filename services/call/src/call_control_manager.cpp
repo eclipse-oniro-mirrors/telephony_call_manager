@@ -1115,10 +1115,10 @@ void CallControlManager::ConnectCallUiService(bool shouldConnect)
         shouldDisconnect = true;
         if (!alarmSeted) {
             signal(SIGALRM, handler);
-            alarm(1);
+            alarm(1); // start timer
             alarmSeted = true;
         }  else {
-            alarm(0);
+            alarm(0); // stop timer
             alarm(1);
         }
     }
