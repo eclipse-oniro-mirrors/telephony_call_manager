@@ -15,11 +15,13 @@
 
 #include "call_policy.h"
 
+#include "call_dialog.h"
+#include "call_data_base_helper.h"
 #include "call_manager_errors.h"
-#include "telephony_log_wrapper.h"
-#include "ims_conference.h"
-
 #include "call_number_utils.h"
+#include "core_service_client.h"
+#include "ims_conference.h"
+#include "telephony_log_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -35,8 +37,8 @@ int32_t CallPolicy::DialPolicy(std::u16string &number, AppExecFwk::PacMap &extra
         TELEPHONY_LOGE("dial type invalid!");
         return CALL_ERR_UNKNOW_DIAL_TYPE;
     }
+    int32_t accountId = extras.GetIntValue("accountId");
     if (dialType == DialType::DIAL_CARRIER_TYPE) {
-        int32_t accountId = extras.GetIntValue("accountId");
         if (!DelayedSingleton<CallNumberUtils>::GetInstance()->SelectAccountId(accountId, extras)) {
             TELEPHONY_LOGE("invalid accountId!");
             return CALL_ERR_INVALID_SLOT_ID;
@@ -62,7 +64,66 @@ int32_t CallPolicy::DialPolicy(std::u16string &number, AppExecFwk::PacMap &extra
     if (IsVoiceCallValid(videoState) != TELEPHONY_SUCCESS) {
         return CALL_ERR_CALL_COUNTS_EXCEED_LIMIT;
     }
-    return HasNewCall();
+    if (HasNewCall() != TELEPHONY_SUCCESS)  {
+        return CALL_ERR_CALL_COUNTS_EXCEED_LIMIT;
+    }
+    if (HasNormalCall(isEcc, accountId) != TELEPHONY_SUCCESS) {
+        return CALL_ERR_DIAL_FAILED;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallPolicy::HasNormalCall(bool isEcc, int32_t slotId)
+{
+    if (isEcc) {
+        return TELEPHONY_SUCCESS;
+    }
+    bool hasSimCard = false;
+    DelayedRefSingleton<CoreServiceClient>::GetInstance().HasSimCard(slotId, hasSimCard);
+    if (!hasSimCard) {
+        TELEPHONY_LOGE("Call failed due to no sim card");
+        DelayedSingleton<CallDialog>::GetInstance()->DialogConnectExtension("CALL_FAILED_NO_SIM_CARD");
+        return CALL_ERR_DIAL_FAILED;
+    }
+    bool isAirplaneModeOn = false;
+    int32_t ret = GetAirplaneMode(isAirplaneModeOn);
+    if (ret == TELEPHONY_SUCCESS && isAirplaneModeOn) {
+        TELEPHONY_LOGE("Call failed due to isAirplaneModeOn is true");
+        DelayedSingleton<CallDialog>::GetInstance()->DialogConnectExtension("CALL_FAILED_IN_AIRPLANE_MODE");
+        return CALL_ERR_DIAL_FAILED;
+    }
+    sptr<NetworkState> networkState = nullptr;
+    RegServiceState regStatus = RegServiceState::REG_STATE_UNKNOWN;
+    DelayedRefSingleton<CoreServiceClient>::GetInstance().GetNetworkState(slotId, networkState);
+    if (networkState != nullptr) {
+        regStatus = networkState->GetRegStatus();
+    }
+    if (regStatus != RegServiceState::REG_STATE_IN_SERVICE) {
+        TELEPHONY_LOGE("Call failed due to no service");
+        DelayedSingleton<CallDialog>::GetInstance()->DialogConnectExtension("CALL_FAILED_NO_SERVICE");
+        return CALL_ERR_DIAL_FAILED;
+    }
+    ImsRegInfo info;
+    DelayedRefSingleton<CoreServiceClient>::GetInstance().GetImsRegStatus(slotId, ImsServiceType::TYPE_VOICE, info);
+    bool isImsRegistered = info.imsRegState == ImsRegState::IMS_REGISTERED;
+    bool isCTSimCard = false;
+    DelayedRefSingleton<CoreServiceClient>::GetInstance().IsCTSimCard(slotId, isCTSimCard);
+    if (isCTSimCard && !isImsRegistered) {
+        TELEPHONY_LOGE("Call failed due to CT card IMS is UNREGISTERED");
+        DelayedSingleton<CallDialog>::GetInstance()->DialogConnectExtension("CALL_FAILED_CTCARD_NO_IMS", slotId);
+        return CALL_ERR_DIAL_FAILED;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallPolicy::GetAirplaneMode(bool &isAirplaneModeOn)
+{
+    std::shared_ptr<CallDataBaseHelper> callDataPtr = DelayedSingleton<CallDataBaseHelper>::GetInstance();
+    if (callDataPtr == nullptr) {
+        TELEPHONY_LOGE("callDataPtr is nullptr");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return callDataPtr->GetAirplaneMode(isAirplaneModeOn);
 }
 
 int32_t CallPolicy::IsVoiceCallValid(VideoStateType videoState)

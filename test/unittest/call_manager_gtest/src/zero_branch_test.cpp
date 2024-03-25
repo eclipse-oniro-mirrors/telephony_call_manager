@@ -682,6 +682,22 @@ HWTEST_F(BranchTest, Telephony_CallPolicy_005, Function | MediumTest | Level1)
 }
 
 /**
+ * @tc.number   Telephony_CallPolicy_006
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_CallPolicy_006, Function | MediumTest | Level1)
+{
+    CallPolicy callPolicy;
+    bool isEcc = false;
+    int32_t slotId = 0;
+    callPolicy.HasNormalCall(isEcc, slotId);
+    bool isAirplaneModeOn = false;
+    callPolicy.GetAirplaneMode(isAirplaneModeOn);
+    ASSERT_EQ(isAirplaneModeOn, false);
+}
+
+/**
  * @tc.number   Telephony_ReportCallInfoHandler_001
  * @tc.name     test error branch
  * @tc.desc     Function test

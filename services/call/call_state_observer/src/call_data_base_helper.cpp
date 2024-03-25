@@ -32,6 +32,11 @@ static constexpr const char *CONTACT_URI = "datashare:///com.ohos.contactsdataab
 static constexpr const char *CALL_BLOCK = "datashare:///com.ohos.contactsdataability/contacts/contact_blocklist";
 static constexpr const char *CONTACT_DATA = "datashare:///com.ohos.contactsdataability/contacts/contact_data";
 static constexpr const char *ISO_COUNTRY_CODE = "CN";
+static constexpr const char *SETTINGS_DATA_URI =
+    "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true";
+static constexpr const char *SETTINGS_AIRPLANE_MODE_URI =
+    "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true&key=airplane_mode";
+static constexpr const char *SETTINGS_AIRPLANE_MODE = "settings.telephony.airplanemode";
 constexpr int32_t E_OK = 0;
 
 CallDataRdbObserver::CallDataRdbObserver(std::vector<std::string> *phones)
@@ -299,6 +304,40 @@ int32_t CallDataBaseHelper::QueryIsBlockPhoneNumber(const std::string &phoneNum,
     TELEPHONY_LOGI("count: %{public}d", count);
     resultSet->Close();
     callDataHelper->Release();
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallDataBaseHelper::GetAirplaneMode(bool &isAirplaneModeOn)
+{
+    std::shared_ptr<DataShare::DataShareHelper> callDataHelper = CreateDataShareHelper(SETTINGS_DATA_URI);
+    if (callDataHelper == nullptr) {
+        TELEPHONY_LOGE("callDataHelper is null");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    Uri uri(SETTINGS_AIRPLANE_MODE_URI);
+    std::vector<std::string> columns;
+    DataShare::DataSharePredicates predicates;
+    predicates.EqualTo(SETTING_KEY, SETTINGS_AIRPLANE_MODE);
+    auto result = callDataHelper->Query(uri, predicates, columns);
+    if (result == nullptr) {
+        TELEPHONY_LOGE("CallDataBaseHelper: query error, result is null");
+        callDataHelper->Release();
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    if (result->GoToFirstRow() != DataShare::E_OK) {
+        TELEPHONY_LOGE("CallDataBaseHelper: query error, go to first row error");
+        result->Close();
+        callDataHelper->Release();
+        return TELEPHONY_ERR_DATABASE_READ_FAIL;
+    }
+    int32_t columnindex = 0;
+    std::string value = "";
+    result->GetColumnIndex(SETTING_VALUE, columnindex);
+    result->GetString(columnindex, value);
+    result->Close();
+    callDataHelper->Release();
+    isAirplaneModeOn = value == "1";
+    TELEPHONY_LOGI("Get airplane mode:%{public}d", isAirplaneModeOn);
     return TELEPHONY_SUCCESS;
 }
 } // namespace Telephony
