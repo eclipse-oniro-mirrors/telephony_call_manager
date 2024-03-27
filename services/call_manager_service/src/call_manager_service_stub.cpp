@@ -375,7 +375,7 @@ int32_t CallManagerServiceStub::OnHangUpCall(MessageParcel &data, MessageParcel 
 int32_t CallManagerServiceStub::OnGetCallState(MessageParcel &data, MessageParcel &reply)
 {
     int32_t result = GetCallState();
-    TELEPHONY_LOGI("result:%{public}d", result);
+    TELEPHONY_LOGD("result:%{public}d", result);
     if (!reply.WriteInt32(result)) {
         TELEPHONY_LOGE("fail to write parcel");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;

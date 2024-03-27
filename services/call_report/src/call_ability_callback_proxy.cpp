@@ -70,7 +70,7 @@ int32_t CallAbilityCallbackProxy::OnCallDetailsChange(const CallAttributeInfo &i
         Remote()->SendRequest(static_cast<uint32_t>(CallManagerCallAbilityInterfaceCode::UPDATE_CALL_STATE_INFO),
         dataParcel, replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("update call state info failed, error: %{public}d", error);
+        TELEPHONY_LOGD("update call state info errcode: %{public}d", error);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     return replyParcel.ReadInt32();
@@ -126,7 +126,7 @@ int32_t CallAbilityCallbackProxy::OnCallDisconnectedCause(const DisconnectedDeta
         static_cast<uint32_t>(CallManagerCallAbilityInterfaceCode::UPDATE_CALL_DISCONNECTED_CAUSE), dataParcel,
         replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("report call disconnected cause failed, error: %{public}d", error);
+        TELEPHONY_LOGD("report call disconnected cause errcode: %{public}d", error);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     return replyParcel.ReadInt32();
@@ -288,7 +288,7 @@ int32_t CallAbilityCallbackProxy::OnReportAudioDeviceChange(const AudioDeviceInf
         static_cast<uint32_t>(CallManagerCallAbilityInterfaceCode::UPDATE_AUDIO_DEVICE_CHANGE_RESULT_REQUEST),
         dataParcel, replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("report audio device info failed, error: %{public}d", error);
+        TELEPHONY_LOGD("report audio device info errcode: %{public}d", error);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     return replyParcel.ReadInt32();
@@ -338,7 +338,7 @@ int32_t CallAbilityCallbackProxy::OnReportImsCallModeChange(const CallMediaModeI
         CallManagerCallAbilityInterfaceCode::UPDATE_IMS_CALL_MODE_RECEIVE), dataParcel,
         replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("report async results failed, error: %{public}d", error);
+        TELEPHONY_LOGD("report async results errcode: %{public}d", error);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     return replyParcel.ReadInt32();
@@ -365,7 +365,7 @@ int32_t CallAbilityCallbackProxy::OnReportCallSessionEventChange(
         CallManagerCallAbilityInterfaceCode::CALL_SESSION_EVENT_CHANGE), dataParcel,
         replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("report async results failed, error: %{public}d", error);
+        TELEPHONY_LOGD("report async results errcode: %{public}d", error);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     return replyParcel.ReadInt32();

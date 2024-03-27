@@ -68,7 +68,7 @@ int32_t CallAbilityCallbackStub::OnRemoteRequest(
         TELEPHONY_LOGE("descriptor checked failed");
         return TELEPHONY_ERR_DESCRIPTOR_MISMATCH;
     }
-    TELEPHONY_LOGI("OnReceived, cmd = %{public}u", code);
+    TELEPHONY_LOGD("OnReceived, cmd = %{public}u", code);
     auto itFunc = memberFuncMap_.find(code);
     if (itFunc != memberFuncMap_.end()) {
         auto memberFunc = itFunc->second;
@@ -84,7 +84,7 @@ int32_t CallAbilityCallbackStub::OnUpdateCallStateInfo(MessageParcel &data, Mess
     int32_t result = TELEPHONY_SUCCESS;
     CallAttributeInfo parcelPtr;
     if (!data.ContainFileDescriptors()) {
-        TELEPHONY_LOGW("sent raw data is less than 32k");
+        TELEPHONY_LOGD("sent raw data is less than 32k");
     }
     strncpy_s(parcelPtr.accountNumber, kMaxNumberLen + 1, data.ReadCString(), kMaxNumberLen + 1);
     strncpy_s(parcelPtr.bundleName, kMaxNumberLen + 1, data.ReadCString(), kMaxNumberLen + 1);
@@ -245,7 +245,7 @@ int32_t CallAbilityCallbackStub::OnUpdateAudioDeviceChange(MessageParcel &data, 
 {
     int32_t result = TELEPHONY_SUCCESS;
     if (!data.ContainFileDescriptors()) {
-        TELEPHONY_LOGW("sent raw data is less than 32k");
+        TELEPHONY_LOGD("sent raw data is less than 32k");
     }
     AudioDeviceInfo info;
     if (memset_s(&info, sizeof(AudioDeviceInfo), 0, sizeof(AudioDeviceInfo)) != EOK) {
@@ -330,7 +330,7 @@ int32_t CallAbilityCallbackStub::OnUpdateImsCallModeChange(MessageParcel &data, 
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
     if (!data.ContainFileDescriptors()) {
-        TELEPHONY_LOGW("sent raw data is less than 32k");
+        TELEPHONY_LOGD("sent raw data is less than 32k");
     }
     if ((parcelPtr = reinterpret_cast<const CallMediaModeInfo *>(data.ReadRawData(len))) == nullptr) {
         TELEPHONY_LOGE("reading raw data failed, length = %d", len);
