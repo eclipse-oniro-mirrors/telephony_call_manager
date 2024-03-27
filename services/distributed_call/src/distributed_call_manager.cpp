@@ -431,6 +431,8 @@ int32_t DistributedCallManager::DistributedCallDeviceListener::OnDeviceOffline(c
 void DistributedCallManager::OnDCallSystemAbilityAdded(const std::string &deviceId)
 {
     TELEPHONY_LOGI("dcall source service is added, deviceId: %{public}s", GetAnonyString(deviceId).c_str());
+    // wait 100ms for dcall-sa to complete init.
+    usleep(100);
     dcallProxy_ = std::make_shared<DistributedCallProxy>();
     if (dcallProxy_ == nullptr) {
         TELEPHONY_LOGE("fail to create dcall proxy obj");
