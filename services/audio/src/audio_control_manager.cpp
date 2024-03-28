@@ -135,10 +135,10 @@ void AudioControlManager::VideoStateUpdated(
         SetAudioDevice(device);
         return;
     }
-    checkTypeAndSetAudioDevice(callObjectPtr, priorVideoState, nextVideoState, device);
+    CheckTypeAndSetAudioDevice(callObjectPtr, priorVideoState, nextVideoState, device);
 }
 
-void AudioControlManager::checkTypeAndSetAudioDevice(sptr<CallBase> &callObjectPtr, VideoStateType priorVideoState,
+void AudioControlManager::CheckTypeAndSetAudioDevice(sptr<CallBase> &callObjectPtr, VideoStateType priorVideoState,
     VideoStateType nextVideoState, AudioDevice &device)
 {
     TelCallState telCallState = callObjectPtr->GetTelCallState();

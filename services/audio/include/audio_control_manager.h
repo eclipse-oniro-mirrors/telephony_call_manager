@@ -75,7 +75,7 @@ public:
     void CallStateUpdated(sptr<CallBase> &callObjectPtr, TelCallState priorState, TelCallState nextState) override;
     void VideoStateUpdated(
         sptr<CallBase> &callObjectPtr, VideoStateType priorVideoState, VideoStateType nextVideoState);
-    void checkTypeAndSetAudioDevice(sptr<CallBase> &callObjectPtr, VideoStateType priorVideoState,
+    void CheckTypeAndSetAudioDevice(sptr<CallBase> &callObjectPtr, VideoStateType priorVideoState,
     VideoStateType nextVideoState, AudioDevice &device);
     void UpdateDeviceTypeForVideoCall();
     void UpdateDeviceTypeForCrs();
