@@ -135,6 +135,12 @@ void AudioControlManager::VideoStateUpdated(
         SetAudioDevice(device);
         return;
     }
+    checkTypeAndSetAudioDevice(callObjectPtr, priorVideoState, nextVideoState, device);
+}
+
+void AudioControlManager::checkTypeAndSetAudioDevice(sptr<CallBase> &callObjectPtr, VideoStateType priorVideoState,
+    VideoStateType nextVideoState, AudioDevice &device)
+{
     TelCallState telCallState = callObjectPtr->GetTelCallState();
     if (!IsVideoCall(priorVideoState) && IsVideoCall(nextVideoState) &&
         (telCallState != TelCallState::CALL_STATUS_INCOMING && telCallState != TelCallState::CALL_STATUS_WAITING)) {
@@ -527,7 +533,7 @@ AudioDeviceType AudioControlManager::GetInitAudioDeviceType() const
          * In voice call state, bluetooth sco > wired headset > earpiece > speaker
          * In video call state, bluetooth sco > wired headset > speaker > earpiece
          */
-         if (AudioDeviceManager::IsDistributedCallConnected()) {
+        if (AudioDeviceManager::IsDistributedCallConnected()) {
             return AudioDeviceType::DEVICE_DISTRIBUTED_AUTOMOTIVE;
         }
         if (AudioDeviceManager::IsBtScoConnected()) {
