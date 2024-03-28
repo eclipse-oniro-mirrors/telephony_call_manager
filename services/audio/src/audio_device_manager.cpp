@@ -428,6 +428,10 @@ int32_t AudioDeviceManager::ReportAudioDeviceChange()
         TELEPHONY_LOGE("address is not too long");
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
+    if (memset_s(info_.currentAudioDevice.address, kMaxAddressLen + 1, 0, kMaxAddressLen + 1) != EOK) {
+        TELEPHONY_LOGE("failed to memset_s currentAudioDevice.address");
+        return TELEPHONY_ERR_MEMCPY_FAIL;
+    }
     if (memcpy_s(info_.currentAudioDevice.address, kMaxAddressLen, address.c_str(), address.length()) != EOK) {
         TELEPHONY_LOGE("memcpy_s address fail");
         return TELEPHONY_ERR_MEMCPY_FAIL;

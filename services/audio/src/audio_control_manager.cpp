@@ -143,7 +143,8 @@ void AudioControlManager::VideoStateUpdated(
             device.deviceType = AudioDeviceType::DEVICE_EARPIECE;
         }
         if (initDeviceType == AudioDeviceType::DEVICE_WIRED_HEADSET ||
-            initDeviceType == AudioDeviceType::DEVICE_BLUETOOTH_SCO) {
+            initDeviceType == AudioDeviceType::DEVICE_BLUETOOTH_SCO ||
+            initDeviceType == AudioDeviceType::DEVICE_DISTRIBUTED_AUTOMOTIVE) {
             device.deviceType = initDeviceType;
         }
         TELEPHONY_LOGI("set device type, type: %{public}d", static_cast<int32_t>(device.deviceType));
@@ -151,7 +152,8 @@ void AudioControlManager::VideoStateUpdated(
     } else if (IsVideoCall(priorVideoState) && !IsVideoCall(nextVideoState)) {
         device.deviceType = AudioDeviceType::DEVICE_EARPIECE;
         if (initDeviceType == AudioDeviceType::DEVICE_WIRED_HEADSET ||
-            initDeviceType == AudioDeviceType::DEVICE_BLUETOOTH_SCO) {
+            initDeviceType == AudioDeviceType::DEVICE_BLUETOOTH_SCO ||
+            initDeviceType == AudioDeviceType::DEVICE_DISTRIBUTED_AUTOMOTIVE) {
             device.deviceType = initDeviceType;
         }
         TELEPHONY_LOGI("set device type, type: %{public}d", static_cast<int32_t>(device.deviceType));
@@ -380,12 +382,14 @@ int32_t AudioControlManager::SetAudioDevice(const AudioDevice &device)
         case AudioDeviceType::DEVICE_DISTRIBUTED_AUTOMOTIVE:
         case AudioDeviceType::DEVICE_DISTRIBUTED_PHONE:
         case AudioDeviceType::DEVICE_DISTRIBUTED_PAD:
-            TELEPHONY_LOGI("set audio device, address: %{public}s", device.address);
-            if (DelayedSingleton<DistributedCallManager>::GetInstance()->SwitchDCallDevice(device)) {
-                DelayedSingleton<AudioDeviceManager>::GetInstance()->SetCurrentAudioDevice(device.deviceType);
-                return TELEPHONY_SUCCESS;
+            if (DelayedSingleton<DistributedCallManager>::GetInstance()->IsDAudioDeviceConnected()) {
+                TELEPHONY_LOGI("set audio device, address: %{public}s", device.address);
+                if (DelayedSingleton<DistributedCallManager>::GetInstance()->SwitchDCallDevice(device)) {
+                    DelayedSingleton<AudioDeviceManager>::GetInstance()->SetCurrentAudioDevice(device.deviceType);
+                    return TELEPHONY_SUCCESS;
+                }
+                return CALL_ERR_AUDIO_SET_AUDIO_DEVICE_FAILED;
             }
-            return CALL_ERR_AUDIO_SET_AUDIO_DEVICE_FAILED;
         case AudioDeviceType::DEVICE_BLUETOOTH_SCO: {
             AudioSystemManager* audioSystemManager = AudioSystemManager::GetInstance();
             int32_t ret = audioSystemManager->SetCallDeviceActive(ActiveDeviceType::BLUETOOTH_SCO,
@@ -523,6 +527,9 @@ AudioDeviceType AudioControlManager::GetInitAudioDeviceType() const
          * In voice call state, bluetooth sco > wired headset > earpiece > speaker
          * In video call state, bluetooth sco > wired headset > speaker > earpiece
          */
+         if (AudioDeviceManager::IsDistributedCallConnected()) {
+            return AudioDeviceType::DEVICE_DISTRIBUTED_AUTOMOTIVE;
+        }
         if (AudioDeviceManager::IsBtScoConnected()) {
             return AudioDeviceType::DEVICE_BLUETOOTH_SCO;
         }
