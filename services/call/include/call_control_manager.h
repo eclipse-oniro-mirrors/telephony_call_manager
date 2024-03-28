@@ -127,6 +127,7 @@ private:
     int32_t NumberLegalityCheck(std::string &number);
     int32_t BroadcastSubscriber();
     void PackageDialInformation(AppExecFwk::PacMap &extras, std::string accountNumber, bool isEcc);
+    static void handler(int args);
 
 private:
     class SystemAbilityListener : public SystemAbilityStatusChangeStub {
@@ -154,6 +155,7 @@ private:
     std::mutex mutex_;
     CallStateToApp VoIPCallState_ = CallStateToApp::CALL_STATE_IDLE;
     bool shouldDisconnect = true;
+    static bool alarmSeted;
     struct AnsweredCallQueue {
         bool hasCall = false;
         int32_t callId = 0;

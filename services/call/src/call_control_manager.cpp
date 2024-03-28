@@ -16,6 +16,7 @@
 #include "call_control_manager.h"
 #include "ffrt.h"
 #include <securec.h>
+#include "csignal"
 #include <string_ex.h>
 
 #include "audio_control_manager.h"
@@ -39,6 +40,7 @@
 
 namespace OHOS {
 namespace Telephony {
+bool CallControlManager::alarmSeted = false;
 using namespace OHOS::EventFwk;
 CallControlManager::CallControlManager()
     : callStateListenerPtr_(nullptr), CallRequestHandlerPtr_(nullptr), incomingCallWakeup_(nullptr),
@@ -1126,15 +1128,33 @@ void CallControlManager::GetDialParaInfo(DialParaInfo &info, AppExecFwk::PacMap 
     extras = extras_;
 }
 
+void CallControlManager::handler(int args)
+{
+    alarmSeted = false;
+    TELEPHONY_LOGE("handle DisconnectAbility");
+    if (!CallObjectManager::HasCallExist()) {
+        DelayedSingleton<CallConnectAbility>::GetInstance()->DisconnectAbility();
+    }
+}
+
 void CallControlManager::ConnectCallUiService(bool shouldConnect)
 {
     if (shouldConnect) {
+        if (alarmSeted) {
+            alarm(0);
+            alarmSeted = false;
+        }
         DelayedSingleton<CallConnectAbility>::GetInstance()->ConnectAbility();
         shouldDisconnect = false;
     } else {
         shouldDisconnect = true;
-        if (!CallObjectManager::HasCallExist()) {
-            DelayedSingleton<CallConnectAbility>::GetInstance()->DisconnectAbility();
+        if (!alarmSeted) {
+            signal(SIGALRM, handler);
+            alarm(1); // start timer
+            alarmSeted = true;
+        }  else {
+            alarm(0); // stop timer
+            alarm(1);
         }
     }
 }
