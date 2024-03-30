@@ -396,6 +396,7 @@ int32_t AudioControlManager::SetAudioDevice(const AudioDevice &device)
                 }
                 return CALL_ERR_AUDIO_SET_AUDIO_DEVICE_FAILED;
             }
+            return TELEPHONY_SUCCESS;
         case AudioDeviceType::DEVICE_BLUETOOTH_SCO: {
             AudioSystemManager* audioSystemManager = AudioSystemManager::GetInstance();
             int32_t ret = audioSystemManager->SetCallDeviceActive(ActiveDeviceType::BLUETOOTH_SCO,
