@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2023 Huawei Device Co., Ltd.
+ * Copyright (C) 2021-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -427,6 +427,10 @@ int32_t AudioDeviceManager::ReportAudioDeviceChange()
     if (address.length() > kMaxAddressLen) {
         TELEPHONY_LOGE("address is not too long");
         return TELEPHONY_ERR_ARGUMENT_INVALID;
+    }
+    if (memset_s(info_.currentAudioDevice.address, kMaxAddressLen + 1, 0, kMaxAddressLen + 1) != EOK) {
+        TELEPHONY_LOGE("failed to memset_s currentAudioDevice.address");
+        return TELEPHONY_ERR_MEMCPY_FAIL;
     }
     if (memcpy_s(info_.currentAudioDevice.address, kMaxAddressLen, address.c_str(), address.length()) != EOK) {
         TELEPHONY_LOGE("memcpy_s address fail");
