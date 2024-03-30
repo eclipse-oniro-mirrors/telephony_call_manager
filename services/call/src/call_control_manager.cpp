@@ -116,8 +116,6 @@ int32_t CallControlManager::DialCall(std::u16string &number, AppExecFwk::PacMap 
         accountNumber, extras.GetIntValue("accountId"), isEcc);
     if (isEcc) {
         extras.PutIntValue("dialScene", (int32_t)DialScene::CALL_EMERGENCY);
-    } else {
-        extras.PutIntValue("dialScene", (int32_t)DialScene::CALL_NORMAL);
     }
     ret = DialPolicy(number, extras, isEcc);
     if (ret != TELEPHONY_SUCCESS) {
