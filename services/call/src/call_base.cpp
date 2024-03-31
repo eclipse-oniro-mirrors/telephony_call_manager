@@ -59,6 +59,7 @@ CallBase::~CallBase() {}
 
 int32_t CallBase::DialCallBase()
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     callRunningState_ = CallRunningState::CALL_RUNNING_STATE_CONNECTING;
     TELEPHONY_LOGI("start to set audio");
     // Set audio, set hands-free
@@ -89,6 +90,7 @@ void CallBase::HangUpVoipCall()
 
 int32_t CallBase::IncomingCallBase()
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     callRunningState_ = CallRunningState::CALL_RUNNING_STATE_RINGING;
     return TELEPHONY_SUCCESS;
 }
@@ -478,6 +480,7 @@ bool CallBase::IsSpeakerphoneEnabled()
 
 bool CallBase::IsCurrentRinging()
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     return (callRunningState_ == CallRunningState::CALL_RUNNING_STATE_RINGING) ? true : false;
 }
 
