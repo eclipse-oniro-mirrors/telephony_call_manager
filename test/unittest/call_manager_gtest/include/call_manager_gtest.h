@@ -124,6 +124,20 @@ public:
         return false;
     }
 
+    bool CanDialCall(int32_t slotId1, int32_t slotId2)
+    {
+        if (IsAirplaneModeOn()) {
+            return false;
+        }
+        if (!IsRegServiceInService(slotId1) && !IsRegServiceInService(slotId2)) {
+            return false;
+        }
+        if (IsCtCardWithoutIms(slotId1) && IsCtCardWithoutIms(slotId2)) {
+            return false;
+        }
+        return true;
+    }
+
     inline void SleepForSeconds(int32_t seconds)
     {
         std::this_thread::sleep_for(std::chrono::seconds(seconds));
