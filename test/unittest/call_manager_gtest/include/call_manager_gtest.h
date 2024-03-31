@@ -86,7 +86,8 @@ public:
         return isConnected_;
     }
 
-    bool IsAirplaneModeOn() {
+    bool IsAirplaneModeOn()
+    {
         bool isAirplaneModeOn = false;
         std::shared_ptr<CallDataBaseHelper> callDataPtr = DelayedSingleton<CallDataBaseHelper>::GetInstance();
         if (callDataPtr == nullptr) {
@@ -96,7 +97,8 @@ public:
         return ret == TELEPHONY_SUCCESS && isAirplaneModeOn;
     }
 
-    bool IsRegServiceInService(int32_t slotId) {
+    bool IsRegServiceInService(int32_t slotId)
+    {
         sptr<NetworkState> networkState = nullptr;
         DelayedRefSingleton<CoreServiceClient>::GetInstance().GetNetworkState(slotId, networkState);
         RegServiceState regStatus = RegServiceState::REG_STATE_UNKNOWN;
@@ -109,7 +111,8 @@ public:
         return false;
     }
 
-    bool IsCtCardWithoutIms(int32_t slotId) {
+    bool IsCtCardWithoutIms(int32_t slotId)
+    {
         ImsRegInfo info;
         DelayedRefSingleton<CoreServiceClient>::GetInstance().GetImsRegStatus(slotId, ImsServiceType::TYPE_VOICE, info);
         bool isImsRegistered = info.imsRegState == ImsRegState::IMS_REGISTERED;

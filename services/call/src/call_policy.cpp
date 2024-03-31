@@ -67,10 +67,7 @@ int32_t CallPolicy::DialPolicy(std::u16string &number, AppExecFwk::PacMap &extra
     if (HasNewCall() != TELEPHONY_SUCCESS)  {
         return CALL_ERR_CALL_COUNTS_EXCEED_LIMIT;
     }
-    if (HasNormalCall(isEcc, accountId) != TELEPHONY_SUCCESS) {
-        return CALL_ERR_DIAL_FAILED;
-    }
-    return TELEPHONY_SUCCESS;
+    return HasNormalCall(isEcc, accountId);
 }
 
 int32_t CallPolicy::HasNormalCall(bool isEcc, int32_t slotId)
@@ -83,14 +80,14 @@ int32_t CallPolicy::HasNormalCall(bool isEcc, int32_t slotId)
     if (!hasSimCard) {
         TELEPHONY_LOGE("Call failed due to no sim card");
         DelayedSingleton<CallDialog>::GetInstance()->DialogConnectExtension("CALL_FAILED_NO_SIM_CARD");
-        return CALL_ERR_DIAL_FAILED;
+        return TELEPHONY_ERR_NO_SIM_CARD;
     }
     bool isAirplaneModeOn = false;
     int32_t ret = GetAirplaneMode(isAirplaneModeOn);
     if (ret == TELEPHONY_SUCCESS && isAirplaneModeOn) {
         TELEPHONY_LOGE("Call failed due to isAirplaneModeOn is true");
         DelayedSingleton<CallDialog>::GetInstance()->DialogConnectExtension("CALL_FAILED_IN_AIRPLANE_MODE");
-        return CALL_ERR_DIAL_FAILED;
+        return TELEPHONY_ERR_AIRPLANE_MODE_ON;
     }
     sptr<NetworkState> networkState = nullptr;
     RegServiceState regStatus = RegServiceState::REG_STATE_UNKNOWN;
@@ -101,7 +98,7 @@ int32_t CallPolicy::HasNormalCall(bool isEcc, int32_t slotId)
     if (regStatus != RegServiceState::REG_STATE_IN_SERVICE) {
         TELEPHONY_LOGE("Call failed due to no service");
         DelayedSingleton<CallDialog>::GetInstance()->DialogConnectExtension("CALL_FAILED_NO_SERVICE");
-        return CALL_ERR_DIAL_FAILED;
+        return TELEPHONY_ERR_NETWORK_NOT_IN_SERVICE;
     }
     ImsRegInfo info;
     DelayedRefSingleton<CoreServiceClient>::GetInstance().GetImsRegStatus(slotId, ImsServiceType::TYPE_VOICE, info);

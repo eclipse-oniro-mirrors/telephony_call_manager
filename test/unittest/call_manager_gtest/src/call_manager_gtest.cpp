@@ -106,7 +106,8 @@ bool CallInfoManager::HasState(int callId, int32_t callState)
     return true;
 }
 
-bool CallInfoManager::CanDialCall() {
+bool CallInfoManager::CanDialCall()
+{
     if (IsAirplaneModeOn()) {
         return false;
     }
