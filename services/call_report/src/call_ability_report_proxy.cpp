@@ -19,6 +19,7 @@
 
 #include "app_mgr_interface.h"
 #include "app_state_observer.h"
+#include "bluetooth_call_manager.h"
 #include "call_manager_errors.h"
 #include "iservice_registry.h"
 #include "system_ability.h"
@@ -173,6 +174,7 @@ int32_t CallAbilityReportProxy::ReportCallStateInfo(const CallAttributeInfo &inf
             }
         }
     }
+    DelayedSingleton<BluetoothCallManager>::GetInstance()->SendCallDetailsChange(info);
     TELEPHONY_LOGI("report call state info success, callId[%{public}d] state[%{public}d] conferenceState[%{public}d] "
                    "videoState[%{public}d]",
         info.callId, info.callState, info.conferenceState, info.videoState);

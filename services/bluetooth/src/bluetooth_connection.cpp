@@ -129,6 +129,22 @@ int32_t BluetoothConnection::SendBtCallState(
     return TELEPHONY_SUCCESS;
 }
 
+int32_t BluetoothConnection::SendCallDetailsChange(const CallAttributeInfo &info)
+{
+#ifdef ABILITY_BLUETOOTH_SUPPORT
+    Bluetooth::HandsFreeAudioGateway *profile = Bluetooth::HandsFreeAudioGateway::GetProfile();
+    if (profile == nullptr) {
+        TELEPHONY_LOGE("profile is nullptr");
+        return TELEPHONY_ERROR;
+    }
+
+    std::string nickName = "";
+    profile->CallDetailsChanged(info.callId, info.callState);
+#endif
+    TELEPHONY_LOGI("Send CallDetails");
+    return TELEPHONY_SUCCESS;
+}
+
 BtScoState BluetoothConnection::GetBtScoState()
 {
     BtScoState btScoState = btScoState_.load();
