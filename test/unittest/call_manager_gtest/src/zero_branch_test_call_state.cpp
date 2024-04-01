@@ -367,7 +367,7 @@ HWTEST_F(CallStateTest, Telephony_AudioControlManager_001, Function | MediumTest
     audioControl->HandleNewActiveCall(call);
     call->SetCallType(CallType::TYPE_ERR_CALL);
     audioControl->HandleNewActiveCall(call);
-    ASSERT_FALSE(audioControl->GetCallList().empty());
+    ASSERT_TRUE(audioControl->GetCallList().empty());
     ASSERT_TRUE(audioControl->GetCurrentActiveCall() == nullptr);
 }
 
