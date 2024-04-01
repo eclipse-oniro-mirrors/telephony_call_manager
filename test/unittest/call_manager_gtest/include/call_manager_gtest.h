@@ -24,6 +24,7 @@
 #include <unordered_set>
 
 #include "bluetooth_call_client.h"
+#include "call_data_base_helper.h"
 #include "call_manager_client.h"
 #include "call_manager_connect.h"
 #include "common_event.h"
@@ -83,6 +84,58 @@ public:
             std::cout << "call manager service not connected" << std::endl;
         }
         return isConnected_;
+    }
+
+    bool IsAirplaneModeOn()
+    {
+        bool isAirplaneModeOn = false;
+        std::shared_ptr<CallDataBaseHelper> callDataPtr = DelayedSingleton<CallDataBaseHelper>::GetInstance();
+        if (callDataPtr == nullptr) {
+            return false;
+        }
+        int32_t ret = callDataPtr->GetAirplaneMode(isAirplaneModeOn);
+        return ret == TELEPHONY_SUCCESS && isAirplaneModeOn;
+    }
+
+    bool IsRegServiceInService(int32_t slotId)
+    {
+        sptr<NetworkState> networkState = nullptr;
+        DelayedRefSingleton<CoreServiceClient>::GetInstance().GetNetworkState(slotId, networkState);
+        RegServiceState regStatus = RegServiceState::REG_STATE_UNKNOWN;
+        if (networkState != nullptr) {
+            regStatus = networkState->GetRegStatus();
+        }
+        if (regStatus == RegServiceState::REG_STATE_IN_SERVICE) {
+            return true;
+        }
+        return false;
+    }
+
+    bool IsCtCardWithoutIms(int32_t slotId)
+    {
+        ImsRegInfo info;
+        DelayedRefSingleton<CoreServiceClient>::GetInstance().GetImsRegStatus(slotId, ImsServiceType::TYPE_VOICE, info);
+        bool isImsRegistered = info.imsRegState == ImsRegState::IMS_REGISTERED;
+        bool isCTSimCard = false;
+        DelayedRefSingleton<CoreServiceClient>::GetInstance().IsCTSimCard(slotId, isCTSimCard);
+        if (isCTSimCard && !isImsRegistered) {
+            return true;
+        }
+        return false;
+    }
+
+    bool CanDialCall(int32_t slotId1, int32_t slotId2)
+    {
+        if (IsAirplaneModeOn()) {
+            return false;
+        }
+        if (!IsRegServiceInService(slotId1) && !IsRegServiceInService(slotId2)) {
+            return false;
+        }
+        if (IsCtCardWithoutIms(slotId1) && IsCtCardWithoutIms(slotId2)) {
+            return false;
+        }
+        return true;
     }
 
     inline void SleepForSeconds(int32_t seconds)

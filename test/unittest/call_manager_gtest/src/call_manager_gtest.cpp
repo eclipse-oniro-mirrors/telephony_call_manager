@@ -330,6 +330,9 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_0100, Function | Mediu
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
     }
+    if (!CanDialCall(SIM1_SLOTID, SIM2_SLOTID)) {
+        return;
+    }
     EXPECT_EQ(CallManagerGtest::IsServiceConnected(), true);
     std::string phoneNumber = "11111111111";
     if (HasSimCard(SIM1_SLOTID)) {
@@ -368,6 +371,9 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_0200, Function | Mediu
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
     }
+    if (!CanDialCall(SIM1_SLOTID, SIM2_SLOTID)) {
+        return;
+    }
     EXPECT_EQ(CallManagerGtest::IsServiceConnected(), true);
     if (HasSimCard(SIM1_SLOTID)) {
         InitDialInfo(
@@ -393,6 +399,9 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_0300, Function | Mediu
 {
     AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+    if (!CanDialCall(SIM1_SLOTID, SIM2_SLOTID)) {
         return;
     }
     EXPECT_EQ(CallManagerGtest::IsServiceConnected(), true);
@@ -429,6 +438,9 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_0400, Function | Mediu
 {
     AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+    if (!CanDialCall(SIM1_SLOTID, SIM2_SLOTID)) {
         return;
     }
     EXPECT_EQ(CallManagerGtest::IsServiceConnected(), true);
@@ -468,6 +480,9 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_0500, Function | Mediu
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
     }
+    if (!CanDialCall(SIM1_SLOTID, SIM2_SLOTID)) {
+        return;
+    }
     EXPECT_EQ(CallManagerGtest::IsServiceConnected(), true);
     if (HasSimCard(SIM1_SLOTID)) {
         InitDialInfo(
@@ -500,6 +515,9 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_1000, Function | Mediu
 {
     AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+    if (!CanDialCall(SIM1_SLOTID, SIM2_SLOTID)) {
         return;
     }
     EXPECT_EQ(CallManagerGtest::IsServiceConnected(), true);
@@ -537,6 +555,9 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_1100, Function | Mediu
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
     }
+    if (!CanDialCall(SIM1_SLOTID, SIM2_SLOTID)) {
+        return;
+    }
     EXPECT_EQ(CallManagerGtest::IsServiceConnected(), true);
     std::string phoneNumber = PHONE_NUMBER; // OPERATOR PHONY NUMBER
     InitDialInfo(INVALID_SLOT_ID, (int32_t)VideoStateType::TYPE_VOICE, (int32_t)DialScene::CALL_NORMAL,
@@ -555,6 +576,9 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_1200, Function | Mediu
 {
     AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+    if (!CanDialCall(SIM1_SLOTID, SIM2_SLOTID)) {
         return;
     }
     EXPECT_EQ(CallManagerGtest::IsServiceConnected(), true);
@@ -576,6 +600,9 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_1300, Function | Mediu
 {
     AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+    if (!CanDialCall(SIM1_SLOTID, SIM2_SLOTID)) {
         return;
     }
     EXPECT_EQ(CallManagerGtest::IsServiceConnected(), true);
@@ -602,6 +629,9 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_1300, Function | Mediu
 HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_1400, Function | MediumTest | Level1)
 {
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+    if (!CanDialCall(SIM1_SLOTID, SIM2_SLOTID)) {
         return;
     }
     EXPECT_EQ(CallManagerGtest::IsServiceConnected(), true);
@@ -631,6 +661,9 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_1500, Function | Mediu
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
     }
+    if (!CanDialCall(SIM1_SLOTID, SIM2_SLOTID)) {
+        return;
+    }
     EXPECT_EQ(CallManagerGtest::IsServiceConnected(), true);
     std::string phoneNumber = "33333333333";
     if (HasSimCard(SIM1_SLOTID)) {
@@ -655,6 +688,9 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_1600, Function | Mediu
 {
     AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+    if (!CanDialCall(SIM1_SLOTID, SIM2_SLOTID)) {
         return;
     }
     EXPECT_EQ(CallManagerGtest::IsServiceConnected(), true);
@@ -683,6 +719,9 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_1700, Function | Mediu
 {
     AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+    if (!CanDialCall(SIM1_SLOTID, SIM2_SLOTID)) {
         return;
     }
     EXPECT_EQ(CallManagerGtest::IsServiceConnected(), true);
@@ -724,6 +763,9 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_1800, Function | Mediu
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
     }
+    if (!CanDialCall(SIM1_SLOTID, SIM2_SLOTID)) {
+        return;
+    }
     EXPECT_EQ(CallManagerGtest::IsServiceConnected(), true);
     std::string phoneNumber = "";
     ASSERT_TRUE(blueToothClientPtr_ != nullptr);
@@ -752,6 +794,9 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_1900, Function | Mediu
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
     }
+    if (!CanDialCall(SIM1_SLOTID, SIM2_SLOTID)) {
+        return;
+    }
     ASSERT_TRUE(blueToothClientPtr_ != nullptr);
     EXPECT_EQ(CallManagerGtest::IsServiceConnected(), true);
     std::string phoneNumber = PHONE_NUMBER; // OPERATOR PHONY NUMBER
@@ -772,6 +817,9 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_2000, Function | Mediu
 {
     AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+    if (!CanDialCall(SIM1_SLOTID, SIM2_SLOTID)) {
         return;
     }
     EXPECT_EQ(CallManagerGtest::IsServiceConnected(), true);
@@ -822,6 +870,9 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_2100, Function | Mediu
 {
     AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+    if (!CanDialCall(SIM1_SLOTID, SIM2_SLOTID)) {
         return;
     }
     EXPECT_EQ(CallManagerGtest::IsServiceConnected(), true);
