@@ -139,7 +139,7 @@ int32_t BluetoothConnection::SendCallDetailsChange(const CallAttributeInfo &info
     }
 
     std::string nickName = "";
-    profile->CallDetailsChanged(info.callId, info.callState);
+    profile->CallDetailsChanged(static_cast<int32_t>(info.callId), static_cast<int32_t>(info.callState));
 #endif
     TELEPHONY_LOGI("Send CallDetails");
     return TELEPHONY_SUCCESS;
