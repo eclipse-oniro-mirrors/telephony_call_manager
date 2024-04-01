@@ -146,7 +146,8 @@ void AudioControlManager::CheckTypeAndSetAudioDevice(sptr<CallBase> &callObjectP
         (telCallState != TelCallState::CALL_STATUS_INCOMING && telCallState != TelCallState::CALL_STATUS_WAITING)) {
         if (callObjectPtr->GetOriginalCallType() == VOICE_TYPE &&
             (telCallState == TelCallState::CALL_STATUS_DIALING || telCallState == TelCallState::CALL_STATUS_ALERTING)) {
-            device.deviceType = AudioDeviceType::DEVICE_EARPIECE;
+            TELEPHONY_LOGI("before modify set device to EARPIECE, now not set");
+            return;
         }
         if (initDeviceType == AudioDeviceType::DEVICE_WIRED_HEADSET ||
             initDeviceType == AudioDeviceType::DEVICE_BLUETOOTH_SCO ||
