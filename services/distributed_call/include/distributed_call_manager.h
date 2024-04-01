@@ -42,9 +42,9 @@ public:
     void ClearConnectedDCallDevice();
     std::string GetConnectedDCallDeviceAddr();
     AudioDeviceType GetConnectedDCallDeviceType();
-    void SwichOffDCallDeviceSync();
-    void SwichOffDCallDeviceAsync();
-    bool IsDCallDeviceswichedOn();
+    void SwitchOffDCallDeviceSync();
+    void SwitchOffDCallDeviceAsync();
+    bool IsDCallDeviceSwitchedOn();
     bool SwitchOnDCallDeviceSync(const AudioDevice& device);
     void SwitchOnDCallDeviceAsync(const AudioDevice& device);
     void SetCallState(bool isActive);
@@ -56,8 +56,8 @@ public:
 
     bool GetIsAnsweredTheSecond();
     void SetIsAnsweredTheSecond(bool isSet);
-    void GetConnectedDCallDevice
-    void GetCurrentDCallDevice(const AudioDevice& device);
+    void GetConnectedDCallDevice(AudioDevice& device);
+    void SetCurrentDCallDevice(const AudioDevice& device);
     AudioDevice GetCurrentDCallDevice();
     void ClearCurrentDCallDevice();
 

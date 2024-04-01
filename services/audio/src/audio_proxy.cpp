@@ -394,7 +394,7 @@ void AudioPreferDeviceChangeCallback::OnPreferredOutputDeviceUpdated(
         TELEPHONY_LOGE("desc size is zero");
         return;
     }
-    if (DelayedSingleton<DistributedCallManager>::GetInstance()->IsDCallDeviceswichedOn()) {
+    if (DelayedSingleton<DistributedCallManager>::GetInstance()->IsDCallDeviceSwitchedOn()) {
         TELEPHONY_LOGW("has already switch to distributed audio device");
         return;
     }

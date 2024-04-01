@@ -36,7 +36,7 @@ const std::string CALLBACK_NAME = "telephony";
 const std::string DISTRIBUTED_AUDIO_DEV_CAR = "dCar";
 const std::string DISTRIBUTED_AUDIO_DEV_PHONE = "dPhone";
 const std::string DISTRIBUTED_AUDIO_DEV_PAD = "dPad";
-const std::string SWITCH_ON_DCALL_THREAD_NAME = "switch no dcall";
+const std::string SWITCH_ON_DCALL_THREAD_NAME = "switch on dcall";
 const std::string SWITCH_OFF_DCALL_THREAD_NAME = "switch off dcall";
 
 std::string GetAnonyString(const std::string &value)
@@ -392,7 +392,7 @@ void DistributedCallManager::SwitchOnDCallDeviceAsync(const AudioDevice& device)
     switchThread.detach();
 }
 
-void DistributedCallManager::SwichOffDCallDeviceSync()
+void DistributedCallManager::SwitchOffDCallDeviceSync()
 {
     if (!dCallDeviceSwitchedOn_.load()) {
         TELEPHONY_LOGE("distributed audio device not connected.");
@@ -426,12 +426,12 @@ void DistributedCallManager::SwitchOffDCallDeviceAsync()
         return;
     }
 
-    std::thread switchThread(&DistributedCallManager::SwichOffDCallDeviceSync, this);
+    std::thread switchThread(&DistributedCallManager::SwitchOffDCallDeviceSync, this);
     pthread_setname_np(switchThread.native_handle(), SWITCH_OFF_DCALL_THREAD_NAME.c_str());
     switchThread.detach();
 }
 
-bool DistributedCallManager::IsDCallDeviceswichedOn()
+bool DistributedCallManager::IsDCallDeviceSwitchedOn()
 {
     return dCallDeviceSwitchedOn_.load();
 }

@@ -238,11 +238,11 @@ bool AudioDeviceManager::ProcessEvent(AudioEvent event)
                     .address = { 0 },
                 };
                 if (DelayedSingleton<AudioProxy>::GetInstance()->GetPreferredOutputAudioDevice(device) !=
-                TELEPHONY_SUCCESS) {
-                TELEPHONY_LOGE("current audio device nullptr");
-                return false;
+                    TELEPHONY_SUCCESS) {
+                    TELEPHONY_LOGE("current audio device nullptr");
+                    return false;
                 }
-            SetCurrentAudioDevice(device.deviceType);
+                SetCurrentAudioDevice(device.deviceType);
             }
             break;
         case AudioEvent::AUDIO_DEACTIVATED:

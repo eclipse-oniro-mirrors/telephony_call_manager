@@ -2728,9 +2728,9 @@ HWTEST_F(BranchTest, Telephony_DistributedCallManager_001, Function | MediumTest
     manager.AddDCallDevice(TEST_STR);
     manager.RemoveDCallDevice(TEST_STR);
     manager.GetConnectedDCallDeviceId();
-    manager.SwichOffDCallDeviceSync();
+    manager.SwitchOffDCallDeviceSync();
     manager.dCallDeviceSwitchedOn_.store(true);
-    manager.SwichOffDCallDeviceSync();
+    manager.SwitchOffDCallDeviceSync();
     manager.GetConnectedDCallDeviceId();
     manager.GetConnectedDCallDevice(device);
     manager.SetConnectedDCallDevice(device);

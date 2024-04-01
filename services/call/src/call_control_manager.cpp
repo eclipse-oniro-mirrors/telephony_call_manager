@@ -457,30 +457,30 @@ bool CallControlManager::NotifyCallStateUpdated(
             DelayedSingleton<AudioDeviceManager>::GetInstance()->CheckAndSwitchDistributedAudioDevice();
         } else if (priorState == TelCallState::CALL_STATUS_ACTIVE &&
             nextState == TelCallState::CALL_STATUS_DISCONNECTED &&
-            DelayedSingleton<DistributedCallManager>::GetInstance()->IsDCallDeviceswichedOn()) {
-                if (DelayedSingleton<DistributedCallManager>::GetInstance()->GetIsAnsweredTheSecond()) {
-                    DelayedSingleton<DistributedCallManager>::GetInstance()->SetIsAnsweredTheSecond(false);
-                } else {
-                    TELEPHONY_LOGI("disconnect dcall link when the last call is ended in a Multi-Call scenario.");
-                    DelayedSingleton<AudioDeviceManager>::GetInstance()->OnActivedCallDisconnected();
-                    DelayedSingleton<DistributedCallManager>::GetInstance()->SwichOffDCallDeviceAsync();
-                }
+            DelayedSingleton<DistributedCallManager>::GetInstance()->IsDCallDeviceSwitchedOn()) {
+            if (DelayedSingleton<DistributedCallManager>::GetInstance()->GetIsAnsweredTheSecond()) {
+                DelayedSingleton<DistributedCallManager>::GetInstance()->SetIsAnsweredTheSecond(false);
+            } else {
+                TELEPHONY_LOGI("disconnect dcall link when the last call is ended in a Multi-Call scenario.");
+                DelayedSingleton<AudioDeviceManager>::GetInstance()->OnActivedCallDisconnected();
+                DelayedSingleton<DistributedCallManager>::GetInstance()->SwitchOffDCallDeviceAsync();
             }
         } else if (priorState == TelCallState::CALL_STATUS_ACTIVE && nextState == TelCallState::CALL_STATUS_HOLDING &&
-            DelayedSingleton<DistributedCallManager>::GetInstance()->IsDCallDeviceswichedOn() &&
+            DelayedSingleton<DistributedCallManager>::GetInstance()->IsDCallDeviceSwitchedOn() &&
             !DelayedSingleton<DistributedCallManager>::GetInstance()->GetIsAnsweredTheSecond()) {
             TELEPHONY_LOGI("to answer the second incoming call, need to restart the dcall data link.");
             DelayedSingleton<DistributedCallManager>::GetInstance()->GetConnectedDCallDevice(connectedDcallDevice);
-            DelayedSingleton<DistributedCallManager>::GetInstance()->SetCurrentDCallDevice();
-            DelayedSingleton<DistributedCallManager>::GetInstance()->SwichOffDCallDeviceAsync();
+            DelayedSingleton<DistributedCallManager>::GetInstance()->SetCurrentDCallDevice(connectedDcallDevice);
+            DelayedSingleton<DistributedCallManager>::GetInstance()->SwitchOffDCallDeviceAsync();
             DelayedSingleton<AudioDeviceManager>::GetInstance()->SetCurrentAudioDevice(AudioDeviceType::DEVICE_SPEAKER);
         } else if (priorState == TelCallState::CALL_STATUS_WAITING && nextState == TelCallState::CALL_STATUS_ACTIVE) {
             connectedDcallDevice = DelayedSingleton<DistributedCallManager>::GetInstance()->GetCurrentDCallDevice();
-            if (connectedDcallDevice.deviceType != AudioDeviceType::DEVICE_UNKNOWN)
-            TELEPHONY_LOGI("to answer the second incoming call, need to restart the dcall data link.");
-            DelayedSingleton<DistributedCallManager>::GetInstance()->SwitchOnDCallDeviceAsync(connectedDcallDevice);
-            DelayedSingleton<DistributedCallManager>::GetInstance()->SetIsAnsweredTheSecond(true);
-            connectedDcallDevice = DelayedSingleton<DistributedCallManager>::GetInstance()->ClearCurrentDCallDevice();
+            if (connectedDcallDevice.deviceType != AudioDeviceType::DEVICE_UNKNOWN) {
+                TELEPHONY_LOGI("to answer the second incoming call, need to restart the dcall data link.");
+                DelayedSingleton<DistributedCallManager>::GetInstance()->SwitchOnDCallDeviceAsync(connectedDcallDevice);
+                DelayedSingleton<DistributedCallManager>::GetInstance()->SetIsAnsweredTheSecond(true);
+                DelayedSingleton<DistributedCallManager>::GetInstance()->ClearCurrentDCallDevice();
+            }
         }
         return true;
     }
