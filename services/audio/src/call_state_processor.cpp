@@ -141,6 +141,7 @@ int32_t CallStateProcessor::GetCallNumber(TelCallState state)
 
 bool CallStateProcessor::ShouldSwitchState(TelCallState callState)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     bool shouldSwitch = false;
     switch (callState) {
         case TelCallState::CALL_STATUS_DIALING:
@@ -166,6 +167,7 @@ bool CallStateProcessor::ShouldSwitchState(TelCallState callState)
 
 bool CallStateProcessor::UpdateCurrentCallState()
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     if (activeCalls_.size() > EMPTY_VALUE) {
         // no need to update call state while active calls exists
         return false;
@@ -187,6 +189,7 @@ bool CallStateProcessor::UpdateCurrentCallState()
 
 bool CallStateProcessor::ShouldStopSoundtone()
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     if (activeCalls_.size() > EMPTY_VALUE || incomingCalls_.size() > EMPTY_VALUE) {
         // no need to stop soundtone
         return false;
@@ -200,6 +203,7 @@ bool CallStateProcessor::ShouldStopSoundtone()
 
 int32_t CallStateProcessor::GetAudioForegroundLiveCall()
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     int32_t callId = INVALID_CALLID;
     if (activeCalls_.size() > EMPTY_VALUE) {
         callId = *activeCalls_.begin();

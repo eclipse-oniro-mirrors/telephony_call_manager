@@ -82,11 +82,11 @@ int32_t CallAbilityReportProxy::RegisterCallBack(
 
 int32_t CallAbilityReportProxy::UnRegisterCallBack(const std::string &bundleName)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     if (callbackPtrList_.empty()) {
         TELEPHONY_LOGE("callbackPtrList_ is null! %{public}s UnRegisterCallBack failed", bundleName.c_str());
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
     std::list<sptr<ICallAbilityCallback>>::iterator it = callbackPtrList_.begin();
     for (; it != callbackPtrList_.end(); ++it) {
         if ((*it)->GetBundleName() == bundleName) {
