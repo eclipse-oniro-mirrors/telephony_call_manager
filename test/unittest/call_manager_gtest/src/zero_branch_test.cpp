@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022 Huawei Device Co., Ltd.
+ * Copyright (C) 2022-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -2715,7 +2715,7 @@ HWTEST_F(BranchTest, Telephony_DistributedCallManager_001, Function | MediumTest
     AudioDevice device;
     device.deviceType = AudioDeviceType::DEVICE_EARPIECE;
     manager.GetDevIdFromAudioDevice(device);
-    manager.SwitchDCallDevice(device);
+    manager.SwitchOnDCallDeviceSync(device);
     device.deviceType = AudioDeviceType::DEVICE_DISTRIBUTED_PHONE;
     std::string devId = "";
     manager.CreateDAudioDevice(devId, device);
@@ -2728,20 +2728,20 @@ HWTEST_F(BranchTest, Telephony_DistributedCallManager_001, Function | MediumTest
     manager.AddDCallDevice(TEST_STR);
     manager.RemoveDCallDevice(TEST_STR);
     manager.GetConnectedDCallDeviceId();
-    manager.DisconnectDCallDevice();
-    manager.isConnected_.store(true);
-    manager.DisconnectDCallDevice();
+    manager.SwichOffDCallDeviceSync();
+    manager.dCallDeviceSwitchedOn_.store(true);
+    manager.SwichOffDCallDeviceSync();
     manager.GetConnectedDCallDeviceId();
-    manager.GetConnectedAudioDevice(device);
-    manager.SetConnectedAudioDevice(device);
-    manager.ClearConnectedDAudioDevice();
-    manager.SwitchDCallDevice(device);
+    manager.GetConnectedDCallDevice(device);
+    manager.SetConnectedDCallDevice(device);
+    manager.ClearConnectedDCallDevice();
+    manager.SwitchOnDCallDeviceSync(device);
     std::unique_ptr<AudioDevice> devicePtr = std::make_unique<AudioDevice>();
     devicePtr->deviceType = AudioDeviceType::DEVICE_DISTRIBUTED_PHONE;
-    manager.SwitchToDistributedCallDevice(std::move(devicePtr));
+    manager.SwitchOnDCallDevice(std::move(devicePtr));
     std::unique_ptr<AudioDevice> deviceRarpiecePtr = std::make_unique<AudioDevice>();
     deviceRarpiecePtr->deviceType = AudioDeviceType::DEVICE_EARPIECE;
-    manager.SwitchToDistributedCallDevice(std::move(deviceRarpiecePtr));
+    manager.SwitchOnDCallDevice(std::move(deviceRarpiecePtr));
     manager.OnDCallSystemAbilityAdded(TEST_STR);
 }
 

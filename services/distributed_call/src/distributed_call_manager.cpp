@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Huawei Device Co., Ltd.
+ * Copyright (C) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -36,7 +36,8 @@ const std::string CALLBACK_NAME = "telephony";
 const std::string DISTRIBUTED_AUDIO_DEV_CAR = "dCar";
 const std::string DISTRIBUTED_AUDIO_DEV_PHONE = "dPhone";
 const std::string DISTRIBUTED_AUDIO_DEV_PAD = "dPad";
-const std::string SWITCH_TO_DCALL_THREAD_NAME = "switch to dcall";
+const std::string SWITCH_ON_DCALL_THREAD_NAME = "switch no dcall";
+const std::string SWITCH_OFF_DCALL_THREAD_NAME = "switch off dcall";
 
 std::string GetAnonyString(const std::string &value)
 {
@@ -191,10 +192,10 @@ void DistributedCallManager::AddDCallDevice(const std::string& devId)
     DelayedSingleton<AudioDeviceManager>::GetInstance()->AddAudioDeviceList(device.address, device.deviceType, "");
     onlineDCallDevices_.emplace(devId, device);
 
-    if (!isConnected_.load() && isCallActived_.load()) {
+    if (!dCallDeviceSwitchedOn_.load() && isCallActived_.load()) {
         if (device.deviceType == AudioDeviceType::DEVICE_DISTRIBUTED_AUTOMOTIVE) {
             TELEPHONY_LOGI("switch call to auto motive as it is online");
-            SwitchDCallDeviceAsync(device);
+            SwitchOnDCallDeviceAsync(device);
         }
     }
 }
@@ -214,14 +215,14 @@ void DistributedCallManager::RemoveDCallDevice(const std::string& devId)
         onlineDCallDevices_.erase(iter);
         if (curDevId == devId) {
             TELEPHONY_LOGI("current dcall device is removed, now reinit audio device.");
-            isConnected_.store(false);
-            ClearConnectedDAudioDevice();
+            dCallDeviceSwitchedOn_.store(false);
+            ClearConnectedDCallDevice();
             DelayedSingleton<AudioDeviceManager>::GetInstance()->InitAudioDevice();
         }
     }
 }
 
-void DistributedCallManager::ClearDCallDevice()
+void DistributedCallManager::ClearDCallDevices()
 {
     TELEPHONY_LOGI("clear dcall device.");
     std::lock_guard<std::mutex> lock(onlineDeviceMtx_);
@@ -238,14 +239,14 @@ void DistributedCallManager::NotifyOnlineDCallDevices(std::vector<std::string> d
     TELEPHONY_LOGI("notify online dcall devices end.");
 }
 
-std::string DistributedCallManager::GetConnectedDCallAddr()
+std::string DistributedCallManager::GetConnectedDCallDeviceAddr()
 {
     std::lock_guard<std::mutex> lock(connectedDevMtx_);
     std::string addr = connectedAudioDevice_.address;
     return addr;
 }
 
-AudioDeviceType DistributedCallManager::GetConnectedDCallType()
+AudioDeviceType DistributedCallManager::GetConnectedDCallDeviceType()
 {
     std::lock_guard<std::mutex> lock(connectedDevMtx_);
     AudioDeviceType type = connectedAudioDevice_.deviceType;
@@ -256,13 +257,13 @@ std::string DistributedCallManager::GetConnectedDCallDeviceId()
 {
     std::lock_guard<std::mutex> lock(connectedDevMtx_);
     std::string devId = "";
-    if (isConnected_.load()) {
+    if (dCallDeviceSwitchedOn_.load()) {
         devId = GetDevIdFromAudioDevice(connectedAudioDevice_);
     }
     return devId;
 }
 
-void DistributedCallManager::GetConnectedAudioDevice(AudioDevice& device)
+void DistributedCallManager::GetConnectedDCallDevice(AudioDevice& device)
 {
     std::lock_guard<std::mutex> lock(connectedDevMtx_);
     device.deviceType = connectedAudioDevice_.deviceType;
@@ -271,7 +272,28 @@ void DistributedCallManager::GetConnectedAudioDevice(AudioDevice& device)
     }
 }
 
-void DistributedCallManager::SetConnectedAudioDevice(const AudioDevice& device)
+void DistributedCallManager::SetCurrentDCallDevice(const AudioDevice& device)
+{
+    currentAudioDevice_.deviceType = device.deviceType;
+    if (memcpy_s(currentAudioDevice_.address, kMaxAddressLen, device.address, kMaxAddressLen) != EOK) {
+        TELEPHONY_LOGE("memcpy_s failed.");
+    }
+}
+
+AudioDevice DistributedCallManager::GetCurrentDCallDevice()
+{
+    return currentAudioDevice_;
+}
+
+void DistributedCallManager::ClearCurrentDCallDevice()
+{
+    currentAudioDevice_.deviceType = AudioDeviceType::DEVICE_UNKNOWN;
+    if (memset_s(currentAudioDevice_.address, kMaxAddressLen, 0, kMaxAddressLen) != EOK) {
+        TELEPHONY_LOGE("memset_s failed.");
+    }
+}
+
+void DistributedCallManager::SetConnectedDCallDevice(const AudioDevice& device)
 {
     std::lock_guard<std::mutex> lock(connectedDevMtx_);
     connectedAudioDevice_.deviceType = device.deviceType;
@@ -280,7 +302,7 @@ void DistributedCallManager::SetConnectedAudioDevice(const AudioDevice& device)
     }
 }
 
-void DistributedCallManager::ClearConnectedDAudioDevice()
+void DistributedCallManager::ClearConnectedDCallDevice()
 {
     std::lock_guard<std::mutex> lock(connectedDevMtx_);
     connectedAudioDevice_.deviceType = AudioDeviceType::DEVICE_UNKNOWN;
@@ -289,7 +311,7 @@ void DistributedCallManager::ClearConnectedDAudioDevice()
     }
 }
 
-bool DistributedCallManager::SwitchDCallDevice(const AudioDevice& device)
+bool DistributedCallManager::SwitchOnDCallDeviceSync(const AudioDevice& device)
 {
     if (!IsDistributedAudioDevice(device)) {
         TELEPHONY_LOGE("not distributed audio device, device type: %{public}d", device.deviceType);
@@ -307,8 +329,8 @@ bool DistributedCallManager::SwitchDCallDevice(const AudioDevice& device)
     }
     int32_t ret = dcallProxy_->SwitchDevice(devId, DCALL_SWITCH_DEVICE_TYPE_SINK);
     if (ret == TELEPHONY_SUCCESS) {
-        isConnected_.store(true);
-        SetConnectedAudioDevice(device);
+        dCallDeviceSwitchedOn_.store(true);
+        SetConnectedDCallDevice(device);
         TELEPHONY_LOGI("switch dcall device succeed.");
         return true;
     }
@@ -316,7 +338,7 @@ bool DistributedCallManager::SwitchDCallDevice(const AudioDevice& device)
     return false;
 }
 
-void DistributedCallManager::SwitchToDistributedCallDevice(std::unique_ptr<AudioDevice> device)
+void DistributedCallManager::SwitchOnDCallDevice(std::unique_ptr<AudioDevice> device)
 {
     if (!IsDistributedAudioDevice(*device)) {
         TELEPHONY_LOGE("not distributed audio device, device type: %{public}d", device->deviceType);
@@ -334,8 +356,8 @@ void DistributedCallManager::SwitchToDistributedCallDevice(std::unique_ptr<Audio
     TELEPHONY_LOGI("switch to distributed call device start, devId: %s", GetAnonyString(devId).c_str());
     int32_t ret = dcallProxy_->SwitchDevice(devId, DCALL_SWITCH_DEVICE_TYPE_SINK);
     if (ret == TELEPHONY_SUCCESS) {
-        isConnected_.store(true);
-        SetConnectedAudioDevice(*device);
+        dCallDeviceSwitchedOn_.store(true);
+        SetConnectedDCallDevice(*device);
         DelayedSingleton<AudioDeviceManager>::GetInstance()->SetCurrentAudioDevice(
             device->deviceType);
         TELEPHONY_LOGI("switch to distributed call device succeed.");
@@ -349,7 +371,7 @@ void DistributedCallManager::SetCallState(bool isActive)
     isCallActived_.store(isActive);
 }
 
-void DistributedCallManager::SwitchDCallDeviceAsync(const AudioDevice& device)
+void DistributedCallManager::SwitchOnDCallDeviceAsync(const AudioDevice& device)
 {
     std::unique_ptr<AudioDevice> dCallDevice = std::make_unique<AudioDevice>();
     if (dCallDevice == nullptr) {
@@ -365,14 +387,14 @@ void DistributedCallManager::SwitchDCallDeviceAsync(const AudioDevice& device)
         TELEPHONY_LOGE("failed to memcpy_s dCallDevice->address");
         return;
     }
-    std::thread switchThread(&DistributedCallManager::SwitchToDistributedCallDevice, this, std::move(dCallDevice));
-    pthread_setname_np(switchThread.native_handle(), SWITCH_TO_DCALL_THREAD_NAME.c_str());
+    std::thread switchThread(&DistributedCallManager::SwitchOnDCallDevice, this, std::move(dCallDevice));
+    pthread_setname_np(switchThread.native_handle(), SWITCH_ON_DCALL_THREAD_NAME.c_str());
     switchThread.detach();
 }
 
-void DistributedCallManager::DisconnectDCallDevice()
+void DistributedCallManager::SwichOffDCallDeviceSync()
 {
-    if (!isConnected_.load()) {
+    if (!dCallDeviceSwitchedOn_.load()) {
         TELEPHONY_LOGE("distributed audio device not connected.");
         return;
     }
@@ -388,8 +410,8 @@ void DistributedCallManager::DisconnectDCallDevice()
     }
     int32_t ret = dcallProxy_->SwitchDevice(devId, DCALL_SWITCH_DEVICE_TYPE_SOURCE);
     if (ret == TELEPHONY_SUCCESS) {
-        isConnected_.store(false);
-        ClearConnectedDAudioDevice();
+        dCallDeviceSwitchedOn_.store(false);
+        ClearConnectedDCallDevice();
         TELEPHONY_LOGI("disconnect dcall device succeed.");
     } else {
         TELEPHONY_LOGE("disconnect dcall device failed");
@@ -397,34 +419,46 @@ void DistributedCallManager::DisconnectDCallDevice()
     TELEPHONY_LOGI("disconnect dcall device end.");
 }
 
-bool DistributedCallManager::IsDAudioDeviceConnected()
+void DistributedCallManager::SwitchOffDCallDeviceAsync()
 {
-    return isConnected_.load();
+    if (!dCallDeviceSwitchedOn_.load()) {
+        TELEPHONY_LOGE("distributed audio device not connected.");
+        return;
+    }
+
+    std::thread switchThread(&DistributedCallManager::SwichOffDCallDeviceSync, this);
+    pthread_setname_np(switchThread.native_handle(), SWITCH_OFF_DCALL_THREAD_NAME.c_str());
+    switchThread.detach();
 }
 
-void DistributedCallManager::OnDeviceOnline(const std::string &devId)
+bool DistributedCallManager::IsDCallDeviceswichedOn()
+{
+    return dCallDeviceSwitchedOn_.load();
+}
+
+void DistributedCallManager::OnDCallDeviceOnline(const std::string &devId)
 {
     TELEPHONY_LOGI("dcall device is online, devId: %{public}s", GetAnonyString(devId).c_str());
     AddDCallDevice(devId);
 }
 
-void DistributedCallManager::OnDeviceOffline(const std::string &devId)
+void DistributedCallManager::OnDCallDeviceOffline(const std::string &devId)
 {
     TELEPHONY_LOGI("dcall device is offline, devId: %{public}s", GetAnonyString(devId).c_str());
     RemoveDCallDevice(devId);
 }
 
-int32_t DistributedCallManager::DistributedCallDeviceListener::OnDeviceOnline(const std::string &devId)
+int32_t DistributedCallManager::DistributedCallDeviceListener::OnDCallDeviceOnline(const std::string &devId)
 {
     TELEPHONY_LOGI("dcall device is online, devId: %{public}s", GetAnonyString(devId).c_str());
-    DelayedSingleton<DistributedCallManager>::GetInstance()->OnDeviceOnline(devId);
+    DelayedSingleton<DistributedCallManager>::GetInstance()->OnDCallDeviceOnline(devId);
     return TELEPHONY_SUCCESS;
 }
 
-int32_t DistributedCallManager::DistributedCallDeviceListener::OnDeviceOffline(const std::string &devId)
+int32_t DistributedCallManager::DistributedCallDeviceListener::OnDCallDeviceOffline(const std::string &devId)
 {
     TELEPHONY_LOGI("dcall device is offline, devId: %{public}s", GetAnonyString(devId).c_str());
-    DelayedSingleton<DistributedCallManager>::GetInstance()->OnDeviceOffline(devId);
+    DelayedSingleton<DistributedCallManager>::GetInstance()->OnDCallDeviceOffline(devId);
     return TELEPHONY_SUCCESS;
 }
 
@@ -467,12 +501,22 @@ void DistributedCallManager::OnDCallSystemAbilityRemoved(const std::string &devi
     TELEPHONY_LOGI("dcall source service is removed, deviceId: %{public}s", GetAnonyString(deviceId).c_str());
     dcallDeviceListener_ = nullptr;
     dcallProxy_ = nullptr;
-    isConnected_.store(false);
-    ClearDCallDevice();
-    ClearConnectedDAudioDevice();
+    dCallDeviceSwitchedOn_.store(false);
+    ClearDCallDevices();
+    ClearConnectedDCallDevice();
     DelayedSingleton<AudioDeviceManager>::GetInstance()->ResetDistributedCallDevicesList();
     DelayedSingleton<AudioDeviceManager>::GetInstance()->InitAudioDevice();
     TELEPHONY_LOGI("OnDCallSystemAbilityRemoved end.");
+}
+
+bool DistributedCallManager::GetIsAnsweredTheSecond()
+{
+    return isAnsweredTheSecond_;
+}
+
+void DistributedCallManager::SetIsAnsweredTheSecond(bool isSet)
+{
+    isAnsweredTheSecond_ = isSet;
 }
 
 void DCallSystemAbilityListener::OnAddSystemAbility(int32_t systemAbilityId, const std::string &deviceId)

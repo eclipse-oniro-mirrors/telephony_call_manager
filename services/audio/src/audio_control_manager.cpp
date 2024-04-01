@@ -390,7 +390,7 @@ int32_t AudioControlManager::SetAudioDevice(const AudioDevice &device)
         case AudioDeviceType::DEVICE_DISTRIBUTED_PAD:
             if (!DelayedSingleton<DistributedCallManager>::GetInstance()->IsDAudioDeviceConnected()) {
                 TELEPHONY_LOGI("set audio device, address: %{public}s", device.address);
-                if (DelayedSingleton<DistributedCallManager>::GetInstance()->SwitchDCallDevice(device)) {
+                if (DelayedSingleton<DistributedCallManager>::GetInstance()->SwitchOnDCallDeviceSync(device)) {
                     DelayedSingleton<AudioDeviceManager>::GetInstance()->SetCurrentAudioDevice(device.deviceType);
                     return TELEPHONY_SUCCESS;
                 }
@@ -412,8 +412,8 @@ int32_t AudioControlManager::SetAudioDevice(const AudioDevice &device)
             break;
     }
     if (audioDeviceType != AudioDeviceType::DEVICE_UNKNOWN) {
-        if (DelayedSingleton<DistributedCallManager>::GetInstance()->IsDAudioDeviceConnected()) {
-            DelayedSingleton<DistributedCallManager>::GetInstance()->DisconnectDCallDevice();
+        if (DelayedSingleton<DistributedCallManager>::GetInstance()->IsDCallDeviceswichedOn()) {
+            DelayedSingleton<DistributedCallManager>::GetInstance()->SwichOffDCallDeviceSync();
         }
         if (DelayedSingleton<AudioDeviceManager>::GetInstance()->SwitchDevice(audioDeviceType)) {
             return TELEPHONY_SUCCESS;

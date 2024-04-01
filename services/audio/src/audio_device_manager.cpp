@@ -351,7 +351,7 @@ bool AudioDeviceManager::EnableBtSco()
 bool AudioDeviceManager::EnableDistributedCall()
 {
     if (isDCallDevConnected_) {
-        AudioDeviceType type = DelayedSingleton<DistributedCallManager>::GetInstance()->GetConnectedDCallType();
+        AudioDeviceType type = DelayedSingleton<DistributedCallManager>::GetInstance()->GetConnectedDCallDeviceType();
         TELEPHONY_LOGI("distributed call enabled, current audio device: %d", static_cast<int32_t>(type));
         SetCurrentAudioDevice(type);
         return true;
@@ -379,9 +379,6 @@ bool AudioDeviceManager::DisableAll()
 
 void AudioDeviceManager::SetCurrentAudioDevice(AudioDeviceType deviceType)
 {
-    if (!IsDistributedAudioDeviceType(deviceType) && IsDistributedAudioDeviceType(audioDeviceType_)) {
-        DelayedSingleton<DistributedCallManager>::GetInstance()->DisconnectDCallDevice();
-    }
     audioDeviceType_ = deviceType;
     ReportAudioDeviceChange();
 }
@@ -393,7 +390,7 @@ bool AudioDeviceManager::CheckAndSwitchDistributedAudioDevice()
     std::vector<AudioDevice>::iterator it = info_.audioDeviceList.begin();
     while (it != info_.audioDeviceList.end()) {
         if (it->deviceType == AudioDeviceType::DEVICE_DISTRIBUTED_AUTOMOTIVE) {
-            DelayedSingleton<DistributedCallManager>::GetInstance()->SwitchDCallDeviceAsync(*it);
+            DelayedSingleton<DistributedCallManager>::GetInstance()->SwitchOnDCallDeviceAsync(*it);
             return true;
         } else {
             ++it;
@@ -422,7 +419,7 @@ int32_t AudioDeviceManager::ReportAudioDeviceChange()
         address = bluetoothCallManager->GetConnectedScoAddr();
         deviceName = bluetoothCallManager->GetConnectedScoName();
     } else if (IsDistributedAudioDeviceType(audioDeviceType_)) {
-        address = DelayedSingleton<DistributedCallManager>::GetInstance()->GetConnectedDCallAddr();
+        address = DelayedSingleton<DistributedCallManager>::GetInstance()->GetConnectedDCallDeviceAddr();
     }
     if (address.length() > kMaxAddressLen) {
         TELEPHONY_LOGE("address is not too long");
