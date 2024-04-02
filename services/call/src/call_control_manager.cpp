@@ -190,7 +190,7 @@ int32_t CallControlManager::AnswerCall(int32_t callId, int32_t videoState)
     }
     TELEPHONY_LOGI("report answered state");
     NotifyCallStateUpdated(call, TelCallState::CALL_STATUS_INCOMING, TelCallState::CALL_STATUS_ANSWERED);
-    CarrierAndVoipConflictProcess(callId);
+    CarrierAndVoipConflictProcess(callId, TelCallState::CALL_STATUS_ANSWERED);
     if (VoIPCallState_ != CallStateToApp::CALL_STATE_IDLE) {
             TELEPHONY_LOGW("VoIP call is active, waiting for VoIP to disconnect");
             AnsweredCallQueue_.hasCall = true;
@@ -217,7 +217,7 @@ int32_t CallControlManager::AnswerCall(int32_t callId, int32_t videoState)
     return TELEPHONY_SUCCESS;
 }
 
-int32_t CallControlManager::CarrierAndVoipConflictProcess(int32_t callId)
+int32_t CallControlManager::CarrierAndVoipConflictProcess(int32_t callId, TelCallState callState)
 {
     sptr<CallBase> call = GetOneCallObject(callId);
     if (call == nullptr) {
@@ -238,7 +238,7 @@ int32_t CallControlManager::CarrierAndVoipConflictProcess(int32_t callId)
             if (voipCall->GetTelCallState() == TelCallState::CALL_STATUS_INCOMING ||
                 voipCall->GetTelCallState() == TelCallState::CALL_STATUS_WAITING) {
                 ret = RejectCall(voipCallId, true, u"CarrierAndVoipConflictProcess");
-            } else {
+            } else if (callState == TelCallState::CALL_STATUS_ANSWERED) {
                 ret = HangUpCall(voipCallId);
             }
             if (ret != TELEPHONY_SUCCESS) {
