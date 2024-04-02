@@ -362,7 +362,8 @@ int32_t CallStatusManager::IncomingHandle(const CallDetailInfo &info)
     return ret;
 }
 
-void CallStatusManager::CarrierAndVoipConflictProcess(int32_t callId) {
+void CallStatusManager::CarrierAndVoipConflictProcess(int32_t callId)
+{
     DelayedSingleton<CallControlManager>::GetInstance()->CarrierAndVoipConflictProcess(callId,
         TelCallState::CALL_STATUS_INCOMING);
 }
