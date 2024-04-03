@@ -90,6 +90,7 @@ private:
     void SetContactInfo(sptr<CallBase> &call, std::string phoneNum);
     int32_t HandleRejectCall(sptr<CallBase> &call);
     bool ShouldRejectIncomingCall();
+    void CarrierAndVoipConflictProcess(int32_t callId);
 
 private:
     CallDetailInfo callReportInfo_;
