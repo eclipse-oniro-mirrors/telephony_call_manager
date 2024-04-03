@@ -92,7 +92,7 @@ void CallManagerProxy::Init(int32_t systemAbilityId)
         return;
     }
     initStatus_ = true;
-    TELEPHONY_LOGI("connected to call manager service successfully!");
+    TELEPHONY_LOGD("connected to call manager service successfully!");
 }
 
 #ifdef CALL_MANAGER_AUTO_START_OPTIMIZE
@@ -158,7 +158,9 @@ int32_t CallManagerProxy::RegisterCallBack(std::unique_ptr<CallManagerCallback> 
     if (ret != TELEPHONY_SUCCESS) {
         callAbilityCallbackPtr_.clear();
         callAbilityCallbackPtr_ = nullptr;
-        TELEPHONY_LOGE("register callback to call manager service failed,result: %{public}d", ret);
+        if (ret != TELEPHONY_ERR_PERMISSION_ERR) {
+            TELEPHONY_LOGE("register callback to call manager service failed,result: %{public}d", ret);
+        }
         if (ret == TELEPHONY_ERR_PERMISSION_ERR) {
             return TELEPHONY_ERR_PERMISSION_ERR;
         } else if (ret == TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API) {

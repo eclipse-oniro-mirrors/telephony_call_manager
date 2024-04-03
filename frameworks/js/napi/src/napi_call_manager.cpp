@@ -1723,7 +1723,7 @@ bool NapiCallManager::MatchOneStringParameter(napi_env env, const napi_value par
 bool NapiCallManager::MatchObserverOffParameter(
     napi_env env, const napi_value parameters[], const size_t parameterCount)
 {
-    TELEPHONY_LOGI("parameter count: %{public}zu", parameterCount);
+    TELEPHONY_LOGD("parameter count: %{public}zu", parameterCount);
     switch (parameterCount) {
         case ONLY_ONE_VALUE:
             return NapiUtil::MatchParameters(env, parameters, { napi_string });
@@ -3859,7 +3859,7 @@ void NapiCallManager::NativeOffCallBack(napi_env env, napi_status status, void *
         napi_value result = nullptr;
         napi_get_reference_value(env, asyncContext->callbackRef, &callback);
         napi_status ret = napi_call_function(env, nullptr, callback, DATA_LENGTH_ONE, callbackValue, &result);
-        TELEPHONY_LOGI("callback result = %{public}d", ret);
+        TELEPHONY_LOGD("callback result = %{public}d", ret);
         napi_delete_reference(env, asyncContext->callbackRef);
     }
     napi_delete_async_work(env, asyncContext->work);

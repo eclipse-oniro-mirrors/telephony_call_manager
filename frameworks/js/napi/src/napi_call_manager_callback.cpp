@@ -25,9 +25,7 @@ namespace Telephony {
 int32_t NapiCallManagerCallback::OnCallDetailsChange(const CallAttributeInfo &info)
 {
     int32_t ret = DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->UpdateCallStateInfo(info);
-    if (ret != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("UpdateCallStateInfoHandler failed! errCode:%{public}d", ret);
-    } else {
+    if (ret == TELEPHONY_SUCCESS) {
         TELEPHONY_LOGI("UpdateCallStateInfoHandler success! state:%{public}d, videoState:%{public}d", info.callState,
             info.videoState);
     }
@@ -93,9 +91,7 @@ int32_t NapiCallManagerCallback::OnOttCallRequest(OttCallRequestId requestId, Ap
 int32_t NapiCallManagerCallback::OnReportAudioDeviceChange(const AudioDeviceInfo &info)
 {
     int32_t ret = DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->UpdateAudioDeviceInfo(info);
-    if (ret != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("UpdateAudioDeviceInfo failed! errCode:%{public}d", ret);
-    } else {
+    if (ret == TELEPHONY_SUCCESS) {
         TELEPHONY_LOGI("UpdateAudioDeviceInfo success!");
     }
     return ret;

@@ -441,7 +441,6 @@ int32_t NapiCallAbilityCallback::ReportStopRttInfo(AppExecFwk::PacMap &resultInf
 int32_t NapiCallAbilityCallback::UpdateCallStateInfo(const CallAttributeInfo &info)
 {
     if (stateCallback_.thisVar == nullptr) {
-        TELEPHONY_LOGE("stateCallback is null!");
         return CALL_ERR_CALLBACK_NOT_EXIST;
     }
     uv_loop_s *loop = nullptr;
@@ -825,7 +824,6 @@ int32_t NapiCallAbilityCallback::ReportMmiCode(MmiCodeInfo &info, EventCallback 
 int32_t NapiCallAbilityCallback::UpdateAudioDeviceInfo(const AudioDeviceInfo &info)
 {
     if (audioDeviceCallback_.thisVar == nullptr) {
-        TELEPHONY_LOGE("audioDeviceCallback_ is null!");
         return CALL_ERR_CALLBACK_NOT_EXIST;
     }
     uv_loop_s *loop = nullptr;
