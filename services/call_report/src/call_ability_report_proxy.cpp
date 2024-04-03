@@ -174,7 +174,8 @@ int32_t CallAbilityReportProxy::ReportCallStateInfo(const CallAttributeInfo &inf
             }
         }
     }
-    DelayedSingleton<BluetoothCallManager>::GetInstance()->SendCallDetailsChange(info);
+    DelayedSingleton<BluetoothCallManager>::GetInstance()->SendCallDetailsChange(static_cast<int32_t>(info.callId),
+        static_cast<int32_t>(info.callState));
     TELEPHONY_LOGI("report call state info success, callId[%{public}d] state[%{public}d] conferenceState[%{public}d] "
                    "videoState[%{public}d]",
         info.callId, info.callState, info.conferenceState, info.videoState);

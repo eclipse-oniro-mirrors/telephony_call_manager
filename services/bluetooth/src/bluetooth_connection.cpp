@@ -129,7 +129,7 @@ int32_t BluetoothConnection::SendBtCallState(
     return TELEPHONY_SUCCESS;
 }
 
-int32_t BluetoothConnection::SendCallDetailsChange(const CallAttributeInfo &info)
+int32_t BluetoothConnection::SendCallDetailsChange(int32_t callId, int32_t callState)
 {
 #ifdef ABILITY_BLUETOOTH_SUPPORT
     Bluetooth::HandsFreeAudioGateway *profile = Bluetooth::HandsFreeAudioGateway::GetProfile();
@@ -139,7 +139,7 @@ int32_t BluetoothConnection::SendCallDetailsChange(const CallAttributeInfo &info
     }
 
     std::string nickName = "";
-    profile->CallDetailsChanged(static_cast<int32_t>(info.callId), static_cast<int32_t>(info.callState));
+    profile->CallDetailsChanged(callId, callState);
 #endif
     TELEPHONY_LOGI("Send CallDetails");
     return TELEPHONY_SUCCESS;
