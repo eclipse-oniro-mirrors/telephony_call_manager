@@ -84,6 +84,7 @@ struct VoipCallReportInfo {
     std::string abilityName = "";
     std::string extensionId = "";
     std::string voipBundleName = "";
+    bool showBannerForIncomingCall = true;
 };
 
 /**
