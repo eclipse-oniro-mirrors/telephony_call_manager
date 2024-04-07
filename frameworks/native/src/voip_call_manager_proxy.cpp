@@ -40,6 +40,7 @@ int32_t VoipCallManagerProxy::ReportIncomingCall(
     dataParcel.WriteString(extras.GetStringValue("abilityName"));
     dataParcel.WriteInt32(extras.GetIntValue("voipCallState"));
     dataParcel.WriteBool(extras.GetBooleanValue("supportFloatWindow"));
+    dataParcel.WriteBool(extras.GetBooleanValue("showBannerForIncomingCall"));
     dataParcel.WriteUInt8Vector(userProfile);
     auto remote = Remote();
     if (remote == nullptr) {
