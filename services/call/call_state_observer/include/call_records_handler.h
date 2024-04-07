@@ -37,6 +37,7 @@ public:
 
 private:
     void QueryCallerInfo(ContactInfo &contactInfo, std::string phoneNumber);
+    std::string CheckNumberLocationInfo(const CallRecordInfo &info);
 
 private:
     std::shared_ptr<CallDataBaseHelper> callDataPtr_;

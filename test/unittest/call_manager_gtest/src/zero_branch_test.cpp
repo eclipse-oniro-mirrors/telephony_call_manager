@@ -360,6 +360,22 @@ HWTEST_F(BranchTest, Telephony_CallNumberUtils_001, Function | MediumTest | Leve
 }
 
 /**
+ * @tc.number   Telephony_CallNumberUtils_002
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_CallNumberUtils_002, Function | MediumTest | Level1)
+{
+    std::string emptyStr = "";
+    std::string phoneNumber = "123456789012";
+    std::string numberLocation = "";
+    ASSERT_NE(DelayedSingleton<CallNumberUtils>::GetInstance()->QueryNumberLocationInfo(numberLocation, emptyStr),
+        TELEPHONY_ERR_SUCCESS);
+    EXPECT_EQ(DelayedSingleton<CallNumberUtils>::GetInstance()->QueryNumberLocationInfo(numberLocation, phoneNumber),
+        TELEPHONY_ERR_SUCCESS);
+}
+
+/**
  * @tc.number   Telephony_CellularCallConnection_001
  * @tc.name     test error branch
  * @tc.desc     Function test

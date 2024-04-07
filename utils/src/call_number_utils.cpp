@@ -24,6 +24,8 @@
 #include "cellular_call_connection.h"
 #include "core_service_client.h"
 #include "cellular_data_client.h"
+#include "call_ability_report_proxy.h"
+#include "number_identity_data_base_helper.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -247,6 +249,58 @@ bool CallNumberUtils::SelectAccountId(int32_t slotId, AppExecFwk::PacMap &extras
     }
 #endif
     return false;
+}
+
+int32_t CallNumberUtils::QueryNumberLocationInfo(std::string &numberLocation, std::string accountNumber)
+{
+    TELEPHONY_LOGI("QueryNumberLocationInfo");
+    if (accountNumber == "") {
+        TELEPHONY_LOGE("accountNumber is null");
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
+    }
+    std::shared_ptr<NumberIdentityDataBaseHelper> callDataPtr =
+        DelayedSingleton<NumberIdentityDataBaseHelper>::GetInstance();
+    if (callDataPtr == nullptr) {
+        TELEPHONY_LOGE("callDataPtr is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+
+    DataShare::DataSharePredicates predicates;
+    std::vector<std::string> phoneNumber;
+    phoneNumber.push_back(accountNumber);
+    predicates.SetWhereArgs(phoneNumber);
+    bool ret = callDataPtr->Query(numberLocation, predicates);
+    if (!ret) {
+        TELEPHONY_LOGE("Query number location database fail!");
+        return TELEPHONY_ERR_DATABASE_READ_FAIL;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+void CallNumberUtils::NumberLocationUpdate(const sptr<CallBase> &callObjectPtr)
+{
+    CallAttributeInfo info;
+    callObjectPtr->GetCallAttributeBaseInfo(info);
+    TELEPHONY_LOGI("NumberLocationUpdate, callId[%{public}d]", info.callId);
+    std::string numberLocation = callObjectPtr->GetNumberLocation();
+    int32_t ret = QueryNumberLocationInfo(numberLocation, callObjectPtr->GetAccountNumber());
+    if (ret != TELEPHONY_SUCCESS) {
+        return;
+    }
+    sptr<CallBase> call = callObjectPtr;
+    if (info.callState == TelCallState::CALL_STATUS_DIALING) {
+        call = CallObjectManager::GetOneCallObject(info.callId);
+        if (call == nullptr) {
+            TELEPHONY_LOGE("call is nullptr");
+            return;
+        }
+    }
+    call->SetNumberLocation(numberLocation);
+    if (numberLocation != "" && numberLocation != "default") {
+        TELEPHONY_LOGI("need report call info of numberLocation");
+        call->GetCallAttributeBaseInfo(info);
+        DelayedSingleton<CallAbilityReportProxy>::GetInstance()->ReportCallStateInfo(info);
+    }
 }
 } // namespace Telephony
 } // namespace OHOS

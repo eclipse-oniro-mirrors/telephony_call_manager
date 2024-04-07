@@ -35,8 +35,10 @@
 #include "satellite_call.h"
 #include "settings_datashare_helper.h"
 #include "telephony_log_wrapper.h"
+#include "call_number_utils.h"
 #include "voip_call.h"
 #include "uri.h"
+#include "ffrt.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -1025,6 +1027,9 @@ sptr<CallBase> CallStatusManager::RefreshCallIfNecessary(const sptr<CallBase> &c
     DeleteOneCallObject(call->GetCallID());
     newCall->SetCallId(call->GetCallID());
     newCall->SetTelCallState(priorState);
+    if (call->GetNumberLocation() != "default") {
+        newCall->SetNumberLocation(call->GetNumberLocation());
+    }
     return newCall;
 }
 
@@ -1109,6 +1114,7 @@ int32_t CallStatusManager::TurnOffMute(sptr<CallBase> &call)
 
 sptr<CallBase> CallStatusManager::CreateNewCall(const CallDetailInfo &info, CallDirection dir)
 {
+    TELEPHONY_LOGI("CreateNewCall");
     DialParaInfo paraInfo;
     AppExecFwk::PacMap extras;
     extras.Clear();
@@ -1121,6 +1127,11 @@ sptr<CallBase> CallStatusManager::CreateNewCall(const CallDetailInfo &info, Call
     }
     callPtr->SetOriginalCallType(info.originalCallType);
     TELEPHONY_LOGD("originalCallType:%{public}d", info.originalCallType);
+    if (info.state == TelCallState::CALL_STATUS_INCOMING || info.state == TelCallState::CALL_STATUS_WAITING ||
+        (info.state == TelCallState::CALL_STATUS_DIALING && info.index == 0)) {
+        TELEPHONY_LOGI("NumberLocationUpdate start");
+        ffrt::submit([=]() { DelayedSingleton<CallNumberUtils>::GetInstance()->NumberLocationUpdate(callPtr); });
+    }
     return callPtr;
 }
 

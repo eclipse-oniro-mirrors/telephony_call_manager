@@ -21,6 +21,7 @@
 #include "phonenumberutil.h"
 
 #include "common_type.h"
+#include "call_base.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -46,6 +47,8 @@ public:
     bool HasAlphabetInPhoneNum(const std::string &inputValue);
     bool HasBCPhoneNumber(const std::string &phoneNumber);
     bool SelectAccountId(int32_t slotId, AppExecFwk::PacMap &extras);
+    int32_t QueryNumberLocationInfo(std::string &numberLocation, std::string accountNumber);
+    void NumberLocationUpdate(const sptr<CallBase> &callObjectPtr);
 
 private:
     void ProcessSpace(std::string &number);
