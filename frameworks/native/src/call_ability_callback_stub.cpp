@@ -106,6 +106,7 @@ int32_t CallAbilityCallbackStub::OnUpdateCallStateInfo(MessageParcel &data, Mess
     parcelPtr.index = data.ReadInt32();
     parcelPtr.crsType = data.ReadInt32();
     parcelPtr.originalCallType = data.ReadInt32();
+    strncpy_s(parcelPtr.numberLocation, kMaxNumberLen + 1, data.ReadCString(), kMaxNumberLen + 1);
     if (parcelPtr.callType == CallType::TYPE_VOIP) {
         parcelPtr.voipCallInfo.voipCallId = data.ReadString();
         parcelPtr.voipCallInfo.userName = data.ReadString();

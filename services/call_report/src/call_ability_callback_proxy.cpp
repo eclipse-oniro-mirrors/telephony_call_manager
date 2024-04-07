@@ -54,6 +54,7 @@ int32_t CallAbilityCallbackProxy::OnCallDetailsChange(const CallAttributeInfo &i
     dataParcel.WriteInt32(info.index);
     dataParcel.WriteInt32(info.crsType);
     dataParcel.WriteInt32(info.originalCallType);
+    dataParcel.WriteCString(info.numberLocation);
     if (info.callType == CallType::TYPE_VOIP) {
         dataParcel.WriteString(info.voipCallInfo.voipCallId);
         dataParcel.WriteString(info.voipCallInfo.userName);
