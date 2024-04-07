@@ -97,7 +97,8 @@ int32_t CallRecordsHandler::AddCallLogInfo(const CallRecordInfo &info)
     return TELEPHONY_SUCCESS;
 }
 
-std::string CallRecordsHandler::CheckNumberLocationInfo(const CallRecordInfo &info) {
+std::string CallRecordsHandler::CheckNumberLocationInfo(const CallRecordInfo &info)
+{
     std::string str(info.numberLocation);
     if (str == "default") {
         TELEPHONY_LOGI("AddCallLogInfo, number location is default");
