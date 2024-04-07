@@ -138,7 +138,6 @@ int32_t BluetoothConnection::SendCallDetailsChange(int32_t callId, int32_t callS
         return TELEPHONY_ERROR;
     }
 
-    std::string nickName = "";
     profile->CallDetailsChanged(callId, callState);
 #endif
     TELEPHONY_LOGI("Send CallDetails");
