@@ -3956,6 +3956,7 @@ void NapiCallManager::NativeDial(napi_env env, void *data)
         asyncContext->errorCode = SLOT_ID_INVALID;
         return;
     }
+    TELEPHONY_LOGI("NativeDial enter");
     std::string phoneNumber(asyncContext->number, asyncContext->numberLen);
     OHOS::AppExecFwk::PacMap dialInfo;
     dialInfo.PutIntValue("accountId", asyncContext->accountId);
@@ -3979,6 +3980,7 @@ void NapiCallManager::NativeDialCall(napi_env env, void *data)
         asyncContext->errorCode = SLOT_ID_INVALID;
         return;
     }
+    TELEPHONY_LOGI("NativeDialCall enter");
     asyncContext->eventId = CALL_MANAGER_DIAL_CALL;
     std::string phoneNumber(asyncContext->number, asyncContext->numberLen);
     std::u16string tmpPhoneNumber = Str8ToStr16(phoneNumber);
@@ -4040,6 +4042,7 @@ void NapiCallManager::NativeAnswerCall(napi_env env, void *data)
         NapiUtil::ThrowParameterError(env);
         return;
     }
+    TELEPHONY_LOGI("NativeAnswerCall enter");
     auto asyncContext = (AnswerAsyncContext *)data;
     asyncContext->errorCode =
         DelayedSingleton<CallManagerClient>::GetInstance()->AnswerCall(asyncContext->callId, asyncContext->videoState);
@@ -4056,6 +4059,7 @@ void NapiCallManager::NativeRejectCall(napi_env env, void *data)
         NapiUtil::ThrowParameterError(env);
         return;
     }
+    TELEPHONY_LOGI("NativeRejectCall enter");
     auto asyncContext = (RejectAsyncContext *)data;
     asyncContext->errorCode = DelayedSingleton<CallManagerClient>::GetInstance()->RejectCall(
         asyncContext->callId, asyncContext->isSendSms, Str8ToStr16(asyncContext->messageContent));
@@ -4072,6 +4076,7 @@ void NapiCallManager::NativeHangUpCall(napi_env env, void *data)
         NapiUtil::ThrowParameterError(env);
         return;
     }
+    TELEPHONY_LOGI("NativeHangUpCall enter");
     auto asyncContext = (AsyncContext *)data;
     asyncContext->errorCode = DelayedSingleton<CallManagerClient>::GetInstance()->HangUpCall(asyncContext->callId);
     if (asyncContext->errorCode == TELEPHONY_SUCCESS) {
@@ -4087,6 +4092,7 @@ void NapiCallManager::NativeHoldCall(napi_env env, void *data)
         NapiUtil::ThrowParameterError(env);
         return;
     }
+    TELEPHONY_LOGI("NativeHoldCall enter");
     auto asyncContext = (AsyncContext *)data;
     asyncContext->errorCode = DelayedSingleton<CallManagerClient>::GetInstance()->HoldCall(asyncContext->callId);
     if (asyncContext->errorCode == TELEPHONY_SUCCESS) {
@@ -4102,6 +4108,7 @@ void NapiCallManager::NativeUnHoldCall(napi_env env, void *data)
         NapiUtil::ThrowParameterError(env);
         return;
     }
+    TELEPHONY_LOGI("NativeUnHoldCall enter");
     auto asyncContext = (AsyncContext *)data;
     asyncContext->errorCode = DelayedSingleton<CallManagerClient>::GetInstance()->UnHoldCall(asyncContext->callId);
     if (asyncContext->errorCode == TELEPHONY_SUCCESS) {
