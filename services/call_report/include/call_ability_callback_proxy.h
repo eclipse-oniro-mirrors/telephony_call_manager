@@ -45,6 +45,7 @@ public:
 
 private:
     void PackDataParcel(CallResultReportId reportId, AppExecFwk::PacMap &resultInfo, MessageParcel &dataParcel);
+    void SetVoipCallInfo(const CallAttributeInfo &info, MessageParcel &dataParcel);
 
 private:
     static inline BrokerDelegator<CallAbilityCallbackProxy> delegator_;
