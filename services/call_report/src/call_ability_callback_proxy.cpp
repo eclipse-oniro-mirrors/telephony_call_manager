@@ -60,6 +60,7 @@ int32_t CallAbilityCallbackProxy::OnCallDetailsChange(const CallAttributeInfo &i
         dataParcel.WriteString(info.voipCallInfo.abilityName);
         dataParcel.WriteString(info.voipCallInfo.extensionId);
         dataParcel.WriteString(info.voipCallInfo.voipBundleName);
+        dataParcel.WriteBool(info.voipCallInfo.showBannerForIncomingCall);
         dataParcel.WriteUInt8Vector(info.voipCallInfo.userProfile);
     }
     if (Remote() == nullptr) {

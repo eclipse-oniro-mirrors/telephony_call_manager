@@ -61,6 +61,7 @@ private:
     std::string voipBundleName_ = "";
     std::string abilityName_ = "";
     std::vector<uint8_t> userProfile_ = {};
+    bool showBannerForIncomingCall_ = true;
 };
 } // namespace Telephony
 } // namespace OHOS
