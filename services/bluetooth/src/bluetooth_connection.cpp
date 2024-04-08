@@ -129,6 +129,21 @@ int32_t BluetoothConnection::SendBtCallState(
     return TELEPHONY_SUCCESS;
 }
 
+int32_t BluetoothConnection::SendCallDetailsChange(int32_t callId, int32_t callState)
+{
+#ifdef ABILITY_BLUETOOTH_SUPPORT
+    Bluetooth::HandsFreeAudioGateway *profile = Bluetooth::HandsFreeAudioGateway::GetProfile();
+    if (profile == nullptr) {
+        TELEPHONY_LOGE("profile is nullptr");
+        return TELEPHONY_ERROR;
+    }
+
+    profile->CallDetailsChanged(callId, callState);
+#endif
+    TELEPHONY_LOGI("Send CallDetails");
+    return TELEPHONY_SUCCESS;
+}
+
 BtScoState BluetoothConnection::GetBtScoState()
 {
     BtScoState btScoState = btScoState_.load();
