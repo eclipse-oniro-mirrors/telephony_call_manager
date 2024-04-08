@@ -38,6 +38,15 @@ int32_t BluetoothCallManager::SendBtCallState(
     return btConnection_->SendBtCallState(numActive, numHeld, callState, number);
 }
 
+int32_t BluetoothCallManager::SendCallDetailsChange(int32_t callId, int32_t callState)
+{
+    if (btConnection_ == nullptr) {
+        TELEPHONY_LOGE("bluetooth connection nullptr");
+        return false;
+    }
+    return btConnection_->SendCallDetailsChange(callId, callState);
+}
+
 BtScoState BluetoothCallManager::GetBtScoState()
 {
     if (btConnection_ == nullptr) {

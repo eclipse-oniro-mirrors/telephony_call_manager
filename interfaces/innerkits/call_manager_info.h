@@ -248,6 +248,10 @@ struct CallAttributeInfo {
      * Indicates the VoIP call specific information
      */
     VoipCallReportInfo voipCallInfo;
+    /**
+     * Indicates the location of phone number.
+     */
+    char numberLocation[kMaxNumberLen + 1] = { 0 };
 };
 
 /**
@@ -266,6 +270,10 @@ struct CallRecordInfo {
      * Indicates the phone number after formatted.
      */
     char formattedPhoneNumber[kMaxNumberLen + 1] = { 0 };
+    /**
+     * Indicates the location of phone number.
+     */
+    char numberLocation[kMaxNumberLen + 1] = { 0 };
     /**
      * Indicates the type of call, includs CS, IMS, OTT, OTHER. {@link CallType}
      */
@@ -324,6 +332,8 @@ struct CallRecordInfo {
         std::copy(std::begin(temp.phoneNumber), std::end(temp.phoneNumber), std::begin(phoneNumber));
         std::copy(std::begin(temp.formattedPhoneNumber), std::end(temp.formattedPhoneNumber),
             std::begin(formattedPhoneNumber));
+        std::copy(std::begin(temp.numberLocation), std::end(temp.numberLocation),
+            std::begin(numberLocation));
         callType = temp.callType;
         callBeginTime = temp.callBeginTime;
         callEndTime = temp.callEndTime;

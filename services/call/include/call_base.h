@@ -117,6 +117,8 @@ public:
     int32_t GetCrsType();
     void SetOriginalCallType(int32_t originalCallType);
     int32_t GetOriginalCallType();
+    void SetNumberLocation(std::string numberLocation);
+    std::string GetNumberLocation();
     virtual void SetSlotId(int32_t slotId) {}
     virtual void SetCallIndex(int32_t index) {}
     virtual int32_t GetCallIndex() {return 0;}
@@ -164,6 +166,7 @@ private:
     int32_t originalCallType_;
     bool isMuted_;
     std::mutex mutex_;
+    std::string numberLocation_;
 };
 } // namespace Telephony
 } // namespace OHOS

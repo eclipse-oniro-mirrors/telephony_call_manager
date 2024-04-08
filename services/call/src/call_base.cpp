@@ -37,7 +37,7 @@ CallBase::CallBase(DialParaInfo &info)
       canUnHoldState_(true), canSwitchCallState_(true), answerVideoState_(0), isSpeakerphoneOn_(false),
       callEndedType_(CallEndedType::UNKNOWN), callBeginTime_(0), callEndTime_(0), ringBeginTime_(0), ringEndTime_(0),
       answerType_(CallAnswerType::CALL_ANSWER_MISSED), accountId_(info.accountId), crsType_(info.crsType),
-      originalCallType_(info.originalCallType), isMuted_(false)
+      originalCallType_(info.originalCallType), isMuted_(false), numberLocation_("default")
 {
     (void)memset_s(&contactInfo_, sizeof(ContactInfo), 0, sizeof(ContactInfo));
 }
@@ -50,7 +50,7 @@ CallBase::CallBase(DialParaInfo &info, AppExecFwk::PacMap &extras)
       autoAnswerState_(false), canUnHoldState_(true), canSwitchCallState_(true), answerVideoState_(0),
       isSpeakerphoneOn_(false), callEndedType_(CallEndedType::UNKNOWN), callBeginTime_(0), callEndTime_(0),
       ringBeginTime_(0), ringEndTime_(0), answerType_(CallAnswerType::CALL_ANSWER_MISSED), accountId_(info.accountId),
-      crsType_(info.crsType), originalCallType_(info.originalCallType), isMuted_(false)
+      crsType_(info.crsType), originalCallType_(info.originalCallType), isMuted_(false), numberLocation_("default")
 {
     (void)memset_s(&contactInfo_, sizeof(ContactInfo), 0, sizeof(ContactInfo));
 }
@@ -135,6 +135,8 @@ void CallBase::GetCallAttributeBaseInfo(CallAttributeInfo &info)
         info.accountId = accountId_;
         info.crsType = crsType_;
         info.originalCallType = originalCallType_;
+        (void)memset_s(info.numberLocation, kMaxNumberLen, 0, kMaxNumberLen);
+        (void)memcpy_s(info.numberLocation, kMaxNumberLen, numberLocation_.c_str(), numberLocation_.length());
         if (bundleName_.length() > static_cast<size_t>(kMaxBundleNameLen)) {
             TELEPHONY_LOGE("Number out of limit!");
             return;
@@ -376,6 +378,18 @@ void CallBase::SetOriginalCallType(int32_t originalCallType)
 {
     std::lock_guard<std::mutex> lock(mutex_);
     originalCallType_ = originalCallType;
+}
+
+void CallBase::SetNumberLocation(std::string numberLocation)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    numberLocation_ = numberLocation;
+}
+
+std::string CallBase::GetNumberLocation()
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    return numberLocation_;
 }
 
 void CallBase::SetPolicyFlag(PolicyFlag flag)

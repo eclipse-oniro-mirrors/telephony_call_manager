@@ -521,12 +521,7 @@ int32_t NapiCallAbilityCallback::ReportCallState(CallAttributeInfo &info, EventC
         env, callbackValues[ARRAY_INDEX_FIRST], "crsType", info.crsType);
     NapiCallManagerUtils::SetPropertyInt32(
         env, callbackValues[ARRAY_INDEX_FIRST], "originalCallType", info.originalCallType);
-    TELEPHONY_LOGI("ReportCallState crsType = %{public}d", info.crsType);
-    if (info.callType == CallType::TYPE_VOIP) {
-        napi_value voipObject = nullptr;
-        CreateVoipNapiValue(env, voipObject, info);
-        napi_set_named_property(env, callbackValues[ARRAY_INDEX_FIRST], "voipCallAttribute", voipObject);
-    }
+    ReportCallAttribute(env, callbackValues, info);
     napi_get_reference_value(env, stateCallback.callbackRef, &callbackFunc);
     if (callbackFunc == nullptr) {
         TELEPHONY_LOGE("callbackFunc is null!");
@@ -539,6 +534,23 @@ int32_t NapiCallAbilityCallback::ReportCallState(CallAttributeInfo &info, EventC
     napi_call_function(env, thisVar, callbackFunc, DATA_LENGTH_ONE, callbackValues, &callbackResult);
     napi_close_handle_scope(env, scope);
     return TELEPHONY_SUCCESS;
+}
+
+void NapiCallAbilityCallback::ReportCallAttribute(napi_env &env, napi_value callbackValues[], CallAttributeInfo &info)
+{
+    std::string str(info.numberLocation);
+    if (str == "default") {
+        TELEPHONY_LOGE("numberLocation is default");
+        (void)memset_s(info.numberLocation, kMaxNumberLen, 0, kMaxNumberLen);
+    }
+    NapiCallManagerUtils::SetPropertyStringUtf8(
+        env, callbackValues[ARRAY_INDEX_FIRST], "numberLocation", info.numberLocation);
+    TELEPHONY_LOGI("ReportCallState crsType = %{public}d", info.crsType);
+    if (info.callType == CallType::TYPE_VOIP) {
+        napi_value voipObject = nullptr;
+        CreateVoipNapiValue(env, voipObject, info);
+        napi_set_named_property(env, callbackValues[ARRAY_INDEX_FIRST], "voipCallAttribute", voipObject);
+    }
 }
 
 void NapiCallAbilityCallback::CreateVoipNapiValue(napi_env &env, napi_value &voipObject, CallAttributeInfo &info)

@@ -52,6 +52,7 @@ public:
     BtScoState GetBtScoState();
     void SetBtScoState(BtScoState state);
     int32_t SendBtCallState(int32_t numActive, int32_t numHeld, int32_t callState, const std::string &number);
+    int32_t SendCallDetailsChange(int32_t callId, int32_t callState);
     void RemoveBtDevice(const std::string &address);
     bool IsBtAvailble();
     std::string GetConnectedScoAddr();

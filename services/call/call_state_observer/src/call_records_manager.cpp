@@ -111,6 +111,15 @@ void CallRecordsManager::AddOneCallRecord(CallAttributeInfo &info)
         TELEPHONY_LOGE("memcpy_s failed!");
         return;
     }
+    if (strlen(info.numberLocation) > static_cast<size_t>(kMaxNumberLen)) {
+        TELEPHONY_LOGE("Location out of limit!");
+        return;
+    }
+    result = memcpy_s(data.numberLocation, kMaxNumberLen, info.numberLocation, strlen(info.numberLocation));
+    if (result != EOK) {
+        TELEPHONY_LOGE("memcpy_s failed!");
+        return;
+    }
     CopyCallInfoToRecord(info, data);
     std::string tmpStr("");
     (void)DelayedSingleton<CallNumberUtils>::GetInstance()->FormatPhoneNumber(

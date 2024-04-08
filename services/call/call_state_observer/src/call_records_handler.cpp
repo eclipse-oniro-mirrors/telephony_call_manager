@@ -18,6 +18,7 @@
 #include "call_manager_errors.h"
 #include "call_manager_inner_type.h"
 #include "ffrt.h"
+#include "call_number_utils.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -52,6 +53,7 @@ int32_t CallRecordsHandler::AddCallLogInfo(const CallRecordInfo &info)
         TELEPHONY_LOGE("callDataPtr is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
+    std::string str = CheckNumberLocationInfo(info);
     ContactInfo contactInfo = {
         .name = "",
         .number = "",
@@ -83,7 +85,7 @@ int32_t CallRecordsHandler::AddCallLogInfo(const CallRecordInfo &info)
     bucket.Put(CALL_ANSWER_STATE, static_cast<int32_t>(info.answerType));
     time_t timeStamp = time(0);
     bucket.Put(CALL_CREATE_TIME, timeStamp);
-    bucket.Put(CALL_NUMBER_LOCATION, std::string(""));
+    bucket.Put(CALL_NUMBER_LOCATION, str);
     bucket.Put(CALL_PHOTO_ID, 0);
     bucket.Put(CALL_SLOT_ID, info.slotId);
     bucket.Put(CALL_FEATURES, info.features);
@@ -93,6 +95,20 @@ int32_t CallRecordsHandler::AddCallLogInfo(const CallRecordInfo &info)
         return TELEPHONY_ERR_DATABASE_WRITE_FAIL;
     }
     return TELEPHONY_SUCCESS;
+}
+
+std::string CallRecordsHandler::CheckNumberLocationInfo(const CallRecordInfo &info)
+{
+    std::string str(info.numberLocation);
+    if (str == "default") {
+        TELEPHONY_LOGI("AddCallLogInfo, number location is default");
+        str = "";
+        DelayedSingleton<CallNumberUtils>::GetInstance()->QueryNumberLocationInfo(str, std::string(info.phoneNumber));
+    }
+    if (str == "") {
+        str = "N";
+    }
+    return str;
 }
 
 int32_t CallRecordsHandler::QueryAndNotifyUnReadMissedCall()
