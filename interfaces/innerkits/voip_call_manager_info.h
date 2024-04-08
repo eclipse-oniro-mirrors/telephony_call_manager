@@ -120,6 +120,10 @@ struct VoipCallAttribute {
      * Indicates whether the VoIP incoming call default show live call banner. Default value is true.
      */
     bool showBannerForIncomingCall = true;
+    /**
+     * Indicates whether the VoIP call is from Push kit.
+    */
+    bool isCallByPushKit = true;
 };
 
 /**
