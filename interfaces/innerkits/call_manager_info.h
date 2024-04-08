@@ -431,6 +431,7 @@ struct CallDetailInfo {
             (temp.voipCallInfo.userProfile).begin(), (temp.voipCallInfo.userProfile).end());
         voipCallInfo.abilityName = temp.voipCallInfo.abilityName;
         voipCallInfo.voipBundleName = temp.voipCallInfo.voipBundleName;
+        voipCallInfo.showBannerForIncomingCall = temp.voipCallInfo.showBannerForIncomingCall;
         return *this;
     }
 };

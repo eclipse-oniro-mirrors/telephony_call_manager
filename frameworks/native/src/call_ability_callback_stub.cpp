@@ -113,6 +113,7 @@ int32_t CallAbilityCallbackStub::OnUpdateCallStateInfo(MessageParcel &data, Mess
         parcelPtr.voipCallInfo.abilityName = data.ReadString();
         parcelPtr.voipCallInfo.extensionId = data.ReadString();
         parcelPtr.voipCallInfo.voipBundleName = data.ReadString();
+        parcelPtr.voipCallInfo.showBannerForIncomingCall = data.ReadBool();
         std::vector<uint8_t> userProfile = {};
         data.ReadUInt8Vector(&userProfile);
         (parcelPtr.voipCallInfo.userProfile).assign(userProfile.begin(), userProfile.end());

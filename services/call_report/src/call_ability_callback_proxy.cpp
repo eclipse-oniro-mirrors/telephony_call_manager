@@ -55,14 +55,7 @@ int32_t CallAbilityCallbackProxy::OnCallDetailsChange(const CallAttributeInfo &i
     dataParcel.WriteInt32(info.crsType);
     dataParcel.WriteInt32(info.originalCallType);
     dataParcel.WriteCString(info.numberLocation);
-    if (info.callType == CallType::TYPE_VOIP) {
-        dataParcel.WriteString(info.voipCallInfo.voipCallId);
-        dataParcel.WriteString(info.voipCallInfo.userName);
-        dataParcel.WriteString(info.voipCallInfo.abilityName);
-        dataParcel.WriteString(info.voipCallInfo.extensionId);
-        dataParcel.WriteString(info.voipCallInfo.voipBundleName);
-        dataParcel.WriteUInt8Vector(info.voipCallInfo.userProfile);
-    }
+    SetVoipCallInfo(info, dataParcel);
     if (Remote() == nullptr) {
         TELEPHONY_LOGE("function Remote() return nullptr!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
@@ -75,6 +68,19 @@ int32_t CallAbilityCallbackProxy::OnCallDetailsChange(const CallAttributeInfo &i
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     return replyParcel.ReadInt32();
+}
+
+void CallAbilityCallbackProxy::SetVoipCallInfo(const CallAttributeInfo &info, MessageParcel &dataParcel)
+{
+    if (info.callType == CallType::TYPE_VOIP) {
+        dataParcel.WriteString(info.voipCallInfo.voipCallId);
+        dataParcel.WriteString(info.voipCallInfo.userName);
+        dataParcel.WriteString(info.voipCallInfo.abilityName);
+        dataParcel.WriteString(info.voipCallInfo.extensionId);
+        dataParcel.WriteString(info.voipCallInfo.voipBundleName);
+        dataParcel.WriteBool(info.voipCallInfo.showBannerForIncomingCall);
+        dataParcel.WriteUInt8Vector(info.voipCallInfo.userProfile);
+    }
 }
 
 int32_t CallAbilityCallbackProxy::OnCallEventChange(const CallEventInfo &info)

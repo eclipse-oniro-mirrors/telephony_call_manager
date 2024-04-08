@@ -32,6 +32,7 @@ VoIPCall::VoIPCall(DialParaInfo &info) : CarrierCall(info)
     abilityName_ = info.voipCallInfo.abilityName;
     extensionId_ = info.voipCallInfo.extensionId;
     voipBundleName_ = info.voipCallInfo.voipBundleName;
+    showBannerForIncomingCall_ = info.voipCallInfo.showBannerForIncomingCall;
 }
 
 VoIPCall::~VoIPCall() {}
@@ -148,6 +149,7 @@ void VoIPCall::GetCallAttributeInfo(CallAttributeInfo &info)
     info.voipCallInfo.extensionId = extensionId_;
     info.voipCallInfo.abilityName = abilityName_;
     info.voipCallInfo.voipBundleName = voipBundleName_;
+    info.voipCallInfo.showBannerForIncomingCall = showBannerForIncomingCall_;
     return;
 }
 

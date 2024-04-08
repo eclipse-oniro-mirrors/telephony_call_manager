@@ -561,6 +561,8 @@ void NapiCallAbilityCallback::CreateVoipNapiValue(napi_env &env, napi_value &voi
     NapiCallManagerUtils::SetPropertyStringUtf8(env, voipObject, "extensionId", info.voipCallInfo.extensionId);
     NapiCallManagerUtils::SetPropertyStringUtf8(env, voipObject, "voipBundleName", info.voipCallInfo.voipBundleName);
     NapiCallManagerUtils::SetPropertyStringUtf8(env, voipObject, "voipCallId", info.voipCallInfo.voipCallId);
+    NapiCallManagerUtils::SetPropertyBoolean(env, voipObject, "showBannerForIncomingCall",
+        info.voipCallInfo.showBannerForIncomingCall);
     std::shared_ptr<Media::PixelMap> userProfile =
         std::shared_ptr<Media::PixelMap>(Media::PixelMap::DecodeTlv(info.voipCallInfo.userProfile));
     napi_value pixelMapObject = Media::PixelMapNapi::CreatePixelMap(env, userProfile);

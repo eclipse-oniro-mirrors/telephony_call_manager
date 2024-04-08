@@ -43,6 +43,7 @@ int32_t CallStatusCallback::UpdateCallReportInfo(const CallReportInfo &info)
         detailInfo.voipCallInfo.extensionId = info.voipCallInfo.extensionId;
         detailInfo.voipCallInfo.voipBundleName = info.voipCallInfo.voipBundleName;
         detailInfo.voipCallInfo.abilityName = info.voipCallInfo.abilityName;
+        detailInfo.voipCallInfo.showBannerForIncomingCall = info.voipCallInfo.showBannerForIncomingCall;
     }
     detailInfo.callType = info.callType;
     detailInfo.accountId = info.accountId;

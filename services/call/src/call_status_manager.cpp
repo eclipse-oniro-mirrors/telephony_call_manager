@@ -1239,6 +1239,7 @@ void CallStatusManager::PackParaInfo(
         paraInfo.voipCallInfo.abilityName = info.voipCallInfo.abilityName;
         paraInfo.voipCallInfo.extensionId = info.voipCallInfo.extensionId;
         paraInfo.voipCallInfo.voipBundleName = info.voipCallInfo.voipBundleName;
+        paraInfo.voipCallInfo.showBannerForIncomingCall = info.voipCallInfo.showBannerForIncomingCall;
     }
     paraInfo.number = info.phoneNum;
     paraInfo.callId = GetNewCallId();
