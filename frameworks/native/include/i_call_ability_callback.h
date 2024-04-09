@@ -25,7 +25,7 @@ namespace OHOS {
 namespace Telephony {
 class ICallAbilityCallback : public IRemoteBroker {
 public:
-    ICallAbilityCallback() : bundleName_("") {}
+    ICallAbilityCallback() : bundleInfo_("") {}
     virtual ~ICallAbilityCallback() = default;
 
     virtual int32_t OnCallDetailsChange(const CallAttributeInfo &info) = 0;
@@ -42,18 +42,18 @@ public:
     virtual int32_t OnReportCallDataUsageChange(const int64_t dataUsage) = 0;
     virtual int32_t OnReportCameraCapabilities(const CameraCapabilities &cameraCapabilities) = 0;
 
-    void SetBundleName(const std::string &name)
+    void SetBundleInfo(const std::string &info)
     {
-        bundleName_ = name;
+        bundleInfo_ = info;
     }
 
-    std::string GetBundleName()
+    std::string GetBundleInfo()
     {
-        return bundleName_;
+        return bundleInfo_;
     }
 
 public:
-    std::string bundleName_;
+    std::string bundleInfo_;
     DECLARE_INTERFACE_DESCRIPTOR(u"OHOS.Telephony.ICallAbilityCallback");
 };
 } // namespace Telephony

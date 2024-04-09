@@ -202,7 +202,7 @@ int32_t CallManagerService::RegisterCallBack(const sptr<ICallAbilityCallback> &c
         TELEPHONY_LOGD("Permission denied.");
         return TELEPHONY_ERR_PERMISSION_ERR;
     }
-    return DelayedSingleton<CallAbilityReportProxy>::GetInstance()->RegisterCallBack(callback, GetBundleName());
+    return DelayedSingleton<CallAbilityReportProxy>::GetInstance()->RegisterCallBack(callback, GetBundleInfo());
 }
 
 int32_t CallManagerService::UnRegisterCallBack()
@@ -215,7 +215,7 @@ int32_t CallManagerService::UnRegisterCallBack()
         TELEPHONY_LOGE("Permission denied!");
         return TELEPHONY_ERR_PERMISSION_ERR;
     }
-    return DelayedSingleton<CallAbilityReportProxy>::GetInstance()->UnRegisterCallBack(GetBundleName());
+    return DelayedSingleton<CallAbilityReportProxy>::GetInstance()->UnRegisterCallBack(GetBundleInfo());
 }
 
 int32_t CallManagerService::ObserverOnCallDetailsChange()
@@ -232,7 +232,7 @@ int32_t CallManagerService::ObserverOnCallDetailsChange()
 
     std::vector<CallAttributeInfo> callAttributeInfo = CallObjectManager::GetAllCallInfoList();
     for (auto info : callAttributeInfo) {
-        DelayedSingleton<CallAbilityReportProxy>::GetInstance()->ReportCallStateInfo(info, GetBundleName());
+        DelayedSingleton<CallAbilityReportProxy>::GetInstance()->ReportCallStateInfo(info, GetBundleInfo());
     }
     return TELEPHONY_SUCCESS;
 }
@@ -1347,11 +1347,11 @@ sptr<IRemoteObject> CallManagerService::GetProxyObjectPtr(CallManagerProxyType p
     return nullptr;
 }
 
-std::string CallManagerService::GetBundleName()
+std::string CallManagerService::GetBundleInfo()
 {
-    std::string bundleName = "";
-    bundleName.append(std::to_string(IPCSkeleton::GetCallingPid()));
-    return bundleName;
+    std::string bundleInfo = "";
+    bundleInfo.append(std::to_string(IPCSkeleton::GetCallingPid()));
+    return bundleInfo;
 }
 
 int32_t CallManagerService::ReportAudioDeviceInfo()

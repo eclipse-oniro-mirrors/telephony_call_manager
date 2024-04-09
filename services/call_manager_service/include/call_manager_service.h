@@ -754,7 +754,7 @@ public:
     int32_t SendCallUiEvent(int32_t callId, std::string &eventName) override;
 
 private:
-    std::string GetBundleName();
+    std::string GetBundleInfo();
 
 private:
     enum ServiceRunningState {

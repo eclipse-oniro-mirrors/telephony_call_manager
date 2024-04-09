@@ -31,8 +31,8 @@ class CallAbilityReportProxy : public CallStateListenerBase,
                                public std::enable_shared_from_this<CallAbilityReportProxy> {
     DECLARE_DELAYED_SINGLETON(CallAbilityReportProxy)
 public:
-    int32_t RegisterCallBack(sptr<ICallAbilityCallback> callback, const std::string &bundleName);
-    int32_t UnRegisterCallBack(const std::string &bundleName);
+    int32_t RegisterCallBack(sptr<ICallAbilityCallback> callback, const std::string &bundleInfo);
+    int32_t UnRegisterCallBack(const std::string &bundleInfo);
     void CallStateUpdated(sptr<CallBase> &callObjectPtr, TelCallState priorState, TelCallState nextState) override;
     void CallEventUpdated(CallEventInfo &info) override;
     void CallDestroyed(const DisconnectedDetails &details) override;
@@ -41,7 +41,7 @@ public:
     int32_t ReportMmiCodeResult(const MmiCodeInfo &info);
     int32_t ReportAudioDeviceChange(const AudioDeviceInfo &info);
     int32_t ReportCallStateInfo(const CallAttributeInfo &info);
-    int32_t ReportCallStateInfo(const CallAttributeInfo &info, std::string bundleName);
+    int32_t ReportCallStateInfo(const CallAttributeInfo &info, std::string bundleInfo);
     int32_t ReportPostDialDelay(const std::string &str);
     int32_t ReportImsCallModeChange(const CallMediaModeInfo &imsCallModeInfo);
     int32_t ReportCallSessionEventChange(const CallSessionEvent &callSessionEventOptions);
