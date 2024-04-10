@@ -327,15 +327,7 @@ int32_t CallStatusManager::IncomingHandle(const CallDetailInfo &info)
         }
         return TELEPHONY_SUCCESS;
     }
-    int32_t ret = IncomingHandlePolicy(info);
-    if (ret != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("IncomingHandlePolicy failed!");
-        if (info.state == TelCallState::CALL_STATUS_INCOMING) {
-            CallManagerHisysevent::WriteIncomingCallFaultEvent(info.accountId, static_cast<int32_t>(info.callType),
-                static_cast<int32_t>(info.callMode), ret, "IncomingHandlePolicy failed");
-        }
-        return ret;
-    }
+    int32_t ret = TELEPHONY_SUCCESS;
     if (info.callType == CallType::TYPE_CS || info.callType == CallType::TYPE_IMS ||
         info.callType == CallType::TYPE_SATELLITE) {
         ret = IncomingFilterPolicy(info);

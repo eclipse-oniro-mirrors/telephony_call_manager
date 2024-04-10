@@ -28,16 +28,6 @@ CallStatusPolicy::CallStatusPolicy() {}
 
 CallStatusPolicy::~CallStatusPolicy() {}
 
-int32_t CallStatusPolicy::IncomingHandlePolicy(const CallDetailInfo &info)
-{
-    std::string numberStr(info.phoneNum);
-    if (numberStr.empty()) {
-        TELEPHONY_LOGE("phone number is NULL!");
-        return CALL_ERR_PHONE_NUMBER_EMPTY;
-    }
-    return TELEPHONY_SUCCESS;
-}
-
 int32_t CallStatusPolicy::DialingHandlePolicy(const CallDetailInfo &info)
 {
     std::string number(info.phoneNum);
