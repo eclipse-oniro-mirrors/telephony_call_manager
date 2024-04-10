@@ -47,16 +47,16 @@ CallAbilityReportProxy::~CallAbilityReportProxy()
 }
 
 int32_t CallAbilityReportProxy::RegisterCallBack(
-    sptr<ICallAbilityCallback> callAbilityCallbackPtr, const std::string &bundleName)
+    sptr<ICallAbilityCallback> callAbilityCallbackPtr, const std::string &bundleInfo)
 {
     if (callAbilityCallbackPtr == nullptr) {
         TELEPHONY_LOGE("callAbilityCallbackPtr is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    callAbilityCallbackPtr->SetBundleName(bundleName);
+    callAbilityCallbackPtr->SetBundleInfo(bundleInfo);
     std::lock_guard<std::mutex> lock(mutex_);
     callbackPtrList_.emplace_back(callAbilityCallbackPtr);
-    TELEPHONY_LOGI("%{public}s successfully registered the callback!", bundleName.c_str());
+    TELEPHONY_LOGI("%{public}s successfully registered the callback!", bundleInfo.c_str());
     if (appStateObserver == nullptr) {
         appStateObserver = new (std::nothrow) ApplicationStateObserver();
         if (appStateObserver == nullptr) {
@@ -81,18 +81,18 @@ int32_t CallAbilityReportProxy::RegisterCallBack(
     return TELEPHONY_SUCCESS;
 }
 
-int32_t CallAbilityReportProxy::UnRegisterCallBack(const std::string &bundleName)
+int32_t CallAbilityReportProxy::UnRegisterCallBack(const std::string &bundleInfo)
 {
     std::lock_guard<std::mutex> lock(mutex_);
     if (callbackPtrList_.empty()) {
-        TELEPHONY_LOGE("callbackPtrList_ is null! %{public}s UnRegisterCallBack failed", bundleName.c_str());
+        TELEPHONY_LOGE("callbackPtrList_ is null! %{public}s UnRegisterCallBack failed", bundleInfo.c_str());
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     std::list<sptr<ICallAbilityCallback>>::iterator it = callbackPtrList_.begin();
     for (; it != callbackPtrList_.end(); ++it) {
-        if ((*it)->GetBundleName() == bundleName) {
+        if ((*it)->GetBundleInfo() == bundleInfo) {
             callbackPtrList_.erase(it);
-            TELEPHONY_LOGI("%{public}s UnRegisterCallBack success", bundleName.c_str());
+            TELEPHONY_LOGI("%{public}s UnRegisterCallBack success", bundleInfo.c_str());
             break;
         }
     }
@@ -148,8 +148,8 @@ void CallAbilityReportProxy::CallDestroyed(const DisconnectedDetails &details)
         if ((*it)) {
             ret = (*it)->OnCallDisconnectedCause(details);
             if (ret != TELEPHONY_SUCCESS) {
-                TELEPHONY_LOGW("OnCallDisconnectedCause failed, errcode:%{public}d, bundleName:%{public}s", ret,
-                    ((*it)->GetBundleName()).c_str());
+                TELEPHONY_LOGW("OnCallDisconnectedCause failed, errcode:%{public}d, bundleInfo:%{public}s", ret,
+                    ((*it)->GetBundleInfo()).c_str());
                 continue;
             }
         }
@@ -160,16 +160,16 @@ void CallAbilityReportProxy::CallDestroyed(const DisconnectedDetails &details)
 int32_t CallAbilityReportProxy::ReportCallStateInfo(const CallAttributeInfo &info)
 {
     int32_t ret = TELEPHONY_ERR_FAIL;
-    std::string bundleName = "";
+    std::string bundleInfo = "";
     std::lock_guard<std::mutex> lock(mutex_);
     std::list<sptr<ICallAbilityCallback>>::iterator it = callbackPtrList_.begin();
     for (; it != callbackPtrList_.end(); ++it) {
         if ((*it)) {
-            bundleName = (*it)->GetBundleName();
+            bundleInfo = (*it)->GetBundleInfo();
             ret = (*it)->OnCallDetailsChange(info);
             if (ret != TELEPHONY_SUCCESS) {
                 TELEPHONY_LOGW(
-                    "OnCallDetailsChange failed, errcode:%{public}d, bundleName:%{public}s", ret, bundleName.c_str());
+                    "OnCallDetailsChange failed, errcode:%{public}d, bundleInfo:%{public}s", ret, bundleInfo.c_str());
                 continue;
             }
         }
@@ -182,22 +182,22 @@ int32_t CallAbilityReportProxy::ReportCallStateInfo(const CallAttributeInfo &inf
     return ret;
 }
 
-int32_t CallAbilityReportProxy::ReportCallStateInfo(const CallAttributeInfo &info, std::string bundleName)
+int32_t CallAbilityReportProxy::ReportCallStateInfo(const CallAttributeInfo &info, std::string bundleInfo)
 {
     int32_t ret = TELEPHONY_ERROR;
     for (auto callback : callbackPtrList_) {
-        if (callback->GetBundleName() == bundleName) {
+        if (callback->GetBundleInfo() == bundleInfo) {
             ret = callback->OnCallDetailsChange(info);
             break;
         }
     }
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE(
-            "OnCallDetailsChange failed, errcode:%{public}d, bundleName:%{public}s", ret, bundleName.c_str());
+            "OnCallDetailsChange failed, errcode:%{public}d, bundleInfo:%{public}s", ret, bundleInfo.c_str());
     } else {
         TELEPHONY_LOGI("callId[%{public}d] state[%{public}d] conferenceState[%{public}d] "
-                       "videoState[%{public}d], report bundleName %{public}s success",
-            info.callId, info.callState, info.conferenceState, info.videoState, bundleName.c_str());
+                       "videoState[%{public}d], report bundleInfo %{public}s success",
+            info.callId, info.callState, info.conferenceState, info.videoState, bundleInfo.c_str());
     }
     return ret;
 }
@@ -212,8 +212,8 @@ int32_t CallAbilityReportProxy::ReportCallEvent(const CallEventInfo &info)
         if ((*it)) {
             ret = (*it)->OnCallEventChange(info);
             if (ret != TELEPHONY_SUCCESS) {
-                TELEPHONY_LOGW("OnCallEventChange failed, errcode:%{public}d, bundleName:%{public}s", ret,
-                    ((*it)->GetBundleName()).c_str());
+                TELEPHONY_LOGW("OnCallEventChange failed, errcode:%{public}d, bundleInfo:%{public}s", ret,
+                    ((*it)->GetBundleInfo()).c_str());
                 continue;
             }
         }
@@ -232,8 +232,8 @@ int32_t CallAbilityReportProxy::ReportAsyncResults(
         if ((*it)) {
             ret = (*it)->OnReportAsyncResults(reportId, resultInfo);
             if (ret != TELEPHONY_SUCCESS) {
-                TELEPHONY_LOGW("ReportAsyncResults failed, errcode:%{public}d, bundleName:%{public}s", ret,
-                    ((*it)->GetBundleName()).c_str());
+                TELEPHONY_LOGW("ReportAsyncResults failed, errcode:%{public}d, bundleInfo:%{public}s", ret,
+                    ((*it)->GetBundleInfo()).c_str());
                 continue;
             }
         }
@@ -251,8 +251,8 @@ int32_t CallAbilityReportProxy::ReportMmiCodeResult(const MmiCodeInfo &info)
         if ((*it)) {
             ret = (*it)->OnReportMmiCodeResult(info);
             if (ret != TELEPHONY_SUCCESS) {
-                TELEPHONY_LOGW("ReportMmiCodeResult failed, errcode:%{public}d, bundleName:%{public}s", ret,
-                    ((*it)->GetBundleName()).c_str());
+                TELEPHONY_LOGW("ReportMmiCodeResult failed, errcode:%{public}d, bundleInfo:%{public}s", ret,
+                    ((*it)->GetBundleInfo()).c_str());
                 continue;
             }
         }
@@ -267,12 +267,12 @@ int32_t CallAbilityReportProxy::OttCallRequest(OttCallRequestId requestId, AppEx
     std::lock_guard<std::mutex> lock(mutex_);
     std::list<sptr<ICallAbilityCallback>>::iterator it = callbackPtrList_.begin();
     for (; it != callbackPtrList_.end(); ++it) {
-        std::string name = (*it)->GetBundleName();
-        if (name == "com.ohos.callservice") {
+        std::string bundleInfo = (*it)->GetBundleInfo();
+        if (bundleInfo == "com.ohos.callservice") {
             ret = (*it)->OnOttCallRequest(requestId, info);
             if (ret != TELEPHONY_SUCCESS) {
                 TELEPHONY_LOGW(
-                    "OttCallRequest failed, errcode:%{public}d, bundleName:%{public}s", ret, name.c_str());
+                    "OttCallRequest failed, errcode:%{public}d, bundleInfo:%{public}s", ret, bundleInfo.c_str());
                 break;
             }
         }
@@ -290,8 +290,8 @@ int32_t CallAbilityReportProxy::ReportAudioDeviceChange(const AudioDeviceInfo &i
         if ((*it)) {
             ret = (*it)->OnReportAudioDeviceChange(info);
             if (ret != TELEPHONY_SUCCESS) {
-                TELEPHONY_LOGW("ReportAudioDeviceChange failed, errcode:%{public}d, bundleName:%{public}s", ret,
-                    ((*it)->GetBundleName()).c_str());
+                TELEPHONY_LOGW("ReportAudioDeviceChange failed, errcode:%{public}d, bundleInfo:%{public}s", ret,
+                    ((*it)->GetBundleInfo()).c_str());
                 continue;
             }
         }
@@ -309,8 +309,8 @@ int32_t CallAbilityReportProxy::ReportPostDialDelay(const std::string &str)
         if ((*it)) {
             ret = (*it)->OnReportPostDialDelay(str);
             if (ret != TELEPHONY_SUCCESS) {
-                TELEPHONY_LOGW("ReportPostDialDelay failed, errcode:%{public}d, bundleName:%{public}s", ret,
-                    ((*it)->GetBundleName()).c_str());
+                TELEPHONY_LOGW("ReportPostDialDelay failed, errcode:%{public}d, bundleInfo:%{public}s", ret,
+                    ((*it)->GetBundleInfo()).c_str());
                 continue;
             }
         }
@@ -328,8 +328,8 @@ int32_t CallAbilityReportProxy::ReportImsCallModeChange(const CallMediaModeInfo 
         if ((*it)) {
             ret = (*it)->OnReportImsCallModeChange(imsCallModeInfo);
             if (ret != TELEPHONY_SUCCESS) {
-                TELEPHONY_LOGW("ReportImsCallModeReceive failed, errcode:%{public}d, bundleName:%{public}s", ret,
-                    ((*it)->GetBundleName()).c_str());
+                TELEPHONY_LOGW("ReportImsCallModeReceive failed, errcode:%{public}d, bundleInfo:%{public}s", ret,
+                    ((*it)->GetBundleInfo()).c_str());
                 continue;
             }
         }
@@ -348,8 +348,8 @@ int32_t CallAbilityReportProxy::ReportCallSessionEventChange(
         if ((*it)) {
             ret = (*it)->OnReportCallSessionEventChange(callSessionEventOptions);
             if (ret != TELEPHONY_SUCCESS) {
-                TELEPHONY_LOGW("ReportCallSessionEventChange failed, errcode:%{public}d, bundleName:%{public}s", ret,
-                    ((*it)->GetBundleName()).c_str());
+                TELEPHONY_LOGW("ReportCallSessionEventChange failed, errcode:%{public}d, bundleInfo:%{public}s", ret,
+                    ((*it)->GetBundleInfo()).c_str());
                 continue;
             }
         }
@@ -367,8 +367,8 @@ int32_t CallAbilityReportProxy::ReportPeerDimensionsChange(const PeerDimensionsD
         if ((*it)) {
             ret = (*it)->OnReportPeerDimensionsChange(peerDimensionsDetail);
             if (ret != TELEPHONY_SUCCESS) {
-                TELEPHONY_LOGW("ReportPeerDimensionsChange failed, errcode:%{public}d, bundleName:%{public}s", ret,
-                    ((*it)->GetBundleName()).c_str());
+                TELEPHONY_LOGW("ReportPeerDimensionsChange failed, errcode:%{public}d, bundleInfo:%{public}s", ret,
+                    ((*it)->GetBundleInfo()).c_str());
                 continue;
             }
         }
@@ -386,8 +386,8 @@ int32_t CallAbilityReportProxy::ReportCallDataUsageChange(const int64_t dataUsag
         if ((*it)) {
             ret = (*it)->OnReportCallDataUsageChange(dataUsage);
             if (ret != TELEPHONY_SUCCESS) {
-                TELEPHONY_LOGW("ReportCallDataUsageChange failed, errcode:%{public}d, bundleName:%{public}s", ret,
-                    ((*it)->GetBundleName()).c_str());
+                TELEPHONY_LOGW("ReportCallDataUsageChange failed, errcode:%{public}d, bundleInfo:%{public}s", ret,
+                    ((*it)->GetBundleInfo()).c_str());
                 continue;
             }
         }
@@ -405,8 +405,8 @@ int32_t CallAbilityReportProxy::ReportCameraCapabilities(const CameraCapabilitie
         if ((*it)) {
             ret = (*it)->OnReportCameraCapabilities(cameraCapabilities);
             if (ret != TELEPHONY_SUCCESS) {
-                TELEPHONY_LOGW("ReportCameraCapabilities failed, errcode:%{public}d, bundleName:%{public}s", ret,
-                    ((*it)->GetBundleName()).c_str());
+                TELEPHONY_LOGW("ReportCameraCapabilities failed, errcode:%{public}d, bundleInfo:%{public}s", ret,
+                    ((*it)->GetBundleInfo()).c_str());
                 continue;
             }
         }
