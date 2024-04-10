@@ -30,7 +30,6 @@ class CallStatusPolicy : public CallObjectManager {
 public:
     CallStatusPolicy();
     ~CallStatusPolicy();
-    int32_t IncomingHandlePolicy(const CallDetailInfo &info);
     int32_t DialingHandlePolicy(const CallDetailInfo &info);
     int32_t FilterResultsDispose(sptr<CallBase> call);
 };
