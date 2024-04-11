@@ -696,6 +696,7 @@ void AudioControlManager::SetSoundState(SoundState state)
 
 void AudioControlManager::SetToneState(ToneState state)
 {
+    std::lock_guard<std::mutex> lock(toneStateLock_);
     toneState_ = state;
 }
 
@@ -775,6 +776,7 @@ int32_t AudioControlManager::StopCallTone()
 
 bool AudioControlManager::IsTonePlaying() const
 {
+    std::lock_guard<std::mutex> lock(toneStateLock_);
     return toneState_ == ToneState::TONEING;
 }
 
