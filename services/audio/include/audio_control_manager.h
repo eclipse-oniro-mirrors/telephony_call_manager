@@ -109,6 +109,7 @@ private:
     std::unique_ptr<Tone> tone_;
     std::unique_ptr<Sound> sound_;
     std::mutex mutex_;
+    std::mutex toneStateLock_;
     sptr<CallBase> frontCall_ = nullptr;
 };
 } // namespace Telephony
