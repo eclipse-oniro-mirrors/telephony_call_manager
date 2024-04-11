@@ -113,9 +113,9 @@ struct VoipCallAttribute {
      */
     std::string extensionId = "";
     /**
-     * Indicates the process mode of voip call. 0: main process mode; 1: sub process mode
+     * Indicates the process mode of voip call. 1: main process mode; 0: sub process mode
      */
-    std::string processMode = "0";
+    std::string processMode = "1";
     /**
      * Indicates whether the VoIP incoming call default show live call banner. Default value is true.
      */
