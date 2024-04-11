@@ -87,7 +87,7 @@ int32_t CallAbilityCallbackProxy::OnCallEventChange(const CallEventInfo &info)
 {
     MessageParcel dataParcel;
     MessageParcel replyParcel;
-    MessageOption option;
+    MessageOption option(MessageOption::TF_ASYNC);
     if (!dataParcel.WriteInterfaceToken(CallAbilityCallbackProxy::GetDescriptor())) {
         TELEPHONY_LOGE("write descriptor fail");
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
@@ -112,7 +112,7 @@ int32_t CallAbilityCallbackProxy::OnCallDisconnectedCause(const DisconnectedDeta
 {
     MessageParcel dataParcel;
     MessageParcel replyParcel;
-    MessageOption option;
+    MessageOption option(MessageOption::TF_ASYNC);
     if (!dataParcel.WriteInterfaceToken(CallAbilityCallbackProxy::GetDescriptor())) {
         TELEPHONY_LOGE("write descriptor fail");
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
@@ -143,7 +143,7 @@ int32_t CallAbilityCallbackProxy::OnReportAsyncResults(CallResultReportId report
 {
     MessageParcel dataParcel;
     MessageParcel replyParcel;
-    MessageOption option;
+    MessageOption option(MessageOption::TF_ASYNC);
     if (!dataParcel.WriteInterfaceToken(CallAbilityCallbackProxy::GetDescriptor())) {
         TELEPHONY_LOGE("write descriptor fail");
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
@@ -167,7 +167,7 @@ int32_t CallAbilityCallbackProxy::OnReportMmiCodeResult(const MmiCodeInfo &info)
 {
     MessageParcel dataParcel;
     MessageParcel replyParcel;
-    MessageOption option;
+    MessageOption option(MessageOption::TF_ASYNC);
     if (!dataParcel.WriteInterfaceToken(CallAbilityCallbackProxy::GetDescriptor())) {
         TELEPHONY_LOGE("write descriptor fail");
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
@@ -234,7 +234,7 @@ int32_t CallAbilityCallbackProxy::OnOttCallRequest(OttCallRequestId requestId, A
 {
     MessageParcel dataParcel;
     MessageParcel replyParcel;
-    MessageOption option;
+    MessageOption option(MessageOption::TF_ASYNC);
     if (!dataParcel.WriteInterfaceToken(CallAbilityCallbackProxy::GetDescriptor())) {
         TELEPHONY_LOGE("write descriptor fail");
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
@@ -273,7 +273,7 @@ int32_t CallAbilityCallbackProxy::OnReportAudioDeviceChange(const AudioDeviceInf
 {
     MessageParcel dataParcel;
     MessageParcel replyParcel;
-    MessageOption option;
+    MessageOption option(MessageOption::TF_ASYNC);
     if (!dataParcel.WriteInterfaceToken(CallAbilityCallbackProxy::GetDescriptor())) {
         TELEPHONY_LOGE("write descriptor fail");
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
@@ -305,7 +305,7 @@ int32_t CallAbilityCallbackProxy::OnReportPostDialDelay(const std::string &str)
 {
     MessageParcel dataParcel;
     MessageParcel replyParcel;
-    MessageOption option;
+    MessageOption option(MessageOption::TF_ASYNC);
     if (!dataParcel.WriteInterfaceToken(CallAbilityCallbackProxy::GetDescriptor())) {
         TELEPHONY_LOGE("WriteInterfaceToken fail");
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
@@ -329,7 +329,7 @@ int32_t CallAbilityCallbackProxy::OnReportImsCallModeChange(const CallMediaModeI
 {
     MessageParcel dataParcel;
     MessageParcel replyParcel;
-    MessageOption option;
+    MessageOption option(MessageOption::TF_ASYNC);
     if (!dataParcel.WriteInterfaceToken(CallAbilityCallbackProxy::GetDescriptor())) {
         TELEPHONY_LOGE("write descriptor fail");
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
@@ -356,7 +356,7 @@ int32_t CallAbilityCallbackProxy::OnReportCallSessionEventChange(
 {
     MessageParcel dataParcel;
     MessageParcel replyParcel;
-    MessageOption option;
+    MessageOption option(MessageOption::TF_ASYNC);
     if (!dataParcel.WriteInterfaceToken(CallAbilityCallbackProxy::GetDescriptor())) {
         TELEPHONY_LOGE("write descriptor fail");
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
@@ -382,7 +382,7 @@ int32_t CallAbilityCallbackProxy::OnReportPeerDimensionsChange(const PeerDimensi
 {
     MessageParcel dataParcel;
     MessageParcel replyParcel;
-    MessageOption option;
+    MessageOption option(MessageOption::TF_ASYNC);
     if (!dataParcel.WriteInterfaceToken(CallAbilityCallbackProxy::GetDescriptor())) {
         TELEPHONY_LOGE("write descriptor fail");
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
@@ -408,7 +408,7 @@ int32_t CallAbilityCallbackProxy::OnReportCallDataUsageChange(const int64_t data
 {
     MessageParcel dataParcel;
     MessageParcel replyParcel;
-    MessageOption option;
+    MessageOption option(MessageOption::TF_ASYNC);
     if (!dataParcel.WriteInterfaceToken(CallAbilityCallbackProxy::GetDescriptor())) {
         TELEPHONY_LOGE("write descriptor fail");
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
@@ -432,7 +432,7 @@ int32_t CallAbilityCallbackProxy::OnReportCameraCapabilities(const CameraCapabil
 {
     MessageParcel dataParcel;
     MessageParcel replyParcel;
-    MessageOption option;
+    MessageOption option(MessageOption::TF_ASYNC);
     if (!dataParcel.WriteInterfaceToken(CallAbilityCallbackProxy::GetDescriptor())) {
         TELEPHONY_LOGE("write descriptor fail");
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
