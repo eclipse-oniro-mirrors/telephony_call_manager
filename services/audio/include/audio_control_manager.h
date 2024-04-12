@@ -51,7 +51,7 @@ public:
     int32_t MuteRinger();
     int32_t SetMute(bool on);
     void SetVolumeAudible();
-    bool IsTonePlaying() const;
+    bool IsTonePlaying();
     bool IsAudioActivated() const;
     bool IsCurrentRinging() const;
     bool IsActiveCallExists() const;
