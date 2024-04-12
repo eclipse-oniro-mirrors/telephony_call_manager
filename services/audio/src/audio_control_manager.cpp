@@ -696,6 +696,7 @@ void AudioControlManager::SetSoundState(SoundState state)
 
 void AudioControlManager::SetToneState(ToneState state)
 {
+    std::lock_guard<std::mutex> lock(toneStateLock_);
     toneState_ = state;
 }
 
@@ -733,6 +734,7 @@ bool AudioControlManager::IsAudioActivated() const
 
 int32_t AudioControlManager::PlayCallTone(ToneDescriptor type)
 {
+    std::lock_guard<std::mutex> lock(toneStateLock_);
     if (toneState_ == ToneState::TONEING) {
         TELEPHONY_LOGE("should not play callTone");
         return CALL_ERR_AUDIO_TONE_PLAY_FAILED;
@@ -753,6 +755,7 @@ int32_t AudioControlManager::PlayCallTone(ToneDescriptor type)
 
 int32_t AudioControlManager::StopCallTone()
 {
+    std::lock_guard<std::mutex> lock(toneStateLock_);
     if (toneState_ == ToneState::STOPPED) {
         TELEPHONY_LOGI("tone is already stopped");
         return TELEPHONY_SUCCESS;
@@ -771,8 +774,9 @@ int32_t AudioControlManager::StopCallTone()
     return TELEPHONY_SUCCESS;
 }
 
-bool AudioControlManager::IsTonePlaying() const
+bool AudioControlManager::IsTonePlaying()
 {
+    std::lock_guard<std::mutex> lock(toneStateLock_);
     return toneState_ == ToneState::TONEING;
 }
 

@@ -51,7 +51,7 @@ public:
     int32_t MuteRinger();
     int32_t SetMute(bool on);
     void SetVolumeAudible();
-    bool IsTonePlaying() const;
+    bool IsTonePlaying();
     bool IsAudioActivated() const;
     bool IsCurrentRinging() const;
     bool IsActiveCallExists() const;
@@ -109,6 +109,7 @@ private:
     std::unique_ptr<Tone> tone_;
     std::unique_ptr<Sound> sound_;
     std::mutex mutex_;
+    std::mutex toneStateLock_;
     sptr<CallBase> frontCall_ = nullptr;
 };
 } // namespace Telephony
