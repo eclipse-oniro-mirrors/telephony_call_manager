@@ -630,11 +630,11 @@ void CallRequestProcess::UnHoldRequest(int32_t callId)
     IsExistCallOtherSlot(callIdList, call->GetSlotId(), noOtherCall);
     for (int32_t otherCallId : callIdList) {
         sptr<CallBase> otherCall = GetOneCallObject(otherCallId);
-        TelCallState state = otherCall->GetTelCallState();
         if (otherCall == nullptr) {
             TELEPHONY_LOGE("otherCall is nullptr");
             return;
         }
+        TelCallState state = otherCall->GetTelCallState();
         TelConferenceState confState = otherCall->GetTelConferenceState();
         int32_t conferenceId = ERR_ID;
         otherCall->GetMainCallId(conferenceId);
