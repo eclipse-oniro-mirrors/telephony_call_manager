@@ -54,7 +54,7 @@ int32_t CallPolicy::DialPolicy(std::u16string &number, AppExecFwk::PacMap &extra
         (dialScene == DialScene::CALL_NORMAL && isEcc) || (dialScene == DialScene::CALL_EMERGENCY && (!isEcc)) ||
         (dialType == DialType::DIAL_VOICE_MAIL_TYPE && dialScene == DialScene::CALL_EMERGENCY)) {
         TELEPHONY_LOGE("invalid dial scene!");
-        return CALL_ERR_INVALID_DIAL_SCENE;
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
     VideoStateType videoState = (VideoStateType)extras.GetIntValue("videoState");
     if (videoState != VideoStateType::TYPE_VOICE && videoState != VideoStateType::TYPE_VIDEO) {
