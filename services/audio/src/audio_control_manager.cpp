@@ -774,7 +774,7 @@ int32_t AudioControlManager::StopCallTone()
     return TELEPHONY_SUCCESS;
 }
 
-bool AudioControlManager::IsTonePlaying() const
+bool AudioControlManager::IsTonePlaying()
 {
     std::lock_guard<std::mutex> lock(toneStateLock_);
     return toneState_ == ToneState::TONEING;
