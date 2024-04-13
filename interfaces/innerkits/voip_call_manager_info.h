@@ -56,7 +56,7 @@ enum class CallAudioEvent {
      * Indicates the event of speaker off.
      */
     AUDIO_EVENT_SPEAKER_OFF = 3,
-}
+};
 
 /**
  * @brief Indicates the voip call state.
