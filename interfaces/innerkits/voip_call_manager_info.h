@@ -39,24 +39,24 @@ enum class WindowMode {
 /**
  * @brief Indicates the call audio event.
  */
- enum class CallAudioEvent {
+enum class CallAudioEvent {
     /**
      * Indicates the event of muted.
      */
-     AUDIO_EVENT_MUTED = 0;
-     /**
+    AUDIO_EVENT_MUTED = 0;
+    /**
      * Indicates the event of unmuted.
      */
-     AUDIO_EVENT_UNMUTED = 1;
-     /**
+    AUDIO_EVENT_UNMUTED = 1;
+    /**
      * Indicates the event of speaker on.
      */
-     AUDIO_EVENT_SPEAKER_ON = 2;
-     /**
+    AUDIO_EVENT_SPEAKER_ON = 2;
+    /**
      * Indicates the event of speaker off.
      */
-     AUDIO_EVENT_SPEAKER_OFF = 3;
- }
+    AUDIO_EVENT_SPEAKER_OFF = 3;
+}
 
 /**
  * @brief Indicates the voip call state.
