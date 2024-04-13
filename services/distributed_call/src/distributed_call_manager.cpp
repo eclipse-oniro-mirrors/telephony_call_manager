@@ -32,6 +32,7 @@ const size_t INT32_PLAINTEXT_LENGTH = 4;
 const int32_t DCALL_SWITCH_DEVICE_TYPE_SOURCE = 0;
 const int32_t DCALL_SWITCH_DEVICE_TYPE_SINK = 1;
 const int32_t DISTRIBUTED_CALL_SOURCE_SA_ID = 9855;
+const int32_t WAIT_DCALL_INIT_100MS = 100 * 1000;
 const std::string CALLBACK_NAME = "telephony";
 const std::string DISTRIBUTED_AUDIO_DEV_CAR = "dCar";
 const std::string DISTRIBUTED_AUDIO_DEV_PHONE = "dPhone";
@@ -432,7 +433,7 @@ void DistributedCallManager::OnDCallSystemAbilityAdded(const std::string &device
 {
     TELEPHONY_LOGI("dcall source service is added, deviceId: %{public}s", GetAnonyString(deviceId).c_str());
     // wait 100ms for dcall-sa to complete init.
-    usleep(100);
+    usleep(WAIT_DCALL_INIT_100MS);
     dcallProxy_ = std::make_shared<DistributedCallProxy>();
     if (dcallProxy_ == nullptr) {
         TELEPHONY_LOGE("fail to create dcall proxy obj");
