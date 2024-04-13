@@ -235,6 +235,9 @@ int32_t CallStatusManager::HandleVoipCallReportInfo(const CallDetailInfo &info)
         case TelCallState::CALL_STATUS_DISCONNECTED:
             ret = DisconnectedVoipCallHandle(info);
             break;
+        case TelCallState::CALL_STATUS_DIALING:
+            ret = OutgoingVoipCallHandle(info);
+            break;
         default:
             TELEPHONY_LOGE("Invalid call state!");
             break;
@@ -415,6 +418,28 @@ int32_t CallStatusManager::IncomingVoipCallHandle(const CallDetailInfo &info)
         return TELEPHONY_SUCCESS;
     }
     call = CreateNewCall(info, CallDirection::CALL_DIRECTION_IN);
+    if (call == nullptr) {
+        TELEPHONY_LOGE("CreateVoipCall failed!");
+        return CALL_ERR_CALL_OBJECT_IS_NULL;
+    }
+    AddOneCallObject(call);
+    DelayedSingleton<CallControlManager>::GetInstance()->NotifyNewCallCreated(call);
+    ret = UpdateCallState(call, info.state);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("UpdateCallState failed!");
+        return ret;
+    }
+    return ret;
+}
+
+int32_t CallStatusManager::OutgoingVoipCallHandle(const CallDetailInfo &info)
+{
+    int32_t ret = TELEPHONY_ERROR;
+    sptr<CallBase> call = GetOneCallObjectByVoipCallId(info.voipCallInfo.voipCallId);
+    if (call != nullptr) {
+        return TELEPHONY_SUCCESS;
+    }
+    call = CreateNewCall(info, CallDirection::CALL_DIRECTION_OUT);
     if (call == nullptr) {
         TELEPHONY_LOGE("CreateVoipCall failed!");
         return CALL_ERR_CALL_OBJECT_IS_NULL;

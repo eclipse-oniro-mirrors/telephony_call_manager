@@ -55,6 +55,7 @@ private:
     void InitCallBaseEvent();
     int32_t IncomingHandle(const CallDetailInfo &info);
     int32_t IncomingVoipCallHandle(const CallDetailInfo &info);
+    int32_t OutgoingVoipCallHandle(const CallDetailInfo &info);
     int32_t DialingHandle(const CallDetailInfo &info);
     int32_t ActiveHandle(const CallDetailInfo &info);
     int32_t ActiveVoipCallHandle(const CallDetailInfo &info);

@@ -62,6 +62,15 @@ public:
      */
     int32_t ReportCallStateChange(std::string &callId, const VoipCallState &state) override;
     /**
+     * @brief thrid-party applications report a outgoing call.
+     *
+     * @param extras[in], extras date.
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t ReportOutgoingCall(
+        AppExecFwk::PacMap &extras, std::vector<uint8_t> &userProfile, ErrorReason &reason) override;
+
+    /**
      * RegisterCallBack
      *
      * @brief Register callback
@@ -69,7 +78,6 @@ public:
      * @return Returns 0 on success, others on failure.
      */
     int32_t RegisterCallBack(const sptr<IVoipCallManagerCallback> &callback) override;
-
     /**
      * UnRegisterCallBack
      *
@@ -77,6 +85,7 @@ public:
      * @return Returns 0 on success, others on failure.
      */
     int32_t UnRegisterCallBack() override;
+
     /**
      * @brief pushSA report a incoming call.
      *
@@ -86,7 +95,6 @@ public:
      * @return Returns 0 on success, others on failure.
      */
     int32_t ReportVoipIncomingCall(std::string &callId, std::string &bundleName, std::string &processMode) override;
-
     /**
      * @brief pushSA report call extensionId.
      *
@@ -158,6 +166,15 @@ public:
      * @return Returns TELEPHONY_SUCCESS on success, others on failure.
      */
     int32_t SendCallUiEvent(std::string &voipCallId, Telephony::WindowMode windowModeEvent) override;
+
+    /**
+     * @brief thrid-party applications report call audio event change
+     *
+     * @param voipCallId[in], The VoipCallId
+     * @param CallAudioEvent[in], The call audio event
+     * @return Returns TELEPHONY_SUCCESS on success, others on failure.
+     */
+    int32_t ReportCallAudioEventChange(std::string &voipCallId, const CallAudioEvent &callAudioEvent) override;
 
 private:
     static inline BrokerDelegator<VoipCallManagerProxy> delegator_;
