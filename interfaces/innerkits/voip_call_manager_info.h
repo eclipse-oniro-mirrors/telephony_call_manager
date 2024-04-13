@@ -37,6 +37,28 @@ enum class WindowMode {
 };
 
 /**
+ * @brief Indicates the call audio event.
+ */
+ enum class CallAudioEvent {
+    /**
+     * Indicates the event of muted.
+     */
+     AUDIO_EVENT_MUTED = 0;
+     /**
+     * Indicates the event of unmuted.
+     */
+     AUDIO_EVENT_UNMUTED = 1;
+     /**
+     * Indicates the event of speaker on.
+     */
+     AUDIO_EVENT_SPEAKER_ON = 2;
+     /**
+     * Indicates the event of speaker off.
+     */
+     AUDIO_EVENT_SPEAKER_OFF = 3;
+ }
+
+/**
  * @brief Indicates the voip call state.
  */
 enum class VoipCallState {
@@ -60,6 +82,10 @@ enum class VoipCallState {
      * Indicates the call state of disconnected.
      */
     VOIP_CALL_STATE_DISCONNECTED,
+    /**
+     * Indicates the call state of dialing.
+     */
+    VOIP_CALL_STATE_DIALING,
 };
 
 /**
@@ -158,6 +184,22 @@ enum class VoipCallEvent {
      * Indicates the window mode of the voip call is float window.
      */
     VOIP_CALL_EVENT_SHOW_FLOAT_WINDOW,
+    /**
+     * Indicates the user clicked muted.
+     */
+    VOIP_CALL_EVENT_MUTED,
+    /**
+     * Indicates the user clicked unmuted.
+     */
+    VOIP_CALL_EVENT_UNMUTED,
+    /**
+     * Indicates the user clicked speaker on.
+     */
+    VOIP_CALL_EVENT_SPEAKER_ON,
+    /**
+     * Indicates the user clicked speaker off.
+     */
+    VOIP_CALL_EVENT_SPEAKER_OFF,
 };
 
 /**

@@ -308,6 +308,14 @@ public:
      */
     int32_t HandleCameraCapabilitiesChanged(const CameraCapabilitiesReportInfo &cameraCapabilities) override;
 
+    /**
+     * @brief update the voip call event
+     *
+     * @param info[in], contains voipCallEvent
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t UpdateVoipEventInfo(const VoipCallEventInfo &info) override;
+
 private:
     static inline BrokerDelegator<CallStatusCallbackProxy> delegator_;
 };

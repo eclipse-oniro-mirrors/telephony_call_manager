@@ -64,6 +64,7 @@ public:
     int32_t HandlePeerDimensionsChanged(const PeerDimensionsReportInfo &dimensionsDetail) override;
     int32_t HandleCallDataUsageChanged(const int64_t result) override;
     int32_t HandleCameraCapabilitiesChanged(const CameraCapabilitiesReportInfo &cameraCapabilities) override;
+    int32_t UpdateVoipEventInfo(const VoipCallEventInfo &info) override;
 };
 } // namespace Telephony
 } // namespace OHOS

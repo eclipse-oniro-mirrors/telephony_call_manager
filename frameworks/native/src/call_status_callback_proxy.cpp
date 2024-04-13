@@ -735,6 +735,11 @@ int32_t CallStatusCallbackProxy::ReportPostDialDelay(const std::string &str)
     return replyParcel.ReadInt32();
 }
 
+int32_t CallStatusCallbackProxy::UpdateVoipEventInfo(const VoipCallEventInfo &info)
+{
+    return TELEPHONY_SUCCESS;
+}
+
 int32_t CallStatusCallbackProxy::HandleCallSessionEventChanged(const CallSessionReportInfo &eventOptions)
 {
     MessageParcel dataParcel;

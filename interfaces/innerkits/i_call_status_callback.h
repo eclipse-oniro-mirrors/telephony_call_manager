@@ -18,6 +18,7 @@
 
 #include "iremote_broker.h"
 #include "call_manager_inner_type.h"
+#include "voip_call_manager_info.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -303,6 +304,14 @@ public:
      * @return Returns 0 on success, others on failure.
      */
     virtual int32_t HandleCameraCapabilitiesChanged(const CameraCapabilitiesReportInfo &cameraCapabilities) = 0;
+
+    /**
+     * @brief update the voip call event
+     *
+     * @param info[in], contains voipCallEvent
+     * @return Returns 0 on success, others on failure.
+     */
+    virtual int32_t UpdateVoipEventInfo(const VoipCallEventInfo &info) = 0;
 
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"OHOS.Telephony.ICallStatusCallback");

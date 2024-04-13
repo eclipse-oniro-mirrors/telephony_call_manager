@@ -110,6 +110,40 @@ int32_t VoipCallManagerProxy::ReportCallStateChange(std::string &callId, const V
     return replyParcel.ReadInt32();
 }
 
+int32_t VoipCallManagerProxy::ReportOutgoingCall(
+    AppExecFwk::PacMap &extras, std::vector<uint8_t> &userProfile, ErrorReason &reason)
+{
+    MessageParcel dataParcel;
+    if (!dataParcel.WriteInterfaceToken(VoipCallManagerProxy::GetDescriptor())) {
+        TELEPHONY_LOGE("write descriptor fail");
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    dataParcel.WriteString(extras.GetStringValue("callId"));
+    dataParcel.WriteInt32(extras.GetIntValue("voipCallType"));
+    dataParcel.WriteString(extras.GetStringValue("userName"));
+    dataParcel.WriteString(extras.GetStringValue("abilityName"));
+    dataParcel.WriteInt32(extras.GetIntValue("voipCallState"));
+    dataParcel.WriteBool(extras.GetBooleanValue("supportFloatWindow"));
+    dataParcel.WriteBool(extras.GetBooleanValue("showBannerForIncomingCall"));
+    dataParcel.WriteUInt8Vector(userProfile);
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("ReportOutgoingCall Remote is null");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    MessageOption option;
+    MessageParcel replyParcel;
+    int32_t error =
+        remote->SendRequest(static_cast<int32_t>(INTERFACE_REPORT_OUTGOING_CALL), dataParcel, replyParcel, option);
+    if (error != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("function ReportOutgoingCall call failed! errCode:%{public}d", error);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t result = replyParcel.ReadInt32();
+    reason = static_cast<ErrorReason>(replyParcel.ReadInt32());
+    return result;
+}
+
 int32_t VoipCallManagerProxy::RegisterCallBack(const sptr<IVoipCallManagerCallback> &callback)
 {
     MessageParcel dataParcel;
@@ -412,6 +446,11 @@ int32_t VoipCallManagerProxy::SendCallUiEvent(std::string &voipCallId, Telephony
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     return replyParcel.ReadInt32();
+}
+
+int32_t VoipCallManagerProxy::ReportCallAudioEventChange(std::string &voipCallId, const CallAudioEvent &callAudioEvent)
+{
+    return TELEPHONY_SUCCESS;
 }
 
 } // namespace Telephony
