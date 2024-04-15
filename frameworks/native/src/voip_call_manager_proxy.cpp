@@ -423,7 +423,27 @@ int32_t VoipCallManagerProxy::SendCallUiEvent(std::string &voipCallId, const Cal
 
 int32_t VoipCallManagerProxy::ReportCallAudioEventChange(std::string &voipCallId, const CallAudioEvent &callAudioEvent)
 {
-    return TELEPHONY_SUCCESS;
+    MessageParcel dataParcel;
+    if (!dataParcel.WriteInterfaceToken(VoipCallManagerProxy::GetDescriptor())) {
+        TELEPHONY_LOGE("write descriptor fail");
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    dataParcel.WriteString(voipCallId);
+    dataParcel.WriteInt32(static_cast<int32_t>(callAudioEvent));
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("ReportCallAudioEventChange Remote is null");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    MessageOption option;
+    MessageParcel replyParcel;
+    int32_t error =
+        remote->SendRequest(static_cast<int32_t>(INTERFACE_REPORT_CALL_AUDIO_EVENT_CHANGE), dataParcel, replyParcel, option);
+    if (error != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("function ReportCallAudioEventChange call failed! errCode:%{public}d", error);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return replyParcel.ReadInt32();
 }
 
 } // namespace Telephony

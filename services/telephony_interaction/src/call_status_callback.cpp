@@ -128,6 +128,16 @@ int32_t CallStatusCallback::UpdateEventResultInfo(const CellularCallEventInfo &i
     return ret;
 }
 
+int32_t CallStatusCallback::UpdateVoipEventInfo(const VoipCallEventInfo &info) {
+    int32_t ret = DelayedSingleton<ReportCallInfoHandler>::GetInstance()->UpdateVoipEventInfo(info);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("UpdateVoipEventInfo failed! errCode:%{public}d", ret);
+    } else {
+        TELEPHONY_LOGI("UpdateVoipEventInfo success!");
+    }
+    return ret;
+}
+
 int32_t CallStatusCallback::UpdateRBTPlayInfo(const RBTPlayInfo info)
 {
     TELEPHONY_LOGI("UpdateRBTPlayInfo info = %{public}d", info);

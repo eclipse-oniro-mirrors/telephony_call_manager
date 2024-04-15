@@ -219,6 +219,27 @@ int32_t ReportCallInfoHandler::ReceiveImsCallModeResponse(const CallModeReportIn
     return TELEPHONY_SUCCESS;
 }
 
+int32_t ReportCallInfoHandler::UpdateVoipEventInfo(const VoipCallEventInfo &info) {
+    if (callStatusManagerPtr_ == nullptr) {
+        TELEPHONY_LOGE("callStatusManagerPtr_ is null");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    VoipCallEventInfo voipCallEventInfo = info;
+    std::weak_ptr<CallStatusManager> callStatusManagerPtr = callStatusManagerPtr_;
+    Submit("UpdateVoipEventInfo", [callStatusManagerPtr, voipCallEventInfo]() {
+        std::shared_ptr<CallStatusManager> managerPtr = callStatusManagerPtr.lock();
+        if (managerPtr == nullptr) {
+            TELEPHONY_LOGE("managerPtr is null");
+            return;
+        }
+        int32_t ret = managerPtr->HandleVoipEventReportInfo(voipCallEventInfo);
+        if (ret != TELEPHONY_SUCCESS) {
+            TELEPHONY_LOGE("UpdateVoipEventInfo failed! ret:%{public}d", ret);
+        }
+    });
+    return TELEPHONY_SUCCESS;
+}
+
 template<typename Function>
 void ReportCallInfoHandler::Submit(const std::string &taskName, Function &&func)
 {

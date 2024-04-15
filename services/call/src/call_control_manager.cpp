@@ -1020,6 +1020,10 @@ int32_t CallControlManager::SetMuted(bool isMute)
         return CALL_ERR_AUDIO_SETTING_MUTE_FAILED;
     }
 
+    if (call->GetCallType() == CallType::TYPE_VOIP) {
+        TELEPHONY_LOGI("SetMute by voip");
+        call->SetMute(isMute, call->GetSlotId());
+    }
     if (call->GetCallType() == CallType::TYPE_IMS
         || call->GetCallType() == CallType::TYPE_CS) {
         TELEPHONY_LOGI("SetMute by ims or cs");

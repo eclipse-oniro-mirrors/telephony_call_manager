@@ -60,6 +60,7 @@ enum CallStatusInterfaceCode {
     CALL_DATA_USAGE,
     CAMERA_CAPBILITIES_CHANGE,
     RECEIVE_UPDATE_MEDIA_MODE_REQUEST,
+    UPDATE_VOIP_EVENT_INFO,
 };
 } // namespace Telephony
 } // namespace OHOS

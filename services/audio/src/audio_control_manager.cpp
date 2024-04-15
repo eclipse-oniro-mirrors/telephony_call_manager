@@ -379,6 +379,16 @@ void AudioControlManager::HandleNewActiveCall(sptr<CallBase> &callObjectPtr)
 int32_t AudioControlManager::SetAudioDevice(const AudioDevice &device)
 {
     TELEPHONY_LOGI("set audio device, type: %{public}d", static_cast<int32_t>(device.deviceType));
+    sptr<CallBase> liveCall = CallObjectManager::GetForegroundLiveCall();
+    if (liveCall != nullptr && liveCall->GetCallType() == CallType::TYPE_VOIP) {
+        CallAttributeInfo info;
+        liveCall->GetCallAttributeInfo(info);
+        std::string voipCallId = info.voipCallInfo.voipCallId;
+        CallAudioEvent callAudioEvent = device.deviceType == AudioDeviceType::DEVICE_SPEAKER ?
+            CallAudioEvent::AUDIO_EVENT_SPEAKER_ON : CallAudioEvent::AUDIO_EVENT_SPEAKER_OFF;
+        DelayedSingleton<VoipCallConnection>::GetInstance()->SendCallUiEvent(voipCallId, callAudioEvent);
+        return TELEPHONY_SUCCESS;
+    }
     AudioDeviceType audioDeviceType = AudioDeviceType::DEVICE_UNKNOWN;
     switch (device.deviceType) {
         case AudioDeviceType::DEVICE_SPEAKER:

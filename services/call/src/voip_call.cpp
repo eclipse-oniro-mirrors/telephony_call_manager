@@ -136,6 +136,11 @@ int32_t VoIPCall::SwitchCall()
 
 int32_t VoIPCall::SetMute(int32_t mute, int32_t slotId)
 {
+    CallAttributeInfo info;
+    GetCallAttributeInfo(info);
+    std::string voipCallId = info.voipCallInfo.voipCallId;
+    CallAudioEvent callAudioEvent = mute == 1 ? CallAudioEvent::AUDIO_EVENT_MUTED : CallAudioEvent::AUDIO_EVENT_UNMUTED;
+    DelayedSingleton<VoipCallConnection>::GetInstance()->SendCallUiEvent(voipCallId, callAudioEvent);
     return TELEPHONY_SUCCESS;
 }
 
