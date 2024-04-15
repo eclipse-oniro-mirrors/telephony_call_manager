@@ -476,10 +476,5 @@ int32_t CallStatusCallback::HandleCameraCapabilitiesChanged(
     cameraCapabilities.height = cameraCapabilitiesReportInfo.height;
     return DelayedSingleton<CallAbilityReportProxy>::GetInstance()->ReportCameraCapabilities(cameraCapabilities);
 }
-
-int32_t CallStatusCallback::UpdateVoipEventInfo(const VoipCallEventInfo &info)
-{
-    return TELEPHONY_SUCCESS;
-}
 } // namespace Telephony
 } // namespace OHOS
