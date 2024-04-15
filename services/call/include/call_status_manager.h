@@ -23,6 +23,7 @@
 #include "common_type.h"
 #include "call_status_policy.h"
 #include "call_incoming_filter_manager.h"
+#include "voip_call_manager_info.h"
 
 /**
  * Singleton
@@ -50,6 +51,7 @@ public:
     int32_t HandleOttEventReportInfo(const OttCallEventInfo &info);
     int32_t HandleVoipCallReportInfo(const CallDetailInfo &info);
     void CallFilterCompleteResult(const CallDetailInfo &info);
+    int32_t HandleVoipEventReportInfo(const VoipCallEventInfo &info);
 
 private:
     void InitCallBaseEvent();

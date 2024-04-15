@@ -72,6 +72,7 @@ private:
     int32_t OnPeerDimensionsChange(MessageParcel &data, MessageParcel &reply);
     int32_t OnCallDataUsageChange(MessageParcel &data, MessageParcel &reply);
     int32_t OnCameraCapabilitiesChange(MessageParcel &data, MessageParcel &reply);
+    int32_t OnUpdateVoipEventInfo(MessageParcel &data, MessageParcel &reply);
 
     std::map<uint32_t, CallStatusCallbackFunc> memberFuncMap_;
 };

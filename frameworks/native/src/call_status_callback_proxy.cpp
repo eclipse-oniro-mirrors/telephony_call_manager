@@ -737,7 +737,24 @@ int32_t CallStatusCallbackProxy::ReportPostDialDelay(const std::string &str)
 
 int32_t CallStatusCallbackProxy::UpdateVoipEventInfo(const VoipCallEventInfo &info)
 {
-    return TELEPHONY_SUCCESS;
+    MessageParcel dataParcel;
+    MessageParcel replyParcel;
+    MessageOption option;
+    int32_t error = TELEPHONY_ERR_FAIL;
+    if (!dataParcel.WriteInterfaceToken(CallStatusCallbackProxy::GetDescriptor())) {
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    int32_t length = sizeof(VoipCallEventInfo);
+    dataParcel.WriteInt32(length);
+    dataParcel.WriteRawData((const void *)&info, length);
+    if (Remote() == nullptr) {
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    error = Remote()->SendRequest(UPDATE_VOIP_EVENT_INFO, dataParcel, replyParcel, option);
+    if (error != TELEPHONY_SUCCESS) {
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return replyParcel.ReadInt32();
 }
 
 int32_t CallStatusCallbackProxy::HandleCallSessionEventChanged(const CallSessionReportInfo &eventOptions)

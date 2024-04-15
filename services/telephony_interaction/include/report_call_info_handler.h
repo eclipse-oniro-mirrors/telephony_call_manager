@@ -21,6 +21,7 @@
 #include "call_status_manager.h"
 #include "mutex"
 #include "singleton.h"
+#include "voip_call_manager_info.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -35,6 +36,7 @@ public:
     int32_t UpdateOttEventInfo(const OttCallEventInfo &info);
     int32_t ReceiveImsCallModeRequest(const CallModeReportInfo &response);
     int32_t ReceiveImsCallModeResponse(const CallModeReportInfo &response);
+    int32_t UpdateVoipEventInfo(const VoipCallEventInfo &info);
 
 private:
     template<typename Function>

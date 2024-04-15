@@ -19,6 +19,7 @@
 
 #include "audio_control_manager.h"
 #include "bluetooth_call_service.h"
+#include "call_ability_report_proxy.h"
 #include "call_control_manager.h"
 #include "call_manager_errors.h"
 #include "call_manager_hisysevent.h"
@@ -315,6 +316,13 @@ int32_t CallStatusManager::HandleOttEventReportInfo(const OttCallEventInfo &info
     } else {
         TELEPHONY_LOGW("unknown type Event, eventid %{public}d", info.ottCallEventId);
     }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallStatusManager::HandleVoipEventReportInfo(const VoipCallEventInfo &info)
+{
+    TELEPHONY_LOGI("recv one Event, eventId:%{public}d", info.voipCallEvent);
+    DelayedSingleton<AudioDeviceManager>::GetInstance()->ReportAudioDeviceInfo();
     return TELEPHONY_SUCCESS;
 }
 
