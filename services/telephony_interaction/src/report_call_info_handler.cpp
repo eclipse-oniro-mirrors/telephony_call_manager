@@ -219,7 +219,8 @@ int32_t ReportCallInfoHandler::ReceiveImsCallModeResponse(const CallModeReportIn
     return TELEPHONY_SUCCESS;
 }
 
-int32_t ReportCallInfoHandler::UpdateVoipEventInfo(const VoipCallEventInfo &info) {
+int32_t ReportCallInfoHandler::UpdateVoipEventInfo(const VoipCallEventInfo &info)
+{
     if (callStatusManagerPtr_ == nullptr) {
         TELEPHONY_LOGE("callStatusManagerPtr_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;

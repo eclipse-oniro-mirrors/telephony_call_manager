@@ -835,7 +835,8 @@ int32_t CallStatusCallbackStub::OnCameraCapabilitiesChange(MessageParcel &data, 
     return TELEPHONY_SUCCESS;
 }
 
-int32_t CallStatusCallbackStub::OnUpdateVoipEventInfo(MessageParcel &data, MessageParcel &reply) {
+int32_t CallStatusCallbackStub::OnUpdateVoipEventInfo(MessageParcel &data, MessageParcel &reply)
+{
     int32_t result = TELEPHONY_ERR_FAIL;
     if (!data.ContainFileDescriptors()) {
         TELEPHONY_LOGW("sent raw data is less than 32k");

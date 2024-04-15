@@ -437,8 +437,8 @@ int32_t VoipCallManagerProxy::ReportCallAudioEventChange(std::string &voipCallId
     }
     MessageOption option;
     MessageParcel replyParcel;
-    int32_t error =
-        remote->SendRequest(static_cast<int32_t>(INTERFACE_REPORT_CALL_AUDIO_EVENT_CHANGE), dataParcel, replyParcel, option);
+    int32_t error = remote->SendRequest(
+        static_cast<int32_t>(INTERFACE_REPORT_CALL_AUDIO_EVENT_CHANGE), dataParcel, replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("function ReportCallAudioEventChange call failed! errCode:%{public}d", error);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;

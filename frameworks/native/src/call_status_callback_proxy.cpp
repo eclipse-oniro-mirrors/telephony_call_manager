@@ -750,8 +750,8 @@ int32_t CallStatusCallbackProxy::UpdateVoipEventInfo(const VoipCallEventInfo &in
     if (Remote() == nullptr) {
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    error = Remote()->SendRequest(static_cast<int32_t>(UPDATE_VOIP_EVENT_INFO), dataParcel, replyParcel, option);
-    if (error == TELEPHONY_SUCCESS) {
+    error = Remote()->SendRequest(UPDATE_VOIP_EVENT_INFO, dataParcel, replyParcel, option);
+    if (error != TELEPHONY_SUCCESS) {
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     return replyParcel.ReadInt32();

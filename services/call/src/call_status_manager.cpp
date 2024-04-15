@@ -319,7 +319,8 @@ int32_t CallStatusManager::HandleOttEventReportInfo(const OttCallEventInfo &info
     return TELEPHONY_SUCCESS;
 }
 
-int32_t CallStatusManager::HandleVoipEventReportInfo(const VoipCallEventInfo &info) {
+int32_t CallStatusManager::HandleVoipEventReportInfo(const VoipCallEventInfo &info)
+{
     TELEPHONY_LOGI("recv one Event, eventId:%{public}d", info.voipCallEvent);
     DelayedSingleton<AudioDeviceManager>::GetInstance()->ReportAudioDeviceInfo();
     return TELEPHONY_SUCCESS;

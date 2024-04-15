@@ -23,6 +23,7 @@
 #include "audio_routing_manager.h"
 #include "audio_device_info.h"
 #include "audio_info.h"
+#include "voip_call_connection.h"
 
 namespace OHOS {
 namespace Telephony {

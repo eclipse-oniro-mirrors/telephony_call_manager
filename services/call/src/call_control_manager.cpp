@@ -1022,7 +1022,7 @@ int32_t CallControlManager::SetMuted(bool isMute)
 
     if (call->GetCallType() == CallType::TYPE_VOIP) {
         TELEPHONY_LOGI("SetMute by voip");
-        call->SetMute(isMute, call->GetSlotId());
+        return call->SetMute(isMute, call->GetSlotId());
     }
     if (call->GetCallType() == CallType::TYPE_IMS
         || call->GetCallType() == CallType::TYPE_CS) {
