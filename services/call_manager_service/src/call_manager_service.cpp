@@ -1407,17 +1407,6 @@ int32_t CallManagerService::SendCallUiEvent(int32_t callId, std::string &eventNa
         TELEPHONY_LOGE("Permission denied!");
         return TELEPHONY_ERR_PERMISSION_ERR;
     }
-    sptr<CallBase> callPtrl = CallObjectManager::GetOneCallObject(callId);
-    if (callPtrl == nullptr) {
-        TELEPHONY_LOGE("callId is invalid, callId:%{public}d", callId);
-        return TELEPHONY_ERR_ARGUMENT_INVALID;
-    }
-    CallAttributeInfo info;
-    callPtrl->GetCallAttributeInfo(info);
-    std::string voipCallId = info.voipCallInfo.voipCallId;
-    Telephony::WindowMode windowModeEvent = eventName.compare(eventShowFloatWindow_) == 0 ?
-        Telephony::WindowMode::MODE_FLOAT_WINDOW : Telephony::WindowMode::MODE_FULL_SCREEN;
-    DelayedSingleton<VoipCallConnection>::GetInstance()->SendCallUiEvent(voipCallId, windowModeEvent);
     return TELEPHONY_SUCCESS;
 }
 } // namespace Telephony

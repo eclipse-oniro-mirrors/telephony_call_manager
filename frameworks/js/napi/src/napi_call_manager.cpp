@@ -337,12 +337,6 @@ napi_value NapiCallManager::DeclareCallEventEnum(napi_env env, napi_value export
         DECLARE_NAPI_STATIC_PROPERTY("EVENT_SPLIT_CALL_FAILED",
             NapiCallManagerUtils::ToInt32Value(
                 env, static_cast<int32_t>(CallAbilityEventId::EVENT_SPLIT_CALL_FAILED))),
-        DECLARE_NAPI_STATIC_PROPERTY("EVENT_SHOW_FULL_SCREEN",
-            NapiCallManagerUtils::ToInt32Value(
-                env, static_cast<int32_t>(CallAbilityEventId::EVENT_SHOW_FULL_SCREEN))),
-        DECLARE_NAPI_STATIC_PROPERTY("EVENT_SHOW_FLOAT_WINDOW",
-            NapiCallManagerUtils::ToInt32Value(
-                env, static_cast<int32_t>(CallAbilityEventId::EVENT_SHOW_FLOAT_WINDOW))),
         // CallSessionEventId
         DECLARE_NAPI_STATIC_PROPERTY("EVENT_CONTROL_CAMERA_FAILURE",
             NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(CallSessionEventId::EVENT_CAMERA_FAILURE))),
@@ -741,12 +735,6 @@ napi_value NapiCallManager::DeclareCallEventEnumEx(napi_env env, napi_value expo
         DECLARE_NAPI_STATIC_PROPERTY("EVENT_SPLIT_CALL_FAILED",
             NapiCallManagerUtils::ToInt32Value(
                 env, static_cast<int32_t>(CallAbilityEventId::EVENT_SPLIT_CALL_FAILED))),
-        DECLARE_NAPI_STATIC_PROPERTY("EVENT_SHOW_FULL_SCREEN",
-            NapiCallManagerUtils::ToInt32Value(
-                env, static_cast<int32_t>(CallAbilityEventId::EVENT_SHOW_FULL_SCREEN))),
-        DECLARE_NAPI_STATIC_PROPERTY("EVENT_SHOW_FLOAT_WINDOW",
-            NapiCallManagerUtils::ToInt32Value(
-                env, static_cast<int32_t>(CallAbilityEventId::EVENT_SHOW_FLOAT_WINDOW))),
     };
     napi_value result = nullptr;
     napi_define_class(env, "CallAbilityEventId", NAPI_AUTO_LENGTH, NapiCallManagerUtils::CreateEnumConstructor, nullptr,

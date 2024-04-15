@@ -43,7 +43,7 @@ public:
     void ClearVoipCall();
     int32_t RegisterCallManagerCallBack(const sptr<ICallStatusCallback> &callback);
     int32_t UnRegisterCallManagerCallBack();
-    int32_t SendCallUiEvent(std::string &voipCallId, Telephony::WindowMode windowModeEvent);
+    int32_t SendCallUiEvent(std::string &voipCallId, const CallAudioEvent &callAudioEvent);
 
 private:
     class SystemAbilityListener : public SystemAbilityStatusChangeStub {

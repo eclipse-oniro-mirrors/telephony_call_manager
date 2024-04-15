@@ -449,14 +449,6 @@ enum class CallAbilityEventId {
      * Indicates that the OTT is not supported.
      */
     EVENT_OTT_FUNCTION_UNSUPPORTED,
-    /**
-     * Indicates show full screen.
-     */
-    EVENT_SHOW_FULL_SCREEN,
-    /**
-     * Indicates show float window.
-     */
-    EVENT_SHOW_FLOAT_WINDOW,
 };
 
 /**
@@ -571,8 +563,6 @@ enum class RequestResultEventId {
     RESULT_COMBINE_SEND_FAILED,
     RESULT_JOIN_SEND_FAILED,
     RESULT_SPLIT_SEND_FAILED,
-    RESULT_SHOW_FULL_SCREEN,
-    RESULT_SHOW_FLOAT_WINDOW,
     RESULT_SUPPLEMENT_SEND_FAILED,
     RESULT_INVITE_TO_CONFERENCE_SUCCESS,
     RESULT_INVITE_TO_CONFERENCE_FAILED,

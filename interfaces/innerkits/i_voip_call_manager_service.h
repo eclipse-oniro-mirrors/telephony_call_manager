@@ -44,7 +44,6 @@ public:
         INTERFACE_HANGUP_VOIP_CALL,
         INTERFACE_REJECT_VOIP_CALL,
         INTERFACE_UNLOAD_VOIP_SA,
-        INTERFACE_REPORT_WINDOW_MODE_CHANGE,
         INTERFACE_SEND_CALL_UI_EVENT,
         INTERFACE_REPORT_CALL_AUDIO_EVENT_CHANGE,
         INTERFACE_REPORT_OUTGOING_CALL
@@ -67,8 +66,7 @@ public:
     virtual int32_t HangUp(const VoipCallEventInfo &events) = 0;
     virtual int32_t Reject(const VoipCallEventInfo &events) = 0;
     virtual int32_t UnloadVoipSa() = 0;
-    virtual int32_t ReportWindowModeChange(AppExecFwk::PacMap &extras) = 0;
-    virtual int32_t SendCallUiEvent(std::string &voipCallId, Telephony::WindowMode windowModeEvent) = 0;
+    virtual int32_t SendCallUiEvent(std::string &voipCallId, const CallAudioEvent &callAudioEvent) = 0;
     virtual int32_t ReportCallAudioEventChange(std::string &voipCallId, const CallAudioEvent &callAudioEvent) = 0;
     virtual int32_t ReportOutgoingCall(
         AppExecFwk::PacMap &extras, std::vector<uint8_t> &userProfile, ErrorReason &reason) = 0;

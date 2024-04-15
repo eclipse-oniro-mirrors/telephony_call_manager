@@ -82,8 +82,6 @@ void CallStatusManager::InitCallBaseEvent()
         CallAbilityEventId::EVENT_COMBINE_CALL_FAILED;
     mEventIdTransferMap_[RequestResultEventId::RESULT_SPLIT_SEND_FAILED] =
         CallAbilityEventId::EVENT_SPLIT_CALL_FAILED;
-    mEventIdTransferMap_[RequestResultEventId::RESULT_SHOW_FULL_SCREEN] = CallAbilityEventId::EVENT_SHOW_FULL_SCREEN;
-    mEventIdTransferMap_[RequestResultEventId::RESULT_SHOW_FLOAT_WINDOW] = CallAbilityEventId::EVENT_SHOW_FLOAT_WINDOW;
 }
 
 int32_t CallStatusManager::UnInit()
