@@ -62,7 +62,8 @@ public:
 
 #ifdef ABILITY_BLUETOOTH_SUPPORT
     void OnScoStateChanged(const Bluetooth::BluetoothRemoteDevice &device, int32_t state, int32_t reason) override;
-    void OnConnectionStateChanged(const Bluetooth::BluetoothRemoteDevice &device, int32_t state, int32_t cause) override;
+    void OnConnectionStateChanged(const Bluetooth::BluetoothRemoteDevice &device,
+        int32_t state, int32_t cause) override;
     Bluetooth::BluetoothRemoteDevice *GetBtDevice(const std::string &address);
     void AddBtDevice(const std::string &address, Bluetooth::BluetoothRemoteDevice device);
 #endif
