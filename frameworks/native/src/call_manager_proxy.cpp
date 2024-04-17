@@ -1624,7 +1624,11 @@ int32_t CallManagerProxy::SendCallUiEvent(int32_t callId, std::string &eventName
         TELEPHONY_LOGE("ipc reconnect failed!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
-    std::lock_guard<std::mutex> lock(mutex_);
+    Utils::UniqueWriteGuard<Utils::RWLock> guard(rwClientLock_);
+    if (callManagerServicePtr_ == nullptr) {
+        TELEPHONY_LOGE("callManagerServicePtr_ is null");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     int32_t errCode = callManagerServicePtr_->SendCallUiEvent(callId, eventName);
     if (errCode != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("SendCallUiEvent failed, errcode:%{public}d", errCode);

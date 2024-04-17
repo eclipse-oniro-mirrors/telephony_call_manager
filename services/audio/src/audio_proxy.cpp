@@ -229,6 +229,10 @@ bool AudioProxy::SetMicrophoneMute(bool mute)
     }
     std::shared_ptr<AudioStandard::AudioGroupManager> audioGroupManager =
         AudioStandard::AudioSystemManager::GetInstance()->GetGroupManager(AudioStandard::DEFAULT_VOLUME_GROUP_ID);
+    if (audioGroupManager == nullptr) {
+        TELEPHONY_LOGE("SetMicrophoneMute fail, audioGroupManager is nullptr");
+        return false;
+    }
     int32_t muteResult = audioGroupManager->SetMicrophoneMute(mute);
     TELEPHONY_LOGI("set microphone mute result : %{public}d", muteResult);
     return (muteResult == TELEPHONY_SUCCESS);
@@ -238,6 +242,10 @@ AudioStandard::AudioRingerMode AudioProxy::GetRingerMode() const
 {
     std::shared_ptr<AudioStandard::AudioGroupManager> audioGroupManager =
         AudioStandard::AudioSystemManager::GetInstance()->GetGroupManager(AudioStandard::DEFAULT_VOLUME_GROUP_ID);
+    if (audioGroupManager == nullptr) {
+        TELEPHONY_LOGE("GetRingerMode fail, audioGroupManager is nullptr");
+        return AudioStandard::AudioRingerMode::RINGER_MODE_NORMAL;
+    }
     return audioGroupManager->GetRingerMode();
 }
 
