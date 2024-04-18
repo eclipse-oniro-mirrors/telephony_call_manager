@@ -259,7 +259,8 @@ Bluetooth::BluetoothRemoteDevice *BluetoothConnection::GetBtDevice(const std::st
     return nullptr;
 }
 
-void BluetoothConnection::OnConnectionStateChanged(const Bluetooth::BluetoothRemoteDevice &device, int32_t state)
+void BluetoothConnection::OnConnectionStateChanged(const Bluetooth::BluetoothRemoteDevice &device,
+    int32_t state, int32_t cause)
 {
     TELEPHONY_LOGI("BluetoothConnection::OnConnectionStateChanged state : %{public}d", state);
     std::string macAddress = device.GetDeviceAddr();
