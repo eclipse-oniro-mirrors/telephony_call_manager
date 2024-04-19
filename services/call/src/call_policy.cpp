@@ -67,7 +67,8 @@ int32_t CallPolicy::DialPolicy(std::u16string &number, AppExecFwk::PacMap &extra
     if (HasNewCall() != TELEPHONY_SUCCESS)  {
         return CALL_ERR_CALL_COUNTS_EXCEED_LIMIT;
     }
-    return HasNormalCall(isEcc, accountId);
+    int32_t slotId = extras.GetIntValue("accountId");
+    return HasNormalCall(isEcc, slotId);
 }
 
 int32_t CallPolicy::HasNormalCall(bool isEcc, int32_t slotId)
