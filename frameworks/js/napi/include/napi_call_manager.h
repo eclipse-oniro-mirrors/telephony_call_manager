@@ -77,6 +77,7 @@ public:
     static napi_value DeclareTransferSettingTypeEnum(napi_env env, napi_value exports);
     static napi_value DeclareMmiCodeResultEnum(napi_env env, napi_value exports);
     static napi_value DeclareDisconnectedReasonEnum(napi_env env, napi_value exports);
+    static napi_value DeclareMarkTypeEnum(napi_env env, napi_value exports);
     static napi_value RegisterCallManagerFunc(napi_env env, napi_value exports);
     static napi_value Dial(napi_env env, napi_callback_info info);
     static napi_value DialCall(napi_env env, napi_callback_info info);

@@ -541,6 +541,56 @@ enum class AudioDeviceType {
 };
 
 /**
+ * @brief Indicates the type of the number mark..
+ */
+enum class MarkType {
+    /**
+     * Indicates the mark is none.
+     */
+    MARK_TYPE_NONE = 0,
+    /**
+     * Indicates the mark is crank.
+     */
+    MARK_TYPE_CRANK,
+    /**
+     * Indicates the mark is fraud.
+     */
+    MARK_TYPE_FRAUD,
+    /**
+     * Indicates the mark is express.
+     */
+    MARK_TYPE_EXPRESS,
+    /**
+     * Indicates the mark is promote sales.
+     */
+    MARK_TYPE_PROMOTE_SALES,
+    /**
+     * Indicates the mark is house agent.
+     */
+    MARK_TYPE_HOUSE_AGENT,
+    /**
+     * Indicates the mark is insurance.
+     */
+    MARK_TYPE_INSURANCE,
+    /**
+     * Indicates the mark is taxi.
+     */
+    MARK_TYPE_TAXI,
+    /**
+     * Indicates the mark is custom.
+     */
+    MARK_TYPE_CUSTOM,
+    /**
+     * Indicates the mark is others.
+     */
+    MARK_TYPE_OTHERS,
+    /**
+     * Indicates the mark is yellow page.
+     */
+    MARK_TYPE_YELLOW_PAGE,
+};
+
+/**
  * @brief Indicates the call event type.
  */
 enum class CellularCallEventType {
