@@ -322,7 +322,25 @@ int32_t CallStatusManager::HandleOttEventReportInfo(const OttCallEventInfo &info
 int32_t CallStatusManager::HandleVoipEventReportInfo(const VoipCallEventInfo &info)
 {
     TELEPHONY_LOGI("recv one Event, eventId:%{public}d", info.voipCallEvent);
-    DelayedSingleton<AudioDeviceManager>::GetInstance()->ReportAudioDeviceInfo();
+    sptr<CallBase> call = GetOneCallObjectByVoipCallId(info.voipCallId);
+    if (call == nullptr) {
+        TELEPHONY_LOGE("voip call is null");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    if (call->GetCallRunningState() != CallRunningState::CALL_RUNNING_STATE_ACTIVE
+        && call->GetCallRunningState() != CallRunningState::CALL_RUNNING_STATE_DIALING) {
+        return TELEPHONY_ERR_FAIL;
+    }
+    if (info.voipCallEvent == VoipCallEvent::VOIP_CALL_EVENT_MUTED) {
+        call->SetMicPhoneState(true);
+    } else if (info.voipCallEvent == VoipCallEvent::VOIP_CALL_EVENT_UNMUTED) {
+        call->SetMicPhoneState(false);
+    } else if (info.voipCallEvent == VoipCallEvent::VOIP_CALL_EVENT_SPEAKER_ON) {
+        call->SetSpeakerphoneOn(true);
+    } else if (info.voipCallEvent == VoipCallEvent::VOIP_CALL_EVENT_SPEAKER_OFF) {
+        call->SetSpeakerphoneOn(false);
+    }
+    DelayedSingleton<AudioDeviceManager>::GetInstance()->ReportAudioDeviceInfo(call);
     return TELEPHONY_SUCCESS;
 }
 

@@ -39,6 +39,10 @@ void CallStateReportProxy::CallStateUpdated(
         TELEPHONY_LOGE("callObjectPtr is nullptr!");
         return;
     }
+    if (callObjectPtr->GetCallType() == CallType::TYPE_VOIP) {
+        TELEPHONY_LOGI("voip call no need to report call state");
+        return;
+    }
     CallAttributeInfo info;
     callObjectPtr->GetCallAttributeInfo(info);
     std::string str(info.accountNumber);
