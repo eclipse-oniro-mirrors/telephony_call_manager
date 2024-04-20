@@ -450,7 +450,18 @@ int32_t AudioDeviceManager::ReportAudioDeviceChange()
 
 int32_t AudioDeviceManager::ReportAudioDeviceInfo()
 {
-    info_.isMuted = DelayedSingleton<AudioProxy>::GetInstance()->IsMicrophoneMute();
+    return ReportAudioDeviceInfo(nullptr);
+}
+
+int32_t AudioDeviceManager::ReportAudioDeviceInfo(sptr<CallBase> call)
+{
+    if (call != nullptr && call->GetCallType() == CallType::TYPE_VOIP) {
+        info_.isMuted = call->IsMuted();
+        info_.currentAudioDevice.deviceType = call->IsSpeakerphoneOn() ?
+            AudioDeviceType::DEVICE_SPEAKER : AudioDeviceType::DEVICE_EARPIECE;
+    } else {
+        info_.isMuted = DelayedSingleton<AudioProxy>::GetInstance()->IsMicrophoneMute();
+    }
     TELEPHONY_LOGI("report audio device info, currentAudioDeviceType:%{public}d, currentAddress:%{public}s, "
         "mute:%{public}d", info_.currentAudioDevice.deviceType, info_.currentAudioDevice.address, info_.isMuted);
     return DelayedSingleton<CallAbilityReportProxy>::GetInstance()->ReportAudioDeviceChange(info_);

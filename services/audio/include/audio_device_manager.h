@@ -19,6 +19,7 @@
 #include <map>
 
 #include "audio_base.h"
+#include "call_base.h"
 #include "call_manager_inner_type.h"
 #include "singleton.h"
 
@@ -47,6 +48,7 @@ public:
     void ResetDistributedCallDevicesList();
     int32_t ReportAudioDeviceChange();
     int32_t ReportAudioDeviceInfo();
+    int32_t ReportAudioDeviceInfo(sptr<CallBase> call);
     void SetCurrentAudioDevice(AudioDeviceType deviceType);
     bool CheckAndSwitchDistributedAudioDevice();
     void OnActivedCallDisconnected();
