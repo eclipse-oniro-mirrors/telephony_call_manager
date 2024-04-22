@@ -33,6 +33,7 @@
 #include "os_account_manager.h"
 #include "ott_call.h"
 #include "report_call_info_handler.h"
+#include "ring_once_helper.h"
 #include "satellite_call.h"
 #include "settings_datashare_helper.h"
 #include "telephony_log_wrapper.h"
@@ -40,6 +41,7 @@
 #include "voip_call.h"
 #include "uri.h"
 #include "ffrt.h"
+#include "spam_call_adapter.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -371,7 +373,13 @@ int32_t CallStatusManager::IncomingHandle(const CallDetailInfo &info)
     int32_t state;
     DelayedSingleton<CallControlManager>::GetInstance()->GetVoIPCallState(state);
     if (ShouldRejectIncomingCall() || state == (int32_t)CallStateToApp::CALL_STATE_RINGING) {
-        return HandleRejectCall(call);
+        return HandleRejectCall(call, false);
+    }
+    if (ShouldBlockIncomingCall(call, info)) {
+        return HandleRejectCall(call, true);
+    }
+    if (DelayedSingleton<RingOnceHelper>::GetInstance()->IsRingOnceCall(call, info)) {
+        return DelayedSingleton<RingOnceHelper>::GetInstance()->HandleRingOnceCall(call);
     }
     AddOneCallObject(call);
     DelayedSingleton<CallControlManager>::GetInstance()->NotifyNewCallCreated(call);
@@ -415,7 +423,7 @@ void CallStatusManager::SetContactInfo(sptr<CallBase> &call, std::string phoneNu
     call->SetCallerInfo(contactInfo);
 }
 
-int32_t CallStatusManager::HandleRejectCall(sptr<CallBase> &call)
+int32_t CallStatusManager::HandleRejectCall(sptr<CallBase> &call, bool isBlock)
 {
     if (call == nullptr) {
         TELEPHONY_LOGE("call is nullptr!");
@@ -430,6 +438,9 @@ int32_t CallStatusManager::HandleRejectCall(sptr<CallBase> &call)
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("RejectCall failed!");
         return ret;
+    }
+    if (isBlock) {
+        return DelayedSingleton<CallControlManager>::GetInstance()->AddBlockLogAndNotification(call);
     }
     return DelayedSingleton<CallControlManager>::GetInstance()->AddCallLogAndNotification(call);
 }
@@ -765,6 +776,10 @@ int32_t CallStatusManager::DisconnectedVoipCallHandle(const CallDetailInfo &info
 int32_t CallStatusManager::DisconnectedHandle(const CallDetailInfo &info)
 {
     TELEPHONY_LOGI("handle disconnected state");
+    if (!DelayedSingleton<RingOnceHelper>::GetInstance()->GetDetectFlag()) {
+        DelayedSingleton<RingOnceHelper>::GetInstance()->SetDetectFlag(true);
+        DelayedSingleton<RingOnceHelper>::GetInstance()->NotifyAll();
+    }
     std::string tmpStr(info.phoneNum);
     sptr<CallBase> call = GetOneCallObjectByIndexAndSlotId(info.index, info.accountId);
     if (call == nullptr) {
@@ -1260,6 +1275,37 @@ bool CallStatusManager::ShouldRejectIncomingCall()
     if (resp_ota == TELEPHONY_SUCCESS && is_ota_finished == "0") {
         TELEPHONY_LOGI("ShouldRejectIncomingCall: is_ota_finished = 0");
         return true;
+    }
+    return false;
+}
+
+bool CallStatusManager::ShouldBlockIncomingCall(const sptr<CallBase> &call, const CallDetailInfo &info)
+{
+    DelayedSingleton<SpamCallAdapter>::GetInstance()->DetectSpamCall(std::string(info.phoneNum), info.accountId);
+    if (DelayedSingleton<SpamCallAdapter>::GetInstance()->WaitForDetectResult()) {
+        TELEPHONY_LOGI("DetectSpamCall no time out");
+        DelayedSingleton<SpamCallAdapter>::GetInstance()->SetDetectFlag(false);
+        int32_t errCode = 0;
+        std::string result = "";
+        DelayedSingleton<SpamCallAdapter>::GetInstance()->GetDetectResult(errCode, result);
+        if (errCode == 0) {
+            NumberMarkInfo numberMarkInfo = {
+                .markType = MarkType::MARK_TYPE_NONE,
+                .markContent = "",
+                .markCount = 0,
+                .markSource = "",
+                .isCloud = false,
+            };
+            bool isBlock = true;
+            int32_t blockReason;
+            DelayedSingleton<SpamCallAdapter>::GetInstance()->ParseDetectResult(result, isBlock, numberMarkInfo, blockReason);
+            call->SetNumberMarkInfo(numberMarkInfo);
+            call->SetBlockReason(blockReason);
+            TELEPHONY_LOGI("isBlock: %{public}d", isBlock);
+            if (isBlock) {
+                return true;
+            }
+        }
     }
     return false;
 }

@@ -96,6 +96,12 @@ ohos_shared_library("tel_call_manager") {
     "services/call_setting/src/call_setting_manager.cpp",
     "services/distributed_call/src/distributed_call_manager.cpp",
     "services/distributed_call/src/distributed_call_proxy.cpp",
+    "services/spam_call/src/callback_stub_helper.cpp",
+    "services/spam_call/src/ring_once_helper.cpp",
+    "services/spam_call/src/spam_call_adapter.cpp",
+    "services/spam_call/src/spam_call_connection.cpp",
+    "services/spam_call/src/spam_call_proxy.cpp",
+    "services/spam_call/src/spam_call_stub.cpp",
     "services/telephony_interaction/src/call_status_callback.cpp",
     "services/telephony_interaction/src/call_status_callback_stub.cpp",
     "services/telephony_interaction/src/cellular_call_connection.cpp",
@@ -128,6 +134,7 @@ ohos_shared_library("tel_call_manager") {
     "services/call_report/include",
     "services/video/include",
     "services/call/call_state_observer/include",
+    "services/spam_call/include",
   ]
 
   deps = [

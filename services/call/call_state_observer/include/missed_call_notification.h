@@ -34,6 +34,7 @@ public:
     int32_t CancelMissedCallsNotification(int32_t id);
     int32_t NotifyUnReadMissedCall(std::map<std::string, int32_t> &phoneNumAndUnreadCountMap);
     void PublishMissedCallEvent(sptr<CallBase> &callObjectPtr);
+    void PublishBlockedCallEvent(sptr<CallBase> &callObjectPtr);
     void PublishMissedCallNotification(sptr<CallBase> &callObjectPtr);
 
 private:

@@ -159,6 +159,8 @@ void CallRecordsManager::CopyCallInfoToRecord(CallAttributeInfo &info, CallRecor
     // use original call type for video call record
     int32_t callFeatures = GetCallFeatures(info.originalCallType);
     data.features = callFeatures;
+    data.numberMarkInfo = info.numberMarkInfo;
+    data.blockReason = info.blockReason;
 }
 
 int32_t CallRecordsManager::RemoveMissedIncomingCallNotification()

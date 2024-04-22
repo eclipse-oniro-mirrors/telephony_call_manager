@@ -69,6 +69,14 @@ constexpr int16_t INVALID_CALLID = 0;
  */
 constexpr int16_t WAIT_TIME_ONE_SECOND = 1;
 /**
+ * @brief Indicates two second duration.
+ */
+constexpr int16_t WAIT_TIME_TWO_SECOND = 2;
+/**
+ * @brief Indicates three second duration.
+ */
+constexpr int16_t WAIT_TIME_THREE_SECOND = 3;
+/**
  * @brief Indicates No Call Exist.
  */
 constexpr int16_t NO_CALL_EXIST = 0;
@@ -415,6 +423,10 @@ enum class CallAnswerType {
      * Indicates the call answer is call rejected.
      */
     CALL_ANSWER_REJECT,
+    /**
+     * Indicates the call answer is call blocked.
+     */
+    CALL_ANSWER_BLOCKED = 6,
 };
 
 /**

@@ -296,6 +296,10 @@ void CallNumberUtils::NumberLocationUpdate(const sptr<CallBase> &callObjectPtr)
         }
     }
     call->SetNumberLocation(numberLocation);
+    if (!CallObjectManager::IsCallExist(info.callId)) {
+        TELEPHONY_LOGE("call is not exist");
+        return;
+    }
     if (numberLocation != "" && numberLocation != "default") {
         TELEPHONY_LOGI("need report call info of numberLocation");
         call->GetCallAttributeBaseInfo(info);

@@ -91,8 +91,9 @@ private:
     void QueryCallerInfo(ContactInfo &contactInfo, std::string phoneNum);
     int32_t UpdateDialingCallInfo(const CallDetailInfo &info);
     void SetContactInfo(sptr<CallBase> &call, std::string phoneNum);
-    int32_t HandleRejectCall(sptr<CallBase> &call);
+    int32_t HandleRejectCall(sptr<CallBase> &call, bool isBlock);
     bool ShouldRejectIncomingCall();
+    bool ShouldBlockIncomingCall(const sptr<CallBase> &call, const CallDetailInfo &info);
     void CarrierAndVoipConflictProcess(int32_t callId);
 
 private:

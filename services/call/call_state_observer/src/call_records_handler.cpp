@@ -15,6 +15,7 @@
 
 #include "call_records_handler.h"
 
+#include "call_manager_base.h"
 #include "call_manager_errors.h"
 #include "call_manager_inner_type.h"
 #include "ffrt.h"
@@ -64,11 +65,17 @@ int32_t CallRecordsHandler::AddCallLogInfo(const CallRecordInfo &info)
         .isVoiceMail = false,
     };
     QueryCallerInfo(contactInfo, std::string(info.phoneNumber));
+    std::string displayName = "";
+    if (std::string(contactInfo.name) != "") {
+        displayName = std::string(contactInfo.name);
+    } else if (info.numberMarkInfo.markType == MarkType::MARK_TYPE_YELLOW_PAGE) {
+        displayName = std::string(info.numberMarkInfo.markContent);
+    }
 
     DataShare::DataShareValuesBucket bucket;
     TELEPHONY_LOGI("callLog Insert begin");
     bucket.Put(CALL_PHONE_NUMBER, std::string(info.phoneNumber));
-    bucket.Put(CALL_DISPLAY_NAME, std::string(contactInfo.name));
+    bucket.Put(CALL_DISPLAY_NAME, displayName);
     bucket.Put(CALL_DIRECTION, static_cast<int32_t>(info.directionType));
     bucket.Put(CALL_VOICEMAIL_URI, std::string(""));
     bucket.Put(CALL_SIM_TYPE, 0);
@@ -89,6 +96,11 @@ int32_t CallRecordsHandler::AddCallLogInfo(const CallRecordInfo &info)
     bucket.Put(CALL_PHOTO_ID, 0);
     bucket.Put(CALL_SLOT_ID, info.slotId);
     bucket.Put(CALL_FEATURES, info.features);
+    bucket.Put(CALL_MARK_TYPE, static_cast<int32_t>(info.numberMarkInfo.markType));
+    bucket.Put(CALL_MARK_CONTENT, std::string(info.numberMarkInfo.markContent));
+    bucket.Put(CALL_IS_CLOUD_MARK, info.numberMarkInfo.isCloud);
+    bucket.Put(CALL_MARK_COUNT, info.numberMarkInfo.markCount);
+    bucket.Put(CALL_BLOCK_REASON, info.blockReason);
     bool ret = callDataPtr_->Insert(bucket);
     if (!ret) {
         TELEPHONY_LOGE("Add call log database fail!");
