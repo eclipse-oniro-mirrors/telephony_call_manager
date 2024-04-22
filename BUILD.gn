@@ -171,7 +171,7 @@ ohos_shared_library("tel_call_manager") {
     "player_framework:system_sound_client",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
-    "location:lbssservice_common",
+    "location:lbsservice_common",
     "location:locator_sdk",
     "os_account:os_account_innerkits",
   ]
