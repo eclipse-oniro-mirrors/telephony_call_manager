@@ -1,3 +1,18 @@
+/*
+ * Copyright (C) 2023-2024 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 #include "call_earthquake_alarm_subscriber.h"
 
 using namespace OHOS::AAFwk;
@@ -16,12 +31,13 @@ const int DataShareSwitchState::TELEPHONY_ERR_LOCAL_PTR_NULL = 1;
 const int DataShareSwitchState::TELEPHONY_ERR_DATABASE_READ_FAIL = 2;
 const int DataShareSwitchState::TELEPHONY_ERR_DATABASE_WRITE_FAIL = 3;
 const int DataShareSwitchState::COW_COUNT_NULL = 4;
-constexpr const char *SETTINGS_DATASHARE_URI = "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true";
+constexpr const char *SETTINGS_DATASHARE_URI =
+    "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true";
 constexpr const char *SETTINGS_DATA_COLUMN_KEYWORD = "KEYWORD";
 constexpr const char *SETTINGS_DATA_COLUMN_VALUE = "VALUE";
 
 LocationSubscriber::LocationSubscriber(const EventFwk::CommonEventSubscribeInfo &subscriberInfo)
-    : EventFwk::CommonEventSubscriber(subscriberInfo){}
+    : EventFwk::CommonEventSubscriber(subscriberInfo) {}
 
 bool LocationSubscriber::Subscriber(void)
 {
@@ -122,7 +138,7 @@ int32_t DataShareSwitchState::QueryData(Uri& uri, const std::string& key, std::s
 void LocationSystemAbilityListener::OnAddSystemAbility(int32_t systemAbilityId, const std::string &deviceId)
 {
     static int firstboot = 0;
-    TELEPHONY_LOGI("location service are add LocationSubscriber systemID = %{public}d",systemAbilityId);
+    TELEPHONY_LOGI("location service are add LocationSubscriber systemID = %{public}d", systemAbilityId);
     if (!CheckInputSysAbilityId(systemAbilityId)) {
         TELEPHONY_LOGE("added SA is invalid! LocationSubscriber");
         return;
@@ -130,7 +146,7 @@ void LocationSystemAbilityListener::OnAddSystemAbility(int32_t systemAbilityId, 
     if (systemAbilityId != OHOS::DEVICE_STANDBY_SERVICE_SYSTEM_ABILITY_ID &&
         systemAbilityId != OHOS::LOCATION_LOCATOR_SA_ID &&
         systemAbilityId != OHOS::LOCATION_NOPOWER_LOCATING_SA_ID) {
-        TELEPHONY_LOGI("location service are add LocationSubscriber systemID = %{public}d",systemAbilityId);
+        TELEPHONY_LOGI("location service are add LocationSubscriber systemID = %{public}d", systemAbilityId);
         return;
     }
     if (!GetSystemAbility(OHOS::DEVICE_STANDBY_SERVICE_SYSTEM_ABILITY_ID))  return;
@@ -153,16 +169,16 @@ bool LocationSystemAbilityListener::GetSystemAbility(int32_t systemAbilityId)
     }
     sptr<IRemoteObject> remote = sysAbilityMgr->GetSystemAbility(systemAbilityId);
     if (remote == nullptr) {
-        TELEPHONY_LOGE("check systemAbilityId return is nullptr. LocationSubscriber %{public}d",systemAbilityId);
+        TELEPHONY_LOGE("check systemAbilityId return is nullptr. LocationSubscriber %{public}d", systemAbilityId);
         return false;
     }
-    TELEPHONY_LOGE("check systemAbilityId return is not nullptr. LocationSubscriber %{public}d",systemAbilityId);
+    TELEPHONY_LOGE("check systemAbilityId return is not nullptr. LocationSubscriber %{public}d", systemAbilityId);
     return true;
 }
 
 void LocationSystemAbilityListener::OnRemoveSystemAbility(int32_t systemAbilityId, const std::string &deviceId)
 {
-    TELEPHONY_LOGI("location service are remove LocationSubscriber systemID = %{public}d",systemAbilityId);
+    TELEPHONY_LOGI("location service are remove LocationSubscriber systemID = %{public}d", systemAbilityId);
     GetSystemAbility(OHOS::DEVICE_STANDBY_SERVICE_SYSTEM_ABILITY_ID);
     GetSystemAbility(OHOS::LOCATION_LOCATOR_SA_ID);
     GetSystemAbility(OHOS::LOCATION_NOPOWER_LOCATING_SA_ID);
@@ -180,17 +196,18 @@ bool LocationSystemAbilityListener::SystemAbilitySubscriber()
         TELEPHONY_LOGE("get system ability manager error LocationSubscriber");
         return false;
     }
-    int32_t ret1 = managerPtr->SubscribeSystemAbility(OHOS::DEVICE_STANDBY_SERVICE_SYSTEM_ABILITY_ID, statusChangeListener_);
+    int32_t ret1 = managerPtr->SubscribeSystemAbility(OHOS::DEVICE_STANDBY_SERVICE_SYSTEM_ABILITY_ID,
+        statusChangeListener_);
         if (ret1 != TELEPHONY_SUCCESS) {
             TELEPHONY_LOGE("failed to subscribe 1914 service SA!");
         }
     TELEPHONY_LOGE("success to subscribe 1914 service SA! LocationSubscriber");
-     int32_t ret2 = managerPtr->SubscribeSystemAbility(OHOS::LOCATION_LOCATOR_SA_ID, statusChangeListener_);
+    int32_t ret2 = managerPtr->SubscribeSystemAbility(OHOS::LOCATION_LOCATOR_SA_ID, statusChangeListener_);
         if (ret2 != TELEPHONY_SUCCESS) {
             TELEPHONY_LOGE("failed to subscribe 2802 service SA!");
         }
     TELEPHONY_LOGE("success to subscribe 2802 service SA! LocationSubscriber");
-     int32_t ret3 = managerPtr->SubscribeSystemAbility(OHOS::LOCATION_NOPOWER_LOCATING_SA_ID, statusChangeListener_);
+    int32_t ret3 = managerPtr->SubscribeSystemAbility(OHOS::LOCATION_NOPOWER_LOCATING_SA_ID, statusChangeListener_);
         if (ret3 != TELEPHONY_SUCCESS) {
             TELEPHONY_LOGE("failed to subscribe 2805 service SA!");
         }

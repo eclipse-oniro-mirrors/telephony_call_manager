@@ -1,3 +1,18 @@
+/*
+ * Copyright (C) 2023-2024 Huawei Device Co., Ltd.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 #ifndef CALL_EARTHQUAKE_ALARM_LOCATOR_H
 #define CALL_EARTHQUAKE_ALARM_LOCATOR_H
 
@@ -49,8 +64,11 @@ private:
         virtual void OnLocationReport(const std::unique_ptr<Location::Location>& location) override;
         virtual void OnLocatingStatusChange(const int status) override;
         virtual void OnErrorReport(const int errorCode) override;
-        int32_t OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
-    };//class MyLoctionCallBack
+        int32_t OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
+            override;
+    };
+    //class MyLoctionCallBack
+
     class MySwitchCallback : public IRemoteStub<Location::ISwitchCallback> {
     public:
         explicit MySwitchCallback(std::shared_ptr<MyLocationEngine> locationUpdate);
@@ -68,14 +86,26 @@ private:
     static std::shared_ptr<MyLocationEngine> mylocator;
     static const int DISTANCE_INTERVAL;
     static const int TIMER_INTERVAL;
-};//class MyLocationCallBack
+    static const std::string EMERGENCY_DEVICE_ID;
+    static const std::string EMERGENCY_BUNDLE_NAME;
+    static const std::string EMERGENCEY_ABILITY_NAME;
+    static const std::string PARAMETERS_VALUE;
+     static const char* PARAMETERS_KEY;
+    static const std::string ALARM_SWITCH_ON;
+    static const std::string ALARM_SWITCH_OFF;
+    static std::string INITIAL_FIRST_VALUE;
+};
+//class MyLocationCallBack
+
 class EmergencyCallConnectCallback : public IRemoteStub<AAFwk::IAbilityConnection> {
 public:
     EmergencyCallConnectCallback() = default;
     ~EmergencyCallConnectCallback() = default;
-    void OnAbilityConnectDone(const AppExecFwk::ElementName &element, const sptr<IRemoteObject> &remoteObject, int resultCode);
+    void OnAbilityConnectDone(const AppExecFwk::ElementName &element, const sptr<IRemoteObject> &remoteObject,
+        int resultCode);
     void OnAbilityDisconnectDone(const AppExecFwk::ElementName &element, int resultCode);
     static sptr<AAFwk::IAbilityConnection> connectCallback_;
+    static const int CONNECT_SUCCESS;
 };
 } // namespace Telephony
 } // namespace OHOS
