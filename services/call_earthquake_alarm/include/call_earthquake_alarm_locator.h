@@ -64,8 +64,8 @@ private:
         virtual void OnLocationReport(const std::unique_ptr<Location::Location>& location) override;
         virtual void OnLocatingStatusChange(const int status) override;
         virtual void OnErrorReport(const int errorCode) override;
-        int32_t OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
-            override;
+        int32_t OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply,
+            MessageOption &option) override;
     };
     //class MyLoctionCallBack
 
