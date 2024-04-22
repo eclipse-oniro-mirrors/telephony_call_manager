@@ -72,7 +72,8 @@ private:
     class MySwitchCallback : public IRemoteStub<Location::ISwitchCallback> {
     public:
         explicit MySwitchCallback(std::shared_ptr<MyLocationEngine> locationUpdate);
-        virtual int OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
+        virtual int OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply,
+           MessageOption &option) override;
         void OnSwitchChange(const int state) override;
     private:
         std::shared_ptr<MyLocationEngine> locationUpdate_ = nullptr;
