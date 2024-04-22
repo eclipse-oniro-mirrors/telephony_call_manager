@@ -28,7 +28,8 @@ const int MyLocationEngine::DISTANCE_INTERVAL = 10000; /** 10 kilometers */
 const int MyLocationEngine::TIMER_INTERVAL = 0;
 const std::string MyLocationEngine::EMERGENCY_DEVICE_ID = "";
 const std::string MyLocationEngine::EMERGENCY_BUNDLE_NAME = "com.huawei.hmos.emergencycommunication";
-const std::string MyLocationEngine::EMERGENCEY_ABILITY_NAME = "com.huawei.hmos.emergencycommunication.ServiceExtAbility";
+const std::string MyLocationEngine::EMERGENCEY_ABILITY_NAME =
+    "com.huawei.hmos.emergencycommunication.ServiceExtAbility";
 const std::string MyLocationEngine::PARAMETERS_VALUE = "call_manager_earthquake_alarm";
 const char* MyLocationEngine::PARAMETERS_KEY = "callerName";
 const std::string MyLocationEngine::ALARM_SWITCH_ON = "1";
@@ -231,7 +232,8 @@ void MyLocationEngine::MySwitchCallback::OnSwitchChange(const int state)
     locationUpdate_->LocationSwitchChange();
 }
 
-int MyLocationEngine::MySwitchCallback::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
+int MyLocationEngine::MySwitchCallback::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply,
+    MessageOption &option)
 {
     if (data.ReadOnterfaceToken != GetDescriptor()) {
         TELEPHONY_LOGI("MyLocationEngine SwitchCallback invalid token.");
