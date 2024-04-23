@@ -37,7 +37,6 @@ const std::string DISTRIBUTED_AUDIO_DEV_CAR = "dCar";
 const std::string DISTRIBUTED_AUDIO_DEV_PHONE = "dPhone";
 const std::string DISTRIBUTED_AUDIO_DEV_PAD = "dPad";
 const std::string SWITCH_ON_DCALL_THREAD_NAME = "switch on dcall";
-const std::string SWITCH_OFF_DCALL_THREAD_NAME = "switch off dcall";
 
 std::string GetAnonyString(const std::string &value)
 {

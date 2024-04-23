@@ -379,6 +379,9 @@ bool AudioDeviceManager::DisableAll()
 
 void AudioDeviceManager::SetCurrentAudioDevice(AudioDeviceType deviceType)
 {
+    if (!IsDistributedAudioDeviceType(deviceType) && IsDistributedAudioDeviceType(audioDeviceType_)) {
+        DelayedSingleton<DistributedCallManager>::GetInstance()->SwitchOffDCallDeviceSync();
+    }
     audioDeviceType_ = deviceType;
     ReportAudioDeviceChange();
 }
