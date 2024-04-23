@@ -58,7 +58,7 @@ public:
     static void ConnectAbility();
     static OHOS::Uri uri_q;
 private:
-    class MyLocationCallBack() : public IRemoteStub<Location::ILocationCallback> {
+    class MyLocationCallBack : public IRemoteStub<Location::ILocationCallback> {
     public:
         MyLocationCallBack();
         virtual void OnLocationReport(const std::unique_ptr<Location::Location>& location) override;
