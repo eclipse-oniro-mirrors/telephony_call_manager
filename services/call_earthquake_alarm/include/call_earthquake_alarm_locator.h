@@ -28,7 +28,7 @@
 #include "call_earthquake_alarm_subscriber.h"
 #include "ability_connect_callback_interface.h"
 #include "telephony_permission.h"
-#include "os_account_manager_client.h"
+#include "os_account_manager.h"
 #include "telephony_log_wrapper.h"
 #include "call_connect_ability.h"
 #include "ability_manager_client.h"
