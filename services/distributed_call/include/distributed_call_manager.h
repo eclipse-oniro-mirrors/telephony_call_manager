@@ -43,7 +43,6 @@ public:
     std::string GetConnectedDCallDeviceAddr();
     AudioDeviceType GetConnectedDCallDeviceType();
     void SwitchOffDCallDeviceSync();
-    void SwitchOffDCallDeviceAsync();
     bool IsDCallDeviceSwitchedOn();
     bool SwitchOnDCallDeviceSync(const AudioDevice& device);
     void SwitchOnDCallDeviceAsync(const AudioDevice& device);
@@ -54,11 +53,7 @@ public:
     void OnDCallSystemAbilityAdded(const std::string &deviceId);
     void OnDCallSystemAbilityRemoved(const std::string &deviceId);
 
-    bool GetIsAnsweredTheSecond();
-    void SetIsAnsweredTheSecond(bool isSet);
     void GetConnectedDCallDevice(AudioDevice& device);
-    void SetCurrentDCallDevice(const AudioDevice& device);
-    AudioDevice GetCurrentDCallDevice();
     void ClearCurrentDCallDevice();
 
 private:
@@ -87,7 +82,6 @@ private:
     std::string connectedDevId_;
     AudioDevice connectedAudioDevice_;
     AudioDevice currentAudioDevice_;
-    bool isAnsweredTheSecond_ = false;
     std::map<std::string, AudioDevice> onlineDCallDevices_;
     sptr<ISystemAbilityStatusChange> statusChangeListener_ = nullptr;
     std::shared_ptr<DistributedCallProxy> dcallProxy_ = nullptr;

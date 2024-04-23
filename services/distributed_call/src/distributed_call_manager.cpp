@@ -272,19 +272,6 @@ void DistributedCallManager::GetConnectedDCallDevice(AudioDevice& device)
     }
 }
 
-void DistributedCallManager::SetCurrentDCallDevice(const AudioDevice& device)
-{
-    currentAudioDevice_.deviceType = device.deviceType;
-    if (memcpy_s(currentAudioDevice_.address, kMaxAddressLen, device.address, kMaxAddressLen) != EOK) {
-        TELEPHONY_LOGE("memcpy_s failed.");
-    }
-}
-
-AudioDevice DistributedCallManager::GetCurrentDCallDevice()
-{
-    return currentAudioDevice_;
-}
-
 void DistributedCallManager::ClearCurrentDCallDevice()
 {
     currentAudioDevice_.deviceType = AudioDeviceType::DEVICE_UNKNOWN;
@@ -423,18 +410,6 @@ void DistributedCallManager::SwitchOffDCallDeviceSync()
     TELEPHONY_LOGI("disconnect dcall device end.");
 }
 
-void DistributedCallManager::SwitchOffDCallDeviceAsync()
-{
-    if (!dCallDeviceSwitchedOn_.load()) {
-        TELEPHONY_LOGE("distributed audio device not connected.");
-        return;
-    }
-
-    std::thread switchThread(&DistributedCallManager::SwitchOffDCallDeviceSync, this);
-    pthread_setname_np(switchThread.native_handle(), SWITCH_OFF_DCALL_THREAD_NAME.c_str());
-    switchThread.detach();
-}
-
 bool DistributedCallManager::IsDCallDeviceSwitchedOn()
 {
     return dCallDeviceSwitchedOn_.load();
@@ -511,16 +486,6 @@ void DistributedCallManager::OnDCallSystemAbilityRemoved(const std::string &devi
     DelayedSingleton<AudioDeviceManager>::GetInstance()->ResetDistributedCallDevicesList();
     DelayedSingleton<AudioDeviceManager>::GetInstance()->InitAudioDevice();
     TELEPHONY_LOGI("OnDCallSystemAbilityRemoved end.");
-}
-
-bool DistributedCallManager::GetIsAnsweredTheSecond()
-{
-    return isAnsweredTheSecond_;
-}
-
-void DistributedCallManager::SetIsAnsweredTheSecond(bool isSet)
-{
-    isAnsweredTheSecond_ = isSet;
 }
 
 void DCallSystemAbilityListener::OnAddSystemAbility(int32_t systemAbilityId, const std::string &deviceId)
