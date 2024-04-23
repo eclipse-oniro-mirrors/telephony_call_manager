@@ -54,7 +54,6 @@ public:
     void OnDCallSystemAbilityRemoved(const std::string &deviceId);
 
     void GetConnectedDCallDevice(AudioDevice& device);
-    void ClearCurrentDCallDevice();
 
 private:
     class DistributedCallDeviceListener : public OHOS::DistributedHardware::IDCallDeviceCallback {

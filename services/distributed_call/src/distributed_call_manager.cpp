@@ -272,14 +272,6 @@ void DistributedCallManager::GetConnectedDCallDevice(AudioDevice& device)
     }
 }
 
-void DistributedCallManager::ClearCurrentDCallDevice()
-{
-    currentAudioDevice_.deviceType = AudioDeviceType::DEVICE_UNKNOWN;
-    if (memset_s(currentAudioDevice_.address, kMaxAddressLen, 0, kMaxAddressLen) != EOK) {
-        TELEPHONY_LOGE("memset_s failed.");
-    }
-}
-
 void DistributedCallManager::SetConnectedDCallDevice(const AudioDevice& device)
 {
     std::lock_guard<std::mutex> lock(connectedDevMtx_);
