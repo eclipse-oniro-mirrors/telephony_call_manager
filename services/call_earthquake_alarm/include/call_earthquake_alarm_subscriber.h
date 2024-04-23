@@ -69,7 +69,7 @@ public:
     static const int TELEPHONY_ERR_DATABASE_WRITE_FAIL;
     static const int INVAILID_VALUE;
 private:
-    std::shared_ptr<DtataShare::DataShareHelper> CreateDataShareHelper(int systemAbilityId);
+    std::shared_ptr<DataShare::DataShareHelper> CreateDataShareHelper(int systemAbilityId);
     std::shared_ptr<DataShare::DataShareHelper> datashareHelper_ = nullptr;
 };
 
