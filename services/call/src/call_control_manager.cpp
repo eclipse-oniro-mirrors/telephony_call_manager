@@ -1278,7 +1278,7 @@ int32_t CallControlManager::AddBlockLogAndNotification(sptr<CallBase> &callObjec
     }
     callObjectPtr->SetAnswerType(CallAnswerType::CALL_ANSWER_BLOCKED);
     DelayedSingleton<CallRecordsManager>::GetInstance()
-            ->CallStateUpdated(callObjectPtr, TelCallState::CALL_STATUS_INCOMING, TelCallState::CALL_STATUS_DISCONNECTED);
+        ->CallStateUpdated(callObjectPtr, TelCallState::CALL_STATUS_INCOMING, TelCallState::CALL_STATUS_DISCONNECTED);
     if (missedCallNotification_ == nullptr) {
         TELEPHONY_LOGE("missedCallNotification is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;

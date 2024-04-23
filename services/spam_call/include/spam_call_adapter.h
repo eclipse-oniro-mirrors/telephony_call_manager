@@ -23,27 +23,6 @@
 #include "singleton.h"
 #include "cJSON.h"
 
-#define JSON_GET_NUMBER_VALUE(json, key, cursor, out, finally)                                                         \
-    do {                                                                                                               \
-        (cursor) = cJSON_GetObjectItem(json, key.c_str());                                                             \
-        if (!cJSON_IsNumber(cursor)) {                                                                                 \
-            TELEPHONY_LOGE("ParseToResponsePart failed to get %{public}s", key.c_str());                               \
-            if (key == "detectResult" || key == "decisionReason") {                                                    \
-                finally;                                                                                               \
-            }                                                                                                          \
-        }                                                                                                              \
-        (out) = static_cast<int32_t>(cJSON_GetNumberValue(cursor));                                                    \
-    } while (0)
-
-#define JSON_GET_STRING_VALUE(json, key, cursor, out, finally)                                                         \
-    do {                                                                                                               \
-        (cursor) = cJSON_GetObjectItem(json, key.c_str());                                                             \
-        if (!cJSON_IsString(cursor)) {                                                                                 \
-            TELEPHONY_LOGE("ParseToResponsePart failed to get %{public}s", key.c_str());                               \
-        }                                                                                                              \
-        (out) = cJSON_GetStringValue(cursor);                                                                          \
-    } while (0)
-
 namespace OHOS {
 namespace Telephony {
 class SpamCallAdapter {
@@ -60,6 +39,8 @@ public:
 
 private:
     bool ConnectSpamCallAbility(const AAFwk::Want &want, const std::string &phoneNumber, const int32_t &slotId);
+    bool JsonGetNumberValue(cJSON *json, const std::string key, int32_t &out);
+    bool JsonGetStringValue(cJSON *json, const std::string key, std::string &out);
     sptr<SpamCallConnection> connection_ {nullptr};
     bool isDetected_ = false;
     static std::condition_variable cv_;

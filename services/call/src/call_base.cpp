@@ -52,7 +52,8 @@ CallBase::CallBase(DialParaInfo &info, AppExecFwk::PacMap &extras)
       autoAnswerState_(false), canUnHoldState_(true), canSwitchCallState_(true), answerVideoState_(0),
       isSpeakerphoneOn_(false), callEndedType_(CallEndedType::UNKNOWN), callBeginTime_(0), callEndTime_(0),
       ringBeginTime_(0), ringEndTime_(0), answerType_(CallAnswerType::CALL_ANSWER_MISSED), accountId_(info.accountId),
-      crsType_(info.crsType), originalCallType_(info.originalCallType), isMuted_(false), numberLocation_("default"), blockReason_(0)
+      crsType_(info.crsType), originalCallType_(info.originalCallType), isMuted_(false), numberLocation_("default"),
+      blockReason_(0)
 {
     (void)memset_s(&contactInfo_, sizeof(ContactInfo), 0, sizeof(ContactInfo));
     (void)memset_s(&numberMarkInfo_, sizeof(NumberMarkInfo), 0, sizeof(NumberMarkInfo));
@@ -141,9 +142,11 @@ void CallBase::GetCallAttributeBaseInfo(CallAttributeInfo &info)
         (void)memset_s(info.numberLocation, kMaxNumberLen, 0, kMaxNumberLen);
         (void)memcpy_s(info.numberLocation, kMaxNumberLen, numberLocation_.c_str(), numberLocation_.length());
         info.numberMarkInfo.markType = numberMarkInfo_.markType;
-        std::copy(std::begin(numberMarkInfo_.markContent), std::end(numberMarkInfo_.markContent), std::begin(info.numberMarkInfo.markContent));
+        std::copy(std::begin(numberMarkInfo_.markContent), std::end(numberMarkInfo_.markContent),
+            std::begin(info.numberMarkInfo.markContent));
         info.numberMarkInfo.markCount = numberMarkInfo_.markCount;
-        std::copy(std::begin(numberMarkInfo_.markSource), std::end(numberMarkInfo_.markSource), std::begin(info.numberMarkInfo.markSource));
+        std::copy(std::begin(numberMarkInfo_.markSource), std::end(numberMarkInfo_.markSource),
+            std::begin(info.numberMarkInfo.markSource));
         info.numberMarkInfo.isCloud = numberMarkInfo_.isCloud;
         info.blockReason = blockReason_;
         if (bundleName_.length() > static_cast<size_t>(kMaxBundleNameLen)) {

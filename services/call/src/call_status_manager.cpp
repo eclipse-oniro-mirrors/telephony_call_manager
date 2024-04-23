@@ -1298,7 +1298,8 @@ bool CallStatusManager::ShouldBlockIncomingCall(const sptr<CallBase> &call, cons
             };
             bool isBlock = true;
             int32_t blockReason;
-            DelayedSingleton<SpamCallAdapter>::GetInstance()->ParseDetectResult(result, isBlock, numberMarkInfo, blockReason);
+            DelayedSingleton<SpamCallAdapter>::GetInstance()->ParseDetectResult(result, isBlock,
+                numberMarkInfo, blockReason);
             call->SetNumberMarkInfo(numberMarkInfo);
             call->SetBlockReason(blockReason);
             TELEPHONY_LOGI("isBlock: %{public}d", isBlock);

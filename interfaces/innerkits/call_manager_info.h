@@ -388,9 +388,11 @@ struct CallRecordInfo {
         videoState = temp.videoState;
         features = temp.features;
         numberMarkInfo.markType = temp.numberMarkInfo.markType;
-        std::copy(std::begin(temp.numberMarkInfo.markContent), std::end(temp.numberMarkInfo.markContent), std::begin(numberMarkInfo.markContent));
+        std::copy(std::begin(temp.numberMarkInfo.markContent), std::end(temp.numberMarkInfo.markContent),
+            std::begin(numberMarkInfo.markContent));
         numberMarkInfo.markCount = temp.numberMarkInfo.markCount;
-        std::copy(std::begin(temp.numberMarkInfo.markSource), std::end(temp.numberMarkInfo.markSource), std::begin(numberMarkInfo.markSource));
+        std::copy(std::begin(temp.numberMarkInfo.markSource), std::end(temp.numberMarkInfo.markSource),
+            std::begin(numberMarkInfo.markSource));
         numberMarkInfo.isCloud = temp.numberMarkInfo.isCloud;
         blockReason = temp.blockReason;
         return *this;

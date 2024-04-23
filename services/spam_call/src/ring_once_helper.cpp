@@ -30,7 +30,8 @@ RingOnceHelper::RingOnceHelper() {}
 
 RingOnceHelper::~RingOnceHelper() {}
 
-bool RingOnceHelper::IsRingOnceCall(const sptr<CallBase> &call, const CallDetailInfo &info) {
+bool RingOnceHelper::IsRingOnceCall(const sptr<CallBase> &call, const CallDetailInfo &info)
+{
     NumberMarkInfo numberMarkInfo = call->GetNumberMarkInfo();
     ContactInfo contactInfo = call->GetCallerInfo();
     if (numberMarkInfo.markType == MarkType::MARK_TYPE_YELLOW_PAGE ||

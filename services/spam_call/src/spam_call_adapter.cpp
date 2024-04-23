@@ -22,6 +22,7 @@
 #include "nlohmann/json.hpp"
 #include "telephony_log_wrapper.h"
 #include "cJSON.h"
+#include <securec.h>
 
 namespace OHOS {
 namespace Telephony {
@@ -83,7 +84,38 @@ void SpamCallAdapter::SetDetectFlag(bool isDetected)
     isDetected_ = isDetected;
 }
 
-void SpamCallAdapter::ParseDetectResult(const std::string &jsonData, bool &isBlock, NumberMarkInfo &info, int32_t &blockReason)
+bool SpamCallAdapter::JsonGetNumberValue(cJSON *json, const std::string key, int32_t &out)
+{
+    do {
+        cJSON *cursor = cJSON_GetObjectItem(json, key.c_str());
+        if (!cJSON_IsNumber(cursor)) {
+            TELEPHONY_LOGE("ParseToResponsePart failed to get %{public}s", key.c_str());
+            if (key == "detectResult" && key == "decisionReason") {
+                return false;
+            }
+        }
+        out = static_cast<int32_t>(cJSON_GetNumberValue(cursor));
+    } while (0);
+    return true;
+}
+
+bool SpamCallAdapter::JsonGetStringValue(cJSON *json, const std::string key, std::string &out)
+{
+    do {
+        cJSON *cursor = cJSON_GetObjectItem(json, key.c_str());
+        if (!cJSON_IsString(cursor)) {
+            TELEPHONY_LOGE("ParseToResponsePart failed to get %{public}s", key.c_str());
+        }
+        char *value = cJSON_GetStringValue(cursor);
+        if (value != nullptr) {
+            out = value;
+        }
+    } while (0);
+    return true;
+}
+
+void SpamCallAdapter::ParseDetectResult(const std::string &jsonData, bool &isBlock,
+    NumberMarkInfo &info, int32_t &blockReason)
 {
     if (jsonData.empty()) {
         return;
@@ -97,23 +129,27 @@ void SpamCallAdapter::ParseDetectResult(const std::string &jsonData, bool &isBlo
     cJSON *jsonObj;
     int32_t numberValue = 0;
     auto stringValue = "";
-    JSON_GET_NUMBER_VALUE(root, std::string(DETECT_RESULT), jsonObj, numberValue, goto finally);
+    if (!JsonGetNumberValue(root, DETECT_RESULT, numberValue)) {
+        goto finally;
+    }
     isBlock = numberValue == 1;
-    JSON_GET_NUMBER_VALUE(root, std::string(DECISION_REASON), jsonObj, numberValue, goto finally);
+    if (!JsonGetNumberValue(root, DECISION_REASON, numberValue)) {
+        goto finally;
+    }
     blockReason = numberValue;
-    JSON_GET_NUMBER_VALUE(root, std::string(MARK_TYPE), jsonObj, numberValue, goto finally);
+    JsonGetNumberValue(root, MARK_TYPE, numberValue);
     info.markType = static_cast<MarkType>(numberValue);
-    JSON_GET_NUMBER_VALUE(root, std::string(MARK_COUNT), jsonObj, numberValue, goto finally);
+    JsonGetNumberValue(root, MARK_COUNT, numberValue);
     info.markCount = numberValue;
-    JSON_GET_STRING_VALUE(root, std::string(MARK_SOURCE), jsonObj, stringValue, goto finally);
-    if (stringValue != nullptr && strcpy_s(info.markContent, sizeof(info.markContent), stringValue) != EOK) {
+    JsonGetStringValue(root, MARK_SOURCE, stringValue);
+    if (strcpy_s(info.markSource, sizeof(info.markSource), stringValue.c_str()) != EOK) {
+        TELEPHONY_LOGE("strcpy_s markSource fail.");
+    }
+    JsonGetStringValue(root, MARK_CONTENT, stringValue);
+    if (strcpy_s(info.markContent, sizeof(info.markContent), stringValue.c_str()) != EOK) {
         TELEPHONY_LOGE("strcpy_s markContent fail.");
     }
-    JSON_GET_STRING_VALUE(root, std::string(MARK_CONTENT), jsonObj, stringValue, goto finally);
-    if (stringValue != nullptr && strcpy_s(info.markContent, sizeof(info.markContent), stringValue) != EOK) {
-        TELEPHONY_LOGE("strcpy_s markContent fail.");
-    }
-    JSON_GET_NUMBER_VALUE(root, std::string(IS_CLOUD), jsonObj, numberValue, goto finally);
+    JsonGetNumberValue(root, IS_CLOUD, numberValue);
     info.isCloud = numberValue == 1;
 finally:
     TELEPHONY_LOGI("ParseDetectResult end");
@@ -140,16 +176,14 @@ void SpamCallAdapter::NotifyAll()
 
 bool SpamCallAdapter::WaitForDetectResult()
 {
-    // if (!isDetected_) {
-        std::unique_lock<std::mutex> lock(mutex_);
-        isDetected_ = false;
-        while (!isDetected_) {
-            if (cv_.wait_for(lock, std::chrono::seconds(WAIT_TIME_TWO_SECOND)) == std::cv_status::timeout) {
-                TELEPHONY_LOGE("detect spam call is time out");
-                return false;
-            }
+    std::unique_lock<std::mutex> lock(mutex_);
+    isDetected_ = false;
+    while (!isDetected_) {
+        if (cv_.wait_for(lock, std::chrono::seconds(WAIT_TIME_TWO_SECOND)) == std::cv_status::timeout) {
+            TELEPHONY_LOGE("detect spam call is time out");
+            return false;
         }
-    // }
+    }
     return true;
 }
 } // namespace Telephony

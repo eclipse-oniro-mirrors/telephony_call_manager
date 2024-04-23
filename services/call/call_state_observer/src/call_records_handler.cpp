@@ -54,7 +54,7 @@ int32_t CallRecordsHandler::AddCallLogInfo(const CallRecordInfo &info)
         TELEPHONY_LOGE("callDataPtr is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    std::string str = CheckNumberLocationInfo(info);
+    std::string numberLocation = CheckNumberLocationInfo(info);
     ContactInfo contactInfo = {
         .name = "",
         .number = "",
@@ -74,6 +74,18 @@ int32_t CallRecordsHandler::AddCallLogInfo(const CallRecordInfo &info)
 
     DataShare::DataShareValuesBucket bucket;
     TELEPHONY_LOGI("callLog Insert begin");
+    MakeCallLogInsertBucket(bucket, info, displayName, numberLocation);
+    bool ret = callDataPtr_->Insert(bucket);
+    if (!ret) {
+        TELEPHONY_LOGE("Add call log database fail!");
+        return TELEPHONY_ERR_DATABASE_WRITE_FAIL;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+void MakeCallLogInsertBucket(DataShare::DataShareValuesBucket &bucket,
+        const CallRecordInfo &info, std::string displayName, std:;string numberLocation)
+{
     bucket.Put(CALL_PHONE_NUMBER, std::string(info.phoneNumber));
     bucket.Put(CALL_DISPLAY_NAME, displayName);
     bucket.Put(CALL_DIRECTION, static_cast<int32_t>(info.directionType));
@@ -101,12 +113,6 @@ int32_t CallRecordsHandler::AddCallLogInfo(const CallRecordInfo &info)
     bucket.Put(CALL_IS_CLOUD_MARK, info.numberMarkInfo.isCloud);
     bucket.Put(CALL_MARK_COUNT, info.numberMarkInfo.markCount);
     bucket.Put(CALL_BLOCK_REASON, info.blockReason);
-    bool ret = callDataPtr_->Insert(bucket);
-    if (!ret) {
-        TELEPHONY_LOGE("Add call log database fail!");
-        return TELEPHONY_ERR_DATABASE_WRITE_FAIL;
-    }
-    return TELEPHONY_SUCCESS;
 }
 
 std::string CallRecordsHandler::CheckNumberLocationInfo(const CallRecordInfo &info)
