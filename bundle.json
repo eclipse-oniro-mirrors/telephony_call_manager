@@ -61,8 +61,7 @@
                 "sms_mms",
                 "image_framework",
                 "miscdevice",
-                "location",
-                "os_account"
+                "location"
             ],
             "third_party": [
                 "libphonenumber",

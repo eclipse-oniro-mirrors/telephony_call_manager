@@ -173,7 +173,6 @@ ohos_shared_library("tel_call_manager") {
     "samgr:samgr_proxy",
     "location:lbsservice_common",
     "location:locator_sdk",
-    "os_account:os_account_innerkits",
   ]
 
   cflags_cc = [
