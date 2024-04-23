@@ -25,7 +25,7 @@ const std::string LocationSubscriber::SWITCH_STATE = "switchState";
 const std::string LocationSubscriber::SWITCH_STATE_KEY = "auto_send_earthquake_alarm_switch";
 std::shared_ptr<LocationSubscriber> LocationSubscriber::subscriber_ = nullptr;
 sptr<ISystemAbilityStatusChange> LocationSystemAbilityListener::statusChangeListener_ = nullptr;
-const int DataShareSwitchState::INVAILID_VALUE = -1;
+const int DataShareSwitchState::INVALID_VALUE = -1;
 const int DataShareSwitchState::TELEPHONY_SUCCESS = 0;
 const int DataShareSwitchState::TELEPHONY_ERR_LOCAL_PTR_NULL = 1;
 const int DataShareSwitchState::TELEPHONY_ERR_DATABASE_READ_FAIL = 2;
@@ -44,8 +44,8 @@ bool LocationSubscriber::Subscriber(void)
     if (LocationSubscriber::subscriber_ == nullptr) {
         EventFwk::MatchingSkills matchingSkills;
         matchingSkills.AddEvent(LocationSubscriber::SWITCH_STATE_CHANGE_EVENTS);
-        EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
-        LocationSubscriber::subscriber_ = std::make_shared<LocationSubscriber>(subscriberInfo);
+        EventFwk::CommonEventSubscribeInfo subscribeInfo(matchingSkills);
+        LocationSubscriber::subscriber_ = std::make_shared<LocationSubscriber>(subscribeInfo);
         EventFwk::CommonEventManager::SubscribeCommonEvent(LocationSubscriber::subscriber_);
     }
     TELEPHONY_LOGI("create SubscribeCommonEvent LocationSubscriber");
@@ -111,7 +111,7 @@ int32_t DataShareSwitchState::QueryData(Uri& uri, const std::string& key, std::s
     auto result = datashareHelper_->Query(uri, predicates, columns);
     if (result == nullptr) {
         TELEPHONY_LOGE("DataShareSwitchState query error, result is nullptr");
-        return DataShareSwitchState::TELEPHONY_ERR_LOCAL_PTR_NULL
+        return DataShareSwitchState::TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
 
     int rowCount = 0;
@@ -188,7 +188,7 @@ bool LocationSystemAbilityListener::SystemAbilitySubscriber()
 {
     statusChangeListener_ = new (std::nothrow) LocationSystemAbilityListener();
     if (statusChangeListener_ == nullptr) {
-        TELEPHONY_LOGI(failed to create statusChangeListener LocationSubscriber);
+        TELEPHONY_LOGI("failed to create statusChangeListener LocationSubscriber");
         return false;
     }
     auto managerPtr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
