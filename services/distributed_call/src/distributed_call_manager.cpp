@@ -369,8 +369,10 @@ void DistributedCallManager::SwitchOnDCallDevice(std::unique_ptr<AudioDevice> de
 void DistributedCallManager::SetCallState(bool isActive)
 {
     isCallActived_.store(isActive);
-    dCallDeviceSwitchedOn_.store(false);
-    ClearConnectedDCallDevice();
+    if (isActive == false) {
+        dCallDeviceSwitchedOn_.store(false);
+        ClearConnectedDCallDevice();
+    }
 }
 
 void DistributedCallManager::SwitchOnDCallDeviceAsync(const AudioDevice& device)
