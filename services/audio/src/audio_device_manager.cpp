@@ -405,6 +405,7 @@ bool AudioDeviceManager::CheckAndSwitchDistributedAudioDevice()
 void AudioDeviceManager::OnActivedCallDisconnected()
 {
     DelayedSingleton<DistributedCallManager>::GetInstance()->SetCallState(false);
+    DelayedSingleton<DistributedCallManager>::GetInstance()->DealDisconnectCall();
 }
 
 int32_t AudioDeviceManager::ReportAudioDeviceChange()
