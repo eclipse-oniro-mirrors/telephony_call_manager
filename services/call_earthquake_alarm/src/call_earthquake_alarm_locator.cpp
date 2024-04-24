@@ -234,7 +234,7 @@ void MyLocationEngine::MySwitchCallback::OnSwitchChange(const int state)
 int MyLocationEngine::MySwitchCallback::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply,
     MessageOption &option)
 {
-    if (data.ReadInterfaceToken != GetDescriptor()) {
+    if (data.ReadInterfaceToken() != GetDescriptor()) {
         TELEPHONY_LOGI("MyLocationEngine SwitchCallback invalid token.");
         return -1;
     }
