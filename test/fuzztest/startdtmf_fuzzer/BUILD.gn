@@ -49,6 +49,7 @@ ohos_fuzztest("StartDtmfFuzzTest") {
     "access_token:libtoken_setproc",
     "c_utils:utils",
     "common_event_service:cesfwk_innerkits",
+    "core_service:libtel_common",
     "core_service:tel_core_service_api",
     "data_share:datashare_consumer",
     "graphic_surface:surface",
