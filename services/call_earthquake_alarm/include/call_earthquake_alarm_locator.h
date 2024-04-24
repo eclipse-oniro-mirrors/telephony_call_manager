@@ -53,7 +53,7 @@ public:
     void UnRegisterSwitchCallback();
     void LocationSwitchChange();
     static void BootComplete();
-    static bool IsSwitch();
+    static bool IsSwitchOn();
     static std::shared_ptr<MyLocationEngine> GetInstance();
     static void ConnectAbility();
     static OHOS::Uri uri_q;

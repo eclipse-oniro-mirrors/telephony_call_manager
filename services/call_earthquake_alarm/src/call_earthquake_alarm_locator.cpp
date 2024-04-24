@@ -22,8 +22,8 @@ using namespace OHOS::EventFwk;
 namespace OHOS {
 namespace Telephony {
 using namespace AppExecFwk;
-OHOS::Uri MyLocationEngine::uri_q("datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true"
-    + "&key=auto_send_earthquake_alarm_switch");
+OHOS::Uri MyLocationEngine::uri_q(string("datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?"）
+    + string("Proxy=true&key=auto_send_earthquake_alarm_switch"));
 const int MyLocationEngine::DISTANCE_INTERVAL = 10000; /** 10 kilometers */
 const int MyLocationEngine::TIMER_INTERVAL = 0;
 const std::string MyLocationEngine::EMERGENCY_DEVICE_ID = "";
@@ -104,7 +104,7 @@ void MyLocationEngine::RegisterLocationChange()
 
 void MyLocationEngine::UnregisterLocationChange()
 {
-    auto callback = sptr<Location::ILocationCallback>(locatorCallback_);
+    auto callback = sptr<Location::ILocatorCallback>(locatorCallback_);
     auto code = this->locatorImpl->StopLocatingV9(callback);
     TELEPHONY_LOGI("MyLocationEngine stopListencdode = %{public}d.", code);
 }
@@ -235,7 +235,7 @@ void MyLocationEngine::MySwitchCallback::OnSwitchChange(const int state)
 int MyLocationEngine::MySwitchCallback::OnRemoteRequest(uint32_t code, MessageParcel &data, MessageParcel &reply,
     MessageOption &option)
 {
-    if (data.ReadOnterfaceToken != GetDescriptor()) {
+    if (data.ReadInterfaceToken != GetDescriptor()) {
         TELEPHONY_LOGI("MyLocationEngine SwitchCallback invalid token.");
         return -1;
     }
@@ -272,7 +272,7 @@ sptr<AAFwk::IAbilityConnection> EmergencyCallConnectCallback::connectCallback_ =
 void MyLocationEngine::ConnectAbility()
 {
     AAFwk::Want want;
-    AppExecFwk::ElementName element(EMERGENCY_DEVICE_ID, EMERGENCEY_BUNDLE_NAME, EMERGENCEY_ABILITY_NAME);
+    AppExecFwk::ElementName element(EMERGENCY_DEVICE_ID, EMERGENCY_BUNDLE_NAME, EMERGENCEY_ABILITY_NAME);
     want.SetElement(element);
     want.SetParam(PARAMETERS_KEY, PARAMETERS_VALUE);
     if (EmergencyCallConnectCallback::connectCallback_ == nullptr) {
