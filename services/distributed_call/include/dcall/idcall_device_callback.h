@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Huawei Device Co., Ltd.
+ * Copyright (C) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -25,8 +25,8 @@ namespace DistributedHardware {
 class IDCallDeviceCallback {
 public:
     virtual ~IDCallDeviceCallback() = default;
-    virtual int32_t OnDeviceOnline(const std::string &devId) = 0;
-    virtual int32_t OnDeviceOffline(const std::string &devId) = 0;
+    virtual int32_t OnDCallDeviceOnline(const std::string &devId) = 0;
+    virtual int32_t OnDCallDeviceOffline(const std::string &devId) = 0;
 };
 } // namespace DistributedHardware
 } // namespace OHOS
