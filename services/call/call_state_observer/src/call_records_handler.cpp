@@ -84,7 +84,7 @@ int32_t CallRecordsHandler::AddCallLogInfo(const CallRecordInfo &info)
 }
 
 void MakeCallLogInsertBucket(DataShare::DataShareValuesBucket &bucket,
-        const CallRecordInfo &info, std::string displayName, std::string numberLocation)
+    const CallRecordInfo &info, std::string displayName, std::string numberLocation)
 {
     bucket.Put(CALL_PHONE_NUMBER, std::string(info.phoneNumber));
     bucket.Put(CALL_DISPLAY_NAME, displayName);
@@ -102,9 +102,8 @@ void MakeCallLogInsertBucket(DataShare::DataShareValuesBucket &bucket,
     bucket.Put(CALL_BEGIN_TIME, info.callBeginTime);
     bucket.Put(CALL_END_TIME, info.callEndTime);
     bucket.Put(CALL_ANSWER_STATE, static_cast<int32_t>(info.answerType));
-    time_t timeStamp = time(0);
-    bucket.Put(CALL_CREATE_TIME, timeStamp);
-    bucket.Put(CALL_NUMBER_LOCATION, str);
+    bucket.Put(CALL_CREATE_TIME, time(0));
+    bucket.Put(CALL_NUMBER_LOCATION, numberLocation);
     bucket.Put(CALL_PHOTO_ID, 0);
     bucket.Put(CALL_SLOT_ID, info.slotId);
     bucket.Put(CALL_FEATURES, info.features);
