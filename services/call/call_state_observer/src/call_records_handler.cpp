@@ -84,7 +84,7 @@ int32_t CallRecordsHandler::AddCallLogInfo(const CallRecordInfo &info)
 }
 
 void MakeCallLogInsertBucket(DataShare::DataShareValuesBucket &bucket,
-        const CallRecordInfo &info, std::string displayName, std:;string numberLocation)
+        const CallRecordInfo &info, std::string displayName, std::string numberLocation)
 {
     bucket.Put(CALL_PHONE_NUMBER, std::string(info.phoneNumber));
     bucket.Put(CALL_DISPLAY_NAME, displayName);
