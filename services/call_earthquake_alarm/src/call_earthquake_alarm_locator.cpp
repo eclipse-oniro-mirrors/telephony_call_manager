@@ -22,14 +22,13 @@ using namespace OHOS::EventFwk;
 namespace OHOS {
 namespace Telephony {
 using namespace AppExecFwk;
-OHOS::Uri MyLocationEngine::uri_q(string("datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?"）
+OHOS::Uri MyLocationEngine::uri_q(string("datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?")
     + string("Proxy=true&key=auto_send_earthquake_alarm_switch"));
 const int MyLocationEngine::DISTANCE_INTERVAL = 10000; /** 10 kilometers */
 const int MyLocationEngine::TIMER_INTERVAL = 0;
 const std::string MyLocationEngine::EMERGENCY_DEVICE_ID = "";
-const std::string MyLocationEngine::EMERGENCY_BUNDLE_NAME = "com.huawei.hmos.emergencycommunication";
-const std::string MyLocationEngine::EMERGENCEY_ABILITY_NAME =
-    "com.huawei.hmos.emergencycommunication.ServiceExtAbility";
+const std::string MyLocationEngine::EMERGENCY_BUNDLE_NAME = "";
+const std::string MyLocationEngine::EMERGENCEY_ABILITY_NAME = "";
 const std::string MyLocationEngine::PARAMETERS_VALUE = "call_manager_earthquake_alarm";
 const char* MyLocationEngine::PARAMETERS_KEY = "callerName";
 const std::string MyLocationEngine::ALARM_SWITCH_ON = "1";
@@ -298,4 +297,4 @@ void EmergencyCallConnectCallback::OnAbilityDisconnectDone(const AppExecFwk::Ele
     TELEPHONY_LOGI("disconnect emergencycommunication result code: %{public}d", resultCode);
 }
 } // namespace Telephony
-}; // namespace OHOS
+} // namespace OHOS
