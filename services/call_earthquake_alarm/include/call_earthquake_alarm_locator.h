@@ -89,7 +89,7 @@ private:
     static const int TIMER_INTERVAL;
     static const std::string EMERGENCY_DEVICE_ID;
     static const std::string EMERGENCY_BUNDLE_NAME;
-    static const std::string EMERGENCEY_ABILITY_NAME;
+    static const std::string EMERGENCY_ABILITY_NAME;
     static const std::string PARAMETERS_VALUE;
     static const char* PARAMETERS_KEY;
     static const std::string ALARM_SWITCH_ON;

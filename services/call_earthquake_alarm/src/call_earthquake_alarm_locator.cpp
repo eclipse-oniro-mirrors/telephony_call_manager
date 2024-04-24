@@ -28,7 +28,7 @@ const int MyLocationEngine::DISTANCE_INTERVAL = 10000; /** 10 kilometers */
 const int MyLocationEngine::TIMER_INTERVAL = 0;
 const std::string MyLocationEngine::EMERGENCY_DEVICE_ID = "";
 const std::string MyLocationEngine::EMERGENCY_BUNDLE_NAME = "";
-const std::string MyLocationEngine::EMERGENCEY_ABILITY_NAME = "";
+const std::string MyLocationEngine::EMERGENCY_ABILITY_NAME = "";
 const std::string MyLocationEngine::PARAMETERS_VALUE = "call_manager_earthquake_alarm";
 const char* MyLocationEngine::PARAMETERS_KEY = "callerName";
 const std::string MyLocationEngine::ALARM_SWITCH_ON = "1";
@@ -271,7 +271,7 @@ sptr<AAFwk::IAbilityConnection> EmergencyCallConnectCallback::connectCallback_ =
 void MyLocationEngine::ConnectAbility()
 {
     AAFwk::Want want;
-    AppExecFwk::ElementName element(EMERGENCY_DEVICE_ID, EMERGENCY_BUNDLE_NAME, EMERGENCEY_ABILITY_NAME);
+    AppExecFwk::ElementName element(EMERGENCY_DEVICE_ID, EMERGENCY_BUNDLE_NAME, EMERGENCY_ABILITY_NAME);
     want.SetElement(element);
     want.SetParam(PARAMETERS_KEY, PARAMETERS_VALUE);
     if (EmergencyCallConnectCallback::connectCallback_ == nullptr) {
