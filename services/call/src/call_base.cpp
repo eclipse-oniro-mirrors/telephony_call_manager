@@ -430,8 +430,8 @@ void CallBase::SetCallerInfo(const ContactInfo &info)
 
 NumberMarkInfo CallBase::GetNumberMarkInfo()
 {
-   std::lock_guard<std::mutex> lock(mutex_);
-   return numberMarkInfo_;
+    std::lock_guard<std::mutex> lock(mutex_);
+    return numberMarkInfo_;
 }
 
 void CallBase::SetNumberMarkInfo(const NumberMarkInfo &numberMarkInfo)

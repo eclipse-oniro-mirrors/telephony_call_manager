@@ -128,7 +128,7 @@ void SpamCallAdapter::ParseDetectResult(const std::string &jsonData, bool &isBlo
     }
     cJSON *jsonObj;
     int32_t numberValue = 0;
-    auto stringValue = "";
+    std::string stringValue = "";
     if (!JsonGetNumberValue(root, DETECT_RESULT, numberValue)) {
         goto finally;
     }
@@ -158,14 +158,14 @@ finally:
 
 void SpamCallAdapter::GetDetectResult(int32_t &errCode, std::string &result)
 {
-   errCode = errCode_;
-   result = result_;
+    errCode = errCode_;
+    result = result_;
 }
 
 void SpamCallAdapter::SetDetectResult(int32_t &errCode, std::string &result)
 {
-   errCode_ = errCode;
-   result_ = result;
+    errCode_ = errCode;
+    result_ = result;
 }
 
 void SpamCallAdapter::NotifyAll()
