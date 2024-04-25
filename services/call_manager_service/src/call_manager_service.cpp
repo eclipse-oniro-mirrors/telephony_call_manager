@@ -33,6 +33,7 @@
 #include "video_control_manager.h"
 #include "voip_call_connection.h"
 #include "distributed_call_manager.h"
+#include "call_earthquake_alarm_subscriber.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -121,6 +122,7 @@ void CallManagerService::OnStart()
             timeNow->tm_min, timeNow->tm_sec);
         TELEPHONY_LOGI("CallManagerService start service cost time:%{public}d(milliseconds)", spendTime_);
     }
+    LocationSystemAbilityListener::SystemAbilitySubscriber();
 }
 
 void CallManagerService::OnStop()
