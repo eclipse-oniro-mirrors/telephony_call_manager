@@ -30,7 +30,8 @@ SpamCallProxy::SpamCallProxy(const sptr<IRemoteObject> &impl)
     : IRemoteProxy<ISpamCall>(impl)
 {}
 
-int32_t SpamCallProxy::DetectSpamCall(const std::string &phoneNumber, const int32_t &slotId)
+int32_t SpamCallProxy::DetectSpamCall(const std::string &phoneNumber, const int32_t &slotId,
+    SpamCallAdapter *spamCallAdapter)
 {
     MessageParcel dataParcel;
     std::u16string myDescriptor = SpamCallProxy::GetDescriptor();
@@ -38,7 +39,7 @@ int32_t SpamCallProxy::DetectSpamCall(const std::string &phoneNumber, const int3
         TELEPHONY_LOGE("Write descriptor fail");
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
-    auto instance = new (std::nothrow) CallbackStubHelper();
+    auto instance = new (std::nothrow) CallbackStubHelper(spamCallAdapter);
     if (instance == nullptr) {
         TELEPHONY_LOGE("CallbackStubHelper is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;

@@ -18,19 +18,19 @@
 
 #include <string>
 
-#include "spam_call_connection.h"
 #include "call_manager_info.h"
 #include "singleton.h"
 #include "cJSON.h"
+#include "time_wait_helper.h"
+#include "ability_connect_callback_stub.h"
 
 namespace OHOS {
 namespace Telephony {
 class SpamCallAdapter {
-    DECLARE_DELAYED_SINGLETON(SpamCallAdapter)
 public:
+    SpamCallAdapter();
+    ~SpamCallAdapter();
     bool DetectSpamCall(const std::string &phoneNumber, const int32_t &slotId);
-    bool GetDetectFlag();
-    void SetDetectFlag(bool isDetected);
     void GetDetectResult(int32_t &errCode, std::string &result);
     void SetDetectResult(int32_t &errCode, std::string &result);
     void NotifyAll();
@@ -41,12 +41,9 @@ private:
     bool ConnectSpamCallAbility(const AAFwk::Want &want, const std::string &phoneNumber, const int32_t &slotId);
     bool JsonGetNumberValue(cJSON *json, const std::string key, int32_t &out);
     bool JsonGetStringValue(cJSON *json, const std::string key, std::string &out);
-    sptr<SpamCallConnection> connection_ {nullptr};
-    bool isDetected_ = false;
-    static std::condition_variable cv_;
-    std::mutex mutex_;
     int32_t errCode_ = -1;
     std::string result_ = "";
+    std::shared_ptr<TimeWaitHelper> timeWaitHelper_ {nullptr};
 };
 } // namespace Telephony
 } // namespace OHOS

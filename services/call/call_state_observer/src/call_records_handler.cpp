@@ -102,7 +102,12 @@ void CallRecordsHandler::MakeCallLogInsertBucket(DataShare::DataShareValuesBucke
     bucket.Put(CALL_BEGIN_TIME, info.callBeginTime);
     bucket.Put(CALL_END_TIME, info.callEndTime);
     bucket.Put(CALL_ANSWER_STATE, static_cast<int32_t>(info.answerType));
-    bucket.Put(CALL_CREATE_TIME, time(0));
+    time_t timeStamp = time(0);
+    if (timeStamp < 0) {
+        TELEPHONY_LOGE("call log timeStamp less than 0");
+        timeStamp = 0;
+    }
+    bucket.Put(CALL_CREATE_TIME, timeStamp);
     bucket.Put(CALL_NUMBER_LOCATION, numberLocation);
     bucket.Put(CALL_PHOTO_ID, 0);
     bucket.Put(CALL_SLOT_ID, info.slotId);

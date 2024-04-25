@@ -16,17 +16,20 @@
 #ifndef TELEPHONY_SPAM_CALL_CONNECTION_H
 #define TELEPHONY_SPAM_CALL_CONNECTION_H
 
-#include "ability_connection.h"
+#include "ability_connect_callback_stub.h"
+#include "spam_call_adapter.h"
 
 namespace OHOS {
 namespace Telephony {
 class SpamCallConnection : public AAFwk::AbilityConnectionStub {
 public:
-    SpamCallConnection(const std::string &phoneNumber, const int32_t &slotId)
+    SpamCallConnection(const std::string &phoneNumber, const int32_t &slotId,
+       SpamCallAdapter *spamCallAdapter)
     {
         phoneNumber_ = phoneNumber;
         slotId_ = slotId;
-    }
+        spamCallAdapter_ = spamCallAdapter;
+    };
 
     virtual ~SpamCallConnection() = default;
 
@@ -37,6 +40,7 @@ public:
 private:
     std::string phoneNumber_;
     int32_t slotId_;
+    SpamCallAdapter *spamCallAdapter_ {nullptr};
 };
 } // namespace Telephony
 } // namespace OHOS

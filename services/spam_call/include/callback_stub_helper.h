@@ -17,13 +17,19 @@
 #define TELEPHONY_CALLBACK_STUB_HELPER_H
 
 #include <singleton.h>
+#include "spam_call_adapter.h"
 #include "spam_call_stub.h"
 
 namespace OHOS {
 namespace Telephony {
 class CallbackStubHelper : public SpamCallStub {
 public:
+    CallbackStubHelper(SpamCallAdapter *spamCallAdapter);
+    ~CallbackStubHelper();
     int32_t OnResult(int32_t &errCode, std::string &result) override;
+
+private:
+    SpamCallAdapter *spamCallAdapter_ {nullptr};
 };
 }
 }

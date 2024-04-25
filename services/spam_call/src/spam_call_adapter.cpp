@@ -23,6 +23,8 @@
 #include "telephony_log_wrapper.h"
 #include "cJSON.h"
 #include <securec.h>
+#include "time_wait_helper.h"
+#include "spam_call_connection.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -34,9 +36,10 @@ constexpr char MARK_COUNT[] = "markCount";
 constexpr char MARK_SOURCE[] = "markSource";
 constexpr char MARK_CONTENT[] = "markContent";
 constexpr char IS_CLOUD[] = "isCloud";
-std::condition_variable SpamCallAdapter::cv_;
 
-SpamCallAdapter::SpamCallAdapter() {}
+SpamCallAdapter::SpamCallAdapter() {
+    timeWaitHelper_ = std::make_shared<TimeWaitHelper>(WAIT_TIME_TWO_SECOND);
+}
 
 SpamCallAdapter::~SpamCallAdapter() {}
 
@@ -59,7 +62,7 @@ bool SpamCallAdapter::ConnectSpamCallAbility(const AAFwk::Want &want, const std:
     const int32_t &slotId)
 {
     TELEPHONY_LOGI("ConnectSpamCallAbility start");
-    connection_ = sptr<SpamCallConnection> (new (std::nothrow) SpamCallConnection(phoneNumber, slotId));
+    sptr<SpamCallConnection> connection_ = new (std::nothrow) SpamCallConnection(phoneNumber, slotId, this);
     if (connection_ == nullptr) {
         TELEPHONY_LOGE("connection_ is nullptr");
         return false;
@@ -74,15 +77,6 @@ bool SpamCallAdapter::ConnectSpamCallAbility(const AAFwk::Want &want, const std:
     }
     return true;
 }
-bool SpamCallAdapter::GetDetectFlag()
-{
-    return isDetected_;
-}
-
-void SpamCallAdapter::SetDetectFlag(bool isDetected)
-{
-    isDetected_ = isDetected;
-}
 
 bool SpamCallAdapter::JsonGetNumberValue(cJSON *json, const std::string key, int32_t &out)
 {
@@ -90,7 +84,7 @@ bool SpamCallAdapter::JsonGetNumberValue(cJSON *json, const std::string key, int
         cJSON *cursor = cJSON_GetObjectItem(json, key.c_str());
         if (!cJSON_IsNumber(cursor)) {
             TELEPHONY_LOGE("ParseToResponsePart failed to get %{public}s", key.c_str());
-            if (key == "detectResult" && key == "decisionReason") {
+            if (key == "detectResult" || key == "decisionReason") {
                 return false;
             }
         }
@@ -171,20 +165,12 @@ void SpamCallAdapter::SetDetectResult(int32_t &errCode, std::string &result)
 void SpamCallAdapter::NotifyAll()
 {
     TELEPHONY_LOGI("SpamCallDetect NotifyAll");
-    cv_.notify_all();
+    timeWaitHelper_->NotifyAll();
 }
 
 bool SpamCallAdapter::WaitForDetectResult()
 {
-    std::unique_lock<std::mutex> lock(mutex_);
-    isDetected_ = false;
-    while (!isDetected_) {
-        if (cv_.wait_for(lock, std::chrono::seconds(WAIT_TIME_TWO_SECOND)) == std::cv_status::timeout) {
-            TELEPHONY_LOGE("detect spam call is time out");
-            return false;
-        }
-    }
-    return true;
+    return timeWaitHelper_->WaitForResult();
 }
 } // namespace Telephony
 } // namespace OHOS

@@ -13,32 +13,26 @@
  * limitations under the License.
  */
 
-#ifndef TELEPHONY_RING_ONCE_HELPER_H
-#define TELEPHONY_RING_ONCE_HELPER_H
+#ifndef TELEPHONY_TIME_WAIT_HELPER_H
+#define TELEPHONY_TIME_WAIT_HELPER_H
 
-#include <string>
-
-#include "call_base.h"
-#include "call_manager_info.h"
-#include "singleton.h"
+#include <condition_variable>
+#include <cstdio>
 
 namespace OHOS {
 namespace Telephony {
-class RingOnceHelper {
-    DECLARE_DELAYED_SINGLETON(RingOnceHelper)
+class TimeWaitHelper {
 public:
-    bool IsRingOnceCall(const sptr<CallBase> &call, const CallDetailInfo &info);
-    int32_t HandleRingOnceCall(sptr<CallBase> &call);
-    bool GetDetectFlag();
-    void SetDetectFlag(bool isDetected);
+    TimeWaitHelper(int16_t waitTime);
+    ~TimeWaitHelper();
     void NotifyAll();
-    bool WaitForDetectResult();
+    bool WaitForResult();
 
 private:
-    bool isDetected_ = false;
-    static std::condition_variable cv_;
+    std::condition_variable cv_;
     std::mutex mutex_;
+    int16_t waitTime_ = 0;
 };
 } // namespace Telephony
 } // namespace OHOS
-#endif // TELEPHONY_RING_ONCE_HELPER_H
+#endif //TELEPHONY_TIME_WAIT_HELPER_H

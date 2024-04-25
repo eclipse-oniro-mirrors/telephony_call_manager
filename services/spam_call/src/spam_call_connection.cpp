@@ -31,7 +31,7 @@ void SpamCallConnection::OnAbilityConnectDone(const AppExecFwk::ElementName &ele
         return;
     }
     SpamCallProxy service(remoteObject);
-    int32_t ret = service.DetectSpamCall(phoneNumber_, slotId_);
+    int32_t ret = service.DetectSpamCall(phoneNumber_, slotId_, spamCallAdapter_);
     TELEPHONY_LOGI("OnAbilityConnectDone, DetectSpamCall ret = %{public}d", ret);
 }
 

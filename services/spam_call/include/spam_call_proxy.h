@@ -18,6 +18,7 @@
 
 #include <iremote_proxy.h>
 #include "i_spam_call.h"
+#include "spam_call_adapter.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -27,10 +28,12 @@ public:
 
     virtual ~SpamCallProxy() = default;
 
-    int32_t DetectSpamCall(const std::string &phoneNumber, const int32_t &slotId) override;
+    int32_t DetectSpamCall(const std::string &phoneNumber, const int32_t &slotId,
+        SpamCallAdapter *spamCallAdapter) override;
 
 private:
     static constexpr int COMMAND_DETECT_SPAM_CALL = 1;
+    SpamCallAdapter *spamCallAdapter_ {nullptr};
 };
 } // namespace Telephony
 } // namespace OHOS

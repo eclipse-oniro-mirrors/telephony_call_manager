@@ -23,6 +23,7 @@
 #include "common_type.h"
 #include "call_status_policy.h"
 #include "call_incoming_filter_manager.h"
+#include "time_wait_helper.h"
 #include "voip_call_manager_info.h"
 
 /**
@@ -94,6 +95,8 @@ private:
     int32_t HandleRejectCall(sptr<CallBase> &call, bool isBlock);
     bool ShouldRejectIncomingCall();
     bool ShouldBlockIncomingCall(const sptr<CallBase> &call, const CallDetailInfo &info);
+    bool IsRingOnceCall(const sptr<CallBase> &call, const CallDetailInfo &info);
+    int32_t HandleRingOnceCall(sptr<CallBase> &call);
     void CarrierAndVoipConflictProcess(int32_t callId);
 
 private:
@@ -107,6 +110,7 @@ private:
     const std::string CONTENT_TYPE = "content_type";
     const std::string PHONE = "phone";
     const int32_t CALL_NUMBER = 2;
+    std::unique_ptr<TimeWaitHelper> timeWaitHelper_ {nullptr};
 };
 } // namespace Telephony
 } // namespace OHOS

@@ -20,13 +20,18 @@
 
 namespace OHOS {
 namespace Telephony {
+CallbackStubHelper::CallbackStubHelper(SpamCallAdapter *spamCallAdapter)
+{
+    spamCallAdapter_ = spamCallAdapter;
+};
+CallbackStubHelper::~CallbackStubHelper() {};
+
 int32_t CallbackStubHelper::OnResult(int32_t &errCode, std::string &result)
 {
     TELEPHONY_LOGI("OnResult errCode: %{public}d", errCode);
-    if (!DelayedSingleton<SpamCallAdapter>::GetInstance()->GetDetectFlag()) {
-        DelayedSingleton<SpamCallAdapter>::GetInstance()->SetDetectResult(errCode, result);
-        DelayedSingleton<SpamCallAdapter>::GetInstance()->SetDetectFlag(true);
-        DelayedSingleton<SpamCallAdapter>::GetInstance()->NotifyAll();
+    if (spamCallAdapter_ != nullptr) {
+        spamCallAdapter_->SetDetectResult(errCode, result);
+        spamCallAdapter_->NotifyAll();
     }
     return TELEPHONY_SUCCESS;
 }
