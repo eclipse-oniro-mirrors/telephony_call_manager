@@ -77,13 +77,14 @@ public:
         sptr<CallBase> &callObjectPtr, VideoStateType priorVideoState, VideoStateType nextVideoState);
     void CheckTypeAndSetAudioDevice(sptr<CallBase> &callObjectPtr, VideoStateType priorVideoState,
         VideoStateType nextVideoState, AudioDeviceType &initDeviceType, AudioDevice &device);
-    void UpdateDeviceTypeForVideoCall();
+    void UpdateDeviceTypeForVideoOrSatelliteCall();
     void UpdateDeviceTypeForCrs();
     void MuteNetWorkRingTone();
     bool IsVideoCall(VideoStateType videoState);
     bool IsSoundPlaying();
     bool StopSoundtone();
     bool PlaySoundtone();
+    bool IsSatelliteExists();
 
 private:
     RingState ringState_ = RingState::STOPPED;
@@ -100,6 +101,8 @@ private:
     void UpdateForegroundLiveCall();
     bool IsBtOrWireHeadPlugin();
     void ProcessAudioWhenCallActive(sptr<CallBase> &callObjectPtr);
+    int32_t HandleDistributeAudioDevice(const AudioDevice &device);
+    int32_t HandleVoipCallAudioDevice(sptr<CallBase> &liveCall, const AudioDevice &device);
     ToneState toneState_ = ToneState::STOPPED;
     SoundState soundState_ = SoundState::STOPPED;
     bool isLocalRingbackNeeded_;

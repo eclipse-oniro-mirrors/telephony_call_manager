@@ -17,8 +17,9 @@
 
 #include "call_control_manager.h"
 #include "call_state_processor.h"
-#include "telephony_log_wrapper.h"
+#include "call_dialog.h"
 #include "distributed_call_manager.h"
+#include "telephony_log_wrapper.h"
 #include "audio_system_manager.h"
 #include "audio_routing_manager.h"
 #include "audio_device_info.h"
@@ -169,14 +170,15 @@ void AudioControlManager::CheckTypeAndSetAudioDevice(sptr<CallBase> &callObjectP
     }
 }
 
-void AudioControlManager::UpdateDeviceTypeForVideoCall()
+void AudioControlManager::UpdateDeviceTypeForVideoOrSatelliteCall()
 {
     sptr<CallBase> foregroundCall = CallObjectManager::GetForegroundLiveCall();
     if (foregroundCall == nullptr) {
         TELEPHONY_LOGE("call object nullptr");
         return;
     }
-    if (foregroundCall->GetCallType() != CallType::TYPE_IMS) {
+    if (foregroundCall->GetCallType() != CallType::TYPE_IMS ||
+        foregroundCall->GetCallType() != CallType::TYPE_SATELLITE) {
         TELEPHONY_LOGE("other call not need control audio");
         return;
     }
@@ -185,7 +187,8 @@ void AudioControlManager::UpdateDeviceTypeForVideoCall()
         .address = { 0 },
     };
     AudioDeviceType initDeviceType = GetInitAudioDeviceType();
-    if (IsVideoCall(foregroundCall->GetVideoStateType())) {
+    if (IsVideoCall(foregroundCall->GetVideoStateType()) ||
+        foregroundCall->GetCallType() == CallType::TYPE_SATELLITE) {
         if (initDeviceType == AudioDeviceType::DEVICE_WIRED_HEADSET ||
             initDeviceType == AudioDeviceType::DEVICE_BLUETOOTH_SCO) {
             device.deviceType = initDeviceType;
@@ -340,7 +343,7 @@ void AudioControlManager::ProcessAudioWhenCallActive(sptr<CallBase> &callObjectP
         }
         StopSoundtone();
         PlaySoundtone();
-        UpdateDeviceTypeForVideoCall();
+        UpdateDeviceTypeForVideoOrSatelliteCall();
     }
 }
 
@@ -382,15 +385,13 @@ int32_t AudioControlManager::SetAudioDevice(const AudioDevice &device)
     TELEPHONY_LOGI("set audio device, type: %{public}d", static_cast<int32_t>(device.deviceType));
     sptr<CallBase> liveCall = CallObjectManager::GetForegroundLiveCall();
     if (liveCall != nullptr && liveCall->GetCallType() == CallType::TYPE_VOIP) {
-        CallAttributeInfo info;
-        liveCall->GetCallAttributeInfo(info);
-        std::string voipCallId = info.voipCallInfo.voipCallId;
-        CallAudioEvent callAudioEvent = device.deviceType == AudioDeviceType::DEVICE_SPEAKER ?
-            CallAudioEvent::AUDIO_EVENT_SPEAKER_ON : CallAudioEvent::AUDIO_EVENT_SPEAKER_OFF;
-        DelayedSingleton<VoipCallConnection>::GetInstance()->SendCallUiEvent(voipCallId, callAudioEvent);
-        return TELEPHONY_SUCCESS;
+        return HandleVoipCallAudioDevice(liveCall, device);
     }
     AudioDeviceType audioDeviceType = AudioDeviceType::DEVICE_UNKNOWN;
+    if (CallObjectManager::HasSatelliteCallExist() && device.deviceType == AudioDeviceType::DEVICE_EARPIECE) {
+        DelayedSingleton<CallDialog>::GetInstance()->DialogConnectExtension("SATELLITE_CALL_NOT_SUPPORT_EARPIECE");
+        return CALL_ERR_AUDIO_SET_AUDIO_DEVICE_FAILED;
+    }
     switch (device.deviceType) {
         case AudioDeviceType::DEVICE_SPEAKER:
         case AudioDeviceType::DEVICE_EARPIECE:
@@ -400,15 +401,7 @@ int32_t AudioControlManager::SetAudioDevice(const AudioDevice &device)
         case AudioDeviceType::DEVICE_DISTRIBUTED_AUTOMOTIVE:
         case AudioDeviceType::DEVICE_DISTRIBUTED_PHONE:
         case AudioDeviceType::DEVICE_DISTRIBUTED_PAD:
-            if (!DelayedSingleton<DistributedCallManager>::GetInstance()->IsDCallDeviceSwitchedOn()) {
-                TELEPHONY_LOGI("set audio device, address: %{public}s", device.address);
-                if (DelayedSingleton<DistributedCallManager>::GetInstance()->SwitchOnDCallDeviceSync(device)) {
-                    DelayedSingleton<AudioDeviceManager>::GetInstance()->SetCurrentAudioDevice(device.deviceType);
-                    return TELEPHONY_SUCCESS;
-                }
-                return CALL_ERR_AUDIO_SET_AUDIO_DEVICE_FAILED;
-            }
-            return TELEPHONY_SUCCESS;
+            return HandleDistributeAudioDevice(device);
         case AudioDeviceType::DEVICE_BLUETOOTH_SCO: {
             AudioSystemManager* audioSystemManager = AudioSystemManager::GetInstance();
             int32_t ret = audioSystemManager->SetCallDeviceActive(ActiveDeviceType::BLUETOOTH_SCO,
@@ -432,6 +425,32 @@ int32_t AudioControlManager::SetAudioDevice(const AudioDevice &device)
         }
     }
     return CALL_ERR_AUDIO_SET_AUDIO_DEVICE_FAILED;
+}
+
+int32_t AudioControlManager::HandleDistributeAudioDevice(const AudioDevice &device)
+{
+    if (!DelayedSingleton<DistributedCallManager>::GetInstance()->IsDCallDeviceSwitchedOn()) {
+        TELEPHONY_LOGI("set audio device, address: %{public}s", device.address);
+        if (DelayedSingleton<DistributedCallManager>::GetInstance()->SwitchOnDCallDeviceSync(device)) {
+            DelayedSingleton<AudioDeviceManager>::GetInstance()->SetCurrentAudioDevice(device.deviceType);
+            return TELEPHONY_SUCCESS;
+        }
+        return CALL_ERR_AUDIO_SET_AUDIO_DEVICE_FAILED;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t AudioControlManager::HandleVoipCallAudioDevice(sptr<CallBase> &liveCall, const AudioDevice &device)
+{
+    if (liveCall != nullptr) {
+        CallAttributeInfo info;
+        liveCall->GetCallAttributeInfo(info);
+        std::string voipCallId = info.voipCallInfo.voipCallId;
+        CallAudioEvent callAudioEvent = device.deviceType == AudioDeviceType::DEVICE_SPEAKER ?
+            CallAudioEvent::AUDIO_EVENT_SPEAKER_ON : CallAudioEvent::AUDIO_EVENT_SPEAKER_OFF;
+        DelayedSingleton<VoipCallConnection>::GetInstance()->SendCallUiEvent(voipCallId, callAudioEvent);
+    }
+    return TELEPHONY_SUCCESS;
 }
 
 bool AudioControlManager::PlayRingtone()
@@ -556,8 +575,9 @@ AudioDeviceType AudioControlManager::GetInitAudioDeviceType() const
             return AudioDeviceType::DEVICE_WIRED_HEADSET;
         }
         sptr<CallBase> liveCall = CallObjectManager::GetForegroundLiveCall();
-        if (liveCall != nullptr && liveCall->GetVideoStateType() == VideoStateType::TYPE_VIDEO) {
-            TELEPHONY_LOGI("current video call speaker is active");
+        if (liveCall != nullptr && (liveCall->GetVideoStateType() == VideoStateType::TYPE_VIDEO ||
+            liveCall->GetCallType() == CallType::TYPE_SATELLITE)) {
+            TELEPHONY_LOGI("current video or satellite call speaker is active");
             return AudioDeviceType::DEVICE_SPEAKER;
         }
         if (AudioDeviceManager::IsEarpieceAvailable()) {
@@ -679,6 +699,16 @@ bool AudioControlManager::IsEmergencyCallExists() const
 {
     for (auto call : totalCalls_) {
         if (call->GetEmergencyState()) {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool AudioControlManager::IsSatelliteExists()
+{
+    for (auto call : totalCalls_) {
+        if (call->GetCallType() == CallType::TYPE_SATELLITE) {
             return true;
         }
     }

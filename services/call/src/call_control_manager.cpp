@@ -23,6 +23,7 @@
 #include "bluetooth_call_manager.h"
 #include "call_ability_report_proxy.h"
 #include "call_connect_ability.h"
+#include "call_dialog.h"
 #include "call_manager_errors.h"
 #include "call_manager_hisysevent.h"
 #include "call_number_utils.h"
@@ -34,6 +35,7 @@
 #include "iservice_registry.h"
 #include "reject_call_sms.h"
 #include "report_call_info_handler.h"
+#include "satellite_call_control.h"
 #include "telephony_log_wrapper.h"
 #include "video_control_manager.h"
 #include "audio_device_manager.h"
@@ -118,14 +120,18 @@ int32_t CallControlManager::DialCall(std::u16string &number, AppExecFwk::PacMap 
     if (isEcc) {
         extras.PutIntValue("dialScene", (int32_t)DialScene::CALL_EMERGENCY);
     }
-    ret = DialPolicy(number, extras, isEcc);
-    if (ret != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("dial policy result:%{public}d", ret);
-        return ret;
+    ret = DelayedSingleton<SatelliteCallControl>::GetInstance()->IsSatelliteSwitchEnable();
+    if (ret == TELEPHONY_SUCCESS) {
+        ret = DelayedSingleton<SatelliteCallControl>::GetInstance()->IsAllowedSatelliteDialCall();
+        if (ret != TELEPHONY_SUCCESS) {
+            return ret;
+        } else {
+            extras.PutIntValue("callType", (int32_t)CallType::TYPE_SATELLITE);
+        }
     }
-    ret = CanDialMulityCall(extras);
+    ret = CanDial(number, extras, isEcc);
     if (ret != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("dial policy result:%{public}d", ret);
+        TELEPHONY_LOGE("can dial policy result:%{public}d", ret);
         return ret;
     }
     if (!IsSupportVideoCall(extras)) {
@@ -144,6 +150,21 @@ int32_t CallControlManager::DialCall(std::u16string &number, AppExecFwk::PacMap 
     ret = CallRequestHandlerPtr_->DialCall();
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("DialCall failed!");
+        return ret;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallControlManager::CanDial(std::u16string &number, AppExecFwk::PacMap &extras, bool isEcc)
+{
+    int32_t ret = DialPolicy(number, extras, isEcc);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("dial policy result:%{public}d", ret);
+        return ret;
+    }
+    ret = CanDialMulityCall(extras);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("dial policy result:%{public}d", ret);
         return ret;
     }
     return TELEPHONY_SUCCESS;
@@ -183,12 +204,7 @@ int32_t CallControlManager::AnswerCall(int32_t callId, int32_t videoState)
         TELEPHONY_LOGE("call is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    if (call->GetCallType() == CallType::TYPE_IMS && videoState != static_cast<int32_t>(call->GetVideoStateType())) {
-        call->SetVideoStateType(static_cast<VideoStateType>(videoState));
-        sptr<IMSCall> imsCall = reinterpret_cast<IMSCall *>(call.GetRefPtr());
-        imsCall->InitVideoCall();
-        TELEPHONY_LOGI("videoState has changed");
-    }
+    AnswerHandlerForSatelliteOrVideoCall(call, videoState);
     TELEPHONY_LOGI("report answered state");
     NotifyCallStateUpdated(call, TelCallState::CALL_STATUS_INCOMING, TelCallState::CALL_STATUS_ANSWERED);
     CarrierAndVoipConflictProcess(callId, TelCallState::CALL_STATUS_ANSWERED);
@@ -216,6 +232,27 @@ int32_t CallControlManager::AnswerCall(int32_t callId, int32_t videoState)
         return ret;
     }
     return TELEPHONY_SUCCESS;
+}
+
+void CallControlManager::AnswerHandlerForSatelliteOrVideoCall(sptr<CallBase> &call, int32_t videoState)
+{
+    if (call == nullptr) {
+        TELEPHONY_LOGE("call is nullptr");
+        return;
+    }
+    if (call->GetCallType() == CallType::TYPE_IMS && videoState != static_cast<int32_t>(call->GetVideoStateType())) {
+        call->SetVideoStateType(static_cast<VideoStateType>(videoState));
+        sptr<IMSCall> imsCall = reinterpret_cast<IMSCall *>(call.GetRefPtr());
+        imsCall->InitVideoCall();
+        TELEPHONY_LOGI("videoState has changed");
+    }
+    if (call->GetCallType() == CallType::TYPE_SATELLITE) {
+        sptr<CallBase> foregroundSatelliteCall =
+            CallObjectManager::GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_ACTIVE);
+        if (foregroundSatelliteCall != nullptr) {
+            CallRequestHandlerPtr_->HangUpCall(foregroundSatelliteCall->GetCallID());
+        }
+    }
 }
 
 int32_t CallControlManager::CarrierAndVoipConflictProcess(int32_t callId, TelCallState callState)
@@ -1343,6 +1380,7 @@ int32_t CallControlManager::BroadcastSubscriber()
 {
     EventFwk::MatchingSkills matchingSkills;
     matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_SIM_STATE_CHANGED);
+    matchingSkills.AddEvent("usual.event.thermal.satcomm.HIGH_TEMP_LEVEL");
     EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
     subscriberInfo.SetThreadMode(EventFwk::CommonEventSubscribeInfo::COMMON);
     std::shared_ptr<CallBroadcastSubscriber> subscriberPtr = std::make_shared<CallBroadcastSubscriber>(subscriberInfo);

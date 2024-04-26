@@ -129,6 +129,8 @@ private:
     int32_t BroadcastSubscriber();
     void PackageDialInformation(AppExecFwk::PacMap &extras, std::string accountNumber, bool isEcc);
     static void handler(int args);
+    int32_t CanDial(std::u16string &number, AppExecFwk::PacMap &extras, bool isEcc);
+    void AnswerHandlerForSatelliteOrVideoCall(sptr<CallBase> &call, int32_t videoState);
 
 private:
     class SystemAbilityListener : public SystemAbilityStatusChangeStub {

@@ -19,18 +19,21 @@
 #include "datashare_helper.h"
 #include "datashare_predicates.h"
 #include "system_ability_definition.h"
+#include "singleton.h"
 #include "uri.h"
 
 namespace OHOS {
 namespace Telephony {
-class SettingsDataShareHelper {
+class SettingsDataShareHelper : public DelayedSingleton<SettingsDataShareHelper> {
+    DECLARE_DELAYED_SINGLETON(SettingsDataShareHelper);
+
 public:
-    SettingsDataShareHelper();
+    static const std::string QUERY_SATELLITE_MODE_KEY;
+    static const std::string QUERY_SATELLITE_CONNECTED_KEY;
+    static const std::string SETTINGS_DATASHARE_URI;
     ErrCode Query(Uri& uri, const std::string& key, std::string& values);
 private:
     std::shared_ptr<DataShare::DataShareHelper> CreateDataShareHelper(int systemAbilityId);
-private:
-    std::shared_ptr<DataShare::DataShareHelper> datashareHelper_ = nullptr;
 };
 } // namespace Telephony
 } // namespace OHOS

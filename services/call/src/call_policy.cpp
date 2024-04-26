@@ -68,12 +68,12 @@ int32_t CallPolicy::DialPolicy(std::u16string &number, AppExecFwk::PacMap &extra
         return CALL_ERR_CALL_COUNTS_EXCEED_LIMIT;
     }
     int32_t slotId = extras.GetIntValue("accountId");
-    return HasNormalCall(isEcc, slotId);
+    return HasNormalCall(isEcc, slotId, callType);
 }
 
-int32_t CallPolicy::HasNormalCall(bool isEcc, int32_t slotId)
+int32_t CallPolicy::HasNormalCall(bool isEcc, int32_t slotId, CallType callType)
 {
-    if (isEcc) {
+    if (isEcc || callType == CallType::TYPE_SATELLITE) {
         return TELEPHONY_SUCCESS;
     }
     bool hasSimCard = false;

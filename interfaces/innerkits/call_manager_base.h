@@ -701,6 +701,24 @@ enum class CallResultReportId {
     CLOSE_UNFINISHED_USSD_REPORT_ID,
     SET_CALL_RESTRICTION_PWD_REPORT_ID,
 };
+
+/**
+ * @brief Indicates the temperature level for satellite call.
+ */
+enum class SatCommTempLevel {
+    /*
+     *  Indicates the low temperature level.(< 51 degressCelsius)
+     */
+    TEMP_LEVEL_LOW = 0,
+    /*
+     *  Indicates the middle temperature level.(>= 51 degressCelsius  && < 53 degressCelsius)
+     */
+    TEMP_LEVEL_MIDDLE,
+    /*
+     *  Indicates the high temperature level.(>= 53 degressCelsius)
+     */
+    TEMP_LEVEL_HIGH,
+};
 } // namespace Telephony
 } // namespace OHOS
 #endif // CALL_MANAGER_BASE_H

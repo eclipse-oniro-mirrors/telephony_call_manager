@@ -34,12 +34,14 @@
 #include "ott_call.h"
 #include "report_call_info_handler.h"
 #include "satellite_call.h"
+#include "satellite_call_control.h"
 #include "settings_datashare_helper.h"
 #include "telephony_log_wrapper.h"
 #include "call_number_utils.h"
 #include "voip_call.h"
 #include "uri.h"
 #include "ffrt.h"
+#include "parameters.h"
 #include "spam_call_adapter.h"
 
 namespace OHOS {
@@ -1003,18 +1005,20 @@ int32_t CallStatusManager::UpdateCallState(sptr<CallBase> &call, TelCallState ne
     TELEPHONY_LOGI(
         "callIndex:%{public}d, callId:%{public}d, priorState:%{public}d, nextState:%{public}d, videoState:%{public}d",
         call->GetCallIndex(), call->GetCallID(), priorState, nextState, videoState);
+    if (call->GetCallType() == CallType::TYPE_SATELLITE) {
+        DelayedSingleton<SatelliteCallControl>::GetInstance()->
+            HandleSatelliteCallStateUpdate(call, priorState, nextState);
+    }
     if (priorState == TelCallState::CALL_STATUS_INCOMING && nextState == TelCallState::CALL_STATUS_ACTIVE) {
         DelayedSingleton<CallManagerHisysevent>::GetInstance()->JudgingAnswerTimeOut(
             call->GetSlotId(), call->GetCallID(), static_cast<int32_t>(call->GetVideoStateType()));
     }
-    // need DTMF judge
     int32_t ret = call->SetTelCallState(nextState);
     UpdateOneCallObjectByCallId(call->GetCallID(), nextState);
     if (ret != TELEPHONY_SUCCESS && ret != CALL_ERR_NOT_NEW_STATE) {
         TELEPHONY_LOGE("SetTelCallState failed");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    // notify state changed
     if (!DelayedSingleton<CallControlManager>::GetInstance()->NotifyCallStateUpdated(call, priorState, nextState)) {
         TELEPHONY_LOGE(
             "NotifyCallStateUpdated failed! priorState:%{public}d,nextState:%{public}d", priorState, nextState);
@@ -1025,11 +1029,22 @@ int32_t CallStatusManager::UpdateCallState(sptr<CallBase> &call, TelCallState ne
         }
         return CALL_ERR_PHONE_CALLSTATE_NOTIFY_FAILED;
     }
+    SetVideoCallState(call, nextState);
+    return TELEPHONY_SUCCESS;
+}
+
+void CallStatusManager::SetVideoCallState(sptr<CallBase> &call, TelCallState nextState)
+{
+    if (call == nullptr) {
+        TELEPHONY_LOGE("Call is NULL");
+        return;
+    }
     int slotId = call->GetSlotId();
     bool isSlotIdValid = false;
     if (slotId < SLOT_NUM && slotId >= 0) {
         isSlotIdValid = true;
     }
+    VideoStateType videoState = call->GetVideoStateType();
     TELEPHONY_LOGI("nextVideoState:%{public}d, priorVideoState:%{public}d, isSlotIdValid:%{public}d", videoState,
         priorVideoState_[slotId], isSlotIdValid);
     if (isSlotIdValid && (priorVideoState_[slotId] != videoState)) {
@@ -1040,7 +1055,6 @@ int32_t CallStatusManager::UpdateCallState(sptr<CallBase> &call, TelCallState ne
     if (isSlotIdValid && (nextState == TelCallState::CALL_STATUS_DISCONNECTED)) {
         priorVideoState_[slotId] = VideoStateType::TYPE_VOICE;
     }
-    return TELEPHONY_SUCCESS;
 }
 
 sptr<CallBase> CallStatusManager::RefreshCallIfNecessary(const sptr<CallBase> &call, const CallDetailInfo &info)
@@ -1247,7 +1261,7 @@ sptr<CallBase> CallStatusManager::CreateNewCallByCallType(
 
 bool CallStatusManager::ShouldRejectIncomingCall()
 {
-    auto datashareHelper = std::make_shared<SettingsDataShareHelper>();
+    auto datashareHelper = SettingsDataShareHelper::GetInstance();
     std::string device_provisioned {"0"};
     OHOS::Uri uri(
         "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true&key=device_provisioned");
@@ -1332,7 +1346,7 @@ bool CallStatusManager::IsRingOnceCall(const sptr<CallBase> &call, const CallDet
         std::string(contactInfo.name) != "") {
         return false;
     }
-    auto datashareHelper = std::make_shared<SettingsDataShareHelper>();
+    auto datashareHelper = SettingsDataShareHelper::GetInstance();
     std::string is_check_ring_once {"0"};
     std::string key = "spamshield_sim" + std::to_string(info.accountId + 1) + "_phone_switch_ring_once";
     OHOS::Uri uri(
