@@ -36,6 +36,7 @@ ohos_fuzztest("CallNotificationFuzzTest") {
     "${CALL_MANAGER_PATH}/services/call_report/include",
     "${CALL_MANAGER_PATH}/services/video/include",
     "${CALL_MANAGER_PATH}/services/call/call_state_observer/include",
+    "${CALL_MANAGER_PATH}/services/spam_call/include",
   ]
 
   deps = [

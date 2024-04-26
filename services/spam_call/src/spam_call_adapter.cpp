@@ -37,7 +37,8 @@ constexpr char MARK_SOURCE[] = "markSource";
 constexpr char MARK_CONTENT[] = "markContent";
 constexpr char IS_CLOUD[] = "isCloud";
 
-SpamCallAdapter::SpamCallAdapter() {
+SpamCallAdapter::SpamCallAdapter()
+{
     timeWaitHelper_ = std::make_shared<TimeWaitHelper>(WAIT_TIME_TWO_SECOND);
 }
 

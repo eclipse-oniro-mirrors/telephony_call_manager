@@ -1298,13 +1298,11 @@ bool CallStatusManager::ShouldBlockIncomingCall(const sptr<CallBase> &call, cons
     }
     spamCallAdapterPtr_->DetectSpamCall(std::string(info.phoneNum), info.accountId);
     if (spamCallAdapterPtr_->WaitForDetectResult()) {
-        //没有超时，判断检测结果
         TELEPHONY_LOGI("DetectSpamCall no time out");
         int32_t errCode = 0;
         std::string result = "";
         spamCallAdapterPtr_->GetDetectResult(errCode, result);
         if (errCode == 0) {
-            //返回检测成功
             NumberMarkInfo numberMarkInfo = {
                 .markType = MarkType::MARK_TYPE_NONE,
                 .markContent = "",
@@ -1326,7 +1324,8 @@ bool CallStatusManager::ShouldBlockIncomingCall(const sptr<CallBase> &call, cons
     return false;
 }
 
-bool CallStatusManager::IsRingOnceCall(const sptr<CallBase> &call, const CallDetailInfo &info) {
+bool CallStatusManager::IsRingOnceCall(const sptr<CallBase> &call, const CallDetailInfo &info)
+{
     NumberMarkInfo numberMarkInfo = call->GetNumberMarkInfo();
     ContactInfo contactInfo = call->GetCallerInfo();
     if (numberMarkInfo.markType == MarkType::MARK_TYPE_YELLOW_PAGE ||

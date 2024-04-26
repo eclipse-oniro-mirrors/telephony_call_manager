@@ -15,8 +15,8 @@
 
 #include "call_manager_info.h"
 #include <memory>
-#define private public
-#define protected public
+#define PRIVATE public
+#define PROTECTED public
 #include "gtest/gtest.h"
 #include "spam_call_adapter.h"
 
