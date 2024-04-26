@@ -27,6 +27,7 @@ ohos_unittest("tel_call_manager_gtest") {
     "src/call_manager_gtest.cpp",
     "src/zero_branch_test.cpp",
     "src/zero_branch_test_call_state.cpp",
+    "src/zero_branch_test_spam_call.cpp",
   ]
 
   include_dirs = [
@@ -42,6 +43,7 @@ ohos_unittest("tel_call_manager_gtest") {
     "${CALL_MANAGER_PATH}/services/call/include",
     "${CALL_MANAGER_PATH}/services/distributed_call/include",
     "${CALL_MANAGER_PATH}/services/distributed_call/include/dcall",
+    "${CALL_MANAGER_PATH}/services/spam_call/include",
     "${CALL_MANAGER_PATH}/services/telephony_interaction/include",
     "${CALL_MANAGER_PATH}/services/video/include",
     "${CALL_MANAGER_PATH}/test/unittest/call_manager_gtest/include",
@@ -54,6 +56,7 @@ ohos_unittest("tel_call_manager_gtest") {
   external_deps = [
     "ability_base:want",
     "ability_runtime:ability_manager",
+    "ability_runtime:abilitykit_native",
     "ability_runtime:app_manager",
     "ability_runtime:dataobs_manager",
     "access_token:libaccesstoken_sdk",
@@ -81,6 +84,7 @@ ohos_unittest("tel_call_manager_gtest") {
   deps = [
     "${CALL_MANAGER_PATH}:tel_call_manager",
     "${CALL_MANAGER_PATH}/frameworks/native:tel_call_manager_api",
+    "//third_party/cJSON:cjson",
   ]
 
   defines = [

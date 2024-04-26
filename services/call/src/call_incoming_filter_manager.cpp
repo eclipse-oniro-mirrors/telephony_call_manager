@@ -55,24 +55,6 @@ int32_t CallIncomingFilterManager::DoIncomingFilter(const CallDetailInfo &info)
         TELEPHONY_LOGI("incoming phoneNumber is ecc.");
         return TELEPHONY_SUCCESS;
     }
-    std::shared_ptr<CallDataBaseHelper> callDataPtr = DelayedSingleton<CallDataBaseHelper>::GetInstance();
-    if (callDataPtr == nullptr) {
-        TELEPHONY_LOGE("callDataPtr is nullptr!");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-    bool isBlockNumber = false;
-    if (callDataPtr->QueryIsBlockPhoneNumber(info.phoneNum, isBlockNumber) != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("QueryIsBlockPhoneNumber fail.");
-    }
-    if (isBlockNumber) {
-        CellularCallInfo callInfo;
-        if (PackCellularCallInfo(callInfo, info) != TELEPHONY_SUCCESS) {
-            TELEPHONY_LOGW("PackCellularCallInfo failed!");
-        }
-        DelayedSingleton<CellularCallConnection>::GetInstance()->HangUp(callInfo, CallSupplementType::TYPE_DEFAULT);
-        TELEPHONY_LOGI("start to Reject");
-        return TELEPHONY_ERR_FAIL;
-    }
     return TELEPHONY_SUCCESS;
 }
 } // namespace Telephony

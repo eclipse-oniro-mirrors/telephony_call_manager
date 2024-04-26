@@ -40,6 +40,7 @@
 #include "voip_call.h"
 #include "uri.h"
 #include "ffrt.h"
+#include "spam_call_adapter.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -371,7 +372,13 @@ int32_t CallStatusManager::IncomingHandle(const CallDetailInfo &info)
     int32_t state;
     DelayedSingleton<CallControlManager>::GetInstance()->GetVoIPCallState(state);
     if (ShouldRejectIncomingCall() || state == (int32_t)CallStateToApp::CALL_STATE_RINGING) {
-        return HandleRejectCall(call);
+        return HandleRejectCall(call, false);
+    }
+    if (info.callType != CallType::TYPE_VOIP && ShouldBlockIncomingCall(call, info)) {
+        return HandleRejectCall(call, true);
+    }
+    if (info.callType != CallType::TYPE_VOIP && IsRingOnceCall(call, info)) {
+        return HandleRingOnceCall(call);
     }
     AddOneCallObject(call);
     DelayedSingleton<CallControlManager>::GetInstance()->NotifyNewCallCreated(call);
@@ -415,7 +422,7 @@ void CallStatusManager::SetContactInfo(sptr<CallBase> &call, std::string phoneNu
     call->SetCallerInfo(contactInfo);
 }
 
-int32_t CallStatusManager::HandleRejectCall(sptr<CallBase> &call)
+int32_t CallStatusManager::HandleRejectCall(sptr<CallBase> &call, bool isBlock)
 {
     if (call == nullptr) {
         TELEPHONY_LOGE("call is nullptr!");
@@ -430,6 +437,9 @@ int32_t CallStatusManager::HandleRejectCall(sptr<CallBase> &call)
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("RejectCall failed!");
         return ret;
+    }
+    if (isBlock) {
+        return DelayedSingleton<CallControlManager>::GetInstance()->AddBlockLogAndNotification(call);
     }
     return DelayedSingleton<CallControlManager>::GetInstance()->AddCallLogAndNotification(call);
 }
@@ -765,6 +775,11 @@ int32_t CallStatusManager::DisconnectedVoipCallHandle(const CallDetailInfo &info
 int32_t CallStatusManager::DisconnectedHandle(const CallDetailInfo &info)
 {
     TELEPHONY_LOGI("handle disconnected state");
+    if (timeWaitHelper_ !=  nullptr) {
+        TELEPHONY_LOGI("ringtone once");
+        timeWaitHelper_->NotifyAll();
+        timeWaitHelper_ = nullptr;
+    }
     std::string tmpStr(info.phoneNum);
     sptr<CallBase> call = GetOneCallObjectByIndexAndSlotId(info.index, info.accountId);
     if (call == nullptr) {
@@ -1168,6 +1183,9 @@ sptr<CallBase> CallStatusManager::CreateNewCall(const CallDetailInfo &info, Call
     }
     callPtr->SetOriginalCallType(info.originalCallType);
     TELEPHONY_LOGD("originalCallType:%{public}d", info.originalCallType);
+    if (info.callType == CallType::TYPE_VOIP) {
+        return callPtr;
+    }
     if (info.state == TelCallState::CALL_STATUS_INCOMING || info.state == TelCallState::CALL_STATUS_WAITING ||
         (info.state == TelCallState::CALL_STATUS_DIALING && info.index == 0)) {
         TELEPHONY_LOGI("NumberLocationUpdate start");
@@ -1262,6 +1280,90 @@ bool CallStatusManager::ShouldRejectIncomingCall()
         return true;
     }
     return false;
+}
+
+bool CallStatusManager::ShouldBlockIncomingCall(const sptr<CallBase> &call, const CallDetailInfo &info)
+{
+    bool isEcc = false;
+    DelayedSingleton<CellularCallConnection>::GetInstance()->IsEmergencyPhoneNumber(
+        info.phoneNum, info.accountId, isEcc);
+    if (isEcc) {
+        TELEPHONY_LOGI("incoming phoneNumber is ecc.");
+        return false;
+    }
+    std::unique_ptr<SpamCallAdapter> spamCallAdapterPtr_ = std::make_unique<SpamCallAdapter>();
+    if (spamCallAdapterPtr_ == nullptr) {
+        TELEPHONY_LOGE("create SpamCallAdapter object failed!");
+        return false;
+    }
+    spamCallAdapterPtr_->DetectSpamCall(std::string(info.phoneNum), info.accountId);
+    if (spamCallAdapterPtr_->WaitForDetectResult()) {
+        TELEPHONY_LOGI("DetectSpamCall no time out");
+        int32_t errCode = 0;
+        std::string result = "";
+        spamCallAdapterPtr_->GetDetectResult(errCode, result);
+        if (errCode == 0) {
+            NumberMarkInfo numberMarkInfo = {
+                .markType = MarkType::MARK_TYPE_NONE,
+                .markContent = "",
+                .markCount = 0,
+                .markSource = "",
+                .isCloud = false,
+            };
+            bool isBlock = true;
+            int32_t blockReason;
+            spamCallAdapterPtr_->ParseDetectResult(result, isBlock, numberMarkInfo, blockReason);
+            call->SetNumberMarkInfo(numberMarkInfo);
+            call->SetBlockReason(blockReason);
+            TELEPHONY_LOGI("isBlock: %{public}d", isBlock);
+            if (isBlock) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+bool CallStatusManager::IsRingOnceCall(const sptr<CallBase> &call, const CallDetailInfo &info)
+{
+    NumberMarkInfo numberMarkInfo = call->GetNumberMarkInfo();
+    ContactInfo contactInfo = call->GetCallerInfo();
+    if (numberMarkInfo.markType == MarkType::MARK_TYPE_YELLOW_PAGE ||
+        std::string(contactInfo.name) != "") {
+        return false;
+    }
+    auto datashareHelper = std::make_shared<SettingsDataShareHelper>();
+    std::string is_check_ring_once {"0"};
+    std::string key = "spamshield_sim" + std::to_string(info.accountId + 1) + "_phone_switch_ring_once";
+    OHOS::Uri uri(
+        "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true&key=" + key);
+    int32_t ret = datashareHelper->Query(uri, key, is_check_ring_once);
+    if (ret != TELEPHONY_SUCCESS || is_check_ring_once == "0") {
+        TELEPHONY_LOGI("is_check_ring_once = 0, not need check ring once call");
+        return false;
+    }
+    if (timeWaitHelper_ == nullptr) {
+        timeWaitHelper_ = std::make_unique<TimeWaitHelper>(WAIT_TIME_THREE_SECOND);
+    }
+    if (!timeWaitHelper_->WaitForResult()) {
+        TELEPHONY_LOGI("is not ring once");
+        return false;
+    }
+    return true;
+}
+
+int32_t CallStatusManager::HandleRingOnceCall(sptr<CallBase> &call)
+{
+    if (call == nullptr) {
+        TELEPHONY_LOGE("call is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    int32_t ret = call->SetTelCallState(TelCallState::CALL_STATUS_INCOMING);
+    if (ret != TELEPHONY_SUCCESS && ret != CALL_ERR_NOT_NEW_STATE) {
+        TELEPHONY_LOGE("Set CallState failed!");
+        return ret;
+    }
+    return DelayedSingleton<CallControlManager>::GetInstance()->AddCallLogAndNotification(call);
 }
 
 void CallStatusManager::PackParaInfo(

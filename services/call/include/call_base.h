@@ -26,6 +26,7 @@
 
 #include "common_type.h"
 #include "conference_base.h"
+#include "call_manager_info.h"
 
 /**
  * @ClassName: CallBase
@@ -85,6 +86,9 @@ public:
     uint64_t GetPolicyFlag();
     ContactInfo GetCallerInfo();
     void SetCallerInfo(const ContactInfo &contactInfo);
+    NumberMarkInfo GetNumberMarkInfo();
+    void SetNumberMarkInfo(const NumberMarkInfo &numberMarkInfo);
+    void SetBlockReason(const int32_t &blockReason);
     void SetCallRunningState(CallRunningState callRunningState);
     void SetStartTime(int64_t startTime);
     void SetCallBeginTime(time_t callBeginTime);
@@ -167,6 +171,8 @@ private:
     bool isMuted_;
     std::mutex mutex_;
     std::string numberLocation_;
+    NumberMarkInfo numberMarkInfo_;
+    int32_t blockReason_;
 };
 } // namespace Telephony
 } // namespace OHOS

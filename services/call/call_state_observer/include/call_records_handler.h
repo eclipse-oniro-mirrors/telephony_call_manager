@@ -38,6 +38,8 @@ public:
 private:
     void QueryCallerInfo(ContactInfo &contactInfo, std::string phoneNumber);
     std::string CheckNumberLocationInfo(const CallRecordInfo &info);
+    void MakeCallLogInsertBucket(DataShare::DataShareValuesBucket &bucket,
+        const CallRecordInfo &info, std::string displayName, std::string numberLocation);
 
 private:
     std::shared_ptr<CallDataBaseHelper> callDataPtr_;

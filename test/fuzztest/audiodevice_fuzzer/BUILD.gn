@@ -43,6 +43,7 @@ ohos_fuzztest("AudioDeviceFuzzTest") {
     "${CALL_MANAGER_PATH}/services/call/call_state_observer/include",
     "${CALL_MANAGER_PATH}/frameworks/native/include",
     "${CALL_MANAGER_PATH}/test/fuzztest/common_fuzzer",
+    "${CALL_MANAGER_PATH}/services/spam_call/include",
   ]
 
   deps = [

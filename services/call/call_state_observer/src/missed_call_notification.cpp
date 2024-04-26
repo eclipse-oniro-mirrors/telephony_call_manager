@@ -87,6 +87,26 @@ void MissedCallNotification::PublishMissedCallEvent(sptr<CallBase> &callObjectPt
     TELEPHONY_LOGI("publish missed call event with number result : %{public}d", resultWithNumber);
 }
 
+void MissedCallNotification::PublishBlockedCallEvent(sptr<CallBase> &callObjectPtr)
+{
+    AAFwk::Want want;
+    want.SetParam("callId", callObjectPtr->GetCallID());
+    want.SetParam("notificationId", INCOMING_CALL_MISSED_ID);
+    want.SetParam("phoneNumber", callObjectPtr->GetAccountNumber());
+    want.SetParam("isBlocked", true);
+    want.SetAction(EventFwk::CommonEventSupport::COMMON_EVENT_INCOMING_CALL_MISSED);
+    EventFwk::CommonEventData data;
+    data.SetWant(want);
+    data.SetCode(INCOMING_CALL_MISSED_CODE);
+    EventFwk::CommonEventPublishInfo publishInfo;
+    publishInfo.SetOrdered(true);
+    std::vector<std::string> callPermissions;
+    callPermissions.emplace_back(Permission::GET_TELEPHONY_STATE);
+    publishInfo.SetSubscriberPermissions(callPermissions);
+    bool result = EventFwk::CommonEventManager::PublishCommonEvent(data, publishInfo, nullptr);
+    TELEPHONY_LOGI("publish blocked call event result : %{public}d", result);
+}
+
 void MissedCallNotification::PublishMissedCallNotification(sptr<CallBase> &callObjectPtr)
 {
     std::shared_ptr<Notification::NotificationNormalContent> normalContent =

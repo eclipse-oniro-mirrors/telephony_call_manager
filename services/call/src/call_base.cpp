@@ -26,6 +26,7 @@
 #include "telephony_log_wrapper.h"
 #include "voip_call.h"
 #include "voip_call_connection.h"
+#include "call_manager_info.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -37,9 +38,10 @@ CallBase::CallBase(DialParaInfo &info)
       canUnHoldState_(true), canSwitchCallState_(true), answerVideoState_(0), isSpeakerphoneOn_(false),
       callEndedType_(CallEndedType::UNKNOWN), callBeginTime_(0), callEndTime_(0), ringBeginTime_(0), ringEndTime_(0),
       answerType_(CallAnswerType::CALL_ANSWER_MISSED), accountId_(info.accountId), crsType_(info.crsType),
-      originalCallType_(info.originalCallType), isMuted_(false), numberLocation_("default")
+      originalCallType_(info.originalCallType), isMuted_(false), numberLocation_("default"), blockReason_(0)
 {
     (void)memset_s(&contactInfo_, sizeof(ContactInfo), 0, sizeof(ContactInfo));
+    (void)memset_s(&numberMarkInfo_, sizeof(NumberMarkInfo), 0, sizeof(NumberMarkInfo));
 }
 
 CallBase::CallBase(DialParaInfo &info, AppExecFwk::PacMap &extras)
@@ -50,9 +52,11 @@ CallBase::CallBase(DialParaInfo &info, AppExecFwk::PacMap &extras)
       autoAnswerState_(false), canUnHoldState_(true), canSwitchCallState_(true), answerVideoState_(0),
       isSpeakerphoneOn_(false), callEndedType_(CallEndedType::UNKNOWN), callBeginTime_(0), callEndTime_(0),
       ringBeginTime_(0), ringEndTime_(0), answerType_(CallAnswerType::CALL_ANSWER_MISSED), accountId_(info.accountId),
-      crsType_(info.crsType), originalCallType_(info.originalCallType), isMuted_(false), numberLocation_("default")
+      crsType_(info.crsType), originalCallType_(info.originalCallType), isMuted_(false), numberLocation_("default"),
+      blockReason_(0)
 {
     (void)memset_s(&contactInfo_, sizeof(ContactInfo), 0, sizeof(ContactInfo));
+    (void)memset_s(&numberMarkInfo_, sizeof(NumberMarkInfo), 0, sizeof(NumberMarkInfo));
 }
 
 CallBase::~CallBase() {}
@@ -137,6 +141,14 @@ void CallBase::GetCallAttributeBaseInfo(CallAttributeInfo &info)
         info.originalCallType = originalCallType_;
         (void)memset_s(info.numberLocation, kMaxNumberLen, 0, kMaxNumberLen);
         (void)memcpy_s(info.numberLocation, kMaxNumberLen, numberLocation_.c_str(), numberLocation_.length());
+        info.numberMarkInfo.markType = numberMarkInfo_.markType;
+        std::copy(std::begin(numberMarkInfo_.markContent), std::end(numberMarkInfo_.markContent),
+            std::begin(info.numberMarkInfo.markContent));
+        info.numberMarkInfo.markCount = numberMarkInfo_.markCount;
+        std::copy(std::begin(numberMarkInfo_.markSource), std::end(numberMarkInfo_.markSource),
+            std::begin(info.numberMarkInfo.markSource));
+        info.numberMarkInfo.isCloud = numberMarkInfo_.isCloud;
+        info.blockReason = blockReason_;
         if (bundleName_.length() > static_cast<size_t>(kMaxBundleNameLen)) {
             TELEPHONY_LOGE("Number out of limit!");
             return;
@@ -414,6 +426,24 @@ void CallBase::SetCallerInfo(const ContactInfo &info)
 {
     std::lock_guard<std::mutex> lock(mutex_);
     contactInfo_ = info;
+}
+
+NumberMarkInfo CallBase::GetNumberMarkInfo()
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    return numberMarkInfo_;
+}
+
+void CallBase::SetNumberMarkInfo(const NumberMarkInfo &numberMarkInfo)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    numberMarkInfo_ = numberMarkInfo;
+}
+
+void CallBase::SetBlockReason(const int32_t &blockReason)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    blockReason_ = blockReason;
 }
 
 void CallBase::SetCallRunningState(CallRunningState callRunningState)

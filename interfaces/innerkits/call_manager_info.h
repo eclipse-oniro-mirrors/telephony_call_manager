@@ -88,6 +88,32 @@ struct VoipCallReportInfo {
 };
 
 /**
+ * @brief Indicates detail information of the number mark.
+ */
+struct NumberMarkInfo {
+    /**
+     * Indicates the type of number mark.
+     */
+    MarkType markType = MarkType::MARK_TYPE_NONE;
+    /**
+     * Indicates the content of number mark.
+     */
+    char markContent[kMaxNumberLen + 1] = { 0 };
+    /**
+     * Indicates the count of number mark.
+     */
+    int32_t markCount = -1;
+    /**
+     * Indicates the source of number mark.
+     */
+    char markSource[kMaxNumberLen + 1] = { 0 };
+    /**
+     * Indicates if this is a number mark from cloud.
+     */
+    bool isCloud = false;
+};
+
+/**
  * @brief Indicates the call event detail information.
  */
 struct CallEventInfo {
@@ -252,6 +278,14 @@ struct CallAttributeInfo {
      * Indicates the location of phone number.
      */
     char numberLocation[kMaxNumberLen + 1] = { 0 };
+    /**
+     * Indicates the mark information of the phone number.
+     */
+    NumberMarkInfo numberMarkInfo;
+    /**
+     * Indicates the reason of call blocked.
+     */
+    int32_t blockReason = 0;
 };
 
 /**
@@ -318,6 +352,14 @@ struct CallRecordInfo {
      * Indicates the call features.
      */
     int32_t features = 0;
+    /**
+     * Indicates the mark information of the phone number.
+     */
+    NumberMarkInfo numberMarkInfo;
+    /**
+     * Indicates the reason of call blocked.
+     */
+    int32_t blockReason = 0;
 
     CallRecordInfo() {}
 
@@ -345,6 +387,14 @@ struct CallRecordInfo {
         slotId = temp.slotId;
         videoState = temp.videoState;
         features = temp.features;
+        numberMarkInfo.markType = temp.numberMarkInfo.markType;
+        std::copy(std::begin(temp.numberMarkInfo.markContent), std::end(temp.numberMarkInfo.markContent),
+            std::begin(numberMarkInfo.markContent));
+        numberMarkInfo.markCount = temp.numberMarkInfo.markCount;
+        std::copy(std::begin(temp.numberMarkInfo.markSource), std::end(temp.numberMarkInfo.markSource),
+            std::begin(numberMarkInfo.markSource));
+        numberMarkInfo.isCloud = temp.numberMarkInfo.isCloud;
+        blockReason = temp.blockReason;
         return *this;
     }
 };
