@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Huawei Device Co., Ltd.
+ * Copyright (C) 2023-2024 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -38,20 +38,23 @@ public:
     void Init();
     void AddDCallDevice(const std::string& devId);
     void RemoveDCallDevice(const std::string& devId);
-    void ClearDCallDevice();
-    void ClearConnectedDAudioDevice();
-    std::string GetConnectedDCallAddr();
-    AudioDeviceType GetConnectedDCallType();
-    void DisconnectDCallDevice();
-    bool IsDAudioDeviceConnected();
-    bool SwitchDCallDevice(const AudioDevice& device);
-    void SwitchDCallDeviceAsync(const AudioDevice& device);
+    void ClearDCallDevices();
+    void ClearConnectedDCallDevice();
+    std::string GetConnectedDCallDeviceAddr();
+    AudioDeviceType GetConnectedDCallDeviceType();
+    void SwitchOffDCallDeviceSync();
+    bool IsDCallDeviceSwitchedOn();
+    bool SwitchOnDCallDeviceSync(const AudioDevice& device);
+    void SwitchOnDCallDeviceAsync(const AudioDevice& device);
     void SetCallState(bool isActive);
+    void DealDisconnectCall();
 
-    void OnDeviceOnline(const std::string &devId);
-    void OnDeviceOffline(const std::string &devId);
+    void OnDCallDeviceOnline(const std::string &devId);
+    void OnDCallDeviceOffline(const std::string &devId);
     void OnDCallSystemAbilityAdded(const std::string &deviceId);
     void OnDCallSystemAbilityRemoved(const std::string &deviceId);
+
+    void GetConnectedDCallDevice(AudioDevice& device);
 
 private:
     class DistributedCallDeviceListener : public OHOS::DistributedHardware::IDCallDeviceCallback {
@@ -59,8 +62,8 @@ private:
         DistributedCallDeviceListener() = default;
         ~DistributedCallDeviceListener() = default;
 
-        int32_t OnDeviceOnline(const std::string &devId) override;
-        int32_t OnDeviceOffline(const std::string &devId) override;
+        int32_t OnDCallDeviceOnline(const std::string &devId) override;
+        int32_t OnDCallDeviceOffline(const std::string &devId) override;
     };
 
     bool CreateDAudioDevice(const std::string& devId, AudioDevice& device);
@@ -68,17 +71,17 @@ private:
     void NotifyOnlineDCallDevices(std::vector<std::string> devices);
     std::string GetConnectedDCallDeviceId();
 
-    void GetConnectedAudioDevice(AudioDevice& device);
-    void SetConnectedAudioDevice(const AudioDevice& device);
-    void SwitchToDistributedCallDevice(std::unique_ptr<AudioDevice> device);
+    void SetConnectedDCallDevice(const AudioDevice& device);
+    void SwitchOnDCallDevice(std::unique_ptr<AudioDevice> device);
 
 private:
     std::atomic<bool> isCallActived_ = false;
-    std::atomic<bool> isConnected_ = false;
+    std::atomic<bool> dCallDeviceSwitchedOn_ = false;
     std::mutex connectedDevMtx_;
     std::mutex onlineDeviceMtx_;
     std::string connectedDevId_;
     AudioDevice connectedAudioDevice_;
+    AudioDevice currentAudioDevice_;
     std::map<std::string, AudioDevice> onlineDCallDevices_;
     sptr<ISystemAbilityStatusChange> statusChangeListener_ = nullptr;
     std::shared_ptr<DistributedCallProxy> dcallProxy_ = nullptr;
