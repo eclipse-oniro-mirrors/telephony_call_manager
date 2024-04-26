@@ -1346,7 +1346,7 @@ bool CallStatusManager::IsRingOnceCall(const sptr<CallBase> &call, const CallDet
         std::string(contactInfo.name) != "") {
         return false;
     }
-    auto datashareHelper = = SettingsDataShareHelper::GetInstance();
+    auto datashareHelper = SettingsDataShareHelper::GetInstance();
     std::string is_check_ring_once {"0"};
     std::string key = "spamshield_sim" + std::to_string(info.accountId + 1) + "_phone_switch_ring_once";
     OHOS::Uri uri(
