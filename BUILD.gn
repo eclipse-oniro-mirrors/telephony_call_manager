@@ -85,6 +85,8 @@ ohos_shared_library("tel_call_manager") {
     "services/call/src/satellite_call.cpp",
     "services/call/src/video_call_state.cpp",
     "services/call/src/voip_call.cpp",
+    "services/call_earthquake_alarm/src/call_earthquake_alarm_locator.cpp",
+    "services/call_earthquake_alarm/src/call_earthquake_alarm_subscriber.cpp",
     "services/call_manager_service/src/call_manager_dump_helper.cpp",
     "services/call_manager_service/src/call_manager_hisysevent.cpp",
     "services/call_manager_service/src/call_manager_service.cpp",
@@ -135,6 +137,7 @@ ohos_shared_library("tel_call_manager") {
     "services/video/include",
     "services/call/call_state_observer/include",
     "services/spam_call/include",
+    "services/call_earthquake_alarm/include",
   ]
 
   deps = [
@@ -171,6 +174,8 @@ ohos_shared_library("tel_call_manager") {
     "hitrace:hitrace_meter",
     "init:libbegetutil",
     "ipc:ipc_single",
+    "location:lbsservice_common",
+    "location:locator_sdk",
     "os_account:os_account_innerkits",
     "player_framework:system_sound_client",
     "safwk:system_ability_fwk",

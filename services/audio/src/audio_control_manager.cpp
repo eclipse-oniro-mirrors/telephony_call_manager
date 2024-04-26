@@ -17,8 +17,8 @@
 
 #include "call_control_manager.h"
 #include "call_state_processor.h"
-#include "distributed_call_manager.h"
 #include "telephony_log_wrapper.h"
+#include "distributed_call_manager.h"
 #include "audio_system_manager.h"
 #include "audio_routing_manager.h"
 #include "audio_device_info.h"
@@ -140,7 +140,7 @@ void AudioControlManager::VideoStateUpdated(
 }
 
 void AudioControlManager::CheckTypeAndSetAudioDevice(sptr<CallBase> &callObjectPtr, VideoStateType priorVideoState,
-    VideoStateType nextVideoState, AudioDeviceType &initDeviceType,  AudioDevice &device)
+    VideoStateType nextVideoState, AudioDeviceType &initDeviceType, AudioDevice &device)
 {
     TelCallState telCallState = callObjectPtr->GetTelCallState();
     if (!IsVideoCall(priorVideoState) && IsVideoCall(nextVideoState) &&
@@ -400,9 +400,9 @@ int32_t AudioControlManager::SetAudioDevice(const AudioDevice &device)
         case AudioDeviceType::DEVICE_DISTRIBUTED_AUTOMOTIVE:
         case AudioDeviceType::DEVICE_DISTRIBUTED_PHONE:
         case AudioDeviceType::DEVICE_DISTRIBUTED_PAD:
-            if (!DelayedSingleton<DistributedCallManager>::GetInstance()->IsDAudioDeviceConnected()) {
+            if (!DelayedSingleton<DistributedCallManager>::GetInstance()->IsDCallDeviceSwitchedOn()) {
                 TELEPHONY_LOGI("set audio device, address: %{public}s", device.address);
-                if (DelayedSingleton<DistributedCallManager>::GetInstance()->SwitchDCallDevice(device)) {
+                if (DelayedSingleton<DistributedCallManager>::GetInstance()->SwitchOnDCallDeviceSync(device)) {
                     DelayedSingleton<AudioDeviceManager>::GetInstance()->SetCurrentAudioDevice(device.deviceType);
                     return TELEPHONY_SUCCESS;
                 }
@@ -424,8 +424,8 @@ int32_t AudioControlManager::SetAudioDevice(const AudioDevice &device)
             break;
     }
     if (audioDeviceType != AudioDeviceType::DEVICE_UNKNOWN) {
-        if (DelayedSingleton<DistributedCallManager>::GetInstance()->IsDAudioDeviceConnected()) {
-            DelayedSingleton<DistributedCallManager>::GetInstance()->DisconnectDCallDevice();
+        if (DelayedSingleton<DistributedCallManager>::GetInstance()->IsDCallDeviceSwitchedOn()) {
+            DelayedSingleton<DistributedCallManager>::GetInstance()->SwitchOffDCallDeviceSync();
         }
         if (DelayedSingleton<AudioDeviceManager>::GetInstance()->SwitchDevice(audioDeviceType)) {
             return TELEPHONY_SUCCESS;
