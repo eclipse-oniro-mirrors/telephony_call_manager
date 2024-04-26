@@ -39,7 +39,7 @@ constexpr char IS_CLOUD[] = "isCloud";
 
 SpamCallAdapter::SpamCallAdapter()
 {
-    timeWaitHelper_ = std::make_shared<TimeWaitHelper>(WAIT_TIME_TWO_SECOND);
+    timeWaitHelper_ = std::make_shared<TimeWaitHelper>(WAIT_TIME_FIVE_SECOND);
 }
 
 SpamCallAdapter::~SpamCallAdapter() {}
@@ -125,11 +125,15 @@ void SpamCallAdapter::ParseDetectResult(const std::string &jsonData, bool &isBlo
     int32_t numberValue = 0;
     std::string stringValue = "";
     if (!JsonGetNumberValue(root, DETECT_RESULT, numberValue)) {
-        goto finally;
+        TELEPHONY_LOGE("ParseDetectResult no detectResult");
+        cJSON_Delete(root);
+        return;
     }
     isBlock = numberValue == 1;
     if (!JsonGetNumberValue(root, DECISION_REASON, numberValue)) {
-        goto finally;
+        TELEPHONY_LOGE("ParseDetectResult no decisionReason");
+        cJSON_Delete(root);
+        return;
     }
     blockReason = numberValue;
     JsonGetNumberValue(root, MARK_TYPE, numberValue);
@@ -146,7 +150,6 @@ void SpamCallAdapter::ParseDetectResult(const std::string &jsonData, bool &isBlo
     }
     JsonGetNumberValue(root, IS_CLOUD, numberValue);
     info.isCloud = numberValue == 1;
-finally:
     TELEPHONY_LOGI("ParseDetectResult end");
     cJSON_Delete(root);
 }

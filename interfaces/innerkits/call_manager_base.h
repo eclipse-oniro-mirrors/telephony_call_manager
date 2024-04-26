@@ -69,13 +69,13 @@ constexpr int16_t INVALID_CALLID = 0;
  */
 constexpr int16_t WAIT_TIME_ONE_SECOND = 1;
 /**
- * @brief Indicates two second duration.
- */
-constexpr int16_t WAIT_TIME_TWO_SECOND = 2;
-/**
  * @brief Indicates three second duration.
  */
 constexpr int16_t WAIT_TIME_THREE_SECOND = 3;
+/**
+ * @brief Indicates two five duration.
+ */
+constexpr int16_t WAIT_TIME_FIVE_SECOND = 5;
 /**
  * @brief Indicates No Call Exist.
  */
