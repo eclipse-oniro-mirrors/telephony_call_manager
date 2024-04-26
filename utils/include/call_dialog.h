@@ -19,6 +19,7 @@
 #include <string>
 
 #include "call_ability_connection.h"
+#include "call_setting_ability_connection.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -28,8 +29,10 @@ public:
     bool DialogConnectExtension(const std::string &dialogReason, int32_t slotId);
 private:
     bool DialogConnectExtensionAbility(const AAFwk::Want &want, const std::string commandStr);
+    bool CallSettingDialogConnectExtensionAbility(const AAFwk::Want &want, const std::string commandStr);
     std::string BuildStartCommand(const std::string &dialogReason, int32_t slotId);
     sptr<CallAbilityConnection> connection_ {nullptr};
+    sptr<CallSettingAbilityConnection> callSettingConnection_ {nullptr};
 };
 } // namespace Telephony
 } // namespace OHOS

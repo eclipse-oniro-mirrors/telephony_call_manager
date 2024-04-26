@@ -707,7 +707,7 @@ HWTEST_F(BranchTest, Telephony_CallPolicy_006, Function | MediumTest | Level1)
     CallPolicy callPolicy;
     bool isEcc = false;
     int32_t slotId = 0;
-    callPolicy.HasNormalCall(isEcc, slotId);
+    callPolicy.HasNormalCall(isEcc, slotId, CallType::TYPE_IMS);
     bool isAirplaneModeOn = false;
     callPolicy.GetAirplaneMode(isAirplaneModeOn);
     ASSERT_EQ(isAirplaneModeOn, false);

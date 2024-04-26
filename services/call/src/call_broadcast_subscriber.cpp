@@ -20,6 +20,7 @@
 #include "call_manager_errors.h"
 #include "telephony_log_wrapper.h"
 #include "call_control_manager.h"
+#include "satellite_call_control.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -30,6 +31,7 @@ CallBroadcastSubscriber::CallBroadcastSubscriber(const OHOS::EventFwk::CommonEve
     memberFuncMap_[UNKNOWN_BROADCAST_EVENT] = &CallBroadcastSubscriber::UnknownBroadcast;
     memberFuncMap_[SIM_STATE_BROADCAST_EVENT] = &CallBroadcastSubscriber::SimStateBroadcast;
     memberFuncMap_[CONNECT_CALLUI_SERVICE] = &CallBroadcastSubscriber::ConnectCallUiServiceBroadcast;
+    memberFuncMap_[HIGH_TEMP_LEVEL_CHANGED] = &CallBroadcastSubscriber::HighTempLevelChangedBroadcast;
 }
 
 void CallBroadcastSubscriber::OnReceiveEvent(const EventFwk::CommonEventData &data)
@@ -42,6 +44,8 @@ void CallBroadcastSubscriber::OnReceiveEvent(const EventFwk::CommonEventData &da
         code = SIM_STATE_BROADCAST_EVENT;
     } else if (action == "event.custom.contacts.PAGE_STATE_CHANGE") {
         code = CONNECT_CALLUI_SERVICE;
+    } else if (action == "usual.event.thermal.satcomm.HIGH_TEMP_LEVEL") {
+        code = HIGH_TEMP_LEVEL_CHANGED;
     } else {
         code = UNKNOWN_BROADCAST_EVENT;
     }
@@ -69,6 +73,13 @@ void CallBroadcastSubscriber::ConnectCallUiServiceBroadcast(const EventFwk::Comm
     bool isConnectService = data.GetWant().GetBoolParam("isShouldConnect", false);
     TELEPHONY_LOGI("isConnectService:%{public}d", isConnectService);
     DelayedSingleton<CallControlManager>::GetInstance()->ConnectCallUiService(isConnectService);
+}
+
+void CallBroadcastSubscriber::HighTempLevelChangedBroadcast(const EventFwk::CommonEventData &data)
+{
+    int32_t satcommHighTempLevel = data.GetWant().GetIntParam("satcomm_high_temp_level", -1);
+    TELEPHONY_LOGI("satcommHighTempLevel:%{public}d", satcommHighTempLevel);
+    DelayedSingleton<SatelliteCallControl>::GetInstance()->SetSatcommTempLevel(satcommHighTempLevel);
 }
 } // namespace Telephony
 } // namespace OHOS

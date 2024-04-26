@@ -98,6 +98,7 @@ ohos_shared_library("tel_call_manager") {
     "services/call_setting/src/call_setting_manager.cpp",
     "services/distributed_call/src/distributed_call_manager.cpp",
     "services/distributed_call/src/distributed_call_proxy.cpp",
+    "services/satellite_call/src/satellite_call_control.cpp",
     "services/spam_call/src/callback_stub_helper.cpp",
     "services/spam_call/src/spam_call_adapter.cpp",
     "services/spam_call/src/spam_call_connection.cpp",
@@ -114,6 +115,7 @@ ohos_shared_library("tel_call_manager") {
     "utils/src/call_ability_connection.cpp",
     "utils/src/call_dialog.cpp",
     "utils/src/call_number_utils.cpp",
+    "utils/src/call_setting_ability_connection.cpp",
     "utils/src/number_identity_data_base_helper.cpp",
     "utils/src/settings_datashare_helper.cpp",
   ]
@@ -132,6 +134,7 @@ ohos_shared_library("tel_call_manager") {
     "services/call/include",
     "services/call_manager_service/include",
     "services/call_setting/include",
+    "services/satellite_call/include",
     "services/telephony_interaction/include",
     "services/call_report/include",
     "services/video/include",

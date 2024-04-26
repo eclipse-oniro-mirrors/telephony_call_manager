@@ -160,7 +160,8 @@ int32_t CallObjectManager::HasNewCall()
     for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
         if ((*it)->GetCallRunningState() == CallRunningState::CALL_RUNNING_STATE_CREATE ||
             (*it)->GetCallRunningState() == CallRunningState::CALL_RUNNING_STATE_CONNECTING ||
-            (*it)->GetCallRunningState() == CallRunningState::CALL_RUNNING_STATE_DIALING) {
+            (*it)->GetCallRunningState() == CallRunningState::CALL_RUNNING_STATE_DIALING ||
+            (*it)->GetCallType() == CallType::TYPE_SATELLITE) {
             TELEPHONY_LOGE("there is already a new call[callId:%{public}d,state:%{public}d], please redial later",
                 (*it)->GetCallID(), (*it)->GetCallRunningState());
             return CALL_ERR_CALL_COUNTS_EXCEED_LIMIT;
@@ -394,6 +395,31 @@ bool CallObjectManager::HasVideoCall()
         }
     }
     return false;
+}
+
+bool CallObjectManager::HasSatelliteCallExist()
+{
+    std::lock_guard<std::mutex> lock(listMutex_);
+    std::list<sptr<CallBase>>::iterator it;
+    for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
+        if ((*it)->GetCallType() == CallType::TYPE_SATELLITE) {
+            return true;
+        }
+    }
+    return false;
+}
+
+int32_t CallObjectManager::GetSatelliteCallList(std::list<int32_t> &list)
+{
+    list.clear();
+    std::lock_guard<std::mutex> lock(listMutex_);
+    std::list<sptr<CallBase>>::iterator it;
+    for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
+        if ((*it)->GetCallType() == CallType::TYPE_SATELLITE) {
+            list.emplace_back((*it)->GetCallID());
+        }
+    }
+    return TELEPHONY_SUCCESS;
 }
 
 int32_t CallObjectManager::HasRingingCall(bool &enabled)

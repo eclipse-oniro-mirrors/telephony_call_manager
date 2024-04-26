@@ -98,6 +98,7 @@ private:
     bool IsRingOnceCall(const sptr<CallBase> &call, const CallDetailInfo &info);
     int32_t HandleRingOnceCall(sptr<CallBase> &call);
     void CarrierAndVoipConflictProcess(int32_t callId);
+    void SetVideoCallState(sptr<CallBase> &call, TelCallState nextState);
 
 private:
     CallDetailInfo callReportInfo_;

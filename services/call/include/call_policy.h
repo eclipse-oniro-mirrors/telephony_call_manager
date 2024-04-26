@@ -66,7 +66,7 @@ public:
     int32_t CanDialMulityCall(AppExecFwk::PacMap &extras);
     int32_t IsValidCallType(CallType callType);
     int32_t IsVoiceCallValid(VideoStateType videoState);
-    int32_t HasNormalCall(bool isEcc, int32_t slotId);
+    int32_t HasNormalCall(bool isEcc, int32_t slotId, CallType callType);
     int32_t GetAirplaneMode(bool &isAirplaneModeOn);
 
 private:

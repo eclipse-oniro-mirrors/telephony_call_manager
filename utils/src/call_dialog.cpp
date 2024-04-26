@@ -36,7 +36,12 @@ bool CallDialog::DialogConnectExtension(const std::string &dialogReason, int32_t
     std::string bundleName = "com.ohos.sceneboard";
     std::string abilityName = "com.ohos.sceneboard.systemdialog";
     want.SetElementName(bundleName, abilityName);
-    bool connectResult = DialogConnectExtensionAbility(want, commandStr);
+    bool connectResult = false;
+    if (dialogReason.find("SATELLITE") != std::string::npos) {
+        connectResult = CallSettingDialogConnectExtensionAbility(want, commandStr);
+    } else {
+        connectResult = DialogConnectExtensionAbility(want, commandStr);
+    }
     if (!connectResult) {
         TELEPHONY_LOGE("DialogConnectExtensionAbility failed!");
         return false;
@@ -55,6 +60,27 @@ bool CallDialog::DialogConnectExtensionAbility(const AAFwk::Want &want, const st
     std::string identity = IPCSkeleton::ResetCallingIdentity();
     auto connectResult = AAFwk::ExtensionManagerClient::GetInstance().ConnectServiceExtensionAbility(want,
         connection_, nullptr, DEFAULT_USER_ID);
+    IPCSkeleton::SetCallingIdentity(identity);
+    if (connectResult != 0) {
+        TELEPHONY_LOGE("ConnectServiceExtensionAbility Failed!");
+        return false;
+    }
+    return true;
+}
+
+bool CallDialog::CallSettingDialogConnectExtensionAbility(const AAFwk::Want &want,
+    const std::string commandStr)
+{
+    TELEPHONY_LOGI("CallSettingDialogConnectExtensionAbility start");
+    callSettingConnection_ = sptr<CallSettingAbilityConnection> (new (std::nothrow)
+        CallSettingAbilityConnection(commandStr));
+    if (callSettingConnection_ == nullptr) {
+        TELEPHONY_LOGE("connection_ is nullptr");
+        return false;
+    }
+    std::string identity = IPCSkeleton::ResetCallingIdentity();
+    auto connectResult = AAFwk::ExtensionManagerClient::GetInstance().ConnectServiceExtensionAbility(want,
+        callSettingConnection_, nullptr, DEFAULT_USER_ID);
     IPCSkeleton::SetCallingIdentity(identity);
     if (connectResult != 0) {
         TELEPHONY_LOGE("ConnectServiceExtensionAbility Failed!");

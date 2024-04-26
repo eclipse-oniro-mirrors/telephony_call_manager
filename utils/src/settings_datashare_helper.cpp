@@ -15,26 +15,27 @@
 
 #include "settings_datashare_helper.h"
 
+#include "call_dialog.h"
 #include "datashare_helper.h"
 #include "datashare_predicates.h"
 #include "iservice_registry.h"
 #include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
 #include "uri.h"
+#include "singleton.h"
 
 namespace OHOS {
 namespace Telephony {
-namespace {
-constexpr const char *SETTINGS_DATASHARE_URI =
+const std::string SettingsDataShareHelper::SETTINGS_DATASHARE_URI =
     "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true";
 constexpr const char *SETTINGS_DATA_COLUMN_KEYWORD = "KEYWORD";
 constexpr const char *SETTINGS_DATA_COLUMN_VALUE = "VALUE";
-}
+const std::string SettingsDataShareHelper::QUERY_SATELLITE_MODE_KEY = "satellite_mode_switch";
+const std::string SettingsDataShareHelper::QUERY_SATELLITE_CONNECTED_KEY = "satellite_connected";
 
-SettingsDataShareHelper::SettingsDataShareHelper()
-{
-    datashareHelper_ = CreateDataShareHelper(DEVICE_STANDBY_SERVICE_SYSTEM_ABILITY_ID);
-}
+SettingsDataShareHelper::SettingsDataShareHelper() = default;
+
+SettingsDataShareHelper::~SettingsDataShareHelper() = default;
 
 std::shared_ptr<DataShare::DataShareHelper> SettingsDataShareHelper::CreateDataShareHelper(int systemAbilityId)
 {
@@ -55,7 +56,9 @@ std::shared_ptr<DataShare::DataShareHelper> SettingsDataShareHelper::CreateDataS
 int32_t SettingsDataShareHelper::Query(Uri& uri, const std::string& key, std::string& value)
 {
     TELEPHONY_LOGI("start Query");
-    if (datashareHelper_ == nullptr) {
+    std::shared_ptr<DataShare::DataShareHelper> settingHelper =
+        CreateDataShareHelper(DEVICE_STANDBY_SERVICE_SYSTEM_ABILITY_ID);
+    if (settingHelper == nullptr) {
         TELEPHONY_LOGE("query error, datashareHelper_ is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
@@ -63,10 +66,10 @@ int32_t SettingsDataShareHelper::Query(Uri& uri, const std::string& key, std::st
     std::vector<std::string> columns;
     DataShare::DataSharePredicates predicates;
     predicates.EqualTo(SETTINGS_DATA_COLUMN_KEYWORD, key);
-    auto result = datashareHelper_->Query(uri, predicates, columns);
+    auto result = settingHelper->Query(uri, predicates, columns);
     if (result == nullptr) {
         TELEPHONY_LOGE("query error, result is nullptr");
-        datashareHelper_->Release();
+        settingHelper->Release();
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
 
@@ -74,14 +77,14 @@ int32_t SettingsDataShareHelper::Query(Uri& uri, const std::string& key, std::st
     result->GetRowCount(rowCount);
     if (rowCount == 0) {
         TELEPHONY_LOGI("query success, but rowCount is 0");
-        datashareHelper_->Release();
+        settingHelper->Release();
         return TELEPHONY_SUCCESS;
     }
 
     if (result->GoToFirstRow() != DataShare::E_OK) {
         TELEPHONY_LOGE("query error, go to first row error");
         result->Close();
-        datashareHelper_->Release();
+        settingHelper->Release();
         return TELEPHONY_ERR_DATABASE_READ_FAIL;
     }
 
@@ -89,7 +92,7 @@ int32_t SettingsDataShareHelper::Query(Uri& uri, const std::string& key, std::st
     result->GetColumnIndex(SETTINGS_DATA_COLUMN_VALUE, columnIndex);
     result->GetString(columnIndex, value);
     result->Close();
-    datashareHelper_->Release();
+    settingHelper->Release();
     TELEPHONY_LOGI("SettingUtils: query success");
     return TELEPHONY_SUCCESS;
 }
