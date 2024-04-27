@@ -153,7 +153,7 @@ bool NumberIdentityDataBaseHelper::SetMarkInfoValues(std::shared_ptr<DataShare::
     resultSet->GetColumnIndex(MARK_SOURCE, columnIndex);
     resultSet->GetString(columnIndex, stringValue);
     TELEPHONY_LOGI("info.markSource: %{public}s", stringValue.c_str());
-    errno_t result = memcpy_s(numberMarkInfo.markSource, kMaxNumberLen, stringValue.c_str(), stringValue.length());
+    result = memcpy_s(numberMarkInfo.markSource, kMaxNumberLen, stringValue.c_str(), stringValue.length());
     if (result != EOK) {
         TELEPHONY_LOGE("memcpy_s failed!");
         return false;
@@ -161,7 +161,7 @@ bool NumberIdentityDataBaseHelper::SetMarkInfoValues(std::shared_ptr<DataShare::
 
     resultSet->GetColumnIndex(IS_CLOUD, columnIndex);
     resultSet->GetLong(columnIndex, longValue);
-    TELEPHONY_LOGI("info.markCount: %{public}ld", longValue);
+    TELEPHONY_LOGI("info.isCloud: %{public}ld", longValue);
     if (longValue == 1L) {
         numberMarkInfo.isCloud = true;
     } else {
