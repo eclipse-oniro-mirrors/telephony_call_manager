@@ -51,8 +51,6 @@ public:
     void NumberLocationUpdate(const sptr<CallBase> &callObjectPtr);
     int32_t QueryYellowPageAndMarkInfo(NumberMarkInfo &numberMarkInfo, std::string accountNumber);
     void YellowPageAndMarkUpdate(const sptr<CallBase> &callObjectPtr);
-
-
 private:
     void ProcessSpace(std::string &number);
 
