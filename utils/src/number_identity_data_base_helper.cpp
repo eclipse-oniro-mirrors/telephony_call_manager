@@ -26,7 +26,13 @@
 namespace OHOS {
 namespace Telephony {
 static constexpr const char *NUMBER_IDENTITY_URI = "datashare:///numberlocationability";
+static constexpr const char *NUMBER_MARK_INFO_URI = "datashare:///numbermarkability/number_mark_info";
 const char *NUMBER_LOCATION = "number_location";
+const char *MARK_TYPE = "markType";
+const char *MARK_CONTENT = "markContent";
+const char *MARK_COUNT = "markCount";
+const char *MARK_SOURCE = "markSource";
+const char *IS_CLOUD = "isCloud";
 
 NumberIdentityDataBaseHelper::NumberIdentityDataBaseHelper() {}
 
@@ -80,6 +86,82 @@ bool NumberIdentityDataBaseHelper::Query(std::string &numberLocation, DataShare:
     helper->Release();
     helper = nullptr;
     TELEPHONY_LOGI("Query end");
+    return true;
+}
+
+bool NumberIdentityDataBaseHelper::QueryYellowPageAndMark(NumberMarkInfo &numberMarkInfo,
+    DataShare::DataSharePredicates &predicates)
+{
+    TELEPHONY_LOGE("query yellow page and mark.");
+    std::shared_ptr<DataShare::DataShareHelper> helper = CreateDataShareHelper(NUMBER_MARK_INFO_URI);
+    if (helper == nullptr) {
+        TELEPHONY_LOGE("helper is nullptr");
+        return false;
+    }
+    Uri uri(NUMBER_MARK_INFO_URI);
+    std::vector<std::string> columns;
+    auto resultSet = helper->Query(uri, predicates, columns);
+    if (resultSet == nullptr) {
+        TELEPHONY_LOGE("resultSet is nullptr");
+        helper->Release();
+        helper = nullptr;
+        return false;
+    }
+    int rowCount = 0;
+    resultSet->GetRowCount(rowCount);
+    if (rowCount == 0) {
+        TELEPHONY_LOGE("query success, but rowCount is 0");
+        helper->Release();
+        return TELEPHONY_SUCCESS;
+    }
+    SetMarkInfoValues(resultSet, numberMarkInfo);
+
+    resultSet->Close();
+    helper->Release();
+    helper = nullptr;
+    TELEPHONY_LOGI("QueryYellowPageAndMark success.");
+    return true;
+}
+
+bool NumberIdentityDataBaseHelper::SetMarkInfoValues(std::shared_ptr<DataShare::DataShareResultSet> &resultSet,
+    NumberMarkInfo &numberMarkInfo)
+{
+    resultSet->GoToFirstRow();
+    int columnIndex = 0;
+    int64_t longValue;
+    std::string stringValue;
+
+    resultSet->GetColumnIndex(MARK_TYPE, columnIndex);
+    resultSet->GetLong(columnIndex, longValue);
+    numberMarkInfo.markType = static_cast<MarkType>(longValue);
+
+    resultSet->GetColumnIndex(MARK_CONTENT, columnIndex);
+    resultSet->GetString(columnIndex, stringValue);
+    errno_t result = memcpy_s(numberMarkInfo.markContent, kMaxNumberLen, stringValue.c_str(), stringValue.length());
+    if (result != EOK) {
+        TELEPHONY_LOGE("memcpy_s failed!");
+        return false;
+    }
+
+    resultSet->GetColumnIndex(MARK_COUNT, columnIndex);
+    resultSet->GetLong(columnIndex, longValue);
+    numberMarkInfo.markCount = longValue;
+
+    resultSet->GetColumnIndex(MARK_SOURCE, columnIndex);
+    resultSet->GetString(columnIndex, stringValue);
+    result = memcpy_s(numberMarkInfo.markSource, kMaxNumberLen, stringValue.c_str(), stringValue.length());
+    if (result != EOK) {
+        TELEPHONY_LOGE("memcpy_s failed!");
+        return false;
+    }
+
+    resultSet->GetColumnIndex(IS_CLOUD, columnIndex);
+    resultSet->GetLong(columnIndex, longValue);
+    if (longValue == 1L) {
+        numberMarkInfo.isCloud = true;
+    } else {
+        numberMarkInfo.isCloud = false;
+    }
     return true;
 }
 } // namespace Telephony

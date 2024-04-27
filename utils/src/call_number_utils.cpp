@@ -306,5 +306,60 @@ void CallNumberUtils::NumberLocationUpdate(const sptr<CallBase> &callObjectPtr)
         DelayedSingleton<CallAbilityReportProxy>::GetInstance()->ReportCallStateInfo(info);
     }
 }
+
+void CallNumberUtils::YellowPageAndMarkUpdate(const sptr<CallBase> &callObjectPtr)
+{
+    CallAttributeInfo info;
+    callObjectPtr->GetCallAttributeBaseInfo(info);
+    TELEPHONY_LOGI("YellowPageAndMarkUpdate, callId[%{public}d]", info.callId);
+    NumberMarkInfo numberMarkInfo;
+    int32_t ret = QueryYellowPageAndMarkInfo(numberMarkInfo, callObjectPtr->GetAccountNumber());
+    if (ret != TELEPHONY_SUCCESS) {
+        return;
+    }
+    sptr<CallBase> call = callObjectPtr;
+    if (info.callState == TelCallState::CALL_STATUS_DIALING) {
+        call = CallObjectManager::GetOneCallObject(info.callId);
+        if (call == nullptr) {
+            TELEPHONY_LOGE("call is nullptr");
+            return;
+        }
+    }
+    call->SetNumberMarkInfo(numberMarkInfo);
+    if (!CallObjectManager::IsCallExist(info.callId)) {
+        TELEPHONY_LOGE("call is not exist");
+        return;
+    }
+    if (numberMarkInfo.markType != MarkType::MARK_TYPE_NONE) {
+        call->GetCallAttributeBaseInfo(info);
+        DelayedSingleton<CallAbilityReportProxy>::GetInstance()->ReportCallStateInfo(info);
+    }
+}
+
+int32_t CallNumberUtils::QueryYellowPageAndMarkInfo(NumberMarkInfo &numberMarkInfo, std::string accountNumber)
+{
+    TELEPHONY_LOGI("QueryYellowPageAndMarkInfo");
+    if (accountNumber == "") {
+        TELEPHONY_LOGE("accountNumber is null");
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
+    }
+    std::shared_ptr<NumberIdentityDataBaseHelper> callDataPtr =
+        DelayedSingleton<NumberIdentityDataBaseHelper>::GetInstance();
+    if (callDataPtr == nullptr) {
+        TELEPHONY_LOGE("callDataPtr is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+
+    DataShare::DataSharePredicates predicates;
+    std::vector<std::string> phoneNumber;
+    phoneNumber.push_back(accountNumber);
+    predicates.SetWhereArgs(phoneNumber);
+    bool ret = callDataPtr->QueryYellowPageAndMark(numberMarkInfo, predicates);
+    if (!ret) {
+        TELEPHONY_LOGE("Query yellow page and mark fail!");
+        return TELEPHONY_ERR_DATABASE_READ_FAIL;
+    }
+    return TELEPHONY_SUCCESS;
+}
 } // namespace Telephony
 } // namespace OHOS

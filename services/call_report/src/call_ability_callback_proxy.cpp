@@ -55,6 +55,11 @@ int32_t CallAbilityCallbackProxy::OnCallDetailsChange(const CallAttributeInfo &i
     dataParcel.WriteInt32(info.crsType);
     dataParcel.WriteInt32(info.originalCallType);
     dataParcel.WriteCString(info.numberLocation);
+    dataParcel.WriteInt32(static_cast<int32_t>(info.numberMarkInfo.markType));
+    dataParcel.WriteCString(info.numberMarkInfo.markContent);
+    dataParcel.WriteInt32(info.numberMarkInfo.markCount);
+    dataParcel.WriteCString(info.numberMarkInfo.markSource);
+    dataParcel.WriteBool(info.numberMarkInfo.isCloud);
     SetVoipCallInfo(info, dataParcel);
     if (Remote() == nullptr) {
         TELEPHONY_LOGE("function Remote() return nullptr!");
