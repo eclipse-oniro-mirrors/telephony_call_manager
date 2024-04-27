@@ -551,6 +551,9 @@ void NapiCallAbilityCallback::ReportCallAttribute(napi_env &env, napi_value call
         CreateVoipNapiValue(env, voipObject, info);
         napi_set_named_property(env, callbackValues[ARRAY_INDEX_FIRST], "voipCallAttribute", voipObject);
     }
+    napi_value markInfoObject = nullptr;
+    CreateMarkInfoNapiValue(env, markInfoObject, info);
+    napi_set_named_property(env, callbackValues[ARRAY_INDEX_FIRST], "numberMarkInfo", markInfoObject);
 }
 
 void NapiCallAbilityCallback::CreateVoipNapiValue(napi_env &env, napi_value &voipObject, CallAttributeInfo &info)
@@ -567,6 +570,16 @@ void NapiCallAbilityCallback::CreateVoipNapiValue(napi_env &env, napi_value &voi
         std::shared_ptr<Media::PixelMap>(Media::PixelMap::DecodeTlv(info.voipCallInfo.userProfile));
     napi_value pixelMapObject = Media::PixelMapNapi::CreatePixelMap(env, userProfile);
     napi_set_named_property(env, voipObject, "userProfile", pixelMapObject);
+}
+
+void NapiCallAbilityCallback::CreateMarkInfoNapiValue(napi_env &env, napi_value &markInfoObject, CallAttributeInfo &info)
+{
+    napi_create_object(env, &markInfoObject);
+    NapiCallManagerUtils::SetPropertyInt32(env, markInfoObject, "markType", info.numberMarkInfo.markType);
+    NapiCallManagerUtils::SetPropertyStringUtf8(env, markInfoObject, "markContent", info.numberMarkInfo.markContent);
+    NapiCallManagerUtils::SetPropertyInt32(env, markInfoObject, "markCount", info.numberMarkInfo.markCount);
+    NapiCallManagerUtils::SetPropertyStringUtf8(env, markInfoObject, "markSource", info.numberMarkInfo.markSource);
+    NapiCallManagerUtils::SetPropertyBoolean(env, markInfoObject, "isCloud", info.numberMarkInfo.isCloud);
 }
 
 int32_t NapiCallAbilityCallback::UpdateCallEvent(const CallEventInfo &info)

@@ -107,6 +107,11 @@ int32_t CallAbilityCallbackStub::OnUpdateCallStateInfo(MessageParcel &data, Mess
     parcelPtr.crsType = data.ReadInt32();
     parcelPtr.originalCallType = data.ReadInt32();
     strncpy_s(parcelPtr.numberLocation, kMaxNumberLen + 1, data.ReadCString(), kMaxNumberLen + 1);
+    parcelPtr.numberMarkInfo.markType = static_cast<markType>(data.ReadInt32());
+    strncpy_s(parcelPtr.numberMarkInfo.markContent, kMaxNumberLen + 1, data.ReadString, kMaxNumberLen + 1);
+    parcelPtr.numberMarkInfo.markCount = data.ReadInt32();
+    strncpy_s(parcelPtr.numberMarkInfo.markSource, kMaxNumberLen + 1, data.ReadString, kMaxNumberLen + 1);
+    parcelPtr.numberMarkInfo.isCloud = data.ReadBool();
     if (parcelPtr.callType == CallType::TYPE_VOIP) {
         parcelPtr.voipCallInfo.voipCallId = data.ReadString();
         parcelPtr.voipCallInfo.userName = data.ReadString();

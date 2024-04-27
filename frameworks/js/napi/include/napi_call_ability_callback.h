@@ -96,6 +96,7 @@ private:
     static int32_t ReportCallState(CallAttributeInfo &info, EventCallback stateCallback);
     static void ReportCallAttribute(napi_env &env, napi_value callbackValues[], CallAttributeInfo &info);
     static void CreateVoipNapiValue(napi_env &env, napi_value &voipObject, CallAttributeInfo &info);
+    static void CreateMarkInfoNapiValue(napi_env &env, napi_value &markInfoObject, CallAttributeInfo &info);
     static void ReportCallEventWork(uv_work_t *work, int32_t status);
     static int32_t ReportCallEvent(CallEventInfo &info, EventCallback stateCallback);
     static void ReportCallDisconnectedCauseWork(uv_work_t *work, int32_t status);

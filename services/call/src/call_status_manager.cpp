@@ -1199,7 +1199,12 @@ sptr<CallBase> CallStatusManager::CreateNewCall(const CallDetailInfo &info, Call
     if (info.state == TelCallState::CALL_STATUS_INCOMING || info.state == TelCallState::CALL_STATUS_WAITING ||
         (info.state == TelCallState::CALL_STATUS_DIALING && info.index == 0)) {
         TELEPHONY_LOGI("NumberLocationUpdate start");
-        ffrt::submit([=]() { DelayedSingleton<CallNumberUtils>::GetInstance()->NumberLocationUpdate(callPtr); });
+        ffrt::submit([=]() {
+            DelayedSingleton<CallNumberUtils>::GetInstance()->NumberLocationUpdate(callPtr);
+            if (info.state == TelCallState::CALL_STATUS_DIALING) {
+                DelayedSingleton<CallNumberUtils>::GetInstance()->yellowPageAndMarkUpdate(callPtr);
+            }
+        });
     }
     return callPtr;
 }

@@ -49,6 +49,9 @@ public:
     bool SelectAccountId(int32_t slotId, AppExecFwk::PacMap &extras);
     int32_t QueryNumberLocationInfo(std::string &numberLocation, std::string accountNumber);
     void NumberLocationUpdate(const sptr<CallBase> &callObjectPtr);
+    int32_t QueryYellowPageAndMarkInfo(NumberMarkInfo &numberMarkInfo, std::string accountNumber);
+    void yellowPageAndMarkUpdate(const sptr<CallBase> &callObjectPtr);
+
 
 private:
     void ProcessSpace(std::string &number);
