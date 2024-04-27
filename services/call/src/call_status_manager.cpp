@@ -338,10 +338,6 @@ int32_t CallStatusManager::HandleVoipEventReportInfo(const VoipCallEventInfo &in
         call->SetMicPhoneState(true);
     } else if (info.voipCallEvent == VoipCallEvent::VOIP_CALL_EVENT_UNMUTED) {
         call->SetMicPhoneState(false);
-    } else if (info.voipCallEvent == VoipCallEvent::VOIP_CALL_EVENT_SPEAKER_ON) {
-        call->SetSpeakerphoneOn(true);
-    } else if (info.voipCallEvent == VoipCallEvent::VOIP_CALL_EVENT_SPEAKER_OFF) {
-        call->SetSpeakerphoneOn(false);
     }
     DelayedSingleton<AudioDeviceManager>::GetInstance()->ReportAudioDeviceInfo(call);
     return TELEPHONY_SUCCESS;

@@ -196,6 +196,7 @@ int32_t VoipCallConnection::SendCallUiEvent(std::string &voipCallId, const CallA
 {
     GetCallManagerProxy();
     if (voipCallManagerInterfacePtr_ == nullptr) {
+        TELEPHONY_LOGE("voipCallManagerInterfacePtr_ is nullptr");
         return TELEPHONY_ERROR;
     }
     return voipCallManagerInterfacePtr_->SendCallUiEvent(voipCallId, callAudioEvent);

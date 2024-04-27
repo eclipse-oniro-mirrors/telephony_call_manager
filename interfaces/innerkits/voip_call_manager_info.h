@@ -33,14 +33,6 @@ enum class CallAudioEvent {
      * Indicates the event of unmuted.
      */
     AUDIO_EVENT_UNMUTED = 1,
-    /**
-     * Indicates the event of speaker on.
-     */
-    AUDIO_EVENT_SPEAKER_ON = 2,
-    /**
-     * Indicates the event of speaker off.
-     */
-    AUDIO_EVENT_SPEAKER_OFF = 3,
 };
 
 /**
@@ -169,14 +161,6 @@ enum class VoipCallEvent {
      * Indicates the user clicked unmuted.
      */
     VOIP_CALL_EVENT_UNMUTED,
-    /**
-     * Indicates the user clicked speaker on.
-     */
-    VOIP_CALL_EVENT_SPEAKER_ON,
-    /**
-     * Indicates the user clicked speaker off.
-     */
-    VOIP_CALL_EVENT_SPEAKER_OFF,
 };
 
 /**
