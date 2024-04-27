@@ -26,7 +26,7 @@
 namespace OHOS {
 namespace Telephony {
 static constexpr const char *NUMBER_IDENTITY_URI = "datashare:///numberlocationability";
-static constexpr const char *NUMBER_MARK_INFO_URI = "datashare:///com.huawei.hmos.numbermarkability/number_mark_info";
+static constexpr const char *NUMBER_MARK_INFO_URI = "datashare:///numbermarkability/number_mark_info";
 const char *NUMBER_LOCATION = "number_location";
 const char *MARK_TYPE = "markType";
 const char *MARK_CONTENT = "markContent";
@@ -114,7 +114,7 @@ bool NumberIdentityDataBaseHelper::QueryYellowPageAndMark(NumberMarkInfo &number
         helper->Release();
         return TELEPHONY_SUCCESS;
     }
-    setMarkInfoValues(resultSet, numberMarkInfo);
+    SetMarkInfoValues(resultSet, numberMarkInfo);
 
     resultSet->Close();
     helper->Release();
@@ -123,7 +123,7 @@ bool NumberIdentityDataBaseHelper::QueryYellowPageAndMark(NumberMarkInfo &number
     return true;
 }
 
-bool NumberIdentityDataBaseHelper::setMarkInfoValues(std::shared_ptr<DataShare::DataShareResultSet> &resultSet,
+bool NumberIdentityDataBaseHelper::SetMarkInfoValues(std::shared_ptr<DataShare::DataShareResultSet> &resultSet,
     NumberMarkInfo &numberMarkInfo)
 {
     resultSet->GoToFirstRow();

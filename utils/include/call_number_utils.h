@@ -50,7 +50,7 @@ public:
     int32_t QueryNumberLocationInfo(std::string &numberLocation, std::string accountNumber);
     void NumberLocationUpdate(const sptr<CallBase> &callObjectPtr);
     int32_t QueryYellowPageAndMarkInfo(NumberMarkInfo &numberMarkInfo, std::string accountNumber);
-    void yellowPageAndMarkUpdate(const sptr<CallBase> &callObjectPtr);
+    void YellowPageAndMarkUpdate(const sptr<CallBase> &callObjectPtr);
 
 
 private:

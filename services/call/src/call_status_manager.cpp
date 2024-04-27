@@ -1202,7 +1202,7 @@ sptr<CallBase> CallStatusManager::CreateNewCall(const CallDetailInfo &info, Call
         ffrt::submit([=]() {
             DelayedSingleton<CallNumberUtils>::GetInstance()->NumberLocationUpdate(callPtr);
             if (info.state == TelCallState::CALL_STATUS_DIALING) {
-                DelayedSingleton<CallNumberUtils>::GetInstance()->yellowPageAndMarkUpdate(callPtr);
+                DelayedSingleton<CallNumberUtils>::GetInstance()->YellowPageAndMarkUpdate(callPtr);
             }
         });
     }

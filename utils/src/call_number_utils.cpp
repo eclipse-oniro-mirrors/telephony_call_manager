@@ -307,11 +307,11 @@ void CallNumberUtils::NumberLocationUpdate(const sptr<CallBase> &callObjectPtr)
     }
 }
 
-void CallNumberUtils::yellowPageAndMarkUpdate(const sptr<CallBase> &callObjectPtr)
+void CallNumberUtils::YellowPageAndMarkUpdate(const sptr<CallBase> &callObjectPtr)
 {
     CallAttributeInfo info;
     callObjectPtr->GetCallAttributeBaseInfo(info);
-    TELEPHONY_LOGI("yellowPageAndMarkUpdate, callId[%{public}d]", info.callId);
+    TELEPHONY_LOGI("YellowPageAndMarkUpdate, callId[%{public}d]", info.callId);
     NumberMarkInfo numberMarkInfo;
     int32_t ret = QueryYellowPageAndMarkInfo(numberMarkInfo, callObjectPtr->GetAccountNumber());
     if (ret != TELEPHONY_SUCCESS) {
@@ -326,8 +326,14 @@ void CallNumberUtils::yellowPageAndMarkUpdate(const sptr<CallBase> &callObjectPt
         }
     }
     call->SetNumberMarkInfo(numberMarkInfo);
-    call->GetCallAttributeBaseInfo(info);
-    DelayedSingleton<CallAbilityReportProxy>::GetInstance()->ReportCallStateInfo(info);
+    if (!CallObjectManager::IsCallExist(info.callId)) {
+        TELEPHONY_LOGE("call is not exist");
+        return;
+    }
+    if (numberMarkInfo.markType != MarkType::MARK_TYPE_NONE) {
+        call->GetCallAttributeBaseInfo(info);
+        DelayedSingleton<CallAbilityReportProxy>::GetInstance()->ReportCallStateInfo(info);
+    }
 }
 
 int32_t CallNumberUtils::QueryYellowPageAndMarkInfo(NumberMarkInfo &numberMarkInfo, std::string accountNumber)

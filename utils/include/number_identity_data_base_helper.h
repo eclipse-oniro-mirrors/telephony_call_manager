@@ -34,8 +34,7 @@ class NumberIdentityDataBaseHelper {
 public:
     bool Query(std::string &numberLocation, DataShare::DataSharePredicates &predicates);
     bool QueryYellowPageAndMark(NumberMarkInfo &numberMarkInfo, DataShare::DataSharePredicates &predicates);
-    bool setMarkInfoValues(std::shared_ptr<DataShare::DataShareResultSet> &resultSet, NumberMarkInfo &numberMarkInfo);
-
+    bool SetMarkInfoValues(std::shared_ptr<DataShare::DataShareResultSet> &resultSet, NumberMarkInfo &numberMarkInfo);=
 private:
     std::shared_ptr<DataShare::DataShareHelper> CreateDataShareHelper(std::string uri);
 };
