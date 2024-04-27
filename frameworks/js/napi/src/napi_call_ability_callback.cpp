@@ -576,9 +576,11 @@ void NapiCallAbilityCallback::CreateMarkInfoNapiValue(napi_env &env,
     napi_value &markInfoObject, CallAttributeInfo &info)
 {
     napi_create_object(env, &markInfoObject);
-    NapiCallManagerUtils::SetPropertyInt32(env, markInfoObject, "markType", static_cast<int32_t>(info.numberMarkInfo.markType));
+    NapiCallManagerUtils::SetPropertyInt32(env, markInfoObject, "markType",
+        static_cast<int32_t>(info.numberMarkInfo.markType));
     NapiCallManagerUtils::SetPropertyStringUtf8(env, markInfoObject, "markContent", info.numberMarkInfo.markContent);
-    NapiCallManagerUtils::SetPropertyInt32(env, markInfoObject, "markCount", static_cast<int32_t>(info.numberMarkInfo.markCount));
+    NapiCallManagerUtils::SetPropertyInt32(env, markInfoObject, "markCount",
+        static_cast<int32_t>(info.numberMarkInfo.markCount));
     NapiCallManagerUtils::SetPropertyStringUtf8(env, markInfoObject, "markSource", info.numberMarkInfo.markSource);
     NapiCallManagerUtils::SetPropertyBoolean(env, markInfoObject, "isCloud", info.numberMarkInfo.isCloud);
 }
