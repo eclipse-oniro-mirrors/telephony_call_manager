@@ -141,13 +141,7 @@ void CallBase::GetCallAttributeBaseInfo(CallAttributeInfo &info)
         info.originalCallType = originalCallType_;
         (void)memset_s(info.numberLocation, kMaxNumberLen, 0, kMaxNumberLen);
         (void)memcpy_s(info.numberLocation, kMaxNumberLen, numberLocation_.c_str(), numberLocation_.length());
-        info.numberMarkInfo.markType = numberMarkInfo_.markType;
-        std::copy(std::begin(numberMarkInfo_.markContent), std::end(numberMarkInfo_.markContent),
-            std::begin(info.numberMarkInfo.markContent));
-        info.numberMarkInfo.markCount = numberMarkInfo_.markCount;
-        std::copy(std::begin(numberMarkInfo_.markSource), std::end(numberMarkInfo_.markSource),
-            std::begin(info.numberMarkInfo.markSource));
-        info.numberMarkInfo.isCloud = numberMarkInfo_.isCloud;
+        info.numberMarkInfo = numberMarkInfo_;
         info.blockReason = blockReason_;
         if (bundleName_.length() > static_cast<size_t>(kMaxBundleNameLen)) {
             TELEPHONY_LOGE("Number out of limit!");

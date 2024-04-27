@@ -129,14 +129,17 @@ void SpamCallAdapter::ParseDetectResult(const std::string &jsonData, bool &isBlo
         cJSON_Delete(root);
         return;
     }
+    TELEPHONY_LOGI("detectResult: %{public}d", numberValue);
     isBlock = numberValue == 1;
     if (!JsonGetNumberValue(root, DECISION_REASON, numberValue)) {
         TELEPHONY_LOGE("ParseDetectResult no decisionReason");
         cJSON_Delete(root);
         return;
     }
+    TELEPHONY_LOGI("decisionReason: %{public}d", numberValue);
     blockReason = numberValue;
     JsonGetNumberValue(root, MARK_TYPE, numberValue);
+    TELEPHONY_LOGI("markType: %{public}d", numberValue);
     info.markType = static_cast<MarkType>(numberValue);
     JsonGetNumberValue(root, MARK_COUNT, numberValue);
     info.markCount = numberValue;
@@ -168,7 +171,6 @@ void SpamCallAdapter::SetDetectResult(int32_t &errCode, std::string &result)
 
 void SpamCallAdapter::NotifyAll()
 {
-    TELEPHONY_LOGI("SpamCallDetect NotifyAll");
     timeWaitHelper_->NotifyAll();
 }
 

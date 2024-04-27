@@ -1315,7 +1315,6 @@ bool CallStatusManager::ShouldBlockIncomingCall(const sptr<CallBase> &call, cons
             spamCallAdapterPtr_->ParseDetectResult(result, isBlock, numberMarkInfo, blockReason);
             call->SetNumberMarkInfo(numberMarkInfo);
             call->SetBlockReason(blockReason);
-            TELEPHONY_LOGI("isBlock: %{public}d", isBlock);
             if (isBlock) {
                 return true;
             }
