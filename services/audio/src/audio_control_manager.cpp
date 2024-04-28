@@ -680,6 +680,7 @@ sptr<CallBase> AudioControlManager::GetCallBase(int32_t callId)
 
 bool AudioControlManager::IsEmergencyCallExists() const
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     for (auto call : totalCalls_) {
         if (call->GetEmergencyState()) {
             return true;
@@ -690,6 +691,7 @@ bool AudioControlManager::IsEmergencyCallExists() const
 
 bool AudioControlManager::IsSatelliteExists()
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     for (auto call : totalCalls_) {
         if (call->GetCallType() == CallType::TYPE_SATELLITE) {
             return true;
