@@ -149,7 +149,6 @@ void SatelliteCallControl::PublishSatelliteConnectEvent()
     EventFwk::CommonEventData data;
     data.SetWant(want);
     EventFwk::CommonEventPublishInfo publishInfo;
-    publishInfo.SetOrdered(true);
     std::vector<std::string> callPermissions;
     callPermissions.emplace_back(Permission::SET_TELEPHONY_STATE);
     publishInfo.SetSubscriberPermissions(callPermissions);
