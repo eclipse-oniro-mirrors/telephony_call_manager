@@ -97,7 +97,7 @@ private:
     sptr<CallBase> GetCallBase(int32_t callId);
     AudioInterruptState audioInterruptState_ = AudioInterruptState::INTERRUPT_STATE_DEACTIVATED;
     bool ShouldPlayRingtone() const;
-    bool IsEmergencyCallExists() const;
+    bool IsEmergencyCallExists();
     void UpdateForegroundLiveCall();
     bool IsBtOrWireHeadPlugin();
     void ProcessAudioWhenCallActive(sptr<CallBase> &callObjectPtr);
