@@ -46,7 +46,7 @@ void SpamCallTest::TearDown() {}
  */
 HWTEST_F(SpamCallTest, Telephony_SpamCallAdapter_001, Function | MediumTest | Level1)
 {
-    std::unique_ptr<SpamCallAdapter> spamCallAdapter_ = std::make_unique<SpamCallAdapter>();
+    std::shared_ptr<SpamCallAdapter> spamCallAdapter_ = std::make_shared<SpamCallAdapter>();
     int32_t errCode = -1;
     std::string result = "";
     spamCallAdapter_->GetDetectResult(errCode, result);
@@ -61,7 +61,7 @@ HWTEST_F(SpamCallTest, Telephony_SpamCallAdapter_001, Function | MediumTest | Le
  */
 HWTEST_F(SpamCallTest, Telephony_SpamCallAdapter_002, Function | MediumTest | Level1)
 {
-    std::unique_ptr<SpamCallAdapter> spamCallAdapter_ = std::make_unique<SpamCallAdapter>();
+    std::shared_ptr<SpamCallAdapter> spamCallAdapter_ = std::make_shared<SpamCallAdapter>();
     const std::string phoneNumber = "12345678900";
     const int32_t slotId = 0;
     bool ret = spamCallAdapter_->DetectSpamCall(phoneNumber, slotId);
@@ -75,7 +75,7 @@ HWTEST_F(SpamCallTest, Telephony_SpamCallAdapter_002, Function | MediumTest | Le
  */
 HWTEST_F(SpamCallTest, Telephony_SpamCallAdapter_003, Function | MediumTest | Level1)
 {
-    std::unique_ptr<SpamCallAdapter> spamCallAdapter_ = std::make_unique<SpamCallAdapter>();
+    std::shared_ptr<SpamCallAdapter> spamCallAdapter_ = std::make_shared<SpamCallAdapter>();
     std::string jsonData = "{\"detectResult\":1,\"decisionReason\":1}";
     NumberMarkInfo info = {
         .markType = MarkType::MARK_TYPE_NONE,
