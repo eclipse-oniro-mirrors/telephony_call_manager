@@ -19,6 +19,8 @@
 #include "bluetooth_call_manager.h"
 #include "bluetooth_device_state.h"
 #include "call_ability_report_proxy.h"
+#include "call_object_manager.h"
+#include "call_state_processor.h"
 #include "earpiece_device_state.h"
 #include "inactive_device_state.h"
 #include "speaker_device_state.h"
@@ -458,15 +460,19 @@ int32_t AudioDeviceManager::ReportAudioDeviceChange()
 
 int32_t AudioDeviceManager::ReportAudioDeviceInfo()
 {
-    return ReportAudioDeviceInfo(nullptr);
+    int32_t callId = DelayedSingleton<CallStateProcessor>::GetInstance()->GetAudioForegroundLiveCall();
+    if (callId == INVALID_CALLID) {
+        TELEPHONY_LOGE("callId is invalid");
+        return ReportAudioDeviceInfo(nullptr);
+    }
+    sptr<CallBase> liveCall = CallObjectManager::GetOneCallObject(callId);
+    return ReportAudioDeviceInfo(liveCall);
 }
 
 int32_t AudioDeviceManager::ReportAudioDeviceInfo(sptr<CallBase> call)
 {
     if (call != nullptr && call->GetCallType() == CallType::TYPE_VOIP) {
         info_.isMuted = call->IsMuted();
-        info_.currentAudioDevice.deviceType = call->IsSpeakerphoneOn() ?
-            AudioDeviceType::DEVICE_SPEAKER : AudioDeviceType::DEVICE_EARPIECE;
     } else {
         info_.isMuted = DelayedSingleton<AudioProxy>::GetInstance()->IsMicrophoneMute();
     }
