@@ -66,7 +66,8 @@ bool SpamCallAdapter::ConnectSpamCallAbility(const AAFwk::Want &want, const std:
     const int32_t &slotId)
 {
     TELEPHONY_LOGI("ConnectSpamCallAbility start");
-    sptr<SpamCallConnection> connection_ = new (std::nothrow) SpamCallConnection(phoneNumber, slotId, shared_from_this());
+    sptr<SpamCallConnection> connection_ = new (std::nothrow) SpamCallConnection(phoneNumber, slotId,
+        shared_from_this());
     if (connection_ == nullptr) {
         TELEPHONY_LOGE("connection_ is nullptr");
         return false;
