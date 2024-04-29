@@ -42,7 +42,10 @@ SpamCallAdapter::SpamCallAdapter()
     timeWaitHelper_ = std::make_shared<TimeWaitHelper>(WAIT_TIME_FIVE_SECOND);
 }
 
-SpamCallAdapter::~SpamCallAdapter() {}
+SpamCallAdapter::~SpamCallAdapter()
+{
+    TELEPHONY_LOGI("~SpamCallAdapter");
+}
 
 bool SpamCallAdapter::DetectSpamCall(const std::string &phoneNumber, const int32_t &slotId)
 {
@@ -63,7 +66,7 @@ bool SpamCallAdapter::ConnectSpamCallAbility(const AAFwk::Want &want, const std:
     const int32_t &slotId)
 {
     TELEPHONY_LOGI("ConnectSpamCallAbility start");
-    sptr<SpamCallConnection> connection_ = new (std::nothrow) SpamCallConnection(phoneNumber, slotId, this);
+    sptr<SpamCallConnection> connection_ = new (std::nothrow) SpamCallConnection(phoneNumber, slotId, shared_from_this());
     if (connection_ == nullptr) {
         TELEPHONY_LOGE("connection_ is nullptr");
         return false;
@@ -171,6 +174,10 @@ void SpamCallAdapter::SetDetectResult(int32_t &errCode, std::string &result)
 
 void SpamCallAdapter::NotifyAll()
 {
+    if (timeWaitHelper_ == nullptr) {
+        TELEPHONY_LOGE("timeWaitHelper_ is null");
+        return;
+    }
     timeWaitHelper_->NotifyAll();
 }
 

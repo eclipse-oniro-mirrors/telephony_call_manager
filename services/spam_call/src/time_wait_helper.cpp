@@ -25,7 +25,10 @@ TimeWaitHelper::TimeWaitHelper(int16_t waitTime)
     waitTime_ = waitTime;
 }
 
-TimeWaitHelper::~TimeWaitHelper() {}
+TimeWaitHelper::~TimeWaitHelper()
+{
+    TELEPHONY_LOGI("~TimeWaitHelper");
+}
 
 void TimeWaitHelper::NotifyAll()
 {

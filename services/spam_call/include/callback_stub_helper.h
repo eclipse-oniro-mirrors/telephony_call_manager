@@ -19,17 +19,18 @@
 #include <singleton.h>
 #include "spam_call_adapter.h"
 #include "spam_call_stub.h"
+#include <memory>
 
 namespace OHOS {
 namespace Telephony {
 class CallbackStubHelper : public SpamCallStub {
 public:
-    CallbackStubHelper(SpamCallAdapter *spamCallAdapter);
+    CallbackStubHelper(std::shared_ptr<SpamCallAdapter> spamCallAdapter);
     ~CallbackStubHelper();
     int32_t OnResult(int32_t &errCode, std::string &result) override;
 
 private:
-    SpamCallAdapter *spamCallAdapter_ {nullptr};
+    std::shared_ptr<SpamCallAdapter> spamCallAdapter_ {nullptr};
 };
 }
 }
