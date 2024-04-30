@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#define PRIVATE public
-#define PROTECTED public
+#define private public
+#define protected public
 #include "ability_connect_callback_interface.h"
 #include "ability_manager_client.h"
 #include "call_ability_connect_callback.h"
