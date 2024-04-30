@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 #define private publicl
-#define protected publicl
+#define protected public
 #include "ability_connect_callback_interface.h"
 #include "ability_manager_client.h"
 #include "call_ability_connect_callback.h"
@@ -25,7 +25,7 @@
 #include "call_number_utils.h"
 #include "call_object_manager.h"
 #include "common_event_manager.h"
-#include "common_event_subscrib_info.h"
+#include "common_event_subscribe_info.h"
 #include "common_event_subscriber.h"
 #include "common_event_support.h"
 #include "datashare_helper.h"
@@ -37,7 +37,7 @@
 #include "iservice_registry.h"
 #include "location_log.h"
 #include "location.h"
-#include "location_impl.h"
+#include "locator_impl.h"
 #include "locator.h"
 #include "matching_skills.h"
 #include "os_account_manager_wrapper.h"
@@ -73,13 +73,13 @@ public:
 };
 
 /**
- * @tc.number   Telephony_MylocationEngine_001
+ * @tc.number   Telephony_MyLocationEngine_001
  * @tc.name     test normal branch
  * @tc.desc     Function test
  */
-HWTEST_F(LocationEngineTest, Telephony_MylocationEngine_001, Function | MediumTest | Level13)
+HWTEST_F(LocationEngineTest, Telephony_MyLocationEngine_001, Function | MediumTest | Level3)
 {
-    auto engine = std::make_shared<MyLocationEngine>;
+    auto engine = std::make_shared<MyLocationEngine>();
     if (engine == nullptr) {
         TELEPHONY_LOGI("engine is null. MyLocationEngine");
         return;
@@ -93,7 +93,7 @@ HWTEST_F(LocationEngineTest, Telephony_MylocationEngine_001, Function | MediumTe
     engine->RegisterSwitchCallback();
     engine->LocationSwitchChange();
     engine->UnregisterLocationChange();
-    engine->UnregisterSwitchCallback();
+    engine->UnRegisterSwitchCallback();
     engine->OnInit();
     engine->SetValue();
     engine->RegisterLocationChange();
@@ -102,11 +102,11 @@ HWTEST_F(LocationEngineTest, Telephony_MylocationEngine_001, Function | MediumTe
 }
 
 /**
- * @tc.number   Telephony_MylocationEngine_002
+ * @tc.number   Telephony_MyLocationEngine_002
  * @tc.name     test normal branch
  * @tc.desc     Function test
  */
-HWTEST_F(LocationEngineTest, Telephony_MylocationEngine_002, Function | MediumTest | Level13)
+HWTEST_F(LocationEngineTest, Telephony_MyLocationEngine_002, Function | MediumTest | Level3)
 {
     auto engine1 = std::make_shared<MyLocationEngine>();
     engine1->mylocator = engine1;
@@ -130,15 +130,15 @@ HWTEST_F(LocationEngineTest, Telephony_MylocationEngine_002, Function | MediumTe
     engine->locatorCallback_->OnRemoteRequest(code, data2, reply, option);
     MessageParcel data3;
     data3.WriteInterfaceToken(MyLocationEngine::MyLocationCallBack::GetDescriptor());
-    code = Location::ILocatorCallBack::RECEIVE_LOCATION_INFO_EVENT;
+    code = Location::ILocatorCallback::RECEIVE_LOCATION_INFO_EVENT;
     engine->locatorCallback_->OnRemoteRequest(code, data3, reply, option);
     MessageParcel data4;
     data4.WriteInterfaceToken(MyLocationEngine::MyLocationCallBack::GetDescriptor());
-    code = Location::ILocatorCallBack::RECEIVE_ERROR_INFO_EVENT;
+    code = Location::ILocatorCallback::RECEIVE_ERROR_INFO_EVENT;
     engine->locatorCallback_->OnRemoteRequest(code, data4, reply, option);
     MessageParcel data5;
     data5.WriteInterfaceToken(MyLocationEngine::MyLocationCallBack::GetDescriptor());
-    code = Location::ILocatorCallBack::RECEIVE_LOCATION_STATUS_EVENT;
+    code = Location::ILocatorCallback::RECEIVE_LOCATION_STATUS_EVENT;
     engine->locatorCallback_->OnRemoteRequest(code, data5, reply, option);
     engine->SetValue();
     engine->RegisterLocationChange();
@@ -147,11 +147,11 @@ HWTEST_F(LocationEngineTest, Telephony_MylocationEngine_002, Function | MediumTe
 }
 
 /**
- * @tc.number   Telephony_MylocationEngine_003
+ * @tc.number   Telephony_MyLocationEngine_003
  * @tc.name     test normal branch
  * @tc.desc     Function test
  */
-HWTEST_F(LocationEngineTest, Telephony_MylocationEngine_003, Function | MediumTest | Level13)
+HWTEST_F(LocationEngineTest, Telephony_MyLocationEngine_003, Function | MediumTest | Level3)
 {
     auto engine1 = std::make_shared<MyLocationEngine>();
     engine1->mylocator = engine1;
@@ -187,7 +187,7 @@ HWTEST_F(LocationEngineTest, Telephony_MylocationEngine_003, Function | MediumTe
  * @tc.name     test normal branch
  * @tc.desc     Function test
  */
-HWTEST_F(LocationEngineTest, Telephony_EmergencyCallConnectCallback_001, Function | MediumTest | Level13)
+HWTEST_F(LocationEngineTest, Telephony_EmergencyCallConnectCallback_001, Function | MediumTest | Level3)
 {
     auto engine1 = std::make_shared<MyLocationEngine>();
     engine1->mylocator = engine1;
@@ -201,7 +201,7 @@ HWTEST_F(LocationEngineTest, Telephony_EmergencyCallConnectCallback_001, Functio
     std::string bundle = "111";
     std::string ability = "222";
     AppExecFwk::ElementName element("", bundle, ability);
-    sptr<IRemoteObject> remoteObject = EmergencyCallConnectCallback();
+    sptr<IRemoteObject> remoteObject = new EmergencyCallConnectCallback();
     int resultCode = 0;
     connectcallback->connectCallback_->OnAbilityConnectDone(element, remoteObject, resultCode);
     connectcallback->connectCallback_->OnAbilityDisconnectDone(element, resultCode);
@@ -213,7 +213,7 @@ HWTEST_F(LocationEngineTest, Telephony_EmergencyCallConnectCallback_001, Functio
  * @tc.name     test normal branch
  * @tc.desc     Function test
  */
-HWTEST_F(LocationEngineTest, Telephony_LocationSubscriber_001, Function | MediumTest | Level13)
+HWTEST_F(LocationEngineTest, Telephony_LocationSubscriber_001, Function | MediumTest | Level3)
 {
     const char* keyword = "switchtest";
     std::string value1 = "true";
@@ -230,7 +230,7 @@ HWTEST_F(LocationEngineTest, Telephony_LocationSubscriber_001, Function | Medium
     subscribe->Subscriber();
     EventFwk::CommonEventData eventData;
     AAFwk::Want want;
-    want.SetAction();
+    want.SetAction(event);
     want.SetParam(keyword, value1);
     eventData.SetWant(want);
     subscribe->subscriber_->OnReceiveEvent(eventData);
@@ -245,10 +245,10 @@ HWTEST_F(LocationEngineTest, Telephony_LocationSubscriber_001, Function | Medium
  * @tc.name     test normal branch
  * @tc.desc     Function test
  */
-HWTEST_F(LocationEngineTest, Telephony_DataShareSwitchState_001, Function | MediumTest | Level13)
+HWTEST_F(LocationEngineTest, Telephony_DataShareSwitchState_001, Function | MediumTest | Level3)
 {
     auto datashareHelper = std::make_shared<DataShareSwitchState>();
-    OHOS::Uri uriTest(string("datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGDATA?")
+    OHOS::Uri uriTest(string("datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?")
         + string("Proxy=true&key=testKeyWord"));
     const std::string key = "testKeyWord";
     std::string value1 = "test";
@@ -263,7 +263,7 @@ HWTEST_F(LocationEngineTest, Telephony_DataShareSwitchState_001, Function | Medi
  * @tc.name     test normal branch
  * @tc.desc     Function test
  */
-HWTEST_F(LocationEngineTest, Telephony_LocationSystemAbilityListener_001, Function | MediumTest | Level13)
+HWTEST_F(LocationEngineTest, Telephony_LocationSystemAbilityListener_001, Function | MediumTest | Level3)
 {
     int32_t ability_1914 = OHOS::DEVICE_STANDBY_SERVICE_SYSTEM_ABILITY_ID;
     int32_t ability_2802 = OHOS::LOCATION_LOCATOR_SA_ID;
@@ -286,5 +286,8 @@ HWTEST_F(LocationEngineTest, Telephony_LocationSystemAbilityListener_001, Functi
     ASSERT_TRUE(locationAbility->SystemAbilitySubscriber() == true);
     ASSERT_TRUE(locationAbility->statusChangeListener_ != nullptr);
 }
-} // namespace Telephony
-} // namespace OHOS
+}
+// namespace Telephony
+
+}
+// namespace OHOS
