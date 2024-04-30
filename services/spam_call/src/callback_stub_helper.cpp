@@ -20,11 +20,14 @@
 
 namespace OHOS {
 namespace Telephony {
-CallbackStubHelper::CallbackStubHelper(SpamCallAdapter *spamCallAdapter)
+CallbackStubHelper::CallbackStubHelper(std::shared_ptr<SpamCallAdapter> spamCallAdapter)
 {
     spamCallAdapter_ = spamCallAdapter;
 };
-CallbackStubHelper::~CallbackStubHelper() {};
+CallbackStubHelper::~CallbackStubHelper()
+{
+    TELEPHONY_LOGI("~CallbackStubHelper");
+};
 
 int32_t CallbackStubHelper::OnResult(int32_t &errCode, std::string &result)
 {

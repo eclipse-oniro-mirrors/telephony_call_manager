@@ -19,6 +19,7 @@
 #include "spam_call_adapter.h"
 #include <iremote_broker.h>
 #include <iremote_object.h>
+#include <memory>
 
 namespace OHOS {
 namespace Telephony {
@@ -27,7 +28,7 @@ public:
     DECLARE_INTERFACE_DESCRIPTOR(u"idl.ISpamShieldService");
 
     virtual int32_t DetectSpamCall(const std::string &phoneNumber, const int32_t &slotId,
-        SpamCallAdapter *spamCallAdapter) = 0;
+        std::shared_ptr<SpamCallAdapter> spamCallAdapter) = 0;
 };
 } // namespace Telephony
 } // namespace OHOS

@@ -18,13 +18,14 @@
 
 #include "ability_connect_callback_stub.h"
 #include "spam_call_adapter.h"
+#include <memory>
 
 namespace OHOS {
 namespace Telephony {
 class SpamCallConnection : public AAFwk::AbilityConnectionStub {
 public:
     SpamCallConnection(const std::string &phoneNumber, const int32_t &slotId,
-       SpamCallAdapter *spamCallAdapter)
+       std::shared_ptr<SpamCallAdapter> spamCallAdapter)
     {
         phoneNumber_ = phoneNumber;
         slotId_ = slotId;
@@ -40,7 +41,7 @@ public:
 private:
     std::string phoneNumber_;
     int32_t slotId_;
-    SpamCallAdapter *spamCallAdapter_ {nullptr};
+    std::shared_ptr<SpamCallAdapter> spamCallAdapter_ {nullptr};
 };
 } // namespace Telephony
 } // namespace OHOS

@@ -31,7 +31,7 @@ SpamCallProxy::SpamCallProxy(const sptr<IRemoteObject> &impl)
 {}
 
 int32_t SpamCallProxy::DetectSpamCall(const std::string &phoneNumber, const int32_t &slotId,
-    SpamCallAdapter *spamCallAdapter)
+    std::shared_ptr<SpamCallAdapter> spamCallAdapter)
 {
     MessageParcel dataParcel;
     std::u16string myDescriptor = SpamCallProxy::GetDescriptor();

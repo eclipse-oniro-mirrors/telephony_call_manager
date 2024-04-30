@@ -23,10 +23,11 @@
 #include "cJSON.h"
 #include "time_wait_helper.h"
 #include "ability_connect_callback_stub.h"
+#include <memory>
 
 namespace OHOS {
 namespace Telephony {
-class SpamCallAdapter {
+class SpamCallAdapter : public std::enable_shared_from_this<SpamCallAdapter> {
 public:
     SpamCallAdapter();
     ~SpamCallAdapter();

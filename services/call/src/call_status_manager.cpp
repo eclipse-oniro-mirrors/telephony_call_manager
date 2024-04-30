@@ -1306,7 +1306,7 @@ bool CallStatusManager::ShouldBlockIncomingCall(const sptr<CallBase> &call, cons
         TELEPHONY_LOGI("incoming phoneNumber is ecc.");
         return false;
     }
-    std::unique_ptr<SpamCallAdapter> spamCallAdapterPtr_ = std::make_unique<SpamCallAdapter>();
+    std::shared_ptr<SpamCallAdapter> spamCallAdapterPtr_ = std::make_shared<SpamCallAdapter>();
     if (spamCallAdapterPtr_ == nullptr) {
         TELEPHONY_LOGE("create SpamCallAdapter object failed!");
         return false;
