@@ -89,8 +89,4 @@ ohos_unittest("tel_call_earthquake_alarm_test") {
         "TELEPHONY_LOG_TAG = \"CallManagerAlarmTest\"",
         "LOG_DOMAIN = 0xD000F00",
     ]
-
-    if (device_name == "rk3568") {
-        defines += ["CALL_MANAGER_IMS_LITE_UNSUPPORT"]
-    }
 }
