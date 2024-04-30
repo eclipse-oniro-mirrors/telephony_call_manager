@@ -47,7 +47,12 @@ void CallStateReportProxy::CallStateUpdated(
     callObjectPtr->GetCallAttributeInfo(info);
     std::string str(info.accountNumber);
     std::u16string accountNumber = Str8ToStr16(str);
-    if (info.callState == TelCallState::CALL_STATUS_INCOMING) {
+    if (nextState == TelCallState::CALL_STATUS_ANSWERED) {
+        TELEPHONY_LOGI("report answered state");
+        info.callState = TelCallState::CALL_STATUS_ANSWERED;
+    }
+    if (info.callState == TelCallState::CALL_STATUS_INCOMING
+        || info.callState == TelCallState::CALL_STATUS_ANSWERED) {
         ReportCallState(info.accountId, static_cast<int32_t>(info.callState), accountNumber);
     } else {
         ReportCallStateForCallId(info.accountId, info.callId, static_cast<int32_t>(info.callState), accountNumber);
