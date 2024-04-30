@@ -12,8 +12,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#define private publicl
-#define protected public
+#define PRIVATE publicl
+#define PROTECTED public
 #include "ability_connect_callback_interface.h"
 #include "ability_manager_client.h"
 #include "call_ability_connect_callback.h"
@@ -268,7 +268,7 @@ HWTEST_F(LocationEngineTest, Telephony_LocationSystemAbilityListener_001, Functi
     int32_t ability_1914 = OHOS::DEVICE_STANDBY_SERVICE_SYSTEM_ABILITY_ID;
     int32_t ability_2802 = OHOS::LOCATION_LOCATOR_SA_ID;
     int32_t ability_2805 = OHOS::LOCATION_NOPOWER_LOCATING_SA_ID;
-    const std::string deviceId = "11111111111test"; 
+    const std::string deviceId = "11111111111test";
     auto locationAbility = std::make_shared<LocationSystemAbilityListener>();
     locationAbility->GetSystemAbility(ability_1914);
     locationAbility->GetSystemAbility(ability_2802);
