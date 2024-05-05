@@ -23,6 +23,7 @@
 
 #include "call_manager_errors.h"
 #include "call_manager_inner_type.h"
+#include "call_object_manager.h"
 #include "telephony_log_wrapper.h"
 #include "telephony_state_registry_client.h"
 
@@ -43,20 +44,19 @@ void CallStateReportProxy::CallStateUpdated(
         TELEPHONY_LOGI("voip call no need to report call state");
         return;
     }
+    sptr<CallBase> foregroundCall = CallObjectManager::GetForegroundLiveCall();
+    if (foregroundCall == nullptr) {
+        TELEPHONY_LOGE("foregroundCall is nullptr!");
+        foregroundCall = callObjectPtr;
+    }
     CallAttributeInfo info;
-    callObjectPtr->GetCallAttributeInfo(info);
+    foregroundCall->GetCallAttributeInfo(info);
     std::string str(info.accountNumber);
     std::u16string accountNumber = Str8ToStr16(str);
     if (nextState == TelCallState::CALL_STATUS_ANSWERED) {
-        TELEPHONY_LOGI("report answered state");
         info.callState = TelCallState::CALL_STATUS_ANSWERED;
     }
-    if (info.callState == TelCallState::CALL_STATUS_INCOMING
-        || info.callState == TelCallState::CALL_STATUS_ANSWERED) {
-        ReportCallState(info.accountId, static_cast<int32_t>(info.callState), accountNumber);
-    } else {
-        ReportCallStateForCallId(info.accountId, info.callId, static_cast<int32_t>(info.callState), accountNumber);
-    }
+    ReportCallStateForCallId(info.accountId, info.callId, static_cast<int32_t>(info.callState), accountNumber);
 }
 
 int32_t CallStateReportProxy::ReportCallState(int32_t slotId, int32_t callState, std::u16string phoneNumber)
