@@ -842,16 +842,6 @@ int32_t CallManagerService::ControlCamera(int32_t callId, std::u16string &camera
         TELEPHONY_LOGE("Permission denied!");
         return TELEPHONY_ERR_PERMISSION_ERR;
     }
-    callerToken_ = IPCSkeleton::GetCallingTokenID();
-    if (cameraId.empty()) {
-        PrivacyKit::StopUsingPermission(callerToken_, "ohos.permission.CAMERA");
-    } else {
-        sptr<CallBase> call = CallObjectManager::GetOneCallObjectByIndex(callId);
-        if (call == nullptr || call->GetVideoStateType() != VideoStateType::TYPE_RECEIVE_ONLY) {
-            PrivacyKit::AddPermissionUsedRecord(callerToken_, "ohos.permission.CAMERA", 1, 0);
-            PrivacyKit::StartUsingPermission(callerToken_, "ohos.permission.CAMERA");
-        }
-    }
     auto videoControlManager = DelayedSingleton<VideoControlManager>::GetInstance();
     if (videoControlManager != nullptr) {
         return videoControlManager->ControlCamera(
@@ -860,11 +850,6 @@ int32_t CallManagerService::ControlCamera(int32_t callId, std::u16string &camera
         TELEPHONY_LOGE("videoControlManager is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-}
-
-int32_t CallManagerService::GetCallerToken()
-{
-    return callerToken_;
 }
 
 int32_t CallManagerService::SetPreviewWindow(int32_t callId, std::string &surfaceId, sptr<Surface> surface)
@@ -879,6 +864,16 @@ int32_t CallManagerService::SetPreviewWindow(int32_t callId, std::string &surfac
     }
     auto videoControlManager = DelayedSingleton<VideoControlManager>::GetInstance();
     if (videoControlManager != nullptr) {
+        int32_t callerToken = IPCSkeleton::GetCallingTokenID();
+        if (cameraId.empty()) {
+            PrivacyKit::StopUsingPermission(callerToken, "ohos.permission.CAMERA");
+        } else {
+            sptr<CallBase> call = CallObjectManager::GetOneCallObjectByIndex(callId);
+            if (call == nullptr || call->GetVideoStateType() != VideoStateType::TYPE_RECEIVE_ONLY) {
+                PrivacyKit::AddPermissionUsedRecord(callerToken, "ohos.permission.CAMERA", 1, 0);
+                PrivacyKit::StartUsingPermission(callerToken, "ohos.permission.CAMERA");
+            }
+        }
         return videoControlManager->SetPreviewWindow(callId, surfaceId, surface);
     } else {
         TELEPHONY_LOGE("videoControlManager is nullptr!");
