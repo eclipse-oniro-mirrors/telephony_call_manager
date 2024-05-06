@@ -852,7 +852,7 @@ int32_t CallManagerService::ControlCamera(int32_t callId, std::u16string &camera
     }
 }
 
-int32_t CallManagerService::SetPreviewWindow(int32_t callId, std::string &surfaceId, sptr<Surface> preSurface)
+int32_t CallManagerService::SetPreviewWindow(int32_t callId, std::string &surfaceId, sptr<Surface> surface)
 {
     if (!TelephonyPermission::CheckCallerIsSystemApp()) {
         TELEPHONY_LOGE("Non-system applications use system APIs!");
@@ -865,7 +865,7 @@ int32_t CallManagerService::SetPreviewWindow(int32_t callId, std::string &surfac
     auto videoControlManager = DelayedSingleton<VideoControlManager>::GetInstance();
     if (videoControlManager != nullptr) {
         int32_t callerToken = IPCSkeleton::GetCallingTokenID();
-        if (preSurface == nullptr) {
+        if (surface == nullptr) {
             PrivacyKit::StopUsingPermission(callerToken, "ohos.permission.CAMERA");
         } else {
             sptr<CallBase> call = CallObjectManager::GetOneCallObjectByIndex(callId);
@@ -874,7 +874,7 @@ int32_t CallManagerService::SetPreviewWindow(int32_t callId, std::string &surfac
                 PrivacyKit::StartUsingPermission(callerToken, "ohos.permission.CAMERA");
             }
         }
-        return videoControlManager->SetPreviewWindow(callId, surfaceId, preSurface);
+        return videoControlManager->SetPreviewWindow(callId, surfaceId, surface);
     } else {
         TELEPHONY_LOGE("videoControlManager is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
