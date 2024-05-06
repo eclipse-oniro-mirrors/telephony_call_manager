@@ -865,7 +865,7 @@ int32_t CallManagerService::SetPreviewWindow(int32_t callId, std::string &surfac
     auto videoControlManager = DelayedSingleton<VideoControlManager>::GetInstance();
     if (videoControlManager != nullptr) {
         int32_t callerToken = IPCSkeleton::GetCallingTokenID();
-        if (cameraId.empty()) {
+        if (surface == nullptr) {
             PrivacyKit::StopUsingPermission(callerToken, "ohos.permission.CAMERA");
         } else {
             sptr<CallBase> call = CallObjectManager::GetOneCallObjectByIndex(callId);
