@@ -1057,7 +1057,6 @@ void CallStatusManager::SetVideoCallState(sptr<CallBase> &call, TelCallState nex
         } else if (priorVideoState_[slotId] == VideoStateType::TYPE_VIDEO
             && videoState == VideoStateType::TYPE_RECEIVE_ONLY) {
             PrivacyKit::StopUsingPermission(callerToken, "ohos.permission.CAMERA");
-
         }
     }
     if (isSlotIdValid && (priorVideoState_[slotId] != videoState)) {
