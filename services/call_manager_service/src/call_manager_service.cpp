@@ -844,12 +844,12 @@ int32_t CallManagerService::ControlCamera(int32_t callId, std::u16string &camera
     }
     callerToken_ = IPCSkeleton::GetCallingTokenID();
     if (cameraId.empty()) {
-        PrivacyKit::StopUsingPermission(callerToken, "ohos.permission.CAMERA");
+        PrivacyKit::StopUsingPermission(callerToken_, "ohos.permission.CAMERA");
     } else {
         sptr<CallBase> call = CallObjectManager::GetOneCallObjectByIndex(callId);
         if (call == nullptr || call->GetVideoStateType() != VideoStateType::TYPE_RECEIVE_ONLY) {
-            PrivacyKit::AddPermissionUsedRecord(callerToken, "ohos.permission.CAMERA", 1, 0);
-            PrivacyKit::StartUsingPermission(callerToken, "ohos.permission.CAMERA");
+            PrivacyKit::AddPermissionUsedRecord(callerToken_, "ohos.permission.CAMERA", 1, 0);
+            PrivacyKit::StartUsingPermission(callerToken_, "ohos.permission.CAMERA");
         }
     }
     auto videoControlManager = DelayedSingleton<VideoControlManager>::GetInstance();
