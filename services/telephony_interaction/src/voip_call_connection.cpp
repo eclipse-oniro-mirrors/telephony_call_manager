@@ -192,7 +192,7 @@ void VoipCallConnection::ClearVoipCall()
     }
 }
 
-int32_t VoipCallConnection::SendCallUiEvent(std::string &voipCallId, const CallAudioEvent &callAudioEvent)
+int32_t VoipCallConnection::SendCallUiEvent(std::string voipCallId, const CallAudioEvent &callAudioEvent)
 {
     GetCallManagerProxy();
     if (voipCallManagerInterfacePtr_ == nullptr) {

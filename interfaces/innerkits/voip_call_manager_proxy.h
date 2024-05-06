@@ -60,7 +60,7 @@ public:
      * @param VoipCallState[in], The voip call state
      * @return Returns 0 on success, others on failure.
      */
-    int32_t ReportCallStateChange(std::string &callId, const VoipCallState &state) override;
+    int32_t ReportCallStateChange(std::string callId, const VoipCallState &state) override;
     /**
      * @brief thrid-party applications report a outgoing call.
      *
@@ -94,7 +94,7 @@ public:
      * @param processMode[in], The processMode
      * @return Returns 0 on success, others on failure.
      */
-    int32_t ReportVoipIncomingCall(std::string &callId, std::string &bundleName, std::string &processMode) override;
+    int32_t ReportVoipIncomingCall(std::string callId, std::string bundleName, std::string processMode) override;
     /**
      * @brief pushSA report call extensionId.
      *
@@ -103,7 +103,7 @@ public:
      * @param extensionId[in], The extensionId
      * @return Returns 0 on success, others on failure.
      */
-    int32_t ReportVoipCallExtensionId(std::string &callId, std::string &bundleName, std::string &extensionId) override;
+    int32_t ReportVoipCallExtensionId(std::string callId, std::string bundleName, std::string extensionId) override;
 
     /**
      * @brief hang up a call
@@ -158,7 +158,7 @@ public:
      * @param callAudioEvent[in], The call audio event
      * @return Returns TELEPHONY_SUCCESS on success, others on failure.
      */
-    int32_t SendCallUiEvent(std::string &voipCallId, const CallAudioEvent &callAudioEvent) override;
+    int32_t SendCallUiEvent(std::string voipCallId, const CallAudioEvent &callAudioEvent) override;
 
     /**
      * @brief thrid-party applications report call audio event change
@@ -167,7 +167,7 @@ public:
      * @param callAudioEvent[in], The call audio event
      * @return Returns TELEPHONY_SUCCESS on success, others on failure.
      */
-    int32_t ReportCallAudioEventChange(std::string &voipCallId, const CallAudioEvent &callAudioEvent) override;
+    int32_t ReportCallAudioEventChange(std::string voipCallId, const CallAudioEvent &callAudioEvent) override;
 
 private:
     static inline BrokerDelegator<VoipCallManagerProxy> delegator_;
