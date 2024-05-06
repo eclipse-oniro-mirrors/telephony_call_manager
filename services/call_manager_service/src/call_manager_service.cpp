@@ -123,6 +123,7 @@ void CallManagerService::OnStart()
         TELEPHONY_LOGI("CallManagerService start service cost time:%{public}d(milliseconds)", spendTime_);
     }
     LocationSystemAbilityListener::SystemAbilitySubscriber();
+    LocationSubscriber::Subscriber();
 }
 
 void CallManagerService::OnStop()
