@@ -753,6 +753,8 @@ public:
      */
     int32_t SendCallUiEvent(int32_t callId, std::string &eventName) override;
 
+int32_t GetCallerToken();
+
 private:
     std::string GetBundleInfo();
 
@@ -777,6 +779,7 @@ private:
     const int32_t extraMonth_ = 1;
     int64_t bindTime_ = 0L;
     int32_t spendTime_ = 0;
+    int32_t callerToken_;
 };
 } // namespace Telephony
 } // namespace OHOS

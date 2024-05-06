@@ -17,12 +17,14 @@
 
 #include <securec.h>
 
+#include "accesstoken_kit.h"
 #include "audio_control_manager.h"
 #include "bluetooth_call_service.h"
 #include "call_ability_report_proxy.h"
 #include "call_control_manager.h"
 #include "call_manager_errors.h"
 #include "call_manager_hisysevent.h"
+#include "call_manager_service.h"
 #include "call_number_utils.h"
 #include "call_request_event_handler_helper.h"
 #include "core_service_client.h"
@@ -30,8 +32,10 @@
 #include "datashare_predicates.h"
 #include "hitrace_meter.h"
 #include "ims_call.h"
+#include "ipc_skeleton.h"
 #include "os_account_manager.h"
 #include "ott_call.h"
+#include "privacy_kit.h"
 #include "report_call_info_handler.h"
 #include "satellite_call.h"
 #include "satellite_call_control.h"
@@ -47,6 +51,7 @@
 namespace OHOS {
 namespace Telephony {
 constexpr int32_t INIT_INDEX = 0;
+using namespace Security::AccessToken;
 CallStatusManager::CallStatusManager()
 {
     (void)memset_s(&callReportInfo_, sizeof(CallDetailInfo), 0, sizeof(CallDetailInfo));
@@ -1043,6 +1048,18 @@ void CallStatusManager::SetVideoCallState(sptr<CallBase> &call, TelCallState nex
     VideoStateType videoState = call->GetVideoStateType();
     TELEPHONY_LOGI("nextVideoState:%{public}d, priorVideoState:%{public}d, isSlotIdValid:%{public}d", videoState,
         priorVideoState_[slotId], isSlotIdValid);
+    int32_t callerToken = DelayedSingleton<CallManagerService>::GetInstance()->GetCallerToken();
+    if (isSlotIdValid) {
+        if (priorVideoState_[slotId] == VideoStateType::TYPE_RECEIVE_ONLY
+            && videoState == VideoStateType::TYPE_VIDEO) {
+            PrivacyKit::AddPermissionUsedRecord(callerToken, "ohos.permission.CAMERA", 1, 0);
+            PrivacyKit::StartUsingPermission(callerToken, "ohos.permission.CAMERA");
+        } else if (priorVideoState_[slotId] == VideoStateType::TYPE_VIDEO
+            && videoState == VideoStateType::TYPE_RECEIVE_ONLY) {
+            PrivacyKit::StopUsingPermission(callerToken, "ohos.permission.CAMERA");
+
+        }
+    }
     if (isSlotIdValid && (priorVideoState_[slotId] != videoState)) {
         DelayedSingleton<AudioControlManager>::GetInstance()->VideoStateUpdated(
             call, priorVideoState_[slotId], videoState);

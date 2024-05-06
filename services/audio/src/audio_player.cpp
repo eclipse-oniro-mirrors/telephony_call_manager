@@ -15,13 +15,17 @@
 
 #include "audio_player.h"
 
+#include "accesstoken_kit.h"
 #include "audio_control_manager.h"
 #include "audio_system_manager.h"
 #include "call_manager_errors.h"
+#include "ipc_skeleton.h"
+#include "privacy_kit.h"
 #include "telephony_log_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
+using namespace Security::AccessToken;
 bool AudioPlayer::InitRenderer(const wav_hdr &wavHeader, AudioStandard::AudioStreamType streamType)
 {
     AudioStandard::AudioRendererParams rendererParams;
@@ -86,6 +90,9 @@ bool AudioPlayer::InitRenderer()
         return false;
     }
     isRenderInitialized_ = true;
+    int32_t callerToken = IPCSkeleton::GetCallingTokenID();
+    PrivacyKit::AddPermissionUsedRecord(callerToken, "ohos.permission.MICROPHONE", 1, 0);
+    PrivacyKit::StartUsingPermission(callerToken, "ohos.permission.MICROPHONE");
     return true;
 }
 
@@ -200,6 +207,8 @@ void AudioPlayer::SetStop(PlayerType playerType, bool state)
             isSoundStop_ = state;
             if (isSoundStop_) {
                 DelayedSingleton<AudioControlManager>::GetInstance()->SetSoundState(SoundState::STOPPED);
+                int32_t callerToken = IPCSkeleton::GetCallingTokenID();
+                PrivacyKit::StopUsingPermission(callerToken, "ohos.permission.MICROPHONE");
             } else {
                 DelayedSingleton<AudioControlManager>::GetInstance()->SetSoundState(SoundState::SOUNDING);
             }

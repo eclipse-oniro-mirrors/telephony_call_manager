@@ -15,6 +15,7 @@
 
 #include "call_manager_service.h"
 
+#include "accesstoken_kit.h"
 #include "audio_device_manager.h"
 #include "bluetooth_call_service.h"
 #include "call_ability_report_proxy.h"
@@ -27,6 +28,7 @@
 #include "core_manager_inner.h"
 #include "hitrace_meter.h"
 #include "ipc_skeleton.h"
+#include "privacy_kit.h"
 #include "report_call_info_handler.h"
 #include "telephony_log_wrapper.h"
 #include "telephony_permission.h"
@@ -37,6 +39,7 @@
 
 namespace OHOS {
 namespace Telephony {
+using namespace Security::AccessToken;
 static constexpr const char *OHOS_PERMISSION_SET_TELEPHONY_STATE = "ohos.permission.SET_TELEPHONY_STATE";
 static constexpr const char *OHOS_PERMISSION_GET_TELEPHONY_STATE = "ohos.permission.GET_TELEPHONY_STATE";
 static constexpr const char *OHOS_PERMISSION_PLACE_CALL = "ohos.permission.PLACE_CALL";
@@ -839,6 +842,16 @@ int32_t CallManagerService::ControlCamera(int32_t callId, std::u16string &camera
         TELEPHONY_LOGE("Permission denied!");
         return TELEPHONY_ERR_PERMISSION_ERR;
     }
+    callerToken_ = IPCSkeleton::GetCallingTokenID();
+    if (cameraId.empty()) {
+        PrivacyKit::StopUsingPermission(callerToken, "ohos.permission.CAMERA");
+    } else {
+        sptr<CallBase> call = CallObjectManager::GetOneCallObjectByIndex(callId);
+        if (call == nullptr || call->GetVideoStateType() != VideoStateType::TYPE_RECEIVE_ONLY) {
+            PrivacyKit::AddPermissionUsedRecord(callerToken, "ohos.permission.CAMERA", 1, 0);
+            PrivacyKit::StartUsingPermission(callerToken, "ohos.permission.CAMERA");
+        }
+    }
     auto videoControlManager = DelayedSingleton<VideoControlManager>::GetInstance();
     if (videoControlManager != nullptr) {
         return videoControlManager->ControlCamera(
@@ -847,6 +860,11 @@ int32_t CallManagerService::ControlCamera(int32_t callId, std::u16string &camera
         TELEPHONY_LOGE("videoControlManager is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
+}
+
+int32_t CallManagerService::GetCallerToken()
+{
+    return callerToken_;
 }
 
 int32_t CallManagerService::SetPreviewWindow(int32_t callId, std::string &surfaceId, sptr<Surface> surface)
