@@ -103,6 +103,9 @@ void MyLocationEngine::RegisterLocationChange()
 
 void MyLocationEngine::UnregisterLocationChange()
 {
+    if (locatorImpl == nullptr || locatorCallback_ == nullptr) {
+        return;
+    }
     auto callback = sptr<Location::ILocatorCallback>(locatorCallback_);
     auto code = this->locatorImpl->StopLocatingV9(callback);
     TELEPHONY_LOGI("MyLocationEngine stopListencdode = %{public}d.", code);
@@ -228,6 +231,9 @@ MyLocationEngine::MySwitchCallback::MySwitchCallback(std::shared_ptr<MyLocationE
 
 void MyLocationEngine::MySwitchCallback::OnSwitchChange(const int state)
 {
+    if (locationUpdate_ == nullptr) {
+        return;
+    }
     locationUpdate_->LocationSwitchChange();
 }
 
