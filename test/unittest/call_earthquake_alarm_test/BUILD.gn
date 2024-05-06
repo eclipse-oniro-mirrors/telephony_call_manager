@@ -51,6 +51,7 @@ ohos_unittest("tel_call_earthquake_alarm_test") {
 
   external_deps = [
     "ability_base:want",
+    "ability_base:zuri",
     "ability_runtime:ability_manager",
     "ability_runtime:app_manager",
     "ability_runtime:dataobs_manager",
@@ -71,6 +72,8 @@ ohos_unittest("tel_call_earthquake_alarm_test") {
     "hilog:libhilog",
     "init:libbegetutil",
     "ipc:ipc_single",
+    "location:lbsservice_common",
+    "location:locator_sdk",
     "player_framework:system_sound_client",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
