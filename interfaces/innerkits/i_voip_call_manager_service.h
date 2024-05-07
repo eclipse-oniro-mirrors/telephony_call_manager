@@ -52,13 +52,13 @@ public:
     virtual int32_t ReportIncomingCall(
         AppExecFwk::PacMap &extras, std::vector<uint8_t> &userProfile, ErrorReason &reason) = 0;
     virtual int32_t ReportIncomingCallError(AppExecFwk::PacMap &extras) = 0;
-    virtual int32_t ReportCallStateChange(std::string &callId, const VoipCallState &state) = 0;
+    virtual int32_t ReportCallStateChange(std::string callId, const VoipCallState &state) = 0;
     virtual int32_t RegisterCallBack(const sptr<IVoipCallManagerCallback> &callback) = 0;
     virtual int32_t UnRegisterCallBack() = 0;
 
-    virtual int32_t ReportVoipIncomingCall(std::string &callId, std::string &bundleName, std::string &processMode) = 0;
+    virtual int32_t ReportVoipIncomingCall(std::string callId, std::string bundleName, std::string processMode) = 0;
     virtual int32_t ReportVoipCallExtensionId(
-        std::string &callId, std::string &bundleName, std::string &extensionId) = 0;
+        std::string callId, std::string bundleName, std::string extensionId) = 0;
 
     virtual int32_t RegisterCallManagerCallBack(const sptr<ICallStatusCallback> &callback) = 0;
     virtual int32_t UnRegisterCallManagerCallBack() = 0;
@@ -66,8 +66,8 @@ public:
     virtual int32_t HangUp(const VoipCallEventInfo &events) = 0;
     virtual int32_t Reject(const VoipCallEventInfo &events) = 0;
     virtual int32_t UnloadVoipSa() = 0;
-    virtual int32_t SendCallUiEvent(std::string &voipCallId, const CallAudioEvent &callAudioEvent) = 0;
-    virtual int32_t ReportCallAudioEventChange(std::string &voipCallId, const CallAudioEvent &callAudioEvent) = 0;
+    virtual int32_t SendCallUiEvent(std::string voipCallId, const CallAudioEvent &callAudioEvent) = 0;
+    virtual int32_t ReportCallAudioEventChange(std::string voipCallId, const CallAudioEvent &callAudioEvent) = 0;
     virtual int32_t ReportOutgoingCall(
         AppExecFwk::PacMap &extras, std::vector<uint8_t> &userProfile, ErrorReason &reason) = 0;
 

@@ -84,7 +84,7 @@ int32_t VoipCallManagerProxy::ReportIncomingCallError(AppExecFwk::PacMap &extras
     return replyParcel.ReadInt32();
 }
 
-int32_t VoipCallManagerProxy::ReportCallStateChange(std::string &callId, const VoipCallState &state)
+int32_t VoipCallManagerProxy::ReportCallStateChange(std::string callId, const VoipCallState &state)
 {
     MessageParcel dataParcel;
     if (!dataParcel.WriteInterfaceToken(VoipCallManagerProxy::GetDescriptor())) {
@@ -190,7 +190,7 @@ int32_t VoipCallManagerProxy::UnRegisterCallBack()
 }
 
 int32_t VoipCallManagerProxy::ReportVoipIncomingCall(
-    std::string &callId, std::string &bundleName, std::string &processMode)
+    std::string callId, std::string bundleName, std::string processMode)
 {
     MessageParcel dataParcel;
     if (!dataParcel.WriteInterfaceToken(VoipCallManagerProxy::GetDescriptor())) {
@@ -217,7 +217,7 @@ int32_t VoipCallManagerProxy::ReportVoipIncomingCall(
 }
 
 int32_t VoipCallManagerProxy::ReportVoipCallExtensionId(
-    std::string &callId, std::string &bundleName, std::string &extensionId)
+    std::string callId, std::string bundleName, std::string extensionId)
 {
     MessageParcel dataParcel;
     if (!dataParcel.WriteInterfaceToken(VoipCallManagerProxy::GetDescriptor())) {
@@ -396,7 +396,7 @@ int32_t VoipCallManagerProxy::UnloadVoipSa()
     return replyParcel.ReadInt32();
 }
 
-int32_t VoipCallManagerProxy::SendCallUiEvent(std::string &voipCallId, const CallAudioEvent &callAudioEvent)
+int32_t VoipCallManagerProxy::SendCallUiEvent(std::string voipCallId, const CallAudioEvent &callAudioEvent)
 {
     MessageParcel dataParcel;
     if (!dataParcel.WriteInterfaceToken(VoipCallManagerProxy::GetDescriptor())) {
@@ -421,7 +421,7 @@ int32_t VoipCallManagerProxy::SendCallUiEvent(std::string &voipCallId, const Cal
     return replyParcel.ReadInt32();
 }
 
-int32_t VoipCallManagerProxy::ReportCallAudioEventChange(std::string &voipCallId, const CallAudioEvent &callAudioEvent)
+int32_t VoipCallManagerProxy::ReportCallAudioEventChange(std::string voipCallId, const CallAudioEvent &callAudioEvent)
 {
     MessageParcel dataParcel;
     if (!dataParcel.WriteInterfaceToken(VoipCallManagerProxy::GetDescriptor())) {
