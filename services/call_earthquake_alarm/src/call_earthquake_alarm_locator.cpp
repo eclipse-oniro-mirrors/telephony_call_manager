@@ -83,6 +83,10 @@ void MyLocationEngine::SetValue()
 
 void MyLocationEngine::RegisterLocationChange()
 {
+    if (locatorImpl == nullptr) {
+        TELEPHONY_LOGI("MyLocationEngine locatorImpl is null");
+        return;
+    }
     if (locatorCallback_ == nullptr) {
         locatorCallback_ =
             sptr<MyLocationEngine::MyLocationCallBack>(new (std::nothrow) MyLocationEngine::MyLocationCallBack());
