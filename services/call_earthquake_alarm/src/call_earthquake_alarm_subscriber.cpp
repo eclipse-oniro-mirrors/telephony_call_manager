@@ -154,7 +154,6 @@ void LocationSystemAbilityListener::OnAddSystemAbility(int32_t systemAbilityId, 
     if (!GetSystemAbility(OHOS::LOCATION_NOPOWER_LOCATING_SA_ID))  return;
     if (firstboot == 0) {
         MyLocationEngine::BootComplete();
-        LocationSubscriber::Subscriber();
         firstboot++;
         TELEPHONY_LOGI("first boot LocationSubscriber");
     }
