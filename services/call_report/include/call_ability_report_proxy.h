@@ -33,6 +33,7 @@ class CallAbilityReportProxy : public CallStateListenerBase,
 public:
     int32_t RegisterCallBack(sptr<ICallAbilityCallback> callback, const std::string &bundleInfo);
     int32_t UnRegisterCallBack(const std::string &bundleInfo);
+    int32_t UnRegisterCallBack(sptr<IRemoteObject> object);
     void CallStateUpdated(sptr<CallBase> &callObjectPtr, TelCallState priorState, TelCallState nextState) override;
     void CallEventUpdated(CallEventInfo &info) override;
     void CallDestroyed(const DisconnectedDetails &details) override;
