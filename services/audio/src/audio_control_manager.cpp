@@ -159,7 +159,7 @@ void AudioControlManager::CheckTypeAndSetAudioDevice(sptr<CallBase> &callObjectP
         TELEPHONY_LOGI("set device type, type: %{public}d", static_cast<int32_t>(device.deviceType));
         SetAudioDevice(device);
     } else if (!isSetAudioDevicesByUser_ && IsVideoCall(priorVideoState) && !IsVideoCall(nextVideoState)) {
-        device.deviceType = callObjectPtr->IsSpeakerphoneOn() ? AudioDeviceType::DEVICE_SPEAKER : AudioDeviceType::DEVICE_EARPIECE;
+        device.deviceType = AudioDeviceType::DEVICE_EARPIECE;
         if (initDeviceType == AudioDeviceType::DEVICE_WIRED_HEADSET ||
             initDeviceType == AudioDeviceType::DEVICE_BLUETOOTH_SCO ||
             initDeviceType == AudioDeviceType::DEVICE_DISTRIBUTED_AUTOMOTIVE) {
