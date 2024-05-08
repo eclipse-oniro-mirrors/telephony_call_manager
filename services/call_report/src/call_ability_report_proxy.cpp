@@ -74,14 +74,15 @@ int32_t CallAbilityReportProxy::UnRegisterCallBack(const std::string &bundleInfo
 {
     std::lock_guard<std::mutex> lock(mutex_);
     if (callbackPtrList_.empty()) {
-        TELEPHONY_LOGE("callbackPtrList_ is null! %{public}s UnRegisterCallBack failed", bundleInfo.c_str());
+        TELEPHONY_LOGE("callbackPtrList_ is null! %{public}s UnRegisterCallBack failed", 
+            (*it)->GetBundleInfo().c_str());
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     std::list<sptr<ICallAbilityCallback>>::iterator it = callbackPtrList_.begin();
     for (; it != callbackPtrList_.end(); ++it) {
         if ((*it)->GetBundleInfo() == bundleInfo) {
             callbackPtrList_.erase(it);
-            TELEPHONY_LOGI("%{public}s UnRegisterCallBack success", bundleInfo.c_str());
+            TELEPHONY_LOGI("%{public}s UnRegisterCallBack success", (*it)->GetBundleInfo().c_str());
             break;
         }
     }
