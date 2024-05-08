@@ -37,6 +37,7 @@ class AudioControlManager : public CallStateListenerBase, public std::enable_sha
 public:
     void Init();
     int32_t SetAudioDevice(const AudioDevice &device);
+    int32_t SetAudioDevice(const AudioDevice &device, bool isByUser);
     bool PlayRingtone(); // plays the default ringtone
     bool StopRingtone();
     int32_t PlayRingback();
@@ -113,6 +114,7 @@ private:
     std::mutex mutex_;
     std::recursive_mutex toneStateLock_;
     sptr<CallBase> frontCall_ = nullptr;
+    bool isSetAudioDeviceByUser_;
 };
 } // namespace Telephony
 } // namespace OHOS

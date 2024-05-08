@@ -1078,7 +1078,7 @@ int32_t CallControlManager::MuteRinger()
 
 int32_t CallControlManager::SetAudioDevice(const AudioDevice &audioDevice)
 {
-    return DelayedSingleton<AudioControlManager>::GetInstance()->SetAudioDevice(audioDevice);
+    return DelayedSingleton<AudioControlManager>::GetInstance()->SetAudioDevice(audioDevice, true);
 }
 
 int32_t CallControlManager::ControlCamera(std::u16string cameraId, int32_t callingUid, int32_t callingPid)
