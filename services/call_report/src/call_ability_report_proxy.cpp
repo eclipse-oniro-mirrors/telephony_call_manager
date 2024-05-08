@@ -65,7 +65,7 @@ int32_t CallAbilityReportProxy::RegisterCallBack(
             TELEPHONY_LOGW("deathRecipient is nullptr");
             return false;
         }
-        callAbilityCallbackPtr->AsObject()->AddDeathRecipient();
+        callAbilityCallbackPtr->AsObject()->AddDeathRecipient(deathRecipient);
     }
     return TELEPHONY_SUCCESS;
 }

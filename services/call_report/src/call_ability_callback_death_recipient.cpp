@@ -26,7 +26,7 @@ CallAbilityCallbackDeathRecipient::CallAbilityCallbackDeathRecipient()
     TELEPHONY_LOGI("create CallAbilityCallbackDeathRecipient instance");
 }
 
-void CallAbilityCallbackDeathRecipient::~CallAbilityCallbackDeathRecipient()
+CallAbilityCallbackDeathRecipient::~CallAbilityCallbackDeathRecipient()
 {
     TELEPHONY_LOGI("destory CallAbilityCallbackDeathRecipient instance");
 }
@@ -34,7 +34,7 @@ void CallAbilityCallbackDeathRecipient::~CallAbilityCallbackDeathRecipient()
 void CallAbilityCallbackDeathRecipient::OnRemoteDied(const OHOS::wptr<OHOS::IRemoteObject> &object)
 {
     TELEPHONY_LOGI("callback service died, remove the proxy object");
-    sptr<ICallAbilityCallback> callback = iface_cast<0>(object.promote());
+    sptr<ICallAbilityCallback> callback = iface_cast<ICallAbilityCallback>(object.promote());
     if (callback == nullptr) {
         TELEPHONY_LOGE("callback is nullptr");
         return;
@@ -42,8 +42,9 @@ void CallAbilityCallbackDeathRecipient::OnRemoteDied(const OHOS::wptr<OHOS::IRem
     auto report = DelayedSingleton<CallAbilityReportProxy>::GetInstance();
     if (report == nullptr) {
         TELEPHONY_LOGE("report is nullptr");
+        return;
     }
-    report->unRegisterCallBack(object.promote());
+    report->UnRegisterCallBack(object.promote());
 }
 } // namespace Telephony
 } // namespace OHOS
