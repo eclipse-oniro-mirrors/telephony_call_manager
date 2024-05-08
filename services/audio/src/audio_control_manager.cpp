@@ -159,7 +159,7 @@ void AudioControlManager::CheckTypeAndSetAudioDevice(sptr<CallBase> &callObjectP
         TELEPHONY_LOGI("set device type, type: %{public}d", static_cast<int32_t>(device.deviceType));
         SetAudioDevice(device);
     } else if (IsVideoCall(priorVideoState) && !IsVideoCall(nextVideoState)) {
-        device.deviceType = AudioDeviceType::DEVICE_EARPIECE;
+        device.deviceType = isUserOpenSpeaker_ ? AudioDeviceType::DEVICE_SPEAKER : AudioDeviceType::DEVICE_EARPIECE;
         if (initDeviceType == AudioDeviceType::DEVICE_WIRED_HEADSET ||
             initDeviceType == AudioDeviceType::DEVICE_BLUETOOTH_SCO ||
             initDeviceType == AudioDeviceType::DEVICE_DISTRIBUTED_AUTOMOTIVE) {
@@ -382,14 +382,30 @@ void AudioControlManager::HandleNewActiveCall(sptr<CallBase> &callObjectPtr)
  */
 int32_t AudioControlManager::SetAudioDevice(const AudioDevice &device)
 {
+    return SetAudioDevice(device, false);
+}
+
+/**
+ * @param device , audio device
+ * @param isByUser , call from callui or not
+ * usually called by the ui interaction , in purpose of switching to another audio device
+ */
+int32_t AudioControlManager::SetAudioDevice(const AudioDevice &device, bool isByUser)
+{
     TELEPHONY_LOGI("set audio device, type: %{public}d", static_cast<int32_t>(device.deviceType));
     AudioDeviceType audioDeviceType = AudioDeviceType::DEVICE_UNKNOWN;
     if (CallObjectManager::HasSatelliteCallExist() && device.deviceType == AudioDeviceType::DEVICE_EARPIECE) {
         DelayedSingleton<CallDialog>::GetInstance()->DialogConnectExtension("SATELLITE_CALL_NOT_SUPPORT_EARPIECE");
         return CALL_ERR_AUDIO_SET_AUDIO_DEVICE_FAILED;
     }
+    if (isByUser) {
+        isUserOpenSpeaker_ = false;
+    }
     switch (device.deviceType) {
         case AudioDeviceType::DEVICE_SPEAKER:
+        if (isByUser) {
+            isUserOpenSpeaker_ = true;
+        }
         case AudioDeviceType::DEVICE_EARPIECE:
         case AudioDeviceType::DEVICE_WIRED_HEADSET:
             audioDeviceType = device.deviceType;
