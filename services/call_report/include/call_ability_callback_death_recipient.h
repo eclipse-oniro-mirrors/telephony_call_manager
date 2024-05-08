@@ -13,20 +13,21 @@
  * limitations under the License.
  */
 
-#include "call_ability_callback_death_recipient.h"
+#ifndef CALL_ABILITY_CALLBACK_DEATH_RECIPIENT_H
+#define CALL_ABILITY_CALLBACK_DEATH_RECIPIENT_H
+
+#include "iremote_broker.h"
 
 namespace OHOS {
 namespace Telephony {
-CallAbilityCallbackDeathRecipient::CallAbilityCallbackDeathRecipient(
-    const std::function<void(const wptr<IRemoteObject> &object)> &deathCallback)
-    : deathCallback_(deathCallback)
-{}
+class CallAbilityCallbackDeathRecipient : public IRemoteObject::DeathRecipient {
+public:
+    CallAbilityCallbackDeathRecipient();
+    ~CallAbilityCallbackDeathRecipient();
 
-void CallAbilityCallbackDeathRecipient::OnRemoteDied(const OHOS::wptr<OHOS::IRemoteObject> &object)
-{
-    if (deathCallback_) {
-        deathCallback_(object);
-    }
-}
+    virtual void OnRemoteDied(const wptr<IRemoteObject> &object) override;
+};
 } // namespace Telephony
 } // namespace OHOS
+
+#endif // CALL_ABILITY_CALLBACK_DEATH_RECIPIENT_H

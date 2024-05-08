@@ -20,6 +20,7 @@
 #include "app_mgr_interface.h"
 #include "app_state_observer.h"
 #include "bluetooth_call_manager.h"
+#include "call_ability_callback_death_recipient.h"
 #include "call_manager_errors.h"
 #include "iservice_registry.h"
 #include "system_ability.h"
@@ -57,26 +58,14 @@ int32_t CallAbilityReportProxy::RegisterCallBack(
     std::lock_guard<std::mutex> lock(mutex_);
     callbackPtrList_.emplace_back(callAbilityCallbackPtr);
     TELEPHONY_LOGI("%{public}s successfully registered the callback!", bundleInfo.c_str());
-    if (appStateObserver == nullptr) {
-        appStateObserver = new (std::nothrow) ApplicationStateObserver();
-        if (appStateObserver == nullptr) {
-            TELEPHONY_LOGE("Failed to Create AppStateObserver Instance");
-            return TELEPHONY_SUCCESS;
+    if (callAbilityCallbackPtr->AsObject() != nullptr) {
+        sptr<CallAbilityCallbackDeathRecipient> deathRecipient =
+            new (std::nothrow) CallAbilityCallbackDeathRecipient();
+        if (deathRecipient == nullptr) {
+            TELEPHONY_LOGW("deathRecipient is nullptr");
+            return false;
         }
-        sptr<ISystemAbilityManager> samgrClient = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-        if (samgrClient == nullptr) {
-            TELEPHONY_LOGE("Failed to get samgrClient");
-            appStateObserver = nullptr;
-            return TELEPHONY_SUCCESS;
-        }
-        appMgrProxy = iface_cast<AppExecFwk::IAppMgr>(samgrClient->GetSystemAbility(APP_MGR_SERVICE_ID));
-        if (appMgrProxy == nullptr) {
-            TELEPHONY_LOGE("Failed to get appMgrProxy");
-            appStateObserver = nullptr;
-            samgrClient = nullptr;
-            return TELEPHONY_SUCCESS;
-        }
-        appMgrProxy->RegisterApplicationStateObserver(appStateObserver);
+        callAbilityCallbackPtr->AsObject()->AddDeathRecipient(deathRecipient);
     }
     return TELEPHONY_SUCCESS;
 }
@@ -96,13 +85,22 @@ int32_t CallAbilityReportProxy::UnRegisterCallBack(const std::string &bundleInfo
             break;
         }
     }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallAbilityReportProxy::UnRegisterCallBack(sptr<IRemoteObject> object)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
     if (callbackPtrList_.empty()) {
         TELEPHONY_LOGE("callbackPtrList_ is null!");
-        if (appMgrProxy != nullptr && appStateObserver != nullptr) {
-            int ret = appMgrProxy->UnregisterApplicationStateObserver(appStateObserver);
-            TELEPHONY_LOGI("UnregisterApplicationStateObserver result = %{public}d", ret);
-            appMgrProxy = nullptr;
-            appStateObserver = nullptr;
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    std::list<sptr<ICallAbilityCallback>>::iterator it = callbackPtrList_.begin();
+    for (; it != callbackPtrList_.end(); ++it) {
+        if ((*it)->AsObject() == object) {
+            callbackPtrList_.erase(it);
+            TELEPHONY_LOGI("%{public}s UnRegisterCallBack success", (*it)->GetBundleInfo().c_str());
+            break;
         }
     }
     return TELEPHONY_SUCCESS;
