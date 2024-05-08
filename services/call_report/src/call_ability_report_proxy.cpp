@@ -92,8 +92,7 @@ int32_t CallAbilityReportProxy::UnRegisterCallBack(sptr<IRemoteObject> object)
 {
     std::lock_guard<std::mutex> lock(mutex_);
     if (callbackPtrList_.empty()) {
-        TELEPHONY_LOGE("callbackPtrList_ is null! %{public}s UnRegisterCallBack failed",
-            (*it)->GetBundleInfo().c_str());
+        TELEPHONY_LOGE("callbackPtrList_ is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     std::list<sptr<ICallAbilityCallback>>::iterator it = callbackPtrList_.begin();
