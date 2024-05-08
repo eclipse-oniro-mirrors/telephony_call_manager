@@ -114,7 +114,6 @@ private:
     std::mutex mutex_;
     std::recursive_mutex toneStateLock_;
     sptr<CallBase> frontCall_ = nullptr;
-    bool isUserOpenSpeaker_;
 };
 } // namespace Telephony
 } // namespace OHOS

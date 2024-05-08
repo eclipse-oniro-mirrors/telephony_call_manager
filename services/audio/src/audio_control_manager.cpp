@@ -159,7 +159,7 @@ void AudioControlManager::CheckTypeAndSetAudioDevice(sptr<CallBase> &callObjectP
         TELEPHONY_LOGI("set device type, type: %{public}d", static_cast<int32_t>(device.deviceType));
         SetAudioDevice(device);
     } else if (IsVideoCall(priorVideoState) && !IsVideoCall(nextVideoState)) {
-        device.deviceType = isUserOpenSpeaker_ ? AudioDeviceType::DEVICE_SPEAKER : AudioDeviceType::DEVICE_EARPIECE;
+        device.deviceType = callObjectPtr->IsSpeakerphoneOn() ? AudioDeviceType::DEVICE_SPEAKER : AudioDeviceType::DEVICE_EARPIECE;
         if (initDeviceType == AudioDeviceType::DEVICE_WIRED_HEADSET ||
             initDeviceType == AudioDeviceType::DEVICE_BLUETOOTH_SCO ||
             initDeviceType == AudioDeviceType::DEVICE_DISTRIBUTED_AUTOMOTIVE) {
@@ -398,13 +398,14 @@ int32_t AudioControlManager::SetAudioDevice(const AudioDevice &device, bool isBy
         DelayedSingleton<CallDialog>::GetInstance()->DialogConnectExtension("SATELLITE_CALL_NOT_SUPPORT_EARPIECE");
         return CALL_ERR_AUDIO_SET_AUDIO_DEVICE_FAILED;
     }
-    if (isByUser) {
-        isUserOpenSpeaker_ = false;
+    sptr<CallBase> liveCall = CallObjectManager::GetForegroundLiveCall();
+    if (liveCall != nullptr) {
+        liveCall->SetSpeakerphoneOn(false);
     }
     switch (device.deviceType) {
         case AudioDeviceType::DEVICE_SPEAKER:
-        if (isByUser) {
-            isUserOpenSpeaker_ = true;
+        if (isByUser && liveCall != nullptr) {
+            liveCall->SetSpeakerphoneOn(true);
         }
         case AudioDeviceType::DEVICE_EARPIECE:
         case AudioDeviceType::DEVICE_WIRED_HEADSET:
