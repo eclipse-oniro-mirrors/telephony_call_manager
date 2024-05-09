@@ -47,5 +47,5 @@ ohos_shared_library("cj_telephony_call_ffi") {
 
   part_name = "call_manager"
   subsystem_name = "telephony"
-  relative_install_dir = "module/telephony"
+  innerapi_tags = [ "platformsdk" ]
 }
