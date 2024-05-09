@@ -341,8 +341,10 @@ void AudioControlManager::ProcessAudioWhenCallActive(sptr<CallBase> &callObjectP
             DelayedSingleton<AudioProxy>::GetInstance()->StopVibrator();
             isCrsVibrating_ = false;
         }
-        StopSoundtone();
-        PlaySoundtone();
+        if (CallObjectManager->GetCurrentCallNum() < 2) {
+            StopSoundtone();
+            PlaySoundtone();
+        }
         UpdateDeviceTypeForVideoOrSatelliteCall();
     }
 }
