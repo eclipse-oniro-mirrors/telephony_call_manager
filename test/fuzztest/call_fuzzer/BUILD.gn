@@ -53,6 +53,7 @@ ohos_fuzztest("CallFuzzTest") {
     "core_service:libtel_common",
     "core_service:tel_core_service_api",
     "data_share:datashare_consumer",
+    "ffrt:libffrt",
     "graphic_surface:surface",
     "hilog:libhilog",
     "init:libbegetutil",
