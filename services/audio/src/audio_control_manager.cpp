@@ -16,8 +16,9 @@
 #include "audio_control_manager.h"
 
 #include "call_control_manager.h"
-#include "call_state_processor.h"
 #include "call_dialog.h"
+#include "call_state_processor.h"
+#include "common_type.h"
 #include "distributed_call_manager.h"
 #include "telephony_log_wrapper.h"
 #include "audio_system_manager.h"
@@ -341,7 +342,7 @@ void AudioControlManager::ProcessAudioWhenCallActive(sptr<CallBase> &callObjectP
             DelayedSingleton<AudioProxy>::GetInstance()->StopVibrator();
             isCrsVibrating_ = false;
         }
-        if (CallObjectManager->GetCurrentCallNum() < 2) {
+        if (CallObjectManager::GetCurrentCallNum() < MIN_MULITY_CALL_COUNT) {
             StopSoundtone();
             PlaySoundtone();
         }
