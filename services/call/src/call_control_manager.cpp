@@ -1178,16 +1178,24 @@ void CallControlManager::handler()
     }
 }
 
+bool CallControlManager::cancel(ffrt::task_handle &handle)
+{
+    if (handle != nullptr) {
+        int ret = ffrt::skip(handle);
+        if (ret != TELEPHONY_SUCCESS) {
+            TELEPHONY_LOGE("skip task failed, ret = %{public}d", ret);
+            return false;
+        }
+    }
+    return true;
+}
+
 void CallControlManager::ConnectCallUiService(bool shouldConnect)
 {
     if (shouldConnect) {
         if (alarmSeted) {
-            if (disconnectHandle != nullptr) {
-                int ret = ffrt::skip(disconnectHandle);
-                if (ret != TELEPHONY_SUCCESS) {
-                    TELEPHONY_LOGE("skip disconnectHandle failed, ret = %{public}d", ret);
-                    return;
-                }
+            if (!cancel(disconnectHandle)) {
+                return;
             }
             alarmSeted = false;
         }
@@ -1201,12 +1209,8 @@ void CallControlManager::ConnectCallUiService(bool shouldConnect)
             }, {}, {}, ffrt::task_attr().delay(DISCONNECT_DELAY_TIME));
             alarmSeted = true;
         }  else {
-            if (disconnectHandle != nullptr) {
-                int ret = ffrt::skip(disconnectHandle);
-                if (ret != TELEPHONY_SUCCESS) {
-                    TELEPHONY_LOGE("skip disconnectHandle failed, ret = %{public}d", ret);
-                    return;
-                }
+            if (!cancel(disconnectHandle)) {
+                return;
             }
             disconnectHandle = ffrt::submit_h([&]() {
                 handler();
