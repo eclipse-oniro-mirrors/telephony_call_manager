@@ -31,6 +31,7 @@
 #include "pac_map.h"
 #include "singleton.h"
 #include "system_ability_status_change_stub.h"
+#include "ffrt.h"
 
 /**
  * Singleton
@@ -128,7 +129,8 @@ private:
     int32_t NumberLegalityCheck(std::string &number);
     int32_t BroadcastSubscriber();
     void PackageDialInformation(AppExecFwk::PacMap &extras, std::string accountNumber, bool isEcc);
-    static void handler(int args);
+    static void handler();
+    bool cancel(ffrt::task_handle &handle);
     int32_t CanDial(std::u16string &number, AppExecFwk::PacMap &extras, bool isEcc);
     void AnswerHandlerForSatelliteOrVideoCall(sptr<CallBase> &call, int32_t videoState);
 
@@ -164,6 +166,7 @@ private:
         int32_t callId = 0;
         int32_t videoState = 0;
     } AnsweredCallQueue_;
+    ffrt::task_handle disconnectHandle = nullptr;
 };
 } // namespace Telephony
 } // namespace OHOS

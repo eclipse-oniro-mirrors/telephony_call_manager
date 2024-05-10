@@ -14,7 +14,7 @@
  */
 
 #include "call_control_manager.h"
-#include "ffrt.h"
+#include "cpp/task_ext.h"
 #include <securec.h>
 #include "csignal"
 #include <string_ex.h>
@@ -44,6 +44,7 @@
 namespace OHOS {
 namespace Telephony {
 bool CallControlManager::alarmSeted = false;
+const uint64_t DISCONNECT_DELAY_TIME = 1000000;
 using namespace OHOS::EventFwk;
 CallControlManager::CallControlManager()
     : callStateListenerPtr_(nullptr), CallRequestHandlerPtr_(nullptr), incomingCallWakeup_(nullptr),
@@ -1168,7 +1169,7 @@ void CallControlManager::GetDialParaInfo(DialParaInfo &info, AppExecFwk::PacMap 
     extras = extras_;
 }
 
-void CallControlManager::handler(int args)
+void CallControlManager::handler()
 {
     alarmSeted = false;
     TELEPHONY_LOGE("handle DisconnectAbility");
@@ -1177,11 +1178,25 @@ void CallControlManager::handler(int args)
     }
 }
 
+bool CallControlManager::cancel(ffrt::task_handle &handle)
+{
+    if (handle != nullptr) {
+        int ret = ffrt::skip(handle);
+        if (ret != TELEPHONY_SUCCESS) {
+            TELEPHONY_LOGE("skip task failed, ret = %{public}d", ret);
+            return false;
+        }
+    }
+    return true;
+}
+
 void CallControlManager::ConnectCallUiService(bool shouldConnect)
 {
     if (shouldConnect) {
         if (alarmSeted) {
-            alarm(0);
+            if (!cancel(disconnectHandle)) {
+                return;
+            }
             alarmSeted = false;
         }
         DelayedSingleton<CallConnectAbility>::GetInstance()->ConnectAbility();
@@ -1189,12 +1204,17 @@ void CallControlManager::ConnectCallUiService(bool shouldConnect)
     } else {
         shouldDisconnect = true;
         if (!alarmSeted) {
-            signal(SIGALRM, handler);
-            alarm(1); // start timer
+            disconnectHandle = ffrt::submit_h([&]() {
+                handler();
+            }, {}, {}, ffrt::task_attr().delay(DISCONNECT_DELAY_TIME));
             alarmSeted = true;
         }  else {
-            alarm(0); // stop timer
-            alarm(1);
+            if (!cancel(disconnectHandle)) {
+                return;
+            }
+            disconnectHandle = ffrt::submit_h([&]() {
+                handler();
+            }, {}, {}, ffrt::task_attr().delay(DISCONNECT_DELAY_TIME));
         }
     }
 }
