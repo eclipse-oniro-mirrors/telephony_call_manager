@@ -381,7 +381,7 @@ bool AudioDeviceManager::DisableAll()
 
 void AudioDeviceManager::SetCurrentAudioDevice(AudioDeviceType deviceType)
 {
-    TELEPHONY_LOGI("check and switch distributed audio device.");
+    TELEPHONY_LOGI("set current audio device, deviceType: %{public}d.", deviceType);
     if (!IsDistributedAudioDeviceType(deviceType) && IsDistributedAudioDeviceType(audioDeviceType_)) {
         DelayedSingleton<DistributedCallManager>::GetInstance()->SwitchOffDCallDeviceSync();
     }
@@ -398,6 +398,7 @@ void AudioDeviceManager::SetCurrentAudioDevice(AudioDeviceType deviceType)
 
 bool AudioDeviceManager::CheckAndSwitchDistributedAudioDevice()
 {
+    TELEPHONY_LOGI("check and switch distributed audio device.");
     std::lock_guard<std::mutex> lock(infoMutex_);
     DelayedSingleton<DistributedCallManager>::GetInstance()->SetCallState(true);
     std::vector<AudioDevice>::iterator it = info_.audioDeviceList.begin();
