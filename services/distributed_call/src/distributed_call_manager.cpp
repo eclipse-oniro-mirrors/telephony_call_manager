@@ -292,6 +292,7 @@ void DistributedCallManager::ClearConnectedDCallDevice()
 
 bool DistributedCallManager::SwitchOnDCallDeviceSync(const AudioDevice& device)
 {
+    TELEPHONY_LOGI("switch on dcall device sync");
     if (!IsDistributedAudioDevice(device)) {
         TELEPHONY_LOGE("not distributed audio device, device type: %{public}d", device.deviceType);
         return false;
@@ -313,7 +314,7 @@ bool DistributedCallManager::SwitchOnDCallDeviceSync(const AudioDevice& device)
         TELEPHONY_LOGI("switch dcall device succeed.");
         return true;
     }
-    TELEPHONY_LOGI("switch dcall device failed.");
+    TELEPHONY_LOGI("switch dcall device failed, ret: %{public}d.", ret);
     return false;
 }
 
@@ -341,7 +342,7 @@ void DistributedCallManager::SwitchOnDCallDevice(std::unique_ptr<AudioDevice> de
             device->deviceType);
         TELEPHONY_LOGI("switch to distributed call device succeed.");
     } else {
-        TELEPHONY_LOGE("switch to distributed call device failed.");
+        TELEPHONY_LOGE("switch to distributed call device failed, %{public}d.", ret);
     }
 }
 
@@ -358,6 +359,7 @@ void DistributedCallManager::DealDisconnectCall()
 
 void DistributedCallManager::SwitchOnDCallDeviceAsync(const AudioDevice& device)
 {
+    TELEPHONY_LOGI("switch on dcall device async");
     std::unique_ptr<AudioDevice> dCallDevice = std::make_unique<AudioDevice>();
     if (dCallDevice == nullptr) {
         TELEPHONY_LOGE("fail to create AudioDevice obj");
@@ -379,6 +381,7 @@ void DistributedCallManager::SwitchOnDCallDeviceAsync(const AudioDevice& device)
 
 void DistributedCallManager::SwitchOffDCallDeviceSync()
 {
+    TELEPHONY_LOGI("switch off dcall device sync");
     if (!dCallDeviceSwitchedOn_.load()) {
         TELEPHONY_LOGE("distributed audio device not connected.");
         return;
@@ -399,9 +402,8 @@ void DistributedCallManager::SwitchOffDCallDeviceSync()
         ClearConnectedDCallDevice();
         TELEPHONY_LOGI("disconnect dcall device succeed.");
     } else {
-        TELEPHONY_LOGE("disconnect dcall device failed");
+        TELEPHONY_LOGE("disconnect dcall device failed, %{public}d", ret);
     }
-    TELEPHONY_LOGI("disconnect dcall device end.");
 }
 
 bool DistributedCallManager::IsDCallDeviceSwitchedOn()

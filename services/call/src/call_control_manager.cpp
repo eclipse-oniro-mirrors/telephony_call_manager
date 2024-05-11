@@ -492,8 +492,10 @@ bool CallControlManager::NotifyCallStateUpdated(
         if (priorState == TelCallState::CALL_STATUS_DIALING && nextState == TelCallState::CALL_STATUS_ALERTING) {
             TELEPHONY_LOGI("call is actived, now check and switch call to distributed audio device");
             DelayedSingleton<AudioDeviceManager>::GetInstance()->CheckAndSwitchDistributedAudioDevice();
-        } else if (priorState == TelCallState::CALL_STATUS_ACTIVE &&
-            nextState == TelCallState::CALL_STATUS_DISCONNECTED) {
+        } else if ((priorState == TelCallState::CALL_STATUS_ACTIVE &&
+            nextState == TelCallState::CALL_STATUS_DISCONNECTED) ||
+            (priorState == TelCallState::CALL_STATUS_DISCONNECTING &&
+            nextState == TelCallState::CALL_STATUS_DISCONNECTED)) {
             TELEPHONY_LOGI("call is disconnected, let audio device manager know");
             DelayedSingleton<AudioDeviceManager>::GetInstance()->OnActivedCallDisconnected();
         }
