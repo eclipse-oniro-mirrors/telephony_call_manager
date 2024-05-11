@@ -166,7 +166,7 @@ int32_t CallAbilityReportProxy::ReportCallStateInfo(const CallAttributeInfo &inf
             bundleInfo = (*it)->GetBundleInfo();
             ret = (*it)->OnCallDetailsChange(info);
             if (ret != TELEPHONY_SUCCESS) {
-                TELEPHONY_LOGW(
+                TELEPHONY_LOGD(
                     "OnCallDetailsChange failed, errcode:%{public}d, bundleInfo:%{public}s", ret, bundleInfo.c_str());
                 continue;
             }
@@ -288,7 +288,7 @@ int32_t CallAbilityReportProxy::ReportAudioDeviceChange(const AudioDeviceInfo &i
         if ((*it)) {
             ret = (*it)->OnReportAudioDeviceChange(info);
             if (ret != TELEPHONY_SUCCESS) {
-                TELEPHONY_LOGW("ReportAudioDeviceChange failed, errcode:%{public}d, bundleInfo:%{public}s", ret,
+                TELEPHONY_LOGD("ReportAudioDeviceChange failed, errcode:%{public}d, bundleInfo:%{public}s", ret,
                     ((*it)->GetBundleInfo()).c_str());
                 continue;
             }

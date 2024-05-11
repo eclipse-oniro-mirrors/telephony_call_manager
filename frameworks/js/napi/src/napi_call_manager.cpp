@@ -1241,7 +1241,7 @@ napi_value NapiCallManager::Dial(napi_env env, napi_callback_info info)
 bool NapiCallManager::MatchStringAndVariableObjectParameters(
     napi_env env, const napi_value parameters[], const size_t parameterCount)
 {
-    TELEPHONY_LOGD("Telephony_CallManager MatchStringAndVariableObjectParameters %{public}zu", parameterCount);
+    TELEPHONY_LOGD("Match parmameter count %{public}zu", parameterCount);
     switch (parameterCount) {
         case ONLY_ONE_VALUE:
             return NapiUtil::MatchParameters(env, parameters, { napi_string });
@@ -1679,7 +1679,7 @@ napi_value NapiCallManager::GetCallIdListForConference(napi_env env, napi_callba
 
 bool NapiCallManager::MatchEmptyParameter(napi_env env, const napi_value parameters[], const size_t parameterCount)
 {
-    TELEPHONY_LOGI("Telephony_CallManager MatchEmptyParameter %{public}zu", parameterCount);
+    TELEPHONY_LOGI("Match parmameter count %{public}zu", parameterCount);
     switch (parameterCount) {
         case ZERO_VALUE:
             return true;
@@ -1693,7 +1693,7 @@ bool NapiCallManager::MatchEmptyParameter(napi_env env, const napi_value paramet
 bool NapiCallManager::MatchOneOptionalNumberParameter(
     napi_env env, const napi_value parameters[], const size_t parameterCount)
 {
-    TELEPHONY_LOGI("Telephony_CallManager MatchAnswerParameters %{public}zu", parameterCount);
+    TELEPHONY_LOGI("Match parmameter count %{public}zu", parameterCount);
     switch (parameterCount) {
         case ZERO_VALUE:
             return true;
@@ -1713,7 +1713,7 @@ bool NapiCallManager::MatchOneOptionalNumberParameter(
 bool NapiCallManager::MatchAnswerCallParameter(
     napi_env env, const napi_value parameters[], const size_t parameterCount)
 {
-    TELEPHONY_LOGI("Telephony_CallManager MatchAnswerParameters %{public}zu", parameterCount);
+    TELEPHONY_LOGI("Match parmameter count %{public}zu", parameterCount);
     switch (parameterCount) {
         case ZERO_VALUE:
             return true;
@@ -1731,7 +1731,7 @@ bool NapiCallManager::MatchAnswerCallParameter(
 
 bool NapiCallManager::MatchOneStringParameter(napi_env env, const napi_value parameters[], const size_t parameterCount)
 {
-    TELEPHONY_LOGI("Telephony_CallManager MatchOneNumberParameter %{public}zu", parameterCount);
+    TELEPHONY_LOGI("Match parmameter count %{public}zu", parameterCount);
     switch (parameterCount) {
         case ONLY_ONE_VALUE:
             return NapiUtil::MatchParameters(env, parameters, { napi_string });
@@ -1760,7 +1760,7 @@ bool NapiCallManager::MatchObserverOffParameter(
 
 bool NapiCallManager::MatchOneNumberParameter(napi_env env, const napi_value parameters[], const size_t parameterCount)
 {
-    TELEPHONY_LOGI("Telephony_CallManager MatchOneNumberParameter %{public}zu", parameterCount);
+    TELEPHONY_LOGI("Match parmameter count %{public}zu", parameterCount);
     switch (parameterCount) {
         case ONLY_ONE_VALUE:
             return NapiUtil::MatchParameters(env, parameters, { napi_number });
@@ -1773,7 +1773,7 @@ bool NapiCallManager::MatchOneNumberParameter(napi_env env, const napi_value par
 
 bool NapiCallManager::MatchTwoNumberParameters(napi_env env, const napi_value parameters[], const size_t parameterCount)
 {
-    TELEPHONY_LOGI("Telephony_CallManager MatchTwoNumberParameters %{public}zu", parameterCount);
+    TELEPHONY_LOGI("Match parmameter count %{public}zu", parameterCount);
     switch (parameterCount) {
         case TWO_VALUE_LIMIT:
             return NapiUtil::MatchParameters(env, parameters, { napi_number, napi_number });
@@ -1786,7 +1786,7 @@ bool NapiCallManager::MatchTwoNumberParameters(napi_env env, const napi_value pa
 
 bool NapiCallManager::MatchTwoStringParameter(napi_env env, const napi_value parameters[], const size_t parameterCount)
 {
-    TELEPHONY_LOGI("Telephony_CallManager MatchTwoStringParameter %{public}zu", parameterCount);
+    TELEPHONY_LOGI("Match parmameter count %{public}zu", parameterCount);
     switch (parameterCount) {
         case TWO_VALUE_LIMIT:
             return NapiUtil::MatchParameters(env, parameters, { napi_string, napi_string });
@@ -1800,7 +1800,7 @@ bool NapiCallManager::MatchTwoStringParameter(napi_env env, const napi_value par
 bool NapiCallManager::MatchNumberAndBoolParameters(
     napi_env env, const napi_value parameters[], const size_t parameterCount)
 {
-    TELEPHONY_LOGI("Telephony_CallManager MatchNumberAndBoolParameters %{public}zu", parameterCount);
+    TELEPHONY_LOGI("Match parmameter count %{public}zu", parameterCount);
     switch (parameterCount) {
         case TWO_VALUE_LIMIT:
             return NapiUtil::MatchParameters(env, parameters, { napi_number, napi_boolean });
@@ -1814,7 +1814,7 @@ bool NapiCallManager::MatchNumberAndBoolParameters(
 bool NapiCallManager::MatchNumberAndStringParameters(
     napi_env env, const napi_value parameters[], const size_t parameterCount)
 {
-    TELEPHONY_LOGI("Telephony_CallManager MatchNumberAndBoolParameters %{public}zu", parameterCount);
+    TELEPHONY_LOGI("Match parmameter count %{public}zu", parameterCount);
     switch (parameterCount) {
         case TWO_VALUE_LIMIT:
             return NapiUtil::MatchParameters(env, parameters, { napi_number, napi_string });
@@ -1828,7 +1828,7 @@ bool NapiCallManager::MatchNumberAndStringParameters(
 bool NapiCallManager::MatchAudioDeviceParameters(
     napi_env env, const napi_value parameters[], const size_t parameterCount)
 {
-    TELEPHONY_LOGI("Telephony_CallManager MatchNumberAndBoolParameters %{public}zu", parameterCount);
+    TELEPHONY_LOGI("Match parmameter count %{public}zu", parameterCount);
     switch (parameterCount) {
         case ONLY_ONE_VALUE:
             return NapiUtil::MatchParameters(env, parameters, { napi_object });
@@ -1842,7 +1842,7 @@ bool NapiCallManager::MatchAudioDeviceParameters(
 bool NapiCallManager::MatchRejectCallParameters(
     napi_env env, const napi_value parameters[], const size_t parameterCount)
 {
-    TELEPHONY_LOGI("Telephony_CallManager MatchNumberAndBoolParameters %{public}zu", parameterCount);
+    TELEPHONY_LOGI("Match parmameter count %{public}zu", parameterCount);
     switch (parameterCount) {
         case ZERO_VALUE:
             return true;
@@ -1890,7 +1890,7 @@ bool NapiCallManager::MatchRejectCallTwoIllegalParameters(napi_env env, const na
 bool NapiCallManager::MatchNumberAndObjectParameters(
     napi_env env, const napi_value parameters[], const size_t parameterCount)
 {
-    TELEPHONY_LOGI("Telephony_CallManager MatchNumberAndObjectParameters %{public}zu", parameterCount);
+    TELEPHONY_LOGI("Match parmameter count %{public}zu", parameterCount);
     switch (parameterCount) {
         case TWO_VALUE_LIMIT:
             return NapiUtil::MatchParameters(env, parameters, { napi_number, napi_object });
