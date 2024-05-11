@@ -105,7 +105,7 @@ private:
     int32_t HandleDistributeAudioDevice(const AudioDevice &device);
     ToneState toneState_ = ToneState::STOPPED;
     SoundState soundState_ = SoundState::STOPPED;
-    bool isLocalRingbackNeeded_;
+    bool isLocalRingbackNeeded_ = false;
     bool isCrsVibrating_ = false;
     std::set<sptr<CallBase>> totalCalls_;
     std::unique_ptr<Ring> ring_;
@@ -114,7 +114,7 @@ private:
     std::mutex mutex_;
     std::recursive_mutex toneStateLock_;
     sptr<CallBase> frontCall_ = nullptr;
-    bool isSetAudioDeviceByUser_;
+    bool isSetAudioDeviceByUser_ = false;
 };
 } // namespace Telephony
 } // namespace OHOS
