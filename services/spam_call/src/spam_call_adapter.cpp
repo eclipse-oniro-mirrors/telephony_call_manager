@@ -36,6 +36,7 @@ constexpr char MARK_COUNT[] = "markCount";
 constexpr char MARK_SOURCE[] = "markSource";
 constexpr char MARK_CONTENT[] = "markContent";
 constexpr char IS_CLOUD[] = "isCloud";
+sptr<SpamCallConnection> connection_ = nullptr;
 
 SpamCallAdapter::SpamCallAdapter()
 {
@@ -65,8 +66,9 @@ bool SpamCallAdapter::DetectSpamCall(const std::string &phoneNumber, const int32
 bool SpamCallAdapter::ConnectSpamCallAbility(const AAFwk::Want &want, const std::string &phoneNumber,
     const int32_t &slotId)
 {
+    std::lock_guard<std::recursive_mutex> lock(mutex_);
     TELEPHONY_LOGI("ConnectSpamCallAbility start");
-    sptr<SpamCallConnection> connection_ = new (std::nothrow) SpamCallConnection(phoneNumber, slotId,
+    connection_ = new (std::nothrow) SpamCallConnection(phoneNumber, slotId,
         shared_from_this());
     if (connection_ == nullptr) {
         TELEPHONY_LOGE("connection_ is nullptr");
@@ -83,12 +85,27 @@ bool SpamCallAdapter::ConnectSpamCallAbility(const AAFwk::Want &want, const std:
     return true;
 }
 
+void SpamCallAdapter::DisconnectSpamCallAbility()
+{
+    std::lock_guard<std::recursive_mutex> lock(mutex_);
+    TELEPHONY_LOGI("DisconnectSpamCallAbility start");
+    if (connection_ == nullptr) {
+        TELEPHONY_LOGE("connection_ is nullptr");
+        return;
+    }
+    auto disconnectResult = AAFwk::ExtensionManagerClient::GetInstance().DisconnectAbility(connection_);
+    connection_.clear();
+    if (disconnectResult != 0) {
+        TELEPHONY_LOGE("DisconnectAbility failed! %d", disconnectResult);
+    }
+}
+
 bool SpamCallAdapter::JsonGetNumberValue(cJSON *json, const std::string key, int32_t &out)
 {
     do {
         cJSON *cursor = cJSON_GetObjectItem(json, key.c_str());
         if (!cJSON_IsNumber(cursor)) {
-            TELEPHONY_LOGE("ParseToResponsePart failed to get %{public}s", key.c_str());
+            TELEPHONY_LOGE("ParseNumberValue failed to get %{public}s", key.c_str());
             if (key == "detectResult" || key == "decisionReason") {
                 return false;
             }
@@ -103,7 +120,7 @@ bool SpamCallAdapter::JsonGetStringValue(cJSON *json, const std::string key, std
     do {
         cJSON *cursor = cJSON_GetObjectItem(json, key.c_str());
         if (!cJSON_IsString(cursor)) {
-            TELEPHONY_LOGE("ParseToResponsePart failed to get %{public}s", key.c_str());
+            TELEPHONY_LOGE("ParseStringValue failed to get %{public}s", key.c_str());
         }
         char *value = cJSON_GetStringValue(cursor);
         if (value != nullptr) {
@@ -111,6 +128,14 @@ bool SpamCallAdapter::JsonGetStringValue(cJSON *json, const std::string key, std
         }
     } while (0);
     return true;
+}
+
+bool SpamCallAdapter::JsonGetBoolValue(cJSON *json, const std::string key)
+{
+    cJSON *cursor = cJSON_GetObjectItem(json, key.c_str());
+    bool value = cJSON_IsTrue(cursor);
+    TELEPHONY_LOGI("ParseBoolValue %{public}s: %{public}d", key.c_str(), value);
+    return value;
 }
 
 void SpamCallAdapter::ParseDetectResult(const std::string &jsonData, bool &isBlock,
@@ -155,8 +180,7 @@ void SpamCallAdapter::ParseDetectResult(const std::string &jsonData, bool &isBlo
     if (strcpy_s(info.markContent, sizeof(info.markContent), stringValue.c_str()) != EOK) {
         TELEPHONY_LOGE("strcpy_s markContent fail.");
     }
-    JsonGetNumberValue(root, IS_CLOUD, numberValue);
-    info.isCloud = numberValue == 1;
+    info.isCloud = JsonGetBoolValue(root, IS_CLOUD);
     TELEPHONY_LOGI("ParseDetectResult end");
     cJSON_Delete(root);
 }
@@ -184,7 +208,12 @@ void SpamCallAdapter::NotifyAll()
 
 bool SpamCallAdapter::WaitForDetectResult()
 {
-    return timeWaitHelper_->WaitForResult();
+    if (!timeWaitHelper_->WaitForResult()) {
+        DisconnectSpamCallAbility();
+        return false;
+    }
+    DisconnectSpamCallAbility();
+    return true;
 }
 } // namespace Telephony
 } // namespace OHOS

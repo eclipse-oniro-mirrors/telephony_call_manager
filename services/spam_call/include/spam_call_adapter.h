@@ -40,11 +40,14 @@ public:
 
 private:
     bool ConnectSpamCallAbility(const AAFwk::Want &want, const std::string &phoneNumber, const int32_t &slotId);
+    void DisconnectSpamCallAbility();
     bool JsonGetNumberValue(cJSON *json, const std::string key, int32_t &out);
     bool JsonGetStringValue(cJSON *json, const std::string key, std::string &out);
+    bool JsonGetBoolValue(cJSON *json, const std::string key);
     int32_t errCode_ = -1;
     std::string result_ = "";
     std::shared_ptr<TimeWaitHelper> timeWaitHelper_ {nullptr};
+    std::recursive_mutex mutex_;
 };
 } // namespace Telephony
 } // namespace OHOS
