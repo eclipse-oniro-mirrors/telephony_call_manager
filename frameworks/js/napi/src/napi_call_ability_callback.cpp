@@ -521,7 +521,7 @@ int32_t NapiCallAbilityCallback::ReportCallState(CallAttributeInfo &info, EventC
         env, callbackValues[ARRAY_INDEX_FIRST], "crsType", info.crsType);
     NapiCallManagerUtils::SetPropertyInt32(
         env, callbackValues[ARRAY_INDEX_FIRST], "originalCallType", info.originalCallType);
-    ReportCallAttribute(env, callbackValues, info);
+    ReportCallAttribute(env, callbackValues, ARRAY_INDEX_THIRD, info);
     napi_get_reference_value(env, stateCallback.callbackRef, &callbackFunc);
     if (callbackFunc == nullptr) {
         TELEPHONY_LOGE("callbackFunc is null!");
@@ -536,7 +536,7 @@ int32_t NapiCallAbilityCallback::ReportCallState(CallAttributeInfo &info, EventC
     return TELEPHONY_SUCCESS;
 }
 
-void NapiCallAbilityCallback::ReportCallAttribute(napi_env &env, napi_value callbackValues[], CallAttributeInfo &info)
+void NapiCallAbilityCallback::ReportCallAttribute(napi_env &env, napi_value callbackValues[], const size_t callbackValuesCount, CallAttributeInfo &info)
 {
     std::string str(info.numberLocation);
     if (str == "default") {

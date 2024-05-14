@@ -139,8 +139,14 @@ void CallBase::GetCallAttributeBaseInfo(CallAttributeInfo &info)
         info.accountId = accountId_;
         info.crsType = crsType_;
         info.originalCallType = originalCallType_;
-        (void)memset_s(info.numberLocation, kMaxNumberLen, 0, kMaxNumberLen);
-        (void)memcpy_s(info.numberLocation, kMaxNumberLen, numberLocation_.c_str(), numberLocation_.length());
+        if (memset_s(info.numberLocation, kMaxNumberLen, 0, kMaxNumberLen) != EOK) {
+            TELEPHONY_LOGE("memset_s numberLocation fail");
+            return;
+        }
+        if (memcpy_s(info.numberLocation, kMaxNumberLen, numberLocation_.c_str(), numberLocation_.length()) != EOK) {
+            TELEPHONY_LOGE("memcpy_s numberLocation fail");
+            return;
+        }
         info.numberMarkInfo = numberMarkInfo_;
         info.blockReason = blockReason_;
         if (bundleName_.length() > static_cast<size_t>(kMaxBundleNameLen)) {

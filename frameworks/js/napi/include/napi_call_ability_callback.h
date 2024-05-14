@@ -94,7 +94,7 @@ public:
 private:
     static void ReportCallStateWork(uv_work_t *work, int32_t status);
     static int32_t ReportCallState(CallAttributeInfo &info, EventCallback stateCallback);
-    static void ReportCallAttribute(napi_env &env, napi_value callbackValues[], CallAttributeInfo &info);
+    static void ReportCallAttribute(napi_env &env, napi_value callbackValues[], const size_t callbackValuesCount, CallAttributeInfo &info);
     static void CreateVoipNapiValue(napi_env &env, napi_value &voipObject, CallAttributeInfo &info);
     static void CreateMarkInfoNapiValue(napi_env &env, napi_value &markInfoObject, CallAttributeInfo &info);
     static void ReportCallEventWork(uv_work_t *work, int32_t status);
