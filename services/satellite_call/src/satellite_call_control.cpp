@@ -30,6 +30,7 @@
 #include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
 #include "telephony_permission.h"
+#include "audio_control_manager.h"
 
 #include "want.h"
 #include "uri.h"
@@ -78,8 +79,9 @@ int32_t SatelliteCallControl::IsAllowedSatelliteDialCall()
             DelayedSingleton<CallDialog>::GetInstance()->DialogConnectExtension("CANNOT_DIAL_SATELLITE_CALL");
             return TELEPHONY_ERROR;
         }
-        std::vector<std::pair<std::string, std::string>> vec =
-            {std::pair<std::string, std::string>("USEDMODEM", "satemodem")};
+        std::vector<std::pair<std::string, std::string>> vec = {
+            std::pair<std::string, std::string>("USEDMODEM", "satemodem")
+        };
         AudioStandard::AudioSystemManager::GetInstance()->SetExtraParameters("mmi",
             vec);
         return TELEPHONY_SUCCESS;
@@ -118,8 +120,9 @@ void SatelliteCallControl::HandleSatelliteCallStateUpdate(sptr<CallBase> &call,
         SetShowDialog(false);
     }
     if (nextState == TelCallState::CALL_STATUS_INCOMING || nextState == TelCallState::CALL_STATUS_WAITING) {
-        std::vector<std::pair<std::string, std::string>> vec =
-            {std::pair<std::string, std::string>("USEDMODEM", "satemodem")};
+        std::vector<std::pair<std::string, std::string>> vec = {
+            std::pair<std::string, std::string>("USEDMODEM", "satemodem")
+        };
         AudioStandard::AudioSystemManager::GetInstance()->SetExtraParameters("mmi",
             vec);
     }
