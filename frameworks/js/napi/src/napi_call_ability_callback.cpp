@@ -536,7 +536,8 @@ int32_t NapiCallAbilityCallback::ReportCallState(CallAttributeInfo &info, EventC
     return TELEPHONY_SUCCESS;
 }
 
-void NapiCallAbilityCallback::ReportCallAttribute(napi_env &env, napi_value callbackValues[], const size_t callbackValuesCount, CallAttributeInfo &info)
+void NapiCallAbilityCallback::ReportCallAttribute(napi_env &env, napi_value callbackValues[],
+    const size_t callbackValuesCount, CallAttributeInfo &info)
 {
     std::string str(info.numberLocation);
     if (str == "default") {
