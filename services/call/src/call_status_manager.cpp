@@ -1096,6 +1096,10 @@ sptr<CallBase> CallStatusManager::RefreshCallIfNecessary(const sptr<CallBase> &c
     if (call->GetNumberLocation() != "default") {
         newCall->SetNumberLocation(call->GetNumberLocation());
     }
+    NumberMarkInfo numberMarkInfo = call->GetNumberMarkInfo();
+    if (numberMarkInfo.markType != MarkType::MARK_TYPE_NONE) {
+        newCall->SetNumberMarkInfo(numberMarkInfo);
+    }
     return newCall;
 }
 
