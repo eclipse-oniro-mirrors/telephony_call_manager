@@ -830,7 +830,7 @@ int32_t NapiCallAbilityCallback::ReportAudioDeviceInfo(AudioDeviceInfo &info, Ev
 
     napi_value currentAudioDeviceValue = nullptr;
     napi_create_object(env, &currentAudioDeviceValue);
-    NapiCallManagerUtils::SetPropertyInt32(env, currentAudioDeviceValue, "currentDeviceType",
+    NapiCallManagerUtils::SetPropertyInt32(env, currentAudioDeviceValue, "deviceType",
         static_cast<int32_t>(info.currentAudioDevice.deviceType));
     NapiCallManagerUtils::SetPropertyStringUtf8(
         env, currentAudioDeviceValue, "currentDeviceAddress", info.currentAudioDevice.address);
