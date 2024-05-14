@@ -1321,7 +1321,7 @@ bool CallStatusManager::ShouldBlockIncomingCall(const sptr<CallBase> &call, cons
             NumberMarkInfo numberMarkInfo = {
                 .markType = MarkType::MARK_TYPE_NONE,
                 .markContent = "",
-                .markCount = 0,
+                .markCount = -1,
                 .markSource = "",
                 .isCloud = false,
             };
