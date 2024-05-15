@@ -158,10 +158,11 @@ int32_t CallObjectManager::HasNewCall()
     std::lock_guard<std::mutex> lock(listMutex_);
     std::list<sptr<CallBase>>::iterator it;
     for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
-        if ((*it)->GetCallRunningState() == CallRunningState::CALL_RUNNING_STATE_CREATE ||
+        if ((*it)->GetCallType() != CallType::TYPE_VOIP &&
+            ((*it)->GetCallRunningState() == CallRunningState::CALL_RUNNING_STATE_CREATE ||
             (*it)->GetCallRunningState() == CallRunningState::CALL_RUNNING_STATE_CONNECTING ||
             (*it)->GetCallRunningState() == CallRunningState::CALL_RUNNING_STATE_DIALING ||
-            (*it)->GetCallType() == CallType::TYPE_SATELLITE) {
+            (*it)->GetCallType() == CallType::TYPE_SATELLITE)) {
             TELEPHONY_LOGE("there is already a new call[callId:%{public}d,state:%{public}d], please redial later",
                 (*it)->GetCallID(), (*it)->GetCallRunningState());
             return CALL_ERR_CALL_COUNTS_EXCEED_LIMIT;
@@ -615,7 +616,7 @@ void CallObjectManager::UpdateOneCallObjectByCallId(int32_t callId, TelCallState
     }
 }
 
-sptr<CallBase> CallObjectManager::GetForegroundLiveCall()
+sptr<CallBase> CallObjectManager::GetForegroundCall()
 {
     std::lock_guard<std::mutex> lock(listMutex_);
     sptr<CallBase> liveCall = nullptr;
@@ -638,6 +639,34 @@ sptr<CallBase> CallObjectManager::GetForegroundLiveCall()
         if (telCallState == TelCallState::CALL_STATUS_HOLDING) {
             liveCall = (*it);
             continue;
+        }
+    }
+    return liveCall;
+}
+
+sptr<CallBase> CallObjectManager::GetForegroundLiveCall()
+{
+    std::lock_guard<std::mutex> lock(listMutex_);
+    sptr<CallBase> liveCall = nullptr;
+    for (std::list<sptr<CallBase>>::iterator it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
+        TelCallState telCallState = (*it)->GetTelCallState();
+        if (telCallState == TelCallState::CALL_STATUS_ACTIVE) {
+            liveCall = (*it);
+            break;
+        }
+        if (telCallState == TelCallState::CALL_STATUS_ALERTING ||
+            telCallState == TelCallState::CALL_STATUS_DIALING) {
+            liveCall = (*it);
+            break;
+        }
+        if (telCallState == TelCallState::CALL_STATUS_HOLDING) {
+            liveCall = (*it);
+            break;
+        }
+        if (telCallState == TelCallState::CALL_STATUS_WAITING ||
+            telCallState == TelCallState::CALL_STATUS_INCOMING) {
+            liveCall = (*it);
+            break;
         }
     }
     return liveCall;

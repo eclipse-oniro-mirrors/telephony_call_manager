@@ -173,7 +173,7 @@ void AudioControlManager::CheckTypeAndSetAudioDevice(sptr<CallBase> &callObjectP
 
 void AudioControlManager::UpdateDeviceTypeForVideoOrSatelliteCall()
 {
-    sptr<CallBase> foregroundCall = CallObjectManager::GetForegroundLiveCall();
+    sptr<CallBase> foregroundCall = CallObjectManager::GetForegroundCall();
     if (foregroundCall == nullptr) {
         TELEPHONY_LOGE("call object nullptr");
         return;
@@ -571,7 +571,7 @@ AudioDeviceType AudioControlManager::GetInitAudioDeviceType() const
         if (AudioDeviceManager::IsWiredHeadsetConnected()) {
             return AudioDeviceType::DEVICE_WIRED_HEADSET;
         }
-        sptr<CallBase> liveCall = CallObjectManager::GetForegroundLiveCall();
+        sptr<CallBase> liveCall = CallObjectManager::GetForegroundCall();
         if (liveCall != nullptr && (liveCall->GetVideoStateType() == VideoStateType::TYPE_VIDEO ||
             liveCall->GetCallType() == CallType::TYPE_SATELLITE)) {
             TELEPHONY_LOGI("current video or satellite call speaker is active");

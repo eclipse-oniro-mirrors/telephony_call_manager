@@ -79,8 +79,7 @@ void CallBase::HangUpVoipCall()
         CallAttributeInfo callinfo = (*it);
         TelCallState callState = callinfo.callState;
         ++it;
-        if (callinfo.callType == CallType::TYPE_VOIP &&
-            (callState == TelCallState::CALL_STATUS_ACTIVE || callState == TelCallState::CALL_STATUS_INCOMING)) {
+        if (callinfo.callType == CallType::TYPE_VOIP) {
             sptr<CallBase> tempCall = CallObjectManager::GetOneCallObject(callinfo.callId);
             sptr<VoIPCall> call = static_cast<VoIPCall *>(static_cast<void *>(tempCall.GetRefPtr()));
             if (call == nullptr) {
