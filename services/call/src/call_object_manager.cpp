@@ -615,7 +615,7 @@ void CallObjectManager::UpdateOneCallObjectByCallId(int32_t callId, TelCallState
     }
 }
 
-sptr<CallBase> CallObjectManager::GetForegroundLiveCall()
+sptr<CallBase> CallObjectManager::GetForegroundCall()
 {
     std::lock_guard<std::mutex> lock(listMutex_);
     sptr<CallBase> liveCall = nullptr;
@@ -638,6 +638,34 @@ sptr<CallBase> CallObjectManager::GetForegroundLiveCall()
         if (telCallState == TelCallState::CALL_STATUS_HOLDING) {
             liveCall = (*it);
             continue;
+        }
+    }
+    return liveCall;
+}
+
+sptr<CallBase> CallObjectManager::GetForegroundLiveCall()
+{
+    std::lock_guard<std::mutex> lock(listMutex_);
+    sptr<CallBase> liveCall = nullptr;
+    for (std::list<sptr<CallBase>>::iterator it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
+        TelCallState telCallState = (*it)->GetTelCallState();
+        if (telCallState == TelCallState::CALL_STATUS_ACTIVE) {
+            liveCall = (*it);
+            break;
+        }
+        if (telCallState == TelCallState::CALL_STATUS_ALERTING ||
+            telCallState == TelCallState::CALL_STATUS_DIALING) {
+            liveCall = (*it);
+            break;
+        }
+        if (telCallState == TelCallState::CALL_STATUS_HOLDING) {
+            liveCall = (*it);
+            break;
+        }
+        if (telCallState == TelCallState::CALL_STATUS_WAITING ||
+            telCallState == TelCallState::CALL_STATUS_INCOMING) {
+            liveCall = (*it);
+            break;
         }
     }
     return liveCall;
