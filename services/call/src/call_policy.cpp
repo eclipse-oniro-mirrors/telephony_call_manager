@@ -35,18 +35,18 @@ int32_t CallPolicy::DialPolicy(std::u16string &number, AppExecFwk::PacMap &extra
     if (dialType != DialType::DIAL_CARRIER_TYPE && dialType != DialType::DIAL_VOICE_MAIL_TYPE &&
         dialType != DialType::DIAL_OTT_TYPE) {
         TELEPHONY_LOGE("dial type invalid!");
-        return CALL_ERR_UNKNOW_DIAL_TYPE;
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
     int32_t accountId = extras.GetIntValue("accountId");
     if (dialType == DialType::DIAL_CARRIER_TYPE) {
         if (!DelayedSingleton<CallNumberUtils>::GetInstance()->SelectAccountId(accountId, extras)) {
             TELEPHONY_LOGE("invalid accountId!");
-            return CALL_ERR_INVALID_SLOT_ID;
+            return TELEPHONY_ERR_ARGUMENT_INVALID;
         }
     }
     CallType callType = (CallType)extras.GetIntValue("callType");
     if (IsValidCallType(callType) != TELEPHONY_SUCCESS) {
-        return CALL_ERR_UNKNOW_CALL_TYPE;
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
     DialScene dialScene = (DialScene)extras.GetIntValue("dialScene");
     if ((dialScene != DialScene::CALL_NORMAL && dialScene != DialScene::CALL_PRIVILEGED &&
@@ -59,7 +59,7 @@ int32_t CallPolicy::DialPolicy(std::u16string &number, AppExecFwk::PacMap &extra
     VideoStateType videoState = (VideoStateType)extras.GetIntValue("videoState");
     if (videoState != VideoStateType::TYPE_VOICE && videoState != VideoStateType::TYPE_VIDEO) {
         TELEPHONY_LOGE("invalid video state!");
-        return CALL_ERR_INVALID_VIDEO_STATE;
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
     if (IsVoiceCallValid(videoState) != TELEPHONY_SUCCESS) {
         return CALL_ERR_CALL_COUNTS_EXCEED_LIMIT;
