@@ -100,7 +100,7 @@ void AudioControlManager::CallStateUpdated(
     if (totalCalls_.count(callObjectPtr) == 0) {
         int32_t callId = callObjectPtr->GetCallID();
         TelCallState callState = callObjectPtr->GetTelCallState();
-        TELEPHONY_LOGI("add new call , call id : %{public}d , call state : %{public}d", callId, callState);
+        TELEPHONY_LOGI("add new call, callid:%{public}d , callstate:%{public}d", callId, callState);
         totalCalls_.insert(callObjectPtr);
     }
     HandleCallStateUpdated(callObjectPtr, priorState, nextState);
