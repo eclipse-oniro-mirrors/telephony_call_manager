@@ -1183,6 +1183,7 @@ void CallControlManager::handler()
 bool CallControlManager::cancel(ffrt::task_handle &handle)
 {
     if (handle != nullptr) {
+        TELEPHONY_LOGI("skip disconnect ability task");
         int ret = ffrt::skip(handle);
         if (ret != TELEPHONY_SUCCESS) {
             TELEPHONY_LOGE("skip task failed, ret = %{public}d", ret);
@@ -1206,6 +1207,7 @@ void CallControlManager::ConnectCallUiService(bool shouldConnect)
     } else {
         shouldDisconnect = true;
         if (!alarmSeted) {
+            TELEPHONY_LOGI("submit delay disconnect ability");
             disconnectHandle = ffrt::submit_h([&]() {
                 handler();
             }, {}, {}, ffrt::task_attr().delay(DISCONNECT_DELAY_TIME));
@@ -1214,6 +1216,7 @@ void CallControlManager::ConnectCallUiService(bool shouldConnect)
             if (!cancel(disconnectHandle)) {
                 return;
             }
+            TELEPHONY_LOGI("submit delay disconnect ability");
             disconnectHandle = ffrt::submit_h([&]() {
                 handler();
             }, {}, {}, ffrt::task_attr().delay(DISCONNECT_DELAY_TIME));
