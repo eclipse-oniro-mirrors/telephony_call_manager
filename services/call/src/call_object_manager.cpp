@@ -659,14 +659,10 @@ sptr<CallBase> CallObjectManager::GetForegroundLiveCall()
             liveCall = (*it);
             break;
         }
-        if (telCallState == TelCallState::CALL_STATUS_HOLDING) {
-            liveCall = (*it);
-            break;
-        }
         if (telCallState == TelCallState::CALL_STATUS_WAITING ||
             telCallState == TelCallState::CALL_STATUS_INCOMING) {
             liveCall = (*it);
-            break;
+            continue;
         }
     }
     return liveCall;
