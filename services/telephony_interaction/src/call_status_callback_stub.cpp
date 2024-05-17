@@ -841,17 +841,12 @@ int32_t CallStatusCallbackStub::OnUpdateVoipEventInfo(MessageParcel &data, Messa
     if (!data.ContainFileDescriptors()) {
         TELEPHONY_LOGW("sent raw data is less than 32k");
     }
-    const VoipCallEventInfo *parcelPtr = nullptr;
-    int32_t len = data.ReadInt32();
-    if (len <= 0 || len >= MAX_LEN) {
-        TELEPHONY_LOGE("Invalid parameter, len = %{public}d", len);
-        return TELEPHONY_ERR_ARGUMENT_INVALID;
-    }
-    if ((parcelPtr = reinterpret_cast<const VoipCallEventInfo *>(data.ReadRawData(len))) == nullptr) {
-        TELEPHONY_LOGE("reading raw data failed, length = %d", len);
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-    error = UpdateVoipEventInfo(*parcelPtr);
+    VoipCallEventInfo parcelPtr;
+    parcelPtr.voipCallId = data.ReadString();
+    parcelPtr.bundleName = data.ReadString();
+    parcelPtr.voipCallEvent = static_cast<VoipCallEvent>(data.ReadInt32());
+    parcelPtr.errorReason = static_cast<ErrorReason>(data.ReadInt32());
+    error = UpdateVoipEventInfo(parcelPtr);
     if (!reply.WriteInt32(error)) {
         TELEPHONY_LOGE("writing parcel failed");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;

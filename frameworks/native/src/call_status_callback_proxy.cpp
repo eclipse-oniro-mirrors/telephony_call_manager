@@ -744,9 +744,10 @@ int32_t CallStatusCallbackProxy::UpdateVoipEventInfo(const VoipCallEventInfo &in
     if (!dataParcel.WriteInterfaceToken(CallStatusCallbackProxy::GetDescriptor())) {
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
-    int32_t length = sizeof(VoipCallEventInfo);
-    dataParcel.WriteInt32(length);
-    dataParcel.WriteRawData((const void *)&info, length);
+    dataParcel.WriteString(info.voipCallId);
+    dataParcel.WriteString(info.bundleName);
+    dataParcel.WriteInt32(static_cast<int32_t>(info.voipCallEvent));
+    dataParcel.WriteInt32(static_cast<int32_t>(info.errorReason));
     if (Remote() == nullptr) {
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
