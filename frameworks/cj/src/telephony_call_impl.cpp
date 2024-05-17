@@ -17,17 +17,11 @@
 #include "call_manager_client.h"
 #include "system_ability_definition.h"
 #include "telephony_types.h"
-#include "telephony_errors.h"
-#include "want.h"
 #include "string_wrapper.h"
 #include "bool_wrapper.h"
 #include "ability_manager_client.h"
-#include "telephony_types.h"
 #include "telephony_errors.h"
-#include "want.h"
-#include "string_wrapper.h"
-#include "bool_wrapper.h"
-#include "ability_manager_client.h"
+#include "call_manager_errors.h"
 
 #include "telephony_call_log.h"
 #include "telephony_call_impl.h"
@@ -72,6 +66,7 @@ namespace Telephony {
             case TELEPHONY_ERR_DATABASE_WRITE_FAIL:
             case TELEPHONY_ERR_DATABASE_READ_FAIL:
             case TELEPHONY_ERR_UNKNOWN_NETWORK_TYPE:
+            case CALL_ERR_INVALID_VIDEO_STATE:
                 // 83000003
                 return CJ_ERROR_TELEPHONY_SYSTEM_ERROR;
             case TELEPHONY_ERR_NO_SIM_CARD:
