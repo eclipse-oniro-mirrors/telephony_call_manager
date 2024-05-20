@@ -133,6 +133,7 @@ public:
     static napi_value EnableImsSwitch(napi_env env, napi_callback_info info);
     static napi_value DisableImsSwitch(napi_env env, napi_callback_info info);
     static napi_value IsImsSwitchEnabled(napi_env env, napi_callback_info info);
+    static napi_value IsImsSwitchEnabledSync(napi_env env, napi_callback_info info);
     static napi_value SetVoNRState(napi_env env, napi_callback_info info);
     static napi_value GetVoNRState(napi_env env, napi_callback_info info);
     static napi_value StartRTT(napi_env env, napi_callback_info info);
