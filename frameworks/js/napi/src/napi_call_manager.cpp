@@ -2192,7 +2192,7 @@ napi_value NapiCallManager::IsImsSwitchEnabledSync(napi_env env, napi_callback_i
 {
     GET_PARAMS(env, info, TWO_VALUE_LIMIT);
     if (!MatchOneNumberParameter(env, argv, argc)) {
-        TELEPHONY_LOGE("NapiCallManager::IsImsSwitchEnabled MatchOneNumberParameter failed.");
+        TELEPHONY_LOGE("NapiCallManager::IsImsSwitchEnabledSync MatchOneNumberParameter failed.");
         NapiUtil::ThrowParameterError(env);
         return nullptr;
     }
