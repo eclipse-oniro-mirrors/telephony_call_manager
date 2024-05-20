@@ -106,6 +106,7 @@ napi_value NapiCallManager::DeclareCallSupplementInterface(napi_env env, napi_va
         DECLARE_NAPI_FUNCTION("enableImsSwitch", EnableImsSwitch),
         DECLARE_NAPI_FUNCTION("disableImsSwitch", DisableImsSwitch),
         DECLARE_NAPI_FUNCTION("isImsSwitchEnabled", IsImsSwitchEnabled),
+        DECLARE_NAPI_FUNCTION("isImsSwitchEnabledSync", IsImsSwitchEnabledSync),
         DECLARE_NAPI_FUNCTION("setVoNRState", SetVoNRState),
         DECLARE_NAPI_FUNCTION("getVoNRState", GetVoNRState),
         DECLARE_NAPI_FUNCTION("canSetCallTransferTime", CanSetCallTransferTime),
@@ -2185,6 +2186,26 @@ napi_value NapiCallManager::IsImsSwitchEnabled(napi_env env, napi_callback_info 
     }
     return HandleAsyncWork(
         env, asyncContext.release(), "IsImsSwitchEnabled", NativeIsImsSwitchEnabled, NativeIsImsSwitchEnabledCallBack);
+}
+
+napi_value NapiCallManager::IsImsSwitchEnabledSync(napi_env env, napi_callback_info info)
+{
+    GET_PARAMS(env, info, TWO_VALUE_LIMIT);
+    if (!MatchOneNumberParameter(env, argv, argc)) {
+        TELEPHONY_LOGE("NapiCallManager::IsImsSwitchEnabledSync MatchOneNumberParameter failed.");
+        NapiUtil::ThrowParameterError(env);
+        return nullptr;
+    }
+    size_t parameterCount = 0;
+    napi_value parameters[] = { nullptr };
+    napi_get_cb_info(env, info, &parameterCount, parameters, nullptr, nullptr);
+    bool enabled = false;
+    int32_t slotId;
+    napi_get_value_int32(env, argv[ARRAY_INDEX_FIRST], &slotId);
+    DelayedSingleton<CallManagerClient>::GetInstance()->IsImsSwitchEnabled(slotId, enabled);
+    napi_value value = nullptr;
+    NAPI_CALL(env, napi_get_boolean(env, enabled, &value));
+    return value;
 }
 
 napi_value NapiCallManager::SetVoNRState(napi_env env, napi_callback_info info)
