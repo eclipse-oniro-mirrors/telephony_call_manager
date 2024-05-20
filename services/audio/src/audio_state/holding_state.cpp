@@ -55,6 +55,21 @@ bool HoldingState::ProcessEvent(int32_t event)
         case AudioEvent::NO_MORE_HOLDING_CALL:
             result = DelayedSingleton<CallStateProcessor>::GetInstance()->UpdateCurrentCallState();
             break;
+        case AudioEvent::NEW_DIALING_CALL:
+            if (DelayedSingleton<CallStateProcessor>::GetInstance()->
+                ShouldSwitchState(TelCallState::CALL_STATUS_DIALING)) {
+                result = DelayedSingleton<AudioSceneProcessor>::GetInstance()->ProcessEvent(
+                    AudioEvent::SWITCH_DIALING_STATE);
+            }
+            break;
+        case AudioEvent::NEW_ALERTING_CALL:
+            if (DelayedSingleton<CallStateProcessor>::GetInstance()->
+                ShouldSwitchState(TelCallState::CALL_STATUS_ALERTING)) {
+                TELEPHONY_LOGI("inactive state switch call to alerting state");
+                result = DelayedSingleton<AudioSceneProcessor>::GetInstance()->ProcessEvent(
+                    AudioEvent::SWITCH_ALERTING_STATE);
+            }
+            break;
         default:
             break;
     }
