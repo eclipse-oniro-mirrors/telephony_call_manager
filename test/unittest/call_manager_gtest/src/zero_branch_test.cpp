@@ -415,7 +415,7 @@ HWTEST_F(BranchTest, Telephony_CallNumberUtils_002, Function | MediumTest | Leve
         TELEPHONY_ERR_SUCCESS);
     std::shared_ptr<NumberIdentityDataBaseHelper> callDataPtr =
         DelayedSingleton<NumberIdentityDataBaseHelper>::GetInstance();
-    printf("NUMBER_IDENTITY_URI: %\n", callDataPtr->NUMBER_IDENTITY_URI);
+    printf("NUMBER_IDENTITY_URI: %s\n", callDataPtr->NUMBER_IDENTITY_URI);
     auto helper = CreateDataShareHelper(callDataPtr->NUMBER_IDENTITY_URI);
     if (helper != nullptr) {
         helper->Release();
