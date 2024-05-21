@@ -108,7 +108,8 @@ void BranchTest::SetUp() {}
 
 void BranchTest::TearDown() {}
 
-void BranchTest::SetUpTestCase() {
+void BranchTest::SetUpTestCase()
+{
     constexpr int permissionNum = 1;
     const char *perms[permissionNum] = {
         "ohos.permission.GET_TELEPHONY_STATE"
@@ -417,7 +418,7 @@ HWTEST_F(BranchTest, Telephony_CallNumberUtils_002, Function | MediumTest | Leve
     printf("NUMBER_IDENTITY_URI: %\n", callDataPtr->NUMBER_IDENTITY_URI);
     auto helper = CreateDataShareHelper(callDataPtr->NUMBER_IDENTITY_URI);
     if (helper != nullptr) {
-        helper->release();
+        helper->Release();
         EXPECT_EQ(DelayedSingleton<CallNumberUtils>::GetInstance()->
             QueryNumberLocationInfo(numberLocation, phoneNumber), TELEPHONY_ERR_SUCCESS);
     } else {
