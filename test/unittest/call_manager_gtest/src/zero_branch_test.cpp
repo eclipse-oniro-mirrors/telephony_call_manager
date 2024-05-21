@@ -59,6 +59,10 @@
 #include "video_control_manager.h"
 #include "voip_call_manager_proxy.h"
 #include "voip_call.h"
+#include "accesstoken_kit.h"
+#include "token_setproc.h"
+#include "nativetoken_kit.h"
+#include "number_identity_data_base_helper.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -104,9 +108,43 @@ void BranchTest::SetUp() {}
 
 void BranchTest::TearDown() {}
 
-void BranchTest::SetUpTestCase() {}
+void BranchTest::SetUpTestCase() {
+    constexpr int permissionNum = 1;
+    const char *perms[permissionNum] = {
+        "ohos.permission.GET_TELEPHONY_STATE"
+    };
+    NativeTokenInfoParams infoInstance = {
+        .dcapsNum = 0,  // Indicates the capsbility list of the sa.
+        .permsNum = permissionNum,
+        .aclsNum = 0,  // acls is the list of rights thar can be escalated.
+        .dcaps = nullptr,
+        .perms = perms,
+        .acls = nullptr,
+        .processName = "BranchTest",
+        .aplStr = "system_basic",
+    };
+    uint64_t tokenId = GetAccessTokenId(&infoInstance);
+    SetSelfTokenID(tokenId);
+    auto result = Security::AccessToken::AccessTokenKit::ReloadNativeTokenInfo();
+    EXPECT_EQ(result, Security::AccessToken::RET_SUCCESS);
+}
 
 void BranchTest::TearDownTestCase() {}
+
+std::shared_ptr<DataShare::DataShareHelper> CreateDataShareHelper(std::string uri)
+{
+    auto saManager = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (saManager == nullptr) {
+        printf("Get system ability mgr failed.");
+        return nullptr;
+    }
+    auto remoteObj = saManager->GetSystemAbility(TELEPHONY_CALL_MANAGER_SYS_ABILITY_ID);
+    if (remoteObj == nullptr) {
+        printf("GetSystemAbility Service Failed.");
+        return nullptr;
+    }
+    return DataShare::DataShareHelper::Creator(remoteObj, uri);
+}
 
 /**
  * @tc.number   Telephony_CallRequestHandler_001
@@ -372,10 +410,21 @@ HWTEST_F(BranchTest, Telephony_CallNumberUtils_002, Function | MediumTest | Leve
     std::string emptyStr = "";
     std::string phoneNumber = "123456789012";
     std::string numberLocation = "";
-    ASSERT_NE(DelayedSingleton<CallNumberUtils>::GetInstance()->QueryNumberLocationInfo(numberLocation, emptyStr),
+    EXPECT_NE(DelayedSingleton<CallNumberUtils>::GetInstance()->QueryNumberLocationInfo(numberLocation, emptyStr),
         TELEPHONY_ERR_SUCCESS);
-    EXPECT_EQ(DelayedSingleton<CallNumberUtils>::GetInstance()->QueryNumberLocationInfo(numberLocation, phoneNumber),
-        TELEPHONY_ERR_SUCCESS);
+    std::shared_ptr<NumberIdentityDataBaseHelper> callDataPtr =
+        DelayedSingleton<NumberIdentityDataBaseHelper>::GetInstance();
+    printf("NUMBER_IDENTITY_URI: %\n", callDataPtr->NUMBER_IDENTITY_URI);
+    auto helper = CreateDataShareHelper(callDataPtr->NUMBER_IDENTITY_URI);
+    if (helper != nullptr) {
+        helper->release();
+        EXPECT_EQ(DelayedSingleton<CallNumberUtils>::GetInstance()->
+            QueryNumberLocationInfo(numberLocation, phoneNumber), TELEPHONY_ERR_SUCCESS);
+    } else {
+        printf("helper is null");
+        EXPECT_NE(DelayedSingleton<CallNumberUtils>::GetInstance()->
+            QueryNumberLocationInfo(numberLocation, phoneNumber), TELEPHONY_ERR_SUCCESS);
+    }
 }
 
 /**

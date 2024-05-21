@@ -25,7 +25,6 @@
 
 namespace OHOS {
 namespace Telephony {
-static constexpr const char *NUMBER_IDENTITY_URI = "datashare:///numberlocationability";
 static constexpr const char *NUMBER_MARK_INFO_URI = "datashare:///numbermarkability/number_mark_info";
 const char *NUMBER_LOCATION = "number_location";
 const char *MARK_TYPE = "markType";
@@ -40,6 +39,7 @@ NumberIdentityDataBaseHelper::~NumberIdentityDataBaseHelper() {}
 
 std::shared_ptr<DataShare::DataShareHelper> NumberIdentityDataBaseHelper::CreateDataShareHelper(std::string uri)
 {
+    TELEPHONY_LOGI("uri: %{public}s", uri.c_str());
     auto saManager = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (saManager == nullptr) {
         TELEPHONY_LOGE("Get system ability mgr failed.");
