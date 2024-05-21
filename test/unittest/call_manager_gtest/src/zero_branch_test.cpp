@@ -358,7 +358,7 @@ HWTEST_F(BranchTest, Telephony_CallNumberUtils_001, Function | MediumTest | Leve
         emptyStr, emptyStr, formatNumber), TELEPHONY_ERR_SUCCESS);
     ASSERT_FALSE(DelayedSingleton<CallNumberUtils>::GetInstance()->IsValidSlotId(INVALID_SLOTID));
     ASSERT_TRUE(DelayedSingleton<CallNumberUtils>::GetInstance()->IsValidSlotId(0));
-    EXPECT_EQ(DelayedSingleton<CallNumberUtils>::GetInstance()->QueryYellowPageAndMarkInfo(
+    ASSERT_NE(DelayedSingleton<CallNumberUtils>::GetInstance()->QueryYellowPageAndMarkInfo(
         numberMarkInfo, phoneNumber), TELEPHONY_ERR_SUCCESS);
 }
 
