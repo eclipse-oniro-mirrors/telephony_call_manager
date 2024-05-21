@@ -1266,6 +1266,11 @@ sptr<CallBase> CallStatusManager::CreateNewCallByCallType(
 
 bool CallStatusManager::ShouldRejectIncomingCall()
 {
+    bool hasEcc = false;
+    if (HasEmergencyCall(hasEcc) == TELEPHONY_SUCCESS && hasEcc) {
+        TELEPHONY_LOGI("HasEmergencyCall reject incoming call.");
+        return true;
+    }
     auto datashareHelper = SettingsDataShareHelper::GetInstance();
     std::string device_provisioned {"0"};
     OHOS::Uri uri(
