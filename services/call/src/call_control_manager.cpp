@@ -498,6 +498,10 @@ bool CallControlManager::NotifyCallStateUpdated(
             nextState == TelCallState::CALL_STATUS_DISCONNECTED)) {
             TELEPHONY_LOGI("call is disconnected, let audio device manager know");
             DelayedSingleton<AudioDeviceManager>::GetInstance()->OnActivedCallDisconnected();
+        } else if (priorState == TelCallState::CALL_STATUS_WAITING &&
+            nextState == TelCallState::CALL_STATUS_ACTIVE) {
+            TELEPHONY_LOGI("answer multi-line call, need switch again.");
+            DelayedSingleton<AudioDeviceManager>::GetInstance()->CheckAndSwitchDistributedAudioDevice();
         }
         return true;
     }
