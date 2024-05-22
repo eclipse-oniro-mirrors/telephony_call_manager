@@ -20,6 +20,12 @@ ohos_unittest("tel_call_manager_gtest") {
   part_name = "call_manager"
   test_module = "tel_call_manager_gtest"
   module_out_path = part_name + "/" + test_module
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+  }
+  branch_protector_ret = "pac_ret"
 
   sources = [
     "${CALL_MANAGER_PATH}/frameworks/native/src/call_manager_service_proxy.cpp",
