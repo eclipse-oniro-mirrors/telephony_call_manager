@@ -222,8 +222,8 @@ int32_t CallStatusManager::HandleCallsReportInfo(const CallDetailsInfo &info)
     auto it_end = std::remove_if(callDetailsInfo_[curSlotId].callVec.begin(),
         callDetailsInfo_[curSlotId].callVec.end(), condition);
     callDetailsInfo_[curSlotId].callVec.erase(it_end, callDetailsInfo_[curSlotId].callVec.end());
-    TELEPHONY_LOGI("callDetailsInfo_ size:%{public}zu", callDetailsInfo_[curSlotId].callVec.size());
-    TELEPHONY_LOGI("End CallStatusManager HandleCallsReportInfo slotId:%{public}d", info.slotId);
+    TELEPHONY_LOGI("End CallStatusManager HandleCallsReportInfo slotId:%{public}d, "
+        "callDetailsInfo_ size:%{public}zu", info.slotId, callDetailsInfo_[curSlotId].callVec.end());
     return TELEPHONY_SUCCESS;
 }
 
