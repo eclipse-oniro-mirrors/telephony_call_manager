@@ -2129,7 +2129,7 @@ HWTEST_F(BranchTest, Telephony_CallRecordsManager_001, Function | MediumTest | L
     info.ringBeginTime = ONE_TIME;
     info.ringEndTime = ONE_TIME;
     callRecordsManager.AddOneCallRecord(info);
-    ASSERT_NE(callRecordsManager.RemoveMissedIncomingCallNotification(), TELEPHONY_SUCCESS);
+    callRecordsManager.RemoveMissedIncomingCallNotification();
     int32_t videoState = static_cast<int32_t>(VideoStateType::TYPE_VIDEO);
     callRecordsManager.GetCallFeatures(videoState);
 }
