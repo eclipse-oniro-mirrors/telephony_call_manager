@@ -354,8 +354,7 @@ int32_t CallStatusManager::IncomingHandle(const CallDetailInfo &info)
     if (call != nullptr && (call->GetCallType() != info.callType || call->GetTelCallState() != info.state)) {
         auto oldCallType = call->GetCallType();
         call = RefreshCallIfNecessary(call, info);
-        if (call->GetCallType() != info.callType
-            || (oldCallType == CallType::TYPE_IMS && info.callType == CallType::TYPE_CS)) {
+        if (oldCallType != info.callType) {
             return UpdateCallState(call, info.state);
         }
         return TELEPHONY_SUCCESS;
