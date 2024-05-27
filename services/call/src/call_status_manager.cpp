@@ -352,9 +352,10 @@ int32_t CallStatusManager::IncomingHandle(const CallDetailInfo &info)
 {
     sptr<CallBase> call = GetOneCallObjectByIndexAndSlotId(info.index, info.accountId);
     if (call != nullptr && (call->GetCallType() != info.callType || call->GetTelCallState() != info.state)) {
+        auto oldCallType = call->GetCallType();
         call = RefreshCallIfNecessary(call, info);
         if (call->GetCallType() != info.callType
-            || (call->GetCallType() == CallType::TYPE_IMS && info.callType == CallType::TYPE_CS)) {
+            || (oldCallType == CallType::TYPE_IMS && info.callType == CallType::TYPE_CS)) {
             return UpdateCallState(call, info.state);
         }
         return TELEPHONY_SUCCESS;
