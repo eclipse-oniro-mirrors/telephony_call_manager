@@ -206,7 +206,13 @@ int32_t ReportCallInfoHandler::ReceiveImsCallModeResponse(const CallModeReportIn
 {
     Submit("ReceiveImsCallModeResponse", [response]() {
         CallModeReportInfo reportInfo = response;
-        sptr<CallBase> call = CallObjectManager::GetOneCallObjectByIndex(response.callIndex);
+        sptr<CallBase> call = nullptr;
+        if (response.slotId != -1) {
+            call = CallObjectManager::GetOneCallObjectByIndexAndSlotId(response.callIndex, response.slotId);
+        }
+        if (call == nullptr) {
+            call = CallObjectManager::GetOneCallObjectByIndex(response.callIndex);
+        }
         if (call == nullptr) {
             TELEPHONY_LOGE("call not exists");
             return;

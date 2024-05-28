@@ -450,6 +450,8 @@ struct CallModeReportInfo {
      * Indicates the response result.
      */
     ImsCallMode callMode = ImsCallMode::CALL_MODE_AUDIO_ONLY;
+
+    int32_t slotId = -1;
 };
 
 /**
