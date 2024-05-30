@@ -58,7 +58,6 @@ int32_t ReportCallInfoHandler::UpdateCallReportInfo(const CallDetailInfo &info)
             TELEPHONY_LOGE("HandleCallReportInfo failed! ret:%{public}d", ret);
         }
     });
-    TELEPHONY_LOGI("UpdateCallReportInfo submit task end");
     return TELEPHONY_SUCCESS;
 }
 
@@ -105,7 +104,6 @@ int32_t ReportCallInfoHandler::UpdateCallsReportInfo(CallDetailsInfo &info)
             TELEPHONY_LOGE("HandleCallsReportInfo failed! ret:%{public}d", ret);
         }
     });
-    TELEPHONY_LOGI("UpdateCallsReportInfo submit task end");
 
     CallDetailInfo detailInfo;
     detailInfo.state = TelCallState::CALL_STATUS_UNKNOWN;
@@ -144,7 +142,7 @@ int32_t ReportCallInfoHandler::UpdateDisconnectedCause(const DisconnectedDetails
             TELEPHONY_LOGE("HandleDisconnectedCause failed! ret:%{public}d", ret);
         }
     });
-    TELEPHONY_LOGI("UpdateDisconnectedCause submit task end");
+
     return TELEPHONY_SUCCESS;
 }
 
@@ -167,7 +165,7 @@ int32_t ReportCallInfoHandler::UpdateEventResultInfo(const CellularCallEventInfo
             TELEPHONY_LOGE("HandleEventResultReportInfo failed! ret:%{public}d", ret);
         }
     });
-    TELEPHONY_LOGI("UpdateEventResultInfo submit task end");
+
     return TELEPHONY_SUCCESS;
 }
 
@@ -191,7 +189,7 @@ int32_t ReportCallInfoHandler::UpdateOttEventInfo(const OttCallEventInfo &info)
             TELEPHONY_LOGE("HandleOttEventReportInfo failed! ret:%{public}d", ret);
         }
     });
-    TELEPHONY_LOGI("UpdateOttEventInfo submit task end");
+
     return TELEPHONY_SUCCESS;
 }
 
@@ -210,7 +208,6 @@ int32_t ReportCallInfoHandler::ReceiveImsCallModeRequest(const CallModeReportInf
             imsCall->RecieveUpdateCallMediaModeRequest(reportInfo);
         }
     });
-    TELEPHONY_LOGI("ReceiveImsCallModeRequest submit task end");
     return TELEPHONY_SUCCESS;
 }
 
@@ -235,7 +232,6 @@ int32_t ReportCallInfoHandler::ReceiveImsCallModeResponse(const CallModeReportIn
             imsCall->ReceiveUpdateCallMediaModeResponse(reportInfo);
         }
     });
-    TELEPHONY_LOGI("ReceiveImsCallModeResponse submit task end");
     return TELEPHONY_SUCCESS;
 }
 
@@ -259,7 +255,6 @@ int32_t ReportCallInfoHandler::UpdateVoipEventInfo(const VoipCallEventInfo &info
             TELEPHONY_LOGE("UpdateVoipEventInfo failed! ret:%{public}d", ret);
         }
     });
-    TELEPHONY_LOGI("UpdateVoipEventInfo submit task end");
     return TELEPHONY_SUCCESS;
 }
 } // namespace Telephony
