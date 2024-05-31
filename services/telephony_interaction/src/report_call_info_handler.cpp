@@ -17,13 +17,16 @@
 
 #include "call_manager_errors.h"
 #include "call_manager_hisysevent.h"
+#include "ffrt.h"
 #include "ims_call.h"
 #include "telephony_log_wrapper.h"
 #include "thread"
 
 namespace OHOS {
 namespace Telephony {
-
+namespace {
+ffrt::queue reportCallInfoQueue { "report_call_info_queue" };
+}
 ReportCallInfoHandler::ReportCallInfoHandler() {}
 
 ReportCallInfoHandler::~ReportCallInfoHandler() {}
@@ -43,7 +46,8 @@ int32_t ReportCallInfoHandler::UpdateCallReportInfo(const CallDetailInfo &info)
     }
     CallDetailInfo callDetailInfo = info;
     std::weak_ptr<CallStatusManager> callStatusManagerPtr = callStatusManagerPtr_;
-    Submit("UpdateCallReportInfo", [callStatusManagerPtr, callDetailInfo]() {
+    TELEPHONY_LOGI("UpdateCallReportInfo submit task enter");
+    reportCallInfoQueue.submit([callStatusManagerPtr, callDetailInfo]() {
         std::shared_ptr<CallStatusManager> managerPtr = callStatusManagerPtr.lock();
         if (managerPtr == nullptr) {
             TELEPHONY_LOGE("managerPtr is null");
@@ -88,7 +92,8 @@ int32_t ReportCallInfoHandler::UpdateCallsReportInfo(CallDetailsInfo &info)
     (void)memcpy_s(callDetailsInfo.bundleName, kMaxBundleNameLen, info.bundleName, kMaxBundleNameLen);
     BuildCallDetailsInfo(info, callDetailsInfo);
     std::weak_ptr<CallStatusManager> callStatusManagerPtr = callStatusManagerPtr_;
-    Submit("UpdateCallsReportInfo", [callStatusManagerPtr, callDetailsInfo]() {
+    TELEPHONY_LOGI("UpdateCallsReportInfo submit task enter");
+    reportCallInfoQueue.submit([callStatusManagerPtr, callDetailsInfo]() {
         std::shared_ptr<CallStatusManager> managerPtr = callStatusManagerPtr.lock();
         if (managerPtr == nullptr) {
             TELEPHONY_LOGE("managerPtr is null");
@@ -125,7 +130,8 @@ int32_t ReportCallInfoHandler::UpdateDisconnectedCause(const DisconnectedDetails
     }
     DisconnectedDetails disconnectedDetails = details;
     std::weak_ptr<CallStatusManager> callStatusManagerPtr = callStatusManagerPtr_;
-    Submit("UpdateDisconnectedCause", [callStatusManagerPtr, disconnectedDetails]() {
+    TELEPHONY_LOGI("UpdateDisconnectedCause submit task enter");
+    reportCallInfoQueue.submit([callStatusManagerPtr, disconnectedDetails]() {
         std::shared_ptr<CallStatusManager> managerPtr = callStatusManagerPtr.lock();
         if (managerPtr == nullptr) {
             TELEPHONY_LOGE("managerPtr is null");
@@ -147,7 +153,8 @@ int32_t ReportCallInfoHandler::UpdateEventResultInfo(const CellularCallEventInfo
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     std::weak_ptr<CallStatusManager> callStatusManagerPtr = callStatusManagerPtr_;
-    Submit("UpdateEventResultInfo", [callStatusManagerPtr, info]() {
+    TELEPHONY_LOGI("UpdateEventResultInfo submit task enter");
+    reportCallInfoQueue.submit([callStatusManagerPtr, info]() {
         std::shared_ptr<CallStatusManager> managerPtr = callStatusManagerPtr.lock();
         if (managerPtr == nullptr) {
             TELEPHONY_LOGE("managerPtr is null");
@@ -170,7 +177,8 @@ int32_t ReportCallInfoHandler::UpdateOttEventInfo(const OttCallEventInfo &info)
     }
     OttCallEventInfo ottCallEventInfo = info;
     std::weak_ptr<CallStatusManager> callStatusManagerPtr = callStatusManagerPtr_;
-    Submit("UpdateOttEventInfo", [callStatusManagerPtr, ottCallEventInfo]() {
+    TELEPHONY_LOGI("UpdateOttEventInfo submit task enter");
+    reportCallInfoQueue.submit([callStatusManagerPtr, ottCallEventInfo]() {
         std::shared_ptr<CallStatusManager> managerPtr = callStatusManagerPtr.lock();
         if (managerPtr == nullptr) {
             TELEPHONY_LOGE("managerPtr is null");
@@ -187,7 +195,8 @@ int32_t ReportCallInfoHandler::UpdateOttEventInfo(const OttCallEventInfo &info)
 
 int32_t ReportCallInfoHandler::ReceiveImsCallModeRequest(const CallModeReportInfo &response)
 {
-    Submit("ReceiveImsCallModeRequest", [response]() {
+    TELEPHONY_LOGI("ReceiveImsCallModeRequest submit task enter");
+    reportCallInfoQueue.submit([response]() {
         CallModeReportInfo reportInfo = response;
         sptr<CallBase> call = CallObjectManager::GetOneCallObjectByIndex(response.callIndex);
         if (call == nullptr) {
@@ -204,7 +213,8 @@ int32_t ReportCallInfoHandler::ReceiveImsCallModeRequest(const CallModeReportInf
 
 int32_t ReportCallInfoHandler::ReceiveImsCallModeResponse(const CallModeReportInfo &response)
 {
-    Submit("ReceiveImsCallModeResponse", [response]() {
+    TELEPHONY_LOGI("ReceiveImsCallModeResponse submit task enter");
+    reportCallInfoQueue.submit([response]() {
         CallModeReportInfo reportInfo = response;
         sptr<CallBase> call = nullptr;
         if (response.slotId != -1) {
@@ -233,7 +243,8 @@ int32_t ReportCallInfoHandler::UpdateVoipEventInfo(const VoipCallEventInfo &info
     }
     VoipCallEventInfo voipCallEventInfo = info;
     std::weak_ptr<CallStatusManager> callStatusManagerPtr = callStatusManagerPtr_;
-    Submit("UpdateVoipEventInfo", [callStatusManagerPtr, voipCallEventInfo]() {
+    TELEPHONY_LOGI("UpdateVoipEventInfo submit task enter");
+    reportCallInfoQueue.submit([callStatusManagerPtr, voipCallEventInfo]() {
         std::shared_ptr<CallStatusManager> managerPtr = callStatusManagerPtr.lock();
         if (managerPtr == nullptr) {
             TELEPHONY_LOGE("managerPtr is null");
@@ -246,20 +257,5 @@ int32_t ReportCallInfoHandler::UpdateVoipEventInfo(const VoipCallEventInfo &info
     });
     return TELEPHONY_SUCCESS;
 }
-
-template<typename Function>
-void ReportCallInfoHandler::Submit(const std::string &taskName, Function &&func)
-{
-    TELEPHONY_LOGI("Submit task : %{public}s", taskName.c_str());
-    std::thread t([this, taskName = std::string(taskName), func = std::move(func)]() {
-        TELEPHONY_LOGI("Submit task enter: %{public}s", taskName.c_str());
-        std::lock_guard<std::mutex> lock(mtx);
-        func();
-        TELEPHONY_LOGI("Submit task end: %{public}s", taskName.c_str());
-    });
-    pthread_setname_np(t.native_handle(), taskName.c_str());
-    t.detach();
-}
-
 } // namespace Telephony
 } // namespace OHOS
