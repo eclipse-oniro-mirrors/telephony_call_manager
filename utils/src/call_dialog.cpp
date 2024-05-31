@@ -111,14 +111,15 @@ bool CallDialog::DialogConnectPrivpacyModeExtension(const std::string &dialogRea
     std::string abilityName = "com.ohos.sceneboard.systemdialog";
     want.SetElementName(bundleName, abilityName);
     bool connectResult = CallSettingDialogConnectExtensionAbility(want, commandStr);
-    if(!connectResult){
+    if (!connectResult) {
         TELEPHONY_LOGE("CallSettingDialogConnectExtensionAbility failed!");
         return false;
     }
     return true;
 }
 
-bool CallDialog::DialogConnectAnswerPrivpacyModeExtension(const std::string &dialogReason, int32_t callId, int32_t videoState, bool isVideo)
+bool CallDialog::DialogConnectAnswerPrivpacyModeExtension(const std::string &dialogReason,
+	int32_t callId, int32_t videoState, bool isVideo)
 {
     std::string commandStr = BuildStartAnswerPrivpacyModeCommand(dialogReason, callId, videoState, isVideo);
     AAFwk::Want want;
@@ -126,7 +127,7 @@ bool CallDialog::DialogConnectAnswerPrivpacyModeExtension(const std::string &dia
     std::string abilityName = "com.ohos.sceneboard.systemdialog";
     want.SetElementName(bundleName, abilityName);
     bool connectResult = CallSettingDialogConnectExtensionAbility(want, commandStr);
-    if(!connectResult){
+    if (!connectResult) {
         TELEPHONY_LOGE("CallSettingDialogConnectExtensionAbility failed!");
         return false;
     }
@@ -134,8 +135,9 @@ bool CallDialog::DialogConnectAnswerPrivpacyModeExtension(const std::string &dia
 }
 
 
-std::string CallDialog::BuildStartPrivpacyModeCommand(const std::string &dialogReason, std::u16string &number, int32_t &accountId,
-    int32_t &videoState, int32_t &dialType, int32_t &dialScene, int32_t &callType, bool isVideo)
+std::string CallDialog::BuildStartPrivpacyModeCommand(const std::string &dialogReason, std::u16string &number,
+	int32_t &accountId, int32_t &videoState, int32_t &dialType, int32_t &dialScene, int32_t &callType, bool isVideo)
+{
     nlohmann::json root;
     std::string uiExtensionType = "sysDialog/common";
     root["ability.want.params.uiExtensionType"] = uiExtensionType;
@@ -153,7 +155,8 @@ std::string CallDialog::BuildStartPrivpacyModeCommand(const std::string &dialogR
     return startCommand;
 }
 
-std::string CallDialog::BuildStartAnswerPrivpacyModeCommand(const std::string &dialogReason, int32_t callId, int32_t videoState, bool isVideo){
+std::string CallDialog::BuildStartAnswerPrivpacyModeCommand(const std::string &dialogReason, int32_t callId, int32_t videoState, bool isVideo)
+{
     nlohmann::json root;
     std::string uiExtensionType = "sysDialog/common";
     root["ability.want.params.uiExtensionType"] = uiExtensionType;

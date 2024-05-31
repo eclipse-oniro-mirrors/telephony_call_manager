@@ -36,7 +36,7 @@ void CallAbilityConnectCallback::OnAbilityConnectDone(
         (void)memset_s(&eventInfo, sizeof(CallEventInfo), 0, sizeof(CallEventInfo));
         bool isSuperPrivacyMode = DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance()->GetCurrentIsSuperPrivacyMode();
         TELEPHONY_LOGI("OnAbilityConnectDone SuperPrivacyMode:%{public}d", isSuperPrivacyMode);
-        if(isSuperPrivacyMode){
+        if (isSuperPrivacyMode) {
             eventInfo.eventId = CallAbilityEventId::EVENT_IS_SUPER_PRIVACY_MODE_ON;
         } else {
             eventInfo.eventId = CallAbilityEventId::EVENT_IS_SUPER_PRIVACY_MODE_OFF;

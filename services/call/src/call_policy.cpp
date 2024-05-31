@@ -73,13 +73,13 @@ int32_t CallPolicy::DialPolicy(std::u16string &number, AppExecFwk::PacMap &extra
         return CALL_ERR_CALL_COUNTS_EXCEED_LIMIT;
     }
     int32_t slotId = extras.GetIntValue("accountId");
-    if(isEcc){
+    if (isEcc) {
         return TELEPHONY_SUCCESS;
     }
     int32_t privpacyMode;
     int32_t privpacy = SuperPrivacyKit::GetSuperPrivacyMode(privpacyMode);
-    TELEPHONY_LOGI("callId is invalid,privpacyMode:%{public}d",privpacyMode);
-    if(privpacy == TELEPHONY_SUCCESS && privpacyMode == static_cast<int32_t>(CallSuperPrivacyModeType::ALWAYS_ON)){
+    TELEPHONY_LOGI("callId is invalid,privpacyMode:%{public}d", privpacyMode);
+    if (privpacy == TELEPHONY_SUCCESS && privpacyMode == static_cast<int32_t>(CallSuperPrivacyModeType::ALWAYS_ON)) {
         DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance()->SetOldSuperPrivacyMode(privpacyMode);
         TELEPHONY_LOGE("Call SetOldSuperPrivacyMode ");
         int32_t videoState = extras.GetIntValue("videoState");
@@ -215,8 +215,8 @@ int32_t CallPolicy::AnswerCallPolicy(int32_t callId, int32_t videoState)
     }
     int32_t privpacyMode;
     int32_t privpacy = SuperPrivacyKit::GetSuperPrivacyMode(privpacyMode);
-    TELEPHONY_LOGI("AnswerCallPolicy, privpacyMode:%{public}d",privpacyMode);
-    if(privpacy == TELEPHONY_SUCCESS && privpacyMode == static_cast<int32_t>(CallSuperPrivacyModeType::ALWAYS_ON)){
+    TELEPHONY_LOGI("AnswerCallPolicy, privpacyMode:%{public}d", privpacyMode);
+    if (privpacy == TELEPHONY_SUCCESS && privpacyMode == static_cast<int32_t>(CallSuperPrivacyModeType::ALWAYS_ON)) {
         DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance()->SetOldSuperPrivacyMode(privpacyMode);
         TELEPHONY_LOGE("call failed due to isSuperPrivacyMode is true");
         DelayedSingleton<CallDialog>::GetInstance()->DialogConnectAnswerPrivpacyModeExtension("SUPER_PRIVACY_MODE",
