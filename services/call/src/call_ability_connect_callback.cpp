@@ -18,6 +18,7 @@
 #include "call_connect_ability.h"
 #include "call_object_manager.h"
 #include "telephony_log_wrapper.h"
+#include "call_superprivacy_control_manager.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -28,9 +29,19 @@ void CallAbilityConnectCallback::OnAbilityConnectDone(
     const AppExecFwk::ElementName &element, const sptr<IRemoteObject> &remoteObject, int resultCode)
 {
     TELEPHONY_LOGI("connect callui result code: %{public}d", resultCode);
+    DelayedSingleton<CallConnectAbility>::GetInstance()->NotifyAll();
+    DelayedSingleton<CallConnectAbility>::GetInstance()->SetConnectFlag(true);
     if (resultCode == CONNECT_ABILITY_SUCCESS) {
-        DelayedSingleton<CallConnectAbility>::GetInstance()->SetConnectFlag(true);
-        DelayedSingleton<CallConnectAbility>::GetInstance()->NotifyAll();
+        CallEventInfo eventInfo;
+        (void)memset_s(&eventInfo, sizeof(CallEventInfo), 0, sizeof(CallEventInfo));
+        bool isSuperPrivacyMode = DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance()->GetCurrentIsSuperPrivacyMode();
+        TELEPHONY_LOGI("OnAbilityConnectDone SuperPrivacyMode:%{public}d", isSuperPrivacyMode);
+        if(isSuperPrivacyMode){
+            eventInfo.eventId = CallAbilityEventId::EVENT_IS_SUPER_PRIVACY_MODE_ON;
+        } else {
+            eventInfo.eventId = CallAbilityEventId::EVENT_IS_SUPER_PRIVACY_MODE_OFF;
+        }
+        DelayedSingleton<CallAbilityReportProxy>::GetInstance()->CallEventUpdated(eventInfo);
     }
 }
 

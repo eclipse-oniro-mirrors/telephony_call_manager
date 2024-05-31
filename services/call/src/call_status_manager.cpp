@@ -43,6 +43,7 @@
 #include "ffrt.h"
 #include "parameters.h"
 #include "spam_call_adapter.h"
+#include "call_superprivacy_control_manager.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -805,6 +806,7 @@ int32_t CallStatusManager::DisconnectedHandle(const CallDetailInfo &info)
         TELEPHONY_LOGE("UpdateCallState failed, errCode:%{public}d", ret);
         return ret;
     }
+    DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance()->restoreSuperPrivacyMode();
     HandleHoldCallOrAutoAnswerCall(call, callIdList, previousState, priorState);
     return ret;
 }

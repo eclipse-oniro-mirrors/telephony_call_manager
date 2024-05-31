@@ -19,6 +19,7 @@
 #include <memory>
 
 #include "call_status_manager.h"
+#include "mutex"
 #include "singleton.h"
 #include "voip_call_manager_info.h"
 
@@ -38,10 +39,13 @@ public:
     int32_t UpdateVoipEventInfo(const VoipCallEventInfo &info);
 
 private:
+    template<typename Function>
+    void Submit(const std::string &taskName, Function &&func);
     void BuildCallDetailsInfo(CallDetailsInfo &info, CallDetailsInfo &callDetailsInfo);
 
 private:
     std::shared_ptr<CallStatusManager> callStatusManagerPtr_;
+    std::mutex mtx;
 };
 } // namespace Telephony
 } // namespace OHOS

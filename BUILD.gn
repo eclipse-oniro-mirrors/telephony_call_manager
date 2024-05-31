@@ -63,6 +63,7 @@ ohos_shared_library("tel_call_manager") {
     "services/call/src/call_broadcast_subscriber.cpp",
     "services/call/src/call_connect_ability.cpp",
     "services/call/src/call_control_manager.cpp",
+    "services/call/src/call_superprivacy_control_manager.cpp",
     "services/call/src/call_incoming_filter_manager.cpp",
     "services/call/src/call_object_manager.cpp",
     "services/call/src/call_policy.cpp",
@@ -187,6 +188,8 @@ ohos_shared_library("tel_call_manager") {
     "player_framework:system_sound_client",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
+    "security_privacy_server:super_privacy_sdk",
+    "security_privacy_server:super_privacy_service_intf",
   ]
 
   cflags_cc = [

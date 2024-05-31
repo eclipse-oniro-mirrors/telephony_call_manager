@@ -21,6 +21,8 @@
 #include "telephony_log_wrapper.h"
 #include "call_control_manager.h"
 #include "satellite_call_control.h"
+#include "securec.h"
+
 
 namespace OHOS {
 namespace Telephony {
@@ -32,6 +34,7 @@ CallBroadcastSubscriber::CallBroadcastSubscriber(const OHOS::EventFwk::CommonEve
     memberFuncMap_[SIM_STATE_BROADCAST_EVENT] = &CallBroadcastSubscriber::SimStateBroadcast;
     memberFuncMap_[CONNECT_CALLUI_SERVICE] = &CallBroadcastSubscriber::ConnectCallUiServiceBroadcast;
     memberFuncMap_[HIGH_TEMP_LEVEL_CHANGED] = &CallBroadcastSubscriber::HighTempLevelChangedBroadcast;
+    memberFuncMap_[SUPER_PRIVACY_MODE] = &CallBroadcastSubscriber::ConnectCallUiSuperPrivacyModeBroadcast;
 }
 
 void CallBroadcastSubscriber::OnReceiveEvent(const EventFwk::CommonEventData &data)
@@ -46,6 +49,8 @@ void CallBroadcastSubscriber::OnReceiveEvent(const EventFwk::CommonEventData &da
         code = CONNECT_CALLUI_SERVICE;
     } else if (action == "usual.event.thermal.satcomm.HIGH_TEMP_LEVEL") {
         code = HIGH_TEMP_LEVEL_CHANGED;
+    } else if (action == "usual.event.SUPER_PRIVACY_MODE") {
+        code = SUPER_PRIVACY_MODE;
     } else {
         code = UNKNOWN_BROADCAST_EVENT;
     }
@@ -80,6 +85,27 @@ void CallBroadcastSubscriber::HighTempLevelChangedBroadcast(const EventFwk::Comm
     int32_t satcommHighTempLevel = data.GetWant().GetIntParam("satcomm_high_temp_level", -1);
     TELEPHONY_LOGI("satcommHighTempLevel:%{public}d", satcommHighTempLevel);
     DelayedSingleton<SatelliteCallControl>::GetInstance()->SetSatcommTempLevel(satcommHighTempLevel);
+}
+
+void CallBroadcastSubscriber::ConnectCallUiSuperPrivacyModeBroadcast(const EventFwk::CommonEventData &data)
+{
+	int32_t videoState = data.GetWant().GetIntParam("videoState", -1);
+	bool isAnswer = data.GetWant().GetBoolParam("isAnswer", false);
+	TELEPHONY_LOGI("Connect CallUiSuperPrivacyModeBroadcast isAnswer:%{public}d", isAnswer);
+	if(isAnswer){
+		int32_t callId = data.GetWant().GetIntParam("callId", -1);
+		TELEPHONY_LOGI("Connect CallUiSuperPrivacyModeBroadcast_Answer callId:%{public}d", callId);
+		DelayedSingleton<CallControlManager>::GetInstance()->CloseAnswerSuperPrivacyMode(callId, videoState);
+	}else{
+		std::string phoneNumber = data.GetWant().GetStringParam("phoneNumber");
+		TELEPHONY_LOGI("Connect CallUiSuperPrivacyModeBroadcast_Answer callId:%{public}s", phoneNumber.c_str());
+		std::u16string phNumber = Str8ToStr16(phoneNumber);
+		int32_t accountId = data.GetWant().GetIntParam("accountId", -1);
+		int32_t dialScene = data.GetWant().GetIntParam("dialScene", -1);
+		int32_t dialType = data.GetWant().GetIntParam("dialType", -1);
+		int32_t callType = data.GetWant().GetIntParam("callType", -1);
+		DelayedSingleton<CallControlManager>::GetInstance()->CloseSuperPrivacyMode(phNumber, accountId, videoState, dialScene, dialType, callType);
+	}
 }
 } // namespace Telephony
 } // namespace OHOS

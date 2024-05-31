@@ -40,6 +40,7 @@
 #include "video_control_manager.h"
 #include "audio_device_manager.h"
 #include "distributed_call_manager.h"
+#include "call_superprivacy_control_manager.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -1228,6 +1229,18 @@ void CallControlManager::ConnectCallUiService(bool shouldConnect)
     }
 }
 
+void CallControlManager::CloseSuperPrivacyMode(std::u16string &phoneNumber, int32_t &accountId,
+    int32_t &videoState, int32_t &dialType, int32_t &dialScene, int32_t &callType)
+{
+	DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance()->CloseSuperPrivacyMode(phoneNumber,
+	    accountId, videoState, dialScene, dialType, callType);
+}
+
+void CallControlManager::CloseAnswerSuperPrivacyMode(int32_t callId, int32_t videoState)
+{
+	DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance()->CloseAnswerSuperPrivacyMode(callId, videoState);
+}
+
 bool CallControlManager::ShouldDisconnectService()
 {
     return shouldDisconnect;
@@ -1410,6 +1423,7 @@ int32_t CallControlManager::BroadcastSubscriber()
     EventFwk::MatchingSkills matchingSkills;
     matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_SIM_STATE_CHANGED);
     matchingSkills.AddEvent("usual.event.thermal.satcomm.HIGH_TEMP_LEVEL");
+    matchingSkills.AddEvent("usual.event.SUPER_PRIVACY_MODE");
     EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
     subscriberInfo.SetThreadMode(EventFwk::CommonEventSubscribeInfo::COMMON);
     std::shared_ptr<CallBroadcastSubscriber> subscriberPtr = std::make_shared<CallBroadcastSubscriber>(subscriberInfo);
