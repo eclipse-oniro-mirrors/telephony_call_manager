@@ -27,7 +27,7 @@ namespace Telephony {
             return nullptr;
         }
         auto lenth = origin.length() + 1;
-        char* res = (char*)malloc(sizeof(char) * lenth);
+        char* res = static_cast<char*>(malloc(sizeof(char) * lenth));
         if (res == nullptr) {
             return nullptr;
         }
