@@ -72,7 +72,7 @@ ohos_shared_library("tel_call_manager") {
     "services/call/src/call_state_listener.cpp",
     "services/call/src/call_status_manager.cpp",
     "services/call/src/call_status_policy.cpp",
-	"services/call/src/call_superprivacy_control_manager.cpp",
+    "services/call/src/call_superprivacy_control_manager.cpp",
     "services/call/src/carrier_call.cpp",
     "services/call/src/conference_base.cpp",
     "services/call/src/cs_call.cpp",
