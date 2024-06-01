@@ -58,7 +58,7 @@ int32_t BluetoothCallService::AnswerCall()
         DelayedSingleton<AudioControlManager>::GetInstance()->PlayWaitingTone();
         ffrt::submit_h([&]() {
             DelayedSingleton<AudioControlManager>::GetInstance()->StopWaitingTone();
-        }, {}, {}, ffrt::task_attr().delay(DELAY_STOP_PLAY_TIME));
+            }, {}, {}, ffrt::task_attr().delay(DELAY_STOP_PLAY_TIME));
         return callControlManagerPtr_->AnswerCall(callId, static_cast<int32_t>(videoState));
     } else {
         TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");
