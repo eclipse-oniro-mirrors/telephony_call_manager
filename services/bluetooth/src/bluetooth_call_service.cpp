@@ -22,6 +22,8 @@
 #include "telephony_permission.h"
 #include "audio_control_manager.h"
 #include "bluetooth_call_manager.h"
+#include "ffrt.h"
+
 
 namespace OHOS {
 namespace Telephony {
