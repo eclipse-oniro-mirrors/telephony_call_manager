@@ -120,7 +120,7 @@ bool CallDialog::DialogConnectPrivpacyModeExtension(const std::string &dialogRea
 }
 
 bool CallDialog::DialogConnectAnswerPrivpacyModeExtension(const std::string &dialogReason,
-    int32_t callId, int32_t videoState, bool isVideo)
+    int32_t &callId, int32_t &videoState, bool isVideo)
 {
     std::string commandStr = BuildStartAnswerPrivpacyModeCommand(dialogReason, callId, videoState, isVideo);
     AAFwk::Want want;
@@ -156,7 +156,7 @@ std::string CallDialog::BuildStartPrivpacyModeCommand(const std::string &dialogR
 }
 
 std::string CallDialog::BuildStartAnswerPrivpacyModeCommand(const std::string &dialogReason,
-    int32_t callId, int32_t videoState, bool isVideo)
+    int32_t &callId, int32_t &videoState, bool isVideo)
 {
     nlohmann::json root;
     std::string uiExtensionType = "sysDialog/common";
