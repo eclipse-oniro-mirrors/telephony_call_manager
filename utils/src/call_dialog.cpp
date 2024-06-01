@@ -102,10 +102,11 @@ std::string CallDialog::BuildStartCommand(const std::string &dialogReason, int32
     return startCommand;
 }
 
-bool CallDialog::DialogConnectPrivpacyModeExtension(const std::string &dialogReason, std::u16string &number, int32_t &accountId,
-    int32_t &videoState, int32_t &dialType, int32_t &dialScene, int32_t &callType, bool isVideo)
+bool CallDialog::DialogConnectPrivpacyModeExtension(const std::string &dialogReason, std::u16string &number,
+    int32_t &accountId, int32_t &videoState, int32_t &dialType, int32_t &dialScene, int32_t &callType, bool isVideo)
 {
-    std::string commandStr = BuildStartPrivpacyModeCommand(dialogReason, number, accountId, videoState, dialType, dialScene, callType, isVideo);
+    std::string commandStr = BuildStartPrivpacyModeCommand(dialogReason, number,
+	                                                       accountId, videoState, dialType, dialScene, callType, isVideo);
     AAFwk::Want want;
     std::string bundleName = "com.ohos.sceneboard";
     std::string abilityName = "com.ohos.sceneboard.systemdialog";
@@ -119,7 +120,7 @@ bool CallDialog::DialogConnectPrivpacyModeExtension(const std::string &dialogRea
 }
 
 bool CallDialog::DialogConnectAnswerPrivpacyModeExtension(const std::string &dialogReason,
-	int32_t callId, int32_t videoState, bool isVideo)
+	                                                      int32_t callId, int32_t videoState, bool isVideo)
 {
     std::string commandStr = BuildStartAnswerPrivpacyModeCommand(dialogReason, callId, videoState, isVideo);
     AAFwk::Want want;
@@ -136,7 +137,7 @@ bool CallDialog::DialogConnectAnswerPrivpacyModeExtension(const std::string &dia
 
 
 std::string CallDialog::BuildStartPrivpacyModeCommand(const std::string &dialogReason, std::u16string &number,
-int32_t &accountId, int32_t &videoState, int32_t &dialType, int32_t &dialScene, int32_t &callType, bool isVideo)
+                                                      int32_t &accountId, int32_t &videoState, int32_t &dialType, int32_t &dialScene, int32_t &callType, bool isVideo)
 {
     nlohmann::json root;
     std::string uiExtensionType = "sysDialog/common";

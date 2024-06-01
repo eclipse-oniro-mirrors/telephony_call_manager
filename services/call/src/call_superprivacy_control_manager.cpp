@@ -43,7 +43,8 @@ int32_t CallSuperPrivacyControlManager::GetOldSuperPrivacyMode()
 }
 
 int32_t CallSuperPrivacyControlManager::CloseSuperPrivacyMode(
-std::u16string &phoneNumber, int32_t &accountId, int32_t &videoState, int32_t &dialType, int32_t &dialScene, int32_t &callType)
+std::u16string &phoneNumber, int32_t &accountId, int32_t &videoState,
+int32_t &dialType, int32_t &dialScene, int32_t &callType)
 {
     int32_t privacy = SuperPrivacyKit::SetSuperPrivacyMode(SuperPrivacyMode::OFF, Source::CALL);
     TELEPHONY_LOGE("CallSuperPrivacyControlManager CloseSuperPrivacyMode privacy:%{public}d", privacy);
@@ -81,7 +82,8 @@ int32_t CallSuperPrivacyControlManager::CloseAnswerSuperPrivacyMode(int32_t call
 
 void CallSuperPrivacyControlManager::restoreSuperPrivacyMode()
 {
-    bool isChangeSuperPrivacyMode = DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance()->GetIsChangeSuperPrivacyMode();
+    bool isChangeSuperPrivacyMode = DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance()->
+	GetIsChangeSuperPrivacyMode();
     if (!isChangeSuperPrivacyMode) {
         return;
     }

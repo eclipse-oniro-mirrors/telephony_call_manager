@@ -105,7 +105,7 @@ void CallBroadcastSubscriber::ConnectCallUiSuperPrivacyModeBroadcast(const Event
     int32_t dialType = data.GetWant().GetIntParam("dialType", -1);
     int32_t callType = data.GetWant().GetIntParam("callType", -1);
     DelayedSingleton<CallControlManager>::GetInstance()->CloseSuperPrivacyMode(
-	phNumber, accountId, videoState, dialScene, dialType, callType);
+    phNumber, accountId, videoState, dialScene, dialType, callType);
     }
 }
 } // namespace Telephony
