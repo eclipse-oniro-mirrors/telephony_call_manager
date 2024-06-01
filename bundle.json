@@ -63,7 +63,7 @@
                 "image_framework",
                 "miscdevice",
                 "location",
-                "security_privacy_server",
+                "security_privacy_server"
             ],
             "third_party": [
                 "libphonenumber",
