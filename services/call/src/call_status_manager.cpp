@@ -808,7 +808,7 @@ int32_t CallStatusManager::DisconnectedHandle(const CallDetailInfo &info)
     }
     int32_t currentCallNum = CallObjectManager::GetCurrentCallNum();
     if (currentCallNum <= 1)) {
-        DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance()->restoreSuperPrivacyMode();		
+        DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance()->restoreSuperPrivacyMode();
     }
     HandleHoldCallOrAutoAnswerCall(call, callIdList, previousState, priorState);
     return ret;
