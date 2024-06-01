@@ -13,6 +13,8 @@
  * limitations under the License.
  */
 
+#include "audio_control_manager.h"
+#include "bluetooth_call_manager.h"
 #include "call_policy.h"
 
 #include "call_dialog.h"
@@ -80,6 +82,10 @@ int32_t CallPolicy::DialPolicy(std::u16string &number, AppExecFwk::PacMap &extra
     int32_t privpacy = SuperPrivacyKit::GetSuperPrivacyMode(privpacyMode);
     TELEPHONY_LOGI("callId is invalid,privpacyMode:%{public}d", privpacyMode);
     if (privpacy == TELEPHONY_SUCCESS && privpacyMode == static_cast<int32_t>(CallSuperPrivacyModeType::ALWAYS_ON)) {
+		if (isEcc) {
+			DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance()->SetIsChangeSuperPrivacyMode(true);
+			return HasNormalCall(isEcc, slotId, callType);
+		}
         DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance()->SetOldSuperPrivacyMode(privpacyMode);
         TELEPHONY_LOGE("Call SetOldSuperPrivacyMode ");
         int32_t videoState = extras.GetIntValue("videoState");
@@ -219,6 +225,12 @@ int32_t CallPolicy::AnswerCallPolicy(int32_t callId, int32_t videoState)
     if (privpacy == TELEPHONY_SUCCESS && privpacyMode == static_cast<int32_t>(CallSuperPrivacyModeType::ALWAYS_ON)) {
         DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance()->SetOldSuperPrivacyMode(privpacyMode);
         TELEPHONY_LOGE("call failed due to isSuperPrivacyMode is true");
+		if (DelayedSingleton<BluetoothCallManager>::GetInstance()->IsBtAvailble()) {
+        TELEPHONY_LOGE("zxu IsBtScoConnected is true");
+        DelayedSingleton<AudioControlManager>::GetInstance()->PlayWaitingTone();
+        ffrt::submit_h([&])(){DelayedSingleton<AudioControlManager>::GetInstance()->StopWaitingTone();
+        },{},{},ffrt::task_attr().delay(DISCONNECT_DELAY_PLAY_TIME);
+		}
         DelayedSingleton<CallDialog>::GetInstance()->DialogConnectAnswerPrivpacyModeExtension("SUPER_PRIVACY_MODE",
             callId, videoState, true);
         return TELEPHONY_ERR_ARGUMENT_INVALID;

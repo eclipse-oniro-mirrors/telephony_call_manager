@@ -806,7 +806,9 @@ int32_t CallStatusManager::DisconnectedHandle(const CallDetailInfo &info)
         TELEPHONY_LOGE("UpdateCallState failed, errCode:%{public}d", ret);
         return ret;
     }
-    DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance()->restoreSuperPrivacyMode();
+	if (currentCallNum <= CallObjectManager::GetCurrentCallNum()) {
+        DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance()->restoreSuperPrivacyMode();		
+	}
     HandleHoldCallOrAutoAnswerCall(call, callIdList, previousState, priorState);
     return ret;
 }
