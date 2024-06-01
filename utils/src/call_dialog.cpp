@@ -19,6 +19,7 @@
 #include "ipc_skeleton.h"
 #include "nlohmann/json.hpp"
 #include "telephony_log_wrapper.h"
+#include <securec.h>
 
 namespace OHOS {
 namespace Telephony {
@@ -96,6 +97,75 @@ std::string CallDialog::BuildStartCommand(const std::string &dialogReason, int32
     root["ability.want.params.uiExtensionType"] = uiExtensionType;
     root["dialogReason"] = dialogReason;
     root["slotId"] = slotId;
+    std::string startCommand = root.dump();
+    TELEPHONY_LOGI("startCommand is: %{public}s", startCommand.c_str());
+    return startCommand;
+}
+
+bool CallDialog::DialogConnectPrivpacyModeExtension(const std::string &dialogReason, std::u16string &number,
+    int32_t &accountId, int32_t &videoState, int32_t &dialType, int32_t &dialScene, int32_t &callType, bool isVideo)
+{
+    std::string commandStr = BuildStartPrivpacyModeCommand(dialogReason, number,
+    accountId, videoState, dialType, dialScene, callType, isVideo);
+    AAFwk::Want want;
+    std::string bundleName = "com.ohos.sceneboard";
+    std::string abilityName = "com.ohos.sceneboard.systemdialog";
+    want.SetElementName(bundleName, abilityName);
+    bool connectResult = CallSettingDialogConnectExtensionAbility(want, commandStr);
+    if (!connectResult) {
+        TELEPHONY_LOGE("CallSettingDialogConnectExtensionAbility failed!");
+        return false;
+    }
+    return true;
+}
+
+bool CallDialog::DialogConnectAnswerPrivpacyModeExtension(const std::string &dialogReason,
+    int32_t &callId, int32_t &videoState, bool isVideo)
+{
+    std::string commandStr = BuildStartAnswerPrivpacyModeCommand(dialogReason, callId, videoState, isVideo);
+    AAFwk::Want want;
+    std::string bundleName = "com.ohos.sceneboard";
+    std::string abilityName = "com.ohos.sceneboard.systemdialog";
+    want.SetElementName(bundleName, abilityName);
+    bool connectResult = CallSettingDialogConnectExtensionAbility(want, commandStr);
+    if (!connectResult) {
+        TELEPHONY_LOGE("CallSettingDialogConnectExtensionAbility failed!");
+        return false;
+    }
+    return true;
+}
+
+std::string CallDialog::BuildStartPrivpacyModeCommand(const std::string &dialogReason, std::u16string &number,
+    int32_t &accountId, int32_t &videoState, int32_t &dialType, int32_t &dialScene, int32_t &callType, bool isVideo)
+{
+    nlohmann::json root;
+    std::string uiExtensionType = "sysDialog/common";
+    root["ability.want.params.uiExtensionType"] = uiExtensionType;
+    root["dialogReason"] = dialogReason;
+    root["number"] = Str16ToStr8(number);
+    root["accountId"] = accountId;
+    root["videoState"] = videoState;
+    root["dialType"] = dialType;
+    root["dialScene"] = dialScene;
+    root["callType"] = callType;
+    root["isAnswer"] = false;
+    root["isVideo"] = isVideo;
+    std::string startCommand = root.dump();
+    TELEPHONY_LOGI("startCommand is: %{public}s", startCommand.c_str());
+    return startCommand;
+}
+
+std::string CallDialog::BuildStartAnswerPrivpacyModeCommand(const std::string &dialogReason,
+    int32_t &callId, int32_t &videoState, bool isVideo)
+{
+    nlohmann::json root;
+    std::string uiExtensionType = "sysDialog/common";
+    root["ability.want.params.uiExtensionType"] = uiExtensionType;
+    root["dialogReason"] = dialogReason;
+    root["callId"] = callId;
+    root["videoState"] = videoState;
+    root["isAnswer"] = true;
+    root["isVideo"] = isVideo;
     std::string startCommand = root.dump();
     TELEPHONY_LOGI("startCommand is: %{public}s", startCommand.c_str());
     return startCommand;

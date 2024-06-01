@@ -461,6 +461,14 @@ enum class CallAbilityEventId {
      * Indicates that the OTT is not supported.
      */
     EVENT_OTT_FUNCTION_UNSUPPORTED,
+    /**
+     * Indicates that the super privacy mode ON.
+     */
+    EVENT_IS_SUPER_PRIVACY_MODE_ON = 20,
+	  /**
+     * Indicates that the super privacy mode OFF.
+     */
+    EVENT_IS_SUPER_PRIVACY_MODE_OFF = 21,
 };
 
 /**
@@ -719,6 +727,25 @@ enum class SatCommTempLevel {
      */
     TEMP_LEVEL_HIGH,
 };
+
+/**
+ * @brief Indicates the super privacy mode for  call.
+ */
+enum class CallSuperPrivacyModeType {
+    /*
+     *  Indicates the super privacy mode for  OFF.
+     */
+    OFF = 0,
+    /*
+     *  Indicates the super privacy mode for  ON_WHEN_FOLDED.
+     */
+    ON_WHEN_FOLDED = 1,
+    /*
+     *  Indicates the super privacy mode for  ALWAYS_ON.
+     */
+    ALWAYS_ON = 2,
+};
+
 } // namespace Telephony
 } // namespace OHOS
 #endif // CALL_MANAGER_BASE_H

@@ -20,9 +20,14 @@
 #include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
 #include "telephony_permission.h"
+#include "audio_control_manager.h"
+#include "bluetooth_call_manager.h"
+#include "ffrt.h"
+
 
 namespace OHOS {
 namespace Telephony {
+const uint64_t DELAY_STOP_PLAY_TIME = 3000000;
 BluetoothCallService::BluetoothCallService()
     : callControlManagerPtr_(DelayedSingleton<CallControlManager>::GetInstance()),
     sendDtmfState_(false), sendDtmfCallId_(ERR_ID)
@@ -50,6 +55,10 @@ int32_t BluetoothCallService::AnswerCall()
     }
     VideoStateType videoState = call->GetVideoStateType();
     if (callControlManagerPtr_ != nullptr) {
+        DelayedSingleton<AudioControlManager>::GetInstance()->PlayWaitingTone();
+        ffrt::submit_h([&]() {
+            DelayedSingleton<AudioControlManager>::GetInstance()->StopWaitingTone();
+            }, {}, {}, ffrt::task_attr().delay(DELAY_STOP_PLAY_TIME));
         return callControlManagerPtr_->AnswerCall(callId, static_cast<int32_t>(videoState));
     } else {
         TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");

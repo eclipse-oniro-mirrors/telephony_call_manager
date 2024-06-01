@@ -72,6 +72,7 @@ ohos_shared_library("tel_call_manager") {
     "services/call/src/call_state_listener.cpp",
     "services/call/src/call_status_manager.cpp",
     "services/call/src/call_status_policy.cpp",
+    "services/call/src/call_superprivacy_control_manager.cpp",
     "services/call/src/carrier_call.cpp",
     "services/call/src/conference_base.cpp",
     "services/call/src/cs_call.cpp",
@@ -247,6 +248,14 @@ ohos_shared_library("tel_call_manager") {
       global_parts_info.telephony_cellular_data) {
     external_deps += [ "cellular_data:tel_cellular_data_api" ]
     defines += [ "CELLULAR_DATA_SUPPORT" ]
+  }
+
+  if (defined(global_parts_info) &&
+      defined(global_parts_info.security_privacy_server) &&
+      global_parts_info.security_privacy_server) {
+    external_deps += [ "security_privacy_server:super_privacy_sdk" ]
+    external_deps += [ "security_privacy_server:super_privacy_service_intf" ]
+    defines += [ "SUPPORT_SUPER_PRIVACY_SERVICE" ]
   }
 
   part_name = "call_manager"
