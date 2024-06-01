@@ -18,8 +18,8 @@
 #include "super_privacy_kit.h"
 #include "call_control_manager.h"
 
-namespace OHOS{
-namespace Telephony{
+namespace OHOS {
+namespace Telephony {
 using namespace AppSecurityPrivacy::SecurityPrivacyServer::SuperPrivacy;
 
 bool CallSuperPrivacyControlManager::GetIsChangeSuperPrivacyMode()
@@ -51,11 +51,11 @@ int32_t CallSuperPrivacyControlManager::CloseSuperPrivacyMode(std::u16string &ph
     if (privacy == 0) {
         TELEPHONY_LOGE("CallSuperPrivacyControlManager CloseSuperPrivacyMode is true");
         AppExecFwk::PacMap dialInfo;
-        dialInfo.PutIntValue("accountId",accountId);
-        dialInfo.PutIntValue("videoState",videoState);
-        dialInfo.PutIntValue("dialType",dialType);
-        dialInfo.PutIntValue("dialScene",dialScene);
-        dialInfo.PutIntValue("callType",callType);
+        dialInfo.PutIntValue("accountId", accountId);
+        dialInfo.PutIntValue("videoState", videoState);
+        dialInfo.PutIntValue("dialType", dialType);
+        dialInfo.PutIntValue("dialScene", dialScene);
+        dialInfo.PutIntValue("callType", callType);
         int32_t ret = DelayedSingleton<CallControlManager>::GetInstance()->DialCall(phoneNumber, dialInfo);
         if (ret == TELEPHONY_SUCCESS) {
             return TELEPHONY_SUCCESS;
@@ -86,7 +86,7 @@ void CallSuperPrivacyControlManager::restoreSuperPrivacyMode()
         return;
     }
     int32_t privpacyMode;
-  	int32_t privpacy = SuperPrivacyKit::GetSuperPrivacyMode(privpacyMode);
+	int32_t privpacy = SuperPrivacyKit::GetSuperPrivacyMode(privpacyMode);
     int32_t oldPrivpacy = DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance()->GetOldSuperPrivacyMode();
     if (privpacy == TELEPHONY_SUCCESS && privpacyMode != oldPrivpacy) {
         int32_t privacy = SuperPrivacyKit::SetSuperPrivacyMode(SuperPrivacyMode::ALWAYS_ON, Source::CALL);

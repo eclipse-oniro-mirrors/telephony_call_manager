@@ -1232,7 +1232,7 @@ void CallControlManager::ConnectCallUiService(bool shouldConnect)
 void CallControlManager::CloseSuperPrivacyMode(std::u16string &phoneNumber, int32_t &accountId,
     int32_t &videoState, int32_t &dialType, int32_t &dialScene, int32_t &callType)
 {
-	DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance()->CloseSuperPrivacyMode(phoneNumber,
+    DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance()->CloseSuperPrivacyMode(phoneNumber,
 	    accountId, videoState, dialScene, dialType, callType);
 }
 
