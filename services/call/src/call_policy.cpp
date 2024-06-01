@@ -24,14 +24,18 @@
 #include "core_service_client.h"
 #include "ims_conference.h"
 #include "telephony_log_wrapper.h"
+#ifdef SUPPORT_SUPER_PRIVACY_SERVICE
 #include "super_privacy_kit.h"
+#endif
 #include "call_control_manager.h"
 #include "call_superprivacy_control_manager.h"
 #include "call_manager_base.h"
 
 namespace OHOS {
 namespace Telephony {
+#ifdef SUPPORT_SUPER_PRIVACY_SERVICE
 using namespace AppSecurityPrivacy::SecurityPrivacyServer::SuperPrivacy;
+#endif
 const uint64_t DISCONNECT_DELAY_PLAY_TIME = 3000000;
 CallPolicy::CallPolicy() {}
 
@@ -87,6 +91,7 @@ int32_t CallPolicy::SuperPrivacyMode(std::u16string &number, AppExecFwk::PacMap 
         return TELEPHONY_SUCCESS;
     }
     int32_t privpacyMode;
+#ifdef SUPPORT_SUPER_PRIVACY_SERVICE
     int32_t privpacy = SuperPrivacyKit::GetSuperPrivacyMode(privpacyMode);
     TELEPHONY_LOGI("callId is invalid,privpacyMode:%{public}d", privpacyMode);
     if (privpacy == TELEPHONY_SUCCESS && privpacyMode == static_cast<int32_t>(CallSuperPrivacyModeType::ALWAYS_ON)) {
@@ -104,6 +109,7 @@ int32_t CallPolicy::SuperPrivacyMode(std::u16string &number, AppExecFwk::PacMap 
             number, accountId, videoState, dialType, dialScene, callType, true);
         return CALL_ERR_DIAL_FAILED;
     }
+#endif
     return HasNormalCall(isEcc, slotId, callType);
 }
 int32_t CallPolicy::HasNormalCall(bool isEcc, int32_t slotId, CallType callType)
@@ -227,6 +233,7 @@ int32_t CallPolicy::AnswerCallPolicy(int32_t callId, int32_t videoState)
         return CALL_ERR_ILLEGAL_CALL_OPERATION;
     }
     int32_t privpacyMode;
+#ifdef SUPPORT_SUPER_PRIVACY_SERVICE
     int32_t privpacy = SuperPrivacyKit::GetSuperPrivacyMode(privpacyMode);
     TELEPHONY_LOGI("AnswerCallPolicy, privpacyMode:%{public}d", privpacyMode);
     if (privpacy == TELEPHONY_SUCCESS && privpacyMode == static_cast<int32_t>(CallSuperPrivacyModeType::ALWAYS_ON)) {
@@ -242,6 +249,7 @@ int32_t CallPolicy::AnswerCallPolicy(int32_t callId, int32_t videoState)
             callId, videoState, true);
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
+#endif
     return TELEPHONY_SUCCESS;
 }
 

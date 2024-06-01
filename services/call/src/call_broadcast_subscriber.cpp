@@ -93,19 +93,19 @@ void CallBroadcastSubscriber::ConnectCallUiSuperPrivacyModeBroadcast(const Event
     bool isAnswer = data.GetWant().GetBoolParam("isAnswer", false);
     TELEPHONY_LOGI("Connect CallUiSuperPrivacyModeBroadcast isAnswer:%{public}d", isAnswer);
     if (isAnswer) {
-    int32_t callId = data.GetWant().GetIntParam("callId", -1);
-    TELEPHONY_LOGI("Connect CallUiSuperPrivacyModeBroadcast_Answer callId:%{public}d", callId);
-    DelayedSingleton<CallControlManager>::GetInstance()->CloseAnswerSuperPrivacyMode(callId, videoState);
+        int32_t callId = data.GetWant().GetIntParam("callId", -1);
+        TELEPHONY_LOGI("Connect CallUiSuperPrivacyModeBroadcast_Answer callId:%{public}d", callId);
+        DelayedSingleton<CallControlManager>::GetInstance()->CloseAnswerSuperPrivacyMode(callId, videoState);
     } else {
-    std::string phoneNumber = data.GetWant().GetStringParam("phoneNumber");
-    TELEPHONY_LOGI("Connect CallUiSuperPrivacyModeBroadcast_Answer callId:%{public}s", phoneNumber.c_str());
-    std::u16string phNumber = Str8ToStr16(phoneNumber);
-    int32_t accountId = data.GetWant().GetIntParam("accountId", -1);
-    int32_t dialScene = data.GetWant().GetIntParam("dialScene", -1);
-    int32_t dialType = data.GetWant().GetIntParam("dialType", -1);
-    int32_t callType = data.GetWant().GetIntParam("callType", -1);
-    DelayedSingleton<CallControlManager>::GetInstance()->CloseSuperPrivacyMode(
-        phNumber, accountId, videoState, dialScene, dialType, callType);
+        std::string phoneNumber = data.GetWant().GetStringParam("phoneNumber");
+        TELEPHONY_LOGI("Connect CallUiSuperPrivacyModeBroadcast_Answer callId:%{public}s", phoneNumber.c_str());
+        std::u16string phNumber = Str8ToStr16(phoneNumber);
+        int32_t accountId = data.GetWant().GetIntParam("accountId", -1);
+        int32_t dialScene = data.GetWant().GetIntParam("dialScene", -1);
+        int32_t dialType = data.GetWant().GetIntParam("dialType", -1);
+        int32_t callType = data.GetWant().GetIntParam("callType", -1);
+        DelayedSingleton<CallControlManager>::GetInstance()->CloseSuperPrivacyMode(
+            phNumber, accountId, videoState, dialScene, dialType, callType);
     }
 }
 } // namespace Telephony
