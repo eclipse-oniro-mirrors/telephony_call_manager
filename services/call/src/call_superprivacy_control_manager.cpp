@@ -22,8 +22,9 @@
 
 namespace OHOS {
 namespace Telephony {
+#ifdef SUPPORT_SUPER_PRIVACY_SERVICE
 using namespace AppSecurityPrivacy::SecurityPrivacyServer::SuperPrivacy;
-
+#endif
 bool CallSuperPrivacyControlManager::GetIsChangeSuperPrivacyMode()
 {
     return isChangeSuperPrivacyMode;

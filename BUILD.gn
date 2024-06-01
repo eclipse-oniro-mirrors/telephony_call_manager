@@ -188,8 +188,6 @@ ohos_shared_library("tel_call_manager") {
     "player_framework:system_sound_client",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
-    "security_privacy_server:super_privacy_sdk",
-    "security_privacy_server:super_privacy_service_intf",
   ]
 
   cflags_cc = [

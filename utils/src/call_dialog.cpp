@@ -135,7 +135,6 @@ bool CallDialog::DialogConnectAnswerPrivpacyModeExtension(const std::string &dia
     return true;
 }
 
-
 std::string CallDialog::BuildStartPrivpacyModeCommand(const std::string &dialogReason, std::u16string &number,
     int32_t &accountId, int32_t &videoState, int32_t &dialType, int32_t &dialScene, int32_t &callType, bool isVideo)
 {
