@@ -32,6 +32,7 @@
 namespace OHOS {
 namespace Telephony {
 using namespace AppSecurityPrivacy::SecurityPrivacyServer::SuperPrivacy;
+const uint64_t DISCONNECT_DELAY_PLAY_TIME = 3000000;
 CallPolicy::CallPolicy() {}
 
 CallPolicy::~CallPolicy() {}
@@ -74,6 +75,13 @@ int32_t CallPolicy::DialPolicy(std::u16string &number, AppExecFwk::PacMap &extra
     if (HasNewCall() != TELEPHONY_SUCCESS)  {
         return CALL_ERR_CALL_COUNTS_EXCEED_LIMIT;
     }
+    return SuperPrivacyMode(number, extras, isEcc);
+}
+
+int32_t CallPolicy::SuperPrivacyMode(std::u16string &number, AppExecFwk::PacMap &extras, bool isEcc)
+{
+    int32_t accountId = extras.GetIntValue("accountId");
+    CallType callType = (CallType)extras.GetIntValue("callType");
     int32_t slotId = extras.GetIntValue("accountId");
     if (isEcc) {
         return TELEPHONY_SUCCESS;
@@ -82,11 +90,11 @@ int32_t CallPolicy::DialPolicy(std::u16string &number, AppExecFwk::PacMap &extra
     int32_t privpacy = SuperPrivacyKit::GetSuperPrivacyMode(privpacyMode);
     TELEPHONY_LOGI("callId is invalid,privpacyMode:%{public}d", privpacyMode);
     if (privpacy == TELEPHONY_SUCCESS && privpacyMode == static_cast<int32_t>(CallSuperPrivacyModeType::ALWAYS_ON)) {
-		if (isEcc) {
-        DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance()->SetIsChangeSuperPrivacyMode(true);
-        return HasNormalCall(isEcc, slotId, callType);
-    }
         DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance()->SetOldSuperPrivacyMode(privpacyMode);
+		if (isEcc) {
+            DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance()->SetIsChangeSuperPrivacyMode(true);
+            return HasNormalCall(isEcc, slotId, callType);
+        }
         TELEPHONY_LOGE("Call SetOldSuperPrivacyMode ");
         int32_t videoState = extras.GetIntValue("videoState");
         int32_t dialType = extras.GetIntValue("dialType");
@@ -98,7 +106,6 @@ int32_t CallPolicy::DialPolicy(std::u16string &number, AppExecFwk::PacMap &extra
     }
     return HasNormalCall(isEcc, slotId, callType);
 }
-
 int32_t CallPolicy::HasNormalCall(bool isEcc, int32_t slotId, CallType callType)
 {
     if (isEcc || callType == CallType::TYPE_SATELLITE) {
