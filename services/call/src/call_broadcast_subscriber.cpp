@@ -90,8 +90,8 @@ void CallBroadcastSubscriber::HighTempLevelChangedBroadcast(const EventFwk::Comm
 void CallBroadcastSubscriber::ConnectCallUiSuperPrivacyModeBroadcast(const EventFwk::CommonEventData &data)
 {
     int32_t videoState = data.GetWant().GetIntParam("videoState", -1);
-	bool isAnswer = data.GetWant().GetBoolParam("isAnswer", false);
-	TELEPHONY_LOGI("Connect CallUiSuperPrivacyModeBroadcast isAnswer:%{public}d", isAnswer);
+    bool isAnswer = data.GetWant().GetBoolParam("isAnswer", false);
+    TELEPHONY_LOGI("Connect CallUiSuperPrivacyModeBroadcast isAnswer:%{public}d", isAnswer);
     if (isAnswer) {
     int32_t callId = data.GetWant().GetIntParam("callId", -1);
     TELEPHONY_LOGI("Connect CallUiSuperPrivacyModeBroadcast_Answer callId:%{public}d", callId);
@@ -104,9 +104,9 @@ void CallBroadcastSubscriber::ConnectCallUiSuperPrivacyModeBroadcast(const Event
     int32_t dialScene = data.GetWant().GetIntParam("dialScene", -1);
     int32_t dialType = data.GetWant().GetIntParam("dialType", -1);
     int32_t callType = data.GetWant().GetIntParam("callType", -1);
-    DelayedSingleton<CallControlManager>::GetInstance()->CloseSuperPrivacyMode(phNumber,
-	accountId, videoState, dialScene, dialType, callType);
-		}
+    DelayedSingleton<CallControlManager>::GetInstance()->CloseSuperPrivacyMode(
+	phNumber, accountId, videoState, dialScene, dialType, callType);
+    }
 }
 } // namespace Telephony
 } // namespace OHOS

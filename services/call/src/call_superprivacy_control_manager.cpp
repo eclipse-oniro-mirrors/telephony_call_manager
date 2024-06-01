@@ -42,8 +42,8 @@ int32_t CallSuperPrivacyControlManager::GetOldSuperPrivacyMode()
     return oldSuperPrivacyMode;
 }
 
-int32_t CallSuperPrivacyControlManager::CloseSuperPrivacyMode(std::u16string &phoneNumber, int32_t &accountId,
-     int32_t &videoState, int32_t &dialType, int32_t &dialScene, int32_t &callType)
+int32_t CallSuperPrivacyControlManager::CloseSuperPrivacyMode(
+std::u16string &phoneNumber, int32_t &accountId, int32_t &videoState, int32_t &dialType, int32_t &dialScene, int32_t &callType)
 {
     int32_t privacy = SuperPrivacyKit::SetSuperPrivacyMode(SuperPrivacyMode::OFF, Source::CALL);
     TELEPHONY_LOGE("CallSuperPrivacyControlManager CloseSuperPrivacyMode privacy:%{public}d", privacy);
@@ -86,7 +86,7 @@ void CallSuperPrivacyControlManager::restoreSuperPrivacyMode()
         return;
     }
     int32_t privpacyMode;
-	int32_t privpacy = SuperPrivacyKit::GetSuperPrivacyMode(privpacyMode);
+    int32_t privpacy = SuperPrivacyKit::GetSuperPrivacyMode(privpacyMode);
     int32_t oldPrivpacy = DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance()->GetOldSuperPrivacyMode();
     if (privpacy == TELEPHONY_SUCCESS && privpacyMode != oldPrivpacy) {
         int32_t privacy = SuperPrivacyKit::SetSuperPrivacyMode(SuperPrivacyMode::ALWAYS_ON, Source::CALL);
@@ -100,10 +100,8 @@ bool CallSuperPrivacyControlManager::GetCurrentIsSuperPrivacyMode()
     int32_t privpacy = SuperPrivacyKit::GetSuperPrivacyMode(privpacyMode);
     if (privpacy == TELEPHONY_SUCCESS && privpacyMode == static_cast<int32_t>(CallSuperPrivacyModeType::ALWAYS_ON)) {
         return true;
-	}
+    }
     return false;
 }
 } // namespace Telephony
 } // namespace OHOS
-
-

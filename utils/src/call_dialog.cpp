@@ -136,7 +136,7 @@ bool CallDialog::DialogConnectAnswerPrivpacyModeExtension(const std::string &dia
 
 
 std::string CallDialog::BuildStartPrivpacyModeCommand(const std::string &dialogReason, std::u16string &number,
-	int32_t &accountId, int32_t &videoState, int32_t &dialType, int32_t &dialScene, int32_t &callType, bool isVideo)
+int32_t &accountId, int32_t &videoState, int32_t &dialType, int32_t &dialScene, int32_t &callType, bool isVideo)
 {
     nlohmann::json root;
     std::string uiExtensionType = "sysDialog/common";
@@ -155,7 +155,8 @@ std::string CallDialog::BuildStartPrivpacyModeCommand(const std::string &dialogR
     return startCommand;
 }
 
-std::string CallDialog::BuildStartAnswerPrivpacyModeCommand(const std::string &dialogReason, int32_t callId, int32_t videoState, bool isVideo)
+std::string CallDialog::BuildStartAnswerPrivpacyModeCommand(const std::string &dialogReason,
+int32_t callId, int32_t videoState, bool isVideo)
 {
     nlohmann::json root;
     std::string uiExtensionType = "sysDialog/common";

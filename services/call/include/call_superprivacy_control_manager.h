@@ -31,7 +31,7 @@ public:
     void SetIsChangeSuperPrivacyMode(bool isChangeSuperPrivacyMode);
     int32_t GetOldSuperPrivacyMode();
     void SetOldSuperPrivacyMode(int32_t superPrivacyMode);
-    int32_t CloseSuperPrivacyMode(std::u16string &number, int32_t &accountId, 
+    int32_t CloseSuperPrivacyMode(std::u16string &number, int32_t &accountId,
 	int32_t &videoState, int32_t &dialType, int32_t &dialScene, int32_t &callType);
     int32_t CloseAnswerSuperPrivacyMode(int32_t callId, int32_t videoState);
     void restoreSuperPrivacyMode();
