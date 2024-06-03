@@ -251,8 +251,8 @@ ohos_shared_library("tel_call_manager") {
   }
 
   if (defined(global_parts_info) &&
-      defined(global_parts_info.security_privacy_server) &&
-      global_parts_info.security_privacy_server) {
+      defined(global_parts_info.appsecurityprivacy_security_privacy_server) &&
+      global_parts_info.appsecurityprivacy_security_privacy_server) {
     external_deps += [ "security_privacy_server:super_privacy_sdk" ]
     external_deps += [ "security_privacy_server:super_privacy_service_intf" ]
     defines += [ "SUPPORT_SUPER_PRIVACY_SERVICE" ]

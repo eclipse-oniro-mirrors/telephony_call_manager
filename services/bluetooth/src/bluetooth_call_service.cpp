@@ -21,8 +21,8 @@
 #include "telephony_log_wrapper.h"
 #include "telephony_permission.h"
 #include "audio_control_manager.h"
-#include "bluetooth_call_manager.h"
 #include "ffrt.h"
+#include "call_superprivacy_control_manager.h"
 
 
 namespace OHOS {
@@ -55,10 +55,13 @@ int32_t BluetoothCallService::AnswerCall()
     }
     VideoStateType videoState = call->GetVideoStateType();
     if (callControlManagerPtr_ != nullptr) {
-        DelayedSingleton<AudioControlManager>::GetInstance()->PlayWaitingTone();
-        ffrt::submit_h([&]() {
-            DelayedSingleton<AudioControlManager>::GetInstance()->StopWaitingTone();
-            }, {}, {}, ffrt::task_attr().delay(DELAY_STOP_PLAY_TIME));
+        if (DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance()->
+            GetCurrentIsSuperPrivacyMode()) {
+            DelayedSingleton<AudioControlManager>::GetInstance()->PlayWaitingTone();
+            ffrt::submit_h([&]() {
+                DelayedSingleton<AudioControlManager>::GetInstance()->StopWaitingTone();
+                }, {}, {}, ffrt::task_attr().delay(DELAY_STOP_PLAY_TIME));
+        }
         return callControlManagerPtr_->AnswerCall(callId, static_cast<int32_t>(videoState));
     } else {
         TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");
