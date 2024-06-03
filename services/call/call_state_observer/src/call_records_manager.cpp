@@ -27,7 +27,7 @@ namespace Telephony {
 constexpr int16_t DEFAULT_COUNTRY_CODE = 0;
 constexpr int16_t DEFAULT_TIME = 0;
 const int32_t ACTIVE_USER_ID = 100;
-const int32_t FEATURES_VIDEO = 1 << 0;
+const uint32_t FEATURES_VIDEO = 1 << 0;
 CallRecordsManager::CallRecordsManager() : callRecordsHandlerServerPtr_(nullptr) {}
 
 CallRecordsManager::~CallRecordsManager()
@@ -179,11 +179,11 @@ int32_t CallRecordsManager::RemoveMissedIncomingCallNotification()
 
 int32_t CallRecordsManager::GetCallFeatures(int32_t videoState)
 {
-    int32_t features = 0;
+    uint32_t features = 0;
     if (IsVideoCall(videoState)) {
         features |= FEATURES_VIDEO;
     }
-    return features;
+    return static_cast<int32_t>(features);
 }
 
 bool CallRecordsManager::IsVideoCall(int32_t videoState)

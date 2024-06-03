@@ -1713,7 +1713,6 @@ void NapiCallAbilityCallback::ReportPostDialDelayWork(uv_work_t *work, int32_t s
 
 int32_t NapiCallAbilityCallback::ReportPostDialDelay(std::string postDialStr, EventCallback eventCallback)
 {
-    napi_value callbackFunc = nullptr;
     napi_env env = eventCallback.env;
     napi_handle_scope scope = nullptr;
     napi_open_handle_scope(env, &scope);
@@ -1722,6 +1721,7 @@ int32_t NapiCallAbilityCallback::ReportPostDialDelay(std::string postDialStr, Ev
         napi_close_handle_scope(env, scope);
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
+    napi_value callbackFunc = nullptr;
     napi_value callbackValues[ARRAY_INDEX_SECOND] = { 0 };
     napi_create_string_utf8(env, postDialStr.c_str(), postDialStr.length(), &callbackValues[ARRAY_INDEX_FIRST]);
     napi_get_reference_value(env, eventCallback.callbackRef, &callbackFunc);
