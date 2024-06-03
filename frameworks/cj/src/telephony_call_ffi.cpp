@@ -66,9 +66,9 @@ extern "C" {
         return TelephonyCallImpl::HasVoiceCapability();
     }
 
-    char* FfiOHOSTelephonyCallFormatPhoneNumber(char *cPhoneNumber, char *cCountryCode, int32_t *errCode)
+    char* FfiOHOSTelephonyCallFormatPhoneNumber(char *phoneNumber, char *countryCode, int32_t *errCode)
     {
-        return TelephonyCallImpl::FormatPhoneNumber(cPhoneNumber, cCountryCode, errCode);
+        return TelephonyCallImpl::FormatPhoneNumber(phoneNumber, countryCode, errCode);
     }
 }
 }  // namespace Telephony
