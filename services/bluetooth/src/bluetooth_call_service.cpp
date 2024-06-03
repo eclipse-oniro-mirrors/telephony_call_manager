@@ -56,7 +56,7 @@ int32_t BluetoothCallService::AnswerCall()
     VideoStateType videoState = call->GetVideoStateType();
     if (callControlManagerPtr_ != nullptr) {
         if (DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance()->
-            GetCurrentIsSuperPrivacyMode()){
+            GetCurrentIsSuperPrivacyMode()) {
             DelayedSingleton<AudioControlManager>::GetInstance()->PlayWaitingTone();
             ffrt::submit_h([&]() {
                 DelayedSingleton<AudioControlManager>::GetInstance()->StopWaitingTone();
