@@ -249,11 +249,6 @@ AudioStandard::AudioRingerMode AudioProxy::GetRingerMode() const
     return audioGroupManager->GetRingerMode();
 }
 
-bool AudioProxy::IsVibrateMode() const
-{
-    return (AudioStandard::AudioRingerMode::RINGER_MODE_VIBRATE == GetRingerMode());
-}
-
 void AudioDeviceChangeCallback::OnDeviceChange(const AudioStandard::DeviceChangeAction &deviceChangeAction)
 {
     TELEPHONY_LOGI("AudioDeviceChangeCallback::OnDeviceChange enter");
@@ -276,27 +271,6 @@ void AudioDeviceChangeCallback::OnDeviceChange(const AudioStandard::DeviceChange
             }
         }
     }
-}
-
-int32_t AudioProxy::StartVibrate()
-{
-#ifdef ABILITY_SENSOR_SUPPORT
-    return VibratorManager::GetInstance()->StartVibrate();
-#endif
-    return TELEPHONY_SUCCESS;
-}
-
-int32_t AudioProxy::CancelVibrate()
-{
-#ifdef ABILITY_SENSOR_SUPPORT
-    return VibratorManager::GetInstance()->CancelVibrate();
-#endif
-    return TELEPHONY_SUCCESS;
-}
-
-std::string AudioProxy::GetDefaultRingPath() const
-{
-    return defaultRingPath_;
 }
 
 std::string AudioProxy::GetDefaultTonePath() const

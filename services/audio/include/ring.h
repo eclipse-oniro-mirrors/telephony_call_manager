@@ -27,10 +27,6 @@
 
 namespace OHOS {
 namespace Telephony {
-struct RingtoneStream {
-    std::string ringtonePath = "";
-    uint32_t playedPosition = 0;
-};
 enum class RingState {
     RINGING = 0,
     STOPPED,
@@ -45,22 +41,14 @@ static constexpr const char* RING_PLAY_THREAD = "ringPlayThread";
 class Ring {
 public:
     Ring();
-    explicit Ring(const std::string &path);
     virtual ~Ring();
-    void Init(const std::string &ringtonePath);
+    void Init();
     int32_t Play(int32_t slotId);
     int32_t Stop();
-    int32_t StartVibrate();
-    int32_t CancelVibrate();
     void ReleaseRenderer();
     int32_t SetMute();
 
 private:
-    bool isVibrating_;
-    bool shouldRing_;
-    bool shouldVibrate_;
-    bool ShouldVibrate();
-    std::string ringtonePath_;
     std::mutex mutex_;
     AudioPlayer *audioPlayer_ = nullptr;
     std::shared_ptr<Media::SystemSoundManager> SystemSoundManager_ = nullptr;
