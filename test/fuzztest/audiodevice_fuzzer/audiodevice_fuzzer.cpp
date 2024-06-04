@@ -146,10 +146,6 @@ void AudioProxyFunc(const uint8_t *data, size_t size)
     audioProxy->GetMaxVolume(audioVolumeType);
     audioProxy->GetMinVolume(audioVolumeType);
     audioProxy->SetAudioDeviceChangeCallback();
-    audioProxy->IsVibrateMode();
-    audioProxy->StartVibrate();
-    audioProxy->CancelVibrate();
-    audioProxy->GetDefaultRingPath();
     audioProxy->GetDefaultTonePath();
     audioProxy->GetDefaultDtmfPath();
 }

@@ -25,17 +25,9 @@ namespace OHOS {
 namespace Telephony {
 static constexpr int32_t DEFAULT_SIM_SLOT_ID = 0;
 
-Ring::Ring() : isVibrating_(false), shouldRing_(false), shouldVibrate_(false), ringtonePath_(""),
-    audioPlayer_(new (std::nothrow) AudioPlayer())
+Ring::Ring() : audioPlayer_(new (std::nothrow) AudioPlayer())
 {
-    Init(DelayedSingleton<AudioProxy>::GetInstance()->GetDefaultRingPath());
-}
-
-Ring::Ring(const std::string &path)
-    : isVibrating_(false), shouldRing_(false), shouldVibrate_(false), ringtonePath_(""),
-    audioPlayer_(new (std::nothrow) AudioPlayer())
-{
-    Init(path);
+    Init();
 }
 
 Ring::~Ring()
@@ -46,27 +38,8 @@ Ring::~Ring()
     }
 }
 
-void Ring::Init(const std::string &ringtonePath)
+void Ring::Init()
 {
-    if (ringtonePath.empty()) {
-        TELEPHONY_LOGE("ringtone path empty");
-        return;
-    }
-    if (AudioStandard::AudioRingerMode::RINGER_MODE_NORMAL ==
-        DelayedSingleton<AudioProxy>::GetInstance()->GetRingerMode()) {
-        shouldRing_ = true;
-        shouldVibrate_ = true;
-    } else if (AudioStandard::AudioRingerMode::RINGER_MODE_VIBRATE ==
-        DelayedSingleton<AudioProxy>::GetInstance()->GetRingerMode()) {
-        shouldRing_ = false;
-        shouldVibrate_ = true;
-    } else if (AudioStandard::AudioRingerMode::RINGER_MODE_SILENT ==
-        DelayedSingleton<AudioProxy>::GetInstance()->GetRingerMode()) {
-        shouldRing_ = false;
-        shouldVibrate_ = false;
-    }
-    ringtonePath_ = ringtonePath;
-
     SystemSoundManager_ = Media::SystemSoundManagerFactory::CreateSystemSoundManager();
     if (SystemSoundManager_ == nullptr) {
         TELEPHONY_LOGE("get systemSoundManager failed");
@@ -112,32 +85,6 @@ int32_t Ring::Stop()
     }
     result = RingtonePlayer_->Stop();
     return result;
-}
-
-int32_t Ring::StartVibrate()
-{
-    if (DelayedSingleton<AudioProxy>::GetInstance()->StartVibrate() == TELEPHONY_SUCCESS) {
-        isVibrating_ = true;
-        return TELEPHONY_SUCCESS;
-    }
-    TELEPHONY_LOGE("start vibrate failed");
-    return CALL_ERR_AUDIO_START_VIBRATE_FAILED;
-}
-
-int32_t Ring::CancelVibrate()
-{
-    if (DelayedSingleton<AudioProxy>::GetInstance()->CancelVibrate() == TELEPHONY_SUCCESS) {
-        isVibrating_ = false;
-        return TELEPHONY_SUCCESS;
-    }
-    TELEPHONY_LOGE("cancel vibrate failed");
-    return CALL_ERR_AUDIO_CANCEL_VIBRATE_FAILED;
-}
-
-bool Ring::ShouldVibrate()
-{
-    return DelayedSingleton<AudioProxy>::GetInstance()->GetRingerMode() !=
-        AudioStandard::AudioRingerMode::RINGER_MODE_SILENT;
 }
 
 void Ring::ReleaseRenderer()

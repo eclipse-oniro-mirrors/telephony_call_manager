@@ -304,14 +304,10 @@ HWTEST_F(CallStateTest, Telephony_AudioProxy_002, Function | MediumTest | Level3
 {
     auto audioProxy = std::make_shared<AudioProxy>();
     audioProxy->GetRingerMode();
-    audioProxy->IsVibrateMode();
-    audioProxy->StartVibrate();
-    audioProxy->CancelVibrate();
     AudioDevice device;
     audioProxy->GetPreferredOutputAudioDevice(device);
     audioProxy->SetAudioPreferDeviceChangeCallback();
     audioProxy->UnsetAudioPreferDeviceChangeCallback();
-    ASSERT_FALSE(audioProxy->GetDefaultRingPath().empty());
     ASSERT_FALSE(audioProxy->GetDefaultTonePath().empty());
     ASSERT_FALSE(audioProxy->GetDefaultDtmfPath().empty());
 }
@@ -513,27 +509,14 @@ HWTEST_F(CallStateTest, Telephony_AudioSceneProcessor_001, Function | MediumTest
  */
 HWTEST_F(CallStateTest, Telephony_Ring_001, Function | MediumTest | Level3)
 {
-    std::string path = "test";
-    auto testRing = std::make_shared<Ring>(path);
-    testRing->Play(DEFAULT_SLOT_ID);
-    sleep(WAIT_TIME);
-    testRing->Stop();
-
     auto ring = std::make_shared<Ring>();
     ring->Play(DEFAULT_SLOT_ID);
     sleep(WAIT_TIME);
     ring->Stop();
-    ring->StartVibrate();
-    ring->CancelVibrate();
-    ring->ShouldVibrate();
     ring->ReleaseRenderer();
-
-    std::string emptyPath = "";
-    auto emptyRing = std::make_shared<Ring>(emptyPath);
-    emptyRing->ReleaseRenderer();
-    ASSERT_EQ(emptyRing->Play(DEFAULT_SLOT_ID), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    ASSERT_EQ(ring->Play(DEFAULT_SLOT_ID), TELEPHONY_ERR_LOCAL_PTR_NULL);
     sleep(WAIT_TIME);
-    ASSERT_EQ(emptyRing->Stop(), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    ASSERT_EQ(ring->Stop(), TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
 
 /**

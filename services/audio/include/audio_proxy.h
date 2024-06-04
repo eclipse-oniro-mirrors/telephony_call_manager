@@ -75,10 +75,6 @@ public:
     int32_t GetMaxVolume(AudioStandard::AudioVolumeType audioVolumeType);
     int32_t GetMinVolume(AudioStandard::AudioVolumeType audioVolumeType);
     int32_t SetAudioDeviceChangeCallback();
-    bool IsVibrateMode() const;
-    int32_t StartVibrate();
-    int32_t CancelVibrate();
-    std::string GetDefaultRingPath() const;
     std::string GetDefaultTonePath() const;
     std::string GetDefaultDtmfPath() const;
     int32_t UnsetDeviceChangeCallback();
@@ -88,7 +84,6 @@ public:
     int32_t UnsetAudioPreferDeviceChangeCallback();
 
 private:
-    const std::string defaultRingPath_ = "/system/etc/telephony/rings/ring.wav";
     const std::string defaultTonePath_ = "/system/etc/telephony/tones/tone.wav";
     const std::string defaultDtmfPath_ = "/system/etc/telephony/dtmfs/dtmf.wav";
     std::shared_ptr<AudioStandard::AudioManagerDeviceChangeCallback> deviceCallback_;
