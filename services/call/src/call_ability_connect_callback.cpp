@@ -31,6 +31,7 @@ void CallAbilityConnectCallback::OnAbilityConnectDone(
     TELEPHONY_LOGI("connect callui result code: %{public}d", resultCode);
     DelayedSingleton<CallConnectAbility>::GetInstance()->NotifyAll();
     DelayedSingleton<CallConnectAbility>::GetInstance()->SetConnectFlag(true);
+    DelayedSingleton<CallConnectAbility>::GetInstance()->SetConnectingFlag(false);
     if (resultCode == CONNECT_ABILITY_SUCCESS) {
         CallEventInfo eventInfo;
         (void)memset_s(&eventInfo, sizeof(CallEventInfo), 0, sizeof(CallEventInfo));
@@ -50,6 +51,7 @@ void CallAbilityConnectCallback::OnAbilityDisconnectDone(const AppExecFwk::Eleme
 {
     TELEPHONY_LOGI("disconnect callui result code: %{public}d", resultCode);
     DelayedSingleton<CallConnectAbility>::GetInstance()->SetConnectFlag(false);
+    DelayedSingleton<CallConnectAbility>::GetInstance()->SetDisconnectingFlag(false);
     if (resultCode == UNEXPECT_DISCONNECT_CODE) {
         ReConnectAbility();
     }

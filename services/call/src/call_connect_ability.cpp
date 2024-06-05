@@ -33,8 +33,14 @@ CallConnectAbility::CallConnectAbility() {}
 
 void CallConnectAbility::ConnectAbility()
 {
+    SetConnectingFlag(true);
+    if (isDisconnecting_) {
+        TELEPHONY_LOGE("callui is disconnecting");
+        return;
+    }
     if (isConnected_) {
         TELEPHONY_LOGE("callui has already connected");
+        SetConnectingFlag(false);
         return;
     }
     TELEPHONY_LOGI("Connect callui ability");
@@ -52,7 +58,13 @@ void CallConnectAbility::ConnectAbility()
 
 void CallConnectAbility::DisconnectAbility()
 {
+    SetDisconnectingFlag(true);
+    if (isConnecting_) {
+        TELEPHONY_LOGE("callui is connecting");
+        return;
+    }
     if (!WaitForConnectResult()) {
+        SetDisconnectingFlag(false);
         return;
     }
     if (connectCallback_ != nullptr) {
@@ -67,6 +79,24 @@ void CallConnectAbility::DisconnectAbility()
 void CallConnectAbility::SetConnectFlag(bool isConnected)
 {
     isConnected_ = isConnected;
+}
+
+void CallConnectAbility::SetDisconnectingFlag(bool isDisconnecting)
+{
+    isDisconnecting_ = isDisconnecting;
+    if (!isDisconnecting_ && isConnecting_) {
+        ConnectAbility();
+        TELEPHONY_LOGE("reconnect ability");
+    }
+}
+
+void CallConnectAbility::SetConnectingFlag(bool isConnecting)
+{
+    isConnecting_ = isConnecting;
+    if (!isConnecting_ && isDisconnecting_) {
+        DisconnectAbility();
+        TELEPHONY_LOGE("redisconnect ability");
+    }
 }
 
 void CallConnectAbility::NotifyAll()
