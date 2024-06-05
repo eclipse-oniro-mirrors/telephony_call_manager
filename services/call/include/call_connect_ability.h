@@ -32,12 +32,16 @@ public:
     void ConnectAbility();
     void DisconnectAbility();
     void SetConnectFlag(bool isConnected);
+    void SetConnectingFlag(bool isConnecting);
+    void SetDisconnectingFlag(bool isDisconnecting);
     void NotifyAll();
     bool WaitForConnectResult();
 
 private:
     sptr<AAFwk::IAbilityConnection> connectCallback_ = nullptr;
     bool isConnected_ = false;
+    bool isConnecting_ = false;
+    bool isDisconnecting_ = false;
     static std::condition_variable cv_;
     std::mutex mutex_;
 };
