@@ -59,7 +59,7 @@ void CallConnectAbility::ConnectAbility()
 void CallConnectAbility::DisconnectAbility()
 {
     SetDisconnectingFlag(true);
-    if(isConnecting_) {
+    if (isConnecting_) {
         TELEPHONY_LOGE("callui is connecting");
         return;
     }
