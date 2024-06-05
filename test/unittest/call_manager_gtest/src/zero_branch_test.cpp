@@ -2621,8 +2621,8 @@ HWTEST_F(BranchTest, Telephony_CallAbilityReportProxy_001, Function | MediumTest
     if (CallObjectManager::HasCallExist()) {
         callAbilityConnectCallback.ReConnectAbility();
     }
-    CallConnectAbility callConnectAbility;
-    ASSERT_FALSE(callConnectAbility.WaitForConnectResult());
+    CallConnectAbility callConnectCalluiAbility;
+    ASSERT_FALSE(callConnectCalluiAbility.WaitForConnectResult());
     std::shared_ptr<CallAbilityReportProxy> callAbilityReportProxy = std::make_shared<CallAbilityReportProxy>();
     sptr<ICallAbilityCallback> callAbilityCallbackPtr = nullptr;
     std::string pidName = "123";
