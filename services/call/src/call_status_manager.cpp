@@ -352,11 +352,14 @@ int32_t CallStatusManager::HandleVoipEventReportInfo(const VoipCallEventInfo &in
 int32_t CallStatusManager::IncomingHandle(const CallDetailInfo &info)
 {
     sptr<CallBase> call = GetOneCallObjectByIndexAndSlotId(info.index, info.accountId);
-    if (call != nullptr && (call->GetCallType() != info.callType || call->GetTelCallState() != info.state)) {
+    if (call != nullptr) {
         auto oldCallType = call->GetCallType();
-        call = RefreshCallIfNecessary(call, info);
-        if (oldCallType != info.callType) {
-            return UpdateCallState(call, info.state);
+        auto videoState = call->GetVideoStateType();
+        if (oldCallType != info.callType || call->GetTelCallState() != info.state || videoState != info.callMode) {
+            call = RefreshCallIfNecessary(call, info);
+            if (oldCallType != info.callType || videoState != info.callMode) {
+                return UpdateCallState(call, info.state);
+            }
         }
         return TELEPHONY_SUCCESS;
     }
