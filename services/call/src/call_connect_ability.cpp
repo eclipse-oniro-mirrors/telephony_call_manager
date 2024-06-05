@@ -64,7 +64,7 @@ void CallConnectAbility::DisconnectAbility()
         return;
     }
     if (!WaitForConnectResult()) {
-        SetDisconnectingFlag(true);
+        SetDisconnectingFlag(false);
         return;
     }
     if (connectCallback_ != nullptr) {
