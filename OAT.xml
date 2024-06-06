@@ -59,7 +59,6 @@
                 <!--filteritem type="filepath" name="projectroot/[a-zA-Z0-9]{20,}.sh" desc="Temp files"/-->
             </filefilter>
             <filefilter name="binaryFileTypePolicyFilter" desc="Filters for binary file policies">
-                <filteritem type="filepath" name="resource/audio/ring.wav" desc="self developed ring"/>
                 <filteritem type="filepath" name="figures/zh-cn_architecture-of-the-call-manager-module.png" desc="self developed image"/>
                 <filteritem type="filepath" name="figures/en-us_architecture-of-the-call-manager-module.png" desc="self developed image"/>
             </filefilter>
