@@ -125,7 +125,9 @@ int32_t CallStatusManager::HandleCallReportInfo(const CallDetailInfo &info)
             ret = AlertHandle(info);
             break;
         case TelCallState::CALL_STATUS_INCOMING: {
+            DelayedSingleton<CallControlManager>::GetInstance()->AcquireIncomingLock();
             ret = IncomingHandle(info);
+            DelayedSingleton<CallControlManager>::GetInstance()->ReleaseIncomingLock();
             FinishAsyncTrace(HITRACE_TAG_OHOS, "InComingCall", getpid());
             DelayedSingleton<CallManagerHisysevent>::GetInstance()->JudgingIncomingTimeOut(
                 info.accountId, static_cast<int32_t>(info.callType), static_cast<int32_t>(info.callMode));
@@ -415,19 +417,21 @@ void CallStatusManager::SetContactInfo(sptr<CallBase> &call, std::string phoneNu
         TELEPHONY_LOGE("CreateVoipCall failed!");
         return;
     }
-    // allow list filtering
-    // Get the contact data from the database
-    ContactInfo contactInfo = {
-        .name = "",
-        .number = "",
-        .isContacterExists = false,
-        .ringtonePath = "",
-        .isSendToVoicemail = false,
-        .isEcc = false,
-        .isVoiceMail = false,
-    };
-    QueryCallerInfo(contactInfo, phoneNum);
-    call->SetCallerInfo(contactInfo);
+    ffrt::submit([=, &call]() {
+        // allow list filtering
+        // Get the contact data from the database
+        ContactInfo contactInfo = {
+            .name = "",
+            .number = "",
+            .isContacterExists = false,
+            .ringtonePath = "",
+            .isSendToVoicemail = false,
+            .isEcc = false,
+            .isVoiceMail = false,
+        };
+        QueryCallerInfo(contactInfo, phoneNum);
+        call->SetCallerInfo(contactInfo);
+    });
 }
 
 int32_t CallStatusManager::HandleRejectCall(sptr<CallBase> &call, bool isBlock)
