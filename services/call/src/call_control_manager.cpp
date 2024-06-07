@@ -1381,6 +1381,22 @@ int32_t CallControlManager::NumberLegalityCheck(std::string &number)
     return TELEPHONY_SUCCESS;
 }
 
+void CallControlManager::AcquireIncomingLock()
+{
+    if (incomingCallWakeup_ == nullptr) {
+        return;
+    }
+    incomingCallWakeup_->AcquireIncomingLock();
+}
+
+void CallControlManager::ReleaseIncomingLock()
+{
+    if (incomingCallWakeup_ == nullptr) {
+        return;
+    }
+    incomingCallWakeup_->ReleaseIncomingLock();
+}
+
 CallControlManager::SystemAbilityListener::SystemAbilityListener(std::shared_ptr<CallBroadcastSubscriber> subscriberPtr)
     : subscriberPtr_(subscriberPtr)
 {}
