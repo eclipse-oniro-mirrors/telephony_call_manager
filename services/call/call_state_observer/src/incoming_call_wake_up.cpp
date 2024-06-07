@@ -33,6 +33,31 @@ void IncomingCallWakeup::NewCallCreated(sptr<CallBase> &callObjectPtr)
     }
 }
 
+void IncomingCallWakeup::AcquireIncomingLock()
+{
+#ifdef ABILITY_POWER_SUPPORT
+    if (phoneRunningLock_ == nullptr) {
+        phoneRunningLock_ = PowerMgr::PowerMgrClient::GetInstance().
+            CreateRunningLock("phonerunninglock", PowerMgr::RunningLockType::RUNNINGLOCK_BACKGROUND_PHONE);
+    }
+    if (phoneRunningLock_ != nullptr && !isPhoneLocked && !phoneRunningLock_->IsUsed()) {
+        phoneRunningLock_->Lock(INCOMING_LOCK_TIMEOUT);
+        TELEPHONY_LOGI("phoneRunningLock_ locked");
+    }
+#endif
+}
+
+void IncomingCallWakeup::ReleaseIncomingLock()
+{
+#ifdef ABILITY_POWER_SUPPORT
+    if (phoneRunningLock_ == nullptr || isPhoneLocked || !phoneRunningLock_->IsUsed()) {
+        return;
+    }
+    phoneRunningLock_->UnLock();
+    TELEPHONY_LOGI("phoneRunningLock_ unlocked");
+#endif
+}
+
 void IncomingCallWakeup::WakeupDevice()
 {
 #ifdef ABILITY_POWER_SUPPORT
