@@ -33,6 +33,8 @@ public:
     void IncomingCallActivated(sptr<CallBase> &callObjectPtr) override;
     void IncomingCallHungUp(sptr<CallBase> &callObjectPtr, bool isSendSms, std::string content) override;
     void CallStateUpdated(sptr<CallBase> &callObjectPtr, TelCallState priorState, TelCallState nextState) override;
+    void AcquireIncomingLock();
+    void ReleaseIncomingLock();
 
 private:
     std::mutex mutex_;
@@ -52,6 +54,7 @@ private:
 #endif
     bool isPhoneLocked = false;
     bool isScreenOnLocked = false;
+    const int32_t INCOMING_LOCK_TIMEOUT = 5000;
 };
 } // namespace Telephony
 } // namespace OHOS
