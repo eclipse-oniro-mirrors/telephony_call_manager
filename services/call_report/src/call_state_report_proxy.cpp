@@ -44,7 +44,7 @@ void CallStateReportProxy::CallStateUpdated(
         TELEPHONY_LOGI("voip call no need to report call state");
         return;
     }
-    sptr<CallBase> foregroundCall = CallObjectManager::GetForegroundCall();
+    sptr<CallBase> foregroundCall = CallObjectManager::GetForegroundCall(false);
     if (foregroundCall == nullptr) {
         TELEPHONY_LOGE("foregroundCall is nullptr!");
         foregroundCall = callObjectPtr;

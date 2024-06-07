@@ -616,11 +616,14 @@ void CallObjectManager::UpdateOneCallObjectByCallId(int32_t callId, TelCallState
     }
 }
 
-sptr<CallBase> CallObjectManager::GetForegroundCall()
+sptr<CallBase> CallObjectManager::GetForegroundCall(bool isIncludeVoipCall)
 {
     std::lock_guard<std::mutex> lock(listMutex_);
     sptr<CallBase> liveCall = nullptr;
     for (std::list<sptr<CallBase>>::iterator it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
+        if (!isIncludeVoipCall && (*it)->GetCallType() == CallType::TYPE_VOIP) {
+            continue;
+        }
         TelCallState telCallState = (*it)->GetTelCallState();
         if (telCallState == TelCallState::CALL_STATUS_WAITING ||
             telCallState == TelCallState::CALL_STATUS_INCOMING) {
