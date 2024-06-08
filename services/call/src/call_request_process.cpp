@@ -108,15 +108,6 @@ void CallRequestProcess::AnswerRequest(int32_t callId, int32_t videoState)
         }
         DelayedSingleton<CallControlManager>::GetInstance()->NotifyIncomingCallAnswered(call);
         return;
-    } else {
-        std::vector<CallAttributeInfo> callAttributeInfo = CallObjectManager::GetAllCallInfoList();
-        for (auto info : callAttributeInfo) {
-            sptr<CallBase> tempCall = GetOneCallObject(info.callId);
-            if (tempCall != nullptr && info.callType == CallType::TYPE_VOIP) {
-                tempCall->HangUpCall();
-                TELEPHONY_LOGI("hangup the voip call");
-            }
-        }
     }
     AnswerRequestForDsda(call, callId, videoState);
 }
