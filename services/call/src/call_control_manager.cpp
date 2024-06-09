@@ -68,6 +68,7 @@ CallControlManager::~CallControlManager()
             statusChangeListener_ = nullptr;
         }
     }
+    DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance()->UnRegisterSuperPrivacyMode();
 }
 
 bool CallControlManager::Init()
@@ -104,6 +105,7 @@ bool CallControlManager::Init()
     }
     DelayedSingleton<AudioControlManager>::GetInstance()->Init();
     CallStateObserve();
+    DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance()->RegisterSuperPrivacyMode();
     return true;
 }
 
@@ -1227,18 +1229,6 @@ void CallControlManager::ConnectCallUiService(bool shouldConnect)
             }, {}, {}, ffrt::task_attr().delay(DISCONNECT_DELAY_TIME));
         }
     }
-}
-
-void CallControlManager::CloseSuperPrivacyMode(std::u16string &phoneNumber, int32_t &accountId,
-    int32_t &videoState, int32_t &dialType, int32_t &dialScene, int32_t &callType)
-{
-    DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance()->CloseSuperPrivacyMode(phoneNumber,
-    accountId, videoState, dialScene, dialType, callType);
-}
-
-void CallControlManager::CloseAnswerSuperPrivacyMode(int32_t callId, int32_t videoState)
-{
-    DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance()->CloseAnswerSuperPrivacyMode(callId, videoState);
 }
 
 bool CallControlManager::ShouldDisconnectService()
