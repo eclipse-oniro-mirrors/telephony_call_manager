@@ -98,7 +98,8 @@ void CallBroadcastSubscriber::ConnectCallUiSuperPrivacyModeBroadcast(const Event
     if (isAnswer) {
         int32_t callId = data.GetWant().GetIntParam("callId", -1);
         TELEPHONY_LOGI("CallUiSuperPrivacyModeBroadcast_Answer callId:%{public}d", callId);
-        DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance()->CloseAnswerSuperPrivacyMode(callId, videoState);
+        DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance()->
+        CloseAnswerSuperPrivacyMode(callId, videoState);
     } else {
         std::string phoneNumber = data.GetWant().GetStringParam("phoneNumber");
         TELEPHONY_LOGI("CallUiSuperPrivacyModeBroadcast_Answer callId:%{public}s", phoneNumber.c_str());

@@ -50,22 +50,27 @@ void CallSuperPrivacyListener::OnSuperPrivacyModeChanged(const int32_t &superPri
     TELEPHONY_LOGE("OnSuperPrivacyModeChanged superPrivacyMode:%{public}d", superPrivacyMode);
     if (superPrivacyMode == static_cast<int32_t>(CallSuperPrivacyModeType::ALWAYS_ON)) {
         SetIsChangeSuperPrivacyMode(false);
-        std::vector<CallAttributeInfo> infos = CallObjectManager::GetAllCallInfoList();
-        for (auto &info : infos) {
-            if (!info.isEcc) {
-                TELEPHONY_LOGE("OnSuperPrivacyModeChanged callState:%{public}d", info.callState);
-                if (info.callState == TelCallState::CALL_STATE_INCOMING ||
-                    info.callState == TelCallState::CALL_STATE_WAITING) {
-                    DelayedSingleton<CallControlManager>::GetInstance()->RejectCall(info.callId, false,
-                    u"superPrivacyMode");
-                } else {
-                    DelayedSingleton<CallControlManager>::GetInstance()->HangUpCall(info.callId);
-                }
-            }
-        }
+        CloseAllCall();
     } else if (superPrivacyMode == static_cast<int32_t>(CallSuperPrivacyModeType::OFF)) {
         if (!GetIsChangeSuperPrivacyMode()) {
             SetIsChangeSuperPrivacyMode(false);
+        }
+    }
+}
+
+void CloseAllCall()
+{
+    std::vector<CallAttributeInfo> infos = CallObjectManager::GetAllCallInfoList();
+    for (auto &info : infos) {
+        if (!info.isEcc) {
+            TELEPHONY_LOGE("OnSuperPrivacyModeChanged callState:%{public}d", info.callState);
+            if (info.callState == TelCallState::CALL_STATE_INCOMING ||
+                info.callState == TelCallState::CALL_STATE_WAITING) {
+                DelayedSingleton<CallControlManager>::GetInstance()->RejectCall(info.callId, false,
+                u"superPrivacyMode");
+            } else {
+                DelayedSingleton<CallControlManager>::GetInstance()->HangUpCall(info.callId);
+            }
         }
     }
 }
