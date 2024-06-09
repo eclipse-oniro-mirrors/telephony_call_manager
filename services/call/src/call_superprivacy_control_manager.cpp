@@ -53,7 +53,7 @@ void CallSuperPrivacyListener::OnSuperPrivacyModeChanged(const int32_t &superPri
         bool isChangeSuperPrivacyMode = DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance()->
         GetIsChangeSuperPrivacyMode();
         if (!isChangeSuperPrivacyMode) {
-            SetIsChangeSuperPrivacyMode(false);
+            DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance()->SetIsChangeSuperPrivacyMode(false);
         }
     }
 }
@@ -101,6 +101,7 @@ int32_t CallSuperPrivacyControlManager::GetOldSuperPrivacyMode()
 }
 
 int32_t CallSuperPrivacyControlManager::CloseSuperPrivacyMode()
+{
 #ifdef SUPPORT_SUPER_PRIVACY_SERVICE
     int32_t privacy = SuperPrivacyKit::SetSuperPrivacyMode(SuperPrivacyMode::OFF, Source::CALL);
     TELEPHONY_LOGE("CloseSuperPrivacyMode privacy:%{public}d", privacy);
@@ -167,7 +168,7 @@ bool CallSuperPrivacyControlManager::GetCurrentIsSuperPrivacyMode()
     int32_t privpacy = SuperPrivacyKit::GetSuperPrivacyMode(privpacyMode);
     TELEPHONY_LOGE("GetCurrentIsSuperPrivacyMode privpacyMode:%{public}d", privpacyMode);
     if (privpacy == SUPER_PRIVACY_MODE_REQUEST_SUCCESS &&
-        privpacyMode ==static_cast<int32_t>(CallSuperPrivacyModeType::ALWAYS_ON)) {
+        privpacyMode == static_cast<int32_t>(CallSuperPrivacyModeType::ALWAYS_ON)) {
         return true;
     }
 #endif
