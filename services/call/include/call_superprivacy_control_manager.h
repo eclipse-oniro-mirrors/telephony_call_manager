@@ -34,7 +34,7 @@ class CallSuperPrivacyListener : public SuperPrivacyModeListener {
 public:
     CallSuperPrivacyListener() = default;
     void OnSuperPrivacyModeChanged(const int32_t &superPrivacyMode) override;
-}
+};
 #endif
 class CallSuperPrivacyControlManager {
 public:

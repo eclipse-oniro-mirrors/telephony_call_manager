@@ -22,9 +22,6 @@
 
 namespace OHOS {
 namespace Telephony {
-#ifdef SUPPORT_SUPER_PRIVACY_SERVICE
-using namespace AppSecurityPrivacy::SecurityPrivacyServer::SuperPrivacy;
-#endif
 
 void CallSuperPrivacyControlManager::RegisterSuperPrivacyMode()
 {
@@ -45,18 +42,22 @@ void CallSuperPrivacyControlManager::UnRegisterSuperPrivacyMode()
 #endif
 }
 
+#ifdef SUPPORT_SUPER_PRIVACY_SERVICE
 void CallSuperPrivacyListener::OnSuperPrivacyModeChanged(const int32_t &superPrivacyMode)
 {
     TELEPHONY_LOGE("OnSuperPrivacyModeChanged superPrivacyMode:%{public}d", superPrivacyMode);
     if (superPrivacyMode == static_cast<int32_t>(CallSuperPrivacyModeType::ALWAYS_ON)) {
-        SetIsChangeSuperPrivacyMode(false);
-        CloseAllCall();
+        DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance()->SetIsChangeSuperPrivacyMode(false);
+        DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance()->CloseAllCall();
     } else if (superPrivacyMode == static_cast<int32_t>(CallSuperPrivacyModeType::OFF)) {
-        if (!GetIsChangeSuperPrivacyMode()) {
+        bool isChangeSuperPrivacyMode = DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance()->
+        GetIsChangeSuperPrivacyMode();
+        if (!isChangeSuperPrivacyMode) {
             SetIsChangeSuperPrivacyMode(false);
         }
     }
 }
+#endif
 
 void CloseAllCall()
 {
@@ -64,10 +65,10 @@ void CloseAllCall()
     for (auto &info : infos) {
         if (!info.isEcc) {
             TELEPHONY_LOGE("OnSuperPrivacyModeChanged callState:%{public}d", info.callState);
-            if (info.callState == TelCallState::CALL_STATE_INCOMING ||
-                info.callState == TelCallState::CALL_STATE_WAITING) {
+            if (info.callState == TelCallState::CALL_STATUS_INCOMING ||
+                info.callState == TelCallState::CALL_STATUS_WAITING) {
                 DelayedSingleton<CallControlManager>::GetInstance()->RejectCall(info.callId, false,
-                u"superPrivacyMode");
+                u"superPrivacyModeOn");
             } else {
                 DelayedSingleton<CallControlManager>::GetInstance()->HangUpCall(info.callId);
             }
