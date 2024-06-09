@@ -107,6 +107,7 @@ int32_t CallSuperPrivacyControlManager::CloseSuperPrivacyMode()
     TELEPHONY_LOGE("CloseSuperPrivacyMode privacy:%{public}d", privacy);
     return privacy;
 #endif
+return CALL_ERR_DIAL_FAILED;
 }
 
 void CallSuperPrivacyControlManager::CloseCallSuperPrivacyMode(std::u16string &phoneNumber, int32_t &accountId,
