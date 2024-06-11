@@ -1303,6 +1303,9 @@ bool CallStatusManager::ShouldRejectIncomingCall()
     std::string user_setup_complete {"1"};
     std::vector<int> activedOsAccountIds;
     OHOS::AccountSA::OsAccountManager::QueryActiveOsAccountIds(activedOsAccountIds);
+    if (activedOsAccountIds.empty()) {
+        return false;
+    }
     int userId = activedOsAccountIds[0];
     OHOS::Uri uri_setup(
         "datashare:///com.ohos.settingsdata/entry/settingsdata/USER_SETTINGSDATA_SECURE_"
