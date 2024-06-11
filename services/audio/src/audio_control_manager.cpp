@@ -343,8 +343,8 @@ void AudioControlManager::ProcessAudioWhenCallActive(sptr<CallBase> &callObjectP
             isCrsVibrating_ = false;
         }
         bool hasRingCall = false;
-        CallObjectManager::HasRingingCall(hasRingCall);
-        if (CallObjectManager::GetCurrentCallNum() < MIN_MULITY_CALL_COUNT || hasRingCall) {
+        int ringCallCount = CallObjectManager::GetCallNumByRunningState(CallRunningState::CALL_RUNNING_STATE_RINGING);
+        if ((CallObjectManager::GetCurrentCallNum() - ringCallCount) < MIN_MULITY_CALL_COUNT) {
             StopSoundtone();
             PlaySoundtone();
         }
