@@ -59,7 +59,7 @@ void CallSuperPrivacyListener::OnSuperPrivacyModeChanged(const int32_t &superPri
 }
 #endif
 
-void CloseAllCall()
+void CallSuperPrivacyControlManager::CloseAllCall()
 {
     std::vector<CallAttributeInfo> infos = CallObjectManager::GetAllCallInfoList();
     for (auto &info : infos) {
