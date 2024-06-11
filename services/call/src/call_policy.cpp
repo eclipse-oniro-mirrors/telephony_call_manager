@@ -82,15 +82,15 @@ int32_t CallPolicy::SuperPrivacyMode(std::u16string &number, AppExecFwk::PacMap 
         return HasNormalCall(isEcc, slotId, callType);
     }
     bool currentIsSuperPrivacyMode = DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance()->
-    GetCurrentIsSuperPrivacyMode();
+        GetCurrentIsSuperPrivacyMode();
     TELEPHONY_LOGI("call policy currentIsSuperPrivacyMode:%{public}d", currentIsSuperPrivacyMode);
     if (currentIsSuperPrivacyMode) {
         int32_t videoState = extras.GetIntValue("videoState");
         int32_t dialType = extras.GetIntValue("dialType");
         int32_t dialScene = extras.GetIntValue("dialScene");
-        int32_t callSettingType = extras.GetIntValue("callType");
+        int32_t spCallType = extras.GetIntValue("callType");
         DelayedSingleton<CallDialog>::GetInstance()->DialogConnectPrivpacyModeExtension("SUPER_PRIVACY_MODE",
-            number, accountId, videoState, dialType, dialScene, callSettingType, true);
+            number, accountId, videoState, dialType, dialScene, spCallType, true);
         return CALL_ERR_DIAL_FAILED;
     }
     return HasNormalCall(isEcc, slotId, callType);
@@ -216,7 +216,7 @@ int32_t CallPolicy::AnswerCallPolicy(int32_t callId, int32_t videoState)
         return CALL_ERR_ILLEGAL_CALL_OPERATION;
     }
     bool currentIsSuperPrivacyMode = DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance()->
-    GetCurrentIsSuperPrivacyMode();
+        GetCurrentIsSuperPrivacyMode();
     TELEPHONY_LOGI("call policy answer currentIsSuperPrivacyMode:%{public}d", currentIsSuperPrivacyMode);
     if (currentIsSuperPrivacyMode) {
         DelayedSingleton<CallDialog>::GetInstance()->DialogConnectAnswerPrivpacyModeExtension("SUPER_PRIVACY_MODE",

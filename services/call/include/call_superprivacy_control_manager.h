@@ -57,7 +57,7 @@ private:
     bool isChangeSuperPrivacyMode = false;
     int32_t oldSuperPrivacyMode = -1;
 #ifdef SUPPORT_SUPER_PRIVACY_SERVICE
-    std::shared_ptr<SuperPrivacyModeListener> modeChangeListener = nullptr;
+    std::shared_ptr<SuperPrivacyModeListener> modeChangeListener_ = nullptr;
 #endif
 };
 } // namespace Telephony

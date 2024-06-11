@@ -792,6 +792,10 @@ int32_t CallStatusManager::DisconnectedHandle(const CallDetailInfo &info)
         timeWaitHelper_->NotifyAll();
         timeWaitHelper_ = nullptr;
     }
+    int32_t currentCallNum = CallObjectManager::GetCurrentCallNum();
+    if (currentCallNum <= 1) {
+        DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance()->RestoreSuperPrivacyMode();
+    }
     std::string tmpStr(info.phoneNum);
     sptr<CallBase> call = GetOneCallObjectByIndexAndSlotId(info.index, info.accountId);
     if (call == nullptr) {
@@ -812,10 +816,6 @@ int32_t CallStatusManager::DisconnectedHandle(const CallDetailInfo &info)
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("UpdateCallState failed, errCode:%{public}d", ret);
         return ret;
-    }
-    int32_t currentCallNum = CallObjectManager::GetCurrentCallNum();
-    if (currentCallNum <= 1) {
-        DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance()->RestoreSuperPrivacyMode();
     }
     HandleHoldCallOrAutoAnswerCall(call, callIdList, previousState, priorState);
     return ret;

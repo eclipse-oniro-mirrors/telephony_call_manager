@@ -123,9 +123,6 @@ public:
     int32_t AddBlockLogAndNotification(sptr<CallBase> &callObjectPtr);
     int32_t HangUpVoipCall();
     int32_t CarrierAndVoipConflictProcess(int32_t callId, TelCallState callState);
-    void CloseSuperPrivacyMode(std::u16string &phoneNumber, int32_t &accountId, int32_t &videoState,
-        int32_t &dialType, int32_t &dialScene, int32_t &callType);
-    void CloseAnswerSuperPrivacyMode(int32_t callId, int32_t videoState);
     void AcquireIncomingLock();
     void ReleaseIncomingLock();
 

@@ -26,8 +26,8 @@ namespace Telephony {
 void CallSuperPrivacyControlManager::RegisterSuperPrivacyMode()
 {
 #ifdef SUPPORT_SUPER_PRIVACY_SERVICE
-    modeChangeListener = std::make_shared<CallSuperPrivacyListener>();
-    int32_t ret = SuperPrivacyKit::RegisterSuperPrivacyModeListener(modeChangeListener);
+    modeChangeListener_ = std::make_shared<CallSuperPrivacyListener>();
+    int32_t ret = SuperPrivacyKit::RegisterSuperPrivacyModeListener(modeChangeListener_);
     TELEPHONY_LOGE("RegisterSuperPrivacyMode ret:%{public}d", ret);
 #endif
 }
@@ -35,8 +35,8 @@ void CallSuperPrivacyControlManager::RegisterSuperPrivacyMode()
 void CallSuperPrivacyControlManager::UnRegisterSuperPrivacyMode()
 {
 #ifdef SUPPORT_SUPER_PRIVACY_SERVICE
-    if (modeChangeListener != nullptr) {
-        int32_t ret = SuperPrivacyKit::UnRegisterSuperPrivacyModeListener(modeChangeListener);
+    if (modeChangeListener_ != nullptr) {
+        int32_t ret = SuperPrivacyKit::UnRegisterSuperPrivacyModeListener(modeChangeListener_);
         TELEPHONY_LOGE("UnRegisterSuperPrivacyMode ret:%{public}d", ret);
     }
 #endif
@@ -51,7 +51,7 @@ void CallSuperPrivacyListener::OnSuperPrivacyModeChanged(const int32_t &superPri
         DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance()->CloseAllCall();
     } else if (superPrivacyMode == static_cast<int32_t>(CallSuperPrivacyModeType::OFF)) {
         bool isChangeSuperPrivacyMode = DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance()->
-        GetIsChangeSuperPrivacyMode();
+            GetIsChangeSuperPrivacyMode();
         if (!isChangeSuperPrivacyMode) {
             DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance()->SetIsChangeSuperPrivacyMode(false);
         }
@@ -102,12 +102,12 @@ int32_t CallSuperPrivacyControlManager::GetOldSuperPrivacyMode()
 
 int32_t CallSuperPrivacyControlManager::CloseSuperPrivacyMode()
 {
+    int32_t privacy = -1;
 #ifdef SUPPORT_SUPER_PRIVACY_SERVICE
-    int32_t privacy = SuperPrivacyKit::SetSuperPrivacyMode(SuperPrivacyMode::OFF, Source::CALL);
+    privacy = SuperPrivacyKit::SetSuperPrivacyMode(SuperPrivacyMode::OFF, Source::CALL);
     TELEPHONY_LOGE("CloseSuperPrivacyMode privacy:%{public}d", privacy);
-    return privacy;
 #endif
-return CALL_ERR_DIAL_FAILED;
+    return privacy;
 }
 
 void CallSuperPrivacyControlManager::CloseCallSuperPrivacyMode(std::u16string &phoneNumber, int32_t &accountId,
