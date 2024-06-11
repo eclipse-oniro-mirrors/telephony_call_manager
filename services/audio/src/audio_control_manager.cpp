@@ -342,7 +342,9 @@ void AudioControlManager::ProcessAudioWhenCallActive(sptr<CallBase> &callObjectP
             DelayedSingleton<AudioProxy>::GetInstance()->StopVibrator();
             isCrsVibrating_ = false;
         }
-        if (CallObjectManager::GetCurrentCallNum() < MIN_MULITY_CALL_COUNT) {
+        bool hasRingCall = false;
+        CallObjectManager::HasRingingCall(hasRingCall);
+        if (CallObjectManager::GetCurrentCallNum() < MIN_MULITY_CALL_COUNT || hasRingCall) {
             StopSoundtone();
             PlaySoundtone();
         }
