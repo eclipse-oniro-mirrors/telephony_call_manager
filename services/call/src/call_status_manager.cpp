@@ -1304,6 +1304,7 @@ bool CallStatusManager::ShouldRejectIncomingCall()
     std::vector<int> activedOsAccountIds;
     OHOS::AccountSA::OsAccountManager::QueryActiveOsAccountIds(activedOsAccountIds);
     if (activedOsAccountIds.empty()) {
+        TELEPHONY_LOGI("ShouldRejectIncomingCall: activedOsAccountIds is empty");
         return false;
     }
     int userId = activedOsAccountIds[0];
