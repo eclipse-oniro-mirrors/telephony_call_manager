@@ -22,6 +22,7 @@
 #include "call_control_manager.h"
 #include "satellite_call_control.h"
 #include "securec.h"
+#include "call_superprivacy_control_manager.h"
 
 
 namespace OHOS {
@@ -91,20 +92,23 @@ void CallBroadcastSubscriber::ConnectCallUiSuperPrivacyModeBroadcast(const Event
 {
     int32_t videoState = data.GetWant().GetIntParam("videoState", -1);
     bool isAnswer = data.GetWant().GetBoolParam("isAnswer", false);
-    TELEPHONY_LOGI("Connect CallUiSuperPrivacyModeBroadcast isAnswer:%{public}d", isAnswer);
+    DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance()->SetOldSuperPrivacyMode();
+    DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance()->SetIsChangeSuperPrivacyMode(true);
+    TELEPHONY_LOGI("CallUiSuperPrivacyModeBroadcast isAnswer:%{public}d", isAnswer);
     if (isAnswer) {
         int32_t callId = data.GetWant().GetIntParam("callId", -1);
-        TELEPHONY_LOGI("Connect CallUiSuperPrivacyModeBroadcast_Answer callId:%{public}d", callId);
-        DelayedSingleton<CallControlManager>::GetInstance()->CloseAnswerSuperPrivacyMode(callId, videoState);
+        TELEPHONY_LOGI("CallUiSuperPrivacyModeBroadcast_Answer callId:%{public}d", callId);
+        DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance()->
+            CloseAnswerSuperPrivacyMode(callId, videoState);
     } else {
         std::string phoneNumber = data.GetWant().GetStringParam("phoneNumber");
-        TELEPHONY_LOGI("Connect CallUiSuperPrivacyModeBroadcast_Answer callId:%{public}s", phoneNumber.c_str());
         std::u16string phNumber = Str8ToStr16(phoneNumber);
         int32_t accountId = data.GetWant().GetIntParam("accountId", -1);
+        TELEPHONY_LOGI("CallUiSuperPrivacyModeBroadcast_Answer accountId:%{public}d", accountId);
         int32_t dialScene = data.GetWant().GetIntParam("dialScene", -1);
         int32_t dialType = data.GetWant().GetIntParam("dialType", -1);
         int32_t callType = data.GetWant().GetIntParam("callType", -1);
-        DelayedSingleton<CallControlManager>::GetInstance()->CloseSuperPrivacyMode(
+        DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance()->CloseCallSuperPrivacyMode(
             phNumber, accountId, videoState, dialScene, dialType, callType);
     }
 }
