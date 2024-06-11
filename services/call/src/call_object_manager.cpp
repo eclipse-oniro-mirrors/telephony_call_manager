@@ -731,7 +731,7 @@ int32_t CallObjectManager::GetCallNumByRunningState(CallRunningState callState)
         }
     }
     TELEPHONY_LOGI("callState:%{public}d, count:%{public}d", callState, count);
-    return num; 
+    return count; 
 }
 } // namespace Telephony
 } // namespace OHOS
