@@ -78,6 +78,7 @@ public:
     static CellularCallInfo GetDialCallInfo();
     static bool HasSatelliteCallExist();
     static int32_t GetSatelliteCallList(std::list<int32_t> &list);
+    static int32_t GetCallNumByRunningState(CallRunningState callState);
 
 protected:
     static std::condition_variable cv_;

@@ -718,5 +718,20 @@ std::vector<CallAttributeInfo> CallObjectManager::GetAllCallInfoList()
     }
     return callVec;
 }
+
+int32_t CallObjectManager::GetCallNumByRunningState(CallRunningState callState)
+{
+    int32_t count = 0;
+    std::lock_guard<std::mutex> lock(listMutex_);
+    std::list<sptr<CallBase>>::iterator it;
+    for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
+        if ((*it)->GetCallRunningState() == callState) {
+            count++;
+            continue;
+        }
+    }
+    TELEPHONY_LOGI("callState:%{public}d, count:%{public}d", callState, count);
+    return count; 
+}
 } // namespace Telephony
 } // namespace OHOS
