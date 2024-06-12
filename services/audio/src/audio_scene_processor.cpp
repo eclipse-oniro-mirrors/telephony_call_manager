@@ -18,6 +18,7 @@
 #include "dialing_state.h"
 #include "alerting_state.h"
 #include "incoming_state.h"
+#include "call_control_manager.h"
 #include "cs_call_state.h"
 #include "holding_state.h"
 #include "ims_call_state.h"
@@ -183,10 +184,16 @@ bool AudioSceneProcessor::SwitchIncoming()
         TELEPHONY_LOGE("make_unique IncomingState failed");
         return false;
     }
-    DelayedSingleton<AudioControlManager>::GetInstance()->StopRingtone();
-    // play ringtone while incoming state
-    DelayedSingleton<AudioControlManager>::GetInstance()->PlayRingtone();
-    DelayedSingleton<AudioDeviceManager>::GetInstance()->ProcessEvent(AudioEvent::AUDIO_RINGING);
+    int32_t state;
+    DelayedSingleton<CallControlManager>::GetInstance()->GetVoIPCallState(state);
+    if(state == (int32_t) CallStateToApp::CALL_STATE_OFFHOOK) {
+        DelayedSingleton<AudioControlManager>::GetInstance()->PlayWaitingTone();
+    } else {
+        DelayedSingleton<AudioControlManager>::GetInstance()->StopRingtone();
+        // play ringtone while incoming state
+        DelayedSingleton<AudioControlManager>::GetInstance()->PlayRingtone();
+        DelayedSingleton<AudioDeviceManager>::GetInstance()->ProcessEvent(AudioEvent::AUDIO_RINGING);
+    }
     TELEPHONY_LOGI("current call state : incoming state");
     return true;
 }
