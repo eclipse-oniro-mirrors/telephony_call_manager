@@ -33,6 +33,7 @@ const int DataShareSwitchState::TELEPHONY_ERR_DATABASE_WRITE_FAIL = 3;
 const int DataShareSwitchState::COW_COUNT_NULL = 4;
 constexpr const char *SETTINGS_DATASHARE_URI =
     "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true";
+constexpr const char *SETTINGS_DATASHARE_EXT_URI = "datashare:///com.ohos.settingsdata.DataAbility";
 constexpr const char *SETTINGS_DATA_COLUMN_KEYWORD = "KEYWORD";
 constexpr const char *SETTINGS_DATA_COLUMN_VALUE = "VALUE";
 
@@ -96,7 +97,7 @@ std::shared_ptr<DataShare::DataShareHelper> DataShareSwitchState::CreateDataShar
         TELEPHONY_LOGE("DataShareSwitchState Service Failed.");
         return nullptr;
     }
-    return DataShare::DataShareHelper::Creator(remote, SETTINGS_DATASHARE_URI);
+    return DataShare::DataShareHelper::Creator(remote, SETTINGS_DATASHARE_URI, SETTINGS_DATASHARE_EXT_URI);
 }
 
 int32_t DataShareSwitchState::QueryData(Uri& uri, const std::string& key, std::string& value)

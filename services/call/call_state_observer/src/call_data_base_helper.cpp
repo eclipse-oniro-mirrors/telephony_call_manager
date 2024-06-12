@@ -34,6 +34,7 @@ static constexpr const char *CONTACT_DATA = "datashare:///com.ohos.contactsdataa
 static constexpr const char *ISO_COUNTRY_CODE = "CN";
 static constexpr const char *SETTINGS_DATA_URI =
     "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true";
+static constexpr const char *SETTINGS_DATA_EXT_URI = "datashare:///com.ohos.settingsdata.DataAbility";
 static constexpr const char *SETTINGS_AIRPLANE_MODE_URI =
     "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true&key=airplane_mode";
 static constexpr const char *SETTINGS_AIRPLANE_MODE = "settings.telephony.airplanemode";
@@ -75,6 +76,9 @@ std::shared_ptr<DataShare::DataShareHelper> CallDataBaseHelper::CreateDataShareH
     if (remoteObj == nullptr) {
         TELEPHONY_LOGE("GetSystemAbility Service Failed.");
         return nullptr;
+    }
+    if (uri == SETTINGS_DATA_URI) {
+        return DataShare::DataShareHelper::Creator(remoteObj, uri, SETTINGS_DATA_EXT_URI);
     }
     return DataShare::DataShareHelper::Creator(remoteObj, uri);
 }

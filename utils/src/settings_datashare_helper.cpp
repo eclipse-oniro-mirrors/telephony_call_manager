@@ -28,6 +28,7 @@ namespace OHOS {
 namespace Telephony {
 const std::string SettingsDataShareHelper::SETTINGS_DATASHARE_URI =
     "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true";
+const std::string SETTINGS_DATASHARE_EXT_URI = "datashare:///com.ohos.settingsdata.DataAbility";
 constexpr const char *SETTINGS_DATA_COLUMN_KEYWORD = "KEYWORD";
 constexpr const char *SETTINGS_DATA_COLUMN_VALUE = "VALUE";
 const std::string SettingsDataShareHelper::QUERY_SATELLITE_MODE_KEY = "satellite_mode_switch";
@@ -50,7 +51,7 @@ std::shared_ptr<DataShare::DataShareHelper> SettingsDataShareHelper::CreateDataS
         return nullptr;
     }
     TELEPHONY_LOGI("systemAbilityId = %{public}d", systemAbilityId);
-    return DataShare::DataShareHelper::Creator(remote, SETTINGS_DATASHARE_URI);
+    return DataShare::DataShareHelper::Creator(remote, SETTINGS_DATASHARE_URI, SETTINGS_DATASHARE_EXT_URI);
 }
 
 int32_t SettingsDataShareHelper::Query(Uri& uri, const std::string& key, std::string& value)
