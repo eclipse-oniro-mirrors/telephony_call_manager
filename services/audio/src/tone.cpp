@@ -243,8 +243,10 @@ AudioStandard::StreamUsage Tone::GetStreamUsageByToneType(ToneDescriptor descrip
             streamUsage = AudioStandard::StreamUsage::STREAM_USAGE_DTMF;
             break;
         case ToneDescriptor::TONE_RINGBACK:
-        case ToneDescriptor::TONE_WAITING:
             streamUsage = AudioStandard::StreamUsage::STREAM_USAGE_VOICE_COMMUNICATION;
+            break;
+        case ToneDescriptor::TONE_WAITING:
+            streamUsage = AudioStandard::StreamUsage::STREAM_USAGE_VOICE_RINGTONE;
             break;
         default:
             break;
