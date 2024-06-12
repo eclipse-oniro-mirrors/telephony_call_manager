@@ -438,6 +438,21 @@ int32_t CallObjectManager::HasRingingCall(bool &enabled)
     return TELEPHONY_ERR_SUCCESS;
 }
 
+int32_t CallObjectManager::HasHoldCall(bool &enabled)
+{
+    enabled = false;
+    std::lock_guard<std::mutex> lock(listMutex_);
+    std::list<sptr<CallBase>>::iterator it;
+    for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
+        // Count the number of calls in the hold state
+        if ((*it)->GetCallRunningState() == CallRunningState::CALL_RUNNING_STATE_HOLD) {
+            enabled = true;
+            break;
+        }
+    }
+    return TELEPHONY_ERR_SUCCESS;
+}
+
 TelCallState CallObjectManager::GetCallState(int32_t callId)
 {
     TelCallState retState = TelCallState::CALL_STATUS_IDLE;
