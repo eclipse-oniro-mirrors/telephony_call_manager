@@ -375,8 +375,8 @@ int32_t CallControlManager::GetCallState()
         callState = CallStateToApp::CALL_STATE_IDLE;
     } else {
         callState = CallStateToApp::CALL_STATE_OFFHOOK;
-        bool enabled = false;
-        if ((HasRingingCall(enabled) == TELEPHONY_SUCCESS) && enabled) {
+        bool hasRingingCall = false;
+        if ((HasRingingCall(hasRingingCall) == TELEPHONY_SUCCESS) && hasRingingCall) {
             callState = CallStateToApp::CALL_STATE_RINGING;
         }
     }
@@ -499,8 +499,8 @@ bool CallControlManager::NotifyCallStateUpdated(
             nextState == TelCallState::CALL_STATUS_DISCONNECTED) ||
             (priorState == TelCallState::CALL_STATUS_DISCONNECTING &&
             nextState == TelCallState::CALL_STATUS_DISCONNECTED)) {
-            bool enabled = false;
-            if ((HasHoldCall(enabled) == TELEPHONY_SUCCESS) && !enabled) {
+            bool hasHoldCall = false;
+            if ((HasHoldCall(hasHoldCall) == TELEPHONY_SUCCESS) && !hasHoldCall) {
                 TELEPHONY_LOGI("call is disconnected, clear distributed call state");
                 DelayedSingleton<AudioDeviceManager>::GetInstance()->OnActivedCallDisconnected();
             }

@@ -423,30 +423,30 @@ int32_t CallObjectManager::GetSatelliteCallList(std::list<int32_t> &list)
     return TELEPHONY_SUCCESS;
 }
 
-int32_t CallObjectManager::HasRingingCall(bool &enabled)
+int32_t CallObjectManager::HasRingingCall(bool &hasRingingCall)
 {
-    enabled = false;
+    hasRingingCall = false;
     std::lock_guard<std::mutex> lock(listMutex_);
     std::list<sptr<CallBase>>::iterator it;
     for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
         // Count the number of calls in the ringing state
         if ((*it)->GetCallRunningState() == CallRunningState::CALL_RUNNING_STATE_RINGING) {
-            enabled = true;
+            hasRingingCall = true;
             break;
         }
     }
     return TELEPHONY_ERR_SUCCESS;
 }
 
-int32_t CallObjectManager::HasHoldCall(bool &enabled)
+int32_t CallObjectManager::HasHoldCall(bool &hasHoldCall)
 {
-    enabled = false;
+    hasHoldCall = false;
     std::lock_guard<std::mutex> lock(listMutex_);
     std::list<sptr<CallBase>>::iterator it;
     for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
         // Count the number of calls in the hold state
         if ((*it)->GetCallRunningState() == CallRunningState::CALL_RUNNING_STATE_HOLD) {
-            enabled = true;
+            hasHoldCall = true;
             break;
         }
     }
