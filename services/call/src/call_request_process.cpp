@@ -848,7 +848,11 @@ int32_t CallRequestProcess::CarrierDialProcess(DialParaInfo &info)
 
 int32_t CallRequestProcess::HandleDialingInfo(std::string newPhoneNum, DialParaInfo &info)
 {
-    bool isEcc = HandleEccCallForDsda(newPhoneNum, info);
+    bool isEcc = false;
+    int32_t ret = HandleEccCallForDsda(newPhoneNum, info, isEcc);
+    if (ret != TELEPHONY_SUCCESS) {
+        return ret;
+    }
     if (!isEcc) {
         bool canDial = true;
         IsNewCallAllowedCreate(canDial);
@@ -856,7 +860,7 @@ int32_t CallRequestProcess::HandleDialingInfo(std::string newPhoneNum, DialParaI
             return CALL_ERR_CALL_COUNTS_EXCEED_LIMIT;
         }
         if (IsDsdsMode5()) {
-            int32_t ret = IsDialCallForDsda(info);
+            ret = IsDialCallForDsda(info);
             if (ret != TELEPHONY_SUCCESS) {
                 TELEPHONY_LOGE("IsDialCallForDsda failed!");
                 return ret;
@@ -898,24 +902,15 @@ int32_t CallRequestProcess::IsDialCallForDsda(DialParaInfo &info)
     return TELEPHONY_SUCCESS;
 }
 
-bool CallRequestProcess::HandleEccCallForDsda(std::string newPhoneNum, DialParaInfo &info)
+int32_t CallRequestProcess::HandleEccCallForDsda(std::string newPhoneNum, DialParaInfo &info, bool &isEcc)
 {
-    bool isEcc = false;
     int32_t ret =
         DelayedSingleton<CallNumberUtils>::GetInstance()->CheckNumberIsEmergency(newPhoneNum, info.accountId, isEcc);
     TELEPHONY_LOGE("CheckNumberIsEmergency ret is %{public}d", ret);
     if (isEcc && IsDsdsMode5()) {
-        std::list<int32_t> callIdList;
-        GetCarrierCallList(callIdList);
-        for (int32_t otherCallId : callIdList) {
-            sptr<CallBase> call = GetOneCallObject(otherCallId);
-            if (call != nullptr && call->GetSlotId() != info.accountId) {
-                TELEPHONY_LOGI("Hangup call SLOTID:%{public}d", call->GetSlotId());
-                call->HangUpCall();
-            }
-        }
+        return EccDialPolicy(info.accountId);
     }
-    return isEcc;
+    return TELEPHONY_SUCCESS;
 }
 
 int32_t CallRequestProcess::VoiceMailDialProcess(DialParaInfo &info)
@@ -981,6 +976,47 @@ bool CallRequestProcess::IsFdnNumber(std::vector<std::u16string> fdnNumberList, 
     }
     TELEPHONY_LOGW("There is no fixed number.");
     return false;
+}
+
+int32_t CallRequestProcess::EccDialPolicy(int32_t slotId)
+{
+    std::list<int32_t> callIdList;
+    std::list<sptr<CallBase>> hangupList;
+
+    GetCarrierCallList(callIdList);
+    for (int32_t otherCallId : callIdList) {
+        sptr<CallBase> call = GetOneCallObject(otherCallId);
+        if (call == nullptr) {
+            continue;
+        }
+        CallRunningState crState = call->GetCallRunningState();
+        if (call->GetCallType() == CallType::TYPE_SATELLITE) {
+            hangupList.emplace_back(call);
+        } else if (crState == CallRunningState::CALL_RUNNING_STATE_CREATE ||
+            crState == CallRunningState::CALL_RUNNING_STATE_CONNECTING ||
+            crState == CallRunningState::CALL_RUNNING_STATE_DIALING) {
+            if (call->GetEmergencyState()) {
+                hangupList.clear();
+                TELEPHONY_LOGE("already has ecc call dailing!");
+                return CALL_ERR_CALL_COUNTS_EXCEED_LIMIT;
+            }
+            hangupList.emplace_back(call);
+        } else if (crState == CallRunningState::CALL_RUNNING_STATE_RINGING) {
+            if (call->GetSlotId() != slotId && !call->GetEmergencyState()) {
+                continue;
+            }
+            hangupList.emplace_back(call);
+        }
+    }
+
+    for (sptr<CallBase> call : hangupList) {
+        int32_t callID = call->GetCallID();
+        CallRunningState crState = call->GetCallRunningState();
+        TELEPHONY_LOGE("HangUpCall call[id:%{public}d state:%{public}d]", callID, crState);
+        call->HangUpCall();
+    }
+    hangupList.clear();
+    return TELEPHONY_SUCCESS;
 }
 } // namespace Telephony
 } // namespace OHOS

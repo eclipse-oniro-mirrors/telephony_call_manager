@@ -64,11 +64,18 @@ int32_t CallPolicy::DialPolicy(std::u16string &number, AppExecFwk::PacMap &extra
         TELEPHONY_LOGE("invalid video state!");
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
-    if (IsVoiceCallValid(videoState) != TELEPHONY_SUCCESS) {
-        return CALL_ERR_CALL_COUNTS_EXCEED_LIMIT;
-    }
-    if (HasNewCall() != TELEPHONY_SUCCESS)  {
-        return CALL_ERR_CALL_COUNTS_EXCEED_LIMIT;
+    if (!isEcc) {
+        if (IsVoiceCallValid(videoState) != TELEPHONY_SUCCESS) {
+            return CALL_ERR_CALL_COUNTS_EXCEED_LIMIT;
+        }
+        if (HasNewCall() != TELEPHONY_SUCCESS) {
+            return CALL_ERR_CALL_COUNTS_EXCEED_LIMIT;
+        }
+        bool hasEccCall = false;
+        if (HasEmergencyCall(hasEccCall) == TELEPHONY_ERR_SUCCESS && hasEccCall) {
+            TELEPHONY_LOGE("during emergency call, calling is prohibited");
+            return CALL_ERR_CALL_COUNTS_EXCEED_LIMIT;
+        }
     }
     return SuperPrivacyMode(number, extras, isEcc);
 }
