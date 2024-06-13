@@ -384,7 +384,9 @@ int32_t NapiCallAbilityCallback::ReportStartRttInfo(AppExecFwk::PacMap &resultIn
     }
     work->data = (void *)callSupplementWorker;
     int32_t errCode = uv_queue_work_with_qos(
-        loop, work, [](uv_work_t *work) {}, ReportStartRttInfoWork, uv_qos_default);
+        loop, work, [](uv_work_t *work) {
+            TELEPHONY_LOGD("ReportStartRttInfo uv_queue_work_with_qos");
+        }, ReportStartRttInfoWork, uv_qos_default);
     if (errCode != 0) {
         TELEPHONY_LOGE("failed to uv_queue_work_with_qos, errCode: %{public}d", errCode);
         delete callSupplementWorker;
@@ -423,7 +425,9 @@ int32_t NapiCallAbilityCallback::ReportStopRttInfo(AppExecFwk::PacMap &resultInf
     }
     work->data = (void *)callSupplementWorker;
     int32_t resultCode = uv_queue_work_with_qos(
-        loop, work, [](uv_work_t *work) {}, ReportStopRttInfoWork, uv_qos_default);
+        loop, work, [](uv_work_t *work) {
+            TELEPHONY_LOGD("ReportStopRttInfo uv_queue_work_with_qos");
+        }, ReportStopRttInfoWork, uv_qos_default);
     if (resultCode != 0) {
         delete callSupplementWorker;
         callSupplementWorker = nullptr;
@@ -460,7 +464,9 @@ int32_t NapiCallAbilityCallback::UpdateCallStateInfo(const CallAttributeInfo &in
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     work->data = (void *)callStateWorker;
-    int32_t errCode = uv_queue_work_with_qos(loop, work, [](uv_work_t *work) {}, ReportCallStateWork, uv_qos_default);
+    int32_t errCode = uv_queue_work_with_qos(loop, work, [](uv_work_t *work) {
+        TELEPHONY_LOGD("UpdateCallStateInfo uv_queue_work_with_qos");
+    }, ReportCallStateWork, uv_qos_default);
     if (errCode != 0) {
         delete callStateWorker;
         callStateWorker = nullptr;
@@ -609,7 +615,9 @@ int32_t NapiCallAbilityCallback::UpdateCallEvent(const CallEventInfo &info)
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     work->data = (void *)callEventWorker;
-    int32_t errCode = uv_queue_work_with_qos(loop, work, [](uv_work_t *work) {}, ReportCallEventWork, uv_qos_default);
+    int32_t errCode = uv_queue_work_with_qos(loop, work, [](uv_work_t *work) {
+        TELEPHONY_LOGD("UpdateCallEvent uv_queue_work_with_qos");
+    }, ReportCallEventWork, uv_qos_default);
     if (errCode != 0) {
         TELEPHONY_LOGE("failed to uv_queue_work_with_qos, errCode: %{public}d", errCode);
         delete callEventWorker;
@@ -694,7 +702,9 @@ int32_t NapiCallAbilityCallback::UpdateCallDisconnectedCause(const DisconnectedD
     }
     work->data = (void *)callDisconnectedCauseWorker;
     int32_t errCode = uv_queue_work_with_qos(
-        loop, work, [](uv_work_t *work) {}, ReportCallDisconnectedCauseWork, uv_qos_default);
+        loop, work, [](uv_work_t *work) {
+            TELEPHONY_LOGD("UpdateCallDisconnectedCause uv_queue_work_with_qos");
+        }, ReportCallDisconnectedCauseWork, uv_qos_default);
     if (errCode != 0) {
         delete callDisconnectedCauseWorker;
         callDisconnectedCauseWorker = nullptr;
@@ -791,7 +801,9 @@ int32_t NapiCallAbilityCallback::UpdateMmiCodeResultsInfo(const MmiCodeInfo &inf
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     work->data = (void *)mmiCodeWorker;
-    int32_t errCode = uv_queue_work_with_qos(loop, work, [](uv_work_t *work) {}, ReportMmiCodeWork, uv_qos_default);
+    int32_t errCode = uv_queue_work_with_qos(loop, work, [](uv_work_t *work) {
+        TELEPHONY_LOGD("UpdateMmiCodeResultsInfo uv_queue_work_with_qos");
+    }, ReportMmiCodeWork, uv_qos_default);
     if (errCode != 0) {
         TELEPHONY_LOGE("failed to uv_queue_work_with_qos, errCode: %{public}d", errCode);
         delete mmiCodeWorker;
@@ -875,7 +887,9 @@ int32_t NapiCallAbilityCallback::UpdateAudioDeviceInfo(const AudioDeviceInfo &in
     }
     work->data = (void *)audioDeviceWork;
     int32_t errCode = uv_queue_work_with_qos(
-        loop, work, [](uv_work_t *work) {}, ReportAudioDeviceInfoWork, uv_qos_default);
+        loop, work, [](uv_work_t *work) {
+            TELEPHONY_LOGD("UpdateAudioDeviceInfo uv_queue_work_with_qos");
+        }, ReportAudioDeviceInfoWork, uv_qos_default);
     if (errCode != 0) {
         TELEPHONY_LOGE("failed to uv_queue_work_with_qos, errCode: %{public}d", errCode);
         delete audioDeviceWork;
@@ -981,7 +995,9 @@ int32_t NapiCallAbilityCallback::OttCallRequest(OttCallRequestId requestId, AppE
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     work->data = (void *)callOttWorker;
-    int32_t errCode = uv_queue_work_with_qos(loop, work, [](uv_work_t *work) {}, ReportCallOttWork, uv_qos_default);
+    int32_t errCode = uv_queue_work_with_qos(loop, work, [](uv_work_t *work) {
+        TELEPHONY_LOGD("OttCallRequest uv_queue_work_with_qos");
+    }, ReportCallOttWork, uv_qos_default);
     if (errCode != 0) {
         TELEPHONY_LOGE("failed to uv_queue_work_with_qos, errCode: %{public}d", errCode);
         delete callOttWorker;
@@ -1017,7 +1033,9 @@ int32_t NapiCallAbilityCallback::ReportGetWaitingInfo(AppExecFwk::PacMap &result
     }
     work->data = (void *)callSupplementWorkerData;
     int32_t errorCode = uv_queue_work_with_qos(
-        loop, work, [](uv_work_t *work) {}, ReportWaitAndLimitInfoWork, uv_qos_default);
+        loop, work, [](uv_work_t *work) {
+            TELEPHONY_LOGD("ReportGetWaitingInfo uv_queue_work_with_qos");
+        }, ReportWaitAndLimitInfoWork, uv_qos_default);
     if (errorCode != 0) {
         delete callSupplementWorkerData;
         callSupplementWorkerData = nullptr;
@@ -1056,7 +1074,9 @@ int32_t NapiCallAbilityCallback::ReportCloseUnFinishedUssdInfo(AppExecFwk::PacMa
     }
     work->data = (void *)callSupplementDataWorker;
     int32_t errorCode = uv_queue_work_with_qos(
-        loop, work, [](uv_work_t *work) {}, ReportExecutionResultWork, uv_qos_default);
+        loop, work, [](uv_work_t *work) {
+            TELEPHONY_LOGD("ReportCloseUnFinishedUssdInfo uv_queue_work_with_qos");
+        }, ReportExecutionResultWork, uv_qos_default);
     if (errorCode != 0) {
         TELEPHONY_LOGE("failed to uv_queue_work_with_qos, errorCode: %{public}d", errorCode);
         delete callSupplementDataWorker;
@@ -1095,7 +1115,9 @@ int32_t NapiCallAbilityCallback::ReportSetWaitingInfo(AppExecFwk::PacMap &result
     }
     work->data = (void *)callSupplementWorker;
     int32_t resultCode = uv_queue_work_with_qos(
-        loop, work, [](uv_work_t *work) {}, ReportExecutionResultWork, uv_qos_default);
+        loop, work, [](uv_work_t *work) {
+            TELEPHONY_LOGD("ReportSetWaitingInfo uv_queue_work_with_qos");
+        }, ReportExecutionResultWork, uv_qos_default);
     if (resultCode != 0) {
         delete callSupplementWorker;
         callSupplementWorker = nullptr;
@@ -1134,7 +1156,9 @@ int32_t NapiCallAbilityCallback::ReportGetRestrictionInfo(AppExecFwk::PacMap &re
     }
     work->data = (void *)callSupplementWorker;
     int32_t resultCode = uv_queue_work_with_qos(
-        loop, work, [](uv_work_t *work) {}, ReportWaitAndLimitInfoWork, uv_qos_default);
+        loop, work, [](uv_work_t *work) {
+            TELEPHONY_LOGD("ReportGetRestrictionInfo uv_queue_work_with_qos");
+        }, ReportWaitAndLimitInfoWork, uv_qos_default);
     if (resultCode != 0) {
         delete callSupplementWorker;
         callSupplementWorker = nullptr;
@@ -1173,7 +1197,9 @@ int32_t NapiCallAbilityCallback::ReportSetRestrictionInfo(AppExecFwk::PacMap &re
     }
     work->data = (void *)callSupplementWorker;
     int32_t resultCode = uv_queue_work_with_qos(
-        loop, work, [](uv_work_t *work) {}, ReportExecutionResultWork, uv_qos_default);
+        loop, work, [](uv_work_t *work) {
+            TELEPHONY_LOGD("ReportSetRestrictionInfo uv_queue_work_with_qos");
+        }, ReportExecutionResultWork, uv_qos_default);
     if (resultCode != 0) {
         TELEPHONY_LOGE("failed to uv_queue_work_with_qos, resultCode: %{public}d", resultCode);
         delete callSupplementWorker;
@@ -1212,7 +1238,9 @@ int32_t NapiCallAbilityCallback::ReportSetRestrictionPassword(AppExecFwk::PacMap
     }
     work->data = (void *)callSupplementWorker;
     int32_t errCode = uv_queue_work_with_qos(
-        loop, work, [](uv_work_t *work) {}, ReportExecutionResultWork, uv_qos_default);
+        loop, work, [](uv_work_t *work) {
+            TELEPHONY_LOGD("ReportSetRestrictionPassword uv_queue_work_with_qos");
+        }, ReportExecutionResultWork, uv_qos_default);
     if (errCode != 0) {
         delete callSupplementWorker;
         callSupplementWorker = nullptr;
@@ -1256,7 +1284,9 @@ int32_t NapiCallAbilityCallback::ReportGetTransferInfo(AppExecFwk::PacMap &resul
     }
     work->data = (void *)callSupplementWorker;
     int32_t errCode = uv_queue_work_with_qos(
-        loop, work, [](uv_work_t *work) {}, ReportSupplementInfoWork, uv_qos_default);
+        loop, work, [](uv_work_t *work) {
+            TELEPHONY_LOGD("ReportGetTransferInfo uv_queue_work_with_qos");
+        }, ReportSupplementInfoWork, uv_qos_default);
     if (errCode != 0) {
         TELEPHONY_LOGE("failed add to uv_queue_work_with_qos, errCode: %{public}d", errCode);
         delete callSupplementWorker;
@@ -1295,7 +1325,9 @@ int32_t NapiCallAbilityCallback::ReportSetTransferInfo(AppExecFwk::PacMap &resul
     }
     work->data = (void *)callSupplementWorker;
     int32_t errCode = uv_queue_work_with_qos(
-        loop, work, [](uv_work_t *work) {}, ReportExecutionResultWork, uv_qos_default);
+        loop, work, [](uv_work_t *work) {
+            TELEPHONY_LOGD("ReportSetTransferInfo uv_queue_work_with_qos");
+        }, ReportExecutionResultWork, uv_qos_default);
     if (errCode != 0) {
         delete callSupplementWorker;
         callSupplementWorker = nullptr;
@@ -1684,7 +1716,9 @@ int32_t NapiCallAbilityCallback::UpdatePostDialDelay(const std::string str)
     }
     work->data = (void *)postDialDelayWorker;
     int32_t errCode = uv_queue_work_with_qos(
-        loop, work, [](uv_work_t *work) {}, ReportPostDialDelayWork, uv_qos_default);
+        loop, work, [](uv_work_t *work) {
+            TELEPHONY_LOGD("UpdatePostDialDelay uv_queue_work_with_qos");
+        }, ReportPostDialDelayWork, uv_qos_default);
     if (errCode != 0) {
         TELEPHONY_LOGE("failed to uv_queue_work_with_qos, errCode: %{public}d", errCode);
         delete postDialDelayWorker;
@@ -1762,7 +1796,9 @@ int32_t NapiCallAbilityCallback::UpdateImsCallModeChange(const CallMediaModeInfo
     }
     work->data = (void *)imsCallModeInfoWorker;
     int32_t errCode = uv_queue_work_with_qos(
-        loop, work, [](uv_work_t *work) {}, ReportCallMediaModeInfoWork, uv_qos_default);
+        loop, work, [](uv_work_t *work) {
+            TELEPHONY_LOGD("UpdateImsCallModeChange uv_queue_work_with_qos");
+        }, ReportCallMediaModeInfoWork, uv_qos_default);
     if (errCode != 0) {
         TELEPHONY_LOGE("failed to uv_queue_work_with_qos, errCode: %{public}d", errCode);
         delete imsCallModeInfoWorker;
@@ -1849,7 +1885,9 @@ int32_t NapiCallAbilityCallback::CallSessionEventChange(const CallSessionEvent &
     }
     work->data = (void *)callSessionEventWorker;
     int32_t errCode = uv_queue_work_with_qos(
-        loop, work, [](uv_work_t *work) {}, ReportCallSessionEventWork, uv_qos_default);
+        loop, work, [](uv_work_t *work) {
+            TELEPHONY_LOGD("CallSessionEventChange uv_queue_work_with_qos");
+        }, ReportCallSessionEventWork, uv_qos_default);
     if (errCode != 0) {
         TELEPHONY_LOGE("failed to uv_queue_work_with_qos, errCode: %{public}d", errCode);
         delete callSessionEventWorker;
@@ -1933,7 +1971,9 @@ int32_t NapiCallAbilityCallback::PeerDimensionsChange(const PeerDimensionsDetail
     }
     work->data = (void *)peerDimensionsWorker;
     int32_t errCode = uv_queue_work_with_qos(
-        loop, work, [](uv_work_t *work) {}, ReportPeerDimensionsWork, uv_qos_default);
+        loop, work, [](uv_work_t *work) {
+            TELEPHONY_LOGD("PeerDimensionsChange uv_queue_work_with_qos");
+        }, ReportPeerDimensionsWork, uv_qos_default);
     if (errCode != 0) {
         TELEPHONY_LOGE("failed to uv_queue_work_with_qos, errCode: %{public}d", errCode);
         delete peerDimensionsWorker;
@@ -2020,7 +2060,9 @@ int32_t NapiCallAbilityCallback::CallDataUsageChange(const int64_t dataUsage)
     }
     work->data = (void *)callDataUsageWorker;
     int32_t errCode = uv_queue_work_with_qos(
-        loop, work, [](uv_work_t *work) {}, ReportCallDataUsageWork, uv_qos_default);
+        loop, work, [](uv_work_t *work) {
+            TELEPHONY_LOGD("CallDataUsageChange uv_queue_work_with_qos");
+        }, ReportCallDataUsageWork, uv_qos_default);
     if (errCode != 0) {
         TELEPHONY_LOGE("failed to uv_queue_work_with_qos, errCode: %{public}d", errCode);
         delete callDataUsageWorker;
@@ -2099,7 +2141,9 @@ int32_t NapiCallAbilityCallback::UpdateCameraCapabilities(const CameraCapabiliti
     }
     work->data = (void *)cameraCapbilitiesWorker;
     int32_t errCode = uv_queue_work_with_qos(
-        loop, work, [](uv_work_t *work) {}, ReportCameraCapabilitiesInfoWork, uv_qos_default);
+        loop, work, [](uv_work_t *work) {
+            TELEPHONY_LOGD("UpdateCameraCapabilities uv_queue_work_with_qos");
+        }, ReportCameraCapabilitiesInfoWork, uv_qos_default);
     if (errCode != 0) {
         TELEPHONY_LOGE("failed to uv_queue_work_with_qos, errCode: %{public}d", errCode);
         delete cameraCapbilitiesWorker;
