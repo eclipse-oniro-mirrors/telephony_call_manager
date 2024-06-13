@@ -50,10 +50,15 @@ void CallStateReportProxy::CallStateUpdated(
 
 void CallStateReportProxy::UpdateCallState(sptr<CallBase> &callObjectPtr, TelCallState nextState)
 {
-    sptr<CallBase> foregroundCall = CallObjectManager::GetForegroundCall(false);
-    if (foregroundCall == nullptr || nextState == TelCallState::CALL_STATUS_ANSWERED) {
-        TELEPHONY_LOGE("foregroundCall is nullptr!");
+    sptr<CallBase> foregroundCall;
+    if (nextState == TelCallState::CALL_STATUS_ANSWERED) {
         foregroundCall = callObjectPtr;
+    } else {
+        foregroundCall = CallObjectManager::GetForegroundCall(false);
+    }
+    if (foregroundCall == nullptr) {
+        TELEPHONY_LOGE("foregroundCall is nullptr!");
+        return;
     }
     CallAttributeInfo info;
     foregroundCall->GetCallAttributeInfo(info);
@@ -61,7 +66,7 @@ void CallStateReportProxy::UpdateCallState(sptr<CallBase> &callObjectPtr, TelCal
         info.callState = TelCallState::CALL_STATUS_ANSWERED;
     }
     if (info.callState == currentCallState_) {
-        TELEPHONY_LOGE("foreground call state is not changed!");
+        TELEPHONY_LOGI("foreground call state is not changed, currentCallState_:%{public}d!", currentCallState_);
         return;
     }
     std::string str(info.accountNumber);
