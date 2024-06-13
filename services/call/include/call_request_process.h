@@ -68,7 +68,7 @@ public:
 private:
     int32_t CarrierDialProcess(DialParaInfo &info);
     int32_t IsDialCallForDsda(DialParaInfo &info);
-    bool HandleEccCallForDsda(std::string newPhoneNum, DialParaInfo &info);
+    int32_t HandleEccCallForDsda(std::string newPhoneNum, DialParaInfo &info, bool &isEcc);
     int32_t VoiceMailDialProcess(DialParaInfo &info);
     int32_t OttDialProcess(DialParaInfo &info);
     int32_t PackCellularCallInfo(DialParaInfo &info, CellularCallInfo &callInfo);
@@ -77,6 +77,7 @@ private:
     int32_t HandleStartDial(bool isMMiCode, CellularCallInfo callInfo);
     int32_t HandleDialFail();
     int32_t GetOtherRingingCall(int32_t currentCallId);
+    int32_t EccDialPolicy(int32_t slotId);
 
 private:
     std::mutex mutex_;

@@ -203,8 +203,9 @@ HWTEST_F(BranchTest, Telephony_CallRequestProcess_001, Function | MediumTest | L
     callRequestProcess->GetOtherRingingCall(1);
     callRequestProcess->CarrierDialProcess(mDialParaInfo);
     callRequestProcess->IsDialCallForDsda(mDialParaInfo);
+    bool isEcc = false;
     std::string phoneNumber = "123456789012";
-    callRequestProcess->HandleEccCallForDsda(phoneNumber, mDialParaInfo);
+    callRequestProcess->HandleEccCallForDsda(phoneNumber, mDialParaInfo, isEcc);
     callRequestProcess->VoiceMailDialProcess(mDialParaInfo);
     callRequestProcess->OttDialProcess(mDialParaInfo);
     CellularCallInfo mCellularCallInfo;
