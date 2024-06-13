@@ -28,9 +28,14 @@ public:
     CallStateReportProxy();
     ~CallStateReportProxy();
     void CallStateUpdated(sptr<CallBase> &callObjectPtr, TelCallState priorState, TelCallState nextState);
-    int32_t ReportCallState(int32_t slotId, int32_t callState, std::u16string phoneNumber);
+    void UpdateCallState(sptr<CallBase> &callObjectPtr, TelCallState nextState);
+    void UpdateCallStateForSlotId(sptr<CallBase> &callObjectPtr, TelCallState nextState);
+    int32_t ReportCallState(int32_t callState, std::u16string phoneNumber);
     int32_t ReportCallStateForCallId(
-        int32_t slotId, int32_t callId, int32_t callState, std::u16string incomingNumber);
+        int32_t slotId, int32_t callState, std::u16string incomingNumber);
+
+private:
+    TelCallState currentCallState_ = TelCallState::CALL_STATUS_UNKNOWN;
 };
 } // namespace Telephony
 } // namespace OHOS
