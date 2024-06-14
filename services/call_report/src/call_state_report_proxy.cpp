@@ -44,26 +44,53 @@ void CallStateReportProxy::CallStateUpdated(
         TELEPHONY_LOGI("voip call no need to report call state");
         return;
     }
-    sptr<CallBase> foregroundCall = CallObjectManager::GetForegroundCall(false);
+    UpdateCallState(callObjectPtr, nextState);
+    UpdateCallStateForSlotId(callObjectPtr, nextState);
+}
+
+void CallStateReportProxy::UpdateCallState(sptr<CallBase> &callObjectPtr, TelCallState nextState)
+{
+    sptr<CallBase> foregroundCall;
+    if (nextState == TelCallState::CALL_STATUS_ANSWERED) {
+        foregroundCall = callObjectPtr;
+    } else {
+        foregroundCall = CallObjectManager::GetForegroundCall(false);
+    }
     if (foregroundCall == nullptr) {
         TELEPHONY_LOGE("foregroundCall is nullptr!");
-        foregroundCall = callObjectPtr;
+        return;
     }
     CallAttributeInfo info;
     foregroundCall->GetCallAttributeInfo(info);
+    if (nextState == TelCallState::CALL_STATUS_ANSWERED) {
+        info.callState = TelCallState::CALL_STATUS_ANSWERED;
+    }
+    if (info.callState == currentCallState_) {
+        TELEPHONY_LOGI("foreground call state is not changed, currentCallState_:%{public}d!", currentCallState_);
+        return;
+    }
+    std::string str(info.accountNumber);
+    std::u16string accountNumber = Str8ToStr16(str);
+    ReportCallState(static_cast<int32_t>(info.callState), accountNumber);
+}
+
+void CallStateReportProxy::UpdateCallStateForSlotId(sptr<CallBase> &callObjectPtr, TelCallState nextState)
+{
+    CallAttributeInfo info;
+    callObjectPtr->GetCallAttributeInfo(info);
     std::string str(info.accountNumber);
     std::u16string accountNumber = Str8ToStr16(str);
     if (nextState == TelCallState::CALL_STATUS_ANSWERED) {
         info.callState = TelCallState::CALL_STATUS_ANSWERED;
     }
-    ReportCallStateForCallId(info.accountId, info.callId, static_cast<int32_t>(info.callState), accountNumber);
+    ReportCallStateForCallId(info.accountId, static_cast<int32_t>(info.callState), accountNumber);
 }
 
-int32_t CallStateReportProxy::ReportCallState(int32_t slotId, int32_t callState, std::u16string phoneNumber)
+int32_t CallStateReportProxy::ReportCallState(int32_t callState, std::u16string phoneNumber)
 {
     int32_t ret = TELEPHONY_ERR_FAIL;
     ret = DelayedRefSingleton<TelephonyStateRegistryClient>::GetInstance().UpdateCallState(
-        slotId, callState, phoneNumber);
+        callState, phoneNumber);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("notifyCallStateUpdated failed, errcode:%{public}d", ret);
         return ret;
@@ -73,16 +100,16 @@ int32_t CallStateReportProxy::ReportCallState(int32_t slotId, int32_t callState,
 }
 
 int32_t CallStateReportProxy::ReportCallStateForCallId(
-    int32_t slotId, int32_t callId, int32_t callState, std::u16string incomingNumber)
+    int32_t slotId, int32_t callState, std::u16string incomingNumber)
 {
     int32_t ret = TELEPHONY_ERR_FAIL;
     ret = DelayedRefSingleton<TelephonyStateRegistryClient>::GetInstance().UpdateCallStateForSlotId(
-        slotId, callId, callState, incomingNumber);
+        slotId, callState, incomingNumber);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("NotifyCallStateUpdated failed, errcode:%{public}d", ret);
         return ret;
     }
-    TELEPHONY_LOGI("report call state:%{public}d, callId:%{public}d", callState, callId);
+    TELEPHONY_LOGI("report call state:%{public}d, slotId:%{public}d", callState, slotId);
     return ret;
 }
 } // namespace Telephony
