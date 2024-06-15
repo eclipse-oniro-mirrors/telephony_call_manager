@@ -42,7 +42,7 @@ int32_t SuperPrivacyManagerClient::SetSuperPrivacyMode(const int32_t &mode, cons
         }
         result = proxy->SetSuperPrivacyMode(mode, source);
     });
-    return result; 
+    return result;
 }
 
 void SuperPrivacyManagerClient::WithSystemAbilityProxy(
@@ -53,7 +53,7 @@ void SuperPrivacyManagerClient::WithSystemAbilityProxy(
     if (sam == nullptr) {
         consumer(nullptr);
         return;
-    }    
+    }
     auto sa = sam->LoadSystemAbility(SUPER_PRIVACY_MANAGER_SA_ID, LOAD_SA_TIMEOUT_SECONDS);
     ConsumeWithSystemAbility(consumer, sa);
 }

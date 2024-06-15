@@ -45,7 +45,6 @@ ErrCode SuperPrivacyManagerProxy::SetSuperPrivacyMode(
         return errCode;
     }
     return ERR_OK;
-    
 }
 } // namespace Telephony
 } // namespace OHOS

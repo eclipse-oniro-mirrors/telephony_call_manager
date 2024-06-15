@@ -25,7 +25,7 @@ namespace Telephony {
 class SuperPrivacyManagerProxy : public IRemoteProxy<ISuperPrivacyManager> {
 public:
     explicit SuperPrivacyManagerProxy(const sptr<IRemoteObject>& remote)
-        : IRemoteProxy<ISuperPrivacyManager>(remote) 
+        : IRemoteProxy<ISuperPrivacyManager>(remote)
     {
     }
 
@@ -38,7 +38,7 @@ public:
 
 private:
     static constexpr int32_t COMMAND_SET_SUPER_PRIVACY_MODE = MIN_TRANSACTION_ID + 0;
-    
+    static inline BrokerDelegator<SuperPrivacyManagerProxy> delegator_;
 };
 } // namespace Telephony
 } // namespace OHOS
