@@ -18,7 +18,7 @@
 
 #include <cstdint>
 #include <functional>
-#include <automic>
+#include <atomic>
 #include <map>
 #include <set>
 #include <mutex>
