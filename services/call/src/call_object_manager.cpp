@@ -484,7 +484,7 @@ sptr<CallBase> CallObjectManager::GetOneCallObjectByIndex(int32_t index)
     std::lock_guard<std::mutex> lock(listMutex_);
     std::list<sptr<CallBase>>::iterator it = callObjectPtrList_.begin();
     for (; it != callObjectPtrList_.end(); ++it) {
-        if ((*it)->GetCallIndex() == index) {
+        if ((*it)->GetCallIndex() == index && (*it)->GetCallType() != CallType::TYPE_VOIP) {
             return (*it);
         }
     }
@@ -497,7 +497,7 @@ sptr<CallBase> CallObjectManager::GetOneCallObjectByIndexAndSlotId(int32_t index
     std::list<sptr<CallBase>>::iterator it = callObjectPtrList_.begin();
     for (; it != callObjectPtrList_.end(); ++it) {
         if ((*it)->GetCallIndex() == index) {
-            if ((*it)->GetSlotId() == slotId) {
+            if ((*it)->GetSlotId() == slotId && (*it)->GetCallType() != CallType::TYPE_VOIP) {
                 return (*it);
             }
         }
