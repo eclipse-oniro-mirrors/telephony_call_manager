@@ -24,6 +24,7 @@
       *ICallStatusCallback*;
       *VoipCallConnection*;
       *VoipCallManagerProxy*;
+      *SuperPrivacyManagerClient*;
     };
   local:
     *;

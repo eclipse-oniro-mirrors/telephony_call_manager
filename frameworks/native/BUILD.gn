@@ -41,6 +41,8 @@ ohos_shared_library("tel_call_manager_api") {
     "src/call_status_callback_proxy.cpp",
     "src/cellular_call_proxy.cpp",
     "src/voip_call_manager_proxy.cpp",
+    "src/super_privacy_manager_client.cpp",
+    "src/super_privacy_manager_proxy.cpp"
   ]
 
   public_configs = [ ":call_manager_config" ]
