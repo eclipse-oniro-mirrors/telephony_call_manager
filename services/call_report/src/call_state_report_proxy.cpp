@@ -68,6 +68,7 @@ void CallStateReportProxy::UpdateCallState(sptr<CallBase> &callObjectPtr, TelCal
         TELEPHONY_LOGI("foreground call state is not changed, currentCallState_:%{public}d!", currentCallState_);
         return;
     }
+    currentCallState_ = info.callState;
     std::string str(info.accountNumber);
     std::u16string accountNumber = Str8ToStr16(str);
     ReportCallState(static_cast<int32_t>(info.callState), accountNumber);
