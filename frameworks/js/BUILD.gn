@@ -33,10 +33,8 @@ ohos_shared_library("call") {
 
   public_configs = [ ":call_manager_js_config" ]
 
-  deps = [
-    "$SUBSYSTEM_DIR/call_manager/frameworks/native:tel_call_manager_api",
-    "//third_party/libuv:uv",
-  ]
+  deps =
+      [ "$SUBSYSTEM_DIR/call_manager/frameworks/native:tel_call_manager_api" ]
 
   external_deps = [
     "ability_base:base",
@@ -49,6 +47,7 @@ ohos_shared_library("call") {
     "image_framework:image",
     "image_framework:image_native",
     "init:libbegetutil",
+    "libuv:uv",
     "napi:ace_napi",
   ]
 
