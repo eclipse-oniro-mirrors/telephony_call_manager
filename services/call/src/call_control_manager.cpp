@@ -68,7 +68,6 @@ CallControlManager::~CallControlManager()
             statusChangeListener_ = nullptr;
         }
     }
-    DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance()->UnRegisterSuperPrivacyMode();
 }
 
 bool CallControlManager::Init()
