@@ -25,6 +25,7 @@ const std::string SUPER_PRIVACY_MODE_PARAM_KEY = "persist.super_privacy.mode";
 const char SUPER_PRIVACY_MODE_PARAM_KEYS[] = "persist.super_privacy.mode";
 const char SUPER_PRIVACY_MODE_PARAM_OPEN[] = "2";
 const char SUPER_PRIVACY_MODE_PARAM_CLOSE[] = "0";
+const int32_t SOURCE_CALL = 2;
 
 void CallSuperPrivacyControlManager::RegisterSuperPrivacyMode()
 {
@@ -100,7 +101,7 @@ int32_t CallSuperPrivacyControlManager::GetOldSuperPrivacyMode()
 int32_t CallSuperPrivacyControlManager::CloseSuperPrivacyMode()
 {
     int32_t privacy = SuperPrivacyManagerClient::GetInstance().
-        SetSuperPrivacyMode(static_cast<int32_t>(CallSuperPrivacyModeType::OFF), CallSetSuperPrivacyMode);
+        SetSuperPrivacyMode(static_cast<int32_t>(CallSuperPrivacyModeType::OFF), SOURCE_CALL);
     TELEPHONY_LOGE("CloseSuperPrivacyMode privacy:%{public}d", privacy);
     return privacy;
 }
@@ -145,7 +146,7 @@ void CallSuperPrivacyControlManager::RestoreSuperPrivacyMode()
         SetIsChangeSuperPrivacyMode(false);
         if (oldPrivpacy == static_cast<int32_t>(CallSuperPrivacyModeType::ALWAYS_ON)) {
             int32_t privacy = SuperPrivacyManagerClient::GetInstance().
-                SetSuperPrivacyMode(static_cast<int32_t>(CallSuperPrivacyModeType::ALWAYS_ON), CallSetSuperPrivacyMode);
+                SetSuperPrivacyMode(static_cast<int32_t>(CallSuperPrivacyModeType::ALWAYS_ON), SOURCE_CALL);
             TELEPHONY_LOGE("RestoreSuperPrivacyMode ret privacy:%{public}d", privacy);
         }
     }
