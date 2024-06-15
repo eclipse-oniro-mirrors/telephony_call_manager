@@ -158,7 +158,6 @@ bool CallSuperPrivacyControlManager::GetCurrentIsSuperPrivacyMode()
     if (privpacyMode == static_cast<int32_t>(CallSuperPrivacyModeType::ALWAYS_ON)) {
         return true;
     }
-#endif
     return false;
 }
 } // namespace Telephony
