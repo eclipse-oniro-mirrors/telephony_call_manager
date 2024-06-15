@@ -17,9 +17,6 @@
 #define CALL_SUPERPRIVACY_CONTROL_MANAGER_H
 
 #include "singleton.h"
-#ifdef SUPPORT_SUPER_PRIVACY_SERVICE
-#include "model/super_privacy_mode_listener.h"
-#endif
 
 
 /**
@@ -28,14 +25,6 @@
  */
 namespace OHOS {
 namespace Telephony {
-#ifdef SUPPORT_SUPER_PRIVACY_SERVICE
-using namespace AppSecurityPrivacy::SecurityPrivacyServer::SuperPrivacy;
-class CallSuperPrivacyListener : public SuperPrivacyModeListener {
-public:
-    CallSuperPrivacyListener() = default;
-    void OnSuperPrivacyModeChanged(const int32_t &superPrivacyMode) override;
-};
-#endif
 class CallSuperPrivacyControlManager {
 public:
     static const int SUPER_PRIVACY_MODE_REQUEST_SUCCESS = 0;
@@ -50,15 +39,12 @@ public:
     void RestoreSuperPrivacyMode();
     bool GetCurrentIsSuperPrivacyMode();
     void RegisterSuperPrivacyMode();
-    void UnRegisterSuperPrivacyMode();
     void CloseAllCall();
     
 private:
     bool isChangeSuperPrivacyMode = false;
     int32_t oldSuperPrivacyMode = -1;
-#ifdef SUPPORT_SUPER_PRIVACY_SERVICE
-    std::shared_ptr<SuperPrivacyModeListener> modeChangeListener_ = nullptr;
-#endif
+    static void ParamChangeCallback(const char *key, const char *value, void *context);
 };
 } // namespace Telephony
 } // namespace OHOS
