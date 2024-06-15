@@ -18,7 +18,7 @@
 #include <thread>
 
 #include "parameter.h"
-#include "iservice_register.h"
+#include "iservice_registry.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -42,13 +42,13 @@ int32_t SuperPrivacyManagerClient::SetSuperPrivacyMode(const int32_t &mode, cons
         }
         result = proxy->SetSuperPrivacyMode(mode, source);
     });
-    return result;
+    return result; 
 }
 
 void SuperPrivacyManagerClient::WithSystemAbilityProxy(
     const std::function<void(const sptr<ISuperPrivacyManager> &)> &consumer)
 {
-    lock_guard<recursive_mutex> lockGurad(withSystemAbilityProxyRecursiveMutex_);
+    std::lock_guard<std::recursive_mutex> lockGuard(withSystemAbilityProxyRecursiveMutex_);
     auto sam = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (sam == nullptr) {
         consumer(nullptr);

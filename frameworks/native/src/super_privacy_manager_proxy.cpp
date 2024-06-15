@@ -21,7 +21,7 @@ ErrCode SuperPrivacyManagerProxy::SetSuperPrivacyMode(
     int32_t mode, int32_t source)
 {
     MessageParcel data;
-    MassageParcel reply;
+    MessageParcel reply;
     MessageOption option(MessageOption::TF_SYNC);
     if (!data.WriteInterfaceToken(GetDescriptor())) {
         return ERR_INVALID_VALUE;
@@ -32,7 +32,7 @@ ErrCode SuperPrivacyManagerProxy::SetSuperPrivacyMode(
     if (!data.WriteInt32(source)) {
         return ERR_INVALID_DATA;
     }
-    sptr<IRemoteObject> remotr = Remote();
+    sptr<IRemoteObject> remote = Remote();
     if (remote == nullptr) {
         return ERR_INVALID_DATA;
     }

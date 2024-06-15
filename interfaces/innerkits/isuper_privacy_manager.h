@@ -17,14 +17,14 @@
 #define OHOS_APPSECURITYPRIVACY_SECURITYPRIVACY_SUPERPRIVACY_ISUPERPRIVACYMANAGER_H
 
 #include <string_ex.h>
-#include <cstdint.h>
+#include <cstdint>
 #include <iremote_broker.h>
 
 namespace OHOS {
 namespace Telephony {
-class ISuserPrivacyManager : public IRemoteBroker {
+class ISuperPrivacyManager : public IRemoteBroker {
 public:
-     
+    DECLARE_INTERFACE_DESCRIPTOR(u"OHOS.AppSecurityPrivacy.SecurityPrivacyServer.SuperPrivacy.ISuperPrivacyManager");
     virtual ErrCode SetSuperPrivacyMode(int32_t mode, int32_t source) = 0;
 
 protected:
