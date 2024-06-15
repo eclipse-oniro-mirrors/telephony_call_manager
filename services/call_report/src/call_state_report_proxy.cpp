@@ -57,8 +57,7 @@ void CallStateReportProxy::UpdateCallState(sptr<CallBase> &callObjectPtr, TelCal
         foregroundCall = CallObjectManager::GetForegroundCall(false);
     }
     if (foregroundCall == nullptr) {
-        TELEPHONY_LOGE("foregroundCall is nullptr!");
-        return;
+        foregroundCall = callObjectPtr;
     }
     CallAttributeInfo info;
     foregroundCall->GetCallAttributeInfo(info);
