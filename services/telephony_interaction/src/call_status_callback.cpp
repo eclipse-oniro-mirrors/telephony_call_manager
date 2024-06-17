@@ -371,6 +371,7 @@ int32_t CallStatusCallback::ReceiveUpdateCallMediaModeRequest(const CallModeRepo
 {
     TELEPHONY_LOGI("ReceiveUpdateCallMediaModeRequest result = %{public}d", response.result);
     int32_t ret = DelayedSingleton<ReportCallInfoHandler>::GetInstance()->ReceiveImsCallModeRequest(response);
+    DelayedSingleton<AudioControlManager>::GetInstance()->PlayWaitingTone();
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("ReceiveUpdateCallMediaModeRequest failed! errCode:%{public}d", ret);
     } else {
@@ -383,6 +384,7 @@ int32_t CallStatusCallback::ReceiveUpdateCallMediaModeResponse(const CallModeRep
 {
     TELEPHONY_LOGI("ReceiveUpdateCallMediaModeResponse result = %{public}d", response.result);
     int32_t ret = DelayedSingleton<ReportCallInfoHandler>::GetInstance()->ReceiveImsCallModeResponse(response);
+    DelayedSingleton<AudioControlManager>::GetInstance()->StopWaitingTone();
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("ReceiveUpdateCallMediaModeResponse failed! errCode:%{public}d", ret);
     } else {
