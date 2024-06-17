@@ -48,6 +48,11 @@ bool AlertingState::ProcessEvent(int32_t event)
                     AudioEvent::SWITCH_IMS_CALL_STATE);
             }
             break;
+        case AudioEvent::NEW_ALERTING_CALL:
+            // check is should play ringback tone.
+            result = DelayedSingleton<AudioSceneProcessor>::GetInstance()->ProcessEvent(
+                AudioEvent::SWITCH_ALERTING_STATE);
+            break;
         default:
             break;
     }

@@ -188,8 +188,8 @@ int32_t CallStatusManager::HandleCallsReportInfo(const CallDetailsInfo &info)
         for (const auto &it1 : callDetailsInfo_[curSlotId].callVec) {
             if (it.index == it1.index) {
                 // call state changes
-                if (it.state != it1.state || it.mpty != it1.mpty ||
-                    it.callType != it1.callType || it.callMode != it1.callMode) {
+                if (it.state != it1.state || it.mpty != it1.mpty || it.callType != it1.callType
+                    || it.callMode != it1.callMode || it.state == TelCallState::CALL_STATUS_ALERTING) {
                     TELEPHONY_LOGI("handle updated call state:%{public}d", it.state);
                     HandleCallReportInfo(it);
                 }
