@@ -98,8 +98,8 @@ int32_t CallAbilityReportProxy::UnRegisterCallBack(sptr<IRemoteObject> object)
     std::list<sptr<ICallAbilityCallback>>::iterator it = callbackPtrList_.begin();
     for (; it != callbackPtrList_.end(); ++it) {
         if ((*it)->AsObject() == object) {
-            callbackPtrList_.erase(it);
             TELEPHONY_LOGI("%{public}s UnRegisterCallBack success", (*it)->GetBundleInfo().c_str());
+            callbackPtrList_.erase(it);
             break;
         }
     }
