@@ -127,8 +127,12 @@ void SatelliteCallControl::HandleSatelliteCallStateUpdate(sptr<CallBase> &call,
             vec);
     }
     if (nextState == TelCallState::CALL_STATUS_ACTIVE) {
-        std::string tempLevel = OHOS::system::GetParameter("persist.thermal.log.satcomm", "-1");
-        SetSatcommTempLevel(stoi(tempLevel));
+        int temp = stoi(tempLevel);
+        if ((SatCommTempLevel)temp == SatCommTempLevel::TEMP_LEVEL_HIGH &&
+            CallObjectManager::HasSatelliteCallExist()) {
+            DelayedSingleton<CallDialog>::GetInstance()->DialogConnectExtension("SATELLITE_CALL_DISCONNECT");
+            SetShowDialog(true);
+        }
     }
     std::string model = OHOS::system::GetParameter("const.build.product", "0");
     if (model != "") {
