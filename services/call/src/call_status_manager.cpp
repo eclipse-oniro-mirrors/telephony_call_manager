@@ -418,6 +418,7 @@ void CallStatusManager::SetContactInfo(sptr<CallBase> &call, std::string phoneNu
         return;
     }
     ffrt::submit([=, &call]() {
+        sptr<CallBase> callObjectPtr = call;
         // allow list filtering
         // Get the contact data from the database
         ContactInfo contactInfo = {
@@ -430,7 +431,7 @@ void CallStatusManager::SetContactInfo(sptr<CallBase> &call, std::string phoneNu
             .isVoiceMail = false,
         };
         QueryCallerInfo(contactInfo, phoneNum);
-        call->SetCallerInfo(contactInfo);
+        callObjectPtr->SetCallerInfo(contactInfo);
     });
 }
 
