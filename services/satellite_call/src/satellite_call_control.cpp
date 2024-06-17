@@ -127,8 +127,7 @@ void SatelliteCallControl::HandleSatelliteCallStateUpdate(sptr<CallBase> &call,
             vec);
     }
     if (nextState == TelCallState::CALL_STATUS_ACTIVE) {
-        int temp = stoi(tempLevel);
-        if ((SatCommTempLevel)temp == SatCommTempLevel::TEMP_LEVEL_HIGH &&
+        if (GetSatcommTempLevel() == SatCommTempLevel::TEMP_LEVEL_HIGH &&
             CallObjectManager::HasSatelliteCallExist()) {
             DelayedSingleton<CallDialog>::GetInstance()->DialogConnectExtension("SATELLITE_CALL_DISCONNECT");
             SetShowDialog(true);
