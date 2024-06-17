@@ -52,7 +52,6 @@ bool AlertingState::ProcessEvent(int32_t event)
             // check is should play ringback tone.
             result = DelayedSingleton<AudioSceneProcessor>::GetInstance()->ProcessEvent(
                 AudioEvent::SWITCH_ALERTING_STATE);
-
             break;
         default:
             break;
