@@ -192,6 +192,9 @@ int32_t CallStatusManager::HandleCallsReportInfo(const CallDetailsInfo &info)
                     it.callType != it1.callType || it.callMode != it1.callMode) {
                     TELEPHONY_LOGI("handle updated call state:%{public}d", it.state);
                     HandleCallReportInfo(it);
+                } else if (it.state == TelCallState::CALL_STATUS_ALERTING) {
+                    TELEPHONY_LOGI("handle updated call state alerting check is should palyRingTone");
+                    HandleCallReportInfo(it);
                 }
                 flag = true;
                 break;
