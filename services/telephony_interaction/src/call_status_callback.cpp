@@ -19,6 +19,7 @@
 #include "call_ability_report_proxy.h"
 #include "call_manager_errors.h"
 #include "call_manager_hisysevent.h"
+#include "cpp/task_ext.h"
 #include "hitrace_meter.h"
 #include "report_call_info_handler.h"
 #include "telephony_log_wrapper.h"
@@ -27,6 +28,8 @@ namespace OHOS {
 namespace Telephony {
 constexpr size_t CHAR_INDEX = 0;
 constexpr int32_t ERR_CALL_ID = 0;
+const uint64_t DELAY_STOP_PLAY_TIME = 3000000;
+const int32_t MIN_MULITY_CALL_COUNT = 2;
 
 CallStatusCallback::CallStatusCallback() {}
 
@@ -371,11 +374,15 @@ int32_t CallStatusCallback::ReceiveUpdateCallMediaModeRequest(const CallModeRepo
 {
     TELEPHONY_LOGI("ReceiveUpdateCallMediaModeRequest result = %{public}d", response.result);
     int32_t ret = DelayedSingleton<ReportCallInfoHandler>::GetInstance()->ReceiveImsCallModeRequest(response);
-    DelayedSingleton<AudioControlManager>::GetInstance()->PlayWaitingTone();
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("ReceiveUpdateCallMediaModeRequest failed! errCode:%{public}d", ret);
     } else {
         TELEPHONY_LOGI("ReceiveUpdateCallMediaModeRequest success!");
+    }
+    if (DelayedSingleton<AudioControlManager>::GetInstance()->PlayWaitingTone() == TELEPHONY_SUCCESS) {
+        waitingToneHandle_ = ffrt::submit_h([&]() {
+            ShouldStopWaitingTone();
+            }, {}, {}, ffrt::task_attr().delay(DELAY_STOP_PLAY_TIME));
     }
     return ret;
 }
@@ -384,13 +391,28 @@ int32_t CallStatusCallback::ReceiveUpdateCallMediaModeResponse(const CallModeRep
 {
     TELEPHONY_LOGI("ReceiveUpdateCallMediaModeResponse result = %{public}d", response.result);
     int32_t ret = DelayedSingleton<ReportCallInfoHandler>::GetInstance()->ReceiveImsCallModeResponse(response);
-    DelayedSingleton<AudioControlManager>::GetInstance()->StopWaitingTone();
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("ReceiveUpdateCallMediaModeResponse failed! errCode:%{public}d", ret);
     } else {
         TELEPHONY_LOGI("ReceiveUpdateCallMediaModeResponse success!");
     }
+    if (waitingToneHandle_ != nullptr) {
+        if (int result = ffrt::skip(waitingToneHandle_) != TELEPHONY_SUCCESS) {
+            TELEPHONY_LOGE("ReceiveUpdateCallMediaModeResponse failed! result:%{public}d", result);
+        }
+        ShouldStopWaitingTone();
+    }
     return ret;
+}
+
+void CallStatusCallback::ShouldStopWaitingTone()
+{
+    bool hasRingingCall = false;
+    CallObjectManager::HasRingingCall(hasRingingCall);
+    if (hasRingingCall && CallObjectManager::GetCurrentCallNum > MIN_MULITY_CALL_COUNT) {
+        DelayedSingleton<AudioControlManager>::GetInstance()->StopWaitingTone();
+    }
+    waitingToneHandle_ = nullptr;
 }
 
 int32_t CallStatusCallback::InviteToConferenceResult(const int32_t result)

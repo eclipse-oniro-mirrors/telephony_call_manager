@@ -20,6 +20,7 @@
 
 #include "call_status_manager.h"
 #include "call_status_callback_stub.h"
+#include "ffrt.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -65,6 +66,12 @@ public:
     int32_t HandleCallDataUsageChanged(const int64_t result) override;
     int32_t HandleCameraCapabilitiesChanged(const CameraCapabilitiesReportInfo &cameraCapabilities) override;
     int32_t UpdateVoipEventInfo(const VoipCallEventInfo &info) override;
+
+private:
+    void ShouldStopWaitingTone();
+
+private:
+    ffrt::task_handle waitingToneHandle_ = nullptr;
 };
 } // namespace Telephony
 } // namespace OHOS
