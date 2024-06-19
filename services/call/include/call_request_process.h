@@ -77,7 +77,7 @@ private:
     int32_t HandleStartDial(bool isMMiCode, CellularCallInfo callInfo);
     int32_t HandleDialFail();
     int32_t GetOtherRingingCall(int32_t currentCallId);
-    int32_t EccDialPolicy(int32_t slotId);
+    int32_t EccDialPolicy();
 
 private:
     std::mutex mutex_;

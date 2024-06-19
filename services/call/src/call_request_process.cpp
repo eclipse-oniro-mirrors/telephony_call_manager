@@ -908,7 +908,7 @@ int32_t CallRequestProcess::HandleEccCallForDsda(std::string newPhoneNum, DialPa
         DelayedSingleton<CallNumberUtils>::GetInstance()->CheckNumberIsEmergency(newPhoneNum, info.accountId, isEcc);
     TELEPHONY_LOGE("CheckNumberIsEmergency ret is %{public}d", ret);
     if (isEcc && IsDsdsMode5()) {
-        return EccDialPolicy(info.accountId);
+        return EccDialPolicy();
     }
     return TELEPHONY_SUCCESS;
 }
@@ -978,14 +978,16 @@ bool CallRequestProcess::IsFdnNumber(std::vector<std::u16string> fdnNumberList, 
     return false;
 }
 
-int32_t CallRequestProcess::EccDialPolicy(int32_t slotId)
+int32_t CallRequestProcess::EccDialPolicy()
 {
+    std::size_t callNum = 0;
     std::list<int32_t> callIdList;
     std::list<sptr<CallBase>> hangupList;
-
+    std::list<sptr<CallBase>> rejectList;
     GetCarrierCallList(callIdList);
-    for (int32_t otherCallId : callIdList) {
-        sptr<CallBase> call = GetOneCallObject(otherCallId);
+    callNum = callIdList.size();
+    for (int32_t callId : callIdList) {
+        sptr<CallBase> call = GetOneCallObject(callId);
         if (call == nullptr) {
             continue;
         }
@@ -997,23 +999,30 @@ int32_t CallRequestProcess::EccDialPolicy(int32_t slotId)
             crState == CallRunningState::CALL_RUNNING_STATE_DIALING) {
             if (call->GetEmergencyState()) {
                 hangupList.clear();
+                rejectList.clear();
                 TELEPHONY_LOGE("already has ecc call dailing!");
                 return CALL_ERR_CALL_COUNTS_EXCEED_LIMIT;
             }
             hangupList.emplace_back(call);
         } else if (crState == CallRunningState::CALL_RUNNING_STATE_RINGING) {
-            if (call->GetSlotId() != slotId && !call->GetEmergencyState()) {
-                continue;
+            rejectList.emplace_back(call);
+        } else if (crState == CallRunningState::CALL_RUNNING_STATE_ACTIVE) {
+            if (callNum > 1) {
+                hangupList.emplace_back(call);
             }
-            hangupList.emplace_back(call);
         }
     }
-
     for (sptr<CallBase> call : hangupList) {
-        int32_t callID = call->GetCallID();
+        int32_t callId = call->GetCallID();
         CallRunningState crState = call->GetCallRunningState();
-        TELEPHONY_LOGE("HangUpCall call[id:%{public}d state:%{public}d]", callID, crState);
+        TELEPHONY_LOGE("HangUpCall call[id:%{public}d state:%{public}d]", callId, crState);
         call->HangUpCall();
+    }
+    for (sptr<CallBase> call : rejectList) {
+        int32_t callId = call->GetCallID();
+        CallRunningState crState = call->GetCallRunningState();
+        TELEPHONY_LOGE("RejectCall call[id:%{public}d state:%{public}d]", callId, crState);
+        call->RejectCall();
     }
     hangupList.clear();
     return TELEPHONY_SUCCESS;
