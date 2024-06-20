@@ -22,6 +22,7 @@ ohos_shared_library("call") {
     cfi = true
     cfi_cross_dso = true
     debug = false
+    cfi_vcall_icall_only = true
   }
   branch_protector_ret = "pac_ret"
   sources = [

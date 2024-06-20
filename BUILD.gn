@@ -18,6 +18,7 @@ ohos_shared_library("tel_call_manager") {
     cfi = true
     cfi_cross_dso = true
     debug = false
+    cfi_vcall_icall_only = true
   }
   branch_protector_ret = "pac_ret"
   sources = [
