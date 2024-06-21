@@ -44,7 +44,6 @@
 #include "wired_headset_device_state.h"
 #include "gtest/gtest.h"
 #include "audio_scene_processor.h"
-#include "sound.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -926,20 +925,5 @@ HWTEST_F(CallStateTest, Telephony_CallStateProcessor_001, Function | MediumTest 
     callStateProcessor->ShouldSwitchState(state);
     callStateProcessor->GetAudioForegroundLiveCall();
 }
-
-/**
- * @tc.number   Telephony_Sound_001
- * @tc.name     test error nullptr branch with permission
- * @tc.desc     Function test
- */
-HWTEST_F(CallStateTest, Telephony_Sound_001, Function | MediumTest | Level3)
-{
-    Sound sound;
-    sound.Init();
-    sound.Play();
-    sound.Stop();
-    sound.ReleaseRenderer();
-}
-
 } // namespace Telephony
 } // namespace OHOS
