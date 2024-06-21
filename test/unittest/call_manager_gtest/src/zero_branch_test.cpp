@@ -63,6 +63,8 @@
 #include "token_setproc.h"
 #include "nativetoken_kit.h"
 #include "number_identity_data_base_helper.h"
+#include "call_ability_callback_death_recipient.h"
+#include "app_state_observer.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -2547,6 +2549,12 @@ HWTEST_F(BranchTest, Telephony_CallStateReportProxy_001, Function | MediumTest |
     callObjectPtr->SetTelCallState(TelCallState::CALL_STATUS_ACTIVE);
     callStateReportPtr.CallStateUpdated(
         callObjectPtr, TelCallState::CALL_STATUS_INCOMING, TelCallState::CALL_STATUS_INCOMING);
+    callStateReportPtr.UpdateCallState(callObjectPtr, TelCallState::CALL_STATUS_INCOMING);
+    callStateReportPtr.UpdateCallStateForSlotId(callObjectPtr, TelCallState::CALL_STATUS_INCOMING);
+    std::u16string phoneNumber = "123456789012";
+    callStateReportPtr.ReportCallState(static_cast<int32_t>::(TelCallState::CALL_STATUS_INCOMING), phoneNumber);
+    callStateReportPtr.ReportCallStateForCallId(0, static_cast<int32_t>::(TelCallState::CALL_STATUS_INCOMING),
+        phoneNumber);
 }
 
 /**
@@ -2839,5 +2847,189 @@ HWTEST_F(BranchTest, Telephony_DistributedCallProxy_001, Function | MediumTest |
     proxy->GetDCallDeviceInfo(TEST_STR, devInfo);
     proxy->UnInit();
 }
+
+/**
+ * @tc.number   Telephony_BluetoothCallStub_001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_BluetoothCallStub_001, Function | MediumTest | Level3)
+{
+    BluetoothCallStub bluetoothCallStub;
+    uint32_t code = 0;
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    bluetoothCallStub.OnRemoteRequest(code, data, reply, option);
+    bluetoothCallStub.OnAnswerCall(data, reply);
+    bluetoothCallStub.OnRejectCall(data, reply);
+    bluetoothCallStub.OnHangUpCall(data, reply);
+    bluetoothCallStub.OnGetBtCallState(data, reply);
+    bluetoothCallStub.OnHoldCall(data, reply);
+    bluetoothCallStub.OnUnHoldCall(data, reply);
+    bluetoothCallStub.OnSwitchCall(data, reply);
+    bluetoothCallStub.OnStartDtmf(data, reply);
+    bluetoothCallStub.OnStopDtmf(data, reply);
+    bluetoothCallStub.OnCombineConference(data, reply);
+    bluetoothCallStub.OnSeparateConference(data, reply);
+    bluetoothCallStub.OnKickOutFromConference(data, reply);
+    bluetoothCallStub.OnGetCurrentCallList(data, reply);
+}
+
+/**
+ * @tc.number   Telephony_BluetoothCallManager_001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_BluetoothCallManager_001, Function | MediumTest | Level3)
+{
+    int32_t state = 0;
+    int32_t numActive = GetCallNum(TelCallState::CALL_STATUS_ACTIVE);
+    int32_t numHeld = GetCallNum(TelCallState::CALL_STATUS_HOLDING);
+    int32_t numDial = GetCallNum(TelCallState::CALL_STATUS_DIALING);
+    int32_t callState = static_cast<int32_t>(TelCallState::CALL_STATUS_IDLE);
+    std::string number = GetCallNumber(TelCallState::CALL_STATUS_HOLDING);
+    BluetoothCallManager bluetoothCallManager;
+    bluetoothCallManager.SendBtCallState(numActive, numHeld, callState, number);
+    bluetoothCallManager.SendCallDetailsChange(1, 1);
+    bluetoothCallManager.GetBtScoState();
+    bluetoothCallManager.IsBtAvailble();
+    bluetoothCallManager.GetConnectedScoAddr();
+    bluetoothCallManager.GetConnectedScoName();
+    bluetoothCallManager.IsBtScoConnected();
+}
+
+/**
+ * @tc.number   Telephony_BluetoothConnection_001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_BluetoothConnection_001, Function | MediumTest | Level3)
+{
+    int32_t state = 0;
+    int32_t numActive = GetCallNum(TelCallState::CALL_STATUS_ACTIVE);
+    int32_t numHeld = GetCallNum(TelCallState::CALL_STATUS_HOLDING);
+    int32_t numDial = GetCallNum(TelCallState::CALL_STATUS_DIALING);
+    int32_t callState = static_cast<int32_t>(TelCallState::CALL_STATUS_IDLE);
+    std::string number = GetCallNumber(TelCallState::CALL_STATUS_HOLDING);
+    BluetoothConnection bluetoothConnection;
+    bluetoothConnection.Init();
+    bluetoothConnection.IsBtScoConnected();
+    bluetoothConnection.GetBtScoState();
+    bluetoothConnection.SetBtScoState(BtScoState::SCO_STATE_CONNECTED);
+    bluetoothConnection.SendBtCallState(numActive, numHeld, callState, number);
+    bluetoothConnection.SendCallDetailsChange(1, 1);
+    bluetoothConnection.RemoveBtDevice(number);
+    bluetoothConnection.IsBtAvailble();
+    bluetoothConnection.GetConnectedScoAddr();
+    bluetoothConnection.GetConnectedScoName();
+    bluetoothConnection.ResetBtConnection();
+    bluetoothConnection.RegisterObserver();
+    bluetoothConnection.IsAudioActivated();
+}
+
+/**
+ * @tc.number   Telephony_CallAbilityCallbackDeathRecipient_001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_CallAbilityCallbackDeathRecipient_001, Function | MediumTest | Level3)
+{
+    CallAbilityCallbackDeathRecipient recipient;
+    auto object = new (OHOS::wptr<OHOS::IRemoteObject> );
+    recipient.OnRemoteDied(object);
+}
+
+/**
+ * @tc.number   Telephony_ApplicationStateObserver_001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_ApplicationStateObserver_001, Function | MediumTest | Level3)
+{
+    ApplicationStateObserver applicationStateObserver;
+    AppExecFwk::ProcessData processData;
+    applicationStateObserver.OnProcessDied(processData);
+}
+
+/**
+ * @tc.number   Telephony_CallAbilityCallbackProxy_001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_CallAbilityCallbackProxy, Function | MediumTest | Level3)
+{
+    sptr<IRemoteObject> impl = new EmergencyCallConnectCallback();
+    CallAbilityCallbackProxy callAbilityCallbackProxy(impl);
+    callAbilityCallbackProxy.SetProcessCallback(nullptr);
+    CallAttributeInfo callAttributeInfo;
+    callAbilityCallbackProxy.OnCallDetailsChange(callAttributeInfo);
+    CallEventInfo info;
+    callAbilityCallbackProxy.OnCallEventChange(info);
+    DisconnectedDetails details;
+    callAbilityCallbackProxy.OnCallDisconnectedCause(details);
+    AppExecFwk::PacMap resultInfo;
+    
+    callAbilityCallbackProxy.OnReportAsyncResults(CallResultReportId::GET_CALL_CLIP_ID, resultInfo);
+    MmiCodeInfo mmiCodeInfo;
+    callAbilityCallbackProxy.OnReportMmiCodeResult(mmiCodeInfo);
+    callAbilityCallbackProxy.OnOttCallRequest(OttCallRequestId::OTT_REQUEST_ANSWER, resultInfo);
+    CallMediaModeInfo imsCallModeInfo;
+    callAbilityCallbackProxy.OnReportImsCallModeChange(imsCallModeInfo);
+    CallSessionEvent callSessionEventOptions;
+    callAbilityCallbackProxy.OnReportCallSessionEventChange(callSessionEventOptions);
+    PeerDimensionsDetail peerDimensionsDetail;
+    callAbilityCallbackProxy.OnReportPeerDimensionsChange(peerDimensionsDetail);
+    int64_t dataUsage = 0;
+    callAbilityCallbackProxy.OnReportCallDataUsageChange(dataUsage);
+    CameraCapabilities cameraCapabilities;
+    callAbilityCallbackProxy.OnReportCameraCapabilities(cameraCapabilities);
+}
+
+/**
+ * @tc.number   Telephony_CallBroadcastSubscriber_001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_CallBroadcastSubscriber_001, Function | MediumTest | Level3)
+{
+    EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_SIM_STATE_CHANGED);
+    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
+    CallBroadcastSubscriber subscriber(subscriberInfo);
+    EventFwk::CommonEventData eventData;
+    subscriber.OnReceiveEvent(eventData);
+    subscriber.UnknownBroadcast(eventData);
+    subscriber.SimStateBroadcast(eventData);
+    subscriber.ConnectCallUiServiceBroadcast(eventData);
+    subscriber.HighTempLevelChangedBroadcast(eventData);
+    subscriber.ConnectCallUiSuperPrivacyModeBroadcast(eventData);
+}
+
+/**
+ * @tc.number   Telephony_OTTCallConnection_001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_OTTCallConnection_001, Function | MediumTest | Level3)
+{
+    OTTCallConnection ott;
+    OttCallRequestInfo requestInfo;
+    ott.Answer(requestInfo);
+    ott.HoldCall(requestInfo);
+    ott.HangUp(requestInfo);
+    ott.Reject(requestInfo);
+    ott.UnHoldCall(requestInfo);
+    ott.SwitchCall(requestInfo);
+    ott.CombineConference(requestInfo);
+    ott.SeparateConference(requestInfo);
+    ott.KickOutFromConference(requestInfo);
+    std::vector<std::string> numberList;
+    ott.InviteToConference(requestInfo, numberList);
+    ott.UpdateImsCallMode(requestInfo, ImsCallMode::CALL_MODE_AUDIO_ONLY);
+    AppExecFwk::PacMap info;
+    ott.PackCellularCallInfo(requestInfo, info);
+}
+
 } // namespace Telephony
 } // namespace OHOS
