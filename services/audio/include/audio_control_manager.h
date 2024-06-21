@@ -103,6 +103,7 @@ private:
     bool IsBtOrWireHeadPlugin();
     void ProcessAudioWhenCallActive(sptr<CallBase> &callObjectPtr);
     int32_t HandleDistributeAudioDevice(const AudioDevice &device);
+    void SendMuteRingEvent();
     ToneState toneState_ = ToneState::STOPPED;
     SoundState soundState_ = SoundState::STOPPED;
     bool isLocalRingbackNeeded_ = false;
