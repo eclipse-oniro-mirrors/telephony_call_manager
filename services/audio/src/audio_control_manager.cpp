@@ -67,7 +67,9 @@ void AudioControlManager::UpdateForegroundLiveCall()
         TELEPHONY_LOGE("liveCall is nullptr");
         return;
     }
-    if (liveCall->GetTelCallState() == TelCallState::CALL_STATUS_ACTIVE) {
+    if (liveCall->GetTelCallState() == TelCallState::CALL_STATUS_ACTIVE ||
+        liveCall->GetTelCallState() == TelCallState::CALL_STATUS_DIALING ||
+        liveCall->GetTelCallState() == TelCallState::CALL_STATUS_ALERTING) {
         if (frontCall_ == nullptr) {
             frontCall_ = liveCall;
         } else {
