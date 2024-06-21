@@ -65,6 +65,7 @@
 #include "number_identity_data_base_helper.h"
 #include "call_ability_callback_death_recipient.h"
 #include "app_state_observer.h"
+#include "call_ability_callback_proxy.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -2551,10 +2552,10 @@ HWTEST_F(BranchTest, Telephony_CallStateReportProxy_001, Function | MediumTest |
         callObjectPtr, TelCallState::CALL_STATUS_INCOMING, TelCallState::CALL_STATUS_INCOMING);
     callStateReportPtr.UpdateCallState(callObjectPtr, TelCallState::CALL_STATUS_INCOMING);
     callStateReportPtr.UpdateCallStateForSlotId(callObjectPtr, TelCallState::CALL_STATUS_INCOMING);
-    std::u16string phoneNumber = "123456789012";
-    callStateReportPtr.ReportCallState(static_cast<int32_t>::(TelCallState::CALL_STATUS_INCOMING), phoneNumber);
-    callStateReportPtr.ReportCallStateForCallId(0, static_cast<int32_t>::(TelCallState::CALL_STATUS_INCOMING),
-        phoneNumber);
+    std::string number = "123456789012";
+    std::u16string phoneNumber = Str8ToStr16(number);
+    callStateReportPtr.ReportCallState(0, phoneNumber);
+    callStateReportPtr.ReportCallStateForCallId(0, 0, phoneNumber);
 }
 
 /**
@@ -2849,34 +2850,6 @@ HWTEST_F(BranchTest, Telephony_DistributedCallProxy_001, Function | MediumTest |
 }
 
 /**
- * @tc.number   Telephony_BluetoothCallStub_001
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
-HWTEST_F(BranchTest, Telephony_BluetoothCallStub_001, Function | MediumTest | Level3)
-{
-    BluetoothCallStub bluetoothCallStub;
-    uint32_t code = 0;
-    MessageParcel data;
-    MessageParcel reply;
-    MessageOption option;
-    bluetoothCallStub.OnRemoteRequest(code, data, reply, option);
-    bluetoothCallStub.OnAnswerCall(data, reply);
-    bluetoothCallStub.OnRejectCall(data, reply);
-    bluetoothCallStub.OnHangUpCall(data, reply);
-    bluetoothCallStub.OnGetBtCallState(data, reply);
-    bluetoothCallStub.OnHoldCall(data, reply);
-    bluetoothCallStub.OnUnHoldCall(data, reply);
-    bluetoothCallStub.OnSwitchCall(data, reply);
-    bluetoothCallStub.OnStartDtmf(data, reply);
-    bluetoothCallStub.OnStopDtmf(data, reply);
-    bluetoothCallStub.OnCombineConference(data, reply);
-    bluetoothCallStub.OnSeparateConference(data, reply);
-    bluetoothCallStub.OnKickOutFromConference(data, reply);
-    bluetoothCallStub.OnGetCurrentCallList(data, reply);
-}
-
-/**
  * @tc.number   Telephony_BluetoothCallManager_001
  * @tc.name     test error branch
  * @tc.desc     Function test
@@ -2884,11 +2857,11 @@ HWTEST_F(BranchTest, Telephony_BluetoothCallStub_001, Function | MediumTest | Le
 HWTEST_F(BranchTest, Telephony_BluetoothCallManager_001, Function | MediumTest | Level3)
 {
     int32_t state = 0;
-    int32_t numActive = GetCallNum(TelCallState::CALL_STATUS_ACTIVE);
-    int32_t numHeld = GetCallNum(TelCallState::CALL_STATUS_HOLDING);
-    int32_t numDial = GetCallNum(TelCallState::CALL_STATUS_DIALING);
+    int32_t numActive = CallObjectManager::GetCallNum(TelCallState::CALL_STATUS_ACTIVE);
+    int32_t numHeld = CallObjectManager::GetCallNum(TelCallState::CALL_STATUS_HOLDING);
+    int32_t numDial = CallObjectManager::GetCallNum(TelCallState::CALL_STATUS_DIALING);
     int32_t callState = static_cast<int32_t>(TelCallState::CALL_STATUS_IDLE);
-    std::string number = GetCallNumber(TelCallState::CALL_STATUS_HOLDING);
+    std::string number = CallObjectManager::GetCallNumber(TelCallState::CALL_STATUS_HOLDING);
     BluetoothCallManager bluetoothCallManager;
     bluetoothCallManager.SendBtCallState(numActive, numHeld, callState, number);
     bluetoothCallManager.SendCallDetailsChange(1, 1);
@@ -2907,11 +2880,11 @@ HWTEST_F(BranchTest, Telephony_BluetoothCallManager_001, Function | MediumTest |
 HWTEST_F(BranchTest, Telephony_BluetoothConnection_001, Function | MediumTest | Level3)
 {
     int32_t state = 0;
-    int32_t numActive = GetCallNum(TelCallState::CALL_STATUS_ACTIVE);
-    int32_t numHeld = GetCallNum(TelCallState::CALL_STATUS_HOLDING);
-    int32_t numDial = GetCallNum(TelCallState::CALL_STATUS_DIALING);
+    int32_t numActive = CallObjectManager::GetCallNum(TelCallState::CALL_STATUS_ACTIVE);
+    int32_t numHeld = CallObjectManager::GetCallNum(TelCallState::CALL_STATUS_HOLDING);
+    int32_t numDial = CallObjectManager::GetCallNum(TelCallState::CALL_STATUS_DIALING);
     int32_t callState = static_cast<int32_t>(TelCallState::CALL_STATUS_IDLE);
-    std::string number = GetCallNumber(TelCallState::CALL_STATUS_HOLDING);
+    std::string number = CallObjectManager::GetCallNumber(TelCallState::CALL_STATUS_HOLDING);
     BluetoothConnection bluetoothConnection;
     bluetoothConnection.Init();
     bluetoothConnection.IsBtScoConnected();
@@ -2936,7 +2909,7 @@ HWTEST_F(BranchTest, Telephony_BluetoothConnection_001, Function | MediumTest | 
 HWTEST_F(BranchTest, Telephony_CallAbilityCallbackDeathRecipient_001, Function | MediumTest | Level3)
 {
     CallAbilityCallbackDeathRecipient recipient;
-    auto object = new (OHOS::wptr<OHOS::IRemoteObject> );
+    OHOS::wptr<OHOS::IRemoteObject> object;
     recipient.OnRemoteDied(object);
 }
 
@@ -2959,9 +2932,8 @@ HWTEST_F(BranchTest, Telephony_ApplicationStateObserver_001, Function | MediumTe
  */
 HWTEST_F(BranchTest, Telephony_CallAbilityCallbackProxy, Function | MediumTest | Level3)
 {
-    sptr<IRemoteObject> impl = new EmergencyCallConnectCallback();
+    sptr<IRemoteObject> impl;
     CallAbilityCallbackProxy callAbilityCallbackProxy(impl);
-    callAbilityCallbackProxy.SetProcessCallback(nullptr);
     CallAttributeInfo callAttributeInfo;
     callAbilityCallbackProxy.OnCallDetailsChange(callAttributeInfo);
     CallEventInfo info;

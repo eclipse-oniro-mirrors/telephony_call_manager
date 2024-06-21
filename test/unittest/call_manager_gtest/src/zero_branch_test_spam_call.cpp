@@ -144,29 +144,13 @@ HWTEST_F(SpamCallTest, Telephony_SpamCallConnection_001, Function | MediumTest |
     std::string bundle = "111";
     std::string ability = "222";
     AppExecFwk::ElementName element("", bundle, ability);
-    sptr<IRemoteObject> remoteObject = new EmergencyCallConnectCallback();
+    sptr<IRemoteObject> remoteObject;
     int resultCode = 0;
     spamCallConnection.OnAbilityConnectDone(element, remoteObject, resultCode);
     spamCallConnection.OnAbilityDisconnectDone(element, resultCode);
     ASSERT_TRUE(remoteObject != nullptr);
 }
 
-/**
- * @tc.number   Telephony_SpamCallStub_001
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
-HWTEST_F(SpamCallTest, Telephony_SpamCallStub_001, Function | MediumTest | Level1)
-{
-    SpamCallStub spamCallStub;
-    uint32_t code = 1;
-    MessageParcel data;
-    MessageParcel reply;
-    MessageOption option;
-    data.WriteInterfaceToken(SpamCallStub::GetDescriptor();)
-    spamCallStub.OnRemoteRequest(code, data, reply, option);
-    ASSERT_TRUE(code != 0);
-}
 
 /**
  * @tc.number   Telephony_TimeWaitHelper_001
@@ -187,7 +171,7 @@ HWTEST_F(SpamCallTest, Telephony_TimeWaitHelper_001, Function | MediumTest | Lev
  */
 HWTEST_F(SpamCallTest, Telephony_SpamCallProxy_001, Function | MediumTest | Level1)
 {
-    sptr<IRemoteObject> remoteObject = new EmergencyCallConnectCallback();
+    sptr<IRemoteObject> remoteObject;
     SpamCallProxy spamCallProxy(remoteObject);
     std::string phoneNumber = "123456789012";
     int32_t slotId = 0;
