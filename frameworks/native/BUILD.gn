@@ -27,6 +27,7 @@ ohos_shared_library("tel_call_manager_api") {
     cfi = true
     cfi_cross_dso = true
     debug = false
+    cfi_vcall_icall_only = true
   }
   branch_protector_ret = "pac_ret"
   version_script = "tel_call_manager_api.versionscript"
