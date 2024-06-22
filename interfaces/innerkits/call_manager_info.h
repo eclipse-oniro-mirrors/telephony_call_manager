@@ -182,6 +182,10 @@ struct CallReportInfo {
      * Indicates the VoIP call specific information
      */
     VoipCallReportInfo voipCallInfo;
+    /**
+     * Call state between with holdRequest and holdResponse
+     */
+    bool isPendingHold = false;
 };
 
 /**
