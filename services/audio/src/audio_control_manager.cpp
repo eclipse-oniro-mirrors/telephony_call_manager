@@ -87,6 +87,28 @@ void AudioControlManager::UpdateForegroundLiveCall()
     }
 }
 
+void AudioControlManager::HandleCallStateUpdatedForVoip(
+    sptr<CallBase> &callObjectPtr, TelCallState priorState, TelCallState nextState)
+{
+    TELEPHONY_LOGI("control audio for voip start, callId:%{public}d, priorState:%{public}d, nextState:%{public}d",
+        callObjectPtr->GetCallID(), priorState, nextState);
+    if (priorState == TelCallState::CALL_STATUS_INCOMING && nextState == TelCallState::CALL_STATUS_INCOMING) {
+        if (DelayedSingleton<CallObjectManager>::GetInstance()->GetVoipCallNum() == 1) {
+            AudioDevice device = {
+                .deviceType = AudioDeviceType::DEVICE_EARPIECE,
+                .address = { 0 },
+            };
+            if (DelayedSingleton<AudioProxy>::GetInstance()->GetPreferredOutputAudioDevice(device) ==
+                TELEPHONY_SUCCESS) {
+                DelayedSingleton<AudioDeviceManager>::GetInstance()->SetCurrentAudioDevice(device.deviceType);
+                TELEPHONY_LOGI("control audio for voip finish, callId:%{public}d", callObjectPtr->GetCallID());
+            } else {
+                TELEPHONY_LOGE("current audio device nullptr when control audio for voip");
+            }
+        }
+    }
+}
+
 void AudioControlManager::CallStateUpdated(
     sptr<CallBase> &callObjectPtr, TelCallState priorState, TelCallState nextState)
 {
@@ -95,7 +117,7 @@ void AudioControlManager::CallStateUpdated(
         return;
     }
     if (callObjectPtr->GetCallType() == CallType::TYPE_VOIP) {
-        TELEPHONY_LOGI("voip call not need control audio");
+        HandleCallStateUpdatedForVoip(callObjectPtr, priorState, nextState);
         return;
     }
     std::lock_guard<std::mutex> lock(mutex_);

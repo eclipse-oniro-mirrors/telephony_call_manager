@@ -246,6 +246,19 @@ int32_t CallObjectManager::GetCarrierCallList(std::list<int32_t> &list)
     return TELEPHONY_SUCCESS;
 }
 
+int32_t CallObjectManager::GetVoipCallNum()
+{
+    int32_t count = 0;
+    std::lock_guard<std::mutex> lock(listMutex_);
+    std::list<sptr<CallBase>>::iterator it;
+    for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
+        if ((*it)->GetCallType() == CallType::TYPE_VOIP) {
+            count++;
+        }
+    }
+    return count;
+}
+
 int32_t CallObjectManager::GetVoipCallList(std::list<int32_t> &list)
 {
     list.clear();
