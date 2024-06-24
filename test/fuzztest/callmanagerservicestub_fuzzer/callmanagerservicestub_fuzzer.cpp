@@ -90,7 +90,7 @@ int32_t ReportAudioDeviceInfo(const uint8_t *data, size_t size)
     }
     MessageParcel dataParcel;
     MessageParcel reply;
-   return  DelayedSingleton<CallManagerService>::GetInstance()->OnReportAudioDeviceInfo(dataParcel, reply);
+    return  DelayedSingleton<CallManagerService>::GetInstance()->OnReportAudioDeviceInfo(dataParcel, reply);
 }
 
 int32_t PostDialProceed(const uint8_t *data, size_t size)
@@ -185,8 +185,12 @@ int32_t SetCallRestrictionPassword(const uint8_t *data, size_t size)
     std::string msg(reinterpret_cast<const char *>(data), size);
     int32_t oldPasswordLength = msg.length() > kMaxNumberLen ? kMaxNumberLen : msg.length();
     int32_t newPasswordLength = msg.length() > kMaxBundleNameLen ? kMaxBundleNameLen : msg.length();
-    memcpy_s(oldPassword, kMaxNumberLen, msg.c_str(), oldPasswordLength);
-    memcpy_s(newPassword, kMaxBundleNameLen, msg.c_str(), newPasswordLength);
+    if (memcpy_s(oldPassword, kMaxNumberLen, msg.c_str(), oldPasswordLength) != EOK) {
+        return TELEPHONY_ERROR;
+    }
+    if (memcpy_s(newPassword, kMaxBundleNameLen, msg.c_str(), newPasswordLength) != EOK) {
+        return TELEPHONY_ERROR;
+    }
 
     int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
     MessageParcel dataParcel;
