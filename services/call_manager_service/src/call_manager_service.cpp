@@ -407,10 +407,6 @@ int32_t CallManagerService::SwitchCall(int32_t callId)
 
 bool CallManagerService::HasCall()
 {
-    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_GET_TELEPHONY_STATE)) {
-        TELEPHONY_LOGE("Permission denied!");
-        return false;
-    }
     if (callControlManagerPtr_ != nullptr) {
         return callControlManagerPtr_->HasCall();
     } else {
