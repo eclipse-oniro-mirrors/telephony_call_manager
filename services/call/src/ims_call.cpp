@@ -512,18 +512,11 @@ sptr<VideoCallState> IMSCall::GetCallVideoState(ImsCallMode mode)
 
 bool IMSCall::IsVoiceModifyToVideo()
 {
-    if (videoCallState_ == nullptr) {
-        return false;
+    if (videoCallState_ != nullptr &&
+        VideoUpdateStatus::STATUS_SEND_REQUEST == videoCallState_->GetVideoUpdateStatus()) {
+        return true;
     }
-    switch (videoCallState_->GetVideoUpdateStatus()) {
-        case VideoUpdateStatus::STATUS_RECV_REQUEST:
-        case VideoUpdateStatus::STATUS_SEND_REQUEST:
-            return true;
-            break;
-        default:
-            return false;
-            break;
-    }
+    return false;
 }
 } // namespace Telephony
 } // namespace OHOS
