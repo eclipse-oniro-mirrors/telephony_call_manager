@@ -42,6 +42,7 @@ private:
     int32_t SetSatelliteCallCountDownProcessing();
     void RemoveCallDurationEventHandlerTask();
     void RemoveCallCountDownEventHandlerTask();
+    void SetUsedModem();
 
 private:
     SatCommTempLevel SatCommTempLevel_ = SatCommTempLevel::TEMP_LEVEL_LOW;
