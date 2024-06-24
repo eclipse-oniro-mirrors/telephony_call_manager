@@ -42,6 +42,8 @@ const int32_t DELAYED_TIME = 270000;
 const int32_t COUNT_DOWN_TIME = 30000;
 const int32_t SATELLITE_CONNECTED = 1;
 const int32_t SATELLITE_MODE_ON = 1;
+constexpr const char *SATELLITE_TYPE_DEFAULT_VALUE = "0";
+constexpr const char *TEL_SATELLITE_SUPPORT_TYPE = "const.telephony.satellite.support_type";
 
 SatelliteCallControl::SatelliteCallControl() = default;
 
@@ -79,11 +81,7 @@ int32_t SatelliteCallControl::IsAllowedSatelliteDialCall()
             DelayedSingleton<CallDialog>::GetInstance()->DialogConnectExtension("CANNOT_DIAL_SATELLITE_CALL");
             return TELEPHONY_ERROR;
         }
-        std::vector<std::pair<std::string, std::string>> vec = {
-            std::pair<std::string, std::string>("USEDMODEM", "satemodem")
-        };
-        AudioStandard::AudioSystemManager::GetInstance()->SetExtraParameters("mmi",
-            vec);
+        SetUsedModem();
         return TELEPHONY_SUCCESS;
     } else {
         PublishSatelliteConnectEvent();
@@ -109,7 +107,20 @@ SatCommTempLevel SatelliteCallControl::GetSatcommTempLevel()
 {
     return SatCommTempLevel_;
 }
-
+void SatelliteCallControl::SetUsedModem()
+{
+    char satelliteSupportType[SYSPARA_SIZE] = { 0 };
+    GetParameter(TEL_SATELLITE_SUPPORT_TYPE, SATELLITE_TYPE_DEFAULT_VALUE, satelliteSupportType, SYSPARA_SIZE);
+    int modem = static_cast<unsigned int>(std::atoi(satelliteSupportType));
+    TELEPHONY_LOGI("satellite modem = %{public}d." modem);
+    if (modem & 0b00000100 || modem & 0b00010000) {
+        std::vector<std::pair<std::string, std::string>> vec = {
+            std::pair<std::string, std::string>("USEDMODEM", "satemodem")
+        };
+        AudioStandard::AudioSystemManager::GetInstance()->SetExtraParameters("mmi",
+            vec);
+    }
+}
 void SatelliteCallControl::HandleSatelliteCallStateUpdate(sptr<CallBase> &call,
     TelCallState priorState, TelCallState nextState)
 {
@@ -120,11 +131,7 @@ void SatelliteCallControl::HandleSatelliteCallStateUpdate(sptr<CallBase> &call,
         SetShowDialog(false);
     }
     if (nextState == TelCallState::CALL_STATUS_INCOMING || nextState == TelCallState::CALL_STATUS_WAITING) {
-        std::vector<std::pair<std::string, std::string>> vec = {
-            std::pair<std::string, std::string>("USEDMODEM", "satemodem")
-        };
-        AudioStandard::AudioSystemManager::GetInstance()->SetExtraParameters("mmi",
-            vec);
+        SetUsedModem();
     }
     if (nextState == TelCallState::CALL_STATUS_ACTIVE) {
         if (GetSatcommTempLevel() == SatCommTempLevel::TEMP_LEVEL_HIGH &&
