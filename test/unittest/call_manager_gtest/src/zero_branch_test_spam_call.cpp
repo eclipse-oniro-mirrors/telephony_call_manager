@@ -19,6 +19,11 @@
 #define PROTECTED public
 #include "gtest/gtest.h"
 #include "spam_call_adapter.h"
+#include "callback_stub_helper.h"
+#include "spam_call_connection.h"
+#include "spam_call_stub.h"
+#include "time_wait_helper.h"
+#include "spam_call_proxy.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -89,6 +94,89 @@ HWTEST_F(SpamCallTest, Telephony_SpamCallAdapter_003, Function | MediumTest | Le
     spamCallAdapter_->ParseDetectResult(jsonData, isBlock, info, blockReason);
     ASSERT_TRUE(isBlock);
     ASSERT_EQ(blockReason, 1);
+}
+
+/**
+ * @tc.number   Telephony_CallbackStubHelper_001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(SpamCallTest, Telephony_CallbackStubHelper_001, Function | MediumTest | Level1)
+{
+    std::shared_ptr<SpamCallAdapter> spamCallAdapter = std::make_shared<SpamCallAdapter>();
+
+    CallbackStubHelper callbackStubHelper(spamCallAdapter);
+    int32_t errCode = 0;
+    std::string result;
+    int32_t res = 0;
+    res = callbackStubHelper.OnResult(errCode, result);
+    ASSERT_EQ(res, 0);
+}
+
+/**
+ * @tc.number   Telephony_CallbackStubHelper_002
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(SpamCallTest, Telephony_CallbackStubHelper_002, Function | MediumTest | Level1)
+{
+    std::shared_ptr<SpamCallAdapter> spamCallAdapter;
+
+    CallbackStubHelper callbackStubHelper(spamCallAdapter);
+    int32_t errCode = 0;
+    std::string result;
+    int32_t res = 0;
+    res = callbackStubHelper.OnResult(errCode, result);
+    ASSERT_EQ(res, 0);
+}
+
+/**
+ * @tc.number   Telephony_SpamCallConnection_001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(SpamCallTest, Telephony_SpamCallConnection_001, Function | MediumTest | Level1)
+{
+    std::string phoneNumber = "123456789012";
+    int32_t slotId = 0;
+    std::shared_ptr<SpamCallAdapter> spamCallAdapter = std::make_shared<SpamCallAdapter>();
+    SpamCallConnection spamCallConnection(phoneNumber, slotId, spamCallAdapter);
+    std::string bundle = "111";
+    std::string ability = "222";
+    AppExecFwk::ElementName element("", bundle, ability);
+    sptr<IRemoteObject> remoteObject;
+    int resultCode = 0;
+    spamCallConnection.OnAbilityConnectDone(element, remoteObject, resultCode);
+    spamCallConnection.OnAbilityDisconnectDone(element, resultCode);
+    ASSERT_TRUE(remoteObject != nullptr);
+}
+
+
+/**
+ * @tc.number   Telephony_TimeWaitHelper_001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(SpamCallTest, Telephony_TimeWaitHelper_001, Function | MediumTest | Level1)
+{
+    TimeWaitHelper timeWaitHelper(10);
+    timeWaitHelper.WaitForResult();
+    timeWaitHelper.NotifyAll();
+}
+
+/**
+ * @tc.number   Telephony_SpamCallProxy_001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(SpamCallTest, Telephony_SpamCallProxy_001, Function | MediumTest | Level1)
+{
+    sptr<IRemoteObject> remoteObject;
+    SpamCallProxy spamCallProxy(remoteObject);
+    std::string phoneNumber = "123456789012";
+    int32_t slotId = 0;
+    std::shared_ptr<SpamCallAdapter> spamCallAdapter = std::make_shared<SpamCallAdapter>();
+    spamCallProxy.DetectSpamCall(phoneNumber, slotId, spamCallAdapter);
 }
 }
 }
