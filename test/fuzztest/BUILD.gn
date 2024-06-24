@@ -34,4 +34,5 @@ group("fuzztest") {
   deps += [ "call_fuzzer:fuzztest" ]
   deps += [ "callabilitycallback_fuzzer:fuzztest" ]
   deps += [ "telephonyinteraction_fuzzer:fuzztest" ]
+  deps += [ "callmanagerservicestub_fuzzer:fuzztest" ]
 }
