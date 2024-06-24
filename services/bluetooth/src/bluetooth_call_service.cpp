@@ -113,6 +113,9 @@ int32_t BluetoothCallService::HangUpCall()
 
 int32_t BluetoothCallService::GetCallState()
 {
+    if (!TelephonyPermission::CheckPermission(Permission::GET_TELEPHONY_STATE)) {
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
     TELEPHONY_LOGI("Entry BluetoothCallService GetCallState");
     int32_t numActive = GetCallNum(TelCallState::CALL_STATUS_ACTIVE);
     int32_t numHeld = GetCallNum(TelCallState::CALL_STATUS_HOLDING);
@@ -222,6 +225,10 @@ int32_t BluetoothCallService::SwitchCall()
 
 int32_t BluetoothCallService::StartDtmf(char str)
 {
+    if (!TelephonyPermission::CheckPermission(Permission::ANSWER_CALL)) {
+        TELEPHONY_LOGE("Permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
     int32_t callId = ERR_ID;
     int32_t ret = StartDtmfPolicy(callId);
     if (ret != TELEPHONY_SUCCESS) {
@@ -243,6 +250,10 @@ int32_t BluetoothCallService::StartDtmf(char str)
 
 int32_t BluetoothCallService::StopDtmf()
 {
+    if (!TelephonyPermission::CheckPermission(Permission::ANSWER_CALL)) {
+        TELEPHONY_LOGE("Permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
     int32_t callId = ERR_ID;
     if (callControlManagerPtr_ != nullptr) {
         {
@@ -260,6 +271,10 @@ int32_t BluetoothCallService::StopDtmf()
 
 int32_t BluetoothCallService::CombineConference()
 {
+    if (!TelephonyPermission::CheckPermission(Permission::ANSWER_CALL)) {
+        TELEPHONY_LOGE("Permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
     int32_t callId = ERR_ID;
     int32_t ret = CombineConferencePolicy(callId);
     if (ret != TELEPHONY_SUCCESS) {
@@ -276,6 +291,10 @@ int32_t BluetoothCallService::CombineConference()
 
 int32_t BluetoothCallService::SeparateConference()
 {
+    if (!TelephonyPermission::CheckPermission(Permission::ANSWER_CALL)) {
+        TELEPHONY_LOGE("Permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
     int32_t callId = ERR_ID;
     if (callControlManagerPtr_ != nullptr) {
         return callControlManagerPtr_->SeparateConference(callId);
@@ -287,6 +306,10 @@ int32_t BluetoothCallService::SeparateConference()
 
 int32_t BluetoothCallService::KickOutFromConference()
 {
+    if (!TelephonyPermission::CheckPermission(Permission::ANSWER_CALL)) {
+        TELEPHONY_LOGE("Permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
     int32_t callId = ERR_ID;
     if (callControlManagerPtr_ != nullptr) {
         return callControlManagerPtr_->KickOutFromConference(callId);
