@@ -519,7 +519,7 @@ bool IMSCall::IsVoiceModifyToVideo()
         case VideoUpdateStatus::STATUS_RECV_REQUEST:
         case VideoUpdateStatus::STATUS_SEND_REQUEST:
             return true;
-        break;
+            break;
         default:
             return false;
             break;
