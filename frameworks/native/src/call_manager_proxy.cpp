@@ -427,7 +427,7 @@ int32_t CallManagerProxy::GetCallState()
     }
     int32_t errCode = callManagerServicePtr_->GetCallState();
     if (errCode != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("GetCallState failed, errcode:%{public}d", errCode);
+        TELEPHONY_LOGD("GetCallState failed, errcode:%{public}d", errCode);
         return errCode;
     }
     return TELEPHONY_SUCCESS;
