@@ -424,7 +424,7 @@ int32_t CallManagerServiceStub::OnSwitchCall(MessageParcel &data, MessageParcel 
 int32_t CallManagerServiceStub::OnHasCall(MessageParcel &data, MessageParcel &reply)
 {
     bool result = HasCall();
-    TELEPHONY_LOGI("result:%{public}d", result);
+    TELEPHONY_LOGD("result:%{public}d", result);
     if (!reply.WriteBool(result)) {
         TELEPHONY_LOGE("fail to write parcel");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;

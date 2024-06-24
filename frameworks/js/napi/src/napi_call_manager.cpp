@@ -5239,7 +5239,7 @@ void NapiCallManager::RegisterCallBack()
     }
     registerStatus_ = DelayedSingleton<CallManagerClient>::GetInstance()->RegisterCallBack(std::move(callbackPtr));
     if (registerStatus_ != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("RegisterCallBack failed!");
+        TELEPHONY_LOGD("RegisterCallBack failed!");
         return;
     }
 }
