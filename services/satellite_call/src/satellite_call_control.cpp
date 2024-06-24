@@ -121,6 +121,7 @@ void SatelliteCallControl::SetUsedModem()
             vec);
     }
 }
+
 void SatelliteCallControl::HandleSatelliteCallStateUpdate(sptr<CallBase> &call,
     TelCallState priorState, TelCallState nextState)
 {
