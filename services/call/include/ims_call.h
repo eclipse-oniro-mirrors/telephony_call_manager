@@ -69,6 +69,7 @@ public:
     int32_t SetDeviceDirection(int32_t rotation) override;
     int32_t CancelCallUpgrade() override;
     int32_t RequestCameraCapabilities() override;
+    bool IsVoiceModifyToVideo();
 
 private:
     void AssignVideoCallState(VideoStateType videoStateType);
