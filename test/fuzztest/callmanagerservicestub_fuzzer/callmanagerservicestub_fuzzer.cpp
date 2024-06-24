@@ -17,7 +17,7 @@
 
 #include <cstddef>
 #include <cstdint>
-#define private public
+#define PRIVATE public
 #include "addcalltoken_fuzzer.h"
 #include "call_manager_service_stub.h"
 #include "call_ability_callback.h"
@@ -180,24 +180,12 @@ int32_t SetCallRestrictionPassword(const uint8_t *data, size_t size)
     if (!IsServiceInited()) {
         return TELEPHONY_ERROR;
     }
-    char oldPassword[kMaxNumberLen + 1] = { 0 };
-    char newPassword[kMaxBundleNameLen + 1] = { 0 };
-    std::string msg(reinterpret_cast<const char *>(data), size);
-    int32_t oldPasswordLength = msg.length() > kMaxNumberLen ? kMaxNumberLen : msg.length();
-    int32_t newPasswordLength = msg.length() > kMaxBundleNameLen ? kMaxBundleNameLen : msg.length();
-    if (memcpy_s(oldPassword, kMaxNumberLen, msg.c_str(), oldPasswordLength) != EOK) {
-        return TELEPHONY_ERROR;
-    }
-    if (memcpy_s(newPassword, kMaxBundleNameLen, msg.c_str(), newPasswordLength) != EOK) {
-        return TELEPHONY_ERROR;
-    }
-
     int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
     MessageParcel dataParcel;
     dataParcel.WriteInt32(slotId);
     dataParcel.WriteInt32(static_cast<int32_t>(size));
-    dataParcel.WriteCString(oldPassword);
-    dataParcel.WriteCString(newPassword);
+    dataParcel.WriteBuffer(data, size);
+    dataParcel.RewindRead(0);
     MessageParcel reply;
     return DelayedSingleton<CallManagerService>::GetInstance()->OnSetCallRestrictionPassword(dataParcel, reply);
 }
