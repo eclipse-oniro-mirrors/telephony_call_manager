@@ -114,7 +114,7 @@ void SatelliteCallControl::SetUsedModem()
     GetParameter(TEL_SATELLITE_SUPPORT_TYPE, SATELLITE_TYPE_DEFAULT_VALUE, satelliteSupportType, SYSPARA_SIZE);
     int satelliteMode = static_cast<unsigned int>(std::atoi(satelliteSupportType));
     TELEPHONY_LOGI("satellite satelliteMode = %{public}d.", satelliteMode);
-    if (satelliteMode & 0b00000100 || satelliteMode & 0b00010000) {
+    if ((satelliteMode & 0b00000100) || (satelliteMode & 0b00010000)) {
         std::vector<std::pair<std::string, std::string>> vec = {
             std::pair<std::string, std::string>("USEDMODEM", "satemodem")
         };
