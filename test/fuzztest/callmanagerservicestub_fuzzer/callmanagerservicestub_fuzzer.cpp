@@ -17,7 +17,7 @@
 
 #include <cstddef>
 #include <cstdint>
-#define PRIVATE public
+#define private public
 #include "addcalltoken_fuzzer.h"
 #include "call_manager_service_stub.h"
 #include "call_ability_callback.h"
