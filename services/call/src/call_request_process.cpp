@@ -454,10 +454,10 @@ void CallRequestProcess::HandleCallWaitingNumZero(
             call->HangUpCall();
         } else if (call->GetCallRunningState() == CallRunningState::CALL_RUNNING_STATE_ACTIVE && !flagForConference) {
             sptr<IMSCall> imsCall = reinterpret_cast<IMSCall *>(call.GetRefPtr());
-            imsCall->StartRtt(msg);
             if (imsCall != nullptr && imsCall->IsVoiceModifyToVideo()) {
                 TELEPHONY_LOGI("hangup call during voice to video when answerCall");
-                call->HoldCall();
+                call->HangUpCall();
+                return;
             }
             TELEPHONY_LOGI("enter zero active call hold");
             call->HoldCall();
