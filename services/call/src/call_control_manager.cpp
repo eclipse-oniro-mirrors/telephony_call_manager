@@ -207,6 +207,13 @@ int32_t CallControlManager::AnswerCall(int32_t callId, int32_t videoState)
         TELEPHONY_LOGE("call is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
+    int32_t ret = AnswerCallPolicy(callId, videoState);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("AnswerCallPolicy failed!");
+        CallManagerHisysevent::WriteAnswerCallFaultEvent(
+            INVALID_PARAMETER, callId, videoState, ret, "AnswerCallPolicy failed");
+        return ret;
+    }
     AnswerHandlerForSatelliteOrVideoCall(call, videoState);
     TELEPHONY_LOGI("report answered state");
     NotifyCallStateUpdated(call, TelCallState::CALL_STATUS_INCOMING, TelCallState::CALL_STATUS_ANSWERED);
@@ -217,13 +224,6 @@ int32_t CallControlManager::AnswerCall(int32_t callId, int32_t videoState)
             AnsweredCallQueue_.callId = callId;
             AnsweredCallQueue_.videoState = videoState;
             return TELEPHONY_SUCCESS;
-    }
-    int32_t ret = AnswerCallPolicy(callId, videoState);
-    if (ret != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("AnswerCallPolicy failed!");
-        CallManagerHisysevent::WriteAnswerCallFaultEvent(
-            INVALID_PARAMETER, callId, videoState, ret, "AnswerCallPolicy failed");
-        return ret;
     }
     if (CallRequestHandlerPtr_ == nullptr) {
         TELEPHONY_LOGE("CallRequestHandlerPtr_ is nullptr!");
