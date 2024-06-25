@@ -74,6 +74,17 @@ void CallStateReportProxy::UpdateCallState(sptr<CallBase> &callObjectPtr, TelCal
     ReportCallState(static_cast<int32_t>(info.callState), accountNumber);
 }
 
+void CallStateReportProxy::UpdateCallStateForVoIP(TelCallState nextState)
+{
+    if (nextState == currentCallState_) {
+        TELEPHONY_LOGI("call state is not changed, currentCallState_:%{public}d!", currentCallState_);
+        return;
+    }
+    currentCallState_ = nextState;
+    std::u16string number = u"";
+    ReportCallState(static_cast<int32_t>(nextState), number);
+}
+
 void CallStateReportProxy::UpdateCallStateForSlotId(sptr<CallBase> &callObjectPtr, TelCallState nextState)
 {
     CallAttributeInfo info;

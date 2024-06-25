@@ -1252,6 +1252,28 @@ int32_t CallControlManager::RemoveMissedIncomingCallNotification()
 
 int32_t CallControlManager::SetVoIPCallState(int32_t state)
 {
+    std::shared_ptr<CallStateReportProxy> callStateReportPtr = std::make_shared<CallStateReportProxy>();
+    std::string identity = IPCSkeleton::ResetCallingIdentity();
+    if (callStateReportPtr != nullptr) {
+        TELEPHONY_LOGI("report voip call state");
+        TelCallState nextState = TelCallState::CALL_STATUS_IDLE;
+        switch ((CallStateToApp)state) {
+            case CallStateToApp::CALL_STATE_IDLE:
+                nextState = TelCallState::CALL_STATUS_IDLE;
+                break;
+            case CallStateToApp::CALL_STATE_OFFHOOK:
+                nextState = TelCallState::CALL_STATUS_ACTIVE;
+                break;
+            case CallStateToApp::CALL_STATE_RINGING:
+                nextState = TelCallState::CALL_STATUS_INCOMING;
+                break;
+            case CallStateToApp::CALL_STATE_ANSWERED:
+                nextState = TelCallState::CALL_STATUS_ANSWERED;
+                break;
+        }
+         callStateReportPtr->UpdateCallStateForVoIP(nextState);
+    }
+    IPCSkeleton::SetCallingIdentity(identity);
     TELEPHONY_LOGI("VoIP state is %{public}d", state);
     VoIPCallState_ = (CallStateToApp)state;
     if (VoIPCallState_ == CallStateToApp::CALL_STATE_ANSWERED) {
