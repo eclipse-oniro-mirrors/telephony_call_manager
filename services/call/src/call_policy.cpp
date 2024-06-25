@@ -30,7 +30,7 @@
 
 namespace OHOS {
 namespace Telephony {
-const std::string EMERGENCYCOMMUNICATION_BUNDLE_NAME = "com.huawei.hmos.emergencycommunication";
+const std::string EMERGENCYCOMMUNICATION_BUNDLE_NAME = "emergencycommunication";
 CallPolicy::CallPolicy() {}
 
 CallPolicy::~CallPolicy() {}
@@ -98,7 +98,7 @@ int32_t CallPolicy::SuperPrivacyMode(std::u16string &number, AppExecFwk::PacMap 
         int32_t uid = IPCSkeleton::GetCallingUid();
         std::string bundleName = "";
         TelephonyPermission::GetBundleNameByUid(uid, bundleName);
-        if(!bundleName.empty() && bundleName == EMERGENCYCOMMUNICATION_BUNDLE_NAME) {
+        if (!bundleName.empty() && bundleName == EMERGENCYCOMMUNICATION_BUNDLE_NAME) {
             TELEPHONY_LOGI("emergencycommunication bundleName:%{public}s", bundleName.c_str());
             return HasNormalCall(isEcc, slotId, callType);
         }
