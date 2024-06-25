@@ -1284,7 +1284,6 @@ int32_t CallControlManager::SetVoIPCallState(int32_t state)
         for (auto call : allCallList) {
             int32_t ret = HangUpCall(call->GetCallID());
             if (ret != TELEPHONY_SUCCESS) {
-                TELEPHONY_LOGE("hangup call %{public}d failed!", call->GetCallID());
                 return ret;
             }
         }
@@ -1295,7 +1294,6 @@ int32_t CallControlManager::SetVoIPCallState(int32_t state)
     if (VoIPCallState_ == CallStateToApp::CALL_STATE_IDLE) {
             TELEPHONY_LOGI("VoIP call state is not active");
             if (AnsweredCallQueue_.hasCall) {
-                TELEPHONY_LOGI("answer call now");
                 AnsweredCallQueue_.hasCall = false;
                 return AnswerCall(AnsweredCallQueue_.callId, AnsweredCallQueue_.videoState);
         }
