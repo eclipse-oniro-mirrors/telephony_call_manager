@@ -409,7 +409,7 @@ void CallStatusCallback::ShouldStopWaitingTone()
 {
     bool hasRingingCall = false;
     CallObjectManager::HasRingingCall(hasRingingCall);
-    if (hasRingingCall && (CallObjectManager::GetCurrentCallNum() > MIN_MULITY_CALL_COUNT)) {
+    if (!(hasRingingCall && (CallObjectManager::GetCurrentCallNum() >= MIN_MULITY_CALL_COUNT))) {
         DelayedSingleton<AudioControlManager>::GetInstance()->StopWaitingTone();
     }
     waitingToneHandle_ = nullptr;
