@@ -1270,8 +1270,10 @@ int32_t CallControlManager::SetVoIPCallState(int32_t state)
             case CallStateToApp::CALL_STATE_ANSWERED:
                 nextState = TelCallState::CALL_STATUS_ANSWERED;
                 break;
+            default:
+                break;
         }
-         callStateReportPtr->UpdateCallStateForVoIP(nextState);
+        callStateReportPtr->UpdateCallStateForVoIP(nextState);
     }
     IPCSkeleton::SetCallingIdentity(identity);
     TELEPHONY_LOGI("VoIP state is %{public}d", state);
