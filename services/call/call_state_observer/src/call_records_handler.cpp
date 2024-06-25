@@ -68,7 +68,7 @@ int32_t CallRecordsHandler::AddCallLogInfo(const CallRecordInfo &info)
     std::string displayName = "";
     if (std::string(contactInfo.name) != "") {
         displayName = std::string(contactInfo.name);
-    } else if (info.numberMarkInfo.markType == MarkType::MARK_TYPE_YELLOW_PAGE) {
+    } else if (info.numberMarkInfo.markType == MarkType::MARK_TYPE_YELLOW_PAGE && !info.numberMarkInfo.isCloud) {
         displayName = std::string(info.numberMarkInfo.markContent);
     }
 
