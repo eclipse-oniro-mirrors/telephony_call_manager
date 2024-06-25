@@ -144,7 +144,7 @@ std::string CallDialog::BuildStartPrivpacyModeCommand(const std::string &dialogR
     nlohmann::json root;
     std::string uiExtensionType = "sysDialog/common";
     root["ability.want.params.uiExtensionType"] = uiExtensionType;
-    bool isScreenLocked = ScreenLock::ScreenLockManager::GetInstance()->isScreenLocked();
+    bool isScreenLocked = ScreenLock::ScreenLockManager::GetInstance()->IsScreenLocked();
     root["sysDialogZOrder"] = isScreenLocked ? SOURCE_SCREENLOCKEN : SOURCE_UNSCREENLOCKEN;
     root["dialogReason"] = dialogReason;
     root["number"] = Str16ToStr8(number);
@@ -166,7 +166,7 @@ std::string CallDialog::BuildStartAnswerPrivpacyModeCommand(const std::string &d
     nlohmann::json root;
     std::string uiExtensionType = "sysDialog/common";
     root["ability.want.params.uiExtensionType"] = uiExtensionType;
-    bool isScreenLocked = ScreenLock::ScreenLockManager::GetInstance()->isScreenLocked();
+    bool isScreenLocked = ScreenLock::ScreenLockManager::GetInstance()->IsScreenLocked();
     root["sysDialogZOrder"] = isScreenLocked ? SOURCE_SCREENLOCKEN : SOURCE_UNSCREENLOCKEN;
     root["dialogReason"] = dialogReason;
     root["callId"] = callId;
