@@ -18,6 +18,7 @@
 
 #include "if_system_ability_manager.h"
 #include "rwlock.h"
+#include "singleton.h"
 
 #include "call_state_listener_base.h"
 
@@ -35,7 +36,6 @@ public:
         int32_t slotId, int32_t callState, std::u16string incomingNumber);
     void UpdateCallStateForVoIP();
     TelCallState GetVoipCallState();
-
 
 private:
     TelCallState currentCallState_ = TelCallState::CALL_STATUS_UNKNOWN;
