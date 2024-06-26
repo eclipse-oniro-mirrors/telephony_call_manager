@@ -23,17 +23,19 @@
 
 namespace OHOS {
 namespace Telephony {
-class CallStateReportProxy : public CallStateListenerBase {
+class CallStateReportProxy : public CallStateListenerBase,
+                             public std::enable_shared_from_this<CallStateReportProxy> {
+    DECLARE_DELAYED_SINGLETON(CallStateReportProxy)
 public:
-    CallStateReportProxy();
-    ~CallStateReportProxy();
     void CallStateUpdated(sptr<CallBase> &callObjectPtr, TelCallState priorState, TelCallState nextState);
     void UpdateCallState(sptr<CallBase> &callObjectPtr, TelCallState nextState);
     void UpdateCallStateForSlotId(sptr<CallBase> &callObjectPtr, TelCallState nextState);
     int32_t ReportCallState(int32_t callState, std::u16string phoneNumber);
     int32_t ReportCallStateForCallId(
         int32_t slotId, int32_t callState, std::u16string incomingNumber);
-    void UpdateCallStateForVoIP(TelCallState nextState);
+    void UpdateCallStateForVoIP();
+    TelCallState GetVoipCallState();
+
 
 private:
     TelCallState currentCallState_ = TelCallState::CALL_STATUS_UNKNOWN;

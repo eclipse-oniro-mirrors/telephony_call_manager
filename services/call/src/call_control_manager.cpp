@@ -1252,29 +1252,8 @@ int32_t CallControlManager::RemoveMissedIncomingCallNotification()
 
 int32_t CallControlManager::SetVoIPCallState(int32_t state)
 {
-    std::shared_ptr<CallStateReportProxy> callStateReportPtr = std::make_shared<CallStateReportProxy>();
     std::string identity = IPCSkeleton::ResetCallingIdentity();
-    if (callStateReportPtr != nullptr) {
-        TELEPHONY_LOGI("report voip call state");
-        TelCallState nextState = TelCallState::CALL_STATUS_IDLE;
-        switch ((CallStateToApp)state) {
-            case CallStateToApp::CALL_STATE_IDLE:
-                nextState = TelCallState::CALL_STATUS_IDLE;
-                break;
-            case CallStateToApp::CALL_STATE_OFFHOOK:
-                nextState = TelCallState::CALL_STATUS_ACTIVE;
-                break;
-            case CallStateToApp::CALL_STATE_RINGING:
-                nextState = TelCallState::CALL_STATUS_INCOMING;
-                break;
-            case CallStateToApp::CALL_STATE_ANSWERED:
-                nextState = TelCallState::CALL_STATUS_ANSWERED;
-                break;
-            default:
-                break;
-        }
-        callStateReportPtr->UpdateCallStateForVoIP(nextState);
-    }
+    DelayedSingleton<CallStateReportProxy>::GetInstance()->UpdateCallStateForVoIP();
     IPCSkeleton::SetCallingIdentity(identity);
     TELEPHONY_LOGI("VoIP state is %{public}d", state);
     VoIPCallState_ = (CallStateToApp)state;
@@ -1334,13 +1313,8 @@ void CallControlManager::CallStateObserve()
         TELEPHONY_LOGE("hangUpSmsPtr is null");
         return;
     }
-    std::shared_ptr<CallStateReportProxy> callStateReportPtr = std::make_shared<CallStateReportProxy>();
-    if (callStateReportPtr == nullptr) {
-        TELEPHONY_LOGE("CallStateReportProxy is nullptr!");
-        return;
-    }
     callStateListenerPtr_->AddOneObserver(DelayedSingleton<CallAbilityReportProxy>::GetInstance());
-    callStateListenerPtr_->AddOneObserver(callStateReportPtr);
+    callStateListenerPtr_->AddOneObserver(DelayedSingleton<CallStateReportProxy>::GetInstance());
     callStateListenerPtr_->AddOneObserver(DelayedSingleton<AudioControlManager>::GetInstance());
     callStateListenerPtr_->AddOneObserver(hangUpSmsPtr);
     callStateListenerPtr_->AddOneObserver(missedCallNotification_);
