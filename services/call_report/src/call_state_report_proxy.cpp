@@ -92,13 +92,13 @@ void CallStateReportProxy::UpdateCallState(sptr<CallBase> &callObjectPtr, TelCal
 void CallStateReportProxy::UpdateCallStateForVoIP()
 {
     sptr<CallBase> callObjectPtr = nullptr;
-    ReportCallState(callObjectPtr, TelCallState::CALL_STATUS_IDLE);
+    UpdateCallState(callObjectPtr, TelCallState::CALL_STATUS_IDLE);
 }
 
 TelCallState CallStateReportProxy::GetVoipCallState()
 {
     int32_t state;
-    DelayedSingleton<CallControlManager>::GetInstance->GetVoipCallState(state);
+    DelayedSingleton<CallControlManager>::GetInstance->GetVoIPCallState(state);
     TELEPHONY_LOGI("report voip call state");
     TelCallState nextState = TelCallState::CALL_STATUS_IDLE;
     switch ((CallStateToApp)state) {
