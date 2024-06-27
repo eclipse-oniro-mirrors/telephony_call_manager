@@ -380,7 +380,8 @@ int32_t CallStatusCallback::ReceiveUpdateCallMediaModeRequest(const CallModeRepo
         TELEPHONY_LOGI("ReceiveUpdateCallMediaModeRequest success!");
     }
     sptr<CallBase> callPtr = CallObjectManager::GetOneCallObjectByIndexAndSlotId(response.callIndex, response.slotId);
-    if (callPtr != nullptr && callPtr->GetTelCallState() == TelCallState::CALL_STATUS_ACTIVE) {
+    if (callPtr != nullptr && callPtr->GetTelCallState() == TelCallState::CALL_STATUS_ACTIVE
+        && callPtr->GetVideoStateType() == VideoStateType::TYPE_VIDEO) {
         if (DelayedSingleton<AudioControlManager>::GetInstance()->PlayWaitingTone() == TELEPHONY_SUCCESS) {
             waitingToneHandle_ = ffrt::submit_h([&]() {
                 ShouldStopWaitingTone();
@@ -399,14 +400,11 @@ int32_t CallStatusCallback::ReceiveUpdateCallMediaModeResponse(const CallModeRep
     } else {
         TELEPHONY_LOGI("ReceiveUpdateCallMediaModeResponse success!");
     }
-    sptr<CallBase> callPtr = CallObjectManager::GetOneCallObjectByIndexAndSlotId(response.callIndex, response.slotId);
-    if (callPtr != nullptr && callPtr->GetTelCallState() == TelCallState::CALL_STATUS_ACTIVE) {
-        if (waitingToneHandle_ != nullptr) {
-            if (int result = ffrt::skip(waitingToneHandle_) != TELEPHONY_SUCCESS) {
-                TELEPHONY_LOGE("ReceiveUpdateCallMediaModeResponse failed! result:%{public}d", result);
-            }
-            ShouldStopWaitingTone();
+    if (waitingToneHandle_ != nullptr) {
+        if (int result = ffrt::skip(waitingToneHandle_) != TELEPHONY_SUCCESS) {
+            TELEPHONY_LOGE("ReceiveUpdateCallMediaModeResponse failed! result:%{public}d", result);
         }
+        ShouldStopWaitingTone();
     }
     return ret;
 }
