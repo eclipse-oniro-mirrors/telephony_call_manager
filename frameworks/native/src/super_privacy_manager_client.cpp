@@ -16,6 +16,7 @@
 #include "super_privacy_manager_client.h"
 
 #include <thread>
+#include <iremote_proxy.h>
 
 #include "parameter.h"
 #include "iservice_registry.h"
@@ -35,47 +36,29 @@ SuperPrivacyManagerClient &SuperPrivacyManagerClient::GetInstance()
 
 int32_t SuperPrivacyManagerClient::SetSuperPrivacyMode(const int32_t &mode, const int32_t &source)
 {
-    int32_t result;
-    WithSystemAbilityProxy([mode, source, &result](const sptr<ISuperPrivacyManager> &proxy) {
-        if (proxy == nullptr) {
-            return;
-        }
-        result = proxy->SetSuperPrivacyMode(mode, source);
-    });
-    return result;
-}
-
-void SuperPrivacyManagerClient::WithSystemAbilityProxy(
-    const std::function<void(const sptr<ISuperPrivacyManager> &)> &consumer)
-{
-    std::lock_guard<std::recursive_mutex> lockGuard(withSystemAbilityProxyRecursiveMutex_);
     auto sam = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (sam == nullptr) {
-        consumer(nullptr);
-        return;
+        return ERR_INVALID_VALUE;
     }
     auto sa = sam->LoadSystemAbility(SUPER_PRIVACY_MANAGER_SA_ID, LOAD_SA_TIMEOUT_SECONDS);
-    ConsumeWithSystemAbility(consumer, sa);
-}
-
-void SuperPrivacyManagerClient::ConsumeWithSystemAbility(
-    const std::function<void(const sptr<ISuperPrivacyManager> &)> &consumer, const sptr<IRemoteObject> &sa)
-{
     if (sa == nullptr) {
-        consumer(nullptr);
-        return;
+        return ERR_INVALID_VALUE;
     }
-    if (sa->IsObjectDead()) {
-        consumer(nullptr);
-        return;
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option(MessageOption::TF_SYNC);
+    if (!data.WriteInterfaceToken(
+        u"OHOS.AppSecurityPrivacy.SecurityPrivacyServer.SuperPrivacy.ISuperPrivacyManager")) {
+        return ERR_INVALID_VALUE;
     }
-    sptr<ISuperPrivacyManager> proxy = iface_cast<ISuperPrivacyManager>(sa);
-    if (proxy == nullptr) {
-        consumer(nullptr);
-        return;
+    if (!data.WriteInt32(mode)) {
+        return ERR_INVALID_DATA;
     }
-    consumer(proxy);
+    if (!data.WriteInt32(source)) {
+        return ERR_INVALID_DATA;
+    }
+    int32_t result = sa->SendRequest(COMMAND_SET_SUPER_PRIVACY_MODE, data, reply, option);
+    return result;
 }
-
 } // namespace Telephony
 } // namespace OHOS
