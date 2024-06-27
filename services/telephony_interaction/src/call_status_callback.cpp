@@ -379,10 +379,13 @@ int32_t CallStatusCallback::ReceiveUpdateCallMediaModeRequest(const CallModeRepo
     } else {
         TELEPHONY_LOGI("ReceiveUpdateCallMediaModeRequest success!");
     }
-    if (DelayedSingleton<AudioControlManager>::GetInstance()->PlayWaitingTone() == TELEPHONY_SUCCESS) {
-        waitingToneHandle_ = ffrt::submit_h([&]() {
-            ShouldStopWaitingTone();
-            }, {}, {}, ffrt::task_attr().delay(DELAY_STOP_PLAY_TIME));
+    sptr<CallBase> callPtr = CallObjectManager::GetOneCallObjectByIndexAndSlotId(response.callIndex, response.slotId);
+    if (callPtr != nullptr && callPtr->GetCallState() == TelCallState::CALL_STATUS_ACTIVE) {
+        if (DelayedSingleton<AudioControlManager>::GetInstance()->PlayWaitingTone() == TELEPHONY_SUCCESS) {
+            waitingToneHandle_ = ffrt::submit_h([&]() {
+                ShouldStopWaitingTone();
+                }, {}, {}, ffrt::task_attr().delay(DELAY_STOP_PLAY_TIME));
+        }
     }
     return ret;
 }
@@ -396,11 +399,14 @@ int32_t CallStatusCallback::ReceiveUpdateCallMediaModeResponse(const CallModeRep
     } else {
         TELEPHONY_LOGI("ReceiveUpdateCallMediaModeResponse success!");
     }
-    if (waitingToneHandle_ != nullptr) {
-        if (int result = ffrt::skip(waitingToneHandle_) != TELEPHONY_SUCCESS) {
-            TELEPHONY_LOGE("ReceiveUpdateCallMediaModeResponse failed! result:%{public}d", result);
+    sptr<CallBase> callPtr = CallObjectManager::GetOneCallObjectByIndexAndSlotId(response.callIndex, response.slotId);
+    if (callPtr != nullptr && callPtr->GetCallState() == TelCallState::CALL_STATUS_ACTIVE) {
+        if (waitingToneHandle_ != nullptr) {
+            if (int result = ffrt::skip(waitingToneHandle_) != TELEPHONY_SUCCESS) {
+                TELEPHONY_LOGE("ReceiveUpdateCallMediaModeResponse failed! result:%{public}d", result);
+            }
+            ShouldStopWaitingTone();
         }
-        ShouldStopWaitingTone();
     }
     return ret;
 }
