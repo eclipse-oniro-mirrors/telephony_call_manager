@@ -379,10 +379,14 @@ int32_t CallStatusCallback::ReceiveUpdateCallMediaModeRequest(const CallModeRepo
     } else {
         TELEPHONY_LOGI("ReceiveUpdateCallMediaModeRequest success!");
     }
-    if (DelayedSingleton<AudioControlManager>::GetInstance()->PlayWaitingTone() == TELEPHONY_SUCCESS) {
-        waitingToneHandle_ = ffrt::submit_h([&]() {
-            ShouldStopWaitingTone();
-            }, {}, {}, ffrt::task_attr().delay(DELAY_STOP_PLAY_TIME));
+    sptr<CallBase> callPtr = CallObjectManager::GetOneCallObjectByIndexAndSlotId(response.callIndex, response.slotId);
+    if (callPtr != nullptr && callPtr->GetTelCallState() == TelCallState::CALL_STATUS_ACTIVE
+        && callPtr->GetVideoStateType() == VideoStateType::TYPE_VIDEO) {
+        if (DelayedSingleton<AudioControlManager>::GetInstance()->PlayWaitingTone() == TELEPHONY_SUCCESS) {
+            waitingToneHandle_ = ffrt::submit_h([&]() {
+                ShouldStopWaitingTone();
+                }, {}, {}, ffrt::task_attr().delay(DELAY_STOP_PLAY_TIME));
+        }
     }
     return ret;
 }
