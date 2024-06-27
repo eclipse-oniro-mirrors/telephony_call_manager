@@ -77,6 +77,7 @@ public:
     static std::list<sptr<CallBase>> GetAllCallList();
     static bool HasCellularCallExist();
     static bool HasVoipCallExist();
+    static bool HasIncomingCallCrsType();
     static CellularCallInfo GetDialCallInfo();
     static bool HasSatelliteCallExist();
     static int32_t GetSatelliteCallList(std::list<int32_t> &list);

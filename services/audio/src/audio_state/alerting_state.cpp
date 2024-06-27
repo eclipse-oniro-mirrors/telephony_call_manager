@@ -19,6 +19,7 @@
 
 #include "call_state_processor.h"
 #include "audio_scene_processor.h"
+#include "audio_control_manager.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -52,6 +53,9 @@ bool AlertingState::ProcessEvent(int32_t event)
             // check is should play ringback tone.
             result = DelayedSingleton<AudioSceneProcessor>::GetInstance()->ProcessEvent(
                 AudioEvent::SWITCH_ALERTING_STATE);
+            break;
+        case AudioEvent::NEW_INCOMING_CALL:
+            result = DelayedSingleton<AudioControlManager>::GetInstance()->PlayWaitingTone();
             break;
         default:
             break;
