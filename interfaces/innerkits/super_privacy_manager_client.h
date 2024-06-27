@@ -38,10 +38,6 @@ public:
 
 private:
     SuperPrivacyManagerClient();
-    void WithSystemAbilityProxy(const std::function<void(const sptr<ISuperPrivacyManager> &)> &consumer);
-    void ConsumeWithSystemAbility(const std::function<void(const sptr<ISuperPrivacyManager> &)> &consumer,
-        const sptr<IRemoteObject> &remoteObject);
-    std::recursive_mutex withSystemAbilityProxyRecursiveMutex_;
     static constexpr int32_t COMMAND_SET_SUPER_PRIVACY_MODE = MIN_TRANSACTION_ID + 0;
 };
 } // namespace Telephony
