@@ -24,7 +24,6 @@
 #include <mutex>
 #include <unordered_set>
 
-#include "isuper_privacy_manager.h"
 #include "parameter.h"
 
 #include "if_system_ability_manager.h"
@@ -43,6 +42,7 @@ private:
     void ConsumeWithSystemAbility(const std::function<void(const sptr<ISuperPrivacyManager> &)> &consumer,
         const sptr<IRemoteObject> &remoteObject);
     std::recursive_mutex withSystemAbilityProxyRecursiveMutex_;
+    static constexpr int32_t COMMAND_SET_SUPER_PRIVACY_MODE = MIN_TRANSACTION_ID + 0;
 };
 } // namespace Telephony
 } // namespace OHOS
