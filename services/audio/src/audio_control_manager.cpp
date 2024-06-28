@@ -646,7 +646,6 @@ int32_t AudioControlManager::MuteRinger()
 void AudioControlManager::SendMuteRingEvent()
 {
     CallEventInfo eventInfo;
-    (void)memset_s(&eventInfo, sizeof(CallEventInfo), 0, sizeof(CallEventInfo));
     eventInfo.eventId = CallAbilityEventId::EVENT_MUTE_RING;
     DelayedSingleton<CallAbilityReportProxy>::GetInstance()->CallEventUpdated(eventInfo);
 }
