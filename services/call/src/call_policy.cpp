@@ -56,9 +56,7 @@ int32_t CallPolicy::DialPolicy(std::u16string &number, AppExecFwk::PacMap &extra
     }
     DialScene dialScene = (DialScene)extras.GetIntValue("dialScene");
     if ((dialScene != DialScene::CALL_NORMAL && dialScene != DialScene::CALL_PRIVILEGED &&
-            dialScene != DialScene::CALL_EMERGENCY) ||
-        (dialScene == DialScene::CALL_NORMAL && isEcc) || (dialScene == DialScene::CALL_EMERGENCY && (!isEcc)) ||
-        (dialType == DialType::DIAL_VOICE_MAIL_TYPE && dialScene == DialScene::CALL_EMERGENCY)) {
+            dialScene != DialScene::CALL_EMERGENCY)) {
         TELEPHONY_LOGE("invalid dial scene!");
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
@@ -89,6 +87,10 @@ int32_t CallPolicy::SuperPrivacyMode(std::u16string &number, AppExecFwk::PacMap 
     CallType callType = (CallType)extras.GetIntValue("callType");
     int32_t slotId = extras.GetIntValue("accountId");
     if (isEcc) {
+        return HasNormalCall(isEcc, slotId, callType);
+    }
+    DialScene dialScene = (DialScene)extras.GetIntValue("dialScene");
+    if (dialScene == DialScene::CALL_EMERGENCY) {
         return HasNormalCall(isEcc, slotId, callType);
     }
     bool currentIsSuperPrivacyMode = DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance()->

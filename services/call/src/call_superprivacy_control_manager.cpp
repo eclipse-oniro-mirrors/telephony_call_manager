@@ -63,7 +63,7 @@ void CallSuperPrivacyControlManager::CloseAllCall()
 {
     std::vector<CallAttributeInfo> infos = CallObjectManager::GetAllCallInfoList();
     for (auto &info : infos) {
-        if (!info.isEcc) {
+        if (!info.isEcc && !info.isEccContact) {
             TELEPHONY_LOGE("OnSuperPrivacyModeChanged callState:%{public}d", info.callState);
             if (info.callState == TelCallState::CALL_STATUS_INCOMING ||
                 info.callState == TelCallState::CALL_STATUS_WAITING) {
