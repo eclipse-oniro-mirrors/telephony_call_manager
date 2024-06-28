@@ -25,12 +25,9 @@
 #include "call_control_manager.h"
 #include "call_superprivacy_control_manager.h"
 #include "call_manager_base.h"
-#include "ipc_skeleton.h"
-#include "telephony_permission.h"
 
 namespace OHOS {
 namespace Telephony {
-const std::string EMERGENCYCOMMUNICATION_BUNDLE_NAME = "emergencycommunication";
 CallPolicy::CallPolicy() {}
 
 CallPolicy::~CallPolicy() {}
@@ -97,13 +94,6 @@ int32_t CallPolicy::SuperPrivacyMode(std::u16string &number, AppExecFwk::PacMap 
         GetCurrentIsSuperPrivacyMode();
     TELEPHONY_LOGI("call policy currentIsSuperPrivacyMode:%{public}d", currentIsSuperPrivacyMode);
     if (currentIsSuperPrivacyMode) {
-        int32_t uid = IPCSkeleton::GetCallingUid();
-        std::string bundleName = "";
-        TelephonyPermission::GetBundleNameByUid(uid, bundleName);
-        if (!bundleName.empty() && bundleName == EMERGENCYCOMMUNICATION_BUNDLE_NAME) {
-            TELEPHONY_LOGI("emergencycommunication bundleName:%{public}s", bundleName.c_str());
-            return HasNormalCall(isEcc, slotId, callType);
-        }
         int32_t videoState = extras.GetIntValue("videoState");
         int32_t dialType = extras.GetIntValue("dialType");
         int32_t dialScene = extras.GetIntValue("dialScene");
