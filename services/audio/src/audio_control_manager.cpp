@@ -784,9 +784,8 @@ bool AudioControlManager::ShouldPlayRingtone() const
     auto processor = DelayedSingleton<CallStateProcessor>::GetInstance();
     int32_t alertingCallNum = processor->GetCallNumber(TelCallState::CALL_STATUS_ALERTING);
     int32_t incomingCallNum = processor->GetCallNumber(TelCallState::CALL_STATUS_INCOMING);
-    bool hasIncomingCallCrsType = CallObjectManager::HasIncomingCallCrsType();
     if (incomingCallNum == EMPTY_VALUE || alertingCallNum > EMPTY_VALUE || ringState_ == RingState::RINGING
-        || (hasIncomingCallCrsType && soundState_ == SoundState::SOUNDING)) {
+        || (soundState_ == SoundState::SOUNDING && CallObjectManager::HasIncomingCallCrsType())) {
         return false;
     }
     return true;
