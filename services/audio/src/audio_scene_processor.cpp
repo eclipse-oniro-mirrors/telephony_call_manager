@@ -71,10 +71,10 @@ void AudioSceneProcessor::ProcessEventInner(AudioEvent event)
         case AudioEvent::SWITCH_IMS_CALL_STATE:
         case AudioEvent::SWITCH_HOLDING_STATE:
         case AudioEvent::SWITCH_AUDIO_INACTIVE_STATE:
-            SwitchState(event);
             if (DelayedSingleton<CallStateProcessor>::GetInstance()->ShouldStopSoundtone()) {
                 DelayedSingleton<AudioControlManager>::GetInstance()->StopSoundtone();
             }
+            SwitchState(event);
             break;
         case AudioEvent::NO_MORE_INCOMING_CALL:
             DelayedSingleton<AudioControlManager>::GetInstance()->StopRingtone();

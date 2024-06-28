@@ -34,6 +34,7 @@ std::condition_variable CallObjectManager::cv_;
 bool CallObjectManager::isFirstDialCallAdded_ = false;
 bool CallObjectManager::needWaitHold_ = false;
 CellularCallInfo CallObjectManager::dialCallInfo_;
+constexpr int32_t CRS_TYPE = 2;
 
 CallObjectManager::CallObjectManager()
 {
@@ -393,6 +394,19 @@ bool CallObjectManager::HasVoipCallExist()
     std::list<sptr<CallBase>>::iterator it;
     for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
         if ((*it)->GetCallType() == CallType::TYPE_VOIP) {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool CallObjectManager::HasIncomingCallCrsType()
+{
+    std::lock_guard<std::mutex> lock(listMutex_);
+    std::list<sptr<CallBase>>::iterator it;
+    for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
+        if ((*it)->GetCallRunningState() == CallRunningState::CALL_RUNNING_STATE_RINGING &&
+            (*it)->GetCrsType() == CRS_TYPE) {
             return true;
         }
     }

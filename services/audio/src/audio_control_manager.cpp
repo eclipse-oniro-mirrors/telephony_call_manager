@@ -785,7 +785,7 @@ bool AudioControlManager::ShouldPlayRingtone() const
     int32_t alertingCallNum = processor->GetCallNumber(TelCallState::CALL_STATUS_ALERTING);
     int32_t incomingCallNum = processor->GetCallNumber(TelCallState::CALL_STATUS_INCOMING);
     if (incomingCallNum == EMPTY_VALUE || alertingCallNum > EMPTY_VALUE || ringState_ == RingState::RINGING
-        || soundState_ == SoundState::SOUNDING) {
+        || (soundState_ == SoundState::SOUNDING && CallObjectManager::HasIncomingCallCrsType())) {
         return false;
     }
     return true;
