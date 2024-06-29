@@ -27,23 +27,32 @@ TimeWaitHelper::TimeWaitHelper(int16_t waitTime)
 
 TimeWaitHelper::~TimeWaitHelper()
 {
-    TELEPHONY_LOGI("~TimeWaitHelper");
+    TELEPHONY_LOGI("~TimeWaitHelper: %{public}d", waitTime_);
 }
 
 void TimeWaitHelper::NotifyAll()
 {
-    TELEPHONY_LOGI("TimeWaitHelper NotifyAll");
+    std::unique_lock<ffrt::mutex> lock(mutex_);
+    TELEPHONY_LOGI("TimeWaitHelper: %{public}d NotifyAll", waitTime_);
+    isNotified_ = true;
     cv_.notify_all();
 }
 
 bool TimeWaitHelper::WaitForResult()
 {
-    std::unique_lock<std::mutex> lock(mutex_);
-    if (cv_.wait_for(lock, std::chrono::seconds(waitTime_)) == std::cv_status::timeout) {
-        TELEPHONY_LOGE("TimeWaitHelper time out");
-        return false;
+    if (!isNotified_) {
+        std::unique_lock<ffrt::mutex> lock(mutex_);
+        auto now = std::chrono::system_clock::now();
+        while (!isNotified_) {
+            if (cv_.wait_until(lock, now + std::chrono::seconds(waitTime_)) == ffrt::cv_status::timeout) {
+                TELEPHONY_LOGE("TimeWaitHelper: %{public}d time out", waitTime_);
+                return false;
+            }
+        }
+        return true;
     }
-    return true;
+    TELEPHONY_LOGE("TimeWaitHelper: %{public}d isNotified_ is true", waitTime_);
+    return false;
 }
 } // namespace Telephony
 } // namespace OHOS

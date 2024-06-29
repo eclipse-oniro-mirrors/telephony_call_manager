@@ -24,6 +24,7 @@
 #include "time_wait_helper.h"
 #include "ability_connect_callback_stub.h"
 #include <memory>
+#include "ffrt.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -46,8 +47,8 @@ private:
     bool JsonGetBoolValue(cJSON *json, const std::string key);
     int32_t errCode_ = -1;
     std::string result_ = "";
-    std::shared_ptr<TimeWaitHelper> timeWaitHelper_ {nullptr};
-    std::recursive_mutex mutex_;
+    std::unique_ptr<TimeWaitHelper> timeWaitHelper_ {nullptr};
+    ffrt::mutex mutex_;
 };
 } // namespace Telephony
 } // namespace OHOS

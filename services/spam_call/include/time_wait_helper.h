@@ -18,6 +18,7 @@
 
 #include <condition_variable>
 #include <cstdio>
+#include "ffrt.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -29,9 +30,10 @@ public:
     bool WaitForResult();
 
 private:
-    std::condition_variable cv_;
-    std::mutex mutex_;
+    ffrt::condition_variable cv_;
+    ffrt::mutex mutex_;
     int16_t waitTime_ = 0;
+    bool isNotified_ = false;
 };
 } // namespace Telephony
 } // namespace OHOS
