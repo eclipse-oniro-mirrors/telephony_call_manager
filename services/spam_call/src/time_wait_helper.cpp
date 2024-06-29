@@ -34,8 +34,8 @@ void TimeWaitHelper::NotifyAll()
 {
     std::unique_lock<ffrt::mutex> lock(mutex_);
     TELEPHONY_LOGI("TimeWaitHelper: %{public}d NotifyAll", waitTime_);
-    cv_.notify_all();
     isNotified_ = true;
+    cv_.notify_all();
 }
 
 bool TimeWaitHelper::WaitForResult()
