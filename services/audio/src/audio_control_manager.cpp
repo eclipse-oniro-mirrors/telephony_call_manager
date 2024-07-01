@@ -15,6 +15,7 @@
 
 #include "audio_control_manager.h"
 
+#include "call_ability_report_proxy.h"
 #include "call_control_manager.h"
 #include "call_dialog.h"
 #include "call_state_processor.h"
@@ -659,8 +660,16 @@ int32_t AudioControlManager::MuteRinger()
         TELEPHONY_LOGE("SetMute fail");
         return CALL_ERR_AUDIO_SETTING_MUTE_FAILED;
     }
+    SendMuteRingEvent();
     TELEPHONY_LOGI("mute ring success");
     return TELEPHONY_SUCCESS;
+}
+
+void AudioControlManager::SendMuteRingEvent()
+{
+    CallEventInfo eventInfo;
+    eventInfo.eventId = CallAbilityEventId::EVENT_MUTE_RING;
+    DelayedSingleton<CallAbilityReportProxy>::GetInstance()->CallEventUpdated(eventInfo);
 }
 
 void AudioControlManager::PlayCallEndedTone(TelCallState priorState, TelCallState nextState, CallEndedType type)
