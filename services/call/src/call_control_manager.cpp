@@ -207,12 +207,7 @@ int32_t CallControlManager::AnswerCall(int32_t callId, int32_t videoState)
         TELEPHONY_LOGE("call is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    bool currentIsSuperPrivacyMode = DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance()->
-        GetCurrentIsSuperPrivacyMode();
-    TELEPHONY_LOGI("call policy answer currentIsSuperPrivacyMode:%{public}d", currentIsSuperPrivacyMode);
-    if (currentIsSuperPrivacyMode) {
-        DelayedSingleton<CallDialog>::GetInstance()->DialogConnectAnswerPrivpacyModeExtension("SUPER_PRIVACY_MODE",
-            callId, videoState, true);
+    if (CurrentIsSuperPrivacyMode(callId, videoState)) {
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
     AnswerHandlerForSatelliteOrVideoCall(call, videoState);
@@ -243,6 +238,19 @@ int32_t CallControlManager::AnswerCall(int32_t callId, int32_t videoState)
         return ret;
     }
     return TELEPHONY_SUCCESS;
+}
+
+bool CallControlManager::CurrentIsSuperPrivacyMode(int32_t callId, int32_t videoState)
+{
+    bool currentIsSuperPrivacyMode = DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance()->
+        GetCurrentIsSuperPrivacyMode();
+    TELEPHONY_LOGI("call policy answer currentIsSuperPrivacyMode:%{public}d", currentIsSuperPrivacyMode);
+    if (currentIsSuperPrivacyMode) {
+        DelayedSingleton<CallDialog>::GetInstance()->DialogConnectAnswerPrivpacyModeExtension("SUPER_PRIVACY_MODE",
+            callId, videoState, true);
+        return true;
+    }
+    return false;
 }
 
 void CallControlManager::AnswerHandlerForSatelliteOrVideoCall(sptr<CallBase> &call, int32_t videoState)
