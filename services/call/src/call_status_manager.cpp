@@ -1218,8 +1218,6 @@ sptr<CallBase> CallStatusManager::CreateNewCall(const CallDetailInfo &info, Call
     DialScene dialScene = (DialScene)extras.GetIntValue("dialScene");
     if (dialScene == DialScene::CALL_EMERGENCY) {
         callPtr->SetIsEccContact(true);
-    } else {
-        callPtr->SetIsEccContact(false);
     }
     callPtr->SetOriginalCallType(info.originalCallType);
     TELEPHONY_LOGD("originalCallType:%{public}d", info.originalCallType);

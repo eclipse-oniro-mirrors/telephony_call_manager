@@ -224,14 +224,6 @@ int32_t CallPolicy::AnswerCallPolicy(int32_t callId, int32_t videoState)
         TELEPHONY_LOGE("current call state is:%{public}d, accept call not allowed", state);
         return CALL_ERR_ILLEGAL_CALL_OPERATION;
     }
-    bool currentIsSuperPrivacyMode = DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance()->
-        GetCurrentIsSuperPrivacyMode();
-    TELEPHONY_LOGI("call policy answer currentIsSuperPrivacyMode:%{public}d", currentIsSuperPrivacyMode);
-    if (currentIsSuperPrivacyMode) {
-        DelayedSingleton<CallDialog>::GetInstance()->DialogConnectAnswerPrivpacyModeExtension("SUPER_PRIVACY_MODE",
-            callId, videoState, true);
-        return TELEPHONY_ERR_ARGUMENT_INVALID;
-    }
     return TELEPHONY_SUCCESS;
 }
 
