@@ -66,6 +66,9 @@
 #include "call_ability_callback_death_recipient.h"
 #include "app_state_observer.h"
 #include "call_ability_callback_proxy.h"
+#include "super_privacy_manager_client.h"
+#include "call_status_callback.h"
+#include "satellite_call_control.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -84,6 +87,7 @@ const int32_t VALID_CALLID = 1;
 const int32_t ERROR_CALLID = -1;
 const int32_t ONE_TIME = 1;
 const int32_t STEP_1 = 1;
+const int32_t SOURCE_CALL = 2;
 constexpr int16_t DEFAULT_TIME = 0;
 constexpr const char *TEST_STR = "123";
 constexpr const char *LONG_STR =
@@ -3003,5 +3007,106 @@ HWTEST_F(BranchTest, Telephony_OTTCallConnection_001, Function | MediumTest | Le
     ott.PackCellularCallInfo(requestInfo, info);
 }
 
+/**
+ * @tc.number   Telephony_SuperPrivacyManagerClient_001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_SuperPrivacyManagerClient_001, Function | MediumTest | Level3)
+{
+    int32_t privacy = SuperPrivacyManagerClient::GetInstance().
+    SetSuperPrivacyMode(static_cast<int32_t>(CallSuperPrivacyModeType::OFF), SOURCE_CALL);
+}
+
+/**
+ * @tc.number   Telephony_CallStatusCallback_001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_CallStatusCallback, Function | MediumTest | Level3)
+{
+    auto callStatusCallback = std::make_shared<CallStatusCallback>();
+    CallReportInfo callReportInfo;
+    callStatusCallback.UpdateCallReportInfo(callReportInfo);
+    CallsReportInfo callsReportInfo;
+    callStatusCallback.UpdateCallsReportInfo(callsReportInfo);
+    DisconnectedDetails disconnectedDetails;
+    callStatusCallback.UpdateDisconnectedCause(disconnectedDetails);
+    CellularCallEventInfo cellularCallEventIndo;
+    callStatusCallback.UpdateEventResultInfo(const CellularCallEventInfo &info) override;
+    RBTPlayInfo rbtpPlyaInfo;
+    callStatusCallback.UpdateRBTPlayInfo(rbtpPlyaInfo);
+    int32_t result = 0;
+    callStatusCallback.StartDtmfResult(result);
+    callStatusCallback.StopDtmfResult(result);
+    callStatusCallback.SendUssdResult(result);
+    callStatusCallback.GetImsCallDataResult(result);
+    CallWaitResponse callWaitResponse;
+    callStatusCallback.UpdateGetWaitingResult(callWaitResponse);
+    callStatusCallback.UpdateSetWaitingResult(result);
+    CallRestrictionResponse callRestrictionResponse;
+    callStatusCallback.UpdateGetRestrictionResult(callRestrictionResponse);
+    callStatusCallback.UpdateSetRestrictionResult(result);
+    callStatusCallback.UpdateSetRestrictionPasswordResult(result);
+    CallTransferResponse callTransferResponse;
+    callStatusCallback.UpdateGetTransferResult(callTransferResponse);
+    callStatusCallback.UpdateSetTransferResult(result);
+    ClipResponse clipResponse;
+    callStatusCallback.UpdateGetCallClipResult(clipResponse);
+    ClirResponse clirResponse;
+    callStatusCallback.UpdateGetCallClirResult(clirResponse);
+    callStatusCallback.UpdateSetCallClirResult(result);
+    callStatusCallback.StartRttResult(result);
+    callStatusCallback.StopRttResult(result);
+    GetImsConfigResponse getImsConfigResponse;
+    callStatusCallback.GetImsConfigResult(getImsConfigResponse);
+    callStatusCallback.SetImsConfigResult(result);
+    GetImsFeatureValueResponse getImsFeatureValueResopnse;
+    callStatusCallback.GetImsFeatureValueResult(getImsFeatureValueResopnse);
+    callStatusCallback.SetImsFeatureValueResult(result);
+    CallModeReportInfo callModeReportInfo;
+    callStatusCallback.ReceiveUpdateCallMediaModeRequest(callModeReportInfo);
+    callStatusCallback.ReceiveUpdateCallMediaModeResponse(callModeReportInfo);
+    callStatusCallback.InviteToConferenceResult(result);
+    MmiCodeInfo mmiCodeInfo;
+    callStatusCallback.SendMmiCodeResult(mmiCodeInfo);
+    callStatusCallback.CloseUnFinishedUssdResult(result);
+    std::string c("a");
+    callStatusCallback.ReportPostDialChar(c);
+    std::string str("abc");
+    callStatusCallback.ReportPostDialDelay(str);
+    CallSessionReportInfo callSessionReportInfo;
+    callStatusCallback.HandleCallSessionEventChanged(callSessionReportInfo);
+    PeerDimensionsReportInfo peerDimensionReportInfo;
+    callStatusCallback.HandlePeerDimensionsChanged(peerDimensionReportInfo);
+    int64_t res = 0;
+    callStatusCallback.HandleCallDataUsageChanged(res);
+    CameraCapabilitiesReportInfo cameraCapabilities;
+    callStatusCallback.HandleCameraCapabilitiesChanged(cameraCapabilities);
+    VoipCallEventInfo voipCallEventInfo;
+    callStatusCallback.UpdateVoipEventInfo(voipCallEventInfo);
+}
+
+/**
+ * @tc.number   Telephony_SatelliteCallControl_001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_SatelliteCallControl_001, Function | MediumTest | Level3)
+{
+    auto satelliteCallControl = DelayedSingleton<SatelliteCallControl>::GetInstance();
+    int32_t level = static_cast<int32_t>(SatCommTempLevel::TEMP_LEVEL_HIGH);
+    satelliteCallControl->SetSatcommTempLevel(level);
+    satelliteCallControl->IsAllowedSatelliteDialCall();
+    satelliteCallControl->IsSatelliteSwitchEnable();
+    satelliteCallControl->GetSatcommTempLevel();
+    sptr<CallBase> call = nullptr;
+    TelCallState priorState;
+    TelCallState nextState
+    satelliteCallControl->HandleSatelliteCallStateUpdate(call, priorState, nextState);
+    satelliteCallControl->IsShowDialog();
+    bool isShowDialog = true;
+    satelliteCallControl->SetShowDialog(isShowDialog);
+}
 } // namespace Telephony
 } // namespace OHOS
