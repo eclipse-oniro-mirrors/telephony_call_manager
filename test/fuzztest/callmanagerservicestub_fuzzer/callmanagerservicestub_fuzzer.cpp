@@ -17,6 +17,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <fuzzer/FuzzedDataProvider.h>
 #define private public
 #include "addcalltoken_fuzzer.h"
 #include "call_manager_service_stub.h"
@@ -190,6 +191,24 @@ int32_t SetCallRestrictionPassword(const uint8_t *data, size_t size)
     return DelayedSingleton<CallManagerService>::GetInstance()->OnSetCallRestrictionPassword(dataParcel, reply);
 }
 
+void doFuzzCallManagerService(const uint8_t *data, size_t size)
+{
+    auto callManagerService = DelayedSingleton<CallManagerService>::GetInstance();
+    callManagerService->OnStart();
+    FuzzedDataProvider fdp(data, size);
+    uint32_t code = fdp.ConsumeIntegralInRange<uint32_t>(0, 72);
+    if (fdp.remaining_bytes() == 0) {
+        return;
+    }
+    std::u16string service_token = u"OHOS.Telephony.ICallManagerService";
+    MessageOption option;
+    MessageParcel dataParcel, replyParcel;
+    std::vector<uint8_t> subData = fdp.ConsumeBytes<uint8_t>(fdp.ConsumeIntegralInRange<size_t>(0, fdp.remaining_bytes()));
+    dataParcel.WriteInterfaceToken(service_token);
+    dataParcel.WriteBuffer(subData.data(), subData.size());
+    callManagerService->OnRemoteRequest(code, dataParcel, replyParcel, option);
+}
+
 void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
 {
     if (data == nullptr || size == 0) {
@@ -207,6 +226,7 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     ReportAudioDeviceInfo(data, size);
     PostDialProceed(data, size);
     OnUnRegisterVoipCallManagerCallback(data, size);
+    doFuzzCallManagerService(data, size);
 }
 } // namespace OHOS
 
