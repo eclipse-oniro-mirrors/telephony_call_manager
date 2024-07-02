@@ -69,10 +69,13 @@
 #include "super_privacy_manager_client.h"
 #include "call_status_callback.h"
 #include "satellite_call_control.h"
+<<<<<<< HEAD
 #include "proximity_sensor.h"
 #include "status_bar.h"
 #include "wired_headset.h"
 #include "call_status_policy.h"
+=======
+>>>>>>> de299b9e07efc9ed33f1bd45c55ec2b0fc2f2efb
 
 namespace OHOS {
 namespace Telephony {
