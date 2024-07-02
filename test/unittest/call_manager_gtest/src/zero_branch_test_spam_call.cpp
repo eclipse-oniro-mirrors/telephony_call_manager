@@ -24,6 +24,8 @@
 #include "spam_call_stub.h"
 #include "time_wait_helper.h"
 #include "spam_call_proxy.h"
+#include "call_ability_connection.h"
+#include "call_setting_ability_connection.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -178,5 +180,42 @@ HWTEST_F(SpamCallTest, Telephony_SpamCallProxy_001, Function | MediumTest | Leve
     std::shared_ptr<SpamCallAdapter> spamCallAdapter = std::make_shared<SpamCallAdapter>();
     spamCallProxy.DetectSpamCall(phoneNumber, slotId, spamCallAdapter);
 }
+
+/**
+ * @tc.number   Telephony_CallAbilityConnection_001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(SpamCallTest, Telephony_CallAbilityConnection_001, Function | MediumTest | Level1)
+{
+    std::string commandStr = "11111";
+    CallAbilityConnection callAbilityConnection(phoneNumber, slotId, spamCallAdapter);
+    std::string bundle = "111";
+    std::string ability = "222";
+    AppExecFwk::ElementName element("", bundle, ability);
+    sptr<IRemoteObject> remoteObject;
+    int resultCode = 0;
+    callAbilityConnection.OnAbilityConnectDone(element, remoteObject, resultCode);
+    callAbilityConnection.OnAbilityDisconnectDone(element, resultCode);
+}
+
+/**
+ * @tc.number   Telephony_CallSettingAbilityConnection_001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(SpamCallTest, Telephony_CallSettingAbilityConnection_001, Function | MediumTest | Level1)
+{
+    std::string commandStr = "11111";
+    CallSettingAbilityConnection callSettingAbilityConnection(phoneNumber, slotId, spamCallAdapter);
+    std::string bundle = "111";
+    std::string ability = "222";
+    AppExecFwk::ElementName element("", bundle, ability);
+    sptr<IRemoteObject> remoteObject;
+    int resultCode = 0;
+    callSettingAbilityConnection.OnAbilityConnectDone(element, remoteObject, resultCode);
+    callSettingAbilityConnection.OnAbilityDisconnectDone(element, resultCode);
+}
+
 }
 }
