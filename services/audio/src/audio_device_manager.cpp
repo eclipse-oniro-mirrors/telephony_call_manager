@@ -402,7 +402,8 @@ bool AudioDeviceManager::CheckAndSwitchDistributedAudioDevice()
     DelayedSingleton<DistributedCallManager>::GetInstance()->SetCallState(true);
     std::vector<AudioDevice>::iterator it = info_.audioDeviceList.begin();
     while (it != info_.audioDeviceList.end()) {
-        if (it->deviceType == AudioDeviceType::DEVICE_DISTRIBUTED_AUTOMOTIVE) {
+        if (it->deviceType == AudioDeviceType::DEVICE_DISTRIBUTED_AUTOMOTIVE &&
+            DelayedSingleton<DistributedCallManager>::GetInstance()->IsSelectVirtualModem()) {
             DelayedSingleton<DistributedCallManager>::GetInstance()->SwitchOnDCallDeviceAsync(*it);
             return true;
         } else {

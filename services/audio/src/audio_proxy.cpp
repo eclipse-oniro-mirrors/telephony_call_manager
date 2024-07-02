@@ -376,7 +376,8 @@ void AudioPreferDeviceChangeCallback::OnPreferredOutputDeviceUpdated(
         TELEPHONY_LOGE("desc size is zero");
         return;
     }
-    if (DelayedSingleton<DistributedCallManager>::GetInstance()->IsDCallDeviceSwitchedOn()) {
+    if (DelayedSingleton<DistributedCallManager>::GetInstance()->IsDCallDeviceSwitchedOn() &&
+        DelayedSingleton<DistributedCallManager>::GetInstance()->IsSelectVirtualModem()) {
         TELEPHONY_LOGW("has already switch to distributed audio device");
         return;
     }

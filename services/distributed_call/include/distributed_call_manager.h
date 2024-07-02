@@ -55,6 +55,7 @@ public:
     void OnDCallSystemAbilityRemoved(const std::string &deviceId);
 
     void GetConnectedDCallDevice(AudioDevice& device);
+    bool IsSelectVirtualModem();
 
 private:
     class DistributedCallDeviceListener : public OHOS::DistributedHardware::IDCallDeviceCallback {
