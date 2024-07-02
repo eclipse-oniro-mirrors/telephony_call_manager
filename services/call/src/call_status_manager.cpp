@@ -1215,6 +1215,10 @@ sptr<CallBase> CallStatusManager::CreateNewCall(const CallDetailInfo &info, Call
         TELEPHONY_LOGE("CreateNewCall failed!");
         return nullptr;
     }
+    DialScene dialScene = (DialScene)extras.GetIntValue("dialScene");
+    if (dialScene == DialScene::CALL_EMERGENCY) {
+        callPtr->SetIsEccContact(true);
+    }
     callPtr->SetOriginalCallType(info.originalCallType);
     TELEPHONY_LOGD("originalCallType:%{public}d", info.originalCallType);
     if (info.callType == CallType::TYPE_VOIP) {

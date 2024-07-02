@@ -128,6 +128,7 @@ public:
     virtual int32_t GetCallIndex() {return 0;}
     int32_t SetMicPhoneState(bool isMuted);
     bool IsMuted();
+    void SetIsEccContact(bool isEccContact);
 
 protected:
     int32_t callId_;
@@ -173,6 +174,7 @@ private:
     std::string numberLocation_;
     NumberMarkInfo numberMarkInfo_;
     int32_t blockReason_;
+    bool isEccContact_;
 };
 } // namespace Telephony
 } // namespace OHOS

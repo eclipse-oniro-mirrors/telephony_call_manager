@@ -232,6 +232,10 @@ struct CallAttributeInfo {
      */
     bool isEcc = false;
     /**
+     * Indicates whether the call is emergency Contact call.
+     */
+    bool isEccContact = false;
+    /**
      * Indicates the type of call, includs CS, IMS, OTT, OTHER. {@link CallType}
      */
     CallType callType = CallType::TYPE_ERR_CALL;

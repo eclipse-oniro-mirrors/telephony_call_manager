@@ -38,7 +38,8 @@ CallBase::CallBase(DialParaInfo &info)
       canUnHoldState_(true), canSwitchCallState_(true), answerVideoState_(0), isSpeakerphoneOn_(false),
       callEndedType_(CallEndedType::UNKNOWN), callBeginTime_(0), callEndTime_(0), ringBeginTime_(0), ringEndTime_(0),
       answerType_(CallAnswerType::CALL_ANSWER_MISSED), accountId_(info.accountId), crsType_(info.crsType),
-      originalCallType_(info.originalCallType), isMuted_(false), numberLocation_("default"), blockReason_(0)
+      originalCallType_(info.originalCallType), isMuted_(false), numberLocation_("default"), blockReason_(0),
+      isEccContact_(false)
 {
     (void)memset_s(&contactInfo_, sizeof(ContactInfo), 0, sizeof(ContactInfo));
     (void)memset_s(&numberMarkInfo_, sizeof(NumberMarkInfo), 0, sizeof(NumberMarkInfo));
@@ -53,7 +54,7 @@ CallBase::CallBase(DialParaInfo &info, AppExecFwk::PacMap &extras)
       isSpeakerphoneOn_(false), callEndedType_(CallEndedType::UNKNOWN), callBeginTime_(0), callEndTime_(0),
       ringBeginTime_(0), ringEndTime_(0), answerType_(CallAnswerType::CALL_ANSWER_MISSED), accountId_(info.accountId),
       crsType_(info.crsType), originalCallType_(info.originalCallType), isMuted_(false), numberLocation_("default"),
-      blockReason_(0)
+      blockReason_(0), isEccContact_(false)
 {
     (void)memset_s(&contactInfo_, sizeof(ContactInfo), 0, sizeof(ContactInfo));
     (void)memset_s(&numberMarkInfo_, sizeof(NumberMarkInfo), 0, sizeof(NumberMarkInfo));
@@ -138,6 +139,7 @@ void CallBase::GetCallAttributeBaseInfo(CallAttributeInfo &info)
         info.accountId = accountId_;
         info.crsType = crsType_;
         info.originalCallType = originalCallType_;
+        info.isEccContact = isEccContact_;
         if (memset_s(info.numberLocation, kMaxNumberLen, 0, kMaxNumberLen) != EOK) {
             TELEPHONY_LOGE("memset_s numberLocation fail");
             return;
@@ -389,6 +391,12 @@ void CallBase::SetOriginalCallType(int32_t originalCallType)
 {
     std::lock_guard<std::mutex> lock(mutex_);
     originalCallType_ = originalCallType;
+}
+
+void CallBase::SetIsEccContact(bool isEccContact)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    isEccContact_ = isEccContact;
 }
 
 void CallBase::SetNumberLocation(std::string numberLocation)

@@ -53,9 +53,7 @@ int32_t CallPolicy::DialPolicy(std::u16string &number, AppExecFwk::PacMap &extra
     }
     DialScene dialScene = (DialScene)extras.GetIntValue("dialScene");
     if ((dialScene != DialScene::CALL_NORMAL && dialScene != DialScene::CALL_PRIVILEGED &&
-            dialScene != DialScene::CALL_EMERGENCY) ||
-        (dialScene == DialScene::CALL_NORMAL && isEcc) || (dialScene == DialScene::CALL_EMERGENCY && (!isEcc)) ||
-        (dialType == DialType::DIAL_VOICE_MAIL_TYPE && dialScene == DialScene::CALL_EMERGENCY)) {
+            dialScene != DialScene::CALL_EMERGENCY)) {
         TELEPHONY_LOGE("invalid dial scene!");
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
@@ -86,6 +84,10 @@ int32_t CallPolicy::SuperPrivacyMode(std::u16string &number, AppExecFwk::PacMap 
     CallType callType = (CallType)extras.GetIntValue("callType");
     int32_t slotId = extras.GetIntValue("accountId");
     if (isEcc) {
+        return HasNormalCall(isEcc, slotId, callType);
+    }
+    DialScene dialScene = (DialScene)extras.GetIntValue("dialScene");
+    if (dialScene == DialScene::CALL_EMERGENCY) {
         return HasNormalCall(isEcc, slotId, callType);
     }
     bool currentIsSuperPrivacyMode = DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance()->
@@ -221,14 +223,6 @@ int32_t CallPolicy::AnswerCallPolicy(int32_t callId, int32_t videoState)
     if (state != TelCallState::CALL_STATUS_INCOMING && state != TelCallState::CALL_STATUS_WAITING) {
         TELEPHONY_LOGE("current call state is:%{public}d, accept call not allowed", state);
         return CALL_ERR_ILLEGAL_CALL_OPERATION;
-    }
-    bool currentIsSuperPrivacyMode = DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance()->
-        GetCurrentIsSuperPrivacyMode();
-    TELEPHONY_LOGI("call policy answer currentIsSuperPrivacyMode:%{public}d", currentIsSuperPrivacyMode);
-    if (currentIsSuperPrivacyMode) {
-        DelayedSingleton<CallDialog>::GetInstance()->DialogConnectAnswerPrivpacyModeExtension("SUPER_PRIVACY_MODE",
-            callId, videoState, true);
-        return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
     return TELEPHONY_SUCCESS;
 }
