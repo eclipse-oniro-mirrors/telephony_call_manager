@@ -20,12 +20,10 @@
 #include "nlohmann/json.hpp"
 #include "telephony_log_wrapper.h"
 #include <securec.h>
-#include "screenlock_manager.h"
 
 namespace OHOS {
 namespace Telephony {
 constexpr int32_t DEFAULT_USER_ID = -1;
-const int32_t SOURCE_UNSCREENLOCKED = 1;
 const int32_t SOURCE_SCREENLOCKED = 2;
 
 bool CallDialog::DialogConnectExtension(const std::string &dialogReason)
@@ -144,8 +142,7 @@ std::string CallDialog::BuildStartPrivpacyModeCommand(const std::string &dialogR
     nlohmann::json root;
     std::string uiExtensionType = "sysDialog/common";
     root["ability.want.params.uiExtensionType"] = uiExtensionType;
-    bool isScreenLocked = ScreenLock::ScreenLockManager::GetInstance()->IsScreenLocked();
-    root["sysDialogZOrder"] = isScreenLocked ? SOURCE_SCREENLOCKED : SOURCE_UNSCREENLOCKED;
+    root["sysDialogZOrder"] = SOURCE_SCREENLOCKED;
     root["dialogReason"] = dialogReason;
     root["number"] = Str16ToStr8(number);
     root["accountId"] = accountId;
@@ -166,8 +163,7 @@ std::string CallDialog::BuildStartAnswerPrivpacyModeCommand(const std::string &d
     nlohmann::json root;
     std::string uiExtensionType = "sysDialog/common";
     root["ability.want.params.uiExtensionType"] = uiExtensionType;
-    bool isScreenLocked = ScreenLock::ScreenLockManager::GetInstance()->IsScreenLocked();
-    root["sysDialogZOrder"] = isScreenLocked ? SOURCE_SCREENLOCKED : SOURCE_UNSCREENLOCKED;
+    root["sysDialogZOrder"] = SOURCE_SCREENLOCKED;
     root["dialogReason"] = dialogReason;
     root["callId"] = callId;
     root["videoState"] = videoState;

@@ -208,7 +208,7 @@ int32_t CallControlManager::AnswerCall(int32_t callId, int32_t videoState)
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     if (CurrentIsSuperPrivacyMode(callId, videoState)) {
-        return TELEPHONY_ERR_ARGUMENT_INVALID;
+        return TELEPHONY_SUCCESS;
     }
     AnswerHandlerForSatelliteOrVideoCall(call, videoState);
     TELEPHONY_LOGI("report answered state");

@@ -62,8 +62,7 @@
                 "sms_mms",
                 "image_framework",
                 "miscdevice",
-                "location",
-                "screenlock_mgr"
+                "location"
             ],
             "third_party": [
                 "libphonenumber",
