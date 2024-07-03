@@ -31,7 +31,7 @@ CallbackStubHelper::~CallbackStubHelper()
 
 int32_t CallbackStubHelper::OnResult(int32_t &errCode, std::string &result)
 {
-    TELEPHONY_LOGI("OnResult errCode: %{public}d", errCode);
+    TELEPHONY_LOGI("OnResult errCode: %{public}d, result: %{public}s", errCode, result);
     if (spamCallAdapter_ != nullptr) {
         spamCallAdapter_->SetDetectResult(errCode, result);
         spamCallAdapter_->NotifyAll();

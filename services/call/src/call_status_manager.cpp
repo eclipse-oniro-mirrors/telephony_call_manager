@@ -48,6 +48,7 @@
 namespace OHOS {
 namespace Telephony {
 constexpr int32_t INIT_INDEX = 0;
+constexpr int32_t DECISION_REASON_TRUSTLIST = 2;
 CallStatusManager::CallStatusManager()
 {
     (void)memset_s(&callReportInfo_, sizeof(CallDetailInfo), 0, sizeof(CallDetailInfo));
@@ -1365,6 +1366,11 @@ bool CallStatusManager::ShouldBlockIncomingCall(const sptr<CallBase> &call, cons
             bool isBlock = true;
             int32_t blockReason;
             spamCallAdapterPtr_->ParseDetectResult(result, isBlock, numberMarkInfo, blockReason);
+            if (blockReason == DECISION_REASON_TRUSTLIST) {
+                TELEPHONY_LOGI("trustlist, need query numbermark");
+                DelayedSingleton<CallNumberUtils>::GetInstance()->
+                    QueryYellowPageAndMarkInfo(numberMarkInfo, std::string(info.phoneNum));
+            }
             call->SetNumberMarkInfo(numberMarkInfo);
             call->SetBlockReason(blockReason);
             if (isBlock) {
