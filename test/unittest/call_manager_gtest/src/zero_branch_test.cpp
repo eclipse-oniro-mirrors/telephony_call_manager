@@ -3027,68 +3027,78 @@ HWTEST_F(BranchTest, Telephony_SuperPrivacyManagerClient_001, Function | MediumT
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(BranchTest, Telephony_CallStatusCallback, Function | MediumTest | Level3)
+HWTEST_F(BranchTest, Telephony_CallStatusCallback_001, Function | MediumTest | Level3)
 {
     auto callStatusCallback = std::make_shared<CallStatusCallback>();
     CallReportInfo callReportInfo;
-    callStatusCallback.UpdateCallReportInfo(callReportInfo);
+    callStatusCallback->UpdateCallReportInfo(callReportInfo);
     CallsReportInfo callsReportInfo;
-    callStatusCallback.UpdateCallsReportInfo(callsReportInfo);
+    callStatusCallback->UpdateCallsReportInfo(callsReportInfo);
     DisconnectedDetails disconnectedDetails;
-    callStatusCallback.UpdateDisconnectedCause(disconnectedDetails);
+    callStatusCallback->UpdateDisconnectedCause(disconnectedDetails);
     CellularCallEventInfo cellularCallEventIndo;
-    callStatusCallback.UpdateEventResultInfo(const CellularCallEventInfo &info) override;
-    RBTPlayInfo rbtpPlyaInfo;
-    callStatusCallback.UpdateRBTPlayInfo(rbtpPlyaInfo);
+    callStatusCallback->UpdateEventResultInfo(cellularCallEventIndo);
+    RBTPlayInfo rbtpPlyaInfo = RBTPlayInfo::LOCAL_ALERTING;
+    callStatusCallback->UpdateRBTPlayInfo(rbtpPlyaInfo);
     int32_t result = 0;
-    callStatusCallback.StartDtmfResult(result);
-    callStatusCallback.StopDtmfResult(result);
-    callStatusCallback.SendUssdResult(result);
-    callStatusCallback.GetImsCallDataResult(result);
+    callStatusCallback->StartDtmfResult(result);
+    callStatusCallback->StopDtmfResult(result);
+    callStatusCallback->SendUssdResult(result);
+    callStatusCallback->GetImsCallDataResult(result);
     CallWaitResponse callWaitResponse;
-    callStatusCallback.UpdateGetWaitingResult(callWaitResponse);
-    callStatusCallback.UpdateSetWaitingResult(result);
+    callStatusCallback->UpdateGetWaitingResult(callWaitResponse);
+    callStatusCallback->UpdateSetWaitingResult(result);
     CallRestrictionResponse callRestrictionResponse;
-    callStatusCallback.UpdateGetRestrictionResult(callRestrictionResponse);
-    callStatusCallback.UpdateSetRestrictionResult(result);
-    callStatusCallback.UpdateSetRestrictionPasswordResult(result);
+    callStatusCallback->UpdateGetRestrictionResult(callRestrictionResponse);
+    callStatusCallback->UpdateSetRestrictionResult(result);
+    callStatusCallback->UpdateSetRestrictionPasswordResult(result);
     CallTransferResponse callTransferResponse;
-    callStatusCallback.UpdateGetTransferResult(callTransferResponse);
-    callStatusCallback.UpdateSetTransferResult(result);
+    callStatusCallback->UpdateGetTransferResult(callTransferResponse);
+    callStatusCallback->UpdateSetTransferResult(result);
     ClipResponse clipResponse;
-    callStatusCallback.UpdateGetCallClipResult(clipResponse);
+    callStatusCallback->UpdateGetCallClipResult(clipResponse);
     ClirResponse clirResponse;
-    callStatusCallback.UpdateGetCallClirResult(clirResponse);
-    callStatusCallback.UpdateSetCallClirResult(result);
-    callStatusCallback.StartRttResult(result);
-    callStatusCallback.StopRttResult(result);
+    callStatusCallback->UpdateGetCallClirResult(clirResponse);
+    callStatusCallback->UpdateSetCallClirResult(result);
+    callStatusCallback->StartRttResult(result);
+    callStatusCallback->StopRttResult(result);
     GetImsConfigResponse getImsConfigResponse;
-    callStatusCallback.GetImsConfigResult(getImsConfigResponse);
-    callStatusCallback.SetImsConfigResult(result);
+    callStatusCallback->GetImsConfigResult(getImsConfigResponse);
+    callStatusCallback->SetImsConfigResult(result);
     GetImsFeatureValueResponse getImsFeatureValueResopnse;
-    callStatusCallback.GetImsFeatureValueResult(getImsFeatureValueResopnse);
-    callStatusCallback.SetImsFeatureValueResult(result);
+    callStatusCallback->GetImsFeatureValueResult(getImsFeatureValueResopnse);
+    callStatusCallback->SetImsFeatureValueResult(result);
     CallModeReportInfo callModeReportInfo;
-    callStatusCallback.ReceiveUpdateCallMediaModeRequest(callModeReportInfo);
-    callStatusCallback.ReceiveUpdateCallMediaModeResponse(callModeReportInfo);
-    callStatusCallback.InviteToConferenceResult(result);
+    callStatusCallback->ReceiveUpdateCallMediaModeRequest(callModeReportInfo);
+    callStatusCallback->ReceiveUpdateCallMediaModeResponse(callModeReportInfo);
+    callStatusCallback->InviteToConferenceResult(result);
     MmiCodeInfo mmiCodeInfo;
-    callStatusCallback.SendMmiCodeResult(mmiCodeInfo);
-    callStatusCallback.CloseUnFinishedUssdResult(result);
+    callStatusCallback->SendMmiCodeResult(mmiCodeInfo);
+    callStatusCallback->CloseUnFinishedUssdResult(result);
+}
+
+/**
+ * @tc.number   Telephony_CallStatusCallback_002
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_CallStatusCallback_002, Function | MediumTest | Level3)
+{
+    auto callStatusCallback = std::make_shared<CallStatusCallback>();
     std::string c("a");
-    callStatusCallback.ReportPostDialChar(c);
+    callStatusCallback->ReportPostDialChar(c);
     std::string str("abc");
-    callStatusCallback.ReportPostDialDelay(str);
+    callStatusCallback->ReportPostDialDelay(str);
     CallSessionReportInfo callSessionReportInfo;
-    callStatusCallback.HandleCallSessionEventChanged(callSessionReportInfo);
+    callStatusCallback->HandleCallSessionEventChanged(callSessionReportInfo);
     PeerDimensionsReportInfo peerDimensionReportInfo;
-    callStatusCallback.HandlePeerDimensionsChanged(peerDimensionReportInfo);
+    callStatusCallback->HandlePeerDimensionsChanged(peerDimensionReportInfo);
     int64_t res = 0;
-    callStatusCallback.HandleCallDataUsageChanged(res);
+    callStatusCallback->HandleCallDataUsageChanged(res);
     CameraCapabilitiesReportInfo cameraCapabilities;
-    callStatusCallback.HandleCameraCapabilitiesChanged(cameraCapabilities);
+    callStatusCallback->HandleCameraCapabilitiesChanged(cameraCapabilities);
     VoipCallEventInfo voipCallEventInfo;
-    callStatusCallback.UpdateVoipEventInfo(voipCallEventInfo);
+    callStatusCallback->UpdateVoipEventInfo(voipCallEventInfo);
 }
 
 /**
@@ -3105,8 +3115,8 @@ HWTEST_F(BranchTest, Telephony_SatelliteCallControl_001, Function | MediumTest |
     satelliteCallControl->IsSatelliteSwitchEnable();
     satelliteCallControl->GetSatcommTempLevel();
     sptr<CallBase> call = nullptr;
-    TelCallState priorState;
-    TelCallState nextState
+    TelCallState priorState = TelCallState::CALL_STATUS_DIALING;
+    TelCallState nextState = TelCallState::CALL_STATUS_ALERTING;
     satelliteCallControl->HandleSatelliteCallStateUpdate(call, priorState, nextState);
     satelliteCallControl->IsShowDialog();
     bool isShowDialog = true;
@@ -3144,7 +3154,7 @@ HWTEST_F(BranchTest, Telephony_StatusBar_001, Function | MediumTest | Level3)
     bool isDisplayMute = false;
     statusBar->UpdateMuteIcon(isDisplayMute);
     statusBar->UpdateSpeakerphoneIcon(isDisplayMute);
-    statusBar->CallStateUpdated(allObjectPtr, TelCallState::CALL_STATUS_IDLE, TelCallState::CALL_STATUS_INCOMING);
+    statusBar->CallStateUpdated(callObjectPtr, TelCallState::CALL_STATUS_IDLE, TelCallState::CALL_STATUS_INCOMING);
     statusBar->IncomingCallHungUp(callObjectPtr, false, "");
     statusBar->IncomingCallActivated(callObjectPtr);
     DisconnectedDetails details;

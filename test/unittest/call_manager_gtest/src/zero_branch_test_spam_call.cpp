@@ -189,7 +189,7 @@ HWTEST_F(SpamCallTest, Telephony_SpamCallProxy_001, Function | MediumTest | Leve
 HWTEST_F(SpamCallTest, Telephony_CallAbilityConnection_001, Function | MediumTest | Level1)
 {
     std::string commandStr = "11111";
-    CallAbilityConnection callAbilityConnection(phoneNumber, slotId, spamCallAdapter);
+    CallAbilityConnection callAbilityConnection(commandStr);
     std::string bundle = "111";
     std::string ability = "222";
     AppExecFwk::ElementName element("", bundle, ability);
@@ -207,7 +207,7 @@ HWTEST_F(SpamCallTest, Telephony_CallAbilityConnection_001, Function | MediumTes
 HWTEST_F(SpamCallTest, Telephony_CallSettingAbilityConnection_001, Function | MediumTest | Level1)
 {
     std::string commandStr = "11111";
-    CallSettingAbilityConnection callSettingAbilityConnection(phoneNumber, slotId, spamCallAdapter);
+    CallSettingAbilityConnection callSettingAbilityConnection(commandStr);
     std::string bundle = "111";
     std::string ability = "222";
     AppExecFwk::ElementName element("", bundle, ability);
