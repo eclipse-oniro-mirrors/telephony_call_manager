@@ -71,7 +71,7 @@ private:
     static bool isBtScoConnected_;
     static bool isDCallDevConnected_;
     bool isAudioActivated_;
-    using AudioDeviceManagerFunc = bool (AudioDeviceManager::*)();
+    using AudioDeviceManagerFunc = std::function<bool()>;
     std::map<uint32_t, AudioDeviceManagerFunc> memberFuncMap_;
     AudioDeviceInfo info_;
     bool SwitchDevice(AudioEvent event);

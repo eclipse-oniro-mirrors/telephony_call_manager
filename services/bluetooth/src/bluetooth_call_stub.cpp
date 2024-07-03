@@ -30,31 +30,31 @@ namespace Telephony {
 BluetoothCallStub::BluetoothCallStub()
 {
     memberFuncMap_[static_cast<uint32_t>(BluetoothCallInterfaceCode::INTERFACE_BT_ANSWER_CALL)] =
-        &BluetoothCallStub::OnAnswerCall;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnAnswerCall(data, reply); };
     memberFuncMap_[static_cast<uint32_t>(BluetoothCallInterfaceCode::INTERFACE_BT_REJECT_CALL)] =
-        &BluetoothCallStub::OnRejectCall;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnRejectCall(data, reply); };
     memberFuncMap_[static_cast<uint32_t>(BluetoothCallInterfaceCode::INTERFACE_BT_HOLD_CALL)] =
-        &BluetoothCallStub::OnHoldCall;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnHoldCall(data, reply); };
     memberFuncMap_[static_cast<uint32_t>(BluetoothCallInterfaceCode::INTERFACE_BT_UNHOLD_CALL)] =
-        &BluetoothCallStub::OnUnHoldCall;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnUnHoldCall(data, reply); };
     memberFuncMap_[static_cast<uint32_t>(BluetoothCallInterfaceCode::INTERFACE_BT_DISCONNECT_CALL)] =
-        &BluetoothCallStub::OnHangUpCall;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnHangUpCall(data, reply); };
     memberFuncMap_[static_cast<uint32_t>(BluetoothCallInterfaceCode::INTERFACE_BT_GET_CALL_STATE)] =
-        &BluetoothCallStub::OnGetBtCallState;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnGetBtCallState(data, reply); };
     memberFuncMap_[static_cast<uint32_t>(BluetoothCallInterfaceCode::INTERFACE_BT_SWAP_CALL)] =
-        &BluetoothCallStub::OnSwitchCall;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnSwitchCall(data, reply); };
     memberFuncMap_[static_cast<uint32_t>(BluetoothCallInterfaceCode::INTERFACE_BT_COMBINE_CONFERENCE)] =
-        &BluetoothCallStub::OnCombineConference;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnCombineConference(data, reply); };
     memberFuncMap_[static_cast<uint32_t>(BluetoothCallInterfaceCode::INTERFACE_BT_SEPARATE_CONFERENCE)] =
-        &BluetoothCallStub::OnSeparateConference;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnSeparateConference(data, reply); };
     memberFuncMap_[static_cast<uint32_t>(BluetoothCallInterfaceCode::INTERFACE_BT_KICK_OUT_CONFERENCE)] =
-        &BluetoothCallStub::OnKickOutFromConference;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnKickOutFromConference(data, reply); };
     memberFuncMap_[static_cast<uint32_t>(BluetoothCallInterfaceCode::INTERFACE_BT_START_DTMF)] =
-        &BluetoothCallStub::OnStartDtmf;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnStartDtmf(data, reply); };
     memberFuncMap_[static_cast<uint32_t>(BluetoothCallInterfaceCode::INTERFACE_BT_STOP_DTMF)] =
-        &BluetoothCallStub::OnStopDtmf;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnStopDtmf(data, reply); };
     memberFuncMap_[static_cast<uint32_t>(BluetoothCallInterfaceCode::INTERFACE_BT_GET_CURRENT_CALL_LIST)] =
-        &BluetoothCallStub::OnGetCurrentCallList;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnGetCurrentCallList(data, reply); };
 }
 
 BluetoothCallStub::~BluetoothCallStub()
@@ -76,7 +76,7 @@ int32_t BluetoothCallStub::OnRemoteRequest(uint32_t code, MessageParcel &data, M
     if (itFunc != memberFuncMap_.end()) {
         auto memberFunc = itFunc->second;
         if (memberFunc != nullptr) {
-            return (this->*memberFunc)(data, reply);
+            return memberFunc(data, reply);
         }
     }
     return IPCObjectStub::OnRemoteRequest(code, data, reply, option);

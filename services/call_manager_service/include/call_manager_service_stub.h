@@ -34,7 +34,7 @@ public:
         uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
 
 private:
-    using CallManagerServiceFunc = int32_t (CallManagerServiceStub::*)(MessageParcel &data, MessageParcel &reply);
+    using CallManagerServiceFunc = std::function<int32_t(MessageParcel &data, MessageParcel &reply)>;
 
     void InitCallBasicRequest();
     void InitCallUtilsRequest();

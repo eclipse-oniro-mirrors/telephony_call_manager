@@ -49,22 +49,26 @@ NapiCallAbilityCallback::NapiCallAbilityCallback()
     (void)memset_s(&callDataUsageCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
     (void)memset_s(&cameraCapabilitiesCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
     (void)memset_s(&callSessionEventCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
-    memberFuncMap_[CallResultReportId::GET_CALL_WAITING_REPORT_ID] = &NapiCallAbilityCallback::ReportGetWaitingInfo;
-    memberFuncMap_[CallResultReportId::SET_CALL_WAITING_REPORT_ID] = &NapiCallAbilityCallback::ReportSetWaitingInfo;
+    memberFuncMap_[CallResultReportId::GET_CALL_WAITING_REPORT_ID] =
+        [this](AppExecFwk::PacMap &resultInfo) { return ReportGetWaitingInfo(resultInfo); };
+    memberFuncMap_[CallResultReportId::SET_CALL_WAITING_REPORT_ID] =
+        [this](AppExecFwk::PacMap &resultInfo) { return ReportSetWaitingInfo(resultInfo); };
     memberFuncMap_[CallResultReportId::GET_CALL_RESTRICTION_REPORT_ID] =
-        &NapiCallAbilityCallback::ReportGetRestrictionInfo;
+        [this](AppExecFwk::PacMap &resultInfo) { return ReportGetRestrictionInfo(resultInfo); };
     memberFuncMap_[CallResultReportId::SET_CALL_RESTRICTION_REPORT_ID] =
-        &NapiCallAbilityCallback::ReportSetRestrictionInfo;
+        [this](AppExecFwk::PacMap &resultInfo) { return ReportSetRestrictionInfo(resultInfo); };
     memberFuncMap_[CallResultReportId::SET_CALL_RESTRICTION_PWD_REPORT_ID] =
-        &NapiCallAbilityCallback::ReportSetRestrictionPassword;
+        [this](AppExecFwk::PacMap &resultInfo) { return ReportSetRestrictionPassword(resultInfo); };
     memberFuncMap_[CallResultReportId::GET_CALL_TRANSFER_REPORT_ID] =
-        &NapiCallAbilityCallback::ReportGetTransferInfo;
+        [this](AppExecFwk::PacMap &resultInfo) { return ReportGetTransferInfo(resultInfo); };
     memberFuncMap_[CallResultReportId::SET_CALL_TRANSFER_REPORT_ID] =
-        &NapiCallAbilityCallback::ReportSetTransferInfo;
-    memberFuncMap_[CallResultReportId::START_RTT_REPORT_ID] = &NapiCallAbilityCallback::ReportStartRttInfo;
-    memberFuncMap_[CallResultReportId::STOP_RTT_REPORT_ID] = &NapiCallAbilityCallback::ReportStopRttInfo;
+        [this](AppExecFwk::PacMap &resultInfo) { return ReportSetTransferInfo(resultInfo); };
+    memberFuncMap_[CallResultReportId::START_RTT_REPORT_ID] =
+        [this](AppExecFwk::PacMap &resultInfo) { return ReportStartRttInfo(resultInfo); };
+    memberFuncMap_[CallResultReportId::STOP_RTT_REPORT_ID] =
+        [this](AppExecFwk::PacMap &resultInfo) { return ReportStopRttInfo(resultInfo); };
     memberFuncMap_[CallResultReportId::CLOSE_UNFINISHED_USSD_REPORT_ID] =
-        &NapiCallAbilityCallback::ReportCloseUnFinishedUssdInfo;
+        [this](AppExecFwk::PacMap &resultInfo) { return ReportCloseUnFinishedUssdInfo(resultInfo); };
 }
 
 NapiCallAbilityCallback::~NapiCallAbilityCallback() {}
@@ -773,7 +777,7 @@ int32_t NapiCallAbilityCallback::UpdateAsyncResultsInfo(
     auto itFunc = memberFuncMap_.find(reportId);
     if (itFunc != memberFuncMap_.end() && itFunc->second != nullptr) {
         auto memberFunc = itFunc->second;
-        result = (this->*memberFunc)(resultInfo);
+        result = memberFunc(resultInfo);
     }
     return result;
 }
