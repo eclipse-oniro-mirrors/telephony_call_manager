@@ -87,8 +87,6 @@ void IncomingCallWakeup::WakeupDevice()
         return;
     }
 #ifdef ABILITY_POWER_SUPPORT
-    PowerMgr::PowerMgrClient::GetInstance().WakeupDevice(
-        PowerMgr::WakeupDeviceType::WAKEUP_DEVICE_APPLICATION, wakeupReason_);
     if (screenRunningLock_ != nullptr && !isScreenOnLocked) {
         screenRunningLock_->Lock();
         isScreenOnLocked = true;
