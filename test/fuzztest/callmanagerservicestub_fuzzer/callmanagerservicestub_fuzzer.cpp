@@ -202,8 +202,10 @@ void doFuzzCallManagerService(const uint8_t *data, size_t size)
     }
     std::u16string service_token = u"OHOS.Telephony.ICallManagerService";
     MessageOption option;
-    MessageParcel dataParcel, replyParcel;
-    std::vector<uint8_t> subData = fdp.ConsumeBytes<uint8_t>(fdp.ConsumeIntegralInRange<size_t>(0, fdp.remaining_bytes()));
+    MessageParcel dataParcel;
+    MessageParcel replyParcel;
+    std::vector<uint8_t> subData =
+        fdp.ConsumeBytes<uint8_t>(fdp.ConsumeIntegralInRange<size_t>(0, fdp.remaining_bytes()));
     dataParcel.WriteInterfaceToken(service_token);
     dataParcel.WriteBuffer(subData.data(), subData.size());
     callManagerService->OnRemoteRequest(code, dataParcel, replyParcel, option);
