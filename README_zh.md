@@ -6,7 +6,8 @@
 -   [接口说明](#section136mcpsimp)
 -   [使用说明](#section163mcpsimp)
     -   [拨打电话接口调用流程及示例代码](#section113291522113518)
-
+    -   [获取VoLTE高清通话服务是否启用](#section113291522113520)
+    
 -   [相关仓](#section227mcpsimp)
 
 ## 简介<a name="section117mcpsimp"></a>
@@ -66,6 +67,7 @@
 **表 1**  通话管理对外提供的接口
 
 <a name="table137mcpsimp"></a>
+
 <table><thead align="left"><tr id="row143mcpsimp"><th class="cellrowborder" valign="top" width="33.33333333333333%" id="mcps1.2.4.1.1"><p id="entry144mcpsimpp0"><a name="entry144mcpsimpp0"></a><a name="entry144mcpsimpp0"></a>接口内容</p>
 </th>
 <th class="cellrowborder" valign="top" width="33.33333333333333%" id="mcps1.2.4.1.2"><p id="entry145mcpsimpp0"><a name="entry145mcpsimpp0"></a><a name="entry145mcpsimpp0"></a>接口描述</p>
@@ -77,6 +79,14 @@
 <tbody><tr id="row147mcpsimp"><td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.2.4.1.1 "><p id="p143312519577"><a name="p143312519577"></a><a name="p143312519577"></a>function dial(phoneNumber: string, options: DialOptions, callback: AsyncCallback&lt;boolean&gt;): void;</p>
 </td>
 <td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.2.4.1.2 "><p id="entry149mcpsimpp0"><a name="entry149mcpsimpp0"></a><a name="entry149mcpsimpp0"></a>拨号接口，调用此接口可以进行拨号操作</p>
+</td>
+<td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.2.4.1.3 "><p id="entry150mcpsimpp0"><a name="entry150mcpsimpp0"></a><a name="entry150mcpsimpp0"></a>ohos.permission.PLACE_CALL</p>
+</td>
+</tr>
+</tbody>
+<tbody><tr id="row147mcpsimp"><td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.2.4.1.1 "><p id="p143312519577"><a name="p143312519577"></a><a name="p143312519577"></a>function isImsSwitchEnabledSync(slotId: number):boolean;</p>
+</td>
+<td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.2.4.1.2 "><p id="entry149mcpsimpp0"><a name="entry149mcpsimpp0"></a><a name="entry149mcpsimpp0"></a>获取VoLTE高清通话服务是否启用（参数slotId表示SIM卡id，0表示卡一，1表示卡二）</p>
 </td>
 <td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.2.4.1.3 "><p id="entry150mcpsimpp0"><a name="entry150mcpsimpp0"></a><a name="entry150mcpsimpp0"></a>ohos.permission.PLACE_CALL</p>
 </td>
@@ -147,13 +157,14 @@
 
 1.  构造phoneNumber和options参数；
 2.  可以通过callback或者Promise的方式调用dial接口。
+
 3.  该接口为异步接口，相关执行结果会从callback中返回。
 
     ```
     import call from "@ohos.telephony.call";
-
+    
     let phoneNumber = "12312312312";
-
+    
     // 调用接口【callback方式】
     call.dial(phoneNumber, {extras: false}, (err, value) => {
       if (err) {
@@ -164,7 +175,7 @@
       // 接口调用成功，err为空
       console.log(`success to dial: ${value}`);
     });
-
+    
     // 调用接口【Promise方式】
     let promise = call.dial(phoneNumber, {extras: false});
     promise.then((value) => {
@@ -176,6 +187,25 @@
     });
     ```
 
+### 获取VoLTE高清通话服务是否启用<a name="section113291522113520"></a>
+
+1. 可以通过调用isImsSwitchEnabledSync获取VoLTE高清通话服务是否启用。
+
+2. 该接口为同步接口，相关执行结果会从isImsSwitchEnabledSync中返回。
+
+   ```
+   import call from "@ohos.telephony.call";
+   
+   try {
+   	// 调用接口【Sync方式】
+   	let isEnabled: boolean = data.isImsSwitchEnabledSync(0);
+   	// 调用接口成功
+       console.log(`isImsSwitchEnabledSync success : ${isEnabled}`);
+   } catch (error) {
+   	// 调用接口失败
+       console.log(`isImsSwitchEnabledSync failed`);  
+   }
+   ```
 
 ## 相关仓<a name="section227mcpsimp"></a>
 

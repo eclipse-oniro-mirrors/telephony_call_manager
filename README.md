@@ -74,7 +74,17 @@ The following figure shows the architecture of the Call Manager module.
 </td>
 </tr>
 </tbody>
+<tbody><tr id="row147mcpsimp"><td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.2.4.1.1 "><p id="p143312519577"><a name="p143312519577"></a><a name="p143312519577"></a>function isImsSwitchEnabledSync(slotId: number):boolean;</p>
+</td>
+<td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.2.4.1.2 "><p id="entry149mcpsimpp0"><a name="entry149mcpsimpp0"></a><a name="entry149mcpsimpp0"></a>Checks if VoLTE HD calling is enabled（The parameter slotId represents the SIM card ID, where 0 indicates Card 1 and 1 indicates Card 2）.</p>
+</td>
+<td class="cellrowborder" valign="top" width="33.33333333333333%" headers="mcps1.2.4.1.3 "><p id="entry150mcpsimpp0"><a name="entry150mcpsimpp0"></a><a name="entry150mcpsimpp0"></a>ohos.permission.PLACE_CALL</p>
+</td>
+</tr>
+</tbody>
 </table>
+
+
 
 **Table  2**  Parameters of the Dial API
 
@@ -142,9 +152,9 @@ The following figure shows the architecture of the Call Manager module.
 
     ```
     import call from "@ohos.telephony.call";
-
+    
     let phoneNumber = "12312312312";
-
+    
     // Call the API in callback mode.
     call.dial(phoneNumber, {extras: false}, (err, value) => {
       if (err) {
@@ -155,7 +165,7 @@ The following figure shows the architecture of the Call Manager module.
       // If the API call succeeded, err is empty.
       console.log(`success to dial: ${value}`);
     });
-
+    
     // Call the API in Promise mode.
     let promise = call.dial(phoneNumber, {extras: false});
     promise.then((value) => {
@@ -167,6 +177,25 @@ The following figure shows the architecture of the Call Manager module.
     });
     ```
 
+### Check if VoLTE HD calling is enabled<a name="section113291522113520"></a>
+
+1. You can check if VoLTE HD calling service is enabled by invoking isImsSwitchEnabledSync.
+
+2. This interface is a synchronous interface, and theThis interface is a synchronous interface, and the returned from isImsSwitch and the relevant execution results will be returned from isImsSwitchEnabledSync.
+
+   ```
+   import call from "@ohos.telephony.call";
+   
+   try {
+   	// Call the interface [Sync method]
+   	let isEnabled: boolean = data.isImsSwitchEnabledSync(0);
+   	// Call the interface successfully
+       console.log(`isImsSwitchEnabledSync success : ${isEnabled}`);
+   } catch (error) {
+   	// Call the interface failed
+       console.log(`isImsSwitchEnabledSync failed`);  
+   }
+   ```
 
 ## Repositories Involved<a name="section227mcpsimp"></a>
 
