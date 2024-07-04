@@ -53,7 +53,7 @@ int32_t CallbackStubHelper::OnResult(int32_t &errCode, std::string &result)
         if (blockReason == DECISION_REASON_TRUSTLIST) {
             TELEPHONY_LOGI("trustlist, need query numbermark");
             DelayedSingleton<CallNumberUtils>::GetInstance()->
-                QueryYellowPageAndMarkInfo(numberMarkInfo, spamCallAdapter_->GetDetectPhoneNum);
+                QueryYellowPageAndMarkInfo(numberMarkInfo, spamCallAdapter_->GetDetectPhoneNum());
         }
         spamCallAdapter_->SetParseResult(isBlock, numberMarkInfo, blockReason);
     }
