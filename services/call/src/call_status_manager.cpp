@@ -48,7 +48,6 @@
 namespace OHOS {
 namespace Telephony {
 constexpr int32_t INIT_INDEX = 0;
-constexpr int32_t DECISION_REASON_TRUSTLIST = 2;
 CallStatusManager::CallStatusManager()
 {
     (void)memset_s(&callReportInfo_, sizeof(CallDetailInfo), 0, sizeof(CallDetailInfo));
@@ -1352,30 +1351,20 @@ bool CallStatusManager::ShouldBlockIncomingCall(const sptr<CallBase> &call, cons
     spamCallAdapterPtr_->DetectSpamCall(std::string(info.phoneNum), info.accountId);
     if (spamCallAdapterPtr_->WaitForDetectResult()) {
         TELEPHONY_LOGI("DetectSpamCall no time out");
-        int32_t errCode = 0;
-        std::string result = "";
-        spamCallAdapterPtr_->GetDetectResult(errCode, result);
-        if (errCode == 0) {
-            NumberMarkInfo numberMarkInfo = {
-                .markType = MarkType::MARK_TYPE_NONE,
-                .markContent = "",
-                .markCount = -1,
-                .markSource = "",
-                .isCloud = false,
-            };
-            bool isBlock = true;
-            int32_t blockReason;
-            spamCallAdapterPtr_->ParseDetectResult(result, isBlock, numberMarkInfo, blockReason);
-            if (blockReason == DECISION_REASON_TRUSTLIST) {
-                TELEPHONY_LOGI("trustlist, need query numbermark");
-                DelayedSingleton<CallNumberUtils>::GetInstance()->
-                    QueryYellowPageAndMarkInfo(numberMarkInfo, std::string(info.phoneNum));
-            }
-            call->SetNumberMarkInfo(numberMarkInfo);
-            call->SetBlockReason(blockReason);
-            if (isBlock) {
-                return true;
-            }
+        NumberMarkInfo numberMarkInfo = {
+            .markType = MarkType::MARK_TYPE_NONE,
+            .markContent = "",
+            .markCount = -1,
+            .markSource = "",
+            .isCloud = false,
+        };
+        bool isBlock = false;
+        int32_t blockReason;
+        spamCallAdapterPtr_->GetParseResult(isBlock, numberMarkInfo, blockReason);
+        call->SetNumberMarkInfo(numberMarkInfo);
+        call->SetBlockReason(blockReason);
+        if (isBlock) {
+            return true;
         }
     }
     return false;
