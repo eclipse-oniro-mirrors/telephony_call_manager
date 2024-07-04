@@ -44,6 +44,7 @@
 #include "wired_headset_device_state.h"
 #include "gtest/gtest.h"
 #include "audio_scene_processor.h"
+#include "core_service_connection.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -925,5 +926,18 @@ HWTEST_F(CallStateTest, Telephony_CallStateProcessor_001, Function | MediumTest 
     callStateProcessor->ShouldSwitchState(state);
     callStateProcessor->GetAudioForegroundLiveCall();
 }
+
+/**
+ * @tc.number   Telephony_CoreServiceConnection_001
+ * @tc.name     test error nullptr branch with permission
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallStateTest, Telephony_CoreServiceConnection_001, Function | MediumTest | Level3)
+{
+    CoreServiceConnection coreServiceConnection;
+    coreServiceConnection.GetFdnNumberList(DEFAULT_SLOT_ID);
+    coreServiceConnection.IsFdnEnabled(DEFAULT_SLOT_ID);
+}
+
 } // namespace Telephony
 } // namespace OHOS

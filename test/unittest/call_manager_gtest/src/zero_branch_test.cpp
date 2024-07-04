@@ -66,6 +66,13 @@
 #include "call_ability_callback_death_recipient.h"
 #include "app_state_observer.h"
 #include "call_ability_callback_proxy.h"
+#include "super_privacy_manager_client.h"
+#include "call_status_callback.h"
+#include "satellite_call_control.h"
+#include "proximity_sensor.h"
+#include "status_bar.h"
+#include "wired_headset.h"
+#include "call_status_policy.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -84,6 +91,7 @@ const int32_t VALID_CALLID = 1;
 const int32_t ERROR_CALLID = -1;
 const int32_t ONE_TIME = 1;
 const int32_t STEP_1 = 1;
+const int32_t SOURCE_CALL = 2;
 constexpr int16_t DEFAULT_TIME = 0;
 constexpr const char *TEST_STR = "123";
 constexpr const char *LONG_STR =
@@ -3001,6 +3009,187 @@ HWTEST_F(BranchTest, Telephony_OTTCallConnection_001, Function | MediumTest | Le
     ott.UpdateImsCallMode(requestInfo, ImsCallMode::CALL_MODE_AUDIO_ONLY);
     AppExecFwk::PacMap info;
     ott.PackCellularCallInfo(requestInfo, info);
+}
+
+/**
+ * @tc.number   Telephony_SuperPrivacyManagerClient_001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_SuperPrivacyManagerClient_001, Function | MediumTest | Level3)
+{
+    int32_t privacy = SuperPrivacyManagerClient::GetInstance().
+    SetSuperPrivacyMode(static_cast<int32_t>(CallSuperPrivacyModeType::OFF), SOURCE_CALL);
+}
+
+/**
+ * @tc.number   Telephony_CallStatusCallback_001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_CallStatusCallback_001, Function | MediumTest | Level3)
+{
+    auto callStatusCallback = std::make_shared<CallStatusCallback>();
+    CallReportInfo callReportInfo;
+    callStatusCallback->UpdateCallReportInfo(callReportInfo);
+    CallsReportInfo callsReportInfo;
+    callStatusCallback->UpdateCallsReportInfo(callsReportInfo);
+    DisconnectedDetails disconnectedDetails;
+    callStatusCallback->UpdateDisconnectedCause(disconnectedDetails);
+    CellularCallEventInfo cellularCallEventIndo;
+    callStatusCallback->UpdateEventResultInfo(cellularCallEventIndo);
+    RBTPlayInfo rbtpPlyaInfo = RBTPlayInfo::LOCAL_ALERTING;
+    callStatusCallback->UpdateRBTPlayInfo(rbtpPlyaInfo);
+    int32_t result = 0;
+    callStatusCallback->StartDtmfResult(result);
+    callStatusCallback->StopDtmfResult(result);
+    callStatusCallback->SendUssdResult(result);
+    callStatusCallback->GetImsCallDataResult(result);
+    CallWaitResponse callWaitResponse;
+    callStatusCallback->UpdateGetWaitingResult(callWaitResponse);
+    callStatusCallback->UpdateSetWaitingResult(result);
+    CallRestrictionResponse callRestrictionResponse;
+    callStatusCallback->UpdateGetRestrictionResult(callRestrictionResponse);
+    callStatusCallback->UpdateSetRestrictionResult(result);
+    callStatusCallback->UpdateSetRestrictionPasswordResult(result);
+    CallTransferResponse callTransferResponse;
+    callStatusCallback->UpdateGetTransferResult(callTransferResponse);
+    callStatusCallback->UpdateSetTransferResult(result);
+    ClipResponse clipResponse;
+    callStatusCallback->UpdateGetCallClipResult(clipResponse);
+    ClirResponse clirResponse;
+    callStatusCallback->UpdateGetCallClirResult(clirResponse);
+    callStatusCallback->UpdateSetCallClirResult(result);
+    callStatusCallback->StartRttResult(result);
+    callStatusCallback->StopRttResult(result);
+    GetImsConfigResponse getImsConfigResponse;
+    callStatusCallback->GetImsConfigResult(getImsConfigResponse);
+    callStatusCallback->SetImsConfigResult(result);
+    GetImsFeatureValueResponse getImsFeatureValueResopnse;
+    callStatusCallback->GetImsFeatureValueResult(getImsFeatureValueResopnse);
+    callStatusCallback->SetImsFeatureValueResult(result);
+    CallModeReportInfo callModeReportInfo;
+    callStatusCallback->ReceiveUpdateCallMediaModeRequest(callModeReportInfo);
+    callStatusCallback->ReceiveUpdateCallMediaModeResponse(callModeReportInfo);
+    callStatusCallback->InviteToConferenceResult(result);
+    MmiCodeInfo mmiCodeInfo;
+    callStatusCallback->SendMmiCodeResult(mmiCodeInfo);
+    callStatusCallback->CloseUnFinishedUssdResult(result);
+}
+
+/**
+ * @tc.number   Telephony_CallStatusCallback_002
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_CallStatusCallback_002, Function | MediumTest | Level3)
+{
+    auto callStatusCallback = std::make_shared<CallStatusCallback>();
+    std::string c("a");
+    callStatusCallback->ReportPostDialChar(c);
+    std::string str("abc");
+    callStatusCallback->ReportPostDialDelay(str);
+    CallSessionReportInfo callSessionReportInfo;
+    callStatusCallback->HandleCallSessionEventChanged(callSessionReportInfo);
+    PeerDimensionsReportInfo peerDimensionReportInfo;
+    callStatusCallback->HandlePeerDimensionsChanged(peerDimensionReportInfo);
+    int64_t res = 0;
+    callStatusCallback->HandleCallDataUsageChanged(res);
+    CameraCapabilitiesReportInfo cameraCapabilities;
+    callStatusCallback->HandleCameraCapabilitiesChanged(cameraCapabilities);
+    VoipCallEventInfo voipCallEventInfo;
+    callStatusCallback->UpdateVoipEventInfo(voipCallEventInfo);
+}
+
+/**
+ * @tc.number   Telephony_SatelliteCallControl_001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_SatelliteCallControl_001, Function | MediumTest | Level3)
+{
+    auto satelliteCallControl = DelayedSingleton<SatelliteCallControl>::GetInstance();
+    int32_t level = static_cast<int32_t>(SatCommTempLevel::TEMP_LEVEL_HIGH);
+    satelliteCallControl->SetSatcommTempLevel(level);
+    satelliteCallControl->IsAllowedSatelliteDialCall();
+    satelliteCallControl->IsSatelliteSwitchEnable();
+    satelliteCallControl->GetSatcommTempLevel();
+    sptr<CallBase> call = nullptr;
+    TelCallState priorState = TelCallState::CALL_STATUS_DIALING;
+    TelCallState nextState = TelCallState::CALL_STATUS_ALERTING;
+    satelliteCallControl->HandleSatelliteCallStateUpdate(call, priorState, nextState);
+    satelliteCallControl->IsShowDialog();
+    bool isShowDialog = true;
+    satelliteCallControl->SetShowDialog(isShowDialog);
+}
+
+/**
+ * @tc.number   Telephony_ProximitySensor_001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_ProximitySensor_001, Function | MediumTest | Level3)
+{
+    auto proximitySensor = DelayedSingleton<ProximitySensor>::GetInstance();
+    sptr<CallBase> callObjectPtr = nullptr;
+    proximitySensor->NewCallCreated(callObjectPtr);
+    proximitySensor->CallStateUpdated(callObjectPtr, TelCallState::CALL_STATUS_IDLE,
+        TelCallState::CALL_STATUS_INCOMING);
+    proximitySensor->IncomingCallHungUp(callObjectPtr, false, "");
+    proximitySensor->IncomingCallActivated(callObjectPtr);
+    DisconnectedDetails details;
+    proximitySensor->CallDestroyed(details);
+}
+
+/**
+ * @tc.number   Telephony_StatusBar_001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_StatusBar_001, Function | MediumTest | Level3)
+{
+    auto statusBar = DelayedSingleton<StatusBar>::GetInstance();
+    sptr<CallBase> callObjectPtr = nullptr;
+    statusBar->NewCallCreated(callObjectPtr);
+    bool isDisplayMute = false;
+    statusBar->UpdateMuteIcon(isDisplayMute);
+    statusBar->UpdateSpeakerphoneIcon(isDisplayMute);
+    statusBar->CallStateUpdated(callObjectPtr, TelCallState::CALL_STATUS_IDLE, TelCallState::CALL_STATUS_INCOMING);
+    statusBar->IncomingCallHungUp(callObjectPtr, false, "");
+    statusBar->IncomingCallActivated(callObjectPtr);
+    DisconnectedDetails details;
+    statusBar->CallDestroyed(details);
+}
+
+/**
+ * @tc.number   Telephony_WiredHeadset_001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_WiredHeadset_001, Function | MediumTest | Level3)
+{
+    auto wiredHeadset = DelayedSingleton<WiredHeadset>::GetInstance();
+    sptr<CallBase> callObjectPtr = nullptr;
+    wiredHeadset->Init();
+    wiredHeadset->NewCallCreated(callObjectPtr);
+    wiredHeadset->CallStateUpdated(callObjectPtr, TelCallState::CALL_STATUS_IDLE, TelCallState::CALL_STATUS_INCOMING);
+    wiredHeadset->IncomingCallHungUp(callObjectPtr, false, "");
+    wiredHeadset->IncomingCallActivated(callObjectPtr);
+    DisconnectedDetails details;
+    wiredHeadset->CallDestroyed(details);
+}
+
+/**
+ * @tc.number   Telephony_CallStatusPolicy_001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_CallStatusPolicy_001, Function | MediumTest | Level3)
+{
+    CallStatusPolicy callStatusPolicy;
+    CallDetailInfo info;
+    callStatusPolicy.DialingHandlePolicy(info);
+    callStatusPolicy.FilterResultsDispose(nullptr);
 }
 
 } // namespace Telephony
