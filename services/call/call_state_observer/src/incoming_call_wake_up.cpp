@@ -27,7 +27,7 @@ namespace OHOS {
 namespace Telephony {
 void IncomingCallWakeup::NewCallCreated(sptr<CallBase> &callObjectPtr)
 {
-    // Should wake up the device and set the screen on while a new incoming call created.
+    // Should wake up the device and not set the screen on while a new incoming call created.
     if (callObjectPtr != nullptr && callObjectPtr->GetTelCallState() == TelCallState::CALL_STATUS_INCOMING) {
         WakeupDevice();
     }
@@ -74,34 +74,12 @@ void IncomingCallWakeup::WakeupDevice()
         screenRunningLock_ = PowerMgr::PowerMgrClient::GetInstance().
             CreateRunningLock("screenonrunninglock", PowerMgr::RunningLockType::RUNNINGLOCK_SCREEN);
     }
-#endif
-    if (IsScreenOn()) {
-        TELEPHONY_LOGI("screen already up");
-    #ifdef ABILITY_POWER_SUPPORT
-        if (screenRunningLock_ != nullptr && !isScreenOnLocked) {
-            screenRunningLock_->Lock();
-            isScreenOnLocked = true;
-            TELEPHONY_LOGI("screenRunningLock_ locked");
-        }
-    #endif
-        return;
-    }
-#ifdef ABILITY_POWER_SUPPORT
     if (screenRunningLock_ != nullptr && !isScreenOnLocked) {
         screenRunningLock_->Lock();
         isScreenOnLocked = true;
         TELEPHONY_LOGI("screenRunningLock_ locked");
     }
 #endif
-}
-
-bool IncomingCallWakeup::IsScreenOn()
-{
-    bool isScreenOn = false;
-#ifdef ABILITY_POWER_SUPPORT
-    isScreenOn = PowerMgr::PowerMgrClient::GetInstance().IsScreenOn();
-#endif
-    return isScreenOn;
 }
 
 bool IncomingCallWakeup::IsPowerAbilityExist()

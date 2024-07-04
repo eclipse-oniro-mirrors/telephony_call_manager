@@ -43,10 +43,6 @@ private:
      * Wake up the device and set the screen on.
      */
     void WakeupDevice();
-    /**
-     * Check whether the device screen is on or not.
-     */
-    bool IsScreenOn();
     bool IsPowerAbilityExist();
 #ifdef ABILITY_POWER_SUPPORT
     std::shared_ptr<PowerMgr::RunningLock> screenRunningLock_;
