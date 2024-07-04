@@ -50,7 +50,7 @@ private:
     bool JsonGetBoolValue(cJSON *json, const std::string key);
     int32_t errCode_ = -1;
     std::string result_ = "";
-    std::string phoneNum_ = "";
+    std::string phoneNumber_ = "";
     NumberMarkInfo info_ = {
         .markType = MarkType::MARK_TYPE_NONE,
         .markContent = "",
