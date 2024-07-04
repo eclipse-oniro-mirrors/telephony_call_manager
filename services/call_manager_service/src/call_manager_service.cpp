@@ -50,6 +50,7 @@ static constexpr const char *SLOT_ID = "accountId";
 static constexpr const char *CALL_TYPE = "callType";
 static constexpr const char *VIDEO_STATE = "videoState";
 static constexpr int32_t CLEAR_VOICE_MAIL_COUNT = 0;
+static constexpr int32_t IS_CELIA_CALL = 1;
 
 const bool g_registerResult =
     SystemAbility::MakeAndRegisterAbility(DelayedSingleton<CallManagerService>::GetInstance().get());
@@ -1428,6 +1429,14 @@ int32_t CallManagerService::SendCallUiEvent(int32_t callId, std::string &eventNa
     if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_SET_TELEPHONY_STATE)) {
         TELEPHONY_LOGE("Permission denied!");
         return TELEPHONY_ERR_PERMISSION_ERR;
+    }
+    if (eventName == "EVENT_IS_CELIA_CALL") {
+        sptr<CallBase> callPtr = CallObjectManager::GetOneCallObject(callId);
+        if (callPtr == nullptr) {
+            TELEPHONY_LOGI("the call object is nullptr!");
+            return TELEPHONY_ERR_LOCAL_PTR_NULL;
+        }
+        callPtr->SetCeliaCallType(IS_CELIA_CALL);
     }
     return TELEPHONY_SUCCESS;
 }

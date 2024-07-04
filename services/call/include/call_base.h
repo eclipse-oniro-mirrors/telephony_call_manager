@@ -129,6 +129,7 @@ public:
     int32_t SetMicPhoneState(bool isMuted);
     bool IsMuted();
     void SetIsEccContact(bool isEccContact);
+    void SetCeliaCallType(int32_t celiaCallType);
 
 protected:
     int32_t callId_;
@@ -175,6 +176,7 @@ private:
     NumberMarkInfo numberMarkInfo_;
     int32_t blockReason_;
     bool isEccContact_;
+    int32_t celiaCallType_;
 };
 } // namespace Telephony
 } // namespace OHOS

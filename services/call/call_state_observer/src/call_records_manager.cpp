@@ -160,7 +160,8 @@ void CallRecordsManager::CopyCallInfoToRecord(CallAttributeInfo &info, CallRecor
     int32_t callFeatures = GetCallFeatures(info.originalCallType);
     data.features = callFeatures;
     data.numberMarkInfo = info.numberMarkInfo;
-    data.blockReason = info.blockReason;
+    data.blockReason = info.blockReason; 
+    data.celiaCallType = info.celiaCallType;
 }
 
 int32_t CallRecordsManager::RemoveMissedIncomingCallNotification()

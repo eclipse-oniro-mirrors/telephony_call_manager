@@ -294,6 +294,10 @@ struct CallAttributeInfo {
      * Indicates the reason of call blocked.
      */
     int32_t blockReason = 0;
+    /**
+     * Indicates the type of celia call.
+     */
+    int32_t celiaCallType = -1;
 };
 
 /**
@@ -369,6 +373,11 @@ struct CallRecordInfo {
      */
     int32_t blockReason = 0;
 
+    /**
+     * Indicates the type of celia call.
+     */
+    int32_t celiaCallType = -1;
+
     CallRecordInfo() {}
 
     CallRecordInfo(const CallRecordInfo &temp)
@@ -403,6 +412,7 @@ struct CallRecordInfo {
             std::begin(numberMarkInfo.markSource));
         numberMarkInfo.isCloud = temp.numberMarkInfo.isCloud;
         blockReason = temp.blockReason;
+        celiaCallType = temp.celiaCallType;
         return *this;
     }
 };
