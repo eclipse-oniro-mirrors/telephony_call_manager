@@ -58,6 +58,7 @@ constexpr const char *CALL_MARK_CONTENT = "mark_content";
 constexpr const char *CALL_IS_CLOUD_MARK = "is_cloud_mark";
 constexpr const char *CALL_MARK_COUNT = "mark_count";
 constexpr const char *CALL_BLOCK_REASON = "block_reason";
+constexpr const char *CELIA_CALL_TYPE = "celia_call_type";
 
 enum class CallLogReadState {
     CALL_IS_UNREAD,

@@ -39,7 +39,7 @@ CallBase::CallBase(DialParaInfo &info)
       callEndedType_(CallEndedType::UNKNOWN), callBeginTime_(0), callEndTime_(0), ringBeginTime_(0), ringEndTime_(0),
       answerType_(CallAnswerType::CALL_ANSWER_MISSED), accountId_(info.accountId), crsType_(info.crsType),
       originalCallType_(info.originalCallType), isMuted_(false), numberLocation_("default"), blockReason_(0),
-      isEccContact_(false)
+      isEccContact_(false), celiaCallType_(-1)
 {
     (void)memset_s(&contactInfo_, sizeof(ContactInfo), 0, sizeof(ContactInfo));
     (void)memset_s(&numberMarkInfo_, sizeof(NumberMarkInfo), 0, sizeof(NumberMarkInfo));
@@ -54,7 +54,7 @@ CallBase::CallBase(DialParaInfo &info, AppExecFwk::PacMap &extras)
       isSpeakerphoneOn_(false), callEndedType_(CallEndedType::UNKNOWN), callBeginTime_(0), callEndTime_(0),
       ringBeginTime_(0), ringEndTime_(0), answerType_(CallAnswerType::CALL_ANSWER_MISSED), accountId_(info.accountId),
       crsType_(info.crsType), originalCallType_(info.originalCallType), isMuted_(false), numberLocation_("default"),
-      blockReason_(0), isEccContact_(false)
+      blockReason_(0), isEccContact_(false), celiaCallType_(-1)
 {
     (void)memset_s(&contactInfo_, sizeof(ContactInfo), 0, sizeof(ContactInfo));
     (void)memset_s(&numberMarkInfo_, sizeof(NumberMarkInfo), 0, sizeof(NumberMarkInfo));
@@ -140,6 +140,7 @@ void CallBase::GetCallAttributeBaseInfo(CallAttributeInfo &info)
         info.crsType = crsType_;
         info.originalCallType = originalCallType_;
         info.isEccContact = isEccContact_;
+        info.celiaCallType = celiaCallType_;
         if (memset_s(info.numberLocation, kMaxNumberLen, 0, kMaxNumberLen) != EOK) {
             TELEPHONY_LOGE("memset_s numberLocation fail");
             return;
@@ -512,6 +513,12 @@ void CallBase::SetCallId(int32_t callId)
 {
     std::lock_guard<std::mutex> lock(mutex_);
     callId_ = callId;
+}
+
+void CallBase::SetCeliaCallType(int32_t celiaCallType)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    celiaCallType_ = celiaCallType;
 }
 
 bool CallBase::CheckVoicemailNumber(std::string phoneNumber)
