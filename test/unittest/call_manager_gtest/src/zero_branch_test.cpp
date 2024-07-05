@@ -2905,7 +2905,6 @@ HWTEST_F(BranchTest, Telephony_BluetoothConnection_001, Function | MediumTest | 
     bluetoothConnection.GetConnectedScoAddr();
     bluetoothConnection.GetConnectedScoName();
     bluetoothConnection.ResetBtConnection();
-    bluetoothConnection.RegisterObserver();
     bluetoothConnection.IsAudioActivated();
 }
 
