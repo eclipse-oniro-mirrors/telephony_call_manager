@@ -51,6 +51,7 @@ SpamCallAdapter::~SpamCallAdapter()
 bool SpamCallAdapter::DetectSpamCall(const std::string &phoneNumber, const int32_t &slotId)
 {
     TELEPHONY_LOGI("DetectSpamCall start");
+    phoneNumber_ = phoneNumber;
     AAFwk::Want want;
     std::string bundleName = "com.spamshield";
     std::string abilityName = "SpamShieldServiceExtAbility";
@@ -195,6 +196,25 @@ void SpamCallAdapter::SetDetectResult(int32_t &errCode, std::string &result)
 {
     errCode_ = errCode;
     result_ = result;
+}
+
+void SpamCallAdapter::GetParseResult(bool &isBlock, NumberMarkInfo &info, int32_t &blockReason)
+{
+    isBlock = isBlock_;
+    info = info_;
+    blockReason = blockReason_;
+}
+
+void SpamCallAdapter::SetParseResult(bool &isBlock, NumberMarkInfo &info, int32_t &blockReason)
+{
+    isBlock_ = isBlock;
+    info_ = info;
+    blockReason_ = blockReason;
+}
+
+std::string SpamCallAdapter::GetDetectPhoneNum()
+{
+    return phoneNumber_;
 }
 
 void SpamCallAdapter::NotifyAll()

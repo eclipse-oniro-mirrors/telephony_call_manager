@@ -35,6 +35,9 @@ public:
     bool DetectSpamCall(const std::string &phoneNumber, const int32_t &slotId);
     void GetDetectResult(int32_t &errCode, std::string &result);
     void SetDetectResult(int32_t &errCode, std::string &result);
+    void GetParseResult(bool &isBlock, NumberMarkInfo &info, int32_t &blockReason);
+    void SetParseResult(bool &isBlock, NumberMarkInfo &info, int32_t &blockReason);
+    std::string GetDetectPhoneNum();
     void NotifyAll();
     bool WaitForDetectResult();
     void ParseDetectResult(const std::string &jsonData, bool &isBlock, NumberMarkInfo &info, int32_t &blockReason);
@@ -47,6 +50,16 @@ private:
     bool JsonGetBoolValue(cJSON *json, const std::string key);
     int32_t errCode_ = -1;
     std::string result_ = "";
+    std::string phoneNumber_ = "";
+    NumberMarkInfo info_ = {
+        .markType = MarkType::MARK_TYPE_NONE,
+        .markContent = "",
+        .markCount = -1,
+        .markSource = "",
+        .isCloud = false,
+    };
+    bool isBlock_ = false;
+    int32_t blockReason_;
     std::unique_ptr<TimeWaitHelper> timeWaitHelper_ {nullptr};
     ffrt::mutex mutex_;
 };
