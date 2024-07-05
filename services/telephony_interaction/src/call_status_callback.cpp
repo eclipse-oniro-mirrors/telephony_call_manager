@@ -381,7 +381,7 @@ int32_t CallStatusCallback::ReceiveUpdateCallMediaModeRequest(const CallModeRepo
     }
     sptr<CallBase> callPtr = CallObjectManager::GetOneCallObjectByIndexAndSlotId(response.callIndex, response.slotId);
     if (callPtr != nullptr && callPtr->GetTelCallState() == TelCallState::CALL_STATUS_ACTIVE
-        && callPtr->GetVideoStateType() == VideoStateType::TYPE_VIDEO) {
+        && response.callMode == ImsCallMode::CALL_MODE_SEND_RECEIVE) {
         if (DelayedSingleton<AudioControlManager>::GetInstance()->PlayWaitingTone() == TELEPHONY_SUCCESS) {
             waitingToneHandle_ = ffrt::submit_h([&]() {
                 ShouldStopWaitingTone();
