@@ -47,6 +47,7 @@ private:
 #ifdef ABILITY_POWER_SUPPORT
     std::shared_ptr<PowerMgr::RunningLock> screenRunningLock_;
     std::shared_ptr<PowerMgr::RunningLock> phoneRunningLock_;
+    std::shared_ptr<PowerMgr::RunningLock> incomingRunningLock_;
 #endif
     bool isPhoneLocked = false;
     bool isScreenOnLocked = false;

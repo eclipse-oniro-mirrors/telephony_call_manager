@@ -36,13 +36,13 @@ void IncomingCallWakeup::NewCallCreated(sptr<CallBase> &callObjectPtr)
 void IncomingCallWakeup::AcquireIncomingLock()
 {
 #ifdef ABILITY_POWER_SUPPORT
-    if (phoneRunningLock_ == nullptr) {
-        phoneRunningLock_ = PowerMgr::PowerMgrClient::GetInstance().
-            CreateRunningLock("phonerunninglock", PowerMgr::RunningLockType::RUNNINGLOCK_BACKGROUND_PHONE);
+    if (incomingRunningLock_ == nullptr) {
+        incomingRunningLock_ = PowerMgr::PowerMgrClient::GetInstance().
+            CreateRunningLock("incomingrunninglock", PowerMgr::RunningLockType::RUNNINGLOCK_BACKGROUND_PHONE);
     }
-    if (phoneRunningLock_ != nullptr && !isPhoneLocked && !phoneRunningLock_->IsUsed()) {
-        phoneRunningLock_->Lock(INCOMING_LOCK_TIMEOUT);
-        TELEPHONY_LOGI("phoneRunningLock_ locked");
+    if (incomingRunningLock_ != nullptr) {
+        incomingRunningLock_->Lock(INCOMING_LOCK_TIMEOUT);
+        TELEPHONY_LOGI("incomingRunningLock_ locked");
     }
 #endif
 }
@@ -50,11 +50,11 @@ void IncomingCallWakeup::AcquireIncomingLock()
 void IncomingCallWakeup::ReleaseIncomingLock()
 {
 #ifdef ABILITY_POWER_SUPPORT
-    if (phoneRunningLock_ == nullptr || isPhoneLocked || !phoneRunningLock_->IsUsed()) {
+    if (incomingRunningLock_ == nullptr || !incomingRunningLock_->IsUsed()) {
         return;
     }
-    phoneRunningLock_->UnLock();
-    TELEPHONY_LOGI("phoneRunningLock_ unlocked");
+    incomingRunningLock_->UnLock();
+    TELEPHONY_LOGI("incomingRunningLock_ unlocked");
 #endif
 }
 
