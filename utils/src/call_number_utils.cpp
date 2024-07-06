@@ -26,6 +26,7 @@
 #include "cellular_data_client.h"
 #include "call_ability_report_proxy.h"
 #include "number_identity_data_base_helper.h"
+#include "asyoutypeformatter.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -51,9 +52,17 @@ int32_t CallNumberUtils::FormatPhoneNumber(
     }
     std::string tmpCode = countryCode;
     transform(tmpCode.begin(), tmpCode.end(), tmpCode.begin(), ::toupper);
-    i18n::phonenumbers::PhoneNumber parseResult;
-    phoneUtils->ParseAndKeepRawInput(phoneNumber, tmpCode, &parseResult);
-    phoneUtils->FormatInOriginalFormat(parseResult, tmpCode, &formatNumber);
+    std::unique_ptr<i18n::phonenumbers::AsYouTypeFormatter> formatter(phoneUtils->GetAsYouTypeFormatter(tmpCode));
+    if (formatter == nullptr) {
+        TELEPHONY_LOGE("formatter is nullptr");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    formatter->Clear();
+    std::string result;
+    for (size_t i = 0; i < phoneNumber.length(); i++) {
+        char c = phoneNumber.at(i);
+        formatNumber = formatter->InputDigit(c, &result);
+    }
     if (formatNumber.empty() || formatNumber == "0") {
         formatNumber = "";
     }
