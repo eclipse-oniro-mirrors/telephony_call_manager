@@ -135,6 +135,18 @@ struct VoipCallAttribute {
      * Indicates whether the VoIP call is from Push kit.
     */
     bool isCallByPushKit = true;
+    /**
+     * Indicates the uid of voip call.
+     */
+    int32_t uid = 0;
+    /**
+     * Indicates the fullTokenId of voip call.
+     */
+    uint64_t fullTokenId = 0;
+    /**
+     * Indicates the tokenId of voip call.
+     */
+    uint32_t tokenId = 0;
 };
 
 /**
