@@ -1300,7 +1300,7 @@ bool CallStatusManager::ShouldRejectIncomingCall()
     OHOS::Uri uri(
         "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true&key=device_provisioned");
     int resp = datashareHelper->Query(uri, "device_provisioned", device_provisioned);
-    if (resp == TELEPHONY_SUCCESS && device_provisioned == "0") {
+    if (resp == TELEPHONY_SUCCESS && (device_provisioned == "0" || device_provisioned.empty())) {
         TELEPHONY_LOGI("ShouldRejectIncomingCall: device_provisioned = 0");
         return true;
     }
@@ -1317,7 +1317,7 @@ bool CallStatusManager::ShouldRejectIncomingCall()
         "datashare:///com.ohos.settingsdata/entry/settingsdata/USER_SETTINGSDATA_SECURE_"
         + std::to_string(userId) + "?Proxy=true&key=user_setup_complete");
     int resp_userSetup = datashareHelper->Query(uri_setup, "user_setup_complete", user_setup_complete);
-    if (resp_userSetup == TELEPHONY_SUCCESS && user_setup_complete == "0") {
+    if (resp_userSetup == TELEPHONY_SUCCESS && (user_setup_complete == "0" || user_setup_complete.empty())) {
         TELEPHONY_LOGI("ShouldRejectIncomingCall: user_setup_complete = 0");
         return true;
     }
