@@ -2802,6 +2802,7 @@ HWTEST_F(BranchTest, Telephony_DistributedCallManager_001, Function | MediumTest
     AudioDevice device;
     device.deviceType = AudioDeviceType::DEVICE_EARPIECE;
     manager.GetDevIdFromAudioDevice(device);
+    manager.IsSelectVirtualModem();
     manager.SwitchOnDCallDeviceSync(device);
     device.deviceType = AudioDeviceType::DEVICE_DISTRIBUTED_PHONE;
     std::string devId = "";
@@ -2822,9 +2823,11 @@ HWTEST_F(BranchTest, Telephony_DistributedCallManager_001, Function | MediumTest
     manager.GetConnectedDCallDevice(device);
     manager.SetConnectedDCallDevice(device);
     manager.ClearConnectedDCallDevice();
+    manager.IsSelectVirtualModem();
     manager.SwitchOnDCallDeviceSync(device);
     std::unique_ptr<AudioDevice> devicePtr = std::make_unique<AudioDevice>();
     devicePtr->deviceType = AudioDeviceType::DEVICE_DISTRIBUTED_PHONE;
+    manager.IsSelectVirtualModem();
     manager.SwitchOnDCallDevice(std::move(devicePtr));
     std::unique_ptr<AudioDevice> deviceRarpiecePtr = std::make_unique<AudioDevice>();
     deviceRarpiecePtr->deviceType = AudioDeviceType::DEVICE_EARPIECE;
@@ -2845,12 +2848,14 @@ HWTEST_F(BranchTest, Telephony_DistributedCallProxy_001, Function | MediumTest |
     proxy->GetDCallClient();
     proxy->dcallClient_ = nullptr;
     proxy->UnInit();
+    manager.IsSelectVirtualModem();
     proxy->SwitchDevice(TEST_STR, 1);
     std::vector<std::string> devList;
     proxy->GetOnlineDeviceList(devList);
     OHOS::DistributedHardware::DCallDeviceInfo devInfo;
     proxy->GetDCallDeviceInfo(TEST_STR, devInfo);
     proxy->GetDCallClient();
+    manager.IsSelectVirtualModem();
     proxy->SwitchDevice(TEST_STR, 1);
     proxy->GetOnlineDeviceList(devList);
     proxy->GetDCallDeviceInfo(TEST_STR, devInfo);
