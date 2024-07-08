@@ -50,9 +50,12 @@ bool AlertingState::ProcessEvent(int32_t event)
             }
             break;
         case AudioEvent::NEW_ALERTING_CALL:
-            // check is should play ringback tone.
-            result = DelayedSingleton<AudioSceneProcessor>::GetInstance()->ProcessEvent(
-                AudioEvent::SWITCH_ALERTING_STATE);
+            if (DelayedSingleton<CallStateProcessor>::GetInstance()->
+                ShouldSwitchState(TelCallState::CALL_STATUS_ALERTING)) {
+                TELEPHONY_LOGI("alerting state: check is should play ringback tone.");
+                result = DelayedSingleton<AudioSceneProcessor>::GetInstance()->ProcessEvent(
+                    AudioEvent::SWITCH_ALERTING_STATE);
+            }
             break;
         case AudioEvent::NEW_INCOMING_CALL:
             result = DelayedSingleton<AudioControlManager>::GetInstance()->PlayWaitingTone();
