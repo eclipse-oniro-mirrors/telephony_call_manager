@@ -255,6 +255,7 @@ struct CallAttributeInfo {
      * Indicates the call beginning and ending time.
      */
     time_t callBeginTime = 0;
+    time_t callCreateTime = 0;
     time_t callEndTime = 0;
     time_t ringBeginTime = 0;
     time_t ringEndTime = 0;
@@ -333,6 +334,10 @@ struct CallRecordInfo {
      */
     time_t callBeginTime = 0;
     /**
+     * Indicates the call create time.
+     */
+    time_t callCreateTime = 0;
+    /**
      * Indicates the call ending time.
      */
     time_t callEndTime = 0;
@@ -395,6 +400,7 @@ struct CallRecordInfo {
             std::begin(numberLocation));
         callType = temp.callType;
         callBeginTime = temp.callBeginTime;
+        callCreateTime = temp.callCreateTime;
         callEndTime = temp.callEndTime;
         ringDuration = temp.ringDuration;
         callDuration = temp.callDuration;

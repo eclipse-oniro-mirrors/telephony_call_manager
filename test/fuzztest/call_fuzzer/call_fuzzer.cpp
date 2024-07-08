@@ -152,6 +152,7 @@ void GetCallerInfo(const uint8_t *data, size_t size)
     CallAnswerType answerType = static_cast<CallAnswerType>(size % CALL_ANSWER_TYPE_NUM);
     int64_t startTime = static_cast<int64_t>(size);
     time_t callBeginTime = static_cast<time_t>(size);
+    time_t callCreateTime = static_cast<time_t>(size);
     time_t callEndTime = static_cast<time_t>(size);
     time_t ringBeginTime = static_cast<time_t>(size);
     time_t ringEndTime = static_cast<time_t>(size);
@@ -160,6 +161,7 @@ void GetCallerInfo(const uint8_t *data, size_t size)
     callObjectPtr->SetCallRunningState(callRunningState);
     callObjectPtr->SetStartTime(startTime);
     callObjectPtr->SetCallBeginTime(callBeginTime);
+    callObjectPtr->SetCallBeginTime(callCreateTime);
     callObjectPtr->SetCallEndTime(callEndTime);
     callObjectPtr->SetRingBeginTime(ringBeginTime);
     callObjectPtr->SetRingEndTime(ringEndTime);

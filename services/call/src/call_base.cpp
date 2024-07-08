@@ -36,10 +36,10 @@ CallBase::CallBase(DialParaInfo &info)
       conferenceState_(TelConferenceState::TEL_CONFERENCE_IDLE), startTime_(0),
       direction_(CallDirection::CALL_DIRECTION_IN), policyFlag_(0), callState_(info.callState), autoAnswerState_(false),
       canUnHoldState_(true), canSwitchCallState_(true), answerVideoState_(0), isSpeakerphoneOn_(false),
-      callEndedType_(CallEndedType::UNKNOWN), callBeginTime_(0), callEndTime_(0), ringBeginTime_(0), ringEndTime_(0),
-      answerType_(CallAnswerType::CALL_ANSWER_MISSED), accountId_(info.accountId), crsType_(info.crsType),
-      originalCallType_(info.originalCallType), isMuted_(false), numberLocation_("default"), blockReason_(0),
-      isEccContact_(false), celiaCallType_(-1)
+      callEndedType_(CallEndedType::UNKNOWN), callBeginTime_(0), callCreateTime_(0), callEndTime_(0), ringBeginTime_(0),
+      ringEndTime_(0), answerType_(CallAnswerType::CALL_ANSWER_MISSED), accountId_(info.accountId),
+      crsType_(info.crsType), originalCallType_(info.originalCallType), isMuted_(false), numberLocation_("default"),
+      blockReason_(0), isEccContact_(false), celiaCallType_(-1)
 {
     (void)memset_s(&contactInfo_, sizeof(ContactInfo), 0, sizeof(ContactInfo));
     (void)memset_s(&numberMarkInfo_, sizeof(NumberMarkInfo), 0, sizeof(NumberMarkInfo));
@@ -51,10 +51,10 @@ CallBase::CallBase(DialParaInfo &info, AppExecFwk::PacMap &extras)
       conferenceState_(TelConferenceState::TEL_CONFERENCE_IDLE), startTime_(0),
       direction_(CallDirection::CALL_DIRECTION_OUT), policyFlag_(0), callState_(info.callState),
       autoAnswerState_(false), canUnHoldState_(true), canSwitchCallState_(true), answerVideoState_(0),
-      isSpeakerphoneOn_(false), callEndedType_(CallEndedType::UNKNOWN), callBeginTime_(0), callEndTime_(0),
-      ringBeginTime_(0), ringEndTime_(0), answerType_(CallAnswerType::CALL_ANSWER_MISSED), accountId_(info.accountId),
-      crsType_(info.crsType), originalCallType_(info.originalCallType), isMuted_(false), numberLocation_("default"),
-      blockReason_(0), isEccContact_(false), celiaCallType_(-1)
+      isSpeakerphoneOn_(false), callEndedType_(CallEndedType::UNKNOWN), callBeginTime_(0), callCreateTime_(0),
+      callEndTime_(0), ringBeginTime_(0), ringEndTime_(0), answerType_(CallAnswerType::CALL_ANSWER_MISSED),
+      accountId_(info.accountId), crsType_(info.crsType), originalCallType_(info.originalCallType), isMuted_(false),
+      numberLocation_("default"), blockReason_(0), isEccContact_(false), celiaCallType_(-1)
 {
     (void)memset_s(&contactInfo_, sizeof(ContactInfo), 0, sizeof(ContactInfo));
     (void)memset_s(&numberMarkInfo_, sizeof(NumberMarkInfo), 0, sizeof(NumberMarkInfo));
@@ -131,6 +131,7 @@ void CallBase::GetCallAttributeBaseInfo(CallAttributeInfo &info)
         info.callState = callState_;
         info.conferenceState = conferenceState_;
         info.callBeginTime = callBeginTime_;
+        info.callCreateTime = callCreateTime_;
         info.callEndTime = callEndTime_;
         info.ringBeginTime = ringBeginTime_;
         info.ringEndTime = ringEndTime_;
@@ -470,6 +471,12 @@ void CallBase::SetCallBeginTime(time_t callBeginTime)
 {
     std::lock_guard<std::mutex> lock(mutex_);
     callBeginTime_ = callBeginTime;
+}
+
+void CallBase::SetCallCreateTime(time_t callCreateTime)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    callCreateTime_ = callCreateTime;
 }
 
 void CallBase::SetCallEndTime(time_t callEndTime)

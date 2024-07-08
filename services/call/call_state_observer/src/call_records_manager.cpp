@@ -150,6 +150,7 @@ void CallRecordsManager::CopyCallInfoToRecord(CallAttributeInfo &info, CallRecor
     }
     data.callId = info.callId;
     data.callBeginTime = info.callBeginTime;
+    data.callCreateTime = info.callCreateTime;
     data.callEndTime = info.callEndTime;
     data.directionType = info.callDirection;
     data.answerType = info.answerType;

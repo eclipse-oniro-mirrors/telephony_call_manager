@@ -1104,6 +1104,7 @@ sptr<CallBase> CallStatusManager::RefreshCallIfNecessary(const sptr<CallBase> &c
     newCall->SetSpeakerphoneOn(call->IsSpeakerphoneOn());
     newCall->SetCallEndedType(call->GetCallEndedType());
     newCall->SetCallBeginTime(attrInfo.callBeginTime);
+    newCall->SetCallCreateTime(attrInfo.callCreateTime);
     newCall->SetCallEndTime(attrInfo.callEndTime);
     newCall->SetRingBeginTime(attrInfo.ringBeginTime);
     newCall->SetRingEndTime(attrInfo.ringEndTime);
@@ -1234,6 +1235,7 @@ sptr<CallBase> CallStatusManager::CreateNewCall(const CallDetailInfo &info, Call
             }
         });
     }
+    callPtr->SetCallCreateTime(time(nullptr));
     return callPtr;
 }
 
