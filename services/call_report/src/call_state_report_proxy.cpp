@@ -21,6 +21,7 @@
 #include "system_ability.h"
 #include "system_ability_definition.h"
 
+#include "call_control_manager.h"
 #include "call_manager_errors.h"
 #include "call_manager_inner_type.h"
 #include "call_object_manager.h"
@@ -56,13 +57,25 @@ void CallStateReportProxy::UpdateCallState(sptr<CallBase> &callObjectPtr, TelCal
     } else {
         foregroundCall = CallObjectManager::GetForegroundCall(false);
     }
-    if (foregroundCall == nullptr) {
+    if (foregroundCall == nullptr && callObjectPtr != nullptr) {
         foregroundCall = callObjectPtr;
     }
     CallAttributeInfo info;
-    foregroundCall->GetCallAttributeInfo(info);
-    if (nextState == TelCallState::CALL_STATUS_ANSWERED) {
-        info.callState = TelCallState::CALL_STATUS_ANSWERED;
+    TelCallState currentVoipCallState = GetVoipCallState();
+    if ((foregroundCall != nullptr) && (nextState == TelCallState::CALL_STATUS_ANSWERED ||
+        foregroundCall->GetTelCallState() == TelCallState::CALL_STATUS_INCOMING ||
+        foregroundCall->GetTelCallState() == TelCallState::CALL_STATUS_WAITING)) {
+        foregroundCall->GetCallAttributeInfo(info);
+        if (nextState == TelCallState::CALL_STATUS_ANSWERED) {
+            info.callState = TelCallState::CALL_STATUS_ANSWERED;
+        }
+    } else if (currentVoipCallState == TelCallState::CALL_STATUS_INCOMING ||
+        currentVoipCallState == TelCallState::CALL_STATUS_ANSWERED) {
+        info.callState = currentVoipCallState;
+    } else if (foregroundCall != nullptr) {
+        foregroundCall->GetCallAttributeInfo(info);
+    } else {
+        info.callState = currentVoipCallState;
     }
     if (info.callState == currentCallState_) {
         TELEPHONY_LOGI("foreground call state is not changed, currentCallState_:%{public}d!", currentCallState_);
@@ -72,6 +85,37 @@ void CallStateReportProxy::UpdateCallState(sptr<CallBase> &callObjectPtr, TelCal
     std::string str(info.accountNumber);
     std::u16string accountNumber = Str8ToStr16(str);
     ReportCallState(static_cast<int32_t>(info.callState), accountNumber);
+}
+
+void CallStateReportProxy::UpdateCallStateForVoIP()
+{
+    sptr<CallBase> callObjectPtr = nullptr;
+    UpdateCallState(callObjectPtr, TelCallState::CALL_STATUS_IDLE);
+}
+
+TelCallState CallStateReportProxy::GetVoipCallState()
+{
+    int32_t state;
+    DelayedSingleton<CallControlManager>::GetInstance()->GetVoIPCallState(state);
+    TELEPHONY_LOGI("report voip call state = %{public}d.", state);
+    TelCallState nextState = TelCallState::CALL_STATUS_IDLE;
+    switch ((CallStateToApp)state) {
+        case CallStateToApp::CALL_STATE_IDLE:
+            nextState = TelCallState::CALL_STATUS_IDLE;
+            break;
+        case CallStateToApp::CALL_STATE_OFFHOOK:
+            nextState = TelCallState::CALL_STATUS_ACTIVE;
+            break;
+        case CallStateToApp::CALL_STATE_RINGING:
+            nextState = TelCallState::CALL_STATUS_INCOMING;
+            break;
+        case CallStateToApp::CALL_STATE_ANSWERED:
+            nextState = TelCallState::CALL_STATUS_ANSWERED;
+            break;
+        default:
+            break;
+    }
+    return nextState;
 }
 
 void CallStateReportProxy::UpdateCallStateForSlotId(sptr<CallBase> &callObjectPtr, TelCallState nextState)
