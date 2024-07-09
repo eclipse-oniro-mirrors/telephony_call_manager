@@ -15,6 +15,7 @@
 
 #include <thread>
 #include <pthread.h>
+#include <dlfcn.h>
 
 #include "distributed_call_manager.h"
 #include "audio_control_manager.h"
@@ -38,6 +39,8 @@ const std::string DISTRIBUTED_AUDIO_DEV_CAR = "dCar";
 const std::string DISTRIBUTED_AUDIO_DEV_PHONE = "dPhone";
 const std::string DISTRIBUTED_AUDIO_DEV_PAD = "dPad";
 const std::string SWITCH_ON_DCALL_THREAD_NAME = "switch on dcall";
+
+const int32_t DISTRIBUTED_COMMUNICATION_CALL_SA_ID = 4011;
 
 std::string GetAnonyString(const std::string &value)
 {
@@ -98,6 +101,7 @@ void DistributedCallManager::Init()
         TELEPHONY_LOGE("failed to subscribe dcall service SA: %{public}d", DISTRIBUTED_CALL_SOURCE_SA_ID);
         return;
     }
+    InitDistributedCommunicationCall();
     TELEPHONY_LOGI("Init end.");
 }
 
@@ -526,5 +530,77 @@ void DCallSystemAbilityListener::OnRemoveSystemAbility(int32_t systemAbilityId, 
     TELEPHONY_LOGI("notify dcall source service removed event to distributed call manager");
     DelayedSingleton<DistributedCallManager>::GetInstance()->OnDCallSystemAbilityRemoved(deviceId);
 }
+
+void DistributedCallManager::InitDistributedCommunicationCall()
+{
+    TELEPHONY_LOGI("Init distributed communication call");
+    dcCallSaListener_ = new (std::nothrow) DcCallSystemAbilityListener();
+    if (dcCallSaListener_ == nullptr) {
+        TELEPHONY_LOGE("init dc-call fail, create sa linstener fail");
+        return;
+    }
+    auto saManager = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (saManager == nullptr) {
+        TELEPHONY_LOGE("init dc-call fail, get system ability manager fail");
+        return;
+    }
+    int32_t ret = saManager->SubscribeSystemAbility(DISTRIBUTED_COMMUNICATION_CALL_SA_ID, dcCallSaListener_);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("failed to subscribe dc-call service SA: %{public}d", DISTRIBUTED_COMMUNICATION_CALL_SA_ID);
+        return;
+    }
+}
+
+void DistributedCallManager::OnDcCallSystemAbilityAdded()
+{
+    TELEPHONY_LOGI("dc-call service added");
+    auto handle = dlopen("libtelephony_ext_service.z.so", RTLD_NOW);
+    if (handle == nullptr) {
+        TELEPHONY_LOGE("open so failed");
+        return;
+    }
+    typedef int32_t (*REGISTER_DC_CALL)();
+    auto regFunc = (REGISTER_DC_CALL)dlsym(handle, "RegisterDcCall");
+    if (regFunc == nullptr) {
+        TELEPHONY_LOGE("get reg function failed");
+        dlclose(handle);
+        return;
+    }
+    auto ret = regFunc();
+    TELEPHONY_LOGI("reg dc-call service result %{public}d", ret);
+    dlclose(handle);
+}
+
+void DistributedCallManager::OnDcCallSystemAbilityRemoved()
+{
+    TELEPHONY_LOGI("dc-call service removed");
+}
+
+void DcCallSystemAbilityListener::OnAddSystemAbility(int32_t systemAbilityId, const std::string &deviceId)
+{
+    if (!CheckInputSysAbilityId(systemAbilityId)) {
+        TELEPHONY_LOGE("invalid sa");
+        return;
+    }
+    if (systemAbilityId != DISTRIBUTED_COMMUNICATION_CALL_SA_ID) {
+        TELEPHONY_LOGE("added SA is not dc-call service, ignored");
+        return;
+    }
+    DelayedSingleton<DistributedCallManager>::GetInstance()->OnDcCallSystemAbilityAdded();
+}
+
+void DcCallSystemAbilityListener::OnRemoveSystemAbility(int32_t systemAbilityId, const std::string &deviceId)
+{
+    if (!CheckInputSysAbilityId(systemAbilityId)) {
+        TELEPHONY_LOGE("invalid sa");
+        return;
+    }
+    if (systemAbilityId != DISTRIBUTED_COMMUNICATION_CALL_SA_ID) {
+        TELEPHONY_LOGE("removed SA is not dc-call service, ignored");
+        return;
+    }
+    DelayedSingleton<DistributedCallManager>::GetInstance()->OnDcCallSystemAbilityRemoved();
+}
+
 } // namespace Telephony
 } // namespace OHOS

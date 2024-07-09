@@ -27,6 +27,7 @@
 #include "audio_device_info.h"
 #include "audio_info.h"
 #include "voip_call_connection.h"
+#include "settings_datashare_helper.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -515,8 +516,27 @@ bool AudioControlManager::PlayRingtone()
     return true;
 }
 
+bool AudioControlManager::IsDistributeCallSinkStatus()
+{
+    std::string dcStatus = "";
+    auto settingHelper = SettingsDataShareHelper::GetInstance();
+    if (settingHelper != nullptr) {
+        OHOS::Uri settingUri(SettingsDataShareHelper::SETTINGS_DATASHARE_URI);
+        settingHelper->Query(settingUri, "distributed_modem_state", dcStatus);
+    }
+    TELEPHONY_LOGI("distributed communication modem status: %{public}s", dcStatus.c_str());
+    if (dcStatus != "1_sink") {
+        return false;
+    }
+    return true;
+}
+
 bool AudioControlManager::PlaySoundtone()
 {
+    if (IsDistributeCallSinkStatus()) {
+        TELEPHONY_LOGI("distribute call sink status, no need to play sound tone");
+        return true;
+    }
     if (soundState_ == SoundState::SOUNDING) {
         TELEPHONY_LOGE("should not play soundTone");
         return false;

@@ -57,6 +57,9 @@ public:
     void GetConnectedDCallDevice(AudioDevice& device);
     bool IsSelectVirtualModem();
 
+    void OnDcCallSystemAbilityAdded();
+    void OnDcCallSystemAbilityRemoved();
+
 private:
     class DistributedCallDeviceListener : public OHOS::DistributedHardware::IDCallDeviceCallback {
     public:
@@ -75,6 +78,8 @@ private:
     void SetConnectedDCallDevice(const AudioDevice& device);
     void SwitchOnDCallDevice(std::unique_ptr<AudioDevice> device);
 
+    void InitDistributedCommunicationCall();
+
 private:
     std::atomic<bool> isCallActived_ = false;
     std::atomic<bool> dCallDeviceSwitchedOn_ = false;
@@ -87,6 +92,8 @@ private:
     sptr<ISystemAbilityStatusChange> statusChangeListener_ = nullptr;
     std::shared_ptr<DistributedCallProxy> dcallProxy_ = nullptr;
     std::shared_ptr<DistributedCallDeviceListener> dcallDeviceListener_ = nullptr;
+
+    sptr<ISystemAbilityStatusChange> dcCallSaListener_ = nullptr;
 };
 
 class DCallSystemAbilityListener : public SystemAbilityStatusChangeStub {
@@ -96,6 +103,15 @@ public:
     void OnAddSystemAbility(int32_t systemAbilityId, const std::string &deviceId) override;
     void OnRemoveSystemAbility(int32_t systemAbilityId, const std::string &deviceId) override;
 };
+
+class DcCallSystemAbilityListener : public SystemAbilityStatusChangeStub {
+public:
+    DcCallSystemAbilityListener() = default;
+    ~DcCallSystemAbilityListener() = default;
+    void OnAddSystemAbility(int32_t systemAbilityId, const std::string &deviceId) override;
+    void OnRemoveSystemAbility(int32_t systemAbilityId, const std::string &deviceId) override;
+};
+
 } // namespace Telephony
 } // namespace OHOS
 #endif // TELEPHONY_DISTRIBUTED_CALL_MANAGER_H
