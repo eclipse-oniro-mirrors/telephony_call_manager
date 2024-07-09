@@ -2188,6 +2188,7 @@ HWTEST_F(BranchTest, Telephony_CallControlManager_001, Function | MediumTest | L
     ASSERT_FALSE(callControlManager->NotifyCallStateUpdated(callObjectPtr, priorState, nextState));
     ASSERT_FALSE(callControlManager->NotifyIncomingCallAnswered(callObjectPtr));
     ASSERT_FALSE(callControlManager->NotifyIncomingCallRejected(callObjectPtr, false, ""));
+    callObjectPtr->SetCallCreateTime(time(nullptr));
 
     callControlManager->Init();
     ASSERT_NE(callControlManager->RejectCall(VALID_CALLID, false, u""), TELEPHONY_SUCCESS);

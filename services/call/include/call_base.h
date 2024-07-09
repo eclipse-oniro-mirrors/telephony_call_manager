@@ -92,6 +92,7 @@ public:
     void SetCallRunningState(CallRunningState callRunningState);
     void SetStartTime(int64_t startTime);
     void SetCallBeginTime(time_t callBeginTime);
+    void SetCallCreateTime(time_t callCreateTime);
     void SetCallEndTime(time_t callEndTime);
     void SetRingBeginTime(time_t ringBeginTime);
     void SetRingEndTime(time_t ringEndTime);
@@ -163,6 +164,7 @@ private:
     CallEndedType callEndedType_;
     ContactInfo contactInfo_;
     time_t callBeginTime_;
+    time_t callCreateTime_;
     time_t callEndTime_;
     time_t ringBeginTime_;
     time_t ringEndTime_;
