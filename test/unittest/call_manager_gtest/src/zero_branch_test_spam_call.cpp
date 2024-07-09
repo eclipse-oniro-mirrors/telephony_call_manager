@@ -193,9 +193,7 @@ HWTEST_F(SpamCallTest, Telephony_CallAbilityConnection_001, Function | MediumTes
     std::string bundle = "111";
     std::string ability = "222";
     AppExecFwk::ElementName element("", bundle, ability);
-    sptr<IRemoteObject> remoteObject;
     int resultCode = 0;
-    callAbilityConnection.OnAbilityConnectDone(element, remoteObject, resultCode);
     callAbilityConnection.OnAbilityDisconnectDone(element, resultCode);
 }
 
@@ -211,9 +209,7 @@ HWTEST_F(SpamCallTest, Telephony_CallSettingAbilityConnection_001, Function | Me
     std::string bundle = "111";
     std::string ability = "222";
     AppExecFwk::ElementName element("", bundle, ability);
-    sptr<IRemoteObject> remoteObject;
     int resultCode = 0;
-    callSettingAbilityConnection.OnAbilityConnectDone(element, remoteObject, resultCode);
     callSettingAbilityConnection.OnAbilityDisconnectDone(element, resultCode);
 }
 
