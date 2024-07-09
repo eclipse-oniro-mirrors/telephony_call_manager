@@ -1252,11 +1252,11 @@ int32_t CallControlManager::RemoveMissedIncomingCallNotification()
 
 int32_t CallControlManager::SetVoIPCallState(int32_t state)
 {
+    TELEPHONY_LOGI("VoIP state is %{public}d", state);
+    VoIPCallState_ = (CallStateToApp)state;
     std::string identity = IPCSkeleton::ResetCallingIdentity();
     DelayedSingleton<CallStateReportProxy>::GetInstance()->UpdateCallStateForVoIP();
     IPCSkeleton::SetCallingIdentity(identity);
-    TELEPHONY_LOGI("VoIP state is %{public}d", state);
-    VoIPCallState_ = (CallStateToApp)state;
     if (VoIPCallState_ == CallStateToApp::CALL_STATE_ANSWERED) {
         TELEPHONY_LOGI("VoIP answered the call, should hangup all calls");
         std::list<sptr<CallBase>> allCallList = CallObjectManager::GetAllCallList();

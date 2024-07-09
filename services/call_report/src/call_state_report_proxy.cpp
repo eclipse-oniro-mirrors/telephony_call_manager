@@ -61,19 +61,20 @@ void CallStateReportProxy::UpdateCallState(sptr<CallBase> &callObjectPtr, TelCal
         foregroundCall = callObjectPtr;
     }
     CallAttributeInfo info;
+    currentVoipCallState_ = GetVoipCallState();
     if (foregroundCall != nullptr) {
         foregroundCall->GetCallAttributeInfo(info);
     } else {
-        info.callState = GetVoipCallState();
+        info.callState = currentVoipCallState_;
     }
     if (nextState == TelCallState::CALL_STATUS_ANSWERED ||
-        GetVoipCallState() == TelCallState::CALL_STATUS_ANSWERED) {
+        currentVoipCallState_ == TelCallState::CALL_STATUS_ANSWERED) {
         info.callState = TelCallState::CALL_STATUS_ANSWERED;
     } else if (nextState == TelCallState::CALL_STATUS_INCOMING ||
         nextState == TelCallState::CALL_STATUS_WAITING ||
-        GetVoipCallState() == TelCallState::CALL_STATUS_INCOMING) {
+        currentVoipCallState_ == TelCallState::CALL_STATUS_INCOMING) {
         info.callState = TelCallState::CALL_STATUS_INCOMING;
-    } else if (GetVoipCallState() == TelCallState::CALL_STATUS_ACTIVE &&
+    } else if (currentVoipCallState_ == TelCallState::CALL_STATUS_ACTIVE &&
         (nextState == TelCallState::CALL_STATUS_DISCONNECTED ||
         nextState == TelCallState::CALL_STATUS_DISCONNECTING ||
         nextState == TelCallState::CALL_STATUS_IDLE)) {

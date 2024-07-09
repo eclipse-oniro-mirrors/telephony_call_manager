@@ -35,10 +35,12 @@ public:
     int32_t ReportCallStateForCallId(
         int32_t slotId, int32_t callState, std::u16string incomingNumber);
     void UpdateCallStateForVoIP();
+private:
     TelCallState GetVoipCallState();
 
 private:
     TelCallState currentCallState_ = TelCallState::CALL_STATUS_UNKNOWN;
+    TelCallState currentVoipCallState_ = TelCallState::CALL_STATUS_UNKNOWN;
 };
 } // namespace Telephony
 } // namespace OHOS
