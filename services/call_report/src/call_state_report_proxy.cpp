@@ -61,7 +61,8 @@ void CallStateReportProxy::UpdateCallState(sptr<CallBase> &callObjectPtr, TelCal
         foregroundCall = callObjectPtr;
     }
     CallAttributeInfo info;
-    currentVoipCallState_ = GetVoipCallState();
+    
+    TelCallState currentVoipCallState = GetVoipCallState();
     if ((foregroundCall != nullptr) && (nextState == TelCallState::CALL_STATUS_ANSWERED ||
         foregroundCall->GetTelCallState() == TelCallState::CALL_STATUS_INCOMING ||
         foregroundCall->GetTelCallState() == TelCallState::CALL_STATUS_WAITING)) {
@@ -69,13 +70,13 @@ void CallStateReportProxy::UpdateCallState(sptr<CallBase> &callObjectPtr, TelCal
         if (nextState == TelCallState::CALL_STATUS_ANSWERED) {
             info.callState = TelCallState::CALL_STATUS_ANSWERED;
         }
-    } else if (currentVoipCallState_ == TelCallState::CALL_STATUS_INCOMING ||
-        currentVoipCallState_ == TelCallState::CALL_STATUS_ANSWERED) {
-        info.callState = currentVoipCallState_;
+    } else if (currentVoipCallState == TelCallState::CALL_STATUS_INCOMING ||
+        currentVoipCallState == TelCallState::CALL_STATUS_ANSWERED) {
+        info.callState = currentVoipCallState;
     } else if (foregroundCall != nullptr) {
         foregroundCall->GetCallAttributeInfo(info);
     } else {
-        info.callState = currentVoipCallState_;
+        info.callState = currentVoipCallState;
     }
     if (info.callState == currentCallState_) {
         TELEPHONY_LOGI("foreground call state is not changed, currentCallState_:%{public}d!", currentCallState_);
@@ -97,7 +98,7 @@ TelCallState CallStateReportProxy::GetVoipCallState()
 {
     int32_t state;
     DelayedSingleton<CallControlManager>::GetInstance()->GetVoIPCallState(state);
-    TELEPHONY_LOGI("report voip call state");
+    TELEPHONY_LOGI("report voip call state= %{public}d.", state);
     TelCallState nextState = TelCallState::CALL_STATUS_IDLE;
     switch ((CallStateToApp)state) {
         case CallStateToApp::CALL_STATE_IDLE:

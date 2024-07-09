@@ -40,7 +40,6 @@ private:
 
 private:
     TelCallState currentCallState_ = TelCallState::CALL_STATUS_UNKNOWN;
-    TelCallState currentVoipCallState_ = TelCallState::CALL_STATUS_UNKNOWN;
 };
 } // namespace Telephony
 } // namespace OHOS
