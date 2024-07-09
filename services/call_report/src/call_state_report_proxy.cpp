@@ -57,28 +57,25 @@ void CallStateReportProxy::UpdateCallState(sptr<CallBase> &callObjectPtr, TelCal
     } else {
         foregroundCall = CallObjectManager::GetForegroundCall(false);
     }
-    if (foregroundCall == nullptr && callObjectPtr!= nullptr) {
+    if (foregroundCall == nullptr && callObjectPtr != nullptr) {
         foregroundCall = callObjectPtr;
     }
     CallAttributeInfo info;
     currentVoipCallState_ = GetVoipCallState();
-    if (foregroundCall != nullptr) {
+    if ((foregroundCall != nullptr) && nextState == TelCallState::CALL_STATUS_ANSWERED ||
+        foregroundCall->GetTelCallState() == TelCallState::CALL_STATUS_INCOMING ||
+        foregroundCall->GetTelCallState() == TelCallState::CALL_STATUS_WAITING) {
+        foregroundCall->GetCallAttributeInfo(info);
+        if (nextState == TelCallState::CALL_STATUS_ANSWERED) {
+            info.callState = TelCallState::CALL_STATUS_ANSWERED;
+        }
+    } else if (currentVoipCallState_ == TelCallState::CALL_STATUS_INCOMING ||
+        currentVoipCallState_ == TelCallState::CALL_STATUS_ANSWERED) {
+        info.callState = currentVoipCallState_;
+    } else if (foregroundCall != nullptr) {
         foregroundCall->GetCallAttributeInfo(info);
     } else {
         info.callState = currentVoipCallState_;
-    }
-    if (nextState == TelCallState::CALL_STATUS_ANSWERED ||
-        currentVoipCallState_ == TelCallState::CALL_STATUS_ANSWERED) {
-        info.callState = TelCallState::CALL_STATUS_ANSWERED;
-    } else if (nextState == TelCallState::CALL_STATUS_INCOMING ||
-        nextState == TelCallState::CALL_STATUS_WAITING ||
-        currentVoipCallState_ == TelCallState::CALL_STATUS_INCOMING) {
-        info.callState = TelCallState::CALL_STATUS_INCOMING;
-    } else if (currentVoipCallState_ == TelCallState::CALL_STATUS_ACTIVE &&
-        (nextState == TelCallState::CALL_STATUS_DISCONNECTED ||
-        nextState == TelCallState::CALL_STATUS_DISCONNECTING ||
-        nextState == TelCallState::CALL_STATUS_IDLE)) {
-        info.callState = TelCallState::CALL_STATUS_ACTIVE;
     }
     if (info.callState == currentCallState_) {
         TELEPHONY_LOGI("foreground call state is not changed, currentCallState_:%{public}d!", currentCallState_);
