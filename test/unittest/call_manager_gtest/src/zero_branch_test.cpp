@@ -2848,14 +2848,14 @@ HWTEST_F(BranchTest, Telephony_DistributedCallProxy_001, Function | MediumTest |
     proxy->GetDCallClient();
     proxy->dcallClient_ = nullptr;
     proxy->UnInit();
-    proxy.IsSelectVirtualModem();
+    proxy->IsSelectVirtualModem();
     proxy->SwitchDevice(TEST_STR, 1);
     std::vector<std::string> devList;
     proxy->GetOnlineDeviceList(devList);
     OHOS::DistributedHardware::DCallDeviceInfo devInfo;
     proxy->GetDCallDeviceInfo(TEST_STR, devInfo);
     proxy->GetDCallClient();
-    proxy.IsSelectVirtualModem();
+    proxy->IsSelectVirtualModem();
     proxy->SwitchDevice(TEST_STR, 1);
     proxy->GetOnlineDeviceList(devList);
     proxy->GetDCallDeviceInfo(TEST_STR, devInfo);
