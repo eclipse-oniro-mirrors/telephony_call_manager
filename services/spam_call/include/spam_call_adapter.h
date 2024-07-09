@@ -59,7 +59,7 @@ private:
         .isCloud = false,
     };
     bool isBlock_ = false;
-    int32_t blockReason_;
+    int32_t blockReason_ = 0;
     std::unique_ptr<TimeWaitHelper> timeWaitHelper_ {nullptr};
     ffrt::mutex mutex_;
 };
