@@ -98,7 +98,7 @@ TelCallState CallStateReportProxy::GetVoipCallState()
 {
     int32_t state;
     DelayedSingleton<CallControlManager>::GetInstance()->GetVoIPCallState(state);
-    TELEPHONY_LOGI("report voip call state= %{public}d.", state);
+    TELEPHONY_LOGI("report voip call state = %{public}d.", state);
     TelCallState nextState = TelCallState::CALL_STATUS_IDLE;
     switch ((CallStateToApp)state) {
         case CallStateToApp::CALL_STATE_IDLE:
