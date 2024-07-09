@@ -34,7 +34,7 @@ public:
             uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
 
 private:
-    using BluetoothCallFunc = int32_t (BluetoothCallStub::*)(MessageParcel &data, MessageParcel &reply);
+    using BluetoothCallFunc = std::function<int32_t(MessageParcel &data, MessageParcel &reply)>;
 
     int32_t OnAnswerCall(MessageParcel &data, MessageParcel &reply);
     int32_t OnRejectCall(MessageParcel &data, MessageParcel &reply);

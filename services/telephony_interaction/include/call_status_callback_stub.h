@@ -34,7 +34,7 @@ public:
         uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
 
 private:
-    using CallStatusCallbackFunc = int32_t (CallStatusCallbackStub::*)(MessageParcel &data, MessageParcel &reply);
+    using CallStatusCallbackFunc = std::function<int32_t(MessageParcel &data, MessageParcel &reply)>;
 
     int32_t OnUpdateCallReportInfo(MessageParcel &data, MessageParcel &reply);
     int32_t OnUpdateCallsReportInfo(MessageParcel &data, MessageParcel &reply);
@@ -73,6 +73,10 @@ private:
     int32_t OnCallDataUsageChange(MessageParcel &data, MessageParcel &reply);
     int32_t OnCameraCapabilitiesChange(MessageParcel &data, MessageParcel &reply);
     int32_t OnUpdateVoipEventInfo(MessageParcel &data, MessageParcel &reply);
+
+    void InitBasicFuncMap();
+    void InitSupplementFuncMap();
+    void InitImsFuncMap();
 
     std::map<uint32_t, CallStatusCallbackFunc> memberFuncMap_;
 };

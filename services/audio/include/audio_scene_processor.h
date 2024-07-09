@@ -62,7 +62,7 @@ private:
     bool DeactivateAudioInterrupt();
     void ProcessEventInner(AudioEvent event);
     std::unique_ptr<AudioBase> currentState_;
-    using AudioSceneProcessorFunc = bool (AudioSceneProcessor::*)();
+    using AudioSceneProcessorFunc = std::function<bool()>;
     std::map<uint32_t, AudioSceneProcessorFunc> memberFuncMap_;
 };
 } // namespace Telephony

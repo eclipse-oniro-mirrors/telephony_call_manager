@@ -40,7 +40,7 @@ private:
         HIGH_TEMP_LEVEL_CHANGED,
         SUPER_PRIVACY_MODE
     };
-    using broadcastSubscriberFunc = void (CallBroadcastSubscriber::*)(const EventFwk::CommonEventData &data);
+    using broadcastSubscriberFunc = std::function<void(const EventFwk::CommonEventData &data)>;
 
     void UnknownBroadcast(const EventFwk::CommonEventData &data);
     void SimStateBroadcast(const EventFwk::CommonEventData &data);

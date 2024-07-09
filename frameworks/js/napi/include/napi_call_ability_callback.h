@@ -166,7 +166,7 @@ private:
     EventCallback callDataUsageCallback_;
     EventCallback cameraCapabilitiesCallback_;
     EventCallback callSessionEventCallback_;
-    using CallResultReportIdProcessorFunc = int32_t (NapiCallAbilityCallback::*)(AppExecFwk::PacMap &resultInfo);
+    using CallResultReportIdProcessorFunc = std::function<int32_t(AppExecFwk::PacMap &resultInfo)>;
     std::map<CallResultReportId, CallResultReportIdProcessorFunc> memberFuncMap_;
     std::mutex mutex_;
     int32_t getCallTransferReason_ = -1;

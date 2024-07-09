@@ -34,7 +34,7 @@ public:
         uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
 
 private:
-    using CallAbilityCallbackFunc = int32_t (CallAbilityCallbackStub::*)(MessageParcel &data, MessageParcel &reply);
+    using CallAbilityCallbackFunc = std::function<int32_t(MessageParcel &data, MessageParcel &reply)>;
 
     int32_t OnUpdateCallStateInfo(MessageParcel &data, MessageParcel &reply);
     int32_t OnUpdateCallEvent(MessageParcel &data, MessageParcel &reply);

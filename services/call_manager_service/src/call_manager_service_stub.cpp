@@ -41,7 +41,8 @@ CallManagerServiceStub::CallManagerServiceStub()
     InitImsServiceRequest();
     InitOttServiceRequest();
     InitVoipOperationRequest();
-    memberFuncMap_[INTERFACE_GET_PROXY_OBJECT_PTR] = &CallManagerServiceStub::OnGetProxyObjectPtr;
+    memberFuncMap_[INTERFACE_GET_PROXY_OBJECT_PTR] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnGetProxyObjectPtr(data, reply); };
 }
 
 CallManagerServiceStub::~CallManagerServiceStub()
@@ -52,183 +53,184 @@ CallManagerServiceStub::~CallManagerServiceStub()
 void CallManagerServiceStub::InitCallBasicRequest()
 {
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_REGISTER_CALLBACK)] =
-        &CallManagerServiceStub::OnRegisterCallBack;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnRegisterCallBack(data, reply); };
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_UNREGISTER_CALLBACK)] =
-        &CallManagerServiceStub::OnUnRegisterCallBack;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnUnRegisterCallBack(data, reply); };
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_DIAL_CALL)] =
-        &CallManagerServiceStub::OnDialCall;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnDialCall(data, reply); };
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_ANSWER_CALL)] =
-        &CallManagerServiceStub::OnAcceptCall;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnAcceptCall(data, reply); };
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_REJECT_CALL)] =
-        &CallManagerServiceStub::OnRejectCall;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnRejectCall(data, reply); };
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_HOLD_CALL)] =
-        &CallManagerServiceStub::OnHoldCall;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnHoldCall(data, reply); };
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_UNHOLD_CALL)] =
-        &CallManagerServiceStub::OnUnHoldCall;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnUnHoldCall(data, reply); };
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_DISCONNECT_CALL)] =
-        &CallManagerServiceStub::OnHangUpCall;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnHangUpCall(data, reply); };
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_GET_CALL_STATE)] =
-        &CallManagerServiceStub::OnGetCallState;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnGetCallState(data, reply); };
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_SWAP_CALL)] =
-        &CallManagerServiceStub::OnSwitchCall;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnSwitchCall(data, reply); };
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_INPUT_DIALER_SPECIAL_CODE)] =
-        &CallManagerServiceStub::OnInputDialerSpecialCode;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnInputDialerSpecialCode(data, reply); };
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_SEND_CALLUI_EVENT)] =
-            &CallManagerServiceStub::OnSendCallUiEvent;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnSendCallUiEvent(data, reply); };
 }
 
 void CallManagerServiceStub::InitCallUtilsRequest()
 {
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_HAS_CALL)] =
-        &CallManagerServiceStub::OnHasCall;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnHasCall(data, reply); };
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_IS_NEW_CALL_ALLOWED)] =
-        &CallManagerServiceStub::OnIsNewCallAllowed;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnIsNewCallAllowed(data, reply); };
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_IS_RINGING)] =
-        &CallManagerServiceStub::OnIsRinging;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnIsRinging(data, reply); };
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_IS_EMERGENCY_CALL)] =
-        &CallManagerServiceStub::OnIsInEmergencyCall;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnIsInEmergencyCall(data, reply); };
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_IS_EMERGENCY_NUMBER)] =
-        &CallManagerServiceStub::OnIsEmergencyPhoneNumber;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnIsEmergencyPhoneNumber(data, reply); };
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_IS_FORMAT_NUMBER)] =
-        &CallManagerServiceStub::OnFormatPhoneNumber;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnFormatPhoneNumber(data, reply); };
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_IS_FORMAT_NUMBER_E164)] =
-        &CallManagerServiceStub::OnFormatPhoneNumberToE164;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnFormatPhoneNumberToE164(data, reply); };
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_CANCEL_MISSED_INCOMING_CALL_NOTIFICATION)] =
-        &CallManagerServiceStub::OnRemoveMissedIncomingCallNotification;
+        [this](
+            MessageParcel &data, MessageParcel &reply) { return OnRemoveMissedIncomingCallNotification(data, reply); };
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_OBSERVER_ON_CALL_DETAILS_CHANGE)] =
-        &CallManagerServiceStub::OnObserverOnCallDetailsChange;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnObserverOnCallDetailsChange(data, reply); };
 }
 
 void CallManagerServiceStub::InitCallConferenceRequest()
 {
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_COMBINE_CONFERENCE)] =
-        &CallManagerServiceStub::OnCombineConference;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnCombineConference(data, reply); };
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_SEPARATE_CONFERENCE)] =
-        &CallManagerServiceStub::OnSeparateConference;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnSeparateConference(data, reply); };
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_JOIN_CONFERENCE)] =
-        &CallManagerServiceStub::OnJoinConference;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnJoinConference(data, reply); };
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_KICK_OUT_CONFERENCE)] =
-        &CallManagerServiceStub::OnKickOutFromConference;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnKickOutFromConference(data, reply); };
 }
 
 void CallManagerServiceStub::InitCallDtmfRequest()
 {
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_START_DTMF)] =
-        &CallManagerServiceStub::OnStartDtmf;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnStartDtmf(data, reply); };
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_STOP_DTMF)] =
-        &CallManagerServiceStub::OnStopDtmf;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnStopDtmf(data, reply); };
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_POST_DIAL_PROCEED)] =
-        &CallManagerServiceStub::OnPostDialProceed;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnPostDialProceed(data, reply); };
 }
 
 void CallManagerServiceStub::InitCallSupplementRequest()
 {
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_GET_CALL_WAITING)] =
-        &CallManagerServiceStub::OnGetCallWaiting;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnGetCallWaiting(data, reply); };
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_SET_CALL_WAITING)] =
-        &CallManagerServiceStub::OnSetCallWaiting;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnSetCallWaiting(data, reply); };
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_GET_CALL_RESTRICTION)] =
-        &CallManagerServiceStub::OnGetCallRestriction;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnGetCallRestriction(data, reply); };
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_SET_CALL_RESTRICTION)] =
-        &CallManagerServiceStub::OnSetCallRestriction;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnSetCallRestriction(data, reply); };
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_SET_CALL_RESTRICTION_PASSWORD)] =
-        &CallManagerServiceStub::OnSetCallRestrictionPassword;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnSetCallRestrictionPassword(data, reply); };
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_GET_CALL_TRANSFER)] =
-        &CallManagerServiceStub::OnGetTransferNumber;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnGetTransferNumber(data, reply); };
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_SET_CALL_TRANSFER)] =
-        &CallManagerServiceStub::OnSetTransferNumber;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnSetTransferNumber(data, reply); };
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_CAN_SET_CALL_TRANSFER_TIME)] =
-        &CallManagerServiceStub::OnCanSetCallTransferTime;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnCanSetCallTransferTime(data, reply); };
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_CLOSE_UNFINISHED_USSD)] =
-        &CallManagerServiceStub::OnCloseUnFinishedUssd;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnCloseUnFinishedUssd(data, reply); };
 }
 
 void CallManagerServiceStub::initCallConferenceExRequest()
 {
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_GET_MAINID)] =
-        &CallManagerServiceStub::OnGetMainCallId;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnGetMainCallId(data, reply); };
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_GET_SUBCALL_LIST_ID)] =
-        &CallManagerServiceStub::OnGetSubCallIdList;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnGetSubCallIdList(data, reply); };
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_GET_CALL_LIST_ID_FOR_CONFERENCE)] =
-        &CallManagerServiceStub::OnGetCallIdListForConference;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnGetCallIdListForConference(data, reply); };
 }
 
 void CallManagerServiceStub::InitCallMultimediaRequest()
 {
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_SET_MUTE)] =
-        &CallManagerServiceStub::OnSetMute;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnSetMute(data, reply); };
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_MUTE_RINGER)] =
-        &CallManagerServiceStub::OnMuteRinger;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnMuteRinger(data, reply); };
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_SET_AUDIO_DEVICE)] =
-        &CallManagerServiceStub::OnSetAudioDevice;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnSetAudioDevice(data, reply); };
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_CTRL_CAMERA)] =
-        &CallManagerServiceStub::OnControlCamera;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnControlCamera(data, reply); };
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_SET_PREVIEW_WINDOW)] =
-        &CallManagerServiceStub::OnSetPreviewWindow;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnSetPreviewWindow(data, reply); };
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_SET_DISPLAY_WINDOW)] =
-        &CallManagerServiceStub::OnSetDisplayWindow;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnSetDisplayWindow(data, reply); };
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_SET_CAMERA_ZOOM)] =
-        &CallManagerServiceStub::OnSetCameraZoom;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnSetCameraZoom(data, reply); };
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_SET_PAUSE_IMAGE)] =
-        &CallManagerServiceStub::OnSetPausePicture;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnSetPausePicture(data, reply); };
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_SET_DEVICE_DIRECTION)] =
-        &CallManagerServiceStub::OnSetDeviceDirection;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnSetDeviceDirection(data, reply); };
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_UPDATE_CALL_MEDIA_MODE)] =
-        &CallManagerServiceStub::OnUpdateCallMediaMode;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnUpdateCallMediaMode(data, reply); };
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_REPORT_AUDIO_DEVICE_INFO)] =
-        &CallManagerServiceStub::OnReportAudioDeviceInfo;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnReportAudioDeviceInfo(data, reply); };
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_CANCEL_CALL_UPGRADE)] =
-        &CallManagerServiceStub::OnCancelCallUpgrade;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnCancelCallUpgrade(data, reply); };
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_REQUEST_CAMERA_CAPABILITIES)] =
-        &CallManagerServiceStub::OnRequestCameraCapabilities;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnRequestCameraCapabilities(data, reply); };
 }
 
 void CallManagerServiceStub::InitImsServiceRequest()
 {
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_SETCALL_PREFERENCEMODE)] =
-        &CallManagerServiceStub::OnSetCallPreferenceMode;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnSetCallPreferenceMode(data, reply); };
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_GET_IMS_CONFIG)] =
-        &CallManagerServiceStub::OnGetImsConfig;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnGetImsConfig(data, reply); };
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_SET_IMS_CONFIG)] =
-        &CallManagerServiceStub::OnSetImsConfig;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnSetImsConfig(data, reply); };
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_GET_IMS_FEATURE_VALUE)] =
-        &CallManagerServiceStub::OnGetImsFeatureValue;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnGetImsFeatureValue(data, reply); };
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_SET_IMS_FEATURE_VALUE)] =
-        &CallManagerServiceStub::OnSetImsFeatureValue;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnSetImsFeatureValue(data, reply); };
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_ENABLE_VOLTE)] =
-        &CallManagerServiceStub::OnEnableVoLte;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnEnableVoLte(data, reply); };
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_DISABLE_VOLTE)] =
-        &CallManagerServiceStub::OnDisableVoLte;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnDisableVoLte(data, reply); };
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_IS_VOLTE_ENABLED)] =
-        &CallManagerServiceStub::OnIsVoLteEnabled;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnIsVoLteEnabled(data, reply); };
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_SET_VONR_STATE)] =
-        &CallManagerServiceStub::OnSetVoNRState;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnSetVoNRState(data, reply); };
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_GET_VONR_STATE)] =
-        &CallManagerServiceStub::OnGetVoNRState;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnGetVoNRState(data, reply); };
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_START_RTT)] =
-        &CallManagerServiceStub::OnStartRtt;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnStartRtt(data, reply); };
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_STOP_RTT)] =
-        &CallManagerServiceStub::OnStopRtt;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnStopRtt(data, reply); };
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_SET_VOIP_CALL_STATE)] =
-        &CallManagerServiceStub::OnSetVoIPCallState;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnSetVoIPCallState(data, reply); };
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_GET_VOIP_CALL_STATE)] =
-        &CallManagerServiceStub::OnGetVoIPCallState;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnGetVoIPCallState(data, reply); };
 }
 
 void CallManagerServiceStub::InitOttServiceRequest()
 {
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_REPORT_OTT_CALL_DETAIL_INFO)] =
-        &CallManagerServiceStub::OnReportOttCallDetailsInfo;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnReportOttCallDetailsInfo(data, reply); };
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_REPORT_OTT_CALL_EVENT_INFO)] =
-        &CallManagerServiceStub::OnReportOttCallEventInfo;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnReportOttCallEventInfo(data, reply); };
 }
 
 void CallManagerServiceStub::InitVoipOperationRequest()
 {
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_VOIP_REGISTER_CALLBACK)] =
-        &CallManagerServiceStub::OnRegisterVoipCallManagerCallback;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnRegisterVoipCallManagerCallback(data, reply); };
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_VOIP_UNREGISTER_CALLBACK)] =
-        &CallManagerServiceStub::OnUnRegisterVoipCallManagerCallback;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnUnRegisterVoipCallManagerCallback(data, reply); };
 }
 
 int32_t CallManagerServiceStub::OnRegisterVoipCallManagerCallback(MessageParcel &data, MessageParcel &reply)
@@ -268,7 +270,7 @@ int32_t CallManagerServiceStub::OnRemoteRequest(
     if (itFunc != memberFuncMap_.end()) {
         auto memberFunc = itFunc->second;
         if (memberFunc != nullptr) {
-            return (this->*memberFunc)(data, reply);
+            return memberFunc(data, reply);
         }
     }
     return IPCObjectStub::OnRemoteRequest(code, data, reply, option);

@@ -31,11 +31,16 @@ using namespace OHOS::EventFwk;
 CallBroadcastSubscriber::CallBroadcastSubscriber(const OHOS::EventFwk::CommonEventSubscribeInfo &subscriberInfo)
     : CommonEventSubscriber(subscriberInfo)
 {
-    memberFuncMap_[UNKNOWN_BROADCAST_EVENT] = &CallBroadcastSubscriber::UnknownBroadcast;
-    memberFuncMap_[SIM_STATE_BROADCAST_EVENT] = &CallBroadcastSubscriber::SimStateBroadcast;
-    memberFuncMap_[CONNECT_CALLUI_SERVICE] = &CallBroadcastSubscriber::ConnectCallUiServiceBroadcast;
-    memberFuncMap_[HIGH_TEMP_LEVEL_CHANGED] = &CallBroadcastSubscriber::HighTempLevelChangedBroadcast;
-    memberFuncMap_[SUPER_PRIVACY_MODE] = &CallBroadcastSubscriber::ConnectCallUiSuperPrivacyModeBroadcast;
+    memberFuncMap_[UNKNOWN_BROADCAST_EVENT] =
+        [this](const EventFwk::CommonEventData &data) { UnknownBroadcast(data); };
+    memberFuncMap_[SIM_STATE_BROADCAST_EVENT] =
+        [this](const EventFwk::CommonEventData &data) { SimStateBroadcast(data); };
+    memberFuncMap_[CONNECT_CALLUI_SERVICE] =
+        [this](const EventFwk::CommonEventData &data) { ConnectCallUiServiceBroadcast(data); };
+    memberFuncMap_[HIGH_TEMP_LEVEL_CHANGED] =
+        [this](const EventFwk::CommonEventData &data) { HighTempLevelChangedBroadcast(data); };
+    memberFuncMap_[SUPER_PRIVACY_MODE] =
+        [this](const EventFwk::CommonEventData &data) { ConnectCallUiSuperPrivacyModeBroadcast(data); };
 }
 
 void CallBroadcastSubscriber::OnReceiveEvent(const EventFwk::CommonEventData &data)
@@ -59,7 +64,7 @@ void CallBroadcastSubscriber::OnReceiveEvent(const EventFwk::CommonEventData &da
     if (itFunc != memberFuncMap_.end()) {
         auto memberFunc = itFunc->second;
         if (memberFunc != nullptr) {
-            return (this->*memberFunc)(data);
+            return memberFunc(data);
         }
     }
 }

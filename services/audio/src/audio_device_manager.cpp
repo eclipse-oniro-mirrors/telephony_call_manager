@@ -51,10 +51,10 @@ AudioDeviceManager::~AudioDeviceManager()
 
 void AudioDeviceManager::Init()
 {
-    memberFuncMap_[AudioEvent::ENABLE_DEVICE_EARPIECE] = &AudioDeviceManager::EnableEarpiece;
-    memberFuncMap_[AudioEvent::ENABLE_DEVICE_SPEAKER] = &AudioDeviceManager::EnableSpeaker;
-    memberFuncMap_[AudioEvent::ENABLE_DEVICE_WIRED_HEADSET] = &AudioDeviceManager::EnableWiredHeadset;
-    memberFuncMap_[AudioEvent::ENABLE_DEVICE_BLUETOOTH] = &AudioDeviceManager::EnableBtSco;
+    memberFuncMap_[AudioEvent::ENABLE_DEVICE_EARPIECE] = [this]() { return EnableEarpiece(); };
+    memberFuncMap_[AudioEvent::ENABLE_DEVICE_SPEAKER] = [this]() { return EnableSpeaker(); };
+    memberFuncMap_[AudioEvent::ENABLE_DEVICE_WIRED_HEADSET] = [this]() { return EnableWiredHeadset(); };
+    memberFuncMap_[AudioEvent::ENABLE_DEVICE_BLUETOOTH] = [this]() { return EnableBtSco(); };
     currentAudioDevice_ = std::make_unique<InactiveDeviceState>();
     if (currentAudioDevice_ == nullptr) {
         TELEPHONY_LOGE("current audio device nullptr");
@@ -273,7 +273,7 @@ bool AudioDeviceManager::SwitchDevice(AudioEvent event)
     auto itFunc = memberFuncMap_.find(event);
     if (itFunc != memberFuncMap_.end() && itFunc->second != nullptr) {
         auto memberFunc = itFunc->second;
-        return (this->*memberFunc)();
+        return memberFunc();
     }
     return false;
 }

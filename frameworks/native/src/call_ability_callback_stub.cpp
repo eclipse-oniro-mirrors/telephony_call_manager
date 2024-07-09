@@ -26,32 +26,32 @@ const int32_t MAX_LEN = 100000;
 CallAbilityCallbackStub::CallAbilityCallbackStub()
 {
     memberFuncMap_[static_cast<uint32_t>(CallManagerCallAbilityInterfaceCode::UPDATE_CALL_STATE_INFO)] =
-        &CallAbilityCallbackStub::OnUpdateCallStateInfo;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnUpdateCallStateInfo(data, reply); };
     memberFuncMap_[static_cast<uint32_t>(CallManagerCallAbilityInterfaceCode::UPDATE_CALL_EVENT)] =
-        &CallAbilityCallbackStub::OnUpdateCallEvent;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnUpdateCallEvent(data, reply); };
     memberFuncMap_[static_cast<uint32_t>(CallManagerCallAbilityInterfaceCode::UPDATE_CALL_DISCONNECTED_CAUSE)] =
-        &CallAbilityCallbackStub::OnUpdateCallDisconnectedCause;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnUpdateCallDisconnectedCause(data, reply); };
     memberFuncMap_[static_cast<uint32_t>(CallManagerCallAbilityInterfaceCode::UPDATE_CALL_ASYNC_RESULT_REQUEST)] =
-        &CallAbilityCallbackStub::OnUpdateAysncResults;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnUpdateAysncResults(data, reply); };
     memberFuncMap_[static_cast<uint32_t>(CallManagerCallAbilityInterfaceCode::REPORT_OTT_CALL_REQUEST)] =
-        &CallAbilityCallbackStub::OnUpdateOttCallRequest;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnUpdateOttCallRequest(data, reply); };
     memberFuncMap_[static_cast<uint32_t>(CallManagerCallAbilityInterfaceCode::UPDATE_MMI_CODE_RESULT_REQUEST)] =
-        &CallAbilityCallbackStub::OnUpdateMmiCodeResults;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnUpdateMmiCodeResults(data, reply); };
     memberFuncMap_[static_cast<uint32_t>(
         CallManagerCallAbilityInterfaceCode::UPDATE_AUDIO_DEVICE_CHANGE_RESULT_REQUEST)] =
-        &CallAbilityCallbackStub::OnUpdateAudioDeviceChange;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnUpdateAudioDeviceChange(data, reply); };
     memberFuncMap_[static_cast<uint32_t>(CallManagerCallAbilityInterfaceCode::REPORT_POST_DIAL_DELAY)] =
-        &CallAbilityCallbackStub::OnUpdatePostDialDelay;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnUpdatePostDialDelay(data, reply); };
     memberFuncMap_[static_cast<uint32_t>(CallManagerCallAbilityInterfaceCode::UPDATE_IMS_CALL_MODE_RECEIVE)] =
-        &CallAbilityCallbackStub::OnUpdateImsCallModeChange;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnUpdateImsCallModeChange(data, reply); };
     memberFuncMap_[static_cast<uint32_t>(CallManagerCallAbilityInterfaceCode::CALL_SESSION_EVENT_CHANGE)] =
-        &CallAbilityCallbackStub::OnUpdateCallSessionEventChange;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnUpdateCallSessionEventChange(data, reply); };
     memberFuncMap_[static_cast<uint32_t>(CallManagerCallAbilityInterfaceCode::PEERD_DIMENSIONS_CHANGE)] =
-        &CallAbilityCallbackStub::OnUpdatePeerDimensionsChange;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnUpdatePeerDimensionsChange(data, reply); };
     memberFuncMap_[static_cast<uint32_t>(CallManagerCallAbilityInterfaceCode::CALL_DATA_USAGE_CHANGE)] =
-        &CallAbilityCallbackStub::OnUpdateCallDataUsageChange;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnUpdateCallDataUsageChange(data, reply); };
     memberFuncMap_[static_cast<uint32_t>(CallManagerCallAbilityInterfaceCode::CAMERA_CAPABILITIES_CHANGE)] =
-        &CallAbilityCallbackStub::OnUpdateCameraCapabilities;
+        [this](MessageParcel &data, MessageParcel &reply) { return OnUpdateCameraCapabilities(data, reply); };
 }
 
 CallAbilityCallbackStub::~CallAbilityCallbackStub()
@@ -73,7 +73,7 @@ int32_t CallAbilityCallbackStub::OnRemoteRequest(
     if (itFunc != memberFuncMap_.end()) {
         auto memberFunc = itFunc->second;
         if (memberFunc != nullptr) {
-            return (this->*memberFunc)(data, reply);
+            return memberFunc(data, reply);
         }
     }
     return IPCObjectStub::OnRemoteRequest(code, data, reply, option);

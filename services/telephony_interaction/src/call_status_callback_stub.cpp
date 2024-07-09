@@ -26,55 +26,100 @@ const int32_t MAX_LEN = 100000;
 const int32_t MAX_CALL_NUM = 10;
 CallStatusCallbackStub::CallStatusCallbackStub()
 {
-    memberFuncMap_[static_cast<uint32_t>(UPDATE_CALL_INFO)] = &CallStatusCallbackStub::OnUpdateCallReportInfo;
-    memberFuncMap_[static_cast<uint32_t>(UPDATE_CALLS_INFO)] = &CallStatusCallbackStub::OnUpdateCallsReportInfo;
-    memberFuncMap_[static_cast<uint32_t>(UPDATE_DISCONNECTED_CAUSE)] =
-        &CallStatusCallbackStub::OnUpdateDisconnectedCause;
-    memberFuncMap_[static_cast<uint32_t>(UPDATE_EVENT_RESULT_INFO)] = &CallStatusCallbackStub::OnUpdateEventReport;
-    memberFuncMap_[static_cast<uint32_t>(UPDATE_RBT_PLAY_INFO)] = &CallStatusCallbackStub::OnUpdateRBTPlayInfo;
-    memberFuncMap_[static_cast<uint32_t>(START_DTMF)] = &CallStatusCallbackStub::OnStartDtmfResult;
-    memberFuncMap_[static_cast<uint32_t>(STOP_DTMF)] = &CallStatusCallbackStub::OnStopDtmfResult;
-    memberFuncMap_[static_cast<uint32_t>(SEND_USSD)] = &CallStatusCallbackStub::OnSendUssdResult;
-    memberFuncMap_[static_cast<uint32_t>(GET_IMS_CALL_DATA)] = &CallStatusCallbackStub::OnGetImsCallDataResult;
-    memberFuncMap_[static_cast<uint32_t>(UPDATE_GET_WAITING)] = &CallStatusCallbackStub::OnUpdateGetWaitingResult;
-    memberFuncMap_[static_cast<uint32_t>(UPDATE_SET_WAITING)] = &CallStatusCallbackStub::OnUpdateSetWaitingResult;
-    memberFuncMap_[static_cast<uint32_t>(UPDATE_GET_RESTRICTION)] =
-        &CallStatusCallbackStub::OnUpdateGetRestrictionResult;
-    memberFuncMap_[static_cast<uint32_t>(UPDATE_SET_RESTRICTION)] =
-        &CallStatusCallbackStub::OnUpdateSetRestrictionResult;
-    memberFuncMap_[static_cast<uint32_t>(UPDATE_SET_RESTRICTION_PWD)] =
-        &CallStatusCallbackStub::OnUpdateSetRestrictionPasswordResult;
-    memberFuncMap_[static_cast<uint32_t>(UPDATE_GET_TRANSFER)] = &CallStatusCallbackStub::OnUpdateGetTransferResult;
-    memberFuncMap_[static_cast<uint32_t>(UPDATE_SET_TRANSFER)] = &CallStatusCallbackStub::OnUpdateSetTransferResult;
-    memberFuncMap_[static_cast<uint32_t>(UPDATE_GET_CALL_CLIP)] = &CallStatusCallbackStub::OnUpdateGetCallClipResult;
-    memberFuncMap_[static_cast<uint32_t>(UPDATE_GET_CALL_CLIR)] = &CallStatusCallbackStub::OnUpdateGetCallClirResult;
-    memberFuncMap_[static_cast<uint32_t>(UPDATE_SET_CALL_CLIR)] = &CallStatusCallbackStub::OnUpdateSetCallClirResult;
-    memberFuncMap_[static_cast<uint32_t>(GET_IMS_CONFIG)] = &CallStatusCallbackStub::OnGetImsConfigResult;
-    memberFuncMap_[static_cast<uint32_t>(SET_IMS_CONFIG)] = &CallStatusCallbackStub::OnSetImsConfigResult;
-    memberFuncMap_[static_cast<uint32_t>(GET_IMS_FEATURE_VALUE)] = &CallStatusCallbackStub::OnGetImsFeatureValueResult;
-    memberFuncMap_[static_cast<uint32_t>(SET_IMS_FEATURE_VALUE)] = &CallStatusCallbackStub::OnSetImsFeatureValueResult;
-    memberFuncMap_[static_cast<uint32_t>(RECEIVE_UPDATE_MEDIA_MODE_RESPONSE)] =
-        &CallStatusCallbackStub::OnReceiveImsCallModeResponse;
-    memberFuncMap_[static_cast<uint32_t>(RECEIVE_UPDATE_MEDIA_MODE_REQUEST)] =
-        &CallStatusCallbackStub::OnReceiveImsCallModeRequest;
-    memberFuncMap_[static_cast<uint32_t>(UPDATE_STARTRTT_STATUS)] = &CallStatusCallbackStub::OnStartRttResult;
-    memberFuncMap_[static_cast<uint32_t>(UPDATE_STOPRTT_STATUS)] = &CallStatusCallbackStub::OnStopRttResult;
-    memberFuncMap_[static_cast<uint32_t>(INVITE_TO_CONFERENCE)] = &CallStatusCallbackStub::OnInviteToConferenceResult;
-    memberFuncMap_[static_cast<uint32_t>(MMI_CODE_INFO_RESPONSE)] = &CallStatusCallbackStub::OnSendMmiCodeResult;
-    memberFuncMap_[static_cast<uint32_t>(CLOSE_UNFINISHED_USSD)] = &CallStatusCallbackStub::OnCloseUnFinishedUssdResult;
-    memberFuncMap_[static_cast<uint32_t>(POST_DIAL_CHAR)] = &CallStatusCallbackStub::OnPostDialNextChar;
-    memberFuncMap_[static_cast<uint32_t>(POST_DIAL_DELAY)] = &CallStatusCallbackStub::OnReportPostDialDelay;
-    memberFuncMap_[static_cast<uint32_t>(CALL_SESSION_EVENT)] = &CallStatusCallbackStub::OnCallSessionEventChange;
-    memberFuncMap_[static_cast<uint32_t>(PEER_DIMENSION_CHANGE)] = &CallStatusCallbackStub::OnPeerDimensionsChange;
-    memberFuncMap_[static_cast<uint32_t>(CALL_DATA_USAGE)] = &CallStatusCallbackStub::OnCallDataUsageChange;
-    memberFuncMap_[static_cast<uint32_t>(CAMERA_CAPBILITIES_CHANGE)] =
-        &CallStatusCallbackStub::OnCameraCapabilitiesChange;
-    memberFuncMap_[static_cast<uint32_t>(UPDATE_VOIP_EVENT_INFO)] = &CallStatusCallbackStub::OnUpdateVoipEventInfo;
+    InitBasicFuncMap();
+    InitSupplementFuncMap();
+    InitImsFuncMap();
 }
 
 CallStatusCallbackStub::~CallStatusCallbackStub()
 {
     memberFuncMap_.clear();
+}
+
+void CallStatusCallbackStub::InitBasicFuncMap()
+{
+    memberFuncMap_[static_cast<uint32_t>(UPDATE_CALL_INFO)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnUpdateCallReportInfo(data, reply); };
+    memberFuncMap_[static_cast<uint32_t>(UPDATE_CALLS_INFO)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnUpdateCallsReportInfo(data, reply); };
+    memberFuncMap_[static_cast<uint32_t>(UPDATE_DISCONNECTED_CAUSE)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnUpdateDisconnectedCause(data, reply); };
+    memberFuncMap_[static_cast<uint32_t>(UPDATE_EVENT_RESULT_INFO)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnUpdateEventReport(data, reply); };
+    memberFuncMap_[static_cast<uint32_t>(UPDATE_RBT_PLAY_INFO)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnUpdateRBTPlayInfo(data, reply); };
+    memberFuncMap_[static_cast<uint32_t>(START_DTMF)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnStartDtmfResult(data, reply); };
+    memberFuncMap_[static_cast<uint32_t>(STOP_DTMF)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnStopDtmfResult(data, reply); };
+    memberFuncMap_[static_cast<uint32_t>(RECEIVE_UPDATE_MEDIA_MODE_RESPONSE)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnReceiveImsCallModeResponse(data, reply); };
+    memberFuncMap_[static_cast<uint32_t>(RECEIVE_UPDATE_MEDIA_MODE_REQUEST)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnReceiveImsCallModeRequest(data, reply); };
+    memberFuncMap_[static_cast<uint32_t>(UPDATE_STARTRTT_STATUS)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnStartRttResult(data, reply); };
+    memberFuncMap_[static_cast<uint32_t>(UPDATE_STOPRTT_STATUS)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnStopRttResult(data, reply); };
+    memberFuncMap_[static_cast<uint32_t>(INVITE_TO_CONFERENCE)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnInviteToConferenceResult(data, reply); };
+    memberFuncMap_[static_cast<uint32_t>(MMI_CODE_INFO_RESPONSE)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnSendMmiCodeResult(data, reply); };
+    memberFuncMap_[static_cast<uint32_t>(CLOSE_UNFINISHED_USSD)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnCloseUnFinishedUssdResult(data, reply); };
+    memberFuncMap_[static_cast<uint32_t>(POST_DIAL_CHAR)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnPostDialNextChar(data, reply); };
+    memberFuncMap_[static_cast<uint32_t>(POST_DIAL_DELAY)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnReportPostDialDelay(data, reply); };
+    memberFuncMap_[static_cast<uint32_t>(CALL_SESSION_EVENT)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnCallSessionEventChange(data, reply); };
+    memberFuncMap_[static_cast<uint32_t>(PEER_DIMENSION_CHANGE)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnPeerDimensionsChange(data, reply); };
+    memberFuncMap_[static_cast<uint32_t>(CALL_DATA_USAGE)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnCallDataUsageChange(data, reply); };
+}
+
+void CallStatusCallbackStub::InitSupplementFuncMap()
+{
+    memberFuncMap_[static_cast<uint32_t>(SEND_USSD)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnSendUssdResult(data, reply); };
+    memberFuncMap_[static_cast<uint32_t>(UPDATE_GET_WAITING)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnUpdateGetWaitingResult(data, reply); };
+    memberFuncMap_[static_cast<uint32_t>(UPDATE_SET_WAITING)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnUpdateSetWaitingResult(data, reply); };
+    memberFuncMap_[static_cast<uint32_t>(UPDATE_GET_RESTRICTION)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnUpdateGetRestrictionResult(data, reply); };
+    memberFuncMap_[static_cast<uint32_t>(UPDATE_SET_RESTRICTION)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnUpdateSetRestrictionResult(data, reply); };
+    memberFuncMap_[static_cast<uint32_t>(UPDATE_SET_RESTRICTION_PWD)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnUpdateSetRestrictionPasswordResult(data, reply); };
+    memberFuncMap_[static_cast<uint32_t>(UPDATE_GET_TRANSFER)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnUpdateGetTransferResult(data, reply); };
+    memberFuncMap_[static_cast<uint32_t>(UPDATE_SET_TRANSFER)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnUpdateSetTransferResult(data, reply); };
+    memberFuncMap_[static_cast<uint32_t>(UPDATE_GET_CALL_CLIP)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnUpdateGetCallClipResult(data, reply); };
+    memberFuncMap_[static_cast<uint32_t>(UPDATE_GET_CALL_CLIR)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnUpdateGetCallClirResult(data, reply); };
+    memberFuncMap_[static_cast<uint32_t>(UPDATE_SET_CALL_CLIR)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnUpdateSetCallClirResult(data, reply); };
+}
+
+void CallStatusCallbackStub::InitImsFuncMap()
+{
+    memberFuncMap_[static_cast<uint32_t>(GET_IMS_CALL_DATA)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnGetImsCallDataResult(data, reply); };
+    memberFuncMap_[static_cast<uint32_t>(GET_IMS_CONFIG)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnGetImsConfigResult(data, reply); };
+    memberFuncMap_[static_cast<uint32_t>(SET_IMS_CONFIG)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnSetImsConfigResult(data, reply); };
+    memberFuncMap_[static_cast<uint32_t>(GET_IMS_FEATURE_VALUE)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnGetImsFeatureValueResult(data, reply); };
+    memberFuncMap_[static_cast<uint32_t>(SET_IMS_FEATURE_VALUE)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnSetImsFeatureValueResult(data, reply); };
+    memberFuncMap_[static_cast<uint32_t>(CAMERA_CAPBILITIES_CHANGE)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnCameraCapabilitiesChange(data, reply); };
+    memberFuncMap_[static_cast<uint32_t>(UPDATE_VOIP_EVENT_INFO)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnUpdateVoipEventInfo(data, reply); };
 }
 
 int32_t CallStatusCallbackStub::OnRemoteRequest(
@@ -91,7 +136,7 @@ int32_t CallStatusCallbackStub::OnRemoteRequest(
     if (itFunc != memberFuncMap_.end()) {
         auto memberFunc = itFunc->second;
         if (memberFunc != nullptr) {
-            return (this->*memberFunc)(data, reply);
+            return memberFunc(data, reply);
         }
     }
     return IPCObjectStub::OnRemoteRequest(code, data, reply, option);

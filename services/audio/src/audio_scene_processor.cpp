@@ -42,13 +42,13 @@ AudioSceneProcessor::~AudioSceneProcessor() {}
 
 int32_t AudioSceneProcessor::Init()
 {
-    memberFuncMap_[AudioEvent::SWITCH_DIALING_STATE] = &AudioSceneProcessor::SwitchDialing;
-    memberFuncMap_[AudioEvent::SWITCH_ALERTING_STATE] = &AudioSceneProcessor::SwitchAlerting;
-    memberFuncMap_[AudioEvent::SWITCH_INCOMING_STATE] = &AudioSceneProcessor::SwitchIncoming;
-    memberFuncMap_[AudioEvent::SWITCH_CS_CALL_STATE] = &AudioSceneProcessor::SwitchCS;
-    memberFuncMap_[AudioEvent::SWITCH_IMS_CALL_STATE] = &AudioSceneProcessor::SwitchIMS;
-    memberFuncMap_[AudioEvent::SWITCH_HOLDING_STATE] = &AudioSceneProcessor::SwitchHolding;
-    memberFuncMap_[AudioEvent::SWITCH_AUDIO_INACTIVE_STATE] = &AudioSceneProcessor::SwitchInactive;
+    memberFuncMap_[AudioEvent::SWITCH_DIALING_STATE] = [this]() { return SwitchDialing(); };
+    memberFuncMap_[AudioEvent::SWITCH_ALERTING_STATE] = [this]() { return SwitchAlerting(); };
+    memberFuncMap_[AudioEvent::SWITCH_INCOMING_STATE] = [this]() { return SwitchIncoming(); };
+    memberFuncMap_[AudioEvent::SWITCH_CS_CALL_STATE] = [this]() { return SwitchCS(); };
+    memberFuncMap_[AudioEvent::SWITCH_IMS_CALL_STATE] = [this]() { return SwitchIMS(); };
+    memberFuncMap_[AudioEvent::SWITCH_HOLDING_STATE] = [this]() { return SwitchHolding(); };
+    memberFuncMap_[AudioEvent::SWITCH_AUDIO_INACTIVE_STATE] = [this]() { return SwitchInactive(); };
     currentState_ = std::make_unique<InActiveState>();
     if (currentState_ == nullptr) {
         TELEPHONY_LOGE("current call state nullptr");
@@ -108,7 +108,7 @@ bool AudioSceneProcessor::SwitchState(AudioEvent event)
     auto itFunc = memberFuncMap_.find(event);
     if (itFunc != memberFuncMap_.end() && itFunc->second != nullptr) {
         auto memberFunc = itFunc->second;
-        return (this->*memberFunc)();
+        return memberFunc();
     }
     return false;
 }
