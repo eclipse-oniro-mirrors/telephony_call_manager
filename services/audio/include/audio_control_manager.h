@@ -105,6 +105,7 @@ private:
     void ProcessAudioWhenCallActive(sptr<CallBase> &callObjectPtr);
     int32_t HandleDistributeAudioDevice(const AudioDevice &device);
     void SendMuteRingEvent();
+    bool IsDistributeCallSinkStatus();
     ToneState toneState_ = ToneState::STOPPED;
     SoundState soundState_ = SoundState::STOPPED;
     bool isLocalRingbackNeeded_ = false;

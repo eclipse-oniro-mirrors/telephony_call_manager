@@ -585,8 +585,14 @@ int32_t CallStatusManager::DialingHandle(const CallDetailInfo &info)
 {
     TELEPHONY_LOGI("handle dialing state");
     if (info.index > 0) {
-        TELEPHONY_LOGI("need update call info");
-        return UpdateDialingCallInfo(info);
+        sptr<CallBase> call = GetOneCallObjectByIndexAndSlotId(INIT_INDEX, info.accountId);
+        if (call == nullptr) {
+            call = GetOneCallObjectByIndexAndSlotId(info.index, info.accountId);
+        }
+        if (call != nullptr) {
+            TELEPHONY_LOGI("need update call info");
+            return UpdateDialingCallInfo(info);
+        }
     }
     sptr<CallBase> call = CreateNewCall(info, CallDirection::CALL_DIRECTION_OUT);
     if (call == nullptr) {
