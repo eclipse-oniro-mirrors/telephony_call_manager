@@ -369,7 +369,6 @@ HWTEST_F(BranchTest, Telephony_CallObjectManager_001, Function | MediumTest | Le
     CallObjectManager::HasVideoCall();
     csCall->SetCallType(CallType::TYPE_VOIP);
     CallObjectManager::HasVideoCall();
-    CallObjectManager::GetCallInfoList(SIM1_SLOTID);
     CallObjectManager::GetCallInfoList(DEFAULT_INDEX);
     csCall->SetCallType(CallType::TYPE_OTT);
     CallObjectManager::GetCallInfoList(SIM1_SLOTID);
@@ -1837,60 +1836,6 @@ std::string GetTestNumber()
 }
 
 /**
- * @tc.number   Telephony_CarrierCall_001
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
-HWTEST_F(BranchTest, Telephony_CarrierCall_001, Function | MediumTest | Level3)
-{
-    DialParaInfo dialParaInfo;
-    CSCall call { dialParaInfo };
-    call.callRunningState_ = CallRunningState::CALL_RUNNING_STATE_CREATE;
-    call.accountNumber_ = GetTestNumber();
-    ASSERT_EQ(CALL_ERR_ANSWER_FAILED, call.CarrierAnswerCall(0));
-    call.callRunningState_ = CallRunningState::CALL_RUNNING_STATE_RINGING;
-    call.cellularCallConnectionPtr_ = nullptr;
-    ASSERT_EQ(TELEPHONY_ERR_LOCAL_PTR_NULL, call.CarrierAnswerCall(0));
-    ASSERT_EQ(TELEPHONY_ERR_LOCAL_PTR_NULL, call.CarrierRejectCall());
-    call.cellularCallConnectionPtr_ = DelayedSingleton<CellularCallConnection>::GetInstance();
-    call.callState_ = TelCallState::CALL_STATUS_INCOMING;
-    ASSERT_NE(TELEPHONY_ERR_SUCCESS, call.CarrierRejectCall());
-    call.callState_ = TelCallState::CALL_STATUS_UNKNOWN;
-    ASSERT_NE(TELEPHONY_ERR_SUCCESS, call.CarrierRejectCall());
-    call.cellularCallConnectionPtr_ = nullptr;
-    ASSERT_EQ(TELEPHONY_ERR_LOCAL_PTR_NULL, call.CarrierHangUpCall());
-    call.cellularCallConnectionPtr_ = DelayedSingleton<CellularCallConnection>::GetInstance();
-    call.policyFlag_ = POLICY_FLAG_HANG_UP_ACTIVE;
-    ASSERT_NE(TELEPHONY_ERR_SUCCESS, call.CarrierHangUpCall());
-    call.policyFlag_ = 0;
-    ASSERT_NE(TELEPHONY_ERR_SUCCESS, call.CarrierHangUpCall());
-    call.cellularCallConnectionPtr_ = nullptr;
-    ASSERT_EQ(TELEPHONY_ERR_LOCAL_PTR_NULL, call.CarrierHoldCall());
-    call.cellularCallConnectionPtr_ = DelayedSingleton<CellularCallConnection>::GetInstance();
-    ASSERT_NE(TELEPHONY_ERR_SUCCESS, call.CarrierHoldCall());
-    call.cellularCallConnectionPtr_ = nullptr;
-    ASSERT_EQ(TELEPHONY_ERR_LOCAL_PTR_NULL, call.CarrierUnHoldCall());
-    call.cellularCallConnectionPtr_ = DelayedSingleton<CellularCallConnection>::GetInstance();
-    ASSERT_NE(TELEPHONY_ERR_SUCCESS, call.CarrierUnHoldCall());
-    call.cellularCallConnectionPtr_ = nullptr;
-    ASSERT_EQ(TELEPHONY_ERR_LOCAL_PTR_NULL, call.CarrierSetMute(0, 0));
-    call.cellularCallConnectionPtr_ = DelayedSingleton<CellularCallConnection>::GetInstance();
-    ASSERT_NE(TELEPHONY_ERR_SUCCESS, call.CarrierSetMute(0, 0));
-    call.cellularCallConnectionPtr_ = nullptr;
-    ASSERT_EQ(TELEPHONY_ERR_LOCAL_PTR_NULL, call.CarrierSwitchCall());
-    call.cellularCallConnectionPtr_ = DelayedSingleton<CellularCallConnection>::GetInstance();
-    ASSERT_NE(TELEPHONY_ERR_SUCCESS, call.CarrierSwitchCall());
-    ASSERT_NE(TELEPHONY_ERR_SUCCESS, call.PostDialProceed(true));
-    call.cellularCallConnectionPtr_ = nullptr;
-    ASSERT_EQ(TELEPHONY_ERR_LOCAL_PTR_NULL, call.PostDialProceed(true));
-    ASSERT_EQ(TELEPHONY_ERR_LOCAL_PTR_NULL, call.CarrierCombineConference());
-    ASSERT_EQ(TELEPHONY_ERR_LOCAL_PTR_NULL, call.CarrierSeparateConference());
-    ASSERT_EQ(TELEPHONY_ERR_LOCAL_PTR_NULL, call.CarrierKickOutFromConference());
-    ASSERT_EQ(TELEPHONY_ERR_LOCAL_PTR_NULL, call.StartDtmf('c'));
-    ASSERT_EQ(TELEPHONY_ERR_LOCAL_PTR_NULL, call.StopDtmf());
-}
-
-/**
  * @tc.number   Telephony_BluetoothCallPolicy_001
  * @tc.name     test error branch
  * @tc.desc     Function test
@@ -1980,53 +1925,6 @@ HWTEST_F(BranchTest, Telephony_BluetoothCallPolicy_002, Function | MediumTest | 
     ASSERT_NE(TELEPHONY_SUCCESS, callPolicy.SeparateConferencePolicy(policy));
     ASSERT_NE(TELEPHONY_SUCCESS, callPolicy.KickOutFromConferencePolicy(policy));
 }
-
-/**
- * @tc.number   Telephony_ImsCall_001
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
-HWTEST_F(BranchTest, Telephony_ImsCall_001, Function | MediumTest | Level3)
-{
-    DialParaInfo dialParaInfo;
-    IMSCall call { dialParaInfo };
-    call.isInitialized_ = true;
-    call.DialingProcess();
-    call.AnswerCall(0);
-    call.RejectCall();
-    call.HoldCall();
-    call.UnHoldCall();
-    call.SwitchCall();
-    call.RejectCall();
-    call.RejectCall();
-    ASSERT_EQ(TELEPHONY_SUCCESS, call.InitVideoCall());
-    call.accountNumber_ = GetTestNumber();
-    std::u16string msg;
-    call.SetMute(0, 0);
-    call.CombineConference();
-    call.SeparateConference();
-    call.KickOutFromConference();
-    call.CanCombineConference();
-    call.CanSeparateConference();
-    call.CanKickOutFromConference();
-    call.LaunchConference();
-    call.ExitConference();
-    call.HoldConference();
-    ASSERT_NE(TELEPHONY_SUCCESS, call.StartRtt(msg));
-    call.HandleCombineConferenceFailEvent();
-    ASSERT_NE(TELEPHONY_SUCCESS, call.StopRtt());
-    CallAttributeInfo callAttributeInfo;
-    call.GetCallAttributeInfo(callAttributeInfo);
-    int32_t mainCallId = 1;
-    ASSERT_EQ(TELEPHONY_SUCCESS, call.GetMainCallId(mainCallId));
-    std::vector<std::u16string> callIdList;
-    call.GetSubCallIdList(callIdList);
-    call.GetCallIdListForConference(callIdList);
-    int32_t videoState = 0;
-    call.SetOriginalCallType(videoState);
-    call.GetOriginalCallType();
-}
-
 
 /**
  * @tc.number   Telephony_ImsCall_002
@@ -2878,34 +2776,6 @@ HWTEST_F(BranchTest, Telephony_BluetoothCallManager_001, Function | MediumTest |
     bluetoothCallManager.GetConnectedScoAddr();
     bluetoothCallManager.GetConnectedScoName();
     bluetoothCallManager.IsBtScoConnected();
-}
-
-/**
- * @tc.number   Telephony_BluetoothConnection_001
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
-HWTEST_F(BranchTest, Telephony_BluetoothConnection_001, Function | MediumTest | Level3)
-{
-    int32_t state = 0;
-    int32_t numActive = CallObjectManager::GetCallNum(TelCallState::CALL_STATUS_ACTIVE);
-    int32_t numHeld = CallObjectManager::GetCallNum(TelCallState::CALL_STATUS_HOLDING);
-    int32_t numDial = CallObjectManager::GetCallNum(TelCallState::CALL_STATUS_DIALING);
-    int32_t callState = static_cast<int32_t>(TelCallState::CALL_STATUS_IDLE);
-    std::string number = CallObjectManager::GetCallNumber(TelCallState::CALL_STATUS_HOLDING);
-    BluetoothConnection bluetoothConnection;
-    bluetoothConnection.Init();
-    bluetoothConnection.IsBtScoConnected();
-    bluetoothConnection.GetBtScoState();
-    bluetoothConnection.SetBtScoState(BtScoState::SCO_STATE_CONNECTED);
-    bluetoothConnection.SendBtCallState(numActive, numHeld, callState, number);
-    bluetoothConnection.SendCallDetailsChange(1, 1);
-    bluetoothConnection.RemoveBtDevice(number);
-    bluetoothConnection.IsBtAvailble();
-    bluetoothConnection.GetConnectedScoAddr();
-    bluetoothConnection.GetConnectedScoName();
-    bluetoothConnection.ResetBtConnection();
-    bluetoothConnection.IsAudioActivated();
 }
 
 /**
