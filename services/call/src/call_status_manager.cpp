@@ -1237,7 +1237,7 @@ sptr<CallBase> CallStatusManager::CreateNewCall(const CallDetailInfo &info, Call
     }
     time_t createTime = time(nullptr);
     if (createTime < 0) {
-        return nullptr;
+        createTime = 0;
     }
     callPtr->SetCallCreateTime(createTime);
     return callPtr;
