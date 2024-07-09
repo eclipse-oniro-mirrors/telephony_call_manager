@@ -62,9 +62,9 @@ void CallStateReportProxy::UpdateCallState(sptr<CallBase> &callObjectPtr, TelCal
     }
     CallAttributeInfo info;
     currentVoipCallState_ = GetVoipCallState();
-    if ((foregroundCall != nullptr) && nextState == TelCallState::CALL_STATUS_ANSWERED ||
+    if ((foregroundCall != nullptr) && (nextState == TelCallState::CALL_STATUS_ANSWERED ||
         foregroundCall->GetTelCallState() == TelCallState::CALL_STATUS_INCOMING ||
-        foregroundCall->GetTelCallState() == TelCallState::CALL_STATUS_WAITING) {
+        foregroundCall->GetTelCallState() == TelCallState::CALL_STATUS_WAITING)) {
         foregroundCall->GetCallAttributeInfo(info);
         if (nextState == TelCallState::CALL_STATUS_ANSWERED) {
             info.callState = TelCallState::CALL_STATUS_ANSWERED;
