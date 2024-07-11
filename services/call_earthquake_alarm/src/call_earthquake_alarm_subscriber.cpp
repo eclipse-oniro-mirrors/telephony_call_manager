@@ -46,6 +46,7 @@ bool LocationSubscriber::Subscriber(void)
         EventFwk::MatchingSkills matchingSkills;
         matchingSkills.AddEvent(LocationSubscriber::SWITCH_STATE_CHANGE_EVENTS);
         EventFwk::CommonEventSubscribeInfo subscribeInfo(matchingSkills);
+        subscribeInfo.SetPermission("ohos.permission.ATTEST_KEY");
         LocationSubscriber::subscriber_ = std::make_shared<LocationSubscriber>(subscribeInfo);
         EventFwk::CommonEventManager::SubscribeCommonEvent(LocationSubscriber::subscriber_);
     }
