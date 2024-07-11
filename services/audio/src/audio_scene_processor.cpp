@@ -81,15 +81,21 @@ void AudioSceneProcessor::ProcessEventInner(AudioEvent event)
             DelayedSingleton<AudioControlManager>::GetInstance()->StopCallTone();
             currentState_->ProcessEvent(event);
             break;
+        case AudioEvent::NO_MORE_ACTIVE_CALL:
+        case AudioEvent::NO_MORE_DIALING_CALL:
+        case AudioEvent::NO_MORE_ALERTING_CALL:
+        case AudioEvent::NO_MORE_HOLDING_CALL:
+            if (DelayedSingleton<CallStateProcessor>::GetInstance()->ShouldStopSoundtone()) {
+                DelayedSingleton<AudioControlManager>::GetInstance()->
+                    PlayCallEndedTone(CallEndedType::CALL_ENDED_NORMALLY);
+            }
+            currentState_->ProcessEvent(event);
+            break;
         case AudioEvent::NEW_ACTIVE_CS_CALL:
         case AudioEvent::NEW_ACTIVE_IMS_CALL:
         case AudioEvent::NEW_DIALING_CALL:
         case AudioEvent::NEW_ALERTING_CALL:
         case AudioEvent::NEW_INCOMING_CALL:
-        case AudioEvent::NO_MORE_ACTIVE_CALL:
-        case AudioEvent::NO_MORE_DIALING_CALL:
-        case AudioEvent::NO_MORE_ALERTING_CALL:
-        case AudioEvent::NO_MORE_HOLDING_CALL:
             currentState_->ProcessEvent(event);
             break;
         default:

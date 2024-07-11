@@ -35,6 +35,7 @@ using namespace AudioStandard;
 constexpr int32_t DTMF_PLAY_TIME = 30;
 constexpr int32_t VOICE_TYPE = 0;
 constexpr int32_t CRS_TYPE = 2;
+constexpr int32_t CALL_ENDED_PLAY_TIME = 300;
 
 AudioControlManager::AudioControlManager()
     : isLocalRingbackNeeded_(false), ring_(nullptr), tone_(nullptr), sound_(nullptr)
@@ -692,29 +693,42 @@ void AudioControlManager::SendMuteRingEvent()
     DelayedSingleton<CallAbilityReportProxy>::GetInstance()->CallEventUpdated(eventInfo);
 }
 
-void AudioControlManager::PlayCallEndedTone(TelCallState priorState, TelCallState nextState, CallEndedType type)
+void AudioControlManager::PlayCallEndedTone(CallEndedType type)
 {
-    if (nextState != TelCallState::CALL_STATUS_DISCONNECTED) {
+    AudioStandard::AudioRingerMode ringMode = DelayedSingleton<AudioProxy>::GetInstance()->GetRingerMode();
+    if (ringMode != AudioStandard::AudioRingerMode::RINGER_MODE_NORMAL) {
+        TELEPHONY_LOGE("ringer mode is not normal");
         return;
     }
-    if (priorState == TelCallState::CALL_STATUS_ACTIVE || priorState == TelCallState::CALL_STATUS_DIALING ||
-        priorState == TelCallState::CALL_STATUS_HOLDING) {
-        switch (type) {
-            case CallEndedType::PHONE_IS_BUSY:
-                PlayCallTone(ToneDescriptor::TONE_ENGAGED);
-                break;
-            case CallEndedType::CALL_ENDED_NORMALLY:
-                PlayCallTone(ToneDescriptor::TONE_FINISHED);
-                break;
-            case CallEndedType::UNKNOWN:
-                PlayCallTone(ToneDescriptor::TONE_UNKNOWN);
-                break;
-            case CallEndedType::INVALID_NUMBER:
-                PlayCallTone(ToneDescriptor::TONE_INVALID_NUMBER);
-                break;
-            default:
-                break;
-        }
+    switch (type) {
+        case CallEndedType::PHONE_IS_BUSY:
+            PlayCallTone(ToneDescriptor::TONE_ENGAGED);
+            break;
+        case CallEndedType::CALL_ENDED_NORMALLY:
+            if (toneState_ == ToneState::TONEING) {
+                StopCallTone();
+            }
+            TELEPHONY_LOGI("play call ended tone");
+            if (PlayCallTone(ToneDescriptor::TONE_FINISHED) != TELEPHONY_SUCCESS) {
+                TELEPHONY_LOGE("play call ended tone failed");
+                return;
+            }
+            toneState_ = ToneState::CALLENDED;
+            std::this_thread::sleep_for(std::chrono::milliseconds(CALL_ENDED_PLAY_TIME));
+            toneState_ = ToneState::TONEING;
+            if (StopCallTone() != TELEPHONY_SUCCESS) {
+                TELEPHONY_LOGE("stop call ended tone failed");
+                return;
+            }
+            break;
+        case CallEndedType::UNKNOWN:
+            PlayCallTone(ToneDescriptor::TONE_UNKNOWN);
+            break;
+        case CallEndedType::INVALID_NUMBER:
+            PlayCallTone(ToneDescriptor::TONE_INVALID_NUMBER);
+            break;
+        default:
+            break;
     }
 }
 
@@ -853,6 +867,10 @@ int32_t AudioControlManager::StopCallTone()
     if (toneState_ == ToneState::STOPPED) {
         TELEPHONY_LOGI("tone is already stopped");
         return TELEPHONY_SUCCESS;
+    }
+    if (toneState_ == ToneState::CALLENDED) {
+        TELEPHONY_LOGE("call ended tone is running");
+        return CALL_ERR_AUDIO_TONE_STOP_FAILED;
     }
     if (tone_ == nullptr) {
         TELEPHONY_LOGE("tone_ is nullptr");

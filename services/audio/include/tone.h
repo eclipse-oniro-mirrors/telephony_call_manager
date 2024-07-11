@@ -56,6 +56,7 @@ struct ToneStream {
 enum class ToneState {
     TONEING = 0,
     STOPPED,
+    CALLENDED
 };
 
 static constexpr const char* TONE_PLAY_THREAD = "tonePlayThread";
