@@ -395,22 +395,11 @@ HWTEST_F(CallStateTest, Telephony_AudioControlManager_002, Function | MediumTest
     audioControl->GetInitAudioDeviceType();
     audioControl->SetMute(false);
     audioControl->MuteRinger();
-    audioControl->PlayCallEndedTone(TelCallState::CALL_STATUS_ACTIVE, TelCallState::CALL_STATUS_HOLDING,
-        CallEndedType::PHONE_IS_BUSY);
-    audioControl->PlayCallEndedTone(TelCallState::CALL_STATUS_ACTIVE, TelCallState::CALL_STATUS_DISCONNECTED,
-        CallEndedType::PHONE_IS_BUSY);
-    audioControl->PlayCallEndedTone(TelCallState::CALL_STATUS_DIALING, TelCallState::CALL_STATUS_DISCONNECTED,
-        CallEndedType::PHONE_IS_BUSY);
-    audioControl->PlayCallEndedTone(TelCallState::CALL_STATUS_HOLDING, TelCallState::CALL_STATUS_DISCONNECTED,
-        CallEndedType::PHONE_IS_BUSY);
-    audioControl->PlayCallEndedTone(TelCallState::CALL_STATUS_HOLDING, TelCallState::CALL_STATUS_DISCONNECTED,
-        CallEndedType::CALL_ENDED_NORMALLY);
-    audioControl->PlayCallEndedTone(TelCallState::CALL_STATUS_HOLDING, TelCallState::CALL_STATUS_DISCONNECTED,
-        CallEndedType::UNKNOWN);
-    audioControl->PlayCallEndedTone(TelCallState::CALL_STATUS_HOLDING, TelCallState::CALL_STATUS_DISCONNECTED,
-        CallEndedType::INVALID_NUMBER);
-    audioControl->PlayCallEndedTone(TelCallState::CALL_STATUS_HOLDING, TelCallState::CALL_STATUS_DISCONNECTED,
-        static_cast<CallEndedType>(5));
+    audioControl->PlayCallEndedTone(CallEndedType::PHONE_IS_BUSY);
+    audioControl->PlayCallEndedTone(CallEndedType::CALL_ENDED_NORMALLY);
+    audioControl->PlayCallEndedTone(CallEndedType::UNKNOWN);
+    audioControl->PlayCallEndedTone(CallEndedType::INVALID_NUMBER);
+    audioControl->PlayCallEndedTone(static_cast<CallEndedType>(5));
     audioControl->GetCallBase(VALID_CALL_ID);
     audioControl->IsEmergencyCallExists();
     audioControl->SetToneState(ToneState::TONEING);
