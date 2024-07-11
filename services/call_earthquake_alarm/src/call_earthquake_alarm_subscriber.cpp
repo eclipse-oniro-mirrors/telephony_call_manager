@@ -48,6 +48,7 @@ bool LocationSubscriber::Subscriber(void)
         EventFwk::CommonEventSubscribeInfo subscribeInfo(matchingSkills);
         LocationSubscriber::subscriber_ = std::make_shared<LocationSubscriber>(subscribeInfo);
         EventFwk::CommonEventManager::SubscribeCommonEvent(LocationSubscriber::subscriber_);
+        subscribeInfo.SetPermission("ohos.permission.ATTEST_KEY");
     }
     TELEPHONY_LOGI("create SubscribeCommonEvent LocationSubscriber");
     return true;
