@@ -218,6 +218,9 @@ AudioStandard::ToneType Tone::ConvertCallToneDescriptorToToneType(ToneDescriptor
         case ToneDescriptor::TONE_WAITING:
             tonType = ToneType::TONE_TYPE_COMMON_SUPERVISORY_CALL_WAITING;
             break;
+        case ToneDescriptor::TONE_FINISHED:
+            tonType = ToneType::TONE_TYPE_COMMON_PROPRIETARY_PROMPT;
+            break;
         default:
             break;
     }
@@ -243,6 +246,7 @@ AudioStandard::StreamUsage Tone::GetStreamUsageByToneType(ToneDescriptor descrip
             streamUsage = AudioStandard::StreamUsage::STREAM_USAGE_DTMF;
             break;
         case ToneDescriptor::TONE_RINGBACK:
+        case ToneDescriptor::TONE_FINISHED:
             streamUsage = AudioStandard::StreamUsage::STREAM_USAGE_VOICE_COMMUNICATION;
             break;
         case ToneDescriptor::TONE_WAITING:
@@ -274,6 +278,7 @@ bool Tone::IsUseTonePlayer(ToneDescriptor tone)
             break;
         case ToneDescriptor::TONE_RINGBACK:
         case ToneDescriptor::TONE_WAITING:
+        case ToneDescriptor::TONE_FINISHED:
             ret = true;
             break;
         default:

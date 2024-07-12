@@ -86,6 +86,7 @@ public:
     bool StopSoundtone();
     bool PlaySoundtone();
     bool IsSatelliteExists();
+    void PlayCallEndedTone(CallEndedType type);
 
 private:
     RingState ringState_ = RingState::STOPPED;
@@ -95,7 +96,6 @@ private:
     void HandleCallStateUpdated(sptr<CallBase> &callObjectPtr, TelCallState priorState, TelCallState nextState);
     void HandleNewActiveCall(sptr<CallBase> &callObjectPtr);
     bool IsNumberAllowed(const std::string &phoneNum);
-    void PlayCallEndedTone(TelCallState priorState, TelCallState nextState, CallEndedType type);
     sptr<CallBase> GetCallBase(int32_t callId);
     AudioInterruptState audioInterruptState_ = AudioInterruptState::INTERRUPT_STATE_DEACTIVATED;
     bool ShouldPlayRingtone() const;
