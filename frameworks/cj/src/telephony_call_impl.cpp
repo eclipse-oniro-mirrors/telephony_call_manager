@@ -91,11 +91,9 @@ namespace Telephony {
 
     bool TelephonyCallImpl::IsRinging(int32_t *errCode)
     {
-        bool *ptr = new bool(true);
-        int32_t err = DelayedSingleton<CallManagerClient>::GetInstance()->IsRinging(*ptr);
+        bool result = true;
+        int32_t err = DelayedSingleton<CallManagerClient>::GetInstance()->IsRinging(result);
         *errCode = ConvertCJErrCode(err);
-        bool result = *ptr;
-        delete ptr;
         return result;
     }
 
@@ -140,12 +138,10 @@ namespace Telephony {
         }
         std::string temPhoneNumber = cPhoneNumber;
         std::u16string phoneNumberU16 = Str8ToStr16(temPhoneNumber);
-        bool *ptr = new bool(true);
+        bool result = false;
         int32_t err = DelayedSingleton<CallManagerClient>::GetInstance()->IsEmergencyPhoneNumber(
-            phoneNumberU16, slotId, *ptr);
+            phoneNumberU16, slotId, result);
         *errCode = ConvertCJErrCode(err);
-        bool result = *ptr;
-        delete ptr;
         return result;
     }
 
