@@ -226,14 +226,6 @@ bool AudioDeviceManager::ProcessEvent(AudioEvent event)
         case AudioEvent::AUDIO_RINGING:
             if (!isAudioActivated_) {
                 isAudioActivated_ = true;
-                std::unique_ptr<AudioStandard::AudioDeviceDescriptor> activeBluetoothDevice =
-                    AudioStandard::AudioRoutingManager::GetInstance()->GetActiveBluetoothDevice();
-                if (activeBluetoothDevice != nullptr && !activeBluetoothDevice->macAddress_.empty()) {
-                    AudioSystemManager* audioSystemManager = AudioSystemManager::GetInstance();
-                    int32_t ret = audioSystemManager->SetCallDeviceActive(ActiveDeviceType::BLUETOOTH_SCO,
-                        true, activeBluetoothDevice->macAddress_);
-                    return ret == 0 ? true : false;
-                }
                 AudioDevice device = {
                     .deviceType = AudioDeviceType::DEVICE_EARPIECE,
                     .address = { 0 },
