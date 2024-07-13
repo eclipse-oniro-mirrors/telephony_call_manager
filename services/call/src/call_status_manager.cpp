@@ -1333,16 +1333,6 @@ bool CallStatusManager::ShouldRejectIncomingCall()
         TELEPHONY_LOGI("ShouldRejectIncomingCall: user_setup_complete = 0");
         return true;
     }
-
-    std::string is_ota_finished {"1"};
-    OHOS::Uri uri_ota(
-        "datashare:///com.ohos.settingsdata/entry/settingsdata/USER_SETTINGSDATA_SECURE_"
-        + std::to_string(userId) + "?Proxy=true&key=is_ota_finished");
-    int resp_ota = datashareHelper->Query(uri_ota, "is_ota_finished", is_ota_finished);
-    if (resp_ota == TELEPHONY_SUCCESS && is_ota_finished == "0") {
-        TELEPHONY_LOGI("ShouldRejectIncomingCall: is_ota_finished = 0");
-        return true;
-    }
     return false;
 }
 
