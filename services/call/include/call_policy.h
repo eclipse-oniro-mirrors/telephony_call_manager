@@ -63,7 +63,7 @@ public:
     static int32_t InviteToConferencePolicy(int32_t callId, std::vector<std::string> &numberList);
     int32_t CloseUnFinishedUssdPolicy(int32_t slotId);
     bool IsSupportVideoCall(AppExecFwk::PacMap &extras);
-    int32_t CanDialMulityCall(AppExecFwk::PacMap &extras);
+    int32_t CanDialMulityCall(AppExecFwk::PacMap &extras, bool isEcc);
     int32_t IsValidCallType(CallType callType);
     int32_t IsVoiceCallValid(VideoStateType videoState);
     int32_t HasNormalCall(bool isEcc, int32_t slotId, CallType callType);
