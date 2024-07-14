@@ -180,14 +180,14 @@ int32_t CallPolicy::IsValidCallType(CallType callType)
     return TELEPHONY_SUCCESS;
 }
 
-int32_t CallPolicy::CanDialMulityCall(AppExecFwk::PacMap &extras)
+int32_t CallPolicy::CanDialMulityCall(AppExecFwk::PacMap &extras, bool isEcc)
 {
     VideoStateType videoState = (VideoStateType)extras.GetIntValue("videoState");
     if (videoState == VideoStateType::TYPE_VIDEO && HasCellularCallExist()) {
         TELEPHONY_LOGE("can not dial video call when any call exist!");
         return CALL_ERR_DIAL_IS_BUSY;
     }
-    if (videoState == VideoStateType::TYPE_VOICE && HasVideoCall()) {
+    if (!isEcc && videoState == VideoStateType::TYPE_VOICE && HasVideoCall()) {
         TELEPHONY_LOGE("can not dial video call when any call exist!");
         return CALL_ERR_DIAL_IS_BUSY;
     }

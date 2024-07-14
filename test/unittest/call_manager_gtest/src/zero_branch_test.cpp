@@ -581,7 +581,7 @@ HWTEST_F(BranchTest, Telephony_CallPolicy_001, Function | MediumTest | Level1)
     ASSERT_NE(mCallPolicy.StopRttPolicy(0), TELEPHONY_ERR_SUCCESS);
     ASSERT_NE(mCallPolicy.IsValidSlotId(INVALID_SLOTID), TELEPHONY_ERR_SUCCESS);
     ASSERT_FALSE(mCallPolicy.IsSupportVideoCall(mPacMap));
-    ASSERT_GE(mCallPolicy.CanDialMulityCall(mPacMap), TELEPHONY_ERR_SUCCESS);
+    ASSERT_GE(mCallPolicy.CanDialMulityCall(mPacMap, false), TELEPHONY_ERR_SUCCESS);
 }
 
 /**
@@ -635,10 +635,10 @@ HWTEST_F(BranchTest, Telephony_CallPolicy_003, Function | MediumTest | Level1)
     CallPolicy callPolicy;
     AppExecFwk::PacMap videoExtras;
     videoExtras.PutIntValue("videoState", static_cast<int>(VideoStateType::TYPE_VIDEO));
-    callPolicy.CanDialMulityCall(videoExtras);
+    callPolicy.CanDialMulityCall(videoExtras, false);
     AppExecFwk::PacMap voiceExtras;
     voiceExtras.PutIntValue("videoState", static_cast<int>(VideoStateType::TYPE_VOICE));
-    callPolicy.CanDialMulityCall(voiceExtras);
+    callPolicy.CanDialMulityCall(voiceExtras, false);
     DialParaInfo info;
     sptr<CallBase> call = new CSCall(info);
     call->SetCallType(CallType::TYPE_CS);
@@ -658,11 +658,11 @@ HWTEST_F(BranchTest, Telephony_CallPolicy_003, Function | MediumTest | Level1)
     callPolicy.IsValidCallType(CallType::TYPE_OTT);
     callPolicy.IsValidCallType(CallType::TYPE_SATELLITE);
     callPolicy.IsValidCallType(CallType::TYPE_VOIP);
-    callPolicy.CanDialMulityCall(videoExtras);
-    callPolicy.CanDialMulityCall(voiceExtras);
+    callPolicy.CanDialMulityCall(videoExtras, false);
+    callPolicy.CanDialMulityCall(voiceExtras, false);
     call->SetVideoStateType(VideoStateType::TYPE_VIDEO);
-    callPolicy.CanDialMulityCall(videoExtras);
-    callPolicy.CanDialMulityCall(voiceExtras);
+    callPolicy.CanDialMulityCall(videoExtras, false);
+    callPolicy.CanDialMulityCall(voiceExtras, false);
     call->SetCallId(VALID_CALLID);
     call->SetTelCallState(TelCallState::CALL_STATUS_DIALING);
     callPolicy.RejectCallPolicy(VALID_CALLID);

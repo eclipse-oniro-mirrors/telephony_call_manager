@@ -165,7 +165,7 @@ int32_t CallControlManager::CanDial(std::u16string &number, AppExecFwk::PacMap &
         TELEPHONY_LOGE("dial policy result:%{public}d", ret);
         return ret;
     }
-    ret = CanDialMulityCall(extras);
+    ret = CanDialMulityCall(extras, isEcc);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("dial policy result:%{public}d", ret);
         return ret;
