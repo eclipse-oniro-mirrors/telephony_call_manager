@@ -95,8 +95,8 @@ void AudioDeviceManager::UpdateEarpieceDevice()
             .deviceType = AudioDeviceType::DEVICE_EARPIECE,
             .address = { 0 },
         };
+        info_.audioDeviceList.push_back(earpiece);
     }
-    info_.audioDeviceList.push_back(earpiece);
 }
 
 void AudioDeviceManager::AddAudioDeviceList(const std::string &address, AudioDeviceType deviceType,

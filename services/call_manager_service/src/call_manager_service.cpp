@@ -80,7 +80,7 @@ bool CallManagerService::Init()
     DelayedSingleton<CallRecordsManager>::GetInstance()->Init();
     DelayedSingleton<BluetoothConnection>::GetInstance()->Init();
     DelayedSingleton<DistributedCallManager>::GetInstance()->Init();
-    AddSystemAbility(AUDIO_POLICY_SERVICE_ID);
+    AddSystemAbilityListener(AUDIO_POLICY_SERVICE_ID);
     return true;
 }
 
