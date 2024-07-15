@@ -17,7 +17,7 @@
 
 #include "audio_control_manager.h"
 #include "audio_scene_processor.h"
-
+#include "call_object_manager.h"
 #include "telephony_log_wrapper.h"
 
 namespace OHOS {
