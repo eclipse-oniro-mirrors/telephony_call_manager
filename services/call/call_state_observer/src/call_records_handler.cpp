@@ -107,11 +107,6 @@ void CallRecordsHandler::MakeCallLogInsertBucket(DataShare::DataShareValuesBucke
     bucket.Put(CALL_PHOTO_ID, 0);
     bucket.Put(CALL_SLOT_ID, info.slotId);
     bucket.Put(CALL_FEATURES, info.features);
-    bucket.Put(CALL_MARK_TYPE, static_cast<int32_t>(info.numberMarkInfo.markType));
-    bucket.Put(CALL_MARK_CONTENT, std::string(info.numberMarkInfo.markContent));
-    bucket.Put(CALL_IS_CLOUD_MARK, info.numberMarkInfo.isCloud);
-    bucket.Put(CALL_MARK_COUNT, info.numberMarkInfo.markCount);
-    bucket.Put(CALL_BLOCK_REASON, info.blockReason);
 }
 
 std::string CallRecordsHandler::CheckNumberLocationInfo(const CallRecordInfo &info)
