@@ -20,14 +20,18 @@
 #include "common_event_manager.h"
 #include "common_event_support.h"
 #include "os_account_manager_wrapper.h"
+#include "parameter.h"
 #include "securec.h"
 
 namespace OHOS {
 namespace Telephony {
+constexpr const char *PROP_NETWORK_COUNTRY_ISO = "telephony.operator.iso-country";
+constexpr const char *DEFAULT_NETWORK_COUNTRY = "CN";
 constexpr int16_t DEFAULT_COUNTRY_CODE = 0;
 constexpr int16_t DEFAULT_TIME = 0;
 const int32_t ACTIVE_USER_ID = 100;
 const uint32_t FEATURES_VIDEO = 1 << 0;
+const int32_t PROP_SYSPARA_SIZE = 128;
 CallRecordsManager::CallRecordsManager() : callRecordsHandlerServerPtr_(nullptr) {}
 
 CallRecordsManager::~CallRecordsManager()
@@ -122,8 +126,17 @@ void CallRecordsManager::AddOneCallRecord(CallAttributeInfo &info)
     }
     CopyCallInfoToRecord(info, data);
     std::string tmpStr("");
-    (void)DelayedSingleton<CallNumberUtils>::GetInstance()->FormatPhoneNumber(
-        std::string(data.phoneNumber), "CN", tmpStr);
+    char valueStr[PROP_SYSPARA_SIZE] = {0};
+    GetParameter(PROP_NETWORK_COUNTRY_ISO, "", valueStr, PROP_SYSPARA_SIZE);
+    std::string countryIso = valueStr;
+    if (countryIso == "") {
+        TELEPHONY_LOGI("GetParameter is null, default network countryIso cn");
+        countryIso = DEFAULT_NETWORK_COUNTRY;
+    } else {
+        TELEPHONY_LOGI("GetParameter network countryIso is %{public}s", countryIso.c_str());
+    }
+    (void)DelayedSingleton<CallNumberUtils>::GetInstance()->FormatPhoneNumberToE164(
+        std::string(data.phoneNumber), countryIso, tmpStr);
 
     if (tmpStr.length() > static_cast<size_t>(kMaxNumberLen)) {
         TELEPHONY_LOGE("Number out of limit!");
