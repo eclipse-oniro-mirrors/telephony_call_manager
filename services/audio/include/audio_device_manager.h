@@ -55,6 +55,12 @@ public:
     void SetMuteState(bool isMuted);
     bool GetMuteState();
 
+    /**
+     * UpdateEarpieceDevice
+     * 
+     * @brief update earpiece device
+     */
+    void UpdateEarpieceDevice();
 private:
     std::mutex mutex_;
     std::mutex infoMutex_;
@@ -88,6 +94,7 @@ private:
     bool IsWiredHeadsetDevEnable();
     AudioDeviceType GetCurrentAudioDevice();
     bool IsDistributedAudioDeviceType(AudioDeviceType deviceType);
+    bool IsSupportEarpiece();
 };
 } // namespace Telephony
 } // namespace OHOS

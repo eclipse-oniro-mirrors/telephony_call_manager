@@ -75,6 +75,30 @@ void AudioDeviceManager::Init()
     info_.audioDeviceList.push_back(earpiece);
 }
 
+bool AudioDeviceManager::IsSupportEarpiece()
+{
+    std::vector<std::unique_ptr<AudioDeviceDescriptor>> audioDeviceList = 
+        AudioStandard::AudioRoutingManager::GetInstance()->GetAvailableDevices(AudioDeviceUsage::CALL_OUTPUT_DEVICES);
+    for (auto & audioDevice : audioDeviceList) {
+        TELEPHONY_LOGI("available deviceType : %{public}d", audioDevice->deviceType_);
+        if (audioDevice->deviceType_ == AudioStandard::DeviceType::DEVICE_TYPE_EARPIECE) {
+            return true;
+        }
+    }
+    return false;
+}
+
+void AudioDeviceManager::UpdateEarpieceDevice()
+{
+    if (IsSupportEarpiece()) {
+        AudioDevice earpiece = {
+            .deviceType = AudioDeviceType::DEVICE_EARPIECE,
+            .address = { 0 },
+        };
+    }
+    info_.audioDeviceList.push_back(earpiece);
+}
+
 void AudioDeviceManager::AddAudioDeviceList(const std::string &address, AudioDeviceType deviceType,
     const std::string &deviceName)
 {

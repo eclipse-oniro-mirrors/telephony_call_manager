@@ -80,7 +80,22 @@ bool CallManagerService::Init()
     DelayedSingleton<CallRecordsManager>::GetInstance()->Init();
     DelayedSingleton<BluetoothConnection>::GetInstance()->Init();
     DelayedSingleton<DistributedCallManager>::GetInstance()->Init();
+    AddSystemAbility(AUDIO_POLICY_SERVICE_ID);
     return true;
+}
+
+void CallManagerService::OnAddSystemAbility(int32_t systemAbilityId, const std::string &deviceId)
+{
+    TELEPHONY_LOGI("OnAddSystemAbility : %{public}d", systemAbilityId);
+    switch (systemAbilityId) {
+        case AUDIO_POLICY_SERVICE_ID: {
+            DelayedSingleton<AudioDeviceManager>::GetInstance()->UpdateEarpieceDevice();
+            break;
+        }
+        default: {
+            TELEPHONY_LOGE("OnAddSystemAbility unhandle id : %{public}d", systemAbilityId);
+        }
+    }
 }
 
 void CallManagerService::UnInit()
