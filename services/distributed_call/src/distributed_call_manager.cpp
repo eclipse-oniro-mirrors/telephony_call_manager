@@ -40,7 +40,7 @@ const std::string DISTRIBUTED_AUDIO_DEV_PHONE = "dPhone";
 const std::string DISTRIBUTED_AUDIO_DEV_PAD = "dPad";
 const std::string SWITCH_ON_DCALL_THREAD_NAME = "switch on dcall";
 
-const int32_t DISTRIBUTED_COMMUNICATION_CALL_SA_ID = 4011;
+const int32_t DISTRIBUTED_COMMUNICATION_CALL_SA_ID = 66198;
 
 std::string GetAnonyString(const std::string &value)
 {
