@@ -190,7 +190,8 @@ bool CallStateProcessor::UpdateCurrentCallState()
 bool CallStateProcessor::ShouldStopSoundtone()
 {
     std::lock_guard<std::mutex> lock(mutex_);
-    if (activeCalls_.size() > EMPTY_VALUE || incomingCalls_.size() > EMPTY_VALUE) {
+    if (activeCalls_.size() > EMPTY_VALUE
+        || (incomingCalls_.size() > EMPTY_VALUE && CallObjectManager::HasIncomingCallCrsType())) {
         // no need to stop soundtone
         return false;
     }
