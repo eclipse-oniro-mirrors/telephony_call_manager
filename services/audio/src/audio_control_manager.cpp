@@ -258,7 +258,7 @@ void AudioControlManager::IncomingCallHungUp(sptr<CallBase> &callObjectPtr, bool
         TELEPHONY_LOGE("call object ptr nullptr");
         return;
     }
-    StopCallTone();
+    StopWaitingTone();
 }
 
 void AudioControlManager::HandleCallStateUpdated(
@@ -917,7 +917,10 @@ int32_t AudioControlManager::PlayWaitingTone()
 
 int32_t AudioControlManager::StopWaitingTone()
 {
-    return StopCallTone();
+    if (tone_ != nullptr && tone_->getCurrentToneType() == ToneDescriptor::TONE_WAITING) {
+        return StopCallTone();
+    }
+    return TELEPHONY_SUCCESS;
 }
 
 int32_t AudioControlManager::PlayDtmfTone(char str)

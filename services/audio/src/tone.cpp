@@ -303,5 +303,10 @@ void Tone::ReleaseRenderer()
     }
     audioPlayer_->ReleaseRenderer();
 }
+
+ToneDescriptor Tone::getCurrentToneType()
+{
+    return currentToneDescriptor_;
+}
 } // namespace Telephony
 } // namespace OHOS
