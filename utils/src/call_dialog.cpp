@@ -96,6 +96,7 @@ std::string CallDialog::BuildStartCommand(const std::string &dialogReason, int32
     nlohmann::json root;
     std::string uiExtensionType = "sysDialog/common";
     root["ability.want.params.uiExtensionType"] = uiExtensionType;
+    root["sysDialogZOrder"] = SOURCE_SCREENLOCKED;
     root["dialogReason"] = dialogReason;
     root["slotId"] = slotId;
     std::string startCommand = root.dump();
