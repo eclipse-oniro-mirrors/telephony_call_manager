@@ -68,11 +68,6 @@ void AudioDeviceManager::Init()
         .address = { 0 },
     };
     info_.audioDeviceList.push_back(speaker);
-    AudioDevice earpiece = {
-        .deviceType = AudioDeviceType::DEVICE_EARPIECE,
-        .address = { 0 },
-    };
-    info_.audioDeviceList.push_back(earpiece);
 }
 
 bool AudioDeviceManager::IsSupportEarpiece()
