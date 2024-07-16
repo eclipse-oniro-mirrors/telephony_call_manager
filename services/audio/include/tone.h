@@ -75,6 +75,7 @@ public:
     int32_t Stop();
     static ToneDescriptor ConvertDigitToTone(char digit);
     void ReleaseRenderer();
+    ToneDescriptor getCurrentToneType();
 
 private:
     ToneDescriptor currentToneDescriptor_ = ToneDescriptor::TONE_UNKNOWN;
