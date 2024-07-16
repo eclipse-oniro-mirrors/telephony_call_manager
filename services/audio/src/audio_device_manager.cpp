@@ -86,11 +86,18 @@ bool AudioDeviceManager::IsSupportEarpiece()
 void AudioDeviceManager::UpdateEarpieceDevice()
 {
     if (IsSupportEarpiece()) {
-        AudioDevice earpiece = {
-            .deviceType = AudioDeviceType::DEVICE_EARPIECE,
-            .address = { 0 },
-        };
-        info_.audioDeviceList.push_back(earpiece);
+        return;
+    }
+    std::lock_guard<std::mutex> lock(infoMutex_);
+    std::vector<AudioDevice>::iterator it = info_.audioDeviceList.begin();
+    while (it != info_.audioDeviceList.end()) {
+        if (it->deviceType == AudioDeviceType::DEVICE_EARPIECE) {
+            it = info_.audioDeviceList.erase(it);
+            TELEPHONY_LOGI("not support Earpice, remove Earpice device success");
+            return;
+        } else {
+            ++it;
+        }
     }
 }
 
