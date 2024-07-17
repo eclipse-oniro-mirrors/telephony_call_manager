@@ -314,6 +314,10 @@ struct CallRecordInfo {
      */
     char phoneNumber[kMaxNumberLen + 1] = { 0 };
     /**
+     * Indicates the number after formatted.
+     */
+    char formattedNumber[kMaxNumberLen + 1] = { 0 };
+    /**
      * Indicates the phone number after formatted.
      */
     char formattedPhoneNumber[kMaxNumberLen + 1] = { 0 };
@@ -396,6 +400,8 @@ struct CallRecordInfo {
         std::copy(std::begin(temp.phoneNumber), std::end(temp.phoneNumber), std::begin(phoneNumber));
         std::copy(std::begin(temp.formattedPhoneNumber), std::end(temp.formattedPhoneNumber),
             std::begin(formattedPhoneNumber));
+        std::copy(std::begin(temp.formattedNumber), std::end(temp.formattedNumber),
+            std::begin(formattedNumber));
         std::copy(std::begin(temp.numberLocation), std::end(temp.numberLocation),
             std::begin(numberLocation));
         callType = temp.callType;

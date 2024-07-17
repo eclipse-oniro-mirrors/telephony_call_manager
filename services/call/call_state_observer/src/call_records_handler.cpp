@@ -95,7 +95,7 @@ void CallRecordsHandler::MakeCallLogInsertBucket(DataShare::DataShareValuesBucke
     bucket.Put(CALL_IS_READ, 0);
     bucket.Put(CALL_RING_DURATION, static_cast<int32_t>(info.ringDuration));
     bucket.Put(CALL_TALK_DURATION, static_cast<int32_t>(info.callDuration));
-    bucket.Put(CALL_FORMAT_NUMBER, std::string(info.formattedPhoneNumber));
+    bucket.Put(CALL_FORMAT_NUMBER, std::string(info.formattedNumber));
     bucket.Put(CALL_QUICKSEARCH_KEY, std::string(""));
     bucket.Put(CALL_NUMBER_TYPE, 0);
     bucket.Put(CALL_NUMBER_TYPE_NAME, std::string(""));

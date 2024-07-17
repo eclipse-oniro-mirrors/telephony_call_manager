@@ -135,7 +135,7 @@ void CallRecordsManager::AddOneCallRecord(CallAttributeInfo &info)
     } else {
         TELEPHONY_LOGI("GetParameter network countryIso is %{public}s", countryIso.c_str());
     }
-    (void)DelayedSingleton<CallNumberUtils>::GetInstance()->FormatPhoneNumberToE164(
+    (void)DelayedSingleton<CallNumberUtils>::GetInstance()->FormatPhoneNumber(
         std::string(data.phoneNumber), countryIso, tmpStr);
 
     if (tmpStr.length() > static_cast<size_t>(kMaxNumberLen)) {
@@ -143,6 +143,17 @@ void CallRecordsManager::AddOneCallRecord(CallAttributeInfo &info)
         return;
     }
     if (memcpy_s(data.formattedPhoneNumber, kMaxNumberLen, tmpStr.c_str(), tmpStr.length()) != 0) {
+        TELEPHONY_LOGE("memcpy_s failed!");
+        return;
+    }
+    std::string tmpFormatStr("");
+    (void)DelayedSingleton<CallNumberUtils>::GetInstance()->FormatPhoneNumberToE164(
+        std::string(data.phoneNumber), countryIso, tmpFormatStr);
+    if (tmpFormatStr.length() > static_cast<size_t>(kMaxNumberLen)) {
+        TELEPHONY_LOGE("Number out of limit!");
+        return;
+    }
+    if (memcpy_s(data.formattedPhoneNumber, kMaxNumberLen, tmpFormatStr.c_str(), tmpFormatStr.length()) != 0) {
         TELEPHONY_LOGE("memcpy_s failed!");
         return;
     }
