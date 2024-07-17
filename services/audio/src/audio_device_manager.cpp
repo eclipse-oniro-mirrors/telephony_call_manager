@@ -33,6 +33,8 @@ namespace OHOS {
 namespace Telephony {
 using namespace AudioStandard;
 constexpr int32_t DEVICE_ADDR_LEN = 17;
+constexpr int32_t ADDR_HEAD_VALID_LEN = 2;
+constexpr int32_t ADDR_TAIL_VALID_LEN = 5;
 bool AudioDeviceManager::isBtScoDevEnable_ = false;
 bool AudioDeviceManager::isDCallDevEnable_ = false;
 bool AudioDeviceManager::isSpeakerAvailable_ = true; // default available
@@ -463,7 +465,7 @@ std::string AudioDeviceManager::ConvertMac()
 {
     std::string addr = info_.currentAudioDevice.address;
     if (addr.length() == DEVICE_ADDR_LEN) {
-        return (addr.substr(0, 2) + ":*:*:*:" + addr.substr(addr.length() - 5));
+        return (addr.substr(0, ADDR_HEAD_VALID_LEN) + ":*:*:*:" + addr.substr(addr.length() - ADDR_TAIL_VALID_LEN));
     }
     return addr;
 }
