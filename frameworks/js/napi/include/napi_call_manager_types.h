@@ -63,7 +63,7 @@ struct AsyncContext {
 };
 
 struct DialAsyncContext : AsyncContext {
-    int32_t accountId = 0;
+    int32_t accountId = -1;
     int32_t videoState = 0;
     int32_t dialScene = 0;
     int32_t dialType = 0;
