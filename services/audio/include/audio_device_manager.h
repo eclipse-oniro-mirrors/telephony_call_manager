@@ -54,6 +54,7 @@ public:
     void OnActivedCallDisconnected();
     void SetMuteState(bool isMuted);
     bool GetMuteState();
+    std::string ConvertMac();
 
 private:
     std::mutex mutex_;
