@@ -77,7 +77,7 @@ void AudioDeviceManager::Init()
 
 bool AudioDeviceManager::IsSupportEarpiece()
 {
-    std::vector<std::unique_ptr<AudioDeviceDescriptor>> audioDeviceList = 
+    std::vector<std::unique_ptr<AudioDeviceDescriptor>> audioDeviceList =
         AudioStandard::AudioRoutingManager::GetInstance()->GetAvailableDevices(AudioDeviceUsage::CALL_OUTPUT_DEVICES);
     for (auto& audioDevice : audioDeviceList) {
         TELEPHONY_LOGI("available deviceType : %{public}d", audioDevice->deviceType_);

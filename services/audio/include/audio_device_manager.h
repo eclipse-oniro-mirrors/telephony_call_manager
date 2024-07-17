@@ -57,7 +57,7 @@ public:
 
     /**
      * UpdateEarpieceDevice
-     * 
+     *
      * @brief update earpiece device
      */
     void UpdateEarpieceDevice();
