@@ -32,6 +32,9 @@
 namespace OHOS {
 namespace Telephony {
 using namespace AudioStandard;
+constexpr int32_t DEVICE_ADDR_LEN = 7;
+constexpr int32_t ADDR_HEAD_VALID_LEN = 5;
+constexpr int32_t ADDR_TAIL_VALID_LEN = 2;
 bool AudioDeviceManager::isBtScoDevEnable_ = false;
 bool AudioDeviceManager::isDCallDevEnable_ = false;
 bool AudioDeviceManager::isSpeakerAvailable_ = true; // default available
@@ -489,6 +492,18 @@ int32_t AudioDeviceManager::ReportAudioDeviceInfo()
     return ReportAudioDeviceInfo(liveCall);
 }
 
+std::string AudioDeviceManager::ConvertAddress()
+{
+    std::string addr = info_.currentAudioDevice.address;
+    if (info_.currentAudioDevice.deviceType == AudioDeviceType::DEVICE_BLUETOOTH_SCO) {
+        if (!addr.empty() && addr.length() > DEVICE_ADDR_LEN) {
+            return (addr.substr(0, ADDR_HEAD_VALID_LEN) + ":*:*:*:" +
+                addr.substr(addr.length() - ADDR_TAIL_VALID_LEN));
+        }
+    }
+    return addr;
+}
+
 int32_t AudioDeviceManager::ReportAudioDeviceInfo(sptr<CallBase> call)
 {
     if (call != nullptr && call->GetCallType() == CallType::TYPE_VOIP) {
@@ -497,7 +512,7 @@ int32_t AudioDeviceManager::ReportAudioDeviceInfo(sptr<CallBase> call)
         info_.isMuted = DelayedSingleton<AudioProxy>::GetInstance()->IsMicrophoneMute();
     }
     TELEPHONY_LOGI("report audio device info, currentAudioDeviceType:%{public}d, currentAddress:%{public}s, "
-        "mute:%{public}d", info_.currentAudioDevice.deviceType, info_.currentAudioDevice.address, info_.isMuted);
+        "mute:%{public}d", info_.currentAudioDevice.deviceType, ConvertAddress().c_str(), info_.isMuted);
     return DelayedSingleton<CallAbilityReportProxy>::GetInstance()->ReportAudioDeviceChange(info_);
 }
 
