@@ -466,7 +466,8 @@ std::string AudioDeviceManager::ConvertAddress()
     std::string addr = info_.currentAudioDevice.address;
     if (info_.currentAudioDevice.deviceType == AudioDeviceType::DEVICE_BLUETOOTH_SCO) {
         if (!addr.empty() && addr.length() > DEVICE_ADDR_LEN) {
-            return (addr.substr(0, ADDR_HEAD_VALID_LEN) + ":*:*:*:" + addr.substr(addr.length() - ADDR_TAIL_VALID_LEN));
+            return (addr.substr(0, ADDR_HEAD_VALID_LEN) + ":*:*:*:" +
+                addr.substr(addr.length() - ADDR_TAIL_VALID_LEN));
         }
     }
     return addr;
