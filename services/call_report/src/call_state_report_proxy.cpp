@@ -87,7 +87,7 @@ void CallStateReportProxy::UpdateCallState(sptr<CallBase> &callObjectPtr, TelCal
     ReportCallState(static_cast<int32_t>(info.callState), accountNumber);
 }
 
-void CallStateReportProxy::UpdateCallStateForVoIP()
+void CallStateReportProxy::UpdateCallStateForVoIPOrRestart()
 {
     sptr<CallBase> callObjectPtr = nullptr;
     UpdateCallState(callObjectPtr, TelCallState::CALL_STATUS_IDLE);

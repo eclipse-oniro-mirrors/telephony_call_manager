@@ -105,6 +105,7 @@ bool CallControlManager::Init()
     DelayedSingleton<AudioControlManager>::GetInstance()->Init();
     CallStateObserve();
     DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance()->RegisterSuperPrivacyMode();
+    DelayedSingleton<CallStateReportProxy>::GetInstance()->UpdateCallStateForVoIPOrRestart();
     return true;
 }
 
@@ -1271,7 +1272,7 @@ int32_t CallControlManager::SetVoIPCallState(int32_t state)
     TELEPHONY_LOGI("VoIP state is %{public}d", state);
     VoIPCallState_ = (CallStateToApp)state;
     std::string identity = IPCSkeleton::ResetCallingIdentity();
-    DelayedSingleton<CallStateReportProxy>::GetInstance()->UpdateCallStateForVoIP();
+    DelayedSingleton<CallStateReportProxy>::GetInstance()->UpdateCallStateForVoIPOrRestart();
     IPCSkeleton::SetCallingIdentity(identity);
     if (VoIPCallState_ == CallStateToApp::CALL_STATE_ANSWERED) {
         TELEPHONY_LOGI("VoIP answered the call, should hangup all calls");
