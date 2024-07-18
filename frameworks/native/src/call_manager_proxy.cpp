@@ -137,7 +137,7 @@ void CallManagerProxy::UnInit()
  */
 int32_t CallManagerProxy::RegisterCallBack(std::unique_ptr<CallManagerCallback> callback)
 {
-    std::lock_guard<std::mutex> lock(mutex_);
+    Utils::UniqueWriteGuard<Utils::RWLock> guard(rwClientLock_);
     if (registerStatus_) {
         TELEPHONY_LOGE("you have already register callback yet!");
         return TELEPHONY_ERR_REGISTER_CALLBACK_FAIL;
@@ -176,7 +176,7 @@ int32_t CallManagerProxy::RegisterCallBack(std::unique_ptr<CallManagerCallback> 
 
 int32_t CallManagerProxy::UnRegisterCallBack()
 {
-    std::lock_guard<std::mutex> lock(mutex_);
+    Utils::UniqueWriteGuard<Utils::RWLock> guard(rwClientLock_);
     if (!registerStatus_) {
         TELEPHONY_LOGE("you haven't register callback yet, please RegisterCallBack first!");
         return TELEPHONY_ERR_REGISTER_CALLBACK_FAIL;
@@ -273,7 +273,7 @@ int32_t CallManagerProxy::ReConnectService()
 
 int32_t CallManagerProxy::ReRegisterCallBack()
 {
-    std::lock_guard<std::mutex> lock(mutex_);
+    Utils::UniqueWriteGuard<Utils::RWLock> guard(rwClientLock_);
     if (callManagerServicePtr_ == nullptr) {
         TELEPHONY_LOGE("callManagerServicePtr_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -298,6 +298,7 @@ int32_t CallManagerProxy::ReRegisterCallBack()
 
 int32_t CallManagerProxy::ObserverOnCallDetailsChange()
 {
+    Utils::UniqueWriteGuard<Utils::RWLock> guard(rwClientLock_);
     if (callManagerServicePtr_ == nullptr) {
         TELEPHONY_LOGE("callManagerServicePtr_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -312,6 +313,7 @@ int32_t CallManagerProxy::ObserverOnCallDetailsChange()
 
 int32_t CallManagerProxy::RegisterVoipCallManagerCallback()
 {
+    Utils::UniqueWriteGuard<Utils::RWLock> guard(rwClientLock_);
     if (callManagerServicePtr_ == nullptr) {
         TELEPHONY_LOGE("callManagerServicePtr_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -326,6 +328,7 @@ int32_t CallManagerProxy::RegisterVoipCallManagerCallback()
 
 int32_t CallManagerProxy::UnRegisterVoipCallManagerCallback()
 {
+    Utils::UniqueWriteGuard<Utils::RWLock> guard(rwClientLock_);
     if (callManagerServicePtr_ == nullptr) {
         TELEPHONY_LOGE("callManagerServicePtr_ is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
