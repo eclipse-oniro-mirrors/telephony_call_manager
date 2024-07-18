@@ -22,6 +22,7 @@
 #include "os_account_manager_wrapper.h"
 #include "parameter.h"
 #include "securec.h"
+#include <regex>
 
 namespace OHOS {
 namespace Telephony {
@@ -32,6 +33,7 @@ constexpr int16_t DEFAULT_TIME = 0;
 const int32_t ACTIVE_USER_ID = 100;
 const uint32_t FEATURES_VIDEO = 1 << 0;
 const int32_t PROP_SYSPARA_SIZE = 128;
+const char *FORMAT_PATTERN = ",|;";
 CallRecordsManager::CallRecordsManager() : callRecordsHandlerServerPtr_(nullptr) {}
 
 CallRecordsManager::~CallRecordsManager()
@@ -135,8 +137,13 @@ void CallRecordsManager::AddOneCallRecord(CallAttributeInfo &info)
         TELEPHONY_LOGI("GetParameter network countryIso is %{public}s", countryIso.c_str());
     }
     std::string tmpStr("");
-    (void)DelayedSingleton<CallNumberUtils>::GetInstance()->FormatPhoneNumber(
-        std::string(data.phoneNumber), countryIso, tmpStr);
+    if (std::regex_search(std::string(data.phoneNumber), std::regex(FORMAT_PATTERN))) {
+        (void)DelayedSingleton<CallNumberUtils>::GetInstance()->FormatPhoneNumberAsYouType(
+            std::string(data.phoneNumber), countryIso, tmpStr);
+    } else {
+        (void)DelayedSingleton<CallNumberUtils>::GetInstance()->FormatPhoneNumber(
+            std::string(data.phoneNumber), countryIso, tmpStr);
+    }
 
     if (tmpStr.length() > static_cast<size_t>(kMaxNumberLen)) {
         TELEPHONY_LOGE("Number out of limit!");

@@ -52,17 +52,9 @@ int32_t CallNumberUtils::FormatPhoneNumber(
     }
     std::string tmpCode = countryCode;
     transform(tmpCode.begin(), tmpCode.end(), tmpCode.begin(), ::toupper);
-    std::unique_ptr<i18n::phonenumbers::AsYouTypeFormatter> formatter(phoneUtils->GetAsYouTypeFormatter(tmpCode));
-    if (formatter == nullptr) {
-        TELEPHONY_LOGE("formatter is nullptr");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-    formatter->Clear();
-    std::string result;
-    for (size_t i = 0; i < phoneNumber.length(); i++) {
-        char c = phoneNumber.at(i);
-        formatNumber = formatter->InputDigit(c, &result);
-    }
+    i18n::phonenumbers::PhoneNumber parseResult;
+    phoneUtils->ParseAndKeepRawInput(phoneNumber, tmpCode, &parseResult);
+    phoneUtils->FormatInOriginalFormat(parseResult, tmpCode, &formatNumber);
     if (formatNumber.empty() || formatNumber == "0") {
         formatNumber = "";
     }
@@ -110,6 +102,41 @@ int32_t CallNumberUtils::FormatNumberBase(const std::string phoneNumber, std::st
     phoneUtils->Parse(phoneNumber, countryCode, &parseResult);
     if (phoneUtils->IsValidNumber(parseResult) || HasBCPhoneNumber(phoneNumber)) {
         phoneUtils->Format(parseResult, formatInfo, &formatNumber);
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallNumberUtils::FormatPhoneNumberAsYouType(
+    const std::string &phoneNumber, const std::string &countryCode, std::string &formatNumber)
+{
+    if (phoneNumber.empty()) {
+        TELEPHONY_LOGE("phoneNumber is nullptr!");
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
+    }
+    if (phoneNumber.front() == '#' || phoneNumber.front() == '*') {
+        formatNumber = phoneNumber;
+        return TELEPHONY_SUCCESS;
+    }
+    i18n::phonenumbers::PhoneNumberUtil *phoneUtils = i18n::phonenumbers::PhoneNumberUtil::GetInstance();
+    if (phoneUtils == nullptr) {
+        TELEPHONY_LOGE("phoneUtils is nullptr");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    std::string tmpCode = countryCode;
+    transform(tmpCode.begin(), tmpCode.end(), tmpCode.begin(), ::toupper);
+    std::unique_ptr<i18n::phonenumbers::AsYouTypeFormatter> formatter(phoneUtils->GetAsYouTypeFormatter(tmpCode));
+    if (formatter == nullptr) {
+        TELEPHONY_LOGE("formatter is nullptr");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    formatter->Clear();
+    std::string result;
+    for (size_t i = 0; i < phoneNumber.length(); i++) {
+        char c = phoneNumber.at(i);
+        formatNumber = formatter->InputDigit(c, &result);
+    }
+    if (formatNumber.empty() || formatNumber == "0") {
+        formatNumber = "";
     }
     return TELEPHONY_SUCCESS;
 }
