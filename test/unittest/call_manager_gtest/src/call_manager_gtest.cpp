@@ -5888,6 +5888,256 @@ HWTEST_F(CallManagerGtest, Telephony_CallManagerService_002, Function | MediumTe
 }
 
 /**
+ * @tc.number   Telephony_CallManagerService_003
+ * @tc.name     test error nullptr branch with permission
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManagerService_003, Function | MediumTest | Level3)
+{
+    AccessToken token;
+    std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
+    callManagerService->Init();
+    callManagerService->OnStart();
+    callManagerService->RegisterCallBack(nullptr);
+    callManagerService->UnRegisterCallBack();
+    callManagerService->ObserverOnCallDetailsChange();
+    callManagerService->RegisterVoipCallManagerCallback();
+    callManagerService->UnRegisterVoipCallManagerCallback();
+    int32_t callId = 0;
+    bool proceed = false;
+    callManagerService->PostDialProceed(callId, proceed);
+    OttCallDetailsInfo info;
+    const char *number = "000000";
+    memcpy_s(info.phoneNum, kMaxNumberLen, number, strlen(number));
+    const char *bundleName = "com.ohos.tddtest";
+    memcpy_s(info.bundleName, kMaxNumberLen, bundleName, strlen(bundleName));
+    info.callState = TelCallState::CALL_STATUS_DIALING;
+    info.videoState = VideoStateType::TYPE_VOICE;
+    std::vector<OttCallDetailsInfo> ottVec { info };
+    callManagerService->ReportOttCallDetailsInfo(ottVec);
+    OttCallEventInfo eventInfo;
+    callManagerService->ReportOttCallEventInfo(eventInfo);
+    int32_t slotId = 0;
+    callManagerService->CloseUnFinishedUssd(slotId);
+    std::string specialCode;
+    callManagerService->InputDialerSpecialCode(specialCode);
+    callManagerService->RemoveMissedIncomingCallNotification();
+    callManagerService->SetVoIPCallState(0);
+    int32_t state = 1;
+    callManagerService->GetVoIPCallState(state);
+    CallManagerProxyType proxyType = CallManagerProxyType::PROXY_BLUETOOTH_CALL;
+    callManagerService->GetProxyObjectPtr(proxyType);
+    callManagerService->GetBundleInfo();
+    callManagerService->ReportAudioDeviceInfo();
+    std::string eventName = "EVENT_IS_CELIA_CALL";
+    callManagerService->SendCallUiEvent(callId, eventName);
+}
+
+/**
+ * @tc.number   Telephony_CallManagerServiceStub_001
+ * @tc.name     test error nullptr branch with permission
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManagerServiceStub_001, Function | MediumTest | Level3)
+{
+    std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    data.WriteInterfaceToken(CallManagerServiceStub::GetDescriptor());
+    data.RewindRead(0);
+    callManagerService->OnRemoteRequest(static_cast<uint32_t>(CallManagerInterfaceCode::INTERFACE_DIAL_CALL),
+        data, reply, option);
+    callManagerService->OnRemoteRequest(static_cast<uint32_t>(CallManagerInterfaceCode::INTERFACE_ANSWER_CALL),
+        data, reply, option);
+    callManagerService->OnRemoteRequest(static_cast<uint32_t>(CallManagerInterfaceCode::INTERFACE_REJECT_CALL),
+        data, reply, option);
+    callManagerService->OnRemoteRequest(static_cast<uint32_t>(CallManagerInterfaceCode::INTERFACE_HOLD_CALL),
+        data, reply, option);
+    callManagerService->OnRemoteRequest(static_cast<uint32_t>(CallManagerInterfaceCode::INTERFACE_UNHOLD_CALL),
+        data, reply, option);
+    callManagerService->OnRemoteRequest(static_cast<uint32_t>(CallManagerInterfaceCode::INTERFACE_DISCONNECT_CALL),
+        data, reply, option);
+    callManagerService->OnRemoteRequest(static_cast<uint32_t>(CallManagerInterfaceCode::INTERFACE_GET_CALL_STATE),
+        data, reply, option);
+    callManagerService->OnRemoteRequest(static_cast<uint32_t>(CallManagerInterfaceCode::INTERFACE_SWAP_CALL),
+        data, reply, option);
+    callManagerService->OnRemoteRequest(static_cast<uint32_t>(CallManagerInterfaceCode::INTERFACE_HAS_CALL),
+        data, reply, option);
+    callManagerService->OnRemoteRequest(static_cast<uint32_t>(CallManagerInterfaceCode::INTERFACE_IS_NEW_CALL_ALLOWED),
+        data, reply, option);
+    callManagerService->OnRemoteRequest(static_cast<uint32_t>(CallManagerInterfaceCode::INTERFACE_IS_RINGING),
+        data, reply, option);
+    callManagerService->OnRemoteRequest(static_cast<uint32_t>(CallManagerInterfaceCode::INTERFACE_IS_EMERGENCY_CALL),
+        data, reply, option);
+    callManagerService->OnRemoteRequest(static_cast<uint32_t>(CallManagerInterfaceCode::INTERFACE_IS_EMERGENCY_NUMBER),
+        data, reply, option);
+    callManagerService->OnRemoteRequest(static_cast<uint32_t>(CallManagerInterfaceCode::INTERFACE_IS_FORMAT_NUMBER),
+        data, reply, option);
+    callManagerService->OnRemoteRequest(static_cast<uint32_t>(
+        CallManagerInterfaceCode::INTERFACE_IS_FORMAT_NUMBER_E164), data, reply, option);
+    callManagerService->OnRemoteRequest(static_cast<uint32_t>(CallManagerInterfaceCode::INTERFACE_COMBINE_CONFERENCE),
+        data, reply, option);
+    callManagerService->OnRemoteRequest(static_cast<uint32_t>(CallManagerInterfaceCode::INTERFACE_SEPARATE_CONFERENCE),
+        data, reply, option);
+    callManagerService->OnRemoteRequest(static_cast<uint32_t>(CallManagerInterfaceCode::INTERFACE_START_DTMF),
+        data, reply, option);
+    callManagerService->OnRemoteRequest(static_cast<uint32_t>(CallManagerInterfaceCode::INTERFACE_STOP_DTMF),
+        data, reply, option);
+    callManagerService->OnRemoteRequest(static_cast<uint32_t>(CallManagerInterfaceCode::INTERFACE_POST_DIAL_PROCEED),
+        data, reply, option);
+}
+
+/**
+ * @tc.number   Telephony_CallManagerServiceStub_002
+ * @tc.name     test error nullptr branch with permission
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManagerServiceStub_002, Function | MediumTest | Level3)
+{
+    std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    data.WriteInterfaceToken(CallManagerServiceStub::GetDescriptor());
+    data.RewindRead(0);
+    callManagerService->OnRemoteRequest(static_cast<uint32_t>(CallManagerInterfaceCode::INTERFACE_GET_CALL_WAITING),
+        data, reply, option);
+    callManagerService->OnRemoteRequest(static_cast<uint32_t>(CallManagerInterfaceCode::INTERFACE_SET_CALL_WAITING),
+        data, reply, option);
+    callManagerService->OnRemoteRequest(static_cast<uint32_t>(CallManagerInterfaceCode::INTERFACE_GET_CALL_RESTRICTION),
+        data, reply, option);
+    callManagerService->OnRemoteRequest(static_cast<uint32_t>(CallManagerInterfaceCode::INTERFACE_SET_CALL_RESTRICTION),
+        data, reply, option);
+    callManagerService->OnRemoteRequest(static_cast<uint32_t>(
+        CallManagerInterfaceCode::INTERFACE_SET_CALL_RESTRICTION_PASSWORD), data, reply, option);
+    callManagerService->OnRemoteRequest(static_cast<uint32_t>(CallManagerInterfaceCode::INTERFACE_GET_CALL_TRANSFER),
+        data, reply, option);
+    callManagerService->OnRemoteRequest(static_cast<uint32_t>(CallManagerInterfaceCode::INTERFACE_SET_CALL_TRANSFER),
+        data, reply, option);
+    callManagerService->OnRemoteRequest(static_cast<uint32_t>(
+        CallManagerInterfaceCode::INTERFACE_CAN_SET_CALL_TRANSFER_TIME), data, reply, option);
+    callManagerService->OnRemoteRequest(static_cast<uint32_t>(CallManagerInterfaceCode::INTERFACE_GET_MAINID),
+        data, reply, option);
+    callManagerService->OnRemoteRequest(static_cast<uint32_t>(CallManagerInterfaceCode::INTERFACE_GET_SUBCALL_LIST_ID),
+        data, reply, option);
+    callManagerService->OnRemoteRequest(static_cast<uint32_t>(
+        CallManagerInterfaceCode::INTERFACE_GET_CALL_LIST_ID_FOR_CONFERENCE), data, reply, option);
+    callManagerService->OnRemoteRequest(static_cast<uint32_t>(CallManagerInterfaceCode::INTERFACE_SET_MUTE),
+        data, reply, option);
+    callManagerService->OnRemoteRequest(static_cast<uint32_t>(CallManagerInterfaceCode::INTERFACE_MUTE_RINGER),
+        data, reply, option);
+    callManagerService->OnRemoteRequest(static_cast<uint32_t>(CallManagerInterfaceCode::INTERFACE_SET_AUDIO_DEVICE),
+        data, reply, option);
+    callManagerService->OnRemoteRequest(static_cast<uint32_t>(CallManagerInterfaceCode::INTERFACE_CTRL_CAMERA),
+        data, reply, option);
+    callManagerService->OnRemoteRequest(static_cast<uint32_t>(CallManagerInterfaceCode::INTERFACE_SET_PREVIEW_WINDOW),
+        data, reply, option);
+    callManagerService->OnRemoteRequest(static_cast<uint32_t>(CallManagerInterfaceCode::INTERFACE_SET_DISPLAY_WINDOW),
+        data, reply, option);
+    callManagerService->OnRemoteRequest(static_cast<uint32_t>(CallManagerInterfaceCode::INTERFACE_SET_CAMERA_ZOOM),
+        data, reply, option);
+    callManagerService->OnRemoteRequest(static_cast<uint32_t>(CallManagerInterfaceCode::INTERFACE_SET_PAUSE_IMAGE),
+        data, reply, option);
+    callManagerService->OnRemoteRequest(static_cast<uint32_t>(CallManagerInterfaceCode::INTERFACE_SET_DEVICE_DIRECTION),
+        data, reply, option);
+}
+
+/**
+ * @tc.number   Telephony_CallManagerServiceStub_003
+ * @tc.name     test error nullptr branch with permission
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManagerServiceStub_003, Function | MediumTest | Level3)
+{
+    std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    data.WriteInterfaceToken(CallManagerServiceStub::GetDescriptor());
+    data.RewindRead(0);
+callManagerService->OnRemoteRequest(static_cast<uint32_t>(CallManagerInterfaceCode::INTERFACE_SETCALL_PREFERENCEMODE),
+    data, reply, option);
+callManagerService->OnRemoteRequest(static_cast<uint32_t>(CallManagerInterfaceCode::INTERFACE_GET_IMS_CONFIG),
+    data, reply, option);
+callManagerService->OnRemoteRequest(static_cast<uint32_t>(CallManagerInterfaceCode::INTERFACE_SET_IMS_CONFIG),
+    data, reply, option);
+callManagerService->OnRemoteRequest(static_cast<uint32_t>(CallManagerInterfaceCode::INTERFACE_GET_IMS_FEATURE_VALUE),
+    data, reply, option);
+callManagerService->OnRemoteRequest(static_cast<uint32_t>(CallManagerInterfaceCode::INTERFACE_SET_IMS_FEATURE_VALUE),
+    data, reply, option);
+callManagerService->OnRemoteRequest(static_cast<uint32_t>(CallManagerInterfaceCode::INTERFACE_UPDATE_CALL_MEDIA_MODE),
+    data, reply, option);
+callManagerService->OnRemoteRequest(static_cast<uint32_t>(CallManagerInterfaceCode::INTERFACE_ENABLE_VOLTE),
+    data, reply, option);
+callManagerService->OnRemoteRequest(static_cast<uint32_t>(CallManagerInterfaceCode::INTERFACE_DISABLE_VOLTE),
+    data, reply, option);
+callManagerService->OnRemoteRequest(static_cast<uint32_t>(CallManagerInterfaceCode::INTERFACE_IS_VOLTE_ENABLED),
+    data, reply, option);
+callManagerService->OnRemoteRequest(static_cast<uint32_t>(CallManagerInterfaceCode::INTERFACE_START_RTT),
+    data, reply, option);
+callManagerService->OnRemoteRequest(static_cast<uint32_t>(CallManagerInterfaceCode::INTERFACE_STOP_RTT),
+    data, reply, option);
+callManagerService->OnRemoteRequest(static_cast<uint32_t>(CallManagerInterfaceCode::INTERFACE_JOIN_CONFERENCE),
+    data, reply, option);
+callManagerService->OnRemoteRequest(static_cast<uint32_t>(
+    CallManagerInterfaceCode::INTERFACE_REPORT_OTT_CALL_DETAIL_INFO), data, reply, option);
+callManagerService->OnRemoteRequest(static_cast<uint32_t>(
+    CallManagerInterfaceCode::INTERFACE_REPORT_OTT_CALL_EVENT_INFO), data, reply, option);
+callManagerService->OnRemoteRequest(static_cast<uint32_t>(CallManagerInterfaceCode::INTERFACE_GET_PROXY_OBJECT_PTR),
+    data, reply, option);
+callManagerService->OnRemoteRequest(static_cast<uint32_t>(CallManagerInterfaceCode::INTERFACE_CLOSE_UNFINISHED_USSD),
+    data, reply, option);
+callManagerService->OnRemoteRequest(static_cast<uint32_t>(CallManagerInterfaceCode::INTERFACE_REPORT_AUDIO_DEVICE_INFO),
+    data, reply, option);
+callManagerService->OnRemoteRequest(static_cast<uint32_t>(
+    CallManagerInterfaceCode::INTERFACE_INPUT_DIALER_SPECIAL_CODE), data, reply, option);
+callManagerService->OnRemoteRequest(static_cast<uint32_t>(
+    CallManagerInterfaceCode::INTERFACE_CANCEL_MISSED_INCOMING_CALL_NOTIFICATION), data, reply, option);
+callManagerService->OnRemoteRequest(static_cast<uint32_t>(CallManagerInterfaceCode::INTERFACE_SET_VONR_STATE),
+    data, reply, option);
+}
+
+/**
+ * @tc.number   Telephony_CallManagerServiceStub_004
+ * @tc.name     test error nullptr branch with permission
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManagerServiceStub_004, Function | MediumTest | Level3)
+{
+    std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    data.WriteInterfaceToken(CallManagerServiceStub::GetDescriptor());
+    data.RewindRead(0);
+    callManagerService->OnRemoteRequest(static_cast<uint32_t>(CallManagerInterfaceCode::INTERFACE_GET_VONR_STATE),
+        data, reply, option);
+    callManagerService->OnRemoteRequest(static_cast<uint32_t>(CallManagerInterfaceCode::INTERFACE_KICK_OUT_CONFERENCE),
+        data, reply, option);
+    callManagerService->OnRemoteRequest(static_cast<uint32_t>(CallManagerInterfaceCode::INTERFACE_SET_VOIP_CALL_STATE),
+        data, reply, option);
+    callManagerService->OnRemoteRequest(static_cast<uint32_t>(CallManagerInterfaceCode::INTERFACE_GET_VOIP_CALL_STATE),
+        data, reply, option);
+    callManagerService->OnRemoteRequest(static_cast<uint32_t>(CallManagerInterfaceCode::INTERFACE_CANCEL_CALL_UPGRADE),
+        data, reply, option);
+    callManagerService->OnRemoteRequest(static_cast<uint32_t>(
+        CallManagerInterfaceCode::INTERFACE_REQUEST_CAMERA_CAPABILITIES), data, reply, option);
+    callManagerService->OnRemoteRequest(static_cast<uint32_t>(CallManagerInterfaceCode::INTERFACE_REGISTER_CALLBACK),
+        data, reply, option);
+    callManagerService->OnRemoteRequest(static_cast<uint32_t>(CallManagerInterfaceCode::INTERFACE_UNREGISTER_CALLBACK),
+        data, reply, option);
+    callManagerService->OnRemoteRequest(static_cast<uint32_t>(
+        CallManagerInterfaceCode::INTERFACE_VOIP_REGISTER_CALLBACK), data, reply, option);
+    callManagerService->OnRemoteRequest(static_cast<uint32_t>(
+        CallManagerInterfaceCode::INTERFACE_VOIP_UNREGISTER_CALLBACK), data, reply, option);
+    callManagerService->OnRemoteRequest(static_cast<uint32_t>(
+        CallManagerInterfaceCode::INTERFACE_OBSERVER_ON_CALL_DETAILS_CHANGE), data, reply, option);
+    callManagerService->OnRemoteRequest(static_cast<uint32_t>(CallManagerInterfaceCode::INTERFACE_SEND_CALLUI_EVENT),
+        data, reply, option);
+}
+
+/**
  * @tc.number   Telephony_VoipCall_001
  * @tc.name     test error nullptr branch with permission
  * @tc.desc     Function test
