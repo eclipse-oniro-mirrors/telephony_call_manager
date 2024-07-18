@@ -34,7 +34,7 @@ public:
     int32_t ReportCallState(int32_t callState, std::u16string phoneNumber);
     int32_t ReportCallStateForCallId(
         int32_t slotId, int32_t callState, std::u16string incomingNumber);
-    void UpdateCallStateForVoIP();
+    void UpdateCallStateForVoIPOrRestart();
 private:
     TelCallState GetVoipCallState();
 
