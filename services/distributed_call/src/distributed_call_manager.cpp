@@ -554,7 +554,7 @@ void DistributedCallManager::InitDistributedCommunicationCall()
 void DistributedCallManager::OnDcCallSystemAbilityAdded()
 {
     TELEPHONY_LOGI("dc-call service added");
-    auto handle = dlopen("libtelephony_ext_service.z.so", RTLD_NOW);
+    auto handle = dlopen("libtelephony_ext_innerkits.z.so", RTLD_NOW);
     if (handle == nullptr) {
         TELEPHONY_LOGE("open so failed");
         return;
