@@ -77,10 +77,6 @@ void CallStateReportProxy::UpdateCallState(sptr<CallBase> &callObjectPtr, TelCal
     } else {
         info.callState = currentVoipCallState;
     }
-    if (info.callState == currentCallState_) {
-        TELEPHONY_LOGI("foreground call state is not changed, currentCallState_:%{public}d!", currentCallState_);
-        return;
-    }
     currentCallState_ = info.callState;
     std::string str(info.accountNumber);
     std::u16string accountNumber = Str8ToStr16(str);
