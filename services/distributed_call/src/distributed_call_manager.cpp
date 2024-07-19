@@ -26,6 +26,7 @@ using json = nlohmann::json;
 
 namespace OHOS {
 namespace Telephony {
+using namespace AudioStandard;
 namespace {
 const size_t INT32_MIN_ID_LENGTH = 3;
 const size_t INT32_SHORT_ID_LENGTH = 20;
@@ -432,21 +433,21 @@ bool DistributedCallManager::IsSelectVirtualModem()
 
 void DistributedCallManager::ReportDistributedDeviceInfo()
 {
-    AudioStandard::AudioSystemManager *audioSystemMananger = AudioStandard::AudioSystemManager::GetInstance();
+    AudioSystemManager *audioSystemMananger = AudioSystemManager::GetInstance();
     if (audioSystemMananger == nullptr) {
         TELEPHONY_LOGW("audioSystemMananger nullptr");
         return;
     }
-    std::vector<sptr<AudioStandard::AudioDeviceDescriptor>> descs = audioSystemMananger
-        ->GetDevices(AudioStandard::DeviceFlag::DISTRIBUTED_OUTPUT_DEVICES_FLAG);
+    std::vector<sptr<AudioDeviceDescriptor>> descs = audioSystemMananger
+        ->GetDevices(DeviceFlag::DISTRIBUTED_OUTPUT_DEVICES_FLAG);
     size_t size = descs.size();
     if (descs.size() <= 0) {
         TELEPHONY_LOGW("no distributed device");
         return;
     }
-    sptr<AudioStandard::AudioRendererFilter> audioRendererFilter = new(std::nothrow) AudioStandard::AudioRendererFilter();
-    audioRendererFilter->rendererInfo.contentType = AudioStandard::ContentType::CONTENT_TYPE_SPEECH;
-    audioRendererFilter->rendererInfo.streamUsage = AudioStandard::StreamUsage::STREAM_USAGE_VOICE_MODEM_COMMUNICATION;
+    sptr<AudioRendererFilter> audioRendererFilter = new(std::nothrow) AudioRendererFilter();
+    audioRendererFilter->rendererInfo.contentType = ContentType::CONTENT_TYPE_SPEECH;
+    audioRendererFilter->rendererInfo.streamUsage = StreamUsage::STREAM_USAGE_VOICE_MODEM_COMMUNICATION;
     audioSystemMananger->SelectOutputDevice(audioRendererFilter, descs);
     TELEPHONY_LOGW("ReportDistributedDeviceInfo");
 }
