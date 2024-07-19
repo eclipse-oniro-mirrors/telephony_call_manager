@@ -890,11 +890,14 @@ void CallStatusManager::AutoHandleForDsda(
             if (videoState == static_cast<int32_t>(VideoStateType::TYPE_VIDEO)) {
                 TELEPHONY_LOGI("AutoAnswer VideoCall for Dsda");
                 AutoAnswerForVideoCall(activeCallNum);
+                AutoUnHoldForDsda(canSwitchCallState, priorState, activeCallNum, slotId);
                 return;
             }
             if (dialingCallNum == 0 && alertingCallNum == 0 && activeCallNum == 0 &&
                 ringCall->GetCallRunningState() == CallRunningState::CALL_RUNNING_STATE_RINGING) {
+                TELEPHONY_LOGI("AutoAnswer VoiceCall for Dsda");
                 AutoAnswerForVoiceCall(ringCall, slotId, continueAnswer);
+                AutoUnHoldForDsda(canSwitchCallState, priorState, activeCallNum, slotId);
                 return;
             }
         }
