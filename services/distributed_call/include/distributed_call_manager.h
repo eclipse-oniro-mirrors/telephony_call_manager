@@ -56,6 +56,7 @@ public:
 
     void GetConnectedDCallDevice(AudioDevice& device);
     bool IsSelectVirtualModem();
+    void ReportDistributedDeviceInfo();
 
     void OnDcCallSystemAbilityAdded();
     void OnDcCallSystemAbilityRemoved();
