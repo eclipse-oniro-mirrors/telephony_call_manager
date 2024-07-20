@@ -64,6 +64,10 @@ int32_t BluetoothCallPolicy::HoldCallPolicy(int32_t &callId)
 
 int32_t BluetoothCallPolicy::UnHoldCallPolicy(int32_t &callId)
 {
+    if (IsCallExist(TelCallState::CALL_STATUS_ACTIVE, callId)) {
+        TELEPHONY_LOGI("active call is exist, callId:%{public}d", callId);
+        return CALL_ERR_ILLEGAL_CALL_OPERATION;
+    }
     if (IsCallExist(TelCallState::CALL_STATUS_HOLDING, callId)) {
         TELEPHONY_LOGI("holding call is exist, callId:%{public}d", callId);
         return TELEPHONY_SUCCESS;
