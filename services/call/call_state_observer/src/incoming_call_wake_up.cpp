@@ -27,9 +27,9 @@ namespace OHOS {
 namespace Telephony {
 void IncomingCallWakeup::NewCallCreated(sptr<CallBase> &callObjectPtr)
 {
-    // Should wake up the device and not set the screen on while a new incoming call created.
+    // Should wake up the device and only Voip callType set the screen on while a new incoming call created.
     if (callObjectPtr != nullptr && callObjectPtr->GetTelCallState() == TelCallState::CALL_STATUS_INCOMING) {
-        WakeupDevice();
+        WakeupDevice(callObjectPtr);
     }
 }
 
@@ -58,7 +58,7 @@ void IncomingCallWakeup::ReleaseIncomingLock()
 #endif
 }
 
-void IncomingCallWakeup::WakeupDevice()
+void IncomingCallWakeup::WakeupDevice(sptr<CallBase> &callObjectPtr)
 {
 #ifdef ABILITY_POWER_SUPPORT
     if (phoneRunningLock_ == nullptr) {
@@ -78,6 +78,11 @@ void IncomingCallWakeup::WakeupDevice()
         screenRunningLock_->Lock();
         isScreenOnLocked = true;
         TELEPHONY_LOGI("screenRunningLock_ locked");
+    }
+    // if call type is voip, set the screen on
+    if (callObjectPtr != nullptr && callObjectPtr->GetCallType() == CallType::TYPE_VOIP) {
+        PowerMgr::PowerMgrClient::GetInstance().WakeupDevice(
+            PowerMgr::WakeupDeviceType::WAKEUP_DEVICE_APPLICATION, wakeupReason_);
     }
 #endif
 }
