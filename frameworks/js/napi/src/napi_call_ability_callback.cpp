@@ -374,6 +374,9 @@ int32_t NapiCallAbilityCallback::ReportStartRttInfo(AppExecFwk::PacMap &resultIn
 #if defined(NAPI_VERSION) && NAPI_VERSION >= 2
     napi_get_uv_event_loop(startRttCallback_.env, &loop);
 #endif
+    if (loop == nullptr) {
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     CallSupplementWorker *callSupplementWorker = std::make_unique<CallSupplementWorker>().release();
     if (callSupplementWorker == nullptr) {
         TELEPHONY_LOGE("callSupplementWorker is nullptr!");
@@ -383,6 +386,8 @@ int32_t NapiCallAbilityCallback::ReportStartRttInfo(AppExecFwk::PacMap &resultIn
     callSupplementWorker->callback = startRttCallback_;
     uv_work_t *work = std::make_unique<uv_work_t>().release();
     if (work == nullptr) {
+        delete callSupplementWorker;
+        callSupplementWorker = nullptr;
         TELEPHONY_LOGE("work is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
@@ -415,6 +420,9 @@ int32_t NapiCallAbilityCallback::ReportStopRttInfo(AppExecFwk::PacMap &resultInf
 #if defined(NAPI_VERSION) && NAPI_VERSION >= 2
     napi_get_uv_event_loop(stopRttCallback_.env, &loop);
 #endif
+    if (loop == nullptr) {
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     CallSupplementWorker *callSupplementWorker = std::make_unique<CallSupplementWorker>().release();
     if (callSupplementWorker == nullptr) {
         TELEPHONY_LOGE("callSupplementWorker is nullptr!");
@@ -424,6 +432,8 @@ int32_t NapiCallAbilityCallback::ReportStopRttInfo(AppExecFwk::PacMap &resultInf
     callSupplementWorker->callback = stopRttCallback_;
     uv_work_t *work = std::make_unique<uv_work_t>().release();
     if (work == nullptr) {
+        delete callSupplementWorker;
+        callSupplementWorker = nullptr;
         TELEPHONY_LOGE("work is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
@@ -455,6 +465,9 @@ int32_t NapiCallAbilityCallback::UpdateCallStateInfo(const CallAttributeInfo &in
 #if defined(NAPI_VERSION) && NAPI_VERSION >= 2
     napi_get_uv_event_loop(stateCallback_.env, &loop);
 #endif
+    if (loop == nullptr) {
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     CallStateWorker *callStateWorker = std::make_unique<CallStateWorker>().release();
     if (callStateWorker == nullptr) {
         TELEPHONY_LOGE("callStateWorker is nullptr!");
@@ -464,6 +477,8 @@ int32_t NapiCallAbilityCallback::UpdateCallStateInfo(const CallAttributeInfo &in
     callStateWorker->callback = stateCallback_;
     uv_work_t *work = std::make_unique<uv_work_t>().release();
     if (work == nullptr) {
+        delete callStateWorker;
+        callStateWorker = nullptr;
         TELEPHONY_LOGE("work is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
@@ -606,6 +621,9 @@ int32_t NapiCallAbilityCallback::UpdateCallEvent(const CallEventInfo &info)
 #if defined(NAPI_VERSION) && NAPI_VERSION >= 2
     napi_get_uv_event_loop(eventCallback_.env, &loop);
 #endif
+    if (loop == nullptr) {
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     CallEventWorker *callEventWorker = std::make_unique<CallEventWorker>().release();
     if (callEventWorker == nullptr) {
         TELEPHONY_LOGE("callEventWorker is nullptr!");
@@ -615,6 +633,8 @@ int32_t NapiCallAbilityCallback::UpdateCallEvent(const CallEventInfo &info)
     callEventWorker->callback = eventCallback_;
     uv_work_t *work = std::make_unique<uv_work_t>().release();
     if (work == nullptr) {
+        delete callEventWorker;
+        callEventWorker = nullptr;
         TELEPHONY_LOGE("work is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
@@ -691,6 +711,9 @@ int32_t NapiCallAbilityCallback::UpdateCallDisconnectedCause(const DisconnectedD
 #if defined(NAPI_VERSION) && NAPI_VERSION >= 2
     napi_get_uv_event_loop(callDisconnectCauseCallback_.env, &loop);
 #endif
+    if (loop == nullptr) {
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     CallDisconnectedCauseWorker *callDisconnectedCauseWorker =
         std::make_unique<CallDisconnectedCauseWorker>().release();
     if (callDisconnectedCauseWorker == nullptr) {
@@ -701,6 +724,8 @@ int32_t NapiCallAbilityCallback::UpdateCallDisconnectedCause(const DisconnectedD
     callDisconnectedCauseWorker->callback = callDisconnectCauseCallback_;
     uv_work_t *work = std::make_unique<uv_work_t>().release();
     if (work == nullptr) {
+        delete callDisconnectedCauseWorker;
+        callDisconnectedCauseWorker = nullptr;
         TELEPHONY_LOGE("work is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
@@ -792,6 +817,9 @@ int32_t NapiCallAbilityCallback::UpdateMmiCodeResultsInfo(const MmiCodeInfo &inf
 #if defined(NAPI_VERSION) && NAPI_VERSION >= 2
     napi_get_uv_event_loop(mmiCodeCallback_.env, &loop);
 #endif
+    if (loop == nullptr) {
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     MmiCodeWorker *mmiCodeWorker = std::make_unique<MmiCodeWorker>().release();
     if (mmiCodeWorker == nullptr) {
         TELEPHONY_LOGE("mmiCodeWorker is nullptr!");
@@ -801,6 +829,8 @@ int32_t NapiCallAbilityCallback::UpdateMmiCodeResultsInfo(const MmiCodeInfo &inf
     mmiCodeWorker->callback = mmiCodeCallback_;
     uv_work_t *work = std::make_unique<uv_work_t>().release();
     if (work == nullptr) {
+        delete mmiCodeWorker;
+        mmiCodeWorker = nullptr;
         TELEPHONY_LOGE("work is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
@@ -877,6 +907,9 @@ int32_t NapiCallAbilityCallback::UpdateAudioDeviceInfo(const AudioDeviceInfo &in
 #if defined(NAPI_VERSION) && NAPI_VERSION >= 2
     napi_get_uv_event_loop(audioDeviceCallback_.env, &loop);
 #endif
+    if (loop == nullptr) {
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     AudioDeviceWork *audioDeviceWork = std::make_unique<AudioDeviceWork>().release();
     if (audioDeviceWork == nullptr) {
         TELEPHONY_LOGE("audioDeviceWork is nullptr!");
@@ -886,6 +919,8 @@ int32_t NapiCallAbilityCallback::UpdateAudioDeviceInfo(const AudioDeviceInfo &in
     audioDeviceWork->callback = audioDeviceCallback_;
     uv_work_t *work = std::make_unique<uv_work_t>().release();
     if (work == nullptr) {
+        delete audioDeviceWork;
+        audioDeviceWork = nullptr;
         TELEPHONY_LOGE("work is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
@@ -985,6 +1020,9 @@ int32_t NapiCallAbilityCallback::OttCallRequest(OttCallRequestId requestId, AppE
 #if defined(NAPI_VERSION) && NAPI_VERSION >= 2
     napi_get_uv_event_loop(ottRequestCallback_.env, &loop);
 #endif
+    if (loop == nullptr) {
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     CallOttWorker *callOttWorker = std::make_unique<CallOttWorker>().release();
     if (callOttWorker == nullptr) {
         TELEPHONY_LOGE("callOttWorker is nullptr!");
@@ -995,6 +1033,8 @@ int32_t NapiCallAbilityCallback::OttCallRequest(OttCallRequestId requestId, AppE
     callOttWorker->callback = ottRequestCallback_;
     uv_work_t *work = std::make_unique<uv_work_t>().release();
     if (work == nullptr) {
+        delete callOttWorker;
+        callOttWorker = nullptr;
         TELEPHONY_LOGE("work is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
@@ -1023,6 +1063,9 @@ int32_t NapiCallAbilityCallback::ReportGetWaitingInfo(AppExecFwk::PacMap &result
 #if defined(NAPI_VERSION) && NAPI_VERSION >= 2
     napi_get_uv_event_loop(getWaitingCallback_.env, &loop);
 #endif
+    if (loop == nullptr) {
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     CallSupplementWorker *callSupplementWorkerData = std::make_unique<CallSupplementWorker>().release();
     if (callSupplementWorkerData == nullptr) {
         TELEPHONY_LOGE("callSupplementWorkerData is nullptr!");
@@ -1032,6 +1075,8 @@ int32_t NapiCallAbilityCallback::ReportGetWaitingInfo(AppExecFwk::PacMap &result
     callSupplementWorkerData->callback = getWaitingCallback_;
     uv_work_t *work = std::make_unique<uv_work_t>().release();
     if (work == nullptr) {
+        delete callSupplementWorkerData;
+        callSupplementWorkerData = nullptr;
         TELEPHONY_LOGE("work is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
@@ -1064,6 +1109,9 @@ int32_t NapiCallAbilityCallback::ReportCloseUnFinishedUssdInfo(AppExecFwk::PacMa
 #if defined(NAPI_VERSION) && NAPI_VERSION >= 2
     napi_get_uv_event_loop(closeUnfinishedUssdCallback_.env, &loop);
 #endif
+    if (loop == nullptr) {
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     CallSupplementWorker *callSupplementDataWorker = std::make_unique<CallSupplementWorker>().release();
     if (callSupplementDataWorker == nullptr) {
         TELEPHONY_LOGE("callSupplementDataWorker is nullptr!");
@@ -1073,6 +1121,8 @@ int32_t NapiCallAbilityCallback::ReportCloseUnFinishedUssdInfo(AppExecFwk::PacMa
     callSupplementDataWorker->callback = closeUnfinishedUssdCallback_;
     uv_work_t *work = std::make_unique<uv_work_t>().release();
     if (work == nullptr) {
+        delete callSupplementDataWorker;
+        callSupplementDataWorker = nullptr;
         TELEPHONY_LOGE("work is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
@@ -1105,6 +1155,9 @@ int32_t NapiCallAbilityCallback::ReportSetWaitingInfo(AppExecFwk::PacMap &result
 #if defined(NAPI_VERSION) && NAPI_VERSION >= 2
     napi_get_uv_event_loop(setWaitingCallback_.env, &loop);
 #endif
+    if (loop == nullptr) {
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     CallSupplementWorker *callSupplementWorker = std::make_unique<CallSupplementWorker>().release();
     if (callSupplementWorker == nullptr) {
         TELEPHONY_LOGE("callSupplementWorker is nullptr!");
@@ -1114,6 +1167,8 @@ int32_t NapiCallAbilityCallback::ReportSetWaitingInfo(AppExecFwk::PacMap &result
     callSupplementWorker->callback = setWaitingCallback_;
     uv_work_t *work = std::make_unique<uv_work_t>().release();
     if (work == nullptr) {
+        delete callSupplementWorker;
+        callSupplementWorker = nullptr;
         TELEPHONY_LOGE("work is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
@@ -1146,6 +1201,9 @@ int32_t NapiCallAbilityCallback::ReportGetRestrictionInfo(AppExecFwk::PacMap &re
 #if defined(NAPI_VERSION) && NAPI_VERSION >= 2
     napi_get_uv_event_loop(getRestrictionCallback_.env, &loop);
 #endif
+    if (loop == nullptr) {
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     CallSupplementWorker *callSupplementWorker = std::make_unique<CallSupplementWorker>().release();
     if (callSupplementWorker == nullptr) {
         TELEPHONY_LOGE("callSupplementWorker is nullptr!");
@@ -1155,6 +1213,8 @@ int32_t NapiCallAbilityCallback::ReportGetRestrictionInfo(AppExecFwk::PacMap &re
     callSupplementWorker->callback = getRestrictionCallback_;
     uv_work_t *work = std::make_unique<uv_work_t>().release();
     if (work == nullptr) {
+        delete callSupplementWorker;
+        callSupplementWorker = nullptr;
         TELEPHONY_LOGE("work is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
@@ -1187,6 +1247,9 @@ int32_t NapiCallAbilityCallback::ReportSetRestrictionInfo(AppExecFwk::PacMap &re
 #if defined(NAPI_VERSION) && NAPI_VERSION >= 2
     napi_get_uv_event_loop(setRestrictionCallback_.env, &loop);
 #endif
+    if (loop == nullptr) {
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     CallSupplementWorker *callSupplementWorker = std::make_unique<CallSupplementWorker>().release();
     if (callSupplementWorker == nullptr) {
         TELEPHONY_LOGE("callSupplementWorker is nullptr!");
@@ -1196,6 +1259,8 @@ int32_t NapiCallAbilityCallback::ReportSetRestrictionInfo(AppExecFwk::PacMap &re
     callSupplementWorker->callback = setRestrictionCallback_;
     uv_work_t *work = std::make_unique<uv_work_t>().release();
     if (work == nullptr) {
+        delete callSupplementWorker;
+        callSupplementWorker = nullptr;
         TELEPHONY_LOGE("work is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
@@ -1228,6 +1293,9 @@ int32_t NapiCallAbilityCallback::ReportSetRestrictionPassword(AppExecFwk::PacMap
 #if defined(NAPI_VERSION) && NAPI_VERSION >= 2
     napi_get_uv_event_loop(setRestrictionPasswordCallback_.env, &loop);
 #endif
+    if (loop == nullptr) {
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     CallSupplementWorker *callSupplementWorker = std::make_unique<CallSupplementWorker>().release();
     if (callSupplementWorker == nullptr) {
         TELEPHONY_LOGE("callSupplementWorker is nullptr!");
@@ -1237,6 +1305,8 @@ int32_t NapiCallAbilityCallback::ReportSetRestrictionPassword(AppExecFwk::PacMap
     callSupplementWorker->callback = setRestrictionPasswordCallback_;
     uv_work_t *work = std::make_unique<uv_work_t>().release();
     if (work == nullptr) {
+        delete callSupplementWorker;
+        callSupplementWorker = nullptr;
         TELEPHONY_LOGE("work is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
@@ -1274,6 +1344,9 @@ int32_t NapiCallAbilityCallback::ReportGetTransferInfo(AppExecFwk::PacMap &resul
 #if defined(NAPI_VERSION) && NAPI_VERSION >= 2
     napi_get_uv_event_loop(getTransferCallback_.env, &loop);
 #endif
+    if (loop == nullptr) {
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     CallSupplementWorker *callSupplementWorker = std::make_unique<CallSupplementWorker>().release();
     if (callSupplementWorker == nullptr) {
         TELEPHONY_LOGE("callSupplementWorker is nullptr!");
@@ -1283,6 +1356,8 @@ int32_t NapiCallAbilityCallback::ReportGetTransferInfo(AppExecFwk::PacMap &resul
     callSupplementWorker->callback = getTransferCallback_;
     uv_work_t *work = std::make_unique<uv_work_t>().release();
     if (work == nullptr) {
+        delete callSupplementWorker;
+        callSupplementWorker = nullptr;
         TELEPHONY_LOGE("work is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
@@ -1315,6 +1390,9 @@ int32_t NapiCallAbilityCallback::ReportSetTransferInfo(AppExecFwk::PacMap &resul
 #if defined(NAPI_VERSION) && NAPI_VERSION >= 2
     napi_get_uv_event_loop(setTransferCallback_.env, &loop);
 #endif
+    if (loop == nullptr) {
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     CallSupplementWorker *callSupplementWorker = std::make_unique<CallSupplementWorker>().release();
     if (callSupplementWorker == nullptr) {
         TELEPHONY_LOGE("callSupplementWorker is nullptr!");
@@ -1324,6 +1402,8 @@ int32_t NapiCallAbilityCallback::ReportSetTransferInfo(AppExecFwk::PacMap &resul
     callSupplementWorker->callback = setTransferCallback_;
     uv_work_t *work = std::make_unique<uv_work_t>().release();
     if (work == nullptr) {
+        delete callSupplementWorker;
+        callSupplementWorker = nullptr;
         TELEPHONY_LOGE("work is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
@@ -1706,6 +1786,9 @@ int32_t NapiCallAbilityCallback::UpdatePostDialDelay(const std::string str)
 #if defined(NAPI_VERSION) && NAPI_VERSION >= 2
     napi_get_uv_event_loop(postDialDelayCallback_.env, &loop);
 #endif
+    if (loop == nullptr) {
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     PostDialDelayWorker *postDialDelayWorker = std::make_unique<PostDialDelayWorker>().release();
     if (postDialDelayWorker == nullptr) {
         TELEPHONY_LOGE("postDialDelayWorker is nullptr!");
@@ -1715,6 +1798,8 @@ int32_t NapiCallAbilityCallback::UpdatePostDialDelay(const std::string str)
     postDialDelayWorker->callback = postDialDelayCallback_;
     uv_work_t *work = std::make_unique<uv_work_t>().release();
     if (work == nullptr) {
+        delete postDialDelayWorker;
+        postDialDelayWorker = nullptr;
         TELEPHONY_LOGE("work is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
@@ -1786,6 +1871,9 @@ int32_t NapiCallAbilityCallback::UpdateImsCallModeChange(const CallMediaModeInfo
 #if defined(NAPI_VERSION) && NAPI_VERSION >= 2
     napi_get_uv_event_loop(imsCallModeCallback_.env, &loop);
 #endif
+    if (loop == nullptr) {
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     ImsCallModeInfoWorker *imsCallModeInfoWorker = std::make_unique<ImsCallModeInfoWorker>().release();
     if (imsCallModeInfoWorker == nullptr) {
         TELEPHONY_LOGE("imsCallModeInfoWorker is nullptr!");
@@ -1795,6 +1883,8 @@ int32_t NapiCallAbilityCallback::UpdateImsCallModeChange(const CallMediaModeInfo
     imsCallModeInfoWorker->callback = imsCallModeCallback_;
     uv_work_t *work = std::make_unique<uv_work_t>().release();
     if (work == nullptr) {
+        delete imsCallModeInfoWorker;
+        imsCallModeInfoWorker = nullptr;
         TELEPHONY_LOGE("work is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
@@ -1875,6 +1965,9 @@ int32_t NapiCallAbilityCallback::CallSessionEventChange(const CallSessionEvent &
 #if defined(NAPI_VERSION) && NAPI_VERSION >= 2
     napi_get_uv_event_loop(callSessionEventCallback_.env, &loop);
 #endif
+    if (loop == nullptr) {
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     CallSessionEventWorker *callSessionEventWorker = std::make_unique<CallSessionEventWorker>().release();
     if (callSessionEventWorker == nullptr) {
         TELEPHONY_LOGE("callSessionEventWorker is nullptr!");
@@ -1884,6 +1977,8 @@ int32_t NapiCallAbilityCallback::CallSessionEventChange(const CallSessionEvent &
     callSessionEventWorker->callback = callSessionEventCallback_;
     uv_work_t *work = std::make_unique<uv_work_t>().release();
     if (work == nullptr) {
+        delete callSessionEventWorker;
+        callSessionEventWorker = nullptr;
         TELEPHONY_LOGE("work is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
@@ -1961,6 +2056,9 @@ int32_t NapiCallAbilityCallback::PeerDimensionsChange(const PeerDimensionsDetail
 #if defined(NAPI_VERSION) && NAPI_VERSION >= 2
     napi_get_uv_event_loop(peerDimensionsCallback_.env, &loop);
 #endif
+    if (loop == nullptr) {
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     PeerDimensionsWorker *peerDimensionsWorker = std::make_unique<PeerDimensionsWorker>().release();
     if (peerDimensionsWorker == nullptr) {
         TELEPHONY_LOGE("peerDimensionsWorker is nullptr!");
@@ -1970,6 +2068,8 @@ int32_t NapiCallAbilityCallback::PeerDimensionsChange(const PeerDimensionsDetail
     peerDimensionsWorker->callback = peerDimensionsCallback_;
     uv_work_t *work = std::make_unique<uv_work_t>().release();
     if (work == nullptr) {
+        delete peerDimensionsWorker;
+        peerDimensionsWorker = nullptr;
         TELEPHONY_LOGE("work is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
@@ -2050,6 +2150,9 @@ int32_t NapiCallAbilityCallback::CallDataUsageChange(const int64_t dataUsage)
 #if defined(NAPI_VERSION) && NAPI_VERSION >= 2
     napi_get_uv_event_loop(callDataUsageCallback_.env, &loop);
 #endif
+    if (loop == nullptr) {
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     CallDataUsageWorker *callDataUsageWorker = std::make_unique<CallDataUsageWorker>().release();
     if (callDataUsageWorker == nullptr) {
         TELEPHONY_LOGE("callDataUsageWorker is nullptr!");
@@ -2059,6 +2162,8 @@ int32_t NapiCallAbilityCallback::CallDataUsageChange(const int64_t dataUsage)
     callDataUsageWorker->callback = callDataUsageCallback_;
     uv_work_t *work = std::make_unique<uv_work_t>().release();
     if (work == nullptr) {
+        delete callDataUsageWorker;
+        callDataUsageWorker = nullptr;
         TELEPHONY_LOGE("work is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
@@ -2131,6 +2236,9 @@ int32_t NapiCallAbilityCallback::UpdateCameraCapabilities(const CameraCapabiliti
 #if defined(NAPI_VERSION) && NAPI_VERSION >= 2
     napi_get_uv_event_loop(cameraCapabilitiesCallback_.env, &loop);
 #endif
+    if (loop == nullptr) {
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     CameraCapbilitiesWorker *cameraCapbilitiesWorker = std::make_unique<CameraCapbilitiesWorker>().release();
     if (cameraCapbilitiesWorker == nullptr) {
         TELEPHONY_LOGE("cameraCapbilitiesWorker is nullptr!");
@@ -2140,6 +2248,8 @@ int32_t NapiCallAbilityCallback::UpdateCameraCapabilities(const CameraCapabiliti
     cameraCapbilitiesWorker->callback = cameraCapabilitiesCallback_;
     uv_work_t *work = std::make_unique<uv_work_t>().release();
     if (work == nullptr) {
+        delete cameraCapbilitiesWorker;
+        cameraCapbilitiesWorker = nullptr;
         TELEPHONY_LOGE("work is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
