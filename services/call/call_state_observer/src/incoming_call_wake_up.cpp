@@ -80,7 +80,7 @@ void IncomingCallWakeup::WakeupDevice(sptr<CallBase> &callObjectPtr)
         TELEPHONY_LOGI("screenRunningLock_ locked");
     }
     // if call type is voip, set the screen on
-    if (callObjectPtr != nullptr && callObjectPtr->GetCallType() == CallType::TYPE_VOIP){
+    if (callObjectPtr != nullptr && callObjectPtr->GetCallType() == CallType::TYPE_VOIP) {
         PowerMgr::PowerMgrClient::GetInstance().WakeupDevice(
             PowerMgr::WakeupDeviceType::WAKEUP_DEVICE_APPLICATION, wakeupReason_);
     }

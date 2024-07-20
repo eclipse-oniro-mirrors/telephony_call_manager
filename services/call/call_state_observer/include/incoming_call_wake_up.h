@@ -40,7 +40,7 @@ private:
     std::mutex mutex_;
     const std::string wakeupReason_ = "incoming call";
     /**
-     * Wake up the device and only Voip callType set the screen on. 
+     * Wake up the device and only Voip callType set the screen on.
      */
     void WakeupDevice(sptr<CallBase> &callObjectPtr);
     bool IsPowerAbilityExist();
