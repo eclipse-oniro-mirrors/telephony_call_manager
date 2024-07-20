@@ -5897,7 +5897,6 @@ HWTEST_F(CallManagerGtest, Telephony_CallManagerService_003, Function | MediumTe
     AccessToken token;
     std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
     callManagerService->Init();
-    callManagerService->OnStart();
     callManagerService->RegisterCallBack(nullptr);
     callManagerService->UnRegisterCallBack();
     callManagerService->ObserverOnCallDetailsChange();
