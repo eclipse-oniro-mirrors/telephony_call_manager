@@ -69,6 +69,9 @@ public:
     bool IsVideoCall(int32_t videoState);
 
 private:
+    std::string GetCountryIso();
+    int32_t CopyFormatNumberToRecord(std::string &countryIso, CallRecordInfo &data);
+    int32_t CopyFormatNumberToE164ToRecord(std::string &countryIso, CallRecordInfo &data);
     std::shared_ptr<CallRecordsHandlerService> callRecordsHandlerServerPtr_;
     std::mutex mutex_;
     sptr<ISystemAbilityStatusChange> statusChangeListener_ = nullptr;

@@ -127,6 +127,22 @@ void CallRecordsManager::AddOneCallRecord(CallAttributeInfo &info)
         return;
     }
     CopyCallInfoToRecord(info, data);
+    std::string countryIso = GetCountryIso();
+    int32_t formatRet = CopyFormatNumberToRecord(countryIso, data);
+    if (formatRet != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("CopyFormatNumberToRecord failed!");
+        return;
+    }
+    int32_t formatToE164Ret = CopyFormatNumberToE164ToRecord(countryIso, data);
+    if (formatToE164Ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("CopyFormatNumberToE164ToRecord failed!");
+        return;
+    }
+    callRecordsHandlerServerPtr_->StoreCallRecord(data);
+}
+
+std::string CallRecordsManager::GetCountryIso()
+{
     char valueStr[PROP_SYSPARA_SIZE] = {0};
     GetParameter(PROP_NETWORK_COUNTRY_ISO, "", valueStr, PROP_SYSPARA_SIZE);
     std::string countryIso = valueStr;
@@ -136,6 +152,11 @@ void CallRecordsManager::AddOneCallRecord(CallAttributeInfo &info)
     } else {
         TELEPHONY_LOGI("GetParameter network countryIso is %{public}s", countryIso.c_str());
     }
+    return countryIso;
+}
+
+int32_t CallRecordsManager::CopyFormatNumberToRecord(std::string &countryIso, CallRecordInfo &data)
+{
     std::string tmpStr("");
     if (std::regex_search(std::string(data.phoneNumber), std::regex(FORMAT_PATTERN))) {
         (void)DelayedSingleton<CallNumberUtils>::GetInstance()->FormatPhoneNumberAsYouType(
@@ -147,24 +168,31 @@ void CallRecordsManager::AddOneCallRecord(CallAttributeInfo &info)
 
     if (tmpStr.length() > static_cast<size_t>(kMaxNumberLen)) {
         TELEPHONY_LOGE("Number out of limit!");
-        return;
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
-    if (memcpy_s(data.formattedNumber, kMaxNumberLen, tmpStr.c_str(), tmpStr.length()) != 0) {
+    errno_t result = memcpy_s(data.formattedNumber, kMaxNumberLen, tmpStr.c_str(), tmpStr.length());
+    if (result != EOK) {
         TELEPHONY_LOGE("memcpy_s failed!");
-        return;
+        return result;
     }
-    std::string tmpFormatStr("");
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallRecordsManager::CopyFormatNumberToE164ToRecord(std::string &countryIso, CallRecordInfo &data)
+{
+    std::string tmpStr("");
     (void)DelayedSingleton<CallNumberUtils>::GetInstance()->FormatPhoneNumberToE164(
-        std::string(data.phoneNumber), countryIso, tmpFormatStr);
-    if (tmpFormatStr.length() > static_cast<size_t>(kMaxNumberLen)) {
+        std::string(data.phoneNumber), countryIso, tmpStr);
+    if (tmpStr.length() > static_cast<size_t>(kMaxNumberLen)) {
         TELEPHONY_LOGE("Number out of limit!");
-        return;
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
-    if (memcpy_s(data.formattedNumberToE164, kMaxNumberLen, tmpFormatStr.c_str(), tmpFormatStr.length()) != 0) {
+    errno_t result = memcpy_s(data.formattedNumberToE164, kMaxNumberLen, tmpStr.c_str(), tmpStr.length());
+    if (result != EOK) {
         TELEPHONY_LOGE("memcpy_s failed!");
-        return;
+        return result;
     }
-    callRecordsHandlerServerPtr_->StoreCallRecord(data);
+    return TELEPHONY_SUCCESS;
 }
 
 void CallRecordsManager::CopyCallInfoToRecord(CallAttributeInfo &info, CallRecordInfo &data)
