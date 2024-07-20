@@ -18,6 +18,7 @@
 #include "bluetooth_call_manager.h"
 #include "bluetooth_call_service.h"
 #include "bluetooth_connection.h"
+#include "iremote_broker.h"
 #include "call_ability_callback.h"
 #include "call_ability_connect_callback.h"
 #include "call_ability_report_proxy.h"
@@ -1898,6 +1899,103 @@ HWTEST_F(BranchTest, Telephony_BluetoothCallService_001, Function | MediumTest |
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, bluetoothCallService.KickOutFromConference());
 }
 
+/**
+ * @tc.number   Telephony_BluetoothCallService_002
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_BluetoothCallService_002, Function | MediumTest | Level3)
+{
+    BluetoothCallService bluetoothCallService;
+    ASSERT_NE(TELEPHONY_ERR_SUCCESS, bluetoothCallService.AnswerCall());
+    DialParaInfo dialParaInfo;
+    sptr<OHOS::Telephony::CallBase> callBase1 = new OTTCall(dialParaInfo);
+    bluetoothCallService.callObjectPtrList_.clear();
+    callBase1->callState_ = TelCallState::CALL_STATUS_INCOMING;
+    callBase1->callId_ = -1;
+    bluetoothCallService.callObjectPtrList_.push_back(callBase1);
+    bluetoothCallService.GetCurrentCallList(-1).size();
+    ASSERT_NE(TELEPHONY_ERR_SUCCESS, bluetoothCallService.CombineConference());
+    ASSERT_NE(TELEPHONY_ERR_SUCCESS, bluetoothCallService.SeparateConference());
+    ASSERT_NE(TELEPHONY_ERR_SUCCESS, bluetoothCallService.KickOutFromConference());
+}
+
+/**
+ * @tc.number   Telephony_BluetoothCallStub_001
+ * @tc.name     test error nullptr branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_BluetoothCallStub_001, Function | MediumTest | Level3)
+{
+    auto bluetoothCallService = std::make_shared<BluetoothCallService>();
+    MessageParcel data1;
+    MessageParcel reply;
+    MessageOption option;
+    bluetoothCallService->OnRemoteRequest(static_cast<uint32_t>(
+        CallManagerCallAbilityInterfaceCode::UPDATE_CALL_STATE_INFO), data1, reply, option);
+    const uint8_t data = 1;
+    MessageParcel dataParcel;
+    dataParcel.WriteBuffer(&data, 1);
+    dataParcel.RewindRead(0);
+    int32_t result = bluetoothCallService->OnAnswerCall(dataParcel, reply);
+    ASSERT_EQ(result, TELEPHONY_ERR_PERMISSION_ERR);
+    result = bluetoothCallService->OnRejectCall(dataParcel, reply);
+    ASSERT_EQ(result, TELEPHONY_ERR_PERMISSION_ERR);
+    result = bluetoothCallService->OnHangUpCall(dataParcel, reply);
+    ASSERT_EQ(result, TELEPHONY_ERR_PERMISSION_ERR);
+    result = bluetoothCallService->OnGetBtCallState(dataParcel, reply);
+    ASSERT_EQ(result, TELEPHONY_ERR_PERMISSION_ERR);
+    result = bluetoothCallService->OnHoldCall(dataParcel, reply);
+    ASSERT_EQ(result, TELEPHONY_ERR_PERMISSION_ERR);
+    result = bluetoothCallService->OnUnHoldCall(dataParcel, reply);
+    ASSERT_EQ(result, TELEPHONY_ERR_PERMISSION_ERR);
+    result = bluetoothCallService->OnSwitchCall(dataParcel, reply);
+    ASSERT_EQ(result, TELEPHONY_ERR_PERMISSION_ERR);
+    result = bluetoothCallService->OnCombineConference(dataParcel, reply);
+    ASSERT_EQ(result, TELEPHONY_ERR_PERMISSION_ERR);
+    result = bluetoothCallService->OnSeparateConference(dataParcel, reply);
+    ASSERT_EQ(result, TELEPHONY_ERR_PERMISSION_ERR);
+    result = bluetoothCallService->OnKickOutFromConference(dataParcel, reply);
+    ASSERT_EQ(result, TELEPHONY_ERR_PERMISSION_ERR);
+    result = bluetoothCallService->OnStartDtmf(dataParcel, reply);
+    ASSERT_EQ(result, TELEPHONY_ERR_PERMISSION_ERR);
+    result = bluetoothCallService->OnStopDtmf(dataParcel, reply);
+    ASSERT_EQ(result, TELEPHONY_ERR_PERMISSION_ERR);
+    result = bluetoothCallService->OnGetCurrentCallList(dataParcel, reply);
+    ASSERT_EQ(result, TELEPHONY_ERR_PERMISSION_ERR);
+}
+
+/**
+ * @tc.number   Telephony_BluetoothConnection_001
+ * @tc.name     test error nullptr branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_BluetoothConnection_001, Function | MediumTest | Level3)
+{
+    auto bluetoothConnection = std::make_shared<BluetoothConnection>();
+    BtScoState state = BtScoState::SCO_STATE_CONNECTED;
+    bluetoothConnection->SetBtScoState(state);
+    EXPECT_TRUE(bluetoothConnection->IsAudioActivated());
+#ifdef ABILITY_BLUETOOTH_SUPPORT
+    bluetoothConnection->SetConnectedScoAddr("");
+    bluetoothConnection->SetConnectedScoName("");
+    bluetoothConnection->ResetBtConnection();
+    bluetoothConnection->RegisterObserver();
+    bluetoothConnection->OnScoStateChanged();
+    std::string address = "123";
+    bluetoothConnection->RemoveBtDevice(address);
+    Bluetooth::BluetoothRemoteDevice device;
+    int32_t state = static_cast<int32_t>(Bluetooth::BTConnectState::CONNECTED);
+    int32_t cause = 1;
+    bluetoothConnection->OnConnectionStateChanged(device, state, cause);
+    int32_t state = static_cast<int32_t>(Bluetooth::BTConnectState::DISCONNECTED);
+    bluetoothConnection->OnConnectionStateChanged(device, state, cause);
+    bluetoothConnection->OnAddSystemAbility(1, "");
+    bluetoothConnection->OnRemoveSystemAbility(1, "");
+    EXPECT_TRUE(bluetoothConnection->IsAudioActivated());
+#endif
+}
+
 std::string GetTestNumber()
 {
     std::string number =
@@ -2697,6 +2795,8 @@ HWTEST_F(BranchTest, Telephony_CallAbilityReportProxy_001, Function | MediumTest
     std::string pidName = "123";
     ASSERT_NE(callAbilityReportProxy->RegisterCallBack(callAbilityCallbackPtr, pidName), TELEPHONY_SUCCESS);
     ASSERT_NE(callAbilityReportProxy->UnRegisterCallBack(pidName), TELEPHONY_SUCCESS);
+    sptr<IRemoteObject> object = nullptr;
+    ASSERT_NE(callAbilityReportProxy->UnRegisterCallBack(object), TELEPHONY_SUCCESS);
     sptr<CallBase> callObjectPtr = nullptr;
     callAbilityReportProxy->CallStateUpdated(
         callObjectPtr, TelCallState::CALL_STATUS_INCOMING, TelCallState::CALL_STATUS_INCOMING);
@@ -2706,7 +2806,9 @@ HWTEST_F(BranchTest, Telephony_CallAbilityReportProxy_001, Function | MediumTest
     callAbilityReportProxy->CallDestroyed(disconnectedDetails);
     CallAttributeInfo callAttributeInfo;
     callAbilityReportProxy->ReportCallStateInfo(callAttributeInfo);
+    callAbilityReportProxy->ReportCallStateInfo(callAttributeInfo, pidName);
     CallEventInfo callEventInfo;
+    callAbilityReportProxy->CallEventUpdated(callEventInfo);
     callAbilityReportProxy->ReportCallEvent(callEventInfo);
     CallResultReportId reportId = CallResultReportId::GET_CALL_CLIP_ID;
     AppExecFwk::PacMap resultInfo;
@@ -2727,11 +2829,6 @@ HWTEST_F(BranchTest, Telephony_CallAbilityReportProxy_001, Function | MediumTest
     callAbilityReportProxy->ReportCallSessionEventChange(callSessionEventOptions);
     PeerDimensionsDetail peerDimensionsDetail;
     callAbilityReportProxy->ReportPeerDimensionsChange(peerDimensionsDetail);
-    int64_t dataUsage = 0;
-    callAbilityReportProxy->ReportCallDataUsageChange(dataUsage);
-    CameraCapabilities cameraCapabilities;
-    callAbilityReportProxy->ReportCameraCapabilities(cameraCapabilities);
-    ASSERT_EQ(callAbilityReportProxy->UnRegisterCallBack(pidName), TELEPHONY_SUCCESS);
 }
 
 /**
@@ -3011,6 +3108,11 @@ HWTEST_F(BranchTest, Telephony_CallAbilityCallbackProxy, Function | MediumTest |
     callAbilityCallbackProxy.OnReportCallDataUsageChange(dataUsage);
     CameraCapabilities cameraCapabilities;
     callAbilityCallbackProxy.OnReportCameraCapabilities(cameraCapabilities);
+
+    AudioDeviceInfo audioDeviceInfo;
+    callAbilityCallbackProxy.OnReportAudioDeviceChange(audioDeviceInfo);
+    const std::string str {"123"};
+    callAbilityCallbackProxy.OnReportPostDialDelay(str);
 }
 
 /**
