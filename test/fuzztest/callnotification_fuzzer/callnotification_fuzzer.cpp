@@ -74,7 +74,7 @@ void IncomingCallWakeupFunc(const uint8_t *data, size_t size)
     DisconnectedDetails details;
 
     notification->NewCallCreated(callObjectPtr);
-    notification->WakeupDevice();
+    notification->WakeupDevice(callObjectPtr);
     notification->IsPowerAbilityExist();
     notification->CallDestroyed(details);
     notification->IncomingCallActivated(callObjectPtr);
