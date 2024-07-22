@@ -40,7 +40,6 @@ const std::string DISTRIBUTED_AUDIO_DEV_CAR = "dCar";
 const std::string DISTRIBUTED_AUDIO_DEV_PHONE = "dPhone";
 const std::string DISTRIBUTED_AUDIO_DEV_PAD = "dPad";
 const std::string SWITCH_ON_DCALL_THREAD_NAME = "switch on dcall";
-const std::string REPORT_DCALL_INFO_THREAD_NAME = "report dcall info";
 
 const int32_t DISTRIBUTED_COMMUNICATION_CALL_SA_ID = 66198;
 
