@@ -427,6 +427,29 @@ HWTEST_F(CallStateTest, Telephony_AudioControlManager_003, Function | MediumTest
 }
 
 /**
+ * @tc.number   Telephony_AudioControlManager_004
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallStateTest, Telephony_AudioControlManager_004, Function | MediumTest | Level3)
+{
+    auto audioControl = DelayedSingleton<AudioControlManager>::GetInstance();
+    audioControl->isCrsVibrating_ = true;
+    audioControl->MuteNetWorkRingTone();
+    DisconnectedDetails details;
+    audioControl->CallDestroyed(details);
+    audioControl->toneState_ = ToneState::CALLENDED;
+    audioControl->StopCallTone();
+    audioControl->tone_ = nullptr;
+    audioControl->StopCallTone();
+    audioControl->GetAudioInterruptState();
+    audioControl->SetVolumeAudible();
+    audioControl->GetCurrentActiveCall();
+    audioControl->ringState_ = RingState::RINGING;
+    audioControl->MuteRinger();
+}
+
+/**
  * @tc.number   Telephony_AudioDeviceManager_001
  * @tc.name     test error branch
  * @tc.desc     Function test
@@ -455,6 +478,37 @@ HWTEST_F(CallStateTest, Telephony_AudioDeviceManager_001, Function | MediumTest 
     audioDeviceManager->SetDeviceAvailable(AudioDeviceType::DEVICE_DISTRIBUTED_PHONE, false);
     audioDeviceManager->SetDeviceAvailable(AudioDeviceType::DEVICE_UNKNOWN, false);
     ASSERT_FALSE(audioDeviceManager->IsWiredHeadsetDevEnable());
+}
+
+/**
+ * @tc.number   Telephony_AudioDeviceManager_002
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallStateTest, Telephony_AudioDeviceManager_002, Function | MediumTest | Level3)
+{
+    auto audioDeviceManager = DelayedSingleton<AudioDeviceManager>::GetInstance();
+    audioDeviceManager->AddAudioDeviceList(NAME, AudioDeviceType::DEVICE_SPEAKER, NAME);
+    audioDeviceManager->AddAudioDeviceList(NAME, AudioDeviceType::DEVICE_WIRED_HEADSET, NAME);
+    audioDeviceManager->AddAudioDeviceList(NAME, AudioDeviceType::DEVICE_BLUETOOTH_SCO, NAME);
+    audioDeviceManager->SwitchDevice(AudioDeviceType::DEVICE_EARPIECE);
+    audioDeviceManager->SwitchDevice(AudioDeviceType::DEVICE_SPEAKER);
+    audioDeviceManager->SwitchDevice(AudioDeviceType::DEVICE_WIRED_HEADSET);
+    audioDeviceManager->SwitchDevice(AudioDeviceType::DEVICE_BLUETOOTH_SCO);
+    audioDeviceManager->SwitchDevice(AudioDeviceType::DEVICE_DISABLE);
+    audioDeviceManager->SwitchDevice(AudioDeviceType::DEVICE_UNKNOWN);
+    audioDeviceManager->SwitchDevice(AudioDeviceType::DEVICE_DISTRIBUTED_AUTOMOTIVE);
+    audioDeviceManager->SwitchDevice(AudioDeviceType::DEVICE_DISTRIBUTED_PHONE);
+    audioDeviceManager->SwitchDevice(AudioDeviceType::DEVICE_DISTRIBUTED_PAD);
+    audioDeviceManager->isWiredHeadsetConnected_ = true;
+    audioDeviceManager->SetDeviceAvailable(AudioDeviceType::DEVICE_WIRED_HEADSET, true);
+    audioDeviceManager->EnableWiredHeadset();
+    audioDeviceManager->SetDeviceAvailable(AudioDeviceType::DEVICE_DISTRIBUTED_PAD, true);
+    audioDeviceManager->EnableDistributedCall();
+    audioDeviceManager->IsBtScoDevEnable();
+    audioDeviceManager->IsDCallDevEnable();
+    audioDeviceManager->IsSpeakerDevEnable();
+    audioDeviceManager->IsSpeakerAvailable();
 }
 
 /**
@@ -873,6 +927,35 @@ HWTEST_F(CallStateTest, Telephony_CallRequestProcess_003, Function | MediumTest 
     callRequestProcess->HasDialingCall();
     callRequestProcess->NeedAnswerVTAndEndActiveVO(defaultCallId, 0);
     callRequestProcess->NeedAnswerVOAndEndActiveVT(defaultCallId, 0);
+}
+
+/**
+ * @tc.number   Telephony_CallRequestProcess_004
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallStateTest, Telephony_CallRequestProcess_004, Function | MediumTest | Level3)
+{
+    int32_t defaultCallId = 1;
+    std::unique_ptr<CallRequestProcess> callRequestProcess = std::make_unique<CallRequestProcess>();
+    DialParaInfo mDialParaInfo;
+    mDialParaInfo.accountId = 0;
+    sptr<OHOS::Telephony::CallBase> call1 = new IMSCall(mDialParaInfo);
+    sptr<OHOS::Telephony::CallBase> call2 = new IMSCall(mDialParaInfo);
+    sptr<OHOS::Telephony::CallBase> call3 = new IMSCall(mDialParaInfo);
+    callRequestProcess->AddOneCallObject(call1);
+    callRequestProcess->AddOneCallObject(call2);
+    callRequestProcess->AddOneCallObject(call3);
+    sptr<OHOS::Telephony::CallBase> callBase = new IMSCall(mDialParaInfo);
+    callRequestProcess->AnswerRequestForDsda(callBase, 1, 0);
+    sptr<OHOS::Telephony::CallBase> callBase1 = new IMSCall(mDialParaInfo);
+    sptr<OHOS::Telephony::CallBase> incomingCall = new IMSCall(mDialParaInfo);
+    callRequestProcess->HandleDsdaIncomingCall(callBase1, 0, DEFAULT_SLOT_ID, 0, incomingCall);
+    sptr<OHOS::Telephony::CallBase> callBase2 = new IMSCall(mDialParaInfo);
+    callRequestProcess->HangUpForDsdaRequest(callBase2);
+    CellularCallInfo callInfo;
+    callRequestProcess->HandleStartDial(false, callInfo);
+    callRequestProcess->EccDialPolicy();
 }
 
 /**
