@@ -470,7 +470,6 @@ int32_t AudioControlManager::HandleDistributeAudioDevice(const AudioDevice &devi
     if (!DelayedSingleton<DistributedCallManager>::GetInstance()->IsDCallDeviceSwitchedOn()) {
         TELEPHONY_LOGI("set audio device, address: %{public}s", device.address);
         if (DelayedSingleton<DistributedCallManager>::GetInstance()->SwitchOnDCallDeviceSync(device)) {
-            DelayedSingleton<AudioDeviceManager>::GetInstance()->SetCurrentAudioDevice(device.deviceType);
             return TELEPHONY_SUCCESS;
         }
         return CALL_ERR_AUDIO_SET_AUDIO_DEVICE_FAILED;
