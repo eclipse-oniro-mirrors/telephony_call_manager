@@ -320,7 +320,7 @@ bool DistributedCallManager::SwitchOnDCallDeviceSync(const AudioDevice& device)
         DelayedSingleton<AudioDeviceManager>::GetInstance()->SetCurrentAudioDevice(device.deviceType);
         TELEPHONY_LOGI("switch dcall device succeed.");
 
-        std::thread reportThread(&DistributedCallManager::ReportDistributedDeviceInfo, this);
+        std::thread reportThread = std::thread([this]() { this->ReportDistributedDeviceInfo(); });
         pthread_setname_np(reportThread.native_handle(), REPORT_DCALL_INFO_THREAD_NAME.c_str());
         reportThread.detach();
         return true;
@@ -346,8 +346,6 @@ void DistributedCallManager::SwitchOnDCallDeviceAsync(const AudioDevice& device)
     std::thread switchThread = std::thread([this, &device]() { this->SwitchOnDCallDeviceSync(device); });
     pthread_setname_np(switchThread.native_handle(), SWITCH_ON_DCALL_THREAD_NAME.c_str());
     switchThread.detach();
-
-    ReportDistributedDeviceInfo();
 }
 
 void DistributedCallManager::SwitchOffDCallDeviceSync()
