@@ -77,7 +77,6 @@ private:
     std::string GetConnectedDCallDeviceId();
 
     void SetConnectedDCallDevice(const AudioDevice& device);
-    void SwitchOnDCallDevice(std::unique_ptr<AudioDevice> device);
 
     void InitDistributedCommunicationCall();
 

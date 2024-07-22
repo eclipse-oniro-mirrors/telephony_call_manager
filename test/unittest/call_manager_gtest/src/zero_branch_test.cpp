@@ -3048,13 +3048,6 @@ HWTEST_F(BranchTest, Telephony_DistributedCallManager_001, Function | MediumTest
     manager.ClearConnectedDCallDevice();
     manager.IsSelectVirtualModem();
     manager.SwitchOnDCallDeviceSync(device);
-    std::unique_ptr<AudioDevice> devicePtr = std::make_unique<AudioDevice>();
-    devicePtr->deviceType = AudioDeviceType::DEVICE_DISTRIBUTED_PHONE;
-    manager.IsSelectVirtualModem();
-    manager.SwitchOnDCallDevice(std::move(devicePtr));
-    std::unique_ptr<AudioDevice> deviceRarpiecePtr = std::make_unique<AudioDevice>();
-    deviceRarpiecePtr->deviceType = AudioDeviceType::DEVICE_EARPIECE;
-    manager.SwitchOnDCallDevice(std::move(deviceRarpiecePtr));
     manager.OnDCallSystemAbilityAdded(TEST_STR);
 }
 
