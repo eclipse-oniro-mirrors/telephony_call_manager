@@ -428,6 +428,7 @@ void AudioDeviceManager::SetCurrentAudioDevice(const AudioDevice &device)
 {
     audioDeviceType_ = deviceType;
     ReportAudioDeviceChange(device);
+    TELEPHONY_LOGI("set current audio device, audioDeviceType = %{public}d.", audioDeviceType_);
 }
   
 bool AudioDeviceManager::CheckAndSwitchDistributedAudioDevice()
