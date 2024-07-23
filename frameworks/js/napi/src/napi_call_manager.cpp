@@ -61,7 +61,6 @@ napi_value NapiCallManager::DeclareCallBasisInterface(napi_env env, napi_value e
     napi_property_descriptor desc[] = {
         DECLARE_NAPI_FUNCTION("dial", Dial),
         DECLARE_NAPI_FUNCTION("dialCall", DialCall),
-        DECLARE_NAPI_FUNCTION("makeCall", MakeCall),
         DECLARE_NAPI_FUNCTION("answer", AnswerCall),
         DECLARE_NAPI_FUNCTION("reject", RejectCall),
         DECLARE_NAPI_FUNCTION("hangup", HangUpCall),
@@ -1287,27 +1286,6 @@ napi_value NapiCallManager::DialCall(napi_env env, napi_callback_info info)
         napi_create_reference(env, argv[ARRAY_INDEX_THIRD], DATA_LENGTH_ONE, &(asyncContext->callbackRef));
     }
     return HandleAsyncWork(env, asyncContext.release(), "DialCall", NativeDialCall, NativeVoidCallBackWithErrorCode);
-}
-
-napi_value NapiCallManager::MakeCall(napi_env env, napi_callback_info info)
-{
-    GET_PARAMS(env, info, VALUE_MAXIMUM_LIMIT);
-    if (!MatchOneStringParameter(env, argv, argc)) {
-        TELEPHONY_LOGE("NapiCallManager::MakeCall MatchOneStringParameter failed.");
-        NapiUtil::ThrowParameterError(env);
-        return nullptr;
-    }
-    auto asyncContext = std::make_unique<AsyncContext>();
-    if (asyncContext == nullptr) {
-        NapiUtil::ThrowParameterError(env);
-        return nullptr;
-    }
-    napi_get_value_string_utf8(
-        env, argv[ARRAY_INDEX_FIRST], asyncContext->number, PHONE_NUMBER_MAXIMUM_LIMIT, &(asyncContext->numberLen));
-    if (argc == TWO_VALUE_LIMIT) {
-        napi_create_reference(env, argv[ARRAY_INDEX_SECOND], DATA_LENGTH_ONE, &(asyncContext->callbackRef));
-    }
-    return HandleAsyncWork(env, asyncContext.release(), "MakeCall", NativeMakeCall, NativeVoidCallBackWithErrorCode);
 }
 
 napi_value NapiCallManager::AnswerCall(napi_env env, napi_callback_info info)
@@ -4052,32 +4030,6 @@ void NapiCallManager::NativeDialCall(napi_env env, void *data)
     }
 }
 
-void NapiCallManager::NativeMakeCall(napi_env env, void *data)
-{
-    if (data == nullptr) {
-        TELEPHONY_LOGE("NapiCallManager::NativeMakeCall data is nullptr");
-        NapiUtil::ThrowParameterError(env);
-        return;
-    }
-    auto asyncContext = (AsyncContext *)data;
-    std::string phoneNumber(asyncContext->number, asyncContext->numberLen);
-    AAFwk::Want want;
-    AppExecFwk::ElementName element("", "com.ohos.contacts", "com.ohos.contacts.MainAbility");
-    want.SetElement(element);
-    AAFwk::WantParams wantParams;
-    wantParams.SetParam("phoneNumber", AAFwk::String::Box(phoneNumber));
-    wantParams.SetParam("pageFlag", AAFwk::String::Box("page_flag_edit_before_calling"));
-    wantParams.SetParam(AAFwk::Want::PARAM_BACK_TO_OTHER_MISSION_STACK, AAFwk::Boolean::Box(true));
-    want.SetParams(wantParams);
-    ErrCode err = AAFwk::AbilityManagerClient::GetInstance()->StartAbility(want);
-    if (err != ERR_OK) {
-        TELEPHONY_LOGE("Fail to make call, err:%{public}d", err);
-        asyncContext->errorCode = TELEPHONY_ERR_UNINIT;
-        return;
-    }
-    asyncContext->resolved = TELEPHONY_SUCCESS;
-}
-
 void NapiCallManager::NativeAnswerCall(napi_env env, void *data)
 {
     if (data == nullptr) {
@@ -5260,21 +5212,6 @@ napi_value NapiCallManager::HandleAsyncWork(napi_env env, AsyncContext *context,
     napi_create_async_work(env, resource, resourceName, execute, complete, (void *)context, &context->work);
     napi_queue_async_work_with_qos(env, context->work, napi_qos_default);
     return result;
-}
-
-static napi_module g_nativeCallManagerModule = {
-    .nm_version = NATIVE_VERSION,
-    .nm_flags = NATIVE_FLAGS,
-    .nm_filename = nullptr,
-    .nm_register_func = NapiCallManager::RegisterCallManagerFunc,
-    .nm_modname = "telephony.call",
-    .nm_priv = ((void *)0),
-    .reserved = {0},
-};
-
-extern "C" __attribute__((constructor)) void RegisterModule(void)
-{
-    napi_module_register(&g_nativeCallManagerModule);
 }
 } // namespace Telephony
 } // namespace OHOS

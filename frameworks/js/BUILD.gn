@@ -11,10 +11,48 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//arkcompiler/ets_frontend/es2panda/es2abc_config.gni")
 import("//build/ohos.gni")
 SUBSYSTEM_DIR = "../../.."
 config("call_manager_js_config") {
   include_dirs = [ "napi/include" ]
+}
+
+jspath = "napi/src/call.js"
+
+# compile .js to .abc.
+action("gen_call_abc") {
+  visibility = [ ":*" ]
+  script = "../../../../../arkcompiler/ets_frontend/es2panda/scripts/generate_js_bytecode.py"
+
+  args = [
+    "--src-js",
+    rebase_path(jspath),
+    "--dst-file",
+    rebase_path(target_out_dir + "/call.abc"),
+    "--frontend-tool-path",
+    rebase_path("${es2abc_build_path}"),
+    "--module",
+  ]
+  deps = [ "../../../../../arkcompiler/ets_frontend/es2panda:es2panda_build" ]
+  inputs = [ jspath ]
+  outputs = [ target_out_dir + "/call.abc" ]
+}
+
+base_output_path = get_label_info(":call_js", "target_out_dir")
+call_obj_path = base_output_path + "/call.o"
+gen_js_obj("call_js") {
+  input = jspath
+  output = call_obj_path
+  dep = ":gen_call_abc"
+}
+
+abc_output_path = get_label_info(":call_abc", "target_out_dir")
+call_abc_obj_path = abc_output_path + "/call_abc.o"
+gen_js_obj("call_abc") {
+  input = "$target_out_dir/call.abc"
+  output = call_abc_obj_path
+  dep = ":gen_call_abc"
 }
 
 ohos_shared_library("call") {
@@ -30,12 +68,16 @@ ohos_shared_library("call") {
     "napi/src/napi_call_manager.cpp",
     "napi/src/napi_call_manager_callback.cpp",
     "napi/src/napi_call_manager_utils.cpp",
+    "napi/src/native_module.cpp",
   ]
 
   public_configs = [ ":call_manager_js_config" ]
 
-  deps =
-      [ "$SUBSYSTEM_DIR/call_manager/frameworks/native:tel_call_manager_api" ]
+  deps = [
+    ":call_abc",
+    ":call_js",
+    "$SUBSYSTEM_DIR/call_manager/frameworks/native:tel_call_manager_api",
+  ]
 
   external_deps = [
     "ability_base:base",

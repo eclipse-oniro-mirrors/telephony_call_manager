@@ -18,7 +18,7 @@ const ARGUMENTS_LEN_TWO = 2;
 
 async function makeCallFunc(...args) {
     if ((arguments.length === ARGUMENTS_LEN_TWO && typeof arguments[1] != 'function') ||
-        （arguments.length >= ARGUMENTS_LEN_TWO) {
+        (arguments.length >= ARGUMENTS_LEN_TWO)) {
         console.log('[call] makeCall callback invalid');
         throw Error('invalid callback');
     }
@@ -112,7 +112,7 @@ export default {
     removeMissedIncomingCallNotification: call.removeMissedIncomingCallNotification,
     setVoIPCallState: call.setVoIPCallState,
     sendCallUiEvent: call.sendCallUiEvent,
-    DialOptions: call.DialOptions
+    DialOptions: call.DialOptions,
     DialCallOptions: call.DialCallOptions,
     ImsCallMode: call.ImsCallMode,
     VoNRState: call.VoNRState,
