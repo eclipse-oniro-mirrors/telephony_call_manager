@@ -250,6 +250,27 @@ void AudioControlManager::UpdateDeviceTypeForCrs()
     }
 }
 
+void AudioControlManager::UpdateDeviceTypeForVideoDialing()
+{
+    sptr<CallBase> dialingCall = CallObjectManager::GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_DIALING);
+    if (dialingCall == nullptr) {
+        return;
+    }
+    if (dialingCall->GetVideoStateType() == VideoStateType::TYPE_VIDEO) {
+        AudioDevice device = {
+            .deviceType = AudioDeviceType::DEVICE_SPEAKER,
+            .address = { 0 },
+        };
+        AudioDeviceType initDeviceType = GetInitAudioDeviceType();
+        if (initDeviceType == AudioDeviceType::DEVICE_WIRED_HEADSET ||
+            initDeviceType == AudioDeviceType::DEVICE_BLUETOOTH_SCO) {
+            device.deviceType = initDeviceType;
+        }
+        TELEPHONY_LOGI("dialing video call should be speaker");
+        SetAudioDevice(device);
+    }
+}
+
 void AudioControlManager::IncomingCallActivated(sptr<CallBase> &callObjectPtr) {}
 
 void AudioControlManager::IncomingCallHungUp(sptr<CallBase> &callObjectPtr, bool isSendSms, std::string content)
@@ -441,9 +462,15 @@ int32_t AudioControlManager::SetAudioDevice(const AudioDevice &device, bool isBy
         case AudioDeviceType::DEVICE_DISTRIBUTED_PAD:
             return HandleDistributeAudioDevice(device);
         case AudioDeviceType::DEVICE_BLUETOOTH_SCO: {
+            std::string address = device.address;
+            std::unique_ptr<AudioStandard::AudioDeviceDescriptor> activeBluetoothDevice =
+                AudioStandard::AudioRoutingManager::GetInstance()->GetActiveBluetoothDevice();
+            if (address.empty() && activeBluetoothDevice != nullptr && !activeBluetoothDevice->macAddress_.empty()) {
+                address = activeBluetoothDevice->macAddress_;
+            }
             AudioSystemManager* audioSystemManager = AudioSystemManager::GetInstance();
             int32_t ret = audioSystemManager->SetCallDeviceActive(ActiveDeviceType::BLUETOOTH_SCO,
-                true, device.address);
+                true, address);
             if (ret != 0) {
                 TELEPHONY_LOGE("SetCallDeviceActive failed");
                 return CALL_ERR_AUDIO_SET_AUDIO_DEVICE_FAILED;

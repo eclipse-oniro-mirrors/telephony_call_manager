@@ -46,11 +46,12 @@ public:
     void RemoveAudioDeviceList(const std::string &address, AudioDeviceType deviceType);
     void ResetBtAudioDevicesList();
     void ResetDistributedCallDevicesList();
-    int32_t ReportAudioDeviceChange();
+    int32_t ReportAudioDeviceChange(const AudioDevice &device);
+    bool CheckAndSwitchDistributedAudioDevice();
     int32_t ReportAudioDeviceInfo();
     int32_t ReportAudioDeviceInfo(sptr<CallBase> call);
     void SetCurrentAudioDevice(AudioDeviceType deviceType);
-    bool CheckAndSwitchDistributedAudioDevice();
+    void SetCurrentAudioDevice(const AudioDevice &device);
     void OnActivedCallDisconnected();
     void SetMuteState(bool isMuted);
     bool GetMuteState();

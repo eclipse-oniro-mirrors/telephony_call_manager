@@ -2001,14 +2001,10 @@ HWTEST_F(BranchTest, Telephony_BluetoothConnection_001, Function | MediumTest | 
 {
     auto bluetoothConnection = std::make_shared<BluetoothConnection>();
     BtScoState state = BtScoState::SCO_STATE_CONNECTED;
-    bluetoothConnection->SetBtScoState(state);
     EXPECT_TRUE(bluetoothConnection->IsAudioActivated());
 #ifdef ABILITY_BLUETOOTH_SUPPORT
-    bluetoothConnection->SetConnectedScoAddr("");
-    bluetoothConnection->SetConnectedScoName("");
     bluetoothConnection->ResetBtConnection();
     bluetoothConnection->RegisterObserver();
-    bluetoothConnection->OnScoStateChanged();
     std::string address = "123";
     bluetoothConnection->RemoveBtDevice(address);
     Bluetooth::BluetoothRemoteDevice device;
@@ -3094,11 +3090,7 @@ HWTEST_F(BranchTest, Telephony_BluetoothCallManager_001, Function | MediumTest |
     BluetoothCallManager bluetoothCallManager;
     bluetoothCallManager.SendBtCallState(numActive, numHeld, callState, number);
     bluetoothCallManager.SendCallDetailsChange(1, 1);
-    bluetoothCallManager.GetBtScoState();
     bluetoothCallManager.IsBtAvailble();
-    bluetoothCallManager.GetConnectedScoAddr();
-    bluetoothCallManager.GetConnectedScoName();
-    bluetoothCallManager.IsBtScoConnected();
 }
 
 /**
@@ -3827,6 +3819,7 @@ HWTEST_F(BranchTest, Telephony_CallStatusPolicy_001, Function | MediumTest | Lev
     callStatusPolicy.DialingHandlePolicy(info);
     callStatusPolicy.FilterResultsDispose(nullptr);
 }
+
 /**
  * @tc.number   Telephony_CallAbilityCallback_002
  * @tc.name     test error branch
@@ -3867,7 +3860,5 @@ HWTEST_F(BranchTest, Telephony_CallAbilityCallback_002, Function | MediumTest | 
     result = callAbilityCallback->OnUpdateCameraCapabilities(data, reply);
     ASSERT_EQ(result, TELEPHONY_SUCCESS);
 }
-
-
 } // namespace Telephony
 } // namespace OHOS

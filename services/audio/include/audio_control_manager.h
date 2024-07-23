@@ -80,6 +80,7 @@ public:
         VideoStateType nextVideoState, AudioDeviceType &initDeviceType, AudioDevice &device);
     void UpdateDeviceTypeForVideoOrSatelliteCall();
     void UpdateDeviceTypeForCrs();
+    void UpdateDeviceTypeForVideoDialing();
     void MuteNetWorkRingTone();
     bool IsVideoCall(VideoStateType videoState);
     bool IsSoundPlaying();
