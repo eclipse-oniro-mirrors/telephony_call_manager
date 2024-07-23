@@ -462,13 +462,11 @@ int32_t AudioControlManager::SetAudioDevice(const AudioDevice &device, bool isBy
         case AudioDeviceType::DEVICE_DISTRIBUTED_PAD:
             return HandleDistributeAudioDevice(device);
         case AudioDeviceType::DEVICE_BLUETOOTH_SCO: {
-            std::string address = "";
+            std::string address = device.address;
             std::unique_ptr<AudioStandard::AudioDeviceDescriptor> activeBluetoothDevice =
                 AudioStandard::AudioRoutingManager::GetInstance()->GetActiveBluetoothDevice();
-            if (activeBluetoothDevice != nullptr && !activeBluetoothDevice->macAddress_.empty()) {
+            if (address.empty() && activeBluetoothDevice != nullptr && !activeBluetoothDevice->macAddress_.empty()) {
                 address = activeBluetoothDevice->macAddress_;
-            } else {
-                address = device.address;
             }
             AudioSystemManager* audioSystemManager = AudioSystemManager::GetInstance();
             int32_t ret = audioSystemManager->SetCallDeviceActive(ActiveDeviceType::BLUETOOTH_SCO,

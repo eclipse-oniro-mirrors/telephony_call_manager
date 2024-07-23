@@ -417,14 +417,16 @@ void AudioDeviceManager::SetCurrentAudioDevice(AudioDeviceType deviceType)
             SetDeviceActive(AudioStandard::ActiveDeviceType::SPEAKER, true);
         return;
     }
+    AudioDevice device = {
+        .deviceType = deviceType,
+        .address = { 0 },
+    };
+    SetCurrentAudioDevice(device);
 }
 
 void AudioDeviceManager::SetCurrentAudioDevice(const AudioDevice &device)
 {
     audioDeviceType_ = deviceType;
-    AudioDevice device = {
-        .deviceType = deviceType,
-    };
     ReportAudioDeviceChange(device);
 }
   
