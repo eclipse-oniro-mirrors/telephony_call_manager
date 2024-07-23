@@ -668,6 +668,7 @@ int32_t AudioControlManager::MuteRinger()
             MuteNetWorkRingTone();
         }
     }
+    SendMuteRingEvent();
     if (ringState_ == RingState::STOPPED) {
         TELEPHONY_LOGI("ring already stopped");
         return TELEPHONY_SUCCESS;
@@ -680,7 +681,6 @@ int32_t AudioControlManager::MuteRinger()
         TELEPHONY_LOGE("SetMute fail");
         return CALL_ERR_AUDIO_SETTING_MUTE_FAILED;
     }
-    SendMuteRingEvent();
     TELEPHONY_LOGI("mute ring success");
     return TELEPHONY_SUCCESS;
 }
