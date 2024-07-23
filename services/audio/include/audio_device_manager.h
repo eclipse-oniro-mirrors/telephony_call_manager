@@ -50,7 +50,7 @@ public:
     bool CheckAndSwitchDistributedAudioDevice();
     int32_t ReportAudioDeviceInfo();
     int32_t ReportAudioDeviceInfo(sptr<CallBase> call);
-    void SetCurrentAudioDevice(AudioDeviceType deviceType); 
+    void SetCurrentAudioDevice(AudioDeviceType deviceType);
     void SetCurrentAudioDevice(const AudioDevice &device);
     void OnActivedCallDisconnected();
     void SetMuteState(bool isMuted);

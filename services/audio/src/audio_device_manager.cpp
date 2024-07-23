@@ -426,7 +426,7 @@ void AudioDeviceManager::SetCurrentAudioDevice(AudioDeviceType deviceType)
 
 void AudioDeviceManager::SetCurrentAudioDevice(const AudioDevice &device)
 {
-    audioDeviceType_ = deviceType;
+    audioDeviceType_ = device.deviceType;
     ReportAudioDeviceChange(device);
     TELEPHONY_LOGI("set current audio device, audioDeviceType = %{public}d.", audioDeviceType_);
 }
@@ -466,7 +466,7 @@ int32_t AudioDeviceManager::ReportAudioDeviceChange(const AudioDevice &device)
     std::string address = device.address;
     std::string deviceName = device.deviceName;
     if (audioDeviceType_ == AudioDeviceType::DEVICE_BLUETOOTH_SCO) {
-        if (address.empty()) {
+        if (address.empty() || deviceName.empty()) {
             std::unique_ptr<AudioStandard::AudioDeviceDescriptor> activeBluetoothDevice =
             AudioStandard::AudioRoutingManager::GetInstance()->GetActiveBluetoothDevice();
             if (activeBluetoothDevice != nullptr && !activeBluetoothDevice->macAddress_.empty()) {
