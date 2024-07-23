@@ -47,6 +47,7 @@ public:
     void ResetBtAudioDevicesList();
     void ResetDistributedCallDevicesList();
     int32_t ReportAudioDeviceChange(const AudioDevice &device);
+    bool CheckAndSwitchDistributedAudioDevice();
     int32_t ReportAudioDeviceInfo();
     int32_t ReportAudioDeviceInfo(sptr<CallBase> call);
     void SetCurrentAudioDevice(AudioDeviceType deviceType); 
