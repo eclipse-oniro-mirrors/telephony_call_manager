@@ -3411,6 +3411,335 @@ HWTEST_F(BranchTest, Telephony_CallStatusCallbackStub_002, Function | MediumTest
 }
 
 /**
+ * @tc.number   Telephony_CallStatusCallbackStub_003
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_CallStatusCallbackStub_003, Function | MediumTest | Level3)
+{
+    auto callStatusCallback = std::make_shared<CallStatusCallback>();
+    MessageParcel data;
+    MessageParcel reply;
+    int32_t accountId = 0;
+    int32_t defaultNumber = 0;
+    std::string defaultString = "";
+    std::vector<uint8_t> userProfile = {};
+    char accountNum[kMaxNumberLen + 1] = { 0 };
+    data.WriteInterfaceToken(CallStatusCallbackStub::GetDescriptor());
+    data.WriteInt32(0);
+    data.WriteCString(accountNum);
+    data.WriteInt32(accountId);
+    data.WriteInt32(static_cast<int32_t>(CallType::TYPE_VOIP));
+    data.WriteInt32(static_cast<int32_t>(VideoStateType::TYPE_VOICE));
+    data.WriteInt32(static_cast<int32_t>(TelCallState::CALL_STATUS_ACTIVE));
+    data.WriteInt32(defaultNumber);
+    data.WriteInt32(defaultNumber);
+    data.WriteInt32(defaultNumber);
+    data.WriteInt32(defaultNumber);
+    data.WriteString(defaultString);
+    data.WriteString(defaultString);
+    data.WriteString(defaultString);
+    data.WriteString(defaultString);
+    data.WriteString(defaultString);
+    data.WriteUInt8Vector(userProfile);
+    data.RewindRead(0);
+    callStatusCallback->OnUpdateCallReportInfo(data, reply);
+}
+
+/**
+ * @tc.number   Telephony_CallStatusCallbackStub_004
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_CallStatusCallbackStub_004, Function | MediumTest | Level3)
+{
+    auto callStatusCallback = std::make_shared<CallStatusCallback>();
+    MessageParcel data;
+    data.WriteInterfaceToken(CallStatusCallbackStub::GetDescriptor());
+    MessageParcel reply;
+    int32_t vecSize = 1;
+    int32_t accountId = 0;
+    int32_t defaultNumber = 0;
+    std::string defaultString = "";
+    std::vector<uint8_t> userProfile = {};
+    char accountNum[kMaxNumberLen + 1] = { 0 };
+    data.WriteInt32(vecSize);
+    data.WriteInt32(0);
+    data.WriteCString(accountNum);
+    data.WriteInt32(accountId);
+    data.WriteInt32(static_cast<int32_t>(CallType::TYPE_VOIP));
+    data.WriteInt32(static_cast<int32_t>(VideoStateType::TYPE_VOICE));
+    data.WriteInt32(static_cast<int32_t>(TelCallState::CALL_STATUS_ACTIVE));
+    data.WriteInt32(defaultNumber);
+    data.WriteInt32(defaultNumber);
+    data.WriteInt32(defaultNumber);
+    data.WriteInt32(defaultNumber);
+    data.WriteString(defaultString);
+    data.WriteString(defaultString);
+    data.WriteString(defaultString);
+    data.WriteString(defaultString);
+    data.WriteString(defaultString);
+    data.WriteUInt8Vector(userProfile);
+    data.WriteInt32(SIM1_SLOTID);
+    data.RewindRead(0);
+    callStatusCallback->OnUpdateCallsReportInfo(data, reply);
+
+    MessageParcel dataParcel;
+    dataParcel.WriteInterfaceToken(CallStatusCallbackStub::GetDescriptor());
+    CellularCallEventInfo info;
+    int32_t length = sizeof(CellularCallEventInfo);
+    info.eventType = CellularCallEventType::EVENT_REQUEST_RESULT_TYPE;
+    info.eventId = RequestResultEventId::INVALID_REQUEST_RESULT_EVENT_ID;
+    dataParcel.WriteInt32(length);
+    dataParcel.WriteRawData((const void *)&info, length);
+    dataParcel.RewindRead(0);
+    MessageParcel reply1;
+    callStatusCallback->OnUpdateEventReport(dataParcel, reply1);
+}
+
+/**
+ * @tc.number   Telephony_CallStatusCallbackStub_005
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_CallStatusCallbackStub_005, Function | MediumTest | Level3)
+{
+    auto callStatusCallback = std::make_shared<CallStatusCallback>();
+    MessageParcel data;
+    data.WriteInterfaceToken(CallStatusCallbackStub::GetDescriptor());
+    int32_t defaultNumber = 0;
+    MessageParcel reply;
+    CallWaitResponse callWaitResponse;
+    int32_t length = sizeof(CallWaitResponse);
+    data.WriteInt32(length);
+    callWaitResponse.result = defaultNumber;
+    callWaitResponse.status = defaultNumber;
+    callWaitResponse.classCw = defaultNumber;
+    data.WriteRawData((const void *)&callWaitResponse, length);
+    data.RewindRead(0);
+    callStatusCallback->OnUpdateGetWaitingResult(data, reply);
+    MessageParcel dataParcel;
+    dataParcel.WriteInterfaceToken(CallStatusCallbackStub::GetDescriptor());
+    CallRestrictionResponse callRestrictionResult;
+    length = sizeof(CallRestrictionResponse);
+    dataParcel.WriteInt32(length);
+    callRestrictionResult.result = 0;
+    callRestrictionResult.status = 0;
+    callRestrictionResult.classCw = 0;
+    dataParcel.WriteRawData((const void *)&callRestrictionResult, length);
+    dataParcel.RewindRead(0);
+    MessageParcel reply1;
+    callStatusCallback->OnUpdateGetRestrictionResult(dataParcel, reply1);
+    MessageParcel dataParcel2;
+    dataParcel2.WriteInterfaceToken(CallStatusCallbackStub::GetDescriptor());
+    CallTransferResponse callTransferResponse;
+    length = sizeof(CallTransferResponse);
+    dataParcel.WriteInt32(length);
+    callTransferResponse.result = defaultNumber;
+    callTransferResponse.status = defaultNumber;
+    callTransferResponse.classx = defaultNumber;
+    callTransferResponse.type = defaultNumber;
+    std::string msg("hello");
+    int32_t accountLength = msg.length() > kMaxNumberLen ? kMaxNumberLen : msg.length();
+    memcpy_s(callTransferResponse.number, kMaxNumberLen, msg.c_str(), accountLength);
+    callTransferResponse.reason = defaultNumber;
+    callTransferResponse.time = defaultNumber;
+    callTransferResponse.startHour = defaultNumber;
+    callTransferResponse.startMinute = defaultNumber;
+    callTransferResponse.endHour = defaultNumber;
+    callTransferResponse.endMinute = defaultNumber;
+    dataParcel2.WriteRawData((const void *)&callTransferResponse, length);
+    dataParcel2.RewindRead(0);
+    MessageParcel reply2;
+    callStatusCallback->OnUpdateGetTransferResult(dataParcel2, reply2);
+}
+
+/**
+ * @tc.number   Telephony_CallStatusCallbackStub_006
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_CallStatusCallbackStub_006, Function | MediumTest | Level3)
+{
+    auto callStatusCallback = std::make_shared<CallStatusCallback>();
+    MessageParcel dataParcel;
+    dataParcel.WriteInterfaceToken(CallStatusCallbackStub::GetDescriptor());
+    MessageParcel reply;
+    ClipResponse clipResponse;
+    int32_t length = sizeof(ClipResponse);
+    dataParcel.WriteInt32(length);
+    dataParcel.WriteRawData((const void *)&clipResponse, length);
+    dataParcel.RewindRead(0);
+    callStatusCallback->OnUpdateGetCallClipResult(dataParcel, reply);
+
+    MessageParcel dataParcel2;
+    dataParcel2.WriteInterfaceToken(CallStatusCallbackStub::GetDescriptor());
+    GetImsConfigResponse response;
+    length = sizeof(GetImsConfigResponse);
+    dataParcel2.WriteInt32(length);
+    dataParcel2.WriteRawData((const void *)&response, length);
+    dataParcel2.RewindRead(0);
+    MessageParcel reply2;
+    callStatusCallback->OnGetImsConfigResult(dataParcel2, reply2);
+
+    MessageParcel dataParcel3;
+    dataParcel3.WriteInterfaceToken(CallStatusCallbackStub::GetDescriptor());
+    GetImsFeatureValueResponse response1;
+    length = sizeof(GetImsFeatureValueResponse);
+    dataParcel3.WriteInt32(length);
+    dataParcel3.WriteRawData((const void *)&response1, length);
+    dataParcel3.RewindRead(0);
+    MessageParcel reply3;
+    callStatusCallback->OnGetImsFeatureValueResult(dataParcel3, reply3);
+
+    MessageParcel dataParcel4;
+    dataParcel4.WriteInterfaceToken(CallStatusCallbackStub::GetDescriptor());
+    MmiCodeInfo info;
+    length = sizeof(MmiCodeInfo);
+    dataParcel4.WriteInt32(length);
+    info.result = 0;
+    std::string msg("hello");
+    int32_t msgLength = msg.length() > kMaxNumberLen ? kMaxNumberLen : msg.length();
+    memcpy_s(info.message, kMaxNumberLen, msg.c_str(), msgLength);
+    dataParcel4.WriteRawData((const void *)&info, length);
+    dataParcel4.RewindRead(0);
+    callStatusCallback->OnSendMmiCodeResult(dataParcel4, reply);
+}
+
+/**
+ * @tc.number   Telephony_CallStatusCallbackStub_007
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_CallStatusCallbackStub_007, Function | MediumTest | Level3)
+{
+    auto callStatusCallback = std::make_shared<CallStatusCallback>();
+    MessageParcel dataParcel;
+    dataParcel.WriteInterfaceToken(CallStatusCallbackStub::GetDescriptor());
+    int32_t length = sizeof(CallModeReportInfo);
+    dataParcel.WriteInt32(length);
+    CallModeReportInfo callModeReportInfo;
+    dataParcel.WriteRawData((const void *)&callModeReportInfo, length);
+    dataParcel.RewindRead(0);
+    MessageParcel reply;
+    callStatusCallback->OnReceiveImsCallModeRequest(dataParcel, reply);
+
+    MessageParcel dataParcel2;
+    dataParcel2.WriteInterfaceToken(CallStatusCallbackStub::GetDescriptor());
+    length = sizeof(CallSessionReportInfo);
+    dataParcel2.WriteInt32(length);
+    CallSessionReportInfo callSessionReportInfo;
+    dataParcel2.WriteRawData((const void *)&callSessionReportInfo, length);
+    dataParcel2.RewindRead(0);
+    MessageParcel reply2;
+    callStatusCallback->OnCallSessionEventChange(dataParcel2, reply2);
+
+    MessageParcel dataParcel3;
+    dataParcel3.WriteInterfaceToken(CallStatusCallbackStub::GetDescriptor());
+    length = sizeof(PeerDimensionsReportInfo);
+    dataParcel3.WriteInt32(length);
+    PeerDimensionsReportInfo dimensionsReportInfo;
+    dataParcel3.WriteRawData((const void *)&dimensionsReportInfo, length);
+    dataParcel3.RewindRead(0);
+    MessageParcel reply3;
+    callStatusCallback->OnPeerDimensionsChange(dataParcel3, reply3);
+
+    MessageParcel dataParcel4;
+    dataParcel4.WriteInterfaceToken(CallStatusCallbackStub::GetDescriptor());
+    int64_t reportInfo = static_cast<int64_t>(10);
+    dataParcel4.WriteInt64(reportInfo);
+    dataParcel4.RewindRead(0);
+    MessageParcel reply4;
+    callStatusCallback->OnCallDataUsageChange(dataParcel4, reply4);
+
+    MessageParcel dataParcel5;
+    dataParcel5.WriteInterfaceToken(CallStatusCallbackStub::GetDescriptor());
+    length = sizeof(CameraCapabilitiesReportInfo);
+    dataParcel5.WriteInt32(length);
+    CameraCapabilitiesReportInfo cameraCapabilitiesReportInfo;
+    dataParcel5.WriteRawData((const void *)&cameraCapabilitiesReportInfo, length);
+    dataParcel5.RewindRead(0);
+    MessageParcel reply5;
+    callStatusCallback->OnCameraCapabilitiesChange(dataParcel5, reply5);
+}
+
+/**
+ * @tc.number   Telephony_CallStatusCallbackStub_008
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_CallStatusCallbackStub_008, Function | MediumTest | Level3)
+{
+    auto callStatusCallback = std::make_shared<CallStatusCallback>();
+    MessageParcel dataParcel;
+    dataParcel.WriteInterfaceToken(CallStatusCallbackStub::GetDescriptor());
+    dataParcel.WriteInt32(0);
+    dataParcel.WriteString("hello");
+    MessageParcel reply;
+    callStatusCallback->OnUpdateDisconnectedCause(dataParcel, reply);
+    MessageParcel dataParcel2;
+    dataParcel2.WriteInterfaceToken(CallStatusCallbackStub::GetDescriptor());
+    dataParcel2.WriteInt32(0);
+    callStatusCallback->OnUpdateRBTPlayInfo(dataParcel2, reply);
+    callStatusCallback->OnUpdateSetWaitingResult(dataParcel2, reply);
+    callStatusCallback->OnUpdateSetRestrictionResult(dataParcel2, reply);
+    callStatusCallback->OnUpdateSetRestrictionPasswordResult(dataParcel2, reply);
+    callStatusCallback->OnUpdateSetTransferResult(dataParcel2, reply);
+    callStatusCallback->OnUpdateSetCallClirResult(dataParcel2, reply);
+    callStatusCallback->OnStartRttResult(dataParcel2, reply);
+    callStatusCallback->OnStopRttResult(dataParcel2, reply);
+    callStatusCallback->OnSetImsConfigResult(dataParcel2, reply);
+    callStatusCallback->OnSetImsFeatureValueResult(dataParcel2, reply);
+    callStatusCallback->OnInviteToConferenceResult(dataParcel2, reply);
+    callStatusCallback->OnStartDtmfResult(dataParcel2, reply);
+    callStatusCallback->OnStopDtmfResult(dataParcel2, reply);
+    callStatusCallback->OnSendUssdResult(dataParcel2, reply);
+    callStatusCallback->OnGetImsCallDataResult(dataParcel2, reply);
+    callStatusCallback->OnCloseUnFinishedUssdResult(dataParcel2, reply);
+}
+
+/**
+ * @tc.number   Telephony_CallStatusCallbackStub_009
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(BranchTest, Telephony_CallStatusCallbackStub_009, Function | MediumTest | Level3)
+{
+    auto callStatusCallback = std::make_shared<CallStatusCallback>();
+    MessageParcel dataParce3;
+    dataParce3.WriteInterfaceToken(CallStatusCallbackStub::GetDescriptor());
+    int32_t length = sizeof(ClirResponse);
+    dataParce3.WriteInt32(length);
+    ClirResponse clirResponse;
+    dataParce3.WriteRawData((const void *)&clirResponse, length);
+    dataParce3.RewindRead(0);
+    MessageParcel reply;
+    callStatusCallback->OnUpdateGetCallClirResult(dataParce3, reply);
+
+    MessageParcel dataParce4;
+    dataParce4.WriteInterfaceToken(CallStatusCallbackStub::GetDescriptor());
+    length = sizeof(CallModeReportInfo);
+    dataParce4.WriteInt32(length);
+    CallModeReportInfo callModeReportInfo;
+    dataParce4.WriteRawData((const void *)&callModeReportInfo, length);
+    dataParce4.RewindRead(0);
+    callStatusCallback->OnReceiveImsCallModeResponse(dataParce4, reply);
+    MessageParcel dataParce5;
+    dataParce5.WriteInterfaceToken(CallStatusCallbackStub::GetDescriptor());
+    dataParce5.WriteString("a");
+    callStatusCallback->OnPostDialNextChar(dataParce5, reply);
+    callStatusCallback->OnReportPostDialDelay(dataParce5, reply);
+
+    MessageParcel dataParce6;
+    dataParce6.WriteInterfaceToken(CallStatusCallbackStub::GetDescriptor());
+    dataParce6.WriteString("123");
+    dataParce6.WriteString("abc");
+    dataParce6.WriteInt32(0);
+    dataParce6.WriteInt32(0);
+    callStatusCallback->OnUpdateVoipEventInfo(dataParce6, reply);
+}
+
+/**
  * @tc.number   Telephony_SatelliteCallControl_001
  * @tc.name     test error branch
  * @tc.desc     Function test
