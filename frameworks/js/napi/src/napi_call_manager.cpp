@@ -3994,7 +3994,7 @@ void NapiCallManager::NativeDial(napi_env env, void *data)
         return;
     }
     auto asyncContext = (DialAsyncContext *)data;
-    if (!IsValidSlotId(asyncContext->accountId)) {
+    if (!IsValidSlotId(asyncContext->accountId) && asyncContext->accountId != -1) {
         TELEPHONY_LOGE("NativeDial slotId is invalid");
         asyncContext->errorCode = SLOT_ID_INVALID;
         return;
