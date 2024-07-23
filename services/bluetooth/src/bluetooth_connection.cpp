@@ -76,10 +76,6 @@ void BluetoothConnection::Init()
         std::string macAddress = device.GetDeviceAddr();
         std::string deviceName = device.GetDeviceName();
         AddBtDevice(macAddress, device);
-        if (profile->GetScoState(device) == (int32_t)Bluetooth::HfpScoConnectState::SCO_CONNECTED) {
-            SetConnectedScoAddr(macAddress);
-            SetConnectedScoName(deviceName);
-        }
         DelayedSingleton<AudioDeviceManager>::GetInstance()->AddAudioDeviceList(macAddress,
             AudioDeviceType::DEVICE_BLUETOOTH_SCO, deviceName);
     }
@@ -100,16 +96,6 @@ bool BluetoothConnection::IsBtAvailble()
     return true;
 }
 #endif
-
-bool BluetoothConnection::IsBtScoConnected()
-{
-    return btScoState_.load() == BtScoState::SCO_STATE_CONNECTED;
-}
-
-void BluetoothConnection::SetBtScoState(BtScoState state)
-{
-    btScoState_.store(state);
-}
 
 int32_t BluetoothConnection::SendBtCallState(
     int32_t numActive, int32_t numHeld, int32_t callState, const std::string &number)
@@ -144,48 +130,15 @@ int32_t BluetoothConnection::SendCallDetailsChange(int32_t callId, int32_t callS
     return TELEPHONY_SUCCESS;
 }
 
-BtScoState BluetoothConnection::GetBtScoState()
-{
-    BtScoState btScoState = btScoState_.load();
-    TELEPHONY_LOGI("current bluetooth sco state : %{public}d", btScoState);
-    return btScoState;
-}
-
 bool BluetoothConnection::IsAudioActivated()
 {
     return DelayedSingleton<AudioControlManager>::GetInstance()->IsAudioActivated();
 }
 
-std::string BluetoothConnection::GetConnectedScoAddr()
-{
-    std::lock_guard<std::mutex> lock(scoAddrMutex_);
-    return connectedScoAddr_;
-}
-
-std::string BluetoothConnection::GetConnectedScoName()
-{
-    std::lock_guard<std::mutex> lock(scoNameMutex_);
-    return connectedScoName_;
-}
-
 #ifdef ABILITY_BLUETOOTH_SUPPORT
-void BluetoothConnection::SetConnectedScoAddr(std::string connectedScoAddr)
-{
-    std::lock_guard<std::mutex> lock(scoAddrMutex_);
-    connectedScoAddr_ = connectedScoAddr;
-}
-
-void BluetoothConnection::SetConnectedScoName(std::string connectedScoName)
-{
-    std::lock_guard<std::mutex> lock(scoNameMutex_);
-    connectedScoName_ = connectedScoName;
-}
 
 void BluetoothConnection::ResetBtConnection()
 {
-    SetConnectedScoAddr("");
-    SetConnectedScoName("");
-    btScoState_.store(BtScoState::SCO_STATE_DISCONNECTED);
     std::lock_guard<std::mutex> lock(bluetoothMutex_);
     mapConnectedBtDevices_.clear();
 }
@@ -199,28 +152,6 @@ void BluetoothConnection::RegisterObserver()
     }
 
     profile->RegisterObserver(shared_from_this());
-}
-
-void BluetoothConnection::OnScoStateChanged(
-    const Bluetooth::BluetoothRemoteDevice &device, int32_t state, int32_t reason)
-{
-    TELEPHONY_LOGI("BluetoothConnection::OnScoStateChanged state : %{public}d", state);
-    switch (state) {
-        case (int32_t)Bluetooth::HfpScoConnectState::SCO_CONNECTED:
-            SetConnectedScoAddr(device.GetDeviceAddr());
-            SetConnectedScoName(device.GetDeviceName());
-            btScoState_.store(BtScoState::SCO_STATE_CONNECTED);
-            break;
-        case (int32_t)Bluetooth::HfpScoConnectState::SCO_DISCONNECTED:
-            if (device.GetDeviceAddr() == GetConnectedScoAddr()) {
-                SetConnectedScoAddr("");
-                SetConnectedScoName("");
-                btScoState_.store(BtScoState::SCO_STATE_DISCONNECTED);
-            }
-            break;
-        default:
-            break;
-    }
 }
 
 void BluetoothConnection::AddBtDevice(const std::string &address, Bluetooth::BluetoothRemoteDevice device)

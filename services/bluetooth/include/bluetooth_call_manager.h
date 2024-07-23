@@ -30,13 +30,7 @@ public:
     ~BluetoothCallManager();
     int32_t SendBtCallState(int32_t numActive, int32_t numHeld, int32_t callState, const std::string &number);
     int32_t SendCallDetailsChange(int32_t callId, int32_t callState);
-    BtScoState GetBtScoState();
     bool IsBtAvailble();
-    std::string GetConnectedScoAddr();
-    std::string GetConnectedScoName();
-
-private:
-    bool IsBtScoConnected();
 
 private:
     std::shared_ptr<BluetoothConnection> btConnection_;

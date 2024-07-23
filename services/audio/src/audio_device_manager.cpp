@@ -417,10 +417,17 @@ void AudioDeviceManager::SetCurrentAudioDevice(AudioDeviceType deviceType)
             SetDeviceActive(AudioStandard::ActiveDeviceType::SPEAKER, true);
         return;
     }
-    audioDeviceType_ = deviceType;
-    ReportAudioDeviceChange();
 }
 
+void AudioDeviceManager::SetCurrentAudioDevice(const AudioDevice &device)
+{
+    audioDeviceType_ = deviceType;
+    AudioDevice device = {
+        .deviceType = deviceType,
+    };
+    ReportAudioDeviceChange(device);
+}
+  
 bool AudioDeviceManager::CheckAndSwitchDistributedAudioDevice()
 {
     TELEPHONY_LOGI("check and switch distributed audio device.");
@@ -445,7 +452,7 @@ void AudioDeviceManager::OnActivedCallDisconnected()
     DelayedSingleton<DistributedCallManager>::GetInstance()->DealDisconnectCall();
 }
 
-int32_t AudioDeviceManager::ReportAudioDeviceChange()
+int32_t AudioDeviceManager::ReportAudioDeviceChange(const AudioDevice &device)
 {
     if (audioDeviceType_ == AudioDeviceType::DEVICE_UNKNOWN) {
         audioDeviceType_ = DelayedSingleton<AudioControlManager>::GetInstance()->GetInitAudioDeviceType();
@@ -453,12 +460,17 @@ int32_t AudioDeviceManager::ReportAudioDeviceChange()
     } else {
         info_.currentAudioDevice.deviceType = audioDeviceType_;
     }
-    std::string address = "";
-    std::string deviceName = "";
+    std::string address = device.address;
+    std::string deviceName = device.deviceName;
     if (audioDeviceType_ == AudioDeviceType::DEVICE_BLUETOOTH_SCO) {
-        std::shared_ptr<BluetoothCallManager> bluetoothCallManager = std::make_shared<BluetoothCallManager>();
-        address = bluetoothCallManager->GetConnectedScoAddr();
-        deviceName = bluetoothCallManager->GetConnectedScoName();
+        if (address.empty()) {
+            std::unique_ptr<AudioStandard::AudioDeviceDescriptor> activeBluetoothDevice =
+            AudioStandard::AudioRoutingManager::GetInstance()->GetActiveBluetoothDevice();
+            if (activeBluetoothDevice != nullptr && !activeBluetoothDevice->macAddress_.empty()) {
+                address = activeBluetoothDevice->macAddress_;
+                deviceName = activeBluetoothDevice->deviceName_;
+            }
+        }
     } else if (IsDistributedAudioDeviceType(audioDeviceType_)) {
         address = DelayedSingleton<DistributedCallManager>::GetInstance()->GetConnectedDCallDeviceAddr();
     }

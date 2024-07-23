@@ -47,24 +47,6 @@ int32_t BluetoothCallManager::SendCallDetailsChange(int32_t callId, int32_t call
     return btConnection_->SendCallDetailsChange(callId, callState);
 }
 
-BtScoState BluetoothCallManager::GetBtScoState()
-{
-    if (btConnection_ == nullptr) {
-        TELEPHONY_LOGE("bluetooth connection nullptr");
-        return BtScoState::SCO_STATE_UNKNOWN;
-    }
-    return btConnection_->GetBtScoState();
-}
-
-bool BluetoothCallManager::IsBtScoConnected()
-{
-    if (btConnection_ == nullptr) {
-        TELEPHONY_LOGE("bluetooth connection nullptr");
-        return false;
-    }
-    return btConnection_->IsBtScoConnected();
-}
-
 bool BluetoothCallManager::IsBtAvailble()
 {
     if (btConnection_ == nullptr) {
@@ -77,16 +59,6 @@ bool BluetoothCallManager::IsBtAvailble()
     isBtAvailble = btConnection_->IsBtAvailble();
 #endif
     return isBtAvailble;
-}
-
-std::string BluetoothCallManager::GetConnectedScoAddr()
-{
-    return btConnection_->GetConnectedScoAddr();
-}
-
-std::string BluetoothCallManager::GetConnectedScoName()
-{
-    return btConnection_->GetConnectedScoName();
 }
 } // namespace Telephony
 } // namespace OHOS

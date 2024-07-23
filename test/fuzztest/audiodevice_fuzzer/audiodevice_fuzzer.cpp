@@ -106,7 +106,6 @@ void AudioDeviceManagerFunc(const uint8_t *data, size_t size)
     audioDeviceManager->IsEarpieceDevEnable();
     audioDeviceManager->IsWiredHeadsetDevEnable();
     audioDeviceManager->GetCurrentAudioDevice();
-    audioDeviceManager->SetCurrentAudioDevice(deviceType);
     audioDeviceManager->IsEarpieceAvailable();
     audioDeviceManager->IsSpeakerAvailable();
     audioDeviceManager->IsBtScoConnected();

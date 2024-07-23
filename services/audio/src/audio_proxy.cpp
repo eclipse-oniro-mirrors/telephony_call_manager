@@ -385,16 +385,18 @@ void AudioPreferDeviceChangeCallback::OnPreferredOutputDeviceUpdated(
     switch (desc[0]->deviceType_) {
         case AudioStandard::DEVICE_TYPE_BLUETOOTH_SCO:
             device.deviceType = AudioDeviceType::DEVICE_BLUETOOTH_SCO;
-            if (memset_s(&device.address, kMaxAddressLen + 1, 0, kMaxAddressLen + 1) != EOK) {
-                TELEPHONY_LOGE("memset_s address fail");
+            if (memset_s(&device.address, kMaxAddressLen + 1, 0, kMaxAddressLen + 1) != EOK ||
+                memset_s(&device.address, kMaxAddressLen + 1, 0, kMaxAddressLen + 1) != EOK) {                TELEPHONY_LOGE("memset_s address fail");
                 return;
             }
             if (memcpy_s(device.address, kMaxAddressLen, desc[0]->macAddress_.c_str(),
-                desc[0]->macAddress_.length()) != EOK) {
+                desc[0]->macAddress_.length()) != EOK ||
+                memcpy_s(device.deviceName, kMaxAddressLen, desc[0]->deviceName_.c_str(),
+                desc[0]->deviceName_.length()) != EOK) {
                 TELEPHONY_LOGE("memcpy_s address fail");
                 return;
             }
-            DelayedSingleton<AudioDeviceManager>::GetInstance()->SetCurrentAudioDevice(device.deviceType);
+            DelayedSingleton<AudioDeviceManager>::GetInstance()->SetCurrentAudioDevice(device);
             break;
         case AudioStandard::DEVICE_TYPE_EARPIECE:
             device.deviceType = AudioDeviceType::DEVICE_EARPIECE;

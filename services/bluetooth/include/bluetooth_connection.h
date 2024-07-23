@@ -48,20 +48,14 @@ class BluetoothConnection {
     DECLARE_DELAYED_SINGLETON(BluetoothConnection)
 public:
     void Init();
-    bool IsBtScoConnected();
-    BtScoState GetBtScoState();
-    void SetBtScoState(BtScoState state);
     int32_t SendBtCallState(int32_t numActive, int32_t numHeld, int32_t callState, const std::string &number);
     int32_t SendCallDetailsChange(int32_t callId, int32_t callState);
     void RemoveBtDevice(const std::string &address);
     bool IsBtAvailble();
-    std::string GetConnectedScoAddr();
-    std::string GetConnectedScoName();
     void ResetBtConnection();
     void RegisterObserver();
 
 #ifdef ABILITY_BLUETOOTH_SUPPORT
-    void OnScoStateChanged(const Bluetooth::BluetoothRemoteDevice &device, int32_t state, int32_t reason) override;
     void OnConnectionStateChanged(const Bluetooth::BluetoothRemoteDevice &device,
         int32_t state, int32_t cause) override;
     Bluetooth::BluetoothRemoteDevice *GetBtDevice(const std::string &address);
@@ -77,9 +71,6 @@ private:
     std::string connectedScoName_;
 
 #ifdef ABILITY_BLUETOOTH_SUPPORT
-    void SetConnectedScoAddr(std::string connectedScoAddr);
-    void SetConnectedScoName(std::string connectedScoName);
-
 private:
     sptr<ISystemAbilityStatusChange> statusChangeListener_ = nullptr;
     std::mutex bluetoothMutex_;
