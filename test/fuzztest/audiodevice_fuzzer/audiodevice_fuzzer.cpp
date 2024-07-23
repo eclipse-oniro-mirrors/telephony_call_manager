@@ -110,6 +110,7 @@ void AudioDeviceManagerFunc(const uint8_t *data, size_t size)
     audioDeviceManager->IsSpeakerAvailable();
     audioDeviceManager->IsBtScoConnected();
     audioDeviceManager->IsWiredHeadsetConnected();
+    audioDeviceManager->SetCurrentAudioDevice(deviceType);
 }
 
 void AudioProxyFunc(const uint8_t *data, size_t size)
