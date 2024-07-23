@@ -1398,7 +1398,11 @@ int32_t CallManagerService::ReportAudioDeviceInfo()
         TELEPHONY_LOGE("Permission denied!");
         return TELEPHONY_ERR_PERMISSION_ERR;
     }
-    return DelayedSingleton<AudioDeviceManager>::GetInstance()->ReportAudioDeviceChange();
+    AudioDevice device = {
+        .deviceType = AudioDeviceType::DEVICE_UNKNOWN,
+        .address = { 0 },
+    };
+    return DelayedSingleton<AudioDeviceManager>::GetInstance()->ReportAudioDeviceChange(device);
 }
 
 int32_t CallManagerService::CancelCallUpgrade(int32_t callId)
