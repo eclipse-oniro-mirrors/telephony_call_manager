@@ -24,6 +24,9 @@ namespace OHOS {
 namespace Telephony {
 bool AudioPlayer::InitRenderer(const wav_hdr &wavHeader, AudioStandard::AudioStreamType streamType)
 {
+    if (isRenderInitialized_) {
+        return true;
+    }
     AudioStandard::AudioRendererParams rendererParams;
     rendererParams.sampleFormat = AudioStandard::AudioSampleFormat::SAMPLE_S16LE;
     rendererParams.sampleRate = static_cast<AudioStandard::AudioSamplingRate>(wavHeader.SamplesPerSec);
@@ -63,6 +66,9 @@ bool AudioPlayer::InitRenderer(const wav_hdr &wavHeader, AudioStandard::AudioStr
 
 bool AudioPlayer::InitRenderer()
 {
+    if (isRenderInitialized_) {
+        return true;
+    }
     AudioStandard::AudioRendererOptions rendererOptions;
     rendererOptions.streamInfo.samplingRate = AudioStandard::AudioSamplingRate::SAMPLE_RATE_96000;
     rendererOptions.streamInfo.encoding = AudioStandard::AudioEncodingType::ENCODING_PCM;
@@ -91,6 +97,9 @@ bool AudioPlayer::InitRenderer()
 
 bool AudioPlayer::InitCapturer()
 {
+    if (isCapturerInitialized_) {
+        return true;
+    }
     AudioStandard::AudioCapturerOptions capturerOptions;
     capturerOptions.streamInfo.samplingRate = AudioStandard::AudioSamplingRate::SAMPLE_RATE_96000;
     capturerOptions.streamInfo.encoding = AudioStandard::AudioEncodingType::ENCODING_PCM;

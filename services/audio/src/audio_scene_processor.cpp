@@ -72,7 +72,13 @@ void AudioSceneProcessor::ProcessEventInner(AudioEvent event)
         case AudioEvent::SWITCH_HOLDING_STATE:
         case AudioEvent::SWITCH_AUDIO_INACTIVE_STATE:
             if (DelayedSingleton<CallStateProcessor>::GetInstance()->ShouldStopSoundtone()) {
-                DelayedSingleton<AudioControlManager>::GetInstance()->StopSoundtone();
+                bool hasRingingCall = false;
+                CallObjectManager::HasRingingCall(hasRingingCall);
+                if (hasRingingCall) {
+                    DelayedSingleton<AudioControlManager>::GetInstance()->StopSoundtone();
+                } else {
+                    DelayedSingleton<AudioControlManager>::GetInstance()->StopSoundtoneAndReleaseRender();
+                }
             }
             SwitchState(event);
             break;
