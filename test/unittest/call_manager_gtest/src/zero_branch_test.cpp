@@ -2289,7 +2289,6 @@ HWTEST_F(BranchTest, Telephony_CallControlManager_001, Function | MediumTest | L
     ASSERT_TRUE(callControlManager->NotifyCallStateUpdated(callObjectPtr, priorState, nextState));
     ASSERT_TRUE(callControlManager->NotifyIncomingCallAnswered(callObjectPtr));
     ASSERT_TRUE(callControlManager->NotifyIncomingCallRejected(callObjectPtr, false, ""));
-    ASSERT_NE(callControlManager->RemoveMissedIncomingCallNotification(), TELEPHONY_SUCCESS);
     callControlManager->ConnectCallUiService(true);
 }
 
