@@ -35,6 +35,7 @@ bool CallObjectManager::isFirstDialCallAdded_ = false;
 bool CallObjectManager::needWaitHold_ = false;
 CellularCallInfo CallObjectManager::dialCallInfo_;
 constexpr int32_t CRS_TYPE = 2;
+constexpr uint64_t DISCONNECT_DELAY_TIME = 2000000;
 
 CallObjectManager::CallObjectManager()
 {
@@ -84,6 +85,22 @@ int32_t CallObjectManager::AddOneCallObject(sptr<CallBase> &call)
     return TELEPHONY_SUCCESS;
 }
 
+void CallObjectManager::DelayedDisconnectCallConnectAbility()
+{
+    ffrt::submit_h(
+        []() {
+            std::lock_guard<std::mutex> lock(listMutex_);
+            TELEPHONY_LOGI("delayed disconnect callback begin");
+            auto controlManager = DelayedSingleton<CallControlManager>::GetInstance();
+            if (callObjectPtrList_.size() == NO_CALL_EXIST && controlManager->ShouldDisconnectService()) {
+                auto callConnectAbility = DelayedSingleton<CallConnectAbility>::GetInstance();
+                callConnectAbility->DisconnectAbility();
+                TELEPHONY_LOGI("delayed disconnect done");
+            }
+        },
+        {}, {}, ffrt::task_attr().delay(DISCONNECT_DELAY_TIME));
+}
+
 int32_t CallObjectManager::DeleteOneCallObject(int32_t callId)
 {
     std::unique_lock<std::mutex> lock(listMutex_);
@@ -98,7 +115,7 @@ int32_t CallObjectManager::DeleteOneCallObject(int32_t callId)
     if (callObjectPtrList_.size() == NO_CALL_EXIST
         && DelayedSingleton<CallControlManager>::GetInstance()->ShouldDisconnectService()) {
         lock.unlock();
-        DelayedSingleton<CallConnectAbility>::GetInstance()->DisconnectAbility();
+        DelayedDisconnectCallConnectAbility();
     }
     return TELEPHONY_SUCCESS;
 }
@@ -114,7 +131,7 @@ void CallObjectManager::DeleteOneCallObject(sptr<CallBase> &call)
     if (callObjectPtrList_.size() == 0
         && DelayedSingleton<CallControlManager>::GetInstance()->ShouldDisconnectService()) {
         lock.unlock();
-        DelayedSingleton<CallConnectAbility>::GetInstance()->DisconnectAbility();
+        DelayedDisconnectCallConnectAbility();
     }
     TELEPHONY_LOGI("DeleteOneCallObject success! callList size:%{public}zu", callObjectPtrList_.size());
 }
