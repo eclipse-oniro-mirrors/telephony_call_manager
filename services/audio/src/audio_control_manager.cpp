@@ -403,11 +403,6 @@ void AudioControlManager::ProcessAudioWhenCallActive(sptr<CallBase> &callObjectP
 
 void AudioControlManager::HandleNewActiveCall(sptr<CallBase> &callObjectPtr)
 {
-    std::string number = callObjectPtr->GetAccountNumber();
-    if (number.empty()) {
-        TELEPHONY_LOGE("call object account number empty");
-        return;
-    }
     CallType callType = callObjectPtr->GetCallType();
     AudioEvent event = AudioEvent::UNKNOWN_EVENT;
     switch (callType) {
