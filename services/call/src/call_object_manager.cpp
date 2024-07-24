@@ -20,8 +20,6 @@
 #include "call_manager_errors.h"
 #include "call_number_utils.h"
 #include "conference_base.h"
-#include "cpp/task_ext.h"
-#include "ffrt.h"
 #include "ims_conference.h"
 #include "report_call_info_handler.h"
 #include "telephony_log_wrapper.h"
@@ -91,10 +89,13 @@ void CallObjectManager::DelayedDisconnectCallConnectAbility()
 {
     ffrt::submit_h(
         []() {
+            std::lock_guard<std::mutex> lock(listMutex_);
+            TELEPHONY_LOGI("delayed disconnect callback begin");
             auto controlManager = DelayedSingleton<CallControlManager>::GetInstance();
-            auto callConnectAbility = DelayedSingleton<CallConnectAbility>::GetInstance();
             if (callObjectPtrList_.size() == NO_CALL_EXIST && controlManager->ShouldDisconnectService()) {
+                auto callConnectAbility = DelayedSingleton<CallConnectAbility>::GetInstance();
                 callConnectAbility->DisconnectAbility();
+                TELEPHONY_LOGI("delayed disconnect done");
             }
         },
         {}, {}, ffrt::task_attr().delay(DISCONNECT_DELAY_TIME));
