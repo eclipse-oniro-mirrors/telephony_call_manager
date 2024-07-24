@@ -214,15 +214,19 @@ void AudioDeviceManager::ResetBtAudioDevicesList()
 {
     std::lock_guard<std::mutex> lock(infoMutex_);
     std::vector<AudioDevice>::iterator it = info_.audioDeviceList.begin();
+    bool hadBtActived = false;
     while (it != info_.audioDeviceList.end()) {
         if (it->deviceType == AudioDeviceType::DEVICE_BLUETOOTH_SCO) {
+            hadBtActived = true;
             it = info_.audioDeviceList.erase(it);
         } else {
             ++it;
         }
     }
     SetDeviceAvailable(AudioDeviceType::DEVICE_BLUETOOTH_SCO, false);
-    ReportAudioDeviceInfo();
+    if (hadBtActived) {
+        ReportAudioDeviceInfo();
+    }
     TELEPHONY_LOGI("ResetBtAudioDevicesList success");
 }
 
