@@ -73,7 +73,7 @@ NapiCallAbilityCallback::NapiCallAbilityCallback()
 
 NapiCallAbilityCallback::~NapiCallAbilityCallback()
 {
-    TELEPHONY_LOGD("~NapiCallAbilityCallback");
+    TELEPHONY_LOGI("~NapiCallAbilityCallback");
 }
 
 void NapiCallAbilityCallback::RegisterCallStateCallback(EventCallback stateCallback)
