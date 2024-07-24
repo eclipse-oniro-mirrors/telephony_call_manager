@@ -432,13 +432,8 @@ int32_t AudioProxy::SetAudioMicStateChangeCallback()
         TELEPHONY_LOGE("audioMicStateChangeCallback_ is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    std::shared_ptr<AudioStandard::AudioGroupManager> audioGroupManager =
-        AudioStandard::AudioSystemManager::GetInstance()->GetGroupManager(AudioStandard::DEFAULT_VOLUME_GROUP_ID);
-    if (audioGroupManager == nullptr) {
-        TELEPHONY_LOGE("SetAudioMicStateChangeCallback fail, audioGroupManager is nullptr");
-        return false;
-    }
-    int32_t ret = AudioStandard::AudioRoutingManager::GetInstance()->SetMicStateChangeCallback(audioMicStateChangeCallback_);
+    int32_t ret = AudioStandard::AudioRoutingManager::GetInstance()->SetMicStateChangeCallback(
+        audioMicStateChangeCallback_);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("SetPreferredOutputDeviceChangeCallback fail");
         return CALL_ERR_AUDIO_OPERATE_FAILED;
@@ -452,13 +447,8 @@ int32_t AudioProxy::UnsetAudioMicStateChangeCallback()
         TELEPHONY_LOGE("audioMicStateChangeCallback_ is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    std::shared_ptr<AudioStandard::AudioGroupManager> audioGroupManager =
-        AudioStandard::AudioSystemManager::GetInstance()->GetGroupManager(AudioStandard::DEFAULT_VOLUME_GROUP_ID);
-    if (audioGroupManager == nullptr) {
-        TELEPHONY_LOGE("UnsetAudioMicStateChangeCallback fail, audioGroupManager is nullptr");
-        return false;
-    }
-    int32_t ret = AudioStandard::AudioRoutingManager::GetInstance()->UnsetMicStateChangeCallback(audioMicStateChangeCallback_);
+    int32_t ret = AudioStandard::AudioRoutingManager::GetInstance()->UnsetMicStateChangeCallback(
+        audioMicStateChangeCallback_);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("UnsetAudioMicStateChangeCallback fail");
         return CALL_ERR_AUDIO_OPERATE_FAILED;
@@ -473,7 +463,7 @@ void AudioMicStateChangeCallback::OnMicStateUpdated(
         AudioStandard::AudioSystemManager::GetInstance()->GetGroupManager(AudioStandard::DEFAULT_VOLUME_GROUP_ID);
     if (audioGroupManager == nullptr) {
         TELEPHONY_LOGE("OnMicStateUpdated fail, audioGroupManager is nullptr");
-        return false;
+        return;
     }
     DelayedSingleton<CallControlManager>::GetInstance()->SetMuted(audioGroupManager->IsMicrophoneMute());
 }
