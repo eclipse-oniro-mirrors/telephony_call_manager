@@ -20,6 +20,7 @@
 #endif
 
 #include "telephony_log_wrapper.h"
+#include "call_control_manager.h"
 #include "bluetooth_call_manager.h"
 #include "audio_control_manager.h"
 #include "audio_group_manager.h"
@@ -48,7 +49,8 @@ const int32_t RENDERER_FLAG = 0;
 
 AudioProxy::AudioProxy()
     : deviceCallback_(std::make_shared<AudioDeviceChangeCallback>()),
-      preferredDeviceCallback_(std::make_shared<AudioPreferDeviceChangeCallback>())
+      preferredDeviceCallback_(std::make_shared<AudioPreferDeviceChangeCallback>()),
+      audioMicStateChangeCallback_(std::make_shared<AudioMicStateChangeCallback>())
 {}
 
 AudioProxy::~AudioProxy() {}
@@ -234,7 +236,7 @@ bool AudioProxy::SetMicrophoneMute(bool mute)
         return false;
     }
     int32_t muteResult = audioGroupManager->SetMicrophoneMute(mute);
-    TELEPHONY_LOGI("set microphone mute result : %{public}d", muteResult);
+    TELEPHONY_LOGI("set microphone mute result : %{public}d, %{public}d ", muteResult, mute);
     return (muteResult == TELEPHONY_SUCCESS);
 }
 
@@ -423,5 +425,58 @@ void AudioPreferDeviceChangeCallback::OnPreferredOutputDeviceUpdated(
         DelayedSingleton<AudioControlManager>::GetInstance()->UpdateDeviceTypeForCrs();
     }
 }
+
+int32_t AudioProxy::SetAudioMicStateChangeCallback()
+{
+    if (audioMicStateChangeCallback_ == nullptr) {
+        TELEPHONY_LOGE("audioMicStateChangeCallback_ is nullptr");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    std::shared_ptr<AudioStandard::AudioGroupManager> audioGroupManager =
+        AudioStandard::AudioSystemManager::GetInstance()->GetGroupManager(AudioStandard::DEFAULT_VOLUME_GROUP_ID);
+    if (audioGroupManager == nullptr) {
+        TELEPHONY_LOGE("SetAudioMicStateChangeCallback fail, audioGroupManager is nullptr");
+        return false;
+    }
+    int32_t ret = AudioStandard::AudioRoutingManager::GetInstance()->SetMicStateChangeCallback(audioMicStateChangeCallback_);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("SetPreferredOutputDeviceChangeCallback fail");
+        return CALL_ERR_AUDIO_OPERATE_FAILED;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t AudioProxy::UnsetAudioMicStateChangeCallback()
+{
+    if (audioMicStateChangeCallback_ == nullptr) {
+        TELEPHONY_LOGE("audioMicStateChangeCallback_ is nullptr");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    std::shared_ptr<AudioStandard::AudioGroupManager> audioGroupManager =
+        AudioStandard::AudioSystemManager::GetInstance()->GetGroupManager(AudioStandard::DEFAULT_VOLUME_GROUP_ID);
+    if (audioGroupManager == nullptr) {
+        TELEPHONY_LOGE("UnsetAudioMicStateChangeCallback fail, audioGroupManager is nullptr");
+        return false;
+    }
+    int32_t ret = AudioStandard::AudioRoutingManager::GetInstance()->UnsetMicStateChangeCallback(audioMicStateChangeCallback_);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("UnsetAudioMicStateChangeCallback fail");
+        return CALL_ERR_AUDIO_OPERATE_FAILED;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+void AudioMicStateChangeCallback::OnMicStateUpdated(
+    const AudioStandard::MicStateChangeEvent &micStateChangeEvent)
+{
+    std::shared_ptr<AudioStandard::AudioGroupManager> audioGroupManager =
+        AudioStandard::AudioSystemManager::GetInstance()->GetGroupManager(AudioStandard::DEFAULT_VOLUME_GROUP_ID);
+    if (audioGroupManager == nullptr) {
+        TELEPHONY_LOGE("OnMicStateUpdated fail, audioGroupManager is nullptr");
+        return false;
+    }
+    DelayedSingleton<CallControlManager>::GetInstance()->SetMuted(audioGroupManager->IsMicrophoneMute());
+}
+
 } // namespace Telephony
 } // namespace OHOS

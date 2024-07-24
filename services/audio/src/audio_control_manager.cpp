@@ -45,6 +45,7 @@ AudioControlManager::~AudioControlManager()
 {
     DelayedSingleton<AudioProxy>::GetInstance()->UnsetDeviceChangeCallback();
     DelayedSingleton<AudioProxy>::GetInstance()->UnsetAudioPreferDeviceChangeCallback();
+    DelayedSingleton<AudioProxy>::GetInstance()->UnsetAudioMicStateChangeCallback();
 }
 
 void AudioControlManager::Init()
@@ -53,6 +54,7 @@ void AudioControlManager::Init()
     DelayedSingleton<AudioSceneProcessor>::GetInstance()->Init();
     DelayedSingleton<AudioProxy>::GetInstance()->SetAudioDeviceChangeCallback();
     DelayedSingleton<AudioProxy>::GetInstance()->SetAudioPreferDeviceChangeCallback();
+    DelayedSingleton<AudioProxy>::GetInstance()->SetAudioMicStateChangeCallback();
 }
 
 void AudioControlManager::UpdateForegroundLiveCall()
@@ -681,8 +683,9 @@ int32_t AudioControlManager::SetMute(bool isMute)
         TELEPHONY_LOGE("frontCall_ is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    frontCall_->SetMicPhoneState(isMute);
-    TELEPHONY_LOGI("SetMute success callId:%{public}d, mute:%{public}d", frontCall_->GetCallID(), isMute);
+    bool muted = DelayedSingleton<AudioProxy>::GetInstance()->IsMicrophoneMute();
+    frontCall_->SetMicPhoneState(muted);
+    TELEPHONY_LOGI("SetMute success callId:%{public}d, mute:%{public}d", frontCall_->GetCallID(), muted);
     return TELEPHONY_SUCCESS;
 }
 
