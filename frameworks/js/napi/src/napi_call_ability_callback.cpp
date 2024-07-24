@@ -71,7 +71,10 @@ NapiCallAbilityCallback::NapiCallAbilityCallback()
         [this](AppExecFwk::PacMap &resultInfo) { return ReportCloseUnFinishedUssdInfo(resultInfo); };
 }
 
-NapiCallAbilityCallback::~NapiCallAbilityCallback() {}
+NapiCallAbilityCallback::~NapiCallAbilityCallback()
+{
+    TELEPHONY_LOGD("~NapiCallAbilityCallback");
+}
 
 void NapiCallAbilityCallback::RegisterCallStateCallback(EventCallback stateCallback)
 {
