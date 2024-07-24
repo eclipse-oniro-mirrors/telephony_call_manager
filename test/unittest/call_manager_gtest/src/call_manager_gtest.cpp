@@ -6137,6 +6137,273 @@ HWTEST_F(CallManagerGtest, Telephony_CallManagerServiceStub_004, Function | Medi
 }
 
 /**
+ * @tc.number   Telephony_CallManagerServiceStub_005
+ * @tc.name     test error nullptr branch with permission
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManagerServiceStub_005, Function | MediumTest | Level3)
+{
+    std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
+    MessageParcel data;
+    MessageParcel reply;
+    int32_t callId = 0;
+    data.WriteInt32(callId);
+    data.RewindRead(0);
+    callManagerService->OnHangUpCall(data, reply);
+    callManagerService->OnGetCallState(data, reply);
+    callManagerService->OnHoldCall(data, reply);
+    callManagerService->OnUnHoldCall(data, reply);
+    callManagerService->OnSwitchCall(data, reply);
+    callManagerService->OnHasCall(data, reply);
+    callManagerService->OnIsNewCallAllowed(data, reply);
+    callManagerService->OnMuteRinger(data, reply);
+    callManagerService->OnIsRinging(data, reply);
+    callManagerService->OnIsInEmergencyCall(data, reply);
+    callManagerService->OnStopDtmf(data, reply);
+    callManagerService->OnGetCallWaiting(data, reply);
+    callManagerService->OnCombineConference(data, reply);
+    callManagerService->OnSeparateConference(data, reply);
+    callManagerService->OnKickOutFromConference(data, reply);
+    callManagerService->OnGetMainCallId(data, reply);
+    callManagerService->OnGetSubCallIdList(data, reply);
+    callManagerService->OnGetCallIdListForConference(data, reply);
+    callManagerService->OnEnableVoLte(data, reply);
+    callManagerService->OnDisableVoLte(data, reply);
+    callManagerService->OnIsVoLteEnabled(data, reply);
+    callManagerService->OnGetVoNRState(data, reply);
+    callManagerService->OnStopRtt(data, reply);
+    callManagerService->OnCloseUnFinishedUssd(data, reply);
+    callManagerService->OnInputDialerSpecialCode(data, reply);
+    callManagerService->OnRemoveMissedIncomingCallNotification(data, reply);
+    callManagerService->OnSetVoIPCallState(data, reply);
+    callManagerService->OnGetVoIPCallState(data, reply);
+    callManagerService->OnReportAudioDeviceInfo(data, reply);
+    callManagerService->OnCancelCallUpgrade(data, reply);
+    callManagerService->OnRequestCameraCapabilities(data, reply);
+    callManagerService->OnSetAudioDevice(data, reply);
+    callManagerService->OnRegisterVoipCallManagerCallback(data, reply);
+    callManagerService->OnUnRegisterVoipCallManagerCallback(data, reply);
+    callManagerService->OnGetProxyObjectPtr(data, reply);
+}
+
+/**
+ * @tc.number   Telephony_CallManagerServiceStub_006
+ * @tc.name     test error nullptr branch with permission
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManagerServiceStub_006, Function | MediumTest | Level3)
+{
+    std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
+    MessageParcel data;
+    MessageParcel reply;
+    int32_t callId = 0;
+    int32_t videoState = 1;
+    data.WriteInt32(callId);
+    data.WriteInt32(videoState);
+    data.RewindRead(0);
+    callManagerService->OnAcceptCall(data, reply);
+    callManagerService->OnGetCallRestriction(data, reply);
+    callManagerService->OnGetTransferNumber(data, reply);
+    callManagerService->OnSetCallPreferenceMode(data, reply);
+    callManagerService->OnSetDeviceDirection(data, reply);
+    callManagerService->OnGetImsConfig(data, reply);
+    callManagerService->OnGetImsFeatureValue(data, reply);
+    callManagerService->OnSetVoNRState(data, reply);
+
+    MessageParcel data1;
+    MessageParcel reply1;
+    std::string message("hello");
+    data1.WriteInt32(callId);
+    data1.WriteBool(false);
+    data1.WriteString16(Str8ToStr16(message));
+    data1.RewindRead(0);
+    callManagerService->OnRejectCall(data1, reply1);
+
+    MessageParcel data2;
+    MessageParcel reply2;
+    data2.WriteBool(false);
+    data2.RewindRead(0);
+    callManagerService->OnSetMute(data2, reply2);
+
+    MessageParcel data3;
+    data3.WriteInt32(callId);
+    data3.WriteInt8('c');
+    data3.RewindRead(0);
+    callManagerService->OnStartDtmf(data3, reply);
+
+    MessageParcel data4;
+    data4.WriteInt32(callId);
+    data4.WriteBool(false);
+    data4.RewindRead(0);
+    callManagerService->OnPostDialProceed(data4, reply);
+    callManagerService->OnSetCallWaiting(data4, reply);
+
+    MessageParcel data5;
+    data5.WriteInt32(callId);
+    std::vector<std::u16string> numberList;
+    data5.WriteString16Vector(numberList);
+    data5.RewindRead(0);
+    callManagerService->OnJoinConference(data5, reply);
+}
+
+/**
+ * @tc.number   Telephony_CallManagerServiceStub_007
+ * @tc.name     test error nullptr branch with permission
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManagerServiceStub_007, Function | MediumTest | Level3)
+{
+    std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
+    MessageParcel data;
+    MessageParcel reply;
+    int32_t callId = 0;
+    data.WriteInterfaceToken(CallManagerServiceStub::GetDescriptor());
+    data.WriteInt32(callId);
+    CallRestrictionInfo callRestrictionInfo;
+    int length = sizeof(CallRestrictionInfo);
+    data.WriteRawData((const void *)&callRestrictionInfo, length);
+    data.RewindRead(0);
+    callManagerService->OnSetCallRestriction(data, reply);
+
+    MessageParcel data1;
+    char accountNum[kMaxNumberLen + 1] = { 0 };
+    data1.WriteInterfaceToken(CallManagerServiceStub::GetDescriptor());
+    data1.WriteInt32(callId);
+    data1.WriteInt32(0);
+    data1.WriteCString(accountNum);
+    data1.WriteCString(accountNum);
+    data1.RewindRead(0);
+    callManagerService->OnSetCallRestrictionPassword(data1, reply);
+
+    MessageParcel data2;
+    data2.WriteInterfaceToken(CallManagerServiceStub::GetDescriptor());
+    data2.WriteInt32(callId);
+    CallTransferInfo callTransferInfo;
+    length = sizeof(CallTransferInfo);
+    data2.WriteRawData((const void *)&callRestrictionInfo, length);
+    data2.RewindRead(0);
+    callManagerService->OnSetTransferNumber(data2, reply);
+
+    MessageParcel data3;
+    data3.WriteInterfaceToken(CallManagerServiceStub::GetDescriptor());
+    data3.WriteInt32(callId);
+    data3.WriteBool(true);
+    data3.RewindRead(0);
+    callManagerService->OnCanSetCallTransferTime(data3, reply);
+    
+    MessageParcel data4;
+    std::string message("hello");
+    data4.WriteInt32(callId);
+    data4.WriteString16(Str8ToStr16(message));
+    data4.RewindRead(0);
+    callManagerService->OnControlCamera(data4, reply);
+    callManagerService->OnSetPausePicture(data4, reply);
+    callManagerService->OnStartRtt(data4, reply);
+
+    MessageParcel data5;
+    float fnum = 0.0;
+    data5.WriteFloat(fnum);
+    data5.RewindRead(0);
+    callManagerService->OnSetCameraZoom(data5, reply);
+}
+
+/**
+ * @tc.number   Telephony_CallManagerServiceStub_008
+ * @tc.name     test error nullptr branch with permission
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManagerServiceStub_008, Function | MediumTest | Level3)
+{
+    std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
+    MessageParcel data6;
+    MessageParcel reply;
+    int32_t callId = 0;
+    std::string message("12345678");
+    data6.WriteString16(Str8ToStr16(message));
+    data6.WriteInt32(callId);
+    data6.RewindRead(0);
+    callManagerService->OnIsEmergencyPhoneNumber(data6, reply);
+
+    MessageParcel data7;
+    std::string callNumber("12345678");
+    std::string countryCode("101");
+    data7.WriteString16(Str8ToStr16(callNumber));
+    data7.WriteString16(Str8ToStr16(countryCode));
+    data7.RewindRead(0);
+    callManagerService->OnFormatPhoneNumber(data7, reply);
+    callManagerService->OnFormatPhoneNumberToE164(data7, reply);
+
+    MessageParcel data8;
+    data8.WriteInt32(callId);
+    data8.WriteInt32(0);
+    data8.WriteString16(Str8ToStr16(message));
+    data8.RewindRead(0);
+    callManagerService->OnSetImsConfig(data8, reply);
+
+    MessageParcel data9;
+    data9.WriteInt32(callId);
+    data9.WriteInt32(0);
+    data9.WriteInt32(0);
+    data9.RewindRead(0);
+    callManagerService->OnSetImsFeatureValue(data9, reply);
+
+    MessageParcel data11;
+    data11.WriteInterfaceToken(CallManagerServiceStub::GetDescriptor());
+    data11.WriteInt32(callId);
+    ImsCallMode imsCallMode;
+    int length = sizeof(ImsCallMode);
+    data11.WriteRawData((const void *)&imsCallMode, length);
+    data11.RewindRead(0);
+    callManagerService->OnUpdateCallMediaMode(data11, reply);
+}
+
+/**
+ * @tc.number   Telephony_CallManagerServiceStub_009
+ * @tc.name     test error nullptr branch with permission
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManagerServiceStub_009, Function | MediumTest | Level3)
+{
+    std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
+    MessageParcel data;
+    MessageParcel reply;
+    std::string message("12345678");
+    std::string bundleName("abc");
+    int32_t defaultNumber = 0;
+    data.WriteString16(Str8ToStr16(message));
+    data.WriteInt32(defaultNumber);
+    data.WriteInt32(defaultNumber);
+    data.WriteInt32(defaultNumber);
+    data.WriteInt32(defaultNumber);
+    data.WriteInt32(defaultNumber);
+    data.WriteString(bundleName);
+    callManagerService->OnDialCall(data, reply);
+
+    MessageParcel data12;
+    data12.WriteInterfaceToken(CallManagerServiceStub::GetDescriptor());
+    OttCallDetailsInfo ottCallDetailsInfo;
+    int length = sizeof(OttCallDetailsInfo);
+    data12.WriteInt32(length);
+    data12.WriteRawData((const void *)&ottCallDetailsInfo, length);
+    data12.RewindRead(0);
+    callManagerService->OnReportOttCallDetailsInfo(data12, reply);
+
+    MessageParcel data13;
+    data13.WriteInterfaceToken(CallManagerServiceStub::GetDescriptor());
+    OttCallEventInfo ottCallEventInfo;
+    length = sizeof(OttCallEventInfo);
+    data13.WriteRawData((const void *)&ottCallEventInfo, length);
+    data13.RewindRead(0);
+    callManagerService->OnReportOttCallEventInfo(data13, reply);
+
+    MessageParcel data15;
+    data15.WriteInt32(defaultNumber);
+    data15.WriteString("hello");
+    callManagerService->OnGetProxyObjectPtr(data15, reply);
+    callManagerService->OnSendCallUiEvent(data15, reply);
+}
+
+/**
  * @tc.number   Telephony_VoipCall_001
  * @tc.name     test error nullptr branch with permission
  * @tc.desc     Function test
