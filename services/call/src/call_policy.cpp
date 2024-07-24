@@ -43,8 +43,8 @@ int32_t CallPolicy::DialPolicy(std::u16string &number, AppExecFwk::PacMap &extra
     int32_t accountId = extras.GetIntValue("accountId");
     if (dialType == DialType::DIAL_CARRIER_TYPE) {
         if (!DelayedSingleton<CallNumberUtils>::GetInstance()->SelectAccountId(accountId, extras)) {
-            TELEPHONY_LOGE("invalid accountId!");
-            return TELEPHONY_ERR_ARGUMENT_INVALID;
+            extras.PutIntValue("accountId", 0);
+            TELEPHONY_LOGE("invalid accountId, select accountId to 0");
         }
     }
     CallType callType = (CallType)extras.GetIntValue("callType");
