@@ -432,8 +432,13 @@ int32_t AudioProxy::SetAudioMicStateChangeCallback()
         TELEPHONY_LOGE("audioMicStateChangeCallback_ is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    int32_t ret = AudioStandard::AudioRoutingManager::GetInstance()->SetMicStateChangeCallback(
-        audioMicStateChangeCallback_);
+    std::shared_ptr<AudioStandard::AudioGroupManager> audioGroupManager =
+        AudioStandard::AudioSystemManager::GetInstance()->GetGroupManager(AudioStandard::DEFAULT_VOLUME_GROUP_ID);
+    if (audioGroupManager == nullptr) {
+        TELEPHONY_LOGE("SetAudioMicStateChangeCallback fail, audioGroupManager is nullptr");
+        return false;
+    }
+    int32_t ret = audioGroupManager->SetMicStateChangeCallback(audioMicStateChangeCallback_);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("SetPreferredOutputDeviceChangeCallback fail");
         return CALL_ERR_AUDIO_OPERATE_FAILED;
@@ -447,8 +452,13 @@ int32_t AudioProxy::UnsetAudioMicStateChangeCallback()
         TELEPHONY_LOGE("audioMicStateChangeCallback_ is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    int32_t ret = AudioStandard::AudioRoutingManager::GetInstance()->UnsetMicStateChangeCallback(
-        audioMicStateChangeCallback_);
+    std::shared_ptr<AudioStandard::AudioGroupManager> audioGroupManager =
+        AudioStandard::AudioSystemManager::GetInstance()->GetGroupManager(AudioStandard::DEFAULT_VOLUME_GROUP_ID);
+    if (audioGroupManager == nullptr) {
+        TELEPHONY_LOGE("UnsetAudioMicStateChangeCallback fail, audioGroupManager is nullptr");
+        return false;
+    }
+    int32_t ret = audioGroupManager->UnsetMicStateChangeCallback(audioMicStateChangeCallback_);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("UnsetAudioMicStateChangeCallback fail");
         return CALL_ERR_AUDIO_OPERATE_FAILED;

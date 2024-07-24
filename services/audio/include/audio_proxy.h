@@ -90,6 +90,7 @@ public:
     int32_t SetAudioMicStateChangeCallback();
     int32_t UnsetAudioMicStateChangeCallback();
 
+
 private:
     const std::string defaultTonePath_ = "/system/etc/telephony/tones/tone.wav";
     const std::string defaultDtmfPath_ = "/system/etc/telephony/dtmfs/dtmf.wav";
