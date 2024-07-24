@@ -458,9 +458,21 @@ enum class CallAbilityEventId {
      */
     EVENT_SPLIT_CALL_FAILED,
     /**
-     * Indicates that the OTT is not supported.
+     * Indicates that call is muted.
      */
-    EVENT_OTT_FUNCTION_UNSUPPORTED,
+    EVENT_CALL_MUTED,
+    /**
+     * Indicates that the call is unmuted.
+     */
+    EVENT_CALL_UNMUTED,
+    /**
+     * Indicates that call is speaker on.
+     */
+    EVENT_CALL_SPEAKER_ON,
+    /**
+     * Indicates that call is speaker on.
+     */
+    EVENT_CALL_SPEAKER_OFF,
     /**
      * Indicates that the super privacy mode ON.
      */
