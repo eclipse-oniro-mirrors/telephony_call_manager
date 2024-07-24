@@ -1095,7 +1095,7 @@ int32_t CallControlManager::SetMuted(bool isMute)
     }
     if (call->GetCallType() == CallType::TYPE_IMS
         || call->GetCallType() == CallType::TYPE_CS) {
-        TELEPHONY_LOGI("SetMute by ims or cs");
+        TELEPHONY_LOGI("SetMute by ims or cs,isMute = %{public}d", isMute);
         call->SetMute(isMute, call->GetSlotId());
     }
 
