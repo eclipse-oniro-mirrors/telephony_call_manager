@@ -284,11 +284,6 @@ bool CallNumberUtils::SelectAccountId(int32_t slotId, AppExecFwk::PacMap &extras
         return true;
     }
 #endif
-    if (slotId == -1) {
-        extras.PutIntValue("accountId", 0);
-        TELEPHONY_LOGI("select accountId to 0 show connot access to network");
-        return true;
-    }
     return false;
 }
 
