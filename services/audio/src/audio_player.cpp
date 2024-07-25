@@ -25,6 +25,7 @@ namespace Telephony {
 bool AudioPlayer::InitRenderer(const wav_hdr &wavHeader, AudioStandard::AudioStreamType streamType)
 {
     if (isRenderInitialized_) {
+        TELEPHONY_LOGI("audio renderer already init");
         return true;
     }
     AudioStandard::AudioRendererParams rendererParams;
@@ -67,6 +68,7 @@ bool AudioPlayer::InitRenderer(const wav_hdr &wavHeader, AudioStandard::AudioStr
 bool AudioPlayer::InitRenderer()
 {
     if (isRenderInitialized_) {
+        TELEPHONY_LOGI("audio renderer already init");
         return true;
     }
     AudioStandard::AudioRendererOptions rendererOptions;
@@ -98,6 +100,7 @@ bool AudioPlayer::InitRenderer()
 bool AudioPlayer::InitCapturer()
 {
     if (isCapturerInitialized_) {
+        TELEPHONY_LOGI("audio capturer already init");
         return true;
     }
     AudioStandard::AudioCapturerOptions capturerOptions;
