@@ -25,9 +25,16 @@ async function makeCallFunc(...args) {
     try {
         let context = getContext(this);
         let result = await startAbility(arguments, context);
+        if (arguments.length === ARGUMENTS_LEN_TWO && typeof arguments[1] === 'function') {
+            if (result.resultCode === 0) {
+                return arguments[1]();
+            } else {
+                return arguments[1](result.resultCode);
+            }
+        }
         return new Promise((resolve, reject) => {
             if (result.resultCode === 0) {
-                resolve(result.resultCode);
+                resolve();
             } else {
                 reject(result.resultCode);
             }
