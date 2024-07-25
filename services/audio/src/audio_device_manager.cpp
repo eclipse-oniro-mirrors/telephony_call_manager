@@ -109,6 +109,32 @@ void AudioDeviceManager::UpdateEarpieceDevice()
     }
 }
 
+void AudioDeviceManager::UpdateBluetoothDeviceName(const std::string &macAddress, const std::string &deviceName)
+{
+    std::lock_guard<std::mutex> lock(infoMutex_);
+    std::vector<AudioDevice>::iterator it = info_.audioDeviceList.begin();
+    while (it != info_.audioDeviceList.end()) {
+        if (it->address == macAddress && it->deviceType == AudioDeviceType::DEVICE_BLUETOOTH_SCO) {
+            if (deviceName.length() > kMaxDeviceNameLen) {
+                TELEPHONY_LOGE("deviceName is too long");
+                return;
+            }
+            if (memset_s(it->deviceName, sizeof(it->deviceName), 0, sizeof(it->deviceName)) != EOK) {
+                TELEPHONY_LOGE("memset_s fail");
+                return;
+            }
+            if (memcpy_s(it->deviceName, kMaxDeviceNameLen, deviceName.c_str(), deviceName.length()) != EOK) {
+                TELEPHONY_LOGE("memcpy_s deviceName fail");
+                return;
+            }
+            TELEPHONY_LOGI("UpdateBluetoothDeviceName");
+            ReportAudioDeviceInfo();
+            return;
+        }
+        ++it;
+    }
+}
+
 void AudioDeviceManager::AddAudioDeviceList(const std::string &address, AudioDeviceType deviceType,
     const std::string &deviceName)
 {
@@ -133,7 +159,7 @@ void AudioDeviceManager::AddAudioDeviceList(const std::string &address, AudioDev
     }
     audioDevice.deviceType = deviceType;
     if (address.length() > kMaxAddressLen) {
-        TELEPHONY_LOGE("address is not too long");
+        TELEPHONY_LOGE("address is too long");
         return;
     }
     if (memcpy_s(audioDevice.address, kMaxAddressLen, address.c_str(), address.length()) != EOK) {
@@ -141,7 +167,7 @@ void AudioDeviceManager::AddAudioDeviceList(const std::string &address, AudioDev
         return;
     }
     if (deviceName.length() > kMaxDeviceNameLen) {
-        TELEPHONY_LOGE("deviceName is not too long");
+        TELEPHONY_LOGE("deviceName is too long");
         return;
     }
     if (memcpy_s(audioDevice.deviceName, kMaxDeviceNameLen, deviceName.c_str(), deviceName.length()) != EOK) {

@@ -17,6 +17,7 @@
 
 #include <string_ex.h>
 
+#include "audio_device_manager.h"
 #include "call_manager_errors.h"
 #include "telephony_log_wrapper.h"
 #include "call_control_manager.h"
@@ -41,6 +42,8 @@ CallBroadcastSubscriber::CallBroadcastSubscriber(const OHOS::EventFwk::CommonEve
         [this](const EventFwk::CommonEventData &data) { HighTempLevelChangedBroadcast(data); };
     memberFuncMap_[SUPER_PRIVACY_MODE] =
         [this](const EventFwk::CommonEventData &data) { ConnectCallUiSuperPrivacyModeBroadcast(data); };
+    memberFuncMap_[BLUETOOTH_REMOTEDEVICE_NAME_UPDATE] =
+        [this](const EventFwk::CommonEventData &data) { UpdateBluetoothDeviceName(data); };
 }
 
 void CallBroadcastSubscriber::OnReceiveEvent(const EventFwk::CommonEventData &data)
@@ -57,6 +60,8 @@ void CallBroadcastSubscriber::OnReceiveEvent(const EventFwk::CommonEventData &da
         code = HIGH_TEMP_LEVEL_CHANGED;
     } else if (action == "usual.event.SUPER_PRIVACY_MODE") {
         code = SUPER_PRIVACY_MODE;
+    } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_BLUETOOTH_REMOTEDEVICE_NAME_UPDATE) {
+        code = BLUETOOTH_REMOTEDEVICE_NAME_UPDATE;
     } else {
         code = UNKNOWN_BROADCAST_EVENT;
     }
@@ -116,6 +121,13 @@ void CallBroadcastSubscriber::ConnectCallUiSuperPrivacyModeBroadcast(const Event
         DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance()->CloseCallSuperPrivacyMode(
             phNumber, accountId, videoState, dialScene, dialType, callType);
     }
+}
+
+void CallBroadcastSubscriber::UpdateBluetoothDeviceName(const EventFwk::CommonEventData &data)
+{
+    std::string macAddress = data.GetWant().GetStringParam("deviceAddr");
+    std::string deviceName = data.GetWant().GetStringParam("remoteName");
+    DelayedSingleton<AudioDeviceManager>::GetInstance()->UpdateBluetoothDeviceName(macAddress, deviceName);
 }
 } // namespace Telephony
 } // namespace OHOS

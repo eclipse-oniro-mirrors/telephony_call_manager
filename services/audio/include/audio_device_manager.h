@@ -63,6 +63,15 @@ public:
      * @brief update earpiece device
      */
     void UpdateEarpieceDevice();
+
+    /**
+     * @brief Update bluetooth device name
+     *
+     * @param macAddress[in], mac address
+     * @param deviceName[in], device name
+     */
+    void UpdateBluetoothDeviceName(const std::string &macAddress, const std::string &deviceName);
+
 private:
     std::mutex mutex_;
     std::mutex infoMutex_;
