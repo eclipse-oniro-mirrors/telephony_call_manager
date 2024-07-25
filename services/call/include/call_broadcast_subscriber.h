@@ -38,7 +38,8 @@ private:
         SIM_STATE_BROADCAST_EVENT,
         CONNECT_CALLUI_SERVICE,
         HIGH_TEMP_LEVEL_CHANGED,
-        SUPER_PRIVACY_MODE
+        SUPER_PRIVACY_MODE,
+        BLUETOOTH_REMOTEDEVICE_NAME_UPDATE
     };
     using broadcastSubscriberFunc = std::function<void(const EventFwk::CommonEventData &data)>;
 
@@ -47,6 +48,7 @@ private:
     void ConnectCallUiServiceBroadcast(const EventFwk::CommonEventData &data);
     void HighTempLevelChangedBroadcast(const EventFwk::CommonEventData &data);
     void ConnectCallUiSuperPrivacyModeBroadcast(const EventFwk::CommonEventData &data);
+    void UpdateBluetoothDeviceName(const EventFwk::CommonEventData &data);
     std::map<uint32_t, broadcastSubscriberFunc> memberFuncMap_;
 };
 } // namespace Telephony
