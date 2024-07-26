@@ -13,6 +13,7 @@
  * limitations under the License.
  */
 
+#include "audio_device_manager.h"
 #include "call_ability_connect_callback.h"
 #include "call_ability_report_proxy.h"
 #include "call_connect_ability.h"
@@ -29,14 +30,15 @@ void CallAbilityConnectCallback::OnAbilityConnectDone(
     const AppExecFwk::ElementName &element, const sptr<IRemoteObject> &remoteObject, int resultCode)
 {
     TELEPHONY_LOGI("connect callui result code: %{public}d", resultCode);
-    DelayedSingleton<CallConnectAbility>::GetInstance()->NotifyAll();
-    DelayedSingleton<CallConnectAbility>::GetInstance()->SetConnectFlag(true);
-    DelayedSingleton<CallConnectAbility>::GetInstance()->SetConnectingFlag(false);
     if (resultCode == CONNECT_ABILITY_SUCCESS) {
+        DelayedSingleton<CallConnectAbility>::GetInstance()->SetConnectFlag(true);
+        DelayedSingleton<CallConnectAbility>::GetInstance()->SetConnectingFlag(false);
+        DelayedSingleton<CallConnectAbility>::GetInstance()->NotifyAll();
+    
         CallEventInfo eventInfo;
         (void)memset_s(&eventInfo, sizeof(CallEventInfo), 0, sizeof(CallEventInfo));
         bool isSuperPrivacyMode = DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance()->
-		GetCurrentIsSuperPrivacyMode();
+		    GetCurrentIsSuperPrivacyMode();
         TELEPHONY_LOGI("OnAbilityConnectDone SuperPrivacyMode:%{public}d", isSuperPrivacyMode);
         if (isSuperPrivacyMode) {
             eventInfo.eventId = CallAbilityEventId::EVENT_IS_SUPER_PRIVACY_MODE_ON;
@@ -44,6 +46,7 @@ void CallAbilityConnectCallback::OnAbilityConnectDone(
             eventInfo.eventId = CallAbilityEventId::EVENT_IS_SUPER_PRIVACY_MODE_OFF;
         }
         DelayedSingleton<CallAbilityReportProxy>::GetInstance()->CallEventUpdated(eventInfo);
+        DelayedSingleton<AudioDeviceManager>::GetInstance()->UpdateEarpieceDevice();
     }
 }
 

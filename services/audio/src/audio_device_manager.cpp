@@ -39,6 +39,7 @@ bool AudioDeviceManager::isBtScoDevEnable_ = false;
 bool AudioDeviceManager::isDCallDevEnable_ = false;
 bool AudioDeviceManager::isSpeakerAvailable_ = true; // default available
 bool AudioDeviceManager::isEarpieceAvailable_ = true;
+bool AudioDeviceManager::isUpdateEarpieceDevice_ = false;
 bool AudioDeviceManager::isWiredHeadsetConnected_ = false;
 bool AudioDeviceManager::isBtScoConnected_ = false;
 bool AudioDeviceManager::isDCallDevConnected_ = false;
@@ -80,6 +81,7 @@ void AudioDeviceManager::Init()
 
 bool AudioDeviceManager::IsSupportEarpiece()
 {
+    isUpdateEarpieceDevice_ = true;
     std::vector<std::unique_ptr<AudioDeviceDescriptor>> audioDeviceList =
         AudioStandard::AudioRoutingManager::GetInstance()->GetAvailableDevices(AudioDeviceUsage::CALL_OUTPUT_DEVICES);
     for (auto& audioDevice : audioDeviceList) {
@@ -93,7 +95,7 @@ bool AudioDeviceManager::IsSupportEarpiece()
 
 void AudioDeviceManager::UpdateEarpieceDevice()
 {
-    if (IsSupportEarpiece()) {
+    if (isUpdateEarpieceDevice_ || IsSupportEarpiece()) {
         return;
     }
     std::lock_guard<std::mutex> lock(infoMutex_);
