@@ -84,6 +84,7 @@ private:
     std::unique_ptr<AudioBase> currentAudioDevice_;
     static bool isEarpieceAvailable_;
     static bool isSpeakerAvailable_;
+    static bool isUpdateEarpieceDevice_;
     static bool isWiredHeadsetConnected_;
     static bool isBtScoConnected_;
     static bool isDCallDevConnected_;
