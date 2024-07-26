@@ -18,16 +18,23 @@ const ARGUMENTS_LEN_TWO = 2;
 
 async function makeCallFunc(...args) {
     if ((arguments.length === ARGUMENTS_LEN_TWO && typeof arguments[1] != 'function') ||
-        (arguments.length >= ARGUMENTS_LEN_TWO)) {
+        (arguments.length > ARGUMENTS_LEN_TWO)) {
         console.log('[call] makeCall callback invalid');
         throw Error('invalid callback');
     }
     try {
         let context = getContext(this);
         let result = await startAbility(arguments, context);
+        if (arguments.length === ARGUMENTS_LEN_TWO && typeof arguments[1] === 'function') {
+            if (result.resultCode === 0) {
+                return arguments[1](undefined, undefined);
+            } else {
+                return arguments[1](result.resultCode, undefined);
+            }
+        }
         return new Promise((resolve, reject) => {
             if (result.resultCode === 0) {
-                resolve(result.resultCode);
+                resolve();
             } else {
                 reject(result.resultCode);
             }
