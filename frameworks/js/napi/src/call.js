@@ -17,36 +17,32 @@ const featureAbility = requireNapi('ability.featureAbility');
 const ARGUMENTS_LEN_TWO = 2;
 
 async function makeCallFunc(...args) {
-    if ((arguments.length === ARGUMENTS_LEN_TWO && typeof arguments[1] != 'function') ||
+    if ((arguments.length === ARGUMENTS_LEN_TWO && typeof arguments[1] !== 'function') ||
         (arguments.length > ARGUMENTS_LEN_TWO)) {
         console.log('[call] makeCall callback invalid');
         throw Error('invalid callback');
     }
     try {
         let context = getContext(this);
-        let result = await startAbility(arguments, context);
+        await startAbility(arguments, context);
         if (arguments.length === ARGUMENTS_LEN_TWO && typeof arguments[1] === 'function') {
-            if (result.resultCode === 0) {
-                return arguments[1](undefined, undefined);
-            } else {
-                return arguments[1](result.resultCode, undefined);
-            }
+            return arguments[1](undefined, undefined);
         }
         return new Promise((resolve, reject) => {
-            if (result.resultCode === 0) {
-                resolve();
-            } else {
-                reject(result.resultCode);
-            }
+            resolve();
         });
     } catch (error) {
         console.log("[call] makeCall error: " + error);
-        return undefined;
+        if (arguments.length === ARGUMENTS_LEN_TWO && typeof arguments[1] === 'function') {
+            return arguments[1](error, undefined);
+        }
+        return new Promise((resolve, reject) => {
+            reject(error);
+        });
     }
 }
 
 async function startAbility(args, context) {
-    let result;
     let config = {
         parameters: {
             'phoneNumber': '',
@@ -59,11 +55,10 @@ async function startAbility(args, context) {
         config.parameters.phoneNumber = args[0];
     }
     if (context) {
-        result = await context.startAbility(config);
+        await context.startAbility(config);
     } else {
-        result = await featureAbility.startAbility(config);
+        await featureAbility.startAbility(config);
     }
-    return result;
 }
 
 export default {
