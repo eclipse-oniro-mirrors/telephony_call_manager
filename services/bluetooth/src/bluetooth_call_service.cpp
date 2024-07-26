@@ -156,7 +156,7 @@ int32_t BluetoothCallService::GetCallState()
         number = GetCallNumber(TelCallState::CALL_STATUS_DISCONNECTED);
     }
     if (numDisconnecting > 0) {
-        callState = static_cast<int32_t>(TelCallState::CALL_STATUS_IDLE);
+        callState = static_cast<int32_t>(TelCallState::CALL_STATUS_DISCONNECTED);
         number = GetCallNumber(TelCallState::CALL_STATUS_DISCONNECTING);
     }
     return DelayedSingleton<BluetoothCallManager>::GetInstance()->
