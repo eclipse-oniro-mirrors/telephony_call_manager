@@ -577,10 +577,6 @@ bool AudioControlManager::StopSoundtone()
 
 bool AudioControlManager::StopSoundtoneAndReleaseRender()
 {
-    if (soundState_ == SoundState::STOPPED) {
-        TELEPHONY_LOGI("soundtone already stopped");
-        return true;
-    }
     if (!StopSoundtone()) {
         return false;
     }
