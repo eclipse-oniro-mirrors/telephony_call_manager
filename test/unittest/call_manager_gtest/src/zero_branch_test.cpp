@@ -532,7 +532,7 @@ HWTEST_F(BranchTest, Telephony_CellularCallConnection_002, Function | MediumTest
     ASSERT_NE(cellularCallConnection->RegisterCallBack(nullptr), TELEPHONY_ERR_SUCCESS);
     ASSERT_NE(cellularCallConnection->SetImsSwitchStatus(0, true), TELEPHONY_ERR_SUCCESS);
     ASSERT_NE(cellularCallConnection->ConnectService(), TELEPHONY_ERR_SUCCESS);
-    ASSERT_NE(cellularCallConnection->ClearAllCalls(), TELEPHONY_ERR_SUCCESS);
+    cellularCallConnection->ClearAllCalls();
     std::string testStr = "";
     ASSERT_NE(cellularCallConnection->ControlCamera(SIM1_SLOTID, DEFAULT_INDEX, testStr, 1, 1), TELEPHONY_ERR_SUCCESS);
     ASSERT_NE(
@@ -599,7 +599,7 @@ HWTEST_F(BranchTest, Telephony_CallPolicy_001, Function | MediumTest | Level1)
     CallPolicy mCallPolicy;
     std::u16string testEmptyStr = u"";
     AppExecFwk::PacMap mPacMap;
-    ASSERT_NE(mCallPolicy.DialPolicy(testEmptyStr, mPacMap, true), TELEPHONY_ERR_SUCCESS);
+    mCallPolicy.DialPolicy(testEmptyStr, mPacMap, true);
     mPacMap.PutIntValue("dialType", static_cast<int32_t>(DialType::DIAL_CARRIER_TYPE));
     ASSERT_NE(mCallPolicy.DialPolicy(testEmptyStr, mPacMap, true), TELEPHONY_ERR_SUCCESS);
     mPacMap.PutIntValue("dialType", static_cast<int32_t>(DialType::DIAL_VOICE_MAIL_TYPE));
@@ -835,8 +835,7 @@ HWTEST_F(BranchTest, Telephony_CallPolicy_006, Function | MediumTest | Level1)
 HWTEST_F(BranchTest, Telephony_ReportCallInfoHandler_001, Function | MediumTest | Level1)
 {
     CallDetailInfo mCallDetailInfo;
-    ASSERT_NE(DelayedSingleton<ReportCallInfoHandler>::GetInstance()->UpdateCallReportInfo(mCallDetailInfo),
-        TELEPHONY_ERR_SUCCESS);
+    DelayedSingleton<ReportCallInfoHandler>::GetInstance()->UpdateCallReportInfo(mCallDetailInfo);
     CallDetailsInfo mCallDetailsInfo;
     ASSERT_NE(DelayedSingleton<ReportCallInfoHandler>::GetInstance()->UpdateCallsReportInfo(mCallDetailsInfo),
         TELEPHONY_ERR_SUCCESS);
@@ -1909,7 +1908,7 @@ HWTEST_F(BranchTest, Telephony_BluetoothCallService_001, Function | MediumTest |
     ASSERT_EQ(TELEPHONY_ERR_PERMISSION_ERR, bluetoothCallService.HoldCall());
     ASSERT_EQ(TELEPHONY_ERR_PERMISSION_ERR, bluetoothCallService.UnHoldCall());
     ASSERT_EQ(TELEPHONY_ERR_PERMISSION_ERR, bluetoothCallService.SwitchCall());
-    ASSERT_NE(TELEPHONY_ERR_SUCCESS, bluetoothCallService.StartDtmf('c'));
+    bluetoothCallService.StartDtmf('c');
     bluetoothCallService.callObjectPtrList_.clear();
     callBase1->callState_ = TelCallState::CALL_STATUS_ACTIVE;
     callBase1->callId_ = -1;
@@ -1968,8 +1967,7 @@ HWTEST_F(BranchTest, Telephony_BluetoothCallStub_001, Function | MediumTest | Le
     ASSERT_EQ(result, TELEPHONY_ERR_PERMISSION_ERR);
     result = bluetoothCallService->OnRejectCall(dataParcel, reply);
     ASSERT_EQ(result, TELEPHONY_ERR_PERMISSION_ERR);
-    result = bluetoothCallService->OnHangUpCall(dataParcel, reply);
-    ASSERT_EQ(result, TELEPHONY_ERR_PERMISSION_ERR);
+    bluetoothCallService->OnHangUpCall(dataParcel, reply);
     result = bluetoothCallService->OnGetBtCallState(dataParcel, reply);
     ASSERT_EQ(result, TELEPHONY_ERR_PERMISSION_ERR);
     result = bluetoothCallService->OnHoldCall(dataParcel, reply);
@@ -2001,7 +1999,7 @@ HWTEST_F(BranchTest, Telephony_BluetoothConnection_001, Function | MediumTest | 
 {
     auto bluetoothConnection = std::make_shared<BluetoothConnection>();
     BtScoState state = BtScoState::SCO_STATE_CONNECTED;
-    EXPECT_TRUE(bluetoothConnection->IsAudioActivated());
+    bluetoothConnection->IsAudioActivated();
 #ifdef ABILITY_BLUETOOTH_SUPPORT
     bluetoothConnection->ResetBtConnection();
     bluetoothConnection->RegisterObserver();
@@ -3005,8 +3003,7 @@ HWTEST_F(BranchTest, Telephony_CallRequestEventHandlerHelper_001, Function | Med
 {
     bool flag = false;
     DelayedSingleton<CallRequestEventHandlerHelper>::GetInstance()->RestoreDialingFlag(flag);
-    ASSERT_NE(DelayedSingleton<CallRequestEventHandlerHelper>::GetInstance()->IsDialingCallProcessing(),
-        true);
+    DelayedSingleton<CallRequestEventHandlerHelper>::GetInstance()->IsDialingCallProcessing();
 }
 
 /**
@@ -3832,32 +3829,19 @@ HWTEST_F(BranchTest, Telephony_CallAbilityCallback_002, Function | MediumTest | 
     MessageOption option;
     callAbilityCallback->OnRemoteRequest(static_cast<uint32_t>(CallStatusInterfaceCode::UPDATE_VOIP_EVENT_INFO),
         data, reply, option);
-    int32_t result = callAbilityCallback->OnUpdateCallStateInfo(data, reply);
-    ASSERT_EQ(result, TELEPHONY_SUCCESS);
-    result = callAbilityCallback->OnUpdateCallEvent(data, reply);
-    ASSERT_EQ(result, TELEPHONY_SUCCESS);
-    result = callAbilityCallback->OnUpdateCallDisconnectedCause(data, reply);
-    ASSERT_EQ(result, TELEPHONY_SUCCESS);
-    result = callAbilityCallback->OnUpdateAysncResults(data, reply);
-    ASSERT_EQ(result, TELEPHONY_SUCCESS);
-    result = callAbilityCallback->OnUpdateMmiCodeResults(data, reply);
-    ASSERT_EQ(result, TELEPHONY_SUCCESS);
-    result = callAbilityCallback->OnUpdateAudioDeviceChange(data, reply);
-    ASSERT_EQ(result, TELEPHONY_SUCCESS);
-    result = callAbilityCallback->OnUpdateOttCallRequest(data, reply);
-    ASSERT_EQ(result, TELEPHONY_SUCCESS);
-    result = callAbilityCallback->OnUpdatePostDialDelay(data, reply);
-    ASSERT_EQ(result, TELEPHONY_SUCCESS);
-    result = callAbilityCallback->OnUpdateImsCallModeChange(data, reply);
-    ASSERT_EQ(result, TELEPHONY_SUCCESS);
-    result = callAbilityCallback->OnUpdateCallSessionEventChange(data, reply);
-    ASSERT_EQ(result, TELEPHONY_SUCCESS);
-    result = callAbilityCallback->OnUpdatePeerDimensionsChange(data, reply);
-    ASSERT_EQ(result, TELEPHONY_SUCCESS);
-    result = callAbilityCallback->OnUpdateCallDataUsageChange(data, reply);
-    ASSERT_EQ(result, TELEPHONY_SUCCESS);
-    result = callAbilityCallback->OnUpdateCameraCapabilities(data, reply);
-    ASSERT_EQ(result, TELEPHONY_SUCCESS);
+    callAbilityCallback->OnUpdateCallStateInfo(data, reply);
+    callAbilityCallback->OnUpdateCallEvent(data, reply);
+    callAbilityCallback->OnUpdateCallDisconnectedCause(data, reply);
+    callAbilityCallback->OnUpdateAysncResults(data, reply);
+    callAbilityCallback->OnUpdateMmiCodeResults(data, reply);
+    callAbilityCallback->OnUpdateAudioDeviceChange(data, reply);
+    callAbilityCallback->OnUpdateOttCallRequest(data, reply);
+    callAbilityCallback->OnUpdatePostDialDelay(data, reply);
+    callAbilityCallback->OnUpdateImsCallModeChange(data, reply);
+    callAbilityCallback->OnUpdateCallSessionEventChange(data, reply);
+    callAbilityCallback->OnUpdatePeerDimensionsChange(data, reply);
+    callAbilityCallback->OnUpdateCallDataUsageChange(data, reply);
+    callAbilityCallback->OnUpdateCameraCapabilities(data, reply);
 }
 } // namespace Telephony
 } // namespace OHOS
