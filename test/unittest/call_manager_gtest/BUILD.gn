@@ -32,6 +32,7 @@ ohos_unittest("tel_call_manager_gtest") {
     "src/call_manager_connect.cpp",
     "src/call_manager_gtest.cpp",
     "src/zero_branch_test.cpp",
+    "src/zero_branch_test_call_manager.cpp",
     "src/zero_branch_test_call_state.cpp",
     "src/zero_branch_test_spam_call.cpp",
   ]
