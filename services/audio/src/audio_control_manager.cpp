@@ -728,6 +728,12 @@ void AudioControlManager::SendMuteRingEvent()
 
 void AudioControlManager::PlayCallEndedTone(CallEndedType type)
 {
+    int32_t state;
+    DelayedSingleton<CallControlManager>::GetInstance()->GetVoIPCallState(state);
+    if (state != static_cast<int32_t>(CallStateToApp::CALL_STATE_IDLE)) {
+        TELEPHONY_LOGI("not play callEndTone when has voip call");
+        return;
+    }
     AudioStandard::AudioRingerMode ringMode = DelayedSingleton<AudioProxy>::GetInstance()->GetRingerMode();
     if (ringMode != AudioStandard::AudioRingerMode::RINGER_MODE_NORMAL) {
         TELEPHONY_LOGE("ringer mode is not normal");
