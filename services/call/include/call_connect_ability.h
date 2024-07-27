@@ -32,6 +32,7 @@ public:
     void ConnectAbility();
     void DisconnectAbility();
     void SetConnectFlag(bool isConnected);
+    bool GetConnectFlag();
     void SetConnectingFlag(bool isConnecting);
     void SetDisconnectingFlag(bool isDisconnecting);
     void NotifyAll();

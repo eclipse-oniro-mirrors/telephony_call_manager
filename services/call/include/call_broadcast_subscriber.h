@@ -49,6 +49,7 @@ private:
     void HighTempLevelChangedBroadcast(const EventFwk::CommonEventData &data);
     void ConnectCallUiSuperPrivacyModeBroadcast(const EventFwk::CommonEventData &data);
     void UpdateBluetoothDeviceName(const EventFwk::CommonEventData &data);
+    void ConnectCallUiUserSwitchedBroadcast(const EventFwk::CommonEventData &data);
     std::map<uint32_t, broadcastSubscriberFunc> memberFuncMap_;
 };
 } // namespace Telephony

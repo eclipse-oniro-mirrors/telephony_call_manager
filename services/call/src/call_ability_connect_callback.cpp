@@ -62,6 +62,7 @@ void CallAbilityConnectCallback::OnAbilityDisconnectDone(const AppExecFwk::Eleme
 
 void CallAbilityConnectCallback::ReConnectAbility()
 {
+    TELEPHONY_LOGI("ReConnectAbility");
     if (!CallObjectManager::HasCallExist()) {
         TELEPHONY_LOGE("callObjectPtrList_ is empty, no need to report");
         return;
@@ -84,10 +85,6 @@ void CallAbilityConnectCallback::ReConnectAbility()
             connectFlag = true;
             continue;
         }
-        if (!DelayedSingleton<CallConnectAbility>::GetInstance()->WaitForConnectResult()) {
-            return;
-        }
-        DelayedSingleton<CallAbilityReportProxy>::GetInstance()->ReportCallStateInfo(info);
     }
 }
 } // namespace Telephony
