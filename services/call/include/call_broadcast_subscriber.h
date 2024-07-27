@@ -39,7 +39,8 @@ private:
         CONNECT_CALLUI_SERVICE,
         HIGH_TEMP_LEVEL_CHANGED,
         SUPER_PRIVACY_MODE,
-        BLUETOOTH_REMOTEDEVICE_NAME_UPDATE
+        BLUETOOTH_REMOTEDEVICE_NAME_UPDATE,
+        USER_SWITCHED
     };
     using broadcastSubscriberFunc = std::function<void(const EventFwk::CommonEventData &data)>;
 
