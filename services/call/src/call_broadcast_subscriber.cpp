@@ -24,6 +24,8 @@
 #include "satellite_call_control.h"
 #include "securec.h"
 #include "call_superprivacy_control_manager.h"
+#include "call_connect_ability.h"
+#include "call_ability_connect_callback.h"
 
 
 namespace OHOS {
