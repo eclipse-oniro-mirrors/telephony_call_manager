@@ -735,6 +735,18 @@ napi_value NapiCallManager::DeclareCallEventEnumEx(napi_env env, napi_value expo
         DECLARE_NAPI_STATIC_PROPERTY("EVENT_SPLIT_CALL_FAILED",
             NapiCallManagerUtils::ToInt32Value(
                 env, static_cast<int32_t>(CallAbilityEventId::EVENT_SPLIT_CALL_FAILED))),
+        DECLARE_NAPI_STATIC_PROPERTY("EVENT_CALL_MUTED",
+            NapiCallManagerUtils::ToInt32Value(
+                env, static_cast<int32_t>(CallAbilityEventId::EVENT_CALL_MUTED))),
+        DECLARE_NAPI_STATIC_PROPERTY("EVENT_CALL_UNMUTED",
+            NapiCallManagerUtils::ToInt32Value(
+                env, static_cast<int32_t>(CallAbilityEventId::EVENT_CALL_UNMUTED))),
+        DECLARE_NAPI_STATIC_PROPERTY("EVENT_CALL_SPEAKER_ON",
+            NapiCallManagerUtils::ToInt32Value(
+                env, static_cast<int32_t>(CallAbilityEventId::EVENT_CALL_SPEAKER_ON))),
+        DECLARE_NAPI_STATIC_PROPERTY("EVENT_CALL_SPEAKER_OFF",
+            NapiCallManagerUtils::ToInt32Value(
+                env, static_cast<int32_t>(CallAbilityEventId::EVENT_CALL_SPEAKER_OFF))),
     };
     napi_value result = nullptr;
     napi_define_class(env, "CallAbilityEventId", NAPI_AUTO_LENGTH, NapiCallManagerUtils::CreateEnumConstructor, nullptr,
