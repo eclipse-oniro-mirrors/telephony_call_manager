@@ -2574,9 +2574,6 @@ HWTEST_F(BranchTest, Telephony_CallStatusManager_002, Function | MediumTest | Le
     callDetailInfo.state = TelCallState::CALL_STATUS_ACTIVE;
     ASSERT_GT(callStatusManager->IncomingHandle(callDetailInfo), TELEPHONY_ERROR);
     ASSERT_GT(callStatusManager->IncomingVoipCallHandle(callDetailInfo), TELEPHONY_ERROR);
-    ContactInfo contactInfo;
-    std::string phoneNum;
-    callStatusManager->QueryCallerInfo(contactInfo, phoneNum);
     ASSERT_GT(callStatusManager->IncomingFilterPolicy(callDetailInfo), TELEPHONY_ERROR);
     sptr<CallBase> callObjectPtr = nullptr;
     TelCallState nextState = TelCallState::CALL_STATUS_ACTIVE;
