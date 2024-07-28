@@ -14,11 +14,11 @@
 import("//build/test.gni")
 CALL_MANAGER_PATH = "../../.."
 
-ohos_unittest("tel_call_manager_gtest") {
+ohos_unittest("tel_call_manager_zero4_gtest") {
   install_enable = true
   subsystem_name = "telephony"
   part_name = "call_manager"
-  test_module = "tel_call_manager_gtest"
+  test_module = "tel_call_manager_zero4_gtest"
   module_out_path = part_name + "/" + test_module
   sanitize = {
     cfi = true
@@ -29,11 +29,7 @@ ohos_unittest("tel_call_manager_gtest") {
 
   sources = [
     "${CALL_MANAGER_PATH}/frameworks/native/src/call_manager_service_proxy.cpp",
-    "src/call_manager_connect.cpp",
-    "src/call_manager_gtest.cpp",
-    "src/zero_branch_test.cpp",
-    "src/zero_branch_test_call_state.cpp",
-    "src/zero_branch_test_spam_call.cpp",
+    "src/zero_branch4_test.cpp",
   ]
 
   include_dirs = [
