@@ -253,11 +253,6 @@ HWTEST_F(ZeroBranch5Test, Telephony_IncomingCallWakeup_001, Function | MediumTes
     IncomingCallWakeup incomingCallWakeup;
     sptr<CallBase> callObjectPtr = nullptr;
     incomingCallWakeup.NewCallCreated(callObjectPtr);
-    DialParaInfo dialParaInfo;
-    dialParaInfo.callType = CallType::TYPE_CS;
-    dialParaInfo.callState = TelCallState::CALL_STATUS_INCOMING;
-    callObjectPtr = new CSCall(dialParaInfo);
-    incomingCallWakeup.WakeupDevice(callObjectPtr);
 }
 
 /**

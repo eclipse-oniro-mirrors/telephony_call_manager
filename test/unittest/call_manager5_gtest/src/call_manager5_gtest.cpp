@@ -328,10 +328,12 @@ HWTEST_F(CallManager5Gtest, Telephony_CallManager_SetCallTransferInfo_0400, Func
     }
 
     if (HasSimCard(SIM1_SLOTID)) {
-        EXPECT_EQ(CallManager5Gtest::clientPtr_->SetCallTransferInfo(SIM1_SLOTID, info), CALL_ERR_INVALID_TRANSFER_TYPE);
+        EXPECT_EQ(CallManager5Gtest::clientPtr_->SetCallTransferInfo(SIM1_SLOTID, info),
+            CALL_ERR_INVALID_TRANSFER_TYPE);
     }
     if (HasSimCard(SIM2_SLOTID)) {
-        EXPECT_EQ(CallManager5Gtest::clientPtr_->SetCallTransferInfo(SIM2_SLOTID, info), CALL_ERR_INVALID_TRANSFER_TYPE);
+        EXPECT_EQ(CallManager5Gtest::clientPtr_->SetCallTransferInfo(SIM2_SLOTID, info),
+            CALL_ERR_INVALID_TRANSFER_TYPE);
     }
 }
 

@@ -726,9 +726,6 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallControlManager_002, Function | MediumTes
     ASSERT_NE(callControlManager->SetImsFeatureValue(slotId, featureType, mode), TELEPHONY_SUCCESS);
     ASSERT_NE(callControlManager->DisableImsSwitch(INVALID_CALLID), TELEPHONY_SUCCESS);
     ASSERT_NE(callControlManager->DisableImsSwitch(slotId), TELEPHONY_SUCCESS);
-    bool enaled = false;
-    ASSERT_NE(callControlManager->IsImsSwitchEnabled(INVALID_CALLID, enaled), TELEPHONY_SUCCESS);
-    ASSERT_NE(callControlManager->IsImsSwitchEnabled(slotId, enaled), TELEPHONY_SUCCESS);
 }
 
 /**
@@ -835,6 +832,10 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallControlManager_004, Function | MediumTes
     ASSERT_NE(callControlManager->StopRtt(INVALID_CALLID), TELEPHONY_SUCCESS);
     ASSERT_NE(callControlManager->SetMuted(false), TELEPHONY_SUCCESS);
     ASSERT_EQ(callControlManager->MuteRinger(), TELEPHONY_SUCCESS);
+    bool enaled = false;
+    int32_t slotId = 1;
+    ASSERT_NE(callControlManager->IsImsSwitchEnabled(INVALID_CALLID, enaled), TELEPHONY_SUCCESS);
+    ASSERT_NE(callControlManager->IsImsSwitchEnabled(slotId, enaled), TELEPHONY_SUCCESS);
 }
 
 /**

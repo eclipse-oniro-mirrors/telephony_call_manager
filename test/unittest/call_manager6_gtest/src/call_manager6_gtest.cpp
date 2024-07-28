@@ -601,10 +601,12 @@ HWTEST_F(CallManager6Gtest, Telephony_CallManager_GetImsFeatureValue_0300, Funct
     }
 
     if (HasSimCard(SIM1_SLOTID)) {
-        EXPECT_EQ(CallManager6Gtest::clientPtr_->GetImsFeatureValue(SIM1_SLOTID, TYPE_SS_OVER_UT), RETURN_VALUE_IS_ZERO);
+        EXPECT_EQ(CallManager6Gtest::clientPtr_->GetImsFeatureValue(SIM1_SLOTID, TYPE_SS_OVER_UT),
+            RETURN_VALUE_IS_ZERO);
     }
     if (HasSimCard(SIM2_SLOTID)) {
-        EXPECT_EQ(CallManager6Gtest::clientPtr_->GetImsFeatureValue(SIM2_SLOTID, TYPE_SS_OVER_UT), RETURN_VALUE_IS_ZERO);
+        EXPECT_EQ(CallManager6Gtest::clientPtr_->GetImsFeatureValue(SIM2_SLOTID, TYPE_SS_OVER_UT),
+            RETURN_VALUE_IS_ZERO);
     }
 }
 
