@@ -97,8 +97,4 @@ ohos_unittest("tel_call_manager5_gtest") {
     "TELEPHONY_LOG_TAG = \"CallManagerGtest\"",
     "LOG_DOMAIN = 0xD000F00",
   ]
-
-  if (device_name == "rk3568") {
-    defines += [ "CALL_MANAGER_IMS_LITE_UNSUPPORT" ]
-  }
 }
