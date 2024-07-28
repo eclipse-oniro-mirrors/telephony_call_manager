@@ -32,7 +32,6 @@ using namespace OHOS::Bluetooth;
 namespace OHOS {
 namespace Telephony {
 using namespace testing::ext;
-#ifndef TEL_TEST_UNSUPPORT
 constexpr int16_t SIM2_SLOTID = 1;
 constexpr int16_t SIM1_SLOTID_NO_CARD = 0;
 constexpr int16_t RETURN_VALUE_IS_ZERO = 0;
@@ -40,11 +39,8 @@ constexpr int16_t INVALID_NEGATIVE_ID = -100;
 constexpr int16_t INVALID_POSITIVE_ID = 100;
 constexpr int INVALID_DIAL_TYPE = 3;
 constexpr int WAIT_TIME = 3;
-#ifndef CALL_MANAGER_IMS_LITE_UNSUPPORT
 constexpr int16_t CAMERA_ROTATION_90 = 90;
 constexpr int16_t CAMERA_ROTATION_ERROR = 50;
-#endif // CALL_MANAGER_IMS_LITE_UNSUPPORT
-#endif // TEL_TEST_UNSUPPORT
 constexpr int16_t SLEEP_1000_MS = 1000;
 constexpr int BASE_TIME_MS = 1000;
 constexpr int SLEEP_TIME_MS = 50;
