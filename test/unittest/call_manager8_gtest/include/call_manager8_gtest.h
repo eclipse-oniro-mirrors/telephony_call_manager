@@ -35,7 +35,7 @@ namespace OHOS {
 namespace Telephony {
 constexpr int16_t SLEEP_ONE_SECONDS = 1;
 
-class CallManagerGtest : public testing::Test {
+class CallManager8Gtest : public testing::Test {
 public:
     // execute before first testcase
     static void SetUpTestCase()
@@ -198,10 +198,10 @@ public:
     const int32_t INVALID_SLOT_ID = -1;
 };
 
-bool CallManagerGtest::isConnected_ = false;
-std::shared_ptr<CallManagerClient> CallManagerGtest::clientPtr_ = nullptr;
-std::shared_ptr<BluetoothCallClient> CallManagerGtest::blueToothClientPtr_ = nullptr;
-std::unique_ptr<CallManagerConnect> CallManagerGtest::servicePtr_ = nullptr;
+bool CallManager8Gtest::isConnected_ = false;
+std::shared_ptr<CallManagerClient> CallManager8Gtest::clientPtr_ = nullptr;
+std::shared_ptr<BluetoothCallClient> CallManager8Gtest::blueToothClientPtr_ = nullptr;
+std::unique_ptr<CallManagerConnect> CallManager8Gtest::servicePtr_ = nullptr;
 } // namespace Telephony
 } // namespace OHOS
 
