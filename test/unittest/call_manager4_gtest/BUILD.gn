@@ -29,8 +29,8 @@ ohos_unittest("tel_call_manager4_gtest") {
 
   sources = [
     "${CALL_MANAGER_PATH}/frameworks/native/src/call_manager_service_proxy.cpp",
-    "src/call_manager_connect.cpp",
     "src/call_manager4_gtest.cpp",
+    "src/call_manager_connect.cpp",
   ]
 
   include_dirs = [
