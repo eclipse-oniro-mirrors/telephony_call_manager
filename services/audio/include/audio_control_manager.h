@@ -85,7 +85,6 @@ public:
     bool IsVideoCall(VideoStateType videoState);
     bool IsSoundPlaying();
     bool StopSoundtone();
-    bool StopSoundtoneAndReleaseRender();
     bool PlaySoundtone();
     bool IsSatelliteExists();
     void PlayCallEndedTone(CallEndedType type);
