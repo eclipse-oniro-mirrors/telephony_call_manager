@@ -183,6 +183,7 @@ int32_t CallAbilityReportProxy::ReportCallStateInfo(const CallAttributeInfo &inf
 int32_t CallAbilityReportProxy::ReportCallStateInfo(const CallAttributeInfo &info, std::string bundleInfo)
 {
     int32_t ret = TELEPHONY_ERROR;
+    std::lock_guard<std::mutex> lock(mutex_);
     for (auto callback : callbackPtrList_) {
         if (callback->GetBundleInfo() == bundleInfo) {
             ret = callback->OnCallDetailsChange(info);
