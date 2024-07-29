@@ -62,11 +62,11 @@ void CallAbilityConnectCallback::OnAbilityDisconnectDone(const AppExecFwk::Eleme
 
 void CallAbilityConnectCallback::ReConnectAbility()
 {
+    TELEPHONY_LOGI("ReConnectAbility");
     if (!CallObjectManager::HasCallExist()) {
         TELEPHONY_LOGE("callObjectPtrList_ is empty, no need to report");
         return;
     }
-    bool connectFlag = false;
     std::vector<CallAttributeInfo> callAttributeInfo = CallObjectManager::GetAllCallInfoList();
     std::vector<CallAttributeInfo>::iterator it = callAttributeInfo.begin();
     while (it != callAttributeInfo.end()) {
@@ -79,15 +79,8 @@ void CallAbilityConnectCallback::ReConnectAbility()
             TELEPHONY_LOGE("no need to report");
             continue;
         }
-        if (!connectFlag) {
-            DelayedSingleton<CallConnectAbility>::GetInstance()->ConnectAbility();
-            connectFlag = true;
-            continue;
-        }
-        if (!DelayedSingleton<CallConnectAbility>::GetInstance()->WaitForConnectResult()) {
-            return;
-        }
-        DelayedSingleton<CallAbilityReportProxy>::GetInstance()->ReportCallStateInfo(info);
+        DelayedSingleton<CallConnectAbility>::GetInstance()->ConnectAbility();
+        return;
     }
 }
 } // namespace Telephony

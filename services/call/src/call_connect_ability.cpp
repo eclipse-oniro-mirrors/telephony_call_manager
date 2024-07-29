@@ -81,6 +81,11 @@ void CallConnectAbility::SetConnectFlag(bool isConnected)
     isConnected_ = isConnected;
 }
 
+bool CallConnectAbility::GetConnectFlag()
+{
+    return isConnected_;
+}
+
 void CallConnectAbility::SetDisconnectingFlag(bool isDisconnecting)
 {
     isDisconnecting_ = isDisconnecting;
