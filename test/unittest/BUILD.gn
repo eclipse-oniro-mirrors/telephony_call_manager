@@ -16,7 +16,20 @@ import("//build/test.gni")
 group("unittest") {
   testonly = true
   deps = []
-  deps += [ "call_manager_gtest:tel_call_manager_gtest" ]
+  deps += [ "call_manager1_gtest:tel_call_manager1_gtest" ]
+  deps += [ "call_manager2_gtest:tel_call_manager2_gtest" ]
+  deps += [ "call_manager3_gtest:tel_call_manager3_gtest" ]
+  deps += [ "call_manager4_gtest:tel_call_manager4_gtest" ]
+  deps += [ "call_manager5_gtest:tel_call_manager5_gtest" ]
+  deps += [ "call_manager6_gtest:tel_call_manager6_gtest" ]
+  deps += [ "call_manager7_gtest:tel_call_manager7_gtest" ]
+  deps += [ "call_manager8_gtest:tel_call_manager8_gtest" ]
+  deps += [ "call_manager_zero1_gtest:tel_call_manager_zero1_gtest" ]
+  deps += [ "call_manager_zero2_gtest:tel_call_manager_zero2_gtest" ]
+  deps += [ "call_manager_zero3_gtest:tel_call_manager_zero3_gtest" ]
+  deps += [ "call_manager_zero4_gtest:tel_call_manager_zero4_gtest" ]
+  deps += [ "call_manager_zero5_gtest:tel_call_manager_zero5_gtest" ]
+  deps += [ "call_manager_zero6_gtest:tel_call_manager_zero6_gtest" ]
   deps += [ "ui_client:tel_call_manager_ui_test" ]
   deps += [ "call_earthquake_alarm_test:tel_call_earthquake_alarm_test" ]
 }

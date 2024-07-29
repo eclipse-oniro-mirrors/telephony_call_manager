@@ -14,11 +14,11 @@
 import("//build/test.gni")
 CALL_MANAGER_PATH = "../../.."
 
-ohos_unittest("tel_call_manager_gtest") {
+ohos_unittest("tel_call_manager7_gtest") {
   install_enable = true
   subsystem_name = "telephony"
   part_name = "call_manager"
-  test_module = "tel_call_manager_gtest"
+  test_module = "tel_call_manager7_gtest"
   module_out_path = part_name + "/" + test_module
   sanitize = {
     cfi = true
@@ -29,11 +29,8 @@ ohos_unittest("tel_call_manager_gtest") {
 
   sources = [
     "${CALL_MANAGER_PATH}/frameworks/native/src/call_manager_service_proxy.cpp",
+    "src/call_manager7_gtest.cpp",
     "src/call_manager_connect.cpp",
-    "src/call_manager_gtest.cpp",
-    "src/zero_branch_test.cpp",
-    "src/zero_branch_test_call_state.cpp",
-    "src/zero_branch_test_spam_call.cpp",
   ]
 
   include_dirs = [
@@ -54,7 +51,7 @@ ohos_unittest("tel_call_manager_gtest") {
     "${CALL_MANAGER_PATH}/services/telephony_interaction/include",
     "${CALL_MANAGER_PATH}/services/video/include",
     "${CALL_MANAGER_PATH}/services/satellite_call/include",
-    "${CALL_MANAGER_PATH}/test/unittest/call_manager_gtest/include",
+    "${CALL_MANAGER_PATH}/test/unittest/call_manager7_gtest/include",
     "${CALL_MANAGER_PATH}/utils/include",
     "//third_party/libphonenumber/cpp/src",
     "//third_party/libphonenumber/cpp/src/phonenumbers",
@@ -100,8 +97,4 @@ ohos_unittest("tel_call_manager_gtest") {
     "TELEPHONY_LOG_TAG = \"CallManagerGtest\"",
     "LOG_DOMAIN = 0xD000F00",
   ]
-
-  if (device_name == "rk3568") {
-    defines += [ "CALL_MANAGER_IMS_LITE_UNSUPPORT" ]
-  }
 }
