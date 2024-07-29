@@ -67,7 +67,6 @@ void CallAbilityConnectCallback::ReConnectAbility()
         TELEPHONY_LOGE("callObjectPtrList_ is empty, no need to report");
         return;
     }
-    bool connectFlag = false;
     std::vector<CallAttributeInfo> callAttributeInfo = CallObjectManager::GetAllCallInfoList();
     std::vector<CallAttributeInfo>::iterator it = callAttributeInfo.begin();
     while (it != callAttributeInfo.end()) {
@@ -80,11 +79,8 @@ void CallAbilityConnectCallback::ReConnectAbility()
             TELEPHONY_LOGE("no need to report");
             continue;
         }
-        if (!connectFlag) {
-            DelayedSingleton<CallConnectAbility>::GetInstance()->ConnectAbility();
-            connectFlag = true;
-            continue;
-        }
+        DelayedSingleton<CallConnectAbility>::GetInstance()->ConnectAbility();
+        return;
     }
 }
 } // namespace Telephony

@@ -138,7 +138,7 @@ void CallBroadcastSubscriber::UpdateBluetoothDeviceName(const EventFwk::CommonEv
 
 void CallBroadcastSubscriber::ConnectCallUiUserSwitchedBroadcast(const EventFwk::CommonEventData &data)
 {
-    if (DelayedSingleton<CallConnectAbility>::GetInstance()->GetConnectFlag()) {
+    if (!DelayedSingleton<CallConnectAbility>::GetInstance()->GetConnectFlag()) {
         TELEPHONY_LOGE("is not connected");
         return;
     }
