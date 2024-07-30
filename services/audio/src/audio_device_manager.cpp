@@ -603,9 +603,9 @@ bool AudioDeviceManager::IsBtActived()
     std::unique_ptr<AudioStandard::AudioDeviceDescriptor> activeBluetoothDevice =
         AudioStandard::AudioRoutingManager::GetInstance()->GetActiveBluetoothDevice();
     if (activeBluetoothDevice != nullptr && !activeBluetoothDevice->macAddress_.empty()) {
+        TELEPHONY_LOGI("has actived bt device");
         return true;
     }
-    TELEPHONY_LOGI("has actived bt device");
     return false;
 }
 
