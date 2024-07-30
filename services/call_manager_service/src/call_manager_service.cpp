@@ -88,7 +88,7 @@ bool CallManagerService::Init()
 void CallManagerService::OnAddSystemAbility(int32_t systemAbilityId, const std::string &deviceId)
 {
     TELEPHONY_LOGI("OnAddSystemAbility : %{public}d", systemAbilityId);
-    switch (systemAbilityId){
+    switch (systemAbilityId) {
         case AUDIO_POLICY_SERVICE_ID:
             DelayedSingleton<AudioProxy>::GetInstance()->SetAudioMicStateChangeCallback();
             break;
