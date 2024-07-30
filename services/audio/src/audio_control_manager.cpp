@@ -634,7 +634,7 @@ AudioDeviceType AudioControlManager::GetInitAudioDeviceType() const
         if (AudioDeviceManager::IsDistributedCallConnected()) {
             return AudioDeviceType::DEVICE_DISTRIBUTED_AUTOMOTIVE;
         }
-        if (AudioDeviceManager::IsBtScoConnected()) {
+        if (AudioDeviceManager::IsBtActived()) {
             return AudioDeviceType::DEVICE_BLUETOOTH_SCO;
         }
         if (AudioDeviceManager::IsWiredHeadsetConnected()) {
@@ -1017,7 +1017,7 @@ bool AudioControlManager::IsVideoCall(VideoStateType videoState)
 
 bool AudioControlManager::IsBtOrWireHeadPlugin()
 {
-    return AudioDeviceManager::IsBtScoConnected() || AudioDeviceManager::IsWiredHeadsetConnected();
+    return AudioDeviceManager::IsBtActived() || AudioDeviceManager::IsWiredHeadsetConnected();
 }
 } // namespace Telephony
 } // namespace OHOS
