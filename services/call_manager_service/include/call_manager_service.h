@@ -753,6 +753,15 @@ public:
      */
     int32_t SendCallUiEvent(int32_t callId, std::string &eventName) override;
 
+    /**
+     * OnAddSystemAbility
+     *
+     * @brief on system ability added
+     * @param systemAbilityId
+     * @param deviceId
+     */
+    void OnAddSystemAbility(int32_t systemAbilityId, const std::string &deviceId) override;
+
 private:
     std::string GetBundleInfo();
 
