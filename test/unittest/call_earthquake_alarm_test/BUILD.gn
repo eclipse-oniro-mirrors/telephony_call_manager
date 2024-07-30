@@ -23,6 +23,8 @@ ohos_unittest("tel_call_earthquake_alarm_test") {
 
   sources = [
     "${CALL_MANAGER_PATH}/frameworks/native/src/call_manager_service_proxy.cpp",
+    "${CALL_MANAGER_PATH}/services/call_earthquake_alarm/src/call_earthquake_alarm_locator.cpp",
+    "${CALL_MANAGER_PATH}/services/call_earthquake_alarm/src/call_earthquake_alarm_subscriber.cpp",
     "src/call_earthquake_alarm_test.cpp",
   ]
 
@@ -80,7 +82,6 @@ ohos_unittest("tel_call_earthquake_alarm_test") {
   ]
 
   deps = [
-    "${CALL_MANAGER_PATH}:tel_call_manager",
     "${CALL_MANAGER_PATH}/frameworks/native:tel_call_manager_api",
   ]
 

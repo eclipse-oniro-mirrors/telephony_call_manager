@@ -96,7 +96,7 @@ void MyLocationEngine::RegisterLocationChange()
         }
     }
     bool IsLocationEnable;
-    auto codeable = locatorImpl->IsLocationEnabledV9(IsLocationEnable);
+    locatorImpl->IsLocationEnabledV9(IsLocationEnable);
     if (IsLocationEnable == false) {
         return;
     }

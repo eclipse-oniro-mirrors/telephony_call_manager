@@ -12,6 +12,8 @@
 # limitations under the License.
 
 import("//build/test.gni")
+import("../../../callmanager.gni")
+
 CALL_MANAGER_PATH = "../../.."
 
 ohos_unittest("tel_call_manager5_gtest") {
@@ -32,69 +34,29 @@ ohos_unittest("tel_call_manager5_gtest") {
     "src/call_manager5_gtest.cpp",
     "src/call_manager_connect.cpp",
   ]
+  sources += call_manager_sources
 
   include_dirs = [
-    "${CALL_MANAGER_PATH}/frameworks/native/include",
     "${CALL_MANAGER_PATH}/interfaces/innerkits",
-    "${CALL_MANAGER_PATH}/services/audio/include",
-    "${CALL_MANAGER_PATH}/services/audio/include/audio_state",
-    "${CALL_MANAGER_PATH}/services/bluetooth/include",
-    "${CALL_MANAGER_PATH}/services/call_manager_service/include",
-    "${CALL_MANAGER_PATH}/services/call_report/include",
-    "${CALL_MANAGER_PATH}/services/call_setting/include",
-    "${CALL_MANAGER_PATH}/services/call/call_state_observer/include",
-    "${CALL_MANAGER_PATH}/services/call/include",
-    "${CALL_MANAGER_PATH}/services/distributed_call/include",
-    "${CALL_MANAGER_PATH}/services/distributed_call/include/dcall",
-    "${CALL_MANAGER_PATH}/services/hisysevent/include",
-    "${CALL_MANAGER_PATH}/services/spam_call/include",
-    "${CALL_MANAGER_PATH}/services/telephony_interaction/include",
-    "${CALL_MANAGER_PATH}/services/video/include",
-    "${CALL_MANAGER_PATH}/services/satellite_call/include",
     "${CALL_MANAGER_PATH}/test/unittest/call_manager5_gtest/include",
-    "${CALL_MANAGER_PATH}/utils/include",
-    "//third_party/libphonenumber/cpp/src",
-    "//third_party/libphonenumber/cpp/src/phonenumbers",
-    "//third_party/protobuf/src",
   ]
+  include_dirs += call_manager_include_dirs
 
   external_deps = [
-    "ability_base:want",
-    "ability_runtime:ability_manager",
-    "ability_runtime:abilitykit_native",
-    "ability_runtime:app_manager",
-    "ability_runtime:dataobs_manager",
-    "access_token:libaccesstoken_sdk",
     "access_token:libnativetoken",
     "access_token:libtoken_setproc",
-    "audio_framework:audio_client",
-    "audio_framework:audio_toneplayer",
-    "bluetooth:btframework",
-    "c_utils:utils",
-    "cellular_data:tel_cellular_data_api",
-    "common_event_service:cesfwk_innerkits",
-    "core_service:libtel_common",
-    "core_service:tel_core_service_api",
-    "data_share:datashare_consumer",
-    "eventhandler:libeventhandler",
-    "ffrt:libffrt",
-    "graphic_surface:surface",
-    "hilog:libhilog",
-    "init:libbegetutil",
-    "ipc:ipc_single",
-    "player_framework:system_sound_client",
-    "safwk:system_ability_fwk",
-    "samgr:samgr_proxy",
   ]
+  external_deps += call_manager_external_deps
 
   deps = [
-    "${CALL_MANAGER_PATH}:tel_call_manager",
     "${CALL_MANAGER_PATH}/frameworks/native:tel_call_manager_api",
     "//third_party/cJSON:cjson",
+    "//third_party/libphonenumber/cpp:phonenumber_standard",
   ]
 
   defines = [
     "TELEPHONY_LOG_TAG = \"CallManagerGtest\"",
     "LOG_DOMAIN = 0xD000F00",
   ]
+  defines += call_manager_defines
 }

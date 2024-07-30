@@ -24,10 +24,9 @@ config("call_manager_config") {
 
 ohos_shared_library("tel_call_manager_api") {
   sanitize = {
-    cfi = true
-    cfi_cross_dso = true
+    cfi = false  # client target, not required to enable cfi
+    cfi_cross_dso = false
     debug = false
-    cfi_vcall_icall_only = true
   }
   branch_protector_ret = "pac_ret"
   version_script = "tel_call_manager_api.versionscript"
@@ -61,6 +60,25 @@ ohos_shared_library("tel_call_manager_api") {
     "ipc:ipc_single",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
+  ]
+
+  cflags_cc = [
+    "-Wunused",
+    "-Wunreachable-code",
+    "-fno-exceptions",
+    "-fno-rtti",
+    "-Os",
+    "-flto",
+    "-Wno-unused-but-set-variable",
+    "-fdata-sections",
+    "-ffunction-sections",
+    "-fno-asynchronous-unwind-tables",
+    "-fno-unwind-tables",
+  ]
+
+  ldflags = [
+    "-flto",
+    "-Wl,--gc-sections",
   ]
 
   defines = [
