@@ -17,6 +17,7 @@
 
 #include "accesstoken_kit.h"
 #include "audio_device_manager.h"
+#include "audio_proxy.h"
 #include "bluetooth_call_service.h"
 #include "call_ability_report_proxy.h"
 #include "call_manager_dump_helper.h"
@@ -80,7 +81,21 @@ bool CallManagerService::Init()
     DelayedSingleton<CallRecordsManager>::GetInstance()->Init();
     DelayedSingleton<BluetoothConnection>::GetInstance()->Init();
     DelayedSingleton<DistributedCallManager>::GetInstance()->Init();
+    AddSystemAbilityListener(AUDIO_POLICY_SERVICE_ID);
     return true;
+}
+
+void CallManagerService::OnAddSystemAbility(int32_t systemAbilityId, const std::string &deviceId)
+{
+    TELEPHONY_LOGI("OnAddSystemAbility : %{public}d", systemAbilityId);
+    switch (systemAbilityId){
+        case AUDIO_POLICY_SERVICE_ID:
+            DelayedSingleton<AudioProxy>::GetInstance()->SetAudioMicStateChangeCallback();
+            break;
+        default:
+            TELEPHONY_LOGE("OnAddSystemAbility unhandle id : %{public}d", systemAbilityId);
+            break;
+    }
 }
 
 void CallManagerService::UnInit()
