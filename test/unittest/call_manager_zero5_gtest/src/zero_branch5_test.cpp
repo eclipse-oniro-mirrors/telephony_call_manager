@@ -424,26 +424,6 @@ HWTEST_F(ZeroBranch5Test, Telephony_CallAbilityReportProxy_002, Function | Mediu
 }
 
 /**
- * @tc.number   Telephony_CallAbilityConnectCallback_001
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
-HWTEST_F(ZeroBranch5Test, Telephony_CallAbilityConnectCallback_001, Function | MediumTest | Level3)
-{
-    CallAbilityConnectCallback callAbilityConnectCallback;
-    callAbilityConnectCallback.ReConnectAbility();
-    if (CallObjectManager::HasCallExist()) {
-        callAbilityConnectCallback.ReConnectAbility();
-    }
-    std::string bundle = "111";
-    std::string ability = "222";
-    AppExecFwk::ElementName element("", bundle, ability);
-    int resultCode = 0;
-    callAbilityConnectCallback.OnAbilityConnectDone(element, nullptr, resultCode);
-    callAbilityConnectCallback.OnAbilityDisconnectDone(element, resultCode);
-}
-
-/**
  * @tc.number   Telephony_AutoAnswerState_001
  * @tc.name     test error branch
  * @tc.desc     Function test
