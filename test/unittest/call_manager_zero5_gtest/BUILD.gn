@@ -13,7 +13,6 @@
 
 import("//build/test.gni")
 import("../../../callmanager.gni")
-
 CALL_MANAGER_PATH = "../../.."
 
 ohos_unittest("tel_call_manager_zero5_gtest") {

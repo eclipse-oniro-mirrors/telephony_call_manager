@@ -16,7 +16,6 @@ import("//build/config/features.gni")
 import("//build/ohos.gni")
 import("//build/test.gni")
 import("../../../callmanager.gni")
-
 CALL_MANAGER_PATH = "../../.."
 
 ##############################fuzztest##########################################
