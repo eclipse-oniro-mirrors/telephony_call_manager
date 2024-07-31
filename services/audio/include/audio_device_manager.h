@@ -38,6 +38,7 @@ public:
     static bool IsEarpieceAvailable();
     static bool IsSpeakerAvailable();
     static bool IsBtScoConnected();
+    static bool IsBtActived();
     static bool IsDistributedCallConnected();
     static bool IsWiredHeadsetConnected();
     static void SetDeviceAvailable(AudioDeviceType deviceType, bool available);

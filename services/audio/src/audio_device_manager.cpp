@@ -398,7 +398,7 @@ bool AudioDeviceManager::EnableWiredHeadset()
 
 bool AudioDeviceManager::EnableBtSco()
 {
-    if (isBtScoConnected_) {
+    if (IsBtActived()) {
         TELEPHONY_LOGI("bluetooth sco enabled , current audio device : bluetooth sco");
         SetCurrentAudioDevice(AudioDeviceType::DEVICE_BLUETOOTH_SCO);
         return true;
@@ -596,6 +596,17 @@ bool AudioDeviceManager::IsDCallDevEnable()
 bool AudioDeviceManager::IsBtScoConnected()
 {
     return isBtScoConnected_;
+}
+
+bool AudioDeviceManager::IsBtActived()
+{
+    std::unique_ptr<AudioStandard::AudioDeviceDescriptor> activeBluetoothDevice =
+        AudioStandard::AudioRoutingManager::GetInstance()->GetActiveBluetoothDevice();
+    if (activeBluetoothDevice != nullptr && !activeBluetoothDevice->macAddress_.empty()) {
+        TELEPHONY_LOGI("has actived bt device");
+        return true;
+    }
+    return false;
 }
 
 bool AudioDeviceManager::IsDistributedCallConnected()
