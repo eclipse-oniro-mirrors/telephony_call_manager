@@ -81,9 +81,7 @@ ohos_unittest("tel_call_earthquake_alarm_test") {
     "samgr:samgr_proxy",
   ]
 
-  deps = [
-    "${CALL_MANAGER_PATH}/frameworks/native:tel_call_manager_api",
-  ]
+  deps = [ "${CALL_MANAGER_PATH}/frameworks/native:tel_call_manager_api" ]
 
   defines = [
     "TELEPHONY_LOG_TAG = \"CallManagerGtest\"",
