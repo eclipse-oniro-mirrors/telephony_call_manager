@@ -99,6 +99,8 @@ private:
     int32_t HandleRingOnceCall(sptr<CallBase> &call);
     void CarrierAndVoipConflictProcess(int32_t callId);
     void SetVideoCallState(sptr<CallBase> &call, TelCallState nextState);
+    bool IsFocusModeOpen();
+    bool IsRejectCall(sptr<CallBase> &call, const CallDetailInfo &info, bool &block);
 
 private:
     CallDetailInfo callReportInfo_;
