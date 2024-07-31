@@ -380,7 +380,6 @@ HWTEST_F(ZeroBranch4Test, Telephony_BluetoothCallStub_001, Function | MediumTest
 HWTEST_F(ZeroBranch4Test, Telephony_BluetoothConnection_001, Function | MediumTest | Level3)
 {
     auto bluetoothConnection = std::make_shared<BluetoothConnection>();
-    BtScoState state = BtScoState::SCO_STATE_CONNECTED;
     bluetoothConnection->IsAudioActivated();
 #ifdef ABILITY_BLUETOOTH_SUPPORT
     bluetoothConnection->ResetBtConnection();
@@ -391,10 +390,8 @@ HWTEST_F(ZeroBranch4Test, Telephony_BluetoothConnection_001, Function | MediumTe
     int32_t state = static_cast<int32_t>(Bluetooth::BTConnectState::CONNECTED);
     int32_t cause = 1;
     bluetoothConnection->OnConnectionStateChanged(device, state, cause);
-    int32_t state = static_cast<int32_t>(Bluetooth::BTConnectState::DISCONNECTED);
+    state = static_cast<int32_t>(Bluetooth::BTConnectState::DISCONNECTED);
     bluetoothConnection->OnConnectionStateChanged(device, state, cause);
-    bluetoothConnection->OnAddSystemAbility(1, "");
-    bluetoothConnection->OnRemoveSystemAbility(1, "");
     EXPECT_TRUE(bluetoothConnection->IsAudioActivated());
 #endif
 }
