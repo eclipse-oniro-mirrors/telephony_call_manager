@@ -34,9 +34,7 @@ ohos_unittest("tel_call_manager_zero6_gtest") {
   ]
   sources += call_manager_sources
 
-  include_dirs = [
-    "${CALL_MANAGER_PATH}/interfaces/innerkits",
-  ]
+  include_dirs = [ "${CALL_MANAGER_PATH}/interfaces/innerkits" ]
   include_dirs += call_manager_include_dirs
 
   external_deps = [
