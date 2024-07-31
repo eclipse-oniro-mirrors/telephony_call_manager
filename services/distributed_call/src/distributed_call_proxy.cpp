@@ -25,13 +25,12 @@ namespace OHOS {
 namespace Telephony {
 namespace {
 using GetDCallClientClass = OHOS::DistributedHardware::IDCallClient *(*)();
-const std::string DCALL_CLIENT_SDK_PATH = "/system/lib64/libdistributed_call_client.z.so";
 }
 
 DistributedCallProxy::DistributedCallProxy()
 {
     TELEPHONY_LOGI("DistributedCallProxy constructed.");
-    dCallClientHandler_ = dlopen(DCALL_CLIENT_SDK_PATH.c_str(), RTLD_LAZY | RTLD_NODELETE);
+    dCallClientHandler_ = dlopen("libdistributed_call_client.z.so", RTLD_LAZY | RTLD_NODELETE);
     if (dCallClientHandler_ == nullptr) {
         TELEPHONY_LOGE("load dcall client sdk failed, fail reason: %{public}s.", dlerror());
         return;
