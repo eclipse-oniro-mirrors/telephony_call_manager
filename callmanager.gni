@@ -215,3 +215,17 @@ if (defined(global_parts_info) &&
   call_manager_external_deps += [ "cellular_data:tel_cellular_data_api" ]
   call_manager_defines += [ "CELLULAR_DATA_SUPPORT" ]
 }
+
+if (defined(global_parts_info) &&
+    defined(global_parts_info.hiviewdfx_hicollie) &&
+    global_parts_info.hiviewdfx_hicollie) {
+  external_deps += [ "hicollie:libhicollie" ]
+  defines += [ "HICOLLIE_ENABLE" ]
+}
+
+if (defined(global_parts_info) &&
+    defined(global_parts_info.resourceschedule_resource_schedule_service) &&
+    global_parts_info.resourceschedule_resource_schedule_service) {
+  external_deps += [ "resource_schedule_service:ressched_client" ]
+  defines += [ "RES_SCHED_SUPPORT" ]
+}

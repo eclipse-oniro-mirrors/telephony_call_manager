@@ -25,6 +25,16 @@
 
 #include "call_control_manager.h"
 
+#ifdef HICOLLIE_ENABLE
+#include "xcollie/xcollie.h"
+#include "xcollie/xcollie_define.h"
+#define XCOLLIE_TIMEOUT_SECONDS 30
+#endif
+
+#ifdef RES_SCHED_SUPPORT
+#include "res_sched_client.h"
+#endif
+
 namespace OHOS {
 namespace Telephony {
 const int32_t MAX_CALLS_NUM = 5;
@@ -270,7 +280,10 @@ int32_t CallManagerServiceStub::OnRemoteRequest(
     if (itFunc != memberFuncMap_.end()) {
         auto memberFunc = itFunc->second;
         if (memberFunc != nullptr) {
-            return memberFunc(data, reply);
+            int32_t idTimer = SetTimer(code);
+            int32_t result = memberFunc(data, reply);
+            CancelTimer(idTimer);
+            return result;
         }
     }
     return IPCObjectStub::OnRemoteRequest(code, data, reply, option);
@@ -1325,6 +1338,57 @@ int32_t CallManagerServiceStub::OnSendCallUiEvent(MessageParcel &data, MessagePa
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
     return result;
+}
+
+int32_t CallManagerServiceStub::SetTimer(uint32_t code)
+{
+#ifdef HICOLLIE_ENABLE
+    int32_t idTimer = HiviewDFX::INVALID_ID;
+    std::map<uint32_t, std::string>::iterator itCollieId = collieCodeStringMap_.find(code);
+    if (itCollieId != collieCodeStringMap_.end()) {
+        std::string collieStr = itCollieId->second;
+        std::string collieName = "CallManagerServiceStub: " + collieStr;
+        unsigned int flag = HiviewDFX::XCOLLIE_FLAG_NOOP;
+        auto TimerCallback = [collieStr](void *) {
+            TELEPHONY_LOGE("OnRemoteRequest timeout func: %{public}s, pid : %{public}s",
+                collieStr.c_str(), getpid());
+            KillProcessByPid(getpid());
+        };
+        idTimer = HiviewDFX::XCollie::GetInstance().SetTimer(
+            collieName, XCOLLIE_TIMEOUT_SECONDS, TimerCallback, nullptr, flag);
+        TELEPHONY_LOGD("SetTimer id: %{public}d, name: %{public}s.", idTimer, collieStr.c_str());
+    }
+    return idTimer;
+#else
+    TELEPHONY_LOGD("No HICOLLIE_ENABLE");
+    return -1;
+#endif
+}
+
+void CallManagerServiceStub::CancelTimer(int32_t id)
+{
+#ifdef HICOLLIE_ENABLE
+    if (id == HiviewDFX::INVALID_ID) {
+        return;
+    }
+    TELEPHONY_LOGD("CancelTimer id: %{public}d.", id);
+    HiviewDFX::XCollie::GetInstance().CancelTimer(id);
+#else
+    return;
+#endif
+}
+
+void CallManagerServiceStub::KillProcessByPid(const pid_t pid)
+{
+    std::unordered_map<std::string, std::string> killInfo;
+    killInfo["pid"] = std::to_string(pid);
+#ifdef RES_SCHED_SUPPORT
+    if (ResourceSchedulr::ResSchedClient::GetInstance().killProcess(killInfo) == 0) {
+        TELEPHONY_LOGI("kill process pid: %{public}d.", pid);
+    } else {
+        TELEPHONY_LOGI("failed kill process pid: %{public}d.", pid);
+    }
+#endif
 }
 } // namespace Telephony
 } // namespace OHOS
