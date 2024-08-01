@@ -24,6 +24,8 @@ ohos_fuzztest("CallAbilityCallbackFuzzTest") {
   module_out_path = module_output_path
   fuzz_config_file =
       "${CALL_MANAGER_PATH}/test/fuzztest/callabilitycallback_fuzzer"
+  _cfi_blocklist_path = "../../cfi_blocklist.txt"
+
   include_dirs = [
     "${CALL_MANAGER_PATH}/interfaces/innerkits",
     "${CALL_MANAGER_PATH}/test/fuzztest/common_fuzzer",
@@ -53,6 +55,10 @@ ohos_fuzztest("CallAbilityCallbackFuzzTest") {
     "-O0",
     "-Wno-unused-variable",
     "-fno-omit-frame-pointer",
+    "-fvisibility=hidden",
+    "-fsanitize=cfi",
+    "-fsanitize-cfi-cross-dso",
+    "-fsanitize-blacklist=" + rebase_path(_cfi_blocklist_path, root_build_dir),
   ]
   sources = [
     "${CALL_MANAGER_PATH}/test/fuzztest/common_fuzzer/addcalltoken_fuzzer.cpp",
