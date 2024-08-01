@@ -1383,7 +1383,7 @@ void CallManagerServiceStub::KillProcessByPid(const pid_t pid)
     std::unordered_map<std::string, std::string> killInfo;
     killInfo["pid"] = std::to_string(pid);
 #ifdef RES_SCHED_SUPPORT
-    if (ResourceSchedulr::ResSchedClient::GetInstance().killProcess(killInfo) == 0) {
+    if (ResourceSchedule::ResSchedClient::GetInstance().KillProcess(killInfo) == 0) {
         TELEPHONY_LOGI("kill process pid: %{public}d.", pid);
     } else {
         TELEPHONY_LOGI("failed kill process pid: %{public}d.", pid);
