@@ -219,6 +219,6 @@ if (defined(global_parts_info) &&
 if (defined(global_parts_info) &&
     defined(global_parts_info.hiviewdfx_hicollie) &&
     global_parts_info.hiviewdfx_hicollie) {
-  external_deps += [ "hicollie:libhicollie" ]
-  defines += [ "HICOLLIE_ENABLE" ]
+  call_manager_external_deps += [ "hicollie:libhicollie" ]
+  call_manager_defines += [ "HICOLLIE_ENABLE" ]
 }
