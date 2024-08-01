@@ -440,23 +440,23 @@ enum class CallAbilityEventId {
     /**
      * Indicates that FDN is invalid.
      */
-    EVENT_INVALID_FDN_NUMBER,
+    EVENT_INVALID_FDN_NUMBER = 2,
     /**
      * Indicates hold call fail.
      */
-    EVENT_HOLD_CALL_FAILED,
+    EVENT_HOLD_CALL_FAILED = 3,
     /**
      * Indicates swap call fail.
      */
-    EVENT_SWAP_CALL_FAILED,
+    EVENT_SWAP_CALL_FAILED = 4,
     /**
      * Indicates that the combine call failed.
      */
-    EVENT_COMBINE_CALL_FAILED,
+    EVENT_COMBINE_CALL_FAILED = 5,
     /**
      * Indicates that the split call failed.
      */
-    EVENT_SPLIT_CALL_FAILED,
+    EVENT_SPLIT_CALL_FAILED = 6,
     /**
      * Indicates that call is muted.
      */
@@ -470,13 +470,21 @@ enum class CallAbilityEventId {
      */
     EVENT_CALL_SPEAKER_ON = 9,
     /**
-     * Indicates that call is speaker on.
+     * Indicates that call is speaker off.
      */
     EVENT_CALL_SPEAKER_OFF = 10,
     /**
      * Indicates that the OTT is not supported.
      */
-    EVENT_OTT_FUNCTION_UNSUPPORTED,
+    EVENT_OTT_FUNCTION_UNSUPPORTED = 11,
+    /**
+     * Indicates show full screen.
+     */
+    EVENT_SHOW_FULL_SCREEN = 12,
+    /**
+     * Indicates show float window.
+     */
+    EVENT_SHOW_FLOAT_WINDOW = 13,
     /**
      * Indicates that the super privacy mode ON.
      */

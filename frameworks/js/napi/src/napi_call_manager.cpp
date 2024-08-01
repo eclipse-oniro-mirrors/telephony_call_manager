@@ -747,6 +747,12 @@ napi_value NapiCallManager::DeclareCallEventEnumEx(napi_env env, napi_value expo
         DECLARE_NAPI_STATIC_PROPERTY("EVENT_CALL_SPEAKER_OFF",
             NapiCallManagerUtils::ToInt32Value(
                 env, static_cast<int32_t>(CallAbilityEventId::EVENT_CALL_SPEAKER_OFF))),
+        DECLARE_NAPI_STATIC_PROPERTY("EVENT_SHOW_FULL_SCREEN",
+            NapiCallManagerUtils::ToInt32Value(
+                env, static_cast<int32_t>(CallAbilityEventId::EVENT_SHOW_FULL_SCREEN))),
+        DECLARE_NAPI_STATIC_PROPERTY("EVENT_SHOW_FLOAT_WINDOW",
+            NapiCallManagerUtils::ToInt32Value(
+                env, static_cast<int32_t>(CallAbilityEventId::EVENT_SHOW_FLOAT_WINDOW))),
     };
     napi_value result = nullptr;
     napi_define_class(env, "CallAbilityEventId", NAPI_AUTO_LENGTH, NapiCallManagerUtils::CreateEnumConstructor, nullptr,
