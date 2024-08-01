@@ -46,6 +46,8 @@ private:
     void InitImsServiceRequest();
     void InitOttServiceRequest();
     void InitVoipOperationRequest();
+    int32_t SetTimer(uint32_t code);
+    void CancelTimer(int32_t id);
 
     int32_t OnRegisterCallBack(MessageParcel &data, MessageParcel &reply);
     int32_t OnUnRegisterCallBack(MessageParcel &data, MessageParcel &reply);
@@ -120,6 +122,9 @@ private:
     int32_t OnUnRegisterVoipCallManagerCallback(MessageParcel &data, MessageParcel &reply);
     int32_t OnSendCallUiEvent(MessageParcel &data, MessageParcel &reply);
     std::map<uint32_t, CallManagerServiceFunc> memberFuncMap_;
+    std::map<uint32_t, std::string> collieCodeStringMap_ = {
+        { uint32_t(CallManagerInterfaceCode::INTERFACE_REGISTER_CALLBACK), "INTERFACE_REGISTER_CALLBACK" },
+    };
 };
 } // namespace Telephony
 } // namespace OHOS

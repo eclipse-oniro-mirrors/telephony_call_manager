@@ -46,6 +46,7 @@
                 "graphic_2d",
                 "graphic_surface",
                 "hilog",
+                "hicollie",
                 "hisysevent",
                 "hitrace",
                 "init",

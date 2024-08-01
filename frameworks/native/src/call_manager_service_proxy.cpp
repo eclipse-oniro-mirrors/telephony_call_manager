@@ -34,6 +34,7 @@ int32_t CallManagerServiceProxy::RegisterCallBack(const sptr<ICallAbilityCallbac
     }
     dataParcel.WriteRemoteObject(callback->AsObject().GetRefPtr());
     MessageParcel replyParcel;
+    
     int32_t error = SendRequest(INTERFACE_REGISTER_CALLBACK, dataParcel, replyParcel);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("Function RegisterCallBack! errCode:%{public}d", error);

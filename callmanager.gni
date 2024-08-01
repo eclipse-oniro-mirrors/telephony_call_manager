@@ -215,3 +215,10 @@ if (defined(global_parts_info) &&
   call_manager_external_deps += [ "cellular_data:tel_cellular_data_api" ]
   call_manager_defines += [ "CELLULAR_DATA_SUPPORT" ]
 }
+
+if (defined(global_parts_info) &&
+    defined(global_parts_info.hiviewdfx_hicollie) &&
+    global_parts_info.hiviewdfx_hicollie) {
+  call_manager_external_deps += [ "hicollie:libhicollie" ]
+  call_manager_defines += [ "HICOLLIE_ENABLE" ]
+}
