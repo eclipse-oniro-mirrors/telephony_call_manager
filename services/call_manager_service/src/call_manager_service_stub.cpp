@@ -31,10 +31,6 @@
 #define XCOLLIE_TIMEOUT_SECONDS 30
 #endif
 
-#ifdef RES_SCHED_SUPPORT
-#include "res_sched_client.h"
-#endif
-
 namespace OHOS {
 namespace Telephony {
 const int32_t MAX_CALLS_NUM = 5;
