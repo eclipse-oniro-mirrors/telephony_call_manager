@@ -1352,7 +1352,7 @@ int32_t CallManagerServiceStub::SetTimer(uint32_t code)
         auto TimerCallback = [collieStr](void *) {
             TELEPHONY_LOGE("OnRemoteRequest timeout func: %{public}s, pid : %{public}s",
                 collieStr.c_str(), getpid());
-            KillProcessByPid(getpid());
+            exit(1);
         };
         idTimer = HiviewDFX::XCollie::GetInstance().SetTimer(
             collieName, XCOLLIE_TIMEOUT_SECONDS, TimerCallback, nullptr, flag);
@@ -1375,19 +1375,6 @@ void CallManagerServiceStub::CancelTimer(int32_t id)
     HiviewDFX::XCollie::GetInstance().CancelTimer(id);
 #else
     return;
-#endif
-}
-
-void CallManagerServiceStub::KillProcessByPid(const pid_t pid)
-{
-    std::unordered_map<std::string, std::string> killInfo;
-    killInfo["pid"] = std::to_string(pid);
-#ifdef RES_SCHED_SUPPORT
-    if (ResourceSchedule::ResSchedClient::GetInstance().KillProcess(killInfo) == 0) {
-        TELEPHONY_LOGI("kill process pid: %{public}d.", pid);
-    } else {
-        TELEPHONY_LOGI("failed kill process pid: %{public}d.", pid);
-    }
 #endif
 }
 } // namespace Telephony

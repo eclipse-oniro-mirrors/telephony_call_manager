@@ -48,7 +48,6 @@ private:
     void InitVoipOperationRequest();
     int32_t SetTimer(uint32_t code);
     void CancelTimer(int32_t id);
-    void KillProcessByPid(const pid_t pid);
 
     int32_t OnRegisterCallBack(MessageParcel &data, MessageParcel &reply);
     int32_t OnUnRegisterCallBack(MessageParcel &data, MessageParcel &reply);

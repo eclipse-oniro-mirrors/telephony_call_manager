@@ -222,10 +222,3 @@ if (defined(global_parts_info) &&
   external_deps += [ "hicollie:libhicollie" ]
   defines += [ "HICOLLIE_ENABLE" ]
 }
-
-if (defined(global_parts_info) &&
-    defined(global_parts_info.resourceschedule_resource_schedule_service) &&
-    global_parts_info.resourceschedule_resource_schedule_service) {
-  external_deps += [ "resource_schedule_service:ressched_client" ]
-  defines += [ "RES_SCHED_SUPPORT" ]
-}
