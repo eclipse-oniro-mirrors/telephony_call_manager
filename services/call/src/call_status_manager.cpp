@@ -134,7 +134,9 @@ int32_t CallStatusManager::HandleCallReportInfo(const CallDetailInfo &info)
             break;
         }
         case TelCallState::CALL_STATUS_WAITING:
+            DelayedSingleton<CallControlManager>::GetInstance()->AcquireIncomingLock();
             ret = WaitingHandle(info);
+            DelayedSingleton<CallControlManager>::GetInstance()->ReleaseIncomingLock();
             break;
         case TelCallState::CALL_STATUS_DISCONNECTED:
             ret = DisconnectedHandle(info);
