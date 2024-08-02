@@ -726,7 +726,10 @@ int32_t CallStatusManager::HoldingHandle(const CallDetailInfo &info)
 
 int32_t CallStatusManager::WaitingHandle(const CallDetailInfo &info)
 {
-    return IncomingHandle(info);
+    DelayedSingleton<CallControlManager>::GetInstance()->AcquireIncomingLock();
+    int32_t ret = IncomingHandle(info);
+    DelayedSingleton<CallControlManager>::GetInstance()->ReleaseIncomingLock();
+    return ret;
 }
 
 int32_t CallStatusManager::AlertHandle(const CallDetailInfo &info)
