@@ -1548,10 +1548,6 @@ void CallManagerProxy::OnRemoteDied(const wptr<IRemoteObject> &remote)
     }
     Utils::UniqueWriteGuard<Utils::RWLock> guard(rwClientLock_);
     if (callManagerServicePtr_ == nullptr) {
-        TELEPHONY_LOGE("callManagerServicePtr_ is null");
-        return;
-    }
-    if (callManagerServicePtr_ == nullptr) {
         TELEPHONY_LOGE("OnRemoteDied failed, callManagerServicePtr_ is nullptr");
         return;
     }

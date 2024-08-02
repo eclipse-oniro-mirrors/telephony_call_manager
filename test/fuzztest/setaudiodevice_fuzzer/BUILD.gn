@@ -54,11 +54,19 @@ ohos_fuzztest("SetAudioDeviceFuzzTest") {
     "-O0",
     "-Wno-unused-variable",
     "-fno-omit-frame-pointer",
+    "-flto",
     "-fvisibility=hidden",
     "-fsanitize=cfi",
     "-fsanitize-cfi-cross-dso",
     "-fsanitize-blacklist=" + rebase_path(_cfi_blocklist_path, root_build_dir),
   ]
+
+  ldflags = [
+    "-flto",
+    "-fsanitize=cfi",
+    "-fsanitize-cfi-cross-dso",
+  ]
+
   sources = [
     "${CALL_MANAGER_PATH}/test/fuzztest/common_fuzzer/addcalltoken_fuzzer.cpp",
     "setaudiodevice_fuzzer.cpp",
