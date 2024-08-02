@@ -634,11 +634,10 @@ HWTEST_F(ZeroBranch3Test, Telephony_CallAbilityCallbackStub_001, Function | Medi
         CallManagerCallAbilityInterfaceCode::PEERD_DIMENSIONS_CHANGE),
         data, reply, option);
     callAbilityCallback->OnRemoteRequest(static_cast<uint32_t>(
-        CallManagerCallAbilityInterfaceCode::CALL_DATA_USAGE_CHANGE),
-        data, reply, option);
-    callAbilityCallback->OnRemoteRequest(static_cast<uint32_t>(
-        CallManagerCallAbilityInterfaceCode::CAMERA_CAPABILITIES_CHANGE),
-        data, reply, option);
+        CallManagerCallAbilityInterfaceCode::CALL_DATA_USAGE_CHANGE), data, reply, option);
+    int32_t res = callAbilityCallback->OnRemoteRequest(static_cast<uint32_t>(
+        CallManagerCallAbilityInterfaceCode::CAMERA_CAPABILITIES_CHANGE), data, reply, option);
+    ASSERT_NE(res, TELEPHONY_ERR_SUCCESS);
 }
 
 /**

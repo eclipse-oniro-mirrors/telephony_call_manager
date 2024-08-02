@@ -877,7 +877,8 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallControlManager_005, Function | MediumTes
     callControlManager->HangUpVoipCall();
     callControlManager->SetVoIPCallState(3);
     callControlManager->SetVoIPCallState(2);
-    callControlManager->SetVoIPCallState(0);
+    int32_t res = callControlManager->SetVoIPCallState(0);
+    ASSERT_NE(res, TELEPHONY_SUCCESS);
 }
 
 /**

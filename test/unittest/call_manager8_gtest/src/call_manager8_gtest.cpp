@@ -308,7 +308,7 @@ HWTEST_F(CallManager8Gtest, Telephony_CallManagerService_003, Function | MediumT
     callManagerService->GetBundleInfo();
     callManagerService->ReportAudioDeviceInfo();
     std::string eventName = "EVENT_IS_CELIA_CALL";
-    callManagerService->SendCallUiEvent(callId, eventName);
+    ASSERT_NE(callManagerService->SendCallUiEvent(callId, eventName), TELEPHONY_SUCCESS);
 }
 
 /**
@@ -324,6 +324,7 @@ HWTEST_F(CallManager8Gtest, Telephony_CallManagerServiceStub_001, Function | Med
     MessageOption option;
     data.WriteInterfaceToken(CallManagerServiceStub::GetDescriptor());
     data.RewindRead(0);
+    int32_t res = -1;
     callManagerService->OnRemoteRequest(static_cast<uint32_t>(CallManagerInterfaceCode::INTERFACE_DIAL_CALL),
         data, reply, option);
     callManagerService->OnRemoteRequest(static_cast<uint32_t>(CallManagerInterfaceCode::INTERFACE_ANSWER_CALL),
@@ -362,8 +363,9 @@ HWTEST_F(CallManager8Gtest, Telephony_CallManagerServiceStub_001, Function | Med
         data, reply, option);
     callManagerService->OnRemoteRequest(static_cast<uint32_t>(CallManagerInterfaceCode::INTERFACE_STOP_DTMF),
         data, reply, option);
-    callManagerService->OnRemoteRequest(static_cast<uint32_t>(CallManagerInterfaceCode::INTERFACE_POST_DIAL_PROCEED),
-        data, reply, option);
+    res = callManagerService->OnRemoteRequest(static_cast<uint32_t>(
+        CallManagerInterfaceCode::INTERFACE_POST_DIAL_PROCEED), data, reply, option);
+    ASSERT_NE(res, TELEPHONY_SUCCESS);
 }
 
 /**
@@ -417,8 +419,9 @@ HWTEST_F(CallManager8Gtest, Telephony_CallManagerServiceStub_002, Function | Med
         data, reply, option);
     callManagerService->OnRemoteRequest(static_cast<uint32_t>(CallManagerInterfaceCode::INTERFACE_SET_PAUSE_IMAGE),
         data, reply, option);
-    callManagerService->OnRemoteRequest(static_cast<uint32_t>(CallManagerInterfaceCode::INTERFACE_SET_DEVICE_DIRECTION),
-        data, reply, option);
+    int32_t res = callManagerService->OnRemoteRequest(static_cast<uint32_t>(
+        CallManagerInterfaceCode::INTERFACE_SET_DEVICE_DIRECTION), data, reply, option);
+    ASSERT_NE(res, TELEPHONY_SUCCESS);
 }
 
 /**
@@ -472,8 +475,9 @@ callManagerService->OnRemoteRequest(static_cast<uint32_t>(
     CallManagerInterfaceCode::INTERFACE_INPUT_DIALER_SPECIAL_CODE), data, reply, option);
 callManagerService->OnRemoteRequest(static_cast<uint32_t>(
     CallManagerInterfaceCode::INTERFACE_CANCEL_MISSED_INCOMING_CALL_NOTIFICATION), data, reply, option);
-callManagerService->OnRemoteRequest(static_cast<uint32_t>(CallManagerInterfaceCode::INTERFACE_SET_VONR_STATE),
-    data, reply, option);
+int32_t res = callManagerService->OnRemoteRequest(static_cast<uint32_t>(
+    CallManagerInterfaceCode::INTERFACE_SET_VONR_STATE), data, reply, option);
+ASSERT_NE(res, TELEPHONY_SUCCESS);
 }
 
 /**
@@ -511,8 +515,9 @@ HWTEST_F(CallManager8Gtest, Telephony_CallManagerServiceStub_004, Function | Med
         CallManagerInterfaceCode::INTERFACE_VOIP_UNREGISTER_CALLBACK), data, reply, option);
     callManagerService->OnRemoteRequest(static_cast<uint32_t>(
         CallManagerInterfaceCode::INTERFACE_OBSERVER_ON_CALL_DETAILS_CHANGE), data, reply, option);
-    callManagerService->OnRemoteRequest(static_cast<uint32_t>(CallManagerInterfaceCode::INTERFACE_SEND_CALLUI_EVENT),
-        data, reply, option);
+    ASSERT_NE(callManagerService->OnRemoteRequest(
+        static_cast<uint32_t>(CallManagerInterfaceCode::INTERFACE_SEND_CALLUI_EVENT),
+        data, reply, option), TELEPHONY_SUCCESS);
 }
 
 /**
@@ -562,7 +567,7 @@ HWTEST_F(CallManager8Gtest, Telephony_CallManagerServiceStub_005, Function | Med
     callManagerService->OnSetAudioDevice(data, reply);
     callManagerService->OnRegisterVoipCallManagerCallback(data, reply);
     callManagerService->OnUnRegisterVoipCallManagerCallback(data, reply);
-    callManagerService->OnGetProxyObjectPtr(data, reply);
+    ASSERT_NE(callManagerService->OnGetProxyObjectPtr(data, reply), TELEPHONY_SUCCESS);
 }
 
 /**
@@ -622,7 +627,7 @@ HWTEST_F(CallManager8Gtest, Telephony_CallManagerServiceStub_006, Function | Med
     std::vector<std::u16string> numberList;
     data5.WriteString16Vector(numberList);
     data5.RewindRead(0);
-    callManagerService->OnJoinConference(data5, reply);
+    ASSERT_NE(callManagerService->OnJoinConference(data5, reply), TELEPHONY_SUCCESS);
 }
 
 /**
@@ -683,7 +688,7 @@ HWTEST_F(CallManager8Gtest, Telephony_CallManagerServiceStub_007, Function | Med
     float fnum = 0.0;
     data5.WriteFloat(fnum);
     data5.RewindRead(0);
-    callManagerService->OnSetCameraZoom(data5, reply);
+    ASSERT_NE(callManagerService->OnSetCameraZoom(data5, reply), TELEPHONY_SUCCESS);
 }
 
 /**
@@ -733,7 +738,7 @@ HWTEST_F(CallManager8Gtest, Telephony_CallManagerServiceStub_008, Function | Med
     int length = sizeof(ImsCallMode);
     data11.WriteRawData((const void *)&imsCallMode, length);
     data11.RewindRead(0);
-    callManagerService->OnUpdateCallMediaMode(data11, reply);
+    ASSERT_NE(callManagerService->OnUpdateCallMediaMode(data11, reply), TELEPHONY_SUCCESS);
 }
 
 /**
@@ -779,7 +784,7 @@ HWTEST_F(CallManager8Gtest, Telephony_CallManagerServiceStub_009, Function | Med
     data15.WriteInt32(defaultNumber);
     data15.WriteString("hello");
     callManagerService->OnGetProxyObjectPtr(data15, reply);
-    callManagerService->OnSendCallUiEvent(data15, reply);
+    ASSERT_NE(callManagerService->OnSendCallUiEvent(data15, reply), TELEPHONY_SUCCESS);
 }
 
 /**

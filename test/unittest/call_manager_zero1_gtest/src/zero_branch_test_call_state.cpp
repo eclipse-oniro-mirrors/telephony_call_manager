@@ -444,9 +444,9 @@ HWTEST_F(CallStateTest, Telephony_AudioControlManager_004, Function | MediumTest
     audioControl->StopCallTone();
     audioControl->GetAudioInterruptState();
     audioControl->SetVolumeAudible();
-    audioControl->GetCurrentActiveCall();
     audioControl->ringState_ = RingState::RINGING;
     audioControl->MuteRinger();
+    ASSERT_TRUE(audioControl->GetCurrentActiveCall() == nullptr);
 }
 
 /**
@@ -508,7 +508,7 @@ HWTEST_F(CallStateTest, Telephony_AudioDeviceManager_002, Function | MediumTest 
     audioDeviceManager->IsBtScoDevEnable();
     audioDeviceManager->IsDCallDevEnable();
     audioDeviceManager->IsSpeakerDevEnable();
-    audioDeviceManager->IsSpeakerAvailable();
+    ASSERT_FALSE(audioDeviceManager->IsSpeakerAvailable());
 }
 
 /**
@@ -829,9 +829,6 @@ HWTEST_F(CallStateTest, Telephony_CallStatusCallbackProxy_003, Function | Medium
     callStatusCallbackProxy->StopDtmfResult(result);
     callStatusCallbackProxy->SendUssdResult(result);
     MmiCodeInfo mmiCodeInfo;
-    ASSERT_EQ(callStatusCallbackProxy->SendMmiCodeResult(mmiCodeInfo), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
-    ASSERT_EQ(callStatusCallbackProxy->GetImsCallDataResult(result), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
-    ASSERT_EQ(callStatusCallbackProxy->CloseUnFinishedUssdResult(result), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
     CallModeReportInfo callModeRequestInfo;
     callStatusCallbackProxy->ReceiveUpdateCallMediaModeRequest(callModeRequestInfo);
     CallModeReportInfo callModeResponseInfo;
@@ -843,6 +840,9 @@ HWTEST_F(CallStateTest, Telephony_CallStatusCallbackProxy_003, Function | Medium
     callStatusCallbackProxy->HandleCallDataUsageChanged(static_cast<int64_t>(result));
     CameraCapabilitiesReportInfo cameraCapabilitiesInfo;
     callStatusCallbackProxy->HandleCameraCapabilitiesChanged(cameraCapabilitiesInfo);
+    ASSERT_EQ(callStatusCallbackProxy->SendMmiCodeResult(mmiCodeInfo), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+    ASSERT_EQ(callStatusCallbackProxy->GetImsCallDataResult(result), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+    ASSERT_EQ(callStatusCallbackProxy->CloseUnFinishedUssdResult(result), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
 }
 
 /**
@@ -897,6 +897,7 @@ HWTEST_F(CallStateTest, Telephony_CallRequestProcess_002, Function | MediumTest 
     callBase12->callId_ = 5;
     bool enabled2 = false;
     callRequestProcess->HandleCallWaitingNumTwo(callBase12, callBase8, 1, 1, enabled2);
+    ASSERT_NE(callBase12, nullptr);
 }
 
 /**
@@ -925,7 +926,7 @@ HWTEST_F(CallStateTest, Telephony_CallRequestProcess_003, Function | MediumTest 
     callRequestProcess->HasActiveCall();
     callRequestProcess->HasDialingCall();
     callRequestProcess->NeedAnswerVTAndEndActiveVO(defaultCallId, 0);
-    callRequestProcess->NeedAnswerVOAndEndActiveVT(defaultCallId, 0);
+    ASSERT_FALSE(callRequestProcess->NeedAnswerVOAndEndActiveVT(defaultCallId, 0));
 }
 
 /**
@@ -954,7 +955,7 @@ HWTEST_F(CallStateTest, Telephony_CallRequestProcess_004, Function | MediumTest 
     callRequestProcess->HangUpForDsdaRequest(callBase2);
     CellularCallInfo callInfo;
     callRequestProcess->HandleStartDial(false, callInfo);
-    callRequestProcess->EccDialPolicy();
+    ASSERT_NE(callRequestProcess->EccDialPolicy(), TELEPHONY_SUCCESS);
 }
 
 /**
@@ -977,7 +978,7 @@ HWTEST_F(CallStateTest, Telephony_VoipCallConnection_001, Function | MediumTest 
     sptr<ICallStatusCallback> callStatusCallback = nullptr;
     voipCallConnection->RegisterCallManagerCallBack(callStatusCallback);
     voipCallConnection->ClearVoipCall();
-    voipCallConnection->UnRegisterCallManagerCallBack();
+    ASSERT_NE(voipCallConnection->UnRegisterCallManagerCallBack(), TELEPHONY_SUCCESS);
 }
 
 /**
@@ -990,12 +991,13 @@ HWTEST_F(CallStateTest, Telephony_CallStateProcessor_001, Function | MediumTest 
     auto callStateProcessor = DelayedSingleton<CallStateProcessor>::GetInstance();
     TelCallState state = TelCallState::CALL_STATUS_ACTIVE;
     callStateProcessor->AddCall(1, state);
-    callStateProcessor->UpdateCurrentCallState();
+    bool result = callStateProcessor->UpdateCurrentCallState();
     callStateProcessor->ShouldStopSoundtone();
     callStateProcessor->GetCurrentActiveCall();
     callStateProcessor->GetCallNumber(state);
     callStateProcessor->ShouldSwitchState(state);
     callStateProcessor->GetAudioForegroundLiveCall();
+    ASSERT_EQ(result, false);
 }
 
 /**
@@ -1007,7 +1009,8 @@ HWTEST_F(CallStateTest, Telephony_CoreServiceConnection_001, Function | MediumTe
 {
     CoreServiceConnection coreServiceConnection;
     coreServiceConnection.GetFdnNumberList(DEFAULT_SLOT_ID);
-    coreServiceConnection.IsFdnEnabled(DEFAULT_SLOT_ID);
+    bool res = coreServiceConnection.IsFdnEnabled(DEFAULT_SLOT_ID);
+    ASSERT_EQ(res, true);
 }
 
 } // namespace Telephony
