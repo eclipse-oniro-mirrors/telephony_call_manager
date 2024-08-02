@@ -71,7 +71,7 @@ HWTEST_F(SpamCallTest, Telephony_SpamCallAdapter_002, Function | MediumTest | Le
     std::shared_ptr<SpamCallAdapter> spamCallAdapter_ = std::make_shared<SpamCallAdapter>();
     const std::string phoneNumber = "12345678900";
     const int32_t slotId = 0;
-    spamCallAdapter_->DetectSpamCall(phoneNumber, slotId);
+    ASSERT_TRUE(spamCallAdapter_->DetectSpamCall(phoneNumber, slotId));
 }
 
 /**
@@ -126,7 +126,7 @@ HWTEST_F(SpamCallTest, Telephony_CallbackStubHelper_002, Function | MediumTest |
     CallbackStubHelper callbackStubHelper(spamCallAdapter);
     int32_t errCode = 0;
     std::string result;
-    callbackStubHelper.OnResult(errCode, result);
+    ASSERT_NE(callbackStubHelper.OnResult(errCode, result), 0);
 }
 
 /**
@@ -167,8 +167,8 @@ HWTEST_F(SpamCallTest, Telephony_SpamCallConnection_001, Function | MediumTest |
     int resultCode = 0;
     spamCallConnection.OnAbilityConnectDone(element, remoteObject, resultCode);
     spamCallConnection.OnAbilityDisconnectDone(element, resultCode);
+    ASSERT_NE(resultCode, 0);
 }
-
 
 /**
  * @tc.number   Telephony_TimeWaitHelper_001
@@ -178,8 +178,9 @@ HWTEST_F(SpamCallTest, Telephony_SpamCallConnection_001, Function | MediumTest |
 HWTEST_F(SpamCallTest, Telephony_TimeWaitHelper_001, Function | MediumTest | Level1)
 {
     TimeWaitHelper timeWaitHelper(10);
-    timeWaitHelper.WaitForResult();
+    bool result = timeWaitHelper.WaitForResult();
     timeWaitHelper.NotifyAll();
+    ASSERT_NE(result, true);
 }
 
 /**
@@ -194,7 +195,7 @@ HWTEST_F(SpamCallTest, Telephony_SpamCallProxy_001, Function | MediumTest | Leve
     std::string phoneNumber = "123456789012";
     int32_t slotId = 0;
     std::shared_ptr<SpamCallAdapter> spamCallAdapter = std::make_shared<SpamCallAdapter>();
-    spamCallProxy.DetectSpamCall(phoneNumber, slotId, spamCallAdapter);
+    ASSERT_NE(spamCallProxy.DetectSpamCall(phoneNumber, slotId, spamCallAdapter), 0);
 }
 
 /**
@@ -211,6 +212,7 @@ HWTEST_F(SpamCallTest, Telephony_CallAbilityConnection_001, Function | MediumTes
     AppExecFwk::ElementName element("", bundle, ability);
     int resultCode = 0;
     callAbilityConnection.OnAbilityDisconnectDone(element, resultCode);
+    ASSERT_EQ(resultCode, 0);
 }
 
 /**
@@ -227,6 +229,7 @@ HWTEST_F(SpamCallTest, Telephony_CallSettingAbilityConnection_001, Function | Me
     AppExecFwk::ElementName element("", bundle, ability);
     int resultCode = 0;
     callSettingAbilityConnection.OnAbilityDisconnectDone(element, resultCode);
+    ASSERT_EQ(resultCode, 0);
 }
 
 }

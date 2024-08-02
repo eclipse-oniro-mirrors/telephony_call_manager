@@ -207,7 +207,7 @@ HWTEST_F(ZeroBranch6Test, Telephony_CallStatusCallbackStub_004, Function | Mediu
     dataParcel.WriteRawData((const void *)&info, length);
     dataParcel.RewindRead(0);
     MessageParcel reply1;
-    callStatusCallback->OnUpdateEventReport(dataParcel, reply1);
+    ASSERT_NE(callStatusCallback->OnUpdateEventReport(dataParcel, reply1), TELEPHONY_SUCCESS);
 }
 
 /**
@@ -264,7 +264,7 @@ HWTEST_F(ZeroBranch6Test, Telephony_CallStatusCallbackStub_005, Function | Mediu
     dataParcel2.WriteRawData((const void *)&callTransferResponse, length);
     dataParcel2.RewindRead(0);
     MessageParcel reply2;
-    callStatusCallback->OnUpdateGetTransferResult(dataParcel2, reply2);
+    ASSERT_NE(callStatusCallback->OnUpdateGetTransferResult(dataParcel2, reply2), TELEPHONY_SUCCESS);
 }
 
 /**
@@ -316,7 +316,7 @@ HWTEST_F(ZeroBranch6Test, Telephony_CallStatusCallbackStub_006, Function | Mediu
     memcpy_s(info.message, kMaxNumberLen, msg.c_str(), msgLength);
     dataParcel4.WriteRawData((const void *)&info, length);
     dataParcel4.RewindRead(0);
-    callStatusCallback->OnSendMmiCodeResult(dataParcel4, reply);
+    ASSERT_NE(callStatusCallback->OnSendMmiCodeResult(dataParcel4, reply), TELEPHONY_SUCCESS);
 }
 
 /**
@@ -373,7 +373,7 @@ HWTEST_F(ZeroBranch6Test, Telephony_CallStatusCallbackStub_007, Function | Mediu
     dataParcel5.WriteRawData((const void *)&cameraCapabilitiesReportInfo, length);
     dataParcel5.RewindRead(0);
     MessageParcel reply5;
-    callStatusCallback->OnCameraCapabilitiesChange(dataParcel5, reply5);
+    ASSERT_NE(callStatusCallback->OnCameraCapabilitiesChange(dataParcel5, reply5), TELEPHONY_SUCCESS);
 }
 
 /**
@@ -389,7 +389,7 @@ HWTEST_F(ZeroBranch6Test, Telephony_CallStatusCallbackStub_008, Function | Mediu
     dataParcel.WriteInt32(0);
     dataParcel.WriteString("hello");
     MessageParcel reply;
-    callStatusCallback->OnUpdateDisconnectedCause(dataParcel, reply);
+    ASSERT_NE(callStatusCallback->OnUpdateDisconnectedCause(dataParcel, reply), TELEPHONY_SUCCESS);
     MessageParcel dataParcel2;
     dataParcel2.WriteInterfaceToken(CallStatusCallbackStub::GetDescriptor());
     dataParcel2.WriteInt32(0);
@@ -408,7 +408,7 @@ HWTEST_F(ZeroBranch6Test, Telephony_CallStatusCallbackStub_008, Function | Mediu
     callStatusCallback->OnStopDtmfResult(dataParcel2, reply);
     callStatusCallback->OnSendUssdResult(dataParcel2, reply);
     callStatusCallback->OnGetImsCallDataResult(dataParcel2, reply);
-    callStatusCallback->OnCloseUnFinishedUssdResult(dataParcel2, reply);
+    ASSERT_NE(callStatusCallback->OnCloseUnFinishedUssdResult(dataParcel2, reply), TELEPHONY_SUCCESS);
 }
 
 /**
@@ -449,7 +449,7 @@ HWTEST_F(ZeroBranch6Test, Telephony_CallStatusCallbackStub_009, Function | Mediu
     dataParce6.WriteString("abc");
     dataParce6.WriteInt32(0);
     dataParce6.WriteInt32(0);
-    callStatusCallback->OnUpdateVoipEventInfo(dataParce6, reply);
+    ASSERT_NE(callStatusCallback->OnUpdateVoipEventInfo(dataParce6, reply), TELEPHONY_SUCCESS);
 }
 
 /**
@@ -472,6 +472,7 @@ HWTEST_F(ZeroBranch6Test, Telephony_SatelliteCallControl_001, Function | MediumT
     satelliteCallControl->IsShowDialog();
     bool isShowDialog = true;
     satelliteCallControl->SetShowDialog(isShowDialog);
+    ASSERT_EQ(isShowDialog, true);
 }
 
 /**
@@ -490,6 +491,7 @@ HWTEST_F(ZeroBranch6Test, Telephony_ProximitySensor_001, Function | MediumTest |
     proximitySensor->IncomingCallActivated(callObjectPtr);
     DisconnectedDetails details;
     proximitySensor->CallDestroyed(details);
+    ASSERT_NE(proximitySensor, nullptr);
 }
 
 /**
@@ -510,6 +512,7 @@ HWTEST_F(ZeroBranch6Test, Telephony_StatusBar_001, Function | MediumTest | Level
     statusBar->IncomingCallActivated(callObjectPtr);
     DisconnectedDetails details;
     statusBar->CallDestroyed(details);
+    ASSERT_NE(statusBar, nullptr);
 }
 
 /**
@@ -528,6 +531,7 @@ HWTEST_F(ZeroBranch6Test, Telephony_WiredHeadset_001, Function | MediumTest | Le
     wiredHeadset->IncomingCallActivated(callObjectPtr);
     DisconnectedDetails details;
     wiredHeadset->CallDestroyed(details);
+    ASSERT_NE(wiredHeadset, nullptr);
 }
 
 /**
@@ -540,7 +544,8 @@ HWTEST_F(ZeroBranch6Test, Telephony_CallStatusPolicy_001, Function | MediumTest 
     CallStatusPolicy callStatusPolicy;
     CallDetailInfo info;
     callStatusPolicy.DialingHandlePolicy(info);
-    callStatusPolicy.FilterResultsDispose(nullptr);
+    int32_t res = callStatusPolicy.FilterResultsDispose(nullptr);
+    ASSERT_NE(res, TELEPHONY_SUCCESS);
 }
 
 /**
@@ -568,7 +573,7 @@ HWTEST_F(ZeroBranch6Test, Telephony_CallAbilityCallback_002, Function | MediumTe
     callAbilityCallback->OnUpdateCallSessionEventChange(data, reply);
     callAbilityCallback->OnUpdatePeerDimensionsChange(data, reply);
     callAbilityCallback->OnUpdateCallDataUsageChange(data, reply);
-    callAbilityCallback->OnUpdateCameraCapabilities(data, reply);
+    ASSERT_NE(callAbilityCallback->OnUpdateCameraCapabilities(data, reply), TELEPHONY_SUCCESS);
 }
 } // namespace Telephony
 } // namespace OHOS

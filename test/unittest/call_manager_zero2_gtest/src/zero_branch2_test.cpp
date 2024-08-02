@@ -227,7 +227,7 @@ HWTEST_F(ZeroBranch2Test, Telephony_CallRequestProcess_001, Function | MediumTes
     callRequestProcess->IsDsdsMode3();
     callRequestProcess->DisconnectOtherSubIdCall(1, 0, 0);
     callRequestProcess->DisconnectOtherCallForVideoCall(1);
-    callRequestProcess->IsDsdsMode5();
+    ASSERT_TRUE(callRequestProcess->IsDsdsMode5());
 }
 
 /**
@@ -284,6 +284,7 @@ HWTEST_F(ZeroBranch2Test, Telephony_CallRequestProcess_002, Function | MediumTes
     callRequestProcess->HandleCallWaitingNumZero(incomingCall, voipCall, SIM1_SLOTID, 2, flagForConference);
     callRequestProcess->HandleCallWaitingNumZero(incomingCall, dialCall, SIM1_SLOTID, 2, flagForConference);
     callRequestProcess->DisconnectOtherCallForVideoCall(VALID_CALLID);
+    ASSERT_TRUE(flagForConference);
 }
 
 /**
@@ -335,6 +336,7 @@ HWTEST_F(ZeroBranch2Test, Telephony_CallRequestProcess_003, Function | MediumTes
     callRequestProcess->HandleDialFail();
     callRequestProcess->DeleteOneCallObject(call);
     callRequestProcess->DeleteOneCallObject(dialCall);
+    ASSERT_TRUE(callRequestProcess->isFirstDialCallAdded_);
 }
 
 /**
@@ -364,7 +366,7 @@ HWTEST_F(ZeroBranch2Test, Telephony_CallObjectManager_001, Function | MediumTest
     std::string number = "";
     CallObjectManager::IsCallExist(number);
     number = "test";
-    CallObjectManager::IsCallExist(number);
+    bool res = CallObjectManager::IsCallExist(number);
     CallObjectManager::HasVideoCall();
     csCall->SetVideoStateType(VideoStateType::TYPE_VIDEO);
     CallObjectManager::HasVideoCall();
@@ -374,6 +376,7 @@ HWTEST_F(ZeroBranch2Test, Telephony_CallObjectManager_001, Function | MediumTest
     csCall->SetCallType(CallType::TYPE_OTT);
     CallObjectManager::GetCallInfoList(SIM1_SLOTID);
     CallObjectManager::GetCallInfoList(DEFAULT_INDEX);
+    ASSERT_TRUE(res);
 }
 
 /**
@@ -398,8 +401,8 @@ HWTEST_F(ZeroBranch2Test, Telephony_CallObjectManager_002, Function | MediumTest
     bool hasRingingCall = false;
     CallObjectManager::HasRingingCall(hasRingingCall);
     csCall->callRunningState_ = CallRunningState::CALL_RUNNING_STATE_HOLD;
-    CallObjectManager::HasHoldCall(hasRingingCall);
-    CallObjectManager::IsCallExist(CallType::TYPE_VOIP, TelCallState::CALL_STATUS_ACTIVE);
+CallObjectManager::HasHoldCall(hasRingingCall);
+    ASSERT_FALSE(CallObjectManager::IsCallExist(CallType::TYPE_VOIP, TelCallState::CALL_STATUS_ACTIVE));
     CallObjectManager::DeleteOneCallObject(0);
 }
 
@@ -581,12 +584,13 @@ HWTEST_F(ZeroBranch2Test, Telephony_CellularCallConnection_004, Function | Mediu
     int32_t state = 0;
     cellularCallConnection->SetVoNRState(SIM1_SLOTID, state);
     cellularCallConnection->GetVoNRState(SIM1_SLOTID, state);
-    cellularCallConnection->CloseUnFinishedUssd(SIM1_SLOTID);
+    int res = cellularCallConnection->CloseUnFinishedUssd(SIM1_SLOTID);
     CellularCallConnection::SystemAbilityListener listen;
     int32_t systemAbilityId = 1;
     std::string deviceId = "123";
     listen.OnAddSystemAbility(systemAbilityId, deviceId);
     listen.OnRemoveSystemAbility(systemAbilityId, deviceId);
+    ASSERT_NE(res, TELEPHONY_ERR_SUCCESS);
 }
 
 /**

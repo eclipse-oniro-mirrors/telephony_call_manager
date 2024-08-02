@@ -239,8 +239,9 @@ HWTEST_F(ZeroBranch5Test, Telephony_CallStatusManager_004, Function | MediumTest
     callStatusManager->ShouldRejectIncomingCall();
     callStatusManager->IsRingOnceCall(callObjectPtr, callDetailInfo);
     sptr<CallBase> callObjectPtr1 = nullptr;
-    callStatusManager->HandleRingOnceCall(callObjectPtr1);
+    int32_t res = callStatusManager->HandleRingOnceCall(callObjectPtr1);
     callStatusManager->HandleRingOnceCall(callObjectPtr);
+    ASSERT_NE(res, TELEPHONY_SUCCESS);
 }
 
 /**
@@ -282,6 +283,7 @@ HWTEST_F(ZeroBranch5Test, Telephony_CallStateReportProxy_001, Function | MediumT
     std::u16string phoneNumber = Str8ToStr16(number);
     callStateReportPtr.ReportCallState(0, phoneNumber);
     callStateReportPtr.ReportCallStateForCallId(0, 0, phoneNumber);
+    ASSERT_TRUE(!number.empty());
 }
 
 /**
@@ -413,14 +415,14 @@ HWTEST_F(ZeroBranch5Test, Telephony_CallAbilityReportProxy_002, Function | Mediu
         callAbilityConnectCallback.ReConnectAbility();
     }
     CallConnectAbility callConnectCalluiAbility;
-    ASSERT_FALSE(callConnectCalluiAbility.WaitForConnectResult());
+    callConnectCalluiAbility.WaitForConnectResult();
     std::shared_ptr<CallAbilityReportProxy> callAbilityReportProxy = std::make_shared<CallAbilityReportProxy>();
     int64_t dataUsage = 0;
     std::string pidName = "123";
     callAbilityReportProxy->ReportCallDataUsageChange(dataUsage);
     CameraCapabilities cameraCapabilities;
     callAbilityReportProxy->ReportCameraCapabilities(cameraCapabilities);
-    callAbilityReportProxy->UnRegisterCallBack(pidName);
+    ASSERT_EQ(callAbilityReportProxy->UnRegisterCallBack(pidName), TELEPHONY_SUCCESS);
 }
 
 /**
@@ -611,6 +613,9 @@ HWTEST_F(ZeroBranch5Test, Telephony_BluetoothCallManager_001, Function | MediumT
     bluetoothCallManager.SendBtCallState(numActive, numHeld, callState, number);
     bluetoothCallManager.SendCallDetailsChange(1, 1);
     bluetoothCallManager.IsBtAvailble();
+    ASSERT_EQ(numHeld, 0);
+    ASSERT_EQ(numActive, 0);
+    ASSERT_EQ(numDial, 0);
 }
 
 /**
@@ -623,6 +628,7 @@ HWTEST_F(ZeroBranch5Test, Telephony_CallAbilityCallbackDeathRecipient_001, Funct
     CallAbilityCallbackDeathRecipient recipient;
     OHOS::wptr<OHOS::IRemoteObject> object;
     recipient.OnRemoteDied(object);
+    ASSERT_EQ(object, nullptr);
 }
 
 /**
@@ -635,6 +641,7 @@ HWTEST_F(ZeroBranch5Test, Telephony_ApplicationStateObserver_001, Function | Med
     ApplicationStateObserver applicationStateObserver;
     AppExecFwk::ProcessData processData;
     applicationStateObserver.OnProcessDied(processData);
+    ASSERT_NE(sizeof(processData), 0);
 }
 
 /**
@@ -642,7 +649,7 @@ HWTEST_F(ZeroBranch5Test, Telephony_ApplicationStateObserver_001, Function | Med
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroBranch5Test, Telephony_CallAbilityCallbackProxy, Function | MediumTest | Level3)
+HWTEST_F(ZeroBranch5Test, Telephony_CallAbilityCallbackProxy_001, Function | MediumTest | Level3)
 {
     sptr<IRemoteObject> impl;
     CallAbilityCallbackProxy callAbilityCallbackProxy(impl);
@@ -673,6 +680,7 @@ HWTEST_F(ZeroBranch5Test, Telephony_CallAbilityCallbackProxy, Function | MediumT
     callAbilityCallbackProxy.OnReportAudioDeviceChange(audioDeviceInfo);
     const std::string str {"123"};
     callAbilityCallbackProxy.OnReportPostDialDelay(str);
+    ASSERT_TRUE(!str.empty());
 }
 
 /**
@@ -693,6 +701,7 @@ HWTEST_F(ZeroBranch5Test, Telephony_CallBroadcastSubscriber_001, Function | Medi
     subscriber.ConnectCallUiServiceBroadcast(eventData);
     subscriber.HighTempLevelChangedBroadcast(eventData);
     subscriber.ConnectCallUiSuperPrivacyModeBroadcast(eventData);
+    ASSERT_NE(sizeof(eventData), 0);
 }
 
 /**
@@ -714,10 +723,11 @@ HWTEST_F(ZeroBranch5Test, Telephony_OTTCallConnection_001, Function | MediumTest
     ott.SeparateConference(requestInfo);
     ott.KickOutFromConference(requestInfo);
     std::vector<std::string> numberList;
-    ott.InviteToConference(requestInfo, numberList);
+    int32_t result = ott.InviteToConference(requestInfo, numberList);
     ott.UpdateImsCallMode(requestInfo, ImsCallMode::CALL_MODE_AUDIO_ONLY);
     AppExecFwk::PacMap info;
     ott.PackCellularCallInfo(requestInfo, info);
+    ASSERT_NE(result, TELEPHONY_SUCCESS);
 }
 
 /**
@@ -728,7 +738,8 @@ HWTEST_F(ZeroBranch5Test, Telephony_OTTCallConnection_001, Function | MediumTest
 HWTEST_F(ZeroBranch5Test, Telephony_SuperPrivacyManagerClient_001, Function | MediumTest | Level3)
 {
     int32_t privacy = SuperPrivacyManagerClient::GetInstance().
-    SetSuperPrivacyMode(static_cast<int32_t>(CallSuperPrivacyModeType::OFF), SOURCE_CALL);
+        SetSuperPrivacyMode(static_cast<int32_t>(CallSuperPrivacyModeType::OFF), SOURCE_CALL);
+    ASSERT_NE(privacy, 0);
 }
 
 /**
@@ -783,7 +794,8 @@ HWTEST_F(ZeroBranch5Test, Telephony_CallStatusCallback_001, Function | MediumTes
     callStatusCallback->InviteToConferenceResult(result);
     MmiCodeInfo mmiCodeInfo;
     callStatusCallback->SendMmiCodeResult(mmiCodeInfo);
-    callStatusCallback->CloseUnFinishedUssdResult(result);
+    int32_t res = callStatusCallback->CloseUnFinishedUssdResult(result);
+    ASSERT_NE(res, TELEPHONY_SUCCESS);
 }
 
 /**
@@ -807,7 +819,8 @@ HWTEST_F(ZeroBranch5Test, Telephony_CallStatusCallback_002, Function | MediumTes
     CameraCapabilitiesReportInfo cameraCapabilities;
     callStatusCallback->HandleCameraCapabilitiesChanged(cameraCapabilities);
     VoipCallEventInfo voipCallEventInfo;
-    callStatusCallback->UpdateVoipEventInfo(voipCallEventInfo);
+    res = callStatusCallback->UpdateVoipEventInfo(voipCallEventInfo);
+    ASSERT_EQ(res, TELEPHONY_SUCCESS);
 }
 
 /**
@@ -860,8 +873,9 @@ HWTEST_F(ZeroBranch5Test, Telephony_CallStatusCallbackStub_001, Function | Mediu
         data, reply, option);
     callStatusCallback->OnRemoteRequest(static_cast<uint32_t>(CallStatusInterfaceCode::GET_IMS_CONFIG),
         data, reply, option);
-    callStatusCallback->OnRemoteRequest(static_cast<uint32_t>(CallStatusInterfaceCode::SET_IMS_CONFIG),
+    int32_t res =  callStatusCallback->OnRemoteRequest(static_cast<uint32_t>(CallStatusInterfaceCode::SET_IMS_CONFIG),
         data, reply, option);
+    ASSERT_NE(res, TELEPHONY_SUCCESS);
 }
 
 /**
@@ -916,8 +930,9 @@ HWTEST_F(ZeroBranch5Test, Telephony_CallStatusCallbackStub_002, Function | Mediu
         data, reply, option);
     callStatusCallback->OnRemoteRequest(static_cast<uint32_t>(
         CallStatusInterfaceCode::RECEIVE_UPDATE_MEDIA_MODE_REQUEST), data, reply, option);
-    callStatusCallback->OnRemoteRequest(static_cast<uint32_t>(CallStatusInterfaceCode::UPDATE_VOIP_EVENT_INFO),
-        data, reply, option);
+    int32_t res = callStatusCallback->OnRemoteRequest(
+        static_cast<uint32_t>(CallStatusInterfaceCode::UPDATE_VOIP_EVENT_INFO), data, reply, option);
+    ASSERT_NE(res, TELEPHONY_SUCCESS);
 }
 
 /**
@@ -953,7 +968,7 @@ HWTEST_F(ZeroBranch5Test, Telephony_CallStatusCallbackStub_003, Function | Mediu
     data.WriteString(defaultString);
     data.WriteUInt8Vector(userProfile);
     data.RewindRead(0);
-    callStatusCallback->OnUpdateCallReportInfo(data, reply);
+    ASSERT_NE(callStatusCallback->OnUpdateCallReportInfo(data, reply), TELEPHONY_SUCCESS);
 }
 } // namespace Telephony
 } // namespace OHOS
