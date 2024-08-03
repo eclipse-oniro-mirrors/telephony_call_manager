@@ -44,6 +44,7 @@
 #include "parameters.h"
 #include "spam_call_adapter.h"
 #include "call_superprivacy_control_manager.h"
+#include "notification_helper.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -1481,8 +1482,11 @@ bool CallStatusManager::IsRejectCall(sptr<CallBase> &call, const CallDetailInfo 
         block = true;
         return true;
     }
-    if (IsFocusModeOpen()) {
+    if (IsFocusModeOpen()
+        && Notification::NotificationHelper::IsNeedSilentInDoNotDisturbMode(info.phoneNum) != 1) {
         TELEPHONY_LOGI("focus mode open");
+        block = false;
+        return true;
     }
     return false;
 }
