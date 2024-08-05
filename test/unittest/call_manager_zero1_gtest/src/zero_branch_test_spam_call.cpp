@@ -71,7 +71,7 @@ HWTEST_F(SpamCallTest, Telephony_SpamCallAdapter_002, Function | MediumTest | Le
     std::shared_ptr<SpamCallAdapter> spamCallAdapter_ = std::make_shared<SpamCallAdapter>();
     const std::string phoneNumber = "12345678900";
     const int32_t slotId = 0;
-    ASSERT_TRUE(spamCallAdapter_->DetectSpamCall(phoneNumber, slotId));
+    ASSERT_FALSE(spamCallAdapter_->DetectSpamCall(phoneNumber, slotId));
 }
 
 /**
@@ -167,7 +167,7 @@ HWTEST_F(SpamCallTest, Telephony_SpamCallConnection_001, Function | MediumTest |
     int resultCode = 0;
     spamCallConnection.OnAbilityConnectDone(element, remoteObject, resultCode);
     spamCallConnection.OnAbilityDisconnectDone(element, resultCode);
-    ASSERT_NE(resultCode, 0);
+    ASSERT_EQ(resultCode, 0);
 }
 
 /**

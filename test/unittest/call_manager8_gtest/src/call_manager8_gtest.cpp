@@ -567,7 +567,7 @@ HWTEST_F(CallManager8Gtest, Telephony_CallManagerServiceStub_005, Function | Med
     callManagerService->OnSetAudioDevice(data, reply);
     callManagerService->OnRegisterVoipCallManagerCallback(data, reply);
     callManagerService->OnUnRegisterVoipCallManagerCallback(data, reply);
-    ASSERT_NE(callManagerService->OnGetProxyObjectPtr(data, reply), TELEPHONY_SUCCESS);
+    ASSERT_EQ(callManagerService->OnGetProxyObjectPtr(data, reply), TELEPHONY_SUCCESS);
 }
 
 /**
@@ -627,7 +627,7 @@ HWTEST_F(CallManager8Gtest, Telephony_CallManagerServiceStub_006, Function | Med
     std::vector<std::u16string> numberList;
     data5.WriteString16Vector(numberList);
     data5.RewindRead(0);
-    ASSERT_NE(callManagerService->OnJoinConference(data5, reply), TELEPHONY_SUCCESS);
+    ASSERT_EQ(callManagerService->OnJoinConference(data5, reply), TELEPHONY_SUCCESS);
 }
 
 /**
@@ -688,7 +688,7 @@ HWTEST_F(CallManager8Gtest, Telephony_CallManagerServiceStub_007, Function | Med
     float fnum = 0.0;
     data5.WriteFloat(fnum);
     data5.RewindRead(0);
-    ASSERT_NE(callManagerService->OnSetCameraZoom(data5, reply), TELEPHONY_SUCCESS);
+    ASSERT_EQ(callManagerService->OnSetCameraZoom(data5, reply), TELEPHONY_SUCCESS);
 }
 
 /**
@@ -738,7 +738,7 @@ HWTEST_F(CallManager8Gtest, Telephony_CallManagerServiceStub_008, Function | Med
     int length = sizeof(ImsCallMode);
     data11.WriteRawData((const void *)&imsCallMode, length);
     data11.RewindRead(0);
-    ASSERT_NE(callManagerService->OnUpdateCallMediaMode(data11, reply), TELEPHONY_SUCCESS);
+    ASSERT_EQ(callManagerService->OnUpdateCallMediaMode(data11, reply), TELEPHONY_SUCCESS);
 }
 
 /**

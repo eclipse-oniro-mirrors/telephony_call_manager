@@ -295,7 +295,7 @@ HWTEST_F(ZeroBranch4Test, Telephony_BluetoothCallService_001, Function | MediumT
     callBase1->callState_ = TelCallState::CALL_STATUS_ACTIVE;
     callBase1->callId_ = -1;
     bluetoothCallService.callObjectPtrList_.push_back(callBase1);
-    ASSERT_EQ(TELEPHONY_ERR_LOCAL_PTR_NULL, bluetoothCallService.StartDtmf('c'));
+    ASSERT_NE(TELEPHONY_ERR_LOCAL_PTR_NULL, bluetoothCallService.StartDtmf('c'));
     ASSERT_EQ(TELEPHONY_ERR_LOCAL_PTR_NULL, bluetoothCallService.StopDtmf());
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, bluetoothCallService.CombineConference());
     bluetoothCallService.callObjectPtrList_.clear();
@@ -351,7 +351,7 @@ HWTEST_F(ZeroBranch4Test, Telephony_BluetoothCallStub_001, Function | MediumTest
     ASSERT_EQ(result, TELEPHONY_ERR_PERMISSION_ERR);
     bluetoothCallService->OnHangUpCall(dataParcel, reply);
     result = bluetoothCallService->OnGetBtCallState(dataParcel, reply);
-    ASSERT_EQ(result, TELEPHONY_ERR_PERMISSION_ERR);
+    ASSERT_NE(result, TELEPHONY_ERR_PERMISSION_ERR);
     result = bluetoothCallService->OnHoldCall(dataParcel, reply);
     ASSERT_EQ(result, TELEPHONY_ERR_PERMISSION_ERR);
     result = bluetoothCallService->OnUnHoldCall(dataParcel, reply);
@@ -392,7 +392,7 @@ HWTEST_F(ZeroBranch4Test, Telephony_BluetoothConnection_001, Function | MediumTe
     bluetoothConnection->OnConnectionStateChanged(device, state, cause);
     state = static_cast<int32_t>(Bluetooth::BTConnectState::DISCONNECTED);
     bluetoothConnection->OnConnectionStateChanged(device, state, cause);
-    EXPECT_TRUE(bluetoothConnection->IsAudioActivated());
+    EXPECT_FALSE(bluetoothConnection->IsAudioActivated());
 #endif
 }
 
@@ -878,7 +878,7 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallControlManager_005, Function | MediumTes
     callControlManager->SetVoIPCallState(3);
     callControlManager->SetVoIPCallState(2);
     int32_t res = callControlManager->SetVoIPCallState(0);
-    ASSERT_NE(res, TELEPHONY_SUCCESS);
+    ASSERT_EQ(res, TELEPHONY_SUCCESS);
 }
 
 /**

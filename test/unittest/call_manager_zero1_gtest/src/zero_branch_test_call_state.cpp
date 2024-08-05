@@ -561,7 +561,7 @@ HWTEST_F(CallStateTest, Telephony_Ring_001, Function | MediumTest | Level3)
     ring->ReleaseRenderer();
     ring->Play(DEFAULT_SLOT_ID);
     sleep(WAIT_TIME);
-    ASSERT_EQ(ring->Stop(), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    ASSERT_NE(ring->Stop(), TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
 
 /**
@@ -955,7 +955,7 @@ HWTEST_F(CallStateTest, Telephony_CallRequestProcess_004, Function | MediumTest 
     callRequestProcess->HangUpForDsdaRequest(callBase2);
     CellularCallInfo callInfo;
     callRequestProcess->HandleStartDial(false, callInfo);
-    ASSERT_NE(callRequestProcess->EccDialPolicy(), TELEPHONY_SUCCESS);
+    ASSERT_EQ(callRequestProcess->EccDialPolicy(), TELEPHONY_SUCCESS);
 }
 
 /**

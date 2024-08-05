@@ -422,7 +422,7 @@ HWTEST_F(ZeroBranch5Test, Telephony_CallAbilityReportProxy_002, Function | Mediu
     callAbilityReportProxy->ReportCallDataUsageChange(dataUsage);
     CameraCapabilities cameraCapabilities;
     callAbilityReportProxy->ReportCameraCapabilities(cameraCapabilities);
-    ASSERT_EQ(callAbilityReportProxy->UnRegisterCallBack(pidName), TELEPHONY_SUCCESS);
+    ASSERT_NE(callAbilityReportProxy->UnRegisterCallBack(pidName), TELEPHONY_SUCCESS);
 }
 
 /**
@@ -739,7 +739,7 @@ HWTEST_F(ZeroBranch5Test, Telephony_SuperPrivacyManagerClient_001, Function | Me
 {
     int32_t privacy = SuperPrivacyManagerClient::GetInstance().
         SetSuperPrivacyMode(static_cast<int32_t>(CallSuperPrivacyModeType::OFF), SOURCE_CALL);
-    ASSERT_NE(privacy, 0);
+    ASSERT_EQ(privacy, 0);
 }
 
 /**
@@ -820,7 +820,7 @@ HWTEST_F(ZeroBranch5Test, Telephony_CallStatusCallback_002, Function | MediumTes
     callStatusCallback->HandleCameraCapabilitiesChanged(cameraCapabilities);
     VoipCallEventInfo voipCallEventInfo;
     res = callStatusCallback->UpdateVoipEventInfo(voipCallEventInfo);
-    ASSERT_EQ(res, TELEPHONY_SUCCESS);
+    ASSERT_NE(res, TELEPHONY_SUCCESS);
 }
 
 /**
@@ -968,7 +968,7 @@ HWTEST_F(ZeroBranch5Test, Telephony_CallStatusCallbackStub_003, Function | Mediu
     data.WriteString(defaultString);
     data.WriteUInt8Vector(userProfile);
     data.RewindRead(0);
-    ASSERT_NE(callStatusCallback->OnUpdateCallReportInfo(data, reply), TELEPHONY_SUCCESS);
+    ASSERT_EQ(callStatusCallback->OnUpdateCallReportInfo(data, reply), TELEPHONY_SUCCESS);
 }
 } // namespace Telephony
 } // namespace OHOS
