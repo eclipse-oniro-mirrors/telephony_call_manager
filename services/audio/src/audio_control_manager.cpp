@@ -52,8 +52,6 @@ void AudioControlManager::Init()
 {
     DelayedSingleton<AudioDeviceManager>::GetInstance()->Init();
     DelayedSingleton<AudioSceneProcessor>::GetInstance()->Init();
-    DelayedSingleton<AudioProxy>::GetInstance()->SetAudioDeviceChangeCallback();
-    DelayedSingleton<AudioProxy>::GetInstance()->SetAudioPreferDeviceChangeCallback();
 }
 
 void AudioControlManager::UpdateForegroundLiveCall()
