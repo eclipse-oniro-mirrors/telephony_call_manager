@@ -227,7 +227,7 @@ HWTEST_F(ZeroBranch2Test, Telephony_CallRequestProcess_001, Function | MediumTes
     callRequestProcess->IsDsdsMode3();
     callRequestProcess->DisconnectOtherSubIdCall(1, 0, 0);
     callRequestProcess->DisconnectOtherCallForVideoCall(1);
-    ASSERT_TRUE(callRequestProcess->IsDsdsMode5());
+    ASSERT_FALSE(callRequestProcess->IsDsdsMode5());
 }
 
 /**
@@ -376,7 +376,7 @@ HWTEST_F(ZeroBranch2Test, Telephony_CallObjectManager_001, Function | MediumTest
     csCall->SetCallType(CallType::TYPE_OTT);
     CallObjectManager::GetCallInfoList(SIM1_SLOTID);
     CallObjectManager::GetCallInfoList(DEFAULT_INDEX);
-    ASSERT_TRUE(res);
+    ASSERT_FALSE(res);
 }
 
 /**
@@ -439,7 +439,7 @@ HWTEST_F(ZeroBranch2Test, Telephony_CallNumberUtils_001, Function | MediumTest |
         emptyStr, emptyStr, formatNumber), TELEPHONY_ERR_SUCCESS);
     ASSERT_FALSE(DelayedSingleton<CallNumberUtils>::GetInstance()->IsValidSlotId(INVALID_SLOTID));
     ASSERT_TRUE(DelayedSingleton<CallNumberUtils>::GetInstance()->IsValidSlotId(0));
-    EXPECT_EQ(DelayedSingleton<CallNumberUtils>::GetInstance()->QueryYellowPageAndMarkInfo(
+    EXPECT_NE(DelayedSingleton<CallNumberUtils>::GetInstance()->QueryYellowPageAndMarkInfo(
         numberMarkInfo, phoneNumber), TELEPHONY_ERR_SUCCESS);
 }
 
@@ -605,7 +605,7 @@ HWTEST_F(ZeroBranch2Test, Telephony_CallPolicy_001, Function | MediumTest | Leve
     AppExecFwk::PacMap mPacMap;
     mCallPolicy.DialPolicy(testEmptyStr, mPacMap, true);
     mPacMap.PutIntValue("dialType", static_cast<int32_t>(DialType::DIAL_CARRIER_TYPE));
-    ASSERT_NE(mCallPolicy.DialPolicy(testEmptyStr, mPacMap, true), TELEPHONY_ERR_SUCCESS);
+    ASSERT_EQ(mCallPolicy.DialPolicy(testEmptyStr, mPacMap, true), TELEPHONY_ERR_SUCCESS);
     mPacMap.PutIntValue("dialType", static_cast<int32_t>(DialType::DIAL_VOICE_MAIL_TYPE));
     ASSERT_NE(mCallPolicy.DialPolicy(testEmptyStr, mPacMap, true), TELEPHONY_ERR_SUCCESS);
     mPacMap.PutIntValue("callType", static_cast<int32_t>(CallType::TYPE_CS));

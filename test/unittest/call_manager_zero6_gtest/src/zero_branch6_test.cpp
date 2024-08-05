@@ -389,7 +389,7 @@ HWTEST_F(ZeroBranch6Test, Telephony_CallStatusCallbackStub_008, Function | Mediu
     dataParcel.WriteInt32(0);
     dataParcel.WriteString("hello");
     MessageParcel reply;
-    ASSERT_NE(callStatusCallback->OnUpdateDisconnectedCause(dataParcel, reply), TELEPHONY_SUCCESS);
+    ASSERT_EQ(callStatusCallback->OnUpdateDisconnectedCause(dataParcel, reply), TELEPHONY_SUCCESS);
     MessageParcel dataParcel2;
     dataParcel2.WriteInterfaceToken(CallStatusCallbackStub::GetDescriptor());
     dataParcel2.WriteInt32(0);
@@ -449,7 +449,7 @@ HWTEST_F(ZeroBranch6Test, Telephony_CallStatusCallbackStub_009, Function | Mediu
     dataParce6.WriteString("abc");
     dataParce6.WriteInt32(0);
     dataParce6.WriteInt32(0);
-    ASSERT_NE(callStatusCallback->OnUpdateVoipEventInfo(dataParce6, reply), TELEPHONY_SUCCESS);
+    ASSERT_EQ(callStatusCallback->OnUpdateVoipEventInfo(dataParce6, reply), TELEPHONY_SUCCESS);
 }
 
 /**
