@@ -779,10 +779,10 @@ int32_t NapiCallAbilityCallback::ReportDisconnectedCause(
     }
     napi_value callbackFunc = nullptr;
     napi_value callbackValues[ARRAY_INDEX_THIRD] = { 0 };
-    napi_create_object(env, &callbackValues[ARRAY_INDEX_SECOND]);
+    napi_create_object(env, &callbackValues[ARRAY_INDEX_FIRST]);
     NapiCallManagerUtils::SetPropertyInt32(
-        env, callbackValues[ARRAY_INDEX_SECOND], "disconnectedCause", static_cast<int32_t>(details.reason));
-    NapiCallManagerUtils::SetPropertyStringUtf8(env, callbackValues[ARRAY_INDEX_SECOND], "message", details.message);
+        env, callbackValues[ARRAY_INDEX_FIRST], "reason", static_cast<int32_t>(details.reason));
+    NapiCallManagerUtils::SetPropertyStringUtf8(env, callbackValues[ARRAY_INDEX_FIRST], "message", details.message);
     napi_get_reference_value(env, eventCallback.callbackRef, &callbackFunc);
     if (callbackFunc == nullptr) {
         TELEPHONY_LOGE("callbackFunc is null!");
