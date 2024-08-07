@@ -303,6 +303,29 @@ int32_t CallManagerService::DialCall(std::u16string number, AppExecFwk::PacMap &
     }
 }
 
+int32_t CallManagerService::MakeCall(std::string number)
+{
+    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
+        TELEPHONY_LOGE("Non-system applications use system APIs!");
+        return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
+    }
+    std::string identity = IPCSkeleton::ResetCallingIdentity();
+    AAFwk::Want want;
+    AppExecFwk::ElementName element("", "com.ohos.contacts", "com.ohos.contacts.MainAbility");
+    want.SetElement(element);
+    AAFwk::WantParams wantParams;
+    wantParams.SetParam("phoneNumber", AAFwk::String::Box(number));
+    wantParams.SetParam("pageFlag", AAFwk::String::Box("page_flag_edit_before_calling"));
+    want.SetParams(wantParams);
+    ErrCode err = AAFwk::AbilityManagerClient::GetInstance()->StartAbility(want);
+    IPCSkeleton::SetCallingIdentity(identity);
+    if (err != ERR_OK) {
+        TELEPHONY_LOGE("Fail to make call, err:%{public}d", err);
+        return TELEPHONY_ERR_UNINIT;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
 int32_t CallManagerService::AnswerCall(int32_t callId, int32_t videoState)
 {
     if (!TelephonyPermission::CheckCallerIsSystemApp()) {

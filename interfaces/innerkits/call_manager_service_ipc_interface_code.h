@@ -93,6 +93,7 @@ enum CallManagerInterfaceCode {
     INTERFACE_VOIP_UNREGISTER_CALLBACK,
     INTERFACE_OBSERVER_ON_CALL_DETAILS_CHANGE,
     INTERFACE_SEND_CALLUI_EVENT,
+    INTERFACE_MAKE_CALL,
 };
 } // end extern
 } // namespace Telephony
