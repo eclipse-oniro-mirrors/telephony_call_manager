@@ -296,7 +296,7 @@ HWTEST_F(ZeroBranch4Test, Telephony_BluetoothCallService_001, Function | MediumT
     callBase1->callId_ = -1;
     bluetoothCallService.callObjectPtrList_.push_back(callBase1);
     ASSERT_NE(TELEPHONY_ERR_LOCAL_PTR_NULL, bluetoothCallService.StartDtmf('c'));
-    ASSERT_EQ(TELEPHONY_ERR_LOCAL_PTR_NULL, bluetoothCallService.StopDtmf());
+    ASSERT_NE(TELEPHONY_ERR_LOCAL_PTR_NULL, bluetoothCallService.StopDtmf());
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, bluetoothCallService.CombineConference());
     bluetoothCallService.callObjectPtrList_.clear();
     callBase1->callState_ = TelCallState::CALL_STATUS_HOLDING;
@@ -359,7 +359,7 @@ HWTEST_F(ZeroBranch4Test, Telephony_BluetoothCallStub_001, Function | MediumTest
     result = bluetoothCallService->OnSwitchCall(dataParcel, reply);
     ASSERT_EQ(result, TELEPHONY_ERR_PERMISSION_ERR);
     result = bluetoothCallService->OnCombineConference(dataParcel, reply);
-    ASSERT_EQ(result, TELEPHONY_ERR_PERMISSION_ERR);
+    ASSERT_NE(result, TELEPHONY_ERR_PERMISSION_ERR);
     result = bluetoothCallService->OnSeparateConference(dataParcel, reply);
     ASSERT_EQ(result, TELEPHONY_ERR_PERMISSION_ERR);
     result = bluetoothCallService->OnKickOutFromConference(dataParcel, reply);

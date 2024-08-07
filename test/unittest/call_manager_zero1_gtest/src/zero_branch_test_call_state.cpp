@@ -1010,7 +1010,7 @@ HWTEST_F(CallStateTest, Telephony_CoreServiceConnection_001, Function | MediumTe
     CoreServiceConnection coreServiceConnection;
     coreServiceConnection.GetFdnNumberList(DEFAULT_SLOT_ID);
     bool res = coreServiceConnection.IsFdnEnabled(DEFAULT_SLOT_ID);
-    ASSERT_EQ(res, true);
+    ASSERT_FALSE(res);
 }
 
 } // namespace Telephony

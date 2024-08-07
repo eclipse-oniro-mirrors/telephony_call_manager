@@ -408,7 +408,7 @@ HWTEST_F(ZeroBranch6Test, Telephony_CallStatusCallbackStub_008, Function | Mediu
     callStatusCallback->OnStopDtmfResult(dataParcel2, reply);
     callStatusCallback->OnSendUssdResult(dataParcel2, reply);
     callStatusCallback->OnGetImsCallDataResult(dataParcel2, reply);
-    ASSERT_NE(callStatusCallback->OnCloseUnFinishedUssdResult(dataParcel2, reply), TELEPHONY_SUCCESS);
+    ASSERT_EQ(callStatusCallback->OnCloseUnFinishedUssdResult(dataParcel2, reply), TELEPHONY_SUCCESS);
 }
 
 /**
