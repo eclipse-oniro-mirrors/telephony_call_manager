@@ -1483,7 +1483,7 @@ bool CallStatusManager::IsRejectCall(sptr<CallBase> &call, const CallDetailInfo 
         return true;
     }
     if (IsFocusModeOpen()
-        && Notification::NotificationHelper::IsNeedSilentInDoNotDisturbMode(info.phoneNum) != 1) {
+        && Notification::NotificationHelper::IsNeedSilentInDoNotDisturbMode(info.phoneNum, 0) != 1) {
         TELEPHONY_LOGI("focus mode open");
         block = false;
         return true;
