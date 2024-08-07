@@ -42,6 +42,7 @@ public:
     virtual int32_t UnRegisterCallBack() = 0;
     virtual int32_t ObserverOnCallDetailsChange() = 0;
     virtual int32_t DialCall(std::u16string number, AppExecFwk::PacMap &extras) = 0;
+    virtual int32_t MakeCall(std::string number) = 0;
     virtual int32_t AnswerCall(int32_t callId, int32_t videoState) = 0;
     virtual int32_t RejectCall(int32_t callId, bool rejectWithMessage, std::u16string textMessage) = 0;
     virtual int32_t HangUpCall(int32_t callId) = 0;
