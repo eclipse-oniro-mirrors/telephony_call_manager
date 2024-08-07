@@ -129,6 +129,9 @@ int32_t ReportCallInfoHandler::UpdateDisconnectedCause(const DisconnectedDetails
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     DisconnectedDetails disconnectedDetails = details;
+    if (static_cast<RilDisconnectedReason>(details.reason) == RilDisconnectedReason::DISCONNECTED_REASON_NORMAL) {
+        disconnectedDetails.reason = DisconnectedReason::NORMAL_CALL_CLEARING;
+    }
     std::weak_ptr<CallStatusManager> callStatusManagerPtr = callStatusManagerPtr_;
     TELEPHONY_LOGI("UpdateDisconnectedCause submit task enter");
     reportCallInfoQueue.submit([callStatusManagerPtr, disconnectedDetails]() {
