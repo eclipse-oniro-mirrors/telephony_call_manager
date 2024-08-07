@@ -366,7 +366,7 @@ enum class RilDisconnectedReason : int32_t {
      * Indicates the call disconnect due to normal of ril.
      */
     DISCONNECTED_REASON_NORMAL = 0,
-}
+};
 
 /**
  * @brief Indicates the cause detail of a call disconnection.
