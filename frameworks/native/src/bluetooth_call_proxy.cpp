@@ -17,6 +17,7 @@
 
 #include "message_option.h"
 #include "message_parcel.h"
+#include "native_call_manager_utils.h"
 
 #include "call_manager_errors.h"
 
@@ -121,12 +122,9 @@ std::vector<CallAttributeInfo> BluetoothCallProxy::GetCurrentCallList(int32_t sl
         return callVec;
     }
     for (int32_t i = 0; i < vecCnt; i++) {
-        auto value = reinterpret_cast<const CallAttributeInfo *>(replyParcel.ReadRawData(sizeof(CallAttributeInfo)));
-        if (value == nullptr) {
-            TELEPHONY_LOGE("data error");
-            return callVec;
-        }
-        callVec.push_back(*value);
+        CallAttributeInfo callAttributeInfo = NativeCallManagerUtils::ReadCallAttributeInfo(replyParcel);
+        TELEPHONY_LOGI("ready to push callAttributeInfo, callId: %{public}d", callAttributeInfo.callId);
+        callVec.push_back(callAttributeInfo);
     }
     return callVec;
 }

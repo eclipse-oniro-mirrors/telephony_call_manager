@@ -109,6 +109,7 @@ call_manager_sources = [
   "${call_manager_path}/services/video/src/video_control_manager.cpp",
   "${call_manager_path}/utils/src/call_ability_connection.cpp",
   "${call_manager_path}/utils/src/call_dialog.cpp",
+  "${call_manager_path}/utils/src/call_manager_utils.cpp",
   "${call_manager_path}/utils/src/call_number_utils.cpp",
   "${call_manager_path}/utils/src/call_setting_ability_connection.cpp",
   "${call_manager_path}/utils/src/number_identity_data_base_helper.cpp",
