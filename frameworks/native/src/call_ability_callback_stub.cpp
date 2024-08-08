@@ -19,6 +19,7 @@
 
 #include "call_manager_errors.h"
 #include "telephony_log_wrapper.h"
+#include "native_call_manager_utils.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -82,47 +83,10 @@ int32_t CallAbilityCallbackStub::OnRemoteRequest(
 int32_t CallAbilityCallbackStub::OnUpdateCallStateInfo(MessageParcel &data, MessageParcel &reply)
 {
     int32_t result = TELEPHONY_SUCCESS;
-    CallAttributeInfo parcelPtr;
     if (!data.ContainFileDescriptors()) {
         TELEPHONY_LOGD("sent raw data is less than 32k");
     }
-    strncpy_s(parcelPtr.accountNumber, kMaxNumberLen + 1, data.ReadCString(), kMaxNumberLen + 1);
-    strncpy_s(parcelPtr.bundleName, kMaxNumberLen + 1, data.ReadCString(), kMaxNumberLen + 1);
-    parcelPtr.speakerphoneOn = data.ReadBool();
-    parcelPtr.accountId = data.ReadInt32();
-    parcelPtr.videoState = static_cast<VideoStateType>(data.ReadInt32());
-    parcelPtr.startTime = data.ReadInt64();
-    parcelPtr.isEcc = data.ReadBool();
-    parcelPtr.callType = static_cast<CallType>(data.ReadInt32());
-    parcelPtr.callId = data.ReadInt32();
-    parcelPtr.callState = static_cast<TelCallState>(data.ReadInt32());
-    parcelPtr.conferenceState = static_cast<TelConferenceState>(data.ReadInt32());
-    parcelPtr.callBeginTime = data.ReadInt64();
-    parcelPtr.callEndTime = data.ReadInt64();
-    parcelPtr.ringBeginTime = data.ReadInt64();
-    parcelPtr.ringEndTime = data.ReadInt64();
-    parcelPtr.callDirection = static_cast<CallDirection>(data.ReadInt32());
-    parcelPtr.answerType = static_cast<CallAnswerType>(data.ReadInt32());
-    parcelPtr.index = data.ReadInt32();
-    parcelPtr.crsType = data.ReadInt32();
-    parcelPtr.originalCallType = data.ReadInt32();
-    strncpy_s(parcelPtr.numberLocation, kMaxNumberLen + 1, data.ReadCString(), kMaxNumberLen + 1);
-    parcelPtr.numberMarkInfo.markType = static_cast<MarkType>(data.ReadInt32());
-    strncpy_s(parcelPtr.numberMarkInfo.markContent, kMaxNumberLen + 1, data.ReadCString(), kMaxNumberLen + 1);
-    parcelPtr.numberMarkInfo.markCount = data.ReadInt32();
-    strncpy_s(parcelPtr.numberMarkInfo.markSource, kMaxNumberLen + 1, data.ReadCString(), kMaxNumberLen + 1);
-    parcelPtr.numberMarkInfo.isCloud = data.ReadBool();
-    if (parcelPtr.callType == CallType::TYPE_VOIP) {
-        parcelPtr.voipCallInfo.voipCallId = data.ReadString();
-        parcelPtr.voipCallInfo.userName = data.ReadString();
-        parcelPtr.voipCallInfo.abilityName = data.ReadString();
-        parcelPtr.voipCallInfo.extensionId = data.ReadString();
-        parcelPtr.voipCallInfo.voipBundleName = data.ReadString();
-        parcelPtr.voipCallInfo.showBannerForIncomingCall = data.ReadBool();
-        std::vector<uint8_t> userProfile = {};
-        data.ReadUInt8Vector(&userProfile);
-        (parcelPtr.voipCallInfo.userProfile).assign(userProfile.begin(), userProfile.end());
-    }
+    CallAttributeInfo parcelPtr = NativeCallManagerUtils::ReadCallAttributeInfo(data);
     result = OnCallDetailsChange(parcelPtr);
     if (!reply.WriteInt32(result)) {
         TELEPHONY_LOGE("writing parcel failed");
