@@ -35,27 +35,27 @@ constexpr int VALID_CALL_ID = 1;
 constexpr const char* NUMBER = "10086";
 constexpr const char* NAME = "test";
 
-class CallStateTest : public testing::Test {
+class ZeroBranch7Test : public testing::Test {
 public:
     static void SetUpTestCase();
     static void TearDownTestCase();
     void SetUp();
     void TearDown();
 };
-void CallStateTest::SetUpTestCase() {}
+void ZeroBranch7Test::SetUpTestCase() {}
 
-void CallStateTest::TearDownTestCase() {}
+void ZeroBranch7Test::TearDownTestCase() {}
 
-void CallStateTest::SetUp() {}
+void ZeroBranch7Test::SetUp() {}
 
-void CallStateTest::TearDown() {}
+void ZeroBranch7Test::TearDown() {}
 
 /**
  * @tc.number   Telephony_AudioControlManager_001
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(CallStateTest, Telephony_AudioControlManager_001, Function | MediumTest | Level3)
+HWTEST_F(ZeroBranch7Test, Telephony_AudioControlManager_001, Function | MediumTest | Level3)
 {
     DialParaInfo mDialParaInfo;
     mDialParaInfo.accountId = 0;
@@ -110,7 +110,7 @@ HWTEST_F(CallStateTest, Telephony_AudioControlManager_001, Function | MediumTest
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(CallStateTest, Telephony_AudioControlManager_002, Function | MediumTest | Level3)
+HWTEST_F(ZeroBranch7Test, Telephony_AudioControlManager_002, Function | MediumTest | Level3)
 {
     auto audioControl = DelayedSingleton<AudioControlManager>::GetInstance();
     AudioDevice device;
@@ -148,7 +148,7 @@ HWTEST_F(CallStateTest, Telephony_AudioControlManager_002, Function | MediumTest
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(CallStateTest, Telephony_AudioControlManager_003, Function | MediumTest | Level3)
+HWTEST_F(ZeroBranch7Test, Telephony_AudioControlManager_003, Function | MediumTest | Level3)
 {
     auto audioControl = DelayedSingleton<AudioControlManager>::GetInstance();
     audioControl->IsTonePlaying();
@@ -167,7 +167,7 @@ HWTEST_F(CallStateTest, Telephony_AudioControlManager_003, Function | MediumTest
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(CallStateTest, Telephony_AudioControlManager_004, Function | MediumTest | Level3)
+HWTEST_F(ZeroBranch7Test, Telephony_AudioControlManager_004, Function | MediumTest | Level3)
 {
     auto audioControl = DelayedSingleton<AudioControlManager>::GetInstance();
     audioControl->isCrsVibrating_ = true;
@@ -190,7 +190,7 @@ HWTEST_F(CallStateTest, Telephony_AudioControlManager_004, Function | MediumTest
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroBranch5Test, Telephony_CallBroadcastSubscriber_001, Function | MediumTest | Level3)
+HWTEST_F(ZeroBranch7Test, Telephony_CallBroadcastSubscriber_001, Function | MediumTest | Level3)
 {
     EventFwk::MatchingSkills matchingSkills;
     matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_SIM_STATE_CHANGED);
@@ -211,7 +211,7 @@ HWTEST_F(ZeroBranch5Test, Telephony_CallBroadcastSubscriber_001, Function | Medi
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroBranch6Test, Telephony_CallStatusCallbackStub_001, Function | MediumTest | Level3)
+HWTEST_F(ZeroBranch7Test, Telephony_CallStatusCallbackStub_001, Function | MediumTest | Level3)
 {
     auto callStatusCallback = std::make_shared<CallStatusCallback>();
     MessageParcel dataParcel;
@@ -246,7 +246,7 @@ HWTEST_F(ZeroBranch6Test, Telephony_CallStatusCallbackStub_001, Function | Mediu
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroBranch6Test, Telephony_CallStatusCallbackStub_002, Function | MediumTest | Level3)
+HWTEST_F(ZeroBranch7Test, Telephony_CallStatusCallbackStub_002, Function | MediumTest | Level3)
 {
     auto callStatusCallback = std::make_shared<CallStatusCallback>();
     MessageParcel dataParce3;
