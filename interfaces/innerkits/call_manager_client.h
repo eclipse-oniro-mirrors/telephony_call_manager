@@ -20,6 +20,7 @@
 #include "pac_map.h"
 
 #include "call_manager_callback.h"
+#include "i_call_status_callback.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -637,6 +638,13 @@ public:
      * @return Returns 0 on success, others on failure.
      */
     int32_t SendCallUiEvent(int32_t callId, std::string &eventName);
+
+    /**
+     * @brief notify voip register callstatus callback
+     *
+     * @return Returns 0 on success, others on failure.
+     */
+    sptr<ICallStatusCallback> RegisterBluetoothCallManagerCallbackPtr(std::string &macAddress);
 };
 } // namespace Telephony
 } // namespace OHOS

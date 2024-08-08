@@ -1353,5 +1353,30 @@ int32_t CallManagerServiceProxy::SendCallUiEvent(int32_t callId, std::string &ev
     }
     return replyParcel.ReadInt32();
 }
+
+sptr<ICallStatusCallback> CallManagerServiceProxy::RegisterBluetoothCallManagerCallbackPtr(std::string &macAddress)
+{
+    MessageParcel dataParcel;
+    if (!dataParcel.WriteInterfaceToken(CallManagerServiceProxy::GetDescriptor())) {
+        TELEPHONY_LOGE("write descriptor fail");
+        return nullptr;
+    }
+    dataParcel.WriteString(macAddress);
+    MessageParcel replyParcel;
+    int32_t error = SendRequest(INTERFACE_BLUETOOTH_REGISTER_CALLBACKPTR, dataParcel, replyParcel);
+    if (error != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("function GetProxyObjectPtr failed! errCode:%{public}d", error);
+        return nullptr;
+    }
+    sptr<IRemoteObject> remote = replyParcel.ReadRemoteObject();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("RegisterBluetoothCallManagerCallbackPtr return ptr is nullptr.");
+        return nullptr;
+    }
+
+    sptr<ICallStatusCallback> callback = iface_cast<ICallStatusCallback>(remote);
+
+    return callback;
+}
 } // namespace Telephony
 } // namespace OHOS

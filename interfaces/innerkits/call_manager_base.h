@@ -128,6 +128,10 @@ enum class CallType {
      * Indicates the call type is SATELLITE.
      */
     TYPE_SATELLITE = 5,
+    /**
+     * Indicates the call type is BLUETOOTH.
+     */
+    TYPE_BLUETOOTH = 6,
 };
 
 /**

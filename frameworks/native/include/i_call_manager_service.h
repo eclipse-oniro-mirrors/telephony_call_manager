@@ -26,6 +26,7 @@
 
 #include "call_manager_inner_type.h"
 #include "i_call_ability_callback.h"
+#include "i_call_status_callback.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -114,6 +115,7 @@ public:
     virtual int32_t RegisterVoipCallManagerCallback() = 0;
     virtual int32_t UnRegisterVoipCallManagerCallback() = 0;
     virtual int32_t SendCallUiEvent(int32_t callId, std::string &eventName) = 0;
+    virtual sptr<ICallStatusCallback> RegisterBluetoothCallManagerCallbackPtr(std::string &macAddress) = 0;
 
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"OHOS.Telephony.ICallManagerService");

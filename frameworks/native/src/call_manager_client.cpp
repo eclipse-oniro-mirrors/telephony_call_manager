@@ -787,5 +787,15 @@ int32_t CallManagerClient::SendCallUiEvent(int32_t callId, std::string &eventNam
         return TELEPHONY_ERR_UNINIT;
     }
 }
+
+sptr<ICallStatusCallback> CallManagerClient::RegisterBluetoothCallManagerCallbackPtr(std::string &macAddress)
+{
+    if (g_callManagerProxy != nullptr) {
+        return g_callManagerProxy->RegisterBluetoothCallManagerCallbackPtr(macAddress);
+    } else {
+        TELEPHONY_LOGE("init first please!");
+        return nullptr;
+    }
+}
 } // namespace Telephony
 } // namespace OHOS
