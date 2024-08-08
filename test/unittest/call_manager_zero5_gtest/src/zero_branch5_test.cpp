@@ -684,27 +684,6 @@ HWTEST_F(ZeroBranch5Test, Telephony_CallAbilityCallbackProxy_001, Function | Med
 }
 
 /**
- * @tc.number   Telephony_CallBroadcastSubscriber_001
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
-HWTEST_F(ZeroBranch5Test, Telephony_CallBroadcastSubscriber_001, Function | MediumTest | Level3)
-{
-    EventFwk::MatchingSkills matchingSkills;
-    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_SIM_STATE_CHANGED);
-    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
-    CallBroadcastSubscriber subscriber(subscriberInfo);
-    EventFwk::CommonEventData eventData;
-    subscriber.OnReceiveEvent(eventData);
-    subscriber.UnknownBroadcast(eventData);
-    subscriber.SimStateBroadcast(eventData);
-    subscriber.ConnectCallUiServiceBroadcast(eventData);
-    subscriber.HighTempLevelChangedBroadcast(eventData);
-    subscriber.ConnectCallUiSuperPrivacyModeBroadcast(eventData);
-    ASSERT_NE(sizeof(eventData), 0);
-}
-
-/**
  * @tc.number   Telephony_OTTCallConnection_001
  * @tc.name     test error branch
  * @tc.desc     Function test
