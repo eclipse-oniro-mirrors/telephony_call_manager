@@ -47,6 +47,7 @@ CallManagerServiceStub::CallManagerServiceStub()
     InitImsServiceRequest();
     InitOttServiceRequest();
     InitVoipOperationRequest();
+    InitBluetoothOperationRequest();
     memberFuncMap_[INTERFACE_GET_PROXY_OBJECT_PTR] =
         [this](MessageParcel &data, MessageParcel &reply) { return OnGetProxyObjectPtr(data, reply); };
 }
@@ -239,6 +240,14 @@ void CallManagerServiceStub::InitVoipOperationRequest()
         [this](MessageParcel &data, MessageParcel &reply) { return OnRegisterVoipCallManagerCallback(data, reply); };
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_VOIP_UNREGISTER_CALLBACK)] =
         [this](MessageParcel &data, MessageParcel &reply) { return OnUnRegisterVoipCallManagerCallback(data, reply); };
+}
+
+void CallManagerServiceStub::InitBluetoothOperationRequest()
+{
+    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_BLUETOOTH_REGISTER_CALLBACKPTR)] =
+        [this](MessageParcel &data, MessageParcel &reply) {
+            return OnRegisterBluetoothCallManagerCallbackPtr(data, reply);
+        };
 }
 
 int32_t CallManagerServiceStub::OnRegisterVoipCallManagerCallback(MessageParcel &data, MessageParcel &reply)
@@ -1392,6 +1401,19 @@ void CallManagerServiceStub::CancelTimer(int32_t id)
 #else
     return;
 #endif
+}
+
+int32_t CallManagerServiceStub::OnRegisterBluetoothCallManagerCallbackPtr(MessageParcel &data, MessageParcel &reply)
+{
+    std::string macAddress = data.ReadString();
+    sptr<ICallStatusCallback> callback = RegisterBluetoothCallManagerCallbackPtr(macAddress);
+    sptr<IRemoteObject> objectPtr = callback->AsObject().GetRefPtr();
+
+    if (!reply.WriteRemoteObject(objectPtr)) {
+        TELEPHONY_LOGE("OnRegisterBluetoothCallManagerCallbackPtr fail to write parcel");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return TELEPHONY_SUCCESS;
 }
 } // namespace Telephony
 } // namespace OHOS

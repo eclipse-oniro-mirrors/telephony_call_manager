@@ -121,6 +121,7 @@ public:
     int32_t CancelCallUpgrade(int32_t callId);
     int32_t RequestCameraCapabilities(int32_t callId);
     int32_t SendCallUiEvent(int32_t callId, std::string &eventName);
+    sptr<ICallStatusCallback> RegisterBluetoothCallManagerCallbackPtr(std::string &macAddress);
 
 private:
     int32_t ConnectService();

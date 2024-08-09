@@ -94,6 +94,7 @@ enum CallManagerInterfaceCode {
     INTERFACE_OBSERVER_ON_CALL_DETAILS_CHANGE,
     INTERFACE_SEND_CALLUI_EVENT,
     INTERFACE_MAKE_CALL,
+    INTERFACE_BLUETOOTH_REGISTER_CALLBACKPTR,
 };
 } // end extern
 } // namespace Telephony

@@ -728,6 +728,14 @@ public:
      */
     int32_t SendCallUiEvent(int32_t callId, std::string &eventName) override;
 
+    /**
+     * RegisterVoipCallManagerCallback
+     *
+     * @brief notify bluetooth register callstatus call back
+     * @return Returns ICallStatusCallback.
+     */
+    sptr<ICallStatusCallback> RegisterBluetoothCallManagerCallbackPtr(std::string &macAddress) override;
+
 private:
     int32_t SendRequest(CallManagerInterfaceCode code);
     int32_t SendRequest(CallManagerInterfaceCode code, MessageParcel &dataParcel, MessageParcel &replyParcel);

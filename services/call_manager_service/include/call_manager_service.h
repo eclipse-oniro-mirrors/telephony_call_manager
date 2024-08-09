@@ -771,6 +771,14 @@ public:
      */
     void OnAddSystemAbility(int32_t systemAbilityId, const std::string &deviceId) override;
 
+    /**
+     * RegisterBluetoothCallManagerCallbackPtr
+     *
+     * @brief notify bluetooth register callstatus callback
+     * @return Returns ICallStatusCallback.
+     */
+    sptr<ICallStatusCallback> RegisterBluetoothCallManagerCallbackPtr(std::string &macAddress) override;
+
 private:
     std::string GetBundleInfo();
 
@@ -795,6 +803,7 @@ private:
     const int32_t extraMonth_ = 1;
     int64_t bindTime_ = 0L;
     int32_t spendTime_ = 0;
+    sptr<ICallStatusCallback> bluetoothCallCallbackPtr_ = nullptr;
 };
 } // namespace Telephony
 } // namespace OHOS

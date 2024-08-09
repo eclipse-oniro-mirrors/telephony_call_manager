@@ -104,6 +104,11 @@ void CallManagerService::UnInit()
 {
     DelayedSingleton<CellularCallConnection>::GetInstance()->UnInit();
     callControlManagerPtr_ = nullptr;
+
+    if (bluetoothCallCallbackPtr_ != nullptr) {
+        delete bluetoothCallCallbackPtr_;
+        bluetoothCallCallbackPtr_ = nullptr;
+    }
 }
 
 void CallManagerService::OnStart()
@@ -1483,6 +1488,25 @@ int32_t CallManagerService::SendCallUiEvent(int32_t callId, std::string &eventNa
         callPtr->SetCeliaCallType(IS_CELIA_CALL);
     }
     return TELEPHONY_SUCCESS;
+}
+
+sptr<ICallStatusCallback> CallManagerService::RegisterBluetoothCallManagerCallbackPtr(std::string &macAddress)
+{
+    if (!TelephonyPermission::CheckPermission(Permission::GET_TELEPHONY_STATE)) {
+        TELEPHONY_LOGE("CallManagerService RegisterBluetoothCallManagerCallbackPtr, Permission denied!");
+        return nullptr;
+    }
+    if (bluetoothCallCallbackPtr_ == nullptr) {
+        bluetoothCallCallbackPtr_ = new (std::nothrow) CallStatusCallback();
+        if (bluetoothCallCallbackPtr_ == nullptr) {
+            TELEPHONY_LOGE("create CallStatusCallback object failed!");
+            return nullptr;
+        }
+    }
+    if (macAddress.empty()) {
+        TELEPHONY_LOGE("macAddress is empty!");
+    }
+    return bluetoothCallCallbackPtr_;
 }
 } // namespace Telephony
 } // namespace OHOS

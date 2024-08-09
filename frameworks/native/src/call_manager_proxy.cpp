@@ -1654,5 +1654,19 @@ int32_t CallManagerProxy::SendCallUiEvent(int32_t callId, std::string &eventName
     }
     return TELEPHONY_SUCCESS;
 }
+
+sptr<ICallStatusCallback> CallManagerProxy::RegisterBluetoothCallManagerCallbackPtr(std::string &macAddress)
+{
+    Utils::UniqueReadGuard<Utils::RWLock> guard(rwClientLock_);
+    if (callManagerServicePtr_ == nullptr) {
+        TELEPHONY_LOGE("callManagerServicePtr_ is null");
+        return nullptr;
+    }
+    sptr<ICallStatusCallback> ptr = callManagerServicePtr_->RegisterBluetoothCallManagerCallbackPtr(macAddress);
+    if (ptr == nullptr) {
+        TELEPHONY_LOGE("GetProxyObjectPtr failed");
+    }
+    return ptr;
+}
 } // namespace Telephony
 } // namespace OHOS
