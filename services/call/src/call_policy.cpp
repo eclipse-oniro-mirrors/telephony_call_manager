@@ -138,8 +138,9 @@ int32_t CallPolicy::HasNormalCall(bool isEcc, int32_t slotId, CallType callType)
     DelayedRefSingleton<CoreServiceClient>::GetInstance().GetImsRegStatus(slotId, ImsServiceType::TYPE_VOICE, info);
     bool isImsRegistered = info.imsRegState == ImsRegState::IMS_REGISTERED;
     bool isCTSimCard = false;
+    bool isRoaming = networkState->IsRoaming();
     DelayedRefSingleton<CoreServiceClient>::GetInstance().IsCTSimCard(slotId, isCTSimCard);
-    if (isCTSimCard && !isImsRegistered) {
+    if (isCTSimCard && !isRoaming && !isImsRegistered) {
         TELEPHONY_LOGE("Call failed due to CT card IMS is UNREGISTERED");
         DelayedSingleton<CallDialog>::GetInstance()->DialogConnectExtension("CALL_FAILED_CTCARD_NO_IMS", slotId);
         return CALL_ERR_DIAL_FAILED;
