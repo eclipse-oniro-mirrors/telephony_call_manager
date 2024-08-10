@@ -508,7 +508,8 @@ bool CallControlManager::NotifyCallStateUpdated(
     if (callStateListenerPtr_ != nullptr) {
         callStateListenerPtr_->CallStateUpdated(callObjectPtr, priorState, nextState);
         TELEPHONY_LOGI("NotifyCallStateUpdated priorState:%{public}d,nextState:%{public}d", priorState, nextState);
-        if (priorState == TelCallState::CALL_STATUS_DIALING && nextState == TelCallState::CALL_STATUS_ALERTING) {
+        if (priorState == TelCallState::CALL_STATUS_DIALING &&
+            (nextState == TelCallState::CALL_STATUS_ALERTING || TelCallState::CALL_STATUS_ACTIVE)) {
             TELEPHONY_LOGI("call is actived, now check and switch call to distributed audio device");
             DelayedSingleton<AudioDeviceManager>::GetInstance()->CheckAndSwitchDistributedAudioDevice();
         } else if ((priorState == TelCallState::CALL_STATUS_ACTIVE &&
