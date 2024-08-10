@@ -53,13 +53,21 @@ public:
     int32_t ObserverOnCallDetailsChange();
 
     /**
-     * @brief Make a phone call
+     * @brief Dial a phone call
      *
      * @param number[in], dial param.
      * @param extras[in], extras date.
      * @return Returns callId when the value is greater than zero, others on failure.
      */
     int32_t DialCall(std::u16string number, AppExecFwk::PacMap &extras);
+
+    /**
+     * @brief Make a phone call
+     *
+     * @param number[in],  call param.
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t MakeCall(std::string number);
 
     /**
      * @brief Answer a phone call

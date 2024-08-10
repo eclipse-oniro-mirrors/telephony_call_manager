@@ -64,6 +64,8 @@ void CallManagerServiceStub::InitCallBasicRequest()
         [this](MessageParcel &data, MessageParcel &reply) { return OnUnRegisterCallBack(data, reply); };
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_DIAL_CALL)] =
         [this](MessageParcel &data, MessageParcel &reply) { return OnDialCall(data, reply); };
+    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_MAKE_CALL)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnMakeCall(data, reply); };
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_ANSWER_CALL)] =
         [this](MessageParcel &data, MessageParcel &reply) { return OnAcceptCall(data, reply); };
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_REJECT_CALL)] =
@@ -338,6 +340,24 @@ int32_t CallManagerServiceStub::OnDialCall(MessageParcel &data, MessageParcel &r
         return CALL_ERR_NUMBER_OUT_OF_RANGE;
     }
     result = DialCall(callNumber, dialInfo);
+    TELEPHONY_LOGI("result:%{public}d", result);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("fail to write parcel");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return result;
+}
+
+int32_t CallManagerServiceStub::OnMakeCall(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t result = TELEPHONY_ERR_FAIL;
+    AppExecFwk::PacMap dialInfo;
+    std::string callNumber = data.ReadString();
+    if (callNumber.length() > ACCOUNT_NUMBER_MAX_LENGTH) {
+        TELEPHONY_LOGE("the account number length exceeds the limit");
+        return CALL_ERR_NUMBER_OUT_OF_RANGE;
+    }
+    result = MakeCall(callNumber);
     TELEPHONY_LOGI("result:%{public}d", result);
     if (!reply.WriteInt32(result)) {
         TELEPHONY_LOGE("fail to write parcel");

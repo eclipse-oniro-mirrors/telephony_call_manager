@@ -84,6 +84,27 @@ int32_t CallManagerServiceProxy::DialCall(std::u16string number, AppExecFwk::Pac
     return replyParcel.ReadInt32();
 }
 
+int32_t CallManagerServiceProxy::MakeCall(std::string number)
+{
+    MessageParcel dataParcel;
+    if (!dataParcel.WriteInterfaceToken(CallManagerServiceProxy::GetDescriptor())) {
+        TELEPHONY_LOGE("write descriptor fail");
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    if (number.empty()) {
+        TELEPHONY_LOGE("number is empty");
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
+    }
+    dataParcel.WriteString(number);
+    MessageParcel replyParcel;
+    int32_t error = SendRequest(INTERFACE_MAKE_CALL, dataParcel, replyParcel);
+    if (error != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("function MakeCall call failed! errCode:%{public}d", error);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return replyParcel.ReadInt32();
+}
+
 int32_t CallManagerServiceProxy::AnswerCall(int32_t callId, int32_t videoState)
 {
     MessageParcel dataParcel;
