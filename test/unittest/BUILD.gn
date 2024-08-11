@@ -31,6 +31,7 @@ group("unittest") {
   deps += [ "call_manager_zero5_gtest:tel_call_manager_zero5_gtest" ]
   deps += [ "call_manager_zero6_gtest:tel_call_manager_zero6_gtest" ]
   deps += [ "call_manager_zero7_gtest:tel_call_manager_zero7_gtest" ]
+  deps += [ "call_manager_zero8_gtest:tel_call_manager_zero8_gtest" ]
   deps += [ "ui_client:tel_call_manager_ui_test" ]
   deps += [ "call_earthquake_alarm_test:tel_call_earthquake_alarm_test" ]
 }
