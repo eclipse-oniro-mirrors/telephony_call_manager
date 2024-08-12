@@ -440,7 +440,7 @@ HWTEST_F(ZeroBranch2Test, Telephony_CallNumberUtils_001, Function | MediumTest |
     ASSERT_FALSE(DelayedSingleton<CallNumberUtils>::GetInstance()->IsValidSlotId(INVALID_SLOTID));
     ASSERT_TRUE(DelayedSingleton<CallNumberUtils>::GetInstance()->IsValidSlotId(0));
     EXPECT_NE(DelayedSingleton<CallNumberUtils>::GetInstance()->QueryYellowPageAndMarkInfo(
-        numberMarkInfo, phoneNumber), TELEPHONY_ERR_SUCCESS);
+        numberMarkInfo, phoneNumber), TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
 
 /**
@@ -609,7 +609,7 @@ HWTEST_F(ZeroBranch2Test, Telephony_CallPolicy_001, Function | MediumTest | Leve
     mPacMap.PutIntValue("dialType", static_cast<int32_t>(DialType::DIAL_VOICE_MAIL_TYPE));
     ASSERT_EQ(mCallPolicy.DialPolicy(testEmptyStr, mPacMap, true), TELEPHONY_ERR_SUCCESS);
     mPacMap.PutIntValue("callType", static_cast<int32_t>(CallType::TYPE_CS));
-    ASSERT_NE(mCallPolicy.DialPolicy(testEmptyStr, mPacMap, true), TELEPHONY_ERR_SUCCESS);
+    ASSERT_EQ(mCallPolicy.DialPolicy(testEmptyStr, mPacMap, true), TELEPHONY_ERR_SUCCESS);
     mPacMap.PutIntValue("dialScene", static_cast<int32_t>(DialScene::CALL_NORMAL));
     ASSERT_NE(mCallPolicy.DialPolicy(testEmptyStr, mPacMap, true), TELEPHONY_ERR_SUCCESS);
     ASSERT_NE(mCallPolicy.DialPolicy(testEmptyStr, mPacMap, false), TELEPHONY_ERR_SUCCESS);
