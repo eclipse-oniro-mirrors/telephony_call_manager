@@ -71,6 +71,14 @@ enum class VoipCallState {
      * Indicates the call state of dialing.
      */
     VOIP_CALL_STATE_DIALING,
+    /**
+     * Indicates the call is answered.
+     */
+    VOIP_CALL_STATE_ANSWERED,
+    /**
+     * Indicates the call is disconnecting.
+     */
+    VOIP_CALL_STATE_DISCONNECTING,
 };
 
 /**
