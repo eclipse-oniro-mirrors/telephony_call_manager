@@ -105,7 +105,7 @@ int32_t SatelliteCallControl::IsSatelliteSwitchEnable()
     std::istringstream str1(is_satellite_mode_on);
     int32_t isSatelliteModeOn = 0;
     str1 >> isSatelliteModeOn;
-    if (err == TELEPHONY_SUCCESS && isSatelliteModeOn) == SATELLITE_MODE_ON) {
+    if (err == TELEPHONY_SUCCESS && isSatelliteModeOn == SATELLITE_MODE_ON) {
         TELEPHONY_LOGI("satellite mode on");
         return TELEPHONY_SUCCESS;
     }
