@@ -49,7 +49,14 @@ int32_t Tone::Play()
     if (IsUseTonePlayer(currentToneDescriptor_)) {
         TELEPHONY_LOGI("currentToneDescriptor = %{public}d", currentToneDescriptor_);
         if (!InitTonePlayer()) {
+            TELEPHONY_LOGE("InitTonePlayer failed");
             return TELEPHONY_ERROR;
+        }
+        if (currentToneDescriptor_ == ToneDescriptor::TONE_FINISHED) {
+            if (!tonePlayer_->StartTone()) {
+                return CALL_ERR_AUDIO_TONE_PLAY_FAILED;
+            }
+            return TELEPHONY_SUCCESS;
         }
         std::thread play([&]() {
             pthread_setname_np(pthread_self(), TONE_PLAY_THREAD);
