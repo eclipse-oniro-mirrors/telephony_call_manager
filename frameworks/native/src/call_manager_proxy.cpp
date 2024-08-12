@@ -360,6 +360,25 @@ int32_t CallManagerProxy::DialCall(std::u16string number, AppExecFwk::PacMap &ex
     return TELEPHONY_SUCCESS;
 }
 
+int32_t CallManagerProxy::MakeCall(std::string number)
+{
+    if (ReConnectService() != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("ipc reconnect failed!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    Utils::UniqueReadGuard<Utils::RWLock> guard(rwClientLock_);
+    if (callManagerServicePtr_ == nullptr) {
+        TELEPHONY_LOGE("callManagerServicePtr_ is null");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    int32_t errCode = callManagerServicePtr_->MakeCall(number);
+    if (errCode != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("MakeCall failed, errcode:%{public}d", errCode);
+        return errCode;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
 int32_t CallManagerProxy::AnswerCall(int32_t callId, int32_t videoState)
 {
     if (ReConnectService() != TELEPHONY_SUCCESS) {

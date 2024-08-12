@@ -94,6 +94,16 @@ int32_t CallManagerClient::DialCall(std::u16string number, AppExecFwk::PacMap &e
     }
 }
 
+int32_t CallManagerClient::MakeCall(std::string number)
+{
+    if (g_callManagerProxy != nullptr) {
+        return g_callManagerProxy->MakeCall(number);
+    } else {
+        TELEPHONY_LOGE("init first please!");
+        return TELEPHONY_ERR_UNINIT;
+    }
+}
+
 int32_t CallManagerClient::AnswerCall(int32_t callId, int32_t videoState)
 {
     if (g_callManagerProxy != nullptr) {

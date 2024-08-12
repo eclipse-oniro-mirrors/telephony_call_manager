@@ -61,6 +61,7 @@ napi_value NapiCallManager::DeclareCallBasisInterface(napi_env env, napi_value e
     napi_property_descriptor desc[] = {
         DECLARE_NAPI_FUNCTION("dial", Dial),
         DECLARE_NAPI_FUNCTION("dialCall", DialCall),
+        DECLARE_NAPI_FUNCTION("makeCall", MakeCall),
         DECLARE_NAPI_FUNCTION("answer", AnswerCall),
         DECLARE_NAPI_FUNCTION("reject", RejectCall),
         DECLARE_NAPI_FUNCTION("hangup", HangUpCall),
@@ -1273,6 +1274,27 @@ bool NapiCallManager::MatchStringAndVariableObjectParameters(
         default:
             return false;
     }
+}
+
+napi_value NapiCallManager::MakeCall(napi_env env, napi_callback_info info)
+{
+    GET_PARAMS(env, info, VALUE_MAXIMUM_LIMIT);
+    if (!MatchOneStringParameter(env, argv, argc)) {
+        TELEPHONY_LOGE("NapiCallManager::MakeCall MatchOneStringParameter failed.");
+        NapiUtil::ThrowParameterError(env);
+        return nullptr;
+    }
+    auto asyncContext = std::make_unique<AsyncContext>();
+    if (asyncContext == nullptr) {
+        NapiUtil::ThrowParameterError(env);
+        return nullptr;
+    }
+    napi_get_value_string_utf8(
+        env, argv[ARRAY_INDEX_FIRST], asyncContext->number, PHONE_NUMBER_MAXIMUM_LIMIT, &(asyncContext->numberLen));
+    if (argc == TWO_VALUE_LIMIT) {
+        napi_create_reference(env, argv[ARRAY_INDEX_SECOND], DATA_LENGTH_ONE, &(asyncContext->callbackRef));
+    }
+    return HandleAsyncWork(env, asyncContext.release(), "MakeCall", NativeMakeCall, NativeVoidCallBackWithErrorCode);
 }
 
 napi_value NapiCallManager::DialCall(napi_env env, napi_callback_info info)
@@ -4047,6 +4069,23 @@ void NapiCallManager::NativeDialCall(napi_env env, void *data)
         asyncContext->resolved = TELEPHONY_SUCCESS;
     }
 }
+
+void NapiCallManager::NativeMakeCall(napi_env env, void *data)
+{
+    if (data == nullptr) {
+        TELEPHONY_LOGE("NapiCallManager::NativeMakeCall data is nullptr");
+        NapiUtil::ThrowParameterError(env);
+        return;
+    }
+    auto asyncContext = (AsyncContext *)data;
+    std::string phoneNumber(asyncContext->number, asyncContext->numberLen);
+    asyncContext->errorCode =
+        DelayedSingleton<CallManagerClient>::GetInstance()->MakeCall(phoneNumber);
+    if (asyncContext->errorCode == TELEPHONY_SUCCESS) {
+        asyncContext->resolved = TELEPHONY_SUCCESS;
+    }
+}
+
 
 void NapiCallManager::NativeAnswerCall(napi_env env, void *data)
 {

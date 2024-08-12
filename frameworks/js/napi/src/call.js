@@ -57,7 +57,7 @@ async function startAbility(args, context) {
     if (context) {
         await context.startAbility(config);
     } else {
-        await featureAbility.startAbility(config);
+        call.makeCall(args[0]);
     }
 }
 
