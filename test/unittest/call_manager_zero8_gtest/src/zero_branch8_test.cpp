@@ -82,6 +82,7 @@
 #include "telephony_types.h"
 #include "voip_call.h"
 #include "telephony_permission.h"
+#include "call_setting_manager.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -403,6 +404,111 @@ HWTEST_F(ZeroBranch8Test, Telephony_CallManagerService_005, Function | MediumTes
     EXPECT_EQ(callManagerService->JoinConference(false, numberList), TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API);
     std::string number = "123456";
     EXPECT_EQ(callManagerService->MakeCall(number), TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API);
+}
+
+HWTEST_F(ZeroBranch8Test, Telephony_BluetoothCallService_001, Function | MediumTest | Level3)
+{
+    AccessToken token;
+    BluetoothCallService bluetoothCallService;
+    EXPECT_NE(bluetoothCallService.HangUpCall(), TELEPHONY_SUCCESS);
+    EXPECT_NE(bluetoothCallService.HoldCall(), TELEPHONY_SUCCESS);
+    EXPECT_NE(bluetoothCallService.UnHoldCall(), TELEPHONY_SUCCESS);
+    EXPECT_NE(bluetoothCallService.SwitchCall(), TELEPHONY_SUCCESS);
+    EXPECT_NE(bluetoothCallService.CombineConference(), TELEPHONY_SUCCESS);
+    EXPECT_NE(bluetoothCallService.SeparateConference(), TELEPHONY_SUCCESS);
+    EXPECT_NE(bluetoothCallService.KickOutFromConference(), TELEPHONY_SUCCESS);
+}
+
+HWTEST_F(ZeroBranch8Test, Telephony_BluetoothCallService_002, Function | MediumTest | Level3)
+{
+    AccessToken token;
+    BluetoothCallService bluetoothCallService;
+    bluetoothCallService.callControlManagerPtr_ = DelayedSingleton<CallControlManager>::GetInstance();
+    EXPECT_NE(bluetoothCallService.SeparateConference(), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_NE(bluetoothCallService.KickOutFromConference(), TELEPHONY_ERR_LOCAL_PTR_NULL);
+}
+
+HWTEST_F(ZeroBranch8Test, Telephony_CallSettingManager_001, Function | MediumTest | Level3)
+{
+    std::shared_ptr<CallSettingManager> callSettingManager = std::make_shared<CallSettingManager>();
+    callSettingManager->cellularCallConnectionPtr_ = nullptr;
+    EXPECT_EQ(callSettingManager->GetCallRestriction(SIM1_SLOTID, CallRestrictionType::RESTRICTION_TYPE_ALL_INCOMING),
+        TELEPHONY_ERR_LOCAL_PTR_NULL);
+    CallRestrictionInfo callRestrictionInfo = {
+        .password = "",
+        .fac = CallRestrictionType::RESTRICTION_TYPE_ALL_INCOMING,
+        .mode = CallRestrictionMode::RESTRICTION_MODE_DEACTIVATION,
+    };
+    EXPECT_EQ(callSettingManager->SetCallRestriction(SIM1_SLOTID, callRestrictionInfo), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    CallRestrictionType fac = CallRestrictionType::RESTRICTION_TYPE_ALL_INCOMING;
+    const char oldPassword[kMaxNumberLen + 1] = "1111";
+    const char newPassword[kMaxNumberLen + 1] = "2222";
+    EXPECT_EQ(callSettingManager->SetCallRestrictionPassword(INVALID_SLOTID, fac, oldPassword, newPassword),
+        CALL_ERR_INVALID_SLOT_ID);
+    EXPECT_EQ(callSettingManager->SetCallRestrictionPassword(SIM1_SLOTID, fac, oldPassword, newPassword),
+        TELEPHONY_ERR_LOCAL_PTR_NULL);
+    CallTransferType type = CallTransferType::TRANSFER_TYPE_UNCONDITIONAL;
+    EXPECT_EQ(callSettingManager->GetCallTransferInfo(INVALID_SLOTID, type), CALL_ERR_INVALID_SLOT_ID);
+    EXPECT_EQ(callSettingManager->GetCallTransferInfo(SIM1_SLOTID, type), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    CallTransferInfo callTransferInfo = {
+        .transferNum = "",
+        .settingType = CallTransferSettingType::CALL_TRANSFER_ENABLE,
+        .type = CallTransferType::TRANSFER_TYPE_BUSY,
+        .startHour = 1,
+        .startMinute = 1,
+        .endHour = 1,
+        .endMinute = 1,
+    };
+    EXPECT_EQ(callSettingManager->SetCallTransferInfo(SIM1_SLOTID, callTransferInfo), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    bool result = false;
+    EXPECT_EQ(callSettingManager->CanSetCallTransferTime(SIM1_SLOTID, result), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    int32_t featureValue = 0;
+    EXPECT_EQ(callSettingManager->SetImsFeatureValue(SIM1_SLOTID, FeatureType::TYPE_VOICE_OVER_LTE, featureValue),
+        TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(callSettingManager->EnableImsSwitch(SIM1_SLOTID), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(callSettingManager->DisableImsSwitch(SIM1_SLOTID), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    bool enabled = false;
+    EXPECT_EQ(callSettingManager->IsImsSwitchEnabled(SIM1_SLOTID, enabled), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    int32_t state = 0;
+    EXPECT_EQ(callSettingManager->SetVoNRState(SIM1_SLOTID, state), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(callSettingManager->GetVoNRState(SIM1_SLOTID, state), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(callSettingManager->CloseUnFinishedUssd(INVALID_SLOTID), CALL_ERR_INVALID_SLOT_ID);
+    EXPECT_EQ(callSettingManager->CloseUnFinishedUssd(SIM1_SLOTID), TELEPHONY_ERR_LOCAL_PTR_NULL);
+}
+
+HWTEST_F(ZeroBranch8Test, Telephony_CallSettingManager_002, Function | MediumTest | Level3)
+{
+    std::shared_ptr<CallSettingManager> callSettingManager = std::make_shared<CallSettingManager>();
+    CallRestrictionType fac = CallRestrictionType::RESTRICTION_TYPE_ALL_INCOMING;
+    const char oldPassword[kMaxNumberLen + 1] = "1111";
+    const char newPassword[kMaxNumberLen + 1] = "2222";
+    EXPECT_NE(callSettingManager->SetCallRestrictionPassword(SIM1_SLOTID, fac, oldPassword, newPassword),
+        TELEPHONY_ERR_LOCAL_PTR_NULL);
+    int32_t state = 0;
+    EXPECT_NE(callSettingManager->SetVoNRState(SIM1_SLOTID, state), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_NE(callSettingManager->GetVoNRState(SIM1_SLOTID, state), TELEPHONY_ERR_LOCAL_PTR_NULL);
+}
+
+HWTEST_F(ZeroBranch8Test, Telephony_CallRequestHandler_001, Function | MediumTest | Level1)
+{
+    std::unique_ptr<CallRequestHandler> callRequestHandler = std::make_unique<CallRequestHandler>();
+    callRequestHandler->Init();
+    EXPECT_NE(callRequestHandler->DialCall(), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_NE(callRequestHandler->AnswerCall(1, 1), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    std::string content = "";
+    EXPECT_NE(callRequestHandler->RejectCall(1, true, content), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_NE(callRequestHandler->HangUpCall(1), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_NE(callRequestHandler->HoldCall(1), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_NE(callRequestHandler->UnHoldCall(1), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_NE(callRequestHandler->SwitchCall(1), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_NE(callRequestHandler->CombineConference(1), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_NE(callRequestHandler->SeparateConference(1), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_NE(callRequestHandler->KickOutFromConference(1), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    std::u16string test = u"";
+    EXPECT_NE(callRequestHandler->StartRtt(1, test), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_NE(callRequestHandler->StopRtt(1), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    std::vector<std::string> emptyRecords = {};
+    EXPECT_NE(callRequestHandler->JoinConference(1, emptyRecords), TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
 } // namespace Telephony
 } // namespace OHOS
