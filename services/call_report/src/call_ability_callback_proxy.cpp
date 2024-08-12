@@ -18,6 +18,7 @@
 #include "call_manager_errors.h"
 #include "message_option.h"
 #include "message_parcel.h"
+#include "call_manager_utils.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -34,33 +35,7 @@ int32_t CallAbilityCallbackProxy::OnCallDetailsChange(const CallAttributeInfo &i
         TELEPHONY_LOGE("write descriptor fail");
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
-    dataParcel.WriteCString(info.accountNumber);
-    dataParcel.WriteCString(info.bundleName);
-    dataParcel.WriteBool(info.speakerphoneOn);
-    dataParcel.WriteInt32(info.accountId);
-    dataParcel.WriteInt32(static_cast<int32_t>(info.videoState));
-    dataParcel.WriteInt64(info.startTime);
-    dataParcel.WriteBool(info.isEcc);
-    dataParcel.WriteInt32(static_cast<int32_t>(info.callType));
-    dataParcel.WriteInt32(info.callId);
-    dataParcel.WriteInt32(static_cast<int32_t>(info.callState));
-    dataParcel.WriteInt32(static_cast<int32_t>(info.conferenceState));
-    dataParcel.WriteInt64(info.callBeginTime);
-    dataParcel.WriteInt64(info.callEndTime);
-    dataParcel.WriteInt64(info.ringBeginTime);
-    dataParcel.WriteInt64(info.ringEndTime);
-    dataParcel.WriteInt32(static_cast<int32_t>(info.callDirection));
-    dataParcel.WriteInt32(static_cast<int32_t>(info.answerType));
-    dataParcel.WriteInt32(info.index);
-    dataParcel.WriteInt32(info.crsType);
-    dataParcel.WriteInt32(info.originalCallType);
-    dataParcel.WriteCString(info.numberLocation);
-    dataParcel.WriteInt32(static_cast<int32_t>(info.numberMarkInfo.markType));
-    dataParcel.WriteCString(info.numberMarkInfo.markContent);
-    dataParcel.WriteInt32(info.numberMarkInfo.markCount);
-    dataParcel.WriteCString(info.numberMarkInfo.markSource);
-    dataParcel.WriteBool(info.numberMarkInfo.isCloud);
-    SetVoipCallInfo(info, dataParcel);
+    CallManagerUtils::WriteCallAttributeInfo(info, dataParcel);
     if (Remote() == nullptr) {
         TELEPHONY_LOGE("function Remote() return nullptr!");
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
@@ -73,19 +48,6 @@ int32_t CallAbilityCallbackProxy::OnCallDetailsChange(const CallAttributeInfo &i
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     return replyParcel.ReadInt32();
-}
-
-void CallAbilityCallbackProxy::SetVoipCallInfo(const CallAttributeInfo &info, MessageParcel &dataParcel)
-{
-    if (info.callType == CallType::TYPE_VOIP) {
-        dataParcel.WriteString(info.voipCallInfo.voipCallId);
-        dataParcel.WriteString(info.voipCallInfo.userName);
-        dataParcel.WriteString(info.voipCallInfo.abilityName);
-        dataParcel.WriteString(info.voipCallInfo.extensionId);
-        dataParcel.WriteString(info.voipCallInfo.voipBundleName);
-        dataParcel.WriteBool(info.voipCallInfo.showBannerForIncomingCall);
-        dataParcel.WriteUInt8Vector(info.voipCallInfo.userProfile);
-    }
 }
 
 int32_t CallAbilityCallbackProxy::OnCallEventChange(const CallEventInfo &info)

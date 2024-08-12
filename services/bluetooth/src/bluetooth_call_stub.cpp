@@ -22,6 +22,7 @@
 
 #include "message_option.h"
 #include "message_parcel.h"
+#include "call_manager_utils.h"
 
 #include "call_control_manager.h"
 
@@ -224,7 +225,7 @@ int32_t BluetoothCallStub::OnGetCurrentCallList(MessageParcel &data, MessageParc
     reply.WriteInt32(callVec.size());
     std::vector<CallAttributeInfo>::iterator it = callVec.begin();
     for (; it != callVec.end(); ++it) {
-        reply.WriteRawData((const void *)&(*it), sizeof(CallAttributeInfo));
+        CallManagerUtils::WriteCallAttributeInfo(*it, reply);
     }
     return TELEPHONY_SUCCESS;
 }
