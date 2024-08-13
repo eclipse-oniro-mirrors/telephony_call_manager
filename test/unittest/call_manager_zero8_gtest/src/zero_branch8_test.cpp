@@ -83,6 +83,7 @@
 #include "voip_call.h"
 #include "telephony_permission.h"
 #include "call_setting_manager.h"
+#include "voip_call_connection.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -509,6 +510,91 @@ HWTEST_F(ZeroBranch8Test, Telephony_CallRequestHandler_001, Function | MediumTes
     EXPECT_NE(callRequestHandler->StopRtt(1), TELEPHONY_ERR_LOCAL_PTR_NULL);
     std::vector<std::string> emptyRecords = {};
     EXPECT_NE(callRequestHandler->JoinConference(1, emptyRecords), TELEPHONY_ERR_LOCAL_PTR_NULL);
+}
+
+HWTEST_F(ZeroBranch8Test, Telephony_CallManagerClient_001, Function | MediumTest | Level1)
+{
+    std::u16string test = u"";
+    int32_t callId = 1;
+    int32_t systemAbilityId = 1;
+    std::shared_ptr<CallManagerClient> callManagerClient = std::make_shared<CallManagerClient>();
+    callManagerClient->Init(systemAbilityId);
+    EXPECT_NE(callManagerClient->ObserverOnCallDetailsChange(), TELEPHONY_ERR_UNINIT);
+    std::string number = "12345678";
+    EXPECT_NE(callManagerClient->MakeCall(number), TELEPHONY_ERR_UNINIT);
+    EXPECT_NE(callManagerClient->UnRegisterVoipCallManagerCallback(), TELEPHONY_ERR_UNINIT);
+    bool result = false;
+    EXPECT_NE(callManagerClient->CanSetCallTransferTime(SIM1_SLOTID, result), TELEPHONY_ERR_UNINIT);
+    EXPECT_NE(callManagerClient->IsRinging(result), TELEPHONY_ERR_UNINIT);
+    EXPECT_NE(callManagerClient->IsNewCallAllowed(result), TELEPHONY_ERR_UNINIT);
+    float zoomRatio = 1.0;
+    EXPECT_NE(callManagerClient->SetCameraZoom(zoomRatio), TELEPHONY_ERR_UNINIT);
+    EXPECT_NE(callManagerClient->SetPausePicture(callId, test), TELEPHONY_ERR_UNINIT);
+    EXPECT_NE(callManagerClient->GetImsConfig(SIM1_SLOTID, ImsConfigItem::ITEM_IMS_SWITCH_STATUS),
+        TELEPHONY_ERR_UNINIT);
+    EXPECT_NE(callManagerClient->SetImsConfig(SIM1_SLOTID, ImsConfigItem::ITEM_IMS_SWITCH_STATUS, test),
+        TELEPHONY_ERR_UNINIT);
+    EXPECT_NE(callManagerClient->GetImsFeatureValue(SIM1_SLOTID, FeatureType::TYPE_SS_OVER_UT), TELEPHONY_ERR_UNINIT);
+    int32_t value = 0;
+    EXPECT_NE(callManagerClient->SetImsFeatureValue(SIM1_SLOTID, FeatureType::TYPE_SS_OVER_UT, value),
+        TELEPHONY_ERR_UNINIT);
+    EXPECT_NE(callManagerClient->UpdateImsCallMode(callId, ImsCallMode::CALL_MODE_AUDIO_ONLY), TELEPHONY_ERR_UNINIT);
+    EXPECT_NE(callManagerClient->StartRtt(callId, test), TELEPHONY_ERR_UNINIT);
+    EXPECT_NE(callManagerClient->StopRtt(callId), TELEPHONY_ERR_UNINIT);
+    EXPECT_NE(callManagerClient->CancelCallUpgrade(callId), TELEPHONY_ERR_UNINIT);
+    EXPECT_NE(callManagerClient->RequestCameraCapabilities(callId), TELEPHONY_ERR_UNINIT);
+    std::string eventName = "abc";
+    EXPECT_NE(callManagerClient->SendCallUiEvent(callId, eventName), TELEPHONY_ERR_UNINIT);
+    EXPECT_NE(callManagerClient->RegisterBluetoothCallManagerCallbackPtr(eventName), nullptr);
+}
+
+HWTEST_F(ZeroBranch8Test, Telephony_CallStatusCallback_001, Function | MediumTest | Level1)
+{
+    auto callStatusCallback = std::make_shared<CallStatusCallback>();
+    CallReportInfo callReportInfo;
+    callReportInfo.callType = CallType::TYPE_VOIP;
+    EXPECT_EQ(callStatusCallback->UpdateCallReportInfo(callReportInfo), TELEPHONY_SUCCESS);
+    CallsReportInfo info;
+    callReportInfo.state = TelCallState::CALL_STATUS_INCOMING;
+    info.callVec.push_back(callReportInfo);
+    EXPECT_EQ(callStatusCallback->UpdateCallsReportInfo(info), TELEPHONY_SUCCESS);
+}
+
+HWTEST_F(ZeroBranch8Test, Telephony_VoipCallConnection_001, Function | MediumTest | Level1)
+{
+    std::shared_ptr<VoipCallConnection> voipCallConnection = std::make_shared<VoipCallConnection>();
+    voipCallConnection->Init(TELEPHONY_CALL_MANAGER_SYS_ABILITY_ID);
+    EXPECT_NE(voipCallConnection->voipCallManagerInterfacePtr_, nullptr);
+    EXPECT_EQ(voipCallConnection->GetCallManagerProxy(), TELEPHONY_SUCCESS);
+    EXPECT_TRUE(voipCallConnection->connectCallManagerState_);
+    voipCallConnection->Init(TELEPHONY_CALL_MANAGER_SYS_ABILITY_ID);
+    VoipCallEventInfo voipCallEventInfo;
+    voipCallEventInfo.voipCallId = "123";
+    EXPECT_NE(voipCallConnection->AnswerCall(voipCallEventInfo, static_cast<int32_t>(VideoStateType::TYPE_VOICE)),
+        TELEPHONY_ERROR);
+    EXPECT_NE(voipCallConnection->RejectCall(voipCallEventInfo), TELEPHONY_ERROR);
+    EXPECT_NE(voipCallConnection->HangUpCall(voipCallEventInfo), TELEPHONY_ERROR);
+    sptr<ICallStatusCallback> callStatusCallback = nullptr;
+    EXPECT_NE(voipCallConnection->RegisterCallManagerCallBack(callStatusCallback), TELEPHONY_ERROR);
+    EXPECT_NE(voipCallConnection->UnRegisterCallManagerCallBack(), TELEPHONY_ERROR);
+    CallAudioEvent callAudioEvent = CallAudioEvent::AUDIO_EVENT_MUTED;
+    std::string voipCallId = "123";
+    EXPECT_NE(voipCallConnection->SendCallUiEvent(voipCallId, callAudioEvent), TELEPHONY_ERROR);
+}
+
+HWTEST_F(ZeroBranch8Test, Telephony_ReportCallInfoHandler_001, Function | MediumTest | Level1)
+{
+    ReportCallInfoHandler reportCallInfoHandler;
+    reportCallInfoHandler.Init();
+    VoipCallEventInfo info;
+    EXPECT_NE(reportCallInfoHandler.UpdateVoipEventInfo(info), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    DialParaInfo mDialParaInfo;
+    sptr<CallBase> csCall = new CSCall(mDialParaInfo);
+    csCall->callType_ =  CallType::TYPE_IMS;
+    EXPECT_EQ(CallObjectManager::AddOneCallObject(csCall), TELEPHONY_SUCCESS);
+    CallModeReportInfo response;
+    reportCallInfoHandler.ReceiveImsCallModeRequest(response);
+    EXPECT_NE(CallObjectManager::GetOneCallObjectByIndex(response.callIndex), nullptr);
 }
 } // namespace Telephony
 } // namespace OHOS
