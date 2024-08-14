@@ -310,22 +310,16 @@ int32_t AudioProxy::GetPreferredOutputAudioDevice(AudioDevice &device)
     switch (desc[0]->deviceType_) {
         case AudioStandard::DEVICE_TYPE_BLUETOOTH_SCO:
             device.deviceType = AudioDeviceType::DEVICE_BLUETOOTH_SCO;
-            if (memset_s(&device.address, kMaxAddressLen + 1, 0, kMaxAddressLen + 1) != EOK) {
+            if (memset_s(&device.address, kMaxAddressLen + 1, 0, kMaxAddressLen + 1) != EOK ||
+                memset_s(&device.deviceName, kMaxDeviceNameLen + 1, 0, kMaxDeviceNameLen + 1) != EOK) {
                 TELEPHONY_LOGE("memset_s address fail");
                 return TELEPHONY_ERR_MEMSET_FAIL;
             }
             if (memcpy_s(device.address, kMaxAddressLen, desc[0]->macAddress_.c_str(),
-                desc[0]->macAddress_.length()) != EOK) {
-                TELEPHONY_LOGE("memcpy_s address fail");
-                return TELEPHONY_ERR_MEMCPY_FAIL;
-            }
-            if (memset_s(&device.deviceName, kMaxDeviceNameLen + 1, 0, kMaxDeviceNameLen + 1) != EOK) {
-                TELEPHONY_LOGE("failed to memset_s currentAudioDevice.deviceName");
-                return TELEPHONY_ERR_MEMSET_FAIL;
-            }
-            if (memcpy_s(&device.deviceName, kMaxDeviceNameLen, desc[0]->deviceName_.c_str(),
+                desc[0]->macAddress_.length()) != EOK ||
+                memcpy_s(&device.deviceName, kMaxDeviceNameLen, desc[0]->deviceName_.c_str(),
                 desc[0]->deviceName_.length()) != EOK) {
-                TELEPHONY_LOGE("memcpy_s deviceName fail");
+                TELEPHONY_LOGE("memcpy_s address fail");
                 return TELEPHONY_ERR_MEMCPY_FAIL;
             }
             break;
