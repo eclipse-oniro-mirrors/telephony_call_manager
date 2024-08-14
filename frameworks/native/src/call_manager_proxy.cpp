@@ -1054,7 +1054,9 @@ int32_t CallManagerProxy::SetPreviewWindow(int32_t callId, std::string &surfaceI
         surfaceId = "";
         errCode = callManagerServicePtr_->SetPreviewWindow(callId, surfaceId, nullptr);
     } else {
-        uint64_t previewSurfaceId = std::stoull(surfaceId);
+        std::istringstream str(surfaceId);
+        uint64_t previewSurfaceId = 0;
+        str >> previewSurfaceId;
         auto surface = SurfaceUtils::GetInstance()->GetSurface(previewSurfaceId);
         if (surface == nullptr) {
             TELEPHONY_LOGI("surface is null");
@@ -1087,7 +1089,9 @@ int32_t CallManagerProxy::SetDisplayWindow(int32_t callId, std::string &surfaceI
         surfaceId = "";
         errCode = callManagerServicePtr_->SetDisplayWindow(callId, surfaceId, nullptr);
     } else {
-        uint64_t displaySurfaceId = std::stoull(surfaceId);
+        std::istringstream str(surfaceId);
+        uint64_t displaySurfaceId = 0;
+        str >> displaySurfaceId;
         auto surface = SurfaceUtils::GetInstance()->GetSurface(displaySurfaceId);
         if (surface == nullptr) {
             TELEPHONY_LOGI("surface is null");
