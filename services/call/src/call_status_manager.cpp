@@ -625,7 +625,7 @@ int32_t CallStatusManager::ActiveHandle(const CallDetailInfo &info)
     call = RefreshCallIfNecessary(call, info);
     SetOriginalCallTypeForActiveState(call);
     // call state change active, need to judge if launching a conference
-    if (info.mpty == 1) {
+    if (info.mpty == 1 && GetCarrierCallNum() > 1) {
         int32_t mainCallId = ERR_ID;
         call->LaunchConference();
         call->GetMainCallId(mainCallId);
@@ -800,10 +800,6 @@ int32_t CallStatusManager::DisconnectedHandle(const CallDetailInfo &info)
         timeWaitHelper_->NotifyAll();
         timeWaitHelper_ = nullptr;
     }
-    int32_t currentCallNum = CallObjectManager::GetCurrentCallNum();
-    if (currentCallNum <= 1) {
-        DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance()->RestoreSuperPrivacyMode();
-    }
     std::string tmpStr(info.phoneNum);
     sptr<CallBase> call = GetOneCallObjectByIndexAndSlotId(info.index, info.accountId);
     if (call == nullptr) {
@@ -815,18 +811,22 @@ int32_t CallStatusManager::DisconnectedHandle(const CallDetailInfo &info)
     std::vector<std::u16string> callIdList;
     call->GetSubCallIdList(callIdList);
     CallRunningState previousState = call->GetCallRunningState();
-    int32_t ret = call->ExitConference();
-    if (ret == TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGI("SubCallSeparateFromConference success");
-    }
+    call->ExitConference();
     TelCallState priorState = call->GetTelCallState();
-    ret = UpdateCallState(call, TelCallState::CALL_STATUS_DISCONNECTED);
-    if (ret != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("UpdateCallState failed, errCode:%{public}d", ret);
-        return ret;
-    }
+    UpdateCallState(call, TelCallState::CALL_STATUS_DISCONNECTED);
     HandleHoldCallOrAutoAnswerCall(call, callIdList, previousState, priorState);
-    return ret;
+    sptr<CallBase> foregroundCall = GetForegroundCall(false);
+    if (foregroundCall != nullptr && GetCarrierCallNum() == 1 &&
+        foregroundCall->GetTelConferenceState() != TelConferenceState::TEL_CONFERENCE_IDLE) {
+        TELEPHONY_LOGI("Not enough calls to be a conference!");
+        foregroundCall->SetTelConferenceState(TelConferenceState::TEL_CONFERENCE_IDLE);
+        UpdateCallState(foregroundCall, foregroundCall->GetTelCallState());
+    }
+    int32_t currentCallNum = CallObjectManager::GetCurrentCallNum();
+    if (currentCallNum <= 0) {
+        DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance()->RestoreSuperPrivacyMode();
+    }
+    return TELEPHONY_SUCCESS;
 }
 
 void CallStatusManager::HandleHoldCallOrAutoAnswerCall(const sptr<CallBase> call,
