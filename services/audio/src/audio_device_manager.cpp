@@ -32,6 +32,7 @@
 namespace OHOS {
 namespace Telephony {
 using namespace AudioStandard;
+
 constexpr int32_t DEVICE_ADDR_LEN = 7;
 constexpr int32_t ADDR_HEAD_VALID_LEN = 5;
 constexpr int32_t ADDR_TAIL_VALID_LEN = 2;
@@ -522,7 +523,7 @@ int32_t AudioDeviceManager::ReportAudioDeviceChange(const AudioDevice &device)
         return TELEPHONY_ERR_MEMCPY_FAIL;
     }
     if (deviceName.length() > kMaxDeviceNameLen) {
-        TELEPHONY_LOGE("deviceName is not too long");
+        TELEPHONY_LOGE("deviceName is too long");
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
     if (memset_s(info_.currentAudioDevice.deviceName, kMaxDeviceNameLen + 1, 0, kMaxDeviceNameLen + 1) != EOK) {
