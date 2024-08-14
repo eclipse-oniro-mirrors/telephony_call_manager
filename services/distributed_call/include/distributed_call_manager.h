@@ -36,8 +36,8 @@ class DistributedCallManager {
     DECLARE_DELAYED_SINGLETON(DistributedCallManager)
 public:
     void Init();
-    void AddDCallDevice(const std::string& devId);
-    void RemoveDCallDevice(const std::string& devId);
+    int32_t AddDCallDevice(const std::string& devId);
+    int32_t RemoveDCallDevice(const std::string& devId);
     void ClearDCallDevices();
     void ClearConnectedDCallDevice();
     std::string GetConnectedDCallDeviceAddr();
@@ -49,8 +49,8 @@ public:
     void SetCallState(bool isActive);
     void DealDisconnectCall();
 
-    void OnDCallDeviceOnline(const std::string &devId);
-    void OnDCallDeviceOffline(const std::string &devId);
+    int32_t OnDCallDeviceOnline(const std::string &devId);
+    int32_t OnDCallDeviceOffline(const std::string &devId);
     void OnDCallSystemAbilityAdded(const std::string &deviceId);
     void OnDCallSystemAbilityRemoved(const std::string &deviceId);
 
