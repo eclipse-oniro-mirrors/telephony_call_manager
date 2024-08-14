@@ -211,6 +211,19 @@ void doFuzzCallManagerService(const uint8_t *data, size_t size)
     callManagerService->OnRemoteRequest(code, dataParcel, replyParcel, option);
 }
 
+int32_t RegisterBluetoothCallManagerCallbackPtr(const uint8_t *data, size_t size)
+{
+    if (!IsServiceInited()) {
+        return TELEPHONY_ERROR;
+    }
+    std::string str = "";
+    MessageParcel dataParcel;
+    dataParcel.WriteString(str);
+    MessageParcel reply;
+    return DelayedSingleton<CallManagerService>::GetInstance()->OnRegisterBluetoothCallManagerCallbackPtr(
+        dataParcel, reply);
+}
+
 void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
 {
     if (data == nullptr || size == 0) {
@@ -229,6 +242,7 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     PostDialProceed(data, size);
     OnUnRegisterVoipCallManagerCallback(data, size);
     doFuzzCallManagerService(data, size);
+    RegisterBluetoothCallManagerCallbackPtr(data, size);
 }
 } // namespace OHOS
 
