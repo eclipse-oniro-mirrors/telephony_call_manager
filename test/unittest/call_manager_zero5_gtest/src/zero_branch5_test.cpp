@@ -470,12 +470,16 @@ HWTEST_F(ZeroBranch5Test, Telephony_SatelliteCall_001, Function | MediumTest | L
 {
     DialParaInfo dialParaInfo;
     SatelliteCall call { dialParaInfo };
-    call.DialingProcess();
-    call.AnswerCall(0);
-    call.RejectCall();
-    call.HangUpCall();
+    int32_t ret1 = call.DialingProcess();
+    int32_t ret2 = call.AnswerCall(0);
+    int32_t ret3 = call.RejectCall();
+    int32_t ret4 = call.HangUpCall();
     CallAttributeInfo callAttributeInfo;
     call.GetCallAttributeInfo(callAttributeInfo);
+    EXPECT_EQ(ret1, TELEPHONY_SUCCESS);
+    EXPECT_NE(ret2, TELEPHONY_SUCCESS);
+    EXPECT_NE(ret3, TELEPHONY_SUCCESS);
+    EXPECT_NE(ret4, TELEPHONY_SUCCESS);
 }
 
 /**
@@ -497,26 +501,39 @@ HWTEST_F(ZeroBranch5Test, Telephony_VoipCallManagerProxy_001, Function | MediumT
     ErrorReason error = ErrorReason::VOIP_CALL_EXISTS;
     if (voipCallManagerInterfacePtr != nullptr) {
         std::vector<uint8_t> userProfile = { 0 };
-        voipCallManagerInterfacePtr->ReportIncomingCall(mPacMap, userProfile, error);
-        voipCallManagerInterfacePtr->ReportIncomingCallError(mPacMap);
+        int32_t ret1 = voipCallManagerInterfacePtr->ReportIncomingCall(mPacMap, userProfile, error);
+        int32_t ret2 = voipCallManagerInterfacePtr->ReportIncomingCallError(mPacMap);
         VoipCallState voipCallState = VoipCallState::VOIP_CALL_STATE_ACTIVE;
         std::string callId = "123";
-        voipCallManagerInterfacePtr->ReportCallStateChange(callId, voipCallState);
-        voipCallManagerInterfacePtr->UnRegisterCallBack();
+        int32_t ret3 = voipCallManagerInterfacePtr->ReportCallStateChange(callId, voipCallState);
+        int32_t ret4 = voipCallManagerInterfacePtr->UnRegisterCallBack();
         std::string bundleName = " ";
         std::string processMode = "0";
-        voipCallManagerInterfacePtr->ReportVoipIncomingCall(callId, bundleName, processMode);
+        int32_t ret5 = voipCallManagerInterfacePtr->ReportVoipIncomingCall(callId, bundleName, processMode);
         std::string extensionId = " ";
-        voipCallManagerInterfacePtr->ReportVoipCallExtensionId(callId, bundleName, extensionId);
+        int32_t ret6 = voipCallManagerInterfacePtr->ReportVoipCallExtensionId(callId, bundleName, extensionId);
         VoipCallEventInfo voipCallEventInfo;
         voipCallEventInfo.voipCallId = "123";
-        voipCallManagerInterfacePtr->Answer(voipCallEventInfo, static_cast<int32_t>(VideoStateType::TYPE_VOICE));
-        voipCallManagerInterfacePtr->HangUp(voipCallEventInfo);
-        voipCallManagerInterfacePtr->Reject(voipCallEventInfo);
-        voipCallManagerInterfacePtr->UnloadVoipSa();
+        int32_t ret7 = voipCallManagerInterfacePtr->Answer(voipCallEventInfo,
+            static_cast<int32_t>(VideoStateType::TYPE_VOICE));
+        int32_t ret8 = voipCallManagerInterfacePtr->HangUp(voipCallEventInfo);
+        int32_t ret9 = voipCallManagerInterfacePtr->Reject(voipCallEventInfo);
+        int32_t ret10 = voipCallManagerInterfacePtr->UnloadVoipSa();
         sptr<ICallStatusCallback> statusCallback = (std::make_unique<CallStatusCallback>()).release();
-        voipCallManagerInterfacePtr->RegisterCallManagerCallBack(statusCallback);
-        voipCallManagerInterfacePtr->UnRegisterCallManagerCallBack();
+        int32_t ret11 = voipCallManagerInterfacePtr->RegisterCallManagerCallBack(statusCallback);
+        int32_t ret12 = voipCallManagerInterfacePtr->UnRegisterCallManagerCallBack();
+        EXPECT_NE(ret1, TELEPHONY_SUCCESS);
+        EXPECT_NE(ret2, TELEPHONY_SUCCESS);
+        EXPECT_NE(ret3, TELEPHONY_SUCCESS);
+        EXPECT_NE(ret4, TELEPHONY_SUCCESS);
+        EXPECT_NE(ret5, TELEPHONY_SUCCESS);
+        EXPECT_NE(ret6, TELEPHONY_SUCCESS);
+        EXPECT_NE(ret7, TELEPHONY_SUCCESS);
+        EXPECT_NE(ret8, TELEPHONY_SUCCESS);
+        EXPECT_NE(ret9, TELEPHONY_SUCCESS);
+        EXPECT_NE(ret10, TELEPHONY_SUCCESS);
+        EXPECT_NE(ret11, TELEPHONY_SUCCESS);
+        EXPECT_NE(ret12, TELEPHONY_SUCCESS);
     }
 }
 
@@ -529,7 +546,7 @@ HWTEST_F(ZeroBranch5Test, Telephony_CallRequestEventHandlerHelper_001, Function 
 {
     bool flag = false;
     DelayedSingleton<CallRequestEventHandlerHelper>::GetInstance()->RestoreDialingFlag(flag);
-    DelayedSingleton<CallRequestEventHandlerHelper>::GetInstance()->IsDialingCallProcessing();
+    EXPECT_FALSE(DelayedSingleton<CallRequestEventHandlerHelper>::GetInstance()->IsDialingCallProcessing());
 }
 
 /**
@@ -542,9 +559,9 @@ HWTEST_F(ZeroBranch5Test, Telephony_DistributedCallManager_001, Function | Mediu
     DistributedCallManager manager;
     AudioDevice device;
     device.deviceType = AudioDeviceType::DEVICE_EARPIECE;
-    manager.GetDevIdFromAudioDevice(device);
-    manager.IsSelectVirtualModem();
-    manager.SwitchOnDCallDeviceSync(device);
+    std::string restr = manager.GetDevIdFromAudioDevice(device);
+    bool res = manager.IsSelectVirtualModem();
+    bool res1 = manager.SwitchOnDCallDeviceSync(device);
     device.deviceType = AudioDeviceType::DEVICE_DISTRIBUTED_PHONE;
     std::string devId = "";
     manager.CreateDAudioDevice(devId, device);
@@ -567,6 +584,9 @@ HWTEST_F(ZeroBranch5Test, Telephony_DistributedCallManager_001, Function | Mediu
     manager.IsSelectVirtualModem();
     manager.SwitchOnDCallDeviceSync(device);
     manager.OnDCallSystemAbilityAdded(TEST_STR);
+    EXPECT_TRUE(restr.empty());
+    EXPECT_FALSE(res);
+    EXPECT_FALSE(res1);
 }
 
 /**
@@ -578,22 +598,31 @@ HWTEST_F(ZeroBranch5Test, Telephony_DistributedCallProxy_001, Function | MediumT
 {
     std::unique_ptr<DistributedCallProxy> proxy = std::make_unique<DistributedCallProxy>();
     proxy->GetDCallClient();
-    proxy->Init();
+    int32_t res = proxy->Init();
     proxy->GetDCallClient();
     proxy->dcallClient_ = nullptr;
-    proxy->UnInit();
-    proxy->IsSelectVirtualModem();
-    proxy->SwitchDevice(TEST_STR, 1);
+    int32_t res1 = proxy->UnInit();
+    bool res2 = proxy->IsSelectVirtualModem();
+    int32_t res3 = proxy->SwitchDevice(TEST_STR, 1);
     std::vector<std::string> devList;
-    proxy->GetOnlineDeviceList(devList);
+    int32_t res4 = proxy->GetOnlineDeviceList(devList);
     OHOS::DistributedHardware::DCallDeviceInfo devInfo;
-    proxy->GetDCallDeviceInfo(TEST_STR, devInfo);
+    int32_t res5 = proxy->GetDCallDeviceInfo(TEST_STR, devInfo);
     proxy->GetDCallClient();
     proxy->IsSelectVirtualModem();
-    proxy->SwitchDevice(TEST_STR, 1);
-    proxy->GetOnlineDeviceList(devList);
+    int32_t res6 = proxy->SwitchDevice(TEST_STR, 1);
+    int32_t res7 = proxy->GetOnlineDeviceList(devList);
     proxy->GetDCallDeviceInfo(TEST_STR, devInfo);
-    proxy->UnInit();
+    int32_t res8 = proxy->UnInit();
+    EXPECT_NE(res, TELEPHONY_SUCCESS);
+    EXPECT_NE(res1, TELEPHONY_SUCCESS);
+    EXPECT_FALSE(res2);
+    EXPECT_NE(res3, TELEPHONY_SUCCESS);
+    EXPECT_NE(res4, TELEPHONY_SUCCESS);
+    EXPECT_NE(res5, TELEPHONY_SUCCESS);
+    EXPECT_NE(res6, TELEPHONY_SUCCESS);
+    EXPECT_NE(res7, TELEPHONY_SUCCESS);
+    EXPECT_NE(res8, TELEPHONY_SUCCESS);
 }
 
 /**

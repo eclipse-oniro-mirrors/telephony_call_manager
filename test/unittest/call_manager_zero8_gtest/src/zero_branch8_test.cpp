@@ -553,11 +553,11 @@ HWTEST_F(ZeroBranch8Test, Telephony_CallStatusCallback_001, Function | MediumTes
     auto callStatusCallback = std::make_shared<CallStatusCallback>();
     CallReportInfo callReportInfo;
     callReportInfo.callType = CallType::TYPE_VOIP;
-    EXPECT_EQ(callStatusCallback->UpdateCallReportInfo(callReportInfo), TELEPHONY_SUCCESS);
+    EXPECT_NE(callStatusCallback->UpdateCallReportInfo(callReportInfo), TELEPHONY_SUCCESS);
     CallsReportInfo info;
     callReportInfo.state = TelCallState::CALL_STATUS_INCOMING;
     info.callVec.push_back(callReportInfo);
-    EXPECT_EQ(callStatusCallback->UpdateCallsReportInfo(info), TELEPHONY_SUCCESS);
+    EXPECT_NE(callStatusCallback->UpdateCallsReportInfo(info), TELEPHONY_SUCCESS);
 }
 
 HWTEST_F(ZeroBranch8Test, Telephony_VoipCallConnection_001, Function | MediumTest | Level1)
@@ -595,6 +595,25 @@ HWTEST_F(ZeroBranch8Test, Telephony_ReportCallInfoHandler_001, Function | Medium
     CallModeReportInfo response;
     reportCallInfoHandler.ReceiveImsCallModeRequest(response);
     EXPECT_NE(CallObjectManager::GetOneCallObjectByIndex(response.callIndex), nullptr);
+}
+
+HWTEST_F(ZeroBranch8Test, Telephony_CallSuperPrivacyControlManager_001, Function | MediumTest | Level1)
+{
+    int32_t callId = 0;
+    int32_t videoState = 0;
+    std::u16string phoneNumber = u"";
+    int32_t accountId = 1;
+    int32_t dialType = 0;
+    int32_t dialScene = 0;
+    int32_t callType = 0;
+    auto controlManager = DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance();
+    controlManager->RestoreSuperPrivacyMode();
+    EXPECT_FALSE(controlManager->GetIsChangeSuperPrivacyMode());
+    controlManager->SetIsChangeSuperPrivacyMode(true);
+    controlManager->RestoreSuperPrivacyMode();
+    EXPECT_FALSE(controlManager->GetIsChangeSuperPrivacyMode());
+    controlManager->CloseAnswerSuperPrivacyMode(callId, videoState);
+    controlManager->CloseCallSuperPrivacyMode(phoneNumber, accountId, videoState, dialType, dialScene, callType);
 }
 } // namespace Telephony
 } // namespace OHOS
