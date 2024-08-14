@@ -191,7 +191,7 @@ int32_t DistributedCallManager::AddDCallDevice(const std::string& devId)
     AudioDevice device;
     if (!CreateDAudioDevice(devId, device)) {
         TELEPHONY_LOGE("failed to create distributed audio device, devId: %{public}s", GetAnonyString(devId).c_str());
-        return TELEPHONY_ERR_FAIL;;
+        return TELEPHONY_ERR_FAIL;
     }
 
     DelayedSingleton<AudioDeviceManager>::GetInstance()->AddAudioDeviceList(device.address, device.deviceType, "");
