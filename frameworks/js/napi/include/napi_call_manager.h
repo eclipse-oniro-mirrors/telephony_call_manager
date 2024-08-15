@@ -46,13 +46,6 @@ public:
     static napi_value DeclareCallExtendInterface(napi_env env, napi_value exports);
     static napi_value DeclareCallMultimediaInterface(napi_env env, napi_value exports);
     static napi_value DeclareCallImsInterface(napi_env env, napi_value exports);
-    static napi_value DeclareCallMediaEnum(napi_env env, napi_value exports);
-    static napi_value DeclareCallDialEnum(napi_env env, napi_value exports);
-    static napi_value DeclareCallStateEnum(napi_env env, napi_value exports);
-    static napi_value DeclareCallEventEnum(napi_env env, napi_value exports);
-    static napi_value DeclareCallRestrictionEnum(napi_env env, napi_value exports);
-    static napi_value DeclareCallWaitingEnum(napi_env env, napi_value exports);
-    static napi_value DeclareCallTransferEnum(napi_env env, napi_value exports);
     // Enumeration type extension
     static napi_value DeclareVoNRStateEnum(napi_env env, napi_value exports);
     static napi_value DeclareAudioDeviceEnum(napi_env env, napi_value exports);
