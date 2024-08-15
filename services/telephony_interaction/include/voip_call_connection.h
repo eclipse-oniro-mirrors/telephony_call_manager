@@ -62,6 +62,7 @@ private:
     sptr<ISystemAbilityStatusChange> statusChangeListener_ = nullptr;
     bool connectCallManagerState_ = false;
     Utils::RWLock rwClientLock_;
+    std::mutex mutex_;
 };
 } // namespace Telephony
 } // namespace OHOS
