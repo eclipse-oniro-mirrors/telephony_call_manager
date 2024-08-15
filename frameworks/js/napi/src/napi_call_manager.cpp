@@ -913,6 +913,7 @@ napi_value NapiCallManager::RegisterCallManagerFunc(napi_env env, napi_value exp
     DeclareCallSupplementInterface(env, exports);
     DeclareCallExtendInterface(env, exports);
     DeclareCallMultimediaInterface(env, exports);
+    DeclareCallImsInterface(env, exports);
     // Enumeration class extension initialization
     DeclareVoNRStateEnum(env, exports);
     DeclareAudioDeviceEnum(env, exports);
