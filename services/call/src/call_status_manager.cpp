@@ -621,7 +621,6 @@ int32_t CallStatusManager::ActiveHandle(const CallDetailInfo &info)
         TELEPHONY_LOGE("Call is NULL");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    call->SetMute(call->IsMuted(), info.accountId);
     call = RefreshCallIfNecessary(call, info);
     SetOriginalCallTypeForActiveState(call);
     // call state change active, need to judge if launching a conference
