@@ -67,7 +67,7 @@ async function startAbility(args, context) {
     };
     if (args.length > 0 && typeof args[0] === 'string') {
         config.parameters.phoneNumber = args[0];
-    } else if (args.length > 0 && typeof args[1] === 'string') {
+    } else if (args.length > 1 && typeof args[1] === 'string') {
         config.parameters.phoneNumber = args[1];
     }
     if (context) {
