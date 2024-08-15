@@ -48,6 +48,9 @@ class AudioDeviceChangeCallback : public AudioStandard::AudioManagerDeviceChange
 class AudioPreferDeviceChangeCallback : public AudioStandard::AudioPreferredOutputDeviceChangeCallback {
 public:
     void OnPreferredOutputDeviceUpdated(const std::vector<sptr<AudioStandard::AudioDeviceDescriptor>> &desc) override;
+
+private:
+    bool IsDistributedDeviceSelected(const std::vector<sptr<AudioStandard::AudioDeviceDescriptor>> &desc);
 };
 
 class AudioMicStateChangeCallback : public AudioStandard::AudioManagerMicStateChangeCallback {
