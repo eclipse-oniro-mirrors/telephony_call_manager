@@ -309,6 +309,8 @@ HWTEST_F(CallManager8Gtest, Telephony_CallManagerService_003, Function | MediumT
     callManagerService->ReportAudioDeviceInfo();
     std::string eventName = "EVENT_IS_CELIA_CALL";
     ASSERT_NE(callManagerService->SendCallUiEvent(callId, eventName), TELEPHONY_SUCCESS);
+    std::string strBluetoothCall = "abc";
+    callManagerService->RegisterBluetoothCallManagerCallbackPtr(strBluetoothCall);
 }
 
 /**
@@ -568,6 +570,7 @@ HWTEST_F(CallManager8Gtest, Telephony_CallManagerServiceStub_005, Function | Med
     callManagerService->OnRegisterVoipCallManagerCallback(data, reply);
     callManagerService->OnUnRegisterVoipCallManagerCallback(data, reply);
     ASSERT_EQ(callManagerService->OnGetProxyObjectPtr(data, reply), TELEPHONY_SUCCESS);
+    ASSERT_EQ(callManagerService->OnRegisterBluetoothCallManagerCallbackPtr(data, reply), TELEPHONY_SUCCESS);
 }
 
 /**
@@ -785,6 +788,7 @@ HWTEST_F(CallManager8Gtest, Telephony_CallManagerServiceStub_009, Function | Med
     data15.WriteString("hello");
     callManagerService->OnGetProxyObjectPtr(data15, reply);
     ASSERT_NE(callManagerService->OnSendCallUiEvent(data15, reply), TELEPHONY_SUCCESS);
+    callManagerService->OnRegisterBluetoothCallManagerCallbackPtr(data15, reply);
 }
 
 /**

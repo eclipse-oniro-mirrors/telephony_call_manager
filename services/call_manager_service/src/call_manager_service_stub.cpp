@@ -1407,6 +1407,10 @@ int32_t CallManagerServiceStub::OnRegisterBluetoothCallManagerCallbackPtr(Messag
 {
     std::string macAddress = data.ReadString();
     sptr<ICallStatusCallback> callback = RegisterBluetoothCallManagerCallbackPtr(macAddress);
+    if (callback == nullptr) {
+        TELEPHONY_LOGE("OnRegisterBluetoothCallManagerCallbackPtr fail.");
+        return TELEPHONY_ERR_FAIL;
+    }
     sptr<IRemoteObject> objectPtr = callback->AsObject().GetRefPtr();
 
     if (!reply.WriteRemoteObject(objectPtr)) {
