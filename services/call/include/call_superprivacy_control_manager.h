@@ -45,6 +45,7 @@ private:
     bool isChangeSuperPrivacyMode = false;
     int32_t oldSuperPrivacyMode = -1;
     static void ParamChangeCallback(const char *key, const char *value, void *context);
+    static void SuperPrivacyModeChangeEvent();
 };
 } // namespace Telephony
 } // namespace OHOS
