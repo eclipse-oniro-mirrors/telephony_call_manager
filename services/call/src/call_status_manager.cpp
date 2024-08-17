@@ -1481,11 +1481,13 @@ bool CallStatusManager::IsRejectCall(sptr<CallBase> &call, const CallDetailInfo 
         block = true;
         return true;
     }
-    if (IsFocusModeOpen()
-        && Notification::NotificationHelper::IsNeedSilentInDoNotDisturbMode(info.phoneNum, 0) != 1) {
-        TELEPHONY_LOGI("focus mode open");
-        block = false;
-        return true;
+    if (IsFocusModeOpen()) {
+        int ret = Notification::NotificationHelper::IsNeedSilentInDoNotDisturbMode(info.phoneNum, 0);
+        TELEPHONY_LOGI("IsRejectCall IsNeedSilentInDoNotDisturbMode ret:%{public}d", ret);
+        if (ret == 0) {
+            block = false;
+            return true;
+        }
     }
     return false;
 }
