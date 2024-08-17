@@ -1434,6 +1434,7 @@ void CallStatusManager::PackParaInfo(
         paraInfo.voipCallInfo.extensionId = info.voipCallInfo.extensionId;
         paraInfo.voipCallInfo.voipBundleName = info.voipCallInfo.voipBundleName;
         paraInfo.voipCallInfo.showBannerForIncomingCall = info.voipCallInfo.showBannerForIncomingCall;
+        paraInfo.voipCallInfo.hasMicPermission = info.voipCallInfo.hasMicPermission;
     }
     paraInfo.number = info.phoneNum;
     paraInfo.callId = GetNewCallId();

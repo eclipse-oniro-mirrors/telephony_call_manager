@@ -47,6 +47,7 @@ int32_t CallStatusCallback::UpdateCallReportInfo(const CallReportInfo &info)
         detailInfo.voipCallInfo.voipBundleName = info.voipCallInfo.voipBundleName;
         detailInfo.voipCallInfo.abilityName = info.voipCallInfo.abilityName;
         detailInfo.voipCallInfo.showBannerForIncomingCall = info.voipCallInfo.showBannerForIncomingCall;
+        detailInfo.voipCallInfo.hasMicPermission = info.voipCallInfo.hasMicPermission;
     }
     detailInfo.callType = info.callType;
     detailInfo.accountId = info.accountId;
