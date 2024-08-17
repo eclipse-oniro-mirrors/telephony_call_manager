@@ -140,6 +140,10 @@ struct VoipCallAttribute {
      */
     bool showBannerForIncomingCall = true;
     /**
+     * Indicates whether the app has the permission to use microphone. Default value is true.
+     */
+    bool hasMicPermission = true;
+    /**
      * Indicates whether the VoIP call is from Push kit.
     */
     bool isCallByPushKit = true;
