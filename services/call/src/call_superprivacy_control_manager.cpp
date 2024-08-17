@@ -36,6 +36,7 @@ void CallSuperPrivacyControlManager::RegisterSuperPrivacyMode()
 
 void CallSuperPrivacyControlManager::ParamChangeCallback(const char *key, const char *value, void *context)
 {
+    SuperPrivacyModeChangeEvent();
     if (key == nullptr ||value == nullptr) {
         return;
     }
@@ -58,6 +59,21 @@ void CallSuperPrivacyControlManager::ParamChangeCallback(const char *key, const 
             DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance()->SetIsChangeSuperPrivacyMode(false);
         }
     }
+}
+
+void CallSuperPrivacyControlManager::SuperPrivacyModeChangeEvent()
+{
+    CallEventInfo eventInfo;
+    (void)memset_s(&eventInfo, sizeof(CallEventInfo), 0, sizeof(CallEventInfo));
+    bool isSuperPrivacyMode = DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance()->
+            GetCurrentIsSuperPrivacyMode();
+    TELEPHONY_LOGI("SuperPrivacyMode:%{public}d", isSuperPrivacyMode);
+    if (isSuperPrivacyMode) {
+        eventInfo.eventId = CallAbilityEventId::EVENT_IS_SUPER_PRIVACY_MODE_ON;
+    } else {
+        eventInfo.eventId = CallAbilityEventId::EVENT_IS_SUPER_PRIVACY_MODE_OFF;
+    }
+    DelayedSingleton<CallAbilityReportProxy>::GetInstance()->CallEventUpdated(eventInfo);
 }
 
 void CallSuperPrivacyControlManager::CloseAllCall()
@@ -132,16 +148,7 @@ void CallSuperPrivacyControlManager::CloseAnswerSuperPrivacyMode(int32_t callId,
     TELEPHONY_LOGE("CloseAnswerSuperPrivacyMode privacy:%{public}d", privacy);
     if (privacy == SUPER_PRIVACY_MODE_REQUEST_SUCCESS) {
         DelayedSingleton<CallControlManager>::GetInstance()->AnswerCall(callId, videoState);
-        CallEventInfo eventInfo;
-        (void)memset_s(&eventInfo, sizeof(CallEventInfo), 0, sizeof(CallEventInfo));
-        bool isSuperPrivacyMode = GetCurrentIsSuperPrivacyMode();
-        TELEPHONY_LOGI("SuperPrivacyMode:%{public}d", isSuperPrivacyMode);
-        if (isSuperPrivacyMode) {
-            eventInfo.eventId = CallAbilityEventId::EVENT_IS_SUPER_PRIVACY_MODE_ON;
-        } else {
-            eventInfo.eventId = CallAbilityEventId::EVENT_IS_SUPER_PRIVACY_MODE_OFF;
-        }
-        DelayedSingleton<CallAbilityReportProxy>::GetInstance()->CallEventUpdated(eventInfo);
+        SuperPrivacyModeChangeEvent();
     }
 }
 
