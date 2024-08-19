@@ -13,33 +13,47 @@
  * limitations under the License.
  */
 const call = requireInternal('telephony.call');
-const featureAbility = requireNapi('ability.featureAbility');
 const ARGUMENTS_LEN_TWO = 2;
-
+const ARGUMENTS_LEN_ONE = 1;
 async function makeCallFunc(...args) {
-    if ((arguments.length === ARGUMENTS_LEN_TWO && typeof arguments[1] !== 'function') ||
-        (arguments.length > ARGUMENTS_LEN_TWO)) {
+    if ((arguments.length === ARGUMENTS_LEN_TWO && typeof arguments[1] === 'function') ||
+        (arguments.length === ARGUMENTS_LEN_ONE)) {
+        try {
+            let context = getContext(this);
+            await startAbility(arguments, context);
+            if (arguments.length === ARGUMENTS_LEN_TWO && typeof arguments[1] === 'function') {
+                return arguments[1](undefined, undefined);
+            }
+            return new Promise((resolve, reject) => {
+                resolve();
+            });
+        } catch (error) {
+            console.log("[call] makeCall error: " + error);
+            if (arguments.length === ARGUMENTS_LEN_TWO && typeof arguments[1] === 'function') {
+                return arguments[1](error, undefined);
+            }
+            return new Promise((resolve, reject) => {
+                reject(error);
+            });
+        }
+    } else if (arguments.length === ARGUMENTS_LEN_TWO && typeof arguments[1] === 'string') {
+        try {
+            let context = arguments[0];
+            await startAbility(arguments, context);
+            return new Promise((resolve, reject) => {
+                resolve();
+            });
+        } catch (error) {
+            console.log("[call] makeCall error: " + error);
+            return new Promise((resolve, reject) => {
+                reject(error);
+            });
+        }
+    } else {
         console.log('[call] makeCall callback invalid');
         throw Error('invalid callback');
     }
-    try {
-        let context = getContext(this);
-        await startAbility(arguments, context);
-        if (arguments.length === ARGUMENTS_LEN_TWO && typeof arguments[1] === 'function') {
-            return arguments[1](undefined, undefined);
-        }
-        return new Promise((resolve, reject) => {
-            resolve();
-        });
-    } catch (error) {
-        console.log("[call] makeCall error: " + error);
-        if (arguments.length === ARGUMENTS_LEN_TWO && typeof arguments[1] === 'function') {
-            return arguments[1](error, undefined);
-        }
-        return new Promise((resolve, reject) => {
-            reject(error);
-        });
-    }
+    
 }
 
 async function startAbility(args, context) {
@@ -53,11 +67,13 @@ async function startAbility(args, context) {
     };
     if (args.length > 0 && typeof args[0] === 'string') {
         config.parameters.phoneNumber = args[0];
+    } else if (args.length > 1 && typeof args[1] === 'string') {
+        config.parameters.phoneNumber = args[1];
     }
     if (context) {
         await context.startAbility(config);
     } else {
-        call.makeCall(args[0]);
+        call.makeCall(config.parameters.phoneNumber);
     }
 }
 
