@@ -32,6 +32,7 @@
 namespace OHOS {
 namespace Telephony {
 using namespace AudioStandard;
+
 constexpr int32_t DEVICE_ADDR_LEN = 7;
 constexpr int32_t ADDR_HEAD_VALID_LEN = 5;
 constexpr int32_t ADDR_TAIL_VALID_LEN = 2;
@@ -515,15 +516,19 @@ int32_t AudioDeviceManager::ReportAudioDeviceChange(const AudioDevice &device)
     }
     if (memset_s(info_.currentAudioDevice.address, kMaxAddressLen + 1, 0, kMaxAddressLen + 1) != EOK) {
         TELEPHONY_LOGE("failed to memset_s currentAudioDevice.address");
-        return TELEPHONY_ERR_MEMCPY_FAIL;
+        return TELEPHONY_ERR_MEMSET_FAIL;
     }
     if (memcpy_s(info_.currentAudioDevice.address, kMaxAddressLen, address.c_str(), address.length()) != EOK) {
         TELEPHONY_LOGE("memcpy_s address fail");
         return TELEPHONY_ERR_MEMCPY_FAIL;
     }
     if (deviceName.length() > kMaxDeviceNameLen) {
-        TELEPHONY_LOGE("deviceName is not too long");
+        TELEPHONY_LOGE("deviceName is too long");
         return TELEPHONY_ERR_ARGUMENT_INVALID;
+    }
+    if (memset_s(info_.currentAudioDevice.deviceName, kMaxDeviceNameLen + 1, 0, kMaxDeviceNameLen + 1) != EOK) {
+        TELEPHONY_LOGE("failed to memset_s currentAudioDevice.deviceName");
+        return TELEPHONY_ERR_MEMSET_FAIL;
     }
     if (memcpy_s(info_.currentAudioDevice.deviceName, kMaxDeviceNameLen,
         deviceName.c_str(), deviceName.length()) != EOK) {
