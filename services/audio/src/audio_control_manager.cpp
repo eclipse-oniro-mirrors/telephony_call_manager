@@ -217,7 +217,8 @@ void AudioControlManager::UpdateDeviceTypeForVideoOrSatelliteCall()
     if (IsVideoCall(foregroundCall->GetVideoStateType()) ||
         foregroundCall->GetCallType() == CallType::TYPE_SATELLITE) {
         if (initDeviceType == AudioDeviceType::DEVICE_WIRED_HEADSET ||
-            initDeviceType == AudioDeviceType::DEVICE_BLUETOOTH_SCO) {
+            initDeviceType == AudioDeviceType::DEVICE_BLUETOOTH_SCO ||
+            initDeviceType == AudioDeviceType::DEVICE_DISTRIBUTED_AUTOMOTIVE) {
             device.deviceType = initDeviceType;
         }
         TELEPHONY_LOGI("set device type, type: %{public}d", static_cast<int32_t>(device.deviceType));
