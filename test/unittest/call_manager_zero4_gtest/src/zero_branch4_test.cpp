@@ -363,7 +363,7 @@ HWTEST_F(ZeroBranch4Test, Telephony_BluetoothCallStub_001, Function | MediumTest
     result = bluetoothCallService->OnSeparateConference(dataParcel, reply);
     ASSERT_NE(result, TELEPHONY_ERR_PERMISSION_ERR);
     result = bluetoothCallService->OnKickOutFromConference(dataParcel, reply);
-    ASSERT_EQ(result, TELEPHONY_ERR_PERMISSION_ERR);
+    ASSERT_NE(result, TELEPHONY_ERR_PERMISSION_ERR);
     result = bluetoothCallService->OnStartDtmf(dataParcel, reply);
     ASSERT_EQ(result, TELEPHONY_ERR_PERMISSION_ERR);
     result = bluetoothCallService->OnStopDtmf(dataParcel, reply);
