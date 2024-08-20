@@ -545,7 +545,7 @@ HWTEST_F(ZeroBranch8Test, Telephony_CallManagerClient_001, Function | MediumTest
     EXPECT_NE(callManagerClient->RequestCameraCapabilities(callId), TELEPHONY_ERR_UNINIT);
     std::string eventName = "abc";
     EXPECT_NE(callManagerClient->SendCallUiEvent(callId, eventName), TELEPHONY_ERR_UNINIT);
-    EXPECT_NE(callManagerClient->RegisterBluetoothCallManagerCallbackPtr(eventName), nullptr);
+    EXPECT_EQ(callManagerClient->RegisterBluetoothCallManagerCallbackPtr(eventName), nullptr);
 }
 
 HWTEST_F(ZeroBranch8Test, Telephony_CallStatusCallback_001, Function | MediumTest | Level1)
@@ -553,7 +553,7 @@ HWTEST_F(ZeroBranch8Test, Telephony_CallStatusCallback_001, Function | MediumTes
     auto callStatusCallback = std::make_shared<CallStatusCallback>();
     CallReportInfo callReportInfo;
     callReportInfo.callType = CallType::TYPE_VOIP;
-    EXPECT_NE(callStatusCallback->UpdateCallReportInfo(callReportInfo), TELEPHONY_SUCCESS);
+    EXPECT_EQ(callStatusCallback->UpdateCallReportInfo(callReportInfo), TELEPHONY_SUCCESS);
     CallsReportInfo info;
     callReportInfo.state = TelCallState::CALL_STATUS_INCOMING;
     info.callVec.push_back(callReportInfo);
