@@ -55,6 +55,7 @@ void CallManagerUtils::WriteCallAttributeInfo(const CallAttributeInfo &info, Mes
         messageParcel.WriteString(info.voipCallInfo.voipBundleName);
         messageParcel.WriteBool(info.voipCallInfo.showBannerForIncomingCall);
         messageParcel.WriteBool(info.voipCallInfo.hasMicPermission);
+        messageParcel.WriteInt32(info.voipCallInfo.uid);
         messageParcel.WriteUInt8Vector(info.voipCallInfo.userProfile);
     }
 }
