@@ -31,8 +31,8 @@ ohos_unittest("tel_call_manager_zero1_gtest") {
 
   sources = [
     "${CALL_MANAGER_PATH}/frameworks/native/src/call_manager_service_proxy.cpp",
-    "src/zero_branch_test_call_state.cpp",
     "src/zero_branch1_test.cpp",
+    "src/zero_branch_test_call_state.cpp",
   ]
   sources += call_manager_sources
 
