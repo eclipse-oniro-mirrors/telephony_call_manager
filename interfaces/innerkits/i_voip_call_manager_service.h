@@ -56,6 +56,9 @@ public:
     virtual int32_t RegisterCallBack(const sptr<IVoipCallManagerCallback> &callback) = 0;
     virtual int32_t UnRegisterCallBack() = 0;
 
+    virtual int32_t ReportVoipIncomingCall(
+        std::string callId, std::string bundleName, std::string processMode, int32_t uid) = 0;
+
     virtual int32_t ReportVoipIncomingCall(std::string callId, std::string bundleName, std::string processMode) = 0;
     virtual int32_t ReportVoipCallExtensionId(
         std::string callId, std::string bundleName, std::string extensionId) = 0;

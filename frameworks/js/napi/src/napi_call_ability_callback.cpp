@@ -596,6 +596,7 @@ void NapiCallAbilityCallback::CreateVoipNapiValue(napi_env &env, napi_value &voi
     NapiCallManagerUtils::SetPropertyBoolean(env, voipObject, "showBannerForIncomingCall",
         info.voipCallInfo.showBannerForIncomingCall);
     NapiCallManagerUtils::SetPropertyBoolean(env, voipObject, "hasMicPermission", info.voipCallInfo.hasMicPermission);
+    NapiCallManagerUtils::SetPropertyInt32(env, voipObject, "uid", info.voipCallInfo.uid);
     std::shared_ptr<Media::PixelMap> userProfile =
         std::shared_ptr<Media::PixelMap>(Media::PixelMap::DecodeTlv(info.voipCallInfo.userProfile));
     napi_value pixelMapObject = Media::PixelMapNapi::CreatePixelMap(env, userProfile);

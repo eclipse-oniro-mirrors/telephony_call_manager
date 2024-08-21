@@ -53,6 +53,7 @@ int32_t CallStatusCallbackProxy::UpdateCallReportInfo(const CallReportInfo &info
         dataParcel.WriteString(info.voipCallInfo.voipBundleName);
         dataParcel.WriteBool(info.voipCallInfo.showBannerForIncomingCall);
         dataParcel.WriteBool(info.voipCallInfo.hasMicPermission);
+        dataParcel.WriteInt32(info.voipCallInfo.uid);
         dataParcel.WriteUInt8Vector(info.voipCallInfo.userProfile);
     }
     if (Remote() == nullptr) {
@@ -94,6 +95,7 @@ int32_t CallStatusCallbackProxy::UpdateCallsReportInfo(const CallsReportInfo &in
             dataParcel.WriteString(it.voipCallInfo.voipBundleName);
             dataParcel.WriteBool(it.voipCallInfo.showBannerForIncomingCall);
             dataParcel.WriteBool(it.voipCallInfo.hasMicPermission);
+            dataParcel.WriteInt32(info.uid);
             dataParcel.WriteUInt8Vector(it.voipCallInfo.userProfile);
         }
     }
@@ -748,6 +750,7 @@ int32_t CallStatusCallbackProxy::UpdateVoipEventInfo(const VoipCallEventInfo &in
     }
     dataParcel.WriteString(info.voipCallId);
     dataParcel.WriteString(info.bundleName);
+    dataParcel.WriteInt32(info.uid);
     dataParcel.WriteInt32(static_cast<int32_t>(info.voipCallEvent));
     dataParcel.WriteInt32(static_cast<int32_t>(info.errorReason));
     if (Remote() == nullptr) {

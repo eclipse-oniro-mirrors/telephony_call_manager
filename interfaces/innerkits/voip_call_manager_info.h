@@ -246,6 +246,10 @@ struct VoipCallEventInfo {
      */
     std::string bundleName = "";
     /**
+     * Indicates the uid.
+     */
+    int32_t uid = 0;
+    /**
      * Indicates the click event of voip.
      */
     VoipCallEvent voipCallEvent = VoipCallEvent::VOIP_CALL_EVENT_NONE;
@@ -271,24 +275,6 @@ enum class ReportVoipCallFailedCause {
      * Indicates application failed to establish connect.
      */
     CONNECT_FAILED,
-};
-
-/**
- * @brief Indicates the fail cause of voip call.
- */
-struct ReportVoipCallFailedCauses {
-    /**
-     * Indicates the callid
-     */
-    std::string callId = "";
-    /**
-     * Indicates the bundleName.
-     */
-    std::string bundleName = "";
-    /**
-     * Indicates the the fail cause of voip call.
-     */
-    ReportVoipCallFailedCause reportVoipCallFailedCause = ReportVoipCallFailedCause::OTHER_CAUSED;
 };
 
 struct ReportVoIPCallParams {

@@ -34,6 +34,7 @@ VoIPCall::VoIPCall(DialParaInfo &info) : CarrierCall(info)
     voipBundleName_ = info.voipCallInfo.voipBundleName;
     showBannerForIncomingCall_ = info.voipCallInfo.showBannerForIncomingCall;
     hasMicPermission_ = info.voipCallInfo.hasMicPermission;
+    uid_ = info.voipCallInfo.uid;
 }
 
 VoIPCall::~VoIPCall() {}
@@ -64,6 +65,7 @@ int32_t VoIPCall::PackVoipCallInfo(VoipCallEventInfo &voipcallInfo)
 {
     voipcallInfo.voipCallId = voipCallId_;
     voipcallInfo.bundleName = voipBundleName_;
+    voipcallInfo.uid = uid_;
     return TELEPHONY_SUCCESS;
 }
 
@@ -159,6 +161,7 @@ void VoIPCall::GetCallAttributeInfo(CallAttributeInfo &info)
     info.voipCallInfo.voipBundleName = voipBundleName_;
     info.voipCallInfo.showBannerForIncomingCall = showBannerForIncomingCall_;
     info.voipCallInfo.hasMicPermission = hasMicPermission_;
+    info.voipCallInfo.uid = uid_;
     return;
 }
 
