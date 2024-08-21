@@ -249,6 +249,12 @@ int32_t CallStatusManager::HandleVoipCallReportInfo(const CallDetailInfo &info)
         case TelCallState::CALL_STATUS_DIALING:
             ret = OutgoingVoipCallHandle(info);
             break;
+        case TelCallState::CALL_STATUS_ANSWERED:
+            ret = AnsweredVoipCallHandle(info);
+            break;
+        case TelCallState::CALL_STATUS_DISCONNECTING:
+            ret = DisconnectingVoipCallHandle(info);
+            break;
         default:
             TELEPHONY_LOGE("Invalid call state!");
             break;
@@ -496,6 +502,30 @@ int32_t CallStatusManager::OutgoingVoipCallHandle(const CallDetailInfo &info)
         return ret;
     }
     return ret;
+}
+
+int32_t CallStatusManager::AnsweredVoipCallHandle(const CallDetailInfo &info)
+{
+    int32_t ret = TELEPHONY_ERROR;
+    sptr<CallBase> call = GetOneCallObjectByVoipCallId(info.voipCallInfo.voipCallId);
+    if (call == nullptr) {
+        return ret;
+    }
+    if (DelayedSingleton<CallControlManager>::GetInstance()->NotifyCallStateUpdated(
+        call, TelCallState::CALL_STATUS_INCOMING, TelCallState::CALL_STATUS_ANSWERED)) {
+        return TELEPHONY_SUCCESS;
+    } else {
+        return ret;
+    }
+}
+
+int32_t CallStatusManager::DisconnectingVoipCallHandle(const CallDetailInfo &info)
+{
+    sptr<CallBase> call = GetOneCallObjectByVoipCallId(info.voipCallInfo.voipCallId);
+    if (call == nullptr) {
+        return TELEPHONY_ERROR;
+    }
+    return UpdateCallState(call, TelCallState::CALL_STATUS_DISCONNECTING);
 }
 
 void CallStatusManager::QueryCallerInfo(ContactInfo &contactInfo, std::string phoneNum)
