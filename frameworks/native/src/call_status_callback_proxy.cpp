@@ -95,7 +95,7 @@ int32_t CallStatusCallbackProxy::UpdateCallsReportInfo(const CallsReportInfo &in
             dataParcel.WriteString(it.voipCallInfo.voipBundleName);
             dataParcel.WriteBool(it.voipCallInfo.showBannerForIncomingCall);
             dataParcel.WriteBool(it.voipCallInfo.hasMicPermission);
-            dataParcel.WriteInt32(info.uid);
+            dataParcel.WriteInt32(it.voipCallInfo.uid);
             dataParcel.WriteUInt8Vector(it.voipCallInfo.userProfile);
         }
     }
