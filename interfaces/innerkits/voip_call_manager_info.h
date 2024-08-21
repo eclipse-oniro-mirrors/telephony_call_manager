@@ -259,24 +259,6 @@ struct VoipCallEventInfo {
     ErrorReason errorReason = ErrorReason::ERROR_NONE;
 };
 
-/**
- * @brief Indicates the ErrorReason.
- */
-enum class ReportVoipCallFailedCause {
-    /**
-     * Indicates other failed cause.
-     */
-    OTHER_CAUSED,
-    /**
-     * Indicates application line is busy.
-     */
-    ROUTE_BUSY,
-    /**
-     * Indicates application failed to establish connect.
-     */
-    CONNECT_FAILED,
-};
-
 struct ReportVoIPCallParams {
     std::string callId = "";
     int32_t status;

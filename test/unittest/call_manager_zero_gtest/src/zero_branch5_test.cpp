@@ -530,7 +530,7 @@ HWTEST_F(ZeroBranch5Test, Telephony_VoipCallManagerProxy_001, Function | MediumT
         std::string bundleName = " ";
         std::string processMode = "0";
         int32_t uid = 0;
-        int32_t ret5 = voipCallManagerInterfacePtr->ReportVoipIncomingCall(callId, bundleName, processMode);
+        int32_t ret5 = voipCallManagerInterfacePtr->ReportVoipIncomingCall(callId, bundleName, processMode, uid);
         std::string extensionId = " ";
         int32_t ret6 = voipCallManagerInterfacePtr->ReportVoipCallExtensionId(callId, bundleName, extensionId);
         VoipCallEventInfo voipCallEventInfo;
