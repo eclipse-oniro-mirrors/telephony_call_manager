@@ -557,7 +557,7 @@ HWTEST_F(ZeroBranch8Test, Telephony_CallStatusCallback_001, Function | MediumTes
     CallsReportInfo info;
     callReportInfo.state = TelCallState::CALL_STATUS_INCOMING;
     info.callVec.push_back(callReportInfo);
-    EXPECT_NE(callStatusCallback->UpdateCallsReportInfo(info), TELEPHONY_SUCCESS);
+    EXPECT_EQ(callStatusCallback->UpdateCallsReportInfo(info), TELEPHONY_SUCCESS);
 }
 
 HWTEST_F(ZeroBranch8Test, Telephony_VoipCallConnection_001, Function | MediumTest | Level1)
