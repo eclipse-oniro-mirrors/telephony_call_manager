@@ -220,7 +220,7 @@ int32_t VoipCallManagerProxy::ReportVoipIncomingCall(
 }
 
 int32_t VoipCallManagerProxy::ReportVoipCallExtensionId(
-    std::string callId, std::string bundleName, std::string extensionId)
+    std::string callId, std::string bundleName, std::string extensionId, int32_t uid)
 {
     MessageParcel dataParcel;
     if (!dataParcel.WriteInterfaceToken(VoipCallManagerProxy::GetDescriptor())) {
@@ -230,6 +230,7 @@ int32_t VoipCallManagerProxy::ReportVoipCallExtensionId(
     dataParcel.WriteString(callId);
     dataParcel.WriteString(bundleName);
     dataParcel.WriteString(extensionId);
+    dataParcel.WriteInt32(uid);
     auto remote = Remote();
     if (remote == nullptr) {
         TELEPHONY_LOGE("ReportVoipCallExtensionId Remote is null");
