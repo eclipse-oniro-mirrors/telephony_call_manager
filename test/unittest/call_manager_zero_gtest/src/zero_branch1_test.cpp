@@ -159,6 +159,7 @@ HWTEST_F(SpamCallTest, Telephony_SpamCallConnection_001, Function | MediumTest |
     std::string phoneNumber = "123456789012";
     int32_t slotId = 0;
     std::shared_ptr<SpamCallAdapter> spamCallAdapter = std::make_shared<SpamCallAdapter>();
+    ASSERT_NE(spamCallAdapter, nullptr);
     SpamCallConnection spamCallConnection(phoneNumber, slotId, spamCallAdapter);
     std::string bundle = "111";
     std::string ability = "222";
@@ -166,6 +167,7 @@ HWTEST_F(SpamCallTest, Telephony_SpamCallConnection_001, Function | MediumTest |
     sptr<IRemoteObject> remoteObject;
     int resultCode = 0;
     spamCallConnection.OnAbilityConnectDone(element, remoteObject, resultCode);
+    ASSERT_EQ(resultCode, 0);
     spamCallConnection.OnAbilityDisconnectDone(element, resultCode);
     ASSERT_EQ(resultCode, 0);
 }
@@ -178,9 +180,8 @@ HWTEST_F(SpamCallTest, Telephony_SpamCallConnection_001, Function | MediumTest |
 HWTEST_F(SpamCallTest, Telephony_TimeWaitHelper_001, Function | MediumTest | Level1)
 {
     TimeWaitHelper timeWaitHelper(10);
-    bool result = timeWaitHelper.WaitForResult();
     timeWaitHelper.NotifyAll();
-    ASSERT_NE(result, true);
+    ASSERT_NE(timeWaitHelper.WaitForResult(), true);
 }
 
 /**

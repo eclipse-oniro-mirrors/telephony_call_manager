@@ -417,11 +417,12 @@ HWTEST_F(ZeroBranch5Test, Telephony_CallAbilityReportProxy_002, Function | Mediu
     CallConnectAbility callConnectCalluiAbility;
     callConnectCalluiAbility.WaitForConnectResult();
     std::shared_ptr<CallAbilityReportProxy> callAbilityReportProxy = std::make_shared<CallAbilityReportProxy>();
+    ASSERT_NE(callAbilityReportProxy, nullptr);
     int64_t dataUsage = 0;
     std::string pidName = "123";
-    callAbilityReportProxy->ReportCallDataUsageChange(dataUsage);
+    ASSERT_NE(callAbilityReportProxy->ReportCallDataUsageChange(dataUsage), TELEPHONY_SUCCESS);
     CameraCapabilities cameraCapabilities;
-    callAbilityReportProxy->ReportCameraCapabilities(cameraCapabilities);
+    ASSERT_NE(callAbilityReportProxy->ReportCameraCapabilities(cameraCapabilities), TELEPHONY_SUCCESS);
     ASSERT_NE(callAbilityReportProxy->UnRegisterCallBack(pidName), TELEPHONY_SUCCESS);
 }
 
@@ -442,7 +443,9 @@ HWTEST_F(ZeroBranch5Test, Telephony_CallAbilityConnectCallback_001, Function | M
     AppExecFwk::ElementName element("", bundle, ability);
     int resultCode = 0;
     callAbilityConnectCallback.OnAbilityConnectDone(element, nullptr, resultCode);
+    ASSERT_EQ(resultCode, 0);
     callAbilityConnectCallback.OnAbilityDisconnectDone(element, resultCode);
+    ASSERT_EQ(resultCode, 0);
 }
 
 /**
@@ -660,12 +663,9 @@ HWTEST_F(ZeroBranch5Test, Telephony_BluetoothCallManager_001, Function | MediumT
     int32_t callState = static_cast<int32_t>(TelCallState::CALL_STATUS_IDLE);
     std::string number = CallObjectManager::GetCallNumber(TelCallState::CALL_STATUS_HOLDING);
     BluetoothCallManager bluetoothCallManager;
-    bluetoothCallManager.SendBtCallState(numActive, numHeld, callState, number);
-    bluetoothCallManager.SendCallDetailsChange(1, 1);
-    bluetoothCallManager.IsBtAvailble();
-    ASSERT_EQ(numHeld, 0);
-    ASSERT_EQ(numActive, 0);
-    ASSERT_EQ(numDial, 0);
+    ASSERT_EQ(bluetoothCallManager.SendBtCallState(numActive, numHeld, callState, number), TELEPHONY_SUCCESS);
+    ASSERT_EQ(bluetoothCallManager.SendCallDetailsChange(1, 1), TELEPHONY_SUCCESS);
+    ASSERT_NE(bluetoothCallManager.IsBtAvailble(), true);
 }
 
 /**
