@@ -28,7 +28,7 @@ async function makeCallFunc(...args) {
                 resolve();
             });
         } catch (error) {
-            console.log("[call] makeCall error: " + error);
+            console.log('[call] makeCall error: ' + error);
             if (arguments.length === ARGUMENTS_LEN_TWO && typeof arguments[1] === 'function') {
                 return arguments[1](error, undefined);
             }
