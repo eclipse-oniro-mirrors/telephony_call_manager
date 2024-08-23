@@ -384,17 +384,7 @@ void AudioPreferDeviceChangeCallback::OnPreferredOutputDeviceUpdated(
 
     TELEPHONY_LOGI("OnPreferredOutputDeviceUpdated type: %{public}d", desc[0]->deviceType_);
 
-    size_t size = desc.size();
-    TELEPHONY_LOGI("desc size is: %{public}zu", size);
-    std::string deviceId = DelayedSingleton<DistributedCallManager>::GetInstance()->GetConnectedDCallDeviceId();
-    for (auto iter = desc.begin(); iter != desc.end(); iter++) {
-        std::string networkId = (*iter)->networkId_;
-        if (networkId.empty() || deviceId != networkId) {
-            continue;
-        }
-        DelayedSingleton<AudioDeviceManager>::GetInstance()->SetCurrentAudioDevice(
-            AudioDeviceType::DEVICE_DISTRIBUTED_AUTOMOTIVE);
-        TELEPHONY_LOGI("switch to distributed audio device");
+    if (IsDistributedDeviceSelected(desc)) {
         return;
     }
 
@@ -438,6 +428,25 @@ void AudioPreferDeviceChangeCallback::OnPreferredOutputDeviceUpdated(
     if (desc[0]->deviceType_ != AudioStandard::DEVICE_TYPE_SPEAKER) {
         DelayedSingleton<AudioControlManager>::GetInstance()->UpdateDeviceTypeForCrs();
     }
+}
+
+bool AudioPreferDeviceChangeCallback::IsDistributedDeviceSelected(
+    const std::vector<sptr<AudioStandard::AudioDeviceDescriptor>> &desc)
+{
+    size_t size = desc.size();
+    TELEPHONY_LOGI("desc size is: %{public}zu", size);
+    std::string deviceId = DelayedSingleton<DistributedCallManager>::GetInstance()->GetConnectedDCallDeviceId();
+    for (auto iter = desc.begin(); iter != desc.end(); iter++) {
+        std::string networkId = (*iter)->networkId_;
+        if (networkId.empty() || deviceId != networkId) {
+            continue;
+        }
+        DelayedSingleton<AudioDeviceManager>::GetInstance()->SetCurrentAudioDevice(
+            AudioDeviceType::DEVICE_DISTRIBUTED_AUTOMOTIVE);
+        TELEPHONY_LOGI("switch to distributed audio device");
+        return true;
+    }
+    return false;
 }
 
 int32_t AudioProxy::SetAudioMicStateChangeCallback()

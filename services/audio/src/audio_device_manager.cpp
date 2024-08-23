@@ -459,9 +459,13 @@ void AudioDeviceManager::SetCurrentAudioDevice(AudioDeviceType deviceType)
 
 void AudioDeviceManager::SetCurrentAudioDevice(const AudioDevice &device)
 {
-    audioDeviceType_ = device.deviceType;
+    AudioDeviceType deviceType = device.deviceType;
+    TELEPHONY_LOGI("set current audio device, audioDeviceType = %{public}d.", deviceType);
+    if (!IsDistributedAudioDeviceType(deviceType) && IsDistributedAudioDeviceType(audioDeviceType_)) {
+        DelayedSingleton<DistributedCallManager>::GetInstance()->SwitchOffDCallDeviceSync();
+    }
+    audioDeviceType_ = deviceType;
     ReportAudioDeviceChange(device);
-    TELEPHONY_LOGI("set current audio device, audioDeviceType = %{public}d.", audioDeviceType_);
 }
   
 bool AudioDeviceManager::CheckAndSwitchDistributedAudioDevice()
