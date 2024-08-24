@@ -1483,7 +1483,8 @@ int32_t CallControlManager::BroadcastSubscriber()
     EventFwk::CommonEventSubscribeInfo subscriberInfo_(matchingSkills_);
     subscriberInfo_.SetThreadMode(EventFwk::CommonEventSubscribeInfo::COMMON)
     subscriberInfo_.SetPublisherUid(SATCOMM_UID);
-    std::shared_ptr<CallBroadcastSubscriber> subscriberPtr_ = std::make_shared<CallBroadcastSubscriber>(subscriberInfo_);
+    std::shared_ptr<CallBroadcastSubscriber> subscriberPtr_ =
+        std::make_shared<CallBroadcastSubscriber>(subscriberInfo_);
     if (subscriberPtr_ == nullptr) {
         TELEPHONY_LOGE("CallControlManager::BroadcastSubscriber subscriberPtr_ is nullptr");
         return TELEPHONY_ERROR;
@@ -1494,7 +1495,8 @@ int32_t CallControlManager::BroadcastSubscriber()
     EventFwk::CommonEventSubscribeInfo subscriberInfos_(matchingSkill_);
     subscriberInfos_.SetPublisherBundleName("com.settings");
     subscriberInfos_.SetThreadMode(EventFwk::CommonEventSubscribeInfo::COMMON);
-    std::shared_ptr<CallBroadcastSubscriber> subscriberPtrs_ = std::make_shared<CallBroadcastSubscriber>(subscriberInfos_);
+    std::shared_ptr<CallBroadcastSubscriber> subscriberPtrs_ =
+        std::make_shared<CallBroadcastSubscriber>(subscriberInfos_);
     if (subscriberPtrs_ == nullptr) {
         TELEPHONY_LOGE("CallControlManager::BroadcastSubscriber subscriberPtrs_ is nullptr");
         return TELEPHONY_ERROR;
