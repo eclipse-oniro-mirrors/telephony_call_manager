@@ -158,6 +158,8 @@ private:
     std::unique_ptr<CallSettingManager> callSettingManagerPtr_;
     sptr<ISystemAbilityStatusChange> statusChangeListener_ = nullptr;
     sptr<ISystemAbilityStatusChange> pageStateChangeListener_ = nullptr;
+    sptr<ISystemAbilityStatusChange> satcommEventListener_ = nullptr;
+    sptr<ISystemAbilityStatusChange> superPrivacyEventListener_ = nullptr;
     DialParaInfo dialSrcInfo_;
     AppExecFwk::PacMap extras_;
     std::mutex mutex_;
