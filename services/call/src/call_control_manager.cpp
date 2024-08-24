@@ -1516,12 +1516,14 @@ int32_t CallControlManager::BroadcastSubscriber()
         TELEPHONY_LOGE("pageStateChangeListener_ is nullptr");
         return TELEPHONY_ERROR;
     }
-    satcommEventListener_ = new (std::nothrow) SystemAbilityListener(subscriberPtr_);
+    satcommEventListener_ =
+        new (std::nothrow) SystemAbilityListener(subscriberPtr_);
     if (satcommEventListener_ == nullptr) {
         TELEPHONY_LOGE("satcommEventListener_ is nullptr");
         return TELEPHONY_ERROR;
     }
-    superPrivacyEventListener_ = new (std::nothrow) SystemAbilityListener(subscriberPtrs_);
+    superPrivacyEventListener_ =
+        new (std::nothrow) SystemAbilityListener(subscriberPtrs_);
     if (superPrivacyEventListener_ == nullptr) {
         TELEPHONY_LOGE("superPrivacyEventListener_ is nullptr");
         return TELEPHONY_ERROR;
