@@ -1481,7 +1481,7 @@ int32_t CallControlManager::BroadcastSubscriber()
     EventFwk::MatchingSkills matchingSkills_;
     matchingSkills.AddEvent("usual.event.thermal.satcomm.HIGH_TEMP_LEVEL");
     EventFwk::CommonEventSubscribeInfo subscriberInfo_(matchingSkills_);
-    subscriberInfo_.SetThreadMode(EventFwk::CommonEventSubscribeInfo::COMMON)
+    subscriberInfo_.SetThreadMode(EventFwk::CommonEventSubscribeInfo::COMMON);
     subscriberInfo_.SetPublisherUid(SATCOMM_UID);
     std::shared_ptr<CallBroadcastSubscriber> subscriberPtr_ =
         std::make_shared<CallBroadcastSubscriber>(subscriberInfo_);
