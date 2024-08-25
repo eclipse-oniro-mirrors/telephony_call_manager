@@ -257,14 +257,21 @@ void CallManagerProxy::DisconnectService()
 
 int32_t CallManagerProxy::ReConnectService()
 {
-    if (callManagerServicePtr_ == nullptr) {
+    sptr<ICallManagerService> callManagerServicePtr = nullptr;
+    bool registerStatus = false;
+    {
+        Utils::UniqueReadGuard<Utils::RWLock> guard(rwClientLock_);
+        callManagerServicePtr = callManagerServicePtr_;
+        registerStatus = registerStatus_;
+    }
+    if (callManagerServicePtr == nullptr) {
         TELEPHONY_LOGI("try to reconnect call manager service now...");
         int32_t result = ConnectService();
         if (result != TELEPHONY_SUCCESS) {
             TELEPHONY_LOGE("Connect service: %{public}d", result);
             return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
         }
-        if (registerStatus_) {
+        if (registerStatus) {
             ReRegisterCallBack();
         }
     }
