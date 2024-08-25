@@ -54,8 +54,8 @@ public:
     }
 
 public:
-    std::string bundleName_;
-    int32_t uid_;
+    std::string bundleName_ = "";
+    int32_t uid_ = 0;
     DECLARE_INTERFACE_DESCRIPTOR(u"OHOS.Telephony.IVoipCallManagerCallback");
 };
 } // namespace Telephony
