@@ -19,6 +19,7 @@
 #include <mutex>
 #include <unordered_map>
 #include <memory>
+
 #include "common_event_manager.h"
 #include "common_event_subscribe_info.h"
 #include "common_event_subscriber.h"
@@ -61,13 +62,13 @@ class DataShareSwitchState {
 public:
     DataShareSwitchState();
     int32_t QueryData(Uri& uri, const std::string& key, std::string& values);
+    bool RegisterListenSettingsKey(std::string key, bool isReg, const sptr<AAFwk::IDataAbilityObserver>& callback);
+
 public:
     static const int TELEPHONY_SUCCESS;
-    static const int COW_COUNT_NULL;
-    static const int TELEPHONY_ERR_LOCAL_PTR_NULL;
-    static const int TELEPHONY_ERR_DATABASE_READ_FAIL;
-    static const int TELEPHONY_ERR_DATABASE_WRITE_FAIL;
     static const int INVALID_VALUE;
+    const std::string DEFAULT_URI =
+        "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true&key=";
 private:
     std::shared_ptr<DataShare::DataShareHelper> CreateDataShareHelper(int systemAbilityId);
     std::shared_ptr<DataShare::DataShareHelper> datashareHelper_ = nullptr;
@@ -81,8 +82,10 @@ public:
     void OnRemoveSystemAbility(int32_t systemAbilityId, const std::string &deviceId) override;
     static bool SystemAbilitySubscriber();
     static bool GetSystemAbility(int32_t systemAbilityId);
+    
 private:
     static sptr<ISystemAbilityStatusChange> statusChangeListener_;
+    static std::map<int32_t, bool> systemAbilityStatus;
 };
 } // namespace Telephony
 } // namespace OHOS

@@ -17,6 +17,9 @@
 #define CALL_EARTHQUAKE_ALARM_LOCATOR_H
 
 #include <iostream>
+#include <memory>
+#include <map>
+
 #include "request_config.h"
 #include "location.h"
 #include "locator.h"
@@ -24,7 +27,6 @@
 #include "locator_impl.h"
 #include "location_log.h"
 #include "iremote_stub.h"
-#include <memory>
 #include "call_earthquake_alarm_subscriber.h"
 #include "ability_connect_callback_interface.h"
 #include "telephony_permission.h"
@@ -38,9 +40,22 @@
 #include "string_wrapper.h"
 #include "call_ability_report_proxy.h"
 #include "call_object_manager.h"
+#include "data_ability_observer_stub.h"
 
 namespace OHOS {
 namespace Telephony {
+
+class OOBESwitchObserver : public AAFwk::DataAbilityObserverStub {
+public:
+    OOBESwitchObserver(std::string key) : mKey(key) {};
+    virtual ~OOBESwitchObserver() = default;
+    void OnChange() override;
+    static std::map<std::string, bool> keyStatus;
+
+private:
+    std::string mKey = "";
+};
+
 class MyLocationEngine {
 public:
     MyLocationEngine();
@@ -52,11 +67,11 @@ public:
     void RegisterSwitchCallback();
     void UnRegisterSwitchCallback();
     void LocationSwitchChange();
+    static void OOBEComplete();
     static void BootComplete();
-    static bool IsSwitchOn();
+    static bool IsSwitchOn(std::string);
     static std::shared_ptr<MyLocationEngine> GetInstance();
-    static void ConnectAbility();
-    static OHOS::Uri uri_q;
+    static void ConnectAbility(std::string);
 private:
     class MyLocationCallBack : public IRemoteStub<Location::ILocatorCallback> {
     public:
@@ -95,6 +110,8 @@ private:
     static const std::string ALARM_SWITCH_ON;
     static const std::string ALARM_SWITCH_OFF;
     static std::string INITIAL_FIRST_VALUE;
+public:
+    static std::map<std::string, sptr<OOBESwitchObserver>> settingsCallbacks;
 };
 //class MyLocationCallBack
 
@@ -106,8 +123,8 @@ public:
         int resultCode);
     void OnAbilityDisconnectDone(const AppExecFwk::ElementName &element, int resultCode);
     static sptr<AAFwk::IAbilityConnection> connectCallback_;
-    static const int CONNECT_SUCCESS;
 };
+
 } // namespace Telephony
 } // namespace OHOS
 #endif // CALL_MANAGER_SERVICE_LOCATOR_H
