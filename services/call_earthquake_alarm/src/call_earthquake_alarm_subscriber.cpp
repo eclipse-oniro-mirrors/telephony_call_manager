@@ -168,7 +168,7 @@ void LocationSystemAbilityListener::OnAddSystemAbility(int32_t systemAbilityId, 
     startService = true;
     SystemAbilitySubscriber();
     statusChangeListener_ = nullptr;
-    bool isBoot = false;
+    bool isBoot = true;
     for (auto& k : OOBESwitchObserver::keyStatus) {
         k.second = MyLocationEngine::IsSwitchOn(k.first);
         if (!k.second)  isBoot = k.second;
