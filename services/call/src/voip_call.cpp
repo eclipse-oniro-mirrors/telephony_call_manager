@@ -241,5 +241,14 @@ std::string VoIPCall::GetVoipCallId()
     return voipCallId_;
 }
 
+std::string VoIPCall::GetVoipBundleName()
+{
+    return voipBundleName_;
+}
+
+int32_t VoIPCall::GetVoipUid()
+{
+    return uid_;
+}
 } // namespace Telephony
 } // namespace OHOS

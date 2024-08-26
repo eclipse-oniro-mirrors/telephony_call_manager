@@ -563,14 +563,16 @@ sptr<CallBase> CallObjectManager::GetOneCallObjectByIndexAndSlotId(int32_t index
     return nullptr;
 }
 
-sptr<CallBase> CallObjectManager::GetOneCallObjectByVoipCallId(std::string voipCallId)
+sptr<CallBase> CallObjectManager::GetOneCallObjectByVoipCallId(
+    std::string voipCallId, std::string bundleName, int32_t uid)
 {
     std::lock_guard<std::mutex> lock(listMutex_);
     std::list<sptr<CallBase>>::iterator it = callObjectPtrList_.begin();
     for (; it != callObjectPtrList_.end(); ++it) {
         if ((*it)->GetCallType() == CallType::TYPE_VOIP) {
             sptr<VoIPCall> voipCall = reinterpret_cast<VoIPCall *>((*it).GetRefPtr());
-            if (voipCall->GetVoipCallId() == voipCallId) {
+            if (voipCall->GetVoipCallId() == voipCallId && voipCall->GetVoipBundleName() == bundleName &&
+                voipCall->GetVoipUid() == uid) {
                 return (*it);
             }
         }
