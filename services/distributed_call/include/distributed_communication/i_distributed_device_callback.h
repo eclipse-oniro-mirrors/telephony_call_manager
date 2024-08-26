@@ -25,11 +25,11 @@ public:
     IDistributedDeviceCallback() = default;
     virtual ~IDistributedDeviceCallback() = default;
     virtual int32_t OnDistributedDeviceOnline(const std::string &devId, const std::string &devName,
-                                              int32_t devType, int32_t devRole) = 0;
+        int32_t devType, int32_t devRole) = 0;
     virtual int32_t OnDistributedDeviceOffline(const std::string &devId, const std::string &devName,
-                                               int32_t devType, int32_t devRole) = 0;
+        int32_t devType, int32_t devRole) = 0;
     virtual int32_t OnDistributedAudioDeviceChange(const std::string &devId, const std::string &devName,
-                                                   int32_t devType, int32_t devRole) = 0;
+        int32_t devType, int32_t devRole) = 0;
 };
 
 }  // namespace Telephony

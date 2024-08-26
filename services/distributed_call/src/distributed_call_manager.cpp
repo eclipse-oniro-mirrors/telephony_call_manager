@@ -544,7 +544,7 @@ void DistributedCallManager::OnDcCallSystemAbilityAdded()
         return;
     }
     typedef int32_t (*REGISTER_DC_CALL)(const std::shared_ptr<OHOS::Telephony::IDistributedDeviceCallback>&);
-    auto regFunc = (REGISTER_DC_CALL)dlsym(handle, "RegisterDistributedDevCallback");
+    auto regFunc = (REGISTER_DC_CALL)dlsym(handle, "RegisterDistributedDevState");
     if (regFunc == nullptr) {
         TELEPHONY_LOGE("get reg function failed");
         dlclose(handle);

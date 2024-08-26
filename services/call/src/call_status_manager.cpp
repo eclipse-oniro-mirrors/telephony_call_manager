@@ -647,10 +647,10 @@ int32_t CallStatusManager::ActiveHandle(const CallDetailInfo &info)
     TELEPHONY_LOGI("handle active state");
     std::string tmpStr(info.phoneNum);
     sptr<CallBase> call = GetOneCallObjectByIndexAndSlotId(info.index, info.accountId);
-    if (call == nullptr) {
+    if (call == nullptr && IsDcCallConneceted()) {
         CreateAndSaveNewCall(info, CallDirection::CALL_DIRECTION_UNKNOW);
+        call = GetOneCallObjectByIndexAndSlotId(info.index, info.accountId);
     }
-    call = GetOneCallObjectByIndexAndSlotId(info.index, info.accountId);
     if (call == nullptr) {
         TELEPHONY_LOGE("Call is NULL");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -711,11 +711,12 @@ int32_t CallStatusManager::HoldingHandle(const CallDetailInfo &info)
     TELEPHONY_LOGI("handle holding state");
     std::string tmpStr(info.phoneNum);
     sptr<CallBase> call = GetOneCallObjectByIndexAndSlotId(info.index, info.accountId);
-    if (call == nullptr) {
+    if (call == nullptr && IsDcCallConneceted()) {
         CreateAndSaveNewCall(info, CallDirection::CALL_DIRECTION_UNKNOW);
+        call = GetOneCallObjectByIndexAndSlotId(info.index, info.accountId);
     }
-    call = GetOneCallObjectByIndexAndSlotId(info.index, info.accountId);
     if (call == nullptr) {
+        TELEPHONY_LOGE("Call is NULL");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     // if the call is in a conference, it will exit, otherwise just set it holding
@@ -726,39 +727,7 @@ int32_t CallStatusManager::HoldingHandle(const CallDetailInfo &info)
             TELEPHONY_LOGI("HoldConference success");
         }
     }
-    TelCallState priorState = call->GetTelCallState();
-    int32_t ret = UpdateCallState(call, TelCallState::CALL_STATUS_HOLDING);
-    if (ret != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("UpdateCallState failed, errCode:%{public}d", ret);
-    }
-    int32_t callId = call->GetCallID();
-    int32_t dsdsMode = DSDS_MODE_V2;
-    DelayedRefSingleton<CoreServiceClient>::GetInstance().GetDsdsMode(dsdsMode);
-    TELEPHONY_LOGE("HoldingHandle dsdsMode:%{public}d", dsdsMode);
-    bool canSwitchCallState = call->GetCanSwitchCallState();
-    if (dsdsMode == static_cast<int32_t>(DsdsMode::DSDS_MODE_V5_DSDA) ||
-        dsdsMode == static_cast<int32_t>(DsdsMode::DSDS_MODE_V5_TDM)) {
-        int32_t activeCallNum = GetCallNum(TelCallState::CALL_STATUS_ACTIVE);
-        if (needWaitHold_ && activeCallNum == 0) {
-            needWaitHold_ = false;
-            int32_t result = DelayedSingleton<CellularCallConnection>::GetInstance()->Dial(GetDialCallInfo());
-            sptr<CallBase> dialCall = GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_DIALING);
-            if (result != TELEPHONY_SUCCESS && dialCall != nullptr) {
-                DealFailDial(call);
-                TELEPHONY_LOGI("Dial call fail");
-            }
-        } else {
-            TelConferenceState confState = call->GetTelConferenceState();
-            int32_t conferenceId = ERR_ID;
-            call->GetMainCallId(conferenceId);
-            if (confState != TelConferenceState::TEL_CONFERENCE_IDLE && conferenceId == callId) {
-                AutoHandleForDsda(canSwitchCallState, priorState, activeCallNum, call->GetSlotId(), false);
-            } else if (confState == TelConferenceState::TEL_CONFERENCE_IDLE) {
-                AutoHandleForDsda(canSwitchCallState, priorState, activeCallNum, call->GetSlotId(), false);
-            }
-        }
-    }
-    return ret;
+    return UpdateCallStateAndHandleDsdsMode(info, call);
 }
 
 int32_t CallStatusManager::WaitingHandle(const CallDetailInfo &info)
@@ -774,10 +743,10 @@ int32_t CallStatusManager::AlertHandle(const CallDetailInfo &info)
     TELEPHONY_LOGI("handle alerting state");
     std::string tmpStr(info.phoneNum);
     sptr<CallBase> call = GetOneCallObjectByIndexAndSlotId(info.index, info.accountId);
-    if (call == nullptr) {
+    if (call == nullptr && IsDcCallConneceted()) {
         CreateAndSaveNewCall(info, CallDirection::CALL_DIRECTION_OUT);
+        call = GetOneCallObjectByIndexAndSlotId(info.index, info.accountId);
     }
-    call = GetOneCallObjectByIndexAndSlotId(info.index, info.accountId);
     if (call == nullptr) {
         TELEPHONY_LOGE("Call is NULL");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -1542,6 +1511,60 @@ void CallStatusManager::CreateAndSaveNewCall(const CallDetailInfo &info, CallDir
         AddOneCallObject(call);
         DelayedSingleton<CallControlManager>::GetInstance()->NotifyNewCallCreated(call);
     }
+}
+
+int32_t CallStatusManager::UpdateCallStateAndHandleDsdsMode(const CallDetailInfo &info, sptr<CallBase> &call)
+{
+    if (call == nullptr) {
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    TelCallState priorState = call->GetTelCallState();
+    int32_t ret = UpdateCallState(call, TelCallState::CALL_STATUS_HOLDING);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("UpdateCallState failed, errCode:%{public}d", ret);
+    }
+    int32_t callId = call->GetCallID();
+    int32_t dsdsMode = DSDS_MODE_V2;
+    DelayedRefSingleton<CoreServiceClient>::GetInstance().GetDsdsMode(dsdsMode);
+    TELEPHONY_LOGE("HoldingHandle dsdsMode:%{public}d", dsdsMode);
+    bool canSwitchCallState = call->GetCanSwitchCallState();
+    if (dsdsMode == static_cast<int32_t>(DsdsMode::DSDS_MODE_V5_DSDA) ||
+        dsdsMode == static_cast<int32_t>(DsdsMode::DSDS_MODE_V5_TDM)) {
+        int32_t activeCallNum = GetCallNum(TelCallState::CALL_STATUS_ACTIVE);
+        if (needWaitHold_ && activeCallNum == 0) {
+            needWaitHold_ = false;
+            int32_t result = DelayedSingleton<CellularCallConnection>::GetInstance()->Dial(GetDialCallInfo());
+            sptr<CallBase> dialCall = GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_DIALING);
+            if (result != TELEPHONY_SUCCESS && dialCall != nullptr) {
+                DealFailDial(call);
+                TELEPHONY_LOGI("Dial call fail");
+            }
+        } else {
+            TelConferenceState confState = call->GetTelConferenceState();
+            int32_t conferenceId = ERR_ID;
+            call->GetMainCallId(conferenceId);
+            if (confState != TelConferenceState::TEL_CONFERENCE_IDLE && conferenceId == callId) {
+                AutoHandleForDsda(canSwitchCallState, priorState, activeCallNum, call->GetSlotId(), false);
+            } else if (confState == TelConferenceState::TEL_CONFERENCE_IDLE) {
+                AutoHandleForDsda(canSwitchCallState, priorState, activeCallNum, call->GetSlotId(), false);
+            }
+        }
+    }
+    return ret;
+}
+
+bool CallStatusManager::IsDcCallConneceted()
+{
+    std::string dcStatus = "";
+    auto settingHelper = SettingsDataShareHelper::GetInstance();
+    if (settingHelper != nullptr) {
+        OHOS::Uri settingUri(SettingsDataShareHelper::SETTINGS_DATASHARE_URI);
+        settingHelper->Query(settingUri, "distributed_modem_state", dcStatus);
+    }
+    if (dcStatus == "1_sink") {
+        return true;
+    }
+    return false;
 }
 } // namespace Telephony
 } // namespace OHOS

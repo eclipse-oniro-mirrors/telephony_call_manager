@@ -104,6 +104,8 @@ private:
     bool IsFocusModeOpen();
     bool IsRejectCall(sptr<CallBase> &call, const CallDetailInfo &info, bool &block);
     void CreateAndSaveNewCall(const CallDetailInfo &info, CallDirection direction);
+    int32_t UpdateCallStateAndHandleDsdsMode(const CallDetailInfo &info, sptr<CallBase> &call);
+    bool IsDcCallConneceted();
 private:
     CallDetailInfo callReportInfo_;
     CallDetailsInfo callDetailsInfo_[SLOT_NUM];
