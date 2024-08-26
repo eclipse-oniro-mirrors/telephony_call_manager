@@ -250,7 +250,6 @@ int32_t CallRecordsManager::GetCallFeatures(int32_t videoState)
 bool CallRecordsManager::IsVideoCall(int32_t videoState)
 {
     if (static_cast<VideoStateType>(videoState) == VideoStateType::TYPE_SEND_ONLY ||
-        static_cast<VideoStateType>(videoState) == VideoStateType::TYPE_RECEIVE_ONLY ||
         static_cast<VideoStateType>(videoState) == VideoStateType::TYPE_VIDEO) {
         return true;
     }
