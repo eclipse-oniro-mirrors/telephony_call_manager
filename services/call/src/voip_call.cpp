@@ -34,6 +34,7 @@ VoIPCall::VoIPCall(DialParaInfo &info) : CarrierCall(info)
     voipBundleName_ = info.voipCallInfo.voipBundleName;
     showBannerForIncomingCall_ = info.voipCallInfo.showBannerForIncomingCall;
     hasMicPermission_ = info.voipCallInfo.hasMicPermission;
+    uid_ = info.voipCallInfo.uid;
 }
 
 VoIPCall::~VoIPCall() {}
@@ -64,6 +65,7 @@ int32_t VoIPCall::PackVoipCallInfo(VoipCallEventInfo &voipcallInfo)
 {
     voipcallInfo.voipCallId = voipCallId_;
     voipcallInfo.bundleName = voipBundleName_;
+    voipcallInfo.uid = uid_;
     return TELEPHONY_SUCCESS;
 }
 
@@ -139,7 +141,8 @@ int32_t VoIPCall::SetMute(int32_t mute, int32_t slotId)
 {
     CallAttributeInfo info;
     GetCallAttributeInfo(info);
-    std::string voipCallId = info.voipCallInfo.voipBundleName + ":" + info.voipCallInfo.voipCallId;
+    std::string voipCallId = info.voipCallInfo.voipBundleName + ":" + std::to_string(info.voipCallInfo.uid) + ":" +
+        info.voipCallInfo.voipCallId;
     CallAudioEvent callAudioEvent = mute == 1 ? CallAudioEvent::AUDIO_EVENT_MUTED : CallAudioEvent::AUDIO_EVENT_UNMUTED;
     TELEPHONY_LOGI("VoIPCall::setMute voipCallId: %{public}s, callAudioEvent: %{public}d", voipCallId.c_str(),
         callAudioEvent);
@@ -159,6 +162,7 @@ void VoIPCall::GetCallAttributeInfo(CallAttributeInfo &info)
     info.voipCallInfo.voipBundleName = voipBundleName_;
     info.voipCallInfo.showBannerForIncomingCall = showBannerForIncomingCall_;
     info.voipCallInfo.hasMicPermission = hasMicPermission_;
+    info.voipCallInfo.uid = uid_;
     return;
 }
 

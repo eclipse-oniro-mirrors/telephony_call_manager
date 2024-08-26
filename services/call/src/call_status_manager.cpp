@@ -248,12 +248,42 @@ int32_t CallStatusManager::HandleVoipCallReportInfo(const CallDetailInfo &info)
         case TelCallState::CALL_STATUS_DIALING:
             ret = OutgoingVoipCallHandle(info);
             break;
+        case TelCallState::CALL_STATUS_ANSWERED:
+            ret = AnsweredVoipCallHandle(info);
+            break;
+        case TelCallState::CALL_STATUS_DISCONNECTING:
+            ret = DisconnectingVoipCallHandle(info);
+            break;
         default:
             TELEPHONY_LOGE("Invalid call state!");
             break;
     }
     DelayedSingleton<BluetoothCallService>::GetInstance()->GetCallState();
     return ret;
+}
+
+int32_t CallStatusManager::AnsweredVoipCallHandle(const CallDetailInfo &info)
+{
+    int32_t ret = TELEPHONY_ERROR;
+    sptr<CallBase> call = GetOneCallObjectByVoipCallId(info.voipCallInfo.voipCallId);
+    if (call == nullptr) {
+        return ret;
+    }
+    if (DelayedSingleton<CallControlManager>::GetInstance()->NotifyCallStateUpdated(
+        call, TelCallState::CALL_STATUS_INCOMING, TelCallState::CALL_STATUS_ANSWERED)) {
+        return TELEPHONY_SUCCESS;
+    } else {
+        return ret;
+    }
+}
+
+int32_t CallStatusManager::DisconnectingVoipCallHandle(const CallDetailInfo &info)
+{
+    sptr<CallBase> call = GetOneCallObjectByVoipCallId(info.voipCallInfo.voipCallId);
+    if (call == nullptr) {
+        return TELEPHONY_ERROR;
+    }
+    return UpdateCallState(call, TelCallState::CALL_STATUS_DISCONNECTING);
 }
 
 int32_t CallStatusManager::HandleDisconnectedCause(const DisconnectedDetails &details)
@@ -1435,6 +1465,7 @@ void CallStatusManager::PackParaInfo(
         paraInfo.voipCallInfo.voipBundleName = info.voipCallInfo.voipBundleName;
         paraInfo.voipCallInfo.showBannerForIncomingCall = info.voipCallInfo.showBannerForIncomingCall;
         paraInfo.voipCallInfo.hasMicPermission = info.voipCallInfo.hasMicPermission;
+        paraInfo.voipCallInfo.uid = info.voipCallInfo.uid;
     }
     paraInfo.number = info.phoneNum;
     paraInfo.callId = GetNewCallId();
