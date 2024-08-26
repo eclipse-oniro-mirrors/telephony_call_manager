@@ -71,6 +71,14 @@ enum class VoipCallState {
      * Indicates the call state of dialing.
      */
     VOIP_CALL_STATE_DIALING,
+    /**
+     * Indicates the call is answered.
+     */
+    VOIP_CALL_STATE_ANSWERED,
+    /**
+     * Indicates the call is disconnecting.
+     */
+    VOIP_CALL_STATE_DISCONNECTING,
 };
 
 /**
@@ -131,6 +139,10 @@ struct VoipCallAttribute {
      * Indicates whether the VoIP incoming call default show live call banner. Default value is true.
      */
     bool showBannerForIncomingCall = true;
+    /**
+     * Indicates whether the app has the permission to use microphone. Default value is true.
+     */
+    bool hasMicPermission = true;
     /**
      * Indicates whether the VoIP call is from Push kit.
     */
