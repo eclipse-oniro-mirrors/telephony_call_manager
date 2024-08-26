@@ -21,6 +21,7 @@
 #include "audio_control_manager.h"
 #include "telephony_log_wrapper.h"
 #include "nlohmann/json.hpp"
+#include "i_distributed_device_callback.h"
 
 using json = nlohmann::json;
 
@@ -542,15 +543,16 @@ void DistributedCallManager::OnDcCallSystemAbilityAdded()
         TELEPHONY_LOGE("open so failed");
         return;
     }
-    typedef int32_t (*REGISTER_DC_CALL)();
-    auto regFunc = (REGISTER_DC_CALL)dlsym(handle, "RegisterDcCall");
+    typedef int32_t (*REGISTER_DC_CALL)(const std::shared_ptr<OHOS::Telephony::IDistributedDeviceCallback>&);
+    auto regFunc = (REGISTER_DC_CALL)dlsym(handle, "RegisterDistributedDevCallback");
     if (regFunc == nullptr) {
         TELEPHONY_LOGE("get reg function failed");
         dlclose(handle);
         return;
     }
-    auto ret = regFunc();
-    TELEPHONY_LOGI("reg dc-call service result %{public}d", ret);
+    std::shared_ptr<IDistributedDeviceCallback> dcCallDeviceListener = nullptr;
+    auto ret = regFunc(dcCallDeviceListener);
+    TELEPHONY_LOGI("reg dc-call service result[%{public}d]", ret);
     dlclose(handle);
 }
 

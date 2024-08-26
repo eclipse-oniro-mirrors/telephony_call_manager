@@ -128,6 +128,7 @@ call_manager_include_dirs = [
   "${call_manager_path}/services/call_setting/include",
   "${call_manager_path}/services/distributed_call/include",
   "${call_manager_path}/services/distributed_call/include/dcall",
+  "${call_manager_path}/services/distributed_call/include/distributed_communication",
   "${call_manager_path}/services/hisysevent/include",
   "${call_manager_path}/services/satellite_call/include",
   "${call_manager_path}/services/spam_call/include",

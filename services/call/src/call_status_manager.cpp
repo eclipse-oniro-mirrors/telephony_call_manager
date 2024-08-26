@@ -648,6 +648,10 @@ int32_t CallStatusManager::ActiveHandle(const CallDetailInfo &info)
     std::string tmpStr(info.phoneNum);
     sptr<CallBase> call = GetOneCallObjectByIndexAndSlotId(info.index, info.accountId);
     if (call == nullptr) {
+        CreateAndSaveNewCall(info, CallDirection::CALL_DIRECTION_UNKNOW);
+    }
+    call = GetOneCallObjectByIndexAndSlotId(info.index, info.accountId);
+    if (call == nullptr) {
         TELEPHONY_LOGE("Call is NULL");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
@@ -708,7 +712,10 @@ int32_t CallStatusManager::HoldingHandle(const CallDetailInfo &info)
     std::string tmpStr(info.phoneNum);
     sptr<CallBase> call = GetOneCallObjectByIndexAndSlotId(info.index, info.accountId);
     if (call == nullptr) {
-        TELEPHONY_LOGE("Call is NULL");
+        CreateAndSaveNewCall(info, CallDirection::CALL_DIRECTION_UNKNOW);
+    }
+    call = GetOneCallObjectByIndexAndSlotId(info.index, info.accountId);
+    if (call == nullptr) {
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     // if the call is in a conference, it will exit, otherwise just set it holding
@@ -767,6 +774,10 @@ int32_t CallStatusManager::AlertHandle(const CallDetailInfo &info)
     TELEPHONY_LOGI("handle alerting state");
     std::string tmpStr(info.phoneNum);
     sptr<CallBase> call = GetOneCallObjectByIndexAndSlotId(info.index, info.accountId);
+    if (call == nullptr) {
+        CreateAndSaveNewCall(info, CallDirection::CALL_DIRECTION_OUT);
+    }
+    call = GetOneCallObjectByIndexAndSlotId(info.index, info.accountId);
     if (call == nullptr) {
         TELEPHONY_LOGE("Call is NULL");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -1522,6 +1533,15 @@ bool CallStatusManager::IsRejectCall(sptr<CallBase> &call, const CallDetailInfo 
         }
     }
     return false;
+}
+
+void CallStatusManager::CreateAndSaveNewCall(const CallDetailInfo &info, CallDirection direction)
+{
+    auto call = CreateNewCall(info, CallDirection::CALL_DIRECTION_UNKNOW);
+    if (call != nullptr) {
+        AddOneCallObject(call);
+        DelayedSingleton<CallControlManager>::GetInstance()->NotifyNewCallCreated(call);
+    }
 }
 } // namespace Telephony
 } // namespace OHOS
