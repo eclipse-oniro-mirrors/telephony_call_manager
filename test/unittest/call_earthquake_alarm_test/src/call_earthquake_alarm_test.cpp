@@ -144,7 +144,7 @@ HWTEST_F(LocationEngineTest, Telephony_MyLocationEngine_002, Function | MediumTe
     engine->SetValue();
     engine->RegisterLocationChange();
     engine->RegisterSwitchCallback();
-    ASSERT_TRUE(engine->IsSwitchOn() == false);
+    ASSERT_TRUE(engine->IsSwitchOn("keywordtest111") == false);
 }
 
 /**
@@ -180,7 +180,7 @@ HWTEST_F(LocationEngineTest, Telephony_MyLocationEngine_003, Function | MediumTe
     engine->SetValue();
     engine->RegisterLocationChange();
     engine->RegisterSwitchCallback();
-    ASSERT_TRUE(engine->IsSwitchOn() == false);
+    ASSERT_TRUE(engine->IsSwitchOn("keywordtest222") == false);
 }
 
 /**
@@ -198,7 +198,7 @@ HWTEST_F(LocationEngineTest, Telephony_EmergencyCallConnectCallback_001, Functio
     if (connectcallback->connectCallback_ == nullptr) {
         return;
     }
-    engine->ConnectAbility("valuetest");
+    engine->ConnectAbility("valuetest1111");
     std::string bundle = "111";
     std::string ability = "222";
     AppExecFwk::ElementName element("", bundle, ability);
