@@ -50,6 +50,8 @@ public:
     int32_t SetMute(int32_t mute, int32_t slotId) override;
     int32_t HangUpCall(const ErrorReason &status);
     std::string GetVoipCallId();
+    std::string GetVoipBundleName();
+    int32_t GetVoipUid();
 
 protected:
     int32_t PackVoipCallInfo(VoipCallEventInfo &voipcallInfo);

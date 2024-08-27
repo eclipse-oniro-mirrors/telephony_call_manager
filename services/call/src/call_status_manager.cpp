@@ -265,7 +265,8 @@ int32_t CallStatusManager::HandleVoipCallReportInfo(const CallDetailInfo &info)
 int32_t CallStatusManager::AnsweredVoipCallHandle(const CallDetailInfo &info)
 {
     int32_t ret = TELEPHONY_ERROR;
-    sptr<CallBase> call = GetOneCallObjectByVoipCallId(info.voipCallInfo.voipCallId);
+    sptr<CallBase> call = GetOneCallObjectByVoipCallId(
+        info.voipCallInfo.voipCallId, info.voipCallInfo.voipBundleName, info.voipCallInfo.uid);
     if (call == nullptr) {
         return ret;
     }
@@ -279,7 +280,8 @@ int32_t CallStatusManager::AnsweredVoipCallHandle(const CallDetailInfo &info)
 
 int32_t CallStatusManager::DisconnectingVoipCallHandle(const CallDetailInfo &info)
 {
-    sptr<CallBase> call = GetOneCallObjectByVoipCallId(info.voipCallInfo.voipCallId);
+    sptr<CallBase> call = GetOneCallObjectByVoipCallId(
+        info.voipCallInfo.voipCallId, info.voipCallInfo.voipBundleName, info.voipCallInfo.uid);
     if (call == nullptr) {
         return TELEPHONY_ERROR;
     }
@@ -363,7 +365,7 @@ int32_t CallStatusManager::HandleOttEventReportInfo(const OttCallEventInfo &info
 int32_t CallStatusManager::HandleVoipEventReportInfo(const VoipCallEventInfo &info)
 {
     TELEPHONY_LOGI("recv one Event, eventId:%{public}d", info.voipCallEvent);
-    sptr<CallBase> call = GetOneCallObjectByVoipCallId(info.voipCallId);
+    sptr<CallBase> call = GetOneCallObjectByVoipCallId(info.voipCallId, info.bundleName, info.uid);
     if (call == nullptr) {
         TELEPHONY_LOGE("voip call is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -486,7 +488,8 @@ int32_t CallStatusManager::HandleRejectCall(sptr<CallBase> &call, bool isBlock)
 int32_t CallStatusManager::IncomingVoipCallHandle(const CallDetailInfo &info)
 {
     int32_t ret = TELEPHONY_ERROR;
-    sptr<CallBase> call = GetOneCallObjectByVoipCallId(info.voipCallInfo.voipCallId);
+    sptr<CallBase> call = GetOneCallObjectByVoipCallId(
+        info.voipCallInfo.voipCallId, info.voipCallInfo.voipBundleName, info.voipCallInfo.uid);
     if (call != nullptr) {
         return TELEPHONY_SUCCESS;
     }
@@ -508,7 +511,8 @@ int32_t CallStatusManager::IncomingVoipCallHandle(const CallDetailInfo &info)
 int32_t CallStatusManager::OutgoingVoipCallHandle(const CallDetailInfo &info)
 {
     int32_t ret = TELEPHONY_ERROR;
-    sptr<CallBase> call = GetOneCallObjectByVoipCallId(info.voipCallInfo.voipCallId);
+    sptr<CallBase> call = GetOneCallObjectByVoipCallId(
+        info.voipCallInfo.voipCallId, info.voipCallInfo.voipBundleName, info.voipCallInfo.uid);
     if (call != nullptr) {
         return TELEPHONY_SUCCESS;
     }
@@ -688,7 +692,8 @@ int32_t CallStatusManager::ActiveHandle(const CallDetailInfo &info)
 int32_t CallStatusManager::ActiveVoipCallHandle(const CallDetailInfo &info)
 {
     TELEPHONY_LOGI("handle active state");
-    sptr<CallBase> call = GetOneCallObjectByVoipCallId(info.voipCallInfo.voipCallId);
+    sptr<CallBase> call = GetOneCallObjectByVoipCallId(
+        info.voipCallInfo.voipCallId, info.voipCallInfo.voipBundleName, info.voipCallInfo.uid);
     if (call == nullptr) {
         TELEPHONY_LOGE("voip Call is NULL");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -806,7 +811,8 @@ int32_t CallStatusManager::DisconnectingHandle(const CallDetailInfo &info)
 int32_t CallStatusManager::DisconnectedVoipCallHandle(const CallDetailInfo &info)
 {
     TELEPHONY_LOGI("handle disconnected voip call state");
-    sptr<CallBase> call = GetOneCallObjectByVoipCallId(info.voipCallInfo.voipCallId);
+    sptr<CallBase> call = GetOneCallObjectByVoipCallId(
+        info.voipCallInfo.voipCallId, info.voipCallInfo.voipBundleName, info.voipCallInfo.uid);
     if (call == nullptr) {
         TELEPHONY_LOGE("voip Call is NULL");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
