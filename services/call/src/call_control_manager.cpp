@@ -511,8 +511,11 @@ bool CallControlManager::NotifyCallStateUpdated(
         return false;
     }
     if (callStateListenerPtr_ != nullptr) {
-        callStateListenerPtr_->CallStateUpdated(callObjectPtr, priorState, nextState);
         TELEPHONY_LOGI("NotifyCallStateUpdated priorState:%{public}d,nextState:%{public}d", priorState, nextState);
+        callStateListenerPtr_->CallStateUpdated(callObjectPtr, priorState, nextState);
+        if (callObjectPtr->GetCallType() == CallType::TYPE_VOIP) {
+            return true;
+        }
         if (priorState == TelCallState::CALL_STATUS_DIALING && nextState == TelCallState::CALL_STATUS_ALERTING) {
             TELEPHONY_LOGI("call is actived, now check and switch call to distributed audio device");
             DelayedSingleton<AudioDeviceManager>::GetInstance()->CheckAndSwitchDistributedAudioDevice();

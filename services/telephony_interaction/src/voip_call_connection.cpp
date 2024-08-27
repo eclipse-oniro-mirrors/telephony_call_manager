@@ -36,6 +36,7 @@ VoipCallConnection::~VoipCallConnection()
 
 void VoipCallConnection::Init(int32_t systemAbilityId)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     if (connectCallManagerState_) {
         TELEPHONY_LOGE("Init, connectState is true");
         return;
@@ -63,6 +64,7 @@ void VoipCallConnection::Init(int32_t systemAbilityId)
 
 void VoipCallConnection::UnInit()
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     voipCallManagerInterfacePtr_ = nullptr;
     connectCallManagerState_ = false;
     if (statusChangeListener_ != nullptr) {

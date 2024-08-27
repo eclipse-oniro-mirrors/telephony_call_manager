@@ -92,18 +92,22 @@ public:
      * @param callId[in], The call id
      * @param bundleName[in], The bundleName
      * @param processMode[in], The processMode
+     * @param uid[in], The uid
      * @return Returns 0 on success, others on failure.
      */
-    int32_t ReportVoipIncomingCall(std::string callId, std::string bundleName, std::string processMode) override;
-    /**
+    int32_t ReportVoipIncomingCall(
+        std::string callId, std::string bundleName, std::string processMode, int32_t uid) override;
+   /**
      * @brief pushSA report call extensionId.
      *
      * @param callId[in], The call id
      * @param bundleName[in], The bundleName
      * @param extensionId[in], The extensionId
+     * @param uid[in], The uid
      * @return Returns 0 on success, others on failure.
      */
-    int32_t ReportVoipCallExtensionId(std::string callId, std::string bundleName, std::string extensionId) override;
+    int32_t ReportVoipCallExtensionId(
+        std::string callId, std::string bundleName, std::string extensionId, int32_t uid) override;
 
     /**
      * @brief hang up a call

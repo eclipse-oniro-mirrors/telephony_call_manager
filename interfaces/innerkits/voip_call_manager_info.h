@@ -71,6 +71,14 @@ enum class VoipCallState {
      * Indicates the call state of dialing.
      */
     VOIP_CALL_STATE_DIALING,
+    /**
+     * Indicates the call is answered.
+     */
+    VOIP_CALL_STATE_ANSWERED,
+    /**
+     * Indicates the call is disconnecting.
+     */
+    VOIP_CALL_STATE_DISCONNECTING,
 };
 
 /**
@@ -131,6 +139,10 @@ struct VoipCallAttribute {
      * Indicates whether the VoIP incoming call default show live call banner. Default value is true.
      */
     bool showBannerForIncomingCall = true;
+    /**
+     * Indicates whether the app has the permission to use microphone. Default value is true.
+     */
+    bool hasMicPermission = true;
     /**
      * Indicates whether the VoIP call is from Push kit.
     */
@@ -234,6 +246,10 @@ struct VoipCallEventInfo {
      */
     std::string bundleName = "";
     /**
+     * Indicates the uid.
+     */
+    int32_t uid = 0;
+    /**
      * Indicates the click event of voip.
      */
     VoipCallEvent voipCallEvent = VoipCallEvent::VOIP_CALL_EVENT_NONE;
@@ -259,24 +275,6 @@ enum class ReportVoipCallFailedCause {
      * Indicates application failed to establish connect.
      */
     CONNECT_FAILED,
-};
-
-/**
- * @brief Indicates the fail cause of voip call.
- */
-struct ReportVoipCallFailedCauses {
-    /**
-     * Indicates the callid
-     */
-    std::string callId = "";
-    /**
-     * Indicates the bundleName.
-     */
-    std::string bundleName = "";
-    /**
-     * Indicates the the fail cause of voip call.
-     */
-    ReportVoipCallFailedCause reportVoipCallFailedCause = ReportVoipCallFailedCause::OTHER_CAUSED;
 };
 
 struct ReportVoIPCallParams {

@@ -190,7 +190,7 @@ int32_t VoipCallManagerProxy::UnRegisterCallBack()
 }
 
 int32_t VoipCallManagerProxy::ReportVoipIncomingCall(
-    std::string callId, std::string bundleName, std::string processMode)
+    std::string callId, std::string bundleName, std::string processMode, int32_t uid)
 {
     MessageParcel dataParcel;
     if (!dataParcel.WriteInterfaceToken(VoipCallManagerProxy::GetDescriptor())) {
@@ -200,6 +200,7 @@ int32_t VoipCallManagerProxy::ReportVoipIncomingCall(
     dataParcel.WriteString(callId);
     dataParcel.WriteString(bundleName);
     dataParcel.WriteString(processMode);
+    dataParcel.WriteInt32(uid);
     auto remote = Remote();
     if (remote == nullptr) {
         TELEPHONY_LOGE("ReportVoipIncomingCall Remote is null");
@@ -217,7 +218,7 @@ int32_t VoipCallManagerProxy::ReportVoipIncomingCall(
 }
 
 int32_t VoipCallManagerProxy::ReportVoipCallExtensionId(
-    std::string callId, std::string bundleName, std::string extensionId)
+    std::string callId, std::string bundleName, std::string extensionId, int32_t uid)
 {
     MessageParcel dataParcel;
     if (!dataParcel.WriteInterfaceToken(VoipCallManagerProxy::GetDescriptor())) {
@@ -227,6 +228,7 @@ int32_t VoipCallManagerProxy::ReportVoipCallExtensionId(
     dataParcel.WriteString(callId);
     dataParcel.WriteString(bundleName);
     dataParcel.WriteString(extensionId);
+    dataParcel.WriteInt32(uid);
     auto remote = Remote();
     if (remote == nullptr) {
         TELEPHONY_LOGE("ReportVoipCallExtensionId Remote is null");
@@ -252,6 +254,7 @@ int32_t VoipCallManagerProxy::Answer(const VoipCallEventInfo &events, int32_t vi
     }
     dataParcel.WriteString(events.voipCallId);
     dataParcel.WriteString(events.bundleName);
+    dataParcel.WriteInt32(events.uid);
     dataParcel.WriteInt32(videoState);
     auto remote = Remote();
     if (remote == nullptr) {
@@ -278,6 +281,7 @@ int32_t VoipCallManagerProxy::HangUp(const VoipCallEventInfo &events)
     }
     dataParcel.WriteString(events.voipCallId);
     dataParcel.WriteString(events.bundleName);
+    dataParcel.WriteInt32(events.uid);
     dataParcel.WriteInt32(static_cast<int32_t>(events.errorReason));
     auto remote = Remote();
     if (remote == nullptr) {
@@ -304,6 +308,7 @@ int32_t VoipCallManagerProxy::Reject(const VoipCallEventInfo &events)
     }
     dataParcel.WriteString(events.voipCallId);
     dataParcel.WriteString(events.bundleName);
+    dataParcel.WriteInt32(events.uid);
     auto remote = Remote();
     if (remote == nullptr) {
         TELEPHONY_LOGE("Reject voip  Remote is null");

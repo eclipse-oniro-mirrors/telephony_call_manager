@@ -166,6 +166,8 @@ int32_t CallStatusCallbackStub::OnUpdateCallReportInfo(MessageParcel &data, Mess
         parcelPtr.voipCallInfo.extensionId = data.ReadString();
         parcelPtr.voipCallInfo.voipBundleName = data.ReadString();
         parcelPtr.voipCallInfo.showBannerForIncomingCall = data.ReadBool();
+        parcelPtr.voipCallInfo.hasMicPermission = data.ReadBool();
+        parcelPtr.voipCallInfo.uid = data.ReadInt32();
         std::vector<uint8_t> userProfile = {};
         data.ReadUInt8Vector(&userProfile);
         (parcelPtr.voipCallInfo.userProfile).assign(userProfile.begin(), userProfile.end());
@@ -210,6 +212,8 @@ int32_t CallStatusCallbackStub::OnUpdateCallsReportInfo(MessageParcel &data, Mes
             parcelPtr.voipCallInfo.extensionId = data.ReadString();
             parcelPtr.voipCallInfo.voipBundleName = data.ReadString();
             parcelPtr.voipCallInfo.showBannerForIncomingCall = data.ReadBool();
+            parcelPtr.voipCallInfo.hasMicPermission = data.ReadBool();
+            parcelPtr.voipCallInfo.uid = data.ReadInt32();
             std::vector<uint8_t> userProfile = {};
             data.ReadUInt8Vector(&userProfile);
             (parcelPtr.voipCallInfo.userProfile).assign(userProfile.begin(), userProfile.end());
@@ -889,6 +893,7 @@ int32_t CallStatusCallbackStub::OnUpdateVoipEventInfo(MessageParcel &data, Messa
     VoipCallEventInfo parcelPtr;
     parcelPtr.voipCallId = data.ReadString();
     parcelPtr.bundleName = data.ReadString();
+    parcelPtr.uid = data.ReadInt32();
     parcelPtr.voipCallEvent = static_cast<VoipCallEvent>(data.ReadInt32());
     parcelPtr.errorReason = static_cast<ErrorReason>(data.ReadInt32());
     error = UpdateVoipEventInfo(parcelPtr);

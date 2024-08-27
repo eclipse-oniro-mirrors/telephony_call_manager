@@ -50,6 +50,8 @@ public:
     int32_t SetMute(int32_t mute, int32_t slotId) override;
     int32_t HangUpCall(const ErrorReason &status);
     std::string GetVoipCallId();
+    std::string GetVoipBundleName();
+    int32_t GetVoipUid();
 
 protected:
     int32_t PackVoipCallInfo(VoipCallEventInfo &voipcallInfo);
@@ -62,6 +64,8 @@ private:
     std::string abilityName_ = "";
     std::vector<uint8_t> userProfile_ = {};
     bool showBannerForIncomingCall_ = true;
+    bool hasMicPermission_ = true;
+    int32_t uid_ = 0;
 };
 } // namespace Telephony
 } // namespace OHOS
