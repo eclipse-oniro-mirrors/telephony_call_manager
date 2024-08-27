@@ -58,7 +58,7 @@ int32_t SettingsDataShareHelper::Query(Uri& uri, const std::string& key, std::st
 {
     TELEPHONY_LOGI("start Query");
     std::shared_ptr<DataShare::DataShareHelper> settingHelper =
-        CreateDataShareHelper(DEVICE_STANDBY_SERVICE_SYSTEM_ABILITY_ID);
+        CreateDataShareHelper(TELEPHONY_CALL_MANAGER_SYS_ABILITY_ID);
     if (settingHelper == nullptr) {
         TELEPHONY_LOGE("query error, datashareHelper_ is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
