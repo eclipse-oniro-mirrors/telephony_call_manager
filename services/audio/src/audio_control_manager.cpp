@@ -490,7 +490,6 @@ int32_t AudioControlManager::SetAudioDevice(const AudioDevice &device, bool isBy
 int32_t AudioControlManager::HandleDistributeAudioDevice(const AudioDevice &device)
 {
     if (!DelayedSingleton<DistributedCallManager>::GetInstance()->IsDCallDeviceSwitchedOn()) {
-        TELEPHONY_LOGI("set audio device, address: %{public}s", device.address);
         if (DelayedSingleton<DistributedCallManager>::GetInstance()->SwitchOnDCallDeviceSync(device)) {
             return TELEPHONY_SUCCESS;
         }
