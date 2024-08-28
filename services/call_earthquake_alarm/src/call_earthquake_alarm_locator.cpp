@@ -63,7 +63,7 @@ void MyLocationEngine::SetValue()
     if (this->locatorImpl == nullptr) {
         this->locatorImpl = Location::Locator::GetInstance();
         if (this->locatorImpl == nullptr) {
-            TELEPHONY_LOGI("locatorCallback_ is null");
+            TELEPHONY_LOGE("locatorCallback_ is null");
             return;
         }
         locationEnabled_ = locatorImpl->IsLocationEnabled();
@@ -80,14 +80,14 @@ void MyLocationEngine::SetValue()
 void MyLocationEngine::RegisterLocationChange()
 {
     if (locatorImpl == nullptr) {
-        TELEPHONY_LOGI("locatorImpl is null");
+        TELEPHONY_LOGE("locatorImpl is null");
         return;
     }
     if (locatorCallback_ == nullptr) {
         locatorCallback_ =
             sptr<MyLocationEngine::MyLocationCallBack>(new (std::nothrow) MyLocationEngine::MyLocationCallBack());
         if (locatorCallback_ == nullptr) {
-            TELEPHONY_LOGI("locatorCallback_ is null");
+            TELEPHONY_LOGE("locatorCallback_ is null");
             return;
         }
     }
@@ -114,7 +114,7 @@ void MyLocationEngine::UnregisterLocationChange()
 void MyLocationEngine::RegisterSwitchCallback()
 {
     if (locatorImpl == nullptr) {
-        TELEPHONY_LOGI("locatorImpl is null.");
+        TELEPHONY_LOGE("locatorImpl is null.");
         return;
     }
     auto engine = MyLocationEngine::GetInstance();
@@ -122,7 +122,7 @@ void MyLocationEngine::RegisterSwitchCallback()
         switchCallback_ = sptr<MyLocationEngine::MySwitchCallback>(
             new (std::nothrow) MyLocationEngine::MySwitchCallback(engine));
         if (switchCallback_ == nullptr) {
-            TELEPHONY_LOGI("callback is null.");
+            TELEPHONY_LOGE("callback is null.");
             return;
         }
     }
@@ -133,11 +133,11 @@ void MyLocationEngine::RegisterSwitchCallback()
 void MyLocationEngine::UnRegisterSwitchCallback()
 {
     if (locatorImpl == nullptr) {
-        TELEPHONY_LOGI("locatorImpl is null.");
+        TELEPHONY_LOGE"locatorImpl is null.");
         return;
     }
     if (switchCallback_ != nullptr) {
-        TELEPHONY_LOGI("unregister switch callback");
+        TELEPHONY_LOGE("unregister switch callback");
         locatorImpl->UnregisterSwitchCallbackV9(switchCallback_->AsObject());
     }
 }
@@ -145,7 +145,7 @@ void MyLocationEngine::UnRegisterSwitchCallback()
 void MyLocationEngine::LocationSwitchChange()
 {
     if (locatorImpl == nullptr) {
-        TELEPHONY_LOGI("locatorImpl is null.");
+        TELEPHONY_LOGE("locatorImpl is null.");
         return;
     }
     bool locationEnabled = locationEnabled_;
@@ -165,7 +165,7 @@ int32_t MyLocationEngine::MyLocationCallBack::OnRemoteRequest(uint32_t code, Mes
     MessageOption &option)
 {
     if (data.ReadInterfaceToken() != GetDescriptor()) {
-        TELEPHONY_LOGI("invalid token.");
+        TELEPHONY_LOGE("invalid token.");
         return -1;
     }
     switch (code) {
@@ -235,7 +235,7 @@ int MyLocationEngine::MySwitchCallback::OnRemoteRequest(uint32_t code, MessagePa
     MessageOption &option)
 {
     if (data.ReadInterfaceToken() != GetDescriptor()) {
-        TELEPHONY_LOGI("switchCallback invalid token.");
+        TELEPHONY_LOGE("switchCallback invalid token.");
         return -1;
     }
     switch (code) {
