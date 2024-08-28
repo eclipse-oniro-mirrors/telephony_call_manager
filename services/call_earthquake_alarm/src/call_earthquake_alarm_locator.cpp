@@ -267,6 +267,7 @@ bool MyLocationEngine::IsSwitchOn(std::string key, std::string& value)
 std::map<std::string, sptr<OOBESwitchObserver>> MyLocationEngine::settingsCallbacks = {};
 void MyLocationEngine::OOBEComplete()
 {
+    std::string stateValue = INITIAL_FIRST_VALUE;
     for (auto& oobeKey : OOBESwitchObserver::keyStatus) {
         oobeKey.second = MyLocationEngine::IsSwitchOn(oobeKey.first, stateValue);
         settingsCallbacks[oobeKey.first] = sptr<OOBESwitchObserver>::MakeSptr(oobeKey.first);
@@ -286,7 +287,7 @@ void OOBESwitchObserver::OnChange()
 {
     std::lock_guard<std::mutex> lock(mutex_);
     if (!keyStatus[mKey]) {
-        keyStatus[mKey] = MyLocationEngine::IsSwitchOn(mKey);
+        keyStatus[mKey] = MyLocationEngine::IsSwitchOn(mKey, mValue);
     }
     for (auto& oobeKey : keyStatus) {
         if (!oobeKey.second) {
@@ -300,7 +301,7 @@ void OOBESwitchObserver::OnChange()
         datashareHelper->RegisterListenSettingsKey(oobeKey.first, false, callback);
     }
     MyLocationEngine::settingsCallbacks = {};
-    if (!MyLocationEngine::IsSwitchOn("earthquake_ue_switch_enable")) {
+    if (!MyLocationEngine::IsSwitchOn("earthquake_ue_switch_enable", mValue)) {
         TELEPHONY_LOGE("the alarm switch is close");
         return;
     }

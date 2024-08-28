@@ -54,6 +54,7 @@ public:
 
 private:
     std::string mKey = "";
+    std::string mValue = "";
     std::mutex mutex_;
 };
 
