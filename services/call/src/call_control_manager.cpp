@@ -1454,8 +1454,6 @@ int32_t CallControlManager::BroadcastSubscriber()
 {
     EventFwk::MatchingSkills matchingSkills;
     matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_SIM_STATE_CHANGED);
-    matchingSkills.AddEvent("usual.event.thermal.satcomm.HIGH_TEMP_LEVEL");
-    matchingSkills.AddEvent("usual.event.SUPER_PRIVACY_MODE");
     matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_BLUETOOTH_REMOTEDEVICE_NAME_UPDATE);
     matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_USER_SWITCHED);
     EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
@@ -1494,6 +1492,7 @@ int32_t CallControlManager::BroadcastSubscriber()
     matchingSkills.AddEvent("usual.event.SUPER_PRIVACY_MODE");
     EventFwk::CommonEventSubscribeInfo subscriberInfos_(matchingSkill_);
     subscriberInfos_.SetPublisherBundleName("com.settings");
+    subscriberInfos_.SetPermission("ohos.permission.SET_TELEPHONY_STATE");
     subscriberInfos_.SetThreadMode(EventFwk::CommonEventSubscribeInfo::COMMON);
     std::shared_ptr<CallBroadcastSubscriber> subscriberPtrs_ =
         std::make_shared<CallBroadcastSubscriber>(subscriberInfos_);
