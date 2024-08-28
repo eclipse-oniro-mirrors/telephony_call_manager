@@ -94,6 +94,7 @@ private:
     std::shared_ptr<DistributedCallDeviceListener> dcallDeviceListener_ = nullptr;
 
     sptr<ISystemAbilityStatusChange> dcCallSaListener_ = nullptr;
+    void *extWrapperHandler_{nullptr};
 };
 
 class DCallSystemAbilityListener : public SystemAbilityStatusChangeStub {
