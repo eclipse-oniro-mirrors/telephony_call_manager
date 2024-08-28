@@ -133,7 +133,7 @@ void MyLocationEngine::RegisterSwitchCallback()
 void MyLocationEngine::UnRegisterSwitchCallback()
 {
     if (locatorImpl == nullptr) {
-        TELEPHONY_LOGE"locatorImpl is null.");
+        TELEPHONY_LOGE("locatorImpl is null.");
         return;
     }
     if (switchCallback_ != nullptr) {
