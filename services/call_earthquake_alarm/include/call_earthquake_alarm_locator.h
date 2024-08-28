@@ -54,6 +54,7 @@ public:
 
 private:
     std::string mKey = "";
+    std::mutex mutex_;
 };
 
 class MyLocationEngine {
@@ -68,10 +69,10 @@ public:
     void UnRegisterSwitchCallback();
     void LocationSwitchChange();
     static void OOBEComplete();
-    static void BootComplete();
-    static bool IsSwitchOn(std::string);
+    static void BootComplete(bool switchState);
+    static bool IsSwitchOn(std::string key, std::string& value);
     static std::shared_ptr<MyLocationEngine> GetInstance();
-    static void ConnectAbility(std::string);
+    static void ConnectAbility(std::string value);
 private:
     class MyLocationCallBack : public IRemoteStub<Location::ILocatorCallback> {
     public:

@@ -87,8 +87,11 @@ HWTEST_F(LocationEngineTest, Telephony_MyLocationEngine_001, Function | MediumTe
     engine->mylocator = engine;
     engine = engine->GetInstance();
     engine->SetValue();
-    engine->IsSwitchOn("keywordtest");
-    engine->BootComplete();
+    std::string key1 = "testkey";
+    std::string value1 = "testvalue";
+    engine->IsSwitchOn(key1, value1);
+    engine->BootComplete(true);
+    engine->BootComplete(false);
     engine->OOBEComplete();
     engine->RegisterLocationChange();
     engine->RegisterSwitchCallback();
@@ -144,7 +147,9 @@ HWTEST_F(LocationEngineTest, Telephony_MyLocationEngine_002, Function | MediumTe
     engine->SetValue();
     engine->RegisterLocationChange();
     engine->RegisterSwitchCallback();
-    ASSERT_TRUE(engine->IsSwitchOn("keywordtest111") == false);
+    std::string key2 = "testkey2222";
+    std::string value2 = "valuetst2222";
+    ASSERT_TRUE(engine->IsSwitchOn(key2, value2) == false);
 }
 
 /**
@@ -180,7 +185,9 @@ HWTEST_F(LocationEngineTest, Telephony_MyLocationEngine_003, Function | MediumTe
     engine->SetValue();
     engine->RegisterLocationChange();
     engine->RegisterSwitchCallback();
-    ASSERT_TRUE(engine->IsSwitchOn("keywordtest222") == false);
+    std::string key3 = "keytest3333";
+    std::string value3 = "valuetest3333";
+    ASSERT_TRUE(engine->IsSwitchOn(key3, value3) == false);
 }
 
 /**

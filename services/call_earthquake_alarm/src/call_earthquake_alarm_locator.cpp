@@ -35,19 +35,18 @@ std::string MyLocationEngine::INITIAL_FIRST_VALUE = "invalid";
 std::shared_ptr<MyLocationEngine> MyLocationEngine::mylocator = std::make_shared<MyLocationEngine>();
 std::shared_ptr<MyLocationEngine> MyLocationEngine::GetInstance()
 {
-    if (MyLocationEngine::mylocator != nullptr) {
-        std::shared_ptr<MyLocationEngine> instance_ = MyLocationEngine::mylocator;
-        return instance_;
+    if (mylocator != nullptr) {
+        return mylocator;
     }
-    return nullptr;
+    return std::make_shared<MyLocationEngine>();
 }
 
 void MyLocationEngine::OnInit()
 {
-    if (this->requestConfig != nullptr)     this->requestConfig = nullptr;
-    if (this->locatorCallback_ != nullptr)  this->locatorCallback_ = nullptr;
-    if (this->locatorImpl != nullptr)       this->locatorImpl = nullptr;
-    if (this->switchCallback_ != nullptr)   this->switchCallback_ = nullptr;
+    this->requestConfig = nullptr;
+    this->locatorCallback_ = nullptr;
+    this->locatorImpl = nullptr;
+    this->switchCallback_ = nullptr;
 }
 
 MyLocationEngine::MyLocationEngine() {}
@@ -208,21 +207,16 @@ void MyLocationEngine::MyLocationCallBack::OnLocationReport(const std::unique_pt
     MyLocationEngine::ConnectAbility(MyLocationEngine::PARAMETERS_VALUE);
 }
 
-void MyLocationEngine::BootComplete()
+void MyLocationEngine::BootComplete(bool switchState)
 {
-    if (!MyLocationEngine::IsSwitchOn(LocationSubscriber::SWITCH_STATE_KEY)) {
-        TELEPHONY_LOGI("the alarm switch is close");
+    if (!switchState) {
+        TELEPHONY_LOGE("the alarm switch is close");
         return;
     }
     TELEPHONY_LOGI("the alarm switch is open");
-    auto engine = MyLocationEngine::GetInstance();
-    if (engine == nullptr) {
-        TELEPHONY_LOGI("engine is nullptr");
-        return;
-    }
-    engine->SetValue();
-    engine->RegisterLocationChange();
-    engine->RegisterSwitchCallback();
+    MyLocationEngine::GetInstance()->SetValue();
+    MyLocationEngine::GetInstance()->RegisterLocationChange();
+    MyLocationEngine::GetInstance()->RegisterSwitchCallback();
 }
 
 MyLocationEngine::MySwitchCallback::MySwitchCallback(std::shared_ptr<MyLocationEngine> locationUpdate)
@@ -258,17 +252,16 @@ int MyLocationEngine::MySwitchCallback::OnRemoteRequest(uint32_t code, MessagePa
     return 0;
 }
 
-bool MyLocationEngine::IsSwitchOn(std::string key)
+bool MyLocationEngine::IsSwitchOn(std::string key, std::string& value)
 {
-    std::string switch_state = INITIAL_FIRST_VALUE;
     auto datashareHelper = std::make_shared<DataShareSwitchState>();
     OHOS::Uri uri(datashareHelper->DEFAULT_URI + key);
-    int resp = datashareHelper->QueryData(uri, key, switch_state);
+    int resp = datashareHelper->QueryData(uri, key, value);
     TELEPHONY_LOGI("query %{public}s is %{public}s", key.c_str(), switch_state.c_str());
-    if (resp == DataShareSwitchState::TELEPHONY_SUCCESS && switch_state == ALARM_SWITCH_ON) {
+    if (resp == DataShareSwitchState::TELEPHONY_SUCCESS && value == ALARM_SWITCH_ON) {
         return true;
     }
-    if (resp == DataShareSwitchState::TELEPHONY_SUCCESS && switch_state == ALARM_SWITCH_OFF) {
+    if (resp == DataShareSwitchState::TELEPHONY_SUCCESS && value == ALARM_SWITCH_OFF) {
         return false;
     }
     return false;
@@ -277,13 +270,13 @@ bool MyLocationEngine::IsSwitchOn(std::string key)
 std::map<std::string, sptr<OOBESwitchObserver>> MyLocationEngine::settingsCallbacks = {};
 void MyLocationEngine::OOBEComplete()
 {
-    for (auto& k : OOBESwitchObserver::keyStatus) {
-        settingsCallbacks[k.first] = sptr<OOBESwitchObserver>::MakeSptr(k.first);
-        auto callback = sptr<AAFwk::IDataAbilityObserver>(settingsCallbacks[k.first]);
+    for (auto& oobeKey : OOBESwitchObserver::keyStatus) {
+        oobeKey.second = MyLocationEngine::IsSwitchOn(oobeKey.first, stateValue);
+        settingsCallbacks[oobeKey.first] = sptr<OOBESwitchObserver>::MakeSptr(oobeKey.first);
+        auto callback = sptr<AAFwk::IDataAbilityObserver>(settingsCallbacks[oobeKey.first]);
         auto datashareHelper = std::make_shared<DataShareSwitchState>();
-        datashareHelper->RegisterListenSettingsKey(k.first, true, callback);
+        datashareHelper->RegisterListenSettingsKey(oobeKey.first, true, callback);
     }
-    TELEPHONY_LOGI("register listen counts %{public}d", (int)settingsCallbacks.size());
 };
 
 std::map<std::string, bool> OOBESwitchObserver::keyStatus = {
@@ -294,13 +287,24 @@ std::map<std::string, bool> OOBESwitchObserver::keyStatus = {
 
 void OOBESwitchObserver::OnChange()
 {
-    keyStatus[mKey] = MyLocationEngine::IsSwitchOn(mKey);
-    for (auto& k : keyStatus) {
-        if (!k.second)  return;
-        TELEPHONY_LOGI("%{public}s is trun on", k.first.c_str());
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (!keyStatus[mKey]) {
+        keyStatus[mKey] = MyLocationEngine::IsSwitchOn(mKey);
     }
+    for (auto& oobeKey : keyStatus) {
+        if (!oobeKey.second) {
+            TELEPHONY_LOGE("%{public}s is trun off", oobeKey.first.c_str());
+            return;
+        } 
+    }
+    for (auto& oobeKey : MyLocationEngine::settingsCallbacks) {
+        auto callback = sptr<AAFwk::IDataAbilityObserver>(oobeKey.second);
+        auto datashareHelper = std::make_shared<DataShareSwitchState>();
+        datashareHelper->RegisterListenSettingsKey(oobeKey.first, false, callback);
+    }
+    MyLocationEngine::settingsCallbacks = {};
     if (!MyLocationEngine::IsSwitchOn("earthquake_ue_switch_enable")) {
-        TELEPHONY_LOGI("the alarm switch is close");
+        TELEPHONY_LOGE("the alarm switch is close");
         return;
     }
     MyLocationEngine::ConnectAbility("call_manager_oobe_earthquake_warning_switch_on");
@@ -326,12 +330,6 @@ void EmergencyCallConnectCallback::OnAbilityConnectDone(const AppExecFwk::Elemen
     const sptr<IRemoteObject> &remoteObject, int resultCode)
 {
     TELEPHONY_LOGI("connect result code: %{public}d", resultCode);
-    for (auto& s : MyLocationEngine::settingsCallbacks) {
-        auto callback = sptr<AAFwk::IDataAbilityObserver>(s.second);
-        auto datashareHelper = std::make_shared<DataShareSwitchState>();
-        datashareHelper->RegisterListenSettingsKey(s.first, false, callback);
-    }
-    MyLocationEngine::settingsCallbacks = {};
 }
 
 void EmergencyCallConnectCallback::OnAbilityDisconnectDone(const AppExecFwk::ElementName &element, int resultCode)

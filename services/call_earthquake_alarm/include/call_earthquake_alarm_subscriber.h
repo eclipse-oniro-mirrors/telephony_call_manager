@@ -84,6 +84,7 @@ public:
     static bool GetSystemAbility(int32_t systemAbilityId);
     
 private:
+    std::mutex mutex_;
     static sptr<ISystemAbilityStatusChange> statusChangeListener_;
     static std::map<int32_t, bool> systemAbilityStatus;
 };
