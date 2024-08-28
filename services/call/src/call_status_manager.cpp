@@ -599,14 +599,6 @@ int32_t CallStatusManager::UpdateDialingCallInfo(const CallDetailInfo &info)
         TELEPHONY_LOGE("call is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    auto callRequestEventHandler = DelayedSingleton<CallRequestEventHandlerHelper>::GetInstance();
-    if (callRequestEventHandler->HasPendingMo()) {
-        callRequestEventHandler->SetPendingMo(false);
-    }
-    if (callRequestEventHandler->HasPendingHangp()) {
-        call->HangUpCall();
-        callRequestEventHandler->SetPendingHangup(false);
-    }
 
     std::string oriNum = call->GetAccountNumber();
     call = RefreshCallIfNecessary(call, info);
@@ -617,6 +609,14 @@ int32_t CallStatusManager::UpdateDialingCallInfo(const CallDetailInfo &info)
     call->SetVideoStateType(info.callMode);
     call->SetCallType(info.callType);
     call->SetAccountNumber(oriNum);
+    auto callRequestEventHandler = DelayedSingleton<CallRequestEventHandlerHelper>::GetInstance();
+    if (callRequestEventHandler->HasPendingMo()) {
+        callRequestEventHandler->SetPendingMo(false);
+    }
+    if (callRequestEventHandler->HasPendingHangp()) {
+        call->HangUpCall();
+        callRequestEventHandler->SetPendingHangup(false);
+    }
     return TELEPHONY_SUCCESS;
 }
 
