@@ -30,10 +30,16 @@ public:
     void RemoveEventHandlerTask();
     void RestoreDialingFlag(bool isDialingCallProcessing);
     bool IsDialingCallProcessing();
+    void SetPendingMo(bool pendingMo);
+    bool HasPendingMo();
+    void SetPendingHangup(bool pendingHangup);
+    bool HasPendingHangp();
 
 private:
     std::shared_ptr<AppExecFwk::EventHandler> callRequestEventHandler_;
     bool isDialingCallProcessing_ = false;
+    bool pendingMo_ = false;
+    bool pendingHangup_ = false;
 };
 } // namespace Telephony
 } // namespace OHOS

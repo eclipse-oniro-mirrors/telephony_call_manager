@@ -849,6 +849,9 @@ int32_t CallRequestProcess::CarrierDialProcess(DialParaInfo &info)
         return ret;
     }
     ret = HandleStartDial(isMMiCode, callInfo);
+    if (ret == TELEPHONY_SUCCESS) {
+        callRequestEventHandler->SetPendingMo(true);
+    }
     return ret;
 }
 
