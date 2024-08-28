@@ -222,8 +222,11 @@ bool LocationSystemAbilityListener::SystemAbilitySubscriber()
     }
     int32_t ret = -1;
     for (auto& systemId : systemAbilityStatus) {
-        if (!systemId.second)  ret = managerPtr->SubscribeSystemAbility(systemId.first, statusChangeListener_);
-        if (systemId.second)  ret = managerPtr->UnSubscribeSystemAbility(systemId.first, statusChangeListener_);
+        if (!systemId.second) {
+            ret = managerPtr->SubscribeSystemAbility(systemId.first, statusChangeListener_);
+        } else {
+            ret = managerPtr->UnSubscribeSystemAbility(systemId.first, statusChangeListener_);
+        }
         std::string isSub = systemId.second ? "unsubscribe" : "subscribe";
         TELEPHONY_LOGI("%{public}s SA %{public}d ret code is %{public}d", isSub.c_str(), systemId.first, ret);
     }

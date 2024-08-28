@@ -110,8 +110,9 @@ private:
     static const char* PARAMETERS_KEY;
     static const std::string ALARM_SWITCH_ON;
     static const std::string ALARM_SWITCH_OFF;
-    static std::string INITIAL_FIRST_VALUE;
+    
 public:
+    static std::string INITIAL_FIRST_VALUE;
     static std::map<std::string, sptr<OOBESwitchObserver>> settingsCallbacks;
 };
 //class MyLocationCallBack
