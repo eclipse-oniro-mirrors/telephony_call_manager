@@ -537,27 +537,38 @@ void DistributedCallManager::InitDistributedCommunicationCall()
 void DistributedCallManager::OnDcCallSystemAbilityAdded()
 {
     TELEPHONY_LOGI("dc-call service added");
-    auto handle = dlopen("libtelephony_ext_innerkits.z.so", RTLD_NOW);
-    if (handle == nullptr) {
+    extWrapperHandler_ = dlopen("libtelephony_ext_innerkits.z.so", RTLD_NOW);
+    if (extWrapperHandler_ == nullptr) {
         TELEPHONY_LOGE("open so failed");
         return;
     }
     typedef int32_t (*REGISTER_DC_CALL)(const std::shared_ptr<OHOS::Telephony::IDistributedDeviceCallback>&);
-    auto regFunc = (REGISTER_DC_CALL)dlsym(handle, "RegisterDistributedDevState");
+    auto regFunc = (REGISTER_DC_CALL)dlsym(extWrapperHandler_, "RegisterDistributedDevState");
     if (regFunc == nullptr) {
         TELEPHONY_LOGE("get reg function failed");
-        dlclose(handle);
         return;
     }
     std::shared_ptr<IDistributedDeviceCallback> dcCallDeviceListener = nullptr;
     auto ret = regFunc(dcCallDeviceListener);
     TELEPHONY_LOGI("reg dc-call service result[%{public}d]", ret);
-    dlclose(handle);
 }
 
 void DistributedCallManager::OnDcCallSystemAbilityRemoved()
 {
     TELEPHONY_LOGI("dc-call service removed");
+    if (extWrapperHandler_ == nullptr) {
+        return;
+    }
+
+    typedef int32_t (*UN_REGISTER_DEVICE_CALLBACK)();
+    auto unRegFunc = (UN_REGISTER_DEVICE_CALLBACK)dlsym(extWrapperHandler_, "UnRegisterDistributedDevState");
+    if (unRegFunc != nullptr) {
+        auto ret = unRegFunc();
+        TELEPHONY_LOGI("un-reg dc-call service result[%{public}d]", ret);
+    }
+
+    dlclose(extWrapperHandler_);
+    extWrapperHandler_ = nullptr;
 }
 
 void DcCallSystemAbilityListener::OnAddSystemAbility(int32_t systemAbilityId, const std::string &deviceId)
