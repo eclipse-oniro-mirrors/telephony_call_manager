@@ -142,8 +142,7 @@ bool DistributedCallManager::CreateDAudioDevice(const std::string& devId, AudioD
         TELEPHONY_LOGE("memcpy_s failed.");
         return false;
     }
-    TELEPHONY_LOGI("create distributed audio device succeed, type: %{public}s, addr: %{public}s",
-        devTypeName.c_str(), device.address);
+    TELEPHONY_LOGI("create distributed audio device succeed.");
     return true;
 }
 
@@ -161,15 +160,15 @@ std::string DistributedCallManager::GetDevIdFromAudioDevice(const AudioDevice& d
     }
     json addressJson = json::parse(address, nullptr, false);
     if (addressJson.is_null() || addressJson.is_discarded()) {
-        TELEPHONY_LOGE("json value is null or discarded, json string: %{public}s", address.c_str());
+        TELEPHONY_LOGE("json value is null or discarded.");
         return devId;
     }
     if (!addressJson.contains("devId")) {
-        TELEPHONY_LOGE("json not contain devId, json string: %{public}s", address.c_str());
+        TELEPHONY_LOGE("json not contain devId.");
         return devId;
     }
     if (!addressJson["devId"].is_string()) {
-        TELEPHONY_LOGE("json has no devId string, json string: %{public}s", address.c_str());
+        TELEPHONY_LOGE("json has no devId string.");
         return devId;
     }
     devId = addressJson["devId"];
