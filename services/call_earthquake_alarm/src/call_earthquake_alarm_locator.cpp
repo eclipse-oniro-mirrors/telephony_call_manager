@@ -257,14 +257,11 @@ bool MyLocationEngine::IsSwitchOn(std::string key, std::string& value)
     auto datashareHelper = std::make_shared<DataShareSwitchState>();
     OHOS::Uri uri(datashareHelper->DEFAULT_URI + key);
     int resp = datashareHelper->QueryData(uri, key, value);
-    TELEPHONY_LOGI("query %{public}s is %{public}s", key.c_str(), switch_state.c_str());
-    if (resp == DataShareSwitchState::TELEPHONY_SUCCESS && value == ALARM_SWITCH_ON) {
-        return true;
-    }
-    if (resp == DataShareSwitchState::TELEPHONY_SUCCESS && value == ALARM_SWITCH_OFF) {
+    TELEPHONY_LOGI("query %{public}s is %{public}s", key.c_str(), value.c_str());
+    if (resp != DataShareSwitchState::TELEPHONY_SUCCESS || value == ALARM_SWITCH_OFF) {
         return false;
     }
-    return false;
+    return true;
 }
 
 std::map<std::string, sptr<OOBESwitchObserver>> MyLocationEngine::settingsCallbacks = {};
@@ -295,7 +292,7 @@ void OOBESwitchObserver::OnChange()
         if (!oobeKey.second) {
             TELEPHONY_LOGE("%{public}s is trun off", oobeKey.first.c_str());
             return;
-        } 
+        }
     }
     for (auto& oobeKey : MyLocationEngine::settingsCallbacks) {
         auto callback = sptr<AAFwk::IDataAbilityObserver>(oobeKey.second);

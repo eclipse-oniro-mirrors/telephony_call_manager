@@ -96,7 +96,7 @@ int32_t DataShareSwitchState::QueryData(Uri& uri, const std::string& key, std::s
 {
     if (datashareHelper_ == nullptr) {
         TELEPHONY_LOGE("query error, datashareHelper_ is nullptr");
-        return DataShareSwitchState::INVALID_VALUE;
+        return INVALID_VALUE;
     }
     std::vector<std::string> columns;
     DataShare::DataSharePredicates predicates;
@@ -105,26 +105,26 @@ int32_t DataShareSwitchState::QueryData(Uri& uri, const std::string& key, std::s
     datashareHelper_->Release();
     if (result == nullptr) {
         TELEPHONY_LOGE("query error, result is nullptr");
-        return DataShareSwitchState::INVALID_VALUE;
+        return INVALID_VALUE;
     }
     int rowCount = 0;
     result->GetRowCount(rowCount);
     if (rowCount == 0) {
         TELEPHONY_LOGI("query success, but rowCount is 0");
         result->Close();
-        return DataShareSwitchState::INVALID_VALUE;
+        return INVALID_VALUE;
     }
     if (result->GoToFirstRow() != DataShare::E_OK) {
         TELEPHONY_LOGE("query error, go to first row error");
         result->Close();
-        return DataShareSwitchState::INVALID_VALUE;
+        return INVALID_VALUE;
     }
     int columnIndex = 0;
     result->GetColumnIndex(SETTINGS_DATA_COLUMN_VALUE, columnIndex);
     result->GetString(columnIndex, value);
     result->Close();
     TELEPHONY_LOGI("query success");
-    return DataShareSwitchState::TELEPHONY_SUCCESS;
+    return TELEPHONY_SUCCESS;
 }
 
 bool DataShareSwitchState::RegisterListenSettingsKey(std::string key, bool isReg,
@@ -163,7 +163,7 @@ void LocationSystemAbilityListener::OnAddSystemAbility(int32_t systemAbilityId, 
     for (auto& systemId : systemAbilityStatus) {
         if (!systemId.second) {
             return;
-        }     
+        }
     }
     if (startService) {
         TELEPHONY_LOGE("service alredy started");
@@ -176,7 +176,7 @@ void LocationSystemAbilityListener::OnAddSystemAbility(int32_t systemAbilityId, 
     
     std::string stateValue = MyLocationEngine::INITIAL_FIRST_VALUE;
     auto alarmSwitchState = MyLocationEngine::IsSwitchOn(LocationSubscriber::SWITCH_STATE_KEY, stateValue);
-    if (stateValue == MyLocationEngine::ALARM_SWITCH_ON || stateValue == MyLocationEngine::ALARM_SWITCH_OFF) {
+    if (stateValue != MyLocationEngine::INITIAL_FIRST_VALUE) {
         TELEPHONY_LOGI("start boot complete");
         MyLocationEngine::BootComplete(alarmSwitchState);
         return;
