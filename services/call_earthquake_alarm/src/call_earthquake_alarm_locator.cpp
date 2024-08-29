@@ -301,7 +301,7 @@ void OOBESwitchObserver::OnChange()
         datashareHelper->RegisterListenSettingsKey(oobeKey.first, false, callback);
     }
     MyLocationEngine::settingsCallbacks = {};
-    if (!MyLocationEngine::IsSwitchOn("earthquake_ue_switch_enable", mValue)) {
+    if (!MyLocationEngine::IsSwitchOn(LocationSubscriber::SWITCH_STATE_KEY, mValue)) {
         TELEPHONY_LOGE("the alarm switch is close");
         return;
     }
