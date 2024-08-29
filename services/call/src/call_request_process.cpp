@@ -923,6 +923,7 @@ int32_t CallRequestProcess::HandleEccCallForDsda(std::string newPhoneNum, DialPa
             call->RejectCall();
             TELEPHONY_LOGI("has ringCall when dial. reject ringCall");
         }
+    }
     return TELEPHONY_SUCCESS;
 }
 
