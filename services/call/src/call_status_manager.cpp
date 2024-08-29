@@ -66,6 +66,7 @@ int32_t CallStatusManager::Init()
 {
     for (int32_t i = 0; i < SLOT_NUM; i++) {
         callDetailsInfo_[i].callVec.clear();
+        tmpCallDetailsInfo_[i].callVec.clear();
     }
     for (int32_t i = 0; i < SLOT_NUM; i++) {
         priorVideoState_[i] = VideoStateType::TYPE_VOICE;
@@ -94,6 +95,7 @@ int32_t CallStatusManager::UnInit()
 {
     for (int32_t i = 0; i < SLOT_NUM; i++) {
         callDetailsInfo_[i].callVec.clear();
+        tmpCallDetailsInfo_[i].callVec.clear();
     }
     mEventIdTransferMap_.clear();
     mOttEventIdTransferMap_.clear();
@@ -185,6 +187,8 @@ int32_t CallStatusManager::HandleCallsReportInfo(const CallDetailsInfo &info)
         TELEPHONY_LOGE("invalid slotId!");
         return CALL_ERR_INVALID_SLOT_ID;
     }
+    tmpCallDetailsInfo_[curSlotId].callVec.clear();
+    tmpCallDetailsInfo_[curSlotId] = info;
     for (auto &it : info.callVec) {
         for (const auto &it1 : callDetailsInfo_[curSlotId].callVec) {
             if (it.index == it1.index) {
@@ -220,15 +224,25 @@ int32_t CallStatusManager::HandleCallsReportInfo(const CallDetailsInfo &info)
         }
         flag = false;
     }
+    UpdateCallDetailsInfo(info);
+    return TELEPHONY_SUCCESS;
+}
+
+void CallStatusManager::UpdateCallDetailsInfo(const CallDetailsInfo &info)
+{
+    int32_t curSlotId = info.slotId;
     callDetailsInfo_[curSlotId].callVec.clear();
     callDetailsInfo_[curSlotId] = info;
     auto condition = [](CallDetailInfo i) { return i.state == TelCallState::CALL_STATUS_DISCONNECTED; };
     auto it_end = std::remove_if(callDetailsInfo_[curSlotId].callVec.begin(),
         callDetailsInfo_[curSlotId].callVec.end(), condition);
     callDetailsInfo_[curSlotId].callVec.erase(it_end, callDetailsInfo_[curSlotId].callVec.end());
+    if (callDetailsInfo_[curSlotId].callVec.empty()) {
+        TELEPHONY_LOGI("clear tmpCallDetailsInfo");
+        tmpCallDetailsInfo_[curSlotId].callVec.clear();
+    }
     TELEPHONY_LOGI("End CallStatusManager HandleCallsReportInfo slotId:%{public}d, "
         "callDetailsInfo_ size:%{public}zu", info.slotId, callDetailsInfo_[curSlotId].callVec.size());
-    return TELEPHONY_SUCCESS;
 }
 
 int32_t CallStatusManager::HandleVoipCallReportInfo(const CallDetailInfo &info)
@@ -675,14 +689,9 @@ int32_t CallStatusManager::ActiveHandle(const CallDetailInfo &info)
     call = RefreshCallIfNecessary(call, info);
     SetOriginalCallTypeForActiveState(call);
     // call state change active, need to judge if launching a conference
-    if (info.mpty == 1 && GetCarrierCallNum() > 1) {
-        int32_t mainCallId = ERR_ID;
-        call->LaunchConference();
-        call->GetMainCallId(mainCallId);
-        sptr<CallBase> mainCall = GetOneCallObject(mainCallId);
-        if (mainCall != nullptr) {
-            mainCall->SetTelConferenceState(TelConferenceState::TEL_CONFERENCE_ACTIVE);
-        }
+    std::vector<sptr<CallBase>> conferenceCallList = GetConferenceCallList(call->GetSlotId());
+    if (info.mpty == 1 && conferenceCallList.size() > 1) {
+        SetConferenceCall(conferenceCallList);
     } else if (call->ExitConference() == TELEPHONY_SUCCESS) {
         TELEPHONY_LOGI("SubCallSeparateFromConference success!");
     } else {
@@ -704,6 +713,18 @@ int32_t CallStatusManager::ActiveHandle(const CallDetailInfo &info)
 #endif
     TELEPHONY_LOGI("handle active state success");
     return ret;
+}
+
+void CallStatusManager::SetConferenceCall(std::vector<sptr<CallBase>> conferenceCallList)
+{
+    for (auto conferenceCall : conferenceCallList) {
+        TELEPHONY_LOGI("SetConferenceCall callid : %{public}d; State : %{public}d",
+            conferenceCall->GetCallID(), conferenceCall->GetTelConferenceState());
+        if (conferenceCall->GetTelConferenceState() != TelConferenceState::TEL_CONFERENCE_ACTIVE) {
+            conferenceCall->LaunchConference();
+            UpdateCallState(conferenceCall, conferenceCall->GetTelCallState());
+        }
+    }
 }
 
 int32_t CallStatusManager::ActiveVoipCallHandle(const CallDetailInfo &info)
@@ -843,18 +864,37 @@ int32_t CallStatusManager::DisconnectedHandle(const CallDetailInfo &info)
     TelCallState priorState = call->GetTelCallState();
     UpdateCallState(call, TelCallState::CALL_STATUS_DISCONNECTED);
     HandleHoldCallOrAutoAnswerCall(call, callIdList, previousState, priorState);
-    sptr<CallBase> foregroundCall = GetForegroundCall(false);
-    if (foregroundCall != nullptr && GetCarrierCallNum() == 1 &&
-        foregroundCall->GetTelConferenceState() != TelConferenceState::TEL_CONFERENCE_IDLE) {
-        TELEPHONY_LOGI("Not enough calls to be a conference!");
-        foregroundCall->SetTelConferenceState(TelConferenceState::TEL_CONFERENCE_IDLE);
-        UpdateCallState(foregroundCall, foregroundCall->GetTelCallState());
+    std::vector<sptr<CallBase>> conferenceCallList = GetConferenceCallList(call->GetSlotId());
+    if (conferenceCallList.size() == 1) {
+        sptr<CallBase> leftOneConferenceCall = conferenceCallList[0];
+        if (leftOneConferenceCall != nullptr &&
+            leftOneConferenceCall->GetTelConferenceState() != TelConferenceState::TEL_CONFERENCE_IDLE) {
+            TELEPHONY_LOGI("Not enough calls to be a conference!");
+            leftOneConferenceCall->SetTelConferenceState(TelConferenceState::TEL_CONFERENCE_IDLE);
+            UpdateCallState(leftOneConferenceCall, leftOneConferenceCall->GetTelCallState());
+        }
     }
+    sptr<CallBase> foregroundCall = GetForegroundCall(false);
     int32_t currentCallNum = CallObjectManager::GetCurrentCallNum();
     if (currentCallNum <= 0) {
         DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance()->RestoreSuperPrivacyMode();
     }
     return TELEPHONY_SUCCESS;
+}
+
+std::vector<sptr<CallBase>> CallStatusManager::GetConferenceCallList(int32_t slotId)
+{
+    std::vector<sptr<CallBase>> conferenceCallList;
+    for (const auto &it : tmpCallDetailsInfo_[slotId].callVec) {
+        if (it.mpty == 1) {
+            sptr<CallBase> conferenceCall = GetOneCallObjectByIndexAndSlotId(it.index, it.accountId);
+            if (conferenceCall != nullptr) {
+                conferenceCallList.emplace_back(conferenceCall);
+            }
+        }
+    }
+    TELEPHONY_LOGI("Conference call list size:%{public}zu", conferenceCallList.size());
+    return conferenceCallList;
 }
 
 void CallStatusManager::HandleHoldCallOrAutoAnswerCall(const sptr<CallBase> call,
