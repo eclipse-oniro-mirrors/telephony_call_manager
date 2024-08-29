@@ -915,7 +915,7 @@ int32_t CallRequestProcess::HandleEccCallForDsda(std::string newPhoneNum, DialPa
     TELEPHONY_LOGE("CheckNumberIsEmergency ret is %{public}d", ret);
     if (isEcc && IsDsdsMode5()) {
         return EccDialPolicy();
-    } else if (isEcc && !IsDsdsMode5()) {
+    } else if (isEcc) {
         bool hasRingCall = false;
         int32_t result = CallObjectManager::HasRingingCall(hasRingCall);
         if ((result == TELEPHONY_SUCCESS) && hasRingCall) {
