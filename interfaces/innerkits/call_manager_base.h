@@ -590,6 +590,10 @@ enum class AudioDeviceType {
      * Indicates the device type is a distributed pad device.
      */
     DEVICE_DISTRIBUTED_PAD,
+    /**
+     * Indicates the device type is a distributed pc device.
+     */
+    DEVICE_DISTRIBUTED_PC,
 };
 
 /**

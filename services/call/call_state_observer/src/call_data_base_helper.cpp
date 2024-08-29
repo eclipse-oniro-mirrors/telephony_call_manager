@@ -183,13 +183,7 @@ bool CallDataBaseHelper::Query(ContactInfo &contactInfo, DataShare::DataSharePre
         resultSet->GetColumnIndex(CALL_DISPLAY_NAME, columnIndex);
         int32_t ret = resultSet->GetString(columnIndex, displayName);
         if (ret == 0 && (!displayName.empty())) {
-            size_t cpyLen = displayName.length() + 1;
-            if (displayName.length() > static_cast<size_t>(CONTACT_NAME_LEN)) {
-                resultSet->Close();
-                helper->Release();
-                return false;
-            }
-            if (strcpy_s(contactInfo.name, cpyLen, displayName.c_str()) != EOK) {
+            if (strcpy_s(contactInfo.name, sizeof(contactInfo.name), displayName.c_str()) != EOK) {
                 TELEPHONY_LOGE("strcpy_s fail.");
                 resultSet->Close();
                 helper->Release();

@@ -25,6 +25,7 @@
 #include "audio_control_manager.h"
 #include "audio_group_manager.h"
 #include "distributed_call_manager.h"
+#include "distributed_communication_manager.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -381,7 +382,10 @@ void AudioPreferDeviceChangeCallback::OnPreferredOutputDeviceUpdated(
         TELEPHONY_LOGE("desc size is zero");
         return;
     }
-
+    if (DelayedSingleton<DistributedCommunicationManager>::GetInstance()->IsAudioOnSink()) {
+        TELEPHONY_LOGI("has already switch to distributed communication device");
+        return;
+    }
     TELEPHONY_LOGI("OnPreferredOutputDeviceUpdated type: %{public}d", desc[0]->deviceType_);
 
     if (IsDistributedDeviceSelected(desc)) {
@@ -390,17 +394,7 @@ void AudioPreferDeviceChangeCallback::OnPreferredOutputDeviceUpdated(
 
     switch (desc[0]->deviceType_) {
         case AudioStandard::DEVICE_TYPE_BLUETOOTH_SCO:
-            device.deviceType = AudioDeviceType::DEVICE_BLUETOOTH_SCO;
-            if (memset_s(&device.address, kMaxAddressLen + 1, 0, kMaxAddressLen + 1) != EOK ||
-                memset_s(&device.deviceName, kMaxDeviceNameLen + 1, 0, kMaxDeviceNameLen + 1) != EOK) {
-                TELEPHONY_LOGE("memset_s address fail");
-                return;
-            }
-            if (memcpy_s(device.address, kMaxAddressLen, desc[0]->macAddress_.c_str(),
-                desc[0]->macAddress_.length()) != EOK ||
-                memcpy_s(device.deviceName, kMaxDeviceNameLen, desc[0]->deviceName_.c_str(),
-                desc[0]->deviceName_.length()) != EOK) {
-                TELEPHONY_LOGE("memcpy_s address fail");
+            if (!SetBluetoothDevice(device, desc)) {
                 return;
             }
             DelayedSingleton<AudioDeviceManager>::GetInstance()->SetCurrentAudioDevice(device);
@@ -428,6 +422,25 @@ void AudioPreferDeviceChangeCallback::OnPreferredOutputDeviceUpdated(
     if (desc[0]->deviceType_ != AudioStandard::DEVICE_TYPE_SPEAKER) {
         DelayedSingleton<AudioControlManager>::GetInstance()->UpdateDeviceTypeForCrs();
     }
+}
+
+bool AudioPreferDeviceChangeCallback::SetBluetoothDevice(AudioDevice &device,
+    const std::vector<sptr<AudioStandard::AudioDeviceDescriptor>> &desc)
+{
+    device.deviceType = AudioDeviceType::DEVICE_BLUETOOTH_SCO;
+    if (memset_s(&device.address, kMaxAddressLen + 1, 0, kMaxAddressLen + 1) != EOK ||
+        memset_s(&device.deviceName, kMaxDeviceNameLen + 1, 0, kMaxDeviceNameLen + 1) != EOK) {
+        TELEPHONY_LOGE("memset_s address fail");
+        return false;
+    }
+    if (memcpy_s(device.address, kMaxAddressLen, desc[0]->macAddress_.c_str(),
+        desc[0]->macAddress_.length()) != EOK ||
+        memcpy_s(device.deviceName, kMaxDeviceNameLen, desc[0]->deviceName_.c_str(),
+        desc[0]->deviceName_.length()) != EOK) {
+        TELEPHONY_LOGE("memcpy_s address fail");
+        return false;
+    }
+    return true;
 }
 
 bool AudioPreferDeviceChangeCallback::IsDistributedDeviceSelected(

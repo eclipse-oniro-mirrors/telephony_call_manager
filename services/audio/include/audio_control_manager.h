@@ -107,6 +107,7 @@ private:
     int32_t HandleDistributeAudioDevice(const AudioDevice &device);
     void SendMuteRingEvent();
     bool IsDistributeCallSinkStatus();
+    int32_t SwitchAudioDevice(AudioDeviceType audioDeviceType);
     ToneState toneState_ = ToneState::STOPPED;
     SoundState soundState_ = SoundState::STOPPED;
     bool isLocalRingbackNeeded_ = false;

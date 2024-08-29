@@ -28,6 +28,7 @@
 #include "audio_info.h"
 #include "voip_call_connection.h"
 #include "settings_datashare_helper.h"
+#include "distributed_communication_manager.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -455,6 +456,7 @@ int32_t AudioControlManager::SetAudioDevice(const AudioDevice &device, bool isBy
         case AudioDeviceType::DEVICE_DISTRIBUTED_AUTOMOTIVE:
         case AudioDeviceType::DEVICE_DISTRIBUTED_PHONE:
         case AudioDeviceType::DEVICE_DISTRIBUTED_PAD:
+        case AudioDeviceType::DEVICE_DISTRIBUTED_PC:
             return HandleDistributeAudioDevice(device);
         case AudioDeviceType::DEVICE_BLUETOOTH_SCO: {
             std::string address = device.address;
@@ -476,7 +478,15 @@ int32_t AudioControlManager::SetAudioDevice(const AudioDevice &device, bool isBy
         default:
             break;
     }
+    return SwitchAudioDevice(audioDeviceType);
+}
+
+int32_t AudioControlManager::SwitchAudioDevice(AudioDeviceType audioDeviceType)
+{
     if (audioDeviceType != AudioDeviceType::DEVICE_UNKNOWN) {
+        if (DelayedSingleton<DistributedCommunicationManager>::GetInstance()->IsAudioOnSink()) {
+            DelayedSingleton<DistributedCommunicationManager>::GetInstance()->SwitchToSourceDevice();
+        }
         if (DelayedSingleton<DistributedCallManager>::GetInstance()->IsDCallDeviceSwitchedOn()) {
             DelayedSingleton<DistributedCallManager>::GetInstance()->SwitchOffDCallDeviceSync();
         }
@@ -489,6 +499,12 @@ int32_t AudioControlManager::SetAudioDevice(const AudioDevice &device, bool isBy
 
 int32_t AudioControlManager::HandleDistributeAudioDevice(const AudioDevice &device)
 {
+    if (DelayedSingleton<DistributedCommunicationManager>::GetInstance()->IsDistributedDev(device)) {
+        if (DelayedSingleton<DistributedCommunicationManager>::GetInstance()->SwitchToSinkDevice(device)) {
+            return TELEPHONY_SUCCESS;
+        }
+        return CALL_ERR_AUDIO_SET_AUDIO_DEVICE_FAILED;
+    }
     if (!DelayedSingleton<DistributedCallManager>::GetInstance()->IsDCallDeviceSwitchedOn()) {
         if (DelayedSingleton<DistributedCallManager>::GetInstance()->SwitchOnDCallDeviceSync(device)) {
             return TELEPHONY_SUCCESS;
@@ -624,6 +640,14 @@ AudioDeviceType AudioControlManager::GetInitAudioDeviceType() const
     if (audioInterruptState_ == AudioInterruptState::INTERRUPT_STATE_DEACTIVATED) {
         return AudioDeviceType::DEVICE_DISABLE;
     } else {
+        if (DelayedSingleton<DistributedCommunicationManager>::GetInstance()->IsConnected()) {
+            AudioDevice device = {
+                .deviceType = AudioDeviceType::DEVICE_UNKNOWN,
+            };
+            (void)DelayedSingleton<AudioProxy>::GetInstance()->GetPreferredOutputAudioDevice(device);
+            return device.deviceType;
+        }
+
         /**
          * Init audio device type according to the priority in different call state:
          * In voice call state, bluetooth sco > wired headset > earpiece > speaker

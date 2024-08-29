@@ -583,6 +583,8 @@ void NapiCallAbilityCallback::ReportCallAttribute(napi_env &env, napi_value call
     napi_value markInfoObject = nullptr;
     CreateMarkInfoNapiValue(env, markInfoObject, info);
     napi_set_named_property(env, callbackValues[ARRAY_INDEX_FIRST], "numberMarkInfo", markInfoObject);
+    NapiCallManagerUtils::SetPropertyStringUtf8(
+        env, callbackValues[ARRAY_INDEX_FIRST], "distributedContactName", info.contactName);
 }
 
 void NapiCallAbilityCallback::CreateVoipNapiValue(napi_env &env, napi_value &voipObject, CallAttributeInfo &info)

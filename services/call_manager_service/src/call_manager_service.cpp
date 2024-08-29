@@ -37,6 +37,7 @@
 #include "voip_call_connection.h"
 #include "distributed_call_manager.h"
 #include "call_earthquake_alarm_subscriber.h"
+#include "distributed_communication_manager.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -81,6 +82,7 @@ bool CallManagerService::Init()
     DelayedSingleton<CallRecordsManager>::GetInstance()->Init();
     DelayedSingleton<BluetoothConnection>::GetInstance()->Init();
     DelayedSingleton<DistributedCallManager>::GetInstance()->Init();
+    DelayedSingleton<DistributedCommunicationManager>::GetInstance()->Init();
     AddSystemAbilityListener(AUDIO_POLICY_SERVICE_ID);
     return true;
 }
@@ -828,7 +830,11 @@ int32_t CallManagerService::SetMuted(bool isMute)
         return TELEPHONY_ERR_PERMISSION_ERR;
     }
     if (callControlManagerPtr_ != nullptr) {
-        return callControlManagerPtr_->SetMuted(isMute);
+        auto ret = callControlManagerPtr_->SetMuted(isMute);
+        if (ret == TELEPHONY_SUCCESS) {
+            DelayedSingleton<DistributedCommunicationManager>::GetInstance()->SetMuted(isMute);
+        }
+        return ret;
     } else {
         TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -846,7 +852,11 @@ int32_t CallManagerService::MuteRinger()
         return TELEPHONY_ERR_PERMISSION_ERR;
     }
     if (callControlManagerPtr_ != nullptr) {
-        return callControlManagerPtr_->MuteRinger();
+        auto ret = callControlManagerPtr_->MuteRinger();
+        if (ret == TELEPHONY_SUCCESS) {
+            DelayedSingleton<DistributedCommunicationManager>::GetInstance()->MuteRinger();
+        }
+        return ret;
     } else {
         TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;

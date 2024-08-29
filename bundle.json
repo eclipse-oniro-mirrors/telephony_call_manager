@@ -63,7 +63,8 @@
                 "sms_mms",
                 "image_framework",
                 "miscdevice",
-                "location"
+                "location",
+                "dsoftbus"
             ],
             "third_party": [
                 "libphonenumber",

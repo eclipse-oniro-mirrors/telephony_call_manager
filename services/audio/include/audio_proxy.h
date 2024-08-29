@@ -51,6 +51,7 @@ public:
 
 private:
     bool IsDistributedDeviceSelected(const std::vector<sptr<AudioStandard::AudioDeviceDescriptor>> &desc);
+    bool SetBluetoothDevice(AudioDevice &device, const std::vector<sptr<AudioStandard::AudioDeviceDescriptor>> &desc);
 };
 
 class AudioMicStateChangeCallback : public AudioStandard::AudioManagerMicStateChangeCallback {

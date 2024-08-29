@@ -28,6 +28,7 @@
 #include "distributed_call_manager.h"
 #include "audio_system_manager.h"
 #include "audio_device_info.h"
+#include "distributed_communication_manager.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -273,6 +274,7 @@ void AudioDeviceManager::ResetDistributedCallDevicesList()
     SetDeviceAvailable(AudioDeviceType::DEVICE_DISTRIBUTED_AUTOMOTIVE, false);
     SetDeviceAvailable(AudioDeviceType::DEVICE_DISTRIBUTED_PHONE, false);
     SetDeviceAvailable(AudioDeviceType::DEVICE_DISTRIBUTED_PAD, false);
+    SetDeviceAvailable(AudioDeviceType::DEVICE_DISTRIBUTED_PC, false);
     DelayedSingleton<CallAbilityReportProxy>::GetInstance()->ReportAudioDeviceChange(info_);
     TELEPHONY_LOGI("Reset Distributed Audio Devices List success");
 }
@@ -505,12 +507,14 @@ int32_t AudioDeviceManager::ReportAudioDeviceChange(const AudioDevice &device)
     if (audioDeviceType_ == AudioDeviceType::DEVICE_BLUETOOTH_SCO) {
         if (address.empty() || deviceName.empty()) {
             std::unique_ptr<AudioStandard::AudioDeviceDescriptor> activeBluetoothDevice =
-            AudioStandard::AudioRoutingManager::GetInstance()->GetActiveBluetoothDevice();
+                AudioStandard::AudioRoutingManager::GetInstance()->GetActiveBluetoothDevice();
             if (activeBluetoothDevice != nullptr && !activeBluetoothDevice->macAddress_.empty()) {
                 address = activeBluetoothDevice->macAddress_;
                 deviceName = activeBluetoothDevice->deviceName_;
             }
         }
+    } else if (DelayedSingleton<DistributedCommunicationManager>::GetInstance()->IsDistributedDev(device)) {
+        TELEPHONY_LOGI("audio device is distributed communication dev");
     } else if (IsDistributedAudioDeviceType(audioDeviceType_)) {
         address = DelayedSingleton<DistributedCallManager>::GetInstance()->GetConnectedDCallDeviceAddr();
     }
@@ -646,7 +650,8 @@ bool AudioDeviceManager::IsDistributedAudioDeviceType(AudioDeviceType deviceType
 {
     if (((deviceType == AudioDeviceType::DEVICE_DISTRIBUTED_AUTOMOTIVE) ||
         (deviceType == AudioDeviceType::DEVICE_DISTRIBUTED_PHONE) ||
-        (deviceType == AudioDeviceType::DEVICE_DISTRIBUTED_PAD))) {
+        (deviceType == AudioDeviceType::DEVICE_DISTRIBUTED_PAD) ||
+        (deviceType == AudioDeviceType::DEVICE_DISTRIBUTED_PC))) {
         return true;
     }
     return false;
@@ -670,6 +675,7 @@ void AudioDeviceManager::SetDeviceAvailable(AudioDeviceType deviceType, bool ava
         case AudioDeviceType::DEVICE_DISTRIBUTED_AUTOMOTIVE:
         case AudioDeviceType::DEVICE_DISTRIBUTED_PHONE:
         case AudioDeviceType::DEVICE_DISTRIBUTED_PAD:
+        case AudioDeviceType::DEVICE_DISTRIBUTED_PC:
             isDCallDevConnected_ = available;
             break;
         default:
