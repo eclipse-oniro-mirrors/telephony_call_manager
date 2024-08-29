@@ -87,8 +87,12 @@ HWTEST_F(LocationEngineTest, Telephony_MyLocationEngine_001, Function | MediumTe
     engine->mylocator = engine;
     engine = engine->GetInstance();
     engine->SetValue();
-    engine->IsSwitchOn();
-    engine->BootComplete();
+    std::string key1 = "testkey";
+    std::string value1 = "testvalue";
+    engine->IsSwitchOn(key1, value1);
+    engine->BootComplete(true);
+    engine->BootComplete(false);
+    engine->OOBEComplete();
     engine->RegisterLocationChange();
     engine->RegisterSwitchCallback();
     engine->LocationSwitchChange();
@@ -143,7 +147,9 @@ HWTEST_F(LocationEngineTest, Telephony_MyLocationEngine_002, Function | MediumTe
     engine->SetValue();
     engine->RegisterLocationChange();
     engine->RegisterSwitchCallback();
-    ASSERT_TRUE(engine->IsSwitchOn() == false);
+    std::string key2 = "testkey2222";
+    std::string value2 = "valuetst2222";
+    ASSERT_TRUE(engine->IsSwitchOn(key2, value2) == false);
 }
 
 /**
@@ -179,7 +185,9 @@ HWTEST_F(LocationEngineTest, Telephony_MyLocationEngine_003, Function | MediumTe
     engine->SetValue();
     engine->RegisterLocationChange();
     engine->RegisterSwitchCallback();
-    ASSERT_TRUE(engine->IsSwitchOn() == false);
+    std::string key3 = "keytest3333";
+    std::string value3 = "valuetest3333";
+    ASSERT_TRUE(engine->IsSwitchOn(key3, value3) == false);
 }
 
 /**
@@ -197,7 +205,7 @@ HWTEST_F(LocationEngineTest, Telephony_EmergencyCallConnectCallback_001, Functio
     if (connectcallback->connectCallback_ == nullptr) {
         return;
     }
-    engine->ConnectAbility();
+    engine->ConnectAbility("valuetest1111");
     std::string bundle = "111";
     std::string ability = "222";
     AppExecFwk::ElementName element("", bundle, ability);
@@ -251,9 +259,19 @@ HWTEST_F(LocationEngineTest, Telephony_DataShareSwitchState_001, Function | Medi
     OHOS::Uri uriTest(string("datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?")
         + string("Proxy=true&key=testKeyWord"));
     const std::string key = "testKeyWord";
+    std::string key2 = "testKeyWord2";
     std::string value1 = "test";
     int code = 4;
     auto ret = datashareHelper->QueryData(uriTest, key, value1);
+    sptr<AAFwk::IDataAbilityObserver> callback1 = sptr<OOBESwitchObserver>::MakeSptr(key2);
+    callback1->OnChange();
+    auto datashareHelper2 = std::make_shared<DataShareSwitchState>();
+    datashareHelper2->RegisterListenSettingsKey(key2, true, callback1);
+    auto datashareHelper3 = std::make_shared<DataShareSwitchState>();
+    datashareHelper3->RegisterListenSettingsKey(key2, false, callback1);
+    callback1 = nullptr;
+    auto datashareHelper4 = std::make_shared<DataShareSwitchState>();
+    datashareHelper4->RegisterListenSettingsKey(key2, false, callback1);
     ASSERT_TRUE(ret == code);
     ASSERT_TRUE(value1 == "test");
 }
