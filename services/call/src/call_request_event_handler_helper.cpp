@@ -75,5 +75,27 @@ bool CallRequestEventHandlerHelper::IsDialingCallProcessing()
     return isDialingCallProcessing_;
 }
 
+void CallRequestEventHandlerHelper::SetPendingMo(bool pendingMo, int32_t callId)
+{
+    pendingMo_ = pendingMo;
+    pendingMoCallId_ = callId;
+}
+
+bool CallRequestEventHandlerHelper::HasPendingMo(int32_t callId)
+{
+    return pendingMo_ && (pendingMoCallId_ == callId);
+}
+
+void CallRequestEventHandlerHelper::SetPendingHangup(bool pendingHangup, int32_t callId)
+{
+    pendingHangup_ = pendingHangup;
+    pendingHangupCallId_ = callId;
+}
+
+bool CallRequestEventHandlerHelper::HasPendingHangp(int32_t callId)
+{
+    return pendingHangup_ && (pendingHangupCallId_ == callId);
+}
+
 } // namespace Telephony
 } // namespace OHOS

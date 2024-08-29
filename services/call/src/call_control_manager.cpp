@@ -28,6 +28,7 @@
 #include "call_manager_hisysevent.h"
 #include "call_number_utils.h"
 #include "call_records_manager.h"
+#include "call_request_event_handler_helper.h"
 #include "call_state_report_proxy.h"
 #include "cellular_call_connection.h"
 #include "common_type.h"
@@ -380,6 +381,13 @@ int32_t CallControlManager::HangUpCall(int32_t callId)
         TELEPHONY_LOGE("HangUpPolicy failed!");
         CallManagerHisysevent::WriteHangUpFaultEvent(INVALID_PARAMETER, callId, ret, "HangUp HangUpPolicy failed");
         return ret;
+    }
+    auto callRequestEventHandler = DelayedSingleton<CallRequestEventHandlerHelper>::GetInstance();
+    if (callRequestEventHandler->HasPendingMo(callId)) {
+        callRequestEventHandler->SetPendingMo(false, callId);
+        callRequestEventHandler->SetPendingHangup(true, callId);
+        TELEPHONY_LOGI("HangUpCall before dialingHandle,hangup after CLCC");
+        return TELEPHONY_SUCCESS;
     }
     ret = CallRequestHandlerPtr_->HangUpCall(callId);
     if (ret != TELEPHONY_SUCCESS) {
