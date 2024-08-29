@@ -610,12 +610,13 @@ int32_t CallStatusManager::UpdateDialingCallInfo(const CallDetailInfo &info)
     call->SetCallType(info.callType);
     call->SetAccountNumber(oriNum);
     auto callRequestEventHandler = DelayedSingleton<CallRequestEventHandlerHelper>::GetInstance();
-    if (callRequestEventHandler->HasPendingMo()) {
-        callRequestEventHandler->SetPendingMo(false);
+    int32_t callId = call->GetCallID();
+    if (callRequestEventHandler->HasPendingMo(callId)) {
+        callRequestEventHandler->SetPendingMo(false, callId);
     }
-    if (callRequestEventHandler->HasPendingHangp()) {
+    if (callRequestEventHandler->HasPendingHangp(callId)) {
         call->HangUpCall();
-        callRequestEventHandler->SetPendingHangup(false);
+        callRequestEventHandler->SetPendingHangup(false, callId);
     }
     return TELEPHONY_SUCCESS;
 }
@@ -640,6 +641,7 @@ int32_t CallStatusManager::DialingHandle(const CallDetailInfo &info)
     }
     AddOneCallObject(call);
     auto callRequestEventHandler = DelayedSingleton<CallRequestEventHandlerHelper>::GetInstance();
+    callRequestEventHandler->SetPendingMo(true, call->GetCallID());
     callRequestEventHandler->RestoreDialingFlag(false);
     callRequestEventHandler->RemoveEventHandlerTask();
     int32_t ret = call->DialingProcess();
