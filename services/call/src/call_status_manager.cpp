@@ -641,7 +641,7 @@ int32_t CallStatusManager::DialingHandle(const CallDetailInfo &info)
     }
     AddOneCallObject(call);
     auto callRequestEventHandler = DelayedSingleton<CallRequestEventHandlerHelper>::GetInstance();
-    if (info.index == 0) {
+    if (info.index == INIT_INDEX) {
         callRequestEventHandler->SetPendingMo(true, call->GetCallID());
     }
 
