@@ -166,800 +166,46 @@ public:
     void TearDown() {};
 };
 
+/********************************************* Test RejectCall() ***********************************************/
 /**
- * @tc.number   Telephony_CallManagerClient_001
- * @tc.name     test error nullptr branch
+ * @tc.number   Telephony_CallManager_RejectCall_0100
+ * @tc.name     test RejectCall with the callId does not exist
  * @tc.desc     Function test
  */
-HWTEST_F(ClientErrorBranchTest, Telephony_CallManagerClient_001, Function | MediumTest | Level3)
-{
-    std::shared_ptr<CallManagerClient> client = std::make_shared<CallManagerClient>();
-    std::u16string str = u"";
-    client->UnInit();
-    ASSERT_EQ(client->RegisterCallBack(nullptr), TELEPHONY_ERR_UNINIT);
-    ASSERT_EQ(client->UnRegisterCallBack(), TELEPHONY_ERR_UNINIT);
-    ASSERT_EQ(client->ObserverOnCallDetailsChange(), TELEPHONY_ERR_UNINIT);
-    AppExecFwk::PacMap extras;
-    ASSERT_EQ(client->DialCall(str, extras), TELEPHONY_ERR_UNINIT);
-    ASSERT_EQ(client->AnswerCall(g_newCallId, 1), TELEPHONY_ERR_UNINIT);
-    ASSERT_EQ(client->RejectCall(g_newCallId, false, str), TELEPHONY_ERR_UNINIT);
-    ASSERT_EQ(client->HangUpCall(g_newCallId), TELEPHONY_ERR_UNINIT);
-    ASSERT_EQ(client->GetCallState(), TELEPHONY_ERR_UNINIT);
-    ASSERT_EQ(client->RegisterVoipCallManagerCallback(), TELEPHONY_ERR_UNINIT);
-    ASSERT_EQ(client->UnRegisterVoipCallManagerCallback(), TELEPHONY_ERR_UNINIT);
-    ASSERT_EQ(client->HoldCall(g_newCallId), TELEPHONY_ERR_UNINIT);
-    ASSERT_EQ(client->UnHoldCall(g_newCallId), TELEPHONY_ERR_UNINIT);
-    ASSERT_EQ(client->SwitchCall(g_newCallId), TELEPHONY_ERR_UNINIT);
-    ASSERT_EQ(client->CombineConference(g_newCallId), TELEPHONY_ERR_UNINIT);
-    ASSERT_EQ(client->SeparateConference(g_newCallId), TELEPHONY_ERR_UNINIT);
-    ASSERT_EQ(client->KickOutFromConference(g_newCallId), TELEPHONY_ERR_UNINIT);
-    int callId = 1;
-    ASSERT_EQ(client->GetMainCallId(callId, callId), TELEPHONY_ERR_UNINIT);
-    std::vector<std::u16string> callIdList;
-    ASSERT_EQ(client->GetSubCallIdList(g_newCallId, callIdList), TELEPHONY_ERR_UNINIT);
-    ASSERT_EQ(client->GetCallIdListForConference(g_newCallId, callIdList), TELEPHONY_ERR_UNINIT);
-    ASSERT_EQ(client->GetCallWaiting(SIM1_SLOTID), TELEPHONY_ERR_UNINIT);
-    ASSERT_EQ(client->SetCallWaiting(SIM1_SLOTID, false), TELEPHONY_ERR_UNINIT);
-    ASSERT_EQ(client->GetCallRestriction(SIM1_SLOTID, CallRestrictionType::RESTRICTION_TYPE_ALL_INCOMING),
-        TELEPHONY_ERR_UNINIT);
-    CallRestrictionInfo callRestrictionInfo;
-    ASSERT_EQ(client->SetCallRestriction(SIM1_SLOTID, callRestrictionInfo), TELEPHONY_ERR_UNINIT);
-    ASSERT_EQ(client->SetCallRestrictionPassword(SIM1_SLOTID, CallRestrictionType::RESTRICTION_TYPE_ALL_INCOMING,
-        "", ""), TELEPHONY_ERR_UNINIT);
-    ASSERT_EQ(client->GetCallTransferInfo(SIM1_SLOTID, CallTransferType::TRANSFER_TYPE_BUSY), TELEPHONY_ERR_UNINIT);
-    CallTransferInfo callTransferInfo;
-    ASSERT_EQ(client->SetCallTransferInfo(SIM1_SLOTID, callTransferInfo), TELEPHONY_ERR_UNINIT);
-    bool boolValue = false;
-    ASSERT_EQ(client->CanSetCallTransferTime(SIM1_SLOTID, boolValue), TELEPHONY_ERR_UNINIT);
-    ASSERT_EQ(client->SetCallPreferenceMode(SIM1_SLOTID, 0), TELEPHONY_ERR_UNINIT);
-    ASSERT_EQ(client->StartDtmf(g_newCallId, 'c'), TELEPHONY_ERR_UNINIT);
-    ASSERT_EQ(client->StopDtmf(g_newCallId), TELEPHONY_ERR_UNINIT);
-    ASSERT_EQ(client->PostDialProceed(SIM1_SLOTID, true), TELEPHONY_ERR_UNINIT);
-    ASSERT_EQ(client->IsRinging(boolValue), TELEPHONY_ERR_UNINIT);
-    ASSERT_FALSE(client->HasCall());
-    ASSERT_EQ(client->CancelCallUpgrade(g_newCallId), TELEPHONY_ERR_UNINIT);
-}
-
-/**
- * @tc.number   Telephony_CallManagerClient_002
- * @tc.name     test error nullptr branch
- * @tc.desc     Function test
- */
-HWTEST_F(ClientErrorBranchTest, Telephony_CallManagerClient_002, Function | MediumTest | Level3)
-{
-    std::shared_ptr<CallManagerClient> client = std::make_shared<CallManagerClient>();
-    std::u16string str = u"";
-    bool boolValue = false;
-    int value = 0;
-    ASSERT_EQ(client->IsNewCallAllowed(boolValue), TELEPHONY_ERR_UNINIT);
-    ASSERT_EQ(client->IsInEmergencyCall(boolValue), TELEPHONY_ERR_UNINIT);
-    ASSERT_EQ(client->IsEmergencyPhoneNumber(str, SIM1_SLOTID, boolValue), TELEPHONY_ERR_UNINIT);
-    ASSERT_EQ(client->FormatPhoneNumber(str, str, str), TELEPHONY_ERR_UNINIT);
-    ASSERT_EQ(client->FormatPhoneNumberToE164(str, str, str), TELEPHONY_ERR_UNINIT);
-    ASSERT_EQ(client->SetMuted(false), TELEPHONY_ERR_UNINIT);
-    ASSERT_EQ(client->MuteRinger(), TELEPHONY_ERR_UNINIT);
-    AudioDevice audioDevice;
-    ASSERT_EQ(client->SetAudioDevice(audioDevice), TELEPHONY_ERR_UNINIT);
-    ASSERT_EQ(client->ControlCamera(g_newCallId, str), TELEPHONY_ERR_UNINIT);
-    std::string surfaceId = "";
-    ASSERT_EQ(client->SetPreviewWindow(g_newCallId, surfaceId), TELEPHONY_ERR_UNINIT);
-    ASSERT_EQ(client->SetDisplayWindow(g_newCallId, surfaceId), TELEPHONY_ERR_UNINIT);
-    float zoomRatio = 1.0;
-    ASSERT_EQ(client->SetCameraZoom(zoomRatio), TELEPHONY_ERR_UNINIT);
-    ASSERT_EQ(client->SetPausePicture(g_newCallId, str), TELEPHONY_ERR_UNINIT);
-    ASSERT_EQ(client->SetDeviceDirection(g_newCallId, value), TELEPHONY_ERR_UNINIT);
-    ASSERT_EQ(client->GetImsConfig(SIM1_SLOTID, ITEM_VIDEO_QUALITY), TELEPHONY_ERR_UNINIT);
-    ASSERT_EQ(client->SetImsConfig(SIM1_SLOTID, ITEM_VIDEO_QUALITY, str), TELEPHONY_ERR_UNINIT);
-    ASSERT_EQ(client->GetImsFeatureValue(SIM1_SLOTID, FeatureType::TYPE_SS_OVER_UT), TELEPHONY_ERR_UNINIT);
-    ASSERT_EQ(client->SetImsFeatureValue(SIM1_SLOTID, FeatureType::TYPE_SS_OVER_UT, value), TELEPHONY_ERR_UNINIT);
-    ASSERT_EQ(client->UpdateImsCallMode(SIM1_SLOTID, CALL_MODE_SEND_ONLY), TELEPHONY_ERR_UNINIT);
-    ASSERT_EQ(client->EnableImsSwitch(SIM1_SLOTID), TELEPHONY_ERR_UNINIT);
-    ASSERT_EQ(client->DisableImsSwitch(SIM1_SLOTID), TELEPHONY_ERR_UNINIT);
-    ASSERT_EQ(client->IsImsSwitchEnabled(SIM1_SLOTID, boolValue), TELEPHONY_ERR_UNINIT);
-    ASSERT_EQ(client->SetVoNRState(SIM1_SLOTID, value), TELEPHONY_ERR_UNINIT);
-    ASSERT_EQ(client->GetVoNRState(SIM1_SLOTID, value), TELEPHONY_ERR_UNINIT);
-    ASSERT_EQ(client->StartRtt(g_newCallId, str), TELEPHONY_ERR_UNINIT);
-    ASSERT_EQ(client->StopRtt(g_newCallId), TELEPHONY_ERR_UNINIT);
-    std::vector<std::u16string> numberList;
-    ASSERT_EQ(client->JoinConference(g_newCallId, numberList), TELEPHONY_ERR_UNINIT);
-    std::vector<OttCallDetailsInfo> ottVec;
-    ASSERT_EQ(client->ReportOttCallDetailsInfo(ottVec), TELEPHONY_ERR_UNINIT);
-    OttCallEventInfo eventInfo;
-    ASSERT_EQ(client->ReportOttCallEventInfo(eventInfo), TELEPHONY_ERR_UNINIT);
-    ASSERT_EQ(client->CloseUnFinishedUssd(SIM1_SLOTID), TELEPHONY_ERR_UNINIT);
-    ASSERT_EQ(client->ObserverOnCallDetailsChange(), TELEPHONY_ERR_UNINIT);
-    ASSERT_EQ(client->InputDialerSpecialCode(PHONE_NUMBER), TELEPHONY_ERR_UNINIT);
-    ASSERT_EQ(client->RemoveMissedIncomingCallNotification(), TELEPHONY_ERR_UNINIT);
-    ASSERT_EQ(client->SetVoIPCallState(value), TELEPHONY_ERR_UNINIT);
-    ASSERT_EQ(client->GetVoIPCallState(value), TELEPHONY_ERR_UNINIT);
-    ASSERT_EQ(client->ReportAudioDeviceInfo(), TELEPHONY_ERR_UNINIT);
-    ASSERT_EQ(client->RequestCameraCapabilities(g_newCallId), TELEPHONY_ERR_UNINIT);
-}
-
-/**
- * @tc.number   Telephony_BluetoothCallClient_001
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
-HWTEST_F(ClientErrorBranchTest, Telephony_BluetoothCallClient_001, Function | MediumTest | Level3)
-{
-    std::shared_ptr<BluetoothCallClient> bluetoothCallClient = std::make_shared<BluetoothCallClient>();
-    bluetoothCallClient->UnInit();
-    ASSERT_NE(bluetoothCallClient->RegisterCallBack(nullptr), TELEPHONY_SUCCESS);
-    ASSERT_NE(bluetoothCallClient->UnRegisterCallBack(), TELEPHONY_SUCCESS);
-    std::u16string value = u"";
-    AppExecFwk::PacMap extras;
-    bool enabled;
-    bluetoothCallClient->IsNewCallAllowed(enabled);
-    bluetoothCallClient->IsInEmergencyCall(enabled);
-    bluetoothCallClient->SetMuted(false);
-    bluetoothCallClient->MuteRinger();
-    bluetoothCallClient->SetAudioDevice(AudioDeviceType::DEVICE_BLUETOOTH_SCO, "test");
-    bluetoothCallClient->GetCurrentCallList(-1).size();
-    ASSERT_NE(bluetoothCallClient->DialCall(value, extras), TELEPHONY_SUCCESS);
-    ASSERT_NE(bluetoothCallClient->AnswerCall(), TELEPHONY_SUCCESS);
-    ASSERT_NE(bluetoothCallClient->RejectCall(), TELEPHONY_SUCCESS);
-    ASSERT_NE(bluetoothCallClient->HangUpCall(), TELEPHONY_SUCCESS);
-    ASSERT_GE(bluetoothCallClient->GetCallState(), TELEPHONY_SUCCESS);
-    ASSERT_NE(bluetoothCallClient->HoldCall(), TELEPHONY_SUCCESS);
-    ASSERT_NE(bluetoothCallClient->UnHoldCall(), TELEPHONY_SUCCESS);
-    ASSERT_NE(bluetoothCallClient->SwitchCall(), TELEPHONY_SUCCESS);
-    ASSERT_NE(bluetoothCallClient->CombineConference(), TELEPHONY_SUCCESS);
-    ASSERT_NE(bluetoothCallClient->SeparateConference(), TELEPHONY_SUCCESS);
-    ASSERT_NE(bluetoothCallClient->KickOutFromConference(), TELEPHONY_SUCCESS);
-    ASSERT_NE(bluetoothCallClient->StartDtmf('a'), TELEPHONY_SUCCESS);
-    ASSERT_NE(bluetoothCallClient->StopDtmf(), TELEPHONY_SUCCESS);
-    ASSERT_NE(bluetoothCallClient->IsRinging(enabled), TELEPHONY_SUCCESS);
-}
-
-/********************************************* Test DialCall()***********************************************/
-/**
- * @tc.number   Telephony_CallManager_DialCall_0100
- * @tc.name     make a normal phone call with card1, TYPE_VOICE
- * @tc.desc     Function test
- * @tc.require: I5P2WO
- */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_0100, Function | MediumTest | Level1)
+HWTEST_F(CallManagerGtest, Telephony_CallManager_RejectCall_0100, Function | MediumTest | Level2)
 {
     AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
-    }
-    if (!CanDialCall(SIM1_SLOTID, SIM2_SLOTID)) {
-        return;
-    }
-    EXPECT_EQ(CallManagerGtest::IsServiceConnected(), true);
-    std::string phoneNumber = "11111111111";
-    if (HasSimCard(SIM1_SLOTID)) {
-        InitDialInfo(
-            SIM1_SLOTID, (int32_t)VideoStateType::TYPE_VOICE, DIAL_SCENE_TEST, (int32_t)DialType::DIAL_CARRIER_TYPE);
-        int32_t ret = CallManagerGtest::clientPtr_->DialCall(Str8ToStr16(phoneNumber), dialInfo_);
-        EXPECT_EQ(ret, RETURN_VALUE_IS_ZERO);
-        sleep(WAIT_TIME);
-        if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
-            HangUpCall();
-        }
-    }
-
-    if (HasSimCard(SIM2_SLOTID)) {
-        InitDialInfo(
-            SIM2_SLOTID, (int32_t)VideoStateType::TYPE_VOICE, DIAL_SCENE_TEST, (int32_t)DialType::DIAL_CARRIER_TYPE);
-        int32_t ret = CallManagerGtest::clientPtr_->DialCall(Str8ToStr16(phoneNumber), dialInfo_);
-        EXPECT_EQ(ret, RETURN_VALUE_IS_ZERO);
-        sleep(WAIT_TIME);
-        if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
-            HangUpCall();
-        }
-    }
-}
-
-/**
- * @tc.number   Telephony_CallManager_DialCall_0200
- * @tc.name     make a normal phone call with null telephone numbers,
- *              wait for the correct status of the callback to execute correctly
- * @tc.desc     Function test
- * @tc.require: I5P2WO
- */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_0200, Function | MediumTest | Level1)
-{
-    AccessToken token;
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
-    if (!CanDialCall(SIM1_SLOTID, SIM2_SLOTID)) {
-        return;
-    }
-    EXPECT_EQ(CallManagerGtest::IsServiceConnected(), true);
-    if (HasSimCard(SIM1_SLOTID)) {
-        InitDialInfo(
-            SIM1_SLOTID, (int32_t)VideoStateType::TYPE_VOICE, DIAL_SCENE_TEST, (int32_t)DialType::DIAL_CARRIER_TYPE);
-        int32_t ret = CallManagerGtest::clientPtr_->DialCall(Str8ToStr16(""), dialInfo_);
-        EXPECT_NE(ret, RETURN_VALUE_IS_ZERO);
-    }
-    if (HasSimCard(SIM2_SLOTID)) {
-        InitDialInfo(
-            SIM2_SLOTID, (int32_t)VideoStateType::TYPE_VOICE, DIAL_SCENE_TEST, (int32_t)DialType::DIAL_CARRIER_TYPE);
-        int32_t ret = CallManagerGtest::clientPtr_->DialCall(Str8ToStr16(""), dialInfo_);
-        EXPECT_NE(ret, RETURN_VALUE_IS_ZERO);
-    }
-}
-
-/**
- * @tc.number   Telephony_CallManager_DialCall_0300
- * @tc.name     make a normal phone call with telephone numbers is negative number
- * @tc.desc     Function test
- * @tc.require: I5P2WO
- */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_0300, Function | MediumTest | Level2)
-{
-    AccessToken token;
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
-    if (!CanDialCall(SIM1_SLOTID, SIM2_SLOTID)) {
-        return;
-    }
-    EXPECT_EQ(CallManagerGtest::IsServiceConnected(), true);
-    std::string phoneNumber = "-12354785268";
-    if (HasSimCard(SIM1_SLOTID)) {
-        InitDialInfo(
-            SIM1_SLOTID, (int32_t)VideoStateType::TYPE_VOICE, DIAL_SCENE_TEST, (int32_t)DialType::DIAL_CARRIER_TYPE);
-        int32_t ret = CallManagerGtest::clientPtr_->DialCall(Str8ToStr16(phoneNumber), dialInfo_);
-        EXPECT_EQ(ret, RETURN_VALUE_IS_ZERO);
-        sleep(WAIT_TIME);
-        if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
-            HangUpCall();
-        }
-    }
-    if (HasSimCard(SIM2_SLOTID)) {
-        InitDialInfo(
-            SIM2_SLOTID, (int32_t)VideoStateType::TYPE_VOICE, DIAL_SCENE_TEST, (int32_t)DialType::DIAL_CARRIER_TYPE);
-        int32_t ret = CallManagerGtest::clientPtr_->DialCall(Str8ToStr16(phoneNumber), dialInfo_);
-        EXPECT_EQ(ret, RETURN_VALUE_IS_ZERO);
-        sleep(WAIT_TIME);
-        if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
-            HangUpCall();
-        }
-    }
-}
-
-/**
- * @tc.number   Telephony_CallManager_DialCall_0400
- * @tc.name     make a normal phone call with telephone numbers is too long
- * @tc.desc     Function test
- * @tc.require: I5P2WO
- */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_0400, Function | MediumTest | Level2)
-{
-    AccessToken token;
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
-    if (!CanDialCall(SIM1_SLOTID, SIM2_SLOTID)) {
-        return;
-    }
-    EXPECT_EQ(CallManagerGtest::IsServiceConnected(), true);
-    std::string phoneNumber = "19119080646435437102938190283912471651865810514786470168818468143768714648";
-    if (HasSimCard(SIM1_SLOTID)) {
-        InitDialInfo(
-            SIM1_SLOTID, (int32_t)VideoStateType::TYPE_VOICE, DIAL_SCENE_TEST, (int32_t)DialType::DIAL_CARRIER_TYPE);
-        int32_t ret = CallManagerGtest::clientPtr_->DialCall(Str8ToStr16(phoneNumber), dialInfo_);
-        EXPECT_EQ(ret, RETURN_VALUE_IS_ZERO);
-        sleep(WAIT_TIME);
-        if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
-            HangUpCall();
-        }
-    }
-
-    if (HasSimCard(SIM2_SLOTID)) {
-        InitDialInfo(
-            SIM2_SLOTID, (int32_t)VideoStateType::TYPE_VOICE, DIAL_SCENE_TEST, (int32_t)DialType::DIAL_CARRIER_TYPE);
-        int32_t ret = CallManagerGtest::clientPtr_->DialCall(Str8ToStr16(phoneNumber), dialInfo_);
-        EXPECT_EQ(ret, RETURN_VALUE_IS_ZERO);
-        sleep(WAIT_TIME);
-        if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
-            HangUpCall();
-        }
-    }
-}
-
-/**
- * @tc.number   Telephony_CallManager_DialCall_0500
- * @tc.name     If an invalid number is dialed, the DialCall() interface succeeds, but callId is not generated
- * @tc.desc     Function test
- * @tc.require: I5P2WO
- */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_0500, Function | MediumTest | Level3)
-{
-    AccessToken token;
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
-    if (!CanDialCall(SIM1_SLOTID, SIM2_SLOTID)) {
-        return;
-    }
-    EXPECT_EQ(CallManagerGtest::IsServiceConnected(), true);
-    if (HasSimCard(SIM1_SLOTID)) {
-        InitDialInfo(
-            SIM1_SLOTID, (int32_t)VideoStateType::TYPE_VOICE, DIAL_SCENE_TEST, (int32_t)DialType::DIAL_CARRIER_TYPE);
-        int32_t ret = CallManagerGtest::clientPtr_->DialCall(Str8ToStr16("19!@#$%^&*:"), dialInfo_);
-        EXPECT_EQ(ret, RETURN_VALUE_IS_ZERO);
-        sleep(WAIT_TIME);
-        if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
-            HangUpCall();
-        }
-    }
-    if (HasSimCard(SIM2_SLOTID)) {
-        InitDialInfo(
-            SIM2_SLOTID, (int32_t)VideoStateType::TYPE_VOICE, DIAL_SCENE_TEST, (int32_t)DialType::DIAL_CARRIER_TYPE);
-        int32_t ret = CallManagerGtest::clientPtr_->DialCall(Str8ToStr16("19!@#$%^&*:"), dialInfo_);
-        EXPECT_EQ(ret, RETURN_VALUE_IS_ZERO);
-        sleep(WAIT_TIME);
-        if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
-            HangUpCall();
-        }
-    }
-}
-
-/**
- * @tc.number   Telephony_CallManager_DialCall_1000 to do ...
- * @tc.name     make a normal phone call with card1, TYPE_VOICE, import phonynumber 10086
- * @tc.desc     Function test
- */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_1000, Function | MediumTest | Level0)
-{
-    AccessToken token;
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
-    if (!CanDialCall(SIM1_SLOTID, SIM2_SLOTID)) {
-        return;
-    }
-    EXPECT_EQ(CallManagerGtest::IsServiceConnected(), true);
-    if (HasSimCard(SIM1_SLOTID)) {
-        InitDialInfo(
-            SIM1_SLOTID, (int32_t)VideoStateType::TYPE_VOICE, DIAL_SCENE_TEST, (int32_t)DialType::DIAL_CARRIER_TYPE);
-        int32_t ret = CallManagerGtest::clientPtr_->DialCall(Str8ToStr16("10086"), dialInfo_);
-        EXPECT_EQ(ret, RETURN_VALUE_IS_ZERO);
-        sleep(WAIT_TIME);
-        if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
-            HangUpCall();
-        }
-    }
-    if (HasSimCard(SIM2_SLOTID)) {
-        InitDialInfo(
-            SIM2_SLOTID, (int32_t)VideoStateType::TYPE_VOICE, DIAL_SCENE_TEST, (int32_t)DialType::DIAL_CARRIER_TYPE);
-        int32_t ret = CallManagerGtest::clientPtr_->DialCall(Str8ToStr16("10086"), dialInfo_);
-        EXPECT_EQ(ret, RETURN_VALUE_IS_ZERO);
-        sleep(WAIT_TIME);
-        if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
-            HangUpCall();
-        }
-    }
-}
-
-/**
- * @tc.number   Telephony_CallManager_DialCall_1100
- * @tc.name     make a normal phone call with card1, TYPE_VOICE, slot id was invalid
- * @tc.desc     Function test
- * @tc.require: I5P2WA
- */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_1100, Function | MediumTest | Level0)
-{
-    AccessToken token;
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
-    if (!CanDialCall(SIM1_SLOTID, SIM2_SLOTID)) {
-        return;
-    }
-    EXPECT_EQ(CallManagerGtest::IsServiceConnected(), true);
-    std::string phoneNumber = PHONE_NUMBER; // OPERATOR PHONY NUMBER
-    InitDialInfo(INVALID_SLOT_ID, (int32_t)VideoStateType::TYPE_VOICE, (int32_t)DialScene::CALL_NORMAL,
-        (int32_t)DialType::DIAL_CARRIER_TYPE);
-    int32_t ret = CallManagerGtest::clientPtr_->DialCall(Str8ToStr16(phoneNumber), dialInfo_);
-    EXPECT_EQ(ret, CALL_ERR_INVALID_SLOT_ID);
-}
-
-/**
- * @tc.number   Telephony_CallManager_DialCall_1200
- * @tc.name     make a normal phone call with card1, TYPE_VOICE, slot id out of count
- * @tc.desc     Function test
- * @tc.require: I5P2WA
- */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_1200, Function | MediumTest | Level0)
-{
-    AccessToken token;
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
-    if (!CanDialCall(SIM1_SLOTID, SIM2_SLOTID)) {
-        return;
-    }
-    EXPECT_EQ(CallManagerGtest::IsServiceConnected(), true);
-    std::string phoneNumber = PHONE_NUMBER; // OPERATOR PHONY NUMBER
-    int32_t slotId = SIM_SLOT_COUNT; // out of the count
-    InitDialInfo(slotId, (int32_t)VideoStateType::TYPE_VOICE, (int32_t)DialScene::CALL_NORMAL,
-        (int32_t)DialType::DIAL_CARRIER_TYPE);
-    int32_t ret = CallManagerGtest::clientPtr_->DialCall(Str8ToStr16(phoneNumber), dialInfo_);
-    EXPECT_EQ(ret, CALL_ERR_INVALID_SLOT_ID);
-}
-
-/**
- * @tc.number   Telephony_CallManager_DialCall_1300
- * @tc.name     make a normal phone call with card1, TYPE_VOICE, video state was invalid
- * @tc.desc     Function test
- * @tc.require: I5P2WA
- */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_1300, Function | MediumTest | Level0)
-{
-    AccessToken token;
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
-    if (!CanDialCall(SIM1_SLOTID, SIM2_SLOTID)) {
-        return;
-    }
-    EXPECT_EQ(CallManagerGtest::IsServiceConnected(), true);
-    std::string phoneNumber = PHONE_NUMBER; // OPERATOR PHONY NUMBER
-    if (HasSimCard(SIM1_SLOTID)) {
-        InitDialInfo(
-            SIM1_SLOTID, INVALID_VIDEO_STATE, (int32_t)DialScene::CALL_NORMAL, (int32_t)DialType::DIAL_CARRIER_TYPE);
-        int32_t ret = CallManagerGtest::clientPtr_->DialCall(Str8ToStr16(phoneNumber), dialInfo_);
-        EXPECT_EQ(ret, CALL_ERR_INVALID_VIDEO_STATE);
-    }
-    if (HasSimCard(SIM2_SLOTID)) {
-        InitDialInfo(
-            SIM2_SLOTID, INVALID_VIDEO_STATE, (int32_t)DialScene::CALL_NORMAL, (int32_t)DialType::DIAL_CARRIER_TYPE);
-        int32_t ret = CallManagerGtest::clientPtr_->DialCall(Str8ToStr16(phoneNumber), dialInfo_);
-        EXPECT_EQ(ret, CALL_ERR_INVALID_VIDEO_STATE);
-    }
-}
-
-/**
- * @tc.number   Telephony_CallManager_DialCall_1400
- * @tc.name     make a normal phone call without permission
- * @tc.desc     Function test
- */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_1400, Function | MediumTest | Level1)
-{
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
-    if (!CanDialCall(SIM1_SLOTID, SIM2_SLOTID)) {
-        return;
-    }
-    EXPECT_EQ(CallManagerGtest::IsServiceConnected(), true);
-    if (HasSimCard(SIM1_SLOTID)) {
-        InitDialInfo(
-            SIM1_SLOTID, (int32_t)VideoStateType::TYPE_VOICE, DIAL_SCENE_TEST, (int32_t)DialType::DIAL_CARRIER_TYPE);
-        int32_t ret = CallManagerGtest::clientPtr_->DialCall(Str8ToStr16("22222222222"), dialInfo_);
-        EXPECT_NE(ret, RETURN_VALUE_IS_ZERO);
-    }
-
-    if (HasSimCard(SIM2_SLOTID)) {
-        InitDialInfo(
-            SIM2_SLOTID, (int32_t)VideoStateType::TYPE_VOICE, DIAL_SCENE_TEST, (int32_t)DialType::DIAL_CARRIER_TYPE);
-        int32_t ret = CallManagerGtest::clientPtr_->DialCall(Str8ToStr16("22222222222"), dialInfo_);
-        EXPECT_NE(ret, RETURN_VALUE_IS_ZERO);
-    }
-}
-
-/**
- * @tc.number   Telephony_CallManager_DialCall_1500
- * @tc.name     make a normal phone call with error dial type
- * @tc.desc     Function test
- */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_1500, Function | MediumTest | Level1)
-{
-    AccessToken token;
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
-    if (!CanDialCall(SIM1_SLOTID, SIM2_SLOTID)) {
-        return;
-    }
-    EXPECT_EQ(CallManagerGtest::IsServiceConnected(), true);
-    std::string phoneNumber = "33333333333";
-    if (HasSimCard(SIM1_SLOTID)) {
-        InitDialInfo(SIM1_SLOTID, (int32_t)VideoStateType::TYPE_VOICE, DIAL_SCENE_TEST, INVALID_DIAL_TYPE);
-        int32_t ret = CallManagerGtest::clientPtr_->DialCall(Str8ToStr16(phoneNumber), dialInfo_);
-        EXPECT_EQ(ret, CALL_ERR_UNKNOW_DIAL_TYPE);
-    }
-
-    if (HasSimCard(SIM2_SLOTID)) {
-        InitDialInfo(SIM2_SLOTID, (int32_t)VideoStateType::TYPE_VOICE, DIAL_SCENE_TEST, INVALID_DIAL_TYPE);
-        int32_t ret = CallManagerGtest::clientPtr_->DialCall(Str8ToStr16(phoneNumber), dialInfo_);
-        EXPECT_EQ(ret, CALL_ERR_UNKNOW_DIAL_TYPE);
-    }
-}
-
-/**
- * @tc.number   Telephony_CallManager_DialCall_1600
- * @tc.name     make a normal phone call with card1, TYPE_VOICE, video state was invalid
- * @tc.desc     Function test
- */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_1600, Function | MediumTest | Level0)
-{
-    AccessToken token;
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
-    if (!CanDialCall(SIM1_SLOTID, SIM2_SLOTID)) {
-        return;
-    }
-    EXPECT_EQ(CallManagerGtest::IsServiceConnected(), true);
-    std::string phoneNumber = PHONE_NUMBER; // OPERATOR PHONY NUMBER
-    ASSERT_TRUE(blueToothClientPtr_ != nullptr);
-    if (HasSimCard(SIM1_SLOTID)) {
-        InitDialInfo(
-            SIM1_SLOTID, INVALID_VIDEO_STATE, (int32_t)DialScene::CALL_NORMAL, (int32_t)DialType::DIAL_CARRIER_TYPE);
-        int32_t ret = CallManagerGtest::blueToothClientPtr_->DialCall(Str8ToStr16(phoneNumber), dialInfo_);
-        EXPECT_EQ(ret, CALL_ERR_INVALID_VIDEO_STATE);
-    }
-    if (HasSimCard(SIM2_SLOTID)) {
-        InitDialInfo(
-            SIM2_SLOTID, INVALID_VIDEO_STATE, (int32_t)DialScene::CALL_NORMAL, (int32_t)DialType::DIAL_CARRIER_TYPE);
-        int32_t ret = CallManagerGtest::blueToothClientPtr_->DialCall(Str8ToStr16(phoneNumber), dialInfo_);
-        EXPECT_EQ(ret, CALL_ERR_INVALID_VIDEO_STATE);
-    }
-}
-
-/**
- * @tc.number   Telephony_CallManager_DialCall_1700
- * @tc.name     make a normal phone call with telephone numbers is too long
- * @tc.desc     Function test
- */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_1700, Function | MediumTest | Level2)
-{
-    AccessToken token;
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
-    if (!CanDialCall(SIM1_SLOTID, SIM2_SLOTID)) {
-        return;
-    }
-    EXPECT_EQ(CallManagerGtest::IsServiceConnected(), true);
-    ASSERT_TRUE(blueToothClientPtr_ != nullptr);
-    std::string phoneNumber =
-        "19119080646435437102938190283912471651865851478647016881846814376871464810514786470168818468143768714648";
-    if (HasSimCard(SIM1_SLOTID)) {
-        InitDialInfo(SIM1_SLOTID, (int32_t)VideoStateType::TYPE_VOICE, (int32_t)DialScene::CALL_NORMAL,
-            (int32_t)DialType::DIAL_CARRIER_TYPE);
-        int32_t ret = CallManagerGtest::blueToothClientPtr_->DialCall(Str8ToStr16(phoneNumber), dialInfo_);
-        EXPECT_EQ(ret, RETURN_VALUE_IS_ZERO);
-        sleep(WAIT_TIME);
-        if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
-            HangUpCall();
-        }
-    }
-
-    if (HasSimCard(SIM2_SLOTID)) {
-        InitDialInfo(SIM2_SLOTID, (int32_t)VideoStateType::TYPE_VOICE, (int32_t)DialScene::CALL_NORMAL,
-            (int32_t)DialType::DIAL_CARRIER_TYPE);
-        int32_t ret = CallManagerGtest::blueToothClientPtr_->DialCall(Str8ToStr16(phoneNumber), dialInfo_);
-        EXPECT_EQ(ret, RETURN_VALUE_IS_ZERO);
-        sleep(WAIT_TIME);
-        if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
-            HangUpCall();
-        }
-    }
-}
-
-/**
- * @tc.number   Telephony_CallManager_DialCall_1800
- * @tc.name     make a normal phone call with null telephone numbers,
- *              wait for the correct status of the callback to execute correctly
- * @tc.desc     Function test
- */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_1800, Function | MediumTest | Level1)
-{
-    AccessToken token;
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
-    if (!CanDialCall(SIM1_SLOTID, SIM2_SLOTID)) {
-        return;
-    }
-    EXPECT_EQ(CallManagerGtest::IsServiceConnected(), true);
-    std::string phoneNumber = "";
-    ASSERT_TRUE(blueToothClientPtr_ != nullptr);
-    if (HasSimCard(SIM1_SLOTID)) {
-        InitDialInfo(
-            SIM1_SLOTID, (int32_t)VideoStateType::TYPE_VOICE, DIAL_SCENE_TEST, (int32_t)DialType::DIAL_CARRIER_TYPE);
-        int32_t ret = CallManagerGtest::blueToothClientPtr_->DialCall(Str8ToStr16(phoneNumber), dialInfo_);
-        EXPECT_NE(ret, TELEPHONY_ERR_SUCCESS);
-    }
-    if (HasSimCard(SIM2_SLOTID)) {
-        InitDialInfo(
-            SIM2_SLOTID, (int32_t)VideoStateType::TYPE_VOICE, DIAL_SCENE_TEST, (int32_t)DialType::DIAL_CARRIER_TYPE);
-        int32_t ret = CallManagerGtest::blueToothClientPtr_->DialCall(Str8ToStr16(phoneNumber), dialInfo_);
-        EXPECT_NE(ret, TELEPHONY_ERR_SUCCESS);
-    }
-}
-
-/**
- * @tc.number   Telephony_CallManager_DialCall_1900
- * @tc.name     make a normal phone call with card1, TYPE_VOICE, slot id out of count
- * @tc.desc     Function test
- */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_1900, Function | MediumTest | Level0)
-{
-    AccessToken token;
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
-    if (!CanDialCall(SIM1_SLOTID, SIM2_SLOTID)) {
-        return;
-    }
-    ASSERT_TRUE(blueToothClientPtr_ != nullptr);
-    EXPECT_EQ(CallManagerGtest::IsServiceConnected(), true);
-    std::string phoneNumber = PHONE_NUMBER; // OPERATOR PHONY NUMBER
-    int32_t slotId = SIM_SLOT_COUNT; // out of the count
-    InitDialInfo(slotId, (int32_t)VideoStateType::TYPE_VOICE, (int32_t)DialScene::CALL_NORMAL,
-        (int32_t)DialType::DIAL_CARRIER_TYPE);
-    int32_t ret = CallManagerGtest::blueToothClientPtr_->DialCall(Str8ToStr16(phoneNumber), dialInfo_);
-    EXPECT_EQ(ret, CALL_ERR_INVALID_SLOT_ID);
-}
-
-/**
- * @tc.number   Telephony_CallManager_DialCall_2000
- * @tc.name     make a normal phone call with card1, TYPE_VOICE
- * @tc.desc     Function test
- * @tc.require: I5P2WO
- */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_2000, Function | MediumTest | Level1)
-{
-    AccessToken token;
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
-    if (!CanDialCall(SIM1_SLOTID, SIM2_SLOTID)) {
-        return;
-    }
-    EXPECT_EQ(CallManagerGtest::IsServiceConnected(), true);
-    if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
-        HangUpCall();
-    }
-    std::string phoneNumber = "10086";
-    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_200_MS, SLEEP_30000_MS);
-    if (HasSimCard(SIM1_SLOTID)) {
-        InitDialInfo(
-            SIM1_SLOTID, (int32_t)VideoStateType::TYPE_VOICE, DIAL_SCENE_TEST, (int32_t)DialType::DIAL_CARRIER_TYPE);
-        EXPECT_EQ(CallManagerGtest::clientPtr_->DialCall(Str8ToStr16(phoneNumber), dialInfo_), RETURN_VALUE_IS_ZERO);
-        sleep(WAIT_TIME);
-        if (CallInfoManager::HasActiveStatus()) {
-            EXPECT_EQ(CallManagerGtest::clientPtr_->HoldCall(g_newCallId), RETURN_VALUE_IS_ZERO);
-            sleep(WAIT_TIME);
-            EXPECT_EQ(CallManagerGtest::clientPtr_->UnHoldCall(g_newCallId), RETURN_VALUE_IS_ZERO);
-        }
-        sleep(WAIT_TIME);
-        if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
-            HangUpCall();
-        }
-    }
-
-    if (HasSimCard(SIM2_SLOTID)) {
-        InitDialInfo(
-            SIM2_SLOTID, (int32_t)VideoStateType::TYPE_VOICE, DIAL_SCENE_TEST, (int32_t)DialType::DIAL_CARRIER_TYPE);
-        EXPECT_EQ(CallManagerGtest::clientPtr_->DialCall(Str8ToStr16(phoneNumber), dialInfo_), RETURN_VALUE_IS_ZERO);
-        if (CallInfoManager::HasActiveStatus()) {
-            EXPECT_EQ(CallManagerGtest::clientPtr_->HoldCall(g_newCallId), RETURN_VALUE_IS_ZERO);
-            sleep(WAIT_TIME);
-            EXPECT_EQ(CallManagerGtest::clientPtr_->UnHoldCall(g_newCallId), RETURN_VALUE_IS_ZERO);
-        }
-        sleep(WAIT_TIME);
-        if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
-            HangUpCall();
-        }
-    }
-}
-
-/**
- * @tc.number   Telephony_CallManager_DialCall_2100
- * @tc.name     make post dial call with pause
- * @tc.desc     Function test
- * @tc.require: I5P2WO
- */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_2100, Function | MediumTest | Level1)
-{
-    AccessToken token;
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
-    if (!CanDialCall(SIM1_SLOTID, SIM2_SLOTID)) {
-        return;
-    }
-    EXPECT_EQ(CallManagerGtest::IsServiceConnected(), true);
-    if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
-        HangUpCall();
-    }
-    std::string phoneNumber = "10086,123";
-    if (HasSimCard(SIM1_SLOTID)) {
-        CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_200_MS, SLEEP_30000_MS);
-        InitDialInfo(
-            SIM1_SLOTID, (int32_t)VideoStateType::TYPE_VOICE, DIAL_SCENE_TEST, (int32_t)DialType::DIAL_CARRIER_TYPE);
-        EXPECT_EQ(CallManagerGtest::clientPtr_->DialCall(Str8ToStr16(phoneNumber), dialInfo_), RETURN_VALUE_IS_ZERO);
-        sleep(1);
-        if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
-            HangUpCall();
-        }
-    }
-
-    if (HasSimCard(SIM2_SLOTID)) {
-        CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_200_MS, SLEEP_30000_MS);
-        InitDialInfo(
-            SIM2_SLOTID, (int32_t)VideoStateType::TYPE_VOICE, DIAL_SCENE_TEST, (int32_t)DialType::DIAL_CARRIER_TYPE);
-        EXPECT_EQ(CallManagerGtest::clientPtr_->DialCall(Str8ToStr16(phoneNumber), dialInfo_), RETURN_VALUE_IS_ZERO);
-        sleep(1);
-        if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
-            HangUpCall();
-        }
-    }
-}
-
-/********************************************* Test AnswerCall() ***********************************************/
-/**
- * @tc.number   Telephony_CallManager_AnswerCall_0100
- * @tc.name     test AnswerCall with the callId does not exist
- * @tc.desc     Function test
- * @tc.require: I5P2WA
- */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_AnswerCall_0100, Function | MediumTest | Level1)
-{
-    AccessToken token;
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
-    if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
-        HangUpCall();
     }
     CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_200_MS, SLEEP_30000_MS);
     int32_t callId = INVALID_NEGATIVE_ID;
-    int32_t videoState = (int32_t)VideoStateType::TYPE_VOICE;
-    EXPECT_NE(CallManagerGtest::clientPtr_->AnswerCall(callId, videoState), RETURN_VALUE_IS_ZERO);
+    std::u16string textMessage = Str8ToStr16("this is a test message");
+    EXPECT_NE(CallManagerGtest::clientPtr_->RejectCall(callId, true, textMessage), RETURN_VALUE_IS_ZERO);
 }
 
 /**
- * @tc.number   Telephony_CallManager_AnswerCall_0200
- * @tc.name     test AnswerCall with the videoState does not exist
- * @tc.desc     Function test
- * @tc.require: I5P2WA
- */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_AnswerCall_0200, Function | MediumTest | Level2)
-{
-    AccessToken token;
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
-    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_200_MS, SLEEP_30000_MS);
-    int32_t callId = INVALID_POSITIVE_ID;
-    int32_t videoState = INVALID_NEGATIVE_ID;
-    EXPECT_NE(CallManagerGtest::clientPtr_->AnswerCall(callId, videoState), RETURN_VALUE_IS_ZERO);
-}
-
-/**
- * @tc.number   Telephony_CallManager_AnswerCall_0300
- * @tc.name     test AnswerCall without permission
+ * @tc.number   Telephony_CallManager_RejectCall_0200
+ * @tc.name     test RejectCall without permission
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_AnswerCall_0300, Function | MediumTest | Level2)
+HWTEST_F(CallManagerGtest, Telephony_CallManager_RejectCall_0200, Function | MediumTest | Level2)
 {
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
     }
     CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_200_MS, SLEEP_30000_MS);
-    int32_t callId = INVALID_POSITIVE_ID;
-    int32_t videoState = INVALID_NEGATIVE_ID;
-    EXPECT_NE(CallManagerGtest::clientPtr_->AnswerCall(callId, videoState), RETURN_VALUE_IS_ZERO);
+    int32_t callId = INVALID_NEGATIVE_ID;
+    std::u16string textMessage = Str8ToStr16("this is a test message");
+    EXPECT_NE(CallManagerGtest::clientPtr_->RejectCall(callId, true, textMessage), RETURN_VALUE_IS_ZERO);
 }
 
 /**
- * @tc.number   Telephony_CallManager_AnswerCall_0400
- * @tc.name     test AnswerCall with the callId does not exist
+ * @tc.number   Telephony_CallManager_RejectCall_0300
+ * @tc.name     test RejectCall with the callId does not exist
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_AnswerCall_0400, Function | MediumTest | Level2)
+HWTEST_F(CallManagerGtest, Telephony_CallManager_RejectCall_0300, Function | MediumTest | Level2)
 {
     AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
@@ -967,7 +213,757 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_AnswerCall_0400, Function | Med
     }
     CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_200_MS, SLEEP_30000_MS);
     ASSERT_TRUE(blueToothClientPtr_ != nullptr);
-    EXPECT_NE(CallManagerGtest::blueToothClientPtr_->AnswerCall(), RETURN_VALUE_IS_ZERO);
+    EXPECT_NE(CallManagerGtest::blueToothClientPtr_->RejectCall(), RETURN_VALUE_IS_ZERO);
+}
+
+/******************************************* Test HangUpCall() *********************************************/
+/**
+ * @tc.number   Telephony_CallManager_HangUpCall_0100
+ * @tc.name     test disconnect call with wrong callId
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_HangUpCall_0100, Function | MediumTest | Level2)
+{
+    AccessToken token;
+    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_200_MS, SLEEP_30000_MS);
+    int32_t callId = INVALID_NEGATIVE_ID;
+    EXPECT_NE(CallManagerGtest::clientPtr_->HangUpCall(callId), RETURN_VALUE_IS_ZERO);
+}
+
+/**
+ * @tc.number   Telephony_CallManager_HangUpCall_0200  to do ...
+ * @tc.name     test ring disconnect call after DialCall,
+ *              wait for the correct status of the callback to execute correctly
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_HangUpCall_0200, Function | MediumTest | Level2)
+{
+    AccessToken token;
+    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_200_MS, SLEEP_30000_MS);
+    InitDialInfo(
+        0, (int32_t)VideoStateType::TYPE_VOICE, (int32_t)DialScene::CALL_NORMAL, (int32_t)DialType::DIAL_CARRIER_TYPE);
+    int32_t callId = INVALID_NEGATIVE_ID;
+    EXPECT_NE(CallManagerGtest::clientPtr_->HangUpCall(callId), RETURN_VALUE_IS_ZERO);
+}
+
+/**
+ * @tc.number   Telephony_CallManager_HangUpCall_0300  to do ...
+ * @tc.name     test ring disconnect call after DialCall without permission
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_HangUpCall_0300, Function | MediumTest | Level2)
+{
+    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_200_MS, SLEEP_30000_MS);
+    InitDialInfo(
+        0, (int32_t)VideoStateType::TYPE_VOICE, (int32_t)DialScene::CALL_NORMAL, (int32_t)DialType::DIAL_CARRIER_TYPE);
+    int32_t callId = INVALID_NEGATIVE_ID;
+    EXPECT_NE(CallManagerGtest::clientPtr_->HangUpCall(callId), RETURN_VALUE_IS_ZERO);
+}
+
+/**
+ * @tc.number   Telephony_CallManager_HangUpCall_0400  to do ...
+ * @tc.name     test ring disconnect call after DialCall
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_HangUpCall_0400, Function | MediumTest | Level2)
+{
+    AccessToken token;
+    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_200_MS, SLEEP_30000_MS);
+    ASSERT_TRUE(blueToothClientPtr_ != nullptr);
+    EXPECT_NE(CallManagerGtest::blueToothClientPtr_->HangUpCall(), RETURN_VALUE_IS_ZERO);
+}
+
+/******************************************* Test GetCallState() *********************************************/
+/**
+ * @tc.number   Telephony_CallManager_GetCallState_0100
+ * @tc.name     test GetCallState() without call
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_GetCallState_0100, Function | MediumTest | Level1)
+{
+    AccessToken token;
+    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_200_MS, SLEEP_30000_MS);
+    EXPECT_EQ(CallManagerGtest::clientPtr_->GetCallState(), (int32_t)CallStateToApp::CALL_STATE_IDLE);
+}
+
+/**
+ * @tc.number   Telephony_CallManager_GetCallState_0200 to do ...
+ * @tc.name     test GetCallState() after call
+ *              wait for the correct status of the callback to execute correctly
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_GetCallState_0200, Function | MediumTest | Level1)
+{
+    AccessToken token;
+    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_200_MS, SLEEP_30000_MS);
+    InitDialInfo(
+        0, (int32_t)VideoStateType::TYPE_VOICE, (int32_t)DialScene::CALL_NORMAL, (int32_t)DialType::DIAL_CARRIER_TYPE);
+    EXPECT_EQ(CallManagerGtest::clientPtr_->GetCallState(), (int32_t)CallStateToApp::CALL_STATE_IDLE);
+}
+
+/**
+ * @tc.number   Telephony_CallManager_GetCallState_0300
+ * @tc.name     test GetCallState()
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_GetCallState_0300, Function | MediumTest | Level1)
+{
+    AccessToken token;
+    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_200_MS, SLEEP_30000_MS);
+    ASSERT_TRUE(blueToothClientPtr_ != nullptr);
+    EXPECT_EQ(CallManagerGtest::blueToothClientPtr_->GetCallState(), TELEPHONY_SUCCESS);
+}
+
+/**************************** Test ReportAudioDeviceInfo() ****************************/
+/**
+ * @tc.number   Telephony_CallManager_ReportAudioDeviceInfo_0100
+ * @tc.name     test report audio device info
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_ReportAudioDeviceInfo_0100, Function | MediumTest | Level3)
+{
+    AccessToken token;
+    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+    std::string phoneNumber = "10086";
+    if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
+        HangUpCall();
+    }
+    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_200_MS, SLEEP_30000_MS);
+    EXPECT_EQ(CallManagerGtest::clientPtr_->DialCall(Str8ToStr16(phoneNumber), dialInfo_), RETURN_VALUE_IS_ZERO);
+    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_OFFHOOK, SLEEP_200_MS, SLEEP_30000_MS);
+    EXPECT_GE(CallManagerGtest::clientPtr_->ReportAudioDeviceInfo(), RETURN_VALUE_IS_ZERO);
+    sleep(1);
+    if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
+        HangUpCall();
+    }
+}
+
+/**
+ * @tc.number   Telephony_CallManager_ReportAudioDeviceInfo_0200
+ * @tc.name     test report audio device info without active call
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_ReportAudioDeviceInfo_0200, Function | MediumTest | Level3)
+{
+    AccessToken token;
+    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+    if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
+        HangUpCall();
+    }
+    EXPECT_GE(CallManagerGtest::clientPtr_->ReportAudioDeviceInfo(), RETURN_VALUE_IS_ZERO);
+}
+
+/**
+ * @tc.number   Telephony_CallManager_ReportAudioDeviceInfo_0300
+ * @tc.name     test report audio device info without permission
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_ReportAudioDeviceInfo_0300, Function | MediumTest | Level3)
+{
+    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+    EXPECT_NE(CallManagerGtest::clientPtr_->ReportAudioDeviceInfo(), RETURN_VALUE_IS_ZERO);
+}
+
+/******************************************* Test HoldCall() *********************************************/
+/**
+ * @tc.number   Telephony_CallManager_HoldCall_0100
+ * @tc.name     Hold calls for non-existent call ID
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_HoldCall_0100, Function | MediumTest | Level2)
+{
+    AccessToken token;
+    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_200_MS, SLEEP_30000_MS);
+    int32_t callId = INVALID_NEGATIVE_ID;
+    EXPECT_NE(CallManagerGtest::clientPtr_->HoldCall(callId), RETURN_VALUE_IS_ZERO);
+}
+
+/**
+ * @tc.number   Telephony_CallManager_HoldCall_0200 to do ...
+ * @tc.name     coming call test hold call, return non 0
+ *              wait for the correct status of the callback to execute correctly
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_HoldCall_0200, Function | MediumTest | Level2)
+{
+    AccessToken token;
+    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_200_MS, SLEEP_30000_MS);
+    InitDialInfo(
+        0, (int32_t)VideoStateType::TYPE_VOICE, (int32_t)DialScene::CALL_NORMAL, (int32_t)DialType::DIAL_CARRIER_TYPE);
+    int32_t callId = INVALID_NEGATIVE_ID;
+    EXPECT_NE(CallManagerGtest::clientPtr_->HoldCall(callId), RETURN_VALUE_IS_ZERO);
+}
+
+/**
+ * @tc.number   Telephony_CallManager_HoldCall_0300 to do ...
+ * @tc.name     coming call test hold call without permission
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_HoldCall_0300, Function | MediumTest | Level2)
+{
+    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_200_MS, SLEEP_30000_MS);
+    InitDialInfo(
+        0, (int32_t)VideoStateType::TYPE_VOICE, (int32_t)DialScene::CALL_NORMAL, (int32_t)DialType::DIAL_CARRIER_TYPE);
+    int32_t callId = INVALID_NEGATIVE_ID;
+    EXPECT_NE(CallManagerGtest::clientPtr_->HoldCall(callId), RETURN_VALUE_IS_ZERO);
+}
+
+/**
+ * @tc.number   Telephony_CallManager_HoldCall_0400
+ * @tc.name     Hold calls for non-existent call ID
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_HoldCall_0400, Function | MediumTest | Level2)
+{
+    AccessToken token;
+    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_200_MS, SLEEP_30000_MS);
+    ASSERT_TRUE(blueToothClientPtr_ != nullptr);
+    EXPECT_NE(CallManagerGtest::blueToothClientPtr_->HoldCall(), RETURN_VALUE_IS_ZERO);
+}
+
+/******************************************* Test UnHoldCall() *********************************************/
+/**
+ * @tc.number   Telephony_CallManager_UnHoldCall_0100
+ * @tc.name     Replies calls to a call ID that does not exist, return non 0
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_UnHoldCall_0100, Function | MediumTest | Level2)
+{
+    AccessToken token;
+    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_200_MS, SLEEP_30000_MS);
+    int32_t callId = INVALID_NEGATIVE_ID;
+    EXPECT_NE(CallManagerGtest::clientPtr_->UnHoldCall(callId), RETURN_VALUE_IS_ZERO);
+}
+
+/**
+ * @tc.number   Telephony_CallManager_UnHoldCall_0200 to do ...
+ * @tc.name     Passing in the suspended call ID, test UnHoldCall() return non 0
+ *              wait for the correct status of the callback to execute correctly
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_UnHoldCall_0200, Function | MediumTest | Level2)
+{
+    AccessToken token;
+    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_200_MS, SLEEP_30000_MS);
+    InitDialInfo(
+        0, (int32_t)VideoStateType::TYPE_VOICE, (int32_t)DialScene::CALL_NORMAL, (int32_t)DialType::DIAL_CARRIER_TYPE);
+    int32_t callId = INVALID_NEGATIVE_ID;
+    EXPECT_NE(CallManagerGtest::clientPtr_->UnHoldCall(callId), RETURN_VALUE_IS_ZERO);
+}
+
+/**
+ * @tc.number   Telephony_CallManager_UnHoldCall_0300
+ * @tc.name     Replies calls to a call ID that does not exist without permission
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_UnHoldCall_0300, Function | MediumTest | Level2)
+{
+    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_200_MS, SLEEP_30000_MS);
+    int32_t callId = INVALID_NEGATIVE_ID;
+    EXPECT_NE(CallManagerGtest::clientPtr_->UnHoldCall(callId), RETURN_VALUE_IS_ZERO);
+}
+
+/**
+ * @tc.number   Telephony_CallManager_UnHoldCall_0400
+ * @tc.name     Replies calls to a call ID that does not exist, return non 0
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_UnHoldCall_0400, Function | MediumTest | Level2)
+{
+    AccessToken token;
+    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_200_MS, SLEEP_30000_MS);
+    ASSERT_TRUE(blueToothClientPtr_ != nullptr);
+    EXPECT_NE(CallManagerGtest::blueToothClientPtr_->UnHoldCall(), RETURN_VALUE_IS_ZERO);
+}
+
+/******************************************* Test SwitchCall() *********************************************/
+/**
+ * @tc.number   Telephony_CallManager_SwitchCall_0100
+ * @tc.name     Test returns 0 after switching call
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_SwitchCall_0100, Function | MediumTest | Level2)
+{
+    AccessToken token;
+    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_200_MS, SLEEP_30000_MS);
+    int32_t callId = INVALID_NEGATIVE_ID;
+    EXPECT_NE(CallManagerGtest::clientPtr_->SwitchCall(callId), RETURN_VALUE_IS_ZERO);
+}
+
+/**
+ * @tc.number   Telephony_CallManager_SwitchCall_0200
+ * @tc.name     Test returns 0 after switching call without permission
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_SwitchCall_0200, Function | MediumTest | Level2)
+{
+    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_200_MS, SLEEP_30000_MS);
+    int32_t callId = INVALID_NEGATIVE_ID;
+    EXPECT_NE(CallManagerGtest::clientPtr_->SwitchCall(callId), RETURN_VALUE_IS_ZERO);
+}
+
+/**
+ * @tc.number   Telephony_CallManager_SwitchCall_0300
+ * @tc.name     Test returns 0 after switching call
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_SwitchCall_0300, Function | MediumTest | Level2)
+{
+    AccessToken token;
+    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_200_MS, SLEEP_30000_MS);
+    ASSERT_TRUE(blueToothClientPtr_ != nullptr);
+    EXPECT_NE(CallManagerGtest::blueToothClientPtr_->SwitchCall(), RETURN_VALUE_IS_ZERO);
+}
+
+/**
+ * @tc.number   Telephony_CallManager_SwitchCall_0400
+ * @tc.name     Test returns 0 after switching call, and DialCall(), return true
+ *              wait for the correct status of the callback to execute correctly
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_SwitchCall_0400, Function | MediumTest | Level2)
+{
+    AccessToken token;
+    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+
+    if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
+        HangUpCall();
+    }
+    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_200_MS, SLEEP_30000_MS);
+    std::string phoneNumber = "44444444444";
+    int32_t callId = INVALID_NEGATIVE_ID;
+    InitDialInfo(
+        0, (int32_t)VideoStateType::TYPE_VOICE, (int32_t)DialScene::CALL_NORMAL, (int32_t)DialType::DIAL_CARRIER_TYPE);
+    int32_t ret = CallManagerGtest::clientPtr_->DialCall(Str8ToStr16(phoneNumber), dialInfo_);
+    EXPECT_EQ(ret, RETURN_VALUE_IS_ZERO);
+    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_OFFHOOK, SLEEP_200_MS, SLEEP_30000_MS);
+    EXPECT_NE(CallManagerGtest::clientPtr_->SwitchCall(callId), RETURN_VALUE_IS_ZERO);
+    sleep(WAIT_TIME);
+    if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
+        HangUpCall();
+    }
+}
+
+/********************************************* Test HasCall() ***********************************************/
+/**
+ * @tc.number   Telephony_CallManager_HasCall_0100
+ * @tc.name     in CALL_STATE_IDLE status, than test Hascall(), return false
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_HasCall_0100, Function | MediumTest | Level2)
+{
+    AccessToken token;
+    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+    if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
+        HangUpCall();
+    }
+    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_200_MS, SLEEP_30000_MS);
+    int32_t callState = CallManagerGtest::clientPtr_->GetCallState();
+    int32_t idleState = (int32_t)CallStateToApp::CALL_STATE_IDLE;
+    ASSERT_EQ(callState, idleState);
+    EXPECT_EQ(CallManagerGtest::clientPtr_->HasCall(), false);
+}
+
+/**
+ * @tc.number   Telephony_CallManager_HasCall_0200 to do ...
+ * @tc.name     The wrong number is not on call, return false
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_HasCall_0200, Function | MediumTest | Level1)
+{
+    AccessToken token;
+    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+
+    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_200_MS, SLEEP_30000_MS);
+    std::string phoneNumber = "";
+    InitDialInfo(
+        0, (int32_t)VideoStateType::TYPE_VOICE, (int32_t)DialScene::CALL_NORMAL, (int32_t)DialType::DIAL_CARRIER_TYPE);
+    int32_t ret = CallManagerGtest::clientPtr_->DialCall(Str8ToStr16(phoneNumber), dialInfo_);
+    EXPECT_NE(ret, RETURN_VALUE_IS_ZERO);
+    bool isRet = CallManagerGtest::clientPtr_->HasCall();
+    EXPECT_NE(isRet, true);
+}
+
+/**
+ * @tc.number   Telephony_CallManager_HasCall_0300 to do ...
+ * @tc.name     Free time test Hascall(), return false
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_HasCall_0300, Function | MediumTest | Level1)
+{
+    AccessToken token;
+    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_200_MS, SLEEP_30000_MS);
+    bool isRet = CallManagerGtest::clientPtr_->HasCall();
+    EXPECT_NE(isRet, true);
+}
+
+/**
+ * @tc.number   Telephony_CallManager_HasCall_0400
+ * @tc.name     in CALL_STATE_IDLE status, than test Hascall(), return false
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_HasCall_0400, Function | MediumTest | Level2)
+{
+    AccessToken token;
+    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_200_MS, SLEEP_30000_MS);
+    ASSERT_EQ(CallManagerGtest::clientPtr_->GetCallState(), (int32_t)CallStateToApp::CALL_STATE_IDLE);
+    ASSERT_TRUE(blueToothClientPtr_ != nullptr);
+    EXPECT_EQ(CallManagerGtest::blueToothClientPtr_->HasCall(), false);
+}
+
+/********************************* Test IsNewCallAllowed() ***************************************/
+/**
+ * @tc.number   Telephony_CallManager_IsNewCallAllowed_0100
+ * @tc.name     The call failed after making a call without the card
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_IsNewCallAllowed_0100, Function | MediumTest | Level1)
+{
+    AccessToken token;
+    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+    if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
+        HangUpCall();
+    }
+    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_200_MS, SLEEP_30000_MS);
+    std::string phoneNumber = "55555555555";
+    InitDialInfo(SIM1_SLOTID, (int32_t)VideoStateType::TYPE_VOICE, (int32_t)DialScene::CALL_NORMAL,
+        (int32_t)DialType::DIAL_CARRIER_TYPE);
+    int32_t ret = CallManagerGtest::clientPtr_->DialCall(Str8ToStr16(phoneNumber), dialInfo_);
+    ASSERT_EQ(ret, RETURN_VALUE_IS_ZERO);
+    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_OFFHOOK, SLEEP_200_MS, SLEEP_30000_MS);
+    bool enabled = false;
+    EXPECT_EQ(CallManagerGtest::clientPtr_->IsNewCallAllowed(enabled), TELEPHONY_SUCCESS);
+    EXPECT_EQ(enabled, false);
+    sleep(WAIT_TIME);
+    if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
+        HangUpCall();
+    }
+}
+
+/**
+ * @tc.number   Telephony_CallManager_IsNewCallAllowed_0200
+ * @tc.name     The call failed after making a call without the card
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_IsNewCallAllowed_0200, Function | MediumTest | Level1)
+{
+    AccessToken token;
+    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+    if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
+        HangUpCall();
+    }
+    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_200_MS, SLEEP_30000_MS);
+    ASSERT_TRUE(blueToothClientPtr_ != nullptr);
+    bool enabled = false;
+    EXPECT_EQ(CallManagerGtest::blueToothClientPtr_->IsNewCallAllowed(enabled), TELEPHONY_SUCCESS);
+    EXPECT_EQ(enabled, true);
+}
+
+/********************************************* Test IsRinging() ***********************************************/
+/**
+ * @tc.number   Telephony_CallManager_IsRinging_0100
+ * @tc.name     There is no call, return true
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_IsRinging_0100, Function | MediumTest | Level1)
+{
+    AccessToken token;
+    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_200_MS, SLEEP_30000_MS);
+    int32_t callState = CallManagerGtest::clientPtr_->GetCallState();
+    int32_t idleState = (int32_t)CallStateToApp::CALL_STATE_IDLE;
+    ASSERT_EQ(callState, idleState);
+    bool enabled = false;
+    EXPECT_EQ(CallManagerGtest::clientPtr_->IsRinging(enabled), TELEPHONY_SUCCESS);
+    EXPECT_NE(enabled, true);
+}
+
+/**
+ * @tc.number   Telephony_CallManager_IsRinging_0200
+ * @tc.name     There is no call, return true
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_IsRinging_0200, Function | MediumTest | Level1)
+{
+    AccessToken token;
+    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_200_MS, SLEEP_30000_MS);
+    int32_t callState = CallManagerGtest::clientPtr_->GetCallState();
+    int32_t idleState = (int32_t)CallStateToApp::CALL_STATE_IDLE;
+    ASSERT_EQ(callState, idleState);
+    ASSERT_TRUE(blueToothClientPtr_ != nullptr);
+    bool enabled = false;
+    EXPECT_EQ(CallManagerGtest::blueToothClientPtr_->IsRinging(enabled), TELEPHONY_SUCCESS);
+    EXPECT_NE(enabled, true);
+}
+
+/***************************************** Test CombineConference() ********************************************/
+/**
+ * @tc.number   Telephony_CallManager_CombineConference_0100
+ * @tc.name     Import callId "@&%￥", test CombineConference(), return non 0
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_CombineConference_0100, Function | MediumTest | Level2)
+{
+    AccessToken token;
+    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+    int32_t callId = INVALID_NEGATIVE_ID;
+    EXPECT_NE(CallManagerGtest::clientPtr_->CombineConference(callId), RETURN_VALUE_IS_ZERO);
+}
+
+/**
+ * @tc.number   Telephony_CallManager_CombineConference_0200
+ * @tc.name     Import callId "100", test CombineConference(), return non 0
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_CombineConference_0200, Function | MediumTest | Level2)
+{
+    AccessToken token;
+    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+    int32_t callId = INVALID_POSITIVE_ID;
+    EXPECT_NE(CallManagerGtest::clientPtr_->CombineConference(callId), RETURN_VALUE_IS_ZERO);
+}
+
+/**
+ * @tc.number   Telephony_CallManager_CombineConference_0300
+ * @tc.name     Import callId "@&%￥", test CombineConference(), return non 0
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_CombineConference_0300, Function | MediumTest | Level2)
+{
+    AccessToken token;
+    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+    ASSERT_TRUE(blueToothClientPtr_ != nullptr);
+    EXPECT_NE(CallManagerGtest::blueToothClientPtr_->CombineConference(), RETURN_VALUE_IS_ZERO);
+}
+
+/**
+ * @tc.number   Telephony_CallManager_CombineConference_0400
+ * @tc.name     Import callId "@&%￥", test CombineConference(), return non 0
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_CombineConference_0400, Function | MediumTest | Level2)
+{
+    AccessToken token;
+    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+
+    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_200_MS, SLEEP_30000_MS);
+    std::string phoneNumber = "10086";
+    InitDialInfo(
+        0, (int32_t)VideoStateType::TYPE_VOICE, (int32_t)DialScene::CALL_NORMAL, (int32_t)DialType::DIAL_CARRIER_TYPE);
+    EXPECT_EQ(CallManagerGtest::clientPtr_->DialCall(Str8ToStr16(phoneNumber), dialInfo_), RETURN_VALUE_IS_ZERO);
+    if (CallInfoManager::HasActiveStatus()) {
+        EXPECT_NE(CallManagerGtest::clientPtr_->CombineConference(g_newCallId), RETURN_VALUE_IS_ZERO);
+    }
+    sleep(WAIT_TIME);
+    if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
+        HangUpCall();
+    }
+}
+
+/***************************************** Test SeparateConference() ********************************************/
+/**
+ * @tc.number   Telephony_CallManager_SeparateConference_0100
+ * @tc.name     Import callId " -100", test SeparateConference(), return non 0
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_SeparateConference_0100, Function | MediumTest | Level2)
+{
+    AccessToken token;
+    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+    int32_t callId = INVALID_NEGATIVE_ID;
+    EXPECT_NE(CallManagerGtest::clientPtr_->SeparateConference(callId), RETURN_VALUE_IS_ZERO);
+}
+
+/**
+ * @tc.number   Telephony_CallManager_SeparateConference_0200
+ * @tc.name     Import callId "100", test SeparateConference(), return non 0
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_SeparateConference_0200, Function | MediumTest | Level2)
+{
+    AccessToken token;
+    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+    int32_t callId = INVALID_POSITIVE_ID;
+    EXPECT_NE(CallManagerGtest::clientPtr_->SeparateConference(callId), RETURN_VALUE_IS_ZERO);
+}
+
+/**
+ * @tc.number   Telephony_CallManager_SeparateConference_0300
+ * @tc.name     Import callId " -100", test SeparateConference(), return non 0
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_SeparateConference_0300, Function | MediumTest | Level2)
+{
+    AccessToken token;
+    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+    ASSERT_TRUE(blueToothClientPtr_ != nullptr);
+    EXPECT_NE(CallManagerGtest::blueToothClientPtr_->SeparateConference(), RETURN_VALUE_IS_ZERO);
+}
+
+/**
+ * @tc.number   Telephony_CallManager_SeparateConference_0400
+ * @tc.name     Import callId normal, test SeparateConference(), return non 0
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_SeparateConference_0400, Function | MediumTest | Level2)
+{
+    AccessToken token;
+    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+
+    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_200_MS, SLEEP_30000_MS);
+    InitDialInfo(
+        0, (int32_t)VideoStateType::TYPE_VOICE, (int32_t)DialScene::CALL_NORMAL, (int32_t)DialType::DIAL_CARRIER_TYPE);
+    EXPECT_EQ(CallManagerGtest::clientPtr_->DialCall(Str8ToStr16("10086"), dialInfo_), RETURN_VALUE_IS_ZERO);
+    if (CallInfoManager::HasActiveStatus()) {
+        EXPECT_NE(CallManagerGtest::clientPtr_->SeparateConference(g_newCallId), RETURN_VALUE_IS_ZERO);
+    }
+    sleep(WAIT_TIME);
+    if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
+        HangUpCall();
+    }
+}
+
+/***************************************** Test KickOutFromConference() ********************************************/
+/**
+ * @tc.number   Telephony_CallManager_KickOutFromConference_0100
+ * @tc.name     Import callId " -100", test KickOutFromConference(), return non 0
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_KickOutFromConference_0100, Function | MediumTest | Level2)
+{
+    AccessToken token;
+    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+    int32_t callId = INVALID_NEGATIVE_ID;
+    EXPECT_NE(CallManagerGtest::clientPtr_->KickOutFromConference(callId), RETURN_VALUE_IS_ZERO);
+}
+
+/**
+ * @tc.number   Telephony_CallManager_KickOutFromConference_0200
+ * @tc.name     Import callId "100", test KickOutFromConference(), return non 0
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_KickOutFromConference_0200, Function | MediumTest | Level2)
+{
+    AccessToken token;
+    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+    int32_t callId = INVALID_POSITIVE_ID;
+    EXPECT_NE(CallManagerGtest::clientPtr_->KickOutFromConference(callId), RETURN_VALUE_IS_ZERO);
+}
+
+/**
+ * @tc.number   Telephony_CallManager_KickOutFromConference_0300
+ * @tc.name     Import callId " -100", test KickOutFromConference(), return non 0
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_KickOutFromConference_0300, Function | MediumTest | Level2)
+{
+    AccessToken token;
+    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+    ASSERT_TRUE(blueToothClientPtr_ != nullptr);
+    EXPECT_NE(CallManagerGtest::blueToothClientPtr_->KickOutFromConference(), RETURN_VALUE_IS_ZERO);
 }
 } // namespace Telephony
 } // namespace OHOS
