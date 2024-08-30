@@ -166,816 +166,817 @@ public:
     void TearDown() {};
 };
 
+/******************************************* Test SetCameraZoom() *********************************************/
 /**
- * @tc.number   Telephony_CallManager_GetCallTransferInfo_0900
- * @tc.name     input slotId out of count, CallTransferType TRANSFER_TYPE_NOT_REACHABLE,
- *              test GetCallTransferInfo() return failed
+ * @tc.number   Telephony_CallManager_SetCameraZoom_0100
+ * @tc.name     input zoomRatio 5.0, Test SetCameraZoom
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_GetCallTransferInfo_0900, Function | MediumTest | Level3)
+HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCameraZoom_0100, Function | MediumTest | Level2)
+{
+    AccessToken token;
+    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+    float zoomRatio = 5.0;
+    EXPECT_EQ(CallManagerGtest::clientPtr_->SetCameraZoom(zoomRatio), RETURN_VALUE_IS_ZERO);
+}
+
+/**
+ * @tc.number   Telephony_CallManager_SetCameraZoom_0200
+ * @tc.name     input zoomRatio 0.1, Test SetCameraZoom
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCameraZoom_0200, Function | MediumTest | Level2)
+{
+    AccessToken token;
+    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+    float zoomRatio = 0.1;
+    EXPECT_EQ(CallManagerGtest::clientPtr_->SetCameraZoom(zoomRatio), RETURN_VALUE_IS_ZERO);
+}
+
+/**
+ * @tc.number   Telephony_CallManager_SetCameraZoom_0300
+ * @tc.name     input zoomRatio 10.0, Test SetCameraZoom
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCameraZoom_0300, Function | MediumTest | Level2)
+{
+    AccessToken token;
+    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+    float zoomRatio = 10.0;
+    EXPECT_EQ(CallManagerGtest::clientPtr_->SetCameraZoom(zoomRatio), RETURN_VALUE_IS_ZERO);
+}
+
+/**
+ * @tc.number   Telephony_CallManager_SetCameraZoom_0400
+ * @tc.name     input invalid para zoomRatio 15.0, Test SetCameraZoom, return error code if failed
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCameraZoom_0400, Function | MediumTest | Level2)
+{
+    AccessToken token;
+    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+    float zoomRatio = 15.0;
+    EXPECT_EQ(CallManagerGtest::clientPtr_->SetCameraZoom(zoomRatio), RETURN_VALUE_IS_ZERO);
+}
+
+/**
+ * @tc.number   Telephony_CallManager_SetCameraZoom_0500
+ * @tc.name     input invalid para zoomRatio 0.0, Test SetCameraZoom, return error code if failed
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCameraZoom_0500, Function | MediumTest | Level2)
+{
+    AccessToken token;
+    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+    float zoomRatio = 0.0;
+    EXPECT_EQ(CallManagerGtest::clientPtr_->SetCameraZoom(zoomRatio), RETURN_VALUE_IS_ZERO);
+}
+
+/**
+ * @tc.number   Telephony_CallManager_SetCameraZoom_0600
+ * @tc.name     input invalid para zoomRatio -1.0, Test SetCameraZoom, return error code if failed
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCameraZoom_0600, Function | MediumTest | Level2)
+{
+    AccessToken token;
+    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+    float zoomRatio = -1.0;
+    EXPECT_EQ(CallManagerGtest::clientPtr_->SetCameraZoom(zoomRatio), RETURN_VALUE_IS_ZERO);
+}
+
+/**
+ * @tc.number   Telephony_CallManager_SetCameraZoom_0700
+ * @tc.name     input invalid para zoomRatio 10.1, Test SetCameraZoom, return error code if failed
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCameraZoom_0700, Function | MediumTest | Level2)
+{
+    AccessToken token;
+    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+    float zoomRatio = 10.1;
+    EXPECT_EQ(CallManagerGtest::clientPtr_->SetCameraZoom(zoomRatio), RETURN_VALUE_IS_ZERO);
+}
+/******************************************* Test SetPausePicture() *********************************************/
+/**
+ * @tc.number   Telephony_CallManager_SetPausePicture_0100
+ * @tc.name     input locale picture path /system/bin/test.png that does not exist, Test SetPausePicture,
+ *              return error code if failed
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_SetPausePicture_0100, Function | MediumTest | Level2)
+{
+    AccessToken token;
+    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+    int32_t callId = 1;
+    std::string pathTemp = "/system/bin/test.png";
+    std::u16string path = Str8ToStr16(pathTemp);
+    EXPECT_NE(CallManagerGtest::clientPtr_->SetPausePicture(callId, path), RETURN_VALUE_IS_ZERO);
+}
+
+/**
+ * @tc.number   Telephony_CallManager_SetPausePicture_0200
+ * @tc.name     input an invalid image format file path, Test SetPausePicture, return error code if failed
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_SetPausePicture_0200, Function | MediumTest | Level2)
+{
+    AccessToken token;
+    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+    int32_t callId = 1;
+    std::string pathTemp = "/system/bin/test.jpg";
+    std::u16string path = Str8ToStr16(pathTemp);
+    EXPECT_NE(CallManagerGtest::clientPtr_->SetPausePicture(callId, path), RETURN_VALUE_IS_ZERO);
+}
+
+/**
+ * @tc.number   Telephony_CallManager_SetPausePicture_0300
+ * @tc.name     input an invalid image format file path, Test SetPausePicture, return error code if failed
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_SetPausePicture_0300, Function | MediumTest | Level2)
+{
+    AccessToken token;
+    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+    int32_t callId = 1;
+    std::string pathTemp = "/system/bin/test.bmp";
+    std::u16string path = Str8ToStr16(pathTemp);
+    EXPECT_NE(CallManagerGtest::clientPtr_->SetPausePicture(callId, path), RETURN_VALUE_IS_ZERO);
+}
+
+/**
+ * @tc.number   Telephony_CallManager_SetPausePicture_0400
+ * @tc.name     input an invalid image format file path, Test SetPausePicture, return error code if failed
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_SetPausePicture_0400, Function | MediumTest | Level2)
+{
+    AccessToken token;
+    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+    int32_t callId = 1;
+    std::string pathTemp = "/system/bin/test.webp";
+    std::u16string path = Str8ToStr16(pathTemp);
+    EXPECT_NE(CallManagerGtest::clientPtr_->SetPausePicture(callId, path), RETURN_VALUE_IS_ZERO);
+}
+
+/**
+ * @tc.number   Telephony_CallManager_SetPausePicture_0500
+ * @tc.name     input remote picture path http://callManager.jpg that does not exist, Test SetPausePicture,
+ *              return error code if failed
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_SetPausePicture_0500, Function | MediumTest | Level2)
+{
+    AccessToken token;
+    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+    int32_t callId = 1;
+    std::string pathTemp = "http://callManager.jpg";
+    std::u16string path = Str8ToStr16(pathTemp);
+    EXPECT_NE(CallManagerGtest::clientPtr_->SetPausePicture(callId, path), RETURN_VALUE_IS_ZERO);
+}
+
+/**
+ * @tc.number   Telephony_CallManager_SetPausePicture_0600
+ * @tc.name     input empty picture path, Test SetPausePicture, return error code if failed
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_SetPausePicture_0600, Function | MediumTest | Level2)
+{
+    AccessToken token;
+    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+    int32_t callId = 1;
+    std::string pathTemp = "";
+    std::u16string path = Str8ToStr16(pathTemp);
+    EXPECT_NE(CallManagerGtest::clientPtr_->SetPausePicture(callId, path), RETURN_VALUE_IS_ZERO);
+}
+
+/**
+ * @tc.number   Telephony_CallManager_CancelCallUpgrade_0100
+ * @tc.name     input callId:1, Test CancelCallUpgrade, return error code if failed
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_CancelCallUpgrade_0100, Function | MediumTest | Level2)
+{
+    AccessToken token;
+    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+    int32_t callId = 1;
+    EXPECT_NE(CallManagerGtest::clientPtr_->CancelCallUpgrade(callId), RETURN_VALUE_IS_ZERO);
+}
+
+/**
+ * @tc.number   Telephony_CallManager_RequestCameraCapabilities_0100
+ * @tc.name     input callId:1, Test RequestCameraCapabilities, return error code if failed
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_RequestCameraCapabilities_0100, Function | MediumTest | Level2)
+{
+    AccessToken token;
+    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+    int32_t callId = 1;
+    EXPECT_NE(CallManagerGtest::clientPtr_->RequestCameraCapabilities(callId), RETURN_VALUE_IS_ZERO);
+}
+
+/********************************************* Test GetImsConfig() ************************************************/
+/**
+ * @tc.number   Telephony_CallManager_GetImsConfig_0100
+ * @tc.name     test get ims config item video quality
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_GetImsConfig_0100, Function | MediumTest | Level3)
 {
     AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
     }
 
+    if (HasSimCard(SIM1_SLOTID)) {
+        EXPECT_EQ(CallManagerGtest::clientPtr_->GetImsConfig(SIM1_SLOTID, ITEM_VIDEO_QUALITY), RETURN_VALUE_IS_ZERO);
+    }
+    if (HasSimCard(SIM2_SLOTID)) {
+        EXPECT_EQ(CallManagerGtest::clientPtr_->GetImsConfig(SIM2_SLOTID, ITEM_VIDEO_QUALITY), RETURN_VALUE_IS_ZERO);
+    }
+}
+
+/**
+ * @tc.number   Telephony_CallManager_GetImsConfig_0200
+ * @tc.name     test get ims config item ims switch status
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_GetImsConfig_0200, Function | MediumTest | Level3)
+{
+    AccessToken token;
+    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+
+    if (HasSimCard(SIM1_SLOTID)) {
+        EXPECT_EQ(
+            CallManagerGtest::clientPtr_->GetImsConfig(SIM1_SLOTID, ITEM_IMS_SWITCH_STATUS), RETURN_VALUE_IS_ZERO);
+    }
+    if (HasSimCard(SIM2_SLOTID)) {
+        EXPECT_EQ(
+            CallManagerGtest::clientPtr_->GetImsConfig(SIM2_SLOTID, ITEM_IMS_SWITCH_STATUS), RETURN_VALUE_IS_ZERO);
+    }
+}
+
+/**
+ * @tc.number   Telephony_CallManager_GetImsConfig_0300
+ * @tc.name     test get ims config item with invalid item
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_GetImsConfig_0300, Function | MediumTest | Level3)
+{
+    AccessToken token;
+    ImsConfigItem item = static_cast<ImsConfigItem>(2);
+    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+
+    if (HasSimCard(SIM1_SLOTID)) {
+        EXPECT_EQ(CallManagerGtest::clientPtr_->GetImsConfig(SIM1_SLOTID, item), RETURN_VALUE_IS_ZERO);
+    }
+    if (HasSimCard(SIM2_SLOTID)) {
+        EXPECT_EQ(CallManagerGtest::clientPtr_->GetImsConfig(SIM2_SLOTID, item), RETURN_VALUE_IS_ZERO);
+    }
+}
+
+/********************************************* Test SetImsConfig() ************************************************/
+/**
+ * @tc.number   Telephony_CallManager_SetImsConfig_0100
+ * @tc.name     test set ims config item video quality
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_SetImsConfig_0100, Function | MediumTest | Level3)
+{
+    AccessToken token;
+    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+
+    std::u16string value = u"123";
+    if (HasSimCard(SIM1_SLOTID)) {
+        EXPECT_EQ(
+            CallManagerGtest::clientPtr_->SetImsConfig(SIM1_SLOTID, ITEM_VIDEO_QUALITY, value), RETURN_VALUE_IS_ZERO);
+    }
+    if (HasSimCard(SIM2_SLOTID)) {
+        EXPECT_EQ(
+            CallManagerGtest::clientPtr_->SetImsConfig(SIM2_SLOTID, ITEM_VIDEO_QUALITY, value), RETURN_VALUE_IS_ZERO);
+    }
+}
+
+/**
+ * @tc.number   Telephony_CallManager_SetImsConfig_0200
+ * @tc.name     test set ims config item ims switch status
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_SetImsConfig_0200, Function | MediumTest | Level3)
+{
+    AccessToken token;
+    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+
+    std::u16string value = u"123";
+    if (HasSimCard(SIM1_SLOTID)) {
+        EXPECT_EQ(CallManagerGtest::clientPtr_->SetImsConfig(SIM1_SLOTID, ITEM_IMS_SWITCH_STATUS, value),
+            RETURN_VALUE_IS_ZERO);
+    }
+    if (HasSimCard(SIM2_SLOTID)) {
+        EXPECT_EQ(CallManagerGtest::clientPtr_->SetImsConfig(SIM2_SLOTID, ITEM_IMS_SWITCH_STATUS, value),
+            RETURN_VALUE_IS_ZERO);
+    }
+}
+
+/**
+ * @tc.number   Telephony_CallManager_SetImsConfig_0300
+ * @tc.name     test set ims config item with invalid item
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_SetImsConfig_0300, Function | MediumTest | Level3)
+{
+    AccessToken token;
+    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+
+    std::u16string value = u"123";
+    ImsConfigItem item = static_cast<ImsConfigItem>(2);
+    if (HasSimCard(SIM1_SLOTID)) {
+        EXPECT_EQ(CallManagerGtest::clientPtr_->SetImsConfig(SIM1_SLOTID, item, value), RETURN_VALUE_IS_ZERO);
+    }
+    if (HasSimCard(SIM2_SLOTID)) {
+        EXPECT_EQ(CallManagerGtest::clientPtr_->SetImsConfig(SIM2_SLOTID, item, value), RETURN_VALUE_IS_ZERO);
+    }
+}
+
+/*********************************** Test GetImsFeatureValue() ****************************************/
+/**
+ * @tc.number   Telephony_CallManager_GetImsFeatureValue_0100
+ * @tc.name     test get ims feature value type voice over lte
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_GetImsFeatureValue_0100, Function | MediumTest | Level3)
+{
+    AccessToken token;
+    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+
+    if (HasSimCard(SIM1_SLOTID)) {
+        EXPECT_EQ(
+            CallManagerGtest::clientPtr_->GetImsFeatureValue(SIM1_SLOTID, TYPE_VOICE_OVER_LTE), RETURN_VALUE_IS_ZERO);
+    }
+    if (HasSimCard(SIM2_SLOTID)) {
+        EXPECT_EQ(
+            CallManagerGtest::clientPtr_->GetImsFeatureValue(SIM2_SLOTID, TYPE_VOICE_OVER_LTE), RETURN_VALUE_IS_ZERO);
+    }
+}
+
+/**
+ * @tc.number   Telephony_CallManager_GetImsFeatureValue_0200
+ * @tc.name     test get ims feature value type video over lte
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_GetImsFeatureValue_0200, Function | MediumTest | Level3)
+{
+    AccessToken token;
+    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+
+    if (HasSimCard(SIM1_SLOTID)) {
+        EXPECT_EQ(
+            CallManagerGtest::clientPtr_->GetImsFeatureValue(SIM1_SLOTID, TYPE_VIDEO_OVER_LTE), RETURN_VALUE_IS_ZERO);
+    }
+    if (HasSimCard(SIM2_SLOTID)) {
+        EXPECT_EQ(
+            CallManagerGtest::clientPtr_->GetImsFeatureValue(SIM2_SLOTID, TYPE_VIDEO_OVER_LTE), RETURN_VALUE_IS_ZERO);
+    }
+}
+
+/**
+ * @tc.number   Telephony_CallManager_GetImsFeatureValue_0300
+ * @tc.name     test get ims feature value type ss over ut
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_GetImsFeatureValue_0300, Function | MediumTest | Level3)
+{
+    AccessToken token;
+    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+
+    if (HasSimCard(SIM1_SLOTID)) {
+        EXPECT_EQ(CallManagerGtest::clientPtr_->GetImsFeatureValue(SIM1_SLOTID, TYPE_SS_OVER_UT),
+            RETURN_VALUE_IS_ZERO);
+    }
+    if (HasSimCard(SIM2_SLOTID)) {
+        EXPECT_EQ(CallManagerGtest::clientPtr_->GetImsFeatureValue(SIM2_SLOTID, TYPE_SS_OVER_UT),
+            RETURN_VALUE_IS_ZERO);
+    }
+}
+
+/**
+ * @tc.number   Telephony_CallManager_GetImsFeatureValue_0400
+ * @tc.name     test get ims feature value with invalid type
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_GetImsFeatureValue_0400, Function | MediumTest | Level3)
+{
+    AccessToken token;
+    FeatureType type = static_cast<FeatureType>(3);
+    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+
+    if (HasSimCard(SIM1_SLOTID)) {
+        EXPECT_EQ(CallManagerGtest::clientPtr_->GetImsFeatureValue(SIM1_SLOTID, type), RETURN_VALUE_IS_ZERO);
+    }
+    if (HasSimCard(SIM2_SLOTID)) {
+        EXPECT_EQ(CallManagerGtest::clientPtr_->GetImsFeatureValue(SIM2_SLOTID, type), RETURN_VALUE_IS_ZERO);
+    }
+}
+
+/***************************************** Test SetImsFeatureValue() ***************************************/
+/**
+ * @tc.number   Telephony_CallManager_SetImsFeatureValue_0100
+ * @tc.name     test set ims feature value type voice over lte
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_SetImsFeatureValue_0100, Function | MediumTest | Level3)
+{
+    AccessToken token;
+    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+
+    int32_t value = 1;
+    if (HasSimCard(SIM1_SLOTID)) {
+        EXPECT_EQ(CallManagerGtest::clientPtr_->SetImsFeatureValue(SIM1_SLOTID, TYPE_VOICE_OVER_LTE, value),
+            RETURN_VALUE_IS_ZERO);
+    }
+    if (HasSimCard(SIM2_SLOTID)) {
+        EXPECT_EQ(CallManagerGtest::clientPtr_->SetImsFeatureValue(SIM2_SLOTID, TYPE_VOICE_OVER_LTE, value),
+            RETURN_VALUE_IS_ZERO);
+    }
+}
+
+/**
+ * @tc.number   Telephony_CallManager_SetImsFeatureValue_0200
+ * @tc.name     test set ims feature value type video over lte
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_SetImsFeatureValue_0200, Function | MediumTest | Level3)
+{
+    AccessToken token;
+    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+
+    int32_t value = 1;
+    if (HasSimCard(SIM1_SLOTID)) {
+        EXPECT_EQ(CallManagerGtest::clientPtr_->SetImsFeatureValue(SIM1_SLOTID, TYPE_VIDEO_OVER_LTE, value),
+            RETURN_VALUE_IS_ZERO);
+    }
+    if (HasSimCard(SIM2_SLOTID)) {
+        EXPECT_EQ(CallManagerGtest::clientPtr_->SetImsFeatureValue(SIM2_SLOTID, TYPE_VIDEO_OVER_LTE, value),
+            RETURN_VALUE_IS_ZERO);
+    }
+}
+
+/**
+ * @tc.number   Telephony_CallManager_SetImsFeatureValue_0300
+ * @tc.name     test set ims feature value type ss over ut
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_SetImsFeatureValue_0300, Function | MediumTest | Level3)
+{
+    AccessToken token;
+    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+
+    int32_t value = 1;
+    if (HasSimCard(SIM1_SLOTID)) {
+        EXPECT_EQ(CallManagerGtest::clientPtr_->SetImsFeatureValue(SIM1_SLOTID, TYPE_SS_OVER_UT, value),
+            RETURN_VALUE_IS_ZERO);
+    }
+    if (HasSimCard(SIM2_SLOTID)) {
+        EXPECT_EQ(CallManagerGtest::clientPtr_->SetImsFeatureValue(SIM2_SLOTID, TYPE_SS_OVER_UT, value),
+            RETURN_VALUE_IS_ZERO);
+    }
+}
+
+/**
+ * @tc.number   Telephony_CallManager_SetImsFeatureValue_0400
+ * @tc.name     test set ims feature value with invalid type
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_SetImsFeatureValue_0400, Function | MediumTest | Level3)
+{
+    AccessToken token;
+    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+
+    int32_t value = 1;
+    FeatureType type = static_cast<FeatureType>(3);
+    if (HasSimCard(SIM1_SLOTID)) {
+        EXPECT_EQ(CallManagerGtest::clientPtr_->SetImsFeatureValue(SIM1_SLOTID, type, value), RETURN_VALUE_IS_ZERO);
+    }
+    if (HasSimCard(SIM2_SLOTID)) {
+        EXPECT_EQ(CallManagerGtest::clientPtr_->SetImsFeatureValue(SIM2_SLOTID, type, value), RETURN_VALUE_IS_ZERO);
+    }
+}
+
+/************************************** Test UpdateImsCallMode() ****************************************/
+/**
+ * @tc.number   Telephony_CallManager_UpdateImsCallMode_0100
+ * @tc.name     test update ims call mode audio only
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_UpdateImsCallMode_0100, Function | MediumTest | Level3)
+{
+    AccessToken token;
+    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+
+    int32_t callId = 1;
+    EXPECT_NE(CallManagerGtest::clientPtr_->UpdateImsCallMode(callId, CALL_MODE_AUDIO_ONLY), RETURN_VALUE_IS_ZERO);
+}
+
+/**
+ * @tc.number   Telephony_CallManager_UpdateImsCallMode_0200
+ * @tc.name     test update ims call mode send only
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_UpdateImsCallMode_0200, Function | MediumTest | Level3)
+{
+    AccessToken token;
+    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+
+    int32_t callId = 1;
+    EXPECT_NE(CallManagerGtest::clientPtr_->UpdateImsCallMode(callId, CALL_MODE_SEND_ONLY), RETURN_VALUE_IS_ZERO);
+}
+
+/**
+ * @tc.number   Telephony_CallManager_UpdateImsCallMode_0300
+ * @tc.name     test update ims call mode recerve only
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_UpdateImsCallMode_0300, Function | MediumTest | Level3)
+{
+    AccessToken token;
+    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+
+    int32_t callId = 1;
+    EXPECT_NE(CallManagerGtest::clientPtr_->UpdateImsCallMode(callId, CALL_MODE_RECEIVE_ONLY), RETURN_VALUE_IS_ZERO);
+}
+
+/**
+ * @tc.number   Telephony_CallManager_UpdateImsCallMode_0400
+ * @tc.name     test update ims call mode send receive
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_UpdateImsCallMode_0400, Function | MediumTest | Level3)
+{
+    AccessToken token;
+    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+
+    int32_t callId = 1;
+    EXPECT_NE(CallManagerGtest::clientPtr_->UpdateImsCallMode(callId, CALL_MODE_SEND_RECEIVE), RETURN_VALUE_IS_ZERO);
+}
+
+/**
+ * @tc.number   Telephony_CallManager_UpdateImsCallMode_0500
+ * @tc.name     test update ims call mode video paused
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_UpdateImsCallMode_0500, Function | MediumTest | Level3)
+{
+    AccessToken token;
+    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+
+    int32_t callId = 1;
+    EXPECT_NE(CallManagerGtest::clientPtr_->UpdateImsCallMode(callId, CALL_MODE_VIDEO_PAUSED), RETURN_VALUE_IS_ZERO);
+}
+
+/**
+ * @tc.number   Telephony_CallManager_UpdateImsCallMode_0600
+ * @tc.name     test update ims call with invalid mode
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_UpdateImsCallMode_0600, Function | MediumTest | Level3)
+{
+    AccessToken token;
+    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+
+    int32_t callId = 1;
+    ImsCallMode mode = static_cast<ImsCallMode>(5);
+    EXPECT_NE(CallManagerGtest::clientPtr_->UpdateImsCallMode(callId, mode), RETURN_VALUE_IS_ZERO);
+}
+
+/********************************************* Test StartRtt() ************************************************/
+/**
+ * @tc.number   Telephony_CallManager_StartRtt_0100
+ * @tc.name     test start rtt
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_StartRtt_0100, Function | MediumTest | Level3)
+{
+    AccessToken token;
+    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+
+    std::u16string msg = u"123";
+    int32_t callId = 1;
+    EXPECT_NE(CallManagerGtest::clientPtr_->StartRtt(callId, msg), RETURN_VALUE_IS_ZERO);
+}
+
+/********************************************* Test StopRtt() ************************************************/
+/**
+ * @tc.number   Telephony_CallManager_StopRtt_0100
+ * @tc.name     test stop rtt
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_StopRtt_0100, Function | MediumTest | Level3)
+{
+    AccessToken token;
+    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+    int32_t callId = 1;
+    EXPECT_NE(CallManagerGtest::clientPtr_->StopRtt(callId), RETURN_VALUE_IS_ZERO);
+}
+
+/**************************************** Test CanSetCallTransferTime() ******************************************/
+/**
+ * @tc.number   Telephony_CallManager_CanSetCallTransferTime_0100
+ * @tc.name     input invalid slotId, test CanSetCallTransferTime() return failed
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_CanSetCallTransferTime_0100, Function | MediumTest | Level3)
+{
+    AccessToken token;
+    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+
+    bool result;
+    EXPECT_EQ(CallManagerGtest::clientPtr_->CanSetCallTransferTime(INVALID_SLOT_ID, result), CALL_ERR_INVALID_SLOT_ID);
+}
+
+/**
+ * @tc.number   Telephony_CallManager_CanSetCallTransferTime_0200
+ * @tc.name     input slotId was out of count
+ *              test CanSetCallTransferTime() return failed
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_CanSetCallTransferTime_0200, Function | MediumTest | Level3)
+{
+    AccessToken token;
+    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+
+    bool result;
     int32_t slotId = SIM_SLOT_COUNT; // out of the count
-    EXPECT_EQ(CallManagerGtest::clientPtr_->GetCallTransferInfo(slotId, CallTransferType::TRANSFER_TYPE_NOT_REACHABLE),
-        CALL_ERR_INVALID_SLOT_ID);
+    EXPECT_EQ(CallManagerGtest::clientPtr_->CanSetCallTransferTime(slotId, result), CALL_ERR_INVALID_SLOT_ID);
 }
 
 /**
- * @tc.number   Telephony_CallManager_GetCallTransferInfo_1000
- * @tc.name     input slotId 0, CallTransferType invalid, test GetCallTransferInfo() return failed
+ * @tc.number   Telephony_CallManager_CanSetCallTransferTime_0300
+ * @tc.name     test CanSetCallTransferTime() without permission
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_GetCallTransferInfo_1000, Function | MediumTest | Level3)
+HWTEST_F(CallManagerGtest, Telephony_CallManager_CanSetCallTransferTime_0300, Function | MediumTest | Level3)
 {
-    AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
     }
 
+    bool result;
     if (HasSimCard(SIM1_SLOTID)) {
-        EXPECT_EQ(CallManagerGtest::clientPtr_->GetCallTransferInfo(SIM1_SLOTID, (CallTransferType)FALSE_DEFAULT),
-            CALL_ERR_INVALID_TRANSFER_TYPE);
+        EXPECT_EQ(
+            CallManagerGtest::clientPtr_->CanSetCallTransferTime(SIM1_SLOTID, result), TELEPHONY_ERR_PERMISSION_ERR);
     }
     if (HasSimCard(SIM2_SLOTID)) {
-        EXPECT_EQ(CallManagerGtest::clientPtr_->GetCallTransferInfo(SIM2_SLOTID, (CallTransferType)FALSE_DEFAULT),
-            CALL_ERR_INVALID_TRANSFER_TYPE);
+        EXPECT_EQ(
+            CallManagerGtest::clientPtr_->CanSetCallTransferTime(SIM2_SLOTID, result), TELEPHONY_ERR_PERMISSION_ERR);
     }
 }
 
 /**
- * @tc.number   Telephony_CallManager_GetCallTransferInfo_1100
- * @tc.name     test GetCallTransferInfo() without permission
+ * @tc.number   Telephony_CallManager_CanSetCallTransferTime_0400
+ * @tc.name     test CanSetCallTransferTime() with normal situation
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_GetCallTransferInfo_1100, Function | MediumTest | Level3)
+HWTEST_F(CallManagerGtest, Telephony_CallManager_CanSetCallTransferTime_0400, Function | MediumTest | Level3)
 {
+    AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
     }
 
+    bool result;
     if (HasSimCard(SIM1_SLOTID)) {
-        EXPECT_EQ(CallManagerGtest::clientPtr_->GetCallTransferInfo(SIM1_SLOTID, CallTransferType::TRANSFER_TYPE_BUSY),
-            TELEPHONY_ERR_PERMISSION_ERR);
+        EXPECT_EQ(CallManagerGtest::clientPtr_->CanSetCallTransferTime(SIM1_SLOTID, result), RETURN_VALUE_IS_ZERO);
     }
     if (HasSimCard(SIM2_SLOTID)) {
-        EXPECT_EQ(CallManagerGtest::clientPtr_->GetCallTransferInfo(SIM1_SLOTID, CallTransferType::TRANSFER_TYPE_BUSY),
-            TELEPHONY_ERR_PERMISSION_ERR);
+        EXPECT_EQ(CallManagerGtest::clientPtr_->CanSetCallTransferTime(SIM2_SLOTID, result), RETURN_VALUE_IS_ZERO);
     }
 }
 
-/******************************************* Test SetCallTransferInfo() ********************************************/
+/********************************************* Test SetAudioDevice()***********************************************/
 /**
- * @tc.number   Telephony_CallManager_SetCallTransferInfo_0100
- * @tc.name     input slotId 0, CallTransferSettingType CALL_TRANSFER_ENABLE, CallTransferType TRANSFER_TYPE_BUSY,
- *              test SetCallTransferInfo()
+ * @tc.number   Telephony_CallManager_SetAudioDevice_0100
+ * @tc.name     make a normal buletoothAddress, set active bluetooth device
  * @tc.desc     Function test
+ * @tc.require: issueI5JUAQ
  */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallTransferInfo_0100, Function | MediumTest | Level3)
+HWTEST_F(CallManagerGtest, Telephony_CallManager_SetAudioDevice_0100, Function | MediumTest | Level2)
 {
     AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
     }
-    CallTransferInfo info;
-    info.settingType = CallTransferSettingType::CALL_TRANSFER_ENABLE;
-    info.type = CallTransferType::TRANSFER_TYPE_BUSY;
-    if (strcpy_s(info.transferNum, kMaxNumberLen + 1, "111") != EOK) {
-        TELEPHONY_LOGE("strcpy_s fail.");
+    std::string phoneNumber = "66666666666";
+    EXPECT_EQ(CallManagerGtest::IsServiceConnected(), true);
+    if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
+        HangUpCall();
+    }
+    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_200_MS, SLEEP_30000_MS);
+    int32_t ret = CallManagerGtest::clientPtr_->DialCall(Str8ToStr16(phoneNumber), dialInfo_);
+    EXPECT_EQ(ret, RETURN_VALUE_IS_ZERO);
+
+    HandsFreeAudioGateway *profile = HandsFreeAudioGateway::GetProfile();
+    vector<BluetoothRemoteDevice> devices = profile->GetConnectedDevices();
+    int deviceNum = devices.size();
+    std::string address = "";
+    const int32_t zeroDevice = 0;
+    if (deviceNum > zeroDevice) {
+        address = devices[0].GetDeviceAddr();
+    }
+
+    AudioDevice audioDevice;
+    if (memset_s(&audioDevice, sizeof(AudioDevice), 0, sizeof(AudioDevice)) != EOK) {
+        TELEPHONY_LOGE("memset_s fail");
+        return;
+    }
+    audioDevice.deviceType = AudioDeviceType::DEVICE_BLUETOOTH_SCO;
+    if (address.length() > kMaxAddressLen) {
+        TELEPHONY_LOGE("address is not too long");
+        return;
+    }
+    if (memcpy_s(audioDevice.address, kMaxAddressLen, address.c_str(), address.length()) != EOK) {
+        TELEPHONY_LOGE("memcpy_s address fail");
         return;
     }
 
-    if (HasSimCard(SIM1_SLOTID)) {
-        EXPECT_EQ(CallManagerGtest::clientPtr_->SetCallTransferInfo(SIM1_SLOTID, info), RETURN_VALUE_IS_ZERO);
-    }
-    if (HasSimCard(SIM2_SLOTID)) {
-        EXPECT_EQ(CallManagerGtest::clientPtr_->SetCallTransferInfo(SIM2_SLOTID, info), RETURN_VALUE_IS_ZERO);
-    }
-}
-
-/**
- * @tc.number   Telephony_CallManager_SetCallTransferInfo_0200
- * @tc.name     input invalid slotId, CallTransferSettingType CALL_TRANSFER_ENABLE, CallTransferType TRANSFER_TYPE_BUSY,
- *              test SetCallTransferInfo() return failed
- * @tc.desc     Function test
- */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallTransferInfo_0200, Function | MediumTest | Level3)
-{
-    AccessToken token;
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
-    CallTransferInfo info;
-    info.settingType = CallTransferSettingType::CALL_TRANSFER_ENABLE;
-    info.type = CallTransferType::TRANSFER_TYPE_BUSY;
-    if (strcpy_s(info.transferNum, kMaxNumberLen + 1, "222") != EOK) {
-        TELEPHONY_LOGE("strcpy_s fail.");
-        return;
-    }
-
-    EXPECT_EQ(CallManagerGtest::clientPtr_->SetCallTransferInfo(INVALID_SLOT_ID, info), CALL_ERR_INVALID_SLOT_ID);
-}
-
-/**
- * @tc.number   Telephony_CallManager_SetCallTransferInfo_0300
- * @tc.name     input slotId was out of count, CallTransferSettingType CALL_TRANSFER_ENABLE,
- *              CallTransferType TRANSFER_TYPE_BUSY, test SetCallTransferInfo() return failed
- * @tc.desc     Function test
- */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallTransferInfo_0300, Function | MediumTest | Level3)
-{
-    AccessToken token;
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
-    CallTransferInfo info;
-    info.settingType = CallTransferSettingType::CALL_TRANSFER_ENABLE;
-    info.type = CallTransferType::TRANSFER_TYPE_BUSY;
-    if (strcpy_s(info.transferNum, kMaxNumberLen + 1, "333") != EOK) {
-        TELEPHONY_LOGE("strcpy_s fail.");
-        return;
-    }
-
-    int32_t slotId = SIM_SLOT_COUNT; // out of the count
-    EXPECT_EQ(CallManagerGtest::clientPtr_->SetCallTransferInfo(slotId, info), CALL_ERR_INVALID_SLOT_ID);
-}
-
-/**
- * @tc.number   Telephony_CallManager_SetCallTransferInfo_0400
- * @tc.name     input slotId 0, CallTransferSettingType CALL_TRANSFER_ENABLE, CallTransferType invalid,
- *              test SetCallTransferInfo() return failed
- * @tc.desc     Function test
- */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallTransferInfo_0400, Function | MediumTest | Level3)
-{
-    AccessToken token;
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
-    CallTransferInfo info;
-    info.settingType = CallTransferSettingType::CALL_TRANSFER_ENABLE;
-    info.type = (CallTransferType)FALSE_DEFAULT;
-    if (strcpy_s(info.transferNum, kMaxNumberLen + 1, "123") != EOK) {
-        TELEPHONY_LOGE("strcpy_s fail.");
-        return;
-    }
-
-    if (HasSimCard(SIM1_SLOTID)) {
-        EXPECT_EQ(CallManagerGtest::clientPtr_->SetCallTransferInfo(SIM1_SLOTID, info),
-            CALL_ERR_INVALID_TRANSFER_TYPE);
-    }
-    if (HasSimCard(SIM2_SLOTID)) {
-        EXPECT_EQ(CallManagerGtest::clientPtr_->SetCallTransferInfo(SIM2_SLOTID, info),
-            CALL_ERR_INVALID_TRANSFER_TYPE);
-    }
-}
-
-/**
- * @tc.number   Telephony_CallManager_SetCallTransferInfo_0500
- * @tc.name     input slotId 0, CallTransferSettingType invalid, CallTransferType TRANSFER_TYPE_BUSY,
- *              test SetCallTransferInfo() return failed
- * @tc.desc     Function test
- */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallTransferInfo_0500, Function | MediumTest | Level3)
-{
-    AccessToken token;
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
-    CallTransferInfo info;
-    info.settingType = (CallTransferSettingType)FALSE_DEFAULT;
-    info.type = CallTransferType::TRANSFER_TYPE_BUSY;
-    if (strcpy_s(info.transferNum, kMaxNumberLen + 1, "123") != EOK) {
-        TELEPHONY_LOGE("strcpy_s fail.");
-        return;
-    }
-
-    if (HasSimCard(SIM1_SLOTID)) {
-        EXPECT_EQ(CallManagerGtest::clientPtr_->SetCallTransferInfo(SIM1_SLOTID, info),
-            CALL_ERR_INVALID_TRANSFER_SETTING_TYPE);
-    }
-    if (HasSimCard(SIM2_SLOTID)) {
-        EXPECT_EQ(CallManagerGtest::clientPtr_->SetCallTransferInfo(SIM2_SLOTID, info),
-            CALL_ERR_INVALID_TRANSFER_SETTING_TYPE);
-    }
-}
-
-/**
- * @tc.number   Telephony_CallManager_SetCallTransferInfo_0600
- * @tc.name     input slotId 0, CallTransferSettingType invalid, CallTransferType TRANSFER_TYPE_BUSY, transferNum was
- *              too long, test SetCallTransferInfo() return failed
- * @tc.desc     Function test
- */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallTransferInfo_0600, Function | MediumTest | Level3)
-{
-    AccessToken token;
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
-    CallTransferInfo info;
-    info.settingType = CallTransferSettingType::CALL_TRANSFER_ENABLE;
-    info.type = CallTransferType::TRANSFER_TYPE_BUSY;
-    if (strcpy_s(info.transferNum, kMaxNumberLen + 2,
-        "1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890"
-        "1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890"
-        "123456789012345678901234567890123456789012345678901234567890") != EOK) {
-        TELEPHONY_LOGE("strcpy_s fail.");
-        return;
-    }
-
-    if (HasSimCard(SIM1_SLOTID)) {
-        EXPECT_EQ(CallManagerGtest::clientPtr_->SetCallTransferInfo(SIM1_SLOTID, info), CALL_ERR_NUMBER_OUT_OF_RANGE);
-    }
-    if (HasSimCard(SIM2_SLOTID)) {
-        EXPECT_EQ(CallManagerGtest::clientPtr_->SetCallTransferInfo(SIM2_SLOTID, info), CALL_ERR_NUMBER_OUT_OF_RANGE);
-    }
-}
-
-/**
- * @tc.number   Telephony_CallManager_SetCallTransferInfo_0700
- * @tc.name     input slotId 0, CallTransferSettingType CALL_TRANSFER_ENABLE, CallTransferType TRANSFER_TYPE_BUSY,
- *              test SetCallTransferInfo()
- * @tc.desc     Function test
- */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallTransferInfo_0700, Function | MediumTest | Level3)
-{
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
-    CallTransferInfo info;
-    info.settingType = CallTransferSettingType::CALL_TRANSFER_ENABLE;
-    info.type = CallTransferType::TRANSFER_TYPE_BUSY;
-    if (strcpy_s(info.transferNum, kMaxNumberLen + 1, "444") != EOK) {
-        TELEPHONY_LOGE("strcpy_s fail.");
-        return;
-    }
-
-    if (HasSimCard(SIM1_SLOTID)) {
-        EXPECT_EQ(CallManagerGtest::clientPtr_->SetCallTransferInfo(SIM1_SLOTID, info), TELEPHONY_ERR_PERMISSION_ERR);
-    }
-    if (HasSimCard(SIM2_SLOTID)) {
-        EXPECT_EQ(CallManagerGtest::clientPtr_->SetCallTransferInfo(SIM2_SLOTID, info), TELEPHONY_ERR_PERMISSION_ERR);
-    }
-}
-
-/******************************************* Test EnableImsSwitch() ********************************************/
-/**
- * @tc.number   Telephony_CallManager_EnableImsSwitch_0100
- * @tc.name     input slotId 0, test EnableImsSwitch
- * @tc.desc     Function test
- */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_EnableImsSwitch_0100, Function | MediumTest | Level3)
-{
-    AccessToken token;
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
-
-    if (HasSimCard(SIM1_SLOTID)) {
-        EXPECT_EQ(CallManagerGtest::clientPtr_->EnableImsSwitch(SIM1_SLOTID), RETURN_VALUE_IS_ZERO);
-    }
-    if (HasSimCard(SIM2_SLOTID)) {
-        EXPECT_EQ(CallManagerGtest::clientPtr_->EnableImsSwitch(SIM2_SLOTID), RETURN_VALUE_IS_ZERO);
-    }
-}
-
-/**
- * @tc.number   Telephony_CallManager_EnableImsSwitch_0200
- * @tc.name     input invalid slotId, test EnableImsSwitch return failed
- * @tc.desc     Function test
- */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_EnableImsSwitch_0200, Function | MediumTest | Level3)
-{
-    AccessToken token;
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
-
-    EXPECT_EQ(CallManagerGtest::clientPtr_->EnableImsSwitch(INVALID_SLOT_ID), CALL_ERR_INVALID_SLOT_ID);
-}
-
-/**
- * @tc.number   Telephony_CallManager_EnableImsSwitch_0300
- * @tc.name     input slotId was out of count, test EnableImsSwitch return failed
- * @tc.desc     Function test
- */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_EnableImsSwitch_0300, Function | MediumTest | Level3)
-{
-    AccessToken token;
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
-
-    int32_t slotId = SIM_SLOT_COUNT; // out of the count
-    EXPECT_EQ(CallManagerGtest::clientPtr_->EnableImsSwitch(slotId), CALL_ERR_INVALID_SLOT_ID);
-}
-
-/**
- * @tc.number   Telephony_CallManager_EnableImsSwitch_0400
- * @tc.name     test EnableImsSwitch without permission
- * @tc.desc     Function test
- */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_EnableImsSwitch_0400, Function | MediumTest | Level3)
-{
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
-
-    if (HasSimCard(SIM1_SLOTID)) {
-        EXPECT_EQ(CallManagerGtest::clientPtr_->EnableImsSwitch(SIM1_SLOTID), TELEPHONY_ERR_PERMISSION_ERR);
-    }
-    if (HasSimCard(SIM2_SLOTID)) {
-        EXPECT_EQ(CallManagerGtest::clientPtr_->EnableImsSwitch(SIM2_SLOTID), TELEPHONY_ERR_PERMISSION_ERR);
-    }
-}
-
-/******************************************* Test DisableImsSwitch() ********************************************/
-/**
- * @tc.number   Telephony_CallManager_DisableImsSwitch_0100
- * @tc.name     input slotId 0, test DisableImsSwitch
- * @tc.desc     Function test
- */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_DisableImsSwitch_0100, Function | MediumTest | Level3)
-{
-    AccessToken token;
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
-
-    if (HasSimCard(SIM1_SLOTID)) {
-        EXPECT_EQ(CallManagerGtest::clientPtr_->DisableImsSwitch(SIM1_SLOTID), RETURN_VALUE_IS_ZERO);
-    }
-    if (HasSimCard(SIM2_SLOTID)) {
-        EXPECT_EQ(CallManagerGtest::clientPtr_->DisableImsSwitch(SIM2_SLOTID), RETURN_VALUE_IS_ZERO);
-    }
-}
-
-/**
- * @tc.number   Telephony_CallManager_DisableImsSwitch_0200
- * @tc.name     input invalid slotId, test DisableImsSwitch return failed
- * @tc.desc     Function test
- */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_DisableImsSwitch_0200, Function | MediumTest | Level3)
-{
-    AccessToken token;
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
-
-    EXPECT_EQ(CallManagerGtest::clientPtr_->DisableImsSwitch(INVALID_SLOT_ID), CALL_ERR_INVALID_SLOT_ID);
-}
-
-/**
- * @tc.number   Telephony_CallManager_DisableImsSwitch_0300
- * @tc.name     input slotId was out of count, test DisableImsSwitch return failed
- * @tc.desc     Function test
- */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_DisableImsSwitch_0300, Function | MediumTest | Level3)
-{
-    AccessToken token;
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
-
-    int32_t slotId = SIM_SLOT_COUNT; // out of the count
-    EXPECT_EQ(CallManagerGtest::clientPtr_->DisableImsSwitch(slotId), CALL_ERR_INVALID_SLOT_ID);
-}
-
-/******************************************* Test IsImsSwitchEnabled() ********************************************/
-/**
- * @tc.number   Telephony_CallManager_IsImsSwitchEnabled_0100
- * @tc.name     input slotId 0, test IsImsSwitchEnabled
- * @tc.desc     Function test
- */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_IsImsSwitchEnabled_0100, Function | MediumTest | Level3)
-{
-    AccessToken token;
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
-
-    bool enabled;
-    if (HasSimCard(SIM1_SLOTID)) {
-        EXPECT_EQ(CallManagerGtest::clientPtr_->IsImsSwitchEnabled(SIM1_SLOTID, enabled), RETURN_VALUE_IS_ZERO);
-    }
-    if (HasSimCard(SIM2_SLOTID)) {
-        EXPECT_EQ(CallManagerGtest::clientPtr_->IsImsSwitchEnabled(SIM2_SLOTID, enabled), RETURN_VALUE_IS_ZERO);
-    }
-}
-
-/**
- * @tc.number   Telephony_CallManager_IsImsSwitchEnabled_0200
- * @tc.name     input invalid slotId, test IsImsSwitchEnabled return failed
- * @tc.desc     Function test
- */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_IsImsSwitchEnabled_0200, Function | MediumTest | Level3)
-{
-    AccessToken token;
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
-
-    bool enabled;
-    EXPECT_EQ(CallManagerGtest::clientPtr_->IsImsSwitchEnabled(INVALID_SLOT_ID, enabled), CALL_ERR_INVALID_SLOT_ID);
-}
-
-/**
- * @tc.number   Telephony_CallManager_IsImsSwitchEnabled_0300
- * @tc.name     input slotId was out of count, test IsImsSwitchEnabled return failed
- * @tc.desc     Function test
- */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_IsImsSwitchEnabled_0300, Function | MediumTest | Level3)
-{
-    AccessToken token;
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
-
-    int32_t slotId = SIM_SLOT_COUNT; // out of the count
-    bool enabled;
-    EXPECT_EQ(CallManagerGtest::clientPtr_->IsImsSwitchEnabled(slotId, enabled), CALL_ERR_INVALID_SLOT_ID);
-}
-
-/******************************************* Test SetVoNRState() ********************************************/
-/**
- * @tc.number   Telephony_CallManager_SetVoNRState_0100
- * @tc.name     input slotId 0, VoNRstate ON(0) test SetVoNRState
- * @tc.desc     Function test
- */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_SetVoNRState_0100, Function | MediumTest | Level3)
-{
-    AccessToken token;
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
-    int32_t state = 0;
-    if (HasSimCard(SIM1_SLOTID)) {
-        EXPECT_EQ(CallManagerGtest::clientPtr_->SetVoNRState(SIM1_SLOTID, state), RETURN_VALUE_IS_ZERO);
-    }
-    if (HasSimCard(SIM2_SLOTID)) {
-        EXPECT_EQ(CallManagerGtest::clientPtr_->SetVoNRState(SIM2_SLOTID, state), RETURN_VALUE_IS_ZERO);
-    }
-}
-
-/**
- * @tc.number   Telephony_CallManager_SetVoNRState_0200
- * @tc.name     input slotId 0, VoNRstate OFF(1) test SetVoNRState
- * @tc.desc     Function test
- */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_SetVoNRState_0200, Function | MediumTest | Level3)
-{
-    AccessToken token;
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
-    int32_t state = 1;
-    if (HasSimCard(SIM1_SLOTID)) {
-        EXPECT_EQ(CallManagerGtest::clientPtr_->SetVoNRState(SIM1_SLOTID, state), RETURN_VALUE_IS_ZERO);
-    }
-    if (HasSimCard(SIM2_SLOTID)) {
-        EXPECT_EQ(CallManagerGtest::clientPtr_->SetVoNRState(SIM2_SLOTID, state), RETURN_VALUE_IS_ZERO);
-    }
-}
-
-/**
- * @tc.number   Telephony_CallManager_SetVoNRState_0300
- * @tc.name     input invalid slotId, test SetVoNRState return failed
- * @tc.desc     Function test
- */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_SetVoNRState_0300, Function | MediumTest | Level3)
-{
-    AccessToken token;
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
-    int32_t state = 0;
-    EXPECT_EQ(CallManagerGtest::clientPtr_->SetVoNRState(INVALID_SLOT_ID, state), CALL_ERR_INVALID_SLOT_ID);
-}
-
-/**
- * @tc.number   Telephony_CallManager_SetVoNRState_0400
- * @tc.name     input slotId was out of count, test SetVoNRState return failed
- * @tc.desc     Function test
- */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_SetVoNRState_0400, Function | MediumTest | Level3)
-{
-    AccessToken token;
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
-    int32_t state = 0;
-    int32_t slotId = SIM_SLOT_COUNT; // out of the count
-    EXPECT_EQ(CallManagerGtest::clientPtr_->SetVoNRState(slotId, state), CALL_ERR_INVALID_SLOT_ID);
-}
-
-/**
- * @tc.number   Telephony_CallManager_SetVoNRState_0500
- * @tc.name     input invalid state, test SetVoNRState return failed
- * @tc.desc     Function test
- */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_SetVoNRState_0500, Function | MediumTest | Level3)
-{
-    AccessToken token;
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
-    int32_t state = -1;
-    if (HasSimCard(SIM1_SLOTID)) {
-        EXPECT_EQ(CallManagerGtest::clientPtr_->SetVoNRState(SIM1_SLOTID, state), TELEPHONY_ERR_ARGUMENT_INVALID);
-    }
-    if (HasSimCard(SIM2_SLOTID)) {
-        EXPECT_EQ(CallManagerGtest::clientPtr_->SetVoNRState(SIM2_SLOTID, state), TELEPHONY_ERR_ARGUMENT_INVALID);
-    }
-}
-
-/**
- * @tc.number   Telephony_CallManager_SetVoNRState_0600
- * @tc.name     test SetVoNRState without permission
- * @tc.desc     Function test
- */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_SetVoNRState_0600, Function | MediumTest | Level3)
-{
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
-    int32_t state = 0;
-    if (HasSimCard(SIM1_SLOTID)) {
-        EXPECT_EQ(CallManagerGtest::clientPtr_->SetVoNRState(SIM1_SLOTID, state), TELEPHONY_ERR_PERMISSION_ERR);
-    }
-    if (HasSimCard(SIM2_SLOTID)) {
-        EXPECT_EQ(CallManagerGtest::clientPtr_->SetVoNRState(SIM2_SLOTID, state), TELEPHONY_ERR_PERMISSION_ERR);
-    }
-}
-
-/******************************************* Test GetVoNRState() ********************************************/
-/**
- * @tc.number   Telephony_CallManager_GetVoNRState_0100
- * @tc.name     input slotId 0, test GetVoNRState
- * @tc.desc     Function test
- */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_GetVoNRState_0100, Function | MediumTest | Level3)
-{
-    AccessToken token;
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
-
-    int32_t state;
-    if (HasSimCard(SIM1_SLOTID)) {
-        EXPECT_EQ(CallManagerGtest::clientPtr_->GetVoNRState(SIM1_SLOTID, state), RETURN_VALUE_IS_ZERO);
-    }
-    if (HasSimCard(SIM2_SLOTID)) {
-        EXPECT_EQ(CallManagerGtest::clientPtr_->GetVoNRState(SIM2_SLOTID, state), RETURN_VALUE_IS_ZERO);
-    }
-}
-
-/**
- * @tc.number   Telephony_CallManager_GetVoNRState_0200
- * @tc.name     input invalid slotId, test GetVoNRState return failed
- * @tc.desc     Function test
- */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_GetVoNRState_0200, Function | MediumTest | Level3)
-{
-    AccessToken token;
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
-
-    int32_t state;
-    EXPECT_EQ(CallManagerGtest::clientPtr_->GetVoNRState(INVALID_SLOT_ID, state), CALL_ERR_INVALID_SLOT_ID);
-}
-
-/**
- * @tc.number   Telephony_CallManager_GetVoNRState_0300
- * @tc.name     input slotId was out of count, test GetVoNRState return failed
- * @tc.desc     Function test
- */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_GetVoNRState_0300, Function | MediumTest | Level3)
-{
-    AccessToken token;
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
-
-    int32_t slotId = SIM_SLOT_COUNT; // out of the count
-    int32_t state;
-    EXPECT_EQ(CallManagerGtest::clientPtr_->GetVoNRState(slotId, state), CALL_ERR_INVALID_SLOT_ID);
-}
-
-/**
- * @tc.number   Telephony_CallManager_GetVoNRState_0400
- * @tc.name     test GetVoNRState without permission
- * @tc.desc     Function test
- */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_GetVoNRState_0400, Function | MediumTest | Level3)
-{
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
-    int32_t state;
-    if (HasSimCard(SIM1_SLOTID)) {
-        EXPECT_EQ(CallManagerGtest::clientPtr_->GetVoNRState(SIM1_SLOTID, state), TELEPHONY_ERR_PERMISSION_ERR);
-    }
-    if (HasSimCard(SIM2_SLOTID)) {
-        EXPECT_EQ(CallManagerGtest::clientPtr_->GetVoNRState(SIM2_SLOTID, state), TELEPHONY_ERR_PERMISSION_ERR);
-    }
-}
-
-/******************************************* Test ControlCamera() *********************************************/
-/**
- * @tc.number   Telephony_CallManager_ControlCamera_0100
- * @tc.name     input camera id lcam001, Test ControlCamera, returns 0 if success
- * @tc.desc     Function test
- */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_ControlCamera_0100, Function | MediumTest | Level0)
-{
-    AccessToken token;
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
-    int32_t callId = 1;
-    // 3516DV300 camera id string is "lcam001"
-    std::string id = "lcam001";
-
-    std::u16string cameraID = Str8ToStr16(id);
-    EXPECT_NE(CallManagerGtest::clientPtr_->ControlCamera(callId, cameraID), RETURN_VALUE_IS_ZERO);
-}
-
-/**
- * @tc.number   Telephony_CallManager_ControlCamera_0200
- * @tc.name     input error camera id xtsautotest123456, Test ControlCamera, return err code if failed
- * @tc.desc     Function test
- */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_ControlCamera_0200, Function | MediumTest | Level2)
-{
-    AccessToken token;
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
-    int32_t callId = 1;
-    std::string id = "xtsautotest123456";
-
-    std::u16string cameraID = Str8ToStr16(id);
-    EXPECT_NE(CallManagerGtest::clientPtr_->ControlCamera(callId, cameraID), RETURN_VALUE_IS_ZERO);
-}
-
-/**
- * @tc.number   Telephony_CallManager_ControlCamera_0300
- * @tc.name     input error camera id xtsautotest123456, Test ControlCamera,
- *              then input empty camera id, Test ControlCamera
- * @tc.desc     Function test
- */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_ControlCamera_0300, Function | MediumTest | Level2)
-{
-    AccessToken token;
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
-    int32_t callId = 1;
-    std::string id = "lcam001";
-
-    std::u16string cameraID = Str8ToStr16(id);
-    EXPECT_NE(CallManagerGtest::clientPtr_->ControlCamera(callId, cameraID), RETURN_VALUE_IS_ZERO);
-
-    id = "";
-    cameraID = Str8ToStr16(id);
-    EXPECT_NE(CallManagerGtest::clientPtr_->ControlCamera(callId, cameraID), RETURN_VALUE_IS_ZERO);
-}
-
-/**
- * @tc.number   Telephony_CallManager_ControlCamera_0600
- * @tc.name     input empty camera id, Test ControlCamera, returns error code if failed
- * @tc.desc     Function test
- */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_ControlCamera_0600, Function | MediumTest | Level2)
-{
-    AccessToken token;
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
-    int32_t callId = 1;
-    std::string id = "";
-
-    std::u16string cameraID = Str8ToStr16(id);
-    EXPECT_NE(CallManagerGtest::clientPtr_->ControlCamera(callId, cameraID), RETURN_VALUE_IS_ZERO);
-}
-
-/******************************************* Test SetPreviewWindow() *********************************************/
-/**
- * @tc.number   Telephony_CallManager_SetPreviewWindow_0100
- * @tc.name     input previewSurfaceId:"", Test set preview window
- * @tc.desc     Function test
- */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_SetPreviewWindow_0100, Function | MediumTest | Level2)
-{
-    AccessToken token;
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
-    int32_t callId = 1;
-    std::string previewSurfaceId = "";
-    EXPECT_NE(CallManagerGtest::clientPtr_->SetPreviewWindow(callId, previewSurfaceId), RETURN_VALUE_IS_ZERO);
-}
-
-/**
- * @tc.number   Telephony_CallManager_SetPreviewWindow_0200
- * @tc.name     input previewSurfaceId:123, Test set preview window
- * @tc.desc     Function test
- */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_SetPreviewWindow_0200, Function | MediumTest | Level2)
-{
-    AccessToken token;
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
-    int32_t callId = 1;
-    std::string previewSurfaceId = "123";
-    EXPECT_NE(CallManagerGtest::clientPtr_->SetPreviewWindow(callId, previewSurfaceId), RETURN_VALUE_IS_ZERO);
-}
-
-/******************************************* Test SetDisplayWindow() *********************************************/
-/**
- * @tc.number   Telephony_CallManager_SetDisplayWindow_0100
- * @tc.name     input displaySurfaceId:"", Test set display window
- * @tc.desc     Function test
- */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_SetDisplayWindow_0100, Function | MediumTest | Level2)
-{
-    AccessToken token;
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
-    int32_t callId = 1;
-    std::string displaySurfaceId = "";
-    EXPECT_NE(CallManagerGtest::clientPtr_->SetDisplayWindow(callId, displaySurfaceId), RETURN_VALUE_IS_ZERO);
-}
-
-/**
- * @tc.number   Telephony_CallManager_SetDisplayWindow_0200
- * @tc.name     input displaySurfaceId:123, Test set display window
- * @tc.desc     Function test
- */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_SetDisplayWindow_0200, Function | MediumTest | Level2)
-{
-    AccessToken token;
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
-    int32_t callId = 1;
-    std::string displaySurfaceId = "123";
-    EXPECT_NE(CallManagerGtest::clientPtr_->SetDisplayWindow(callId, displaySurfaceId), RETURN_VALUE_IS_ZERO);
-}
-
-/******************************************* Test SetDeviceDirection() *********************************************/
-/**
- * @tc.number   Telephony_CallManager_SetDeviceDirection_0100
- * @tc.name     input invalid rotation, Test SetDeviceDirection, return error code if failed
- * @tc.desc     Function test
- */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_SetDeviceDirection_0100, Function | MediumTest | Level2)
-{
-    AccessToken token;
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
-    int32_t callId = 1;
-    int32_t rotation = CAMERA_ROTATION_ERROR;
-    EXPECT_NE(CallManagerGtest::clientPtr_->SetDeviceDirection(callId, rotation), RETURN_VALUE_IS_ZERO);
-}
-
-/**
- * @tc.number   Telephony_CallManager_SetDeviceDirection_0200
- * @tc.name     input rotation 0, Test SetDeviceDirection, return 0 if success
- * @tc.desc     Function test
- */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_SetDeviceDirection_0200, Function | MediumTest | Level2)
-{
-    AccessToken token;
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
-    int32_t callId = 1;
-    int32_t rotation = 0;
-    EXPECT_NE(CallManagerGtest::clientPtr_->SetDeviceDirection(callId, rotation), RETURN_VALUE_IS_ZERO);
-}
-
-/**
- * @tc.number   Telephony_CallManager_SetDeviceDirection_0300
- * @tc.name     input rotation 90, Test SetDeviceDirection
- * @tc.desc     Function test
- */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_SetDeviceDirection_0300, Function | MediumTest | Level2)
-{
-    AccessToken token;
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
-    int32_t callId = 1;
-    int32_t rotation = CAMERA_ROTATION_90;
-    EXPECT_NE(CallManagerGtest::clientPtr_->SetDeviceDirection(callId, rotation), RETURN_VALUE_IS_ZERO);
+    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_OFFHOOK, SLEEP_200_MS, SLEEP_30000_MS);
+    EXPECT_NE(clientPtr_->SetAudioDevice(audioDevice), RETURN_VALUE_IS_ZERO);
 }
 } // namespace Telephony
 } // namespace OHOS
