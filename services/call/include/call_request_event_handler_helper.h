@@ -40,8 +40,8 @@ private:
     bool isDialingCallProcessing_ = false;
     bool pendingMo_ = false;
     bool pendingHangup_ = false;
-    bool pendingMoCallId_ = false;
-    bool pendingHangupCallId_ = false;
+    int32_t pendingMoCallId_ = -1;
+    int32_t pendingHangupCallId_ = -1;
 };
 } // namespace Telephony
 } // namespace OHOS
