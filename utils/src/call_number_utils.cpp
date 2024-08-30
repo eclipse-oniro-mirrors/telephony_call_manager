@@ -338,7 +338,7 @@ void CallNumberUtils::NumberLocationUpdate(const sptr<CallBase> &callObjectPtr)
     }
     if (numberLocation != "" && numberLocation != "default") {
         TELEPHONY_LOGI("need report call info of numberLocation");
-        call->GetCallAttributeBaseInfo(info);
+        call->GetCallAttributeInfo(info);
         DelayedSingleton<CallAbilityReportProxy>::GetInstance()->ReportCallStateInfo(info);
     }
 }
@@ -367,7 +367,7 @@ void CallNumberUtils::YellowPageAndMarkUpdate(const sptr<CallBase> &callObjectPt
         return;
     }
     if (numberMarkInfo.markType != MarkType::MARK_TYPE_NONE) {
-        call->GetCallAttributeBaseInfo(info);
+        call->GetCallAttributeInfo(info);
         DelayedSingleton<CallAbilityReportProxy>::GetInstance()->ReportCallStateInfo(info);
     }
 }
