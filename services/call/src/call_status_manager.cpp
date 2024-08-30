@@ -874,7 +874,6 @@ int32_t CallStatusManager::DisconnectedHandle(const CallDetailInfo &info)
             UpdateCallState(leftOneConferenceCall, leftOneConferenceCall->GetTelCallState());
         }
     }
-    sptr<CallBase> foregroundCall = GetForegroundCall(false);
     int32_t currentCallNum = CallObjectManager::GetCurrentCallNum();
     if (currentCallNum <= 0) {
         DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance()->RestoreSuperPrivacyMode();
