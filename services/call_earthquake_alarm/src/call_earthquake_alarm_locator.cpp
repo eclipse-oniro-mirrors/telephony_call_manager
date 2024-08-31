@@ -270,12 +270,14 @@ void MyLocationEngine::OOBEComplete()
     std::string stateValue = INITIAL_FIRST_VALUE;
     for (auto& oobeKey : OOBESwitchObserver::keyStatus) {
         if (!oobeKey.second) {
-            oobeKey.second = MyLocationEngine::IsSwitchOn(oobeKey.first, stateValue);
+            settingsCallbacks[oobeKey.first] = sptr<OOBESwitchObserver>::MakeSptr(oobeKey.first);
+            oobeKey.second = settingsCallbacks[oobeKey.first]->OnChange();
         }
         if (!oobeKey.second) {
-            settingsCallbacks[oobeKey.first] = sptr<OOBESwitchObserver>::MakeSptr(oobeKey.first);
             auto datashareHelper = std::make_shared<DataShareSwitchState>();
             datashareHelper->RegisterListenSettingsKey(oobeKey.first, true, settingsCallbacks[oobeKey.first]);
+        } else {
+            settingsCallbacks[oobeKey.first] = nulltr;
         }
     }
 };

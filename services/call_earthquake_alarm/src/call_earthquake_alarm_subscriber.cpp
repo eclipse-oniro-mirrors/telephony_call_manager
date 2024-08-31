@@ -213,7 +213,7 @@ void LocationSystemAbilityListener::OnRemoveSystemAbility(int32_t systemAbilityI
         TELEPHONY_LOGE("service is not started");
         return;
     }
-    int32t len = MyLocationEngine::settingsCallbacks.size();
+    int32t len = (int32_t)MyLocationEngine::settingsCallbacks.size();
     TELEPHONY_LOGI("callbacks is %{public}d", len);
     if (len != 0) {
         for (auto& oobeKey : OOBESwitchObserver::keyStatus) {
