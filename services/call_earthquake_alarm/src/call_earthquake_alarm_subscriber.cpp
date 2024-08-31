@@ -186,8 +186,7 @@ void LocationSystemAbilityListener::OnAddSystemAbility(int32_t systemAbilityId, 
     }
     TELEPHONY_LOGI("start boot complete");
     MyLocationEngine::BootComplete(alarmSwitchState);
-    SystemAbilitySubscriber();
-    statusChangeListener_ = nullptr;
+    OnRemoveSystemAbility(systemAbilityId, deviceId);
 }
 
 bool LocationSystemAbilityListener::GetSystemAbility(int32_t systemAbilityId)
@@ -226,10 +225,12 @@ void LocationSystemAbilityListener::OnRemoveSystemAbility(int32_t systemAbilityI
             auto datashareHelper = std::make_shared<DataShareSwitchState>();
             datashareHelper->RegisterListenSettingsKey(oobeKey.first, false, oobeKey.second);
         }
-        MyLocationEngine::settingsCallbacks = {};
     }
     SystemAbilitySubscriber();
     statusChangeListener_ = nullptr;
+    systemAbilityStatus = {};
+    OOBESwitchObserver::keyStatus = {};
+    MyLocationEngine::settingsCallbacks = {};
 }
 
 bool LocationSystemAbilityListener::SystemAbilitySubscriber()
