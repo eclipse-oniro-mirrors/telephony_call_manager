@@ -106,6 +106,7 @@ private:
     void CreateAndSaveNewCall(const CallDetailInfo &info, CallDirection direction);
     int32_t UpdateCallStateAndHandleDsdsMode(const CallDetailInfo &info, sptr<CallBase> &call);
     bool IsDcCallConneceted();
+    void HandleDialWhenHolding(int32_t callId, sptr<CallBase> &call);
 private:
     CallDetailInfo callReportInfo_;
     CallDetailsInfo callDetailsInfo_[SLOT_NUM];
