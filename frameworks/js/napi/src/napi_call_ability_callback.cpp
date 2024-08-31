@@ -64,7 +64,6 @@ NapiCallAbilityCallback::NapiCallAbilityCallback()
     memberFuncMap_[CallResultReportId::CLOSE_UNFINISHED_USSD_REPORT_ID] =
         [this](AppExecFwk::PacMap &resultInfo) { return ReportCloseUnFinishedUssdInfo(resultInfo); };
     UnRegisterGetWaitingCallback();
-    UnRegisterCloseUnFinishedUssdCallback();
     UnRegisterSetWaitingCallback();
     UnRegisterGetRestrictionCallback();
     UnRegisterSetRestrictionPasswordCallback();
