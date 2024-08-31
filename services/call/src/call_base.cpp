@@ -30,6 +30,8 @@
 
 namespace OHOS {
 namespace Telephony {
+static const int MILLI_TO_BASE = 1000;
+
 CallBase::CallBase(DialParaInfo &info)
     : callId_(info.callId), callType_(info.callType), videoState_(info.videoState), accountNumber_(info.number),
       bundleName_(info.bundleName), callRunningState_(CallRunningState::CALL_RUNNING_STATE_CREATE),
@@ -243,7 +245,13 @@ void CallBase::StateChangesToActive()
     callRunningState_ = CallRunningState::CALL_RUNNING_STATE_ACTIVE;
     if (callBeginTime_ == 0) {
         callBeginTime_ = ringEndTime_ = time(nullptr);
-        startTime_ = callBeginTime_;
+        if (callType_ == CallType::TYPE_VOIP) {
+            struct timeval tv;
+            gettimeofday(&tv, nullptr);
+            startTime_ = tv.tv_sec * MILLI_TO_BASE + tv.tv_usec / MILLI_TO_BASE;
+        } else {
+            startTime_ = callBeginTime_;
+        }
         answerType_ = CallAnswerType::CALL_ANSWER_ACTIVED;
     }
 }

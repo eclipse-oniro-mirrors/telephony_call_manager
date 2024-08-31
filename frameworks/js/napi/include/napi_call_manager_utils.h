@@ -78,6 +78,7 @@ public:
         napi_env env, napi_value object, const std::string &propertyName, std::string &result);
     static bool GetBoolProperty(napi_env env, napi_value object, const std::string &propertyName);
     static void SetPropertyInt32(napi_env env, napi_value object, std::string name, int32_t value);
+    static void SetPropertyInt64(napi_env env, napi_value object, std::string name, int64_t value);
     static void SetPropertyStringUtf8(napi_env env, napi_value object, std::string name, std::string value);
     static void SetPropertyBoolean(napi_env env, napi_value object, std::string name, int32_t value);
     static napi_value CreateEnumConstructor(napi_env env, napi_callback_info info);
