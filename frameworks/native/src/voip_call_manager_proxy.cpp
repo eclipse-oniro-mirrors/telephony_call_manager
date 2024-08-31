@@ -128,7 +128,10 @@ int32_t VoipCallManagerProxy::ReportOutgoingCall(
     dataParcel.WriteInt32(extras.GetIntValue("voipCallState"));
     dataParcel.WriteBool(extras.GetBooleanValue("showBannerForIncomingCall"));
     dataParcel.WriteBool(extras.GetBooleanValue("isConferenceCall"));
-    dataParcel.WriteUInt8Vector(userProfile);
+    bool result = dataParcel.WriteUInt8Vector(userProfile);
+    if (!result) {
+        TELEPHONY_LOGE("ReportOutgoingCall userProfile write fail, size:%{public}d", userProfile.size());
+    }
     auto remote = Remote();
     if (remote == nullptr) {
         TELEPHONY_LOGE("ReportOutgoingCall Remote is null");
