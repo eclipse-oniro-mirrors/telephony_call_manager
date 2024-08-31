@@ -106,9 +106,14 @@ private:
     void CreateAndSaveNewCall(const CallDetailInfo &info, CallDirection direction);
     int32_t UpdateCallStateAndHandleDsdsMode(const CallDetailInfo &info, sptr<CallBase> &call);
     bool IsDcCallConneceted();
+    void SetConferenceCall(std::vector<sptr<CallBase>>);
+    std::vector<sptr<CallBase>> GetConferenceCallList(int32_t slotId);
+    void UpdateCallDetailsInfo(const CallDetailsInfo &info);
+
 private:
     CallDetailInfo callReportInfo_;
     CallDetailsInfo callDetailsInfo_[SLOT_NUM];
+    CallDetailsInfo tmpCallDetailsInfo_[SLOT_NUM];
     sptr<CallIncomingFilterManager> CallIncomingFilterManagerPtr_;
     std::map<RequestResultEventId, CallAbilityEventId> mEventIdTransferMap_;
     std::map<OttCallEventId, CallAbilityEventId> mOttEventIdTransferMap_;
