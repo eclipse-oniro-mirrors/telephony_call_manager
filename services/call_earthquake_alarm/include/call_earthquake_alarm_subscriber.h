@@ -62,7 +62,7 @@ class DataShareSwitchState {
 public:
     DataShareSwitchState();
     int32_t QueryData(Uri& uri, const std::string& key, std::string& values);
-    bool RegisterListenSettingsKey(std::string key, bool isReg, const sptr<AAFwk::IDataAbilityObserver>& callback);
+    bool RegisterListenSettingsKey(std::string key, bool isReg, sptr<AAFwk::IDataAbilityObserver> callback);
 
 public:
     static const int TELEPHONY_SUCCESS;

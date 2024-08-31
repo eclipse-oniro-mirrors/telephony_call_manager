@@ -128,7 +128,7 @@ int32_t DataShareSwitchState::QueryData(Uri& uri, const std::string& key, std::s
 }
 
 bool DataShareSwitchState::RegisterListenSettingsKey(std::string key, bool isReg,
-    const sptr<AAFwk::IDataAbilityObserver>& callback)
+    sptr<AAFwk::IDataAbilityObserver> callback)
 {
     if (datashareHelper_ == nullptr) {
         TELEPHONY_LOGE("datashareHelper is nullptr");
@@ -139,14 +139,22 @@ bool DataShareSwitchState::RegisterListenSettingsKey(std::string key, bool isReg
         return false;
     }
     std::string uri = DEFAULT_URI + key;
-    if (isReg)  datashareHelper_->RegisterObserver(OHOS::Uri(uri), callback);
-    if (!isReg)  datashareHelper_->UnregisterObserver(OHOS::Uri(uri), callback);
+    if (isReg) {
+        TELEPHONY_LOGI("register listen %{public}s finish", key.c_str());
+        datashareHelper_->RegisterObserver(OHOS::Uri(uri), callback);
+    } else {
+        TELEPHONY_LOGI("unregister listen %{public}s finish", key.c_str());
+        datashareHelper_->UnregisterObserver(OHOS::Uri(uri), callback);
+    }
     datashareHelper_->Release();
-    TELEPHONY_LOGI("register listen %{public}d, %{public}s finish", isReg, key.c_str());
     return true;
 }
 
-std::map<int32_t, bool> LocationSystemAbilityListener::systemAbilityStatus = {};
+std::map<int32_t, bool> LocationSystemAbilityListener::systemAbilityStatus = {
+    {OHOS::DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID, false},
+    {OHOS::LOCATION_LOCATOR_SA_ID, false},
+    {OHOS::LOCATION_NOPOWER_LOCATING_SA_ID, false}
+};
 void LocationSystemAbilityListener::OnAddSystemAbility(int32_t systemAbilityId, const std::string &deviceId)
 {
     static bool startService = false;
@@ -208,10 +216,6 @@ void LocationSystemAbilityListener::OnRemoveSystemAbility(int32_t systemAbilityI
 
 bool LocationSystemAbilityListener::SystemAbilitySubscriber()
 {
-    systemAbilityStatus[OHOS::DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID];
-    systemAbilityStatus[OHOS::LOCATION_LOCATOR_SA_ID];
-    systemAbilityStatus[OHOS::LOCATION_NOPOWER_LOCATING_SA_ID];
-    
     if (statusChangeListener_ == nullptr) {
         statusChangeListener_ = sptr<LocationSystemAbilityListener>::MakeSptr();
     }

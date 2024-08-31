@@ -14,6 +14,9 @@
  */
 
 #include "call_earthquake_alarm_locator.h"
+#include "ffrt.h"
+#include "parameters.h"
+#include "spam_call_adapter.h"
 
 using namespace std;
 using namespace OHOS::Telephony;
@@ -264,16 +267,17 @@ bool MyLocationEngine::IsSwitchOn(std::string key, std::string& value)
     return true;
 }
 
-std::map<std::string, sptr<OOBESwitchObserver>> MyLocationEngine::settingsCallbacks = {};
+std::map<std::string, sptr<AAFwk::IDataAbilityObserver>> MyLocationEngine::settingsCallbacks = {};
 void MyLocationEngine::OOBEComplete()
 {
     std::string stateValue = INITIAL_FIRST_VALUE;
     for (auto& oobeKey : OOBESwitchObserver::keyStatus) {
         oobeKey.second = MyLocationEngine::IsSwitchOn(oobeKey.first, stateValue);
-        settingsCallbacks[oobeKey.first] = sptr<OOBESwitchObserver>::MakeSptr(oobeKey.first);
-        auto callback = sptr<AAFwk::IDataAbilityObserver>(settingsCallbacks[oobeKey.first]);
-        auto datashareHelper = std::make_shared<DataShareSwitchState>();
-        datashareHelper->RegisterListenSettingsKey(oobeKey.first, true, callback);
+        if (!oobeKey.second) {
+            settingsCallbacks[oobeKey.first] = sptr<OOBESwitchObserver>::MakeSptr(oobeKey.first);
+            auto datashareHelper = std::make_shared<DataShareSwitchState>();
+            datashareHelper->RegisterListenSettingsKey(oobeKey.first, true, settingsCallbacks[oobeKey.first]);
+        }
     }
 };
 
@@ -283,6 +287,7 @@ std::map<std::string, bool> OOBESwitchObserver::keyStatus = {
     {"is_ota_finished", false}
 };
 
+std::mutex OOBESwitchObserver::mutex_;
 void OOBESwitchObserver::OnChange()
 {
     std::lock_guard<std::mutex> lock(mutex_);
@@ -295,17 +300,19 @@ void OOBESwitchObserver::OnChange()
             return;
         }
     }
-    for (auto& oobeKey : MyLocationEngine::settingsCallbacks) {
-        auto callback = sptr<AAFwk::IDataAbilityObserver>(oobeKey.second);
-        auto datashareHelper = std::make_shared<DataShareSwitchState>();
-        datashareHelper->RegisterListenSettingsKey(oobeKey.first, false, callback);
+    mValue = MyLocationEngine::INITIAL_FIRST_VALUE;
+    if (MyLocationEngine::IsSwitchOn(LocationSubscriber::SWITCH_STATE_KEY, mValue)) {
+        TELEPHONY_LOGI("the alarm switch is open");
+        MyLocationEngine::ConnectAbility("call_manager_oobe_earthquake_warning_switch_on");
     }
-    MyLocationEngine::settingsCallbacks = {};
-    if (!MyLocationEngine::IsSwitchOn(LocationSubscriber::SWITCH_STATE_KEY, mValue)) {
-        TELEPHONY_LOGE("the alarm switch is close");
-        return;
-    }
-    MyLocationEngine::ConnectAbility("call_manager_oobe_earthquake_warning_switch_on");
+    ffrt::submit([&]() {
+        for (auto& oobeKey : MyLocationEngine::settingsCallbacks) {
+            auto datashareHelper = std::make_shared<DataShareSwitchState>();
+            datashareHelper->RegisterListenSettingsKey(oobeKey.first, false, oobeKey.second);
+        }
+        MyLocationEngine::settingsCallbacks = {};
+        keyStatus = {};
+    });
 }
 
 sptr<AAFwk::IAbilityConnection> EmergencyCallConnectCallback::connectCallback_ = nullptr;

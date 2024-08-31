@@ -55,7 +55,7 @@ public:
 private:
     std::string mKey = "";
     std::string mValue = "";
-    std::mutex mutex_;
+    static std::mutex mutex_;
 };
 
 class MyLocationEngine {
@@ -114,7 +114,7 @@ private:
     
 public:
     static std::string INITIAL_FIRST_VALUE;
-    static std::map<std::string, sptr<OOBESwitchObserver>> settingsCallbacks;
+    static std::map<std::string, sptr<AAFwk::IDataAbilityObserver>> settingsCallbacks;
 };
 //class MyLocationCallBack
 
