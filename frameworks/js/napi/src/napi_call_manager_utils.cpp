@@ -272,6 +272,13 @@ void NapiCallManagerUtils::SetPropertyInt32(napi_env env, napi_value object, std
     napi_set_named_property(env, object, name.c_str(), peopertyValue);
 }
 
+void NapiCallManagerUtils::SetPropertyInt64(napi_env env, napi_value object, std::string name, int64_t value)
+{
+    napi_value peopertyValue = nullptr;
+    napi_create_int64(env, value, &peopertyValue);
+    napi_set_named_property(env, object, name.c_str(), peopertyValue);
+}
+
 void NapiCallManagerUtils::SetPropertyStringUtf8(napi_env env, napi_value object, std::string name, std::string value)
 {
     napi_value peopertyValue = nullptr;

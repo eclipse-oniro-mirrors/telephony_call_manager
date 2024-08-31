@@ -550,7 +550,7 @@ int32_t NapiCallAbilityCallback::ReportCallState(CallAttributeInfo &info, EventC
     NapiCallManagerUtils::SetPropertyInt32(env, callbackValues[ARRAY_INDEX_FIRST], "accountId", info.accountId);
     NapiCallManagerUtils::SetPropertyInt32(
         env, callbackValues[ARRAY_INDEX_FIRST], "videoState", static_cast<int32_t>(info.videoState));
-    NapiCallManagerUtils::SetPropertyInt32(env, callbackValues[ARRAY_INDEX_FIRST], "startTime", info.startTime);
+    NapiCallManagerUtils::SetPropertyInt64(env, callbackValues[ARRAY_INDEX_FIRST], "startTime", info.startTime);
     NapiCallManagerUtils::SetPropertyBoolean(env, callbackValues[ARRAY_INDEX_FIRST], "isEcc", info.isEcc);
     NapiCallManagerUtils::SetPropertyInt32(
         env, callbackValues[ARRAY_INDEX_FIRST], "callType", static_cast<int32_t>(info.callType));
