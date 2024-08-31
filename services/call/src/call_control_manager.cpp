@@ -1436,8 +1436,9 @@ void CallControlManager::SystemAbilityListener::OnAddSystemAbility(int32_t syste
         TELEPHONY_LOGE("CallControlManager::OnAddSystemAbility subscriberPtr is nullptr");
         return;
     }
-
+    std::string identity = IPCSkeleton::ResetCallingIdentity();
     bool subscribeResult = EventFwk::CommonEventManager::SubscribeCommonEvent(subscriberPtr_);
+    IPCSkeleton::SetCallingIdentity(identity);
     TELEPHONY_LOGI("CallControlManager::OnAddSystemAbility subscribeResult = %{public}d", subscribeResult);
 }
 
@@ -1453,8 +1454,9 @@ void CallControlManager::SystemAbilityListener::OnRemoveSystemAbility(
         TELEPHONY_LOGE("CallControlManager::OnRemoveSystemAbility subscriberPtr is nullptr");
         return;
     }
-
+    std::string identity = IPCSkeleton::ResetCallingIdentity();
     bool subscribeResult = EventFwk::CommonEventManager::UnSubscribeCommonEvent(subscriberPtr_);
+    IPCSkeleton::SetCallingIdentity(identity);
     TELEPHONY_LOGI("CallControlManager::OnRemoveSystemAbility subscribeResult = %{public}d", subscribeResult);
 }
 
@@ -1497,7 +1499,7 @@ int32_t CallControlManager::BroadcastSubscriber()
     }
 
     EventFwk::MatchingSkills matchingSkill_;
-    matchingSkills.AddEvent("usual.event.SUPER_PRIVACY_MODE");
+    matchingSkill_.AddEvent("usual.event.SUPER_PRIVACY_MODE");
     EventFwk::CommonEventSubscribeInfo subscriberInfos_(matchingSkill_);
     subscriberInfos_.SetPublisherBundleName("com.settings");
     subscriberInfos_.SetPermission("ohos.permission.SET_TELEPHONY_STATE");
