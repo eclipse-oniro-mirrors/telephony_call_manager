@@ -32,13 +32,7 @@ NapiCallAbilityCallback::NapiCallAbilityCallback()
     (void)memset_s(&stateCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
     (void)memset_s(&eventCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
     (void)memset_s(&ottRequestCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
-    (void)memset_s(&getWaitingCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
-    (void)memset_s(&setWaitingCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
-    (void)memset_s(&getRestrictionCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
     (void)memset_s(&setRestrictionCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
-    (void)memset_s(&setRestrictionPasswordCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
-    (void)memset_s(&getTransferCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
-    (void)memset_s(&setTransferCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
     (void)memset_s(&startRttCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
     (void)memset_s(&stopRttCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
     (void)memset_s(&callDisconnectCauseCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
@@ -69,6 +63,12 @@ NapiCallAbilityCallback::NapiCallAbilityCallback()
         [this](AppExecFwk::PacMap &resultInfo) { return ReportStopRttInfo(resultInfo); };
     memberFuncMap_[CallResultReportId::CLOSE_UNFINISHED_USSD_REPORT_ID] =
         [this](AppExecFwk::PacMap &resultInfo) { return ReportCloseUnFinishedUssdInfo(resultInfo); };
+    UnRegisterGetWaitingCallback();
+    UnRegisterSetWaitingCallback();
+    UnRegisterGetRestrictionCallback();
+    UnRegisterSetRestrictionPasswordCallback();
+    UnRegisterGetTransferCallback();
+    UnRegisterSetTransferCallback();
 }
 
 NapiCallAbilityCallback::~NapiCallAbilityCallback()
@@ -222,6 +222,7 @@ void NapiCallAbilityCallback::UnRegisterCallOttRequestCallback()
 
 int32_t NapiCallAbilityCallback::RegisterGetWaitingCallback(EventCallback callback)
 {
+    std::lock_guard<std::mutex> lock(getWaitingCallbackMutex_);
     if (getWaitingCallback_.thisVar) {
         TELEPHONY_LOGE("callback already exist!");
         return CALL_ERR_CALLBACK_ALREADY_EXIST;
@@ -232,11 +233,13 @@ int32_t NapiCallAbilityCallback::RegisterGetWaitingCallback(EventCallback callba
 
 void NapiCallAbilityCallback::UnRegisterGetWaitingCallback()
 {
+    std::lock_guard<std::mutex> lock(getWaitingCallbackMutex_);
     (void)memset_s(&getWaitingCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
 }
 
 int32_t NapiCallAbilityCallback::RegisterCloseUnFinishedUssdCallback(EventCallback callback)
 {
+    std::lock_guard<std::mutex> lock(closeUnfinishedUssdCallbackMutex_);
     if (closeUnfinishedUssdCallback_.thisVar) {
         TELEPHONY_LOGE("callback already exist!");
         return CALL_ERR_CALLBACK_ALREADY_EXIST;
@@ -247,11 +250,13 @@ int32_t NapiCallAbilityCallback::RegisterCloseUnFinishedUssdCallback(EventCallba
 
 void NapiCallAbilityCallback::UnRegisterCloseUnFinishedUssdCallback()
 {
+    std::lock_guard<std::mutex> lock(closeUnfinishedUssdCallbackMutex_);
     (void)memset_s(&closeUnfinishedUssdCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
 }
 
 int32_t NapiCallAbilityCallback::RegisterSetWaitingCallback(EventCallback callback)
 {
+    std::lock_guard<std::mutex> lock(setWaitingCallbackMutex_);
     if (setWaitingCallback_.thisVar) {
         TELEPHONY_LOGE("callback already exist!");
         return CALL_ERR_CALLBACK_ALREADY_EXIST;
@@ -262,11 +267,13 @@ int32_t NapiCallAbilityCallback::RegisterSetWaitingCallback(EventCallback callba
 
 void NapiCallAbilityCallback::UnRegisterSetWaitingCallback()
 {
+    std::lock_guard<std::mutex> lock(setWaitingCallbackMutex_);
     (void)memset_s(&setWaitingCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
 }
 
 int32_t NapiCallAbilityCallback::RegisterGetRestrictionCallback(EventCallback callback)
 {
+    std::lock_guard<std::mutex> lock(getRestrictionCallbackMutex_);
     if (getRestrictionCallback_.thisVar) {
         TELEPHONY_LOGE("callback already exist!");
         return CALL_ERR_CALLBACK_ALREADY_EXIST;
@@ -277,6 +284,7 @@ int32_t NapiCallAbilityCallback::RegisterGetRestrictionCallback(EventCallback ca
 
 void NapiCallAbilityCallback::UnRegisterGetRestrictionCallback()
 {
+    std::lock_guard<std::mutex> lock(getRestrictionCallbackMutex_);
     (void)memset_s(&getRestrictionCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
 }
 
@@ -297,6 +305,7 @@ void NapiCallAbilityCallback::UnRegisterSetRestrictionCallback()
 
 int32_t NapiCallAbilityCallback::RegisterSetRestrictionPasswordCallback(EventCallback callback)
 {
+    std::lock_guard<std::mutex> lock(setRestrictionPasswordCallbackMutex_);
     if (setRestrictionPasswordCallback_.thisVar) {
         TELEPHONY_LOGE("callback already exist!");
         return CALL_ERR_CALLBACK_ALREADY_EXIST;
@@ -307,11 +316,13 @@ int32_t NapiCallAbilityCallback::RegisterSetRestrictionPasswordCallback(EventCal
 
 void NapiCallAbilityCallback::UnRegisterSetRestrictionPasswordCallback()
 {
+    std::lock_guard<std::mutex> lock(setRestrictionPasswordCallbackMutex_);
     (void)memset_s(&setRestrictionPasswordCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
 }
 
 int32_t NapiCallAbilityCallback::RegisterGetTransferCallback(EventCallback callback, int32_t type)
 {
+    std::lock_guard<std::mutex> lock(getTransferCallbackMutex_);
     getTransferCallback_ = callback;
     getCallTransferReason_ = type;
     return TELEPHONY_SUCCESS;
@@ -319,11 +330,13 @@ int32_t NapiCallAbilityCallback::RegisterGetTransferCallback(EventCallback callb
 
 void NapiCallAbilityCallback::UnRegisterGetTransferCallback()
 {
+    std::lock_guard<std::mutex> lock(getTransferCallbackMutex_);
     (void)memset_s(&getTransferCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
 }
 
 int32_t NapiCallAbilityCallback::RegisterSetTransferCallback(EventCallback callback)
 {
+    std::lock_guard<std::mutex> lock(setTransferCallbackMutex_);
     if (setTransferCallback_.thisVar) {
         TELEPHONY_LOGE("callback already exist!");
         return CALL_ERR_CALLBACK_ALREADY_EXIST;
@@ -334,6 +347,7 @@ int32_t NapiCallAbilityCallback::RegisterSetTransferCallback(EventCallback callb
 
 void NapiCallAbilityCallback::UnRegisterSetTransferCallback()
 {
+    std::lock_guard<std::mutex> lock(setTransferCallbackMutex_);
     (void)memset_s(&setTransferCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
 }
 
@@ -1061,6 +1075,7 @@ int32_t NapiCallAbilityCallback::OttCallRequest(OttCallRequestId requestId, AppE
 
 int32_t NapiCallAbilityCallback::ReportGetWaitingInfo(AppExecFwk::PacMap &resultInfo)
 {
+    std::lock_guard<std::mutex> lock(getWaitingCallbackMutex_);
     if (getWaitingCallback_.thisVar == nullptr) {
         TELEPHONY_LOGE("getWaitingCallback is null!");
         return CALL_ERR_CALLBACK_NOT_EXIST;
@@ -1107,6 +1122,7 @@ int32_t NapiCallAbilityCallback::ReportGetWaitingInfo(AppExecFwk::PacMap &result
 
 int32_t NapiCallAbilityCallback::ReportCloseUnFinishedUssdInfo(AppExecFwk::PacMap &resultInfo)
 {
+    std::lock_guard<std::mutex> lock(closeUnfinishedUssdCallbackMutex_);
     if (closeUnfinishedUssdCallback_.thisVar == nullptr) {
         TELEPHONY_LOGE("closeUnfinishedUssdCallback is null!");
         return CALL_ERR_CALLBACK_NOT_EXIST;
@@ -1153,6 +1169,7 @@ int32_t NapiCallAbilityCallback::ReportCloseUnFinishedUssdInfo(AppExecFwk::PacMa
 
 int32_t NapiCallAbilityCallback::ReportSetWaitingInfo(AppExecFwk::PacMap &resultInfo)
 {
+    std::lock_guard<std::mutex> lock(setWaitingCallbackMutex_);
     if (setWaitingCallback_.thisVar == nullptr) {
         TELEPHONY_LOGE("setWaitingCallback is null!");
         return CALL_ERR_CALLBACK_NOT_EXIST;
@@ -1199,6 +1216,7 @@ int32_t NapiCallAbilityCallback::ReportSetWaitingInfo(AppExecFwk::PacMap &result
 
 int32_t NapiCallAbilityCallback::ReportGetRestrictionInfo(AppExecFwk::PacMap &resultInfo)
 {
+    std::lock_guard<std::mutex> lock(getRestrictionCallbackMutex_);
     if (getRestrictionCallback_.thisVar == nullptr) {
         TELEPHONY_LOGE("getRestrictionCallback is null!");
         return CALL_ERR_CALLBACK_NOT_EXIST;
@@ -1291,6 +1309,7 @@ int32_t NapiCallAbilityCallback::ReportSetRestrictionInfo(AppExecFwk::PacMap &re
 
 int32_t NapiCallAbilityCallback::ReportSetRestrictionPassword(AppExecFwk::PacMap &resultInfo)
 {
+    std::lock_guard<std::mutex> lock(setRestrictionPasswordCallbackMutex_);
     if (setRestrictionPasswordCallback_.thisVar == nullptr) {
         TELEPHONY_LOGE("setRestrictionPasswordCallback is null!");
         return CALL_ERR_CALLBACK_NOT_EXIST;
@@ -1337,6 +1356,7 @@ int32_t NapiCallAbilityCallback::ReportSetRestrictionPassword(AppExecFwk::PacMap
 
 int32_t NapiCallAbilityCallback::ReportGetTransferInfo(AppExecFwk::PacMap &resultInfo)
 {
+    std::lock_guard<std::mutex> lock(getTransferCallbackMutex_);
     if (getTransferCallback_.thisVar == nullptr) {
         TELEPHONY_LOGE("getTransferCallback is null!");
         return CALL_ERR_CALLBACK_NOT_EXIST;
@@ -1388,6 +1408,7 @@ int32_t NapiCallAbilityCallback::ReportGetTransferInfo(AppExecFwk::PacMap &resul
 
 int32_t NapiCallAbilityCallback::ReportSetTransferInfo(AppExecFwk::PacMap &resultInfo)
 {
+    std::lock_guard<std::mutex> lock(setTransferCallbackMutex_);
     if (setTransferCallback_.thisVar == nullptr) {
         TELEPHONY_LOGE("setTransferCallback is null!");
         return CALL_ERR_CALLBACK_NOT_EXIST;

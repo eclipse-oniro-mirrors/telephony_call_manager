@@ -168,8 +168,14 @@ private:
     EventCallback callSessionEventCallback_;
     using CallResultReportIdProcessorFunc = std::function<int32_t(AppExecFwk::PacMap &resultInfo)>;
     std::map<CallResultReportId, CallResultReportIdProcessorFunc> memberFuncMap_;
-    std::mutex mutex_;
     int32_t getCallTransferReason_ = -1;
+    std::mutex getTransferCallbackMutex_;
+    std::mutex setTransferCallbackMutex_;
+    std::mutex getRestrictionCallbackMutex_;
+    std::mutex setRestrictionPasswordCallbackMutex_;
+    std::mutex closeUnfinishedUssdCallbackMutex_;
+    std::mutex setWaitingCallbackMutex_;
+    std::mutex getWaitingCallbackMutex_;
 };
 } // namespace Telephony
 } // namespace OHOS
