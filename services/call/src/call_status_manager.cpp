@@ -1465,6 +1465,7 @@ void CallStatusManager::PackParaInfo(
         paraInfo.voipCallInfo.extensionId = info.voipCallInfo.extensionId;
         paraInfo.voipCallInfo.voipBundleName = info.voipCallInfo.voipBundleName;
         paraInfo.voipCallInfo.showBannerForIncomingCall = info.voipCallInfo.showBannerForIncomingCall;
+        paraInfo.voipCallInfo.isConferenceCall = info.voipCallInfo.isConferenceCall;
         paraInfo.voipCallInfo.hasMicPermission = info.voipCallInfo.hasMicPermission;
         paraInfo.voipCallInfo.uid = info.voipCallInfo.uid;
     }
