@@ -86,13 +86,29 @@ bool CallRequestEventHandlerHelper::HasPendingMo(int32_t callId)
     return pendingMo_ && (pendingMoCallId_ == callId);
 }
 
+bool CallRequestEventHandlerHelper::IsPendingHangup()
+{
+    if (pendingHangupCallId_ != -1) {
+        return pendingHangup_;
+    }
+    return false;
+}
+
+int32_t CallRequestEventHandlerHelper::GetPendingHangupCallId()
+{
+    if (pendingHangup_) {
+        return pendingHangupCallId_;
+    }
+    return -1;
+}
+
 void CallRequestEventHandlerHelper::SetPendingHangup(bool pendingHangup, int32_t callId)
 {
     pendingHangup_ = pendingHangup;
     pendingHangupCallId_ = callId;
 }
 
-bool CallRequestEventHandlerHelper::HasPendingHangp(int32_t callId)
+bool CallRequestEventHandlerHelper::HasPendingHangup(int32_t callId)
 {
     return pendingHangup_ && (pendingHangupCallId_ == callId);
 }

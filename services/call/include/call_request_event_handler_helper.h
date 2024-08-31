@@ -33,7 +33,9 @@ public:
     void SetPendingMo(bool pendingMo, int32_t callId);
     bool HasPendingMo(int32_t callId);
     void SetPendingHangup(bool pendingHangup, int32_t callId);
-    bool HasPendingHangp(int32_t callId);
+    bool HasPendingHangup(int32_t callId);
+    bool IsPendingHangup();
+    int32_t GetPendingHangupCallId();
 
 private:
     std::shared_ptr<AppExecFwk::EventHandler> callRequestEventHandler_;
