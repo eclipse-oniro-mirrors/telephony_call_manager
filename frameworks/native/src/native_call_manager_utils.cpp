@@ -56,6 +56,7 @@ CallAttributeInfo NativeCallManagerUtils::ReadCallAttributeInfo(MessageParcel &m
         info.voipCallInfo.extensionId = messageParcel.ReadString();
         info.voipCallInfo.voipBundleName = messageParcel.ReadString();
         info.voipCallInfo.showBannerForIncomingCall = messageParcel.ReadBool();
+        info.voipCallInfo.isConferenceCall = messageParcel.ReadBool();
         info.voipCallInfo.hasMicPermission = messageParcel.ReadBool();
         info.voipCallInfo.uid = messageParcel.ReadInt32();
         std::vector<uint8_t> userProfile = {};
