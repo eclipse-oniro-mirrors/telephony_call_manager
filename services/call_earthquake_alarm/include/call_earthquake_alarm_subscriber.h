@@ -85,6 +85,7 @@ public:
     
 private:
     std::mutex mutex_;
+    bool startService = false;
     static sptr<ISystemAbilityStatusChange> statusChangeListener_;
     static std::map<int32_t, bool> systemAbilityStatus;
 };

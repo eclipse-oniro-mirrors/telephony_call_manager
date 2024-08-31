@@ -14,9 +14,6 @@
  */
 
 #include "call_earthquake_alarm_locator.h"
-#include "ffrt.h"
-#include "parameters.h"
-#include "spam_call_adapter.h"
 
 using namespace std;
 using namespace OHOS::Telephony;
@@ -272,7 +269,9 @@ void MyLocationEngine::OOBEComplete()
 {
     std::string stateValue = INITIAL_FIRST_VALUE;
     for (auto& oobeKey : OOBESwitchObserver::keyStatus) {
-        oobeKey.second = MyLocationEngine::IsSwitchOn(oobeKey.first, stateValue);
+        if (!oobeKey.second) {
+            oobeKey.second = MyLocationEngine::IsSwitchOn(oobeKey.first, stateValue);
+        }
         if (!oobeKey.second) {
             settingsCallbacks[oobeKey.first] = sptr<OOBESwitchObserver>::MakeSptr(oobeKey.first);
             auto datashareHelper = std::make_shared<DataShareSwitchState>();
@@ -305,14 +304,6 @@ void OOBESwitchObserver::OnChange()
         TELEPHONY_LOGI("the alarm switch is open");
         MyLocationEngine::ConnectAbility("call_manager_oobe_earthquake_warning_switch_on");
     }
-    ffrt::submit([&]() {
-        for (auto& oobeKey : MyLocationEngine::settingsCallbacks) {
-            auto datashareHelper = std::make_shared<DataShareSwitchState>();
-            datashareHelper->RegisterListenSettingsKey(oobeKey.first, false, oobeKey.second);
-        }
-        MyLocationEngine::settingsCallbacks = {};
-        keyStatus = {};
-    });
 }
 
 sptr<AAFwk::IAbilityConnection> EmergencyCallConnectCallback::connectCallback_ = nullptr;

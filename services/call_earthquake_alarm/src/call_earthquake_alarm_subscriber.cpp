@@ -157,40 +157,37 @@ std::map<int32_t, bool> LocationSystemAbilityListener::systemAbilityStatus = {
 };
 void LocationSystemAbilityListener::OnAddSystemAbility(int32_t systemAbilityId, const std::string &deviceId)
 {
-    static bool startService = false;
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (startService) {
+        TELEPHONY_LOGE("service alredy started");
+        return;
+    }
     if (systemAbilityId != OHOS::DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID &&
         systemAbilityId != OHOS::LOCATION_LOCATOR_SA_ID &&
         systemAbilityId != OHOS::LOCATION_NOPOWER_LOCATING_SA_ID) {
         TELEPHONY_LOGE("add other SA failed, id = %{public}d", systemAbilityId);
         return;
     };
-
     TELEPHONY_LOGI("added SA success, id = %{public}d", systemAbilityId);
-    std::lock_guard<std::mutex> lock(mutex_);
     systemAbilityStatus[systemAbilityId] = GetSystemAbility(systemAbilityId);
     for (auto& systemId : systemAbilityStatus) {
         if (!systemId.second) {
+            TELEPHONY_LOGE("SA id %{public}d, status is false", systemId.first);
             return;
         }
     }
-    if (startService) {
-        TELEPHONY_LOGE("service alredy started");
-        return;
-    }
     startService = true;
-    SystemAbilitySubscriber();
-    statusChangeListener_ = nullptr;
-    systemAbilityStatus = {};
-    
     std::string stateValue = MyLocationEngine::INITIAL_FIRST_VALUE;
     auto alarmSwitchState = MyLocationEngine::IsSwitchOn(LocationSubscriber::SWITCH_STATE_KEY, stateValue);
-    if (stateValue != MyLocationEngine::INITIAL_FIRST_VALUE) {
-        TELEPHONY_LOGI("start boot complete");
-        MyLocationEngine::BootComplete(alarmSwitchState);
+    if (stateValue == MyLocationEngine::INITIAL_FIRST_VALUE) {
+        TELEPHONY_LOGI("start OOBE complete");
+        MyLocationEngine::OOBEComplete();
         return;
     }
-    TELEPHONY_LOGI("start OOBE complete");
-    MyLocationEngine::OOBEComplete();
+    TELEPHONY_LOGI("start boot complete");
+    MyLocationEngine::BootComplete(alarmSwitchState);
+    SystemAbilitySubscriber();
+    statusChangeListener_ = nullptr;
 }
 
 bool LocationSystemAbilityListener::GetSystemAbility(int32_t systemAbilityId)
@@ -212,6 +209,27 @@ bool LocationSystemAbilityListener::GetSystemAbility(int32_t systemAbilityId)
 void LocationSystemAbilityListener::OnRemoveSystemAbility(int32_t systemAbilityId, const std::string &deviceId)
 {
     TELEPHONY_LOGI("remove SA %{public}d", systemAbilityId);
+    if (!startService) {
+        TELEPHONY_LOGE("service is not started");
+        return;
+    }
+    int32t len = MyLocationEngine::settingsCallbacks.size();
+    TELEPHONY_LOGI("callbacks is %{public}d", len);
+    if (len != 0) {
+        for (auto& oobeKey : OOBESwitchObserver::keyStatus) {
+            if (!oobeKey.second) {
+                TELEPHONY_LOGE("key %{public}s, status is false", oobeKey.first.c_str());
+                return;
+            }
+        }
+        for (auto& oobeKey : MyLocationEngine::settingsCallbacks) {
+            auto datashareHelper = std::make_shared<DataShareSwitchState>();
+            datashareHelper->RegisterListenSettingsKey(oobeKey.first, false, oobeKey.second);
+        }
+        MyLocationEngine::settingsCallbacks = {};
+    }
+    SystemAbilitySubscriber();
+    statusChangeListener_ = nullptr;
 }
 
 bool LocationSystemAbilityListener::SystemAbilitySubscriber()
