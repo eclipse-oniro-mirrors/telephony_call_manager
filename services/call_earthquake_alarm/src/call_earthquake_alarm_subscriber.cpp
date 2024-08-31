@@ -226,11 +226,11 @@ void LocationSystemAbilityListener::OnRemoveSystemAbility(int32_t systemAbilityI
             datashareHelper->RegisterListenSettingsKey(oobeKey.first, false, oobeKey.second);
         }
     }
-    SystemAbilitySubscriber();
-    statusChangeListener_ = nullptr;
+    MyLocationEngine::settingsCallbacks = {};
     systemAbilityStatus = {};
     OOBESwitchObserver::keyStatus = {};
-    MyLocationEngine::settingsCallbacks = {};
+    SystemAbilitySubscriber();
+    statusChangeListener_ = nullptr;
 }
 
 bool LocationSystemAbilityListener::SystemAbilitySubscriber()
