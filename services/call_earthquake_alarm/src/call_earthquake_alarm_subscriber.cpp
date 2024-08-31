@@ -227,9 +227,9 @@ void LocationSystemAbilityListener::OnRemoveSystemAbility(int32_t systemAbilityI
         }
     }
     MyLocationEngine::settingsCallbacks = {};
-    systemAbilityStatus = {};
     OOBESwitchObserver::keyStatus = {};
     SystemAbilitySubscriber();
+    systemAbilityStatus = {};
     statusChangeListener_ = nullptr;
 }
 
