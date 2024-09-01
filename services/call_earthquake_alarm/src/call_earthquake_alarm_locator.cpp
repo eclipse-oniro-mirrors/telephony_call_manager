@@ -277,7 +277,7 @@ void MyLocationEngine::OOBEComplete()
             auto datashareHelper = std::make_shared<DataShareSwitchState>();
             datashareHelper->RegisterListenSettingsKey(oobeKey.first, true, settingsCallbacks[oobeKey.first]);
         } else {
-            settingsCallbacks[oobeKey.first] = nullptr;
+            settingsCallbacks.erase(oobeKey.first);
         }
     }
 };

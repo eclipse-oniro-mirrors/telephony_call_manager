@@ -155,6 +155,7 @@ std::map<int32_t, bool> LocationSystemAbilityListener::systemAbilityStatus = {
     {OHOS::LOCATION_LOCATOR_SA_ID, false},
     {OHOS::LOCATION_NOPOWER_LOCATING_SA_ID, false}
 };
+
 void LocationSystemAbilityListener::OnAddSystemAbility(int32_t systemAbilityId, const std::string &deviceId)
 {
     std::lock_guard<std::mutex> lock(mutex_);
@@ -218,18 +219,15 @@ void LocationSystemAbilityListener::OnRemoveSystemAbility(int32_t systemAbilityI
     int32_t len = (int32_t)MyLocationEngine::settingsCallbacks.size();
     TELEPHONY_LOGI("callbacks size is %{public}d", len);
     if (len != 0) {
-        for (auto& oobeKey : OOBESwitchObserver::keyStatus) {
-            if (!oobeKey.second) {
-                TELEPHONY_LOGE("key %{public}s, status is false", oobeKey.first.c_str());
-                return;
-            }
+        if (OOBESwitchObserver::keyStatus.size() != 0) {
+            TELEPHONY_LOGE("key status size is not 0");
+            return;
         }
         for (auto& oobeKey : MyLocationEngine::settingsCallbacks) {
             auto datashareHelper = std::make_shared<DataShareSwitchState>();
             datashareHelper->RegisterListenSettingsKey(oobeKey.first, false, oobeKey.second);
         }
         MyLocationEngine::settingsCallbacks = {};
-        OOBESwitchObserver::keyStatus = {};
     }
 
     if (systemAbilityStatus.size() == 0) {
