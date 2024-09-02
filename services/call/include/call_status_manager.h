@@ -106,6 +106,7 @@ private:
     void CreateAndSaveNewCall(const CallDetailInfo &info, CallDirection direction);
     int32_t UpdateCallStateAndHandleDsdsMode(const CallDetailInfo &info, sptr<CallBase> &call);
     bool IsDcCallConneceted();
+    void HandleDialWhenHolding(int32_t callId, sptr<CallBase> &call);
     void SetConferenceCall(std::vector<sptr<CallBase>>);
     std::vector<sptr<CallBase>> GetConferenceCallList(int32_t slotId);
     void UpdateCallDetailsInfo(const CallDetailsInfo &info);

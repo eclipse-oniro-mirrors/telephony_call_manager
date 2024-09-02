@@ -384,7 +384,7 @@ int32_t CallControlManager::HangUpCall(int32_t callId)
     }
     auto callRequestEventHandler = DelayedSingleton<CallRequestEventHandlerHelper>::GetInstance();
     if (callRequestEventHandler->HasPendingMo(callId)) {
-        callRequestEventHandler->SetPendingMo(false, callId);
+        callRequestEventHandler->SetPendingMo(false, -1);
         callRequestEventHandler->SetPendingHangup(true, callId);
         TELEPHONY_LOGI("HangUpCall before dialingHandle,hangup after CLCC");
         return TELEPHONY_SUCCESS;

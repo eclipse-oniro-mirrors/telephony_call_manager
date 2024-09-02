@@ -626,11 +626,11 @@ int32_t CallStatusManager::UpdateDialingCallInfo(const CallDetailInfo &info)
     auto callRequestEventHandler = DelayedSingleton<CallRequestEventHandlerHelper>::GetInstance();
     int32_t callId = call->GetCallID();
     if (callRequestEventHandler->HasPendingMo(callId)) {
-        callRequestEventHandler->SetPendingMo(false, callId);
+        callRequestEventHandler->SetPendingMo(false, -1);
     }
-    if (callRequestEventHandler->HasPendingHangp(callId)) {
+    if (callRequestEventHandler->HasPendingHangup(callId)) {
         call->HangUpCall();
-        callRequestEventHandler->SetPendingHangup(false, callId);
+        callRequestEventHandler->SetPendingHangup(false, -1);
     }
     return TELEPHONY_SUCCESS;
 }
@@ -1592,12 +1592,7 @@ int32_t CallStatusManager::UpdateCallStateAndHandleDsdsMode(const CallDetailInfo
         int32_t activeCallNum = GetCallNum(TelCallState::CALL_STATUS_ACTIVE);
         if (needWaitHold_ && activeCallNum == 0) {
             needWaitHold_ = false;
-            int32_t result = DelayedSingleton<CellularCallConnection>::GetInstance()->Dial(GetDialCallInfo());
-            sptr<CallBase> dialCall = GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_DIALING);
-            if (result != TELEPHONY_SUCCESS && dialCall != nullptr) {
-                DealFailDial(call);
-                TELEPHONY_LOGI("Dial call fail");
-            }
+            HandleDialWhenHolding(callId, call);
         } else {
             TelConferenceState confState = call->GetTelConferenceState();
             int32_t conferenceId = ERR_ID;
@@ -1610,6 +1605,31 @@ int32_t CallStatusManager::UpdateCallStateAndHandleDsdsMode(const CallDetailInfo
         }
     }
     return ret;
+}
+
+void CallStatusManager::HandleDialWhenHolding(int32_t callId, sptr<CallBase> &call)
+{
+    auto callRequestEventHandler = DelayedSingleton<CallRequestEventHandlerHelper>::GetInstance();
+    if (callRequestEventHandler->IsPendingHangup()) {
+        sptr<CallBase> holdCall = CallObjectManager::GetOneCallObject(callId);
+        if (holdCall != nullptr) {
+            holdCall->UnHoldCall();
+        }
+        int32_t pendingHangupCallId = callRequestEventHandler->GetPendingHangupCallId();
+        sptr<CallBase> pendingHangupCall = CallObjectManager::GetOneCallObject(pendingHangupCallId);
+        if (pendingHangupCall != nullptr) {
+            UpdateCallState(pendingHangupCall, TelCallState::CALL_STATUS_DISCONNECTED);
+            DeleteOneCallObject(pendingHangupCallId);
+        }
+        callRequestEventHandler->SetPendingHangup(false, -1);
+    } else {
+        int32_t result = DelayedSingleton<CellularCallConnection>::GetInstance()->Dial(GetDialCallInfo());
+        sptr<CallBase> dialCall = GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_DIALING);
+        if (result != TELEPHONY_SUCCESS && dialCall != nullptr) {
+            DealFailDial(call);
+            TELEPHONY_LOGI("Dial call fail");
+        }
+    }
 }
 
 bool CallStatusManager::IsDcCallConneceted()
