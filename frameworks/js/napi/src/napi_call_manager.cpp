@@ -3207,9 +3207,7 @@ void NapiCallManager::NativeVoidCallBackWithErrorCode(napi_env env, napi_status 
     auto asyncContext = (AsyncContext *)data;
     if (asyncContext->deferred != nullptr) {
         if (asyncContext->resolved == TELEPHONY_SUCCESS) {
-            napi_value promiseValue = nullptr;
-            napi_get_null(env, &promiseValue);
-            napi_status ret = napi_resolve_deferred(env, asyncContext->deferred, promiseValue);
+            napi_status ret = napi_resolve_deferred(env, asyncContext->deferred, NapiCallManagerUtils::CreateUndefined(env));
             TELEPHONY_LOGI("promise successful result = %{public}d", ret);
         } else {
             napi_status ret = napi_reject_deferred(env, asyncContext->deferred,
