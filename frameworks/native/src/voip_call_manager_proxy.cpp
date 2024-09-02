@@ -42,7 +42,7 @@ int32_t VoipCallManagerProxy::ReportIncomingCall(
     dataParcel.WriteBool(extras.GetBooleanValue("showBannerForIncomingCall"));
     dataParcel.WriteBool(extras.GetBooleanValue("isConferenceCall"));
     if (!dataParcel.WriteUInt8Vector(userProfile)) {
-        TELEPHONY_LOGE("ReportIncomingCall userProfile write fail, size:%{public}u", userProfile.size());
+        TELEPHONY_LOGE("ReportIncomingCall userProfile write fail, size:%{public}" PRIu64, userProfile.size());
     }
     auto remote = Remote();
     if (remote == nullptr) {
@@ -128,7 +128,7 @@ int32_t VoipCallManagerProxy::ReportOutgoingCall(
     dataParcel.WriteBool(extras.GetBooleanValue("showBannerForIncomingCall"));
     dataParcel.WriteBool(extras.GetBooleanValue("isConferenceCall"));
     if (!dataParcel.WriteUInt8Vector(userProfile)) {
-        TELEPHONY_LOGE("ReportOutgoingCall userProfile write fail, size:%{public}u", userProfile.size());
+        TELEPHONY_LOGE("ReportOutgoingCall userProfile write fail, size:%{public}" PRIu64, userProfile.size());
     }
     auto remote = Remote();
     if (remote == nullptr) {
