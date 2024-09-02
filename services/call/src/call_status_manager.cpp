@@ -1611,11 +1611,15 @@ void CallStatusManager::HandleDialWhenHolding(int32_t callId, sptr<CallBase> &ca
     auto callRequestEventHandler = DelayedSingleton<CallRequestEventHandlerHelper>::GetInstance();
     if (callRequestEventHandler->IsPendingHangup()) {
         sptr<CallBase> holdCall = CallObjectManager::GetOneCallObject(callId);
-        holdCall->UnHoldCall();
+        if (holdCall != nullptr) {
+            holdCall->UnHoldCall();
+        }
         int32_t pendingHangupCallId = callRequestEventHandler->GetPendingHangupCallId();
         sptr<CallBase> pendingHangupCall = CallObjectManager::GetOneCallObject(pendingHangupCallId);
-        UpdateCallState(pendingHangupCall, TelCallState::CALL_STATUS_DISCONNECTED);
-        DeleteOneCallObject(pendingHangupCallId);
+        if (pendingHangupCall != nullptr) {
+            UpdateCallState(pendingHangupCall, TelCallState::CALL_STATUS_DISCONNECTED);
+            DeleteOneCallObject(pendingHangupCallId);
+        }
         callRequestEventHandler->SetPendingHangup(false, -1);
     } else {
         int32_t result = DelayedSingleton<CellularCallConnection>::GetInstance()->Dial(GetDialCallInfo());
