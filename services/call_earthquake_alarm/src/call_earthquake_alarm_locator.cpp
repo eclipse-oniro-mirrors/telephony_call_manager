@@ -279,6 +279,9 @@ void MyLocationEngine::OOBEComplete()
         } else {
             settingsCallbacks.erase(oobeKey.first);
         }
+        if (OOBESwitchObserver::keyStatus.size() == 0) {
+            break;
+        }
     }
 };
 
