@@ -3207,9 +3207,8 @@ void NapiCallManager::NativeVoidCallBackWithErrorCode(napi_env env, napi_status 
     auto asyncContext = (AsyncContext *)data;
     if (asyncContext->deferred != nullptr) {
         if (asyncContext->resolved == TELEPHONY_SUCCESS) {
-            napi_value promiseValue = nullptr;
-            napi_get_null(env, &promiseValue);
-            napi_status ret = napi_resolve_deferred(env, asyncContext->deferred, promiseValue);
+            napi_status ret = napi_resolve_deferred(env, asyncContext->deferred,
+                NapiCallManagerUtils::CreateUndefined(env));
             TELEPHONY_LOGI("promise successful result = %{public}d", ret);
         } else {
             napi_status ret = napi_reject_deferred(env, asyncContext->deferred,
@@ -3221,7 +3220,7 @@ void NapiCallManager::NativeVoidCallBackWithErrorCode(napi_env env, napi_status 
         napi_value callbackValue[ARRAY_INDEX_THIRD] = { 0 };
         if (asyncContext->resolved == TELEPHONY_SUCCESS) {
             callbackValue[ARRAY_INDEX_FIRST] = NapiCallManagerUtils::CreateUndefined(env);
-            napi_get_null(env, &callbackValue[ARRAY_INDEX_SECOND]);
+            napi_get_undefined(env, &callbackValue[ARRAY_INDEX_SECOND]);
         } else {
             callbackValue[ARRAY_INDEX_FIRST] = NapiCallManagerUtils::CreateErrorCodeAndMessageForJs(
                 env, asyncContext->errorCode, asyncContext->eventId);
