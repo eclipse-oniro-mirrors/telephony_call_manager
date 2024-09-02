@@ -3220,7 +3220,7 @@ void NapiCallManager::NativeVoidCallBackWithErrorCode(napi_env env, napi_status 
         napi_value callbackValue[ARRAY_INDEX_THIRD] = { 0 };
         if (asyncContext->resolved == TELEPHONY_SUCCESS) {
             callbackValue[ARRAY_INDEX_FIRST] = NapiCallManagerUtils::CreateUndefined(env);
-            napi_get_null(env, &callbackValue[ARRAY_INDEX_SECOND]);
+            napi_get_undefined(env, &callbackValue[ARRAY_INDEX_SECOND]);
         } else {
             callbackValue[ARRAY_INDEX_FIRST] = NapiCallManagerUtils::CreateErrorCodeAndMessageForJs(
                 env, asyncContext->errorCode, asyncContext->eventId);
