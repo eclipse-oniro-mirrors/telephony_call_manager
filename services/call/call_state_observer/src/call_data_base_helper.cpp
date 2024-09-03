@@ -73,7 +73,7 @@ std::shared_ptr<DataShare::DataShareHelper> CallDataBaseHelper::CreateDataShareH
         return helper;
     }
     int32_t retryCount = 0;
-    while (helper == nullptr && retryCount < 3) {
+    while (helper == nullptr && retryCount < MAX_RETRY_COUNT) {
         TELEPHONY_LOGE("helper is null,retry create.");
         helper = CreateDataShareHelperInner(CONTACT_URI);
         retryCount++;
