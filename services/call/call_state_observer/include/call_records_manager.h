@@ -40,6 +40,13 @@ public:
     void OnReceiveEvent(const OHOS::EventFwk::CommonEventData &data) override;
 };
 
+class DataShareReadyhEventSubscriber : public CommonEventSubscriber {
+public:
+    explicit DataShareReadyhEventSubscriber(const CommonEventSubscribeInfo &info) : CommonEventSubscriber(info) {}
+    ~DataShareReadyhEventSubscriber() = default;
+    void OnReceiveEvent(const OHOS::EventFwk::CommonEventData &data) override;
+};
+
 class AccountSystemAbilityListener : public SystemAbilityStatusChangeStub {
 public:
     AccountSystemAbilityListener() = default;
@@ -67,14 +74,22 @@ public:
     int32_t RemoveMissedIncomingCallNotification();
     int32_t GetCallFeatures(int32_t videoState);
     bool IsVideoCall(int32_t videoState);
+    void SetDataShareReady(bool isDataShareReady);
+    void SetSystemAbilityAdd(bool isSystemAbilityAdd);
+    void QueryUnReadMissedCallLog(int32_t userId);
 
 private:
     std::string GetCountryIso();
     int32_t CopyFormatNumberToRecord(std::string &countryIso, CallRecordInfo &data);
     int32_t CopyFormatNumberToE164ToRecord(std::string &countryIso, CallRecordInfo &data);
+    void RegisterDataShareReadySubscriber();
     std::shared_ptr<CallRecordsHandlerService> callRecordsHandlerServerPtr_;
     std::mutex mutex_;
     sptr<ISystemAbilityStatusChange> statusChangeListener_ = nullptr;
+    std::shared_ptr<DataShareReadyhEventSubscriber> dataShareReadySubscriber_ = nullptr;
+    bool isDataShareReady_ = false;
+    bool isSystemAbilityAdd_ = false;
+    bool isUnReadMissedCallLogQWuery_ = false;
 };
 } // namespace Telephony
 } // namespace OHOS

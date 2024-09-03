@@ -38,6 +38,7 @@ static constexpr const char *SETTINGS_DATA_EXT_URI = "datashare:///com.ohos.sett
 static constexpr const char *SETTINGS_AIRPLANE_MODE_URI =
     "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true&key=airplane_mode";
 static constexpr const char *SETTINGS_AIRPLANE_MODE = "settings.telephony.airplanemode";
+static constexpr const int32_t MAX_RETRY_COUNT = 3;
 constexpr int32_t E_OK = 0;
 
 CallDataRdbObserver::CallDataRdbObserver(std::vector<std::string> *phones)
@@ -65,7 +66,22 @@ CallDataBaseHelper::CallDataBaseHelper() {}
 
 CallDataBaseHelper::~CallDataBaseHelper() {}
 
-std::shared_ptr<DataShare::DataShareHelper> CallDataBaseHelper::CreateDataShareHelper(std::string uri)
+std::shared_ptr<DataShare::DataShareHelper> CallDataBaseHelper::CreateDataShareHelper(std::string uri, bool isReboot)
+{
+    std::shared_ptr<DataShare::DataShareHelper> helper = CreateDataShareHelperInner(CONTACT_URI);
+    if (!isReboot) {
+        return helper;
+    }
+    int32_t retryCount = 0;
+    while (helper == nullptr && retryCount < 3) {
+        TELEPHONY_LOGE("helper is null,retry create.");
+        helper = CreateDataShareHelperInner(CONTACT_URI);
+        retryCount++;
+    }
+    return helper;
+}
+
+std::shared_ptr<DataShare::DataShareHelper> CallDataBaseHelper::CreateDataShareHelperInner(std::string uri)
 {
     auto saManager = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (saManager == nullptr) {
@@ -207,7 +223,7 @@ bool CallDataBaseHelper::Query(ContactInfo &contactInfo, DataShare::DataSharePre
 bool CallDataBaseHelper::QueryCallLog(
     std::map<std::string, int32_t> &phoneNumAndUnreadCountMap, DataShare::DataSharePredicates &predicates)
 {
-    std::shared_ptr<DataShare::DataShareHelper> helper = CreateDataShareHelper(CALLLOG_URI);
+    std::shared_ptr<DataShare::DataShareHelper> helper = CreateDataShareHelper(CALLLOG_URI, true);
     if (helper == nullptr) {
         TELEPHONY_LOGE("helper is nullptr!");
         return false;

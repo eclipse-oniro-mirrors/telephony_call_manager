@@ -45,6 +45,13 @@ CallRecordsManager::~CallRecordsManager()
             statusChangeListener_ = nullptr;
         }
     }
+    if (dataShareReadySubscriber_ != nullptr) {
+        bool subRet = CommonEventManager::UnSubscribeCommonEvent(dataShareReadySubscriber_);
+        if (!subRet) {
+            TELEPHONY_LOGE("UnSubscribe data share ready event failed!");
+        }
+        dataShareReadySubscriber_ = nullptr;
+    }
 }
 
 void CallRecordsManager::Init()
@@ -60,6 +67,7 @@ void CallRecordsManager::Init()
         TELEPHONY_LOGE("failed to create statusChangeListener");
         return;
     }
+    RegisterDataShareReadySubscriber();
     auto managerPtr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (managerPtr == nullptr) {
         TELEPHONY_LOGE("get system ability manager error");
@@ -69,6 +77,19 @@ void CallRecordsManager::Init()
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("failed to subscribe account manager service SA!");
         return;
+    }
+}
+
+void CallRecordsManager::RegisterDataShareReadySubscriber()
+{
+    MatchingSkills matchingSkills;
+    matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_DATA_SHARE_READY);
+    CommonEventSubscribeInfo subscriberInfo(matchingSkills);
+    subscriberInfo.SetThreadMode(EventFwk::CommonEventSubscribeInfo::COMMON);
+    dataShareReadySubscriber_ = std::make_shared<DataShareReadyhEventSubscriber>(subscriberInfo);
+    bool subRet = CommonEventManager::SubscribeCommonEvent(dataShareReadySubscriber_);
+    if (!subRet) {
+        TELEPHONY_LOGE("Subscribe data share ready event failed!");
     }
 }
 
@@ -256,6 +277,33 @@ bool CallRecordsManager::IsVideoCall(int32_t videoState)
     return false;
 }
 
+void CallRecordsManager::SetDataShareReady(bool isDataShareReady)
+{
+    isDataShareReady_ = isDataShareReady;
+}
+
+void CallRecordsManager::SetSystemAbilityAdd(bool isSystemAbilityAdd)
+{
+    isSystemAbilityAdd_ = isSystemAbilityAdd;
+}
+
+void CallRecordsManager::QueryUnReadMissedCallLog(int32_t userId)
+{
+    if (!isDataShareReady_ || !isSystemAbilityAdd_ || isUnReadMissedCallLogQWuery_) {
+        return;
+    }
+    TELEPHONY_LOGI("the user id is :%{public}d", userId);
+    if (userId == ACTIVE_USER_ID) {
+        int32_t ret = DelayedSingleton<CallRecordsHandlerService>::GetInstance()->QueryUnReadMissedCallLog();
+        if (ret != TELEPHONY_SUCCESS) {
+            TELEPHONY_LOGE("Query unread missed call log failed!");
+            isUnReadMissedCallLogQWuery_ = false;
+        } else {
+            isUnReadMissedCallLogQWuery_ = true;
+        }
+    }
+}
+
 void AccountSystemAbilityListener::OnAddSystemAbility(int32_t systemAbilityId, const std::string &deviceId)
 {
     TELEPHONY_LOGI("SA:%{public}d is added!", systemAbilityId);
@@ -267,14 +315,12 @@ void AccountSystemAbilityListener::OnAddSystemAbility(int32_t systemAbilityId, c
         TELEPHONY_LOGE("added SA is not accoubt manager service, ignored.");
         return;
     }
+    DelayedSingleton<CallRecordsManager>::GetInstance()->SetSystemAbilityAdd(true);
     std::vector<int32_t> activeList = { 0 };
     DelayedSingleton<AppExecFwk::OsAccountManagerWrapper>::GetInstance()->QueryActiveOsAccountIds(activeList);
     TELEPHONY_LOGI("current active user id is :%{public}d", activeList[0]);
     if (activeList[0] == ACTIVE_USER_ID) {
-        int32_t ret = DelayedSingleton<CallRecordsHandlerService>::GetInstance()->QueryUnReadMissedCallLog();
-        if (ret != TELEPHONY_SUCCESS) {
-            TELEPHONY_LOGE("QueryUnReadMissedCallLog failed!");
-        }
+        DelayedSingleton<CallRecordsManager>::GetInstance()->QueryUnReadMissedCallLog(activeList[0]);
     } else {
         MatchingSkills matchingSkills;
         matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_USER_SWITCHED);
@@ -299,6 +345,7 @@ void AccountSystemAbilityListener::OnRemoveSystemAbility(int32_t systemAbilityId
         TELEPHONY_LOGE("removed SA is not account manager service,, ignored.");
         return;
     }
+    DelayedSingleton<CallRecordsManager>::GetInstance()->SetSystemAbilityAdd(false);
     if (userSwitchSubscriber_ != nullptr) {
         bool subRet = CommonEventManager::UnSubscribeCommonEvent(userSwitchSubscriber_);
         if (!subRet) {
@@ -315,12 +362,20 @@ void UserSwitchEventSubscriber::OnReceiveEvent(const CommonEventData &data)
     TELEPHONY_LOGI("action = %{public}s", action.c_str());
     if (action == CommonEventSupport::COMMON_EVENT_USER_SWITCHED) {
         int32_t userId = data.GetCode();
-        if (userId == ACTIVE_USER_ID) {
-            int32_t ret = DelayedSingleton<CallRecordsHandlerService>::GetInstance()->QueryUnReadMissedCallLog();
-            if (ret != TELEPHONY_SUCCESS) {
-                TELEPHONY_LOGE("Query unread missed call log failed!");
-            }
-        }
+        DelayedSingleton<CallRecordsManager>::GetInstance()->QueryUnReadMissedCallLog(userId);
+    }
+}
+
+void DataShareReadyhEventSubscriber::OnReceiveEvent(const CommonEventData &data)
+{
+    OHOS::EventFwk::Want want = data.GetWant();
+    std::string action = data.GetWant().GetAction();
+    TELEPHONY_LOGI("action = %{public}s", action.c_str());
+    if (action == CommonEventSupport::COMMON_EVENT_DATA_SHARE_READY) {
+        DelayedSingleton<CallRecordsManager>::GetInstance()->SetDataShareReady(true);
+        std::vector<int32_t> activeList = { 0 };
+        DelayedSingleton<AppExecFwk::OsAccountManagerWrapper>::GetInstance()->QueryActiveOsAccountIds(activeList);
+        DelayedSingleton<CallRecordsManager>::GetInstance()->QueryUnReadMissedCallLog(activeList[0]);
     }
 }
 } // namespace Telephony
