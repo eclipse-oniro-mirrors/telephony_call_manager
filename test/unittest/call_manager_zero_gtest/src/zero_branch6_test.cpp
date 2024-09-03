@@ -768,7 +768,11 @@ HWTEST_F(ZeroBranch5Test, Telephony_SuperPrivacyManagerClient_001, Function | Me
 {
     int32_t privacy = SuperPrivacyManagerClient::GetInstance().
         SetSuperPrivacyMode(static_cast<int32_t>(CallSuperPrivacyModeType::OFF), SOURCE_CALL);
+#ifdef CALL_MANAGER_AUTO_START_OPTIMIZE
+    ASSERT_EQ(privacy, 22);
+#else
     ASSERT_EQ(privacy, 0);
+#endif
 }
 
 /**

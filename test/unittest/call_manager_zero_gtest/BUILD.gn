@@ -266,6 +266,10 @@ ohos_unittest("tel_call_manager_zero6_gtest") {
     "LOG_DOMAIN = 0xD000F00",
   ]
   defines += call_manager_defines
+
+  if (device_name == "rk3568") {
+    defines += [ "CALL_MANAGER_AUTO_START_OPTIMIZE" ]
+  }
 }
 
 ohos_unittest("tel_call_manager_zero7_gtest") {
