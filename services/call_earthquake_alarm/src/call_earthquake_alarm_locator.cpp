@@ -269,18 +269,11 @@ void MyLocationEngine::OOBEComplete()
 {
     std::string stateValue = INITIAL_FIRST_VALUE;
     for (auto& oobeKey : OOBESwitchObserver::keyStatus) {
+        oobeKey.second = MyLocationEngine::IsSwitchOn(oobeKey.first, stateValue);
         if (!oobeKey.second) {
             settingsCallbacks[oobeKey.first] = sptr<OOBESwitchObserver>::MakeSptr(oobeKey.first);
-            settingsCallbacks[oobeKey.first]->OnChange();
-        }
-        if (!oobeKey.second) {
             auto datashareHelper = std::make_shared<DataShareSwitchState>();
             datashareHelper->RegisterListenSettingsKey(oobeKey.first, true, settingsCallbacks[oobeKey.first]);
-        } else {
-            settingsCallbacks.erase(oobeKey.first);
-        }
-        if (OOBESwitchObserver::keyStatus.size() == 0) {
-            break;
         }
     }
 };
@@ -309,7 +302,6 @@ void OOBESwitchObserver::OnChange()
         TELEPHONY_LOGI("the alarm switch is open");
         MyLocationEngine::ConnectAbility("call_manager_oobe_earthquake_warning_switch_on");
     }
-    keyStatus = {};
 }
 
 sptr<AAFwk::IAbilityConnection> EmergencyCallConnectCallback::connectCallback_ = nullptr;

@@ -184,11 +184,11 @@ void LocationSystemAbilityListener::OnAddSystemAbility(int32_t systemAbilityId, 
         TELEPHONY_LOGI("start OOBE complete");
         MyLocationEngine::OOBEComplete();
         return;
+    } else {
+        TELEPHONY_LOGI("start boot complete");
+        MyLocationEngine::BootComplete(alarmSwitchState);
     }
-    TELEPHONY_LOGI("start boot complete");
-    MyLocationEngine::BootComplete(alarmSwitchState);
     SystemAbilitySubscriber();
-    systemAbilityStatus = {};
     statusChangeListener_ = nullptr;
 }
 
@@ -211,32 +211,6 @@ bool LocationSystemAbilityListener::GetSystemAbility(int32_t systemAbilityId)
 void LocationSystemAbilityListener::OnRemoveSystemAbility(int32_t systemAbilityId, const std::string &deviceId)
 {
     TELEPHONY_LOGI("remove SA %{public}d", systemAbilityId);
-    std::lock_guard<std::mutex> lock(mutex_);
-    if (!startService) {
-        TELEPHONY_LOGE("service is not started");
-        return;
-    }
-    int32_t len = (int32_t)MyLocationEngine::settingsCallbacks.size();
-    TELEPHONY_LOGI("callbacks size is %{public}d", len);
-    if (len != 0) {
-        if (OOBESwitchObserver::keyStatus.size() != 0) {
-            TELEPHONY_LOGE("key status size is not 0");
-            return;
-        }
-        for (auto& oobeKey : MyLocationEngine::settingsCallbacks) {
-            auto datashareHelper = std::make_shared<DataShareSwitchState>();
-            datashareHelper->RegisterListenSettingsKey(oobeKey.first, false, oobeKey.second);
-        }
-        MyLocationEngine::settingsCallbacks = {};
-    }
-
-    if (systemAbilityStatus.size() == 0) {
-        TELEPHONY_LOGE("SA size is 0");
-        return;
-    }
-    SystemAbilitySubscriber();
-    systemAbilityStatus = {};
-    statusChangeListener_ = nullptr;
 }
 
 bool LocationSystemAbilityListener::SystemAbilitySubscriber()
