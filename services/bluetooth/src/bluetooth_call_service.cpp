@@ -53,6 +53,10 @@ int32_t BluetoothCallService::AnswerCall()
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     VideoStateType videoState = call->GetVideoStateType();
+    if (videoState != VideoStateType::TYPE_VOICE && videoState != VideoStateType::TYPE_VIDEO) {
+        TELEPHONY_LOGE("videoState is invalid!");
+        videoState = static_cast<VideoStateType>(call->GetOriginalCallType());
+    }
     if (callControlManagerPtr_ != nullptr) {
         if (DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance()->
             GetCurrentIsSuperPrivacyMode()) {
