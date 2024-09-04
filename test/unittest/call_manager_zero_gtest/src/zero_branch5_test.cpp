@@ -108,7 +108,7 @@ public:
     void ProcessEvent(const AppExecFwk::InnerEvent::Pointer &event) {}
 };
 
-class ZeroBranch5Test : public testing::Test {
+class ZeroBranch6Test : public testing::Test {
 public:
     void SetUp();
     void TearDown();
@@ -116,11 +116,11 @@ public:
     static void TearDownTestCase();
 };
 
-void ZeroBranch5Test::SetUp() {}
+void ZeroBranch6Test::SetUp() {}
 
-void ZeroBranch5Test::TearDown() {}
+void ZeroBranch6Test::TearDown() {}
 
-void ZeroBranch5Test::SetUpTestCase()
+void ZeroBranch6Test::SetUpTestCase()
 {
     constexpr int permissionNum = 1;
     const char *perms[permissionNum] = {
@@ -133,7 +133,7 @@ void ZeroBranch5Test::SetUpTestCase()
         .dcaps = nullptr,
         .perms = perms,
         .acls = nullptr,
-        .processName = "ZeroBranch5Test",
+        .processName = "ZeroBranch6Test",
         .aplStr = "system_basic",
     };
     uint64_t tokenId = GetAccessTokenId(&infoInstance);
@@ -142,7 +142,7 @@ void ZeroBranch5Test::SetUpTestCase()
     EXPECT_EQ(result, Security::AccessToken::RET_SUCCESS);
 }
 
-void ZeroBranch5Test::TearDownTestCase() {}
+void ZeroBranch6Test::TearDownTestCase() {}
 
 std::shared_ptr<DataShare::DataShareHelper> CreateDataShareHelper(std::string uri)
 {
@@ -160,826 +160,23 @@ std::shared_ptr<DataShare::DataShareHelper> CreateDataShareHelper(std::string ur
 }
 
 /**
- * @tc.number   Telephony_CallStatusManager_003
+ * @tc.number   Telephony_CallStatusCallbackStub_004
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroBranch5Test, Telephony_CallStatusManager_003, Function | MediumTest | Level3)
-{
-    std::shared_ptr<CallStatusManager> callStatusManager = std::make_shared<CallStatusManager>();
-    callStatusManager->Init();
-    CellularCallEventInfo cellularCallEventInfo;
-    ASSERT_EQ(callStatusManager->HandleEventResultReportInfo(cellularCallEventInfo), TELEPHONY_SUCCESS);
-    cellularCallEventInfo.eventType = CellularCallEventType::EVENT_REQUEST_RESULT_TYPE;
-    cellularCallEventInfo.eventId = RequestResultEventId::RESULT_DIAL_NO_CARRIER;
-    ASSERT_EQ(callStatusManager->HandleEventResultReportInfo(cellularCallEventInfo), TELEPHONY_SUCCESS);
-    OttCallEventInfo ottCallEventInfo;
-    (void)memset_s(&ottCallEventInfo, sizeof(OttCallEventInfo), 0, sizeof(OttCallEventInfo));
-    ottCallEventInfo.ottCallEventId = OttCallEventId::OTT_CALL_EVENT_FUNCTION_UNSUPPORTED;
-    (void)memcpy_s(ottCallEventInfo.bundleName, kMaxBundleNameLen + 1, LONG_STR, strlen(LONG_STR));
-    ASSERT_EQ(callStatusManager->HandleOttEventReportInfo(ottCallEventInfo), TELEPHONY_SUCCESS);
-    (void)memset_s(&ottCallEventInfo, sizeof(OttCallEventInfo), 0, sizeof(OttCallEventInfo));
-    ottCallEventInfo.ottCallEventId = OttCallEventId::OTT_CALL_EVENT_FUNCTION_UNSUPPORTED;
-    (void)memcpy_s(ottCallEventInfo.bundleName, kMaxBundleNameLen + 1, TEST_STR, strlen(TEST_STR));
-    ASSERT_EQ(callStatusManager->HandleOttEventReportInfo(ottCallEventInfo), TELEPHONY_SUCCESS);
-    CallDetailInfo callDetailInfo;
-    std::string number = "";
-    memcpy_s(&callDetailInfo.phoneNum, kMaxNumberLen, number.c_str(), number.length());
-    callDetailInfo.state = TelCallState::CALL_STATUS_INCOMING;
-    callDetailInfo.callType = CallType::TYPE_CS;
-    ASSERT_EQ(callStatusManager->IncomingFilterPolicy(callDetailInfo), TELEPHONY_SUCCESS);
-    callStatusManager->CallFilterCompleteResult(callDetailInfo);
-    CallDirection dir = CallDirection::CALL_DIRECTION_OUT;
-    ASSERT_FALSE(callStatusManager->CreateNewCall(callDetailInfo, dir) == nullptr);
-    dir = CallDirection::CALL_DIRECTION_IN;
-    ASSERT_FALSE(callStatusManager->CreateNewCall(callDetailInfo, dir) == nullptr);
-    callDetailInfo.callType = CallType::TYPE_IMS;
-    dir = CallDirection::CALL_DIRECTION_OUT;
-    ASSERT_FALSE(callStatusManager->CreateNewCall(callDetailInfo, dir) == nullptr);
-    dir = CallDirection::CALL_DIRECTION_IN;
-    ASSERT_FALSE(callStatusManager->CreateNewCall(callDetailInfo, dir) == nullptr);
-    callDetailInfo.callType = CallType::TYPE_OTT;
-    dir = CallDirection::CALL_DIRECTION_OUT;
-    ASSERT_FALSE(callStatusManager->CreateNewCall(callDetailInfo, dir) == nullptr);
-    dir = CallDirection::CALL_DIRECTION_IN;
-    ASSERT_FALSE(callStatusManager->CreateNewCall(callDetailInfo, dir) == nullptr);
-    callDetailInfo.callType = CallType::TYPE_ERR_CALL;
-    ASSERT_TRUE(callStatusManager->CreateNewCall(callDetailInfo, dir) == nullptr);
-}
-
-/**
- * @tc.number   Telephony_CallStatusManager_004
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
-HWTEST_F(ZeroBranch5Test, Telephony_CallStatusManager_004, Function | MediumTest | Level3)
-{
-    std::shared_ptr<CallStatusManager> callStatusManager = std::make_shared<CallStatusManager>();
-    callStatusManager->Init();
-    sptr<CallBase> callObjectPtr = nullptr;
-    callStatusManager->HandleRejectCall(callObjectPtr, true);
-    DialParaInfo dialParaInfo;
-    dialParaInfo.callType = CallType::TYPE_CS;
-    dialParaInfo.callState = TelCallState::CALL_STATUS_INCOMING;
-    callObjectPtr = new CSCall(dialParaInfo);
-    callStatusManager->HandleRejectCall(callObjectPtr, true);
-    CallDetailInfo callDetailInfo;
-    std::string number = "";
-    memcpy_s(&callDetailInfo.phoneNum, kMaxNumberLen, number.c_str(), number.length());
-    callDetailInfo.state = TelCallState::CALL_STATUS_INCOMING;
-    callDetailInfo.callType = CallType::TYPE_CS;
-    callDetailInfo.voipCallInfo.voipCallId = "123456789";
-    callStatusManager->OutgoingVoipCallHandle(callDetailInfo);
-    std::vector<std::u16string> callIdList;
-    CallRunningState previousState = CallRunningState::CALL_RUNNING_STATE_CREATE;
-    TelCallState priorState = TelCallState::CALL_STATUS_INCOMING;
-    callStatusManager->HandleHoldCallOrAutoAnswerCall(callObjectPtr, callIdList, previousState, priorState);
-    callStatusManager->AutoAnswerForVoiceCall(callObjectPtr, SIM1_SLOTID, true);
-    callStatusManager->SetVideoCallState(callObjectPtr, TelCallState::CALL_STATUS_ACTIVE);
-    callStatusManager->ShouldRejectIncomingCall();
-    callStatusManager->IsRingOnceCall(callObjectPtr, callDetailInfo);
-    sptr<CallBase> callObjectPtr1 = nullptr;
-    int32_t res = callStatusManager->HandleRingOnceCall(callObjectPtr1);
-    callStatusManager->HandleRingOnceCall(callObjectPtr);
-    ASSERT_NE(res, TELEPHONY_SUCCESS);
-}
-
-/**
- * @tc.number   Telephony_IncomingCallWakeup_001
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
-HWTEST_F(ZeroBranch5Test, Telephony_IncomingCallWakeup_001, Function | MediumTest | Level3)
-{
-    IncomingCallWakeup incomingCallWakeup;
-    sptr<CallBase> callObjectPtr = nullptr;
-    incomingCallWakeup.NewCallCreated(callObjectPtr);
-}
-
-/**
- * @tc.number   Telephony_CallStateReportProxy_001
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
-HWTEST_F(ZeroBranch5Test, Telephony_CallStateReportProxy_001, Function | MediumTest | Level3)
-{
-    CallStateReportProxy callStateReportPtr;
-    sptr<CallBase> callObjectPtr = nullptr;
-    callStateReportPtr.CallStateUpdated(
-        callObjectPtr, TelCallState::CALL_STATUS_INCOMING, TelCallState::CALL_STATUS_INCOMING);
-    DialParaInfo dialParaInfo;
-    dialParaInfo.callType = CallType::TYPE_CS;
-    dialParaInfo.callState = TelCallState::CALL_STATUS_INCOMING;
-    callObjectPtr = new CSCall(dialParaInfo);
-    ASSERT_TRUE(callObjectPtr != nullptr);
-    callStateReportPtr.CallStateUpdated(
-        callObjectPtr, TelCallState::CALL_STATUS_INCOMING, TelCallState::CALL_STATUS_INCOMING);
-    callObjectPtr->SetTelCallState(TelCallState::CALL_STATUS_ACTIVE);
-    callStateReportPtr.CallStateUpdated(
-        callObjectPtr, TelCallState::CALL_STATUS_INCOMING, TelCallState::CALL_STATUS_INCOMING);
-    callStateReportPtr.UpdateCallState(callObjectPtr, TelCallState::CALL_STATUS_INCOMING);
-    callStateReportPtr.UpdateCallStateForSlotId(callObjectPtr, TelCallState::CALL_STATUS_INCOMING);
-    std::string number = "123456789012";
-    std::u16string phoneNumber = Str8ToStr16(number);
-    callStateReportPtr.ReportCallState(0, phoneNumber);
-    callStateReportPtr.ReportCallStateForCallId(0, 0, phoneNumber);
-    ASSERT_TRUE(!number.empty());
-}
-
-/**
- * @tc.number   Telephony_CallStateListener_001
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
-HWTEST_F(ZeroBranch5Test, Telephony_CallStateListener_001, Function | MediumTest | Level3)
-{
-    CallStateListener callStateListener;
-    sptr<CallBase> callObjectPtr = nullptr;
-    callStateListener.NewCallCreated(callObjectPtr);
-    callStateListener.CallStateUpdated(
-        callObjectPtr, TelCallState::CALL_STATUS_INCOMING, TelCallState::CALL_STATUS_INCOMING);
-    callStateListener.IncomingCallHungUp(callObjectPtr, true, "");
-    callStateListener.IncomingCallActivated(callObjectPtr);
-    DialParaInfo dialParaInfo;
-    callObjectPtr = new CSCall(dialParaInfo);
-    callStateListener.NewCallCreated(callObjectPtr);
-    callStateListener.CallStateUpdated(
-        callObjectPtr, TelCallState::CALL_STATUS_INCOMING, TelCallState::CALL_STATUS_INCOMING);
-    callStateListener.IncomingCallHungUp(callObjectPtr, true, "");
-    callStateListener.IncomingCallActivated(callObjectPtr);
-    std::shared_ptr<CallStateReportProxy> callStateReportPtr = nullptr;
-    ASSERT_FALSE(callStateListener.AddOneObserver(callStateReportPtr));
-    ASSERT_FALSE(callStateListener.RemoveOneObserver(callStateReportPtr));
-    callStateReportPtr = std::make_shared<CallStateReportProxy>();
-    ASSERT_TRUE(callStateListener.AddOneObserver(callStateReportPtr));
-    ASSERT_TRUE(callStateListener.AddOneObserver(callStateReportPtr));
-}
-
-/**
- * @tc.number   Telephony_ConferenceBase_001
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
-HWTEST_F(ZeroBranch5Test, Telephony_ConferenceBase_001, Function | MediumTest | Level3)
-{
-    std::shared_ptr<ConferenceBase> conference = std::make_shared<CsConference>();
-    std::vector<std::u16string> callIdList;
-    ASSERT_NE(conference->GetSubCallIdList(VALID_CALLID, callIdList), TELEPHONY_SUCCESS);
-    ASSERT_NE(conference->GetCallIdListForConference(VALID_CALLID, callIdList), TELEPHONY_SUCCESS);
-    ASSERT_NE(conference->JoinToConference(VALID_CALLID), TELEPHONY_SUCCESS);
-    ASSERT_NE(conference->LeaveFromConference(VALID_CALLID), TELEPHONY_SUCCESS);
-    ASSERT_NE(conference->HoldConference(VALID_CALLID), TELEPHONY_SUCCESS);
-    ASSERT_NE(conference->CanSeparateConference(), TELEPHONY_SUCCESS);
-    ASSERT_NE(conference->CanKickOutFromConference(), TELEPHONY_SUCCESS);
-    ASSERT_EQ(conference->SetMainCall(ERROR_CALLID), TELEPHONY_SUCCESS);
-    ASSERT_EQ(conference->SetMainCall(VALID_CALLID), TELEPHONY_SUCCESS);
-    ASSERT_NE(conference->CanSeparateConference(), TELEPHONY_SUCCESS);
-    ASSERT_NE(conference->CanKickOutFromConference(), TELEPHONY_SUCCESS);
-    conference->SetConferenceState(ConferenceState::CONFERENCE_STATE_CREATING);
-    ASSERT_EQ(conference->JoinToConference(VALID_CALLID), TELEPHONY_SUCCESS);
-    ASSERT_EQ(conference->GetSubCallIdList(VALID_CALLID, callIdList), TELEPHONY_SUCCESS);
-    ASSERT_EQ(conference->GetCallIdListForConference(VALID_CALLID, callIdList), TELEPHONY_SUCCESS);
-    ASSERT_EQ(conference->CanSeparateConference(), TELEPHONY_SUCCESS);
-    ASSERT_EQ(conference->CanKickOutFromConference(), TELEPHONY_SUCCESS);
-    ASSERT_EQ(conference->HoldConference(VALID_CALLID), TELEPHONY_SUCCESS);
-    ASSERT_EQ(conference->SetMainCall(VALID_CALLID), TELEPHONY_SUCCESS);
-    ASSERT_EQ(conference->JoinToConference(VALID_CALLID), TELEPHONY_SUCCESS);
-    ASSERT_EQ(conference->LeaveFromConference(VALID_CALLID), TELEPHONY_SUCCESS);
-}
-
-/**
- * @tc.number   Telephony_CallAbilityReportProxy_001
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
-HWTEST_F(ZeroBranch5Test, Telephony_CallAbilityReportProxy_001, Function | MediumTest | Level3)
-{
-    CallAbilityConnectCallback callAbilityConnectCallback;
-    callAbilityConnectCallback.ReConnectAbility();
-    if (CallObjectManager::HasCallExist()) {
-        callAbilityConnectCallback.ReConnectAbility();
-    }
-    CallConnectAbility callConnectCalluiAbility;
-    ASSERT_FALSE(callConnectCalluiAbility.WaitForConnectResult());
-    std::shared_ptr<CallAbilityReportProxy> callAbilityReportProxy = std::make_shared<CallAbilityReportProxy>();
-    sptr<ICallAbilityCallback> callAbilityCallbackPtr = nullptr;
-    std::string pidName = "123";
-    ASSERT_NE(callAbilityReportProxy->RegisterCallBack(callAbilityCallbackPtr, pidName), TELEPHONY_SUCCESS);
-    ASSERT_NE(callAbilityReportProxy->UnRegisterCallBack(pidName), TELEPHONY_SUCCESS);
-    sptr<IRemoteObject> object = nullptr;
-    ASSERT_NE(callAbilityReportProxy->UnRegisterCallBack(object), TELEPHONY_SUCCESS);
-    sptr<CallBase> callObjectPtr = nullptr;
-    callAbilityReportProxy->CallStateUpdated(
-        callObjectPtr, TelCallState::CALL_STATUS_INCOMING, TelCallState::CALL_STATUS_INCOMING);
-    callAbilityCallbackPtr = new CallAbilityCallback();
-    ASSERT_EQ(callAbilityReportProxy->RegisterCallBack(callAbilityCallbackPtr, pidName), TELEPHONY_SUCCESS);
-    DisconnectedDetails disconnectedDetails;
-    callAbilityReportProxy->CallDestroyed(disconnectedDetails);
-    CallAttributeInfo callAttributeInfo;
-    callAbilityReportProxy->ReportCallStateInfo(callAttributeInfo);
-    callAbilityReportProxy->ReportCallStateInfo(callAttributeInfo, pidName);
-    CallEventInfo callEventInfo;
-    callAbilityReportProxy->CallEventUpdated(callEventInfo);
-    callAbilityReportProxy->ReportCallEvent(callEventInfo);
-    CallResultReportId reportId = CallResultReportId::GET_CALL_CLIP_ID;
-    AppExecFwk::PacMap resultInfo;
-    callAbilityReportProxy->ReportAsyncResults(reportId, resultInfo);
-    MmiCodeInfo mmiCodeInfo;
-    callAbilityReportProxy->ReportMmiCodeResult(mmiCodeInfo);
-    OttCallRequestId ottReportId = OttCallRequestId::OTT_REQUEST_ANSWER;
-    callAbilityReportProxy->OttCallRequest(ottReportId, resultInfo);
-    callAbilityReportProxy->ReportPostDialDelay(TEST_STR);
-    std::string ottBundleName = "com.ohos.callservice";
-    sptr<CallAbilityCallback> ottCallAbilityCallbackPtr = new CallAbilityCallback();
-    ASSERT_EQ(callAbilityReportProxy->RegisterCallBack(ottCallAbilityCallbackPtr, ottBundleName), TELEPHONY_SUCCESS);
-    callAbilityReportProxy->OttCallRequest(ottReportId, resultInfo);
-    ASSERT_EQ(callAbilityReportProxy->UnRegisterCallBack(ottBundleName), TELEPHONY_SUCCESS);
-    CallMediaModeInfo imsCallModeInfo;
-    callAbilityReportProxy->ReportImsCallModeChange(imsCallModeInfo);
-    CallSessionEvent callSessionEventOptions;
-    callAbilityReportProxy->ReportCallSessionEventChange(callSessionEventOptions);
-    PeerDimensionsDetail peerDimensionsDetail;
-    callAbilityReportProxy->ReportPeerDimensionsChange(peerDimensionsDetail);
-}
-
-/**
- * @tc.number   Telephony_CallAbilityReportProxy_002
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
-HWTEST_F(ZeroBranch5Test, Telephony_CallAbilityReportProxy_002, Function | MediumTest | Level3)
-{
-    CallAbilityConnectCallback callAbilityConnectCallback;
-    callAbilityConnectCallback.ReConnectAbility();
-    if (CallObjectManager::HasCallExist()) {
-        callAbilityConnectCallback.ReConnectAbility();
-    }
-    CallConnectAbility callConnectCalluiAbility;
-    callConnectCalluiAbility.WaitForConnectResult();
-    std::shared_ptr<CallAbilityReportProxy> callAbilityReportProxy = std::make_shared<CallAbilityReportProxy>();
-    ASSERT_NE(callAbilityReportProxy, nullptr);
-    int64_t dataUsage = 0;
-    std::string pidName = "123";
-    ASSERT_NE(callAbilityReportProxy->ReportCallDataUsageChange(dataUsage), TELEPHONY_SUCCESS);
-    CameraCapabilities cameraCapabilities;
-    ASSERT_NE(callAbilityReportProxy->ReportCameraCapabilities(cameraCapabilities), TELEPHONY_SUCCESS);
-    ASSERT_NE(callAbilityReportProxy->UnRegisterCallBack(pidName), TELEPHONY_SUCCESS);
-}
-
-/**
- * @tc.number   Telephony_CallAbilityConnectCallback_001
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
-HWTEST_F(ZeroBranch5Test, Telephony_CallAbilityConnectCallback_001, Function | MediumTest | Level3)
-{
-    CallAbilityConnectCallback callAbilityConnectCallback;
-    callAbilityConnectCallback.ReConnectAbility();
-    if (CallObjectManager::HasCallExist()) {
-        callAbilityConnectCallback.ReConnectAbility();
-    }
-    std::string bundle = "111";
-    std::string ability = "222";
-    AppExecFwk::ElementName element("", bundle, ability);
-    int resultCode = 0;
-    callAbilityConnectCallback.OnAbilityConnectDone(element, nullptr, resultCode);
-    ASSERT_EQ(resultCode, 0);
-    callAbilityConnectCallback.OnAbilityDisconnectDone(element, resultCode);
-    ASSERT_EQ(resultCode, 0);
-}
-
-/**
- * @tc.number   Telephony_AutoAnswerState_001
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
-HWTEST_F(ZeroBranch5Test, Telephony_AutoAnswerState_001, Function | MediumTest | Level3)
-{
-    bool flag = true;
-    sptr<CallBase> callObjectPtr = nullptr;
-    DialParaInfo dialParaInfo;
-    dialParaInfo.callType = CallType::TYPE_IMS;
-    dialParaInfo.callState = TelCallState::CALL_STATUS_INCOMING;
-    callObjectPtr = new IMSCall(dialParaInfo);
-    ASSERT_TRUE(callObjectPtr != nullptr);
-    callObjectPtr->SetAutoAnswerState(flag);
-    ASSERT_EQ(callObjectPtr->GetAutoAnswerState(), true);
-}
-
-/**
- * @tc.number   Telephony_CanUnHoldState_001
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
-HWTEST_F(ZeroBranch5Test, Telephony_CanUnHoldState_001, Function | MediumTest | Level3)
-{
-    bool flag = true;
-    sptr<CallBase> callObjectPtr = nullptr;
-    DialParaInfo dialParaInfo;
-    dialParaInfo.callType = CallType::TYPE_IMS;
-    dialParaInfo.callState = TelCallState::CALL_STATUS_INCOMING;
-    callObjectPtr = new IMSCall(dialParaInfo);
-    ASSERT_TRUE(callObjectPtr != nullptr);
-    callObjectPtr->SetCanUnHoldState(flag);
-    ASSERT_EQ(callObjectPtr->GetCanUnHoldState(), true);
-}
-
-/**
- * @tc.number   Telephony_SatelliteCall_001
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
-HWTEST_F(ZeroBranch5Test, Telephony_SatelliteCall_001, Function | MediumTest | Level3)
-{
-    DialParaInfo dialParaInfo;
-    SatelliteCall call { dialParaInfo };
-    int32_t ret1 = call.DialingProcess();
-    int32_t ret2 = call.AnswerCall(0);
-    int32_t ret3 = call.RejectCall();
-    int32_t ret4 = call.HangUpCall();
-    CallAttributeInfo callAttributeInfo;
-    call.GetCallAttributeInfo(callAttributeInfo);
-    EXPECT_EQ(ret1, TELEPHONY_SUCCESS);
-    EXPECT_NE(ret2, TELEPHONY_SUCCESS);
-    EXPECT_NE(ret3, TELEPHONY_SUCCESS);
-    EXPECT_NE(ret4, TELEPHONY_SUCCESS);
-}
-
-/**
- * @tc.number   Telephony_VoipCallManagerProxy_001
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
-HWTEST_F(ZeroBranch5Test, Telephony_VoipCallManagerProxy_001, Function | MediumTest | Level3)
-{
-    sptr<ISystemAbilityManager> managerPtr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    sptr<IVoipCallManagerService> voipCallManagerInterfacePtr = nullptr;
-    if (managerPtr != nullptr) {
-        sptr<IRemoteObject> iRemoteObjectPtr = managerPtr->GetSystemAbility(TELEPHONY_CALL_MANAGER_SYS_ABILITY_ID);
-        if (iRemoteObjectPtr != nullptr) {
-            voipCallManagerInterfacePtr = iface_cast<IVoipCallManagerService>(iRemoteObjectPtr);
-        }
-    }
-    AppExecFwk::PacMap mPacMap;
-    ErrorReason error = ErrorReason::VOIP_CALL_EXISTS;
-    if (voipCallManagerInterfacePtr != nullptr) {
-        std::vector<uint8_t> userProfile = { 0 };
-        int32_t ret1 = voipCallManagerInterfacePtr->ReportIncomingCall(mPacMap, userProfile, error);
-        int32_t ret2 = voipCallManagerInterfacePtr->ReportIncomingCallError(mPacMap);
-        VoipCallState voipCallState = VoipCallState::VOIP_CALL_STATE_ACTIVE;
-        std::string callId = "123";
-        int32_t ret3 = voipCallManagerInterfacePtr->ReportCallStateChange(callId, voipCallState);
-        int32_t ret4 = voipCallManagerInterfacePtr->UnRegisterCallBack();
-        std::string bundleName = " ";
-        std::string processMode = "0";
-        int32_t uid = 0;
-        int32_t ret5 = voipCallManagerInterfacePtr->ReportVoipIncomingCall(callId, bundleName, processMode, uid);
-        std::string extensionId = " ";
-        int32_t ret6 = voipCallManagerInterfacePtr->ReportVoipCallExtensionId(callId, bundleName, extensionId, uid);
-        VoipCallEventInfo voipCallEventInfo;
-        voipCallEventInfo.voipCallId = "123";
-        int32_t ret7 = voipCallManagerInterfacePtr->Answer(voipCallEventInfo,
-            static_cast<int32_t>(VideoStateType::TYPE_VOICE));
-        int32_t ret8 = voipCallManagerInterfacePtr->HangUp(voipCallEventInfo);
-        int32_t ret9 = voipCallManagerInterfacePtr->Reject(voipCallEventInfo);
-        int32_t ret10 = voipCallManagerInterfacePtr->UnloadVoipSa();
-        sptr<ICallStatusCallback> statusCallback = (std::make_unique<CallStatusCallback>()).release();
-        int32_t ret11 = voipCallManagerInterfacePtr->RegisterCallManagerCallBack(statusCallback);
-        int32_t ret12 = voipCallManagerInterfacePtr->UnRegisterCallManagerCallBack();
-        EXPECT_NE(ret1, TELEPHONY_SUCCESS);
-        EXPECT_NE(ret2, TELEPHONY_SUCCESS);
-        EXPECT_NE(ret3, TELEPHONY_SUCCESS);
-        EXPECT_NE(ret4, TELEPHONY_SUCCESS);
-        EXPECT_NE(ret5, TELEPHONY_SUCCESS);
-        EXPECT_NE(ret6, TELEPHONY_SUCCESS);
-        EXPECT_NE(ret7, TELEPHONY_SUCCESS);
-        EXPECT_NE(ret8, TELEPHONY_SUCCESS);
-        EXPECT_NE(ret9, TELEPHONY_SUCCESS);
-        EXPECT_NE(ret10, TELEPHONY_SUCCESS);
-        EXPECT_NE(ret11, TELEPHONY_SUCCESS);
-        EXPECT_NE(ret12, TELEPHONY_SUCCESS);
-    }
-}
-
-/**
- * @tc.number   Telephony_CallRequestEventHandlerHelper_001
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
-HWTEST_F(ZeroBranch5Test, Telephony_CallRequestEventHandlerHelper_001, Function | MediumTest | Level3)
-{
-    bool flag = false;
-    DelayedSingleton<CallRequestEventHandlerHelper>::GetInstance()->RestoreDialingFlag(flag);
-    EXPECT_FALSE(DelayedSingleton<CallRequestEventHandlerHelper>::GetInstance()->IsDialingCallProcessing());
-}
-
-/**
- * @tc.number   Telephony_DistributedCallManager_001
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
-HWTEST_F(ZeroBranch5Test, Telephony_DistributedCallManager_001, Function | MediumTest | Level3)
-{
-    DistributedCallManager manager;
-    AudioDevice device;
-    device.deviceType = AudioDeviceType::DEVICE_EARPIECE;
-    std::string restr = manager.GetDevIdFromAudioDevice(device);
-    bool res = manager.IsSelectVirtualModem();
-    bool res1 = manager.SwitchOnDCallDeviceSync(device);
-    device.deviceType = AudioDeviceType::DEVICE_DISTRIBUTED_PHONE;
-    std::string devId = "";
-    manager.CreateDAudioDevice(devId, device);
-    manager.CreateDAudioDevice(TEST_STR, device);
-    manager.dcallProxy_ = std::make_shared<DistributedCallProxy>();
-    manager.CreateDAudioDevice(TEST_STR, device);
-    manager.AddDCallDevice(TEST_STR);
-    manager.RemoveDCallDevice(TEST_STR);
-    manager.onlineDCallDevices_.insert(std::make_pair(TEST_STR, device));
-    manager.AddDCallDevice(TEST_STR);
-    manager.RemoveDCallDevice(TEST_STR);
-    manager.GetConnectedDCallDeviceId();
-    manager.SwitchOffDCallDeviceSync();
-    manager.dCallDeviceSwitchedOn_.store(true);
-    manager.SwitchOffDCallDeviceSync();
-    manager.GetConnectedDCallDeviceId();
-    manager.GetConnectedDCallDevice(device);
-    manager.SetConnectedDCallDevice(device);
-    manager.ClearConnectedDCallDevice();
-    manager.IsSelectVirtualModem();
-    manager.SwitchOnDCallDeviceSync(device);
-    manager.OnDCallSystemAbilityAdded(TEST_STR);
-    EXPECT_TRUE(restr.empty());
-    EXPECT_FALSE(res);
-    EXPECT_FALSE(res1);
-}
-
-/**
- * @tc.number   Telephony_DistributedCallProxy_001
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
-HWTEST_F(ZeroBranch5Test, Telephony_DistributedCallProxy_001, Function | MediumTest | Level3)
-{
-    std::unique_ptr<DistributedCallProxy> proxy = std::make_unique<DistributedCallProxy>();
-    proxy->GetDCallClient();
-    int32_t res = proxy->Init();
-    proxy->GetDCallClient();
-    proxy->dcallClient_ = nullptr;
-    int32_t res1 = proxy->UnInit();
-    bool res2 = proxy->IsSelectVirtualModem();
-    int32_t res3 = proxy->SwitchDevice(TEST_STR, 1);
-    std::vector<std::string> devList;
-    int32_t res4 = proxy->GetOnlineDeviceList(devList);
-    OHOS::DistributedHardware::DCallDeviceInfo devInfo;
-    int32_t res5 = proxy->GetDCallDeviceInfo(TEST_STR, devInfo);
-    proxy->GetDCallClient();
-    proxy->IsSelectVirtualModem();
-    int32_t res6 = proxy->SwitchDevice(TEST_STR, 1);
-    int32_t res7 = proxy->GetOnlineDeviceList(devList);
-    proxy->GetDCallDeviceInfo(TEST_STR, devInfo);
-    int32_t res8 = proxy->UnInit();
-    EXPECT_NE(res, TELEPHONY_SUCCESS);
-    EXPECT_NE(res1, TELEPHONY_SUCCESS);
-    EXPECT_FALSE(res2);
-    EXPECT_NE(res3, TELEPHONY_SUCCESS);
-    EXPECT_NE(res4, TELEPHONY_SUCCESS);
-    EXPECT_NE(res5, TELEPHONY_SUCCESS);
-    EXPECT_NE(res6, TELEPHONY_SUCCESS);
-    EXPECT_NE(res7, TELEPHONY_SUCCESS);
-    EXPECT_NE(res8, TELEPHONY_SUCCESS);
-}
-
-/**
- * @tc.number   Telephony_BluetoothCallManager_001
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
-HWTEST_F(ZeroBranch5Test, Telephony_BluetoothCallManager_001, Function | MediumTest | Level3)
-{
-    int32_t state = 0;
-    int32_t numActive = CallObjectManager::GetCallNum(TelCallState::CALL_STATUS_ACTIVE);
-    int32_t numHeld = CallObjectManager::GetCallNum(TelCallState::CALL_STATUS_HOLDING);
-    int32_t numDial = CallObjectManager::GetCallNum(TelCallState::CALL_STATUS_DIALING);
-    int32_t callState = static_cast<int32_t>(TelCallState::CALL_STATUS_IDLE);
-    std::string number = CallObjectManager::GetCallNumber(TelCallState::CALL_STATUS_HOLDING);
-    BluetoothCallManager bluetoothCallManager;
-    ASSERT_EQ(bluetoothCallManager.SendBtCallState(numActive, numHeld, callState, number), TELEPHONY_SUCCESS);
-    ASSERT_EQ(bluetoothCallManager.SendCallDetailsChange(1, 1), TELEPHONY_SUCCESS);
-    ASSERT_NE(bluetoothCallManager.IsBtAvailble(), true);
-}
-
-/**
- * @tc.number   Telephony_CallAbilityCallbackDeathRecipient_001
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
-HWTEST_F(ZeroBranch5Test, Telephony_CallAbilityCallbackDeathRecipient_001, Function | MediumTest | Level3)
-{
-    CallAbilityCallbackDeathRecipient recipient;
-    OHOS::wptr<OHOS::IRemoteObject> object;
-    recipient.OnRemoteDied(object);
-    ASSERT_EQ(object, nullptr);
-}
-
-/**
- * @tc.number   Telephony_ApplicationStateObserver_001
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
-HWTEST_F(ZeroBranch5Test, Telephony_ApplicationStateObserver_001, Function | MediumTest | Level3)
-{
-    ApplicationStateObserver applicationStateObserver;
-    AppExecFwk::ProcessData processData;
-    applicationStateObserver.OnProcessDied(processData);
-    ASSERT_NE(sizeof(processData), 0);
-}
-
-/**
- * @tc.number   Telephony_CallAbilityCallbackProxy_001
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
-HWTEST_F(ZeroBranch5Test, Telephony_CallAbilityCallbackProxy_001, Function | MediumTest | Level3)
-{
-    sptr<IRemoteObject> impl;
-    CallAbilityCallbackProxy callAbilityCallbackProxy(impl);
-    CallAttributeInfo callAttributeInfo;
-    callAbilityCallbackProxy.OnCallDetailsChange(callAttributeInfo);
-    CallEventInfo info;
-    callAbilityCallbackProxy.OnCallEventChange(info);
-    DisconnectedDetails details;
-    callAbilityCallbackProxy.OnCallDisconnectedCause(details);
-    AppExecFwk::PacMap resultInfo;
-    
-    callAbilityCallbackProxy.OnReportAsyncResults(CallResultReportId::GET_CALL_CLIP_ID, resultInfo);
-    MmiCodeInfo mmiCodeInfo;
-    callAbilityCallbackProxy.OnReportMmiCodeResult(mmiCodeInfo);
-    callAbilityCallbackProxy.OnOttCallRequest(OttCallRequestId::OTT_REQUEST_ANSWER, resultInfo);
-    CallMediaModeInfo imsCallModeInfo;
-    callAbilityCallbackProxy.OnReportImsCallModeChange(imsCallModeInfo);
-    CallSessionEvent callSessionEventOptions;
-    callAbilityCallbackProxy.OnReportCallSessionEventChange(callSessionEventOptions);
-    PeerDimensionsDetail peerDimensionsDetail;
-    callAbilityCallbackProxy.OnReportPeerDimensionsChange(peerDimensionsDetail);
-    int64_t dataUsage = 0;
-    callAbilityCallbackProxy.OnReportCallDataUsageChange(dataUsage);
-    CameraCapabilities cameraCapabilities;
-    callAbilityCallbackProxy.OnReportCameraCapabilities(cameraCapabilities);
-
-    AudioDeviceInfo audioDeviceInfo;
-    callAbilityCallbackProxy.OnReportAudioDeviceChange(audioDeviceInfo);
-    const std::string str {"123"};
-    callAbilityCallbackProxy.OnReportPostDialDelay(str);
-    ASSERT_TRUE(!str.empty());
-}
-
-/**
- * @tc.number   Telephony_OTTCallConnection_001
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
-HWTEST_F(ZeroBranch5Test, Telephony_OTTCallConnection_001, Function | MediumTest | Level3)
-{
-    OTTCallConnection ott;
-    OttCallRequestInfo requestInfo;
-    ott.Answer(requestInfo);
-    ott.HoldCall(requestInfo);
-    ott.HangUp(requestInfo);
-    ott.Reject(requestInfo);
-    ott.UnHoldCall(requestInfo);
-    ott.SwitchCall(requestInfo);
-    ott.CombineConference(requestInfo);
-    ott.SeparateConference(requestInfo);
-    ott.KickOutFromConference(requestInfo);
-    std::vector<std::string> numberList;
-    int32_t result = ott.InviteToConference(requestInfo, numberList);
-    ott.UpdateImsCallMode(requestInfo, ImsCallMode::CALL_MODE_AUDIO_ONLY);
-    AppExecFwk::PacMap info;
-    ott.PackCellularCallInfo(requestInfo, info);
-    ASSERT_NE(result, TELEPHONY_SUCCESS);
-}
-
-/**
- * @tc.number   Telephony_SuperPrivacyManagerClient_001
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
-HWTEST_F(ZeroBranch5Test, Telephony_SuperPrivacyManagerClient_001, Function | MediumTest | Level3)
-{
-    int32_t privacy = SuperPrivacyManagerClient::GetInstance().
-        SetSuperPrivacyMode(static_cast<int32_t>(CallSuperPrivacyModeType::OFF), SOURCE_CALL);
-    ASSERT_EQ(privacy, 0);
-}
-
-/**
- * @tc.number   Telephony_CallStatusCallback_001
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
-HWTEST_F(ZeroBranch5Test, Telephony_CallStatusCallback_001, Function | MediumTest | Level3)
-{
-    auto callStatusCallback = std::make_shared<CallStatusCallback>();
-    CallReportInfo callReportInfo;
-    callStatusCallback->UpdateCallReportInfo(callReportInfo);
-    CallsReportInfo callsReportInfo;
-    callStatusCallback->UpdateCallsReportInfo(callsReportInfo);
-    DisconnectedDetails disconnectedDetails;
-    callStatusCallback->UpdateDisconnectedCause(disconnectedDetails);
-    CellularCallEventInfo cellularCallEventIndo;
-    callStatusCallback->UpdateEventResultInfo(cellularCallEventIndo);
-    RBTPlayInfo rbtpPlyaInfo = RBTPlayInfo::LOCAL_ALERTING;
-    callStatusCallback->UpdateRBTPlayInfo(rbtpPlyaInfo);
-    int32_t result = 0;
-    callStatusCallback->StartDtmfResult(result);
-    callStatusCallback->StopDtmfResult(result);
-    callStatusCallback->SendUssdResult(result);
-    callStatusCallback->GetImsCallDataResult(result);
-    CallWaitResponse callWaitResponse;
-    callStatusCallback->UpdateGetWaitingResult(callWaitResponse);
-    callStatusCallback->UpdateSetWaitingResult(result);
-    CallRestrictionResponse callRestrictionResponse;
-    callStatusCallback->UpdateGetRestrictionResult(callRestrictionResponse);
-    callStatusCallback->UpdateSetRestrictionResult(result);
-    callStatusCallback->UpdateSetRestrictionPasswordResult(result);
-    CallTransferResponse callTransferResponse;
-    callStatusCallback->UpdateGetTransferResult(callTransferResponse);
-    callStatusCallback->UpdateSetTransferResult(result);
-    ClipResponse clipResponse;
-    callStatusCallback->UpdateGetCallClipResult(clipResponse);
-    ClirResponse clirResponse;
-    callStatusCallback->UpdateGetCallClirResult(clirResponse);
-    callStatusCallback->UpdateSetCallClirResult(result);
-    callStatusCallback->StartRttResult(result);
-    callStatusCallback->StopRttResult(result);
-    GetImsConfigResponse getImsConfigResponse;
-    callStatusCallback->GetImsConfigResult(getImsConfigResponse);
-    callStatusCallback->SetImsConfigResult(result);
-    GetImsFeatureValueResponse getImsFeatureValueResopnse;
-    callStatusCallback->GetImsFeatureValueResult(getImsFeatureValueResopnse);
-    callStatusCallback->SetImsFeatureValueResult(result);
-    CallModeReportInfo callModeReportInfo;
-    callStatusCallback->ReceiveUpdateCallMediaModeRequest(callModeReportInfo);
-    callStatusCallback->ReceiveUpdateCallMediaModeResponse(callModeReportInfo);
-    callStatusCallback->InviteToConferenceResult(result);
-    MmiCodeInfo mmiCodeInfo;
-    callStatusCallback->SendMmiCodeResult(mmiCodeInfo);
-    int32_t res = callStatusCallback->CloseUnFinishedUssdResult(result);
-    ASSERT_NE(res, TELEPHONY_SUCCESS);
-}
-
-/**
- * @tc.number   Telephony_CallStatusCallback_002
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
-HWTEST_F(ZeroBranch5Test, Telephony_CallStatusCallback_002, Function | MediumTest | Level3)
-{
-    auto callStatusCallback = std::make_shared<CallStatusCallback>();
-    std::string c("a");
-    callStatusCallback->ReportPostDialChar(c);
-    std::string str("abc");
-    callStatusCallback->ReportPostDialDelay(str);
-    CallSessionReportInfo callSessionReportInfo;
-    callStatusCallback->HandleCallSessionEventChanged(callSessionReportInfo);
-    PeerDimensionsReportInfo peerDimensionReportInfo;
-    callStatusCallback->HandlePeerDimensionsChanged(peerDimensionReportInfo);
-    int64_t res = 0;
-    callStatusCallback->HandleCallDataUsageChanged(res);
-    CameraCapabilitiesReportInfo cameraCapabilities;
-    callStatusCallback->HandleCameraCapabilitiesChanged(cameraCapabilities);
-    VoipCallEventInfo voipCallEventInfo;
-    res = callStatusCallback->UpdateVoipEventInfo(voipCallEventInfo);
-    ASSERT_NE(res, TELEPHONY_SUCCESS);
-}
-
-/**
- * @tc.number   Telephony_CallStatusCallbackStub_001
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
-HWTEST_F(ZeroBranch5Test, Telephony_CallStatusCallbackStub_001, Function | MediumTest | Level3)
+HWTEST_F(ZeroBranch6Test, Telephony_CallStatusCallbackStub_004, Function | MediumTest | Level3)
 {
     auto callStatusCallback = std::make_shared<CallStatusCallback>();
     MessageParcel data;
-    MessageParcel reply;
-    MessageOption option;
     data.WriteInterfaceToken(CallStatusCallbackStub::GetDescriptor());
-    callStatusCallback->OnRemoteRequest(static_cast<uint32_t>(CallStatusInterfaceCode::UPDATE_CALL_INFO),
-        data, reply, option);
-    callStatusCallback->OnRemoteRequest(static_cast<uint32_t>(CallStatusInterfaceCode::UPDATE_CALLS_INFO),
-        data, reply, option);
-    callStatusCallback->OnRemoteRequest(static_cast<uint32_t>(CallStatusInterfaceCode::UPDATE_DISCONNECTED_CAUSE),
-        data, reply, option);
-    callStatusCallback->OnRemoteRequest(static_cast<uint32_t>(CallStatusInterfaceCode::UPDATE_EVENT_RESULT_INFO),
-        data, reply, option);
-    callStatusCallback->OnRemoteRequest(static_cast<uint32_t>(CallStatusInterfaceCode::UPDATE_RBT_PLAY_INFO),
-        data, reply, option);
-    callStatusCallback->OnRemoteRequest(static_cast<uint32_t>(CallStatusInterfaceCode::UPDATE_GET_WAITING),
-        data, reply, option);
-    callStatusCallback->OnRemoteRequest(static_cast<uint32_t>(CallStatusInterfaceCode::UPDATE_SET_WAITING),
-        data, reply, option);
-    callStatusCallback->OnRemoteRequest(static_cast<uint32_t>(CallStatusInterfaceCode::UPDATE_GET_RESTRICTION),
-        data, reply, option);
-    callStatusCallback->OnRemoteRequest(static_cast<uint32_t>(CallStatusInterfaceCode::UPDATE_SET_RESTRICTION),
-        data, reply, option);
-    callStatusCallback->OnRemoteRequest(static_cast<uint32_t>(CallStatusInterfaceCode::UPDATE_GET_TRANSFER),
-        data, reply, option);
-    callStatusCallback->OnRemoteRequest(static_cast<uint32_t>(CallStatusInterfaceCode::UPDATE_SET_TRANSFER),
-        data, reply, option);
-    callStatusCallback->OnRemoteRequest(static_cast<uint32_t>(CallStatusInterfaceCode::UPDATE_GET_CALL_CLIP),
-        data, reply, option);
-    callStatusCallback->OnRemoteRequest(static_cast<uint32_t>(CallStatusInterfaceCode::UPDATE_GET_CALL_CLIR),
-        data, reply, option);
-    callStatusCallback->OnRemoteRequest(static_cast<uint32_t>(CallStatusInterfaceCode::UPDATE_SET_CALL_CLIR),
-        data, reply, option);
-    callStatusCallback->OnRemoteRequest(static_cast<uint32_t>(CallStatusInterfaceCode::GET_IMS_SWITCH_STATUS),
-        data, reply, option);
-    callStatusCallback->OnRemoteRequest(static_cast<uint32_t>(CallStatusInterfaceCode::SET_IMS_SWITCH_STATUS),
-        data, reply, option);
-    callStatusCallback->OnRemoteRequest(static_cast<uint32_t>(CallStatusInterfaceCode::UPDATE_STARTRTT_STATUS),
-        data, reply, option);
-    callStatusCallback->OnRemoteRequest(static_cast<uint32_t>(CallStatusInterfaceCode::UPDATE_STOPRTT_STATUS),
-        data, reply, option);
-    callStatusCallback->OnRemoteRequest(static_cast<uint32_t>(CallStatusInterfaceCode::GET_IMS_CONFIG),
-        data, reply, option);
-    int32_t res =  callStatusCallback->OnRemoteRequest(static_cast<uint32_t>(CallStatusInterfaceCode::SET_IMS_CONFIG),
-        data, reply, option);
-    ASSERT_NE(res, TELEPHONY_SUCCESS);
-}
-
-/**
- * @tc.number   Telephony_CallStatusCallbackStub_002
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
-HWTEST_F(ZeroBranch5Test, Telephony_CallStatusCallbackStub_002, Function | MediumTest | Level3)
-{
-    auto callStatusCallback = std::make_shared<CallStatusCallback>();
-    MessageParcel data;
     MessageParcel reply;
-    MessageOption option;
-    data.WriteInterfaceToken(CallStatusCallbackStub::GetDescriptor());
-    callStatusCallback->OnRemoteRequest(static_cast<uint32_t>(CallStatusInterfaceCode::GET_IMS_FEATURE_VALUE),
-        data, reply, option);
-    callStatusCallback->OnRemoteRequest(static_cast<uint32_t>(CallStatusInterfaceCode::SET_IMS_FEATURE_VALUE),
-        data, reply, option);
-    callStatusCallback->OnRemoteRequest(static_cast<uint32_t>(CallStatusInterfaceCode::GET_LTE_ENHANCE_MODE),
-        data, reply, option);
-    callStatusCallback->OnRemoteRequest(static_cast<uint32_t>(CallStatusInterfaceCode::SET_LTE_ENHANCE_MODE),
-        data, reply, option);
-    callStatusCallback->OnRemoteRequest(static_cast<uint32_t>(
-        CallStatusInterfaceCode::RECEIVE_UPDATE_MEDIA_MODE_RESPONSE), data, reply, option);
-    callStatusCallback->OnRemoteRequest(static_cast<uint32_t>(CallStatusInterfaceCode::INVITE_TO_CONFERENCE),
-        data, reply, option);
-    callStatusCallback->OnRemoteRequest(static_cast<uint32_t>(CallStatusInterfaceCode::START_DTMF),
-        data, reply, option);
-    callStatusCallback->OnRemoteRequest(static_cast<uint32_t>(CallStatusInterfaceCode::STOP_DTMF),
-        data, reply, option);
-    callStatusCallback->OnRemoteRequest(static_cast<uint32_t>(CallStatusInterfaceCode::SEND_USSD),
-        data, reply, option);
-    callStatusCallback->OnRemoteRequest(static_cast<uint32_t>(CallStatusInterfaceCode::GET_IMS_CALL_DATA),
-        data, reply, option);
-    callStatusCallback->OnRemoteRequest(static_cast<uint32_t>(CallStatusInterfaceCode::MMI_CODE_INFO_RESPONSE),
-        data, reply, option);
-    callStatusCallback->OnRemoteRequest(static_cast<uint32_t>(CallStatusInterfaceCode::CLOSE_UNFINISHED_USSD),
-        data, reply, option);
-    callStatusCallback->OnRemoteRequest(static_cast<uint32_t>(CallStatusInterfaceCode::UPDATE_SET_RESTRICTION_PWD),
-        data, reply, option);
-    callStatusCallback->OnRemoteRequest(static_cast<uint32_t>(CallStatusInterfaceCode::POST_DIAL_CHAR),
-        data, reply, option);
-    callStatusCallback->OnRemoteRequest(static_cast<uint32_t>(CallStatusInterfaceCode::POST_DIAL_DELAY),
-        data, reply, option);
-    callStatusCallback->OnRemoteRequest(static_cast<uint32_t>(CallStatusInterfaceCode::CALL_SESSION_EVENT),
-        data, reply, option);
-    callStatusCallback->OnRemoteRequest(static_cast<uint32_t>(CallStatusInterfaceCode::PEER_DIMENSION_CHANGE),
-        data, reply, option);
-    callStatusCallback->OnRemoteRequest(static_cast<uint32_t>(CallStatusInterfaceCode::CALL_DATA_USAGE),
-        data, reply, option);
-    callStatusCallback->OnRemoteRequest(static_cast<uint32_t>(CallStatusInterfaceCode::CAMERA_CAPBILITIES_CHANGE),
-        data, reply, option);
-    callStatusCallback->OnRemoteRequest(static_cast<uint32_t>(
-        CallStatusInterfaceCode::RECEIVE_UPDATE_MEDIA_MODE_REQUEST), data, reply, option);
-    int32_t res = callStatusCallback->OnRemoteRequest(
-        static_cast<uint32_t>(CallStatusInterfaceCode::UPDATE_VOIP_EVENT_INFO), data, reply, option);
-    ASSERT_NE(res, TELEPHONY_SUCCESS);
-}
-
-/**
- * @tc.number   Telephony_CallStatusCallbackStub_003
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
-HWTEST_F(ZeroBranch5Test, Telephony_CallStatusCallbackStub_003, Function | MediumTest | Level3)
-{
-    auto callStatusCallback = std::make_shared<CallStatusCallback>();
-    MessageParcel data;
-    MessageParcel reply;
+    int32_t vecSize = 1;
     int32_t accountId = 0;
     int32_t defaultNumber = 0;
     std::string defaultString = "";
     std::vector<uint8_t> userProfile = {};
     char accountNum[kMaxNumberLen + 1] = { 0 };
-    data.WriteInterfaceToken(CallStatusCallbackStub::GetDescriptor());
+    data.WriteInt32(vecSize);
     data.WriteInt32(0);
     data.WriteCString(accountNum);
     data.WriteInt32(accountId);
@@ -996,8 +193,311 @@ HWTEST_F(ZeroBranch5Test, Telephony_CallStatusCallbackStub_003, Function | Mediu
     data.WriteString(defaultString);
     data.WriteString(defaultString);
     data.WriteUInt8Vector(userProfile);
+    data.WriteInt32(SIM1_SLOTID);
     data.RewindRead(0);
-    ASSERT_EQ(callStatusCallback->OnUpdateCallReportInfo(data, reply), TELEPHONY_SUCCESS);
+    callStatusCallback->OnUpdateCallsReportInfo(data, reply);
+
+    MessageParcel dataParcel;
+    dataParcel.WriteInterfaceToken(CallStatusCallbackStub::GetDescriptor());
+    CellularCallEventInfo info;
+    int32_t length = sizeof(CellularCallEventInfo);
+    info.eventType = CellularCallEventType::EVENT_REQUEST_RESULT_TYPE;
+    info.eventId = RequestResultEventId::INVALID_REQUEST_RESULT_EVENT_ID;
+    dataParcel.WriteInt32(length);
+    dataParcel.WriteRawData((const void *)&info, length);
+    dataParcel.RewindRead(0);
+    MessageParcel reply1;
+    ASSERT_NE(callStatusCallback->OnUpdateEventReport(dataParcel, reply1), TELEPHONY_SUCCESS);
+}
+
+/**
+ * @tc.number   Telephony_CallStatusCallbackStub_005
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch6Test, Telephony_CallStatusCallbackStub_005, Function | MediumTest | Level3)
+{
+    auto callStatusCallback = std::make_shared<CallStatusCallback>();
+    MessageParcel data;
+    data.WriteInterfaceToken(CallStatusCallbackStub::GetDescriptor());
+    int32_t defaultNumber = 0;
+    MessageParcel reply;
+    CallWaitResponse callWaitResponse;
+    int32_t length = sizeof(CallWaitResponse);
+    data.WriteInt32(length);
+    callWaitResponse.result = defaultNumber;
+    callWaitResponse.status = defaultNumber;
+    callWaitResponse.classCw = defaultNumber;
+    data.WriteRawData((const void *)&callWaitResponse, length);
+    data.RewindRead(0);
+    callStatusCallback->OnUpdateGetWaitingResult(data, reply);
+    MessageParcel dataParcel;
+    dataParcel.WriteInterfaceToken(CallStatusCallbackStub::GetDescriptor());
+    CallRestrictionResponse callRestrictionResult;
+    length = sizeof(CallRestrictionResponse);
+    dataParcel.WriteInt32(length);
+    callRestrictionResult.result = 0;
+    callRestrictionResult.status = 0;
+    callRestrictionResult.classCw = 0;
+    dataParcel.WriteRawData((const void *)&callRestrictionResult, length);
+    dataParcel.RewindRead(0);
+    MessageParcel reply1;
+    callStatusCallback->OnUpdateGetRestrictionResult(dataParcel, reply1);
+    MessageParcel dataParcel2;
+    dataParcel2.WriteInterfaceToken(CallStatusCallbackStub::GetDescriptor());
+    CallTransferResponse callTransferResponse;
+    length = sizeof(CallTransferResponse);
+    dataParcel.WriteInt32(length);
+    callTransferResponse.result = defaultNumber;
+    callTransferResponse.status = defaultNumber;
+    callTransferResponse.classx = defaultNumber;
+    callTransferResponse.type = defaultNumber;
+    std::string msg("hello");
+    int32_t accountLength = msg.length() > kMaxNumberLen ? kMaxNumberLen : msg.length();
+    memcpy_s(callTransferResponse.number, kMaxNumberLen, msg.c_str(), accountLength);
+    callTransferResponse.reason = defaultNumber;
+    callTransferResponse.time = defaultNumber;
+    callTransferResponse.startHour = defaultNumber;
+    callTransferResponse.startMinute = defaultNumber;
+    callTransferResponse.endHour = defaultNumber;
+    callTransferResponse.endMinute = defaultNumber;
+    dataParcel2.WriteRawData((const void *)&callTransferResponse, length);
+    dataParcel2.RewindRead(0);
+    MessageParcel reply2;
+    ASSERT_NE(callStatusCallback->OnUpdateGetTransferResult(dataParcel2, reply2), TELEPHONY_SUCCESS);
+}
+
+/**
+ * @tc.number   Telephony_CallStatusCallbackStub_006
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch6Test, Telephony_CallStatusCallbackStub_006, Function | MediumTest | Level3)
+{
+    auto callStatusCallback = std::make_shared<CallStatusCallback>();
+    MessageParcel dataParcel;
+    dataParcel.WriteInterfaceToken(CallStatusCallbackStub::GetDescriptor());
+    MessageParcel reply;
+    ClipResponse clipResponse;
+    int32_t length = sizeof(ClipResponse);
+    dataParcel.WriteInt32(length);
+    dataParcel.WriteRawData((const void *)&clipResponse, length);
+    dataParcel.RewindRead(0);
+    callStatusCallback->OnUpdateGetCallClipResult(dataParcel, reply);
+
+    MessageParcel dataParcel2;
+    dataParcel2.WriteInterfaceToken(CallStatusCallbackStub::GetDescriptor());
+    GetImsConfigResponse response;
+    length = sizeof(GetImsConfigResponse);
+    dataParcel2.WriteInt32(length);
+    dataParcel2.WriteRawData((const void *)&response, length);
+    dataParcel2.RewindRead(0);
+    MessageParcel reply2;
+    callStatusCallback->OnGetImsConfigResult(dataParcel2, reply2);
+
+    MessageParcel dataParcel3;
+    dataParcel3.WriteInterfaceToken(CallStatusCallbackStub::GetDescriptor());
+    GetImsFeatureValueResponse response1;
+    length = sizeof(GetImsFeatureValueResponse);
+    dataParcel3.WriteInt32(length);
+    dataParcel3.WriteRawData((const void *)&response1, length);
+    dataParcel3.RewindRead(0);
+    MessageParcel reply3;
+    callStatusCallback->OnGetImsFeatureValueResult(dataParcel3, reply3);
+
+    MessageParcel dataParcel4;
+    dataParcel4.WriteInterfaceToken(CallStatusCallbackStub::GetDescriptor());
+    MmiCodeInfo info;
+    length = sizeof(MmiCodeInfo);
+    dataParcel4.WriteInt32(length);
+    info.result = 0;
+    std::string msg("hello");
+    int32_t msgLength = msg.length() > kMaxNumberLen ? kMaxNumberLen : msg.length();
+    memcpy_s(info.message, kMaxNumberLen, msg.c_str(), msgLength);
+    dataParcel4.WriteRawData((const void *)&info, length);
+    dataParcel4.RewindRead(0);
+    ASSERT_NE(callStatusCallback->OnSendMmiCodeResult(dataParcel4, reply), TELEPHONY_SUCCESS);
+}
+
+/**
+ * @tc.number   Telephony_CallStatusCallbackStub_007
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch6Test, Telephony_CallStatusCallbackStub_007, Function | MediumTest | Level3)
+{
+    auto callStatusCallback = std::make_shared<CallStatusCallback>();
+    MessageParcel dataParcel;
+    dataParcel.WriteInterfaceToken(CallStatusCallbackStub::GetDescriptor());
+    int32_t length = sizeof(CallModeReportInfo);
+    dataParcel.WriteInt32(length);
+    CallModeReportInfo callModeReportInfo;
+    dataParcel.WriteRawData((const void *)&callModeReportInfo, length);
+    dataParcel.RewindRead(0);
+    MessageParcel reply;
+    callStatusCallback->OnReceiveImsCallModeRequest(dataParcel, reply);
+
+    MessageParcel dataParcel2;
+    dataParcel2.WriteInterfaceToken(CallStatusCallbackStub::GetDescriptor());
+    length = sizeof(CallSessionReportInfo);
+    dataParcel2.WriteInt32(length);
+    CallSessionReportInfo callSessionReportInfo;
+    dataParcel2.WriteRawData((const void *)&callSessionReportInfo, length);
+    dataParcel2.RewindRead(0);
+    MessageParcel reply2;
+    callStatusCallback->OnCallSessionEventChange(dataParcel2, reply2);
+
+    MessageParcel dataParcel3;
+    dataParcel3.WriteInterfaceToken(CallStatusCallbackStub::GetDescriptor());
+    length = sizeof(PeerDimensionsReportInfo);
+    dataParcel3.WriteInt32(length);
+    PeerDimensionsReportInfo dimensionsReportInfo;
+    dataParcel3.WriteRawData((const void *)&dimensionsReportInfo, length);
+    dataParcel3.RewindRead(0);
+    MessageParcel reply3;
+    callStatusCallback->OnPeerDimensionsChange(dataParcel3, reply3);
+
+    MessageParcel dataParcel4;
+    dataParcel4.WriteInterfaceToken(CallStatusCallbackStub::GetDescriptor());
+    int64_t reportInfo = static_cast<int64_t>(10);
+    dataParcel4.WriteInt64(reportInfo);
+    dataParcel4.RewindRead(0);
+    MessageParcel reply4;
+    callStatusCallback->OnCallDataUsageChange(dataParcel4, reply4);
+
+    MessageParcel dataParcel5;
+    dataParcel5.WriteInterfaceToken(CallStatusCallbackStub::GetDescriptor());
+    length = sizeof(CameraCapabilitiesReportInfo);
+    dataParcel5.WriteInt32(length);
+    CameraCapabilitiesReportInfo cameraCapabilitiesReportInfo;
+    dataParcel5.WriteRawData((const void *)&cameraCapabilitiesReportInfo, length);
+    dataParcel5.RewindRead(0);
+    MessageParcel reply5;
+    ASSERT_NE(callStatusCallback->OnCameraCapabilitiesChange(dataParcel5, reply5), TELEPHONY_SUCCESS);
+}
+
+/**
+ * @tc.number   Telephony_SatelliteCallControl_001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch6Test, Telephony_SatelliteCallControl_001, Function | MediumTest | Level3)
+{
+    auto satelliteCallControl = DelayedSingleton<SatelliteCallControl>::GetInstance();
+    int32_t level = static_cast<int32_t>(SatCommTempLevel::TEMP_LEVEL_HIGH);
+    satelliteCallControl->SetSatcommTempLevel(level);
+    satelliteCallControl->IsAllowedSatelliteDialCall();
+    satelliteCallControl->IsSatelliteSwitchEnable();
+    satelliteCallControl->GetSatcommTempLevel();
+    sptr<CallBase> call = nullptr;
+    TelCallState priorState = TelCallState::CALL_STATUS_DIALING;
+    TelCallState nextState = TelCallState::CALL_STATUS_ALERTING;
+    satelliteCallControl->HandleSatelliteCallStateUpdate(call, priorState, nextState);
+    satelliteCallControl->IsShowDialog();
+    bool isShowDialog = true;
+    satelliteCallControl->SetShowDialog(isShowDialog);
+    ASSERT_EQ(isShowDialog, true);
+}
+
+/**
+ * @tc.number   Telephony_ProximitySensor_001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch6Test, Telephony_ProximitySensor_001, Function | MediumTest | Level3)
+{
+    auto proximitySensor = DelayedSingleton<ProximitySensor>::GetInstance();
+    sptr<CallBase> callObjectPtr = nullptr;
+    proximitySensor->NewCallCreated(callObjectPtr);
+    proximitySensor->CallStateUpdated(callObjectPtr, TelCallState::CALL_STATUS_IDLE,
+        TelCallState::CALL_STATUS_INCOMING);
+    proximitySensor->IncomingCallHungUp(callObjectPtr, false, "");
+    proximitySensor->IncomingCallActivated(callObjectPtr);
+    DisconnectedDetails details;
+    proximitySensor->CallDestroyed(details);
+    ASSERT_NE(proximitySensor, nullptr);
+}
+
+/**
+ * @tc.number   Telephony_StatusBar_001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch6Test, Telephony_StatusBar_001, Function | MediumTest | Level3)
+{
+    auto statusBar = DelayedSingleton<StatusBar>::GetInstance();
+    sptr<CallBase> callObjectPtr = nullptr;
+    statusBar->NewCallCreated(callObjectPtr);
+    bool isDisplayMute = false;
+    statusBar->UpdateMuteIcon(isDisplayMute);
+    statusBar->UpdateSpeakerphoneIcon(isDisplayMute);
+    statusBar->CallStateUpdated(callObjectPtr, TelCallState::CALL_STATUS_IDLE, TelCallState::CALL_STATUS_INCOMING);
+    statusBar->IncomingCallHungUp(callObjectPtr, false, "");
+    statusBar->IncomingCallActivated(callObjectPtr);
+    DisconnectedDetails details;
+    statusBar->CallDestroyed(details);
+    ASSERT_NE(statusBar, nullptr);
+}
+
+/**
+ * @tc.number   Telephony_WiredHeadset_001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch6Test, Telephony_WiredHeadset_001, Function | MediumTest | Level3)
+{
+    auto wiredHeadset = DelayedSingleton<WiredHeadset>::GetInstance();
+    sptr<CallBase> callObjectPtr = nullptr;
+    wiredHeadset->Init();
+    wiredHeadset->NewCallCreated(callObjectPtr);
+    wiredHeadset->CallStateUpdated(callObjectPtr, TelCallState::CALL_STATUS_IDLE, TelCallState::CALL_STATUS_INCOMING);
+    wiredHeadset->IncomingCallHungUp(callObjectPtr, false, "");
+    wiredHeadset->IncomingCallActivated(callObjectPtr);
+    DisconnectedDetails details;
+    wiredHeadset->CallDestroyed(details);
+    ASSERT_NE(wiredHeadset, nullptr);
+}
+
+/**
+ * @tc.number   Telephony_CallStatusPolicy_001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch6Test, Telephony_CallStatusPolicy_001, Function | MediumTest | Level3)
+{
+    CallStatusPolicy callStatusPolicy;
+    CallDetailInfo info;
+    callStatusPolicy.DialingHandlePolicy(info);
+    int32_t res = callStatusPolicy.FilterResultsDispose(nullptr);
+    ASSERT_NE(res, TELEPHONY_SUCCESS);
+}
+
+/**
+ * @tc.number   Telephony_CallAbilityCallback_002
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch6Test, Telephony_CallAbilityCallback_002, Function | MediumTest | Level3)
+{
+    auto callAbilityCallback = std::make_shared<CallAbilityCallback>();
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    callAbilityCallback->OnRemoteRequest(static_cast<uint32_t>(CallStatusInterfaceCode::UPDATE_VOIP_EVENT_INFO),
+        data, reply, option);
+    callAbilityCallback->OnUpdateCallStateInfo(data, reply);
+    callAbilityCallback->OnUpdateCallEvent(data, reply);
+    callAbilityCallback->OnUpdateCallDisconnectedCause(data, reply);
+    callAbilityCallback->OnUpdateAysncResults(data, reply);
+    callAbilityCallback->OnUpdateMmiCodeResults(data, reply);
+    callAbilityCallback->OnUpdateAudioDeviceChange(data, reply);
+    callAbilityCallback->OnUpdateOttCallRequest(data, reply);
+    callAbilityCallback->OnUpdatePostDialDelay(data, reply);
+    callAbilityCallback->OnUpdateImsCallModeChange(data, reply);
+    callAbilityCallback->OnUpdateCallSessionEventChange(data, reply);
+    callAbilityCallback->OnUpdatePeerDimensionsChange(data, reply);
+    callAbilityCallback->OnUpdateCallDataUsageChange(data, reply);
+    ASSERT_NE(callAbilityCallback->OnUpdateCameraCapabilities(data, reply), TELEPHONY_SUCCESS);
 }
 } // namespace Telephony
 } // namespace OHOS
