@@ -273,7 +273,6 @@ int32_t CallStatusManager::HandleVoipCallReportInfo(const CallDetailInfo &info)
             TELEPHONY_LOGE("Invalid call state!");
             break;
     }
-    DelayedSingleton<BluetoothCallService>::GetInstance()->GetCallState();
     return ret;
 }
 
