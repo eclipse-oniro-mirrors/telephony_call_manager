@@ -67,8 +67,8 @@ public:
     static bool IsCallExist(TelCallState callState);
     static bool IsCallExist(TelCallState callState, int32_t &callId);
     static bool IsConferenceCallExist(TelConferenceState state, int32_t &callId);
-    static int32_t GetCallNum(TelCallState callState);
-    static std::string GetCallNumber(TelCallState callState);
+    static int32_t GetCallNum(TelCallState callState, bool isIncludeVoipCall = true);
+    static std::string GetCallNumber(TelCallState callState, bool isIncludeVoipCall = true);
     static std::vector<CallAttributeInfo> GetCallInfoList(int32_t slotId);
     static sptr<CallBase> GetForegroundCall(bool isIncludeVoipCall = true);
     static sptr<CallBase> GetForegroundLiveCall();

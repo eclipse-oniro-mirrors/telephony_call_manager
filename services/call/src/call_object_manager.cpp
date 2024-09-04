@@ -620,30 +620,37 @@ bool CallObjectManager::IsConferenceCallExist(TelConferenceState state, int32_t 
     return false;
 }
 
-int32_t CallObjectManager::GetCallNum(TelCallState callState)
+int32_t CallObjectManager::GetCallNum(TelCallState callState, bool isIncludeVoipCall)
 {
     int32_t num = 0;
     std::lock_guard<std::mutex> lock(listMutex_);
     std::list<sptr<CallBase>>::iterator it;
     for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
         if ((*it)->GetTelCallState() == callState) {
-            ++num;
-            continue;
+            if (!isIncludeVoipCall && (*it)->GetCallType() == CallType::TYPE_VOIP) {
+                continue;
+            } else {
+                ++num;
+            }
         }
     }
     TELEPHONY_LOGI("callState:%{public}d, num:%{public}d", callState, num);
     return num;
 }
 
-std::string CallObjectManager::GetCallNumber(TelCallState callState)
+std::string CallObjectManager::GetCallNumber(TelCallState callState, bool isIncludeVoipCall)
 {
     std::string number = "";
     std::lock_guard<std::mutex> lock(listMutex_);
     std::list<sptr<CallBase>>::iterator it;
     for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
         if ((*it)->GetTelCallState() == callState) {
-            number = (*it)->GetAccountNumber();
-            break;
+            if (!isIncludeVoipCall && (*it)->GetCallType() == CallType::TYPE_VOIP) {
+                continue;
+            } else {
+                number = (*it)->GetAccountNumber();
+                break;
+            }
         }
     }
     return number;

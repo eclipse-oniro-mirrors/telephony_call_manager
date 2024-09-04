@@ -54,14 +54,15 @@ bool CallDialog::DialogConnectExtension(const std::string &dialogReason, int32_t
 bool CallDialog::DialogConnectExtensionAbility(const AAFwk::Want &want, const std::string commandStr)
 {
     TELEPHONY_LOGI("DialogConnectExtensionAbility start");
-    connection_ = sptr<CallAbilityConnection> (new (std::nothrow) CallAbilityConnection(commandStr));
-    if (connection_ == nullptr) {
-        TELEPHONY_LOGE("connection_ is nullptr");
+    sptr<CallAbilityConnection> connection =
+        sptr<CallAbilityConnection> (new (std::nothrow) CallAbilityConnection(commandStr));
+    if (connection == nullptr) {
+        TELEPHONY_LOGE("connection is nullptr");
         return false;
     }
     std::string identity = IPCSkeleton::ResetCallingIdentity();
     auto connectResult = AAFwk::ExtensionManagerClient::GetInstance().ConnectServiceExtensionAbility(want,
-        connection_, nullptr, DEFAULT_USER_ID);
+        connection, nullptr, DEFAULT_USER_ID);
     IPCSkeleton::SetCallingIdentity(identity);
     if (connectResult != 0) {
         TELEPHONY_LOGE("ConnectServiceExtensionAbility Failed!");
@@ -74,15 +75,15 @@ bool CallDialog::CallSettingDialogConnectExtensionAbility(const AAFwk::Want &wan
     const std::string commandStr)
 {
     TELEPHONY_LOGI("CallSettingDialogConnectExtensionAbility start");
-    callSettingConnection_ = sptr<CallSettingAbilityConnection> (new (std::nothrow)
+    sptr<CallSettingAbilityConnection> callSettingConnection = sptr<CallSettingAbilityConnection> (new (std::nothrow)
         CallSettingAbilityConnection(commandStr));
-    if (callSettingConnection_ == nullptr) {
-        TELEPHONY_LOGE("connection_ is nullptr");
+    if (callSettingConnection == nullptr) {
+        TELEPHONY_LOGE("connection is nullptr");
         return false;
     }
     std::string identity = IPCSkeleton::ResetCallingIdentity();
     auto connectResult = AAFwk::ExtensionManagerClient::GetInstance().ConnectServiceExtensionAbility(want,
-        callSettingConnection_, nullptr, DEFAULT_USER_ID);
+        callSettingConnection, nullptr, DEFAULT_USER_ID);
     IPCSkeleton::SetCallingIdentity(identity);
     if (connectResult != 0) {
         TELEPHONY_LOGE("ConnectServiceExtensionAbility Failed!");
