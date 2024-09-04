@@ -38,8 +38,7 @@ static constexpr const char *SETTINGS_DATA_EXT_URI = "datashare:///com.ohos.sett
 static constexpr const char *SETTINGS_AIRPLANE_MODE_URI =
     "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true&key=airplane_mode";
 static constexpr const char *SETTINGS_AIRPLANE_MODE = "settings.telephony.airplanemode";
-static constexpr const int32_t DEFAULT_WAITIME_TIME = 2;
-static constexpr const int32_t MAX__WAITIME_TIME = 10;
+static constexpr const int32_t MAX_WAITIME_TIME = 10;
 constexpr int32_t E_OK = 0;
 
 CallDataRdbObserver::CallDataRdbObserver(std::vector<std::string> *phones)
@@ -67,7 +66,7 @@ CallDataBaseHelper::CallDataBaseHelper() {}
 
 CallDataBaseHelper::~CallDataBaseHelper() {}
 
-std::shared_ptr<DataShare::DataShareHelper> CallDataBaseHelper::CreateDataShareHelper(std::string uri, bool isReboot)
+std::shared_ptr<DataShare::DataShareHelper> CallDataBaseHelper::CreateDataShareHelper(std::string uri)
 {
     auto saManager = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (saManager == nullptr) {
@@ -79,14 +78,10 @@ std::shared_ptr<DataShare::DataShareHelper> CallDataBaseHelper::CreateDataShareH
         TELEPHONY_LOGE("GetSystemAbility Service Failed.");
         return nullptr;
     }
-    int32_t waitTime = DEFAULT_WAITIME_TIME;
-    if (isReboot) {
-        waitTime = MAX__WAITIME_TIME;
-    }
     if (uri == SETTINGS_DATA_URI) {
-        return DataShare::DataShareHelper::Creator(remoteObj, uri, SETTINGS_DATA_EXT_URI, waitTime);
+        return DataShare::DataShareHelper::Creator(remoteObj, uri, SETTINGS_DATA_EXT_URI);
     }
-    return DataShare::DataShareHelper::Creator(remoteObj, uri, "", waitTime);
+    return DataShare::DataShareHelper::Creator(remoteObj, uri, "", MAX_WAITIME_TIME);
 }
 
 void CallDataBaseHelper::RegisterObserver(std::vector<std::string> *phones)
@@ -213,7 +208,7 @@ bool CallDataBaseHelper::Query(ContactInfo &contactInfo, DataShare::DataSharePre
 bool CallDataBaseHelper::QueryCallLog(
     std::map<std::string, int32_t> &phoneNumAndUnreadCountMap, DataShare::DataSharePredicates &predicates)
 {
-    std::shared_ptr<DataShare::DataShareHelper> helper = CreateDataShareHelper(CALLLOG_URI, true);
+    std::shared_ptr<DataShare::DataShareHelper> helper = CreateDataShareHelper(CALLLOG_URI);
     if (helper == nullptr) {
         TELEPHONY_LOGE("helper is nullptr!");
         return false;
