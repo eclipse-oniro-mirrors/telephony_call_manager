@@ -559,7 +559,7 @@ HWTEST_F(CallStateTest, Telephony_Tone_004, Function | MediumTest | Level3)
     ASSERT_EQ(tone->GetStreamUsageByToneType(ToneDescriptor::TONE_DTMF_CHAR_W),
         AudioStandard::StreamUsage::STREAM_USAGE_DTMF);
     ASSERT_EQ(tone->GetStreamUsageByToneType(ToneDescriptor::TONE_RINGBACK),
-        AudioStandard::StreamUsage::STREAM_USAGE_VOICE_COMMUNICATION);
+        AudioStandard::StreamUsage::STREAM_USAGE_VOICE_MODEM_COMMUNICATION);
     tone->GetStreamUsageByToneType(ToneDescriptor::TONE_WAITING);
 }
 
