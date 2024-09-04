@@ -96,7 +96,6 @@ public:
 private:
     sptr<CallDataRdbObserver> callDataRdbObserverPtr_;
     std::shared_ptr<DataShare::DataShareHelper> CreateDataShareHelper(std::string uri, bool isReboot = false);
-    std::shared_ptr<DataShare::DataShareHelper> CreateDataShareHelperInner(std::string uri);
     const std::string SETTING_KEY = "KEYWORD";
     const std::string SETTING_VALUE = "VALUE";
 };
