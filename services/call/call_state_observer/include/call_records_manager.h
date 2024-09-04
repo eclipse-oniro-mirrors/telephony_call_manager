@@ -33,10 +33,10 @@ using namespace OHOS::EventFwk;
 using CommonEventSubscribeInfo = OHOS::EventFwk::CommonEventSubscribeInfo;
 using CommonEventSubscriber = OHOS::EventFwk::CommonEventSubscriber;
 
-class UserSwitchEventSubscriber : public CommonEventSubscriber {
+class DataShareReadyhEventSubscriber : public CommonEventSubscriber {
 public:
-    explicit UserSwitchEventSubscriber(const CommonEventSubscribeInfo &info) : CommonEventSubscriber(info) {}
-    ~UserSwitchEventSubscriber() = default;
+    explicit DataShareReadyhEventSubscriber(const CommonEventSubscribeInfo &info) : CommonEventSubscriber(info) {}
+    ~DataShareReadyhEventSubscriber() = default;
     void OnReceiveEvent(const OHOS::EventFwk::CommonEventData &data) override;
 };
 
@@ -46,9 +46,6 @@ public:
     ~AccountSystemAbilityListener() = default;
     void OnAddSystemAbility(int32_t systemAbilityId, const std::string &deviceId) override;
     void OnRemoveSystemAbility(int32_t systemAbilityId, const std::string &deviceId) override;
-
-private:
-    std::shared_ptr<UserSwitchEventSubscriber> userSwitchSubscriber_ = nullptr;
 };
 
 /**
@@ -67,14 +64,21 @@ public:
     int32_t RemoveMissedIncomingCallNotification();
     int32_t GetCallFeatures(int32_t videoState);
     bool IsVideoCall(int32_t videoState);
+    void SetDataShareReady(bool isDataShareReady);
+    void SetSystemAbilityAdd(bool isSystemAbilityAdd);
+    void QueryUnReadMissedCallLog(int32_t userId);
 
 private:
     std::string GetCountryIso();
     int32_t CopyFormatNumberToRecord(std::string &countryIso, CallRecordInfo &data);
     int32_t CopyFormatNumberToE164ToRecord(std::string &countryIso, CallRecordInfo &data);
+    void RegisterDataShareReadySubscriber();
     std::shared_ptr<CallRecordsHandlerService> callRecordsHandlerServerPtr_;
     std::mutex mutex_;
     sptr<ISystemAbilityStatusChange> statusChangeListener_ = nullptr;
+    std::shared_ptr<DataShareReadyhEventSubscriber> dataShareReadySubscriber_ = nullptr;
+    bool isDataShareReady_ = false;
+    bool isSystemAbilityAdd_ = false;
 };
 } // namespace Telephony
 } // namespace OHOS
