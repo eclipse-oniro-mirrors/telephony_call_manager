@@ -297,9 +297,6 @@ void CallRecordsManager::QueryUnReadMissedCallLog(int32_t userId)
         int32_t ret = DelayedSingleton<CallRecordsHandlerService>::GetInstance()->QueryUnReadMissedCallLog();
         if (ret != TELEPHONY_SUCCESS) {
             TELEPHONY_LOGE("Query unread missed call log failed!");
-            isUnReadMissedCallLogQWuery_ = false;
-        } else {
-            isUnReadMissedCallLogQWuery_ = true;
         }
     }
 }
