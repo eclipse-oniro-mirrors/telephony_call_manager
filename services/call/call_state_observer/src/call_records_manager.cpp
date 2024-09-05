@@ -86,7 +86,7 @@ void CallRecordsManager::RegisterDataShareReadySubscriber()
     matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_DATA_SHARE_READY);
     CommonEventSubscribeInfo subscriberInfo(matchingSkills);
     subscriberInfo.SetThreadMode(EventFwk::CommonEventSubscribeInfo::COMMON);
-    dataShareReadySubscriber_ = std::make_shared<DataShareReadyhEventSubscriber>(subscriberInfo);
+    dataShareReadySubscriber_ = std::make_shared<DataShareReadyEventSubscriber>(subscriberInfo);
     bool subRet = CommonEventManager::SubscribeCommonEvent(dataShareReadySubscriber_);
     if (!subRet) {
         TELEPHONY_LOGE("Subscribe data share ready event failed!");
@@ -365,7 +365,7 @@ void UserSwitchEventSubscriber::OnReceiveEvent(const CommonEventData &data)
     }
 }
 
-void DataShareReadyhEventSubscriber::OnReceiveEvent(const CommonEventData &data)
+void DataShareReadyEventSubscriber::OnReceiveEvent(const CommonEventData &data)
 {
     OHOS::EventFwk::Want want = data.GetWant();
     std::string action = data.GetWant().GetAction();

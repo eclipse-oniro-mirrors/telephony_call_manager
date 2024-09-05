@@ -40,10 +40,10 @@ public:
     void OnReceiveEvent(const OHOS::EventFwk::CommonEventData &data) override;
 };
 
-class DataShareReadyhEventSubscriber : public CommonEventSubscriber {
+class DataShareReadyEventSubscriber : public CommonEventSubscriber {
 public:
-    explicit DataShareReadyhEventSubscriber(const CommonEventSubscribeInfo &info) : CommonEventSubscriber(info) {}
-    ~DataShareReadyhEventSubscriber() = default;
+    explicit DataShareReadyEventSubscriber(const CommonEventSubscribeInfo &info) : CommonEventSubscriber(info) {}
+    ~DataShareReadyEventSubscriber() = default;
     void OnReceiveEvent(const OHOS::EventFwk::CommonEventData &data) override;
 };
 
@@ -86,7 +86,7 @@ private:
     std::shared_ptr<CallRecordsHandlerService> callRecordsHandlerServerPtr_;
     std::mutex mutex_;
     sptr<ISystemAbilityStatusChange> statusChangeListener_ = nullptr;
-    std::shared_ptr<DataShareReadyhEventSubscriber> dataShareReadySubscriber_ = nullptr;
+    std::shared_ptr<DataShareReadyEventSubscriber> dataShareReadySubscriber_ = nullptr;
     bool isDataShareReady_ = false;
     bool isSystemAbilityAdd_ = false;
     bool isUnReadMissedCallLogQuery_ = false;
