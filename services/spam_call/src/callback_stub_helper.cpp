@@ -18,6 +18,7 @@
 #include "call_manager_errors.h"
 #include "spam_call_adapter.h"
 #include "call_number_utils.h"
+#include "call_manager_hisysevent.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -56,6 +57,7 @@ int32_t CallbackStubHelper::OnResult(int32_t &errCode, std::string &result)
                 QueryYellowPageAndMarkInfo(numberMarkInfo, spamCallAdapter_->GetDetectPhoneNum());
         }
         spamCallAdapter_->SetParseResult(isBlock, numberMarkInfo, blockReason);
+        CallManagerHisysevent::WriteIncomingNumIdentityBehaviorEvent(static_cast<int32_t>(numberMarkInfo.markType));
     }
     spamCallAdapter_->NotifyAll();
     return TELEPHONY_SUCCESS;
