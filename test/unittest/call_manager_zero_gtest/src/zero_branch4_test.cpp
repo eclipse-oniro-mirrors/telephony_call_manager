@@ -883,7 +883,6 @@ HWTEST_F(ZeroBranch3Test, Telephony_CallManagerHisysevent_002, Function | Medium
     ASSERT_EQ(eventValue, CallErrorCode::CALL_ERROR_MEMSET_FAIL);
     callManagerHisysevent->TelephonyErrorCodeConversion(static_cast<int32_t>(TELEPHONY_ERR_MEMCPY_FAIL), eventValue);
     ASSERT_EQ(eventValue, CallErrorCode::CALL_ERROR_MEMCPY_FAIL);
-    callManagerHisysevent->WriteIncomingNumIdentityBehaviorEvent(static_cast<int32_t>(MarkType::MARK_TYPE_CRANK));
 }
 
 /**
