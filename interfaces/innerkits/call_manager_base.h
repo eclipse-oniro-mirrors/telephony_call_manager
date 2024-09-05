@@ -489,7 +489,7 @@ enum class CallAbilityEventId {
      * Indicates that the super privacy mode ON.
      */
     EVENT_IS_SUPER_PRIVACY_MODE_ON = 20,
-	  /**
+    /**
      * Indicates that the super privacy mode OFF.
      */
     EVENT_IS_SUPER_PRIVACY_MODE_OFF = 21,
@@ -773,7 +773,6 @@ enum class CallSuperPrivacyModeType {
      */
     ALWAYS_ON = 2,
 };
-
 } // namespace Telephony
 } // namespace OHOS
 #endif // CALL_MANAGER_BASE_H

@@ -34,7 +34,6 @@ void CallAbilityConnectCallback::OnAbilityConnectDone(
         DelayedSingleton<CallConnectAbility>::GetInstance()->SetConnectFlag(true);
         DelayedSingleton<CallConnectAbility>::GetInstance()->SetConnectingFlag(false);
         DelayedSingleton<CallConnectAbility>::GetInstance()->NotifyAll();
-    
         CallEventInfo eventInfo;
         (void)memset_s(&eventInfo, sizeof(CallEventInfo), 0, sizeof(CallEventInfo));
         bool isSuperPrivacyMode = DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance()->

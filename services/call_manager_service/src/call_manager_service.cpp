@@ -33,9 +33,9 @@
 #include "report_call_info_handler.h"
 #include "telephony_log_wrapper.h"
 #include "telephony_permission.h"
+#include "distributed_call_manager.h"
 #include "video_control_manager.h"
 #include "voip_call_connection.h"
-#include "distributed_call_manager.h"
 #include "call_earthquake_alarm_subscriber.h"
 
 namespace OHOS {
@@ -91,6 +91,8 @@ void CallManagerService::OnAddSystemAbility(int32_t systemAbilityId, const std::
     switch (systemAbilityId) {
         case AUDIO_POLICY_SERVICE_ID:
             DelayedSingleton<AudioProxy>::GetInstance()->SetAudioMicStateChangeCallback();
+            DelayedSingleton<AudioProxy>::GetInstance()->SetAudioDeviceChangeCallback();
+            DelayedSingleton<AudioProxy>::GetInstance()->SetAudioPreferDeviceChangeCallback();
             break;
         default:
             TELEPHONY_LOGE("OnAddSystemAbility unhandle id : %{public}d", systemAbilityId);
@@ -1479,6 +1481,7 @@ int32_t CallManagerService::SendCallUiEvent(int32_t callId, std::string &eventNa
             return TELEPHONY_ERR_LOCAL_PTR_NULL;
         }
         callPtr->SetCeliaCallType(IS_CELIA_CALL);
+        TELEPHONY_LOGI("set celia call type!");
     }
     return TELEPHONY_SUCCESS;
 }

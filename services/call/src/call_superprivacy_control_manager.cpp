@@ -37,7 +37,7 @@ void CallSuperPrivacyControlManager::RegisterSuperPrivacyMode()
 void CallSuperPrivacyControlManager::ParamChangeCallback(const char *key, const char *value, void *context)
 {
     SuperPrivacyModeChangeEvent();
-    if (key == nullptr ||value == nullptr) {
+    if (key == nullptr || value == nullptr) {
         return;
     }
     if (strcmp(key, SUPER_PRIVACY_MODE_PARAM_KEYS)) {
@@ -85,7 +85,7 @@ void CallSuperPrivacyControlManager::CloseAllCall()
             if (info.callState == TelCallState::CALL_STATUS_INCOMING ||
                 info.callState == TelCallState::CALL_STATUS_WAITING) {
                 DelayedSingleton<CallControlManager>::GetInstance()->RejectCall(info.callId, false,
-                u"superPrivacyModeOn");
+                    u"superPrivacyModeOn");
             } else {
                 DelayedSingleton<CallControlManager>::GetInstance()->HangUpCall(info.callId);
             }

@@ -236,22 +236,6 @@ std::string CallNumberUtils::RemovePostDialPhoneNumber(const std::string &phoneS
     return newString;
 }
 
-bool CallNumberUtils::HasAlphabetInPhoneNum(const std::string &inputValue)
-{
-    if (inputValue.empty()) {
-        TELEPHONY_LOGE("HasAlphabetInPhoneNum return, input is empty.");
-        return true;
-    }
-    for (char c : inputValue) {
-        if (((c >= 'a') && (c <= 'z')) || ((c >= 'A') && (c <= 'Z'))) {
-            TELEPHONY_LOGE("The Phone Number contains letter");
-            return true;
-        }
-    }
-    TELEPHONY_LOGI("The Phone Number is valid");
-    return false;
-}
-
 bool CallNumberUtils::HasBCPhoneNumber(const std::string &phoneNumber)
 {
     int32_t phoneNumberStart = 0;

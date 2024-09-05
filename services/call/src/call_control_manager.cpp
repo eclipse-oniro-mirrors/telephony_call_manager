@@ -140,7 +140,7 @@ int32_t CallControlManager::DialCall(std::u16string &number, AppExecFwk::PacMap 
     }
     ret = CanDial(number, extras, isEcc);
     if (ret != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("can dial policy result:%{public}d", ret);
+        TELEPHONY_LOGE("dial policy result:%{public}d", ret);
         return ret;
     }
     if (!IsSupportVideoCall(extras)) {
@@ -213,12 +213,15 @@ int32_t CallControlManager::AnswerCall(int32_t callId, int32_t videoState)
         TELEPHONY_LOGE("call is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    if (CurrentIsSuperPrivacyMode(callId, videoState)) {
+    bool isVoipCall = call->GetCallType() == CallType::TYPE_VOIP;
+    if (!isVoipCall && CurrentIsSuperPrivacyMode(callId, videoState)) {
         return TELEPHONY_SUCCESS;
     }
     AnswerHandlerForSatelliteOrVideoCall(call, videoState);
     TELEPHONY_LOGI("report answered state");
-    NotifyCallStateUpdated(call, TelCallState::CALL_STATUS_INCOMING, TelCallState::CALL_STATUS_ANSWERED);
+    if (!isVoipCall) {
+        NotifyCallStateUpdated(call, TelCallState::CALL_STATUS_INCOMING, TelCallState::CALL_STATUS_ANSWERED);
+    }
     CarrierAndVoipConflictProcess(callId, TelCallState::CALL_STATUS_ANSWERED);
     if (VoIPCallState_ != CallStateToApp::CALL_STATE_IDLE) {
             TELEPHONY_LOGW("VoIP call is active, waiting for VoIP to disconnect");
@@ -1277,7 +1280,6 @@ int32_t CallControlManager::RemoveMissedIncomingCallNotification()
 
 int32_t CallControlManager::SetVoIPCallState(int32_t state)
 {
-    TELEPHONY_LOGI("VoIP state is %{public}d", state);
     VoIPCallState_ = (CallStateToApp)state;
     std::string identity = IPCSkeleton::ResetCallingIdentity();
     DelayedSingleton<CallStateReportProxy>::GetInstance()->UpdateCallStateForVoIPOrRestart();
@@ -1296,10 +1298,11 @@ int32_t CallControlManager::SetVoIPCallState(int32_t state)
         HangUpVoipCall();
     }
     if (VoIPCallState_ == CallStateToApp::CALL_STATE_IDLE) {
-            TELEPHONY_LOGI("VoIP call state is not active");
-            if (AnsweredCallQueue_.hasCall) {
-                AnsweredCallQueue_.hasCall = false;
-                return AnswerCall(AnsweredCallQueue_.callId, AnsweredCallQueue_.videoState);
+        TELEPHONY_LOGI("VoIP call state is not active");
+        if (AnsweredCallQueue_.hasCall == true) {
+            TELEPHONY_LOGI("answer call now");
+            AnsweredCallQueue_.hasCall = false;
+            return AnswerCall(AnsweredCallQueue_.callId, AnsweredCallQueue_.videoState);
         }
     }
     return TELEPHONY_SUCCESS;
@@ -1428,7 +1431,9 @@ void CallControlManager::SystemAbilityListener::OnAddSystemAbility(int32_t syste
         return;
     }
 
+    std::string identity = IPCSkeleton::ResetCallingIdentity();
     bool subscribeResult = EventFwk::CommonEventManager::SubscribeCommonEvent(subscriberPtr_);
+    IPCSkeleton::SetCallingIdentity(identity);
     TELEPHONY_LOGI("CallControlManager::OnAddSystemAbility subscribeResult = %{public}d", subscribeResult);
 }
 
@@ -1444,8 +1449,9 @@ void CallControlManager::SystemAbilityListener::OnRemoveSystemAbility(
         TELEPHONY_LOGE("CallControlManager::OnRemoveSystemAbility subscriberPtr is nullptr");
         return;
     }
-
+    std::string identity = IPCSkeleton::ResetCallingIdentity();
     bool subscribeResult = EventFwk::CommonEventManager::UnSubscribeCommonEvent(subscriberPtr_);
+    IPCSkeleton::SetCallingIdentity(identity);
     TELEPHONY_LOGI("CallControlManager::OnRemoveSystemAbility subscribeResult = %{public}d", subscribeResult);
 }
 
@@ -1453,8 +1459,6 @@ int32_t CallControlManager::BroadcastSubscriber()
 {
     EventFwk::MatchingSkills matchingSkills;
     matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_SIM_STATE_CHANGED);
-    matchingSkills.AddEvent("usual.event.thermal.satcomm.HIGH_TEMP_LEVEL");
-    matchingSkills.AddEvent("usual.event.SUPER_PRIVACY_MODE");
     matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_BLUETOOTH_REMOTEDEVICE_NAME_UPDATE);
     matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_USER_SWITCHED);
     EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
@@ -1478,7 +1482,7 @@ int32_t CallControlManager::BroadcastSubscriber()
     }
 
     EventFwk::MatchingSkills matchingSkills_;
-    matchingSkills.AddEvent("usual.event.thermal.satcomm.HIGH_TEMP_LEVEL");
+    matchingSkills_.AddEvent("usual.event.thermal.satcomm.HIGH_TEMP_LEVEL");
     EventFwk::CommonEventSubscribeInfo subscriberInfo_(matchingSkills_);
     subscriberInfo_.SetThreadMode(EventFwk::CommonEventSubscribeInfo::COMMON);
     subscriberInfo_.SetPublisherUid(SATCOMM_UID);
@@ -1490,9 +1494,10 @@ int32_t CallControlManager::BroadcastSubscriber()
     }
 
     EventFwk::MatchingSkills matchingSkill_;
-    matchingSkills.AddEvent("usual.event.SUPER_PRIVACY_MODE");
+    matchingSkill_.AddEvent("usual.event.SUPER_PRIVACY_MODE");
     EventFwk::CommonEventSubscribeInfo subscriberInfos_(matchingSkill_);
     subscriberInfos_.SetPublisherBundleName("com.settings");
+    subscriberInfos_.SetPermission("ohos.permission.SET_TELEPHONY_STATE");
     subscriberInfos_.SetThreadMode(EventFwk::CommonEventSubscribeInfo::COMMON);
     std::shared_ptr<CallBroadcastSubscriber> subscriberPtrs_ =
         std::make_shared<CallBroadcastSubscriber>(subscriberInfos_);

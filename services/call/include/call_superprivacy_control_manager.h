@@ -18,7 +18,6 @@
 
 #include "singleton.h"
 
-
 /**
  * @ClassName: CallSuperPrivacyControlManager
  * @Description: check super privacy mode in CallSuperPrivacyControlManager

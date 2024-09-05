@@ -46,7 +46,6 @@ public:
     bool RegexMatchMmi(const std::string &number);
     std::string RemoveSeparatorsPhoneNumber(const std::string &phoneString);
     std::string RemovePostDialPhoneNumber(const std::string &phoneString);
-    bool HasAlphabetInPhoneNum(const std::string &inputValue);
     bool HasBCPhoneNumber(const std::string &phoneNumber);
     bool SelectAccountId(int32_t slotId, AppExecFwk::PacMap &extras);
     int32_t QueryNumberLocationInfo(std::string &numberLocation, std::string accountNumber);

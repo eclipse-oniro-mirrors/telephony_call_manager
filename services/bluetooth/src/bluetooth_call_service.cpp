@@ -24,7 +24,6 @@
 #include "ffrt.h"
 #include "call_superprivacy_control_manager.h"
 
-
 namespace OHOS {
 namespace Telephony {
 const uint64_t DELAY_STOP_PLAY_TIME = 3000000;

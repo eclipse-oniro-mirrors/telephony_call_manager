@@ -142,7 +142,6 @@ int32_t ReportCallInfoHandler::UpdateDisconnectedCause(const DisconnectedDetails
             TELEPHONY_LOGE("HandleDisconnectedCause failed! ret:%{public}d", ret);
         }
     });
-
     return TELEPHONY_SUCCESS;
 }
 
@@ -165,7 +164,6 @@ int32_t ReportCallInfoHandler::UpdateEventResultInfo(const CellularCallEventInfo
             TELEPHONY_LOGE("HandleEventResultReportInfo failed! ret:%{public}d", ret);
         }
     });
-
     return TELEPHONY_SUCCESS;
 }
 
@@ -189,7 +187,6 @@ int32_t ReportCallInfoHandler::UpdateOttEventInfo(const OttCallEventInfo &info)
             TELEPHONY_LOGE("HandleOttEventReportInfo failed! ret:%{public}d", ret);
         }
     });
-
     return TELEPHONY_SUCCESS;
 }
 

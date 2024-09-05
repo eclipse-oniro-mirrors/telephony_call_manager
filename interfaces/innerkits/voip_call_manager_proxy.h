@@ -97,7 +97,7 @@ public:
      */
     int32_t ReportVoipIncomingCall(
         std::string callId, std::string bundleName, std::string processMode, int32_t uid) override;
-   /**
+    /**
      * @brief pushSA report call extensionId.
      *
      * @param callId[in], The call id

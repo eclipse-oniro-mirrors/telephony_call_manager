@@ -120,9 +120,8 @@ int32_t CallSettingManager::GetCallTransferInfo(int32_t slotId, CallTransferType
 int32_t CallSettingManager::SetCallTransferInfo(int32_t slotId, CallTransferInfo &info)
 {
     TELEPHONY_LOGI(
-        "SetCallTransferInfo: slotId = %{public}d, settingType = %{public}d, type = %{public}d, transferNum = "
-        "%{public}s",
-        slotId, info.settingType, info.type, info.transferNum);
+        "SetCallTransferInfo: slotId = %{public}d, settingType = %{public}d, type = %{public}d",
+        slotId, info.settingType, info.type);
     int32_t ret = SetCallTransferInfoPolicy(slotId, info);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("Invalid data!");

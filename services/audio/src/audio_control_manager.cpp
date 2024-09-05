@@ -52,8 +52,6 @@ void AudioControlManager::Init()
 {
     DelayedSingleton<AudioDeviceManager>::GetInstance()->Init();
     DelayedSingleton<AudioSceneProcessor>::GetInstance()->Init();
-    DelayedSingleton<AudioProxy>::GetInstance()->SetAudioDeviceChangeCallback();
-    DelayedSingleton<AudioProxy>::GetInstance()->SetAudioPreferDeviceChangeCallback();
 }
 
 void AudioControlManager::UpdateForegroundLiveCall()
@@ -206,7 +204,7 @@ void AudioControlManager::UpdateDeviceTypeForVideoOrSatelliteCall()
         TELEPHONY_LOGE("call object nullptr");
         return;
     }
-    if (foregroundCall->GetCallType() != CallType::TYPE_IMS ||
+    if (foregroundCall->GetCallType() != CallType::TYPE_IMS &&
         foregroundCall->GetCallType() != CallType::TYPE_SATELLITE) {
         TELEPHONY_LOGE("other call not need control audio");
         return;
@@ -265,7 +263,7 @@ void AudioControlManager::UpdateDeviceTypeForVideoDialing()
         AudioDeviceType initDeviceType = GetInitAudioDeviceType();
         if (initDeviceType == AudioDeviceType::DEVICE_WIRED_HEADSET ||
             initDeviceType == AudioDeviceType::DEVICE_BLUETOOTH_SCO) {
-            device.deviceType = initDeviceType;
+            return;
         }
         TELEPHONY_LOGI("dialing video call should be speaker");
         SetAudioDevice(device);
@@ -442,11 +440,11 @@ int32_t AudioControlManager::SetAudioDevice(const AudioDevice &device, bool isBy
 {
     TELEPHONY_LOGI("set audio device, type: %{public}d", static_cast<int32_t>(device.deviceType));
     AudioDeviceType audioDeviceType = AudioDeviceType::DEVICE_UNKNOWN;
+    isSetAudioDeviceByUser_ = isByUser;
     if (CallObjectManager::HasSatelliteCallExist() && device.deviceType == AudioDeviceType::DEVICE_EARPIECE) {
         DelayedSingleton<CallDialog>::GetInstance()->DialogConnectExtension("SATELLITE_CALL_NOT_SUPPORT_EARPIECE");
         return CALL_ERR_AUDIO_SET_AUDIO_DEVICE_FAILED;
     }
-    isSetAudioDeviceByUser_ = isByUser;
     switch (device.deviceType) {
         case AudioDeviceType::DEVICE_SPEAKER:
         case AudioDeviceType::DEVICE_EARPIECE:
@@ -461,8 +459,10 @@ int32_t AudioControlManager::SetAudioDevice(const AudioDevice &device, bool isBy
             std::string address = device.address;
             std::unique_ptr<AudioStandard::AudioDeviceDescriptor> activeBluetoothDevice =
                 AudioStandard::AudioRoutingManager::GetInstance()->GetActiveBluetoothDevice();
-            if (address.empty() && activeBluetoothDevice != nullptr && !activeBluetoothDevice->macAddress_.empty()) {
-                address = activeBluetoothDevice->macAddress_;
+            if (address.empty()) {
+                if (activeBluetoothDevice != nullptr && !activeBluetoothDevice->macAddress_.empty()) {
+                    address = activeBluetoothDevice->macAddress_;
+                }
             }
             AudioSystemManager* audioSystemManager = AudioSystemManager::GetInstance();
             int32_t ret = audioSystemManager->SetCallDeviceActive(ActiveDeviceType::BLUETOOTH_SCO,
