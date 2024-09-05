@@ -89,7 +89,7 @@ private:
     std::shared_ptr<DataShareReadyhEventSubscriber> dataShareReadySubscriber_ = nullptr;
     bool isDataShareReady_ = false;
     bool isSystemAbilityAdd_ = false;
-    bool isUnReadMissedCallLogQuery = false;
+    bool isUnReadMissedCallLogQuery_ = false;
 };
 } // namespace Telephony
 } // namespace OHOS
