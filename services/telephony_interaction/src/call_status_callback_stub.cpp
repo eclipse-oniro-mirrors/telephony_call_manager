@@ -167,6 +167,7 @@ int32_t CallStatusCallbackStub::OnUpdateCallReportInfo(MessageParcel &data, Mess
         parcelPtr.voipCallInfo.voipBundleName = data.ReadString();
         parcelPtr.voipCallInfo.showBannerForIncomingCall = data.ReadBool();
         parcelPtr.voipCallInfo.isConferenceCall = data.ReadBool();
+        parcelPtr.voipCallInfo.isVoiceAnswerSupported = data.ReadBool();
         parcelPtr.voipCallInfo.hasMicPermission = data.ReadBool();
         parcelPtr.voipCallInfo.uid = data.ReadInt32();
         std::vector<uint8_t> userProfile = {};
@@ -196,30 +197,7 @@ int32_t CallStatusCallbackStub::OnUpdateCallsReportInfo(MessageParcel &data, Mes
     CallsReportInfo callReportInfo;
     CallReportInfo parcelPtr;
     for (int32_t i = 0; i < cnt; i++) {
-        parcelPtr.index = data.ReadInt32();
-        strncpy_s(parcelPtr.accountNum, kMaxNumberLen + 1, data.ReadCString(), kMaxNumberLen + 1);
-        parcelPtr.accountId = data.ReadInt32();
-        parcelPtr.callType = static_cast<CallType>(data.ReadInt32());
-        parcelPtr.callMode = static_cast<VideoStateType>(data.ReadInt32());
-        parcelPtr.state = static_cast<TelCallState>(data.ReadInt32());
-        parcelPtr.voiceDomain = data.ReadInt32();
-        parcelPtr.mpty = data.ReadInt32();
-        parcelPtr.crsType = data.ReadInt32();
-        parcelPtr.originalCallType = data.ReadInt32();
-        if (parcelPtr.callType == CallType::TYPE_VOIP) {
-            parcelPtr.voipCallInfo.voipCallId = data.ReadString();
-            parcelPtr.voipCallInfo.userName = data.ReadString();
-            parcelPtr.voipCallInfo.abilityName = data.ReadString();
-            parcelPtr.voipCallInfo.extensionId = data.ReadString();
-            parcelPtr.voipCallInfo.voipBundleName = data.ReadString();
-            parcelPtr.voipCallInfo.showBannerForIncomingCall = data.ReadBool();
-            parcelPtr.voipCallInfo.isConferenceCall = data.ReadBool();
-            parcelPtr.voipCallInfo.hasMicPermission = data.ReadBool();
-            parcelPtr.voipCallInfo.uid = data.ReadInt32();
-            std::vector<uint8_t> userProfile = {};
-            data.ReadUInt8Vector(&userProfile);
-            (parcelPtr.voipCallInfo.userProfile).assign(userProfile.begin(), userProfile.end());
-        }
+        BuildCallReportInfo(data, parcelPtr);
         callReportInfo.callVec.push_back(parcelPtr);
         TELEPHONY_LOGI("accountId:%{public}d,state:%{public}d", parcelPtr.accountId, parcelPtr.state);
     }
@@ -231,6 +209,35 @@ int32_t CallStatusCallbackStub::OnUpdateCallsReportInfo(MessageParcel &data, Mes
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
     return TELEPHONY_SUCCESS;
+}
+
+void CallStatusCallbackStub::BuildCallReportInfo(MessageParcel &data, CallReportInfo &parcelPtr)
+{
+    parcelPtr.index = data.ReadInt32();
+    strncpy_s(parcelPtr.accountNum, kMaxNumberLen + 1, data.ReadCString(), kMaxNumberLen + 1);
+    parcelPtr.accountId = data.ReadInt32();
+    parcelPtr.callType = static_cast<CallType>(data.ReadInt32());
+    parcelPtr.callMode = static_cast<VideoStateType>(data.ReadInt32());
+    parcelPtr.state = static_cast<TelCallState>(data.ReadInt32());
+    parcelPtr.voiceDomain = data.ReadInt32();
+    parcelPtr.mpty = data.ReadInt32();
+    parcelPtr.crsType = data.ReadInt32();
+    parcelPtr.originalCallType = data.ReadInt32();
+    if (parcelPtr.callType == CallType::TYPE_VOIP) {
+        parcelPtr.voipCallInfo.voipCallId = data.ReadString();
+        parcelPtr.voipCallInfo.userName = data.ReadString();
+        parcelPtr.voipCallInfo.abilityName = data.ReadString();
+        parcelPtr.voipCallInfo.extensionId = data.ReadString();
+        parcelPtr.voipCallInfo.voipBundleName = data.ReadString();
+        parcelPtr.voipCallInfo.showBannerForIncomingCall = data.ReadBool();
+        parcelPtr.voipCallInfo.isConferenceCall = data.ReadBool();
+        parcelPtr.voipCallInfo.isVoiceAnswerSupported = data.ReadBool();
+        parcelPtr.voipCallInfo.hasMicPermission = data.ReadBool();
+        parcelPtr.voipCallInfo.uid = data.ReadInt32();
+        std::vector<uint8_t> userProfile = {};
+        data.ReadUInt8Vector(&userProfile);
+        (parcelPtr.voipCallInfo.userProfile).assign(userProfile.begin(), userProfile.end());
+    }
 }
 
 int32_t CallStatusCallbackStub::OnUpdateDisconnectedCause(MessageParcel &data, MessageParcel &reply)

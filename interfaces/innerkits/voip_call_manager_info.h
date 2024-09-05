@@ -144,6 +144,10 @@ struct VoipCallAttribute {
      */
     bool isConferenceCall = false;
     /**
+     * Indicates whether the VoIP incoming video call is support voice answer. Default value is true.
+     */
+    bool isVoiceAnswerSupported = true;
+    /**
      * Indicates whether the app has the permission to use microphone. Default value is true.
      */
     bool hasMicPermission = true;

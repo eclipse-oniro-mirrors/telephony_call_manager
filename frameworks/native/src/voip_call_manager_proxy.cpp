@@ -41,7 +41,11 @@ int32_t VoipCallManagerProxy::ReportIncomingCall(
     dataParcel.WriteInt32(extras.GetIntValue("voipCallState"));
     dataParcel.WriteBool(extras.GetBooleanValue("showBannerForIncomingCall"));
     dataParcel.WriteBool(extras.GetBooleanValue("isConferenceCall"));
-    dataParcel.WriteUInt8Vector(userProfile);
+    dataParcel.WriteBool(extras.GetBooleanValue("isVoiceAnswerSupported"));
+    if (!dataParcel.WriteUInt8Vector(userProfile)) {
+        TELEPHONY_LOGE("ReportIncomingCall userProfile write fail, size:%{public}u",
+            static_cast<uint32_t>(userProfile.size()));
+    }
     auto remote = Remote();
     if (remote == nullptr) {
         TELEPHONY_LOGE("ReportIncomingCall Remote is null");
@@ -85,7 +89,8 @@ int32_t VoipCallManagerProxy::ReportIncomingCallError(AppExecFwk::PacMap &extras
     return replyParcel.ReadInt32();
 }
 
-int32_t VoipCallManagerProxy::ReportCallStateChange(std::string callId, const VoipCallState &state)
+int32_t VoipCallManagerProxy::ReportCallStateChange(
+    std::string callId, const VoipCallState &state, const VoipCallType &type)
 {
     MessageParcel dataParcel;
     if (!dataParcel.WriteInterfaceToken(VoipCallManagerProxy::GetDescriptor())) {
@@ -94,6 +99,7 @@ int32_t VoipCallManagerProxy::ReportCallStateChange(std::string callId, const Vo
     }
     dataParcel.WriteString(callId);
     dataParcel.WriteInt32(static_cast<int32_t>(state));
+    dataParcel.WriteInt32(static_cast<int32_t>(type));
     auto remote = Remote();
     if (remote == nullptr) {
         TELEPHONY_LOGE("ReportCallStateChange Remote is null");
@@ -125,7 +131,11 @@ int32_t VoipCallManagerProxy::ReportOutgoingCall(
     dataParcel.WriteInt32(extras.GetIntValue("voipCallState"));
     dataParcel.WriteBool(extras.GetBooleanValue("showBannerForIncomingCall"));
     dataParcel.WriteBool(extras.GetBooleanValue("isConferenceCall"));
-    dataParcel.WriteUInt8Vector(userProfile);
+    dataParcel.WriteBool(extras.GetBooleanValue("isVoiceAnswerSupported"));
+    if (!dataParcel.WriteUInt8Vector(userProfile)) {
+        TELEPHONY_LOGE("ReportOutgoingCall userProfile write fail, size:%{public}u",
+            static_cast<uint32_t>(userProfile.size()));
+    }
     auto remote = Remote();
     if (remote == nullptr) {
         TELEPHONY_LOGE("ReportOutgoingCall Remote is null");
