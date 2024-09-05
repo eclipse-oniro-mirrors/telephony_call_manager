@@ -21,6 +21,7 @@
 #include "app_state_observer.h"
 #include "bluetooth_call_manager.h"
 #include "call_ability_callback_death_recipient.h"
+#include "call_control_manager.h"
 #include "call_manager_errors.h"
 #include "iservice_registry.h"
 #include "system_ability.h"

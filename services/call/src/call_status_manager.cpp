@@ -19,7 +19,6 @@
 
 #include "audio_control_manager.h"
 #include "bluetooth_call_service.h"
-#include "call_ability_report_proxy.h"
 #include "call_control_manager.h"
 #include "call_manager_errors.h"
 #include "call_manager_hisysevent.h"
@@ -262,32 +261,6 @@ int32_t CallStatusManager::HandleVoipCallReportInfo(const CallDetailInfo &info)
     return ret;
 }
 
-int32_t CallStatusManager::AnsweredVoipCallHandle(const CallDetailInfo &info)
-{
-    int32_t ret = TELEPHONY_ERROR;
-    sptr<CallBase> call = GetOneCallObjectByVoipCallId(
-        info.voipCallInfo.voipCallId, info.voipCallInfo.voipBundleName, info.voipCallInfo.uid);
-    if (call == nullptr) {
-        return ret;
-    }
-    if (DelayedSingleton<CallControlManager>::GetInstance()->NotifyCallStateUpdated(
-        call, TelCallState::CALL_STATUS_INCOMING, TelCallState::CALL_STATUS_ANSWERED)) {
-        return TELEPHONY_SUCCESS;
-    } else {
-        return ret;
-    }
-}
-
-int32_t CallStatusManager::DisconnectingVoipCallHandle(const CallDetailInfo &info)
-{
-    sptr<CallBase> call = GetOneCallObjectByVoipCallId(
-        info.voipCallInfo.voipCallId, info.voipCallInfo.voipBundleName, info.voipCallInfo.uid);
-    if (call == nullptr) {
-        return TELEPHONY_ERROR;
-    }
-    return UpdateCallState(call, TelCallState::CALL_STATUS_DISCONNECTING);
-}
-
 int32_t CallStatusManager::HandleDisconnectedCause(const DisconnectedDetails &details)
 {
     bool ret = DelayedSingleton<CallControlManager>::GetInstance()->NotifyCallDestroyed(details);
@@ -411,9 +384,13 @@ int32_t CallStatusManager::IncomingHandle(const CallDetailInfo &info)
         return CALL_ERR_CALL_OBJECT_IS_NULL;
     }
     SetContactInfo(call, std::string(info.phoneNum));
-    bool block = false;
-    if (IsRejectCall(call, info, block)) {
-        return HandleRejectCall(call, block);
+    int32_t state;
+    DelayedSingleton<CallControlManager>::GetInstance()->GetVoIPCallState(state);
+    if (ShouldRejectIncomingCall() || state == (int32_t)CallStateToApp::CALL_STATE_RINGING) {
+        return HandleRejectCall(call, false);
+    }
+    if (info.callType != CallType::TYPE_VOIP && ShouldBlockIncomingCall(call, info)) {
+        return HandleRejectCall(call, true);
     }
     if (info.callType != CallType::TYPE_VOIP && IsRingOnceCall(call, info)) {
         return HandleRingOnceCall(call);
@@ -529,6 +506,32 @@ int32_t CallStatusManager::OutgoingVoipCallHandle(const CallDetailInfo &info)
         return ret;
     }
     return ret;
+}
+
+int32_t CallStatusManager::AnsweredVoipCallHandle(const CallDetailInfo &info)
+{   
+    int32_t ret = TELEPHONY_ERROR;
+    sptr<CallBase> call = GetOneCallObjectByVoipCallId(
+        info.voipCallInfo.voipCallId, info.voipCallInfo.voipBundleName, info.voipCallInfo.uid);
+    if (call == nullptr) {
+        return ret;
+    }
+    if (DelayedSingleton<CallControlManager>::GetInstance()->NotifyCallStateUpdated(
+        call, TelCallState::CALL_STATUS_INCOMING, TelCallState::CALL_STATUS_ANSWERED)) {
+        return TELEPHONY_SUCCESS;
+    } else {
+        return ret;
+    }
+}
+
+int32_t CallStatusManager::DisconnectingVoipCallHandle(const CallDetailInfo &info)
+{
+    sptr<CallBase> call = GetOneCallObjectByVoipCallId(
+        info.voipCallInfo.voipCallId, info.voipCallInfo.voipBundleName, info.voipCallInfo.uid);
+    if (call == nullptr) {
+        return TELEPHONY_ERROR;
+    }
+    return UpdateCallState(call, TelCallState::CALL_STATUS_DISCONNECTING);
 }
 
 void CallStatusManager::QueryCallerInfo(ContactInfo &contactInfo, std::string phoneNum)
@@ -654,7 +657,6 @@ int32_t CallStatusManager::ActiveHandle(const CallDetailInfo &info)
         TELEPHONY_LOGE("Call is NULL");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    call->SetMute(call->IsMuted(), info.accountId);
     call = RefreshCallIfNecessary(call, info);
     SetOriginalCallTypeForActiveState(call);
     // call state change active, need to judge if launching a conference
@@ -835,10 +837,6 @@ int32_t CallStatusManager::DisconnectedHandle(const CallDetailInfo &info)
         timeWaitHelper_->NotifyAll();
         timeWaitHelper_ = nullptr;
     }
-    int32_t currentCallNum = CallObjectManager::GetCurrentCallNum();
-    if (currentCallNum <= 1) {
-        DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance()->RestoreSuperPrivacyMode();
-    }
     std::string tmpStr(info.phoneNum);
     sptr<CallBase> call = GetOneCallObjectByIndexAndSlotId(info.index, info.accountId);
     if (call == nullptr) {
@@ -850,18 +848,15 @@ int32_t CallStatusManager::DisconnectedHandle(const CallDetailInfo &info)
     std::vector<std::u16string> callIdList;
     call->GetSubCallIdList(callIdList);
     CallRunningState previousState = call->GetCallRunningState();
-    int32_t ret = call->ExitConference();
-    if (ret == TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGI("SubCallSeparateFromConference success");
-    }
+    call->ExitConference();
     TelCallState priorState = call->GetTelCallState();
-    ret = UpdateCallState(call, TelCallState::CALL_STATUS_DISCONNECTED);
-    if (ret != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("UpdateCallState failed, errCode:%{public}d", ret);
-        return ret;
-    }
+    UpdateCallState(call, TelCallState::CALL_STATUS_DISCONNECTED);
     HandleHoldCallOrAutoAnswerCall(call, callIdList, previousState, priorState);
-    return ret;
+    int32_t currentCallNum = CallObjectManager::GetCurrentCallNum();
+    if (currentCallNum <= 0) {
+        DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance()->RestoreSuperPrivacyMode();
+    }
+    return TELEPHONY_SUCCESS;
 }
 
 void CallStatusManager::HandleHoldCallOrAutoAnswerCall(const sptr<CallBase> call,
@@ -1483,46 +1478,6 @@ void CallStatusManager::PackParaInfo(
     paraInfo.bundleName = info.bundleName;
     paraInfo.crsType = info.crsType;
     paraInfo.originalCallType = info.originalCallType;
-}
-
-bool CallStatusManager::IsFocusModeOpen()
-{
-    auto datashareHelper = SettingsDataShareHelper::GetInstance();
-    std::string focusModeEnable {"0"};
-    std::vector<int> activedOsAccountIds;
-    OHOS::AccountSA::OsAccountManager::QueryActiveOsAccountIds(activedOsAccountIds);
-    if (activedOsAccountIds.empty()) {
-        TELEPHONY_LOGW("ShouldRejectIncomingCall: activedOsAccountIds is empty");
-        return false;
-    }
-    int userId = activedOsAccountIds[0];
-    OHOS::Uri uri(
-        "datashare:///com.ohos.settingsdata/entry/settingsdata/USER_SETTINGSDATA_SECURE_"
-        + std::to_string(userId) + "?Proxy=true&key=focus_mode_enable");
-    int resp = datashareHelper->Query(uri, "focus_mode_enable", focusModeEnable);
-    if (resp == TELEPHONY_SUCCESS && focusModeEnable == "1") {
-        TELEPHONY_LOGI("IsFocusModeOpen: focus_mode_enable = 1");
-        return true;
-    }
-    return false;
-}
-
-bool CallStatusManager::IsRejectCall(sptr<CallBase> &call, const CallDetailInfo &info, bool &block)
-{
-    int32_t state;
-    DelayedSingleton<CallControlManager>::GetInstance()->GetVoIPCallState(state);
-    if (ShouldRejectIncomingCall() || state == (int32_t)CallStateToApp::CALL_STATE_RINGING) {
-        block = false;
-        return true;
-    }
-    if (info.callType != CallType::TYPE_VOIP && ShouldBlockIncomingCall(call, info)) {
-        block = true;
-        return true;
-    }
-    if (IsFocusModeOpen()) {
-        TELEPHONY_LOGI("focus mode open");
-    }
-    return false;
 }
 } // namespace Telephony
 } // namespace OHOS

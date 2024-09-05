@@ -381,23 +381,11 @@ void AudioPreferDeviceChangeCallback::OnPreferredOutputDeviceUpdated(
         TELEPHONY_LOGE("desc size is zero");
         return;
     }
-
-    TELEPHONY_LOGI("OnPreferredOutputDeviceUpdated type: %{public}d", desc[0]->deviceType_);
-
-    size_t size = desc.size();
-    TELEPHONY_LOGI("desc size is: %{public}zu", size);
-    std::string deviceId = DelayedSingleton<DistributedCallManager>::GetInstance()->GetConnectedDCallDeviceId();
-    for (auto iter = desc.begin(); iter != desc.end(); iter++) {
-        std::string networkId = (*iter)->networkId_;
-        if (networkId.empty() || deviceId != networkId) {
-            continue;
-        }
-        DelayedSingleton<AudioDeviceManager>::GetInstance()->SetCurrentAudioDevice(
-            AudioDeviceType::DEVICE_DISTRIBUTED_AUTOMOTIVE);
-        TELEPHONY_LOGI("switch to distributed audio device");
+    if (DelayedSingleton<DistributedCallManager>::GetInstance()->IsDCallDeviceSwitchedOn()) {
+        TELEPHONY_LOGW("has already switch to distributed audio device");
         return;
     }
-
+    TELEPHONY_LOGI("OnPreferredOutputDeviceUpdated type: %{public}d", desc[0]->deviceType_);
     switch (desc[0]->deviceType_) {
         case AudioStandard::DEVICE_TYPE_BLUETOOTH_SCO:
             device.deviceType = AudioDeviceType::DEVICE_BLUETOOTH_SCO;

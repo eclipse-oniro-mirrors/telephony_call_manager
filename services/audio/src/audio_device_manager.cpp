@@ -104,7 +104,7 @@ void AudioDeviceManager::UpdateEarpieceDevice()
     while (it != info_.audioDeviceList.end()) {
         if (it->deviceType == AudioDeviceType::DEVICE_EARPIECE) {
             it = info_.audioDeviceList.erase(it);
-            TELEPHONY_LOGI("not support Earpice, remove Earpice device success");
+            TELEPHONY_LOGI("no support Earpiece, remove Earpiece device success");
             return;
         } else {
             ++it;
@@ -471,8 +471,7 @@ bool AudioDeviceManager::CheckAndSwitchDistributedAudioDevice()
     DelayedSingleton<DistributedCallManager>::GetInstance()->SetCallState(true);
     std::vector<AudioDevice>::iterator it = info_.audioDeviceList.begin();
     while (it != info_.audioDeviceList.end()) {
-        if (it->deviceType == AudioDeviceType::DEVICE_DISTRIBUTED_AUTOMOTIVE &&
-            DelayedSingleton<DistributedCallManager>::GetInstance()->IsSelectVirtualModem()) {
+        if (it->deviceType == AudioDeviceType::DEVICE_DISTRIBUTED_AUTOMOTIVE) {
             DelayedSingleton<DistributedCallManager>::GetInstance()->SwitchOnDCallDeviceAsync(*it);
             return true;
         } else {
@@ -501,7 +500,7 @@ int32_t AudioDeviceManager::ReportAudioDeviceChange(const AudioDevice &device)
     if (audioDeviceType_ == AudioDeviceType::DEVICE_BLUETOOTH_SCO) {
         if (address.empty() || deviceName.empty()) {
             std::unique_ptr<AudioStandard::AudioDeviceDescriptor> activeBluetoothDevice =
-            AudioStandard::AudioRoutingManager::GetInstance()->GetActiveBluetoothDevice();
+                AudioStandard::AudioRoutingManager::GetInstance()->GetActiveBluetoothDevice();
             if (activeBluetoothDevice != nullptr && !activeBluetoothDevice->macAddress_.empty()) {
                 address = activeBluetoothDevice->macAddress_;
                 deviceName = activeBluetoothDevice->deviceName_;
@@ -612,7 +611,6 @@ bool AudioDeviceManager::IsBtActived()
     std::unique_ptr<AudioStandard::AudioDeviceDescriptor> activeBluetoothDevice =
         AudioStandard::AudioRoutingManager::GetInstance()->GetActiveBluetoothDevice();
     if (activeBluetoothDevice != nullptr && !activeBluetoothDevice->macAddress_.empty()) {
-        TELEPHONY_LOGI("has actived bt device");
         return true;
     }
     return false;

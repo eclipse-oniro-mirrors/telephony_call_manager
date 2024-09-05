@@ -990,6 +990,7 @@ int32_t CallRequestProcess::EccDialPolicy()
     std::list<int32_t> callIdList;
     std::list<sptr<CallBase>> hangupList;
     std::list<sptr<CallBase>> rejectList;
+
     GetCarrierCallList(callIdList);
     callNum = callIdList.size();
     for (int32_t callId : callIdList) {
@@ -1031,6 +1032,7 @@ int32_t CallRequestProcess::EccDialPolicy()
         call->RejectCall();
     }
     hangupList.clear();
+    rejectList.clear();
     return TELEPHONY_SUCCESS;
 }
 } // namespace Telephony

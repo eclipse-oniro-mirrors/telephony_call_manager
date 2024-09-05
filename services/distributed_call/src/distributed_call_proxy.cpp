@@ -25,12 +25,13 @@ namespace OHOS {
 namespace Telephony {
 namespace {
 using GetDCallClientClass = OHOS::DistributedHardware::IDCallClient *(*)();
+const std::string DCALL_CLIENT_SDK_PATH = "/system/lib64/libdistributed_call_client.z.so";
 }
 
 DistributedCallProxy::DistributedCallProxy()
 {
     TELEPHONY_LOGI("DistributedCallProxy constructed.");
-    dCallClientHandler_ = dlopen("libdistributed_call_client.z.so", RTLD_LAZY | RTLD_NODELETE);
+    dCallClientHandler_ = dlopen(DCALL_CLIENT_SDK_PATH.c_str(), RTLD_LAZY | RTLD_NODELETE);
     if (dCallClientHandler_ == nullptr) {
         TELEPHONY_LOGE("load dcall client sdk failed, fail reason: %{public}s.", dlerror());
         return;
@@ -155,16 +156,6 @@ int32_t DistributedCallProxy::GetDCallDeviceInfo(const std::string &devId,
         return TELEPHONY_ERR_FAIL;
     }
     return dcallClient_->GetDCallDeviceInfo(devId, devInfo);
-}
-
-bool DistributedCallProxy::IsSelectVirtualModem()
-{
-    std::lock_guard<std::mutex> lock(dcallClientMtx_);
-    if (dcallClient_ == nullptr) {
-        TELEPHONY_LOGE("dcallClient_ is nullptr");
-        return false;
-    }
-    return dcallClient_->IsSelectVirtualModem();
 }
 } // namespace Telephony
 } // namespace OHOS

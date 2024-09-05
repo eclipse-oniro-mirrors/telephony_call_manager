@@ -57,10 +57,13 @@ public:
                 std::this_thread::sleep_for(std::chrono::milliseconds(interval));
                 taskFun();
             }
-            std::lock_guard<std::mutex> locker(mutex_);
-            stopStatus_ = true;
-            tryStopFlag_ = false;
-            timerCond_.notify_one();
+
+            {
+                std::lock_guard<std::mutex> locker(mutex_);
+                stopStatus_ = true;
+                tryStopFlag_ = false;
+                timerCond_.notify_one();
+            }
         }).detach();
     }
 

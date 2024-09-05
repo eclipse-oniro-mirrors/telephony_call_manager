@@ -26,7 +26,6 @@ using json = nlohmann::json;
 
 namespace OHOS {
 namespace Telephony {
-using namespace AudioStandard;
 namespace {
 const size_t INT32_MIN_ID_LENGTH = 3;
 const size_t INT32_SHORT_ID_LENGTH = 20;
@@ -197,7 +196,7 @@ void DistributedCallManager::AddDCallDevice(const std::string& devId)
     onlineDCallDevices_.emplace(devId, device);
 
     if (!dCallDeviceSwitchedOn_.load() && isCallActived_.load()) {
-        if (device.deviceType == AudioDeviceType::DEVICE_DISTRIBUTED_AUTOMOTIVE && IsSelectVirtualModem()) {
+        if (device.deviceType == AudioDeviceType::DEVICE_DISTRIBUTED_AUTOMOTIVE) {
             TELEPHONY_LOGI("switch call to auto motive as it is online");
             SwitchOnDCallDeviceAsync(device);
         }
@@ -317,8 +316,6 @@ bool DistributedCallManager::SwitchOnDCallDeviceSync(const AudioDevice& device)
         SetConnectedDCallDevice(device);
         DelayedSingleton<AudioDeviceManager>::GetInstance()->SetCurrentAudioDevice(device.deviceType);
         TELEPHONY_LOGI("switch dcall device succeed.");
-
-        ReportDistributedDeviceInfo();
         return true;
     }
     TELEPHONY_LOGI("switch dcall device failed, ret: %{public}d.", ret);
@@ -369,40 +366,6 @@ void DistributedCallManager::SwitchOffDCallDeviceSync()
     } else {
         TELEPHONY_LOGE("disconnect dcall device failed, %{public}d", ret);
     }
-}
-
-bool DistributedCallManager::IsSelectVirtualModem()
-{
-    if (onlineDCallDevices_.size() <= 0) {
-        TELEPHONY_LOGW("no dcall device");
-        return false;
-    }
-    if (dcallProxy_ == nullptr) {
-        TELEPHONY_LOGE("fail to create dcall proxy obj");
-        return false;
-    }
-    return dcallProxy_->IsSelectVirtualModem();
-}
-
-void DistributedCallManager::ReportDistributedDeviceInfo()
-{
-    AudioSystemManager *audioSystemMananger = AudioSystemManager::GetInstance();
-    if (audioSystemMananger == nullptr) {
-        TELEPHONY_LOGW("audioSystemMananger nullptr");
-        return;
-    }
-    std::vector<sptr<AudioDeviceDescriptor>> descs = audioSystemMananger
-        ->GetDevices(DeviceFlag::DISTRIBUTED_OUTPUT_DEVICES_FLAG);
-    size_t size = descs.size();
-    if (descs.size() <= 0) {
-        TELEPHONY_LOGW("no distributed device");
-        return;
-    }
-    sptr<AudioRendererFilter> audioRendererFilter = new(std::nothrow) AudioRendererFilter();
-    audioRendererFilter->rendererInfo.contentType = ContentType::CONTENT_TYPE_SPEECH;
-    audioRendererFilter->rendererInfo.streamUsage = StreamUsage::STREAM_USAGE_VOICE_MODEM_COMMUNICATION;
-    audioSystemMananger->SelectOutputDevice(audioRendererFilter, descs);
-    TELEPHONY_LOGW("ReportDistributedDeviceInfo");
 }
 
 bool DistributedCallManager::IsDCallDeviceSwitchedOn()

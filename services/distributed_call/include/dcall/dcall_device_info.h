@@ -41,5 +41,4 @@ struct DCallDeviceInfo {
 };
 } // DistributedHardware
 } // OHOS
-
 #endif // OHOS_IDCALL_DEVICE_INFO_H

@@ -140,7 +140,6 @@ call_manager_external_deps = [
   "ability_base:base",
   "ability_base:want",
   "ability_base:zuri",
-  "ability_runtime:ability_connect_callback_stub",
   "ability_runtime:ability_deps_wrapper",
   "ability_runtime:ability_manager",
   "ability_runtime:abilitykit_native",

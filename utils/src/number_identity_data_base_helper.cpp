@@ -39,7 +39,6 @@ NumberIdentityDataBaseHelper::~NumberIdentityDataBaseHelper() {}
 
 std::shared_ptr<DataShare::DataShareHelper> NumberIdentityDataBaseHelper::CreateDataShareHelper(std::string uri)
 {
-    TELEPHONY_LOGI("uri: %{public}s", uri.c_str());
     auto saManager = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (saManager == nullptr) {
         TELEPHONY_LOGE("Get system ability mgr failed.");
