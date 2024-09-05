@@ -289,7 +289,7 @@ void CallRecordsManager::SetSystemAbilityAdd(bool isSystemAbilityAdd)
 
 void CallRecordsManager::QueryUnReadMissedCallLog(int32_t userId)
 {
-    if (!isDataShareReady_ || !isSystemAbilityAdd_) {
+    if (!isDataShareReady_ || !isSystemAbilityAdd_ || isUnReadMissedCallLogQuery_) {
         return;
     }
     TELEPHONY_LOGI("the user id is :%{public}d", userId);
@@ -297,6 +297,9 @@ void CallRecordsManager::QueryUnReadMissedCallLog(int32_t userId)
         int32_t ret = DelayedSingleton<CallRecordsHandlerService>::GetInstance()->QueryUnReadMissedCallLog();
         if (ret != TELEPHONY_SUCCESS) {
             TELEPHONY_LOGE("Query unread missed call log failed!");
+            isUnReadMissedCallLogQuery_ = false;
+        } else {
+            isUnReadMissedCallLogQuery_ = true;
         }
     }
 }
@@ -318,6 +321,16 @@ void AccountSystemAbilityListener::OnAddSystemAbility(int32_t systemAbilityId, c
     TELEPHONY_LOGI("current active user id is :%{public}d", activeList[0]);
     if (activeList[0] == ACTIVE_USER_ID) {
         DelayedSingleton<CallRecordsManager>::GetInstance()->QueryUnReadMissedCallLog(activeList[0]);
+    } else {
+        MatchingSkills matchingSkills;
+        matchingSkills.AddEvent(CommonEventSupport::COMMON_EVENT_USER_SWITCHED);
+        CommonEventSubscribeInfo subscriberInfo(matchingSkills);
+        subscriberInfo.SetThreadMode(EventFwk::CommonEventSubscribeInfo::COMMON);
+        userSwitchSubscriber_ = std::make_shared<UserSwitchEventSubscriber>(subscriberInfo);
+        bool subRet = CommonEventManager::SubscribeCommonEvent(userSwitchSubscriber_);
+        if (!subRet) {
+            TELEPHONY_LOGE("Subscribe user switched event failed!");
+        }
     }
 }
 
@@ -331,6 +344,24 @@ void AccountSystemAbilityListener::OnRemoveSystemAbility(int32_t systemAbilityId
     if (systemAbilityId != OHOS::SUBSYS_ACCOUNT_SYS_ABILITY_ID_BEGIN) {
         TELEPHONY_LOGE("removed SA is not account manager service,, ignored.");
         return;
+    }
+    if (userSwitchSubscriber_ != nullptr) {
+        bool subRet = CommonEventManager::UnSubscribeCommonEvent(userSwitchSubscriber_);
+        if (!subRet) {
+            TELEPHONY_LOGE("UnSubscribe user switched event failed!");
+        }
+        userSwitchSubscriber_ = nullptr;
+    }
+}
+
+void UserSwitchEventSubscriber::OnReceiveEvent(const CommonEventData &data)
+{
+    OHOS::EventFwk::Want want = data.GetWant();
+    std::string action = data.GetWant().GetAction();
+    TELEPHONY_LOGI("action = %{public}s", action.c_str());
+    if (action == CommonEventSupport::COMMON_EVENT_USER_SWITCHED) {
+        int32_t userId = data.GetCode();
+        DelayedSingleton<CallRecordsManager>::GetInstance()->QueryUnReadMissedCallLog(userId);
     }
 }
 

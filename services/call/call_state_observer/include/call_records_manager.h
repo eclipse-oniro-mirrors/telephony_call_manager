@@ -33,6 +33,13 @@ using namespace OHOS::EventFwk;
 using CommonEventSubscribeInfo = OHOS::EventFwk::CommonEventSubscribeInfo;
 using CommonEventSubscriber = OHOS::EventFwk::CommonEventSubscriber;
 
+class UserSwitchEventSubscriber : public CommonEventSubscriber {
+public:
+    explicit UserSwitchEventSubscriber(const CommonEventSubscribeInfo &info) : CommonEventSubscriber(info) {}
+    ~UserSwitchEventSubscriber() = default;
+    void OnReceiveEvent(const OHOS::EventFwk::CommonEventData &data) override;
+};
+
 class DataShareReadyhEventSubscriber : public CommonEventSubscriber {
 public:
     explicit DataShareReadyhEventSubscriber(const CommonEventSubscribeInfo &info) : CommonEventSubscriber(info) {}
@@ -46,6 +53,9 @@ public:
     ~AccountSystemAbilityListener() = default;
     void OnAddSystemAbility(int32_t systemAbilityId, const std::string &deviceId) override;
     void OnRemoveSystemAbility(int32_t systemAbilityId, const std::string &deviceId) override;
+
+private:
+    std::shared_ptr<UserSwitchEventSubscriber> userSwitchSubscriber_ = nullptr;
 };
 
 /**
@@ -79,6 +89,7 @@ private:
     std::shared_ptr<DataShareReadyhEventSubscriber> dataShareReadySubscriber_ = nullptr;
     bool isDataShareReady_ = false;
     bool isSystemAbilityAdd_ = false;
+    bool isUnReadMissedCallLogQuery = false;
 };
 } // namespace Telephony
 } // namespace OHOS
