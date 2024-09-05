@@ -790,6 +790,7 @@ HWTEST_F(ZeroBranch3Test, Telephony_CallManagerHisysevent_001, Function | Medium
     callManagerHisysevent->WriteIncomingCallBehaviorEvent(0, 1, 1);
     callManagerHisysevent->WriteIncomingCallBehaviorEvent(0, 0, 0);
     callManagerHisysevent->WriteIncomingCallBehaviorEvent(0, -1, -1);
+    callManagerHisysevent->WriteIncomingNumIdentityBehaviorEvent(static_cast<int32_t>(MarkType::MARK_TYPE_CRANK));
     callManagerHisysevent->WriteIncomingCallFaultEvent(0, 0, 0, static_cast<int32_t>(TELEPHONY_ERR_MEMCPY_FAIL), desc);
     auto errCode = static_cast<int32_t>(TELEPHONY_ERR_VCARD_FILE_INVALID) + STEP_1;
     callManagerHisysevent->WriteIncomingCallFaultEvent(0, 0, 0, errCode, desc);

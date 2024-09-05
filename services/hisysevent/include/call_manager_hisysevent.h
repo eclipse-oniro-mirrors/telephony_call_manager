@@ -25,6 +25,7 @@ namespace Telephony {
 static const int64_t NORMAL_DIAL_TIME = 500;     // dial time (ms)
 static const int64_t NORMAL_INCOMING_TIME = 100; // incoming time (ms)
 static const int64_t NORMAL_ANSWER_TIME = 300;   // answer time (ms)
+static constexpr const char DOMAIN_PHONE_UE[] = "PHONE_UE";
 
 enum class IncomingCallType {
     IMS_VOICE_INCOMING = 0,
@@ -36,6 +37,7 @@ class CallManagerHisysevent : public TelephonyHiSysEvent {
 public:
     static void WriteCallStateBehaviorEvent(const int32_t slotId, const int32_t state, const int32_t index);
     static void WriteIncomingCallBehaviorEvent(const int32_t slotId, int32_t callType, int32_t callMode);
+    static void WriteIncomingNumIdentityBehaviorEvent(const int32_t markType);
     static void WriteIncomingCallFaultEvent(const int32_t slotId, const int32_t callType, const int32_t videoState,
         const int32_t errCode, const std::string &desc);
     static void WriteDialCallFaultEvent(const int32_t slotId, const int32_t callType, const int32_t videoState,
@@ -51,6 +53,13 @@ public:
     void JudgingDialTimeOut(const int32_t slotId, const int32_t callType, const int32_t videoState);
     void JudgingIncomingTimeOut(const int32_t slotId, const int32_t callType, const int32_t videoState);
     void JudgingAnswerTimeOut(const int32_t slotId, const int32_t callId, const int32_t videoState);
+
+public:
+    template<typename... Types>
+    static void HiWriteBehaviorEventPhoneUE(const std::string &eventName, Types... args)
+    {
+        HiSysEventWrite(DOMAIN_PHONE_UE, eventName, EventType::BEHAVIOR, args...);
+    }
 
 private:
     static int32_t ErrorCodeConversion(const int32_t errCode, CallErrorCode &eventValue);
