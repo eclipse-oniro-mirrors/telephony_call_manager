@@ -65,6 +65,7 @@ private:
     std::vector<uint8_t> userProfile_ = {};
     bool showBannerForIncomingCall_ = true;
     bool isConferenceCall_ = false;
+    bool isVoiceAnswerSupported_ = true;
     bool hasMicPermission_ = true;
     int32_t uid_ = 0;
 };

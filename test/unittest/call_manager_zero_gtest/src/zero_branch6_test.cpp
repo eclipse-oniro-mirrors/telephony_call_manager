@@ -527,8 +527,9 @@ HWTEST_F(ZeroBranch5Test, Telephony_VoipCallManagerProxy_001, Function | MediumT
         int32_t ret1 = voipCallManagerInterfacePtr->ReportIncomingCall(mPacMap, userProfile, error);
         int32_t ret2 = voipCallManagerInterfacePtr->ReportIncomingCallError(mPacMap);
         VoipCallState voipCallState = VoipCallState::VOIP_CALL_STATE_ACTIVE;
+        VoipCallType voipCallType = VoipCallType::VOIP_CALL_VOICE;
         std::string callId = "123";
-        int32_t ret3 = voipCallManagerInterfacePtr->ReportCallStateChange(callId, voipCallState);
+        int32_t ret3 = voipCallManagerInterfacePtr->ReportCallStateChange(callId, voipCallState, voipCallType);
         int32_t ret4 = voipCallManagerInterfacePtr->UnRegisterCallBack();
         std::string bundleName = " ";
         std::string processMode = "0";

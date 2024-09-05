@@ -68,6 +68,7 @@ ohos_shared_library("tel_call_manager_api") {
     "-Wunreachable-code",
     "-fno-exceptions",
     "-fno-rtti",
+    "-fstack-protector-all",
     "-Os",
     "-flto",
     "-Wno-unused-but-set-variable",
