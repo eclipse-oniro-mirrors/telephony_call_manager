@@ -18,6 +18,7 @@
 #include "call_manager_errors.h"
 #include "spam_call_adapter.h"
 #include "call_number_utils.h"
+#include "call_manager_hisysevent.h"
 
 namespace OHOS {
 namespace Telephony {
