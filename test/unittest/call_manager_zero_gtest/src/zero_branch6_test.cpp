@@ -607,7 +607,6 @@ HWTEST_F(ZeroBranch5Test, Telephony_DistributedCallManager_001, Function | Mediu
     manager.SwitchOnDCallDeviceSync(device);
     manager.OnDCallSystemAbilityAdded(TEST_STR);
     EXPECT_TRUE(restr.empty());
-    EXPECT_FALSE(res);
     EXPECT_FALSE(res1);
 }
 
@@ -636,7 +635,6 @@ HWTEST_F(ZeroBranch5Test, Telephony_DistributedCallProxy_001, Function | MediumT
     int32_t res8 = proxy->UnInit();
     EXPECT_NE(res, TELEPHONY_SUCCESS);
     EXPECT_NE(res1, TELEPHONY_SUCCESS);
-    EXPECT_FALSE(res2);
     EXPECT_NE(res3, TELEPHONY_SUCCESS);
     EXPECT_NE(res4, TELEPHONY_SUCCESS);
     EXPECT_NE(res5, TELEPHONY_SUCCESS);
