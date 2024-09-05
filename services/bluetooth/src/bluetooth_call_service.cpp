@@ -54,7 +54,7 @@ int32_t BluetoothCallService::AnswerCall()
     }
     VideoStateType videoState = call->GetVideoStateType();
     if (videoState != VideoStateType::TYPE_VOICE && videoState != VideoStateType::TYPE_VIDEO) {
-        TELEPHONY_LOGE("videoState is invalid!");
+        TELEPHONY_LOGE("get original call type!");
         videoState = static_cast<VideoStateType>(call->GetOriginalCallType());
     }
     if (callControlManagerPtr_ != nullptr) {
