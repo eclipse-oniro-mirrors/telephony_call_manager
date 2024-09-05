@@ -33,10 +33,17 @@ using namespace OHOS::EventFwk;
 using CommonEventSubscribeInfo = OHOS::EventFwk::CommonEventSubscribeInfo;
 using CommonEventSubscriber = OHOS::EventFwk::CommonEventSubscriber;
 
-class DataShareReadyhEventSubscriber : public CommonEventSubscriber {
+class UserSwitchEventSubscriber : public CommonEventSubscriber {
 public:
-    explicit DataShareReadyhEventSubscriber(const CommonEventSubscribeInfo &info) : CommonEventSubscriber(info) {}
-    ~DataShareReadyhEventSubscriber() = default;
+    explicit UserSwitchEventSubscriber(const CommonEventSubscribeInfo &info) : CommonEventSubscriber(info) {}
+    ~UserSwitchEventSubscriber() = default;
+    void OnReceiveEvent(const OHOS::EventFwk::CommonEventData &data) override;
+};
+
+class DataShareReadyEventSubscriber : public CommonEventSubscriber {
+public:
+    explicit DataShareReadyEventSubscriber(const CommonEventSubscribeInfo &info) : CommonEventSubscriber(info) {}
+    ~DataShareReadyEventSubscriber() = default;
     void OnReceiveEvent(const OHOS::EventFwk::CommonEventData &data) override;
 };
 
@@ -46,6 +53,9 @@ public:
     ~AccountSystemAbilityListener() = default;
     void OnAddSystemAbility(int32_t systemAbilityId, const std::string &deviceId) override;
     void OnRemoveSystemAbility(int32_t systemAbilityId, const std::string &deviceId) override;
+
+private:
+    std::shared_ptr<UserSwitchEventSubscriber> userSwitchSubscriber_ = nullptr;
 };
 
 /**
@@ -76,9 +86,10 @@ private:
     std::shared_ptr<CallRecordsHandlerService> callRecordsHandlerServerPtr_;
     std::mutex mutex_;
     sptr<ISystemAbilityStatusChange> statusChangeListener_ = nullptr;
-    std::shared_ptr<DataShareReadyhEventSubscriber> dataShareReadySubscriber_ = nullptr;
+    std::shared_ptr<DataShareReadyEventSubscriber> dataShareReadySubscriber_ = nullptr;
     bool isDataShareReady_ = false;
     bool isSystemAbilityAdd_ = false;
+    bool isUnReadMissedCallLogQuery_ = false;
 };
 } // namespace Telephony
 } // namespace OHOS
