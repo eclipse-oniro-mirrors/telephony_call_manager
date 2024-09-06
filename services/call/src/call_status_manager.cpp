@@ -1315,7 +1315,7 @@ sptr<CallBase> CallStatusManager::CreateNewCall(const CallDetailInfo &info, Call
         return callPtr;
     }
     if (info.state == TelCallState::CALL_STATUS_INCOMING || info.state == TelCallState::CALL_STATUS_WAITING ||
-        (info.state == TelCallState::CALL_STATUS_DIALING && info.index == 0)) {
+        (info.state == TelCallState::CALL_STATUS_DIALING && (info.index == 0 || IsDcCallConneceted()))) {
         TELEPHONY_LOGI("NumberLocationUpdate start");
         ffrt::submit([=]() {
             DelayedSingleton<CallNumberUtils>::GetInstance()->NumberLocationUpdate(callPtr);
@@ -1578,8 +1578,11 @@ bool CallStatusManager::IsRejectCall(sptr<CallBase> &call, const CallDetailInfo 
 
 void CallStatusManager::CreateAndSaveNewCall(const CallDetailInfo &info, CallDirection direction)
 {
-    auto call = CreateNewCall(info, CallDirection::CALL_DIRECTION_UNKNOW);
+    auto call = CreateNewCall(info, direction);
     if (call != nullptr) {
+        ffrt::submit([=]() {
+            DelayedSingleton<CallNumberUtils>::GetInstance()->YellowPageAndMarkUpdate(call);
+        });
         AddOneCallObject(call);
         DelayedSingleton<CallControlManager>::GetInstance()->NotifyNewCallCreated(call);
     }
@@ -1653,7 +1656,7 @@ bool CallStatusManager::IsDcCallConneceted()
         OHOS::Uri settingUri(SettingsDataShareHelper::SETTINGS_DATASHARE_URI);
         settingHelper->Query(settingUri, "distributed_modem_state", dcStatus);
     }
-    if (dcStatus == "1_sink") {
+    if (dcStatus == "1_sink" || dcStatus == "1_source") {
         return true;
     }
     return false;

@@ -209,6 +209,8 @@ napi_value NapiCallManager::DeclareAudioDeviceEnum(napi_env env, napi_value expo
             NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(AudioDeviceType::DEVICE_DISTRIBUTED_PHONE))),
         DECLARE_NAPI_STATIC_PROPERTY("DEVICE_DISTRIBUTED_PAD",
             NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(AudioDeviceType::DEVICE_DISTRIBUTED_PAD))),
+        DECLARE_NAPI_STATIC_PROPERTY("DEVICE_DISTRIBUTED_PC",
+            NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(AudioDeviceType::DEVICE_DISTRIBUTED_PC))),
         DECLARE_NAPI_STATIC_PROPERTY("DEVICE_WIRED_HEADSET",
             NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(AudioDeviceType::DEVICE_WIRED_HEADSET))),
         DECLARE_NAPI_STATIC_PROPERTY("DEVICE_SPEAKER",

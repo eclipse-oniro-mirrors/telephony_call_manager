@@ -303,6 +303,10 @@ struct CallAttributeInfo {
      * Indicates the type of celia call.
      */
     int32_t celiaCallType = -1;
+    /**
+     * Indicates the contact name.
+     */
+    char contactName[kMaxNumberLen + 1] = { 0 };
 };
 
 /**

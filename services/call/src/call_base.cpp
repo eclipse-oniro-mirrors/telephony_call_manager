@@ -152,6 +152,9 @@ void CallBase::GetCallAttributeBaseInfo(CallAttributeInfo &info)
             TELEPHONY_LOGE("memcpy_s numberLocation fail");
             return;
         }
+        if (memcpy_s(info.contactName, sizeof(info.contactName), contactInfo_.name, CONTACT_NAME_LEN) != EOK) {
+            TELEPHONY_LOGE("memcpy_s contact name fail");
+        }
         info.numberMarkInfo = numberMarkInfo_;
         info.blockReason = blockReason_;
         if (bundleName_.length() > static_cast<size_t>(kMaxBundleNameLen)) {
@@ -603,6 +606,16 @@ int32_t CallBase::SetMicPhoneState(bool isMuted)
 bool CallBase::IsMuted()
 {
     return isMuted_;
+}
+
+void CallBase::SetCallDirection(CallDirection direction)
+{
+    direction_ = direction;
+}
+
+CallDirection CallBase::GetCallDirection()
+{
+    return direction_;
 }
 } // namespace Telephony
 } // namespace OHOS

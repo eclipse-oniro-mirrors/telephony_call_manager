@@ -25,6 +25,7 @@
 #include "call_control_manager.h"
 #include "call_superprivacy_control_manager.h"
 #include "call_manager_base.h"
+#include "distributed_communication_manager.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -191,6 +192,12 @@ int32_t CallPolicy::CanDialMulityCall(AppExecFwk::PacMap &extras, bool isEcc)
     if (!isEcc && videoState == VideoStateType::TYPE_VOICE && HasVideoCall()) {
         TELEPHONY_LOGE("can not dial video call when any call exist!");
         return CALL_ERR_DIAL_IS_BUSY;
+    }
+    if (DelayedSingleton<DistributedCommunicationManager>::GetInstance()->IsConnected() &&
+        DelayedSingleton<DistributedCommunicationManager>::GetInstance()->IsSinkRole() &&
+        HasCellularCallExist()) {
+        TELEPHONY_LOGE("dc-call sink can not dial call when any call exist!");
+        return CALL_ERR_CALL_COUNTS_EXCEED_LIMIT;
     }
     return TELEPHONY_SUCCESS;
 }

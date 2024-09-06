@@ -47,6 +47,7 @@ void CallManagerUtils::WriteCallAttributeInfo(const CallAttributeInfo &info, Mes
     messageParcel.WriteInt32(info.numberMarkInfo.markCount);
     messageParcel.WriteCString(info.numberMarkInfo.markSource);
     messageParcel.WriteBool(info.numberMarkInfo.isCloud);
+    messageParcel.WriteCString(info.contactName);
     if (info.callType == CallType::TYPE_VOIP) {
         messageParcel.WriteString(info.voipCallInfo.voipCallId);
         messageParcel.WriteString(info.voipCallInfo.userName);

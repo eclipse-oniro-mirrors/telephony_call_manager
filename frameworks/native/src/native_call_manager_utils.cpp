@@ -49,6 +49,7 @@ CallAttributeInfo NativeCallManagerUtils::ReadCallAttributeInfo(MessageParcel &m
     info.numberMarkInfo.markCount = messageParcel.ReadInt32();
     strncpy_s(info.numberMarkInfo.markSource, kMaxNumberLen + 1, messageParcel.ReadCString(), kMaxNumberLen + 1);
     info.numberMarkInfo.isCloud = messageParcel.ReadBool();
+    (void)strncpy_s(info.contactName, kMaxNumberLen + 1, messageParcel.ReadCString(), kMaxNumberLen + 1);
     if (info.callType == CallType::TYPE_VOIP) {
         info.voipCallInfo.voipCallId = messageParcel.ReadString();
         info.voipCallInfo.userName = messageParcel.ReadString();
