@@ -994,12 +994,10 @@ bool CallRequestProcess::IsFdnNumber(std::vector<std::u16string> fdnNumberList, 
 
 int32_t CallRequestProcess::EccDialPolicy()
 {
-    std::size_t callNum = 0;
     std::list<int32_t> callIdList;
     std::list<sptr<CallBase>> hangupList;
     std::list<sptr<CallBase>> rejectList;
     GetCarrierCallList(callIdList);
-    callNum = callIdList.size();
     for (int32_t callId : callIdList) {
         sptr<CallBase> call = GetOneCallObject(callId);
         if (call == nullptr) {
@@ -1021,9 +1019,7 @@ int32_t CallRequestProcess::EccDialPolicy()
         } else if (crState == CallRunningState::CALL_RUNNING_STATE_RINGING) {
             rejectList.emplace_back(call);
         } else if (crState == CallRunningState::CALL_RUNNING_STATE_ACTIVE) {
-            if (callNum > 1) {
-                hangupList.emplace_back(call);
-            }
+            hangupList.emplace_back(call);
         }
     }
     for (sptr<CallBase> call : hangupList) {
