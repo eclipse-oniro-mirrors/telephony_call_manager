@@ -27,6 +27,7 @@
 #include "voip_call.h"
 #include "voip_call_connection.h"
 #include "call_manager_info.h"
+#include "call_voice_assistant_manager.h"
 
 namespace OHOS {
 namespace Telephony {
