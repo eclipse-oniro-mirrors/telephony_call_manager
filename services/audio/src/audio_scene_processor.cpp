@@ -28,6 +28,7 @@
 #include "ffrt.h"
 
 #include "telephony_log_wrapper.h"
+#include "call_voice_assistant_manager.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -192,12 +193,16 @@ bool AudioSceneProcessor::SwitchIncoming()
     }
     int32_t state;
     DelayedSingleton<CallControlManager>::GetInstance()->GetVoIPCallState(state);
+    auto isStartBroadcast = CallVoiceAssistantManager::GetInstance()->IsStartVoiceBroadcast();
     if (state == (int32_t) CallStateToApp::CALL_STATE_OFFHOOK) {
         DelayedSingleton<AudioControlManager>::GetInstance()->PlayWaitingTone();
     } else {
-        DelayedSingleton<AudioControlManager>::GetInstance()->StopRingtone();
-        // play ringtone while incoming state
-        DelayedSingleton<AudioControlManager>::GetInstance()->PlayRingtone();
+        if (!isStartBroadcast) {
+            TELEPHONY_LOGI("broadcast switch is close, start play system ring");
+            DelayedSingleton<AudioControlManager>::GetInstance()->StopRingtone();
+            // play ringtone while incoming state
+            DelayedSingleton<AudioControlManager>::GetInstance()->PlayRingtone();
+        }
         DelayedSingleton<AudioDeviceManager>::GetInstance()->ProcessEvent(AudioEvent::AUDIO_RINGING);
     }
     TELEPHONY_LOGI("current call state : incoming state");

@@ -439,7 +439,7 @@ void CallStatusManager::SetContactInfo(sptr<CallBase> &call, std::string phoneNu
         // Get the contact data from the database
         ContactInfo contactInfo = {
             .name = "",
-            .number = "",
+            .number = phoneNum,
             .isContacterExists = false,
             .ringtonePath = "",
             .isSendToVoicemail = false,

@@ -20,6 +20,7 @@
 #include "call_object_manager.h"
 #include "telephony_log_wrapper.h"
 #include "call_superprivacy_control_manager.h"
+#include "call_voice_assistant_manager.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -47,6 +48,7 @@ void CallAbilityConnectCallback::OnAbilityConnectDone(
         }
         DelayedSingleton<CallAbilityReportProxy>::GetInstance()->CallEventUpdated(eventInfo);
         DelayedSingleton<AudioDeviceManager>::GetInstance()->UpdateEarpieceDevice();
+        CallVoiceAssistantManager::GetInstance()->PublishCommonEvent(true);
     }
 }
 
