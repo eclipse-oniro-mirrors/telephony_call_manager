@@ -34,6 +34,7 @@ VoIPCall::VoIPCall(DialParaInfo &info) : CarrierCall(info)
     voipBundleName_ = info.voipCallInfo.voipBundleName;
     showBannerForIncomingCall_ = info.voipCallInfo.showBannerForIncomingCall;
     isConferenceCall_ = info.voipCallInfo.isConferenceCall;
+    isVoiceAnswerSupported_ = info.voipCallInfo.isVoiceAnswerSupported;
     hasMicPermission_ = info.voipCallInfo.hasMicPermission;
     uid_ = info.voipCallInfo.uid;
 }
@@ -163,6 +164,7 @@ void VoIPCall::GetCallAttributeInfo(CallAttributeInfo &info)
     info.voipCallInfo.voipBundleName = voipBundleName_;
     info.voipCallInfo.showBannerForIncomingCall = showBannerForIncomingCall_;
     info.voipCallInfo.isConferenceCall = isConferenceCall_;
+    info.voipCallInfo.isVoiceAnswerSupported = isVoiceAnswerSupported_;
     info.voipCallInfo.hasMicPermission = hasMicPermission_;
     info.voipCallInfo.uid = uid_;
     return;

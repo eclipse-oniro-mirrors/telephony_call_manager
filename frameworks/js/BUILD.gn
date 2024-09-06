@@ -98,6 +98,7 @@ ohos_shared_library("call") {
     "-Wunreachable-code",
     "-fno-exceptions",
     "-fno-rtti",
+    "-fstack-protector-all",
     "-Os",
     "-flto",
     "-Wno-unused-but-set-variable",

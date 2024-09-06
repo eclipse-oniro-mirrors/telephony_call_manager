@@ -77,6 +77,7 @@ private:
     void InitBasicFuncMap();
     void InitSupplementFuncMap();
     void InitImsFuncMap();
+    void BuildCallReportInfo(MessageParcel &data, CallReportInfo &parcelPtr);
 
     std::map<uint32_t, CallStatusCallbackFunc> memberFuncMap_;
 };

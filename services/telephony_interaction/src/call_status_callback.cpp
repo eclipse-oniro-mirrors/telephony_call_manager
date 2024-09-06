@@ -48,6 +48,7 @@ int32_t CallStatusCallback::UpdateCallReportInfo(const CallReportInfo &info)
         detailInfo.voipCallInfo.abilityName = info.voipCallInfo.abilityName;
         detailInfo.voipCallInfo.showBannerForIncomingCall = info.voipCallInfo.showBannerForIncomingCall;
         detailInfo.voipCallInfo.isConferenceCall = info.voipCallInfo.isConferenceCall;
+        detailInfo.voipCallInfo.isVoiceAnswerSupported = info.voipCallInfo.isVoiceAnswerSupported;
         detailInfo.voipCallInfo.hasMicPermission = info.voipCallInfo.hasMicPermission;
         detailInfo.voipCallInfo.uid = info.voipCallInfo.uid;
     }

@@ -58,9 +58,10 @@ public:
      *
      * @param callId[in], The call id
      * @param VoipCallState[in], The voip call state
+     * @param VoipCallType[in], The voip call type
      * @return Returns 0 on success, others on failure.
      */
-    int32_t ReportCallStateChange(std::string callId, const VoipCallState &state) override;
+    int32_t ReportCallStateChange(std::string callId, const VoipCallState &state, const VoipCallType &type) override;
     /**
      * @brief thrid-party applications report a outgoing call.
      *
