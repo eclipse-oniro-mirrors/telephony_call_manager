@@ -332,7 +332,6 @@ HWTEST_F(CallStateTest, Telephony_AudioDeviceManager_001, Function | MediumTest 
     audioDeviceManager->ProcessEvent(AudioEvent::WIRED_HEADSET_DISCONNECTED);
     audioDeviceManager->SwitchDevice(AUDIO_DEACTIVATED);
     audioDeviceManager->EnableBtSco();
-    audioDeviceManager->EnableDistributedCall();
     audioDeviceManager->GetCurrentAudioDevice();
     audioDeviceManager->IsEarpieceDevEnable();
     audioDeviceManager->SetDeviceAvailable(AudioDeviceType::DEVICE_SPEAKER, false);
@@ -369,7 +368,6 @@ HWTEST_F(CallStateTest, Telephony_AudioDeviceManager_002, Function | MediumTest 
     audioDeviceManager->SetDeviceAvailable(AudioDeviceType::DEVICE_WIRED_HEADSET, true);
     audioDeviceManager->EnableWiredHeadset();
     audioDeviceManager->SetDeviceAvailable(AudioDeviceType::DEVICE_DISTRIBUTED_PAD, true);
-    audioDeviceManager->EnableDistributedCall();
     audioDeviceManager->IsBtScoDevEnable();
     audioDeviceManager->IsDCallDevEnable();
     audioDeviceManager->IsSpeakerDevEnable();

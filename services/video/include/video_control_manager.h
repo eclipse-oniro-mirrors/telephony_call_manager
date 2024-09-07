@@ -46,7 +46,6 @@ private:
     int32_t CloseCamera(int32_t callId, std::u16string &cameraId, int32_t callingUid, int32_t callingPid);
     bool CheckWindow(VideoWindow &window);
     bool ContainCameraID(std::string id);
-    bool IsPngFile(std::string fileName);
 
 private:
     bool isOpenCamera_;

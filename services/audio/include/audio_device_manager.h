@@ -95,7 +95,6 @@ private:
     AudioDeviceInfo info_;
     bool SwitchDevice(AudioEvent event);
     bool EnableBtSco();
-    bool EnableDistributedCall();
     bool EnableWiredHeadset();
     bool EnableSpeaker();
     bool EnableEarpiece();
