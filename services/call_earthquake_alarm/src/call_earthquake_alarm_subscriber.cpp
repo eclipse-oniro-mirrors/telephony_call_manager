@@ -183,7 +183,6 @@ void LocationSystemAbilityListener::OnAddSystemAbility(int32_t systemAbilityId, 
     if (stateValue == MyLocationEngine::INITIAL_FIRST_VALUE) {
         TELEPHONY_LOGI("start OOBE complete");
         MyLocationEngine::OOBEComplete();
-        return;
     } else {
         TELEPHONY_LOGI("start boot complete");
         MyLocationEngine::BootComplete(alarmSwitchState);
