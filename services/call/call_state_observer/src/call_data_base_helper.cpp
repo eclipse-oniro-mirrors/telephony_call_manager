@@ -89,7 +89,7 @@ std::shared_ptr<DataShare::DataShareHelper> CallDataBaseHelper::CreateDataShareH
 
 void CallDataBaseHelper::RegisterObserver(std::vector<std::string> *phones)
 {
-    if (callObjectPtr == nullptr) {
+    if (phones == nullptr) {
         TELEPHONY_LOGE("phones is nullptr");
         return;
     }
