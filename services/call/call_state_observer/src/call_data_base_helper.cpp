@@ -43,6 +43,9 @@ constexpr int32_t E_OK = 0;
 
 CallDataRdbObserver::CallDataRdbObserver(std::vector<std::string> *phones)
 {
+    if (callObjectPtr == nullptr) {
+        TELEPHONY_LOGE("phones is nullptr");
+    }
     this->phones = phones;
 }
 
@@ -86,6 +89,10 @@ std::shared_ptr<DataShare::DataShareHelper> CallDataBaseHelper::CreateDataShareH
 
 void CallDataBaseHelper::RegisterObserver(std::vector<std::string> *phones)
 {
+    if (callObjectPtr == nullptr) {
+        TELEPHONY_LOGE("phones is nullptr");
+        return;
+    }
     callDataRdbObserverPtr_ = new (std::nothrow) CallDataRdbObserver(phones);
     if (callDataRdbObserverPtr_ == nullptr) {
         TELEPHONY_LOGE("callDataRdbObserverPtr_ is null");
