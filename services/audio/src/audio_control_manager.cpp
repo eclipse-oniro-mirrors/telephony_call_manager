@@ -286,6 +286,10 @@ void AudioControlManager::IncomingCallHungUp(sptr<CallBase> &callObjectPtr, bool
 void AudioControlManager::HandleCallStateUpdated(
     sptr<CallBase> &callObjectPtr, TelCallState priorState, TelCallState nextState)
 {
+    if (callObjectPtr == nullptr) {
+        TELEPHONY_LOGE("call object is nullptr");
+        return;
+    }
     if (nextState == TelCallState::CALL_STATUS_ANSWERED) {
         TELEPHONY_LOGI("user answered, mute ringer instead of release renderer");
         if (priorState == TelCallState::CALL_STATUS_INCOMING) {

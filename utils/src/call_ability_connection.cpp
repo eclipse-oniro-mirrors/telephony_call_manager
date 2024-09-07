@@ -25,6 +25,10 @@ void CallAbilityConnection::OnAbilityConnectDone(const AppExecFwk::ElementName &
     const sptr<IRemoteObject> &remoteObject, int32_t resultCode)
 {
     TELEPHONY_LOGI("OnAbilityConnectDone, resultCode = %{public}d", resultCode);
+    if (remoteObject == nullptr) {
+        TELEPHONY_LOGE("remote object is nullptr");
+        return;
+    }
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
