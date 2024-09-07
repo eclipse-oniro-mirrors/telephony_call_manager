@@ -43,7 +43,7 @@ constexpr int32_t E_OK = 0;
 
 CallDataRdbObserver::CallDataRdbObserver(std::vector<std::string> *phones)
 {
-    if (callObjectPtr == nullptr) {
+    if (phones == nullptr) {
         TELEPHONY_LOGE("phones is nullptr");
     }
     this->phones = phones;
