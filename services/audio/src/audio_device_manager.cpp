@@ -410,18 +410,6 @@ bool AudioDeviceManager::EnableBtSco()
     return false;
 }
 
-bool AudioDeviceManager::EnableDistributedCall()
-{
-    if (isDCallDevConnected_) {
-        AudioDeviceType type = DelayedSingleton<DistributedCallManager>::GetInstance()->GetConnectedDCallDeviceType();
-        TELEPHONY_LOGI("distributed call enabled, current audio device: %d", static_cast<int32_t>(type));
-        SetCurrentAudioDevice(type);
-        return true;
-    }
-    TELEPHONY_LOGI("enable distributed call device failed");
-    return false;
-}
-
 bool AudioDeviceManager::DisableAll()
 {
     audioDeviceType_ = AudioDeviceType::DEVICE_UNKNOWN;

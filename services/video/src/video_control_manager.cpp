@@ -280,22 +280,6 @@ bool VideoControlManager::ContainCameraID(std::string id)
     return bRet;
 }
 
-bool VideoControlManager::IsPngFile(std::string fileName)
-{
-    size_t len = SUPPORT_PICTURE_EXT.length();
-    if (fileName.length() <= len + 1) {
-        TELEPHONY_LOGE("file not support: %{public}s", fileName.c_str());
-        return false;
-    }
-    std::string ext = fileName.substr(fileName.length() - len, len);
-    std::transform(ext.begin(), ext.end(), ext.begin(), ::tolower);
-    if (!((ext == SUPPORT_PICTURE_EXT))) {
-        TELEPHONY_LOGE("file not support: %{public}s", fileName.c_str());
-        return false;
-    }
-    return true;
-}
-
 int32_t VideoControlManager::CancelCallUpgrade(int32_t callId)
 {
     int32_t ret = TELEPHONY_ERR_FAIL;
