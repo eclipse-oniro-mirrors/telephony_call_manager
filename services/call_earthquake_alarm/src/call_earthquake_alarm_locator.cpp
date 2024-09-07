@@ -304,7 +304,6 @@ void OOBESwitchObserver::OnChange()
         MyLocationEngine::ConnectAbility("call_manager_oobe_earthquake_warning_switch_on");
     }
     ffrt::submit([&]() {
-        std::string stateValue = INITIAL_FIRST_VALUE;
         for (auto& oobeKey : MyLocationEngine::settingsCallbacks) {
             auto datashareHelper = std::make_shared<DataShareSwitchState>();
             datashareHelper->RegisterListenSettingsKey(oobeKey.first, false, oobeKey.second);
