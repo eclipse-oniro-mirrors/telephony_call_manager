@@ -257,7 +257,6 @@ int32_t CallStatusManager::HandleVoipCallReportInfo(const CallDetailInfo &info)
             TELEPHONY_LOGE("Invalid call state!");
             break;
     }
-    DelayedSingleton<BluetoothCallService>::GetInstance()->GetCallState();
     return ret;
 }
 
@@ -491,6 +490,13 @@ int32_t CallStatusManager::OutgoingVoipCallHandle(const CallDetailInfo &info)
     sptr<CallBase> call = GetOneCallObjectByVoipCallId(
         info.voipCallInfo.voipCallId, info.voipCallInfo.voipBundleName, info.voipCallInfo.uid);
     if (call != nullptr) {
+        VideoStateType originalType = call->GetVideoStateType();
+        if (originalType != info.callMode) {
+            TELEPHONY_LOGI("change VideoStateType from %{public}d to %{public}d",
+                static_cast<int32_t>(originalType), static_cast<int32_t>(info.callMode));
+            call->SetVideoStateType(info.callMode);
+            return UpdateCallState(call, info.state);
+        }
         return TELEPHONY_SUCCESS;
     }
     call = CreateNewCall(info, CallDirection::CALL_DIRECTION_OUT);
@@ -699,6 +705,12 @@ int32_t CallStatusManager::ActiveVoipCallHandle(const CallDetailInfo &info)
     if (call == nullptr) {
         TELEPHONY_LOGE("voip Call is NULL");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    VideoStateType originalType = call->GetVideoStateType();
+    if (originalType != info.callMode) {
+        TELEPHONY_LOGI("change VideoStateType from %{public}d to %{public}d",
+            static_cast<int32_t>(originalType), static_cast<int32_t>(info.callMode));
+        call->SetVideoStateType(info.callMode);
     }
     int32_t ret = UpdateCallState(call, TelCallState::CALL_STATUS_ACTIVE);
     if (ret != TELEPHONY_SUCCESS) {
@@ -1465,6 +1477,8 @@ void CallStatusManager::PackParaInfo(
         paraInfo.voipCallInfo.extensionId = info.voipCallInfo.extensionId;
         paraInfo.voipCallInfo.voipBundleName = info.voipCallInfo.voipBundleName;
         paraInfo.voipCallInfo.showBannerForIncomingCall = info.voipCallInfo.showBannerForIncomingCall;
+        paraInfo.voipCallInfo.isConferenceCall = info.voipCallInfo.isConferenceCall;
+        paraInfo.voipCallInfo.isVoiceAnswerSupported = info.voipCallInfo.isVoiceAnswerSupported;
         paraInfo.voipCallInfo.hasMicPermission = info.voipCallInfo.hasMicPermission;
         paraInfo.voipCallInfo.uid = info.voipCallInfo.uid;
     }

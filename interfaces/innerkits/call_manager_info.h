@@ -85,6 +85,8 @@ struct VoipCallReportInfo {
     std::string extensionId = "";
     std::string voipBundleName = "";
     bool showBannerForIncomingCall = true;
+    bool isConferenceCall = false;
+    bool isVoiceAnswerSupported = true;
     bool hasMicPermission = true;
     int32_t uid = 0;
 };
@@ -514,6 +516,8 @@ struct CallDetailInfo {
         voipCallInfo.abilityName = temp.voipCallInfo.abilityName;
         voipCallInfo.voipBundleName = temp.voipCallInfo.voipBundleName;
         voipCallInfo.showBannerForIncomingCall = temp.voipCallInfo.showBannerForIncomingCall;
+        voipCallInfo.isConferenceCall = temp.voipCallInfo.isConferenceCall;
+        voipCallInfo.isVoiceAnswerSupported = temp.voipCallInfo.isVoiceAnswerSupported;
         voipCallInfo.hasMicPermission = temp.voipCallInfo.hasMicPermission;
         voipCallInfo.uid = temp.voipCallInfo.uid;
         return *this;
