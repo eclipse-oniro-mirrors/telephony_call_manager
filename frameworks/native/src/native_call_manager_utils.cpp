@@ -16,6 +16,7 @@
 #include "native_call_manager_utils.h"
 #include "call_manager_base.h"
 #include <securec.h>
+#include "telephony_log_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -23,8 +24,12 @@ namespace Telephony {
 CallAttributeInfo NativeCallManagerUtils::ReadCallAttributeInfo(MessageParcel &messageParcel)
 {
     CallAttributeInfo info;
-    strncpy_s(info.accountNumber, kMaxNumberLen + 1, messageParcel.ReadCString(), kMaxNumberLen + 1);
-    strncpy_s(info.bundleName, kMaxNumberLen + 1, messageParcel.ReadCString(), kMaxNumberLen + 1);
+    if (strncpy_s(info.accountNumber, kMaxNumberLen + 1, messageParcel.ReadCString(), kMaxNumberLen + 1) != EOK) {
+        TELEPHONY_LOGE("strncpy_s accountNumber failed");
+    }
+    if (strncpy_s(info.bundleName, kMaxNumberLen + 1, messageParcel.ReadCString(), kMaxNumberLen + 1) != EOK) {
+        TELEPHONY_LOGE("strncpy_s bundleName failed");
+    }
     info.speakerphoneOn = messageParcel.ReadBool();
     info.accountId = messageParcel.ReadInt32();
     info.videoState = static_cast<VideoStateType>(messageParcel.ReadInt32());
@@ -43,13 +48,23 @@ CallAttributeInfo NativeCallManagerUtils::ReadCallAttributeInfo(MessageParcel &m
     info.index = messageParcel.ReadInt32();
     info.crsType = messageParcel.ReadInt32();
     info.originalCallType = messageParcel.ReadInt32();
-    strncpy_s(info.numberLocation, kMaxNumberLen + 1, messageParcel.ReadCString(), kMaxNumberLen + 1);
+    if (strncpy_s(info.numberLocation, kMaxNumberLen + 1, messageParcel.ReadCString(), kMaxNumberLen + 1) != EOK) {
+        TELEPHONY_LOGE("strncpy_s numberLocation failed");
+    }
     info.numberMarkInfo.markType = static_cast<MarkType>(messageParcel.ReadInt32());
-    strncpy_s(info.numberMarkInfo.markContent, kMaxNumberLen + 1, messageParcel.ReadCString(), kMaxNumberLen + 1);
+    if (strncpy_s(info.numberMarkInfo.markContent, kMaxNumberLen + 1, messageParcel.ReadCString(), kMaxNumberLen + 1)
+        != EOK) {
+        TELEPHONY_LOGE("strncpy_s markContent failed");
+    }
     info.numberMarkInfo.markCount = messageParcel.ReadInt32();
-    strncpy_s(info.numberMarkInfo.markSource, kMaxNumberLen + 1, messageParcel.ReadCString(), kMaxNumberLen + 1);
+    if (strncpy_s(info.numberMarkInfo.markSource, kMaxNumberLen + 1, messageParcel.ReadCString(), kMaxNumberLen + 1)
+        != EOK) {
+        TELEPHONY_LOGE("strncpy_s markSource failed");
+    }
     info.numberMarkInfo.isCloud = messageParcel.ReadBool();
-    (void)strncpy_s(info.contactName, kMaxNumberLen + 1, messageParcel.ReadCString(), kMaxNumberLen + 1);
+    if (strncpy_s(info.contactName, kMaxNumberLen + 1, messageParcel.ReadCString(), kMaxNumberLen + 1) != EOK) {
+        TELEPHONY_LOGE("strncpy_s contactName failed");
+    }
     if (info.callType == CallType::TYPE_VOIP) {
         info.voipCallInfo.voipCallId = messageParcel.ReadString();
         info.voipCallInfo.userName = messageParcel.ReadString();
