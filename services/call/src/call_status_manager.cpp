@@ -43,6 +43,7 @@
 #include "parameters.h"
 #include "spam_call_adapter.h"
 #include "call_superprivacy_control_manager.h"
+#include "notification_helper.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -383,13 +384,9 @@ int32_t CallStatusManager::IncomingHandle(const CallDetailInfo &info)
         return CALL_ERR_CALL_OBJECT_IS_NULL;
     }
     SetContactInfo(call, std::string(info.phoneNum));
-    int32_t state;
-    DelayedSingleton<CallControlManager>::GetInstance()->GetVoIPCallState(state);
-    if (ShouldRejectIncomingCall() || state == (int32_t)CallStateToApp::CALL_STATE_RINGING) {
-        return HandleRejectCall(call, false);
-    }
-    if (info.callType != CallType::TYPE_VOIP && ShouldBlockIncomingCall(call, info)) {
-        return HandleRejectCall(call, true);
+    bool block = false;
+    if (IsRejectCall(call, info, block)) {
+        return HandleRejectCall(call, block);
     }
     if (info.callType != CallType::TYPE_VOIP && IsRingOnceCall(call, info)) {
         return HandleRingOnceCall(call);
@@ -1492,6 +1489,51 @@ void CallStatusManager::PackParaInfo(
     paraInfo.bundleName = info.bundleName;
     paraInfo.crsType = info.crsType;
     paraInfo.originalCallType = info.originalCallType;
+}
+
+bool CallStatusManager::IsFocusModeOpen()
+{
+    auto datashareHelper = SettingsDataShareHelper::GetInstance();
+    std::string focusModeEnable {"0"};
+    std::vector<int> activedOsAccountIds;
+    OHOS::AccountSA::OsAccountManager::QueryActiveOsAccountIds(activedOsAccountIds);
+    if (activedOsAccountIds.empty()) {
+        TELEPHONY_LOGW("ShouldRejectIncomingCall: activedOsAccountIds is empty");
+        return false;
+    }
+    int userId = activedOsAccountIds[0];
+    OHOS::Uri uri(
+        "datashare:///com.ohos.settingsdata/entry/settingsdata/USER_SETTINGSDATA_SECURE_"
+        + std::to_string(userId) + "?Proxy=true&key=focus_mode_enable");
+    int resp = datashareHelper->Query(uri, "focus_mode_enable", focusModeEnable);
+    if (resp == TELEPHONY_SUCCESS && focusModeEnable == "1") {
+        TELEPHONY_LOGI("IsFocusModeOpen: focus_mode_enable = 1");
+        return true;
+    }
+    return false;
+}
+
+bool CallStatusManager::IsRejectCall(sptr<CallBase> &call, const CallDetailInfo &info, bool &block)
+{
+    int32_t state;
+    DelayedSingleton<CallControlManager>::GetInstance()->GetVoIPCallState(state);
+    if (ShouldRejectIncomingCall() || state == (int32_t)CallStateToApp::CALL_STATE_RINGING) {
+        block = false;
+        return true;
+    }
+    if (info.callType != CallType::TYPE_VOIP && ShouldBlockIncomingCall(call, info)) {
+        block = true;
+        return true;
+    }
+    if (IsFocusModeOpen()) {
+        int ret = Notification::NotificationHelper::IsNeedSilentInDoNotDisturbMode(info.phoneNum, 0);
+        TELEPHONY_LOGI("IsRejectCall IsNeedSilentInDoNotDisturbMode ret:%{public}d", ret);
+        if (ret == 0) {
+            block = false;
+            return true;
+        }
+    }
+    return false;
 }
 } // namespace Telephony
 } // namespace OHOS
