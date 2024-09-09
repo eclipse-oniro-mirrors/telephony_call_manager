@@ -543,6 +543,7 @@ void CallVoiceAssistantManager::CallStatusActive(const int32_t& callId, const in
     VoiceAssistantRingSubscriber::Release();
     PublishCommonEvent(false);
     mRemoteObject = nullptr;
+    isQueryedBroadcastSwitch = false;
 }
 
 void CallVoiceAssistantManager::CallStatusDisconnected(const int32_t& callId, const int32_t& accountId)
