@@ -248,7 +248,7 @@ int CallVoiceAssistantManager::QueryValue(const std::string& key, std::string& v
         return FAIL_CODE;
     }
     if (result->GoToFirstRow() != DataShare::E_OK) {
-        TELEPHONY_LOGE("gotofirst row is error");
+        TELEPHONY_LOGE("gotofirst row error");
         result->Close();
         return FAIL_CODE;
     }
