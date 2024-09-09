@@ -149,7 +149,6 @@ public:
     virtual ~VoiceAssistantRingSubscriber() = default;
     virtual void OnReceiveEvent(const EventFwk::CommonEventData &eventData) override;
     static bool Initial();
-    static void StopPlayRing();
     static void Release();
 
 private:
