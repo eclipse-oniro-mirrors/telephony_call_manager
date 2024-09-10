@@ -1489,21 +1489,18 @@ int32_t CallManagerService::SendCallUiEvent(int32_t callId, std::string &eventNa
         TELEPHONY_LOGE("Permission denied!");
         return TELEPHONY_ERR_PERMISSION_ERR;
     }
-    switch (eventName) {
-        case "EVENT_IS_CELIA_CALL":
-            sptr<CallBase> callPtr = CallObjectManager::GetOneCallObject(callId);
-            if (callPtr == nullptr) {
-                TELEPHONY_LOGI("the call object is nullptr!");
-                return TELEPHONY_ERR_LOCAL_PTR_NULL;
-            }
-            callPtr->SetCeliaCallType(IS_CELIA_CALL);
-            break;
-        case "EVENT_SPEAKER_OFF":
-            DelayedSingleton<AudioProxy>::GetInstance()->SetSpeakerDevActive(false);
-            break;
-        default:
-            break;
-    }
+    if (eventName == "EVENT_IS_CELIA_CALL") {
+        sptr<CallBase> callPtr = CallObjectManager::GetOneCallObject(callId);
+        if (callPtr == nullptr) {
+            TELEPHONY_LOGI("the call object is nullptr!");
+            return TELEPHONY_ERR_LOCAL_PTR_NULL;
+        }
+        callPtr->SetCeliaCallType(IS_CELIA_CALL);
+    } else if (eventName == "EVENT_SPEAKER_OFF") {
+        if (!DelayedSingleton<AudioProxy>::GetInstance()->SetSpeakerDevActive(false)) {
+            return TELEPHONY_ERR_FAIL;
+        }
+    } 
     return TELEPHONY_SUCCESS;
 }
 
