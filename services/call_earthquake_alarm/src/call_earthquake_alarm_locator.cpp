@@ -346,7 +346,7 @@ void MyLocationEngine::ConnectAbility(std::string value, sptr<AAFwk::IAbilityCon
     AppExecFwk::ElementName element(EMERGENCY_DEVICE_ID, EMERGENCY_BUNDLE_NAME, abilityName);
     want.SetElement(element);
     auto ret = AAFwk::AbilityManagerClient::GetInstance()->ConnectAbility(want, callback, userId);
-    TELEPHONY_LOGI("Connect emergencycall ability %{public}d", ret);
+    TELEPHONY_LOGI("connect emergencycall ability %{public}d", ret);
 }
 
 void MyLocationEngine::StartEccService(sptr<CallBase> call, const CallDetailInfo &info)
