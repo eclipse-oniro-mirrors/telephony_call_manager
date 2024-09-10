@@ -72,7 +72,7 @@ public:
     int32_t StopVibrator();
     bool SetMicrophoneMute(bool mute);
     bool SetEarpieceDevActive();
-    bool SetSpeakerDevActive();
+    bool SetSpeakerDevActive(bool isActive);
     bool SetBluetoothDevActive();
     bool SetWiredHeadsetDevActive();
     AudioStandard::AudioRingerMode GetRingerMode() const;

@@ -266,8 +266,8 @@ HWTEST_F(CallStateTest, Telephony_AudioProxy_001, Function | MediumTest | Level3
 
     audioProxy->SetBluetoothDevActive();
     audioProxy->SetBluetoothDevActive();
-    audioProxy->SetSpeakerDevActive();
-    audioProxy->SetSpeakerDevActive();
+    audioProxy->SetSpeakerDevActive(true);
+    audioProxy->SetSpeakerDevActive(true);
     audioProxy->SetWiredHeadsetState(true);
     ASSERT_FALSE(audioProxy->SetEarpieceDevActive());
     audioProxy->SetWiredHeadsetState(false);
@@ -276,7 +276,7 @@ HWTEST_F(CallStateTest, Telephony_AudioProxy_001, Function | MediumTest | Level3
     ASSERT_FALSE(audioProxy->SetWiredHeadsetDevActive());
     audioProxy->SetWiredHeadsetState(true);
     audioProxy->SetWiredHeadsetDevActive();
-    audioProxy->SetSpeakerDevActive();
+    audioProxy->SetSpeakerDevActive(true);
     audioProxy->SetWiredHeadsetDevActive();
     audioProxy->SetEarpieceDevActive();
     audioProxy->SetWiredHeadsetDevActive();

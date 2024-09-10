@@ -95,14 +95,15 @@ bool AudioProxy::SetBluetoothDevActive()
     return false;
 }
 
-bool AudioProxy::SetSpeakerDevActive()
+bool AudioProxy::SetSpeakerDevActive(bool isActive)
 {
-    if (AudioStandard::AudioSystemManager::GetInstance()->IsDeviceActive(AudioStandard::ActiveDeviceType::SPEAKER)) {
-        TELEPHONY_LOGI("speaker device is already active");
+    if (AudioStandard::AudioSystemManager::GetInstance()->
+        IsDeviceActive(AudioStandard::ActiveDeviceType::SPEAKER) == isActive) {
+        TELEPHONY_LOGI("current speaker state[%{public}d] is consistent with the expected", isActive);
         return true;
     }
     bool ret = AudioStandard::AudioSystemManager::GetInstance()->SetDeviceActive(
-        AudioStandard::ActiveDeviceType::SPEAKER, true);
+        AudioStandard::ActiveDeviceType::SPEAKER, isActive);
     if (ret == ERR_NONE) {
         return true;
     }
