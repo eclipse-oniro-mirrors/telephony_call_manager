@@ -797,7 +797,6 @@ private:
     std::vector<std::string> supportSpecialCode_ { "*#2846#", "*#2846*",
         "*#*#2846579#*#*", "#1#", "*#28465#", "*#*#121314#*#*", "*#*#19467328#*#*",
         "*#*#2589#*#*", "*#*#2845#*#*", "*#*#2846#*#*", "*#*#2847#*#*", "*#*#28465#*#*" };
-    sptr<ICallStatusCallback> voipCallCallbackPtr_;
     std::mutex lock_;
     const int32_t startTime_ = 1900;
     const int32_t extraMonth_ = 1;

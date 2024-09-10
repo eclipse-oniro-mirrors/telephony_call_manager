@@ -481,12 +481,12 @@ int32_t CallManagerService::RegisterVoipCallManagerCallback()
 {
     std::lock_guard<std::mutex> guard(lock_);
     DelayedSingleton<VoipCallConnection>::GetInstance()->Init(TELEPHONY_VOIP_CALL_MANAGER_SYS_ABILITY_ID);
-    voipCallCallbackPtr_ = (std::make_unique<CallStatusCallback>()).release();
-    if (voipCallCallbackPtr_ == nullptr) {
-        TELEPHONY_LOGE("voipCallCallbackPtr_ is nullptr!");
+    sptr<ICallStatusCallback> voipCallCallbackPtr = (std::make_unique<CallStatusCallback>()).release();
+    if (voipCallCallbackPtr == nullptr) {
+        TELEPHONY_LOGE("voipCallCallbackPtr is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    DelayedSingleton<VoipCallConnection>::GetInstance()->RegisterCallManagerCallBack(voipCallCallbackPtr_);
+    DelayedSingleton<VoipCallConnection>::GetInstance()->RegisterCallManagerCallBack(voipCallCallbackPtr);
     return 0;
 }
 
