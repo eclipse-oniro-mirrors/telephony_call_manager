@@ -203,10 +203,7 @@ void DistributedDataSinkController::UpdateCallName(sptr<CallBase> &call, const c
         return;
     }
     auto callerInfo = call->GetCallerInfo();
-    if (strcpy_s(callerInfo.name, sizeof(callerInfo.name), name.c_str()) != EOK) {
-        TELEPHONY_LOGE("copy call name fail");
-        return;
-    }
+    callerInfo.name = name;
     call->SetCallerInfo(callerInfo);
     ReportCallInfo(call);
 }

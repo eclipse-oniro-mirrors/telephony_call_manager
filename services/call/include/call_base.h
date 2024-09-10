@@ -133,6 +133,7 @@ public:
     void SetCeliaCallType(int32_t celiaCallType);
     void SetCallDirection(CallDirection direction);
     CallDirection GetCallDirection();
+    int32_t GetAccountId();
 
 protected:
     int32_t callId_;

@@ -186,18 +186,9 @@ bool CallDataBaseHelper::Query(ContactInfo &contactInfo, DataShare::DataSharePre
     }
     int32_t resultSetNum = resultSet->GoToFirstRow();
     while (resultSetNum == 0) {
-        std::string displayName;
         int32_t columnIndex;
         resultSet->GetColumnIndex(CALL_DISPLAY_NAME, columnIndex);
-        int32_t ret = resultSet->GetString(columnIndex, displayName);
-        if (ret == 0 && (!displayName.empty())) {
-            if (strcpy_s(contactInfo.name, sizeof(contactInfo.name), displayName.c_str()) != EOK) {
-                TELEPHONY_LOGE("strcpy_s fail.");
-                resultSet->Close();
-                helper->Release();
-                return false;
-            }
-        }
+        resultSet->GetString(columnIndex, contactInfo.name);
         resultSetNum = resultSet->GoToNextRow();
     }
     resultSet->Close();

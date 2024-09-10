@@ -27,6 +27,7 @@
 #include "voip_call.h"
 #include "voip_call_connection.h"
 #include "call_manager_info.h"
+#include "call_voice_assistant_manager.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -152,7 +153,8 @@ void CallBase::GetCallAttributeBaseInfo(CallAttributeInfo &info)
             TELEPHONY_LOGE("memcpy_s numberLocation fail");
             return;
         }
-        if (memcpy_s(info.contactName, sizeof(info.contactName), contactInfo_.name, CONTACT_NAME_LEN) != EOK) {
+        if (memcpy_s(info.contactName, sizeof(info.contactName), contactInfo_.name.c_str(),
+            contactInfo_.name.length()) != EOK) {
             TELEPHONY_LOGE("memcpy_s contact name fail");
         }
         info.numberMarkInfo = numberMarkInfo_;
@@ -416,6 +418,12 @@ void CallBase::SetNumberLocation(std::string numberLocation)
 {
     std::lock_guard<std::mutex> lock(mutex_);
     numberLocation_ = numberLocation;
+    CallVoiceAssistantManager::UpdateNumberLocation(numberLocation, accountId_);
+}
+
+int32_t CallBase::GetAccountId()
+{
+    return accountId_;
 }
 
 std::string CallBase::GetNumberLocation()
@@ -446,6 +454,7 @@ void CallBase::SetCallerInfo(const ContactInfo &info)
 {
     std::lock_guard<std::mutex> lock(mutex_);
     contactInfo_ = info;
+    CallVoiceAssistantManager::UpdateContactInfo(info, accountId_);
 }
 
 NumberMarkInfo CallBase::GetNumberMarkInfo()
