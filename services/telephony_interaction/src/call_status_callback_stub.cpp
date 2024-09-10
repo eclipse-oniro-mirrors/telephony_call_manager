@@ -149,31 +149,7 @@ int32_t CallStatusCallbackStub::OnUpdateCallReportInfo(MessageParcel &data, Mess
     if (!data.ContainFileDescriptors()) {
         TELEPHONY_LOGW("sent raw data is less than 32k");
     }
-    parcelPtr.index = data.ReadInt32();
-    strncpy_s(parcelPtr.accountNum, kMaxNumberLen + 1, data.ReadCString(), kMaxNumberLen + 1);
-    parcelPtr.accountId = data.ReadInt32();
-    parcelPtr.callType = static_cast<CallType>(data.ReadInt32());
-    parcelPtr.callMode = static_cast<VideoStateType>(data.ReadInt32());
-    parcelPtr.state = static_cast<TelCallState>(data.ReadInt32());
-    parcelPtr.voiceDomain = data.ReadInt32();
-    parcelPtr.mpty = data.ReadInt32();
-    parcelPtr.crsType = data.ReadInt32();
-    parcelPtr.originalCallType = data.ReadInt32();
-    if (parcelPtr.callType == CallType::TYPE_VOIP) {
-        parcelPtr.voipCallInfo.voipCallId = data.ReadString();
-        parcelPtr.voipCallInfo.userName = data.ReadString();
-        parcelPtr.voipCallInfo.abilityName = data.ReadString();
-        parcelPtr.voipCallInfo.extensionId = data.ReadString();
-        parcelPtr.voipCallInfo.voipBundleName = data.ReadString();
-        parcelPtr.voipCallInfo.showBannerForIncomingCall = data.ReadBool();
-        parcelPtr.voipCallInfo.isConferenceCall = data.ReadBool();
-        parcelPtr.voipCallInfo.isVoiceAnswerSupported = data.ReadBool();
-        parcelPtr.voipCallInfo.hasMicPermission = data.ReadBool();
-        parcelPtr.voipCallInfo.uid = data.ReadInt32();
-        std::vector<uint8_t> userProfile = {};
-        data.ReadUInt8Vector(&userProfile);
-        (parcelPtr.voipCallInfo.userProfile).assign(userProfile.begin(), userProfile.end());
-    }
+    BuildCallReportInfo(data, parcelPtr);
     result = UpdateCallReportInfo(parcelPtr);
     if (!reply.WriteInt32(result)) {
         TELEPHONY_LOGE("writing parcel failed");
@@ -214,7 +190,9 @@ int32_t CallStatusCallbackStub::OnUpdateCallsReportInfo(MessageParcel &data, Mes
 void CallStatusCallbackStub::BuildCallReportInfo(MessageParcel &data, CallReportInfo &parcelPtr)
 {
     parcelPtr.index = data.ReadInt32();
-    strncpy_s(parcelPtr.accountNum, kMaxNumberLen + 1, data.ReadCString(), kMaxNumberLen + 1);
+    if (strncpy_s(parcelPtr.accountNum, kMaxNumberLen + 1, data.ReadCString(), kMaxNumberLen + 1) != EOK) {
+        TELEPHONY_LOGE("strncpy_s accountNum failed");
+    }
     parcelPtr.accountId = data.ReadInt32();
     parcelPtr.callType = static_cast<CallType>(data.ReadInt32());
     parcelPtr.callMode = static_cast<VideoStateType>(data.ReadInt32());

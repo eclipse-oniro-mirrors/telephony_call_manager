@@ -23,8 +23,12 @@ int32_t CallAbilityCallbackStub::OnUpdateCallStateInfoRequest(MessageParcel &dat
     if (!data.ContainFileDescriptors()) {
         TELEPHONY_LOGW("sent raw data is less than 32k");
     }
-    strncpy_s(parcelPtr.accountNumber, kMaxNumberLen + 1, data.ReadCString(), kMaxNumberLen + 1);
-    strncpy_s(parcelPtr.bundleName, kMaxNumberLen + 1, data.ReadCString(), kMaxNumberLen + 1);
+    if (strncpy_s(parcelPtr.accountNumber, kMaxNumberLen + 1, data.ReadCString(), kMaxNumberLen + 1) != EOK) {
+        TELEPHONY_LOGE("strncpy_s accountNumber failed");
+    }
+    if (strncpy_s(parcelPtr.bundleName, kMaxNumberLen + 1, data.ReadCString(), kMaxNumberLen + 1) != EOK) {
+        TELEPHONY_LOGE("strncpy_s bundleName failed");
+    }
     parcelPtr.speakerphoneOn = data.ReadBool();
     parcelPtr.accountId = data.ReadInt32();
     parcelPtr.videoState = static_cast<VideoStateType>(data.ReadInt32());
