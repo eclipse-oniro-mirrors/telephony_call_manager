@@ -519,7 +519,8 @@ bool CallControlManager::NotifyCallStateUpdated(
         if (callObjectPtr->GetCallType() == CallType::TYPE_VOIP) {
             return true;
         }
-        if (priorState == TelCallState::CALL_STATUS_DIALING && nextState == TelCallState::CALL_STATUS_ALERTING) {
+        if (priorState == TelCallState::CALL_STATUS_DIALING &&
+            (nextState == TelCallState::CALL_STATUS_ALERTING || nextState == TelCallState::CALL_STATUS_ACTIVE)) {
             TELEPHONY_LOGI("call is actived, now check and switch call to distributed audio device");
             DelayedSingleton<AudioDeviceManager>::GetInstance()->CheckAndSwitchDistributedAudioDevice();
         } else if ((priorState == TelCallState::CALL_STATUS_ACTIVE &&

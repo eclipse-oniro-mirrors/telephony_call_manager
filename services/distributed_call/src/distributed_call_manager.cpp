@@ -175,21 +175,21 @@ std::string DistributedCallManager::GetDevIdFromAudioDevice(const AudioDevice& d
     return devId;
 }
 
-void DistributedCallManager::AddDCallDevice(const std::string& devId)
+int32_t DistributedCallManager::AddDCallDevice(const std::string& devId)
 {
     TELEPHONY_LOGI("add dcall device, devId: %{public}s.", GetAnonyString(devId).c_str());
     std::lock_guard<std::mutex> lock(onlineDeviceMtx_);
 
     auto iter = onlineDCallDevices_.find(devId);
     if (iter != onlineDCallDevices_.end()) {
-        TELEPHONY_LOGI("device is already exist, devId: %{public}s", GetAnonyString(devId).c_str());
-        return;
+        TELEPHONY_LOGW("device is already exist, devId: %{public}s", GetAnonyString(devId).c_str());
+        return TELEPHONY_SUCCESS;
     }
 
     AudioDevice device;
     if (!CreateDAudioDevice(devId, device)) {
         TELEPHONY_LOGE("failed to create distributed audio device, devId: %{public}s", GetAnonyString(devId).c_str());
-        return;
+        return TELEPHONY_ERR_FAIL;
     }
 
     DelayedSingleton<AudioDeviceManager>::GetInstance()->AddAudioDeviceList(device.address, device.deviceType, "");
@@ -201,9 +201,10 @@ void DistributedCallManager::AddDCallDevice(const std::string& devId)
             SwitchOnDCallDeviceAsync(device);
         }
     }
+    return TELEPHONY_SUCCESS;
 }
 
-void DistributedCallManager::RemoveDCallDevice(const std::string& devId)
+int32_t DistributedCallManager::RemoveDCallDevice(const std::string& devId)
 {
     TELEPHONY_LOGI("remove dcall device, devId: %{public}s.", GetAnonyString(devId).c_str());
     std::lock_guard<std::mutex> lock(onlineDeviceMtx_);
@@ -223,6 +224,7 @@ void DistributedCallManager::RemoveDCallDevice(const std::string& devId)
             DelayedSingleton<AudioDeviceManager>::GetInstance()->InitAudioDevice();
         }
     }
+    return TELEPHONY_SUCCESS;
 }
 
 void DistributedCallManager::ClearDCallDevices()
@@ -336,7 +338,7 @@ void DistributedCallManager::DealDisconnectCall()
 void DistributedCallManager::SwitchOnDCallDeviceAsync(const AudioDevice& device)
 {
     TELEPHONY_LOGI("switch on dcall device async");
-    std::thread switchThread = std::thread([this, &device]() { this->SwitchOnDCallDeviceSync(device); });
+    std::thread switchThread = std::thread([this, device]() { this->SwitchOnDCallDeviceSync(device); });
     pthread_setname_np(switchThread.native_handle(), SWITCH_ON_DCALL_THREAD_NAME.c_str());
     switchThread.detach();
 }
@@ -373,30 +375,28 @@ bool DistributedCallManager::IsDCallDeviceSwitchedOn()
     return dCallDeviceSwitchedOn_.load();
 }
 
-void DistributedCallManager::OnDCallDeviceOnline(const std::string &devId)
+int32_t DistributedCallManager::OnDCallDeviceOnline(const std::string &devId)
 {
     TELEPHONY_LOGI("dcall device is online, devId: %{public}s", GetAnonyString(devId).c_str());
-    AddDCallDevice(devId);
+    return AddDCallDevice(devId);
 }
 
-void DistributedCallManager::OnDCallDeviceOffline(const std::string &devId)
+int32_t DistributedCallManager::OnDCallDeviceOffline(const std::string &devId)
 {
     TELEPHONY_LOGI("dcall device is offline, devId: %{public}s", GetAnonyString(devId).c_str());
-    RemoveDCallDevice(devId);
+    return RemoveDCallDevice(devId);
 }
 
 int32_t DistributedCallManager::DistributedCallDeviceListener::OnDCallDeviceOnline(const std::string &devId)
 {
     TELEPHONY_LOGI("dcall device is online, devId: %{public}s", GetAnonyString(devId).c_str());
-    DelayedSingleton<DistributedCallManager>::GetInstance()->OnDCallDeviceOnline(devId);
-    return TELEPHONY_SUCCESS;
+    return DelayedSingleton<DistributedCallManager>::GetInstance()->OnDCallDeviceOnline(devId);
 }
 
 int32_t DistributedCallManager::DistributedCallDeviceListener::OnDCallDeviceOffline(const std::string &devId)
 {
     TELEPHONY_LOGI("dcall device is offline, devId: %{public}s", GetAnonyString(devId).c_str());
-    DelayedSingleton<DistributedCallManager>::GetInstance()->OnDCallDeviceOffline(devId);
-    return TELEPHONY_SUCCESS;
+    return DelayedSingleton<DistributedCallManager>::GetInstance()->OnDCallDeviceOffline(devId);
 }
 
 void DistributedCallManager::OnDCallSystemAbilityAdded(const std::string &deviceId)
