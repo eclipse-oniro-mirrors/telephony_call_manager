@@ -134,7 +134,7 @@ void AudioProxyFunc(const uint8_t *data, size_t size)
     audioProxy->IsMicrophoneMute();
     audioProxy->SetMicrophoneMute(isMute);
     audioProxy->SetEarpieceDevActive();
-    audioProxy->SetSpeakerDevActive();
+    audioProxy->SetSpeakerDevActive(true);
     audioProxy->SetBluetoothDevActive();
     audioProxy->SetWiredHeadsetDevActive();
     audioProxy->GetRingerMode();

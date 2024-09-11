@@ -1496,6 +1496,10 @@ int32_t CallManagerService::SendCallUiEvent(int32_t callId, std::string &eventNa
             return TELEPHONY_ERR_LOCAL_PTR_NULL;
         }
         callPtr->SetCeliaCallType(IS_CELIA_CALL);
+    } else if (eventName == "EVENT_SPEAKER_OFF") {
+        if (!DelayedSingleton<AudioProxy>::GetInstance()->SetSpeakerDevActive(false)) {
+            return TELEPHONY_ERR_FAIL;
+        }
     }
     return TELEPHONY_SUCCESS;
 }

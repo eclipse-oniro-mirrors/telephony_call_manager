@@ -368,7 +368,7 @@ bool AudioDeviceManager::SwitchDevice(AudioDeviceType device)
 
 bool AudioDeviceManager::EnableSpeaker()
 {
-    if (isSpeakerAvailable_ && DelayedSingleton<AudioProxy>::GetInstance()->SetSpeakerDevActive()) {
+    if (isSpeakerAvailable_ && DelayedSingleton<AudioProxy>::GetInstance()->SetSpeakerDevActive(true)) {
         TELEPHONY_LOGI("speaker enabled , current audio device : speaker");
         SetCurrentAudioDevice(AudioDeviceType::DEVICE_SPEAKER);
         return true;
