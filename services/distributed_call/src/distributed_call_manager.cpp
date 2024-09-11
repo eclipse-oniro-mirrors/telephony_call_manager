@@ -296,6 +296,10 @@ void DistributedCallManager::ClearConnectedDCallDevice()
 bool DistributedCallManager::SwitchOnDCallDeviceSync(const AudioDevice& device)
 {
     TELEPHONY_LOGI("switch on dcall device sync");
+    if (!isCallActived_.load()) {
+        TELEPHONY_LOGW("call is not active, no need switch");
+        return true;
+    }
     if (!IsDistributedAudioDevice(device)) {
         TELEPHONY_LOGE("not distributed audio device, device type: %{public}d", device.deviceType);
         return false;
