@@ -1500,7 +1500,7 @@ int32_t CallManagerService::SendCallUiEvent(int32_t callId, std::string &eventNa
         if (!DelayedSingleton<AudioProxy>::GetInstance()->SetSpeakerDevActive(false)) {
             return TELEPHONY_ERR_FAIL;
         }
-    } 
+    }
     return TELEPHONY_SUCCESS;
 }
 
