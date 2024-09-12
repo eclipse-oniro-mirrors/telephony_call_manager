@@ -644,6 +644,10 @@ enum class MarkType {
      * Indicates the mark is yellow page.
      */
     MARK_TYPE_YELLOW_PAGE,
+    /**
+     * Indicates the mark is enterprise.
+     */
+    MARK_TYPE_ENTERPRISE,
 };
 
 /**

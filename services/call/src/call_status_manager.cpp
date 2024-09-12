@@ -1439,13 +1439,7 @@ bool CallStatusManager::ShouldBlockIncomingCall(const sptr<CallBase> &call, cons
     spamCallAdapterPtr_->DetectSpamCall(std::string(info.phoneNum), info.accountId);
     if (spamCallAdapterPtr_->WaitForDetectResult()) {
         TELEPHONY_LOGI("DetectSpamCall no time out");
-        NumberMarkInfo numberMarkInfo = {
-            .markType = MarkType::MARK_TYPE_NONE,
-            .markContent = "",
-            .markCount = -1,
-            .markSource = "",
-            .isCloud = false,
-        };
+        NumberMarkInfo numberMarkInfo;
         bool isBlock = false;
         int32_t blockReason;
         spamCallAdapterPtr_->GetParseResult(isBlock, numberMarkInfo, blockReason);
