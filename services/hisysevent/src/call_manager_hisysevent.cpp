@@ -28,6 +28,7 @@ static constexpr const char *CALL_ANSWER_FAILED_EVENT = "CALL_ANSWER_FAILED";
 static constexpr const char *CALL_HANGUP_FAILED_EVENT = "CALL_HANGUP_FAILED";
 static constexpr const char *INCOMING_CALL_EVENT = "INCOMING_CALL";
 static constexpr const char *CALL_STATE_CHANGED_EVENT = "CALL_STATE";
+static constexpr const char *CALL_INCOMING_NUM_IDENTITY_EVENT = "CALL_INCOMING_NUM_IDENTITY";
 
 // KEY
 static constexpr const char *MODULE_NAME_KEY = "MODULE";
@@ -39,6 +40,9 @@ static constexpr const char *CALL_TYPE_KEY = "CALL_TYPE";
 static constexpr const char *VIDEO_STATE_KEY = "VIDEO_STATE";
 static constexpr const char *ERROR_TYPE_KEY = "ERROR_TYPE";
 static constexpr const char *ERROR_MSG_KEY = "ERROR_MSG";
+static constexpr const char *MARK_TYPE_KEY = "MARK_TYPE";
+static constexpr const char *PNAMEID_KEY = "PNAMEID";
+static constexpr const char *PVERSIONID_KEY = "PVERSIONID";
 
 // VALUE
 static constexpr const char *CALL_MANAGER_MODULE = "CALL_MANAGER";
@@ -67,6 +71,13 @@ void CallManagerHisysevent::WriteIncomingCallBehaviorEvent(const int32_t slotId,
         return;
     }
     HiWriteBehaviorEvent(INCOMING_CALL_EVENT, SLOT_ID_KEY, slotId, CALL_TYPE_KEY, type);
+}
+
+void CallManagerHisysevent::WriteIncomingNumIdentityBehaviorEvent(const int32_t markType)
+{
+    TELEPHONY_LOGI("WriteIncomingNumIdentityBehaviorEvent markType: %{public}d", markType);
+    HiWriteBehaviorEventPhoneUE(CALL_INCOMING_NUM_IDENTITY_EVENT, PNAMEID_KEY, "callmanager", PVERSIONID_KEY, "",
+        MARK_TYPE_KEY, markType);
 }
 
 void CallManagerHisysevent::WriteIncomingCallFaultEvent(const int32_t slotId, const int32_t callType,
