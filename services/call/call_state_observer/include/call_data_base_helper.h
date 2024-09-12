@@ -29,7 +29,7 @@
 
 namespace OHOS {
 namespace Telephony {
-constexpr const char *ID = "id";
+constexpr const char *CALL_ID = "id";
 constexpr const char *CALL_PHONE_NUMBER = "phone_number";
 constexpr const char *CALL_DISPLAY_NAME = "display_name";
 constexpr const char *CALL_DIRECTION = "call_direction";

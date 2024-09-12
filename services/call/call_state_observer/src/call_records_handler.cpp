@@ -103,7 +103,7 @@ void CallRecordsHandler::DeleteCallLogForLimit(const CallRecordInfo &info)
         start++;
     }
     DataShare::DataSharePredicates deletePredicates;
-    deletePredicates.In(ID, needDeleteIds);
+    deletePredicates.In(CALL_ID, needDeleteIds);
     callDataPtr_->Delete(deletePredicates);
 }
 

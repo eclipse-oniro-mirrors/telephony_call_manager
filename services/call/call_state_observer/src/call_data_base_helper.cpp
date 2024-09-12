@@ -246,7 +246,7 @@ bool CallDataBaseHelper::QueryIdsNeedToDelete(std::vector<int32_t> &needDeleteId
     }
     Uri uri(CALL_SUBSECTION);
     std::vector<std::string> columns;
-    columns.push_back(ID);
+    columns.push_back(CALL_ID);
     auto resultSet = helper->Query(uri, predicates, columns);
     if (resultSet == nullptr) {
         helper->Release();
@@ -256,7 +256,7 @@ bool CallDataBaseHelper::QueryIdsNeedToDelete(std::vector<int32_t> &needDeleteId
     while (operationResult == TELEPHONY_SUCCESS) {
         int32_t id = 0;
         int32_t columnIndex = 0;
-        resultSet->GetColumnIndex(ID, columnIndex);
+        resultSet->GetColumnIndex(CALL_ID, columnIndex);
         operationResult = resultSet->GetInt(columnIndex, id);
         if (operationResult == TELEPHONY_SUCCESS) {
             needDeleteIds.push_back(id);
