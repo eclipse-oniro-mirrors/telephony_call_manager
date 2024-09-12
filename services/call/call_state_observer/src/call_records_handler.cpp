@@ -90,9 +90,9 @@ void CallRecordsHandler::DeleteCallLogForLimit(const CallRecordInfo &info)
     std::string selections;
     std::vector<int32_t> needDeleteIds;
     if (info.answerType == CallAnswerType::CALL_ANSWER_BLOCKED) {
-        queryPredicates.EqualTo(CALL_ANSWER_STATE, static_cast<int32_t>(CallAnswerType::CALL_ANSWER_BLOCKED))
+        queryPredicates.EqualTo(CALL_ANSWER_STATE, static_cast<int32_t>(CallAnswerType::CALL_ANSWER_BLOCKED));
     } else {
-        queryPredicates.NotEqualTo(CALL_ANSWER_STATE, static_cast<int32_t>(CallAnswerType::CALL_ANSWER_BLOCKED))
+        queryPredicates.NotEqualTo(CALL_ANSWER_STATE, static_cast<int32_t>(CallAnswerType::CALL_ANSWER_BLOCKED));
     }
     queryPredicates.OrderByDesc(CALL_CREATE_TIME);
     queryPredicates.Limit(-1, LOG_LIMIT_NUM);
