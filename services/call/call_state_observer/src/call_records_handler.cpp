@@ -99,7 +99,7 @@ void CallRecordsHandler::DeleteCallLogForLimit(const CallRecordInfo &info)
     callDataPtr_->QueryIdsNeedToDelete(needDeleteIds, queryPredicates);
     TELEPHONY_LOGI("need delete size: %{public}ld", needDeleteIds.size());
     std::vector<int32_t>::iterator start = needDeleteIds.begin();
-    while(start != needDeleteIds.end()) {
+    while (start != needDeleteIds.end()) {
         TELEPHONY_LOGI("need delete id: %{public}d", *start);
         start++;
     }
