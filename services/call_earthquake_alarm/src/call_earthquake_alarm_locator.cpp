@@ -14,6 +14,7 @@
  */
 
 #include "call_earthquake_alarm_locator.h"
+#include "call_manager_base.h"
 #include "ffrt.h"
 
 using namespace std;
@@ -28,11 +29,16 @@ const int MyLocationEngine::TIMER_INTERVAL = 0;
 const std::string MyLocationEngine::EMERGENCY_DEVICE_ID = "";
 const std::string MyLocationEngine::EMERGENCY_BUNDLE_NAME = "";
 const std::string MyLocationEngine::EMERGENCY_ABILITY_NAME = "";
+const std::string MyLocationEngine::EMERGENCY_ABILITY_NAME_ECC = "EccServiceExtAbility";
 const std::string MyLocationEngine::PARAMETERS_VALUE = "call_manager_earthquake_alarm";
 const char* MyLocationEngine::PARAMETERS_KEY = "callerName";
+const char* MyLocationEngine::PARAMETERS_KEY_PHONE_NUMBER = "phoneNumber";
+const char* MyLocationEngine::PARAMETERS_KEY_SLOTID = "slotId";
+const std::string MyLocationEngine::PARAMETERS_VALUE_ECC = "call_status_manager";
+const std::string MyLocationEngine::PARAMETERS_VALUE_OOBE = "call_manager_oobe_earthquake_warning_switch_on";
 const std::string MyLocationEngine::ALARM_SWITCH_ON = "1";
 const std::string MyLocationEngine::ALARM_SWITCH_OFF = "0";
-std::string MyLocationEngine::INITIAL_FIRST_VALUE = "invalid";
+const std::string MyLocationEngine::INITIAL_FIRST_VALUE = "invalid";
 std::shared_ptr<MyLocationEngine> MyLocationEngine::mylocator = std::make_shared<MyLocationEngine>();
 std::shared_ptr<MyLocationEngine> MyLocationEngine::GetInstance()
 {
@@ -205,7 +211,9 @@ void MyLocationEngine::MyLocationCallBack::OnErrorReport(const int errorCode) {}
 void MyLocationEngine::MyLocationCallBack::OnLocationReport(const std::unique_ptr<Location::Location>& location)
 {
     TELEPHONY_LOGI("location report");
-    MyLocationEngine::ConnectAbility(MyLocationEngine::PARAMETERS_VALUE);
+    CallDetailInfo info;
+    MyLocationEngine::ConnectAbility(MyLocationEngine::PARAMETERS_VALUE,
+        EmergencyCallConnectCallback::connectCallback_, info);
 }
 
 void MyLocationEngine::BootComplete(bool switchState)
@@ -301,7 +309,9 @@ void OOBESwitchObserver::OnChange()
     mValue = MyLocationEngine::INITIAL_FIRST_VALUE;
     if (MyLocationEngine::IsSwitchOn(LocationSubscriber::SWITCH_STATE_KEY, mValue)) {
         TELEPHONY_LOGI("the alarm switch is open");
-        MyLocationEngine::ConnectAbility("call_manager_oobe_earthquake_warning_switch_on");
+        CallDetailInfo info;
+        MyLocationEngine::ConnectAbility(MyLocationEngine::PARAMETERS_VALUE_OOBE,
+            EmergencyCallConnectCallback::connectCallback_, info);
     }
     ffrt::submit([&]() {
         for (auto& oobeKey : MyLocationEngine::settingsCallbacks) {
@@ -313,20 +323,74 @@ void OOBESwitchObserver::OnChange()
     });
 }
 
+std::mutex EmergencyCallConnectCallback::mutex_;
+bool EmergencyCallConnectCallback::isStartEccService = false;
+int32_t EmergencyCallConnectCallback::nowCallId = -1;
 sptr<AAFwk::IAbilityConnection> EmergencyCallConnectCallback::connectCallback_ = nullptr;
-void MyLocationEngine::ConnectAbility(std::string value)
+sptr<AAFwk::IAbilityConnection> EmergencyCallConnectCallback::connectCallbackEcc = nullptr;
+void MyLocationEngine::ConnectAbility(std::string value, sptr<AAFwk::IAbilityConnection>& callback,
+    const CallDetailInfo &info)
 {
     AAFwk::Want want;
-    AppExecFwk::ElementName element(EMERGENCY_DEVICE_ID, EMERGENCY_BUNDLE_NAME, EMERGENCY_ABILITY_NAME);
-    want.SetElement(element);
+    std::string abilityName = EMERGENCY_ABILITY_NAME;
     want.SetParam(PARAMETERS_KEY, value);
-    if (EmergencyCallConnectCallback::connectCallback_ == nullptr) {
-        EmergencyCallConnectCallback::connectCallback_ = sptr<EmergencyCallConnectCallback>::MakeSptr();
+    if (callback == nullptr) {
+        callback = sptr<EmergencyCallConnectCallback>::MakeSptr();
+    }
+    if (value == PARAMETERS_VALUE_ECC) {
+        abilityName = EMERGENCY_ABILITY_NAME_ECC;
+        want.SetParam(PARAMETERS_KEY_SLOTID, std::to_string(info.accountId));
+        want.SetParam(PARAMETERS_KEY_PHONE_NUMBER, std::string(info.phoneNum));
     }
     int32_t userId = -1;
-    auto ret = AAFwk::AbilityManagerClient::GetInstance()->ConnectAbility(want,
-        EmergencyCallConnectCallback::connectCallback_, userId);
-    TELEPHONY_LOGI("Connect emergencycall ability %{public}d", ret);
+    AppExecFwk::ElementName element(EMERGENCY_DEVICE_ID, EMERGENCY_BUNDLE_NAME, abilityName);
+    want.SetElement(element);
+    auto ret = AAFwk::AbilityManagerClient::GetInstance()->ConnectAbility(want, callback, userId);
+    TELEPHONY_LOGI("connect emergencycall ability %{public}d", ret);
+}
+
+void MyLocationEngine::StartEccService(sptr<CallBase> call, const CallDetailInfo &info)
+{
+    std::lock_guard<std::mutex> lock(EmergencyCallConnectCallback::mutex_);
+    if (call == nullptr) {
+        TELEPHONY_LOGE("call is nullptr");
+        return;
+    }
+    if (EmergencyCallConnectCallback::isStartEccService) {
+        TELEPHONY_LOGE("ecc service already start");
+        return;
+    }
+    CallAttributeInfo attributeInfo;
+    call->GetCallAttributeInfo(attributeInfo);
+    if (!attributeInfo.isEcc) {
+        TELEPHONY_LOGE("ecc state is false");
+        return;
+    }
+    std::string value = "";
+    if (!IsSwitchOn("emergency_post_location_switch", value)) {
+        TELEPHONY_LOGE("ecc switch is close");
+        return;
+    }
+    ConnectAbility(PARAMETERS_VALUE_ECC, EmergencyCallConnectCallback::connectCallbackEcc, info);
+    EmergencyCallConnectCallback::nowCallId = call->GetCallID();
+    EmergencyCallConnectCallback::isStartEccService = true;
+}
+
+void MyLocationEngine::StopEccService(int32_t callId)
+{
+    std::lock_guard<std::mutex> lock(EmergencyCallConnectCallback::mutex_);
+    if (EmergencyCallConnectCallback::connectCallbackEcc == nullptr) {
+        TELEPHONY_LOGE("ecc callback is nullptr");
+        return;
+    }
+    if (EmergencyCallConnectCallback::nowCallId != callId) {
+        TELEPHONY_LOGE("disconnect callId is not equal now dial callId");
+        return;
+    }
+    AAFwk::AbilityManagerClient::GetInstance()->DisconnectAbility(EmergencyCallConnectCallback::connectCallbackEcc);
+    EmergencyCallConnectCallback::connectCallbackEcc = nullptr;
+    EmergencyCallConnectCallback::nowCallId = -1;
+    EmergencyCallConnectCallback::isStartEccService = false;
 }
 
 void EmergencyCallConnectCallback::OnAbilityConnectDone(const AppExecFwk::ElementName &element,

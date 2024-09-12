@@ -54,6 +54,8 @@
 #include "telephony_permission.h"
 #include "uri.h"
 #include "want.h"
+#include "call_manager_base.h"
+#include "call_base.h"
 #include <iostream>
 #include <memory>
 #include <mutex>
@@ -200,20 +202,20 @@ HWTEST_F(LocationEngineTest, Telephony_EmergencyCallConnectCallback_001, Functio
     auto engine1 = std::make_shared<MyLocationEngine>();
     engine1->mylocator = engine1;
     auto engine = engine1->GetInstance();
-    auto connectcallback = new EmergencyCallConnectCallback();
-    connectcallback->connectCallback_ = connectcallback;
-    if (connectcallback->connectCallback_ == nullptr) {
-        return;
-    }
-    engine->ConnectAbility("valuetest1111");
+    sptr<AAFwk::IAbilityConnection> connectcallback = sptr<EmergencyCallConnectCallback>::MakeSptr();
+    CallDetailInfo info;
+    engine->ConnectAbility("valuetest1111", connectcallback, info);
+    engine->StartEccService(nullptr, info);
+    engine->StopEccService(-1);
     std::string bundle = "111";
     std::string ability = "222";
     AppExecFwk::ElementName element("", bundle, ability);
-    sptr<IRemoteObject> remoteObject = new EmergencyCallConnectCallback();
+    sptr<IRemoteObject> remoteObject = sptr<EmergencyCallConnectCallback>::MakeSptr();
     int resultCode = 0;
-    connectcallback->connectCallback_->OnAbilityConnectDone(element, remoteObject, resultCode);
-    connectcallback->connectCallback_->OnAbilityDisconnectDone(element, resultCode);
-    ASSERT_TRUE(connectcallback->connectCallback_ != nullptr);
+    sptr<AAFwk::IAbilityConnection> connectcallback3 = sptr<EmergencyCallConnectCallback>::MakeSptr();
+    connectcallback3->OnAbilityConnectDone(element, remoteObject, resultCode);
+    connectcallback3->OnAbilityDisconnectDone(element, resultCode);
+    ASSERT_TRUE(connectcallback3 != nullptr);
 }
 
 /**

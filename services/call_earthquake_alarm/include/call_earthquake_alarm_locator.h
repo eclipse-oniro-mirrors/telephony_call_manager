@@ -41,6 +41,7 @@
 #include "call_ability_report_proxy.h"
 #include "call_object_manager.h"
 #include "data_ability_observer_stub.h"
+#include "call_base.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -73,7 +74,10 @@ public:
     static void BootComplete(bool switchState);
     static bool IsSwitchOn(std::string key, std::string& value);
     static std::shared_ptr<MyLocationEngine> GetInstance();
-    static void ConnectAbility(std::string value);
+    static void StartEccService(sptr<CallBase> call, const CallDetailInfo &info);
+    static void StopEccService(int32_t callId);
+    static void ConnectAbility(std::string value, sptr<AAFwk::IAbilityConnection>& callback,
+        const CallDetailInfo &info);
 private:
     class MyLocationCallBack : public IRemoteStub<Location::ILocatorCallback> {
     public:
@@ -107,13 +111,18 @@ private:
     static const std::string EMERGENCY_DEVICE_ID;
     static const std::string EMERGENCY_BUNDLE_NAME;
     static const std::string EMERGENCY_ABILITY_NAME;
+    static const std::string EMERGENCY_ABILITY_NAME_ECC;
     static const std::string PARAMETERS_VALUE;
     static const char* PARAMETERS_KEY;
+    static const char* PARAMETERS_KEY_PHONE_NUMBER;
+    static const char* PARAMETERS_KEY_SLOTID;
     static const std::string ALARM_SWITCH_ON;
     static const std::string ALARM_SWITCH_OFF;
     
 public:
-    static std::string INITIAL_FIRST_VALUE;
+    static const std::string INITIAL_FIRST_VALUE;
+    static const std::string PARAMETERS_VALUE_ECC;
+    static const std::string PARAMETERS_VALUE_OOBE;
     static std::map<std::string, sptr<AAFwk::IDataAbilityObserver>> settingsCallbacks;
 };
 //class MyLocationCallBack
@@ -126,6 +135,10 @@ public:
         int resultCode);
     void OnAbilityDisconnectDone(const AppExecFwk::ElementName &element, int resultCode);
     static sptr<AAFwk::IAbilityConnection> connectCallback_;
+    static sptr<AAFwk::IAbilityConnection> connectCallbackEcc;
+    static bool isStartEccService;
+    static std::mutex mutex_;
+    static int32_t nowCallId;
 };
 
 } // namespace Telephony

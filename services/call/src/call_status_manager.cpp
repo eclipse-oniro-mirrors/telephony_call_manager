@@ -45,6 +45,7 @@
 #include "spam_call_adapter.h"
 #include "call_superprivacy_control_manager.h"
 #include "notification_helper.h"
+#include "call_earthquake_alarm_locator.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -672,6 +673,7 @@ int32_t CallStatusManager::DialingHandle(const CallDetailInfo &info)
         return ret;
     }
     DelayedSingleton<CallControlManager>::GetInstance()->NotifyNewCallCreated(call);
+    MyLocationEngine::StartEccService(call, info);
     ret = UpdateCallState(call, TelCallState::CALL_STATUS_DIALING);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("UpdateCallState failed, errCode:%{public}d", ret);
@@ -875,6 +877,7 @@ int32_t CallStatusManager::DisconnectedHandle(const CallDetailInfo &info)
     call->ExitConference();
     TelCallState priorState = call->GetTelCallState();
     UpdateCallState(call, TelCallState::CALL_STATUS_DISCONNECTED);
+    MyLocationEngine::StopEccService(call->GetCallID());
     HandleHoldCallOrAutoAnswerCall(call, callIdList, previousState, priorState);
     std::vector<sptr<CallBase>> conferenceCallList = GetConferenceCallList(call->GetSlotId());
     if (conferenceCallList.size() == 1) {
