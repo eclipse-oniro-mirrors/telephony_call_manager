@@ -32,6 +32,7 @@ const char *MARK_CONTENT = "markContent";
 const char *MARK_COUNT = "markCount";
 const char *MARK_SOURCE = "markSource";
 const char *IS_CLOUD = "isCloud";
+const char *MARK_DETAILS = "markDetails";
 
 NumberIdentityDataBaseHelper::NumberIdentityDataBaseHelper() {}
 
@@ -129,7 +130,7 @@ bool NumberIdentityDataBaseHelper::SetMarkInfoValues(std::shared_ptr<DataShare::
     resultSet->GoToFirstRow();
     int columnIndex = 0;
     int64_t longValue;
-    std::string stringValue;
+    std::string stringValue = "";
 
     resultSet->GetColumnIndex(MARK_TYPE, columnIndex);
     resultSet->GetLong(columnIndex, longValue);
@@ -137,8 +138,7 @@ bool NumberIdentityDataBaseHelper::SetMarkInfoValues(std::shared_ptr<DataShare::
 
     resultSet->GetColumnIndex(MARK_CONTENT, columnIndex);
     resultSet->GetString(columnIndex, stringValue);
-    errno_t result = memcpy_s(numberMarkInfo.markContent, kMaxNumberLen, stringValue.c_str(), stringValue.length());
-    if (result != EOK) {
+    if (memcpy_s(numberMarkInfo.markContent, kMaxNumberLen, stringValue.c_str(), stringValue.length()) != EOK) {
         TELEPHONY_LOGE("memcpy_s failed!");
         return false;
     }
@@ -147,10 +147,10 @@ bool NumberIdentityDataBaseHelper::SetMarkInfoValues(std::shared_ptr<DataShare::
     resultSet->GetLong(columnIndex, longValue);
     numberMarkInfo.markCount = longValue;
 
+    stringValue = "";
     resultSet->GetColumnIndex(MARK_SOURCE, columnIndex);
     resultSet->GetString(columnIndex, stringValue);
-    result = memcpy_s(numberMarkInfo.markSource, kMaxNumberLen, stringValue.c_str(), stringValue.length());
-    if (result != EOK) {
+    if (memcpy_s(numberMarkInfo.markSource, kMaxNumberLen, stringValue.c_str(), stringValue.length()) != EOK) {
         TELEPHONY_LOGE("memcpy_s failed!");
         return false;
     }
@@ -161,6 +161,14 @@ bool NumberIdentityDataBaseHelper::SetMarkInfoValues(std::shared_ptr<DataShare::
         numberMarkInfo.isCloud = true;
     } else {
         numberMarkInfo.isCloud = false;
+    }
+
+    stringValue = "";
+    resultSet->GetColumnIndex(MARK_DETAILS, columnIndex);
+    resultSet->GetString(columnIndex, stringValue);
+    if (memcpy_s(numberMarkInfo.markDetails, kMaxNumberLen, stringValue.c_str(), stringValue.length()) != EOK) {
+        TELEPHONY_LOGE("memcpy_s failed!");
+        return false;
     }
     return true;
 }

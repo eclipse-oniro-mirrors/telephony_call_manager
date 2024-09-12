@@ -83,13 +83,7 @@ HWTEST_F(SpamCallTest, Telephony_SpamCallAdapter_003, Function | MediumTest | Le
 {
     std::shared_ptr<SpamCallAdapter> spamCallAdapter_ = std::make_shared<SpamCallAdapter>();
     std::string jsonData = "{\"detectResult\":1,\"decisionReason\":1}";
-    NumberMarkInfo info = {
-        .markType = MarkType::MARK_TYPE_NONE,
-        .markContent = "",
-        .markCount = 0,
-        .markSource = "",
-        .isCloud = false,
-    };
+    NumberMarkInfo info;
     bool isBlock = false;
     int32_t blockReason = 0;
     spamCallAdapter_->ParseDetectResult(jsonData, isBlock, info, blockReason);

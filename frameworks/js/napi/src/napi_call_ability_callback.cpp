@@ -633,6 +633,7 @@ void NapiCallAbilityCallback::CreateMarkInfoNapiValue(napi_env &env,
         static_cast<int32_t>(info.numberMarkInfo.markCount));
     NapiCallManagerUtils::SetPropertyStringUtf8(env, markInfoObject, "markSource", info.numberMarkInfo.markSource);
     NapiCallManagerUtils::SetPropertyBoolean(env, markInfoObject, "isCloud", info.numberMarkInfo.isCloud);
+    NapiCallManagerUtils::SetPropertyStringUtf8(env, markInfoObject, "markDetails", info.numberMarkInfo.markDetails);
 }
 
 int32_t NapiCallAbilityCallback::UpdateCallEvent(const CallEventInfo &info)

@@ -896,6 +896,8 @@ napi_value NapiCallManager::DeclareMarkTypeEnum(napi_env env, napi_value exports
             NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(MarkType::MARK_TYPE_OTHERS))),
         DECLARE_NAPI_STATIC_PROPERTY("MARK_TYPE_YELLOW_PAGE",
             NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(MarkType::MARK_TYPE_YELLOW_PAGE))),
+        DECLARE_NAPI_STATIC_PROPERTY("MARK_TYPE_ENTERPRISE",
+            NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(MarkType::MARK_TYPE_ENTERPRISE))),
     };
     napi_value result = nullptr;
     napi_define_class(env, "MarkType", NAPI_AUTO_LENGTH, NapiCallManagerUtils::CreateEnumConstructor, nullptr,

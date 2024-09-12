@@ -36,6 +36,7 @@ constexpr char MARK_COUNT[] = "markCount";
 constexpr char MARK_SOURCE[] = "markSource";
 constexpr char MARK_CONTENT[] = "markContent";
 constexpr char IS_CLOUD[] = "isCloud";
+constexpr char MARK_DETAILS[] = "markDetails";
 sptr<SpamCallConnection> connection_ = nullptr;
 
 SpamCallAdapter::SpamCallAdapter()
@@ -182,6 +183,10 @@ void SpamCallAdapter::ParseDetectResult(const std::string &jsonData, bool &isBlo
         TELEPHONY_LOGE("strcpy_s markContent fail.");
     }
     info.isCloud = JsonGetBoolValue(root, IS_CLOUD);
+    JsonGetStringValue(root, MARK_DETAILS, stringValue);
+    if (strcpy_s(info.markDetails, sizeof(info.markDetails), stringValue.c_str()) != EOK) {
+        TELEPHONY_LOGE("strcpy_s markDetails fail.");
+    }
     TELEPHONY_LOGI("ParseDetectResult end");
     cJSON_Delete(root);
 }

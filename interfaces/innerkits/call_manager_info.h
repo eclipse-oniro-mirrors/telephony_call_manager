@@ -115,6 +115,10 @@ struct NumberMarkInfo {
      * Indicates if this is a number mark from cloud.
      */
     bool isCloud = false;
+    /**
+     * Indicates the details of number mark.
+     */
+    char markDetails[kMaxNumberLen + 1] = { 0 };
 };
 
 /**
@@ -431,6 +435,8 @@ struct CallRecordInfo {
         std::copy(std::begin(temp.numberMarkInfo.markSource), std::end(temp.numberMarkInfo.markSource),
             std::begin(numberMarkInfo.markSource));
         numberMarkInfo.isCloud = temp.numberMarkInfo.isCloud;
+        std::copy(std::begin(temp.numberMarkInfo.markDetails), std::end(temp.numberMarkInfo.markDetails),
+            std::begin(numberMarkInfo.markDetails));
         blockReason = temp.blockReason;
         celiaCallType = temp.celiaCallType;
         return *this;

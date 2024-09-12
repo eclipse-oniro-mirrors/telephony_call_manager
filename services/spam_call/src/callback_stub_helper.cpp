@@ -34,20 +34,14 @@ CallbackStubHelper::~CallbackStubHelper()
 
 int32_t CallbackStubHelper::OnResult(int32_t &errCode, std::string &result)
 {
-    TELEPHONY_LOGI("OnResult errCode: %{public}d, result: %{public}s", errCode, result.c_str());
+    TELEPHONY_LOGI("OnResult errCode: %{public}d", errCode);
     if (spamCallAdapter_ == nullptr) {
         TELEPHONY_LOGE("spamCallAdapter_ is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     spamCallAdapter_->SetDetectResult(errCode, result);
     if (errCode == 0) {
-        NumberMarkInfo numberMarkInfo = {
-            .markType = MarkType::MARK_TYPE_NONE,
-            .markContent = "",
-            .markCount = -1,
-            .markSource = "",
-            .isCloud = false,
-        };
+        NumberMarkInfo numberMarkInfo;
         bool isBlock = false;
         int32_t blockReason;
         spamCallAdapter_->ParseDetectResult(result, isBlock, numberMarkInfo, blockReason);

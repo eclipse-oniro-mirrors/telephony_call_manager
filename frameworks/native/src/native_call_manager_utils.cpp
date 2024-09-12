@@ -62,6 +62,10 @@ CallAttributeInfo NativeCallManagerUtils::ReadCallAttributeInfo(MessageParcel &m
         TELEPHONY_LOGE("strncpy_s markSource failed");
     }
     info.numberMarkInfo.isCloud = messageParcel.ReadBool();
+    if (strncpy_s(info.numberMarkInfo.markDetails, kMaxNumberLen + 1, messageParcel.ReadCString(), kMaxNumberLen + 1)
+        != EOK) {
+        TELEPHONY_LOGE("strncpy_s markDetails failed");
+    }
     if (strncpy_s(info.contactName, kMaxNumberLen + 1, messageParcel.ReadCString(), kMaxNumberLen + 1) != EOK) {
         TELEPHONY_LOGE("strncpy_s contactName failed");
     }

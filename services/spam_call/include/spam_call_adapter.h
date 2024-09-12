@@ -51,13 +51,7 @@ private:
     int32_t errCode_ = -1;
     std::string result_ = "";
     std::string phoneNumber_ = "";
-    NumberMarkInfo info_ = {
-        .markType = MarkType::MARK_TYPE_NONE,
-        .markContent = "",
-        .markCount = -1,
-        .markSource = "",
-        .isCloud = false,
-    };
+    NumberMarkInfo info_;
     bool isBlock_ = false;
     int32_t blockReason_ = 0;
     std::unique_ptr<TimeWaitHelper> timeWaitHelper_ {nullptr};
