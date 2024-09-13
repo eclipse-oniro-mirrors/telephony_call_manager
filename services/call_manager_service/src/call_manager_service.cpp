@@ -1508,7 +1508,7 @@ int32_t CallManagerService::SendCallUiEvent(int32_t callId, std::string &eventNa
         }
         CallAttributeInfo info;
         callPtr->SetExtras("");
-        callPtr->GetCallAttributeBaseInfo(info);
+        callPtr->GetCallAttributeInfo(info);
         DelayedSingleton<CallAbilityReportProxy>::GetInstance()->ReportCallStateInfo(info);
     }
     return TELEPHONY_SUCCESS;
