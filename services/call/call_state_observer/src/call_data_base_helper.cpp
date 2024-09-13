@@ -259,6 +259,7 @@ bool CallDataBaseHelper::QueryIdsNeedToDelete(std::vector<int32_t> &needDeleteId
         resultSet->GetColumnIndex(CALL_ID, columnIndex);
         operationResult = resultSet->GetInt(columnIndex, id);
         if (operationResult == TELEPHONY_SUCCESS) {
+            TELEPHONY_LOGI("need delete call log id: %{public}d", id);
             needDeleteIds.push_back(id);
         }
         operationResult = resultSet->GoToNextRow();

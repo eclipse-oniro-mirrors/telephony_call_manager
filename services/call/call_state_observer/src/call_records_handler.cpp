@@ -98,16 +98,12 @@ void CallRecordsHandler::DeleteCallLogForLimit(const CallRecordInfo &info)
     queryPredicates.Limit(-1, LOG_LIMIT_NUM);
     callDataPtr_->QueryIdsNeedToDelete(needDeleteIds, queryPredicates);
     if (needDeleteIds.size() > 0) {
-        std::vector<int32_t>::iterator start = needDeleteIds.begin();
-        while (start != needDeleteIds.end()) {
-            TELEPHONY_LOGI("need delete id: %{public}d", *start);
-            start++;
-        }
+        TELEPHONY_LOGI("need delete call log for more than limit.");
         DataShare::DataSharePredicates deletePredicates;
         deletePredicates.In(CALL_ID, needDeleteIds);
         callDataPtr_->Delete(deletePredicates);
     } else {
-        TELEPHONY_LOGI("no need delete for not more than limit.");
+        TELEPHONY_LOGI("no need delete call log for not more than limit.");
     }
 }
 
