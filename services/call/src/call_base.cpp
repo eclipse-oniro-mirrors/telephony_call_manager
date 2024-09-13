@@ -150,7 +150,7 @@ void CallBase::GetCallAttributeBaseInfo(CallAttributeInfo &info)
         info.originalCallType = originalCallType_;
         info.isEccContact = isEccContact_;
         info.celiaCallType = celiaCallType_;
-        if (memcpy_s(info.extras, sizeof(info.extras), extras_.c_str(), extras_.length()) != EOK) {
+        if (memcpy_s(info.extras, kMaxNumberLen, extras_.c_str(), extras_.length()) != EOK) {
             TELEPHONY_LOGE("memcpy_s extras fail");
         }
         if (memset_s(info.numberLocation, kMaxNumberLen, 0, kMaxNumberLen) != EOK) {
@@ -161,8 +161,7 @@ void CallBase::GetCallAttributeBaseInfo(CallAttributeInfo &info)
             TELEPHONY_LOGE("memcpy_s numberLocation fail");
             return;
         }
-        if (memcpy_s(info.contactName, sizeof(info.contactName), contactInfo_.name.c_str(),
-            contactInfo_.name.length()) != EOK) {
+        if (memcpy_s(info.contactName, kMaxNumberLen, contactInfo_.name.c_str(), contactInfo_.name.length()) != EOK) {
             TELEPHONY_LOGE("memcpy_s contact name fail");
         }
         info.numberMarkInfo = numberMarkInfo_;

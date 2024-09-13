@@ -1338,7 +1338,6 @@ sptr<CallBase> CallStatusManager::CreateNewCall(const CallDetailInfo &info, Call
 sptr<CallBase> CallStatusManager::CreateNewCallByCallType(
     DialParaInfo &paraInfo, const CallDetailInfo &info, CallDirection dir, AppExecFwk::PacMap &extras)
 {
-    paraInfo.extras = extras.GetStringValue("extras");
     sptr<CallBase> callPtr = nullptr;
     switch (info.callType) {
         case CallType::TYPE_CS: {
@@ -1527,6 +1526,7 @@ void CallStatusManager::PackParaInfo(
     paraInfo.bundleName = info.bundleName;
     paraInfo.crsType = info.crsType;
     paraInfo.originalCallType = info.originalCallType;
+    paraInfo.extras = extras.GetStringValue("extras");
 }
 
 bool CallStatusManager::IsFocusModeOpen()
