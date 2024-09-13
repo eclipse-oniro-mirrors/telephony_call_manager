@@ -29,6 +29,7 @@
 
 namespace OHOS {
 namespace Telephony {
+constexpr const char *CALL_ID = "id";
 constexpr const char *CALL_PHONE_NUMBER = "phone_number";
 constexpr const char *CALL_DISPLAY_NAME = "display_name";
 constexpr const char *CALL_DIRECTION = "call_direction";
@@ -59,6 +60,7 @@ constexpr const char *CALL_IS_CLOUD_MARK = "is_cloud_mark";
 constexpr const char *CALL_MARK_COUNT = "mark_count";
 constexpr const char *CALL_BLOCK_REASON = "block_reason";
 constexpr const char *CELIA_CALL_TYPE = "celia_call_type";
+constexpr const int32_t LOG_LIMIT_NUM = 5000;
 
 enum class CallLogReadState {
     CALL_IS_UNREAD,
@@ -87,6 +89,7 @@ public:
     bool Delete(DataShare::DataSharePredicates &predicates);
     bool QueryCallLog(
         std::map<std::string, int32_t> &phonesAndUnreadCountMap, DataShare::DataSharePredicates &predicates);
+    bool QueryIdsNeedToDelete(std::vector<int32_t> &needDeleteIds, DataShare::DataSharePredicates &predicates);
     int32_t QueryIsBlockPhoneNumber(const std::string &phoneNum, bool &result);
     int32_t GetAirplaneMode(bool &isAirplaneModeOn);
 

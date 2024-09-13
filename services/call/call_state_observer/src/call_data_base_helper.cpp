@@ -236,6 +236,40 @@ bool CallDataBaseHelper::QueryCallLog(
     return true;
 }
 
+bool CallDataBaseHelper::QueryIdsNeedToDelete(std::vector<int32_t> &needDeleteIds,
+    DataShare::DataSharePredicates &predicates)
+{
+    std::shared_ptr<DataShare::DataShareHelper> helper = CreateDataShareHelper(CALLLOG_URI);
+    if (helper == nullptr) {
+        TELEPHONY_LOGE("helper is nullptr!");
+        return false;
+    }
+    Uri uri(CALL_SUBSECTION);
+    std::vector<std::string> columns;
+    columns.push_back(CALL_ID);
+    auto resultSet = helper->Query(uri, predicates, columns);
+    if (resultSet == nullptr) {
+        helper->Release();
+        return false;
+    }
+    int32_t operationResult = resultSet->GoToFirstRow();
+    while (operationResult == TELEPHONY_SUCCESS) {
+        int32_t id = 0;
+        int32_t columnIndex = 0;
+        resultSet->GetColumnIndex(CALL_ID, columnIndex);
+        operationResult = resultSet->GetInt(columnIndex, id);
+        if (operationResult == TELEPHONY_SUCCESS) {
+            TELEPHONY_LOGI("need delete call log id: %{public}d", id);
+            needDeleteIds.push_back(id);
+        }
+        operationResult = resultSet->GoToNextRow();
+    }
+    resultSet->Close();
+    helper->Release();
+    TELEPHONY_LOGI("QueryIdsNeedToDelete end");
+    return true;
+}
+
 bool CallDataBaseHelper::Update(DataShare::DataSharePredicates &predicates, DataShare::DataShareValuesBucket &values)
 {
     std::shared_ptr<DataShare::DataShareHelper> helper = CreateDataShareHelper(CALLLOG_URI);
@@ -258,6 +292,7 @@ bool CallDataBaseHelper::Delete(DataShare::DataSharePredicates &predicates)
     }
     Uri uri(CALL_SUBSECTION);
     bool result = (helper->Delete(uri, predicates) > 0);
+    TELEPHONY_LOGI("delete result: %{public}d", result);
     helper->Release();
     return result;
 }

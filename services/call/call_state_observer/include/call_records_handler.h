@@ -40,6 +40,7 @@ private:
     std::string CheckNumberLocationInfo(const CallRecordInfo &info);
     void MakeCallLogInsertBucket(DataShare::DataShareValuesBucket &bucket,
         const CallRecordInfo &info, std::string displayName, std::string numberLocation);
+    void DeleteCallLogForLimit(const CallRecordInfo &info);
 
 private:
     std::shared_ptr<CallDataBaseHelper> callDataPtr_;
