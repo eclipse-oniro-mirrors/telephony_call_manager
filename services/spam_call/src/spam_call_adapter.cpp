@@ -108,9 +108,7 @@ bool SpamCallAdapter::JsonGetNumberValue(cJSON *json, const std::string key, int
         cJSON *cursor = cJSON_GetObjectItem(json, key.c_str());
         if (!cJSON_IsNumber(cursor)) {
             TELEPHONY_LOGE("ParseNumberValue failed to get %{public}s", key.c_str());
-            if (key == "detectResult" || key == "decisionReason") {
-                return false;
-            }
+            return false;
         }
         out = static_cast<int32_t>(cJSON_GetNumberValue(cursor));
     } while (0);
@@ -120,9 +118,11 @@ bool SpamCallAdapter::JsonGetNumberValue(cJSON *json, const std::string key, int
 bool SpamCallAdapter::JsonGetStringValue(cJSON *json, const std::string key, std::string &out)
 {
     do {
+        out = "";
         cJSON *cursor = cJSON_GetObjectItem(json, key.c_str());
         if (!cJSON_IsString(cursor)) {
             TELEPHONY_LOGE("ParseStringValue failed to get %{public}s", key.c_str());
+            return false;
         }
         char *value = cJSON_GetStringValue(cursor);
         if (value != nullptr) {
@@ -156,24 +156,24 @@ void SpamCallAdapter::ParseDetectResult(const std::string &jsonData, bool &isBlo
     int32_t numberValue = 0;
     std::string stringValue = "";
     if (!JsonGetNumberValue(root, DETECT_RESULT, numberValue)) {
-        TELEPHONY_LOGE("ParseDetectResult no detectResult");
         cJSON_Delete(root);
         return;
     }
     TELEPHONY_LOGI("detectResult: %{public}d", numberValue);
     isBlock = numberValue == 1;
     if (!JsonGetNumberValue(root, DECISION_REASON, numberValue)) {
-        TELEPHONY_LOGE("ParseDetectResult no decisionReason");
         cJSON_Delete(root);
         return;
     }
     TELEPHONY_LOGI("decisionReason: %{public}d", numberValue);
     blockReason = numberValue;
-    JsonGetNumberValue(root, MARK_TYPE, numberValue);
+    if (JsonGetNumberValue(root, MARK_TYPE, numberValue)) {
+        info.markType = static_cast<MarkType>(numberValue);
+    }
     TELEPHONY_LOGI("markType: %{public}d", numberValue);
-    info.markType = static_cast<MarkType>(numberValue);
-    JsonGetNumberValue(root, MARK_COUNT, numberValue);
-    info.markCount = numberValue;
+    if (JsonGetNumberValue(root, MARK_COUNT, numberValue)) {
+        info.markCount = numberValue;
+    }
     JsonGetStringValue(root, MARK_SOURCE, stringValue);
     if (strcpy_s(info.markSource, sizeof(info.markSource), stringValue.c_str()) != EOK) {
         TELEPHONY_LOGE("strcpy_s markSource fail.");
