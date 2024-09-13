@@ -57,7 +57,7 @@ CallBase::CallBase(DialParaInfo &info, AppExecFwk::PacMap &extras)
       isSpeakerphoneOn_(false), callEndedType_(CallEndedType::UNKNOWN), callBeginTime_(0), callCreateTime_(0),
       callEndTime_(0), ringBeginTime_(0), ringEndTime_(0), answerType_(CallAnswerType::CALL_ANSWER_MISSED),
       accountId_(info.accountId), crsType_(info.crsType), originalCallType_(info.originalCallType), isMuted_(false),
-      numberLocation_("default"), blockReason_(0), isEccContact_(false), celiaCallType_(-1), , extras_(info.extras)
+      numberLocation_("default"), blockReason_(0), isEccContact_(false), celiaCallType_(-1), extras_(info.extras)
 {
     (void)memset_s(&contactInfo_, sizeof(ContactInfo), 0, sizeof(ContactInfo));
     (void)memset_s(&numberMarkInfo_, sizeof(NumberMarkInfo), 0, sizeof(NumberMarkInfo));
@@ -150,7 +150,7 @@ void CallBase::GetCallAttributeBaseInfo(CallAttributeInfo &info)
         info.originalCallType = originalCallType_;
         info.isEccContact = isEccContact_;
         info.celiaCallType = celiaCallType_;
-        if (memcpy_s(info.extras, sizeof(info.extras), extras_.c_str(), extras_.length() != EOK) {
+        if (memcpy_s(info.extras, sizeof(info.extras), extras_.c_str(), extras_.length()) != EOK) {
             TELEPHONY_LOGE("memcpy_s extras fail");
         }
         if (memset_s(info.numberLocation, kMaxNumberLen, 0, kMaxNumberLen) != EOK) {
