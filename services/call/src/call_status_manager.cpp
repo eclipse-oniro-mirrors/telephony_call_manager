@@ -1338,6 +1338,7 @@ sptr<CallBase> CallStatusManager::CreateNewCall(const CallDetailInfo &info, Call
 sptr<CallBase> CallStatusManager::CreateNewCallByCallType(
     DialParaInfo &paraInfo, const CallDetailInfo &info, CallDirection dir, AppExecFwk::PacMap &extras)
 {
+    paraInfo.extras = extras.GetStringValue("extras");
     sptr<CallBase> callPtr = nullptr;
     switch (info.callType) {
         case CallType::TYPE_CS: {

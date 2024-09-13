@@ -343,6 +343,7 @@ int32_t CallManagerServiceStub::OnDialCall(MessageParcel &data, MessageParcel &r
     dialInfo.PutIntValue("dialScene", data.ReadInt32());
     dialInfo.PutIntValue("dialType", data.ReadInt32());
     dialInfo.PutIntValue("callType", data.ReadInt32());
+    dialInfo.PutStringValue("extras", data.ReadString());
     dialInfo.PutStringValue("bundleName", data.ReadString());
     if (callNumber.length() > ACCOUNT_NUMBER_MAX_LENGTH) {
         TELEPHONY_LOGE("the account number length exceeds the limit");

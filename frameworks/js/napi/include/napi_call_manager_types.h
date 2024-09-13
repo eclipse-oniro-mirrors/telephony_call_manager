@@ -67,6 +67,7 @@ struct DialAsyncContext : AsyncContext {
     int32_t videoState = 0;
     int32_t dialScene = 0;
     int32_t dialType = 0;
+    std::string extras = "";
 };
 
 struct AnswerAsyncContext : AsyncContext {

@@ -1500,6 +1500,16 @@ int32_t CallManagerService::SendCallUiEvent(int32_t callId, std::string &eventNa
         if (!DelayedSingleton<AudioProxy>::GetInstance()->SetSpeakerDevActive(false)) {
             return TELEPHONY_ERR_FAIL;
         }
+    } else if (eventName == "DISPLAY_SPECIFIED_CALL_PAGE_BY_CALL_ID") {
+        sptr<CallBase> callPtr = CallObjectManager::GetOneCallObject(callId);
+        if (callPtr == nullptr) {
+            TELEPHONY_LOGI("the call object is nullptr!");
+            return TELEPHONY_ERR_LOCAL_PTR_NULL;
+        }
+        CallAttributeInfo info;
+        callPtr->SetExtras("");
+        callPtr->GetCallAttributeBaseInfo(info);
+        DelayedSingleton<CallAbilityReportProxy>::GetInstance()->ReportCallStateInfo(info);
     }
     return TELEPHONY_SUCCESS;
 }
