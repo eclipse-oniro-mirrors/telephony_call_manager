@@ -1501,14 +1501,16 @@ int32_t CallManagerService::SendCallUiEvent(int32_t callId, std::string &eventNa
             return TELEPHONY_ERR_FAIL;
         }
     } else if (eventName == "DISPLAY_SPECIFIED_CALL_PAGE_BY_CALL_ID") {
+        TELEPHONY_LOGI("enter emergency start callui event");
         sptr<CallBase> callPtr = CallObjectManager::GetOneCallObject(callId);
         if (callPtr == nullptr) {
             TELEPHONY_LOGI("the call object is nullptr!");
             return TELEPHONY_ERR_LOCAL_PTR_NULL;
         }
         CallAttributeInfo info;
-        callPtr->SetExtras("");
+        callPtr->SetExtras("{\"sosWithOutCallUiAbility\":\"2\"}");
         callPtr->GetCallAttributeInfo(info);
+        callPtr->SetExtras("");
         DelayedSingleton<CallAbilityReportProxy>::GetInstance()->ReportCallStateInfo(info);
     }
     return TELEPHONY_SUCCESS;
