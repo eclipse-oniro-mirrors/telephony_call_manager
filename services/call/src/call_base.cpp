@@ -42,7 +42,7 @@ CallBase::CallBase(DialParaInfo &info)
       callEndedType_(CallEndedType::UNKNOWN), callBeginTime_(0), callCreateTime_(0), callEndTime_(0), ringBeginTime_(0),
       ringEndTime_(0), answerType_(CallAnswerType::CALL_ANSWER_MISSED), accountId_(info.accountId),
       crsType_(info.crsType), originalCallType_(info.originalCallType), isMuted_(false), numberLocation_("default"),
-      blockReason_(0), isEccContact_(false), celiaCallType_(-1)
+      blockReason_(0), isEccContact_(false), celiaCallType_(-1), extras_(info.extras)
 {
     (void)memset_s(&contactInfo_, sizeof(ContactInfo), 0, sizeof(ContactInfo));
     (void)memset_s(&numberMarkInfo_, sizeof(NumberMarkInfo), 0, sizeof(NumberMarkInfo));
@@ -57,7 +57,7 @@ CallBase::CallBase(DialParaInfo &info, AppExecFwk::PacMap &extras)
       isSpeakerphoneOn_(false), callEndedType_(CallEndedType::UNKNOWN), callBeginTime_(0), callCreateTime_(0),
       callEndTime_(0), ringBeginTime_(0), ringEndTime_(0), answerType_(CallAnswerType::CALL_ANSWER_MISSED),
       accountId_(info.accountId), crsType_(info.crsType), originalCallType_(info.originalCallType), isMuted_(false),
-      numberLocation_("default"), blockReason_(0), isEccContact_(false), celiaCallType_(-1)
+      numberLocation_("default"), blockReason_(0), isEccContact_(false), celiaCallType_(-1), extras_(info.extras)
 {
     (void)memset_s(&contactInfo_, sizeof(ContactInfo), 0, sizeof(ContactInfo));
     (void)memset_s(&numberMarkInfo_, sizeof(NumberMarkInfo), 0, sizeof(NumberMarkInfo));
@@ -117,6 +117,11 @@ int32_t CallBase::RejectCallBase()
     return TELEPHONY_SUCCESS;
 }
 
+void CallBase::SetExtras(std::string extras)
+{
+    extras_ = extras;
+}
+
 void CallBase::GetCallAttributeBaseInfo(CallAttributeInfo &info)
 {
     std::lock_guard<std::mutex> lock(mutex_);
@@ -145,6 +150,9 @@ void CallBase::GetCallAttributeBaseInfo(CallAttributeInfo &info)
         info.originalCallType = originalCallType_;
         info.isEccContact = isEccContact_;
         info.celiaCallType = celiaCallType_;
+        if (memcpy_s(info.extras, kMaxNumberLen, extras_.c_str(), extras_.length()) != EOK) {
+            TELEPHONY_LOGE("memcpy_s extras fail");
+        }
         if (memset_s(info.numberLocation, kMaxNumberLen, 0, kMaxNumberLen) != EOK) {
             TELEPHONY_LOGE("memset_s numberLocation fail");
             return;
@@ -153,8 +161,7 @@ void CallBase::GetCallAttributeBaseInfo(CallAttributeInfo &info)
             TELEPHONY_LOGE("memcpy_s numberLocation fail");
             return;
         }
-        if (memcpy_s(info.contactName, sizeof(info.contactName), contactInfo_.name.c_str(),
-            contactInfo_.name.length()) != EOK) {
+        if (memcpy_s(info.contactName, kMaxNumberLen, contactInfo_.name.c_str(), contactInfo_.name.length()) != EOK) {
             TELEPHONY_LOGE("memcpy_s contact name fail");
         }
         info.numberMarkInfo = numberMarkInfo_;

@@ -1526,6 +1526,7 @@ void CallStatusManager::PackParaInfo(
     paraInfo.bundleName = info.bundleName;
     paraInfo.crsType = info.crsType;
     paraInfo.originalCallType = info.originalCallType;
+    paraInfo.extras = extras.GetStringValue("extras");
 }
 
 bool CallStatusManager::IsFocusModeOpen()

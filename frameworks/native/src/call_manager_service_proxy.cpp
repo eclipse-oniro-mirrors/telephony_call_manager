@@ -75,6 +75,7 @@ int32_t CallManagerServiceProxy::DialCall(std::u16string number, AppExecFwk::Pac
     dataParcel.WriteInt32(extras.GetIntValue("dialScene"));
     dataParcel.WriteInt32(extras.GetIntValue("dialType"));
     dataParcel.WriteInt32(extras.GetIntValue("callType"));
+    dataParcel.WriteString(extras.GetStringValue("extras"));
     MessageParcel replyParcel;
     int32_t error = SendRequest(INTERFACE_DIAL_CALL, dataParcel, replyParcel);
     if (error != TELEPHONY_SUCCESS) {

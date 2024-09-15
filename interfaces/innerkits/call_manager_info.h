@@ -311,6 +311,10 @@ struct CallAttributeInfo {
      * Indicates the contact name.
      */
     char contactName[kMaxNumberLen + 1] = { 0 };
+    /**
+     * Indicates the extras information.
+     */
+    char extras[kMaxNumberLen + 1] = { 0 };
 };
 
 /**

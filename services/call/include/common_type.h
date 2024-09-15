@@ -49,6 +49,7 @@ struct DialParaInfo {
     int32_t crsType = 0;
     int32_t originalCallType = 0;
     VoipCallReportInfo voipCallInfo;
+    std::string extras = "";
 };
 
 enum PolicyFlag : uint64_t {
