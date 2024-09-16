@@ -68,6 +68,9 @@ void CallVoiceAssistantManager::Release()
     isBroadcastSwitchOn = false;
     isControlSwitchOn = false;
     isQueryedBroadcastSwitch = false;
+    isConnectService = false;
+    broadcastCheck = DEFAULT_STRING;
+    isplay = SWITCH_TURN_OFF;
 };
 
 bool CallVoiceAssistantManager::IsSwitchOn(const std::string& switchState)
@@ -168,6 +171,7 @@ void CallVoiceAssistantManager::PublishCommonEvent(bool isConnect)
     want.SetAction(CONTROL_SWITCH_STATE_CHANGE_EVENT);
     want.SetParam(IS_CONNECT_SERVICE, startService);
     want.SetParam(CONTROL_SWITCH.c_str(), controlCheck);
+    want.SetParam(BROADCAST_SWITCH.c_str(), broadcastCheck);
     want.SetParam(IS_PLAY_RING, isplay);
     EventFwk::CommonEventData data;
     data.SetWant(want);
@@ -181,16 +185,8 @@ void CallVoiceAssistantManager::PublishCommonEvent(bool isConnect)
 
 void CallVoiceAssistantManager::OnStartService(const std::string& isDial, const int32_t& accountId)
 {
-    auto info = accountIds[accountId];
-    if (info == nullptr) {
-        return;
-    }
     if (mRemoteObject != nullptr) {
         TELEPHONY_LOGI("mRemote Object is not nullptr");
-        if (!isBroadcastSwitchOn) {
-            TELEPHONY_LOGI("start play system ring");
-            info->stopBroadcasting = 1;
-        }
         this->SendRequest(accountIds[accountId], true);
         return;
     }
@@ -202,10 +198,6 @@ void CallVoiceAssistantManager::OnStartService(const std::string& isDial, const 
     if (!isControlSwitchOn && !isBroadcastSwitchOn) {
         TELEPHONY_LOGE("the switch is all close");
         return;
-    }
-    if (!isBroadcastSwitchOn) {
-        TELEPHONY_LOGI("start play system ring");
-        info->stopBroadcasting = 1;
     }
     if (ConnectAbility(accountId)) {
         TELEPHONY_LOGI("start service success");
@@ -329,7 +321,8 @@ void CallVoiceAssistantManager::MuteRinger()
     if (info != nullptr) {
         info->stopBroadcasting = 1;
     }
-    this->SendRequest(info, true);
+    this->SendRequest(info, false);
+    this->PublishCommonEvent(isConnectService);
 }
 
 void CallVoiceAssistantManager::SendRequest(const std::shared_ptr<IncomingContactInformation> info, bool isNeed)
@@ -346,30 +339,29 @@ void CallVoiceAssistantManager::SendRequest(const std::shared_ptr<IncomingContac
         info->isSetNumberLocation = true;
         info->isSetContactInfo = true;
     }
-
     if (!info->isSetNumberLocation || !info->isSetContactInfo || info->dialOrCome == DEFAULT_STRING) {
         return;
     }
     MessageParcel data, reply;
     MessageOption option;
-    isplay = SWITCH_TURN_OFF;
-    isConnectService = true;
     std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> convert;
     data.WriteString16(convert.from_bytes(GetSendString(info)));
     int32_t retCode = mRemoteObject->SendRequest(CHECK_CODE, data, reply, option);
     if (!isNeed) {
         return;
     }
+    isConnectService = false;
+    isplay = SWITCH_TURN_OFF;
     if (retCode != TELEPHONY_SUCCESS && isBroadcastSwitchOn && info->stopBroadcasting == 0) {
         TELEPHONY_LOGE("ret is %{public}d", retCode);
         VoiceAssistantRingSubscriber::Initial();
-        isConnectService = false;
         isplay = SWITCH_TURN_ON;
     }
     std::u16string _reply1 = reply.ReadString16();
     TELEPHONY_LOGI("receiveData is %{public}s", convert.to_bytes(_reply1).c_str());
     UpdateReplyData(convert.to_bytes(_reply1));
     if (controlCheck == SWITCH_TURN_ON && isControlSwitchOn) {
+        isConnectService = true;
         RegisterListenSwitchState();
     } else {
         controlCheck = SWITCH_TURN_OFF;
@@ -593,8 +585,9 @@ bool VoiceAssistantRingSubscriber::Initial()
 
 void VoiceAssistantRingSubscriber::Release()
 {
-    DelayedSingleton<AudioControlManager>::GetInstance()->StopRingtone();
     if (subscriber_ != nullptr) {
+        TELEPHONY_LOGI("stop play system ring");
+        DelayedSingleton<AudioControlManager>::GetInstance()->StopRingtone();
         EventFwk::CommonEventManager::UnSubscribeCommonEvent(subscriber_);
         subscriber_ = nullptr;
     }
@@ -643,31 +636,31 @@ std::mutex& CallVoiceAssistantManager::GetMutex()
 
 void CallVoiceAssistantManager::UpdateReplyData(const std::string& str)
 {
-    int pos1 = 0, pos2 = 0;
+    std::size_t pos1 = 0, pos2 = 0;
     std::map<std::string, std::string> replyData;
-    while (pos1 != FAIL_CODE && pos2 != FAIL_CODE) {
+    while (pos1 != std::string::npos && pos2 != std::string::npos) {
         pos1 = str.find("\"", pos2 + 1);
-        if (pos1 == FAIL_CODE) {
+        if (pos1 == std::string::npos) {
             break;
         }
         pos2 = str.find("\"", pos1 + 1);
-        if (pos2 == FAIL_CODE) {
+        if (pos2 == std::string::npos) {
             break;
         }
         auto key = str.substr(pos1 + 1, pos2 -pos1 - 1);
         pos1 = str.find("\"", pos2 + 1);
-        if (pos1 == FAIL_CODE) {
+        if (pos1 == std::string::npos) {
             break;
         }
         pos2 = str.find("\"", pos1 + 1);
-        if (pos2 == FAIL_CODE) {
+        if (pos2 == std::string::npos) {
             break;
         }
         auto value = str.substr(pos1 + 1, pos2 -pos1 - 1);
         replyData.insert({key, value});
     }
     controlCheck = SWITCH_TURN_OFF;
-    broadcastCheck = SWITCH_TURN_OFF;
+    broadcastCheck = DEFAULT_STRING;
     auto it_control = replyData.find(CONTROL_CHECK_RESULT);
     if (it_control != replyData.end()) {
         controlCheck = it_control->second;
@@ -676,7 +669,7 @@ void CallVoiceAssistantManager::UpdateReplyData(const std::string& str)
     if (it_broadcast != replyData.end()) {
         broadcastCheck = it_broadcast->second;
     }
-    TELEPHONY_LOGI("%{public}s %{public}s", broadcastCheck.c_str(), controlCheck.c_str());
+    TELEPHONY_LOGI("%{public}s, %{public}s.", broadcastCheck.c_str(), controlCheck.c_str());
 }
 
 }
