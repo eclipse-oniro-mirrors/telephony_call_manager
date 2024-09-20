@@ -49,8 +49,6 @@ void DistributedDataSourceController::OnDeviceOffline(const std::string &devId, 
 
 void DistributedDataSourceController::OnCallCreated(const sptr<CallBase> &call, const std::string &devId)
 {
-    SaveMtLocalData(call);
-    SendMtLocalDataRsp();
 }
 
 void DistributedDataSourceController::OnCallDestroyed()
@@ -59,13 +57,19 @@ void DistributedDataSourceController::OnCallDestroyed()
         return;
     }
     std::lock_guard<ffrt::mutex> lock(mutex_);
-    localMtInfo_.clear();
-    queryMtInfo_.clear();
+    localInfo_.clear();
+    queryInfo_.clear();
+}
+
+void DistributedDataSourceController::ProcessCallInfo(const sptr<CallBase> &call, DistributedDataType type)
+{
+    SaveLocalData(call, type);
+    SendLocalDataRsp();
 }
 
 void DistributedDataSourceController::OnConnected()
 {
-    SendMtLocalDataRsp();
+    SendLocalDataRsp();
 }
 
 void DistributedDataSourceController::HandleRecvMsg(int32_t msgType, const cJSON *msg)
@@ -74,9 +78,9 @@ void DistributedDataSourceController::HandleRecvMsg(int32_t msgType, const cJSON
         return;
     }
     switch (msgType) {
-        case static_cast<int32_t>(DistributedMsgType::MT_DATA_REQ):
-            HandleMtDataQueryMsg(msg);
-            SendMtLocalDataRsp();
+        case static_cast<int32_t>(DistributedMsgType::DATA_REQ):
+            HandleDataQueryMsg(msg);
+            SendLocalDataRsp();
             break;
         case static_cast<int32_t>(DistributedMsgType::CURRENT_DATA_REQ):
             HandleCurrentDataQueryMsg(msg);
@@ -86,44 +90,41 @@ void DistributedDataSourceController::HandleRecvMsg(int32_t msgType, const cJSON
     }
 }
 
-void DistributedDataSourceController::SaveMtLocalData(const std::string &num, DistributedDataType type,
+void DistributedDataSourceController::SaveLocalData(const std::string &num, DistributedDataType type,
     const std::string &data)
 {
     std::lock_guard<ffrt::mutex> lock(mutex_);
-    auto iter = localMtInfo_.find(num);
-    if (iter == localMtInfo_.end()) {
+    auto iter = localInfo_.find(num);
+    if (iter == localInfo_.end()) {
         std::map<uint32_t, std::string> info;
         info[static_cast<uint32_t>(type)] = data;
-        localMtInfo_[num] = info;
+        localInfo_[num] = info;
     } else {
         (iter->second)[static_cast<uint32_t>(type)] = data;
     }
 }
 
-void DistributedDataSourceController::SaveMtLocalData(const sptr<CallBase> &call)
+void DistributedDataSourceController::SaveLocalData(const sptr<CallBase> &call, DistributedDataType type)
 {
     if (call == nullptr) {
         return;
     }
-    if (call->GetCallDirection() != CallDirection::CALL_DIRECTION_IN) {
-        return;
-    }
     std::string num = call->GetAccountNumber();
-    std::string name(call->GetCallerInfo().name);
-    std::string location = call->GetNumberLocation();
     if (num.empty()) {
         TELEPHONY_LOGE("invalid phone num");
         return;
     }
-    if (!name.empty()) {
-        SaveMtLocalData(num, DistributedDataType::NAME, name);
+    std::string name(call->GetCallerInfo().name);
+    if (type == DistributedDataType::NAME && !name.empty()) {
+        SaveLocalData(num, type, name);
     }
-    if (!location.empty() && location != "default") {
-        SaveMtLocalData(num, DistributedDataType::LOCATION, location);
+    std::string location = call->GetNumberLocation();
+    if (type == DistributedDataType::LOCATION && !location.empty() && location != "default") {
+        SaveLocalData(num, type, location);
     }
 }
 
-void DistributedDataSourceController::HandleMtDataQueryMsg(const cJSON *msg)
+void DistributedDataSourceController::HandleDataQueryMsg(const cJSON *msg)
 {
     int32_t type = static_cast<int32_t>(DistributedDataType::MAX);
     if (!GetInt32Value(msg, DISTRIBUTED_ITEM_TYPE, type)) {
@@ -139,15 +140,15 @@ void DistributedDataSourceController::HandleMtDataQueryMsg(const cJSON *msg)
     }
 
     std::lock_guard<ffrt::mutex> lock(mutex_);
-    auto iter = queryMtInfo_.find(num);
-    if (iter == queryMtInfo_.end()) {
-        queryMtInfo_[num] = DISTRIBUTED_DATA_TYPE_OFFSET_BASE << static_cast<uint32_t>(type);
+    auto iter = queryInfo_.find(num);
+    if (iter == queryInfo_.end()) {
+        queryInfo_[num] = DISTRIBUTED_DATA_TYPE_OFFSET_BASE << static_cast<uint32_t>(type);
     } else {
-        queryMtInfo_[num] |= DISTRIBUTED_DATA_TYPE_OFFSET_BASE << static_cast<uint32_t>(type);
+        queryInfo_[num] |= DISTRIBUTED_DATA_TYPE_OFFSET_BASE << static_cast<uint32_t>(type);
     }
 }
 
-std::string DistributedDataSourceController::CreateMtDataRspMsg(DistributedMsgType msgType, uint32_t itemType,
+std::string DistributedDataSourceController::CreateDataRspMsg(DistributedMsgType msgType, uint32_t itemType,
     const std::string &num, const std::string &name, const std::string &value)
 {
     std::string data = "";
@@ -184,16 +185,16 @@ std::string DistributedDataSourceController::CreateMtDataRspMsg(DistributedMsgTy
     return data;
 }
 
-void DistributedDataSourceController::SendMtLocalDataRsp()
+void DistributedDataSourceController::SendLocalDataRsp()
 {
     if (session_ == nullptr || !session_->IsReady()) {
         TELEPHONY_LOGI("session not ready");
         return;
     }
     std::lock_guard<ffrt::mutex> lock(mutex_);
-    for (auto queryIter = queryMtInfo_.begin(); queryIter != queryMtInfo_.end(); queryIter++) {
-        auto localIter = localMtInfo_.find(queryIter->first);
-        if (localIter == localMtInfo_.end()) {
+    for (auto queryIter = queryInfo_.begin(); queryIter != queryInfo_.end(); queryIter++) {
+        auto localIter = localInfo_.find(queryIter->first);
+        if (localIter == localInfo_.end()) {
             continue; // local info not contain queried number
         }
         uint32_t queryInfo = queryIter->second;
@@ -209,10 +210,10 @@ void DistributedDataSourceController::SendMtLocalDataRsp()
             TELEPHONY_LOGI("send response data, type %{public}d", type);
             std::string data;
             if (type == static_cast<uint32_t>(DistributedDataType::NAME)) {
-                data = CreateMtDataRspMsg(DistributedMsgType::MT_DATA_RSP, type, queryIter->first,
+                data = CreateDataRspMsg(DistributedMsgType::DATA_RSP, type, queryIter->first,
                     DISTRIBUTED_ITEM_NAME, typeIter->second);
             } else if (type == static_cast<uint32_t>(DistributedDataType::LOCATION)) {
-                data = CreateMtDataRspMsg(DistributedMsgType::MT_DATA_RSP, type, queryIter->first,
+                data = CreateDataRspMsg(DistributedMsgType::DATA_RSP, type, queryIter->first,
                     DISTRIBUTED_ITEM_LOCATION, typeIter->second);
             }
             if (data.empty()) {

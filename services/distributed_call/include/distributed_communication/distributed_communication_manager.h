@@ -60,6 +60,7 @@ public:
     bool IsAudioOnSink();
     void SetMuted(bool isMute);
     void MuteRinger();
+    void ProcessCallInfo(const sptr<CallBase> &call, DistributedDataType type);
 
     void NewCallCreated(sptr<CallBase> &call) override;
     void CallDestroyed(const DisconnectedDetails &details) override;
