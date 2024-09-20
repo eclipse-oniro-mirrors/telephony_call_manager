@@ -634,7 +634,7 @@ int32_t CallObjectManager::GetCallNum(TelCallState callState, bool isIncludeVoip
             }
         }
     }
-    TELEPHONY_LOGI("callState:%{public}d, num:%{public}d", callState, num);
+    TELEPHONY_LOGD("callState:%{public}d, num:%{public}d", callState, num);
     return num;
 }
 

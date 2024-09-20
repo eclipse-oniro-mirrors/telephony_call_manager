@@ -1528,7 +1528,7 @@ bool NapiCallManager::MatchTwoNumberParameters(napi_env env, const napi_value pa
 
 bool NapiCallManager::MatchTwoStringParameter(napi_env env, const napi_value parameters[], const size_t parameterCount)
 {
-    TELEPHONY_LOGI("Match parmameter count %{public}zu", parameterCount);
+    TELEPHONY_LOGD("Match parmameter count %{public}zu", parameterCount);
     switch (parameterCount) {
         case TWO_VALUE_LIMIT:
             return NapiUtil::MatchParameters(env, parameters, { napi_string, napi_string });
@@ -3025,7 +3025,7 @@ napi_value NapiCallManager::SetVoIPCallState(napi_env env, napi_callback_info in
 
 napi_value NapiCallManager::HasVoiceCapability(napi_env env, napi_callback_info)
 {
-    TELEPHONY_LOGI("napi_call HasVoiceCapability");
+    TELEPHONY_LOGD("napi_call HasVoiceCapability");
     napi_value result = nullptr;
     napi_get_boolean(env, DelayedSingleton<CallManagerClient>::GetInstance()->HasVoiceCapability(), &result);
     return result;
@@ -4980,7 +4980,7 @@ void NapiCallManager::RegisterCallBack()
 napi_value NapiCallManager::HandleAsyncWork(napi_env env, AsyncContext *context, std::string workName,
     napi_async_execute_callback execute, napi_async_complete_callback complete)
 {
-    TELEPHONY_LOGI("HandleAsyncWork start workName = %{public}s", workName.c_str());
+    TELEPHONY_LOGD("HandleAsyncWork start workName = %{public}s", workName.c_str());
     napi_value result = nullptr;
     if (context->callbackRef == nullptr) {
         napi_create_promise(env, &context->deferred, &result);
