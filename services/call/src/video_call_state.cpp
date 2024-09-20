@@ -379,7 +379,7 @@ int32_t VideoSendState::ReceiveUpdateCallMediaModeResponse(CallMediaModeInfo &im
             }
             if (GetCallVideoState(ImsCallMode::CALL_MODE_AUDIO_ONLY) != nullptr) {
                 GetCallVideoState(ImsCallMode::CALL_MODE_AUDIO_ONLY)->
-                SetVideoUpdateStatus(VideoUpdateStatus::STATUS_NONE);
+                    SetVideoUpdateStatus(VideoUpdateStatus::STATUS_NONE);
                 break;
             } else {
                 TELEPHONY_LOGE("CALL_MODE_AUDIO_ONLY is nullptr");
