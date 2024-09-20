@@ -23,7 +23,7 @@ namespace OHOS {
 namespace Telephony {
 CallAbilityCallbackDeathRecipient::CallAbilityCallbackDeathRecipient()
 {
-    TELEPHONY_LOGI("create CallAbilityCallbackDeathRecipient instance");
+    TELEPHONY_LOGD("create CallAbilityCallbackDeathRecipient instance");
 }
 
 CallAbilityCallbackDeathRecipient::~CallAbilityCallbackDeathRecipient()
