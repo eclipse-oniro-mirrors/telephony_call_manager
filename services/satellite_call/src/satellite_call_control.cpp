@@ -236,7 +236,10 @@ int32_t SatelliteCallControl::SetSatelliteCallCountDownProcessing()
         }
         for (auto satelliteCallId : satelliteCallIdList) {
             sptr<CallBase> satelliteCall = CallObjectManager::GetOneCallObject(satelliteCallId);
-            if (satelliteCall->GetTelCallState() == TelCallState::CALL_STATUS_INCOMING ||
+            if (satelliteCall == nullptr) {
+                TELEPHONY_LOGE("satelliteCall is nullptr");
+                return;
+            } else if (satelliteCall->GetTelCallState() == TelCallState::CALL_STATUS_INCOMING ||
                 satelliteCall->GetTelCallState() == TelCallState::CALL_STATUS_WAITING) {
                 DelayedSingleton<CallControlManager>::GetInstance()->RejectCall(satelliteCallId,
                     true, u"satellitecalldurationlimit");

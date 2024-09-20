@@ -377,8 +377,15 @@ int32_t VideoSendState::ReceiveUpdateCallMediaModeResponse(CallMediaModeInfo &im
                 TELEPHONY_LOGE("error occurs when switch call");
                 return ret;
             }
-            GetCallVideoState(ImsCallMode::CALL_MODE_AUDIO_ONLY)->SetVideoUpdateStatus(VideoUpdateStatus::STATUS_NONE);
-            break;
+            if (GetCallVideoState(ImsCallMode::CALL_MODE_AUDIO_ONLY) != nullptr) {
+                GetCallVideoState(ImsCallMode::CALL_MODE_AUDIO_ONLY)->SetVideoUpdateStatus(VideoUpdateStatus::STATUS_NONE);
+                break;
+            } else { 
+                TELEPHONY_LOGE("CALL_MODE_AUDIO_ONLY is nullptr");
+                ret = CALL_ERR_VIDEO_ILLEGAL_MEDIA_TYPE;
+                break;
+            }
+            
         default:
             TELEPHONY_LOGE("unknown media type.");
             ret = CALL_ERR_VIDEO_ILLEGAL_MEDIA_TYPE;
