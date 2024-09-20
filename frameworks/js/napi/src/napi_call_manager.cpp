@@ -4980,7 +4980,7 @@ void NapiCallManager::RegisterCallBack()
 napi_value NapiCallManager::HandleAsyncWork(napi_env env, AsyncContext *context, std::string workName,
     napi_async_execute_callback execute, napi_async_complete_callback complete)
 {
-    TELEPHONY_LOGD("HandleAsyncWork start workName = %{public}s", workName.c_str());
+    TELEPHONY_LOGI("HandleAsyncWork start workName = %{public}s", workName.c_str());
     napi_value result = nullptr;
     if (context->callbackRef == nullptr) {
         napi_create_promise(env, &context->deferred, &result);
