@@ -31,6 +31,7 @@ public:
     void OnDeviceOffline(const std::string &devId, const std::string &devName, AudioDeviceType devType) override {}
     void OnCallCreated(const sptr<CallBase> &call, const std::string &devId) override;
     void OnCallDestroyed() override;
+    void ProcessCallInfo(const sptr<CallBase> &call, DistributedDataType type) override;
     void OnConnected() override;
 
 protected:
@@ -38,10 +39,10 @@ protected:
 
 private:
     void ConnectRemote(const std::string &devId);
-    void CheckMtLocalData(const sptr<CallBase> &call);
-    std::string CreateMtDataReqMsg(DistributedMsgType msgType, uint32_t itemType, const std::string &num);
-    void SendMtDataQueryReq();
-    void HandleMtDataQueryRsp(const cJSON *msg);
+    void CheckLocalData(const sptr<CallBase> &call, DistributedDataType type);
+    std::string CreateDataReqMsg(DistributedMsgType msgType, uint32_t itemType, const std::string &num);
+    void SendDataQueryReq();
+    void HandleDataQueryRsp(const cJSON *msg);
     void UpdateCallName(sptr<CallBase> &call, const cJSON *msg);
     void UpdateCallLocation(sptr<CallBase> &call, const cJSON *msg);
     void ReportCallInfo(const sptr<CallBase> &call);
@@ -51,7 +52,7 @@ private:
 
 private:
     ffrt::mutex mutex_{};
-    std::map<std::string, uint32_t> queryMtInfo_{};
+    std::map<std::string, uint32_t> queryInfo_{};
 };
 
 } // namespace Telephony

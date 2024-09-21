@@ -237,6 +237,14 @@ void DistributedCommunicationManager::MuteRinger()
     }
 }
 
+void DistributedCommunicationManager::ProcessCallInfo(const sptr<CallBase> &call, DistributedDataType type)
+{
+    std::lock_guard<ffrt::mutex> lock(mutex_);
+    if (dataController_ != nullptr) {
+        dataController_->ProcessCallInfo(call, type);
+    }
+}
+
 void DistributedCommunicationManager::NewCallCreated(sptr<CallBase> &call)
 {
     if (call == nullptr) {

@@ -25,8 +25,9 @@ namespace Telephony {
 void DistributedDataSinkController::OnCallCreated(const sptr<CallBase> &call, const std::string &devId)
 {
     ConnectRemote(devId);
-    CheckMtLocalData(call);
-    SendMtDataQueryReq();
+    CheckLocalData(call, DistributedDataType::NAME);
+    CheckLocalData(call, DistributedDataType::LOCATION);
+    SendDataQueryReq();
 }
 
 void DistributedDataSinkController::OnCallDestroyed()
@@ -41,12 +42,18 @@ void DistributedDataSinkController::OnCallDestroyed()
     }
 
     std::lock_guard<ffrt::mutex> lock(mutex_);
-    queryMtInfo_.clear();
+    queryInfo_.clear();
+}
+
+void DistributedDataSinkController::ProcessCallInfo(const sptr<CallBase> &call, DistributedDataType type)
+{
+    CheckLocalData(call, type);
+    SendDataQueryReq();
 }
 
 void DistributedDataSinkController::OnConnected()
 {
-    SendMtDataQueryReq();
+    SendDataQueryReq();
     SendCurrentDataQueryReq();
 }
 
@@ -56,8 +63,8 @@ void DistributedDataSinkController::HandleRecvMsg(int32_t msgType, const cJSON *
         return;
     }
     switch (msgType) {
-        case static_cast<int32_t>(DistributedMsgType::MT_DATA_RSP):
-            HandleMtDataQueryRsp(msg);
+        case static_cast<int32_t>(DistributedMsgType::DATA_RSP):
+            HandleDataQueryRsp(msg);
             break;
         case static_cast<int32_t>(DistributedMsgType::CURRENT_DATA_RSP):
             HandleCurrentDataQueryRsp(msg);
@@ -83,12 +90,9 @@ void DistributedDataSinkController::ConnectRemote(const std::string &devId)
     }
 }
 
-void DistributedDataSinkController::CheckMtLocalData(const sptr<CallBase> &call)
+void DistributedDataSinkController::CheckLocalData(const sptr<CallBase> &call, DistributedDataType type)
 {
     if (call == nullptr) {
-        return;
-    }
-    if (call->GetCallDirection() != CallDirection::CALL_DIRECTION_IN) {
         return;
     }
     std::string num = call->GetAccountNumber();
@@ -99,21 +103,23 @@ void DistributedDataSinkController::CheckMtLocalData(const sptr<CallBase> &call)
         return;
     }
     uint32_t queryInfo = 0;
-    if (name.empty()) {
+    if (type == DistributedDataType::NAME && name.empty()) {
         queryInfo |= DISTRIBUTED_DATA_TYPE_OFFSET_BASE << static_cast<uint32_t>(DistributedDataType::NAME);
     }
-    if (location.empty() || location == "default") {
+    if (type == DistributedDataType::LOCATION && (location.empty() || location == "default")) {
         queryInfo |= DISTRIBUTED_DATA_TYPE_OFFSET_BASE << static_cast<uint32_t>(DistributedDataType::LOCATION);
     }
     TELEPHONY_LOGI("query distributed data info %{public}d", queryInfo);
 
     std::lock_guard<ffrt::mutex> lock(mutex_);
-    if (queryMtInfo_.find(num) == queryMtInfo_.end()) {
-        queryMtInfo_[num] = queryInfo;
+    if (queryInfo_.find(num) == queryInfo_.end()) {
+        queryInfo_[num] = queryInfo;
+    } else {
+        queryInfo_[num] |= queryInfo;
     }
 }
 
-std::string DistributedDataSinkController::CreateMtDataReqMsg(DistributedMsgType msgType, uint32_t itemType,
+std::string DistributedDataSinkController::CreateDataReqMsg(DistributedMsgType msgType, uint32_t itemType,
     const std::string &num)
 {
     std::string data = "";
@@ -146,14 +152,14 @@ std::string DistributedDataSinkController::CreateMtDataReqMsg(DistributedMsgType
     return data;
 }
 
-void DistributedDataSinkController::SendMtDataQueryReq()
+void DistributedDataSinkController::SendDataQueryReq()
 {
     if (session_ == nullptr || !session_->IsReady()) {
         TELEPHONY_LOGI("session not ready");
         return;
     }
     std::lock_guard<ffrt::mutex> lock(mutex_);
-    for (auto iter = queryMtInfo_.begin(); iter != queryMtInfo_.end(); iter++) {
+    for (auto iter = queryInfo_.begin(); iter != queryInfo_.end(); iter++) {
         uint32_t queryInfo = iter->second;
         for (auto type = static_cast<uint32_t>(DistributedDataType::NAME);
              type < static_cast<uint32_t>(DistributedDataType::MAX); type++) {
@@ -161,17 +167,17 @@ void DistributedDataSinkController::SendMtDataQueryReq()
                 continue;
             }
             TELEPHONY_LOGI("send request data, type %{public}d", type);
-            auto data = CreateMtDataReqMsg(DistributedMsgType::MT_DATA_REQ, type, iter->first);
+            auto data = CreateDataReqMsg(DistributedMsgType::DATA_REQ, type, iter->first);
             if (data.empty()) {
                 continue;
             }
             session_->SendMsg(data.c_str(), static_cast<uint32_t>(data.length()));
+            iter->second &= ~(DISTRIBUTED_DATA_TYPE_OFFSET_BASE << type);
         }
-        iter->second = 0;
     }
 }
 
-void DistributedDataSinkController::HandleMtDataQueryRsp(const cJSON *msg)
+void DistributedDataSinkController::HandleDataQueryRsp(const cJSON *msg)
 {
     int32_t type = static_cast<int32_t>(DistributedDataType::MAX);
     if (!GetInt32Value(msg, DISTRIBUTED_ITEM_TYPE, type)) {

@@ -46,6 +46,7 @@
 #include "call_superprivacy_control_manager.h"
 #include "notification_helper.h"
 #include "call_earthquake_alarm_locator.h"
+#include "distributed_communication_manager.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -449,6 +450,8 @@ void CallStatusManager::SetContactInfo(sptr<CallBase> &call, std::string phoneNu
         };
         QueryCallerInfo(contactInfo, phoneNum);
         callObjectPtr->SetCallerInfo(contactInfo);
+        DelayedSingleton<DistributedCommunicationManager>::GetInstance()->ProcessCallInfo(callObjectPtr,
+            DistributedDataType::NAME);
     });
 }
 
@@ -659,6 +662,9 @@ int32_t CallStatusManager::DialingHandle(const CallDetailInfo &info)
     if (call == nullptr) {
         TELEPHONY_LOGE("CreateNewCall failed!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    if (IsDcCallConneceted()) {
+        SetContactInfo(call, std::string(info.phoneNum));
     }
     AddOneCallObject(call);
     auto callRequestEventHandler = DelayedSingleton<CallRequestEventHandlerHelper>::GetInstance();
@@ -1322,6 +1328,8 @@ sptr<CallBase> CallStatusManager::CreateNewCall(const CallDetailInfo &info, Call
         TELEPHONY_LOGI("NumberLocationUpdate start");
         ffrt::submit([=]() {
             DelayedSingleton<CallNumberUtils>::GetInstance()->NumberLocationUpdate(callPtr);
+            DelayedSingleton<DistributedCommunicationManager>::GetInstance()->ProcessCallInfo(callPtr,
+                DistributedDataType::LOCATION);
             if (info.state == TelCallState::CALL_STATUS_DIALING) {
                 DelayedSingleton<CallNumberUtils>::GetInstance()->YellowPageAndMarkUpdate(callPtr);
             }

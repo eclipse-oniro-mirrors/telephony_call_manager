@@ -43,8 +43,8 @@ enum class DistributedDataType : int32_t {
 
 enum class DistributedMsgType : int32_t {
     UNKNOWN = -1,
-    MT_DATA_REQ = 100,
-    MT_DATA_RSP = 101,
+    DATA_REQ = 100,
+    DATA_RSP = 101,
     MUTE_RINGER = 102,
     MUTE = 104,
     CURRENT_DATA_REQ = 105,
@@ -62,6 +62,7 @@ public:
 
     virtual void OnCallCreated(const sptr<CallBase> &call, const std::string &devId) = 0;
     virtual void OnCallDestroyed() = 0;
+    virtual void ProcessCallInfo(const sptr<CallBase> &call, DistributedDataType type) = 0;
 
     void SetMuted(bool isMute);
     void MuteRinger();

@@ -31,25 +31,26 @@ public:
     void OnDeviceOffline(const std::string &devId, const std::string &devName, AudioDeviceType devType) override;
     void OnCallCreated(const sptr<CallBase> &call, const std::string &devId) override;
     void OnCallDestroyed() override;
+    void ProcessCallInfo(const sptr<CallBase> &call, DistributedDataType type) override;
     void OnConnected() override;
 
 protected:
     void HandleRecvMsg(int32_t msgType, const cJSON *msg) override;
 
 private:
-    void SaveMtLocalData(const std::string &num, DistributedDataType type, const std::string &data);
-    void SaveMtLocalData(const sptr<CallBase> &call);
-    void HandleMtDataQueryMsg(const cJSON *msg);
-    std::string CreateMtDataRspMsg(DistributedMsgType msgType, uint32_t itemType, const std::string &num,
+    void SaveLocalData(const std::string &num, DistributedDataType type, const std::string &data);
+    void SaveLocalData(const sptr<CallBase> &call, DistributedDataType type);
+    void HandleDataQueryMsg(const cJSON *msg);
+    std::string CreateDataRspMsg(DistributedMsgType msgType, uint32_t itemType, const std::string &num,
         const std::string &name, const std::string &value);
-    void SendMtLocalDataRsp();
+    void SendLocalDataRsp();
     std::string CreateCurrentDataRspMsg(const std::string &num, bool isMuted, int32_t direction);
     void HandleCurrentDataQueryMsg(const cJSON *msg);
 
 private:
     ffrt::mutex mutex_{};
-    std::map<std::string, std::map<uint32_t, std::string>> localMtInfo_{};
-    std::map<std::string, uint32_t> queryMtInfo_{};
+    std::map<std::string, std::map<uint32_t, std::string>> localInfo_{};
+    std::map<std::string, uint32_t> queryInfo_{};
 };
 
 } // namespace Telephony
