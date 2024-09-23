@@ -236,8 +236,8 @@ void AudioDeviceManager::RemoveAudioDeviceList(const std::string &address, Audio
         TELEPHONY_LOGI("add Earpiece device success");
     }
     sptr<CallBase> liveCall = CallObjectManager::GetForegroundLiveCall();
-    if (liveCall != nullptr && (liveCall->GetVideoStateType == VideoStateType::TYPE_VIDEO ||
-        liveCall->GetCallType == CallType::TYPE_SATELLITE)) {
+    if (liveCall != nullptr && (liveCall->GetVideoStateType() == VideoStateType::TYPE_VIDEO ||
+        liveCall->GetCallType() == CallType::TYPE_SATELLITE)) {
         DelayedSingleton<AudioControlManager>::GetInstance()->UpdateDeviceTypeForVideoOrSatelliteCall();
     }
     ReportAudioDeviceInfo();
