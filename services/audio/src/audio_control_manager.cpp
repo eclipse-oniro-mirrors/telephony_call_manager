@@ -230,7 +230,7 @@ void AudioControlManager::UpdateDeviceTypeForVideoOrSatelliteCall()
 void AudioControlManager::UpdateDeviceTypeForCrs()
 {
     sptr<CallBase> incomingCall = CallObjectManager::GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_RINGING);
-    if (incomingCall == nullptr) {
+    if (incomingCall == nullptr || incomingCall->GetAnsweredCall()) {
         return;
     }
     if (incomingCall->GetCrsType() == CRS_TYPE) {
@@ -548,6 +548,8 @@ bool AudioControlManager::PlayRingtone()
             }
             return false;
         }
+        TELEPHONY_LOGI("type_crs but not play ringtone");
+        return false;
     }
     if (ring_->Play(info.accountId) != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("play ringtone failed");
@@ -820,17 +822,6 @@ bool AudioControlManager::IsEmergencyCallExists()
     std::lock_guard<std::mutex> lock(mutex_);
     for (auto call : totalCalls_) {
         if (call->GetEmergencyState()) {
-            return true;
-        }
-    }
-    return false;
-}
-
-bool AudioControlManager::IsSatelliteExists()
-{
-    std::lock_guard<std::mutex> lock(mutex_);
-    for (auto call : totalCalls_) {
-        if (call->GetCallType() == CallType::TYPE_SATELLITE) {
             return true;
         }
     }

@@ -86,7 +86,6 @@ public:
     bool IsSoundPlaying();
     bool StopSoundtone();
     bool PlaySoundtone();
-    bool IsSatelliteExists();
     void PlayCallEndedTone(CallEndedType type);
 
 private:

@@ -42,7 +42,7 @@ CallBase::CallBase(DialParaInfo &info)
       callEndedType_(CallEndedType::UNKNOWN), callBeginTime_(0), callCreateTime_(0), callEndTime_(0), ringBeginTime_(0),
       ringEndTime_(0), answerType_(CallAnswerType::CALL_ANSWER_MISSED), accountId_(info.accountId),
       crsType_(info.crsType), originalCallType_(info.originalCallType), isMuted_(false), numberLocation_("default"),
-      blockReason_(0), isEccContact_(false), celiaCallType_(-1), extras_(info.extras)
+      blockReason_(0), isEccContact_(false), celiaCallType_(-1), extras_(info.extras), isAnswered_(false)
 {
     (void)memset_s(&contactInfo_, sizeof(ContactInfo), 0, sizeof(ContactInfo));
     (void)memset_s(&numberMarkInfo_, sizeof(NumberMarkInfo), 0, sizeof(NumberMarkInfo));
@@ -57,7 +57,8 @@ CallBase::CallBase(DialParaInfo &info, AppExecFwk::PacMap &extras)
       isSpeakerphoneOn_(false), callEndedType_(CallEndedType::UNKNOWN), callBeginTime_(0), callCreateTime_(0),
       callEndTime_(0), ringBeginTime_(0), ringEndTime_(0), answerType_(CallAnswerType::CALL_ANSWER_MISSED),
       accountId_(info.accountId), crsType_(info.crsType), originalCallType_(info.originalCallType), isMuted_(false),
-      numberLocation_("default"), blockReason_(0), isEccContact_(false), celiaCallType_(-1), extras_(info.extras)
+      numberLocation_("default"), blockReason_(0), isEccContact_(false), celiaCallType_(-1), extras_(info.extras),
+      isAnswered_(false)
 {
     (void)memset_s(&contactInfo_, sizeof(ContactInfo), 0, sizeof(ContactInfo));
     (void)memset_s(&numberMarkInfo_, sizeof(NumberMarkInfo), 0, sizeof(NumberMarkInfo));
@@ -150,6 +151,7 @@ void CallBase::GetCallAttributeBaseInfo(CallAttributeInfo &info)
         info.originalCallType = originalCallType_;
         info.isEccContact = isEccContact_;
         info.celiaCallType = celiaCallType_;
+        info.isAnswered = isAnswered_;
         if (memcpy_s(info.extras, kMaxNumberLen, extras_.c_str(), extras_.length()) != EOK) {
             TELEPHONY_LOGE("memcpy_s extras fail");
         }
@@ -584,6 +586,18 @@ std::string CallBase::GetAccountNumber()
 void CallBase::SetAccountNumber(const std::string accountNumber)
 {
     accountNumber_ = accountNumber;
+}
+
+bool CallBase::IsAnsweredCall()
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    return isAnswered_;
+}
+
+void CallBase::SetAnsweredCall(bool isAnswered)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    isAnswered_ = isAnswered;
 }
 
 int32_t CallBase::SetSpeakerphoneOn(bool speakerphoneOn)
