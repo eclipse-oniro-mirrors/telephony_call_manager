@@ -223,10 +223,10 @@ int32_t CallControlManager::AnswerCall(int32_t callId, int32_t videoState)
     if (CurrentIsSuperPrivacyMode(callId, videoState)) {
         return TELEPHONY_SUCCESS;
     }
+    call->SetAnsweredCall(true);
     AnswerHandlerForSatelliteOrVideoCall(call, videoState);
     TELEPHONY_LOGI("report answered state");
     NotifyCallStateUpdated(call, TelCallState::CALL_STATUS_INCOMING, TelCallState::CALL_STATUS_ANSWERED);
-    call->SetAnsweredCall(true);
     CarrierAndVoipConflictProcess(callId, TelCallState::CALL_STATUS_ANSWERED);
     if (VoIPCallState_ != CallStateToApp::CALL_STATE_IDLE) {
             TELEPHONY_LOGW("VoIP call is active, waiting for VoIP to disconnect");
