@@ -230,7 +230,7 @@ void AudioControlManager::UpdateDeviceTypeForVideoOrSatelliteCall()
 void AudioControlManager::UpdateDeviceTypeForCrs()
 {
     sptr<CallBase> incomingCall = CallObjectManager::GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_RINGING);
-    if (incomingCall == nullptr || incomingCall->GetAnsweredCall()) {
+    if (incomingCall == nullptr || incomingCall->IsAnsweredCall()) {
         return;
     }
     if (incomingCall->GetCrsType() == CRS_TYPE) {
