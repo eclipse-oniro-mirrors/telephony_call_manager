@@ -23,7 +23,6 @@ group("fuzztest") {
   deps += [ "callabilitycallback_fuzzer:fuzztest" ]
   deps += [ "callmanagerservicestub_fuzzer:fuzztest" ]
   deps += [ "callnotification_fuzzer:fuzztest" ]
-  deps += [ "callvoiceassistantmanager_fuzzer:fuzztest" ]
   deps += [ "controlcamera_fuzzer:fuzztest" ]
   deps += [ "dialcall_fuzzer:fuzztest" ]
   deps += [ "formatphonenumber_fuzzer:fuzztest" ]
