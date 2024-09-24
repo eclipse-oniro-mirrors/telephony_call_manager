@@ -20,6 +20,7 @@
 
 #include "call_ability_connection.h"
 #include "call_setting_ability_connection.h"
+#include "display_info.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -31,6 +32,7 @@ public:
     int32_t &videoState, int32_t &dialType, int32_t &dialScene, int32_t &callType, bool isVideo);
     bool DialogConnectAnswerPrivpacyModeExtension(const std::string &dialogReason,
         int32_t &callId, int32_t &videoState, bool isVideo);
+    void DialogCallingPrivacyModeExtension(Rosen::FoldStatus foldStatus);
 private:
     bool DialogConnectExtensionAbility(const AAFwk::Want &want, const std::string commandStr);
     bool CallSettingDialogConnectExtensionAbility(const AAFwk::Want &want, const std::string commandStr);
@@ -39,6 +41,7 @@ private:
 	int32_t &accountId, int32_t &videoState, int32_t &dialType, int32_t &dialScene, int32_t &callType, bool isVideo);
     std::string BuildStartAnswerPrivpacyModeCommand(const std::string &dialogReason,
         int32_t &callId, int32_t &videoState, bool isVideo);
+    std::string BuildCallingPrivacyModeCommand(int32_t &videoState);
 };
 } // namespace Telephony
 } // namespace OHOS

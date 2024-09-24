@@ -106,10 +106,20 @@ void CallBroadcastSubscriber::HighTempLevelChangedBroadcast(const EventFwk::Comm
 
 void CallBroadcastSubscriber::ConnectCallUiSuperPrivacyModeBroadcast(const EventFwk::CommonEventData &data)
 {
+    bool isInCall = data.GetWant().GetBoolParam("isInCall", false);
+    bool isHangup = data.GetWant().GetBoolParam("isHangup", false);
+    if (isInCall && isHangup) {
+        DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance()->CloseAllCall();
+        return;
+    }
     int32_t videoState = data.GetWant().GetIntParam("videoState", -1);
     bool isAnswer = data.GetWant().GetBoolParam("isAnswer", false);
     DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance()->SetOldSuperPrivacyMode();
     DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance()->SetIsChangeSuperPrivacyMode(true);
+    if (isInCall) {
+        DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance()->CloseSuperPrivacyMode();
+        return;
+    }
     TELEPHONY_LOGI("CallUiSuperPrivacyModeBroadcast isAnswer:%{public}d", isAnswer);
     if (isAnswer) {
         int32_t callId = data.GetWant().GetIntParam("callId", -1);

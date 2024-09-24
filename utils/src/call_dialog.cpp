@@ -20,6 +20,10 @@
 #include "nlohmann/json.hpp"
 #include "telephony_log_wrapper.h"
 #include <securec.h>
+#include "display_manager.h"
+#include "fold_status_manager.h"
+#include "call_object_manager.h"
+#include "call_superprivacy_control_manager.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -138,6 +142,28 @@ bool CallDialog::DialogConnectAnswerPrivpacyModeExtension(const std::string &dia
     return true;
 }
 
+void CallDialog::DialogCallingPrivacyModeExtension(Rosen::FoldStatus foldStatus)
+{
+    if (foldStatus != Rosen::FoldStatus::FOLDED
+        || !DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance()->GetCurrentIsSuperPrivacyMode()) {
+        return;
+    }
+    sptr<CallBase> foregroundCall = CallObjectManager::GetForegroundCall(false);
+    if (foregroundCall == nullptr || foregroundCall->GetTelCallState() == TelCallState::CALL_STATUS_INCOMING) {
+        return;
+    }
+    int32_t videoState = static_cast<int32_t>(foregroundCall->GetVideoStateType());
+    std::string commandStr = BuildCallingPrivacyModeCommand(videoState);
+    AAFwk::Want want;
+    std::string bundleName = "com.ohos.sceneboard";
+    std::string abilityName = "com.ohos.sceneboard.systemdialog";
+    want.SetElementName(bundleName, abilityName);
+    bool connectResult = CallSettingDialogConnectExtensionAbility(want, commandStr);
+    if (!connectResult) {
+        TELEPHONY_LOGE("DialogCallingPrivacyModeExtension failed!");
+    }
+}
+
 std::string CallDialog::BuildStartPrivpacyModeCommand(const std::string &dialogReason, std::u16string &number,
     int32_t &accountId, int32_t &videoState, int32_t &dialType, int32_t &dialScene, int32_t &callType, bool isVideo)
 {
@@ -154,6 +180,8 @@ std::string CallDialog::BuildStartPrivpacyModeCommand(const std::string &dialogR
     root["callType"] = callType;
     root["isAnswer"] = false;
     root["isVideo"] = isVideo;
+    root["isFold"] = FoldStatusManager::IsSmallFoldDevice()
+        && Rosen::DisplayManager::GetInstance().GetFoldStatus() == Rosen::FoldStatus::FOLDED;
     std::string startCommand = root.dump();
     TELEPHONY_LOGI("startCommand is: %{public}s", startCommand.c_str());
     return startCommand;
@@ -171,6 +199,25 @@ std::string CallDialog::BuildStartAnswerPrivpacyModeCommand(const std::string &d
     root["videoState"] = videoState;
     root["isAnswer"] = true;
     root["isVideo"] = isVideo;
+    root["isFold"] = FoldStatusManager::IsSmallFoldDevice()
+        && Rosen::DisplayManager::GetInstance().GetFoldStatus() == Rosen::FoldStatus::FOLDED;
+    std::string startCommand = root.dump();
+    TELEPHONY_LOGI("startCommand is: %{public}s", startCommand.c_str());
+    return startCommand;
+}
+
+std::string CallDialog::BuildCallingPrivacyModeCommand(int32_t &videoState)
+{
+    nlohmann::json root;
+    std::string uiExtensionType = "sysDialog/common";
+    std::string dialogReason = "SUPER_PRIVACY_MODE";
+    root["ability.want.params.uiExtensionType"] = uiExtensionType;
+    root["sysDialogZOrder"] = SOURCE_SCREENLOCKED;
+    root["dialogReason"] = dialogReason;
+    root["videoState"] = videoState;
+    root["isInCall"] = true;
+    root["isAnswer"] = false;
+    root["isFold"] = true;
     std::string startCommand = root.dump();
     TELEPHONY_LOGI("startCommand is: %{public}s", startCommand.c_str());
     return startCommand;

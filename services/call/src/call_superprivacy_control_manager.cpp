@@ -19,6 +19,8 @@
 #include "call_control_manager.h"
 #include "syspara/parameters.h"
 #include "super_privacy_manager_client.h"
+#include "display_manager.h"
+#include "display_info.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -162,9 +164,9 @@ void CallSuperPrivacyControlManager::RestoreSuperPrivacyMode()
     TELEPHONY_LOGE("RestoreSuperPrivacyMode oldPrivpacy:%{public}d", oldPrivpacy);
     if (privpacyMode != oldPrivpacy) {
         SetIsChangeSuperPrivacyMode(false);
-        if (oldPrivpacy == static_cast<int32_t>(CallSuperPrivacyModeType::ALWAYS_ON)) {
-            int32_t privacy = SuperPrivacyManagerClient::GetInstance().
-                SetSuperPrivacyMode(static_cast<int32_t>(CallSuperPrivacyModeType::ALWAYS_ON), SOURCE_CALL);
+        if (oldPrivpacy == static_cast<int32_t>(CallSuperPrivacyModeType::ALWAYS_ON)
+            || oldPrivpacy == static_cast<int32_t>(CallSuperPrivacyModeType::ON_WHEN_FOLDED)) {
+            int32_t privacy = SuperPrivacyManagerClient::GetInstance().SetSuperPrivacyMode(oldPrivpacy, SOURCE_CALL);
             TELEPHONY_LOGE("RestoreSuperPrivacyMode ret privacy:%{public}d", privacy);
         }
     }
@@ -175,6 +177,12 @@ bool CallSuperPrivacyControlManager::GetCurrentIsSuperPrivacyMode()
     int32_t privpacyMode = system::GetIntParameter(SUPER_PRIVACY_MODE_PARAM_KEY.c_str(), -1);
     TELEPHONY_LOGE("GetCurrentIsSuperPrivacyMode privpacyMode:%{public}d", privpacyMode);
     if (privpacyMode == static_cast<int32_t>(CallSuperPrivacyModeType::ALWAYS_ON)) {
+        return true;
+    }
+    Rosen::FoldStatus foldStatus = Rosen::DisplayManager::GetInstance().GetFoldStatus();
+    if (privpacyMode == static_cast<int32_t>(CallSuperPrivacyModeType::ON_WHEN_FOLDED)
+        && foldStatus == Rosen::FoldStatus::FOLDED) {
+        TELEPHONY_LOGI("GetCurrentIsSuperPrivacyMode ON_WHEN_FOLDED");
         return true;
     }
     return false;
