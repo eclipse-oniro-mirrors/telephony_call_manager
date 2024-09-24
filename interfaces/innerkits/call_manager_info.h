@@ -315,11 +315,6 @@ struct CallAttributeInfo {
      * Indicates the extras information.
      */
     char extras[kMaxNumberLen + 1] = { 0 };
-
-    /**
-     * Indicates whether the call is answered
-     */
-    bool isAnswered = false;
 };
 
 /**

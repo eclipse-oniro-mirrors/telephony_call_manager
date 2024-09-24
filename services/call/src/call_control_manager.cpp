@@ -217,7 +217,7 @@ int32_t CallControlManager::AnswerCall(int32_t callId, int32_t videoState)
         TELEPHONY_LOGE("call is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    if (call->GetCrsType() == CRS_TYPE) {
+    if (call->GetCrsType() == CRS_TYPE && static_cast<VideoStateType>(videoState) != VideoStateType::TYPE_VIDEO) {
         DelayedSingleton<AudioProxy>::GetInstance()->SetSpeakerDevActive(false);
     }
     if (CurrentIsSuperPrivacyMode(callId, videoState)) {
@@ -229,11 +229,11 @@ int32_t CallControlManager::AnswerCall(int32_t callId, int32_t videoState)
     NotifyCallStateUpdated(call, TelCallState::CALL_STATUS_INCOMING, TelCallState::CALL_STATUS_ANSWERED);
     CarrierAndVoipConflictProcess(callId, TelCallState::CALL_STATUS_ANSWERED);
     if (VoIPCallState_ != CallStateToApp::CALL_STATE_IDLE) {
-            TELEPHONY_LOGW("VoIP call is active, waiting for VoIP to disconnect");
-            AnsweredCallQueue_.hasCall = true;
-            AnsweredCallQueue_.callId = callId;
-            AnsweredCallQueue_.videoState = videoState;
-            return TELEPHONY_SUCCESS;
+        TELEPHONY_LOGW("VoIP call is active, waiting for VoIP to disconnect");
+        AnsweredCallQueue_.hasCall = true;
+        AnsweredCallQueue_.callId = callId;
+        AnsweredCallQueue_.videoState = videoState;
+        return TELEPHONY_SUCCESS;
     }
     int32_t ret = AnswerCallPolicy(callId, videoState);
     if (ret != TELEPHONY_SUCCESS) {

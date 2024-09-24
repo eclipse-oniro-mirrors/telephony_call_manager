@@ -151,7 +151,6 @@ void CallBase::GetCallAttributeBaseInfo(CallAttributeInfo &info)
         info.originalCallType = originalCallType_;
         info.isEccContact = isEccContact_;
         info.celiaCallType = celiaCallType_;
-        info.isAnswered = isAnswered_;
         if (memcpy_s(info.extras, kMaxNumberLen, extras_.c_str(), extras_.length()) != EOK) {
             TELEPHONY_LOGE("memcpy_s extras fail");
         }
