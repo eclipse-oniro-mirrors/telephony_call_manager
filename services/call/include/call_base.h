@@ -135,6 +135,8 @@ public:
     CallDirection GetCallDirection();
     int32_t GetAccountId();
     void SetExtras(std::string extras);
+    bool IsAnsweredCall();
+    void SetAnsweredCall(bool isAnswered);
 
 protected:
     int32_t callId_;
@@ -184,6 +186,7 @@ private:
     bool isEccContact_;
     int32_t celiaCallType_;
     std::string extras_;
+    bool isAnswered_;
 };
 } // namespace Telephony
 } // namespace OHOS
