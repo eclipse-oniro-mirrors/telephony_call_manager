@@ -27,10 +27,6 @@ std::shared_ptr<LocationSubscriber> LocationSubscriber::subscriber_ = nullptr;
 sptr<ISystemAbilityStatusChange> LocationSystemAbilityListener::statusChangeListener_ = nullptr;
 const int DataShareSwitchState::INVALID_VALUE = -1;
 const int DataShareSwitchState::TELEPHONY_SUCCESS = 0;
-const int DataShareSwitchState::TELEPHONY_ERR_LOCAL_PTR_NULL = 1;
-const int DataShareSwitchState::TELEPHONY_ERR_DATABASE_READ_FAIL = 2;
-const int DataShareSwitchState::TELEPHONY_ERR_DATABASE_WRITE_FAIL = 3;
-const int DataShareSwitchState::COW_COUNT_NULL = 4;
 constexpr const char *SETTINGS_DATASHARE_URI =
     "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true";
 constexpr const char *SETTINGS_DATASHARE_EXT_URI = "datashare:///com.ohos.settingsdata.DataAbility";
@@ -50,7 +46,7 @@ bool LocationSubscriber::Subscriber(void)
         LocationSubscriber::subscriber_ = std::make_shared<LocationSubscriber>(subscribeInfo);
         EventFwk::CommonEventManager::SubscribeCommonEvent(LocationSubscriber::subscriber_);
     }
-    TELEPHONY_LOGI("create SubscribeCommonEvent LocationSubscriber");
+    TELEPHONY_LOGI("create subscribe commonEvent");
     return true;
 }
 
@@ -61,41 +57,36 @@ void LocationSubscriber::OnReceiveEvent(const EventFwk::CommonEventData &eventDa
     std::string switchState = want.GetStringParam(LocationSubscriber::SWITCH_STATE);
 
     if (action == LocationSubscriber::SWITCH_STATE_CHANGE_EVENTS) {
-        auto engine = MyLocationEngine::GetInstance();
-        if (engine == nullptr) {
-            TELEPHONY_LOGI("engine == nullptr LocationSubscriber");
-            return;
-        }
         if (switchState == LocationSubscriber::SWITCH_STATE_START) {
-            TELEPHONY_LOGI("start location LocationSubscriber");
-            engine->SetValue();
-            engine->RegisterLocationChange();
-            engine->RegisterSwitchCallback();
+            TELEPHONY_LOGI("start location listen");
+            MyLocationEngine::GetInstance()->SetValue();
+            MyLocationEngine::GetInstance()->RegisterLocationChange();
+            MyLocationEngine::GetInstance()->RegisterSwitchCallback();
         };
         if (switchState == LocationSubscriber::SWITCH_STATE_STOP) {
-            TELEPHONY_LOGI("stop location LocationSubscriber");
-            engine->UnregisterLocationChange();
-            engine->UnRegisterSwitchCallback();
-            engine->OnInit();
+            TELEPHONY_LOGI("stop location listen");
+            MyLocationEngine::GetInstance()->UnregisterLocationChange();
+            MyLocationEngine::GetInstance()->UnRegisterSwitchCallback();
+            MyLocationEngine::GetInstance()->OnInit();
         };
     };
 }
 
 DataShareSwitchState::DataShareSwitchState()
 {
-    datashareHelper_ = CreateDataShareHelper(OHOS::DEVICE_STANDBY_SERVICE_SYSTEM_ABILITY_ID);
+    datashareHelper_ = CreateDataShareHelper(OHOS::TELEPHONY_CALL_MANAGER_SYS_ABILITY_ID);
 }
 
 std::shared_ptr<DataShare::DataShareHelper> DataShareSwitchState::CreateDataShareHelper(int systemAbilityId)
 {
     sptr<ISystemAbilityManager> saManager = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (saManager == nullptr) {
-        TELEPHONY_LOGE("DataShareSwitchState failed.");
+        TELEPHONY_LOGE("get SA manager failed");
         return nullptr;
     }
     sptr<IRemoteObject> remote = saManager->GetSystemAbility(systemAbilityId);
     if (remote == nullptr) {
-        TELEPHONY_LOGE("DataShareSwitchState Service Failed.");
+        TELEPHONY_LOGE("get SA failed");
         return nullptr;
     }
     return DataShare::DataShareHelper::Creator(remote, SETTINGS_DATASHARE_URI, SETTINGS_DATASHARE_EXT_URI);
@@ -104,116 +95,145 @@ std::shared_ptr<DataShare::DataShareHelper> DataShareSwitchState::CreateDataShar
 int32_t DataShareSwitchState::QueryData(Uri& uri, const std::string& key, std::string& value)
 {
     if (datashareHelper_ == nullptr) {
-        TELEPHONY_LOGE("DataShareSwitchState query error, datashareHelper_ is nullptr");
-        return DataShareSwitchState::TELEPHONY_ERR_LOCAL_PTR_NULL;
+        TELEPHONY_LOGE("query error, datashareHelper_ is nullptr");
+        return INVALID_VALUE;
     }
     std::vector<std::string> columns;
     DataShare::DataSharePredicates predicates;
     predicates.EqualTo(SETTINGS_DATA_COLUMN_KEYWORD, key);
     auto result = datashareHelper_->Query(uri, predicates, columns);
+    datashareHelper_->Release();
     if (result == nullptr) {
-        TELEPHONY_LOGE("DataShareSwitchState query error, result is nullptr");
-        return DataShareSwitchState::TELEPHONY_ERR_LOCAL_PTR_NULL;
+        TELEPHONY_LOGE("query error, result is nullptr");
+        return INVALID_VALUE;
     }
-
     int rowCount = 0;
     result->GetRowCount(rowCount);
     if (rowCount == 0) {
-        TELEPHONY_LOGI("DataShareSwitchState query success, but rowCount is 0");
-        return DataShareSwitchState::COW_COUNT_NULL;
-    }
-
-    if (result->GoToFirstRow() != DataShare::E_OK) {
-        TELEPHONY_LOGE("DataShareSwitchState query error, go to first row error");
+        TELEPHONY_LOGI("query success, but rowCount is 0");
         result->Close();
-        return DataShareSwitchState::TELEPHONY_ERR_DATABASE_READ_FAIL;
+        return INVALID_VALUE;
+    }
+    if (result->GoToFirstRow() != DataShare::E_OK) {
+        TELEPHONY_LOGE("query error, go to first row error");
+        result->Close();
+        return INVALID_VALUE;
     }
     int columnIndex = 0;
     result->GetColumnIndex(SETTINGS_DATA_COLUMN_VALUE, columnIndex);
     result->GetString(columnIndex, value);
     result->Close();
-    datashareHelper_->Release();
-    TELEPHONY_LOGI("DataShareSwitchState query success");
-    return DataShareSwitchState::TELEPHONY_SUCCESS;
+    TELEPHONY_LOGI("query success");
+    return TELEPHONY_SUCCESS;
 }
+
+bool DataShareSwitchState::RegisterListenSettingsKey(std::string key, bool isReg,
+    sptr<AAFwk::IDataAbilityObserver> callback)
+{
+    if (datashareHelper_ == nullptr) {
+        TELEPHONY_LOGE("datashareHelper is nullptr");
+        return false;
+    }
+    if (callback == nullptr) {
+        TELEPHONY_LOGE("callback is nullptr");
+        return false;
+    }
+    std::string uri = DEFAULT_URI + key;
+    if (isReg) {
+        TELEPHONY_LOGI("register listen %{public}s finish", key.c_str());
+        datashareHelper_->RegisterObserver(OHOS::Uri(uri), callback);
+    } else {
+        TELEPHONY_LOGI("unregister listen %{public}s finish", key.c_str());
+        datashareHelper_->UnregisterObserver(OHOS::Uri(uri), callback);
+    }
+    datashareHelper_->Release();
+    return true;
+}
+
+std::map<int32_t, bool> LocationSystemAbilityListener::systemAbilityStatus = {
+    {OHOS::DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID, false},
+    {OHOS::LOCATION_LOCATOR_SA_ID, false},
+    {OHOS::LOCATION_NOPOWER_LOCATING_SA_ID, false}
+};
 
 void LocationSystemAbilityListener::OnAddSystemAbility(int32_t systemAbilityId, const std::string &deviceId)
 {
-    static int firstboot = 0;
-    TELEPHONY_LOGI("location service are add LocationSubscriber systemID = %{public}d", systemAbilityId);
-    if (!CheckInputSysAbilityId(systemAbilityId)) {
-        TELEPHONY_LOGE("added SA is invalid! LocationSubscriber");
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (startService) {
+        TELEPHONY_LOGE("service alredy started");
         return;
     }
-    if (systemAbilityId != OHOS::DEVICE_STANDBY_SERVICE_SYSTEM_ABILITY_ID &&
+    if (systemAbilityId != OHOS::DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID &&
         systemAbilityId != OHOS::LOCATION_LOCATOR_SA_ID &&
         systemAbilityId != OHOS::LOCATION_NOPOWER_LOCATING_SA_ID) {
-        TELEPHONY_LOGI("location service are add LocationSubscriber systemID = %{public}d", systemAbilityId);
+        TELEPHONY_LOGE("add other SA failed, id = %{public}d", systemAbilityId);
         return;
+    };
+    TELEPHONY_LOGI("added SA success, id = %{public}d", systemAbilityId);
+    systemAbilityStatus[systemAbilityId] = GetSystemAbility(systemAbilityId);
+    for (auto& systemId : systemAbilityStatus) {
+        if (!systemId.second) {
+            TELEPHONY_LOGE("SA id %{public}d, status is false", systemId.first);
+            return;
+        }
     }
-    if (!GetSystemAbility(OHOS::DEVICE_STANDBY_SERVICE_SYSTEM_ABILITY_ID))  return;
-    if (!GetSystemAbility(OHOS::LOCATION_LOCATOR_SA_ID))  return;
-    if (!GetSystemAbility(OHOS::LOCATION_NOPOWER_LOCATING_SA_ID))  return;
-    if (firstboot == 0) {
-        MyLocationEngine::BootComplete();
-        firstboot++;
-        TELEPHONY_LOGI("first boot LocationSubscriber");
+    startService = true;
+    std::string stateValue = MyLocationEngine::INITIAL_FIRST_VALUE;
+    auto alarmSwitchState = MyLocationEngine::IsSwitchOn(LocationSubscriber::SWITCH_STATE_KEY, stateValue);
+    if (stateValue == MyLocationEngine::INITIAL_FIRST_VALUE) {
+        TELEPHONY_LOGI("start OOBE complete");
+        MyLocationEngine::OOBEComplete();
+    } else {
+        TELEPHONY_LOGI("start boot complete");
+        MyLocationEngine::BootComplete(alarmSwitchState);
     }
+    SystemAbilitySubscriber();
+    statusChangeListener_ = nullptr;
 }
 
 bool LocationSystemAbilityListener::GetSystemAbility(int32_t systemAbilityId)
 {
     sptr<ISystemAbilityManager> sysAbilityMgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (sysAbilityMgr == nullptr) {
-        TELEPHONY_LOGE("system ability manager is nullptr. LocationSubscriber");
+        TELEPHONY_LOGE("SA manager is nullptr");
         return false;
     }
     sptr<IRemoteObject> remote = sysAbilityMgr->GetSystemAbility(systemAbilityId);
     if (remote == nullptr) {
-        TELEPHONY_LOGE("check systemAbilityId return is nullptr. LocationSubscriber %{public}d", systemAbilityId);
+        TELEPHONY_LOGE("get SA %{public}d failed", systemAbilityId);
         return false;
     }
-    TELEPHONY_LOGE("check systemAbilityId return is not nullptr. LocationSubscriber %{public}d", systemAbilityId);
+    TELEPHONY_LOGI("get SA %{public}d success", systemAbilityId);
     return true;
 }
 
 void LocationSystemAbilityListener::OnRemoveSystemAbility(int32_t systemAbilityId, const std::string &deviceId)
 {
-    TELEPHONY_LOGI("location service are remove LocationSubscriber systemID = %{public}d", systemAbilityId);
-    GetSystemAbility(OHOS::DEVICE_STANDBY_SERVICE_SYSTEM_ABILITY_ID);
-    GetSystemAbility(OHOS::LOCATION_LOCATOR_SA_ID);
-    GetSystemAbility(OHOS::LOCATION_NOPOWER_LOCATING_SA_ID);
+    TELEPHONY_LOGI("remove SA %{public}d", systemAbilityId);
 }
 
 bool LocationSystemAbilityListener::SystemAbilitySubscriber()
 {
-    statusChangeListener_ = new (std::nothrow) LocationSystemAbilityListener();
     if (statusChangeListener_ == nullptr) {
-        TELEPHONY_LOGI("failed to create statusChangeListener LocationSubscriber");
-        return false;
+        statusChangeListener_ = sptr<LocationSystemAbilityListener>::MakeSptr();
     }
     auto managerPtr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (managerPtr == nullptr) {
-        TELEPHONY_LOGE("get system ability manager error LocationSubscriber");
+        TELEPHONY_LOGE("get SA manager error");
         return false;
     }
-    int32_t ret1 = managerPtr->SubscribeSystemAbility(OHOS::DEVICE_STANDBY_SERVICE_SYSTEM_ABILITY_ID,
-        statusChangeListener_);
-        if (ret1 != TELEPHONY_SUCCESS) {
-            TELEPHONY_LOGE("failed to subscribe 1914 service SA!");
+    int32_t ret = -1;
+    for (auto& systemId : systemAbilityStatus) {
+        if (!systemId.second) {
+            ret = managerPtr->SubscribeSystemAbility(systemId.first, statusChangeListener_);
+        } else {
+            ret = managerPtr->UnSubscribeSystemAbility(systemId.first, statusChangeListener_);
         }
-    TELEPHONY_LOGE("success to subscribe 1914 service SA! LocationSubscriber");
-    int32_t ret2 = managerPtr->SubscribeSystemAbility(OHOS::LOCATION_LOCATOR_SA_ID, statusChangeListener_);
-        if (ret2 != TELEPHONY_SUCCESS) {
-            TELEPHONY_LOGE("failed to subscribe 2802 service SA!");
-        }
-    TELEPHONY_LOGE("success to subscribe 2802 service SA! LocationSubscriber");
-    int32_t ret3 = managerPtr->SubscribeSystemAbility(OHOS::LOCATION_NOPOWER_LOCATING_SA_ID, statusChangeListener_);
-        if (ret3 != TELEPHONY_SUCCESS) {
-            TELEPHONY_LOGE("failed to subscribe 2805 service SA!");
-        }
-    TELEPHONY_LOGE("success to subscribe 2805 service SA! LocationSubscriber");
+        std::string isSub = systemId.second ? "unsubscribe" : "subscribe";
+        TELEPHONY_LOGI("%{public}s SA %{public}d ret code is %{public}d", isSub.c_str(), systemId.first, ret);
+    }
     return true;
 }
+
 } // namespace Telephony
 } // namespace OHOS

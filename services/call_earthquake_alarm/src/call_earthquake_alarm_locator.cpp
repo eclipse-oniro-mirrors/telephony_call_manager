@@ -14,6 +14,7 @@
  */
 
 #include "call_earthquake_alarm_locator.h"
+#include "ffrt.h"
 
 using namespace std;
 using namespace OHOS::Telephony;
@@ -22,8 +23,6 @@ using namespace OHOS::EventFwk;
 namespace OHOS {
 namespace Telephony {
 using namespace AppExecFwk;
-OHOS::Uri MyLocationEngine::uri_q(string("datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?")
-    + string("Proxy=true&key=auto_send_earthquake_alarm_switch"));
 const int MyLocationEngine::DISTANCE_INTERVAL = 10000; /** 10 kilometers */
 const int MyLocationEngine::TIMER_INTERVAL = 0;
 const std::string MyLocationEngine::EMERGENCY_DEVICE_ID = "";
@@ -33,24 +32,22 @@ const std::string MyLocationEngine::PARAMETERS_VALUE = "call_manager_earthquake_
 const char* MyLocationEngine::PARAMETERS_KEY = "callerName";
 const std::string MyLocationEngine::ALARM_SWITCH_ON = "1";
 const std::string MyLocationEngine::ALARM_SWITCH_OFF = "0";
-std::string MyLocationEngine::INITIAL_FIRST_VALUE = "FIRST_NO_VALUE";
-const int EmergencyCallConnectCallback::CONNECT_SUCCESS = 0;
+std::string MyLocationEngine::INITIAL_FIRST_VALUE = "invalid";
 std::shared_ptr<MyLocationEngine> MyLocationEngine::mylocator = std::make_shared<MyLocationEngine>();
 std::shared_ptr<MyLocationEngine> MyLocationEngine::GetInstance()
 {
-    if (MyLocationEngine::mylocator != nullptr) {
-        std::shared_ptr<MyLocationEngine> instance_ = MyLocationEngine::mylocator;
-        return instance_;
+    if (mylocator != nullptr) {
+        return mylocator;
     }
-    return nullptr;
+    return std::make_shared<MyLocationEngine>();
 }
 
 void MyLocationEngine::OnInit()
 {
-    if (this->requestConfig != nullptr)     this->requestConfig = nullptr;
-    if (this->locatorCallback_ != nullptr)  this->locatorCallback_ = nullptr;
-    if (this->locatorImpl != nullptr)       this->locatorImpl = nullptr;
-    if (this->switchCallback_ != nullptr)   this->switchCallback_ = nullptr;
+    this->requestConfig = nullptr;
+    this->locatorCallback_ = nullptr;
+    this->locatorImpl = nullptr;
+    this->switchCallback_ = nullptr;
 }
 
 MyLocationEngine::MyLocationEngine() {}
@@ -67,31 +64,31 @@ void MyLocationEngine::SetValue()
     if (this->locatorImpl == nullptr) {
         this->locatorImpl = Location::Locator::GetInstance();
         if (this->locatorImpl == nullptr) {
-            TELEPHONY_LOGI("MyLocationEngine locatorCallback_ is null");
+            TELEPHONY_LOGE("locatorCallback_ is null");
             return;
         }
         locationEnabled_ = locatorImpl->IsLocationEnabled();
-        TELEPHONY_LOGI("MyLocationEngine locatorImpl is not nullptr");
+        TELEPHONY_LOGI("locatorImpl is not nullptr");
     }
     if (this->requestConfig == nullptr) {
-    this->requestConfig = std::make_unique<RequestConfig>(Location::SCENE_NO_POWER);
-    this->requestConfig->SetTimeInterval(TIMER_INTERVAL);
-    this->requestConfig->SetDistanceInterval(DISTANCE_INTERVAL);
-    TELEPHONY_LOGI("MyLocationEngine requestConfig initial");
+        this->requestConfig = std::make_unique<RequestConfig>(Location::SCENE_NO_POWER);
+        this->requestConfig->SetTimeInterval(TIMER_INTERVAL);
+        this->requestConfig->SetDistanceInterval(DISTANCE_INTERVAL);
+        TELEPHONY_LOGI("requestConfig initial");
     }
 }
 
 void MyLocationEngine::RegisterLocationChange()
 {
     if (locatorImpl == nullptr) {
-        TELEPHONY_LOGI("MyLocationEngine locatorImpl is null");
+        TELEPHONY_LOGE("locatorImpl is null");
         return;
     }
     if (locatorCallback_ == nullptr) {
         locatorCallback_ =
             sptr<MyLocationEngine::MyLocationCallBack>(new (std::nothrow) MyLocationEngine::MyLocationCallBack());
         if (locatorCallback_ == nullptr) {
-            TELEPHONY_LOGI("MyLocationEngine locatorCallback_ is null");
+            TELEPHONY_LOGE("locatorCallback_ is null");
             return;
         }
     }
@@ -102,7 +99,7 @@ void MyLocationEngine::RegisterLocationChange()
     }
     auto callback = sptr<Location::ILocatorCallback>(locatorCallback_);
     int code = this->locatorImpl->StartLocatingV9(this->requestConfig, callback);
-    TELEPHONY_LOGI("MyLocationEngine startListencode = %{public}d.", code);
+    TELEPHONY_LOGI("start listen location change code = %{public}d.", code);
 }
 
 void MyLocationEngine::UnregisterLocationChange()
@@ -112,13 +109,13 @@ void MyLocationEngine::UnregisterLocationChange()
     }
     auto callback = sptr<Location::ILocatorCallback>(locatorCallback_);
     auto code = this->locatorImpl->StopLocatingV9(callback);
-    TELEPHONY_LOGI("MyLocationEngine stopListencdode = %{public}d.", code);
+    TELEPHONY_LOGI("stopListencdode = %{public}d.", code);
 }
 
 void MyLocationEngine::RegisterSwitchCallback()
 {
     if (locatorImpl == nullptr) {
-        TELEPHONY_LOGI("MyLocationEnginek locatorImpl is null.");
+        TELEPHONY_LOGE("locatorImpl is null.");
         return;
     }
     auto engine = MyLocationEngine::GetInstance();
@@ -126,22 +123,22 @@ void MyLocationEngine::RegisterSwitchCallback()
         switchCallback_ = sptr<MyLocationEngine::MySwitchCallback>(
             new (std::nothrow) MyLocationEngine::MySwitchCallback(engine));
         if (switchCallback_ == nullptr) {
-            TELEPHONY_LOGI("MyLocationEngine callback is null.");
+            TELEPHONY_LOGE("callback is null.");
             return;
         }
     }
     auto code = locatorImpl->RegisterSwitchCallbackV9(switchCallback_->AsObject());
-    TELEPHONY_LOGI("MyLocationEngine code = %{public}d. success", code);
+    TELEPHONY_LOGI("register switch callback code = %{public}d. success", code);
 }
 
 void MyLocationEngine::UnRegisterSwitchCallback()
 {
     if (locatorImpl == nullptr) {
-        TELEPHONY_LOGI("MyLocationEngine locatorImpl is null.");
+        TELEPHONY_LOGE("locatorImpl is null.");
         return;
     }
     if (switchCallback_ != nullptr) {
-        TELEPHONY_LOGI("MyLocationEngine lUnregisterSwitchCallback");
+        TELEPHONY_LOGE("unregister switch callback");
         locatorImpl->UnregisterSwitchCallbackV9(switchCallback_->AsObject());
     }
 }
@@ -149,20 +146,19 @@ void MyLocationEngine::UnRegisterSwitchCallback()
 void MyLocationEngine::LocationSwitchChange()
 {
     if (locatorImpl == nullptr) {
-        TELEPHONY_LOGI("MyLocationEngine locatorImpl is null.");
+        TELEPHONY_LOGE("locatorImpl is null.");
         return;
     }
     bool locationEnabled = locationEnabled_;
     locationEnabled_ = locatorImpl->IsLocationEnabled();
     if (!locationEnabled && locationEnabled_) {
-        TELEPHONY_LOGI("MyLocationEngine Enable location.[%{public}d][%{public}d]", locationEnabled, locationEnabled_);
+        TELEPHONY_LOGI("Enable location.[%{public}d][%{public}d]", locationEnabled, locationEnabled_);
         RegisterLocationChange();
     } else if (locationEnabled && !locationEnabled_) {
-        TELEPHONY_LOGI("MyLocationEngine Disable location.[%{public}d][%{public}d]",
-            locationEnabled, locationEnabled_);
+        TELEPHONY_LOGI("Disable location.[%{public}d][%{public}d]", locationEnabled, locationEnabled_);
         UnregisterLocationChange();
     } else {
-        TELEPHONY_LOGI("MyLocationEngine Location switch not change[%{public}d]", locationEnabled_);
+        TELEPHONY_LOGI("Location switch not change[%{public}d]", locationEnabled_);
     }
 }
 
@@ -170,7 +166,7 @@ int32_t MyLocationEngine::MyLocationCallBack::OnRemoteRequest(uint32_t code, Mes
     MessageOption &option)
 {
     if (data.ReadInterfaceToken() != GetDescriptor()) {
-        TELEPHONY_LOGI("MyLocationEngine invalid token.");
+        TELEPHONY_LOGE("invalid token.");
         return -1;
     }
     switch (code) {
@@ -193,7 +189,7 @@ int32_t MyLocationEngine::MyLocationCallBack::OnRemoteRequest(uint32_t code, Mes
             break;
         }
     }
-    TELEPHONY_LOGI("MyLocationEngine locationreport code = %{public}d.", code);
+    TELEPHONY_LOGI("locationreport code = %{public}d.", code);
     return 0;
 }
 
@@ -201,32 +197,27 @@ MyLocationEngine::MyLocationCallBack::MyLocationCallBack() {}
 
 void MyLocationEngine::MyLocationCallBack::OnLocatingStatusChange(const int status)
 {
-    TELEPHONY_LOGI("MyLocationEngine ListenStatus = %{public}d.", status);
+    TELEPHONY_LOGI("listen status = %{public}d", status);
 }
 
 void MyLocationEngine::MyLocationCallBack::OnErrorReport(const int errorCode) {}
 
 void MyLocationEngine::MyLocationCallBack::OnLocationReport(const std::unique_ptr<Location::Location>& location)
 {
-    TELEPHONY_LOGI("MyLocationEngine ListenLocation is success");
-    MyLocationEngine::ConnectAbility();
+    TELEPHONY_LOGI("location report");
+    MyLocationEngine::ConnectAbility(MyLocationEngine::PARAMETERS_VALUE);
 }
 
-void MyLocationEngine::BootComplete()
+void MyLocationEngine::BootComplete(bool switchState)
 {
-    if (!MyLocationEngine::IsSwitchOn()) {
-        TELEPHONY_LOGI("the switchstate is close MyLocationEngine");
+    if (!switchState) {
+        TELEPHONY_LOGE("the alarm switch is close");
         return;
     }
-    TELEPHONY_LOGI("the switchstate is open MyLocationEngine");
-    auto engine = MyLocationEngine::GetInstance();
-    if (engine == nullptr) {
-        TELEPHONY_LOGI("engine == nullptr MyLocationEngine");
-        return;
-    }
-    engine->SetValue();
-    engine->RegisterLocationChange();
-    engine->RegisterSwitchCallback();
+    TELEPHONY_LOGI("the alarm switch is open");
+    MyLocationEngine::GetInstance()->SetValue();
+    MyLocationEngine::GetInstance()->RegisterLocationChange();
+    MyLocationEngine::GetInstance()->RegisterSwitchCallback();
 }
 
 MyLocationEngine::MySwitchCallback::MySwitchCallback(std::shared_ptr<MyLocationEngine> locationUpdate)
@@ -245,7 +236,7 @@ int MyLocationEngine::MySwitchCallback::OnRemoteRequest(uint32_t code, MessagePa
     MessageOption &option)
 {
     if (data.ReadInterfaceToken() != GetDescriptor()) {
-        TELEPHONY_LOGI("MyLocationEngine SwitchCallback invalid token.");
+        TELEPHONY_LOGE("switchCallback invalid token.");
         return -1;
     }
     switch (code) {
@@ -255,56 +246,98 @@ int MyLocationEngine::MySwitchCallback::OnRemoteRequest(uint32_t code, MessagePa
             break;
         }
         default: {
-            TELEPHONY_LOGI("MyLocationEngine  receive error code:%{public}u", code);
+            TELEPHONY_LOGI("receive error code:%{public}u", code);
             break;
         }
     }
     return 0;
 }
 
-bool MyLocationEngine::IsSwitchOn()
+bool MyLocationEngine::IsSwitchOn(std::string key, std::string& value)
 {
     auto datashareHelper = std::make_shared<DataShareSwitchState>();
-    std::string switch_state = INITIAL_FIRST_VALUE;
-    int resp = datashareHelper->QueryData(MyLocationEngine::uri_q, LocationSubscriber::SWITCH_STATE_KEY, switch_state);
-    TELEPHONY_LOGI("MyLocationEngine switch_state = %{public}s ", switch_state.c_str());
-    if (resp == DataShareSwitchState::TELEPHONY_SUCCESS && switch_state == ALARM_SWITCH_ON) {
-        return true;
-    }
-    if (resp == DataShareSwitchState::TELEPHONY_SUCCESS && switch_state == ALARM_SWITCH_OFF) {
+    OHOS::Uri uri(datashareHelper->DEFAULT_URI + key);
+    int resp = datashareHelper->QueryData(uri, key, value);
+    TELEPHONY_LOGI("query %{public}s is %{public}s", key.c_str(), value.c_str());
+    if (resp != DataShareSwitchState::TELEPHONY_SUCCESS || value == ALARM_SWITCH_OFF) {
         return false;
     }
-    return false;
+    return true;
+}
+
+std::map<std::string, sptr<AAFwk::IDataAbilityObserver>> MyLocationEngine::settingsCallbacks = {};
+void MyLocationEngine::OOBEComplete()
+{
+    std::string stateValue = INITIAL_FIRST_VALUE;
+    for (auto& oobeKey : OOBESwitchObserver::keyStatus) {
+        oobeKey.second = MyLocationEngine::IsSwitchOn(oobeKey.first, stateValue);
+        if (!oobeKey.second) {
+            settingsCallbacks[oobeKey.first] = sptr<OOBESwitchObserver>::MakeSptr(oobeKey.first);
+            auto datashareHelper = std::make_shared<DataShareSwitchState>();
+            datashareHelper->RegisterListenSettingsKey(oobeKey.first, true, settingsCallbacks[oobeKey.first]);
+        }
+    }
+};
+
+std::map<std::string, bool> OOBESwitchObserver::keyStatus = {
+    {"device_provisioned", false},
+    {"user_setup_complete", false},
+    {"is_ota_finished", false}
+};
+
+std::mutex OOBESwitchObserver::mutex_;
+void OOBESwitchObserver::OnChange()
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (!keyStatus[mKey]) {
+        keyStatus[mKey] = MyLocationEngine::IsSwitchOn(mKey, mValue);
+    }
+    for (auto& oobeKey : keyStatus) {
+        if (!oobeKey.second) {
+            TELEPHONY_LOGE("%{public}s is trun off", oobeKey.first.c_str());
+            return;
+        }
+    }
+    mValue = MyLocationEngine::INITIAL_FIRST_VALUE;
+    if (MyLocationEngine::IsSwitchOn(LocationSubscriber::SWITCH_STATE_KEY, mValue)) {
+        TELEPHONY_LOGI("the alarm switch is open");
+        MyLocationEngine::ConnectAbility("call_manager_oobe_earthquake_warning_switch_on");
+    }
+    ffrt::submit([&]() {
+        for (auto& oobeKey : MyLocationEngine::settingsCallbacks) {
+            auto datashareHelper = std::make_shared<DataShareSwitchState>();
+            datashareHelper->RegisterListenSettingsKey(oobeKey.first, false, oobeKey.second);
+            oobeKey.second = nullptr;
+        }
+        TELEPHONY_LOGI("unregister listen finish");
+    });
 }
 
 sptr<AAFwk::IAbilityConnection> EmergencyCallConnectCallback::connectCallback_ = nullptr;
-void MyLocationEngine::ConnectAbility()
+void MyLocationEngine::ConnectAbility(std::string value)
 {
     AAFwk::Want want;
     AppExecFwk::ElementName element(EMERGENCY_DEVICE_ID, EMERGENCY_BUNDLE_NAME, EMERGENCY_ABILITY_NAME);
     want.SetElement(element);
-    want.SetParam(PARAMETERS_KEY, PARAMETERS_VALUE);
+    want.SetParam(PARAMETERS_KEY, value);
     if (EmergencyCallConnectCallback::connectCallback_ == nullptr) {
-        EmergencyCallConnectCallback::connectCallback_ = new EmergencyCallConnectCallback();
+        EmergencyCallConnectCallback::connectCallback_ = sptr<EmergencyCallConnectCallback>::MakeSptr();
     }
     int32_t userId = -1;
-    AAFwk::AbilityManagerClient::GetInstance()->ConnectAbility(want, EmergencyCallConnectCallback::connectCallback_,
-        userId);
-    TELEPHONY_LOGI("Connect emergencycommunication ability MyLocationEngine");
+    auto ret = AAFwk::AbilityManagerClient::GetInstance()->ConnectAbility(want,
+        EmergencyCallConnectCallback::connectCallback_, userId);
+    TELEPHONY_LOGI("Connect emergencycall ability %{public}d", ret);
 }
 
 void EmergencyCallConnectCallback::OnAbilityConnectDone(const AppExecFwk::ElementName &element,
     const sptr<IRemoteObject> &remoteObject, int resultCode)
 {
-    TELEPHONY_LOGI("connect callui result code: %{public}d", resultCode);
-    if (resultCode == CONNECT_SUCCESS) {
-        TELEPHONY_LOGI("connect emergencycommunication result success");
-    }
+    TELEPHONY_LOGI("connect result code: %{public}d", resultCode);
 }
 
 void EmergencyCallConnectCallback::OnAbilityDisconnectDone(const AppExecFwk::ElementName &element, int resultCode)
 {
-    TELEPHONY_LOGI("disconnect emergencycommunication result code: %{public}d", resultCode);
+    TELEPHONY_LOGI("disconnect result code: %{public}d", resultCode);
 }
 } // namespace Telephony
 } // namespace OHOS
