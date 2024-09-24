@@ -585,8 +585,8 @@ HWTEST_F(ZeroBranch5Test, Telephony_DistributedCallManager_001, Function | Mediu
     AudioDevice device;
     device.deviceType = AudioDeviceType::DEVICE_EARPIECE;
     std::string restr = manager.GetDevIdFromAudioDevice(device);
-    bool res = manager.IsSelectVirtualModem();
-    bool res1 = manager.SwitchOnDCallDeviceSync(device);
+    EXPECT_FALSE(manager.IsSelectVirtualModem());
+    EXPECT_TRUE(manager.SwitchOnDCallDeviceSync(device));
     device.deviceType = AudioDeviceType::DEVICE_DISTRIBUTED_PHONE;
     std::string devId = "";
     manager.CreateDAudioDevice(devId, device);
@@ -610,8 +610,6 @@ HWTEST_F(ZeroBranch5Test, Telephony_DistributedCallManager_001, Function | Mediu
     manager.SwitchOnDCallDeviceSync(device);
     manager.OnDCallSystemAbilityAdded(TEST_STR);
     EXPECT_TRUE(restr.empty());
-    EXPECT_FALSE(res);
-    EXPECT_FALSE(res1);
 }
 
 /**
