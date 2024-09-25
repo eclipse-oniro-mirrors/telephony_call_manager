@@ -23,8 +23,8 @@
 
 namespace OHOS {
 namespace Telephony {
-class BluetoothCallClient : public std::enable_shared_from_this<BluetoothCallClient> {
-    DECLARE_DELAYED_SINGLETON(BluetoothCallClient)
+class BluetoothCallClient : public std::DelayedRefSingleton<BluetoothCallClient> {
+    DECLARE_DELAYED_REF_SINGLETON(BluetoothCallClient)
 public:
     void Init();
     void UnInit();
@@ -200,6 +200,8 @@ public:
      * @return Returns call info list.
      */
     std::vector<CallAttributeInfo> GetCurrentCallList(int32_t slotId);
+private:
+    std::mutex Mutex_;
 };
 } // namespace Telephony
 } // namespace OHOS

@@ -27,7 +27,6 @@ namespace OHOS {
 namespace Telephony {
 using namespace Security::AccessToken;
 using Security::AccessToken::AccessTokenID;
-std::shared_ptr<BluetoothCallClient> g_bluetoothCallPtr = nullptr;
 
 HapInfoParams testInfoParamsCase = {
     .userID = 1,
@@ -145,18 +144,14 @@ private:
 int32_t BluetoothCallTest::Init()
 {
     AccessToken token;
-    g_bluetoothCallPtr = DelayedSingleton<BluetoothCallClient>::GetInstance();
-    if (g_bluetoothCallPtr == nullptr) {
-        std::cout << "g_bluetoothCallPtr is nullptr" << std::endl;
-        return TELEPHONY_ERROR;
-    }
-    g_bluetoothCallPtr->Init();
+    BluetoothCallClient &bluetoothCallClient = DelayedRefSingleton<BluetoothCallClient>::GetInstance();
+    bluetoothCallClient.Init();
     std::unique_ptr<CallManagerCallbackTest> callbackPtr = std::make_unique<CallManagerCallbackTest>();
     if (callbackPtr == nullptr) {
         std::cout << "make_unique CallManagerCallbackTest failed!" << std::endl;
         return TELEPHONY_ERROR;
     }
-    int32_t ret = g_bluetoothCallPtr->RegisterCallBack(std::move(callbackPtr));
+    int32_t ret = bluetoothCallClient.RegisterCallBack(std::move(callbackPtr));
     if (ret != TELEPHONY_SUCCESS) {
         std::cout << "RegisterCallBack failed!" << std::endl;
         return TELEPHONY_ERROR;
@@ -283,11 +278,8 @@ void BluetoothCallTest::DialCall()
     dialInfo.PutIntValue("dialScene", dialScene);
     dialInfo.PutIntValue("dialType", dialType);
     dialInfo.PutIntValue("callType", callType);
-    if (g_bluetoothCallPtr == nullptr) {
-        std::cout << "g_bluetoothCallPtr is nullptr" << std::endl;
-        return;
-    }
-    int32_t ret = g_bluetoothCallPtr->DialCall(u16PhoneNumber, dialInfo);
+    BluetoothCallClient &bluetoothCallClient = DelayedRefSingleton<BluetoothCallClient>::GetInstance();
+    int32_t ret = bluetoothCallClient.DialCall(u16PhoneNumber, dialInfo);
     std::cout << "return value:" << ret << std::endl;
 }
 
@@ -295,11 +287,7 @@ void BluetoothCallTest::AnswerCall()
 {
     AccessToken token;
     std::cout << "------Answer------" << std::endl;
-    if (g_bluetoothCallPtr == nullptr) {
-        std::cout << "g_bluetoothCallPtr is nullptr" << std::endl;
-        return;
-    }
-    int32_t ret = g_bluetoothCallPtr->AnswerCall();
+    int32_t ret = bluetoothCallClient.AnswerCall();
     std::cout << "return value:" << ret << std::endl;
 }
 
@@ -307,11 +295,7 @@ void BluetoothCallTest::RejectCall()
 {
     AccessToken token;
     std::cout << "------Reject------" << std::endl;
-    if (g_bluetoothCallPtr == nullptr) {
-        std::cout << "g_bluetoothCallPtr is nullptr" << std::endl;
-        return;
-    }
-    int32_t ret = g_bluetoothCallPtr->RejectCall();
+    int32_t ret = bluetoothCallClient.RejectCall();
     std::cout << "return value:" << ret << std::endl;
 }
 
@@ -319,22 +303,14 @@ void BluetoothCallTest::HangUpCall()
 {
     AccessToken token;
     std::cout << "------HangUpCall------" << std::endl;
-    if (g_bluetoothCallPtr == nullptr) {
-        std::cout << "g_bluetoothCallPtr is nullptr" << std::endl;
-        return;
-    }
-    int32_t ret = g_bluetoothCallPtr->HangUpCall();
+    int32_t ret = bluetoothCallClient.HangUpCall();
     std::cout << "return value:" << ret << std::endl;
 }
 
 void BluetoothCallTest::GetCallState()
 {
     std::cout << "------GetCallState------" << std::endl;
-    if (g_bluetoothCallPtr == nullptr) {
-        std::cout << "g_bluetoothCallPtr is nullptr" << std::endl;
-        return;
-    }
-    int32_t ret = g_bluetoothCallPtr->GetCallState();
+    int32_t ret = bluetoothCallClient.GetCallState();
     std::cout << "return value:" << ret << std::endl;
 }
 
@@ -342,11 +318,7 @@ void BluetoothCallTest::HoldCall()
 {
     AccessToken token;
     std::cout << "------HoldCall------" << std::endl;
-    if (g_bluetoothCallPtr == nullptr) {
-        std::cout << "g_bluetoothCallPtr is nullptr" << std::endl;
-        return;
-    }
-    int32_t ret = g_bluetoothCallPtr->HoldCall();
+    int32_t ret = bluetoothCallClient.HoldCall();
     std::cout << "return value:" << ret << std::endl;
 }
 
@@ -354,44 +326,28 @@ void BluetoothCallTest::UnHoldCall()
 {
     AccessToken token;
     std::cout << "------UnHoldCall------" << std::endl;
-    if (g_bluetoothCallPtr == nullptr) {
-        std::cout << "g_bluetoothCallPtr is nullptr" << std::endl;
-        return;
-    }
-    int32_t ret = g_bluetoothCallPtr->UnHoldCall();
+    int32_t ret = bluetoothCallClient.UnHoldCall();
     std::cout << "return value:" << ret << std::endl;
 }
 
 void BluetoothCallTest::CombineConference()
 {
     std::cout << "------CombineConference------" << std::endl;
-    if (g_bluetoothCallPtr == nullptr) {
-        std::cout << "g_bluetoothCallPtr is nullptr" << std::endl;
-        return;
-    }
-    int32_t ret = g_bluetoothCallPtr->CombineConference();
+    int32_t ret = bluetoothCallClient.CombineConference();
     std::cout << "return value:" << ret << std::endl;
 }
 
 void BluetoothCallTest::SeparateConference()
 {
     std::cout << "------SeparateConference------" << std::endl;
-    if (g_bluetoothCallPtr == nullptr) {
-        std::cout << "g_bluetoothCallPtr is nullptr" << std::endl;
-        return;
-    }
-    int32_t ret = g_bluetoothCallPtr->SeparateConference();
+    int32_t ret = bluetoothCallClient.SeparateConference();
     std::cout << "return value:" << ret << std::endl;
 }
 
 void BluetoothCallTest::KickOutFromConference()
 {
     std::cout << "------KickOutFromConference------" << std::endl;
-    if (g_bluetoothCallPtr == nullptr) {
-        std::cout << "g_bluetoothCallPtr is nullptr" << std::endl;
-        return;
-    }
-    int32_t ret = g_bluetoothCallPtr->KickOutFromConference();
+    int32_t ret = bluetoothCallClient.KickOutFromConference();
     std::cout << "return value:" << ret << std::endl;
 }
 
@@ -399,34 +355,22 @@ void BluetoothCallTest::SwitchCall()
 {
     AccessToken token;
     std::cout << "------SwitchCall------" << std::endl;
-    if (g_bluetoothCallPtr == nullptr) {
-        std::cout << "g_bluetoothCallPtr is nullptr" << std::endl;
-        return;
-    }
-    int32_t ret = g_bluetoothCallPtr->SwitchCall();
+    int32_t ret = bluetoothCallClient.SwitchCall();
     std::cout << "return value:" << ret << std::endl;
 }
 
 void BluetoothCallTest::HasCall()
 {
     std::cout << "------HasCall------" << std::endl;
-    if (g_bluetoothCallPtr == nullptr) {
-        std::cout << "g_bluetoothCallPtr is nullptr" << std::endl;
-        return;
-    }
-    int32_t ret = g_bluetoothCallPtr->HasCall();
+    int32_t ret = bluetoothCallClient.HasCall();
     std::cout << "return value:" << ret << std::endl;
 }
 
 void BluetoothCallTest::IsNewCallAllowed()
 {
     std::cout << "------IsNewCallAllowed------" << std::endl;
-    if (g_bluetoothCallPtr == nullptr) {
-        std::cout << "g_bluetoothCallPtr is nullptr" << std::endl;
-        return;
-    }
     bool enabled = false;
-    int32_t ret = g_bluetoothCallPtr->IsNewCallAllowed(enabled);
+    int32_t ret = bluetoothCallClient.IsNewCallAllowed(enabled);
     std::cout << "ret:" << ret << std::endl;
     std::cout << "enabled value:" << enabled << std::endl;
 }
@@ -435,12 +379,8 @@ void BluetoothCallTest::IsRinging()
 {
     AccessToken token;
     std::cout << "------IsRinging------" << std::endl;
-    if (g_bluetoothCallPtr == nullptr) {
-        std::cout << "g_bluetoothCallPtr is nullptr" << std::endl;
-        return;
-    }
     bool enabled = false;
-    int32_t ret = g_bluetoothCallPtr->IsRinging(enabled);
+    int32_t ret = bluetoothCallClient.IsRinging(enabled);
     std::cout << "ret:" << ret << std::endl;
     std::cout << "enabled value:" << enabled << std::endl;
 }
@@ -449,12 +389,8 @@ void BluetoothCallTest::IsInEmergencyCall()
 {
     AccessToken token;
     std::cout << "------IsInEmergencyCall------" << std::endl;
-    if (g_bluetoothCallPtr == nullptr) {
-        std::cout << "g_bluetoothCallPtr is nullptr" << std::endl;
-        return;
-    }
     bool enabled = false;
-    int32_t ret = g_bluetoothCallPtr->IsInEmergencyCall(enabled);
+    int32_t ret = bluetoothCallClient.IsInEmergencyCall(enabled);
     std::cout << "ret:" << ret << std::endl;
     std::cout << "enabled value:" << enabled << std::endl;
 }
@@ -465,22 +401,14 @@ void BluetoothCallTest::StartDtmf()
     std::cout << "------StartDtmf------" << std::endl;
     std::cout << "Please enter to send dtmf characters:" << std::endl;
     std::cin >> c;
-    if (g_bluetoothCallPtr == nullptr) {
-        std::cout << "g_bluetoothCallPtr is nullptr" << std::endl;
-        return;
-    }
-    int32_t ret = g_bluetoothCallPtr->StartDtmf(c);
+    int32_t ret = bluetoothCallClient.StartDtmf(c);
     std::cout << "return value:" << ret << std::endl;
 }
 
 void BluetoothCallTest::StopDtmf()
 {
     std::cout << "------StopDtmf------" << std::endl;
-    if (g_bluetoothCallPtr == nullptr) {
-        std::cout << "g_bluetoothCallPtr is nullptr" << std::endl;
-        return;
-    }
-    int32_t ret = g_bluetoothCallPtr->StopDtmf();
+    int32_t ret = bluetoothCallClient.StopDtmf();
     std::cout << "return value:" << ret << std::endl;
 }
 
@@ -490,11 +418,7 @@ void BluetoothCallTest::SetMute()
     std::cout << "------SetMute------" << std::endl;
     std::cout << "please input mute state(0:false 1:true):" << std::endl;
     std::cin >> isMute;
-    if (g_bluetoothCallPtr == nullptr) {
-        std::cout << "g_bluetoothCallPtr is nullptr" << std::endl;
-        return;
-    }
-    int32_t ret = g_bluetoothCallPtr->SetMuted((isMute == 1) ? true : false);
+    int32_t ret = bluetoothCallClient.SetMuted((isMute == 1) ? true : false);
     std::cout << "return value:" << ret << std::endl;
 }
 
@@ -502,11 +426,7 @@ void BluetoothCallTest::MuteRinger()
 {
     AccessToken token;
     std::cout << "------MuteRinger------" << std::endl;
-    if (g_bluetoothCallPtr == nullptr) {
-        std::cout << "g_bluetoothCallPtr is nullptr" << std::endl;
-        return;
-    }
-    int32_t ret = g_bluetoothCallPtr->MuteRinger();
+    int32_t ret = bluetoothCallClient.MuteRinger();
     std::cout << "return value:" << ret << std::endl;
 }
 
@@ -516,13 +436,9 @@ void BluetoothCallTest::SetAudioDevice()
     std::cout << "------SetAudioDevice------" << std::endl;
     std::cout << "please input device type(0:earpiece 1:speaker 2:wired headset 3:bluetooth sco):" << std::endl;
     std::cin >> deviceType;
-    if (g_bluetoothCallPtr == nullptr) {
-        std::cout << "g_bluetoothCallPtr is nullptr" << std::endl;
-        return;
-    }
     AudioDeviceType device = static_cast<AudioDeviceType>(deviceType);
     std::string address = "0C:D7:46:14:AA:33";
-    int32_t ret = g_bluetoothCallPtr->SetAudioDevice(device, address);
+    int32_t ret = bluetoothCallClient.SetAudioDevice(device, address);
     std::cout << "return value:" << ret << std::endl;
 }
 
@@ -533,11 +449,7 @@ void BluetoothCallTest::GetCurrentCallList()
     std::cout << "------GetCurrentCallList------" << std::endl;
     std::cout << "Please enter slotId:" << std::endl;
     std::cin >> slotId;
-    if (g_bluetoothCallPtr == nullptr) {
-        std::cout << "g_bluetoothCallPtr is nullptr" << std::endl;
-        return;
-    }
-    std::vector<CallAttributeInfo> callVec = g_bluetoothCallPtr->GetCurrentCallList(slotId);
+    std::vector<CallAttributeInfo> callVec = bluetoothCallClient.GetCurrentCallList(slotId);
     std::cout << "call list count:" << callVec.size() << std::endl;
     std::vector<CallAttributeInfo>::iterator it = callVec.begin();
     for (; it != callVec.end(); ++it) {

@@ -59,12 +59,7 @@ public:
             std::cout << "connect callManager server failed!" << std::endl;
             return;
         }
-        blueToothClientPtr_ = DelayedSingleton<BluetoothCallClient>::GetInstance();
-        if (blueToothClientPtr_ == nullptr) {
-            std::cout << "make_unique CallManagerConnect failed!" << std::endl;
-            return;
-        }
-        blueToothClientPtr_->Init();
+        DelayedRefSingleton<BluetoothCallClient>::GetInstance().Init();
         isConnected_ = true;
         std::cout << "connect callManager server success!!!" << std::endl;
 
@@ -169,9 +164,7 @@ public:
         if (servicePtr_ != nullptr) {
             servicePtr_->UnInit();
         }
-        if (blueToothClientPtr_ != nullptr) {
-            blueToothClientPtr_->UnInit();
-        }
+        DelayedRefSingleton<BluetoothCallClient>::GetInstance().UnInit();
         std::cout << "---------- gtest end ------------" << std::endl;
     }
 
@@ -181,7 +174,6 @@ public:
 public:
     static bool isConnected_;
     static std::shared_ptr<CallManagerClient> clientPtr_;
-    static std::shared_ptr<BluetoothCallClient> blueToothClientPtr_;
     static std::unique_ptr<CallManagerConnect> servicePtr_;
     AppExecFwk::PacMap dialInfo_;
 
@@ -200,7 +192,6 @@ public:
 
 bool CallManagerGtest::isConnected_ = false;
 std::shared_ptr<CallManagerClient> CallManagerGtest::clientPtr_ = nullptr;
-std::shared_ptr<BluetoothCallClient> CallManagerGtest::blueToothClientPtr_ = nullptr;
 std::unique_ptr<CallManagerConnect> CallManagerGtest::servicePtr_ = nullptr;
 } // namespace Telephony
 } // namespace OHOS

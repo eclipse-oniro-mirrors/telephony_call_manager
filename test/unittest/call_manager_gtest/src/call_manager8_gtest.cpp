@@ -618,9 +618,8 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_IsInEmergencyCall_0200, Functio
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
     }
-    ASSERT_TRUE(blueToothClientPtr_ != nullptr);
     bool enabled = false;
-    EXPECT_EQ(CallManagerGtest::blueToothClientPtr_->IsInEmergencyCall(enabled), TELEPHONY_SUCCESS);
+    EXPECT_EQ(DelayedRefSingleton<BluetoothCallClient>::GetInstance().IsInEmergencyCall(enabled), TELEPHONY_SUCCESS);
     EXPECT_EQ(enabled, false);
 }
 

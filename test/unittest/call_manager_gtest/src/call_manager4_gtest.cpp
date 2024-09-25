@@ -590,8 +590,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_StartDtmf_0300, Function | Medi
     }
 
     char str = '1';
-    ASSERT_TRUE(blueToothClientPtr_ != nullptr);
-    EXPECT_NE(CallManagerGtest::blueToothClientPtr_->StartDtmf(str), RETURN_VALUE_IS_ZERO);
+    EXPECT_NE(DelayedRefSingleton<BluetoothCallClient>::GetInstance().StartDtmf(str), RETURN_VALUE_IS_ZERO);
 }
 
 /**
@@ -669,8 +668,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_StopDtmf_0300, Function | Mediu
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
     }
-    ASSERT_TRUE(blueToothClientPtr_ != nullptr);
-    EXPECT_NE(CallManagerGtest::blueToothClientPtr_->StopDtmf(), RETURN_VALUE_IS_ZERO);
+    EXPECT_NE(DelayedRefSingleton<BluetoothCallClient>::GetInstance().StopDtmf(), RETURN_VALUE_IS_ZERO);
 }
 
 /**
