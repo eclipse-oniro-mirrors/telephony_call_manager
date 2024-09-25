@@ -23,7 +23,7 @@
 
 namespace OHOS {
 namespace Telephony {
-class BluetoothCallClient : public std::DelayedRefSingleton<BluetoothCallClient> {
+class BluetoothCallClient : public DelayedRefSingleton<BluetoothCallClient> {
     DECLARE_DELAYED_REF_SINGLETON(BluetoothCallClient)
 public:
     void Init();
