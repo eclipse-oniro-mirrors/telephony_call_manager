@@ -770,7 +770,8 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_1800, Function | Mediu
     if (HasSimCard(SIM2_SLOTID)) {
         InitDialInfo(
             SIM2_SLOTID, (int32_t)VideoStateType::TYPE_VOICE, DIAL_SCENE_TEST, (int32_t)DialType::DIAL_CARRIER_TYPE);
-        int32_t ret = DelayedRefSingleton<BluetoothCallClient>::GetInstance().DialCall(Str8ToStr16(phoneNumber), dialInfo_);
+        int32_t ret = DelayedRefSingleton<BluetoothCallClient>::
+            GetInstance().DialCall(Str8ToStr16(phoneNumber), dialInfo_);
         EXPECT_NE(ret, TELEPHONY_ERR_SUCCESS);
     }
 }
@@ -794,7 +795,8 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_1900, Function | Mediu
     int32_t slotId = SIM_SLOT_COUNT; // out of the count
     InitDialInfo(slotId, (int32_t)VideoStateType::TYPE_VOICE, (int32_t)DialScene::CALL_NORMAL,
         (int32_t)DialType::DIAL_CARRIER_TYPE);
-    int32_t ret = DelayedRefSingleton<BluetoothCallClient>::GetInstance().->DialCall(Str8ToStr16(phoneNumber), dialInfo_);
+    int32_t ret = DelayedRefSingleton<BluetoothCallClient>::
+        GetInstance().DialCall(Str8ToStr16(phoneNumber), dialInfo_);
     EXPECT_EQ(ret, CALL_ERR_INVALID_SLOT_ID);
 }
 
