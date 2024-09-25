@@ -70,16 +70,12 @@ int32_t SatelliteCallControl::IsAllowedSatelliteDialCall()
     std::string is_satellite_connected{"0"};
     int32_t err = datashareHelper->Query(satelliteModeUri, SettingsDataShareHelper::QUERY_SATELLITE_CONNECTED_KEY,
         is_satellite_connected);
-    std::istringstream str(is_satellite_connected);
-    int32_t isSatelliteConnected = 0;
-    str >> isSatelliteConnected;
-    if (err == TELEPHONY_SUCCESS && isSatelliteConnected == SATELLITE_CONNECTED) {
+    int32_t satelliteConnected = std::atoi(is_satellite_connected);
+    if (err == TELEPHONY_SUCCESS && satelliteConnected == SATELLITE_CONNECTED) {
         TELEPHONY_LOGI("satellite service is connected");
         std::string tempLevel = OHOS::system::GetParameter("persist.thermal.log.satcomm", "-1");
         if (tempLevel != "-1") {
-            std::istringstream str1(tempLevel);
-            int32_t temp = 0;
-            str1 >> temp;
+            int32_t temp = std::atoi(tempLevel);
             SetSatcommTempLevel(temp);
         }
         TELEPHONY_LOGI("GetSatcommTempLevel = %{public}s", tempLevel.c_str());
@@ -102,10 +98,8 @@ int32_t SatelliteCallControl::IsSatelliteSwitchEnable()
     std::string is_satellite_mode_on{ "0" };
     int32_t err = datashareHelper->Query(satelliteModeUri, SettingsDataShareHelper::QUERY_SATELLITE_MODE_KEY,
         is_satellite_mode_on);
-    std::istringstream str1(is_satellite_mode_on);
-    int32_t isSatelliteModeOn = 0;
-    str1 >> isSatelliteModeOn;
-    if (err == TELEPHONY_SUCCESS && isSatelliteModeOn == SATELLITE_MODE_ON) {
+    int32_t satelliteMode = std::atoi(is_satellite_mode_on);
+    if (err == TELEPHONY_SUCCESS && satelliteMode == SATELLITE_MODE_ON) {
         TELEPHONY_LOGI("satellite mode on");
         return TELEPHONY_SUCCESS;
     }
