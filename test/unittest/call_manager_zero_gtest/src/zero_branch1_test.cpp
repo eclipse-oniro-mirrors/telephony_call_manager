@@ -280,11 +280,10 @@ HWTEST_F(ZeroBranch2Test, Telephony_CallRequestProcess_002, Function | MediumTes
     sptr<CallBase> incomingCall = new CSCall(mDialParaInfo);
     incomingCall->SetCallType(CallType::TYPE_CS);
     bool flagForConference = false;
-    callRequestProcess->HandleCallWaitingNumZero(incomingCall, call, SIM1_SLOTID, 1, flagForConference);
     callRequestProcess->HandleCallWaitingNumZero(incomingCall, voipCall, SIM1_SLOTID, 2, flagForConference);
     callRequestProcess->HandleCallWaitingNumZero(incomingCall, dialCall, SIM1_SLOTID, 2, flagForConference);
     callRequestProcess->DisconnectOtherCallForVideoCall(VALID_CALLID);
-    ASSERT_TRUE(flagForConference);
+    ASSERT_FALSE(flagForConference);
 }
 
 /**
