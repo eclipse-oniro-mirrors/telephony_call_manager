@@ -260,6 +260,7 @@ bool CallControlManager::CurrentIsSuperPrivacyMode(int32_t callId, int32_t video
         GetCurrentIsSuperPrivacyMode();
     TELEPHONY_LOGI("call policy answer currentIsSuperPrivacyMode:%{public}d", currentIsSuperPrivacyMode);
     if (currentIsSuperPrivacyMode) {
+        DelayedSingleton<AudioControlManager>::GetInstance()->MuteRinger();
         DelayedSingleton<CallDialog>::GetInstance()->DialogConnectAnswerPrivpacyModeExtension("SUPER_PRIVACY_MODE",
             callId, videoState, true);
         return true;
