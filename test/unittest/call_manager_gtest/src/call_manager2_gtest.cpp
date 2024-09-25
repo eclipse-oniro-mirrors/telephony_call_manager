@@ -693,13 +693,13 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_1600, Function | Mediu
     if (HasSimCard(SIM1_SLOTID)) {
         InitDialInfo(
             SIM1_SLOTID, INVALID_VIDEO_STATE, (int32_t)DialScene::CALL_NORMAL, (int32_t)DialType::DIAL_CARRIER_TYPE);
-        int32_t ret = DelayedRefSingleton<BluetoothCallClient>::GetInstance().DialCall(Str8ToStr16(phoneNumber), dialInfo_);
+        int32_t ret = bluetoothCallClient.DialCall(Str8ToStr16(phoneNumber), dialInfo_);
         EXPECT_EQ(ret, CALL_ERR_INVALID_VIDEO_STATE);
     }
     if (HasSimCard(SIM2_SLOTID)) {
         InitDialInfo(
             SIM2_SLOTID, INVALID_VIDEO_STATE, (int32_t)DialScene::CALL_NORMAL, (int32_t)DialType::DIAL_CARRIER_TYPE);
-        int32_t ret = DelayedRefSingleton<BluetoothCallClient>::GetInstance().DialCall(Str8ToStr16(phoneNumber), dialInfo_);
+        int32_t ret = bluetoothCallClient.DialCall(Str8ToStr16(phoneNumber), dialInfo_);
         EXPECT_EQ(ret, CALL_ERR_INVALID_VIDEO_STATE);
     }
 }
@@ -724,7 +724,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_1700, Function | Mediu
     if (HasSimCard(SIM1_SLOTID)) {
         InitDialInfo(SIM1_SLOTID, (int32_t)VideoStateType::TYPE_VOICE, (int32_t)DialScene::CALL_NORMAL,
             (int32_t)DialType::DIAL_CARRIER_TYPE);
-        int32_t ret = DelayedRefSingleton<BluetoothCallClient>::GetInstance().DialCall(Str8ToStr16(phoneNumber), dialInfo_);
+        int32_t ret = bluetoothCallClient.DialCall(Str8ToStr16(phoneNumber), dialInfo_);
         EXPECT_EQ(ret, RETURN_VALUE_IS_ZERO);
         sleep(WAIT_TIME);
         if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
@@ -735,7 +735,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_1700, Function | Mediu
     if (HasSimCard(SIM2_SLOTID)) {
         InitDialInfo(SIM2_SLOTID, (int32_t)VideoStateType::TYPE_VOICE, (int32_t)DialScene::CALL_NORMAL,
             (int32_t)DialType::DIAL_CARRIER_TYPE);
-        int32_t ret = DelayedRefSingleton<BluetoothCallClient>::GetInstance().DialCall(Str8ToStr16(phoneNumber), dialInfo_);
+        int32_t ret = bluetoothCallClient.DialCall(Str8ToStr16(phoneNumber), dialInfo_);
         EXPECT_EQ(ret, RETURN_VALUE_IS_ZERO);
         sleep(WAIT_TIME);
         if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
@@ -764,14 +764,13 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_1800, Function | Mediu
     if (HasSimCard(SIM1_SLOTID)) {
         InitDialInfo(
             SIM1_SLOTID, (int32_t)VideoStateType::TYPE_VOICE, DIAL_SCENE_TEST, (int32_t)DialType::DIAL_CARRIER_TYPE);
-        int32_t ret = DelayedRefSingleton<BluetoothCallClient>::GetInstance().DialCall(Str8ToStr16(phoneNumber), dialInfo_);
+        int32_t ret = bluetoothCallClient.DialCall(Str8ToStr16(phoneNumber), dialInfo_);
         EXPECT_NE(ret, TELEPHONY_ERR_SUCCESS);
     }
     if (HasSimCard(SIM2_SLOTID)) {
         InitDialInfo(
             SIM2_SLOTID, (int32_t)VideoStateType::TYPE_VOICE, DIAL_SCENE_TEST, (int32_t)DialType::DIAL_CARRIER_TYPE);
-        int32_t ret = DelayedRefSingleton<BluetoothCallClient>::
-            GetInstance().DialCall(Str8ToStr16(phoneNumber), dialInfo_);
+        int32_t ret = bluetoothCallClient.DialCall(Str8ToStr16(phoneNumber), dialInfo_);
         EXPECT_NE(ret, TELEPHONY_ERR_SUCCESS);
     }
 }
@@ -795,8 +794,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_1900, Function | Mediu
     int32_t slotId = SIM_SLOT_COUNT; // out of the count
     InitDialInfo(slotId, (int32_t)VideoStateType::TYPE_VOICE, (int32_t)DialScene::CALL_NORMAL,
         (int32_t)DialType::DIAL_CARRIER_TYPE);
-    int32_t ret = DelayedRefSingleton<BluetoothCallClient>::
-        GetInstance().DialCall(Str8ToStr16(phoneNumber), dialInfo_);
+    int32_t ret = bluetoothCallClient.DialCall(Str8ToStr16(phoneNumber), dialInfo_);
     EXPECT_EQ(ret, CALL_ERR_INVALID_SLOT_ID);
 }
 
@@ -964,7 +962,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_AnswerCall_0400, Function | Med
         return;
     }
     CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_200_MS, SLEEP_30000_MS);
-    EXPECT_NE(DelayedRefSingleton<BluetoothCallClient>::GetInstance().AnswerCall(), RETURN_VALUE_IS_ZERO);
+    EXPECT_NE(bluetoothCallClient.AnswerCall(), RETURN_VALUE_IS_ZERO);
 }
 } // namespace Telephony
 } // namespace OHOS
