@@ -690,6 +690,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_1600, Function | Mediu
     }
     EXPECT_EQ(CallManagerGtest::IsServiceConnected(), true);
     std::string phoneNumber = PHONE_NUMBER; // OPERATOR PHONY NUMBER
+    BluetoothCallClient &bluetoothCallClient = DelayedRefSingleton<BluetoothCallClient>::GetInstance();
     if (HasSimCard(SIM1_SLOTID)) {
         InitDialInfo(
             SIM1_SLOTID, INVALID_VIDEO_STATE, (int32_t)DialScene::CALL_NORMAL, (int32_t)DialType::DIAL_CARRIER_TYPE);
