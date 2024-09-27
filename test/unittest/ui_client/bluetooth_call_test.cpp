@@ -27,6 +27,7 @@ namespace OHOS {
 namespace Telephony {
 using namespace Security::AccessToken;
 using Security::AccessToken::AccessTokenID;
+BluetoothCallClient &bluetoothCallClient = DelayedRefSingleton<BluetoothCallClient>::GetInstance();
 
 HapInfoParams testInfoParamsCase = {
     .userID = 1,
@@ -144,7 +145,6 @@ private:
 int32_t BluetoothCallTest::Init()
 {
     AccessToken token;
-    BluetoothCallClient &bluetoothCallClient = DelayedRefSingleton<BluetoothCallClient>::GetInstance();
     bluetoothCallClient.Init();
     std::unique_ptr<CallManagerCallbackTest> callbackPtr = std::make_unique<CallManagerCallbackTest>();
     if (callbackPtr == nullptr) {
@@ -278,7 +278,6 @@ void BluetoothCallTest::DialCall()
     dialInfo.PutIntValue("dialScene", dialScene);
     dialInfo.PutIntValue("dialType", dialType);
     dialInfo.PutIntValue("callType", callType);
-    BluetoothCallClient &bluetoothCallClient = DelayedRefSingleton<BluetoothCallClient>::GetInstance();
     int32_t ret = bluetoothCallClient.DialCall(u16PhoneNumber, dialInfo);
     std::cout << "return value:" << ret << std::endl;
 }
