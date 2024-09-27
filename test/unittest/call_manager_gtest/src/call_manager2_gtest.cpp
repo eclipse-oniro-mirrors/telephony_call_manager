@@ -54,6 +54,7 @@ std::mutex CallInfoManager::mutex_;
 int16_t CallInfoManager::newCallState_;
 CallAttributeInfo CallInfoManager::updateCallInfo_;
 std::unordered_set<int32_t> CallInfoManager::callIdSet_;
+BluetoothCallClient &bluetoothCallClient = DelayedRefSingleton<BluetoothCallClient>::GetInstance();
 
 int32_t CallInfoManager::CallDetailsChange(const CallAttributeInfo &info)
 {
@@ -283,7 +284,6 @@ HWTEST_F(ClientErrorBranchTest, Telephony_CallManagerClient_002, Function | Medi
  */
 HWTEST_F(ClientErrorBranchTest, Telephony_BluetoothCallClient_001, Function | MediumTest | Level3)
 {
-    BluetoothCallClient &bluetoothCallClient = DelayedRefSingleton<BluetoothCallClient>::GetInstance();
     bluetoothCallClient.UnInit();
     ASSERT_NE(bluetoothCallClient.RegisterCallBack(nullptr), TELEPHONY_SUCCESS);
     ASSERT_NE(bluetoothCallClient.UnRegisterCallBack(), TELEPHONY_SUCCESS);
@@ -690,7 +690,6 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_1600, Function | Mediu
     }
     EXPECT_EQ(CallManagerGtest::IsServiceConnected(), true);
     std::string phoneNumber = PHONE_NUMBER; // OPERATOR PHONY NUMBER
-    BluetoothCallClient &bluetoothCallClient = DelayedRefSingleton<BluetoothCallClient>::GetInstance();
     if (HasSimCard(SIM1_SLOTID)) {
         InitDialInfo(
             SIM1_SLOTID, INVALID_VIDEO_STATE, (int32_t)DialScene::CALL_NORMAL, (int32_t)DialType::DIAL_CARRIER_TYPE);
