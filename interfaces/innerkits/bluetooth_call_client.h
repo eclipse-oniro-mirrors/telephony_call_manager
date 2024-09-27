@@ -201,7 +201,7 @@ public:
      */
     std::vector<CallAttributeInfo> GetCurrentCallList(int32_t slotId);
 private:
-    std::mutex Mutex_;
+    std::mutex mutex_;
 };
 } // namespace Telephony
 } // namespace OHOS
