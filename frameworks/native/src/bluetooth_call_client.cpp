@@ -35,6 +35,7 @@ BluetoothCallClient::~BluetoothCallClient() {}
 
 void BluetoothCallClient::Init()
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     TELEPHONY_LOGI("BluetoothCallClient init:");
     if (g_callManagerProxyPtr == nullptr) {
         g_callManagerProxyPtr = DelayedSingleton<CallManagerProxy>::GetInstance();
@@ -59,6 +60,7 @@ void BluetoothCallClient::Init()
 
 void BluetoothCallClient::UnInit()
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     if (g_callManagerProxyPtr != nullptr) {
         g_callManagerProxyPtr->UnInit();
     } else {
@@ -68,6 +70,7 @@ void BluetoothCallClient::UnInit()
 
 int32_t BluetoothCallClient::RegisterCallBack(std::unique_ptr<CallManagerCallback> callback)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     if (g_callManagerProxyPtr != nullptr) {
         return g_callManagerProxyPtr->RegisterCallBack(std::move(callback));
     } else {
@@ -78,6 +81,7 @@ int32_t BluetoothCallClient::RegisterCallBack(std::unique_ptr<CallManagerCallbac
 
 int32_t BluetoothCallClient::UnRegisterCallBack()
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     if (g_callManagerProxyPtr != nullptr) {
         return g_callManagerProxyPtr->UnRegisterCallBack();
     } else {
@@ -88,6 +92,7 @@ int32_t BluetoothCallClient::UnRegisterCallBack()
 
 int32_t BluetoothCallClient::DialCall(std::u16string number, AppExecFwk::PacMap &extras)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     if (g_callManagerProxyPtr != nullptr) {
         return g_callManagerProxyPtr->DialCall(number, extras);
     } else {
@@ -98,6 +103,7 @@ int32_t BluetoothCallClient::DialCall(std::u16string number, AppExecFwk::PacMap 
 
 int32_t BluetoothCallClient::AnswerCall()
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     if (g_bluetoothCallProxyPtr != nullptr) {
         return g_bluetoothCallProxyPtr->AnswerCall();
     } else {
@@ -108,6 +114,7 @@ int32_t BluetoothCallClient::AnswerCall()
 
 int32_t BluetoothCallClient::RejectCall()
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     if (g_bluetoothCallProxyPtr != nullptr) {
         return g_bluetoothCallProxyPtr->RejectCall();
     } else {
@@ -118,6 +125,7 @@ int32_t BluetoothCallClient::RejectCall()
 
 int32_t BluetoothCallClient::HangUpCall()
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     if (g_bluetoothCallProxyPtr != nullptr) {
         return g_bluetoothCallProxyPtr->HangUpCall();
     } else {
@@ -128,6 +136,7 @@ int32_t BluetoothCallClient::HangUpCall()
 
 int32_t BluetoothCallClient::GetCallState()
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     if (g_bluetoothCallProxyPtr != nullptr) {
         return g_bluetoothCallProxyPtr->GetCallState();
     } else {
@@ -138,6 +147,7 @@ int32_t BluetoothCallClient::GetCallState()
 
 int32_t BluetoothCallClient::HoldCall()
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     if (g_bluetoothCallProxyPtr != nullptr) {
         return g_bluetoothCallProxyPtr->HoldCall();
     } else {
@@ -148,6 +158,7 @@ int32_t BluetoothCallClient::HoldCall()
 
 int32_t BluetoothCallClient::UnHoldCall()
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     if (g_bluetoothCallProxyPtr != nullptr) {
         return g_bluetoothCallProxyPtr->UnHoldCall();
     } else {
@@ -158,6 +169,7 @@ int32_t BluetoothCallClient::UnHoldCall()
 
 int32_t BluetoothCallClient::SwitchCall()
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     if (g_bluetoothCallProxyPtr != nullptr) {
         return g_bluetoothCallProxyPtr->SwitchCall();
     } else {
@@ -168,6 +180,7 @@ int32_t BluetoothCallClient::SwitchCall()
 
 int32_t BluetoothCallClient::CombineConference()
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     if (g_bluetoothCallProxyPtr != nullptr) {
         return g_bluetoothCallProxyPtr->CombineConference();
     } else {
@@ -178,6 +191,7 @@ int32_t BluetoothCallClient::CombineConference()
 
 int32_t BluetoothCallClient::SeparateConference()
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     if (g_bluetoothCallProxyPtr != nullptr) {
         return g_bluetoothCallProxyPtr->SeparateConference();
     } else {
@@ -188,6 +202,7 @@ int32_t BluetoothCallClient::SeparateConference()
 
 int32_t BluetoothCallClient::KickOutFromConference()
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     if (g_bluetoothCallProxyPtr != nullptr) {
         return g_bluetoothCallProxyPtr->KickOutFromConference();
     } else {
@@ -198,6 +213,7 @@ int32_t BluetoothCallClient::KickOutFromConference()
 
 int32_t BluetoothCallClient::StartDtmf(char str)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     if (g_bluetoothCallProxyPtr != nullptr) {
         return g_bluetoothCallProxyPtr->StartDtmf(str);
     } else {
@@ -208,6 +224,7 @@ int32_t BluetoothCallClient::StartDtmf(char str)
 
 int32_t BluetoothCallClient::StopDtmf()
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     if (g_bluetoothCallProxyPtr != nullptr) {
         return g_bluetoothCallProxyPtr->StopDtmf();
     } else {
@@ -218,6 +235,7 @@ int32_t BluetoothCallClient::StopDtmf()
 
 int32_t BluetoothCallClient::IsRinging(bool &enabled)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     if (g_callManagerProxyPtr != nullptr) {
         return g_callManagerProxyPtr->IsRinging(enabled);
     } else {
@@ -228,6 +246,7 @@ int32_t BluetoothCallClient::IsRinging(bool &enabled)
 
 bool BluetoothCallClient::HasCall()
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     if (g_callManagerProxyPtr != nullptr) {
         return g_callManagerProxyPtr->HasCall();
     } else {
@@ -238,6 +257,7 @@ bool BluetoothCallClient::HasCall()
 
 int32_t BluetoothCallClient::IsNewCallAllowed(bool &enabled)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     if (g_callManagerProxyPtr != nullptr) {
         return g_callManagerProxyPtr->IsNewCallAllowed(enabled);
     } else {
@@ -248,6 +268,7 @@ int32_t BluetoothCallClient::IsNewCallAllowed(bool &enabled)
 
 int32_t BluetoothCallClient::IsInEmergencyCall(bool &enabled)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     if (g_callManagerProxyPtr != nullptr) {
         return g_callManagerProxyPtr->IsInEmergencyCall(enabled);
     } else {
@@ -258,6 +279,7 @@ int32_t BluetoothCallClient::IsInEmergencyCall(bool &enabled)
 
 int32_t BluetoothCallClient::SetMuted(bool isMute)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     if (g_callManagerProxyPtr != nullptr) {
         return g_callManagerProxyPtr->SetMuted(isMute);
     } else {
@@ -268,6 +290,7 @@ int32_t BluetoothCallClient::SetMuted(bool isMute)
 
 int32_t BluetoothCallClient::MuteRinger()
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     if (g_callManagerProxyPtr != nullptr) {
         return g_callManagerProxyPtr->MuteRinger();
     } else {
@@ -278,6 +301,7 @@ int32_t BluetoothCallClient::MuteRinger()
 
 int32_t BluetoothCallClient::SetAudioDevice(AudioDeviceType deviceType, const std::string &bluetoothAddress)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     AudioDevice device;
     if (memset_s(&device, sizeof(AudioDevice), 0, sizeof(AudioDevice)) != EOK) {
         TELEPHONY_LOGE("memset_s fail");
@@ -303,6 +327,7 @@ int32_t BluetoothCallClient::SetAudioDevice(AudioDeviceType deviceType, const st
 
 std::vector<CallAttributeInfo> BluetoothCallClient::GetCurrentCallList(int32_t slotId)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     std::vector<CallAttributeInfo> callVec;
     callVec.clear();
     if (g_bluetoothCallProxyPtr != nullptr) {

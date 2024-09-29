@@ -54,6 +54,7 @@ std::mutex CallInfoManager::mutex_;
 int16_t CallInfoManager::newCallState_;
 CallAttributeInfo CallInfoManager::updateCallInfo_;
 std::unordered_set<int32_t> CallInfoManager::callIdSet_;
+BluetoothCallClient &bluetoothCallClient = DelayedRefSingleton<BluetoothCallClient>::GetInstance();
 
 int32_t CallInfoManager::CallDetailsChange(const CallAttributeInfo &info)
 {
@@ -283,33 +284,32 @@ HWTEST_F(ClientErrorBranchTest, Telephony_CallManagerClient_002, Function | Medi
  */
 HWTEST_F(ClientErrorBranchTest, Telephony_BluetoothCallClient_001, Function | MediumTest | Level3)
 {
-    std::shared_ptr<BluetoothCallClient> bluetoothCallClient = std::make_shared<BluetoothCallClient>();
-    bluetoothCallClient->UnInit();
-    ASSERT_NE(bluetoothCallClient->RegisterCallBack(nullptr), TELEPHONY_SUCCESS);
-    ASSERT_NE(bluetoothCallClient->UnRegisterCallBack(), TELEPHONY_SUCCESS);
+    bluetoothCallClient.UnInit();
+    ASSERT_NE(bluetoothCallClient.RegisterCallBack(nullptr), TELEPHONY_SUCCESS);
+    ASSERT_NE(bluetoothCallClient.UnRegisterCallBack(), TELEPHONY_SUCCESS);
     std::u16string value = u"";
     AppExecFwk::PacMap extras;
     bool enabled;
-    bluetoothCallClient->IsNewCallAllowed(enabled);
-    bluetoothCallClient->IsInEmergencyCall(enabled);
-    bluetoothCallClient->SetMuted(false);
-    bluetoothCallClient->MuteRinger();
-    bluetoothCallClient->SetAudioDevice(AudioDeviceType::DEVICE_BLUETOOTH_SCO, "test");
-    bluetoothCallClient->GetCurrentCallList(-1).size();
-    ASSERT_NE(bluetoothCallClient->DialCall(value, extras), TELEPHONY_SUCCESS);
-    ASSERT_NE(bluetoothCallClient->AnswerCall(), TELEPHONY_SUCCESS);
-    ASSERT_NE(bluetoothCallClient->RejectCall(), TELEPHONY_SUCCESS);
-    ASSERT_NE(bluetoothCallClient->HangUpCall(), TELEPHONY_SUCCESS);
-    ASSERT_GE(bluetoothCallClient->GetCallState(), TELEPHONY_SUCCESS);
-    ASSERT_NE(bluetoothCallClient->HoldCall(), TELEPHONY_SUCCESS);
-    ASSERT_NE(bluetoothCallClient->UnHoldCall(), TELEPHONY_SUCCESS);
-    ASSERT_NE(bluetoothCallClient->SwitchCall(), TELEPHONY_SUCCESS);
-    ASSERT_NE(bluetoothCallClient->CombineConference(), TELEPHONY_SUCCESS);
-    ASSERT_NE(bluetoothCallClient->SeparateConference(), TELEPHONY_SUCCESS);
-    ASSERT_NE(bluetoothCallClient->KickOutFromConference(), TELEPHONY_SUCCESS);
-    ASSERT_NE(bluetoothCallClient->StartDtmf('a'), TELEPHONY_SUCCESS);
-    ASSERT_NE(bluetoothCallClient->StopDtmf(), TELEPHONY_SUCCESS);
-    ASSERT_NE(bluetoothCallClient->IsRinging(enabled), TELEPHONY_SUCCESS);
+    bluetoothCallClient.IsNewCallAllowed(enabled);
+    bluetoothCallClient.IsInEmergencyCall(enabled);
+    bluetoothCallClient.SetMuted(false);
+    bluetoothCallClient.MuteRinger();
+    bluetoothCallClient.SetAudioDevice(AudioDeviceType::DEVICE_BLUETOOTH_SCO, "test");
+    bluetoothCallClient.GetCurrentCallList(-1).size();
+    ASSERT_NE(bluetoothCallClient.DialCall(value, extras), TELEPHONY_SUCCESS);
+    ASSERT_NE(bluetoothCallClient.AnswerCall(), TELEPHONY_SUCCESS);
+    ASSERT_NE(bluetoothCallClient.RejectCall(), TELEPHONY_SUCCESS);
+    ASSERT_NE(bluetoothCallClient.HangUpCall(), TELEPHONY_SUCCESS);
+    ASSERT_GE(bluetoothCallClient.GetCallState(), TELEPHONY_SUCCESS);
+    ASSERT_NE(bluetoothCallClient.HoldCall(), TELEPHONY_SUCCESS);
+    ASSERT_NE(bluetoothCallClient.UnHoldCall(), TELEPHONY_SUCCESS);
+    ASSERT_NE(bluetoothCallClient.SwitchCall(), TELEPHONY_SUCCESS);
+    ASSERT_NE(bluetoothCallClient.CombineConference(), TELEPHONY_SUCCESS);
+    ASSERT_NE(bluetoothCallClient.SeparateConference(), TELEPHONY_SUCCESS);
+    ASSERT_NE(bluetoothCallClient.KickOutFromConference(), TELEPHONY_SUCCESS);
+    ASSERT_NE(bluetoothCallClient.StartDtmf('a'), TELEPHONY_SUCCESS);
+    ASSERT_NE(bluetoothCallClient.StopDtmf(), TELEPHONY_SUCCESS);
+    ASSERT_NE(bluetoothCallClient.IsRinging(enabled), TELEPHONY_SUCCESS);
 }
 
 /********************************************* Test DialCall()***********************************************/
@@ -690,17 +690,16 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_1600, Function | Mediu
     }
     EXPECT_EQ(CallManagerGtest::IsServiceConnected(), true);
     std::string phoneNumber = PHONE_NUMBER; // OPERATOR PHONY NUMBER
-    ASSERT_TRUE(blueToothClientPtr_ != nullptr);
     if (HasSimCard(SIM1_SLOTID)) {
         InitDialInfo(
             SIM1_SLOTID, INVALID_VIDEO_STATE, (int32_t)DialScene::CALL_NORMAL, (int32_t)DialType::DIAL_CARRIER_TYPE);
-        int32_t ret = CallManagerGtest::blueToothClientPtr_->DialCall(Str8ToStr16(phoneNumber), dialInfo_);
+        int32_t ret = bluetoothCallClient.DialCall(Str8ToStr16(phoneNumber), dialInfo_);
         EXPECT_EQ(ret, CALL_ERR_INVALID_VIDEO_STATE);
     }
     if (HasSimCard(SIM2_SLOTID)) {
         InitDialInfo(
             SIM2_SLOTID, INVALID_VIDEO_STATE, (int32_t)DialScene::CALL_NORMAL, (int32_t)DialType::DIAL_CARRIER_TYPE);
-        int32_t ret = CallManagerGtest::blueToothClientPtr_->DialCall(Str8ToStr16(phoneNumber), dialInfo_);
+        int32_t ret = bluetoothCallClient.DialCall(Str8ToStr16(phoneNumber), dialInfo_);
         EXPECT_EQ(ret, CALL_ERR_INVALID_VIDEO_STATE);
     }
 }
@@ -720,13 +719,12 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_1700, Function | Mediu
         return;
     }
     EXPECT_EQ(CallManagerGtest::IsServiceConnected(), true);
-    ASSERT_TRUE(blueToothClientPtr_ != nullptr);
     std::string phoneNumber =
         "19119080646435437102938190283912471651865851478647016881846814376871464810514786470168818468143768714648";
     if (HasSimCard(SIM1_SLOTID)) {
         InitDialInfo(SIM1_SLOTID, (int32_t)VideoStateType::TYPE_VOICE, (int32_t)DialScene::CALL_NORMAL,
             (int32_t)DialType::DIAL_CARRIER_TYPE);
-        int32_t ret = CallManagerGtest::blueToothClientPtr_->DialCall(Str8ToStr16(phoneNumber), dialInfo_);
+        int32_t ret = bluetoothCallClient.DialCall(Str8ToStr16(phoneNumber), dialInfo_);
         EXPECT_EQ(ret, RETURN_VALUE_IS_ZERO);
         sleep(WAIT_TIME);
         if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
@@ -737,7 +735,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_1700, Function | Mediu
     if (HasSimCard(SIM2_SLOTID)) {
         InitDialInfo(SIM2_SLOTID, (int32_t)VideoStateType::TYPE_VOICE, (int32_t)DialScene::CALL_NORMAL,
             (int32_t)DialType::DIAL_CARRIER_TYPE);
-        int32_t ret = CallManagerGtest::blueToothClientPtr_->DialCall(Str8ToStr16(phoneNumber), dialInfo_);
+        int32_t ret = bluetoothCallClient.DialCall(Str8ToStr16(phoneNumber), dialInfo_);
         EXPECT_EQ(ret, RETURN_VALUE_IS_ZERO);
         sleep(WAIT_TIME);
         if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
@@ -763,17 +761,16 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_1800, Function | Mediu
     }
     EXPECT_EQ(CallManagerGtest::IsServiceConnected(), true);
     std::string phoneNumber = "";
-    ASSERT_TRUE(blueToothClientPtr_ != nullptr);
     if (HasSimCard(SIM1_SLOTID)) {
         InitDialInfo(
             SIM1_SLOTID, (int32_t)VideoStateType::TYPE_VOICE, DIAL_SCENE_TEST, (int32_t)DialType::DIAL_CARRIER_TYPE);
-        int32_t ret = CallManagerGtest::blueToothClientPtr_->DialCall(Str8ToStr16(phoneNumber), dialInfo_);
+        int32_t ret = bluetoothCallClient.DialCall(Str8ToStr16(phoneNumber), dialInfo_);
         EXPECT_NE(ret, TELEPHONY_ERR_SUCCESS);
     }
     if (HasSimCard(SIM2_SLOTID)) {
         InitDialInfo(
             SIM2_SLOTID, (int32_t)VideoStateType::TYPE_VOICE, DIAL_SCENE_TEST, (int32_t)DialType::DIAL_CARRIER_TYPE);
-        int32_t ret = CallManagerGtest::blueToothClientPtr_->DialCall(Str8ToStr16(phoneNumber), dialInfo_);
+        int32_t ret = bluetoothCallClient.DialCall(Str8ToStr16(phoneNumber), dialInfo_);
         EXPECT_NE(ret, TELEPHONY_ERR_SUCCESS);
     }
 }
@@ -792,13 +789,12 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_1900, Function | Mediu
     if (!CanDialCall(SIM1_SLOTID, SIM2_SLOTID)) {
         return;
     }
-    ASSERT_TRUE(blueToothClientPtr_ != nullptr);
     EXPECT_EQ(CallManagerGtest::IsServiceConnected(), true);
     std::string phoneNumber = PHONE_NUMBER; // OPERATOR PHONY NUMBER
     int32_t slotId = SIM_SLOT_COUNT; // out of the count
     InitDialInfo(slotId, (int32_t)VideoStateType::TYPE_VOICE, (int32_t)DialScene::CALL_NORMAL,
         (int32_t)DialType::DIAL_CARRIER_TYPE);
-    int32_t ret = CallManagerGtest::blueToothClientPtr_->DialCall(Str8ToStr16(phoneNumber), dialInfo_);
+    int32_t ret = bluetoothCallClient.DialCall(Str8ToStr16(phoneNumber), dialInfo_);
     EXPECT_EQ(ret, CALL_ERR_INVALID_SLOT_ID);
 }
 
@@ -966,8 +962,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_AnswerCall_0400, Function | Med
         return;
     }
     CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_200_MS, SLEEP_30000_MS);
-    ASSERT_TRUE(blueToothClientPtr_ != nullptr);
-    EXPECT_NE(CallManagerGtest::blueToothClientPtr_->AnswerCall(), RETURN_VALUE_IS_ZERO);
+    EXPECT_NE(bluetoothCallClient.AnswerCall(), RETURN_VALUE_IS_ZERO);
 }
 } // namespace Telephony
 } // namespace OHOS

@@ -48,6 +48,7 @@ constexpr int MAX_LIMIT_TIME = 18000;
 constexpr int16_t SIM1_SLOTID = 0;
 const std::string PHONE_NUMBER = "0000000000";
 
+BluetoothCallClient &bluetoothCallClient = DelayedRefSingleton<BluetoothCallClient>::GetInstance();
 std::unordered_map<int32_t, std::unordered_set<int32_t>> g_callStateMap;
 int32_t g_newCallId = -1;
 std::mutex CallInfoManager::mutex_;
@@ -212,8 +213,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_RejectCall_0300, Function | Med
         return;
     }
     CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_200_MS, SLEEP_30000_MS);
-    ASSERT_TRUE(blueToothClientPtr_ != nullptr);
-    EXPECT_NE(CallManagerGtest::blueToothClientPtr_->RejectCall(), RETURN_VALUE_IS_ZERO);
+    EXPECT_NE(bluetoothCallClient.RejectCall(), RETURN_VALUE_IS_ZERO);
 }
 
 /******************************************* Test HangUpCall() *********************************************/
@@ -281,8 +281,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_HangUpCall_0400, Function | Med
         return;
     }
     CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_200_MS, SLEEP_30000_MS);
-    ASSERT_TRUE(blueToothClientPtr_ != nullptr);
-    EXPECT_NE(CallManagerGtest::blueToothClientPtr_->HangUpCall(), RETURN_VALUE_IS_ZERO);
+    EXPECT_NE(bluetoothCallClient.HangUpCall(), RETURN_VALUE_IS_ZERO);
 }
 
 /******************************************* Test GetCallState() *********************************************/
@@ -331,8 +330,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_GetCallState_0300, Function | M
         return;
     }
     CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_200_MS, SLEEP_30000_MS);
-    ASSERT_TRUE(blueToothClientPtr_ != nullptr);
-    EXPECT_EQ(CallManagerGtest::blueToothClientPtr_->GetCallState(), TELEPHONY_SUCCESS);
+    EXPECT_EQ(bluetoothCallClient.GetCallState(), TELEPHONY_SUCCESS);
 }
 
 /**************************** Test ReportAudioDeviceInfo() ****************************/
@@ -456,8 +454,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_HoldCall_0400, Function | Mediu
         return;
     }
     CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_200_MS, SLEEP_30000_MS);
-    ASSERT_TRUE(blueToothClientPtr_ != nullptr);
-    EXPECT_NE(CallManagerGtest::blueToothClientPtr_->HoldCall(), RETURN_VALUE_IS_ZERO);
+    EXPECT_NE(bluetoothCallClient.HoldCall(), RETURN_VALUE_IS_ZERO);
 }
 
 /******************************************* Test UnHoldCall() *********************************************/
@@ -523,8 +520,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_UnHoldCall_0400, Function | Med
         return;
     }
     CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_200_MS, SLEEP_30000_MS);
-    ASSERT_TRUE(blueToothClientPtr_ != nullptr);
-    EXPECT_NE(CallManagerGtest::blueToothClientPtr_->UnHoldCall(), RETURN_VALUE_IS_ZERO);
+    EXPECT_NE(bluetoothCallClient.UnHoldCall(), RETURN_VALUE_IS_ZERO);
 }
 
 /******************************************* Test SwitchCall() *********************************************/
@@ -571,8 +567,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SwitchCall_0300, Function | Med
         return;
     }
     CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_200_MS, SLEEP_30000_MS);
-    ASSERT_TRUE(blueToothClientPtr_ != nullptr);
-    EXPECT_NE(CallManagerGtest::blueToothClientPtr_->SwitchCall(), RETURN_VALUE_IS_ZERO);
+    EXPECT_NE(bluetoothCallClient.SwitchCall(), RETURN_VALUE_IS_ZERO);
 }
 
 /**
@@ -679,8 +674,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_HasCall_0400, Function | Medium
     }
     CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_200_MS, SLEEP_30000_MS);
     ASSERT_EQ(CallManagerGtest::clientPtr_->GetCallState(), (int32_t)CallStateToApp::CALL_STATE_IDLE);
-    ASSERT_TRUE(blueToothClientPtr_ != nullptr);
-    EXPECT_EQ(CallManagerGtest::blueToothClientPtr_->HasCall(), false);
+    EXPECT_EQ(bluetoothCallClient.HasCall(), false);
 }
 
 /********************************* Test IsNewCallAllowed() ***************************************/
@@ -729,9 +723,8 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_IsNewCallAllowed_0200, Function
         HangUpCall();
     }
     CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_200_MS, SLEEP_30000_MS);
-    ASSERT_TRUE(blueToothClientPtr_ != nullptr);
     bool enabled = false;
-    EXPECT_EQ(CallManagerGtest::blueToothClientPtr_->IsNewCallAllowed(enabled), TELEPHONY_SUCCESS);
+    EXPECT_EQ(bluetoothCallClient.IsNewCallAllowed(enabled), TELEPHONY_SUCCESS);
     EXPECT_EQ(enabled, true);
 }
 
@@ -771,9 +764,8 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_IsRinging_0200, Function | Medi
     int32_t callState = CallManagerGtest::clientPtr_->GetCallState();
     int32_t idleState = (int32_t)CallStateToApp::CALL_STATE_IDLE;
     ASSERT_EQ(callState, idleState);
-    ASSERT_TRUE(blueToothClientPtr_ != nullptr);
     bool enabled = false;
-    EXPECT_EQ(CallManagerGtest::blueToothClientPtr_->IsRinging(enabled), TELEPHONY_SUCCESS);
+    EXPECT_EQ(bluetoothCallClient.IsRinging(enabled), TELEPHONY_SUCCESS);
     EXPECT_NE(enabled, true);
 }
 
@@ -819,8 +811,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_CombineConference_0300, Functio
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
     }
-    ASSERT_TRUE(blueToothClientPtr_ != nullptr);
-    EXPECT_NE(CallManagerGtest::blueToothClientPtr_->CombineConference(), RETURN_VALUE_IS_ZERO);
+    EXPECT_NE(bluetoothCallClient.CombineConference(), RETURN_VALUE_IS_ZERO);
 }
 
 /**
@@ -891,8 +882,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SeparateConference_0300, Functi
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
     }
-    ASSERT_TRUE(blueToothClientPtr_ != nullptr);
-    EXPECT_NE(CallManagerGtest::blueToothClientPtr_->SeparateConference(), RETURN_VALUE_IS_ZERO);
+    EXPECT_NE(bluetoothCallClient.SeparateConference(), RETURN_VALUE_IS_ZERO);
 }
 
 /**
@@ -962,8 +952,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_KickOutFromConference_0300, Fun
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
     }
-    ASSERT_TRUE(blueToothClientPtr_ != nullptr);
-    EXPECT_NE(CallManagerGtest::blueToothClientPtr_->KickOutFromConference(), RETURN_VALUE_IS_ZERO);
+    EXPECT_NE(bluetoothCallClient.KickOutFromConference(), RETURN_VALUE_IS_ZERO);
 }
 } // namespace Telephony
 } // namespace OHOS

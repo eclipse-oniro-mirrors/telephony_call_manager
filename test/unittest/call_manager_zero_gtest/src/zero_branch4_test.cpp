@@ -647,33 +647,33 @@ HWTEST_F(ZeroBranch3Test, Telephony_CallAbilityCallbackStub_001, Function | Medi
  */
 HWTEST_F(ZeroBranch3Test, Telephony_BluetoothCallClient_001, Function | MediumTest | Level3)
 {
-    std::shared_ptr<BluetoothCallClient> bluetoothCallClient = std::make_shared<BluetoothCallClient>();
-    bluetoothCallClient->UnInit();
-    ASSERT_NE(bluetoothCallClient->RegisterCallBack(nullptr), TELEPHONY_SUCCESS);
-    ASSERT_NE(bluetoothCallClient->UnRegisterCallBack(), TELEPHONY_SUCCESS);
+    BluetoothCallClient &bluetoothCallClient = DelayedRefSingleton<BluetoothCallClient>::GetInstance();
+    bluetoothCallClient.UnInit();
+    ASSERT_NE(bluetoothCallClient.RegisterCallBack(nullptr), TELEPHONY_SUCCESS);
+    ASSERT_NE(bluetoothCallClient.UnRegisterCallBack(), TELEPHONY_SUCCESS);
     std::u16string value = u"";
     AppExecFwk::PacMap extras;
     bool enabled;
-    bluetoothCallClient->IsNewCallAllowed(enabled);
-    bluetoothCallClient->IsInEmergencyCall(enabled);
-    bluetoothCallClient->SetMuted(false);
-    bluetoothCallClient->MuteRinger();
-    bluetoothCallClient->SetAudioDevice(AudioDeviceType::DEVICE_BLUETOOTH_SCO, "test");
-    bluetoothCallClient->GetCurrentCallList(-1).size();
-    ASSERT_NE(bluetoothCallClient->DialCall(value, extras), TELEPHONY_SUCCESS);
-    ASSERT_NE(bluetoothCallClient->AnswerCall(), TELEPHONY_SUCCESS);
-    ASSERT_NE(bluetoothCallClient->RejectCall(), TELEPHONY_SUCCESS);
-    ASSERT_NE(bluetoothCallClient->HangUpCall(), TELEPHONY_SUCCESS);
-    ASSERT_GE(bluetoothCallClient->GetCallState(), TELEPHONY_SUCCESS);
-    ASSERT_NE(bluetoothCallClient->HoldCall(), TELEPHONY_SUCCESS);
-    ASSERT_NE(bluetoothCallClient->UnHoldCall(), TELEPHONY_SUCCESS);
-    ASSERT_NE(bluetoothCallClient->SwitchCall(), TELEPHONY_SUCCESS);
-    ASSERT_NE(bluetoothCallClient->CombineConference(), TELEPHONY_SUCCESS);
-    ASSERT_NE(bluetoothCallClient->SeparateConference(), TELEPHONY_SUCCESS);
-    ASSERT_NE(bluetoothCallClient->KickOutFromConference(), TELEPHONY_SUCCESS);
-    ASSERT_NE(bluetoothCallClient->StartDtmf('a'), TELEPHONY_SUCCESS);
-    ASSERT_NE(bluetoothCallClient->StopDtmf(), TELEPHONY_SUCCESS);
-    ASSERT_NE(bluetoothCallClient->IsRinging(enabled), TELEPHONY_SUCCESS);
+    bluetoothCallClient.IsNewCallAllowed(enabled);
+    bluetoothCallClient.IsInEmergencyCall(enabled);
+    bluetoothCallClient.SetMuted(false);
+    bluetoothCallClient.MuteRinger();
+    bluetoothCallClient.SetAudioDevice(AudioDeviceType::DEVICE_BLUETOOTH_SCO, "test");
+    bluetoothCallClient.GetCurrentCallList(-1).size();
+    ASSERT_NE(bluetoothCallClient.DialCall(value, extras), TELEPHONY_SUCCESS);
+    ASSERT_NE(bluetoothCallClient.AnswerCall(), TELEPHONY_SUCCESS);
+    ASSERT_NE(bluetoothCallClient.RejectCall(), TELEPHONY_SUCCESS);
+    ASSERT_NE(bluetoothCallClient.HangUpCall(), TELEPHONY_SUCCESS);
+    ASSERT_GE(bluetoothCallClient.GetCallState(), TELEPHONY_SUCCESS);
+    ASSERT_NE(bluetoothCallClient.HoldCall(), TELEPHONY_SUCCESS);
+    ASSERT_NE(bluetoothCallClient.UnHoldCall(), TELEPHONY_SUCCESS);
+    ASSERT_NE(bluetoothCallClient.SwitchCall(), TELEPHONY_SUCCESS);
+    ASSERT_NE(bluetoothCallClient.CombineConference(), TELEPHONY_SUCCESS);
+    ASSERT_NE(bluetoothCallClient.SeparateConference(), TELEPHONY_SUCCESS);
+    ASSERT_NE(bluetoothCallClient.KickOutFromConference(), TELEPHONY_SUCCESS);
+    ASSERT_NE(bluetoothCallClient.StartDtmf('a'), TELEPHONY_SUCCESS);
+    ASSERT_NE(bluetoothCallClient.StopDtmf(), TELEPHONY_SUCCESS);
+    ASSERT_NE(bluetoothCallClient.IsRinging(enabled), TELEPHONY_SUCCESS);
 }
 
 /**

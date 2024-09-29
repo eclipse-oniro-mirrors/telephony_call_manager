@@ -48,6 +48,7 @@ constexpr int MAX_LIMIT_TIME = 18000;
 constexpr int16_t SIM1_SLOTID = 0;
 const std::string PHONE_NUMBER = "0000000000";
 
+BluetoothCallClient &bluetoothCallClient = DelayedRefSingleton<BluetoothCallClient>::GetInstance();
 std::unordered_map<int32_t, std::unordered_set<int32_t>> g_callStateMap;
 int32_t g_newCallId = -1;
 std::mutex CallInfoManager::mutex_;
@@ -618,9 +619,8 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_IsInEmergencyCall_0200, Functio
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
     }
-    ASSERT_TRUE(blueToothClientPtr_ != nullptr);
     bool enabled = false;
-    EXPECT_EQ(CallManagerGtest::blueToothClientPtr_->IsInEmergencyCall(enabled), TELEPHONY_SUCCESS);
+    EXPECT_EQ(bluetoothCallClient.IsInEmergencyCall(enabled), TELEPHONY_SUCCESS);
     EXPECT_EQ(enabled, false);
 }
 
