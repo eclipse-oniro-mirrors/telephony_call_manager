@@ -341,8 +341,14 @@ void DistributedCallManager::DealDisconnectCall()
 
 void DistributedCallManager::SwitchOnDCallDeviceAsync(const AudioDevice& device)
 {
+    auto weak = weak_from_this();
     TELEPHONY_LOGI("switch on dcall device async");
-    std::thread switchThread = std::thread([this, device]() { this->SwitchOnDCallDeviceSync(device); });
+    std::thread switchThread = std::thread([weak, device]() {
+        auto strong = weak.lock();
+        if (strong) {
+            strong->SwitchOnDCallDeviceSync(device);
+        }
+    });
     pthread_setname_np(switchThread.native_handle(), SWITCH_ON_DCALL_THREAD_NAME.c_str());
     switchThread.detach();
 }

@@ -136,9 +136,15 @@ int32_t CallRequestHandler::JoinConference(int32_t callId, std::vector<std::stri
         TELEPHONY_LOGE("callRequestProcessPtr_ is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    ffrt::submit([=]() {
+    std::weak_ptr<CallRequestProcess> callRequestProcessPtr = callRequestProcessPtr_;
+    ffrt::submit([callId, callRequestProcessPtr, numberList]() {
+        std::shared_ptr<CallRequestProcess> processPtr = callRequestProcessPtr.lock();
         std::vector<std::string> mNumberList(numberList);
-        callRequestProcessPtr_->JoinConference(callId, mNumberList);
+        if (processPtr == nullptr) {
+            TELEPHONY_LOGE("processPtr is null");
+            return;
+        }
+        processPtr->JoinConference(callId, mNumberList);
     });
     return TELEPHONY_SUCCESS;
 }

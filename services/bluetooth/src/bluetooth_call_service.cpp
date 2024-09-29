@@ -62,7 +62,7 @@ int32_t BluetoothCallService::AnswerCall()
         if (DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance()->
             GetCurrentIsSuperPrivacyMode()) {
             DelayedSingleton<AudioControlManager>::GetInstance()->PlayWaitingTone();
-            ffrt::submit_h([&]() {
+            ffrt::submit_h([]() {
                 DelayedSingleton<AudioControlManager>::GetInstance()->StopWaitingTone();
                 }, {}, {}, ffrt::task_attr().delay(DELAY_STOP_PLAY_TIME));
         }

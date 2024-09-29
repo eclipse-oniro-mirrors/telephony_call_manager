@@ -32,7 +32,7 @@
 
 namespace OHOS {
 namespace Telephony {
-class DistributedCallManager {
+class DistributedCallManager : public std::enable_shared_from_this<DistributedCallManager> {
     DECLARE_DELAYED_SINGLETON(DistributedCallManager)
 public:
     void Init();
