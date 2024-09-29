@@ -1,0 +1,61 @@
+# Copyright (C) 2024-2024 Huawei Device Co., Ltd.
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/test.gni")
+import("../../../callmanager.gni")
+CALL_MANAGER_PATH = "../../.."
+
+ohos_unittest("distributed_communication_test") {
+  install_enable = true
+  subsystem_name = "telephony"
+  part_name = "call_manager"
+  test_module = "distributed_communication_test"
+  module_out_path = part_name + "/" + test_module
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+    blocklist = "../../cfi_blocklist.txt"
+  }
+  branch_protector_ret = "pac_ret"
+
+  sources = [
+    "src/distributed_communication_manager_test.cpp",
+    "src/distributed_data_test.cpp",
+    "src/distributed_dev_observer_test.cpp",
+    "src/distributed_dev_switch_test.cpp",
+    "src/distributed_transmission_test.cpp",
+  ]
+  sources += call_manager_sources
+
+  include_dirs = []
+  include_dirs += call_manager_include_dirs
+
+  external_deps = []
+  external_deps += call_manager_external_deps
+
+  remove_configs = [ "//build/config/compiler:no_exceptions" ]
+
+  deps = [
+    "${CALL_MANAGER_PATH}/frameworks/native:tel_call_manager_api",
+    "//third_party/cJSON:cjson",
+    "//third_party/libphonenumber/cpp:phonenumber_standard",
+  ]
+
+  defines = [
+    "TELEPHONY_LOG_TAG = \"CallManagerGtest\"",
+    "LOG_DOMAIN = 0xD000F00",
+    "private = public",
+    "protected = public",
+  ]
+}
