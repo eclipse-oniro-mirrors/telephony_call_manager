@@ -58,9 +58,10 @@ int32_t Tone::Play()
             }
             return TELEPHONY_SUCCESS;
         }
-        std::thread play([&]() {
+        std::shared_ptr<AudioStandard::TonePlayer> tonePlayerPtr = tonePlayer_;
+        std::thread play([tonePlayerPtr]() {
             pthread_setname_np(pthread_self(), TONE_PLAY_THREAD);
-            tonePlayer_->StartTone();
+            tonePlayerPtr->StartTone();
         });
         play.detach();
     } else {

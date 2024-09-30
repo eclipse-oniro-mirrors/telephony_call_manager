@@ -376,6 +376,7 @@ int32_t CallStatusCallback::SetImsFeatureValueResult(const int32_t result)
 
 int32_t CallStatusCallback::ReceiveUpdateCallMediaModeRequest(const CallModeReportInfo &response)
 {
+    auto weak = weak_from_this();
     TELEPHONY_LOGI("ReceiveUpdateCallMediaModeRequest result = %{public}d", response.result);
     int32_t ret = DelayedSingleton<ReportCallInfoHandler>::GetInstance()->ReceiveImsCallModeRequest(response);
     if (ret != TELEPHONY_SUCCESS) {
@@ -387,9 +388,12 @@ int32_t CallStatusCallback::ReceiveUpdateCallMediaModeRequest(const CallModeRepo
     if (callPtr != nullptr && callPtr->GetTelCallState() == TelCallState::CALL_STATUS_ACTIVE
         && response.callMode == ImsCallMode::CALL_MODE_SEND_RECEIVE) {
         if (DelayedSingleton<AudioControlManager>::GetInstance()->PlayWaitingTone() == TELEPHONY_SUCCESS) {
-            waitingToneHandle_ = ffrt::submit_h([&]() {
-                ShouldStopWaitingTone();
-                }, {}, {}, ffrt::task_attr().delay(DELAY_STOP_PLAY_TIME));
+            waitingToneHandle_ = ffrt::submit_h([weak]() {
+                auto strong = weak.lock();
+                if (strong) {
+                    strong->ShouldStopWaitingTone();
+                }
+            }, {}, {}, ffrt::task_attr().delay(DELAY_STOP_PLAY_TIME));
         }
     }
     return ret;

@@ -26,7 +26,7 @@
 
 namespace OHOS {
 namespace Telephony {
-class SatelliteCallControl {
+class SatelliteCallControl : public std::enable_shared_from_this<SatelliteCallControl> {
     DECLARE_DELAYED_SINGLETON(SatelliteCallControl);
 public:
     void SetSatcommTempLevel(int32_t level);

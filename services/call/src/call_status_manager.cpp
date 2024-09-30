@@ -1326,12 +1326,18 @@ sptr<CallBase> CallStatusManager::CreateNewCall(const CallDetailInfo &info, Call
     if (info.state == TelCallState::CALL_STATUS_INCOMING || info.state == TelCallState::CALL_STATUS_WAITING ||
         (info.state == TelCallState::CALL_STATUS_DIALING && (info.index == 0 || IsDcCallConneceted()))) {
         TELEPHONY_LOGI("NumberLocationUpdate start");
-        ffrt::submit([=]() {
-            DelayedSingleton<CallNumberUtils>::GetInstance()->NumberLocationUpdate(callPtr);
-            DelayedSingleton<DistributedCommunicationManager>::GetInstance()->ProcessCallInfo(callPtr,
+        wptr<CallBase> callBaseWeakPtr = callPtr;
+        ffrt::submit([callBaseWeakPtr, info]() {
+            sptr<CallBase> callBasePtr = callBaseWeakPtr.promote();
+            if (callBasePtr == nullptr) {
+                TELEPHONY_LOGE("callBasePtr is nullptr");
+                return;
+            }
+            DelayedSingleton<CallNumberUtils>::GetInstance()->NumberLocationUpdate(callBasePtr);
+            DelayedSingleton<DistributedCommunicationManager>::GetInstance()->ProcessCallInfo(callBasePtr,
                 DistributedDataType::LOCATION);
             if (info.state == TelCallState::CALL_STATUS_DIALING) {
-                DelayedSingleton<CallNumberUtils>::GetInstance()->YellowPageAndMarkUpdate(callPtr);
+                DelayedSingleton<CallNumberUtils>::GetInstance()->YellowPageAndMarkUpdate(callBasePtr);
             }
         });
     }

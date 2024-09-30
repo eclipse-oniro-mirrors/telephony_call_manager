@@ -186,6 +186,7 @@ void SatelliteCallControl::PublishSatelliteConnectEvent()
 
 int32_t SatelliteCallControl::SetSatelliteCallDurationProcessing()
 {
+    auto weak = weak_from_this();
     TELEPHONY_LOGI("start satellite call duration task");
     auto runner = AppExecFwk::EventRunner::Create("start_satellite_call_duration_dialog");
     if (CallDurationLimitHandler_ == nullptr) {
@@ -195,10 +196,14 @@ int32_t SatelliteCallControl::SetSatelliteCallDurationProcessing()
         TELEPHONY_LOGI("CallDurationLimitHandler_ is nullptr");
         return TELEPHONY_ERROR;
     }
-    auto task = [this]() {
-        if (!IsShowDialog()) {
+    auto task = [weak]() {
+        auto strong = weak.lock();
+        if (!strong) {
+            return;
+        }
+        if (!strong->IsShowDialog()) {
             DelayedSingleton<CallDialog>::GetInstance()->DialogConnectExtension("SATELLITE_CALL_DURATION_LIMIT");
-            SetShowDialog(true);
+            strong->SetShowDialog(true);
         }
     };
     CallDurationLimitHandler_->RemoveTask("start_satellite_call_duration_dialog");
