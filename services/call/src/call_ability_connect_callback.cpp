@@ -48,7 +48,7 @@ void CallAbilityConnectCallback::OnAbilityConnectDone(
         }
         DelayedSingleton<CallAbilityReportProxy>::GetInstance()->CallEventUpdated(eventInfo);
         DelayedSingleton<AudioDeviceManager>::GetInstance()->UpdateEarpieceDevice();
-        CallVoiceAssistantManager::GetInstance()->PublishCommonEvent(true);
+        CallVoiceAssistantManager::GetInstance()->PublishCommonEvent(true, std::string("call_ui_connect_done"));
     }
 }
 

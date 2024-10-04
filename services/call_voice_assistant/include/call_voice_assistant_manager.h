@@ -58,7 +58,7 @@ public:
     bool UnRegisterListenSwitchState();
     bool ConnectAbility(int32_t accountId);
     bool DisconnectAbility();
-    void PublishCommonEvent(bool isConnect);
+    void PublishCommonEvent(bool isConnect, std::string publisher);
     void OnStartService(const std::string& isDial, const int32_t& accountId);
     void OnStopService();
     void UpdateReplyData(const std::string& str);
