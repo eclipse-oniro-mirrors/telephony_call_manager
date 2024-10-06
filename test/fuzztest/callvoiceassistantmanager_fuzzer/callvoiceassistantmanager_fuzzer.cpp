@@ -51,10 +51,10 @@ void ListenCallStateFunc(const uint8_t *data, size_t size)
     voicePtr->ConnectAbility(ACCOUNT_ID);
     voicePtr->OnStartService(INCOMING, ACCOUNT_ID);
     voicePtr->RegisterListenSwitchState();
-    voicePtr->PublishCommonEvent(true);
+    voicePtr->PublishCommonEvent(true, INCOMING);
     voicePtr->DisconnectAbility();
     voicePtr->UnRegisterListenSwitchState();
-    voicePtr->PublishCommonEvent(false);
+    voicePtr->PublishCommonEvent(false, DIALING);
     voicePtr->OnStopService();
     voicePtr->Release();
 }

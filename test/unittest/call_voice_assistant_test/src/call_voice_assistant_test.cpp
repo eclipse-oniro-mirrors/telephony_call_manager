@@ -73,10 +73,10 @@ HWTEST_F(CallVoiceAssistantManagerTest, Telephony_CallVoiceAssistantManager_001,
     voicePtr->ConnectAbility(ACCOUNT_ID);
     voicePtr->OnStartService(INCOMING, ACCOUNT_ID);
     voicePtr->RegisterListenSwitchState();
-    voicePtr->PublishCommonEvent(true);
+    voicePtr->PublishCommonEvent(true, INCOMING);
     voicePtr->DisconnectAbility();
     voicePtr->UnRegisterListenSwitchState();
-    voicePtr->PublishCommonEvent(false);
+    voicePtr->PublishCommonEvent(false, DIALING);
     voicePtr->OnStopService();
     voicePtr->Release();
     ASSERT_TRUE(voicePtr->GetInstance() != nullptr);
