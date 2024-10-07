@@ -46,13 +46,15 @@ void ZeroBranch7Test::SetUpTestCase() {}
 
 void ZeroBranch7Test::TearDownTestCase() {}
 
-void ZeroBranch7Test::SetUp() {
+void ZeroBranch7Test::SetUp()
+{
     DelayedSingleton<AudioProxy>::GetInstance()->SetAudioMicStateChangeCallback();
     DelayedSingleton<AudioProxy>::GetInstance()->SetAudioDeviceChangeCallback();
     DelayedSingleton<AudioProxy>::GetInstance()->SetAudioPreferDeviceChangeCallback();
 }
 
-void ZeroBranch7Test::TearDown() {
+void ZeroBranch7Test::TearDown()
+{
     sleep(1);
 }
 
