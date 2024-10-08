@@ -395,6 +395,8 @@ bool DistributedCallManager::IsSelectVirtualModem()
 
 void DistributedCallManager::ReportDistributedDeviceInfo()
 {
+    std::string curDevId = GetConnectedDCallDeviceId();
+    TELEPHONY_LOGD("curDevId = %{public}s", GetAnonyString(curDevId)).c_str();
     AudioSystemManager *audioSystemMananger = AudioSystemManager::GetInstance();
     if (audioSystemMananger == nullptr) {
         TELEPHONY_LOGW("audioSystemMananger nullptr");
@@ -407,10 +409,21 @@ void DistributedCallManager::ReportDistributedDeviceInfo()
         TELEPHONY_LOGW("no distributed device");
         return;
     }
+    std::vector<sptr<AudioDeviceDescriptor>> remoteDevice = descs;
+    for (auto device = descs.begin(); device != descs.end(); device++) {
+        std::string devId = (*device)->networkId_;
+        if (!devId.empty() && curDevId == devId) {
+            TELEPHONY_LOGI("curDecId is the same as devId, devId = %{public}s",
+                GetAnonyString(devId).c_str());
+            remoteDevice.clear();
+            remoteDevice.push_back(sptr<AudioDeviceDescriptor>(*device));
+            break;
+        }
+    }
     sptr<AudioRendererFilter> audioRendererFilter = new(std::nothrow) AudioRendererFilter();
     audioRendererFilter->rendererInfo.contentType = ContentType::CONTENT_TYPE_SPEECH;
     audioRendererFilter->rendererInfo.streamUsage = StreamUsage::STREAM_USAGE_VOICE_MODEM_COMMUNICATION;
-    audioSystemMananger->SelectOutputDevice(audioRendererFilter, descs);
+    audioSystemMananger->SelectOutputDevice(audioRendererFilter, remoteDevice);
     TELEPHONY_LOGW("ReportDistributedDeviceInfo");
 }
 
