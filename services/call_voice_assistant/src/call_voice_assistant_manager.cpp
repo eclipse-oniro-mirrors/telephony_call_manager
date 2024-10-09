@@ -123,10 +123,10 @@ bool CallVoiceAssistantManager::UnRegisterListenSwitchState()
     return true;
 };
 
-bool CallVoiceAssistantManager::ConnectAbility(int32_t accountId)
+bool CallVoiceAssistantManager::ConnectAbility(int32_t callId)
 {
     if (connectCallback_ == nullptr) {
-        connectCallback_ = sptr<VoiceAssistantConnectCallback>::MakeSptr(accountId);
+        connectCallback_ = sptr<VoiceAssistantConnectCallback>::MakeSptr(callId);
         if (connectCallback_ == nullptr) {
             TELEPHONY_LOGE("connectCallback is nullptr");
             return false;
@@ -184,11 +184,11 @@ void CallVoiceAssistantManager::PublishCommonEvent(bool isConnect, std::string p
     TELEPHONY_LOGI("publish commonEvent done, [%{public}s].", publisher.c_str());
 }
 
-void CallVoiceAssistantManager::OnStartService(const std::string& isDial, const int32_t& accountId)
+void CallVoiceAssistantManager::OnStartService(const std::string& isDial, const int32_t& callId)
 {
     if (mRemoteObject != nullptr) {
         TELEPHONY_LOGI("mRemote Object is not nullptr");
-        this->SendRequest(accountIds[accountId], true);
+        this->SendRequest(accountIds[callId], true);
         return;
     }
     OnStopService();
@@ -200,7 +200,7 @@ void CallVoiceAssistantManager::OnStartService(const std::string& isDial, const 
         TELEPHONY_LOGE("the switch is all close");
         return;
     }
-    if (ConnectAbility(accountId)) {
+    if (ConnectAbility(callId)) {
         TELEPHONY_LOGI("start service success");
         return;
     }
@@ -252,16 +252,16 @@ int CallVoiceAssistantManager::QueryValue(const std::string& key, std::string& v
     return TELEPHONY_SUCCESS;
 }
 
-void CallVoiceAssistantManager::UpdateNumberLocation(const std::string& location, int32_t accountId)
+void CallVoiceAssistantManager::UpdateNumberLocation(const std::string& location, int32_t callId)
 {
-    TELEPHONY_LOGI("update location id is %{public}d", accountId);
+    TELEPHONY_LOGI("update location callId is %{public}d", callId);
     auto voicePtr = CallVoiceAssistantManager::GetInstance();
     if (voicePtr == nullptr) {
         TELEPHONY_LOGE("voicePtr is nullptr");
         return;
     }
     std::lock_guard<std::mutex> lock(voicePtr->GetMutex());
-    auto nowInfo = voicePtr->GetContactInfo(accountId);
+    auto nowInfo = voicePtr->GetContactInfo(callId);
     if (nowInfo == nullptr) {
         TELEPHONY_LOGE("info is nullptr");
         return;
@@ -271,31 +271,31 @@ void CallVoiceAssistantManager::UpdateNumberLocation(const std::string& location
     voicePtr->SendRequest(nowInfo, true);
 }
 
-std::shared_ptr<IncomingContactInformation> CallVoiceAssistantManager::GetContactInfo(int32_t accountId)
+std::shared_ptr<IncomingContactInformation> CallVoiceAssistantManager::GetContactInfo(int32_t callId)
 {
-    if (accountIds[accountId] == nullptr) {
-        TELEPHONY_LOGI("initial contactinfo id is %{public}d", accountId);
-        accountIds[accountId] = std::make_shared<IncomingContactInformation>();
+    if (accountIds[callId] == nullptr) {
+        TELEPHONY_LOGI("initial contactinfo callId is %{public}d", callId);
+        accountIds[callId] = std::make_shared<IncomingContactInformation>();
     }
-    return accountIds[accountId];
+    return accountIds[callId];
 }
 
-void CallVoiceAssistantManager::UpdateRemoteObject(const sptr<IRemoteObject> &object, int32_t accountId)
+void CallVoiceAssistantManager::UpdateRemoteObject(const sptr<IRemoteObject> &object, int32_t callId)
 {
     mRemoteObject = object;
-    this->SendRequest(accountIds[accountId], true);
+    this->SendRequest(accountIds[callId], true);
 }
 
-void CallVoiceAssistantManager::UpdateContactInfo(const ContactInfo& info, int32_t accountId)
+void CallVoiceAssistantManager::UpdateContactInfo(const ContactInfo& info, int32_t callId)
 {
-    TELEPHONY_LOGI("update contactinfo id is %{public}d", accountId);
+    TELEPHONY_LOGI("update contactinfo callId is %{public}d", callId);
     auto voicePtr = CallVoiceAssistantManager::GetInstance();
     if (voicePtr == nullptr) {
         TELEPHONY_LOGE("voicePtr is nullptr");
         return;
     }
     std::lock_guard<std::mutex> lock(voicePtr->GetMutex());
-    auto nowInfo = voicePtr->GetContactInfo(accountId);
+    auto nowInfo = voicePtr->GetContactInfo(callId);
     if (nowInfo == nullptr) {
         TELEPHONY_LOGE("nowInfo is nullptr");
         return;
@@ -314,11 +314,11 @@ void CallVoiceAssistantManager::MuteRinger()
     std::lock_guard<std::mutex> lock(mutex_);
     VoiceAssistantRingSubscriber::Release();
     isplay = SWITCH_TURN_OFF;
-    if (nowAccountId == FAIL_CODE) {
-        TELEPHONY_LOGE("nowAccountId is invalid");
+    if (nowCallId == FAIL_CODE) {
+        TELEPHONY_LOGE("nowCallId is invalid");
         return;
     }
-    auto info = accountIds[nowAccountId];
+    auto info = accountIds[nowCallId];
     if (info != nullptr) {
         info->stopBroadcasting = 1;
     }
@@ -445,7 +445,7 @@ void CallVoiceAssistantManager::CallStateUpdated(
     }
     int32_t callId = callObjectPtr->GetCallID();
     int32_t accountId = callObjectPtr->GetAccountId();
-    auto info = GetContactInfo(accountId);
+    auto info = GetContactInfo(callId);
     if (info != nullptr) {
         info->call_status = (int32_t)callState;
         info->accountId = accountId;
@@ -477,56 +477,50 @@ void CallVoiceAssistantManager::UpdateVoipCallState(int32_t state)
 
 void CallVoiceAssistantManager::CallStatusIncoming(const int32_t& callId, const int32_t& accountId)
 {
-    if ((CallStateToApp)nowVoipCallState == CallStateToApp::CALL_STATE_OFFHOOK) {
-        TELEPHONY_LOGE("the meetime callstate is off_hook");
-        OnStopService();
-        return;
-    }
-    auto info = GetContactInfo(accountId);
-    if (info == nullptr) {
-        TELEPHONY_LOGE("info is nullptr");
-        return;
-    }
-    info->dialOrCome = INCOMING;
-    for (auto& id : accountIds) {
-        if (id.second == nullptr) {
-            break;
-        }
-        TELEPHONY_LOGI("id %{public}d, state %{public}d.", id.first, id.second->call_status);
-        if ((TelCallState)id.second->call_status == TelCallState::CALL_STATUS_DIALING) {
-            info->dialOrCome = DIALING;
-        }
-        if ((TelCallState)id.second->call_status == TelCallState::CALL_STATUS_ACTIVE) {
+    if (nowCallId != callId && nowAccountId != accountId) {
+        TELEPHONY_LOGI("call_status_incoming, [%{public}d][%{public}d]", accountId, callId);
+        if ((CallStateToApp)nowVoipCallState == CallStateToApp::CALL_STATE_OFFHOOK) {
+            TELEPHONY_LOGE("the meetime callstate is off_hook");
+            OnStopService();
             return;
         }
-    }
-    if (nowCallId != callId && nowAccountId != accountId) {
-        TELEPHONY_LOGI("call_status_incoming id %{public}d", accountId);
+        auto info = accountIds[callId];
+        if (info == nullptr) {
+            TELEPHONY_LOGE("info is nullptr");
+            return;
+        }
+        info->dialOrCome = INCOMING;
+        if (CheckTelCallState(TelCallState::CALL_STATUS_ACTIVE) != FAIL_CODE) {
+            return;
+        }
+        if (CheckTelCallState(TelCallState::CALL_STATUS_DIALING) != FAIL_CODE) {
+            info->dialOrCome = DIALING;
+        }
         nowCallId = callId;
         nowAccountId = accountId;
-        OnStartService(info->dialOrCome, accountId);
+        OnStartService(info->dialOrCome, callId);
     }
 }
 
 void CallVoiceAssistantManager::CallStatusDialing(const int32_t& callId, const int32_t& accountId)
 {
-    auto info = GetContactInfo(accountId);
+    auto info = accountIds[callId];
     if (info == nullptr) {
         TELEPHONY_LOGE("info is nullptr");
         return;
     }
     if (nowCallId != callId && nowAccountId != accountId) {
-        TELEPHONY_LOGI("call_status_dialing id %{public}d", accountId);
+        TELEPHONY_LOGI("call_status_dialing, [%{public}d][%{public}d]", accountId, callId);
         info->dialOrCome = DIALING;
         nowCallId = callId;
         nowAccountId = accountId;
-        OnStartService(info->dialOrCome, accountId);
+        OnStartService(info->dialOrCome, callId);
     }
 }
 
 void CallVoiceAssistantManager::CallStatusActive(const int32_t& callId, const int32_t& accountId)
 {
-    TELEPHONY_LOGI("call_status_active id %{public}d", accountId);
+    TELEPHONY_LOGI("call_status_active, [%{public}d][%{public}d]", accountId, callId);
     VoiceAssistantRingSubscriber::Release();
     PublishCommonEvent(false, std::string("call_status_active"));
     mRemoteObject = nullptr;
@@ -535,33 +529,47 @@ void CallVoiceAssistantManager::CallStatusActive(const int32_t& callId, const in
 
 void CallVoiceAssistantManager::CallStatusDisconnected(const int32_t& callId, const int32_t& accountId)
 {
-    TELEPHONY_LOGI("call_status_disconnected id %{public}d", accountId);
-    auto info = accountIds[accountId];
-    accountIds.erase(accountId);
-    for (auto& id : accountIds) {
-        if (id.second == nullptr) {
-            break;
-        }
-        TELEPHONY_LOGI("id %{public}d, state %{public}d.", id.first, id.second->call_status);
-        if ((TelCallState)id.second->call_status == TelCallState::CALL_STATUS_INCOMING) {
-            nowCallId = FAIL_CODE;
-            nowAccountId = FAIL_CODE;
-            IsStartVoiceBroadcast();
-            CallStatusIncoming(id.second->callId, id.second->accountId);
-            return;
-        }
-        if ((TelCallState)id.second->call_status == TelCallState::CALL_STATUS_DIALING) {
-            CallStatusDialing(id.second->callId, id.second->accountId);
-            return;
-        }
-        if ((TelCallState)id.second->call_status == TelCallState::CALL_STATUS_ACTIVE) {
-            return;
-        }
+    TELEPHONY_LOGI("call_status_disconnected, [%{public}d][%{public}d]", accountId, callId);
+    auto lastInfo = accountIds[callId];
+    accountIds.erase(callId);
+    if (CheckTelCallState(TelCallState::CALL_STATUS_ACTIVE) != FAIL_CODE) {
+        return;
     }
-    SendRequest(info, false);
+    int32_t comeCallId = CheckTelCallState(TelCallState::CALL_STATUS_INCOMING);
+    TELEPHONY_LOGI("comeCallId, %{public}d.", comeCallId);
+    if (comeCallId != FAIL_CODE) {
+        auto nowInfo = accountIds[comeCallId];
+        if (nowInfo != nullptr && nowInfo->dialOrCome == INCOMING) {
+            nowCallId = nowInfo->callId;
+            nowAccountId = nowInfo->accountId;
+            SendRequest(nowInfo, true);
+        }
+        return;
+    }
+    TELEPHONY_LOGI("accountIds size is %{public}zu", accountIds.size());
+    SendRequest(lastInfo, false);
     OnStopService();
     nowCallId = FAIL_CODE;
     nowAccountId = FAIL_CODE;
+}
+
+int32_t CallVoiceAssistantManager::CheckTelCallState(TelCallState state)
+{
+    TELEPHONY_LOGI("check state, %{public}d.", state);
+    int32_t invalid = FAIL_CODE;
+    for (auto& id : accountIds) {
+        if (id.second == nullptr) {
+            TELEPHONY_LOGE("invalid callId, %{public}d.", id.first);
+            invalid = id.first;
+            continue;
+        }
+        TELEPHONY_LOGI("callId %{public}d, state %{public}d.", id.first, id.second->call_status);
+        if ((TelCallState)id.second->call_status == state) {
+            return id.first;
+        }
+    }
+    accountIds.erase(invalid);
+    return FAIL_CODE;
 }
 
 VoiceAssistantRingSubscriber::VoiceAssistantRingSubscriber(const EventFwk::CommonEventSubscribeInfo &subscriberInfo)

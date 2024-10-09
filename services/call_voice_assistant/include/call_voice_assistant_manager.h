@@ -56,10 +56,10 @@ public:
     bool IsSwitchOn(const std::string& switchState);
     bool RegisterListenSwitchState();
     bool UnRegisterListenSwitchState();
-    bool ConnectAbility(int32_t accountId);
+    bool ConnectAbility(int32_t callId);
     bool DisconnectAbility();
     void PublishCommonEvent(bool isConnect, std::string publisher);
-    void OnStartService(const std::string& isDial, const int32_t& accountId);
+    void OnStartService(const std::string& isDial, const int32_t& callId);
     void OnStopService();
     void UpdateReplyData(const std::string& str);
     void CallStateUpdated(sptr<CallBase> &callObjectPtr, TelCallState priorState, TelCallState nextState) override;
@@ -68,9 +68,9 @@ public:
     void CallStatusActive(const int32_t& callId, const int32_t& accountId);
     void CallStatusDisconnected(const int32_t& callId, const int32_t& accountId);
     void MuteRinger();
-    std::shared_ptr<IncomingContactInformation> GetContactInfo(int32_t accountId);
+    std::shared_ptr<IncomingContactInformation> GetContactInfo(int32_t callId);
     void SendRequest(const std::shared_ptr<IncomingContactInformation> info, bool isNeed);
-    void UpdateRemoteObject(const sptr<IRemoteObject> &object, int32_t accountId);
+    void UpdateRemoteObject(const sptr<IRemoteObject> &object, int32_t callId);
     std::string GetSendString(const std::shared_ptr<IncomingContactInformation> nowInfo);
     void SetIsControlSwitchOn(bool state);
     bool GetIsControlSwitchOn();
@@ -78,8 +78,9 @@ public:
     std::mutex& GetMutex();
     void UpdateVoipCallState(int32_t state);
     bool IsStartVoiceBroadcast();
-    static void UpdateNumberLocation(const std::string& location, int32_t accountId);
-    static void UpdateContactInfo(const ContactInfo &info, int32_t accountId);
+    int32_t CheckTelCallState(TelCallState state);
+    static void UpdateNumberLocation(const std::string& location, int32_t callId);
+    static void UpdateContactInfo(const ContactInfo &info, int32_t callId);
     static std::shared_ptr<CallVoiceAssistantManager> GetInstance();
 
 private:

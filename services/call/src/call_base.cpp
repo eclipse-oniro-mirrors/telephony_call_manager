@@ -426,7 +426,7 @@ void CallBase::SetNumberLocation(std::string numberLocation)
 {
     std::lock_guard<std::mutex> lock(mutex_);
     numberLocation_ = numberLocation;
-    CallVoiceAssistantManager::UpdateNumberLocation(numberLocation, accountId_);
+    CallVoiceAssistantManager::UpdateNumberLocation(numberLocation, callId_);
 }
 
 int32_t CallBase::GetAccountId()
@@ -462,7 +462,7 @@ void CallBase::SetCallerInfo(const ContactInfo &info)
 {
     std::lock_guard<std::mutex> lock(mutex_);
     contactInfo_ = info;
-    CallVoiceAssistantManager::UpdateContactInfo(info, accountId_);
+    CallVoiceAssistantManager::UpdateContactInfo(info, callId_);
 }
 
 NumberMarkInfo CallBase::GetNumberMarkInfo()
