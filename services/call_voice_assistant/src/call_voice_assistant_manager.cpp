@@ -546,7 +546,7 @@ void CallVoiceAssistantManager::CallStatusDisconnected(const int32_t& callId, co
         }
         return;
     }
-    TELEPHONY_LOGI("accountIds size is %{public}d", (int)accountIds.size());
+    TELEPHONY_LOGI("accountIds size is %{public}zu", accountIds.size());
     SendRequest(lastInfo, false);
     OnStopService();
     nowCallId = FAIL_CODE;
