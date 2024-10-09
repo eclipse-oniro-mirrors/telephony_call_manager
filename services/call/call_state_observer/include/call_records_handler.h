@@ -36,7 +36,6 @@ public:
     int32_t AddCallLogInfo(const CallRecordInfo &info);
 
 private:
-    void QueryCallerInfo(ContactInfo &contactInfo, std::string phoneNumber);
     std::string CheckNumberLocationInfo(const CallRecordInfo &info);
     void MakeCallLogInsertBucket(DataShare::DataShareValuesBucket &bucket,
         const CallRecordInfo &info, std::string displayName, std::string numberLocation);

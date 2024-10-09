@@ -159,18 +159,18 @@ void SpamCallAdapter::ParseDetectResult(const std::string &jsonData, bool &isBlo
         cJSON_Delete(root);
         return;
     }
-    TELEPHONY_LOGI("detectResult: %{public}d", numberValue);
     isBlock = numberValue == 1;
+    TELEPHONY_LOGI("detectResult: %{public}d", isBlock);
     if (!JsonGetNumberValue(root, DECISION_REASON, numberValue)) {
         cJSON_Delete(root);
         return;
     }
-    TELEPHONY_LOGI("decisionReason: %{public}d", numberValue);
     blockReason = numberValue;
+    TELEPHONY_LOGI("decisionReason: %{public}d", blockReason);
     if (JsonGetNumberValue(root, MARK_TYPE, numberValue)) {
         info.markType = static_cast<MarkType>(numberValue);
     }
-    TELEPHONY_LOGI("markType: %{public}d", numberValue);
+    TELEPHONY_LOGI("markType: %{public}d", info.markType);
     if (JsonGetNumberValue(root, MARK_COUNT, numberValue)) {
         info.markCount = numberValue;
     }
