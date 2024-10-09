@@ -396,7 +396,7 @@ bool DistributedCallManager::IsSelectVirtualModem()
 void DistributedCallManager::ReportDistributedDeviceInfo()
 {
     std::string curDevId = GetConnectedDCallDeviceId();
-    TELEPHONY_LOGD("curDevId = %{public}s", GetAnonyString(curDevId)).c_str();
+    TELEPHONY_LOGD("curDevId = %{public}s", GetAnonyString(curDevId).c_str());
     AudioSystemManager *audioSystemMananger = AudioSystemManager::GetInstance();
     if (audioSystemMananger == nullptr) {
         TELEPHONY_LOGW("audioSystemMananger nullptr");
