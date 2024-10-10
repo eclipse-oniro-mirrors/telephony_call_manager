@@ -64,8 +64,7 @@
                 "image_framework",
                 "miscdevice",
                 "location",
-                "dsoftbus",
-                "telephony_cust"
+                "dsoftbus"
             ],
             "third_party": [
                 "libphonenumber",

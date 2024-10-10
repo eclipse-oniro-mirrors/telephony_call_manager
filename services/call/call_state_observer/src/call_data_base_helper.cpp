@@ -172,6 +172,7 @@ bool CallDataBaseHelper::Query(std::vector<std::string> *phones, DataShare::Data
 
 bool CallDataBaseHelper::Query(ContactInfo &contactInfo, DataShare::DataSharePredicates &predicates)
 {
+    TELEPHONY_LOGI("QueryCallerInfo use normal query");
     std::shared_ptr<DataShare::DataShareHelper> helper = CreateDataShareHelper(CONTACT_URI);
     if (helper == nullptr) {
         TELEPHONY_LOGE("helper is nullptr");
@@ -184,17 +185,8 @@ bool CallDataBaseHelper::Query(ContactInfo &contactInfo, DataShare::DataSharePre
         helper->Release();
         return false;
     }
-    int32_t ret = 0;
-    if (contactInfo.number.length() >= static_cast<size_t>(QUERY_CONTACT_LEN)) {
-        int resultId = TelCustManager::GetInstance().GetCallerIndex(resultSet, contactInfo.number);
-        TELEPHONY_LOGI("QueryCallerInfo use enhanced query, index: %{public}d", resultId);
-        ret = resultSet->GoToRow(resultId);
-    } else {
-        TELEPHONY_LOGI("QueryCallerInfo use normal query");
-        ret = resultSet->GoToFirstRow();
-    }
-    if (ret != E_OK) {
-        TELEPHONY_LOGE("GoToRow failed");
+    if (resultSet->GoToFirstRow() != E_OK) {
+        TELEPHONY_LOGE("GoToFirstRow failed");
         resultSet->Close();
         helper->Release();
         return false;
@@ -384,7 +376,8 @@ int32_t CallDataBaseHelper::GetAirplaneMode(bool &isAirplaneModeOn)
     return TELEPHONY_SUCCESS;
 }
 
-bool CallDataBaseHelper::CheckResultSet(std::shared_ptr<DataShare::DataShareResultSet> resultSet) {
+bool CallDataBaseHelper::CheckResultSet(std::shared_ptr<DataShare::DataShareResultSet> resultSet)
+{
     if (resultSet == nullptr) {
         TELEPHONY_LOGE("resultSet is nullptr");
         return false;
@@ -398,5 +391,58 @@ bool CallDataBaseHelper::CheckResultSet(std::shared_ptr<DataShare::DataShareResu
     }
     return true;
 }
+
+#ifdef ABILITY_CUST_SUPPORT
+bool CallDataBaseHelper::QueryContactInfoEnhanced(ContactInfo &contactInfo, DataShare::DataSharePredicates &predicates)
+{
+    std::shared_ptr<DataShare::DataShareHelper> helper = CreateDataShareHelper(CONTACT_URI);
+    if (helper == nullptr) {
+        TELEPHONY_LOGE("helper is nullptr");
+        return false;
+    }
+    Uri uri(CONTACT_DATA);
+    std::vector<std::string> columns;
+    auto resultSet = helper->Query(uri, predicates, columns);
+    if (!CheckResultSet(resultSet)) {
+        helper->Release();
+        return false;
+    }
+    int resultId = GetCallerIndex(resultSet, contactInfo.number);
+    TELEPHONY_LOGI("QueryCallerInfo use enhanced query, index: %{public}d", resultId);
+    if (resultSet->GoToRow(resultId) != E_OK) {
+        TELEPHONY_LOGE("GoToRow failed");
+        resultSet->Close();
+        helper->Release();
+        return false;
+    }
+    int32_t columnIndex;
+    resultSet->GetColumnIndex(CALL_DISPLAY_NAME, columnIndex);
+    resultSet->GetString(columnIndex, contactInfo.name);
+    resultSet->Close();
+    helper->Release();
+    TELEPHONY_LOGI("Query end, contactName length: %{public}zu", contactInfo.name.length());
+    return true;
+}
+
+int GetCallerIndex(std::shared_ptr<DataShare::DataShareResultSet> resultSet,
+    std::string phoneNumber)
+{
+    void *telephonyHandle = dlopen(TELEPHONY_CUST_SO_PATH.c_str(), RTLD_LAZY);
+    if (telephonyHandle == nullptr) {
+        TELEPHONY_LOGE("telephonyHandle is nullptr");
+        return -1;
+    }
+    typedef int (*GetCallerIndex) (std::shared_ptr<DataShare::DataShareResultSet>, std::string);
+    GetCallerIndex getCallerIndex = reinterpret_cast<GetCallerIndex>(dlsym(telephonyHandle, "GetCallerNumIndex"));
+    if (getCallerIndex == nullptr) {
+        TELEPHONY_LOGE("getCallerIndex is nullptr");
+        dlclose(telephonyHandle);
+        return -1;
+    }
+    int resultId = getCallerIndex(resultSet, phoneNumber);
+    dlclose(telephonyHandle);
+    return resultId;
+}
+#endif
 } // namespace Telephony
 } // namespace OHOS

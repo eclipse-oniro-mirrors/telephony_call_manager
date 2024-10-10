@@ -190,7 +190,6 @@ call_manager_external_deps = [
   "player_framework:system_sound_client",
   "safwk:system_ability_fwk",
   "samgr:samgr_proxy",
-  "telephony_cust:telephony_cust_api",
 ]
 
 call_manager_defines = []
@@ -240,4 +239,10 @@ if (defined(global_parts_info) &&
     global_parts_info.hiviewdfx_hicollie) {
   call_manager_external_deps += [ "hicollie:libhicollie" ]
   call_manager_defines += [ "HICOLLIE_ENABLE" ]
+}
+
+if (defined(global_parts_info) &&
+    defined(global_parts_info.telephony_telephony_enhanced) &&
+    global_parts_info.telephony_telephony_enhanced) {
+  call_manager_defines += [ "ABILITY_CUST_SUPPORT" ]
 }
