@@ -254,27 +254,30 @@ int CallVoiceAssistantManager::QueryValue(const std::string& key, std::string& v
 
 void CallVoiceAssistantManager::UpdateNumberLocation(const std::string& location, int32_t callId)
 {
-    TELEPHONY_LOGI("update location callId is %{public}d", callId);
-    auto voicePtr = CallVoiceAssistantManager::GetInstance();
-    if (voicePtr == nullptr) {
-        TELEPHONY_LOGE("voicePtr is nullptr");
+    TELEPHONY_LOGI("update location callId, %{public}d", callId);
+    std::lock_guard<std::mutex> lock(mutex_);
+    auto it_callId = accountIds.find(callId);
+    if (it_callId == accountIds.end()) {
+        TELEPHONY_LOGE("iterator is end");
         return;
     }
-    std::lock_guard<std::mutex> lock(voicePtr->GetMutex());
-    auto nowInfo = voicePtr->GetContactInfo(callId);
+    auto nowInfo = it_callId->second;
     if (nowInfo == nullptr) {
         TELEPHONY_LOGE("info is nullptr");
         return;
     }
+    if (nowInfo->dialOrCome == DIALING) {
+        TELEPHONY_LOGE("dialing without number location");
+        return;
+    }
     nowInfo->numberLocation = location;
-    nowInfo->isSetNumberLocation = true;
-    voicePtr->SendRequest(nowInfo, true);
+    SendRequest(nowInfo, true);
 }
 
 std::shared_ptr<IncomingContactInformation> CallVoiceAssistantManager::GetContactInfo(int32_t callId)
 {
     if (accountIds[callId] == nullptr) {
-        TELEPHONY_LOGI("initial contactinfo callId is %{public}d", callId);
+        TELEPHONY_LOGI("initial accountIds callId, %{public}d", callId);
         accountIds[callId] = std::make_shared<IncomingContactInformation>();
     }
     return accountIds[callId];
@@ -282,30 +285,34 @@ std::shared_ptr<IncomingContactInformation> CallVoiceAssistantManager::GetContac
 
 void CallVoiceAssistantManager::UpdateRemoteObject(const sptr<IRemoteObject> &object, int32_t callId)
 {
+    TELEPHONY_LOGI("update remote object callId, %{public}d", callId);
+    std::lock_guard<std::mutex> lock(mutex_);
     mRemoteObject = object;
     this->SendRequest(accountIds[callId], true);
 }
 
 void CallVoiceAssistantManager::UpdateContactInfo(const ContactInfo& info, int32_t callId)
 {
-    TELEPHONY_LOGI("update contactinfo callId is %{public}d", callId);
-    auto voicePtr = CallVoiceAssistantManager::GetInstance();
-    if (voicePtr == nullptr) {
-        TELEPHONY_LOGE("voicePtr is nullptr");
+    TELEPHONY_LOGI("update contact info callId, %{public}d", callId);
+    std::lock_guard<std::mutex> lock(mutex_);
+    auto it_callId = accountIds.find(callId);
+    if (it_callId == accountIds.end()) {
+        TELEPHONY_LOGE("iterator is end");
         return;
     }
-    std::lock_guard<std::mutex> lock(voicePtr->GetMutex());
-    auto nowInfo = voicePtr->GetContactInfo(callId);
+    auto nowInfo = it_callId->second;
     if (nowInfo == nullptr) {
-        TELEPHONY_LOGE("nowInfo is nullptr");
+        TELEPHONY_LOGE("info is nullptr");
+        return;
+    }
+    if (nowInfo->dialOrCome == DIALING) {
+        TELEPHONY_LOGE("dialing without contact info");
         return;
     }
     nowInfo->incomingName = info.name;
     nowInfo->phoneNumber = info.number;
-    nowInfo->isContact =
-        (nowInfo->incomingName == "") ? voicePtr->SWITCH_TURN_OFF : voicePtr->SWITCH_TURN_ON;
-    nowInfo->isSetContactInfo = true;
-    voicePtr->SendRequest(nowInfo, true);
+    nowInfo->isContact = (nowInfo->incomingName == "") ? SWITCH_TURN_OFF : SWITCH_TURN_ON;
+    SendRequest(nowInfo, true);
 }
 
 void CallVoiceAssistantManager::MuteRinger()
@@ -336,11 +343,9 @@ void CallVoiceAssistantManager::SendRequest(const std::shared_ptr<IncomingContac
         TELEPHONY_LOGE("info is nullptr");
         return;
     }
-    if (info->dialOrCome == DIALING) {
-        info->isSetNumberLocation = true;
-        info->isSetContactInfo = true;
-    }
-    if (!info->isSetNumberLocation || !info->isSetContactInfo || info->dialOrCome == DEFAULT_STRING) {
+    if (info->phoneNumber == DEFAULT_STRING || info->dialOrCome == DEFAULT_STRING ||
+        info->numberLocation == DEFAULT_STRING) {
+        TELEPHONY_LOGE("exist null string, %{public}s", (info->dialOrCome).c_str());
         return;
     }
     MessageParcel data, reply;
@@ -348,7 +353,7 @@ void CallVoiceAssistantManager::SendRequest(const std::shared_ptr<IncomingContac
     std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> convert;
     data.WriteString16(convert.from_bytes(GetSendString(info)));
     int32_t retCode = mRemoteObject->SendRequest(CHECK_CODE, data, reply, option);
-    TELEPHONY_LOGE("send request ret code, %{public}d.", retCode);
+    TELEPHONY_LOGI("send request ret code, %{public}d.", retCode);
     if (!isNeed) {
         return;
     }
@@ -372,17 +377,19 @@ void CallVoiceAssistantManager::SendRequest(const std::shared_ptr<IncomingContac
 void VoiceAssistantConnectCallback::OnAbilityConnectDone(const AppExecFwk::ElementName &element,
     const sptr<IRemoteObject> &remoteObject, int resultCode)
 {
-    TELEPHONY_LOGI("update mRemote Object code is %{public}d", resultCode);
+    TELEPHONY_LOGI("connect callback result code, %{public}d", resultCode);
     if (remoteObject == nullptr) {
         TELEPHONY_LOGE("RemoteObject is nullptr");
         return;
     }
-    CallVoiceAssistantManager::GetInstance()->UpdateRemoteObject(remoteObject, startId);
+    if (resultCode == TELEPHONY_SUCCESS) {
+        CallVoiceAssistantManager::GetInstance()->UpdateRemoteObject(remoteObject, startId);
+    }
 };
 
 void VoiceAssistantConnectCallback::OnAbilityDisconnectDone(const AppExecFwk::ElementName &element, int resultCode)
 {
-    TELEPHONY_LOGI("disconnect callback result code: %{public}d", resultCode);
+    TELEPHONY_LOGI("disconnect callback result code, %{public}d", resultCode);
 };
 
 std::string CallVoiceAssistantManager::GetSendString(const std::shared_ptr<IncomingContactInformation> nowInfo)
@@ -450,6 +457,7 @@ void CallVoiceAssistantManager::CallStateUpdated(
         info->call_status = (int32_t)callState;
         info->accountId = accountId;
         info->callId = callId;
+        info->call = callObjectPtr;
     }
     switch (callState) {
         case TelCallState::CALL_STATUS_ACTIVE:
@@ -496,6 +504,13 @@ void CallVoiceAssistantManager::CallStatusIncoming(const int32_t& callId, const 
         if (CheckTelCallState(TelCallState::CALL_STATUS_DIALING) != FAIL_CODE) {
             info->dialOrCome = DIALING;
         }
+        if (info->call != nullptr) {
+            ContactInfo contactInfo = info->call->GetCallerInfo();
+            info->numberLocation = info->call->GetNumberLocation();
+            info->incomingName = contactInfo.name;
+            info->phoneNumber = contactInfo.number;
+            info->isContact = (info->incomingName == "") ? SWITCH_TURN_OFF : SWITCH_TURN_ON;
+        }
         nowCallId = callId;
         nowAccountId = accountId;
         OnStartService(info->dialOrCome, callId);
@@ -512,6 +527,8 @@ void CallVoiceAssistantManager::CallStatusDialing(const int32_t& callId, const i
     if (nowCallId != callId && nowAccountId != accountId) {
         TELEPHONY_LOGI("call_status_dialing, [%{public}d][%{public}d]", accountId, callId);
         info->dialOrCome = DIALING;
+        info->numberLocation = DIALING;
+        info->phoneNumber = DIALING;
         nowCallId = callId;
         nowAccountId = accountId;
         OnStartService(info->dialOrCome, callId);
@@ -644,11 +661,6 @@ void CallVoiceAssistantManager::SetIsControlSwitchOn(bool state)
 bool CallVoiceAssistantManager::GetIsControlSwitchOn()
 {
     return isControlSwitchOn;
-};
-
-std::mutex& CallVoiceAssistantManager::GetMutex()
-{
-    return this->mutex_;
 };
 
 void CallVoiceAssistantManager::UpdateReplyData(const std::string& str)
