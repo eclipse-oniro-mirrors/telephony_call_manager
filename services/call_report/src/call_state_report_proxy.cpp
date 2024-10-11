@@ -45,6 +45,10 @@ void CallStateReportProxy::CallStateUpdated(
         TELEPHONY_LOGI("voip call no need to report call state");
         return;
     }
+    if (nextState == TelCallState::CALL_STATUS_DISCONNECTING) {
+        TELEPHONY_LOGI("disconnecting call no need to report call state");
+        return;
+    }
     UpdateCallState(callObjectPtr, nextState);
     UpdateCallStateForSlotId(callObjectPtr, nextState);
 }
