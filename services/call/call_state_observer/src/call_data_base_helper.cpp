@@ -22,7 +22,6 @@
 #include "phonenumbers/phonenumber.pb.h"
 #include "phonenumberutil.h"
 #include "telephony_log_wrapper.h"
-#include "tel_cust_manager.h"
 
 namespace OHOS {
 namespace Telephony {
