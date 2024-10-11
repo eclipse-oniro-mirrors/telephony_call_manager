@@ -405,8 +405,8 @@ bool CallObjectManager::HasCellularCallExist()
     for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
         if ((*it)->GetCallType() == CallType::TYPE_CS || (*it)->GetCallType() == CallType::TYPE_IMS ||
             (*it)->GetCallType() == CallType::TYPE_SATELLITE) {
-            if ((*it)->GetTelCallState != TelCallState::CALL_STATUS_DISCONNECTED &&
-                (*it)->GetTelCallState != TelCallState::CALL_STATUS_DISCONNECTING) {
+            if ((*it)->GetTelCallState() != TelCallState::CALL_STATUS_DISCONNECTED &&
+                (*it)->GetTelCallState() != TelCallState::CALL_STATUS_DISCONNECTING) {
                 return true;
             }
         }
