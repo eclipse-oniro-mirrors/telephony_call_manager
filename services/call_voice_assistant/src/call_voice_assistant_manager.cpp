@@ -343,7 +343,6 @@ void CallVoiceAssistantManager::SendRequest(const std::shared_ptr<IncomingContac
         TELEPHONY_LOGE("info is nullptr");
         return;
     }
-    TELEPHONY_LOGE("is has query contact info: %{public}d.", info->isQueryComplete);
     if (!info->isQueryComplete || info->dialOrCome == DEFAULT_STRING || info->numberLocation == "default") {
         TELEPHONY_LOGE("exist null string: %{public}s.", (info->dialOrCome).c_str());
         return;
