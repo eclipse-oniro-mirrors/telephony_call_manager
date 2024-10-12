@@ -286,7 +286,6 @@ std::shared_ptr<IncomingContactInformation> CallVoiceAssistantManager::GetContac
 void CallVoiceAssistantManager::UpdateRemoteObject(const sptr<IRemoteObject> &object, int32_t callId)
 {
     TELEPHONY_LOGI("update remote object callId, %{public}d", callId);
-    std::lock_guard<std::mutex> lock(mutex_);
     mRemoteObject = object;
     this->SendRequest(accountIds[callId], true);
 }
