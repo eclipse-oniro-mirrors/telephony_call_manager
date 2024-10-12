@@ -106,7 +106,6 @@ HWTEST_F(CallVoiceAssistantManagerTest, Telephony_CallVoiceAssistantManager_002,
         return;
     }
     voicePtr->mInstance_ = voicePtr;
-    voicePtr->GetMutex();
     voicePtr->SetIsControlSwitchOn(true);
     voicePtr->GetIsControlSwitchOn();
     voicePtr->GetIsPlayRing();

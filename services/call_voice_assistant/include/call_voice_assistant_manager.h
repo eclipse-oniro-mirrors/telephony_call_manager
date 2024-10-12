@@ -42,8 +42,8 @@ struct IncomingContactInformation {
     int32_t callId = -1;
     int32_t stopBroadcasting = 0;
     int32_t call_status = -1;
-    bool isSetNumberLocation = false;
-    bool isSetContactInfo = false;
+    sptr<CallBase> call = nullptr;
+    bool isQueryComplete = false;
 };
 
 class CallVoiceAssistantManager : public CallStateListenerBase {
@@ -75,12 +75,11 @@ public:
     void SetIsControlSwitchOn(bool state);
     bool GetIsControlSwitchOn();
     bool GetIsPlayRing();
-    std::mutex& GetMutex();
     void UpdateVoipCallState(int32_t state);
     bool IsStartVoiceBroadcast();
     int32_t CheckTelCallState(TelCallState state);
-    static void UpdateNumberLocation(const std::string& location, int32_t callId);
-    static void UpdateContactInfo(const ContactInfo &info, int32_t callId);
+    void UpdateNumberLocation(const std::string& location, int32_t callId);
+    void UpdateContactInfo(const ContactInfo &info, int32_t callId);
     static std::shared_ptr<CallVoiceAssistantManager> GetInstance();
 
 private:

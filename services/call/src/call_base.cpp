@@ -424,9 +424,9 @@ void CallBase::SetIsEccContact(bool isEccContact)
 
 void CallBase::SetNumberLocation(std::string numberLocation)
 {
+    CallVoiceAssistantManager::GetInstance()->UpdateNumberLocation(numberLocation, callId_);
     std::lock_guard<std::mutex> lock(mutex_);
     numberLocation_ = numberLocation;
-    CallVoiceAssistantManager::UpdateNumberLocation(numberLocation, callId_);
 }
 
 int32_t CallBase::GetAccountId()
@@ -460,9 +460,9 @@ ContactInfo CallBase::GetCallerInfo()
 
 void CallBase::SetCallerInfo(const ContactInfo &info)
 {
+    CallVoiceAssistantManager::GetInstance()->UpdateContactInfo(info, callId_);
     std::lock_guard<std::mutex> lock(mutex_);
     contactInfo_ = info;
-    CallVoiceAssistantManager::UpdateContactInfo(info, callId_);
 }
 
 NumberMarkInfo CallBase::GetNumberMarkInfo()

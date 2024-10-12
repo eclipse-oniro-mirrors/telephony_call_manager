@@ -114,7 +114,6 @@ void UpdateValueFunc(const uint8_t *data, size_t size)
     subscriber->OnReceiveEvent(eventData);
     subscriber->Initial();
     subscriber->Release();
-    voicePtr->GetMutex();
     voicePtr->SetIsControlSwitchOn(true);
     voicePtr->GetIsControlSwitchOn();
     voicePtr->GetIsPlayRing();

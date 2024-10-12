@@ -447,6 +447,7 @@ void CallStatusManager::SetContactInfo(sptr<CallBase> &call, std::string phoneNu
             .isSendToVoicemail = false,
             .isEcc = false,
             .isVoiceMail = false,
+            .isQueryComplete = true,
         };
         QueryCallerInfo(contactInfo, phoneNum);
         callObjectPtr->SetCallerInfo(contactInfo);
