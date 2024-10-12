@@ -530,6 +530,7 @@ void CallVoiceAssistantManager::CallStatusDialing(const int32_t& callId, const i
         info->dialOrCome = DIALING;
         info->numberLocation = DIALING;
         info->phoneNumber = DIALING;
+        info->isQueryComplete = true;
         nowCallId = callId;
         nowAccountId = accountId;
         OnStartService(info->dialOrCome, callId);
