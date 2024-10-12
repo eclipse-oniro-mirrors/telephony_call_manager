@@ -510,7 +510,7 @@ void CallVoiceAssistantManager::CallStatusIncoming(const int32_t& callId, const 
             info->incomingName = contactInfo.name;
             info->phoneNumber = contactInfo.number;
             info->isContact = (info->incomingName == "") ? SWITCH_TURN_OFF : SWITCH_TURN_ON;
-            nowInfo->isQueryComplete = contactInfo.isQueryComplete;
+            info->isQueryComplete = contactInfo.isQueryComplete;
         }
         nowCallId = callId;
         nowAccountId = accountId;
