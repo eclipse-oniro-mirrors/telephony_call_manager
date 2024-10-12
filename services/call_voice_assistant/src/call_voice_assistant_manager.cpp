@@ -310,6 +310,7 @@ void CallVoiceAssistantManager::UpdateContactInfo(const ContactInfo& info, int32
     }
     nowInfo->incomingName = info.name;
     nowInfo->phoneNumber = info.number;
+    nowInfo->isQueryComplete = info.isQueryComplete;
     nowInfo->isContact = (nowInfo->incomingName == "") ? SWITCH_TURN_OFF : SWITCH_TURN_ON;
     SendRequest(nowInfo, true);
 }
@@ -342,9 +343,9 @@ void CallVoiceAssistantManager::SendRequest(const std::shared_ptr<IncomingContac
         TELEPHONY_LOGE("info is nullptr");
         return;
     }
-    if (info->phoneNumber == DEFAULT_STRING || info->dialOrCome == DEFAULT_STRING ||
-        info->numberLocation == DEFAULT_STRING) {
-        TELEPHONY_LOGE("exist null string, %{public}s", (info->dialOrCome).c_str());
+    TELEPHONY_LOGE("is has query contact info: %{public}d.", info->isQueryComplete);
+    if (!info->isQueryComplete || info->dialOrCome == DEFAULT_STRING || info->numberLocation == "default") {
+        TELEPHONY_LOGE("exist null string: %{public}s.", (info->dialOrCome).c_str());
         return;
     }
     MessageParcel data, reply;
@@ -352,7 +353,7 @@ void CallVoiceAssistantManager::SendRequest(const std::shared_ptr<IncomingContac
     std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> convert;
     data.WriteString16(convert.from_bytes(GetSendString(info)));
     int32_t retCode = mRemoteObject->SendRequest(CHECK_CODE, data, reply, option);
-    TELEPHONY_LOGI("send request ret code, %{public}d.", retCode);
+    TELEPHONY_LOGI("send request ret code: %{public}d.", retCode);
     if (!isNeed) {
         return;
     }
@@ -509,6 +510,7 @@ void CallVoiceAssistantManager::CallStatusIncoming(const int32_t& callId, const 
             info->incomingName = contactInfo.name;
             info->phoneNumber = contactInfo.number;
             info->isContact = (info->incomingName == "") ? SWITCH_TURN_OFF : SWITCH_TURN_ON;
+            nowInfo->isQueryComplete = info.isQueryComplete;
         }
         nowCallId = callId;
         nowAccountId = accountId;

@@ -43,6 +43,7 @@ struct IncomingContactInformation {
     int32_t stopBroadcasting = 0;
     int32_t call_status = -1;
     sptr<CallBase> call = nullptr;
+    bool isQueryComplete = false;
 };
 
 class CallVoiceAssistantManager : public CallStateListenerBase {

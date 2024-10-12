@@ -85,6 +85,7 @@ struct ContactInfo {
     bool isSendToVoicemail = false;
     bool isEcc = false;
     bool isVoiceMail = false;
+    bool isQueryComplete = false;
 };
 } // namespace Telephony
 } // namespace OHOS
