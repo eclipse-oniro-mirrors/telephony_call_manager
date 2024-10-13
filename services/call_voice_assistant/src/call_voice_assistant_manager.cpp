@@ -266,7 +266,7 @@ void CallVoiceAssistantManager::UpdateNumberLocation(const std::string& location
         TELEPHONY_LOGE("info is nullptr");
         return;
     }
-    if (nowInfo->dialOrCome == DIALING) {
+    if ((TelCallState)nowInfo->call_status == TelCallState::CALL_STATUS_DIALING) {
         TELEPHONY_LOGE("dialing without number location");
         return;
     }
@@ -304,7 +304,7 @@ void CallVoiceAssistantManager::UpdateContactInfo(const ContactInfo& info, int32
         TELEPHONY_LOGE("info is nullptr");
         return;
     }
-    if (nowInfo->dialOrCome == DIALING) {
+    if ((TelCallState)nowInfo->call_status == TelCallState::CALL_STATUS_DIALING) {
         TELEPHONY_LOGE("dialing without contact info");
         return;
     }
