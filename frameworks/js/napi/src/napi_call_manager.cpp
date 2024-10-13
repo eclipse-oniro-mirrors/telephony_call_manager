@@ -3656,7 +3656,7 @@ void NapiCallManager::GetDialInfo(napi_env env, napi_value objValue, DialAsyncCo
     asyncContext.videoState = NapiCallManagerUtils::GetIntProperty(env, objValue, "videoState");
     asyncContext.dialScene = NapiCallManagerUtils::GetIntProperty(env, objValue, "dialScene");
     asyncContext.dialType = NapiCallManagerUtils::GetIntProperty(env, objValue, "dialType");
-    asyncContext.extras = NapiCallManagerUtils::GetStringProperty(env, objValue, "extras");
+    asyncContext.extraParams = NapiCallManagerUtils::GetWantParamsProperty(env, objValue, "extraParams");
 }
 
 void NapiCallManager::GetSmsInfo(napi_env env, napi_value objValue, RejectAsyncContext &asyncContext)
@@ -3786,7 +3786,7 @@ void NapiCallManager::NativeDialCall(napi_env env, void *data)
     dialInfo.PutIntValue("videoState", asyncContext->videoState);
     dialInfo.PutIntValue("dialScene", asyncContext->dialScene);
     dialInfo.PutIntValue("dialType", asyncContext->dialType);
-    dialInfo.PutStringValue("extras", asyncContext->extras);
+    dialInfo.PutStringValue("extraParams", AAFwk::WantParamWrapper(asyncContext->extraParams).ToString());
     asyncContext->errorCode =
         DelayedSingleton<CallManagerClient>::GetInstance()->DialCall(Str8ToStr16(phoneNumber), dialInfo);
     if (asyncContext->errorCode == TELEPHONY_SUCCESS) {

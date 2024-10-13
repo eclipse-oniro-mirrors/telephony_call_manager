@@ -22,6 +22,7 @@
 
 #include "call_manager_inner_type.h"
 #include "telephony_log_wrapper.h"
+#include "want_params_wrapper.h"
 
 const int16_t RINGING_CALL_NUMBER_LEN = 30;
 const int16_t DIALING_CALL_NUMBER_LEN = 30;
@@ -49,7 +50,7 @@ struct DialParaInfo {
     int32_t crsType = 0;
     int32_t originalCallType = 0;
     VoipCallReportInfo voipCallInfo;
-    std::string extras = "";
+    AAFwk::WantParams extraParams;
 };
 
 enum PolicyFlag : uint64_t {

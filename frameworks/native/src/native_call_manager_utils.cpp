@@ -17,6 +17,7 @@
 #include "call_manager_base.h"
 #include <securec.h>
 #include "telephony_log_wrapper.h"
+#include "want_params_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -69,9 +70,7 @@ CallAttributeInfo NativeCallManagerUtils::ReadCallAttributeInfo(MessageParcel &m
     if (strncpy_s(info.contactName, kMaxNumberLen + 1, messageParcel.ReadCString(), kMaxNumberLen + 1) != EOK) {
         TELEPHONY_LOGE("strncpy_s contactName failed");
     }
-    if (strncpy_s(info.extras, kMaxNumberLen + 1, messageParcel.ReadCString(), kMaxNumberLen + 1) != EOK) {
-        TELEPHONY_LOGE("strncpy_s extras failed");
-    }
+    info.extraParams = AAFwk::WantParamWrapper::ParseWantParamsWithBrackets(messageParcel.ReadString());
     if (info.callType == CallType::TYPE_VOIP) {
         info.voipCallInfo.voipCallId = messageParcel.ReadString();
         info.voipCallInfo.userName = messageParcel.ReadString();

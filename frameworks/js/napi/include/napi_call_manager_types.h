@@ -21,6 +21,7 @@
 #include "napi/native_node_api.h"
 #include "pac_map.h"
 #include "telephony_errors.h"
+#include "want_params.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -67,7 +68,7 @@ struct DialAsyncContext : AsyncContext {
     int32_t videoState = 0;
     int32_t dialScene = 0;
     int32_t dialType = 0;
-    std::string extras = "";
+    AAFwk::WantParams extraParams;
 };
 
 struct AnswerAsyncContext : AsyncContext {

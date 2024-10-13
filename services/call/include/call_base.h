@@ -134,7 +134,7 @@ public:
     void SetCallDirection(CallDirection direction);
     CallDirection GetCallDirection();
     int32_t GetAccountId();
-    void SetExtras(std::string extras);
+    void SetExtraParams(AAFwk::WantParams extraParams);
     bool IsAnsweredCall();
     void SetAnsweredCall(bool isAnswered);
 
@@ -185,7 +185,7 @@ private:
     int32_t blockReason_;
     bool isEccContact_;
     int32_t celiaCallType_;
-    std::string extras_;
+    AAFwk::WantParams extraParams_;
     bool isAnswered_;
 };
 } // namespace Telephony

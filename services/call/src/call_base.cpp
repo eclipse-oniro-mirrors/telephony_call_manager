@@ -42,7 +42,7 @@ CallBase::CallBase(DialParaInfo &info)
       callEndedType_(CallEndedType::UNKNOWN), callBeginTime_(0), callCreateTime_(0), callEndTime_(0), ringBeginTime_(0),
       ringEndTime_(0), answerType_(CallAnswerType::CALL_ANSWER_MISSED), accountId_(info.accountId),
       crsType_(info.crsType), originalCallType_(info.originalCallType), isMuted_(false), numberLocation_("default"),
-      blockReason_(0), isEccContact_(false), celiaCallType_(-1), extras_(info.extras), isAnswered_(false)
+      blockReason_(0), isEccContact_(false), celiaCallType_(-1), extraParams_(info.extraParams), isAnswered_(false)
 {
     (void)memset_s(&contactInfo_, sizeof(ContactInfo), 0, sizeof(ContactInfo));
     (void)memset_s(&numberMarkInfo_, sizeof(NumberMarkInfo), 0, sizeof(NumberMarkInfo));
@@ -57,7 +57,7 @@ CallBase::CallBase(DialParaInfo &info, AppExecFwk::PacMap &extras)
       isSpeakerphoneOn_(false), callEndedType_(CallEndedType::UNKNOWN), callBeginTime_(0), callCreateTime_(0),
       callEndTime_(0), ringBeginTime_(0), ringEndTime_(0), answerType_(CallAnswerType::CALL_ANSWER_MISSED),
       accountId_(info.accountId), crsType_(info.crsType), originalCallType_(info.originalCallType), isMuted_(false),
-      numberLocation_("default"), blockReason_(0), isEccContact_(false), celiaCallType_(-1), extras_(info.extras),
+      numberLocation_("default"), blockReason_(0), isEccContact_(false), celiaCallType_(-1), extraParams_(info.extraParams),
       isAnswered_(false)
 {
     (void)memset_s(&contactInfo_, sizeof(ContactInfo), 0, sizeof(ContactInfo));
@@ -118,9 +118,9 @@ int32_t CallBase::RejectCallBase()
     return TELEPHONY_SUCCESS;
 }
 
-void CallBase::SetExtras(std::string extras)
+void CallBase::SetExtraParams(AAFwk::WantParams extraParams)
 {
-    extras_ = extras;
+    extraParams_ = extraParams;
 }
 
 void CallBase::GetCallAttributeBaseInfo(CallAttributeInfo &info)
@@ -151,9 +151,7 @@ void CallBase::GetCallAttributeBaseInfo(CallAttributeInfo &info)
         info.originalCallType = originalCallType_;
         info.isEccContact = isEccContact_;
         info.celiaCallType = celiaCallType_;
-        if (memcpy_s(info.extras, kMaxNumberLen, extras_.c_str(), extras_.length()) != EOK) {
-            TELEPHONY_LOGE("memcpy_s extras fail");
-        }
+        info.extraParams = extraParams_;
         if (memset_s(info.numberLocation, kMaxNumberLen, 0, kMaxNumberLen) != EOK) {
             TELEPHONY_LOGE("memset_s numberLocation fail");
             return;
