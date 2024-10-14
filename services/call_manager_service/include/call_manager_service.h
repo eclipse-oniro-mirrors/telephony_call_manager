@@ -787,6 +787,7 @@ private:
         STATE_STOPPED = 0,
         STATE_RUNNING,
     };
+    const std::string SOS_PULL_CALL_PAGE = "2";
 
     ServiceRunningState state_ { ServiceRunningState::STATE_STOPPED };
 #ifndef TELEPHONY_VOIP_CALL_MANAGER_SYS_ABILITY_ID

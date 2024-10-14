@@ -38,6 +38,8 @@
 #include "distributed_call_manager.h"
 #include "call_earthquake_alarm_subscriber.h"
 #include "distributed_communication_manager.h"
+#include "want_params_wrapper.h"
+#include "string_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -1509,9 +1511,12 @@ int32_t CallManagerService::SendCallUiEvent(int32_t callId, std::string &eventNa
             return TELEPHONY_ERR_LOCAL_PTR_NULL;
         }
         CallAttributeInfo info;
-        callPtr->SetExtras("{\"sosWithOutCallUiAbility\":\"2\"}");
         callPtr->GetCallAttributeInfo(info);
-        callPtr->SetExtras("");
+        AAFwk::WantParams object = AAFwk::WantParamWrapper::ParseWantParamsWithBrackets(info.extraParamsString);
+        object.SetParam("sosWithOutCallUiAbility", AAFwk::String::Box(SOS_PULL_CALL_PAGE));
+        info.extraParamsString = AAFwk::WantParamWrapper(object).ToString();
+        object.Remove("sosWithOutCallUiAbility");
+        callPtr->SetExtraParams(object);
         DelayedSingleton<CallAbilityReportProxy>::GetInstance()->ReportCallStateInfo(info);
     }
     return TELEPHONY_SUCCESS;

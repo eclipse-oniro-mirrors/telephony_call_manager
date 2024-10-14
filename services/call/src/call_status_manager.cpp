@@ -47,6 +47,7 @@
 #include "notification_helper.h"
 #include "call_earthquake_alarm_locator.h"
 #include "distributed_communication_manager.h"
+#include "want_params_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -1541,7 +1542,8 @@ void CallStatusManager::PackParaInfo(
     paraInfo.bundleName = info.bundleName;
     paraInfo.crsType = info.crsType;
     paraInfo.originalCallType = info.originalCallType;
-    paraInfo.extras = extras.GetStringValue("extras");
+    paraInfo.extraParams =
+        AAFwk::WantParamWrapper::ParseWantParamsWithBrackets(extras.GetStringValue("extraParams"));
 }
 
 bool CallStatusManager::IsFocusModeOpen()

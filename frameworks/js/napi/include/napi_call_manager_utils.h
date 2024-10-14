@@ -21,6 +21,9 @@
 #include "napi_call_manager_types.h"
 #include "string_ex.h"
 #include "telephony_napi_common_error.h"
+#include "want_params.h"
+#include "want_params_wrapper.h"
+#include "napi_common_want.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -83,6 +86,7 @@ public:
     static void SetPropertyBoolean(napi_env env, napi_value object, std::string name, int32_t value);
     static napi_value CreateEnumConstructor(napi_env env, napi_callback_info info);
     static napi_value CreateErrorCodeAndMessageForJs(napi_env env, int32_t errorCode, int32_t eventId);
+    static AAFwk::WantParams GetWantParamsProperty(napi_env env, napi_value object, const std::string &propertyName);
 
 private:
     static std::string GetEventName(int32_t eventId);

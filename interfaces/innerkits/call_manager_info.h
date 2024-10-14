@@ -312,9 +312,9 @@ struct CallAttributeInfo {
      */
     char contactName[kMaxNumberLen + 1] = { 0 };
     /**
-     * Indicates the extras information.
+     * Indicates the extraParamsString information.
      */
-    char extras[kMaxNumberLen + 1] = { 0 };
+    std::string extraParamsString;
 };
 
 /**
