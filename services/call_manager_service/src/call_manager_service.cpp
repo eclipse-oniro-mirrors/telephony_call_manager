@@ -1513,7 +1513,7 @@ int32_t CallManagerService::SendCallUiEvent(int32_t callId, std::string &eventNa
         CallAttributeInfo info;
         callPtr->GetCallAttributeInfo(info);
         AAFwk::WantParams object = AAFwk::WantParamWrapper::ParseWantParamsWithBrackets(info.extraParamsString);
-        object.SetParam("sosWithOutCallUiAbility", AAFwk::String::Box(std::string("2")));
+        object.SetParam("sosWithOutCallUiAbility", AAFwk::String::Box(SOS_PULL_CALL_PAGE));
         info.extraParamsString = AAFwk::WantParamWrapper(object).ToString();
         object.Remove("sosWithOutCallUiAbility");
         callPtr->SetExtraParams(object);
