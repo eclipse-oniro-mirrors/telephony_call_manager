@@ -94,7 +94,7 @@ public:
     int32_t QueryIsBlockPhoneNumber(const std::string &phoneNum, bool &result);
     int32_t GetAirplaneMode(bool &isAirplaneModeOn);
     bool CheckResultSet(std::shared_ptr<DataShare::DataShareResultSet> resultSet);
-#ifdef ABILITY_CUST_SUPPORT
+#ifdef TELEPHONY_CUST_SUPPORT
     bool QueryContactInfoEnhanced(ContactInfo &contactInfo, DataShare::DataSharePredicates &predicates);
     int GetCallerIndex(std::shared_ptr<DataShare::DataShareResultSet> resultSet, std::string phoneNumber);
     const std::string TELEPHONY_CUST_SO_PATH = "libtelephony_cust_api.z.so";

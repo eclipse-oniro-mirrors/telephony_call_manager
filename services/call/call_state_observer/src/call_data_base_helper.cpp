@@ -391,7 +391,7 @@ bool CallDataBaseHelper::CheckResultSet(std::shared_ptr<DataShare::DataShareResu
     return true;
 }
 
-#ifdef ABILITY_CUST_SUPPORT
+#ifdef TELEPHONY_CUST_SUPPORT
 bool CallDataBaseHelper::QueryContactInfoEnhanced(ContactInfo &contactInfo, DataShare::DataSharePredicates &predicates)
 {
     std::shared_ptr<DataShare::DataShareHelper> helper = CreateDataShareHelper(CONTACT_URI);
