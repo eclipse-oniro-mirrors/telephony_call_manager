@@ -1511,13 +1511,12 @@ int32_t CallManagerService::SendCallUiEvent(int32_t callId, std::string &eventNa
             return TELEPHONY_ERR_LOCAL_PTR_NULL;
         }
         CallAttributeInfo info;
-        AAFwk::WantParams object;
-        AAFwk::WantParams wantParams;
-        object.SetParam("sosWithOutCallUiAbility", AAFwk::String::Box(std::string("2")));
-        wantParams.SetParam("sosEmergencyCall", AAFwk::WantParamWrapper::Box(object));
-        callPtr->SetExtraParams(wantParams);
         callPtr->GetCallAttributeInfo(info);
-        callPtr->SetExtraParams(AAFwk::WantParams());
+        AAFwk::WantParams object = AAFwk::WantParamWrapper::ParseWantParamsWithBrackets(info.extraParamsString);
+        object.SetParam("sosWithOutCallUiAbility", AAFwk::String::Box(std::string("2")));
+        info.extraParamsString = AAFwk::WantParamWrapper(object).ToString();
+        object.Remove("sosWithOutCallUiAbility");
+        callPtr->SetExtraParams(object);
         DelayedSingleton<CallAbilityReportProxy>::GetInstance()->ReportCallStateInfo(info);
     }
     return TELEPHONY_SUCCESS;

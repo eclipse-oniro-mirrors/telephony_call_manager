@@ -17,7 +17,6 @@
 #define CALL_MANAGER_INFO_H
 
 #include "call_manager_base.h"
-#include "want_params.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -313,9 +312,9 @@ struct CallAttributeInfo {
      */
     char contactName[kMaxNumberLen + 1] = { 0 };
     /**
-     * Indicates the extraParams information.
+     * Indicates the extraParamsString information.
      */
-    AAFwk::WantParams extraParams;
+    std::string extraParamsString;
 };
 
 /**

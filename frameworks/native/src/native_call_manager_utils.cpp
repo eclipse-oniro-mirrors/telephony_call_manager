@@ -70,7 +70,7 @@ CallAttributeInfo NativeCallManagerUtils::ReadCallAttributeInfo(MessageParcel &m
     if (strncpy_s(info.contactName, kMaxNumberLen + 1, messageParcel.ReadCString(), kMaxNumberLen + 1) != EOK) {
         TELEPHONY_LOGE("strncpy_s contactName failed");
     }
-    info.extraParams = AAFwk::WantParamWrapper::ParseWantParamsWithBrackets(messageParcel.ReadString());
+    info.extraParamsString = messageParcel.ReadString();
     if (info.callType == CallType::TYPE_VOIP) {
         info.voipCallInfo.voipCallId = messageParcel.ReadString();
         info.voipCallInfo.userName = messageParcel.ReadString();

@@ -151,7 +151,7 @@ void CallBase::GetCallAttributeBaseInfo(CallAttributeInfo &info)
         info.originalCallType = originalCallType_;
         info.isEccContact = isEccContact_;
         info.celiaCallType = celiaCallType_;
-        info.extraParams = extraParams_;
+        info.extraParamsString = AAFwk::WantParamWrapper(extraParams_).ToString());
         if (memset_s(info.numberLocation, kMaxNumberLen, 0, kMaxNumberLen) != EOK) {
             TELEPHONY_LOGE("memset_s numberLocation fail");
             return;
