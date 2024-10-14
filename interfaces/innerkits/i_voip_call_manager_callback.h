@@ -19,6 +19,7 @@
 #include "iremote_broker.h"
 #include "pac_map.h"
 #include "voip_call_manager_info.h"
+#include "want_params.h"
 
 namespace OHOS {
 namespace Telephony {

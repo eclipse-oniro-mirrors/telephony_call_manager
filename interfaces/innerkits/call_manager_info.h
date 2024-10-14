@@ -17,7 +17,7 @@
 #define CALL_MANAGER_INFO_H
 
 #include "call_manager_base.h"
-#include "want_params.h"
+#include "i_voip_call_manager_callback.h"
 
 namespace OHOS {
 namespace Telephony {
