@@ -148,6 +148,10 @@ void AudioControlManager::VideoStateUpdated(
         TELEPHONY_LOGE("other call not need control audio");
         return;
     }
+    if (DelayedSingleton<DistributedCommunicationManager>::GetInstance()->IsAudioOnSink()) {
+        TELEPHONY_LOGI("audio is on sink, not need control audio");
+        return;
+    }
     AudioDevice device = {
         .deviceType = AudioDeviceType::DEVICE_SPEAKER,
         .address = { 0 },

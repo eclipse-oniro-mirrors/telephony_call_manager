@@ -15,6 +15,7 @@
 
 #include "distributed_device_switch_controller.h"
 #include "cJSON.h"
+#include "audio_proxy.h"
 #include "telephony_errors.h"
 #include "audio_device_manager.h"
 #include "telephony_log_wrapper.h"
@@ -59,6 +60,14 @@ void DistributedDeviceSwitchController::OnDistributedAudioDeviceChange(const std
                 return;
             }
             audioDeviceManager->SetCurrentAudioDevice(targetDevice);
+        } else {
+            AudioDevice audioDevice;
+            if (DelayedSingleton<AudioProxy>::GetInstance()->GetPreferredOutputAudioDevice(audioDevice) !=
+                TELEPHONY_SUCCESS) {
+                TELEPHONY_LOGE("get preferred output audio device fail");
+                return;
+            }
+            audioDeviceManager->SetCurrentAudioDevice(audioDevice.deviceType);
         }
     }
 
