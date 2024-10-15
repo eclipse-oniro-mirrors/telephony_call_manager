@@ -60,11 +60,11 @@ std::unique_ptr<CallManagerCallback> CallManagerProxy::GetCallBack()
 
 void CallManagerProxy::Init(int32_t systemAbilityId)
 {
-    std::unique_lock<std::mutex> lock(mutex_);
     if (initStatus_) {
         TELEPHONY_LOGW("you have already initialized");
         return;
     }
+    std::unique_lock<std::mutex> lock(mutex_);
     systemAbilityId_ = systemAbilityId;
 #ifdef CALL_MANAGER_AUTO_START_OPTIMIZE
     if (!IsServiceStart()) {
