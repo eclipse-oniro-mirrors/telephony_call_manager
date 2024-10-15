@@ -77,12 +77,12 @@ void CallStateReportProxy::UpdateCallState(sptr<CallBase> &callObjectPtr, TelCal
     } else {
         info.callState = currentVoipCallState;
     }
-    if (info.callState == TelCallState::CALL_STATUS_DISCONNECTING) {
-        TELEPHONY_LOGI("disconnecting call no need to report call state");
-        return;
-    }
     if (info.callState == currentCallState_) {
         TELEPHONY_LOGI("foreground call state is not changed, currentCallState_:%{public}d!", currentCallState_);
+        return;
+    }
+    if (info.callState == TelCallState::CALL_STATUS_DISCONNECTING) {
+        TELEPHONY_LOGI("disconnecting call no need to report call state");
         return;
     }
     currentCallState_ = info.callState;
