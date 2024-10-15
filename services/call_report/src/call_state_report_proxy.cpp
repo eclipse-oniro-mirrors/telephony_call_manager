@@ -45,10 +45,6 @@ void CallStateReportProxy::CallStateUpdated(
         TELEPHONY_LOGI("voip call no need to report call state");
         return;
     }
-    if (nextState == TelCallState::CALL_STATUS_DISCONNECTING) {
-        TELEPHONY_LOGI("disconnecting call no need to report call state");
-        return;
-    }
     UpdateCallState(callObjectPtr, nextState);
     UpdateCallStateForSlotId(callObjectPtr, nextState);
 }
@@ -83,6 +79,10 @@ void CallStateReportProxy::UpdateCallState(sptr<CallBase> &callObjectPtr, TelCal
     }
     if (info.callState == currentCallState_) {
         TELEPHONY_LOGI("foreground call state is not changed, currentCallState_:%{public}d!", currentCallState_);
+        return;
+    }
+    if (info.callState == TelCallState::CALL_STATUS_DISCONNECTING) {
+        TELEPHONY_LOGI("disconnecting call no need to report call state");
         return;
     }
     currentCallState_ = info.callState;
@@ -130,6 +130,10 @@ void CallStateReportProxy::UpdateCallStateForSlotId(sptr<CallBase> &callObjectPt
     std::u16string accountNumber = Str8ToStr16(str);
     if (nextState == TelCallState::CALL_STATUS_ANSWERED) {
         info.callState = TelCallState::CALL_STATUS_ANSWERED;
+    }
+    if (info.callState == TelCallState::CALL_STATUS_DISCONNECTING) {
+        TELEPHONY_LOGI("disconnecting call no need to report call state");
+        return;
     }
     ReportCallStateForCallId(info.accountId, static_cast<int32_t>(info.callState), accountNumber);
 }
