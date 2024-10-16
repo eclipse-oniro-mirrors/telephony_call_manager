@@ -357,7 +357,6 @@ void AudioControlManager::HandlePriorState(sptr<CallBase> &callObjectPtr, TelCal
     switch (priorState) {
         case TelCallState::CALL_STATUS_DIALING:
             if (stateNumber == EMPTY_VALUE) {
-                StopRingback(); // should stop ringtone while no more dialing calls
                 event = AudioEvent::NO_MORE_DIALING_CALL;
             }
             break;

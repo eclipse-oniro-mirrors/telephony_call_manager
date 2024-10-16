@@ -83,18 +83,8 @@ void AudioSceneProcessor::ProcessEventInner(AudioEvent event)
             currentState_->ProcessEvent(event);
             break;
         case AudioEvent::NO_MORE_ACTIVE_CALL:
-            DelayedSingleton<AudioControlManager>::GetInstance()->StopRingback();
-            if (DelayedSingleton<CallStateProcessor>::GetInstance()->ShouldStopSoundtone()) {
-                DelayedSingleton<AudioControlManager>::GetInstance()->
-                    PlayCallEndedTone(CallEndedType::CALL_ENDED_NORMALLY);
-            }
-            currentState_->ProcessEvent(event);
-            break;
         case AudioEvent::NO_MORE_ALERTING_CALL:
-            if (DelayedSingleton<CallStateProcessor>::GetInstance()->
-                GetCallNumber(TelCallState::CALL_STATUS_ALERTING) == 0) {
-                DelayedSingleton<AudioControlManager>::GetInstance()->StopRingback();
-            }
+            DelayedSingleton<AudioControlManager>::GetInstance()->StopRingback();
             if (DelayedSingleton<CallStateProcessor>::GetInstance()->ShouldStopSoundtone()) {
                 DelayedSingleton<AudioControlManager>::GetInstance()->
                     PlayCallEndedTone(CallEndedType::CALL_ENDED_NORMALLY);
