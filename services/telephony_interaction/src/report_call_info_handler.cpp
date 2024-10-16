@@ -46,7 +46,7 @@ int32_t ReportCallInfoHandler::UpdateCallReportInfo(const CallDetailInfo &info)
     }
     CallDetailInfo callDetailInfo = info;
     std::weak_ptr<CallStatusManager> callStatusManagerPtr = callStatusManagerPtr_;
-    TELEPHONY_LOGI("UpdateCallReportInfo submit task enter");
+    TELEPHONY_LOGW("UpdateCallReportInfo submit task enter");
     reportCallInfoQueue.submit([callStatusManagerPtr, callDetailInfo]() {
         std::shared_ptr<CallStatusManager> managerPtr = callStatusManagerPtr.lock();
         if (managerPtr == nullptr) {
@@ -92,7 +92,7 @@ int32_t ReportCallInfoHandler::UpdateCallsReportInfo(CallDetailsInfo &info)
     (void)memcpy_s(callDetailsInfo.bundleName, kMaxBundleNameLen, info.bundleName, kMaxBundleNameLen);
     BuildCallDetailsInfo(info, callDetailsInfo);
     std::weak_ptr<CallStatusManager> callStatusManagerPtr = callStatusManagerPtr_;
-    TELEPHONY_LOGI("UpdateCallsReportInfo submit task enter");
+    TELEPHONY_LOGW("UpdateCallsReportInfo submit task enter");
     reportCallInfoQueue.submit([callStatusManagerPtr, callDetailsInfo]() {
         std::shared_ptr<CallStatusManager> managerPtr = callStatusManagerPtr.lock();
         if (managerPtr == nullptr) {

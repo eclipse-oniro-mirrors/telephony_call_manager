@@ -43,7 +43,7 @@ void CallConnectAbility::ConnectAbility()
         SetConnectingFlag(false);
         return;
     }
-    TELEPHONY_LOGI("Connect callui ability");
+    TELEPHONY_LOGW("Connect callui ability");
     AAFwk::Want want;
     AppExecFwk::ElementName element("", "com.ohos.callui", "com.ohos.callui.ServiceAbility");
     want.SetElement(element);
@@ -68,7 +68,7 @@ void CallConnectAbility::DisconnectAbility()
         return;
     }
     if (connectCallback_ != nullptr) {
-        TELEPHONY_LOGI("Disconnect callui ability");
+        TELEPHONY_LOGW("Disconnect callui ability");
         std::string identity = IPCSkeleton::ResetCallingIdentity();
         AAFwk::AbilityManagerClient::GetInstance()->DisconnectAbility(connectCallback_);
         IPCSkeleton::SetCallingIdentity(identity);

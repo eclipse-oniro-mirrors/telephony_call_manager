@@ -24,7 +24,7 @@ constexpr int32_t PARAM_NUM = 3;
 void CallAbilityConnection::OnAbilityConnectDone(const AppExecFwk::ElementName &element,
     const sptr<IRemoteObject> &remoteObject, int32_t resultCode)
 {
-    TELEPHONY_LOGI("OnAbilityConnectDone, resultCode = %{public}d", resultCode);
+    TELEPHONY_LOGW("OnAbilityConnectDone, resultCode = %{public}d", resultCode);
     if (remoteObject == nullptr) {
         TELEPHONY_LOGE("remote object is nullptr");
         return;
@@ -47,7 +47,7 @@ void CallAbilityConnection::OnAbilityConnectDone(const AppExecFwk::ElementName &
 void CallAbilityConnection::OnAbilityDisconnectDone(const AppExecFwk::ElementName &element,
     int32_t resultCode)
 {
-    TELEPHONY_LOGI("OnAbilityDisconnectDone, resultCode = %{public}d", resultCode);
+    TELEPHONY_LOGW("OnAbilityDisconnectDone, resultCode = %{public}d", resultCode);
 }
 } // namespace Telephony
 } // namespace OHOS

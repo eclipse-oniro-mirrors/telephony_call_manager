@@ -1110,7 +1110,7 @@ void CallStatusManager::AutoAnswer(int32_t activeCallNum, int32_t waitingCallNum
 
 int32_t CallStatusManager::UpdateCallState(sptr<CallBase> &call, TelCallState nextState)
 {
-    TELEPHONY_LOGI("UpdateCallState start");
+    TELEPHONY_LOGW("UpdateCallState start");
     if (call == nullptr) {
         TELEPHONY_LOGE("Call is NULL");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -1415,7 +1415,7 @@ bool CallStatusManager::ShouldRejectIncomingCall()
         "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true&key=device_provisioned");
     int resp = datashareHelper->Query(uri, "device_provisioned", device_provisioned);
     if (resp == TELEPHONY_SUCCESS && (device_provisioned == "0" || device_provisioned.empty())) {
-        TELEPHONY_LOGI("ShouldRejectIncomingCall: device_provisioned = 0");
+        TELEPHONY_LOGW("ShouldRejectIncomingCall: device_provisioned = 0");
         return true;
     }
 
@@ -1423,7 +1423,7 @@ bool CallStatusManager::ShouldRejectIncomingCall()
     std::vector<int> activedOsAccountIds;
     OHOS::AccountSA::OsAccountManager::QueryActiveOsAccountIds(activedOsAccountIds);
     if (activedOsAccountIds.empty()) {
-        TELEPHONY_LOGI("ShouldRejectIncomingCall: activedOsAccountIds is empty");
+        TELEPHONY_LOGW("ShouldRejectIncomingCall: activedOsAccountIds is empty");
         return false;
     }
     int userId = activedOsAccountIds[0];
@@ -1432,7 +1432,7 @@ bool CallStatusManager::ShouldRejectIncomingCall()
         + std::to_string(userId) + "?Proxy=true&key=user_setup_complete");
     int resp_userSetup = datashareHelper->Query(uri_setup, "user_setup_complete", user_setup_complete);
     if (resp_userSetup == TELEPHONY_SUCCESS && (user_setup_complete == "0" || user_setup_complete.empty())) {
-        TELEPHONY_LOGI("ShouldRejectIncomingCall: user_setup_complete = 0");
+        TELEPHONY_LOGW("ShouldRejectIncomingCall: user_setup_complete = 0");
         return true;
     }
     return false;
