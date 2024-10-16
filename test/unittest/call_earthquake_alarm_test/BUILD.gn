@@ -24,19 +24,15 @@ ohos_unittest("tel_call_earthquake_alarm_test") {
 
   sources = [
     "${CALL_MANAGER_PATH}/frameworks/native/src/call_manager_service_proxy.cpp",
-    "${CALL_MANAGER_PATH}/services/call/src/call_base.cpp",
-    "${CALL_MANAGER_PATH}/services/call_earthquake_alarm/src/call_earthquake_alarm_locator.cpp",
-    "${CALL_MANAGER_PATH}/services/call_earthquake_alarm/src/call_earthquake_alarm_subscriber.cpp",
-    "src/call_earthquake_alarm_test.cpp",
+    "src/tel_call_earthquake_alarm_test.cpp",
   ]
+  sources += call_manager_sources
 
   include_dirs = [
     "//third_party/libphonenumber/cpp/src",
     "//third_party/libphonenumber/cpp/src/phonenumbers",
     "//third_party/protobuf/src",
-    "${CALL_MANAGER_PATH}/frameworks/native/include",
     "${CALL_MANAGER_PATH}/interfaces/innerkits",
-    "${CALL_MANAGER_PATH}/test/unittest/call_manager_gtest/include",
   ]
   include_dirs += call_manager_include_dirs
 
