@@ -24,7 +24,7 @@ ohos_unittest("tel_call_earthquake_alarm_test") {
 
   sources = [
     "${CALL_MANAGER_PATH}/frameworks/native/src/call_manager_service_proxy.cpp",
-    "src/tel_call_earthquake_alarm_test.cpp",
+    "src/call_earthquake_alarm_test.cpp",
   ]
   sources += call_manager_sources
 
