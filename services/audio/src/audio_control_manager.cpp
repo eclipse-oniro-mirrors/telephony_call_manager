@@ -357,13 +357,11 @@ void AudioControlManager::HandlePriorState(sptr<CallBase> &callObjectPtr, TelCal
     switch (priorState) {
         case TelCallState::CALL_STATUS_DIALING:
             if (stateNumber == EMPTY_VALUE) {
-                StopRingback(); // should stop ringtone while no more alerting calls
                 event = AudioEvent::NO_MORE_DIALING_CALL;
             }
             break;
         case TelCallState::CALL_STATUS_ALERTING:
             if (stateNumber == EMPTY_VALUE) {
-                StopRingback(); // should stop ringtone while no more alerting calls
                 event = AudioEvent::NO_MORE_ALERTING_CALL;
             }
             break;
@@ -376,7 +374,6 @@ void AudioControlManager::HandlePriorState(sptr<CallBase> &callObjectPtr, TelCal
             if (stateNumber == EMPTY_VALUE) {
                 event = AudioEvent::NO_MORE_ACTIVE_CALL;
             }
-            StopRingback();
             break;
         case TelCallState::CALL_STATUS_HOLDING:
             if (stateNumber == EMPTY_VALUE) {
@@ -894,7 +891,7 @@ int32_t AudioControlManager::PlayCallTone(ToneDescriptor type)
 {
     std::lock_guard<std::recursive_mutex> lock(toneStateLock_);
     if (toneState_ == ToneState::TONEING) {
-        TELEPHONY_LOGE("should not play callTone");
+        TELEPHONY_LOGE("callTone is already playing");
         return CALL_ERR_AUDIO_TONE_PLAY_FAILED;
     }
     toneState_ = ToneState::TONEING;
