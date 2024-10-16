@@ -65,7 +65,7 @@ int32_t CallStatusCallback::UpdateCallReportInfo(const CallReportInfo &info)
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("UpdateCallReportInfo failed! errCode:%{public}d", ret);
     } else {
-        TELEPHONY_LOGI("UpdateCallReportInfo success! state:%{public}d", info.state);
+        TELEPHONY_LOGW("UpdateCallReportInfo success! state:%{public}d", info.state);
     }
     return ret;
 }
@@ -108,7 +108,7 @@ int32_t CallStatusCallback::UpdateCallsReportInfo(const CallsReportInfo &info)
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("UpdateCallsReportInfo failed! errCode:%{public}d", ret);
     } else {
-        TELEPHONY_LOGI("UpdateCallsReportInfo success!");
+        TELEPHONY_LOGW("UpdateCallsReportInfo success!");
     }
     return ret;
 }

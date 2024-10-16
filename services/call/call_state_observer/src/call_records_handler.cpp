@@ -73,7 +73,7 @@ int32_t CallRecordsHandler::AddCallLogInfo(const CallRecordInfo &info)
     }
 
     DataShare::DataShareValuesBucket bucket;
-    TELEPHONY_LOGI("callLog Insert begin");
+    TELEPHONY_LOGW("callLog Insert begin");
     MakeCallLogInsertBucket(bucket, info, displayName, numberLocation);
     bool ret = callDataPtr_->Insert(bucket);
     if (!ret) {
