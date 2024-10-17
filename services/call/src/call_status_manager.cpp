@@ -567,11 +567,22 @@ void CallStatusManager::QueryCallerInfo(ContactInfo &contactInfo, std::string ph
         return;
     }
     DataShare::DataSharePredicates predicates;
-    predicates.EqualTo(DETAIL_INFO, phoneNum);
+    predicates.EqualTo(TYPE_ID, 5); // type 5 means query number
     predicates.And();
-    predicates.EqualTo(CONTENT_TYPE, PHONE);
-    bool ret = callDataPtr->Query(contactInfo, predicates);
-    if (!ret) {
+    predicates.EqualTo(IS_DELETED, 0);
+    predicates.And();
+#ifdef TELEPHONY_CUST_SUPPORT
+    if (phoneNum.length() >= static_cast<size_t>(QUERY_CONTACT_LEN)) {
+        TELEPHONY_LOGI("phoneNum is longer than 7");
+        predicates.EndsWith(DETAIL_INFO, phoneNum.substr(phoneNum.length() - QUERY_CONTACT_LEN));
+        if (!callDataPtr->QueryContactInfoEnhanced(contactInfo, predicates)) {
+            TELEPHONY_LOGE("Query contact database enhanced fail!");
+        }
+        return;
+    }
+#endif
+    predicates.EqualTo(DETAIL_INFO, phoneNum);
+    if (!callDataPtr->Query(contactInfo, predicates)) {
         TELEPHONY_LOGE("Query contact database fail!");
     }
 }
@@ -594,12 +605,6 @@ void CallStatusManager::CallFilterCompleteResult(const CallDetailInfo &info)
         return;
     }
     AddOneCallObject(call);
-#ifdef ABILITY_DATABASE_SUPPORT
-    // allow list filtering
-    // Get the contact data from the database
-    GetCallerInfoDate(ContactInfo);
-    SetCallerInfo(contactInfo);
-#endif
     DelayedSingleton<CallControlManager>::GetInstance()->NotifyNewCallCreated(call);
     ret = UpdateCallState(call, info.state);
     if (ret != TELEPHONY_SUCCESS) {
@@ -1472,8 +1477,8 @@ bool CallStatusManager::IsRingOnceCall(const sptr<CallBase> &call, const CallDet
 {
     NumberMarkInfo numberMarkInfo = call->GetNumberMarkInfo();
     ContactInfo contactInfo = call->GetCallerInfo();
-    if (numberMarkInfo.markType == MarkType::MARK_TYPE_YELLOW_PAGE ||
-        std::string(contactInfo.name) != "") {
+    if (numberMarkInfo.markType == MarkType::MARK_TYPE_YELLOW_PAGE || contactInfo.name != "") {
+        TELEPHONY_LOGI("yellowpage or contact, no need check ring once call");
         return false;
     }
     auto datashareHelper = SettingsDataShareHelper::GetInstance();
@@ -1482,8 +1487,8 @@ bool CallStatusManager::IsRingOnceCall(const sptr<CallBase> &call, const CallDet
     OHOS::Uri uri(
         "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true&key=" + key);
     int32_t ret = datashareHelper->Query(uri, key, is_check_ring_once);
+    TELEPHONY_LOGI("is_check_ring_once = %{public}s", is_check_ring_once.c_str());
     if (ret != TELEPHONY_SUCCESS || is_check_ring_once == "0") {
-        TELEPHONY_LOGI("is_check_ring_once = 0, not need check ring once call");
         return false;
     }
     if (timeWaitHelper_ == nullptr) {

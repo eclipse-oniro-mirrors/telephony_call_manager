@@ -240,3 +240,9 @@ if (defined(global_parts_info) &&
   call_manager_external_deps += [ "hicollie:libhicollie" ]
   call_manager_defines += [ "HICOLLIE_ENABLE" ]
 }
+
+if (defined(global_parts_info) &&
+    defined(global_parts_info.telephony_telephony_enhanced) &&
+    global_parts_info.telephony_telephony_enhanced) {
+  call_manager_defines += [ "TELEPHONY_CUST_SUPPORT" ]
+}

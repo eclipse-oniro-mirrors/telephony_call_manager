@@ -21,6 +21,7 @@
 #include "data_ability_observer_stub.h"
 #include "datashare_helper.h"
 #include "datashare_predicates.h"
+#include "datashare_result_set.h"
 #include "if_system_ability_manager.h"
 #include "refbase.h"
 #include "singleton.h"
@@ -92,6 +93,12 @@ public:
     bool QueryIdsNeedToDelete(std::vector<int32_t> &needDeleteIds, DataShare::DataSharePredicates &predicates);
     int32_t QueryIsBlockPhoneNumber(const std::string &phoneNum, bool &result);
     int32_t GetAirplaneMode(bool &isAirplaneModeOn);
+    bool CheckResultSet(std::shared_ptr<DataShare::DataShareResultSet> resultSet);
+#ifdef TELEPHONY_CUST_SUPPORT
+    bool QueryContactInfoEnhanced(ContactInfo &contactInfo, DataShare::DataSharePredicates &predicates);
+    int GetCallerIndex(std::shared_ptr<DataShare::DataShareResultSet> resultSet, std::string phoneNumber);
+    const std::string TELEPHONY_CUST_SO_PATH = "libtelephony_cust_api.z.so";
+#endif
 
 public:
     const int16_t CALL_LOG_DEFAULT_COUNT = 1;
