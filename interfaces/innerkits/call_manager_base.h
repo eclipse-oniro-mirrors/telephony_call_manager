@@ -498,9 +498,13 @@ enum class CallAbilityEventId {
      */
     EVENT_IS_SUPER_PRIVACY_MODE_OFF = 21,
     /**
-     * Indicates that the super privacy mode OFF.
+     * Indicates that the mute ring.
      */
     EVENT_MUTE_RING = 22,
+    /**
+     * Indicates that the local alerting.
+     */
+    EVENT_LOCAL_ALERTING =23,
 };
 
 /**
