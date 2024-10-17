@@ -504,7 +504,7 @@ enum class CallAbilityEventId {
     /**
      * Indicates that the local alerting.
      */
-    EVENT_LOCAL_ALERTING =23,
+    EVENT_LOCAL_ALERTING = 23,
 };
 
 /**
