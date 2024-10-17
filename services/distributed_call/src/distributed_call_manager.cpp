@@ -382,6 +382,7 @@ void DistributedCallManager::SwitchOffDCallDeviceSync()
 
 bool DistributedCallManager::IsSelectVirtualModem()
 {
+    TELEPHONY_LOGI("IsSelectVirtualModem");
     if (onlineDCallDevices_.size() <= 0) {
         TELEPHONY_LOGW("no dcall device");
         return false;
@@ -430,6 +431,18 @@ void DistributedCallManager::ReportDistributedDeviceInfo()
 bool DistributedCallManager::IsDCallDeviceSwitchedOn()
 {
     return dCallDeviceSwitchedOn_.load();
+}
+
+bool DistributedCallManager::SelectedDistributedIfNeed()
+{
+    if (isCallActived_.load()) {
+        if (DelayedSingleton<AudioDeviceManager>::GetInstance()->CheckAndSwitchDistributedAudioDevice()) {
+            return true;
+        }
+        return false;
+    }
+    TELEPHONY_LOGW("Call is no active");
+    return false;
 }
 
 int32_t DistributedCallManager::OnDCallDeviceOnline(const std::string &devId)
