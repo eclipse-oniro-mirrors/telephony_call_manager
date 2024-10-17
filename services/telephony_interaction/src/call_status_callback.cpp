@@ -152,6 +152,9 @@ int32_t CallStatusCallback::UpdateRBTPlayInfo(const RBTPlayInfo info)
     bool isLocalRingbackNeeded = false;
     if (info == RBTPlayInfo::LOCAL_ALERTING) {
         isLocalRingbackNeeded = true;
+        CallEventInfo eventInfo;
+        eventInfo.eventId = CallAbilityEventId::EVENT_LOCAL_ALERTING;
+        DelayedSingleton<CallAbilityReportProxy>::GetInstance()->CallEventUpdated(eventInfo);
     }
     DelayedSingleton<AudioControlManager>::GetInstance()->SetLocalRingbackNeeded(isLocalRingbackNeeded);
     return TELEPHONY_SUCCESS;
