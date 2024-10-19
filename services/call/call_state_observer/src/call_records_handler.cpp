@@ -102,8 +102,6 @@ void CallRecordsHandler::MakeCallLogInsertBucket(DataShare::DataShareValuesBucke
     bucket.Put(CALL_PHOTO_ID, 0);
     bucket.Put(CALL_SLOT_ID, info.slotId);
     bucket.Put(CALL_FEATURES, info.features);
-    bucket.Put(CALL_MARK_SOURCE, info.numberMarkInfo.markSource);
-    bucket.Put(CALL_MARK_DETAILS, info.numberMarkInfo.markDetails);
 }
 
 std::string CallRecordsHandler::CheckNumberLocationInfo(const CallRecordInfo &info)
