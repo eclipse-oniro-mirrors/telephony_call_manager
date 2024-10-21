@@ -58,8 +58,6 @@ int32_t CallRecordsHandler::AddCallLogInfo(const CallRecordInfo &info)
 void CallRecordsHandler::DeleteCallLogForLimit(const CallRecordInfo &info)
 {
     DataShare::DataSharePredicates queryPredicates;
-    std::string selections;
-    std::vector<int32_t> needDeleteIds;
     if (info.answerType == CallAnswerType::CALL_ANSWER_BLOCKED) {
         queryPredicates.EqualTo(CALL_ANSWER_STATE, static_cast<int32_t>(CallAnswerType::CALL_ANSWER_BLOCKED));
     } else {
@@ -67,15 +65,7 @@ void CallRecordsHandler::DeleteCallLogForLimit(const CallRecordInfo &info)
     }
     queryPredicates.OrderByDesc(CALL_CREATE_TIME);
     queryPredicates.Limit(-1, LOG_LIMIT_NUM);
-    callDataPtr_->QueryIdsNeedToDelete(needDeleteIds, queryPredicates);
-    if (needDeleteIds.size() > 0) {
-        TELEPHONY_LOGI("need delete call log for more than limit.");
-        DataShare::DataSharePredicates deletePredicates;
-        deletePredicates.In(CALL_ID, needDeleteIds);
-        callDataPtr_->Delete(deletePredicates);
-    } else {
-        TELEPHONY_LOGI("no need delete call log for not more than limit.");
-    }
+    callDataPtr_->QueryAndDeleteLimitedIds(queryPredicates);
 }
 
 void CallRecordsHandler::MakeCallLogInsertBucket(DataShare::DataShareValuesBucket &bucket,
