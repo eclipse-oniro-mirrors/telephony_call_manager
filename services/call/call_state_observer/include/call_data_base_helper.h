@@ -92,7 +92,7 @@ public:
     bool Delete(DataShare::DataSharePredicates &predicates);
     bool QueryCallLog(
         std::map<std::string, int32_t> &phonesAndUnreadCountMap, DataShare::DataSharePredicates &predicates);
-    bool QueryIdsNeedToDelete(std::vector<int32_t> &needDeleteIds, DataShare::DataSharePredicates &predicates);
+    bool QueryAndDeleteLimitedIds(DataShare::DataSharePredicates &predicates);
     int32_t QueryIsBlockPhoneNumber(const std::string &phoneNum, bool &result);
     int32_t GetAirplaneMode(bool &isAirplaneModeOn);
     bool CheckResultSet(std::shared_ptr<DataShare::DataShareResultSet> resultSet);

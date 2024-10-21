@@ -238,8 +238,7 @@ bool CallDataBaseHelper::QueryCallLog(
     return true;
 }
 
-bool CallDataBaseHelper::QueryIdsNeedToDelete(std::vector<int32_t> &needDeleteIds,
-    DataShare::DataSharePredicates &predicates)
+bool CallDataBaseHelper::QueryAndDeleteLimitedIds(DataShare::DataSharePredicates &predicates)
 {
     std::shared_ptr<DataShare::DataShareHelper> helper = CreateDataShareHelper(CALLLOG_URI);
     if (helper == nullptr) {
@@ -262,13 +261,16 @@ bool CallDataBaseHelper::QueryIdsNeedToDelete(std::vector<int32_t> &needDeleteId
         operationResult = resultSet->GetInt(columnIndex, id);
         if (operationResult == TELEPHONY_SUCCESS) {
             TELEPHONY_LOGI("need delete call log id: %{public}d", id);
-            needDeleteIds.push_back(id);
+            DataShare::DataSharePredicates deletePredicates;
+            deletePredicates.EqualTo(CALL_ID, id);
+            bool result = (helper->Delete(uri, deletePredicates) > 0);
+            TELEPHONY_LOGI("delete result: %{public}d", result);
         }
         operationResult = resultSet->GoToNextRow();
     }
     resultSet->Close();
     helper->Release();
-    TELEPHONY_LOGI("QueryIdsNeedToDelete end");
+    TELEPHONY_LOGI("QueryAndDeleteLimitedIds end");
     return true;
 }
 
