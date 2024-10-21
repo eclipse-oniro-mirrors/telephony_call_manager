@@ -263,7 +263,7 @@ bool CallDataBaseHelper::QueryAndDeleteLimitedIds(DataShare::DataSharePredicates
             TELEPHONY_LOGI("need delete call log id: %{public}d", id);
             DataShare::DataSharePredicates deletePredicates;
             deletePredicates.EqualTo(CALL_ID, id);
-            bool result = (helper->Delete(uri, predicates) > 0);
+            bool result = (helper->Delete(uri, deletePredicates) > 0);
             TELEPHONY_LOGI("delete result: %{public}d", result);
         }
         operationResult = resultSet->GoToNextRow();
