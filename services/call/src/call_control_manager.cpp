@@ -291,6 +291,10 @@ void CallControlManager::AnswerHandlerForSatelliteOrVideoCall(sptr<CallBase> &ca
 
 int32_t CallControlManager::CarrierAndVoipConflictProcess(int32_t callId, TelCallState callState)
 {
+    if (callState != TelCallState::CALL_STATUS_ANSWERED) {
+        TELEPHONY_LOGI("voip calls should be handled with only when a carrier call is answered");
+        return TELEPHONY_SUCCESS;
+    }
     sptr<CallBase> call = GetOneCallObject(callId);
     if (call == nullptr) {
         TELEPHONY_LOGE("CarrierAndVoipConflictProcess, call is nullptr!");
@@ -307,10 +311,12 @@ int32_t CallControlManager::CarrierAndVoipConflictProcess(int32_t callId, TelCal
         }
         for (auto voipCallId : voipCallIdList) {
             sptr<CallBase> voipCall = GetOneCallObject(voipCallId);
-            if (voipCall->GetTelCallState() == TelCallState::CALL_STATUS_INCOMING ||
-                voipCall->GetTelCallState() == TelCallState::CALL_STATUS_WAITING) {
+            TelCallState voipCallState = voipCall->GetTelCallState();
+            if (voipCallState == TelCallState::CALL_STATUS_INCOMING) {
+                TELEPHONY_LOGI("the system is rejecting a voip call, callId = %{public}d", voipCall->GetCallID());
                 ret = RejectCall(voipCallId, true, u"CarrierAndVoipConflictProcess");
-            } else if (callState == TelCallState::CALL_STATUS_ANSWERED) {
+            } else if (voipCallState == TelCallState::CALL_STATUS_DIALING) {
+                TELEPHONY_LOGI("the system is hanging up a voip call, callId = %{public}d", voipCall->GetCallID());
                 ret = HangUpCall(voipCallId);
             }
             if (ret != TELEPHONY_SUCCESS) {
@@ -1330,6 +1336,10 @@ int32_t CallControlManager::HangUpVoipCall()
     std::list<sptr<CallBase>> allCallList = CallObjectManager::GetAllCallList();
     for (auto call : allCallList) {
         if (call != nullptr && call->GetCallType() == CallType::TYPE_VOIP) {
+            if (call->GetTelCallState() == TelCallState::CALL_STATUS_ACTIVE) {
+                TELEPHONY_LOGI("the voip call with callId %{public}d is active, no need to hangup", call->GetCallID());
+                continue;
+            }
             TELEPHONY_LOGI("HangUp VoipCall callId %{public}d", call->GetCallID());
             int32_t ret = HangUpCall(call->GetCallID());
             if (ret != TELEPHONY_SUCCESS) {
