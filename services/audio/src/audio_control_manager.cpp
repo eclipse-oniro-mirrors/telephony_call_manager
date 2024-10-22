@@ -1055,7 +1055,7 @@ bool AudioControlManager::IsRingingVibrateModeOn()
     OHOS::Uri uri(
         "datashare:///com.ohos.settingsdata/entry/settingsdata/USER_SETTINGSDATA_"
         + std::to_string(userId) + "?Proxy=true");
-    int resp = datashareHelper->Query(uri, "hw_vibate_when_ringing", ringingVibrateModeEnable);
+    int resp = datashareHelper->Query(uri, "hw_vibrate_when_ringing", ringingVibrateModeEnable);
     if (resp == TELEPHONY_SUCCESS && ringingVibrateModeEnable == "1") {
         TELEPHONY_LOGI("RingingVibrateModeOpen:true");
         return true;
