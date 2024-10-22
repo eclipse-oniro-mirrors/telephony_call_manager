@@ -91,6 +91,10 @@ void CallBase::HangUpVoipCall()
                 TELEPHONY_LOGE("the call object is nullptr, callId:%{public}d", callinfo.callId);
                 break;
             }
+            if (call->GetTelCallState() == TelCallState::CALL_STATUS_ACTIVE) {
+                TELEPHONY_LOGI("the voip call with callId %{public}d is active, no need to hangup", call->GetCallID());
+                continue;
+            }
             call->HangUpCall(ErrorReason::CELLULAR_CALL_EXISTS);
         }
     }
