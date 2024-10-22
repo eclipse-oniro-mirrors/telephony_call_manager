@@ -31,7 +31,6 @@
 #include "distributed_communication_manager.h"
 #include "os_account_manager.h"
 
-
 namespace OHOS {
 namespace Telephony {
 using namespace AudioStandard;
