@@ -29,6 +29,7 @@
 #include "voip_call_connection.h"
 #include "settings_datashare_helper.h"
 #include "distributed_communication_manager.h"
+#include "os_account_manager.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -540,7 +541,9 @@ bool AudioControlManager::PlayRingtone()
     AudioStandard::AudioRingerMode ringMode = DelayedSingleton<AudioProxy>::GetInstance()->GetRingerMode();
     if (incomingCall->GetCrsType() == CRS_TYPE) {
         if (!isCrsVibrating_ && (ringMode != AudioStandard::AudioRingerMode::RINGER_MODE_SILENT)) {
-            isCrsVibrating_ = (DelayedSingleton<AudioProxy>::GetInstance()->StartVibrator() == TELEPHONY_SUCCESS);
+            if (ringMode == AudioStandard::AudioRingerMode::RINGER_MODE_VIBRATE || IsRingingVibrateModeOn()) {
+                isCrsVibrating_ = (DelayedSingleton<AudioProxy>::GetInstance()->StartVibrator() == TELEPHONY_SUCCESS);
+            }
         }
         if ((ringMode == AudioStandard::AudioRingerMode::RINGER_MODE_NORMAL) || IsBtOrWireHeadPlugin()) {
             if (PlaySoundtone()) {
@@ -1036,6 +1039,28 @@ bool AudioControlManager::IsVideoCall(VideoStateType videoState)
 bool AudioControlManager::IsBtOrWireHeadPlugin()
 {
     return AudioDeviceManager::IsBtActived() || AudioDeviceManager::IsWiredHeadsetConnected();
+}
+
+bool AudioControlManager::IsRingingVibrateModeOn()
+{
+    auto datashareHelper = SettingsDataShareHelper::GetInstance();
+    std::string ringingVibrateModeEnable {"1"};
+    std::vector<int> activedOsAccountIds;
+    OHOS::AccountSA::OsAccountManager::QueryActiveOsAccountIds(activedOsAccountIds);
+    if (activedOsAccountIds.empty()) {
+        TELEPHONY_LOGW("activedOsAccountIds is empty");
+        return false;
+    }
+    int userId = activedOsAccountIds[0];
+    OHOS::Uri uri(
+        "datashare:///com.ohos.settingsdata/entry/settingsdata/USER_SETTINGSDATA_"
+        + std::to_string(userId) + "?Proxy=true");
+    int resp = datashareHelper->Query(uri, "hw_vibrate_when_ringing", ringingVibrateModeEnable);
+    if (resp == TELEPHONY_SUCCESS && ringingVibrateModeEnable == "1") {
+        TELEPHONY_LOGI("RingingVibrateModeOpen:true");
+        return true;
+    }
+    return false;
 }
 } // namespace Telephony
 } // namespace OHOS
