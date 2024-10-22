@@ -1044,7 +1044,7 @@ bool AudioControlManager::IsBtOrWireHeadPlugin()
 bool AudioControlManager::IsRingingVibrateModeOn()
 {
     auto datashareHelper = SettingsDataShareHelper::GetInstance();
-    std::string ringingVibrateModeEnable {"0"};
+    std::string ringingVibrateModeEnable {"1"};
     std::vector<int> activedOsAccountIds;
     OHOS::AccountSA::OsAccountManager::QueryActiveOsAccountIds(activedOsAccountIds);
     if (activedOsAccountIds.empty()) {
