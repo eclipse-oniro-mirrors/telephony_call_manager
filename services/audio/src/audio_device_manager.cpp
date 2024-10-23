@@ -497,7 +497,7 @@ int32_t AudioDeviceManager::ReportAudioDeviceChange(const AudioDevice &device)
     std::string deviceName = device.deviceName;
     if (audioDeviceType_ == AudioDeviceType::DEVICE_BLUETOOTH_SCO) {
         if (address.empty() || deviceName.empty()) {
-            std::unique_ptr<AudioStandard::AudioDeviceDescriptor> activeBluetoothDevice =
+            std::shared_ptr<AudioStandard::AudioDeviceDescriptor> activeBluetoothDevice =
                 AudioStandard::AudioRoutingManager::GetInstance()->GetActiveBluetoothDevice();
             if (activeBluetoothDevice != nullptr && !activeBluetoothDevice->macAddress_.empty()) {
                 address = activeBluetoothDevice->macAddress_;
@@ -612,7 +612,7 @@ bool AudioDeviceManager::IsBtScoConnected()
 
 bool AudioDeviceManager::IsBtActived()
 {
-    std::unique_ptr<AudioStandard::AudioDeviceDescriptor> activeBluetoothDevice =
+    std::shared_ptr<AudioStandard::AudioDeviceDescriptor> activeBluetoothDevice =
         AudioStandard::AudioRoutingManager::GetInstance()->GetActiveBluetoothDevice();
     if (activeBluetoothDevice != nullptr && !activeBluetoothDevice->macAddress_.empty()) {
         TELEPHONY_LOGI("has actived bt device");

@@ -300,7 +300,7 @@ int32_t AudioProxy::GetPreferredOutputAudioDevice(AudioDevice &device)
     rendererInfo.contentType = AudioStandard::ContentType::CONTENT_TYPE_UNKNOWN;
     rendererInfo.streamUsage = AudioStandard::StreamUsage::STREAM_USAGE_VOICE_MODEM_COMMUNICATION;
     rendererInfo.rendererFlags = RENDERER_FLAG;
-    std::vector<sptr<AudioStandard::AudioDeviceDescriptor>> desc;
+    std::vector<std::shared_ptr<AudioStandard::AudioDeviceDescriptor>> desc;
     int32_t ret =
         AudioStandard::AudioRoutingManager::GetInstance()->GetPreferredOutputDeviceForRendererInfo(rendererInfo, desc);
     if (ret != TELEPHONY_SUCCESS) {
@@ -378,7 +378,7 @@ int32_t AudioProxy::UnsetAudioPreferDeviceChangeCallback()
 }
 
 void AudioPreferDeviceChangeCallback::OnPreferredOutputDeviceUpdated(
-    const std::vector<sptr<AudioStandard::AudioDeviceDescriptor>> &desc)
+    const std::vector<std::shared_ptr<AudioStandard::AudioDeviceDescriptor>> &desc)
 {
     bool hasCall = DelayedSingleton<CallControlManager>::GetInstance()->HasCall() ||
         DelayedSingleton<CallControlManager>::GetInstance()->HasVoipCall();
@@ -434,7 +434,7 @@ void AudioPreferDeviceChangeCallback::OnPreferredOutputDeviceUpdated(
 }
 
 bool AudioPreferDeviceChangeCallback::SetBluetoothDevice(AudioDevice &device,
-    const std::vector<sptr<AudioStandard::AudioDeviceDescriptor>> &desc)
+    const std::vector<std::shared_ptr<AudioStandard::AudioDeviceDescriptor>> &desc)
 {
     device.deviceType = AudioDeviceType::DEVICE_BLUETOOTH_SCO;
     if (memset_s(&device.address, kMaxAddressLen + 1, 0, kMaxAddressLen + 1) != EOK ||
@@ -453,7 +453,7 @@ bool AudioPreferDeviceChangeCallback::SetBluetoothDevice(AudioDevice &device,
 }
 
 bool AudioPreferDeviceChangeCallback::IsDistributedDeviceSelected(
-    const std::vector<sptr<AudioStandard::AudioDeviceDescriptor>> &desc)
+    const std::vector<std::shared_ptr<AudioStandard::AudioDeviceDescriptor>> &desc)
 {
     size_t size = desc.size();
     TELEPHONY_LOGI("desc size is: %{public}zu", size);
