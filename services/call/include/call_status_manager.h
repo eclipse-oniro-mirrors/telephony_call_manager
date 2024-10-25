@@ -123,7 +123,7 @@ private:
     const std::string CONTENT_TYPE = "content_type";
     const std::string PHONE = "phone";
     const std::string TYPE_ID = "type_id";
-    const std::string IS_DELETED = "is_deteled";
+    const std::string IS_DELETED = "is_deleted";
     const int32_t CALL_NUMBER = 2;
     std::unique_ptr<TimeWaitHelper> timeWaitHelper_ {nullptr};
 };

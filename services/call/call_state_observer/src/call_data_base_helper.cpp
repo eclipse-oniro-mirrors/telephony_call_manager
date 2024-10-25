@@ -425,7 +425,7 @@ bool CallDataBaseHelper::QueryContactInfoEnhanced(ContactInfo &contactInfo, Data
     return true;
 }
 
-int GetCallerIndex(std::shared_ptr<DataShare::DataShareResultSet> resultSet,
+int CallDataBaseHelper::GetCallerIndex(std::shared_ptr<DataShare::DataShareResultSet> resultSet,
     std::string phoneNumber)
 {
     void *telephonyHandle = dlopen(TELEPHONY_CUST_SO_PATH.c_str(), RTLD_LAZY);
