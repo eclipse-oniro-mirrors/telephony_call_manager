@@ -121,7 +121,6 @@ bool CallControlManager::Init()
 void ReportPhoneUEInSuperPrivacy(const std::string &eventName)
 {
     if (DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance()->GetCurrentIsSuperPrivacyMode()) {
-        TELEPHONY_LOGI("ReportPhoneUE eventName: %{public}s", eventName);
         CallManagerHisysevent::HiWriteBehaviorEventPhoneUE(
             eventName, PNAMEID_KEY, KEY_CALL_MANAGER, PVERSIONID_KEY, "");
     }

@@ -143,7 +143,6 @@ void CallSuperPrivacyControlManager::CloseCallSuperPrivacyMode(std::u16string &p
             RestoreSuperPrivacyMode();
         }
     }
-    TELEPHONY_LOGI("ReportPhoneUE eventName: %{public}s", CALL_DIAL_CLOSE_SUPER_PRIVACY);
     CallManagerHisysevent::HiWriteBehaviorEventPhoneUE(
         CALL_DIAL_CLOSE_SUPER_PRIVACY, PNAMEID_KEY, KEY_CALL_MANAGER, PVERSIONID_KEY, "");
 }
