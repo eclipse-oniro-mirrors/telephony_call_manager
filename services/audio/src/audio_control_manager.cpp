@@ -472,7 +472,7 @@ int32_t AudioControlManager::SetAudioDevice(const AudioDevice &device, bool isBy
                 address = activeBluetoothDevice->macAddress_;
             }
             AudioSystemManager* audioSystemManager = AudioSystemManager::GetInstance();
-            int32_t ret = audioSystemManager->SetCallDeviceActive(ActiveDeviceType::BLUETOOTH_SCO,
+            int32_t ret = audioSystemManager->SetCallDeviceActive(DeviceType::DEVICE_TYPE_BLUETOOTH_SCO,
                 true, address);
             if (ret != 0) {
                 TELEPHONY_LOGE("SetCallDeviceActive failed");

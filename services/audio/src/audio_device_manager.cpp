@@ -440,7 +440,7 @@ void AudioDeviceManager::SetCurrentAudioDevice(AudioDeviceType deviceType)
     if (deviceType == AudioDeviceType::DEVICE_EARPIECE && CallObjectManager::HasSatelliteCallExist()) {
         audioDeviceType_ = AudioDeviceType::DEVICE_SPEAKER;
         AudioStandard::AudioSystemManager::GetInstance()->
-            SetDeviceActive(AudioStandard::ActiveDeviceType::SPEAKER, true);
+            SetDeviceActive(AudioStandard::DeviceType::DEVICE_TYPE_SPEAKER, true);
         return;
     }
     AudioDevice device = {
@@ -460,7 +460,7 @@ void AudioDeviceManager::SetCurrentAudioDevice(const AudioDevice &device)
     audioDeviceType_ = deviceType;
     ReportAudioDeviceChange(device);
 }
-  
+
 bool AudioDeviceManager::CheckAndSwitchDistributedAudioDevice()
 {
     TELEPHONY_LOGI("check and switch distributed audio device.");

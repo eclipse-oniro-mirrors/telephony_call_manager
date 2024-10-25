@@ -83,12 +83,12 @@ int32_t AudioProxy::UnsetDeviceChangeCallback()
 bool AudioProxy::SetBluetoothDevActive()
 {
     if (AudioStandard::AudioSystemManager::GetInstance()->IsDeviceActive(
-        AudioStandard::ActiveDeviceType::BLUETOOTH_SCO)) {
+        AudioStandard::DeviceType::DEVICE_TYPE_BLUETOOTH_SCO)) {
         TELEPHONY_LOGI("bluetooth device is already active");
         return true;
     }
     bool ret = AudioStandard::AudioSystemManager::GetInstance()->SetDeviceActive(
-        AudioStandard::ActiveDeviceType::BLUETOOTH_SCO, true);
+        AudioStandard::DeviceType::DEVICE_TYPE_BLUETOOTH_SCO, true);
     if (ret == ERR_NONE) {
         return true;
     }
@@ -98,12 +98,12 @@ bool AudioProxy::SetBluetoothDevActive()
 bool AudioProxy::SetSpeakerDevActive(bool isActive)
 {
     if (AudioStandard::AudioSystemManager::GetInstance()->
-        IsDeviceActive(AudioStandard::ActiveDeviceType::SPEAKER) == isActive) {
+        IsDeviceActive(AudioStandard::DeviceType::DEVICE_TYPE_SPEAKER) == isActive) {
         TELEPHONY_LOGI("current speaker state[%{public}d] is consistent with the expected", isActive);
         return true;
     }
     bool ret = AudioStandard::AudioSystemManager::GetInstance()->SetDeviceActive(
-        AudioStandard::ActiveDeviceType::SPEAKER, isActive);
+        AudioStandard::DeviceType::DEVICE_TYPE_SPEAKER, isActive);
     if (ret == ERR_NONE) {
         return true;
     }
@@ -117,12 +117,12 @@ bool AudioProxy::SetWiredHeadsetDevActive()
         return false;
     }
     if (AudioStandard::AudioSystemManager::GetInstance()->
-        IsDeviceActive(AudioStandard::ActiveDeviceType::USB_HEADSET)) {
+        IsDeviceActive(AudioStandard::DeviceType::DEVICE_TYPE_USB_HEADSET)) {
         TELEPHONY_LOGI("wired headset device is already active");
         return true;
     }
     bool ret = AudioStandard::AudioSystemManager::GetInstance()->SetDeviceActive(
-        AudioStandard::ActiveDeviceType::USB_HEADSET, true);
+        AudioStandard::DeviceType::DEVICE_TYPE_USB_HEADSET, true);
     if (ret == ERR_NONE) {
         return true;
     }
@@ -135,12 +135,13 @@ bool AudioProxy::SetEarpieceDevActive()
         TELEPHONY_LOGE("SetEarpieceDevActive wiredheadset is connected, no need set earpiece dev active");
         return false;
     }
-    if (AudioStandard::AudioSystemManager::GetInstance()->IsDeviceActive(AudioStandard::ActiveDeviceType::EARPIECE)) {
+    if (AudioStandard::AudioSystemManager::GetInstance()->IsDeviceActive(
+        AudioStandard::DeviceType::DEVICE_TYPE_EARPIECE)) {
         TELEPHONY_LOGI("earpiece device is already active");
         return true;
     }
     if (AudioStandard::AudioSystemManager::GetInstance()->SetDeviceActive(
-        AudioStandard::ActiveDeviceType::EARPIECE, true) != ERR_NONE) {
+        AudioStandard::DeviceType::DEVICE_TYPE_EARPIECE, true) != ERR_NONE) {
         TELEPHONY_LOGE("SetEarpieceDevActive earpiece active fail");
         return false;
     }
