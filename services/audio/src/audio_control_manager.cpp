@@ -705,13 +705,14 @@ int32_t AudioControlManager::SetMute(bool isMute)
         return CALL_ERR_AUDIO_SETTING_MUTE_FAILED;
     }
     DelayedSingleton<AudioDeviceManager>::GetInstance()->ReportAudioDeviceInfo();
-    if (frontCall_ == nullptr) {
+    sptr<CallBase> currentCall = frontCall_;
+    if (currentCall == nullptr) {
         TELEPHONY_LOGE("frontCall_ is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     bool muted = DelayedSingleton<AudioProxy>::GetInstance()->IsMicrophoneMute();
-    frontCall_->SetMicPhoneState(muted);
-    TELEPHONY_LOGI("SetMute success callId:%{public}d, mute:%{public}d", frontCall_->GetCallID(), muted);
+    currentCall->SetMicPhoneState(muted);
+    TELEPHONY_LOGI("SetMute success callId:%{public}d, mute:%{public}d", currentCall->GetCallID(), muted);
     return TELEPHONY_SUCCESS;
 }
 
