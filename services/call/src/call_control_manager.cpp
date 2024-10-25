@@ -118,7 +118,7 @@ bool CallControlManager::Init()
     return true;
 }
 
-void ReportPhoneUEInSuperPrivacy(const std::string &eventName)
+void CallControlManager::ReportPhoneUEInSuperPrivacy(const std::string &eventName)
 {
     if (DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance()->GetCurrentIsSuperPrivacyMode()) {
         CallManagerHisysevent::HiWriteBehaviorEventPhoneUE(
