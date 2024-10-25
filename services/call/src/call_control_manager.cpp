@@ -118,6 +118,15 @@ bool CallControlManager::Init()
     return true;
 }
 
+void ReportPhoneUEInSuperPrivacy(const std::string &eventName)
+{
+    if (DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance()->GetCurrentIsSuperPrivacyMode()) {
+        TELEPHONY_LOGI("ReportPhoneUE eventName: %{public}s", eventName);
+        CallManagerHisysevent::HiWriteBehaviorEventPhoneUE(
+            eventName, PNAMEID_KEY, KEY_CALL_MANAGER, PVERSIONID_KEY, "");
+    }
+}
+
 int32_t CallControlManager::DialCall(std::u16string &number, AppExecFwk::PacMap &extras)
 {
     sptr<CallBase> callObjectPtr = nullptr;
@@ -142,6 +151,7 @@ int32_t CallControlManager::DialCall(std::u16string &number, AppExecFwk::PacMap 
             extras.PutIntValue("callType", (int32_t)CallType::TYPE_SATELLITE);
         }
     }
+    ReportPhoneUEInSuperPrivacy(CALL_DIAL_IN_SUPER_PRIVACY);
     ret = CanDial(number, extras, isEcc);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("can dial policy result:%{public}d", ret);
@@ -220,6 +230,7 @@ int32_t CallControlManager::AnswerCall(int32_t callId, int32_t videoState)
     if (call->GetCrsType() == CRS_TYPE && static_cast<VideoStateType>(videoState) != VideoStateType::TYPE_VIDEO) {
         DelayedSingleton<AudioProxy>::GetInstance()->SetSpeakerDevActive(false);
     }
+    ReportPhoneUEInSuperPrivacy(CALL_ANSWER_IN_SUPER_PRIVACY);
     if (CurrentIsSuperPrivacyMode(callId, videoState)) {
         return TELEPHONY_SUCCESS;
     }
@@ -359,6 +370,7 @@ int32_t CallControlManager::RejectCall(int32_t callId, bool rejectWithMessage, s
         TELEPHONY_LOGE("RejectCall failed!");
         return ret;
     }
+    ReportPhoneUEInSuperPrivacy(CALL_REJECT_IN_SUPER_PRIVACY);
     return TELEPHONY_SUCCESS;
 }
 
