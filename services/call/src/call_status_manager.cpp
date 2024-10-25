@@ -1580,7 +1580,7 @@ bool CallStatusManager::IsRejectCall(sptr<CallBase> &call, const CallDetailInfo 
     }
     if (IsFocusModeOpen()) {
         int ret = Notification::NotificationHelper::IsNeedSilentInDoNotDisturbMode(info.phoneNum, 0);
-        TELEPHONY_LOGI("IsRejectCall IsNeedSilentInDoNotDisturbMode ret:%{public}d", ret);
+        TELEPHONY_LOGW("IsRejectCall IsNeedSilentInDoNotDisturbMode ret:%{public}d", ret);
         if (ret == 0) {
             block = false;
             return true;
