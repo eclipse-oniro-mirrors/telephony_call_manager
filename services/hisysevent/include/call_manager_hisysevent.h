@@ -26,7 +26,7 @@ static const int64_t NORMAL_DIAL_TIME = 500;     // dial time (ms)
 static const int64_t NORMAL_INCOMING_TIME = 100; // incoming time (ms)
 static const int64_t NORMAL_ANSWER_TIME = 300;   // answer time (ms)
 static constexpr const char DOMAIN_PHONE_UE[] = "PHONE_UE";
-//phoneUE const
+// phoneUE const
 static constexpr const char *KEY_CALL_MANAGER = "callmanager";
 static constexpr const char *CALL_DIAL_IN_SUPER_PRIVACY = "CALL_DIAL_IN_SUPER_PRIVACY";
 static constexpr const char *CALL_ANSWER_IN_SUPER_PRIVACY = "CALL_ANSWER_IN_SUPER_PRIVACY";
