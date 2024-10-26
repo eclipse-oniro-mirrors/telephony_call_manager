@@ -216,8 +216,8 @@ void MyLocationEngine::MyLocationCallBack::OnLocationReport(const std::unique_pt
         return;
     }
     CallDetailInfo info;
-    info.latitude_ = std::string(location->GetLatitude());
-    info.longitude_ = std::string(location->GetLongitude());
+    info.latitude_ = std::to_string(location->GetLatitude());
+    info.longitude_ = std::to_string(location->GetLongitude());
     MyLocationEngine::ConnectAbility(MyLocationEngine::PARAMETERS_VALUE,
         EmergencyCallConnectCallback::connectCallback_, info);
 }
