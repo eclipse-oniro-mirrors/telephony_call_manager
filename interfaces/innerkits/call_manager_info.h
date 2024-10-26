@@ -502,6 +502,10 @@ struct CallDetailInfo {
      */
     VoipCallReportInfo voipCallInfo;
 
+    std::string latitude_;
+
+    std::string longitude_;
+
     CallDetailInfo() {}
 
     CallDetailInfo(const CallDetailInfo &temp)

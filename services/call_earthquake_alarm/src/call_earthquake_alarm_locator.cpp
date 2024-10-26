@@ -211,7 +211,13 @@ void MyLocationEngine::MyLocationCallBack::OnErrorReport(const int errorCode) {}
 void MyLocationEngine::MyLocationCallBack::OnLocationReport(const std::unique_ptr<Location::Location>& location)
 {
     TELEPHONY_LOGI("location report");
+    if (location == nullptr) {
+        ELEPHONY_LOGI("location is nullptr");
+        return;
+    }
     CallDetailInfo info;
+    info.latitude_ = std::string(location->GetLatitude());
+    info.longitude_ = std::string(location->GetLongitude());
     MyLocationEngine::ConnectAbility(MyLocationEngine::PARAMETERS_VALUE,
         EmergencyCallConnectCallback::connectCallback_, info);
 }
@@ -341,6 +347,10 @@ void MyLocationEngine::ConnectAbility(std::string value, sptr<AAFwk::IAbilityCon
         abilityName = EMERGENCY_ABILITY_NAME_ECC;
         want.SetParam(PARAMETERS_KEY_SLOTID, std::to_string(info.accountId));
         want.SetParam(PARAMETERS_KEY_PHONE_NUMBER, std::string(info.phoneNum));
+    }
+    if (value == PARAMETERS_VALUE) {
+        want.SetParam("latitude", info.latitude_);
+        want.SetParam("longitude", info.longitude_);
     }
     int32_t userId = -1;
     AppExecFwk::ElementName element(EMERGENCY_DEVICE_ID, EMERGENCY_BUNDLE_NAME, abilityName);
