@@ -501,6 +501,14 @@ struct CallDetailInfo {
      * Indicates the VoIP call specific information
      */
     VoipCallReportInfo voipCallInfo;
+    /**
+     * Indicates the latitude of location
+     */
+    std::string latitude_;
+    /**
+     * Indicates the longitude of location
+     */
+    std::string longitude_;
 
     CallDetailInfo() {}
 
