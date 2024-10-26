@@ -212,7 +212,7 @@ void MyLocationEngine::MyLocationCallBack::OnLocationReport(const std::unique_pt
 {
     TELEPHONY_LOGI("location report");
     if (location == nullptr) {
-        TELEPHONY_LOGI("location is nullptr");
+        TELEPHONY_LOGE("location is nullptr");
         return;
     }
     CallDetailInfo info;
