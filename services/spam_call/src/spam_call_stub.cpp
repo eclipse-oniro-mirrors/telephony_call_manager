@@ -38,7 +38,7 @@ int32_t SpamCallStub::OnRemoteRequest(uint32_t code, MessageParcel &data, Messag
         TELEPHONY_LOGE("descriptor checked fail !");
         return TELEPHONY_ERR_DESCRIPTOR_MISMATCH;
     }
-    TELEPHONY_LOGI("OnReceived, cmd = %{public}u", code);
+    TELEPHONY_LOGW("DetectSpamCall OnReceived, cmd = %{public}u", code);
     switch (code) {
         case COMMAND_ON_RESULT:
             do {

@@ -25,20 +25,20 @@ constexpr int32_t PARAM_NUM = 3;
 void SpamCallConnection::OnAbilityConnectDone(const AppExecFwk::ElementName &element,
     const sptr<IRemoteObject> &remoteObject, int32_t resultCode)
 {
-    TELEPHONY_LOGI("OnAbilityConnectDone, resultCode = %{public}d", resultCode);
+    TELEPHONY_LOGW("OnAbilityConnectDone, resultCode = %{public}d", resultCode);
     if (remoteObject == nullptr) {
         TELEPHONY_LOGE("Connected service is invalid!");
         return;
     }
     SpamCallProxy service(remoteObject);
     int32_t ret = service.DetectSpamCall(phoneNumber_, slotId_, spamCallAdapter_);
-    TELEPHONY_LOGI("OnAbilityConnectDone, DetectSpamCall ret = %{public}d", ret);
+    TELEPHONY_LOGW("SpamCallProxy DetectSpamCall ret = %{public}d", ret);
 }
 
 void SpamCallConnection::OnAbilityDisconnectDone(const AppExecFwk::ElementName &element,
     int32_t resultCode)
 {
-    TELEPHONY_LOGI("OnAbilityDisconnectDone, resultCode = %{public}d", resultCode);
+    TELEPHONY_LOGW("OnAbilityDisconnectDone, resultCode = %{public}d", resultCode);
 }
 } // namespace Telephony
 } // namespace OHOS

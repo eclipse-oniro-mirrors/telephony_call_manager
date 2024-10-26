@@ -29,12 +29,12 @@ CallbackStubHelper::CallbackStubHelper(std::shared_ptr<SpamCallAdapter> spamCall
 };
 CallbackStubHelper::~CallbackStubHelper()
 {
-    TELEPHONY_LOGI("~CallbackStubHelper");
+    TELEPHONY_LOGW("~CallbackStubHelper");
 };
 
 int32_t CallbackStubHelper::OnResult(int32_t &errCode, std::string &result)
 {
-    TELEPHONY_LOGI("OnResult errCode: %{public}d", errCode);
+    TELEPHONY_LOGW("DetectSpamCall OnResult errCode: %{public}d", errCode);
     if (spamCallAdapter_ == nullptr) {
         TELEPHONY_LOGE("spamCallAdapter_ is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -46,7 +46,7 @@ int32_t CallbackStubHelper::OnResult(int32_t &errCode, std::string &result)
         int32_t blockReason;
         spamCallAdapter_->ParseDetectResult(result, isBlock, numberMarkInfo, blockReason);
         if (blockReason == DECISION_REASON_TRUSTLIST) {
-            TELEPHONY_LOGI("trustlist, need query numbermark");
+            TELEPHONY_LOGW("trustlist, need query numbermark");
             DelayedSingleton<CallNumberUtils>::GetInstance()->
                 QueryYellowPageAndMarkInfo(numberMarkInfo, spamCallAdapter_->GetDetectPhoneNum());
         }

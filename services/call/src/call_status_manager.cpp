@@ -1442,7 +1442,7 @@ bool CallStatusManager::ShouldBlockIncomingCall(const sptr<CallBase> &call, cons
     DelayedSingleton<CellularCallConnection>::GetInstance()->IsEmergencyPhoneNumber(
         info.phoneNum, info.accountId, isEcc);
     if (isEcc) {
-        TELEPHONY_LOGI("incoming phoneNumber is ecc.");
+        TELEPHONY_LOGW("incoming phoneNumber is ecc.");
         return false;
     }
     std::shared_ptr<SpamCallAdapter> spamCallAdapterPtr_ = std::make_shared<SpamCallAdapter>();
@@ -1452,7 +1452,7 @@ bool CallStatusManager::ShouldBlockIncomingCall(const sptr<CallBase> &call, cons
     }
     spamCallAdapterPtr_->DetectSpamCall(std::string(info.phoneNum), info.accountId);
     if (spamCallAdapterPtr_->WaitForDetectResult()) {
-        TELEPHONY_LOGI("DetectSpamCall no time out");
+        TELEPHONY_LOGW("DetectSpamCall no time out");
         NumberMarkInfo numberMarkInfo;
         bool isBlock = false;
         int32_t blockReason;
@@ -1471,7 +1471,7 @@ bool CallStatusManager::IsRingOnceCall(const sptr<CallBase> &call, const CallDet
     NumberMarkInfo numberMarkInfo = call->GetNumberMarkInfo();
     ContactInfo contactInfo = call->GetCallerInfo();
     if (numberMarkInfo.markType == MarkType::MARK_TYPE_YELLOW_PAGE || contactInfo.name != "") {
-        TELEPHONY_LOGI("yellowpage or contact, no need check ring once call");
+        TELEPHONY_LOGW("yellowpage or contact, no need check ring once call");
         return false;
     }
     auto datashareHelper = SettingsDataShareHelper::GetInstance();
@@ -1480,7 +1480,7 @@ bool CallStatusManager::IsRingOnceCall(const sptr<CallBase> &call, const CallDet
     OHOS::Uri uri(
         "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true&key=" + key);
     int32_t ret = datashareHelper->Query(uri, key, is_check_ring_once);
-    TELEPHONY_LOGI("is_check_ring_once = %{public}s", is_check_ring_once.c_str());
+    TELEPHONY_LOGW("is_check_ring_once = %{public}s", is_check_ring_once.c_str());
     if (ret != TELEPHONY_SUCCESS || is_check_ring_once == "0") {
         return false;
     }
@@ -1488,7 +1488,7 @@ bool CallStatusManager::IsRingOnceCall(const sptr<CallBase> &call, const CallDet
         timeWaitHelper_ = std::make_unique<TimeWaitHelper>(WAIT_TIME_THREE_SECOND);
     }
     if (!timeWaitHelper_->WaitForResult()) {
-        TELEPHONY_LOGI("is not ring once");
+        TELEPHONY_LOGW("is not ring once");
         return false;
     }
     return true;

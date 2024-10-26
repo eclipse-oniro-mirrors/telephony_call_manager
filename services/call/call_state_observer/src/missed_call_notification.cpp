@@ -72,7 +72,7 @@ void MissedCallNotification::PublishMissedCallEvent(sptr<CallBase> &callObjectPt
     EventFwk::CommonEventPublishInfo publishInfo;
     publishInfo.SetOrdered(true);
     bool result = EventFwk::CommonEventManager::PublishCommonEvent(data, publishInfo, nullptr);
-    TELEPHONY_LOGI("publish missed call event result : %{public}d", result);
+    TELEPHONY_LOGW("publish missed call event result : %{public}d", result);
 
     AAFwk::Want wantWithNumber = want;
     wantWithNumber.SetParam("phoneNumber", callObjectPtr->GetAccountNumber());
@@ -84,7 +84,7 @@ void MissedCallNotification::PublishMissedCallEvent(sptr<CallBase> &callObjectPt
     callPermissions.emplace_back(Permission::GET_TELEPHONY_STATE);
     publishInfo.SetSubscriberPermissions(callPermissions);
     bool resultWithNumber = EventFwk::CommonEventManager::PublishCommonEvent(data, publishInfo, nullptr);
-    TELEPHONY_LOGI("publish missed call event with number result : %{public}d", resultWithNumber);
+    TELEPHONY_LOGW("publish missed call event with number result : %{public}d", resultWithNumber);
 }
 
 void MissedCallNotification::PublishBlockedCallEvent(sptr<CallBase> &callObjectPtr)
@@ -104,7 +104,7 @@ void MissedCallNotification::PublishBlockedCallEvent(sptr<CallBase> &callObjectP
     callPermissions.emplace_back(Permission::GET_TELEPHONY_STATE);
     publishInfo.SetSubscriberPermissions(callPermissions);
     bool result = EventFwk::CommonEventManager::PublishCommonEvent(data, publishInfo, nullptr);
-    TELEPHONY_LOGI("publish blocked call event result : %{public}d", result);
+    TELEPHONY_LOGW("publish blocked call event result : %{public}d", result);
 }
 
 void MissedCallNotification::PublishMissedCallNotification(sptr<CallBase> &callObjectPtr)

@@ -56,7 +56,7 @@ std::shared_ptr<DataShare::DataShareHelper> SettingsDataShareHelper::CreateDataS
 
 int32_t SettingsDataShareHelper::Query(Uri& uri, const std::string& key, std::string& value)
 {
-    TELEPHONY_LOGI("start Query");
+    TELEPHONY_LOGW("start Query");
     std::shared_ptr<DataShare::DataShareHelper> settingHelper =
         CreateDataShareHelper(TELEPHONY_CALL_MANAGER_SYS_ABILITY_ID);
     if (settingHelper == nullptr) {
@@ -77,7 +77,7 @@ int32_t SettingsDataShareHelper::Query(Uri& uri, const std::string& key, std::st
     int rowCount = 0;
     result->GetRowCount(rowCount);
     if (rowCount == 0) {
-        TELEPHONY_LOGI("query success, but rowCount is 0");
+        TELEPHONY_LOGW("query success, but rowCount is 0");
         settingHelper->Release();
         return TELEPHONY_SUCCESS;
     }
@@ -94,7 +94,7 @@ int32_t SettingsDataShareHelper::Query(Uri& uri, const std::string& key, std::st
     result->GetString(columnIndex, value);
     result->Close();
     settingHelper->Release();
-    TELEPHONY_LOGI("SettingUtils: query success");
+    TELEPHONY_LOGW("SettingUtils: query success");
     return TELEPHONY_SUCCESS;
 }
 } // namespace Telephony
