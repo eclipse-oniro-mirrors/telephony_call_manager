@@ -289,7 +289,7 @@ bool CallNumberUtils::SelectAccountId(int32_t slotId, AppExecFwk::PacMap &extras
 
 int32_t CallNumberUtils::QueryNumberLocationInfo(std::string &numberLocation, std::string accountNumber)
 {
-    TELEPHONY_LOGI("QueryNumberLocationInfo");
+    TELEPHONY_LOGW("QueryNumberLocationInfo");
     if (accountNumber == "") {
         TELEPHONY_LOGE("accountNumber is null");
         return TELEPHONY_ERR_ARGUMENT_INVALID;
@@ -317,7 +317,7 @@ void CallNumberUtils::NumberLocationUpdate(const sptr<CallBase> &callObjectPtr)
 {
     CallAttributeInfo info;
     callObjectPtr->GetCallAttributeBaseInfo(info);
-    TELEPHONY_LOGI("NumberLocationUpdate, callId[%{public}d]", info.callId);
+    TELEPHONY_LOGW("NumberLocationUpdate, callId[%{public}d]", info.callId);
     std::string numberLocation = callObjectPtr->GetNumberLocation();
     int32_t ret = QueryNumberLocationInfo(numberLocation, callObjectPtr->GetAccountNumber());
     if (ret != TELEPHONY_SUCCESS) {
@@ -337,7 +337,7 @@ void CallNumberUtils::NumberLocationUpdate(const sptr<CallBase> &callObjectPtr)
         return;
     }
     if (numberLocation != "" && numberLocation != "default") {
-        TELEPHONY_LOGI("need report call info of numberLocation");
+        TELEPHONY_LOGW("need report call info of numberLocation");
         call->GetCallAttributeInfo(info);
         DelayedSingleton<CallAbilityReportProxy>::GetInstance()->ReportCallStateInfo(info);
     }
@@ -347,7 +347,7 @@ void CallNumberUtils::YellowPageAndMarkUpdate(const sptr<CallBase> &callObjectPt
 {
     CallAttributeInfo info;
     callObjectPtr->GetCallAttributeBaseInfo(info);
-    TELEPHONY_LOGI("YellowPageAndMarkUpdate, callId[%{public}d]", info.callId);
+    TELEPHONY_LOGW("YellowPageAndMarkUpdate, callId[%{public}d]", info.callId);
     NumberMarkInfo numberMarkInfo;
     int32_t ret = QueryYellowPageAndMarkInfo(numberMarkInfo, callObjectPtr->GetAccountNumber());
     if (ret != TELEPHONY_SUCCESS) {
@@ -367,6 +367,8 @@ void CallNumberUtils::YellowPageAndMarkUpdate(const sptr<CallBase> &callObjectPt
         return;
     }
     if (numberMarkInfo.markType != MarkType::MARK_TYPE_NONE) {
+        TELEPHONY_LOGW("need report call info of numberMark, markType: %{public}d",
+            static_cast<int32_t>(numberMarkInfo.markType));
         call->GetCallAttributeInfo(info);
         DelayedSingleton<CallAbilityReportProxy>::GetInstance()->ReportCallStateInfo(info);
     }
@@ -374,7 +376,7 @@ void CallNumberUtils::YellowPageAndMarkUpdate(const sptr<CallBase> &callObjectPt
 
 int32_t CallNumberUtils::QueryYellowPageAndMarkInfo(NumberMarkInfo &numberMarkInfo, std::string accountNumber)
 {
-    TELEPHONY_LOGI("QueryYellowPageAndMarkInfo");
+    TELEPHONY_LOGW("QueryYellowPageAndMarkInfo");
     if (accountNumber == "") {
         TELEPHONY_LOGE("accountNumber is null");
         return TELEPHONY_ERR_ARGUMENT_INVALID;

@@ -27,13 +27,13 @@ TimeWaitHelper::TimeWaitHelper(int16_t waitTime)
 
 TimeWaitHelper::~TimeWaitHelper()
 {
-    TELEPHONY_LOGI("~TimeWaitHelper: %{public}d", waitTime_);
+    TELEPHONY_LOGW("~TimeWaitHelper: %{public}d", waitTime_);
 }
 
 void TimeWaitHelper::NotifyAll()
 {
     std::unique_lock<ffrt::mutex> lock(mutex_);
-    TELEPHONY_LOGI("TimeWaitHelper: %{public}d NotifyAll", waitTime_);
+    TELEPHONY_LOGW("TimeWaitHelper: %{public}d NotifyAll", waitTime_);
     isNotified_ = true;
     cv_.notify_all();
 }

@@ -46,12 +46,12 @@ SpamCallAdapter::SpamCallAdapter()
 
 SpamCallAdapter::~SpamCallAdapter()
 {
-    TELEPHONY_LOGI("~SpamCallAdapter");
+    TELEPHONY_LOGW("~SpamCallAdapter");
 }
 
 bool SpamCallAdapter::DetectSpamCall(const std::string &phoneNumber, const int32_t &slotId)
 {
-    TELEPHONY_LOGI("DetectSpamCall start");
+    TELEPHONY_LOGW("DetectSpamCall start");
     phoneNumber_ = phoneNumber;
     AAFwk::Want want;
     std::string bundleName = "com.spamshield";
@@ -69,7 +69,7 @@ bool SpamCallAdapter::ConnectSpamCallAbility(const AAFwk::Want &want, const std:
     const int32_t &slotId)
 {
     std::lock_guard<ffrt::mutex> lock(mutex_);
-    TELEPHONY_LOGI("ConnectSpamCallAbility start");
+    TELEPHONY_LOGW("ConnectSpamCallAbility start");
     connection_ = new (std::nothrow) SpamCallConnection(phoneNumber, slotId,
         shared_from_this());
     if (connection_ == nullptr) {
@@ -90,7 +90,7 @@ bool SpamCallAdapter::ConnectSpamCallAbility(const AAFwk::Want &want, const std:
 void SpamCallAdapter::DisconnectSpamCallAbility()
 {
     std::lock_guard<ffrt::mutex> lock(mutex_);
-    TELEPHONY_LOGI("DisconnectSpamCallAbility start");
+    TELEPHONY_LOGW("DisconnectSpamCallAbility start");
     if (connection_ == nullptr) {
         TELEPHONY_LOGE("connection_ is nullptr");
         return;
@@ -136,7 +136,7 @@ bool SpamCallAdapter::JsonGetBoolValue(cJSON *json, const std::string key)
 {
     cJSON *cursor = cJSON_GetObjectItem(json, key.c_str());
     bool value = cJSON_IsTrue(cursor);
-    TELEPHONY_LOGI("ParseBoolValue %{public}s: %{public}d", key.c_str(), value);
+    TELEPHONY_LOGW("ParseBoolValue %{public}s: %{public}d", key.c_str(), value);
     return value;
 }
 
@@ -160,17 +160,17 @@ void SpamCallAdapter::ParseDetectResult(const std::string &jsonData, bool &isBlo
         return;
     }
     isBlock = numberValue == 1;
-    TELEPHONY_LOGI("detectResult: %{public}d", isBlock);
+    TELEPHONY_LOGW("DetectSpamCall detectResult: %{public}d", isBlock);
     if (!JsonGetNumberValue(root, DECISION_REASON, numberValue)) {
         cJSON_Delete(root);
         return;
     }
     blockReason = numberValue;
-    TELEPHONY_LOGI("decisionReason: %{public}d", blockReason);
+    TELEPHONY_LOGW("DetectSpamCall decisionReason: %{public}d", blockReason);
     if (JsonGetNumberValue(root, MARK_TYPE, numberValue)) {
         info.markType = static_cast<MarkType>(numberValue);
     }
-    TELEPHONY_LOGI("markType: %{public}d", info.markType);
+    TELEPHONY_LOGW("DetectSpamCall markType: %{public}d", info.markType);
     if (JsonGetNumberValue(root, MARK_COUNT, numberValue)) {
         info.markCount = numberValue;
     }
@@ -187,7 +187,7 @@ void SpamCallAdapter::ParseDetectResult(const std::string &jsonData, bool &isBlo
     if (strcpy_s(info.markDetails, sizeof(info.markDetails), stringValue.c_str()) != EOK) {
         TELEPHONY_LOGE("strcpy_s markDetails fail.");
     }
-    TELEPHONY_LOGI("ParseDetectResult end");
+    TELEPHONY_LOGW("ParseDetectResult end");
     cJSON_Delete(root);
 }
 
