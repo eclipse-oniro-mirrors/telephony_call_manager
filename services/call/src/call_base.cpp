@@ -89,13 +89,16 @@ void CallBase::HangUpVoipCall()
             sptr<VoIPCall> call = static_cast<VoIPCall *>(static_cast<void *>(tempCall.GetRefPtr()));
             if (call == nullptr) {
                 TELEPHONY_LOGE("the call object is nullptr, callId:%{public}d", callinfo.callId);
-                break;
-            }
-            if (call->GetTelCallState() == TelCallState::CALL_STATUS_ACTIVE) {
-                TELEPHONY_LOGI("the voip call with callId %{public}d is active, no need to hangup", call->GetCallID());
                 continue;
             }
-            call->HangUpCall(ErrorReason::CELLULAR_CALL_EXISTS);
+            TelCallState voipCallState = call->GetTelCallState();
+            if (voipCallState == TelCallState::CALL_STATUS_ACTIVE) {
+                TELEPHONY_LOGI("the voip call with callId %{public}d is active, no need to hangup", call->GetCallID());
+            } else if (voipCallState == TelCallState::CALL_STATUS_INCOMING) {
+                call->RejectCall();
+            } else {
+                call->HangUpCall(ErrorReason::CELLULAR_CALL_EXISTS);
+            }
         }
     }
 }
