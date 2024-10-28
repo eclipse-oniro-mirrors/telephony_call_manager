@@ -376,6 +376,7 @@ int32_t CallStatusManager::HandleVoipEventReportInfo(const VoipCallEventInfo &in
 
 int32_t CallStatusManager::IncomingHandle(const CallDetailInfo &info)
 {
+    detectStartTime = std::chrono::system_clock::from_time_t(0);
     sptr<CallBase> call = GetOneCallObjectByIndexAndSlotId(info.index, info.accountId);
     if (call != nullptr) {
         auto oldCallType = call->GetCallType();
@@ -1451,6 +1452,7 @@ bool CallStatusManager::ShouldBlockIncomingCall(const sptr<CallBase> &call, cons
         return false;
     }
     spamCallAdapterPtr_->DetectSpamCall(std::string(info.phoneNum), info.accountId);
+    detectStartTime = std::chrono::system_clock::now();
     if (spamCallAdapterPtr_->WaitForDetectResult()) {
         TELEPHONY_LOGW("DetectSpamCall no time out");
         NumberMarkInfo numberMarkInfo;
@@ -1484,13 +1486,25 @@ bool CallStatusManager::IsRingOnceCall(const sptr<CallBase> &call, const CallDet
     if (ret != TELEPHONY_SUCCESS || is_check_ring_once == "0") {
         return false;
     }
+    auto waitTime = WAIT_TIME_THREE_SECOND;
+    if (detectStartTime != std::chrono::system_clock::from_time_t(0)) {
+        auto detectEndTime = std::chrono::system_clock::now();
+        auto diff = detectEndTime - detectStartTime;
+        std::chrono::milliseconds ms = std::chrono::duration_cast<std::chrono::milliseconds>(diff);
+        if (diff >= WAIT_TIME_THREE_SECOND) {
+            TELEPHONY_LOGW("cost time over 3s, non need check ring once call");
+        }
+        waitTime = WAIT_TIME_THREE_SECOND - ms;
+    }
     if (timeWaitHelper_ == nullptr) {
-        timeWaitHelper_ = std::make_unique<TimeWaitHelper>(WAIT_TIME_THREE_SECOND);
+        timeWaitHelper_ = std::make_unique<TimeWaitHelper>(waitTime);
     }
     if (!timeWaitHelper_->WaitForResult()) {
         TELEPHONY_LOGW("is not ring once");
+        timeWaitHelper_ = nullptr;
         return false;
     }
+    timeWaitHelper_ = nullptr;
     return true;
 }
 

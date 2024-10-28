@@ -20,20 +20,20 @@
 namespace OHOS {
 namespace Telephony {
 
-TimeWaitHelper::TimeWaitHelper(int16_t waitTime)
+TimeWaitHelper::TimeWaitHelper(std::chrono::milliseconds waitTime)
 {
     waitTime_ = waitTime;
 }
 
 TimeWaitHelper::~TimeWaitHelper()
 {
-    TELEPHONY_LOGW("~TimeWaitHelper: %{public}d", waitTime_);
+    TELEPHONY_LOGW("~TimeWaitHelper: %{public}lld", waitTime_.count());
 }
 
 void TimeWaitHelper::NotifyAll()
 {
     std::unique_lock<ffrt::mutex> lock(mutex_);
-    TELEPHONY_LOGW("TimeWaitHelper: %{public}d NotifyAll", waitTime_);
+    TELEPHONY_LOGW("TimeWaitHelper: %{public}lld NotifyAll", waitTime_.count());
     isNotified_ = true;
     cv_.notify_all();
 }
@@ -44,14 +44,14 @@ bool TimeWaitHelper::WaitForResult()
         std::unique_lock<ffrt::mutex> lock(mutex_);
         auto now = std::chrono::system_clock::now();
         while (!isNotified_) {
-            if (cv_.wait_until(lock, now + std::chrono::seconds(waitTime_)) == ffrt::cv_status::timeout) {
-                TELEPHONY_LOGE("TimeWaitHelper: %{public}d time out", waitTime_);
+            if (cv_.wait_until(lock, now + waitTime_) == ffrt::cv_status::timeout) {
+                TELEPHONY_LOGE("TimeWaitHelper: %{public}lld time out", waitTime_.count());
                 return false;
             }
         }
         return true;
     }
-    TELEPHONY_LOGE("TimeWaitHelper: %{public}d isNotified_ is true", waitTime_);
+    TELEPHONY_LOGE("TimeWaitHelper: %{public}lld isNotified_ is true", waitTime_.count());
     return false;
 }
 } // namespace Telephony
