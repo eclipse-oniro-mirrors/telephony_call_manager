@@ -38,6 +38,7 @@ static constexpr const char *SETTINGS_DATA_EXT_URI = "datashare:///com.ohos.sett
 static constexpr const char *SETTINGS_AIRPLANE_MODE_URI =
     "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true&key=airplane_mode";
 static constexpr const char *SETTINGS_AIRPLANE_MODE = "settings.telephony.airplanemode";
+static constexpr const int32_t MAX_WAITIME_TIME = 10;
 constexpr int32_t E_OK = 0;
 
 CallDataRdbObserver::CallDataRdbObserver(std::vector<std::string> *phones)
@@ -80,7 +81,7 @@ std::shared_ptr<DataShare::DataShareHelper> CallDataBaseHelper::CreateDataShareH
     if (uri == SETTINGS_DATA_URI) {
         return DataShare::DataShareHelper::Creator(remoteObj, uri, SETTINGS_DATA_EXT_URI);
     }
-    return DataShare::DataShareHelper::Creator(remoteObj, uri);
+    return DataShare::DataShareHelper::Creator(remoteObj, uri, "", MAX_WAITIME_TIME);
 }
 
 void CallDataBaseHelper::RegisterObserver(std::vector<std::string> *phones)
