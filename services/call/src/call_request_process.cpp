@@ -1018,7 +1018,8 @@ int32_t CallRequestProcess::EccDialPolicy()
             hangupList.emplace_back(call);
         } else if (crState == CallRunningState::CALL_RUNNING_STATE_RINGING) {
             rejectList.emplace_back(call);
-        } else if (crState == CallRunningState::CALL_RUNNING_STATE_ACTIVE) {
+        } else if (crState == CallRunningState::CALL_RUNNING_STATE_ACTIVE ||
+            crState == CallRunningState::CALL_RUNNING_STATE_HOLD) {
             hangupList.emplace_back(call);
         }
     }
