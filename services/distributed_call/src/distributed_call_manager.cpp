@@ -415,7 +415,7 @@ void DistributedCallManager::ReportDistributedDeviceInfo(const AudioDevice& devi
             TELEPHONY_LOGI("curDecId is the same as devId, devId = %{public}s",
                 GetAnonyString(devId).c_str());
             remoteDevice.clear();
-            remoteDevice.push_back(std::shared_ptr<AudioDeviceDescriptor>(*device));
+            remoteDevice.push_back(*device);
             break;
         }
     }
