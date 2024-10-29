@@ -19,6 +19,7 @@
 #include "call_control_manager.h"
 #include "syspara/parameters.h"
 #include "super_privacy_manager_client.h"
+#include "call_manager_hisysevent.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -140,6 +141,8 @@ void CallSuperPrivacyControlManager::CloseCallSuperPrivacyMode(std::u16string &p
             RestoreSuperPrivacyMode();
         }
     }
+    CallManagerHisysevent::HiWriteBehaviorEventPhoneUE(
+        CALL_DIAL_CLOSE_SUPER_PRIVACY, PNAMEID_KEY, KEY_CALL_MANAGER, PVERSIONID_KEY, "");
 }
 
 void CallSuperPrivacyControlManager::CloseAnswerSuperPrivacyMode(int32_t callId, int32_t videoState)
