@@ -51,7 +51,7 @@ private:
 #endif
     bool isPhoneLocked = false;
     bool isScreenOnLocked = false;
-    const int32_t INCOMING_LOCK_TIMEOUT = 5000;
+    const int32_t INCOMING_LOCK_TIMEOUT = 6000;
 };
 } // namespace Telephony
 } // namespace OHOS

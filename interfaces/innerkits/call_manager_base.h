@@ -71,11 +71,11 @@ constexpr int16_t WAIT_TIME_ONE_SECOND = 1;
 /**
  * @brief Indicates three second duration.
  */
-constexpr int16_t WAIT_TIME_THREE_SECOND = 3;
+constexpr std::chrono::milliseconds WAIT_TIME_THREE_SECOND(3000);
 /**
- * @brief Indicates two five duration.
+ * @brief Indicates five second duration.
  */
-constexpr int16_t WAIT_TIME_FIVE_SECOND = 5;
+constexpr std::chrono::milliseconds WAIT_TIME_FIVE_SECOND(5000);
 /**
  * @brief Indicates No Call Exist.
  */
