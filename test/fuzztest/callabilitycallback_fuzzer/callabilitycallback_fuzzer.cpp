@@ -22,6 +22,7 @@
 #include "call_ability_callback.h"
 #include "call_ability_callback_proxy.h"
 #include "call_manager_callback.h"
+#include "call_manager_utils.h"
 
 using namespace OHOS::Telephony;
 namespace OHOS {
@@ -336,6 +337,16 @@ int32_t UpdateCameraCapabilities(const uint8_t *data, size_t size)
     return callAbilityCallbackPtr_->OnUpdateCameraCapabilities(dataParcel, replyParcel);
 }
 
+void WriteCallAttributeInfo(const uint8_t *data, size_t size)
+{
+    MessageParcel dataParcel;
+    CallAttributeInfo info;
+    info.accountId = static_cast<int32_t>(size);
+    info.callId = static_cast<int32_t>(size);
+    info.callState = static_cast<TelCallState>(static_cast<int32_t>(size));
+    CallManagerUtils::WriteCallAttributeInfo(info, dataParcel);
+}
+
 void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
 {
     if (data == nullptr || size == 0) {
@@ -354,6 +365,7 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     UpdatePeerDimensionsChange(data, size);
     UpdateCallDataUsageChange(data, size);
     UpdateCameraCapabilities(data, size);
+    WriteCallAttributeInfo(data, size);
 }
 } // namespace OHOS
 
