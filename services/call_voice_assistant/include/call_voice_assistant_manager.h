@@ -123,6 +123,9 @@ public:
     const std::string BROADCAST_CHECK_RESULT = "incomingCallVoiceBroadcastCheckResult";
     const int CHECK_CODE = 1006;
     const int FAIL_CODE = -1;
+    const int UTF8_1BYTES = 1;
+    const int UTF8_2BYTES = 2;
+    const int UTF8_3BYTES = 3;
 };
 
 class VoiceAssistantConnectCallback : public IRemoteStub<AAFwk::IAbilityConnection> {
