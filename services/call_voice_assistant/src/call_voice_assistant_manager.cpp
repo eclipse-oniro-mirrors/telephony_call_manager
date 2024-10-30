@@ -286,6 +286,7 @@ std::shared_ptr<IncomingContactInformation> CallVoiceAssistantManager::GetContac
 void CallVoiceAssistantManager::UpdateRemoteObject(const sptr<IRemoteObject> &object, int32_t callId)
 {
     TELEPHONY_LOGI("update remote object callId, %{public}d", callId);
+    std::lock_guard<std::mutex> lock(mutex_);
     auto it_callId = accountIds.find(callId);
     if (it_callId == accountIds.end()) {
         TELEPHONY_LOGE("iterator is end");
@@ -352,16 +353,9 @@ void CallVoiceAssistantManager::SendRequest(const std::shared_ptr<IncomingContac
         TELEPHONY_LOGE("exist null string: %{public}s.", (info->dialOrCome).c_str());
         return;
     }
-    if(!CheckValidUTF8(info->incomingName) {
-        TELEPHONY_LOGE("incomingName is invalid.");
-        info->incomingName = DEFAULT_STRING;
-    }
-    if(!CheckValidUTF8(info->numberLocation) {
-        TELEPHONY_LOGE("numberLocation is invalid.");
-        info->numberLocation = DEFAULT_STRING;
-    }
     MessageParcel data, reply;
     MessageOption option;
+    CheckContactInfo(info);
     std::string sendStr = GetSendString(info);
     if (!CheckValidUTF8(sendStr)) {
         TELEPHONY_LOGE("send string is invalid");
@@ -720,28 +714,50 @@ void CallVoiceAssistantManager::UpdateReplyData(const std::string& str)
     TELEPHONY_LOGI("%{public}s, %{public}s.", broadcastCheck.c_str(), controlCheck.c_str());
 }
 
-bool CallVoiceAssistantManager::CheckValidUTF8(const std::string& str) {
+bool CallVoiceAssistantManager::CheckValidUTF8(const std::string& str)
+{
     int bytes = 0;
-    for (unsigned char c : str) {
-        if (bytes == 0) {                            // 检查每个字符的前缀，判断字节数
-            if ((c >> 5) == 0b110) {
-                bytes = 1;                           // 2字节字符 0b110xxxxx
-            } else if ((c >> 4) == 0b1110) {
-                bytes = 2;                           // 3字节字符 0b1110xxxx
-            } else if ((c >> 3) == 0b11110) {
-                bytes = 3;                           // 4字节字符 0b11110xxx
-            } else if ((c >> 7)) {
-                return false;                        // 非单字节ASCII字符 0b1xxxxxxx
+    for (unsigned char singleChar : str) {
+        if (bytes == 0) {                                      // 检查每个字符的前缀，判断字节数
+            if ((singleChar >> 5) == MULTIBYTE_2_START) {
+                bytes = UTF8_1BYTES;                           // 2字节字符 0b110xxxxx
+            } else if ((singleChar >> 4) == MULTIBYTE_3_START) {
+                bytes = UTF8_2BYTES;                           // 3字节字符 0b1110xxxx
+            } else if ((singleChar >> 3) == MULTIBYTE_4_START) {
+                bytes = UTF8_3BYTES;                           // 4字节字符 0b11110xxx
+            } else if ((singleChar >> 7)) {
+                return false;                                  // 非单字节ASCII字符 0b1xxxxxxx
             }
         } else {
-            if ((c >> 6) != 0b10) {
-                return false;                        // 检查后续字节是否符合 UTF-8 格式 0b10xxxxxx
+            if ((singleChar >> 6) != MULTIBYTE_1_START) {
+                return false;                                  // 检查后续字节是否符合 UTF-8 格式 0b10xxxxxx
             }
             bytes--;
         }
     }
     return bytes == 0;
-}
+};
+
+bool CallVoiceAssistantManager::CheckContactInfo(const std::shared_ptr<IncomingContactInformation> info)
+{
+    if (info == nullptr) {
+        TELEPHONY_LOGE("info is nullptr");
+        return false;
+    }
+    if (!CheckValidUTF8(info->incomingName) {
+        TELEPHONY_LOGE("incomingName is invalid.");
+        info->incomingName = DEFAULT_STRING;
+    }
+    if (!CheckValidUTF8(info->numberLocation) {
+        TELEPHONY_LOGE("numberLocation is invalid.");
+        info->numberLocation = DEFAULT_STRING;
+    }
+    if (!CheckValidUTF8(info->phoneNumber) {
+        TELEPHONY_LOGE("phoneNumber is invalid.");
+        info->phoneNumber = DEFAULT_STRING;
+    }
+    return true;
+};
 
 }
 }

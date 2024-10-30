@@ -81,6 +81,7 @@ public:
     void UpdateNumberLocation(const std::string& location, int32_t callId);
     void UpdateContactInfo(const ContactInfo &info, int32_t callId);
     bool CheckValidUTF8(const std::string& str);
+    bool CheckContactInfo(const std::shared_ptr<IncomingContactInformation> info);
     static std::shared_ptr<CallVoiceAssistantManager> GetInstance();
 
 private:
@@ -122,6 +123,13 @@ public:
     const std::string BROADCAST_CHECK_RESULT = "incomingCallVoiceBroadcastCheckResult";
     const int CHECK_CODE = 1006;
     const int FAIL_CODE = -1;
+    const int MULTIBYTE_1_START = 0b10;
+    const int MULTIBYTE_2_START = 0b110;
+    const int MULTIBYTE_3_START = 0b1110;
+    const int MULTIBYTE_4_START = 0b11110;
+    const int UTF8_1BYTES = 1;
+    const int UTF8_2BYTES = 2;
+    const int UTF8_3BYTES = 3;
 };
 
 class VoiceAssistantConnectCallback : public IRemoteStub<AAFwk::IAbilityConnection> {
