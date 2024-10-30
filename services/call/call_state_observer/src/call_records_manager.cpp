@@ -22,6 +22,7 @@
 #include "os_account_manager_wrapper.h"
 #include "parameter.h"
 #include "securec.h"
+#include "call_earthquake_alarm_subscriber.h"
 #include <regex>
 
 namespace OHOS {
@@ -375,6 +376,7 @@ void DataShareReadyEventSubscriber::OnReceiveEvent(const CommonEventData &data)
         std::vector<int32_t> activeList = { 0 };
         DelayedSingleton<AppExecFwk::OsAccountManagerWrapper>::GetInstance()->QueryActiveOsAccountIds(activeList);
         DelayedSingleton<CallRecordsManager>::GetInstance()->QueryUnReadMissedCallLog(activeList[0]);
+        LocationSystemAbilityListener::SystemAbilitySubscriber();
     }
 }
 } // namespace Telephony

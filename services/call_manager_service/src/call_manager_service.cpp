@@ -152,7 +152,6 @@ void CallManagerService::OnStart()
             timeNow->tm_min, timeNow->tm_sec);
         TELEPHONY_LOGI("CallManagerService start service cost time:%{public}d(milliseconds)", spendTime_);
     }
-    LocationSystemAbilityListener::SystemAbilitySubscriber();
     LocationSubscriber::Subscriber();
 }
 
