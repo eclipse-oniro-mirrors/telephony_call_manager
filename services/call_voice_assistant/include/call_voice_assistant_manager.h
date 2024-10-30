@@ -123,10 +123,10 @@ public:
     const std::string BROADCAST_CHECK_RESULT = "incomingCallVoiceBroadcastCheckResult";
     const int CHECK_CODE = 1006;
     const int FAIL_CODE = -1;
-    const int MULTIBYTE_1_START = 0b10;
-    const int MULTIBYTE_2_START = 0b110;
-    const int MULTIBYTE_3_START = 0b1110;
-    const int MULTIBYTE_4_START = 0b11110;
+    const int MULTIBYTE_1_START = 2;
+    const int MULTIBYTE_2_START = 6;
+    const int MULTIBYTE_3_START = 14;
+    const int MULTIBYTE_4_START = 30;
     const int UTF8_1BYTES = 1;
     const int UTF8_2BYTES = 2;
     const int UTF8_3BYTES = 3;

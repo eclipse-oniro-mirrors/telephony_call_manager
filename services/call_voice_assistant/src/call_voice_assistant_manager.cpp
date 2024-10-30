@@ -718,19 +718,19 @@ bool CallVoiceAssistantManager::CheckValidUTF8(const std::string& str)
 {
     int bytes = 0;
     for (unsigned char singleChar : str) {
-        if (bytes == 0) {                                      // 检查每个字符的前缀，判断字节数
-            if ((singleChar >> 5) == MULTIBYTE_2_START) {
-                bytes = UTF8_1BYTES;                           // 2字节字符 0b110xxxxx
-            } else if ((singleChar >> 4) == MULTIBYTE_3_START) {
-                bytes = UTF8_2BYTES;                           // 3字节字符 0b1110xxxx
-            } else if ((singleChar >> 3) == MULTIBYTE_4_START) {
-                bytes = UTF8_3BYTES;                           // 4字节字符 0b11110xxx
-            } else if ((singleChar >> 7)) {
-                return false;                                  // 非单字节ASCII字符 0b1xxxxxxx
+        if (bytes == 0) {                                             // 检查每个字符的前缀，判断字节数
+            if ((singleChar & 0b11100000) == 0b11000000) {
+                bytes = UTF8_1BYTES;                                  // 2字节字符 0b110xxxxx
+            } else if ((singleChar & 0b11110000) == 0b11100000) {
+                bytes = UTF8_2BYTES;                                  // 3字节字符 0b1110xxxx
+            } else if ((singleChar & 0b11111000) == 0b11110000) {
+                bytes = UTF8_3BYTES;                                  // 4字节字符 0b11110xxx
+            } else if ((singleChar & 0b10000000) != 0) {
+                return false;                                         // 非单字节ASCII字符 0b1xxxxxxx
             }
         } else {
-            if ((singleChar >> 6) != MULTIBYTE_1_START) {
-                return false;                                  // 检查后续字节是否符合 UTF-8 格式 0b10xxxxxx
+            if ((singleChar & 0b11000000) != 0b10000000) {
+                return false;                                         // 检查后续字节是否符合 UTF-8 格式 0b10xxxxxx
             }
             bytes--;
         }
@@ -744,15 +744,15 @@ bool CallVoiceAssistantManager::CheckContactInfo(const std::shared_ptr<IncomingC
         TELEPHONY_LOGE("info is nullptr");
         return false;
     }
-    if (!CheckValidUTF8(info->incomingName) {
+    if (!CheckValidUTF8(info->incomingName)) {
         TELEPHONY_LOGE("incomingName is invalid.");
         info->incomingName = DEFAULT_STRING;
     }
-    if (!CheckValidUTF8(info->numberLocation) {
+    if (!CheckValidUTF8(info->numberLocation)) {
         TELEPHONY_LOGE("numberLocation is invalid.");
         info->numberLocation = DEFAULT_STRING;
     }
-    if (!CheckValidUTF8(info->phoneNumber) {
+    if (!CheckValidUTF8(info->phoneNumber)) {
         TELEPHONY_LOGE("phoneNumber is invalid.");
         info->phoneNumber = DEFAULT_STRING;
     }
