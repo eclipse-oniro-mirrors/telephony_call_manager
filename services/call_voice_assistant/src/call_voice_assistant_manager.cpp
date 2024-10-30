@@ -286,14 +286,12 @@ std::shared_ptr<IncomingContactInformation> CallVoiceAssistantManager::GetContac
 void CallVoiceAssistantManager::UpdateRemoteObject(const sptr<IRemoteObject> &object, int32_t callId)
 {
     TELEPHONY_LOGI("update remote object callId, %{public}d", callId);
-    std::lock_guard<std::mutex> lock(mutex_);
-    auto it_callId = accountIds.find(callId);
-    if (it_callId == accountIds.end()) {
-        TELEPHONY_LOGE("iterator is end");
+    if (nowCallId != callId) {
+        TELEPHONY_LOGE("nowCallId, %{public}d", nowCallId);
         return;
     }
     mRemoteObject = object;
-    this->SendRequest(it_callId->second, true);
+    this->SendRequest(accountIds[callId], true);
 }
 
 void CallVoiceAssistantManager::UpdateContactInfo(const ContactInfo& info, int32_t callId)
