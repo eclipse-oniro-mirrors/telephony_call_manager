@@ -81,7 +81,9 @@ int32_t CallObjectManager::AddOneCallObject(sptr<CallBase> &call)
         isFirstDialCallAdded_ = true;
         cv_.notify_all();
     }
-    DelayedSingleton<FoldStatusManager>::GetInstance()->RegisterFoldableListener();
+    if (FoldStatusManager::IsSmallFoldDevice()) {
+        DelayedSingleton<FoldStatusManager>::GetInstance()->RegisterFoldableListener();
+    }
     TELEPHONY_LOGI("AddOneCallObject success! callId:%{public}d,call list size:%{public}zu", call->GetCallID(),
         callObjectPtrList_.size());
     return TELEPHONY_SUCCESS;
@@ -115,7 +117,9 @@ int32_t CallObjectManager::DeleteOneCallObject(int32_t callId)
         }
     }
     if (callObjectPtrList_.size() == NO_CALL_EXIST) {
-        DelayedSingleton<FoldStatusManager>::GetInstance()->UnregisterFoldableListener();
+        if (FoldStatusManager::IsSmallFoldDevice()) {
+            DelayedSingleton<FoldStatusManager>::GetInstance()->UnregisterFoldableListener();
+        }
         if (DelayedSingleton<CallControlManager>::GetInstance()->ShouldDisconnectService()) {
             lock.unlock();
             DelayedDisconnectCallConnectAbility();
@@ -133,7 +137,9 @@ void CallObjectManager::DeleteOneCallObject(sptr<CallBase> &call)
     std::unique_lock<std::mutex> lock(listMutex_);
     callObjectPtrList_.remove(call);
     if (callObjectPtrList_.size() == NO_CALL_EXIST) {
-        DelayedSingleton<FoldStatusManager>::GetInstance()->UnregisterFoldableListener();
+        if (FoldStatusManager::IsSmallFoldDevice()) {
+            DelayedSingleton<FoldStatusManager>::GetInstance()->UnregisterFoldableListener();
+        }
         if (DelayedSingleton<CallControlManager>::GetInstance()->ShouldDisconnectService()) {
             lock.unlock();
             DelayedDisconnectCallConnectAbility();
