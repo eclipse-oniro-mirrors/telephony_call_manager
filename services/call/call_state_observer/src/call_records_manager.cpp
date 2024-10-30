@@ -22,6 +22,7 @@
 #include "os_account_manager_wrapper.h"
 #include "parameter.h"
 #include "securec.h"
+#include "call_earthquake_alarm_subscriber.h"
 #include <regex>
 
 namespace OHOS {
