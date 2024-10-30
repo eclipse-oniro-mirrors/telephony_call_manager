@@ -80,6 +80,7 @@ public:
     int32_t CheckTelCallState(TelCallState state);
     void UpdateNumberLocation(const std::string& location, int32_t callId);
     void UpdateContactInfo(const ContactInfo &info, int32_t callId);
+    bool CheckValidUTF8(const std::string& str);
     static std::shared_ptr<CallVoiceAssistantManager> GetInstance();
 
 private:

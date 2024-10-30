@@ -286,8 +286,13 @@ std::shared_ptr<IncomingContactInformation> CallVoiceAssistantManager::GetContac
 void CallVoiceAssistantManager::UpdateRemoteObject(const sptr<IRemoteObject> &object, int32_t callId)
 {
     TELEPHONY_LOGI("update remote object callId, %{public}d", callId);
+    auto it_callId = accountIds.find(callId);
+    if (it_callId == accountIds.end()) {
+        TELEPHONY_LOGE("iterator is end");
+        return;
+    }
     mRemoteObject = object;
-    this->SendRequest(accountIds[callId], true);
+    this->SendRequest(it_callId->second, true);
 }
 
 void CallVoiceAssistantManager::UpdateContactInfo(const ContactInfo& info, int32_t callId)
@@ -347,10 +352,19 @@ void CallVoiceAssistantManager::SendRequest(const std::shared_ptr<IncomingContac
         TELEPHONY_LOGE("exist null string: %{public}s.", (info->dialOrCome).c_str());
         return;
     }
+    if(!CheckValidUTF8(info->incomingName) {
+        TELEPHONY_LOGE("incomingName is invalid.");
+        info->incomingName = DEFAULT_STRING;
+    }
     MessageParcel data, reply;
     MessageOption option;
+    std::string sendStr = GetSendString(info);
+    if (!CheckValidUTF8(sendStr)) {
+        TELEPHONY_LOGE("send string is invalid");
+        return;
+    }
     std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> convert;
-    data.WriteString16(convert.from_bytes(GetSendString(info)));
+    data.WriteString16(convert.from_bytes(sendStr));
     int32_t retCode = mRemoteObject->SendRequest(CHECK_CODE, data, reply, option);
     TELEPHONY_LOGI("send request ret code: %{public}d.", retCode);
     if (!isNeed) {
@@ -359,7 +373,6 @@ void CallVoiceAssistantManager::SendRequest(const std::shared_ptr<IncomingContac
     isConnectService = false;
     isplay = SWITCH_TURN_OFF;
     std::u16string _reply1 = reply.ReadString16();
-    TELEPHONY_LOGI("receiveData, %{public}s.", convert.to_bytes(_reply1).c_str());
     UpdateReplyData(convert.to_bytes(_reply1));
     if (controlCheck == SWITCH_TURN_ON && isControlSwitchOn) {
         isConnectService = true;
@@ -666,6 +679,7 @@ bool CallVoiceAssistantManager::GetIsControlSwitchOn()
 
 void CallVoiceAssistantManager::UpdateReplyData(const std::string& str)
 {
+    TELEPHONY_LOGI("receiveData, %{public}s.", str.c_str());
     std::size_t pos1 = 0, pos2 = 0;
     std::map<std::string, std::string> replyData;
     while (pos1 != std::string::npos && pos2 != std::string::npos) {
@@ -700,6 +714,29 @@ void CallVoiceAssistantManager::UpdateReplyData(const std::string& str)
         broadcastCheck = it_broadcast->second;
     }
     TELEPHONY_LOGI("%{public}s, %{public}s.", broadcastCheck.c_str(), controlCheck.c_str());
+}
+
+bool CallVoiceAssistantManager::CheckValidUTF8(const std::string& str) {
+    int bytes = 0;
+    for (unsigned char c : str) {
+        if (bytes == 0) {                            // 检查每个字符的前缀，判断字节数
+            if ((c >> 5) == 0b110) {
+                bytes = 1;                           // 2字节字符 0b110xxxxx
+            } else if ((c >> 4) == 0b1110) {
+                bytes = 2;                           // 3字节字符 0b1110xxxx
+            } else if ((c >> 3) == 0b11110) {
+                bytes = 3;                           // 4字节字符 0b11110xxx
+            } else if ((c >> 7)) {
+                return false;                        // 非单字节ASCII字符 0b1xxxxxxx
+            }
+        } else {
+            if ((c >> 6) != 0b10) {
+                return false;                        // 检查后续字节是否符合 UTF-8 格式 0b10xxxxxx
+            }
+            bytes--;
+        }
+    }
+    return bytes == 0;
 }
 
 }
