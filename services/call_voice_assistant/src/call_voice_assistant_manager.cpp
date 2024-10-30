@@ -356,6 +356,10 @@ void CallVoiceAssistantManager::SendRequest(const std::shared_ptr<IncomingContac
         TELEPHONY_LOGE("incomingName is invalid.");
         info->incomingName = DEFAULT_STRING;
     }
+    if(!CheckValidUTF8(info->numberLocation) {
+        TELEPHONY_LOGE("numberLocation is invalid.");
+        info->numberLocation = DEFAULT_STRING;
+    }
     MessageParcel data, reply;
     MessageOption option;
     std::string sendStr = GetSendString(info);
