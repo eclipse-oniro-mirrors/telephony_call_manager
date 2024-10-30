@@ -375,6 +375,7 @@ void DataShareReadyEventSubscriber::OnReceiveEvent(const CommonEventData &data)
         std::vector<int32_t> activeList = { 0 };
         DelayedSingleton<AppExecFwk::OsAccountManagerWrapper>::GetInstance()->QueryActiveOsAccountIds(activeList);
         DelayedSingleton<CallRecordsManager>::GetInstance()->QueryUnReadMissedCallLog(activeList[0]);
+        LocationSystemAbilityListener::SystemAbilitySubscriber();
     }
 }
 } // namespace Telephony
