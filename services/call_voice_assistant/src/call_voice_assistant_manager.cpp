@@ -290,6 +290,10 @@ void CallVoiceAssistantManager::UpdateRemoteObject(const sptr<IRemoteObject> &ob
         TELEPHONY_LOGE("nowCallId, %{public}d", nowCallId);
         return;
     }
+    if (accountIds.find(callId) == accountIds.end()) {
+        TELEPHONY_LOGE("iterator is end");
+        return;
+    }
     mRemoteObject = object;
     this->SendRequest(accountIds[callId], true);
 }
