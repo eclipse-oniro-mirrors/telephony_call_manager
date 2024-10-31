@@ -335,6 +335,7 @@ void AudioControlManager::HandleNextState(sptr<CallBase> &callObjectPtr, TelCall
             break;
         case TelCallState::CALL_STATUS_DISCONNECTING:
         case TelCallState::CALL_STATUS_DISCONNECTED:
+            DelayedSingleton<AudioProxy>::GetInstance()->SetVoiceRingtoneMute(false);
             if (isCrsVibrating_) {
                 DelayedSingleton<AudioProxy>::GetInstance()->StopVibrator();
                 isCrsVibrating_ = false;
@@ -393,6 +394,7 @@ void AudioControlManager::HandlePriorState(sptr<CallBase> &callObjectPtr, TelCal
 void AudioControlManager::ProcessAudioWhenCallActive(sptr<CallBase> &callObjectPtr)
 {
     if (callObjectPtr->GetCallRunningState() == CallRunningState::CALL_RUNNING_STATE_ACTIVE) {
+        DelayedSingleton<AudioProxy>::GetInstance()->SetVoiceRingtoneMute(false);
         if (isCrsVibrating_) {
             DelayedSingleton<AudioProxy>::GetInstance()->StopVibrator();
             isCrsVibrating_ = false;
@@ -1023,8 +1025,8 @@ bool AudioControlManager::IsSoundPlaying()
 void AudioControlManager::MuteNetWorkRingTone()
 {
     bool result =
-        DelayedSingleton<AudioProxy>::GetInstance()->SetAudioScene(AudioStandard::AudioScene::AUDIO_SCENE_DEFAULT);
-    TELEPHONY_LOGI("Set volume mute, result: %{public}d", result);
+        DelayedSingleton<AudioProxy>::GetInstance()->SetVoiceRingtoneMute(true);
+    TELEPHONY_LOGI("Set Voice Ringtone mute, result: %{public}d", result);
     if (isCrsVibrating_) {
         DelayedSingleton<AudioProxy>::GetInstance()->StopVibrator();
         isCrsVibrating_ = false;
