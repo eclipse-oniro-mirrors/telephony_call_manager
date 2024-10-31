@@ -252,6 +252,7 @@ int32_t CallAbilityCallbackProxy::OnReportAudioDeviceChange(const AudioDeviceInf
     }
     dataParcel.WriteRawData((const void *)&info.currentAudioDevice, sizeof(AudioDevice));
     dataParcel.WriteBool(info.isMuted);
+    dataParcel.WriteInt32(info.callId);
 
     TELEPHONY_LOGD("audioDeviceListLength=%{public}zu", audioDeviceListLength);
     if (Remote() == nullptr) {
