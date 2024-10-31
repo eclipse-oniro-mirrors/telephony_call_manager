@@ -114,6 +114,14 @@ bool CallControlManager::Init()
     return true;
 }
 
+void CallControlManager::ReportPhoneUEInSuperPrivacy(const std::string &eventName)
+{
+    if (DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance()->GetCurrentIsSuperPrivacyMode()) {
+        CallManagerHisysevent::HiWriteBehaviorEventPhoneUE(
+            eventName, PNAMEID_KEY, KEY_CALL_MANAGER, PVERSIONID_KEY, "");
+    }
+}
+
 int32_t CallControlManager::DialCall(std::u16string &number, AppExecFwk::PacMap &extras)
 {
     sptr<CallBase> callObjectPtr = nullptr;
@@ -138,6 +146,7 @@ int32_t CallControlManager::DialCall(std::u16string &number, AppExecFwk::PacMap 
             extras.PutIntValue("callType", (int32_t)CallType::TYPE_SATELLITE);
         }
     }
+    ReportPhoneUEInSuperPrivacy(CALL_DIAL_IN_SUPER_PRIVACY);
     ret = CanDial(number, extras, isEcc);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("dial policy result:%{public}d", ret);
@@ -213,6 +222,7 @@ int32_t CallControlManager::AnswerCall(int32_t callId, int32_t videoState)
         TELEPHONY_LOGE("call is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
+    ReportPhoneUEInSuperPrivacy(CALL_ANSWER_IN_SUPER_PRIVACY);
     bool isVoipCall = call->GetCallType() == CallType::TYPE_VOIP;
     if (!isVoipCall && CurrentIsSuperPrivacyMode(callId, videoState)) {
         return TELEPHONY_SUCCESS;
@@ -347,6 +357,7 @@ int32_t CallControlManager::RejectCall(int32_t callId, bool rejectWithMessage, s
         TELEPHONY_LOGE("RejectCall failed!");
         return ret;
     }
+    ReportPhoneUEInSuperPrivacy(CALL_REJECT_IN_SUPER_PRIVACY);
     return TELEPHONY_SUCCESS;
 }
 

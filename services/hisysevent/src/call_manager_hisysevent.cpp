@@ -41,8 +41,6 @@ static constexpr const char *VIDEO_STATE_KEY = "VIDEO_STATE";
 static constexpr const char *ERROR_TYPE_KEY = "ERROR_TYPE";
 static constexpr const char *ERROR_MSG_KEY = "ERROR_MSG";
 static constexpr const char *MARK_TYPE_KEY = "MARK_TYPE";
-static constexpr const char *PNAMEID_KEY = "PNAMEID";
-static constexpr const char *PVERSIONID_KEY = "PVERSIONID";
 
 // VALUE
 static constexpr const char *CALL_MANAGER_MODULE = "CALL_MANAGER";
