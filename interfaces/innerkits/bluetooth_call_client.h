@@ -200,8 +200,6 @@ public:
      * @return Returns call info list.
      */
     std::vector<CallAttributeInfo> GetCurrentCallList(int32_t slotId);
-private:
-    std::mutex mutex_;
 };
 } // namespace Telephony
 } // namespace OHOS
