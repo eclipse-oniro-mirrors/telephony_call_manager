@@ -283,7 +283,8 @@ std::shared_ptr<IncomingContactInformation> CallVoiceAssistantManager::GetContac
     return accountIds[callId];
 }
 
-void CallVoiceAssistantManager::UpdateRemoteObject(const sptr<IRemoteObject> &object, int32_t callId, const sptr<AAFwk::IAbilityConnection> callback)
+void CallVoiceAssistantManager::UpdateRemoteObject(const sptr<IRemoteObject> &object, int32_t callId,
+    const sptr<AAFwk::IAbilityConnection> callback)
 {
     TELEPHONY_LOGI("update remote object callId, %{public}d", callId);
     if (nowCallId != callId || accountIds.find(callId) == accountIds.end()) {
