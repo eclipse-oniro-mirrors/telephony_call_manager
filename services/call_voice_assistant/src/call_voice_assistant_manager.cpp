@@ -283,15 +283,12 @@ std::shared_ptr<IncomingContactInformation> CallVoiceAssistantManager::GetContac
     return accountIds[callId];
 }
 
-void CallVoiceAssistantManager::UpdateRemoteObject(const sptr<IRemoteObject> &object, int32_t callId)
+void CallVoiceAssistantManager::UpdateRemoteObject(const sptr<IRemoteObject> &object, int32_t callId, const sptr<AAFwk::IAbilityConnection> callback)
 {
     TELEPHONY_LOGI("update remote object callId, %{public}d", callId);
-    if (nowCallId != callId) {
+    if (nowCallId != callId || accountIds.find(callId) == accountIds.end()) {
         TELEPHONY_LOGE("nowCallId, %{public}d", nowCallId);
-        return;
-    }
-    if (accountIds.find(callId) == accountIds.end()) {
-        TELEPHONY_LOGE("iterator is end");
+        AAFwk::AbilityManagerClient::GetInstance()->DisconnectAbility(callback);
         return;
     }
     mRemoteObject = object;
@@ -395,7 +392,8 @@ void VoiceAssistantConnectCallback::OnAbilityConnectDone(const AppExecFwk::Eleme
         return;
     }
     if (resultCode == TELEPHONY_SUCCESS) {
-        CallVoiceAssistantManager::GetInstance()->UpdateRemoteObject(remoteObject, startId);
+        sptr<AAFwk::IAbilityConnection> callback = sptr<AAFwk::IAbilityConnection>(this);
+        CallVoiceAssistantManager::GetInstance()->UpdateRemoteObject(remoteObject, startId, callback);
     }
 };
 

@@ -113,7 +113,7 @@ HWTEST_F(CallVoiceAssistantManagerTest, Telephony_CallVoiceAssistantManager_002,
     auto infoptr = voicePtr->GetContactInfo(ACCOUNT_ID);
     voicePtr->UpdateNumberLocation(value, ACCOUNT_ID);
     voicePtr->UpdateContactInfo(contactInfo, ACCOUNT_ID);
-    voicePtr->UpdateRemoteObject(remoteObject, ACCOUNT_ID);
+    voicePtr->UpdateRemoteObject(remoteObject, ACCOUNT_ID, nullptr);
     voicePtr->OnStopService();
     voicePtr->Initial();
     voicePtr->QueryValue(CONTROL_SWITCH, value);

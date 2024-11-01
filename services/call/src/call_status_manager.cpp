@@ -48,6 +48,7 @@
 #include "call_earthquake_alarm_locator.h"
 #include "distributed_communication_manager.h"
 #include "want_params_wrapper.h"
+#include "call_voice_assistant_manager.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -446,6 +447,7 @@ void CallStatusManager::SetContactInfo(sptr<CallBase> &call, std::string phoneNu
         };
         QueryCallerInfo(contactInfo, phoneNum);
         callObjectPtr->SetCallerInfo(contactInfo);
+        CallVoiceAssistantManager::GetInstance()->UpdateContactInfo(contactInfo, callObjectPtr->GetCallID());
         DelayedSingleton<DistributedCommunicationManager>::GetInstance()->ProcessCallInfo(callObjectPtr,
             DistributedDataType::NAME);
     });
