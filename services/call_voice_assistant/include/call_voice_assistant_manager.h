@@ -70,7 +70,8 @@ public:
     void MuteRinger();
     std::shared_ptr<IncomingContactInformation> GetContactInfo(int32_t callId);
     void SendRequest(const std::shared_ptr<IncomingContactInformation> info, bool isNeed);
-    void UpdateRemoteObject(const sptr<IRemoteObject> &object, int32_t callId, const sptr<AAFwk::IAbilityConnection> callback);
+    void UpdateRemoteObject(const sptr<IRemoteObject> &object, int32_t callId,
+        const sptr<AAFwk::IAbilityConnection> callback);
     std::string GetSendString(const std::shared_ptr<IncomingContactInformation> nowInfo);
     void SetIsControlSwitchOn(bool state);
     bool GetIsControlSwitchOn();
