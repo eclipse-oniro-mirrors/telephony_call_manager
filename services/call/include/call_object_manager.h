@@ -83,6 +83,7 @@ public:
     static bool HasSatelliteCallExist();
     static int32_t GetSatelliteCallList(std::list<int32_t> &list);
     static int32_t GetCallNumByRunningState(CallRunningState callState);
+    static sptr<CallBase> GetForegroundLiveCallByCallId(int32_t callId);
 
 protected:
     static std::condition_variable cv_;

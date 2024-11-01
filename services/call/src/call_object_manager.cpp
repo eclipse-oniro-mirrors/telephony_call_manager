@@ -816,5 +816,29 @@ int32_t CallObjectManager::GetCallNumByRunningState(CallRunningState callState)
     TELEPHONY_LOGI("callState:%{public}d, count:%{public}d", callState, count);
     return count; 
 }
+
+sptr<CallBase> CallObjectManager::GetForegroundLiveCallByCallId(int32_t callId)
+{
+    std::lock_guard<std::mutex> lock(listMutex_);
+    sptr<CallBase> liveCall = nullptr;
+    for (std::list<sptr<CallBase>>::iterator it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
+        TelCallState telCallState = (*it)->GetTelCallState();
+        if (telCallState == TelCallState::CALL_STATUS_ACTIVE && (*it)->GetCallID() == callId) {
+            liveCall = (*it);
+            break;
+        }
+        if ((telCallState == TelCallState::CALL_STATUS_ALERTING ||
+            telCallState == TelCallState::CALL_STATUS_DIALING) && (*it)->GetCallID() == callId) {
+            liveCall = (*it);
+            break;
+        }
+        if ((telCallState == TelCallState::CALL_STATUS_WAITING ||
+            telCallState == TelCallState::CALL_STATUS_INCOMING) && (*it)->GetCallID() == callId) {
+            liveCall = (*it);
+            continue;
+        }
+    }
+    return liveCall;
+}
 } // namespace Telephony
 } // namespace OHOS
