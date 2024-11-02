@@ -1585,10 +1585,16 @@ bool CallStatusManager::IsRejectCall(sptr<CallBase> &call, const CallDetailInfo 
     int32_t state;
     DelayedSingleton<CallControlManager>::GetInstance()->GetVoIPCallState(state);
     if (ShouldRejectIncomingCall() || state == (int32_t)CallStateToApp::CALL_STATE_RINGING) {
+        CallManagerHisysevent::HiWriteBehaviorEventPhoneUE(
+            CALL_INCOMING_REJECT_BY_SYSTEM, PNAMEID_KEY, KEY_CALL_MANAGER, PVERSIONID_KEY, "",
+            ACTION_TYPE, REJECT_BY_OOBE);
         block = false;
         return true;
     }
     if (info.callType != CallType::TYPE_VOIP && ShouldBlockIncomingCall(call, info)) {
+        CallManagerHisysevent::HiWriteBehaviorEventPhoneUE(
+            CALL_INCOMING_REJECT_BY_SYSTEM, PNAMEID_KEY, KEY_CALL_MANAGER, PVERSIONID_KEY, "",
+            ACTION_TYPE, REJECT_BY_NUM_BLOCK);
         block = true;
         return true;
     }
@@ -1596,6 +1602,9 @@ bool CallStatusManager::IsRejectCall(sptr<CallBase> &call, const CallDetailInfo 
         int ret = Notification::NotificationHelper::IsNeedSilentInDoNotDisturbMode(info.phoneNum, 0);
         TELEPHONY_LOGW("IsRejectCall IsNeedSilentInDoNotDisturbMode ret:%{public}d", ret);
         if (ret == 0) {
+            CallManagerHisysevent::HiWriteBehaviorEventPhoneUE(
+                CALL_INCOMING_REJECT_BY_SYSTEM, PNAMEID_KEY, KEY_CALL_MANAGER, PVERSIONID_KEY, "",
+                ACTION_TYPE, REJECT_IN_FOCUSMODE);
             block = false;
             return true;
         }
