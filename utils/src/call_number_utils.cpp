@@ -27,6 +27,7 @@
 #include "call_ability_report_proxy.h"
 #include "number_identity_data_base_helper.h"
 #include "asyoutypeformatter.h"
+#include "call_voice_assistant_manager.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -332,6 +333,7 @@ void CallNumberUtils::NumberLocationUpdate(const sptr<CallBase> &callObjectPtr)
         }
     }
     call->SetNumberLocation(numberLocation);
+    CallVoiceAssistantManager::GetInstance()->UpdateNumberLocation(numberLocation, info.callId);
     if (!CallObjectManager::IsCallExist(info.callId)) {
         TELEPHONY_LOGE("call is not exist");
         return;

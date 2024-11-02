@@ -283,9 +283,15 @@ std::shared_ptr<IncomingContactInformation> CallVoiceAssistantManager::GetContac
     return accountIds[callId];
 }
 
-void CallVoiceAssistantManager::UpdateRemoteObject(const sptr<IRemoteObject> &object, int32_t callId)
+void CallVoiceAssistantManager::UpdateRemoteObject(const sptr<IRemoteObject> &object, int32_t callId,
+    const sptr<AAFwk::IAbilityConnection> callback)
 {
     TELEPHONY_LOGI("update remote object callId, %{public}d", callId);
+    if (nowCallId != callId || accountIds.find(callId) == accountIds.end()) {
+        TELEPHONY_LOGE("nowCallId, %{public}d", nowCallId);
+        AAFwk::AbilityManagerClient::GetInstance()->DisconnectAbility(callback);
+        return;
+    }
     mRemoteObject = object;
     this->SendRequest(accountIds[callId], true);
 }
@@ -349,8 +355,12 @@ void CallVoiceAssistantManager::SendRequest(const std::shared_ptr<IncomingContac
     }
     MessageParcel data, reply;
     MessageOption option;
-    std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> convert;
-    data.WriteString16(convert.from_bytes(GetSendString(info)));
+    std::u16string sendStr = GetSendString(info);
+    if (sendStr == DEFAULT_U16STRING) {
+        TELEPHONY_LOGE("send string is invalid");
+        return;
+    }
+    data.WriteString16(sendStr);
     int32_t retCode = mRemoteObject->SendRequest(CHECK_CODE, data, reply, option);
     TELEPHONY_LOGI("send request ret code: %{public}d.", retCode);
     if (!isNeed) {
@@ -358,9 +368,7 @@ void CallVoiceAssistantManager::SendRequest(const std::shared_ptr<IncomingContac
     }
     isConnectService = false;
     isplay = SWITCH_TURN_OFF;
-    std::u16string _reply1 = reply.ReadString16();
-    TELEPHONY_LOGI("receiveData, %{public}s.", convert.to_bytes(_reply1).c_str());
-    UpdateReplyData(convert.to_bytes(_reply1));
+    UpdateReplyData(Str16ToStr8(reply.ReadString16()));
     if (controlCheck == SWITCH_TURN_ON && isControlSwitchOn) {
         isConnectService = true;
         RegisterListenSwitchState();
@@ -382,7 +390,8 @@ void VoiceAssistantConnectCallback::OnAbilityConnectDone(const AppExecFwk::Eleme
         return;
     }
     if (resultCode == TELEPHONY_SUCCESS) {
-        CallVoiceAssistantManager::GetInstance()->UpdateRemoteObject(remoteObject, startId);
+        sptr<AAFwk::IAbilityConnection> callback = sptr<AAFwk::IAbilityConnection>(this);
+        CallVoiceAssistantManager::GetInstance()->UpdateRemoteObject(remoteObject, startId, callback);
     }
 };
 
@@ -391,13 +400,25 @@ void VoiceAssistantConnectCallback::OnAbilityDisconnectDone(const AppExecFwk::El
     TELEPHONY_LOGI("disconnect callback result code, %{public}d", resultCode);
 };
 
-std::string CallVoiceAssistantManager::GetSendString(const std::shared_ptr<IncomingContactInformation> nowInfo)
+std::u16string CallVoiceAssistantManager::GetSendString(const std::shared_ptr<IncomingContactInformation> nowInfo)
 {
-    std::string str = "";
     if (nowInfo == nullptr) {
         TELEPHONY_LOGE("nowInfo is nullptr");
-        return str;
+        return DEFAULT_U16STRING;
     }
+    if (Str8ToStr16(nowInfo->incomingName) == DEFAULT_U16STRING) {
+        TELEPHONY_LOGE("incomingName is invalid.");
+        nowInfo->incomingName = DEFAULT_STRING;
+    }
+    if (Str8ToStr16(nowInfo->numberLocation) == DEFAULT_U16STRING) {
+        TELEPHONY_LOGE("numberLocation is invalid.");
+        nowInfo->numberLocation = DEFAULT_STRING;
+    }
+    if (Str8ToStr16(nowInfo->phoneNumber) == DEFAULT_U16STRING) {
+        TELEPHONY_LOGE("phoneNumber is invalid.");
+        nowInfo->phoneNumber = DEFAULT_STRING;
+    }
+    std::string str = DEFAULT_STRING;
     auto fun = [&str](std::string key, std::string value, bool start = false, bool end = false) {
         std::string first = (start) ? "{" : "";
         std::string last = (end) ? "}" : ",";
@@ -412,7 +433,7 @@ std::string CallVoiceAssistantManager::GetSendString(const std::shared_ptr<Incom
     fun("sim", std::to_string(nowInfo->accountId));
     fun("stopBroadcasting", std::to_string(nowInfo->stopBroadcasting));
     fun("location", nowInfo->numberLocation, false, true);
-    return str;
+    return Str8ToStr16(str);
 }
 
 void VoiceAssistantSwitchObserver::OnChange()
@@ -666,6 +687,7 @@ bool CallVoiceAssistantManager::GetIsControlSwitchOn()
 
 void CallVoiceAssistantManager::UpdateReplyData(const std::string& str)
 {
+    TELEPHONY_LOGI("receiveData, %{public}s.", str.c_str());
     std::size_t pos1 = 0, pos2 = 0;
     std::map<std::string, std::string> replyData;
     while (pos1 != std::string::npos && pos2 != std::string::npos) {

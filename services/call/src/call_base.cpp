@@ -27,7 +27,6 @@
 #include "voip_call.h"
 #include "voip_call_connection.h"
 #include "call_manager_info.h"
-#include "call_voice_assistant_manager.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -429,7 +428,6 @@ void CallBase::SetIsEccContact(bool isEccContact)
 
 void CallBase::SetNumberLocation(std::string numberLocation)
 {
-    CallVoiceAssistantManager::GetInstance()->UpdateNumberLocation(numberLocation, callId_);
     std::lock_guard<std::mutex> lock(mutex_);
     numberLocation_ = numberLocation;
 }
@@ -465,7 +463,6 @@ ContactInfo CallBase::GetCallerInfo()
 
 void CallBase::SetCallerInfo(const ContactInfo &info)
 {
-    CallVoiceAssistantManager::GetInstance()->UpdateContactInfo(info, callId_);
     std::lock_guard<std::mutex> lock(mutex_);
     contactInfo_ = info;
 }
