@@ -158,7 +158,7 @@ void AudioControlManager::VideoStateUpdated(
         .address = { 0 },
     };
     AudioDeviceType initDeviceType = GetInitAudioDeviceType();
-    if (callObjectPtr->GetCrsType() == CRS_TYPE) {
+    if (callObjectPtr->GetCrsType() == CRS_TYPE && !IsVoIPCallActived()) {
         AudioStandard::AudioRingerMode ringMode = DelayedSingleton<AudioProxy>::GetInstance()->GetRingerMode();
         if (ringMode != AudioStandard::AudioRingerMode::RINGER_MODE_NORMAL) {
             if (initDeviceType == AudioDeviceType::DEVICE_WIRED_HEADSET ||
@@ -238,7 +238,7 @@ void AudioControlManager::UpdateDeviceTypeForCrs()
     if (incomingCall == nullptr || incomingCall->IsAnsweredCall()) {
         return;
     }
-    if (incomingCall->GetCrsType() == CRS_TYPE) {
+    if (incomingCall->GetCrsType() == CRS_TYPE && !IsVoIPCallActived()) {
         AudioDevice device = {
             .deviceType = AudioDeviceType::DEVICE_SPEAKER,
             .address = { 0 },
@@ -720,7 +720,7 @@ int32_t AudioControlManager::MuteRinger()
 {
     sptr<CallBase> incomingCall = CallObjectManager::GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_RINGING);
     if (incomingCall != nullptr) {
-        if (incomingCall->GetCrsType() == CRS_TYPE) {
+        if (incomingCall->GetCrsType() == CRS_TYPE && !IsVoIPCallActived()) {
             TELEPHONY_LOGI("Mute network ring tone.");
             MuteNetWorkRingTone();
         }
@@ -1062,6 +1062,17 @@ bool AudioControlManager::IsRingingVibrateModeOn()
         return true;
     }
     return false;
+}
+bool AudioControlManager::IsVoIPCallActived()
+{
+    int32_t state;
+    DelayedSingleton<CallControlManager>::GetInstance()->GetVoIPCallState(state);
+    if (state == static_cast<int32_t>(CallStateToApp::CALL_STATE_IDLE) ||
+        state == static_cast<int32_t>(CallStateToApp::CALL_STATE_UNKNOWN)) {
+        return false;    
+    }
+    TELEPHONY_LOGI("VoIP Call is actived");
+    return true;
 }
 } // namespace Telephony
 } // namespace OHOS
