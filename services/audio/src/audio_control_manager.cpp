@@ -1069,7 +1069,7 @@ bool AudioControlManager::IsVoIPCallActived()
     DelayedSingleton<CallControlManager>::GetInstance()->GetVoIPCallState(state);
     if (state == static_cast<int32_t>(CallStateToApp::CALL_STATE_IDLE) ||
         state == static_cast<int32_t>(CallStateToApp::CALL_STATE_UNKNOWN)) {
-        return false;    
+        return false;
     }
     TELEPHONY_LOGI("VoIP Call is actived");
     return true;
