@@ -795,6 +795,10 @@ struct AudioDeviceInfo {
      * Indicates wether the device is muted, true: mute, false: no mute
      */
     bool isMuted = false;
+    /**
+     * The callId of audio device change.
+     */
+    int32_t callId;
 };
 
 enum class MmiCodeResult {

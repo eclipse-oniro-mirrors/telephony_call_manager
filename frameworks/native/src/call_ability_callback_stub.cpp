@@ -243,6 +243,7 @@ int32_t CallAbilityCallbackStub::OnUpdateAudioDeviceChange(MessageParcel &data, 
     }
 
     info.isMuted = data.ReadBool();
+    info.callId = data.ReadInt32();
     result = OnReportAudioDeviceChange(info);
     if (!reply.WriteInt32(result)) {
         TELEPHONY_LOGE("writing parcel failed");

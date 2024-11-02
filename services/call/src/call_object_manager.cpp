@@ -730,11 +730,14 @@ sptr<CallBase> CallObjectManager::GetForegroundCall(bool isIncludeVoipCall)
     return liveCall;
 }
 
-sptr<CallBase> CallObjectManager::GetForegroundLiveCall()
+sptr<CallBase> CallObjectManager::GetForegroundLiveCall(bool isIncludeVoipCall)
 {
     std::lock_guard<std::mutex> lock(listMutex_);
     sptr<CallBase> liveCall = nullptr;
     for (std::list<sptr<CallBase>>::iterator it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
+        if (!isIncludeVoipCall && (*it)->GetCallType() == CallType::TYPE_VOIP) {
+            continue;
+        }
         TelCallState telCallState = (*it)->GetTelCallState();
         if (telCallState == TelCallState::CALL_STATUS_ACTIVE) {
             liveCall = (*it);
