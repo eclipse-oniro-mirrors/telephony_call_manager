@@ -132,7 +132,6 @@ bool CallVoiceAssistantManager::ConnectAbility(int32_t callId)
             return false;
         }
     }
-    
     AAFwk::Want want;
     AppExecFwk::ElementName element(DEFAULT_STRING, BUNDLE_NAME, ABILITY_NAME);
     want.SetElement(element);
