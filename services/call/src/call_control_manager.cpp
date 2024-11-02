@@ -41,6 +41,7 @@
 #include "audio_device_manager.h"
 #include "distributed_call_manager.h"
 #include "call_superprivacy_control_manager.h"
+#include "call_voice_assistant_manager.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -1127,6 +1128,7 @@ int32_t CallControlManager::SetMuted(bool isMute)
 
 int32_t CallControlManager::MuteRinger()
 {
+    CallVoiceAssistantManager::GetInstance()->MuteRinger();
     return DelayedSingleton<AudioControlManager>::GetInstance()->MuteRinger();
 }
 
@@ -1295,6 +1297,7 @@ int32_t CallControlManager::SetVoIPCallState(int32_t state)
     VoIPCallState_ = (CallStateToApp)state;
     std::string identity = IPCSkeleton::ResetCallingIdentity();
     DelayedSingleton<CallStateReportProxy>::GetInstance()->UpdateCallStateForVoIPOrRestart();
+    CallVoiceAssistantManager::GetInstance()->UpdateVoipCallState(state);
     IPCSkeleton::SetCallingIdentity(identity);
     if (VoIPCallState_ == CallStateToApp::CALL_STATE_ANSWERED) {
         TELEPHONY_LOGI("VoIP answered the call, should hangup all calls");
@@ -1360,6 +1363,7 @@ void CallControlManager::CallStateObserve()
     callStateListenerPtr_->AddOneObserver(missedCallNotification_);
     callStateListenerPtr_->AddOneObserver(incomingCallWakeup_);
     callStateListenerPtr_->AddOneObserver(DelayedSingleton<CallRecordsManager>::GetInstance());
+    callStateListenerPtr_->AddOneObserver(CallVoiceAssistantManager::GetInstance());
 }
 
 int32_t CallControlManager::AddCallLogAndNotification(sptr<CallBase> &callObjectPtr)

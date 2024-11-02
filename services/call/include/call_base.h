@@ -131,6 +131,7 @@ public:
     bool IsMuted();
     void SetIsEccContact(bool isEccContact);
     void SetCeliaCallType(int32_t celiaCallType);
+    int32_t GetAccountId();
 
 protected:
     int32_t callId_;
