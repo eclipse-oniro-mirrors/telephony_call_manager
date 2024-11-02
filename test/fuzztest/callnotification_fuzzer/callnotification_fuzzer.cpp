@@ -162,14 +162,9 @@ void CallDataRdbObserverFunc(const uint8_t *data, size_t size)
     DialParaInfo paraInfo;
     sptr<CallBase> callObjectPtr = std::make_unique<CSCall>(paraInfo).release();
     ContactInfo contactInfo;
-    int32_t length = message.length() > CONTACT_NAME_LEN ? CONTACT_NAME_LEN : message.length();
-    if (memcpy_s(contactInfo.name, CONTACT_NAME_LEN, message.c_str(), length) != EOK) {
-        return;
-    }
-    length = message.length() > kMaxNumberLen ? kMaxNumberLen : message.length();
-    if (memcpy_s(contactInfo.number, kMaxNumberLen, message.c_str(), length) != EOK) {
-        return;
-    }
+    contactInfo.name = message;
+    contactInfo.number = message;
+    int32_t length = message.length() > FILE_PATH_MAX_LEN ? FILE_PATH_MAX_LEN : message.length();
     length = message.length() > FILE_PATH_MAX_LEN ? FILE_PATH_MAX_LEN : message.length();
     if (memcpy_s(contactInfo.ringtonePath, FILE_PATH_MAX_LEN, message.c_str(), length) != EOK) {
         return;
