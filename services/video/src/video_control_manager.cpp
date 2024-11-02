@@ -177,7 +177,7 @@ int32_t VideoControlManager::UpdateImsCallMode(int32_t callId, ImsCallMode callM
     }
     sptr<CallBase> callPtr = CallObjectManager::GetForegroundLiveCallByCallId(callId);
     if (callPtr == nullptr) {
-        callPtr = CallObjectManager::GetForegroundCallByCallId(callId);
+        callPtr = CallObjectManager::GetOneCallObject(callId);
         TELEPHONY_LOGI("GetForegroundLiveCallByCallId is null use default call");
     }
     if (callPtr == nullptr) {
