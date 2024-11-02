@@ -406,17 +406,17 @@ std::u16string CallVoiceAssistantManager::GetSendString(const std::shared_ptr<In
         TELEPHONY_LOGE("nowInfo is nullptr");
         return DEFAULT_U16STRING;
     }
-    if (Str8ToStr16(info->incomingName) == DEFAULT_U16STRING) {
+    if (Str8ToStr16(nowInfo->incomingName) == DEFAULT_U16STRING) {
         TELEPHONY_LOGE("incomingName is invalid.");
-        info->incomingName = DEFAULT_STRING;
+        nowInfo->incomingName = DEFAULT_STRING;
     }
-    if (Str8ToStr16(info->numberLocation) == DEFAULT_U16STRING) {
+    if (Str8ToStr16(nowInfo->numberLocation) == DEFAULT_U16STRING) {
         TELEPHONY_LOGE("numberLocation is invalid.");
-        info->numberLocation = DEFAULT_STRING;
+        nowInfo->numberLocation = DEFAULT_STRING;
     }
-    if (Str8ToStr16(info->phoneNumber) == DEFAULT_U16STRING) {
+    if (Str8ToStr16(nowInfo->phoneNumber) == DEFAULT_U16STRING) {
         TELEPHONY_LOGE("phoneNumber is invalid.");
-        info->phoneNumber = DEFAULT_STRING;
+        nowInfo->phoneNumber = DEFAULT_STRING;
     }
     std::string str = DEFAULT_STRING;
     auto fun = [&str](std::string key, std::string value, bool start = false, bool end = false) {
