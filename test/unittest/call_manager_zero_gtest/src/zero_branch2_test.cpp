@@ -173,7 +173,7 @@ HWTEST_F(SpamCallTest, Telephony_SpamCallConnection_001, Function | MediumTest |
  */
 HWTEST_F(SpamCallTest, Telephony_TimeWaitHelper_001, Function | MediumTest | Level1)
 {
-    TimeWaitHelper timeWaitHelper(10);
+    TimeWaitHelper timeWaitHelper(std::chrono::milliseconds(10000));
     timeWaitHelper.NotifyAll();
     ASSERT_NE(timeWaitHelper.WaitForResult(), true);
 }

@@ -312,9 +312,9 @@ struct CallAttributeInfo {
      */
     char contactName[kMaxNumberLen + 1] = { 0 };
     /**
-     * Indicates the extras information.
+     * Indicates the extraParamsString information.
      */
-    char extras[kMaxNumberLen + 1] = { 0 };
+    std::string extraParamsString;
 };
 
 /**
@@ -501,6 +501,14 @@ struct CallDetailInfo {
      * Indicates the VoIP call specific information
      */
     VoipCallReportInfo voipCallInfo;
+    /**
+     * Indicates the latitude of location
+     */
+    std::string latitude_;
+    /**
+     * Indicates the longitude of location
+     */
+    std::string longitude_;
 
     CallDetailInfo() {}
 

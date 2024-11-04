@@ -26,6 +26,21 @@ static const int64_t NORMAL_DIAL_TIME = 500;     // dial time (ms)
 static const int64_t NORMAL_INCOMING_TIME = 100; // incoming time (ms)
 static const int64_t NORMAL_ANSWER_TIME = 300;   // answer time (ms)
 static constexpr const char DOMAIN_PHONE_UE[] = "PHONE_UE";
+// phoneUE const
+static constexpr const char *KEY_CALL_MANAGER = "callmanager";
+static constexpr const char *CALL_DIAL_IN_SUPER_PRIVACY = "CALL_DIAL_IN_SUPER_PRIVACY";
+static constexpr const char *CALL_ANSWER_IN_SUPER_PRIVACY = "CALL_ANSWER_IN_SUPER_PRIVACY";
+static constexpr const char *CALL_REJECT_IN_SUPER_PRIVACY = "CALL_REJECT_IN_SUPER_PRIVACY";
+static constexpr const char *CALL_DIAL_CLOSE_SUPER_PRIVACY = "CALL_DIAL_CLOSE_SUPER_PRIVACY";
+static constexpr const char *CALL_INCOMING_REJECT_BY_SYSTEM = "CALL_INCOMING_REJECT_BY_SYSTEM";
+// KEY
+static constexpr const char *PNAMEID_KEY = "PNAMEID";
+static constexpr const char *PVERSIONID_KEY = "PVERSIONID";
+static constexpr const char *ACTION_TYPE = "ACTION_TYPE";
+// VALUE
+static constexpr const int64_t REJECT_BY_OOBE = 0;
+static constexpr const int64_t REJECT_BY_NUM_BLOCK = 1;
+static constexpr const int64_t REJECT_IN_FOCUSMODE = 2;
 
 enum class IncomingCallType {
     IMS_VOICE_INCOMING = 0,
@@ -37,7 +52,8 @@ class CallManagerHisysevent : public TelephonyHiSysEvent {
 public:
     static void WriteCallStateBehaviorEvent(const int32_t slotId, const int32_t state, const int32_t index);
     static void WriteIncomingCallBehaviorEvent(const int32_t slotId, int32_t callType, int32_t callMode);
-    static void WriteIncomingNumIdentityBehaviorEvent(const int32_t markType);
+    static void WriteIncomingNumIdentityBehaviorEvent(const int32_t markType, const bool isBlock,
+        const int32_t blockReason);
     static void WriteIncomingCallFaultEvent(const int32_t slotId, const int32_t callType, const int32_t videoState,
         const int32_t errCode, const std::string &desc);
     static void WriteDialCallFaultEvent(const int32_t slotId, const int32_t callType, const int32_t videoState,

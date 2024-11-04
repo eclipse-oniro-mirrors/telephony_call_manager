@@ -24,7 +24,7 @@ namespace OHOS {
 namespace Telephony {
 class TimeWaitHelper {
 public:
-    TimeWaitHelper(int16_t waitTime);
+    TimeWaitHelper(std::chrono::milliseconds waitTime);
     ~TimeWaitHelper();
     void NotifyAll();
     bool WaitForResult();
@@ -32,7 +32,7 @@ public:
 private:
     ffrt::condition_variable cv_;
     ffrt::mutex mutex_;
-    int16_t waitTime_ = 0;
+    std::chrono::milliseconds waitTime_{0};
     bool isNotified_ = false;
 };
 } // namespace Telephony

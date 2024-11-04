@@ -118,6 +118,14 @@ bool CallControlManager::Init()
     return true;
 }
 
+void CallControlManager::ReportPhoneUEInSuperPrivacy(const std::string &eventName)
+{
+    if (DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance()->GetCurrentIsSuperPrivacyMode()) {
+        CallManagerHisysevent::HiWriteBehaviorEventPhoneUE(
+            eventName, PNAMEID_KEY, KEY_CALL_MANAGER, PVERSIONID_KEY, "");
+    }
+}
+
 int32_t CallControlManager::DialCall(std::u16string &number, AppExecFwk::PacMap &extras)
 {
     sptr<CallBase> callObjectPtr = nullptr;
@@ -142,6 +150,7 @@ int32_t CallControlManager::DialCall(std::u16string &number, AppExecFwk::PacMap 
             extras.PutIntValue("callType", (int32_t)CallType::TYPE_SATELLITE);
         }
     }
+    ReportPhoneUEInSuperPrivacy(CALL_DIAL_IN_SUPER_PRIVACY);
     ret = CanDial(number, extras, isEcc);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("can dial policy result:%{public}d", ret);
@@ -220,6 +229,7 @@ int32_t CallControlManager::AnswerCall(int32_t callId, int32_t videoState)
     if (call->GetCrsType() == CRS_TYPE && static_cast<VideoStateType>(videoState) != VideoStateType::TYPE_VIDEO) {
         DelayedSingleton<AudioProxy>::GetInstance()->SetSpeakerDevActive(false);
     }
+    ReportPhoneUEInSuperPrivacy(CALL_ANSWER_IN_SUPER_PRIVACY);
     if (CurrentIsSuperPrivacyMode(callId, videoState)) {
         return TELEPHONY_SUCCESS;
     }
@@ -291,6 +301,10 @@ void CallControlManager::AnswerHandlerForSatelliteOrVideoCall(sptr<CallBase> &ca
 
 int32_t CallControlManager::CarrierAndVoipConflictProcess(int32_t callId, TelCallState callState)
 {
+    if (callState != TelCallState::CALL_STATUS_ANSWERED) {
+        TELEPHONY_LOGI("voip calls should be handled with only when a carrier call is answered");
+        return TELEPHONY_SUCCESS;
+    }
     sptr<CallBase> call = GetOneCallObject(callId);
     if (call == nullptr) {
         TELEPHONY_LOGE("CarrierAndVoipConflictProcess, call is nullptr!");
@@ -307,10 +321,12 @@ int32_t CallControlManager::CarrierAndVoipConflictProcess(int32_t callId, TelCal
         }
         for (auto voipCallId : voipCallIdList) {
             sptr<CallBase> voipCall = GetOneCallObject(voipCallId);
-            if (voipCall->GetTelCallState() == TelCallState::CALL_STATUS_INCOMING ||
-                voipCall->GetTelCallState() == TelCallState::CALL_STATUS_WAITING) {
+            TelCallState voipCallState = voipCall->GetTelCallState();
+            if (voipCallState == TelCallState::CALL_STATUS_INCOMING) {
+                TELEPHONY_LOGI("the system is rejecting a voip call, callId = %{public}d", voipCall->GetCallID());
                 ret = RejectCall(voipCallId, true, u"CarrierAndVoipConflictProcess");
-            } else if (callState == TelCallState::CALL_STATUS_ANSWERED) {
+            } else if (voipCallState == TelCallState::CALL_STATUS_DIALING) {
+                TELEPHONY_LOGI("the system is hanging up a voip call, callId = %{public}d", voipCall->GetCallID());
                 ret = HangUpCall(voipCallId);
             }
             if (ret != TELEPHONY_SUCCESS) {
@@ -353,6 +369,7 @@ int32_t CallControlManager::RejectCall(int32_t callId, bool rejectWithMessage, s
         TELEPHONY_LOGE("RejectCall failed!");
         return ret;
     }
+    ReportPhoneUEInSuperPrivacy(CALL_REJECT_IN_SUPER_PRIVACY);
     return TELEPHONY_SUCCESS;
 }
 
@@ -409,12 +426,14 @@ int32_t CallControlManager::HangUpCall(int32_t callId)
 int32_t CallControlManager::GetCallState()
 {
     CallStateToApp callState = CallStateToApp::CALL_STATE_UNKNOWN;
-    if (!HasCellularCallExist()) {
+    if (!HasCellularCallExist() && (VoIPCallState_ == CallStateToApp::CALL_STATE_IDLE ||
+        VoIPCallState_ == CallStateToApp::CALL_STATE_UNKNOWN)) {
         callState = CallStateToApp::CALL_STATE_IDLE;
     } else {
         callState = CallStateToApp::CALL_STATE_OFFHOOK;
         bool hasRingingCall = false;
-        if ((HasRingingCall(hasRingingCall) == TELEPHONY_SUCCESS) && hasRingingCall) {
+        if ((HasRingingCall(hasRingingCall) == TELEPHONY_SUCCESS && hasRingingCall) ||
+            VoIPCallState_ == CallStateToApp::CALL_STATE_RINGING) {
             callState = CallStateToApp::CALL_STATE_RINGING;
         }
     }
@@ -481,7 +500,13 @@ int32_t CallControlManager::SwitchCall(int32_t callId)
 
 bool CallControlManager::HasCall()
 {
-    return HasCellularCallExist();
+    if (VoIPCallState_ == CallStateToApp::CALL_STATE_ANSWERED ||
+        VoIPCallState_ == CallStateToApp::CALL_STATE_OFFHOOK ||
+        VoIPCallState_ == CallStateToApp::CALL_STATE_RINGING ||
+        HasCellularCallExist()) {
+        return true;
+    }
+    return false;
 }
 
 int32_t CallControlManager::IsNewCallAllowed(bool &enabled)
@@ -533,8 +558,9 @@ bool CallControlManager::NotifyCallStateUpdated(
         if (callObjectPtr->GetCallType() == CallType::TYPE_VOIP) {
             return true;
         }
-        if (priorState == TelCallState::CALL_STATUS_DIALING &&
-            (nextState == TelCallState::CALL_STATUS_ALERTING || nextState == TelCallState::CALL_STATUS_ACTIVE)) {
+        if ((priorState == TelCallState::CALL_STATUS_DIALING && nextState == TelCallState::CALL_STATUS_ALERTING) ||
+            (priorState == TelCallState::CALL_STATUS_DIALING && nextState == TelCallState::CALL_STATUS_ACTIVE) ||
+            (priorState == TelCallState::CALL_STATUS_INCOMING && nextState == TelCallState::CALL_STATUS_ACTIVE)) {
             TELEPHONY_LOGI("call is actived, now check and switch call to distributed audio device");
             DelayedSingleton<AudioDeviceManager>::GetInstance()->CheckAndSwitchDistributedAudioDevice();
         } else if ((priorState == TelCallState::CALL_STATUS_ACTIVE &&
@@ -566,8 +592,6 @@ bool CallControlManager::NotifyIncomingCallAnswered(sptr<CallBase> &callObjectPt
     }
     if (callStateListenerPtr_ != nullptr) {
         callStateListenerPtr_->IncomingCallActivated(callObjectPtr);
-        TELEPHONY_LOGI("call is answered, now check and switch call to distributed audio device");
-        DelayedSingleton<AudioDeviceManager>::GetInstance()->CheckAndSwitchDistributedAudioDevice();
         return true;
     }
     return false;
@@ -1110,7 +1134,10 @@ int32_t CallControlManager::JoinConference(int32_t callId, std::vector<std::u16s
 
 int32_t CallControlManager::SetMuted(bool isMute)
 {
-    sptr<CallBase> call = CallObjectManager::GetForegroundLiveCall();
+    sptr<CallBase> call = CallObjectManager::GetForegroundLiveCall(false);
+    if (call == nullptr) {
+        call = CallObjectManager::GetForegroundLiveCall();
+    }
     if (call == nullptr) {
         return CALL_ERR_AUDIO_SETTING_MUTE_FAILED;
     }
@@ -1329,7 +1356,20 @@ int32_t CallControlManager::HangUpVoipCall()
 {
     std::list<sptr<CallBase>> allCallList = CallObjectManager::GetAllCallList();
     for (auto call : allCallList) {
-        if (call != nullptr && call->GetCallType() == CallType::TYPE_VOIP) {
+        if (call == nullptr || call->GetCallType() != CallType::TYPE_VOIP) {
+            continue;
+        }
+        TelCallState voipCallState = call->GetTelCallState();
+        if (voipCallState == TelCallState::CALL_STATUS_ACTIVE) {
+            TELEPHONY_LOGI("the voip call with callId %{public}d is active, no need to hangup", call->GetCallID());
+        } else if (voipCallState == TelCallState::CALL_STATUS_INCOMING) {
+            TELEPHONY_LOGI("Reject VoipCall callId %{public}d", call->GetCallID());
+            int32_t ret = RejectCall(call->GetCallID(), true, u"CarrierAndVoipConflictProcess");
+            if (ret != TELEPHONY_SUCCESS) {
+                TELEPHONY_LOGE("reject voip call %{public}d failed!", call->GetCallID());
+                return ret;
+            }
+        } else {
             TELEPHONY_LOGI("HangUp VoipCall callId %{public}d", call->GetCallID());
             int32_t ret = HangUpCall(call->GetCallID());
             if (ret != TELEPHONY_SUCCESS) {

@@ -130,6 +130,7 @@ private:
     void CallStateObserve();
     int32_t NumberLegalityCheck(std::string &number);
     int32_t BroadcastSubscriber();
+    void ReportPhoneUEInSuperPrivacy(const std::string &eventName);
     void PackageDialInformation(AppExecFwk::PacMap &extras, std::string accountNumber, bool isEcc);
     static void handler();
     bool cancel(ffrt::task_handle &handle);

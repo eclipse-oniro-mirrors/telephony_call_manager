@@ -18,16 +18,13 @@
 
 #include <map>
 #include <mutex>
+#include <string_ex.h>
 
 #include "call_earthquake_alarm_locator.h"
 #include "data_ability_observer_stub.h"
-#include "call_status_manager.h"
 #include "call_manager_inner_type.h"
 #include "call_state_listener_base.h"
-#include "call_control_manager.h"
 #include "audio_control_manager.h"
-#include "audio_device_manager.h"
-#include "ring.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -42,8 +39,8 @@ struct IncomingContactInformation {
     int32_t callId = -1;
     int32_t stopBroadcasting = 0;
     int32_t call_status = -1;
-    bool isSetNumberLocation = false;
-    bool isSetContactInfo = false;
+    sptr<CallBase> call = nullptr;
+    bool isQueryComplete = false;
 };
 
 class CallVoiceAssistantManager : public CallStateListenerBase {
@@ -56,10 +53,10 @@ public:
     bool IsSwitchOn(const std::string& switchState);
     bool RegisterListenSwitchState();
     bool UnRegisterListenSwitchState();
-    bool ConnectAbility(int32_t accountId);
+    bool ConnectAbility(int32_t callId);
     bool DisconnectAbility();
     void PublishCommonEvent(bool isConnect, std::string publisher);
-    void OnStartService(const std::string& isDial, const int32_t& accountId);
+    void OnStartService(const std::string& isDial, const int32_t& callId);
     void OnStopService();
     void UpdateReplyData(const std::string& str);
     void CallStateUpdated(sptr<CallBase> &callObjectPtr, TelCallState priorState, TelCallState nextState) override;
@@ -68,18 +65,19 @@ public:
     void CallStatusActive(const int32_t& callId, const int32_t& accountId);
     void CallStatusDisconnected(const int32_t& callId, const int32_t& accountId);
     void MuteRinger();
-    std::shared_ptr<IncomingContactInformation> GetContactInfo(int32_t accountId);
+    std::shared_ptr<IncomingContactInformation> GetContactInfo(int32_t callId);
     void SendRequest(const std::shared_ptr<IncomingContactInformation> info, bool isNeed);
-    void UpdateRemoteObject(const sptr<IRemoteObject> &object, int32_t accountId);
-    std::string GetSendString(const std::shared_ptr<IncomingContactInformation> nowInfo);
+    void UpdateRemoteObject(const sptr<IRemoteObject> &object, int32_t callId,
+        const sptr<AAFwk::IAbilityConnection> callback);
+    std::u16string GetSendString(const std::shared_ptr<IncomingContactInformation> nowInfo);
     void SetIsControlSwitchOn(bool state);
     bool GetIsControlSwitchOn();
     bool GetIsPlayRing();
-    std::mutex& GetMutex();
     void UpdateVoipCallState(int32_t state);
     bool IsStartVoiceBroadcast();
-    static void UpdateNumberLocation(const std::string& location, int32_t accountId);
-    static void UpdateContactInfo(const ContactInfo &info, int32_t accountId);
+    int32_t CheckTelCallState(TelCallState state);
+    void UpdateNumberLocation(const std::string& location, int32_t callId);
+    void UpdateContactInfo(const ContactInfo &info, int32_t callId);
     static std::shared_ptr<CallVoiceAssistantManager> GetInstance();
 
 private:
@@ -108,6 +106,7 @@ public:
     const std::string CONTROL_SWITCH = "incoming_call_voice_control_switch";
     const std::string BROADCAST_SWITCH = "incoming_call_voice_broadcast_switch";
     const std::string DEFAULT_STRING = "";
+    const std::u16string DEFAULT_U16STRING = u"";
     const std::string SWITCH_TURN_OFF = "0";
     const std::string SWITCH_TURN_ON = "1";
     const std::string INCOMING = "come";

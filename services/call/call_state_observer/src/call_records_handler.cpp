@@ -31,23 +31,6 @@ CallRecordsHandler::CallRecordsHandler() : callDataPtr_(nullptr)
     }
 }
 
-void CallRecordsHandler::QueryCallerInfo(ContactInfo &contactInfo, std::string phoneNumber)
-{
-    std::shared_ptr<CallDataBaseHelper> callDataPtr = DelayedSingleton<CallDataBaseHelper>::GetInstance();
-    if (callDataPtr == nullptr) {
-        TELEPHONY_LOGE("callDataPtr is nullptr!");
-        return;
-    }
-    DataShare::DataSharePredicates predicates;
-    predicates.EqualTo(CALL_DETAIL_INFO, phoneNumber);
-    predicates.And();
-    predicates.EqualTo(CALL_CONTENT_TYPE, CALL_PHONE);
-    bool ret = callDataPtr->Query(contactInfo, predicates);
-    if (!ret) {
-        TELEPHONY_LOGE("Query contact database fail!");
-    }
-}
-
 int32_t CallRecordsHandler::AddCallLogInfo(const CallRecordInfo &info)
 {
     if (callDataPtr_ == nullptr) {
@@ -55,25 +38,13 @@ int32_t CallRecordsHandler::AddCallLogInfo(const CallRecordInfo &info)
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     std::string numberLocation = CheckNumberLocationInfo(info);
-    ContactInfo contactInfo = {
-        .name = "",
-        .number = "",
-        .isContacterExists = false,
-        .ringtonePath = "",
-        .isSendToVoicemail = false,
-        .isEcc = false,
-        .isVoiceMail = false,
-    };
-    QueryCallerInfo(contactInfo, std::string(info.phoneNumber));
     std::string displayName = "";
-    if (std::string(contactInfo.name) != "") {
-        displayName = std::string(contactInfo.name);
-    } else if (info.numberMarkInfo.markType == MarkType::MARK_TYPE_YELLOW_PAGE && !info.numberMarkInfo.isCloud) {
+    if (info.numberMarkInfo.markType == MarkType::MARK_TYPE_YELLOW_PAGE && !info.numberMarkInfo.isCloud) {
         displayName = std::string(info.numberMarkInfo.markContent);
     }
 
     DataShare::DataShareValuesBucket bucket;
-    TELEPHONY_LOGI("callLog Insert begin");
+    TELEPHONY_LOGW("callLog Insert begin");
     MakeCallLogInsertBucket(bucket, info, displayName, numberLocation);
     bool ret = callDataPtr_->Insert(bucket);
     if (!ret) {
@@ -87,8 +58,6 @@ int32_t CallRecordsHandler::AddCallLogInfo(const CallRecordInfo &info)
 void CallRecordsHandler::DeleteCallLogForLimit(const CallRecordInfo &info)
 {
     DataShare::DataSharePredicates queryPredicates;
-    std::string selections;
-    std::vector<int32_t> needDeleteIds;
     if (info.answerType == CallAnswerType::CALL_ANSWER_BLOCKED) {
         queryPredicates.EqualTo(CALL_ANSWER_STATE, static_cast<int32_t>(CallAnswerType::CALL_ANSWER_BLOCKED));
     } else {
@@ -96,15 +65,7 @@ void CallRecordsHandler::DeleteCallLogForLimit(const CallRecordInfo &info)
     }
     queryPredicates.OrderByDesc(CALL_CREATE_TIME);
     queryPredicates.Limit(-1, LOG_LIMIT_NUM);
-    callDataPtr_->QueryIdsNeedToDelete(needDeleteIds, queryPredicates);
-    if (needDeleteIds.size() > 0) {
-        TELEPHONY_LOGI("need delete call log for more than limit.");
-        DataShare::DataSharePredicates deletePredicates;
-        deletePredicates.In(CALL_ID, needDeleteIds);
-        callDataPtr_->Delete(deletePredicates);
-    } else {
-        TELEPHONY_LOGI("no need delete call log for not more than limit.");
-    }
+    callDataPtr_->QueryAndDeleteLimitedIds(queryPredicates);
 }
 
 void CallRecordsHandler::MakeCallLogInsertBucket(DataShare::DataShareValuesBucket &bucket,

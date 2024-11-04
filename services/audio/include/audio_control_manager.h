@@ -106,6 +106,8 @@ private:
     int32_t HandleDistributeAudioDevice(const AudioDevice &device);
     void SendMuteRingEvent();
     bool IsDistributeCallSinkStatus();
+    bool IsRingingVibrateModeOn();
+    bool IsVoIPCallActived();
     int32_t SwitchAudioDevice(AudioDeviceType audioDeviceType);
     ToneState toneState_ = ToneState::STOPPED;
     SoundState soundState_ = SoundState::STOPPED;

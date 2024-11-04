@@ -24,6 +24,8 @@
 #include "pixel_map.h"
 #include "pixel_map_napi.h"
 #include "telephony_log_wrapper.h"
+#include "napi_common_want.h"
+#include "want_params_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -563,8 +565,8 @@ int32_t NapiCallAbilityCallback::ReportCallState(CallAttributeInfo &info, EventC
         env, callbackValues[ARRAY_INDEX_FIRST], "crsType", info.crsType);
     NapiCallManagerUtils::SetPropertyInt32(
         env, callbackValues[ARRAY_INDEX_FIRST], "originalCallType", info.originalCallType);
-    NapiCallManagerUtils::SetPropertyStringUtf8(
-        env, callbackValues[ARRAY_INDEX_FIRST], "extras", info.extras);
+    napi_set_named_property(env, callbackValues[ARRAY_INDEX_FIRST], std::string("extraParams").c_str(),
+        AppExecFwk::WrapWantParams(env, AAFwk::WantParamWrapper::ParseWantParamsWithBrackets(info.extraParamsString)));
     ReportCallAttribute(env, callbackValues, ARRAY_INDEX_THIRD, info);
     napi_get_reference_value(env, stateCallback.callbackRef, &callbackFunc);
     if (callbackFunc == nullptr) {
@@ -997,6 +999,7 @@ int32_t NapiCallAbilityCallback::ReportAudioDeviceInfo(AudioDeviceInfo &info, Ev
     napi_create_object(env, &callbackValues[ARRAY_INDEX_FIRST]);
 
     NapiCallManagerUtils::SetPropertyBoolean(env, callbackValues[ARRAY_INDEX_FIRST], "isMuted", info.isMuted);
+    NapiCallManagerUtils::SetPropertyInt32(env, callbackValues[ARRAY_INDEX_FIRST], "callId", info.callId);
 
     napi_value currentAudioDeviceValue = nullptr;
     napi_create_object(env, &currentAudioDeviceValue);

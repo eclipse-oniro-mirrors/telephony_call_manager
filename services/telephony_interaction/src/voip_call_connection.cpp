@@ -107,6 +107,7 @@ int32_t VoipCallConnection::GetCallManagerProxy()
 
 int32_t VoipCallConnection::AnswerCall(const VoipCallEventInfo &events, int32_t videoState)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     GetCallManagerProxy();
     if (voipCallManagerInterfacePtr_ == nullptr) {
         TELEPHONY_LOGI("Voipconnect AnswerCall voipCallManagerInterfacePtr_ is null");
@@ -117,6 +118,7 @@ int32_t VoipCallConnection::AnswerCall(const VoipCallEventInfo &events, int32_t 
 
 int32_t VoipCallConnection::RejectCall(const VoipCallEventInfo &events)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     GetCallManagerProxy();
     if (voipCallManagerInterfacePtr_ == nullptr) {
         TELEPHONY_LOGI("Voipconnect RejectCall voipCallManagerInterfacePtr_ is null");
@@ -127,6 +129,7 @@ int32_t VoipCallConnection::RejectCall(const VoipCallEventInfo &events)
 
 int32_t VoipCallConnection::HangUpCall(const VoipCallEventInfo &events)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     GetCallManagerProxy();
     if (voipCallManagerInterfacePtr_ == nullptr) {
         TELEPHONY_LOGI("Voipconnect HangUpCall voipCallManagerInterfacePtr_ is null");
@@ -137,6 +140,7 @@ int32_t VoipCallConnection::HangUpCall(const VoipCallEventInfo &events)
 
 int32_t VoipCallConnection::RegisterCallManagerCallBack(const sptr<ICallStatusCallback> &callback)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     GetCallManagerProxy();
     if (voipCallManagerInterfacePtr_ == nullptr) {
         TELEPHONY_LOGI("Voipconnect RegisterCallManagerCallBack voipCallManagerInterfacePtr_ is null");
@@ -147,12 +151,16 @@ int32_t VoipCallConnection::RegisterCallManagerCallBack(const sptr<ICallStatusCa
 
 int32_t VoipCallConnection::UnRegisterCallManagerCallBack()
 {
-    GetCallManagerProxy();
-    if (voipCallManagerInterfacePtr_ == nullptr) {
-        TELEPHONY_LOGI("Voipconnect UnRegisterCallManagerCallBack voipCallManagerInterfacePtr_ is null");
-        return TELEPHONY_ERROR;
+    int32_t ret;
+    {
+        std::lock_guard<std::mutex> lock(mutex_);
+        GetCallManagerProxy();
+        if (voipCallManagerInterfacePtr_ == nullptr) {
+            TELEPHONY_LOGI("Voipconnect UnRegisterCallManagerCallBack voipCallManagerInterfacePtr_ is null");
+            return TELEPHONY_ERROR;
+        }
+        ret = voipCallManagerInterfacePtr_->UnRegisterCallManagerCallBack();
     }
-    int32_t ret = voipCallManagerInterfacePtr_->UnRegisterCallManagerCallBack();
     UnInit();
     return ret;
 }
@@ -196,6 +204,7 @@ void VoipCallConnection::ClearVoipCall()
 
 int32_t VoipCallConnection::SendCallUiEvent(std::string voipCallId, const CallAudioEvent &callAudioEvent)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     GetCallManagerProxy();
     if (voipCallManagerInterfacePtr_ == nullptr) {
         TELEPHONY_LOGE("voipCallManagerInterfacePtr_ is nullptr");

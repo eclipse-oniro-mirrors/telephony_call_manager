@@ -47,6 +47,8 @@
 #include "notification_helper.h"
 #include "call_earthquake_alarm_locator.h"
 #include "distributed_communication_manager.h"
+#include "want_params_wrapper.h"
+#include "call_voice_assistant_manager.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -375,6 +377,7 @@ int32_t CallStatusManager::HandleVoipEventReportInfo(const VoipCallEventInfo &in
 
 int32_t CallStatusManager::IncomingHandle(const CallDetailInfo &info)
 {
+    detectStartTime = std::chrono::system_clock::from_time_t(0);
     sptr<CallBase> call = GetOneCallObjectByIndexAndSlotId(info.index, info.accountId);
     if (call != nullptr) {
         auto oldCallType = call->GetCallType();
@@ -410,7 +413,6 @@ int32_t CallStatusManager::IncomingHandle(const CallDetailInfo &info)
     }
     AddOneCallObject(call);
     DelayedSingleton<CallControlManager>::GetInstance()->NotifyNewCallCreated(call);
-    CarrierAndVoipConflictProcess(call->GetCallID());
     ret = UpdateCallState(call, info.state);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("UpdateCallState failed!");
@@ -421,12 +423,6 @@ int32_t CallStatusManager::IncomingHandle(const CallDetailInfo &info)
         TELEPHONY_LOGE("FilterResultsDispose failed!");
     }
     return ret;
-}
-
-void CallStatusManager::CarrierAndVoipConflictProcess(int32_t callId)
-{
-    DelayedSingleton<CallControlManager>::GetInstance()->CarrierAndVoipConflictProcess(callId,
-        TelCallState::CALL_STATUS_INCOMING);
 }
 
 void CallStatusManager::SetContactInfo(sptr<CallBase> &call, std::string phoneNum)
@@ -447,9 +443,11 @@ void CallStatusManager::SetContactInfo(sptr<CallBase> &call, std::string phoneNu
             .isSendToVoicemail = false,
             .isEcc = false,
             .isVoiceMail = false,
+            .isQueryComplete = true,
         };
         QueryCallerInfo(contactInfo, phoneNum);
         callObjectPtr->SetCallerInfo(contactInfo);
+        CallVoiceAssistantManager::GetInstance()->UpdateContactInfo(contactInfo, callObjectPtr->GetCallID());
         DelayedSingleton<DistributedCommunicationManager>::GetInstance()->ProcessCallInfo(callObjectPtr,
             DistributedDataType::NAME);
     });
@@ -565,11 +563,22 @@ void CallStatusManager::QueryCallerInfo(ContactInfo &contactInfo, std::string ph
         return;
     }
     DataShare::DataSharePredicates predicates;
-    predicates.EqualTo(DETAIL_INFO, phoneNum);
+    predicates.EqualTo(TYPE_ID, 5); // type 5 means query number
     predicates.And();
-    predicates.EqualTo(CONTENT_TYPE, PHONE);
-    bool ret = callDataPtr->Query(contactInfo, predicates);
-    if (!ret) {
+    predicates.EqualTo(IS_DELETED, 0);
+    predicates.And();
+#ifdef TELEPHONY_CUST_SUPPORT
+    if (phoneNum.length() >= static_cast<size_t>(QUERY_CONTACT_LEN)) {
+        TELEPHONY_LOGI("phoneNum is longer than 7");
+        predicates.EndsWith(DETAIL_INFO, phoneNum.substr(phoneNum.length() - QUERY_CONTACT_LEN));
+        if (!callDataPtr->QueryContactInfoEnhanced(contactInfo, predicates)) {
+            TELEPHONY_LOGE("Query contact database enhanced fail!");
+        }
+        return;
+    }
+#endif
+    predicates.EqualTo(DETAIL_INFO, phoneNum);
+    if (!callDataPtr->Query(contactInfo, predicates)) {
         TELEPHONY_LOGE("Query contact database fail!");
     }
 }
@@ -592,12 +601,6 @@ void CallStatusManager::CallFilterCompleteResult(const CallDetailInfo &info)
         return;
     }
     AddOneCallObject(call);
-#ifdef ABILITY_DATABASE_SUPPORT
-    // allow list filtering
-    // Get the contact data from the database
-    GetCallerInfoDate(ContactInfo);
-    SetCallerInfo(contactInfo);
-#endif
     DelayedSingleton<CallControlManager>::GetInstance()->NotifyNewCallCreated(call);
     ret = UpdateCallState(call, info.state);
     if (ret != TELEPHONY_SUCCESS) {
@@ -1108,7 +1111,7 @@ void CallStatusManager::AutoAnswer(int32_t activeCallNum, int32_t waitingCallNum
 
 int32_t CallStatusManager::UpdateCallState(sptr<CallBase> &call, TelCallState nextState)
 {
-    TELEPHONY_LOGI("UpdateCallState start");
+    TELEPHONY_LOGW("UpdateCallState start");
     if (call == nullptr) {
         TELEPHONY_LOGE("Call is NULL");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -1413,7 +1416,7 @@ bool CallStatusManager::ShouldRejectIncomingCall()
         "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true&key=device_provisioned");
     int resp = datashareHelper->Query(uri, "device_provisioned", device_provisioned);
     if (resp == TELEPHONY_SUCCESS && (device_provisioned == "0" || device_provisioned.empty())) {
-        TELEPHONY_LOGI("ShouldRejectIncomingCall: device_provisioned = 0");
+        TELEPHONY_LOGW("ShouldRejectIncomingCall: device_provisioned = 0");
         return true;
     }
 
@@ -1421,7 +1424,7 @@ bool CallStatusManager::ShouldRejectIncomingCall()
     std::vector<int> activedOsAccountIds;
     OHOS::AccountSA::OsAccountManager::QueryActiveOsAccountIds(activedOsAccountIds);
     if (activedOsAccountIds.empty()) {
-        TELEPHONY_LOGI("ShouldRejectIncomingCall: activedOsAccountIds is empty");
+        TELEPHONY_LOGW("ShouldRejectIncomingCall: activedOsAccountIds is empty");
         return false;
     }
     int userId = activedOsAccountIds[0];
@@ -1430,7 +1433,7 @@ bool CallStatusManager::ShouldRejectIncomingCall()
         + std::to_string(userId) + "?Proxy=true&key=user_setup_complete");
     int resp_userSetup = datashareHelper->Query(uri_setup, "user_setup_complete", user_setup_complete);
     if (resp_userSetup == TELEPHONY_SUCCESS && (user_setup_complete == "0" || user_setup_complete.empty())) {
-        TELEPHONY_LOGI("ShouldRejectIncomingCall: user_setup_complete = 0");
+        TELEPHONY_LOGW("ShouldRejectIncomingCall: user_setup_complete = 0");
         return true;
     }
     return false;
@@ -1442,7 +1445,7 @@ bool CallStatusManager::ShouldBlockIncomingCall(const sptr<CallBase> &call, cons
     DelayedSingleton<CellularCallConnection>::GetInstance()->IsEmergencyPhoneNumber(
         info.phoneNum, info.accountId, isEcc);
     if (isEcc) {
-        TELEPHONY_LOGI("incoming phoneNumber is ecc.");
+        TELEPHONY_LOGW("incoming phoneNumber is ecc.");
         return false;
     }
     std::shared_ptr<SpamCallAdapter> spamCallAdapterPtr_ = std::make_shared<SpamCallAdapter>();
@@ -1451,8 +1454,9 @@ bool CallStatusManager::ShouldBlockIncomingCall(const sptr<CallBase> &call, cons
         return false;
     }
     spamCallAdapterPtr_->DetectSpamCall(std::string(info.phoneNum), info.accountId);
+    detectStartTime = std::chrono::system_clock::now();
     if (spamCallAdapterPtr_->WaitForDetectResult()) {
-        TELEPHONY_LOGI("DetectSpamCall no time out");
+        TELEPHONY_LOGW("DetectSpamCall no time out");
         NumberMarkInfo numberMarkInfo;
         bool isBlock = false;
         int32_t blockReason;
@@ -1470,8 +1474,8 @@ bool CallStatusManager::IsRingOnceCall(const sptr<CallBase> &call, const CallDet
 {
     NumberMarkInfo numberMarkInfo = call->GetNumberMarkInfo();
     ContactInfo contactInfo = call->GetCallerInfo();
-    if (numberMarkInfo.markType == MarkType::MARK_TYPE_YELLOW_PAGE ||
-        std::string(contactInfo.name) != "") {
+    if (numberMarkInfo.markType == MarkType::MARK_TYPE_YELLOW_PAGE || contactInfo.name != "") {
+        TELEPHONY_LOGW("yellowpage or contact, no need check ring once call");
         return false;
     }
     auto datashareHelper = SettingsDataShareHelper::GetInstance();
@@ -1480,17 +1484,29 @@ bool CallStatusManager::IsRingOnceCall(const sptr<CallBase> &call, const CallDet
     OHOS::Uri uri(
         "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true&key=" + key);
     int32_t ret = datashareHelper->Query(uri, key, is_check_ring_once);
+    TELEPHONY_LOGW("is_check_ring_once = %{public}s", is_check_ring_once.c_str());
     if (ret != TELEPHONY_SUCCESS || is_check_ring_once == "0") {
-        TELEPHONY_LOGI("is_check_ring_once = 0, not need check ring once call");
         return false;
+    }
+    auto waitTime = WAIT_TIME_THREE_SECOND;
+    if (detectStartTime != std::chrono::system_clock::from_time_t(0)) {
+        auto detectEndTime = std::chrono::system_clock::now();
+        auto diff = detectEndTime - detectStartTime;
+        std::chrono::milliseconds ms = std::chrono::duration_cast<std::chrono::milliseconds>(diff);
+        if (diff >= WAIT_TIME_THREE_SECOND) {
+            TELEPHONY_LOGW("cost time over 3s, non need check ring once call");
+        }
+        waitTime = WAIT_TIME_THREE_SECOND - ms;
     }
     if (timeWaitHelper_ == nullptr) {
-        timeWaitHelper_ = std::make_unique<TimeWaitHelper>(WAIT_TIME_THREE_SECOND);
+        timeWaitHelper_ = std::make_unique<TimeWaitHelper>(waitTime);
     }
     if (!timeWaitHelper_->WaitForResult()) {
-        TELEPHONY_LOGI("is not ring once");
+        TELEPHONY_LOGW("is not ring once");
+        timeWaitHelper_ = nullptr;
         return false;
     }
+    timeWaitHelper_ = nullptr;
     return true;
 }
 
@@ -1540,7 +1556,8 @@ void CallStatusManager::PackParaInfo(
     paraInfo.bundleName = info.bundleName;
     paraInfo.crsType = info.crsType;
     paraInfo.originalCallType = info.originalCallType;
-    paraInfo.extras = extras.GetStringValue("extras");
+    paraInfo.extraParams =
+        AAFwk::WantParamWrapper::ParseWantParamsWithBrackets(extras.GetStringValue("extraParams"));
 }
 
 bool CallStatusManager::IsFocusModeOpen()
@@ -1570,17 +1587,26 @@ bool CallStatusManager::IsRejectCall(sptr<CallBase> &call, const CallDetailInfo 
     int32_t state;
     DelayedSingleton<CallControlManager>::GetInstance()->GetVoIPCallState(state);
     if (ShouldRejectIncomingCall() || state == (int32_t)CallStateToApp::CALL_STATE_RINGING) {
+        CallManagerHisysevent::HiWriteBehaviorEventPhoneUE(
+            CALL_INCOMING_REJECT_BY_SYSTEM, PNAMEID_KEY, KEY_CALL_MANAGER, PVERSIONID_KEY, "",
+            ACTION_TYPE, REJECT_BY_OOBE);
         block = false;
         return true;
     }
     if (info.callType != CallType::TYPE_VOIP && ShouldBlockIncomingCall(call, info)) {
+        CallManagerHisysevent::HiWriteBehaviorEventPhoneUE(
+            CALL_INCOMING_REJECT_BY_SYSTEM, PNAMEID_KEY, KEY_CALL_MANAGER, PVERSIONID_KEY, "",
+            ACTION_TYPE, REJECT_BY_NUM_BLOCK);
         block = true;
         return true;
     }
     if (IsFocusModeOpen()) {
         int ret = Notification::NotificationHelper::IsNeedSilentInDoNotDisturbMode(info.phoneNum, 0);
-        TELEPHONY_LOGI("IsRejectCall IsNeedSilentInDoNotDisturbMode ret:%{public}d", ret);
+        TELEPHONY_LOGW("IsRejectCall IsNeedSilentInDoNotDisturbMode ret:%{public}d", ret);
         if (ret == 0) {
+            CallManagerHisysevent::HiWriteBehaviorEventPhoneUE(
+                CALL_INCOMING_REJECT_BY_SYSTEM, PNAMEID_KEY, KEY_CALL_MANAGER, PVERSIONID_KEY, "",
+                ACTION_TYPE, REJECT_IN_FOCUSMODE);
             block = false;
             return true;
         }

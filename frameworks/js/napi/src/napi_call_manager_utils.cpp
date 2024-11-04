@@ -201,6 +201,26 @@ std::string NapiCallManagerUtils::GetStringProperty(napi_env env, napi_value obj
     return "";
 }
 
+AAFwk::WantParams NapiCallManagerUtils::GetWantParamsProperty(napi_env env, napi_value object,
+    const std::string &propertyName)
+{
+    bool hasParam = false;
+    napi_value value = nullptr;
+    AAFwk::WantParams wantParams;
+    napi_has_named_property(env, object, propertyName.c_str(), &hasParam);
+    if (hasParam) {
+        napi_get_named_property(env, object, propertyName.c_str(), &value);
+        napi_valuetype valueType = napi_undefined;
+        napi_typeof(env, value, &valueType);
+        if ((valueType != napi_undefined) && (valueType != napi_null) &&
+            AppExecFwk::UnwrapWantParams(env, value, wantParams)) {
+            return wantParams;
+        }
+    }
+    TELEPHONY_LOGW("GetWantParamsProperty failed!");
+    return wantParams;
+}
+
 int32_t NapiCallManagerUtils::GetIntProperty(napi_env env, napi_value object, const std::string &propertyName)
 {
     int32_t intValue = 0;

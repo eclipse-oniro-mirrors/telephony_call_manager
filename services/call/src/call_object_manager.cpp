@@ -81,7 +81,9 @@ int32_t CallObjectManager::AddOneCallObject(sptr<CallBase> &call)
         isFirstDialCallAdded_ = true;
         cv_.notify_all();
     }
-    DelayedSingleton<FoldStatusManager>::GetInstance()->RegisterFoldableListener();
+    if (FoldStatusManager::IsSmallFoldDevice()) {
+        DelayedSingleton<FoldStatusManager>::GetInstance()->RegisterFoldableListener();
+    }
     TELEPHONY_LOGI("AddOneCallObject success! callId:%{public}d,call list size:%{public}zu", call->GetCallID(),
         callObjectPtrList_.size());
     return TELEPHONY_SUCCESS;
@@ -115,7 +117,9 @@ int32_t CallObjectManager::DeleteOneCallObject(int32_t callId)
         }
     }
     if (callObjectPtrList_.size() == NO_CALL_EXIST) {
-        DelayedSingleton<FoldStatusManager>::GetInstance()->UnregisterFoldableListener();
+        if (FoldStatusManager::IsSmallFoldDevice()) {
+            DelayedSingleton<FoldStatusManager>::GetInstance()->UnregisterFoldableListener();
+        }
         if (DelayedSingleton<CallControlManager>::GetInstance()->ShouldDisconnectService()) {
             lock.unlock();
             DelayedDisconnectCallConnectAbility();
@@ -133,7 +137,9 @@ void CallObjectManager::DeleteOneCallObject(sptr<CallBase> &call)
     std::unique_lock<std::mutex> lock(listMutex_);
     callObjectPtrList_.remove(call);
     if (callObjectPtrList_.size() == NO_CALL_EXIST) {
-        DelayedSingleton<FoldStatusManager>::GetInstance()->UnregisterFoldableListener();
+        if (FoldStatusManager::IsSmallFoldDevice()) {
+            DelayedSingleton<FoldStatusManager>::GetInstance()->UnregisterFoldableListener();
+        }
         if (DelayedSingleton<CallControlManager>::GetInstance()->ShouldDisconnectService()) {
             lock.unlock();
             DelayedDisconnectCallConnectAbility();
@@ -405,7 +411,10 @@ bool CallObjectManager::HasCellularCallExist()
     for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
         if ((*it)->GetCallType() == CallType::TYPE_CS || (*it)->GetCallType() == CallType::TYPE_IMS ||
             (*it)->GetCallType() == CallType::TYPE_SATELLITE) {
-            return true;
+            if ((*it)->GetTelCallState() != TelCallState::CALL_STATUS_DISCONNECTED &&
+                (*it)->GetTelCallState() != TelCallState::CALL_STATUS_DISCONNECTING) {
+                return true;
+            }
         }
     }
     return false;
@@ -721,11 +730,14 @@ sptr<CallBase> CallObjectManager::GetForegroundCall(bool isIncludeVoipCall)
     return liveCall;
 }
 
-sptr<CallBase> CallObjectManager::GetForegroundLiveCall()
+sptr<CallBase> CallObjectManager::GetForegroundLiveCall(bool isIncludeVoipCall)
 {
     std::lock_guard<std::mutex> lock(listMutex_);
     sptr<CallBase> liveCall = nullptr;
     for (std::list<sptr<CallBase>>::iterator it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
+        if (!isIncludeVoipCall && (*it)->GetCallType() == CallType::TYPE_VOIP) {
+            continue;
+        }
         TelCallState telCallState = (*it)->GetTelCallState();
         if (telCallState == TelCallState::CALL_STATUS_ACTIVE) {
             liveCall = (*it);
@@ -806,6 +818,30 @@ int32_t CallObjectManager::GetCallNumByRunningState(CallRunningState callState)
     }
     TELEPHONY_LOGI("callState:%{public}d, count:%{public}d", callState, count);
     return count; 
+}
+
+sptr<CallBase> CallObjectManager::GetForegroundLiveCallByCallId(int32_t callId)
+{
+    std::lock_guard<std::mutex> lock(listMutex_);
+    sptr<CallBase> liveCall = nullptr;
+    for (std::list<sptr<CallBase>>::iterator it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
+        TelCallState telCallState = (*it)->GetTelCallState();
+        if (telCallState == TelCallState::CALL_STATUS_ACTIVE && (*it)->GetCallID() == callId) {
+            liveCall = (*it);
+            break;
+        }
+        if ((telCallState == TelCallState::CALL_STATUS_ALERTING ||
+            telCallState == TelCallState::CALL_STATUS_DIALING) && (*it)->GetCallID() == callId) {
+            liveCall = (*it);
+            break;
+        }
+        if ((telCallState == TelCallState::CALL_STATUS_WAITING ||
+            telCallState == TelCallState::CALL_STATUS_INCOMING) && (*it)->GetCallID() == callId) {
+            liveCall = (*it);
+            continue;
+        }
+    }
+    return liveCall;
 }
 } // namespace Telephony
 } // namespace OHOS

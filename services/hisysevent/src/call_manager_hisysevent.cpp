@@ -41,8 +41,8 @@ static constexpr const char *VIDEO_STATE_KEY = "VIDEO_STATE";
 static constexpr const char *ERROR_TYPE_KEY = "ERROR_TYPE";
 static constexpr const char *ERROR_MSG_KEY = "ERROR_MSG";
 static constexpr const char *MARK_TYPE_KEY = "MARK_TYPE";
-static constexpr const char *PNAMEID_KEY = "PNAMEID";
-static constexpr const char *PVERSIONID_KEY = "PVERSIONID";
+static constexpr const char *IS_BLOCK = "IS_BLOCK";
+static constexpr const char *BLOCK_REASON = "BLOCK_REASON";
 
 // VALUE
 static constexpr const char *CALL_MANAGER_MODULE = "CALL_MANAGER";
@@ -73,11 +73,13 @@ void CallManagerHisysevent::WriteIncomingCallBehaviorEvent(const int32_t slotId,
     HiWriteBehaviorEvent(INCOMING_CALL_EVENT, SLOT_ID_KEY, slotId, CALL_TYPE_KEY, type);
 }
 
-void CallManagerHisysevent::WriteIncomingNumIdentityBehaviorEvent(const int32_t markType)
+void CallManagerHisysevent::WriteIncomingNumIdentityBehaviorEvent(const int32_t markType, const bool isBlock,
+    const int32_t blockReason)
 {
-    TELEPHONY_LOGI("WriteIncomingNumIdentityBehaviorEvent markType: %{public}d", markType);
+    TELEPHONY_LOGI("WriteIncomingNumIdentityBehaviorEvent markType: %{public}d, isBlock: %{public}d, "
+        "blockReason: %{public}d", markType, isBlock, blockReason);
     HiWriteBehaviorEventPhoneUE(CALL_INCOMING_NUM_IDENTITY_EVENT, PNAMEID_KEY, "callmanager", PVERSIONID_KEY, "",
-        MARK_TYPE_KEY, markType);
+        MARK_TYPE_KEY, markType, IS_BLOCK, isBlock, BLOCK_REASON, blockReason);
 }
 
 void CallManagerHisysevent::WriteIncomingCallFaultEvent(const int32_t slotId, const int32_t callType,

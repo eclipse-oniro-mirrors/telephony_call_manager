@@ -22,12 +22,14 @@
 
 #include "call_manager_inner_type.h"
 #include "telephony_log_wrapper.h"
+#include "want_params_wrapper.h"
 
 const int16_t RINGING_CALL_NUMBER_LEN = 30;
 const int16_t DIALING_CALL_NUMBER_LEN = 30;
 const int16_t FILE_PATH_MAX_LEN = 60;
 const int16_t CALL_START_ID = 0;
 const int16_t MIN_MULITY_CALL_COUNT = 2;
+const int16_t QUERY_CONTACT_LEN = 7;
 
 namespace OHOS {
 namespace Telephony {
@@ -49,7 +51,7 @@ struct DialParaInfo {
     int32_t crsType = 0;
     int32_t originalCallType = 0;
     VoipCallReportInfo voipCallInfo;
-    std::string extras = "";
+    AAFwk::WantParams extraParams;
 };
 
 enum PolicyFlag : uint64_t {
@@ -85,6 +87,7 @@ struct ContactInfo {
     bool isSendToVoicemail = false;
     bool isEcc = false;
     bool isVoiceMail = false;
+    bool isQueryComplete = false;
 };
 } // namespace Telephony
 } // namespace OHOS

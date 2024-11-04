@@ -60,11 +60,11 @@ std::unique_ptr<CallManagerCallback> CallManagerProxy::GetCallBack()
 
 void CallManagerProxy::Init(int32_t systemAbilityId)
 {
-    std::unique_lock<std::mutex> lock(mutex_);
     if (initStatus_) {
         TELEPHONY_LOGW("you have already initialized");
         return;
     }
+    std::unique_lock<std::mutex> lock(mutex_);
     systemAbilityId_ = systemAbilityId;
 #ifdef CALL_MANAGER_AUTO_START_OPTIMIZE
     if (!IsServiceStart()) {
@@ -156,7 +156,6 @@ int32_t CallManagerProxy::RegisterCallBack(std::unique_ptr<CallManagerCallback> 
     }
     int32_t ret = callManagerServicePtr_->RegisterCallBack(callAbilityCallbackPtr_);
     if (ret != TELEPHONY_SUCCESS) {
-        callAbilityCallbackPtr_.clear();
         callAbilityCallbackPtr_ = nullptr;
         if (ret != TELEPHONY_ERR_PERMISSION_ERR) {
             TELEPHONY_LOGE("register callback to call manager service failed,result: %{public}d", ret);
@@ -199,7 +198,6 @@ int32_t CallManagerProxy::UnRegisterCallBack()
         TELEPHONY_LOGE("callAbilityCallbackPtr_ is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    callAbilityCallbackPtr_.clear();
     callAbilityCallbackPtr_ = nullptr;
     registerStatus_ = false;
     TELEPHONY_LOGI("UnRegisterCallBack success!");
@@ -291,7 +289,6 @@ int32_t CallManagerProxy::ReRegisterCallBack()
     }
     int32_t ret = callManagerServicePtr_->RegisterCallBack(callAbilityCallbackPtr_);
     if (ret != TELEPHONY_SUCCESS) {
-        callAbilityCallbackPtr_.clear();
         callAbilityCallbackPtr_ = nullptr;
         TELEPHONY_LOGE("register callback to call manager service failed,result: %{public}d", ret);
         if (ret == TELEPHONY_ERR_PERMISSION_ERR) {

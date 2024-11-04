@@ -86,14 +86,14 @@ bool NumberIdentityDataBaseHelper::Query(std::string &numberLocation, DataShare:
     resultSet->Close();
     helper->Release();
     helper = nullptr;
-    TELEPHONY_LOGI("Query end");
+    TELEPHONY_LOGW("QueryNumberLocation end");
     return true;
 }
 
 bool NumberIdentityDataBaseHelper::QueryYellowPageAndMark(NumberMarkInfo &numberMarkInfo,
     DataShare::DataSharePredicates &predicates)
 {
-    TELEPHONY_LOGE("query yellow page and mark.");
+    TELEPHONY_LOGW("query yellow page and mark.");
     std::shared_ptr<DataShare::DataShareHelper> helper = CreateDataShareHelper(NUMBER_MARK_INFO_URI);
     if (helper == nullptr) {
         TELEPHONY_LOGE("helper is nullptr");
@@ -120,7 +120,7 @@ bool NumberIdentityDataBaseHelper::QueryYellowPageAndMark(NumberMarkInfo &number
     resultSet->Close();
     helper->Release();
     helper = nullptr;
-    TELEPHONY_LOGI("QueryYellowPageAndMark success.");
+    TELEPHONY_LOGW("QueryYellowPageAndMark success.");
     return true;
 }
 

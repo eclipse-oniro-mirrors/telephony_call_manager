@@ -29,6 +29,7 @@
 #include "voip_call_connection.h"
 #include "settings_datashare_helper.h"
 #include "distributed_communication_manager.h"
+#include "os_account_manager.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -148,12 +149,16 @@ void AudioControlManager::VideoStateUpdated(
         TELEPHONY_LOGE("other call not need control audio");
         return;
     }
+    if (DelayedSingleton<DistributedCommunicationManager>::GetInstance()->IsAudioOnSink()) {
+        TELEPHONY_LOGI("audio is on sink, not need control audio");
+        return;
+    }
     AudioDevice device = {
         .deviceType = AudioDeviceType::DEVICE_SPEAKER,
         .address = { 0 },
     };
     AudioDeviceType initDeviceType = GetInitAudioDeviceType();
-    if (callObjectPtr->GetCrsType() == CRS_TYPE) {
+    if (callObjectPtr->GetCrsType() == CRS_TYPE && !IsVoIPCallActived()) {
         AudioStandard::AudioRingerMode ringMode = DelayedSingleton<AudioProxy>::GetInstance()->GetRingerMode();
         if (ringMode != AudioStandard::AudioRingerMode::RINGER_MODE_NORMAL) {
             if (initDeviceType == AudioDeviceType::DEVICE_WIRED_HEADSET ||
@@ -233,7 +238,7 @@ void AudioControlManager::UpdateDeviceTypeForCrs()
     if (incomingCall == nullptr || incomingCall->IsAnsweredCall()) {
         return;
     }
-    if (incomingCall->GetCrsType() == CRS_TYPE) {
+    if (incomingCall->GetCrsType() == CRS_TYPE && !IsVoIPCallActived()) {
         AudioDevice device = {
             .deviceType = AudioDeviceType::DEVICE_SPEAKER,
             .address = { 0 },
@@ -353,13 +358,11 @@ void AudioControlManager::HandlePriorState(sptr<CallBase> &callObjectPtr, TelCal
     switch (priorState) {
         case TelCallState::CALL_STATUS_DIALING:
             if (stateNumber == EMPTY_VALUE) {
-                StopRingback(); // should stop ringtone while no more alerting calls
                 event = AudioEvent::NO_MORE_DIALING_CALL;
             }
             break;
         case TelCallState::CALL_STATUS_ALERTING:
             if (stateNumber == EMPTY_VALUE) {
-                StopRingback(); // should stop ringtone while no more alerting calls
                 event = AudioEvent::NO_MORE_ALERTING_CALL;
             }
             break;
@@ -372,7 +375,6 @@ void AudioControlManager::HandlePriorState(sptr<CallBase> &callObjectPtr, TelCal
             if (stateNumber == EMPTY_VALUE) {
                 event = AudioEvent::NO_MORE_ACTIVE_CALL;
             }
-            StopRingback();
             break;
         case TelCallState::CALL_STATUS_HOLDING:
             if (stateNumber == EMPTY_VALUE) {
@@ -470,7 +472,7 @@ int32_t AudioControlManager::SetAudioDevice(const AudioDevice &device, bool isBy
                 address = activeBluetoothDevice->macAddress_;
             }
             AudioSystemManager* audioSystemManager = AudioSystemManager::GetInstance();
-            int32_t ret = audioSystemManager->SetCallDeviceActive(ActiveDeviceType::BLUETOOTH_SCO,
+            int32_t ret = audioSystemManager->SetCallDeviceActive(DeviceType::DEVICE_TYPE_BLUETOOTH_SCO,
                 true, address);
             if (ret != 0) {
                 TELEPHONY_LOGE("SetCallDeviceActive failed");
@@ -539,7 +541,9 @@ bool AudioControlManager::PlayRingtone()
     AudioStandard::AudioRingerMode ringMode = DelayedSingleton<AudioProxy>::GetInstance()->GetRingerMode();
     if (incomingCall->GetCrsType() == CRS_TYPE) {
         if (!isCrsVibrating_ && (ringMode != AudioStandard::AudioRingerMode::RINGER_MODE_SILENT)) {
-            isCrsVibrating_ = (DelayedSingleton<AudioProxy>::GetInstance()->StartVibrator() == TELEPHONY_SUCCESS);
+            if (ringMode == AudioStandard::AudioRingerMode::RINGER_MODE_VIBRATE || IsRingingVibrateModeOn()) {
+                isCrsVibrating_ = (DelayedSingleton<AudioProxy>::GetInstance()->StartVibrator() == TELEPHONY_SUCCESS);
+            }
         }
         if ((ringMode == AudioStandard::AudioRingerMode::RINGER_MODE_NORMAL) || IsBtOrWireHeadPlugin()) {
             if (PlaySoundtone()) {
@@ -701,13 +705,14 @@ int32_t AudioControlManager::SetMute(bool isMute)
         return CALL_ERR_AUDIO_SETTING_MUTE_FAILED;
     }
     DelayedSingleton<AudioDeviceManager>::GetInstance()->ReportAudioDeviceInfo();
-    if (frontCall_ == nullptr) {
+    sptr<CallBase> currentCall = frontCall_;
+    if (currentCall == nullptr) {
         TELEPHONY_LOGE("frontCall_ is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     bool muted = DelayedSingleton<AudioProxy>::GetInstance()->IsMicrophoneMute();
-    frontCall_->SetMicPhoneState(muted);
-    TELEPHONY_LOGI("SetMute success callId:%{public}d, mute:%{public}d", frontCall_->GetCallID(), muted);
+    currentCall->SetMicPhoneState(muted);
+    TELEPHONY_LOGI("SetMute success callId:%{public}d, mute:%{public}d", currentCall->GetCallID(), muted);
     return TELEPHONY_SUCCESS;
 }
 
@@ -715,7 +720,7 @@ int32_t AudioControlManager::MuteRinger()
 {
     sptr<CallBase> incomingCall = CallObjectManager::GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_RINGING);
     if (incomingCall != nullptr) {
-        if (incomingCall->GetCrsType() == CRS_TYPE) {
+        if (incomingCall->GetCrsType() == CRS_TYPE && !IsVoIPCallActived()) {
             TELEPHONY_LOGI("Mute network ring tone.");
             MuteNetWorkRingTone();
         }
@@ -890,7 +895,7 @@ int32_t AudioControlManager::PlayCallTone(ToneDescriptor type)
 {
     std::lock_guard<std::recursive_mutex> lock(toneStateLock_);
     if (toneState_ == ToneState::TONEING) {
-        TELEPHONY_LOGE("should not play callTone");
+        TELEPHONY_LOGE("callTone is already playing");
         return CALL_ERR_AUDIO_TONE_PLAY_FAILED;
     }
     toneState_ = ToneState::TONEING;
@@ -1035,6 +1040,39 @@ bool AudioControlManager::IsVideoCall(VideoStateType videoState)
 bool AudioControlManager::IsBtOrWireHeadPlugin()
 {
     return AudioDeviceManager::IsBtActived() || AudioDeviceManager::IsWiredHeadsetConnected();
+}
+
+bool AudioControlManager::IsRingingVibrateModeOn()
+{
+    auto datashareHelper = SettingsDataShareHelper::GetInstance();
+    std::string ringingVibrateModeEnable {"1"};
+    std::vector<int> activedOsAccountIds;
+    OHOS::AccountSA::OsAccountManager::QueryActiveOsAccountIds(activedOsAccountIds);
+    if (activedOsAccountIds.empty()) {
+        TELEPHONY_LOGW("activedOsAccountIds is empty");
+        return false;
+    }
+    int userId = activedOsAccountIds[0];
+    OHOS::Uri uri(
+        "datashare:///com.ohos.settingsdata/entry/settingsdata/USER_SETTINGSDATA_"
+        + std::to_string(userId) + "?Proxy=true");
+    int resp = datashareHelper->Query(uri, "hw_vibrate_when_ringing", ringingVibrateModeEnable);
+    if (resp == TELEPHONY_SUCCESS && ringingVibrateModeEnable == "1") {
+        TELEPHONY_LOGI("RingingVibrateModeOpen:true");
+        return true;
+    }
+    return false;
+}
+bool AudioControlManager::IsVoIPCallActived()
+{
+    int32_t state;
+    DelayedSingleton<CallControlManager>::GetInstance()->GetVoIPCallState(state);
+    if (state == static_cast<int32_t>(CallStateToApp::CALL_STATE_IDLE) ||
+        state == static_cast<int32_t>(CallStateToApp::CALL_STATE_UNKNOWN)) {
+        return false;
+    }
+    TELEPHONY_LOGI("VoIP Call is actived");
+    return true;
 }
 } // namespace Telephony
 } // namespace OHOS

@@ -17,6 +17,7 @@
 
 #include <thread>
 
+#include "call_control_manager.h"
 #include "telephony_log_wrapper.h"
 
 namespace OHOS {
@@ -257,6 +258,15 @@ AudioStandard::StreamUsage Tone::GetStreamUsageByToneType(ToneDescriptor descrip
             streamUsage = AudioStandard::StreamUsage::STREAM_USAGE_VOICE_MODEM_COMMUNICATION;
             break;
         case ToneDescriptor::TONE_WAITING:
+            streamUsage = AudioStandard::StreamUsage::STREAM_USAGE_VOICE_MODEM_COMMUNICATION;
+            int32_t state;
+            DelayedSingleton<CallControlManager>::GetInstance()->GetVoIPCallState(state);
+            if (state == (int32_t)CallStateToApp::CALL_STATE_RINGING ||
+                state == (int32_t)CallStateToApp::CALL_STATE_OFFHOOK ||
+                state == (int32_t)CallStateToApp::CALL_STATE_ANSWERED) {
+                streamUsage = AudioStandard::StreamUsage::STREAM_USAGE_VOICE_COMMUNICATION;
+            }
+            break;
         case ToneDescriptor::TONE_FINISHED:
             streamUsage = AudioStandard::StreamUsage::STREAM_USAGE_VOICE_RINGTONE;
             break;

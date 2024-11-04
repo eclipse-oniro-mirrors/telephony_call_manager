@@ -440,7 +440,7 @@ void AudioDeviceManager::SetCurrentAudioDevice(AudioDeviceType deviceType)
     if (deviceType == AudioDeviceType::DEVICE_EARPIECE && CallObjectManager::HasSatelliteCallExist()) {
         audioDeviceType_ = AudioDeviceType::DEVICE_SPEAKER;
         AudioStandard::AudioSystemManager::GetInstance()->
-            SetDeviceActive(AudioStandard::ActiveDeviceType::SPEAKER, true);
+            SetDeviceActive(AudioStandard::DeviceType::DEVICE_TYPE_SPEAKER, true);
         return;
     }
     AudioDevice device = {
@@ -460,7 +460,7 @@ void AudioDeviceManager::SetCurrentAudioDevice(const AudioDevice &device)
     audioDeviceType_ = deviceType;
     ReportAudioDeviceChange(device);
 }
-  
+
 bool AudioDeviceManager::CheckAndSwitchDistributedAudioDevice()
 {
     TELEPHONY_LOGI("check and switch distributed audio device.");
@@ -539,7 +539,10 @@ int32_t AudioDeviceManager::ReportAudioDeviceChange(const AudioDevice &device)
 
 int32_t AudioDeviceManager::ReportAudioDeviceInfo()
 {
-    sptr<CallBase> liveCall = CallObjectManager::GetForegroundLiveCall();
+    sptr<CallBase> liveCall = CallObjectManager::GetForegroundLiveCall(false);
+    if (liveCall == nullptr) {
+        liveCall = CallObjectManager::GetForegroundLiveCall();
+    }
     return ReportAudioDeviceInfo(liveCall);
 }
 
@@ -566,8 +569,12 @@ int32_t AudioDeviceManager::ReportAudioDeviceInfo(sptr<CallBase> call)
     } else {
         info_.isMuted = DelayedSingleton<AudioProxy>::GetInstance()->IsMicrophoneMute();
     }
+    if (call != nullptr) {
+        info_.callId = call->GetCallID();
+    }
     TELEPHONY_LOGI("report audio device info, currentAudioDeviceType:%{public}d, currentAddress:%{public}s, "
-        "mute:%{public}d", info_.currentAudioDevice.deviceType, ConvertAddress().c_str(), info_.isMuted);
+        "mute:%{public}d, callId:%{public}d", info_.currentAudioDevice.deviceType, ConvertAddress().c_str(),
+        info_.isMuted, info_.callId);
     return DelayedSingleton<CallAbilityReportProxy>::GetInstance()->ReportAudioDeviceChange(info_);
 }
 

@@ -15,6 +15,7 @@
 
 #include "call_manager_utils.h"
 #include "call_manager_base.h"
+#include "want_params_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -49,7 +50,7 @@ void CallManagerUtils::WriteCallAttributeInfo(const CallAttributeInfo &info, Mes
     messageParcel.WriteBool(info.numberMarkInfo.isCloud);
     messageParcel.WriteCString(info.numberMarkInfo.markDetails);
     messageParcel.WriteCString(info.contactName);
-    messageParcel.WriteCString(info.extras);
+    messageParcel.WriteString(info.extraParamsString);
     if (info.callType == CallType::TYPE_VOIP) {
         messageParcel.WriteString(info.voipCallInfo.voipCallId);
         messageParcel.WriteString(info.voipCallInfo.userName);

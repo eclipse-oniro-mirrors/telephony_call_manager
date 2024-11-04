@@ -122,8 +122,11 @@ private:
     const std::string DETAIL_INFO = "detail_info";
     const std::string CONTENT_TYPE = "content_type";
     const std::string PHONE = "phone";
+    const std::string TYPE_ID = "type_id";
+    const std::string IS_DELETED = "is_deleted";
     const int32_t CALL_NUMBER = 2;
     std::unique_ptr<TimeWaitHelper> timeWaitHelper_ {nullptr};
+    std::chrono::system_clock::time_point detectStartTime = std::chrono::system_clock::from_time_t(0);
 };
 } // namespace Telephony
 } // namespace OHOS

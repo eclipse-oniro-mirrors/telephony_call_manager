@@ -72,7 +72,6 @@ void SendRequestFunc(const uint8_t *data, size_t size)
     auto infoptr = voicePtr->GetContactInfo(ACCOUNT_ID);
     voicePtr->UpdateNumberLocation(value, ACCOUNT_ID);
     voicePtr->UpdateContactInfo(contactInfo, ACCOUNT_ID);
-    voicePtr->UpdateRemoteObject(remoteObject, ACCOUNT_ID);
     voicePtr->OnStopService();
     voicePtr->Initial();
     voicePtr->QueryValue(CONTROL_SWITCH, value);
@@ -114,7 +113,6 @@ void UpdateValueFunc(const uint8_t *data, size_t size)
     subscriber->OnReceiveEvent(eventData);
     subscriber->Initial();
     subscriber->Release();
-    voicePtr->GetMutex();
     voicePtr->SetIsControlSwitchOn(true);
     voicePtr->GetIsControlSwitchOn();
     voicePtr->GetIsPlayRing();

@@ -175,7 +175,7 @@ int32_t CallStatusCallbackStub::OnUpdateCallsReportInfo(MessageParcel &data, Mes
     for (int32_t i = 0; i < cnt; i++) {
         BuildCallReportInfo(data, parcelPtr);
         callReportInfo.callVec.push_back(parcelPtr);
-        TELEPHONY_LOGI("accountId:%{public}d,state:%{public}d", parcelPtr.accountId, parcelPtr.state);
+        TELEPHONY_LOGW("accountId:%{public}d,state:%{public}d", parcelPtr.accountId, parcelPtr.state);
     }
     callReportInfo.slotId = data.ReadInt32();
     TELEPHONY_LOGI("slotId:%{public}d", callReportInfo.slotId);

@@ -34,10 +34,6 @@ FoldStatusManager::FoldStatusManager()
 
 void FoldStatusManager::RegisterFoldableListener()
 {
-    if (!IsSmallFoldDevice()) {
-        TELEPHONY_LOGI("Is not small fold device");
-        return;
-    }
     if (foldStatusListener_ != nullptr) {
         TELEPHONY_LOGI("Foldable listener is already registed");
         return;

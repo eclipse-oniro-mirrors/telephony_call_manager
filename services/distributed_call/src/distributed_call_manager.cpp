@@ -295,7 +295,7 @@ void DistributedCallManager::ClearConnectedDCallDevice()
 
 bool DistributedCallManager::SwitchOnDCallDeviceSync(const AudioDevice& device)
 {
-    TELEPHONY_LOGI("switch on dcall device sync");
+    TELEPHONY_LOGI("switch dcall device on sync");
     if (!isCallActived_.load()) {
         TELEPHONY_LOGW("call is not active, no need switch");
         return true;
@@ -309,7 +309,7 @@ bool DistributedCallManager::SwitchOnDCallDeviceSync(const AudioDevice& device)
         TELEPHONY_LOGE("dcall devId is invalid");
         return false;
     }
-    TELEPHONY_LOGI("switch dcall device start, devId: %{public}s", GetAnonyString(devId).c_str());
+    TELEPHONY_LOGI("switch dcall device on start, devId: %{public}s", GetAnonyString(devId).c_str());
     if (dcallProxy_ == nullptr) {
         TELEPHONY_LOGE("dcallProxy_ is nullptr");
         return false;
@@ -319,12 +319,12 @@ bool DistributedCallManager::SwitchOnDCallDeviceSync(const AudioDevice& device)
         dCallDeviceSwitchedOn_.store(true);
         SetConnectedDCallDevice(device);
         DelayedSingleton<AudioDeviceManager>::GetInstance()->SetCurrentAudioDevice(device.deviceType);
-        TELEPHONY_LOGI("switch dcall device succeed.");
+        TELEPHONY_LOGI("switch dcall device on succeed.");
 
         ReportDistributedDeviceInfo();
         return true;
     }
-    TELEPHONY_LOGI("switch dcall device failed, ret: %{public}d.", ret);
+    TELEPHONY_LOGI("switch dcall device on failed, ret: %{public}d.", ret);
     return false;
 }
 
@@ -342,7 +342,7 @@ void DistributedCallManager::DealDisconnectCall()
 void DistributedCallManager::SwitchOnDCallDeviceAsync(const AudioDevice& device)
 {
     auto weak = weak_from_this();
-    TELEPHONY_LOGI("switch on dcall device async");
+    TELEPHONY_LOGI("switch dcall device on async");
     std::thread switchThread = std::thread([weak, device]() {
         auto strong = weak.lock();
         if (strong) {
@@ -355,7 +355,7 @@ void DistributedCallManager::SwitchOnDCallDeviceAsync(const AudioDevice& device)
 
 void DistributedCallManager::SwitchOffDCallDeviceSync()
 {
-    TELEPHONY_LOGI("switch off dcall device sync");
+    TELEPHONY_LOGI("switch dcall device off sync");
     if (!dCallDeviceSwitchedOn_.load()) {
         TELEPHONY_LOGE("distributed audio device not connected.");
         return;
@@ -365,7 +365,7 @@ void DistributedCallManager::SwitchOffDCallDeviceSync()
         TELEPHONY_LOGE("dcall devId is invalid");
         return;
     }
-    TELEPHONY_LOGI("disconnect dcall device start, devId: %{public}s", GetAnonyString(devId).c_str());
+    TELEPHONY_LOGI("switch dcall device off start, devId: %{public}s", GetAnonyString(devId).c_str());
     if (dcallProxy_ == nullptr) {
         TELEPHONY_LOGE("dcallProxy_ is nullptr");
         return;
@@ -374,9 +374,9 @@ void DistributedCallManager::SwitchOffDCallDeviceSync()
     if (ret == TELEPHONY_SUCCESS) {
         dCallDeviceSwitchedOn_.store(false);
         ClearConnectedDCallDevice();
-        TELEPHONY_LOGI("disconnect dcall device succeed.");
+        TELEPHONY_LOGI("switch dcall device off succeed.");
     } else {
-        TELEPHONY_LOGE("disconnect dcall device failed, %{public}d", ret);
+        TELEPHONY_LOGE("switch dcall device off failed, %{public}d", ret);
     }
 }
 

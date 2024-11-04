@@ -27,7 +27,6 @@
 #include "voip_call.h"
 #include "voip_call_connection.h"
 #include "call_manager_info.h"
-#include "call_voice_assistant_manager.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -42,7 +41,7 @@ CallBase::CallBase(DialParaInfo &info)
       callEndedType_(CallEndedType::UNKNOWN), callBeginTime_(0), callCreateTime_(0), callEndTime_(0), ringBeginTime_(0),
       ringEndTime_(0), answerType_(CallAnswerType::CALL_ANSWER_MISSED), accountId_(info.accountId),
       crsType_(info.crsType), originalCallType_(info.originalCallType), isMuted_(false), numberLocation_("default"),
-      blockReason_(0), isEccContact_(false), celiaCallType_(-1), extras_(info.extras), isAnswered_(false)
+      blockReason_(0), isEccContact_(false), celiaCallType_(-1), extraParams_(info.extraParams), isAnswered_(false)
 {
     (void)memset_s(&contactInfo_, sizeof(ContactInfo), 0, sizeof(ContactInfo));
     (void)memset_s(&numberMarkInfo_, sizeof(NumberMarkInfo), 0, sizeof(NumberMarkInfo));
@@ -57,8 +56,8 @@ CallBase::CallBase(DialParaInfo &info, AppExecFwk::PacMap &extras)
       isSpeakerphoneOn_(false), callEndedType_(CallEndedType::UNKNOWN), callBeginTime_(0), callCreateTime_(0),
       callEndTime_(0), ringBeginTime_(0), ringEndTime_(0), answerType_(CallAnswerType::CALL_ANSWER_MISSED),
       accountId_(info.accountId), crsType_(info.crsType), originalCallType_(info.originalCallType), isMuted_(false),
-      numberLocation_("default"), blockReason_(0), isEccContact_(false), celiaCallType_(-1), extras_(info.extras),
-      isAnswered_(false)
+      numberLocation_("default"), blockReason_(0), isEccContact_(false), celiaCallType_(-1),
+      extraParams_(info.extraParams), isAnswered_(false)
 {
     (void)memset_s(&contactInfo_, sizeof(ContactInfo), 0, sizeof(ContactInfo));
     (void)memset_s(&numberMarkInfo_, sizeof(NumberMarkInfo), 0, sizeof(NumberMarkInfo));
@@ -89,9 +88,16 @@ void CallBase::HangUpVoipCall()
             sptr<VoIPCall> call = static_cast<VoIPCall *>(static_cast<void *>(tempCall.GetRefPtr()));
             if (call == nullptr) {
                 TELEPHONY_LOGE("the call object is nullptr, callId:%{public}d", callinfo.callId);
-                break;
+                continue;
             }
-            call->HangUpCall(ErrorReason::CELLULAR_CALL_EXISTS);
+            TelCallState voipCallState = call->GetTelCallState();
+            if (voipCallState == TelCallState::CALL_STATUS_ACTIVE) {
+                TELEPHONY_LOGI("the voip call with callId %{public}d is active, no need to hangup", call->GetCallID());
+            } else if (voipCallState == TelCallState::CALL_STATUS_INCOMING) {
+                call->RejectCall();
+            } else {
+                call->HangUpCall(ErrorReason::CELLULAR_CALL_EXISTS);
+            }
         }
     }
 }
@@ -118,9 +124,9 @@ int32_t CallBase::RejectCallBase()
     return TELEPHONY_SUCCESS;
 }
 
-void CallBase::SetExtras(std::string extras)
+void CallBase::SetExtraParams(AAFwk::WantParams extraParams)
 {
-    extras_ = extras;
+    extraParams_ = extraParams;
 }
 
 void CallBase::GetCallAttributeBaseInfo(CallAttributeInfo &info)
@@ -151,9 +157,7 @@ void CallBase::GetCallAttributeBaseInfo(CallAttributeInfo &info)
         info.originalCallType = originalCallType_;
         info.isEccContact = isEccContact_;
         info.celiaCallType = celiaCallType_;
-        if (memcpy_s(info.extras, kMaxNumberLen, extras_.c_str(), extras_.length()) != EOK) {
-            TELEPHONY_LOGE("memcpy_s extras fail");
-        }
+        info.extraParamsString = AAFwk::WantParamWrapper(extraParams_).ToString();
         if (memset_s(info.numberLocation, kMaxNumberLen, 0, kMaxNumberLen) != EOK) {
             TELEPHONY_LOGE("memset_s numberLocation fail");
             return;
@@ -426,7 +430,6 @@ void CallBase::SetNumberLocation(std::string numberLocation)
 {
     std::lock_guard<std::mutex> lock(mutex_);
     numberLocation_ = numberLocation;
-    CallVoiceAssistantManager::UpdateNumberLocation(numberLocation, accountId_);
 }
 
 int32_t CallBase::GetAccountId()
@@ -462,7 +465,6 @@ void CallBase::SetCallerInfo(const ContactInfo &info)
 {
     std::lock_guard<std::mutex> lock(mutex_);
     contactInfo_ = info;
-    CallVoiceAssistantManager::UpdateContactInfo(info, accountId_);
 }
 
 NumberMarkInfo CallBase::GetNumberMarkInfo()

@@ -65,7 +65,7 @@ int32_t CallStatusCallback::UpdateCallReportInfo(const CallReportInfo &info)
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("UpdateCallReportInfo failed! errCode:%{public}d", ret);
     } else {
-        TELEPHONY_LOGI("UpdateCallReportInfo success! state:%{public}d", info.state);
+        TELEPHONY_LOGW("UpdateCallReportInfo success! state:%{public}d", info.state);
     }
     return ret;
 }
@@ -108,7 +108,7 @@ int32_t CallStatusCallback::UpdateCallsReportInfo(const CallsReportInfo &info)
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("UpdateCallsReportInfo failed! errCode:%{public}d", ret);
     } else {
-        TELEPHONY_LOGI("UpdateCallsReportInfo success!");
+        TELEPHONY_LOGW("UpdateCallsReportInfo success!");
     }
     return ret;
 }
@@ -152,6 +152,9 @@ int32_t CallStatusCallback::UpdateRBTPlayInfo(const RBTPlayInfo info)
     bool isLocalRingbackNeeded = false;
     if (info == RBTPlayInfo::LOCAL_ALERTING) {
         isLocalRingbackNeeded = true;
+        CallEventInfo eventInfo;
+        eventInfo.eventId = CallAbilityEventId::EVENT_LOCAL_ALERTING;
+        DelayedSingleton<CallAbilityReportProxy>::GetInstance()->CallEventUpdated(eventInfo);
     }
     DelayedSingleton<AudioControlManager>::GetInstance()->SetLocalRingbackNeeded(isLocalRingbackNeeded);
     return TELEPHONY_SUCCESS;

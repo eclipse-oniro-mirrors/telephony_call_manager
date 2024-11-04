@@ -30,7 +30,7 @@ const int32_t UNEXPECT_DISCONNECT_CODE = -1;
 void CallAbilityConnectCallback::OnAbilityConnectDone(
     const AppExecFwk::ElementName &element, const sptr<IRemoteObject> &remoteObject, int resultCode)
 {
-    TELEPHONY_LOGI("connect callui result code: %{public}d", resultCode);
+    TELEPHONY_LOGW("connect callui result code: %{public}d", resultCode);
     if (resultCode == CONNECT_ABILITY_SUCCESS) {
         DelayedSingleton<CallConnectAbility>::GetInstance()->SetConnectFlag(true);
         DelayedSingleton<CallConnectAbility>::GetInstance()->SetConnectingFlag(false);
@@ -54,7 +54,7 @@ void CallAbilityConnectCallback::OnAbilityConnectDone(
 
 void CallAbilityConnectCallback::OnAbilityDisconnectDone(const AppExecFwk::ElementName &element, int resultCode)
 {
-    TELEPHONY_LOGI("disconnect callui result code: %{public}d", resultCode);
+    TELEPHONY_LOGW("disconnect callui result code: %{public}d", resultCode);
     DelayedSingleton<CallConnectAbility>::GetInstance()->SetConnectFlag(false);
     DelayedSingleton<CallConnectAbility>::GetInstance()->SetDisconnectingFlag(false);
     if (resultCode == UNEXPECT_DISCONNECT_CODE) {

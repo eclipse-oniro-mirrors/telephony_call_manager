@@ -71,7 +71,7 @@ public:
     static std::string GetCallNumber(TelCallState callState, bool isIncludeVoipCall = true);
     static std::vector<CallAttributeInfo> GetCallInfoList(int32_t slotId);
     static sptr<CallBase> GetForegroundCall(bool isIncludeVoipCall = true);
-    static sptr<CallBase> GetForegroundLiveCall();
+    static sptr<CallBase> GetForegroundLiveCall(bool isIncludeVoipCall = true);
     static std::vector<CallAttributeInfo> GetAllCallInfoList();
     int32_t DealFailDial(sptr<CallBase> call);
     static bool HasVideoCall();
@@ -83,6 +83,7 @@ public:
     static bool HasSatelliteCallExist();
     static int32_t GetSatelliteCallList(std::list<int32_t> &list);
     static int32_t GetCallNumByRunningState(CallRunningState callState);
+    static sptr<CallBase> GetForegroundLiveCallByCallId(int32_t callId);
 
 protected:
     static std::condition_variable cv_;
