@@ -314,14 +314,13 @@ bool DistributedCallManager::SwitchOnDCallDeviceSync(const AudioDevice& device)
         TELEPHONY_LOGE("dcallProxy_ is nullptr");
         return false;
     }
+    ReportDistributedDeviceInfo();
     int32_t ret = dcallProxy_->SwitchDevice(devId, DCALL_SWITCH_DEVICE_TYPE_SINK);
     if (ret == TELEPHONY_SUCCESS) {
         dCallDeviceSwitchedOn_.store(true);
         SetConnectedDCallDevice(device);
         DelayedSingleton<AudioDeviceManager>::GetInstance()->SetCurrentAudioDevice(device.deviceType);
         TELEPHONY_LOGI("switch dcall device on succeed.");
-
-        ReportDistributedDeviceInfo();
         return true;
     }
     TELEPHONY_LOGI("switch dcall device on failed, ret: %{public}d.", ret);
