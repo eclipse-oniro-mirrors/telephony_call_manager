@@ -59,7 +59,6 @@ public:
     void ReportDistributedDeviceInfo();
 
     std::string GetConnectedDCallDeviceId();
-
 private:
     class DistributedCallDeviceListener : public OHOS::DistributedHardware::IDCallDeviceCallback {
     public:
