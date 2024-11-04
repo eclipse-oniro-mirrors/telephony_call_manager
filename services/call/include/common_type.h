@@ -78,13 +78,14 @@ enum PolicyFlag : uint64_t {
 };
 
 struct ContactInfo {
-    char name[CONTACT_NAME_LEN] = { 0 };
-    char number[kMaxNumberLen] = { 0 };
+    std::string name = "";
+    std::string number = "";
     bool isContacterExists = false;
     char ringtonePath[FILE_PATH_MAX_LEN] = { 0 };
     bool isSendToVoicemail = false;
     bool isEcc = false;
     bool isVoiceMail = false;
+    bool isQueryComplete = false;
 };
 } // namespace Telephony
 } // namespace OHOS

@@ -44,6 +44,7 @@
 #include "spam_call_adapter.h"
 #include "call_superprivacy_control_manager.h"
 #include "notification_helper.h"
+#include "call_voice_assistant_manager.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -424,15 +425,17 @@ void CallStatusManager::SetContactInfo(sptr<CallBase> &call, std::string phoneNu
         // Get the contact data from the database
         ContactInfo contactInfo = {
             .name = "",
-            .number = "",
+            .number = phoneNum,
             .isContacterExists = false,
             .ringtonePath = "",
             .isSendToVoicemail = false,
             .isEcc = false,
             .isVoiceMail = false,
+            .isQueryComplete = true,
         };
         QueryCallerInfo(contactInfo, phoneNum);
         callObjectPtr->SetCallerInfo(contactInfo);
+        CallVoiceAssistantManager::GetInstance()->UpdateContactInfo(contactInfo, callObjectPtr->GetCallID());
     });
 }
 

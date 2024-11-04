@@ -407,6 +407,11 @@ void CallBase::SetNumberLocation(std::string numberLocation)
     numberLocation_ = numberLocation;
 }
 
+int32_t CallBase::GetAccountId()
+{
+    return accountId_;
+}
+
 std::string CallBase::GetNumberLocation()
 {
     std::lock_guard<std::mutex> lock(mutex_);
