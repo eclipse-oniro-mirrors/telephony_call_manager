@@ -748,13 +748,17 @@ sptr<CallBase> CallObjectManager::GetForegroundLiveCall(bool isIncludeVoipCall)
             liveCall = (*it);
             break;
         }
-        if (telCallState == TelCallState::CALL_STATUS_WAITING ||
-            telCallState == TelCallState::CALL_STATUS_INCOMING) {
-            liveCall = (*it);
-            continue;
-        }
     }
     return liveCall;
+}
+
+sptr<CallBase> CallObjectManager::GetAudioLiveCall()
+{
+    sptr<CallBase> call = GetForegroundLiveCall(false);
+    if (call == nullptr) {
+        call = GetForegroundLiveCall();
+    }
+    return call;
 }
 
 CellularCallInfo CallObjectManager::GetDialCallInfo()

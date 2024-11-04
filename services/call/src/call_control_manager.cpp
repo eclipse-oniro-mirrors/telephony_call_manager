@@ -1134,10 +1134,7 @@ int32_t CallControlManager::JoinConference(int32_t callId, std::vector<std::u16s
 
 int32_t CallControlManager::SetMuted(bool isMute)
 {
-    sptr<CallBase> call = CallObjectManager::GetForegroundLiveCall(false);
-    if (call == nullptr) {
-        call = CallObjectManager::GetForegroundLiveCall();
-    }
+    sptr<CallBase> call = CallObjectManager::GetAudioLiveCall();
     if (call == nullptr) {
         return CALL_ERR_AUDIO_SETTING_MUTE_FAILED;
     }
