@@ -394,11 +394,6 @@ void AudioPreferDeviceChangeCallback::OnPreferredOutputDeviceUpdated(
         return;
     }
 
-    if (DelayedSingleton<AudioDeviceManager>::GetInstance()->IsDistributedCallConnected() &&
-        DelayedSingleton<DistributedCallManager>::GetInstance()->SelectedDistributedIfNeed()) {
-        return;
-    }
-
     switch (desc[0]->deviceType_) {
         case AudioStandard::DEVICE_TYPE_BLUETOOTH_SCO:
             if (!SetBluetoothDevice(device, desc)) {
