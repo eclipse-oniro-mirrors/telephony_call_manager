@@ -28,7 +28,7 @@ CallAttributeInfo NativeCallManagerUtils::ReadCallAttributeInfo(MessageParcel &m
     if (strncpy_s(info.accountNumber, kMaxNumberLen + 1, messageParcel.ReadCString(), kMaxNumberLen + 1) != EOK) {
         TELEPHONY_LOGE("strncpy_s accountNumber failed");
     }
-    if (strncpy_s(info.bundleName, kMaxNumberLen + 1, messageParcel.ReadCString(), kMaxNumberLen + 1) != EOK) {
+    if (strncpy_s(info.bundleName, kMaxBundleNameLen + 1, messageParcel.ReadCString(), kMaxBundleNameLen + 1) != EOK) {
         TELEPHONY_LOGE("strncpy_s bundleName failed");
     }
     info.speakerphoneOn = messageParcel.ReadBool();
