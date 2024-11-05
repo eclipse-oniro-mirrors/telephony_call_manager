@@ -501,6 +501,11 @@ bool CallControlManager::HasCall()
     return HasCellularCallExist();
 }
 
+bool CallControlManager::HasVoipCall()
+{
+    return HasVoipCallExist();
+}
+
 int32_t CallControlManager::IsNewCallAllowed(bool &enabled)
 {
     return IsNewCallAllowedCreate(enabled);

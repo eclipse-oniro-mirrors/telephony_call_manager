@@ -55,6 +55,7 @@ public:
     int32_t UnHoldCall(int32_t callId);
     int32_t SwitchCall(int32_t callId);
     bool HasCall();
+    bool HasVoipCall();
     int32_t IsNewCallAllowed(bool &enabled);
     int32_t IsRinging(bool &enabled);
     int32_t HasEmergency(bool &enabled);

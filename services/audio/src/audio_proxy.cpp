@@ -384,6 +384,12 @@ int32_t AudioProxy::UnsetAudioPreferDeviceChangeCallback()
 void AudioPreferDeviceChangeCallback::OnPreferredOutputDeviceUpdated(
     const std::vector<sptr<AudioStandard::AudioDeviceDescriptor>> &desc)
 {
+    bool hasCall = DelayedSingleton<CallControlManager>::GetInstance()->HasCall() ||
+        DelayedSingleton<CallControlManager>::GetInstance()->HasVoipCall();
+    if (!hasCall) {
+        TELEPHONY_LOGE("no call exists, on preferred audio device update failed");
+        return;
+    }
     AudioDevice device;
     if (desc.size() == NO_DEVICE_VALID) {
         TELEPHONY_LOGE("desc size is zero");

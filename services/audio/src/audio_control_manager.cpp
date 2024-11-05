@@ -335,7 +335,6 @@ void AudioControlManager::HandleNextState(sptr<CallBase> &callObjectPtr, TelCall
             break;
         case TelCallState::CALL_STATUS_DISCONNECTING:
         case TelCallState::CALL_STATUS_DISCONNECTED:
-            DelayedSingleton<AudioProxy>::GetInstance()->SetVoiceRingtoneMute(false);
             if (isCrsVibrating_) {
                 DelayedSingleton<AudioProxy>::GetInstance()->StopVibrator();
                 isCrsVibrating_ = false;
@@ -394,7 +393,6 @@ void AudioControlManager::HandlePriorState(sptr<CallBase> &callObjectPtr, TelCal
 void AudioControlManager::ProcessAudioWhenCallActive(sptr<CallBase> &callObjectPtr)
 {
     if (callObjectPtr->GetCallRunningState() == CallRunningState::CALL_RUNNING_STATE_ACTIVE) {
-        DelayedSingleton<AudioProxy>::GetInstance()->SetVoiceRingtoneMute(false);
         if (isCrsVibrating_) {
             DelayedSingleton<AudioProxy>::GetInstance()->StopVibrator();
             isCrsVibrating_ = false;
@@ -448,6 +446,12 @@ int32_t AudioControlManager::SetAudioDevice(const AudioDevice &device)
  */
 int32_t AudioControlManager::SetAudioDevice(const AudioDevice &device, bool isByUser)
 {
+    bool hasCall = DelayedSingleton<CallControlManager>::GetInstance()->HasCall() ||
+        DelayedSingleton<CallControlManager>::GetInstance()->HasVoipCall();
+    if (!hasCall) {
+        TELEPHONY_LOGE("no call exists, set audio device failed");
+        return CALL_ERR_AUDIO_SET_AUDIO_DEVICE_FAILED;
+    }
     TELEPHONY_LOGI("set audio device, type: %{public}d", static_cast<int32_t>(device.deviceType));
     AudioDeviceType audioDeviceType = AudioDeviceType::DEVICE_UNKNOWN;
     if (CallObjectManager::HasSatelliteCallExist() && device.deviceType == AudioDeviceType::DEVICE_EARPIECE) {
@@ -615,6 +619,7 @@ bool AudioControlManager::StopSoundtone()
         TELEPHONY_LOGE("sound_ is nullptr");
         return false;
     }
+    DelayedSingleton<AudioProxy>::GetInstance()->SetVoiceRingtoneMute(false);
     if (sound_->Stop() != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("stop soundtone failed");
         return false;
