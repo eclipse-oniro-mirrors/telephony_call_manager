@@ -1455,7 +1455,7 @@ bool CallStatusManager::ShouldBlockIncomingCall(const sptr<CallBase> &call, cons
     }
     bool isSpamCall = spamCallAdapterPtr_->DetectSpamCall(std::string(info.phoneNum), info.accountId);
     detectStartTime = std::chrono::system_clock::now();
-    if (isSpamCall == false) {
+    if (!isSpamCall) {
         TELEPHONY_LOGE("DetectSpamCall failed!");
         return false;
     }
