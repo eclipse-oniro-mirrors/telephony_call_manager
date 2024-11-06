@@ -798,7 +798,7 @@ struct AudioDeviceInfo {
     /**
      * The callId of audio device change.
      */
-    int32_t callId;
+    int32_t callId = 0;
 };
 
 enum class MmiCodeResult {
