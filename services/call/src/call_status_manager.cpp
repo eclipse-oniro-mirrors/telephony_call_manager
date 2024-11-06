@@ -1396,7 +1396,11 @@ bool CallStatusManager::ShouldBlockIncomingCall(const sptr<CallBase> &call, cons
         TELEPHONY_LOGE("create SpamCallAdapter object failed!");
         return false;
     }
-    spamCallAdapterPtr_->DetectSpamCall(std::string(info.phoneNum), info.accountId);
+    bool isSpamCall = spamCallAdapterPtr_->DetectSpamCall(std::string(info.phoneNum), info.accountId);
+    if (!isSpamCall) {
+        TELEPHONY_LOGE("DetectSpamCall failed!");
+        return false;
+    }
     if (spamCallAdapterPtr_->WaitForDetectResult()) {
         TELEPHONY_LOGI("DetectSpamCall no time out");
         NumberMarkInfo numberMarkInfo = {
