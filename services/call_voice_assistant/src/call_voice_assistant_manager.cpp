@@ -80,7 +80,7 @@ bool CallVoiceAssistantManager::IsSwitchOn(const std::string& switchState)
     AccountSA::OsAccountManager::GetForegroundOsAccountLocalld(userId);
     AccountSA::OsAccountManager::IsOsAccountVerified(userId, isUserUnlocked);
     if (!isUserUnlocked) {
-        TELEPHONY_LOGI("user is locked");
+        TELEPHONY_LOGE("user is locked");
         return false;
     }
     std::string value = SWITCH_TURN_OFF;
