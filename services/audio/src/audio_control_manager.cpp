@@ -180,7 +180,8 @@ void AudioControlManager::CheckTypeAndSetAudioDevice(sptr<CallBase> &callObjectP
     if (!IsVideoCall(priorVideoState) && IsVideoCall(nextVideoState) &&
         (telCallState != TelCallState::CALL_STATUS_INCOMING && telCallState != TelCallState::CALL_STATUS_WAITING)) {
         if (callObjectPtr->GetOriginalCallType() == VOICE_TYPE &&
-            (telCallState == TelCallState::CALL_STATUS_DIALING || telCallState == TelCallState::CALL_STATUS_ALERTING)) {
+            (telCallState == TelCallState::CALL_STATUS_DIALING || telCallState == TelCallState::CALL_STATUS_ALERTING ||
+            telCallState == TelCallState::CALL_STATUS_DISCONNECTED)) {
             TELEPHONY_LOGI("before modify set device to EARPIECE, now not set");
             return;
         }
