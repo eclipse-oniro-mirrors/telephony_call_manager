@@ -446,6 +446,12 @@ int32_t AudioControlManager::SetAudioDevice(const AudioDevice &device)
  */
 int32_t AudioControlManager::SetAudioDevice(const AudioDevice &device, bool isByUser)
 {
+    bool hasCall = DelayedSingleton<CallControlManager>::GetInstance()->HasCall() ||
+        DelayedSingleton<CallControlManager>::GetInstance()->HasVoipCall();
+    if (!hasCall) {
+        TELEPHONY_LOGE("no call exists, set audio device failed");
+        return CALL_ERR_AUDIO_SET_AUDIO_DEVICE_FAILED;
+    }
     TELEPHONY_LOGI("set audio device, type: %{public}d", static_cast<int32_t>(device.deviceType));
     AudioDeviceType audioDeviceType = AudioDeviceType::DEVICE_UNKNOWN;
     if (CallObjectManager::HasSatelliteCallExist() && device.deviceType == AudioDeviceType::DEVICE_EARPIECE) {
@@ -613,6 +619,7 @@ bool AudioControlManager::StopSoundtone()
         TELEPHONY_LOGE("sound_ is nullptr");
         return false;
     }
+    DelayedSingleton<AudioProxy>::GetInstance()->SetVoiceRingtoneMute(false);
     if (sound_->Stop() != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("stop soundtone failed");
         return false;
@@ -1023,8 +1030,8 @@ bool AudioControlManager::IsSoundPlaying()
 void AudioControlManager::MuteNetWorkRingTone()
 {
     bool result =
-        DelayedSingleton<AudioProxy>::GetInstance()->SetAudioScene(AudioStandard::AudioScene::AUDIO_SCENE_DEFAULT);
-    TELEPHONY_LOGI("Set volume mute, result: %{public}d", result);
+        DelayedSingleton<AudioProxy>::GetInstance()->SetVoiceRingtoneMute(true);
+    TELEPHONY_LOGI("Set Voice Ringtone mute, result: %{public}d", result);
     if (isCrsVibrating_) {
         DelayedSingleton<AudioProxy>::GetInstance()->StopVibrator();
         isCrsVibrating_ = false;

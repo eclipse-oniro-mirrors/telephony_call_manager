@@ -61,6 +61,11 @@ bool AudioProxy::SetAudioScene(AudioStandard::AudioScene audioScene)
     return (AudioStandard::AudioSystemManager::GetInstance()->SetAudioScene(audioScene) == TELEPHONY_SUCCESS);
 }
 
+bool AudioProxy::SetVoiceRingtoneMute(bool isMute)
+{
+    return (AudioStandard::AudioSystemManager::GetInstance()->SetVoiceRingtoneMute(isMute) == TELEPHONY_SUCCESS);
+}
+
 int32_t AudioProxy::SetAudioDeviceChangeCallback()
 {
     if (deviceCallback_ == nullptr) {
@@ -379,6 +384,12 @@ int32_t AudioProxy::UnsetAudioPreferDeviceChangeCallback()
 void AudioPreferDeviceChangeCallback::OnPreferredOutputDeviceUpdated(
     const std::vector<sptr<AudioStandard::AudioDeviceDescriptor>> &desc)
 {
+    bool hasCall = DelayedSingleton<CallControlManager>::GetInstance()->HasCall() ||
+        DelayedSingleton<CallControlManager>::GetInstance()->HasVoipCall();
+    if (!hasCall) {
+        TELEPHONY_LOGE("no call exists, on preferred audio device update failed");
+        return;
+    }
     AudioDevice device;
     if (desc.size() == NO_DEVICE_VALID) {
         TELEPHONY_LOGE("desc size is zero");
