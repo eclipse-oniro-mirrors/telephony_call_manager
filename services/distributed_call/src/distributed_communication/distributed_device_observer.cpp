@@ -81,17 +81,19 @@ void DistributedDeviceObserver::RegisterDevCallback()
     }
 }
 
-void DistributedDeviceObserver::UnRegisterDevCallback()
+int32_t DistributedDeviceObserver::UnRegisterDevCallback()
 {
+    int32_t res = TELEPHONY_SUCCESS;
     if (deviceListener_ != nullptr) {
         auto distributedMgr = DelayedSingleton<DistributedCommunicationManager>::GetInstance();
         if (distributedMgr != nullptr) {
-            auto ret = distributedMgr->UnRegDevCallbackWrapper();
-            TELEPHONY_LOGI("un-reg distributed device callback result[%{public}d]", ret);
+            res = distributedMgr->UnRegDevCallbackWrapper();
+            TELEPHONY_LOGI("un-reg distributed device callback result[%{public}d]", res);
         }
         deviceListener_.reset();
         deviceListener_ = nullptr;
     }
+    return res;
 }
 
 void DistributedDeviceObserver::OnDeviceOnline(const std::string &devId, const std::string &devName,
@@ -232,7 +234,10 @@ void DistributedSystemAbilityListener::OnRemoveSystemAbility(int32_t systemAbili
     auto deviceObserver = distributedMgr->GetDistributedDeviceObserver();
     if (deviceObserver != nullptr) {
         deviceObserver->OnRemoveSystemAbility();
-        deviceObserver->UnRegisterDevCallback();
+        if (deviceObserver->UnRegisterDevCallback() != TELEPHONY_SUCCESS) {
+            TELEPHONY_LOGE("un-reg distributed device callback failed, can't dlclose ext lib");
+            return;
+        }
     }
     distributedMgr->DeInitExtWrapper();
 }
