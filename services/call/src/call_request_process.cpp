@@ -912,17 +912,9 @@ int32_t CallRequestProcess::HandleEccCallForDsda(std::string newPhoneNum, DialPa
 {
     int32_t ret =
         DelayedSingleton<CallNumberUtils>::GetInstance()->CheckNumberIsEmergency(newPhoneNum, info.accountId, isEcc);
-    TELEPHONY_LOGE("CheckNumberIsEmergency ret is %{public}d", ret);
-    if (isEcc && IsDsdsMode5()) {
+    TELEPHONY_LOGE("CheckNumberIsEmergency ret is %{public}d, isEcc: %{public}d", ret, isEcc);
+    if (isEcc) {
         return EccDialPolicy();
-    } else if (isEcc) {
-        bool hasRingCall = false;
-        int32_t result = CallObjectManager::HasRingingCall(hasRingCall);
-        if ((result == TELEPHONY_SUCCESS) && hasRingCall) {
-            sptr<CallBase> call = CallObjectManager::GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_RINGING);
-            call->RejectCall();
-            TELEPHONY_LOGI("has ringCall when dial. reject ringCall");
-        }
     }
     return TELEPHONY_SUCCESS;
 }
@@ -1026,13 +1018,13 @@ int32_t CallRequestProcess::EccDialPolicy()
     for (sptr<CallBase> call : hangupList) {
         int32_t callId = call->GetCallID();
         CallRunningState crState = call->GetCallRunningState();
-        TELEPHONY_LOGE("HangUpCall call[id:%{public}d state:%{public}d]", callId, crState);
+        TELEPHONY_LOGE("HangUpCall call[id:%{public}d crState:%{public}d]", callId, crState);
         call->HangUpCall();
     }
     for (sptr<CallBase> call : rejectList) {
         int32_t callId = call->GetCallID();
         CallRunningState crState = call->GetCallRunningState();
-        TELEPHONY_LOGE("RejectCall call[id:%{public}d state:%{public}d]", callId, crState);
+        TELEPHONY_LOGE("RejectCall call[id:%{public}d crState:%{public}d]", callId, crState);
         call->RejectCall();
     }
     hangupList.clear();
