@@ -295,6 +295,7 @@ void CallVoiceAssistantManager::UpdateRemoteObject(const sptr<IRemoteObject> &ob
     const sptr<AAFwk::IAbilityConnection> callback)
 {
     TELEPHONY_LOGI("update remote object callId, %{public}d", callId);
+    std::lock_guard<std::mutex> lock(mutex_);
     if (nowCallId != callId || accountIds.find(callId) == accountIds.end()) {
         TELEPHONY_LOGE("nowCallId, %{public}d", nowCallId);
         AAFwk::AbilityManagerClient::GetInstance()->DisconnectAbility(callback);
