@@ -53,7 +53,7 @@ public:
     ~DistributedDeviceObserver() = default;
     void Init();
     void RegisterDevCallback();
-    void UnRegisterDevCallback();
+    int32_t UnRegisterDevCallback();
     void RegisterDevStatusCallback(const std::shared_ptr<IDistributedDeviceStateCallback> &callback);
     void UnRegisterDevStatusCallback(const std::shared_ptr<IDistributedDeviceStateCallback> &callback);
     void OnDeviceOnline(const std::string &devId, const std::string &devName, AudioDeviceType devType);
