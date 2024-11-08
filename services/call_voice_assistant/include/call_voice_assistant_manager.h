@@ -25,6 +25,7 @@
 #include "call_manager_inner_type.h"
 #include "call_state_listener_base.h"
 #include "audio_control_manager.h"
+#include "ffrt.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -90,7 +91,6 @@ private:
     bool isQueryedBroadcastSwitch = false;
     sptr<AAFwk::IAbilityConnection> connectCallback_ = nullptr;
     sptr<AAFwk::IDataAbilityObserver> settingsCallback_ = nullptr;
-    std::mutex mutex_;
     int32_t nowCallId = -1;
     int32_t nowAccountId = -1;
     int32_t nowVoipCallState = -1;
