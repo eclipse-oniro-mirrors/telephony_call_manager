@@ -102,11 +102,6 @@ bool AudioProxy::SetBluetoothDevActive()
 
 bool AudioProxy::SetSpeakerDevActive(bool isActive)
 {
-    if (AudioStandard::AudioSystemManager::GetInstance()->
-        IsDeviceActive(AudioStandard::DeviceType::DEVICE_TYPE_SPEAKER) == isActive) {
-        TELEPHONY_LOGI("current speaker state[%{public}d] is consistent with the expected", isActive);
-        return true;
-    }
     bool ret = AudioStandard::AudioSystemManager::GetInstance()->SetDeviceActive(
         AudioStandard::DeviceType::DEVICE_TYPE_SPEAKER, isActive);
     if (ret == ERR_NONE) {
