@@ -56,7 +56,7 @@ public:
 
     void GetConnectedDCallDevice(AudioDevice& device);
     bool IsSelectVirtualModem();
-    void ReportDistributedDeviceInfo();
+    void ReportDistributedDeviceInfo(const AudioDevice& device);
 
     std::string GetConnectedDCallDeviceId();
 private:
