@@ -126,6 +126,7 @@ public:
     int32_t CarrierAndVoipConflictProcess(int32_t callId, TelCallState callState);
     void AcquireIncomingLock();
     void ReleaseIncomingLock();
+    void DisconnectAllCalls();
 
 private:
     void CallStateObserve();

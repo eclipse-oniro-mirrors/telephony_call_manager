@@ -1476,6 +1476,20 @@ void CallControlManager::ReleaseIncomingLock()
     incomingCallWakeup_->ReleaseIncomingLock();
 }
 
+void CallControlManager::DisconnectAllCalls()
+{
+    std::list<sptr<CallBase>> allCallList = CallObjectManager::GetAllCallList();
+    for (auto call : allCallList) {
+        if (call == nullptr) {
+            continue;
+        }
+        int32_t ret = HangUpCall(call->GetCallID());
+        if (ret == TELEPHONY_SUCCESS) {
+            TELEPHONY_LOGI("one call is disconnected. call state: %{public}d", call->GetCallRunningState());
+        }
+    }
+}
+
 CallControlManager::SystemAbilityListener::SystemAbilityListener(std::shared_ptr<CallBroadcastSubscriber> subscriberPtr)
     : subscriberPtr_(subscriberPtr)
 {}
@@ -1521,6 +1535,7 @@ int32_t CallControlManager::BroadcastSubscriber()
     matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_SIM_STATE_CHANGED);
     matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_BLUETOOTH_REMOTEDEVICE_NAME_UPDATE);
     matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_USER_SWITCHED);
+    matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_SHUTDOWN);
     EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
     subscriberInfo.SetThreadMode(EventFwk::CommonEventSubscribeInfo::COMMON);
     std::shared_ptr<CallBroadcastSubscriber> subscriberPtr = std::make_shared<CallBroadcastSubscriber>(subscriberInfo);
