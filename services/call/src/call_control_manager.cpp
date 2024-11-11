@@ -1550,7 +1550,6 @@ int32_t CallControlManager::CommonBroadcastSubscriber()
         return TELEPHONY_ERROR;
     }
 
-    // if SubscribeCommonEvent fail, register statusChangeListener to SubscribeCommonEvent again
     auto samgrProxy = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (samgrProxy == nullptr) {
         TELEPHONY_LOGE("samgrProxy is nullptr");
@@ -1580,7 +1579,6 @@ int32_t CallControlManager::ContactsBroadcastSubscriber()
         return TELEPHONY_ERROR;
     }
 
-    // if SubscribeCommonEvent fail, register statusChangeListener to SubscribeCommonEvent again
     auto samgrProxy = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (samgrProxy == nullptr) {
         TELEPHONY_LOGE("samgrProxy is nullptr");
@@ -1599,7 +1597,7 @@ int32_t CallControlManager::ContactsBroadcastSubscriber()
 int32_t CallControlManager::SatcommBroadcastSubscriber()
 {
     EventFwk::MatchingSkills matchingSkills_;
-    matchingSkills.AddEvent("usual.event.thermal.satcomm.HIGH_TEMP_LEVEL");
+    matchingSkills_.AddEvent("usual.event.thermal.satcomm.HIGH_TEMP_LEVEL");
     EventFwk::CommonEventSubscribeInfo subscriberInfo_(matchingSkills_);
     subscriberInfo_.SetThreadMode(EventFwk::CommonEventSubscribeInfo::COMMON);
     subscriberInfo_.SetPublisherUid(SATCOMM_UID);
@@ -1610,7 +1608,6 @@ int32_t CallControlManager::SatcommBroadcastSubscriber()
         return TELEPHONY_ERROR;
     }
 
-    // if SubscribeCommonEvent fail, register statusChangeListener to SubscribeCommonEvent again
     auto samgrProxy = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (samgrProxy == nullptr) {
         TELEPHONY_LOGE("samgrProxy is nullptr");
@@ -1642,7 +1639,6 @@ int32_t CallControlManager::SuperPrivacyModeBroadcastSubscriber()
         return TELEPHONY_ERROR;
     }
 
-    // if SubscribeCommonEvent fail, register statusChangeListener to SubscribeCommonEvent again
     auto samgrProxy = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (samgrProxy == nullptr) {
         TELEPHONY_LOGE("samgrProxy is nullptr");
@@ -1671,12 +1667,12 @@ int32_t CallControlManager::BroadcastSubscriber()
         TELEPHONY_LOGE("ContactsBroadcastSubscriber fail.");
         return ret;
     }
-    int32_t SatcommBroadcastSubscriber();
+    ret = SatcommBroadcastSubscriber();
     if (ret) {
         TELEPHONY_LOGE("SatcommBroadcastSubscriber fail.");
         return ret;
     }
-    int32_t SuperPrivacyModeBroadcastSubscriber();
+    ret = SuperPrivacyModeBroadcastSubscriber();
     if (ret) {
         TELEPHONY_LOGE("SuperPrivacyModeBroadcastSubscriber fail.");
         return ret;
