@@ -780,6 +780,7 @@ void AudioControlManager::PlayCallEndedTone(CallEndedType type)
             }
             TELEPHONY_LOGI("play call ended tone");
             if (PlayCallTone(ToneDescriptor::TONE_FINISHED) != TELEPHONY_SUCCESS) {
+                StopCallTone();
                 TELEPHONY_LOGE("play call ended tone failed");
                 return;
             }
