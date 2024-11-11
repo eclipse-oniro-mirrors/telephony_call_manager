@@ -1546,7 +1546,7 @@ int32_t CallControlManager::CommonBroadcastSubscriber()
     subscriberInfo.SetThreadMode(EventFwk::CommonEventSubscribeInfo::COMMON);
     std::shared_ptr<CallBroadcastSubscriber> subscriberPtr = std::make_shared<CallBroadcastSubscriber>(subscriberInfo);
     if (subscriberPtr == nullptr) {
-        TELEPHONY_LOGE("CallControlManager::BroadcastSubscriber subscriberPtr is nullptr");
+        TELEPHONY_LOGE("CommonBroadcastSubscriber subscriberPtr is nullptr");
         return TELEPHONY_ERROR;
     }
 
@@ -1561,7 +1561,7 @@ int32_t CallControlManager::CommonBroadcastSubscriber()
         return TELEPHONY_ERROR;
     }
     int32_t ret = samgrProxy->SubscribeSystemAbility(COMMON_EVENT_SERVICE_ID, statusChangeListener_);
-    TELEPHONY_LOGI("CallControlManager::BroadcastSubscriber statusChangeListener_ ret: %{public}d", ret);
+    TELEPHONY_LOGI("CommonBroadcastSubscriber ret: %{public}d", ret);
     return TELEPHONY_SUCCESS;
 }
 
@@ -1569,13 +1569,12 @@ int32_t CallControlManager::ContactsBroadcastSubscriber()
 {
     EventFwk::MatchingSkills matchingSkill;
     matchingSkill.AddEvent("event.custom.contacts.PAGE_STATE_CHANGE");
-    EventFwk::CommonEventSubscribeInfo subscriberInfomation(matchingSkill);
-    subscriberInfomation.SetThreadMode(EventFwk::CommonEventSubscribeInfo::COMMON);
-    subscriberInfomation.SetPermission("ohos.permission.SET_TELEPHONY_STATE");
-    std::shared_ptr<CallBroadcastSubscriber> subscriber =
-        std::make_shared<CallBroadcastSubscriber>(subscriberInfomation);
-    if (subscriber == nullptr) {
-        TELEPHONY_LOGE("CallControlManager::BroadcastSubscriber subscriber is nullptr");
+    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkill);
+    subscriberInfo.SetThreadMode(EventFwk::CommonEventSubscribeInfo::COMMON);
+    subscriberInfo.SetPermission("ohos.permission.SET_TELEPHONY_STATE");
+    std::shared_ptr<CallBroadcastSubscriber> subscriberPtr = std::make_shared<CallBroadcastSubscriber>(subscriberInfo);
+    if (subscriberPtr == nullptr) {
+        TELEPHONY_LOGE("ContactsBroadcastSubscriber subscriberPtr is nullptr");
         return TELEPHONY_ERROR;
     }
 
@@ -1584,27 +1583,26 @@ int32_t CallControlManager::ContactsBroadcastSubscriber()
         TELEPHONY_LOGE("samgrProxy is nullptr");
         return TELEPHONY_ERROR;
     }
-    pageStateChangeListener_ = new (std::nothrow) SystemAbilityListener(subscriber);
+    pageStateChangeListener_ = new (std::nothrow) SystemAbilityListener(subscriberPtr);
     if (pageStateChangeListener_ == nullptr) {
         TELEPHONY_LOGE("pageStateChangeListener_ is nullptr");
         return TELEPHONY_ERROR;
     }
     int32_t ret = samgrProxy->SubscribeSystemAbility(COMMON_EVENT_SERVICE_ID, pageStateChangeListener_);
-    TELEPHONY_LOGI("CallControlManager::BroadcastSubscriber pageStateChangeListener_ ret: %{public}d", ret);
+    TELEPHONY_LOGI("ContactsBroadcastSubscriber ret: %{public}d", ret);
     return TELEPHONY_SUCCESS;
 }
 
 int32_t CallControlManager::SatcommBroadcastSubscriber()
 {
-    EventFwk::MatchingSkills matchingSkills_;
-    matchingSkills_.AddEvent("usual.event.thermal.satcomm.HIGH_TEMP_LEVEL");
-    EventFwk::CommonEventSubscribeInfo subscriberInfo_(matchingSkills_);
-    subscriberInfo_.SetThreadMode(EventFwk::CommonEventSubscribeInfo::COMMON);
-    subscriberInfo_.SetPublisherUid(SATCOMM_UID);
-    std::shared_ptr<CallBroadcastSubscriber> subscriberPtr_ =
-        std::make_shared<CallBroadcastSubscriber>(subscriberInfo_);
-    if (subscriberPtr_ == nullptr) {
-        TELEPHONY_LOGE("CallControlManager::BroadcastSubscriber subscriberPtr_ is nullptr");
+    EventFwk::MatchingSkills matchingSkill;
+    matchingSkill.AddEvent("usual.event.thermal.satcomm.HIGH_TEMP_LEVEL");
+    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkill);
+    subscriberInfo.SetThreadMode(EventFwk::CommonEventSubscribeInfo::COMMON);
+    subscriberInfo.SetPublisherUid(SATCOMM_UID);
+    std::shared_ptr<CallBroadcastSubscriber> subscriberPtr = std::make_shared<CallBroadcastSubscriber>(subscriberInfo);
+    if (subscriberPtr == nullptr) {
+        TELEPHONY_LOGE("SatcommBroadcastSubscriber subscriberPtr is nullptr");
         return TELEPHONY_ERROR;
     }
 
@@ -1613,29 +1611,27 @@ int32_t CallControlManager::SatcommBroadcastSubscriber()
         TELEPHONY_LOGE("samgrProxy is nullptr");
         return TELEPHONY_ERROR;
     }
-    satcommEventListener_ =
-        new (std::nothrow) SystemAbilityListener(subscriberPtr_);
+    satcommEventListener_ = new (std::nothrow) SystemAbilityListener(subscriberPtr);
     if (satcommEventListener_ == nullptr) {
         TELEPHONY_LOGE("satcommEventListener_ is nullptr");
         return TELEPHONY_ERROR;
     }
     int32_t ret = samgrProxy->SubscribeSystemAbility(COMMON_EVENT_SERVICE_ID, satcommEventListener_);
-    TELEPHONY_LOGI("CallControlManager::BroadcastSubscriber satcommEventListener_ ret: %{public}d", ret);
+    TELEPHONY_LOGI("SatcommBroadcastSubscriber ret: %{public}d", ret);
     return TELEPHONY_SUCCESS;
 }
 
 int32_t CallControlManager::SuperPrivacyModeBroadcastSubscriber()
 {
-    EventFwk::MatchingSkills matchingSkill_;
-    matchingSkill_.AddEvent("usual.event.SUPER_PRIVACY_MODE");
-    EventFwk::CommonEventSubscribeInfo subscriberInfos_(matchingSkill_);
-    subscriberInfos_.SetPublisherBundleName("com.settings");
-    subscriberInfos_.SetPermission("ohos.permission.SET_TELEPHONY_STATE");
-    subscriberInfos_.SetThreadMode(EventFwk::CommonEventSubscribeInfo::COMMON);
-    std::shared_ptr<CallBroadcastSubscriber> subscriberPtrs_ =
-        std::make_shared<CallBroadcastSubscriber>(subscriberInfos_);
-    if (subscriberPtrs_ == nullptr) {
-        TELEPHONY_LOGE("CallControlManager::BroadcastSubscriber subscriberPtrs_ is nullptr");
+    EventFwk::MatchingSkills matchingSkill;
+    matchingSkill.AddEvent("usual.event.SUPER_PRIVACY_MODE");
+    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkill);
+    subscriberInfo.SetPublisherBundleName("com.settings");
+    subscriberInfo.SetPermission("ohos.permission.SET_TELEPHONY_STATE");
+    subscriberInfo.SetThreadMode(EventFwk::CommonEventSubscribeInfo::COMMON);
+    std::shared_ptr<CallBroadcastSubscriber> subscriberPtr = std::make_shared<CallBroadcastSubscriber>(subscriberInfo);
+    if (subscriberPtr == nullptr) {
+        TELEPHONY_LOGE("SuperPrivacyModeBroadcastSubscriber subscriberPtr is nullptr");
         return TELEPHONY_ERROR;
     }
 
@@ -1644,14 +1640,13 @@ int32_t CallControlManager::SuperPrivacyModeBroadcastSubscriber()
         TELEPHONY_LOGE("samgrProxy is nullptr");
         return TELEPHONY_ERROR;
     }
-    superPrivacyEventListener_ =
-        new (std::nothrow) SystemAbilityListener(subscriberPtrs_);
+    superPrivacyEventListener_ = new (std::nothrow) SystemAbilityListener(subscriberPtr);
     if (superPrivacyEventListener_ == nullptr) {
         TELEPHONY_LOGE("superPrivacyEventListener_ is nullptr");
         return TELEPHONY_ERROR;
     }
     int32_t ret = samgrProxy->SubscribeSystemAbility(COMMON_EVENT_SERVICE_ID, superPrivacyEventListener_);
-    TELEPHONY_LOGI("CallControlManager::BroadcastSubscriber superPrivacyEventListener_ ret: %{public}d", ret);
+    TELEPHONY_LOGI("SuperPrivacyModeBroadcastSubscriber ret: %{public}d", ret);
     return TELEPHONY_SUCCESS;
 }
 
@@ -1659,23 +1654,19 @@ int32_t CallControlManager::BroadcastSubscriber()
 {
     int32_t ret = CommonBroadcastSubscriber();
     if (ret) {
-        TELEPHONY_LOGE("CommonBroadcastSubscriber fail.");
-        return ret;
+        TELEPHONY_LOGW("CommonBroadcastSubscriber fail.");
     }
     ret = ContactsBroadcastSubscriber();
     if (ret) {
-        TELEPHONY_LOGE("ContactsBroadcastSubscriber fail.");
-        return ret;
+        TELEPHONY_LOGW("ContactsBroadcastSubscriber fail.");
     }
     ret = SatcommBroadcastSubscriber();
     if (ret) {
-        TELEPHONY_LOGE("SatcommBroadcastSubscriber fail.");
-        return ret;
+        TELEPHONY_LOGW("SatcommBroadcastSubscriber fail.");
     }
     ret = SuperPrivacyModeBroadcastSubscriber();
     if (ret) {
-        TELEPHONY_LOGE("SuperPrivacyModeBroadcastSubscriber fail.");
-        return ret;
+        TELEPHONY_LOGW("SuperPrivacyModeBroadcastSubscriber fail.");
     }
     return TELEPHONY_SUCCESS;
 }
