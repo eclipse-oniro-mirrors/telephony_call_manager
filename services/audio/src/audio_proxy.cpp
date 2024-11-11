@@ -47,6 +47,7 @@ const std::unordered_map<VibrationType, std::string> EFFECT_ID_MAP = {
 
 const int32_t NO_DEVICE_VALID = 0;
 const int32_t RENDERER_FLAG = 0;
+const std::string LOCAL_DEVICE = "LocalDevice";
 
 AudioProxy::AudioProxy()
     : deviceCallback_(std::make_shared<AudioDeviceChangeCallback>()),
@@ -456,16 +457,12 @@ bool AudioPreferDeviceChangeCallback::IsDistributedDeviceSelected(
 {
     size_t size = desc.size();
     TELEPHONY_LOGI("desc size is: %{public}zu", size);
-    std::string deviceId = DelayedSingleton<DistributedCallManager>::GetInstance()->GetConnectedDCallDeviceId();
     for (auto iter = desc.begin(); iter != desc.end(); iter++) {
         std::string networkId = (*iter)->networkId_;
-        if (networkId.empty() || deviceId != networkId) {
-            continue;
+        if (LOCAL_DEVICE != networkId && (*iter)->deviceType_ == AudioStandard::DEVICE_TYPE_SPEAKER) {
+            TELEPHONY_LOGI("distributed device networkId.");
+            return true;
         }
-        DelayedSingleton<AudioDeviceManager>::GetInstance()->SetCurrentAudioDevice(
-            AudioDeviceType::DEVICE_DISTRIBUTED_AUTOMOTIVE);
-        TELEPHONY_LOGI("switch to distributed audio device");
-        return true;
     }
     return false;
 }

@@ -314,7 +314,7 @@ bool DistributedCallManager::SwitchOnDCallDeviceSync(const AudioDevice& device)
         TELEPHONY_LOGE("dcallProxy_ is nullptr");
         return false;
     }
-    ReportDistributedDeviceInfo();
+    ReportDistributedDeviceInfo(device);
     int32_t ret = dcallProxy_->SwitchDevice(devId, DCALL_SWITCH_DEVICE_TYPE_SINK);
     if (ret == TELEPHONY_SUCCESS) {
         dCallDeviceSwitchedOn_.store(true);
@@ -392,9 +392,9 @@ bool DistributedCallManager::IsSelectVirtualModem()
     return dcallProxy_->IsSelectVirtualModem();
 }
 
-void DistributedCallManager::ReportDistributedDeviceInfo()
+void DistributedCallManager::ReportDistributedDeviceInfo(const AudioDevice& device)
 {
-    std::string curDevId = GetConnectedDCallDeviceId();
+    std::string curDevId = GetDevIdFromAudioDevice(device);
     TELEPHONY_LOGD("curDevId = %{public}s", GetAnonyString(curDevId).c_str());
     AudioSystemManager *audioSystemMananger = AudioSystemManager::GetInstance();
     if (audioSystemMananger == nullptr) {
