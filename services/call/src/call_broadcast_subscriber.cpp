@@ -48,6 +48,8 @@ CallBroadcastSubscriber::CallBroadcastSubscriber(const OHOS::EventFwk::CommonEve
         [this](const EventFwk::CommonEventData &data) { UpdateBluetoothDeviceName(data); };
     memberFuncMap_[USER_SWITCHED] =
         [this](const EventFwk::CommonEventData &data) { ConnectCallUiUserSwitchedBroadcast(data); };
+    memberFuncMap_[SHUTDOWN] =
+        [this](const EventFwk::CommonEventData &data) { ShutdownBroadcast(data); };
 }
 
 void CallBroadcastSubscriber::OnReceiveEvent(const EventFwk::CommonEventData &data)
@@ -68,6 +70,8 @@ void CallBroadcastSubscriber::OnReceiveEvent(const EventFwk::CommonEventData &da
         code = BLUETOOTH_REMOTEDEVICE_NAME_UPDATE;
     } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_USER_SWITCHED) {
         code = USER_SWITCHED;
+    } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_SHUTDOWN) {
+        code = SHUTDOWN;
     } else {
         code = UNKNOWN_BROADCAST_EVENT;
     }
@@ -156,6 +160,12 @@ void CallBroadcastSubscriber::ConnectCallUiUserSwitchedBroadcast(const EventFwk:
     DelayedSingleton<CallConnectAbility>::GetInstance()->DisconnectAbility();
     sptr<CallAbilityConnectCallback> connectCallback_ = new CallAbilityConnectCallback();
     connectCallback_->ReConnectAbility();
+}
+
+void CallBroadcastSubscriber::ShutdownBroadcast(const EventFwk::CommonEventData &data)
+{
+    TELEPHONY_LOGI("system is shutdown.");
+    DelayedSingleton<CallControlManager>::GetInstance()->DisconnectAllCalls();
 }
 } // namespace Telephony
 } // namespace OHOS
