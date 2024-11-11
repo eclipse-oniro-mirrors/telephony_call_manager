@@ -131,6 +131,10 @@ public:
 private:
     void CallStateObserve();
     int32_t NumberLegalityCheck(std::string &number);
+    int32_t CommonBroadcastSubscriber();
+    int32_t ContactsBroadcastSubscriber();
+    int32_t SatcommBroadcastSubscriber();
+    int32_t SuperPrivacyModeBroadcastSubscriber();
     int32_t BroadcastSubscriber();
     void ReportPhoneUEInSuperPrivacy(const std::string &eventName);
     void PackageDialInformation(AppExecFwk::PacMap &extras, std::string accountNumber, bool isEcc);

@@ -1479,13 +1479,19 @@ void CallControlManager::ReleaseIncomingLock()
 void CallControlManager::DisconnectAllCalls()
 {
     std::list<sptr<CallBase>> allCallList = CallObjectManager::GetAllCallList();
+    int32_t ret = -1;
     for (auto call : allCallList) {
         if (call == nullptr) {
             continue;
         }
-        int32_t ret = HangUpCall(call->GetCallID());
+        if (call->GetCallRunningState() == CallRunningState::CALL_RUNNING_STATE_RINGING) {
+            ret = RejectCall(call->GetCallID(), false, Str8ToStr16(""));
+        } else {
+            ret = HangUpCall(call->GetCallID());
+        }
         if (ret == TELEPHONY_SUCCESS) {
-            TELEPHONY_LOGI("one call is disconnected. call state: %{public}d", call->GetCallRunningState());
+            TELEPHONY_LOGI("one call is disconnected. call state: %{public}d, callId: %{public}d",
+                call->GetCallRunningState(), call->GetCallID());
         }
     }
 }
@@ -1529,7 +1535,7 @@ void CallControlManager::SystemAbilityListener::OnRemoveSystemAbility(
     TELEPHONY_LOGI("CallControlManager::OnRemoveSystemAbility subscribeResult = %{public}d", subscribeResult);
 }
 
-int32_t CallControlManager::BroadcastSubscriber()
+int32_t CallControlManager::CommonBroadcastSubscriber()
 {
     EventFwk::MatchingSkills matchingSkills;
     matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_SIM_STATE_CHANGED);
@@ -1544,6 +1550,24 @@ int32_t CallControlManager::BroadcastSubscriber()
         return TELEPHONY_ERROR;
     }
 
+    // if SubscribeCommonEvent fail, register statusChangeListener to SubscribeCommonEvent again
+    auto samgrProxy = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (samgrProxy == nullptr) {
+        TELEPHONY_LOGE("samgrProxy is nullptr");
+        return TELEPHONY_ERROR;
+    }
+    statusChangeListener_ = new (std::nothrow) SystemAbilityListener(subscriberPtr);
+    if (statusChangeListener_ == nullptr) {
+        TELEPHONY_LOGE("statusChangeListener_ is nullptr");
+        return TELEPHONY_ERROR;
+    }
+    int32_t ret = samgrProxy->SubscribeSystemAbility(COMMON_EVENT_SERVICE_ID, statusChangeListener_);
+    TELEPHONY_LOGI("CallControlManager::BroadcastSubscriber statusChangeListener_ ret: %{public}d", ret);
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallControlManager::ContactsBroadcastSubscriber()
+{
     EventFwk::MatchingSkills matchingSkill;
     matchingSkill.AddEvent("event.custom.contacts.PAGE_STATE_CHANGE");
     EventFwk::CommonEventSubscribeInfo subscriberInfomation(matchingSkill);
@@ -1556,6 +1580,24 @@ int32_t CallControlManager::BroadcastSubscriber()
         return TELEPHONY_ERROR;
     }
 
+    // if SubscribeCommonEvent fail, register statusChangeListener to SubscribeCommonEvent again
+    auto samgrProxy = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (samgrProxy == nullptr) {
+        TELEPHONY_LOGE("samgrProxy is nullptr");
+        return TELEPHONY_ERROR;
+    }
+    pageStateChangeListener_ = new (std::nothrow) SystemAbilityListener(subscriber);
+    if (pageStateChangeListener_ == nullptr) {
+        TELEPHONY_LOGE("pageStateChangeListener_ is nullptr");
+        return TELEPHONY_ERROR;
+    }
+    int32_t ret = samgrProxy->SubscribeSystemAbility(COMMON_EVENT_SERVICE_ID, pageStateChangeListener_);
+    TELEPHONY_LOGI("CallControlManager::BroadcastSubscriber pageStateChangeListener_ ret: %{public}d", ret);
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallControlManager::SatcommBroadcastSubscriber()
+{
     EventFwk::MatchingSkills matchingSkills_;
     matchingSkills.AddEvent("usual.event.thermal.satcomm.HIGH_TEMP_LEVEL");
     EventFwk::CommonEventSubscribeInfo subscriberInfo_(matchingSkills_);
@@ -1568,6 +1610,25 @@ int32_t CallControlManager::BroadcastSubscriber()
         return TELEPHONY_ERROR;
     }
 
+    // if SubscribeCommonEvent fail, register statusChangeListener to SubscribeCommonEvent again
+    auto samgrProxy = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (samgrProxy == nullptr) {
+        TELEPHONY_LOGE("samgrProxy is nullptr");
+        return TELEPHONY_ERROR;
+    }
+    satcommEventListener_ =
+        new (std::nothrow) SystemAbilityListener(subscriberPtr_);
+    if (satcommEventListener_ == nullptr) {
+        TELEPHONY_LOGE("satcommEventListener_ is nullptr");
+        return TELEPHONY_ERROR;
+    }
+    int32_t ret = samgrProxy->SubscribeSystemAbility(COMMON_EVENT_SERVICE_ID, satcommEventListener_);
+    TELEPHONY_LOGI("CallControlManager::BroadcastSubscriber satcommEventListener_ ret: %{public}d", ret);
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallControlManager::SuperPrivacyModeBroadcastSubscriber()
+{
     EventFwk::MatchingSkills matchingSkill_;
     matchingSkill_.AddEvent("usual.event.SUPER_PRIVACY_MODE");
     EventFwk::CommonEventSubscribeInfo subscriberInfos_(matchingSkill_);
@@ -1587,36 +1648,39 @@ int32_t CallControlManager::BroadcastSubscriber()
         TELEPHONY_LOGE("samgrProxy is nullptr");
         return TELEPHONY_ERROR;
     }
-    statusChangeListener_ = new (std::nothrow) SystemAbilityListener(subscriberPtr);
-    if (statusChangeListener_ == nullptr) {
-        TELEPHONY_LOGE("statusChangeListener_ is nullptr");
-        return TELEPHONY_ERROR;
-    }
-    pageStateChangeListener_ = new (std::nothrow) SystemAbilityListener(subscriber);
-    if (pageStateChangeListener_ == nullptr) {
-        TELEPHONY_LOGE("pageStateChangeListener_ is nullptr");
-        return TELEPHONY_ERROR;
-    }
-    satcommEventListener_ =
-        new (std::nothrow) SystemAbilityListener(subscriberPtr_);
-    if (satcommEventListener_ == nullptr) {
-        TELEPHONY_LOGE("satcommEventListener_ is nullptr");
-        return TELEPHONY_ERROR;
-    }
     superPrivacyEventListener_ =
         new (std::nothrow) SystemAbilityListener(subscriberPtrs_);
     if (superPrivacyEventListener_ == nullptr) {
         TELEPHONY_LOGE("superPrivacyEventListener_ is nullptr");
         return TELEPHONY_ERROR;
     }
-    int32_t ret = samgrProxy->SubscribeSystemAbility(COMMON_EVENT_SERVICE_ID, statusChangeListener_);
-    TELEPHONY_LOGI("CallControlManager::BroadcastSubscriber statusChangeListener_ ret: %{public}d", ret);
-    ret = samgrProxy->SubscribeSystemAbility(COMMON_EVENT_SERVICE_ID, pageStateChangeListener_);
-    TELEPHONY_LOGI("CallControlManager::BroadcastSubscriber pageStateChangeListener_ ret: %{public}d", ret);
-    ret = samgrProxy->SubscribeSystemAbility(COMMON_EVENT_SERVICE_ID, satcommEventListener_);
-    TELEPHONY_LOGI("CallControlManager::BroadcastSubscriber satcommEventListener_ ret: %{public}d", ret);
-    ret = samgrProxy->SubscribeSystemAbility(COMMON_EVENT_SERVICE_ID, superPrivacyEventListener_);
+    int32_t ret = samgrProxy->SubscribeSystemAbility(COMMON_EVENT_SERVICE_ID, superPrivacyEventListener_);
     TELEPHONY_LOGI("CallControlManager::BroadcastSubscriber superPrivacyEventListener_ ret: %{public}d", ret);
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallControlManager::BroadcastSubscriber()
+{
+    int32_t ret = CommonBroadcastSubscriber()
+    if (ret) {
+        TELEPHONY_LOGE("CommonBroadcastSubscriber fail.");
+        return ret;
+    }
+    ret = ContactsBroadcastSubscriber();
+    if (ret) {
+        TELEPHONY_LOGE("ContactsBroadcastSubscriber fail.");
+        return ret;
+    }
+    int32_t SatcommBroadcastSubscriber();
+    if (ret) {
+        TELEPHONY_LOGE("SatcommBroadcastSubscriber fail.");
+        return ret;
+    }
+    int32_t SuperPrivacyModeBroadcastSubscriber();
+    if (ret) {
+        TELEPHONY_LOGE("SuperPrivacyModeBroadcastSubscriber fail.");
+        return ret;
+    }
     return TELEPHONY_SUCCESS;
 }
 
