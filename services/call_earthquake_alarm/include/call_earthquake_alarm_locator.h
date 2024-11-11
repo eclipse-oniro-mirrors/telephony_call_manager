@@ -76,8 +76,7 @@ public:
     static std::shared_ptr<MyLocationEngine> GetInstance();
     static void StartEccService(sptr<CallBase> call, const CallDetailInfo &info);
     static void StopEccService(int32_t callId);
-    static void ConnectAbility(std::string value, sptr<AAFwk::IAbilityConnection>& callback,
-        const CallDetailInfo &info);
+    static void ConnectAbility(std::string value, sptr<AAFwk::IAbilityConnection>& callback, AAFwk::Want& want);
 private:
     class MyLocationCallBack : public IRemoteStub<Location::ILocatorCallback> {
     public:

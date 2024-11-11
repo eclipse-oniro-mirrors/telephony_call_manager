@@ -215,11 +215,11 @@ void MyLocationEngine::MyLocationCallBack::OnLocationReport(const std::unique_pt
         TELEPHONY_LOGE("location is nullptr");
         return;
     }
-    CallDetailInfo info;
-    info.latitude_ = std::to_string(location->GetLatitude());
-    info.longitude_ = std::to_string(location->GetLongitude());
+    AAFwk::Want want;
+    want.SetParam("latitude", std::to_string(location->GetLatitude()));
+    want.SetParam("longitude", std::to_string(location->GetLongitude()));
     MyLocationEngine::ConnectAbility(MyLocationEngine::PARAMETERS_VALUE,
-        EmergencyCallConnectCallback::connectCallback_, info);
+        EmergencyCallConnectCallback::connectCallback_, want);
 }
 
 void MyLocationEngine::BootComplete(bool switchState)
@@ -315,9 +315,9 @@ void OOBESwitchObserver::OnChange()
     mValue = MyLocationEngine::INITIAL_FIRST_VALUE;
     if (MyLocationEngine::IsSwitchOn(LocationSubscriber::SWITCH_STATE_KEY, mValue)) {
         TELEPHONY_LOGI("the alarm switch is open");
-        CallDetailInfo info;
+        AAFwk::Want want;
         MyLocationEngine::ConnectAbility(MyLocationEngine::PARAMETERS_VALUE_OOBE,
-            EmergencyCallConnectCallback::connectCallback_, info);
+            EmergencyCallConnectCallback::connectCallback_, want);
     }
     ffrt::submit([&]() {
         for (auto& oobeKey : MyLocationEngine::settingsCallbacks) {
@@ -335,9 +335,8 @@ int32_t EmergencyCallConnectCallback::nowCallId = -1;
 sptr<AAFwk::IAbilityConnection> EmergencyCallConnectCallback::connectCallback_ = nullptr;
 sptr<AAFwk::IAbilityConnection> EmergencyCallConnectCallback::connectCallbackEcc = nullptr;
 void MyLocationEngine::ConnectAbility(std::string value, sptr<AAFwk::IAbilityConnection>& callback,
-    const CallDetailInfo &info)
+    AAFwk::Want& want)
 {
-    AAFwk::Want want;
     std::string abilityName = EMERGENCY_ABILITY_NAME;
     want.SetParam(PARAMETERS_KEY, value);
     if (callback == nullptr) {
@@ -345,12 +344,6 @@ void MyLocationEngine::ConnectAbility(std::string value, sptr<AAFwk::IAbilityCon
     }
     if (value == PARAMETERS_VALUE_ECC) {
         abilityName = EMERGENCY_ABILITY_NAME_ECC;
-        want.SetParam(PARAMETERS_KEY_SLOTID, std::to_string(info.accountId));
-        want.SetParam(PARAMETERS_KEY_PHONE_NUMBER, std::string(info.phoneNum));
-    }
-    if (value == PARAMETERS_VALUE) {
-        want.SetParam("latitude", info.latitude_);
-        want.SetParam("longitude", info.longitude_);
     }
     int32_t userId = -1;
     AppExecFwk::ElementName element(EMERGENCY_DEVICE_ID, EMERGENCY_BUNDLE_NAME, abilityName);
@@ -381,7 +374,10 @@ void MyLocationEngine::StartEccService(sptr<CallBase> call, const CallDetailInfo
         TELEPHONY_LOGE("ecc switch is close");
         return;
     }
-    ConnectAbility(PARAMETERS_VALUE_ECC, EmergencyCallConnectCallback::connectCallbackEcc, info);
+    AAFwk::Want want;
+    want.SetParam(PARAMETERS_KEY_SLOTID, std::to_string(info.accountId));
+    want.SetParam(PARAMETERS_KEY_PHONE_NUMBER, std::string(info.phoneNum));
+    ConnectAbility(PARAMETERS_VALUE_ECC, EmergencyCallConnectCallback::connectCallbackEcc, want);
     EmergencyCallConnectCallback::nowCallId = call->GetCallID();
     EmergencyCallConnectCallback::isStartEccService = true;
 }

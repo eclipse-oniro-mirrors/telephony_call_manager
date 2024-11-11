@@ -204,7 +204,8 @@ HWTEST_F(LocationEngineTest, Telephony_EmergencyCallConnectCallback_001, Functio
     auto engine = engine1->GetInstance();
     sptr<AAFwk::IAbilityConnection> connectcallback = sptr<EmergencyCallConnectCallback>::MakeSptr();
     CallDetailInfo info;
-    engine->ConnectAbility("valuetest1111", connectcallback, info);
+    AAFwk::Want want;
+    engine->ConnectAbility("valuetest1111", connectcallback, want);
     engine->StartEccService(nullptr, info);
     engine->StopEccService(-1);
     std::string bundle = "111";
