@@ -38,7 +38,7 @@ bool CallVoiceAssistantManager::IsStartVoiceBroadcast()
 {
     if (!isQueryedBroadcastSwitch) {
         TELEPHONY_LOGI("first query broad switch");
-        bool queryResult = = IsSwitchOn(BROADCAST_SWITCH);
+        bool queryResult = IsSwitchOn(BROADCAST_SWITCH);
         isBroadcastSwitchOn = queryResult;
         isQueryedBroadcastSwitch = true;
         return queryResult;
