@@ -1567,9 +1567,9 @@ int32_t CallControlManager::CommonBroadcastSubscriber()
 
 int32_t CallControlManager::ContactsBroadcastSubscriber()
 {
-    EventFwk::MatchingSkills matchingSkill;
-    matchingSkill.AddEvent("event.custom.contacts.PAGE_STATE_CHANGE");
-    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkill);
+    EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent("event.custom.contacts.PAGE_STATE_CHANGE");
+    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
     subscriberInfo.SetThreadMode(EventFwk::CommonEventSubscribeInfo::COMMON);
     subscriberInfo.SetPermission("ohos.permission.SET_TELEPHONY_STATE");
     std::shared_ptr<CallBroadcastSubscriber> subscriberPtr = std::make_shared<CallBroadcastSubscriber>(subscriberInfo);
@@ -1595,9 +1595,9 @@ int32_t CallControlManager::ContactsBroadcastSubscriber()
 
 int32_t CallControlManager::SatcommBroadcastSubscriber()
 {
-    EventFwk::MatchingSkills matchingSkill;
-    matchingSkill.AddEvent("usual.event.thermal.satcomm.HIGH_TEMP_LEVEL");
-    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkill);
+    EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent("usual.event.thermal.satcomm.HIGH_TEMP_LEVEL");
+    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
     subscriberInfo.SetThreadMode(EventFwk::CommonEventSubscribeInfo::COMMON);
     subscriberInfo.SetPublisherUid(SATCOMM_UID);
     std::shared_ptr<CallBroadcastSubscriber> subscriberPtr = std::make_shared<CallBroadcastSubscriber>(subscriberInfo);
@@ -1623,9 +1623,9 @@ int32_t CallControlManager::SatcommBroadcastSubscriber()
 
 int32_t CallControlManager::SuperPrivacyModeBroadcastSubscriber()
 {
-    EventFwk::MatchingSkills matchingSkill;
-    matchingSkill.AddEvent("usual.event.SUPER_PRIVACY_MODE");
-    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkill);
+    EventFwk::MatchingSkills matchingSkills;
+    matchingSkills.AddEvent("usual.event.SUPER_PRIVACY_MODE");
+    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
     subscriberInfo.SetPublisherBundleName("com.settings");
     subscriberInfo.SetPermission("ohos.permission.SET_TELEPHONY_STATE");
     subscriberInfo.SetThreadMode(EventFwk::CommonEventSubscribeInfo::COMMON);
