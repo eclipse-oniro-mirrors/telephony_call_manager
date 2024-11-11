@@ -1657,7 +1657,7 @@ int32_t CallControlManager::SuperPrivacyModeBroadcastSubscriber()
 
 int32_t CallControlManager::BroadcastSubscriber()
 {
-    int32_t ret = CommonBroadcastSubscriber()
+    int32_t ret = CommonBroadcastSubscriber();
     if (ret) {
         TELEPHONY_LOGE("CommonBroadcastSubscriber fail.");
         return ret;
