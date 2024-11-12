@@ -713,10 +713,11 @@ int32_t VideoPauseState::RecieveUpdateCallMediaModeRequest(CallMediaModeInfo &im
         case ImsCallMode::CALL_MODE_AUDIO_ONLY:
         case ImsCallMode::CALL_MODE_SEND_RECEIVE:
             ret = SwitchCallVideoState(imsCallModeInfo.callMode);
-            if (ret == TELEPHONY_SUCCESS) {
+            if (ret != TELEPHONY_SUCCESS) {
                 TELEPHONY_LOGE("error occur when switch call state");
                 return ret;
             }
+            (void)DispatchReportVideoCallInfo(imsCallModeInfo);
             SetVideoUpdateStatus(VideoUpdateStatus::STATUS_NONE);
             break;
         case ImsCallMode::CALL_MODE_SEND_ONLY:
