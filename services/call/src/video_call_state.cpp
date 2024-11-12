@@ -410,7 +410,7 @@ int32_t VideoReceiveState::SendUpdateCallMediaModeRequest(ImsCallMode mode)
                 return ret;
             }
             ret = SwitchCallVideoState(mode);
-            if (ret) {
+            if (ret != TELEPHONY_SUCCESS) {
                 TELEPHONY_LOGE("error occur when switch call state");
                 return ret;
             }
@@ -476,7 +476,7 @@ int32_t VideoReceiveState::SendUpdateCallMediaModeResponse(ImsCallMode mode)
         case ImsCallMode::CALL_MODE_AUDIO_ONLY:
         case ImsCallMode::CALL_MODE_VIDEO_PAUSED:
             ret = SwitchCallVideoState(mode);
-            if (ret == TELEPHONY_SUCCESS) {
+            if (ret != TELEPHONY_SUCCESS) {
                 TELEPHONY_LOGE("error occur when switch call state");
                 return ret;
             }
@@ -498,7 +498,7 @@ int32_t VideoReceiveState::SendUpdateCallMediaModeResponse(ImsCallMode mode)
             SetVideoUpdateStatus(VideoUpdateStatus::STATUS_NONE);
             DispatchUpdateVideoResponse(ImsCallMode::CALL_MODE_SEND_RECEIVE);
             ret = SwitchCallVideoState(mode);
-            if (ret) {
+            if (ret != TELEPHONY_SUCCESS) {
                 TELEPHONY_LOGE("error occur when switch call state");
                 return ret;
             }
@@ -682,7 +682,7 @@ int32_t VideoPauseState::SendUpdateCallMediaModeRequest(ImsCallMode mode)
                 return ret;
             }
             ret = SwitchCallVideoState(mode);
-            if (ret == TELEPHONY_SUCCESS) {
+            if (ret != TELEPHONY_SUCCESS) {
                 TELEPHONY_LOGE("error occur when switch call state");
                 return ret;
             }
