@@ -407,12 +407,14 @@ int32_t CallControlManager::HangUpCall(int32_t callId)
 int32_t CallControlManager::GetCallState()
 {
     CallStateToApp callState = CallStateToApp::CALL_STATE_UNKNOWN;
-    if (!HasCellularCallExist()) {
+    if (!HasCellularCallExist() && (VoIPCallState_ == CallStateToApp::CALL_STATE_IDLE ||
+        VoIPCallState_ == CallStateToApp::CALL_STATE_UNKNOWN)) {
         callState = CallStateToApp::CALL_STATE_IDLE;
     } else {
         callState = CallStateToApp::CALL_STATE_OFFHOOK;
         bool hasRingingCall = false;
-        if ((HasRingingCall(hasRingingCall) == TELEPHONY_SUCCESS) && hasRingingCall) {
+        if ((HasRingingCall(hasRingingCall) == TELEPHONY_SUCCESS && hasRingingCall) ||
+            VoIPCallState_ == CallStateToApp::CALL_STATE_RINGING) {
             callState = CallStateToApp::CALL_STATE_RINGING;
         }
     }
@@ -479,7 +481,13 @@ int32_t CallControlManager::SwitchCall(int32_t callId)
 
 bool CallControlManager::HasCall()
 {
-    return HasCellularCallExist();
+    if (VoIPCallState_ == CallStateToApp::CALL_STATE_ANSWERED ||
+        VoIPCallState_ == CallStateToApp::CALL_STATE_OFFHOOK ||
+        VoIPCallState_ == CallStateToApp::CALL_STATE_RINGING ||
+        HasCellularCallExist()) {
+        return true;
+    }
+    return false;
 }
 
 int32_t CallControlManager::IsNewCallAllowed(bool &enabled)
