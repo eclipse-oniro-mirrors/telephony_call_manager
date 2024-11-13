@@ -667,7 +667,7 @@ int32_t CallStatusManager::DialingHandle(const CallDetailInfo &info)
     if (isDistributedDeviceDialing) {
         AAFwk::WantParams extraParam;
         extraParams.SetParam("isDistributedDeviceDialing", AAFwk::String::Box("true"));
-        call->SetExtraParams(extraParams)
+        call->SetExtraParams(extraParams);
     }
     if (call == nullptr) {
         TELEPHONY_LOGE("CreateNewCall failed!");
