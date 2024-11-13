@@ -110,6 +110,8 @@ void NapiCallAbilityCallback::RegisterAudioDeviceCallback(EventCallback eventCal
 void NapiCallAbilityCallback::UnRegisterAudioDeviceCallback()
 {
     if (audioDeviceCallback_.callbackRef) {
+        napi_delete_reference(audioDeviceCallback_.env, audioDeviceCallback_.callbackRef);
+        napi_delete_reference(audioDeviceCallback_.env, audioDeviceCallback_.thisVar);
         (void)memset_s(&audioDeviceCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
     }
 }
@@ -122,6 +124,8 @@ void NapiCallAbilityCallback::RegisterPostDialDelay(EventCallback eventCallback)
 void NapiCallAbilityCallback::UnRegisterPostDialDelayCallback()
 {
     if (postDialDelayCallback_.callbackRef) {
+        napi_delete_reference(postDialDelayCallback_.env, postDialDelayCallback_.callbackRef);
+        napi_delete_reference(postDialDelayCallback_.env, postDialDelayCallback_.thisVar);
         (void)memset_s(&postDialDelayCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
     }
 }
