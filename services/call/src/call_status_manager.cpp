@@ -665,7 +665,7 @@ int32_t CallStatusManager::DialingHandle(const CallDetailInfo &info)
     }
     sptr<CallBase> call = CreateNewCall(info, CallDirection::CALL_DIRECTION_OUT);
     if (isDistributedDeviceDialing) {
-        AAFwk::WantParams extraParam;
+        AAFwk::WantParams extraParams;
         extraParams.SetParam("isDistributedDeviceDialing", AAFwk::String::Box("true"));
         call->SetExtraParams(extraParams);
     }
