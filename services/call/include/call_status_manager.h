@@ -110,6 +110,7 @@ private:
     void SetConferenceCall(std::vector<sptr<CallBase>>);
     std::vector<sptr<CallBase>> GetConferenceCallList(int32_t slotId);
     void UpdateCallDetailsInfo(const CallDetailsInfo &info);
+    bool IsDistributeCallSourceStatus();
 
 private:
     CallDetailInfo callReportInfo_;

@@ -87,6 +87,7 @@ public:
     bool StopSoundtone();
     bool PlaySoundtone();
     void PlayCallEndedTone(CallEndedType type);
+    bool IsDistributeCallSinkStatus();
 
 private:
     RingState ringState_ = RingState::STOPPED;
@@ -105,7 +106,6 @@ private:
     void ProcessAudioWhenCallActive(sptr<CallBase> &callObjectPtr);
     int32_t HandleDistributeAudioDevice(const AudioDevice &device);
     void SendMuteRingEvent();
-    bool IsDistributeCallSinkStatus();
     bool IsRingingVibrateModeOn();
     bool IsVoIPCallActived();
     int32_t SwitchAudioDevice(AudioDeviceType audioDeviceType);
