@@ -656,7 +656,9 @@ int32_t CallStatusManager::DialingHandle(const CallDetailInfo &info)
         sptr<CallBase> call = GetOneCallObjectByIndexAndSlotId(INIT_INDEX, info.accountId);
         if (call == nullptr) {
             call = GetOneCallObjectByIndexAndSlotId(info.index, info.accountId);
-            isDistributedDeviceDialing = true;
+            if (IsDistributeCallSourceStatus()) {
+                isDistributedDeviceDialing = true;
+            }
         }
         if (call != nullptr) {
             TELEPHONY_LOGI("need update call info");
@@ -1611,7 +1613,8 @@ bool CallStatusManager::IsRejectCall(sptr<CallBase> &call, const CallDetailInfo 
         block = true;
         return true;
     }
-    if (IsFocusModeOpen() && !IsDistributeCallSinkStatus()) {
+    if (!DelayedSingleton<AudioDeviceManager>::GetInstance()->IsDistributeCallSinkStatus() &&
+        IsFocusModeOpen()) {
         int ret = Notification::NotificationHelper::IsNeedSilentInDoNotDisturbMode(info.phoneNum, 0);
         TELEPHONY_LOGW("IsRejectCall IsNeedSilentInDoNotDisturbMode ret:%{public}d", ret);
         if (ret == 0) {
@@ -1711,7 +1714,7 @@ bool CallStatusManager::IsDcCallConneceted()
     return false;
 }
 
-bool CallStatusManager::IsDistributeCallSinkStatus()
+bool CallStatusManager::IsDistributeCallSourceStatus()
 {
     std::string dcStatus = "";
     auto settingHelper = SettingsDataShareHelper::GetInstance();
@@ -1719,7 +1722,7 @@ bool CallStatusManager::IsDistributeCallSinkStatus()
         OHOS::Uri settingUri(SettingsDataShareHelper::SETTINGS_DATASHARE_URI);
         settingHelper->Query(settingUri, "distributed_modem_state", dcStatus);
     }
-    if (dcStatus == "1_sink") {
+    if (dcStatus == "1_source") {
         return true;
     }
     return false;
