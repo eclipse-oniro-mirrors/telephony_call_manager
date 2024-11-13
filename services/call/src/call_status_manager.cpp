@@ -651,10 +651,12 @@ int32_t CallStatusManager::UpdateDialingCallInfo(const CallDetailInfo &info)
 int32_t CallStatusManager::DialingHandle(const CallDetailInfo &info)
 {
     TELEPHONY_LOGI("handle dialing state");
+    bool isDistributedDeviceDialing = false;
     if (info.index > 0) {
         sptr<CallBase> call = GetOneCallObjectByIndexAndSlotId(INIT_INDEX, info.accountId);
         if (call == nullptr) {
             call = GetOneCallObjectByIndexAndSlotId(info.index, info.accountId);
+            isDistributedDeviceDialing = true;
         }
         if (call != nullptr) {
             TELEPHONY_LOGI("need update call info");
@@ -662,6 +664,11 @@ int32_t CallStatusManager::DialingHandle(const CallDetailInfo &info)
         }
     }
     sptr<CallBase> call = CreateNewCall(info, CallDirection::CALL_DIRECTION_OUT);
+    if (isDistributedDeviceDialing) {
+        AAFwk::WantParams extraParam;
+        extraParams.SetParam("isDistributedDeviceDialing", AAFwk::String::Box("true"));
+        call->SetExtraParams(extraParams)
+    }
     if (call == nullptr) {
         TELEPHONY_LOGE("CreateNewCall failed!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -1604,7 +1611,7 @@ bool CallStatusManager::IsRejectCall(sptr<CallBase> &call, const CallDetailInfo 
         block = true;
         return true;
     }
-    if (IsFocusModeOpen()) {
+    if (IsFocusModeOpen() && !IsDistributeCallSinkStatus()) {
         int ret = Notification::NotificationHelper::IsNeedSilentInDoNotDisturbMode(info.phoneNum, 0);
         TELEPHONY_LOGW("IsRejectCall IsNeedSilentInDoNotDisturbMode ret:%{public}d", ret);
         if (ret == 0) {
@@ -1699,6 +1706,20 @@ bool CallStatusManager::IsDcCallConneceted()
         settingHelper->Query(settingUri, "distributed_modem_state", dcStatus);
     }
     if (dcStatus == "1_sink" || dcStatus == "1_source") {
+        return true;
+    }
+    return false;
+}
+
+bool CallStatusManager::IsDistributeCallSinkStatus()
+{
+    std::string dcStatus = "";
+    auto settingHelper = SettingsDataShareHelper::GetInstance();
+    if (settingHelper != nullptr) {
+        OHOS::Uri settingUri(SettingsDataShareHelper::SETTINGS_DATASHARE_URI);
+        settingHelper->Query(settingUri, "distributed_modem_state", dcStatus);
+    }
+    if (dcStatus == "1_sink") {
         return true;
     }
     return false;
