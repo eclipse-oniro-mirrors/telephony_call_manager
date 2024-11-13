@@ -1613,7 +1613,7 @@ bool CallStatusManager::IsRejectCall(sptr<CallBase> &call, const CallDetailInfo 
         block = true;
         return true;
     }
-    if (!DelayedSingleton<AudioDeviceManager>::GetInstance()->IsDistributeCallSinkStatus() &&
+    if (!DelayedSingleton<AudioControlManager>::GetInstance()->IsDistributeCallSinkStatus() &&
         IsFocusModeOpen()) {
         int ret = Notification::NotificationHelper::IsNeedSilentInDoNotDisturbMode(info.phoneNum, 0);
         TELEPHONY_LOGW("IsRejectCall IsNeedSilentInDoNotDisturbMode ret:%{public}d", ret);
