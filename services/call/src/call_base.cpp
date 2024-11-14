@@ -533,6 +533,12 @@ void CallBase::SetAnswerType(CallAnswerType answerType)
     answerType_ = answerType;
 }
 
+CallAnswerType CallBase::GetAnswerType()
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    return answerType_;
+}
+
 CallEndedType CallBase::GetCallEndedType()
 {
     std::lock_guard<std::mutex> lock(mutex_);

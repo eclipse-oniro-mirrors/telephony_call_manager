@@ -31,15 +31,11 @@ public:
     void IncomingCallActivated(sptr<CallBase> &callObjectPtr) override;
     void IncomingCallHungUp(sptr<CallBase> &callObjectPtr, bool isSendSms, std::string content) override;
     void CallStateUpdated(sptr<CallBase> &callObjectPtr, TelCallState priorState, TelCallState nextState) override;
-    int32_t CancelMissedCallsNotification(int32_t id);
     int32_t NotifyUnReadMissedCall(std::map<std::string, int32_t> &phoneNumAndUnreadCountMap);
     void PublishMissedCallEvent(sptr<CallBase> &callObjectPtr);
     void PublishBlockedCallEvent(sptr<CallBase> &callObjectPtr);
-    void PublishMissedCallNotification(sptr<CallBase> &callObjectPtr);
 
 private:
-    bool isIncomingCallMissed_;
-    std::string incomingCallNumber_;
     static constexpr int16_t INCOMING_CALL_MISSED_ID = 0;
     static constexpr int16_t INCOMING_CALL_MISSED_CODE = 0;
     const std::string INCOMING_CALL_MISSED_TITLE = "Missed Call";

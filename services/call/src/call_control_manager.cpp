@@ -1425,7 +1425,6 @@ int32_t CallControlManager::AddCallLogAndNotification(sptr<CallBase> &callObject
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     missedCallNotification_->PublishMissedCallEvent(callObjectPtr);
-    missedCallNotification_->PublishMissedCallNotification(callObjectPtr);
     return TELEPHONY_SUCCESS;
 }
 

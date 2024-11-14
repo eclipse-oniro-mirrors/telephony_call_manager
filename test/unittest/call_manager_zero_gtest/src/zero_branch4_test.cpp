@@ -496,9 +496,6 @@ HWTEST_F(ZeroBranch3Test, Telephony_MissedCallNotification_001, Function | Mediu
         callObjectPtr, TelCallState::CALL_STATUS_DISCONNECTED, TelCallState::CALL_STATUS_INCOMING);
 
     missedCallNotification->PublishMissedCallEvent(callObjectPtr);
-    missedCallNotification->PublishMissedCallNotification(callObjectPtr);
-    int32_t id = 1;
-    ASSERT_EQ(missedCallNotification->CancelMissedCallsNotification(id), TELEPHONY_SUCCESS);
     std::map<std::string, int32_t> phoneNumAndUnReadCountMap;
     phoneNumAndUnReadCountMap.insert(pair<string, int>("000", 1));
     ASSERT_EQ(missedCallNotification->NotifyUnReadMissedCall(phoneNumAndUnReadCountMap), TELEPHONY_SUCCESS);
