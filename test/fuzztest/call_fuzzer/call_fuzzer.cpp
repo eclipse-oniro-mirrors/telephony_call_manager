@@ -235,7 +235,7 @@ void VoIPCallFunc(const uint8_t *data, size_t size)
     int32_t mainCallId = 0;
     VoipCallEventInfo voipcallInfo;
     std::vector<std::u16string> callIdList;
-    int32_t videoState = static_cast<int32_t>(size % VIDIO_TYPE_NUM);
+    int32_t videoState = static_cast<int32_t>(*data % VIDIO_TYPE_NUM);
     sptr<VoIPCall> voipCall = std::make_unique<VoIPCall>(dialParaInfo).release();
 
     voipCall->DialingProcess();
@@ -343,14 +343,14 @@ void OttCallFunc(const uint8_t *data, size_t size)
     }
 
     DialParaInfo paraInfo;
-    paraInfo.dialType = static_cast<DialType>(size % DIAL_TYPE);
-    paraInfo.callType = static_cast<CallType>(size % CALL_TYPE_NUM);
-    paraInfo.videoState = static_cast<VideoStateType>(size % VIDIO_TYPE_NUM);
-    paraInfo.callState = static_cast<TelCallState>(size % TEL_CALL_STATE_NUM);
+    paraInfo.dialType = static_cast<DialType>(*data % DIAL_TYPE);
+    paraInfo.callType = static_cast<CallType>(*data % CALL_TYPE_NUM);
+    paraInfo.videoState = static_cast<VideoStateType>(*data % VIDIO_TYPE_NUM);
+    paraInfo.callState = static_cast<TelCallState>(*data % TEL_CALL_STATE_NUM);
     sptr<OTTCall> callObjectPtr = std::make_unique<OTTCall>(paraInfo).release();
-    int32_t videoState = static_cast<int32_t>(size % VIDIO_TYPE_NUM);
-    int32_t mute = static_cast<int32_t>(size % BOOL_NUM);
-    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
+    int32_t videoState = static_cast<int32_t>(*data % VIDIO_TYPE_NUM);
+    int32_t mute = static_cast<int32_t>(*data % BOOL_NUM);
+    int32_t slotId = static_cast<int32_t>(*data % SLOT_NUM);
 
     callObjectPtr->DialingProcess();
     callObjectPtr->AnswerCall(videoState);
@@ -456,12 +456,12 @@ void SatelliteCallFunc(const uint8_t *data, size_t size)
     }
 
     DialParaInfo paraInfo;
-    paraInfo.dialType = static_cast<DialType>(size % DIAL_TYPE);
-    paraInfo.callType = static_cast<CallType>(size % CALL_TYPE_NUM);
-    paraInfo.videoState = static_cast<VideoStateType>(size % VIDIO_TYPE_NUM);
-    paraInfo.callState = static_cast<TelCallState>(size % TEL_CALL_STATE_NUM);
+    paraInfo.dialType = static_cast<DialType>(*data % DIAL_TYPE);
+    paraInfo.callType = static_cast<CallType>(*data % CALL_TYPE_NUM);
+    paraInfo.videoState = static_cast<VideoStateType>(*data % VIDIO_TYPE_NUM);
+    paraInfo.callState = static_cast<TelCallState>(*data % TEL_CALL_STATE_NUM);
     sptr<SatelliteCall> callObjectPtr = std::make_unique<SatelliteCall>(paraInfo).release();
-    int32_t videoState = static_cast<int32_t>(size % VIDIO_TYPE_NUM);
+    int32_t videoState = static_cast<int32_t>(*data % VIDIO_TYPE_NUM);
     CallAttributeInfo info;
 
     callObjectPtr->DialingProcess();

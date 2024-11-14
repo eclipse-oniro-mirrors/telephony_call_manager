@@ -88,8 +88,8 @@ void AudioDeviceManagerFunc(const uint8_t *data, size_t size)
     }
 
     std::shared_ptr<AudioDeviceManager> audioDeviceManager = DelayedSingleton<AudioDeviceManager>::GetInstance();
-    AudioDeviceType deviceType = static_cast<AudioDeviceType>(size % AUDIO_DEVICE_NUM);
-    AudioEvent event = static_cast<AudioEvent>(size % AUDIO_EVENT);
+    AudioDeviceType deviceType = static_cast<AudioDeviceType>(*data % AUDIO_DEVICE_NUM);
+    AudioEvent event = static_cast<AudioEvent>(*data % AUDIO_EVENT);
 
     audioDeviceManager->Init();
     audioDeviceManager->InitAudioDevice();
@@ -121,12 +121,12 @@ void AudioProxyFunc(const uint8_t *data, size_t size)
 
     std::shared_ptr<AudioProxy> audioProxy = DelayedSingleton<AudioProxy>::GetInstance();
     std::shared_ptr<AudioControlManager> audioControlManager = DelayedSingleton<AudioControlManager>::GetInstance();
-    AudioStandard::AudioScene audioScene = static_cast<AudioStandard::AudioScene>(size % AUDIO_SCENE_NUM);
+    AudioStandard::AudioScene audioScene = static_cast<AudioStandard::AudioScene>(*data % AUDIO_SCENE_NUM);
     AudioStandard::AudioVolumeType audioVolumeType =
-        static_cast<AudioStandard::AudioVolumeType>(size % AUDIO_VOLUME_TYPE_NUM);
-    int32_t volume = static_cast<int32_t>(size);
-    int32_t callId = static_cast<int32_t>(size);
-    bool isMute = static_cast<bool>(size % BOOL_NUM);
+        static_cast<AudioStandard::AudioVolumeType>(*data % AUDIO_VOLUME_TYPE_NUM);
+    int32_t volume = static_cast<int32_t>(*data);
+    int32_t callId = static_cast<int32_t>(*data);
+    bool isMute = static_cast<bool>(*data % BOOL_NUM);
 
     audioControlManager->GetCallBase(callId);
     audioProxy->SetAudioScene(audioScene);

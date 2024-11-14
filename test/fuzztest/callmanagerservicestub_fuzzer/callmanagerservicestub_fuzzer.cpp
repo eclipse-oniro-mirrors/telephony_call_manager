@@ -65,7 +65,7 @@ int32_t GetProxyObjectPtr(const uint8_t *data, size_t size)
     if (!IsServiceInited()) {
         return TELEPHONY_ERROR;
     }
-    int32_t type = static_cast<int32_t>(size);
+    int32_t type = static_cast<int32_t>(*data);
     MessageParcel dataParcel;
     dataParcel.WriteInt32(type);
     MessageParcel reply;
@@ -77,7 +77,7 @@ int32_t SetVoIPCallState(const uint8_t *data, size_t size)
     if (!IsServiceInited()) {
         return TELEPHONY_ERROR;
     }
-    int32_t state = static_cast<int32_t>(size % SLOT_NUM);
+    int32_t state = static_cast<int32_t>(*data % SLOT_NUM);
     MessageParcel dataParcel;
     dataParcel.WriteInt32(state);
     MessageParcel reply;
@@ -101,8 +101,8 @@ int32_t PostDialProceed(const uint8_t *data, size_t size)
     }
     MessageParcel dataParcel;
     MessageParcel reply;
-    int32_t callId = static_cast<int32_t>(size % CALL_ID_NUM);
-    int32_t activate = static_cast<int32_t>(size % ACTIVE_NUM);
+    int32_t callId = static_cast<int32_t>(*data % CALL_ID_NUM);
+    int32_t activate = static_cast<int32_t>(*data % ACTIVE_NUM);
     dataParcel.WriteInt32(callId);
     dataParcel.WriteBool(activate);
     return DelayedSingleton<CallManagerService>::GetInstance()->OnPostDialProceed(dataParcel, reply);
@@ -155,8 +155,8 @@ int32_t SetVoNRState(const uint8_t *data, size_t size)
     if (!IsServiceInited()) {
         return TELEPHONY_ERROR;
     }
-    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
-    int32_t state = static_cast<int32_t>(size % SLOT_NUM);
+    int32_t slotId = static_cast<int32_t>(*data % SLOT_NUM);
+    int32_t state = static_cast<int32_t>(*data % SLOT_NUM);
     MessageParcel dataParcel;
     dataParcel.WriteInt32(slotId);
     dataParcel.WriteInt32(state);
@@ -169,7 +169,7 @@ int32_t KickOutFromConference(const uint8_t *data, size_t size)
     if (!IsServiceInited()) {
         return TELEPHONY_ERROR;
     }
-    int32_t callId = static_cast<int32_t>(size);
+    int32_t callId = static_cast<int32_t>(*data);
     MessageParcel dataParcel;
     dataParcel.WriteInt32(callId);
     MessageParcel reply;

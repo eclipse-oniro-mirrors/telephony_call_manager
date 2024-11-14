@@ -57,7 +57,7 @@ void OnRemoteRequest(const uint8_t *data, size_t size)
         return;
     }
     dataMessageParcel.RewindRead(0);
-    uint32_t code = static_cast<uint32_t>(size);
+    uint32_t code = static_cast<uint32_t>(*data);
     MessageParcel reply;
     MessageOption option;
     DelayedSingleton<CallManagerService>::GetInstance()->OnRemoteRequest(code, dataMessageParcel, reply, option);
@@ -183,8 +183,8 @@ int32_t SetCallWaiting(const uint8_t *data, size_t size)
     if (!IsServiceInited()) {
         return TELEPHONY_ERROR;
     }
-    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
-    int32_t activate = static_cast<int32_t>(size % ACTIVE_NUM);
+    int32_t slotId = static_cast<int32_t>(*data % SLOT_NUM);
+    int32_t activate = static_cast<int32_t>(*data % ACTIVE_NUM);
     MessageParcel dataParcel;
     dataParcel.WriteInt32(slotId);
     dataParcel.WriteBool(activate);
@@ -216,7 +216,7 @@ int32_t JoinConference(const uint8_t *data, size_t size)
     if (!IsServiceInited()) {
         return TELEPHONY_ERROR;
     }
-    int32_t callId = static_cast<int32_t>(size % CALL_ID_NUM);
+    int32_t callId = static_cast<int32_t>(*data % CALL_ID_NUM);
     std::vector<std::u16string> numberList { u"0000000000" };
     MessageParcel dataParcel;
     dataParcel.WriteInt32(callId);
@@ -262,7 +262,7 @@ int32_t CancelCallUpgrade(const uint8_t *data, size_t size)
     }
     MessageParcel dataParcel;
     MessageParcel replyParcel;
-    int32_t callId = static_cast<int32_t>(size % CALL_ID_NUM);
+    int32_t callId = static_cast<int32_t>(*data % CALL_ID_NUM);
     dataParcel.WriteInt32(callId);
     dataParcel.RewindRead(0);
     return DelayedSingleton<CallManagerService>::GetInstance()->OnCancelCallUpgrade(dataParcel, replyParcel);
@@ -275,7 +275,7 @@ int32_t RequestCameraCapabilities(const uint8_t *data, size_t size)
     }
     MessageParcel dataParcel;
     MessageParcel replyParcel;
-    int32_t callId = static_cast<int32_t>(size % CALL_ID_NUM);
+    int32_t callId = static_cast<int32_t>(*data % CALL_ID_NUM);
     dataParcel.WriteInt32(callId);
     dataParcel.RewindRead(0);
     return DelayedSingleton<CallManagerService>::GetInstance()->OnRequestCameraCapabilities(dataParcel, replyParcel);

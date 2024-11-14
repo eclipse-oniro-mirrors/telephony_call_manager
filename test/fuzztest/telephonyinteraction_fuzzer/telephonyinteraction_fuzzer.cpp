@@ -56,7 +56,7 @@ int32_t OnRemoteRequest(const uint8_t *data, size_t size)
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
     dataMessageParcel.RewindRead(0);
-    uint32_t code = static_cast<uint32_t>(size);
+    uint32_t code = static_cast<uint32_t>(*data);
     MessageParcel reply;
     MessageOption option;
     return CallStatusCallbackPtr_->OnRemoteRequest(code, dataMessageParcel, reply, option);
@@ -180,9 +180,9 @@ int32_t UpdateGetWaitingResult(const uint8_t *data, size_t size)
     CallWaitResponse callWaitResponse;
     int32_t length = sizeof(CallWaitResponse);
     dataParcel.WriteInt32(length);
-    callWaitResponse.result = static_cast<int32_t>(size);
-    callWaitResponse.status = static_cast<int32_t>(size);
-    callWaitResponse.classCw = static_cast<int32_t>(size);
+    callWaitResponse.result = static_cast<int32_t>(*data);
+    callWaitResponse.status = static_cast<int32_t>(*data);
+    callWaitResponse.classCw = static_cast<int32_t>(*data);
     dataParcel.WriteRawData((const void *)&callWaitResponse, length);
     dataParcel.RewindRead(0);
     MessageParcel reply;
@@ -201,9 +201,9 @@ int32_t UpdateGetRestrictionResult(const uint8_t *data, size_t size)
     CallRestrictionResponse callRestrictionResult;
     int32_t length = sizeof(CallRestrictionResponse);
     dataParcel.WriteInt32(length);
-    callRestrictionResult.result = static_cast<int32_t>(size);
-    callRestrictionResult.status = static_cast<int32_t>(size);
-    callRestrictionResult.classCw = static_cast<int32_t>(size);
+    callRestrictionResult.result = static_cast<int32_t>(*data);
+    callRestrictionResult.status = static_cast<int32_t>(*data);
+    callRestrictionResult.classCw = static_cast<int32_t>(*data);
     dataParcel.WriteRawData((const void *)&callRestrictionResult, length);
     dataParcel.RewindRead(0);
     MessageParcel reply;
@@ -253,9 +253,9 @@ int32_t UpdateGetCallClipResult(const uint8_t *data, size_t size)
     ClipResponse clipResponse;
     int32_t length = sizeof(ClipResponse);
     dataParcel.WriteInt32(length);
-    clipResponse.result = static_cast<int32_t>(size);
-    clipResponse.action = static_cast<int32_t>(size);
-    clipResponse.clipStat = static_cast<int32_t>(size);
+    clipResponse.result = static_cast<int32_t>(*data);
+    clipResponse.action = static_cast<int32_t>(*data);
+    clipResponse.clipStat = static_cast<int32_t>(*data);
     dataParcel.WriteRawData((const void *)&clipResponse, length);
     dataParcel.RewindRead(0);
     MessageParcel reply;
@@ -274,8 +274,8 @@ int32_t GetImsConfigResult(const uint8_t *data, size_t size)
     GetImsConfigResponse response;
     int32_t length = sizeof(GetImsConfigResponse);
     dataParcel.WriteInt32(length);
-    response.result = static_cast<int32_t>(size);
-    response.value = static_cast<int32_t>(size);
+    response.result = static_cast<int32_t>(*data);
+    response.value = static_cast<int32_t>(*data);
     dataParcel.WriteRawData((const void *)&response, length);
     dataParcel.RewindRead(0);
     MessageParcel reply;
@@ -294,8 +294,8 @@ int32_t GetImsFeatureValueResult(const uint8_t *data, size_t size)
     GetImsFeatureValueResponse response;
     int32_t length = sizeof(GetImsFeatureValueResponse);
     dataParcel.WriteInt32(length);
-    response.result = static_cast<int32_t>(size);
-    response.value = static_cast<int32_t>(size);
+    response.result = static_cast<int32_t>(*data);
+    response.value = static_cast<int32_t>(*data);
     dataParcel.WriteRawData((const void *)&response, length);
     dataParcel.RewindRead(0);
     MessageParcel reply;
@@ -337,9 +337,9 @@ int32_t ReceiveUpdateCallMediaModeRequest(const uint8_t *data, size_t size)
     int32_t length = sizeof(CallModeReportInfo);
     dataParcel.WriteInt32(length);
     CallModeReportInfo callModeReportInfo;
-    callModeReportInfo.callIndex = static_cast<int32_t>(size % CALL_INDEX_MAX_NUM);
-    callModeReportInfo.callMode = static_cast<ImsCallMode>(size % IMS_CALL_MODE_NUM);
-    callModeReportInfo.result = static_cast<VideoRequestResultType>(size % VIDEO_REQUEST_RESULT_TYPE_NUM);
+    callModeReportInfo.callIndex = static_cast<int32_t>(*data % CALL_INDEX_MAX_NUM);
+    callModeReportInfo.callMode = static_cast<ImsCallMode>(*data % IMS_CALL_MODE_NUM);
+    callModeReportInfo.result = static_cast<VideoRequestResultType>(*data % VIDEO_REQUEST_RESULT_TYPE_NUM);
     dataParcel.WriteRawData((const void *)&callModeReportInfo, length);
     dataParcel.RewindRead(0);
     MessageParcel reply;
@@ -359,9 +359,9 @@ int32_t ReceiveUpdateCallMediaModeResponse(const uint8_t *data, size_t size)
     int32_t length = sizeof(CallModeReportInfo);
     dataParcel.WriteInt32(length);
     CallModeReportInfo callModeReportInfo;
-    callModeReportInfo.callIndex = static_cast<int32_t>(size % CALL_INDEX_MAX_NUM);
-    callModeReportInfo.callMode = static_cast<ImsCallMode>(size % IMS_CALL_MODE_NUM);
-    callModeReportInfo.result = static_cast<VideoRequestResultType>(size % VIDEO_REQUEST_RESULT_TYPE_NUM);
+    callModeReportInfo.callIndex = static_cast<int32_t>(*data % CALL_INDEX_MAX_NUM);
+    callModeReportInfo.callMode = static_cast<ImsCallMode>(*data % IMS_CALL_MODE_NUM);
+    callModeReportInfo.result = static_cast<VideoRequestResultType>(*data % VIDEO_REQUEST_RESULT_TYPE_NUM);
     dataParcel.WriteRawData((const void *)&callModeReportInfo, length);
     dataParcel.RewindRead(0);
     MessageParcel reply;
@@ -381,8 +381,8 @@ int32_t HandleCallSessionEventChanged(const uint8_t *data, size_t size)
     int32_t length = sizeof(CallSessionReportInfo);
     dataParcel.WriteInt32(length);
     CallSessionReportInfo callSessionReportInfo;
-    callSessionReportInfo.index = static_cast<int32_t>(size % CALL_INDEX_MAX_NUM);
-    callSessionReportInfo.eventId = static_cast<CallSessionEventId>(size % CALL_SESSION_EVENT_ID_NUM);
+    callSessionReportInfo.index = static_cast<int32_t>(*data % CALL_INDEX_MAX_NUM);
+    callSessionReportInfo.eventId = static_cast<CallSessionEventId>(*data % CALL_SESSION_EVENT_ID_NUM);
     dataParcel.WriteRawData((const void *)&callSessionReportInfo, length);
     dataParcel.RewindRead(0);
     MessageParcel reply;
@@ -402,9 +402,9 @@ int32_t HandlePeerDimensionsChanged(const uint8_t *data, size_t size)
     int32_t length = sizeof(PeerDimensionsReportInfo);
     dataParcel.WriteInt32(length);
     PeerDimensionsReportInfo dimensionsReportInfo;
-    dimensionsReportInfo.index = static_cast<int32_t>(size % CALL_INDEX_MAX_NUM);
-    dimensionsReportInfo.width = static_cast<int32_t>(size);
-    dimensionsReportInfo.height = static_cast<int32_t>(size);
+    dimensionsReportInfo.index = static_cast<int32_t>(*data % CALL_INDEX_MAX_NUM);
+    dimensionsReportInfo.width = static_cast<int32_t>(*data);
+    dimensionsReportInfo.height = static_cast<int32_t>(*data);
     dataParcel.WriteRawData((const void *)&dimensionsReportInfo, length);
     dataParcel.RewindRead(0);
     MessageParcel reply;
@@ -421,7 +421,7 @@ int32_t HandleCallDataUsageChanged(const uint8_t *data, size_t size)
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
 
-    int64_t reportInfo = static_cast<int64_t>(size);
+    int64_t reportInfo = static_cast<int64_t>(*data);
     dataParcel.WriteInt64(reportInfo);
     dataParcel.RewindRead(0);
     MessageParcel reply;
@@ -441,9 +441,9 @@ int32_t HandleCameraCapabilitiesChanged(const uint8_t *data, size_t size)
     int32_t length = sizeof(CameraCapabilitiesReportInfo);
     dataParcel.WriteInt32(length);
     CameraCapabilitiesReportInfo cameraCapabilitiesReportInfo;
-    cameraCapabilitiesReportInfo.index = static_cast<int32_t>(size % CALL_INDEX_MAX_NUM);
-    cameraCapabilitiesReportInfo.width = static_cast<int32_t>(size);
-    cameraCapabilitiesReportInfo.height = static_cast<int32_t>(size);
+    cameraCapabilitiesReportInfo.index = static_cast<int32_t>(*data % CALL_INDEX_MAX_NUM);
+    cameraCapabilitiesReportInfo.width = static_cast<int32_t>(*data);
+    cameraCapabilitiesReportInfo.height = static_cast<int32_t>(*data);
     dataParcel.WriteRawData((const void *)&cameraCapabilitiesReportInfo, length);
     dataParcel.RewindRead(0);
     MessageParcel reply;
