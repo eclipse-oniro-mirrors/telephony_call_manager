@@ -30,21 +30,9 @@
 namespace OHOS {
 namespace Telephony {
 using namespace OHOS::EventFwk;
-MissedCallNotification::MissedCallNotification() : isIncomingCallMissed_(true), incomingCallNumber_("") {}
+MissedCallNotification::MissedCallNotification() {}
 
-void MissedCallNotification::NewCallCreated(sptr<CallBase> &callObjectPtr)
-{
-    if (callObjectPtr != nullptr && callObjectPtr->GetCallType() == CallType::TYPE_VOIP) {
-        return;
-    }
-    if (callObjectPtr != nullptr && callObjectPtr->GetTelCallState() == TelCallState::CALL_STATUS_INCOMING &&
-        !callObjectPtr->GetAccountNumber().empty()) {
-        incomingCallNumber_ = callObjectPtr->GetAccountNumber();
-    } else {
-        incomingCallNumber_ = "";
-    }
-    isIncomingCallMissed_ = true;
-}
+void MissedCallNotification::NewCallCreated(sptr<CallBase> &callObjectPtr) {}
 
 void MissedCallNotification::CallStateUpdated(
     sptr<CallBase> &callObjectPtr, TelCallState priorState, TelCallState nextState)
@@ -54,7 +42,8 @@ void MissedCallNotification::CallStateUpdated(
         return;
     }
     if (callObjectPtr != nullptr && nextState == TelCallState::CALL_STATUS_DISCONNECTED &&
-        callObjectPtr->GetAccountNumber() == incomingCallNumber_ && isIncomingCallMissed_) {
+        callObjectPtr->GetCallDirection() == CallDirection::CALL_DIRECTION_IN &&
+        callObjectPtr->GetAnswerType() == CallAnswerType::CALL_ANSWER_MISSED) {
         PublishMissedCallEvent(callObjectPtr);
         PublishMissedCallNotification(callObjectPtr);
     }
@@ -83,7 +72,7 @@ void MissedCallNotification::PublishMissedCallEvent(sptr<CallBase> &callObjectPt
     std::vector<std::string> callPermissions;
     callPermissions.emplace_back(Permission::GET_TELEPHONY_STATE);
     publishInfo.SetSubscriberPermissions(callPermissions);
-    bool resultWithNumber = EventFwk::CommonEventManager::PublishCommonEvent(data, publishInfo, nullptr);
+    bool resultWithNumber = EventFwk::CommonEventManager::PublishCommonEvent(dataWithNumber, publishInfo, nullptr);
     TELEPHONY_LOGW("publish missed call event with number result : %{public}d", resultWithNumber);
 }
 
@@ -166,19 +155,10 @@ int32_t MissedCallNotification::NotifyUnReadMissedCall(std::map<std::string, int
     return TELEPHONY_ERR_SUCCESS;
 }
 
-void MissedCallNotification::IncomingCallActivated(sptr<CallBase> &callObjectPtr)
-{
-    if (callObjectPtr != nullptr && callObjectPtr->GetAccountNumber() == incomingCallNumber_) {
-        isIncomingCallMissed_ = false;
-    }
-}
+void MissedCallNotification::IncomingCallActivated(sptr<CallBase> &callObjectPtr) {}
 
-void MissedCallNotification::IncomingCallHungUp(sptr<CallBase> &callObjectPtr, bool isSendSms, std::string content)
-{
-    if (callObjectPtr != nullptr && callObjectPtr->GetAccountNumber() == incomingCallNumber_) {
-        isIncomingCallMissed_ = false;
-    }
-}
+void MissedCallNotification::IncomingCallHungUp(sptr<CallBase> &callObjectPtr,
+    bool isSendSms, std::string content) {}
 
 void MissedCallNotification::CallDestroyed(const DisconnectedDetails &details) {}
 } // namespace Telephony
