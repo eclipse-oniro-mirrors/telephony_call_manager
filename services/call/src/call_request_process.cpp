@@ -964,18 +964,11 @@ int32_t CallRequestProcess::PackCellularCallInfo(DialParaInfo &info, CellularCal
 
 bool CallRequestProcess::IsFdnNumber(std::vector<std::u16string> fdnNumberList, std::string phoneNumber)
 {
-    char number[kMaxNumberLen + 1] = { 0 };
-    int32_t j = 0;
-    for (int32_t i = 0; i < static_cast<int32_t>(phoneNumber.length()); i++) {
-        if (i >= kMaxNumberLen) {
-            break;
-        }
-        if (*(phoneNumber.c_str() + i) != ' ') {
-            number[j++] = *(phoneNumber.c_str() + i);
-        }
-    }
-    for (std::vector<std::u16string>::iterator it = fdnNumberList.begin(); it != fdnNumberList.end(); ++it) {
-        if (strstr(number, Str16ToStr8(*it).c_str()) != nullptr) {
+    std::string withoutSpaceNumber = phoneNumber;
+    withoutSpaceNumber.erase(std::remove(withoutSpaceNumber.begin(),
+        withoutSpaceNumber.end(), ' '), withoutSpaceNumber.end());
+    for (const auto& fdnNumber : fdnNumberList) {
+        if (withoutSpaceNumber.compare(Str16ToStr8(fdnNumber)) == 0) {
             TELEPHONY_LOGI("you are allowed to dial!");
             return true;
         }
