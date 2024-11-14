@@ -191,8 +191,6 @@ void MissedCallNotificationFunc(const uint8_t *data, size_t size)
 
     notification->NewCallCreated(callObjectPtr);
     notification->PublishMissedCallEvent(callObjectPtr);
-    notification->PublishMissedCallNotification(callObjectPtr);
-    notification->CancelMissedCallsNotification(static_cast<int32_t>(size));
     notification->CallDestroyed(details);
     notification->IncomingCallActivated(callObjectPtr);
     notification->IncomingCallHungUp(callObjectPtr, true, message);
