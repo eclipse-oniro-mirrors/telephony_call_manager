@@ -233,6 +233,10 @@ void SpamCallAdapter::NotifyAll()
 
 bool SpamCallAdapter::WaitForDetectResult()
 {
+    if (timeWaitHelper_ == nullptr) {
+        TELEPHONY_LOGE("timeWaitHelper_ is null");
+        return false;
+    }
     if (!timeWaitHelper_->WaitForResult()) {
         DisconnectSpamCallAbility();
         return false;
