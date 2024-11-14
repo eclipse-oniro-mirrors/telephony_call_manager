@@ -139,8 +139,8 @@ int32_t SetDeviceDirection(const uint8_t *data, size_t size)
     if (!IsServiceInited()) {
         return TELEPHONY_ERROR;
     }
-    int32_t callId = static_cast<int32_t>(size);
-    int32_t rotation = static_cast<int32_t>(size);
+    int32_t callId = static_cast<int32_t>(*data);
+    int32_t rotation = static_cast<int32_t>(*data);
     MessageParcel dataParcel;
     dataParcel.WriteInt32(callId);
     dataParcel.WriteInt32(rotation);
@@ -153,7 +153,7 @@ int32_t CancelCallUpgrade(const uint8_t *data, size_t size)
     if (!IsServiceInited()) {
         return TELEPHONY_ERROR;
     }
-    int32_t callId = static_cast<int32_t>(size);
+    int32_t callId = static_cast<int32_t>(*data);
     MessageParcel dataParcel;
     dataParcel.WriteInt32(callId);
     MessageParcel reply;
@@ -165,7 +165,7 @@ int32_t RequestCameraCapabilities(const uint8_t *data, size_t size)
     if (!IsServiceInited()) {
         return TELEPHONY_ERROR;
     }
-    int32_t callId = static_cast<int32_t>(size);
+    int32_t callId = static_cast<int32_t>(*data);
     MessageParcel dataParcel;
     dataParcel.WriteInt32(callId);
     MessageParcel reply;

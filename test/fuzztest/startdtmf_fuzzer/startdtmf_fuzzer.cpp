@@ -47,7 +47,7 @@ void StopRtt(const uint8_t *data, size_t size)
         return;
     }
 
-    int32_t callId = size % CALL_ID_NUM;
+    int32_t callId = *data % CALL_ID_NUM;
     MessageParcel dataMessageParcel;
     dataMessageParcel.WriteInt32(callId);
     dataMessageParcel.RewindRead(0);

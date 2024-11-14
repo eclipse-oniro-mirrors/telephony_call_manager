@@ -127,7 +127,7 @@ int32_t CloseUnFinishedUssd(const uint8_t *data, size_t size)
     if (!IsServiceInited()) {
         return TELEPHONY_ERROR;
     }
-    int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
+    int32_t slotId = static_cast<int32_t>(*data % SLOT_NUM);
     MessageParcel dataParcel;
     dataParcel.WriteInt32(slotId);
     dataParcel.RewindRead(0);

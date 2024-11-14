@@ -60,7 +60,7 @@ int32_t OnRemoteRequest(const uint8_t *data, size_t size)
         return TELEPHONY_ERROR;
     }
     dataMessageParcel.RewindRead(0);
-    uint32_t code = static_cast<uint32_t>(size);
+    uint32_t code = static_cast<uint32_t>(*data);
     MessageParcel reply;
     MessageOption option;
     return callAbilityCallbackPtr_->OnRemoteRequest(code, dataMessageParcel, reply, option);
@@ -157,8 +157,8 @@ int32_t UpdateAysncResults(const uint8_t *data, size_t size)
     if (!ServiceInited()) {
         return TELEPHONY_ERROR;
     }
-    int32_t reportId = static_cast<uint32_t>(size % REPORT_ID_NUM);
-    int32_t resultId = static_cast<uint32_t>(size % RESULT_ID_NUM);
+    int32_t reportId = static_cast<uint32_t>(*data % REPORT_ID_NUM);
+    int32_t resultId = static_cast<uint32_t>(*data % RESULT_ID_NUM);
     MessageParcel dataMessageParcel;
     dataMessageParcel.WriteInt32(reportId);
     dataMessageParcel.WriteInt32(resultId);
@@ -248,10 +248,10 @@ int32_t UpdateImsCallModeChange(const uint8_t *data, size_t size)
     int32_t length = sizeof(CallMediaModeInfo);
     dataParcel.WriteInt32(length);
     CallMediaModeInfo callMediaModeInfo;
-    callMediaModeInfo.callId = static_cast<int32_t>(size);
-    callMediaModeInfo.isRequestInfo = static_cast<bool>(size % BOOL_NUM);
-    callMediaModeInfo.result = static_cast<VideoRequestResultType>(size % VIDEO_REQUEST_RESULT_TYPE_NUM);
-    callMediaModeInfo.callMode = static_cast<ImsCallMode>(size % IMS_CALL_MODE_NUM);
+    callMediaModeInfo.callId = static_cast<int32_t>(*data);
+    callMediaModeInfo.isRequestInfo = static_cast<bool>(*data % BOOL_NUM);
+    callMediaModeInfo.result = static_cast<VideoRequestResultType>(*data % VIDEO_REQUEST_RESULT_TYPE_NUM);
+    callMediaModeInfo.callMode = static_cast<ImsCallMode>(*data % IMS_CALL_MODE_NUM);
     dataParcel.WriteRawData((const void *)&callMediaModeInfo, length);
     dataParcel.RewindRead(0);
     return callAbilityCallbackPtr_->OnUpdateImsCallModeChange(dataParcel, replyParcel);
@@ -271,8 +271,8 @@ int32_t UpdateCallSessionEventChange(const uint8_t *data, size_t size)
     int32_t length = sizeof(CallSessionEvent);
     dataParcel.WriteInt32(length);
     CallSessionEvent callSessionInfo;
-    callSessionInfo.callId = static_cast<int32_t>(size);
-    callSessionInfo.eventId = static_cast<CallSessionEventId>(size % CALL_SESSION_EVENT_ID_NUM);
+    callSessionInfo.callId = static_cast<int32_t>(*data);
+    callSessionInfo.eventId = static_cast<CallSessionEventId>(*data % CALL_SESSION_EVENT_ID_NUM);
     dataParcel.WriteRawData((const void *)&callSessionInfo, length);
     dataParcel.RewindRead(0);
     return callAbilityCallbackPtr_->OnUpdateCallSessionEventChange(dataParcel, replyParcel);
@@ -292,9 +292,9 @@ int32_t UpdatePeerDimensionsChange(const uint8_t *data, size_t size)
     int32_t length = sizeof(PeerDimensionsDetail);
     dataParcel.WriteInt32(length);
     PeerDimensionsDetail peerDimensionsInfo;
-    peerDimensionsInfo.callId = static_cast<int32_t>(size);
-    peerDimensionsInfo.width = static_cast<int32_t>(size);
-    peerDimensionsInfo.height = static_cast<int32_t>(size);
+    peerDimensionsInfo.callId = static_cast<int32_t>(*data);
+    peerDimensionsInfo.width = static_cast<int32_t>(*data);
+    peerDimensionsInfo.height = static_cast<int32_t>(*data);
     dataParcel.RewindRead(0);
     return callAbilityCallbackPtr_->OnUpdatePeerDimensionsChange(dataParcel, replyParcel);
 }
@@ -310,7 +310,7 @@ int32_t UpdateCallDataUsageChange(const uint8_t *data, size_t size)
         TELEPHONY_LOGE("write descriptor fail");
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
-    int64_t dataUsage = static_cast<int64_t>(size);
+    int64_t dataUsage = static_cast<int64_t>(*data);
     dataParcel.WriteInt64(dataUsage);
     dataParcel.RewindRead(0);
     return callAbilityCallbackPtr_->OnUpdateCallDataUsageChange(dataParcel, replyParcel);
@@ -330,9 +330,9 @@ int32_t UpdateCameraCapabilities(const uint8_t *data, size_t size)
     int32_t length = sizeof(CameraCapabilities);
     dataParcel.WriteInt32(length);
     CameraCapabilities cameraCapabilitiesInfo;
-    cameraCapabilitiesInfo.callId = static_cast<int32_t>(size);
-    cameraCapabilitiesInfo.width = static_cast<int32_t>(size);
-    cameraCapabilitiesInfo.height = static_cast<int32_t>(size);
+    cameraCapabilitiesInfo.callId = static_cast<int32_t>(*data);
+    cameraCapabilitiesInfo.width = static_cast<int32_t>(*data);
+    cameraCapabilitiesInfo.height = static_cast<int32_t>(*data);
     dataParcel.RewindRead(0);
     return callAbilityCallbackPtr_->OnUpdateCameraCapabilities(dataParcel, replyParcel);
 }
@@ -341,9 +341,9 @@ void WriteCallAttributeInfo(const uint8_t *data, size_t size)
 {
     MessageParcel dataParcel;
     CallAttributeInfo info;
-    info.accountId = static_cast<int32_t>(size);
-    info.callId = static_cast<int32_t>(size);
-    info.callState = static_cast<TelCallState>(static_cast<int32_t>(size));
+    info.accountId = static_cast<int32_t>(*data);
+    info.callId = static_cast<int32_t>(*data);
+    info.callState = static_cast<TelCallState>(static_cast<int32_t>(*data));
     CallManagerUtils::WriteCallAttributeInfo(info, dataParcel);
 }
 
