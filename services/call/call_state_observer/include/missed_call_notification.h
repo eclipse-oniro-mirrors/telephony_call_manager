@@ -38,8 +38,6 @@ public:
     void PublishMissedCallNotification(sptr<CallBase> &callObjectPtr);
 
 private:
-    bool isIncomingCallMissed_;
-    std::string incomingCallNumber_;
     static constexpr int16_t INCOMING_CALL_MISSED_ID = 0;
     static constexpr int16_t INCOMING_CALL_MISSED_CODE = 0;
     const std::string INCOMING_CALL_MISSED_TITLE = "Missed Call";
