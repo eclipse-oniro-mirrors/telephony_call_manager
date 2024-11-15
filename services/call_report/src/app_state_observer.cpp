@@ -35,7 +35,7 @@ void ApplicationStateObserver::OnProcessDied(const AppExecFwk::ProcessData& proc
 {
     if (processData.processName == "ui") {
         TELEPHONY_LOGE("report voipcall state idle");
-        DelayedSingleton<CallControlManager>::GetInstance->SetVoIPCallState((int32_t)CallStateToApp::CALL_STATE_IDLE);
+        DelayedSingleton<CallControlManager>::GetInstance()->SetVoIPCallState((int32_t)CallStateToApp::CALL_STATE_IDLE);
     }
 }
 
