@@ -21,6 +21,7 @@
 #include <memory>
 #include <mutex>
 
+#include "app_state_observer.h"
 #include "call_broadcast_subscriber.h"
 #include "call_policy.h"
 #include "call_request_handler.h"
@@ -143,6 +144,7 @@ private:
     int32_t CanDial(std::u16string &number, AppExecFwk::PacMap &extras, bool isEcc);
     void AnswerHandlerForSatelliteOrVideoCall(sptr<CallBase> &call, int32_t videoState);
     bool CurrentIsSuperPrivacyMode(int32_t callId, int32_t videoState);
+    void AppStateObserver();
 
 private:
     class SystemAbilityListener : public SystemAbilityStatusChangeStub {
@@ -179,6 +181,8 @@ private:
         int32_t videoState = 0;
     } AnsweredCallQueue_;
     ffrt::task_handle disconnectHandle = nullptr;
+    sptr<ApplicationStateObserver> appStateObserver;
+    sptr<AppExecFwk::IAppMgr> appMgrProxy = nullptr;
 };
 } // namespace Telephony
 } // namespace OHOS
