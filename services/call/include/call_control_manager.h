@@ -181,7 +181,7 @@ private:
         int32_t videoState = 0;
     } AnsweredCallQueue_;
     ffrt::task_handle disconnectHandle = nullptr;
-    sptr<ApplicationStateObserver> appStateObserver;
+    sptr<ApplicationStateObserver> appStateObserver = nullptr;
     sptr<AppExecFwk::IAppMgr> appMgrProxy = nullptr;
 };
 } // namespace Telephony
