@@ -1376,20 +1376,20 @@ void CallControlManager::AppStateObserver()
         appStateObserver = new (std::nothrow) ApplicationStateObserver();
         if (appStateObserver == nullptr) {
             TELEPHONY_LOGE("Failed to Create AppStateObserver Instance");
-            return TELEPHONY_SUCCESS;
+            return;
         }
         sptr<ISystemAbilityManager> samgrClient = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
         if (samgrClient == nullptr) {
             TELEPHONY_LOGE("Failed to get samgrClient");
             appStateObserver = nullptr;
-            return TELEPHONY_SUCCESS;
+            return;
         }
         appMgrProxy = iface_cast<AppExecFwk::IAppMgr>(samgrClient->GetSystemAbility(APP_MGR_SERVICE_ID));
         if (appMgrProxy == nullptr) {
             TELEPHONY_LOGE("Failed to get appMgrProxy");
             appStateObserver = nullptr;
             samgrClient = nullptr;
-            return TELEPHONY_SUCCESS;
+            return;
         }
         appMgrProxy->RegisterApplicationStateObserver(appStateObserver);
     }
