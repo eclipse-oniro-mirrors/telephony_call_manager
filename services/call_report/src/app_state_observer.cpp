@@ -18,7 +18,6 @@
 #include "iservice_registry.h"
 #include "telephony_log_wrapper.h"
 #include "i_call_ability_callback.h"
-#include "call_ability_report_proxy.h"
 #include "call_control_manager.h"
 #include "ffrt.h"
 
@@ -34,12 +33,10 @@ ApplicationStateObserver::~ApplicationStateObserver() {}
 
 void ApplicationStateObserver::OnProcessDied(const AppExecFwk::ProcessData& processData)
 {
-    auto report = DelayedSingleton<CallAbilityReportProxy>::GetInstance();
-    if (report == nullptr) {
-        TELEPHONY_LOGE("report is nullptr");
-        return;
+    if (processData.processName == "ui") {
+        TELEPHONY_LOGE("report voipcall state idle");
+        DelayedSingleton<CallControlManager>::GetInstance()->SetVoIPCallState((int32_t)CallStateToApp::CALL_STATE_IDLE);
     }
-    unregisterCallbackQueue.submit([=]() { report->UnRegisterCallBack(std::to_string(processData.pid)); });
 }
 
 } //namespace Telephony

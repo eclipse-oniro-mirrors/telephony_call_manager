@@ -19,6 +19,7 @@
 #include "csignal"
 #include <string_ex.h>
 
+#include "app_mgr_interface.h"
 #include "audio_control_manager.h"
 #include "bluetooth_call_manager.h"
 #include "call_ability_report_proxy.h"
@@ -75,6 +76,14 @@ CallControlManager::~CallControlManager()
             statusChangeListener_ = nullptr;
             satcommEventListener_ = nullptr;
             superPrivacyEventListener_ = nullptr;
+        }
+    }
+    {
+        std::lock_guard<std::mutex> lock(voipMutex_);
+        if (appMgrProxy != nullptr && appStateObserver != nullptr) {
+            appMgrProxy->UnregisterApplicationStateObserver(appStateObserver);
+            appMgrProxy = nullptr;
+            appStateObserver = nullptr;
         }
     }
 }
@@ -1330,6 +1339,17 @@ int32_t CallControlManager::SetVoIPCallState(int32_t state)
     std::string identity = IPCSkeleton::ResetCallingIdentity();
     DelayedSingleton<CallStateReportProxy>::GetInstance()->UpdateCallStateForVoIPOrRestart();
     CallVoiceAssistantManager::GetInstance()->UpdateVoipCallState(state);
+    if (VoIPCallState_ == CallStateToApp::CALL_STATE_IDLE ||
+        VoIPCallState_ == CallStateToApp::CALL_STATE_UNKNOWN) {
+        std::lock_guard<std::mutex> lock(voipMutex_);
+        if (appMgrProxy != nullptr && appStateObserver != nullptr) {
+            appMgrProxy->UnregisterApplicationStateObserver(appStateObserver);
+            appMgrProxy = nullptr;
+            appStateObserver = nullptr;
+        }
+    } else {
+        AppStateObserver();
+    }
     IPCSkeleton::SetCallingIdentity(identity);
     if (VoIPCallState_ == CallStateToApp::CALL_STATE_ANSWERED) {
         TELEPHONY_LOGI("VoIP answered the call, should hangup all calls");
@@ -1352,6 +1372,32 @@ int32_t CallControlManager::SetVoIPCallState(int32_t state)
         }
     }
     return TELEPHONY_SUCCESS;
+}
+
+void CallControlManager::AppStateObserver()
+{
+    std::lock_guard<std::mutex> lock(voipMutex_);
+    if (appStateObserver == nullptr) {
+        appStateObserver = new (std::nothrow) ApplicationStateObserver();
+        if (appStateObserver == nullptr) {
+            TELEPHONY_LOGE("Failed to Create AppStateObserver Instance");
+            return;
+        }
+        sptr<ISystemAbilityManager> samgrClient = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+        if (samgrClient == nullptr) {
+            TELEPHONY_LOGE("Failed to get samgrClient");
+            appStateObserver = nullptr;
+            return;
+        }
+        appMgrProxy = iface_cast<AppExecFwk::IAppMgr>(samgrClient->GetSystemAbility(APP_MGR_SERVICE_ID));
+        if (appMgrProxy == nullptr) {
+            TELEPHONY_LOGE("Failed to get appMgrProxy");
+            appStateObserver = nullptr;
+            samgrClient = nullptr;
+            return;
+        }
+        appMgrProxy->RegisterApplicationStateObserver(appStateObserver);
+    }
 }
 
 int32_t CallControlManager::HangUpVoipCall()
