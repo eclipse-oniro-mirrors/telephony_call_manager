@@ -1338,11 +1338,13 @@ int32_t CallControlManager::SetVoIPCallState(int32_t state)
     CallVoiceAssistantManager::GetInstance()->UpdateVoipCallState(state);
     if (VoIPCallState_ == CallStateToApp::CALL_STATE_IDLE ||
         VoIPCallState_ == CallStateToApp::CALL_STATE_UNKNOWN) {
+        std::unique_lock<std::mutex> lock(voipMutex_);
         if (appMgrProxy != nullptr && appStateObserver != nullptr) {
             appMgrProxy->UnregisterApplicationStateObserver(appStateObserver);
             appMgrProxy = nullptr;
             appStateObserver = nullptr;
         }
+        lock.unlock();
     } else {
         AppStateObserver();
     }
@@ -1372,6 +1374,7 @@ int32_t CallControlManager::SetVoIPCallState(int32_t state)
 
 void CallControlManager::AppStateObserver()
 {
+    std::unique_lock<std::mutex> lock(voipMutex_);
     if (appStateObserver == nullptr) {
         appStateObserver = new (std::nothrow) ApplicationStateObserver();
         if (appStateObserver == nullptr) {

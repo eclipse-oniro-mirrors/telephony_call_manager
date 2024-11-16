@@ -183,6 +183,8 @@ private:
     ffrt::task_handle disconnectHandle = nullptr;
     sptr<ApplicationStateObserver> appStateObserver = nullptr;
     sptr<AppExecFwk::IAppMgr> appMgrProxy = nullptr;
+    
+    std::mutex VoipMutex_;
 };
 } // namespace Telephony
 } // namespace OHOS
