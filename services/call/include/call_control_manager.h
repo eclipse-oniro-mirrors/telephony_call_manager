@@ -184,7 +184,7 @@ private:
     sptr<ApplicationStateObserver> appStateObserver = nullptr;
     sptr<AppExecFwk::IAppMgr> appMgrProxy = nullptr;
     
-    std::mutex VoipMutex_;
+    std::mutex voipMutex_;
 };
 } // namespace Telephony
 } // namespace OHOS
