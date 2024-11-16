@@ -1588,8 +1588,9 @@ bool CallStatusManager::IsFocusModeOpen()
         "datashare:///com.ohos.settingsdata/entry/settingsdata/USER_SETTINGSDATA_SECURE_"
         + std::to_string(userId) + "?Proxy=true&key=focus_mode_enable");
     int resp = datashareHelper->Query(uri, "focus_mode_enable", focusModeEnable);
+    TELEPHONY_LOGI("IsFocusModeOpen: userId = %{public}d, focus_mode_enable = %{public}s",
+        userId, focusModeEnable.c_str());
     if (resp == TELEPHONY_SUCCESS && focusModeEnable == "1") {
-        TELEPHONY_LOGI("IsFocusModeOpen: focus_mode_enable = 1");
         return true;
     }
     return false;
@@ -1621,8 +1622,9 @@ bool CallStatusManager::IsRejectCall(sptr<CallBase> &call, const CallDetailInfo 
             CallManagerHisysevent::HiWriteBehaviorEventPhoneUE(
                 CALL_INCOMING_REJECT_BY_SYSTEM, PNAMEID_KEY, KEY_CALL_MANAGER, PVERSIONID_KEY, "",
                 ACTION_TYPE, REJECT_IN_FOCUSMODE);
-            block = false;
-            return true;
+            AAFwk::WantParams params = call->GetExtraParams();
+            params.SetParam("IsNeedSilentInDoNotDisturbMode", AAFwk::Integer::Box(1));
+            call->SetExtraParams(params);
         }
     }
     return false;

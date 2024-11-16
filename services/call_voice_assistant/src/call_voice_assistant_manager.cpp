@@ -506,7 +506,11 @@ void CallVoiceAssistantManager::CallStateUpdated(
                 CallStatusDialing(callId, accountId);
                 break;
             case TelCallState::CALL_STATUS_INCOMING:
-                CallStatusIncoming(callId, accountId);
+                if (!CallObjectManager::IsNeedSilentInDoNotDisturbMode()) {
+                    CallStatusIncoming(callId, accountId);
+                } else {
+                    TELEPHONY_LOGI("need silent, no need voice assistant");
+                }
                 break;
             case TelCallState::CALL_STATUS_DISCONNECTED:
                 CallStatusDisconnected(callId, accountId);

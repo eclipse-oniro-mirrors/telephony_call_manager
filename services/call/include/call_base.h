@@ -138,6 +138,7 @@ public:
     void SetExtraParams(AAFwk::WantParams extraParams);
     bool IsAnsweredCall();
     void SetAnsweredCall(bool isAnswered);
+    AAFwk::WantParams GetExtraParams();
 
 protected:
     int32_t callId_;

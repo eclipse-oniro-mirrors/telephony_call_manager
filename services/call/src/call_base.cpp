@@ -124,6 +124,11 @@ int32_t CallBase::RejectCallBase()
     return TELEPHONY_SUCCESS;
 }
 
+AAFwk::WantParams CallBase::GetExtraParams()
+{
+    return extraParams_;
+}
+
 void CallBase::SetExtraParams(AAFwk::WantParams extraParams)
 {
     extraParams_ = extraParams;
