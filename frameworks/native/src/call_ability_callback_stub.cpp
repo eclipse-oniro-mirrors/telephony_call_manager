@@ -55,10 +55,7 @@ CallAbilityCallbackStub::CallAbilityCallbackStub()
         [this](MessageParcel &data, MessageParcel &reply) { return OnUpdateCameraCapabilities(data, reply); };
 }
 
-CallAbilityCallbackStub::~CallAbilityCallbackStub()
-{
-    memberFuncMap_.clear();
-}
+CallAbilityCallbackStub::~CallAbilityCallbackStub() {}
 
 int32_t CallAbilityCallbackStub::OnRemoteRequest(
     uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
