@@ -847,5 +847,24 @@ sptr<CallBase> CallObjectManager::GetForegroundLiveCallByCallId(int32_t callId)
     }
     return liveCall;
 }
+
+bool CallObjectManager::IsNeedSilentInDoNotDisturbMode()
+{
+    sptr<CallBase> foregroundCall = CallObjectManager::GetForegroundCall(false);
+    if (foregroundCall == nullptr) {
+        TELEPHONY_LOGE("call object nullptr");
+        return false;
+    }
+    TelCallState telCallState = foregroundCall->GetTelCallState();
+    if (telCallState == TelCallState::CALL_STATUS_INCOMING) {
+        AAFwk::WantParams params = foregroundCall->GetExtraParams();
+        int value = params.GetIntParam("IsNeedSilentInDoNotDisturbMode", 0);
+        TELEPHONY_LOGI("CallObjectManager::IsNeedSilentInDoNotDisturbMode: %{public}d", value);
+        if (value == 1) {
+            return true;
+        }
+    }
+    return false;
+}
 } // namespace Telephony
 } // namespace OHOS

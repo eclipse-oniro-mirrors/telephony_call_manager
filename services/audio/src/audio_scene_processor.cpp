@@ -200,15 +200,18 @@ bool AudioSceneProcessor::SwitchIncoming()
     }
     int32_t state;
     DelayedSingleton<CallControlManager>::GetInstance()->GetVoIPCallState(state);
-    auto isStartBroadcast = CallVoiceAssistantManager::GetInstance()->IsStartVoiceBroadcast();
     if (state == (int32_t) CallStateToApp::CALL_STATE_OFFHOOK) {
         DelayedSingleton<AudioControlManager>::GetInstance()->PlayWaitingTone();
     } else {
-        if (!isStartBroadcast) {
-            TELEPHONY_LOGI("broadcast switch is close, start play system ring");
+        bool isStartBroadcast = CallVoiceAssistantManager::GetInstance()->IsStartVoiceBroadcast();
+        bool isNeedSilent = CallObjectManager::IsNeedSilentInDoNotDisturbMode();
+        if (!isStartBroadcast || !isNeedSilent) {
+            TELEPHONY_LOGI("broadcast switch and is close, start play system ring");
             DelayedSingleton<AudioControlManager>::GetInstance()->StopRingtone();
             // play ringtone while incoming state
             DelayedSingleton<AudioControlManager>::GetInstance()->PlayRingtone();
+        } else {
+            TELEPHONY_LOGI("isStartBroadcast: %{public}d, isNeedSilent: %{public}d", isStartBroadcast, isNeedSilent);
         }
         DelayedSingleton<AudioDeviceManager>::GetInstance()->ProcessEvent(AudioEvent::AUDIO_RINGING);
     }
