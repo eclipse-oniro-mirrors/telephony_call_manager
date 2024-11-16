@@ -57,7 +57,6 @@ CallAbilityCallbackStub::CallAbilityCallbackStub()
 
 CallAbilityCallbackStub::~CallAbilityCallbackStub()
 {
-    memberFuncMap_.clear();
 }
 
 int32_t CallAbilityCallbackStub::OnRemoteRequest(
