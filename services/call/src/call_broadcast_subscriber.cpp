@@ -26,7 +26,7 @@
 #include "call_superprivacy_control_manager.h"
 #include "call_connect_ability.h"
 #include "call_ability_connect_callback.h"
-
+#include "number_identity_service.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -50,6 +50,8 @@ CallBroadcastSubscriber::CallBroadcastSubscriber(const OHOS::EventFwk::CommonEve
         [this](const EventFwk::CommonEventData &data) { ConnectCallUiUserSwitchedBroadcast(data); };
     memberFuncMap_[SHUTDOWN] =
         [this](const EventFwk::CommonEventData &data) { ShutdownBroadcast(data); };
+    memberFuncMap_[HSDR_EVENT] =
+        [this](const EventFwk::CommonEventData &data) { HsdrEventBroadcast(data); };
 }
 
 void CallBroadcastSubscriber::OnReceiveEvent(const EventFwk::CommonEventData &data)
@@ -66,6 +68,8 @@ void CallBroadcastSubscriber::OnReceiveEvent(const EventFwk::CommonEventData &da
         code = HIGH_TEMP_LEVEL_CHANGED;
     } else if (action == "usual.event.SUPER_PRIVACY_MODE") {
         code = SUPER_PRIVACY_MODE;
+    } else if (action == "usual.event.HSDR_EVENT") {
+        code = HSDR_EVENT;
     } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_BLUETOOTH_REMOTEDEVICE_NAME_UPDATE) {
         code = BLUETOOTH_REMOTEDEVICE_NAME_UPDATE;
     } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_USER_SWITCHED) {
@@ -167,5 +171,16 @@ void CallBroadcastSubscriber::ShutdownBroadcast(const EventFwk::CommonEventData 
     TELEPHONY_LOGI("system is shutdown.");
     DelayedSingleton<CallControlManager>::GetInstance()->DisconnectAllCalls();
 }
+
+void CallBroadcastSubscriber::HsdrEventBroadcast(const EventFwk::CommonEventData &data)
+{
+    TELEPHONY_LOGI("HsdrEventBroadcast begin");
+    auto dataStr = data.GetData();
+    if (dataStr.find("com.numberidentity.devicenumber") != std::string::npos) {
+        DelayedRefSingleton<NumberIdentityServiceHelper>::GetInstance().NotifyNumberMarkDataUpdate();
+    }
+    TELEPHONY_LOGI("HsdrEventBroadcast end");
+}
+
 } // namespace Telephony
 } // namespace OHOS

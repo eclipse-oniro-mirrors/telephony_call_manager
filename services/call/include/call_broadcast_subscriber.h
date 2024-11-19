@@ -41,7 +41,8 @@ private:
         SUPER_PRIVACY_MODE,
         BLUETOOTH_REMOTEDEVICE_NAME_UPDATE,
         USER_SWITCHED,
-        SHUTDOWN
+        SHUTDOWN,
+        HSDR_EVENT,
     };
     using broadcastSubscriberFunc = std::function<void(const EventFwk::CommonEventData &data)>;
 
@@ -53,6 +54,7 @@ private:
     void UpdateBluetoothDeviceName(const EventFwk::CommonEventData &data);
     void ConnectCallUiUserSwitchedBroadcast(const EventFwk::CommonEventData &data);
     void ShutdownBroadcast(const EventFwk::CommonEventData &data);
+    void HsdrEventBroadcast(const EventFwk::CommonEventData &data);
     std::map<uint32_t, broadcastSubscriberFunc> memberFuncMap_;
 };
 } // namespace Telephony

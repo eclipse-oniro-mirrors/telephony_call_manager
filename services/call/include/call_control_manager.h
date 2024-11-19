@@ -136,6 +136,7 @@ private:
     int32_t ContactsBroadcastSubscriber();
     int32_t SatcommBroadcastSubscriber();
     int32_t SuperPrivacyModeBroadcastSubscriber();
+    int32_t HSDRBroadcastSubscriber();
     int32_t BroadcastSubscriber();
     void ReportPhoneUEInSuperPrivacy(const std::string &eventName);
     void PackageDialInformation(AppExecFwk::PacMap &extras, std::string accountNumber, bool isEcc);
@@ -169,6 +170,7 @@ private:
     sptr<ISystemAbilityStatusChange> pageStateChangeListener_ = nullptr;
     sptr<ISystemAbilityStatusChange> satcommEventListener_ = nullptr;
     sptr<ISystemAbilityStatusChange> superPrivacyEventListener_ = nullptr;
+    sptr<ISystemAbilityStatusChange> hsdrEventListener_ = nullptr;
     DialParaInfo dialSrcInfo_;
     AppExecFwk::PacMap extras_;
     std::mutex mutex_;
