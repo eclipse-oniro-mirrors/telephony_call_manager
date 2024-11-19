@@ -108,11 +108,6 @@ void CallManagerService::UnInit()
 {
     DelayedSingleton<CellularCallConnection>::GetInstance()->UnInit();
     callControlManagerPtr_ = nullptr;
-
-    if (bluetoothCallCallbackPtr_ != nullptr) {
-        delete bluetoothCallCallbackPtr_;
-        bluetoothCallCallbackPtr_ = nullptr;
-    }
 }
 
 void CallManagerService::OnStart()
