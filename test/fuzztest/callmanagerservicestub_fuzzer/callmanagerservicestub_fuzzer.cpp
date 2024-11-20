@@ -200,7 +200,7 @@ int32_t SetCallRestrictionPassword(const uint8_t *data, size_t size)
     return DelayedSingleton<CallManagerService>::GetInstance()->OnSetCallRestrictionPassword(messageParcel, reply);
 }
 
-void doFuzzCallManagerService(const uint8_t *data, size_t size)
+void DoFuzzCallManagerService(const uint8_t *data, size_t size)
 {
     auto callManagerService = DelayedSingleton<CallManagerService>::GetInstance();
     callManagerService->OnStart();
@@ -252,7 +252,7 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     ReportAudioDeviceInfo(data, size);
     PostDialProceed(data, size);
     OnUnRegisterVoipCallManagerCallback(data, size);
-    doFuzzCallManagerService(data, size);
+    DoFuzzCallManagerService(data, size);
     RegisterBluetoothCallManagerCallbackPtr(data, size);
 }
 } // namespace OHOS

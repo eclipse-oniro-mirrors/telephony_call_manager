@@ -19,6 +19,7 @@
 #include <cstdint>
 #define private public
 #include "addcalltoken_fuzzer.h"
+#include "audio_control_manager.h"
 
 using namespace OHOS::Telephony;
 namespace OHOS {
