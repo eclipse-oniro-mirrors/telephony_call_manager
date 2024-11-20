@@ -32,12 +32,12 @@ void SetPausePicture(const uint8_t *data, size_t size)
     int32_t callId = static_cast<int32_t>(size);
     std::string path(reinterpret_cast<const char *>(data), size);
     auto pathU16 = Str8ToStr16(path);
-    MessageParcel dataParcel;
-    dataParcel.WriteInt32(callId);
-    dataParcel.WriteString16(pathU16);
-    dataParcel.RewindRead(0);
+    MessageParcel messageParcel;
+    messageParcel.WriteInt32(callId);
+    messageParcel.WriteString16(pathU16);
+    messageParcel.RewindRead(0);
     MessageParcel reply;
-    DelayedSingleton<CallManagerService>::GetInstance()->OnSetPausePicture(dataParcel, reply);
+    DelayedSingleton<CallManagerService>::GetInstance()->OnSetPausePicture(messageParcel, reply);
 }
 
 void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)

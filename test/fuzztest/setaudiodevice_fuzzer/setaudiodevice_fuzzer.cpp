@@ -19,6 +19,7 @@
 #include <cstdint>
 #define private public
 #include "addcalltoken_fuzzer.h"
+#include "audio_control_manager.h"
 
 using namespace OHOS::Telephony;
 namespace OHOS {
@@ -43,12 +44,12 @@ void SetAudioDevice(const uint8_t *data, size_t size)
     if (memcpy_s(audioDevice.address, kMaxAddressLen, address.c_str(), address.length()) != EOK) {
         return;
     }
-    MessageParcel dataParcel;
-    dataParcel.WriteRawData((const void *)&audioDevice, sizeof(AudioDevice));
-    dataParcel.RewindRead(0);
+    MessageParcel messageParcel;
+    messageParcel.WriteRawData((const void *)&audioDevice, sizeof(AudioDevice));
+    messageParcel.RewindRead(0);
 
     MessageParcel reply;
-    DelayedSingleton<CallManagerService>::GetInstance()->OnSetAudioDevice(dataParcel, reply);
+    DelayedSingleton<CallManagerService>::GetInstance()->OnSetAudioDevice(messageParcel, reply);
 }
 
 void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
@@ -56,7 +57,9 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     if (data == nullptr || size == 0) {
         return;
     }
-
+    DelayedSingleton<AudioProxy>::GetInstance()->SetAudioMicStateChangeCallback();
+    DelayedSingleton<AudioProxy>::GetInstance()->SetAudioDeviceChangeCallback();
+    DelayedSingleton<AudioProxy>::GetInstance()->SetAudioPreferDeviceChangeCallback();
     SetAudioDevice(data, size);
 }
 } // namespace OHOS

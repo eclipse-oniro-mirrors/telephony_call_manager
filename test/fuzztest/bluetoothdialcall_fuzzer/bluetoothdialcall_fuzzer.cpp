@@ -32,11 +32,11 @@ void AnswerCall(const uint8_t *data, size_t size)
         return;
     }
 
-    MessageParcel dataParcel;
-    dataParcel.WriteBuffer(data, size);
-    dataParcel.RewindRead(0);
+    MessageParcel messageParcel;
+    messageParcel.WriteBuffer(data, size);
+    messageParcel.RewindRead(0);
     MessageParcel reply;
-    DelayedSingleton<BluetoothCallService>::GetInstance()->OnAnswerCall(dataParcel, reply);
+    DelayedSingleton<BluetoothCallService>::GetInstance()->OnAnswerCall(messageParcel, reply);
 }
 
 void RejectCall(const uint8_t *data, size_t size)
@@ -45,11 +45,11 @@ void RejectCall(const uint8_t *data, size_t size)
         return;
     }
 
-    MessageParcel dataParcel;
-    dataParcel.WriteBuffer(data, size);
-    dataParcel.RewindRead(0);
+    MessageParcel messageParcel;
+    messageParcel.WriteBuffer(data, size);
+    messageParcel.RewindRead(0);
     MessageParcel reply;
-    DelayedSingleton<BluetoothCallService>::GetInstance()->OnRejectCall(dataParcel, reply);
+    DelayedSingleton<BluetoothCallService>::GetInstance()->OnRejectCall(messageParcel, reply);
 }
 
 void HangUpCall(const uint8_t *data, size_t size)
@@ -58,11 +58,11 @@ void HangUpCall(const uint8_t *data, size_t size)
         return;
     }
 
-    MessageParcel dataParcel;
-    dataParcel.WriteBuffer(data, size);
-    dataParcel.RewindRead(0);
+    MessageParcel messageParcel;
+    messageParcel.WriteBuffer(data, size);
+    messageParcel.RewindRead(0);
     MessageParcel reply;
-    DelayedSingleton<BluetoothCallService>::GetInstance()->OnHangUpCall(dataParcel, reply);
+    DelayedSingleton<BluetoothCallService>::GetInstance()->OnHangUpCall(messageParcel, reply);
 }
 
 void GetBtCallState(const uint8_t *data, size_t size)
@@ -71,11 +71,11 @@ void GetBtCallState(const uint8_t *data, size_t size)
         return;
     }
 
-    MessageParcel dataParcel;
-    dataParcel.WriteBuffer(data, size);
-    dataParcel.RewindRead(0);
+    MessageParcel messageParcel;
+    messageParcel.WriteBuffer(data, size);
+    messageParcel.RewindRead(0);
     MessageParcel reply;
-    DelayedSingleton<BluetoothCallService>::GetInstance()->OnGetBtCallState(dataParcel, reply);
+    DelayedSingleton<BluetoothCallService>::GetInstance()->OnGetBtCallState(messageParcel, reply);
 }
 
 void HoldCall(const uint8_t *data, size_t size)
@@ -84,11 +84,11 @@ void HoldCall(const uint8_t *data, size_t size)
         return;
     }
 
-    MessageParcel dataParcel;
-    dataParcel.WriteBuffer(data, size);
-    dataParcel.RewindRead(0);
+    MessageParcel messageParcel;
+    messageParcel.WriteBuffer(data, size);
+    messageParcel.RewindRead(0);
     MessageParcel reply;
-    DelayedSingleton<BluetoothCallService>::GetInstance()->OnHoldCall(dataParcel, reply);
+    DelayedSingleton<BluetoothCallService>::GetInstance()->OnHoldCall(messageParcel, reply);
 }
 
 void UnHoldCall(const uint8_t *data, size_t size)
@@ -97,11 +97,11 @@ void UnHoldCall(const uint8_t *data, size_t size)
         return;
     }
 
-    MessageParcel dataParcel;
-    dataParcel.WriteBuffer(data, size);
-    dataParcel.RewindRead(0);
+    MessageParcel messageParcel;
+    messageParcel.WriteBuffer(data, size);
+    messageParcel.RewindRead(0);
     MessageParcel reply;
-    DelayedSingleton<BluetoothCallService>::GetInstance()->OnUnHoldCall(dataParcel, reply);
+    DelayedSingleton<BluetoothCallService>::GetInstance()->OnUnHoldCall(messageParcel, reply);
 }
 
 void SwitchCall(const uint8_t *data, size_t size)
@@ -110,11 +110,11 @@ void SwitchCall(const uint8_t *data, size_t size)
         return;
     }
 
-    MessageParcel dataParcel;
-    dataParcel.WriteBuffer(data, size);
-    dataParcel.RewindRead(0);
+    MessageParcel messageParcel;
+    messageParcel.WriteBuffer(data, size);
+    messageParcel.RewindRead(0);
     MessageParcel reply;
-    DelayedSingleton<BluetoothCallService>::GetInstance()->OnSwitchCall(dataParcel, reply);
+    DelayedSingleton<BluetoothCallService>::GetInstance()->OnSwitchCall(messageParcel, reply);
 }
 
 void CombineConference(const uint8_t *data, size_t size)
@@ -123,11 +123,11 @@ void CombineConference(const uint8_t *data, size_t size)
         return;
     }
 
-    MessageParcel dataParcel;
-    dataParcel.WriteBuffer(data, size);
-    dataParcel.RewindRead(0);
+    MessageParcel messageParcel;
+    messageParcel.WriteBuffer(data, size);
+    messageParcel.RewindRead(0);
     MessageParcel reply;
-    DelayedSingleton<BluetoothCallService>::GetInstance()->OnCombineConference(dataParcel, reply);
+    DelayedSingleton<BluetoothCallService>::GetInstance()->OnCombineConference(messageParcel, reply);
 }
 
 void SeparateConference(const uint8_t *data, size_t size)
@@ -136,11 +136,11 @@ void SeparateConference(const uint8_t *data, size_t size)
         return;
     }
 
-    MessageParcel dataParcel;
-    dataParcel.WriteBuffer(data, size);
-    dataParcel.RewindRead(0);
+    MessageParcel messageParcel;
+    messageParcel.WriteBuffer(data, size);
+    messageParcel.RewindRead(0);
     MessageParcel reply;
-    DelayedSingleton<BluetoothCallService>::GetInstance()->OnSeparateConference(dataParcel, reply);
+    DelayedSingleton<BluetoothCallService>::GetInstance()->OnSeparateConference(messageParcel, reply);
 }
 
 void KickOutFromConference(const uint8_t *data, size_t size)
@@ -149,11 +149,11 @@ void KickOutFromConference(const uint8_t *data, size_t size)
         return;
     }
 
-    MessageParcel dataParcel;
-    dataParcel.WriteBuffer(data, size);
-    dataParcel.RewindRead(0);
+    MessageParcel messageParcel;
+    messageParcel.WriteBuffer(data, size);
+    messageParcel.RewindRead(0);
     MessageParcel reply;
-    DelayedSingleton<BluetoothCallService>::GetInstance()->OnKickOutFromConference(dataParcel, reply);
+    DelayedSingleton<BluetoothCallService>::GetInstance()->OnKickOutFromConference(messageParcel, reply);
 }
 
 void StartDtmf(const uint8_t *data, size_t size)
@@ -162,12 +162,12 @@ void StartDtmf(const uint8_t *data, size_t size)
         return;
     }
 
-    MessageParcel dataParcel;
-    dataParcel.WriteInt8(*data);
-    dataParcel.WriteBuffer(data, size);
-    dataParcel.RewindRead(0);
+    MessageParcel messageParcel;
+    messageParcel.WriteInt8(*data);
+    messageParcel.WriteBuffer(data, size);
+    messageParcel.RewindRead(0);
     MessageParcel reply;
-    DelayedSingleton<BluetoothCallService>::GetInstance()->OnStartDtmf(dataParcel, reply);
+    DelayedSingleton<BluetoothCallService>::GetInstance()->OnStartDtmf(messageParcel, reply);
 }
 
 void StopDtmf(const uint8_t *data, size_t size)
@@ -176,11 +176,11 @@ void StopDtmf(const uint8_t *data, size_t size)
         return;
     }
 
-    MessageParcel dataParcel;
-    dataParcel.WriteBuffer(data, size);
-    dataParcel.RewindRead(0);
+    MessageParcel messageParcel;
+    messageParcel.WriteBuffer(data, size);
+    messageParcel.RewindRead(0);
     MessageParcel reply;
-    DelayedSingleton<BluetoothCallService>::GetInstance()->OnStopDtmf(dataParcel, reply);
+    DelayedSingleton<BluetoothCallService>::GetInstance()->OnStopDtmf(messageParcel, reply);
 }
 
 void GetCurrentCallList(const uint8_t *data, size_t size)
@@ -190,12 +190,12 @@ void GetCurrentCallList(const uint8_t *data, size_t size)
     }
 
     int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
-    MessageParcel dataParcel;
-    dataParcel.WriteInt32(slotId);
-    dataParcel.WriteBuffer(data, size);
-    dataParcel.RewindRead(0);
+    MessageParcel messageParcel;
+    messageParcel.WriteInt32(slotId);
+    messageParcel.WriteBuffer(data, size);
+    messageParcel.RewindRead(0);
     MessageParcel reply;
-    DelayedSingleton<BluetoothCallService>::GetInstance()->OnGetCurrentCallList(dataParcel, reply);
+    DelayedSingleton<BluetoothCallService>::GetInstance()->OnGetCurrentCallList(messageParcel, reply);
 }
 
 void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)

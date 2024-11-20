@@ -197,17 +197,17 @@ HWTEST_F(ZeroBranch6Test, Telephony_CallStatusCallbackStub_004, Function | Mediu
     data.RewindRead(0);
     callStatusCallback->OnUpdateCallsReportInfo(data, reply);
 
-    MessageParcel dataParcel;
-    dataParcel.WriteInterfaceToken(CallStatusCallbackStub::GetDescriptor());
+    MessageParcel messageParcel;
+    messageParcel.WriteInterfaceToken(CallStatusCallbackStub::GetDescriptor());
     CellularCallEventInfo info;
     int32_t length = sizeof(CellularCallEventInfo);
     info.eventType = CellularCallEventType::EVENT_REQUEST_RESULT_TYPE;
     info.eventId = RequestResultEventId::INVALID_REQUEST_RESULT_EVENT_ID;
-    dataParcel.WriteInt32(length);
-    dataParcel.WriteRawData((const void *)&info, length);
-    dataParcel.RewindRead(0);
+    messageParcel.WriteInt32(length);
+    messageParcel.WriteRawData((const void *)&info, length);
+    messageParcel.RewindRead(0);
     MessageParcel reply1;
-    ASSERT_NE(callStatusCallback->OnUpdateEventReport(dataParcel, reply1), TELEPHONY_SUCCESS);
+    ASSERT_NE(callStatusCallback->OnUpdateEventReport(messageParcel, reply1), TELEPHONY_SUCCESS);
 }
 
 /**
@@ -231,23 +231,23 @@ HWTEST_F(ZeroBranch6Test, Telephony_CallStatusCallbackStub_005, Function | Mediu
     data.WriteRawData((const void *)&callWaitResponse, length);
     data.RewindRead(0);
     callStatusCallback->OnUpdateGetWaitingResult(data, reply);
-    MessageParcel dataParcel;
-    dataParcel.WriteInterfaceToken(CallStatusCallbackStub::GetDescriptor());
+    MessageParcel messageParcel;
+    messageParcel.WriteInterfaceToken(CallStatusCallbackStub::GetDescriptor());
     CallRestrictionResponse callRestrictionResult;
     length = sizeof(CallRestrictionResponse);
-    dataParcel.WriteInt32(length);
+    messageParcel.WriteInt32(length);
     callRestrictionResult.result = 0;
     callRestrictionResult.status = 0;
     callRestrictionResult.classCw = 0;
-    dataParcel.WriteRawData((const void *)&callRestrictionResult, length);
-    dataParcel.RewindRead(0);
+    messageParcel.WriteRawData((const void *)&callRestrictionResult, length);
+    messageParcel.RewindRead(0);
     MessageParcel reply1;
-    callStatusCallback->OnUpdateGetRestrictionResult(dataParcel, reply1);
+    callStatusCallback->OnUpdateGetRestrictionResult(messageParcel, reply1);
     MessageParcel dataParcel2;
     dataParcel2.WriteInterfaceToken(CallStatusCallbackStub::GetDescriptor());
     CallTransferResponse callTransferResponse;
     length = sizeof(CallTransferResponse);
-    dataParcel.WriteInt32(length);
+    messageParcel.WriteInt32(length);
     callTransferResponse.result = defaultNumber;
     callTransferResponse.status = defaultNumber;
     callTransferResponse.classx = defaultNumber;
@@ -275,15 +275,15 @@ HWTEST_F(ZeroBranch6Test, Telephony_CallStatusCallbackStub_005, Function | Mediu
 HWTEST_F(ZeroBranch6Test, Telephony_CallStatusCallbackStub_006, Function | MediumTest | Level3)
 {
     auto callStatusCallback = std::make_shared<CallStatusCallback>();
-    MessageParcel dataParcel;
-    dataParcel.WriteInterfaceToken(CallStatusCallbackStub::GetDescriptor());
+    MessageParcel messageParcel;
+    messageParcel.WriteInterfaceToken(CallStatusCallbackStub::GetDescriptor());
     MessageParcel reply;
     ClipResponse clipResponse;
     int32_t length = sizeof(ClipResponse);
-    dataParcel.WriteInt32(length);
-    dataParcel.WriteRawData((const void *)&clipResponse, length);
-    dataParcel.RewindRead(0);
-    callStatusCallback->OnUpdateGetCallClipResult(dataParcel, reply);
+    messageParcel.WriteInt32(length);
+    messageParcel.WriteRawData((const void *)&clipResponse, length);
+    messageParcel.RewindRead(0);
+    callStatusCallback->OnUpdateGetCallClipResult(messageParcel, reply);
 
     MessageParcel dataParcel2;
     dataParcel2.WriteInterfaceToken(CallStatusCallbackStub::GetDescriptor());
@@ -327,15 +327,15 @@ HWTEST_F(ZeroBranch6Test, Telephony_CallStatusCallbackStub_006, Function | Mediu
 HWTEST_F(ZeroBranch6Test, Telephony_CallStatusCallbackStub_007, Function | MediumTest | Level3)
 {
     auto callStatusCallback = std::make_shared<CallStatusCallback>();
-    MessageParcel dataParcel;
-    dataParcel.WriteInterfaceToken(CallStatusCallbackStub::GetDescriptor());
+    MessageParcel messageParcel;
+    messageParcel.WriteInterfaceToken(CallStatusCallbackStub::GetDescriptor());
     int32_t length = sizeof(CallModeReportInfo);
-    dataParcel.WriteInt32(length);
+    messageParcel.WriteInt32(length);
     CallModeReportInfo callModeReportInfo;
-    dataParcel.WriteRawData((const void *)&callModeReportInfo, length);
-    dataParcel.RewindRead(0);
+    messageParcel.WriteRawData((const void *)&callModeReportInfo, length);
+    messageParcel.RewindRead(0);
     MessageParcel reply;
-    callStatusCallback->OnReceiveImsCallModeRequest(dataParcel, reply);
+    callStatusCallback->OnReceiveImsCallModeRequest(messageParcel, reply);
 
     MessageParcel dataParcel2;
     dataParcel2.WriteInterfaceToken(CallStatusCallbackStub::GetDescriptor());

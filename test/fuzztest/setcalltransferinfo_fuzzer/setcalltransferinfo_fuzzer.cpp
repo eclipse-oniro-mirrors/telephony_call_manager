@@ -34,12 +34,12 @@ void IsImsSwitchEnabled(const uint8_t *data, size_t size)
     }
 
     int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
-    MessageParcel dataMessageParcel;
-    dataMessageParcel.WriteInt32(slotId);
-    dataMessageParcel.WriteBuffer(data, size);
-    dataMessageParcel.RewindRead(0);
+    MessageParcel messageParcel;
+    messageParcel.WriteInt32(slotId);
+    messageParcel.WriteBuffer(data, size);
+    messageParcel.RewindRead(0);
     MessageParcel reply;
-    DelayedSingleton<CallManagerService>::GetInstance()->OnIsVoLteEnabled(dataMessageParcel, reply);
+    DelayedSingleton<CallManagerService>::GetInstance()->OnIsVoLteEnabled(messageParcel, reply);
 }
 
 void GetVoNRState(const uint8_t *data, size_t size)
@@ -48,12 +48,12 @@ void GetVoNRState(const uint8_t *data, size_t size)
         return;
     }
 
-    MessageParcel dataMessageParcel;
-    dataMessageParcel.WriteInt32(static_cast<int32_t>(size % SLOT_NUM));
-    dataMessageParcel.WriteBuffer(data, size);
-    dataMessageParcel.RewindRead(0);
+    MessageParcel messageParcel;
+    messageParcel.WriteInt32(static_cast<int32_t>(size % SLOT_NUM));
+    messageParcel.WriteBuffer(data, size);
+    messageParcel.RewindRead(0);
     MessageParcel reply;
-    DelayedSingleton<CallManagerService>::GetInstance()->OnGetVoNRState(dataMessageParcel, reply);
+    DelayedSingleton<CallManagerService>::GetInstance()->OnGetVoNRState(messageParcel, reply);
 }
 
 void GetImsConfig(const uint8_t *data, size_t size)
@@ -64,13 +64,13 @@ void GetImsConfig(const uint8_t *data, size_t size)
 
     int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
     int32_t item = static_cast<int32_t>(size % IMS_CONFIG_ITEM_NUM);
-    MessageParcel dataMessageParcel;
-    dataMessageParcel.WriteInt32(slotId);
-    dataMessageParcel.WriteInt32(static_cast<ImsConfigItem>(item));
-    dataMessageParcel.WriteBuffer(data, size);
-    dataMessageParcel.RewindRead(0);
+    MessageParcel messageParcel;
+    messageParcel.WriteInt32(slotId);
+    messageParcel.WriteInt32(static_cast<ImsConfigItem>(item));
+    messageParcel.WriteBuffer(data, size);
+    messageParcel.RewindRead(0);
     MessageParcel reply;
-    DelayedSingleton<CallManagerService>::GetInstance()->OnGetImsConfig(dataMessageParcel, reply);
+    DelayedSingleton<CallManagerService>::GetInstance()->OnGetImsConfig(messageParcel, reply);
 }
 
 void GetImsFeatureValue(const uint8_t *data, size_t size)
@@ -81,13 +81,13 @@ void GetImsFeatureValue(const uint8_t *data, size_t size)
 
     int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
     int32_t type = static_cast<int32_t>(size % FEATURE_TYPE_NUM);
-    MessageParcel dataMessageParcel;
-    dataMessageParcel.WriteInt32(slotId);
-    dataMessageParcel.WriteInt32(static_cast<FeatureType>(type));
-    dataMessageParcel.WriteBuffer(data, size);
-    dataMessageParcel.RewindRead(0);
+    MessageParcel messageParcel;
+    messageParcel.WriteInt32(slotId);
+    messageParcel.WriteInt32(static_cast<FeatureType>(type));
+    messageParcel.WriteBuffer(data, size);
+    messageParcel.RewindRead(0);
     MessageParcel reply;
-    DelayedSingleton<CallManagerService>::GetInstance()->OnGetImsFeatureValue(dataMessageParcel, reply);
+    DelayedSingleton<CallManagerService>::GetInstance()->OnGetImsFeatureValue(messageParcel, reply);
 }
 
 void GetCallTransferInfo(const uint8_t *data, size_t size)
@@ -97,13 +97,13 @@ void GetCallTransferInfo(const uint8_t *data, size_t size)
     }
 
     int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
-    MessageParcel dataMessageParcel;
-    dataMessageParcel.WriteInt32(slotId);
-    dataMessageParcel.WriteInt32(static_cast<int32_t>(size));
-    dataMessageParcel.WriteBuffer(data, size);
-    dataMessageParcel.RewindRead(0);
+    MessageParcel messageParcel;
+    messageParcel.WriteInt32(slotId);
+    messageParcel.WriteInt32(static_cast<int32_t>(size));
+    messageParcel.WriteBuffer(data, size);
+    messageParcel.RewindRead(0);
     MessageParcel reply;
-    DelayedSingleton<CallManagerService>::GetInstance()->OnGetTransferNumber(dataMessageParcel, reply);
+    DelayedSingleton<CallManagerService>::GetInstance()->OnGetTransferNumber(messageParcel, reply);
 }
 
 void SetCallTransferInfo(const uint8_t *data, size_t size)
@@ -113,16 +113,16 @@ void SetCallTransferInfo(const uint8_t *data, size_t size)
     }
 
     int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
-    MessageParcel dataMessageParcel;
+    MessageParcel messageParcel;
     CallTransferInfo info;
     (void)memcpy_s(info.transferNum, kMaxNumberLen, reinterpret_cast<const char *>(data), size);
     info.settingType = CallTransferSettingType::CALL_TRANSFER_ENABLE;
     info.type = CallTransferType::TRANSFER_TYPE_BUSY;
-    dataMessageParcel.WriteInt32(slotId);
-    dataMessageParcel.WriteRawData((const void *)&info, sizeof(CallTransferInfo));
-    dataMessageParcel.RewindRead(0);
+    messageParcel.WriteInt32(slotId);
+    messageParcel.WriteRawData((const void *)&info, sizeof(CallTransferInfo));
+    messageParcel.RewindRead(0);
     MessageParcel reply;
-    DelayedSingleton<CallManagerService>::GetInstance()->OnSetTransferNumber(dataMessageParcel, reply);
+    DelayedSingleton<CallManagerService>::GetInstance()->OnSetTransferNumber(messageParcel, reply);
 }
 
 void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)

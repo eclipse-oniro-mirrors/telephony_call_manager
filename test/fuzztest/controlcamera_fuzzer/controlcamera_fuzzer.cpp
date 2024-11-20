@@ -32,12 +32,12 @@ int32_t ControlCamera(const uint8_t *data, size_t size)
     int32_t callId = static_cast<int32_t>(size);
     std::string cameraId(reinterpret_cast<const char *>(data), size);
     auto cameraIdU16 = Str8ToStr16(cameraId);
-    MessageParcel dataParcel;
-    dataParcel.WriteInt32(callId);
-    dataParcel.WriteString16(cameraIdU16);
-    dataParcel.RewindRead(0);
+    MessageParcel messageParcel;
+    messageParcel.WriteInt32(callId);
+    messageParcel.WriteString16(cameraIdU16);
+    messageParcel.RewindRead(0);
     MessageParcel reply;
-    return DelayedSingleton<CallManagerService>::GetInstance()->OnControlCamera(dataParcel, reply);
+    return DelayedSingleton<CallManagerService>::GetInstance()->OnControlCamera(messageParcel, reply);
 }
 
 int32_t SetPreviewWindow(const uint8_t *data, size_t size)
@@ -47,8 +47,8 @@ int32_t SetPreviewWindow(const uint8_t *data, size_t size)
     }
     int32_t callId = static_cast<int32_t>(size);
     std::string surfaceId(reinterpret_cast<const char *>(data), size);
-    MessageParcel dataParcel;
-    dataParcel.WriteInt32(callId);
+    MessageParcel messageParcel;
+    messageParcel.WriteInt32(callId);
     int len = static_cast<int>(surfaceId.length());
     std::string subSurfaceId = surfaceId;
     if (len >= 1) {
@@ -56,20 +56,20 @@ int32_t SetPreviewWindow(const uint8_t *data, size_t size)
     }
     if (subSurfaceId.empty() || subSurfaceId[0] < '0' || subSurfaceId[0] > '9') {
         subSurfaceId = "";
-        dataParcel.WriteString(subSurfaceId);
+        messageParcel.WriteString(subSurfaceId);
     } else {
-        dataParcel.WriteString(subSurfaceId);
+        messageParcel.WriteString(subSurfaceId);
         uint64_t tmpSurfaceId = std::stoull(subSurfaceId);
         auto surface = SurfaceUtils::GetInstance()->GetSurface(tmpSurfaceId);
         if (surface != nullptr) {
             sptr<IBufferProducer> producer = surface->GetProducer();
             if (producer != nullptr) {
-                dataParcel.WriteRemoteObject(producer->AsObject());
+                messageParcel.WriteRemoteObject(producer->AsObject());
             }
         }
     }
     MessageParcel reply;
-    return DelayedSingleton<CallManagerService>::GetInstance()->OnSetPreviewWindow(dataParcel, reply);
+    return DelayedSingleton<CallManagerService>::GetInstance()->OnSetPreviewWindow(messageParcel, reply);
 }
 
 int32_t SetDisplayWindow(const uint8_t *data, size_t size)
@@ -79,8 +79,8 @@ int32_t SetDisplayWindow(const uint8_t *data, size_t size)
     }
     int32_t callId = static_cast<int32_t>(size);
     std::string surfaceId(reinterpret_cast<const char *>(data), size);
-    MessageParcel dataParcel;
-    dataParcel.WriteInt32(callId);
+    MessageParcel messageParcel;
+    messageParcel.WriteInt32(callId);
     int len = static_cast<int>(surfaceId.length());
     std::string subSurfaceId = surfaceId;
     if (len >= 1) {
@@ -88,20 +88,20 @@ int32_t SetDisplayWindow(const uint8_t *data, size_t size)
     }
     if (subSurfaceId.empty() || subSurfaceId[0] < '0' || subSurfaceId[0] > '9') {
         subSurfaceId = "";
-        dataParcel.WriteString(subSurfaceId);
+        messageParcel.WriteString(subSurfaceId);
     } else {
-        dataParcel.WriteString(subSurfaceId);
+        messageParcel.WriteString(subSurfaceId);
         uint64_t tmpSurfaceId = std::stoull(subSurfaceId);
         auto surface = SurfaceUtils::GetInstance()->GetSurface(tmpSurfaceId);
         if (surface != nullptr) {
             sptr<IBufferProducer> producer = surface->GetProducer();
             if (producer != nullptr) {
-                dataParcel.WriteRemoteObject(producer->AsObject());
+                messageParcel.WriteRemoteObject(producer->AsObject());
             }
         }
     }
     MessageParcel reply;
-    return DelayedSingleton<CallManagerService>::GetInstance()->OnSetDisplayWindow(dataParcel, reply);
+    return DelayedSingleton<CallManagerService>::GetInstance()->OnSetDisplayWindow(messageParcel, reply);
 }
 
 int32_t SetCameraZoom(const uint8_t *data, size_t size)
@@ -110,12 +110,12 @@ int32_t SetCameraZoom(const uint8_t *data, size_t size)
         return TELEPHONY_ERROR;
     }
     float zoomRatio = static_cast<float>(size);
-    MessageParcel dataParcel;
-    dataParcel.WriteFloat(zoomRatio);
-    dataParcel.WriteBuffer(data, size);
-    dataParcel.RewindRead(0);
+    MessageParcel messageParcel;
+    messageParcel.WriteFloat(zoomRatio);
+    messageParcel.WriteBuffer(data, size);
+    messageParcel.RewindRead(0);
     MessageParcel reply;
-    return DelayedSingleton<CallManagerService>::GetInstance()->OnSetCameraZoom(dataParcel, reply);
+    return DelayedSingleton<CallManagerService>::GetInstance()->OnSetCameraZoom(messageParcel, reply);
 }
 
 int32_t SetPausePicture(const uint8_t *data, size_t size)
@@ -126,12 +126,12 @@ int32_t SetPausePicture(const uint8_t *data, size_t size)
     int32_t callId = static_cast<int32_t>(size);
     std::string path(reinterpret_cast<const char *>(data), size);
     auto pathU16 = Str8ToStr16(path);
-    MessageParcel dataParcel;
-    dataParcel.WriteInt32(callId);
-    dataParcel.WriteString16(pathU16);
-    dataParcel.RewindRead(0);
+    MessageParcel messageParcel;
+    messageParcel.WriteInt32(callId);
+    messageParcel.WriteString16(pathU16);
+    messageParcel.RewindRead(0);
     MessageParcel reply;
-    return DelayedSingleton<CallManagerService>::GetInstance()->OnSetPausePicture(dataParcel, reply);
+    return DelayedSingleton<CallManagerService>::GetInstance()->OnSetPausePicture(messageParcel, reply);
 }
 
 int32_t SetDeviceDirection(const uint8_t *data, size_t size)
@@ -141,11 +141,11 @@ int32_t SetDeviceDirection(const uint8_t *data, size_t size)
     }
     int32_t callId = static_cast<int32_t>(*data);
     int32_t rotation = static_cast<int32_t>(*data);
-    MessageParcel dataParcel;
-    dataParcel.WriteInt32(callId);
-    dataParcel.WriteInt32(rotation);
+    MessageParcel messageParcel;
+    messageParcel.WriteInt32(callId);
+    messageParcel.WriteInt32(rotation);
     MessageParcel reply;
-    return DelayedSingleton<CallManagerService>::GetInstance()->OnSetDeviceDirection(dataParcel, reply);
+    return DelayedSingleton<CallManagerService>::GetInstance()->OnSetDeviceDirection(messageParcel, reply);
 }
 
 int32_t CancelCallUpgrade(const uint8_t *data, size_t size)
@@ -154,10 +154,10 @@ int32_t CancelCallUpgrade(const uint8_t *data, size_t size)
         return TELEPHONY_ERROR;
     }
     int32_t callId = static_cast<int32_t>(*data);
-    MessageParcel dataParcel;
-    dataParcel.WriteInt32(callId);
+    MessageParcel messageParcel;
+    messageParcel.WriteInt32(callId);
     MessageParcel reply;
-    return DelayedSingleton<CallManagerService>::GetInstance()->OnCancelCallUpgrade(dataParcel, reply);
+    return DelayedSingleton<CallManagerService>::GetInstance()->OnCancelCallUpgrade(messageParcel, reply);
 }
 
 int32_t RequestCameraCapabilities(const uint8_t *data, size_t size)
@@ -166,10 +166,10 @@ int32_t RequestCameraCapabilities(const uint8_t *data, size_t size)
         return TELEPHONY_ERROR;
     }
     int32_t callId = static_cast<int32_t>(*data);
-    MessageParcel dataParcel;
-    dataParcel.WriteInt32(callId);
+    MessageParcel messageParcel;
+    messageParcel.WriteInt32(callId);
     MessageParcel reply;
-    return DelayedSingleton<CallManagerService>::GetInstance()->OnRequestCameraCapabilities(dataParcel, reply);
+    return DelayedSingleton<CallManagerService>::GetInstance()->OnRequestCameraCapabilities(messageParcel, reply);
 }
 
 void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)

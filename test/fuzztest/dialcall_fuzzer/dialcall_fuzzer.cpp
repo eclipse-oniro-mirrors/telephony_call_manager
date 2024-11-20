@@ -36,14 +36,15 @@ void OnRegisterVoipCallManagerCallback(const uint8_t *data, size_t size)
     if (!IsServiceInited()) {
         return;
     }
-    MessageParcel dataMessageParcel;
+    MessageParcel messageParcel;
     std::unique_ptr<CallAbilityCallback> callbackWrap = std::make_unique<CallAbilityCallback>();
     if (callbackWrap == nullptr) {
         return;
     }
-    dataMessageParcel.WriteRemoteObject(callbackWrap.release()->AsObject().GetRefPtr());
+    messageParcel.WriteBuffer(data, size);
+    messageParcel.RewindRead(0);
     MessageParcel reply;
-    DelayedSingleton<CallManagerService>::GetInstance()->OnRegisterVoipCallManagerCallback(dataMessageParcel, reply);
+    DelayedSingleton<CallManagerService>::GetInstance()->OnRegisterVoipCallManagerCallback(messageParcel, reply);
 }
 
 void OnRemoteRequest(const uint8_t *data, size_t size)
@@ -52,15 +53,15 @@ void OnRemoteRequest(const uint8_t *data, size_t size)
         return;
     }
 
-    MessageParcel dataMessageParcel;
-    if (!dataMessageParcel.WriteInterfaceToken(CallManagerServiceStub::GetDescriptor())) {
+    MessageParcel messageParcel;
+    if (!messageParcel.WriteInterfaceToken(CallManagerServiceStub::GetDescriptor())) {
         return;
     }
-    dataMessageParcel.RewindRead(0);
+    messageParcel.RewindRead(0);
     uint32_t code = static_cast<uint32_t>(*data);
     MessageParcel reply;
     MessageOption option;
-    DelayedSingleton<CallManagerService>::GetInstance()->OnRemoteRequest(code, dataMessageParcel, reply, option);
+    DelayedSingleton<CallManagerService>::GetInstance()->OnRemoteRequest(code, messageParcel, reply, option);
 }
 
 int32_t OnRegisterCallBack(const uint8_t *data, size_t size)
@@ -68,14 +69,16 @@ int32_t OnRegisterCallBack(const uint8_t *data, size_t size)
     if (!IsServiceInited()) {
         return TELEPHONY_ERROR;
     }
-    MessageParcel dataMessageParcel;
+    MessageParcel messageParcel;
     std::unique_ptr<CallAbilityCallback> callbackWrap = std::make_unique<CallAbilityCallback>();
     if (callbackWrap == nullptr) {
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    dataMessageParcel.WriteRemoteObject(callbackWrap.release()->AsObject().GetRefPtr());
+    messageParcel.WriteRemoteObject(callbackWrap.release()->AsObject().GetRefPtr());
+    messageParcel.WriteBuffer(data, size);
+    messageParcel.RewindRead(0);
     MessageParcel reply;
-    return DelayedSingleton<CallManagerService>::GetInstance()->OnRegisterCallBack(dataMessageParcel, reply);
+    return DelayedSingleton<CallManagerService>::GetInstance()->OnRegisterCallBack(messageParcel, reply);
 }
 
 bool HasCall(const uint8_t *data, size_t size)
@@ -83,11 +86,11 @@ bool HasCall(const uint8_t *data, size_t size)
     if (!IsServiceInited()) {
         return TELEPHONY_ERROR;
     }
-    MessageParcel dataParcel;
-    dataParcel.WriteBuffer(data, size);
-    dataParcel.RewindRead(0);
+    MessageParcel messageParcel;
+    messageParcel.WriteBuffer(data, size);
+    messageParcel.RewindRead(0);
     MessageParcel reply;
-    return DelayedSingleton<CallManagerService>::GetInstance()->OnHasCall(dataParcel, reply);
+    return DelayedSingleton<CallManagerService>::GetInstance()->OnHasCall(messageParcel, reply);
 }
 
 int32_t GetCallState(const uint8_t *data, size_t size)
@@ -95,11 +98,11 @@ int32_t GetCallState(const uint8_t *data, size_t size)
     if (!IsServiceInited()) {
         return TELEPHONY_ERROR;
     }
-    MessageParcel dataParcel;
-    dataParcel.WriteBuffer(data, size);
-    dataParcel.RewindRead(0);
+    MessageParcel messageParcel;
+    messageParcel.WriteBuffer(data, size);
+    messageParcel.RewindRead(0);
     MessageParcel reply;
-    return DelayedSingleton<CallManagerService>::GetInstance()->OnGetCallState(dataParcel, reply);
+    return DelayedSingleton<CallManagerService>::GetInstance()->OnGetCallState(messageParcel, reply);
 }
 
 int32_t GetCallWaiting(const uint8_t *data, size_t size)
@@ -108,12 +111,12 @@ int32_t GetCallWaiting(const uint8_t *data, size_t size)
         return TELEPHONY_ERROR;
     }
     int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
-    MessageParcel dataParcel;
-    dataParcel.WriteInt32(slotId);
-    dataParcel.WriteBuffer(data, size);
-    dataParcel.RewindRead(0);
+    MessageParcel messageParcel;
+    messageParcel.WriteInt32(slotId);
+    messageParcel.WriteBuffer(data, size);
+    messageParcel.RewindRead(0);
     MessageParcel reply;
-    return DelayedSingleton<CallManagerService>::GetInstance()->OnGetCallWaiting(dataParcel, reply);
+    return DelayedSingleton<CallManagerService>::GetInstance()->OnGetCallWaiting(messageParcel, reply);
 }
 
 bool IsRinging(const uint8_t *data, size_t size)
@@ -121,11 +124,11 @@ bool IsRinging(const uint8_t *data, size_t size)
     if (!IsServiceInited()) {
         return false;
     }
-    MessageParcel dataParcel;
-    dataParcel.WriteBuffer(data, size);
-    dataParcel.RewindRead(0);
+    MessageParcel messageParcel;
+    messageParcel.WriteBuffer(data, size);
+    messageParcel.RewindRead(0);
     MessageParcel reply;
-    return DelayedSingleton<CallManagerService>::GetInstance()->OnIsRinging(dataParcel, reply);
+    return DelayedSingleton<CallManagerService>::GetInstance()->OnIsRinging(messageParcel, reply);
 }
 
 bool IsInEmergencyCall(const uint8_t *data, size_t size)
@@ -133,11 +136,11 @@ bool IsInEmergencyCall(const uint8_t *data, size_t size)
     if (!IsServiceInited()) {
         return false;
     }
-    MessageParcel dataParcel;
-    dataParcel.WriteBuffer(data, size);
-    dataParcel.RewindRead(0);
+    MessageParcel messageParcel;
+    messageParcel.WriteBuffer(data, size);
+    messageParcel.RewindRead(0);
     MessageParcel reply;
-    return DelayedSingleton<CallManagerService>::GetInstance()->OnIsInEmergencyCall(dataParcel, reply);
+    return DelayedSingleton<CallManagerService>::GetInstance()->OnIsInEmergencyCall(messageParcel, reply);
 }
 
 int32_t DialCall(const uint8_t *data, size_t size)
@@ -152,17 +155,17 @@ int32_t DialCall(const uint8_t *data, size_t size)
     int32_t dialScene = static_cast<int32_t>(size % DIAL_SCENE_NUM);
     int32_t dialType = static_cast<int32_t>(size % DIAL_TYPE_NUM);
     int32_t callType = static_cast<int32_t>(size % CALL_TYPE_NUM);
-    MessageParcel dataParcel;
-    dataParcel.WriteString16(numberU16);
-    dataParcel.WriteInt32(accountId);
-    dataParcel.WriteInt32(videoState);
-    dataParcel.WriteInt32(dialScene);
-    dataParcel.WriteInt32(dialType);
-    dataParcel.WriteInt32(callType);
-    dataParcel.RewindRead(0);
+    MessageParcel messageParcel;
+    messageParcel.WriteString16(numberU16);
+    messageParcel.WriteInt32(accountId);
+    messageParcel.WriteInt32(videoState);
+    messageParcel.WriteInt32(dialScene);
+    messageParcel.WriteInt32(dialType);
+    messageParcel.WriteInt32(callType);
+    messageParcel.RewindRead(0);
 
     MessageParcel reply;
-    return DelayedSingleton<CallManagerService>::GetInstance()->OnDialCall(dataParcel, reply);
+    return DelayedSingleton<CallManagerService>::GetInstance()->OnDialCall(messageParcel, reply);
 }
 
 void RemoveMissedIncomingCallNotification(const uint8_t *data, size_t size)
@@ -170,12 +173,12 @@ void RemoveMissedIncomingCallNotification(const uint8_t *data, size_t size)
     if (!IsServiceInited()) {
         return;
     }
-    MessageParcel dataMessageParcel;
-    dataMessageParcel.WriteBuffer(data, size);
-    dataMessageParcel.RewindRead(0);
+    MessageParcel messageParcel;
+    messageParcel.WriteBuffer(data, size);
+    messageParcel.RewindRead(0);
     MessageParcel reply;
     DelayedSingleton<CallManagerService>::GetInstance()->OnRemoveMissedIncomingCallNotification(
-        dataMessageParcel, reply);
+        messageParcel, reply);
 }
 
 int32_t SetCallWaiting(const uint8_t *data, size_t size)
@@ -185,12 +188,12 @@ int32_t SetCallWaiting(const uint8_t *data, size_t size)
     }
     int32_t slotId = static_cast<int32_t>(*data % SLOT_NUM);
     int32_t activate = static_cast<int32_t>(*data % ACTIVE_NUM);
-    MessageParcel dataParcel;
-    dataParcel.WriteInt32(slotId);
-    dataParcel.WriteBool(activate);
-    dataParcel.RewindRead(0);
+    MessageParcel messageParcel;
+    messageParcel.WriteInt32(slotId);
+    messageParcel.WriteBool(activate);
+    messageParcel.RewindRead(0);
     MessageParcel reply;
-    return DelayedSingleton<CallManagerService>::GetInstance()->OnSetCallWaiting(dataParcel, reply);
+    return DelayedSingleton<CallManagerService>::GetInstance()->OnSetCallWaiting(messageParcel, reply);
 }
 
 int32_t SetCallRestriction(const uint8_t *data, size_t size)
@@ -203,12 +206,12 @@ int32_t SetCallRestriction(const uint8_t *data, size_t size)
     std::string msg(reinterpret_cast<const char *>(data), size);
     int32_t length = msg.length() > kMaxNumberLen ? kMaxNumberLen : msg.length();
     memcpy_s(info.password, kMaxNumberLen, msg.c_str(), length);
-    MessageParcel dataParcel;
-    dataParcel.WriteInt32(slotId);
-    dataParcel.WriteRawData((const void *)&info, sizeof(CallRestrictionInfo));
-    dataParcel.RewindRead(0);
+    MessageParcel messageParcel;
+    messageParcel.WriteInt32(slotId);
+    messageParcel.WriteRawData((const void *)&info, sizeof(CallRestrictionInfo));
+    messageParcel.RewindRead(0);
     MessageParcel reply;
-    return DelayedSingleton<CallManagerService>::GetInstance()->OnSetCallRestriction(dataParcel, reply);
+    return DelayedSingleton<CallManagerService>::GetInstance()->OnSetCallRestriction(messageParcel, reply);
 }
 
 int32_t JoinConference(const uint8_t *data, size_t size)
@@ -218,12 +221,12 @@ int32_t JoinConference(const uint8_t *data, size_t size)
     }
     int32_t callId = static_cast<int32_t>(*data % CALL_ID_NUM);
     std::vector<std::u16string> numberList { u"0000000000" };
-    MessageParcel dataParcel;
-    dataParcel.WriteInt32(callId);
-    dataParcel.WriteString16Vector(numberList);
-    dataParcel.RewindRead(0);
+    MessageParcel messageParcel;
+    messageParcel.WriteInt32(callId);
+    messageParcel.WriteString16Vector(numberList);
+    messageParcel.RewindRead(0);
     MessageParcel reply;
-    return DelayedSingleton<CallManagerService>::GetInstance()->OnJoinConference(dataParcel, reply);
+    return DelayedSingleton<CallManagerService>::GetInstance()->OnJoinConference(messageParcel, reply);
 }
 
 int32_t StartRtt(const uint8_t *data, size_t size)
@@ -234,12 +237,12 @@ int32_t StartRtt(const uint8_t *data, size_t size)
 
     int32_t callId = static_cast<int32_t>(size % CALL_ID_NUM);
     std::string msg(reinterpret_cast<const char *>(data), size);
-    MessageParcel dataParcel;
-    dataParcel.WriteInt32(callId);
-    dataParcel.WriteString(msg);
-    dataParcel.RewindRead(0);
+    MessageParcel messageParcel;
+    messageParcel.WriteInt32(callId);
+    messageParcel.WriteString(msg);
+    messageParcel.RewindRead(0);
     MessageParcel reply;
-    return DelayedSingleton<CallManagerService>::GetInstance()->OnStartRtt(dataParcel, reply);
+    return DelayedSingleton<CallManagerService>::GetInstance()->OnStartRtt(messageParcel, reply);
 }
 
 int32_t InputDialerSpecialCode(const uint8_t *data, size_t size)
@@ -248,11 +251,11 @@ int32_t InputDialerSpecialCode(const uint8_t *data, size_t size)
         return TELEPHONY_ERROR;
     }
     std::string specialCode(reinterpret_cast<const char *>(data), size);
-    MessageParcel dataParcel;
-    dataParcel.WriteString(specialCode);
-    dataParcel.RewindRead(0);
+    MessageParcel messageParcel;
+    messageParcel.WriteString(specialCode);
+    messageParcel.RewindRead(0);
     MessageParcel reply;
-    return DelayedSingleton<CallManagerService>::GetInstance()->OnInputDialerSpecialCode(dataParcel, reply);
+    return DelayedSingleton<CallManagerService>::GetInstance()->OnInputDialerSpecialCode(messageParcel, reply);
 }
 
 int32_t CancelCallUpgrade(const uint8_t *data, size_t size)
@@ -260,12 +263,12 @@ int32_t CancelCallUpgrade(const uint8_t *data, size_t size)
     if (!IsServiceInited()) {
         return TELEPHONY_ERROR;
     }
-    MessageParcel dataParcel;
+    MessageParcel messageParcel;
     MessageParcel replyParcel;
     int32_t callId = static_cast<int32_t>(*data % CALL_ID_NUM);
-    dataParcel.WriteInt32(callId);
-    dataParcel.RewindRead(0);
-    return DelayedSingleton<CallManagerService>::GetInstance()->OnCancelCallUpgrade(dataParcel, replyParcel);
+    messageParcel.WriteInt32(callId);
+    messageParcel.RewindRead(0);
+    return DelayedSingleton<CallManagerService>::GetInstance()->OnCancelCallUpgrade(messageParcel, replyParcel);
 }
 
 int32_t RequestCameraCapabilities(const uint8_t *data, size_t size)
@@ -273,12 +276,12 @@ int32_t RequestCameraCapabilities(const uint8_t *data, size_t size)
     if (!IsServiceInited()) {
         return TELEPHONY_ERROR;
     }
-    MessageParcel dataParcel;
+    MessageParcel messageParcel;
     MessageParcel replyParcel;
     int32_t callId = static_cast<int32_t>(*data % CALL_ID_NUM);
-    dataParcel.WriteInt32(callId);
-    dataParcel.RewindRead(0);
-    return DelayedSingleton<CallManagerService>::GetInstance()->OnRequestCameraCapabilities(dataParcel, replyParcel);
+    messageParcel.WriteInt32(callId);
+    messageParcel.RewindRead(0);
+    return DelayedSingleton<CallManagerService>::GetInstance()->OnRequestCameraCapabilities(messageParcel, replyParcel);
 }
 
 void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
