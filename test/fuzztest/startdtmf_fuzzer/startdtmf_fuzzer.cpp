@@ -33,12 +33,12 @@ void StartDtmf(const uint8_t *data, size_t size)
 
     int32_t callId = size % CALL_ID_NUM;
     char str = *reinterpret_cast<const char *>(data);
-    MessageParcel dataMessageParcel;
-    dataMessageParcel.WriteInt32(callId);
-    dataMessageParcel.WriteInt8(str);
-    dataMessageParcel.RewindRead(0);
+    MessageParcel messageParcel;
+    messageParcel.WriteInt32(callId);
+    messageParcel.WriteInt8(str);
+    messageParcel.RewindRead(0);
     MessageParcel reply;
-    DelayedSingleton<CallManagerService>::GetInstance()->OnStartDtmf(dataMessageParcel, reply);
+    DelayedSingleton<CallManagerService>::GetInstance()->OnStartDtmf(messageParcel, reply);
 }
 
 void StopRtt(const uint8_t *data, size_t size)
@@ -48,11 +48,11 @@ void StopRtt(const uint8_t *data, size_t size)
     }
 
     int32_t callId = *data % CALL_ID_NUM;
-    MessageParcel dataMessageParcel;
-    dataMessageParcel.WriteInt32(callId);
-    dataMessageParcel.RewindRead(0);
+    MessageParcel messageParcel;
+    messageParcel.WriteInt32(callId);
+    messageParcel.RewindRead(0);
     MessageParcel reply;
-    DelayedSingleton<CallManagerService>::GetInstance()->OnStopRtt(dataMessageParcel, reply);
+    DelayedSingleton<CallManagerService>::GetInstance()->OnStopRtt(messageParcel, reply);
 }
 
 void SetMuted(const uint8_t *data, size_t size)
@@ -62,11 +62,12 @@ void SetMuted(const uint8_t *data, size_t size)
     }
 
     bool isMute = false;
-    MessageParcel dataMessageParcel;
-    dataMessageParcel.WriteBool(isMute);
-    dataMessageParcel.RewindRead(0);
+    MessageParcel messageParcel;
+    messageParcel.WriteBool(isMute);
+    messageParcel.WriteBuffer(data, size);
+    messageParcel.RewindRead(0);
     MessageParcel reply;
-    DelayedSingleton<CallManagerService>::GetInstance()->OnSetMute(dataMessageParcel, reply);
+    DelayedSingleton<CallManagerService>::GetInstance()->OnSetMute(messageParcel, reply);
 }
 
 void MuteRinger(const uint8_t *data, size_t size)
@@ -75,11 +76,11 @@ void MuteRinger(const uint8_t *data, size_t size)
         return;
     }
 
-    MessageParcel dataMessageParcel;
-    dataMessageParcel.WriteBuffer(data, size);
-    dataMessageParcel.RewindRead(0);
+    MessageParcel messageParcel;
+    messageParcel.WriteBuffer(data, size);
+    messageParcel.RewindRead(0);
     MessageParcel reply;
-    DelayedSingleton<CallManagerService>::GetInstance()->OnSetMute(dataMessageParcel, reply);
+    DelayedSingleton<CallManagerService>::GetInstance()->OnSetMute(messageParcel, reply);
 }
 
 void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)

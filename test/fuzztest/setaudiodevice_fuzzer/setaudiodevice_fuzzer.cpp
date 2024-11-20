@@ -43,12 +43,12 @@ void SetAudioDevice(const uint8_t *data, size_t size)
     if (memcpy_s(audioDevice.address, kMaxAddressLen, address.c_str(), address.length()) != EOK) {
         return;
     }
-    MessageParcel dataParcel;
-    dataParcel.WriteRawData((const void *)&audioDevice, sizeof(AudioDevice));
-    dataParcel.RewindRead(0);
+    MessageParcel messageParcel;
+    messageParcel.WriteRawData((const void *)&audioDevice, sizeof(AudioDevice));
+    messageParcel.RewindRead(0);
 
     MessageParcel reply;
-    DelayedSingleton<CallManagerService>::GetInstance()->OnSetAudioDevice(dataParcel, reply);
+    DelayedSingleton<CallManagerService>::GetInstance()->OnSetAudioDevice(messageParcel, reply);
 }
 
 void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)

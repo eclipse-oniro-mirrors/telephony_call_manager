@@ -35,13 +35,13 @@ void RejectCall(const uint8_t *data, size_t size)
     int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
     int32_t rejectWithMessage = static_cast<int32_t>(size % CHOICE_NUM);
     std::string message(reinterpret_cast<const char *>(data), size);
-    MessageParcel dataMessageParcel;
-    dataMessageParcel.WriteInt32(slotId);
-    dataMessageParcel.WriteInt32(rejectWithMessage);
-    dataMessageParcel.WriteString16(Str8ToStr16(message));
-    dataMessageParcel.RewindRead(0);
+    MessageParcel messageParcel;
+    messageParcel.WriteInt32(slotId);
+    messageParcel.WriteInt32(rejectWithMessage);
+    messageParcel.WriteString16(Str8ToStr16(message));
+    messageParcel.RewindRead(0);
     MessageParcel reply;
-    DelayedSingleton<CallManagerService>::GetInstance()->OnRejectCall(dataMessageParcel, reply);
+    DelayedSingleton<CallManagerService>::GetInstance()->OnRejectCall(messageParcel, reply);
 }
 
 void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)

@@ -28,16 +28,16 @@ int32_t FormatPhoneNumberToE164(const uint8_t *data, size_t size)
     if (!IsServiceInited()) {
         return TELEPHONY_ERROR;
     }
-    MessageParcel dataParcel;
+    MessageParcel messageParcel;
     std::string number(reinterpret_cast<const char *>(data), size);
     auto numberU16 = Str8ToStr16(number);
     std::string countryCode(reinterpret_cast<const char *>(data), size);
     auto countryCodeU16 = Str8ToStr16(countryCode);
-    dataParcel.WriteString16(numberU16);
-    dataParcel.WriteString16(countryCodeU16);
-    dataParcel.RewindRead(0);
+    messageParcel.WriteString16(numberU16);
+    messageParcel.WriteString16(countryCodeU16);
+    messageParcel.RewindRead(0);
     MessageParcel reply;
-    return DelayedSingleton<CallManagerService>::GetInstance()->OnFormatPhoneNumberToE164(dataParcel, reply);
+    return DelayedSingleton<CallManagerService>::GetInstance()->OnFormatPhoneNumberToE164(messageParcel, reply);
 }
 
 void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)

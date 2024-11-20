@@ -33,12 +33,12 @@ bool IsEmergencyPhoneNumber(const uint8_t *data, size_t size)
     std::string number(reinterpret_cast<char *>(const_cast<uint8_t *>(data)), size);
     auto numberU16 = Str8ToStr16(number);
     int32_t slotId = static_cast<uint32_t>(size % SLOT_NUM);
-    MessageParcel dataParcel;
-    dataParcel.WriteString16(numberU16);
-    dataParcel.WriteInt32(slotId);
-    dataParcel.RewindRead(0);
+    MessageParcel messageParcel;
+    messageParcel.WriteString16(numberU16);
+    messageParcel.WriteInt32(slotId);
+    messageParcel.RewindRead(0);
     MessageParcel reply;
-    return DelayedSingleton<CallManagerService>::GetInstance()->OnIsEmergencyPhoneNumber(dataParcel, reply);
+    return DelayedSingleton<CallManagerService>::GetInstance()->OnIsEmergencyPhoneNumber(messageParcel, reply);
 }
 
 void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)

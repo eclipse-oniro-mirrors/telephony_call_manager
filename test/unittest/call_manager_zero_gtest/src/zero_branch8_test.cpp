@@ -222,12 +222,12 @@ HWTEST_F(ZeroBranch7Test, Telephony_CallBroadcastSubscriber_001, Function | Medi
 HWTEST_F(ZeroBranch7Test, Telephony_CallStatusCallbackStub_001, Function | MediumTest | Level3)
 {
     auto callStatusCallback = std::make_shared<CallStatusCallback>();
-    MessageParcel dataParcel;
-    dataParcel.WriteInterfaceToken(CallStatusCallbackStub::GetDescriptor());
-    dataParcel.WriteInt32(0);
-    dataParcel.WriteString("hello");
+    MessageParcel messageParcel;
+    messageParcel.WriteInterfaceToken(CallStatusCallbackStub::GetDescriptor());
+    messageParcel.WriteInt32(0);
+    messageParcel.WriteString("hello");
     MessageParcel reply;
-    ASSERT_EQ(callStatusCallback->OnUpdateDisconnectedCause(dataParcel, reply), TELEPHONY_SUCCESS);
+    ASSERT_EQ(callStatusCallback->OnUpdateDisconnectedCause(messageParcel, reply), TELEPHONY_SUCCESS);
     MessageParcel dataParcel2;
     dataParcel2.WriteInterfaceToken(CallStatusCallbackStub::GetDescriptor());
     dataParcel2.WriteInt32(0);

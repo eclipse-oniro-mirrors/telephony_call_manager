@@ -29,15 +29,15 @@ int32_t GetMainCallId(const uint8_t *data, size_t size)
     if (!IsServiceInited()) {
         return TELEPHONY_ERROR;
     }
-    MessageParcel dataParcel;
+    MessageParcel messageParcel;
     int32_t callId = static_cast<int32_t>(size);
-    dataParcel.WriteInt32(callId);
+    messageParcel.WriteInt32(callId);
     size_t mainCallId = static_cast<int32_t>(size);
-    dataParcel.WriteInt32(mainCallId);
-    dataParcel.WriteBuffer(data, size);
-    dataParcel.RewindRead(0);
+    messageParcel.WriteInt32(mainCallId);
+    messageParcel.WriteBuffer(data, size);
+    messageParcel.RewindRead(0);
     MessageParcel reply;
-    return DelayedSingleton<CallManagerService>::GetInstance()->OnGetMainCallId(dataParcel, reply);
+    return DelayedSingleton<CallManagerService>::GetInstance()->OnGetMainCallId(messageParcel, reply);
 }
 
 int32_t GetSubCallIdList(const uint8_t *data, size_t size)
@@ -45,13 +45,13 @@ int32_t GetSubCallIdList(const uint8_t *data, size_t size)
     if (!IsServiceInited()) {
         return TELEPHONY_ERROR;
     }
-    MessageParcel dataParcel;
+    MessageParcel messageParcel;
     int32_t id = static_cast<int32_t>(size);
-    dataParcel.WriteInt32(id);
-    dataParcel.WriteBuffer(data, size);
-    dataParcel.RewindRead(0);
+    messageParcel.WriteInt32(id);
+    messageParcel.WriteBuffer(data, size);
+    messageParcel.RewindRead(0);
     MessageParcel reply;
-    return DelayedSingleton<CallManagerService>::GetInstance()->OnGetSubCallIdList(dataParcel, reply);
+    return DelayedSingleton<CallManagerService>::GetInstance()->OnGetSubCallIdList(messageParcel, reply);
 }
 
 int32_t GetCallIdListForConference(const uint8_t *data, size_t size)
@@ -59,13 +59,13 @@ int32_t GetCallIdListForConference(const uint8_t *data, size_t size)
     if (!IsServiceInited()) {
         return TELEPHONY_ERROR;
     }
-    MessageParcel dataParcel;
+    MessageParcel messageParcel;
     int32_t callId = static_cast<int32_t>(size);
-    dataParcel.WriteInt32(callId);
-    dataParcel.WriteBuffer(data, size);
-    dataParcel.RewindRead(0);
+    messageParcel.WriteInt32(callId);
+    messageParcel.WriteBuffer(data, size);
+    messageParcel.RewindRead(0);
     MessageParcel reply;
-    return DelayedSingleton<CallManagerService>::GetInstance()->OnGetCallIdListForConference(dataParcel, reply);
+    return DelayedSingleton<CallManagerService>::GetInstance()->OnGetCallIdListForConference(messageParcel, reply);
 }
 
 int32_t GetCallRestriction(const uint8_t *data, size_t size)
@@ -74,13 +74,13 @@ int32_t GetCallRestriction(const uint8_t *data, size_t size)
         return TELEPHONY_ERROR;
     }
     int32_t slotId = static_cast<int32_t>(size % SLOT_NUM);
-    MessageParcel dataParcel;
-    dataParcel.WriteInt32(slotId);
-    dataParcel.WriteInt32(static_cast<int32_t>(size));
-    dataParcel.WriteBuffer(data, size);
-    dataParcel.RewindRead(0);
+    MessageParcel messageParcel;
+    messageParcel.WriteInt32(slotId);
+    messageParcel.WriteInt32(static_cast<int32_t>(size));
+    messageParcel.WriteBuffer(data, size);
+    messageParcel.RewindRead(0);
     MessageParcel reply;
-    return DelayedSingleton<CallManagerService>::GetInstance()->OnGetCallRestriction(dataParcel, reply);
+    return DelayedSingleton<CallManagerService>::GetInstance()->OnGetCallRestriction(messageParcel, reply);
 }
 
 int32_t ReportOttCallDetailsInfo(const uint8_t *data, size_t size)
@@ -97,12 +97,12 @@ int32_t ReportOttCallDetailsInfo(const uint8_t *data, size_t size)
     memcpy_s(info.bundleName, kMaxBundleNameLen, msg.c_str(), bundleLength);
     info.callState = TelCallState::CALL_STATUS_DIALING;
     info.videoState = VideoStateType::TYPE_VOICE;
-    MessageParcel dataParcel;
-    dataParcel.WriteInt32(vecCnt);
-    dataParcel.WriteRawData((const void *)&info, sizeof(OttCallDetailsInfo));
-    dataParcel.RewindRead(0);
+    MessageParcel messageParcel;
+    messageParcel.WriteInt32(vecCnt);
+    messageParcel.WriteRawData((const void *)&info, sizeof(OttCallDetailsInfo));
+    messageParcel.RewindRead(0);
     MessageParcel reply;
-    return DelayedSingleton<CallManagerService>::GetInstance()->OnReportOttCallDetailsInfo(dataParcel, reply);
+    return DelayedSingleton<CallManagerService>::GetInstance()->OnReportOttCallDetailsInfo(messageParcel, reply);
 }
 
 int32_t ReportOttCallEventInfo(const uint8_t *data, size_t size)
@@ -115,11 +115,11 @@ int32_t ReportOttCallEventInfo(const uint8_t *data, size_t size)
     std::string msg(reinterpret_cast<const char *>(data), size);
     int32_t bundleLength = msg.length() > kMaxBundleNameLen ? kMaxBundleNameLen : msg.length();
     memcpy_s(info.bundleName, kMaxBundleNameLen, msg.c_str(), bundleLength);
-    MessageParcel dataParcel;
-    dataParcel.WriteRawData((const void *)&info, sizeof(OttCallEventInfo));
-    dataParcel.RewindRead(0);
+    MessageParcel messageParcel;
+    messageParcel.WriteRawData((const void *)&info, sizeof(OttCallEventInfo));
+    messageParcel.RewindRead(0);
     MessageParcel reply;
-    return DelayedSingleton<CallManagerService>::GetInstance()->OnReportOttCallEventInfo(dataParcel, reply);
+    return DelayedSingleton<CallManagerService>::GetInstance()->OnReportOttCallEventInfo(messageParcel, reply);
 }
 
 int32_t CloseUnFinishedUssd(const uint8_t *data, size_t size)
@@ -128,11 +128,11 @@ int32_t CloseUnFinishedUssd(const uint8_t *data, size_t size)
         return TELEPHONY_ERROR;
     }
     int32_t slotId = static_cast<int32_t>(*data % SLOT_NUM);
-    MessageParcel dataParcel;
-    dataParcel.WriteInt32(slotId);
-    dataParcel.RewindRead(0);
+    MessageParcel messageParcel;
+    messageParcel.WriteInt32(slotId);
+    messageParcel.RewindRead(0);
     MessageParcel reply;
-    return DelayedSingleton<CallManagerService>::GetInstance()->OnCloseUnFinishedUssd(dataParcel, reply);
+    return DelayedSingleton<CallManagerService>::GetInstance()->OnCloseUnFinishedUssd(messageParcel, reply);
 }
 
 int32_t FormatPhoneNumber(const uint8_t *data, size_t size)
@@ -144,12 +144,12 @@ int32_t FormatPhoneNumber(const uint8_t *data, size_t size)
     auto numberU16 = Str8ToStr16(number);
     std::string countryCode(reinterpret_cast<const char *>(data), size);
     auto countryCodeU16 = Str8ToStr16(countryCode);
-    MessageParcel dataParcel;
-    dataParcel.WriteString16(numberU16);
-    dataParcel.WriteString16(countryCodeU16);
-    dataParcel.RewindRead(0);
+    MessageParcel messageParcel;
+    messageParcel.WriteString16(numberU16);
+    messageParcel.WriteString16(countryCodeU16);
+    messageParcel.RewindRead(0);
     MessageParcel reply;
-    return DelayedSingleton<CallManagerService>::GetInstance()->OnFormatPhoneNumber(dataParcel, reply);
+    return DelayedSingleton<CallManagerService>::GetInstance()->OnFormatPhoneNumber(messageParcel, reply);
 }
 
 void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
