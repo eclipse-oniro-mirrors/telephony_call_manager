@@ -56,7 +56,9 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     if (data == nullptr || size == 0) {
         return;
     }
-
+    DelayedSingleton<AudioProxy>::GetInstance()->SetAudioMicStateChangeCallback();
+    DelayedSingleton<AudioProxy>::GetInstance()->SetAudioDeviceChangeCallback();
+    DelayedSingleton<AudioProxy>::GetInstance()->SetAudioPreferDeviceChangeCallback();
     SetAudioDevice(data, size);
 }
 } // namespace OHOS
