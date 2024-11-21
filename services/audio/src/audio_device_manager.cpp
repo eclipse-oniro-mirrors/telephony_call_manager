@@ -84,7 +84,7 @@ void AudioDeviceManager::Init()
 bool AudioDeviceManager::IsSupportEarpiece()
 {
     isUpdateEarpieceDevice_ = true;
-    std::vector<std::unique_ptr<AudioDeviceDescriptor>> audioDeviceList =
+    std::vector<std::shared_ptr<AudioDeviceDescriptor>> audioDeviceList =
         AudioStandard::AudioRoutingManager::GetInstance()->GetAvailableDevices(AudioDeviceUsage::CALL_OUTPUT_DEVICES);
     for (auto& audioDevice : audioDeviceList) {
         TELEPHONY_LOGI("available deviceType : %{public}d", audioDevice->deviceType_);
@@ -497,7 +497,7 @@ int32_t AudioDeviceManager::ReportAudioDeviceChange(const AudioDevice &device)
     std::string deviceName = device.deviceName;
     if (audioDeviceType_ == AudioDeviceType::DEVICE_BLUETOOTH_SCO) {
         if (address.empty() || deviceName.empty()) {
-            std::unique_ptr<AudioStandard::AudioDeviceDescriptor> activeBluetoothDevice =
+            std::shared_ptr<AudioStandard::AudioDeviceDescriptor> activeBluetoothDevice =
                 AudioStandard::AudioRoutingManager::GetInstance()->GetActiveBluetoothDevice();
             if (activeBluetoothDevice != nullptr && !activeBluetoothDevice->macAddress_.empty()) {
                 address = activeBluetoothDevice->macAddress_;
@@ -612,7 +612,7 @@ bool AudioDeviceManager::IsBtScoConnected()
 
 bool AudioDeviceManager::IsBtActived()
 {
-    std::unique_ptr<AudioStandard::AudioDeviceDescriptor> activeBluetoothDevice =
+    std::shared_ptr<AudioStandard::AudioDeviceDescriptor> activeBluetoothDevice =
         AudioStandard::AudioRoutingManager::GetInstance()->GetActiveBluetoothDevice();
     if (activeBluetoothDevice != nullptr && !activeBluetoothDevice->macAddress_.empty()) {
         TELEPHONY_LOGI("has actived bt device");

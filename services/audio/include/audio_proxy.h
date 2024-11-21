@@ -47,11 +47,13 @@ class AudioDeviceChangeCallback : public AudioStandard::AudioManagerDeviceChange
 
 class AudioPreferDeviceChangeCallback : public AudioStandard::AudioPreferredOutputDeviceChangeCallback {
 public:
-    void OnPreferredOutputDeviceUpdated(const std::vector<sptr<AudioStandard::AudioDeviceDescriptor>> &desc) override;
+    void OnPreferredOutputDeviceUpdated(
+        const std::vector<std::shared_ptr<AudioStandard::AudioDeviceDescriptor>> &desc) override;
 
 private:
-    bool IsDistributedDeviceSelected(const std::vector<sptr<AudioStandard::AudioDeviceDescriptor>> &desc);
-    bool SetBluetoothDevice(AudioDevice &device, const std::vector<sptr<AudioStandard::AudioDeviceDescriptor>> &desc);
+    bool IsDistributedDeviceSelected(const std::vector<std::shared_ptr<AudioStandard::AudioDeviceDescriptor>> &desc);
+    bool SetBluetoothDevice(AudioDevice &device,
+        const std::vector<std::shared_ptr<AudioStandard::AudioDeviceDescriptor>> &desc);
 };
 
 class AudioMicStateChangeCallback : public AudioStandard::AudioManagerMicStateChangeCallback {

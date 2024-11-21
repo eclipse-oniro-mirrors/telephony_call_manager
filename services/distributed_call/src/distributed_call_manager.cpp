@@ -400,21 +400,21 @@ void DistributedCallManager::ReportDistributedDeviceInfo(const AudioDevice& devi
         TELEPHONY_LOGW("audioSystemMananger nullptr");
         return;
     }
-    std::vector<sptr<AudioDeviceDescriptor>> descs = audioSystemMananger
+    std::vector<std::shared_ptr<AudioDeviceDescriptor>> descs = audioSystemMananger
         ->GetDevices(DeviceFlag::DISTRIBUTED_OUTPUT_DEVICES_FLAG);
     size_t size = descs.size();
     if (descs.size() <= 0) {
         TELEPHONY_LOGW("no distributed device");
         return;
     }
-    std::vector<sptr<AudioDeviceDescriptor>> remoteDevice = descs;
+    std::vector<std::shared_ptr<AudioDeviceDescriptor>> remoteDevice = descs;
     for (auto device = descs.begin(); device != descs.end(); device++) {
         std::string devId = (*device)->networkId_;
         if (!devId.empty() && curDevId == devId) {
             TELEPHONY_LOGI("curDecId is the same as devId, devId = %{public}s",
                 GetAnonyString(devId).c_str());
             remoteDevice.clear();
-            remoteDevice.push_back(sptr<AudioDeviceDescriptor>(*device));
+            remoteDevice.push_back(*device);
             break;
         }
     }
