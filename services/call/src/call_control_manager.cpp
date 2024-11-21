@@ -15,6 +15,7 @@
 
 #include "call_control_manager.h"
 #include "cpp/task_ext.h"
+#include <cstdint>
 #include <securec.h>
 #include "csignal"
 #include <string_ex.h>
@@ -72,10 +73,12 @@ CallControlManager::~CallControlManager()
             samgrProxy->UnSubscribeSystemAbility(COMMON_EVENT_SERVICE_ID, pageStateChangeListener_);
             samgrProxy->UnSubscribeSystemAbility(COMMON_EVENT_SERVICE_ID, satcommEventListener_);
             samgrProxy->UnSubscribeSystemAbility(COMMON_EVENT_SERVICE_ID, superPrivacyEventListener_);
+            samgrProxy->UnSubscribeSystemAbility(COMMON_EVENT_SERVICE_ID, hsdrEventListener_);
             pageStateChangeListener_ = nullptr;
             statusChangeListener_ = nullptr;
             satcommEventListener_ = nullptr;
             superPrivacyEventListener_ = nullptr;
+            hsdrEventListener_ = nullptr;
         }
     }
     {
@@ -1695,6 +1698,36 @@ int32_t CallControlManager::SuperPrivacyModeBroadcastSubscriber()
     return TELEPHONY_SUCCESS;
 }
 
+int32_t CallControlManager::HSDRBroadcastSubscriber()
+{
+    EventFwk::MatchingSkills matchingSkillsHsdr_;
+    matchingSkillsHsdr_.AddEvent("usual.event.HSDR_EVENT");
+    EventFwk::CommonEventSubscribeInfo subscriberInfosHsdr_(matchingSkillsHsdr_);
+    subscriberInfosHsdr_.SetPublisherBundleName("com.hsdr");
+    subscriberInfosHsdr_.SetPermission("ohos.permission.securityguard.REPORT_SECURITY_INFO");
+    subscriberInfosHsdr_.SetThreadMode(EventFwk::CommonEventSubscribeInfo::COMMON);
+    std::shared_ptr<CallBroadcastSubscriber> subscriberHsdr_ =
+        std::make_shared<CallBroadcastSubscriber>(subscriberInfosHsdr_);
+    if (subscriberHsdr_ == nullptr) {
+        TELEPHONY_LOGE("CallControlManager::BroadcastSubscriber subscriberPtrs_ is nullptr");
+        return TELEPHONY_ERROR;
+    }
+
+    auto samgrProxy = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (samgrProxy == nullptr) {
+        TELEPHONY_LOGE("samgrProxy is nullptr");
+        return TELEPHONY_ERROR;
+    }
+    hsdrEventListener_ = new (std::nothrow) SystemAbilityListener(subscriberHsdr_);
+    if (hsdrEventListener_ == nullptr) {
+        TELEPHONY_LOGE("hsdrEventListener_ is nullptr");
+        return TELEPHONY_ERROR;
+    }
+    int32_t ret = samgrProxy->SubscribeSystemAbility(COMMON_EVENT_SERVICE_ID, hsdrEventListener_);
+    TELEPHONY_LOGI("CallControlManager::BroadcastSubscriber hsdrEventListener_ ret: %{public}d", ret);
+    return TELEPHONY_SUCCESS;
+}
+
 int32_t CallControlManager::BroadcastSubscriber()
 {
     int32_t ret = CommonBroadcastSubscriber();
@@ -1712,6 +1745,10 @@ int32_t CallControlManager::BroadcastSubscriber()
     ret = SuperPrivacyModeBroadcastSubscriber();
     if (ret) {
         TELEPHONY_LOGW("SuperPrivacyModeBroadcastSubscriber fail.");
+    }
+    ret = HSDRBroadcastSubscriber();
+    if (ret) {
+        TELEPHONY_LOGW("HSDRBroadcastSubscriber fail.");
     }
     return TELEPHONY_SUCCESS;
 }
