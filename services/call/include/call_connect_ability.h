@@ -40,6 +40,7 @@ public:
 
 private:
     sptr<AAFwk::IAbilityConnection> connectCallback_ = nullptr;
+    std::mutex connectAbilityMutex_;
     bool isConnected_ = false;
     bool isConnecting_ = false;
     bool isDisconnecting_ = false;

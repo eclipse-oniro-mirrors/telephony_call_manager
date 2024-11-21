@@ -44,9 +44,11 @@ void CallConnectAbility::ConnectAbility()
         return;
     }
     TELEPHONY_LOGW("Connect callui ability");
+    std::lock_guard<std::mutex> lock(connectAbilityMutex_);
     AAFwk::Want want;
     AppExecFwk::ElementName element("", "com.ohos.callui", "com.ohos.callui.ServiceAbility");
     want.SetElement(element);
+    
     if (connectCallback_ == nullptr) {
         connectCallback_ = new CallAbilityConnectCallback();
     }
@@ -67,6 +69,7 @@ void CallConnectAbility::DisconnectAbility()
         SetDisconnectingFlag(false);
         return;
     }
+    std::lock_guard<std::mutex> lock(connectAbilityMutex_);
     if (connectCallback_ != nullptr) {
         TELEPHONY_LOGW("Disconnect callui ability");
         std::string identity = IPCSkeleton::ResetCallingIdentity();
