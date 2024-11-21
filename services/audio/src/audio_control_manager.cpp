@@ -75,18 +75,23 @@ void AudioControlManager::UpdateForegroundLiveCall()
         liveCall->GetTelCallState() == TelCallState::CALL_STATUS_DIALING ||
         liveCall->GetTelCallState() == TelCallState::CALL_STATUS_ALERTING) {
         if (frontCall_ == nullptr) {
-            frontCall_ = liveCall;
-        } else {
+            CallAttributeInfo info;
+            liveCall->GetCallAttributeInfo(info);
+            if (info.index != 0) {
+                frontCall_ = liveCall;
+            }
+        }
+        if (frontCall_ != nullptr) {
             int32_t frontCallId = frontCall_->GetCallID();
             int32_t liveCallId = liveCall->GetCallID();
             if (frontCallId != liveCallId) {
                 frontCall_ = liveCall;
             }
-        }
-        bool frontCallMute = frontCall_->IsMuted();
-        bool currentMute = DelayedSingleton<AudioProxy>::GetInstance()->IsMicrophoneMute();
-        if (frontCallMute != currentMute) {
-            SetMute(frontCallMute);
+            bool frontCallMute = frontCall_->IsMuted();
+            bool currentMute = DelayedSingleton<AudioProxy>::GetInstance()->IsMicrophoneMute();
+            if (frontCallMute != currentMute) {
+                SetMute(frontCallMute);
+            }
         }
     }
 }
@@ -545,7 +550,7 @@ bool AudioControlManager::PlayRingtone()
     }
     CallAttributeInfo info;
     incomingCall->GetCallAttributeBaseInfo(info);
-    AudioStandard::AudioRingerMode ringMode = DelayedSingleton<AudioProxy>::GetInstance()->GetRingerMode();
+    AudioStandard::AudioRingerMode ringMode = DelayedSingleton<AudioProxy>::GetInstance()->GetRingerMode();   
     if (incomingCall->GetCrsType() == CRS_TYPE) {
         if (!isCrsVibrating_ && (ringMode != AudioStandard::AudioRingerMode::RINGER_MODE_SILENT)) {
             if (ringMode == AudioStandard::AudioRingerMode::RINGER_MODE_VIBRATE || IsRingingVibrateModeOn()) {
