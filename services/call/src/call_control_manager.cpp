@@ -1580,6 +1580,7 @@ void CallControlManager::SystemAbilityListener::OnRemoveSystemAbility(
         bool subscribeResult = EventFwk::CommonEventManager::UnSubscribeCommonEvent(subscriberPtr);
         TELEPHONY_LOGI("CallControlManager UnSubscribeCommonEvent = %{public}d", subscribeResult);
     }
+    subscriberPtrList_.clear();
     IPCSkeleton::SetCallingIdentity(identity);
     TELEPHONY_LOGI("CallControlManager remove BroadcastSubscriber");
 }
