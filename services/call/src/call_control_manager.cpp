@@ -1673,8 +1673,8 @@ int32_t CallControlManager::SystemAbilityListener::HSDRBroadcastSubscriber()
         TELEPHONY_LOGE("CallControlManager::BroadcastSubscriber subscriberPtrs_ is nullptr");
         return TELEPHONY_ERROR;
     }
-    subscriberPtrList_.emplace_back(subscriberPtr);
-    bool subscribeResult = EventFwk::CommonEventManager::SubscribeCommonEvent(subscriberPtr);
+    subscriberPtrList_.emplace_back(subscriberHsdr_);
+    bool subscribeResult = EventFwk::CommonEventManager::SubscribeCommonEvent(subscriberHsdr_);
     TELEPHONY_LOGI("CallControlManager SubscribeCommonEvent subscribeResult = %{public}d", subscribeResult);
     return TELEPHONY_SUCCESS;
 }
