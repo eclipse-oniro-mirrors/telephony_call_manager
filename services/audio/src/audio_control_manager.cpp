@@ -79,7 +79,7 @@ void AudioControlManager::UpdateForegroundLiveCall()
         } else {
             int32_t frontCallId = frontCall_->GetCallID();
             int32_t liveCallId = liveCall->GetCallID();
-            if (frontCallId != liveCallId) {
+            if (frontCallId != liveCallId || (frontCall_->GetCallIndex() == 0 && liveCall->GetCallIndex() != 0)) {
                 frontCall_ = liveCall;
             }
         }
