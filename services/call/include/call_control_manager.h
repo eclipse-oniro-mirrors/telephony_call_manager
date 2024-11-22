@@ -132,12 +132,7 @@ public:
 private:
     void CallStateObserve();
     int32_t NumberLegalityCheck(std::string &number);
-    int32_t CommonBroadcastSubscriber();
-    int32_t ContactsBroadcastSubscriber();
-    int32_t SatcommBroadcastSubscriber();
-    int32_t SuperPrivacyModeBroadcastSubscriber();
-    int32_t HSDRBroadcastSubscriber();
-    int32_t BroadcastSubscriber();
+    int32_t SubscriberSaStateChange();
     void ReportPhoneUEInSuperPrivacy(const std::string &eventName);
     void PackageDialInformation(AppExecFwk::PacMap &extras, std::string accountNumber, bool isEcc);
     static void handler();
@@ -150,13 +145,20 @@ private:
 private:
     class SystemAbilityListener : public SystemAbilityStatusChangeStub {
     public:
-        explicit SystemAbilityListener(std::shared_ptr<CallBroadcastSubscriber> subscriberPtr);
+        explicit SystemAbilityListener();
         ~SystemAbilityListener() = default;
         void OnAddSystemAbility(int32_t systemAbilityId, const std::string &deviceId) override;
         void OnRemoveSystemAbility(int32_t systemAbilityId, const std::string &deviceId) override;
 
     private:
-        std::shared_ptr<CallBroadcastSubscriber> subscriberPtr_;
+        int32_t CommonBroadcastSubscriber();
+        int32_t ContactsBroadcastSubscriber();
+        int32_t SatcommBroadcastSubscriber();
+        int32_t SuperPrivacyModeBroadcastSubscriber();
+        int32_t HSDRBroadcastSubscriber();
+
+    private:
+        std::vector<std::shared_ptr<CallBroadcastSubscriber>> subscriberPtrList_;
     };
 
 private:
@@ -167,10 +169,6 @@ private:
     std::shared_ptr<MissedCallNotification> missedCallNotification_;
     std::unique_ptr<CallSettingManager> callSettingManagerPtr_;
     sptr<ISystemAbilityStatusChange> statusChangeListener_ = nullptr;
-    sptr<ISystemAbilityStatusChange> pageStateChangeListener_ = nullptr;
-    sptr<ISystemAbilityStatusChange> satcommEventListener_ = nullptr;
-    sptr<ISystemAbilityStatusChange> superPrivacyEventListener_ = nullptr;
-    sptr<ISystemAbilityStatusChange> hsdrEventListener_ = nullptr;
     DialParaInfo dialSrcInfo_;
     AppExecFwk::PacMap extras_;
     std::mutex mutex_;
