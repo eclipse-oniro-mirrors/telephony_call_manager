@@ -967,7 +967,10 @@ int32_t AudioControlManager::PlayRingback()
 
 int32_t AudioControlManager::StopRingback()
 {
-    return StopCallTone();
+    if (tone_ != nullptr && tone_->getCurrentToneType() == ToneDescriptor::TONE_RINGBACK) {
+        return StopCallTone();
+    }
+    return TELEPHONY_SUCCESS;
 }
 
 int32_t AudioControlManager::PlayWaitingTone()
