@@ -75,23 +75,22 @@ void AudioControlManager::UpdateForegroundLiveCall()
         liveCall->GetTelCallState() == TelCallState::CALL_STATUS_DIALING ||
         liveCall->GetTelCallState() == TelCallState::CALL_STATUS_ALERTING) {
         if (frontCall_ == nullptr) {
-            CallAttributeInfo info;
-            liveCall->GetCallAttributeInfo(info);
-            if (info.index != 0) {
+            frontCall_ = liveCall;
+        } else {
+            CallAttributeInfo liveCallInfo;
+            liveCall->GetCallAttributeInfo(liveCallInfo);
+            CallAttributeInfo frontCallInfo;
+            frontCall_->GetCallAttributeInfo(frontCallInfo);
+            int32_t frontCallId = frontCall_->GetCallID();
+            int32_t liveCallId = liveCall->GetCallID();
+            if (frontCallId != liveCallId || (frontCallInfo.index == 0 && liveCallInfo.index != 0)) {
                 frontCall_ = liveCall;
             }
         }
-        if (frontCall_ != nullptr) {
-            int32_t frontCallId = frontCall_->GetCallID();
-            int32_t liveCallId = liveCall->GetCallID();
-            if (frontCallId != liveCallId) {
-                frontCall_ = liveCall;
-            }
-            bool frontCallMute = frontCall_->IsMuted();
-            bool currentMute = DelayedSingleton<AudioProxy>::GetInstance()->IsMicrophoneMute();
-            if (frontCallMute != currentMute) {
-                SetMute(frontCallMute);
-            }
+        bool frontCallMute = frontCall_->IsMuted();
+        bool currentMute = DelayedSingleton<AudioProxy>::GetInstance()->IsMicrophoneMute();
+        if (frontCallMute != currentMute) {
+            SetMute(frontCallMute);
         }
     }
 }
