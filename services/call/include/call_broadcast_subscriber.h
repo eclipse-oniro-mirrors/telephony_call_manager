@@ -43,6 +43,7 @@ private:
         USER_SWITCHED,
         SHUTDOWN,
         HSDR_EVENT,
+        SCREEN_UNLOCKED
     };
     using broadcastSubscriberFunc = std::function<void(const EventFwk::CommonEventData &data)>;
 
@@ -55,6 +56,7 @@ private:
     void ConnectCallUiUserSwitchedBroadcast(const EventFwk::CommonEventData &data);
     void ShutdownBroadcast(const EventFwk::CommonEventData &data);
     void HsdrEventBroadcast(const EventFwk::CommonEventData &data);
+    void ScreenUnlockedBroadcast(const EventFwk::CommonEventData &data);
     std::map<uint32_t, broadcastSubscriberFunc> memberFuncMap_;
 };
 } // namespace Telephony
