@@ -33,6 +33,9 @@ public:
 
 private:
     int32_t CreateSocket(const std::string &peerDevId, const std::string &localName, const std::string &peerName);
+
+private:
+    int32_t clientSocket_{INVALID_SOCKET_ID};
 };
 
 } // namespace Telephony
