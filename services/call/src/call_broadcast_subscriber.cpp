@@ -205,7 +205,7 @@ void CallBroadcastSubscriber::ScreenUnlockedBroadcast(const EventFwk::CommonEven
         eventData.SetCode(INCOMING_CALL_MISSED_CODE);
         EventFwk::CommonEventPublishInfo publishInfo;
         publishInfo.SetOrdered(true);
-        bool result = EventFwk::CommonEventManager::PublishCommonEvent(eventData, publishInfo, nullptr);
+        EventFwk::CommonEventManager::PublishCommonEvent(eventData, publishInfo, nullptr);
     }
 }
 } // namespace Telephony
