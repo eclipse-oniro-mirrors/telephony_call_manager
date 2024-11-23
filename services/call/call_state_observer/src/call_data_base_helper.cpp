@@ -43,8 +43,6 @@ static constexpr const char *SETTINGS_AIRPLANE_MODE_URI =
     "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true&key=airplane_mode";
 static constexpr const char *SETTINGS_AIRPLANE_MODE = "settings.telephony.airplanemode";
 static constexpr const int32_t MAX_WAITIME_TIME = 10;
-static constexpr const int32_t RETRY_NUM = 3;
-static constexpr const int32_t RETRY_INTERVAL_10MS = 10 * 1000;
 constexpr int32_t E_OK = 0;
 
 CallDataRdbObserver::CallDataRdbObserver(std::vector<std::string> *phones)
@@ -216,24 +214,6 @@ bool CallDataBaseHelper::GetHelperAndUrl(std::shared_ptr<DataShare::DataShareHel
     AccountSA::OsAccountManager::IsOsAccountVerified(userId, isUserUnlocked);
     TELEPHONY_LOGI("isUserUnlocked: %{public}d", isUserUnlocked);
     if (!isUserUnlocked) {
-        usleep(RETRY_INTERVAL_10MS);
-        for (int retryNum = 0; retryNum < RETRY_NUM; retryNum++) {
-            sptr<ISystemAbilityManager> samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-            if (samgr == nullptr) {
-                TELEPHONY_LOGE("Failed to get system ability samgr.");
-                return false;
-            }
-            sptr<IRemoteObject> remoteObject = samgr->CheckSystemAbility(DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID);
-            if (remoteObject == nullptr) {
-                usleep(RETRY_INTERVAL_10MS);
-            } else {
-                break;
-            }
-            if (retryNum == RETRY_NUM -1) {
-                TELEPHONY_LOGE("max retry num.");
-                return false;
-            }
-        }
         helper = CreateDataShareHelper(CALL_SUBSECTION_SILENCE + std::to_string(userId));
         url = CALL_SUBSECTION_SILENCE + std::to_string(userId);
     } else {
