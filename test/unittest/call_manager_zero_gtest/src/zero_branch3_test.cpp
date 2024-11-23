@@ -811,7 +811,7 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallControlManager_004, Function | MediumTes
     number = "1234567";
     callControlManager->NumberLegalityCheck(number);
     std::shared_ptr<CallBroadcastSubscriber> subscriberPtr = nullptr;
-    CallControlManager::SystemAbilityListener listen();
+    CallControlManager::SystemAbilityListener listen;
     int32_t systemAbilityId = 1;
     std::string deviceId = "123";
     listen.OnAddSystemAbility(systemAbilityId, deviceId);
