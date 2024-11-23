@@ -257,13 +257,14 @@ bool CallDataBaseHelper::QueryCallLog(
         TELEPHONY_LOGE("GetHelperAndUrl fail!");
         return false;
     }
+
     Uri uri(url);
     std::vector<std::string> columns;
     columns.push_back(CALL_PHONE_NUMBER);
     auto resultSet = helper->Query(uri, predicates, columns);
     if (resultSet == nullptr) {
-        helper->Release();
         TELEPHONY_LOGE("resultSet is nullptr!");
+        helper->Release();
         return false;
     }
     int32_t operationResult = resultSet->GoToFirstRow();
@@ -304,8 +305,8 @@ bool CallDataBaseHelper::QueryAndDeleteLimitedIds(DataShare::DataSharePredicates
     columns.push_back(CALL_ID);
     auto resultSet = helper->Query(uri, predicates, columns);
     if (resultSet == nullptr) {
-        helper->Release();
         TELEPHONY_LOGE("resultSet is nullptr!");
+        helper->Release();
         return false;
     }
     int32_t operationResult = resultSet->GoToFirstRow();

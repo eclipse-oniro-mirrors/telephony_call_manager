@@ -216,7 +216,6 @@ HWTEST_F(ZeroBranch7Test, Telephony_CallBroadcastSubscriber_001, Function | Medi
     ASSERT_NO_THROW(subscriber.ShutdownBroadcast(eventData));
     ASSERT_NO_THROW(subscriber.HsdrEventBroadcast(eventData));
     ASSERT_NO_THROW(subscriber.ScreenUnlockedBroadcast(eventData));
-    ASSERT_NE(sizeof(eventData), 0);
 }
 
 /**

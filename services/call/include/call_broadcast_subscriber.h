@@ -43,7 +43,7 @@ private:
         USER_SWITCHED,
         SHUTDOWN,
         HSDR_EVENT,
-        SCREEN_UNLOCKED,
+        SCREEN_UNLOCKED
     };
     using broadcastSubscriberFunc = std::function<void(const EventFwk::CommonEventData &data)>;
 
