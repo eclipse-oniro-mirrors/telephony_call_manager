@@ -27,8 +27,8 @@ void ClientSession::Connect(const std::string &peerDevId, const std::string &loc
 {
     {
         std::lock_guard<ffrt::mutex> lock(mutex_);
-        if (socket_ > INVALID_SOCKET_ID) {
-            TELEPHONY_LOGI("client socket %{public}d already connect", socket_);
+        if (clientSocket_ > INVALID_SOCKET_ID) {
+            TELEPHONY_LOGI("client socket %{public}d already connect", clientSocket_);
             return;
         }
     }
@@ -42,15 +42,19 @@ void ClientSession::Connect(const std::string &peerDevId, const std::string &loc
     };
     int32_t ret = BindAsync(socket, qos, sizeof(qos) / sizeof(qos[0]), &listener_);
     TELEPHONY_LOGI("async bind socket %{public}d result %{public}d", socket, ret);
+
+    std::lock_guard<ffrt::mutex> lock(mutex_);
+    clientSocket_ = socket;
 }
 
 void ClientSession::Disconnect()
 {
     std::lock_guard<ffrt::mutex> lock(mutex_);
-    if (socket_ > INVALID_SOCKET_ID) {
-        Shutdown(socket_);
-        TELEPHONY_LOGI("close client socket %{public}d success", socket_);
+    if (clientSocket_ > INVALID_SOCKET_ID) {
+        Shutdown(clientSocket_);
+        TELEPHONY_LOGI("close client socket %{public}d success", clientSocket_);
     }
+    clientSocket_ = INVALID_SOCKET_ID;
     socket_ = INVALID_SOCKET_ID;
 }
 
@@ -70,6 +74,10 @@ void ClientSession::OnSessionShutdown(int32_t socket)
 {
     std::lock_guard<ffrt::mutex> lock(mutex_);
     if (socket == socket_) {
+        socket_ = INVALID_SOCKET_ID;
+    }
+    if (socket == clientSocket_) {
+        clientSocket_ = INVALID_SOCKET_ID;
         socket_ = INVALID_SOCKET_ID;
     }
 }
