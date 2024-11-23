@@ -44,13 +44,14 @@ int32_t CallRecordsHandler::AddCallLogInfo(const CallRecordInfo &info)
     }
 
     DataShare::DataShareValuesBucket bucket;
-    TELEPHONY_LOGW("callLog Insert begin");
+    TELEPHONY_LOGI("callLog Insert begin.");
     MakeCallLogInsertBucket(bucket, info, displayName, numberLocation);
     bool ret = callDataPtr_->Insert(bucket);
     if (!ret) {
-        TELEPHONY_LOGE("Add call log database fail!");
+        TELEPHONY_LOGE("add call log database fail!");
         return TELEPHONY_ERR_DATABASE_WRITE_FAIL;
     }
+    TELEPHONY_LOGI("callLog Insert success.");
     DeleteCallLogForLimit(info);
     return TELEPHONY_SUCCESS;
 }

@@ -27,6 +27,7 @@
 #include "call_connect_ability.h"
 #include "call_ability_connect_callback.h"
 #include "number_identity_service.h"
+#include "os_account_manager.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -52,6 +53,8 @@ CallBroadcastSubscriber::CallBroadcastSubscriber(const OHOS::EventFwk::CommonEve
         [this](const EventFwk::CommonEventData &data) { ShutdownBroadcast(data); };
     memberFuncMap_[HSDR_EVENT] =
         [this](const EventFwk::CommonEventData &data) { HsdrEventBroadcast(data); };
+    memberFuncMap_[SCREEN_UNLOCKED] =
+        [this](const EventFwk::CommonEventData &data) { ScreenUnlockedBroadcast(data); };
 }
 
 void CallBroadcastSubscriber::OnReceiveEvent(const EventFwk::CommonEventData &data)
@@ -76,6 +79,8 @@ void CallBroadcastSubscriber::OnReceiveEvent(const EventFwk::CommonEventData &da
         code = USER_SWITCHED;
     } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_SHUTDOWN) {
         code = SHUTDOWN;
+    } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_UNLOCKED) {
+        code = SCREEN_UNLOCKED;
     } else {
         code = UNKNOWN_BROADCAST_EVENT;
     }
@@ -182,5 +187,24 @@ void CallBroadcastSubscriber::HsdrEventBroadcast(const EventFwk::CommonEventData
     TELEPHONY_LOGI("HsdrEventBroadcast end");
 }
 
+void CallBroadcastSubscriber::ScreenUnlockedBroadcast(const EventFwk::CommonEventData &data)
+{
+    int32_t userId = 0;
+    bool isUserUnlocked = false;
+    AccountSA::OsAccountManager::GetForegroundOsAccountLocalId(userId);
+    AccountSA::OsAccountManager::IsOsAccountVerified(userId, isUserUnlocked);
+    TELEPHONY_LOGI("isUserUnlocked: %{public}d", isUserUnlocked);
+    if (!isUserUnlocked) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(PUBLISH_MISSCALL_EVENT_DELAY_TIME));
+        AAFwk::Want want;
+        want.SetAction(EventFwk::CommonEventSupport::COMMON_EVENT_INCOMING_CALL_MISSED);
+        EventFwk::CommonEventData eventData;
+        eventData.SetWant(wantWithNumber);
+        eventData.SetCode(INCOMING_CALL_MISSED_CODE);
+        EventFwk::CommonEventPublishInfo publishInfo;
+        publishInfo.SetOrdered(true);
+        bool resultWithNumber = EventFwk::CommonEventManager::PublishCommonEvent(dataWithNumber, publishInfo, nullptr);
+    }
+}
 } // namespace Telephony
 } // namespace OHOS
