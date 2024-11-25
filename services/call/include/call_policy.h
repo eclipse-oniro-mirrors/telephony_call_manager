@@ -29,6 +29,10 @@
  */
 namespace OHOS {
 namespace Telephony {
+const int32_t MCC_LEN = 3;
+const std::string CHN_MCC = "460";
+const std::string MC_MCC = "455";
+
 class CallPolicy : public CallObjectManager {
 public:
     CallPolicy();
@@ -69,6 +73,9 @@ public:
     int32_t HasNormalCall(bool isEcc, int32_t slotId, CallType callType);
     int32_t GetAirplaneMode(bool &isAirplaneModeOn);
     int32_t SuperPrivacyMode(std::u16string &number, AppExecFwk::PacMap &extras, bool isEcc);
+
+private:
+    bool IsCtSimCardSwitchToChnOrMc(int32_t slotId);
 
 private:
     uint16_t onlyTwoCall_ = 2;
