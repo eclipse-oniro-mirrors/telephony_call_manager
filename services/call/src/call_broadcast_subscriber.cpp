@@ -25,10 +25,13 @@
 #include "call_superprivacy_control_manager.h"
 #include "call_connect_ability.h"
 #include "call_ability_connect_callback.h"
+#include "os_account_manager.h"
 
 namespace OHOS {
 namespace Telephony {
 using namespace OHOS::EventFwk;
+static constexpr int16_t INCOMING_CALL_MISSED_CODE = 0;
+static constexpr int16_t PUBLISH_MISSCALL_EVENT_DELAY_TIME = 2000;
 CallBroadcastSubscriber::CallBroadcastSubscriber(const OHOS::EventFwk::CommonEventSubscribeInfo &subscriberInfo)
     : CommonEventSubscriber(subscriberInfo)
 {
@@ -46,6 +49,8 @@ CallBroadcastSubscriber::CallBroadcastSubscriber(const OHOS::EventFwk::CommonEve
         [this](const EventFwk::CommonEventData &data) { UpdateBluetoothDeviceName(data); };
     memberFuncMap_[USER_SWITCHED] =
         [this](const EventFwk::CommonEventData &data) { ConnectCallUiUserSwitchedBroadcast(data); };
+    memberFuncMap_[SCREEN_UNLOCKED] =
+        [this](const EventFwk::CommonEventData &data) { ScreenUnlockedBroadcast(data); };
 }
 
 void CallBroadcastSubscriber::OnReceiveEvent(const EventFwk::CommonEventData &data)
@@ -144,6 +149,27 @@ void CallBroadcastSubscriber::ConnectCallUiUserSwitchedBroadcast(const EventFwk:
     DelayedSingleton<CallConnectAbility>::GetInstance()->DisconnectAbility();
     sptr<CallAbilityConnectCallback> connectCallback_ = new CallAbilityConnectCallback();
     connectCallback_->ReConnectAbility();
+}
+
+
+void CallBroadcastSubscriber::ScreenUnlockedBroadcast(const EventFwk::CommonEventData &data)
+{
+    int32_t userId = 0;
+    bool isUserUnlocked = false;
+    AccountSA::OsAccountManager::GetForegroundOsAccountLocalId(userId);
+    AccountSA::OsAccountManager::IsOsAccountVerified(userId, isUserUnlocked);
+    TELEPHONY_LOGI("isUserUnlocked: %{public}d", isUserUnlocked);
+    if (!isUserUnlocked) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(PUBLISH_MISSCALL_EVENT_DELAY_TIME));
+        AAFwk::Want want;
+        want.SetAction(EventFwk::CommonEventSupport::COMMON_EVENT_INCOMING_CALL_MISSED);
+        EventFwk::CommonEventData eventData;
+        eventData.SetWant(want);
+        eventData.SetCode(INCOMING_CALL_MISSED_CODE);
+        EventFwk::CommonEventPublishInfo publishInfo;
+        publishInfo.SetOrdered(true);
+        EventFwk::CommonEventManager::PublishCommonEvent(eventData, publishInfo, nullptr);
+    }
 }
 } // namespace Telephony
 } // namespace OHOS
