@@ -141,12 +141,27 @@ int32_t CallPolicy::HasNormalCall(bool isEcc, int32_t slotId, CallType callType)
     bool isCTSimCard = false;
     bool isRoaming = networkState->IsRoaming();
     DelayedRefSingleton<CoreServiceClient>::GetInstance().IsCTSimCard(slotId, isCTSimCard);
-    if (isCTSimCard && !isRoaming && !isImsRegistered) {
+    if (isCTSimCard && !isRoaming && !isImsRegistered && IsCtSimCardSwitchToChnOrMc(slotId)) {
         TELEPHONY_LOGE("Call failed due to CT card IMS is UNREGISTERED");
         DelayedSingleton<CallDialog>::GetInstance()->DialogConnectExtension("CALL_FAILED_CTCARD_NO_IMS", slotId);
         return CALL_ERR_DIAL_FAILED;
     }
     return TELEPHONY_SUCCESS;
+}
+
+bool CallPolicy::IsCtSimCardSwitchToChnOrMc(int32_t slotId)
+{
+    std::string regPlmn = DelayedRefSingleton<CoreServiceClient>::GetInstance().GetResidentNetworkNumeric(slotId);
+    std::u16string hplmn;
+    DelayedRefSingleton<CoreServiceClient>::GetInstance().GetSimOperatorNumeric(slotId, hplmn);
+    std::string simOperator =
+        std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t>{}.to_bytes(hplmn);
+    TELEPHONY_LOGI("regPlmn = %{piblic}s, simOperator = %{piblic}s", regPlmn.c_str(), simOperator.c_str());
+    if (regPlmn.empty() || simOperator.empty() || regPlmn.length() < MCC_LEN || simOperator.length() < MCC_LEN) {
+        return false;
+    }
+    return (regPlmn.substr(0, MCC_LEN).compare(CHN_MCC) == 0 && simOperator.substr(0, MCC_LEN).compare(CHN_MCC) == 0)
+        || (regPlmn.substr(0, MCC_LEN).compare(MC_MCC) == 0 && simOperator.substr(0, MCC_LEN).compare(MC_MCC) == 0);
 }
 
 int32_t CallPolicy::GetAirplaneMode(bool &isAirplaneModeOn)
