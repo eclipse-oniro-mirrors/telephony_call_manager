@@ -64,7 +64,8 @@
                 "image_framework",
                 "miscdevice",
                 "location",
-                "dsoftbus"
+                "dsoftbus",
+                "car_distributed_engine"
             ],
             "third_party": [
                 "libphonenumber",

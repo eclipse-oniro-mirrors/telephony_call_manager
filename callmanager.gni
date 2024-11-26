@@ -246,3 +246,10 @@ if (defined(global_parts_info) &&
     global_parts_info.telephony_telephony_enhanced) {
   call_manager_defines += [ "TELEPHONY_CUST_SUPPORT" ]
 }
+
+if (defined(global_parts_info) &&
+    defined(global_parts_info.carservice_car_distributed_engine)) {
+  car_distributed_engine_enable = true
+} else {
+  car_distributed_engine_enable = false
+}
