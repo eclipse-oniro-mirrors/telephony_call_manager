@@ -86,7 +86,8 @@ HWTEST_F(SpamCallTest, Telephony_SpamCallAdapter_003, Function | MediumTest | Le
     NumberMarkInfo info;
     bool isBlock = false;
     int32_t blockReason = 0;
-    spamCallAdapter_->ParseDetectResult(jsonData, isBlock, info, blockReason);
+    std::string detectDetails = "";
+    spamCallAdapter_->ParseDetectResult(jsonData, isBlock, info, blockReason, detectDetails);
     ASSERT_TRUE(isBlock);
     ASSERT_EQ(blockReason, 1);
 }
