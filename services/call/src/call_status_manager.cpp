@@ -666,14 +666,14 @@ int32_t CallStatusManager::DialingHandle(const CallDetailInfo &info)
         }
     }
     sptr<CallBase> call = CreateNewCall(info, CallDirection::CALL_DIRECTION_OUT);
+    if (call == nullptr) {
+        TELEPHONY_LOGE("CreateNewCall failed!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     if (isDistributedDeviceDialing) {
         AAFwk::WantParams extraParams;
         extraParams.SetParam("isDistributedDeviceDialing", AAFwk::String::Box("true"));
         call->SetExtraParams(extraParams);
-    }
-    if (call == nullptr) {
-        TELEPHONY_LOGE("CreateNewCall failed!");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     if (IsDcCallConneceted()) {
         SetContactInfo(call, std::string(info.phoneNum));
@@ -1616,8 +1616,7 @@ bool CallStatusManager::IsRejectCall(sptr<CallBase> &call, const CallDetailInfo 
         block = true;
         return true;
     }
-    if (!DelayedSingleton<AudioControlManager>::GetInstance()->IsDistributeCallSinkStatus() &&
-        IsFocusModeOpen()) {
+    if (IsFocusModeOpen()) {
         int ret = Notification::NotificationHelper::IsNeedSilentInDoNotDisturbMode(info.phoneNum, 0);
         TELEPHONY_LOGW("IsRejectCall IsNeedSilentInDoNotDisturbMode ret:%{public}d", ret);
         if (ret == 0) {
