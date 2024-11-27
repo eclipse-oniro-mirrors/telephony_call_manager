@@ -1473,9 +1473,11 @@ bool CallStatusManager::ShouldBlockIncomingCall(const sptr<CallBase> &call, cons
         NumberMarkInfo numberMarkInfo;
         bool isBlock = false;
         int32_t blockReason;
-        spamCallAdapterPtr_->GetParseResult(isBlock, numberMarkInfo, blockReason);
+        std::string detectDetails = "";
+        spamCallAdapterPtr_->GetParseResult(isBlock, numberMarkInfo, blockReason, detectDetails);
         call->SetNumberMarkInfo(numberMarkInfo);
         call->SetBlockReason(blockReason);
+        call->SetDetectDetails(detectDetails);
         if (isBlock) {
             return true;
         }

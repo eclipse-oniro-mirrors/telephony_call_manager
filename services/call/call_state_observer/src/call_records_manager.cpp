@@ -148,6 +148,11 @@ void CallRecordsManager::AddOneCallRecord(CallAttributeInfo &info)
         TELEPHONY_LOGE("memcpy_s failed!");
         return;
     }
+    if (memcpy_s(data.detectDetails, sizeof(data.detectDetails), info.detectDetails, strlen(info.detectDetails))
+        != EOK) {
+        TELEPHONY_LOGE("memcpy_s detectDetails failed!");
+        return;
+    }
     CopyCallInfoToRecord(info, data);
     std::string countryIso = GetCountryIso();
     int32_t formatRet = CopyFormatNumberToRecord(countryIso, data);

@@ -44,13 +44,14 @@ int32_t CallbackStubHelper::OnResult(int32_t &errCode, std::string &result)
         NumberMarkInfo numberMarkInfo;
         bool isBlock = false;
         int32_t blockReason;
-        spamCallAdapter_->ParseDetectResult(result, isBlock, numberMarkInfo, blockReason);
+        std::string detectDetails = "";
+        spamCallAdapter_->ParseDetectResult(result, isBlock, numberMarkInfo, blockReason, detectDetails);
         if (blockReason == DECISION_REASON_TRUSTLIST) {
             TELEPHONY_LOGW("trustlist, need query numbermark");
             DelayedSingleton<CallNumberUtils>::GetInstance()->
                 QueryYellowPageAndMarkInfo(numberMarkInfo, spamCallAdapter_->GetDetectPhoneNum());
         }
-        spamCallAdapter_->SetParseResult(isBlock, numberMarkInfo, blockReason);
+        spamCallAdapter_->SetParseResult(isBlock, numberMarkInfo, blockReason, detectDetails);
         CallManagerHisysevent::WriteIncomingNumIdentityBehaviorEvent(
             static_cast<int32_t>(numberMarkInfo.markType), isBlock, blockReason);
     }

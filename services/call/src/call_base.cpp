@@ -41,7 +41,8 @@ CallBase::CallBase(DialParaInfo &info)
       callEndedType_(CallEndedType::UNKNOWN), callBeginTime_(0), callCreateTime_(0), callEndTime_(0), ringBeginTime_(0),
       ringEndTime_(0), answerType_(CallAnswerType::CALL_ANSWER_MISSED), accountId_(info.accountId),
       crsType_(info.crsType), originalCallType_(info.originalCallType), isMuted_(false), numberLocation_("default"),
-      blockReason_(0), isEccContact_(false), celiaCallType_(-1), extraParams_(info.extraParams), isAnswered_(false)
+      blockReason_(0), isEccContact_(false), celiaCallType_(-1), extraParams_(info.extraParams), isAnswered_(false),
+      detectDetails_("")
 {
     (void)memset_s(&contactInfo_, sizeof(ContactInfo), 0, sizeof(ContactInfo));
     (void)memset_s(&numberMarkInfo_, sizeof(NumberMarkInfo), 0, sizeof(NumberMarkInfo));
@@ -57,7 +58,7 @@ CallBase::CallBase(DialParaInfo &info, AppExecFwk::PacMap &extras)
       callEndTime_(0), ringBeginTime_(0), ringEndTime_(0), answerType_(CallAnswerType::CALL_ANSWER_MISSED),
       accountId_(info.accountId), crsType_(info.crsType), originalCallType_(info.originalCallType), isMuted_(false),
       numberLocation_("default"), blockReason_(0), isEccContact_(false), celiaCallType_(-1),
-      extraParams_(info.extraParams), isAnswered_(false)
+      extraParams_(info.extraParams), isAnswered_(false), detectDetails_("")
 {
     (void)memset_s(&contactInfo_, sizeof(ContactInfo), 0, sizeof(ContactInfo));
     (void)memset_s(&numberMarkInfo_, sizeof(NumberMarkInfo), 0, sizeof(NumberMarkInfo));
@@ -183,6 +184,10 @@ void CallBase::GetCallAttributeBaseInfo(CallAttributeInfo &info)
         errno_t result = memcpy_s(info.bundleName, kMaxBundleNameLen, bundleName_.c_str(), bundleName_.length());
         if (result != EOK) {
             TELEPHONY_LOGE("memcpy_s failed!");
+        }
+        if (memcpy_s(info.detectDetails, sizeof(info.detectDetails), detectDetails_.c_str(), detectDetails_.length())
+            != EOK) {
+            TELEPHONY_LOGE("memcpy_s detectDetails fail");
         }
     }
 }
@@ -488,6 +493,18 @@ void CallBase::SetBlockReason(const int32_t &blockReason)
 {
     std::lock_guard<std::mutex> lock(mutex_);
     blockReason_ = blockReason;
+}
+
+void CallBase::SetDetectDetails(std::string detectDetails)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    detectDetails_ = detectDetails;
+}
+
+std::string CallBase::GetDetectDetails()
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    return detectDetails_;
 }
 
 void CallBase::SetCallRunningState(CallRunningState callRunningState)

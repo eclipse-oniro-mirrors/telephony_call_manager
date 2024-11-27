@@ -35,12 +35,13 @@ public:
     bool DetectSpamCall(const std::string &phoneNumber, const int32_t &slotId);
     void GetDetectResult(int32_t &errCode, std::string &result);
     void SetDetectResult(int32_t &errCode, std::string &result);
-    void GetParseResult(bool &isBlock, NumberMarkInfo &info, int32_t &blockReason);
-    void SetParseResult(bool &isBlock, NumberMarkInfo &info, int32_t &blockReason);
+    void GetParseResult(bool &isBlock, NumberMarkInfo &info, int32_t &blockReason, std::string &detectDetails);
+    void SetParseResult(bool &isBlock, NumberMarkInfo &info, int32_t &blockReason, std::string &detectDetails);
     std::string GetDetectPhoneNum();
     void NotifyAll();
     bool WaitForDetectResult();
-    void ParseDetectResult(const std::string &jsonData, bool &isBlock, NumberMarkInfo &info, int32_t &blockReason);
+    void ParseDetectResult(const std::string &jsonData, bool &isBlock, NumberMarkInfo &info,
+        int32_t &blockReason, std::string &detectDetails);
 
 private:
     bool ConnectSpamCallAbility(const AAFwk::Want &want, const std::string &phoneNumber, const int32_t &slotId);
@@ -54,6 +55,7 @@ private:
     NumberMarkInfo info_;
     bool isBlock_ = false;
     int32_t blockReason_ = 0;
+    std::string detectDetails_ = "";
     std::unique_ptr<TimeWaitHelper> timeWaitHelper_ {nullptr};
     ffrt::mutex mutex_;
 };

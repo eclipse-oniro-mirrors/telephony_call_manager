@@ -37,6 +37,7 @@ constexpr char MARK_SOURCE[] = "markSource";
 constexpr char MARK_CONTENT[] = "markContent";
 constexpr char IS_CLOUD[] = "isCloud";
 constexpr char MARK_DETAILS[] = "markDetails";
+constexpr char DETECT_DETAILS[] = "detectDetails";
 sptr<SpamCallConnection> connection_ = nullptr;
 
 SpamCallAdapter::SpamCallAdapter()
@@ -141,7 +142,7 @@ bool SpamCallAdapter::JsonGetBoolValue(cJSON *json, const std::string key)
 }
 
 void SpamCallAdapter::ParseDetectResult(const std::string &jsonData, bool &isBlock,
-    NumberMarkInfo &info, int32_t &blockReason)
+    NumberMarkInfo &info, int32_t &blockReason, std::string &detectDetails)
 {
     if (jsonData.empty()) {
         return;
@@ -187,6 +188,8 @@ void SpamCallAdapter::ParseDetectResult(const std::string &jsonData, bool &isBlo
     if (strcpy_s(info.markDetails, sizeof(info.markDetails), stringValue.c_str()) != EOK) {
         TELEPHONY_LOGE("strcpy_s markDetails fail.");
     }
+    JsonGetStringValue(root, DETECT_DETAILS, detectDetails);
+    TELEPHONY_LOGW("DetectSpamCall detectDetails: %{public}s", detectDetails.c_str());
     TELEPHONY_LOGW("ParseDetectResult end");
     cJSON_Delete(root);
 }
@@ -203,18 +206,22 @@ void SpamCallAdapter::SetDetectResult(int32_t &errCode, std::string &result)
     result_ = result;
 }
 
-void SpamCallAdapter::GetParseResult(bool &isBlock, NumberMarkInfo &info, int32_t &blockReason)
+void SpamCallAdapter::GetParseResult(bool &isBlock, NumberMarkInfo &info,
+    int32_t &blockReason, std::string &detectDetails)
 {
     isBlock = isBlock_;
     info = info_;
     blockReason = blockReason_;
+    detectDetails = detectDetails_;
 }
 
-void SpamCallAdapter::SetParseResult(bool &isBlock, NumberMarkInfo &info, int32_t &blockReason)
+void SpamCallAdapter::SetParseResult(bool &isBlock, NumberMarkInfo &info,
+    int32_t &blockReason, std::string &detectDetails)
 {
     isBlock_ = isBlock;
     info_ = info;
     blockReason_ = blockReason;
+    detectDetails_ = detectDetails;
 }
 
 std::string SpamCallAdapter::GetDetectPhoneNum()
