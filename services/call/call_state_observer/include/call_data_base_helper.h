@@ -64,6 +64,7 @@ constexpr const char *CELIA_CALL_TYPE = "celia_call_type";
 constexpr const int32_t LOG_LIMIT_NUM = 5000;
 constexpr const char *CALL_MARK_SOURCE = "mark_source";
 constexpr const char *CALL_MARK_DETAILS = "mark_details";
+constexpr const char *CALL_DETECT_DETAILS = "detect_details";
 
 enum class CallLogReadState {
     CALL_IS_UNREAD,

@@ -89,6 +89,8 @@ public:
     NumberMarkInfo GetNumberMarkInfo();
     void SetNumberMarkInfo(const NumberMarkInfo &numberMarkInfo);
     void SetBlockReason(const int32_t &blockReason);
+    void SetDetectDetails(std::string detectDetails);
+    std::string GetDetectDetails();
     void SetCallRunningState(CallRunningState callRunningState);
     void SetStartTime(int64_t startTime);
     void SetCallBeginTime(time_t callBeginTime);
@@ -189,6 +191,7 @@ private:
     int32_t celiaCallType_;
     AAFwk::WantParams extraParams_;
     bool isAnswered_;
+    std::string detectDetails_;
 };
 } // namespace Telephony
 } // namespace OHOS

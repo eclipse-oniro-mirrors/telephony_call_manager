@@ -90,6 +90,8 @@ void MissedCallNotification::PublishBlockedCallEvent(sptr<CallBase> &callObjectP
     want.SetParam("notificationId", INCOMING_CALL_MISSED_ID);
     want.SetParam("phoneNumber", callObjectPtr->GetAccountNumber());
     want.SetParam("isBlocked", true);
+    std::string detectDetails = callObjectPtr->GetDetectDetails();
+    want.SetParam("detectDetails", detectDetails);
     want.SetAction(EventFwk::CommonEventSupport::COMMON_EVENT_INCOMING_CALL_MISSED);
     EventFwk::CommonEventData data;
     data.SetWant(want);
@@ -100,7 +102,8 @@ void MissedCallNotification::PublishBlockedCallEvent(sptr<CallBase> &callObjectP
     callPermissions.emplace_back(Permission::GET_TELEPHONY_STATE);
     publishInfo.SetSubscriberPermissions(callPermissions);
     bool result = EventFwk::CommonEventManager::PublishCommonEvent(data, publishInfo, nullptr);
-    TELEPHONY_LOGW("publish blocked call event result : %{public}d", result);
+    TELEPHONY_LOGW("publish blocked call event result : %{public}d, detectDetails: %{public}s",
+        result, detectDetails.c_str());
 }
 
 int32_t MissedCallNotification::NotifyUnReadMissedCall(std::map<std::string, int32_t> &phoneNumAndUnreadCountMap)

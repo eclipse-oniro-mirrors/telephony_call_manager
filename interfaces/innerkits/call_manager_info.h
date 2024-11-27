@@ -315,6 +315,10 @@ struct CallAttributeInfo {
      * Indicates the extraParamsString information.
      */
     std::string extraParamsString;
+    /**
+     * Indicates the details of call detect result.
+     */
+    char detectDetails[kMaxNumberLen + 1] = { 0 };
 };
 
 /**
@@ -403,6 +407,11 @@ struct CallRecordInfo {
      */
     int32_t celiaCallType = -1;
 
+    /**
+     * Indicates the details of call detect result.
+     */
+    char detectDetails[kMaxNumberLen + 1] = { 0 };
+
     CallRecordInfo() {}
 
     CallRecordInfo(const CallRecordInfo &temp)
@@ -443,6 +452,8 @@ struct CallRecordInfo {
             std::begin(numberMarkInfo.markDetails));
         blockReason = temp.blockReason;
         celiaCallType = temp.celiaCallType;
+        std::copy(std::begin(temp.detectDetails), std::end(temp.detectDetails),
+            std::begin(detectDetails));
         return *this;
     }
 };
