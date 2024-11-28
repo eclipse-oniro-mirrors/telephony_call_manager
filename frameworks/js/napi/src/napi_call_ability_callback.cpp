@@ -29,6 +29,7 @@
 
 namespace OHOS {
 namespace Telephony {
+std::mutex NapiCallAbilityCallback::audioDeviceCallbackMutex_;
 NapiCallAbilityCallback::NapiCallAbilityCallback()
 {
     (void)memset_s(&stateCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
@@ -104,11 +105,13 @@ void NapiCallAbilityCallback::UnRegisterMmiCodeCallback()
 
 void NapiCallAbilityCallback::RegisterAudioDeviceCallback(EventCallback eventCallback)
 {
+    std::lock_guard<std::mutex> lock(audioDeviceCallbackMutex_);
     audioDeviceCallback_ = eventCallback;
 }
 
 void NapiCallAbilityCallback::UnRegisterAudioDeviceCallback()
 {
+    std::lock_guard<std::mutex> lock(audioDeviceCallbackMutex_);
     if (audioDeviceCallback_.callbackRef) {
         napi_delete_reference(audioDeviceCallback_.env, audioDeviceCallback_.callbackRef);
         napi_delete_reference(audioDeviceCallback_.env, audioDeviceCallback_.thisVar);
@@ -933,6 +936,7 @@ int32_t NapiCallAbilityCallback::ReportMmiCode(MmiCodeInfo &info, EventCallback 
 
 int32_t NapiCallAbilityCallback::UpdateAudioDeviceInfo(const AudioDeviceInfo &info)
 {
+    std::lock_guard<std::mutex> lock(audioDeviceCallbackMutex_);
     if (audioDeviceCallback_.thisVar == nullptr) {
         return CALL_ERR_CALLBACK_NOT_EXIST;
     }
@@ -975,6 +979,7 @@ int32_t NapiCallAbilityCallback::UpdateAudioDeviceInfo(const AudioDeviceInfo &in
 
 void NapiCallAbilityCallback::ReportAudioDeviceInfoWork(uv_work_t *work, int32_t status)
 {
+    std::lock_guard<std::mutex> lock(audioDeviceCallbackMutex_);
     AudioDeviceWork *dataWorkerData = (AudioDeviceWork *)work->data;
     if (dataWorkerData == nullptr) {
         TELEPHONY_LOGE("dataWorkerData is nullptr!");
