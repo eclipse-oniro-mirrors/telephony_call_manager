@@ -62,6 +62,12 @@ ohos_shared_library("tel_call_manager") {
   ]
   defines += call_manager_defines
 
+  cflags = []
+  if (car_distributed_engine_enable) {
+    cflags += [ "-DCAR_DISTRIBUTED_ENGINE_ENABLE" ]
+    external_deps += [ "car_distributed_engine:cardistributedengine_client" ]
+  }
+
   part_name = "call_manager"
   subsystem_name = "telephony"
 }
