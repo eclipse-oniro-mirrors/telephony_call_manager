@@ -54,6 +54,7 @@ void DistributedDeviceObserver::RegisterDevStatusCallback(
         return;
     }
     callbacks_.push_back(callback);
+    TELEPHONY_LOGI("reg dev status callback");
 }
 
 void DistributedDeviceObserver::UnRegisterDevStatusCallback(
@@ -64,6 +65,7 @@ void DistributedDeviceObserver::UnRegisterDevStatusCallback(
     if (iter != callbacks_.end()) {
         callbacks_.erase(iter);
     }
+    TELEPHONY_LOGI("un-reg dev status callback");
 }
 
 void DistributedDeviceObserver::RegisterDevCallback()
@@ -210,6 +212,7 @@ void DistributedSystemAbilityListener::OnAddSystemAbility(int32_t systemAbilityI
         TELEPHONY_LOGE("not distributed sa id");
         return;
     }
+    TELEPHONY_LOGE("distribute communication sa online");
     auto distributedMgr = DelayedSingleton<DistributedCommunicationManager>::GetInstance();
     if (distributedMgr == nullptr) {
         return;
@@ -227,6 +230,7 @@ void DistributedSystemAbilityListener::OnRemoveSystemAbility(int32_t systemAbili
         TELEPHONY_LOGE("not distributed sa id");
         return;
     }
+    TELEPHONY_LOGE("distribute communication sa offline");
     auto distributedMgr = DelayedSingleton<DistributedCommunicationManager>::GetInstance();
     if (distributedMgr == nullptr) {
         return;

@@ -149,10 +149,6 @@ void AudioControlManager::VideoStateUpdated(
         TELEPHONY_LOGE("other call not need control audio");
         return;
     }
-    if (DelayedSingleton<DistributedCommunicationManager>::GetInstance()->IsAudioOnSink()) {
-        TELEPHONY_LOGI("audio is on sink, not need control audio");
-        return;
-    }
     AudioDevice device = {
         .deviceType = AudioDeviceType::DEVICE_SPEAKER,
         .address = { 0 },
@@ -192,7 +188,8 @@ void AudioControlManager::CheckTypeAndSetAudioDevice(sptr<CallBase> &callObjectP
         }
         TELEPHONY_LOGI("set device type, type: %{public}d", static_cast<int32_t>(device.deviceType));
         SetAudioDevice(device);
-    } else if (!isSetAudioDeviceByUser_ && IsVideoCall(priorVideoState) && !IsVideoCall(nextVideoState)) {
+    } else if (!DelayedSingleton<DistributedCommunicationManager>::GetInstance()->IsAudioOnSink() &&
+               !isSetAudioDeviceByUser_ && IsVideoCall(priorVideoState) && !IsVideoCall(nextVideoState)) {
         device.deviceType = AudioDeviceType::DEVICE_EARPIECE;
         if (initDeviceType == AudioDeviceType::DEVICE_WIRED_HEADSET ||
             initDeviceType == AudioDeviceType::DEVICE_BLUETOOTH_SCO ||

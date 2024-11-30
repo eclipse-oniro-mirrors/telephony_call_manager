@@ -54,6 +54,7 @@ void DistributedDataController::OnReceiveMsg(const char* data, uint32_t dataLen)
 void DistributedDataController::SetMuted(bool isMute)
 {
     if (session_ == nullptr) {
+        TELEPHONY_LOGE("session is null");
         return;
     }
     TELEPHONY_LOGI("send muted %{public}d", isMute);

@@ -50,9 +50,7 @@ void SessionAdapter::SendMsg(const void *data, uint32_t len)
         socket = socket_;
     }
     int32_t ret = SendBytes(socket, data, len);
-    if (ret != 0) {
-        TELEPHONY_LOGE("send socket %{public}d msg fail, result %{public}d", socket, ret);
-    }
+    TELEPHONY_LOGI("send socket %{public}d msg len %{public}u, ret %{public}d", socket, len, ret);
 }
 
 void SessionAdapter::OnReceiveMsg(int32_t socket, const char* data, uint32_t dataLen)
