@@ -120,6 +120,7 @@ void DistributedCommunicationManager::OnDeviceOnline(const std::string &devId, c
         }
     }
     devObserver_->OnDeviceOnline(devId, devName, deviceType);
+    TELEPHONY_LOGI("distributed device online");
 }
 
 void DistributedCommunicationManager::OnDeviceOffline(const std::string &devId, const std::string &devName,
@@ -135,6 +136,7 @@ void DistributedCommunicationManager::OnDeviceOffline(const std::string &devId, 
         peerDevices_.erase(iter);
     }
     if (!peerDevices_.empty()) {
+        TELEPHONY_LOGI("device list not empty");
         return;
     }
 
@@ -149,6 +151,7 @@ void DistributedCommunicationManager::OnDeviceOffline(const std::string &devId, 
         devSwitchController_.reset();
         devSwitchController_ = nullptr;
     }
+    TELEPHONY_LOGI("distributed device offline");
 }
 
 bool DistributedCommunicationManager::IsSinkRole()
@@ -186,7 +189,7 @@ bool DistributedCommunicationManager::SwitchToSinkDevice(const AudioDevice& devi
         return false;
     }
 
-    TELEPHONY_LOGE("switch to remote.");
+    TELEPHONY_LOGI("switch to remote.");
     std::lock_guard<ffrt::mutex> lock(mutex_);
     if (devSwitchController_ == nullptr) {
         return false;
@@ -201,7 +204,7 @@ bool DistributedCommunicationManager::SwitchToSinkDevice(const AudioDevice& devi
 
 bool DistributedCommunicationManager::SwitchToSourceDevice()
 {
-    TELEPHONY_LOGE("switch to local.");
+    TELEPHONY_LOGI("switch to local.");
     std::lock_guard<ffrt::mutex> lock(mutex_);
     if (devSwitchController_ == nullptr) {
         return false;
@@ -227,6 +230,7 @@ void DistributedCommunicationManager::SetMuted(bool isMute)
     if (dataController_ != nullptr) {
         dataController_->SetMuted(isMute);
     }
+    TELEPHONY_LOGI("set muted %{public}d", isMute);
 }
 
 void DistributedCommunicationManager::MuteRinger()

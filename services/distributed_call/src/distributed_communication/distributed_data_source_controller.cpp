@@ -17,6 +17,7 @@
 #include "telephony_log_wrapper.h"
 #include "call_object_manager.h"
 #include "transmission_manager.h"
+#include "audio_proxy.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -274,7 +275,9 @@ void DistributedDataSourceController::HandleCurrentDataQueryMsg(const cJSON *msg
         TELEPHONY_LOGE("not find distributed call");
         return;
     }
-    auto data = CreateCurrentDataRspMsg(num, call->IsMuted(), static_cast<int32_t>(call->GetCallDirection()));
+    bool isMuted = DelayedSingleton<AudioProxy>::GetInstance()->IsMicrophoneMute();
+    TELEPHONY_LOGI("HandleCurrentDataQueryMsg isMuted[%{public}d]", isMuted);
+    auto data = CreateCurrentDataRspMsg(num, isMuted, static_cast<int32_t>(call->GetCallDirection()));
     if (data.empty()) {
         return;
     }
