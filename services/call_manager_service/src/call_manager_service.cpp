@@ -40,6 +40,7 @@
 #include "distributed_communication_manager.h"
 #include "want_params_wrapper.h"
 #include "string_wrapper.h"
+#include "call_wired_headset.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -86,6 +87,7 @@ bool CallManagerService::Init()
     DelayedSingleton<DistributedCallManager>::GetInstance()->Init();
     DelayedSingleton<DistributedCommunicationManager>::GetInstance()->Init();
     AddSystemAbilityListener(AUDIO_POLICY_SERVICE_ID);
+    DelayedSingleton<CallWiredHeadSet>::GetInstance()->Init();
     return true;
 }
 
