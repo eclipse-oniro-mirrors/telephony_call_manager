@@ -212,7 +212,7 @@ void DistributedSystemAbilityListener::OnAddSystemAbility(int32_t systemAbilityI
         TELEPHONY_LOGE("not distributed sa id");
         return;
     }
-    TELEPHONY_LOGE("distribute communication sa online");
+    TELEPHONY_LOGI("distribute communication sa online");
     auto distributedMgr = DelayedSingleton<DistributedCommunicationManager>::GetInstance();
     if (distributedMgr == nullptr) {
         return;
@@ -230,7 +230,7 @@ void DistributedSystemAbilityListener::OnRemoveSystemAbility(int32_t systemAbili
         TELEPHONY_LOGE("not distributed sa id");
         return;
     }
-    TELEPHONY_LOGE("distribute communication sa offline");
+    TELEPHONY_LOGI("distribute communication sa offline");
     auto distributedMgr = DelayedSingleton<DistributedCommunicationManager>::GetInstance();
     if (distributedMgr == nullptr) {
         return;
