@@ -805,7 +805,7 @@ enum class PhoneOrWatchDial {
     /*
      *  Indicates call from watch.
      */
-    WATCH_DAIL = 1,
+    WATCH_DIAL = 1,
 };
 
 } // namespace Telephony

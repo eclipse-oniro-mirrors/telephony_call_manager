@@ -145,7 +145,7 @@ void AudioControlManager::VideoStateUpdated(
         TELEPHONY_LOGE("call object nullptr");
         return;
     }
-    if (callObjectPtr->GetCallType() != CallType::TYPE_IMS ||
+    if (callObjectPtr->GetCallType() != CallType::TYPE_IMS &&
         callObjectPtr->GetCallType() != CallType::TYPE_BLUETOOTH) {
         TELEPHONY_LOGE("other call not need control audio");
         return;

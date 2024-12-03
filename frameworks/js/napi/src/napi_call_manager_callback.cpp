@@ -26,7 +26,7 @@ int32_t NapiCallManagerCallback::OnCallDetailsChange(const CallAttributeInfo &in
 {
     int32_t ret = DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->UpdateCallStateInfo(info);
     if (ret == TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGI("UpdateCallStateInfoHandler success! state:%{public}d, videoState:%{public}d,"
+        TELEPHONY_LOGI("UpdateCallStateInfoHandler success! state:%{public}d, videoState:%{public}d, "
             "index:%{public}d, callType:%{public}d",info.callState, info.videoState, info.index, info.callType);
     }
     return ret;

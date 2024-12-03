@@ -1560,9 +1560,9 @@ sptr<ICallStatusCallback> CallManagerService::RegisterBluetoothCallManagerCallba
         if (bluetoothCallObserver_ == nullptr) {
             bluetoothCallObserver_ = std::make_shared<BluetoothCallState>();
         }
-        profile->RegisterObServer(bluetoothCallObserver_);
+        profile->RegisterObserver(bluetoothCallObserver_);
     } else {
-        TELEPHONY_LOGE("profile is nullprt");
+        TELEPHONY_LOGE("profile is nullptr");
     }
     DelayedSingleton<BluetoothCallConnection>::GetInstance()->SetMacAddress(macAddress);
     return bluetoothCallCallbackPtr_;
