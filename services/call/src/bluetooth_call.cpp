@@ -52,7 +52,7 @@ int32_t BluetoothCall::AnswerCall(int32_t videoState)
     Bluetooth::HandsFreeUnit *profile = Bluetooth::HandsFreeUnit::GetProfile();
     if (profile == nullptr) {
         TELEPHONY_LOGE("profile is nullptr");
-        retrun CALL_ERR_ANSWER_FAILED;
+        return CALL_ERR_ANSWER_FAILED;
     }
     if (macAddress_.empty()) {
         TELEPHONY_LOGE("error: macAddress is empty");
@@ -68,7 +68,7 @@ int32_t BluetoothCall::RejectCall()
     Bluetooth::HandsFreeUnit *profile = Bluetooth::HandsFreeUnit::GetProfile();
     if (profile == nullptr) {
         TELEPHONY_LOGE("profile is nullptr");
-        retrun CALL_ERR_REJECT_FAILED;
+        return CALL_ERR_REJECT_FAILED;
     }
     if (macAddress_.empty()) {
         TELEPHONY_LOGE("error: macAddress is empty");
@@ -85,7 +85,7 @@ int32_t BluetoothCall::HangUpCall()
     Bluetooth::HandsFreeUnit *profile = Bluetooth::HandsFreeUnit::GetProfile();
     if (profile == nullptr) {
         TELEPHONY_LOGE("profile is nullptr");
-        retrun CALL_ERR_HANGUP_FAILED;
+        return CALL_ERR_HANGUP_FAILED;
     }
     if (macAddress_.empty()) {
         TELEPHONY_LOGE("error: macAddress is empty");
@@ -198,13 +198,13 @@ int BluetoothCall::StartDtmf(char str)
     Bluetooth::HandsFreeUnit *profile = Bluetooth::HandsFreeUnit::GetProfile();
     if (profile == nullptr) {
         TELEPHONY_LOGE("profile is nullptr");
-        retrun CALL_ERR_FUNCTION_NOT_SUPPORTED;
+        return CALL_ERR_FUNCTION_NOT_SUPPORTED;
     }
     if (macAddress_.empty()) {
         TELEPHONY_LOGE("error: macAddress is empty");
     }
     Bluetooth::BluetoothRemoteDevice device(macAddress_);
-    unit8_t code = (unit8_t)str;
+    uint8_t code = (uint8_t)str;
     profile->SendDTMFTone(device, code);
     return TELEPHONY_SUCCESS;
 }

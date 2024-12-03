@@ -22,14 +22,14 @@
 
 namespace OHOS {
 namespace Telephony {
-BluetoothCallConnection::BluetoothCallConnection(){}
-BluetoothCallConnection::~BluetoothCallConnection(){}
+BluetoothCallConnection::BluetoothCallConnection() {}
+BluetoothCallConnection::~BluetoothCallConnection() {}
 
 int32_t BluetoothCallConnection::Dial(DialParaInfo &info)
 {
     TELEPHONY_LOGI("bluetooth dial start!");
     if (!GetSupportBtCall()) {
-        retrun CALL_ERR_BLUETOOTH_CONNECTION_FAILED;
+        return CALL_ERR_BLUETOOTH_CONNECTION_FAILED;
     }
     std::string number = info.number;
     if (number.empty()) {
@@ -43,13 +43,12 @@ int32_t BluetoothCallConnection::Dial(DialParaInfo &info)
     Bluetooth::HandsFreeUnit *profile = Bluetooth::HandsFreeUnit::GetProfile();
     if (profile == nullptr) {
         TELEPHONY_LOGE("profile is nullptr");
-        retrun CALL_ERR_DIAL_FAILED;
+        return CALL_ERR_DIAL_FAILED;
     }
 
     Bluetooth::BluetoothRemoteDevice device(macAddress_);
     profile->StartDial(device, number);
-    retrun TELEPHONY_SUCCESS;
-
+    return TELEPHONY_SUCCESS;
 }
 
 void BluetoothCallConnection::SetMacAddress(const std::string &macAddress)
@@ -74,13 +73,13 @@ int32_t BluetoothCallConnection::ConnectBtSco()
         bool isOK = profile->ConnectSco(device);
         if (!isOK) {
             TELEPHONY_LOGI("connectBtSco failed!");
-            retrun TELEPHONY_ERR_FAIL;
+            return TELEPHONY_ERR_FAIL;
         }
-        retrun TELEPHONY_SUCCESS;
+        return TELEPHONY_SUCCESS;
     } else {
         TELEPHONY_LOGE("profile is nullptr");
     }
-    retrun TELEPHONY_ERR_FAIL;
+    return TELEPHONY_ERR_FAIL;
 }
 
 int32_t BluetoothCallConnection::DisConnectBtSco()
@@ -92,13 +91,13 @@ int32_t BluetoothCallConnection::DisConnectBtSco()
         bool isOK = profile->DisconnectSco(device);
         if (!isOK) {
             TELEPHONY_LOGI("disconnectBtSco failed!");
-            retrun TELEPHONY_ERR_FAIL;
+            return TELEPHONY_ERR_FAIL;
         }
-        retrun TELEPHONY_SUCCESS;
+        return TELEPHONY_SUCCESS;
     } else {
         TELEPHONY_LOGE("profile is nullptr");
     }
-    retrun TELEPHONY_ERR_FAIL;
+    return TELEPHONY_ERR_FAIL;
 }
 
 bool BluetoothCallConnection::GetBtScoIsConnected()
@@ -116,7 +115,7 @@ bool BluetoothCallConnection::GetBtScoIsConnected()
         TELEPHONY_LOGE("profile is nullptr");
     }
     TELEPHONY_LOGI("BtScoconnect off!");
-    retrun false;
+    return false;
 }
 
 void BluetoothCallConnection::SetHfpConnected(bool isHfpConnected)

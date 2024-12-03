@@ -113,7 +113,7 @@ private:
     std::vector<sptr<CallBase>> GetConferenceCallList(int32_t slotId);
     void UpdateCallDetailsInfo(const CallDetailsInfo &info);
     bool IsDistributeCallSourceStatus();
-    void HandleBluetoothCallReportInfo(const CallDetailInfo &inof);
+    void HandleBluetoothCallReportInfo(const CallDetailInfo &info);
     void SetBtCallDialByPhone(const sptr<CallBase> &call, bool isBtCallDialByPhone);
 
 private:

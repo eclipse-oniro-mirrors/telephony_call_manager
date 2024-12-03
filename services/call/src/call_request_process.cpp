@@ -1038,7 +1038,7 @@ int32_t CallRequestProcess::EccDialPolicy()
 int32_t CallRequestProcess::BluetoothDialProcess(DialParaInfo &info)
 {
     TELEPHONY_LOGI("CallRequestProcess BluetoothDialProcess start");
-    int32_t ret = DelayedRefSingleton<BluetoothCallConnection>::GetInstance()->Dial(info);
+    int32_t ret = DelayedSingleton<BluetoothCallConnection>::GetInstance()->Dial(info);
     if (ret == TELEPHONY_SUCCESS) {
         TELEPHONY_LOGI("BluetoothCall Dial Success.");
         info.index = INIT_INDEX;

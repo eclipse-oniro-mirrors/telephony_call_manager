@@ -116,7 +116,7 @@ int32_t CallStatusManager::HandleCallReportInfo(const CallDetailInfo &info)
     if (info.callType == CallType::TYPE_VOIP) {
         return HandleVoipCallReportInfo(info);
     }
-    if (info.callType == CallType::BLUETOOTH) {
+    if (info.callType == CallType::TYPE_BLUETOOTH) {
         HandleBluetoothCallReportInfo(info);
     }
     switch (info.state) {
@@ -175,7 +175,7 @@ void CallStatusManager::HandleBluetoothCallReportInfo(const CallDetailInfo &info
         if (info.state == TelCallState::CALL_STATUS_DIALING || info.state == TelCallState::CALL_STATUS_ALERTING) {
             call = GetOneCallObjectByIndexSlotIdAndCallType(INIT_INDEX, info.accountId, info.callType);
             if (call != nullptr) {
-                call->SetPhoneOrWatchDial(static_cast<int32_t>(PhoneOrWatchDial::WATCH_DAIL));
+                call->SetPhoneOrWatchDial(static_cast<int32_t>(PhoneOrWatchDial::WATCH_DIAL));
                 SetBtCallDialByPhone(call, false);
                 if (info.state == TelCallState::CALL_STATUS_ALERTING) {
                     UpdateDialingCallInfo(info);
@@ -704,12 +704,12 @@ int32_t CallStatusManager::DialingHandle(const CallDetailInfo &info)
         sptr<CallBase> call = GetOneCallObjectByIndexSlotIdAndCallType(INIT_INDEX, info.accountId, info.callType);
         if (info.callType == CallType::TYPE_BLUETOOTH) {
             if (call != nullptr) {
-                call->SetPhoneOrWatchDial(static_cast<int32_t>(PhoneOrWatchDial::WATCH_DAIL));
+                call->SetPhoneOrWatchDial(static_cast<int32_t>(PhoneOrWatchDial::WATCH_DIAL));
                 SetBtCallDialByPhone(call, false);
             } else {
                 call = GetOneCallObjectByIndexSlotIdAndCallType(info.index, info.accountId, info.callType);
                 if (call != nullptr) {
-                    call->SetPhoneOrWatchDial(static_cast<int32_t>(PhoneOrWatchDial::PHONE_DAIL));
+                    call->SetPhoneOrWatchDial(static_cast<int32_t>(PhoneOrWatchDial::PHONE_DIAL));
                     SetBtCallDialByPhone(call, true);
                 }
             }
@@ -743,7 +743,7 @@ int32_t CallStatusManager::DialingHandle(const CallDetailInfo &info)
     auto callRequestEventHandler = DelayedSingleton<CallRequestEventHandlerHelper>::GetInstance();
     if (info.index == INIT_INDEX) {
         callRequestEventHandler->SetPendingMo(true, call->GetCallID());
-        call->SetPhoneOrWatchDial(static_cast<int32_t>(PhoneOrWatchDial::WATCH_DAIL));
+        call->SetPhoneOrWatchDial(static_cast<int32_t>(PhoneOrWatchDial::WATCH_DIAL));
         SetBtCallDialByPhone(call, false);
     }
 
@@ -1833,7 +1833,7 @@ void CallStatusManager::SetBtCallDialByPhone(const sptr<CallBase> &call, bool is
     object.SetParam("isBtCallDialByPhone", AAFwk::Boolean::Box(isBtCallDialByPhone));
     info.extraParamsString = AAFwk::WantParamWrapper(object).ToString();
     callPtr->SetExtraParams(object);
-    callPtr->GetCallAttributeBaseInfo(inof);
+    callPtr->GetCallAttributeBaseInfo(info);
 }
 } // namespace Telephony
 } // namespace OHOS

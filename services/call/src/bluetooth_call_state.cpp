@@ -21,8 +21,8 @@
 namespace OHOS {
 namespace Telephony {
 
-BluetoothCallState::BluetoothCallState(){}
-BluetoothCallState::~BluetoothCallState(){}
+BluetoothCallState::BluetoothCallState() {}
+BluetoothCallState::~BluetoothCallState() {}
 
 void BluetoothCallState::OnConnectionStateChanged(const Bluetooth::BluetoothRemoteDevice &device,
     int32_t state, int32_t cause)
@@ -40,7 +40,7 @@ void BluetoothCallState::OnConnectionStateChanged(const Bluetooth::BluetoothRemo
 void BluetoothCallState::OnScoStateChanged(const Bluetooth::BluetoothRemoteDevice &device, int state)
 {
     TELEPHONY_LOGI("BluetoothCallState OnScoStateChanged, state = %{public}d", state);
-    if (state == static_cast<int>(Bluetooth::HfpScoConnectState::SCO_CONNECTED) || 
+    if (state == static_cast<int>(Bluetooth::HfpScoConnectState::SCO_CONNECTED) ||
         state == static_cast<int>(Bluetooth::HfpScoConnectState::SCO_DISCONNECTED)) {
         DelayedSingleton<AudioDeviceManager>::GetInstance()->ReportAudioDeviceInfo();
     }
