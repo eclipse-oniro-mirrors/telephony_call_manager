@@ -65,7 +65,6 @@
                 "miscdevice",
                 "location",
                 "dsoftbus",
-                "car_distributed_engine",
                 "input"
             ],
             "third_party": [

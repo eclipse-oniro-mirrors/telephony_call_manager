@@ -80,7 +80,6 @@ public:
     void UpdateNumberLocation(const std::string& location, int32_t callId);
     void UpdateContactInfo(const ContactInfo &info, int32_t callId);
     static std::shared_ptr<CallVoiceAssistantManager> GetInstance();
-    bool IsHiCarConnected();
 
 private:
     std::string broadcastCheck = "0";
@@ -90,7 +89,6 @@ private:
     bool isControlSwitchOn = false;
     bool isBroadcastSwitchOn = false;
     bool isQueryedBroadcastSwitch = false;
-    bool isHiCarConnected = false;
     sptr<AAFwk::IAbilityConnection> connectCallback_ = nullptr;
     sptr<AAFwk::IDataAbilityObserver> settingsCallback_ = nullptr;
     int32_t nowCallId = -1;
