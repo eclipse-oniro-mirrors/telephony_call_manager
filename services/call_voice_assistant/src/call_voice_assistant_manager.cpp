@@ -14,10 +14,7 @@
  */
  
 #include "call_voice_assistant_manager.h"
-
-#ifdef CAR_DISTRIBUTED_ENGINE_ENABLE
-#include "travel_inner_interface.h"
-#endif
+#include "distributed_call_manager.h"
 
 namespace {
     ffrt::queue callVoiceAssistantQueue { "call_voice_assistant_manager" };
@@ -77,7 +74,6 @@ void CallVoiceAssistantManager::Release()
     mRemoteObject = nullptr;
     isBroadcastSwitchOn = false;
     isControlSwitchOn = false;
-    isHiCarConnected = false;
     isQueryedBroadcastSwitch = false;
     isConnectService = false;
     broadcastCheck = DEFAULT_STRING;
@@ -86,7 +82,8 @@ void CallVoiceAssistantManager::Release()
 
 bool CallVoiceAssistantManager::IsSwitchOn(const std::string& switchState)
 {
-    if (isHiCarConnected || this->IsHiCarConnected()) {
+    bool isHiCarConnected = DelayedSingleton<DistributedCallManager>::GetInstance()->IsDistributedCarDeviceOnline();
+    if (isHiCarConnected) {
         TELEPHONY_LOGI("hicar is connected, voice control by hicar");
         return true;
     }
@@ -155,6 +152,7 @@ bool CallVoiceAssistantManager::ConnectAbility(int32_t callId)
             return false;
         }
     }
+    bool isHiCarConnected = DelayedSingleton<DistributedCallManager>::GetInstance()->IsDistributedCarDeviceOnline();
     AAFwk::Want want;
     AppExecFwk::ElementName element(
         DEFAULT_STRING, isHiCarConnected ? HICAR_BUNDLE_NAME : BUNDLE_NAME, ABILITY_NAME);
@@ -169,23 +167,6 @@ bool CallVoiceAssistantManager::ConnectAbility(int32_t callId)
     }
     return ret == TELEPHONY_SUCCESS;
 };
-
-bool CallVoiceAssistantManager::IsHiCarConnected()
-{
-#ifdef CAR_DISTRIBUTED_ENGINE_ENABLE
-    TravelService::SmartMobilityInfo hiCarInfo;
-    int32_t hiCarStatus = TravelService::TravelInnerInterface::GetInstance()->GetSmartMobilityStatus(
-        TravelService::BUSINESS_ID::HICAR, hiCarInfo);
-    if (hiCarStatus == 0 && hiCarInfo.status == TravelService::BUSINESS_STATUS::ACTIVE) {
-        TELEPHONY_LOGI("Current hiCar mode on");
-        isHiCarConnected = true;
-    }
-#else
-    TELEPHONY_LOGI("no CAR_DISTRIBUTED_ENGINE_ENABLE");
-#endif
-    TELEPHONY_LOGI("isHiCarConnected %{public}d", isHiCarConnected);
-    return isHiCarConnected;
-}
 
 bool CallVoiceAssistantManager::DisconnectAbility()
 {

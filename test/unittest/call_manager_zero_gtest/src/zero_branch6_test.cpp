@@ -609,6 +609,7 @@ HWTEST_F(ZeroBranch5Test, Telephony_DistributedCallManager_001, Function | Mediu
     manager.IsSelectVirtualModem();
     manager.SwitchOnDCallDeviceSync(device);
     manager.OnDCallSystemAbilityAdded(TEST_STR);
+    manager.IsDistributedCarDeviceOnline();
     EXPECT_TRUE(restr.empty());
 }
 
