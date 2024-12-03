@@ -42,7 +42,7 @@ CallBase::CallBase(DialParaInfo &info)
       ringEndTime_(0), answerType_(CallAnswerType::CALL_ANSWER_MISSED), accountId_(info.accountId),
       crsType_(info.crsType), originalCallType_(info.originalCallType), isMuted_(false), numberLocation_("default"),
       blockReason_(0), isEccContact_(false), celiaCallType_(-1), extraParams_(info.extraParams), isAnswered_(false),
-      detectDetails_("")
+      detectDetails_(""), phoneOrWatch_(inof.phoneOrWatch)
 {
     (void)memset_s(&contactInfo_, sizeof(ContactInfo), 0, sizeof(ContactInfo));
     (void)memset_s(&numberMarkInfo_, sizeof(NumberMarkInfo), 0, sizeof(NumberMarkInfo));
@@ -58,7 +58,7 @@ CallBase::CallBase(DialParaInfo &info, AppExecFwk::PacMap &extras)
       callEndTime_(0), ringBeginTime_(0), ringEndTime_(0), answerType_(CallAnswerType::CALL_ANSWER_MISSED),
       accountId_(info.accountId), crsType_(info.crsType), originalCallType_(info.originalCallType), isMuted_(false),
       numberLocation_("default"), blockReason_(0), isEccContact_(false), celiaCallType_(-1),
-      extraParams_(info.extraParams), isAnswered_(false), detectDetails_("")
+      extraParams_(info.extraParams), isAnswered_(false), detectDetails_(""), phoneOrWatch_(inof.phoneOrWatch)
 {
     (void)memset_s(&contactInfo_, sizeof(ContactInfo), 0, sizeof(ContactInfo));
     (void)memset_s(&numberMarkInfo_, sizeof(NumberMarkInfo), 0, sizeof(NumberMarkInfo));
@@ -164,6 +164,7 @@ void CallBase::GetCallAttributeBaseInfo(CallAttributeInfo &info)
         info.isEccContact = isEccContact_;
         info.celiaCallType = celiaCallType_;
         info.extraParamsString = AAFwk::WantParamWrapper(extraParams_).ToString();
+        inof.phoneOrWatch = phoneOrWatch_;
         if (memset_s(info.numberLocation, kMaxNumberLen, 0, kMaxNumberLen) != EOK) {
             TELEPHONY_LOGE("memset_s numberLocation fail");
             return;
@@ -675,6 +676,11 @@ void CallBase::SetCallDirection(CallDirection direction)
 CallDirection CallBase::GetCallDirection()
 {
     return direction_;
+}
+
+void CallBase::SetPhoneOrWatchDial(int32_t phoneOrWatch)
+{
+    phoneOrWatch_ = phoneOrWatch;    
 }
 } // namespace Telephony
 } // namespace OHOS

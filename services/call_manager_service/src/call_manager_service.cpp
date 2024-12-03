@@ -41,6 +41,7 @@
 #include "want_params_wrapper.h"
 #include "string_wrapper.h"
 #include "call_wired_headset.h"
+#include "bluetooth_call_connection.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -110,6 +111,9 @@ void CallManagerService::UnInit()
 {
     DelayedSingleton<CellularCallConnection>::GetInstance()->UnInit();
     callControlManagerPtr_ = nullptr;
+    if (bluetoothCallCallbackPtr_ != nullptr) {
+        bluetoothCallCallbackPtr_ = nullptr;
+    }
 }
 
 void CallManagerService::OnStart()
@@ -1484,6 +1488,7 @@ int32_t CallManagerService::RequestCameraCapabilities(int32_t callId)
 
 int32_t CallManagerService::SendCallUiEvent(int32_t callId, std::string &eventName)
 {
+    TELEPHONY_LOGI("SendCallUiEvent eventName=%{public}s", eventName.c_str());
     if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_SET_TELEPHONY_STATE)) {
         TELEPHONY_LOGE("Permission denied!");
         return TELEPHONY_ERR_PERMISSION_ERR;
@@ -1514,6 +1519,22 @@ int32_t CallManagerService::SendCallUiEvent(int32_t callId, std::string &eventNa
         object.Remove("sosWithOutCallUiAbility");
         callPtr->SetExtraParams(object);
         DelayedSingleton<CallAbilityReportProxy>::GetInstance()->ReportCallStateInfo(info);
+    } else if (eventName == "EVENT_BLUETOOTH_SCO_STATE_OFF") {
+        return DelayedSingleton<BluetoothCallConnection>::GetInstance()->DisConnectBtSco();
+    } else if (eventName == "EVENT_BLUETOOTH_SCO_STATE_ON") {
+        return DelayedSingleton<BluetoothCallConnection>::GetInstance()->ConnectBtSco();
+    } else if (eventName == "EVENT_SUPPORT_BLUETOOTH_CALL") {
+        bool state = DelayedSingleton<BluetoothCallConnection>::GetInstance()->GetSupportBtCall();
+        if (state) {
+            return TELEPHONY_SUCCESS;
+        }
+        return TELEPHONY_ERR_FAIL;
+    } else if (eventName == "EVENT_NOT_SUPPORT_BLUETOOTH_CALL") {
+        bool state = DelayedSingleton<BluetoothCallConnection>::GetInstance()->GetSupportBtCall();
+        if (!state) {
+            return TELEPHONY_SUCCESS;
+        }
+        return TELEPHONY_ERR_FAIL;
     }
     return TELEPHONY_SUCCESS;
 }
@@ -1534,6 +1555,16 @@ sptr<ICallStatusCallback> CallManagerService::RegisterBluetoothCallManagerCallba
     if (macAddress.empty()) {
         TELEPHONY_LOGE("macAddress is empty!");
     }
+    Bluetooth::HandsFreeUnit *profile = Bluetooth::HandsFreeUnit::GetProfile();
+    if (profile != nullptr) {
+        if (bluetoothCallObserver_ == nullptr) {
+            bluetoothCallObserver_ = std::make_shared<BluetoothCallState>();
+        }
+        profile->RegisterObServer(bluetoothCallObserver_);
+    } else {
+        TELEPHONY_LOGE("profile is nullprt");
+    }
+    DelayedSingleton<BluetoothCallConnection>::GetInstance()->SetMacAddress(macAddress);
     return bluetoothCallCallbackPtr_;
 }
 } // namespace Telephony

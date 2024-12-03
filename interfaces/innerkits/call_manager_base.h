@@ -380,6 +380,10 @@ enum class DialType {
      * Indicates the dialing call type is OTT.
      */
     DIAL_OTT_TYPE,
+    /**
+     * Indicates the dialing call type is bluetooth.
+     */
+    DIAL_BLUETOOTH_TYPE,
 };
 
 /**
@@ -788,6 +792,20 @@ enum class CallSuperPrivacyModeType {
      *  Indicates the super privacy mode for  ALWAYS_ON.
      */
     ALWAYS_ON = 2,
+};
+
+/**
+ * @brief Indicates dial from phone or watch.
+ */
+enum class PhoneOrWatchDial {
+    /*
+     *  Indicates call from phone.
+     */
+    PHONE_DIAL = 0,
+    /*
+     *  Indicates call from watch.
+     */
+    WATCH_DAIL = 1,
 };
 
 } // namespace Telephony

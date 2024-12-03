@@ -154,17 +154,23 @@ int32_t CallControlManager::DialCall(std::u16string &number, AppExecFwk::PacMap 
         }
     }
     ReportPhoneUEInSuperPrivacy(CALL_DIAL_IN_SUPER_PRIVACY);
+    int32_t dialType = extras.GetIntValue("dialType");
+    if (dialType == (int32_t)DialType::DIAL_BLUETOOTH_TYPE) {
+        extras.PutIntValue("callType", (int32_t)CallType::TYPE_BLUETOOTH);
+    }
     ret = CanDial(number, extras, isEcc);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("can dial policy result:%{public}d", ret);
         return ret;
     }
-    if (!IsSupportVideoCall(extras)) {
-        extras.PutIntValue("videoState", (int32_t)VideoStateType::TYPE_VOICE);
-    }
-    VideoStateType videoState = (VideoStateType)extras.GetIntValue("videoState");
-    if (videoState == VideoStateType::TYPE_VIDEO) {
-        extras.PutIntValue("callType", (int32_t)CallType::TYPE_IMS);
+    if (dialType == (int32_t)DialType::DIAL_CARRIER_TYPE || dialType == (int32_t)DialType::DIAL_VOICE_MAIL_TYPE) {
+        if (!IsSupportVideoCall(extras)) {
+            extras.PutIntValue("videoState", (int32_t)VideoStateType::TYPE_VOICE);
+        }
+        VideoStateType videoState = (VideoStateType)extras.GetIntValue("videoState");
+        if (videoState == VideoStateType::TYPE_VIDEO) {
+            extras.PutIntValue("callType", (int32_t)CallType::TYPE_IMS);
+        }
     }
     // temporarily save dial information
     PackageDialInformation(extras, accountNumber, isEcc);

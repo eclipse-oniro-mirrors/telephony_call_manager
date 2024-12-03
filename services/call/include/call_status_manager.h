@@ -82,6 +82,8 @@ private:
     sptr<CallBase> CreateNewCall(const CallDetailInfo &info, CallDirection dir);
     sptr<CallBase> CreateNewCallByCallType(
         DialParaInfo &paraInfo, const CallDetailInfo &info, CallDirection dir, AppExecFwk::PacMap &extras);
+    sptr<CallBase> CreateNewCallByCallTypeEx(
+        DialParaInfo &paraInfo, const CallDetailInfo &info, CallDirection dir, AppExecFwk::PacMap &extras);
     sptr<CallBase> RefreshCallIfNecessary(const sptr<CallBase> &call, const CallDetailInfo &info);
     void SetOriginalCallTypeForActiveState(sptr<CallBase> &call);
     void SetOriginalCallTypeForDisconnectState(sptr<CallBase> &call);
@@ -111,6 +113,8 @@ private:
     std::vector<sptr<CallBase>> GetConferenceCallList(int32_t slotId);
     void UpdateCallDetailsInfo(const CallDetailsInfo &info);
     bool IsDistributeCallSourceStatus();
+    void HandleBluetoothCallReportInfo(const CallDetailInfo &inof);
+    void SetBtCallDialByPhone(const sptr<CallBase> &call, bool isBtCallDialByPhone);
 
 private:
     CallDetailInfo callReportInfo_;

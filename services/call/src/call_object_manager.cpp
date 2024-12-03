@@ -192,7 +192,8 @@ int32_t CallObjectManager::HasNewCall()
             ((*it)->GetCallRunningState() == CallRunningState::CALL_RUNNING_STATE_CREATE ||
             (*it)->GetCallRunningState() == CallRunningState::CALL_RUNNING_STATE_CONNECTING ||
             (*it)->GetCallRunningState() == CallRunningState::CALL_RUNNING_STATE_DIALING ||
-            (*it)->GetCallType() == CallType::TYPE_SATELLITE)) {
+            (*it)->GetCallType() == CallType::TYPE_SATELLITE ||
+            (*it)->GetCallType() == CallType::TYPE_BLUETOOTH)) {
             TELEPHONY_LOGE("there is already a new call[callId:%{public}d,state:%{public}d], please redial later",
                 (*it)->GetCallID(), (*it)->GetCallRunningState());
             return CALL_ERR_CALL_COUNTS_EXCEED_LIMIT;
@@ -269,7 +270,8 @@ int32_t CallObjectManager::GetCarrierCallList(std::list<int32_t> &list)
     std::list<sptr<CallBase>>::iterator it;
     for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
         if ((*it)->GetCallType() == CallType::TYPE_CS || (*it)->GetCallType() == CallType::TYPE_IMS ||
-            (*it)->GetCallType() == CallType::TYPE_SATELLITE) {
+            (*it)->GetCallType() == CallType::TYPE_SATELLITE ||
+            (*it)->GetCallType() == CallType::TYPE_BLUETOOTH) {
             list.emplace_back((*it)->GetCallID());
         }
     }
@@ -410,7 +412,8 @@ bool CallObjectManager::HasCellularCallExist()
     std::list<sptr<CallBase>>::iterator it;
     for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
         if ((*it)->GetCallType() == CallType::TYPE_CS || (*it)->GetCallType() == CallType::TYPE_IMS ||
-            (*it)->GetCallType() == CallType::TYPE_SATELLITE) {
+            (*it)->GetCallType() == CallType::TYPE_SATELLITE ||
+            (*it)->GetCallType() == CallType::TYPE_BLUETOOTH) {
             if ((*it)->GetTelCallState() != TelCallState::CALL_STATUS_DISCONNECTED &&
                 (*it)->GetTelCallState() != TelCallState::CALL_STATUS_DISCONNECTING) {
                 return true;
@@ -556,6 +559,21 @@ sptr<CallBase> CallObjectManager::GetOneCallObjectByIndexAndSlotId(int32_t index
     std::list<sptr<CallBase>>::iterator it = callObjectPtrList_.begin();
     for (; it != callObjectPtrList_.end(); ++it) {
         if ((*it)->GetCallIndex() == index) {
+            if ((*it)->GetSlotId() == slotId && (*it)->GetCallType() != CallType::TYPE_VOIP) {
+                return (*it);
+            }
+        }
+    }
+    return nullptr;
+}
+
+sptr<CallBase> CallObjectManager::GetOneCallObjectByIndexSlotIdAndCallType(int32_t index, int32_t slotId,
+    CallType callType)
+{
+    std::lock_guard<std::mutex> lock(listMutex_);
+    std::list<sptr<CallBase>>::iterator it = callObjectPtrList_.begin();
+    for (; it != callObjectPtrList_.end(); ++it) {
+        if ((*it)->GetCallType() == callType && (*it)->GetCallIndex() == index) {
             if ((*it)->GetSlotId() == slotId && (*it)->GetCallType() != CallType::TYPE_VOIP) {
                 return (*it);
             }

@@ -319,6 +319,10 @@ struct CallAttributeInfo {
      * Indicates the details of call detect result.
      */
     char detectDetails[kMaxNumberLen + 1] = { 0 };
+    /**
+     * Indicates the type of dial call from phone or watch.
+     */
+    int32_t phoneOrWatch = 0;
 };
 
 /**
@@ -513,6 +517,8 @@ struct CallDetailInfo {
      */
     VoipCallReportInfo voipCallInfo;
 
+    int32_t phoneOrWatch = 0;
+
     CallDetailInfo() {}
 
     CallDetailInfo(const CallDetailInfo &temp)
@@ -545,6 +551,7 @@ struct CallDetailInfo {
         voipCallInfo.isVoiceAnswerSupported = temp.voipCallInfo.isVoiceAnswerSupported;
         voipCallInfo.hasMicPermission = temp.voipCallInfo.hasMicPermission;
         voipCallInfo.uid = temp.voipCallInfo.uid;
+        phoneOrWatch = temp.phoneOrWatch;
         return *this;
     }
 };

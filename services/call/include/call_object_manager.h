@@ -44,7 +44,7 @@ public:
     static sptr<CallBase> GetOneCallObject(std::string &phoneNumber);
     static sptr<CallBase> GetOneCallObjectByIndex(int32_t index);
     static sptr<CallBase> GetOneCallObjectByIndexAndSlotId(int32_t index, int32_t slotId);
-    static sptr<CallBase> GetOneCallObjectByVoipCallId(std::string voipCallId, std::string bundleName, int32_t uid);
+    static sptr<CallBase> GetOneCallObjectByIndexSlotIdAndCallType(int32_t index, int32_t slotId, CallType callType);    static sptr<CallBase> GetOneCallObjectByVoipCallId(std::string voipCallId, std::string bundleName, int32_t uid);
     static void UpdateOneCallObjectByCallId(int32_t callId, TelCallState nextCallState);
     static int32_t HasNewCall();
     static int32_t IsNewCallAllowedCreate(bool &enabled);

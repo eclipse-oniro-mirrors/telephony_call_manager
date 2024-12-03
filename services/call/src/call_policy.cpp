@@ -37,8 +37,8 @@ int32_t CallPolicy::DialPolicy(std::u16string &number, AppExecFwk::PacMap &extra
 {
     DialType dialType = (DialType)extras.GetIntValue("dialType");
     if (dialType != DialType::DIAL_CARRIER_TYPE && dialType != DialType::DIAL_VOICE_MAIL_TYPE &&
-        dialType != DialType::DIAL_OTT_TYPE) {
-        TELEPHONY_LOGE("dial type invalid!");
+        dialType != DialType::DIAL_OTT_TYPE && dialType != DialType::DIAL_BLUETOOTH_TYPE) {
+        TELEPHONY_LOGE("dial type invalid! dialType=%{public}d", dialType);
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
     int32_t accountId = extras.GetIntValue("accountId");
@@ -107,7 +107,7 @@ int32_t CallPolicy::SuperPrivacyMode(std::u16string &number, AppExecFwk::PacMap 
 }
 int32_t CallPolicy::HasNormalCall(bool isEcc, int32_t slotId, CallType callType)
 {
-    if (isEcc || callType == CallType::TYPE_SATELLITE) {
+    if (isEcc || callType == CallType::TYPE_SATELLITE || callType == CallType::TYPE_BLUETOOTH) {
         return TELEPHONY_SUCCESS;
     }
     bool hasSimCard = false;
@@ -190,7 +190,7 @@ int32_t CallPolicy::IsVoiceCallValid(VideoStateType videoState)
 int32_t CallPolicy::IsValidCallType(CallType callType)
 {
     if (callType != CallType::TYPE_CS && callType != CallType::TYPE_IMS && callType != CallType::TYPE_OTT &&
-        callType != CallType::TYPE_SATELLITE) {
+        callType != CallType::TYPE_SATELLITE && callType == CallType::TYPE_BLUETOOTH) {
         TELEPHONY_LOGE("invalid call type!");
         return CALL_ERR_UNKNOW_CALL_TYPE;
     }

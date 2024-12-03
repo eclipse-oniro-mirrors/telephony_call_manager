@@ -29,6 +29,7 @@
 #include "audio_system_manager.h"
 #include "audio_device_info.h"
 #include "distributed_communication_manager.h"
+#include "bluetooth_call_connection.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -568,6 +569,17 @@ int32_t AudioDeviceManager::ReportAudioDeviceInfo(sptr<CallBase> call)
     }
     if (call != nullptr) {
         info_.callId = call->GetCallID();
+    }
+    if (call != nullptr && call->GetCallType() == CallType::TYPE_BLUETOOTH &&
+        (call->GetTelCallState() == TelCallState::CALL_STATUS_ACTIVE ||
+        call->GetTelCallState() == TelCallState::CALL_STATUS_DIALING ||
+        call->GetTelCallState() == TelCallState::CALL_STATUS_ALERTING)) {
+        bool state = DelayedSingleton<BluetoothCallConnection>::GetInstance()->GetBtScoIsConnected();
+        if (state) {
+            info_.currentAudioDevice.deviceType = AudioDeviceType::DEVICE_SPEAKER;
+        } else {
+            info_.currentAudioDevice.deviceType = AudioDeviceType::DEVICE_EARPIECE;
+        }
     }
     TELEPHONY_LOGI("report audio device info, currentAudioDeviceType:%{public}d, currentAddress:%{public}s, "
         "mute:%{public}d, callId:%{public}d", info_.currentAudioDevice.deviceType, ConvertAddress().c_str(),

@@ -1413,7 +1413,9 @@ int32_t CallManagerServiceStub::OnRegisterBluetoothCallManagerCallbackPtr(Messag
         return TELEPHONY_ERR_FAIL;
     }
     sptr<IRemoteObject> objectPtr = callback->AsObject().GetRefPtr();
-
+    if (objectPtr == nullprt) {
+        TELEPHONY_LOGE("RegisterBluetoothCallManagerCallbackPtr faild!");
+    }
     if (!reply.WriteRemoteObject(objectPtr)) {
         TELEPHONY_LOGE("OnRegisterBluetoothCallManagerCallbackPtr fail to write parcel");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;

@@ -145,7 +145,8 @@ void AudioControlManager::VideoStateUpdated(
         TELEPHONY_LOGE("call object nullptr");
         return;
     }
-    if (callObjectPtr->GetCallType() != CallType::TYPE_IMS) {
+    if (callObjectPtr->GetCallType() != CallType::TYPE_IMS ||
+        callObjectPtr->GetCallType() != CallType::TYPE_BLUETOOTH) {
         TELEPHONY_LOGE("other call not need control audio");
         return;
     }
@@ -209,7 +210,8 @@ void AudioControlManager::UpdateDeviceTypeForVideoOrSatelliteCall()
         return;
     }
     if (foregroundCall->GetCallType() != CallType::TYPE_IMS ||
-        foregroundCall->GetCallType() != CallType::TYPE_SATELLITE) {
+        foregroundCall->GetCallType() != CallType::TYPE_SATELLITE ||
+        foregroundCall->GetCallType() != CallType::TYPE_BLUETOOTH) {
         TELEPHONY_LOGE("other call not need control audio");
         return;
     }
@@ -293,6 +295,7 @@ void AudioControlManager::HandleCallStateUpdated(
         TELEPHONY_LOGE("call object is nullptr");
         return;
     }
+    TELEPHONY_LOGI("HandleCallStateUpdated priorState:%{public}d, nextState:%{public}d", priorState, nextState);
     if (nextState == TelCallState::CALL_STATUS_ANSWERED) {
         TELEPHONY_LOGI("user answered, mute ringer instead of release renderer");
         if (priorState == TelCallState::CALL_STATUS_INCOMING) {
@@ -342,6 +345,7 @@ void AudioControlManager::HandleNextState(sptr<CallBase> &callObjectPtr, TelCall
         default:
             break;
     }
+    TELEPHONY_LOGI("HandleNextState ProcessEvent event=%{public}d", event);
     if (event == AudioEvent::UNKNOWN_EVENT) {
         return;
     }
@@ -382,6 +386,7 @@ void AudioControlManager::HandlePriorState(sptr<CallBase> &callObjectPtr, TelCal
         default:
             break;
     }
+    TELEPHONY_LOGI("HandlePriorState ProcessEvent event=%{public}d", event);
     if (event == AudioEvent::UNKNOWN_EVENT) {
         return;
     }
@@ -414,6 +419,7 @@ void AudioControlManager::HandleNewActiveCall(sptr<CallBase> &callObjectPtr)
             event = AudioEvent::NEW_ACTIVE_CS_CALL;
             break;
         case CallType::TYPE_IMS:
+        case CallType::TYPE_BLUETOOTH:
             event = AudioEvent::NEW_ACTIVE_IMS_CALL;
             break;
         case CallType::TYPE_OTT:
@@ -679,7 +685,8 @@ AudioDeviceType AudioControlManager::GetInitAudioDeviceType() const
         }
         sptr<CallBase> liveCall = CallObjectManager::GetForegroundCall();
         if (liveCall != nullptr && (liveCall->GetVideoStateType() == VideoStateType::TYPE_VIDEO ||
-            liveCall->GetCallType() == CallType::TYPE_SATELLITE)) {
+            liveCall->GetCallType() == CallType::TYPE_SATELLITE ||
+            liveCall->GetCallType() == CallType::TYPE_BLUETOOTH)) {
             TELEPHONY_LOGI("current video or satellite call speaker is active");
             return AudioDeviceType::DEVICE_SPEAKER;
         }
@@ -705,9 +712,19 @@ int32_t AudioControlManager::SetMute(bool isMute)
     if ((DelayedSingleton<CallControlManager>::GetInstance()->HasEmergency(enabled) == TELEPHONY_SUCCESS) && enabled) {
         isMute = false;
     }
-    if (!DelayedSingleton<AudioProxy>::GetInstance()->SetMicrophoneMute(isMute)) {
-        TELEPHONY_LOGE("set mute failed");
-        return CALL_ERR_AUDIO_SETTING_MUTE_FAILED;
+    if (DelayedSingleton<CallControlManager>::GetInstance()->IsCallExist(CallType::TYPE_BLUETOOTH,
+        TelCallState::CALL_STATUS_ACTIVE)) {
+        std::string strMute = isMute ? "true" : "false";
+        TELEPHONY_LOGI("SetMute strMute=%{public}s", strMute.c_str());
+        std::vector<std::pair<std::string, std::string>> vec = {
+            std::pair<std::string, std::string>("hfp_set_mic_mute", strMute)
+        };
+        OHOS::AudioStandard::AudioSystemManager::GetInstance()->SetExtraParameters("hfp_extra", vec);
+    } else {
+        if (!DelayedSingleton<AudioProxy>::GetInstance()->SetMicrophoneMute(isMute)) {
+            TELEPHONY_LOGE("set mute failed");
+            return CALL_ERR_AUDIO_SETTING_MUTE_FAILED;
+        }
     }
     DelayedSingleton<AudioDeviceManager>::GetInstance()->ReportAudioDeviceInfo();
     sptr<CallBase> currentCall = frontCall_;

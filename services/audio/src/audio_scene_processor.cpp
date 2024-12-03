@@ -64,6 +64,7 @@ void AudioSceneProcessor::ProcessEventInner(AudioEvent event)
         TELEPHONY_LOGE("current call state nullptr");
         return;
     }
+    TELEPHONY_LOGE("ProcessEventInner event=%{public}d", event);
     switch (event) {
         case AudioEvent::SWITCH_DIALING_STATE:
         case AudioEvent::SWITCH_ALERTING_STATE:
