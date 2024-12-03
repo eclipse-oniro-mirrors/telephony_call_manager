@@ -41,6 +41,7 @@ void DistributedCommunicationManager::Init()
 
 void DistributedCommunicationManager::InitExtWrapper()
 {
+    std::lock_guard<ffrt::mutex> lock(mutexFunc_);
     if (extWrapperHandler_ != nullptr) {
         return;
     }
@@ -57,9 +58,13 @@ void DistributedCommunicationManager::InitExtWrapper()
 
 void DistributedCommunicationManager::DeInitExtWrapper()
 {
+    std::lock_guard<ffrt::mutex> lock(mutexFunc_);
     if (extWrapperHandler_ != nullptr) {
         dlclose(extWrapperHandler_);
         extWrapperHandler_ = nullptr;
+        regDevCallbackFunc_ = nullptr;
+        unRegDevCallbackFunc_ = nullptr;
+        switchDevFunc_ = nullptr;
     }
     TELEPHONY_LOGI("de-init ext wrapper finish");
 }
@@ -67,6 +72,7 @@ void DistributedCommunicationManager::DeInitExtWrapper()
 int32_t DistributedCommunicationManager::RegDevCallbackWrapper(
     const std::shared_ptr<IDistributedDeviceCallback> &callback)
 {
+    std::lock_guard<ffrt::mutex> lock(mutexFunc_);
     if (regDevCallbackFunc_ == nullptr) {
         TELEPHONY_LOGE("reg dev callback func is null");
         return TELEPHONY_ERROR;
@@ -76,6 +82,7 @@ int32_t DistributedCommunicationManager::RegDevCallbackWrapper(
 
 int32_t DistributedCommunicationManager::UnRegDevCallbackWrapper()
 {
+    std::lock_guard<ffrt::mutex> lock(mutexFunc_);
     if (unRegDevCallbackFunc_ == nullptr) {
         TELEPHONY_LOGE("un-reg dev callback func is null");
         return TELEPHONY_ERROR;
@@ -85,6 +92,7 @@ int32_t DistributedCommunicationManager::UnRegDevCallbackWrapper()
 
 int32_t DistributedCommunicationManager::SwitchDevWrapper(const std::string &devId, int32_t direction)
 {
+    std::lock_guard<ffrt::mutex> lock(mutexFunc_);
     if (switchDevFunc_ == nullptr) {
         TELEPHONY_LOGE("switch dev func is null");
         return TELEPHONY_ERROR;
@@ -98,27 +106,29 @@ void DistributedCommunicationManager::OnDeviceOnline(const std::string &devId, c
     if (devObserver_ == nullptr) {
         return;
     }
-    std::lock_guard<ffrt::mutex> lock(mutex_);
-    status_ = DistributedStatus::CONNECT;
-    role_ = (devRole == 0 ? DistributedRole::SINK : DistributedRole::SOURCE); // peer role 0 means local role sink
-    auto iter = std::find(peerDevices_.begin(), peerDevices_.end(), devId);
-    if (iter == peerDevices_.end()) {
-        peerDevices_.emplace_back(devId);
-    }
-    if (dataController_ == nullptr) {
-        if (role_ == DistributedRole::SINK) {
-            dataController_ = std::make_shared<DistributedDataSinkController>();
-        } else {
-            dataController_ = std::make_shared<DistributedDataSourceController>();
+    {
+        std::lock_guard<ffrt::mutex> lock(mutex_);
+        status_ = DistributedStatus::CONNECT;
+        role_ = (devRole == 0 ? DistributedRole::SINK : DistributedRole::SOURCE); // peer role 0 means local role sink
+        auto iter = std::find(peerDevices_.begin(), peerDevices_.end(), devId);
+        if (iter == peerDevices_.end()) {
+            peerDevices_.emplace_back(devId);
         }
-        devObserver_->RegisterDevStatusCallback(dataController_);
-    }
-    if (devSwitchController_ == nullptr) {
-        if (role_ == DistributedRole::SOURCE) {
-            devSwitchController_ = std::make_shared<DistributedDeviceSwitchController>();
-            devObserver_->RegisterDevStatusCallback(devSwitchController_);
+        if (dataController_ == nullptr) {
+            if (role_ == DistributedRole::SINK) {
+                dataController_ = std::make_shared<DistributedDataSinkController>();
+            } else {
+                dataController_ = std::make_shared<DistributedDataSourceController>();
+            }
+        }
+        if (devSwitchController_ == nullptr) {
+            if (role_ == DistributedRole::SOURCE) {
+                devSwitchController_ = std::make_shared<DistributedDeviceSwitchController>();
+            }
         }
     }
+    devObserver_->RegisterDevStatusCallback(dataController_);
+    devObserver_->RegisterDevStatusCallback(devSwitchController_);
     devObserver_->OnDeviceOnline(devId, devName, deviceType);
     TELEPHONY_LOGI("distributed device online");
 }
@@ -130,6 +140,9 @@ void DistributedCommunicationManager::OnDeviceOffline(const std::string &devId, 
         return;
     }
     devObserver_->OnDeviceOffline(devId, devName, deviceType);
+    devObserver_->UnRegisterDevStatusCallback(dataController_);
+    devObserver_->UnRegisterDevStatusCallback(devSwitchController_);
+
     std::lock_guard<ffrt::mutex> lock(mutex_);
     auto iter = std::find(peerDevices_.begin(), peerDevices_.end(), devId);
     if (iter != peerDevices_.end()) {
@@ -142,12 +155,10 @@ void DistributedCommunicationManager::OnDeviceOffline(const std::string &devId, 
 
     status_ = DistributedStatus::DISCONNECT;
     if (dataController_ != nullptr) {
-        devObserver_->UnRegisterDevStatusCallback(dataController_);
         dataController_.reset();
         dataController_ = nullptr;
     }
     if (devSwitchController_ != nullptr) {
-        devObserver_->UnRegisterDevStatusCallback(devSwitchController_);
         devSwitchController_.reset();
         devSwitchController_ = nullptr;
     }

@@ -53,6 +53,11 @@ void DistributedDeviceObserver::RegisterDevStatusCallback(
         TELEPHONY_LOGE("reg dev status callback null");
         return;
     }
+    auto iter = std::find(callbacks_.begin(), callbacks_.end(), callback);
+    if (iter != callbacks_.end()) {
+        TELEPHONY_LOGI("callback already reg");
+        return;
+    }
     callbacks_.push_back(callback);
     TELEPHONY_LOGI("reg dev status callback");
 }
@@ -101,8 +106,12 @@ int32_t DistributedDeviceObserver::UnRegisterDevCallback()
 void DistributedDeviceObserver::OnDeviceOnline(const std::string &devId, const std::string &devName,
                                                AudioDeviceType devType)
 {
-    std::lock_guard<ffrt::mutex> lock(mutex_);
-    for (auto callback : callbacks_) {
+    std::list<std::shared_ptr<IDistributedDeviceStateCallback>> callbacks;
+    {
+        std::lock_guard<ffrt::mutex> lock(mutex_);
+        callbacks = callbacks_;
+    }
+    for (auto& callback : callbacks) {
         if (callback != nullptr) {
             callback->OnDeviceOnline(devId, devName, devType);
         }
@@ -112,8 +121,12 @@ void DistributedDeviceObserver::OnDeviceOnline(const std::string &devId, const s
 void DistributedDeviceObserver::OnDeviceOffline(const std::string &devId, const std::string &devName,
                                                 AudioDeviceType devType)
 {
-    std::lock_guard<ffrt::mutex> lock(mutex_);
-    for (auto callback : callbacks_) {
+    std::list<std::shared_ptr<IDistributedDeviceStateCallback>> callbacks;
+    {
+        std::lock_guard<ffrt::mutex> lock(mutex_);
+        callbacks = callbacks_;
+    }
+    for (auto& callback : callbacks) {
         if (callback != nullptr) {
             callback->OnDeviceOffline(devId, devName, devType);
         }
@@ -123,8 +136,12 @@ void DistributedDeviceObserver::OnDeviceOffline(const std::string &devId, const 
 void DistributedDeviceObserver::OnDistributedAudioDeviceChange(const std::string &devId, const std::string &devName,
     AudioDeviceType devType, int32_t devRole)
 {
-    std::lock_guard<ffrt::mutex> lock(mutex_);
-    for (auto callback : callbacks_) {
+    std::list<std::shared_ptr<IDistributedDeviceStateCallback>> callbacks;
+    {
+        std::lock_guard<ffrt::mutex> lock(mutex_);
+        callbacks = callbacks_;
+    }
+    for (auto& callback : callbacks) {
         if (callback != nullptr) {
             callback->OnDistributedAudioDeviceChange(devId, devName, devType, devRole);
         }
@@ -133,8 +150,12 @@ void DistributedDeviceObserver::OnDistributedAudioDeviceChange(const std::string
 
 void DistributedDeviceObserver::OnRemoveSystemAbility()
 {
-    std::lock_guard<ffrt::mutex> lock(mutex_);
-    for (auto callback : callbacks_) {
+    std::list<std::shared_ptr<IDistributedDeviceStateCallback>> callbacks;
+    {
+        std::lock_guard<ffrt::mutex> lock(mutex_);
+        callbacks = callbacks_;
+    }
+    for (auto& callback : callbacks) {
         if (callback != nullptr) {
             callback->OnRemoveSystemAbility();
         }

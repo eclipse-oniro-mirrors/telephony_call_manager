@@ -66,13 +66,20 @@ void ServerSession::Create(const std::string &localName)
 
 void ServerSession::Destroy()
 {
-    std::lock_guard<ffrt::mutex> lock(mutex_);
-    if (serverSocket_ > INVALID_SOCKET_ID) {
-        Shutdown(serverSocket_);
-        TELEPHONY_LOGI("close server socket %{public}d success", serverSocket_);
+    int32_t socket = INVALID_SOCKET_ID;
+    {
+        std::lock_guard<ffrt::mutex> lock(mutex_);
+        if (serverSocket_ > INVALID_SOCKET_ID) {
+            socket = serverSocket_;
+        }
+        serverSocket_ = INVALID_SOCKET_ID;
+        socket_ = INVALID_SOCKET_ID;
+        TELEPHONY_LOGI("disconnect server session");
     }
-    serverSocket_ = INVALID_SOCKET_ID;
-    socket_ = INVALID_SOCKET_ID;
+    if (socket > INVALID_SOCKET_ID) {
+        Shutdown(socket);
+        TELEPHONY_LOGI("close server socket %{public}d success", socket);
+    }
 }
 
 void ServerSession::OnSessionBind(int32_t socket)
