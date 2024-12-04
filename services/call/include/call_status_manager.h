@@ -115,6 +115,8 @@ private:
     bool IsDistributeCallSourceStatus();
     void HandleBluetoothCallReportInfo(const CallDetailInfo &info);
     void SetBtCallDialByPhone(const sptr<CallBase> &call, bool isBtCallDialByPhone);
+    void BtCallDialingHandle(sptr<CallBase> call, const CallDetailInfo &info);
+    void SetDistributedDeviceDialing(bool isDistributedDeviceDialing);
 
 private:
     CallDetailInfo callReportInfo_;

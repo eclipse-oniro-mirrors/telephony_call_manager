@@ -37,11 +37,11 @@ void BluetoothCallState::OnConnectionStateChanged(const Bluetooth::BluetoothRemo
     }
 }
 
-void BluetoothCallState::OnScoStateChanged(const Bluetooth::BluetoothRemoteDevice &device, int state)
+void BluetoothCallState::OnScoStateChanged(const Bluetooth::BluetoothRemoteDevice &device, int32_t state)
 {
     TELEPHONY_LOGI("BluetoothCallState OnScoStateChanged, state = %{public}d", state);
-    if (state == static_cast<int>(Bluetooth::HfpScoConnectState::SCO_CONNECTED) ||
-        state == static_cast<int>(Bluetooth::HfpScoConnectState::SCO_DISCONNECTED)) {
+    if (state == static_cast<int32_t>(Bluetooth::HfpScoConnectState::SCO_CONNECTED) ||
+        state == static_cast<int32_t>(Bluetooth::HfpScoConnectState::SCO_DISCONNECTED)) {
         DelayedSingleton<AudioDeviceManager>::GetInstance()->ReportAudioDeviceInfo();
     }
 }

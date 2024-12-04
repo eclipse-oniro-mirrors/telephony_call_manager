@@ -28,7 +28,7 @@ public:
     ~BluetoothCallState();
 
     void OnConnectionStateChanged(const Bluetooth::BluetoothRemoteDevice &device, int32_t state, int32_t cause);
-    void OnScoStateChanged(const Bluetooth::BluetoothRemoteDevice &device, int state);
+    void OnScoStateChanged(const Bluetooth::BluetoothRemoteDevice &device, int32_t state);
 private:
 };
 } // namespace Telephony

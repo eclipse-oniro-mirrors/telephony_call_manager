@@ -141,6 +141,7 @@ private:
     void AnswerHandlerForSatelliteOrVideoCall(sptr<CallBase> &call, int32_t videoState);
     bool CurrentIsSuperPrivacyMode(int32_t callId, int32_t videoState);
     void AppStateObserver();
+    void SetCallTypeExtras(AppExecFwk::PacMap &extras);
 
 private:
     class SystemAbilityListener : public SystemAbilityStatusChangeStub {

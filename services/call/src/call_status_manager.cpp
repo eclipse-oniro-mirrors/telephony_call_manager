@@ -703,22 +703,11 @@ int32_t CallStatusManager::DialingHandle(const CallDetailInfo &info)
     if (info.index > 0) {
         sptr<CallBase> call = GetOneCallObjectByIndexSlotIdAndCallType(INIT_INDEX, info.accountId, info.callType);
         if (info.callType == CallType::TYPE_BLUETOOTH) {
-            if (call != nullptr) {
-                call->SetPhoneOrWatchDial(static_cast<int32_t>(PhoneOrWatchDial::WATCH_DIAL));
-                SetBtCallDialByPhone(call, false);
-            } else {
-                call = GetOneCallObjectByIndexSlotIdAndCallType(info.index, info.accountId, info.callType);
-                if (call != nullptr) {
-                    call->SetPhoneOrWatchDial(static_cast<int32_t>(PhoneOrWatchDial::PHONE_DIAL));
-                    SetBtCallDialByPhone(call, true);
-                }
-            }
+            BtCallDialingHandle(call, info);
         } else {
             if (call == nullptr) {
                 call = GetOneCallObjectByIndexSlotIdAndCallType(info.index, info.accountId, info.callType);
-                if (IsDistributeCallSourceStatus()) {
-                    isDistributedDeviceDialing = true;
-                }
+                isDistributedDeviceDialing = IsDistributeCallSourceStatus();
             }
             if (call != nullptr) {
                 TELEPHONY_LOGI("need update call info");
@@ -731,11 +720,7 @@ int32_t CallStatusManager::DialingHandle(const CallDetailInfo &info)
         TELEPHONY_LOGE("CreateNewCall failed!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    if (isDistributedDeviceDialing) {
-        AAFwk::WantParams extraParams;
-        extraParams.SetParam("isDistributedDeviceDialing", AAFwk::String::Box("true"));
-        call->SetExtraParams(extraParams);
-    }
+    SetDistributedDeviceDialing(isDistributedDeviceDialing);
     if (IsDcCallConneceted()) {
         SetContactInfo(call, std::string(info.phoneNum));
     }
@@ -746,7 +731,6 @@ int32_t CallStatusManager::DialingHandle(const CallDetailInfo &info)
         call->SetPhoneOrWatchDial(static_cast<int32_t>(PhoneOrWatchDial::WATCH_DIAL));
         SetBtCallDialByPhone(call, false);
     }
-
     callRequestEventHandler->RestoreDialingFlag(false);
     callRequestEventHandler->RemoveEventHandlerTask();
     int32_t ret = call->DialingProcess();
@@ -1833,6 +1817,29 @@ void CallStatusManager::SetBtCallDialByPhone(const sptr<CallBase> &call, bool is
     object.SetParam("isBtCallDialByPhone", AAFwk::Boolean::Box(isBtCallDialByPhone));
     call->SetExtraParams(object);
     call->GetCallAttributeBaseInfo(info);
+}
+
+void CallStatusManager::BtCallDialingHandle(sptr<CallBase> call, const CallDetailInfo &info)
+{
+    if (call != nullptr) {
+        call->SetPhoneOrWatchDial(static_cast<int32_t>(PhoneOrWatchDial::WATCH_DIAL));
+        SetBtCallDialByPhone(call, false);
+    } else {
+        call = GetOneCallObjectByIndexSlotIdAndCallType(info.index, info.accountId, info.callType);
+        if (call != nullptr) {
+            call->SetPhoneOrWatchDial(static_cast<int32_t>(PhoneOrWatchDial::PHONE_DIAL));
+            SetBtCallDialByPhone(call, true);
+        }
+    }
+}
+
+void CallStatusManager::SetDistributedDeviceDialing(bool isDistributedDeviceDialing)
+{
+    if (isDistributedDeviceDialing) {
+        AAFwk::WantParams extraParams;
+        extraParams.SetParam("isDistributedDeviceDialing", AAFwk::String::Box("true"));
+        call->SetExtraParams(extraParams);
+    }
 }
 } // namespace Telephony
 } // namespace OHOS
