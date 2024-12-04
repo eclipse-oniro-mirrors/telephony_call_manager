@@ -139,6 +139,7 @@ public:
     bool IsAnsweredCall();
     void SetAnsweredCall(bool isAnswered);
     AAFwk::WantParams GetExtraParams();
+    void SetPhoneOrWatchDial(int32_t phoneOrWatch);
 
 protected:
     int32_t callId_;
@@ -189,6 +190,7 @@ private:
     int32_t celiaCallType_;
     AAFwk::WantParams extraParams_;
     bool isAnswered_;
+	int32_t phoneOrWatch_ = 0;
 };
 } // namespace Telephony
 } // namespace OHOS

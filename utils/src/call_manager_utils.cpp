@@ -64,6 +64,7 @@ void CallManagerUtils::WriteCallAttributeInfo(const CallAttributeInfo &info, Mes
         messageParcel.WriteInt32(info.voipCallInfo.uid);
         messageParcel.WriteUInt8Vector(info.voipCallInfo.userProfile);
     }
+    messageParcel.WriteInt32(info.phoneOrWatch);
 }
 
 } // namespace Telephony

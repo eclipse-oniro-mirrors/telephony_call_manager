@@ -640,9 +640,9 @@ public:
     int32_t SendCallUiEvent(int32_t callId, std::string &eventName);
 
     /**
-     * @brief notify voip register callstatus callback
+     * @brief notify bluetoothcall register callstatus callback
      *
-     * @return Returns 0 on success, others on failure.
+     * @return Returns sptr<ICallStatusCallback>.
      */
     sptr<ICallStatusCallback> RegisterBluetoothCallManagerCallbackPtr(std::string &macAddress);
 };
