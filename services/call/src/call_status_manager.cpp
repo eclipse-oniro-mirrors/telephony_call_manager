@@ -175,14 +175,7 @@ void CallStatusManager::HandleBluetoothCallReportInfo(const CallDetailInfo &info
         if (info.state == TelCallState::CALL_STATUS_DIALING || info.state == TelCallState::CALL_STATUS_ALERTING) {
             call = GetOneCallObjectByIndexSlotIdAndCallType(INIT_INDEX, info.accountId, info.callType);
             if (call != nullptr) {
-                call->SetPhoneOrWatchDial(static_cast<int32_t>(PhoneOrWatchDial::WATCH_DIAL));
-                SetBtCallDialByPhone(call, false);
-                if (info.state == TelCallState::CALL_STATUS_ALERTING) {
-                    UpdateDialingCallInfo(info);
-                    if (call->GetTelCallState() == TelCallState::CALL_STATUS_ALERTING) {
-                        call->SetTelCallState(TelCallState::CALL_STATUS_DIALING);
-                    }
-                }
+                BtCallDialingHandleFirst(call, info);
                 return;
             }
         }
@@ -1839,6 +1832,21 @@ void CallStatusManager::SetDistributedDeviceDialing(bool isDistributedDeviceDial
         AAFwk::WantParams extraParams;
         extraParams.SetParam("isDistributedDeviceDialing", AAFwk::String::Box("true"));
         call->SetExtraParams(extraParams);
+    }
+}
+
+void CallStatusManager::BtCallDialingHandleFirst(sptr<CallBase> call, const CallDetailInfo &info)
+{
+    if (call == nullptr) {
+        return;
+    }
+    call->SetPhoneOrWatchDial(static_cast<int32_t>(PhoneOrWatchDial::WATCH_DIAL));
+    SetBtCallDialByPhone(call, false);
+    if (info.state == TelCallState::CALL_STATUS_ALERTING) {
+        UpdateDialingCallInfo(info);
+        if (call->GetTelCallState() == TelCallState::CALL_STATUS_ALERTING) {
+            call->SetTelCallState(TelCallState::CALL_STATUS_DIALING);
+        }
     }
 }
 } // namespace Telephony

@@ -1524,14 +1524,12 @@ int32_t CallManagerService::SendCallUiEvent(int32_t callId, std::string &eventNa
     } else if (eventName == "EVENT_BLUETOOTH_SCO_STATE_ON") {
         return DelayedSingleton<BluetoothCallConnection>::GetInstance()->ConnectBtSco();
     } else if (eventName == "EVENT_SUPPORT_BLUETOOTH_CALL") {
-        bool state = DelayedSingleton<BluetoothCallConnection>::GetInstance()->GetSupportBtCall();
-        if (state) {
+        if (DelayedSingleton<BluetoothCallConnection>::GetInstance()->GetSupportBtCall()) {
             return TELEPHONY_SUCCESS;
         }
         return TELEPHONY_ERR_FAIL;
     } else if (eventName == "EVENT_NOT_SUPPORT_BLUETOOTH_CALL") {
-        bool state = DelayedSingleton<BluetoothCallConnection>::GetInstance()->GetSupportBtCall();
-        if (!state) {
+        if (!DelayedSingleton<BluetoothCallConnection>::GetInstance()->GetSupportBtCall()) {
             return TELEPHONY_SUCCESS;
         }
         return TELEPHONY_ERR_FAIL;

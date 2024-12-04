@@ -117,6 +117,7 @@ private:
     void SetBtCallDialByPhone(const sptr<CallBase> &call, bool isBtCallDialByPhone);
     void BtCallDialingHandle(sptr<CallBase> call, const CallDetailInfo &info);
     void SetDistributedDeviceDialing(bool isDistributedDeviceDialing);
+    void BtCallDialingHandleFirst(sptr<CallBase> call, const CallDetailInfo &infol);
 
 private:
     CallDetailInfo callReportInfo_;
