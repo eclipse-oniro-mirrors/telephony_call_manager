@@ -190,7 +190,7 @@ private:
     int32_t celiaCallType_;
     AAFwk::WantParams extraParams_;
     bool isAnswered_;
-	int32_t phoneOrWatch_ = 0;
+    int32_t phoneOrWatch_ = 0;
 };
 } // namespace Telephony
 } // namespace OHOS
