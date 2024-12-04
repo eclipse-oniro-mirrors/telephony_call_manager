@@ -190,7 +190,7 @@ int32_t CallPolicy::IsVoiceCallValid(VideoStateType videoState)
 int32_t CallPolicy::IsValidCallType(CallType callType)
 {
     if (callType != CallType::TYPE_CS && callType != CallType::TYPE_IMS && callType != CallType::TYPE_OTT &&
-        callType != CallType::TYPE_SATELLITE && callType == CallType::TYPE_BLUETOOTH) {
+        callType != CallType::TYPE_SATELLITE && callType != CallType::TYPE_BLUETOOTH) {
         TELEPHONY_LOGE("invalid call type!");
         return CALL_ERR_UNKNOW_CALL_TYPE;
     }

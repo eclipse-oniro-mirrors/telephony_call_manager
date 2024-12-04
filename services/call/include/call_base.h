@@ -141,7 +141,7 @@ public:
     bool IsAnsweredCall();
     void SetAnsweredCall(bool isAnswered);
     AAFwk::WantParams GetExtraParams();
-    void SetPhoneOrWatchDial(int32_t  phoneOrWatch);
+    void SetPhoneOrWatchDial(int32_t phoneOrWatch);
 
 protected:
     int32_t callId_;

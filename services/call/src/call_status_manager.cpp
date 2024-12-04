@@ -148,7 +148,7 @@ int32_t CallStatusManager::HandleCallReportInfo(const CallDetailInfo &info)
         case TelCallState::CALL_STATUS_WAITING:
         case TelCallState::CALL_STATUS_DISCONNECTED:
         case TelCallState::CALL_STATUS_DISCONNECTING:
-            return HandleCallReportInfoEx(info);
+            ret = HandleCallReportInfoEx(info);
         default:
             TELEPHONY_LOGE("Invalid call state!");
             break;
@@ -1860,6 +1860,9 @@ int32_t CallStatusManager::HandleCallReportInfoEx(const CallDetailInfo &info)
             break;
         case TelCallState::CALL_STATUS_DISCONNECTING:
             ret = DisconnectingHandle(info);
+            break;
+        default:
+            TELEPHONY_LOGE("Invalid call state!");
             break;
     }
     return ret;
