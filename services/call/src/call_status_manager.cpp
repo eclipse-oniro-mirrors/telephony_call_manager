@@ -146,14 +146,9 @@ int32_t CallStatusManager::HandleCallReportInfo(const CallDetailInfo &info)
             break;
         }
         case TelCallState::CALL_STATUS_WAITING:
-            ret = WaitingHandle(info);
-            break;
         case TelCallState::CALL_STATUS_DISCONNECTED:
-            ret = DisconnectedHandle(info);
-            break;
         case TelCallState::CALL_STATUS_DISCONNECTING:
-            ret = DisconnectingHandle(info);
-            break;
+            return HandleCallReportInfoEx(info);
         default:
             TELEPHONY_LOGE("Invalid call state!");
             break;
@@ -713,7 +708,7 @@ int32_t CallStatusManager::DialingHandle(const CallDetailInfo &info)
         TELEPHONY_LOGE("CreateNewCall failed!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    SetDistributedDeviceDialing(isDistributedDeviceDialing);
+    SetDistributedDeviceDialing(call, isDistributedDeviceDialing);
     if (IsDcCallConneceted()) {
         SetContactInfo(call, std::string(info.phoneNum));
     }
@@ -1826,8 +1821,11 @@ void CallStatusManager::BtCallDialingHandle(sptr<CallBase> call, const CallDetai
     }
 }
 
-void CallStatusManager::SetDistributedDeviceDialing(bool isDistributedDeviceDialing)
+void CallStatusManager::SetDistributedDeviceDialing(sptr<CallBase> call, bool isDistributedDeviceDialing)
 {
+    if (call == nullptr) {
+        return;
+    }
     if (isDistributedDeviceDialing) {
         AAFwk::WantParams extraParams;
         extraParams.SetParam("isDistributedDeviceDialing", AAFwk::String::Box("true"));
@@ -1848,6 +1846,23 @@ void CallStatusManager::BtCallDialingHandleFirst(sptr<CallBase> call, const Call
             call->SetTelCallState(TelCallState::CALL_STATUS_DIALING);
         }
     }
+}
+
+int32_t CallStatusManager::HandleCallReportInfoEx(const CallDetailInfo &info)
+{
+    int32_t ret = TELEPHONY_ERR_FAIL;
+    switch (info.state) {
+        case TelCallState::CALL_STATUS_WAITING:
+            ret = WaitingHandle(info);
+            break;
+        case TelCallState::CALL_STATUS_DISCONNECTED:
+            ret = DisconnectedHandle(info);
+            break;
+        case TelCallState::CALL_STATUS_DISCONNECTING:
+            ret = DisconnectingHandle(info);
+            break;
+    }
+    return ret;
 }
 } // namespace Telephony
 } // namespace OHOS
