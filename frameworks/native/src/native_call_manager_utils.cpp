@@ -86,6 +86,7 @@ CallAttributeInfo NativeCallManagerUtils::ReadCallAttributeInfo(MessageParcel &m
         messageParcel.ReadUInt8Vector(&userProfile);
         (info.voipCallInfo.userProfile).assign(userProfile.begin(), userProfile.end());
     }
+    info.phoneOrWatch = messageParcel.ReadInt32();
     return info;
 }
 

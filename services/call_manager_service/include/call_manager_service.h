@@ -28,6 +28,7 @@
 #include "singleton.h"
 #include "system_ability.h"
 #include "system_ability_definition.h"
+#include "bluetooth_call_state.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -775,7 +776,7 @@ public:
      * RegisterBluetoothCallManagerCallbackPtr
      *
      * @brief notify bluetooth register callstatus callback
-     * @return Returns ICallStatusCallback.
+     * @return Returns sptr<ICallStatusCallback>.
      */
     sptr<ICallStatusCallback> RegisterBluetoothCallManagerCallbackPtr(std::string &macAddress) override;
 
@@ -805,6 +806,7 @@ private:
     int64_t bindTime_ = 0L;
     int32_t spendTime_ = 0;
     sptr<ICallStatusCallback> bluetoothCallCallbackPtr_ = nullptr;
+    std::shared_ptr<BluetoothCallState> bluetoothCallObserver_  = nullptr;
 };
 } // namespace Telephony
 } // namespace OHOS
