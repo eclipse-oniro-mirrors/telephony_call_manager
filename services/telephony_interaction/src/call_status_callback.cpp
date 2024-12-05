@@ -66,7 +66,7 @@ int32_t CallStatusCallback::UpdateCallReportInfo(const CallReportInfo &info)
     if (callPtr != nullptr && callPtr->GetCallType() == CallType::TYPE_BLUETOOTH &&
         callPtr->GetTelCallState() == TelCallState::CALL_STATUS_DIALING && callPtr->GetCallIndex() == INIT_INDEX &&
         info.callType == CallType::TYPE_BLUETOOTH && info.state == TelCallState::CALL_STATUS_DISCONNECTED &&
-        (info.index == -1 || info.index === INIT_INDEX)) {
+        (info.index == -1 || info.index == INIT_INDEX)) {
             detailInfo.index = INIT_INDEX;
         }
     int32_t ret = DelayedSingleton<ReportCallInfoHandler>::GetInstance()->UpdateCallReportInfo(detailInfo);
