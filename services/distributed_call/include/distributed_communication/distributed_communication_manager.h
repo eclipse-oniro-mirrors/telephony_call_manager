@@ -51,6 +51,7 @@ public:
         int32_t devRole);
     void OnDeviceOffline(const std::string &devId, const std::string &devName, AudioDeviceType deviceType,
         int32_t devRole);
+    void OnRemoveSystemAbility();
     bool IsSinkRole();
     bool IsConnected();
     bool IsDistributedDev(const AudioDevice& device);

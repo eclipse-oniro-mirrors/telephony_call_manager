@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#include "distributed_device_switch_controller.h"
+#include "distributed_source_switch_controller.h"
 #include "cJSON.h"
 #include "audio_proxy.h"
 #include "telephony_errors.h"
@@ -23,7 +23,7 @@
 
 namespace OHOS {
 namespace Telephony {
-void DistributedDeviceSwitchController::OnDeviceOnline(const std::string &devId, const std::string &devName,
+void DistributedSourceSwitchController::OnDeviceOnline(const std::string &devId, const std::string &devName,
     AudioDeviceType devType)
 {
     auto audioDeviceManager = DelayedSingleton<AudioDeviceManager>::GetInstance();
@@ -33,7 +33,7 @@ void DistributedDeviceSwitchController::OnDeviceOnline(const std::string &devId,
     }
 }
 
-void DistributedDeviceSwitchController::OnDeviceOffline(const std::string &devId, const std::string &devName,
+void DistributedSourceSwitchController::OnDeviceOffline(const std::string &devId, const std::string &devName,
     AudioDeviceType devType)
 {
     auto audioDeviceManager = DelayedSingleton<AudioDeviceManager>::GetInstance();
@@ -44,9 +44,14 @@ void DistributedDeviceSwitchController::OnDeviceOffline(const std::string &devId
     }
 }
 
-void DistributedDeviceSwitchController::OnDistributedAudioDeviceChange(const std::string &devId,
+void DistributedSourceSwitchController::OnDistributedAudioDeviceChange(const std::string &devId,
     const std::string &devName, AudioDeviceType devType, int32_t devRole)
 {
+    {
+        std::lock_guard<ffrt::mutex> lock(mutex_);
+        isAudioOnSink_ = (devRole == static_cast<int32_t>(DistributedRole::SINK));
+        TELEPHONY_LOGI("OnDistributedAudioDeviceChange isAudioOnSink[%{public}d]", isAudioOnSink_);
+    }
     auto audioDeviceManager = DelayedSingleton<AudioDeviceManager>::GetInstance();
     if (audioDeviceManager != nullptr) {
         if (devRole == static_cast<int32_t>(DistributedRole::SINK)) {
@@ -70,13 +75,9 @@ void DistributedDeviceSwitchController::OnDistributedAudioDeviceChange(const std
             audioDeviceManager->SetCurrentAudioDevice(audioDevice.deviceType);
         }
     }
-
-    std::lock_guard<ffrt::mutex> lock(mutex_);
-    isAudioOnSink_ = (devRole == static_cast<int32_t>(DistributedRole::SINK));
-    TELEPHONY_LOGI("OnDistributedAudioDeviceChange isAudioOnSink[%{public}d]", isAudioOnSink_);
 }
 
-void DistributedDeviceSwitchController::OnRemoveSystemAbility()
+void DistributedSourceSwitchController::OnRemoveSystemAbility()
 {
     auto audioDeviceManager = DelayedSingleton<AudioDeviceManager>::GetInstance();
     if (audioDeviceManager != nullptr) {
@@ -88,7 +89,7 @@ void DistributedDeviceSwitchController::OnRemoveSystemAbility()
     isAudioOnSink_ = false;
 }
 
-bool DistributedDeviceSwitchController::SwitchDevice(const std::string &devId, int32_t direction)
+bool DistributedSourceSwitchController::SwitchDevice(const std::string &devId, int32_t direction)
 {
     auto distributedMgr = DelayedSingleton<DistributedCommunicationManager>::GetInstance();
     if (distributedMgr == nullptr) {
@@ -99,13 +100,7 @@ bool DistributedDeviceSwitchController::SwitchDevice(const std::string &devId, i
     return ret == TELEPHONY_SUCCESS;
 }
 
-bool DistributedDeviceSwitchController::IsAudioOnSink()
-{
-    std::lock_guard<ffrt::mutex> lock(mutex_);
-    return isAudioOnSink_;
-}
-
-std::string DistributedDeviceSwitchController::GetDevAddress(const std::string &devId, const std::string &devName)
+std::string DistributedSourceSwitchController::GetDevAddress(const std::string &devId, const std::string &devName)
 {
     std::string address = "";
     cJSON *root = cJSON_CreateObject();

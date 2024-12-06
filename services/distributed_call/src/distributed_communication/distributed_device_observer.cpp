@@ -264,6 +264,7 @@ void DistributedSystemAbilityListener::OnRemoveSystemAbility(int32_t systemAbili
             return;
         }
     }
+    distributedMgr->OnRemoveSystemAbility();
     distributedMgr->DeInitExtWrapper();
 }
 

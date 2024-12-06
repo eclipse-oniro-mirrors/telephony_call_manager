@@ -20,12 +20,15 @@
 #include "telephony_log_wrapper.h"
 #ifdef ABILITY_BLUETOOTH_SUPPORT
 #include "bluetooth_host.h"
+#include "bluetooth_audio_manager.h"
+#include "bluetooth_device.h"
 
 constexpr int32_t PHONE_NUMBER_TYPE = 0x81;
 #endif
 
 namespace OHOS {
 namespace Telephony {
+constexpr int32_t DEFAULT_BT_VALUE = -1;
 BluetoothConnection::BluetoothConnection() : connectedScoAddr_("") {}
 
 BluetoothConnection::~BluetoothConnection()
@@ -247,6 +250,28 @@ void SystemAbilityListener::OnRemoveSystemAbility(int32_t systemAbilityId, const
     audioDeviceManager->ResetBtAudioDevicesList();
     audioDeviceManager->ProcessEvent(AudioEvent::INIT_AUDIO_DEVICE);
 }
+
+std::string BluetoothConnection::GetWearBtHeadsetAddress()
+{
+    int32_t cod = DEFAULT_BT_VALUE;
+    int32_t majorClass = DEFAULT_BT_VALUE;
+    int32_t majorMinorClass = DEFAULT_BT_VALUE;
+    std::lock_guard<std::mutex> lock(bluetoothMutex_);
+    for (auto &[address, device] : mapConnectedBtDevices_) {
+        device.GetDeviceProductType(cod, majorClass, majorMinorClass);
+        TELEPHONY_LOGI("Device type majorClass: %{public}d, majorMinorClass: %{public}d.", majorClass, majorMinorClass);
+        bool isWearing = Bluetooth::BluetoothAudioManager::GetInstance().IsDeviceWearing(device);
+        bool isBtHeadset = (majorClass == Bluetooth::BluetoothDevice::MAJOR_AUDIO_VIDEO &&
+                            (majorMinorClass == Bluetooth::BluetoothDevice::AUDIO_VIDEO_HEADPHONES ||
+                             majorMinorClass == Bluetooth::BluetoothDevice::AUDIO_VIDEO_WEARABLE_HEADSET));
+        if (isWearing && isBtHeadset) {
+            return address;
+        }
+    }
+    TELEPHONY_LOGI("not wearing bt headset");
+    return "";
+}
+
 #endif
 } // namespace Telephony
 } // namespace OHOS

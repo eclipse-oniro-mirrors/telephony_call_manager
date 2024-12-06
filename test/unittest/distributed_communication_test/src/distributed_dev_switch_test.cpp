@@ -15,7 +15,8 @@
 
 #include <gtest/gtest.h>
 #include "distributed_communication_manager.h"
-#include "distributed_device_switch_controller.h"
+#include "distributed_sink_switch_controller.h"
+#include "distributed_source_switch_controller.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -41,14 +42,22 @@ HWTEST_F(DistributedDevSwitchTest, Telephony_DcDevSwitch_001, Function | MediumT
     std::string devName = "UnitTestDeviceName";
     DistributedRole devRole = DistributedRole::SINK;
     AudioDeviceType deviceType = AudioDeviceType::DEVICE_DISTRIBUTED_PHONE;
-    auto devSwitchController = std::make_shared<DistributedDeviceSwitchController>();
-    ASSERT_NO_THROW(devSwitchController->OnDeviceOnline(devId, devName, deviceType));
-    ASSERT_NO_THROW(devSwitchController->OnDeviceOffline(devId, devName, deviceType));
-    ASSERT_NO_THROW(devSwitchController->OnDistributedAudioDeviceChange(devId, devName,
+    auto sourceSwitchController = std::make_shared<DistributedSourceSwitchController>();
+    ASSERT_NO_THROW(sourceSwitchController->OnDeviceOnline(devId, devName, deviceType));
+    ASSERT_NO_THROW(sourceSwitchController->OnDeviceOffline(devId, devName, deviceType));
+    ASSERT_NO_THROW(sourceSwitchController->OnDistributedAudioDeviceChange(devId, devName,
         deviceType, static_cast<int32_t>(devRole)));
-    ASSERT_TRUE(devSwitchController->IsAudioOnSink());
-    ASSERT_NO_THROW(devSwitchController->OnRemoveSystemAbility());
-    ASSERT_FALSE(devSwitchController->IsAudioOnSink());
+    ASSERT_TRUE(sourceSwitchController->IsAudioOnSink());
+    ASSERT_NO_THROW(sourceSwitchController->OnRemoveSystemAbility());
+    ASSERT_FALSE(sourceSwitchController->IsAudioOnSink());
+    auto sinkSwitchController = std::make_shared<DistributedSinkSwitchController>();
+    ASSERT_NO_THROW(sinkSwitchController->OnDeviceOnline(devId, devName, deviceType));
+    ASSERT_NO_THROW(sinkSwitchController->OnDeviceOffline(devId, devName, deviceType));
+    ASSERT_NO_THROW(sinkSwitchController->OnDistributedAudioDeviceChange(devId, devName,
+        deviceType, static_cast<int32_t>(devRole)));
+    ASSERT_TRUE(sinkSwitchController->IsAudioOnSink());
+    ASSERT_NO_THROW(sinkSwitchController->OnRemoveSystemAbility());
+    ASSERT_FALSE(sinkSwitchController->IsAudioOnSink());
 }
 
 } // namespace Telephony
