@@ -22,6 +22,7 @@
 #include "call_manager_base.h"
 #include "system_ability_definition.h"
 #include "call_control_manager.h"
+#include "audio_proxy.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -153,21 +154,22 @@ void CallWiredHeadSet::DealKeyMutePressedDown(std::shared_ptr<MMI::KeyEvent> eve
 void CallWiredHeadSet::DealKeyMuteShortPressed()
 {
     sptr<CallBase> ringingCall = CallObjectManager::GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_RINGING);
-    sptr<CallBase> holdCall = CallObjectManager::GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_HOLD);
     if (ringingCall == nullptr) {
+        sptr<CallBase> holdCall = CallObjectManager::GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_HOLD);
         sptr<CallBase> activeCall = CallObjectManager::GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_ACTIVE);
         if (activeCall != nullptr && holdCall != nullptr) {
-            holdCall->UnHoldCall();
+            TELEPHONY_LOGI("DealKeyMuteShortPressed UnHoldCall callid(%{public}d)", holdCall->GetCallID());
+            DelayedSingleton<CallControlManager>::GetInstance()->UnHoldCall(holdCall->GetCallID());
             return;
         }
         sptr<CallBase> call = CallObjectManager::GetAudioLiveCall();
         if (call != nullptr) {
-            DelayedSingleton<CallControlManager>::GetInstance()->SetMuted(!call->IsMuted());
+            bool isMuted = DelayedSingleton<AudioProxy>::GetInstance()->IsMicrophoneMute();
+            TELEPHONY_LOGI("DealKeyMuteShortPressed SetMuted isMuted((%{public}d))", (!isMuted));
+            DelayedSingleton<CallControlManager>::GetInstance()->SetMuted(!isMuted);
         }
     } else {
-        if (holdCall != nullptr) {
-            holdCall->HangUpCall();
-        }
+        TELEPHONY_LOGI("DealKeyMuteShortPressed AnswerCall callid(%{public}d)", ringingCall->GetCallID());
         int32_t videoState = static_cast<int32_t>(ringingCall->GetVideoStateType());
         DelayedSingleton<CallControlManager>::GetInstance()->AnswerCall(ringingCall->GetCallID(), videoState);
     }
@@ -178,10 +180,12 @@ void CallWiredHeadSet::DealKeyMuteLongPressed()
 {
     sptr<CallBase> ringingCall = CallObjectManager::GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_RINGING);
     if (ringingCall != nullptr) {
+        TELEPHONY_LOGI("DealKeyMuteLongPressed RejectCall callid(%{public}d)", ringingCall->GetCallID());
         ringingCall->RejectCall();
     } else {
         sptr<CallBase> foregroundCall = CallObjectManager::GetForegroundCall();
         if (foregroundCall != nullptr) {
+            TELEPHONY_LOGI("DealKeyMuteLongPressed HangUpCall callid(%{public}d)", foregroundCall->GetCallID());
             foregroundCall->HangUpCall();
         }
     }
