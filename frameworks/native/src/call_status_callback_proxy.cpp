@@ -55,6 +55,7 @@ int32_t CallStatusCallbackProxy::UpdateCallReportInfo(const CallReportInfo &info
         dataParcel.WriteBool(info.voipCallInfo.isConferenceCall);
         dataParcel.WriteBool(info.voipCallInfo.isVoiceAnswerSupported);
         dataParcel.WriteBool(info.voipCallInfo.hasMicPermission);
+        dataParcel.WriteBool(info.voipCallInfo.isCapsuleSticky);
         dataParcel.WriteInt32(info.voipCallInfo.uid);
         dataParcel.WriteUInt8Vector(info.voipCallInfo.userProfile);
     }
@@ -99,6 +100,7 @@ int32_t CallStatusCallbackProxy::UpdateCallsReportInfo(const CallsReportInfo &in
             dataParcel.WriteBool(it.voipCallInfo.isConferenceCall);
             dataParcel.WriteBool(it.voipCallInfo.isVoiceAnswerSupported);
             dataParcel.WriteBool(it.voipCallInfo.hasMicPermission);
+            dataParcel.WriteBool(it.voipCallInfo.isCapsuleSticky);
             dataParcel.WriteInt32(it.voipCallInfo.uid);
             dataParcel.WriteUInt8Vector(it.voipCallInfo.userProfile);
         }

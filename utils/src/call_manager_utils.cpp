@@ -61,6 +61,7 @@ void CallManagerUtils::WriteCallAttributeInfo(const CallAttributeInfo &info, Mes
         messageParcel.WriteBool(info.voipCallInfo.isConferenceCall);
         messageParcel.WriteBool(info.voipCallInfo.isVoiceAnswerSupported);
         messageParcel.WriteBool(info.voipCallInfo.hasMicPermission);
+        messageParcel.WriteBool(info.voipCallInfo.isCapsuleSticky);
         messageParcel.WriteInt32(info.voipCallInfo.uid);
         messageParcel.WriteUInt8Vector(info.voipCallInfo.userProfile);
     }
