@@ -152,6 +152,11 @@ struct VoipCallAttribute {
      */
     bool hasMicPermission = true;
     /**
+     * Indicates whether a call capsule should be displayed while the app is serving as a foreground process.
+     * Default value is false.
+     */
+    bool isCapsuleSticky = false;
+    /**
      * Indicates whether the VoIP call is from Push kit.
     */
     bool isCallByPushKit = true;

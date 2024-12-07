@@ -88,6 +88,7 @@ struct VoipCallReportInfo {
     bool isConferenceCall = false;
     bool isVoiceAnswerSupported = true;
     bool hasMicPermission = true;
+    bool isCapsuleSticky = false;
     int32_t uid = 0;
 };
 
@@ -544,6 +545,7 @@ struct CallDetailInfo {
         voipCallInfo.isConferenceCall = temp.voipCallInfo.isConferenceCall;
         voipCallInfo.isVoiceAnswerSupported = temp.voipCallInfo.isVoiceAnswerSupported;
         voipCallInfo.hasMicPermission = temp.voipCallInfo.hasMicPermission;
+        voipCallInfo.isCapsuleSticky = temp.voipCallInfo.isCapsuleSticky;
         voipCallInfo.uid = temp.voipCallInfo.uid;
         return *this;
     }
