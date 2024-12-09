@@ -73,6 +73,7 @@ private:
     typedef int32_t (*REGISTER_DEVICE_CALLBACK)(const std::shared_ptr<OHOS::Telephony::IDistributedDeviceCallback>&);
     typedef int32_t (*UN_REGISTER_DEVICE_CALLBACK)(void);
     typedef int32_t (*SWITCH_DEVICE)(const std::string&, int32_t);
+    ffrt::mutex mutexFunc_{};
     void *extWrapperHandler_{nullptr};
     REGISTER_DEVICE_CALLBACK regDevCallbackFunc_{nullptr};
     UN_REGISTER_DEVICE_CALLBACK unRegDevCallbackFunc_{nullptr};

@@ -337,6 +337,14 @@ void DistributedCallManager::DealDisconnectCall()
     ClearConnectedDCallDevice();
 }
 
+bool DistributedCallManager::IsDistributedCarDeviceOnline()
+{
+    if (onlineDCallDevices_.size() > 0) {
+        return true;
+    }
+    return false;
+}
+
 void DistributedCallManager::SwitchOnDCallDeviceAsync(const AudioDevice& device)
 {
     auto weak = weak_from_this();

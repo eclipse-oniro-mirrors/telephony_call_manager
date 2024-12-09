@@ -1620,6 +1620,7 @@ void CallStatusManager::PackParaInfo(
         paraInfo.voipCallInfo.isConferenceCall = info.voipCallInfo.isConferenceCall;
         paraInfo.voipCallInfo.isVoiceAnswerSupported = info.voipCallInfo.isVoiceAnswerSupported;
         paraInfo.voipCallInfo.hasMicPermission = info.voipCallInfo.hasMicPermission;
+        paraInfo.voipCallInfo.isCapsuleSticky = info.voipCallInfo.isCapsuleSticky;
         paraInfo.voipCallInfo.uid = info.voipCallInfo.uid;
     }
     paraInfo.number = info.phoneNum;

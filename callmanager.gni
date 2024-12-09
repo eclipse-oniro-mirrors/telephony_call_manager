@@ -86,6 +86,7 @@ call_manager_sources = [
   "${call_manager_path}/services/call_earthquake_alarm/src/call_earthquake_alarm_subscriber.cpp",
   "${call_manager_path}/services/call_manager_service/src/call_manager_service.cpp",
   "${call_manager_path}/services/call_manager_service/src/call_manager_service_stub.cpp",
+  "${call_manager_path}/services/call_manager_service/src/telephony_cust_wrapper.cpp",
   "${call_manager_path}/services/call_report/src/app_state_observer.cpp",
   "${call_manager_path}/services/call_report/src/call_ability_callback_death_recipient.cpp",
   "${call_manager_path}/services/call_report/src/call_ability_callback_proxy.cpp",
@@ -255,8 +256,7 @@ if (defined(global_parts_info) &&
 }
 
 if (defined(global_parts_info) &&
-    defined(global_parts_info.carservice_car_distributed_engine)) {
-  car_distributed_engine_enable = true
-} else {
-  car_distributed_engine_enable = false
+    defined(global_parts_info.telephony_telephony_cust) &&
+    global_parts_info.telephony_telephony_cust) {
+  call_manager_defines += [ "OHOS_BUILD_ENABLE_TELEPHONY_CUST" ]
 }

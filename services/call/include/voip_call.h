@@ -67,6 +67,7 @@ private:
     bool isConferenceCall_ = false;
     bool isVoiceAnswerSupported_ = true;
     bool hasMicPermission_ = true;
+    bool isCapsuleSticky_ = false;
     int32_t uid_ = 0;
 };
 } // namespace Telephony

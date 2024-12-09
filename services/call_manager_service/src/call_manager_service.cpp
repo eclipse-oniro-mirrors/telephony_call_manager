@@ -43,6 +43,10 @@
 #include "call_wired_headset.h"
 #include "bluetooth_call_connection.h"
 
+#ifdef OHOS_BUILD_ENABLE_TELEPHONY_CUST
+#include "telephony_cust_wrapper.h"
+#endif
+
 namespace OHOS {
 namespace Telephony {
 using namespace Security::AccessToken;
@@ -72,6 +76,9 @@ CallManagerService::~CallManagerService()
 
 bool CallManagerService::Init()
 {
+#ifdef OHOS_BUILD_ENABLE_TELEPHONY_CUST
+    TELEPHONY_CUST_WRAPPER.InitTelephonyCustWrapper();
+#endif
     if (!DelayedSingleton<CallControlManager>::GetInstance()->Init()) {
         TELEPHONY_LOGE("CallControlManager init failed!");
         return false;

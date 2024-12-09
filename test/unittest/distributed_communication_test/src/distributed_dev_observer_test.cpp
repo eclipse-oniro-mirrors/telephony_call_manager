@@ -53,6 +53,7 @@ HWTEST_F(DistributedDevObserverTest, Telephony_DcDeviceObserver_001, Function | 
     std::shared_ptr<IDistributedDeviceStateCallback> callback = nullptr;
     ASSERT_NO_THROW(deviceObserver->Init());
     ASSERT_NO_THROW(deviceObserver->RegisterDevStatusCallback(callback));
+    ASSERT_NO_THROW(deviceObserver->RegisterDevStatusCallback(callback)); // duplicate register
     ASSERT_NO_THROW(deviceObserver->UnRegisterDevCallback());
 
     callback = std::make_shared<DistributedDeviceSwitchController>();

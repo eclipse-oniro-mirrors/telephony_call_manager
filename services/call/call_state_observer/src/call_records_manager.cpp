@@ -24,6 +24,7 @@
 #include "securec.h"
 #include "call_earthquake_alarm_subscriber.h"
 #include <regex>
+#include "telephony_cust_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -132,6 +133,11 @@ void CallRecordsManager::AddOneCallRecord(CallAttributeInfo &info)
     }
     if (strlen(info.accountNumber) > static_cast<size_t>(kMaxNumberLen)) {
         TELEPHONY_LOGE("Number out of limit!");
+        return;
+    }
+    if (TELEPHONY_CUST_WRAPPER.isHideViolenceOrEmcNumbersInCallLog_ != nullptr
+        && TELEPHONY_CUST_WRAPPER.isHideViolenceOrEmcNumbersInCallLog_(info)) {
+        TELEPHONY_LOGE("hide violence or emergency nums in call log!");
         return;
     }
     errno_t result = memcpy_s(data.phoneNumber, kMaxNumberLen, info.accountNumber, strlen(info.accountNumber));

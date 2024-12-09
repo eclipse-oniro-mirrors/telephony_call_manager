@@ -211,6 +211,7 @@ void CallStatusCallbackStub::BuildCallReportInfo(MessageParcel &data, CallReport
         parcelPtr.voipCallInfo.isConferenceCall = data.ReadBool();
         parcelPtr.voipCallInfo.isVoiceAnswerSupported = data.ReadBool();
         parcelPtr.voipCallInfo.hasMicPermission = data.ReadBool();
+        parcelPtr.voipCallInfo.isCapsuleSticky = data.ReadBool();
         parcelPtr.voipCallInfo.uid = data.ReadInt32();
         std::vector<uint8_t> userProfile = {};
         data.ReadUInt8Vector(&userProfile);

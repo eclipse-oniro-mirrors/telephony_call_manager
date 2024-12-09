@@ -49,13 +49,20 @@ void ClientSession::Connect(const std::string &peerDevId, const std::string &loc
 
 void ClientSession::Disconnect()
 {
-    std::lock_guard<ffrt::mutex> lock(mutex_);
-    if (clientSocket_ > INVALID_SOCKET_ID) {
-        Shutdown(clientSocket_);
-        TELEPHONY_LOGI("close client socket %{public}d success", clientSocket_);
+    int32_t socket = INVALID_SOCKET_ID;
+    {
+        std::lock_guard<ffrt::mutex> lock(mutex_);
+        if (clientSocket_ > INVALID_SOCKET_ID) {
+            socket = clientSocket_;
+        }
+        clientSocket_ = INVALID_SOCKET_ID;
+        socket_ = INVALID_SOCKET_ID;
+        TELEPHONY_LOGI("disconnect client session");
     }
-    clientSocket_ = INVALID_SOCKET_ID;
-    socket_ = INVALID_SOCKET_ID;
+    if (socket > INVALID_SOCKET_ID) {
+        Shutdown(socket);
+        TELEPHONY_LOGI("close client socket %{public}d success", socket);
+    }
 }
 
 void ClientSession::OnSessionBind(int32_t socket)

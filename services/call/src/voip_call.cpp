@@ -36,6 +36,7 @@ VoIPCall::VoIPCall(DialParaInfo &info) : CarrierCall(info)
     isConferenceCall_ = info.voipCallInfo.isConferenceCall;
     isVoiceAnswerSupported_ = info.voipCallInfo.isVoiceAnswerSupported;
     hasMicPermission_ = info.voipCallInfo.hasMicPermission;
+    isCapsuleSticky_ = info.voipCallInfo.isCapsuleSticky;
     uid_ = info.voipCallInfo.uid;
 }
 
@@ -166,6 +167,7 @@ void VoIPCall::GetCallAttributeInfo(CallAttributeInfo &info)
     info.voipCallInfo.isConferenceCall = isConferenceCall_;
     info.voipCallInfo.isVoiceAnswerSupported = isVoiceAnswerSupported_;
     info.voipCallInfo.hasMicPermission = hasMicPermission_;
+    info.voipCallInfo.isCapsuleSticky = isCapsuleSticky_;
     info.voipCallInfo.uid = uid_;
     return;
 }
