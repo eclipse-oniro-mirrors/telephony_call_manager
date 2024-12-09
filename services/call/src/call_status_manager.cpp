@@ -636,15 +636,7 @@ int32_t CallStatusManager::UpdateDialingCallInfo(const CallDetailInfo &info)
     call->SetVideoStateType(info.callMode);
     call->SetCallType(info.callType);
     call->SetAccountNumber(oriNum);
-    auto callRequestEventHandler = DelayedSingleton<CallRequestEventHandlerHelper>::GetInstance();
-    int32_t callId = call->GetCallID();
-    if (callRequestEventHandler->HasPendingMo(callId)) {
-        callRequestEventHandler->SetPendingMo(false, -1);
-    }
-    if (callRequestEventHandler->HasPendingHangup(callId)) {
-        call->HangUpCall();
-        callRequestEventHandler->SetPendingHangup(false, -1);
-    }
+    ClearPendingState(call);
     return TELEPHONY_SUCCESS;
 }
 
@@ -712,6 +704,7 @@ int32_t CallStatusManager::ActiveHandle(const CallDetailInfo &info)
         TELEPHONY_LOGE("Call is NULL");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
+    ClearPendingState(call);
     call = RefreshCallIfNecessary(call, info);
     SetOriginalCallTypeForActiveState(call);
     // call state change active, need to judge if launching a conference
@@ -822,6 +815,7 @@ int32_t CallStatusManager::AlertHandle(const CallDetailInfo &info)
         TELEPHONY_LOGE("Call is NULL");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
+    ClearPendingState(call);
     call = RefreshCallIfNecessary(call, info);
     int32_t ret = UpdateCallState(call, TelCallState::CALL_STATUS_ALERTING);
     if (ret != TELEPHONY_SUCCESS) {
@@ -888,6 +882,7 @@ int32_t CallStatusManager::DisconnectedHandle(const CallDetailInfo &info)
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     call = RefreshCallIfNecessary(call, info);
+    ClearPendingState(call);
     SetOriginalCallTypeForDisconnectState(call);
     std::vector<std::u16string> callIdList;
     call->GetSubCallIdList(callIdList);
@@ -1730,6 +1725,20 @@ bool CallStatusManager::IsDistributeCallSourceStatus()
         return true;
     }
     return false;
+}
+
+void CallStatusManager::ClearPendingState(sptr<CallBase> &call)
+{
+    auto callRequestEventHandler = DelayedSingleton<CallRequestEventHandlerHelper>::GetInstance();
+    int32_t callId = call->GetCallID();
+    TELEPHONY_LOGI("check clear pending state callId = %{public}d", callId);
+    if (callRequestEventHandler->HasPendingMo(callId)) {
+        callRequestEventHandler->SetPendingMo(false, -1);
+    }
+    if (callRequestEventHandler->HasPendingHangup(callId)) {
+        call->HangUpCall();
+        callRequestEventHandler->SetPendingHangup(false, -1);
+    }
 }
 } // namespace Telephony
 } // namespace OHOS

@@ -111,6 +111,7 @@ private:
     std::vector<sptr<CallBase>> GetConferenceCallList(int32_t slotId);
     void UpdateCallDetailsInfo(const CallDetailsInfo &info);
     bool IsDistributeCallSourceStatus();
+    void ClearPendingState(sptr<CallBase> &call);
 
 private:
     CallDetailInfo callReportInfo_;
