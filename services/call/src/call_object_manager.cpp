@@ -579,16 +579,15 @@ sptr<CallBase> CallObjectManager::GetOneCallObjectByIndexSlotIdAndCallType(int32
                     return (*it);
             }
         }
-        return nullptr;
-    }
-    std::list<sptr<CallBase>>::iterator it = callObjectPtrList_.begin();
-    for (; it != callObjectPtrList_.end(); ++it) {
-        if ((*it)->GetCallType() != CallType::TYPE_BLUETOOTH && (*it)->GetCallIndex() == index) {
-            if ((*it)->GetSlotId() == slotId && (*it)->GetCallType() != CallType::TYPE_VOIP) {
+    } else {
+        std::list<sptr<CallBase>>::iterator it = callObjectPtrList_.begin();
+        for (; it != callObjectPtrList_.end(); ++it) {
+            if ((*it)->GetCallType() != CallType::TYPE_BLUETOOTH && (*it)->GetCallIndex() == index && 
+                (*it)->GetSlotId() == slotId && (*it)->GetCallType() != CallType::TYPE_VOIP) {
                 return (*it);
             }
         }
-    }    
+    }
     return nullptr;
 }
 
