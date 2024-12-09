@@ -574,18 +574,17 @@ sptr<CallBase> CallObjectManager::GetOneCallObjectByIndexSlotIdAndCallType(int32
     if (callType == CallType::TYPE_BLUETOOTH) {
         std::list<sptr<CallBase>>::iterator it = callObjectPtrList_.begin();
         for (; it != callObjectPtrList_.end(); ++it) {
-            if ((*it)->GetCallType() == CallType::TYPE_BLUETOOTH && (*it)->GetCallIndex() == index) {
-                if ((*it)->GetSlotId() == slotId && (*it)->GetCallType() != CallType::TYPE_VOIP) {
+            if ((*it)->GetCallType() == CallType::TYPE_BLUETOOTH && (*it)->GetCallIndex() == index &&
+                (*it)->GetSlotId() == slotId) {
                     return (*it);
-                }
             }
+        }
     } else {
         std::list<sptr<CallBase>>::iterator it = callObjectPtrList_.begin();
         for (; it != callObjectPtrList_.end(); ++it) {
-            if ((*it)->GetCallType() != CallType::TYPE_BLUETOOTH && (*it)->GetCallIndex() == index) {
-                if ((*it)->GetSlotId() == slotId && (*it)->GetCallType() != CallType::TYPE_VOIP) {
-                    return (*it);
-                }
+            if ((*it)->GetCallType() != CallType::TYPE_BLUETOOTH && (*it)->GetCallIndex() == index && 
+                (*it)->GetSlotId() == slotId && (*it)->GetCallType() != CallType::TYPE_VOIP) {
+                return (*it);                
             }
         }
     }
