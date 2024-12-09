@@ -567,6 +567,31 @@ sptr<CallBase> CallObjectManager::GetOneCallObjectByIndexAndSlotId(int32_t index
     return nullptr;
 }
 
+sptr<CallBase> CallObjectManager::GetOneCallObjectByIndexSlotIdAndCallType(int32_t index, int32_t slotId,
+    CallType callType)
+{
+    std::lock_guard<std::mutex> lock(listMutex_);
+    if (callType == CallType::TYPE_BLUETOOTH) {
+        std::list<sptr<CallBase>>::iterator it = callObjectPtrList_.begin();
+        for (; it != callObjectPtrList_.end(); ++it) {
+            if ((*it)->GetCallType() == CallType::TYPE_BLUETOOTH && (*it)->GetCallIndex() == index) {
+                if ((*it)->GetSlotId() == slotId && (*it)->GetCallType() != CallType::TYPE_VOIP) {
+                    return (*it);
+                }
+            }
+    } else {
+        std::list<sptr<CallBase>>::iterator it = callObjectPtrList_.begin();
+        for (; it != callObjectPtrList_.end(); ++it) {
+            if ((*it)->GetCallType() != CallType::TYPE_BLUETOOTH && (*it)->GetCallIndex() == index) {
+                if ((*it)->GetSlotId() == slotId && (*it)->GetCallType() != CallType::TYPE_VOIP) {
+                    return (*it);
+                }
+            }
+        }
+    }
+    return nullptr;
+}
+
 sptr<CallBase> CallObjectManager::GetOneCallObjectByVoipCallId(
     std::string voipCallId, std::string bundleName, int32_t uid)
 {
