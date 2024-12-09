@@ -579,8 +579,7 @@ sptr<CallBase> CallObjectManager::GetOneCallObjectByIndexSlotIdAndCallType(int32
                     return (*it);
                 }
             }
-    }
-    else {
+    } else {
         std::list<sptr<CallBase>>::iterator it = callObjectPtrList_.begin();
         for (; it != callObjectPtrList_.end(); ++it) {
             if ((*it)->GetCallType() != CallType::TYPE_BLUETOOTH && (*it)->GetCallIndex() == index) {
