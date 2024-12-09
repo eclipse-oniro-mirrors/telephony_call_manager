@@ -1736,7 +1736,9 @@ void CallStatusManager::ClearPendingState(sptr<CallBase> &call)
         callRequestEventHandler->SetPendingMo(false, -1);
     }
     if (callRequestEventHandler->HasPendingHangup(callId)) {
-        call->HangUpCall();
+        if (call->GetCallRunningState() != CallRunningState::CALL_RUNNING_STATE_ENDED) {
+            call->HangUpCall();
+        }
         callRequestEventHandler->SetPendingHangup(false, -1);
     }
 }
