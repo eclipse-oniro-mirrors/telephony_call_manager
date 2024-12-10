@@ -114,7 +114,9 @@ void NapiCallAbilityCallback::UnRegisterAudioDeviceCallback()
     std::lock_guard<std::mutex> lock(audioDeviceCallbackMutex_);
     if (audioDeviceCallback_.callbackRef) {
         napi_delete_reference(audioDeviceCallback_.env, audioDeviceCallback_.callbackRef);
+        audioDeviceCallback_.callbackRef = nullptr;
         napi_delete_reference(audioDeviceCallback_.env, audioDeviceCallback_.thisVar);
+        audioDeviceCallback_.thisVar = nullptr;
         (void)memset_s(&audioDeviceCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
     }
 }
@@ -128,7 +130,9 @@ void NapiCallAbilityCallback::UnRegisterPostDialDelayCallback()
 {
     if (postDialDelayCallback_.callbackRef) {
         napi_delete_reference(postDialDelayCallback_.env, postDialDelayCallback_.callbackRef);
+        postDialDelayCallback_.callbackRef = nullptr;
         napi_delete_reference(postDialDelayCallback_.env, postDialDelayCallback_.thisVar);
+        postDialDelayCallback_.thisVar = nullptr;
         (void)memset_s(&postDialDelayCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
     }
 }
@@ -985,12 +989,14 @@ void NapiCallAbilityCallback::ReportAudioDeviceInfoWork(uv_work_t *work, int32_t
         TELEPHONY_LOGE("dataWorkerData is nullptr!");
         return;
     }
-    int32_t ret = ReportAudioDeviceInfo(dataWorkerData->info, dataWorkerData->callback);
-    TELEPHONY_LOGI("ReportAudioDeviceInfo result = %{public}d", ret);
-    delete dataWorkerData;
-    dataWorkerData = nullptr;
-    delete work;
-    work = nullptr;
+    if (dataWorkerData->callback.thisVar && dataWorkerData->callback.callbackRef) {
+        int32_t ret = ReportAudioDeviceInfo(dataWorkerData->info, dataWorkerData->callback);
+        TELEPHONY_LOGI("ReportAudioDeviceInfo result = %{public}d", ret);
+        delete dataWorkerData;
+        dataWorkerData = nullptr;
+        delete work;
+        work = nullptr;
+    }
 }
 
 int32_t NapiCallAbilityCallback::ReportAudioDeviceInfo(AudioDeviceInfo &info, EventCallback eventCallback)
@@ -1515,7 +1521,9 @@ void NapiCallAbilityCallback::ReportWaitAndLimitInfo(AppExecFwk::PacMap &resultI
         napi_value callbackResult = nullptr;
         napi_call_function(env, thisVar, callbackFunc, DATA_LENGTH_TWO, callbackValues, &callbackResult);
         napi_delete_reference(env, supplementInfo.callbackRef);
+        supplementInfo.callbackRef = nullptr;
         napi_delete_reference(env, supplementInfo.thisVar);
+        supplementInfo.thisVar = nullptr;
     } else if (supplementInfo.deferred != nullptr) {
         if (result == TELEPHONY_SUCCESS) {
             napi_value promiseValue = nullptr;
@@ -1576,7 +1584,9 @@ void NapiCallAbilityCallback::ReportSupplementInfo(AppExecFwk::PacMap &resultInf
         napi_value callbackResult = nullptr;
         napi_call_function(env, thisVar, callbackFunc, DATA_LENGTH_TWO, callbackValues, &callbackResult);
         napi_delete_reference(env, supplementInfo.callbackRef);
+        supplementInfo.callbackRef = nullptr;
         napi_delete_reference(env, supplementInfo.thisVar);
+        supplementInfo.thisVar = nullptr;
     } else if (supplementInfo.deferred != nullptr) {
         if (result == TELEPHONY_SUCCESS) {
             napi_resolve_deferred(env, supplementInfo.deferred, callbackValue);
@@ -1634,7 +1644,9 @@ void NapiCallAbilityCallback::ReportExecutionResult(EventCallback &settingInfo, 
         napi_value callbackResult = nullptr;
         napi_call_function(env, thisVar, callbackFunc, DATA_LENGTH_TWO, callbackValues, &callbackResult);
         napi_delete_reference(env, settingInfo.callbackRef);
+        settingInfo.callbackRef = nullptr;
         napi_delete_reference(env, settingInfo.thisVar);
+        settingInfo.thisVar = nullptr;
     } else if (settingInfo.deferred != nullptr) {
         if (result == TELEPHONY_SUCCESS) {
             napi_value promiseValue = nullptr;
@@ -1690,7 +1702,9 @@ void NapiCallAbilityCallback::ReportStartRttInfo(AppExecFwk::PacMap &resultInfo,
         napi_value callbackResult = nullptr;
         napi_call_function(env, thisVar, callbackFunc, DATA_LENGTH_TWO, callbackValues, &callbackResult);
         napi_delete_reference(env, supplementInfo.callbackRef);
+        supplementInfo.callbackRef = nullptr;
         napi_delete_reference(env, supplementInfo.thisVar);
+        supplementInfo.thisVar = nullptr;
     } else if (supplementInfo.deferred != nullptr) {
         if (result == TELEPHONY_SUCCESS) {
             napi_value promiseValue = nullptr;
@@ -1745,7 +1759,9 @@ void NapiCallAbilityCallback::ReportStopRttInfo(AppExecFwk::PacMap &resultInfo, 
         napi_value callbackResult = nullptr;
         napi_call_function(env, thisVar, callbackFunc, DATA_LENGTH_TWO, callbackValues, &callbackResult);
         napi_delete_reference(env, supplementInfo.callbackRef);
+        supplementInfo.callbackRef = nullptr;
         napi_delete_reference(env, supplementInfo.thisVar);
+        supplementInfo.thisVar = nullptr;
     } else if (supplementInfo.deferred != nullptr) {
         if (result == TELEPHONY_SUCCESS) {
             napi_value promiseValue = nullptr;
