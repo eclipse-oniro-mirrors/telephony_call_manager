@@ -57,11 +57,6 @@ AudioProxy::AudioProxy()
 
 AudioProxy::~AudioProxy() {}
 
-bool AudioProxy::SetAudioScene(AudioStandard::AudioScene audioScene)
-{
-    return (AudioStandard::AudioSystemManager::GetInstance()->SetAudioScene(audioScene) == TELEPHONY_SUCCESS);
-}
-
 bool AudioProxy::SetVoiceRingtoneMute(bool isMute)
 {
     return (AudioStandard::AudioSystemManager::GetInstance()->SetVoiceRingtoneMute(isMute) == TELEPHONY_SUCCESS);
