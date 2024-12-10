@@ -159,7 +159,7 @@ private:
     EventCallback stopRttCallback_;
     EventCallback mmiCodeCallback_;
     EventCallback closeUnfinishedUssdCallback_;
-    EventCallback audioDeviceCallback_;
+    static EventCallback audioDeviceCallback_;
     EventCallback postDialDelayCallback_;
     EventCallback imsCallModeCallback_;
     EventCallback peerDimensionsCallback_;
