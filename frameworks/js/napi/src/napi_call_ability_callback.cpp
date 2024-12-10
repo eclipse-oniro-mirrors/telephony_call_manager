@@ -29,6 +29,7 @@
 
 namespace OHOS {
 namespace Telephony {
+EventCallback NapiCallAbilityCallback::audioDeviceCallback_;
 std::mutex NapiCallAbilityCallback::audioDeviceCallbackMutex_;
 NapiCallAbilityCallback::NapiCallAbilityCallback()
 {
@@ -116,8 +117,6 @@ void NapiCallAbilityCallback::UnRegisterAudioDeviceCallback()
         napi_delete_reference(audioDeviceCallback_.env, audioDeviceCallback_.callbackRef);
         napi_delete_reference(audioDeviceCallback_.env, audioDeviceCallback_.thisVar);
         (void)memset_s(&audioDeviceCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
-        audioDeviceCallback_.callbackRef = nullptr;
-        audioDeviceCallback_.thisVar = nullptr;
         TELEPHONY_LOGI("unregister audio device callback end.");
     }
 }
@@ -990,7 +989,7 @@ void NapiCallAbilityCallback::ReportAudioDeviceInfoWork(uv_work_t *work, int32_t
         TELEPHONY_LOGE("dataWorkerData is nullptr!");
         return;
     }
-    if (dataWorkerData->callback.thisVar && dataWorkerData->callback.callbackRef) {
+    if (audioDeviceCallback_.thisVar && audioDeviceCallback_.callbackRef) {
         int32_t ret = ReportAudioDeviceInfo(dataWorkerData->info, dataWorkerData->callback);
         TELEPHONY_LOGI("ReportAudioDeviceInfo result = %{public}d", ret);
         delete dataWorkerData;
