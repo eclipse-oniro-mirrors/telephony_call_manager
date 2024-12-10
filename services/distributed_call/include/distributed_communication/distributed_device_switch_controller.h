@@ -24,20 +24,20 @@ namespace Telephony {
 class DistributedDeviceSwitchController : public IDistributedDeviceStateCallback {
 public:
     DistributedDeviceSwitchController() = default;
-    ~DistributedDeviceSwitchController() override = default;
-    void OnDeviceOnline(const std::string &devId, const std::string &devName, AudioDeviceType devType) override;
-    void OnDeviceOffline(const std::string &devId, const std::string &devName, AudioDeviceType devType) override;
-    void OnDistributedAudioDeviceChange(const std::string &devId, const std::string &devName,
-        AudioDeviceType devType, int32_t devRole) override;
-    void OnRemoveSystemAbility() override;
+    virtual ~DistributedDeviceSwitchController() = default;
 
-    bool SwitchDevice(const std::string &devId, int32_t direction);
-    bool IsAudioOnSink();
+    virtual bool SwitchDevice(const std::string &devId, int32_t direction)
+    {
+        return false;
+    }
 
-private:
-    std::string GetDevAddress(const std::string &devId, const std::string &devName);
+    virtual bool IsAudioOnSink()
+    {
+        std::lock_guard<ffrt::mutex> lock(mutex_);
+        return isAudioOnSink_;
+    }
 
-private:
+protected:
     ffrt::mutex mutex_{};
     bool isAudioOnSink_{false};
 };

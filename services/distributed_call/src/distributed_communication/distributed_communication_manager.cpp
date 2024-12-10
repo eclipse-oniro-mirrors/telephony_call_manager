@@ -20,6 +20,8 @@
 #include "telephony_log_wrapper.h"
 #include "distributed_data_sink_controller.h"
 #include "distributed_data_source_controller.h"
+#include "distributed_sink_switch_controller.h"
+#include "distributed_source_switch_controller.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -122,8 +124,10 @@ void DistributedCommunicationManager::OnDeviceOnline(const std::string &devId, c
             }
         }
         if (devSwitchController_ == nullptr) {
-            if (role_ == DistributedRole::SOURCE) {
-                devSwitchController_ = std::make_shared<DistributedDeviceSwitchController>();
+            if (role_ == DistributedRole::SINK) {
+                devSwitchController_ = std::make_shared<DistributedSinkSwitchController>();
+            } else {
+                devSwitchController_ = std::make_shared<DistributedSourceSwitchController>();
             }
         }
     }
@@ -154,6 +158,7 @@ void DistributedCommunicationManager::OnDeviceOffline(const std::string &devId, 
     }
 
     status_ = DistributedStatus::DISCONNECT;
+    role_ = DistributedRole::UNKNOWN;
     if (dataController_ != nullptr) {
         dataController_.reset();
         dataController_ = nullptr;
@@ -163,6 +168,17 @@ void DistributedCommunicationManager::OnDeviceOffline(const std::string &devId, 
         devSwitchController_ = nullptr;
     }
     TELEPHONY_LOGI("distributed device offline");
+}
+
+void DistributedCommunicationManager::OnRemoveSystemAbility()
+{
+    std::lock_guard<ffrt::mutex> lock(mutex_);
+    peerDevices_.clear();
+    status_ = DistributedStatus::DISCONNECT;
+    role_ = DistributedRole::UNKNOWN;
+    dataController_ = nullptr;
+    devSwitchController_ = nullptr;
+    TELEPHONY_LOGI("distributed system ability remove");
 }
 
 bool DistributedCommunicationManager::IsSinkRole()
@@ -269,6 +285,11 @@ void DistributedCommunicationManager::NewCallCreated(sptr<CallBase> &call)
     if (callType != CallType::TYPE_IMS && callType != CallType::TYPE_CS) {
         return;
     }
+
+    if (role_ == DistributedRole::SINK) {
+        DistributedSinkSwitchController::TrySwitchToBtHeadset();
+    }
+
     std::lock_guard<ffrt::mutex> lock(mutex_);
     if (dataController_ != nullptr) {
         if (peerDevices_.empty()) {

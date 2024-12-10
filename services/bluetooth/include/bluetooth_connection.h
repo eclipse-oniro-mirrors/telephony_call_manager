@@ -60,6 +60,7 @@ public:
         int32_t state, int32_t cause) override;
     Bluetooth::BluetoothRemoteDevice *GetBtDevice(const std::string &address);
     void AddBtDevice(const std::string &address, Bluetooth::BluetoothRemoteDevice device);
+    std::string GetWearBtHeadsetAddress();
 #endif
 
 private:

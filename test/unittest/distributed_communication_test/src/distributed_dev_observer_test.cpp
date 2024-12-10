@@ -16,7 +16,8 @@
 #include <gtest/gtest.h>
 #include "telephony_errors.h"
 #include "distributed_device_observer.h"
-#include "distributed_device_switch_controller.h"
+#include "distributed_sink_switch_controller.h"
+#include "distributed_source_switch_controller.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -56,7 +57,7 @@ HWTEST_F(DistributedDevObserverTest, Telephony_DcDeviceObserver_001, Function | 
     ASSERT_NO_THROW(deviceObserver->RegisterDevStatusCallback(callback)); // duplicate register
     ASSERT_NO_THROW(deviceObserver->UnRegisterDevCallback());
 
-    callback = std::make_shared<DistributedDeviceSwitchController>();
+    callback = std::make_shared<DistributedSourceSwitchController>();
     ASSERT_NO_THROW(deviceObserver->RegisterDevStatusCallback(callback));
     ASSERT_NO_THROW(deviceObserver->OnDeviceOnline(devId, devName, deviceType));
     ASSERT_NO_THROW(deviceObserver->OnDeviceOffline(devId, devName, deviceType));
@@ -80,6 +81,30 @@ HWTEST_F(DistributedDevObserverTest, Telephony_DcDeviceObserver_001, Function | 
     EXPECT_TRUE(convertRes == AudioDeviceType::DEVICE_DISTRIBUTED_PAD);
     convertRes = deviceCallback->ConvertDeviceType(dcPc);
     EXPECT_TRUE(convertRes == AudioDeviceType::DEVICE_DISTRIBUTED_PC);
+}
+
+/**
+ * @tc.number   Telephony_DcDeviceObserver_002
+ * @tc.name     test normal branch
+ * @tc.desc     normal branch test
+ */
+HWTEST_F(DistributedDevObserverTest, Telephony_DcDeviceObserver_002, Function | MediumTest | Level1)
+{
+    std::string devId = "UnitTestDeviceId";
+    std::string devName = "UnitTestDeviceName";
+    AudioDeviceType deviceType = AudioDeviceType::DEVICE_DISTRIBUTED_PHONE;
+    auto deviceObserver = std::make_shared<DistributedDeviceObserver>();
+    std::shared_ptr<IDistributedDeviceStateCallback> callback = nullptr;
+    ASSERT_NO_THROW(deviceObserver->Init());
+    ASSERT_NO_THROW(deviceObserver->RegisterDevStatusCallback(callback));
+    ASSERT_NO_THROW(deviceObserver->RegisterDevStatusCallback(callback)); // duplicate register
+    ASSERT_NO_THROW(deviceObserver->UnRegisterDevCallback());
+
+    callback = std::make_shared<DistributedSinkSwitchController>();
+    ASSERT_NO_THROW(deviceObserver->RegisterDevStatusCallback(callback));
+    ASSERT_NO_THROW(deviceObserver->OnDeviceOnline(devId, devName, deviceType));
+    ASSERT_NO_THROW(deviceObserver->OnDeviceOffline(devId, devName, deviceType));
+    ASSERT_NO_THROW(deviceObserver->OnRemoveSystemAbility());
 }
 
 /**
