@@ -45,8 +45,8 @@
 #include "spam_call_adapter.h"
 #include "call_superprivacy_control_manager.h"
 #include "notification_helper.h"
-#include "call_earthquake_alarm_locator.h"
 #include "distributed_communication_manager.h"
+#include "call_earthquake_alarm_locator.h"
 #include "want_params_wrapper.h"
 #include "call_voice_assistant_manager.h"
 

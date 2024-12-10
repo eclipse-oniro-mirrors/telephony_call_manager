@@ -205,8 +205,8 @@ bool AudioSceneProcessor::SwitchIncoming()
     } else {
         bool isStartBroadcast = CallVoiceAssistantManager::GetInstance()->IsStartVoiceBroadcast();
         bool isNeedSilent = CallObjectManager::IsNeedSilentInDoNotDisturbMode();
-        if (!isStartBroadcast || !isNeedSilent) {
-            TELEPHONY_LOGI("broadcast switch and is close, start play system ring");
+        if (!isStartBroadcast && !isNeedSilent) {
+            TELEPHONY_LOGI("broadcast switch and doNotDisturbMode close, start play system ring");
             DelayedSingleton<AudioControlManager>::GetInstance()->StopRingtone();
             // play ringtone while incoming state
             DelayedSingleton<AudioControlManager>::GetInstance()->PlayRingtone();

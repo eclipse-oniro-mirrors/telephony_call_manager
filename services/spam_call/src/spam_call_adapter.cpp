@@ -189,8 +189,7 @@ void SpamCallAdapter::ParseDetectResult(const std::string &jsonData, bool &isBlo
         TELEPHONY_LOGE("strcpy_s markDetails fail.");
     }
     JsonGetStringValue(root, DETECT_DETAILS, detectDetails);
-    TELEPHONY_LOGW("DetectSpamCall detectDetails: %{public}s", detectDetails.c_str());
-    TELEPHONY_LOGW("ParseDetectResult end");
+    TELEPHONY_LOGW("DetectSpamCall detectDetails length: %{public}zu", detectDetails.length());
     cJSON_Delete(root);
 }
 
