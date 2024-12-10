@@ -28,6 +28,7 @@
 #include "call_ability_connect_callback.h"
 #include "number_identity_service.h"
 #include "os_account_manager.h"
+#include "call_object_manager.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -55,6 +56,8 @@ CallBroadcastSubscriber::CallBroadcastSubscriber(const OHOS::EventFwk::CommonEve
         [this](const EventFwk::CommonEventData &data) { ShutdownBroadcast(data); };
     memberFuncMap_[HSDR_EVENT] =
         [this](const EventFwk::CommonEventData &data) { HsdrEventBroadcast(data); };
+    memberFuncMap_[HFP_EVENT] =
+        [this](const EventFwk::CommonEventData &data) { HfpConnectBroadcast(data); };
     memberFuncMap_[SCREEN_UNLOCKED] =
         [this](const EventFwk::CommonEventData &data) { ScreenUnlockedBroadcast(data); };
 }
@@ -83,6 +86,8 @@ void CallBroadcastSubscriber::OnReceiveEvent(const EventFwk::CommonEventData &da
         code = SHUTDOWN;
     } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_UNLOCKED) {
         code = SCREEN_UNLOCKED;
+    } else if (action == "usual.event.bluetooth.CONNECT_HFP_HF") {
+        code = HFP_EVENT;
     } else {
         code = UNKNOWN_BROADCAST_EVENT;
     }
@@ -187,6 +192,15 @@ void CallBroadcastSubscriber::HsdrEventBroadcast(const EventFwk::CommonEventData
         DelayedRefSingleton<NumberIdentityServiceHelper>::GetInstance().NotifyNumberMarkDataUpdate();
     }
     TELEPHONY_LOGI("HsdrEventBroadcast end");
+}
+
+void CallBroadcastSubscriber::HfpConnectBroadcast(const EventFwk::CommonEventData &data)
+{
+    TELEPHONY_LOGI("HfpConnectBroadcast begin");
+    DelayedSingleton<CallConnectAbility>::GetInstance()->ConnectAbility();
+    constexpr static uint64_t DISCONNECT_DELAY_TIME = 3000000;
+    DelayedSingleton<CallObjectManager>::GetInstance()->DelayedDisconnectCallConnectAbility(DISCONNECT_DELAY_TIME);
+    TELEPHONY_LOGI("HfpConnectBroadcast end");
 }
 
 void CallBroadcastSubscriber::ScreenUnlockedBroadcast(const EventFwk::CommonEventData &data)

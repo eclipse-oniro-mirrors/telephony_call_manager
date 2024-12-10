@@ -37,7 +37,7 @@ public:
     virtual ~CallObjectManager();
 
     static int32_t AddOneCallObject(sptr<CallBase> &call);
-    static void DelayedDisconnectCallConnectAbility();
+    static void DelayedDisconnectCallConnectAbility(uint64_t time);
     static int32_t DeleteOneCallObject(int32_t callId);
     static void DeleteOneCallObject(sptr<CallBase> &call);
     static sptr<CallBase> GetOneCallObject(int32_t callId);
