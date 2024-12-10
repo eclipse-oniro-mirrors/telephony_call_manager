@@ -309,13 +309,13 @@ struct CallAttributeInfo {
      */
     int32_t celiaCallType = -1;
     /**
-     * Indicates the contact name.
-     */
-    char contactName[kMaxNumberLen + 1] = { 0 };
-    /**
      * Indicates the extraParamsString information.
      */
     std::string extraParamsString;
+    /**
+     * Indicates the contact name.
+     */
+    char contactName[kMaxNumberLen + 1] = { 0 };
     /**
      * Indicates the details of call detect result.
      */
