@@ -41,6 +41,7 @@ private:
         SUPER_PRIVACY_MODE,
         BLUETOOTH_REMOTEDEVICE_NAME_UPDATE,
         USER_SWITCHED,
+        HFP_EVENT,
         SHUTDOWN
     };
     using broadcastSubscriberFunc = std::function<void(const EventFwk::CommonEventData &data)>;
@@ -52,6 +53,7 @@ private:
     void ConnectCallUiSuperPrivacyModeBroadcast(const EventFwk::CommonEventData &data);
     void UpdateBluetoothDeviceName(const EventFwk::CommonEventData &data);
     void ConnectCallUiUserSwitchedBroadcast(const EventFwk::CommonEventData &data);
+    void HfpConnectBroadcast(const EventFwk::CommonEventData &data);
     void ShutdownBroadcast(const EventFwk::CommonEventData &data);
     std::map<uint32_t, broadcastSubscriberFunc> memberFuncMap_;
 };

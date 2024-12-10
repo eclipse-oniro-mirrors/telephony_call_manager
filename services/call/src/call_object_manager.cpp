@@ -89,7 +89,7 @@ int32_t CallObjectManager::AddOneCallObject(sptr<CallBase> &call)
     return TELEPHONY_SUCCESS;
 }
 
-void CallObjectManager::DelayedDisconnectCallConnectAbility()
+void CallObjectManager::DelayedDisconnectCallConnectAbility(uint64_t time = DISCONNECT_DELAY_TIME)
 {
     ffrt::submit_h(
         []() {
@@ -102,7 +102,7 @@ void CallObjectManager::DelayedDisconnectCallConnectAbility()
                 TELEPHONY_LOGI("delayed disconnect done");
             }
         },
-        {}, {}, ffrt::task_attr().delay(DISCONNECT_DELAY_TIME));
+        {}, {}, ffrt::task_attr().delay(time));
 }
 
 int32_t CallObjectManager::DeleteOneCallObject(int32_t callId)

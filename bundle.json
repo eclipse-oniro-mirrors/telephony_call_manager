@@ -23,7 +23,9 @@
             "SystemCapability.Telephony.CallManager",
             "SystemCapability.Applications.Contacts"
         ],
-        "features": [],
+        "features": [
+            "call_manager_feature_hfp_async_enable"
+        ],
         "adapted_system_type": [
             "standard"
         ],
