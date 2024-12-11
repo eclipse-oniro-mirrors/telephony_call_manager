@@ -29,6 +29,8 @@
 
 namespace OHOS {
 namespace Telephony {
+EventCallback NapiCallAbilityCallback::audioDeviceCallback_;
+std::mutex NapiCallAbilityCallback::audioDeviceCallbackMutex_;
 NapiCallAbilityCallback::NapiCallAbilityCallback()
 {
     (void)memset_s(&stateCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
@@ -104,15 +106,18 @@ void NapiCallAbilityCallback::UnRegisterMmiCodeCallback()
 
 void NapiCallAbilityCallback::RegisterAudioDeviceCallback(EventCallback eventCallback)
 {
+    std::lock_guard<std::mutex> lock(audioDeviceCallbackMutex_);
     audioDeviceCallback_ = eventCallback;
 }
 
 void NapiCallAbilityCallback::UnRegisterAudioDeviceCallback()
 {
+    std::lock_guard<std::mutex> lock(audioDeviceCallbackMutex_);
     if (audioDeviceCallback_.callbackRef) {
         napi_delete_reference(audioDeviceCallback_.env, audioDeviceCallback_.callbackRef);
         napi_delete_reference(audioDeviceCallback_.env, audioDeviceCallback_.thisVar);
         (void)memset_s(&audioDeviceCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
+        TELEPHONY_LOGI("unregister audio device callback end.");
     }
 }
 
@@ -936,6 +941,7 @@ int32_t NapiCallAbilityCallback::ReportMmiCode(MmiCodeInfo &info, EventCallback 
 
 int32_t NapiCallAbilityCallback::UpdateAudioDeviceInfo(const AudioDeviceInfo &info)
 {
+    std::lock_guard<std::mutex> lock(audioDeviceCallbackMutex_);
     if (audioDeviceCallback_.thisVar == nullptr) {
         return CALL_ERR_CALLBACK_NOT_EXIST;
     }
@@ -978,21 +984,26 @@ int32_t NapiCallAbilityCallback::UpdateAudioDeviceInfo(const AudioDeviceInfo &in
 
 void NapiCallAbilityCallback::ReportAudioDeviceInfoWork(uv_work_t *work, int32_t status)
 {
+    TELEPHONY_LOGI("report audio device info work.");
+    std::lock_guard<std::mutex> lock(audioDeviceCallbackMutex_);
     AudioDeviceWork *dataWorkerData = (AudioDeviceWork *)work->data;
     if (dataWorkerData == nullptr) {
         TELEPHONY_LOGE("dataWorkerData is nullptr!");
         return;
     }
-    int32_t ret = ReportAudioDeviceInfo(dataWorkerData->info, dataWorkerData->callback);
-    TELEPHONY_LOGI("ReportAudioDeviceInfo result = %{public}d", ret);
-    delete dataWorkerData;
-    dataWorkerData = nullptr;
-    delete work;
-    work = nullptr;
+    if (audioDeviceCallback_.thisVar && audioDeviceCallback_.callbackRef) {
+        int32_t ret = ReportAudioDeviceInfo(dataWorkerData->info, dataWorkerData->callback);
+        TELEPHONY_LOGI("ReportAudioDeviceInfo result = %{public}d", ret);
+        delete dataWorkerData;
+        dataWorkerData = nullptr;
+        delete work;
+        work = nullptr;
+    }
 }
 
 int32_t NapiCallAbilityCallback::ReportAudioDeviceInfo(AudioDeviceInfo &info, EventCallback eventCallback)
 {
+    TELEPHONY_LOGI("report audio device info.");
     napi_env env = eventCallback.env;
     napi_handle_scope AudioDeviceInfoScope = nullptr;
     napi_open_handle_scope(env, &AudioDeviceInfoScope);

@@ -391,7 +391,8 @@ void AudioPreferDeviceChangeCallback::OnPreferredOutputDeviceUpdated(
         TELEPHONY_LOGE("desc size is zero");
         return;
     }
-    if (DelayedSingleton<DistributedCommunicationManager>::GetInstance()->IsAudioOnSink()) {
+    if (DelayedSingleton<DistributedCommunicationManager>::GetInstance()->IsAudioOnSink() &&
+        !DelayedSingleton<DistributedCommunicationManager>::GetInstance()->IsSinkRole()) {
         TELEPHONY_LOGI("has already switch to distributed communication device");
         return;
     }

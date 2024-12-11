@@ -159,7 +159,7 @@ private:
     EventCallback stopRttCallback_;
     EventCallback mmiCodeCallback_;
     EventCallback closeUnfinishedUssdCallback_;
-    EventCallback audioDeviceCallback_;
+    static EventCallback audioDeviceCallback_;
     EventCallback postDialDelayCallback_;
     EventCallback imsCallModeCallback_;
     EventCallback peerDimensionsCallback_;
@@ -176,6 +176,7 @@ private:
     std::mutex closeUnfinishedUssdCallbackMutex_;
     std::mutex setWaitingCallbackMutex_;
     std::mutex getWaitingCallbackMutex_;
+    static std::mutex audioDeviceCallbackMutex_;
 };
 } // namespace Telephony
 } // namespace OHOS

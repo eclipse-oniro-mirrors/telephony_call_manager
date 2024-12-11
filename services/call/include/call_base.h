@@ -134,10 +134,10 @@ public:
     bool IsMuted();
     void SetIsEccContact(bool isEccContact);
     void SetCeliaCallType(int32_t celiaCallType);
+    void SetExtraParams(AAFwk::WantParams extraParams);
     void SetCallDirection(CallDirection direction);
     CallDirection GetCallDirection();
     int32_t GetAccountId();
-    void SetExtraParams(AAFwk::WantParams extraParams);
     bool IsAnsweredCall();
     void SetAnsweredCall(bool isAnswered);
     AAFwk::WantParams GetExtraParams();

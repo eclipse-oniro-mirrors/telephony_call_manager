@@ -119,6 +119,7 @@ private:
     void SetDistributedDeviceDialing(sptr<CallBase> call, bool isDistributedDeviceDialing);
     void BtCallDialingHandleFirst(sptr<CallBase> call, const CallDetailInfo &infol);
     int32_t HandleCallReportInfoEx(const CallDetailInfo &info);
+    void ClearPendingState(sptr<CallBase> &call);
 
 private:
     CallDetailInfo callReportInfo_;

@@ -1060,8 +1060,7 @@ void AudioControlManager::MuteNetWorkRingTone()
 
 bool AudioControlManager::IsVideoCall(VideoStateType videoState)
 {
-    return videoState == VideoStateType::TYPE_SEND_ONLY || videoState == VideoStateType::TYPE_RECEIVE_ONLY ||
-           videoState == VideoStateType::TYPE_VIDEO;
+    return videoState == VideoStateType::TYPE_VIDEO;
 }
 
 bool AudioControlManager::IsBtOrWireHeadPlugin()

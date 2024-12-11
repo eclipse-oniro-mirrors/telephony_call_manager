@@ -1576,6 +1576,10 @@ void CallControlManager::SystemAbilityListener::OnAddSystemAbility(int32_t syste
     if (ret) {
         TELEPHONY_LOGW("HSDRBroadcastSubscriber fail.");
     }
+    ret = HfpBroadcastSubscriber();
+    if (ret) {
+        TELEPHONY_LOGW("HfpBroadcastSubscriber fail.");
+    }
     IPCSkeleton::SetCallingIdentity(identity);
     TELEPHONY_LOGI("CallControlManager add BroadcastSubscriber");
 }
@@ -1690,6 +1694,27 @@ int32_t CallControlManager::SystemAbilityListener::HSDRBroadcastSubscriber()
     subscriberPtrList_.emplace_back(subscriberHsdr_);
     bool subscribeResult = EventFwk::CommonEventManager::SubscribeCommonEvent(subscriberHsdr_);
     TELEPHONY_LOGI("CallControlManager SubscribeCommonEvent subscribeResult = %{public}d", subscribeResult);
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallControlManager::SystemAbilityListener::HfpBroadcastSubscriber()
+{
+#ifdef HFP_ASYNC_ENABLE
+    EventFwk::MatchingSkills matchingSkillsHfp_;
+    matchingSkillsHfp_.AddEvent("usual.event.bluetooth.CONNECT_HFP_HF");
+    EventFwk::CommonEventSubscribeInfo subscriberInfosHfp_(matchingSkillsHfp_);
+    subscriberInfosHfp_.SetThreadMode(EventFwk::CommonEventSubscribeInfo::COMMON);
+    subscriberInfosHfp_.SetPermission("ohos.permission.MANAGR_SETTINGS");
+    std::shared_ptr<CallBroadcastSubscriber> subscriberHfp_ =
+        std::make_shared<CallBroadcastSubscriber>(subscriberInfosHfp_);
+    if (subscriberHfp_ == nullptr) {
+        TELEPHONY_LOGE("CallControlManager::BroadcastSubscriber subscriberPtrs is nullptr");
+        return TELEPHONY_ERROR;
+    }
+    subscriberPtrList_.emplace_back(subscriberHfp_);
+    bool subscribeResult = EventFwk::CommonEventManager::SubscribeCommonEvent(subscriberHfp_);
+    TELEPHONY_LOGI("CallControlManager SubscribeCommonEvent subscribeResult = %{public}d", subscribeResult);
+#endif
     return TELEPHONY_SUCCESS;
 }
 
