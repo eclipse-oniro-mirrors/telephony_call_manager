@@ -64,7 +64,6 @@ public:
 class AudioProxy : public std::enable_shared_from_this<AudioProxy> {
     DECLARE_DELAYED_SINGLETON(AudioProxy)
 public:
-    bool SetAudioScene(AudioStandard::AudioScene audioScene);
     bool SetVoiceRingtoneMute(bool isMute);
     int32_t ActivateAudioInterrupt(const AudioStandard::AudioInterrupt &audioInterrupt);
     int32_t DeactivateAudioInterrupt(const AudioStandard::AudioInterrupt &audioInterrupt);
