@@ -36,6 +36,7 @@ class AudioControlManager : public CallStateListenerBase, public std::enable_sha
 
 public:
     void Init();
+    void UnInit();
     int32_t SetAudioDevice(const AudioDevice &device);
     int32_t SetAudioDevice(const AudioDevice &device, bool isByUser);
     bool PlayRingtone(); // plays the default ringtone

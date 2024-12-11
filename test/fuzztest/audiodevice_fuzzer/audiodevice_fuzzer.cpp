@@ -182,6 +182,7 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     AudioDeviceManagerFunc(data, size);
     AudioProxyFunc(data, size);
     AudioSceneProcessorFunc(data, size);
+    DelayedSingleton<AudioControlManager>::GetInstance()->UnInit();
 }
 } // namespace OHOS
 
