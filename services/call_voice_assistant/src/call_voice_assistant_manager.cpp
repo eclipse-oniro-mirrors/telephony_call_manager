@@ -677,29 +677,31 @@ void VoiceAssistantRingSubscriber::Release()
 
 void VoiceAssistantRingSubscriber::OnReceiveEvent(const EventFwk::CommonEventData &eventData)
 {
-    auto voicePtr = CallVoiceAssistantManager::GetInstance();
-    if (voicePtr == nullptr) {
-        TELEPHONY_LOGE("voicePtr is nullptr");
-        return;
-    }
-    const AAFwk::Want &want = eventData.GetWant();
-    std::string action = want.GetAction();
-    if (action != voicePtr->CONTROL_SWITCH_STATE_CHANGE_EVENT) {
-        return;
-    }
-    std::string publisher = want.GetStringParam("publisher_name");
-    if (publisher != std::string("remote_object_send_request") &&
-        publisher != std::string("connect_voice_assistant_ability_failed")) {
-        TELEPHONY_LOGE("publisher name, [%{public}s]", publisher.c_str());
-        return;
-    }
-    std::string isplay = want.GetStringParam(voicePtr->IS_PLAY_RING);
-    bool isPlayRing = voicePtr->GetIsPlayRing();
-    if (isplay == voicePtr->SWITCH_TURN_ON && isPlayRing) {
-        TELEPHONY_LOGI("broadcast switch is open, start play system ring");
-        DelayedSingleton<AudioControlManager>::GetInstance()->StopRingtone();
-        DelayedSingleton<AudioControlManager>::GetInstance()->PlayRingtone();
-    }
+    callVoiceAssistantQueue.submit([=]() {
+        auto voicePtr = CallVoiceAssistantManager::GetInstance();
+        if (voicePtr == nullptr) {
+            TELEPHONY_LOGE("voicePtr is nullptr");
+            return;
+        }
+        const AAFwk::Want &want = eventData.GetWant();
+        std::string action = want.GetAction();
+        if (action != voicePtr->CONTROL_SWITCH_STATE_CHANGE_EVENT) {
+            return;
+        }
+        std::string publisher = want.GetStringParam("publisher_name");
+        if (publisher != std::string("remote_object_send_request") &&
+            publisher != std::string("connect_voice_assistant_ability_failed")) {
+            TELEPHONY_LOGE("publisher name, [%{public}s]", publisher.c_str());
+            return;
+        }
+        std::string isplay = want.GetStringParam(voicePtr->IS_PLAY_RING);
+        bool isPlayRing = voicePtr->GetIsPlayRing();
+        if (isplay == voicePtr->SWITCH_TURN_ON && isPlayRing) {
+            TELEPHONY_LOGI("broadcast switch is open, start play system ring");
+            DelayedSingleton<AudioControlManager>::GetInstance()->StopRingtone();
+            DelayedSingleton<AudioControlManager>::GetInstance()->PlayRingtone();
+        }
+    });
 };
 
 bool CallVoiceAssistantManager::GetIsPlayRing()
