@@ -137,6 +137,7 @@ private:
     int32_t SatcommBroadcastSubscriber();
     int32_t SuperPrivacyModeBroadcastSubscriber();
     int32_t BroadcastSubscriber();
+    int32_t HfpBroadcastSubscriber();
     void ReportPhoneUEInSuperPrivacy(const std::string &eventName);
     void PackageDialInformation(AppExecFwk::PacMap &extras, std::string accountNumber, bool isEcc);
     static void handler();

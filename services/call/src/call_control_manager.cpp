@@ -1678,6 +1678,37 @@ int32_t CallControlManager::SatcommBroadcastSubscriber()
     return TELEPHONY_SUCCESS;
 }
 
+int32_t CallControlManager::HfpBroadcastSubscriber()
+{
+#ifdef HFP_ASYNC_ENABLE
+    EventFwk::MatchingSkills matchingSkillsHfp_;
+    matchingSkillsHfp_.AddEvent("usual.event.bluetooth.CONNECT_HFP_HF");
+    EventFwk::CommonEventSubscribeInfo subscriberInfosHfp_(matchingSkillsHfp_);
+    subscriberInfosHfp_.SetThreadMode(EventFwk::CommonEventSubscribeInfo::COMMON);
+    subscriberInfosHfp_.SetPermission("ohos.permission.MANAGR_SETTINGS");
+    std::shared_ptr<CallBroadcastSubscriber> subscriberHfp_ =
+        std::make_shared<CallBroadcastSubscriber>(subscriberInfosHfp_);
+    if (subscriberHfp_ == nullptr) {
+        TELEPHONY_LOGE("HfpBroadcastSubscriber subscriberPtr is nullptr");
+        return TELEPHONY_ERROR;
+    }
+
+    auto samgrProxy = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (samgrProxy == nullptr) {
+        TELEPHONY_LOGE("samgrProxy is nullptr");
+        return TELEPHONY_ERROR;
+    }
+    satcommEventListener_ = new (std::nothrow) SystemAbilityListener(subscriberHfp_);
+    if (satcommEventListener_ == nullptr) {
+        TELEPHONY_LOGE("satcommEventListener_ is nullptr");
+        return TELEPHONY_ERROR;
+    }
+    int32_t ret = samgrProxy->SubscribeSystemAbility(COMMON_EVENT_SERVICE_ID, satcommEventListener_);
+    TELEPHONY_LOGI("HfpBroadcastSubscriber ret: %{public}d", ret);
+#endif
+    return TELEPHONY_SUCCESS;
+}
+
 int32_t CallControlManager::SuperPrivacyModeBroadcastSubscriber()
 {
     EventFwk::MatchingSkills matchingSkills;
@@ -1720,6 +1751,10 @@ int32_t CallControlManager::BroadcastSubscriber()
     ret = SatcommBroadcastSubscriber();
     if (ret) {
         TELEPHONY_LOGW("SatcommBroadcastSubscriber fail.");
+    }
+    ret = HfpBroadcastSubscriber();
+    if (ret) {
+        TELEPHONY_LOGW("HfpBroadcastSubscriber fail.");
     }
     ret = SuperPrivacyModeBroadcastSubscriber();
     if (ret) {

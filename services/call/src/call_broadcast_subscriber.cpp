@@ -26,11 +26,13 @@
 #include "call_superprivacy_control_manager.h"
 #include "call_connect_ability.h"
 #include "call_ability_connect_callback.h"
+#include "call_object_manager.h"
 
 
 namespace OHOS {
 namespace Telephony {
 using namespace OHOS::EventFwk;
+static constexpr uint64_t DISCONNECT_DELAY_TIME = 3000000;
 CallBroadcastSubscriber::CallBroadcastSubscriber(const OHOS::EventFwk::CommonEventSubscribeInfo &subscriberInfo)
     : CommonEventSubscriber(subscriberInfo)
 {
@@ -48,6 +50,8 @@ CallBroadcastSubscriber::CallBroadcastSubscriber(const OHOS::EventFwk::CommonEve
         [this](const EventFwk::CommonEventData &data) { UpdateBluetoothDeviceName(data); };
     memberFuncMap_[USER_SWITCHED] =
         [this](const EventFwk::CommonEventData &data) { ConnectCallUiUserSwitchedBroadcast(data); };
+    memberFuncMap_[HFP_EVENT] =
+        [this](const EventFwk::CommonEventData &data) { HfpConnectBroadcast(data); };
     memberFuncMap_[SHUTDOWN] =
         [this](const EventFwk::CommonEventData &data) { ShutdownBroadcast(data); };
 }
@@ -72,6 +76,8 @@ void CallBroadcastSubscriber::OnReceiveEvent(const EventFwk::CommonEventData &da
         code = USER_SWITCHED;
     } else if (action == EventFwk::CommonEventSupport::COMMON_EVENT_SHUTDOWN) {
         code = SHUTDOWN;
+    } else if (action == "usual.event.bluetooth.CONNECT_HFP_HF") {
+        code = HFP_EVENT;
     } else {
         code = UNKNOWN_BROADCAST_EVENT;
     }
@@ -160,6 +166,14 @@ void CallBroadcastSubscriber::ConnectCallUiUserSwitchedBroadcast(const EventFwk:
     DelayedSingleton<CallConnectAbility>::GetInstance()->DisconnectAbility();
     sptr<CallAbilityConnectCallback> connectCallback_ = new CallAbilityConnectCallback();
     connectCallback_->ReConnectAbility();
+}
+
+void CallBroadcastSubscriber::HfpConnectBroadcast(const EventFwk::CommonEventData &data)
+{
+    TELEPHONY_LOGI("HfpConnectBroadcast begin");
+    DelayedSingleton<CallConnectAbility>::GetInstance()->ConnectAbility();
+    DelayedSingleton<CallObjectManager>::GetInstance()->DelayedDisconnectCallConnectAbility(DISCONNECT_DELAY_TIME);
+    TELEPHONY_LOGI("HfpConnectBroadcast end");
 }
 
 void CallBroadcastSubscriber::ShutdownBroadcast(const EventFwk::CommonEventData &data)
