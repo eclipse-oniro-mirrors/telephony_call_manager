@@ -683,6 +683,7 @@ void VoiceAssistantRingSubscriber::OnReceiveEvent(const EventFwk::CommonEventDat
             TELEPHONY_LOGE("voicePtr is nullptr");
             return;
         }
+
         const AAFwk::Want &want = eventData.GetWant();
         std::string action = want.GetAction();
         if (action != voicePtr->CONTROL_SWITCH_STATE_CHANGE_EVENT) {
