@@ -689,10 +689,10 @@ int32_t CallStatusManager::DialingHandle(const CallDetailInfo &info)
                 call = GetOneCallObjectByIndexSlotIdAndCallType(info.index, info.accountId, info.callType);
                 isDistributedDeviceDialing = IsDistributeCallSourceStatus();
             }
-            if (call != nullptr) {
-                TELEPHONY_LOGI("need update call info");
-                return UpdateDialingCallInfo(info);
-            }
+        }
+        if (call != nullptr) {
+            TELEPHONY_LOGI("need update call info");
+            return UpdateDialingCallInfo(info);
         }
     }
     sptr<CallBase> call = CreateNewCall(info, CallDirection::CALL_DIRECTION_OUT);
@@ -1803,7 +1803,7 @@ void CallStatusManager::SetBtCallDialByPhone(const sptr<CallBase> &call, bool is
     call->GetCallAttributeBaseInfo(info);
 }
 
-void CallStatusManager::BtCallDialingHandle(sptr<CallBase> call, const CallDetailInfo &info)
+void CallStatusManager::BtCallDialingHandle(sptr<CallBase> &call, const CallDetailInfo &info)
 {
     if (call != nullptr) {
         call->SetPhoneOrWatchDial(static_cast<int32_t>(PhoneOrWatchDial::WATCH_DIAL));

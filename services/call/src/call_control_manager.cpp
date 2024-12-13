@@ -1539,6 +1539,9 @@ void CallControlManager::DisconnectAllCalls()
         if (call == nullptr) {
             continue;
         }
+        if (call->GetCallType() == CallType::TYPE_BLUETOOTH) {
+            continue;
+        }
         if (call->GetCallRunningState() == CallRunningState::CALL_RUNNING_STATE_RINGING) {
             ret = RejectCall(call->GetCallID(), false, Str8ToStr16(""));
         } else {
