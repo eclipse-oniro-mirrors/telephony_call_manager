@@ -70,9 +70,7 @@ CallManagerService::CallManagerService()
 {}
 
 CallManagerService::~CallManagerService()
-{
-    UnInit();
-}
+{}
 
 bool CallManagerService::Init()
 {
@@ -117,6 +115,7 @@ void CallManagerService::OnAddSystemAbility(int32_t systemAbilityId, const std::
 void CallManagerService::UnInit()
 {
     DelayedSingleton<CellularCallConnection>::GetInstance()->UnInit();
+    DelayedSingleton<CallControlManager>::GetInstance()->UnInit();
     callControlManagerPtr_ = nullptr;
     if (bluetoothCallCallbackPtr_ != nullptr) {
         bluetoothCallCallbackPtr_ = nullptr;
@@ -181,6 +180,7 @@ void CallManagerService::OnStop()
     }
     DelayedSingleton<CellularCallConnection>::GetInstance()->UnInit();
     state_ = ServiceRunningState::STATE_STOPPED;
+    UnInit();
 }
 
 int32_t CallManagerService::GetServiceRunningState()

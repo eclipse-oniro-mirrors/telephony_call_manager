@@ -260,7 +260,6 @@ HWTEST_F(CallStateTest, Telephony_InactiveDeviceState_001, Function | MediumTest
 HWTEST_F(CallStateTest, Telephony_AudioProxy_001, Function | MediumTest | Level3)
 {
     auto audioProxy = std::make_shared<AudioProxy>();
-    audioProxy->SetAudioScene(AudioStandard::AudioScene::AUDIO_SCENE_DEFAULT);
     audioProxy->SetAudioDeviceChangeCallback();
     audioProxy->UnsetDeviceChangeCallback();
 

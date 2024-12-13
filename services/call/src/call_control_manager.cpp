@@ -65,23 +65,7 @@ CallControlManager::CallControlManager()
 }
 
 CallControlManager::~CallControlManager()
-{
-    if (statusChangeListener_ != nullptr) {
-        auto samgrProxy = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-        if (samgrProxy != nullptr) {
-            samgrProxy->UnSubscribeSystemAbility(COMMON_EVENT_SERVICE_ID, statusChangeListener_);
-            statusChangeListener_ = nullptr;
-        }
-    }
-    {
-        std::lock_guard<std::mutex> lock(voipMutex_);
-        if (appMgrProxy != nullptr && appStateObserver != nullptr) {
-            appMgrProxy->UnregisterApplicationStateObserver(appStateObserver);
-            appMgrProxy = nullptr;
-            appStateObserver = nullptr;
-        }
-    }
-}
+{}
 
 bool CallControlManager::Init()
 {
@@ -119,6 +103,26 @@ bool CallControlManager::Init()
     DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance()->RegisterSuperPrivacyMode();
     DelayedSingleton<CallStateReportProxy>::GetInstance()->UpdateCallStateForVoIPOrRestart();
     return true;
+}
+
+void CallControlManager::UnInit()
+{
+    if (statusChangeListener_ != nullptr) {
+        auto samgrProxy = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+        if (samgrProxy != nullptr) {
+            samgrProxy->UnSubscribeSystemAbility(COMMON_EVENT_SERVICE_ID, statusChangeListener_);
+            statusChangeListener_ = nullptr;
+        }
+    }
+    {
+        std::lock_guard<std::mutex> lock(voipMutex_);
+        if (appMgrProxy != nullptr && appStateObserver != nullptr) {
+            appMgrProxy->UnregisterApplicationStateObserver(appStateObserver);
+            appMgrProxy = nullptr;
+            appStateObserver = nullptr;
+        }
+    }
+    DelayedSingleton<AudioControlManager>::GetInstance()->UnInit();
 }
 
 void CallControlManager::ReportPhoneUEInSuperPrivacy(const std::string &eventName)

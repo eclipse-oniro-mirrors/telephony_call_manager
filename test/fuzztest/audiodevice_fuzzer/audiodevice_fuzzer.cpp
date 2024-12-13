@@ -129,7 +129,6 @@ void AudioProxyFunc(const uint8_t *data, size_t size)
     bool isMute = static_cast<bool>(*data % BOOL_NUM);
 
     audioControlManager->GetCallBase(callId);
-    audioProxy->SetAudioScene(audioScene);
     audioProxy->SetVolumeAudible();
     audioProxy->IsMicrophoneMute();
     audioProxy->SetMicrophoneMute(isMute);
@@ -182,6 +181,7 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     AudioDeviceManagerFunc(data, size);
     AudioProxyFunc(data, size);
     AudioSceneProcessorFunc(data, size);
+    DelayedSingleton<AudioControlManager>::GetInstance()->UnInit();
 }
 } // namespace OHOS
 

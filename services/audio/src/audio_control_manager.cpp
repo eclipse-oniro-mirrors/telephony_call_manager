@@ -44,16 +44,19 @@ AudioControlManager::AudioControlManager()
 {}
 
 AudioControlManager::~AudioControlManager()
-{
-    DelayedSingleton<AudioProxy>::GetInstance()->UnsetDeviceChangeCallback();
-    DelayedSingleton<AudioProxy>::GetInstance()->UnsetAudioPreferDeviceChangeCallback();
-    DelayedSingleton<AudioProxy>::GetInstance()->UnsetAudioMicStateChangeCallback();
-}
+{}
 
 void AudioControlManager::Init()
 {
     DelayedSingleton<AudioDeviceManager>::GetInstance()->Init();
     DelayedSingleton<AudioSceneProcessor>::GetInstance()->Init();
+}
+
+void AudioControlManager::UnInit()
+{
+    DelayedSingleton<AudioProxy>::GetInstance()->UnsetDeviceChangeCallback();
+    DelayedSingleton<AudioProxy>::GetInstance()->UnsetAudioPreferDeviceChangeCallback();
+    DelayedSingleton<AudioProxy>::GetInstance()->UnsetAudioMicStateChangeCallback();
 }
 
 void AudioControlManager::UpdateForegroundLiveCall()
