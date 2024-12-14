@@ -36,6 +36,20 @@ void DistributedDataSourceController::OnDeviceOnline(const std::string &devId, c
     if (session_ != nullptr) {
         session_->Create(SESSION_NAME);
     }
+
+    // save current call info
+    auto calls = CallObjectManager::GetAllCallList();
+    for (auto call : calls) {
+        if (call == nullptr) {
+            continue;
+        }
+        auto callType = call->GetCallType();
+        if (callType != CallType::TYPE_IMS && callType != CallType::TYPE_CS) {
+            continue;
+        }
+        SaveLocalData(call, DistributedDataType::NAME);
+        SaveLocalData(call, DistributedDataType::LOCATION);
+    }
 }
 
 void DistributedDataSourceController::OnDeviceOffline(const std::string &devId, const std::string &devName,
