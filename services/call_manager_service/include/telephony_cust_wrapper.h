@@ -30,8 +30,10 @@ public:
     void InitTelephonyCustWrapper();
 
     typedef bool (*IS_HIDE_VIOLENCE_OR_EMC_NUMBERS_IN_CALLLOG)(const CallAttributeInfo &info);
+    typedef bool (*IS_CHANGE_DIAL_NUMBER_TO_TW_EMC)(std::u16string &oriNum, int32_t slotId);
 
     IS_HIDE_VIOLENCE_OR_EMC_NUMBERS_IN_CALLLOG isHideViolenceOrEmcNumbersInCallLog_ = nullptr;
+    IS_CHANGE_DIAL_NUMBER_TO_TW_EMC isChangeDialNumberToTwEmc_ = nullptr;
 
 private:
     void* telephonyCustWrapperHandle_ = nullptr;

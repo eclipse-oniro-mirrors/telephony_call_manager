@@ -48,6 +48,12 @@ void TelephonyCustWrapper::InitTelephonyCustWrapper()
         TELEPHONY_LOGE("telephony cust wrapper symbol faild, error: %{public}s", dlerror());
         return;
     }
+    isChangeDialNumberToTwEmc_ = (IS_CHANGE_DIAL_NUMBER_TO_TW_EMC)dlsym(
+        telephonyCustWrapperHandle_, "IsChangeDialNumberToTwEmc");
+    if (isChangeDialNumberToTwEmc_ == nullptr) {
+        TELEPHONY_LOGE("telephony cust wrapper change dial num symbol faild, error: %{public}s", dlerror());
+        return;
+    }
     TELEPHONY_LOGI("telephony cust wrapper init success!");
 }
 } // namespace Telephony
