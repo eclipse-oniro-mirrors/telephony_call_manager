@@ -154,7 +154,7 @@ void DistributedDeviceObserver::OnRemoveSystemAbility()
     {
         std::lock_guard<ffrt::mutex> lock(mutex_);
         callbacks = callbacks_;
-        callbacks.clear();
+        callbacks_.clear();
     }
     for (auto& callback : callbacks) {
         if (callback != nullptr) {
