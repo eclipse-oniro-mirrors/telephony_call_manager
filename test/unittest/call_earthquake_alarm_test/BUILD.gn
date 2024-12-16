@@ -28,7 +28,6 @@ ohos_unittest("tel_call_earthquake_alarm_test") {
   ]
   sources += call_manager_sources
 
-
   include_dirs = [
     "//third_party/libphonenumber/cpp/src",
     "//third_party/libphonenumber/cpp/src/phonenumbers",
