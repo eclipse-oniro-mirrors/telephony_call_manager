@@ -17,6 +17,9 @@
 #define CALL_EARTHQUAKE_ALARM_LOCATOR_H
 
 #include <iostream>
+#include <memory>
+#include <map>
+
 #include "request_config.h"
 #include "location.h"
 #include "locator.h"
@@ -24,7 +27,6 @@
 #include "locator_impl.h"
 #include "location_log.h"
 #include "iremote_stub.h"
-#include <memory>
 #include "call_earthquake_alarm_subscriber.h"
 #include "ability_connect_callback_interface.h"
 #include "telephony_permission.h"
@@ -38,9 +40,25 @@
 #include "string_wrapper.h"
 #include "call_ability_report_proxy.h"
 #include "call_object_manager.h"
+#include "data_ability_observer_stub.h"
+#include "call_base.h"
 
 namespace OHOS {
 namespace Telephony {
+
+class OOBESwitchObserver : public AAFwk::DataAbilityObserverStub {
+public:
+    OOBESwitchObserver(std::string key) : mKey(key) {};
+    virtual ~OOBESwitchObserver() = default;
+    void OnChange() override;
+    static std::map<std::string, bool> keyStatus;
+
+private:
+    std::string mKey = "";
+    std::string mValue = "";
+    static std::mutex mutex_;
+};
+
 class MyLocationEngine {
 public:
     MyLocationEngine();
@@ -52,11 +70,13 @@ public:
     void RegisterSwitchCallback();
     void UnRegisterSwitchCallback();
     void LocationSwitchChange();
-    static void BootComplete();
-    static bool IsSwitchOn();
+    static void OOBEComplete();
+    static void BootComplete(bool switchState);
+    static bool IsSwitchOn(std::string key, std::string& value);
     static std::shared_ptr<MyLocationEngine> GetInstance();
-    static void ConnectAbility();
-    static OHOS::Uri uri_q;
+    static void StartEccService(sptr<CallBase> call, const CallDetailInfo &info);
+    static void StopEccService(int32_t callId);
+    static void ConnectAbility(std::string value, sptr<AAFwk::IAbilityConnection>& callback, AAFwk::Want& want);
 private:
     class MyLocationCallBack : public IRemoteStub<Location::ILocatorCallback> {
     public:
@@ -90,11 +110,19 @@ private:
     static const std::string EMERGENCY_DEVICE_ID;
     static const std::string EMERGENCY_BUNDLE_NAME;
     static const std::string EMERGENCY_ABILITY_NAME;
+    static const std::string EMERGENCY_ABILITY_NAME_ECC;
     static const std::string PARAMETERS_VALUE;
     static const char* PARAMETERS_KEY;
+    static const char* PARAMETERS_KEY_PHONE_NUMBER;
+    static const char* PARAMETERS_KEY_SLOTID;
     static const std::string ALARM_SWITCH_ON;
     static const std::string ALARM_SWITCH_OFF;
-    static std::string INITIAL_FIRST_VALUE;
+    
+public:
+    static const std::string INITIAL_FIRST_VALUE;
+    static const std::string PARAMETERS_VALUE_ECC;
+    static const std::string PARAMETERS_VALUE_OOBE;
+    static std::map<std::string, sptr<AAFwk::IDataAbilityObserver>> settingsCallbacks;
 };
 //class MyLocationCallBack
 
@@ -106,8 +134,12 @@ public:
         int resultCode);
     void OnAbilityDisconnectDone(const AppExecFwk::ElementName &element, int resultCode);
     static sptr<AAFwk::IAbilityConnection> connectCallback_;
-    static const int CONNECT_SUCCESS;
+    static sptr<AAFwk::IAbilityConnection> connectCallbackEcc;
+    static bool isStartEccService;
+    static std::mutex mutex_;
+    static int32_t nowCallId;
 };
+
 } // namespace Telephony
 } // namespace OHOS
 #endif // CALL_MANAGER_SERVICE_LOCATOR_H

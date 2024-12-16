@@ -54,6 +54,8 @@
 #include "telephony_permission.h"
 #include "uri.h"
 #include "want.h"
+#include "call_manager_base.h"
+#include "call_base.h"
 #include <iostream>
 #include <memory>
 #include <mutex>
@@ -87,8 +89,12 @@ HWTEST_F(LocationEngineTest, Telephony_MyLocationEngine_001, Function | MediumTe
     engine->mylocator = engine;
     engine = engine->GetInstance();
     engine->SetValue();
-    engine->IsSwitchOn();
-    engine->BootComplete();
+    std::string key1 = "testkey";
+    std::string value1 = "testvalue";
+    engine->IsSwitchOn(key1, value1);
+    engine->BootComplete(true);
+    engine->BootComplete(false);
+    engine->OOBEComplete();
     engine->RegisterLocationChange();
     engine->RegisterSwitchCallback();
     engine->LocationSwitchChange();
@@ -143,7 +149,9 @@ HWTEST_F(LocationEngineTest, Telephony_MyLocationEngine_002, Function | MediumTe
     engine->SetValue();
     engine->RegisterLocationChange();
     engine->RegisterSwitchCallback();
-    ASSERT_TRUE(engine->IsSwitchOn() == false);
+    std::string key2 = "testkey2222";
+    std::string value2 = "valuetst2222";
+    ASSERT_TRUE(engine->IsSwitchOn(key2, value2) == false);
 }
 
 /**
@@ -179,7 +187,9 @@ HWTEST_F(LocationEngineTest, Telephony_MyLocationEngine_003, Function | MediumTe
     engine->SetValue();
     engine->RegisterLocationChange();
     engine->RegisterSwitchCallback();
-    ASSERT_TRUE(engine->IsSwitchOn() == false);
+    std::string key3 = "keytest3333";
+    std::string value3 = "valuetest3333";
+    ASSERT_TRUE(engine->IsSwitchOn(key3, value3) == false);
 }
 
 /**
@@ -192,20 +202,21 @@ HWTEST_F(LocationEngineTest, Telephony_EmergencyCallConnectCallback_001, Functio
     auto engine1 = std::make_shared<MyLocationEngine>();
     engine1->mylocator = engine1;
     auto engine = engine1->GetInstance();
-    auto connectcallback = new EmergencyCallConnectCallback();
-    connectcallback->connectCallback_ = connectcallback;
-    if (connectcallback->connectCallback_ == nullptr) {
-        return;
-    }
-    engine->ConnectAbility();
+    sptr<AAFwk::IAbilityConnection> connectcallback = sptr<EmergencyCallConnectCallback>::MakeSptr();
+    CallDetailInfo info;
+    AAFwk::Want want;
+    engine->ConnectAbility("valuetest1111", connectcallback, want);
+    engine->StartEccService(nullptr, info);
+    engine->StopEccService(-1);
     std::string bundle = "111";
     std::string ability = "222";
     AppExecFwk::ElementName element("", bundle, ability);
-    sptr<IRemoteObject> remoteObject = new EmergencyCallConnectCallback();
+    sptr<IRemoteObject> remoteObject = sptr<EmergencyCallConnectCallback>::MakeSptr();
     int resultCode = 0;
-    connectcallback->connectCallback_->OnAbilityConnectDone(element, remoteObject, resultCode);
-    connectcallback->connectCallback_->OnAbilityDisconnectDone(element, resultCode);
-    ASSERT_TRUE(connectcallback->connectCallback_ != nullptr);
+    sptr<AAFwk::IAbilityConnection> connectcallback3 = sptr<EmergencyCallConnectCallback>::MakeSptr();
+    connectcallback3->OnAbilityConnectDone(element, remoteObject, resultCode);
+    connectcallback3->OnAbilityDisconnectDone(element, resultCode);
+    ASSERT_TRUE(connectcallback3 != nullptr);
 }
 
 /**
@@ -251,9 +262,19 @@ HWTEST_F(LocationEngineTest, Telephony_DataShareSwitchState_001, Function | Medi
     OHOS::Uri uriTest(string("datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?")
         + string("Proxy=true&key=testKeyWord"));
     const std::string key = "testKeyWord";
+    std::string key2 = "testKeyWord2";
     std::string value1 = "test";
-    int code = 4;
+    int code = -1;
     auto ret = datashareHelper->QueryData(uriTest, key, value1);
+    sptr<AAFwk::IDataAbilityObserver> callback1 = sptr<OOBESwitchObserver>::MakeSptr(key2);
+    callback1->OnChange();
+    auto datashareHelper2 = std::make_shared<DataShareSwitchState>();
+    datashareHelper2->RegisterListenSettingsKey(key2, true, callback1);
+    auto datashareHelper3 = std::make_shared<DataShareSwitchState>();
+    datashareHelper3->RegisterListenSettingsKey(key2, false, callback1);
+    callback1 = nullptr;
+    auto datashareHelper4 = std::make_shared<DataShareSwitchState>();
+    datashareHelper4->RegisterListenSettingsKey(key2, false, callback1);
     ASSERT_TRUE(ret == code);
     ASSERT_TRUE(value1 == "test");
 }
@@ -265,24 +286,26 @@ HWTEST_F(LocationEngineTest, Telephony_DataShareSwitchState_001, Function | Medi
  */
 HWTEST_F(LocationEngineTest, Telephony_LocationSystemAbilityListener_001, Function | MediumTest | Level3)
 {
-    int32_t ability_1914 = OHOS::DEVICE_STANDBY_SERVICE_SYSTEM_ABILITY_ID;
+    int32_t ability_1301 = OHOS::DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID;
     int32_t ability_2802 = OHOS::LOCATION_LOCATOR_SA_ID;
     int32_t ability_2805 = OHOS::LOCATION_NOPOWER_LOCATING_SA_ID;
     const std::string deviceId = "11111111111test";
-    auto locationAbility = std::make_shared<LocationSystemAbilityListener>();
-    locationAbility->GetSystemAbility(ability_1914);
+    sptr<LocationSystemAbilityListener> locationAbility = sptr<LocationSystemAbilityListener>::MakeSptr();
+    locationAbility->systemAbilityStatus = {};
+    locationAbility->GetSystemAbility(ability_1301);
     locationAbility->GetSystemAbility(ability_2802);
     locationAbility->GetSystemAbility(ability_2805);
-    locationAbility->statusChangeListener_ = new (std::nothrow) LocationSystemAbilityListener();
+    locationAbility->statusChangeListener_ = sptr<LocationSystemAbilityListener>::MakeSptr();
     locationAbility->SystemAbilitySubscriber();
     locationAbility->statusChangeListener_ = nullptr;
     locationAbility->SystemAbilitySubscriber();
-    locationAbility->statusChangeListener_->OnAddSystemAbility(ability_1914, deviceId);
-    locationAbility->statusChangeListener_->OnAddSystemAbility(ability_2802, deviceId);
-    locationAbility->statusChangeListener_->OnAddSystemAbility(ability_2805, deviceId);
-    locationAbility->statusChangeListener_->OnRemoveSystemAbility(ability_1914, deviceId);
-    locationAbility->statusChangeListener_->OnRemoveSystemAbility(ability_2802, deviceId);
-    locationAbility->statusChangeListener_->OnRemoveSystemAbility(ability_2805, deviceId);
+    sptr<LocationSystemAbilityListener> callback = sptr<LocationSystemAbilityListener>::MakeSptr();
+    callback->OnAddSystemAbility(ability_1301, deviceId);
+    callback->OnAddSystemAbility(ability_2802, deviceId);
+    callback->OnAddSystemAbility(ability_2805, deviceId);
+    callback->OnRemoveSystemAbility(ability_1301, deviceId);
+    callback->OnRemoveSystemAbility(ability_2802, deviceId);
+    callback->OnRemoveSystemAbility(ability_2805, deviceId);
     ASSERT_TRUE(locationAbility->SystemAbilitySubscriber() == true);
     ASSERT_TRUE(locationAbility->statusChangeListener_ != nullptr);
 }
