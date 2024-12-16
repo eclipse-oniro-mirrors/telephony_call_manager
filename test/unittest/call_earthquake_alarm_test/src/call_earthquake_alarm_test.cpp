@@ -286,26 +286,26 @@ HWTEST_F(LocationEngineTest, Telephony_DataShareSwitchState_001, Function | Medi
  */
 HWTEST_F(LocationEngineTest, Telephony_LocationSystemAbilityListener_001, Function | MediumTest | Level3)
 {
-    int32_t ability_1301 = OHOS::DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID;
-    int32_t ability_2802 = OHOS::LOCATION_LOCATOR_SA_ID;
-    int32_t ability_2805 = OHOS::LOCATION_NOPOWER_LOCATING_SA_ID;
+    int32_t gAbility1301 = OHOS::DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID;
+    int32_t gAbility2802 = OHOS::LOCATION_LOCATOR_SA_ID;
+    int32_t gAbility2805 = OHOS::LOCATION_NOPOWER_LOCATING_SA_ID;
     const std::string deviceId = "11111111111test";
     sptr<LocationSystemAbilityListener> locationAbility = sptr<LocationSystemAbilityListener>::MakeSptr();
     locationAbility->systemAbilityStatus = {};
-    locationAbility->GetSystemAbility(ability_1301);
-    locationAbility->GetSystemAbility(ability_2802);
-    locationAbility->GetSystemAbility(ability_2805);
+    locationAbility->GetSystemAbility(gAbility1301);
+    locationAbility->GetSystemAbility(gAbility2802);
+    locationAbility->GetSystemAbility(gAbility2805);
     locationAbility->statusChangeListener_ = sptr<LocationSystemAbilityListener>::MakeSptr();
     locationAbility->SystemAbilitySubscriber();
     locationAbility->statusChangeListener_ = nullptr;
     locationAbility->SystemAbilitySubscriber();
     sptr<LocationSystemAbilityListener> callback = sptr<LocationSystemAbilityListener>::MakeSptr();
-    callback->OnAddSystemAbility(ability_1301, deviceId);
-    callback->OnAddSystemAbility(ability_2802, deviceId);
-    callback->OnAddSystemAbility(ability_2805, deviceId);
-    callback->OnRemoveSystemAbility(ability_1301, deviceId);
-    callback->OnRemoveSystemAbility(ability_2802, deviceId);
-    callback->OnRemoveSystemAbility(ability_2805, deviceId);
+    callback->OnAddSystemAbility(gAbility1301, deviceId);
+    callback->OnAddSystemAbility(gAbility2802, deviceId);
+    callback->OnAddSystemAbility(gAbility2805, deviceId);
+    callback->OnRemoveSystemAbility(gAbility1301, deviceId);
+    callback->OnRemoveSystemAbility(gAbility2802, deviceId);
+    callback->OnRemoveSystemAbility(gAbility2805, deviceId);
     ASSERT_TRUE(locationAbility->SystemAbilitySubscriber() == true);
     ASSERT_TRUE(locationAbility->statusChangeListener_ != nullptr);
 }
