@@ -115,6 +115,7 @@ public:
     const std::string IS_CONNECT_SERVICE = "isConnectVoiceAssistant";
     const std::string IS_PLAY_RING = "call_manager_play_ring";
     const std::string BUNDLE_NAME = "";
+    const std::string HICAR_BUNDLE_NAME = "";
     const std::string ABILITY_NAME = "CallVoiceControlAbility";
     const std::string CONTROL_CHECK_RESULT = "incomingCallVoiceControlCheckResult";
     const std::string BROADCAST_CHECK_RESULT = "incomingCallVoiceBroadcastCheckResult";

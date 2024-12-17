@@ -335,6 +335,14 @@ void DistributedCallManager::DealDisconnectCall()
     ClearConnectedDCallDevice();
 }
 
+bool DistributedCallManager::IsDistributedCarDeviceOnline()
+{
+    if (onlineDCallDevices_.size() > 0) {
+        return true;
+    }
+    return false;
+}
+
 void DistributedCallManager::SwitchOnDCallDeviceAsync(const AudioDevice& device)
 {
     TELEPHONY_LOGI("switch dcall device on async");
