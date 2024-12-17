@@ -48,6 +48,7 @@ public:
     void SwitchOnDCallDeviceAsync(const AudioDevice& device);
     void SetCallState(bool isActive);
     void DealDisconnectCall();
+    bool IsDistributedCarDeviceOnline();
 
     int32_t OnDCallDeviceOnline(const std::string &devId);
     int32_t OnDCallDeviceOffline(const std::string &devId);

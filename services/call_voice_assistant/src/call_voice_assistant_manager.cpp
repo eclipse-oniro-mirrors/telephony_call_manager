@@ -14,6 +14,7 @@
  */
  
 #include "call_voice_assistant_manager.h"
+#include "distributed_call_manager.h"
  
 namespace OHOS {
 namespace Telephony {
@@ -75,6 +76,11 @@ void CallVoiceAssistantManager::Release()
 
 bool CallVoiceAssistantManager::IsSwitchOn(const std::string& switchState)
 {
+    bool isHiCarConnected = DelayedSingleton<DistributedCallManager>::GetInstance()->IsDistributedCarDeviceOnline();
+    if (isHiCarConnected) {
+        TELEPHONY_LOGI("hicar is connected, voice control by hicar");
+        return true;
+    }
     std::string value = SWITCH_TURN_OFF;
     this->QueryValue(switchState, value);
     TELEPHONY_LOGI("%{public}s is %{public}s", switchState.c_str(), value.c_str());
@@ -132,8 +138,10 @@ bool CallVoiceAssistantManager::ConnectAbility(int32_t callId)
             return false;
         }
     }
+    bool isHiCarConnected = DelayedSingleton<DistributedCallManager>::GetInstance()->IsDistributedCarDeviceOnline();
     AAFwk::Want want;
-    AppExecFwk::ElementName element(DEFAULT_STRING, BUNDLE_NAME, ABILITY_NAME);
+    AppExecFwk::ElementName element(
+        DEFAULT_STRING, isHiCarConnected ? HICAR_BUNDLE_NAME : BUNDLE_NAME, ABILITY_NAME);
     want.SetElement(element);
     int32_t userId = FAIL_CODE;
     auto ret = AAFwk::AbilityManagerClient::GetInstance()->ConnectAbility(want, connectCallback_, userId);
