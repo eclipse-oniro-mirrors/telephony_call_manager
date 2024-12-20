@@ -38,10 +38,13 @@ public:
 
     void SetHfpConnected(bool isHfpConnected);
     bool GetSupportBtCall();
+    void SetBtCallScoConnected(bool isBtCallScoConnected);
+    bool GetBtCallScoConnected();
 
 private:
     std::string macAddress_;
     bool isHfpConnected_ = false;
+    bool isBtCallScoConnected_ = false;
 };
 } // namespace Telephony
 } // namespace OHOS

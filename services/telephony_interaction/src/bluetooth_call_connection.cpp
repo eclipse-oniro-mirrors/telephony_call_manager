@@ -151,5 +151,17 @@ bool BluetoothCallConnection::GetSupportBtCall()
     TELEPHONY_LOGE("Watch not Support Bluetooth Call.");
     return false;
 }
+
+void BluetoothCallConnection::SetBtCallScoConnected(bool isBtCallScoConnected)
+{
+    isBtCallScoConnected_ = isBtCallScoConnected;
+    TELEPHONY_LOGI("Set BtCallScoConnected=%{public}d", isBtCallScoConnected_);
+}
+
+bool BluetoothCallConnection::GetBtCallScoConnected()
+{
+    TELEPHONY_LOGI("Get BtCallScoConnected=%{public}d", isBtCallScoConnected_);
+    return isBtCallScoConnected_;
+}
 } // namespace Telephony
 } // namespace OHOS

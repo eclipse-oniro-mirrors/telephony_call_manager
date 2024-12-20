@@ -33,6 +33,7 @@ void BluetoothCallState::OnConnectionStateChanged(const Bluetooth::BluetoothRemo
             break;
         default:
             DelayedSingleton<BluetoothCallConnection>::GetInstance()->SetHfpConnected(false);
+            DelayedSingleton<BluetoothCallConnection>::GetInstance()->SetBtCallScoConnected(false);
             break;
     }
 }
@@ -40,8 +41,11 @@ void BluetoothCallState::OnConnectionStateChanged(const Bluetooth::BluetoothRemo
 void BluetoothCallState::OnScoStateChanged(const Bluetooth::BluetoothRemoteDevice &device, int32_t state)
 {
     TELEPHONY_LOGI("BluetoothCallState OnScoStateChanged, state = %{public}d", state);
-    if (state == static_cast<int32_t>(Bluetooth::HfpScoConnectState::SCO_CONNECTED) ||
-        state == static_cast<int32_t>(Bluetooth::HfpScoConnectState::SCO_DISCONNECTED)) {
+    if (state == static_cast<int32_t>(Bluetooth::HfpScoConnectState::SCO_CONNECTED)) {
+        DelayedSingleton<BluetoothCallConnection>::GetInstance()->SetBtCallScoConnected(true);
+        DelayedSingleton<AudioDeviceManager>::GetInstance()->ReportAudioDeviceInfo();
+    } else if (state == static_cast<int32_t>(Bluetooth::HfpScoConnectState::SCO_DISCONNECTED)) {
+        DelayedSingleton<BluetoothCallConnection>::GetInstance()->SetBtCallScoConnected(false);
         DelayedSingleton<AudioDeviceManager>::GetInstance()->ReportAudioDeviceInfo();
     }
 }
