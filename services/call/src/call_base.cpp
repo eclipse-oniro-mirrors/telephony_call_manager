@@ -86,6 +86,10 @@ void CallBase::HangUpVoipCall()
         ++it;
         if (callinfo.callType == CallType::TYPE_VOIP) {
             sptr<CallBase> tempCall = CallObjectManager::GetOneCallObject(callinfo.callId);
+            if (tempCall == nullptr) {
+                TELEPHONY_LOGE("the call object is nullptr, callId:%{public}d", callinfo.callId);
+                continue;
+            }
             sptr<VoIPCall> call = static_cast<VoIPCall *>(static_cast<void *>(tempCall.GetRefPtr()));
             if (call == nullptr) {
                 TELEPHONY_LOGE("the call object is nullptr, callId:%{public}d", callinfo.callId);

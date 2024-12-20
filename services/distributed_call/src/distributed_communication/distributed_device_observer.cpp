@@ -154,6 +154,7 @@ void DistributedDeviceObserver::OnRemoveSystemAbility()
     {
         std::lock_guard<ffrt::mutex> lock(mutex_);
         callbacks = callbacks_;
+        callbacks_.clear();
     }
     for (auto& callback : callbacks) {
         if (callback != nullptr) {
@@ -261,6 +262,7 @@ void DistributedSystemAbilityListener::OnRemoveSystemAbility(int32_t systemAbili
         deviceObserver->OnRemoveSystemAbility();
         if (deviceObserver->UnRegisterDevCallback() != TELEPHONY_SUCCESS) {
             TELEPHONY_LOGE("un-reg distributed device callback failed, can't dlclose ext lib");
+            distributedMgr->OnRemoveSystemAbility();
             return;
         }
     }
