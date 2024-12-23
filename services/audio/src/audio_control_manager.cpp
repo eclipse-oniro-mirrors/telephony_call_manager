@@ -317,6 +317,7 @@ void AudioControlManager::HandleCallStateUpdated(
 
 void AudioControlManager::HandleNextState(sptr<CallBase> &callObjectPtr, TelCallState nextState)
 {
+    TELEPHONY_LOGI("handle next state.");
     AudioEvent event = AudioEvent::UNKNOWN_EVENT;
     DelayedSingleton<CallStateProcessor>::GetInstance()->AddCall(callObjectPtr->GetCallID(), nextState);
     switch (nextState) {
@@ -352,11 +353,13 @@ void AudioControlManager::HandleNextState(sptr<CallBase> &callObjectPtr, TelCall
     if (event == AudioEvent::UNKNOWN_EVENT) {
         return;
     }
+    TELEPHONY_LOGI("handle next state, event: %{public}d.", event);
     DelayedSingleton<AudioSceneProcessor>::GetInstance()->ProcessEvent(event);
 }
 
 void AudioControlManager::HandlePriorState(sptr<CallBase> &callObjectPtr, TelCallState priorState)
 {
+    TELEPHONY_LOGI("handle prior state.");
     AudioEvent event = AudioEvent::UNKNOWN_EVENT;
     DelayedSingleton<CallStateProcessor>::GetInstance()->DeleteCall(callObjectPtr->GetCallID(), priorState);
     int32_t stateNumber = DelayedSingleton<CallStateProcessor>::GetInstance()->GetCallNumber(priorState);
@@ -393,6 +396,7 @@ void AudioControlManager::HandlePriorState(sptr<CallBase> &callObjectPtr, TelCal
     if (event == AudioEvent::UNKNOWN_EVENT) {
         return;
     }
+    TELEPHONY_LOGI("handle prior state, event: %{public}d.", event);
     DelayedSingleton<AudioSceneProcessor>::GetInstance()->ProcessEvent(event);
 }
 
