@@ -64,6 +64,7 @@ void AudioSceneProcessor::ProcessEventInner(AudioEvent event)
         TELEPHONY_LOGE("current call state nullptr");
         return;
     }
+    TELEPHONY_LOGI("process event inner, event: %{public}d.", event);
     switch (event) {
         case AudioEvent::SWITCH_DIALING_STATE:
         case AudioEvent::SWITCH_ALERTING_STATE:
@@ -122,6 +123,7 @@ bool AudioSceneProcessor::SwitchState(AudioEvent event)
 
 bool AudioSceneProcessor::SwitchState(CallStateType stateType)
 {
+    TELEPHONY_LOGI("switch state, stateType: %{public}d.", stateType);
     bool result = false;
     std::lock_guard<std::mutex> lock(mutex_);
     switch (stateType) {
