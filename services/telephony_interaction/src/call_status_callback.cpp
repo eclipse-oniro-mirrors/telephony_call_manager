@@ -30,6 +30,7 @@ constexpr size_t CHAR_INDEX = 0;
 constexpr int32_t ERR_CALL_ID = 0;
 const uint64_t DELAY_STOP_PLAY_TIME = 3000000;
 const int32_t MIN_MULITY_CALL_COUNT = 2;
+constexpr int32_t INIT_INDEX = 0;
 
 CallStatusCallback::CallStatusCallback() {}
 
@@ -62,11 +63,18 @@ int32_t CallStatusCallback::UpdateCallReportInfo(const CallReportInfo &info)
     detailInfo.mpty = info.mpty;
     (void)memcpy_s(detailInfo.phoneNum, kMaxNumberLen, info.accountNum, kMaxNumberLen);
     (void)memset_s(detailInfo.bundleName, kMaxBundleNameLen, 0, kMaxBundleNameLen);
+    sptr<CallBase> callPtr = CallObjectManager::GetOneCallObjectByIndex(INIT_INDEX);
+    if (callPtr != nullptr && callPtr->GetCallType() == CallType::TYPE_BLUETOOTH &&
+        callPtr->GetTelCallState() == TelCallState::CALL_STATUS_DIALING && callPtr->GetCallIndex() == INIT_INDEX &&
+        info.callType == CallType::TYPE_BLUETOOTH && info.state == TelCallState::CALL_STATUS_DISCONNECTED &&
+        (info.index == -1 || info.index == INIT_INDEX)) {
+            detailInfo.index = INIT_INDEX;
+    }
     int32_t ret = DelayedSingleton<ReportCallInfoHandler>::GetInstance()->UpdateCallReportInfo(detailInfo);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("UpdateCallReportInfo failed! errCode:%{public}d", ret);
     } else {
-        TELEPHONY_LOGW("UpdateCallReportInfo success! state:%{public}d", info.state);
+        TELEPHONY_LOGW("UpdateCallReportInfo success! state:%{public}d, index:%{public}d", info.state, info.index);
     }
     return ret;
 }

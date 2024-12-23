@@ -52,6 +52,7 @@ struct DialParaInfo {
     int32_t originalCallType = 0;
     VoipCallReportInfo voipCallInfo;
     AAFwk::WantParams extraParams;
+    int32_t phoneOrWatch = 0;
 };
 
 enum PolicyFlag : uint64_t {

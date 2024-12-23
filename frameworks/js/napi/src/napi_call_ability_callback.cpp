@@ -574,6 +574,8 @@ int32_t NapiCallAbilityCallback::ReportCallState(CallAttributeInfo &info, EventC
         env, callbackValues[ARRAY_INDEX_FIRST], "crsType", info.crsType);
     NapiCallManagerUtils::SetPropertyInt32(
         env, callbackValues[ARRAY_INDEX_FIRST], "originalCallType", info.originalCallType);
+    NapiCallManagerUtils::SetPropertyInt32(
+        env, callbackValues[ARRAY_INDEX_FIRST], "phoneOrWatch", info.phoneOrWatch);
     napi_set_named_property(env, callbackValues[ARRAY_INDEX_FIRST], std::string("extraParams").c_str(),
         AppExecFwk::WrapWantParams(env, AAFwk::WantParamWrapper::ParseWantParamsWithBrackets(info.extraParamsString)));
     ReportCallAttribute(env, callbackValues, ARRAY_INDEX_THIRD, info);

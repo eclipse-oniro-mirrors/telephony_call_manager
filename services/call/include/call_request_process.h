@@ -28,6 +28,7 @@ public:
     ~CallRequestProcess();
 
     int32_t DialRequest();
+    int32_t HandleDialRequest(DialParaInfo &info);
     void AnswerRequest(int32_t callId, int32_t videoState);
     void AnswerRequestForDsda(sptr<CallBase> call, int32_t callId, int32_t videoState);
     void RejectRequest(int32_t callId, bool isSendSms, std::string &content);
@@ -78,6 +79,7 @@ private:
     int32_t HandleDialFail();
     int32_t GetOtherRingingCall(int32_t currentCallId);
     int32_t EccDialPolicy();
+    int32_t BluetoothDialProcess(DialParaInfo &info);
 
 private:
     std::mutex mutex_;

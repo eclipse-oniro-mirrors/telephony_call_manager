@@ -361,6 +361,8 @@ napi_value NapiCallManager::DeclareDialTypeEnum(napi_env env, napi_value exports
             NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(DialType::DIAL_VOICE_MAIL_TYPE))),
         DECLARE_NAPI_STATIC_PROPERTY("DIAL_OTT_TYPE",
             NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(DialType::DIAL_OTT_TYPE))),
+        DECLARE_NAPI_STATIC_PROPERTY("DIAL_BLUETOOTH_TYPE",
+            NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(DialType::DIAL_BLUETOOTH_TYPE))),
     };
     napi_value result = nullptr;
     napi_define_class(env, "DialType", NAPI_AUTO_LENGTH, NapiCallManagerUtils::CreateEnumConstructor, nullptr,

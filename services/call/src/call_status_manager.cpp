@@ -45,10 +45,13 @@
 #include "spam_call_adapter.h"
 #include "call_superprivacy_control_manager.h"
 #include "notification_helper.h"
-#include "distributed_communication_manager.h"
 #include "call_earthquake_alarm_locator.h"
+#include "distributed_communication_manager.h"
 #include "want_params_wrapper.h"
 #include "call_voice_assistant_manager.h"
+#include "bool_wrapper.h"
+#include "bluetooth_call.h"
+#include "bluetooth_call_connection.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -111,8 +114,10 @@ int32_t CallStatusManager::HandleCallReportInfo(const CallDetailInfo &info)
     int32_t ret = TELEPHONY_ERR_FAIL;
     callReportInfo_ = info;
     if (info.callType == CallType::TYPE_VOIP) {
-        ret = HandleVoipCallReportInfo(info);
-        return ret;
+        return HandleVoipCallReportInfo(info);
+    }
+    if (info.callType == CallType::TYPE_BLUETOOTH) {
+        HandleBluetoothCallReportInfo(info);
     }
     switch (info.state) {
         case TelCallState::CALL_STATUS_ACTIVE:
@@ -141,14 +146,9 @@ int32_t CallStatusManager::HandleCallReportInfo(const CallDetailInfo &info)
             break;
         }
         case TelCallState::CALL_STATUS_WAITING:
-            ret = WaitingHandle(info);
-            break;
         case TelCallState::CALL_STATUS_DISCONNECTED:
-            ret = DisconnectedHandle(info);
-            break;
         case TelCallState::CALL_STATUS_DISCONNECTING:
-            ret = DisconnectingHandle(info);
-            break;
+            ret = HandleCallReportInfoEx(info);
         default:
             TELEPHONY_LOGE("Invalid call state!");
             break;
@@ -158,6 +158,41 @@ int32_t CallStatusManager::HandleCallReportInfo(const CallDetailInfo &info)
     DelayedSingleton<BluetoothCallService>::GetInstance()->GetCallState();
     TELEPHONY_LOGI("End CallStatusManager HandleCallReportInfo");
     return ret;
+}
+
+void CallStatusManager::HandleBluetoothCallReportInfo(const CallDetailInfo &info)
+{
+    if (info.state == TelCallState::CALL_STATUS_WAITING || info.state == TelCallState::CALL_STATUS_INCOMING) {
+        return;
+    }
+    sptr<CallBase> call = nullptr;
+    if (info.index > 0) {
+        if (info.state == TelCallState::CALL_STATUS_DIALING || info.state == TelCallState::CALL_STATUS_ALERTING) {
+            call = GetOneCallObjectByIndexSlotIdAndCallType(INIT_INDEX, info.accountId, info.callType);
+            if (call != nullptr) {
+                BtCallDialingHandleFirst(call, info);
+                return;
+            }
+        }
+        if (call == nullptr) {
+            call = GetOneCallObjectByIndexSlotIdAndCallType(info.index, info.accountId, info.callType);
+        }
+        if (call != nullptr) {
+            return;
+        }
+    } else {
+        return;
+    }
+    if (call == nullptr) {
+        call = CreateNewCall(info, CallDirection::CALL_DIRECTION_OUT);
+        if (call == nullptr) {
+            TELEPHONY_LOGE("Call is NULL");
+            return;
+        }
+        AddOneCallObject(call);
+        DelayedSingleton<CallControlManager>::GetInstance()->NotifyNewCallCreated(call);
+    }
+    return;
 }
 
 void CallStatusManager::HandleDsdaInfo(int32_t slotId)
@@ -378,7 +413,7 @@ int32_t CallStatusManager::HandleVoipEventReportInfo(const VoipCallEventInfo &in
 int32_t CallStatusManager::IncomingHandle(const CallDetailInfo &info)
 {
     detectStartTime = std::chrono::system_clock::from_time_t(0);
-    sptr<CallBase> call = GetOneCallObjectByIndexAndSlotId(info.index, info.accountId);
+    sptr<CallBase> call = GetOneCallObjectByIndexSlotIdAndCallType(info.index, info.accountId, info.callType);
     if (call != nullptr) {
         auto oldCallType = call->GetCallType();
         auto videoState = call->GetVideoStateType();
@@ -408,7 +443,8 @@ int32_t CallStatusManager::IncomingHandle(const CallDetailInfo &info)
     if (IsRejectCall(call, info, block)) {
         return HandleRejectCall(call, block);
     }
-    if (info.callType != CallType::TYPE_VOIP && IsRingOnceCall(call, info)) {
+    if (info.callType != CallType::TYPE_VOIP && info.callType != CallType::TYPE_BLUETOOTH &&
+        IsRingOnceCall(call, info)) {
         return HandleRingOnceCall(call);
     }
     AddOneCallObject(call);
@@ -616,7 +652,7 @@ void CallStatusManager::CallFilterCompleteResult(const CallDetailInfo &info)
 
 int32_t CallStatusManager::UpdateDialingCallInfo(const CallDetailInfo &info)
 {
-    sptr<CallBase> call = GetOneCallObjectByIndexAndSlotId(info.index, info.accountId);
+    sptr<CallBase> call = GetOneCallObjectByIndexSlotIdAndCallType(info.index, info.accountId, info.callType);
     if (call != nullptr) {
         call = RefreshCallIfNecessary(call, info);
         return TELEPHONY_SUCCESS;
@@ -645,11 +681,13 @@ int32_t CallStatusManager::DialingHandle(const CallDetailInfo &info)
     TELEPHONY_LOGI("handle dialing state");
     bool isDistributedDeviceDialing = false;
     if (info.index > 0) {
-        sptr<CallBase> call = GetOneCallObjectByIndexAndSlotId(INIT_INDEX, info.accountId);
-        if (call == nullptr) {
-            call = GetOneCallObjectByIndexAndSlotId(info.index, info.accountId);
-            if (IsDistributeCallSourceStatus()) {
-                isDistributedDeviceDialing = true;
+        sptr<CallBase> call = GetOneCallObjectByIndexSlotIdAndCallType(INIT_INDEX, info.accountId, info.callType);
+        if (info.callType == CallType::TYPE_BLUETOOTH) {
+            BtCallDialingHandle(call, info);
+        } else {
+            if (call == nullptr) {
+                call = GetOneCallObjectByIndexSlotIdAndCallType(info.index, info.accountId, info.callType);
+                isDistributedDeviceDialing = IsDistributeCallSourceStatus();
             }
         }
         if (call != nullptr) {
@@ -662,11 +700,7 @@ int32_t CallStatusManager::DialingHandle(const CallDetailInfo &info)
         TELEPHONY_LOGE("CreateNewCall failed!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    if (isDistributedDeviceDialing) {
-        AAFwk::WantParams extraParams;
-        extraParams.SetParam("isDistributedDeviceDialing", AAFwk::String::Box("true"));
-        call->SetExtraParams(extraParams);
-    }
+    SetDistributedDeviceDialing(call, isDistributedDeviceDialing);
     if (IsDcCallConneceted()) {
         SetContactInfo(call, std::string(info.phoneNum));
     }
@@ -674,8 +708,9 @@ int32_t CallStatusManager::DialingHandle(const CallDetailInfo &info)
     auto callRequestEventHandler = DelayedSingleton<CallRequestEventHandlerHelper>::GetInstance();
     if (info.index == INIT_INDEX) {
         callRequestEventHandler->SetPendingMo(true, call->GetCallID());
+        call->SetPhoneOrWatchDial(static_cast<int32_t>(PhoneOrWatchDial::WATCH_DIAL));
+        SetBtCallDialByPhone(call, false);
     }
-
     callRequestEventHandler->RestoreDialingFlag(false);
     callRequestEventHandler->RemoveEventHandlerTask();
     int32_t ret = call->DialingProcess();
@@ -695,10 +730,10 @@ int32_t CallStatusManager::ActiveHandle(const CallDetailInfo &info)
 {
     TELEPHONY_LOGI("handle active state");
     std::string tmpStr(info.phoneNum);
-    sptr<CallBase> call = GetOneCallObjectByIndexAndSlotId(info.index, info.accountId);
+    sptr<CallBase> call = GetOneCallObjectByIndexSlotIdAndCallType(info.index, info.accountId, info.callType);
     if (call == nullptr && IsDcCallConneceted()) {
         CreateAndSaveNewCall(info, CallDirection::CALL_DIRECTION_UNKNOW);
-        call = GetOneCallObjectByIndexAndSlotId(info.index, info.accountId);
+        call = GetOneCallObjectByIndexSlotIdAndCallType(info.index, info.accountId, info.callType);
     }
     if (call == nullptr) {
         TELEPHONY_LOGE("Call is NULL");
@@ -774,10 +809,10 @@ int32_t CallStatusManager::HoldingHandle(const CallDetailInfo &info)
 {
     TELEPHONY_LOGI("handle holding state");
     std::string tmpStr(info.phoneNum);
-    sptr<CallBase> call = GetOneCallObjectByIndexAndSlotId(info.index, info.accountId);
+    sptr<CallBase> call = GetOneCallObjectByIndexSlotIdAndCallType(info.index, info.accountId, info.callType);
     if (call == nullptr && IsDcCallConneceted()) {
         CreateAndSaveNewCall(info, CallDirection::CALL_DIRECTION_UNKNOW);
-        call = GetOneCallObjectByIndexAndSlotId(info.index, info.accountId);
+        call = GetOneCallObjectByIndexSlotIdAndCallType(info.index, info.accountId, info.callType);
     }
     if (call == nullptr) {
         TELEPHONY_LOGE("Call is NULL");
@@ -806,10 +841,10 @@ int32_t CallStatusManager::AlertHandle(const CallDetailInfo &info)
 {
     TELEPHONY_LOGI("handle alerting state");
     std::string tmpStr(info.phoneNum);
-    sptr<CallBase> call = GetOneCallObjectByIndexAndSlotId(info.index, info.accountId);
+    sptr<CallBase> call = GetOneCallObjectByIndexSlotIdAndCallType(info.index, info.accountId, info.callType);
     if (call == nullptr && IsDcCallConneceted()) {
         CreateAndSaveNewCall(info, CallDirection::CALL_DIRECTION_OUT);
-        call = GetOneCallObjectByIndexAndSlotId(info.index, info.accountId);
+        call = GetOneCallObjectByIndexSlotIdAndCallType(info.index, info.accountId, info.callType);
     }
     if (call == nullptr) {
         TELEPHONY_LOGE("Call is NULL");
@@ -834,7 +869,7 @@ int32_t CallStatusManager::DisconnectingHandle(const CallDetailInfo &info)
 {
     TELEPHONY_LOGI("handle disconnecting state");
     std::string tmpStr(info.phoneNum);
-    sptr<CallBase> call = GetOneCallObjectByIndexAndSlotId(info.index, info.accountId);
+    sptr<CallBase> call = GetOneCallObjectByIndexSlotIdAndCallType(info.index, info.accountId, info.callType);
     if (call == nullptr) {
         TELEPHONY_LOGE("Call is NULL");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -876,7 +911,7 @@ int32_t CallStatusManager::DisconnectedHandle(const CallDetailInfo &info)
         timeWaitHelper_ = nullptr;
     }
     std::string tmpStr(info.phoneNum);
-    sptr<CallBase> call = GetOneCallObjectByIndexAndSlotId(info.index, info.accountId);
+    sptr<CallBase> call = GetOneCallObjectByIndexSlotIdAndCallType(info.index, info.accountId, info.callType);
     if (call == nullptr) {
         TELEPHONY_LOGE("call is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -1389,6 +1424,23 @@ sptr<CallBase> CallStatusManager::CreateNewCallByCallType(
             }
             break;
         }
+        case CallType::TYPE_VOIP:
+        case CallType::TYPE_SATELLITE:
+        case CallType::TYPE_BLUETOOTH: {
+            callPtr = CreateNewCallByCallTypeEx(paraInfo, info, dir, extras);
+            break;
+        }
+        default:
+            return nullptr;
+    }
+    return callPtr;
+}
+
+sptr<CallBase> CallStatusManager::CreateNewCallByCallTypeEx(
+    DialParaInfo &paraInfo, const CallDetailInfo &info, CallDirection dir, AppExecFwk::PacMap &extras)
+{
+    sptr<CallBase> callPtr = nullptr;
+    switch (info.callType) {
         case CallType::TYPE_VOIP: {
             callPtr = (std::make_unique<VoIPCall>(paraInfo)).release();
             break;
@@ -1398,6 +1450,15 @@ sptr<CallBase> CallStatusManager::CreateNewCallByCallType(
                 callPtr = (std::make_unique<SatelliteCall>(paraInfo, extras)).release();
             } else {
                 callPtr = (std::make_unique<SatelliteCall>(paraInfo)).release();
+            }
+            break;
+        }
+        case CallType::TYPE_BLUETOOTH: {
+            std::string macAddress = DelayedSingleton<BluetoothCallConnection>::GetInstance()->GetMacAddress();
+            if (dir == CallDirection::CALL_DIRECTION_OUT) {
+                callPtr = (std::make_unique<BluetoothCall>(paraInfo, extras, macAddress)).release();
+            } else {
+                callPtr = (std::make_unique<BluetoothCall>(paraInfo, macAddress)).release();
             }
             break;
         }
@@ -1569,6 +1630,7 @@ void CallStatusManager::PackParaInfo(
     paraInfo.originalCallType = info.originalCallType;
     paraInfo.extraParams =
         AAFwk::WantParamWrapper::ParseWantParamsWithBrackets(extras.GetStringValue("extraParams"));
+    paraInfo.phoneOrWatch = info.phoneOrWatch;
 }
 
 bool CallStatusManager::IsFocusModeOpen()
@@ -1605,7 +1667,8 @@ bool CallStatusManager::IsRejectCall(sptr<CallBase> &call, const CallDetailInfo 
         block = false;
         return true;
     }
-    if (info.callType != CallType::TYPE_VOIP && ShouldBlockIncomingCall(call, info)) {
+    if (info.callType != CallType::TYPE_VOIP && info.callType != CallType::TYPE_BLUETOOTH &&
+        ShouldBlockIncomingCall(call, info)) {
         CallManagerHisysevent::HiWriteBehaviorEventPhoneUE(
             CALL_INCOMING_REJECT_BY_SYSTEM, PNAMEID_KEY, KEY_CALL_MANAGER, PVERSIONID_KEY, "",
             ACTION_TYPE, REJECT_BY_NUM_BLOCK);
@@ -1725,6 +1788,80 @@ bool CallStatusManager::IsDistributeCallSourceStatus()
         return true;
     }
     return false;
+}
+
+void CallStatusManager::SetBtCallDialByPhone(const sptr<CallBase> &call, bool isBtCallDialByPhone)
+{
+    if (call == nullptr) {
+        return;
+    }
+    CallAttributeInfo info;
+    call->GetCallAttributeInfo(info);
+    AAFwk::WantParams object = AAFwk::WantParamWrapper::ParseWantParamsWithBrackets(info.extraParamsString);
+    object.SetParam("isBtCallDialByPhone", AAFwk::Boolean::Box(isBtCallDialByPhone));
+    call->SetExtraParams(object);
+    call->GetCallAttributeBaseInfo(info);
+}
+
+void CallStatusManager::BtCallDialingHandle(sptr<CallBase> &call, const CallDetailInfo &info)
+{
+    if (call != nullptr) {
+        call->SetPhoneOrWatchDial(static_cast<int32_t>(PhoneOrWatchDial::WATCH_DIAL));
+        SetBtCallDialByPhone(call, false);
+    } else {
+        call = GetOneCallObjectByIndexSlotIdAndCallType(info.index, info.accountId, info.callType);
+        if (call != nullptr) {
+            call->SetPhoneOrWatchDial(static_cast<int32_t>(PhoneOrWatchDial::PHONE_DIAL));
+            SetBtCallDialByPhone(call, true);
+        }
+    }
+}
+
+void CallStatusManager::SetDistributedDeviceDialing(sptr<CallBase> call, bool isDistributedDeviceDialing)
+{
+    if (call == nullptr) {
+        return;
+    }
+    if (isDistributedDeviceDialing) {
+        AAFwk::WantParams extraParams;
+        extraParams.SetParam("isDistributedDeviceDialing", AAFwk::String::Box("true"));
+        call->SetExtraParams(extraParams);
+    }
+}
+
+void CallStatusManager::BtCallDialingHandleFirst(sptr<CallBase> call, const CallDetailInfo &info)
+{
+    if (call == nullptr) {
+        return;
+    }
+    call->SetPhoneOrWatchDial(static_cast<int32_t>(PhoneOrWatchDial::WATCH_DIAL));
+    SetBtCallDialByPhone(call, false);
+    if (info.state == TelCallState::CALL_STATUS_ALERTING) {
+        UpdateDialingCallInfo(info);
+        if (call->GetTelCallState() == TelCallState::CALL_STATUS_ALERTING) {
+            call->SetTelCallState(TelCallState::CALL_STATUS_DIALING);
+        }
+    }
+}
+
+int32_t CallStatusManager::HandleCallReportInfoEx(const CallDetailInfo &info)
+{
+    int32_t ret = TELEPHONY_ERR_FAIL;
+    switch (info.state) {
+        case TelCallState::CALL_STATUS_WAITING:
+            ret = WaitingHandle(info);
+            break;
+        case TelCallState::CALL_STATUS_DISCONNECTED:
+            ret = DisconnectedHandle(info);
+            break;
+        case TelCallState::CALL_STATUS_DISCONNECTING:
+            ret = DisconnectingHandle(info);
+            break;
+        default:
+            TELEPHONY_LOGE("Invalid call state!");
+            break;
+    }
+    return ret;
 }
 
 void CallStatusManager::ClearPendingState(sptr<CallBase> &call)
