@@ -168,6 +168,9 @@ void CallBase::GetCallAttributeBaseInfo(CallAttributeInfo &info)
         info.isEccContact = isEccContact_;
         info.celiaCallType = celiaCallType_;
         info.extraParamsString = AAFwk::WantParamWrapper(extraParams_).ToString();
+        AAFwk::WantParams object = AAFwk::WantParamWrapper::ParseWantParamsWithBrackets(info.extraParamsString);
+        info.name = object.GetStringParam("name");
+        info.namePresentation = object.GetIntParam("namePresentation", 0);
         info.phoneOrWatch = phoneOrWatch_;
         if (memset_s(info.numberLocation, kMaxNumberLen, 0, kMaxNumberLen) != EOK) {
             TELEPHONY_LOGE("memset_s numberLocation fail");

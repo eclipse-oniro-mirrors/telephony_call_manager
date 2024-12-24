@@ -104,6 +104,8 @@ int32_t CallStatusCallbackProxy::UpdateCallsReportInfo(const CallsReportInfo &in
             dataParcel.WriteInt32(it.voipCallInfo.uid);
             dataParcel.WriteUInt8Vector(it.voipCallInfo.userProfile);
         }
+        dataParcel.WriteString(it.name);
+        dataParcel.WriteInt32(it.namePresentation);
     }
     dataParcel.WriteInt32(info.slotId);
     if (Remote() == nullptr) {

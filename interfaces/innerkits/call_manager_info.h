@@ -195,6 +195,18 @@ struct CallReportInfo {
      * Call state between with holdRequest and holdResponse
      */
     bool isPendingHold = false;
+    /**
+     * Identifies the CNAP display name;
+     * - 0：Allowed
+     * - 1：Restricted
+     * - 2：Not Specified/Unknown
+     * - 3：Payphone
+     */
+    int32_t namePresentation = 0;
+    /**
+     * Indicates remote party name.
+     */
+    std::string name = "";
 };
 
 /**
@@ -324,6 +336,18 @@ struct CallAttributeInfo {
      * Indicates the type of dial call from phone or watch.
      */
     int32_t phoneOrWatch = 0;
+    /**
+     * Identifies the CNAP display name;
+     * - 0：Allowed
+     * - 1：Restricted
+     * - 2：Not Specified/Unknown
+     * - 3：Payphone
+     */
+    int32_t namePresentation = 0;
+    /**
+     * Indicates remote party name.
+     */
+    std::string name = "";
 };
 
 /**
@@ -416,6 +440,18 @@ struct CallRecordInfo {
      * Indicates the details of call detect result.
      */
     char detectDetails[kMaxNumberLen + 1] = { 0 };
+    /**
+     * Indicates remote party name.
+     */
+    std::string name = "";
+    /**
+     * Identifies the CNAP display name;
+     * - 0：Allowed
+     * - 1：Restricted
+     * - 2：Not Specified/Unknown
+     * - 3：Payphone
+     */
+    int32_t namePresentation = 0;
 
     CallRecordInfo() {}
 
@@ -459,6 +495,8 @@ struct CallRecordInfo {
         celiaCallType = temp.celiaCallType;
         std::copy(std::begin(temp.detectDetails), std::end(temp.detectDetails),
             std::begin(detectDetails));
+        namePresentation = temp.namePresentation;
+        name = temp.name;
         return *this;
     }
 };
@@ -517,6 +555,21 @@ struct CallDetailInfo {
      * Indicates the VoIP call specific information
      */
     VoipCallReportInfo voipCallInfo;
+    /**
+     * Indicates remote party name.
+     */
+    std::string name = "";
+    /**
+     * Identifies the CNAP display name;
+     * - 0：Allowed
+     * - 1：Restricted
+     * - 2：Not Specified/Unknown
+     * - 3：Payphone
+     */
+    int32_t namePresentation = 0;
+
+
+    int32_t phoneOrWatch = 0;
 
     int32_t phoneOrWatch = 0;
 
@@ -553,6 +606,8 @@ struct CallDetailInfo {
         voipCallInfo.hasMicPermission = temp.voipCallInfo.hasMicPermission;
         voipCallInfo.isCapsuleSticky = temp.voipCallInfo.isCapsuleSticky;
         voipCallInfo.uid = temp.voipCallInfo.uid;
+        name = temp.name;
+        namePresentation = temp.namePresentation;
         phoneOrWatch = temp.phoneOrWatch;
         return *this;
     }

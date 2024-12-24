@@ -77,6 +77,8 @@ void ReportCallInfoHandler::BuildCallDetailsInfo(CallDetailsInfo &info, CallDeta
         callDetailInfo.originalCallType = (*iter).originalCallType;
         (void)memcpy_s(callDetailInfo.phoneNum, kMaxNumberLen, (*iter).phoneNum, kMaxNumberLen);
         (void)memcpy_s(callDetailInfo.bundleName, kMaxBundleNameLen, (*iter).bundleName, kMaxBundleNameLen);
+        callDetailInfo.name = (*iter).name;
+        callDetailInfo.namePresentation = (*iter).namePresentation;
         callDetailsInfo.callVec.push_back(callDetailInfo);
     }
 }

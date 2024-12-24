@@ -112,6 +112,12 @@ void CallRecordsManager::CallStateUpdated(
     }
     (void)memset_s(&info, sizeof(CallAttributeInfo), 0, sizeof(CallAttributeInfo));
     callObjectPtr->GetCallAttributeBaseInfo(info);
+    Contact contactInfo = callObjectPtr->GetCallerInfo();
+    if (contactInfo.name.empty() && !info.name.empty()) {
+        info.namePresentation = 1;
+    } else {
+        info.namePresentation = 0;
+    }
     AddOneCallRecord(info);
 }
 
@@ -255,6 +261,8 @@ void CallRecordsManager::CopyCallInfoToRecord(CallAttributeInfo &info, CallRecor
     data.numberMarkInfo = info.numberMarkInfo;
     data.blockReason = info.blockReason;
     data.celiaCallType = info.celiaCallType;
+    data.name = info.name;
+    data.namePresentation = info.namePresentation;
 }
 
 int32_t CallRecordsManager::RemoveMissedIncomingCallNotification()

@@ -217,6 +217,8 @@ void CallStatusCallbackStub::BuildCallReportInfo(MessageParcel &data, CallReport
         data.ReadUInt8Vector(&userProfile);
         (parcelPtr.voipCallInfo.userProfile).assign(userProfile.begin(), userProfile.end());
     }
+    parcelPtr.name = data.ReadString();
+    parcelPtr.namePresentation = data.ReadInt32();
 }
 
 int32_t CallStatusCallbackStub::OnUpdateDisconnectedCause(MessageParcel &data, MessageParcel &reply)
