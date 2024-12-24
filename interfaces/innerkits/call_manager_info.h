@@ -568,9 +568,6 @@ struct CallDetailInfo {
      */
     int32_t namePresentation = 0;
 
-
-    int32_t phoneOrWatch = 0;
-
     int32_t phoneOrWatch = 0;
 
     CallDetailInfo() {}
