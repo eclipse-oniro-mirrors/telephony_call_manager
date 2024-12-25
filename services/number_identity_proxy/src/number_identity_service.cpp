@@ -75,6 +75,11 @@ void NumberIdentityConnection::OnAbilityDisconnectDone(const AppExecFwk::Element
     lock_guard lock(remoteProxyMutex_);
     TELEPHONY_LOGI("NumberIdentityService disconnect done.");
     remoteObject_ = nullptr;
+    if (disconnectedCallback_ == nullptr) {
+        TELEPHONY_LOGE("disconnectedCallback_ is nullptr.");
+        return;
+    }
+    ffrt::submit(disconnectedCallback_, task_attr().qos(qos_default::qos_background));
 }
 
 bool NumberIdentityConnection::IsAlive()
