@@ -23,6 +23,8 @@
 #include "system_ability_definition.h"
 #include "call_control_manager.h"
 #include "audio_proxy.h"
+#include "call_manager_base.h"
+#include "ims_conference.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -170,8 +172,13 @@ void CallWiredHeadSet::DealKeyMuteShortPressed()
         }
     } else {
         TELEPHONY_LOGI("DealKeyMuteShortPressed AnswerCall callid(%{public}d)", ringingCall->GetCallID());
-        int32_t videoState = static_cast<int32_t>(ringingCall->GetVideoStateType());
-        DelayedSingleton<CallControlManager>::GetInstance()->AnswerCall(ringingCall->GetCallID(), videoState);
+        VideoStateType videoState = ringingCall->GetVideoStateType();
+        if (videoState != VideoStateType::TYPE_VOICE && videoState != VideoStateType::TYPE_VIDEO) {
+            TELEPHONY_LOGI("DealKeyMuteShortPressed get original call type");
+            videoState = static_cast<VideoStateType>(ringingCall->GetOriginalCallType());
+        }
+        DelayedSingleton<CallControlManager>::GetInstance()->AnswerCall(
+            ringingCall->GetCallID(), static_cast<int32_t>(videoState));
     }
 }
 
@@ -185,8 +192,15 @@ void CallWiredHeadSet::DealKeyMuteLongPressed()
     } else {
         sptr<CallBase> foregroundCall = CallObjectManager::GetForegroundCall();
         if (foregroundCall != nullptr) {
-            TELEPHONY_LOGI("DealKeyMuteLongPressed HangUpCall callid(%{public}d)", foregroundCall->GetCallID());
-            foregroundCall->HangUpCall();
+            TelConferenceState confState = foregroundCall->GetTelConferenceState();
+            if (confState != TelConferenceState::TEL_CONFERENCE_IDLE) {
+                int32_t conferenceId = DelayedSingleton<ImsConference>::GetInstance()->GetMainCall();
+                TELEPHONY_LOGI("DealKeyMuteLongPressed HangUpCall conferenceId(%{public}d)", conferenceId);
+                DelayedSingleton<CallControlManager>::GetInstance()->HangUpCall(conferenceId);
+            } else {
+                TELEPHONY_LOGI("DealKeyMuteLongPressed HangUpCall callid(%{public}d)", foregroundCall->GetCallID());
+                foregroundCall->HangUpCall();
+            }
         }
     }
 }
