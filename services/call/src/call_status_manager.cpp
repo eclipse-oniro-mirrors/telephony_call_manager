@@ -1640,7 +1640,7 @@ void CallStatusManager::PackParaInfo(
     }
     namePresentation = value ? info.namePresentation : PRESENTATION_RESTRICTED;
     paraInfo.extraParams.SetParam("namePresentation", AAFwk::Integer::Box(namePresentation));
-    paraInfo.extraParams.SetParam("name", AAFwk::Integer::Box(namePresentation == 0 ? info.name : ""));
+    paraInfo.extraParams.SetParam("name", AAFwk::String::Box(namePresentation == 0 ? info.name : ""));
     paraInfo.phoneOrWatch = info.phoneOrWatch;
 }
 
