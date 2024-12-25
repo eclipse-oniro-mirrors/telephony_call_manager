@@ -112,7 +112,7 @@ void CallRecordsManager::CallStateUpdated(
     }
     (void)memset_s(&info, sizeof(CallAttributeInfo), 0, sizeof(CallAttributeInfo));
     callObjectPtr->GetCallAttributeBaseInfo(info);
-    Contact contactInfo = callObjectPtr->GetCallerInfo();
+    ContactInfo contactInfo = callObjectPtr->GetCallerInfo();
     if (contactInfo.name.empty() && !info.name.empty()) {
         info.namePresentation = 1;
     } else {
