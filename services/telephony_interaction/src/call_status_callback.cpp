@@ -99,6 +99,8 @@ int32_t CallStatusCallback::UpdateCallsReportInfo(const CallsReportInfo &info)
         detailInfo.originalCallType = (*it).originalCallType;
         (void)memcpy_s(detailInfo.phoneNum, kMaxNumberLen, (*it).accountNum, kMaxNumberLen);
         (void)memset_s(detailInfo.bundleName, kMaxBundleNameLen, 0, kMaxBundleNameLen);
+        detailInfo.name = (*it).name;
+        detailInfo.namePresentation = (*it).namePresentation;
         detailsInfo.callVec.push_back(detailInfo);
     }
     detailsInfo.slotId = callsInfo.slotId;

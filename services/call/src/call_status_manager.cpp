@@ -56,6 +56,7 @@
 namespace OHOS {
 namespace Telephony {
 constexpr int32_t INIT_INDEX = 0;
+constexpr int32_t PRESENTATION_RESTRICTED = 3;
 CallStatusManager::CallStatusManager()
 {
     (void)memset_s(&callReportInfo_, sizeof(CallDetailInfo), 0, sizeof(CallDetailInfo));
@@ -1630,6 +1631,16 @@ void CallStatusManager::PackParaInfo(
     paraInfo.originalCallType = info.originalCallType;
     paraInfo.extraParams =
         AAFwk::WantParamWrapper::ParseWantParamsWithBrackets(extras.GetStringValue("extraParams"));
+    bool value = false;
+    int32_t namePresentation;
+    OperatorConfig config;
+    CoreServiceClient::GetInstance().GetOperatorConfigs(info.accountId, config);
+    if (config.boolValue.find("support_cnap_bool") != config.boolValue.end()) {
+        value = config.boolValue["support_cnap_bool"];
+    }
+    namePresentation = value ? info.namePresentation : PRESENTATION_RESTRICTED;
+    paraInfo.extraParams.SetParam("namePresentation", AAFwk::Integer::Box(namePresentation));
+    paraInfo.extraParams.SetParam("name", AAFwk::String::Box(namePresentation == 0 ? info.name : ""));
     paraInfo.phoneOrWatch = info.phoneOrWatch;
 }
 

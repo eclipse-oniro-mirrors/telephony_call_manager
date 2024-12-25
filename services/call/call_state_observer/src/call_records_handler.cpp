@@ -41,6 +41,8 @@ int32_t CallRecordsHandler::AddCallLogInfo(const CallRecordInfo &info)
     std::string displayName = "";
     if (info.numberMarkInfo.markType == MarkType::MARK_TYPE_YELLOW_PAGE && !info.numberMarkInfo.isCloud) {
         displayName = std::string(info.numberMarkInfo.markContent);
+    } else {
+        displayName = info.name;
     }
 
     DataShare::DataShareValuesBucket bucket;
@@ -93,6 +95,7 @@ void CallRecordsHandler::MakeCallLogInsertBucket(DataShare::DataShareValuesBucke
     bucket.Put(CALL_PHOTO_ID, 0);
     bucket.Put(CALL_SLOT_ID, info.slotId);
     bucket.Put(CALL_FEATURES, info.features);
+    bucket.Put(CALL_IS_CNAP, info.namePresentation);
 }
 
 std::string CallRecordsHandler::CheckNumberLocationInfo(const CallRecordInfo &info)
