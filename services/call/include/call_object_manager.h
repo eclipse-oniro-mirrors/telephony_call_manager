@@ -73,6 +73,7 @@ public:
     static std::vector<CallAttributeInfo> GetCallInfoList(int32_t slotId);
     static sptr<CallBase> GetForegroundCall(bool isIncludeVoipCall = true);
     static sptr<CallBase> GetForegroundLiveCall(bool isIncludeVoipCall = true);
+    static sptr<CallBase> GetIncomingCall(bool isIncludeVoipCall = true);
     static sptr<CallBase> GetAudioLiveCall();
     static std::vector<CallAttributeInfo> GetAllCallInfoList();
     int32_t DealFailDial(sptr<CallBase> call);
