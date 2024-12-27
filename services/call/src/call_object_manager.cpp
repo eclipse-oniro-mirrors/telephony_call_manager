@@ -779,11 +779,31 @@ sptr<CallBase> CallObjectManager::GetForegroundLiveCall(bool isIncludeVoipCall)
     return liveCall;
 }
 
+sptr<CallBase> CallObjectManager::GetIncomingCall(bool isIncludeVoipCall)
+{
+    std::lock_guard<std::mutex> lock(listMutex_);
+    sptr<CallBase> call = nullptr;
+    for (std::list<sptr<CallBase>>::iterator it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
+        if (!isIncludeVoipCall && (*it)->GetCallType() == CallType::TYPE_VOIP) {
+            continue;
+        }
+        TelCallState callState = (*it)->GetTelCallState();
+        if (callState == TelCallState::CALL_STATUS_INCOMING || callState == TelCallState::CALL_STATUS_WAITING) {
+            call = (*it);
+            break;
+        }
+    }
+    return call;
+}
+
 sptr<CallBase> CallObjectManager::GetAudioLiveCall()
 {
     sptr<CallBase> call = GetForegroundLiveCall(false);
     if (call == nullptr) {
         call = GetForegroundLiveCall();
+    }
+    if (call == nullptr) {
+        call = GetIncomingCall(false);
     }
     return call;
 }
