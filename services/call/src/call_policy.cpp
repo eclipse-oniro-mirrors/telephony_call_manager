@@ -156,7 +156,7 @@ bool CallPolicy::IsCtSimCardSwitchToChnOrMc(int32_t slotId)
     DelayedRefSingleton<CoreServiceClient>::GetInstance().GetSimOperatorNumeric(slotId, hplmn);
     std::string simOperator =
         std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t>{}.to_bytes(hplmn);
-    TELEPHONY_LOGI("regPlmn = %{piblic}s, simOperator = %{piblic}s", regPlmn.c_str(), simOperator.c_str());
+    TELEPHONY_LOGI("regPlmn = %{public}s, simOperator = %{public}s", regPlmn.c_str(), simOperator.c_str());
     if (regPlmn.empty() || simOperator.empty() || regPlmn.length() < MCC_LEN || simOperator.length() < MCC_LEN) {
         return false;
     }
