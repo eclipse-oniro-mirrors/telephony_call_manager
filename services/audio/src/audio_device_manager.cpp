@@ -551,9 +551,7 @@ std::string AudioDeviceManager::ConvertAddress()
             return (addr.substr(0, ADDR_HEAD_VALID_LEN) + ":*:*:*:" +
                 addr.substr(addr.length() - ADDR_TAIL_VALID_LEN));
         }
-    } else if (info_.currentAudioDevice.deviceType == AudioDeviceType::DEVICE_DISTRIBUTED_AUTOMOTIVE||
-               info_.currentAudioDevice.deviceType == AudioDeviceType::DEVICE_DISTRIBUTED_PHONE||
-               info_.currentAudioDevice.deviceType == AudioDeviceType::DEVICE_DISTRIBUTED_PAD) {
+    } else {
         addr = "";
     }
     return addr;
