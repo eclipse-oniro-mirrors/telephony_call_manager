@@ -16,10 +16,27 @@
 #ifndef TELEPHONY_DISTRIBUTED_COMMUNICATION_SOURCE_SWITCH_CONTROLLER_H
 #define TELEPHONY_DISTRIBUTED_COMMUNICATION_SOURCE_SWITCH_CONTROLLER_H
 
+#ifdef ABILITY_BLUETOOTH_SUPPORT
+#include "bluetooth_hfp_ag.h"
+#endif
+
 #include "distributed_device_switch_controller.h"
 
 namespace OHOS {
 namespace Telephony {
+#ifdef ABILITY_BLUETOOTH_SUPPORT
+class DcCallSourceHfpListener : public Bluetooth::HandsFreeAudioGatewayObserver {
+public:
+    DcCallSourceHfpListener() = default;
+    ~DcCallSourceHfpListener() override = default;
+    void OnHfpStackChanged(const Bluetooth::BluetoothRemoteDevice &device, int32_t action) override;
+
+private:
+    BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(DcCallSourceHfpListener);
+    bool IsNeedSwitchToSource(const Bluetooth::BluetoothRemoteDevice &device, int32_t action);
+};
+#endif
+
 class DistributedSourceSwitchController : public DistributedDeviceSwitchController {
 public:
     DistributedSourceSwitchController() = default;
@@ -34,6 +51,11 @@ public:
 
 private:
     std::string GetDevAddress(const std::string &devId, const std::string &devName);
+
+private:
+#ifdef ABILITY_BLUETOOTH_SUPPORT
+    std::shared_ptr<DcCallSourceHfpListener> hfpListener_{nullptr};
+#endif
 };
 } // namespace Telephony
 } // namespace OHOS

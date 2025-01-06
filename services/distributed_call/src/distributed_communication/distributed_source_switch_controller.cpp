@@ -15,6 +15,9 @@
 
 #include "distributed_source_switch_controller.h"
 #include "cJSON.h"
+#ifdef ABILITY_BLUETOOTH_SUPPORT
+#include "bluetooth_device.h"
+#endif
 #include "audio_proxy.h"
 #include "telephony_errors.h"
 #include "audio_device_manager.h"
@@ -31,6 +34,14 @@ void DistributedSourceSwitchController::OnDeviceOnline(const std::string &devId,
         std::string address = GetDevAddress(devId, devName);
         audioDeviceManager->AddAudioDeviceList(address, devType, devName);
     }
+
+#ifdef ABILITY_BLUETOOTH_SUPPORT
+    std::lock_guard<ffrt::mutex> lock(mutex_);
+    if (hfpListener_ == nullptr) {
+        hfpListener_ = std::make_shared<DcCallSourceHfpListener>();
+        Bluetooth::HandsFreeAudioGateway::GetProfile()->RegisterObserver(hfpListener_);
+    }
+#endif
 }
 
 void DistributedSourceSwitchController::OnDeviceOffline(const std::string &devId, const std::string &devName,
@@ -42,6 +53,14 @@ void DistributedSourceSwitchController::OnDeviceOffline(const std::string &devId
         audioDeviceManager->RemoveAudioDeviceList(address, devType);
         audioDeviceManager->InitAudioDevice();
     }
+
+#ifdef ABILITY_BLUETOOTH_SUPPORT
+    std::lock_guard<ffrt::mutex> lock(mutex_);
+    if (hfpListener_ != nullptr) {
+        Bluetooth::HandsFreeAudioGateway::GetProfile()->DeregisterObserver(hfpListener_);
+        hfpListener_ = nullptr;
+    }
+#endif
 }
 
 void DistributedSourceSwitchController::OnDistributedAudioDeviceChange(const std::string &devId,
@@ -55,6 +74,11 @@ void DistributedSourceSwitchController::OnDistributedAudioDeviceChange(const std
     auto audioDeviceManager = DelayedSingleton<AudioDeviceManager>::GetInstance();
     if (audioDeviceManager != nullptr) {
         if (devRole == static_cast<int32_t>(DistributedRole::SINK)) {
+            if (AudioStandard::AudioSystemManager::GetInstance()->IsDeviceActive(
+                    AudioStandard::DeviceType::DEVICE_TYPE_BLUETOOTH_SCO)) { // deactive bt if switch from bt to sink
+                AudioStandard::AudioSystemManager::GetInstance()->SetDeviceActive(
+                    AudioStandard::DeviceType::DEVICE_TYPE_BLUETOOTH_SCO, false);
+            }
             std::string address = GetDevAddress(devId, devName);
             AudioDevice targetDevice = {
                 .deviceType = devType,
@@ -87,6 +111,12 @@ void DistributedSourceSwitchController::OnRemoveSystemAbility()
 
     std::lock_guard<ffrt::mutex> lock(mutex_);
     isAudioOnSink_ = false;
+#ifdef ABILITY_BLUETOOTH_SUPPORT
+    if (hfpListener_ != nullptr) {
+        Bluetooth::HandsFreeAudioGateway::GetProfile()->DeregisterObserver(hfpListener_);
+        hfpListener_ = nullptr;
+    }
+#endif
 }
 
 bool DistributedSourceSwitchController::SwitchDevice(const std::string &devId, int32_t direction)
@@ -127,6 +157,38 @@ std::string DistributedSourceSwitchController::GetDevAddress(const std::string &
     cJSON_Delete(root);
     return address;
 }
+
+#ifdef ABILITY_BLUETOOTH_SUPPORT
+void DcCallSourceHfpListener::OnHfpStackChanged(const Bluetooth::BluetoothRemoteDevice &device, int32_t action)
+{
+    TELEPHONY_LOGI("source hfp stack changed, action[%{public}d]", action);
+    if (IsNeedSwitchToSource(device, action)) {
+        (void)DelayedSingleton<DistributedCommunicationManager>::GetInstance()->SwitchToSourceDevice();
+    }
+}
+
+bool DcCallSourceHfpListener::IsNeedSwitchToSource(const Bluetooth::BluetoothRemoteDevice &device, int32_t action)
+{
+    if (!DelayedSingleton<DistributedCommunicationManager>::GetInstance()->IsAudioOnSink()) {
+        return false;
+    }
+    int32_t cod = DEFAULT_HFP_FLAG_VALUE;
+    int32_t majorClass = DEFAULT_HFP_FLAG_VALUE;
+    int32_t majorMinorClass = DEFAULT_HFP_FLAG_VALUE;
+    device.GetDeviceProductType(cod, majorClass, majorMinorClass);
+    TELEPHONY_LOGI("device major %{public}d, minor %{public}d", majorClass, majorMinorClass);
+    if (action == WEAR_ACTION && majorClass == Bluetooth::BluetoothDevice::MAJOR_AUDIO_VIDEO &&
+        (majorMinorClass == Bluetooth::BluetoothDevice::AUDIO_VIDEO_HEADPHONES ||
+        majorMinorClass == Bluetooth::BluetoothDevice::AUDIO_VIDEO_WEARABLE_HEADSET)) {
+        return true;
+    }
+    if (action == USER_SELECTION_ACTION && majorClass == Bluetooth::BluetoothDevice::MAJOR_WEARABLE &&
+        majorMinorClass == Bluetooth::BluetoothDevice::WEARABLE_WRIST_WATCH) {
+        return true;
+    }
+    return false;
+}
+#endif
 
 } // namespace Telephony
 } // namespace OHOS
