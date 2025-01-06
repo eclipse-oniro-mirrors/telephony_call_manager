@@ -257,7 +257,7 @@ int32_t CallControlManager::AnswerCall(int32_t callId, int32_t videoState)
     TELEPHONY_LOGI("report answered state");
     NotifyCallStateUpdated(call, TelCallState::CALL_STATUS_INCOMING, TelCallState::CALL_STATUS_ANSWERED);
     CarrierAndVoipConflictProcess(callId, TelCallState::CALL_STATUS_ANSWERED);
-    if (VoIPCallState_ != CallStateToApp::CALL_STATE_IDLE) {
+    if (VoIPCallState_ != CallStateToApp::CALL_STATE_IDLE && call->GetCallType() != CallType::TYPE_VOIP) {
         TELEPHONY_LOGW("VoIP call is active, waiting for VoIP to disconnect");
         AnsweredCallQueue_.hasCall = true;
         AnsweredCallQueue_.callId = callId;
