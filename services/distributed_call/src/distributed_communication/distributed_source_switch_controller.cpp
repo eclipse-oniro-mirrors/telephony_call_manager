@@ -75,7 +75,7 @@ void DistributedSourceSwitchController::OnDistributedAudioDeviceChange(const std
     if (audioDeviceManager != nullptr) {
         if (devRole == static_cast<int32_t>(DistributedRole::SINK)) {
             if (AudioStandard::AudioSystemManager::GetInstance()->IsDeviceActive(
-                    AudioStandard::DeviceType::DEVICE_TYPE_BLUETOOTH_SCO)) { // deactive bt if switch from bt to sink
+                AudioStandard::DeviceType::DEVICE_TYPE_BLUETOOTH_SCO)) { // deactive bt if switch from bt to sink
                 AudioStandard::AudioSystemManager::GetInstance()->SetDeviceActive(
                     AudioStandard::DeviceType::DEVICE_TYPE_BLUETOOTH_SCO, false);
             }
