@@ -97,7 +97,7 @@ int32_t SpamCallProxy::DetectNeedNotify(const int32_t &slotId, std::shared_ptr<S
     MessageOption option;
     int32_t ret = remote->SendRequest(COMMAND_DETECT_NEED_NOTIFY, dataParcel, replyParcel, option);
     if (ret != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("DetectSpamCall:%{public}d errCode:%{public}d", COMMAND_DETECT_NEED_NOTIFY, ret);
+        TELEPHONY_LOGE("DetectNeedNotify:%{public}d errCode:%{public}d", COMMAND_DETECT_NEED_NOTIFY, ret);
         return ret;
     }
     return replyParcel.ReadInt32();

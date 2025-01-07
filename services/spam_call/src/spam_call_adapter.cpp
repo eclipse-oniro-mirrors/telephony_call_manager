@@ -173,7 +173,7 @@ void SpamCallAdapter::ParseNeedNotifyResult(const std::string &jsonData)
         eventData.SetCode(INCOMING_CALL_MISSED_CODE);
         OHOS::EventFwk::CommonEventPublishInfo publishInfo;
         publishInfo.SetOrdered(true);
-        EventFwk::CommonEventManager::PublishCommonEvent(eventData, publishInfo, nullptr);
+        OHOS::EventFwk::CommonEventManager::PublishCommonEvent(eventData, publishInfo, nullptr);
     }
 }
 
