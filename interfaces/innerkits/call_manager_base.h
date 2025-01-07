@@ -435,6 +435,10 @@ enum class CallAnswerType {
      * Indicates the call answer is call blocked.
      */
     CALL_ANSWER_BLOCKED = 6,
+    /**
+     * Indicates the call is answered elsewhere.
+     */
+    CALL_ANSWERED_ELSEWHER = 7,
 };
 
 /**

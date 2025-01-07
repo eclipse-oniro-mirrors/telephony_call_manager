@@ -101,6 +101,7 @@ int32_t CallStatusCallback::UpdateCallsReportInfo(const CallsReportInfo &info)
         (void)memset_s(detailInfo.bundleName, kMaxBundleNameLen, 0, kMaxBundleNameLen);
         detailInfo.name = (*it).name;
         detailInfo.namePresentation = (*it).namePresentation;
+        detailInfo.reason = (*it).reason;
         detailsInfo.callVec.push_back(detailInfo);
     }
     detailsInfo.slotId = callsInfo.slotId;

@@ -17,6 +17,7 @@
 #define CALL_MANAGER_INFO_H
 
 #include "call_manager_base.h"
+#include "call_manager_disconnected_details.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -207,6 +208,10 @@ struct CallReportInfo {
      * Indicates remote party name.
      */
     std::string name = "";
+    /**
+     * Indicates the call disconnect information
+    */
+    DisconnectedReason reason = DisconnectedReason::FAILED_UNKNOWN;
 };
 
 /**
@@ -569,6 +574,10 @@ struct CallDetailInfo {
     int32_t namePresentation = 0;
 
     int32_t phoneOrWatch = 0;
+    /**
+     * Indicates the disconnect reason.
+    */
+    DisconnectedReason reason = DisconnectedReason::FAILED_UNKNOWN;
 
     CallDetailInfo() {}
 
@@ -606,6 +615,7 @@ struct CallDetailInfo {
         name = temp.name;
         namePresentation = temp.namePresentation;
         phoneOrWatch = temp.phoneOrWatch;
+        reason = temp.reason;
         return *this;
     }
 };

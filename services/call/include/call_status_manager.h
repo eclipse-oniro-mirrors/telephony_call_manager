@@ -120,7 +120,7 @@ private:
     void BtCallDialingHandleFirst(sptr<CallBase> call, const CallDetailInfo &infol);
     int32_t HandleCallReportInfoEx(const CallDetailInfo &info);
     void ClearPendingState(sptr<CallBase> &call);
-
+    void RefreshCallDisconnectReason(const sptr<CallBase> &call, int32_t reason);
 private:
     CallDetailInfo callReportInfo_;
     CallDetailsInfo callDetailsInfo_[SLOT_NUM];

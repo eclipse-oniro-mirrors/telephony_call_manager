@@ -363,9 +363,25 @@ enum class DisconnectedReason : int32_t {
  */
 enum class RilDisconnectedReason : int32_t {
     /**
+     * Indicates the invalid reason
+     */
+    DISCONNECTED_REASON_INVALID = -1,
+    /**
      * Indicates the call disconnect due to normal of ril.
      */
     DISCONNECTED_REASON_NORMAL = 0,
+    /**
+     * Indicates the call disconnect due to user reject.
+     */
+    DISCONNECTED_REASON_USER_DECLINE = 143,
+    /**
+     * Indicates the call disconnect due to usr hangup.
+     */
+    DISCONNECTED_REASON_USER_TERMINATED = 501,
+    /**
+     * Indicates the call is answered elsewhere.
+     */
+    DISCONNECTED_REASON_ANSWERED_ELSEWHER = 18632,
 };
 
 /**

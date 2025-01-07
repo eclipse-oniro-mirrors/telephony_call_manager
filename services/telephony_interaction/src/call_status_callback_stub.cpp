@@ -219,6 +219,11 @@ void CallStatusCallbackStub::BuildCallReportInfo(MessageParcel &data, CallReport
     }
     parcelPtr.name = data.ReadString();
     parcelPtr.namePresentation = data.ReadInt32();
+    int32_t reason = static_cast<int32_t>(DisconnectedReason::FAILED_UNKNOWN);
+    // only OnUpdateCallsReportInfo() func can read reason, OnUpdateCallReportInfo() func can not read reason
+    if (data.ReadInt32(reason)) {
+        parcelPtr.reason = static_cast<DisconnectedReason>(reason);
+    }
 }
 
 int32_t CallStatusCallbackStub::OnUpdateDisconnectedCause(MessageParcel &data, MessageParcel &reply)
