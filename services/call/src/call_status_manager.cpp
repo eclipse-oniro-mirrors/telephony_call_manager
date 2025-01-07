@@ -52,6 +52,7 @@
 #include "bool_wrapper.h"
 #include "bluetooth_call.h"
 #include "bluetooth_call_connection.h"
+#include "antifraud_service.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -83,6 +84,8 @@ int32_t CallStatusManager::Init()
     mOttEventIdTransferMap_.clear();
     InitCallBaseEvent();
     CallIncomingFilterManagerPtr_ = (std::make_unique<CallIncomingFilterManager>()).release();
+    std::shared_ptr<CallStatusManager> sharedPtr(this);
+    DelayedSingleton<AntiFraudService>::GetInstance()->SetCallStatusManager(sharedPtr);
     return TELEPHONY_SUCCESS;
 }
 
@@ -767,7 +770,82 @@ int32_t CallStatusManager::ActiveHandle(const CallDetailInfo &info)
     DelayedSingleton<AudioControlManager>::GetInstance()->SetVolumeAudible();
 #endif
     TELEPHONY_LOGI("handle active state success");
+
+    bool isAntiFraudSupport = OHOS::system::GetBoolParameter(ANTIFRAUD_FEATRUE, false);
+    if (isAntiFraudSupport) {
+        SetupAntiFraudService(call, info);
+    }
     return ret;
+}
+
+void CallStatusManager::SetupAntiFraudService(const sptr<CallBase> &call, const CallDetailInfo &info)
+{
+    auto antiFraudService = DelayedSingleton<AntiFraudService>::GetInstance();
+    NumberMarkInfo numberMarkInfo = call->GetNumberMarkInfo();
+    std::string tmpStr(info.phoneNum);
+    if (numberMarkInfo.markType != MarkType::MARK_TYPE_FRAUD &&
+        !IsContactPhoneNum(tmpStr) && antiFraudService->IsAntiFraudSwitchOn()) {
+        int32_t slotId = call->GetSlotId();
+        if (slotId == -1) {
+            return;
+        }
+        if (antiFraudSlotId_ != -1 || antiFraudIndex_ != -1) {
+            return;
+        }
+        antiFraudSlotId_ = slotId;
+        antiFraudIndex_ = info.index;
+        antiFraudService->InitAntiFraudService();
+    }
+}
+
+bool CallStatusManager::IsContactPhoneNum(const std::string &phoneNum) {
+    ContactInfo contactInfo = {
+        .name = "",
+        .number = phoneNum,
+        .isContacterExists = false,
+        .ringtonePath = "",
+        .isSendToVoicemail = false,
+        .isEcc = false,
+        .isVoiceMail = false,
+        .isQueryComplete = true,
+    };
+    QueryCallerInfo(contactInfo, phoneNum);
+    if (contactInfo.name.length() < 1) {
+        TELEPHONY_LOGI("no corresponding contact found");
+        return false;
+    }
+    else {
+        return true;
+    }
+}
+
+void CallStatusManager::TriggerAntiFraud(int32_t antiFraudState)
+{
+    TELEPHONY_LOGI("TriggerAntiState, antiFraudState = %{public}d", antiFraudState);
+    sptr<CallBase> call = nullptr;
+    for (auto &it : callDetailsInfo_[antiFraudSlotId_].callVec) {
+        if (it.index == antiFraudIndex_) {
+            it.antiFraudState = antiFraudState;
+            call = GetOneCallObjectByIndexSlotIdAndCallType(it.index, it.accountId, it.callType);
+            break;
+        }
+    }
+
+    if (call == nullptr) {
+        return;
+    }
+    if (antiFraudState != static_cast<int32_t>(AntiFraudService::ANTIFRAUD_STATE_DEFAULT)) {
+        AAFwk::WantParams extraParams;
+        extraParams.SetParam("antiFraudState", AAFwk::Integer::Box(antiFraudState));
+        call->SetExtraParams(extraParams);
+    }
+
+    if (call->GetTelCallState() == TelCallState::CALL_STATUS_ACTIVE) {
+        int32_t ret = UpdateCallState(call, TelCallState::CALL_STATUS_ACTIVE);
+        if (ret != TELEPHONY_SUCCESS) {
+            TELEPHONY_LOGE("UpdateCallState failed, errCode:%{public}d", ret);
+        }
+    }
 }
 
 void CallStatusManager::SetConferenceCall(std::vector<sptr<CallBase>> conferenceCallList)

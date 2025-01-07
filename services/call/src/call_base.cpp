@@ -27,6 +27,7 @@
 #include "voip_call.h"
 #include "voip_call_connection.h"
 #include "call_manager_info.h"
+#include "antifraud_service.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -171,6 +172,7 @@ void CallBase::GetCallAttributeBaseInfo(CallAttributeInfo &info)
         AAFwk::WantParams object = AAFwk::WantParamWrapper::ParseWantParamsWithBrackets(info.extraParamsString);
         info.name = object.GetStringParam("name");
         info.namePresentation = object.GetIntParam("namePresentation", 0);
+        info.antiFraudState = object.GetIntParam("antiFraudState", 0);
         info.phoneOrWatch = phoneOrWatch_;
         if (memset_s(info.numberLocation, kMaxNumberLen, 0, kMaxNumberLen) != EOK) {
             TELEPHONY_LOGE("memset_s numberLocation fail");
@@ -184,6 +186,10 @@ void CallBase::GetCallAttributeBaseInfo(CallAttributeInfo &info)
             TELEPHONY_LOGE("memcpy_s contact name fail");
         }
         info.numberMarkInfo = numberMarkInfo_;
+        if (info.antiFraudState == static_cast<int32_t>(AntiFraudState::ANTIFRAUD_STATE_RISK)) {
+            info.numberMarkInfo.markType = MarkType::MARK_TYPE_FRAUD_RISK;
+            TELEPHONY_LOGI("mark fraud risk success");
+        }
         info.blockReason = blockReason_;
         if (bundleName_.length() > static_cast<size_t>(kMaxBundleNameLen)) {
             TELEPHONY_LOGE("Number out of limit!");

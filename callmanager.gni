@@ -133,6 +133,8 @@ call_manager_sources = [
   "${call_manager_path}/utils/src/call_setting_ability_connection.cpp",
   "${call_manager_path}/utils/src/number_identity_data_base_helper.cpp",
   "${call_manager_path}/utils/src/settings_datashare_helper.cpp",
+  "${call_manager_path}/services/antifraud/antifraud_service.cpp",
+  "${call_manager_path}/services/antifraud/antifraud_adapter.cpp",
 ]
 
 call_manager_include_dirs = [
@@ -158,6 +160,8 @@ call_manager_include_dirs = [
   "${call_manager_path}/services/telephony_interaction/include",
   "${call_manager_path}/services/video/include",
   "${call_manager_path}/utils/include",
+  "${call_manager_path}/services/antifraud",
+  "${call_manager_path}/services/antifraud/antiinclude",
 ]
 
 call_manager_external_deps = [

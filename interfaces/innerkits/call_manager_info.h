@@ -207,6 +207,8 @@ struct CallReportInfo {
      * Indicates remote party name.
      */
     std::string name = "";
+
+    int32_t antiFraudState = 0;
 };
 
 /**
