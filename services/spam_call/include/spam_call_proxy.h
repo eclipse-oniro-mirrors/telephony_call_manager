@@ -32,8 +32,10 @@ public:
     int32_t DetectSpamCall(const std::string &phoneNumber, const int32_t &slotId,
         std::shared_ptr<SpamCallAdapter> spamCallAdapter) override;
 
+    int32_t DetectNeedNotify(const int32_t &slotId, std::shared_ptr<SpamCallAdapter> spamCallAdapter) override;
 private:
     static constexpr int COMMAND_DETECT_SPAM_CALL = 1;
+    static constexpr int COMMAND_DETECT_NEED_NOTIFY = 3;
     std::shared_ptr<SpamCallAdapter> spamCallAdapter_ {nullptr};
 };
 } // namespace Telephony

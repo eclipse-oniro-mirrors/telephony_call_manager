@@ -42,6 +42,7 @@ public:
     bool WaitForDetectResult();
     void ParseDetectResult(const std::string &jsonData, bool &isBlock, NumberMarkInfo &info,
         int32_t &blockReason, std::string &detectDetails);
+    void ParseNeedNotifyResult(const std::string &jsonData);
 
 private:
     bool ConnectSpamCallAbility(const AAFwk::Want &want, const std::string &phoneNumber, const int32_t &slotId);
@@ -49,6 +50,7 @@ private:
     bool JsonGetNumberValue(cJSON *json, const std::string key, int32_t &out);
     bool JsonGetStringValue(cJSON *json, const std::string key, std::string &out);
     bool JsonGetBoolValue(cJSON *json, const std::string key);
+    void ParseMarkResults(NumberMarkInfo &info, cJSON *root, std::string &detectDetails);
     int32_t errCode_ = -1;
     std::string result_ = "";
     std::string phoneNumber_ = "";

@@ -29,6 +29,7 @@ public:
 
     virtual int32_t DetectSpamCall(const std::string &phoneNumber, const int32_t &slotId,
         std::shared_ptr<SpamCallAdapter> spamCallAdapter) = 0;
+    virtual int32_t DetectNeedNotify(const int32_t &slotId, std::shared_ptr<SpamCallAdapter> spamCallAdapter) = 0;
 };
 } // namespace Telephony
 } // namespace OHOS

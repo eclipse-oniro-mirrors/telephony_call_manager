@@ -25,10 +25,15 @@
 #include <securec.h>
 #include "time_wait_helper.h"
 #include "spam_call_connection.h"
+#include "common_event_manager.h"
+#include "common_event_support.h"
 
 namespace OHOS {
 namespace Telephony {
 constexpr int32_t DEFAULT_USER_ID = -1;
+constexpr int16_t INCOMING_CALL_MISSED_CODE = 0;
+constexpr char REMINDER_RESULT[] = "reminderResult";
+constexpr char SLOT_ID[] = "slotId";
 constexpr char DETECT_RESULT[] = "detectResult";
 constexpr char DECISION_REASON[] = "decisionReason";
 constexpr char MARK_TYPE[] = "markType";
@@ -141,6 +146,37 @@ bool SpamCallAdapter::JsonGetBoolValue(cJSON *json, const std::string key)
     return value;
 }
 
+void SpamCallAdapter::ParseNeedNotifyResult(const std::string &jsonData)
+{
+    if (jsonData.empty()) {
+        return;
+    }
+    const char *data = jsonData.c_str();
+    cJSON *root = cJSON_Parse(data);
+    if (root == nullptr) {
+        TELEPHONY_LOGE("ParseNeedNotifyResult failed to parse JSON");
+        return;
+    }
+    int32_t slotId = 0;
+    if (!JsonGetNumberValue(root, SLOT_ID, slotId)) {
+        cJSON_Delete(root);
+        return;
+    }
+    bool result = JsonGetBoolValue(root, REMINDER_RESULT);
+    if (result) {
+        TELEPHONY_LOGI("send notify to contacts");
+        AAFwk::Want want;
+        want.SetParam("slotId", slotId);
+        want.SetAction(OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_INCOMING_CALL_MISSED);
+        OHOS::EventFwk::CommonEventData eventData;
+        eventData.SetWant(want);
+        eventData.SetCode(INCOMING_CALL_MISSED_CODE);
+        OHOS::EventFwk::CommonEventPublishInfo publishInfo;
+        publishInfo.SetOrdered(true);
+        EventFwk::CommonEventManager::PublishCommonEvent(eventData, publishInfo, nullptr);
+    }
+}
+
 void SpamCallAdapter::ParseDetectResult(const std::string &jsonData, bool &isBlock,
     NumberMarkInfo &info, int32_t &blockReason, std::string &detectDetails)
 {
@@ -153,9 +189,7 @@ void SpamCallAdapter::ParseDetectResult(const std::string &jsonData, bool &isBlo
         TELEPHONY_LOGE("ParseDetectResult failed to parse JSON");
         return;
     }
-    cJSON *jsonObj;
     int32_t numberValue = 0;
-    std::string stringValue = "";
     if (!JsonGetNumberValue(root, DETECT_RESULT, numberValue)) {
         cJSON_Delete(root);
         return;
@@ -168,10 +202,22 @@ void SpamCallAdapter::ParseDetectResult(const std::string &jsonData, bool &isBlo
     }
     blockReason = numberValue;
     TELEPHONY_LOGW("DetectSpamCall decisionReason: %{public}d", blockReason);
+    ParseMarkResults(info, root, detectDetails);
+    cJSON_Delete(root);
+}
+
+void SpamCallAdapter::ParseMarkResults(NumberMarkInfo &info, cJSON *root, std::string &detectDetails)
+{
+    int32_t numberValue = 0;
+    std::string stringValue = "";
     if (JsonGetNumberValue(root, MARK_TYPE, numberValue)) {
         info.markType = static_cast<MarkType>(numberValue);
     }
     TELEPHONY_LOGW("DetectSpamCall markType: %{public}d", info.markType);
+    if (info.markType == MarkType::MARK_TYPE_CRANK || info.markType == MarkType::MARK_TYPE_FRAUD ||
+        info.markType == MarkType::MARK_TYPE_PROMOTE_SALES || info.markType == MarkType::MARK_TYPE_HOUSE_AGENT) {
+        connection_->DetectNeedNotify();
+    }
     if (JsonGetNumberValue(root, MARK_COUNT, numberValue)) {
         info.markCount = numberValue;
     }
@@ -190,7 +236,6 @@ void SpamCallAdapter::ParseDetectResult(const std::string &jsonData, bool &isBlo
     }
     JsonGetStringValue(root, DETECT_DETAILS, detectDetails);
     TELEPHONY_LOGW("DetectSpamCall detectDetails length: %{public}zu", detectDetails.length());
-    cJSON_Delete(root);
 }
 
 void SpamCallAdapter::GetDetectResult(int32_t &errCode, std::string &result)

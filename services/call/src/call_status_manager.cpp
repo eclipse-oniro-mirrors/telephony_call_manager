@@ -413,6 +413,7 @@ int32_t CallStatusManager::HandleVoipEventReportInfo(const VoipCallEventInfo &in
 
 int32_t CallStatusManager::IncomingHandle(const CallDetailInfo &info)
 {
+    TELEPHONY_LOGI("handle incoming state");
     detectStartTime = std::chrono::system_clock::from_time_t(0);
     sptr<CallBase> call = GetOneCallObjectByIndexSlotIdAndCallType(info.index, info.accountId, info.callType);
     if (call != nullptr) {

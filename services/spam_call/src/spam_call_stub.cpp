@@ -40,11 +40,18 @@ int32_t SpamCallStub::OnRemoteRequest(uint32_t code, MessageParcel &data, Messag
     }
     TELEPHONY_LOGW("DetectSpamCall OnReceived, cmd = %{public}u", code);
     switch (code) {
-        case COMMAND_ON_RESULT:
+        case COMMAND_DETECT_SPAM_CALL_RESULT:
             do {
                 int32_t errCodeVar = data.ReadInt32();
                 std::string resultVar = Str16ToStr8(data.ReadString16());
                 OnResult(errCodeVar, resultVar);
+            } while (false);
+            break;
+        case COMMAND_DETECT_NEED_NOTIFY_RESULT:
+            do {
+                int32_t errCodeVar = data.ReadInt32();
+                std::string resultVar = Str16ToStr8(data.ReadString16());
+                OnNeedNotifyResult(errCodeVar, resultVar);
             } while (false);
             break;
         default:

@@ -58,5 +58,13 @@ int32_t CallbackStubHelper::OnResult(int32_t &errCode, std::string &result)
     spamCallAdapter_->NotifyAll();
     return TELEPHONY_SUCCESS;
 }
+
+int32_t CallbackStubHelper::OnResult(int32_t &errCode, std::string &result)
+{
+    if (errCode == 0) {
+        spamCallAdapter_->ParseNeedNotifyResult(result);
+    }
+    return TELEPHONY_SUCCESS;
+}
 } // namespace Telephony
 } // namespace OHOS

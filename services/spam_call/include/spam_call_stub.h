@@ -33,7 +33,8 @@ public:
             uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
 
 private:
-    static constexpr int COMMAND_ON_RESULT = 1;
+    static constexpr int COMMAND_DETECT_SPAM_CALL_RESULT = 1;
+    static constexpr int COMMAND_DETECT_NEED_NOTIFY_RESULT = 3;
 };
 } // namespace Telephony
 } // namespace OHOS

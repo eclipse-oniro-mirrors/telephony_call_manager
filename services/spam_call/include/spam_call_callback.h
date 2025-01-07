@@ -25,6 +25,7 @@ public:
     DECLARE_INTERFACE_DESCRIPTOR(u"idl.ISpamResultCallback");
 
     virtual int32_t OnResult(int32_t &errCode, std::string &result) = 0;
+    virtual int32_t OnNeedNotifyResult(int32_t &errCode, std::string &result) = 0;
 };
 } // namespace Telephony
 } // namespace OHOS
