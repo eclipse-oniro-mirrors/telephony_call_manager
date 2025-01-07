@@ -17,7 +17,7 @@
 #define ANTI_FRAUD_DETECT_RES_LISTENER_H
  
 #include <cstdint>
-#include "exinclude/anti_fraud_service_client_type.h"
+#include "anti_fraud_service_client_type.h"
  
 namespace OHOS::AntiFraudService {
 class AntiFraudDetectResListener {
