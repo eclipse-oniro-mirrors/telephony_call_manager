@@ -106,6 +106,7 @@ int32_t CallStatusCallbackProxy::UpdateCallsReportInfo(const CallsReportInfo &in
         }
         dataParcel.WriteString(it.name);
         dataParcel.WriteInt32(it.namePresentation);
+        dataParcel.WriteInt32(static_cast<int32_t>(it.reason));
     }
     dataParcel.WriteInt32(info.slotId);
     if (Remote() == nullptr) {

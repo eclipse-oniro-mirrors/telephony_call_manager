@@ -52,6 +52,7 @@
 #include "bool_wrapper.h"
 #include "bluetooth_call.h"
 #include "bluetooth_call_connection.h"
+#include "distributed_communication_manager.h"
 #include "antifraud_service.h"
 
 namespace OHOS {
@@ -996,6 +997,7 @@ int32_t CallStatusManager::DisconnectedHandle(const CallDetailInfo &info)
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     call = RefreshCallIfNecessary(call, info);
+    RefreshCallDisconnectReason(call, static_cast<int32_t>(info.reason));
     ClearPendingState(call);
     SetOriginalCallTypeForDisconnectState(call);
     std::vector<std::u16string> callIdList;
@@ -1966,6 +1968,20 @@ void CallStatusManager::ClearPendingState(sptr<CallBase> &call)
             call->HangUpCall();
         }
         callRequestEventHandler->SetPendingHangup(false, -1);
+    }
+}
+
+void CallStatusManager::RefreshCallDisconnectReason(const sptr<CallBase> &call, int32_t reason)
+{
+    switch (reason) {
+        case static_cast<int32_t>(RilDisconnectedReason::DISCONNECTED_REASON_ANSWERED_ELSEWHER):
+            if (DelayedSingleton<DistributedCommunicationManager>::GetInstance()->IsSinkRole()) {
+                call->SetAnswerType(CallAnswerType::CALL_ANSWERED_ELSEWHER);
+                TELEPHONY_LOGI("call answered elsewhere");
+            }
+            break;
+        default:
+            break;
     }
 }
 } // namespace Telephony

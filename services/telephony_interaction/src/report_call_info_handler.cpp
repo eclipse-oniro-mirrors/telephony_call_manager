@@ -79,6 +79,7 @@ void ReportCallInfoHandler::BuildCallDetailsInfo(CallDetailsInfo &info, CallDeta
         (void)memcpy_s(callDetailInfo.bundleName, kMaxBundleNameLen, (*iter).bundleName, kMaxBundleNameLen);
         callDetailInfo.name = (*iter).name;
         callDetailInfo.namePresentation = (*iter).namePresentation;
+        callDetailInfo.reason = (*iter).reason;
         callDetailsInfo.callVec.push_back(callDetailInfo);
     }
 }
