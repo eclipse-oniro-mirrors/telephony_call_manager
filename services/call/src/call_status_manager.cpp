@@ -798,7 +798,8 @@ void CallStatusManager::SetupAntiFraudService(const sptr<CallBase> &call, const 
     }
 }
 
-bool CallStatusManager::IsContactPhoneNum(const std::string &phoneNum) {
+bool CallStatusManager::IsContactPhoneNum(const std::string &phoneNum)
+{
     ContactInfo contactInfo = {
         .name = "",
         .number = phoneNum,
@@ -813,8 +814,7 @@ bool CallStatusManager::IsContactPhoneNum(const std::string &phoneNum) {
     if (contactInfo.name.length() < 1) {
         TELEPHONY_LOGI("no corresponding contact found");
         return false;
-    }
-    else {
+    } else {
         return true;
     }
 }
