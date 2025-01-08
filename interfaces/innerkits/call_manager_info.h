@@ -586,6 +586,7 @@ struct CallDetailInfo {
      * Indicates the disconnect reason.
     */
     DisconnectedReason reason = DisconnectedReason::FAILED_UNKNOWN;
+    /**
      * Indicates the AntiFraud state.
      * - 0: AntiFraud is not started.
      * - 1: AntiFraud is started.
