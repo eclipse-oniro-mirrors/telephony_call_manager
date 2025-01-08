@@ -97,5 +97,30 @@ int32_t SettingsDataShareHelper::Query(Uri& uri, const std::string& key, std::st
     TELEPHONY_LOGW("SettingUtils: query success");
     return TELEPHONY_SUCCESS;
 }
+
+int32_t SettingsDataShareHelper::Update(Uri &uri, const std::string &key, const std::string &value)
+{
+    std::shared_ptr<DataShare::DataShareHelper> dataShareHelper =
+            CreateDataShareHelper(TELEPHONY_CALL_MANAGER_SYS_ABILITY_ID);
+    if (dataShareHelper == nullptr) {
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    DataShare::DataShareValueObject keyObj(key);
+    DataShare::DataShareValueObject valueObj(value);
+    DataShare::DataShareValuesBucket valuesBucket;
+    valuesBucket.Put(SETTINGS_DATA_COLUMN_KEYWORD, keyObj);
+    valuesBucket.Put(SETTINGS_DATA_COLUMN_VALUE, valueObj);
+    DataShare::DataSharePredicates predicates;
+    predicates.EqualTo(SETTINGS_DATA_COLUMN_KEYWORD, key);
+    int32_t ret = dataShareHelper->Update(uri, predicates, valuesBucket);
+    if (ret <= 0) {
+        TELEPHONY_LOGE("DataShareHelper update failed, retCode:%{public}d", ret);
+        dataShareHelper->Release();
+        return TELEPHONY_ERROR;
+    }
+    dataShareHelper->NotifyChange(uri);
+    dataShareHelper->Release();
+    return TELEPHONY_SUCCESS;
+}
 } // namespace Telephony
 } // namespace OHOS

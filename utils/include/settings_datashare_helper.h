@@ -32,6 +32,7 @@ public:
     static const std::string QUERY_SATELLITE_CONNECTED_KEY;
     static const std::string SETTINGS_DATASHARE_URI;
     ErrCode Query(Uri& uri, const std::string& key, std::string& values);
+    int32_t Update(Uri &uri, const std::string &key, const std::string &value);
 private:
     std::shared_ptr<DataShare::DataShareHelper> CreateDataShareHelper(int systemAbilityId);
 };
