@@ -163,6 +163,7 @@ void SpamCallAdapter::ParseNeedNotifyResult(const std::string &jsonData)
         return;
     }
     bool result = JsonGetBoolValue(root, REMINDER_RESULT);
+    TELEPHONY_LOGI("result: %{public}d, slotId: {public}d", result, slotId);
     if (result) {
         TELEPHONY_LOGI("send notify to contacts");
         AAFwk::Want want;
@@ -195,13 +196,13 @@ void SpamCallAdapter::ParseDetectResult(const std::string &jsonData, bool &isBlo
         return;
     }
     isBlock = numberValue == 1;
-    TELEPHONY_LOGW("DetectSpamCall detectResult: %{public}d", isBlock);
+    TELEPHONY_LOGI("DetectSpamCall detectResult: %{public}d", isBlock);
     if (!JsonGetNumberValue(root, DECISION_REASON, numberValue)) {
         cJSON_Delete(root);
         return;
     }
     blockReason = numberValue;
-    TELEPHONY_LOGW("DetectSpamCall decisionReason: %{public}d", blockReason);
+    TELEPHONY_LOGI("DetectSpamCall decisionReason: %{public}d", blockReason);
     ParseMarkResults(info, root, detectDetails);
     cJSON_Delete(root);
 }
@@ -213,7 +214,7 @@ void SpamCallAdapter::ParseMarkResults(NumberMarkInfo &info, cJSON *root, std::s
     if (JsonGetNumberValue(root, MARK_TYPE, numberValue)) {
         info.markType = static_cast<MarkType>(numberValue);
     }
-    TELEPHONY_LOGW("DetectSpamCall markType: %{public}d", info.markType);
+    TELEPHONY_LOGI("DetectSpamCall markType: %{public}d", info.markType);
     if (info.markType == MarkType::MARK_TYPE_CRANK || info.markType == MarkType::MARK_TYPE_FRAUD ||
         info.markType == MarkType::MARK_TYPE_PROMOTE_SALES || info.markType == MarkType::MARK_TYPE_HOUSE_AGENT) {
         connection_->DetectNeedNotify();
@@ -235,7 +236,7 @@ void SpamCallAdapter::ParseMarkResults(NumberMarkInfo &info, cJSON *root, std::s
         TELEPHONY_LOGE("strcpy_s markDetails fail.");
     }
     JsonGetStringValue(root, DETECT_DETAILS, detectDetails);
-    TELEPHONY_LOGW("DetectSpamCall detectDetails length: %{public}zu", detectDetails.length());
+    TELEPHONY_LOGI("DetectSpamCall detectDetails length: %{public}zu", detectDetails.length());
 }
 
 void SpamCallAdapter::GetDetectResult(int32_t &errCode, std::string &result)
