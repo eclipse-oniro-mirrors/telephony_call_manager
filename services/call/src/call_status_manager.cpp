@@ -771,7 +771,7 @@ int32_t CallStatusManager::ActiveHandle(const CallDetailInfo &info)
 #endif
     TELEPHONY_LOGI("handle active state success");
 
-    bool isAntiFraudSupport = OHOS::system::GetBoolParameter(ANTIFRAUD_FEATRUE, false);
+    bool isAntiFraudSupport = OHOS::system::GetBoolParameter(ANTIFRAUD_FEATURE, false);
     if (isAntiFraudSupport) {
         SetupAntiFraudService(call, info);
     }
@@ -834,7 +834,7 @@ void CallStatusManager::TriggerAntiFraud(int32_t antiFraudState)
     if (call == nullptr) {
         return;
     }
-    if (antiFraudState != static_cast<int32_t>(AntiFraudService::ANTIFRAUD_STATE_DEFAULT)) {
+    if (antiFraudState != static_cast<int32_t>(AntiFraudState::ANTIFRAUD_STATE_DEFAULT)) {
         AAFwk::WantParams extraParams;
         extraParams.SetParam("antiFraudState", AAFwk::Integer::Box(antiFraudState));
         call->SetExtraParams(extraParams);
