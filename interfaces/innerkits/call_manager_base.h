@@ -660,6 +660,10 @@ enum class MarkType {
      * Indicates the mark is enterprise.
      */
     MARK_TYPE_ENTERPRISE,
+    /**
+     * Indicates the mark is fraud risk.
+     */
+    MARK_TYPE_FRAUD_RISK,
 };
 
 /**

@@ -14,6 +14,8 @@
 call_manager_path = "//base/telephony/call_manager"
 
 call_manager_sources = [
+  "${call_manager_path}/services/antifraud/src/antifraud_adapter.cpp",
+  "${call_manager_path}/services/antifraud/src/antifraud_service.cpp",
   "${call_manager_path}/services/audio/src/audio_control_manager.cpp",
   "${call_manager_path}/services/audio/src/audio_device_manager.cpp",
   "${call_manager_path}/services/audio/src/audio_player.cpp",
@@ -136,6 +138,8 @@ call_manager_sources = [
 ]
 
 call_manager_include_dirs = [
+  "${call_manager_path}/services/antifraud/antiinclude",
+  "${call_manager_path}/services/antifraud/include",
   "${call_manager_path}/services/audio/include",
   "${call_manager_path}/services/audio/include/audio_state",
   "${call_manager_path}/services/bluetooth/include",

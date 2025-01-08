@@ -21,6 +21,13 @@
 
 namespace OHOS {
 namespace Telephony {
+constexpr int32_t DEFAULT_HFP_FLAG_VALUE = -1;
+constexpr int32_t WEAR_ACTION = 0;
+constexpr int32_t UNWEAR_ACTION = 1;
+constexpr int32_t ENABLE_FROM_REMOTE_ACTION = 2;
+constexpr int32_t DISABLE_FROM_REMOTE_ACTION = 3;
+constexpr int32_t USER_SELECTION_ACTION = 6;
+
 class DistributedDeviceSwitchController : public IDistributedDeviceStateCallback {
 public:
     DistributedDeviceSwitchController() = default;
