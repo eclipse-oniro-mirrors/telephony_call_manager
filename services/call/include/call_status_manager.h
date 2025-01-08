@@ -37,6 +37,7 @@
 namespace OHOS {
 namespace Telephony {
 const int32_t SLOT_NUM = 2;
+const std::string ANTIFRAUD_FEATURE = "const.telephony.antifraud.supported";
 
 class CallStatusManager : public CallStatusPolicy {
 public:
@@ -53,6 +54,7 @@ public:
     int32_t HandleVoipCallReportInfo(const CallDetailInfo &info);
     void CallFilterCompleteResult(const CallDetailInfo &info);
     int32_t HandleVoipEventReportInfo(const VoipCallEventInfo &info);
+    void TriggerAntiFraud(int32_t antiFraudState);
 
 private:
     void InitCallBaseEvent();
@@ -94,6 +96,8 @@ private:
     int32_t TurnOffMute(sptr<CallBase> &call);
     int32_t IncomingFilterPolicy(const CallDetailInfo &info);
     void QueryCallerInfo(ContactInfo &contactInfo, std::string phoneNum);
+    void SetupAntiFraudService(const sptr<CallBase> &call, const CallDetailInfo &info);
+    bool IsContactPhoneNum(const std::string &phoneNum);
     int32_t UpdateDialingCallInfo(const CallDetailInfo &info);
     void SetContactInfo(sptr<CallBase> &call, std::string phoneNum);
     int32_t HandleRejectCall(sptr<CallBase> &call, bool isBlock);
@@ -137,6 +141,8 @@ private:
     const int32_t CALL_NUMBER = 2;
     std::unique_ptr<TimeWaitHelper> timeWaitHelper_ {nullptr};
     std::chrono::system_clock::time_point detectStartTime = std::chrono::system_clock::from_time_t(0);
+    int32_t antiFraudSlotId_ = -1;
+    int32_t antiFraudIndex_ = -1;
 };
 } // namespace Telephony
 } // namespace OHOS

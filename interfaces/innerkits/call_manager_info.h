@@ -348,6 +348,14 @@ struct CallAttributeInfo {
      * Indicates remote party name.
      */
     std::string name = "";
+    /**
+     * Indicates the AntiFraud state.
+     * - 0: AntiFraud is not started.
+     * - 1: AntiFraud is started.
+     * - 2: detect the call is fraud call.
+     * - 3: AntiFraud is finished.
+     */
+    int32_t antiFraudState = 0;
 };
 
 /**
@@ -569,6 +577,14 @@ struct CallDetailInfo {
     int32_t namePresentation = 0;
 
     int32_t phoneOrWatch = 0;
+    /**
+     * Indicates the AntiFraud state.
+     * - 0: AntiFraud is not started.
+     * - 1: AntiFraud is started.
+     * - 2: detect the call is fraud call.
+     * - 3: AntiFraud is finished.
+     */
+    int32_t antiFraudState = 0;
 
     CallDetailInfo() {}
 
@@ -606,6 +622,7 @@ struct CallDetailInfo {
         name = temp.name;
         namePresentation = temp.namePresentation;
         phoneOrWatch = temp.phoneOrWatch;
+        antiFraudState = temp.antiFraudState;
         return *this;
     }
 };
