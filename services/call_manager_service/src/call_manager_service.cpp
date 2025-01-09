@@ -1267,6 +1267,14 @@ int32_t CallManagerService::JoinConference(int32_t callId, std::vector<std::u16s
 
 int32_t CallManagerService::ReportOttCallDetailsInfo(std::vector<OttCallDetailsInfo> &ottVec)
 {
+    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
+        TELEPHONY_LOGE("Non-system applications use system APIs!");
+        return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
+    }
+    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_PLACE_CALL)) {
+        TELEPHONY_LOGE("Permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
     if (ottVec.empty()) {
         TELEPHONY_LOGE("ottVec is empty!");
         return TELEPHONY_ERR_ARGUMENT_INVALID;
