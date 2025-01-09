@@ -1306,6 +1306,14 @@ int32_t CallManagerService::ReportOttCallDetailsInfo(std::vector<OttCallDetailsI
 
 int32_t CallManagerService::ReportOttCallEventInfo(OttCallEventInfo &eventInfo)
 {
+    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
+        TELEPHONY_LOGE("Non-system applications use system APIs!");
+        return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
+    }
+    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_PLACE_CALL)) {
+        TELEPHONY_LOGE("Permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
     int32_t ret = DelayedSingleton<ReportCallInfoHandler>::GetInstance()->UpdateOttEventInfo(eventInfo);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("UpdateOttEventInfo failed! errCode:%{public}d", ret);
