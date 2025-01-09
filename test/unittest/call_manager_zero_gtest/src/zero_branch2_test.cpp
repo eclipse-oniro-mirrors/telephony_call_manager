@@ -14,6 +14,7 @@
  */
 
 #include "call_manager_info.h"
+#include "call_manager_errors.h"
 #include <memory>
 #define PRIVATE public
 #define PROTECTED public
@@ -106,7 +107,6 @@ HWTEST_F(SpamCallTest, Telephony_CallbackStubHelper_001, Function | MediumTest |
     std::string result = "{\"detectResult\":0,\"decisionReason\":1002,\"markType\":0}";
     ASSERT_EQ(callbackStubHelper.OnResult(errCode, result), TELEPHONY_SUCCESS);
     result = "{\"reminderResult\":false,\"slotId\":0,\"reminderTime\":1736428340229,\"remindedTimes\":0}";
-    ASSERT_EQ(callbackStubHelper.OnResult(errCode, result), TELEPHONY_SUCCESS);
     ASSERT_EQ(callbackStubHelper.OnNeedNotifyResult(errCode, result), TELEPHONY_SUCCESS);
 }
 
@@ -193,7 +193,7 @@ HWTEST_F(SpamCallTest, Telephony_SpamCallProxy_001, Function | MediumTest | Leve
     int32_t slotId = 0;
     std::shared_ptr<SpamCallAdapter> spamCallAdapter = std::make_shared<SpamCallAdapter>();
     ASSERT_NE(spamCallProxy.DetectSpamCall(phoneNumber, slotId, spamCallAdapter), 0);
-    ASSERT_NE(spamCallProxy.DetectSpamCall(slotId, spamCallAdapter), 0);
+    ASSERT_NE(spamCallProxy.DetectNeedNotify(slotId, spamCallAdapter), 0);
 }
 
 /**

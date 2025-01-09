@@ -170,7 +170,7 @@ void SpamCallAdapter::ParseNeedNotifyResult(const std::string &jsonData)
         want.SetAction(OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_INCOMING_CALL_MISSED);
         OHOS::EventFwk::CommonEventData eventData;
         eventData.SetWant(want);
-        eventData.SetData(std:::to_string(slotId));
+        eventData.SetData(std::to_string(slotId));
         OHOS::EventFwk::CommonEventPublishInfo publishInfo;
         if (!OHOS::EventFwk::CommonEventManager::PublishCommonEvent(eventData, publishInfo, nullptr)) {
             TELEPHONY_LOGE("PublishCommonEvent fail.");
@@ -203,11 +203,11 @@ void SpamCallAdapter::ParseDetectResult(const std::string &jsonData, bool &isBlo
     }
     blockReason = numberValue;
     TELEPHONY_LOGI("DetectSpamCall decisionReason: %{public}d", blockReason);
-    ParseMarkResults(info, root, detectDetails);
+    ParseMarkResults(info, root, detectDetails, isBlock);
     cJSON_Delete(root);
 }
 
-void SpamCallAdapter::ParseMarkResults(NumberMarkInfo &info, cJSON *root, std::string &detectDetails)
+void SpamCallAdapter::ParseMarkResults(NumberMarkInfo &info, cJSON *root, std::string &detectDetails, bool isBlock)
 {
     int32_t numberValue = 0;
     std::string stringValue = "";
@@ -242,7 +242,7 @@ void SpamCallAdapter::ParseMarkResults(NumberMarkInfo &info, cJSON *root, std::s
 
 bool SpamCallAdapter::GetCanDisconnect()
 {
-    return canDisconnect_
+    return canDisconnect_;
 }
 
 void SpamCallAdapter::GetDetectResult(int32_t &errCode, std::string &result)

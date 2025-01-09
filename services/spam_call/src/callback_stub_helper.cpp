@@ -56,7 +56,7 @@ int32_t CallbackStubHelper::OnResult(int32_t &errCode, std::string &result)
             static_cast<int32_t>(numberMarkInfo.markType), isBlock, blockReason);
     }
     spamCallAdapter_->NotifyAll();
-    if (spamCallAdapter_->GetCalDisconnect()) {
+    if (spamCallAdapter_->GetCanDisconnect()) {
         spamCallAdapter_->DisconnectSpamCallAbility();
     }
     return TELEPHONY_SUCCESS;
