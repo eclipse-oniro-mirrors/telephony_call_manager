@@ -163,18 +163,18 @@ void SpamCallAdapter::ParseNeedNotifyResult(const std::string &jsonData)
         return;
     }
     bool result = JsonGetBoolValue(root, REMINDER_RESULT);
-    TELEPHONY_LOGI("result: %{public}d, slotId: {public}d", result, slotId);
+    TELEPHONY_LOGI("result: %{public}d, slotId: %{public}d", result, slotId);
     if (result) {
         TELEPHONY_LOGI("send notify to contacts");
         AAFwk::Want want;
-        want.SetParam("slotId", slotId);
         want.SetAction(OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_INCOMING_CALL_MISSED);
         OHOS::EventFwk::CommonEventData eventData;
         eventData.SetWant(want);
-        eventData.SetCode(INCOMING_CALL_MISSED_CODE);
+        eventData.SetData(std:::to_string(slotId));
         OHOS::EventFwk::CommonEventPublishInfo publishInfo;
-        publishInfo.SetOrdered(true);
-        OHOS::EventFwk::CommonEventManager::PublishCommonEvent(eventData, publishInfo, nullptr);
+        if (!OHOS::EventFwk::CommonEventManager::PublishCommonEvent(eventData, publishInfo, nullptr)) {
+            TELEPHONY_LOGE("PublishCommonEvent fail.");
+        }
     }
 }
 
