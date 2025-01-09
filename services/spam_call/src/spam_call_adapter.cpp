@@ -215,8 +215,9 @@ void SpamCallAdapter::ParseMarkResults(NumberMarkInfo &info, cJSON *root, std::s
         info.markType = static_cast<MarkType>(numberValue);
     }
     TELEPHONY_LOGI("DetectSpamCall markType: %{public}d", info.markType);
-    if (info.markType == MarkType::MARK_TYPE_CRANK || info.markType == MarkType::MARK_TYPE_FRAUD ||
-        info.markType == MarkType::MARK_TYPE_PROMOTE_SALES || info.markType == MarkType::MARK_TYPE_HOUSE_AGENT) {
+    if (!isBlock && (info.markType == MarkType::MARK_TYPE_CRANK || info.markType == MarkType::MARK_TYPE_FRAUD ||
+        info.markType == MarkType::MARK_TYPE_PROMOTE_SALES || info.markType == MarkType::MARK_TYPE_HOUSE_AGENT)) {
+        canDisconnect_ = false;
         connection_->DetectNeedNotify();
     }
     if (JsonGetNumberValue(root, MARK_COUNT, numberValue)) {
@@ -237,6 +238,11 @@ void SpamCallAdapter::ParseMarkResults(NumberMarkInfo &info, cJSON *root, std::s
     }
     JsonGetStringValue(root, DETECT_DETAILS, detectDetails);
     TELEPHONY_LOGI("DetectSpamCall detectDetails length: %{public}zu", detectDetails.length());
+}
+
+bool SpamCallAdapter::GetCanDisconnect()
+{
+    return canDisconnect_
 }
 
 void SpamCallAdapter::GetDetectResult(int32_t &errCode, std::string &result)
@@ -293,7 +299,6 @@ bool SpamCallAdapter::WaitForDetectResult()
         DisconnectSpamCallAbility();
         return false;
     }
-    DisconnectSpamCallAbility();
     return true;
 }
 } // namespace Telephony

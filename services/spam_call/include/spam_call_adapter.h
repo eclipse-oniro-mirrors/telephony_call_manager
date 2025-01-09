@@ -43,14 +43,14 @@ public:
     void ParseDetectResult(const std::string &jsonData, bool &isBlock, NumberMarkInfo &info,
         int32_t &blockReason, std::string &detectDetails);
     void ParseNeedNotifyResult(const std::string &jsonData);
-
+    void DisconnectSpamCallAbility();
+    bool GetCanDisconnect();
 private:
     bool ConnectSpamCallAbility(const AAFwk::Want &want, const std::string &phoneNumber, const int32_t &slotId);
-    void DisconnectSpamCallAbility();
     bool JsonGetNumberValue(cJSON *json, const std::string key, int32_t &out);
     bool JsonGetStringValue(cJSON *json, const std::string key, std::string &out);
     bool JsonGetBoolValue(cJSON *json, const std::string key);
-    void ParseMarkResults(NumberMarkInfo &info, cJSON *root, std::string &detectDetails);
+    void ParseMarkResults(NumberMarkInfo &info, cJSON *root, std::string &detectDetails, bool isBlock);
     int32_t errCode_ = -1;
     std::string result_ = "";
     std::string phoneNumber_ = "";
@@ -58,6 +58,7 @@ private:
     bool isBlock_ = false;
     int32_t blockReason_ = 0;
     std::string detectDetails_ = "";
+    bool canDisconnect_ = true;
     std::unique_ptr<TimeWaitHelper> timeWaitHelper_ {nullptr};
     ffrt::mutex mutex_;
 };
