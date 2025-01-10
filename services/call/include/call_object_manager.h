@@ -64,6 +64,7 @@ public:
     static int32_t HasHoldCall(bool &hasHoldCall);
     static TelCallState GetCallState(int32_t callId);
     static sptr<CallBase> GetOneCallObject(CallRunningState callState);
+    static sptr<CallBase> GetOneCarrierCallObject(CallRunningState callState);
     static bool IsCallExist(CallType type, TelCallState callState);
     static bool IsCallExist(TelCallState callState);
     static bool IsCallExist(TelCallState callState, int32_t &callId);
