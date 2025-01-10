@@ -1139,6 +1139,14 @@ int32_t CallManagerService::GetImsConfig(int32_t slotId, ImsConfigItem item)
 
 int32_t CallManagerService::SetImsConfig(int32_t slotId, ImsConfigItem item, std::u16string &value)
 {
+    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
+        TELEPHONY_LOGE("Non-system applications use system APIs!");
+        return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
+    }
+    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_PLACE_CALL)) {
+        TELEPHONY_LOGE("Permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
     if (callControlManagerPtr_ != nullptr) {
         return callControlManagerPtr_->SetImsConfig(slotId, item, value);
     } else {
