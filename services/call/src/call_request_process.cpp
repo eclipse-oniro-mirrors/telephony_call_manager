@@ -907,7 +907,7 @@ int32_t CallRequestProcess::HandleStartDial(bool isMMiCode, CellularCallInfo cal
 
 int32_t CallRequestProcess::IsDialCallForDsda(DialParaInfo &info)
 {
-    sptr<CallBase> activeCall = GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_ACTIVE);
+    sptr<CallBase> activeCall = GetOneCarrierCallObject(CallRunningState::CALL_RUNNING_STATE_ACTIVE);
     TELEPHONY_LOGI("Is dsdsmode5 dial call info.accountId = %{public}d", info.accountId);
     if (activeCall != nullptr && activeCall->GetSlotId() != info.accountId) {
         int32_t ret = activeCall->HoldCall();

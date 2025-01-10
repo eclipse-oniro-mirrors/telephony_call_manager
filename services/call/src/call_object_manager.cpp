@@ -541,6 +541,18 @@ sptr<CallBase> CallObjectManager::GetOneCallObject(CallRunningState callState)
     return nullptr;
 }
 
+sptr<CallBase> CallObjectManager::GetOneCarrierCallObject(CallRunningState callState)
+{
+    std::lock_guard<std::mutex> lock(listMutex_);
+    std::list<sptr<CallBase>>::reverse_iterator it;
+    for (it = callObjectPtrList_.rbegin(); it!= callObjectPtrList_.rend(); ++it) {
+        if ((*it)->GetCallRunningState() == callState && (*it)->GetCallType() != CallType::TYPE_VOIP) {
+            return (*it);
+        }
+    }
+    return nullptr;
+}
+
 sptr<CallBase> CallObjectManager::GetOneCallObjectByIndex(int32_t index)
 {
     std::lock_guard<std::mutex> lock(listMutex_);
