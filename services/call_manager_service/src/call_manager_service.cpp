@@ -489,6 +489,14 @@ int32_t CallManagerService::IsNewCallAllowed(bool &enabled)
 
 int32_t CallManagerService::RegisterVoipCallManagerCallback()
 {
+    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
+        TELEPHONY_LOGE("Non-system applications use system APIs!");
+        return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
+    }
+    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_PLACE_CALL)) {
+        TELEPHONY_LOGE("Permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
     std::lock_guard<std::mutex> guard(lock_);
     DelayedSingleton<VoipCallConnection>::GetInstance()->Init(TELEPHONY_VOIP_CALL_MANAGER_SYS_ABILITY_ID);
     sptr<ICallStatusCallback> voipCallCallbackPtr = (std::make_unique<CallStatusCallback>()).release();
