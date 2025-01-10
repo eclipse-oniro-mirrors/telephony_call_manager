@@ -27,6 +27,7 @@
 #include "spam_call_connection.h"
 #include "common_event_manager.h"
 #include "common_event_support.h"
+#include "telephony_permission.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -169,14 +170,14 @@ void SpamCallAdapter::ParseNeedNotifyResult(const std::string &jsonData)
         AAFwk::Want want;
         want.SetParam("isHarassmentGuidance", true);
         want.SetParam("slotId", slotId);
-        want.SetAction(OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_INCOMING_CALL_MISSED);
-        OHOS::EventFwk::CommonEventData eventData;
+        want.SetAction(EventFwk::CommonEventSupport::COMMON_EVENT_INCOMING_CALL_MISSED);
+        EventFwk::CommonEventData eventData;
         eventData.SetWant(want);
-        OHOS::EventFwk::CommonEventPublishInfo publishInfo;
+        EventFwk::CommonEventPublishInfo publishInfo;
         std::vector<std::string> callPermissions;
         callPermissions.emplace_back(Permission::GET_TELEPHONY_STATE);
         publishInfo.SetSubscriberPermissions(callPermissions);
-        if (!OHOS::EventFwk::CommonEventManager::PublishCommonEvent(eventData, publishInfo, nullptr)) {
+        if (!EventFwk::CommonEventManager::PublishCommonEvent(eventData, publishInfo, nullptr)) {
             TELEPHONY_LOGE("PublishCommonEvent fail.");
         }
     }
