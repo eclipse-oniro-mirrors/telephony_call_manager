@@ -167,11 +167,15 @@ void SpamCallAdapter::ParseNeedNotifyResult(const std::string &jsonData)
     if (result) {
         TELEPHONY_LOGI("send notify to contacts");
         AAFwk::Want want;
+        want.SetParam("isHarassmentGuidance", true);
+        want.SetParam("slotId", slotId);
         want.SetAction(OHOS::EventFwk::CommonEventSupport::COMMON_EVENT_INCOMING_CALL_MISSED);
         OHOS::EventFwk::CommonEventData eventData;
         eventData.SetWant(want);
-        eventData.SetData(std::to_string(slotId));
         OHOS::EventFwk::CommonEventPublishInfo publishInfo;
+        std::vector<std::string> callPermissions;
+        callPermissions.emplace_back(Permission::GET_TELEPHONY_STATE);
+        publishInfo.SetSubscriberPermissions(callPermissions);
         if (!OHOS::EventFwk::CommonEventManager::PublishCommonEvent(eventData, publishInfo, nullptr)) {
             TELEPHONY_LOGE("PublishCommonEvent fail.");
         }
