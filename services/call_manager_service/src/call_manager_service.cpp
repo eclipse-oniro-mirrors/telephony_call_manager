@@ -1129,6 +1129,14 @@ int32_t CallManagerService::GetCallIdListForConference(int32_t callId, std::vect
 
 int32_t CallManagerService::GetImsConfig(int32_t slotId, ImsConfigItem item)
 {
+    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
+        TELEPHONY_LOGE("Non-system applications use system APIs!");
+        return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
+    }
+    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_PLACE_CALL)) {
+        TELEPHONY_LOGE("Permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
     if (callControlManagerPtr_ != nullptr) {
         return callControlManagerPtr_->GetImsConfig(slotId, item);
     } else {
