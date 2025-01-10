@@ -502,6 +502,14 @@ int32_t CallManagerService::RegisterVoipCallManagerCallback()
 
 int32_t CallManagerService::UnRegisterVoipCallManagerCallback()
 {
+    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
+        TELEPHONY_LOGE("Non-system applications use system APIs!");
+        return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
+    }
+    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_PLACE_CALL)) {
+        TELEPHONY_LOGE("Permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
     std::lock_guard<std::mutex> guard(lock_);
     return DelayedSingleton<VoipCallConnection>::GetInstance()->UnRegisterCallManagerCallBack();
 }
