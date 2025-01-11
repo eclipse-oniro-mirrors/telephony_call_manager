@@ -108,13 +108,17 @@ bool DistributedCallManager::CreateDAudioDevice(const std::string& devId, AudioD
         TELEPHONY_LOGE("dcall devId is invalid");
         return false;
     }
-    std::lock_guard<std::mutex> lock(dcallProxyMtx_);
-    if (dcallProxy_ == nullptr) {
-        TELEPHONY_LOGE("dcallProxy_ is nullptr");
-        return false;
+    int32_t ret;
+    {
+        std::lock_guard<std::mutex> lock(dcallProxyMtx_);
+        if (dcallProxy_ == nullptr) {
+            TELEPHONY_LOGE("dcallProxy_ is nullptr");
+            return false;
+        }
+        OHOS::DistributedHardware::DCallDeviceInfo devInfo;
+        ret = dcallProxy_->GetDCallDeviceInfo(devId, devInfo);
     }
-    OHOS::DistributedHardware::DCallDeviceInfo devInfo;
-    int32_t ret = dcallProxy_->GetDCallDeviceInfo(devId, devInfo);
+
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGI("get dcall device info failed.");
         return false;
@@ -310,13 +314,17 @@ bool DistributedCallManager::SwitchOnDCallDeviceSync(const AudioDevice& device)
         return false;
     }
     TELEPHONY_LOGI("switch dcall device on start, devId: %{public}s", GetAnonyString(devId).c_str());
-    std::lock_guard<std::mutex> lock(dcallProxyMtx_);
-    if (dcallProxy_ == nullptr) {
-        TELEPHONY_LOGE("dcallProxy_ is nullptr");
-        return false;
+    int32_t ret;
+    {
+        std::lock_guard<std::mutex> lock(dcallProxyMtx_);
+        if (dcallProxy_ == nullptr) {
+            TELEPHONY_LOGE("dcallProxy_ is nullptr");
+            return false;
+        }
+        ReportDistributedDeviceInfo(device);
+        ret = dcallProxy_->SwitchDevice(devId, DCALL_SWITCH_DEVICE_TYPE_SINK);
     }
-    ReportDistributedDeviceInfo(device);
-    int32_t ret = dcallProxy_->SwitchDevice(devId, DCALL_SWITCH_DEVICE_TYPE_SINK);
+    
     if (ret == TELEPHONY_SUCCESS) {
         dCallDeviceSwitchedOn_.store(true);
         SetConnectedDCallDevice(device);
@@ -374,12 +382,16 @@ void DistributedCallManager::SwitchOffDCallDeviceSync()
         return;
     }
     TELEPHONY_LOGI("switch dcall device off start, devId: %{public}s", GetAnonyString(devId).c_str());
-    std::lock_guard<std::mutex> lock(dcallProxyMtx_);
-    if (dcallProxy_ == nullptr) {
-        TELEPHONY_LOGE("dcallProxy_ is nullptr");
-        return;
+    int32_t ret;
+    {
+        std::lock_guard<std::mutex> lock(dcallProxyMtx_);
+        if (dcallProxy_ == nullptr) {
+            TELEPHONY_LOGE("dcallProxy_ is nullptr");
+            return;
+        }
+        ret = dcallProxy_->SwitchDevice(devId, DCALL_SWITCH_DEVICE_TYPE_SOURCE);
     }
-    int32_t ret = dcallProxy_->SwitchDevice(devId, DCALL_SWITCH_DEVICE_TYPE_SOURCE);
+    
     if (ret == TELEPHONY_SUCCESS) {
         dCallDeviceSwitchedOn_.store(false);
         ClearConnectedDCallDevice();
@@ -504,9 +516,11 @@ void DistributedCallManager::OnDCallSystemAbilityAdded(const std::string &device
 void DistributedCallManager::OnDCallSystemAbilityRemoved(const std::string &deviceId)
 {
     TELEPHONY_LOGI("dcall source service is removed, deviceId: %{public}s", GetAnonyString(deviceId).c_str());
-    dcallDeviceListener_ = nullptr;
-    std::lock_guard<std::mutex> lock(dcallProxyMtx_);
-    dcallProxy_ = nullptr;
+    {
+        std::lock_guard<std::mutex> lock(dcallProxyMtx_);
+        dcallDeviceListener_ = nullptr;
+        dcallProxy_ = nullptr;
+    }
     dCallDeviceSwitchedOn_.store(false);
     ClearDCallDevices();
     ClearConnectedDCallDevice();
