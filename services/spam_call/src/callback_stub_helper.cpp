@@ -56,9 +56,6 @@ int32_t CallbackStubHelper::OnResult(int32_t &errCode, std::string &result)
             static_cast<int32_t>(numberMarkInfo.markType), isBlock, blockReason);
     }
     spamCallAdapter_->NotifyAll();
-    if (spamCallAdapter_->GetCanDisconnect()) {
-        spamCallAdapter_->DisconnectSpamCallAbility();
-    }
     return TELEPHONY_SUCCESS;
 }
 
@@ -68,7 +65,6 @@ int32_t CallbackStubHelper::OnNeedNotifyResult(int32_t &errCode, std::string &re
     if (errCode == 0) {
         spamCallAdapter_->ParseNeedNotifyResult(result);
     }
-    spamCallAdapter_->DisconnectSpamCallAbility();
     return TELEPHONY_SUCCESS;
 }
 } // namespace Telephony
