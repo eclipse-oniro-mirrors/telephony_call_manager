@@ -38,14 +38,15 @@ int32_t SpamCallStub::OnRemoteRequest(uint32_t code, MessageParcel &data, Messag
         TELEPHONY_LOGE("descriptor checked fail !");
         return TELEPHONY_ERR_DESCRIPTOR_MISMATCH;
     }
-    TELEPHONY_LOGW("DetectSpamCall OnReceived, cmd = %{public}u", code);
+    int32_t errCodeVar = data.ReadInt32();
+    std::string resultVar = Str16ToStr8(data.ReadString16());
+    TELEPHONY_LOGI("OnReceived, cmd = %{public}u", code);
     switch (code) {
-        case COMMAND_ON_RESULT:
-            do {
-                int32_t errCodeVar = data.ReadInt32();
-                std::string resultVar = Str16ToStr8(data.ReadString16());
-                OnResult(errCodeVar, resultVar);
-            } while (false);
+        case COMMAND_DETECT_SPAM_CALL_RESULT:
+            OnResult(errCodeVar, resultVar);
+            break;
+        case COMMAND_DETECT_NEED_NOTIFY_RESULT:
+            OnNeedNotifyResult(errCodeVar, resultVar);
             break;
         default:
             TELEPHONY_LOGE("callback failed, default = %d", code);

@@ -37,11 +37,12 @@ public:
     void OnAbilityConnectDone(const AppExecFwk::ElementName &element,
         const sptr<IRemoteObject> &remoteObject, int32_t resultCode) override;
     void OnAbilityDisconnectDone(const AppExecFwk::ElementName &element, int32_t resultCode) override;
-
+    void DetectNeedNotify();
 private:
     std::string phoneNumber_;
     int32_t slotId_;
     std::shared_ptr<SpamCallAdapter> spamCallAdapter_ {nullptr};
+    sptr<IRemoteObject> remoteObject_ = nullptr;
 };
 } // namespace Telephony
 } // namespace OHOS

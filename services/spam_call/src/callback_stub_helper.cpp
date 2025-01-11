@@ -34,7 +34,7 @@ CallbackStubHelper::~CallbackStubHelper()
 
 int32_t CallbackStubHelper::OnResult(int32_t &errCode, std::string &result)
 {
-    TELEPHONY_LOGW("DetectSpamCall OnResult errCode: %{public}d", errCode);
+    TELEPHONY_LOGI("OnResult errCode: %{public}d", errCode);
     if (spamCallAdapter_ == nullptr) {
         TELEPHONY_LOGE("spamCallAdapter_ is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -56,6 +56,15 @@ int32_t CallbackStubHelper::OnResult(int32_t &errCode, std::string &result)
             static_cast<int32_t>(numberMarkInfo.markType), isBlock, blockReason);
     }
     spamCallAdapter_->NotifyAll();
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallbackStubHelper::OnNeedNotifyResult(int32_t &errCode, std::string &result)
+{
+    TELEPHONY_LOGI("OnNeedNotifyResult errCode: %{public}d", errCode);
+    if (errCode == 0) {
+        spamCallAdapter_->ParseNeedNotifyResult(result);
+    }
     return TELEPHONY_SUCCESS;
 }
 } // namespace Telephony
