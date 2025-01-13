@@ -117,9 +117,9 @@ bool DistributedCallManager::CreateDAudioDevice(const std::string& devId, AudioD
         }
         int32_t ret = dcallProxy_->GetDCallDeviceInfo(devId, devInfo);
         if (ret != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGI("get dcall device info failed.");
-        return false;
-    }
+            TELEPHONY_LOGI("get dcall device info failed.");
+            return false;
+        }
     }
     std::string devTypeName;
     std::string devName = devInfo.devName;
