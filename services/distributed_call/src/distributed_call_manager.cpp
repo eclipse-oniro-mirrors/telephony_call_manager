@@ -413,6 +413,8 @@ int32_t DistributedCallManager::DistributedCallDeviceListener::OnDCallDeviceOffl
 void DistributedCallManager::OnDCallSystemAbilityAdded(const std::string &deviceId)
 {
     TELEPHONY_LOGI("dcall source service is added, deviceId: %{public}s", GetAnonyString(deviceId).c_str());
+    // wait 100ms for dcall-sa to complete init.
+    usleep(WAIT_DCALL_INIT_100MS);
     std::vector<std::string> dcallDevices;
     {
         std::lock_guard<std::mutex> lock(dcallProxyMtx_);
