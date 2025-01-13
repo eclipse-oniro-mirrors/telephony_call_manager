@@ -17,6 +17,7 @@
 #define NUMBER_IDENTITY_SERVICE_H
 
 #include "ability_connect_callback_stub.h"
+#include "ffrt.h"
 #include "ipc_object_stub.h"
 #include "iremote_broker.h"
 #include "iremote_proxy.h"
@@ -32,7 +33,7 @@ namespace Telephony {
 
 using std::atomic;
 using std::function;
-using std::recursive_mutex;
+using ffrt::recursive_mutex;
 using ConnectedCallback = function<void(sptr<IRemoteObject>)>;
 using DisconnectedCallback = function<void()>;
 using RemoteRequestCallBack = function<int32_t(uint32_t, MessageParcel &, MessageParcel &, MessageOption &)>;
