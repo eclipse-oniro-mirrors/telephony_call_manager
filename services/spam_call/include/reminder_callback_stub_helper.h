@@ -13,25 +13,26 @@
  * limitations under the License.
  */
 
-#ifndef I_SPAM_CALL_H
-#define I_SPAM_CALL_H
+#ifndef TELEPHONY_REMINDER_CALLBACK_STUB_HELPER_H
+#define TELEPHONY_REMINDER_CALLBACK_STUB_HELPER_H
 
+#include <singleton.h>
 #include "spam_call_adapter.h"
-#include <iremote_broker.h>
-#include <iremote_object.h>
+#include "spam_call_stub.h"
 #include <memory>
 
 namespace OHOS {
 namespace Telephony {
-class ISpamCall : public OHOS::IRemoteBroker {
+class ReminderCallbackStubHelper : public SpamCallStub {
 public:
-    DECLARE_INTERFACE_DESCRIPTOR(u"idl.ISpamShieldService");
+    ReminderCallbackStubHelper(std::shared_ptr<SpamCallAdapter> spamCallAdapter);
+    ~ReminderCallbackStubHelper();
+    int32_t OnResult(int32_t &errCode, std::string &result) override;
 
-    virtual int32_t DetectSpamCall(const std::string &phoneNumber, const int32_t &slotId,
-        std::shared_ptr<SpamCallAdapter> spamCallAdapter) = 0;
-    virtual int32_t RequireCallReminder(const int32_t &slotId, std::shared_ptr<SpamCallAdapter> spamCallAdapter) = 0;
+private:
+    std::shared_ptr<SpamCallAdapter> spamCallAdapter_ {nullptr};
 };
-} // namespace Telephony
-} // namespace OHOS
+}
+}
 
-#endif // I_SPAM_CALL_H
+#endif // TELEPHONY_REMINDER_CALLBACK_STUB_HELPER_H

@@ -68,7 +68,7 @@ int32_t SpamCallProxy::DetectSpamCall(const std::string &phoneNumber, const int3
     return replyParcel.ReadInt32();
 }
 
-int32_t SpamCallProxy::DetectNeedNotify(const int32_t &slotId, std::shared_ptr<SpamCallAdapter> spamCallAdapter)
+int32_t SpamCallProxy::RequireCallReminder(const int32_t &slotId, std::shared_ptr<SpamCallAdapter> spamCallAdapter)
 {
     MessageParcel dataParcel;
     std::u16string myDescriptor = SpamCallProxy::GetDescriptor();

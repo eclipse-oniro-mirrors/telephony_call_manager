@@ -45,9 +45,6 @@ int32_t SpamCallStub::OnRemoteRequest(uint32_t code, MessageParcel &data, Messag
         case COMMAND_DETECT_SPAM_CALL_RESULT:
             OnResult(errCodeVar, resultVar);
             break;
-        case COMMAND_DETECT_NEED_NOTIFY_RESULT:
-            OnNeedNotifyResult(errCodeVar, resultVar);
-            break;
         default:
             TELEPHONY_LOGE("callback failed, default = %d", code);
             break;

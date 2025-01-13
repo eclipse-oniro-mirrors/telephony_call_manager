@@ -28,7 +28,6 @@ public:
     CallbackStubHelper(std::shared_ptr<SpamCallAdapter> spamCallAdapter);
     ~CallbackStubHelper();
     int32_t OnResult(int32_t &errCode, std::string &result) override;
-    int32_t OnNeedNotifyResult(int32_t &errCode, std::string &result) override;
 
 private:
     std::shared_ptr<SpamCallAdapter> spamCallAdapter_ {nullptr};

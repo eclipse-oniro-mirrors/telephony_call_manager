@@ -222,7 +222,7 @@ void SpamCallAdapter::ParseMarkResults(NumberMarkInfo &info, cJSON *root, std::s
     TELEPHONY_LOGI("DetectSpamCall markType: %{public}d", info.markType);
     if (!isBlock && (info.markType == MarkType::MARK_TYPE_CRANK || info.markType == MarkType::MARK_TYPE_FRAUD ||
         info.markType == MarkType::MARK_TYPE_PROMOTE_SALES || info.markType == MarkType::MARK_TYPE_HOUSE_AGENT)) {
-        connection_->DetectNeedNotify();
+        connection_->RequireCallReminder();
     }
     if (JsonGetNumberValue(root, MARK_COUNT, numberValue)) {
         info.markCount = numberValue;

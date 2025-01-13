@@ -42,11 +42,11 @@ void SpamCallConnection::OnAbilityDisconnectDone(const AppExecFwk::ElementName &
     TELEPHONY_LOGI("OnAbilityDisconnectDone, resultCode = %{public}d", resultCode);
 }
 
-void SpamCallConnection::DetectNeedNotify()
+void SpamCallConnection::RequireCallReminder()
 {
     TELEPHONY_LOGI("DetectNeedNotify start.");
     SpamCallProxy service(remoteObject_);
-    int32_t ret = service.DetectNeedNotify(slotId_, spamCallAdapter_);
+    int32_t ret = service.RequireCallReminder(slotId_, spamCallAdapter_);
     TELEPHONY_LOGI("SpamCallProxy DetectNeedNotify ret = %{public}d", ret);
 }
 } // namespace Telephony
