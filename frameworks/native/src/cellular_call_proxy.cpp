@@ -999,6 +999,31 @@ int32_t CellularCallProxy::GetImsSwitchStatus(int32_t slotId, bool &enabled)
     return out.ReadInt32();
 }
 
+int32_t CellularCallProxy::GetCarrierVtConfig(int32_t slotId, bool &enabled)
+{
+    MessageOption option;
+    MessageParcel out;
+    MessageParcel in;
+    int32_t result = TELEPHONY_SUCCESS;
+    result = SetCommonParamForMessageParcel(slotId, in);
+    if (result != TELEPHONY_SUCCESS) {
+        return result;
+    }
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("function Remote() return nullptr!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t error = remote->SendRequest(static_cast<uint32_t>(CellularCallInterfaceCode::GET_CARRIER_VT_CONFIG),
+        in, out, option);
+    if (error != ERR_NONE) {
+        TELEPHONY_LOGE("function GetCarrierVtConfig failed! errCode:%{public}d", error);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    enabled = out.ReadBool();
+    return out.ReadInt32();
+}
+
 int32_t CellularCallProxy::SetVoNRState(int32_t slotId, int32_t state)
 {
     MessageOption option;

@@ -228,6 +228,11 @@ bool CallPolicy::IsSupportVideoCall(AppExecFwk::PacMap &extras)
         TELEPHONY_LOGW("emergency call not support video upgrade");
         isSupportVideoCall = false;
     }
+    bool vtEnabled = false;
+    DelayedSingleton<CallNumberUtils>::GetInstance()->IsCarrierVtConfig(extras.GetIntValue("accountId", vtEnabled))
+    if (!vtEnabled) {
+        isSupportVideoCall = false;
+    }
     return isSupportVideoCall;
 }
 

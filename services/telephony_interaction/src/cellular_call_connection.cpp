@@ -682,6 +682,20 @@ int32_t CellularCallConnection::GetImsSwitchStatus(int32_t slotId, bool &enabled
     return TELEPHONY_SUCCESS;
 }
 
+int32_t CellularCallConnection::GetCarrierVtConfig(int32_t slotId, bool &enabled)
+{
+    if (ReConnectService() != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("ipc reconnect failed!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int errCode = cellularCallInterfacePtr_->GetCarrierVtConfig(slotId, enabled);
+    if (errCode != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("GetCarrierVtConfig failed, errcode:%{public}d", errCode);
+        return errCode;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
 int32_t CellularCallConnection::SetVoNRState(int32_t slotId, int32_t state)
 {
     if (ReConnectService() != TELEPHONY_SUCCESS) {

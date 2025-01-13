@@ -402,6 +402,16 @@ public:
     int32_t GetImsSwitchStatus(int32_t slotId, bool &enabled);
 
     /**
+     * GetCarrierVtConfig
+     *
+     * @brief Getting Carrier Vt Config
+     * @param slotId[in], The slot id
+     * @param enabled[out], The result of enable or not
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t GetCarrierVtConfig(int32_t slotId, bool &enabled);
+
+    /**
      * SetVoNRState
      *
      * @brief Setting VoNR Switch
