@@ -1,4 +1,4 @@
-# Copyright (C) 2024-2024 Huawei Device Co., Ltd.
+# Copyright (C) 2024-2025 Huawei Device Co., Ltd.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
@@ -115,6 +115,7 @@ call_manager_sources = [
   "${call_manager_path}/services/number_identity_proxy/src/number_identity_service.cpp",
   "${call_manager_path}/services/satellite_call/src/satellite_call_control.cpp",
   "${call_manager_path}/services/spam_call/src/callback_stub_helper.cpp",
+  "${call_manager_path}/services/spam_call/src/reminder_callback_stub_helper.cpp",
   "${call_manager_path}/services/spam_call/src/spam_call_adapter.cpp",
   "${call_manager_path}/services/spam_call/src/spam_call_connection.cpp",
   "${call_manager_path}/services/spam_call/src/spam_call_proxy.cpp",

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 Huawei Device Co., Ltd.
+ * Copyright (C) 2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef TELEPHONY_CALLBACK_STUB_HELPER_H
-#define TELEPHONY_CALLBACK_STUB_HELPER_H
+#ifndef TELEPHONY_REMINDER_CALLBACK_STUB_HELPER_H
+#define TELEPHONY_REMINDER_CALLBACK_STUB_HELPER_H
 
 #include <singleton.h>
 #include "spam_call_adapter.h"
@@ -23,10 +23,10 @@
 
 namespace OHOS {
 namespace Telephony {
-class CallbackStubHelper : public SpamCallStub {
+class ReminderCallbackStubHelper : public SpamCallStub {
 public:
-    CallbackStubHelper(std::shared_ptr<SpamCallAdapter> spamCallAdapter);
-    ~CallbackStubHelper();
+    ReminderCallbackStubHelper(std::shared_ptr<SpamCallAdapter> spamCallAdapter);
+    ~ReminderCallbackStubHelper();
     int32_t OnResult(int32_t &errCode, std::string &result) override;
 
 private:
@@ -35,4 +35,4 @@ private:
 }
 }
 
-#endif // TELEPHONY_CALLBACK_STUB_HELPER_H
+#endif // TELEPHONY_REMINDER_CALLBACK_STUB_HELPER_H

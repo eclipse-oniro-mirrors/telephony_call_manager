@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 Huawei Device Co., Ltd.
+ * Copyright (C) 2024-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -42,11 +42,11 @@ void SpamCallConnection::OnAbilityDisconnectDone(const AppExecFwk::ElementName &
     TELEPHONY_LOGI("OnAbilityDisconnectDone, resultCode = %{public}d", resultCode);
 }
 
-void SpamCallConnection::DetectNeedNotify()
+void SpamCallConnection::RequireCallReminder()
 {
     TELEPHONY_LOGI("DetectNeedNotify start.");
     SpamCallProxy service(remoteObject_);
-    int32_t ret = service.DetectNeedNotify(slotId_, spamCallAdapter_);
+    int32_t ret = service.RequireCallReminder(slotId_, spamCallAdapter_);
     TELEPHONY_LOGI("SpamCallProxy DetectNeedNotify ret = %{public}d", ret);
 }
 } // namespace Telephony
