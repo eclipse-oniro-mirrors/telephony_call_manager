@@ -20,7 +20,7 @@
 
 #include "call_manager_errors.h"
 #include "telephony_log_wrapper.h"
-#include "callback_stub_helper.h"
+#include "reminder_callback_stub_helper.h"
 #include "callback_stub_helper.h"
 #include <string_ex.h>
 
@@ -76,9 +76,9 @@ int32_t SpamCallProxy::RequireCallReminder(const int32_t &slotId, std::shared_pt
         TELEPHONY_LOGE("Write descriptor fail");
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
-    auto instance = new (std::nothrow) CallbackStubHelper(spamCallAdapter);
+    auto instance = new (std::nothrow) ReminderCallbackStubHelper(spamCallAdapter);
     if (instance == nullptr) {
-        TELEPHONY_LOGE("CallbackStubHelper is null!");
+        TELEPHONY_LOGE("ReminderCallbackStubHelper is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
 

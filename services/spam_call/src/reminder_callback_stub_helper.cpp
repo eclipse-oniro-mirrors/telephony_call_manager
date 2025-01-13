@@ -22,7 +22,6 @@
 
 namespace OHOS {
 namespace Telephony {
-constexpr int32_t DECISION_REASON_TRUSTLIST = 2;
 ReminderCallbackStubHelper::ReminderCallbackStubHelper(std::shared_ptr<SpamCallAdapter> spamCallAdapter)
 {
     spamCallAdapter_ = spamCallAdapter;
