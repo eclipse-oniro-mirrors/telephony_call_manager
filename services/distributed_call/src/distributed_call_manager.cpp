@@ -110,15 +110,18 @@ bool DistributedCallManager::CreateDAudioDevice(const std::string& devId, AudioD
         TELEPHONY_LOGE("dcall devId is invalid");
         return false;
     }
-    if (dcallProxy_ == nullptr) {
-        TELEPHONY_LOGE("dcallProxy_ is nullptr");
-        return false;
-    }
     OHOS::DistributedHardware::DCallDeviceInfo devInfo;
-    int32_t ret = dcallProxy_->GetDCallDeviceInfo(devId, devInfo);
-    if (ret != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGI("get dcall device info failed.");
-        return false;
+    {
+        std::lock_guard<std::mutex> lock(dcallProxyMtx_);
+        if (dcallProxy_ == nullptr) {
+            TELEPHONY_LOGE("dcallProxy_ is nullptr");
+            return false;
+        }
+        int32_t ret = dcallProxy_->GetDCallDeviceInfo(devId, devInfo);
+        if (ret != TELEPHONY_SUCCESS) {
+            TELEPHONY_LOGI("get dcall device info failed.");
+            return false;
+        }
     }
     std::string devTypeName;
     std::string devName = devInfo.devName;
