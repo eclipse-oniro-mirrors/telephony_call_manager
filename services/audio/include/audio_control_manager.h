@@ -122,6 +122,7 @@ private:
     std::recursive_mutex toneStateLock_;
     sptr<CallBase> frontCall_ = nullptr;
     bool isSetAudioDeviceByUser_ = false;
+    bool isBtCallDisConnected_ = false;
 };
 } // namespace Telephony
 } // namespace OHOS

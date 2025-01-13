@@ -137,6 +137,9 @@ void AudioControlManager::CallStateUpdated(
     HandleCallStateUpdated(callObjectPtr, priorState, nextState);
     if (nextState == TelCallState::CALL_STATUS_DISCONNECTED && totalCalls_.count(callObjectPtr) > 0) {
         totalCalls_.erase(callObjectPtr);
+        if (callObjectPtr->GetCallType() == CallType::TYPE_BLUETOOTH) {
+            isBtCallDisConnected_ = true
+        }
     }
     UpdateForegroundLiveCall();
 }
@@ -801,6 +804,11 @@ void AudioControlManager::PlayCallEndedTone(CallEndedType type)
                 StopCallTone();
             }
             TELEPHONY_LOGI("play call ended tone");
+            if (isBtCallDisConnected_) {
+                isBtCallDisConnected_ = false;
+                toneState_ = ToneState::CALLENDED;
+                return;
+            }
             if (PlayCallTone(ToneDescriptor::TONE_FINISHED) != TELEPHONY_SUCCESS) {
                 StopCallTone();
                 TELEPHONY_LOGE("play call ended tone failed");
