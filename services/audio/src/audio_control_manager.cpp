@@ -138,7 +138,7 @@ void AudioControlManager::CallStateUpdated(
     if (nextState == TelCallState::CALL_STATUS_DISCONNECTED && totalCalls_.count(callObjectPtr) > 0) {
         totalCalls_.erase(callObjectPtr);
         if (callObjectPtr->GetCallType() == CallType::TYPE_BLUETOOTH) {
-            isBtCallDisConnected_ = true
+            isBtCallDisConnected_ = true;
         }
     }
     UpdateForegroundLiveCall();
