@@ -108,20 +108,18 @@ bool DistributedCallManager::CreateDAudioDevice(const std::string& devId, AudioD
         TELEPHONY_LOGE("dcall devId is invalid");
         return false;
     }
-    int32_t ret;
+    OHOS::DistributedHardware::DCallDeviceInfo devInfo;
     {
         std::lock_guard<std::mutex> lock(dcallProxyMtx_);
         if (dcallProxy_ == nullptr) {
             TELEPHONY_LOGE("dcallProxy_ is nullptr");
             return false;
         }
-        OHOS::DistributedHardware::DCallDeviceInfo devInfo;
-        ret = dcallProxy_->GetDCallDeviceInfo(devId, devInfo);
-    }
-
-    if (ret != TELEPHONY_SUCCESS) {
+        int32_t ret = dcallProxy_->GetDCallDeviceInfo(devId, devInfo);
+        if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGI("get dcall device info failed.");
         return false;
+    }
     }
     std::string devTypeName;
     std::string devName = devInfo.devName;
@@ -324,7 +322,6 @@ bool DistributedCallManager::SwitchOnDCallDeviceSync(const AudioDevice& device)
         ReportDistributedDeviceInfo(device);
         ret = dcallProxy_->SwitchDevice(devId, DCALL_SWITCH_DEVICE_TYPE_SINK);
     }
-    
     if (ret == TELEPHONY_SUCCESS) {
         dCallDeviceSwitchedOn_.store(true);
         SetConnectedDCallDevice(device);
@@ -391,7 +388,6 @@ void DistributedCallManager::SwitchOffDCallDeviceSync()
         }
         ret = dcallProxy_->SwitchDevice(devId, DCALL_SWITCH_DEVICE_TYPE_SOURCE);
     }
-    
     if (ret == TELEPHONY_SUCCESS) {
         dCallDeviceSwitchedOn_.store(false);
         ClearConnectedDCallDevice();
