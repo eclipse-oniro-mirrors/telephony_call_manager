@@ -253,7 +253,7 @@ HWTEST_F(ZeroBranch5Test, Telephony_IncomingCallWakeup_001, Function | MediumTes
 {
     IncomingCallWakeup incomingCallWakeup;
     sptr<CallBase> callObjectPtr = nullptr;
-    incomingCallWakeup.NewCallCreated(callObjectPtr);
+    ASSERT_NO_THROW(incomingCallWakeup.NewCallCreated(callObjectPtr));
 }
 
 /**
