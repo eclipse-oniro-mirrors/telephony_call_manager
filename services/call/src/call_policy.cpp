@@ -229,7 +229,7 @@ bool CallPolicy::IsSupportVideoCall(AppExecFwk::PacMap &extras)
         isSupportVideoCall = false;
     }
     bool vtEnabled = false;
-    DelayedSingleton<CallNumberUtils>::GetInstance()->IsCarrierVtConfig(extras.GetIntValue("accountId", vtEnabled))
+    DelayedSingleton<CallNumberUtils>::GetInstance()->IsCarrierVtConfig(extras.GetIntValue("accountId"), vtEnabled);
     if (!vtEnabled) {
         isSupportVideoCall = false;
     }
