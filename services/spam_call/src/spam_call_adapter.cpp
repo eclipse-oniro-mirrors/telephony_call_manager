@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 Huawei Device Co., Ltd.
+ * Copyright (C) 2024-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -222,7 +222,7 @@ void SpamCallAdapter::ParseMarkResults(NumberMarkInfo &info, cJSON *root, std::s
     TELEPHONY_LOGI("DetectSpamCall markType: %{public}d", info.markType);
     if (!isBlock && (info.markType == MarkType::MARK_TYPE_CRANK || info.markType == MarkType::MARK_TYPE_FRAUD ||
         info.markType == MarkType::MARK_TYPE_PROMOTE_SALES || info.markType == MarkType::MARK_TYPE_HOUSE_AGENT)) {
-        connection_->DetectNeedNotify();
+        connection_->RequireCallReminder();
     }
     if (JsonGetNumberValue(root, MARK_COUNT, numberValue)) {
         info.markCount = numberValue;

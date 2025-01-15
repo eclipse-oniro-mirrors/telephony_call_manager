@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 Huawei Device Co., Ltd.
+ * Copyright (C) 2024-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -44,9 +44,6 @@ int32_t SpamCallStub::OnRemoteRequest(uint32_t code, MessageParcel &data, Messag
     switch (code) {
         case COMMAND_DETECT_SPAM_CALL_RESULT:
             OnResult(errCodeVar, resultVar);
-            break;
-        case COMMAND_DETECT_NEED_NOTIFY_RESULT:
-            OnNeedNotifyResult(errCodeVar, resultVar);
             break;
         default:
             TELEPHONY_LOGE("callback failed, default = %d", code);

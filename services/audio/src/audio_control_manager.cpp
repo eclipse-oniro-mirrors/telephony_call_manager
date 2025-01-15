@@ -577,6 +577,11 @@ bool AudioControlManager::PlayRingtone()
         return false;
     }
     TELEPHONY_LOGI("play ringtone success");
+    incomingCall = CallObjectManager::GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_RINGING);
+    if (incomingCall == nullptr) {
+        TELEPHONY_LOGI("play ringtone success but incoming call is null stop it");
+        StopRingtone();
+    }
     return true;
 }
 

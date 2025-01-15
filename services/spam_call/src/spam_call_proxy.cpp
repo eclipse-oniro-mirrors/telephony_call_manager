@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 Huawei Device Co., Ltd.
+ * Copyright (C) 2024-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -20,7 +20,7 @@
 
 #include "call_manager_errors.h"
 #include "telephony_log_wrapper.h"
-#include "callback_stub_helper.h"
+#include "reminder_callback_stub_helper.h"
 #include "callback_stub_helper.h"
 #include <string_ex.h>
 
@@ -68,7 +68,7 @@ int32_t SpamCallProxy::DetectSpamCall(const std::string &phoneNumber, const int3
     return replyParcel.ReadInt32();
 }
 
-int32_t SpamCallProxy::DetectNeedNotify(const int32_t &slotId, std::shared_ptr<SpamCallAdapter> spamCallAdapter)
+int32_t SpamCallProxy::RequireCallReminder(const int32_t &slotId, std::shared_ptr<SpamCallAdapter> spamCallAdapter)
 {
     MessageParcel dataParcel;
     std::u16string myDescriptor = SpamCallProxy::GetDescriptor();
@@ -76,9 +76,9 @@ int32_t SpamCallProxy::DetectNeedNotify(const int32_t &slotId, std::shared_ptr<S
         TELEPHONY_LOGE("Write descriptor fail");
         return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
-    auto instance = new (std::nothrow) CallbackStubHelper(spamCallAdapter);
+    auto instance = new (std::nothrow) ReminderCallbackStubHelper(spamCallAdapter);
     if (instance == nullptr) {
-        TELEPHONY_LOGE("CallbackStubHelper is null!");
+        TELEPHONY_LOGE("ReminderCallbackStubHelper is null!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
 

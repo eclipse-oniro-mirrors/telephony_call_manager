@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 Huawei Device Co., Ltd.
+ * Copyright (C) 2024-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -56,15 +56,6 @@ int32_t CallbackStubHelper::OnResult(int32_t &errCode, std::string &result)
             static_cast<int32_t>(numberMarkInfo.markType), isBlock, blockReason);
     }
     spamCallAdapter_->NotifyAll();
-    return TELEPHONY_SUCCESS;
-}
-
-int32_t CallbackStubHelper::OnNeedNotifyResult(int32_t &errCode, std::string &result)
-{
-    TELEPHONY_LOGI("OnNeedNotifyResult errCode: %{public}d", errCode);
-    if (errCode == 0) {
-        spamCallAdapter_->ParseNeedNotifyResult(result);
-    }
     return TELEPHONY_SUCCESS;
 }
 } // namespace Telephony

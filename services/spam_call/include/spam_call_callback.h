@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 Huawei Device Co., Ltd.
+ * Copyright (C) 2024-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -25,7 +25,6 @@ public:
     DECLARE_INTERFACE_DESCRIPTOR(u"idl.ISpamResultCallback");
 
     virtual int32_t OnResult(int32_t &errCode, std::string &result) = 0;
-    virtual int32_t OnNeedNotifyResult(int32_t &errCode, std::string &result) = 0;
 };
 } // namespace Telephony
 } // namespace OHOS
