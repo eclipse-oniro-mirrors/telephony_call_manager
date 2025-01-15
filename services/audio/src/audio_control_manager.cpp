@@ -806,6 +806,9 @@ void AudioControlManager::PlayCallEndedTone(CallEndedType type)
                 StopCallTone();
             }
             TELEPHONY_LOGI("play call ended tone");
+            if (IsBtCallDisconnected()) {
+                return;
+            }
             if (PlayCallTone(ToneDescriptor::TONE_FINISHED) != TELEPHONY_SUCCESS) {
                 StopCallTone();
                 TELEPHONY_LOGE("play call ended tone failed");
@@ -1111,6 +1114,15 @@ bool AudioControlManager::IsVoIPCallActived()
     }
     TELEPHONY_LOGI("VoIP Call is actived");
     return true;
+}
+
+bool AudioControlManager::IsBtCallDisconnected()
+{
+    sptr<CallBase> call = CallObjectManager::GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_ENDED);
+    if (call != nullptr && call->GetCallType() == CallType::TYPE_BLUETOOTH) {
+        return true;
+    }
+    return false;
 }
 } // namespace Telephony
 } // namespace OHOS

@@ -110,6 +110,7 @@ private:
     bool IsRingingVibrateModeOn();
     bool IsVoIPCallActived();
     int32_t SwitchAudioDevice(AudioDeviceType audioDeviceType);
+    bool IsBtCallDisconnected();
     ToneState toneState_ = ToneState::STOPPED;
     SoundState soundState_ = SoundState::STOPPED;
     bool isLocalRingbackNeeded_ = false;
