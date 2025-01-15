@@ -807,7 +807,6 @@ void AudioControlManager::PlayCallEndedTone(CallEndedType type)
             }
             TELEPHONY_LOGI("play call ended tone");
             if (IsBtCallDisconnected()) {
-                toneState_ = ToneState::CALLENDED;
                 return;
             }
             if (PlayCallTone(ToneDescriptor::TONE_FINISHED) != TELEPHONY_SUCCESS) {
