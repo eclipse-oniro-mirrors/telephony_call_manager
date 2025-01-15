@@ -223,6 +223,12 @@ bool CallPolicy::IsSupportVideoCall(AppExecFwk::PacMap &extras)
 #ifdef ABILITY_CONFIG_SUPPORT
     isSupportVideoCall = GetCarrierConfig(ITEM_VIDEO_CALL);
 #endif
+    bool vtEnabled = false;
+    DelayedSingleton<CallNumberUtils>::GetInstance()->IsCarrierVtConfig(extras.GetIntValue("accountId"), vtEnabled);
+    if (!vtEnabled) {
+        isSupportVideoCall = false;
+        return isSupportVideoCall;
+    }
     DialScene dialScene = (DialScene)extras.GetIntValue("dialScene");
     if (dialScene != DialScene::CALL_NORMAL) {
         TELEPHONY_LOGW("emergency call not support video upgrade");

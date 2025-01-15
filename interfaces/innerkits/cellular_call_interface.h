@@ -339,6 +339,15 @@ public:
     virtual int32_t GetImsSwitchStatus(int32_t slotId, bool &enabled) = 0;
 
     /**
+     * @brief Get Carrier Vt Config
+     *
+     * @param slotId[in] the slot id
+     * @param enabled[out] indicate the carrier vt config, true is support, false is not support
+     * @return Returns TELEPHONY_SUCCESS on success, others on failure.
+     */
+    virtual int32_t GetCarrierVtConfig(int32_t slotId, bool &enabled) = 0;
+
+    /**
      * @brief Set VoNR Switch Status
      *
      * @param state[in] Indicates the VoNR state, 0: off, 1: on

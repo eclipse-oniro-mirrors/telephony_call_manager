@@ -159,6 +159,12 @@ int32_t CallNumberUtils::CheckNumberIsEmergency(const std::string &phoneNumber, 
         phoneNumber, slotId, enabled);
 }
 
+int32_t CallNumberUtils::IsCarrierVtConfig(const int32_t slotId, bool &enabled)
+{
+    return DelayedSingleton<CellularCallConnection>::GetInstance()->GetCarrierVtConfig(
+        slotId, enabled);
+}
+
 bool CallNumberUtils::IsValidSlotId(int32_t slotId) const
 {
     if (SIM_SLOT_COUNT == HAS_A_SLOT) {

@@ -42,6 +42,7 @@ public:
         const std::string &phoneNumber, const std::string &countryCode, std::string &formatNumber);
     int32_t CheckNumberIsEmergency(const std::string &phoneNumber, const int32_t slotId, bool &enabled);
     bool IsValidSlotId(int32_t slotId) const;
+    int32_t IsCarrierVtConfig(const int32_t slotId, bool &enabled);
     bool IsMMICode(const std::string &number);
     bool RegexMatchMmi(const std::string &number);
     std::string RemoveSeparatorsPhoneNumber(const std::string &phoneString);
