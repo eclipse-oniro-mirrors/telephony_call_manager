@@ -1548,6 +1548,44 @@ int32_t CallManagerProxy::GetVoIPCallState(int32_t &state)
     return TELEPHONY_SUCCESS;
 }
 
+int32_t CallManagerProxy::SetVoIPCallInfo(int32_t callId, int32_t state, std::string phoneNumber)
+{
+    if (ReConnectService() != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("ipc reconnect failed!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    Utils::UniqueReadGuard<Utils::RWLock> guard(rwClientLock_);
+    if (callManagerServicePtr_ == nullptr) {
+        TELEPHONY_LOGE("callManagerServicePtr_ is null");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    int32_t errCode = callManagerServicePtr_->SetVoIPCallInfo(callId, state, phoneNumber);
+    if (errCode != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("failed, errcode:%{public}d", errCode);
+        return errCode;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallManagerProxy::GetVoIPCallInfo(int32_t &callId, int32_t &state, std::string &phoneNumber)
+{
+    if (ReConnectService() != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("ipc reconnect failed!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    Utils::UniqueReadGuard<Utils::RWLock> guard(rwClientLock_);
+    if (callManagerServicePtr_ == nullptr) {
+        TELEPHONY_LOGE("callManagerServicePtr_ is null");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    int32_t errCode = callManagerServicePtr_->GetVoIPCallInfo(callId, state, phoneNumber);
+    if (errCode != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("failed, errcode:%{public}d", errCode);
+        return errCode;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
 sptr<IRemoteObject> CallManagerProxy::GetProxyObjectPtr(CallManagerProxyType proxyType)
 {
     if (ReConnectService() != TELEPHONY_SUCCESS) {

@@ -44,6 +44,15 @@ int32_t CallAbilityCallback::OnCallDetailsChange(const CallAttributeInfo &info)
     return TELEPHONY_SUCCESS;
 }
 
+int32_t CallAbilityCallback::OnMeeTimeDetailsChange(const CallAttributeInfo &info)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (callbackPtr_ != nullptr) {
+        return callbackPtr_->OnMeeTimeDetailsChange(info);
+    }
+    return TELEPHONY_SUCCESS;
+}
+
 int32_t CallAbilityCallback::OnCallEventChange(const CallEventInfo &info)
 {
     std::lock_guard<std::mutex> lock(mutex_);

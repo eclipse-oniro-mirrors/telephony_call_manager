@@ -32,6 +32,15 @@ int32_t NapiCallManagerCallback::OnCallDetailsChange(const CallAttributeInfo &in
     return ret;
 }
 
+int32_t NapiCallManagerCallback::OnMeeTimeDetailsChange(const CallAttributeInfo &info)
+{
+    int32_t ret = DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->UpdateMeeTimeStateInfo(info);
+    if (ret == TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGI("UpdateMeeTimeStateInfoHandler success! state:%{public}d", info.callState);
+    }
+    return ret;
+}
+
 int32_t NapiCallManagerCallback::OnCallEventChange(const CallEventInfo &info)
 {
     int32_t ret = DelayedSingleton<NapiCallAbilityCallback>::GetInstance()->UpdateCallEvent(info);

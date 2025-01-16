@@ -29,6 +29,7 @@ public:
     virtual ~ICallAbilityCallback() = default;
 
     virtual int32_t OnCallDetailsChange(const CallAttributeInfo &info) = 0;
+    virtual int32_t OnMeeTimeDetailsChange(const CallAttributeInfo &info) = 0;
     virtual int32_t OnCallEventChange(const CallEventInfo &info) = 0;
     virtual int32_t OnCallDisconnectedCause(const DisconnectedDetails &details) = 0;
     virtual int32_t OnReportAsyncResults(CallResultReportId reportId, AppExecFwk::PacMap &resultInfo) = 0;

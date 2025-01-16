@@ -40,6 +40,8 @@
 #include "distributed_communication_manager.h"
 #include "want_params_wrapper.h"
 #include "string_wrapper.h"
+#include "call_manager_info.h"
+#include "call_status_manager.h"
 #include "call_wired_headset.h"
 #include "bluetooth_call_connection.h"
 
@@ -61,6 +63,7 @@ static constexpr const char *CALL_TYPE = "callType";
 static constexpr const char *VIDEO_STATE = "videoState";
 static constexpr int32_t CLEAR_VOICE_MAIL_COUNT = 0;
 static constexpr int32_t IS_CELIA_CALL = 1;
+static CallAttributeInfo info;
 
 const bool g_registerResult =
     SystemAbility::MakeAndRegisterAbility(DelayedSingleton<CallManagerService>::GetInstance().get());
@@ -1480,6 +1483,57 @@ int32_t CallManagerService::GetVoIPCallState(int32_t &state)
     }
     if (callControlManagerPtr_ != nullptr) {
         return callControlManagerPtr_->GetVoIPCallState(state);
+    } else {
+        TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+}
+
+int32_t CallManagerService::SetVoIPCallInfo(int32_t callId, int32_t state, std::string phoneNumber)
+{
+    size_t copiedChars = phoneNumber.copy(info.accountNumber, sizeof(info.accountNumber) - 1);
+    info.accountNumber[copiedChars] = '\0';
+    info.callType = CallType::TYPE_VOIP;
+    info.callId = callId;
+    info.callState = (TelCallState)state;
+    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
+        TELEPHONY_LOGE("Non-system applications use system APIs!");
+        return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
+    }
+    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_SET_TELEPHONY_STATE) &&
+        !TelephonyPermission::CheckPermission(OHOS_PERMISSION_GET_TELEPHONY_STATE)) {
+        TELEPHONY_LOGE("Permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
+    if (callControlManagerPtr_ != nullptr) {
+        if (state == (int32_t)TelCallState::CALL_STATUS_INCOMING) {
+            TELEPHONY_LOGI("SetVoIPCallInfo to CALL_STATUS_INCOMING");
+            DelayedSingleton<CallControlManager>::GetInstance()->NotifyVoipCallStateUpdated(info,
+            TelCallState::CALL_STATUS_INCOMING, TelCallState::CALL_STATUS_INCOMING);
+        } else if (state == (int32_t)TelCallState::CALL_STATUS_IDLE) {
+            TELEPHONY_LOGI("SetVoIPCallInfo to CALL_STATUS_ACTIVE");
+            DelayedSingleton<CallControlManager>::GetInstance()->NotifyVoipCallStateUpdated(info,
+            TelCallState::CALL_STATUS_INCOMING, TelCallState::CALL_STATUS_ACTIVE);
+        } else if (state == (int32_t)TelCallState::CALL_STATUS_DISCONNECTED) {
+            TELEPHONY_LOGI("SetVoIPCallInfo to CALL_STATUS_DISCONNECTED");
+            DelayedSingleton<CallControlManager>::GetInstance()->NotifyVoipCallStateUpdated(info,
+            TelCallState::CALL_STATUS_ACTIVE, TelCallState::CALL_STATUS_DISCONNECTED);
+        }
+        return callControlManagerPtr_->SetVoIPCallInfo(callId, state, phoneNumber);
+    } else {
+        TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+}
+
+int32_t CallManagerService::GetVoIPCallInfo(int32_t &callId, int32_t &state, std::string &phoneNumber)
+{
+    if (!TelephonyPermission::CheckCallerIsSystemApp()) {
+        TELEPHONY_LOGE("Non-system applications use system APIs!");
+        return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
+    }
+    if (callControlManagerPtr_ != nullptr) {
+        return callControlManagerPtr_->GetVoIPCallInfo(callId, state, phoneNumber);
     } else {
         TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;

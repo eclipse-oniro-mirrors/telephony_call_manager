@@ -139,6 +139,7 @@ napi_value NapiCallManager::DeclareCallExtendInterface(napi_env env, napi_value 
         DECLARE_NAPI_FUNCTION("reportOttCallEventInfo", ReportOttCallEventInfo),
         DECLARE_NAPI_FUNCTION("removeMissedIncomingCallNotification", RemoveMissedIncomingCallNotification),
         DECLARE_NAPI_FUNCTION("setVoIPCallState", SetVoIPCallState),
+        DECLARE_NAPI_FUNCTION("setVoIPCallInfo", SetVoIPCallInfo),
     };
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc));
     return exports;
@@ -1564,6 +1565,18 @@ bool NapiCallManager::MatchNumberAndStringParameters(
             return NapiUtil::MatchParameters(env, parameters, { napi_number, napi_string });
         case THREE_VALUE_MAXIMUM_LIMIT:
             return NapiUtil::MatchParameters(env, parameters, { napi_number, napi_string, napi_function });
+        default:
+            return false;
+    }
+}
+
+bool NapiCallManager::MatchTwoNumberAndStringParameters(
+    napi_env env, const napi_value parameters[], const size_t parameterCount)
+{
+    TELEPHONY_LOGI("Match parmameter count %{public}zu", parameterCount);
+    switch (parameterCount) {
+        case THREE_VALUE_MAXIMUM_LIMIT:
+            return NapiUtil::MatchParameters(env, parameters, { napi_number, napi_number, napi_string });
         default:
             return false;
     }
@@ -3023,6 +3036,41 @@ napi_value NapiCallManager::SetVoIPCallState(napi_env env, napi_callback_info in
     }
     return HandleAsyncWork(
         env, asyncContext.release(), "SetVoIPCallState", NativeSetVoIPCallState, NativeVoidCallBackWithErrorCode);
+}
+
+bool NapiCallManager::NeedSetCallInfoThirdParyApp()
+{
+    std::string readSetVoipCallInfo = system::GetParameter(KEY_CONST_TELEPHONY_READ_SET_VOIP_CALL_INFO, "");
+    if (readSetVoipCallInfo.compare("false") == 0) {
+        return false;
+    }
+    return true;
+}
+
+napi_value NapiCallManager::SetVoIPCallInfo(napi_env env, napi_callback_info info)
+{
+    GET_PARAMS(env, info, THREE_VALUE_MAXIMUM_LIMIT);
+    if (!MatchTwoNumberAndStringParameters(env, argv, argc)) {
+        TELEPHONY_LOGE("NapiCallManager::SetVoIPCallInfo MatchEmptyParameter failed.");
+        NapiUtil::ThrowParameterError(env);
+        return nullptr;
+    }
+    auto asyncContext = std::make_unique<VoIPCallInfoAsyncContext>();
+    if (asyncContext == nullptr) {
+        TELEPHONY_LOGE("NapiCallManager::SetVoIPCallInfo asyncContext is nullptr.");
+        NapiUtil::ThrowParameterError(env);
+        return nullptr;
+    }
+    napi_get_value_int32(env, argv[ARRAY_INDEX_FIRST], &asyncContext->callId);
+    napi_get_value_int32(env, argv[ARRAY_INDEX_SECOND], &asyncContext->state);
+    char tmpStr[kMaxNumberLen + 1] = {0};
+    size_t strLen = 0;
+    napi_get_value_string_utf8(
+        env, argv[ARRAY_INDEX_THIRD], tmpStr, PHONE_NUMBER_MAXIMUM_LIMIT, &strLen);
+    std::string tmpCode(tmpStr, strLen);
+    asyncContext->phoneNumber = tmpCode;
+    return HandleAsyncWork(
+        env, asyncContext.release(), "SetVoIPCallInfo", NativeSetVoIPCallInfo, NativeVoidCallBackWithErrorCode);
 }
 
 napi_value NapiCallManager::HasVoiceCapability(napi_env env, napi_callback_info)
@@ -4959,6 +5007,25 @@ void NapiCallManager::NativeSetVoIPCallState(napi_env env, void *data)
         asyncContext->resolved = TELEPHONY_SUCCESS;
     }
     asyncContext->eventId = CALL_MANAGER_SET_VOIP_CALL_STATE;
+}
+
+void NapiCallManager::NativeSetVoIPCallInfo(napi_env env, void *data)
+{
+    if (!NeedSetCallInfoThirdParyApp()) {
+        TELEPHONY_LOGE("NapiCallManager::NativeSetVoIPCallInfo is not support");
+        return;
+    }
+    if (data == nullptr) {
+        TELEPHONY_LOGE("NapiCallManager::NativeSetVoIPCallInfo data is nullptr");
+        NapiUtil::ThrowParameterError(env);
+        return;
+    }
+    auto asyncContext = (VoIPCallInfoAsyncContext *)data;
+    asyncContext->errorCode = DelayedSingleton<CallManagerClient>::GetInstance()->SetVoIPCallInfo(
+        asyncContext->callId, asyncContext->state, asyncContext->phoneNumber);
+    if (asyncContext->errorCode == TELEPHONY_SUCCESS) {
+        asyncContext->resolved = TELEPHONY_SUCCESS;
+    }
 }
 
 void NapiCallManager::RegisterCallBack()

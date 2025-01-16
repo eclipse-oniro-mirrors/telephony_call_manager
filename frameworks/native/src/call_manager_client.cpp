@@ -727,6 +727,28 @@ int32_t CallManagerClient::SetVoIPCallState(int32_t state)
     }
 }
 
+int32_t CallManagerClient::SetVoIPCallInfo(int32_t callId, int32_t state, std::string phoneNumber)
+{
+    if (g_callManagerProxy != nullptr) {
+        return g_callManagerProxy->SetVoIPCallInfo(callId, state, phoneNumber);
+    } else {
+        TELEPHONY_LOGE("init first please!");
+        return TELEPHONY_ERR_UNINIT;
+    }
+    return 0;
+}
+
+int32_t CallManagerClient::GetVoIPCallInfo(int32_t &callId, int32_t &state, std::string &phoneNumber)
+{
+    if (g_callManagerProxy != nullptr) {
+        return g_callManagerProxy->GetVoIPCallInfo(callId, state, phoneNumber);
+    } else {
+        TELEPHONY_LOGE("init first please!");
+        return TELEPHONY_ERR_UNINIT;
+    }
+    return 0;
+}
+
 int32_t CallManagerClient::GetVoIPCallState(int32_t &state)
 {
     if (g_callManagerProxy != nullptr) {

@@ -608,6 +608,17 @@ bool CallControlManager::NotifyCallStateUpdated(
     return false;
 }
 
+bool CallControlManager::NotifyVoipCallStateUpdated(
+    CallAttributeInfo info, TelCallState priorState, TelCallState nextState)
+{
+    if (callStateListenerPtr_ != nullptr) {
+        TELEPHONY_LOGI("NotifyVoipStateUpdated priorState:%{public}d,nextState:%{public}d", priorState, nextState);
+        callStateListenerPtr_->MeeTimeStateUpdated(info, priorState, nextState);
+        return true;
+    }
+    return false;
+}
+
 bool CallControlManager::NotifyIncomingCallAnswered(sptr<CallBase> &callObjectPtr)
 {
     if (callObjectPtr == nullptr) {
@@ -1382,6 +1393,108 @@ int32_t CallControlManager::SetVoIPCallState(int32_t state)
         }
     }
     return TELEPHONY_SUCCESS;
+}
+
+int32_t CallControlManager::SetVoIPCallInfo(int32_t callId, int32_t state, std::string phoneNumber)
+{
+    int32_t numActive = GetCallNum(TelCallState::CALL_STATUS_ACTIVE, true);
+    int32_t numHeld = GetCallNum(TelCallState::CALL_STATUS_HOLDING, true);
+    switch (state) {
+        case (int32_t)TelCallState::CALL_STATUS_IDLE: {
+            HandleVoipConnected(numActive, callId);
+            break;
+        }
+        case (int32_t)TelCallState::CALL_STATUS_INCOMING: {
+            HandleVoipIncoming(numActive, callId, phoneNumber);
+            break;
+        }
+        case (int32_t)TelCallState::CALL_STATUS_DISCONNECTED: {
+            DeleteOneVoipCallObject(callId);
+            DelayedSingleton<BluetoothCallManager>::GetInstance()->
+                SendBtCallState(numActive, numHeld, state, phoneNumber);
+            int32_t callId = ERR_ID;
+            IsCallExist(TelCallState::CALL_STATUS_INCOMING, callId);
+            if (callId != ERR_ID) {
+                TELEPHONY_LOGI("SetVoIPCallInfo handle cs call sucessed");
+                sptr<CallBase> call = GetOneCallObject(callId);
+                return DelayedSingleton<BluetoothCallManager>::GetInstance()->
+                    SendBtCallState(0, 0, (int32_t)TelCallState::CALL_STATUS_INCOMING, call->GetAccountNumber());
+            } else {
+                return DelayedSingleton<BluetoothCallManager>::GetInstance()->
+                    SendBtCallState(numActive, numHeld, (int32_t)TelCallState::CALL_STATUS_IDLE, "");
+            }
+            break;
+        }
+        case (int32_t)TelCallState::CALL_STATUS_ALERTING: {
+            HandleVoipAlerting(callId, phoneNumber);
+            break;
+        }
+        default:
+            break;
+    }
+    VoipCallInfo_.callId = callId;
+    VoipCallInfo_.state = state;
+    VoipCallInfo_.phoneNumber = phoneNumber;
+    return DelayedSingleton<BluetoothCallManager>::GetInstance()->
+        SendBtCallState(numActive, numHeld, state, phoneNumber);
+}
+
+void CallControlManager::HandleVoipConnected(int32_t &numActive, int32_t callId)
+{
+    if (numActive == 0) {
+        numActive = 1;
+    }
+    UpdateOneVoipCallObjectByCallId(callId, TelCallState::CALL_STATUS_ACTIVE);
+}
+
+void CallControlManager::HandleVoipIncoming(int32_t &numActive, int32_t callId, const std::string phoneNumber)
+{
+    CallAttributeInfo info;
+    size_t copiedChars = phoneNumber.copy(info.accountNumber, sizeof(info.accountNumber) - 1);
+    info.accountNumber[copiedChars] = '\0';
+    info.callType = CallType::TYPE_VOIP;
+    info.callId = callId;
+    if (HasCallExist()) {
+        info.callState = TelCallState::CALL_STATUS_WAITING;
+    } else {
+        info.callState = TelCallState::CALL_STATUS_INCOMING;
+    }
+    info.callDirection = CallDirection::CALL_DIRECTION_IN;
+    if (IsVoipCallExist() && (GetVoipCallInfo().callState == TelCallState::CALL_STATUS_ACTIVE)) {
+        if (numActive == 0) {
+            numActive = 1;
+        }
+    }
+    AddOneVoipCallObject(info);
+    bool res = DelayedSingleton<AudioDeviceManager>::GetInstance()->SetVirtualCall(false);
+    TELEPHONY_LOGI("SetVirtualCall res: %{public}d.", res);
+}
+
+void CallControlManager::HandleVoipAlerting(int32_t callId, const std::string phoneNumber)
+{
+    CallAttributeInfo info;
+    size_t copiedChars = phoneNumber.copy(info.accountNumber, sizeof(info.accountNumber) - 1);
+    info.accountNumber[copiedChars] = '\0';
+    info.callType = CallType::TYPE_VOIP;
+    info.callId = callId;
+    info.callState = TelCallState::CALL_STATUS_ALERTING;
+    info.callDirection = CallDirection::CALL_DIRECTION_OUT;
+    AddOneVoipCallObject(info);
+    bool res = DelayedSingleton<AudioDeviceManager>::GetInstance()->SetVirtualCall(false);
+    TELEPHONY_LOGI("SetVirtualCall res = %{public}d.", res);
+}
+
+int32_t CallControlManager::GetMeetimeCallState()
+{
+    return VoipCallInfo_.state;
+}
+
+int32_t CallControlManager::GetVoIPCallInfo(int32_t &callId, int32_t &state, std::string &phoneNumber)
+{
+    callId = VoipCallInfo_.callId;
+    state = VoipCallInfo_.state;
+    phoneNumber = VoipCallInfo_.phoneNumber;
+    return 0;
 }
 
 void CallControlManager::AppStateObserver()

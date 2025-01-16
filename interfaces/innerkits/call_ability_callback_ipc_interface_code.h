@@ -21,6 +21,7 @@ namespace OHOS {
 namespace Telephony {
 enum CallManagerCallAbilityInterfaceCode {
     UPDATE_CALL_STATE_INFO = 0,
+    UPDATE_MEETIME_STATE_INFO,
     UPDATE_CALL_EVENT,
     UPDATE_CALL_DISCONNECTED_CAUSE,
     UPDATE_CALL_ASYNC_RESULT_REQUEST,

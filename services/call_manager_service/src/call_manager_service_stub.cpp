@@ -225,6 +225,10 @@ void CallManagerServiceStub::InitImsServiceRequest()
         [this](MessageParcel &data, MessageParcel &reply) { return OnSetVoIPCallState(data, reply); };
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_GET_VOIP_CALL_STATE)] =
         [this](MessageParcel &data, MessageParcel &reply) { return OnGetVoIPCallState(data, reply); };
+    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_SET_VOIP_CALL_INFO)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnSetVoIPCallInfo(data, reply); };
+    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_GET_VOIP_CALL_INFO)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnGetVoIPCallInfo(data, reply); };
 }
 
 void CallManagerServiceStub::InitOttServiceRequest()
@@ -1306,6 +1310,46 @@ int32_t CallManagerServiceStub::OnGetVoIPCallState(MessageParcel &data, MessageP
     }
     if (!reply.WriteInt32(result)) {
         TELEPHONY_LOGE("GetVoIPCallState fail to write parcel");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallManagerServiceStub::OnSetVoIPCallInfo(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t result = TELEPHONY_ERR_FAIL;
+    int32_t callId = data.ReadInt32();
+    int32_t state = data.ReadInt32();
+    std::string phoneNumber = data.ReadString();
+    result = SetVoIPCallInfo(callId, state, phoneNumber);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("SetVoIPCallInfo fail to write parcel");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallManagerServiceStub::OnGetVoIPCallInfo(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t result = TELEPHONY_ERR_FAIL;
+    int32_t callId;
+    int32_t state;
+    std::string phoneNumber;
+    result = GetVoIPCallInfo(callId, state, phoneNumber);
+    if (!reply.WriteInt32(callId)) {
+        TELEPHONY_LOGE("GetVoIPCallInfo fail to write parcel");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    if (!reply.WriteInt32(state)) {
+        TELEPHONY_LOGE("GetVoIPCallInfo fail to write parcel");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    if (!reply.WriteString(phoneNumber)) {
+        TELEPHONY_LOGE("GetVoIPCallInfo fail to write parcel");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("GetVoIPCallInfo fail to write parcel");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
     return TELEPHONY_SUCCESS;
