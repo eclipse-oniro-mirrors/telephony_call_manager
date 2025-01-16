@@ -129,6 +129,8 @@ ohos_unittest("tel_call_manager_zero3_gtest") {
   ]
   external_deps += call_manager_external_deps
 
+  remove_configs = [ "//build/config/compiler:no_exceptions" ]
+
   deps = [
     "${CALL_MANAGER_PATH}/frameworks/native:tel_call_manager_api",
     "//third_party/cJSON:cjson",

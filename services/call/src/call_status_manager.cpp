@@ -59,6 +59,7 @@ namespace OHOS {
 namespace Telephony {
 constexpr int32_t INIT_INDEX = 0;
 constexpr int32_t PRESENTATION_RESTRICTED = 3;
+
 CallStatusManager::CallStatusManager()
 {
     (void)memset_s(&callReportInfo_, sizeof(CallDetailInfo), 0, sizeof(CallDetailInfo));
@@ -419,19 +420,12 @@ int32_t CallStatusManager::IncomingHandle(const CallDetailInfo &info)
 {
     TELEPHONY_LOGI("handle incoming state");
     detectStartTime = std::chrono::system_clock::from_time_t(0);
-    sptr<CallBase> call = GetOneCallObjectByIndexSlotIdAndCallType(info.index, info.accountId, info.callType);
-    if (call != nullptr) {
-        auto oldCallType = call->GetCallType();
-        auto videoState = call->GetVideoStateType();
-        if (oldCallType != info.callType || call->GetTelCallState() != info.state || videoState != info.callMode) {
-            call = RefreshCallIfNecessary(call, info);
-            if (oldCallType != info.callType || videoState != info.callMode) {
-                return UpdateCallState(call, info.state);
-            }
-        }
-        return TELEPHONY_SUCCESS;
-    }
     int32_t ret = TELEPHONY_SUCCESS;
+    bool isExisted = false;
+    ret = RefreshOldCall(info, isExisted);
+    if (isExisted) {
+        return ret;
+    }
     if (info.callType == CallType::TYPE_CS || info.callType == CallType::TYPE_IMS ||
         info.callType == CallType::TYPE_SATELLITE) {
         ret = IncomingFilterPolicy(info);
@@ -439,10 +433,14 @@ int32_t CallStatusManager::IncomingHandle(const CallDetailInfo &info)
             return ret;
         }
     }
-    call = CreateNewCall(info, CallDirection::CALL_DIRECTION_IN);
+    sptr<CallBase> call = CreateNewCall(info, CallDirection::CALL_DIRECTION_IN);
     if (call == nullptr) {
         TELEPHONY_LOGE("CreateNewCall failed!");
         return CALL_ERR_CALL_OBJECT_IS_NULL;
+    }
+    if (IsFromTheSameNumberAtTheSameTime(call)) {
+        ModifyEsimType();
+        return ret;
     }
     SetContactInfo(call, std::string(info.phoneNum));
     bool block = false;
@@ -1557,6 +1555,7 @@ bool CallStatusManager::ShouldRejectIncomingCall()
         TELEPHONY_LOGI("HasEmergencyCall reject incoming call.");
         return true;
     }
+
     auto datashareHelper = SettingsDataShareHelper::GetInstance();
     std::string device_provisioned {"0"};
     OHOS::Uri uri(
@@ -1984,6 +1983,102 @@ void CallStatusManager::RefreshCallDisconnectReason(const sptr<CallBase> &call, 
         default:
             break;
     }
+}
+
+bool CallStatusManager::IsFromTheSameNumberAtTheSameTime(const sptr<CallBase> &newCall)
+{
+    if (newCall == nullptr) {
+        return false;
+    }
+    // get the old call obj with phoneNumber of new call.
+    std::string phoneNumber = newCall->GetAccountNumber();
+    sptr<CallBase> oldCall = GetOneCallObject(phoneNumber);
+    if (oldCall == nullptr) {
+        return false;
+    }
+    // compare old with new in scene of one-number-dual-terminal
+    if ((abs(newCall->GetCallID() - oldCall->GetCallID()) != 1)) {
+        return false;
+    }
+    CallAttributeInfo oldAttrInfo;
+    oldCall->GetCallAttributeBaseInfo(oldAttrInfo);
+    if (oldAttrInfo.callState != TelCallState::CALL_STATUS_INCOMING) {
+        return false;
+    }
+    CallAttributeInfo newAttrInfo;
+    newCall->GetCallAttributeBaseInfo(newAttrInfo);
+    constexpr int32_t CALLS_COMING_MAX_INTERVAL_DURATION = 10 * 1000;
+    if ((newAttrInfo.callCreateTime - oldAttrInfo.callCreateTime) > CALLS_COMING_MAX_INTERVAL_DURATION) {
+        return false;
+    }
+    TELEPHONY_LOGI("the new call is from the same number at the same time.");
+    return true;
+}
+
+void CallStatusManager::ModifyEsimType()
+{
+    auto datashareHelper = SettingsDataShareHelper::GetInstance();
+    if (datashareHelper == nullptr) {
+        return;
+    }
+    OHOS::Uri settingUri(SettingsDataShareHelper::SETTINGS_DATASHARE_URI);
+    std::string esimCardType = "";
+    
+    constexpr const char* ESIM_TYPE_ONE_NUMBER_DUAL_TERMINAL = "1";
+    int32_t retCode = datashareHelper->Query(settingUri, "key_esim_card_type", esimCardType);
+    if ((retCode == TELEPHONY_SUCCESS) && (esimCardType == ESIM_TYPE_ONE_NUMBER_DUAL_TERMINAL ||
+        esimCardType == "")) {
+        TELEPHONY_LOGI("do not need to fix esim card type, current type: %{public}s", esimCardType.c_str());
+        return;
+    }
+   
+    retCode = datashareHelper->Update(settingUri, "key_esim_card_type", ESIM_TYPE_ONE_NUMBER_DUAL_TERMINAL);
+    if (retCode != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("update esim card type failed, retCode: %{public}d", retCode);
+        return;
+    }
+    std::string manullySetState = "";
+    retCode = datashareHelper->Query(settingUri, "key_manually_set_net", manullySetState);
+    if (manullySetState == "") {
+        manullySetState = "000";
+    }
+    constexpr int32_t STATUS_VALUE_LEN = 3;
+    const char *changeStatus = manullySetState.c_str();
+    if (strlen(changeStatus) != STATUS_VALUE_LEN) {
+        return;
+    }
+    constexpr char SMARTOFF_NETWORK_MODIFIED = '1';
+    int32_t index = 0;
+    if (changeStatus[index++] != SMARTOFF_NETWORK_MODIFIED) {
+        retCode = datashareHelper->Update(settingUri, "key_smartoff_network_bluetooth_connection", "1");
+    }
+    if (changeStatus[index++] != SMARTOFF_NETWORK_MODIFIED) {
+        retCode = datashareHelper->Update(settingUri, "key_smartoff_network_not_wear", "true");
+    }
+    if (changeStatus[index++] != SMARTOFF_NETWORK_MODIFIED) {
+        retCode = datashareHelper->Update(settingUri, "key_smartoff_network_sleep_mode", "true");
+    }
+}
+
+int32_t CallStatusManager::RefreshOldCall(const CallDetailInfo &info, bool &isExistedOldCall)
+{
+    TELEPHONY_LOGI("RefreshOldCall enter.");
+    sptr<CallBase> call = GetOneCallObjectByIndexSlotIdAndCallType(info.index, info.accountId, info.callType);
+    if (call == nullptr) {
+        isExistedOldCall = false;
+        return TELEPHONY_SUCCESS;
+    }
+    isExistedOldCall = true;
+    auto oldCallType = call->GetCallType();
+    auto videoState = call->GetVideoStateType();
+    if (oldCallType != info.callType || call->GetTelCallState() != info.state || videoState != info.callMode) {
+        call = RefreshCallIfNecessary(call, info);
+        if (oldCallType != info.callType || videoState != info.callMode) {
+            return UpdateCallState(call, info.state);
+        }
+    }
+    
+    return TELEPHONY_SUCCESS;
 }
 } // namespace Telephony
 } // namespace OHOS

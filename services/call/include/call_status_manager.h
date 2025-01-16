@@ -125,6 +125,10 @@ private:
     int32_t HandleCallReportInfoEx(const CallDetailInfo &info);
     void ClearPendingState(sptr<CallBase> &call);
     void RefreshCallDisconnectReason(const sptr<CallBase> &call, int32_t reason);
+    bool IsFromTheSameNumberAtTheSameTime(const sptr<CallBase> &newCall);
+    void ModifyEsimType();
+    int32_t RefreshOldCall(const CallDetailInfo &info, bool &isExistedOldCall);
+
 private:
     CallDetailInfo callReportInfo_;
     CallDetailsInfo callDetailsInfo_[SLOT_NUM];

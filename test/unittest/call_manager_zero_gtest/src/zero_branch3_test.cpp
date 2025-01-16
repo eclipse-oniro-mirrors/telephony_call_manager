@@ -74,6 +74,8 @@
 #include "status_bar.h"
 #include "wired_headset.h"
 #include "call_status_policy.h"
+#include "bluetooth_call.h"
+#include "datashare_helper.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -157,6 +159,24 @@ std::shared_ptr<DataShare::DataShareHelper> CreateDataShareHelper(std::string ur
         return nullptr;
     }
     return DataShare::DataShareHelper::Creator(remoteObj, uri);
+}
+
+std::shared_ptr<DataShare::DataShareHelper> CreateDataShareHelper(int systemAbilityId)
+{
+    sptr<ISystemAbilityManager> saManager = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (saManager == nullptr) {
+        TELEPHONY_LOGE("GetSystemAbilityManager failed.");
+        return nullptr;
+    }
+    sptr<IRemoteObject> remote = saManager->GetSystemAbility(systemAbilityId);
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("GetSystemAbility Service Failed.");
+        return nullptr;
+    }
+    const std::string SETTINGS_DATASHARE_URI =
+        "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true";
+    const std::string SETTINGS_DATASHARE_EXT_URI = "datashare:///com.ohos.settingsdata.DataAbility";
+    return DataShare::DataShareHelper::Creator(remote, SETTINGS_DATASHARE_URI, SETTINGS_DATASHARE_EXT_URI);
 }
 
 /**
@@ -986,6 +1006,149 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_002, Function | MediumTest
     callStatusManager->AutoHandleForDsda(canSwitchCallState, priorState, activeCallNum, slotId, true);
     callStatusManager->AutoUnHoldForDsda(canSwitchCallState, priorState, activeCallNum, slotId);
     callStatusManager->AutoAnswerForVideoCall(activeCallNum);
+}
+
+HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_003, Function | MediumTest | Level3)
+{
+    std::shared_ptr<CallStatusManager> callStatusManager = std::make_shared<CallStatusManager>();
+    // scene-0: null input
+    ASSERT_EQ(callStatusManager->IsFromTheSameNumberAtTheSameTime(nullptr), false);
+    
+    // init
+    const std::string phoneNumber = "12345678911";
+    time_t oldCallCreateTime = time(nullptr);
+    if (oldCallCreateTime < 0) {
+        oldCallCreateTime = 0;
+    }
+    int32_t incomingMaxDuration = 10 * 1000;
+    
+    //old call
+    DialParaInfo dialParaInfoOld;
+    sptr<OHOS::Telephony::CallBase> oldCall = new BluetoothCall(dialParaInfoOld, "");
+    oldCall->SetAccountNumber(phoneNumber);
+    oldCall->SetCallId(1);
+    oldCall->SetCallCreateTime(oldCallCreateTime);
+    oldCall->SetTelCallState(TelCallState::CALL_STATUS_INCOMING);
+    oldCall->SetCallType(CallType::TYPE_BLUETOOTH);
+    //new call
+    DialParaInfo dialParaInfoNew;
+    sptr<OHOS::Telephony::CallBase> newCall = new IMSCall(dialParaInfoNew);
+    newCall->SetAccountNumber(phoneNumber);
+    newCall->SetCallId(2);
+    newCall->SetCallCreateTime(oldCallCreateTime + incomingMaxDuration - 1000);
+    newCall->SetTelCallState(TelCallState::CALL_STATUS_INCOMING);
+    newCall->SetCallType(CallType::TYPE_IMS);
+    
+    // scene-1: do not exist old call with the same phone number
+    ASSERT_EQ(callStatusManager->IsFromTheSameNumberAtTheSameTime(newCall), false);
+    ASSERT_NO_THROW(callStatusManager->ModifyEsimType());
+    
+    // scene-2: invalid diff-CallID
+    callStatusManager->AddOneCallObject(oldCall);
+    newCall->SetCallId(9);
+    ASSERT_EQ(callStatusManager->IsFromTheSameNumberAtTheSameTime(newCall), false);
+    ASSERT_NO_THROW(callStatusManager->ModifyEsimType());
+}
+
+HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_004, Function | MediumTest | Level3)
+{
+    std::shared_ptr<CallStatusManager> callStatusManager = std::make_shared<CallStatusManager>();
+    
+    // init
+    const std::string phoneNumber = "12345678911";
+    time_t oldCallCreateTime = time(nullptr);
+    if (oldCallCreateTime < 0) {
+        oldCallCreateTime = 0;
+    }
+    int32_t incomingMaxDuration = 10 * 1000;
+    
+    //old call
+    DialParaInfo dialParaInfoOld;
+    sptr<OHOS::Telephony::CallBase> oldCall = new BluetoothCall(dialParaInfoOld, "");
+    oldCall->SetAccountNumber(phoneNumber);
+    oldCall->SetCallId(1);
+    oldCall->SetCallCreateTime(oldCallCreateTime);
+    oldCall->SetTelCallState(TelCallState::CALL_STATUS_INCOMING);
+    oldCall->SetCallType(CallType::TYPE_BLUETOOTH);
+    //new call
+    DialParaInfo dialParaInfoNew;
+    sptr<OHOS::Telephony::CallBase> newCall = new IMSCall(dialParaInfoNew);
+    newCall->SetAccountNumber(phoneNumber);
+    newCall->SetCallId(2);
+    newCall->SetCallCreateTime(oldCallCreateTime + incomingMaxDuration + 1000);
+    newCall->SetTelCallState(TelCallState::CALL_STATUS_INCOMING);
+    newCall->SetCallType(CallType::TYPE_IMS);
+    
+    // scene-3: invalid diff-CreateTime
+    ASSERT_EQ(callStatusManager->IsFromTheSameNumberAtTheSameTime(newCall), false);
+    ASSERT_NO_THROW(callStatusManager->ModifyEsimType());
+
+    // scene-4: invalid old call status
+    callStatusManager->DeleteOneCallObject(oldCall->GetCallID());
+    oldCall->SetTelCallState(TelCallState::CALL_STATUS_DIALING);
+    callStatusManager->AddOneCallObject(oldCall);
+    newCall->SetCallCreateTime(oldCallCreateTime + incomingMaxDuration - 1000);
+    ASSERT_EQ(callStatusManager->IsFromTheSameNumberAtTheSameTime(newCall), false);
+    ASSERT_NO_THROW(callStatusManager->ModifyEsimType());
+}
+
+HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_005, Function | MediumTest | Level3)
+{
+    std::shared_ptr<CallStatusManager> callStatusManager = std::make_shared<CallStatusManager>();
+    
+    // init
+    const std::string phoneNumber = "12345678911";
+    time_t oldCallCreateTime = time(nullptr);
+    if (oldCallCreateTime < 0) {
+        oldCallCreateTime = 0;
+    }
+    int32_t incomingMaxDuration = 10 * 1000;
+    
+    // old call
+    DialParaInfo dialParaInfoOld;
+    sptr<OHOS::Telephony::CallBase> oldCall = new BluetoothCall(dialParaInfoOld, "");
+    oldCall->SetAccountNumber(phoneNumber);
+    oldCall->SetCallId(1);
+    oldCall->SetCallCreateTime(oldCallCreateTime);
+    oldCall->SetTelCallState(TelCallState::CALL_STATUS_INCOMING);
+    oldCall->SetCallType(CallType::TYPE_BLUETOOTH);
+    // new call
+    DialParaInfo dialParaInfoNew;
+    sptr<OHOS::Telephony::CallBase> newCall = new IMSCall(dialParaInfoNew);
+    newCall->SetAccountNumber(phoneNumber);
+    newCall->SetCallId(2);
+    newCall->SetCallCreateTime(oldCallCreateTime + incomingMaxDuration - 1000);
+    newCall->SetTelCallState(TelCallState::CALL_STATUS_INCOMING);
+    newCall->SetCallType(CallType::TYPE_IMS);
+    // scene-5: invalid call type
+    callStatusManager->AddOneCallObject(oldCall);
+    newCall->SetCallType(CallType::TYPE_CS);
+    ASSERT_EQ(callStatusManager->IsFromTheSameNumberAtTheSameTime(newCall), true);
+    ASSERT_NO_THROW(callStatusManager->ModifyEsimType());
+    // scene-6: valid on-number-dual-call scene
+    newCall->SetCallType(CallType::TYPE_IMS);
+    ASSERT_EQ(callStatusManager->IsFromTheSameNumberAtTheSameTime(newCall), true);
+    ASSERT_NO_THROW(callStatusManager->ModifyEsimType());
+}
+
+HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_006, Function | MediumTest | Level3)
+{
+    std::shared_ptr<DataShare::DataShareHelper> dataShareHelper =
+            CreateDataShareHelper(TELEPHONY_CALL_MANAGER_SYS_ABILITY_ID);
+    if (dataShareHelper != nullptr) {
+        std::shared_ptr<CallStatusManager> callStatusManager = std::make_shared<CallStatusManager>();
+        ASSERT_NO_THROW(callStatusManager->ModifyEsimType());
+        
+        OHOS::Uri uri("datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true");
+        DataShare::DataShareValueObject keyObj("key_esim_card_type");
+        DataShare::DataShareValueObject valueObj("2");
+        DataShare::DataShareValuesBucket bucket;
+        bucket.Put("KEYWORD", keyObj);
+        bucket.Put("VALUE", valueObj);
+        dataShareHelper->Insert(uri, bucket);
+        dataShareHelper->Release();
+        ASSERT_NO_THROW(callStatusManager->ModifyEsimType());
+    }
 }
 } // namespace Telephony
 } // namespace OHOS
