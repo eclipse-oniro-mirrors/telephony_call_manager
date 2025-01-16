@@ -33,6 +33,8 @@ public:
     virtual void CallDestroyed(const DisconnectedDetails &details) {}
     virtual void CallStateUpdated(sptr<CallBase> &callObjectPtr, TelCallState priorState, TelCallState nextState)
     {}
+    virtual void MeeTimeStateUpdated(CallAttributeInfo info, TelCallState priorState, TelCallState nextState)
+    {}
     virtual void IncomingCallHungUp(sptr<CallBase> &callObjectPtr, bool isSendSms, std::string content) {}
     virtual void IncomingCallActivated(sptr<CallBase> &callObjectPtr) {}
     virtual void CallEventUpdated(CallEventInfo &info) {}

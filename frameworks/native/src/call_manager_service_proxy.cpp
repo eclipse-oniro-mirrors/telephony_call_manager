@@ -1252,6 +1252,45 @@ int32_t CallManagerServiceProxy::GetVoIPCallState(int32_t &state)
     return replyParcel.ReadInt32();
 }
 
+int32_t CallManagerServiceProxy::SetVoIPCallInfo(int32_t callId, int32_t state, std::string phoneNumber)
+{
+    MessageParcel dataParcel;
+    if (!dataParcel.WriteInterfaceToken(CallManagerServiceProxy::GetDescriptor())) {
+        TELEPHONY_LOGE("write descriptor fail");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    dataParcel.WriteInt32(callId);
+    dataParcel.WriteInt32(state);
+    dataParcel.WriteString(phoneNumber);
+    MessageParcel replyParcel;
+    int32_t error = SendRequest(INTERFACE_SET_VOIP_CALL_INFO, dataParcel, replyParcel);
+    if (error != ERR_NONE) {
+        TELEPHONY_LOGE("function SetVoIPCallInfo failed! errCode:%{public}d", error);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return replyParcel.ReadInt32();
+}
+
+
+int32_t CallManagerServiceProxy::GetVoIPCallInfo(int32_t &callId, int32_t &state, std::string &phoneNumber)
+{
+    MessageParcel dataParcel;
+    if (!dataParcel.WriteInterfaceToken(CallManagerServiceProxy::GetDescriptor())) {
+        TELEPHONY_LOGE("write descriptor fail");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    MessageParcel replyParcel;
+    int32_t error = SendRequest(INTERFACE_GET_VOIP_CALL_INFO, dataParcel, replyParcel);
+    if (error != ERR_NONE) {
+        TELEPHONY_LOGE("function GetVoIPCallInfo failed! errCode:%{public}d", error);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    callId = replyParcel.ReadInt32();
+    state = replyParcel.ReadInt32();
+    phoneNumber = replyParcel.ReadString();
+    return replyParcel.ReadInt32();
+}
+
 sptr<IRemoteObject> CallManagerServiceProxy::GetProxyObjectPtr(CallManagerProxyType proxyType)
 {
     MessageParcel dataParcel;

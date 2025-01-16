@@ -58,12 +58,14 @@ public:
     int32_t SwitchCall(int32_t callId);
     bool HasCall();
     bool HasVoipCall();
+    int32_t GetMeetimeCallState();
     int32_t IsNewCallAllowed(bool &enabled);
     int32_t IsRinging(bool &enabled);
     int32_t HasEmergency(bool &enabled);
     bool NotifyNewCallCreated(sptr<CallBase> &callObjectPtr);
     bool NotifyCallDestroyed(const DisconnectedDetails &details);
     bool NotifyCallStateUpdated(sptr<CallBase> &callObjectPtr, TelCallState priorState, TelCallState nextState);
+    bool NotifyVoipCallStateUpdated(CallAttributeInfo info, TelCallState priorState, TelCallState nextState);
     bool NotifyIncomingCallAnswered(sptr<CallBase> &callObjectPtr);
     bool NotifyIncomingCallRejected(sptr<CallBase> &callObjectPtr, bool isSendSms, std::string content);
     bool NotifyCallEventUpdated(CallEventInfo &info);
@@ -122,6 +124,8 @@ public:
     int32_t RemoveMissedIncomingCallNotification();
     int32_t SetVoIPCallState(int32_t state);
     int32_t GetVoIPCallState(int32_t &state);
+    int32_t SetVoIPCallInfo(int32_t callId, int32_t state, std::string phoneNumber);
+    int32_t GetVoIPCallInfo(int32_t &callId, int32_t &state, std::string &phoneNumber);
     int32_t AddCallLogAndNotification(sptr<CallBase> &callObjectPtr);
     int32_t AddBlockLogAndNotification(sptr<CallBase> &callObjectPtr);
     int32_t HangUpVoipCall();
@@ -143,6 +147,9 @@ private:
     bool CurrentIsSuperPrivacyMode(int32_t callId, int32_t videoState);
     void AppStateObserver();
     void SetCallTypeExtras(AppExecFwk::PacMap &extras);
+    void HandleVoipConnected(int32_t &numActive, int32_t callId);
+    void HandleVoipIncoming(int32_t &numActive, int32_t callId, const std::string phoneNumber);
+    void HandleVoipAlerting(int32_t callId, const std::string phoneNumber);
 
 private:
     class SystemAbilityListener : public SystemAbilityStatusChangeStub {
@@ -183,6 +190,13 @@ private:
         int32_t callId = 0;
         int32_t videoState = 0;
     } AnsweredCallQueue_;
+
+    struct VoipCallInfo {
+        int32_t callId = 10000;
+        int32_t state = 0;
+        std::string phoneNumber = "";
+    } VoipCallInfo_;
+
     ffrt::task_handle disconnectHandle = nullptr;
     sptr<ApplicationStateObserver> appStateObserver = nullptr;
     sptr<AppExecFwk::IAppMgr> appMgrProxy = nullptr;

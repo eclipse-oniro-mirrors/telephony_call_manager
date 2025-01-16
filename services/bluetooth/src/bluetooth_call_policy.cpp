@@ -78,7 +78,7 @@ int32_t BluetoothCallPolicy::UnHoldCallPolicy(int32_t &callId)
 
 int32_t BluetoothCallPolicy::HangUpPolicy(int32_t &callId)
 {
-    if (IsCallExist(TelCallState::CALL_STATUS_ACTIVE, callId)) {
+    if (HasActivedCallExist(callId)) {
         TELEPHONY_LOGI("active call is exist, callId:%{public}d", callId);
         return TELEPHONY_SUCCESS;
     }

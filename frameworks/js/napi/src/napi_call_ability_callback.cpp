@@ -34,6 +34,7 @@ std::mutex NapiCallAbilityCallback::audioDeviceCallbackMutex_;
 NapiCallAbilityCallback::NapiCallAbilityCallback()
 {
     (void)memset_s(&stateCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
+    (void)memset_s(&meeTimeStateCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
     (void)memset_s(&eventCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
     (void)memset_s(&ottRequestCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
     (void)memset_s(&setRestrictionCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
@@ -525,6 +526,47 @@ int32_t NapiCallAbilityCallback::UpdateCallStateInfo(const CallAttributeInfo &in
     return TELEPHONY_SUCCESS;
 }
 
+int32_t NapiCallAbilityCallback::UpdateMeeTimeStateInfo(const CallAttributeInfo &info)
+{
+    if (meeTimeStateCallback_.thisVar == nullptr) {
+        return CALL_ERR_CALLBACK_NOT_EXIST;
+    }
+    uv_loop_s *loop = nullptr;
+#if defined(NAPI_VERSION) && NAPI_VERSION >= 2
+    napi_get_uv_event_loop(meeTimeStateCallback_.env, &loop);
+#endif
+    if (loop == nullptr) {
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    MeeTimeStateWorker *meeTimeStateWorker = std::make_unique<MeeTimeStateWorker>().release();
+    if (meeTimeStateWorker == nullptr) {
+        TELEPHONY_LOGE("meeTimeStateWorker is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    meeTimeStateWorker->info = info;
+    meeTimeStateWorker->callback = meeTimeStateCallback_;
+    uv_work_t *work = std::make_unique<uv_work_t>().release();
+    if (work == nullptr) {
+        delete meeTimeStateWorker;
+        meeTimeStateWorker = nullptr;
+        TELEPHONY_LOGE("work is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    work->data = (void *)meeTimeStateWorker;
+    int32_t errCode = uv_queue_work_with_qos(loop, work, [](uv_work_t *work) {
+        TELEPHONY_LOGD("UpdateMeeTimeStateInfo uv_queue_work_with_qos");
+    }, ReportMeeTimeStateWork, uv_qos_default);
+    if (errCode != 0) {
+        delete meeTimeStateWorker;
+        meeTimeStateWorker = nullptr;
+        delete work;
+        work = nullptr;
+        TELEPHONY_LOGE("failed to add uv_queue_work_with_qos, errCode: %{public}d", errCode);
+        return TELEPHONY_ERROR;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
 void NapiCallAbilityCallback::ReportCallStateWork(uv_work_t *work, int32_t status)
 {
     CallStateWorker *dataWorkerData = (CallStateWorker *)work->data;
@@ -540,10 +582,78 @@ void NapiCallAbilityCallback::ReportCallStateWork(uv_work_t *work, int32_t statu
     work = nullptr;
 }
 
+void NapiCallAbilityCallback::ReportMeeTimeStateWork(uv_work_t *work, int32_t status)
+{
+    MeeTimeStateWorker *dataWorkerData = (MeeTimeStateWorker *)work->data;
+    if (dataWorkerData == nullptr) {
+        TELEPHONY_LOGE("meeTimeStateWorker is nullptr!");
+        return;
+    }
+    int32_t ret = ReportMeeTimeState(dataWorkerData->info, dataWorkerData->callback);
+    TELEPHONY_LOGI("ReportMeeTimeState result = %{public}d", ret);
+    delete dataWorkerData;
+    dataWorkerData = nullptr;
+    delete work;
+    work = nullptr;
+}
+
 /**
  * To notify an application of a call status change, register a callback with on() first.
  */
 int32_t NapiCallAbilityCallback::ReportCallState(CallAttributeInfo &info, EventCallback stateCallback)
+{
+    napi_env env = stateCallback.env;
+    napi_handle_scope scope = nullptr;
+    napi_open_handle_scope(env, &scope);
+    if (scope == nullptr) {
+        TELEPHONY_LOGE("scope is nullptr");
+        napi_close_handle_scope(env, scope);
+        return TELEPHONY_ERROR;
+    }
+    napi_value callbackFunc = nullptr;
+    napi_value callbackValues[ARRAY_INDEX_THIRD] = { 0 };
+    napi_create_object(env, &callbackValues[ARRAY_INDEX_FIRST]);
+    NapiCallManagerUtils::SetPropertyStringUtf8(
+        env, callbackValues[ARRAY_INDEX_FIRST], "accountNumber", info.accountNumber);
+    NapiCallManagerUtils::SetPropertyInt32(env, callbackValues[ARRAY_INDEX_FIRST], "accountId", info.accountId);
+    NapiCallManagerUtils::SetPropertyInt32(
+        env, callbackValues[ARRAY_INDEX_FIRST], "videoState", static_cast<int32_t>(info.videoState));
+    NapiCallManagerUtils::SetPropertyInt64(env, callbackValues[ARRAY_INDEX_FIRST], "startTime", info.startTime);
+    NapiCallManagerUtils::SetPropertyBoolean(env, callbackValues[ARRAY_INDEX_FIRST], "isEcc", info.isEcc);
+    NapiCallManagerUtils::SetPropertyInt32(
+        env, callbackValues[ARRAY_INDEX_FIRST], "callType", static_cast<int32_t>(info.callType));
+    NapiCallManagerUtils::SetPropertyInt32(env, callbackValues[ARRAY_INDEX_FIRST], "callId", info.callId);
+    NapiCallManagerUtils::SetPropertyInt32(
+        env, callbackValues[ARRAY_INDEX_FIRST], "callState", static_cast<int32_t>(info.callState));
+    NapiCallManagerUtils::SetPropertyInt32(
+        env, callbackValues[ARRAY_INDEX_FIRST], "conferenceState", static_cast<int32_t>(info.conferenceState));
+    NapiCallManagerUtils::SetPropertyInt32(
+        env, callbackValues[ARRAY_INDEX_FIRST], "crsType", info.crsType);
+    NapiCallManagerUtils::SetPropertyInt32(
+        env, callbackValues[ARRAY_INDEX_FIRST], "originalCallType", info.originalCallType);
+    NapiCallManagerUtils::SetPropertyInt32(
+        env, callbackValues[ARRAY_INDEX_FIRST], "phoneOrWatch", info.phoneOrWatch);
+    napi_set_named_property(env, callbackValues[ARRAY_INDEX_FIRST], std::string("extraParams").c_str(),
+        AppExecFwk::WrapWantParams(env, AAFwk::WantParamWrapper::ParseWantParamsWithBrackets(info.extraParamsString)));
+    ReportCallAttribute(env, callbackValues, ARRAY_INDEX_THIRD, info);
+    napi_get_reference_value(env, stateCallback.callbackRef, &callbackFunc);
+    if (callbackFunc == nullptr) {
+        TELEPHONY_LOGE("callbackFunc is null!");
+        napi_close_handle_scope(env, scope);
+        return CALL_ERR_CALLBACK_NOT_EXIST;
+    }
+    napi_value thisVar = nullptr;
+    napi_get_reference_value(env, stateCallback.thisVar, &thisVar);
+    napi_value callbackResult = nullptr;
+    napi_call_function(env, thisVar, callbackFunc, DATA_LENGTH_ONE, callbackValues, &callbackResult);
+    napi_close_handle_scope(env, scope);
+    return TELEPHONY_SUCCESS;
+}
+
+/**
+ * To notify an application of a voip call status change, register a callback with on() first.
+ */
+int32_t NapiCallAbilityCallback::ReportMeeTimeState(CallAttributeInfo &info, EventCallback stateCallback)
 {
     napi_env env = stateCallback.env;
     napi_handle_scope scope = nullptr;

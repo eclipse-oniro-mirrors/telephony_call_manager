@@ -42,6 +42,7 @@ public:
     static bool IsDistributedCallConnected();
     static bool IsWiredHeadsetConnected();
     static void SetDeviceAvailable(AudioDeviceType deviceType, bool available);
+    static bool SetVirtualCall(bool isVirtual);
     bool SwitchDevice(AudioDeviceType device);
     void AddAudioDeviceList(const std::string &address, AudioDeviceType deviceType, const std::string &deviceName);
     void RemoveAudioDeviceList(const std::string &address, AudioDeviceType deviceType);

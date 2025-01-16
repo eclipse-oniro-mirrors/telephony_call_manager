@@ -37,6 +37,7 @@ private:
     using CallAbilityCallbackFunc = std::function<int32_t(MessageParcel &data, MessageParcel &reply)>;
 
     int32_t OnUpdateCallStateInfo(MessageParcel &data, MessageParcel &reply);
+    int32_t OnUpdateMeeTimeStateInfo(MessageParcel &data, MessageParcel &reply);
     int32_t OnUpdateCallEvent(MessageParcel &data, MessageParcel &reply);
     int32_t OnUpdateCallDisconnectedCause(MessageParcel &data, MessageParcel &reply);
     int32_t OnUpdateAysncResults(MessageParcel &data, MessageParcel &reply);

@@ -29,6 +29,7 @@
 namespace OHOS {
 namespace Telephony {
 std::list<sptr<CallBase>> CallObjectManager::callObjectPtrList_;
+std::map<int32_t, CallAttributeInfo> CallObjectManager::voipCallObjectList_;
 std::mutex CallObjectManager::listMutex_;
 int32_t CallObjectManager::callId_ = CALL_START_ID;
 std::condition_variable CallObjectManager::cv_;
@@ -49,6 +50,7 @@ CallObjectManager::~CallObjectManager()
         (*it) = nullptr;
         callObjectPtrList_.erase(it++);
     }
+    voipCallObjectList_.clear();
 }
 
 int32_t CallObjectManager::AddOneCallObject(sptr<CallBase> &call)
@@ -88,6 +90,104 @@ int32_t CallObjectManager::AddOneCallObject(sptr<CallBase> &call)
         callObjectPtrList_.size());
     return TELEPHONY_SUCCESS;
 }
+
+int32_t CallObjectManager::AddOneVoipCallObject(CallAttributeInfo info)
+{
+    std::lock_guard<std::mutex> lock(listMutex_);
+    std::map<int32_t, CallAttributeInfo>::iterator it = voipCallObjectList_.find(info.callId);
+    if (it == voipCallObjectList_.end()) {
+        voipCallObjectList_[info.callId] = info;
+        TELEPHONY_LOGI("AddOneVoipCallObject success! callList size:%{public}zu", voipCallObjectList_.size());
+        return TELEPHONY_SUCCESS;
+    }
+    TELEPHONY_LOGI("AddOneVoipCallObject failed!");
+    return CALL_ERR_PHONE_CALL_ALREADY_EXISTS;
+}
+
+int32_t CallObjectManager::DeleteOneVoipCallObject(int32_t callId)
+{
+    std::unique_lock<std::mutex> lock(listMutex_);
+    std::map<int32_t, CallAttributeInfo>::iterator it = voipCallObjectList_.find(callId);
+    if (it != voipCallObjectList_.end()) {
+        voipCallObjectList_.erase((callId));
+        TELEPHONY_LOGI("DeleteOneVoipCallObject success! callList size:%{public}zu", voipCallObjectList_.size());
+        return TELEPHONY_SUCCESS;
+    }
+    TELEPHONY_LOGI("DeleteOneVoipCallObject failed!");
+    return TELEPHONY_ERROR;
+}
+
+bool CallObjectManager::IsVoipCallExist()
+{
+    std::lock_guard<std::mutex> lock(listMutex_);
+    bool res = (voipCallObjectList_.size() != 0);
+    TELEPHONY_LOGI("has voip call exist:%{public}d", res);
+    return res;
+}
+
+bool CallObjectManager::IsVoipCallExist(TelCallState callState, int32_t &callId)
+{
+    std::lock_guard<std::mutex> lock(listMutex_);
+    std::map<int32_t, CallAttributeInfo>::iterator it;
+    for (it = voipCallObjectList_.begin(); it != voipCallObjectList_.end(); ++it) {
+        if (it->second.callState == callState) {
+            callId = it->first;
+            return true;
+        }
+    }
+    TELEPHONY_LOGI("the voip call is does not exist");
+    return false;
+}
+
+void CallObjectManager::ClearVoipList()
+{
+    if (voipCallObjectList_.size() != 0) {
+        voipCallObjectList_.clear();
+    }
+}
+
+int32_t CallObjectManager::UpdateOneVoipCallObjectByCallId(int32_t callId, TelCallState nextCallState)
+{
+    std::lock_guard<std::mutex> lock(listMutex_);
+    std::map<int32_t, CallAttributeInfo>::iterator it = voipCallObjectList_.find(callId);
+    if (it != voipCallObjectList_.end()) {
+        voipCallObjectList_[callId].callState = nextCallState;
+        std::map<int32_t, CallAttributeInfo>::iterator firstIndex = voipCallObjectList_.begin();
+        for (firstIndex; firstIndex != voipCallObjectList_.end(); ++firstIndex) {
+            if (firstIndex != it) {
+                voipCallObjectList_.erase(firstIndex->first);
+            }
+        }
+        return TELEPHONY_SUCCESS;
+    }
+    TELEPHONY_LOGI("UpdateOneVoipCallObjectByCallId failed!");
+    return TELEPHONY_ERROR;
+}
+
+CallAttributeInfo CallObjectManager::GetVoipCallInfo()
+{
+    CallAttributeInfo res;
+    std::map<int32_t, CallAttributeInfo>::iterator it = voipCallObjectList_.begin();
+    if (it != voipCallObjectList_.end()) {
+        res = it->second;
+        return res;
+    }
+    return res;
+}
+
+CallAttributeInfo CallObjectManager::GetActiveVoipCallInfo()
+{
+    CallAttributeInfo res;
+    std::map<int32_t, CallAttributeInfo>::iterator it = voipCallObjectList_.begin();
+    for (it; it != voipCallObjectList_.end(); ++it) {
+        if (it->second.callState == TelCallState::CALL_STATUS_ACTIVE) {
+            res = it->second;
+            return it->second;
+        }
+    }
+    return res;
+}
+
 
 void CallObjectManager::DelayedDisconnectCallConnectAbility(uint64_t time = DISCONNECT_DELAY_TIME)
 {
@@ -674,6 +774,25 @@ bool CallObjectManager::IsConferenceCallExist(TelConferenceState state, int32_t 
     return false;
 }
 
+bool CallObjectManager::HasActivedCallExist(int32_t &callId)
+{
+    std::lock_guard<std::mutex> lock(listMutex_);
+    std::list<sptr<CallBase>>::iterator it;
+    for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
+        if ((*it)->GetTelCallState() == TelCallState::CALL_STATUS_ACTIVE) {
+            callId = (*it)->GetCallID();
+            return true;
+        }
+    }
+    CallAttributeInfo res = GetActiveVoipCallInfo();
+    if (res.callId >= VOIP_CALL_MINIMUM) {
+        callId = res.callId;
+        return true;
+    }
+    TELEPHONY_LOGI("the call is does not exist.");
+    return false;
+}
+
 int32_t CallObjectManager::GetCallNum(TelCallState callState, bool isIncludeVoipCall)
 {
     int32_t num = 0;
@@ -722,6 +841,27 @@ std::vector<CallAttributeInfo> CallObjectManager::GetCallInfoList(int32_t slotId
         (*it)->GetCallAttributeInfo(info);
         if (info.accountId == slotId && info.callType != CallType::TYPE_OTT) {
             callVec.emplace_back(info);
+        }
+    }
+    std::vector<CallAttributeInfo> voipCallVec = GetVoipCallInfoList();
+    for (CallAttributeInfo voipCall : voipCallVec) {
+        callVec.emplace_back(voipCall);
+    }
+    TELEPHONY_LOGI("call list size is %{public}u", static_cast<uint32_t>(callVec.size()));
+    return callVec;
+}
+
+std::vector<CallAttributeInfo> CallObjectManager::GetVoipCallInfoList()
+{
+    std::vector<CallAttributeInfo> callVec;
+    int32_t voipState = DelayedSingleton<CallControlManager>::GetInstance()->GetMeetimeCallState();
+    TELEPHONY_LOGI("voip state is :%{public}d", voipState);
+    if (voipState == (int32_t)TelCallState::CALL_STATUS_INCOMING ||
+        voipState == (int32_t)TelCallState::CALL_STATUS_IDLE ||
+        voipState == (int32_t)TelCallState::CALL_STATUS_ALERTING) {
+        std::map<int32_t, CallAttributeInfo>::iterator it = voipCallObjectList_.begin();
+        for (; it != voipCallObjectList_.end(); ++it) {
+            callVec.emplace_back(it->second);
         }
     }
     return callVec;
@@ -864,6 +1004,10 @@ std::vector<CallAttributeInfo> CallObjectManager::GetAllCallInfoList()
         }
         (*it)->GetCallAttributeInfo(info);
         callVec.emplace_back(info);
+    }
+    std::vector<CallAttributeInfo> voipCallVec = GetVoipCallInfoList();
+    for (CallAttributeInfo voipCall : voipCallVec) {
+        callVec.emplace_back(voipCall);
     }
     return callVec;
 }

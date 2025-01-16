@@ -132,6 +132,15 @@ void CallAbilityReportProxy::CallStateUpdated(
     ReportCallStateInfo(info);
 }
 
+void CallAbilityReportProxy::MeeTimeStateUpdated(
+    CallAttributeInfo info, TelCallState priorState, TelCallState nextState)
+{
+    info.callState = nextState;
+    TELEPHONY_LOGI("MeeTimeStateUpdated");
+    ReportMeeTimeStateInfo(info);
+}
+
+
 void CallAbilityReportProxy::CallEventUpdated(CallEventInfo &info)
 {
     ReportCallEvent(info);
@@ -176,6 +185,31 @@ int32_t CallAbilityReportProxy::ReportCallStateInfo(const CallAttributeInfo &inf
         static_cast<int32_t>(info.callState));
     TELEPHONY_LOGI("report call state info success, callId[%{public}d] state[%{public}d] conferenceState[%{public}d] "
                    "videoState[%{public}d]",
+        info.callId, info.callState, info.conferenceState, info.videoState);
+    return ret;
+}
+
+int32_t CallAbilityReportProxy::ReportMeeTimeStateInfo(const CallAttributeInfo &info)
+{
+    int32_t ret = TELEPHONY_ERR_FAIL;
+    std::string bundleInfo = "";
+    std::lock_guard<std::mutex> lock(mutex_);
+    std::list<sptr<ICallAbilityCallback>>::iterator it = callbackPtrList_.begin();
+    for (; it != callbackPtrList_.end(); ++it) {
+        if ((*it)) {
+            bundleInfo = (*it)->GetBundleInfo();
+            ret = (*it)->OnMeeTimeDetailsChange(info);
+            if (ret != TELEPHONY_SUCCESS) {
+                TELEPHONY_LOGD(
+                    "OnMeeTimeDetailsChange failed, errcode:%{public}d, bundleInfo:%{public}s", ret, bundleInfo.c_str());
+                continue;
+            }
+        }
+    }
+    DelayedSingleton<BluetoothCallManager>::GetInstance()->SendCallDetailsChange(static_cast<int32_t>(info.callId),
+        static_cast<int32_t>(info.callState));
+    TELEPHONY_LOGI("report meeTime state info success, callId[%{public}d] state[%{public}d] "
+        "conferenceState[%{public}d] videoState[%{public}d]",
         info.callId, info.callState, info.conferenceState, info.videoState);
     return ret;
 }

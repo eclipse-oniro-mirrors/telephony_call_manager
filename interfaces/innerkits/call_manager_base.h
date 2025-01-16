@@ -61,6 +61,10 @@ constexpr uint16_t CONNECT_SERVICE_WAIT_TIME = 1000;
  */
 constexpr int16_t ERR_ID = -1;
 /**
+ * @brief Indicates the voip call minimum callId.
+ */
+constexpr int16_t VOIP_CALL_MINIMUM = 10000;
+/**
  * @brief Indicates the call id is invalid.
  */
 constexpr int16_t INVALID_CALLID = 0;
@@ -513,6 +517,18 @@ enum class CallAbilityEventId {
      * Indicates that the local alerting.
      */
     EVENT_LOCAL_ALERTING = 23,
+    /**
+     * Indicates that answer voip call from BT.
+     */
+    EVENT_ANSWER_VOIP_CALL = 255,
+    /**
+     * Indicates that hangup voip call from BT.
+     */
+    EVENT_HANGUP_VOIP_CALL = 256,
+    /**
+     * Indicates that reject voip call from BT.
+     */
+    EVENT_REJECT_VOIP_CALL = 257,
 };
 
 /**
