@@ -136,6 +136,7 @@ public:
 
 private:
     std::vector<int32_t> getCarrierCallInfoNum(int32_t &callState, std::string &number);
+    void sendEventToVoip(CallAbilityEventId eventId);
 private:
     void GetVoipCallState(int32_t &numActive, int32_t &callState, std::string &number);
     std::shared_ptr<CallControlManager> callControlManagerPtr_;
