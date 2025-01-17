@@ -63,7 +63,6 @@ static constexpr const char *CALL_TYPE = "callType";
 static constexpr const char *VIDEO_STATE = "videoState";
 static constexpr int32_t CLEAR_VOICE_MAIL_COUNT = 0;
 static constexpr int32_t IS_CELIA_CALL = 1;
-static CallAttributeInfo info;
 
 const bool g_registerResult =
     SystemAbility::MakeAndRegisterAbility(DelayedSingleton<CallManagerService>::GetInstance().get());
@@ -1491,6 +1490,7 @@ int32_t CallManagerService::GetVoIPCallState(int32_t &state)
 
 int32_t CallManagerService::SetVoIPCallInfo(int32_t callId, int32_t state, std::string phoneNumber)
 {
+    static CallAttributeInfo info;
     size_t copiedChars = phoneNumber.copy(info.accountNumber, sizeof(info.accountNumber) - 1);
     info.accountNumber[copiedChars] = '\0';
     info.callType = CallType::TYPE_VOIP;
@@ -1505,25 +1505,24 @@ int32_t CallManagerService::SetVoIPCallInfo(int32_t callId, int32_t state, std::
         TELEPHONY_LOGE("Permission denied!");
         return TELEPHONY_ERR_PERMISSION_ERR;
     }
-    if (callControlManagerPtr_ != nullptr) {
-        if (state == (int32_t)TelCallState::CALL_STATUS_INCOMING) {
-            TELEPHONY_LOGI("SetVoIPCallInfo to CALL_STATUS_INCOMING");
-            DelayedSingleton<CallControlManager>::GetInstance()->NotifyVoipCallStateUpdated(info,
-            TelCallState::CALL_STATUS_INCOMING, TelCallState::CALL_STATUS_INCOMING);
-        } else if (state == (int32_t)TelCallState::CALL_STATUS_IDLE) {
-            TELEPHONY_LOGI("SetVoIPCallInfo to CALL_STATUS_ACTIVE");
-            DelayedSingleton<CallControlManager>::GetInstance()->NotifyVoipCallStateUpdated(info,
-            TelCallState::CALL_STATUS_INCOMING, TelCallState::CALL_STATUS_ACTIVE);
-        } else if (state == (int32_t)TelCallState::CALL_STATUS_DISCONNECTED) {
-            TELEPHONY_LOGI("SetVoIPCallInfo to CALL_STATUS_DISCONNECTED");
-            DelayedSingleton<CallControlManager>::GetInstance()->NotifyVoipCallStateUpdated(info,
-            TelCallState::CALL_STATUS_ACTIVE, TelCallState::CALL_STATUS_DISCONNECTED);
-        }
-        return callControlManagerPtr_->SetVoIPCallInfo(callId, state, phoneNumber);
-    } else {
+    if (callControlManagerPtr_ == nullptr) {
         TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
+    if (state == (int32_t)TelCallState::CALL_STATUS_INCOMING) {
+        TELEPHONY_LOGI("SetVoIPCallInfo to CALL_STATUS_INCOMING");
+        DelayedSingleton<CallControlManager>::GetInstance()->NotifyVoipCallStateUpdated(info,
+        TelCallState::CALL_STATUS_INCOMING, TelCallState::CALL_STATUS_INCOMING);
+    } else if (state == (int32_t)TelCallState::CALL_STATUS_IDLE) {
+        TELEPHONY_LOGI("SetVoIPCallInfo to CALL_STATUS_ACTIVE");
+        DelayedSingleton<CallControlManager>::GetInstance()->NotifyVoipCallStateUpdated(info,
+        TelCallState::CALL_STATUS_INCOMING, TelCallState::CALL_STATUS_ACTIVE);
+    } else if (state == (int32_t)TelCallState::CALL_STATUS_DISCONNECTED) {
+        TELEPHONY_LOGI("SetVoIPCallInfo to CALL_STATUS_DISCONNECTED");
+        DelayedSingleton<CallControlManager>::GetInstance()->NotifyVoipCallStateUpdated(info,
+        TelCallState::CALL_STATUS_ACTIVE, TelCallState::CALL_STATUS_DISCONNECTED);
+    }
+    return callControlManagerPtr_->SetVoIPCallInfo(callId, state, phoneNumber);
 }
 
 int32_t CallManagerService::GetVoIPCallInfo(int32_t &callId, int32_t &state, std::string &phoneNumber)

@@ -73,6 +73,24 @@ int32_t CallInfoManager::CallDetailsChange(const CallAttributeInfo &info)
     return TELEPHONY_SUCCESS;
 }
 
+int32_t CallInfoManager::MeeTimeDetailsChange(const CallAttributeInfo &info)
+{
+    TELEPHONY_LOGI("MeeTimeDetailsChange Start");
+    std::lock_guard<std::mutex> lock(mutex_);
+    updateCallInfo_ = info;
+    if (callIdSet_.find(updateCallInfo_.callId) == callIdSet_.end()) {
+        TELEPHONY_LOGI("MeeTimeDetailsChange new call");
+        callIdSet_.insert(updateCallInfo_.callId);
+        g_newCallId = updateCallInfo_.callId;
+        newCallState_ = (int32_t)updateCallInfo_.callState;
+        std::unordered_set<int32_t> newSet;
+        newSet.clear();
+        g_callStateMap.insert(std::pair<int32_t, std::unordered_set<int32_t>>(g_newCallId, newSet));
+    }
+    g_callStateMap[updateCallInfo_.callId].insert((int32_t)updateCallInfo_.callState);
+    return TELEPHONY_SUCCESS;
+}
+
 bool CallInfoManager::HasActiveStatus()
 {
     TELEPHONY_LOGI("Waiting for activation !");
