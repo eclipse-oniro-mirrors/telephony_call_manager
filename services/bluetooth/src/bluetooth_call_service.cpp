@@ -232,6 +232,33 @@ void BluetoothCallService::HandleVoipCall(int32_t &numActive, int32_t &callState
     }
     TELEPHONY_LOGI("HandleVoipCall finish,callState:%{public}d, numActive:%{public}d", callState, numActive);
 }
+void BluetoothCallService::HandleVoipCall(int32_t &numActive, int32_t &callState, std::string &number)
+{
+    TELEPHONY_LOGI("HandleVoipCall start,callState:%{public}d", callState);
+    CallAttributeInfo callAttributeInfo = GetVoipCallInfo();
+    if (callState == (int32_t)TelCallState::CALL_STATUS_IDLE && number == "") {
+        switch (callAttributeInfo.callState) {
+            case TelCallState::CALL_STATUS_IDLE:
+                numActive = 1;
+                break;
+            case TelCallState::CALL_STATUS_WAITING:
+                callState = (int32_t)TelCallState::CALL_STATUS_INCOMING;
+                break;
+            case TelCallState::CALL_STATUS_INCOMING:
+                callState = (int32_t)TelCallState::CALL_STATUS_INCOMING;
+                break;
+            default:
+                TELEPHONY_LOGI("voip call state need not handle");
+                break;
+        }
+        number = callAttributeInfo.accountNumber;
+    }
+
+    if (numActive == 0 && callAttributeInfo.callState == TelCallState::CALL_STATUS_ACTIVE) {
+        numActive = 1;
+    }
+    TELEPHONY_LOGI("HandleVoipCall finish,callState:%{public}d, numActive:%{public}d", callState, numActive);
+}
 
 int32_t BluetoothCallService::HoldCall()
 {
