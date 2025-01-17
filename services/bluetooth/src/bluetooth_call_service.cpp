@@ -149,8 +149,8 @@ int32_t BluetoothCallService::GetCallState()
     int32_t callState = static_cast<int32_t>(TelCallState::CALL_STATUS_IDLE);
     std::string number = "";
     std::vector<int32_t> carrierCallInfo = getCarrierCallInfoNum(callState, number);
-    if (!carriercallInfo.empty()) {
-        numActive = carriercallInfo[0];
+    if (!carrierCallInfo.empty()) {
+        numActive = carrierCallInfo[0];
         numHeld = carrierCallInfo[1];
     }
     if (IsVoipCallExist() && numActive == 0) {
