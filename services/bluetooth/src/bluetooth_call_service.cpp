@@ -202,9 +202,44 @@ std::vector<int32_t> BluetoothCallService::getCarrierCallInfoNum(int32_t &callSt
         callState = static_cast<int32_t>(TelCallState::CALL_STATUS_DISCONNECTED);
         number = GetCallNumber(TelCallState::CALL_STATUS_DISCONNECTING, false);
     }
+<<<<<<< HEAD
     return {numActive, numHeld};
 }
 
+void BluetoothCallService::HandleVoipCall(int32_t &numActive, int32_t &callState, std::string &number)
+{
+    TELEPHONY_LOGI("HandleVoipCall start,callState:%{public}d", callState);
+    CallAttributeInfo callAttributeInfo = GetVoipCallInfo();
+    if (callState == (int32_t)TelCallState::CALL_STATUS_IDLE && number == "") {
+        switch (callAttributeInfo.callState) {
+            case TelCallState::CALL_STATUS_IDLE:
+                numActive = 1;
+                break;
+            case TelCallState::CALL_STATUS_WAITING:
+                callState = (int32_t)TelCallState::CALL_STATUS_INCOMING;
+                break;
+            case TelCallState::CALL_STATUS_INCOMING:
+                callState = (int32_t)TelCallState::CALL_STATUS_INCOMING;
+                break;
+            default:
+                TELEPHONY_LOGI("voip call state need not handle");
+                break;
+        }
+        number = callAttributeInfo.accountNumber;
+    }
+
+    if (numActive == 0 && callAttributeInfo.callState == TelCallState::CALL_STATUS_ACTIVE) {
+        numActive = 1;
+    }
+    TELEPHONY_LOGI("HandleVoipCall finish,callState:%{public}d, numActive:%{public}d", callState, numActive);
+=======
+    if (IsVoipCallExist() && numActive == 0) {
+        HandleVoipCall(numActive, callState, number);
+    }
+    return DelayedSingleton<BluetoothCallManager>::GetInstance()->
+        SendBtCallState(numActive, numHeld, callState, number);
+>>>>>>> 39596fc8beaa52f6adbc940cba0c424adef78cd1
+}
 void BluetoothCallService::HandleVoipCall(int32_t &numActive, int32_t &callState, std::string &number)
 {
     TELEPHONY_LOGI("HandleVoipCall start,callState:%{public}d", callState);
