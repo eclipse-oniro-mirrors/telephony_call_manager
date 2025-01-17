@@ -108,7 +108,7 @@ int32_t BluetoothCallService::HangUpCall()
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("HangUpPolicy Voip Call!");
         sendEventToVoip(CallAbilityEventId::EVENT_HANGUP_VOIP_CALL);
-        DeleteOneVoipCallObject(res.callId);
+        DeleteOneVoipCallObject(callId);
         return ret;
     }
     if (callId >= VOIP_CALL_MINIMUM) {
@@ -129,7 +129,7 @@ void BluetoothCallService::sendEventToVoip(CallAbilityEventId eventId)
     CallEventInfo eventInfo;
     (void)memset_s(&eventInfo, sizeof(CallEventInfo), 0, sizeof(CallEventInfo));
     eventInfo.eventId = eventId;
-    DelayedSingleton<CallControlManager>::GetInstance()->NotifyCallEventUpdated(eventInfo); 
+    DelayedSingleton<CallControlManager>::GetInstance()->NotifyCallEventUpdated(eventInfo);
 }
 
 int32_t BluetoothCallService::GetCallState()
