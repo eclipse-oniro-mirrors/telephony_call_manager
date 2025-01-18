@@ -99,6 +99,10 @@ public:
     static int32_t GetCallNumByRunningState(CallRunningState callState);
     static sptr<CallBase> GetForegroundLiveCallByCallId(int32_t callId);
     static bool IsNeedSilentInDoNotDisturbMode();
+    static bool IsTwoCallBtCallAndESIM();
+    static bool IsTwoCallBtCall();
+    static bool IsTwoCallESIMCall();
+    static bool IsOneNumberDualTerminal();
 
 protected:
     static std::condition_variable cv_;

@@ -230,6 +230,9 @@ void CallControlManager::PackageDialInformation(AppExecFwk::PacMap &extras, std:
 
 int32_t CallControlManager::AnswerCall(int32_t callId, int32_t videoState)
 {
+    if (HangUpFirstCall(callId)) {
+        return TELEPHONY_SUCCESS;
+    }
     sptr<CallBase> call = GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_RINGING);
     if (call == nullptr) {
         TELEPHONY_LOGE("call is nullptr");
@@ -271,18 +274,22 @@ int32_t CallControlManager::AnswerCall(int32_t callId, int32_t videoState)
             INVALID_PARAMETER, callId, videoState, ret, "AnswerCallPolicy failed");
         return ret;
     }
+    return HandlerAnswerCall(callId, videoState);
+}
+
+int32_t CallControlManager::HandlerAnswerCall(int32_t callId, int32_t videoState)
+{
     if (CallRequestHandlerPtr_ == nullptr) {
         TELEPHONY_LOGE("CallRequestHandlerPtr_ is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    ret = CallRequestHandlerPtr_->AnswerCall(callId, videoState);
+    int ret = CallRequestHandlerPtr_->AnswerCall(callId, videoState);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("AnswerCall failed!");
         return ret;
     }
     return TELEPHONY_SUCCESS;
 }
-
 bool CallControlManager::CurrentIsSuperPrivacyMode(int32_t callId, int32_t videoState)
 {
     bool currentIsSuperPrivacyMode = DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance()->
@@ -1896,5 +1903,79 @@ bool CallControlManager::onButtonDealing(HeadsetButtonService::ButtonEvent type)
     return true;
 }
 #endif
+bool CallControlManager::HangUpFirstCallBtAndESIM(int32_t secondCallId)
+{
+    if (!CallObjectManager::IsTwoCallBtCallAndESIM()) {
+        return false;
+    }
+    HangUpFirstCallBySecondCallID(secondCallId, true);
+    return true;
+}
+
+bool CallControlManager::HangUpFirstCallBtCall(int32_t secondCallId)
+{
+    if (!CallObjectManager::IsTwoCallBtCall()) {
+        return false;
+    }
+    HangUpFirstCallBySecondCallID(secondCallId);
+    return true;
+}
+
+bool CallControlManager::HangUpFirstCallESIMCall(int32_t secondCallId)
+{
+    if (!CallObjectManager::IsTwoCallESIMCall()) {
+        return false;
+    }
+    HangUpFirstCallBySecondCallID(secondCallId);
+    return true;
+}
+
+bool CallControlManager::HangUpFirstCall(int32_t secondCallId)
+{
+    if (CallObjectManager::IsTwoCallBtCallAndESIM()) {
+        return HangUpFirstCallBtAndESIM(secondCallId);
+    } else if (CallObjectManager::IsTwoCallBtCall()) {
+        HangUpFirstCallBtCall(secondCallId);
+    } else if (CallObjectManager::IsTwoCallESIMCall()) {
+        HangUpFirstCallESIMCall(secondCallId);
+    }
+    return false;
+}
+
+void CallControlManager::HangUpFirstCallBySecondCallID(int32_t secondCallId, bool secondAutoAnswer)
+{
+    sptr<CallBase> answerCall = CallObjectManager::GetOneCallObject(secondCallId);
+    if (answerCall != nullptr) {
+        TELEPHONY_LOGI("AutoAnswerCall second callid=%{public}d", secondCallId);
+        answerCall->SetAutoAnswerState(secondAutoAnswer);
+    }
+    std::list<sptr<CallBase>> allCallList = CallObjectManager::GetAllCallList();
+    for (auto call : allCallList) {
+        if (call->GetCallID() == secondCallId) {
+            continue;
+        }
+        TelCallState telCallState = call->GetTelCallState();
+        if (telCallState == TelCallState::CALL_STATUS_ACTIVE ||
+            telCallState == TelCallState::CALL_STATUS_DIALING ||
+            telCallState == TelCallState::CALL_STATUS_ALERTING) {
+            TELEPHONY_LOGI("first call HangUpCall callid=%{public}d", call->GetCallID());
+            int32_t ret = HangUpCall(call->GetCallID());
+            if (ret != TELEPHONY_SUCCESS) {
+                TELEPHONY_LOGE("first call HangUpCall fail callid=%{public}d", call->GetCallID());
+            }
+        } else if (telCallState == TelCallState::CALL_STATUS_INCOMING ||
+            telCallState == TelCallState::CALL_STATUS_WAITING) {
+            TELEPHONY_LOGI("first call RejectCall callid=%{public}d", call->GetCallID());
+            if (answerCall->GetAccountNumber() == answerCall->GetAccountNumber()) {
+                break;
+            }
+            int32_t ret = RejectCall(call->GetCallID(), false, Str8ToStr16(""));
+            if (ret != TELEPHONY_SUCCESS) {
+                TELEPHONY_LOGE("first call RejectCall fail callid=%{public}d", call->GetCallID());
+            }
+        }
+        break;
+    }
+}
 } // namespace Telephony
 } // namespace OHOS

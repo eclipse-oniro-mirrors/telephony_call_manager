@@ -38,6 +38,7 @@ bool CallObjectManager::needWaitHold_ = false;
 CellularCallInfo CallObjectManager::dialCallInfo_;
 constexpr int32_t CRS_TYPE = 2;
 constexpr uint64_t DISCONNECT_DELAY_TIME = 2000000;
+constexpr int32_t CALL_MAX_COUNT = 2;
 
 CallObjectManager::CallObjectManager()
 {
@@ -1064,6 +1065,94 @@ bool CallObjectManager::IsNeedSilentInDoNotDisturbMode()
         int value = params.GetIntParam("IsNeedSilentInDoNotDisturbMode", 0);
         TELEPHONY_LOGI("CallObjectManager::IsNeedSilentInDoNotDisturbMode: %{public}d", value);
         if (value == 1) {
+            return true;
+        }
+    }
+    return false;
+}
+bool CallObjectManager::IsTwoCallBtCallAndESIM()
+{
+    std::lock_guard<std::mutex> lock(listMutex_);
+    if (callObjectPtrList_.size() != CALL_MAX_COUNT) {
+        return false;
+    }
+    std::string numberEsim;
+    std::string numberBtCall;
+    bool hasEsim = false;
+    bool hasBtCall = false;
+    std::list<sptr<CallBase>>::iterator it;
+    for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
+        if ((*it)->GetCallType() == CallType::TYPE_IMS) {
+            hasEsim = true;
+            numberEsim = (*it)->GetAccountNumber();
+        }
+        if ((*it)->GetCallType() == CallType::TYPE_BLUETOOTH) {
+            hasBtCall = true;
+            numberBtCall = (*it)->GetAccountNumber();
+        }
+    }
+    if (hasEsim && hasBtCall) {
+        if (!numberEsim.empty() && (numberEsim == numberBtCall)) {
+            return false;
+        }
+        return true;
+    }
+    return false;
+}
+
+bool CallObjectManager::IsTwoCallBtCall()
+{
+    std::lock_guard<std::mutex> lock(listMutex_);
+    if (callObjectPtrList_.size() != CALL_MAX_COUNT) {
+        return false;
+    }
+    std::list<sptr<CallBase>>::iterator it;
+    for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
+        if ((*it)->GetCallType() != CallType::TYPE_BLUETOOTH) {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool CallObjectManager::IsTwoCallESIMCall()
+{
+    std::lock_guard<std::mutex> lock(listMutex_);
+    if (callObjectPtrList_.size() != CALL_MAX_COUNT) {
+        return false;
+    }
+    std::list<sptr<CallBase>>::iterator it;
+    for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
+        if ((*it)->GetCallType() != CallType::TYPE_IMS) {
+            return false;
+        }
+    }
+    return true;
+}
+
+bool CallObjectManager::IsOneNumberDualTerminal()
+{
+    std::lock_guard<std::mutex> lock(listMutex_);
+    if (callObjectPtrList_.size() != CALL_MAX_COUNT) {
+        return false;
+    }
+    std::string numberEsim;
+    std::string numberBtCall;
+    bool hasEsim = false;
+    bool hasBtCall = false;
+    std::list<sptr<CallBase>>::iterator it;
+    for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
+        if ((*it)->GetCallType() == CallType::TYPE_IMS) {
+            hasEsim = true;
+            numberEsim = (*it)->GetAccountNumber();
+        }
+        if ((*it)->GetCallType() == CallType::TYPE_BLUETOOTH) {
+            hasBtCall = true;
+            numberBtCall = (*it)->GetAccountNumber();
+        }
+    }
+    if (hasEsim && hasBtCall) {
+        if (!numberEsim.empty() && (numberEsim == numberBtCall)) {
             return true;
         }
     }

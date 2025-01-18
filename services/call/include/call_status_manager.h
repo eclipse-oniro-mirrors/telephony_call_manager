@@ -128,6 +128,8 @@ private:
     bool IsFromTheSameNumberAtTheSameTime(const sptr<CallBase> &newCall);
     void ModifyEsimType();
     int32_t RefreshOldCall(const CallDetailInfo &info, bool &isExistedOldCall);
+    void AutoAnswerSecondCall();
+    void OneCallAnswerAtPhone(int32_t callId);
 
 private:
     CallDetailInfo callReportInfo_;
