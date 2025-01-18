@@ -743,6 +743,7 @@ int32_t CallStatusManager::ActiveHandle(const CallDetailInfo &info)
         TELEPHONY_LOGE("Call is NULL");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
+    OneCallAnswerAtPhone(call->GetCallID());
     ClearPendingState(call);
     call = RefreshCallIfNecessary(call, info);
     SetOriginalCallTypeForActiveState(call);
@@ -2095,7 +2096,7 @@ void CallStatusManager::AutoAnswerSecondCall()
             int ret = DelayedSingleton<CallControlManager>::GetInstance()->AnswerCall(call->GetCallID(),
                 static_cast<int32_t>(call->GetVideoStateType()));
             if (ret != TELEPHONY_SUCCESS) {
-               TELEPHONY_LOGE("Auto AnswerCall failed callid=%{public}d", call->GetCallID());
+                TELEPHONY_LOGE("Auto AnswerCall failed callid=%{public}d", call->GetCallID());
             }
             return;
         }
@@ -2113,23 +2114,23 @@ void CallStatusManager::OneCallAnswerAtPhone(int32_t callId)
     }
     std::list<sptr<CallBase>> allCallList = CallObjectManager::GetAllCallList();
     for (auto call : allCallList) {
-        if (call->GetCallID() == secondCallId) {
+        if (call->GetCallID() == callId) {
             continue;
         }
         if (call->GetTelCallState() == TelCallState::CALL_STATUS_DIALING ||
             call->GetTelCallState() == TelCallState::CALL_STATUS_ALERTING) {
-           int ret = DelayedSingleton<CallControlManager>::GetInstance()->HangUpCall(call->GetCallID());
-           if (ret != TELEPHONY_SUCCESS) {
-               TELEPHONY_LOGE("One Call AnswerCall AtPhone HangUpCall failed callid=%{public}d", call->GetCallID());
+            int32_t ret = DelayedSingleton<CallControlManager>::GetInstance()->HangUpCall(call->GetCallID());
+            if (ret != TELEPHONY_SUCCESS) {
+                TELEPHONY_LOGE("One Call AnswerCall AtPhone HangUpCall failed callid=%{public}d", call->GetCallID());
             }
         }
         if (call->GetTelCallState() == TelCallState::CALL_STATUS_INCOMING ||
             call->GetTelCallState() == TelCallState::CALL_STATUS_WAITING) {
             TELEPHONY_LOGI("Need AnswerCall callid=%{public}d", call->GetCallID());
-            int ret = DelayedSingleton<CallControlManager>::GetInstance()->RejectCall(call->GetCallID(),
-                false, u"");
+            int32_t ret = DelayedSingleton<CallControlManager>::GetInstance()->RejectCall(
+                call->GetCallID(), false, u"");
             if (ret != TELEPHONY_SUCCESS) {
-               TELEPHONY_LOGE("One Call AnswerCall AtPhone RejectCall failed callid=%{public}d", call->GetCallID());
+                TELEPHONY_LOGE("One Call AnswerCall AtPhone RejectCall failed callid=%{public}d", call->GetCallID());
             }
         }
     }
