@@ -1021,6 +1021,7 @@ int32_t CallStatusManager::DisconnectedHandle(const CallDetailInfo &info)
     if (currentCallNum <= 0) {
         DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance()->RestoreSuperPrivacyMode();
     }
+    AutoAnswerSecondCall();
     return TELEPHONY_SUCCESS;
 }
 
@@ -2079,6 +2080,60 @@ int32_t CallStatusManager::RefreshOldCall(const CallDetailInfo &info, bool &isEx
     }
     
     return TELEPHONY_SUCCESS;
+}
+
+void CallStatusManager::AutoAnswerSecondCall()
+{
+    std::list<sptr<CallBase>> allCallList = CallObjectManager::GetAllCallList();
+    for (auto call : allCallList) {
+        if (call->GetTelCallState() != TelCallState::CALL_STATUS_INCOMING &&
+            call->GetTelCallState() != TelCallState::CALL_STATUS_WAITING) {
+            continue;
+        }
+        if (call->GetAutoAnswerState()) {
+            TELEPHONY_LOGI("Auto AnswerCall callid=%{public}d", call->GetCallID());
+            int ret = DelayedSingleton<CallControlManager>::GetInstance()->AnswerCall(call->GetCallID(),
+                static_cast<int32_t>(call->GetVideoStateType()));
+            if (ret != TELEPHONY_SUCCESS) {
+               TELEPHONY_LOGE("Auto AnswerCall failed callid=%{public}d", call->GetCallID());
+            }
+            return;
+        }
+    }
+    return;
+}
+void CallStatusManager::OneCallAnswerAtPhone(int32_t callId)
+{
+    TELEPHONY_LOGI("One Call AnswerCall AtPhone callid=%{public}d", callId);
+    if (CallObjectManager::IsOneNumberDualTerminal()) {
+        return;
+    }
+    if (!CallObjectManager::IsTwoCallBtCallAndESIM()) {
+        return;
+    }
+    std::list<sptr<CallBase>> allCallList = CallObjectManager::GetAllCallList();
+    for (auto call : allCallList) {
+        if (call->GetCallID() == secondCallId) {
+            continue;
+        }
+        if (call->GetTelCallState() == TelCallState::CALL_STATUS_DIALING ||
+            call->GetTelCallState() == TelCallState::CALL_STATUS_ALERTING) {
+           int ret = DelayedSingleton<CallControlManager>::GetInstance()->HangUpCall(call->GetCallID());
+           if (ret != TELEPHONY_SUCCESS) {
+               TELEPHONY_LOGE("One Call AnswerCall AtPhone HangUpCall failed callid=%{public}d", call->GetCallID());
+            }
+        }
+        if (call->GetTelCallState() == TelCallState::CALL_STATUS_INCOMING ||
+            call->GetTelCallState() == TelCallState::CALL_STATUS_WAITING) {
+            TELEPHONY_LOGI("Need AnswerCall callid=%{public}d", call->GetCallID());
+            int ret = DelayedSingleton<CallControlManager>::GetInstance()->RejectCall(call->GetCallID(),
+                false, u"");
+            if (ret != TELEPHONY_SUCCESS) {
+               TELEPHONY_LOGE("One Call AnswerCall AtPhone RejectCall failed callid=%{public}d", call->GetCallID());
+            }
+        }
+    }
+    return;
 }
 } // namespace Telephony
 } // namespace OHOS

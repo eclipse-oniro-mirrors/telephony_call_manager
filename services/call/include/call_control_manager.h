@@ -50,6 +50,7 @@ public:
     void UnInit();
     int32_t DialCall(std::u16string &number, AppExecFwk::PacMap &extras);
     int32_t AnswerCall(int32_t callId, int32_t videoState);
+    int32_t HandlerAnswerCall(int32_t callId, int32_t videoState);
     int32_t RejectCall(int32_t callId, bool rejectWithMessage, std::u16string textMessage);
     int32_t HangUpCall(int32_t callId);
     int32_t GetCallState();
@@ -133,6 +134,11 @@ public:
     void AcquireIncomingLock();
     void ReleaseIncomingLock();
     void DisconnectAllCalls();
+    bool HangUpFirstCallBtAndESIM(int32_t secondCallId);
+    bool HangUpFirstCallBtCall(int32_t secondCallId);
+    bool HangUpFirstCallESIMCall(int32_t secondCallId);
+    bool HangUpFirstCall(int32_t secondCallId);
+    void HangUpFirstCallBySecondCallID(int32_t secondCallId, bool secondAutoAnswer = false);
 
 private:
     void CallStateObserve();
