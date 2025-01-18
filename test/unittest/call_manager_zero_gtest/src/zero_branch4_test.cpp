@@ -566,6 +566,7 @@ HWTEST_F(ZeroBranch3Test, Telephony_CallAbilityCallback_001, Function | MediumTe
     ASSERT_EQ(callAbilityCallback->SetProcessCallback(nullptr), TELEPHONY_SUCCESS);
     CallAttributeInfo callAttributeInfo;
     ASSERT_EQ(callAbilityCallback->OnCallDetailsChange(callAttributeInfo), TELEPHONY_SUCCESS);
+    ASSERT_EQ(callAbilityCallback->OnMeeTimeDetailsChange(callAttributeInfo), TELEPHONY_SUCCESS);
     CallEventInfo info;
     ASSERT_EQ(callAbilityCallback->OnCallEventChange(info), TELEPHONY_SUCCESS);
     DisconnectedDetails details;

@@ -37,8 +37,10 @@ public:
     virtual ~CallObjectManager();
 
     static int32_t AddOneCallObject(sptr<CallBase> &call);
+    static int32_t AddOneVoipCallObject(CallAttributeInfo info);
     static void DelayedDisconnectCallConnectAbility(uint64_t time);
     static int32_t DeleteOneCallObject(int32_t callId);
+    static int32_t DeleteOneVoipCallObject(int32_t callId);
     static void DeleteOneCallObject(sptr<CallBase> &call);
     static sptr<CallBase> GetOneCallObject(int32_t callId);
     static sptr<CallBase> GetOneCallObject(std::string &phoneNumber);
@@ -47,6 +49,7 @@ public:
     static sptr<CallBase> GetOneCallObjectByIndexSlotIdAndCallType(int32_t index, int32_t slotId, CallType callType);
     static sptr<CallBase> GetOneCallObjectByVoipCallId(std::string voipCallId, std::string bundleName, int32_t uid);
     static void UpdateOneCallObjectByCallId(int32_t callId, TelCallState nextCallState);
+    static int32_t UpdateOneVoipCallObjectByCallId(int32_t callId, TelCallState nextCallState);
     static int32_t HasNewCall();
     static int32_t IsNewCallAllowedCreate(bool &enabled);
     static int32_t GetCurrentCallNum();
@@ -60,6 +63,7 @@ public:
     static bool IsCallExist(int32_t callId);
     static bool IsCallExist(std::string &phoneNumber);
     static bool HasCallExist();
+    static bool HasActivedCallExist(int32_t &callId);
     static int32_t HasRingingCall(bool &hasRingingCall);
     static int32_t HasHoldCall(bool &hasHoldCall);
     static TelCallState GetCallState(int32_t callId);
@@ -71,17 +75,23 @@ public:
     static bool IsConferenceCallExist(TelConferenceState state, int32_t &callId);
     static int32_t GetCallNum(TelCallState callState, bool isIncludeVoipCall = true);
     static std::string GetCallNumber(TelCallState callState, bool isIncludeVoipCall = true);
+    static CallAttributeInfo GetVoipCallInfo();
+    static CallAttributeInfo GetActiveVoipCallInfo();
+    static void ClearVoipList();
     static std::vector<CallAttributeInfo> GetCallInfoList(int32_t slotId);
     static sptr<CallBase> GetForegroundCall(bool isIncludeVoipCall = true);
     static sptr<CallBase> GetForegroundLiveCall(bool isIncludeVoipCall = true);
     static sptr<CallBase> GetIncomingCall(bool isIncludeVoipCall = true);
     static sptr<CallBase> GetAudioLiveCall();
     static std::vector<CallAttributeInfo> GetAllCallInfoList();
+    static std::vector<CallAttributeInfo> GetVoipCallInfoList();
     int32_t DealFailDial(sptr<CallBase> call);
     static bool HasVideoCall();
     static std::list<sptr<CallBase>> GetAllCallList();
     static bool HasCellularCallExist();
     static bool HasVoipCallExist();
+    static bool IsVoipCallExist();
+    static bool IsVoipCallExist(TelCallState callState, int32_t &callId);
     static bool HasIncomingCallCrsType();
     static CellularCallInfo GetDialCallInfo();
     static bool HasSatelliteCallExist();
@@ -98,6 +108,7 @@ protected:
 
 private:
     static std::list<sptr<CallBase>> callObjectPtrList_;
+    static std::map<int32_t, CallAttributeInfo> voipCallObjectList_;
     static std::mutex listMutex_;
     static int32_t callId_;
 };

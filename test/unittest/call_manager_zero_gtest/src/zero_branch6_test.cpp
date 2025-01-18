@@ -705,6 +705,7 @@ HWTEST_F(ZeroBranch5Test, Telephony_CallAbilityCallbackProxy_001, Function | Med
     CallAbilityCallbackProxy callAbilityCallbackProxy(impl);
     CallAttributeInfo callAttributeInfo;
     callAbilityCallbackProxy.OnCallDetailsChange(callAttributeInfo);
+    callAbilityCallbackProxy.OnMeeTimeDetailsChange(callAttributeInfo);
     CallEventInfo info;
     callAbilityCallbackProxy.OnCallEventChange(info);
     DisconnectedDetails details;

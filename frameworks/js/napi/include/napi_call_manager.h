@@ -25,6 +25,8 @@
 namespace OHOS {
 namespace Telephony {
 constexpr int32_t SLOT_ID_INVALID = 202;
+constexpr const char *KEY_CONST_TELEPHONY_READ_SET_VOIP_CALL_INFO =
+    "const.telephony.read_set_voip_call_info";
 #define GET_PARAMS(env, info, num) \
     size_t argc = num;             \
     napi_value argv[num] = {0};    \
@@ -140,6 +142,7 @@ public:
     static napi_value InputDialerSpecialCode(napi_env env, napi_callback_info info);
     static napi_value RemoveMissedIncomingCallNotification(napi_env env, napi_callback_info info);
     static napi_value SetVoIPCallState(napi_env env, napi_callback_info info);
+    static napi_value SetVoIPCallInfo(napi_env env, napi_callback_info info);
     static napi_value CancelCallUpgrade(napi_env env, napi_callback_info info);
     static napi_value SendCallUiEvent(napi_env env, napi_callback_info info);
 
@@ -221,6 +224,7 @@ private:
     static void NativeInputDialerSpecialCode(napi_env env, void *data);
     static void NativeRemoveMissedIncomingCallNotification(napi_env env, void *data);
     static void NativeSetVoIPCallState(napi_env env, void *data);
+    static void NativeSetVoIPCallInfo(napi_env env, void *data);
     static void NativeCancelCallUpgrade(napi_env env, void *data);
     static void NativeSendCallUiEvent(napi_env env, void *data);
     static bool MatchEmptyParameter(napi_env env, const napi_value parameters[], const size_t parameterCount);
@@ -228,6 +232,8 @@ private:
         napi_env env, const napi_value parameters[], const size_t parameterCount);
     static bool MatchAnswerCallParameter(
         napi_env env, const napi_value parameters[], const size_t parameterCount);
+    static bool MatchTwoNumberAndStringParameters(napi_env env, const napi_value parameters[],
+        const size_t parameterCount);
     static bool MatchOneNumberParameter(napi_env env, const napi_value parameters[], const size_t parameterCount);
     static bool MatchOneStringParameter(napi_env env, const napi_value parameters[], const size_t parameterCount);
     static bool MatchObserverOffParameter(napi_env env, const napi_value parameters[], const size_t parameterCount);
@@ -256,6 +262,7 @@ private:
         napi_env env, const napi_value parameters[], const size_t parameterCount);
     static void HandleRejectCall(napi_env env, RejectAsyncContext &asyncContext,
         const napi_value parameters[], const size_t parameterCount);
+    static bool NeedSetCallInfoThirdParyApp();
 private:
     static int32_t registerStatus_;
 };

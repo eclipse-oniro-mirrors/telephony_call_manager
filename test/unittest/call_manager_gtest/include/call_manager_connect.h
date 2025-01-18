@@ -238,6 +238,7 @@ private:
 class CallInfoManager {
 public:
     static int32_t CallDetailsChange(const CallAttributeInfo &info);
+    static int32_t MeeTimeDetailsChange(const CallAttributeInfo &info);
     static int32_t CallEventChange(const CallEventInfo &info);
     static void Init();
     // replace LOCK_NUM_WHILE_EQ and LOCK_NUM_WHILE_NE
@@ -293,6 +294,12 @@ public:
     {
         TELEPHONY_LOGI("UCallDetailsChange callA!");
         return CallInfoManager::CallDetailsChange(info);
+    }
+
+    int32_t OnMeeTimeDetailsChange(const CallAttributeInfo &info)
+    {
+        TELEPHONY_LOGI("UMeeTimeDetailsChange callA!");
+        return CallInfoManager::MeeTimeDetailsChange(info);
     }
 
     int32_t OnCallEventChange(const CallEventInfo &info)
@@ -380,6 +387,11 @@ private:
 class CallManagerCallBackStub : public CallManagerCallback {
 public:
     int32_t OnCallDetailsChange(const CallAttributeInfo &info)
+    {
+        return TELEPHONY_SUCCESS;
+    }
+
+    int32_t OnMeeTimeDetailsChange(const CallAttributeInfo &info)
     {
         return TELEPHONY_SUCCESS;
     }

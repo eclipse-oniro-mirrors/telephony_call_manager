@@ -44,6 +44,15 @@ public:
     virtual int32_t OnCallDetailsChange(const CallAttributeInfo &info) = 0;
 
     /**
+     * @brief indicate the meeTime detail informaion while the call state is changed
+     *
+     * @param info[in] meeTime detail infomation, contains call type, account number, call state,
+     * call start or end time .etc
+     * @return Returns 0 on success, others on failure.
+     */
+    virtual int32_t OnMeeTimeDetailsChange(const CallAttributeInfo &info) = 0;
+
+    /**
      * @brief indicate the call event informaion while the call event is changed
      *
      * @param info[in] call event information, contains event id, phone number, bundle name.

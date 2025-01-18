@@ -46,6 +46,7 @@ int32_t BluetoothCallService::AnswerCall()
     int32_t ret = AnswerCallPolicy(callId);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("AnswerCallPolicy failed!");
+        sendEventToVoip(CallAbilityEventId::EVENT_ANSWER_VOIP_CALL);
         return ret;
     }
     sptr<CallBase> call = GetOneCallObject(callId);
@@ -85,6 +86,7 @@ int32_t BluetoothCallService::RejectCall()
     int32_t ret = RejectCallPolicy(callId);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("RejectCallPolicy failed!");
+        sendEventToVoip(CallAbilityEventId::EVENT_REJECT_VOIP_CALL);
         return ret;
     }
     if (callControlManagerPtr_ != nullptr) {
@@ -104,8 +106,15 @@ int32_t BluetoothCallService::HangUpCall()
     int32_t callId = ERR_ID;
     int32_t ret = HangUpPolicy(callId);
     if (ret != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("HangUpPolicy failed!");
+        TELEPHONY_LOGE("HangUpPolicy Voip Call!");
+        sendEventToVoip(CallAbilityEventId::EVENT_HANGUP_VOIP_CALL);
+        DeleteOneVoipCallObject(callId);
         return ret;
+    }
+    if (callId >= VOIP_CALL_MINIMUM) {
+        sendEventToVoip(CallAbilityEventId::EVENT_HANGUP_VOIP_CALL);
+        DeleteOneVoipCallObject(callId);
+        return CALL_ERR_ILLEGAL_CALL_OPERATION;
     }
     if (callControlManagerPtr_ != nullptr) {
         return callControlManagerPtr_->HangUpCall(callId);
@@ -115,12 +124,38 @@ int32_t BluetoothCallService::HangUpCall()
     }
 }
 
+void BluetoothCallService::sendEventToVoip(CallAbilityEventId eventId)
+{
+    CallEventInfo eventInfo;
+    (void)memset_s(&eventInfo, sizeof(CallEventInfo), 0, sizeof(CallEventInfo));
+    eventInfo.eventId = eventId;
+    DelayedSingleton<CallControlManager>::GetInstance()->NotifyCallEventUpdated(eventInfo);
+}
+
 int32_t BluetoothCallService::GetCallState()
 {
     if (!TelephonyPermission::CheckPermission(Permission::GET_TELEPHONY_STATE)) {
         return TELEPHONY_ERR_PERMISSION_ERR;
     }
     TELEPHONY_LOGI("Entry BluetoothCallService GetCallState");
+    int32_t numActive = 0;
+    int32_t numHeld = 0;
+    int32_t callState = static_cast<int32_t>(TelCallState::CALL_STATUS_IDLE);
+    std::string number = "";
+    std::vector<int32_t> carrierCallInfo = getCarrierCallInfoNum(callState, number);
+    if (!carrierCallInfo.empty()) {
+        numActive = carrierCallInfo[0];
+        numHeld = carrierCallInfo[1];
+    }
+    if (IsVoipCallExist() && numActive == 0) {
+        GetVoipCallState(numActive, callState, number);
+    }
+    return DelayedSingleton<BluetoothCallManager>::GetInstance()->
+        SendBtCallState(numActive, numHeld, callState, number);
+}
+
+std::vector<int32_t> BluetoothCallService::getCarrierCallInfoNum(int32_t &callState, std::string &number)
+{
     int32_t numActive = GetCallNum(TelCallState::CALL_STATUS_ACTIVE, false);
     int32_t numHeld = GetCallNum(TelCallState::CALL_STATUS_HOLDING, false);
     int32_t numDial = GetCallNum(TelCallState::CALL_STATUS_DIALING, false);
@@ -129,8 +164,6 @@ int32_t BluetoothCallService::GetCallState()
     int32_t numWait = GetCallNum(TelCallState::CALL_STATUS_WAITING, false);
     int32_t numDisconnected = GetCallNum(TelCallState::CALL_STATUS_DISCONNECTED, false);
     int32_t numDisconnecting = GetCallNum(TelCallState::CALL_STATUS_DISCONNECTING, false);
-    int32_t callState = static_cast<int32_t>(TelCallState::CALL_STATUS_IDLE);
-    std::string number = "";
     if (numHeld > 0) {
         callState = static_cast<int32_t>(TelCallState::CALL_STATUS_IDLE);
         number = GetCallNumber(TelCallState::CALL_STATUS_HOLDING, false);
@@ -163,8 +196,35 @@ int32_t BluetoothCallService::GetCallState()
         callState = static_cast<int32_t>(TelCallState::CALL_STATUS_DISCONNECTED);
         number = GetCallNumber(TelCallState::CALL_STATUS_DISCONNECTING, false);
     }
-    return DelayedSingleton<BluetoothCallManager>::GetInstance()->
-        SendBtCallState(numActive, numHeld, callState, number);
+    return {numActive, numHeld};
+}
+
+void BluetoothCallService::GetVoipCallState(int32_t &numActive, int32_t &callState, std::string &number)
+{
+    TELEPHONY_LOGI("GetVoipCallState start,callState:%{public}d", callState);
+    CallAttributeInfo callAttributeInfo = GetVoipCallInfo();
+    if (callState == (int32_t)TelCallState::CALL_STATUS_IDLE && number == "") {
+        switch (callAttributeInfo.callState) {
+            case TelCallState::CALL_STATUS_IDLE:
+                numActive = 1;
+                break;
+            case TelCallState::CALL_STATUS_WAITING:
+                callState = (int32_t)TelCallState::CALL_STATUS_INCOMING;
+                break;
+            case TelCallState::CALL_STATUS_INCOMING:
+                callState = (int32_t)TelCallState::CALL_STATUS_INCOMING;
+                break;
+            default:
+                TELEPHONY_LOGI("voip call state need not handle");
+                break;
+        }
+        number = callAttributeInfo.accountNumber;
+    }
+
+    if (numActive == 0 && callAttributeInfo.callState == TelCallState::CALL_STATUS_ACTIVE) {
+        numActive = 1;
+    }
+    TELEPHONY_LOGI("GetVoipCallState finish,callState:%{public}d, numActive:%{public}d", callState, numActive);
 }
 
 int32_t BluetoothCallService::HoldCall()

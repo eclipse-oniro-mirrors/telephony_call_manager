@@ -182,6 +182,11 @@ struct VoIPCallStateAsyncContext : AsyncContext {
     int32_t state = 0;
 };
 
+struct VoIPCallInfoAsyncContext : AsyncContext {
+    int32_t callId = -1;
+    int32_t state = 0;
+    std::string phoneNumber = "";
+};
 struct SendCallUiEventAsyncContext : AsyncContext {
     std::string eventName = "";
 };
@@ -202,6 +207,11 @@ enum TransferStatus {
 };
 
 struct CallStateWorker {
+    CallAttributeInfo info;
+    EventCallback callback;
+};
+
+struct MeeTimeStateWorker {
     CallAttributeInfo info;
     EventCallback callback;
 };

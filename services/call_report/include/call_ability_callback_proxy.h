@@ -30,6 +30,7 @@ public:
     virtual ~CallAbilityCallbackProxy() = default;
 
     int32_t OnCallDetailsChange(const CallAttributeInfo &info) override;
+    int32_t OnMeeTimeDetailsChange(const CallAttributeInfo &info) override;
     int32_t OnCallEventChange(const CallEventInfo &info) override;
     int32_t OnCallDisconnectedCause(const DisconnectedDetails &details) override;
     int32_t OnReportAsyncResults(CallResultReportId reportId, AppExecFwk::PacMap &resultInfo) override;

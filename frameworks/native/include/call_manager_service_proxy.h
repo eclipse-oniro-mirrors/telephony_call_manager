@@ -669,6 +669,26 @@ public:
     int32_t GetVoIPCallState(int32_t &state) override;
 
     /**
+     * @brief Set VoIP Call info
+     *
+     * @param callId[in] Indicates the VoIP Call id
+     * @param state[in] Indicates the VoIP Call state
+     * @param phoneNumber[in] Indicates the VoIP Call phone number
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t SetVoIPCallInfo(int32_t callId, int32_t state, std::string phoneNumber) override;
+
+    /**
+     * @brief Get VoIP Call Switch Status
+     *
+     * @param callId[out] Indicates the VoIP Call id
+     * @param state[out] Indicates the VoIP Call state
+     * @param phoneNumber[out] Indicates the VoIP Call phone number
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t GetVoIPCallInfo(int32_t &callId, int32_t &state, std::string &phoneNumber) override;
+
+    /**
      * GetProxyObjectPtr
      *
      * @brief get callManager proxy object ptr

@@ -94,6 +94,15 @@ void CallStateListener::CallStateUpdated(
     }
 }
 
+void CallStateListener::MeeTimeStateUpdated(
+    CallAttributeInfo info, TelCallState priorState, TelCallState nextState)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    for (auto &observer : listenerSet_) {
+        observer->MeeTimeStateUpdated(info, priorState, nextState);
+    }
+}
+
 void CallStateListener::IncomingCallHungUp(sptr<CallBase> &callObjectPtr, bool isSendSms, std::string content)
 {
     if (callObjectPtr == nullptr) {

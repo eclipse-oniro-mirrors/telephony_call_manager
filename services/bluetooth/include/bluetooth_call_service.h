@@ -133,7 +133,12 @@ public:
      * @return Returns call info list.
      */
     std::vector<CallAttributeInfo> GetCurrentCallList(int32_t slotId) override;
+
 private:
+    std::vector<int32_t> getCarrierCallInfoNum(int32_t &callState, std::string &number);
+    void sendEventToVoip(CallAbilityEventId eventId);
+private:
+    void GetVoipCallState(int32_t &numActive, int32_t &callState, std::string &number);
     std::shared_ptr<CallControlManager> callControlManagerPtr_;
     bool sendDtmfState_;
     int32_t sendDtmfCallId_;

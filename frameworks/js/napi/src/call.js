@@ -129,6 +129,7 @@ export default {
     reportOttCallEventInfo: call.reportOttCallEventInfo,
     removeMissedIncomingCallNotification: call.removeMissedIncomingCallNotification,
     setVoIPCallState: call.setVoIPCallState,
+    setVoIPCallInfo: call.setVoIPCallInfo,
     sendCallUiEvent: call.sendCallUiEvent,
     DialOptions: call.DialOptions,
     DialCallOptions: call.DialCallOptions,

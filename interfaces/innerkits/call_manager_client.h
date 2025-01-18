@@ -54,6 +54,13 @@ public:
     int32_t ObserverOnCallDetailsChange();
 
     /**
+     * @brief the application subscribe the OnMeeTimeDetailsChange event
+     *
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t ObserverOnMeeTimeDetailsChange();
+
+    /**
      * @brief Dial a phone call
      *
      * @param number[in], dial param.
@@ -587,6 +594,26 @@ public:
      * @return Returns 0 on success, others on failure.
      */
     int32_t GetVoIPCallState(int32_t &state);
+
+    /**
+     * @brief Set VoIP Call info
+     *
+     * @param callId[in] Indicates the VoIP Call id
+     * @param state[in] Indicates the VoIP Call state
+     * @param phoneNumber[in] Indicates the VoIP Call phone number
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t SetVoIPCallInfo(int32_t callId, int32_t state, std::string phoneNumber);
+
+    /**
+     * @brief Get VoIP Call info
+     *
+     * @param callId[out] Indicates the VoIP Call id
+     * @param state[out] Indicates the VoIP Call state
+     * @param phoneNumber[out] Indicates the VoIP Call phone number
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t GetVoIPCallInfo(int32_t &callId, int32_t &state, std::string &phoneNumber);
 
     /**
      * @brief Checks whether a device supports voice calls

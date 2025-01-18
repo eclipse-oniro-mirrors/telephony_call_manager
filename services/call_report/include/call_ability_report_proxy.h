@@ -35,6 +35,7 @@ public:
     int32_t UnRegisterCallBack(const std::string &bundleInfo);
     int32_t UnRegisterCallBack(sptr<IRemoteObject> object);
     void CallStateUpdated(sptr<CallBase> &callObjectPtr, TelCallState priorState, TelCallState nextState) override;
+    void MeeTimeStateUpdated(CallAttributeInfo info, TelCallState priorState, TelCallState nextState) override;
     void CallEventUpdated(CallEventInfo &info) override;
     void CallDestroyed(const DisconnectedDetails &details) override;
     int32_t ReportAsyncResults(const CallResultReportId reportId, AppExecFwk::PacMap &resultInfo);
@@ -42,6 +43,7 @@ public:
     int32_t ReportMmiCodeResult(const MmiCodeInfo &info);
     int32_t ReportAudioDeviceChange(const AudioDeviceInfo &info);
     int32_t ReportCallStateInfo(const CallAttributeInfo &info);
+    int32_t ReportMeeTimeStateInfo(const CallAttributeInfo &info);
     int32_t ReportCallStateInfo(const CallAttributeInfo &info, std::string bundleInfo);
     int32_t ReportPostDialDelay(const std::string &str);
     int32_t ReportImsCallModeChange(const CallMediaModeInfo &imsCallModeInfo);

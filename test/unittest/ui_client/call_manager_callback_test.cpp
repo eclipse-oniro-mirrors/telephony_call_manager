@@ -30,6 +30,17 @@ int32_t CallManagerCallbackTest::OnCallDetailsChange(const CallAttributeInfo &in
     return RETURN_SUCCESS;
 }
 
+int32_t CallManagerCallbackTest::OnMeeTimeDetailsChange(const CallAttributeInfo &info)
+{
+    std::cout << "----------OnMeeTimeDetailsChange--------" << std::endl
+              << "callId:" << info.callId << std::endl
+              << "callType:" << (int32_t)info.callType << std::endl
+              << "callState:" << (int32_t)info.callState << std::endl
+              << "conferenceState:" << (int32_t)info.conferenceState << std::endl
+              << "accountNumber:" << info.accountNumber << std::endl;
+    return RETURN_SUCCESS;
+}
+
 int32_t CallManagerCallbackTest::OnCallEventChange(const CallEventInfo &info)
 {
     std::cout << "----------OnCallEventChange--------" << std::endl

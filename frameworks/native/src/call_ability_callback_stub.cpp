@@ -28,6 +28,8 @@ CallAbilityCallbackStub::CallAbilityCallbackStub()
 {
     memberFuncMap_[static_cast<uint32_t>(CallManagerCallAbilityInterfaceCode::UPDATE_CALL_STATE_INFO)] =
         [this](MessageParcel &data, MessageParcel &reply) { return OnUpdateCallStateInfo(data, reply); };
+    memberFuncMap_[static_cast<uint32_t>(CallManagerCallAbilityInterfaceCode::UPDATE_MEETIME_STATE_INFO)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnUpdateMeeTimeStateInfo(data, reply); };
     memberFuncMap_[static_cast<uint32_t>(CallManagerCallAbilityInterfaceCode::UPDATE_CALL_EVENT)] =
         [this](MessageParcel &data, MessageParcel &reply) { return OnUpdateCallEvent(data, reply); };
     memberFuncMap_[static_cast<uint32_t>(CallManagerCallAbilityInterfaceCode::UPDATE_CALL_DISCONNECTED_CAUSE)] =
@@ -85,6 +87,21 @@ int32_t CallAbilityCallbackStub::OnUpdateCallStateInfo(MessageParcel &data, Mess
     }
     CallAttributeInfo parcelPtr = NativeCallManagerUtils::ReadCallAttributeInfo(data);
     result = OnCallDetailsChange(parcelPtr);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("writing parcel failed");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallAbilityCallbackStub::OnUpdateMeeTimeStateInfo(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t result = TELEPHONY_SUCCESS;
+    if (!data.ContainFileDescriptors()) {
+        TELEPHONY_LOGD("sent raw data is less than 32k");
+    }
+    CallAttributeInfo parcelPtr = NativeCallManagerUtils::ReadCallAttributeInfo(data);
+    result = OnMeeTimeDetailsChange(parcelPtr);
     if (!reply.WriteInt32(result)) {
         TELEPHONY_LOGE("writing parcel failed");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;

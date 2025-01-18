@@ -115,6 +115,8 @@ public:
     int32_t RemoveMissedIncomingCallNotification();
     int32_t SetVoIPCallState(int32_t state);
     int32_t GetVoIPCallState(int32_t &state);
+    int32_t SetVoIPCallInfo(int32_t callId, int32_t state, std::string phoneNumber);
+    int32_t GetVoIPCallInfo(int32_t &callId, int32_t &state, std::string &phoneNumber);
     sptr<IRemoteObject> GetProxyObjectPtr(CallManagerProxyType proxyType);
     void OnRemoteDied(const wptr<IRemoteObject> &remote);
     int32_t ReportAudioDeviceInfo();
