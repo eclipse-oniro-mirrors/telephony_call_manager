@@ -1969,7 +1969,7 @@ void CallControlManager::HangUpFirstCallBySecondCallID(int32_t secondCallId, boo
             if (answerCall->GetAccountNumber() == answerCall->GetAccountNumber()) {
                 break;
             }
-            int32_t ret = RejectCall(call->GetCallID(), false, Str8ToStr16());
+            int32_t ret = RejectCall(call->GetCallID(), false, Str8ToStr16(""));
             if (ret != TELEPHONY_SUCCESS) {
                 TELEPHONY_LOGE("first call RejectCall fail callid=%{public}d", call->GetCallID());
             }
