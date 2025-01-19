@@ -50,7 +50,10 @@ public:
      * call start or end time .etc
      * @return Returns 0 on success, others on failure.
      */
-    virtual int32_t OnMeeTimeDetailsChange(const CallAttributeInfo &info) = 0;
+    virtual int32_t OnMeeTimeDetailsChange(const CallAttributeInfo &info)
+    {
+        return -1;
+    }
 
     /**
      * @brief indicate the call event informaion while the call event is changed

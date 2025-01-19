@@ -40,8 +40,6 @@
 #include "distributed_communication_manager.h"
 #include "want_params_wrapper.h"
 #include "string_wrapper.h"
-#include "call_manager_info.h"
-#include "call_status_manager.h"
 #include "call_wired_headset.h"
 #include "bluetooth_call_connection.h"
 
