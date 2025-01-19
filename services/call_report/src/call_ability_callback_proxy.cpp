@@ -68,7 +68,7 @@ int32_t CallAbilityCallbackProxy::OnMeeTimeDetailsChange(const CallAttributeInfo
         Remote()->SendRequest(static_cast<uint32_t>(CallManagerCallAbilityInterfaceCode::UPDATE_MEETIME_STATE_INFO),
         dataParcel, replyParcel, option);
     if (error != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGD("update meeTime state info errcode: %{public}d", error);
+        TELEPHONY_LOGE("update meeTime state info errcode: %{public}d", error);
         return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
     }
     return replyParcel.ReadInt32();
