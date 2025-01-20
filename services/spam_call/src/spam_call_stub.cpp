@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 Huawei Device Co., Ltd.
+ * Copyright (C) 2024-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -38,14 +38,12 @@ int32_t SpamCallStub::OnRemoteRequest(uint32_t code, MessageParcel &data, Messag
         TELEPHONY_LOGE("descriptor checked fail !");
         return TELEPHONY_ERR_DESCRIPTOR_MISMATCH;
     }
+    int32_t errCodeVar = data.ReadInt32();
+    std::string resultVar = Str16ToStr8(data.ReadString16());
     TELEPHONY_LOGI("OnReceived, cmd = %{public}u", code);
     switch (code) {
-        case COMMAND_ON_RESULT:
-            do {
-                int32_t errCodeVar = data.ReadInt32();
-                std::string resultVar = Str16ToStr8(data.ReadString16());
-                OnResult(errCodeVar, resultVar);
-            } while (false);
+        case COMMAND_DETECT_SPAM_CALL_RESULT:
+            OnResult(errCodeVar, resultVar);
             break;
         default:
             TELEPHONY_LOGE("callback failed, default = %d", code);

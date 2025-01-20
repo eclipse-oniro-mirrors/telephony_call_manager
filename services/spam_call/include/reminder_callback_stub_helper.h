@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2021-2025 Huawei Device Co., Ltd.
+ * Copyright (C) 2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -13,29 +13,26 @@
  * limitations under the License.
  */
 
-#ifndef TELEPHONY_SPAM_CALL_STUB_H
-#define TELEPHONY_SPAM_CALL_STUB_H
+#ifndef TELEPHONY_REMINDER_CALLBACK_STUB_HELPER_H
+#define TELEPHONY_REMINDER_CALLBACK_STUB_HELPER_H
 
-#include <map>
-
-#include "iremote_object.h"
-#include "iremote_stub.h"
-
-#include "spam_call_callback.h"
+#include <singleton.h>
+#include "spam_call_adapter.h"
+#include "spam_call_stub.h"
+#include <memory>
 
 namespace OHOS {
 namespace Telephony {
-class SpamCallStub : public IRemoteStub<SpamCallCallback> {
+class ReminderCallbackStubHelper : public SpamCallStub {
 public:
-    SpamCallStub();
-    ~SpamCallStub();
-    int32_t OnRemoteRequest(
-            uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option) override;
+    ReminderCallbackStubHelper(std::shared_ptr<SpamCallAdapter> spamCallAdapter);
+    ~ReminderCallbackStubHelper();
+    int32_t OnResult(int32_t &errCode, std::string &result) override;
 
 private:
-    static constexpr int COMMAND_DETECT_SPAM_CALL_RESULT = 1;
+    std::shared_ptr<SpamCallAdapter> spamCallAdapter_ {nullptr};
 };
-} // namespace Telephony
-} // namespace OHOS
+}
+}
 
-#endif // TELEPHONY_SPAM_CALL_STUB_H
+#endif // TELEPHONY_REMINDER_CALLBACK_STUB_HELPER_H
