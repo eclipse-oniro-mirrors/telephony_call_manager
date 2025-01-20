@@ -1158,7 +1158,7 @@ int32_t CallControlManager::JoinConference(int32_t callId, std::vector<std::u16s
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     std::vector<std::string> phoneNumberList(numberList.size());
-    for (size_t index = 0; index < numberList.size(); index) {
+    for (size_t index = 0; index < numberList.size(); ++index) {
         phoneNumberList[index] = Str16ToStr8(numberList[index]);
     }
     int32_t ret = CallPolicy::InviteToConferencePolicy(callId, phoneNumberList);
