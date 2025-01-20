@@ -996,6 +996,7 @@ int32_t CallStatusManager::DisconnectedHandle(const CallDetailInfo &info)
         TELEPHONY_LOGE("call is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
+    bool isTwoCallBtCallAndESIM = CallObjectManager::IsTwoCallBtCallAndESIM();
     call = RefreshCallIfNecessary(call, info);
     RefreshCallDisconnectReason(call, static_cast<int32_t>(info.reason));
     ClearPendingState(call);
@@ -1022,7 +1023,10 @@ int32_t CallStatusManager::DisconnectedHandle(const CallDetailInfo &info)
     if (currentCallNum <= 0) {
         DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance()->RestoreSuperPrivacyMode();
     }
-    AutoAnswerSecondCall();
+    if (isTwoCallBtCallAndESIM) {
+        TELEPHONY_LOGI("Watch Auto AnswerCall");
+        AutoAnswerSecondCall();
+    }
     return TELEPHONY_SUCCESS;
 }
 
