@@ -1442,6 +1442,8 @@ int32_t CallControlManager::SetVoIPCallInfo(int32_t callId, int32_t state, std::
     VoipCallInfo_.callId = callId;
     VoipCallInfo_.state = state;
     VoipCallInfo_.phoneNumber = phoneNumber;
+    TELEPHONY_LOGI("SetVoIPCallInfo,numActive:%{public}d,numHeld:%{public}d,callState:%{public}d", numActive, numHeld,
+        state);
     return DelayedSingleton<BluetoothCallManager>::GetInstance()->
         SendBtCallState(numActive, numHeld, state, phoneNumber);
 }
