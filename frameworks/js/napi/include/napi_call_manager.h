@@ -25,8 +25,6 @@
 namespace OHOS {
 namespace Telephony {
 constexpr int32_t SLOT_ID_INVALID = 202;
-constexpr const char *KEY_CONST_TELEPHONY_READ_SET_VOIP_CALL_INFO =
-    "const.telephony.read_set_voip_call_info";
 #define GET_PARAMS(env, info, num) \
     size_t argc = num;             \
     napi_value argv[num] = {0};    \
@@ -262,7 +260,6 @@ private:
         napi_env env, const napi_value parameters[], const size_t parameterCount);
     static void HandleRejectCall(napi_env env, RejectAsyncContext &asyncContext,
         const napi_value parameters[], const size_t parameterCount);
-    static bool NeedSetCallInfoThirdParyApp();
 private:
     static int32_t registerStatus_;
 };

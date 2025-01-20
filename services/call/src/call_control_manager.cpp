@@ -1158,7 +1158,7 @@ int32_t CallControlManager::JoinConference(int32_t callId, std::vector<std::u16s
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     std::vector<std::string> phoneNumberList(numberList.size());
-    for (size_t index = 0; index < numberList.size(); ++index) {
+    for (size_t index = 0; index < numberList.size(); index) {
         phoneNumberList[index] = Str16ToStr8(numberList[index]);
     }
     int32_t ret = CallPolicy::InviteToConferencePolicy(callId, phoneNumberList);
@@ -1362,6 +1362,10 @@ int32_t CallControlManager::RemoveMissedIncomingCallNotification()
 
 int32_t CallControlManager::SetVoIPCallState(int32_t state)
 {
+    if (!IsSupportSetVoipInfo()) {
+        TELEPHONY_LOGE("SetVoIPCallState is not support");
+        return TELEPHONY_ERROR;
+    }
     TELEPHONY_LOGI("VoIP state is %{public}d", state);
     VoIPCallState_ = (CallStateToApp)state;
     std::string identity = IPCSkeleton::ResetCallingIdentity();
@@ -1424,6 +1428,9 @@ int32_t CallControlManager::SetVoIPCallInfo(int32_t callId, int32_t state, std::
             if (callId != ERR_ID) {
                 TELEPHONY_LOGI("SetVoIPCallInfo handle cs call sucessed");
                 sptr<CallBase> call = GetOneCallObject(callId);
+                if (call == nullptr) {
+                    return TELEPHONY_ERROR;
+                }
                 return DelayedSingleton<BluetoothCallManager>::GetInstance()->
                     SendBtCallState(0, 0, (int32_t)TelCallState::CALL_STATUS_INCOMING, call->GetAccountNumber());
             } else {
@@ -1446,6 +1453,15 @@ int32_t CallControlManager::SetVoIPCallInfo(int32_t callId, int32_t state, std::
         state);
     return DelayedSingleton<BluetoothCallManager>::GetInstance()->
         SendBtCallState(numActive, numHeld, state, phoneNumber);
+}
+
+bool CallControlManager::IsSupportSetVoipInfo()
+{
+    std::string readSetVoipCallInfo = system::GetParameter(KEY_CONST_TELEPHONY_READ_SET_VOIP_CALL_INFO, "");
+    if (readSetVoipCallInfo.compare("false") == 0) {
+        return false;
+    }
+    return true;
 }
 
 void CallControlManager::HandleVoipConnected(int32_t &numActive, int32_t callId)

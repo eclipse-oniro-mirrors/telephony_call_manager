@@ -110,7 +110,7 @@ int32_t CallObjectManager::DeleteOneVoipCallObject(int32_t callId)
     std::unique_lock<std::mutex> lock(listMutex_);
     std::map<int32_t, CallAttributeInfo>::iterator it = voipCallObjectList_.find(callId);
     if (it != voipCallObjectList_.end()) {
-        voipCallObjectList_.erase((callId));
+        voipCallObjectList_.erase(callId);
         TELEPHONY_LOGI("DeleteOneVoipCallObject success! callList size:%{public}zu", voipCallObjectList_.size());
         return TELEPHONY_SUCCESS;
     }
