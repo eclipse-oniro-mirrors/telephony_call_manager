@@ -3038,15 +3038,6 @@ napi_value NapiCallManager::SetVoIPCallState(napi_env env, napi_callback_info in
         env, asyncContext.release(), "SetVoIPCallState", NativeSetVoIPCallState, NativeVoidCallBackWithErrorCode);
 }
 
-bool NapiCallManager::NeedSetCallInfoThirdParyApp()
-{
-    std::string readSetVoipCallInfo = system::GetParameter(KEY_CONST_TELEPHONY_READ_SET_VOIP_CALL_INFO, "");
-    if (readSetVoipCallInfo.compare("false") == 0) {
-        return false;
-    }
-    return true;
-}
-
 napi_value NapiCallManager::SetVoIPCallInfo(napi_env env, napi_callback_info info)
 {
     GET_PARAMS(env, info, THREE_VALUE_MAXIMUM_LIMIT);
@@ -5011,10 +5002,6 @@ void NapiCallManager::NativeSetVoIPCallState(napi_env env, void *data)
 
 void NapiCallManager::NativeSetVoIPCallInfo(napi_env env, void *data)
 {
-    if (!NeedSetCallInfoThirdParyApp()) {
-        TELEPHONY_LOGE("NapiCallManager::NativeSetVoIPCallInfo is not support");
-        return;
-    }
     if (data == nullptr) {
         TELEPHONY_LOGE("NapiCallManager::NativeSetVoIPCallInfo data is nullptr");
         NapiUtil::ThrowParameterError(env);
