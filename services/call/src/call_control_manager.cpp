@@ -1423,11 +1423,11 @@ int32_t CallControlManager::SetVoIPCallInfo(int32_t callId, int32_t state, std::
             DeleteOneVoipCallObject(callId);
             DelayedSingleton<BluetoothCallManager>::GetInstance()->
                 SendBtCallState(numActive, numHeld, state, phoneNumber);
-            int32_t callId = ERR_ID;
-            IsCallExist(TelCallState::CALL_STATUS_INCOMING, callId);
-            if (callId != ERR_ID) {
+            int32_t carrierCallId = ERR_ID;
+            IsCallExist(TelCallState::CALL_STATUS_INCOMING, carrierCallId);
+            if (carrierCallId != ERR_ID) {
                 TELEPHONY_LOGI("SetVoIPCallInfo handle cs call sucessed");
-                sptr<CallBase> call = GetOneCallObject(callId);
+                sptr<CallBase> call = GetOneCallObject(carrierCallId);
                 if (call == nullptr) {
                     return TELEPHONY_ERROR;
                 }

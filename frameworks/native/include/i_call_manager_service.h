@@ -108,7 +108,7 @@ public:
     virtual int32_t RemoveMissedIncomingCallNotification() = 0;
     virtual int32_t SetVoIPCallState(int32_t state) = 0;
     virtual int32_t GetVoIPCallState(int32_t &state) = 0;
-    virtual int32_t SetVoIPCallInfo(int32_t callId, int32_t state, std::string phoneNumber) = 0;
+    virtual int32_t SetVoIPCallInfo(const int32_t callId, const int32_t state, const std::string phoneNumber) = 0;
     virtual int32_t GetVoIPCallInfo(int32_t &callId, int32_t &state, std::string &phoneNumber) = 0;
     virtual sptr<IRemoteObject> GetProxyObjectPtr(CallManagerProxyType proxyType) = 0;
     virtual int32_t ReportAudioDeviceInfo() = 0;

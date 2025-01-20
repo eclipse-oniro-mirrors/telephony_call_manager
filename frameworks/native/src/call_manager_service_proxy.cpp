@@ -1257,7 +1257,7 @@ int32_t CallManagerServiceProxy::SetVoIPCallInfo(int32_t callId, int32_t state, 
     MessageParcel dataParcel;
     if (!dataParcel.WriteInterfaceToken(CallManagerServiceProxy::GetDescriptor())) {
         TELEPHONY_LOGE("write descriptor fail");
-        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
     dataParcel.WriteInt32(callId);
     dataParcel.WriteInt32(state);
@@ -1277,7 +1277,7 @@ int32_t CallManagerServiceProxy::GetVoIPCallInfo(int32_t &callId, int32_t &state
     MessageParcel dataParcel;
     if (!dataParcel.WriteInterfaceToken(CallManagerServiceProxy::GetDescriptor())) {
         TELEPHONY_LOGE("write descriptor fail");
-        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
     MessageParcel replyParcel;
     int32_t error = SendRequest(INTERFACE_GET_VOIP_CALL_INFO, dataParcel, replyParcel);
