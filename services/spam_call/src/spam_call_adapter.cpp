@@ -208,7 +208,7 @@ void SpamCallAdapter::ParseDetectResult(const std::string &jsonData, bool &isBlo
     }
     blockReason = numberValue;
     TELEPHONY_LOGI("DetectSpamCall decisionReason: %{public}d", blockReason);
-    ParseMarkResults(info, root, detectDetails, isBlock);
+    ParseMarkResults(info, root, isBlock);
     cJSON_Delete(root);
 }
 
