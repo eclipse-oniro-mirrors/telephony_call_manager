@@ -49,7 +49,7 @@ private:
     bool JsonGetNumberValue(cJSON *json, const std::string key, int32_t &out);
     bool JsonGetStringValue(cJSON *json, const std::string key, std::string &out);
     bool JsonGetBoolValue(cJSON *json, const std::string key);
-    void ParseMarkResults(NumberMarkInfo &info, cJSON *root, std::string &detectDetails, bool isBlock);
+    void ParseMarkResults(NumberMarkInfo &info, cJSON *root, bool isBlock);
     int32_t errCode_ = -1;
     std::string result_ = "";
     std::string phoneNumber_ = "";
