@@ -733,7 +733,7 @@ int32_t CallManagerClient::SetVoIPCallInfo(int32_t callId, int32_t state, std::s
         return g_callManagerProxy->SetVoIPCallInfo(callId, state, phoneNumber);
     }
     TELEPHONY_LOGE("init first please!");
-    return TELEPHONY_ERR_UNINIT;   
+    return TELEPHONY_ERR_UNINIT;
 }
 
 int32_t CallManagerClient::GetVoIPCallInfo(int32_t &callId, int32_t &state, std::string &phoneNumber)
