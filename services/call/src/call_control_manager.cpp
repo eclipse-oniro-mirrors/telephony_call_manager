@@ -369,6 +369,7 @@ int32_t CallControlManager::HangUpCall(int32_t callId)
         callRunningStateVec.push_back(CallRunningState::CALL_RUNNING_STATE_ACTIVE);
         callRunningStateVec.push_back(CallRunningState::CALL_RUNNING_STATE_DIALING);
         callRunningStateVec.push_back(CallRunningState::CALL_RUNNING_STATE_CONNECTING);
+        callRunningStateVec.push_back(CallRunningState::CALL_RUNNING_STATE_HOLD);
 
         for (auto &state : callRunningStateVec) {
             sptr<CallBase> call = GetOneCallObject(state);
