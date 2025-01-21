@@ -1362,10 +1362,6 @@ int32_t CallControlManager::RemoveMissedIncomingCallNotification()
 
 int32_t CallControlManager::SetVoIPCallState(int32_t state)
 {
-    if (!IsSupportSetVoipInfo()) {
-        TELEPHONY_LOGE("SetVoIPCallState is not support");
-        return TELEPHONY_ERROR;
-    }
     TELEPHONY_LOGI("VoIP state is %{public}d", state);
     VoIPCallState_ = (CallStateToApp)state;
     std::string identity = IPCSkeleton::ResetCallingIdentity();
@@ -1408,6 +1404,10 @@ int32_t CallControlManager::SetVoIPCallState(int32_t state)
 
 int32_t CallControlManager::SetVoIPCallInfo(int32_t callId, int32_t state, std::string phoneNumber)
 {
+    if (!IsSupportSetVoipInfo()) {
+        TELEPHONY_LOGE("SetVoIPCallState is not support");
+        return TELEPHONY_ERROR;
+    }
     int32_t numActive = GetCallNum(TelCallState::CALL_STATUS_ACTIVE, true);
     int32_t numHeld = GetCallNum(TelCallState::CALL_STATUS_HOLDING, true);
     switch (state) {
@@ -1446,9 +1446,7 @@ int32_t CallControlManager::SetVoIPCallInfo(int32_t callId, int32_t state, std::
         default:
             break;
     }
-    VoipCallInfo_.callId = callId;
-    VoipCallInfo_.state = state;
-    VoipCallInfo_.phoneNumber = phoneNumber;
+    SetVoipCallInfoInner(callId, state, phoneNumber);
     TELEPHONY_LOGI("SetVoIPCallInfo,numActive:%{public}d,numHeld:%{public}d,callState:%{public}d", numActive, numHeld,
         state);
     return DelayedSingleton<BluetoothCallManager>::GetInstance()->
@@ -1514,8 +1512,20 @@ int32_t CallControlManager::GetMeetimeCallState()
     return VoipCallInfo_.state;
 }
 
+int32_t CallControlManager::SetVoipCallInfoInner(const int32_t callId, const int32_t state,
+    const std::string phoneNumber)
+{
+    VoipCallInfo_.callId = callId;
+    VoipCallInfo_.state = state;
+    VoipCallInfo_.phoneNumber = phoneNumber;
+}
+
 int32_t CallControlManager::GetVoIPCallInfo(int32_t &callId, int32_t &state, std::string &phoneNumber)
 {
+    if (!IsSupportSetVoipInfo()) {
+        TELEPHONY_LOGE("GetVoIPCallInfo is not support");
+        return TELEPHONY_ERROR;
+    }
     callId = VoipCallInfo_.callId;
     state = VoipCallInfo_.state;
     phoneNumber = VoipCallInfo_.phoneNumber;

@@ -159,6 +159,7 @@ private:
     void HandleVoipIncoming(int32_t &numActive, int32_t callId, const std::string phoneNumber);
     void HandleVoipAlerting(int32_t callId, const std::string phoneNumber);
     bool IsSupportSetVoipInfo();
+    void SetVoipCallInfoInner();
 
 private:
     class SystemAbilityListener : public SystemAbilityStatusChangeStub {
