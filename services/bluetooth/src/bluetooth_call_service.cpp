@@ -46,7 +46,9 @@ int32_t BluetoothCallService::AnswerCall()
     int32_t ret = AnswerCallPolicy(callId);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("AnswerCallPolicy failed!");
-        sendEventToVoip(CallAbilityEventId::EVENT_ANSWER_VOIP_CALL);
+        if (IsVoipCallExist()) {
+            sendEventToVoip(CallAbilityEventId::EVENT_ANSWER_VOIP_CALL);
+        }
         return ret;
     }
     sptr<CallBase> call = GetOneCallObject(callId);
@@ -86,7 +88,9 @@ int32_t BluetoothCallService::RejectCall()
     int32_t ret = RejectCallPolicy(callId);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("RejectCallPolicy failed!");
-        sendEventToVoip(CallAbilityEventId::EVENT_REJECT_VOIP_CALL);
+        if (IsVoipCallExist()) {
+            sendEventToVoip(CallAbilityEventId::EVENT_REJECT_VOIP_CALL);
+        }
         return ret;
     }
     if (callControlManagerPtr_ != nullptr) {
@@ -107,7 +111,9 @@ int32_t BluetoothCallService::HangUpCall()
     int32_t ret = HangUpPolicy(callId);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("HangUpPolicy Voip Call!");
-        sendEventToVoip(CallAbilityEventId::EVENT_HANGUP_VOIP_CALL);
+        if (IsVoipCallExist()) {
+            sendEventToVoip(CallAbilityEventId::EVENT_HANGUP_VOIP_CALL);
+        }
         DeleteOneVoipCallObject(callId);
         return ret;
     }

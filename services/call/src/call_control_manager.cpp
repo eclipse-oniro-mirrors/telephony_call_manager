@@ -1404,6 +1404,10 @@ int32_t CallControlManager::SetVoIPCallState(int32_t state)
 
 int32_t CallControlManager::SetVoIPCallInfo(int32_t callId, int32_t state, std::string phoneNumber)
 {
+    if (!IsSupportSetVoipInfo()) {
+        TELEPHONY_LOGE("SetVoIPCallState is not support");
+        return TELEPHONY_ERROR;
+    }
     int32_t numActive = GetCallNum(TelCallState::CALL_STATUS_ACTIVE, true);
     int32_t numHeld = GetCallNum(TelCallState::CALL_STATUS_HOLDING, true);
     switch (state) {
@@ -1419,11 +1423,14 @@ int32_t CallControlManager::SetVoIPCallInfo(int32_t callId, int32_t state, std::
             DeleteOneVoipCallObject(callId);
             DelayedSingleton<BluetoothCallManager>::GetInstance()->
                 SendBtCallState(numActive, numHeld, state, phoneNumber);
-            int32_t callId = ERR_ID;
-            IsCallExist(TelCallState::CALL_STATUS_INCOMING, callId);
-            if (callId != ERR_ID) {
+            int32_t carrierCallId = ERR_ID;
+            IsCallExist(TelCallState::CALL_STATUS_INCOMING, carrierCallId);
+            if (carrierCallId != ERR_ID) {
                 TELEPHONY_LOGI("SetVoIPCallInfo handle cs call sucessed");
-                sptr<CallBase> call = GetOneCallObject(callId);
+                sptr<CallBase> call = GetOneCallObject(carrierCallId);
+                if (call == nullptr) {
+                    return TELEPHONY_ERROR;
+                }
                 return DelayedSingleton<BluetoothCallManager>::GetInstance()->
                     SendBtCallState(0, 0, (int32_t)TelCallState::CALL_STATUS_INCOMING, call->GetAccountNumber());
             } else {
@@ -1439,13 +1446,20 @@ int32_t CallControlManager::SetVoIPCallInfo(int32_t callId, int32_t state, std::
         default:
             break;
     }
-    VoipCallInfo_.callId = callId;
-    VoipCallInfo_.state = state;
-    VoipCallInfo_.phoneNumber = phoneNumber;
+    SetVoipCallInfoInner(callId, state, phoneNumber);
     TELEPHONY_LOGI("SetVoIPCallInfo,numActive:%{public}d,numHeld:%{public}d,callState:%{public}d", numActive, numHeld,
         state);
     return DelayedSingleton<BluetoothCallManager>::GetInstance()->
         SendBtCallState(numActive, numHeld, state, phoneNumber);
+}
+
+bool CallControlManager::IsSupportSetVoipInfo()
+{
+    std::string readSetVoipCallInfo = system::GetParameter(KEY_CONST_TELEPHONY_READ_SET_VOIP_CALL_INFO, "");
+    if (readSetVoipCallInfo.compare("false") == 0) {
+        return false;
+    }
+    return true;
 }
 
 void CallControlManager::HandleVoipConnected(int32_t &numActive, int32_t callId)
@@ -1498,8 +1512,20 @@ int32_t CallControlManager::GetMeetimeCallState()
     return VoipCallInfo_.state;
 }
 
+void CallControlManager::SetVoipCallInfoInner(const int32_t callId, const int32_t state,
+    const std::string phoneNumber)
+{
+    VoipCallInfo_.callId = callId;
+    VoipCallInfo_.state = state;
+    VoipCallInfo_.phoneNumber = phoneNumber;
+}
+
 int32_t CallControlManager::GetVoIPCallInfo(int32_t &callId, int32_t &state, std::string &phoneNumber)
 {
+    if (!IsSupportSetVoipInfo()) {
+        TELEPHONY_LOGE("GetVoIPCallInfo is not support");
+        return TELEPHONY_ERROR;
+    }
     callId = VoipCallInfo_.callId;
     state = VoipCallInfo_.state;
     phoneNumber = VoipCallInfo_.phoneNumber;

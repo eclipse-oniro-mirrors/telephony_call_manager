@@ -99,6 +99,10 @@ void CallStateListener::MeeTimeStateUpdated(
 {
     std::lock_guard<std::mutex> lock(mutex_);
     for (auto &observer : listenerSet_) {
+        if (observer == nullptr) {
+            TELEPHONY_LOGE("MeeTimeStateUpdated observer is nullptr");
+            return;
+        }
         observer->MeeTimeStateUpdated(info, priorState, nextState);
     }
 }
