@@ -1512,7 +1512,7 @@ int32_t CallControlManager::GetMeetimeCallState()
     return VoipCallInfo_.state;
 }
 
-int32_t CallControlManager::SetVoipCallInfoInner(const int32_t callId, const int32_t state,
+void CallControlManager::SetVoipCallInfoInner(const int32_t callId, const int32_t state,
     const std::string phoneNumber)
 {
     VoipCallInfo_.callId = callId;
