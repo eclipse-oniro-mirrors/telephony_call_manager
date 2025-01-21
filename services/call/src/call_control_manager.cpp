@@ -1938,8 +1938,6 @@ bool CallControlManager::HangUpFirstCall(int32_t secondCallId)
         return HangUpFirstCallBtAndESIM(secondCallId);
     } else if (CallObjectManager::IsTwoCallBtCall()) {
         HangUpFirstCallBtCall(secondCallId);
-    } else if (CallObjectManager::IsTwoCallESIMCall()) {
-        HangUpFirstCallESIMCall(secondCallId);
     }
     return false;
 }
@@ -1947,7 +1945,9 @@ bool CallControlManager::HangUpFirstCall(int32_t secondCallId)
 void CallControlManager::HangUpFirstCallBySecondCallID(int32_t secondCallId, bool secondAutoAnswer)
 {
     sptr<CallBase> answerCall = CallObjectManager::GetOneCallObject(secondCallId);
-    if (answerCall != nullptr) {
+    if (answerCall != nullptr &&
+        (answerCall->GetTelCallState() == TelCallState::CALL_STATUS_INCOMING ||
+        answerCall->GetTelCallState() == TelCallState::CALL_STATUS_WAITING)) {
         TELEPHONY_LOGI("AutoAnswerCall second callid=%{public}d", secondCallId);
         answerCall->SetAutoAnswerState(secondAutoAnswer);
     }
@@ -1968,7 +1968,7 @@ void CallControlManager::HangUpFirstCallBySecondCallID(int32_t secondCallId, boo
         } else if (telCallState == TelCallState::CALL_STATUS_INCOMING ||
             telCallState == TelCallState::CALL_STATUS_WAITING) {
             TELEPHONY_LOGI("first call RejectCall callid=%{public}d", call->GetCallID());
-            if (answerCall->GetAccountNumber() == answerCall->GetAccountNumber()) {
+            if (answerCall->GetAccountNumber() == call->GetAccountNumber()) {
                 break;
             }
             int32_t ret = RejectCall(call->GetCallID(), false, Str8ToStr16(""));
