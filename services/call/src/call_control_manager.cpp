@@ -1362,10 +1362,6 @@ int32_t CallControlManager::RemoveMissedIncomingCallNotification()
 
 int32_t CallControlManager::SetVoIPCallState(int32_t state)
 {
-    if (!IsSupportSetVoipInfo()) {
-        TELEPHONY_LOGE("SetVoIPCallState is not support");
-        return TELEPHONY_ERROR;
-    }
     TELEPHONY_LOGI("VoIP state is %{public}d", state);
     VoIPCallState_ = (CallStateToApp)state;
     std::string identity = IPCSkeleton::ResetCallingIdentity();
@@ -1408,6 +1404,10 @@ int32_t CallControlManager::SetVoIPCallState(int32_t state)
 
 int32_t CallControlManager::SetVoIPCallInfo(int32_t callId, int32_t state, std::string phoneNumber)
 {
+    if (!IsSupportSetVoipInfo()) {
+        TELEPHONY_LOGE("SetVoIPCallState is not support");
+        return TELEPHONY_ERROR;
+    }
     int32_t numActive = GetCallNum(TelCallState::CALL_STATUS_ACTIVE, true);
     int32_t numHeld = GetCallNum(TelCallState::CALL_STATUS_HOLDING, true);
     switch (state) {
@@ -1516,6 +1516,10 @@ int32_t CallControlManager::GetMeetimeCallState()
 
 int32_t CallControlManager::GetVoIPCallInfo(int32_t &callId, int32_t &state, std::string &phoneNumber)
 {
+    if (!IsSupportSetVoipInfo()) {
+        TELEPHONY_LOGE("GetVoIPCallInfo is not support");
+        return TELEPHONY_ERROR;
+    }
     callId = VoipCallInfo_.callId;
     state = VoipCallInfo_.state;
     phoneNumber = VoipCallInfo_.phoneNumber;
