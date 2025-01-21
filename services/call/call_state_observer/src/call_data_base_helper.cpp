@@ -188,6 +188,7 @@ bool CallDataBaseHelper::Query(ContactInfo &contactInfo, DataShare::DataSharePre
     std::vector<std::string> columns;
     auto resultSet = helper->Query(uri, predicates, columns);
     if (!CheckResultSet(resultSet)) {
+        TELEPHONY_LOGE("resultSet is null");
         helper->Release();
         return false;
     }
@@ -198,8 +199,17 @@ bool CallDataBaseHelper::Query(ContactInfo &contactInfo, DataShare::DataSharePre
         return false;
     }
     int32_t columnIndex;
+    std::string ringtonePath = "";
     resultSet->GetColumnIndex(CALL_DISPLAY_NAME, columnIndex);
     resultSet->GetString(columnIndex, contactInfo.name);
+    resultSet->GetColumnIndex(PERSONAL_RINGTONE, columnIndex);
+    resultSet->GetString(columnIndex, ringtonePath);
+    int32_t length = ringtonePath.length() > FILE_PATH_MAX_LEN ? FILE_PATH_MAX_LEN : ringtonePath.length();
+    if (memcpy_s(contactInfo.ringtonePath, FILE_PATH_MAX_LEN, ringtonePath.c_str(), length) != EOK) {
+        TELEPHONY_LOGE("memcpy_s ringtonePath fail!");
+        return false;
+    }
+    TELEPHONY_LOGI("ringtonePath: %{public}s", contactInfo.ringtonePath);
     resultSet->Close();
     helper->Release();
     TELEPHONY_LOGI("Query end, contactName length: %{public}zu", contactInfo.name.length());
@@ -432,6 +442,7 @@ bool CallDataBaseHelper::CheckResultSet(std::shared_ptr<DataShare::DataShareResu
 #ifdef TELEPHONY_CUST_SUPPORT
 bool CallDataBaseHelper::QueryContactInfoEnhanced(ContactInfo &contactInfo, DataShare::DataSharePredicates &predicates)
 {
+    TELEPHONY_LOGI("QueryCallerInfo use enhanced query.");
     std::shared_ptr<DataShare::DataShareHelper> helper = CreateDataShareHelper(CONTACT_URI);
     if (helper == nullptr) {
         TELEPHONY_LOGE("helper is nullptr");
@@ -441,11 +452,12 @@ bool CallDataBaseHelper::QueryContactInfoEnhanced(ContactInfo &contactInfo, Data
     std::vector<std::string> columns;
     auto resultSet = helper->Query(uri, predicates, columns);
     if (!CheckResultSet(resultSet)) {
+        TELEPHONY_LOGE("resultSet is null!");
         helper->Release();
         return false;
     }
     int resultId = GetCallerIndex(resultSet, contactInfo.number);
-    TELEPHONY_LOGI("QueryCallerInfo use enhanced query, index: %{public}d", resultId);
+    TELEPHONY_LOGI("index: %{public}d", resultId);
     if (resultSet->GoToRow(resultId) != E_OK) {
         TELEPHONY_LOGE("GoToRow failed");
         resultSet->Close();
@@ -453,8 +465,17 @@ bool CallDataBaseHelper::QueryContactInfoEnhanced(ContactInfo &contactInfo, Data
         return false;
     }
     int32_t columnIndex;
+    std::string ringtonePath = "";
     resultSet->GetColumnIndex(CALL_DISPLAY_NAME, columnIndex);
     resultSet->GetString(columnIndex, contactInfo.name);
+    resultSet->GetColumnIndex(PERSONAL_RINGTONE, columnIndex);
+    resultSet->GetString(columnIndex, ringtonePath);
+    int32_t length = ringtonePath.length() > FILE_PATH_MAX_LEN ? FILE_PATH_MAX_LEN : ringtonePath.length();
+    if (memcpy_s(contactInfo.ringtonePath, FILE_PATH_MAX_LEN, ringtonePath.c_str(), length) != EOK) {
+        TELEPHONY_LOGE("memcpy_s ringtonePath fail!");
+        return false;
+    }
+    TELEPHONY_LOGI("ringtonePath: %{public}s", contactInfo.ringtonePath);
     resultSet->Close();
     helper->Release();
     TELEPHONY_LOGI("Query end, contactName length: %{public}zu", contactInfo.name.length());

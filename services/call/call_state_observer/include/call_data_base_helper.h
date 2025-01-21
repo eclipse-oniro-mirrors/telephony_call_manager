@@ -66,6 +66,7 @@ constexpr const char *CALL_MARK_SOURCE = "mark_source";
 constexpr const char *CALL_MARK_DETAILS = "mark_details";
 constexpr const char *CALL_DETECT_DETAILS = "detect_details";
 constexpr const char *CALL_IS_CNAP = "is_cnap";
+constexpr const char *PERSONAL_RINGTONE = "personal_ringtone";
 
 enum class CallLogReadState {
     CALL_IS_UNREAD,

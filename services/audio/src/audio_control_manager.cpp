@@ -555,6 +555,7 @@ bool AudioControlManager::PlayRingtone()
     }
     CallAttributeInfo info;
     incomingCall->GetCallAttributeBaseInfo(info);
+    ContactInfo contactInfo = incomingCall->GetCallerInfo();
     AudioStandard::AudioRingerMode ringMode = DelayedSingleton<AudioProxy>::GetInstance()->GetRingerMode();
     if (incomingCall->GetCrsType() == CRS_TYPE) {
         if (!isCrsVibrating_ && (ringMode != AudioStandard::AudioRingerMode::RINGER_MODE_SILENT)) {
@@ -572,7 +573,7 @@ bool AudioControlManager::PlayRingtone()
         TELEPHONY_LOGI("type_crs but not play ringtone");
         return false;
     }
-    if (ring_->Play(info.accountId) != TELEPHONY_SUCCESS) {
+    if (ring_->Play(info.accountId, contactInfo.ringtonePath) != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("play ringtone failed");
         return false;
     }
