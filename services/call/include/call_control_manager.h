@@ -157,6 +157,8 @@ private:
     void SetCallTypeExtras(AppExecFwk::PacMap &extras);
     void HandleVoipConnected(int32_t &numActive, int32_t callId);
     void HandleVoipIncoming(int32_t &numActive, int32_t callId, const std::string phoneNumber);
+    int32_t HandleVoipDisconnected(int32_t &numActive, int32_t numHeld, int32_t callId,
+        int32_t state, const std::string phoneNumber);
     void HandleVoipAlerting(int32_t callId, const std::string phoneNumber);
     bool IsSupportSetVoipInfo();
     void SetVoipCallInfoInner(const int32_t callId, const int32_t state,
