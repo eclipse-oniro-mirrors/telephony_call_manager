@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 Huawei Device Co., Ltd.
+ * Copyright (C) 2024-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -41,6 +41,7 @@ public:
     void NotifyAll();
     bool WaitForDetectResult();
     void ParseDetectResult(const std::string &jsonData, bool &isBlock, NumberMarkInfo &info, int32_t &blockReason);
+    void ParseNeedNotifyResult(const std::string &jsonData);
 
 private:
     bool ConnectSpamCallAbility(const AAFwk::Want &want, const std::string &phoneNumber, const int32_t &slotId);
@@ -48,6 +49,7 @@ private:
     bool JsonGetNumberValue(cJSON *json, const std::string key, int32_t &out);
     bool JsonGetStringValue(cJSON *json, const std::string key, std::string &out);
     bool JsonGetBoolValue(cJSON *json, const std::string key);
+    void ParseMarkResults(NumberMarkInfo &info, cJSON *root, bool isBlock);
     int32_t errCode_ = -1;
     std::string result_ = "";
     std::string phoneNumber_ = "";
