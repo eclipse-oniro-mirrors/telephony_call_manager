@@ -251,7 +251,7 @@ HWTEST_F(ZeroBranch5Test, Telephony_CallStatusManager_004, Function | MediumTest
  */
 HWTEST_F(ZeroBranch5Test, Telephony_IncomingCallWakeup_001, Function | MediumTest | Level3)
 {
-    auto incomingCallWakeup = std::make_shared<>(IncomingCallWakeup);
+    auto incomingCallWakeup = std::make_shared<IncomingCallWakeup>();
     sptr<CallBase> callObjectPtr = nullptr;
     incomingCallWakeup->NewCallCreated(callObjectPtr);
     EXPECT_EQ(incomingCallWakeup != nullptr);
