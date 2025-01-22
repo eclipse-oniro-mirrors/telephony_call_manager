@@ -447,7 +447,7 @@ void AudioDeviceManager::SetCurrentAudioDevice(AudioDeviceType deviceType)
         DelayedSingleton<AudioControlManager>::GetInstance()->IsSatelliteExists()) {
         audioDeviceType_ = AudioDeviceType::DEVICE_SPEAKER;
         AudioStandard::AudioSystemManager::GetInstance()->
-            SetDeviceActive(AudioStandard::ActiveDeviceType::SPEAKER, true);
+            SetDeviceActive(AudioStandard::DeviceType::DEVICE_TYPE_SPEAKER, true);
         return;
     }
     AudioDevice device = {
@@ -463,7 +463,7 @@ void AudioDeviceManager::SetCurrentAudioDevice(const AudioDevice &device)
     ReportAudioDeviceChange(device);
     TELEPHONY_LOGI("set current audio device, audioDeviceType = %{public}d.", audioDeviceType_);
 }
-  
+
 bool AudioDeviceManager::CheckAndSwitchDistributedAudioDevice()
 {
     TELEPHONY_LOGI("check and switch distributed audio device.");
