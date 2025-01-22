@@ -1488,12 +1488,6 @@ int32_t CallManagerService::GetVoIPCallState(int32_t &state)
 
 int32_t CallManagerService::SetVoIPCallInfo(int32_t callId, int32_t state, std::string phoneNumber)
 {
-    static CallAttributeInfo info;
-    size_t copiedChars = phoneNumber.copy(info.accountNumber, sizeof(info.accountNumber) - 1);
-    info.accountNumber[copiedChars] = '\0';
-    info.callType = CallType::TYPE_VOIP;
-    info.callId = callId;
-    info.callState = (TelCallState)state;
     if (!TelephonyPermission::CheckCallerIsSystemApp()) {
         TELEPHONY_LOGE("Non-system applications use system APIs!");
         return TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API;
@@ -1506,19 +1500,6 @@ int32_t CallManagerService::SetVoIPCallInfo(int32_t callId, int32_t state, std::
     if (callControlManagerPtr_ == nullptr) {
         TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-    if (state == (int32_t)TelCallState::CALL_STATUS_INCOMING) {
-        TELEPHONY_LOGI("SetVoIPCallInfo to CALL_STATUS_INCOMING");
-        DelayedSingleton<CallControlManager>::GetInstance()->NotifyVoipCallStateUpdated(info,
-        TelCallState::CALL_STATUS_INCOMING, TelCallState::CALL_STATUS_INCOMING);
-    } else if (state == (int32_t)TelCallState::CALL_STATUS_IDLE) {
-        TELEPHONY_LOGI("SetVoIPCallInfo to CALL_STATUS_ACTIVE");
-        DelayedSingleton<CallControlManager>::GetInstance()->NotifyVoipCallStateUpdated(info,
-        TelCallState::CALL_STATUS_INCOMING, TelCallState::CALL_STATUS_ACTIVE);
-    } else if (state == (int32_t)TelCallState::CALL_STATUS_DISCONNECTED) {
-        TELEPHONY_LOGI("SetVoIPCallInfo to CALL_STATUS_DISCONNECTED");
-        DelayedSingleton<CallControlManager>::GetInstance()->NotifyVoipCallStateUpdated(info,
-        TelCallState::CALL_STATUS_ACTIVE, TelCallState::CALL_STATUS_DISCONNECTED);
     }
     return callControlManagerPtr_->SetVoIPCallInfo(callId, state, phoneNumber);
 }
