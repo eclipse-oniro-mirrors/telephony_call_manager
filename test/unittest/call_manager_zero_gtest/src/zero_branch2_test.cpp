@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024 Huawei Device Co., Ltd.
+ * Copyright (C) 2024-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -14,12 +14,14 @@
  */
 
 #include "call_manager_info.h"
+#include "call_manager_errors.h"
 #include <memory>
 #define PRIVATE public
 #define PROTECTED public
 #include "gtest/gtest.h"
 #include "spam_call_adapter.h"
 #include "callback_stub_helper.h"
+#include "reminder_callback_stub_helper.h"
 #include "spam_call_connection.h"
 #include "spam_call_stub.h"
 #include "time_wait_helper.h"
@@ -108,10 +110,11 @@ HWTEST_F(SpamCallTest, Telephony_CallbackStubHelper_001, Function | MediumTest |
 
     CallbackStubHelper callbackStubHelper(spamCallAdapter);
     int32_t errCode = 0;
-    std::string result;
-    int32_t res = 0;
-    res = callbackStubHelper.OnResult(errCode, result);
-    ASSERT_EQ(res, 0);
+    std::string result = "{\"detectResult\":0,\"decisionReason\":1002,\"markType\":0}";
+    ASSERT_EQ(callbackStubHelper.OnResult(errCode, result), TELEPHONY_SUCCESS);
+    ReminderCallbackStubHelper reminderCallbackStubHelper(spamCallAdapter);
+    result = "{\"reminderResult\":false,\"slotId\":0,\"reminderTime\":1736428340229,\"remindedTimes\":0}";
+    ASSERT_EQ(reminderCallbackStubHelper.OnResult(errCode, result), TELEPHONY_SUCCESS);
 }
 
 /**
@@ -127,6 +130,8 @@ HWTEST_F(SpamCallTest, Telephony_CallbackStubHelper_002, Function | MediumTest |
     int32_t errCode = 0;
     std::string result;
     ASSERT_NE(callbackStubHelper.OnResult(errCode, result), 0);
+    ReminderCallbackStubHelper reminderCallbackStubHelper(spamCallAdapter);
+    ASSERT_NE(reminderCallbackStubHelper.OnResult(errCode, result), 0);
 }
 
 /**
@@ -197,6 +202,7 @@ HWTEST_F(SpamCallTest, Telephony_SpamCallProxy_001, Function | MediumTest | Leve
     int32_t slotId = 0;
     std::shared_ptr<SpamCallAdapter> spamCallAdapter = std::make_shared<SpamCallAdapter>();
     ASSERT_NE(spamCallProxy.DetectSpamCall(phoneNumber, slotId, spamCallAdapter), 0);
+    ASSERT_NE(spamCallProxy.RequireCallReminder(slotId, spamCallAdapter), 0);
 }
 
 /**

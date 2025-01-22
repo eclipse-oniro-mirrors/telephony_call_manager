@@ -359,6 +359,7 @@ int32_t CallStatusManager::HandleVoipEventReportInfo(const VoipCallEventInfo &in
 
 int32_t CallStatusManager::IncomingHandle(const CallDetailInfo &info)
 {
+    TELEPHONY_LOGI("handle incoming state");
     sptr<CallBase> call = GetOneCallObjectByIndexAndSlotId(info.index, info.accountId);
     if (call != nullptr) {
         auto oldCallType = call->GetCallType();
