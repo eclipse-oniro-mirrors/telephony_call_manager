@@ -180,6 +180,7 @@ call_manager_external_deps = [
   "access_token:libprivacy_sdk",
   "audio_framework:audio_capturer",
   "audio_framework:audio_client",
+  "audio_framework:audio_foundation",
   "audio_framework:audio_renderer",
   "audio_framework:audio_toneplayer",
   "c_utils:utils",
