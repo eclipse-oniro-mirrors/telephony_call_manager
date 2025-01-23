@@ -2122,7 +2122,8 @@ void CallStatusManager::OneCallAnswerAtPhone(int32_t callId)
             continue;
         }
         if (call->GetTelCallState() == TelCallState::CALL_STATUS_DIALING ||
-            call->GetTelCallState() == TelCallState::CALL_STATUS_ALERTING) {
+            call->GetTelCallState() == TelCallState::CALL_STATUS_ALERTING ||
+            call->GetTelCallState() == TelCallState::CALL_STATUS_ACTIVE) {
             int32_t ret = DelayedSingleton<CallControlManager>::GetInstance()->HangUpCall(call->GetCallID());
             if (ret != TELEPHONY_SUCCESS) {
                 TELEPHONY_LOGE("One Call AnswerCall AtPhone HangUpCall failed callid=%{public}d", call->GetCallID());
