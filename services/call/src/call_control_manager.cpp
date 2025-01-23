@@ -1422,7 +1422,6 @@ int32_t CallControlManager::SetVoIPCallInfo(int32_t callId, int32_t state, std::
         case (int32_t)TelCallState::CALL_STATUS_DISCONNECTED: {
             return HandleVoipDisconnected(numActive, numHeld, callId,
                 state, phoneNumber);
-            break;
         }
         case (int32_t)TelCallState::CALL_STATUS_ALERTING: {
             HandleVoipAlerting(callId, phoneNumber);
