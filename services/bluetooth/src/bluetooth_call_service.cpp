@@ -220,6 +220,9 @@ void BluetoothCallService::GetVoipCallState(int32_t &numActive, int32_t &callSta
             case TelCallState::CALL_STATUS_INCOMING:
                 callState = (int32_t)TelCallState::CALL_STATUS_INCOMING;
                 break;
+            case TelCallState::CALL_STATUS_ALERTING:
+                callState = (int32_t)TelCallState::CALL_STATUS_ALERTING;
+                break;
             default:
                 TELEPHONY_LOGI("voip call state need not handle");
                 break;
