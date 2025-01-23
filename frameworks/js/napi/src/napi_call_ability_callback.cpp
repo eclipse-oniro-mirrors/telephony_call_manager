@@ -1049,7 +1049,7 @@ void NapiCallAbilityCallback::ReportAudioDeviceInfoWork(uv_work_t *work, int32_t
         return;
     }
     if (audioDeviceCallback_.thisVar && audioDeviceCallback_.callbackRef) {
-        int32_t ret = ReportAudioDeviceInfo(dataWorkerData->info, dataWorkerData->callback);
+        int32_t ret = ReportAudioDeviceInfo(dataWorkerData->info, audioDeviceCallback_);
         TELEPHONY_LOGI("ReportAudioDeviceInfo result = %{public}d", ret);
         delete dataWorkerData;
         dataWorkerData = nullptr;
