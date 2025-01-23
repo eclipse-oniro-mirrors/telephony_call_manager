@@ -57,7 +57,7 @@ int32_t Ring::Play(int32_t slotId, std::string ringtonePath)
     Media::RingtoneType type = slotId == DEFAULT_SIM_SLOT_ID ? Media::RingtoneType::RINGTONE_TYPE_SIM_CARD_0 :
         Media::RingtoneType::RINGTONE_TYPE_SIM_CARD_1;
     TELEPHONY_LOGI("ringtonePath: %{public}s", ringtonePath.c_str());
-    RingtonePlayer_ = SystemSoundManager_->GetSpecificRingtonePlayer(context, type, ringtonePath);
+    RingtonePlayer_ = SystemSoundManager_->GetSpecificRingTonePlayer(context, type, ringtonePath);
     if (RingtonePlayer_ == nullptr) {
         TELEPHONY_LOGE("get RingtonePlayer failed");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
