@@ -20,7 +20,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <slfcn.h>
+#include <dlfcn.h>
 #include <unistd.h>
 
 namespace OHOS {

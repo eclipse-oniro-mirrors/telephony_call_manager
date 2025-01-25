@@ -115,6 +115,7 @@ int32_t Ring::SetRingToneVolume(float volume)
         return RingtonePlayer_->Configure(volume, true);
     } else {
         TELEPHONY_LOGE("volume is valid");
+        return TELEPHONY_ERR_FAIL;
     }
 }
 } // namespace Telephony
