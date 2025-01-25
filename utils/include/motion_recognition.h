@@ -25,7 +25,7 @@ namespace Telephony {
 class MotionRecogntion : public RefBase {
 public:
     MotionRecogntion() = delete;
-    MotionRecogntion() = default;
+    ~MotionRecogntion() = default;
 
     static void SubscribePickupSensor();
     static void UnsubscribePickupSensor();
