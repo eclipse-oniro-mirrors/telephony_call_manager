@@ -23,7 +23,6 @@
 #include "bluetooth_call_connection.h"
 #include "bluetooth_call_service.h"
 #include "bool_wrapper.h"
-
 #include "call_ability_report_proxy.h"
 #include "call_control_manager.h"
 #include "call_earthquake_alarm_locator.h"
@@ -790,8 +789,8 @@ int32_t CallStatusManager::ActiveHandle(const CallDetailInfo &info)
 
 void CallStatusManager::StopMotionWhenActive()
 {
-    MotionRecogntion::UnsubsCribeFlipSensor();
-    MotionRecogntion::UnsubsCribePickupSensor();
+    MotionRecogntion::UnsubscribeFlipSensor();
+    MotionRecogntion::UnsubscribePickupSensor();
 }
 
 void CallStatusManager::SetupAntiFraudService(const sptr<CallBase> &call, const CallDetailInfo &info)
@@ -1049,7 +1048,10 @@ int32_t CallStatusManager::DisconnectedHandle(const CallDetailInfo &info)
 void CallStatusManager::StopMotionWhenDisconnected()
 {
     if (!CallObjectManager::HasCellularCallExist()) {
-        //TODO
+        MotionRecogntion::UnsubscribePickupSensor();
+        MotionRecogntion::UnsubscribeFlipSensor();
+        MotionRecogntion::UnsubscribeCloseToEarSensor();
+        Rosen::UnloadMotionSensor();
     }
 }
 
@@ -2163,6 +2165,65 @@ void CallStatusManager::OneCallAnswerAtPhone(int32_t callId)
         }
     }
     return;
+}
+
+bool CallStatusManager::IsMotionSwitchEnable(const std::string& key)
+{
+    std::vector<int> activedOsAccountIds;
+    OHOS::AccountSA::OsAccountManager::QueryActiveOsAccountIds(activedOsAccountIds);
+    if (activedOsAccountIds.empty()) {
+        TELEPHONY_LOGW("activedOsAccountIds is empty");
+        return false;
+    }
+    int userId = activedOsAccountIds[0];
+    OHOS::Uri uri(
+        "datashare:///com.ohos.settingsdata/entry/settingsdata/USER_SETTINGSDATA_"
+        + std::to_string(userId) + "?Proxy=true");
+    auto datashareHelper = SettingsDataShareHelper::GetInstance();
+    std::string is_motion_switch_on {"0"};
+    int resp = datashareHelper->Query(uri, key, is_motion_switch_on);
+    TELEPHONY_LOGI("key = %{public}s, value = %{public}s", key.c_str(), is_motion_switch_on.c_str());
+    if (resp == TELEPHONY_SUCCESS && is_motion_switch_on == "1") {
+        return true;
+    }
+    return false;
+}
+
+void CallStatusManager::StartInComingMotion()
+{
+    bool isPickupSwitchOn = IsMotionSwitchEnable(SettingsDataShareHelper::QUERY_MOTION_PICKUP_REDUCE_KEY);
+    bool isFlipSwitchOn = IsMotionSwitchEnable(SettingsDataShareHelper::QUERY_MOTION_FLIP_MUTE_KEY);
+    bool isCloseToEarSwitchOn = IsMotionSwitchEnable(SettingsDataShareHelper::QUERY_MOTION_CLOSE_TO_EAR_KEY);
+
+    if (isPickupSwitchOn || isFlipSwitchOn || isCloseToEarSwitchOn) {
+        if (!Rosen::LoadMotionSensor()) {
+            TELEPHONY_LOGE("LoadMotionSensor failed");
+            return;
+        }
+        TELEPHONY_LOGI("LoadMotionSensor success");
+        if (isPickupSwitchOn) {
+            MotionRecogntion::SubscribePickupSensor();
+        }
+        if (isFlipSwitchOn) {
+            MotionRecogntion::SubscribeFlipSensor();
+        }
+        if (isCloseToEarSwitchOn) {
+            MotionRecogntion::SubscribeCloseToEarSensor();
+        }
+    }
+}
+
+viod CallStatusManager::StartOutGoingMotion()
+{
+    bool isCloseToEarSwitchOn = IsMotionSwitchEnable(SettingsDataShareHelper::QUERY_MOTION_CLOSE_TO_EAR_KEY);
+    if (isCloseToEarSwitchOn) {
+        if (!Rosen::LoadMotionSensor()) {
+            TELEPHONY_LOGE("LoadMotionSensor failed");
+            return;
+        }
+        TELEPHONY_LOGI("LoadMotionSensor success");
+        MotionRecogntion::SubscribeCloseToEarSensor();
+    }
 }
 } // namespace Telephony
 } // namespace OHOS

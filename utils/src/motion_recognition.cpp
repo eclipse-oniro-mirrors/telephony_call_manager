@@ -58,6 +58,7 @@ constexpr int32_t MOTION_TYPE_CLOSE_TO_EAR = 300;
 
 //来电铃声减弱总时长
 constexpr int32_t REDUCE_RING_TOTAL_LENGTH = 1500000;  //us
+//来电铃声减弱总次数
 constexpr int32_t REDUCE_RING_COUNT = 5;
 
 /**
@@ -84,7 +85,7 @@ void MotionRecogntion::SubscribePickupSensor()
 #endif
 }
 
-void MotionRecogntion::UnsubsCribePickupSensor()
+void MotionRecogntion::UnsubscribePickupSensor()
 {
 #indef OHOS_SUBSCRIBE_MOTION_ENABLE
     MotionPickupSubscriber::UnsubscribePickupMotion();
@@ -115,7 +116,7 @@ void MotionRecogntion::SubscribeCloseToEarMotion()
 void MotionRecogntion::UnsubscribeCloseToEarSensor()
 {
 #ifdef  OHOS_SUBSCRIBE_MOTION_ENABLE
-    MotionFlipSubscriber::UnsubscribeCloseToEarSensor();
+    MotionFlipSubscriber::UnsubscribeCloseToEarMotion();
 #endif
 }
 
@@ -139,7 +140,7 @@ void FlipMotionEventCallback(const Rosen::MotionSensorEvent &motionData)
             if (motionData.status != 0) {
                 break;
             }
-            MotionRecogntion::UnsubsCribeFlipSensor();
+            MotionRecogntion::UnsubscribeFlipSensor();
             ffrt::submit([=]() {
                 MotionRecogntion::ReduceRingToneVolume();
                 ffrt_usleep(REDUCE_RING_TOTAL_LENGTH / REDUCE_RING_COUNT);
