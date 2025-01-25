@@ -106,7 +106,7 @@ void MotionRecogntion::UnsubscribeFlipSensor()
 #endif
 }
 
-void MotionRecogntion::SubscribeCloseToEarMotion()
+void MotionRecogntion::SubscribeCloseToEarSensor()
 {
 #ifdef  OHOS_SUBSCRIBE_MOTION_ENABLE
     MotionCloseToEarSubscriber::SubscribeCloseToEarMotion();
