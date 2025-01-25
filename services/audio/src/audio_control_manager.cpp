@@ -1129,11 +1129,13 @@ void AudioControlManager::SetRingToneVolume(float volume)
 {
     if (ring_ == nullptr) {
         TELEPHONY_LOGE("ring_ is nullptr ignore SetRingToneVolume");
+        return;
     }
     if (volume >= 0.0f && volume <= 1.0f) {
         ring_->SetRingToneVolume(volume);
+        return;
     } else {
-        TELEPHONY_LOGE("volume is vilid");
+        TELEPHONY_LOGE("volume is valid");
     }
 }
 } // namespace Telephony
