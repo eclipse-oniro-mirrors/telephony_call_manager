@@ -33,6 +33,9 @@ constexpr const char *SETTINGS_DATA_COLUMN_KEYWORD = "KEYWORD";
 constexpr const char *SETTINGS_DATA_COLUMN_VALUE = "VALUE";
 const std::string SettingsDataShareHelper::QUERY_SATELLITE_MODE_KEY = "satellite_mode_switch";
 const std::string SettingsDataShareHelper::QUERY_SATELLITE_CONNECTED_KEY = "satellite_connected";
+const std::string SettingsDataShareHelper::QUERY_MOTION_FLIP_MUTE_KEY = "motion_flip_mute_call";
+const std::string SettingsDataShareHelper::QUERY_MOTION_CLOSE_TO_EAR_KEY = "motion_quick_answer";
+const std::string SettingsDataShareHelper::QUERY_MOTION_PICKUP_REDUCE_KEY = "motion_pickup_reduce_call";
 
 SettingsDataShareHelper::SettingsDataShareHelper() = default;
 

@@ -47,6 +47,7 @@ public:
     int32_t Stop();
     void ReleaseRenderer();
     int32_t SetMute();
+    int32_t SetRingToneVolume(float volume);
 
 private:
     std::mutex mutex_;

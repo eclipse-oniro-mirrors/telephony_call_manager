@@ -104,5 +104,18 @@ int32_t Ring::SetMute()
     }
     return RingtonePlayer_->Configure(0, true);
 }
+
+int32_t Ring::SetRingToneVolume(float volume)
+{
+    TELEPHONY_LOGI("SetRingToneVolume volume = %{public}f", volume);
+    if (RingtonePlayer_ == nullptr) {
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    if (volume >= 0.0f && volume <= 1.0f) {
+        return RingtonePlayer_->Configure(volume, true);
+    } else {
+        TELEPHONY_LOGE("volume is vilid");
+    }
+}
 } // namespace Telephony
 } // namespace OHOS

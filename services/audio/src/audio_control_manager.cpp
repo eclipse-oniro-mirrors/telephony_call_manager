@@ -1124,5 +1124,17 @@ bool AudioControlManager::IsBtCallDisconnected()
     }
     return false;
 }
+
+void AudioControlManager::SetRingToneVolume(float volume)
+{
+    if (ring_ == nullptr) {
+        TELEPHONY_LOGE("ring_ is nullptr ignore SetRingToneVolume");
+    }
+    if (volume >= 0.0f && volume <= 1.0f) {
+        ring_->SetRingToneVolume(volume);
+    } else {
+        TELEPHONY_LOGE("volume is vilid");
+    }
+}
 } // namespace Telephony
 } // namespace OHOS
