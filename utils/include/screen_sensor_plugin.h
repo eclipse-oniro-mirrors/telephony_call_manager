@@ -39,8 +39,8 @@ typedef struct MotionSensorEvent {
 } MotionSensorEvent;
 
 using OnMotionChangedPtr = void (*)(const MotionSensorEvent &);
-using MotionSubscribeCallbackPtr = bool (*)(int32_t OnMotionChangedPtr);
-using MotionUnsubscribeCallbackPtr = bool (*)(int32_t OnMotionChangedPtr);
+using MotionSubscribeCallbackPtr = bool (*)(int32_t, OnMotionChangedPtr);
+using MotionUnsubscribeCallbackPtr = bool (*)(int32_t, OnMotionChangedPtr);
 
 bool LoadMotionSensor(void);
 void UnloadMotionSensor(void);
