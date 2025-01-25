@@ -37,9 +37,8 @@ public:
 };
 
 #ifdef  OHOS_SUBSCRIBE_MOTION_ENABLE
-class MotionPickupSubscriber
-{
-    friend MotionRecogntion;
+class MotionPickupSubscriber {
+friend MotionRecogntion;
 
 public:
     MotionPickupSubscriber() = delete;
@@ -52,9 +51,8 @@ private:
     static bool IsMotionPickupSubscribed_;
 };
 
-class MotionCloseToEarSubscriber
-{
-    friend MotionRecogntion;
+class MotionCloseToEarSubscriber {
+friend MotionRecogntion;
 
 public:
     MotionCloseToEarSubscriber() = delete;
@@ -67,8 +65,8 @@ private:
     static bool isMotionCloseToEarSubscribed_;
 };
 
-class MotionFlipSubscriber{
-    friend MotionRecogntion;
+class MotionFlipSubscriber {
+friend MotionRecogntion;
 
 public:
     MotionFlipSubscriber() = delete;
