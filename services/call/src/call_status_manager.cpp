@@ -2212,7 +2212,7 @@ void CallStatusManager::StartInComingMotion()
     }
 }
 
-viod CallStatusManager::StartOutGoingMotion()
+void CallStatusManager::StartOutGoingMotion()
 {
     bool isCloseToEarSwitchOn = IsMotionSwitchEnable(SettingsDataShareHelper::QUERY_MOTION_CLOSE_TO_EAR_KEY);
     if (isCloseToEarSwitchOn) {
