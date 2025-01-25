@@ -117,6 +117,7 @@ void CallManagerService::UnInit()
     DelayedSingleton<CellularCallConnection>::GetInstance()->UnInit();
     DelayedSingleton<CallControlManager>::GetInstance()->UnInit();
     callControlManagerPtr_ = nullptr;
+    std::lock_guard<std::mutex> guard(lock_);
     if (bluetoothCallCallbackPtr_ != nullptr) {
         bluetoothCallCallbackPtr_ = nullptr;
     }
@@ -1670,6 +1671,7 @@ sptr<ICallStatusCallback> CallManagerService::RegisterBluetoothCallManagerCallba
         TELEPHONY_LOGE("CallManagerService RegisterBluetoothCallManagerCallbackPtr, Permission denied!");
         return nullptr;
     }
+    std::lock_guard<std::mutex> guard(lock_);
     if (bluetoothCallCallbackPtr_ == nullptr) {
         bluetoothCallCallbackPtr_ = new (std::nothrow) CallStatusCallback();
         if (bluetoothCallCallbackPtr_ == nullptr) {
