@@ -87,7 +87,7 @@ void MotionRecogntion::SubscribePickupSensor()
 
 void MotionRecogntion::UnsubscribePickupSensor()
 {
-#indef OHOS_SUBSCRIBE_MOTION_ENABLE
+#ifdef OHOS_SUBSCRIBE_MOTION_ENABLE
     MotionPickupSubscriber::UnsubscribePickupMotion();
 #endif
 }
@@ -176,25 +176,25 @@ viod CloseToEarMotionEventCallback(const Rosen::MotionSensorEvent &motionData)
     AudioDeviceType deviceType = DelayedSingleton<AudioDeviceManager>::GetInstance()->GetCurrentAudioDevice();
     switch (motionData.type) {
         case MOTION_TYPE_CLOSE_TO_EAR:
-        if (motionData.status != 0) {
-            TELEPHONY_LOGI("ignore status is not success");
-            break;
-        }
-        if (controlManager != nullptr && ringCall != nullptr) {
-            controlManager->AnswerCall(ringCall->GetCallID(), static_cast<int32_t>(VideoStateType::TYPE_VOICE));
-            TELEPHONY_LOGI("close to ear: AnswerCall");
-        };
-        if (controlManager != nullptr && (dialingCall != nullptr || activecall != nullptr)) {
-            if (deviceType == AudioDeviceType::DEVICE_SPEAKER ||
-                deviceType == AudioDeviceType::DEVICE_BLUETOOTH_SCO) {
-                    TELEPHONY_LOGI("current deviceType = %{public}d, det audioDevice to earpiece",
-                                    static_cast<int32_t>(deviceType));
-                    controlManager->SetAudioDevice(device);
+            if (motionData.status != 0) {
+                TELEPHONY_LOGI("ignore status is not success");
+                break;
             }
-        }
-        break;
-    default:
-        break;
+            if (controlManager != nullptr && ringCall != nullptr) {
+                controlManager->AnswerCall(ringCall->GetCallID(), static_cast<int32_t>(VideoStateType::TYPE_VOICE));
+                TELEPHONY_LOGI("close to ear: AnswerCall");
+            };
+            if (controlManager != nullptr && (dialingCall != nullptr || activecall != nullptr)) {
+                if (deviceType == AudioDeviceType::DEVICE_SPEAKER ||
+                    deviceType == AudioDeviceType::DEVICE_BLUETOOTH_SCO) {
+                        TELEPHONY_LOGI("current deviceType = %{public}d, det audioDevice to earpiece",
+                            static_cast<int32_t>(deviceType));
+                        controlManager->SetAudioDevice(device);
+                }
+            }
+            break;
+        default:
+            break;
     }
 }
 
@@ -217,7 +217,7 @@ void MotionPickupSubscriber::UnsubscribePickupMotion()
         return;
     }
 
-    if(!UnsubscribeCallback(MOTION_TYPE_PICKUP, FlipMotionEventCallback)) {
+    if (!UnsubscribeCallback(MOTION_TYPE_PICKUP, FlipMotionEventCallback)) {
         TELEPHONY_LOGI("Pickup motion unsubscribe failed");
         return;
     }
@@ -229,7 +229,7 @@ void MotionFlipSubscriber::SubscribeFlipMotion()
     if (isMotionFlipSubscribed_) {
         return;
     }
-    if(!SubscribeCallback(MOTION_TYPE_FLIP, FlipMotionEventCallback)) {
+    if (!SubscribeCallback(MOTION_TYPE_FLIP, FlipMotionEventCallback)) {
         TELEPHONY_LOGI("flip motion subscribe failed");
         return;
     }
@@ -243,7 +243,7 @@ void MotionPickupSubscriber::UnsubscribeFlipMotion()
         return;
     }
 
-    if(!UnsubscribeCallback(MOTION_TYPE_FLIP, FlipMotionEventCallback)) {
+    if (!UnsubscribeCallback(MOTION_TYPE_FLIP, FlipMotionEventCallback)) {
         TELEPHONY_LOGI("flip motion unsubscribe failed");
         return;
     }
@@ -255,7 +255,7 @@ void MotionCloseToEarSubscriber::SubscribeCloseToEarMotion()
     if (isMotionCloseToEarSubscribed_) {
         return;
     }
-    if(!SubscribeCallback(MOTION_TYPE_CLOSE_TO_EAR, CloseToEarMotionEventCallback)) {
+    if (!SubscribeCallback(MOTION_TYPE_CLOSE_TO_EAR, CloseToEarMotionEventCallback)) {
         TELEPHONY_LOGI("close to ear motion subscribe failed");
         return;
     }
@@ -268,7 +268,7 @@ void MotionCloseToEarSubscriber::UnsubscribeCloseToEarMotion()
         TELEPHONY_LOGI("Unsubscribe close to ear motion");
         return;
     }
-    if(!UnsubscribeCallback(MOTION_TYPE_CLOSE_TO_EAR, CloseToEarMotionEventCallback)) {
+    if (!UnsubscribeCallback(MOTION_TYPE_CLOSE_TO_EAR, CloseToEarMotionEventCallback)) {
         TELEPHONY_LOGI("close to ear motion unsubscribe failed");
         return;
     }

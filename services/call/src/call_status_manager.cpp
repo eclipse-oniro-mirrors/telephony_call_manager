@@ -2194,7 +2194,6 @@ void CallStatusManager::StartInComingMotion()
     bool isPickupSwitchOn = IsMotionSwitchEnable(SettingsDataShareHelper::QUERY_MOTION_PICKUP_REDUCE_KEY);
     bool isFlipSwitchOn = IsMotionSwitchEnable(SettingsDataShareHelper::QUERY_MOTION_FLIP_MUTE_KEY);
     bool isCloseToEarSwitchOn = IsMotionSwitchEnable(SettingsDataShareHelper::QUERY_MOTION_CLOSE_TO_EAR_KEY);
-
     if (isPickupSwitchOn || isFlipSwitchOn || isCloseToEarSwitchOn) {
         if (!Rosen::LoadMotionSensor()) {
             TELEPHONY_LOGE("LoadMotionSensor failed");

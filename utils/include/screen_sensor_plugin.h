@@ -46,7 +46,6 @@ bool LoadMotionSensor(void);
 void UnloadMotionSensor(void);
 bool SubscribeCallback(int32_t motionType, OnMotionChangedPtr callback);
 bool UnsubscribeCallback(int32_t motionType, OnMotionChangedPtr callback);
-#endif
 } // namespace Rosen
 } // namespace OHOS
 #endif /*SCREEN_SENSOR_PLUGIN_H*/
