@@ -40,6 +40,7 @@ public:
 class MotionPickupSubscriber
 {
     friend MotionRecogntion;
+
 public:
     MotionPickupSubscriber() = delete;
     ~MotionPickupSubscriber() = default;
@@ -66,8 +67,7 @@ private:
     static bool isMotionCloseToEarSubscribed_;
 };
 
-class MotionFlipSubscriber
-{
+class MotionFlipSubscriber{
     friend MotionRecogntion;
 
 public:
