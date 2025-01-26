@@ -2194,9 +2194,11 @@ bool CallStatusManager::IsCallMotionRecognitionEnable(const std::string& key)
 
 void CallStatusManager::StartInComingCallMotionRecognition()
 {
-    bool isPickupReduceVolumeSwitchOn = IsCallMotionRecognitionEnable(SettingsDataShareHelper::QUERY_MOTION_PICKUP_REDUCE_KEY);
+    bool isPickupReduceVolumeSwitchOn =
+        IsCallMotionRecognitionEnable(SettingsDataShareHelper::QUERY_MOTION_PICKUP_REDUCE_KEY);
     bool isFlipMuteSwitchOn = IsCallMotionRecognitionEnable(SettingsDataShareHelper::QUERY_MOTION_FLIP_MUTE_KEY);
-    bool isCloseToEarQuickAnswerSwitchOn = IsCallMotionRecognitionEnable(SettingsDataShareHelper::QUERY_MOTION_CLOSE_TO_EAR_KEY);
+    bool isCloseToEarQuickAnswerSwitchOn =
+        IsCallMotionRecognitionEnable(SettingsDataShareHelper::QUERY_MOTION_CLOSE_TO_EAR_KEY);
     if (isPickupReduceVolumeSwitchOn || isFlipMuteSwitchOn || isCloseToEarQuickAnswerSwitchOn) {
         if (!Rosen::LoadMotionSensor()) {
             TELEPHONY_LOGE("LoadMotionSensor failed");
