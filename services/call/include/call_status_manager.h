@@ -132,10 +132,9 @@ private:
     void OneCallAnswerAtPhone(int32_t callId);
     bool IsCallMotionRecognitionEnable(const std::string &key);
     void StartInComingCallMotionRecognition();
-    void StopMotionWhenActive();
     void StartOutGoingCallMotionRecognition();
-    void StopCallMotionRecognition();
-    void UpdateDialingHandle(const CallDetailInfo &info, bool &isDistributedDeviceDialing);
+    void StopCallMotionRecognition(TelCallState nextState);
+    bool UpdateDialingHandle(const CallDetailInfo &info, bool &isDistributedDeviceDialing);
 
 private:
     CallDetailInfo callReportInfo_;

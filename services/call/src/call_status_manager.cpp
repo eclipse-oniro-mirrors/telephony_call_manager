@@ -701,7 +701,7 @@ int32_t CallStatusManager::DialingHandle(const CallDetailInfo &info)
     }
     AddOneCallObject(call);
     auto callRequestEventHandler = DelayedSingleton<CallRequestEventHandlerHelper>::GetInstance();
-    if (callId == INIT_INDEX) {
+    if (info.index == INIT_INDEX) {
         callRequestEventHandler->SetPendingMo(true, call->GetCallID());
         call->SetPhoneOrWatchDial(static_cast<int32_t>(PhoneOrWatchDial::WATCH_DIAL));
         SetBtCallDialByPhone(call, false);
@@ -722,7 +722,7 @@ int32_t CallStatusManager::DialingHandle(const CallDetailInfo &info)
     return ret;
 }
 
-bool CallStatusManager::UpdateDialingHandle(const CallDetailInfo &info, bool isDistributedDeviceDialing)
+bool CallStatusManager::UpdateDialingHandle(const CallDetailInfo &info, bool &isDistributedDeviceDialing)
 {
     sptr<CallBase> call = GetOneCallObjectByIndexSlotIdAndCallType(INIT_INDEX, info.accountId, info.callType);
     if (info.callType == CallType::TYPE_BLUETOOTH) {
@@ -743,7 +743,7 @@ bool CallStatusManager::UpdateDialingHandle(const CallDetailInfo &info, bool isD
 int32_t CallStatusManager::ActiveHandle(const CallDetailInfo &info)
 {
     TELEPHONY_LOGI("handle active state");
-    StopMotionWhenActive();
+    StopCallMotionRecognition(TelCallState::CALL_STATUS_ACTIVE);
     std::string tmpStr(info.phoneNum);
     sptr<CallBase> call = GetOneCallObjectByIndexSlotIdAndCallType(info.index, info.accountId, info.callType);
     if (call == nullptr && IsDcCallConneceted()) {
@@ -788,12 +788,6 @@ int32_t CallStatusManager::ActiveHandle(const CallDetailInfo &info)
         SetupAntiFraudService(call, info);
     }
     return ret;
-}
-
-void CallStatusManager::StopMotionWhenActive()
-{
-    MotionRecogntion::UnsubscribeFlipSensor();
-    MotionRecogntion::UnsubscribePickupSensor();
 }
 
 void CallStatusManager::SetupAntiFraudService(const sptr<CallBase> &call, const CallDetailInfo &info)
@@ -1013,7 +1007,7 @@ int32_t CallStatusManager::DisconnectedHandle(const CallDetailInfo &info)
         TELEPHONY_LOGE("call is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    StopCallMotionRecognition();
+    StopCallMotionRecognition(TelCallState::CALL_STATUS_DISCONNECTED);
     bool isTwoCallBtCallAndESIM = CallObjectManager::IsTwoCallBtCallAndESIM();
     call = RefreshCallIfNecessary(call, info);
     RefreshCallDisconnectReason(call, static_cast<int32_t>(info.reason));
@@ -1048,13 +1042,23 @@ int32_t CallStatusManager::DisconnectedHandle(const CallDetailInfo &info)
     return TELEPHONY_SUCCESS;
 }
 
-void CallStatusManager::StopCallMotionRecognition()
+void CallStatusManager::StopCallMotionRecognition(TelCallState nextState)
 {
-    if (!CallObjectManager::HasCellularCallExist()) {
-        MotionRecogntion::UnsubscribePickupSensor();
-        MotionRecogntion::UnsubscribeFlipSensor();
-        MotionRecogntion::UnsubscribeCloseToEarSensor();
-        Rosen::UnloadMotionSensor();
+    switch (nextState) {
+        case TelCallState::CALL_STATUS_ACTIVE:
+            MotionRecogntion::UnsubscribePickupSensor();
+            MotionRecogntion::UnsubscribeFlipSensor();
+            break;
+        case TelCallState::CALL_STATUS_DISCONNECTED:
+            if (!CallObjectManager::HasCellularCallExist()) {
+                MotionRecogntion::UnsubscribePickupSensor();
+                MotionRecogntion::UnsubscribeFlipSensor();
+                MotionRecogntion::UnsubscribeCloseToEarSensor();
+                Rosen::UnloadMotionSensor();
+            }
+            break;
+        default:
+            break;
     }
 }
 
