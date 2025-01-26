@@ -133,7 +133,7 @@ private:
     bool IsCallMotionRecognitionEnable(const std::string &key);
     void StartInComingCallMotionRecognition();
     void StopMotionWhenActive();
-    void StartInComingCallMotionRecognition();
+    void StartOutGoingCallMotionRecognition();
     void StopCallMotionRecognition();
     void UpdateDialingHandle(const CallDetailInfo &info, bool &isDistributedDeviceDialing);
 
