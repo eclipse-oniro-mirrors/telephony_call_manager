@@ -48,7 +48,7 @@ private:
     static void SubscribePickupMotion();
     static void UnsubscribePickupMotion();
 
-    static bool IsMotionPickupSubscribed_;
+    static bool isMotionPickupSubscribed_;
 };
 
 class MotionCloseToEarSubscriber {

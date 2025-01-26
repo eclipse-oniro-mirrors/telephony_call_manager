@@ -81,7 +81,7 @@ static void CloseToEarMotionEventCallback(const Rosen::MotionSensorEvent &motion
 void MotionRecogntion::SubscribePickupSensor()
 {
 #ifdef OHOS_SUBSCRIBE_MOTION_ENABLE
-    MotionPickupSubscriber::SubscribePickupMotion()
+    MotionPickupSubscriber::SubscribePickupMotion();
 #endif
 }
 
@@ -162,10 +162,10 @@ void MotionRecogntion::ReduceRingToneVolume()
     }
 }
 
-viod CloseToEarMotionEventCallback(const Rosen::MotionSensorEvent &motionData)
+void CloseToEarMotionEventCallback(const Rosen::MotionSensorEvent &motionData)
 {
     TELEPHONY_LOGI("type = %{public}d, status = %{public}d", motionData.type, motionData.status);
-    auto controlManager = DelayedSingleton<CallControlManager>::getinstance();
+    auto controlManager = DelayedSingleton<CallControlManager>::GetInstance();
     sptr<CallBase> ringCall = controlManager->GetOneCarrierCallObject(CallRunningState::CALL_RUNNING_STATE_RINGING);
     sptr<CallBase> dialingCall = controlManager->GetOneCarrierCallObject(CallRunningState::CALL_RUNNING_STATE_DIALING);
     sptr<CallBase> activeCall = controlManager->GetOneCarrierCallObject(CallRunningState::CALL_RUNNING_STATE_ACTIVE);
@@ -184,7 +184,7 @@ viod CloseToEarMotionEventCallback(const Rosen::MotionSensorEvent &motionData)
                 controlManager->AnswerCall(ringCall->GetCallID(), static_cast<int32_t>(VideoStateType::TYPE_VOICE));
                 TELEPHONY_LOGI("close to ear: AnswerCall");
             };
-            if (controlManager != nullptr && (dialingCall != nullptr || activecall != nullptr)) {
+            if (controlManager != nullptr && (dialingCall != nullptr || activeCall != nullptr)) {
                 if (deviceType == AudioDeviceType::DEVICE_SPEAKER ||
                     deviceType == AudioDeviceType::DEVICE_BLUETOOTH_SCO) {
                         TELEPHONY_LOGI("current deviceType = %{public}d, det audioDevice to earpiece",
@@ -236,7 +236,7 @@ void MotionFlipSubscriber::SubscribeFlipMotion()
     isMotionFlipSubscribed_ = true;
 }
 
-void MotionPickupSubscriber::UnsubscribeFlipMotion()
+void MotionFlipSubscriber::UnsubscribeFlipMotion()
 {
     if (!isMotionFlipSubscribed_)  {
         TELEPHONY_LOGI("Unsubscribe flip motion");
