@@ -705,7 +705,7 @@ int32_t CallStatusManager::DialingHandle(const CallDetailInfo &info)
         callRequestEventHandler->SetPendingMo(true, call->GetCallID());
         call->SetPhoneOrWatchDial(static_cast<int32_t>(PhoneOrWatchDial::WATCH_DIAL));
         SetBtCallDialByPhone(call, false);
-        StartInComingCallMotionRecognition();
+        StartOutGoingCallMotionRecognition();
     }
     callRequestEventHandler->RestoreDialingFlag(false);
     callRequestEventHandler->RemoveEventHandlerTask();
@@ -2217,9 +2217,10 @@ void CallStatusManager::StartInComingCallMotionRecognition()
     }
 }
 
-void CallStatusManager::StartInComingCallMotionRecognition()
+void CallStatusManager::StartOutGoingCallMotionRecognition()
 {
-    bool isCloseToEarQuickAnswerSwitchOn = IsCallMotionRecognitionEnable(SettingsDataShareHelper::QUERY_MOTION_CLOSE_TO_EAR_KEY);
+    bool isCloseToEarQuickAnswerSwitchOn =
+        IsCallMotionRecognitionEnable(SettingsDataShareHelper::QUERY_MOTION_CLOSE_TO_EAR_KEY);
     if (isCloseToEarQuickAnswerSwitchOn) {
         if (!Rosen::LoadMotionSensor()) {
             TELEPHONY_LOGE("LoadMotionSensor failed");
