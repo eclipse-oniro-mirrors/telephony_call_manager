@@ -67,7 +67,7 @@ constexpr int32_t REDUCE_RING_COUNT = 5;
  */
 typedef enum FilpDirection {
     FLIP_DOWN = 3,  /**向上翻转 */
-    FLIP_UP = 4,  /**向上翻转 */
+    FLIP_UP = 4,  /**向下翻转 */
 } FilpDirection;
 
 bool MotionFlipSubscriber::isMotionFlipSubscribed_ = false;
@@ -143,7 +143,6 @@ void FlipMotionEventCallback(const Rosen::MotionSensorEvent &motionData)
             MotionRecogntion::UnsubscribeFlipSensor();
             ffrt::submit([=]() {
                 MotionRecogntion::ReduceRingToneVolume();
-                ffrt_usleep(REDUCE_RING_TOTAL_LENGTH / REDUCE_RING_COUNT);
             });
             break;
         default:
@@ -159,6 +158,7 @@ void MotionRecogntion::ReduceRingToneVolume()
         count++;
         value = 1.0f - (0.7f / REDUCE_RING_COUNT * count);
         DelayedSingleton<AudioControlManager>::GetInstance()->SetRingToneVolume(value);
+        ffrt_usleep(REDUCE_RING_TOTAL_LENGTH / REDUCE_RING_COUNT);
     }
 }
 

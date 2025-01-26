@@ -37,7 +37,7 @@ bool LoadMotionSensor(void)
     int32_t cnt = 0;
     int32_t retryTimes = 3;
     do {
-        cnt ++;
+        cnt++;
         g_handle = dlopen(PLUGIN_SO_PATH.c_str(), RTLD_LAZY);
         TELEPHONY_LOGI("dlopen %{public}s, retry cnt: %{public}d", PLUGIN_SO_PATH.c_str(), cnt);
         usleep(SLEEP_TIME_US);

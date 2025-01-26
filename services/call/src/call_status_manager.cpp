@@ -452,7 +452,7 @@ int32_t CallStatusManager::IncomingHandle(const CallDetailInfo &info)
         return HandleRingOnceCall(call);
     }
     AddOneCallObject(call);
-    StartInComingMotion();
+    StartInComingCallMotionRecognition();
     DelayedSingleton<CallControlManager>::GetInstance()->NotifyNewCallCreated(call);
     ret = UpdateCallState(call, info.state);
     if (ret != TELEPHONY_SUCCESS) {
@@ -686,17 +686,7 @@ int32_t CallStatusManager::DialingHandle(const CallDetailInfo &info)
     TELEPHONY_LOGI("handle dialing state");
     bool isDistributedDeviceDialing = false;
     if (info.index > 0) {
-        sptr<CallBase> call = GetOneCallObjectByIndexSlotIdAndCallType(INIT_INDEX, info.accountId, info.callType);
-        if (info.callType == CallType::TYPE_BLUETOOTH) {
-            BtCallDialingHandle(call, info);
-        } else {
-            if (call == nullptr) {
-                call = GetOneCallObjectByIndexSlotIdAndCallType(info.index, info.accountId, info.callType);
-                isDistributedDeviceDialing = IsDistributeCallSourceStatus();
-            }
-        }
-        if (call != nullptr) {
-            TELEPHONY_LOGI("need update call info");
+        if (UpdateDialingHandle(info, isDistributedDeviceDialing)) {
             return UpdateDialingCallInfo(info);
         }
     }
@@ -710,7 +700,15 @@ int32_t CallStatusManager::DialingHandle(const CallDetailInfo &info)
         SetContactInfo(call, std::string(info.phoneNum));
     }
     AddOneCallObject(call);
-    DialingHandlePart(call, info.index);
+    auto callRequestEventHandler = DelayedSingleton<CallRequestEventHandlerHelper>::GetInstance();
+    if (callId == INIT_INDEX) {
+        callRequestEventHandler->SetPendingMo(true, call->GetCallID());
+        call->SetPhoneOrWatchDial(static_cast<int32_t>(PhoneOrWatchDial::WATCH_DIAL));
+        SetBtCallDialByPhone(call, false);
+        StartInComingCallMotionRecognition();
+    }
+    callRequestEventHandler->RestoreDialingFlag(false);
+    callRequestEventHandler->RemoveEventHandlerTask();
     int32_t ret = call->DialingProcess();
     if (ret != TELEPHONY_SUCCESS) {
         return ret;
@@ -724,17 +722,22 @@ int32_t CallStatusManager::DialingHandle(const CallDetailInfo &info)
     return ret;
 }
 
-void CallStatusManager::DialingHandlePart(const sptr<CallBase> &call, int32_t callId)
+bool CallStatusManager::UpdateDialingHandle(const CallDetailInfo &info, bool isDistributedDeviceDialing)
 {
-    auto callRequestEventHandler = DelayedSingleton<CallRequestEventHandlerHelper>::GetInstance();
-    if (callId == INIT_INDEX) {
-        callRequestEventHandler->SetPendingMo(true, call->GetCallID());
-        call->SetPhoneOrWatchDial(static_cast<int32_t>(PhoneOrWatchDial::WATCH_DIAL));
-        SetBtCallDialByPhone(call, false);
-        StartOutGoingMotion();
+    sptr<CallBase> call = GetOneCallObjectByIndexSlotIdAndCallType(INIT_INDEX, info.accountId, info.callType);
+    if (info.callType == CallType::TYPE_BLUETOOTH) {
+        BtCallDialingHandle(call, info);
+    } else {
+        if (call == nullptr) {
+            call = GetOneCallObjectByIndexSlotIdAndCallType(info.index, info.accountId, info.callType);
+            isDistributedDeviceDialing = IsDistributeCallSourceStatus();
+        }
     }
-    callRequestEventHandler->RestoreDialingFlag(false);
-    callRequestEventHandler->RemoveEventHandlerTask();
+    if (call != nullptr) {
+        TELEPHONY_LOGI("need update call info");
+        return true;
+    }
+    return false;
 }
 
 int32_t CallStatusManager::ActiveHandle(const CallDetailInfo &info)
@@ -1010,7 +1013,7 @@ int32_t CallStatusManager::DisconnectedHandle(const CallDetailInfo &info)
         TELEPHONY_LOGE("call is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    StopMotionWhenDisconnected();
+    StopCallMotionRecognition();
     bool isTwoCallBtCallAndESIM = CallObjectManager::IsTwoCallBtCallAndESIM();
     call = RefreshCallIfNecessary(call, info);
     RefreshCallDisconnectReason(call, static_cast<int32_t>(info.reason));
@@ -1045,7 +1048,7 @@ int32_t CallStatusManager::DisconnectedHandle(const CallDetailInfo &info)
     return TELEPHONY_SUCCESS;
 }
 
-void CallStatusManager::StopMotionWhenDisconnected()
+void CallStatusManager::StopCallMotionRecognition()
 {
     if (!CallObjectManager::HasCellularCallExist()) {
         MotionRecogntion::UnsubscribePickupSensor();
@@ -2167,7 +2170,7 @@ void CallStatusManager::OneCallAnswerAtPhone(int32_t callId)
     return;
 }
 
-bool CallStatusManager::IsMotionSwitchEnable(const std::string& key)
+bool CallStatusManager::IsCallMotionRecognitionEnable(const std::string& key)
 {
     std::vector<int> activedOsAccountIds;
     OHOS::AccountSA::OsAccountManager::QueryActiveOsAccountIds(activedOsAccountIds);
@@ -2189,33 +2192,33 @@ bool CallStatusManager::IsMotionSwitchEnable(const std::string& key)
     return false;
 }
 
-void CallStatusManager::StartInComingMotion()
+void CallStatusManager::StartInComingCallMotionRecognition()
 {
-    bool isPickupSwitchOn = IsMotionSwitchEnable(SettingsDataShareHelper::QUERY_MOTION_PICKUP_REDUCE_KEY);
-    bool isFlipSwitchOn = IsMotionSwitchEnable(SettingsDataShareHelper::QUERY_MOTION_FLIP_MUTE_KEY);
-    bool isCloseToEarSwitchOn = IsMotionSwitchEnable(SettingsDataShareHelper::QUERY_MOTION_CLOSE_TO_EAR_KEY);
-    if (isPickupSwitchOn || isFlipSwitchOn || isCloseToEarSwitchOn) {
+    bool isPickupReduceVolumeSwitchOn = IsCallMotionRecognitionEnable(SettingsDataShareHelper::QUERY_MOTION_PICKUP_REDUCE_KEY);
+    bool isFlipMuteSwitchOn = IsCallMotionRecognitionEnable(SettingsDataShareHelper::QUERY_MOTION_FLIP_MUTE_KEY);
+    bool isCloseToEarQuickAnswerSwitchOn = IsCallMotionRecognitionEnable(SettingsDataShareHelper::QUERY_MOTION_CLOSE_TO_EAR_KEY);
+    if (isPickupReduceVolumeSwitchOn || isFlipMuteSwitchOn || isCloseToEarQuickAnswerSwitchOn) {
         if (!Rosen::LoadMotionSensor()) {
             TELEPHONY_LOGE("LoadMotionSensor failed");
             return;
         }
         TELEPHONY_LOGI("LoadMotionSensor success");
-        if (isPickupSwitchOn) {
+        if (isPickupReduceVolumeSwitchOn) {
             MotionRecogntion::SubscribePickupSensor();
         }
-        if (isFlipSwitchOn) {
+        if (isFlipMuteSwitchOn) {
             MotionRecogntion::SubscribeFlipSensor();
         }
-        if (isCloseToEarSwitchOn) {
+        if (isCloseToEarQuickAnswerSwitchOn) {
             MotionRecogntion::SubscribeCloseToEarSensor();
         }
     }
 }
 
-void CallStatusManager::StartOutGoingMotion()
+void CallStatusManager::StartInComingCallMotionRecognition()
 {
-    bool isCloseToEarSwitchOn = IsMotionSwitchEnable(SettingsDataShareHelper::QUERY_MOTION_CLOSE_TO_EAR_KEY);
-    if (isCloseToEarSwitchOn) {
+    bool isCloseToEarQuickAnswerSwitchOn = IsCallMotionRecognitionEnable(SettingsDataShareHelper::QUERY_MOTION_CLOSE_TO_EAR_KEY);
+    if (isCloseToEarQuickAnswerSwitchOn) {
         if (!Rosen::LoadMotionSensor()) {
             TELEPHONY_LOGE("LoadMotionSensor failed");
             return;

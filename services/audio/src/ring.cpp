@@ -84,6 +84,7 @@ int32_t Ring::Stop()
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     result = RingtonePlayer_->Stop();
+    isMutedRing_ = false;
     return result;
 }
 
@@ -102,12 +103,17 @@ int32_t Ring::SetMute()
         TELEPHONY_LOGE("RingtonePlayer_ is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
+    isMutedRing_ = true;
     return RingtonePlayer_->Configure(0, true);
 }
 
 int32_t Ring::SetRingToneVolume(float volume)
 {
     TELEPHONY_LOGI("SetRingToneVolume volume = %{public}f", volume);
+    if (isMutedRing_) {
+        TELEPHONY_LOGI("ringTone is already muted");
+        return TELEPHONY_SUCCESS;
+    }
     if (RingtonePlayer_ == nullptr) {
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
