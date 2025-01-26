@@ -134,7 +134,9 @@ call_manager_sources = [
   "${call_manager_path}/utils/src/call_manager_utils.cpp",
   "${call_manager_path}/utils/src/call_number_utils.cpp",
   "${call_manager_path}/utils/src/call_setting_ability_connection.cpp",
+  "${call_manager_path}/utils/src/motion_recognition.cpp",
   "${call_manager_path}/utils/src/number_identity_data_base_helper.cpp",
+  "${call_manager_path}/utils/src/screen_sensor_plugin.cpp",
   "${call_manager_path}/utils/src/settings_datashare_helper.cpp",
 ]
 
@@ -266,4 +268,9 @@ if (defined(global_parts_info) &&
     defined(global_parts_info.telephony_telephony_cust) &&
     global_parts_info.telephony_telephony_cust) {
   call_manager_defines += [ "OHOS_BUILD_ENABLE_TELEPHONY_CUST" ]
+}
+
+if (defined(global_parts_info) && defined(global_parts_info.msdp_motion) &&
+    global_parts_info.msdp_motion) {
+  call_manager_defines += [ "OHOS_SUBSCRIBE_MOTION_ENABLE" ]
 }

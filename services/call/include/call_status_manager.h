@@ -130,6 +130,11 @@ private:
     int32_t RefreshOldCall(const CallDetailInfo &info, bool &isExistedOldCall);
     void AutoAnswerSecondCall();
     void OneCallAnswerAtPhone(int32_t callId);
+    bool IsCallMotionRecognitionEnable(const std::string &key);
+    void StartInComingCallMotionRecognition();
+    void StartOutGoingCallMotionRecognition();
+    void StopCallMotionRecognition(TelCallState nextState);
+    bool UpdateDialingHandle(const CallDetailInfo &info, bool &isDistributedDeviceDialing);
 
 private:
     CallDetailInfo callReportInfo_;

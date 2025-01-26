@@ -74,6 +74,8 @@ public:
      */
     void UpdateBluetoothDeviceName(const std::string &macAddress, const std::string &deviceName);
 
+    AudioDeviceType GetCurrentAudioDevice();
+
 private:
     std::mutex mutex_;
     std::mutex infoMutex_;
@@ -105,7 +107,6 @@ private:
     bool IsSpeakerDevEnable();
     bool IsEarpieceDevEnable();
     bool IsWiredHeadsetDevEnable();
-    AudioDeviceType GetCurrentAudioDevice();
     bool IsDistributedAudioDeviceType(AudioDeviceType deviceType);
     bool IsSupportEarpiece();
 };

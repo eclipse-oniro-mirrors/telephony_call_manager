@@ -17,43 +17,43 @@
 
 #include <securec.h>
 
+#include "antifraud_service.h"
 #include "audio_control_manager.h"
+#include "bluetooth_call.h"
+#include "bluetooth_call_connection.h"
 #include "bluetooth_call_service.h"
+#include "bool_wrapper.h"
 #include "call_ability_report_proxy.h"
 #include "call_control_manager.h"
+#include "call_earthquake_alarm_locator.h"
 #include "call_manager_errors.h"
 #include "call_manager_hisysevent.h"
 #include "call_number_utils.h"
 #include "call_request_event_handler_helper.h"
-#include "core_service_client.h"
+#include "call_superprivacy_control_manager.h"
+#include "call_voice_assistant_manager.h"
 #include "cs_call.h"
+#include "core_service_client.h"
 #include "datashare_predicates.h"
+#include "distributed_communication_manager.h"
+#include "ffrt.h"
 #include "hitrace_meter.h"
 #include "ims_call.h"
+#include "notification_helper.h"
+#include "motion_recognition.h"
 #include "os_account_manager.h"
 #include "ott_call.h"
+#include "parameters.h"
 #include "report_call_info_handler.h"
 #include "satellite_call.h"
 #include "satellite_call_control.h"
+#include "screen_sensor_plugin.h"
 #include "settings_datashare_helper.h"
-#include "telephony_log_wrapper.h"
-#include "call_number_utils.h"
-#include "voip_call.h"
-#include "uri.h"
-#include "ffrt.h"
-#include "parameters.h"
 #include "spam_call_adapter.h"
-#include "call_superprivacy_control_manager.h"
-#include "notification_helper.h"
-#include "call_earthquake_alarm_locator.h"
-#include "distributed_communication_manager.h"
+#include "telephony_log_wrapper.h"
+#include "uri.h"
+#include "voip_call.h"
 #include "want_params_wrapper.h"
-#include "call_voice_assistant_manager.h"
-#include "bool_wrapper.h"
-#include "bluetooth_call.h"
-#include "bluetooth_call_connection.h"
-#include "distributed_communication_manager.h"
-#include "antifraud_service.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -452,6 +452,7 @@ int32_t CallStatusManager::IncomingHandle(const CallDetailInfo &info)
         return HandleRingOnceCall(call);
     }
     AddOneCallObject(call);
+    StartInComingCallMotionRecognition();
     DelayedSingleton<CallControlManager>::GetInstance()->NotifyNewCallCreated(call);
     ret = UpdateCallState(call, info.state);
     if (ret != TELEPHONY_SUCCESS) {
@@ -685,17 +686,7 @@ int32_t CallStatusManager::DialingHandle(const CallDetailInfo &info)
     TELEPHONY_LOGI("handle dialing state");
     bool isDistributedDeviceDialing = false;
     if (info.index > 0) {
-        sptr<CallBase> call = GetOneCallObjectByIndexSlotIdAndCallType(INIT_INDEX, info.accountId, info.callType);
-        if (info.callType == CallType::TYPE_BLUETOOTH) {
-            BtCallDialingHandle(call, info);
-        } else {
-            if (call == nullptr) {
-                call = GetOneCallObjectByIndexSlotIdAndCallType(info.index, info.accountId, info.callType);
-                isDistributedDeviceDialing = IsDistributeCallSourceStatus();
-            }
-        }
-        if (call != nullptr) {
-            TELEPHONY_LOGI("need update call info");
+        if (UpdateDialingHandle(info, isDistributedDeviceDialing)) {
             return UpdateDialingCallInfo(info);
         }
     }
@@ -714,6 +705,7 @@ int32_t CallStatusManager::DialingHandle(const CallDetailInfo &info)
         callRequestEventHandler->SetPendingMo(true, call->GetCallID());
         call->SetPhoneOrWatchDial(static_cast<int32_t>(PhoneOrWatchDial::WATCH_DIAL));
         SetBtCallDialByPhone(call, false);
+        StartOutGoingCallMotionRecognition();
     }
     callRequestEventHandler->RestoreDialingFlag(false);
     callRequestEventHandler->RemoveEventHandlerTask();
@@ -730,9 +722,28 @@ int32_t CallStatusManager::DialingHandle(const CallDetailInfo &info)
     return ret;
 }
 
+bool CallStatusManager::UpdateDialingHandle(const CallDetailInfo &info, bool &isDistributedDeviceDialing)
+{
+    sptr<CallBase> call = GetOneCallObjectByIndexSlotIdAndCallType(INIT_INDEX, info.accountId, info.callType);
+    if (info.callType == CallType::TYPE_BLUETOOTH) {
+        BtCallDialingHandle(call, info);
+    } else {
+        if (call == nullptr) {
+            call = GetOneCallObjectByIndexSlotIdAndCallType(info.index, info.accountId, info.callType);
+            isDistributedDeviceDialing = IsDistributeCallSourceStatus();
+        }
+    }
+    if (call != nullptr) {
+        TELEPHONY_LOGI("need update call info");
+        return true;
+    }
+    return false;
+}
+
 int32_t CallStatusManager::ActiveHandle(const CallDetailInfo &info)
 {
     TELEPHONY_LOGI("handle active state");
+    StopCallMotionRecognition(TelCallState::CALL_STATUS_ACTIVE);
     std::string tmpStr(info.phoneNum);
     sptr<CallBase> call = GetOneCallObjectByIndexSlotIdAndCallType(info.index, info.accountId, info.callType);
     if (call == nullptr && IsDcCallConneceted()) {
@@ -996,6 +1007,7 @@ int32_t CallStatusManager::DisconnectedHandle(const CallDetailInfo &info)
         TELEPHONY_LOGE("call is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
+    StopCallMotionRecognition(TelCallState::CALL_STATUS_DISCONNECTED);
     bool isTwoCallBtCallAndESIM = CallObjectManager::IsTwoCallBtCallAndESIM();
     call = RefreshCallIfNecessary(call, info);
     RefreshCallDisconnectReason(call, static_cast<int32_t>(info.reason));
@@ -1028,6 +1040,26 @@ int32_t CallStatusManager::DisconnectedHandle(const CallDetailInfo &info)
         AutoAnswerSecondCall();
     }
     return TELEPHONY_SUCCESS;
+}
+
+void CallStatusManager::StopCallMotionRecognition(TelCallState nextState)
+{
+    switch (nextState) {
+        case TelCallState::CALL_STATUS_ACTIVE:
+            MotionRecogntion::UnsubscribePickupSensor();
+            MotionRecogntion::UnsubscribeFlipSensor();
+            break;
+        case TelCallState::CALL_STATUS_DISCONNECTED:
+            if (!CallObjectManager::HasCellularCallExist()) {
+                MotionRecogntion::UnsubscribePickupSensor();
+                MotionRecogntion::UnsubscribeFlipSensor();
+                MotionRecogntion::UnsubscribeCloseToEarSensor();
+                Rosen::UnloadMotionSensor();
+            }
+            break;
+        default:
+            break;
+    }
 }
 
 std::vector<sptr<CallBase>> CallStatusManager::GetConferenceCallList(int32_t slotId)
@@ -2140,6 +2172,67 @@ void CallStatusManager::OneCallAnswerAtPhone(int32_t callId)
         }
     }
     return;
+}
+
+bool CallStatusManager::IsCallMotionRecognitionEnable(const std::string& key)
+{
+    std::vector<int> activedOsAccountIds;
+    OHOS::AccountSA::OsAccountManager::QueryActiveOsAccountIds(activedOsAccountIds);
+    if (activedOsAccountIds.empty()) {
+        TELEPHONY_LOGW("activedOsAccountIds is empty");
+        return false;
+    }
+    int userId = activedOsAccountIds[0];
+    OHOS::Uri uri(
+        "datashare:///com.ohos.settingsdata/entry/settingsdata/USER_SETTINGSDATA_"
+        + std::to_string(userId) + "?Proxy=true");
+    auto datashareHelper = SettingsDataShareHelper::GetInstance();
+    std::string is_motion_switch_on {"0"};
+    int resp = datashareHelper->Query(uri, key, is_motion_switch_on);
+    TELEPHONY_LOGI("key = %{public}s, value = %{public}s", key.c_str(), is_motion_switch_on.c_str());
+    if (resp == TELEPHONY_SUCCESS && is_motion_switch_on == "1") {
+        return true;
+    }
+    return false;
+}
+
+void CallStatusManager::StartInComingCallMotionRecognition()
+{
+    bool isPickupReduceVolumeSwitchOn =
+        IsCallMotionRecognitionEnable(SettingsDataShareHelper::QUERY_MOTION_PICKUP_REDUCE_KEY);
+    bool isFlipMuteSwitchOn = IsCallMotionRecognitionEnable(SettingsDataShareHelper::QUERY_MOTION_FLIP_MUTE_KEY);
+    bool isCloseToEarQuickAnswerSwitchOn =
+        IsCallMotionRecognitionEnable(SettingsDataShareHelper::QUERY_MOTION_CLOSE_TO_EAR_KEY);
+    if (isPickupReduceVolumeSwitchOn || isFlipMuteSwitchOn || isCloseToEarQuickAnswerSwitchOn) {
+        if (!Rosen::LoadMotionSensor()) {
+            TELEPHONY_LOGE("LoadMotionSensor failed");
+            return;
+        }
+        TELEPHONY_LOGI("LoadMotionSensor success");
+        if (isPickupReduceVolumeSwitchOn) {
+            MotionRecogntion::SubscribePickupSensor();
+        }
+        if (isFlipMuteSwitchOn) {
+            MotionRecogntion::SubscribeFlipSensor();
+        }
+        if (isCloseToEarQuickAnswerSwitchOn) {
+            MotionRecogntion::SubscribeCloseToEarSensor();
+        }
+    }
+}
+
+void CallStatusManager::StartOutGoingCallMotionRecognition()
+{
+    bool isCloseToEarQuickAnswerSwitchOn =
+        IsCallMotionRecognitionEnable(SettingsDataShareHelper::QUERY_MOTION_CLOSE_TO_EAR_KEY);
+    if (isCloseToEarQuickAnswerSwitchOn) {
+        if (!Rosen::LoadMotionSensor()) {
+            TELEPHONY_LOGE("LoadMotionSensor failed");
+            return;
+        }
+        TELEPHONY_LOGI("LoadMotionSensor success");
+        MotionRecogntion::SubscribeCloseToEarSensor();
+    }
 }
 } // namespace Telephony
 } // namespace OHOS

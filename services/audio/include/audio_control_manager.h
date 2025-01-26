@@ -89,6 +89,7 @@ public:
     bool PlaySoundtone();
     void PlayCallEndedTone(CallEndedType type);
     bool IsDistributeCallSinkStatus();
+    void SetRingToneVolume(float volume);
 
 private:
     RingState ringState_ = RingState::STOPPED;
