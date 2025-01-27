@@ -140,6 +140,7 @@ private:
     CallDetailInfo callReportInfo_;
     CallDetailsInfo callDetailsInfo_[SLOT_NUM];
     CallDetailsInfo tmpCallDetailsInfo_[SLOT_NUM];
+    void HandleConnectingCallReportInfo(const CallDetailsInfo &info);
     sptr<CallIncomingFilterManager> CallIncomingFilterManagerPtr_;
     std::map<RequestResultEventId, CallAbilityEventId> mEventIdTransferMap_;
     std::map<OttCallEventId, CallAbilityEventId> mOttEventIdTransferMap_;

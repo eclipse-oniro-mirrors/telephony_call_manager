@@ -1463,7 +1463,7 @@ void CallControlManager::HandleVoipIncoming(int32_t &numActive, int32_t callId, 
     info.accountNumber[copiedChars] = '\0';
     info.callType = CallType::TYPE_VOIP;
     info.callId = callId;
-    if (HasCallExist()) {
+    if (HasCallExist() || IsVoipCallExist()) {
         info.callState = TelCallState::CALL_STATUS_WAITING;
     } else {
         info.callState = TelCallState::CALL_STATUS_INCOMING;
