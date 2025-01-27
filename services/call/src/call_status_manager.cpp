@@ -272,7 +272,7 @@ int32_t CallStatusManager::HandleCallsReportInfo(const CallDetailsInfo &info)
     return TELEPHONY_SUCCESS;
 }
 
-void CallStatusManager::HandleConnectingCallReportInfo(const CallDetailsInfo &info)
+void CallStatusManager::HandleConnectingCallReportInfo(const CallDetailInfo &info)
 {
     int32_t callId = ERR_ID;
     bool isMeetimeActiveCallExist = CallObjectManager::IsVoipCallExist(TelCallState::CALL_STATUS_ACTIVE, callId);
