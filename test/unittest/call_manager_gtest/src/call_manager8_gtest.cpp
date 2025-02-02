@@ -966,5 +966,71 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_TestDump_0100, Function | Mediu
     EXPECT_GE(DelayedSingleton<CallManagerService>::GetInstance()->Dump(0, emptyArgs), 0);
     EXPECT_GE(DelayedSingleton<CallManagerService>::GetInstance()->Dump(0, args), 0);
 }
+
+/******************************************* Test VoipCallObject() ********************************************/
+/**
+ * @tc.number   Telephony_VoipCallObject_0100
+ * @tc.name     Test VoipCallObject
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_VoipCallObject_0100, Function | MediumTest | Level3)
+{
+    CallObjectManager::ClearVoipList();
+    CallAttributeInfo callAttrInfo;
+    int32_t callId = 12345;
+    callAttrInfo.callId = callId;
+    callAttrInfo.callState = TelCallState::CALL_STATUS_WAITING;
+    EXPECT_EQ(CallObjectManager::IsVoipCallExist(), true);
+
+    EXPECT_EQ(CallObjectManager::IsVoipCallExist(TelCallState::CALL_STATUS_WAITING, callId), true);
+
+    int32_t newCallId = -1;
+    EXPECT_EQ(CallObjectManager::IsVoipCallExist(TelCallState::CALL_STATUS_WAITING, newCallId), true);
+
+    CallAttributeInfo retrievedCallAttrInfo = CallObjectManager::GetVoipCallInfo();
+    EXPECT_EQ(retrievedCallAttrInfo.callId, callId);
+
+    TelCallState nextState = TelCallState::CALL_STATUS_ACTIVE;
+    EXPECT_EQ(CallObjectManager::UpdateOneVoipCallObjectByCallId(callId, nextState), TELEPHONY_SUCCESS);
+
+    EXPECT_EQ(CallObjectManager::DeleteOneVoipCallObject(callId), TELEPHONY_SUCCESS);
+
+    CallObjectManager::ClearVoipList();
+}
+
+/**
+ * @tc.number   Telephony_VoipCallObject_0200
+ * @tc.name     Test VoipCallObject
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_VoipCallObject_0200, Function | MediumTest | Level3)
+{
+    CallObjectManager::ClearVoipList();
+    int32_t callId = 10010;
+    int32_t secondCallId = 10011;
+    CallAttributeInfo callAttrInfo;
+    callAttrInfo.callId = callId;
+    CallAttributeInfo secondCallAttrInfo;
+    secondCallAttrInfo.callId = secondCallId;
+    EXPECT_EQ(CallObjectManager::AddOneVoipCallObject(callAttrInfo), TELEPHONY_SUCCESS);
+    
+    EXPECT_EQ(CallObjectManager::AddOneVoipCallObject(secondCallAttrInfo), TELEPHONY_SUCCESS);
+    
+    EXPECT_EQ(CallObjectManager::AddOneVoipCallObject(callAttrInfo), CALL_ERR_PHONE_CALL_ALREADY_EXISTS);
+
+    TelCallState nextState = TelCallState::CALL_STATUS_DISCONNECTED;
+    EXPECT_EQ(CallObjectManager::UpdateOneVoipCallObjectByCallId(secondCallId, nextState), TELEPHONY_SUCCESS);
+
+    int32_t newCallId = -1;
+    EXPECT_EQ(CallObjectManager::UpdateOneVoipCallObjectByCallId(newCallId, nextState), TELEPHONY_ERROR);
+
+    EXPECT_EQ(CallObjectManager::DeleteOneVoipCallObject(newCallId, nextState), TELEPHONY_ERROR);
+
+    EXPECT_TRUE(CallObjectManager::IsVoipCallExist());
+
+    CallObjectManager::ClearVoipList();
+
+    EXPECT_FALSE(CallObjectManager::IsVoipCallExist());
+}
 } // namespace Telephony
 } // namespace OHOS
