@@ -249,8 +249,7 @@ int32_t CallStatusManager::HandleCallsReportInfo(const CallDetailsInfo &info)
         }
         // incoming/outgoing call handle
         if (!flag || callDetailsInfo_[curSlotId].callVec.empty()) {
-            TELEPHONY_LOGI("handle new call state:%{public}d", it.state);
-            HandleCallReportInfo(it);
+            HandleConnectingCallReportInfo(it);
         }
         flag = false;
     }
@@ -271,6 +270,19 @@ int32_t CallStatusManager::HandleCallsReportInfo(const CallDetailsInfo &info)
     }
     UpdateCallDetailsInfo(info);
     return TELEPHONY_SUCCESS;
+}
+
+void CallStatusManager::HandleConnectingCallReportInfo(const CallDetailInfo &info)
+{
+    int32_t callId = ERR_ID;
+    bool isMeetimeActiveCallExist = CallObjectManager::IsVoipCallExist(TelCallState::CALL_STATUS_ACTIVE, callId);
+    CallDetailInfo tempInfo = info;
+    TELEPHONY_LOGI("handle new call state:%{public}d, isMeetimeActiveCallExist:%{public}d",
+        info.state, isMeetimeActiveCallExist);
+    if (isMeetimeActiveCallExist && info.state == TelCallState::CALL_STATUS_INCOMING) {
+        tempInfo.state = TelCallState::CALL_STATUS_WAITING;
+    }
+    HandleCallReportInfo(tempInfo);
 }
 
 void CallStatusManager::UpdateCallDetailsInfo(const CallDetailsInfo &info)
