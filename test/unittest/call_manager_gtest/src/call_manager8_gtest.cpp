@@ -1024,7 +1024,7 @@ HWTEST_F(CallManagerGtest, Telephony_VoipCallObject_0200, Function | MediumTest 
     int32_t newCallId = -1;
     EXPECT_EQ(CallObjectManager::UpdateOneVoipCallObjectByCallId(newCallId, nextState), TELEPHONY_ERROR);
 
-    EXPECT_EQ(CallObjectManager::DeleteOneVoipCallObject(newCallId, nextState), TELEPHONY_ERROR);
+    EXPECT_EQ(CallObjectManager::DeleteOneVoipCallObject(newCallId), TELEPHONY_ERROR);
 
     EXPECT_TRUE(CallObjectManager::IsVoipCallExist());
 
