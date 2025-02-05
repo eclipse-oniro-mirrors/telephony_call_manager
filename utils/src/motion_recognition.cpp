@@ -140,7 +140,7 @@ void FlipMotionEventCallback(const Rosen::MotionSensorEvent &motionData)
             if (motionData.status != 0) {
                 break;
             }
-            MotionRecogntion::UnsubscribeFlipSensor();
+            MotionRecogntion::UnsubscribePickupSensor();
             ffrt::submit([=]() {
                 MotionRecogntion::ReduceRingToneVolume();
             });
