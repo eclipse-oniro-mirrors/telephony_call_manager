@@ -355,7 +355,7 @@ void CallNumberUtils::NumberLocationUpdate(const sptr<CallBase> &callObjectPtr)
 void CallNumberUtils::YellowPageAndMarkUpdate(const sptr<CallBase> &callObjectPtr)
 {
     if (OHOS::system::GetParameter("const.global.region", "CN") != "CN") {
-        TELEPHONY_LOGE("is not chinese user");
+        TELEPHONY_LOGE("not the chinese version, no need to query markinfo.");
         return;
     }
     CallAttributeInfo info;
