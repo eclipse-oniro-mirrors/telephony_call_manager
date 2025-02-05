@@ -66,9 +66,8 @@ __attribute__((no_sanitize("cfi"))) bool SubscribeCallback(int32_t motionType, O
         return false;
     }
     MotionSubscribeCallbackPtr func = (MotionSubscribeCallbackPtr)(dlsym(g_handle, "MotionSubscribeCallback"));
-    const char *dlsymError = dlerror();
-    if (dlsymError != nullptr || func != nullptr) {
-        TELEPHONY_LOGE("dlsym error: %{public}s, or func is nullptr", dlsymError);
+    if (func == nullptr) {
+        TELEPHONY_LOGE("func is nullptr, dlsym error: %{public}s", dlerror());
         return false;
     }
     return func(motionType, callback);
