@@ -1100,7 +1100,11 @@ int32_t NapiCallAbilityCallback::ReportAudioDeviceInfo(AudioDeviceInfo &info, Ev
         ++i;
     }
     napi_set_named_property(env, callbackValues[ARRAY_INDEX_FIRST], "audioDeviceList", audioDeviceListValue);
-
+    if (eventCallback.callbackRef == nullptr) {
+        TELEPHONY_LOGE("eventCallback callbackRef is null!");
+        napi_close_handle_scope(env, AudioDeviceInfoScope);
+        return CALL_ERR_CALLBACK_NOT_EXIST;
+    }
     napi_get_reference_value(env, eventCallback.callbackRef, &callbackFunc);
     if (callbackFunc == nullptr) {
         TELEPHONY_LOGE("callbackFunc is null!");
@@ -1108,6 +1112,11 @@ int32_t NapiCallAbilityCallback::ReportAudioDeviceInfo(AudioDeviceInfo &info, Ev
         return CALL_ERR_CALLBACK_NOT_EXIST;
     }
     napi_value thisVar = nullptr;
+    if (eventCallback.thisVar == nullptr) {
+        TELEPHONY_LOGE("eventCallback thisVar is null!");
+        napi_close_handle_scope(env, AudioDeviceInfoScope);
+        return CALL_ERR_CALLBACK_NOT_EXIST;
+    }
     napi_get_reference_value(env, eventCallback.thisVar, &thisVar);
     napi_value callbackResult = nullptr;
     napi_call_function(env, thisVar, callbackFunc, DATA_LENGTH_ONE, callbackValues, &callbackResult);
