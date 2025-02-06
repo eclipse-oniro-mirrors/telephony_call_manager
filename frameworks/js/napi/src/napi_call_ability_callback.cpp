@@ -1103,7 +1103,7 @@ int32_t NapiCallAbilityCallback::ReportAudioDeviceInfo(AudioDeviceInfo &info, Ev
     if (eventCallback.callbackRef == nullptr) {
         TELEPHONY_LOGE("eventCallback callbackRef is null!");
         napi_close_handle_scope(env, AudioDeviceInfoScope);
-        return TELEPHONY_ERROR;
+        return CALL_ERR_CALLBACK_NOT_EXIST;
     }
     napi_get_reference_value(env, eventCallback.callbackRef, &callbackFunc);
     if (callbackFunc == nullptr) {
@@ -1115,7 +1115,7 @@ int32_t NapiCallAbilityCallback::ReportAudioDeviceInfo(AudioDeviceInfo &info, Ev
     if (eventCallback.thisVar == nullptr) {
         TELEPHONY_LOGE("eventCallback thisVar is null!");
         napi_close_handle_scope(env, AudioDeviceInfoScope);
-        return TELEPHONY_ERROR;
+        return CALL_ERR_CALLBACK_NOT_EXIST;
     }
     napi_get_reference_value(env, eventCallback.thisVar, &thisVar);
     napi_value callbackResult = nullptr;
