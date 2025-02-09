@@ -248,7 +248,6 @@ void SystemAbilityListener::OnRemoveSystemAbility(int32_t systemAbilityId, const
     DelayedSingleton<BluetoothConnection>::GetInstance()->ResetBtConnection();
     std::shared_ptr<AudioDeviceManager> audioDeviceManager = DelayedSingleton<AudioDeviceManager>::GetInstance();
     audioDeviceManager->ResetBtAudioDevicesList();
-    AudioDeviceType currentDeviceType = audioDeviceManager->GetCurrentAudioDevice();
     audioDeviceManager->ProcessEvent(AudioEvent::INIT_AUDIO_DEVICE);
 }
 
