@@ -249,11 +249,7 @@ void SystemAbilityListener::OnRemoveSystemAbility(int32_t systemAbilityId, const
     std::shared_ptr<AudioDeviceManager> audioDeviceManager = DelayedSingleton<AudioDeviceManager>::GetInstance();
     audioDeviceManager->ResetBtAudioDevicesList();
     AudioDeviceType currentDeviceType = audioDeviceManager->GetCurrentAudioDevice();
-    if (currentDeviceType == AudioDeviceType::DEVICE_BLUETOOTH_SCO
-        || currentDeviceType == AudioDeviceType::DEVICE_DISABLE
-        || currentDeviceType == AudioDeviceType::DEVICE_UNKNOWN) {
-        audioDeviceManager->ProcessEvent(AudioEvent::INIT_AUDIO_DEVICE);
-    }
+    audioDeviceManager->ProcessEvent(AudioEvent::INIT_AUDIO_DEVICE);
 }
 
 std::string BluetoothConnection::GetWearBtHeadsetAddress()
