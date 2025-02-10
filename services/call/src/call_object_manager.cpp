@@ -156,7 +156,7 @@ int32_t CallObjectManager::UpdateOneVoipCallObjectByCallId(int32_t callId, TelCa
         std::map<int32_t, CallAttributeInfo>::iterator firstIndex = voipCallObjectList_.begin();
         for (firstIndex; firstIndex != voipCallObjectList_.end(); ++firstIndex) {
             if (firstIndex != it) {
-                voipCallObjectList_.erase(firstIndex->first);
+                voipCallObjectList_.erase(firstIndex);
             }
         }
         return TELEPHONY_SUCCESS;
