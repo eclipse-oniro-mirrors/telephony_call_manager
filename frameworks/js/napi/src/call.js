@@ -66,9 +66,21 @@ async function startAbility(args, context) {
         abilityName: 'com.ohos.contacts.MainAbility'
     };
     if (args.length > 0 && typeof args[0] === 'string') {
-        config.parameters.phoneNumber = args[0];
+        let phoneNumberUri = new URL(args[0]);
+        if (phoneNumberUri && phoneNumberUri.protocol === 'tel:') {
+            let phoneNumber = phoneNumberUri.pathname;
+            config.parameters.phoneNumber = phoneNumber;
+        } else {
+            config.parameters.phoneNumber = args[0];
+        }
     } else if (args.length > 1 && typeof args[1] === 'string') {
-        config.parameters.phoneNumber = args[1];
+        let phoneNumberUri = new URL(args[1]);
+        if (phoneNumberUri && phoneNumberUri.protocol === 'tel:') {
+            let phoneNumber = phoneNumberUri.pathname;
+            config.parameters.phoneNumber = phoneNumber;
+        } else {
+            config.parameters.phoneNumber = args[1];
+        }
     }
     if (context) {
         await context.startAbility(config);
