@@ -75,7 +75,7 @@ async function startAbility(args, context) {
         }
     } else if (args.length > 1 && typeof args[1] === 'string') {
         let phoneNumberUri = new URL(args[1]);
-        if (phoneNumberUri && phoneNumberUri.protocol === 'tel') {
+        if (phoneNumberUri && phoneNumberUri.protocol === 'tel:') {
             let phoneNumber = phoneNumberUri.pathname;
             config.parameters.phoneNumber = phoneNumber;
         } else {
