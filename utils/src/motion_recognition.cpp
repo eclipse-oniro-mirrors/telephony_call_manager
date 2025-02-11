@@ -181,8 +181,8 @@ void CloseToEarMotionEventCallback(const Rosen::MotionSensorEvent &motionData)
                 TELEPHONY_LOGI("ignore status is not success");
                 break;
             }
-            if (dialingCall == nullptr && activeCall == nullptr && holdingCall == nullptr
-                && controlManager != nullptr && ringCall != nullptr) {
+            if (dialingCall == nullptr && activeCall == nullptr && holdingCall == nullptr &&
+                controlManager != nullptr && ringCall != nullptr) {
                 controlManager->AnswerCall(ringCall->GetCallID(), static_cast<int32_t>(VideoStateType::TYPE_VOICE));
                 TELEPHONY_LOGI("close to ear: AnswerCall");
             };

@@ -2210,9 +2210,9 @@ bool CallStatusManager::IsCallMotionRecognitionEnable(const std::string& key)
 
 void CallStatusManager::StartInComingCallMotionRecognition()
 {
-    if (GetOneCarrierCallObject(CallRunningState::CALL_RUNNING_STATE_DIALING) != nullptr
-        || GetOneCarrierCallObject(CallRunningState::CALL_RUNNING_STATE_ACTIVE) != nullptr
-        || GetOneCarrierCallObject(CallRunningState::CALL_RUNNING_STATE_HOLD) != nullptr) {
+    if (GetOneCarrierCallObject(CallRunningState::CALL_RUNNING_STATE_DIALING) != nullptr ||
+        GetOneCarrierCallObject(CallRunningState::CALL_RUNNING_STATE_ACTIVE) != nullptr ||
+        GetOneCarrierCallObject(CallRunningState::CALL_RUNNING_STATE_HOLD) != nullptr) {
         TELEPHONY_LOGI("has dialing active or holding call return");
         return;
     }
