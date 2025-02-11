@@ -952,6 +952,82 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_GetVoIPCallState_0200, Function
     EXPECT_EQ(CallManagerGtest::clientPtr_->GetVoIPCallState(state), RETURN_VALUE_IS_ZERO);
 }
 
+/******************************************* Test SetVoIPCallInfo() ********************************************/
+/**
+ * @tc.number   Telephony_CallManager_SetVoIPCallInfo_0100
+ * @tc.name     test SetVoIPCallInfo
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_SetVoIPCallInfo_0100, Function | MediumTest | Level3)
+{
+    AccessToken token;
+    int32_t callId = 10001;
+    int32_t state = 4;
+    std::string phoneNumber = "12345678901";
+    std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
+    EXPECT_EQ(callManagerService->SetVoIPCallInfo(callId, state, phoneNumber), TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API);
+}
+
+/**
+ * @tc.number   Telephony_CallManager_SetVoIPCallInfo_0200
+ * @tc.name     test SetVoIPCallInfo
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_SetVoIPCallInfo_0200, Function | MediumTest | Level3)
+{
+    std::shared_ptr<CallManagerClient> client = std::make_shared<CallManagerClient>();
+    AccessToken token;
+    int32_t callId = 10020;
+    int32_t state = 5;
+    std::string phoneNumber = "12345678901";
+    int32_t systemAbilityId = 100;
+    client->Init(systemAbilityId);
+    ASSERT_EQ(client->SetVoIPCallInfo(callId, state, phoneNumber), TELEPHONY_ERR_PERMISSION_ERR);
+    ASSERT_EQ(client->GetVoIPCallInfo(callId, state, phoneNumber), TELEPHONY_SUCCESS);
+    client->UnInit();
+    ASSERT_EQ(client->SetVoIPCallInfo(callId, state, phoneNumber), TELEPHONY_ERR_UNINIT);
+    ASSERT_EQ(client->GetVoIPCallInfo(callId, state, phoneNumber), TELEPHONY_ERR_UNINIT);
+}
+
+/**
+ * @tc.number   Telephony_CallControlManager_SetVoIPCallInfo_0300
+ * @tc.name     test SetVoIPCallInfo
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallControlManager_SetVoIPCallInfo_0300, Function | MediumTest | Level3)
+{
+    std::shared_ptr<CallControlManager> callControlManager = std::make_shared<CallControlManager>();
+    int32_t callId = 10020;
+    std::string phoneNumber = "12345678901";
+    ASSERT_EQ(callControlManager->SetVoIPCallInfo(callId, static_cast<int32_t>(TelCallState::CALL_STATUS_IDLE),
+                                                    phoneNumber), TELEPHONY_SUCCESS);
+    ASSERT_EQ(callControlManager->SetVoIPCallInfo(callId, static_cast<int32_t>(TelCallState::CALL_STATUS_INCOMING),
+                                                    phoneNumber), TELEPHONY_SUCCESS);
+    ASSERT_EQ(callControlManager->SetVoIPCallInfo(callId, static_cast<int32_t>(TelCallState::CALL_STATUS_DISCONNECTED),
+                                                    phoneNumber), TELEPHONY_SUCCESS);
+    ASSERT_EQ(callControlManager->SetVoIPCallInfo(callId, static_cast<int32_t>(TelCallState::CALL_STATUS_ALERTING),
+                                                    phoneNumber), TELEPHONY_SUCCESS);
+    int32_t state = 5;
+    ASSERT_EQ(callControlManager->GetVoIPCallInfo(callId, state, phoneNumber), TELEPHONY_SUCCESS);
+}
+
+/**
+ * @tc.number   Telephony_CallManagerServiceStub_SetVoIPCallInfo_0400
+ * @tc.name     test SetVoIPCallInfo
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManagerServiceStub_SetVoIPCallInfo_0400, Function | MediumTest | Level3)
+{
+    std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
+    MessageParcel data;
+    MessageParcel reply;
+    int32_t callId = 0;
+    data.WriteInt32(callId);
+    data.RewindRead(0);
+    ASSERT_EQ(callManagerService->OnSetVoIPCallInfo(data, reply), TELEPHONY_SUCCESS);
+    ASSERT_EQ(callManagerService->OnGetVoIPCallInfo(data, reply), TELEPHONY_SUCCESS);
+}
+
 /*********************************** Test Dump() ***************************************/
 /**
  * @tc.number   Telephony_CallManager_TestDump_0100
