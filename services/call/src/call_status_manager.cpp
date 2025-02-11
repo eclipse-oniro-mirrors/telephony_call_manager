@@ -1019,7 +1019,6 @@ int32_t CallStatusManager::DisconnectedHandle(const CallDetailInfo &info)
         TELEPHONY_LOGE("call is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    StopCallMotionRecognition(TelCallState::CALL_STATUS_DISCONNECTED);
     bool isTwoCallBtCallAndESIM = CallObjectManager::IsTwoCallBtCallAndESIM();
     call = RefreshCallIfNecessary(call, info);
     RefreshCallDisconnectReason(call, static_cast<int32_t>(info.reason));
@@ -1051,6 +1050,7 @@ int32_t CallStatusManager::DisconnectedHandle(const CallDetailInfo &info)
         TELEPHONY_LOGI("Watch Auto AnswerCall");
         AutoAnswerSecondCall();
     }
+    StopCallMotionRecognition(TelCallState::CALL_STATUS_DISCONNECTED);
     return TELEPHONY_SUCCESS;
 }
 
@@ -2210,6 +2210,12 @@ bool CallStatusManager::IsCallMotionRecognitionEnable(const std::string& key)
 
 void CallStatusManager::StartInComingCallMotionRecognition()
 {
+    if (GetOneCarrierCallObject(CallRunningState::CALL_RUNNING_STATE_DIALING) != nullptr ||
+        GetOneCarrierCallObject(CallRunningState::CALL_RUNNING_STATE_ACTIVE) != nullptr ||
+        GetOneCarrierCallObject(CallRunningState::CALL_RUNNING_STATE_HOLD) != nullptr) {
+        TELEPHONY_LOGI("has dialing active or holding call return");
+        return;
+    }
     bool isPickupReduceVolumeSwitchOn =
         IsCallMotionRecognitionEnable(SettingsDataShareHelper::QUERY_MOTION_PICKUP_REDUCE_KEY);
     bool isFlipMuteSwitchOn = IsCallMotionRecognitionEnable(SettingsDataShareHelper::QUERY_MOTION_FLIP_MUTE_KEY);

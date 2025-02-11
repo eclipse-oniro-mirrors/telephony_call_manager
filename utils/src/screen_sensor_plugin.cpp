@@ -56,7 +56,7 @@ void UnloadMotionSensor(void)
 
 __attribute__((no_sanitize("cfi"))) bool SubscribeCallback(int32_t motionType, OnMotionChangedPtr callback)
 {
-    TELEPHONY_LOGI("RegisterCallback enter.");
+    TELEPHONY_LOGI("RegisterCallback enter. motionType = %{public}d", motionType);
     if (callback == nullptr) {
         TELEPHONY_LOGE("callback is nullptr");
         return false;
