@@ -125,7 +125,7 @@ void BluetoothCallConnection::SetHfpConnected(bool isHfpConnected)
 }
 
 bool BluetoothCallConnection::GetSupportBtCall()
-{    
+{
     Bluetooth::BluetoothRemoteDevice device(macAddress_);
     bool isAclConnected = device.IsAclConnected();
     if (isAclConnected) {
