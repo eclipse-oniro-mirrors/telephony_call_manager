@@ -486,6 +486,7 @@ HWTEST_F(ZeroBranch6Test, Telephony_CallAbilityCallback_002, Function | MediumTe
     callAbilityCallback->OnRemoteRequest(static_cast<uint32_t>(CallStatusInterfaceCode::UPDATE_VOIP_EVENT_INFO),
         data, reply, option);
     callAbilityCallback->OnUpdateCallStateInfo(data, reply);
+    callAbilityCallback->OnUpdateMeeTimeStateInfo(data, reply);
     callAbilityCallback->OnUpdateCallEvent(data, reply);
     callAbilityCallback->OnUpdateCallDisconnectedCause(data, reply);
     callAbilityCallback->OnUpdateAysncResults(data, reply);
