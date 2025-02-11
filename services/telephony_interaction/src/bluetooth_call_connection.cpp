@@ -126,30 +126,14 @@ void BluetoothCallConnection::SetHfpConnected(bool isHfpConnected)
 
 bool BluetoothCallConnection::GetSupportBtCall()
 {
-    Bluetooth::HandsFreeUnit *profile = Bluetooth::HandsFreeUnit::GetProfile();
-    if (profile != nullptr) {
-        Bluetooth::BluetoothRemoteDevice device(macAddress_);
-        int state = profile->GetDeviceState(device);
-        if (state == (int32_t)Bluetooth::BTConnectState::CONNECTED) {
-            isHfpConnected_ = true;
-        } else {
-            isHfpConnected_ = false;
-        }
-    } else {
-        TELEPHONY_LOGE("profile is nullptr");
-    }
-
-    auto datashareHelper = SettingsDataShareHelper::GetInstance();
-    std::string btConnectState {"0"};
-    OHOS::Uri uri(
-        "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true");
-    int btState = datashareHelper->Query(uri, "hw_bluetooth_connection_status", btConnectState);
-    if (isHfpConnected_ || btConnectState == "2") {
+    Bluetooth::BluetoothRemoteDevice device(macAddress_);
+    bool isAclConnected = device.IsAclConnected();
+    if (isAclConnected) {
         TELEPHONY_LOGI("Watch Support Bluetooth Call.");
-        return true;
+    } else {
+        TELEPHONY_LOGE("Watch not Support Bluetooth Call.");
     }
-    TELEPHONY_LOGE("Watch not Support Bluetooth Call.");
-    return false;
+    return isAclConnected;
 }
 
 void BluetoothCallConnection::SetBtCallScoConnected(bool isBtCallScoConnected)
