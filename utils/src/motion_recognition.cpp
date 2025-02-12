@@ -18,8 +18,9 @@
 #include "chrono"
 #include "securec.h"
 
-#include "audio_device_manager.h"
 #include "audio_control_manager.h"
+#include "audio_device_manager.h"
+#include "audio_proxy.h"
 #include "call_base.h"
 #include "call_control_manager.h"
 #include "call_object_manager.h"
@@ -58,8 +59,6 @@ constexpr int32_t MOTION_TYPE_CLOSE_TO_EAR = 300;
 
 //来电铃声减弱总时长
 constexpr int32_t REDUCE_RING_TOTAL_LENGTH = 1500000;  //us
-//来电铃声减弱总次数
-constexpr int32_t REDUCE_RING_COUNT = 5;
 
 /**
 * @brief 翻转方向
@@ -154,11 +153,26 @@ void MotionRecogntion::ReduceRingToneVolume()
 {
     int32_t count = 0;
     float value = 0.0f;
-    while (count < REDUCE_RING_COUNT) {
+    int32_t currentVolume = DelayedSingleton<AudioProxy>::GetInstance()->GetVolume(AudioStandard::AudioVolumeType::STREAM_RING);
+    if (currentVolume <= 1) {
+        TELEPHONY_LOGE("currentVolume = %{public}d, return it", currentVolume);
+        return;
+    }
+    float beginVolumeDb = DelayedSingleton<AudioProxy>::GetInstance()->GetSystemRingVolumeInDb(currentVolume);
+    if (beginVolumeDb == 0.0f) {
+        TELEPHONY_LOGE("GetSystemRingVolumeInDb fail");
+        return;
+    }
+    int32_t reduceCount = currentVolume - 1;
+    while (count < reduceCount) {
         count++;
-        value = 1.0f - (0.7f / REDUCE_RING_COUNT * count);
-        DelayedSingleton<AudioControlManager>::GetInstance()->SetRingToneVolume(value);
-        ffrt_usleep(REDUCE_RING_TOTAL_LENGTH / REDUCE_RING_COUNT);
+        float endVolumeDb = DelayedSingleton<AudioProxy>::GetInstance()->GetSystemRingVolumeInDb(currentVolume - count);
+        if (endVolumeDb == 0.0f || beginVolumeDb <= endVolumeDb) {
+            TELEPHONY_LOGE("GetSystemRingVolumeInDb fail or beginVolumeDb unexpected");
+            return;
+        }
+        DelayedSingleton<AudioControlManager>::GetInstance()->SetRingToneVolume(endVolumeDb / beginVolumeDb);
+        ffrt_usleep(REDUCE_RING_TOTAL_LENGTH / reduceCount);
     }
 }
 
