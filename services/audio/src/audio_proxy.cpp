@@ -515,5 +515,16 @@ void AudioMicStateChangeCallback::OnMicStateUpdated(
     DelayedSingleton<CallControlManager>::GetInstance()->SetMuted(audioGroupManager->IsMicrophoneMute());
 }
 
+float AudioProxy::GetSystemRingVolumeInDb(int32_t volumeLevel)
+{
+    std::shared_ptr<AudioStandard::AudioGroupManager> audioGroupManager =
+        AudioStandard::AudioSystemManager::GetInstance()->GetGroupManager(AudioStandard::DEFAULT_VOLUME_GROUP_ID);
+    if (audioGroupManager == nullptr) {
+        TELEPHONY_LOGE("GetSystemRingVolumeInDb fail, audioGroupManager is nullptr");
+        return 0;
+    }
+    return audioGroupManager->GetSystemVolumeInDb(AudioStandard::AudioVolumeType::STREAM_RING,
+        volumeLevel, AudioStandard::DEVICE_TYPE_SPEAKER);
+}
 } // namespace Telephony
 } // namespace OHOS

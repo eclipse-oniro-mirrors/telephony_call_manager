@@ -95,6 +95,7 @@ public:
     int32_t UnsetAudioPreferDeviceChangeCallback();
     int32_t SetAudioMicStateChangeCallback();
     int32_t UnsetAudioMicStateChangeCallback();
+    float GetSystemRingVolumeInDb(int32_t volumeLevel);
 
 private:
     const std::string defaultTonePath_ = "/system/etc/telephony/tones/tone.wav";
