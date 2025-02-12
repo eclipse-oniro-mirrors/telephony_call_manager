@@ -199,7 +199,7 @@ int32_t DistributedCallManager::AddDCallDevice(const std::string& devId)
 
     if (!dCallDeviceSwitchedOn_.load() && isCallActived_.load()) {
         sptr<CallBase> foregroundCall = CallObjectManager::GetForegroundCall();
-        int32_t isCeliaCall = foregroundCall->GetCeliaCallType()
+        int32_t isCeliaCall = foregroundCall->GetCeliaCallType();
         if (isCeliaCall == IS_CELIA_CALL) {
             TELEPHONY_LOGI("current is celia call, no need switch on dcall device.");
             return TELEPHONY_SUCCESS;
