@@ -802,6 +802,7 @@ public:
 
 private:
     std::string GetBundleInfo();
+    int32_t dealCeliaCallEvent(int32_t callId);
 
 private:
     enum ServiceRunningState {

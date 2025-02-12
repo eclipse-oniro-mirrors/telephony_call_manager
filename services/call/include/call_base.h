@@ -134,6 +134,7 @@ public:
     bool IsMuted();
     void SetIsEccContact(bool isEccContact);
     void SetCeliaCallType(int32_t celiaCallType);
+    int32_t GetCeliaCallType();
     void SetExtraParams(AAFwk::WantParams extraParams);
     void SetCallDirection(CallDirection direction);
     CallDirection GetCallDirection();
