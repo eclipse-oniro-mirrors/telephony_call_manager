@@ -58,6 +58,7 @@ public:
 #ifdef ABILITY_BLUETOOTH_SUPPORT
     void OnConnectionStateChanged(const Bluetooth::BluetoothRemoteDevice &device,
         int32_t state, int32_t cause) override;
+    void OnVirtualDeviceChanged(int32_t action, std::string address) override;
     Bluetooth::BluetoothRemoteDevice *GetBtDevice(const std::string &address);
     void AddBtDevice(const std::string &address, Bluetooth::BluetoothRemoteDevice device);
     std::string GetWearBtHeadsetAddress();
