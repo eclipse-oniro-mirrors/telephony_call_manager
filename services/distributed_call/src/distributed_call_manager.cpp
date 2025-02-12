@@ -198,9 +198,13 @@ int32_t DistributedCallManager::AddDCallDevice(const std::string& devId)
     onlineDCallDevices_.emplace(devId, device);
 
     if (!dCallDeviceSwitchedOn_.load() && isCallActived_.load()) {
-        sptr<CallBase> foregroundCall = CallObjectManager::GetForegroundCall();
-        int32_t isCeliaCall = foregroundCall->GetCeliaCallType();
-        if (isCeliaCall == IS_CELIA_CALL) {
+        sptr<CallBase> foregroundCall = CallObjectManager::GetForegroundCall(false);
+        if (foregroundCall == nullptr) {
+            TELEPHONY_LOGE("foregroundCall is nullptr!");
+            return TELEPHONY_ERR_FAIL;
+        }
+        int32_t celiaCallType = foregroundCall->GetCeliaCallType();
+        if (celiaCallType == IS_CELIA_CALL) {
             TELEPHONY_LOGI("current is celia call, no need switch on dcall device.");
             return TELEPHONY_SUCCESS;
         }
