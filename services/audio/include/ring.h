@@ -43,7 +43,7 @@ public:
     Ring();
     virtual ~Ring();
     void Init();
-    int32_t Play(int32_t slotId);
+    int32_t Play(int32_t slotId, std::string ringtonePath);
     int32_t Stop();
     void ReleaseRenderer();
     int32_t SetMute();

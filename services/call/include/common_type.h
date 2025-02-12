@@ -26,7 +26,7 @@
 
 const int16_t RINGING_CALL_NUMBER_LEN = 30;
 const int16_t DIALING_CALL_NUMBER_LEN = 30;
-const int16_t FILE_PATH_MAX_LEN = 60;
+const int16_t FILE_PATH_MAX_LEN = 256;
 const int16_t CALL_START_ID = 0;
 const int16_t MIN_MULITY_CALL_COUNT = 2;
 const int16_t QUERY_CONTACT_LEN = 7;

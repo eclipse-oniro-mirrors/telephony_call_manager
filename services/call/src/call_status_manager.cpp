@@ -621,6 +621,7 @@ void CallStatusManager::QueryCallerInfo(ContactInfo &contactInfo, std::string ph
     predicates.EqualTo(IS_DELETED, 0);
     predicates.And();
 #ifdef TELEPHONY_CUST_SUPPORT
+    TELEPHONY_LOGI("telephony cust support.");
     if (phoneNum.length() >= static_cast<size_t>(QUERY_CONTACT_LEN)) {
         TELEPHONY_LOGI("phoneNum is longer than 7");
         predicates.EndsWith(DETAIL_INFO, phoneNum.substr(phoneNum.length() - QUERY_CONTACT_LEN));
