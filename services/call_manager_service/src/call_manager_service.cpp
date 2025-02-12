@@ -1630,7 +1630,7 @@ int32_t CallManagerService::SendCallUiEvent(int32_t callId, std::string &eventNa
         callPtr->SetCeliaCallType(IS_CELIA_CALL);
         TELEPHONY_LOGI("set selia call type!");
         if (DelayedSingleton<DistributedCallManager>::GetInstance()->IsDCallDeviceSwitchedOn()) {
-            DelayedSingleton<AudioDeviceManager>::GetInstance()->SwitchOffDCallDeviceSync();
+            DelayedSingleton<DistributedCallManager>::GetInstance()->SwitchOffDCallDeviceSync();
         }
     } else if (eventName == "EVENT_SPEAKER_OFF") {
         if (!DelayedSingleton<AudioProxy>::GetInstance()->SetSpeakerDevActive(false)) {
