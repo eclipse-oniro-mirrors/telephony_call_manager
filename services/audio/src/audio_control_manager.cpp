@@ -482,17 +482,7 @@ int32_t AudioControlManager::SetAudioDevice(const AudioDevice &device, bool isBy
         case AudioDeviceType::DEVICE_DISTRIBUTED_PC:
             return HandleDistributeAudioDevice(device);
         case AudioDeviceType::DEVICE_BLUETOOTH_SCO: {
-            std::string address = device.address;
-            std::shared_ptr<AudioStandard::AudioDeviceDescriptor> activeBluetoothDevice =
-                AudioStandard::AudioRoutingManager::GetInstance()->GetActiveBluetoothDevice();
-            if (address.empty() && activeBluetoothDevice != nullptr && !activeBluetoothDevice->macAddress_.empty()) {
-                address = activeBluetoothDevice->macAddress_;
-            }
-            AudioSystemManager* audioSystemManager = AudioSystemManager::GetInstance();
-            int32_t ret = audioSystemManager->SetCallDeviceActive(DeviceType::DEVICE_TYPE_BLUETOOTH_SCO,
-                true, address);
-            if (ret != 0) {
-                TELEPHONY_LOGE("SetCallDeviceActive failed");
+            if (HandleBluetoothAudioDevice(device) != TELEPHONY_SUCCESS) {
                 return CALL_ERR_AUDIO_SET_AUDIO_DEVICE_FAILED;
             }
             audioDeviceType = device.deviceType;
@@ -532,6 +522,35 @@ int32_t AudioControlManager::HandleDistributeAudioDevice(const AudioDevice &devi
         if (DelayedSingleton<DistributedCallManager>::GetInstance()->SwitchOnDCallDeviceSync(device)) {
             return TELEPHONY_SUCCESS;
         }
+        return CALL_ERR_AUDIO_SET_AUDIO_DEVICE_FAILED;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t AudioControlManager::HandleBluetoothAudioDevice(const AudioDevice &device)
+{
+    std::string address = device.address;
+    std::shared_ptr<AudioStandard::AudioDeviceDescriptor> activeBluetoothDevice =
+        AudioStandard::AudioRoutingManager::GetInstance()->GetActiveBluetoothDevice();
+    if (address.empty() && activeBluetoothDevice != nullptr && !activeBluetoothDevice->macAddress_.empty()) {
+        address = activeBluetoothDevice->macAddress_;
+    }
+    std::shared_ptr<AudioStandard::AudioDeviceDescriptor> audioDev =
+        std::make_shared<AudioStandard::AudioDeviceDescriptor>();
+    if (audioDev != nullptr) {
+        audioDev->macAddress_ = address;
+        audioDev->deviceType_ = AudioStandard::DEVICE_TYPE_BLUETOOTH_SCO;
+        audioDev->deviceRole_ = AudioStandard::OUTPUT_DEVICE;
+        audioDev->networkId_ = AudioStandard::LOCAL_NETWORK_ID;
+    }
+    std::vector<std::shared_ptr<AudioDeviceDescriptor>> remoteDevice;
+    remoteDevice.push_back(audioDev);
+    AudioSystemManager* audioSystemManager = AudioSystemManager::GetInstance();
+    sptr<AudioRendererFilter> audioRendererFilter = new(std::nothrow) AudioRendererFilter();
+    audioRendererFilter->rendererInfo.streamUsage = StreamUsage::STREAM_USAGE_VOICE_MODEM_COMMUNICATION;
+    int32_t ret = audioSystemManager->SelectOutputDevice(audioRendererFilter, remoteDevice);
+    if (ret != 0) {
+        TELEPHONY_LOGE("SelectOutputDevice failed");
         return CALL_ERR_AUDIO_SET_AUDIO_DEVICE_FAILED;
     }
     return TELEPHONY_SUCCESS;

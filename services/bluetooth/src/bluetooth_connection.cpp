@@ -24,6 +24,8 @@
 #include "bluetooth_device.h"
 
 constexpr int32_t PHONE_NUMBER_TYPE = 0x81;
+constexpr int32_t VIRTUAL_DEVICE_ADD = 0;
+constexpr int32_t VIRTUAL_DEVICE_REMOVE = 1;
 #endif
 
 namespace OHOS {
@@ -212,6 +214,40 @@ void BluetoothConnection::OnConnectionStateChanged(const Bluetooth::BluetoothRem
             DelayedSingleton<AudioDeviceManager>::GetInstance()->RemoveAudioDeviceList(
                 macAddress, AudioDeviceType::DEVICE_BLUETOOTH_SCO);
             RemoveBtDevice(macAddress);
+            break;
+        default:
+            break;
+    }
+}
+
+void BluetoothConnection::OnVirtualDeviceChanged(int32_t action, std::string address)
+{
+    TELEPHONY_LOGI("BluetoothConnection::OnVirtualDeviceChanged action : %{public}d", action);
+    Bluetooth::BluetoothRemoteDevice device(address);
+    std::string deviceName = device.GetDeviceName();
+    int state = (int32_t)Bluetooth::BTConnectState::DISCONNECTED;
+    Bluetooth::HandsFreeAudioGateway *profile = Bluetooth::HandsFreeAudioGateway::GetProfile();
+    if (profile != nullptr) {
+        profile->GetDeviceState(device, state);
+    } else {
+        TELEPHONY_LOGE("profile is nullptr");
+        return;
+    }
+    switch (action) {
+        case VIRTUAL_DEVICE_ADD:
+            DelayedSingleton<AudioDeviceManager>::GetInstance()->AddAudioDeviceList(
+                address, AudioDeviceType::DEVICE_BLUETOOTH_SCO, deviceName);
+            AddBtDevice(address, device);
+            /** try to connect sco while new bluetooth device connected
+             *  if connect sco successfully , should switch current audio device to bluetooth sco
+             */
+            break;
+        case VIRTUAL_DEVICE_REMOVE:
+            if (state != (int32_t)Bluetooth::BTConnectState::CONNECTED) {
+                DelayedSingleton<AudioDeviceManager>::GetInstance()->RemoveAudioDeviceList(
+                    address, AudioDeviceType::DEVICE_BLUETOOTH_SCO);
+                RemoveBtDevice(address);
+            }
             break;
         default:
             break;
