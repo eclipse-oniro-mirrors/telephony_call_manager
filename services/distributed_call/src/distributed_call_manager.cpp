@@ -18,6 +18,7 @@
 
 #include "distributed_call_manager.h"
 #include "audio_control_manager.h"
+#include "call_object_manager.h"
 #include "telephony_log_wrapper.h"
 #include "nlohmann/json.hpp"
 #include "i_distributed_device_callback.h"
@@ -34,6 +35,7 @@ const size_t INT32_PLAINTEXT_LENGTH = 4;
 const int32_t DCALL_SWITCH_DEVICE_TYPE_SOURCE = 0;
 const int32_t DCALL_SWITCH_DEVICE_TYPE_SINK = 1;
 const int32_t DISTRIBUTED_CALL_SOURCE_SA_ID = 9855;
+const int32_t IS_CELIA_CALL = 1;
 const std::string CALLBACK_NAME = "telephony";
 const std::string DISTRIBUTED_AUDIO_DEV_CAR = "dCar";
 const std::string DISTRIBUTED_AUDIO_DEV_PHONE = "dPhone";
@@ -196,6 +198,12 @@ int32_t DistributedCallManager::AddDCallDevice(const std::string& devId)
     onlineDCallDevices_.emplace(devId, device);
 
     if (!dCallDeviceSwitchedOn_.load() && isCallActived_.load()) {
+        sptr<CallBase> foregroundCall = CallObjectManager::GetForegroundCall();
+        int32_t isCeliaCall = foregroundCall->GetCeliaCallType()
+        if (isCeliaCall == IS_CELIA_CALL) {
+            TELEPHONY_LOGI("current is celia call, no need switch on dcall device.");
+            return TELEPHONY_SUCCESS;
+        }
         if (device.deviceType == AudioDeviceType::DEVICE_DISTRIBUTED_AUTOMOTIVE && IsSelectVirtualModem()) {
             TELEPHONY_LOGI("switch call to auto motive as it is online");
             SwitchOnDCallDeviceAsync(device);
