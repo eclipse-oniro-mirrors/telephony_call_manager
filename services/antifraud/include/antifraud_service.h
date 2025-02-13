@@ -28,7 +28,7 @@ namespace Telephony {
 const std::string ANTIFRAUD_SWITCH = "spamshield_call_live_detection";
 const std::string USER_IMPROPLAN_SWITCH = "spamshield_call_live_report";
 const std::string USER_SETTINGSDATA_URI =
-    "datashare:///com.ohos.settingsdata/entry/settingsdata/USER_SETTINGSDATA_100?Proxy=true";
+    "datashare:///com.ohos.settingsdata/entry/settingsdata/USER_SETTINGSDATA_SECURE_100?Proxy=true";
  
 enum class AntiFraudState {
     /**
