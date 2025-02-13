@@ -363,21 +363,21 @@ HWTEST_F(ZeroBranch4Test, Telephony_BluetoothCallService_003, Function | MediumT
     callAttributeInfo.callId = callId;
     CallObjectManager::AddOneVoipCallObject(callAttributeInfo);
     BluetoothCallService bluetoothCallService;
-    bluetoothCallService::GetVoipCallState(numActive, callState, number);
+    bluetoothCallService.GetVoipCallState(numActive, callState, number);
     EXPECT_EQ(numActive, 1);
-    CallObjectManager.UpdateOneVoipCallObjectByCallId(callId, TelCallState::CALL_STATUS_WAITING);
-    bluetoothCallService::GetVoipCallState(numActive, callState, number);
+    CallObjectManager::UpdateOneVoipCallObjectByCallId(callId, TelCallState::CALL_STATUS_WAITING);
+    bluetoothCallService.GetVoipCallState(numActive, callState, number);
     EXPECT_EQ(callState, (int32_t)TelCallState::CALL_STATUS_INCOMING);
-    CallObjectManager.UpdateOneVoipCallObjectByCallId(callId, TelCallState::CALL_STATUS_INCOMING);
-    bluetoothCallService::GetVoipCallState(numActive, callState, number);
+    CallObjectManager::UpdateOneVoipCallObjectByCallId(callId, TelCallState::CALL_STATUS_INCOMING);
+    bluetoothCallService.GetVoipCallState(numActive, callState, number);
     EXPECT_EQ(callState, (int32_t)TelCallState::CALL_STATUS_INCOMING);
     callState = (int32_t)TelCallState::CALL_STATUS_IDLE;
-    CallObjectManager.UpdateOneVoipCallObjectByCallId(callId, TelCallState::CALL_STATUS_ALERTING);
-    bluetoothCallService::GetVoipCallState(numActive, callState, number);
+    CallObjectManager::UpdateOneVoipCallObjectByCallId(callId, TelCallState::CALL_STATUS_ALERTING);
+    bluetoothCallService.GetVoipCallState(numActive, callState, number);
     EXPECT_EQ(callState, (int32_t)TelCallState::CALL_STATUS_ALERTING);
     numActive = 0;
-    CallObjectManager.UpdateOneVoipCallObjectByCallId(callId, TelCallState::CALL_STATUS_ACTIVE);
-    bluetoothCallService::GetVoipCallState(numActive, callState, number);
+    CallObjectManager::UpdateOneVoipCallObjectByCallId(callId, TelCallState::CALL_STATUS_ACTIVE);
+    bluetoothCallService.GetVoipCallState(numActive, callState, number);
     EXPECT_EQ(numActive, 1);
 }
 
