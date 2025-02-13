@@ -870,7 +870,7 @@ void CallStatusManager::TriggerAntiFraud(int32_t antiFraudState)
             TELEPHONY_LOGE("UpdateCallState failed, errCode:%{public}d", ret);
         }
         if (antiFraudState == static_cast<int32_t>(AntiFraudState::ANTIFRAUD_STATE_RISK)) {
-            DelaySingleton<AudioControlManager>::GetInstance()->PlayWaitingTone();
+            DelayedSingleton<AudioControlManager>::GetInstance()->PlayWaitingTone();
         }
     }
 
