@@ -2035,7 +2035,7 @@ void CallStatusManager::RefreshCallDisconnectReason(const sptr<CallBase> &call, 
             {
                 AAFwk::WantParams params = call->GetExtraParams();
                 params.SetParam("disconnectedReason",
-                    AAFwk::Integer::Box(static_cast<int32_t>(CallAnswerType::DISCONNECTED_BY_REMOTE)));
+                    AAFwk::Integer::Box(static_cast<int32_t>(CallAnswerType::CALL_DISCONNECTED_BY_REMOTE)));
                 call->SetExtraParams(params);
             }
             break;
