@@ -2033,7 +2033,7 @@ void CallStatusManager::RefreshCallDisconnectReason(const sptr<CallBase> &call, 
             }
             break;
         case static_cast<int32_t>(RilDisconnectedReason::DISCONNECTED_REASON_NORMAL):
-            params.SetParam("disconnectedReason", AAFwk::Integer::Box(reason));
+            params.SetParam("disconnectedReason", AAFwk::Integer::Box(CallAnswerType::CALL_ANSWER_DISCONNECTED_BY_REMOTE));
             call->SetExtraParams(params);
             break;
         default:
