@@ -349,6 +349,38 @@ HWTEST_F(ZeroBranch4Test, Telephony_BluetoothCallService_002, Function | MediumT
 }
 
 /**
+ * @tc.number   Telephony_BluetoothCallService_003
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch4Test, Telephony_BluetoothCallService_003, Function | MediumTest | Level3)
+{
+    int32_t callId = 10020;
+    int32_t numActive = 1;
+    int32_t callState = (int32_t)TelCallState::CALL_STATUS_IDLE;
+    std::string number = "";
+    CallAttributeInfo callAttributeInfo;
+    callAttributeInfo.callId = callId;
+    CallObjectManager::AddOneVoipCallObject(callAttributeInfo);
+    BluetoothCallService bluetoothCallService;
+    bluetoothCallService.GetVoIPCallState(numActive, callState, number);
+    EXPECT_EQ(numActive, 1);
+    CallObjectManager.UpdateOneVoipCallObjectByCallId(callId, TelCallState::CALL_STATUS_WAITING);
+    bluetoothCallService.GetVoIPCallState(numActive, callState, number);
+    EXPECT_EQ(callState, TelCallState::CALL_STATUS_INCOMING);
+    CallObjectManager.UpdateOneVoipCallObjectByCallId(callId, TelCallState::CALL_STATUS_INCOMING);
+    bluetoothCallService.GetVoIPCallState(numActive, callState, number);
+    EXPECT_EQ(callState, TelCallState::CALL_STATUS_INCOMING);
+    CallObjectManager.UpdateOneVoipCallObjectByCallId(callId, TelCallState::CALL_STATUS_ALERTING);
+    bluetoothCallService.GetVoIPCallState(numActive, callState, number);
+    EXPECT_EQ(callState, TelCallState::CALL_STATUS_ALERTING);
+    numActive = 0;
+    CallObjectManager.UpdateOneVoipCallObjectByCallId(callId, TelCallState::CALL_STATUS_ACTIVE);
+    bluetoothCallService.GetVoIPCallState(numActive, callState, number);
+    EXPECT_EQ(numActive, 1);
+}
+
+/**
  * @tc.number   Telephony_BluetoothCallStub_001
  * @tc.name     test error nullptr branch
  * @tc.desc     Function test

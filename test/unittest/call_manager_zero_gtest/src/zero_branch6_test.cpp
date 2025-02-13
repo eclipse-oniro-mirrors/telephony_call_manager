@@ -428,6 +428,18 @@ HWTEST_F(ZeroBranch5Test, Telephony_CallAbilityReportProxy_002, Function | Mediu
 }
 
 /**
+ * @tc.number   Telephony_CallAbilityReportProxy_003
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch5Test, Telephony_CallAbilityReportProxy_003, Function | MediumTest | Level3)
+{
+    CallAttributeInfo callAttributeInfo;
+    std::shared_ptr<CallAbilityReportProxy> callAbilityReportProxy = std::make_shared<CallAbilityReportProxy>();
+    EXPECT_EQ(callAbilityReportProxy->ReportMeeTimeStateInfo(callAttributeInfo), TELEPHONY_ERR_FAIL);
+}
+
+/**
  * @tc.number   Telephony_CallAbilityConnectCallback_001
  * @tc.name     test error branch
  * @tc.desc     Function test
