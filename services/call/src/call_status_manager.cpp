@@ -2024,7 +2024,6 @@ void CallStatusManager::ClearPendingState(sptr<CallBase> &call)
 
 void CallStatusManager::RefreshCallDisconnectReason(const sptr<CallBase> &call, int32_t reason)
 {
-    AAFwk::WantParams params = call->GetExtraParams();
     switch (reason) {
         case static_cast<int32_t>(RilDisconnectedReason::DISCONNECTED_REASON_ANSWERED_ELSEWHER):
             if (DelayedSingleton<DistributedCommunicationManager>::GetInstance()->IsSinkRole()) {
@@ -2033,8 +2032,12 @@ void CallStatusManager::RefreshCallDisconnectReason(const sptr<CallBase> &call, 
             }
             break;
         case static_cast<int32_t>(RilDisconnectedReason::DISCONNECTED_REASON_NORMAL):
-            params.SetParam("disconnectedReason", AAFwk::Integer::Box(CallAnswerType::CALL_ANSWER_DISCONNECTED_BY_REMOTE));
-            call->SetExtraParams(params);
+            {
+                AAFwk::WantParams params = call->GetExtraParams();
+                params.SetParam("disconnectedReason",
+                    AAFwk::Integer::Box(static_cast<int32_t>(CallAnswerType::DISCONNECTED_BY_REMOTE)));
+                call->SetExtraParams(params);
+            }
             break;
         default:
             break;

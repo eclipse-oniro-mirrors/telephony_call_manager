@@ -446,7 +446,7 @@ enum class CallAnswerType {
     /**
      * Indicates the call is diconnected by remote.
      */
-    CALL_ANSWER_DISCONNECTED_BY_REMOTE = 8,
+    DISCONNECTED_BY_REMOTE = 8,
 };
 
 /**
