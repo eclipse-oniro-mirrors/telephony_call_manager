@@ -443,6 +443,10 @@ enum class CallAnswerType {
      * Indicates the call is answered elsewhere.
      */
     CALL_ANSWERED_ELSEWHER = 7,
+    /**
+     * Indicates the call is diconnected by remote.
+     */
+    CALL_DISCONNECTED_BY_REMOTE = 8,
 };
 
 /**

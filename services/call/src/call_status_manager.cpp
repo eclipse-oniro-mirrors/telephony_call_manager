@@ -2031,6 +2031,14 @@ void CallStatusManager::RefreshCallDisconnectReason(const sptr<CallBase> &call, 
                 TELEPHONY_LOGI("call answered elsewhere");
             }
             break;
+        case static_cast<int32_t>(RilDisconnectedReason::DISCONNECTED_REASON_NORMAL):
+            {
+                AAFwk::WantParams params = call->GetExtraParams();
+                params.SetParam("disconnectedReason",
+                    AAFwk::Integer::Box(static_cast<int32_t>(CallAnswerType::CALL_DISCONNECTED_BY_REMOTE)));
+                call->SetExtraParams(params);
+            }
+            break;
         default:
             break;
     }
