@@ -59,6 +59,7 @@ namespace OHOS {
 namespace Telephony {
 constexpr int32_t INIT_INDEX = 0;
 constexpr int32_t PRESENTATION_RESTRICTED = 3;
+constexpr uint64_t DELAY_STOP_PLAY_TIME = 5000000;
 
 CallStatusManager::CallStatusManager()
 {
@@ -871,6 +872,9 @@ void CallStatusManager::TriggerAntiFraud(int32_t antiFraudState)
         }
         if (antiFraudState == static_cast<int32_t>(AntiFraudState::ANTIFRAUD_STATE_RISK)) {
             DelayedSingleton<AudioControlManager>::GetInstance()->PlayWaitingTone();
+            ffrt::submit_h([]() {
+                DelayedSingleton<AudioControlManager>::GetInstance()->StopWaitingTone();
+                }, {}, {}, ffrt::task_attr().delay(DELAY_STOP_PLAY_TIME));
         }
     }
 
