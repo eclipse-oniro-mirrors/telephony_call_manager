@@ -2024,12 +2024,17 @@ void CallStatusManager::ClearPendingState(sptr<CallBase> &call)
 
 void CallStatusManager::RefreshCallDisconnectReason(const sptr<CallBase> &call, int32_t reason)
 {
+    AAFwk::WantParams params = call->GetExtraParams();
     switch (reason) {
         case static_cast<int32_t>(RilDisconnectedReason::DISCONNECTED_REASON_ANSWERED_ELSEWHER):
             if (DelayedSingleton<DistributedCommunicationManager>::GetInstance()->IsSinkRole()) {
                 call->SetAnswerType(CallAnswerType::CALL_ANSWERED_ELSEWHER);
                 TELEPHONY_LOGI("call answered elsewhere");
             }
+            break;
+        case static_cast<int32_t>(RilDisconnectedReason::DISCONNECTED_REASON_NORMAL):
+            params.SetParam("disconnectedReason", AAFwk::Integer::Box(reason));
+            call->SetExtraParams(params);
             break;
         default:
             break;
