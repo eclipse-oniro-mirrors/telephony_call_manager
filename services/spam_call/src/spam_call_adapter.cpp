@@ -179,6 +179,7 @@ void SpamCallAdapter::ParseNeedNotifyResult(const std::string &jsonData)
             TELEPHONY_LOGE("PublishCommonEvent fail.");
         }
     }
+    cJSON_Delete(root);
 }
 
 void SpamCallAdapter::ParseDetectResult(const std::string &jsonData, bool &isBlock,
