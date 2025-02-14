@@ -109,6 +109,7 @@ private:
     bool IsWiredHeadsetDevEnable();
     bool IsDistributedAudioDeviceType(AudioDeviceType deviceType);
     bool IsSupportEarpiece();
+    void AddEarpiece();
 };
 } // namespace Telephony
 } // namespace OHOS
