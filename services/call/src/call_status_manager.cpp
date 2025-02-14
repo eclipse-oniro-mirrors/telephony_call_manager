@@ -59,7 +59,6 @@ namespace OHOS {
 namespace Telephony {
 constexpr int32_t INIT_INDEX = 0;
 constexpr int32_t PRESENTATION_RESTRICTED = 3;
-constexpr uint64_t DELAY_STOP_PLAY_TIME = 5000000;
 
 CallStatusManager::CallStatusManager()
 {
@@ -870,12 +869,6 @@ void CallStatusManager::TriggerAntiFraud(int32_t antiFraudState)
         if (ret != TELEPHONY_SUCCESS) {
             TELEPHONY_LOGE("UpdateCallState failed, errCode:%{public}d", ret);
         }
-        if (antiFraudState == static_cast<int32_t>(AntiFraudState::ANTIFRAUD_STATE_RISK)) {
-            DelayedSingleton<AudioControlManager>::GetInstance()->PlayWaitingTone();
-            ffrt::submit_h([]() {
-                DelayedSingleton<AudioControlManager>::GetInstance()->StopWaitingTone();
-                }, {}, {}, ffrt::task_attr().delay(DELAY_STOP_PLAY_TIME));
-        }
     }
 
     if (antiFraudState == static_cast<int32_t>(AntiFraudState::ANTIFRAUD_STATE_RISK)
@@ -992,7 +985,6 @@ int32_t CallStatusManager::DisconnectingHandle(const CallDetailInfo &info)
     }
     call = RefreshCallIfNecessary(call, info);
     SetOriginalCallTypeForDisconnectState(call);
-    DelayedSingleton<AudioControlManager>::GetInstance()->StopWaitingTone();
     int32_t ret = UpdateCallState(call, TelCallState::CALL_STATUS_DISCONNECTING);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("UpdateCallState failed, errCode:%{public}d", ret);
