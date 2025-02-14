@@ -871,8 +871,8 @@ void CallStatusManager::TriggerAntiFraud(int32_t antiFraudState)
         }
     }
 
-    if (antiFraudState == static_cast<int32_t>(AntiFraudState::ANTIFRAUD_STATE_RISK)
-        || antiFraudState == static_cast<int32_t>(AntiFraudState::ANTIFRAUD_STATE_FINISHED)) {
+    if (antiFraudState == static_cast<int32_t>(AntiFraudState::ANTIFRAUD_STATE_RISK) ||
+        antiFraudState == static_cast<int32_t>(AntiFraudState::ANTIFRAUD_STATE_FINISHED)) {
         antiFraudSlotId_ = -1;
         antiFraudIndex_ = -1;
     }
