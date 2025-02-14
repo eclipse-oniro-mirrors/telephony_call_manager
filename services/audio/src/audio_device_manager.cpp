@@ -84,7 +84,6 @@ void AudioDeviceManager::Init()
 
 bool AudioDeviceManager::IsSupportEarpiece()
 {
-    isUpdateEarpieceDevice_ = true;
     std::vector<std::shared_ptr<AudioDeviceDescriptor>> audioDeviceList =
         AudioStandard::AudioRoutingManager::GetInstance()->GetAvailableDevices(AudioDeviceUsage::CALL_OUTPUT_DEVICES);
     for (auto& audioDevice : audioDeviceList) {
@@ -99,8 +98,10 @@ bool AudioDeviceManager::IsSupportEarpiece()
 void AudioDeviceManager::UpdateEarpieceDevice()
 {
     if (isUpdateEarpieceDevice_ || IsSupportEarpiece()) {
+        isUpdateEarpieceDevice_ = true;
         return;
     }
+    isUpdateEarpieceDevice_ = true;
     std::lock_guard<std::mutex> lock(infoMutex_);
     std::vector<AudioDevice>::iterator it = info_.audioDeviceList.begin();
     while (it != info_.audioDeviceList.end()) {
@@ -229,12 +230,7 @@ void AudioDeviceManager::RemoveAudioDeviceList(const std::string &address, Audio
         SetDeviceAvailable(deviceType, false);
     }
     if (needAddEarpiece && deviceType == AudioDeviceType::DEVICE_WIRED_HEADSET && !wiredHeadsetExist) {
-        AudioDevice audioDevice = {
-            .deviceType = AudioDeviceType::DEVICE_EARPIECE,
-            .address = { 0 },
-        };
-        info_.audioDeviceList.push_back(audioDevice);
-        TELEPHONY_LOGI("add Earpiece device success");
+        AddEarpiece();
     }
     sptr<CallBase> liveCall = CallObjectManager::GetAudioLiveCall();
     if (liveCall != nullptr && (liveCall->GetVideoStateType() == VideoStateType::TYPE_VIDEO ||
@@ -243,6 +239,20 @@ void AudioDeviceManager::RemoveAudioDeviceList(const std::string &address, Audio
     }
     ReportAudioDeviceInfo();
     TELEPHONY_LOGI("RemoveAudioDeviceList success");
+}
+
+void AudioDeviceManager::AddEarpiece()
+{
+    if (!IsSupportEarpiece()) {
+        TELEPHONY_LOGI("not support Earpiece device");
+        return;
+    }
+    AudioDevice audioDevice = {
+        .deviceType = AudioDeviceType::DEVICE_EARPIECE,
+        .address = { 0 },
+    };
+    info_.audioDeviceList.push_back(audioDevice);
+    TELEPHONY_LOGI("add Earpiece device success");
 }
 
 void AudioDeviceManager::ResetBtAudioDevicesList()
