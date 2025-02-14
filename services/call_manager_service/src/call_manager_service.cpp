@@ -42,7 +42,6 @@
 #include "string_wrapper.h"
 #include "call_wired_headset.h"
 #include "bluetooth_call_connection.h"
-#include "audio_control_manager.h"
 
 #ifdef OHOS_BUILD_ENABLE_TELEPHONY_CUST
 #include "telephony_cust_wrapper.h"
@@ -1670,8 +1669,6 @@ int32_t CallManagerService::SendCallUiEvent(int32_t callId, std::string &eventNa
             return TELEPHONY_SUCCESS;
         }
         return TELEPHONY_ERR_FAIL;
-    } else if (eventName == "EVENT_FRAUD_WARNING_END") {
-        DelayedSingleton<AudioControlManager>::GetInstance()->StopWaitingTone();
     }
     return TELEPHONY_SUCCESS;
 }
