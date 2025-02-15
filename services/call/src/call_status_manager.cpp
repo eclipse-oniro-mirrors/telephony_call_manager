@@ -796,7 +796,7 @@ int32_t CallStatusManager::ActiveHandle(const CallDetailInfo &info)
 #endif
     TELEPHONY_LOGI("handle active state success");
 
-    bool isAntiFraudSupport = OHOS::system::GetBoolParameter(ANTIFRAUD_FEATURE, false);
+    bool isAntiFraudSupport = OHOS::system::GetBoolParameter(ANTIFRAUD_FEATURE, true);
     if (isAntiFraudSupport) {
         SetupAntiFraudService(call, info);
     }
@@ -870,6 +870,12 @@ void CallStatusManager::TriggerAntiFraud(int32_t antiFraudState)
         if (ret != TELEPHONY_SUCCESS) {
             TELEPHONY_LOGE("UpdateCallState failed, errCode:%{public}d", ret);
         }
+    }
+
+    if (antiFraudState == static_cast<int32_t>(AntiFraudState::ANTIFRAUD_STATE_RISK) ||
+        antiFraudState == static_cast<int32_t>(AntiFraudState::ANTIFRAUD_STATE_FINISHED)) {
+        antiFraudSlotId_ = -1;
+        antiFraudIndex_ = -1;
     }
 }
 
