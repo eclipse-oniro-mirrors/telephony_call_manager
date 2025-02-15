@@ -209,8 +209,8 @@ bool CallRequestProcess::HasActiveCall()
 bool CallRequestProcess::NeedAnswerVTAndEndActiveVO(int32_t callId, int32_t videoState)
 {
     TELEPHONY_LOGI("Enter NeedAnswerVTAndEndActiveVO");
-    sptr<CallBase> activeCall = GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_ACTIVE);
-    sptr<CallBase> holdingCall = GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_HOLD);
+    sptr<CallBase> activeCall = GetOneCarrierCallObject(CallRunningState::CALL_RUNNING_STATE_ACTIVE);
+    sptr<CallBase> holdingCall = GetOneCarrierCallObject(CallRunningState::CALL_RUNNING_STATE_HOLD);
     // if this call is existed foreground or backgroud call, don't hang up it.
     if ((activeCall != nullptr && activeCall->GetCallID() == callId) ||
         (holdingCall != nullptr && holdingCall->GetCallID() == callId)) {
@@ -231,8 +231,8 @@ bool CallRequestProcess::NeedAnswerVOAndEndActiveVT(int32_t callId, int32_t vide
         return false;
     }
     if (HasActiveCall()) {
-        sptr<CallBase> activeCall = GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_ACTIVE);
-        sptr<CallBase> holdingCall = GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_HOLD);
+        sptr<CallBase> activeCall = GetOneCarrierCallObject(CallRunningState::CALL_RUNNING_STATE_ACTIVE);
+        sptr<CallBase> holdingCall = GetOneCarrierCallObject(CallRunningState::CALL_RUNNING_STATE_HOLD);
         if ((activeCall != nullptr && activeCall->GetVideoStateType() != VideoStateType::TYPE_VOICE &&
                 activeCall->GetCallID() != callId) ||
             (holdingCall != nullptr && holdingCall->GetVideoStateType() != VideoStateType::TYPE_VOICE &&
