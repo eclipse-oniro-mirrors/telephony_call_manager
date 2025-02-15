@@ -533,6 +533,12 @@ void CallBase::SetCeliaCallType(int32_t celiaCallType)
     celiaCallType_ = celiaCallType;
 }
 
+int32_t CallBase::GetCeliaCallType()
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    return celiaCallType_;
+}
+
 bool CallBase::CheckVoicemailNumber(std::string phoneNumber)
 {
     return false;
