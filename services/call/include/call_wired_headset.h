@@ -45,7 +45,7 @@ private:
     time_t GetCurrentTimeMS();
 private:
     bool isProcessed_;
-    uint64_t downFirstTime_;
+    time_t downFirstTime_;
     int32_t subscribeIdForPressedUp_;
     int32_t subscribeIdForPressedDown_;
 };

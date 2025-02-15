@@ -155,6 +155,7 @@ int32_t CallStatusManager::HandleCallReportInfo(const CallDetailInfo &info)
         case TelCallState::CALL_STATUS_DISCONNECTED:
         case TelCallState::CALL_STATUS_DISCONNECTING:
             ret = HandleCallReportInfoEx(info);
+            break;
         default:
             TELEPHONY_LOGE("Invalid call state!");
             break;
