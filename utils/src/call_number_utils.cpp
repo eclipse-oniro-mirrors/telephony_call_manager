@@ -313,7 +313,7 @@ void CallNumberUtils::NumberLocationUpdate(const sptr<CallBase> &callObjectPtr)
         call = CallObjectManager::GetOneCallObject(info.callId);
         if (call == nullptr) {
             TELEPHONY_LOGE("call is nullptr");
-            return;
+            call = callObjectPtr;
         }
     }
     call->SetNumberLocation(numberLocation);
