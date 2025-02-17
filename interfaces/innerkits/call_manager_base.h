@@ -69,6 +69,10 @@ constexpr int16_t VOIP_CALL_MINIMUM = 10000;
  */
 constexpr int16_t INVALID_CALLID = 0;
 /**
+ * @brief Indicates the call id is illegal.
+ */
+constexpr int16_t ILLEGAL_CALLID = -1;
+/**
  * @brief Indicates one second duration.
  */
 constexpr int16_t WAIT_TIME_ONE_SECOND = 1;
