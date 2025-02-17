@@ -1469,6 +1469,19 @@ int32_t CallManagerService::RequestCameraCapabilities(int32_t callId)
     }
 }
 
+int32_t CallManagerService::dealCeliaCallEvent(int32_t callId)
+{
+    sptr<CallBase> callPtr = CallObjectManager::GetOneCallObject(callId);
+    if (callPtr == nullptr) {
+        TELEPHONY_LOGI("the call object is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    callPtr->SetCeliaCallType(IS_CELIA_CALL);
+    TELEPHONY_LOGI("set selia call type!");
+    DelayedSingleton<DistributedCallManager>::GetInstance()->SwitchOffDCallDeviceSync();
+    return TELEPHONY_SUCCESS;
+}
+
 int32_t CallManagerService::SendCallUiEvent(int32_t callId, std::string &eventName)
 {
     if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_SET_TELEPHONY_STATE)) {
@@ -1476,13 +1489,7 @@ int32_t CallManagerService::SendCallUiEvent(int32_t callId, std::string &eventNa
         return TELEPHONY_ERR_PERMISSION_ERR;
     }
     if (eventName == "EVENT_IS_CELIA_CALL") {
-        sptr<CallBase> callPtr = CallObjectManager::GetOneCallObject(callId);
-        if (callPtr == nullptr) {
-            TELEPHONY_LOGI("the call object is nullptr!");
-            return TELEPHONY_ERR_LOCAL_PTR_NULL;
-        }
-        callPtr->SetCeliaCallType(IS_CELIA_CALL);
-        TELEPHONY_LOGI("set celia call type!");
+        return dealCeliaCallEvent(callId);
     }
     return TELEPHONY_SUCCESS;
 }
