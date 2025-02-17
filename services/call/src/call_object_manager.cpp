@@ -152,13 +152,7 @@ int32_t CallObjectManager::UpdateOneVoipCallObjectByCallId(int32_t callId, TelCa
     std::lock_guard<std::mutex> lock(listMutex_);
     std::map<int32_t, CallAttributeInfo>::iterator it = voipCallObjectList_.find(callId);
     if (it != voipCallObjectList_.end()) {
-        voipCallObjectList_[callId].callState = nextCallState;
-        std::map<int32_t, CallAttributeInfo>::iterator firstIndex = voipCallObjectList_.begin();
-        for (firstIndex; firstIndex != voipCallObjectList_.end(); ++firstIndex) {
-            if (firstIndex != it) {
-                voipCallObjectList_.erase(firstIndex);
-            }
-        }
+        it->second.callState = nextCallState;
         return TELEPHONY_SUCCESS;
     }
     TELEPHONY_LOGI("UpdateOneVoipCallObjectByCallId failed!");
