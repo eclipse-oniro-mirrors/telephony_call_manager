@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023-2024 Huawei Device Co., Ltd.
+ * Copyright (C) 2023-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -198,16 +198,6 @@ int32_t DistributedCallManager::AddDCallDevice(const std::string& devId)
     onlineDCallDevices_.emplace(devId, device);
 
     if (!dCallDeviceSwitchedOn_.load() && isCallActived_.load()) {
-        sptr<CallBase> foregroundCall = CallObjectManager::GetForegroundCall(false);
-        if (foregroundCall == nullptr) {
-            TELEPHONY_LOGE("foregroundCall is nullptr!");
-            return TELEPHONY_ERR_FAIL;
-        }
-        int32_t celiaCallType = foregroundCall->GetCeliaCallType();
-        if (celiaCallType == IS_CELIA_CALL) {
-            TELEPHONY_LOGI("current is celia call, no need switch on dcall device.");
-            return TELEPHONY_SUCCESS;
-        }
         if (device.deviceType == AudioDeviceType::DEVICE_DISTRIBUTED_AUTOMOTIVE && IsSelectVirtualModem()) {
             TELEPHONY_LOGI("switch call to auto motive as it is online");
             SwitchOnDCallDeviceAsync(device);
@@ -381,7 +371,7 @@ bool DistributedCallManager::isCeliaCall()
 
 void DistributedCallManager::SwitchOnDCallDeviceAsync(const AudioDevice& device)
 {
-    if (isCeliaCall) {
+    if (isCeliaCall()) {
         return;
     }
     auto weak = weak_from_this();
@@ -390,7 +380,7 @@ void DistributedCallManager::SwitchOnDCallDeviceAsync(const AudioDevice& device)
         auto strong = weak.lock();
         if (strong) {
             strong->SwitchOnDCallDeviceSync(device);
-            if (isCeliaCall) {
+            if (strong->isCeliaCall()) {
                 strong->SwitchOffDCallDeviceSync();
                 strong->ReportDistributedDeviceInfoForSwitchOff();
             }
@@ -488,7 +478,7 @@ void DistributedCallManager::ReportDistributedDeviceInfoForSwitchOff()
         return;
     }
     std::vector<std::shared_ptr<AudioDeviceDescriptor>> descs = audioSystemMananger
-        ->GetDevices(DeviceFlag::DISTRIBUTED_OUTPUT_DEVICES_FLAG);
+        ->GetDevices(DeviceFlag::OUTPUT_DEVICES_FLAG);
     size_t size = descs.size();
     if (descs.size() <= 0) {
         TELEPHONY_LOGW("no distributed device");
@@ -497,7 +487,7 @@ void DistributedCallManager::ReportDistributedDeviceInfoForSwitchOff()
     std::vector<std::shared_ptr<AudioDeviceDescriptor>> remoteDevice = descs;
     for (auto device = descs.begin(); device != descs.end(); device++) {
         if ((*device)->deviceType_ == DeviceType::DEVICE_TYPE_SPEAKER) {
-            TELEPHONY_LOGI("curDecId is the same as devId");
+            TELEPHONY_LOGI("curDecType is speaker");
             remoteDevice.clear();
             remoteDevice.push_back(*device);
             break;
