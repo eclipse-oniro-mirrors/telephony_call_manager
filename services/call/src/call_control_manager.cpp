@@ -1408,6 +1408,11 @@ int32_t CallControlManager::SetVoIPCallInfo(int32_t callId, int32_t state, std::
         TELEPHONY_LOGE("SetVoIPCallState is not support");
         return TELEPHONY_ERROR;
     }
+    if (callId == ILLEGAL_CALLID) {
+        TELEPHONY_LOGE("The calling is dead and need the call list cleared");
+        ClearVoipList();
+        return TELEPHONY_ERROR;
+    }
     int32_t numActive = GetCallNum(TelCallState::CALL_STATUS_ACTIVE, true);
     int32_t numHeld = GetCallNum(TelCallState::CALL_STATUS_HOLDING, true);
     switch (state) {
