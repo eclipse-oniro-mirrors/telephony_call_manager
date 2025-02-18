@@ -58,6 +58,7 @@ public:
     void GetConnectedDCallDevice(AudioDevice& device);
     bool IsSelectVirtualModem();
     void ReportDistributedDeviceInfo(const AudioDevice& device);
+    void ReportDistributedDeviceInfoForSwitchOff();
 
     std::string GetConnectedDCallDeviceId();
 private:
@@ -73,7 +74,7 @@ private:
     bool CreateDAudioDevice(const std::string& devId, AudioDevice& device);
     std::string GetDevIdFromAudioDevice(const AudioDevice& device);
     void NotifyOnlineDCallDevices(std::vector<std::string> devices);
-
+    bool isCeliaCall()
     void SetConnectedDCallDevice(const AudioDevice& device);
 
 private:
