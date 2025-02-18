@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023-2024 Huawei Device Co., Ltd.
+ * Copyright (C) 2023-2025 Huawei Device Co., Ltd.
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -198,16 +198,6 @@ int32_t DistributedCallManager::AddDCallDevice(const std::string& devId)
     onlineDCallDevices_.emplace(devId, device);
 
     if (!dCallDeviceSwitchedOn_.load() && isCallActived_.load()) {
-        sptr<CallBase> foregroundCall = CallObjectManager::GetForegroundCall(false);
-        if (foregroundCall == nullptr) {
-            TELEPHONY_LOGE("foregroundCall is nullptr!");
-            return TELEPHONY_ERR_FAIL;
-        }
-        int32_t celiaCallType = foregroundCall->GetCeliaCallType();
-        if (celiaCallType == IS_CELIA_CALL) {
-            TELEPHONY_LOGI("current is celia call, no need switch on dcall device.");
-            return TELEPHONY_SUCCESS;
-        }
         if (device.deviceType == AudioDeviceType::DEVICE_DISTRIBUTED_AUTOMOTIVE && IsSelectVirtualModem()) {
             TELEPHONY_LOGI("switch call to auto motive as it is online");
             SwitchOnDCallDeviceAsync(device);
@@ -364,14 +354,36 @@ bool DistributedCallManager::IsDistributedCarDeviceOnline()
     return false;
 }
 
+bool DistributedCallManager::isCeliaCall()
+{
+    sptr<CallBase> foregroundCall = CallObjectManager::GetForegroundCall(false);
+    if (foregroundCall == nullptr) {
+        TELEPHONY_LOGE("foregroundCall is nullptr!");
+        return false;
+    }
+    int32_t celiaCallType = foregroundCall->GetCeliaCallType();
+    if (celiaCallType == IS_CELIA_CALL) {
+        TELEPHONY_LOGI("current is celia call, no need switch on dcall device.");
+        return true;
+    }
+    return false;
+}
+
 void DistributedCallManager::SwitchOnDCallDeviceAsync(const AudioDevice& device)
 {
+    if (isCeliaCall()) {
+        return;
+    }
     auto weak = weak_from_this();
     TELEPHONY_LOGI("switch dcall device on async");
     std::thread switchThread = std::thread([weak, device]() {
         auto strong = weak.lock();
         if (strong) {
             strong->SwitchOnDCallDeviceSync(device);
+            if (strong->isCeliaCall()) {
+                strong->SwitchOffDCallDeviceSync();
+                strong->ReportDistributedDeviceInfoForSwitchOff();
+            }
         }
     });
     pthread_setname_np(switchThread.native_handle(), SWITCH_ON_DCALL_THREAD_NAME.c_str());
@@ -455,6 +467,37 @@ void DistributedCallManager::ReportDistributedDeviceInfo(const AudioDevice& devi
     audioRendererFilter->rendererInfo.streamUsage = StreamUsage::STREAM_USAGE_VOICE_MODEM_COMMUNICATION;
     audioSystemMananger->SelectOutputDevice(audioRendererFilter, remoteDevice);
     TELEPHONY_LOGW("ReportDistributedDeviceInfo");
+}
+
+void DistributedCallManager::ReportDistributedDeviceInfoForSwitchOff()
+{
+    TELEPHONY_LOGI("ReportDistributedDeviceInfoForSwitchOff start.");
+    AudioSystemManager *audioSystemMananger = AudioSystemManager::GetInstance();
+    if (audioSystemMananger == nullptr) {
+        TELEPHONY_LOGW("audioSystemMananger nullptr");
+        return;
+    }
+    std::vector<std::shared_ptr<AudioDeviceDescriptor>> descs = audioSystemMananger
+        ->GetDevices(DeviceFlag::OUTPUT_DEVICES_FLAG);
+    size_t size = descs.size();
+    if (descs.size() <= 0) {
+        TELEPHONY_LOGW("no distributed device");
+        return;
+    }
+    std::vector<std::shared_ptr<AudioDeviceDescriptor>> remoteDevice = descs;
+    for (auto device = descs.begin(); device != descs.end(); device++) {
+        if ((*device)->deviceType_ == DeviceType::DEVICE_TYPE_SPEAKER) {
+            TELEPHONY_LOGI("curDecType is speaker");
+            remoteDevice.clear();
+            remoteDevice.push_back(*device);
+            break;
+        }
+    }
+    sptr<AudioRendererFilter> audioRendererFilter = new(std::nothrow) AudioRendererFilter();
+    audioRendererFilter->rendererInfo.contentType = ContentType::CONTENT_TYPE_SPEECH;
+    audioRendererFilter->rendererInfo.streamUsage = StreamUsage::STREAM_USAGE_VOICE_MODEM_COMMUNICATION;
+    audioSystemMananger->SelectOutputDevice(audioRendererFilter, remoteDevice);
+    TELEPHONY_LOGI("ReportDistributedDeviceInfoForSwitchOff end.");
 }
 
 bool DistributedCallManager::IsDCallDeviceSwitchedOn()
