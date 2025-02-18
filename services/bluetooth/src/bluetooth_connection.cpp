@@ -286,6 +286,7 @@ void SystemAbilityListener::OnRemoveSystemAbility(int32_t systemAbilityId, const
     audioDeviceManager->ResetBtAudioDevicesList();
     AudioDeviceType currentDeviceType = audioDeviceManager->GetCurrentAudioDevice();
     if (currentDeviceType == AudioDeviceType::DEVICE_BLUETOOTH_SCO) {
+        TELEPHONY_LOGI("BlueTooth SA removed, init audio device");
         audioDeviceManager->ProcessEvent(AudioEvent::INIT_AUDIO_DEVICE);
     }
 }
