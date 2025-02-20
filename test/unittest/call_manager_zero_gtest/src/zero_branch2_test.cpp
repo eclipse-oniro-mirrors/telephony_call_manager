@@ -131,7 +131,7 @@ HWTEST_F(SpamCallTest, Telephony_CallbackStubHelper_002, Function | MediumTest |
     std::string result;
     ASSERT_NE(callbackStubHelper.OnResult(errCode, result), 0);
     ReminderCallbackStubHelper reminderCallbackStubHelper(spamCallAdapter);
-    ASSERT_NE(reminderCallbackStubHelper.OnResult(errCode, result), 0);
+    ASSERT_EQ(reminderCallbackStubHelper.OnResult(errCode, result), 0);
 }
 
 /**

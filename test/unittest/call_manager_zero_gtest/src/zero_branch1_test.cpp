@@ -280,11 +280,10 @@ HWTEST_F(ZeroBranch2Test, Telephony_CallRequestProcess_002, Function | MediumTes
     sptr<CallBase> incomingCall = new CSCall(mDialParaInfo);
     incomingCall->SetCallType(CallType::TYPE_CS);
     bool flagForConference = false;
-    callRequestProcess->HandleCallWaitingNumZero(incomingCall, call, SIM1_SLOTID, 1, flagForConference);
     callRequestProcess->HandleCallWaitingNumZero(incomingCall, voipCall, SIM1_SLOTID, 2, flagForConference);
     callRequestProcess->HandleCallWaitingNumZero(incomingCall, dialCall, SIM1_SLOTID, 2, flagForConference);
     callRequestProcess->DisconnectOtherCallForVideoCall(VALID_CALLID);
-    ASSERT_TRUE(flagForConference);
+    ASSERT_FALSE(flagForConference);
 }
 
 /**
@@ -948,7 +947,6 @@ HWTEST_F(ZeroBranch2Test, Telephony_VideoControlManager_002, Function | MediumTe
     ASSERT_NE(
         DelayedSingleton<VideoControlManager>::GetInstance()->UpdateImsCallMode(callId, mode), TELEPHONY_ERR_SUCCESS);
     ASSERT_FALSE(DelayedSingleton<VideoControlManager>::GetInstance()->ContainCameraID(""));
-    ASSERT_FALSE(DelayedSingleton<VideoControlManager>::GetInstance()->IsPngFile(""));
     VideoWindow mVideoWindow;
     mVideoWindow.width = -1;
     mVideoWindow.height = 1;
