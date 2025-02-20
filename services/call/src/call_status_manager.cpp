@@ -856,6 +856,12 @@ void CallStatusManager::TriggerAntiFraud(int32_t antiFraudState)
             break;
         }
     }
+    if (antiFraudState == static_cast<int32_t>(AntiFraudState::ANTIFRAUD_STATE_RISK) ||
+        antiFraudState == static_cast<int32_t>(AntiFraudState::ANTIFRAUD_STATE_FINISHED)) {
+        antiFraudSlotId_ = -1;
+        antiFraudIndex_ = -1;
+        TELEPHONY_LOGI("can begin a new antifraud");
+    }
 
     if (call == nullptr) {
         return;
@@ -871,12 +877,6 @@ void CallStatusManager::TriggerAntiFraud(int32_t antiFraudState)
         if (ret != TELEPHONY_SUCCESS) {
             TELEPHONY_LOGE("UpdateCallState failed, errCode:%{public}d", ret);
         }
-    }
-
-    if (antiFraudState == static_cast<int32_t>(AntiFraudState::ANTIFRAUD_STATE_RISK) ||
-        antiFraudState == static_cast<int32_t>(AntiFraudState::ANTIFRAUD_STATE_FINISHED)) {
-        antiFraudSlotId_ = -1;
-        antiFraudIndex_ = -1;
     }
 }
 
