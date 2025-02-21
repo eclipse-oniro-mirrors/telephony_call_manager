@@ -486,8 +486,8 @@ void DistributedCallManager::ReportDistributedDeviceInfoForSwitchOff()
     }
     std::vector<std::shared_ptr<AudioDeviceDescriptor>> remoteDevice = descs;
     for (auto device = descs.begin(); device != descs.end(); device++) {
-        if ((*device)->deviceType_ == DeviceType::DEVICE_TYPE_SPEAKER) {
-            TELEPHONY_LOGI("curDecType is speaker");
+        if ((*device)->deviceType_ == DeviceType::DEVICE_TYPE_EARPIECE) {
+            TELEPHONY_LOGI("curDecType is speaker.");
             remoteDevice.clear();
             remoteDevice.push_back(*device);
             break;
