@@ -261,6 +261,11 @@ int32_t CallPolicy::RejectCallPolicy(int32_t callId)
 {
     if (!IsCallExist(callId)) {
         TELEPHONY_LOGE("callId is invalid, callId:%{public}d", callId);
+        if (callId >= VOIP_CALL_MINIMUM && IsVoipCallExist()) {
+            ELEPHONY_LOGI("Need reject meetime call, callId:%{public}d", callId);
+            sendEventToVoip(CallAbilityEventId::EVENT_HANGUP_VOIP_CALL);
+            DeleteOneVoipCallObject(callId);
+        }
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
     TelCallState state = GetCallState(callId);
@@ -303,6 +308,11 @@ int32_t CallPolicy::HangUpPolicy(int32_t callId)
 {
     if (!IsCallExist(callId)) {
         TELEPHONY_LOGE("callId is invalid, callId:%{public}d", callId);
+        if (callId >= VOIP_CALL_MINIMUM && IsVoipCallExist()) {
+            ELEPHONY_LOGI("Need hangUp meetime call, callId:%{public}d", callId);
+            sendEventToVoip(CallAbilityEventId::EVENT_HANGUP_VOIP_CALL);
+            DeleteOneVoipCallObject(callId);
+        }
         return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
     TelCallState state = GetCallState(callId);
@@ -312,6 +322,14 @@ int32_t CallPolicy::HangUpPolicy(int32_t callId)
         return CALL_ERR_ILLEGAL_CALL_OPERATION;
     }
     return TELEPHONY_SUCCESS;
+}
+
+void CallPolicy::sendEventToVoip(CallAbilityEventId eventId)
+{
+    CallEventInfo eventInfo;
+    (void)memset_s(&eventInfo, sizeof(CallEventInfo), 0, sizeof(CallEventInfo));
+    eventInfo.eventId = eventId;
+    DelayedSingleton<CallControlManager>::GetInstance()->NotifyCallEventUpdated(eventInfo);
 }
 
 int32_t CallPolicy::SwitchCallPolicy(int32_t callId)
