@@ -76,7 +76,6 @@ public:
 
 private:
     bool IsCtSimCardSwitchToChnOrMc(int32_t slotId);
-    void sendEventToVoip(CallAbilityEventId eventId);
 
 private:
     uint16_t onlyTwoCall_ = 2;
