@@ -183,7 +183,8 @@ void BluetoothCallConnection::HfpDisConnectedEndBtCall()
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("UpdateCallReportInfo failed! errCode:%{public}d", ret);
     } else {
-        TELEPHONY_LOGW("UpdateCallReportInfo success! state:%{public}d, index:%{public}d", info.state, info.index);
+        TELEPHONY_LOGW("UpdateCallReportInfo success! state:%{public}d, index:%{public}d",
+            detailInfo.state, detailInfo.index);
     }
 }
 } // namespace Telephony

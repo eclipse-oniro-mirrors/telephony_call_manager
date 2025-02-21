@@ -1042,7 +1042,7 @@ int32_t CallRequestProcess::BluetoothDialProcess(DialParaInfo &info)
         TELEPHONY_LOGW("BluetoothCall Dial has Call Exist.");
         return CALL_ERR_CALL_COUNTS_EXCEED_LIMIT;
     }
-     if (DelayedSingleton<BluetoothCallConnection>::GetInstance()->HasBtCallDialing()) {
+    if (DelayedSingleton<BluetoothCallConnection>::GetInstance()->HasBtCallDialing()) {
         TELEPHONY_LOGW("BluetoothCall Dial has Call Exist.");
         return CALL_ERR_CALL_COUNTS_EXCEED_LIMIT;
     }
