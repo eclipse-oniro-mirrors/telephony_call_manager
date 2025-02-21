@@ -26,6 +26,7 @@
 #include "call_superprivacy_control_manager.h"
 #include "call_manager_base.h"
 #include "distributed_communication_manager.h"
+#include "cellular_call_connection.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -200,13 +201,18 @@ int32_t CallPolicy::IsValidCallType(CallType callType)
 int32_t CallPolicy::CanDialMulityCall(AppExecFwk::PacMap &extras, bool isEcc)
 {
     VideoStateType videoState = (VideoStateType)extras.GetIntValue("videoState");
-    if (videoState == VideoStateType::TYPE_VIDEO && HasCellularCallExist()) {
-        TELEPHONY_LOGE("can not dial video call when any call exist!");
-        return CALL_ERR_DIAL_IS_BUSY;
-    }
-    if (!isEcc && videoState == VideoStateType::TYPE_VOICE && HasVideoCall()) {
-        TELEPHONY_LOGE("can not dial video call when any call exist!");
-        return CALL_ERR_DIAL_IS_BUSY;
+    int32_t slotId = extras.GetIntValue("accountId");
+    bool enabled = false;
+    DelayedSingleton<CellularCallConnection>::GetInstance()->GetVideoCallWaiting(slotId, enabled);
+    if (!enabled) {
+        if (videoState == VideoStateType::TYPE_VIDEO && HasCellularCallExist()) {
+            TELEPHONY_LOGE("can not dial video call when any call exist!");
+            return CALL_ERR_DIAL_IS_BUSY;
+        }
+        if (!isEcc && videoState == VideoStateType::TYPE_VOICE && HasVideoCall()) {
+            TELEPHONY_LOGE("can not dial video call when any call exist!");
+            return CALL_ERR_DIAL_IS_BUSY;
+        }
     }
     if (DelayedSingleton<DistributedCommunicationManager>::GetInstance()->IsConnected() &&
         DelayedSingleton<DistributedCommunicationManager>::GetInstance()->IsSinkRole() &&

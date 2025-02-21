@@ -60,6 +60,7 @@ enum class CellularCallInterfaceCode {
     GET_CALL_RESTRICTION,
     CLOSE_UNFINISHED_USSD,
     SET_CALL_RESTRICTION_PWD,
+    GET_VIDEO_CALL_WAITING,
 
     /****************** config ******************/
     SET_DOMAIN_PREFERENCE_MODE = 300,

@@ -234,6 +234,16 @@ public:
     int GetCallWaiting(int32_t slotId);
 
     /**
+     * GetVideoCallWaiting
+     *
+     * @brief Gets whether the call waiting service of the current account is enabled
+     * @param slotId[in], The slot id
+     * @param enabled
+     * @return Returns 0 on success, others on failure.
+     */
+    int GetVideoCallWaiting(int32_t slotId, bool &enabled);
+
+    /**
      * SetCallRestriction
      *
      * @brief Set the call restriction function for the current account
