@@ -1623,7 +1623,11 @@ int32_t CallManagerService::dealCeliaCallEvent(int32_t callId)
     }
     callPtr->SetCeliaCallType(IS_CELIA_CALL);
     TELEPHONY_LOGI("set selia call type!");
-    DelayedSingleton<DistributedCallManager>::GetInstance()->SwitchOffDCallDeviceSync();
+    if (DelayedSingleton<DistributedCallManager>::GetInstance()->IsDCallDeviceSwitchedOn()) {
+        TELEPHONY_LOGI("switch device to local.");
+        DelayedSingleton<DistributedCallManager>::GetInstance()->SwitchOffDCallDeviceSync();
+        DelayedSingleton<DistributedCallManager>::GetInstance()->ReportDistributedDeviceInfoForSwitchOff();
+    }
     return TELEPHONY_SUCCESS;
 }
 
