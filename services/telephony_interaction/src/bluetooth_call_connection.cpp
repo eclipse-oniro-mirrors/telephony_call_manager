@@ -152,23 +152,13 @@ bool BluetoothCallConnection::GetBtCallScoConnected()
     return isBtCallScoConnected_;
 }
 
-void BluetoothCallConnection::SetBtCallDialing(bool isHasBtCallDial)
-{
-    isHasBtCallDial_ = isHasBtCallDial;
-}
-
-bool BluetoothCallConnection::HasBtCallDialing()
-{
-    return isHasBtCallDial_;
-}
-
 void BluetoothCallConnection::HfpDisConnectedEndBtCall()
 {
     sptr<CallBase> call = CallObjectManager::GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_DIALING);
     if (call == nullptr || call->GetCallType() != CallType::TYPE_BLUETOOTH) {
         return;
     }
-    TELEPHONY_LOGW("When Watch Bluetooth dialing Hfp is disconnected.");
+    TELEPHONY_LOGW("When BluetoothCall dialing Hfp is disconnected.");
     CallAttributeInfo info;
     (void)memset_s(&info, sizeof(CallAttributeInfo), 0, sizeof(CallAttributeInfo));
     call->GetCallAttributeBaseInfo(info);

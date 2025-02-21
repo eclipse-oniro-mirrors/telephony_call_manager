@@ -40,9 +40,6 @@ public:
     bool GetSupportBtCall();
     void SetBtCallScoConnected(bool isBtCallScoConnected);
     bool GetBtCallScoConnected();
-
-    void SetBtCallDialing(bool isHasBtCallDial);
-    bool HasBtCallDialing();
     void HfpDisConnectedEndBtCall();
 
 private:

@@ -723,7 +723,6 @@ int32_t CallStatusManager::DialingHandle(const CallDetailInfo &info)
     }
     callRequestEventHandler->RestoreDialingFlag(false);
     callRequestEventHandler->RemoveEventHandlerTask();
-    DelayedSingleton<BluetoothCallConnection>::GetInstance()->SetBtCallDialing(false);
     int32_t ret = call->DialingProcess();
     if (ret != TELEPHONY_SUCCESS) {
         return ret;
