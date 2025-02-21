@@ -387,7 +387,7 @@ int32_t CallControlManager::RejectCall(int32_t callId, bool rejectWithMessage, s
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("RejectCallPolicy failed!");
         if (callId >= VOIP_CALL_MINIMUM && IsVoipCallExist()) {
-            ELEPHONY_LOGI("Need reject meetime call, callId:%{public}d", callId);
+            TELEPHONY_LOGI("Need reject meetime call, callId:%{public}d", callId);
             sendEventToVoip(CallAbilityEventId::EVENT_HANGUP_VOIP_CALL);
             DeleteOneVoipCallObject(callId);
             return TELEPHONY_SUCCESS;
@@ -438,7 +438,7 @@ int32_t CallControlManager::HangUpCall(int32_t callId)
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("HangUpPolicy failed!");
         if (callId >= VOIP_CALL_MINIMUM && IsVoipCallExist()) {
-            ELEPHONY_LOGI("Need hangUp meetime call, callId:%{public}d", callId);
+            TELEPHONY_LOGI("Need hangUp meetime call, callId:%{public}d", callId);
             sendEventToVoip(CallAbilityEventId::EVENT_HANGUP_VOIP_CALL);
             DeleteOneVoipCallObject(callId);
             return TELEPHONY_SUCCESS;
