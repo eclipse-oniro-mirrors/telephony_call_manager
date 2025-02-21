@@ -163,7 +163,7 @@ private:
     bool IsSupportSetVoipInfo();
     void SetVoipCallInfoInner(const int32_t callId, const int32_t state,
         const std::string phoneNumber);
-
+    void sendEventToVoip(CallAbilityEventId eventId);
 private:
     class SystemAbilityListener : public SystemAbilityStatusChangeStub {
     public:

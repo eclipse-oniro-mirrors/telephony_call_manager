@@ -26,6 +26,7 @@
 #include "call_superprivacy_control_manager.h"
 #include "call_manager_base.h"
 #include "distributed_communication_manager.h"
+#include "call_control_manager.h"
 
 namespace OHOS {
 namespace Telephony {
