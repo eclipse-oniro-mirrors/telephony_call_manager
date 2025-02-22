@@ -117,7 +117,7 @@ int32_t BluetoothCallService::HangUpCall()
         DeleteOneVoipCallObject(callId);
         return ret;
     }
-    if (callId >= VOIP_CALL_MINIMUM) {
+    if (callId >= VOIP_CALL_MINIMUM  && IsVoipCallExist()) {
         sendEventToVoip(CallAbilityEventId::EVENT_HANGUP_VOIP_CALL);
         DeleteOneVoipCallObject(callId);
         return CALL_ERR_ILLEGAL_CALL_OPERATION;

@@ -623,6 +623,7 @@ HWTEST_F(ZeroBranch5Test, Telephony_DistributedCallManager_001, Function | Mediu
     manager.SwitchOnDCallDeviceSync(device);
     manager.OnDCallSystemAbilityAdded(TEST_STR);
     manager.IsDistributedCarDeviceOnline();
+    manager.ReportDistributedDeviceInfoForSwitchOff();
     EXPECT_TRUE(restr.empty());
 }
 
