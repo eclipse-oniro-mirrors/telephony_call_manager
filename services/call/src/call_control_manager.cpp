@@ -270,6 +270,10 @@ int32_t CallControlManager::AnswerCall(int32_t callId, int32_t videoState)
     int32_t ret = AnswerCallPolicy(callId, videoState);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("AnswerCallPolicy failed!");
+        if (IsVoipCallExist()) {
+            sendEventToVoip(CallAbilityEventId::EVENT_ANSWER_VOIP_CALL);
+            return TELEPHONY_SUCCESS;
+        }
         CallManagerHisysevent::WriteAnswerCallFaultEvent(
             INVALID_PARAMETER, callId, videoState, ret, "AnswerCallPolicy failed");
         return ret;
