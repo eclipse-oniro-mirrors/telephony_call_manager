@@ -40,6 +40,7 @@ public:
     bool GetSupportBtCall();
     void SetBtCallScoConnected(bool isBtCallScoConnected);
     bool GetBtCallScoConnected();
+    void HfpDisConnectedEndBtCall();
 
 private:
     std::string macAddress_;
