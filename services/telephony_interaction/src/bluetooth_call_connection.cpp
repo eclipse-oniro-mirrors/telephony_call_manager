@@ -163,10 +163,10 @@ void BluetoothCallConnection::HfpDisConnectedEndBtCall()
     (void)memset_s(&info, sizeof(CallAttributeInfo), 0, sizeof(CallAttributeInfo));
     call->GetCallAttributeBaseInfo(info);
     CallDetailInfo detailInfo;
-    detailInfo.callType  = info.callType;
+    detailInfo.callType = info.callType;
     detailInfo.accountId = info.accountId;
-    detailInfo.index     = info.index;
-    detailInfo.state     = TelCallState::CALL_STATUS_DISCONNECTED;
+    detailInfo.index = info.index;
+    detailInfo.state = TelCallState::CALL_STATUS_DISCONNECTED;
     (void)memcpy_s(detailInfo.phoneNum, kMaxNumberLen, info.accountNumber, kMaxNumberLen);
     (void)memset_s(detailInfo.bundleName, kMaxBundleNameLen  + 1, 0, kMaxBundleNameLen + 1);
     int32_t ret = DelayedSingleton<ReportCallInfoHandler>::GetInstance()->UpdateCallReportInfo(detailInfo);

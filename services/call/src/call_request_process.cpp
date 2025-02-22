@@ -1047,11 +1047,11 @@ int32_t CallRequestProcess::BluetoothDialProcess(DialParaInfo &info)
         TELEPHONY_LOGW("BluetoothCall Dial has Call Exist.");
         return CALL_ERR_CALL_COUNTS_EXCEED_LIMIT;
     }
+    callRequestEventHandler->RestoreDialingFlag(true);
+    callRequestEventHandler->SetDialingCallProcessing();
     int32_t ret = DelayedSingleton<BluetoothCallConnection>::GetInstance()->Dial(info);
     if (ret == TELEPHONY_SUCCESS) {
         TELEPHONY_LOGI("BluetoothCall Dial Success.");
-        callRequestEventHandler->RestoreDialingFlag(true);
-        callRequestEventHandler->SetDialingCallProcessing();
         info.index = INIT_INDEX;
         ret = UpdateCallReportInfo(info, TelCallState::CALL_STATUS_DIALING);
     } else {

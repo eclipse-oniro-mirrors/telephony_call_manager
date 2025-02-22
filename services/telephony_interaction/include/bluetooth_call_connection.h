@@ -46,7 +46,6 @@ private:
     std::string macAddress_;
     bool isHfpConnected_ = false;
     bool isBtCallScoConnected_ = false;
-    bool isHasBtCallDial_ = false;
 };
 } // namespace Telephony
 } // namespace OHOS
