@@ -830,7 +830,7 @@ int32_t CellularCallProxy::GetVideoCallWaiting(int32_t slotId, bool &enabled)
     }
     int32_t error = remote->SendRequest(static_cast<uint32_t>(CellularCallInterfaceCode::GET_VIDEO_CALL_WAITING), in,
     out, option);
-    if (error == ERROR_NONE) {
+    if (error == ERR_NONE) {
         enabled = out.ReadBool();
         return out.ReadInt32();
     }
