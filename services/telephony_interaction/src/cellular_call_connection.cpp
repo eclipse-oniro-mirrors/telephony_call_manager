@@ -473,7 +473,7 @@ int CellularCallConnection::GetVideoCallWaiting(int32_t slotId, bool &enabled)
     }
     int errCode = cellularCallInterfacePtr_->GetVideoCallWaiting(slotId, enabled);
     if (errCode != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("GetCallWaiting failed, errcode:%{public}d", errCode);
+        TELEPHONY_LOGE("GetVideoCallWaiting failed, errcode:%{public}d", errCode);
         return errCode;
     }
     return TELEPHONY_SUCCESS;
