@@ -16,6 +16,7 @@
 #define TELEPHONY_CALL_IMPL_H
 
 #include "telephony_call_utils.h"
+#include "ability_context.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -40,7 +41,7 @@ public:
 
     static bool IsEmergencyPhoneNumber(char *cPhoneNumber, int32_t slotId, int32_t* errCode);
 
-    static int32_t MakeCall(char* phoneNumber);
+    static int32_t MakeCall(OHOS::AbilityRuntime::Context* context, char* phoneNumber);
 };
 }
 }
