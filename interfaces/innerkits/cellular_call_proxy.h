@@ -271,6 +271,15 @@ public:
     int32_t GetCallWaiting(int32_t slotId) override;
 
     /**
+     * @brief Gets whether the call waiting service of the current account is enabled
+     *
+     * @param slotId[in] the slot id
+     * @param enabled
+     * @return Returns TELEPHONY_SUCCESS on success, others on failure.
+     */
+    int32_t GetVideoCallWaiting(int32_t slotId, bool &enabled) override;
+
+    /**
      * @brief Set the call restriction function for the current account
      *
      * @param cRInfo[in] contains the password, call restriction type and call restriction mode

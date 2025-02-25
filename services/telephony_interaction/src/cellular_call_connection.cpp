@@ -465,6 +465,20 @@ int CellularCallConnection::GetCallWaiting(int32_t slotId)
     return TELEPHONY_SUCCESS;
 }
 
+int CellularCallConnection::GetVideoCallWaiting(int32_t slotId, bool &enabled)
+{
+    if (ReConnectService() != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("ipc reconnect failed!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int errCode = cellularCallInterfacePtr_->GetVideoCallWaiting(slotId, enabled);
+    if (errCode != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("GetVideoCallWaiting failed, errcode:%{public}d", errCode);
+        return errCode;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
 int CellularCallConnection::SetCallRestriction(const CallRestrictionInfo &info, int32_t slotId)
 {
     if (ReConnectService() != TELEPHONY_SUCCESS) {
