@@ -5337,15 +5337,6 @@ declare namespace call {
    */
   export enum MarkType {
     /**
-     * Indicates the mark is default.
-     *
-     * @syscap SystemCapability.Telephony.CallManager
-     * @systemapi Hide this for inner system use.
-     * @since 12
-     */
-    MARK_TYPE_DEFAULT = -1,
-
-    /**
      * Indicates the mark is none.
      *
      * @syscap SystemCapability.Telephony.CallManager
