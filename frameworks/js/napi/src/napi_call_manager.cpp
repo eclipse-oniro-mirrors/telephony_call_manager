@@ -877,6 +877,8 @@ napi_value NapiCallManager::DeclareDisconnectedReasonEnum(napi_env env, napi_val
 napi_value NapiCallManager::DeclareMarkTypeEnum(napi_env env, napi_value exports)
 {
     napi_property_descriptor desc[] = {
+        DECLARE_NAPI_STATIC_PROPERTY("MARK_TYPE_DEFAULT",
+            NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(MarkType::MARK_TYPE_DEFAULT))),
         DECLARE_NAPI_STATIC_PROPERTY("MARK_TYPE_NONE",
             NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(MarkType::MARK_TYPE_NONE))),
         DECLARE_NAPI_STATIC_PROPERTY("MARK_TYPE_CRANK",

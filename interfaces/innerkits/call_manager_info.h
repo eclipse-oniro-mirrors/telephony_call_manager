@@ -100,7 +100,7 @@ struct NumberMarkInfo {
     /**
      * Indicates the type of number mark.
      */
-    MarkType markType = MarkType::MARK_TYPE_NONE;
+    MarkType markType = MarkType::MARK_TYPE_DEFAULT;
     /**
      * Indicates the content of number mark.
      */

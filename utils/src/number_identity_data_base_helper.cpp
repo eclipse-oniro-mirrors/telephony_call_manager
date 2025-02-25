@@ -113,6 +113,7 @@ bool NumberIdentityDataBaseHelper::QueryYellowPageAndMark(NumberMarkInfo &number
     if (rowCount == 0) {
         TELEPHONY_LOGE("query success, but rowCount is 0");
         helper->Release();
+        numberMarkInfo.markType = MARK_TYPE::MARK_TYPE_NONE;
         return TELEPHONY_SUCCESS;
     }
     SetMarkInfoValues(resultSet, numberMarkInfo);
