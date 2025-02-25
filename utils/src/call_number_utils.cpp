@@ -379,9 +379,9 @@ void CallNumberUtils::YellowPageAndMarkUpdate(const sptr<CallBase> &callObjectPt
         TELEPHONY_LOGE("call is not exist");
         return;
     }
-    if (numberMarkInfo.markType != MarkType::MARK_TYPE_NONE) {
-        TELEPHONY_LOGW("need report call info of numberMark, markType: %{public}d",
-            static_cast<int32_t>(numberMarkInfo.markType));
+    if (numberMarkInfo.markType > MarkType::MARK_TYPE_NONE || info.isEcc) {
+        TELEPHONY_LOGW("markType: %{public}d, isEcc: %{public}d",
+            static_cast<int32_t>(numberMarkInfo.markType), info.isEcc);
         call->GetCallAttributeInfo(info);
         DelayedSingleton<CallAbilityReportProxy>::GetInstance()->ReportCallStateInfo(info);
     }

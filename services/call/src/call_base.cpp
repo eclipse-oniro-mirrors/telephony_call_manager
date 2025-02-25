@@ -47,6 +47,7 @@ CallBase::CallBase(DialParaInfo &info)
 {
     (void)memset_s(&contactInfo_, sizeof(ContactInfo), 0, sizeof(ContactInfo));
     (void)memset_s(&numberMarkInfo_, sizeof(NumberMarkInfo), 0, sizeof(NumberMarkInfo));
+    numberMarkInfo_.markType = MarkType::MARK_TYPE_DEFAULT;
 }
 
 CallBase::CallBase(DialParaInfo &info, AppExecFwk::PacMap &extras)
@@ -63,6 +64,7 @@ CallBase::CallBase(DialParaInfo &info, AppExecFwk::PacMap &extras)
 {
     (void)memset_s(&contactInfo_, sizeof(ContactInfo), 0, sizeof(ContactInfo));
     (void)memset_s(&numberMarkInfo_, sizeof(NumberMarkInfo), 0, sizeof(NumberMarkInfo));
+    numberMarkInfo_.markType = MarkType::MARK_TYPE_DEFAULT;
 }
 
 CallBase::~CallBase() {}

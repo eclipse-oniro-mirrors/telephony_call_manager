@@ -637,6 +637,10 @@ enum class AudioDeviceType {
  */
 enum class MarkType {
     /**
+     * Indicates the mark is default.
+     */
+    MARK_TYPE_DEFAULT = -1,
+    /**
      * Indicates the mark is none.
      */
     MARK_TYPE_NONE = 0,
