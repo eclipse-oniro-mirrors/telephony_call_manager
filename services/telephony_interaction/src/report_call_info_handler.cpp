@@ -35,6 +35,7 @@ void ReportCallInfoHandler::Init()
 {
     callStatusManagerPtr_ = std::make_shared<CallStatusManager>();
     callStatusManagerPtr_->Init();
+    DelayedSingleton<AntiFraudService>::GetInstance()->SetCallStatusManager(callStatusManagerPtr_);
     return;
 }
 
