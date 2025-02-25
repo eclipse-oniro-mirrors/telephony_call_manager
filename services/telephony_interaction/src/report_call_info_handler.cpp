@@ -20,6 +20,7 @@
 #include "ffrt.h"
 #include "ims_call.h"
 #include "telephony_log_wrapper.h"
+#include "antifraud_service.h"
 #include "thread"
 
 namespace OHOS {
