@@ -20,6 +20,7 @@
 #include "ffrt.h"
 #include "ims_call.h"
 #include "telephony_log_wrapper.h"
+#include "antifraud_service.h"
 #include "thread"
 
 namespace OHOS {
@@ -35,6 +36,7 @@ void ReportCallInfoHandler::Init()
 {
     callStatusManagerPtr_ = std::make_shared<CallStatusManager>();
     callStatusManagerPtr_->Init();
+    DelayedSingleton<AntiFraudService>::GetInstance()->SetCallStatusManager(callStatusManagerPtr_);
     return;
 }
 

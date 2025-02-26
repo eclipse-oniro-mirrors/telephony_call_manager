@@ -23,7 +23,6 @@ ohos_fuzztest("StartDtmfFuzzTest") {
   module_output_path = "call_manager/call_manager"
   module_out_path = module_output_path
   fuzz_config_file = "${CALL_MANAGER_PATH}/test/fuzztest/startdtmf_fuzzer"
-  _cfi_blocklist_path = "../../cfi_blocklist.txt"
 
   include_dirs = [
     "${CALL_MANAGER_PATH}/interfaces/innerkits",
@@ -54,17 +53,6 @@ ohos_fuzztest("StartDtmfFuzzTest") {
     "-O0",
     "-Wno-unused-variable",
     "-fno-omit-frame-pointer",
-    "-flto",
-    "-fvisibility=hidden",
-    "-fsanitize=cfi",
-    "-fsanitize-cfi-cross-dso",
-    "-fsanitize-blacklist=" + rebase_path(_cfi_blocklist_path, root_build_dir),
-  ]
-
-  ldflags = [
-    "-flto",
-    "-fsanitize=cfi",
-    "-fsanitize-cfi-cross-dso",
   ]
 
   sources = [

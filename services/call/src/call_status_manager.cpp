@@ -86,8 +86,6 @@ int32_t CallStatusManager::Init()
     mOttEventIdTransferMap_.clear();
     InitCallBaseEvent();
     CallIncomingFilterManagerPtr_ = (std::make_unique<CallIncomingFilterManager>()).release();
-    std::shared_ptr<CallStatusManager> sharedPtr(this);
-    DelayedSingleton<AntiFraudService>::GetInstance()->SetCallStatusManager(sharedPtr);
     return TELEPHONY_SUCCESS;
 }
 
