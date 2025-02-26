@@ -31,9 +31,9 @@ extern "C" {
         return TelephonyCallImpl::FormatPhoneNumberToE164(cPhoneNumber, cCountryCode, errCode);
     }
 
-    int32_t FfiOHOSTelephonyCallMakeCall(char* number)
+    int32_t FfiOHOSTelephonyCallMakeCall(OHOS::AbilityRuntime::Context* context, char* number)
     {
-        return TelephonyCallImpl::MakeCall(number);
+        return TelephonyCallImpl::MakeCall(context, number);
     }
 
     bool FfiOHOSTelephonyCallIsEmergencyPhoneNumber(char* phoneNumber, int32_t slotId, int32_t* errCode)
