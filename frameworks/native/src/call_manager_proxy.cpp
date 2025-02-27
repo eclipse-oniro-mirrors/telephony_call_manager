@@ -877,7 +877,7 @@ bool CallManagerProxy::HasCall()
     Utils::UniqueReadGuard<Utils::RWLock> guard(rwClientLock_);
     if (callManagerServicePtr_ == nullptr) {
         TELEPHONY_LOGE("callManagerServicePtr_ is null");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+        return false;
     }
     return callManagerServicePtr_->HasCall();
 }
