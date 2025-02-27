@@ -118,6 +118,10 @@ void CallRecordsManager::CallStateUpdated(
     } else {
         info.namePresentation = 0;
     }
+    if (info.numberMarkInfo.markType == MarkType::MARK_TYPE_DEFAULT) {
+        TELEPHONY_LOGI("markType is default.");
+        info.numberMarkInfo.markType = MarkType::MARK_TYPE_NONE;
+    }
     AddOneCallRecord(info);
 }
 
@@ -126,6 +130,10 @@ void CallRecordsManager::AddOneCallRecord(sptr<CallBase> call, CallAnswerType an
     CallAttributeInfo info;
     (void)memset_s(&info, sizeof(CallAttributeInfo), 0, sizeof(CallAttributeInfo));
     call->GetCallAttributeBaseInfo(info);
+    if (info.numberMarkInfo.markType == MarkType::MARK_TYPE_DEFAULT) {
+        TELEPHONY_LOGI("markType is default.");
+        info.numberMarkInfo.markType = MarkType::MARK_TYPE_NONE;
+    }
     AddOneCallRecord(info);
 }
 
