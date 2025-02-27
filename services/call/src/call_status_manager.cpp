@@ -451,7 +451,6 @@ int32_t CallStatusManager::IncomingHandle(const CallDetailInfo &info)
     }
     if (IsFromTheSameNumberAtTheSameTime(call)) {
         ModifyEsimType();
-        return ret;
     }
     SetContactInfo(call, std::string(info.phoneNum));
     bool block = false;
