@@ -774,8 +774,7 @@ bool CallObjectManager::HasActivedCallExist(int32_t &callId)
     std::lock_guard<std::mutex> lock(listMutex_);
     std::list<sptr<CallBase>>::iterator it;
     for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
-        if ((*it)->GetTelCallState() == TelCallState::CALL_STATUS_ACTIVE
-            && (*it)->GetTelCallState != CallType::TYPE_VOIP) {
+        if ((*it)->GetTelCallState() == TelCallState::CALL_STATUS_ACTIVE) {
             callId = (*it)->GetCallID();
             return true;
         }
