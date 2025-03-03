@@ -817,7 +817,7 @@ void CallStatusManager::SetupAntiFraudService(const sptr<CallBase> &call, const 
         }
         antiFraudSlotId_ = slotId;
         antiFraudIndex_ = info.index;
-        antiFraudService->InitAntiFraudService();
+        antiFraudService->InitAntiFraudService(tmpStr);
     }
 }
 
