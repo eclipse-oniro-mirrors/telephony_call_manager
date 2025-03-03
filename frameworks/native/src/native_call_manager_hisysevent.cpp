@@ -18,7 +18,7 @@
 namespace OHOS {
 namespace Telephony {
 // EVENT
-static const std::string VOIP_CALL_MANAGER = "CALL_INCOMING_NUM_IDENTITY";
+static const std::string VOIP_CALL_MANAGER = "VOIP_CALL_MANAGER";
 
 // KEY
 static const std::string CALL_ID_KEY = "CALL_ID";
