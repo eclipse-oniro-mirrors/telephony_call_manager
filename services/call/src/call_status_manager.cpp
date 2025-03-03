@@ -492,12 +492,12 @@ void CallStatusManager::SetContactInfo(sptr<CallBase> &call, std::string phoneNu
         .isVoiceMail = false,
         .isQueryComplete = true,
     };
-    if (callObjectPtr->GetCallType() == CallType::TYPE_BLUETOOTH &&
-        DelayedSingleton<CallControlManager>::GetInstance()->GetHfpBroadcastFlag()) {
+    if (callObjectPtr->GetCallType() == CallType::TYPE_BLUETOOTH) {
         std::string contactName = DelayedSingleton<BluetoothCallConnection>::GetInstance()->GetHfpContactName(
             phoneNum);
         if (!contactName.empty()) {
             contactInfo.name = contactName;
+            contactInfo.isContacterExists = true;
             callObjectPtr->SetCallerInfo(contactInfo);
             AAFwk::WantParams params = call->GetExtraParams();
             params.SetParam("BtCallContactName", AAFwk::String::Box(contactName));

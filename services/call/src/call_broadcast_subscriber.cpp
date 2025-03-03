@@ -200,16 +200,20 @@ void CallBroadcastSubscriber::HfpConnectBroadcast(const EventFwk::CommonEventDat
     TELEPHONY_LOGI("HfpConnectBroadcast begin");
     std::string phoneNumber = data.GetWant().GetStringParam("phoneNumber");
     std::string contactName = data.GetWant().GetStringParam("contact");
-    DelayedSingleton<BluetoothCallConnection>::GetInstance()->SetHfpPhoneNumber(phoneNumber);
-    DelayedSingleton<BluetoothCallConnection>::GetInstance()->SetHfpContactName(contactName);
     DelayedSingleton<CallConnectAbility>::GetInstance()->ConnectAbility();
     constexpr static uint64_t DISCONNECT_DELAY_TIME = 3000000;
     DelayedSingleton<CallObjectManager>::GetInstance()->DelayedDisconnectCallConnectAbility(DISCONNECT_DELAY_TIME);
+    if (contactName.empty()) {
+        TELEPHONY_LOGI("contactName is empty.");
+        return;
+    }
     sptr<CallBase> foregroundCall = CallObjectManager::GetForegroundCall(false);
     if (foregroundCall == nullptr) {
         TELEPHONY_LOGI("foregroundCall is nullptr.");
-        DelayedSingleton<CallControlManager>::GetInstance()->SetHfpBroadcastFlag(true);
-    } else {
+        DelayedSingleton<BluetoothCallConnection>::GetInstance()->SetHfpPhoneNumber(phoneNumber);
+        DelayedSingleton<BluetoothCallConnection>::GetInstance()->SetHfpContactName(contactName);
+    } else if (phoneNumber == foregroundCall->GetAccountNumber()) {
+        TELEPHONY_LOGI("need SetCallerInfo.");
         ContactInfo contactInfo = foregroundCall->GetCallerInfo();
         contactInfo.name = contactName;
         foregroundCall->SetCallerInfo(contactInfo);

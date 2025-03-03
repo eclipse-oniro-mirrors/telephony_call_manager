@@ -1571,19 +1571,6 @@ int32_t CallControlManager::GetVoIPCallInfo(int32_t &callId, int32_t &state, std
     return TELEPHONY_SUCCESS;
 }
 
-int32_t CallControlManager::SetHfpBroadcastFlag(bool flag)
-{
-    std::lock_guard<std::mutex> lock(hfpBroadcastFlagMutex_);
-    hfpBroadcastFlag_ = flag;
-    return TELEPHONY_SUCCESS;
-}
-
-bool CallControlManager::GetHfpBroadcastFlag()
-{
-    std::lock_guard<std::mutex> lock(hfpBroadcastFlagMutex_);
-    return hfpBroadcastFlag_;
-}
-
 void CallControlManager::AppStateObserver()
 {
     std::lock_guard<std::mutex> lock(voipMutex_);
