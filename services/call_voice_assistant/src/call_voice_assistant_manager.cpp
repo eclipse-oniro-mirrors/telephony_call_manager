@@ -353,7 +353,8 @@ void CallVoiceAssistantManager::SendRequest(const std::shared_ptr<IncomingContac
         TELEPHONY_LOGE("exist null string: %{public}s.", (info->dialOrCome).c_str());
         return;
     }
-    MessageParcel data, reply;
+    MessageParcel data;
+    MessageParcel reply;
     MessageOption option;
     std::u16string sendStr = GetSendString(info);
     if (sendStr == DEFAULT_U16STRING) {
@@ -688,7 +689,8 @@ bool CallVoiceAssistantManager::GetIsControlSwitchOn()
 void CallVoiceAssistantManager::UpdateReplyData(const std::string& str)
 {
     TELEPHONY_LOGI("receiveData, %{public}s.", str.c_str());
-    std::size_t pos1 = 0, pos2 = 0;
+    std::size_t pos1 = 0;
+    std::size_t pos2 = 0;
     std::map<std::string, std::string> replyData;
     while (pos1 != std::string::npos && pos2 != std::string::npos) {
         pos1 = str.find("\"", pos2 + 1);
