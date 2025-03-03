@@ -15,6 +15,8 @@ call_manager_path = "//base/telephony/call_manager"
 
 call_manager_sources = [
   "${call_manager_path}/services/antifraud/src/antifraud_adapter.cpp",
+  "${call_manager_path}/services/antifraud/src/antifraud_cloud_service.cpp",
+  "${call_manager_path}/services/antifraud/src/antifraud_hsdr_helper.cpp",
   "${call_manager_path}/services/antifraud/src/antifraud_service.cpp",
   "${call_manager_path}/services/audio/src/audio_control_manager.cpp",
   "${call_manager_path}/services/audio/src/audio_device_manager.cpp",
@@ -207,6 +209,8 @@ call_manager_external_deps = [
   "player_framework:system_sound_client",
   "safwk:system_ability_fwk",
   "samgr:samgr_proxy",
+  "openssl:libcrypto_shared",
+  "openssl:libssl_shared",
 ]
 
 call_manager_defines = []

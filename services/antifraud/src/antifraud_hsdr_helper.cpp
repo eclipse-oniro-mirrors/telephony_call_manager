@@ -211,7 +211,7 @@ int HsdrProxy::RequestHsdrServiceAsync(sptr<IRemoteObject> callbackStub, const H
         return errCode;
     }
     auto replyCode = reply.ReadInt32();
-    TELEPHONY_LOGI("reply code: %{public}d", replyCode)
+    TELEPHONY_LOGI("reply code: %{public}d", replyCode);
     return errCode;
 }
 

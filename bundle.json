@@ -67,7 +67,8 @@
                 "miscdevice",
                 "location",
                 "dsoftbus",
-                "input"
+                "input",
+                "openssl"
             ],
             "third_party": [
                 "libphonenumber",
