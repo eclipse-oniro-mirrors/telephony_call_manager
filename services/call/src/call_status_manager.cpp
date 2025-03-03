@@ -482,6 +482,27 @@ void CallStatusManager::SetContactInfo(sptr<CallBase> &call, std::string phoneNu
         TELEPHONY_LOGE("CreateVoipCall failed!");
         return;
     }
+    if (callObjectPtr->GetCallType() == CallType::TYPE_BLUETOOTH &&
+        DelayedSingleton<CallControlManager>::GetInstance()->GetHfpBroadcastFlag()) {
+        std::string contactName = DelayedSingleton<BluetoothCallConnection>::GetInstance()->GetHfpContactName(
+            phoneNum);
+        if (!contactName.empty()) {
+            ContactInfo contactInfo = {
+                .name = "",
+                .number = phoneNum,
+                .isContacterExists = false,
+                .ringtonePath = "",
+                .isSendToVoicemail = false,
+                .isEcc = false,
+                .isVoiceMail = false,
+                .isQueryComplete = true,
+            };
+            contactInfo.name = contactName;
+            callObjectPtr->SetCallerInfo(contactInfo);
+            TELEPHONY_LOGI("SetCallerInfo end for type bluetooth.");
+            return;
+        }
+    }
     ffrt::submit([=, &call]() {
         sptr<CallBase> callObjectPtr = call;
         // allow list filtering

@@ -41,11 +41,16 @@ public:
     void SetBtCallScoConnected(bool isBtCallScoConnected);
     bool GetBtCallScoConnected();
     void HfpDisConnectedEndBtCall();
+    void SetHfpPhoneNumber(const std::string &hfpPhoneNumber);
+    void SetHfpContactName(const std::string &hfpContactName);
+    std::string GetHfpContactName(const std::string &hfpPhoneNumber);
 
 private:
     std::string macAddress_;
     bool isHfpConnected_ = false;
     bool isBtCallScoConnected_ = false;
+    std::string hfpPhoneNumber_;
+    std::string hfpContactName_;
 };
 } // namespace Telephony
 } // namespace OHOS

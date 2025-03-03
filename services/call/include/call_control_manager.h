@@ -129,6 +129,8 @@ public:
     int32_t GetVoIPCallState(int32_t &state);
     int32_t SetVoIPCallInfo(int32_t callId, int32_t state, std::string phoneNumber);
     int32_t GetVoIPCallInfo(int32_t &callId, int32_t &state, std::string &phoneNumber);
+    int32_t SetHfpBroadcastFlag(bool flag);
+    void GetHfpBroadcastFlag();
     int32_t AddCallLogAndNotification(sptr<CallBase> &callObjectPtr);
     int32_t AddBlockLogAndNotification(sptr<CallBase> &callObjectPtr);
     int32_t HangUpVoipCall();
@@ -215,6 +217,8 @@ private:
     sptr<AppExecFwk::IAppMgr> appMgrProxy = nullptr;
     
     std::mutex voipMutex_;
+    std::mutex hfpBroadcastFlagMutex_;
+    bool hfpBroadcastFlag_ = false;
 };
 } // namespace Telephony
 } // namespace OHOS
