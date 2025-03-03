@@ -74,6 +74,7 @@
 #include "status_bar.h"
 #include "wired_headset.h"
 #include "call_status_policy.h"
+#include "native_call_manager_hisysevent.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -881,6 +882,9 @@ HWTEST_F(ZeroBranch3Test, Telephony_CallManagerHisysevent_002, Function | Medium
     ASSERT_EQ(eventValue, CallErrorCode::CALL_ERROR_MEMSET_FAIL);
     callManagerHisysevent->TelephonyErrorCodeConversion(static_cast<int32_t>(TELEPHONY_ERR_MEMCPY_FAIL), eventValue);
     ASSERT_EQ(eventValue, CallErrorCode::CALL_ERROR_MEMCPY_FAIL);
+    std::shared_ptr<NativeCallManagerHisysevent> nativeCallManagerHisysevent =
+        std::make_shared<NativeCallManagerHisysevent>();
+    nativeCallManagerHisysevent->WriteVoipCallEvent("001", "test", 0, 111, "testMsg", 1, 1, 1);
 }
 
 /**

@@ -26,6 +26,7 @@
 #include "call_manager_client.h"
 #include "call_manager_errors.h"
 #include "call_manager_service_proxy.h"
+#include "native_call_manager_hisysevent.h"
 #include "i_call_ability_callback.h"
 #include "if_system_ability_manager.h"
 #include "iremote_object.h"

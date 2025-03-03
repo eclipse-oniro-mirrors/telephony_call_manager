@@ -31,6 +31,7 @@ ohos_unittest("tel_call_manager_zero1_gtest") {
 
   sources = [
     "${CALL_MANAGER_PATH}/frameworks/native/src/call_manager_service_proxy.cpp",
+    "${CALL_MANAGER_PATH}/frameworks/native/src/native_call_manager_hisysevent.cpp",
     "src/zero_branch1_test.cpp",
     "src/zero_branch_test_call_state.cpp",
   ]
@@ -160,6 +161,7 @@ ohos_unittest("tel_call_manager_zero4_gtest") {
 
   sources = [
     "${CALL_MANAGER_PATH}/frameworks/native/src/call_manager_service_proxy.cpp",
+    "${CALL_MANAGER_PATH}/frameworks/native/src/native_call_manager_hisysevent.cpp",
     "src/zero_branch4_test.cpp",
   ]
   sources += call_manager_sources
