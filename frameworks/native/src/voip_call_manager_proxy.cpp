@@ -227,7 +227,7 @@ int32_t VoipCallManagerProxy::ReportVoipIncomingCall(
     auto remote = Remote();
     if (remote == nullptr) {
         TELEPHONY_LOGE("ReportVoipIncomingCall Remote is null");
-        NativeCallManagerHisysevent::WriteVoipCallEvent(callId, ,bundleName,
+        NativeCallManagerHisysevent::WriteVoipCallEvent(callId, bundleName,
             static_cast<int32_t>(Scenario::VOIP_PROXY_IPC_CONNECTTING), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL,
             "voip remote is nullptr!", static_cast<int32_t>(VoipCallType::VOIP_CALL_VOICE),
             static_cast<int32_t>(VoipCallState::VOIP_CALL_STATE_INCOMING),
