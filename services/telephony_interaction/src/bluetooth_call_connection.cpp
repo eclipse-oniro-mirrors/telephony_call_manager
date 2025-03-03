@@ -180,17 +180,20 @@ void BluetoothCallConnection::HfpDisConnectedEndBtCall()
 
 void BluetoothCallConnection::SetHfpPhoneNumber(const std::string &hfpPhoneNumber)
 {
+    TELEPHONY_LOGI("hfpPhoneNumber length = %{public}lu", hfpPhoneNumber.length());
     hfpPhoneNumber_ = hfpPhoneNumber;
 }
 
 void BluetoothCallConnection::SetHfpContactName(const std::string &hfpContactName)
 {
+    TELEPHONY_LOGI("hfpContactName length = %{public}lu", hfpContactName.length());
     hfpContactName_ = hfpContactName;
 }
 
 std::string BluetoothCallConnection::GetHfpContactName(const std::string &hfpPhoneNumber)
 {
     if (!hfpPhoneNumber_.empty() && hfpPhoneNumber == hfpPhoneNumber_) {
+        TELEPHONY_LOGI("got name.");
         return hfpContactName_;
     }
     return "";

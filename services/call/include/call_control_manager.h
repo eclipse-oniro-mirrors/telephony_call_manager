@@ -215,8 +215,6 @@ private:
     sptr<AppExecFwk::IAppMgr> appMgrProxy = nullptr;
     
     std::mutex voipMutex_;
-    std::mutex hfpBroadcastFlagMutex_;
-    bool hfpBroadcastFlag_ = false;
 };
 } // namespace Telephony
 } // namespace OHOS
