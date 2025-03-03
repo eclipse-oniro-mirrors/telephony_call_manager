@@ -204,7 +204,7 @@ bool CallDataBaseHelper::Query(ContactInfo &contactInfo, DataShare::DataSharePre
     resultSet->GetString(columnIndex, contactInfo.name);
     resultSet->GetColumnIndex(PERSONAL_RINGTONE, columnIndex);
     resultSet->GetString(columnIndex, ringtonePath);
-    int32_t length = ringtonePath.length() > FILE_PATH_MAX_LEN ? FILE_PATH_MAX_LEN : ringtonePath.length();
+    uint32_t length = ringtonePath.length() > FILE_PATH_MAX_LEN ? FILE_PATH_MAX_LEN : ringtonePath.length();
     if (memcpy_s(contactInfo.ringtonePath, FILE_PATH_MAX_LEN, ringtonePath.c_str(), length) != EOK) {
         TELEPHONY_LOGE("memcpy_s ringtonePath fail!");
         return false;
@@ -470,7 +470,7 @@ bool CallDataBaseHelper::QueryContactInfoEnhanced(ContactInfo &contactInfo, Data
     resultSet->GetString(columnIndex, contactInfo.name);
     resultSet->GetColumnIndex(PERSONAL_RINGTONE, columnIndex);
     resultSet->GetString(columnIndex, ringtonePath);
-    int32_t length = ringtonePath.length() > FILE_PATH_MAX_LEN ? FILE_PATH_MAX_LEN : ringtonePath.length();
+    uint32_t length = ringtonePath.length() > FILE_PATH_MAX_LEN ? FILE_PATH_MAX_LEN : ringtonePath.length();
     if (memcpy_s(contactInfo.ringtonePath, FILE_PATH_MAX_LEN, ringtonePath.c_str(), length) != EOK) {
         TELEPHONY_LOGE("memcpy_s ringtonePath fail!");
         return false;
