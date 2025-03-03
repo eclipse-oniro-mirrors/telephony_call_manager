@@ -55,7 +55,6 @@ bool AntiFraudCloudService::UploadPostRequest(const OHOS::AntiFraudService::Anti
     helper.ConnectHsdr([weakPtr, metaData, &auth](sptr<IRemoteObject> remoteObject) {
         auto ptr = weakPtr.lock();
         if (ptr == nullptr) {
-            TELEPHONY_LOGE("weakPtr is invalid.");
             auto &helper = DelayedRefSingleton<HsdrHelper>().GetInstance();
             helper.DisconnectHsdr();
             return;
@@ -91,7 +90,6 @@ bool AntiFraudCloudService::UploadPostRequest(const OHOS::AntiFraudService::Anti
     helper.ConnectHsdr([metaData, auth, antiFraudResult, weakPtr](sptr<IRemoteObject> remoteObject) {
         auto ptr = weakPtr.lock();
         if (ptr == nullptr) {
-            TELEPHONY_LOGE("weakPtr is invalid.");
             auto &helper = DelayedRefSingleton<HsdrHelper>().GetInstance();
             helper.DisconnectHsdr();
             return;
@@ -162,14 +160,14 @@ std::pair<std::string, std::string> AntiFraudCloudService::ProcessEncryptResult(
         cJSON_Delete(root);
         return {"", ""};
     }
-    std::string akString(ak->valueString);
+    std::string akString(ak->valuestring);
     cJSON *encrypt = cJSON_GetObjectItem(root, "data");
     if (encrypt == nullptr || encrypt->type != cJSON_String) {
         TELEPHONY_LOGE("encrypt is not string.");
         cJSON_Delete(root);
         return {akString, ""};
     }
-    std::string encryptString(encrypt->valueString);
+    std::string encryptString(encrypt->valuestring);
     cJSON_Delete(root);
     return {akString, encryptString};
 }
