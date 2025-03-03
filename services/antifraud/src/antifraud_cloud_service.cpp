@@ -141,7 +141,7 @@ std::pair<std::string, std::string> AntiFraudCloudService::EncryptSync(const std
     HsdrProxy service(remoteObject);
     std::string encryptResult;
     HsdrRequest encryptReq = { std::to_string(GenerateRandomLong()), UCS_SERVICE_NAME,
-        HsdrCommands::COMMAND_UCS_REQUEST, GenerateUcsRequestBody(UcsMethod::Encrypt, metaData)};
+        HsdrCommands::COMMAND_UCS_REQUEST, GenerateUcsRequestBody(UcsMethod::Encrypt, metaData) };
     auto ret = service.RequestHsdrServiceSync(encryptReq, encryptResult);
     TELEPHONY_LOGI("RequestHsdrServiceSync ret = %{public}d", ret);
 
@@ -190,7 +190,7 @@ std::string AntiFraudCloudService::GetAuthSync(const std::string &metaData, cons
     toSign += "timestamp=" + timestamp;
     std::string signResult;
     HsdrRequest signReq = { std::to_string(GenerateRandomLong()), UCS_SERVICE_NAME, HsdrCommands::COMMAND_UCS_REQUEST,
-        GenerateUcsRequestBody(UcsMethod::Sign, toSign)};
+        GenerateUcsRequestBody(UcsMethod::Sign, toSign) };
     auto ret = service.RequestHsdrServiceSync(signReq, signResult);
     TELEPHONY_LOGI("RequestHsdrServiceSync ret = %{public}d", ret);
     std::string signature = ProcessSignResult(signResult);
@@ -212,7 +212,7 @@ std::string AntiFraudCloudService::ProcessSignResult(const std::string &signResu
         cJSON_Delete(root);
         return "";
     }
-    std::string signature(data->valueString);
+    std::string signature(data->valuestring);
     cJSON_Delete(root);
     return signature;
 }
@@ -333,7 +333,7 @@ bool AntiFraudCloudService::ConnectCloudAsync(const std::string &metaData, const
         return false;
     }
     HsdrRequest request = { requestId, CLOUD_CONNECT_SERVICE_NAME, HsdrCommands::COMMAND_CLOUD_CONNECT,
-        requestJson};
+        requestJson };
     int ret = service.RequestHsdrServiceAsync(callbackStub, request);
     TELEPHONY_LOGI("RequestHsdrServiceAsync ret = %{public}d", ret);
     return ret == 0;
