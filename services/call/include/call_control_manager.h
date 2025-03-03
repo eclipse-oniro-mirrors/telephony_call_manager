@@ -128,7 +128,7 @@ public:
     int32_t SetVoIPCallState(int32_t state);
     int32_t GetVoIPCallState(int32_t &state);
     int32_t SetVoIPCallInfo(int32_t callId, int32_t state, std::string phoneNumber);
-    void GetHfpBroadcastFlag();
+    int32_t GetVoIPCallInfo(int32_t &callId, int32_t &state, std::string &phoneNumber);
     int32_t AddCallLogAndNotification(sptr<CallBase> &callObjectPtr);
     int32_t AddBlockLogAndNotification(sptr<CallBase> &callObjectPtr);
     int32_t HangUpVoipCall();
