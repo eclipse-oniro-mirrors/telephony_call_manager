@@ -16,6 +16,8 @@
 #ifndef ANTIFRAUD_SERVICE_H
 #define ANTIFRAUD_SERVICE_H
  
+#include <mutex>
+#include <queue>
 #include "call_status_manager.h"
 #include "anti_fraud_service_client.h"
 #include "anti_fraud_service_client_type.h"
@@ -59,7 +61,7 @@ public:
     bool IsUserImprovementPlanSwitchOn();
     void InitParams();
     void RecordDetectResult(const OHOS::AntiFraudService::AntiFraudResult &antiFraudResult);
-    void InitAntiFraudService();
+    void InitAntiFraudService(const std::string &phoneNum);
     std::shared_ptr<DataShare::DataShareHelper> CreateDataShareHelper(
         int32_t systemAbilityId, const char *uri);
  
@@ -77,6 +79,9 @@ private:
     std::string fraudDetectText_ = "";
  
     int32_t antiFraudState_ = 0;
+
+    std::mutex queueMutex_;
+    std::queue<std::string> phoneNumQueue_;
  
 private:
     std::shared_ptr<CallStatusManager> callStatusManagerPtr_ = nullptr;

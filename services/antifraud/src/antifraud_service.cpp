@@ -16,6 +16,7 @@
 #include "antifraud_service.h"
  
 #include "antifraud_adapter.h"
+#include "antifraud_cloud_service.h"
 #include "anti_fraud_service_client.h"
 #include "common_type.h"
 #include "telephony_log_wrapper.h"
@@ -116,6 +117,9 @@ void AntiFraudService::InitParams()
  
 void AntiFraudService::RecordDetectResult(const OHOS::AntiFraudService::AntiFraudResult &antiFraudResult)
 {
+    std::lock_guard<std::mutex> lock(queueMutex_);
+    std::string phoneNum = phoneNumQueue_.front();
+    phoneNumQueue_.pop();
     fraudDetectErr_ = antiFraudResult.errCode;
     isResultFraud_ = antiFraudResult.result;
     fraudDetectVersion_ = antiFraudResult.modelVersion;
@@ -138,10 +142,11 @@ void AntiFraudService::RecordDetectResult(const OHOS::AntiFraudService::AntiFrau
     if (isResultFraud_ && IsUserImprovementPlanSwitchOn()) {
         TELEPHONY_LOGI("text reported to the cloud after desensitization");
         // 调用脱敏接口 与 云服务接口
+        std::make_shared<AntiFraudCloudService>(phoneNum)->UploadPostRequest(antiFraudResult);
     }
 }
  
-void AntiFraudService::InitAntiFraudService()
+void AntiFraudService::InitAntiFraudService(const std::string &phoneNum)
 {
     InitParams();
     auto antiFraudAdapter = DelayedSingleton<AntiFraudAdapter>::GetInstance();
@@ -149,6 +154,8 @@ void AntiFraudService::InitAntiFraudService()
     int32_t antiFraudErrCode = antiFraudAdapter->DetectAntiFraud(listener);
     if (antiFraudErrCode == 0) {
         TELEPHONY_LOGI("AntiFraud begin detect");
+        std::lock_guard<std::mutex> lock(queueMutex_);
+        phoneNumQueue_.push(phoneNum);
         antiFraudState_ = static_cast<int32_t>(AntiFraudState::ANTIFRAUD_STATE_STARTED);
         if (callStatusManagerPtr_ != nullptr) {
             callStatusManagerPtr_->TriggerAntiFraud(antiFraudState_);

@@ -21,6 +21,7 @@
 #include <cstring>
 #include <string>
 
+#include "antifraud_cloud_service.h"
 #include "bluetooth_hfp_ag.h"
 #include "call_manager_connect.h"
 #include "call_manager_service.h"
