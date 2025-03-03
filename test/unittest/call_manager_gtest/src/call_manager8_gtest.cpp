@@ -1109,5 +1109,190 @@ HWTEST_F(CallManagerGtest, Telephony_VoipCallObject_0200, Function | MediumTest 
 
     EXPECT_FALSE(CallObjectManager::IsVoipCallExist());
 }
+
+/**
+ * @tc.number   Telephony_AntiFraudCloudService_0001
+ * @tc.name     Test antiFraud cloud service
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_AntiFraudCloudService_0001, Function | MediumTest | Level3)
+{
+    auto service = std::make_shared<AntiFraudCloudService>("10000");
+    std::string fileContent = "abcdefghij";
+    OHOS::AntiFraudService::AntiFraudResult antiFraudResult = {0, true, 0, 0, fileContent, 1.0f};
+    EXPECT_FALSE(service->UploadPostRequest(antiFraudResult));
+    EXPECT_TRUE(service->EncryptSync("", nullptr).first.empty());
+    EXPECT_TRUE(service->ProcessEncryptResult("{\"key\":\"value\"}").first.empty());
+    EXPECT_TRUE(service->ProcessEncryptResult("{\"ak\":0}").first.empty());
+    EXPECT_EQ(service->ProcessEncryptResult("{\"ak\":\"ak\"}").first, "ak");
+    EXPECT_TRUE(service->ProcessEncryptResult("{\"ak\":\"ak\"}").second.empty());
+    EXPECT_TRUE(service->ProcessEncryptResult("{\"ak\":\"ak\",\"data\":0}").second.empty());
+    EXPECT_EQ(service->ProcessEncryptResult("{\"ak\":\"ak\",\"data\":\"data\"}").second, "data");
+    EXPECT_TRUE(service->GetAuthSync("", "", nullptr).empty());
+    EXPECT_TRUE(service->ProcessSignResult("").empty());
+    EXPECT_TRUE(service->ProcessSignResult("{\"key\":\"value\"}").empty());
+    EXPECT_TRUE(service->ProcessSignResult("{\"data\":0}").empty());
+    EXPECT_EQ(service->ProcessSignResult("{\"data\":\"data\"}"), "data");
+    auto headers = service->GenerateHeadersMap("", "", "");
+    EXPECT_FALSE(headers.empty());
+    EXPECT_EQ(service->CalculateDigest("abcdefghij"),
+        "72399361da6a7754fec986dca5b7cbaf1c810a28ded4abaf56b2106d06cb78b0");
+    EXPECT_FALSE(service->GenerateRequestJson(headers, "").empty());
+    EXPECT_FALSE(service->GetDeviceSerial().empty());
+    EXPECT_EQ(service->GetSubstringBeforeSymbol("1234", "."), "1234");
+}
+
+constexpr int UCS_SERVICE_COMMAND = 0;
+constexpr int CLOUD_CONNECT_SERVICE_COMMAND = 1;
+class MockRemoteObject : public IRemoteObject {
+public:
+    explicit MockRemoteObject(int command) : IRemoteObject(u"default")
+    {
+        command_ = command;
+    }
+
+    int SendRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
+    {
+        if (command_ == -1) {
+            return -1;
+        }
+        reply.WriteInt32(0);
+        if (command_ == UCS_SERVICE_COMMAND) {
+            std::vector<std::u16string> responseBuffer{u"0"};
+            reply.WriteString16Vector(responseBuffer);
+        }
+        return 0;
+    }
+
+    int32_t GetObjectRefCount()
+    {
+        return 0;
+    }
+
+    bool AddDeathRecipient(const sptr<DeathRecipient> &recipient)
+    {
+        return true;
+    }
+
+    bool RemoveDeathRecipient(const sptr<DeathRecipient> &recipient)
+    {
+        return true;
+    }
+
+    bool IsObjectDead() const
+    {
+        return command_ != UCS_SERVICE_COMMAND && command_ != CLOUD_CONNECT_SERVICE_COMMAND;
+    }
+
+    int Dump(int fd, const std::vector<std::u16string> &args)
+    {
+        return 0;
+    }
+private:
+    int command_;
+};
+
+/**
+ * @tc.number   Telephony_AntiFraudCloudService_0002
+ * @tc.name     Test antiFraud cloud service
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_AntiFraudCloudService_0002, Function | MediumTest | Level3)
+{
+    auto service = std::make_shared<AntiFraudCloudService>("10000");
+    sptr<OHOS::IRemoteObject> failRemoteObj = new MockRemoteObject(-1);
+    EXPECT_FALSE(service->GetAuthSync("", "", failRemoteObj).empty());
+    sptr<OHOS::IRemoteObject> ucsRemoteObj = new MockRemoteObject(UCS_SERVICE_COMMAND);
+    EXPECT_FALSE(service->GetAuthSync("", "", ucsRemoteObj).empty());
+    sptr<OHOS::IRemoteObject> cloudConnectRemoteObj = new MockRemoteObject(CLOUD_CONNECT_SERVICE_COMMAND);
+    OHOS::AntiFraudService::AntiFraudResult antiFraudResult = {0, true, 0, 0, "fileContent", 1.0f};
+    EXPECT_FALSE(service->ConnectCloudAsync("", "", antiFraudResult, nullptr));
+    EXPECT_FALSE(service->ConnectCloudAsync("", "", antiFraudResult, failRemoteObj));
+    EXPECT_TRUE(service->ConnectCloudAsync("", "", antiFraudResult, cloudConnectRemoteObj));
+}
+
+/**
+ * @tc.number   Telephony_AntiFraudHsdrHelper_0001
+ * @tc.name     Test antiFraud hsdr helper
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_AntiFraudHsdrHelper_0001, Function | MediumTest | Level3)
+{
+    sptr<HsdrConnection> connection = new (std::nothrow) HsdrConnection(
+        [](const sptr<IRemoteObject> &remoteObject) {});
+    if (connection == nullptr) {
+        std::cout << "connection is nullptr" << std::endl;
+        return;
+    }
+    AppExecFwk::ElementName element;
+    sptr<OHOS::IRemoteObject> failRemoteObj = new MockRemoteObject(-1);
+    connection->OnAbilityConnectDone(element, failRemoteObj, -1);
+    EXPECT_EQ(connection->remoteObject_, nullptr);
+    connection->OnAbilityConnectDone(element, nullptr, 0);
+    EXPECT_EQ(connection->remoteObject_, nullptr);
+    EXPECT_FALSE(connection->IsAlive());
+    connection->OnAbilityConnectDone(element, failRemoteObj, 0);
+    EXPECT_NE(connection->remoteObject_, nullptr);
+    EXPECT_FALSE(connection->IsAlive());
+    connection->OnAbilityDisconnectDone(element, 0);
+    EXPECT_EQ(connection->remoteObject_, nullptr);
+    sptr<OHOS::IRemoteObject> ucsRemoteObj = new MockRemoteObject(UCS_SERVICE_COMMAND);
+    connection->remoteObject_ = ucsRemoteObj;
+    EXPECT_TRUE(connection->IsAlive());
+    connection->OnAbilityDisconnectDone(element, -1);
+    EXPECT_EQ(connection->remoteObject_, nullptr);
+    connection->connectedCallback_ = nullptr;
+    connection->OnAbilityConnectDone(element, failRemoteObj, 0);
+    EXPECT_EQ(connection->remoteObject_, nullptr);
+    auto &helper = DelayedRefSingleton<HsdrHelper>().GetInstance();
+    helper.connection_ = connection;
+    connection->remoteObject_ = ucsRemoteObj;
+    EXPECT_EQ(helper.ConnectHsdr([](const sptr<IRemoteObject> &remoteObject) {}), 0);
+    connection->remoteObject_ = failRemoteObj;
+    EXPECT_EQ(helper.ConnectHsdr([](const sptr<IRemoteObject> &remoteObject) {}), 0);
+    helper.DisconnectHsdr();
+    EXPECT_EQ(helper.ConnectHsdr([](const sptr<IRemoteObject> &remoteObject) {}), 0);
+    helper.DisconnectHsdr();
+    helper.DisconnectHsdr();
+    EXPECT_EQ(helper.connection_, nullptr);
+}
+
+/**
+ * @tc.number   Telephony_AntiFraudHsdrHelper_0002
+ * @tc.name     Test antiFraud hsdr helper
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_AntiFraudHsdrHelper_0002, Function | MediumTest | Level3)
+{
+    OnResponse onResponse = [](const HsdrResponse &response) {};
+    OnError onError = [](int errCode) {};
+    sptr<HsdrCallbackStub> callbackStub =
+        new (std::nothrow) HsdrCallbackStub("123456", onResponse, onError);
+    if (callbackStub == nullptr) {
+        std::cout << "callbackStub is nullptr" << std::endl;
+        return;
+    }
+    MessageParcel data;
+    MessageParcel reply;
+    MessageOption option;
+    EXPECT_NE(callbackStub->OnRemoteRequest(0, data, reply, option), 0);
+    data.WriteInterfaceToken(u"");
+    EXPECT_NE(callbackStub->OnRemoteRequest(0, data, reply, option), 0);
+
+    data.WriteInterfaceToken(u"OHOS.Security.CloudConnectCallback");
+    EXPECT_NE(callbackStub->OnRemoteRequest(0, data, reply, option), 0);
+
+    data.WriteInterfaceToken(u"OHOS.Security.CloudConnectCallback");
+    data.WriteString16(u"123456");
+    std::vector<std::u16string> responseBuffer{u"0"};
+    data.WriteString16Vector(responseBuffer);
+    EXPECT_EQ(callbackStub->OnRemoteRequest(0, data, reply, option), 0);
+
+    MessageParcel data2;
+    data2.WriteInterfaceToken(u"OHOS.Security.CloudConnectCallback");
+    data2.WriteString16(u"1234567");
+    data2.WriteString16Vector(responseBuffer);
+    EXPECT_EQ(callbackStub->OnRemoteRequest(0, data2, reply, option), 0);
+}
 } // namespace Telephony
 } // namespace OHOS
