@@ -27,7 +27,7 @@ enum class Scenario {
     /**
      * Indicates that the sendrequest request is sent through the remote
      */
-    VOPI_PROXY_IPC_CONNECTTING = 0,   
+    VOIP_PROXY_IPC_CONNECTTING = 0,
 };
 class NativeCallManagerHisysevent : public TelephonyHiSysEvent {
 public:
