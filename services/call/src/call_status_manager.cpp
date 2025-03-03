@@ -482,23 +482,26 @@ void CallStatusManager::SetContactInfo(sptr<CallBase> &call, std::string phoneNu
         TELEPHONY_LOGE("CreateVoipCall failed!");
         return;
     }
+    ContactInfo contactInfo = {
+        .name = "",
+        .number = phoneNum,
+        .isContacterExists = false,
+        .ringtonePath = "",
+        .isSendToVoicemail = false,
+        .isEcc = false,
+        .isVoiceMail = false,
+        .isQueryComplete = true,
+    };
     if (callObjectPtr->GetCallType() == CallType::TYPE_BLUETOOTH &&
         DelayedSingleton<CallControlManager>::GetInstance()->GetHfpBroadcastFlag()) {
         std::string contactName = DelayedSingleton<BluetoothCallConnection>::GetInstance()->GetHfpContactName(
             phoneNum);
         if (!contactName.empty()) {
-            ContactInfo contactInfo = {
-                .name = "",
-                .number = phoneNum,
-                .isContacterExists = false,
-                .ringtonePath = "",
-                .isSendToVoicemail = false,
-                .isEcc = false,
-                .isVoiceMail = false,
-                .isQueryComplete = true,
-            };
             contactInfo.name = contactName;
             callObjectPtr->SetCallerInfo(contactInfo);
+            AAFwk::WantParams params = call->GetExtraParams();
+            params.SetParam("BtCallContactName", AAFwk::String::Box(contactName));
+            call->SetExtraParams(params);
             TELEPHONY_LOGI("SetCallerInfo end for type bluetooth.");
             return;
         }
@@ -507,19 +510,10 @@ void CallStatusManager::SetContactInfo(sptr<CallBase> &call, std::string phoneNu
         sptr<CallBase> callObjectPtr = call;
         // allow list filtering
         // Get the contact data from the database
-        ContactInfo contactInfo = {
-            .name = "",
-            .number = phoneNum,
-            .isContacterExists = false,
-            .ringtonePath = "",
-            .isSendToVoicemail = false,
-            .isEcc = false,
-            .isVoiceMail = false,
-            .isQueryComplete = true,
-        };
-        QueryCallerInfo(contactInfo, phoneNum);
-        callObjectPtr->SetCallerInfo(contactInfo);
-        CallVoiceAssistantManager::GetInstance()->UpdateContactInfo(contactInfo, callObjectPtr->GetCallID());
+        ContactInfo contactInfoTemp = contactInfo;
+        QueryCallerInfo(contactInfoTemp, phoneNum);
+        callObjectPtr->SetCallerInfo(contactInfoTemp);
+        CallVoiceAssistantManager::GetInstance()->UpdateContactInfo(contactInfoTemp, callObjectPtr->GetCallID());
         DelayedSingleton<DistributedCommunicationManager>::GetInstance()->ProcessCallInfo(callObjectPtr,
             DistributedDataType::NAME);
     });
