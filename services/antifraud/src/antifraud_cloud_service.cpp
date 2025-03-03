@@ -39,8 +39,8 @@ constexpr int COMMON_TIME_OUT = 5000;
 const std::string BASE_64_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 const std::string RANDOM_CHAR_SET = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 const std::string UPLOAD_MODEL_PATH = "/rms/v1/antiFraud/upload-model-result";
-const std::string CLOUD_CONNECT_SERVICE_NAME = "com.huawei.cloud.afs.ROOT";
-const std::string UCS_SERVICE_NAME = "com.huawei.hmos.hsdr.antifraud";
+const std::string CLOUD_CONNECT_SERVICE_NAME = "com.cloud.afs.ROOT";
+const std::string UCS_SERVICE_NAME = "com.hmos.hsdr.antifraud";
 
 AntiFraudCloudService::AntiFraudCloudService(const std::string &phoneNum) : phoneNum_(phoneNum) {}
 
@@ -345,7 +345,7 @@ std::map<std::string, std::string> AntiFraudCloudService::GenerateHeadersMap(con
     headers["X-Request-ID"] = GetDeviceSerial();
     headers["Content-Digest"] = CalculateDigest(fileContent);
     headers["down-algo"] = "AES-GCM";
-    headers["X-HarmonyOS-Version"] = GetHarmonyOsVersion();
+    headers["X-OS-Version"] = GetOsVersion();
     std::string contentType = "multipart/form-data; boundary=" + boundary;
     headers["Content-Type"] = contentType;
     return headers;
@@ -444,7 +444,7 @@ uint64_t AntiFraudCloudService::GenerateRandomLong()
     return dis(gen);
 }
 
-std::string AntiFraudCloudService::GetHarmonyOsVersion()
+std::string AntiFraudCloudService::GetOsVersion()
 {
     return system::GetParameter("const.ohos.fullname", "");
 }

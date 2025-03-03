@@ -28,7 +28,7 @@
 
 namespace OHOS {
 namespace Telephony {
-const std::string HSDR_BUNDLE_NAME = "com.huawei.hmos.hsdr";
+const std::string HSDR_BUNDLE_NAME = "com.hmos.hsdr";
 const std::string HSDR_ABILITY_NAME = "HSDRService";
 constexpr int HSDR_USERID = 100;
 

@@ -45,7 +45,7 @@ private:
     std::string GetSubstringBeforeSymbol(const std::string &str, const std::string &symbol);
     std::string GetDeviceSerial();
     std::string CalculateDigest(const std::string &payload);
-    std::string GetHarmonyOsVersion();
+    std::string GetOsVersion();
     std::string GenerateRandomString(size_t length);
     std::string ProcessSignResult(const std::string &signResult);
     uint64_t GenerateRandomLong();
