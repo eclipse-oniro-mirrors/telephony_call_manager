@@ -64,7 +64,7 @@ int AnonymizeAdapter::InitConfig(void **config)
     return func(config);
 }
 
-int AnonymizeAdapter::SetRule(void *config, const DIA_String *key, const DIA_Rule_C *value)
+int AnonymizeAdapter::SetRule(void *config, const DIA_String *key, const DIA_Rule *value)
 {
     libAnonymize_ = GetLibAnonymize();
     if (libAnonymize_ == nullptr) {
