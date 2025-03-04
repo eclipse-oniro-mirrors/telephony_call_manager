@@ -143,7 +143,7 @@ void AntiFraudService::RecordDetectResult(const OHOS::AntiFraudService::AntiFrau
  
     if (isResultFraud_ && IsUserImprovementPlanSwitchOn()) {
         TELEPHONY_LOGI("text reported to the cloud after anonymize");
-        int ret = Anonymize();
+        int ret = AnonymizeText();
         if (ret != 0) {
             TELEPHONY_LOGE("Anonymize text fail");
             return;
@@ -187,7 +187,7 @@ void AntiFraudService::AddRuleToConfig(const std::string rulesName, void *config
     rule.ruleName = rName.data();
     if ((rName == "CHINA_RESIDENT_PASSPORT") || (rName == "PERMIT_HM_TO_LAND") ||
         (rName == "PERMIT_TW_TO_LAND") || (rName == "POLICE_OFFICER_CARD")) {
-        rule.isOpenkeywords = true;
+        rule.isOpenKeywords = true;
     }
     auto anonymizeAdapter = DelayedSingleton<AnonymizeAdapter>::GetInstance();
     int ret = anonymizeAdapter->SetRule(config, &key, &rule);
