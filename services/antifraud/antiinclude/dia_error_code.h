@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifdef DIA_ERROR_CODE_H
+#ifndef DIA_ERROR_CODE_H
 #define DIA_ERROR_CODE_H
 
 namespace OHOS::Security::DIA {
