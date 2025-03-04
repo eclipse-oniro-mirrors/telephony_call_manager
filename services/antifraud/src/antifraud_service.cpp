@@ -237,8 +237,8 @@ int AntiFraudService::AnonymizeText()
         fraudDetectText_ = (std::string)output->data;
     }
     anonymizeAdapter->ReleaseConfig(&config);
-    anonymizeAdapter->ReleaseAnonymize(&config);
-    anonymizeAdapter->ReleaseOutputData(&config);
+    anonymizeAdapter->ReleaseAnonymize(&assistant);
+    anonymizeAdapter->ReleaseOutputData(&output);
     return 0;
 }
 }
