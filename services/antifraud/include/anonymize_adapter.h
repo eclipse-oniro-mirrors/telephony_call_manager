@@ -52,5 +52,5 @@ private:
 }
 }
 
- #endif /* ANONYMIZE_ADAPTER_H */
+#endif /* ANONYMIZE_ADAPTER_H */
   
