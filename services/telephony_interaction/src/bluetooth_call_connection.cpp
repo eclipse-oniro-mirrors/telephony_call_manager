@@ -177,5 +177,22 @@ void BluetoothCallConnection::HfpDisConnectedEndBtCall()
             detailInfo.state, detailInfo.index);
     }
 }
+
+void BluetoothCallConnection::SetHfpContactName(const std::string &hfpPhoneNumber, const std::string &hfpContactName)
+{
+    TELEPHONY_LOGI("hfpPhoneNumber length = %{public}zu, hfpContactName length = %{public}zu",
+        hfpPhoneNumber.length(), hfpContactName.length());
+    hfpPhoneNumber_ = hfpPhoneNumber;
+    hfpContactName_ = hfpContactName;
+}
+
+std::string BluetoothCallConnection::GetHfpContactName(const std::string &hfpPhoneNumber)
+{
+    if (!hfpPhoneNumber_.empty() && hfpPhoneNumber == hfpPhoneNumber_) {
+        TELEPHONY_LOGI("got name.");
+        return hfpContactName_;
+    }
+    return "";
+}
 } // namespace Telephony
 } // namespace OHOS

@@ -29,6 +29,7 @@
 #include "number_identity_service.h"
 #include "os_account_manager.h"
 #include "call_object_manager.h"
+#include "bluetooth_call_connection.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -197,9 +198,26 @@ void CallBroadcastSubscriber::HsdrEventBroadcast(const EventFwk::CommonEventData
 void CallBroadcastSubscriber::HfpConnectBroadcast(const EventFwk::CommonEventData &data)
 {
     TELEPHONY_LOGI("HfpConnectBroadcast begin");
+    std::string phoneNumber = data.GetWant().GetStringParam("phoneNumber");
+    std::string contactName = data.GetWant().GetStringParam("contact");
     DelayedSingleton<CallConnectAbility>::GetInstance()->ConnectAbility();
     constexpr static uint64_t DISCONNECT_DELAY_TIME = 3000000;
     DelayedSingleton<CallObjectManager>::GetInstance()->DelayedDisconnectCallConnectAbility(DISCONNECT_DELAY_TIME);
+    if (contactName.empty()) {
+        TELEPHONY_LOGI("contactName is empty.");
+        return;
+    }
+    sptr<CallBase> foregroundCall = CallObjectManager::GetForegroundCall(false);
+    if (foregroundCall == nullptr || phoneNumber != foregroundCall->GetAccountNumber()) {
+        TELEPHONY_LOGI("foregroundCall is nullptr.");
+        DelayedSingleton<BluetoothCallConnection>::GetInstance()->SetHfpContactName(phoneNumber, contactName);
+    } else {
+        TELEPHONY_LOGI("need SetCallerInfo.");
+        ContactInfo contactInfo = foregroundCall->GetCallerInfo();
+        contactInfo.name = contactName;
+        contactInfo.isContacterExists = true;
+        foregroundCall->SetCallerInfo(contactInfo);
+    }
     TELEPHONY_LOGI("HfpConnectBroadcast end");
 }
 

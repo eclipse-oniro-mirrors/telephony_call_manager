@@ -482,23 +482,38 @@ void CallStatusManager::SetContactInfo(sptr<CallBase> &call, std::string phoneNu
         TELEPHONY_LOGE("CreateVoipCall failed!");
         return;
     }
+    ContactInfo contactInfo = {
+        .name = "",
+        .number = phoneNum,
+        .isContacterExists = false,
+        .ringtonePath = "",
+        .isSendToVoicemail = false,
+        .isEcc = false,
+        .isVoiceMail = false,
+        .isQueryComplete = true,
+    };
+    if (call->GetCallType() == CallType::TYPE_BLUETOOTH) {
+        std::string contactName = DelayedSingleton<BluetoothCallConnection>::GetInstance()->GetHfpContactName(
+            phoneNum);
+        if (!contactName.empty()) {
+            contactInfo.name = contactName;
+            contactInfo.isContacterExists = true;
+            call->SetCallerInfo(contactInfo);
+            AAFwk::WantParams params = call->GetExtraParams();
+            params.SetParam("BtCallContactName", AAFwk::String::Box(contactName));
+            call->SetExtraParams(params);
+            TELEPHONY_LOGI("SetCallerInfo end for type bluetooth.");
+            return;
+        }
+    }
     ffrt::submit([=, &call]() {
         sptr<CallBase> callObjectPtr = call;
         // allow list filtering
         // Get the contact data from the database
-        ContactInfo contactInfo = {
-            .name = "",
-            .number = phoneNum,
-            .isContacterExists = false,
-            .ringtonePath = "",
-            .isSendToVoicemail = false,
-            .isEcc = false,
-            .isVoiceMail = false,
-            .isQueryComplete = true,
-        };
-        QueryCallerInfo(contactInfo, phoneNum);
-        callObjectPtr->SetCallerInfo(contactInfo);
-        CallVoiceAssistantManager::GetInstance()->UpdateContactInfo(contactInfo, callObjectPtr->GetCallID());
+        ContactInfo contactInfoTemp = contactInfo;
+        QueryCallerInfo(contactInfoTemp, phoneNum);
+        callObjectPtr->SetCallerInfo(contactInfoTemp);
+        CallVoiceAssistantManager::GetInstance()->UpdateContactInfo(contactInfoTemp, callObjectPtr->GetCallID());
         DelayedSingleton<DistributedCommunicationManager>::GetInstance()->ProcessCallInfo(callObjectPtr,
             DistributedDataType::NAME);
     });
