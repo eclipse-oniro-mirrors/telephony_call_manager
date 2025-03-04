@@ -26,10 +26,10 @@ typedef struct DIA_String {
     unsigned dataLength;
 } DIA_String;
 
-typedef struct DIA_Rule_C {
+typedef struct DiaRuleC {
     char *ruleName;     // 需使用上面定义的规则名称
     bool isOpenKeywords;      // 是否开启关键词
-} DIA_Rule_C;
+} DiaRuleC;
 
 __attribute__((visibility("default"))) int DIA_InitConfig(void **config); // 创建Config对象
 __attribute__((visibility("default"))) void DIA_ReleaseConfig(void** config); // 释放Config对象
