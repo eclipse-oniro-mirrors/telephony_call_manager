@@ -1853,6 +1853,11 @@ bool CallStatusManager::IsRejectCall(sptr<CallBase> &call, const CallDetailInfo 
 
 void CallStatusManager::CreateAndSaveNewCall(const CallDetailInfo &info, CallDirection direction)
 {
+    if (GetOneCallObjectByIndex(INIT_INDEX) != nullptr) {
+        TELEPHONY_LOGI("get init_index call success");
+        UpdateDialingCallInfo(info);
+        return;
+    }
     auto call = CreateNewCall(info, direction);
     if (call != nullptr) {
         ffrt::submit([=]() {
