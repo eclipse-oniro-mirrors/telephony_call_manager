@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#ifdef DIA_CONFIG_C_H
+#ifndef DIA_CONFIG_C_H
 #define DIA_CONFIG_C_H
 #include "dia_config_info.h"
 
