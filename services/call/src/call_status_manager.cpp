@@ -861,6 +861,9 @@ void CallStatusManager::TriggerAntiFraud(int32_t antiFraudState)
 {
     TELEPHONY_LOGI("TriggerAntiState, antiFraudState = %{public}d", antiFraudState);
     sptr<CallBase> call = nullptr;
+    if (antiFraudSlotId_ >= SLOT_NUM || antiFraudSlotId_ < 0) {
+        return;
+    }
     for (auto &it : callDetailsInfo_[antiFraudSlotId_].callVec) {
         if (it.index == antiFraudIndex_) {
             it.antiFraudState = antiFraudState;
@@ -1096,6 +1099,9 @@ void CallStatusManager::StopCallMotionRecognition(TelCallState nextState)
 
 std::vector<sptr<CallBase>> CallStatusManager::GetConferenceCallList(int32_t slotId)
 {
+    if (slotId >= SLOT_NUM || slotId < 0) {
+        return std::vector<sptr<CallBase>>();
+    }
     std::vector<sptr<CallBase>> conferenceCallList;
     for (const auto &it : tmpCallDetailsInfo_[slotId].callVec) {
         if (it.mpty == 1) {
@@ -1346,18 +1352,17 @@ void CallStatusManager::SetVideoCallState(sptr<CallBase> &call, TelCallState nex
     }
     int slotId = call->GetSlotId();
     bool isSlotIdValid = false;
-    if (slotId < SLOT_NUM && slotId >= 0) {
-        isSlotIdValid = true;
+    if (slotId >= SLOT_NUM || slotId < 0) {
+        return;
     }
     VideoStateType videoState = call->GetVideoStateType();
-    TELEPHONY_LOGI("nextVideoState:%{public}d, priorVideoState:%{public}d, isSlotIdValid:%{public}d", videoState,
-        priorVideoState_[slotId], isSlotIdValid);
-    if (isSlotIdValid && (priorVideoState_[slotId] != videoState)) {
+    TELEPHONY_LOGI("nextVideoState:%{public}d, priorVideoState:%{public}d", videoState, priorVideoState_[slotId]);
+    if (priorVideoState_[slotId] != videoState) {
         DelayedSingleton<AudioControlManager>::GetInstance()->VideoStateUpdated(
             call, priorVideoState_[slotId], videoState);
         priorVideoState_[slotId] = videoState;
     }
-    if (isSlotIdValid && (nextState == TelCallState::CALL_STATUS_DISCONNECTED)) {
+    if (nextState == TelCallState::CALL_STATUS_DISCONNECTED) {
         priorVideoState_[slotId] = VideoStateType::TYPE_VOICE;
     }
 }

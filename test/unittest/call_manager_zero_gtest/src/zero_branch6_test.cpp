@@ -236,6 +236,9 @@ HWTEST_F(ZeroBranch5Test, Telephony_CallStatusManager_004, Function | MediumTest
     callStatusManager->HandleHoldCallOrAutoAnswerCall(callObjectPtr, callIdList, previousState, priorState);
     callStatusManager->AutoAnswerForVoiceCall(callObjectPtr, SIM1_SLOTID, true);
     callStatusManager->SetVideoCallState(callObjectPtr, TelCallState::CALL_STATUS_ACTIVE);
+    callObjectPtr->SetSlotId(-1);
+    callStatusManager->SetVideoCallState(callObjectPtr, TelCallState::CALL_STATUS_ACTIVE);
+    EXPECT_TRUE(callStatusManager->GetConferenceCallList(-1).empty());
     callStatusManager->ShouldRejectIncomingCall();
     callStatusManager->IsRingOnceCall(callObjectPtr, callDetailInfo);
     sptr<CallBase> callObjectPtr1 = nullptr;
