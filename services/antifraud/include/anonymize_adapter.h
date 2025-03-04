@@ -26,7 +26,7 @@
 namespace OHOS {
 namespace Telephony {
 typedef int (*PfnInitConfig)(void **config);
-typedef int (*PfnSetRule)(void *config, const DIA_String *key, const DIA_Rule_C *value);
+typedef int (*PfnSetRule)(void *config, const DIA_String *key, const DIA_Rule *value);
 typedef int (*PfnCreateAnonymize)(void *config, void **anonymize);
 typedef int (*PfnIdentifyAnonymize)(void *anonymize, const DIA_String *input, const DIA_String **output);
 typedef int (*PfnReleaseConfig)(void **config);
@@ -39,7 +39,7 @@ public:
     void *GetLibAnonymize();
     void ReleaseLibAnonymize();
     int InitConfig(void **config);
-    int SetRule(void **config, const DIA_String *key, const DIA_Rule_C *value);
+    int SetRule(void **config, const DIA_String *key, const DIA_Rule *value);
     int CreateAnonymize(void *config, void **anonymize);
     int IdentifyAnonymize(void *anonymize, const DIA_String *input, DIA_String **output);
     int ReleaseConfig(void **config);
