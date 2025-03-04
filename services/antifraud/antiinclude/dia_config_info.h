@@ -13,7 +13,7 @@
  * limitations under the License.
  */
 
-#ifdef DIA_CONFIG_INFO_H
+#ifndef DIA_CONFIG_INFO_H
 #define DIA_CONFIG_INFO_H
 
 #define DIA_SESSION_ID "SESSION_ID"
