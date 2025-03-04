@@ -23,7 +23,7 @@ extern "C" {
 __attribute__((visibility("default"))) int DIA_CreateAnonymize(void *config, void** anonymize); // 创建隐私助理对象
 // 释放隐私助理对象
 __attribute__((visibility("default"))) int DIA_IdentifyAnonymize(void *anonymize, const DIA_String *input,
-                                                                 DIA_string **output);
+                                                                 DIA_String **output);
 __attribute__((visibility("default"))) void DIA_ReleaseAnonymize(void** anonymize); // 对敏感信息进行识别和脱敏
 __attribute__((visibility("default"))) void DIA_ReleaseOutputData(DIA_String** output); // 释放识别和脱敏后的数据
 
