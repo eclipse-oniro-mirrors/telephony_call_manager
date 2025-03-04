@@ -39,7 +39,7 @@ public:
     void *GetLibAnonymize();
     void ReleaseLibAnonymize();
     int InitConfig(void **config);
-    int SetRule(void **config, const DIA_String *key, const DIA_Rule *value);
+    int SetRule(void *config, const DIA_String *key, const DIA_Rule *value);
     int CreateAnonymize(void *config, void **anonymize);
     int IdentifyAnonymize(void *anonymize, const DIA_String *input, DIA_String **output);
     int ReleaseConfig(void **config);
