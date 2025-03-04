@@ -182,7 +182,7 @@ void AntiFraudService::AddRuleToConfig(const std::string rulesName, void *config
     std::string skey = "SELECT_RULE";
     key.data = skey.data();
     key.dataLength = SELECT_RULE_LENGTH;
-    DIA_Rule_C rule;
+    DIA_Rule rule;
     std::string rName = rulesName;
     rule.ruleName = rName.data();
     if ((rName == "CHINA_RESIDENT_PASSPORT") || (rName == "PERMIT_HM_TO_LAND") ||
