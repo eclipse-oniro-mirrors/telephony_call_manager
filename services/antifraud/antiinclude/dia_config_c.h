@@ -40,7 +40,7 @@ __attribute__((visibility("default"))) int DIA_SetDouble(void* config, const DIA
 // 设置字符串类型参数
 __attribute__((visibility("default"))) int DIA_SetString(void *config, const DIA_String *key, const DIA_String *value);
 // 设置dia_rule类型参数
-__attribute__((visibility("default"))) int DIA_SetRule(void *config, const DIA_String *key, const DIA_Rule_C *value);
+__attribute__((visibility("default"))) int DIA_SetRule(void *config, const DIA_String *key, const DiaRuleC *value);
 
 #ifdef __cplusplus
 }
