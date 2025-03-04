@@ -12,7 +12,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifdef DIA_INTERFACE_C_H
+#ifndef DIA_INTERFACE_C_H
 #define DIA_INTERFACE_C_H
 #include "dia_config_c.h"
 
