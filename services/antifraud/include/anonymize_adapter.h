@@ -17,7 +17,7 @@
 #define ANONYMIZE_ADAPTER_H
 
 #include <securec.h>
-#include "anitfraud_service.h"
+#include "antifraud_service.h"
 #include "dia_config_c.h"
 #include "dia_interface_c.h"
 #include "dia_config_info.h"
