@@ -28,6 +28,8 @@
 #include "surface_utils.h"
 #include "telephony_types.h"
 #include "voip_call.h"
+#include "anonymize_adapter.h"
+#include "antifraud_service.h"
 
 using namespace OHOS::Bluetooth;
 namespace OHOS {
@@ -1293,6 +1295,29 @@ HWTEST_F(CallManagerGtest, Telephony_AntiFraudHsdrHelper_0002, Function | Medium
     data2.WriteString16(u"1234567");
     data2.WriteString16Vector(responseBuffer);
     EXPECT_EQ(callbackStub->OnRemoteRequest(0, data2, reply, option), 0);
+}
+
+/**
+ * @tc.number   Telephony_AnonymizeAdapter_0100
+ * @tc.name     Test AnonymizeAdapter
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_AnonymizeAdapter_0100, Function | MediumTest | Level3)
+{
+    auto antiFraudService = DelayedSingleton<AntiFraudService>::GetInstance();
+    EXPECT_EQ(antiFraudService->AnonymizeText(), 1000);
+
+    auto anonymizeAdapter = DelayedSingleton<AnonymizeAdapter>::GetInstance();
+    anonymizeAdapter->ReleaseLibAnonymize();
+    EXPECT_EQ(anonymizeAdapter->libAnonymize_, nullptr);
+    anonymizeAdapter->GetLibAnonymize();
+    anonymizeAdapter->ReleaseLibAnonymize();
+    EXPECT_EQ(anonymizeAdapter->libAnonymize_, nullptr);
+
+    void *config = nullptr;
+    void *assistant = nullptr;
+    EXPECT_EQ(anonymizeAdapter->ReleaseConfig(&config), 0);
+    EXPECT_EQ(anonymizeAdapter->ReleaseAnonymize(&assistant), 0);
 }
 } // namespace Telephony
 } // namespace OHOS

@@ -31,6 +31,7 @@ const std::string ANTIFRAUD_SWITCH = "spamshield_call_live_detection";
 const std::string USER_IMPROPLAN_SWITCH = "spamshield_call_live_report";
 const std::string USER_SETTINGSDATA_URI =
     "datashare:///com.ohos.settingsdata/entry/settingsdata/USER_SETTINGSDATA_SECURE_100?Proxy=true";
+constexpr int32_t SELECT_RULE_LENGTH = 11;
  
 enum class AntiFraudState {
     /**
@@ -64,6 +65,8 @@ public:
     void InitAntiFraudService(const std::string &phoneNum);
     std::shared_ptr<DataShare::DataShareHelper> CreateDataShareHelper(
         int32_t systemAbilityId, const char *uri);
+    void AddRuleToConfig(const std::string rulesName, void *config);
+    int AnonymizeText();
  
 private:
     class AntiFraudDetectResListenerImpl : public OHOS::AntiFraudService::AntiFraudDetectResListener {
