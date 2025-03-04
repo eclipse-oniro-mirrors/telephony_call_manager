@@ -14,8 +14,10 @@
  */
  
 #include "antifraud_service.h"
- 
+
+#include <string>
 #include "antifraud_adapter.h"
+#include "anonymize_adapter.h"
 #include "antifraud_cloud_service.h"
 #include "anti_fraud_service_client.h"
 #include "common_type.h"
@@ -140,9 +142,15 @@ void AntiFraudService::RecordDetectResult(const OHOS::AntiFraudService::AntiFrau
         }
  
     if (isResultFraud_ && IsUserImprovementPlanSwitchOn()) {
-        TELEPHONY_LOGI("text reported to the cloud after desensitization");
-        // 调用脱敏接口 与 云服务接口
-        std::make_shared<AntiFraudCloudService>(phoneNum)->UploadPostRequest(antiFraudResult);
+        TELEPHONY_LOGI("text reported to the cloud after anonymize");
+        int ret = AnonymizeText();
+        if (ret != 0) {
+            TELEPHONY_LOGE("Anonymize text fail");
+            return;
+        }
+        OHOS::AntiFraudService::AntiFraudResult fraudResult = antiFraudResult;
+        fraudResult.text = fraudDetectText_;
+        std::make_shared<AntiFraudCloudService>(phoneNum)->UploadPostRequest(fraudResult);
     }
 }
  
@@ -168,6 +176,72 @@ void AntiFraudService::AntiFraudDetectResListenerImpl::HandleAntiFraudDetectRes(
 {
     TELEPHONY_LOGI("HandleAntiFraudDetectRes, result=%{public}d", antiFraudResult.result);
     DelayedSingleton<AntiFraudService>::GetInstance()->RecordDetectResult(antiFraudResult);
+}
+
+void AntiFraudService::AddRuleToConfig(const std::string rulesName, void *config)
+{
+    DIA_String key;
+    std::string skey = "SELECT_RULE";
+    key.data = skey.data();
+    key.dataLength = SELECT_RULE_LENGTH;
+    DIA_Rule rule;
+    std::string rName = rulesName;
+    rule.ruleName = rName.data();
+    if ((rName == "CHINA_RESIDENT_PASSPORT") || (rName == "PERMIT_HM_TO_LAND") ||
+        (rName == "PERMIT_TW_TO_LAND") || (rName == "POLICE_OFFICER_CARD")) {
+        rule.isOpenKeywords = true;
+    }
+    auto anonymizeAdapter = DelayedSingleton<AnonymizeAdapter>::GetInstance();
+    int ret = anonymizeAdapter->SetRule(config, &key, &rule);
+    if (ret != 0) {
+        TELEPHONY_LOGE("AddRuleToConfig fail, rulename=%{public}s", rulesName.c_str());
+    }
+}
+
+int AntiFraudService::AnonymizeText()
+{
+    void *config = nullptr;
+    auto anonymizeAdapter = DelayedSingleton<AnonymizeAdapter>::GetInstance();
+    int ret = anonymizeAdapter->InitConfig(&config);
+    if (ret != 0) {
+        TELEPHONY_LOGE("InitConfig fail");
+        return ret;
+    }
+    AddRuleToConfig("PRC", config);
+    AddRuleToConfig("CHINA_RESIDENT_PASSPORT", config);
+    AddRuleToConfig("MILITARY_IDENTITY_CARD_NUMBER", config);
+    AddRuleToConfig("BANK_CARD_NUMBER", config);
+    AddRuleToConfig("PERMIT_LAND_TO_HM", config);
+    AddRuleToConfig("PERMIT_LAND_TO_TW", config);
+    AddRuleToConfig("PERMIT_HM_TO_LAND", config);
+    AddRuleToConfig("PERMIT_TW_TO_LAND", config);
+    AddRuleToConfig("BIRTH_CERTIFICATE", config);
+    AddRuleToConfig("SEAFARER_PASSPORT", config);
+    AddRuleToConfig("POLICE_OFFICER_CARD", config);
+
+    void *assistant = nullptr;
+    ret = anonymizeAdapter->CreateAnonymize(config, &assistant);
+    if (ret != 0) {
+        TELEPHONY_LOGE("CreateAnonymize fail");
+        return ret;
+    }
+
+    DIA_String input;
+    std::string fraudDetectText = fraudDetectText_;
+    input.data = fraudDetectText.data();
+    input.dataLength = strlen(input.data);
+    DIA_String *output = nullptr;
+    ret = anonymizeAdapter->IdentifyAnonymize(assistant, &input, &output);
+    if (ret != 0) {
+        TELEPHONY_LOGE("IdentifyAnonymize fail");
+        return ret;
+    } else {
+        fraudDetectText_ = (std::string)output->data;
+    }
+    anonymizeAdapter->ReleaseConfig(&config);
+    anonymizeAdapter->ReleaseAnonymize(&assistant);
+    anonymizeAdapter->ReleaseOutputData(&output);
+    return 0;
 }
 }
 }
