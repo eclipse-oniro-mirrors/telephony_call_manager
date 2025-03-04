@@ -148,6 +148,7 @@ void AntiFraudService::RecordDetectResult(const OHOS::AntiFraudService::AntiFrau
             TELEPHONY_LOGE("Anonymize text fail");
             return;
         }
+        antiFraudResult.text = fraudDetectText_;
         std::make_shared<AntiFraudCloudService>(phoneNum)->UploadPostRequest(antiFraudResult);
     }
 }
