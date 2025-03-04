@@ -41,8 +41,7 @@ public:
     void SetBtCallScoConnected(bool isBtCallScoConnected);
     bool GetBtCallScoConnected();
     void HfpDisConnectedEndBtCall();
-    void SetHfpPhoneNumber(const std::string &hfpPhoneNumber);
-    void SetHfpContactName(const std::string &hfpContactName);
+    void SetHfpContactName(const std::string &hfpPhoneNumber, const std::string &hfpContactName);
     std::string GetHfpContactName(const std::string &hfpPhoneNumber);
 
 private:

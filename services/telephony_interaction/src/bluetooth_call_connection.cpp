@@ -178,15 +178,11 @@ void BluetoothCallConnection::HfpDisConnectedEndBtCall()
     }
 }
 
-void BluetoothCallConnection::SetHfpPhoneNumber(const std::string &hfpPhoneNumber)
+void BluetoothCallConnection::SetHfpContactName(const std::string &hfpPhoneNumber, const std::string &hfpContactName)
 {
-    TELEPHONY_LOGI("hfpPhoneNumber length = %{public}lu", hfpPhoneNumber.length());
+    TELEPHONY_LOGI("hfpPhoneNumber length = %{public}zu, hfpContactName length = %{public}zu",
+        hfpPhoneNumber.length(), hfpContactName.length());
     hfpPhoneNumber_ = hfpPhoneNumber;
-}
-
-void BluetoothCallConnection::SetHfpContactName(const std::string &hfpContactName)
-{
-    TELEPHONY_LOGI("hfpContactName length = %{public}lu", hfpContactName.length());
     hfpContactName_ = hfpContactName;
 }
 

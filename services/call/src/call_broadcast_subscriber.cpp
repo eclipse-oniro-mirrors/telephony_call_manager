@@ -208,14 +208,14 @@ void CallBroadcastSubscriber::HfpConnectBroadcast(const EventFwk::CommonEventDat
         return;
     }
     sptr<CallBase> foregroundCall = CallObjectManager::GetForegroundCall(false);
-    if (foregroundCall == nullptr || phoneNumber == foregroundCall->GetAccountNumber()) {
+    if (foregroundCall == nullptr || phoneNumber != foregroundCall->GetAccountNumber()) {
         TELEPHONY_LOGI("foregroundCall is nullptr.");
-        DelayedSingleton<BluetoothCallConnection>::GetInstance()->SetHfpPhoneNumber(phoneNumber);
-        DelayedSingleton<BluetoothCallConnection>::GetInstance()->SetHfpContactName(contactName);
+        DelayedSingleton<BluetoothCallConnection>::GetInstance()->SetHfpContactName(phoneNumber, contactName);
     } else {
         TELEPHONY_LOGI("need SetCallerInfo.");
         ContactInfo contactInfo = foregroundCall->GetCallerInfo();
         contactInfo.name = contactName;
+        contactInfo.isContacterExists = true;
         foregroundCall->SetCallerInfo(contactInfo);
     }
     TELEPHONY_LOGI("HfpConnectBroadcast end");
