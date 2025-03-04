@@ -28,7 +28,7 @@ namespace Telephony {
 typedef int (*PfnInitConfig)(void **config);
 typedef int (*PfnSetRule)(void *config, const DIA_String *key, const DIA_Rule *value);
 typedef int (*PfnCreateAnonymize)(void *config, void **anonymize);
-typedef int (*PfnIdentifyAnonymize)(void *anonymize, const DIA_String *input, const DIA_String **output);
+typedef int (*PfnIdentifyAnonymize)(void *anonymize, const DIA_String *input, DIA_String **output);
 typedef int (*PfnReleaseConfig)(void **config);
 typedef int (*PfnReleaseAonoymize)(void **anonymize);
 typedef int (*PfnReleaseOutputData)(DIA_String **output);
