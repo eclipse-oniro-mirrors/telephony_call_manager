@@ -185,21 +185,21 @@ bool CallRequestProcess::IsDsdsMode5()
     return false;
 }
 
-bool CallRequestProcess::HasDialingCall()
+bool CallRequestProcess::HasConnectingCall(bool isIncludeVoipCall)
 {
-    int32_t dialingCallNum = GetCallNum(TelCallState::CALL_STATUS_DIALING);
-    int32_t alertingCallNum = GetCallNum(TelCallState::CALL_STATUS_ALERTING);
+    int32_t dialingCallNum = GetCallNum(TelCallState::CALL_STATUS_DIALING, isIncludeVoipCall);
+    int32_t alertingCallNum = GetCallNum(TelCallState::CALL_STATUS_ALERTING, isIncludeVoipCall);
     if (dialingCallNum == 0 && alertingCallNum == 0) {
         return false;
     }
     return true;
 }
 
-bool CallRequestProcess::HasActiveCall()
+bool CallRequestProcess::HasActivedCall(bool isIncludeVoipCall)
 {
-    int32_t activeCallNum = GetCallNum(TelCallState::CALL_STATUS_ACTIVE);
-    int32_t holdingCallNum = GetCallNum(TelCallState::CALL_STATUS_HOLDING);
-    int32_t answeredCallNum = GetCallNum(TelCallState::CALL_STATUS_ANSWERED);
+    int32_t activeCallNum = GetCallNum(TelCallState::CALL_STATUS_ACTIVE, isIncludeVoipCall);
+    int32_t holdingCallNum = GetCallNum(TelCallState::CALL_STATUS_HOLDING, isIncludeVoipCall);
+    int32_t answeredCallNum = GetCallNum(TelCallState::CALL_STATUS_ANSWERED, isIncludeVoipCall);
     if (activeCallNum == 0 && holdingCallNum == 0 && answeredCallNum == 0) {
         return false;
     }
@@ -216,7 +216,7 @@ bool CallRequestProcess::NeedAnswerVTAndEndActiveVO(int32_t callId, int32_t vide
         (holdingCall != nullptr && holdingCall->GetCallID() == callId)) {
         return false;
     }
-    if (HasDialingCall() || HasActiveCall()) {
+    if (HasConnectingCall(false) || HasActivedCall(false)) {
         if (videoState != static_cast<int32_t>(VideoStateType::TYPE_VOICE)) {
             TELEPHONY_LOGI("answer a new video call, need to hang up the exist call");
             return true;
@@ -230,7 +230,7 @@ bool CallRequestProcess::NeedAnswerVOAndEndActiveVT(int32_t callId, int32_t vide
     if (videoState != static_cast<int32_t>(VideoStateType::TYPE_VOICE)) {
         return false;
     }
-    if (HasActiveCall()) {
+    if (HasActivedCall(false)) {
         sptr<CallBase> activeCall = GetOneCarrierCallObject(CallRunningState::CALL_RUNNING_STATE_ACTIVE);
         sptr<CallBase> holdingCall = GetOneCarrierCallObject(CallRunningState::CALL_RUNNING_STATE_HOLD);
         if ((activeCall != nullptr && activeCall->GetVideoStateType() != VideoStateType::TYPE_VOICE &&

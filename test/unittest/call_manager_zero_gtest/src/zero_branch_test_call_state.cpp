@@ -785,10 +785,11 @@ HWTEST_F(CallStateTest, Telephony_CallRequestProcess_003, Function | MediumTest 
     callBase3->callId_ = 3;
     bool enabled = false;
     callRequestProcess->HandleCallWaitingNumOneNext(callBase3, callBase2, callBase1, 1, enabled);
-    callRequestProcess->HasActiveCall();
-    callRequestProcess->HasDialingCall();
-    callRequestProcess->NeedAnswerVTAndEndActiveVO(defaultCallId, 0);
+    ASSERT_FALSE(callRequestProcess->HasActivedCall(false));
+    ASSERT_TRUE(callRequestProcess->HasConnectingCall(false));
+    ASSERT_TRUE(callRequestProcess->NeedAnswerVTAndEndActiveVO(3, 1));
     ASSERT_FALSE(callRequestProcess->NeedAnswerVOAndEndActiveVT(defaultCallId, 0));
+    ASSERT_FALSE(callRequestProcess->NeedAnswerVOAndEndActiveVT(defaultCallId, 2));
 }
 
 /**
