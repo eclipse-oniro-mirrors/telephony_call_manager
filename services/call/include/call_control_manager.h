@@ -136,12 +136,13 @@ public:
     void AcquireIncomingLock();
     void ReleaseIncomingLock();
     void DisconnectAllCalls();
+#ifdef NOT_SUPPORT_MULTICALL
     bool HangUpFirstCallBtAndESIM(int32_t secondCallId);
     bool HangUpFirstCallBtCall(int32_t secondCallId);
     bool HangUpFirstCallESIMCall(int32_t secondCallId);
     bool HangUpFirstCall(int32_t secondCallId);
     void HangUpFirstCallBySecondCallID(int32_t secondCallId, bool secondAutoAnswer = false);
-
+#endif
 private:
     void CallStateObserve();
     int32_t NumberLegalityCheck(std::string &number);

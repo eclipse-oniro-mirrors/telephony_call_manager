@@ -38,8 +38,9 @@ bool CallObjectManager::needWaitHold_ = false;
 CellularCallInfo CallObjectManager::dialCallInfo_;
 constexpr int32_t CRS_TYPE = 2;
 constexpr uint64_t DISCONNECT_DELAY_TIME = 2000000;
+#ifdef NOT_SUPPORT_MULTICALL
 constexpr int32_t CALL_MAX_COUNT = 2;
-
+#endif
 CallObjectManager::CallObjectManager()
 {
 }
@@ -1064,6 +1065,7 @@ bool CallObjectManager::IsNeedSilentInDoNotDisturbMode()
     }
     return false;
 }
+#ifdef NOT_SUPPORT_MULTICALL
 bool CallObjectManager::IsTwoCallBtCallAndESIM()
 {
     std::lock_guard<std::mutex> lock(listMutex_);
@@ -1152,5 +1154,6 @@ bool CallObjectManager::IsOneNumberDualTerminal()
     }
     return false;
 }
+#endif
 } // namespace Telephony
 } // namespace OHOS
