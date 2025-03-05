@@ -124,7 +124,7 @@ HWTEST_F(LocationEngineTest, Telephony_MyLocationEngine_002, Function | MediumTe
         return;
     }
     Parcel parcel;
-    std::unique_ptr<Location::Location> location = Location::Location::Unmarshalling(parcel);
+    std::unique_ptr<Location::Location> location = Location::Location::UnmarshallingMakeUnique(parcel);
     engine->locatorCallback_->OnLocationReport(location);
     uint32_t code = 0;
     MessageParcel data1;

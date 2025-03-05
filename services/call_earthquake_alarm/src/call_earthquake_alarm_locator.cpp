@@ -177,7 +177,7 @@ int32_t MyLocationEngine::MyLocationCallBack::OnRemoteRequest(uint32_t code, Mes
     }
     switch (code) {
         case RECEIVE_LOCATION_INFO_EVENT: {
-            std::unique_ptr<OHOS::Location::Location> location = 
+            std::unique_ptr<OHOS::Location::Location> location =
                 OHOS::Location::Location::UnmarshallingMakeUnique(data);
             OnLocationReport(location);
             break;
