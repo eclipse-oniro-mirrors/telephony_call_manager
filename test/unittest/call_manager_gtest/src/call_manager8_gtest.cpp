@@ -29,6 +29,7 @@
 #include "telephony_types.h"
 #include "voip_call.h"
 #include "anonymize_adapter.h"
+#include "antifraud_adapter.h"
 #include "antifraud_service.h"
 
 using namespace OHOS::Bluetooth;
@@ -1318,6 +1319,49 @@ HWTEST_F(CallManagerGtest, Telephony_AnonymizeAdapter_0100, Function | MediumTes
     void *assistant = nullptr;
     EXPECT_EQ(anonymizeAdapter->ReleaseConfig(&config), 0);
     EXPECT_EQ(anonymizeAdapter->ReleaseAnonymize(&assistant), 0);
+}
+
+/**
+ * @tc.number   Telephony_AntiFraud_0100
+ * @tc.name     Test AntiFraud
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_AntiFraud_0100, Function | MediumTest | Level3)
+{
+    auto antiFraudService = DelayedSingleton<AntiFraudService>::GetInstance();
+    EXPECT_EQ(antiFraudService->CreateDataShareHelper(-1, USER_SETTINGSDATA_URI.c_str()), nullptr);
+    EXPECT_NE(antiFraudService->CreateDataShareHelper(TELEPHONY_CALL_MANAGER_SYS_ABILITY_ID,
+        USER_SETTINGSDATA_URI.c_str()), nullptr);
+
+    std::string switchName = "noswitch";
+    EXPECT_FALSE(antiFraudService->IsSwitchOn(switchName));
+    EXPECT_FALSE(antiFraudService->IsSwitchOn(ANTIFRAUD_SWITCH));
+
+    OHOS::AntiFraudService::AntiFraudResult fraudResult;
+    antiFraudService->RecordDetectResult(fraudResult);
+    EXPECT_EQ(antiFraudService->antiFraudState_, 3);
+    fraudResult.result = true;
+    antiFraudService->RecordDetectResult(fraudResult);
+    EXPECT_EQ(antiFraudService->antiFraudState_, 2);
+    antiFraudService->InitAntiFraudService();
+    EXPECT_EQ(antiFraudService->antiFraudState_, 1);
+
+    auto callStatusManager1 = DelayedSingleton<CallStatusManager>::GetInstance();
+    antiFraudService->SetCallStatusManager(callStatusManager1);
+    antiFraudService->RecordDetectResult(fraudResult);
+    fraudResult.result = false;
+    antiFraudService->RecordDetectResult(fraudResult);
+    auto callStatusManager2 = DelayedSingleton<CallStatusManager>::GetInstance();
+    antiFraudService->SetCallStatusManager(callStatusManager2);
+    antiFraudService->InitAntiFraudService();
+    EXPECT_EQ(antiFraudService->antiFraudState_, 0);
+
+    auto antiFraudAdapter = DelayedSingleton<AntiFraudAdapter>::GetInstance();
+    antiFraudAdapter->ReleaseAntiFraud();
+    EXPECT_EQ(antiFraudAdapter->libAntiFraud_, nullptr);
+    antiFraudAdapter->GetLibAntiFraud();
+    antiFraudAdapter->ReleaseAntiFraud();
+    EXPECT_EQ(antiFraudAdapter->libAntiFraud_, nullptr);
 }
 } // namespace Telephony
 } // namespace OHOS
