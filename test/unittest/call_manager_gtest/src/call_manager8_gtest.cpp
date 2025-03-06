@@ -1344,7 +1344,7 @@ HWTEST_F(CallManagerGtest, Telephony_AntiFraud_0100, Function | MediumTest | Lev
     fraudResult.result = true;
     antiFraudService->RecordDetectResult(fraudResult);
     EXPECT_EQ(antiFraudService->antiFraudState_, 2);
-    antiFraudService->InitAntiFraudService();
+    antiFraudService->InitAntiFraudService(phoneNum);
     EXPECT_EQ(antiFraudService->antiFraudState_, 1);
 
     auto callStatusManager1 = DelayedSingleton<CallStatusManager>::GetInstance();
@@ -1354,7 +1354,7 @@ HWTEST_F(CallManagerGtest, Telephony_AntiFraud_0100, Function | MediumTest | Lev
     antiFraudService->RecordDetectResult(fraudResult);
     auto callStatusManager2 = DelayedSingleton<CallStatusManager>::GetInstance();
     antiFraudService->SetCallStatusManager(callStatusManager2);
-    antiFraudService->InitAntiFraudService();
+    antiFraudService->InitAntiFraudService(phoneNum);
     EXPECT_EQ(antiFraudService->antiFraudState_, 0);
 
     auto antiFraudAdapter = DelayedSingleton<AntiFraudAdapter>::GetInstance();
