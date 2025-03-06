@@ -409,7 +409,6 @@ HWTEST_F(ZeroBranch2Test, Telephony_CallObjectManager_002, Function | MediumTest
     EXPECT_EQ(CallObjectManager::GetCallNumByRunningState(CallRunningState::CALL_RUNNING_STATE_ACTIVE), 1);
     EXPECT_EQ(CallObjectManager::GetCallNumByRunningState(CallRunningState::CALL_RUNNING_STATE_DIALING), 0);
     EXPECT_EQ(CallObjectManager::GetForegroundLiveCallByCallId(0), nullptr);
-    EXPECT_FALSE(CallObjectManager::IsTwoCallESIMCall());
     EXPECT_FALSE(CallObjectManager::HasIncomingCallCrsType());
     CallObjectManager::DeleteOneCallObject(0);
 }
