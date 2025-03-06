@@ -125,11 +125,13 @@ private:
     int32_t HandleCallReportInfoEx(const CallDetailInfo &info);
     void ClearPendingState(sptr<CallBase> &call);
     void RefreshCallDisconnectReason(const sptr<CallBase> &call, int32_t reason);
+#ifdef NOT_SUPPORT_MULTICALL
+    void AutoAnswerSecondCall();
+    void OneCallAnswerAtPhone(int32_t callId);
+#endif
     bool IsFromTheSameNumberAtTheSameTime(const sptr<CallBase> &newCall);
     void ModifyEsimType();
     int32_t RefreshOldCall(const CallDetailInfo &info, bool &isExistedOldCall);
-    void AutoAnswerSecondCall();
-    void OneCallAnswerAtPhone(int32_t callId);
     bool IsCallMotionRecognitionEnable(const std::string &key);
     void StartInComingCallMotionRecognition();
     void StartOutGoingCallMotionRecognition();

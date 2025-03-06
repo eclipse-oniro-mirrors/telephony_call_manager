@@ -230,9 +230,11 @@ void CallControlManager::PackageDialInformation(AppExecFwk::PacMap &extras, std:
 
 int32_t CallControlManager::AnswerCall(int32_t callId, int32_t videoState)
 {
+#ifdef NOT_SUPPORT_MULTICALL
     if (HangUpFirstCall(callId)) {
         return TELEPHONY_SUCCESS;
     }
+#endif
     sptr<CallBase> call = GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_RINGING);
     if (call == nullptr) {
         TELEPHONY_LOGE("call is nullptr");
@@ -1970,6 +1972,7 @@ bool CallControlManager::onButtonDealing(HeadsetButtonService::ButtonEvent type)
     return true;
 }
 #endif
+#ifdef NOT_SUPPORT_MULTICALL
 bool CallControlManager::HangUpFirstCallBtAndESIM(int32_t secondCallId)
 {
     if (!CallObjectManager::IsTwoCallBtCallAndESIM()) {
@@ -1993,7 +1996,7 @@ bool CallControlManager::HangUpFirstCallESIMCall(int32_t secondCallId)
     if (!CallObjectManager::IsTwoCallESIMCall()) {
         return false;
     }
-    HangUpFirstCallBySecondCallID(secondCallId);
+    HangUpFirstCallBySecondCallID(secondCallId, true);
     return true;
 }
 
@@ -2003,6 +2006,8 @@ bool CallControlManager::HangUpFirstCall(int32_t secondCallId)
         return HangUpFirstCallBtAndESIM(secondCallId);
     } else if (CallObjectManager::IsTwoCallBtCall()) {
         HangUpFirstCallBtCall(secondCallId);
+    } else if (CallObjectManager::IsTwoCallESIMCall()) {
+        return HangUpFirstCallESIMCall(secondCallId);
     }
     return false;
 }
@@ -2044,5 +2049,6 @@ void CallControlManager::HangUpFirstCallBySecondCallID(int32_t secondCallId, boo
         break;
     }
 }
+#endif
 } // namespace Telephony
 } // namespace OHOS
