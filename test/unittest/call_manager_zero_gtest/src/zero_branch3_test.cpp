@@ -14,6 +14,7 @@
  */
 #define private public
 #define protected public
+#include "antifraud_service.h"
 #include "bluetooth_call_client.h"
 #include "bluetooth_call_manager.h"
 #include "bluetooth_call_service.h"
@@ -100,6 +101,7 @@ constexpr const char *TEST_STR = "123";
 constexpr const char *LONG_STR =
     "11111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111"
     "111111111";
+constexpr int WAIT_TIME = 3;
 } // namespace
 
 class DemoHandler : public AppExecFwk::EventHandler {
@@ -1182,6 +1184,68 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_006, Function | MediumTest
         dataShareHelper->Release();
         ASSERT_NO_THROW(callStatusManager->ModifyEsimType());
     }
+}
+
+HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_007, Function | MediumTest | Level3)
+{
+    std::shared_ptr<CallStatusManager> callStatusManager = std::make_shared<CallStatusManager>();
+    CallDetailInfo info;
+    std::string number = "123456789";
+    memcpy_s(&info.phoneNum, kMaxNumberLen, number.c_str(), number.length());
+    info.voipCallInfo.voipCallId = "123456789";
+    info.callType = CallType::TYPE_VOIP;
+    info.state = TelCallState::CALL_STATUS_INCOMING;
+    ASSERT_GT(callStatusManager->HandleCallReportInfo(info), TELEPHONY_ERROR);
+    info.callType = CallType::TYPE_BLUETOOTH;
+    info.index = 1;
+    info.state = TelCallState::CALL_STATUS_INCOMING;
+    ASSERT_GT(callStatusManager->HandleCallReportInfo(info), TELEPHONY_ERROR);
+    info.state = TelCallState::CALL_STATUS_ACTIVE;
+    ASSERT_GT(callStatusManager->HandleCallReportInfo(info), TELEPHONY_ERROR);
+    info.state = TelCallState::CALL_STATUS_WAITING;
+    ASSERT_GT(callStatusManager->HandleCallReportInfo(info), TELEPHONY_ERROR);
+    info.state = TelCallState::CALL_STATUS_DISCONNECTED;
+    ASSERT_GT(callStatusManager->HandleCallReportInfo(info), TELEPHONY_ERROR);
+    info.state = TelCallState::CALL_STATUS_DIALING;
+    ASSERT_GT(callStatusManager->HandleCallReportInfo(info), TELEPHONY_ERROR);
+    info.state = TelCallState::CALL_STATUS_ALERTING;
+    ASSERT_GT(callStatusManager->HandleCallReportInfo(info), TELEPHONY_ERROR);
+    callStatusManager->HandleConnectingCallReportInfo(info);
+    info.index = 0;
+    ASSERT_GT(callStatusManager->HandleCallReportInfo(info), TELEPHONY_ERROR);
+    sptr<CallBase> call = callStatusManager->GetOneCallObjectByVoipCallId(
+        info.voipCallInfo.voipCallId, info.voipCallInfo.voipBundleName, info.voipCallInfo.uid);
+    ASSERT_TRUE(call != nullptr);
+    EXPECT_EQ(callStatusManager->AnsweredVoipCallHandle(info), TELEPHONY_ERROR);
+    EXPECT_GT(callStatusManager->DisconnectingVoipCallHandle(info), TELEPHONY_ERROR);
+    callStatusManager->DeleteOneCallObject(call);
+    EXPECT_EQ(callStatusManager->AnsweredVoipCallHandle(info), TELEPHONY_ERROR);
+    EXPECT_EQ(callStatusManager->DisconnectingVoipCallHandle(info), TELEPHONY_ERROR);
+    EXPECT_FALSE(callStatusManager->IsContactPhoneNum(number));
+    EXPECT_FALSE(callStatusManager->IsDistributeCallSourceStatus());
+    EXPECT_GT(callStatusManager->UpdateCallStateAndHandleDsdsMode(info, call), TELEPHONY_ERROR);
+    EXPECT_FALSE(callStatusManager->ShouldBlockIncomingCall(call, info));
+    call = nullptr;
+    EXPECT_EQ(callStatusManager->UpdateCallStateAndHandleDsdsMode(info, call), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(callStatusManager->HandleCallReportInfoEx(info), TELEPHONY_ERR_FAIL);
+    VoipCallEventInfo voipCallInfo;
+    callStatusManager->BtCallDialingHandleFirst(nullptr, info);
+    std::vector<sptr<CallBase>> conferenceCallList;
+    callStatusManager->SetConferenceCall(conferenceCallList);
+    EXPECT_GT(callStatusManager->HandleVoipEventReportInfo(voipCallInfo), TELEPHONY_ERROR);
+}
+
+HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_008, Function | MediumTest | Level3)
+{
+    std::shared_ptr<CallStatusManager> callStatusManager = std::make_shared<CallStatusManager>();
+    callStatusManager->antiFraudIndex_ = -1;
+    callStatusManager->antiFraudSlotId_ = 0;
+    callStatusManager->TriggerAntiFraud(static_cast<int32_t>(AntiFraudState::ANTIFRAUD_STATE_RISK));
+    EXPECT_EQ(callStatusManager->antiFraudSlotId_, -1);
+    callStatusManager->antiFraudSlotId_ = 0;
+    callStatusManager->TriggerAntiFraud(static_cast<int32_t>(AntiFraudState::ANTIFRAUD_STATE_FINISHED));
+    EXPECT_EQ(callStatusManager->antiFraudSlotId_, -1);
+    sleep(WAIT_TIME);
 }
 } // namespace Telephony
 } // namespace OHOS

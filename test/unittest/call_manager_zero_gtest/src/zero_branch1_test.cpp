@@ -400,8 +400,16 @@ HWTEST_F(ZeroBranch2Test, Telephony_CallObjectManager_002, Function | MediumTest
     bool hasRingingCall = false;
     CallObjectManager::HasRingingCall(hasRingingCall);
     csCall->callRunningState_ = CallRunningState::CALL_RUNNING_STATE_HOLD;
-CallObjectManager::HasHoldCall(hasRingingCall);
+    CallObjectManager::HasHoldCall(hasRingingCall);
     ASSERT_FALSE(CallObjectManager::IsCallExist(CallType::TYPE_VOIP, TelCallState::CALL_STATUS_ACTIVE));
+    std::list<int32_t> satelliteCallList;
+    EXPECT_EQ(CallObjectManager::GetSatelliteCallList(satelliteCallList), TELEPHONY_SUCCESS);
+    EXPECT_EQ(CallObjectManager::GetForegroundCall(false), nullptr);
+    EXPECT_EQ(CallObjectManager::GetForegroundCall(true), nullptr);
+    EXPECT_EQ(CallObjectManager::GetCallNumByRunningState(CallRunningState::CALL_RUNNING_STATE_ACTIVE), 1);
+    EXPECT_EQ(CallObjectManager::GetCallNumByRunningState(CallRunningState::CALL_RUNNING_STATE_DIALING), 0);
+    EXPECT_EQ(CallObjectManager::GetForegroundLiveCallByCallId(0), nullptr);
+    EXPECT_FALSE(CallObjectManager::HasIncomingCallCrsType());
     CallObjectManager::DeleteOneCallObject(0);
 }
 
