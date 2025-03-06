@@ -59,9 +59,13 @@ HWTEST_F(DistributedDevObserverTest, Telephony_DcDeviceObserver_001, Function | 
 
     callback = std::make_shared<DistributedSourceSwitchController>();
     ASSERT_NO_THROW(deviceObserver->RegisterDevStatusCallback(callback));
+    ASSERT_NO_THROW(deviceObserver->Init());
     ASSERT_NO_THROW(deviceObserver->OnDeviceOnline(devId, devName, deviceType));
     ASSERT_NO_THROW(deviceObserver->OnDeviceOffline(devId, devName, deviceType));
     ASSERT_NO_THROW(deviceObserver->OnRemoveSystemAbility());
+    deviceObserver->callbacks_.push_back(callback);
+    ASSERT_NO_THROW(deviceObserver->OnDistributedAudioDeviceChange(devId, devName,
+        static_cast<AudioDeviceType>(devType), devRole));
     ASSERT_NO_THROW(saListener->OnAddSystemAbility(otherSaId, devId));
     ASSERT_NO_THROW(saListener->OnAddSystemAbility(dcCallSaId, devId));
     ASSERT_NO_THROW(saListener->OnRemoveSystemAbility(otherSaId, devId));

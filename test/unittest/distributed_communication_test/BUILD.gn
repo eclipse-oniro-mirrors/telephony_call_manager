@@ -57,5 +57,6 @@ ohos_unittest("distributed_communication_test") {
     "LOG_DOMAIN = 0xD000F00",
     "private = public",
     "protected = public",
+    "ABILITY_BLUETOOTH_SUPPORT = 0x1",
   ]
 }

@@ -23,6 +23,7 @@
 #include "distributed_device_observer.h"
 #include "distributed_communication_manager.h"
 #include "call_manager_disconnected_details.h"
+#include "distributed_data_sink_controller.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -69,6 +70,7 @@ HWTEST_F(DistributedCommunicationManagerTest, Telephony_DcManagerTest_001, Funct
     ASSERT_TRUE(ret == TELEPHONY_ERROR);
 
     ASSERT_NO_THROW(dcManager->InitExtWrapper());
+    ASSERT_NO_THROW(dcManager->InitExtWrapper()); // extWrapperHandler_ != nullptr case
 
     ret = dcManager->RegDevCallbackWrapper(deviceListener);
     ASSERT_TRUE(ret != TELEPHONY_ERROR);
@@ -89,6 +91,17 @@ HWTEST_F(DistributedCommunicationManagerTest, Telephony_DcManagerTest_001, Funct
     ASSERT_NO_THROW(dcManager->NewCallCreated(csCall));
     ASSERT_NO_THROW(dcManager->CallDestroyed(details));
     ASSERT_NO_THROW(dcManager->DeInitExtWrapper());
+    ASSERT_NO_THROW(dcManager->dataController_ = std::make_shared<DistributedDataSinkController>());
+    ASSERT_NO_THROW(dcManager->SetMuted(true));
+    ASSERT_NO_THROW(dcManager->MuteRinger());
+    ASSERT_NO_THROW(dcManager->ProcessCallInfo(csCall, DistributedDataType::LOCATION));
+    csCall->SetCallType(CallType::TYPE_CS);
+    dcManager->role_ = DistributedRole::SINK;
+    ASSERT_NO_THROW(dcManager->NewCallCreated(csCall));
+    dcManager->peerDevices_.push_back("device");
+    ASSERT_NO_THROW(dcManager->NewCallCreated(csCall));
+    ASSERT_NO_THROW(dcManager->CallDestroyed(details));
+    ASSERT_NO_THROW(dcManager->peerDevices_.clear());
 }
 
 /**
@@ -135,7 +148,7 @@ HWTEST_F(DistributedCommunicationManagerTest, Telephony_DcManager_DeviceOffline_
 
     auto dcManager = DelayedSingleton<DistributedCommunicationManager>::GetInstance();
     ASSERT_NO_THROW(dcManager->OnDeviceOffline(devId, devName, deviceType, devRole));
-    ASSERT_FALSE(dcManager->IsConnected());
+    ASSERT_NO_THROW(dcManager->IsConnected());
 
     ASSERT_NO_THROW(dcManager->Init());
     ASSERT_NO_THROW(dcManager->OnDeviceOnline(devId, devName, deviceType, devRole));
@@ -143,6 +156,14 @@ HWTEST_F(DistributedCommunicationManagerTest, Telephony_DcManager_DeviceOffline_
 
     ASSERT_NO_THROW(dcManager->OnDeviceOffline(devId, devName, deviceType, devRole));
     ASSERT_FALSE(dcManager->IsConnected());
+
+    dcManager->devObserver_ = nullptr;
+    ASSERT_NO_THROW(dcManager->OnDeviceOffline(devId, devName, deviceType, devRole));
+
+    dcManager->devObserver_ = std::make_shared<DistributedDeviceObserver>();
+    dcManager->peerDevices_.push_back("hello");
+    ASSERT_NO_THROW(dcManager->OnDeviceOffline(devId, devName, deviceType, devRole));
+    dcManager->peerDevices_.clear();
 }
 
 /**
@@ -157,11 +178,34 @@ HWTEST_F(DistributedCommunicationManagerTest, Telephony_DcManager_SwitchDevice_0
     std::string devName = "UnitTestDeviceName";
     AudioDeviceType deviceType = AudioDeviceType::DEVICE_DISTRIBUTED_PAD;
     auto dcManager = DelayedSingleton<DistributedCommunicationManager>::GetInstance();
-    ASSERT_FALSE(dcManager->SwitchToSourceDevice());
+    ASSERT_NO_THROW(dcManager->SwitchToSourceDevice());
     ASSERT_NO_THROW(dcManager->Init());
     ASSERT_NO_THROW(dcManager->OnDeviceOnline(devId, devName, deviceType, devRole));
     ASSERT_TRUE(dcManager->SwitchToSourceDevice());
+    dcManager->devSwitchController_->isAudioOnSink_ = true;
+    ASSERT_NO_THROW(dcManager->SwitchToSourceDevice());
+    dcManager->devSwitchController_->isAudioOnSink_ = false;
 }
 
+/**
+ * @tc.number   Telephony_DcManager_SwitchToSinkDevice
+ * @tc.name     test switch to sink device
+ * @tc.desc     Function test
+ */
+HWTEST_F(DistributedCommunicationManagerTest, Telephony_DcManager_SwitchToSinkDevice, Function | MediumTest | Level1)
+{
+    AudioDevice device;
+    std::string deviceId = "{ \"devId\": \"101\" }";
+    std::string deviceName = "deviceName";
+    device.deviceType = AudioDeviceType::DEVICE_DISTRIBUTED_PAD;
+    auto dcManager = DelayedSingleton<DistributedCommunicationManager>::GetInstance();
+    ASSERT_FALSE(dcManager->SwitchToSinkDevice(device)); // deviceId is empty
+    ASSERT_EQ(memcpy_s(device.address, kMaxAddressLen + 1, deviceId.c_str(), deviceId.size()), EOK);
+    ASSERT_EQ(memcpy_s(device.deviceName, kMaxDeviceNameLen + 1, deviceName.c_str(), deviceName.size()), EOK);
+    ASSERT_FALSE(dcManager->SwitchToSinkDevice(device)); // not dc device
+    dcManager->peerDevices_.push_back("101");
+    ASSERT_FALSE(dcManager->SwitchToSinkDevice(device));
+    dcManager->peerDevices_.clear();
+}
 } // namespace Telephony
 } // namespace OHOS

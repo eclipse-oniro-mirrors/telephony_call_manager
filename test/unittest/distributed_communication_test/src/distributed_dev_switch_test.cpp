@@ -50,15 +50,46 @@ HWTEST_F(DistributedDevSwitchTest, Telephony_DcDevSwitch_001, Function | MediumT
     ASSERT_TRUE(sourceSwitchController->IsAudioOnSink());
     ASSERT_NO_THROW(sourceSwitchController->OnRemoveSystemAbility());
     ASSERT_FALSE(sourceSwitchController->IsAudioOnSink());
+    ASSERT_NO_THROW(sourceSwitchController->SwitchDevice(devId, 1));
     auto sinkSwitchController = std::make_shared<DistributedSinkSwitchController>();
     ASSERT_NO_THROW(sinkSwitchController->OnDeviceOnline(devId, devName, deviceType));
     ASSERT_NO_THROW(sinkSwitchController->OnDeviceOffline(devId, devName, deviceType));
+    ASSERT_NO_THROW(sinkSwitchController->hfpListener_ = std::make_shared<DcCallHfpListener>());
     ASSERT_NO_THROW(sinkSwitchController->OnDistributedAudioDeviceChange(devId, devName,
         deviceType, static_cast<int32_t>(devRole)));
     ASSERT_TRUE(sinkSwitchController->IsAudioOnSink());
+    ASSERT_NO_THROW(sinkSwitchController->hfpListener_ = std::make_shared<DcCallHfpListener>());
     ASSERT_NO_THROW(sinkSwitchController->OnRemoveSystemAbility());
     ASSERT_FALSE(sinkSwitchController->IsAudioOnSink());
 }
 
+#ifdef ABILITY_BLUETOOTH_SUPPORT
+/**
+ * @tc.number   Telephony_DcCallHfpListenerTest
+ * @tc.name     test hfp listeber normal func
+ * @tc.desc     Function test
+ */
+HWTEST_F(DistributedDevSwitchTest, Telephony_DcCallHfpListenerTest, Function | MediumTest | Level1)
+{
+    DcCallHfpListener listener;
+    DcCallSourceHfpListener sourceListener;
+    Bluetooth::BluetoothRemoteDevice device;
+    ASSERT_NO_THROW(listener.SetPreAction(1));
+    ASSERT_NO_THROW(listener.SwitchToBtHeadset(device));
+    ASSERT_NO_THROW(listener.OnHfpStackChanged(device, 0)); // WEAR_ACTION
+    ASSERT_NO_THROW(listener.OnHfpStackChanged(device, 1)); // UNWEAR_ACTION
+    ASSERT_NO_THROW(listener.OnHfpStackChanged(device, 2)); // ENABLE_FROM_REMOTE_ACTION
+    ASSERT_NO_THROW(listener.OnHfpStackChanged(device, 3)); // DISABLE_FROM_REMOTE_ACTION
+    ASSERT_NO_THROW(listener.OnHfpStackChanged(device, 6)); // USER_SELECTION_ACTION
+    ASSERT_NO_THROW(sourceListener.OnHfpStackChanged(device, 0));
+
+    auto dcManager = DelayedSingleton<DistributedCommunicationManager>::GetInstance();
+    ASSERT_NO_THROW(dcManager->devSwitchController_ = std::make_shared<DistributedSinkSwitchController>());
+    dcManager->devSwitchController_->isAudioOnSink_ = true;
+    ASSERT_NO_THROW(sourceListener.IsNeedSwitchToSource(device, 1));
+    dcManager->devSwitchController_->isAudioOnSink_ = false;
+    ASSERT_NO_THROW(sourceListener.IsNeedSwitchToSource(device, 1));
+}
+#endif
 } // namespace Telephony
 } // namespace OHOS
