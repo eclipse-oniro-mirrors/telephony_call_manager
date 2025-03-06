@@ -1229,7 +1229,7 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_007, Function | MediumTest
     EXPECT_GT(callStatusManager->UpdateCallStateAndHandleDsdsMode(info, call), TELEPHONY_ERROR);
     EXPECT_FALSE(callStatusManager->ShouldBlockIncomingCall(call, info));
     call = nullptr;
-    EXPECT_EQ(callStatusManager->UpdateCallStateAndHandleDsdsMode(call, info), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(callStatusManager->UpdateCallStateAndHandleDsdsMode(info, call), TELEPHONY_ERR_LOCAL_PTR_NULL);
     callStatusManager->AutoAnswerSecondCall();
     EXPECT_EQ(callStatusManager->HandleCallReportInfoEx(info), TELEPHONY_ERR_FAIL);
     callStatusManager->antiFraudIndex_ = -1;
