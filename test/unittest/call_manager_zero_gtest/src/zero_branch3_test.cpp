@@ -989,9 +989,6 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_001, Function | MediumTest
     info.state = TelCallState::CALL_STATUS_ACTIVE;
     ASSERT_GT(callStatusManager->HandleCallReportInfo(info), TELEPHONY_ERROR);
     info.state = TelCallState::CALL_STATUS_DISCONNECTED;
-    callStatusManager->BtCallDialingHandleFirst(nullptr, info);
-    std::vector<sptr<CallBase>> conferenceCallList;
-    callStatusManager->SetConferenceCall(conferenceCallList);
     ASSERT_GT(callStatusManager->HandleCallReportInfo(info), TELEPHONY_ERROR);
 }
 
@@ -1232,6 +1229,16 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_007, Function | MediumTest
     EXPECT_EQ(callStatusManager->UpdateCallStateAndHandleDsdsMode(info, call), TELEPHONY_ERR_LOCAL_PTR_NULL);
     callStatusManager->AutoAnswerSecondCall();
     EXPECT_EQ(callStatusManager->HandleCallReportInfoEx(info), TELEPHONY_ERR_FAIL);
+    VoipCallEventInfo voipCallInfo;
+    callStatusManager->BtCallDialingHandleFirst(nullptr, info);
+    std::vector<sptr<CallBase>> conferenceCallList;
+    callStatusManager->SetConferenceCall(conferenceCallList);
+    EXPECT_GT(callStatusManager->HandleVoipEventReportInfo(voipCallInfo), TELEPHONY_ERROR);
+}
+
+HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_008, Function | MediumTest | Level3)
+{
+    std::shared_ptr<CallStatusManager> callStatusManager = std::make_shared<CallStatusManager>();
     callStatusManager->antiFraudIndex_ = -1;
     callStatusManager->antiFraudSlotId_ = 0;
     callStatusManager->TriggerAntiFraud(static_cast<int32_t>(AntiFraudState::ANTIFRAUD_STATE_RISK));
@@ -1239,8 +1246,6 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_007, Function | MediumTest
     callStatusManager->antiFraudSlotId_ = 0;
     callStatusManager->TriggerAntiFraud(static_cast<int32_t>(AntiFraudState::ANTIFRAUD_STATE_FINISHED));
     EXPECT_EQ(callStatusManager->antiFraudSlotId_, -1);
-    VoipCallEventInfo voipCallInfo;
-    EXPECT_GT(callStatusManager->HandleVoipEventReportInfo(voipCallInfo), TELEPHONY_ERROR);
     sleep(WAIT_TIME);
 }
 } // namespace Telephony
