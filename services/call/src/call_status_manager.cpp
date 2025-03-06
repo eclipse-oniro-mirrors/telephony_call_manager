@@ -824,6 +824,7 @@ void CallStatusManager::SetupAntiFraudService(const sptr<CallBase> &call, const 
     NumberMarkInfo numberMarkInfo = call->GetNumberMarkInfo();
     std::string tmpStr(info.phoneNum);
     if (numberMarkInfo.markType != MarkType::MARK_TYPE_FRAUD &&
+        numberMarkInfo.markType != MarkType::MARK_TYPE_YELLOW_PAGE &&
         !IsContactPhoneNum(tmpStr) && antiFraudService->IsAntiFraudSwitchOn()) {
         int32_t slotId = call->GetSlotId();
         if (slotId == -1) {
