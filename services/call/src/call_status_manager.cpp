@@ -2063,10 +2063,8 @@ void CallStatusManager::RefreshCallDisconnectReason(const sptr<CallBase> &call, 
 {
     switch (reason) {
         case static_cast<int32_t>(RilDisconnectedReason::DISCONNECTED_REASON_ANSWERED_ELSEWHER):
-            if (DelayedSingleton<DistributedCommunicationManager>::GetInstance()->IsSinkRole()) {
-                call->SetAnswerType(CallAnswerType::CALL_ANSWERED_ELSEWHER);
-                TELEPHONY_LOGI("call answered elsewhere");
-            }
+            call->SetAnswerType(CallAnswerType::CALL_ANSWERED_ELSEWHER);
+            TELEPHONY_LOGI("call answered elsewhere");
             break;
         case static_cast<int32_t>(RilDisconnectedReason::DISCONNECTED_REASON_NORMAL):
             {
