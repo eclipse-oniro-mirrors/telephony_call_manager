@@ -776,13 +776,13 @@ HWTEST_F(CallStateTest, Telephony_CallRequestProcess_003, Function | MediumTest 
     sptr<OHOS::Telephony::CallBase> callBase1 = new IMSCall(mDialParaInfo);
     callBase1->callState_ = TelCallState::CALL_STATUS_HOLDING;
     callBase1->callId_ = 1;
-    callBase1->callRunningState_ = CallRunningState::CALLRUNNING_STATE_HOLD;
+    callBase1->callRunningState_ = CallRunningState::CALL_RUNNING_STATE_HOLD;
     callBase1->videoState_ = VideoStateType::TYPE_SEND_ONLY;
     mDialParaInfo.accountId = 1;
     sptr<OHOS::Telephony::CallBase> callBase2 = new IMSCall(mDialParaInfo);
     callBase2->callState_ = TelCallState::CALL_STATUS_ACTIVE;
     callBase2->callId_ = 2;
-    callBase2->callRunningState_ = CallRunningState::CALLRUNNING_STATE_ACTIVE;
+    callBase2->callRunningState_ = CallRunningState::CALL_RUNNING_STATE_ACTIVE;
     callBase2->videoState_ = VideoStateType::TYPE_SEND_ONLY;
     sptr<OHOS::Telephony::CallBase> callBase3 = new IMSCall(mDialParaInfo);
     callBase3->callState_ = TelCallState::CALL_STATUS_INCOMING;
