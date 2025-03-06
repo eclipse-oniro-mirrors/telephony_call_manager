@@ -46,8 +46,8 @@ public:
     void JoinConference(int32_t callId, std::vector<std::string> &numberList);
     bool IsDsdsMode3();
     bool IsDsdsMode5();
-    bool HasActiveCall();
-    bool HasDialingCall();
+    bool HasActivedCall(bool isIncludeVoipCall);
+    bool HasConnectingCall(bool isIncludeVoipCall);
     bool NeedAnswerVTAndEndActiveVO(int32_t callId, int32_t videoState);
     bool NeedAnswerVOAndEndActiveVT(int32_t callId, int32_t videoState);
     void DisconnectOtherSubIdCall(int32_t callId, int32_t slotId, int32_t videoState);
