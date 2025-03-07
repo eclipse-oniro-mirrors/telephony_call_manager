@@ -39,12 +39,17 @@ void SpamCallConnection::OnAbilityConnectDone(const AppExecFwk::ElementName &ele
 void SpamCallConnection::OnAbilityDisconnectDone(const AppExecFwk::ElementName &element,
     int32_t resultCode)
 {
+    remoteObject_ = nullptr;
     TELEPHONY_LOGI("OnAbilityDisconnectDone, resultCode = %{public}d", resultCode);
 }
 
 void SpamCallConnection::RequireCallReminder()
 {
     TELEPHONY_LOGI("DetectNeedNotify start.");
+    if (remoteObject_ == nullptr) {
+        TELEPHONY_LOGE("remoteObject_ is nullptr");
+        return;
+    }
     SpamCallProxy service(remoteObject_);
     int32_t ret = service.RequireCallReminder(slotId_, spamCallAdapter_);
     TELEPHONY_LOGI("SpamCallProxy DetectNeedNotify ret = %{public}d", ret);
