@@ -210,8 +210,13 @@ HWTEST_F(DistributedDataTest, Telephony_DistributedDataTest_008, Function | Medi
     CallObjectManager::callObjectPtrList_.emplace_back(nullptr);
     CallObjectManager::callObjectPtrList_.emplace_back(call1);
     CallObjectManager::callObjectPtrList_.emplace_back(call2);
-
+    sptr<CallBase> call = new IMSCall(paraInfo);
+    call->callType_ = CallType::TYPE_IMS;
+    CallObjectManager::callObjectPtrList_.push_back(call);
     auto controller = std::make_shared<DistributedDataSinkController>();
+    ASSERT_NO_THROW(controller->SendCurrentDataQueryReq());
+    std::shared_ptr<ISessionCallback> callback = std::make_shared<DataSessionCallbackTest>();
+    controller->session_ = DelayedSingleton<TransmissionManager>::GetInstance()->CreateServerSession(callback);
     ASSERT_NO_THROW(controller->SendCurrentDataQueryReq());
     CallObjectManager::callObjectPtrList_.clear();
 }
@@ -241,6 +246,9 @@ HWTEST_F(DistributedDataTest, Telephony_DistributedDataTest_009, Function | Medi
 
     msg = cJSON_Parse("{ \"itemType\": 0, \"num\": \"123456\", \"direction\": 0 }");
     ASSERT_NO_THROW(controller->HandleCurrentDataQueryRsp(msg));
+    std::string num = "123";
+    std::string reqMsg = controller->CreateCurrentDataReqMsg(num);
+    EXPECT_FALSE(reqMsg.empty());
     cJSON_Delete(msg);
 }
 
@@ -407,6 +415,75 @@ HWTEST_F(DistributedDataTest, Telephony_DistributedDataTest_015, Function | Medi
     msg = cJSON_Parse("{ \"mute\": true }");
     ASSERT_NO_THROW(controller->HandleMuted(msg));
     cJSON_Delete(msg);
+}
+
+/**
+ * @tc.number   Telephony_DistributedDataTest_016
+ * @tc.name     test data msg
+ * @tc.desc     Function test
+ */
+HWTEST_F(DistributedDataTest, Telephony_DistributedDataTest_016, Function | MediumTest | Level1)
+{
+    DialParaInfo mDialParaInfo;
+    sptr<CallBase> imsCall = nullptr;
+    ContactInfo info;
+    info.name = "name";
+    auto sourceController = std::make_shared<DistributedDataSourceController>();
+    ASSERT_NO_THROW(sourceController->SaveLocalData(imsCall, DistributedDataType::LOCATION));
+    imsCall = new IMSCall(mDialParaInfo);
+    imsCall->SetCallerInfo(info);
+    imsCall->SetAccountNumber("number");
+    ASSERT_NO_THROW(sourceController->SaveLocalData(imsCall, DistributedDataType::NAME));
+    std::shared_ptr<ISessionCallback> callback = std::make_shared<DataSessionCallbackTest>();
+    sourceController->session_ = DelayedSingleton<TransmissionManager>::GetInstance()->CreateServerSession(callback);
+    sourceController->session_->socket_ = INVALID_SOCKET_ID + 1; // session is ready
+    ASSERT_NO_THROW(sourceController->SendLocalDataRsp()); // both localInfo_ and queryInfo_ empty
+    sourceController->queryInfo_["name_1"] = 1;
+    sourceController->queryInfo_["name_2"] = 2;
+    std::map<uint32_t, std::string> localInfo;
+    sourceController->localInfo_["name_1"] = localInfo;
+    sourceController->localInfo_["name_2"] = localInfo;
+    ASSERT_NO_THROW(sourceController->SendLocalDataRsp()); // localInfo_["name"] is empty
+    localInfo[0] = "zero";
+    localInfo[1] = "one";
+    localInfo[2] = "two";
+    sourceController->localInfo_["name_1"] = localInfo;
+    sourceController->localInfo_["name_2"] = localInfo;
+    ASSERT_NO_THROW(sourceController->SendLocalDataRsp()); // both localInfo_ and queryInfo_ not empty
+    sourceController->localInfo_.clear();
+    sourceController->queryInfo_.clear();
+    cJSON *msg = cJSON_Parse("{ \"num\": \"123\" }");
+    imsCall->SetAccountNumber("123");
+    CallObjectManager::callObjectPtrList_.push_back(imsCall);
+    ASSERT_NO_THROW(sourceController->HandleCurrentDataQueryMsg(msg));
+    CallObjectManager::callObjectPtrList_.clear();
+}
+
+/**
+ * @tc.number   Telephony_DistributedDataTest_017
+ * @tc.name     test data msg
+ * @tc.desc     Function test
+ */
+HWTEST_F(DistributedDataTest, Telephony_DistributedDataTest_017, Function | MediumTest | Level1)
+{
+    DialParaInfo mDialParaInfo;
+    AudioDeviceType deviceType = AudioDeviceType::DEVICE_DISTRIBUTED_PHONE;
+    std::string devId = "UnitTestDeviceId";
+    std::string devName = "UnitTestDeviceName";
+    sptr<CallBase> imsCall = new IMSCall(mDialParaInfo);
+    imsCall->callType_ = CallType::TYPE_IMS;
+    auto sourceController = std::make_shared<DistributedDataSourceController>();
+    std::shared_ptr<ISessionCallback> callback = std::make_shared<DataSessionCallbackTest>();
+    sourceController->session_ = DelayedSingleton<TransmissionManager>::GetInstance()->CreateServerSession(callback);
+    ASSERT_NO_THROW(sourceController->OnDeviceOnline(devId, devName, deviceType));
+    sourceController->session_ = nullptr;
+    CallObjectManager::callObjectPtrList_.emplace_back(nullptr);
+    CallObjectManager::callObjectPtrList_.emplace_back(imsCall);
+    ASSERT_NO_THROW(sourceController->OnDeviceOnline(devId, devName, deviceType));
+    ASSERT_NO_THROW(sourceController->OnCallCreated(imsCall, devId));
+    CallObjectManager::callObjectPtrList_.clear();
+    ASSERT_NO_THROW(sourceController->OnCallDestroyed());
+    ASSERT_NO_THROW(sourceController->ProcessCallInfo(imsCall, DistributedDataType::NAME));
 }
 
 } // namespace Telephony

@@ -599,12 +599,15 @@ HWTEST_F(ZeroBranch5Test, Telephony_DistributedCallManager_001, Function | Mediu
 {
     DistributedCallManager manager;
     AudioDevice device;
+    std::string deviceId = "{ \"devIds\": \"101\" }";
     device.deviceType = AudioDeviceType::DEVICE_EARPIECE;
     std::string restr = manager.GetDevIdFromAudioDevice(device);
     EXPECT_FALSE(manager.IsSelectVirtualModem());
     EXPECT_TRUE(manager.SwitchOnDCallDeviceSync(device));
     device.deviceType = AudioDeviceType::DEVICE_DISTRIBUTED_PHONE;
     std::string devId = "";
+    std::vector<std::string> devices;
+    devices.push_back("TEST_STR");
     manager.CreateDAudioDevice(devId, device);
     manager.CreateDAudioDevice(TEST_STR, device);
     manager.dcallProxy_ = std::make_shared<DistributedCallProxy>();
@@ -627,6 +630,14 @@ HWTEST_F(ZeroBranch5Test, Telephony_DistributedCallManager_001, Function | Mediu
     manager.OnDCallSystemAbilityAdded(TEST_STR);
     manager.IsDistributedCarDeviceOnline();
     manager.ReportDistributedDeviceInfoForSwitchOff();
+    manager.NotifyOnlineDCallDevices(devices);
+    manager.RemoveDCallDevice(TEST_STR);
+    device.deviceType = AudioDeviceType::DEVICE_DISTRIBUTED_PHONE;
+    ASSERT_EQ(memcpy_s(device.address, kMaxAddressLen + 1, deviceId.c_str(), deviceId.size()), EOK);
+    manager.GetDevIdFromAudioDevice(device);
+    deviceId = "{ \"devId\": \"101\" }";
+    ASSERT_EQ(memcpy_s(device.address, kMaxAddressLen + 1, deviceId.c_str(), deviceId.size()), EOK);
+    manager.GetDevIdFromAudioDevice(device);
     EXPECT_TRUE(restr.empty());
 }
 

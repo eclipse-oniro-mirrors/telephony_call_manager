@@ -16,6 +16,7 @@
 #include <gtest/gtest.h>
 #include "transmission_manager.h"
 #include "server_session.h"
+#include "client_session.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -70,6 +71,19 @@ HWTEST_F(DistributedTransmissionTest, Telephony_DistributedTransmissionTest_002,
     session->Disconnect();
     session->OnSessionShutdown(0);
     EXPECT_EQ(session->socket_, INVALID_SOCKET_ID);
+
+    std::string peerDevice = "";
+    std::string localName = "localName";
+    std::string peerName = "peerName";
+    auto clientSession = std::make_shared<ClientSession>(callback);
+    clientSession->clientSocket_ = INVALID_SOCKET_ID + 1;
+    clientSession->Connect("", SESSION_NAME, SESSION_NAME); // already connect
+    clientSession->socket_ = INVALID_SOCKET_ID + 1;
+    clientSession->Disconnect();
+    clientSession->socket_ = 1;
+    clientSession->clientSocket_ = 1;
+    clientSession->OnSessionShutdown(1);
+    EXPECT_EQ(clientSession->CreateSocket(peerDevice, localName, peerName), INVALID_SOCKET_ID);
 }
 
 /**
@@ -91,7 +105,13 @@ HWTEST_F(DistributedTransmissionTest, Telephony_DistributedTransmissionTest_003,
     session->OnSessionShutdown(66);
     session->OnSessionShutdown(session->serverSocket_);
     session->serverSocket_ = 0;
-    session->Destroy();
+
+    session->serverSocket_ = INVALID_SOCKET_ID + 1;
+    EXPECT_NO_THROW(session->Create("123"));
+    session->serverSocket_ = INVALID_SOCKET_ID;
+    EXPECT_NO_THROW(session->Destroy());
+    session->serverSocket_ = INVALID_SOCKET_ID + 1;
+    EXPECT_NO_THROW(session->Destroy());
     EXPECT_EQ(session->serverSocket_, INVALID_SOCKET_ID);
 }
 
