@@ -36,6 +36,6 @@ public:
 private:
     void ConnectRemote(const std::string &networkId);
 };
-} 
-} 
+}
+}
 #endif // INTEROPERABLE_CLIENT_MANAGER_H
