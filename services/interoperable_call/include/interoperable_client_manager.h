@@ -38,5 +38,4 @@ private:
 };
 } 
 } 
- 
 #endif // INTEROPERABLE_CLIENT_MANAGER_H
