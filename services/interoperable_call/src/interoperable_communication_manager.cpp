@@ -44,14 +44,12 @@ void InteroperableCommunicationManager::OnDeviceOnline(const DistributedHardware
         } else if (devType == 0x6D || devType == 0x83) { // 0x6D手表，0x83车机
             role_ = InteroperableRole::PHONE;
         } else {
+            TELEPHONY_LOGE("not interoperable device");
             return;
         }
         auto iter = std::find(peerDevices_.begin(), peerDevices_.end(), networkId);
         if (iter == peerDevices_.end()) {
             peerDevices_.emplace_back(networkId);
-        } else {
-            TELEPHONY_LOGE("device already online");
-            return;
         }
         if (dataController_ == nullptr) {
             if (role_ == InteroperableRole::OTHERS) {
