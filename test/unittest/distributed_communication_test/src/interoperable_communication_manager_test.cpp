@@ -35,7 +35,8 @@ public:
  * @tc.name     test normal branch
  * @tc.desc     normal branch test
  */
-HWTEST_F(InteroperableCommunicationManagerTest, Telephony_InteroperableCommunicationManagerTest_001, Function | MediumTest | Level1)
+HWTEST_F(InteroperableCommunicationManagerTest,
+         Telephony_InteroperableCommunicationManagerTest_001, Function | MediumTest | Level1)
 {
     DisconnectedDetails details;
     sptr<CallBase> csCall = nullptr;
@@ -54,7 +55,8 @@ HWTEST_F(InteroperableCommunicationManagerTest, Telephony_InteroperableCommunica
  * @tc.name     test device online and offline
  * @tc.desc     Function test
  */
-HWTEST_F(InteroperableCommunicationManagerTest, Telephony_InteroperableCommunicationManagerTest_002, Function | MediumTest | Level1)
+HWTEST_F(InteroperableCommunicationManagerTest,
+         Telephony_InteroperableCommunicationManagerTest_002, Function | MediumTest | Level1)
 {
     DistributedHardware::DmDeviceInfo deviceInfo;
     strncpy_s(deviceInfo.networkId, DM_MAX_DEVICE_ID_LEN + 1, "NetId", DM_MAX_DEVICE_ID_LEN + 1);
