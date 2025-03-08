@@ -28,5 +28,4 @@ public:
 };
 }
 }
- 
 #endif // INTEROPERABLE_DEVICE_STATE_CALLBACK_I_H
