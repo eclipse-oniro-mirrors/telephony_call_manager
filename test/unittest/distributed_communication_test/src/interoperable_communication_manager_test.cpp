@@ -66,6 +66,18 @@ HWTEST_F(InteroperableCommunicationManagerTest,
     
     ASSERT_NO_THROW(dcManager->OnDeviceOnline(deviceInfo));
     ASSERT_NO_THROW(dcManager->OnDeviceOffline(deviceInfo));
+
+    deviceInfo.deviceTypeId = 0x0E;
+    ASSERT_NO_THROW(dcManager->OnDeviceOnline(deviceInfo));
+    ASSERT_NO_THROW(dcManager->OnDeviceOffline(deviceInfo));
+
+    deviceInfo.deviceTypeId = 0x6D;
+    ASSERT_NO_THROW(dcManager->OnDeviceOnline(deviceInfo));
+    ASSERT_NO_THROW(dcManager->OnDeviceOffline(deviceInfo));
+
+    deviceInfo.deviceTypeId = 0x83;
+    ASSERT_NO_THROW(dcManager->OnDeviceOnline(deviceInfo));
+    ASSERT_NO_THROW(dcManager->OnDeviceOffline(deviceInfo));
 }
 } // namespace Telephony
 } // namespace OHOS
