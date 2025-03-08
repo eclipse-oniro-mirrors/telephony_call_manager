@@ -323,6 +323,9 @@ HWTEST_F(DistributedDataTest, Telephony_DistributedDataTest_011, Function | Medi
     ASSERT_NO_THROW(sourceController->HandleCurrentDataQueryMsg(msg));
     ASSERT_NO_THROW(sourceController->HandleDataQueryMsg(msg));
     ASSERT_NO_THROW(sourceController->HandleDataQueryMsg(msg));
+
+    msg = cJSON_Parse("{ \"itemType\": 0, \"num\": \"\" }");
+    ASSERT_NO_THROW(sourceController->HandleDataQueryMsg(msg));
     std::string rspMsg = sourceController->CreateCurrentDataRspMsg(num, isMuted, direction);
     ASSERT_FALSE(rspMsg.empty());
     cJSON_Delete(msg);
@@ -440,6 +443,7 @@ HWTEST_F(DistributedDataTest, Telephony_DistributedDataTest_016, Function | Medi
     ASSERT_NO_THROW(sourceController->SendLocalDataRsp()); // both localInfo_ and queryInfo_ empty
     sourceController->queryInfo_["name_1"] = 1;
     sourceController->queryInfo_["name_2"] = 2;
+    sourceController->queryInfo_["name_3"] = 2; // local info not contain queried number
     std::map<uint32_t, std::string> localInfo;
     sourceController->localInfo_["name_1"] = localInfo;
     sourceController->localInfo_["name_2"] = localInfo;
@@ -456,7 +460,10 @@ HWTEST_F(DistributedDataTest, Telephony_DistributedDataTest_016, Function | Medi
     imsCall->SetAccountNumber("123");
     CallObjectManager::callObjectPtrList_.push_back(imsCall);
     ASSERT_NO_THROW(sourceController->HandleCurrentDataQueryMsg(msg));
+    msg = cJSON_Parse("{ \"num\": \"2\" }");
+    ASSERT_NO_THROW(sourceController->HandleCurrentDataQueryMsg(msg)); // not find distributed call
     CallObjectManager::callObjectPtrList_.clear();
+    cJSON_Delete(msg);
 }
 
 /**

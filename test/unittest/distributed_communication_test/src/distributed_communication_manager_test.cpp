@@ -24,6 +24,7 @@
 #include "distributed_communication_manager.h"
 #include "call_manager_disconnected_details.h"
 #include "distributed_data_sink_controller.h"
+#include "distributed_sink_switch_controller.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -205,7 +206,16 @@ HWTEST_F(DistributedCommunicationManagerTest, Telephony_DcManager_SwitchToSinkDe
     ASSERT_FALSE(dcManager->SwitchToSinkDevice(device)); // not dc device
     dcManager->peerDevices_.push_back("101");
     ASSERT_FALSE(dcManager->SwitchToSinkDevice(device));
+    dcManager->devSwitchController_ = nullptr;
+    ASSERT_FALSE(dcManager->SwitchToSinkDevice(device));
+    dcManager->devSwitchController_ = std::make_shared<DistributedSinkSwitchController>();
+    dcManager->devSwitchController_->isAudioOnSink_ = true;
+    ASSERT_TRUE(dcManager->SwitchToSinkDevice(device));
+    dcManager->devSwitchController_->isAudioOnSink_ = false;
     dcManager->peerDevices_.clear();
+    deviceId = "not Json string";
+    ASSERT_EQ(memcpy_s(device.address, kMaxAddressLen + 1, deviceId.c_str(), deviceId.size()), EOK);
+    ASSERT_EQ(dcManager->ParseDevIdFromAudioDevice(device), "");
 }
 } // namespace Telephony
 } // namespace OHOS

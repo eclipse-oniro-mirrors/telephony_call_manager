@@ -92,7 +92,10 @@ const int32_t VALID_CALLID = 1;
 const int32_t ERROR_CALLID = -1;
 const int32_t ONE_TIME = 1;
 const int32_t STEP_1 = 1;
+const int32_t IS_CELIA_CALL = 1;
 const int32_t SOURCE_CALL = 2;
+const int32_t TELEPHONY_EXT_SA_ID = 4011;
+const int32_t DISTRIBUTED_CALL_SOURCE_SA_ID = 9855;
 constexpr int16_t DEFAULT_TIME = 0;
 constexpr const char *TEST_STR = "123";
 constexpr const char *LONG_STR =
@@ -642,6 +645,98 @@ HWTEST_F(ZeroBranch5Test, Telephony_DistributedCallManager_001, Function | Mediu
 }
 
 /**
+ * @tc.number   Telephony_DistributedCallManager_002
+ * @tc.name     test normal branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch5Test, Telephony_DistributedCallManager_002, Function | MediumTest | Level3)
+{
+    DistributedCallManager manager;
+    AudioDevice device;
+    std::string deviceId = "";
+    DialParaInfo dialParaInfo;
+    sptr<CallBase> call = new IMSCall(dialParaInfo);
+    manager.statusChangeListener_ = nullptr;
+    manager.Init();
+    manager.statusChangeListener_ = new (std::nothrow) DCallSystemAbilityListener();
+    manager.Init();
+    manager.AddDCallDevice(LONG_STR);
+    manager.RemoveDCallDevice(LONG_STR);
+    manager.ClearDCallDevices();
+    manager.GetConnectedDCallDeviceType();
+    manager.isCallActived_.store(false);
+    ASSERT_TRUE(manager.SwitchOnDCallDeviceSync(device));
+    manager.isCallActived_.store(true);
+    device.deviceType = AudioDeviceType::DEVICE_UNKNOWN;
+    ASSERT_FALSE(manager.SwitchOnDCallDeviceSync(device));
+
+    device.deviceType = AudioDeviceType::DEVICE_DISTRIBUTED_PHONE;
+    ASSERT_EQ(memcpy_s(device.address, kMaxAddressLen + 1, deviceId.c_str(), deviceId.size()), EOK);
+    ASSERT_FALSE(manager.SwitchOnDCallDeviceSync(device));
+
+    deviceId = "{ \"devId\": \"101\" }";
+    ASSERT_EQ(memcpy_s(device.address, kMaxAddressLen + 1, deviceId.c_str(), deviceId.size()), EOK);
+    manager.dcallProxy_ = nullptr;
+    manager.SwitchOnDCallDeviceSync(device);
+    manager.dcallProxy_ = std::make_shared<DistributedCallProxy>();
+    manager.SwitchOnDCallDeviceSync(device);
+    manager.SetCallState(false);
+    manager.DealDisconnectCall();
+    manager.onlineDCallDevices_["101"] = device;
+    ASSERT_TRUE(manager.IsDistributedCarDeviceOnline());
+    manager.onlineDCallDevices_.clear();
+    ASSERT_FALSE(manager.IsDistributedCarDeviceOnline());
+    CallObjectManager::callObjectPtrList_.clear();
+    ASSERT_FALSE(manager.isCeliaCall());
+    call->callType_ = CallType::TYPE_IMS;
+    call->callState_ = TelCallState::CALL_STATUS_WAITING;
+    call->celiaCallType_ = IS_CELIA_CALL;
+    CallObjectManager::callObjectPtrList_.push_back(call);
+    EXPECT_TRUE(manager.isCeliaCall());
+    manager.SwitchOnDCallDeviceAsync(device); // is celia call, return
+    CallObjectManager::callObjectPtrList_.clear();
+    call->celiaCallType_ = IS_CELIA_CALL + 1;
+    CallObjectManager::callObjectPtrList_.push_back(call);
+    EXPECT_FALSE(manager.isCeliaCall());
+    manager.SwitchOnDCallDeviceAsync(device); // not celia call
+    CallObjectManager::callObjectPtrList_.clear();
+}
+
+/**
+ * @tc.number   Telephony_DistributedCallManager_003
+ * @tc.name     test normal branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch5Test, Telephony_DistributedCallManager_003, Function | MediumTest | Level3)
+{
+    AudioDevice device;
+    std::string deviceId = "";
+    DistributedCallManager manager;
+    auto listener = new (std::nothrow) DCallSystemAbilityListener();
+    manager.onlineDCallDevices_.clear();
+    ASSERT_FALSE(manager.IsSelectVirtualModem());
+    manager.onlineDCallDevices_["101"] = device;
+    manager.dcallProxy_ = nullptr;
+    ASSERT_FALSE(manager.IsSelectVirtualModem());
+    manager.dcallProxy_ = std::make_shared<DistributedCallProxy>();
+    manager.IsSelectVirtualModem();
+    manager.onlineDCallDevices_.clear();
+
+    manager.IsDCallDeviceSwitchedOn();
+    manager.OnDCallSystemAbilityRemoved(deviceId);
+    listener->OnAddSystemAbility(-1, deviceId); // invalid sa id
+    listener->OnAddSystemAbility(TELEPHONY_EXT_SA_ID, deviceId);
+    listener->OnAddSystemAbility(DISTRIBUTED_CALL_SOURCE_SA_ID, deviceId);
+    listener->OnRemoveSystemAbility(-1, deviceId);
+    listener->OnRemoveSystemAbility(TELEPHONY_EXT_SA_ID, deviceId);
+    listener->OnRemoveSystemAbility(DISTRIBUTED_CALL_SOURCE_SA_ID, deviceId);
+    ASSERT_EQ(memcpy_s(device.address, kMaxAddressLen + 1, deviceId.c_str(), deviceId.size()), EOK);
+    manager.SetCallState(true);
+    manager.ReportDistributedDeviceInfo(device);
+    ASSERT_TRUE(manager.isCallActived_);
+}
+
+/**
  * @tc.number   Telephony_DistributedCallProxy_001
  * @tc.name     test error branch
  * @tc.desc     Function test
@@ -649,7 +744,11 @@ HWTEST_F(ZeroBranch5Test, Telephony_DistributedCallManager_001, Function | Mediu
 HWTEST_F(ZeroBranch5Test, Telephony_DistributedCallProxy_001, Function | MediumTest | Level3)
 {
     std::unique_ptr<DistributedCallProxy> proxy = std::make_unique<DistributedCallProxy>();
+    std::shared_ptr<OHOS::DistributedHardware::IDCallDeviceCallback> callback = nullptr;
+    std::string name = "123";
     proxy->GetDCallClient();
+    proxy->RegisterDeviceCallback(name, callback);
+    proxy->UnRegisterDeviceCallback(name);
     int32_t res = proxy->Init();
     proxy->GetDCallClient();
     proxy->dcallClient_ = nullptr;
@@ -666,6 +765,14 @@ HWTEST_F(ZeroBranch5Test, Telephony_DistributedCallProxy_001, Function | MediumT
     int32_t res7 = proxy->GetOnlineDeviceList(devList);
     proxy->GetDCallDeviceInfo(TEST_STR, devInfo);
     int32_t res8 = proxy->UnInit();
+    proxy->GetDCallClient();
+    proxy->UnInit();
+    proxy->SwitchDevice(TEST_STR, 1);
+    proxy->GetDCallDeviceInfo(TEST_STR, devInfo);
+    proxy->RegisterDeviceCallback(name, callback);
+    proxy->UnRegisterDeviceCallback(name);
+    proxy->GetDCallDeviceInfo(TEST_STR, devInfo);
+    proxy->IsSelectVirtualModem();
     EXPECT_NE(res, TELEPHONY_SUCCESS);
     EXPECT_NE(res1, TELEPHONY_SUCCESS);
     EXPECT_FALSE(res2);
