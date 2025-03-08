@@ -42,6 +42,7 @@
 #include "string_wrapper.h"
 #include "call_wired_headset.h"
 #include "bluetooth_call_connection.h"
+#include "interoperable_communication_manager.h"
 
 #ifdef OHOS_BUILD_ENABLE_TELEPHONY_CUST
 #include "telephony_cust_wrapper.h"
@@ -94,6 +95,7 @@ bool CallManagerService::Init()
     DelayedSingleton<DistributedCommunicationManager>::GetInstance()->Init();
     AddSystemAbilityListener(AUDIO_POLICY_SERVICE_ID);
     DelayedSingleton<CallWiredHeadSet>::GetInstance()->Init();
+    AddSystemAbilityListener(DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID);
     return true;
 }
 
@@ -105,6 +107,9 @@ void CallManagerService::OnAddSystemAbility(int32_t systemAbilityId, const std::
             DelayedSingleton<AudioProxy>::GetInstance()->SetAudioMicStateChangeCallback();
             DelayedSingleton<AudioProxy>::GetInstance()->SetAudioDeviceChangeCallback();
             DelayedSingleton<AudioProxy>::GetInstance()->SetAudioPreferDeviceChangeCallback();
+            break;
+        case DISTRIBUTED_HARDWARE_DEVICEMANAGER_SA_ID:
+            DelayedSingleton<InteroperableDeviceObserver>::GetInstance()->Init();
             break;
         default:
             TELEPHONY_LOGE("OnAddSystemAbility unhandle id : %{public}d", systemAbilityId);
@@ -876,6 +881,7 @@ int32_t CallManagerService::SetMuted(bool isMute)
         auto ret = callControlManagerPtr_->SetMuted(isMute);
         if (ret == TELEPHONY_SUCCESS) {
             DelayedSingleton<DistributedCommunicationManager>::GetInstance()->SetMuted(isMute);
+            DelayedSingleton<InteroperableCommunicationManager>::GetInstance()->SetMuted(isMute);
         }
         return ret;
     } else {
@@ -898,6 +904,7 @@ int32_t CallManagerService::MuteRinger()
         auto ret = callControlManagerPtr_->MuteRinger();
         if (ret == TELEPHONY_SUCCESS) {
             DelayedSingleton<DistributedCommunicationManager>::GetInstance()->MuteRinger();
+            DelayedSingleton<InteroperableCommunicationManager>::GetInstance()->MuteRinger();
         }
         return ret;
     } else {

@@ -35,6 +35,10 @@ ohos_unittest("distributed_communication_test") {
     "src/distributed_dev_observer_test.cpp",
     "src/distributed_dev_switch_test.cpp",
     "src/distributed_transmission_test.cpp",
+    "src/interoperable_client_manager_test.cpp",
+    "src/interoperable_communication_manager_test.cpp",
+    "src/interoperable_device_observer_test.cpp",
+    "src/interoperable_server_manager_test.cpp",
   ]
   sources += call_manager_sources
 

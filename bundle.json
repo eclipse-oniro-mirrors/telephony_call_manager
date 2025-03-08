@@ -69,6 +69,7 @@
                 "location",
                 "dsoftbus",
                 "input",
+                "device_manager",
                 "openssl"
             ],
             "third_party": [
