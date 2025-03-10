@@ -40,8 +40,8 @@ const int32_t PROP_SYSPARA_SIZE = 128;
 const char *FORMAT_PATTERN = ",|;";
 const char *MARK_SOURCE_OF_ANTIFRAUT_CENTER = "5";
 const char *MARK_SOURCE_OF_OTHERS = "3";
-const std::string SETTINGS_ANTIFRAUD_CENTER_SWITCH = "settings.telephony.antifraud_center_switch";
-const std::string TELEPHONY_IDENTITY_SWITCH = "settings.telephony.number_identity_switch";
+const std::string SETTINGS_ANTIFRAUD_CENTER_SWITCH = "";
+const std::string TELEPHONY_IDENTITY_SWITCH = "";
 CallRecordsManager::CallRecordsManager() : callRecordsHandlerServerPtr_(nullptr) {}
 
 CallRecordsManager::~CallRecordsManager()
@@ -299,7 +299,7 @@ void CallRecordsManager::GetNumberMarkSource(int32_t userId, char *source, unsig
     if (size <= strlen(MARK_SOURCE_OF_ANTIFRAUT_CENTER) && size <= strlen(MARK_SOURCE_OF_OTHERS)) {
         return;
     }
-    if (isBundleInstalled && isAntifraudSwitchOn == "1" && isTelephonyIdentityOn == "1") {
+    if (isAntifraudSwitchOn == "0" && isBundleInstalled && isTelephonyIdentityOn == "1") {
         strcpy_s(source, size, MARK_SOURCE_OF_ANTIFRAUT_CENTER);
     } else {
         strcpy_s(source, size, MARK_SOURCE_OF_OTHERS);
