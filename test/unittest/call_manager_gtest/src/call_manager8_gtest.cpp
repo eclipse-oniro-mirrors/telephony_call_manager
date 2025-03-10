@@ -31,6 +31,7 @@
 #include "anonymize_adapter.h"
 #include "antifraud_adapter.h"
 #include "antifraud_service.h"
+#include "number_identity_service.h"
 
 using namespace OHOS::Bluetooth;
 namespace OHOS {
