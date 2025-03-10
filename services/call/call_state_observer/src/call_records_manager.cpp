@@ -273,7 +273,9 @@ void CallRecordsManager::CopyCallInfoToRecord(CallAttributeInfo &info, CallRecor
     AccountSA::OsAccountManager::GetForegroundOsAccountLocalId(userId);
     data.features = callFeatures;
     data.numberMarkInfo = info.numberMarkInfo;
-    GetNumberMarkSource(userId, data.numberMarkInfo.markSource, kMaxNumberLen + 1);
+    if (data.numberMarkInfo.markSource == "5") {
+        GetNumberMarkSource(userId, data.numberMarkInfo.markSource, kMaxNumberLen + 1);
+    }
     data.blockReason = info.blockReason;
     data.celiaCallType = info.celiaCallType;
     data.name = info.name;
@@ -285,23 +287,20 @@ void CallRecordsManager::GetNumberMarkSource(int32_t userId, char *source, unsig
     bool isBundleInstalled = false;
     std::string isAntifraudSwitchOn = "0";
     std::string isTelephonyIdentityOn = "0";
-    const char *markSourceOfOthers = "3";
-    const char *markSourceOfAntifrautCenter = "5";
-    std::string bundleName = "com.hicorenational.antifraud.hmy";
     auto settingHelper = SettingsDataShareHelper::GetInstance();
     if (settingHelper != nullptr) {
         OHOS::Uri settingUri(SettingsDataShareHelper::SETTINGS_DATASHARE_URI);
         settingHelper->Query(settingUri, SETTINGS_ANTIFRAUD_CENTER_SWITCH, isAntifraudSwitchOn);
         settingHelper->Query(settingUri, TELEPHONY_IDENTITY_SWITCH, isTelephonyIdentityOn);
     }
-    isBundleInstalled = CallManagerUtils::IsBundleInstalled(bundleName, userId);
+    isBundleInstalled = CallManagerUtils::IsBundleInstalled("", userId);
     if (size <= strlen(markSourceOfOthers) && size <= strlen(markSourceOfAntifrautCenter)) {
         return;
     }
     if (isBundleInstalled && isAntifraudSwitchOn == "1" && isTelephonyIdentityOn == "1") {
-        strcpy_s(source, size, markSourceOfAntifrautCenter);
+        strcpy_s(source, size, 5); // 5: markSourceOfAntifrautCenter
     } else {
-        strcpy_s(source, size, markSourceOfOthers);
+        strcpy_s(source, size, 3); // 3: markSourceOfOthers
     }
 }
 
