@@ -18,12 +18,17 @@
 
 #include "call_manager_info.h"
 #include "message_parcel.h"
+#include "bundle_mgr_proxy.h"
+#include "bundle_mgr_interface.h"
+#include "iservice_registry.h"
+#include "system_ability_definition.h"
 
 namespace OHOS {
 namespace Telephony {
 class CallManagerUtils {
 public:
     static void WriteCallAttributeInfo(const CallAttributeInfo &info, MessageParcel &messageParcel);
+    static bool IsBundleInstalled(const std::string &bundleName, int32_t userId);
 };
 } // namespace Telephony
 } // namespace OHOS

@@ -68,5 +68,23 @@ void CallManagerUtils::WriteCallAttributeInfo(const CallAttributeInfo &info, Mes
     messageParcel.WriteInt32(info.phoneOrWatch);
 }
 
+bool CallManagerUtils::IsBundleInstalled(const std::string &bundleName, int32_t userId)
+{
+    bool isInstalled = false;
+    sptr<ISystemAbilityManager> systemAbilityManager =
+        SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (!systemAbilityManager) {
+        return false;
+    }
+    sptr<IRemoteObject> remoteObject = systemAbilityManager->GetSystemAbility(BUNDLE_MGR_SERVICE_SYS_ABILITY_ID);
+    sptr<AppExecFwk::IBundleMgr> proxy = iface_cast<AppExecFwk::IBundleMgr>(remoteObject);
+    if (proxy == nullptr) {
+        return false;
+    }
+    if (FAILED(proxy->IsBundleInstalled(bundleName, userId, 0, isInstalled))) {
+        return false;
+    }
+    return isInstalled;
+}
 } // namespace Telephony
 } // namespace OHOS

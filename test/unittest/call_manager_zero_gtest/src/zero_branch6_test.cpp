@@ -801,6 +801,10 @@ HWTEST_F(ZeroBranch5Test, Telephony_BluetoothCallManager_001, Function | MediumT
     ASSERT_EQ(bluetoothCallManager.SendBtCallState(numActive, numHeld, callState, number), TELEPHONY_SUCCESS);
     ASSERT_EQ(bluetoothCallManager.SendCallDetailsChange(1, 1), TELEPHONY_SUCCESS);
     ASSERT_NE(bluetoothCallManager.IsBtAvailble(), true);
+    bluetoothCallManager.btConnection_ = nullptr;
+    EXPECT_FALSE(bluetoothCallManager.IsBtAvailble());
+    EXPECT_FALSE(bluetoothCallManager.SendBtCallState(numActive, numHeld, callState, number));
+    EXPECT_FALSE(bluetoothCallManager.SendCallDetailsChange(1, 1));
 }
 
 /**
