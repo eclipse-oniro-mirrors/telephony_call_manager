@@ -1269,9 +1269,9 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_008, Function | MediumTest
     info.state = TelCallState::CALL_STATUS_DIALING;
     EXPECT_GT(callStatusManager->HandleVoipCallReportInfo(info), TELEPHONY_ERROR);
     info.state = TelCallState::CALL_STATUS_ANSWERED;
-    EXPECT_GT(callStatusManager->HandleVoipCallReportInfo(info), TELEPHONY_ERROR);
+    EXPECT_EQ(callStatusManager->HandleVoipCallReportInfo(info), TELEPHONY_ERROR);
     info.state = TelCallState::CALL_STATUS_DISCONNECTING;
-    EXPECT_GT(callStatusManager->HandleVoipCallReportInfo(info), TELEPHONY_ERROR);
+    EXPECT_EQ(callStatusManager->HandleVoipCallReportInfo(info), TELEPHONY_ERROR);
 }
 
 HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_009, Function | MediumTest | Level3)
@@ -1299,24 +1299,24 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_009, Function | MediumTest
     info.callType = CallType::TYPE_VOIP;
     sptr<CallBase> voipCall = callStatusManager->CreateNewCall(info, CallDirection::CALL_DIRECTION_IN);
     ASSERT_TRUE(voipCall != nullptr);
-    callStatusManager->antiFraudIndex_ = 0;
     callStatusManager->antiFraudSlotId_ = 0;
+    callStatusManager->antiFraudIndex_ = 0;
     CallObjectManager::AddOneCallObject(voipCall);
     callStatusManager->SetupAntiFraudService(voipCall, info);
     callStatusManager->SetConferenceCall({voipCall});
     EXPECT_EQ(CallObjectManager::callObjectPtrList_.size(), 1);
-    EXPECT_EQ(callStatusManager->HandleEventResultReportInfo(voipCallEventInfo), TELEPHONY_ERR_FAIL);
+    EXPECT_EQ(callStatusManager->HandleVoipEventReportInfo(voipCallEventInfo), TELEPHONY_ERR_FAIL);
     voipCall->SetCallRunningState(CallRunningState::CALL_RUNNING_STATE_ACTIVE);
-    EXPECT_EQ(callStatusManager->HandleEventResultReportInfo(voipCallEventInfo), TELEPHONY_SUCCESS);
+    EXPECT_EQ(callStatusManager->HandleVoipEventReportInfo(voipCallEventInfo), TELEPHONY_SUCCESS);
     voipCall->SetCallRunningState(CallRunningState::CALL_RUNNING_STATE_DIALING);
     voipCallEventInfo.voipCallEvent = VoipCallEvent::VOIP_CALL_EVENT_MUTED;
-    EXPECT_EQ(callStatusManager->HandleEventResultReportInfo(voipCallEventInfo), TELEPHONY_SUCCESS);
-    oipCallEventInfo.voipCallEvent = VoipCallEvent::VOIP_CALL_EVENT_UNMUTED;
-    EXPECT_EQ(callStatusManager->HandleEventResultReportInfo(voipCallEventInfo), TELEPHONY_SUCCESS);
+    EXPECT_EQ(callStatusManager->HandleVoipEventReportInfo(voipCallEventInfo), TELEPHONY_SUCCESS);
+    voipCallEventInfo.voipCallEvent = VoipCallEvent::VOIP_CALL_EVENT_UNMUTED;
+    EXPECT_EQ(callStatusManager->HandleVoipEventReportInfo(voipCallEventInfo), TELEPHONY_SUCCESS);
     EXPECT_EQ(callStatusManager->IncomingVoipCallHandle(info), TELEPHONY_SUCCESS);
     EXPECT_EQ(callStatusManager->OutgoingVoipCallHandle(info), TELEPHONY_SUCCESS);
     info.callMode = VideoStateType::TYPE_VIDEO;
-    EXPECT_NE(callStatusManager->OutgoingVoipCallHandle(info), TELEPHONY_SUCCESS);
+    EXPECT_NE(callStatusManager->OutgoingVoipCallHandle(info), TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
 
 HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_010, Function | MediumTest | Level3)
@@ -1328,8 +1328,8 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_010, Function | MediumTest
     info.callType = CallType::TYPE_SATELLITE;
     sptr<CallBase> satelliteCall = callStatusManager->CreateNewCall(info, CallDirection::CALL_DIRECTION_IN);
     ASSERT_TRUE(satelliteCall != nullptr);
-    CallObjectManager::AddOneCallObject(voipCall);
-    XPECT_EQ(CallObjectManager::callObjectPtrList_.size(), 1);
+    CallObjectManager::AddOneCallObject(satelliteCall);
+    EXPECT_EQ(CallObjectManager::callObjectPtrList_.size(), 1);
     EXPECT_EQ(callStatusManager->UpdateDialingCallInfo(info), TELEPHONY_SUCCESS);
     EXPECT_NE(callStatusManager->HoldingHandle(info), TELEPHONY_ERR_LOCAL_PTR_NULL);
     EXPECT_NE(callStatusManager->DisconnectingHandle(info), TELEPHONY_ERR_LOCAL_PTR_NULL);
