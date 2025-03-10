@@ -1347,12 +1347,12 @@ HWTEST_F(CallManagerGtest, Telephony_AntiFraud_0100, Function | MediumTest | Lev
     antiFraudService->InitAntiFraudService(phoneNum);
     EXPECT_EQ(antiFraudService->antiFraudState_, 1);
 
-    auto callStatusManager1 = DelayedSingleton<CallStatusManager>::GetInstance();
+    auto callStatusManager1 = std::make_shared<CallStatusManager>();
     antiFraudService->SetCallStatusManager(callStatusManager1);
     antiFraudService->RecordDetectResult(fraudResult);
     fraudResult.result = false;
     antiFraudService->RecordDetectResult(fraudResult);
-    auto callStatusManager2 = DelayedSingleton<CallStatusManager>::GetInstance();
+    auto callStatusManager2 = std::make_shared<CallStatusManager>();
     antiFraudService->SetCallStatusManager(callStatusManager2);
     antiFraudService->InitAntiFraudService(phoneNum);
     EXPECT_EQ(antiFraudService->antiFraudState_, 0);
@@ -1363,6 +1363,49 @@ HWTEST_F(CallManagerGtest, Telephony_AntiFraud_0100, Function | MediumTest | Lev
     antiFraudAdapter->GetLibAntiFraud();
     antiFraudAdapter->ReleaseAntiFraud();
     EXPECT_EQ(antiFraudAdapter->libAntiFraud_, nullptr);
+}
+
+/**
+ * @tc.number   Telephony_NumberIdentityConnection_0001
+ * @tc.name     Test antiFraud hsdr helper
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_NumberIdentityConnection_0001, Function | MediumTest | Level3)
+{
+    sptr<NumberIdentityConnection> connection = new (std::nothrow) NumberIdentityConnection(
+        [](const sptr<IRemoteObject> &remoteObject) {}, []() {});
+    if (connection == nullptr) {
+        std::cout << "connection is nullptr" << std::endl;
+        return;
+    }
+    AppExecFwk::ElementName element;
+    sptr<OHOS::IRemoteObject> failRemoteObj = new MockRemoteObject(-1);
+    connection->OnAbilityConnectDone(element, failRemoteObj, -1);
+    EXPECT_EQ(connection->remoteObject_, nullptr);
+    connection->OnAbilityConnectDone(element, nullptr, 0);
+    EXPECT_EQ(connection->remoteObject_, nullptr);
+    EXPECT_FALSE(connection->IsAlive());
+    connection->OnAbilityConnectDone(element, failRemoteObj, 0);
+    EXPECT_NE(connection->remoteObject_, nullptr);
+    EXPECT_FALSE(connection->IsAlive());
+    connection->OnAbilityDisconnectDone(element, 0);
+    EXPECT_EQ(connection->remoteObject_, nullptr);
+    sptr<OHOS::IRemoteObject> ucsRemoteObj = new MockRemoteObject(UCS_SERVICE_COMMAND);
+    connection->remoteObject_ = ucsRemoteObj;
+    EXPECT_TRUE(connection->IsAlive());
+    connection->OnAbilityDisconnectDone(element, -1);
+    EXPECT_EQ(connection->remoteObject_, nullptr);
+    connection->connectedCallback_ = nullptr;
+    connection->OnAbilityConnectDone(element, failRemoteObj, 0);
+    EXPECT_EQ(connection->remoteObject_, nullptr);
+    auto &helper = DelayedRefSingleton<NumberIdentityServiceHelper>().GetInstance();
+    helper.connection_ = connection;
+    connection->remoteObject_ = ucsRemoteObj;
+    EXPECT_EQ(helper.Connect([](const sptr<IRemoteObject> &remoteObject) {}, []() {}), 0);
+    connection->remoteObject_ = failRemoteObj;
+    helper.Disconnect();
+    EXPECT_EQ(helper.connection_, nullptr);
+    helper.NotifyNumberMarkDataUpdate();
 }
 } // namespace Telephony
 } // namespace OHOS

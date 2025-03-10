@@ -83,6 +83,7 @@ private:
     int32_t CopyFormatNumberToRecord(std::string &countryIso, CallRecordInfo &data);
     int32_t CopyFormatNumberToE164ToRecord(std::string &countryIso, CallRecordInfo &data);
     void RegisterDataShareReadySubscriber();
+    void GetNumberMarkSource(int32_t userId, char *source, unsigned int size);
     std::shared_ptr<CallRecordsHandlerService> callRecordsHandlerServerPtr_;
     std::mutex mutex_;
     sptr<ISystemAbilityStatusChange> statusChangeListener_ = nullptr;

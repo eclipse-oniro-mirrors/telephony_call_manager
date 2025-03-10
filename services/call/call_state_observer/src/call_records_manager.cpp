@@ -25,6 +25,8 @@
 #include "call_earthquake_alarm_subscriber.h"
 #include <regex>
 #include "telephony_cust_wrapper.h"
+#include "settings_datashare_helper.h"
+#include "call_manager_utils.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -36,6 +38,8 @@ const int32_t ACTIVE_USER_ID = 100;
 const uint32_t FEATURES_VIDEO = 1 << 0;
 const int32_t PROP_SYSPARA_SIZE = 128;
 const char *FORMAT_PATTERN = ",|;";
+const std::string SETTINGS_ANTIFRAUD_CENTER_SWITCH = "settings.telephony.antifraud_center_switch";
+const std::string TELEPHONY_IDENTITY_SWITCH = "settings.telephony.number_identity_switch";
 CallRecordsManager::CallRecordsManager() : callRecordsHandlerServerPtr_(nullptr) {}
 
 CallRecordsManager::~CallRecordsManager()
@@ -265,12 +269,40 @@ void CallRecordsManager::CopyCallInfoToRecord(CallAttributeInfo &info, CallRecor
     data.callType = info.callType;
     // use original call type for video call record
     int32_t callFeatures = GetCallFeatures(info.originalCallType);
+    int32_t userId = 0;
+    AccountSA::OsAccountManager::GetForegroundOsAccountLocalId(userId);
     data.features = callFeatures;
     data.numberMarkInfo = info.numberMarkInfo;
+    GetNumberMarkSource(userId, data.numberMarkInfo.markSource, kMaxNumberLen + 1);
     data.blockReason = info.blockReason;
     data.celiaCallType = info.celiaCallType;
     data.name = info.name;
     data.namePresentation = info.namePresentation;
+}
+
+void CallRecordsManager::GetNumberMarkSource(int32_t userId, char *source, unsigned int size)
+{
+    bool isBundleInstalled = false;
+    std::string isAntifraudSwitchOn = "0";
+    std::string isTelephonyIdentityOn = "0";
+    const char *markSourceOfOthers = "3";
+    const char *markSourceOfAntifrautCenter = "5";
+    std::string bundleName = "com.hicorenational.antifraud.hmy";
+    auto settingHelper = SettingsDataShareHelper::GetInstance();
+    if (settingHelper != nullptr) {
+        OHOS::Uri settingUri(SettingsDataShareHelper::SETTINGS_DATASHARE_URI);
+        settingHelper->Query(settingUri, SETTINGS_ANTIFRAUD_CENTER_SWITCH, isAntifraudSwitchOn);
+        settingHelper->Query(settingUri, TELEPHONY_IDENTITY_SWITCH, isTelephonyIdentityOn);
+    }
+    isBundleInstalled = CallManagerUtils::IsBundleInstalled(bundleName, userId);
+    if (size <= strlen(markSourceOfOthers) && size <= strlen(markSourceOfAntifrautCenter)) {
+        return;
+    }
+    if (isBundleInstalled && isAntifraudSwitchOn == "1" && isTelephonyIdentityOn == "1") {
+        strcpy_s(source, size, markSourceOfAntifrautCenter);
+    } else {
+        strcpy_s(source, size, markSourceOfOthers);
+    }
 }
 
 int32_t CallRecordsManager::RemoveMissedIncomingCallNotification()
