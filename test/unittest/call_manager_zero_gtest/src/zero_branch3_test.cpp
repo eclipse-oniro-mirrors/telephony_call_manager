@@ -1281,7 +1281,7 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_009, Function | MediumTest
     ContactInfo contactInfo;
     callStatusManager->QueryCallerInfo(contactInfo, "110");
     VoipCallEventInfo voipCallEventInfo;
-    EXPECT_EQ(callStatusManager->HandleVoipEventReportInfo(VoipCallEventInfo), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(callStatusManager->HandleVoipEventReportInfo(voipCallEventInfo), TELEPHONY_ERR_LOCAL_PTR_NULL);
     CallDetailInfo info;
     callStatusManager->CallFilterCompleteResult(info);
     EXPECT_EQ(callStatusManager->UpdateDialingCallInfo(info), TELEPHONY_ERR_LOCAL_PTR_NULL);
