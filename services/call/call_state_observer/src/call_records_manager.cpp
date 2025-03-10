@@ -299,7 +299,11 @@ void CallRecordsManager::GetNumberMarkSource(int32_t userId, char *source, unsig
     if (size <= strlen(MARK_SOURCE_OF_ANTIFRAUT_CENTER) && size <= strlen(MARK_SOURCE_OF_OTHERS)) {
         return;
     }
-    if (isAntifraudSwitchOn == "0" && isBundleInstalled && isTelephonyIdentityOn == "1") {
+    if (isAntifraudSwitchOn == "0") {
+        strcpy_s(source, size, MARK_SOURCE_OF_OTHERS);
+        return;
+    }
+    if (isBundleInstalled && isTelephonyIdentityOn == "1") {
         strcpy_s(source, size, MARK_SOURCE_OF_ANTIFRAUT_CENTER);
     } else {
         strcpy_s(source, size, MARK_SOURCE_OF_OTHERS);
