@@ -38,6 +38,8 @@ const int32_t ACTIVE_USER_ID = 100;
 const uint32_t FEATURES_VIDEO = 1 << 0;
 const int32_t PROP_SYSPARA_SIZE = 128;
 const char *FORMAT_PATTERN = ",|;";
+const char *MARK_SOURCE_OF_ANTIFRAUT_CENTER = "5";
+const char *MARK_SOURCE_OF_OTHERS = "3";
 const std::string SETTINGS_ANTIFRAUD_CENTER_SWITCH = "settings.telephony.antifraud_center_switch";
 const std::string TELEPHONY_IDENTITY_SWITCH = "settings.telephony.number_identity_switch";
 CallRecordsManager::CallRecordsManager() : callRecordsHandlerServerPtr_(nullptr) {}
@@ -273,8 +275,7 @@ void CallRecordsManager::CopyCallInfoToRecord(CallAttributeInfo &info, CallRecor
     AccountSA::OsAccountManager::GetForegroundOsAccountLocalId(userId);
     data.features = callFeatures;
     data.numberMarkInfo = info.numberMarkInfo;
-    if (data.numberMarkInfo.markSource == "5") // 5:markSourceOfAntifrautCenter
-    {
+    if (strcmp(data.numberMarkInfo.markSource, MARK_SOURCE_OF_ANTIFRAUT_CENTER) == 0) {
         GetNumberMarkSource(userId, data.numberMarkInfo.markSource, kMaxNumberLen + 1);
     }
     data.blockReason = info.blockReason;
@@ -295,13 +296,13 @@ void CallRecordsManager::GetNumberMarkSource(int32_t userId, char *source, unsig
         settingHelper->Query(settingUri, TELEPHONY_IDENTITY_SWITCH, isTelephonyIdentityOn);
     }
     isBundleInstalled = CallManagerUtils::IsBundleInstalled("", userId);
-    if (size <= strlen(markSourceOfOthers) && size <= strlen(markSourceOfAntifrautCenter)) {
+    if (size <= strlen(MARK_SOURCE_OF_ANTIFRAUT_CENTER) && size <= strlen(MARK_SOURCE_OF_OTHERS)) {
         return;
     }
     if (isBundleInstalled && isAntifraudSwitchOn == "1" && isTelephonyIdentityOn == "1") {
-        strcpy_s(source, size, "5"); // 5: markSourceOfAntifrautCenter
+        strcpy_s(source, size, MARK_SOURCE_OF_ANTIFRAUT_CENTER);
     } else {
-        strcpy_s(source, size, "3"); // 3: markSourceOfOthers
+        strcpy_s(source, size, MARK_SOURCE_OF_OTHERS);
     }
 }
 
