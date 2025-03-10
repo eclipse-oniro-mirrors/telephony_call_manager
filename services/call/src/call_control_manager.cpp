@@ -46,6 +46,7 @@
 #include "call_superprivacy_control_manager.h"
 #include "distributed_communication_manager.h"
 #include "call_voice_assistant_manager.h"
+#include "interoperable_communication_manager.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -1653,6 +1654,7 @@ void CallControlManager::CallStateObserve()
     callStateListenerPtr_->AddOneObserver(incomingCallWakeup_);
     callStateListenerPtr_->AddOneObserver(DelayedSingleton<CallRecordsManager>::GetInstance());
     callStateListenerPtr_->AddOneObserver(DelayedSingleton<DistributedCommunicationManager>::GetInstance());
+    callStateListenerPtr_->AddOneObserver(DelayedSingleton<InteroperableCommunicationManager>::GetInstance());
     callStateListenerPtr_->AddOneObserver(CallVoiceAssistantManager::GetInstance());
 }
 
