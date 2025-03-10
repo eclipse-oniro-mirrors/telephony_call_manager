@@ -286,7 +286,6 @@ void CallRecordsManager::CopyCallInfoToRecord(CallAttributeInfo &info, CallRecor
 
 void CallRecordsManager::GetNumberMarkSource(int32_t userId, char *source, unsigned int size)
 {
-    bool isBundleInstalled = false;
     std::string isAntifraudSwitchOn = "0";
     std::string isTelephonyIdentityOn = "0";
     auto settingHelper = SettingsDataShareHelper::GetInstance();
@@ -307,11 +306,9 @@ void CallRecordsManager::GetNumberMarkSource(int32_t userId, char *source, unsig
         strcpy_s(source, size, MARK_SOURCE_OF_OTHERS);
         return;
     }
-    isBundleInstalled = CallManagerUtils::IsBundleInstalled("", userId);
-    if (isBundleInstalled) {
-        strcpy_s(source, size, MARK_SOURCE_OF_ANTIFRAUT_CENTER);
-    } else {
+    if (!CallManagerUtils::IsBundleInstalled("", userId)) {
         strcpy_s(source, size, MARK_SOURCE_OF_OTHERS);
+        return;
     }
 }
 
