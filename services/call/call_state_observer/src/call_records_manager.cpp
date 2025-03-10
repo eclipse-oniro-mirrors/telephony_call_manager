@@ -290,12 +290,11 @@ void CallRecordsManager::GetNumberMarkSource(int32_t userId, char *source, unsig
     std::string isAntifraudSwitchOn = "0";
     std::string isTelephonyIdentityOn = "0";
     auto settingHelper = SettingsDataShareHelper::GetInstance();
-    if (settingHelper != nullptr) {
-        OHOS::Uri settingUri(SettingsDataShareHelper::SETTINGS_DATASHARE_URI);
-        settingHelper->Query(settingUri, SETTINGS_ANTIFRAUD_CENTER_SWITCH, isAntifraudSwitchOn);
-        settingHelper->Query(settingUri, TELEPHONY_IDENTITY_SWITCH, isTelephonyIdentityOn);
+    if (settingHelper == nullptr) {
+        return;
     }
-    isBundleInstalled = CallManagerUtils::IsBundleInstalled("", userId);
+    OHOS::Uri settingUri(SettingsDataShareHelper::SETTINGS_DATASHARE_URI);
+    settingHelper->Query(settingUri, SETTINGS_ANTIFRAUD_CENTER_SWITCH, isAntifraudSwitchOn);
     if (size <= strlen(MARK_SOURCE_OF_ANTIFRAUT_CENTER) && size <= strlen(MARK_SOURCE_OF_OTHERS)) {
         return;
     }
@@ -303,7 +302,13 @@ void CallRecordsManager::GetNumberMarkSource(int32_t userId, char *source, unsig
         strcpy_s(source, size, MARK_SOURCE_OF_OTHERS);
         return;
     }
-    if (isBundleInstalled && isTelephonyIdentityOn == "1") {
+    settingHelper->Query(settingUri, TELEPHONY_IDENTITY_SWITCH, isTelephonyIdentityOn);
+    if (settingHelper == "0") {
+        strcpy_s(source, size, MARK_SOURCE_OF_OTHERS);
+        return;
+    }
+    isBundleInstalled = CallManagerUtils::IsBundleInstalled("", userId);
+    if (isBundleInstalled) {
         strcpy_s(source, size, MARK_SOURCE_OF_ANTIFRAUT_CENTER);
     } else {
         strcpy_s(source, size, MARK_SOURCE_OF_OTHERS);
