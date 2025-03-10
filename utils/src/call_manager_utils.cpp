@@ -19,7 +19,6 @@
 
 namespace OHOS {
 namespace Telephony {
-constexpr int32_t APP_INDEX_ZERO = 0;
 
 void CallManagerUtils::WriteCallAttributeInfo(const CallAttributeInfo &info, MessageParcel &messageParcel)
 {
@@ -82,7 +81,7 @@ bool CallManagerUtils::IsBundleInstalled(const std::string &bundleName, int32_t 
     if (proxy == nullptr) {
         return false;
     }
-    if (FAILED(proxy->IsBundleInstalled(bundleName, userId, APP_INDEX_ZERO, isInstalled))) {
+    if (FAILED(proxy->IsBundleInstalled(bundleName, userId, 0, isInstalled))) {
         return false;
     }
     return isInstalled;
