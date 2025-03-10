@@ -293,11 +293,11 @@ void CallRecordsManager::GetNumberMarkSource(int32_t userId, char *source, unsig
     if (settingHelper == nullptr) {
         return;
     }
-    OHOS::Uri settingUri(SettingsDataShareHelper::SETTINGS_DATASHARE_URI);
-    settingHelper->Query(settingUri, SETTINGS_ANTIFRAUD_CENTER_SWITCH, isAntifraudSwitchOn);
     if (size <= strlen(MARK_SOURCE_OF_ANTIFRAUT_CENTER) && size <= strlen(MARK_SOURCE_OF_OTHERS)) {
         return;
     }
+    OHOS::Uri settingUri(SettingsDataShareHelper::SETTINGS_DATASHARE_URI);
+    settingHelper->Query(settingUri, SETTINGS_ANTIFRAUD_CENTER_SWITCH, isAntifraudSwitchOn); 
     if (isAntifraudSwitchOn == "0") {
         strcpy_s(source, size, MARK_SOURCE_OF_OTHERS);
         return;
