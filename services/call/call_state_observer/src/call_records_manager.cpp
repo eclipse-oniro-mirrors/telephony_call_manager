@@ -273,7 +273,8 @@ void CallRecordsManager::CopyCallInfoToRecord(CallAttributeInfo &info, CallRecor
     AccountSA::OsAccountManager::GetForegroundOsAccountLocalId(userId);
     data.features = callFeatures;
     data.numberMarkInfo = info.numberMarkInfo;
-    if (data.numberMarkInfo.markSource == "5") {
+    if (data.numberMarkInfo.markSource == "5") // 5:markSourceOfAntifrautCenter
+    {
         GetNumberMarkSource(userId, data.numberMarkInfo.markSource, kMaxNumberLen + 1);
     }
     data.blockReason = info.blockReason;
@@ -298,9 +299,9 @@ void CallRecordsManager::GetNumberMarkSource(int32_t userId, char *source, unsig
         return;
     }
     if (isBundleInstalled && isAntifraudSwitchOn == "1" && isTelephonyIdentityOn == "1") {
-        strcpy_s(source, size, 5); // 5: markSourceOfAntifrautCenter
+        strcpy_s(source, size, "5"); // 5: markSourceOfAntifrautCenter
     } else {
-        strcpy_s(source, size, 3); // 3: markSourceOfOthers
+        strcpy_s(source, size, "3"); // 3: markSourceOfOthers
     }
 }
 
