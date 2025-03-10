@@ -303,7 +303,7 @@ void CallRecordsManager::GetNumberMarkSource(int32_t userId, char *source, unsig
         return;
     }
     settingHelper->Query(settingUri, TELEPHONY_IDENTITY_SWITCH, isTelephonyIdentityOn);
-    if (settingHelper == "0") {
+    if (isTelephonyIdentityOn == "0") {
         strcpy_s(source, size, MARK_SOURCE_OF_OTHERS);
         return;
     }
