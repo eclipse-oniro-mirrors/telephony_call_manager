@@ -788,6 +788,7 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallControlManager_002, Function | MediumTes
 HWTEST_F(ZeroBranch4Test, Telephony_CallControlManager_003, Function | MediumTest | Level3)
 {
     std::shared_ptr<CallControlManager> callControlManager = std::make_shared<CallControlManager>();
+    callControlManager->UnInit();
     callControlManager->CallStateObserve();
     callControlManager->Init();
     callControlManager->CallStateObserve();
@@ -1238,6 +1239,110 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_007, Function | MediumTest
 HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_008, Function | MediumTest | Level3)
 {
     std::shared_ptr<CallStatusManager> callStatusManager = std::make_shared<CallStatusManager>();
+    CallDetailsInfo infos;
+    infos.slotId = -1;
+    EXPECT_EQ(callStatusManager->HandleCallsReportInfo(infos), CALL_ERR_INVALID_SLOT_ID);
+    infos.slotId = 0;
+    CallDetailInfo info;
+    infos.callVec.push_back(info);
+    EXPECT_EQ(callStatusManager->HandleCallsReportInfo(infos), TELEPHONY_SUCCESS);
+    callStatusManager->callDetailsInfo_[0].callVec.push_back(info);
+    EXPECT_EQ(callStatusManager->HandleCallsReportInfo(infos), TELEPHONY_SUCCESS);
+    auto &info0 = infos.callVec[0];
+    info0.state = TelCallState::CALL_STATUS_ACTIVE;
+    EXPECT_EQ(callStatusManager->HandleCallsReportInfo(infos), TELEPHONY_SUCCESS);
+    info0.state = TelCallState::CALL_STATUS_UNKNOWN;
+    info0.mpty = 1;
+    EXPECT_EQ(callStatusManager->HandleCallsReportInfo(infos), TELEPHONY_SUCCESS);
+    info0.mpty = 0;
+    info0.callType = CallType::TYPE_CS;
+    EXPECT_EQ(callStatusManager->HandleCallsReportInfo(infos), TELEPHONY_SUCCESS);
+    info0.callType = CallType::TYPE_ERR_CALL;
+    info0.callMode = VideoStateType::TYPE_VIDEO;
+    EXPECT_EQ(callStatusManager->HandleCallsReportInfo(infos), TELEPHONY_SUCCESS);
+    info0.callMode = VideoStateType::TYPE_VOICE;
+    info0.state = TelCallState::CALL_STATUS_ALERTING;
+    EXPECT_EQ(callStatusManager->HandleCallsReportInfo(infos), TELEPHONY_SUCCESS);
+    auto &info1 = callStatusManager->callDetailsInfo_[0].callVec[0];
+    info1.index = 1;
+    EXPECT_EQ(callStatusManager->HandleCallsReportInfo(infos), TELEPHONY_SUCCESS);
+    info.state = TelCallState::CALL_STATUS_DIALING;
+    EXPECT_GT(callStatusManager->HandleVoipCallReportInfo(info), TELEPHONY_ERROR);
+    info.state = TelCallState::CALL_STATUS_ANSWERED;
+    EXPECT_EQ(callStatusManager->HandleVoipCallReportInfo(info), TELEPHONY_ERROR);
+    info.state = TelCallState::CALL_STATUS_DISCONNECTING;
+    EXPECT_EQ(callStatusManager->HandleVoipCallReportInfo(info), TELEPHONY_ERROR);
+}
+
+HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_009, Function | MediumTest | Level3)
+{
+    std::shared_ptr<CallStatusManager> callStatusManager = std::make_shared<CallStatusManager>();
+    CallObjectManager::callObjectPtrList_.clear();
+    ContactInfo contactInfo;
+    callStatusManager->QueryCallerInfo(contactInfo, "110");
+    VoipCallEventInfo voipCallEventInfo;
+    EXPECT_EQ(callStatusManager->HandleVoipEventReportInfo(voipCallEventInfo), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    CallDetailInfo info;
+    callStatusManager->CallFilterCompleteResult(info);
+    EXPECT_EQ(callStatusManager->UpdateDialingCallInfo(info), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(callStatusManager->IncomingVoipCallHandle(info), CALL_ERR_CALL_OBJECT_IS_NULL);
+    EXPECT_EQ(callStatusManager->OutgoingVoipCallHandle(info), CALL_ERR_CALL_OBJECT_IS_NULL);
+    bool isDistributedDeviceDialing = false;
+    EXPECT_FALSE(callStatusManager->UpdateDialingHandle(info, isDistributedDeviceDialing));
+    EXPECT_EQ(callStatusManager->ActiveHandle(info), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(callStatusManager->ActiveVoipCallHandle(info), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(callStatusManager->HoldingHandle(info), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(callStatusManager->AlertHandle(info), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(callStatusManager->DisconnectedVoipCallHandle(info), TELEPHONY_ERR_LOCAL_PTR_NULL);
+
+    info.state = TelCallState::CALL_STATUS_ACTIVE;
+    info.callType = CallType::TYPE_VOIP;
+    sptr<CallBase> voipCall = callStatusManager->CreateNewCall(info, CallDirection::CALL_DIRECTION_IN);
+    ASSERT_TRUE(voipCall != nullptr);
+    callStatusManager->antiFraudSlotId_ = 0;
+    callStatusManager->antiFraudIndex_ = 0;
+    CallObjectManager::AddOneCallObject(voipCall);
+    callStatusManager->SetupAntiFraudService(voipCall, info);
+    callStatusManager->SetConferenceCall({voipCall});
+    EXPECT_EQ(CallObjectManager::callObjectPtrList_.size(), 1);
+    EXPECT_EQ(callStatusManager->HandleVoipEventReportInfo(voipCallEventInfo), TELEPHONY_ERR_FAIL);
+    voipCall->SetCallRunningState(CallRunningState::CALL_RUNNING_STATE_ACTIVE);
+    EXPECT_EQ(callStatusManager->HandleVoipEventReportInfo(voipCallEventInfo), TELEPHONY_SUCCESS);
+    voipCall->SetCallRunningState(CallRunningState::CALL_RUNNING_STATE_DIALING);
+    voipCallEventInfo.voipCallEvent = VoipCallEvent::VOIP_CALL_EVENT_MUTED;
+    EXPECT_EQ(callStatusManager->HandleVoipEventReportInfo(voipCallEventInfo), TELEPHONY_SUCCESS);
+    voipCallEventInfo.voipCallEvent = VoipCallEvent::VOIP_CALL_EVENT_UNMUTED;
+    EXPECT_EQ(callStatusManager->HandleVoipEventReportInfo(voipCallEventInfo), TELEPHONY_SUCCESS);
+    EXPECT_EQ(callStatusManager->IncomingVoipCallHandle(info), TELEPHONY_SUCCESS);
+    EXPECT_EQ(callStatusManager->OutgoingVoipCallHandle(info), TELEPHONY_SUCCESS);
+    info.callMode = VideoStateType::TYPE_VIDEO;
+    EXPECT_NE(callStatusManager->OutgoingVoipCallHandle(info), TELEPHONY_ERR_LOCAL_PTR_NULL);
+}
+
+HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_010, Function | MediumTest | Level3)
+{
+    std::shared_ptr<CallStatusManager> callStatusManager = std::make_shared<CallStatusManager>();
+    CallObjectManager::callObjectPtrList_.clear();
+    CallDetailInfo info;
+    info.state = TelCallState::CALL_STATUS_ACTIVE;
+    info.callType = CallType::TYPE_SATELLITE;
+    sptr<CallBase> satelliteCall = callStatusManager->CreateNewCall(info, CallDirection::CALL_DIRECTION_IN);
+    ASSERT_TRUE(satelliteCall != nullptr);
+    CallObjectManager::AddOneCallObject(satelliteCall);
+    EXPECT_EQ(CallObjectManager::callObjectPtrList_.size(), 1);
+    EXPECT_EQ(callStatusManager->UpdateDialingCallInfo(info), TELEPHONY_SUCCESS);
+    EXPECT_NE(callStatusManager->HoldingHandle(info), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_NE(callStatusManager->DisconnectingHandle(info), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_NE(callStatusManager->DialingHandle(info), TELEPHONY_ERR_LOCAL_PTR_NULL);
+}
+
+HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_011, Function | MediumTest | Level3)
+{
+    std::shared_ptr<CallStatusManager> callStatusManager = std::make_shared<CallStatusManager>();
+    CallDetailInfo info;
+    callStatusManager->callDetailsInfo_[0].callVec.push_back(info);
+    callStatusManager->antiFraudSlotId_ = 0;
+    callStatusManager->TriggerAntiFraud(static_cast<int32_t>(AntiFraudState::ANTIFRAUD_STATE_DEFAULT));
     callStatusManager->antiFraudIndex_ = -1;
     callStatusManager->antiFraudSlotId_ = 0;
     callStatusManager->TriggerAntiFraud(static_cast<int32_t>(AntiFraudState::ANTIFRAUD_STATE_RISK));
