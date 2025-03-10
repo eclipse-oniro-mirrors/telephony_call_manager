@@ -271,11 +271,11 @@ void CallRecordsManager::CopyCallInfoToRecord(CallAttributeInfo &info, CallRecor
     data.callType = info.callType;
     // use original call type for video call record
     int32_t callFeatures = GetCallFeatures(info.originalCallType);
-    int32_t userId = 0;
-    AccountSA::OsAccountManager::GetForegroundOsAccountLocalId(userId);
     data.features = callFeatures;
     data.numberMarkInfo = info.numberMarkInfo;
     if (strcmp(data.numberMarkInfo.markSource, MARK_SOURCE_OF_ANTIFRAUT_CENTER) == 0) {
+        int32_t userId = 0;
+        AccountSA::OsAccountManager::GetForegroundOsAccountLocalId(userId);
         GetNumberMarkSource(userId, data.numberMarkInfo.markSource, kMaxNumberLen + 1);
     }
     data.blockReason = info.blockReason;
