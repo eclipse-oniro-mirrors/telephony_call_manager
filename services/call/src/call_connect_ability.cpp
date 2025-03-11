@@ -102,6 +102,10 @@ void CallConnectAbility::SetConnectingFlag(bool isConnecting)
 {
     isConnecting_ = isConnecting;
     if (!isConnecting_ && isDisconnecting_) {
+        if (CallObjectManager::HasCallExist()) {
+            SetDisconnectingFlag(false);
+            return;
+        }
         DisconnectAbility();
         TELEPHONY_LOGE("redisconnect ability");
     }
