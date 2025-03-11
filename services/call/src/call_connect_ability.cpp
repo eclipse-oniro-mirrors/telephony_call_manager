@@ -14,6 +14,7 @@
  */
 
 #include "call_connect_ability.h"
+#include "call_object_manager.h"
 
 #include "ability_manager_client.h"
 #include "call_ability_connect_callback.h"
@@ -102,6 +103,11 @@ void CallConnectAbility::SetConnectingFlag(bool isConnecting)
 {
     isConnecting_ = isConnecting;
     if (!isConnecting_ && isDisconnecting_) {
+        if (CallObjectManager::HasCallExist()) {
+            TELEPHONY_LOGI("stop disconnect with callui when in call");
+            SetDisconnectingFlag(false);
+            return;
+        }
         DisconnectAbility();
         TELEPHONY_LOGE("redisconnect ability");
     }
