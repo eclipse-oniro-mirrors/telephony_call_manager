@@ -14,6 +14,7 @@
  */
 
 #include "call_connect_ability.h"
+#include "call_object_manager.h"
 
 #include "ability_manager_client.h"
 #include "call_ability_connect_callback.h"
