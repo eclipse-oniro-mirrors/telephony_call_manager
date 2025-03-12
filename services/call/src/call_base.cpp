@@ -134,11 +134,13 @@ int32_t CallBase::RejectCallBase()
 
 AAFwk::WantParams CallBase::GetExtraParams()
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     return extraParams_;
 }
 
 void CallBase::SetExtraParams(AAFwk::WantParams extraParams)
 {
+    std::lock_guard<std::mutex> lock(mutex_);
     extraParams_ = extraParams;
 }
 
