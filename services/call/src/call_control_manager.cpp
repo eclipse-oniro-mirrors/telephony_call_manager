@@ -144,8 +144,9 @@ int32_t CallControlManager::DialCall(std::u16string &number, AppExecFwk::PacMap 
         return ret;
     }
     bool isEcc = false;
+    std::string newPhoneNum = standardizeUtils.RemoveSeparatorsPhoneNumber(accountNumber);
     DelayedSingleton<CallNumberUtils>::GetInstance()->CheckNumberIsEmergency(
-        accountNumber, extras.GetIntValue("accountId"), isEcc);
+        newPhoneNum, extras.GetIntValue("accountId"), isEcc);
     if (isEcc) {
         extras.PutIntValue("dialScene", (int32_t)DialScene::CALL_EMERGENCY);
     }
@@ -170,7 +171,7 @@ int32_t CallControlManager::DialCall(std::u16string &number, AppExecFwk::PacMap 
     }
     SetCallTypeExtras(extras);
     // temporarily save dial information
-    PackageDialInformation(extras, accountNumber, isEcc);
+    PackageDialInformation(extras, newPhoneNum, isEcc);
     if (CallRequestHandlerPtr_ == nullptr) {
         TELEPHONY_LOGE("CallRequestHandlerPtr_ is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
