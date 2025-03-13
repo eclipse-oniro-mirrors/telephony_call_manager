@@ -144,7 +144,8 @@ int32_t CallControlManager::DialCall(std::u16string &number, AppExecFwk::PacMap 
         return ret;
     }
     bool isEcc = false;
-    std::string newPhoneNum = standardizeUtils.RemoveSeparatorsPhoneNumber(accountNumber);
+    std::string newPhoneNum =
+        DelayedSingleton<CallNumberUtils>::GetInstance()->RemoveSeparatorsPhoneNumber(accountNumber);
     DelayedSingleton<CallNumberUtils>::GetInstance()->CheckNumberIsEmergency(
         newPhoneNum, extras.GetIntValue("accountId"), isEcc);
     if (isEcc) {
