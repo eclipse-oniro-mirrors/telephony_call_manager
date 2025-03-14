@@ -835,7 +835,9 @@ void CallStatusManager::SetupAntiFraudService(const sptr<CallBase> &call, const 
         }
         antiFraudSlotId_ = slotId;
         antiFraudIndex_ = info.index;
-        antiFraudService->InitAntiFraudService(tmpStr);
+        ffrt::submit([tmpStr, slotId, info]() {
+            DelayedSingleton<AntiFraudService>::GetInstance()->InitAntiFraudService(tmpStr, slotId, info.index);
+        });
     }
 }
 
@@ -878,7 +880,7 @@ void CallStatusManager::TriggerAntiFraud(int32_t antiFraudState)
         antiFraudState == static_cast<int32_t>(AntiFraudState::ANTIFRAUD_STATE_FINISHED)) {
         antiFraudSlotId_ = -1;
         antiFraudIndex_ = -1;
-        TELEPHONY_LOGI("can begin a new antifraud");
+        TELEPHONY_LOGI("detect finish, can begin a new antifraud");
     }
 
     if (call == nullptr) {
@@ -947,6 +949,14 @@ int32_t CallStatusManager::HoldingHandle(const CallDetailInfo &info)
         TELEPHONY_LOGE("Call is NULL");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
+    if (call->GetSlotId() == antiFraudSlotId_ && info.index == antiFraudIndex_) {
+        ffrt::submit([call, info]() {
+            DelayedSingleton<AntiFraudService>::GetInstance()->StopAntiFraudService(call->GetSlotId(), info.index);
+        });
+        antiFraudSlotId_ = -1;
+        antiFraudIndex_ = -1;
+        TELEPHONY_LOGI("call holding, can begin a new antifraud");
+    }
     // if the call is in a conference, it will exit, otherwise just set it holding
     call = RefreshCallIfNecessary(call, info);
     if (info.mpty == 1) {
@@ -1003,6 +1013,14 @@ int32_t CallStatusManager::DisconnectingHandle(const CallDetailInfo &info)
         TELEPHONY_LOGE("Call is NULL");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
+    if (call->GetSlotId() == antiFraudSlotId_ && info.index == antiFraudIndex_) {
+        ffrt::submit([call, info]() {
+            DelayedSingleton<AntiFraudService>::GetInstance()->StopAntiFraudService(call->GetSlotId(), info.index);
+        });
+        antiFraudSlotId_ = -1;
+        antiFraudIndex_ = -1;
+        TELEPHONY_LOGI("call disconnecting, can begin a new antifraud");
+    }
     call = RefreshCallIfNecessary(call, info);
     SetOriginalCallTypeForDisconnectState(call);
     int32_t ret = UpdateCallState(call, TelCallState::CALL_STATUS_DISCONNECTING);
@@ -1044,6 +1062,14 @@ int32_t CallStatusManager::DisconnectedHandle(const CallDetailInfo &info)
     if (call == nullptr) {
         TELEPHONY_LOGE("call is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    if (call->GetSlotId() == antiFraudSlotId_ && info.index == antiFraudIndex_) {
+        ffrt::submit([call, info]() {
+            DelayedSingleton<AntiFraudService>::GetInstance()->StopAntiFraudService(call->GetSlotId(), info.index);
+        });
+        antiFraudSlotId_ = -1;
+        antiFraudIndex_ = -1;
+        TELEPHONY_LOGI("call disconnected, can begin a new antifraud");
     }
 #ifdef NOT_SUPPORT_MULTICALL
     bool isTwoCallBtCallAndESIM = CallObjectManager::IsTwoCallBtCallAndESIM();
