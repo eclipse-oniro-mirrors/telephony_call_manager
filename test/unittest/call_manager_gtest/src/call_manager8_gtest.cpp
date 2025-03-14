@@ -1367,8 +1367,59 @@ HWTEST_F(CallManagerGtest, Telephony_AntiFraud_0100, Function | MediumTest | Lev
 }
 
 /**
- * 
+ * @tc.number   Telephony_AntiFraud_0100
+ * @tc.name     Test AntiFraud
+ * @tc.desc     Function test
  */
+HWTEST_F(CallManagerGtest, Telephony_AntiFraud_0100, Function | MediumTest | Level3)
+{
+    auto antiFraudService = DelayedSingleton<AntiFraudService>::GetInstance();
+    EXPECT_EQ(antiFraudService->CreateDataShareHelper(-1, USER_SETTINGSDATA_URI.c_str()), nullptr);
+    EXPECT_NE(antiFraudService->CreateDataShareHelper(TELEPHONY_CALL_MANAGER_SYS_ABILITY_ID,
+        USER_SETTINGSDATA_URI.c_str()), nullptr);
+ 
+    std::string switchName = "noswitch";
+    EXPECT_FALSE(antiFraudService->IsSwitchOn(switchName));
+    EXPECT_FALSE(antiFraudService->IsSwitchOn(ANTIFRAUD_SWITCH));
+ 
+    OHOS::AntiFraudService::AntiFraudResult fraudResult;
+    std::string phoneNum = "123456";
+    antiFraudService->InitAntiFraudService(phoneNum, 0, 1);
+    EXPECT_EQ(antiFraudService->antiFraudState_, 1);
+    antiFraudService->StopAntiFraudService(0, 1);
+    antiFraudService->RecordDetectResult(fraudResult, 0, 1);
+    EXPECT_EQ(antiFraudService->antiFraudState_, 1);
+ 
+    antiFraudService->InitAntiFraudService(phoneNum, 0, 1);
+    antiFraudService->StopAntiFraudService(0, 1);
+    antiFraudService->RecordDetectResult(fraudResult, 0, 2);
+    EXPECT_EQ(antiFraudService->antiFraudState_, 3);
+ 
+    fraudResult.result = true;
+    antiFraudService->InitAntiFraudService(phoneNum, 0, 1);
+    antiFraudService->RecordDetectResult(fraudResult, 1, 1);
+    EXPECT_EQ(antiFraudService->antiFraudState_, 2);
+ 
+    antiFraudService->InitAntiFraudService(phoneNum, 0, 1);
+    antiFraudService->RecordDetectResult(fraudResult, 1, 2);
+    EXPECT_EQ(antiFraudService->antiFraudState_, 2);
+ 
+    antiFraudService->RecordDetectResult(fraudResult, 1, 2);
+    EXPECT_EQ(antiFraudService->antiFraudState_, 2);
+    
+    auto callStatusManager = std::make_shared<CallStatusManager>();
+    antiFraudService->SetCallStatusManager(callStatusManager);
+    antiFraudService->InitAntiFraudService(phoneNum, 0, 3);
+    antiFraudService->RecordDetectResult(fraudResult, 0, 3);
+    EXPECT_EQ(antiFraudService->antiFraudState_, 2);
+ 
+    auto antiFraudAdapter = DelayedSingleton<AntiFraudAdapter>::GetInstance();
+    antiFraudAdapter->ReleaseAntiFraud();
+    EXPECT_EQ(antiFraudAdapter->libAntiFraud_, nullptr);
+    antiFraudAdapter->GetLibAntiFraud();
+    antiFraudAdapter->ReleaseAntiFraud();
+    EXPECT_EQ(antiFraudAdapter->libAntiFraud_, nullptr);
+}
 
 /**
  * @tc.number   Telephony_NumberIdentityConnection_0001
