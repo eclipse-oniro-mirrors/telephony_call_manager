@@ -637,7 +637,11 @@ void CallStatusManager::QueryCallerInfo(ContactInfo &contactInfo, std::string ph
     TELEPHONY_LOGI("telephony cust support.");
     if (phoneNum.length() >= static_cast<size_t>(QUERY_CONTACT_LEN)) {
         TELEPHONY_LOGI("phoneNum is longer than 7");
+        predicates.BeginWrap();
         predicates.EndsWith(DETAIL_INFO, phoneNum.substr(phoneNum.length() - QUERY_CONTACT_LEN));
+        predicates.Or();
+        predicates.EndsWith(FORMAT_PHONE_NUMBER, phoneNum.substr(phoneNum.length() - QUERY_CONTACT_LEN));
+        predicates.EndWrap();
         if (!callDataPtr->QueryContactInfoEnhanced(contactInfo, predicates)) {
             TELEPHONY_LOGE("Query contact database enhanced fail!");
         }
@@ -840,6 +844,17 @@ void CallStatusManager::SetupAntiFraudService(const sptr<CallBase> &call, const 
         });
     }
 }
+void CallStatusManager::StopAntiFraudDetect(const sptr<CallBase> &call, const CallDetailInfo &info)
+{
+    if (call->GetSlotId() == antiFraudSlotId_ && info.index == antiFraudIndex_) {
+        ffrt::submit([call, info]() {
+            DelayedSingleton<AntiFraudService>::GetInstance()->StopAntiFraudService(call->GetSlotId(), info.index);
+        });
+        antiFraudSlotId_ = -1;
+        antiFraudIndex_ = -1;
+        TELEPHONY_LOGI("call ending, can begin a new antifraud");
+    }
+}
 
 bool CallStatusManager::IsContactPhoneNum(const std::string &phoneNum)
 {
@@ -949,14 +964,7 @@ int32_t CallStatusManager::HoldingHandle(const CallDetailInfo &info)
         TELEPHONY_LOGE("Call is NULL");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    if (call->GetSlotId() == antiFraudSlotId_ && info.index == antiFraudIndex_) {
-        ffrt::submit([call, info]() {
-            DelayedSingleton<AntiFraudService>::GetInstance()->StopAntiFraudService(call->GetSlotId(), info.index);
-        });
-        antiFraudSlotId_ = -1;
-        antiFraudIndex_ = -1;
-        TELEPHONY_LOGI("call holding, can begin a new antifraud");
-    }
+    StopAntiFraudDetect(call, info);
     // if the call is in a conference, it will exit, otherwise just set it holding
     call = RefreshCallIfNecessary(call, info);
     if (info.mpty == 1) {
@@ -1013,14 +1021,7 @@ int32_t CallStatusManager::DisconnectingHandle(const CallDetailInfo &info)
         TELEPHONY_LOGE("Call is NULL");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    if (call->GetSlotId() == antiFraudSlotId_ && info.index == antiFraudIndex_) {
-        ffrt::submit([call, info]() {
-            DelayedSingleton<AntiFraudService>::GetInstance()->StopAntiFraudService(call->GetSlotId(), info.index);
-        });
-        antiFraudSlotId_ = -1;
-        antiFraudIndex_ = -1;
-        TELEPHONY_LOGI("call disconnecting, can begin a new antifraud");
-    }
+    StopAntiFraudDetect(call, info);
     call = RefreshCallIfNecessary(call, info);
     SetOriginalCallTypeForDisconnectState(call);
     int32_t ret = UpdateCallState(call, TelCallState::CALL_STATUS_DISCONNECTING);
@@ -1063,14 +1064,7 @@ int32_t CallStatusManager::DisconnectedHandle(const CallDetailInfo &info)
         TELEPHONY_LOGE("call is null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    if (call->GetSlotId() == antiFraudSlotId_ && info.index == antiFraudIndex_) {
-        ffrt::submit([call, info]() {
-            DelayedSingleton<AntiFraudService>::GetInstance()->StopAntiFraudService(call->GetSlotId(), info.index);
-        });
-        antiFraudSlotId_ = -1;
-        antiFraudIndex_ = -1;
-        TELEPHONY_LOGI("call disconnected, can begin a new antifraud");
-    }
+    StopAntiFraudDetect(call, info);
 #ifdef NOT_SUPPORT_MULTICALL
     bool isTwoCallBtCallAndESIM = CallObjectManager::IsTwoCallBtCallAndESIM();
     bool IsTwoCallESIMCall = CallObjectManager::IsTwoCallESIMCall();
