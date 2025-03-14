@@ -709,7 +709,7 @@ int32_t CallStatusManager::UpdateDialingCallInfo(const CallDetailInfo &info)
 
 int32_t CallStatusManager::DialingHandle(const CallDetailInfo &info)
 {
-    TELEPHONY_LOGI("handle dialing state");
+    TELEPHONY_LOGI("handle dialing state, index: %{public}d", info.index);
     bool isDistributedDeviceDialing = false;
     if (info.index > 0) {
         if (UpdateDialingHandle(info, isDistributedDeviceDialing)) {
