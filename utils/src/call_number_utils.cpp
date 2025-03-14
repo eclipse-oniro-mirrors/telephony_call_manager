@@ -384,8 +384,6 @@ void CallNumberUtils::YellowPageAndMarkUpdate(const sptr<CallBase> &callObjectPt
         static_cast<int32_t>(numberMarkInfo.markType), info.isEcc);
     if (numberMarkInfo.markType > MarkType::MARK_TYPE_NONE || info.isEcc) {
         call->GetCallAttributeInfo(info);
-        TELEPHONY_LOGI("report markType: %{public}d, isEcc: %{public}d",
-            static_cast<int32_t>(numberMarkInfo.markType), info.isEcc);
         DelayedSingleton<CallAbilityReportProxy>::GetInstance()->ReportCallStateInfo(info);
     }
 }
