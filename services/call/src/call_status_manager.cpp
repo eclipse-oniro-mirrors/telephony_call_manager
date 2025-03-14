@@ -1058,7 +1058,6 @@ int32_t CallStatusManager::DisconnectedHandle(const CallDetailInfo &info)
     bool isTwoCallBtCallAndESIM = CallObjectManager::IsTwoCallBtCallAndESIM();
     bool IsTwoCallESIMCall = CallObjectManager::IsTwoCallESIMCall();
 #endif
-    TELEPHONY_LOGI("refresh call.");
     call = RefreshCallIfNecessary(call, info);
     RefreshCallDisconnectReason(call, static_cast<int32_t>(info.reason));
     ClearPendingState(call);
