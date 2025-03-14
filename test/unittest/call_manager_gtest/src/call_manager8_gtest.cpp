@@ -1367,6 +1367,10 @@ HWTEST_F(CallManagerGtest, Telephony_AntiFraud_0100, Function | MediumTest | Lev
 }
 
 /**
+ * 
+ */
+
+/**
  * @tc.number   Telephony_NumberIdentityConnection_0001
  * @tc.name     Test antiFraud hsdr helper
  * @tc.desc     Function test
