@@ -93,7 +93,7 @@ bool NumberIdentityDataBaseHelper::Query(std::string &numberLocation, DataShare:
 bool NumberIdentityDataBaseHelper::QueryYellowPageAndMark(NumberMarkInfo &numberMarkInfo,
     DataShare::DataSharePredicates &predicates)
 {
-    TELEPHONY_LOGW("query yellow page and mark.");
+    TELEPHONY_LOGI("query yellow page and mark.");
     std::shared_ptr<DataShare::DataShareHelper> helper = CreateDataShareHelper(NUMBER_MARK_INFO_URI);
     if (helper == nullptr) {
         TELEPHONY_LOGE("helper is nullptr");
@@ -101,6 +101,7 @@ bool NumberIdentityDataBaseHelper::QueryYellowPageAndMark(NumberMarkInfo &number
     }
     Uri uri(NUMBER_MARK_INFO_URI);
     std::vector<std::string> columns;
+    TELEPHONY_LOGI("begin datashare query.");
     auto resultSet = helper->Query(uri, predicates, columns);
     if (resultSet == nullptr) {
         TELEPHONY_LOGE("resultSet is nullptr");
@@ -108,6 +109,7 @@ bool NumberIdentityDataBaseHelper::QueryYellowPageAndMark(NumberMarkInfo &number
         helper = nullptr;
         return false;
     }
+    TELEPHONY_LOGI("datashare query success.");
     int rowCount = 0;
     resultSet->GetRowCount(rowCount);
     if (rowCount == 0) {
@@ -121,7 +123,7 @@ bool NumberIdentityDataBaseHelper::QueryYellowPageAndMark(NumberMarkInfo &number
     resultSet->Close();
     helper->Release();
     helper = nullptr;
-    TELEPHONY_LOGW("QueryYellowPageAndMark success.");
+    TELEPHONY_LOGI("QueryYellowPageAndMark success.");
     return true;
 }
 

@@ -359,11 +359,12 @@ void CallNumberUtils::YellowPageAndMarkUpdate(const sptr<CallBase> &callObjectPt
         return;
     }
     CallAttributeInfo info;
-    callObjectPtr->GetCallAttributeBaseInfo(info);
-    TELEPHONY_LOGW("YellowPageAndMarkUpdate, callId[%{public}d]", info.callId);
+    callObjectPtr->GetCallAttributeInfo(info);
+    TELEPHONY_LOGI("YellowPageAndMarkUpdate, callId[%{public}d]", info.callId);
     NumberMarkInfo numberMarkInfo;
     int32_t ret = QueryYellowPageAndMarkInfo(numberMarkInfo, callObjectPtr->GetAccountNumber());
     if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("QueryYellowPageAndMarkInfo fail!");
         return;
     }
     sptr<CallBase> call = callObjectPtr;
@@ -379,9 +380,9 @@ void CallNumberUtils::YellowPageAndMarkUpdate(const sptr<CallBase> &callObjectPt
         TELEPHONY_LOGE("call is not exist");
         return;
     }
+    TELEPHONY_LOGI("markType: %{public}d, isEcc: %{public}d",
+        static_cast<int32_t>(numberMarkInfo.markType), info.isEcc);
     if (numberMarkInfo.markType > MarkType::MARK_TYPE_NONE || info.isEcc) {
-        TELEPHONY_LOGW("markType: %{public}d, isEcc: %{public}d",
-            static_cast<int32_t>(numberMarkInfo.markType), info.isEcc);
         call->GetCallAttributeInfo(info);
         DelayedSingleton<CallAbilityReportProxy>::GetInstance()->ReportCallStateInfo(info);
     }

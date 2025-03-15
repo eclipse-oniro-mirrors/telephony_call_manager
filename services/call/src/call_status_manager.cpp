@@ -687,8 +687,10 @@ void CallStatusManager::CallFilterCompleteResult(const CallDetailInfo &info)
 
 int32_t CallStatusManager::UpdateDialingCallInfo(const CallDetailInfo &info)
 {
+    TELEPHONY_LOGI("UpdateDialingCallInfo start.");
     sptr<CallBase> call = GetOneCallObjectByIndexSlotIdAndCallType(info.index, info.accountId, info.callType);
     if (call != nullptr) {
+        TELEPHONY_LOGI("RefreshCallIfNecessary for not null.");
         call = RefreshCallIfNecessary(call, info);
         return TELEPHONY_SUCCESS;
     }
@@ -699,6 +701,7 @@ int32_t CallStatusManager::UpdateDialingCallInfo(const CallDetailInfo &info)
     }
 
     std::string oriNum = call->GetAccountNumber();
+    TELEPHONY_LOGI("RefreshCallIfNecessary");
     call = RefreshCallIfNecessary(call, info);
     call->SetCallIndex(info.index);
     call->SetBundleName(info.bundleName);
@@ -713,7 +716,7 @@ int32_t CallStatusManager::UpdateDialingCallInfo(const CallDetailInfo &info)
 
 int32_t CallStatusManager::DialingHandle(const CallDetailInfo &info)
 {
-    TELEPHONY_LOGI("handle dialing state");
+    TELEPHONY_LOGI("handle dialing state, index: %{public}d", info.index);
     bool isDistributedDeviceDialing = false;
     if (info.index > 0) {
         if (UpdateDialingHandle(info, isDistributedDeviceDialing)) {
@@ -777,6 +780,7 @@ int32_t CallStatusManager::ActiveHandle(const CallDetailInfo &info)
     std::string tmpStr(info.phoneNum);
     sptr<CallBase> call = GetOneCallObjectByIndexSlotIdAndCallType(info.index, info.accountId, info.callType);
     if (call == nullptr && IsDcCallConneceted()) {
+        TELEPHONY_LOGW("need create new call.");
         CreateAndSaveNewCall(info, CallDirection::CALL_DIRECTION_UNKNOW);
         call = GetOneCallObjectByIndexSlotIdAndCallType(info.index, info.accountId, info.callType);
     }
@@ -788,6 +792,7 @@ int32_t CallStatusManager::ActiveHandle(const CallDetailInfo &info)
     OneCallAnswerAtPhone(call->GetCallID());
 #endif
     ClearPendingState(call);
+    TELEPHONY_LOGI("refresh call.");
     call = RefreshCallIfNecessary(call, info);
     SetOriginalCallTypeForActiveState(call);
     // call state change active, need to judge if launching a conference
@@ -966,6 +971,7 @@ int32_t CallStatusManager::HoldingHandle(const CallDetailInfo &info)
     }
     StopAntiFraudDetect(call, info);
     // if the call is in a conference, it will exit, otherwise just set it holding
+    TELEPHONY_LOGI("refresh call.");
     call = RefreshCallIfNecessary(call, info);
     if (info.mpty == 1) {
         int32_t ret = call->HoldConference();
@@ -990,6 +996,7 @@ int32_t CallStatusManager::AlertHandle(const CallDetailInfo &info)
     std::string tmpStr(info.phoneNum);
     sptr<CallBase> call = GetOneCallObjectByIndexSlotIdAndCallType(info.index, info.accountId, info.callType);
     if (call == nullptr && IsDcCallConneceted()) {
+        TELEPHONY_LOGI("create new call.");
         CreateAndSaveNewCall(info, CallDirection::CALL_DIRECTION_OUT);
         call = GetOneCallObjectByIndexSlotIdAndCallType(info.index, info.accountId, info.callType);
     }
@@ -998,6 +1005,7 @@ int32_t CallStatusManager::AlertHandle(const CallDetailInfo &info)
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     ClearPendingState(call);
+    TELEPHONY_LOGI("refresh call.");
     call = RefreshCallIfNecessary(call, info);
     int32_t ret = UpdateCallState(call, TelCallState::CALL_STATUS_ALERTING);
     if (ret != TELEPHONY_SUCCESS) {
@@ -1022,6 +1030,7 @@ int32_t CallStatusManager::DisconnectingHandle(const CallDetailInfo &info)
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     StopAntiFraudDetect(call, info);
+    TELEPHONY_LOGI("refresh call.");
     call = RefreshCallIfNecessary(call, info);
     SetOriginalCallTypeForDisconnectState(call);
     int32_t ret = UpdateCallState(call, TelCallState::CALL_STATUS_DISCONNECTING);
@@ -1787,6 +1796,7 @@ void CallStatusManager::PackParaInfo(
     if (dir == CallDirection::CALL_DIRECTION_OUT) {
         DelayedSingleton<CallControlManager>::GetInstance()->GetDialParaInfo(paraInfo, extras);
     }
+    TELEPHONY_LOGI("is ecc: %{public}d", paraInfo.isEcc);
     if (info.callType == CallType::TYPE_VOIP) {
         paraInfo.voipCallInfo.voipCallId = info.voipCallInfo.voipCallId;
         paraInfo.voipCallInfo.userName = info.voipCallInfo.userName;
@@ -2241,6 +2251,7 @@ int32_t CallStatusManager::RefreshOldCall(const CallDetailInfo &info, bool &isEx
     auto oldCallType = call->GetCallType();
     auto videoState = call->GetVideoStateType();
     if (oldCallType != info.callType || call->GetTelCallState() != info.state || videoState != info.callMode) {
+        TELEPHONY_LOGI("refresh call.");
         call = RefreshCallIfNecessary(call, info);
         if (oldCallType != info.callType || videoState != info.callMode) {
             return UpdateCallState(call, info.state);
