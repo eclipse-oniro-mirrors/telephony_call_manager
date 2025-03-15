@@ -221,7 +221,7 @@ HWTEST_F(ZeroBranch8Test, Telephony_CallManagerService_002, Function | MediumTes
 {
     AccessToken token;
     std::u16string test = u"";
-    std::string test_ = "";
+    std::string testStr = "";
     bool enabled;
     auto callManagerService = new CallManagerService();
     callManagerService->OnStart();
@@ -264,7 +264,7 @@ HWTEST_F(ZeroBranch8Test, Telephony_CallManagerService_003, Function | MediumTes
     AccessToken token;
     float zoomRatio = 1;
     std::u16string test = u"";
-    std::string test_ = "";
+    std::string testStr = "";
     int32_t callId = 1;
     int32_t value = 1;
     bool enabled;
@@ -307,8 +307,8 @@ HWTEST_F(ZeroBranch8Test, Telephony_CallManagerService_003, Function | MediumTes
     };
     EXPECT_NE(callManagerService->SetAudioDevice(audioDevice), TELEPHONY_ERR_LOCAL_PTR_NULL);
     EXPECT_NE(callManagerService->ControlCamera(1, test), TELEPHONY_ERR_LOCAL_PTR_NULL);
-    EXPECT_NE(callManagerService->SetPreviewWindow(1, test_, nullptr), TELEPHONY_ERR_LOCAL_PTR_NULL);
-    EXPECT_NE(callManagerService->SetDisplayWindow(1, test_, nullptr), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_NE(callManagerService->SetPreviewWindow(1, testStr, nullptr), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_NE(callManagerService->SetDisplayWindow(1, testStr, nullptr), TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
 
 /**
