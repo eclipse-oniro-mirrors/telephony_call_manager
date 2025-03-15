@@ -24,6 +24,7 @@ namespace OHOS {
 namespace Telephony {
 typedef OHOS::ErrCode (*PfnAntiFraudVoiceDetect)(
     const std::shared_ptr<OHOS::AntiFraudService::AntiFraudDetectResListener> &listener);
+typedef OHOS::ErrCode (*PfnStopAntiFraudVoiceDetect)();
 class AntiFraudAdapter {
     DECLARE_DELAYED_SINGLETON(AntiFraudAdapter)
  
@@ -31,6 +32,7 @@ public:
     void *GetLibAntiFraud();
     void ReleaseAntiFraud();
     int32_t DetectAntiFraud(const std::shared_ptr<OHOS::AntiFraudService::AntiFraudDetectResListener> &listener);
+    int32_t StopAntiFraud();
  
 private:
     void *libAntiFraud_ = nullptr;

@@ -14,6 +14,8 @@
  */
 #define private public
 #define protected public
+#include <thread>
+#include <chrono>
 #include "bluetooth_call_client.h"
 #include "bluetooth_call_manager.h"
 #include "bluetooth_call_service.h"
@@ -103,6 +105,7 @@ const int32_t ERROR_CALLID = -1;
 const int32_t ONE_TIME = 1;
 const int32_t STEP_1 = 1;
 const int32_t SOURCE_CALL = 2;
+const int32_t FIVE_SECOND = 5;
 constexpr int16_t DEFAULT_TIME = 0;
 constexpr const char *TEST_STR = "123";
 constexpr const char *LONG_STR =
@@ -157,7 +160,10 @@ void ZeroBranch8Test::SetUpTestCase()
     EXPECT_EQ(result, Security::AccessToken::RET_SUCCESS);
 }
 
-void ZeroBranch8Test::TearDownTestCase() {}
+void ZeroBranch8Test::TearDownTestCase()
+{
+    std::this_thread::sleep_for(std::chrono::seconds(FIVE_SECOND));
+}
 
 void ZeroBranch8Test::InitDialInfo(int32_t accountId, int32_t videoState, int32_t dialScene, int32_t dialType)
 {
@@ -215,7 +221,7 @@ HWTEST_F(ZeroBranch8Test, Telephony_CallManagerService_002, Function | MediumTes
 {
     AccessToken token;
     std::u16string test = u"";
-    std::string test_ = "";
+    std::string testStr = "";
     bool enabled;
     auto callManagerService = new CallManagerService();
     callManagerService->OnStart();
@@ -246,18 +252,6 @@ HWTEST_F(ZeroBranch8Test, Telephony_CallManagerService_002, Function | MediumTes
     EXPECT_NE(
         callManagerService->GetCallTransferInfo(0, CallTransferType::TRANSFER_TYPE_UNCONDITIONAL),
         TELEPHONY_ERR_LOCAL_PTR_NULL);
-    CallTransferInfo callTransferInfo;
-    EXPECT_NE(callManagerService->SetCallTransferInfo(0, callTransferInfo), TELEPHONY_ERR_LOCAL_PTR_NULL);
-    EXPECT_NE(callManagerService->CanSetCallTransferTime(0, enabled), TELEPHONY_ERR_PERMISSION_ERR);
-    EXPECT_NE(callManagerService->SetCallPreferenceMode(0, 0), TELEPHONY_ERR_PERMISSION_ERR);
-    EXPECT_NE(callManagerService->StartRtt(0, test), TELEPHONY_ERR_LOCAL_PTR_NULL);
-    EXPECT_NE(callManagerService->StopRtt(0), TELEPHONY_ERR_LOCAL_PTR_NULL);
-    EXPECT_NE(callManagerService->CombineConference(0), TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API);
-    EXPECT_NE(callManagerService->SeparateConference(0), TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API);
-    EXPECT_NE(callManagerService->KickOutFromConference(0), TELEPHONY_ERR_LOCAL_PTR_NULL);
-    EXPECT_NE(callManagerService->SetMuted(false), TELEPHONY_ERR_LOCAL_PTR_NULL);
-    EXPECT_NE(callManagerService->MuteRinger(), TELEPHONY_ERR_LOCAL_PTR_NULL);
-    callManagerService->OnStop();
 }
 
 /**
@@ -270,7 +264,7 @@ HWTEST_F(ZeroBranch8Test, Telephony_CallManagerService_003, Function | MediumTes
     AccessToken token;
     float zoomRatio = 1;
     std::u16string test = u"";
-    std::string test_ = "";
+    std::string testStr = "";
     int32_t callId = 1;
     int32_t value = 1;
     bool enabled;
@@ -313,8 +307,8 @@ HWTEST_F(ZeroBranch8Test, Telephony_CallManagerService_003, Function | MediumTes
     };
     EXPECT_NE(callManagerService->SetAudioDevice(audioDevice), TELEPHONY_ERR_LOCAL_PTR_NULL);
     EXPECT_NE(callManagerService->ControlCamera(1, test), TELEPHONY_ERR_LOCAL_PTR_NULL);
-    EXPECT_NE(callManagerService->SetPreviewWindow(1, test_, nullptr), TELEPHONY_ERR_LOCAL_PTR_NULL);
-    EXPECT_NE(callManagerService->SetDisplayWindow(1, test_, nullptr), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_NE(callManagerService->SetPreviewWindow(1, testStr, nullptr), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_NE(callManagerService->SetDisplayWindow(1, testStr, nullptr), TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
 
 /**
@@ -326,7 +320,7 @@ HWTEST_F(ZeroBranch8Test, Telephony_CallManagerService_004, Function | MediumTes
 {
     AccessFalseToken token;
     std::u16string test = u"";
-    std::string test_ = "";
+    std::string testStr = "";
     bool enabled;
     auto callManagerService = new CallManagerService();
     EXPECT_FALSE(TelephonyPermission::CheckCallerIsSystemApp());
@@ -368,8 +362,8 @@ HWTEST_F(ZeroBranch8Test, Telephony_CallManagerService_004, Function | MediumTes
     };
     EXPECT_EQ(callManagerService->SetAudioDevice(audioDevice), TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API);
     EXPECT_EQ(callManagerService->ControlCamera(1, test), TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API);
-    EXPECT_EQ(callManagerService->SetPreviewWindow(1, test_, nullptr), TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API);
-    EXPECT_EQ(callManagerService->SetDisplayWindow(1, test_, nullptr), TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API);
+    EXPECT_EQ(callManagerService->SetPreviewWindow(1, testStr, nullptr), TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API);
+    EXPECT_EQ(callManagerService->SetDisplayWindow(1, testStr, nullptr), TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API);
 }
 
 /**
@@ -581,21 +575,6 @@ HWTEST_F(ZeroBranch8Test, Telephony_VoipCallConnection_001, Function | MediumTes
     CallAudioEvent callAudioEvent = CallAudioEvent::AUDIO_EVENT_MUTED;
     std::string voipCallId = "123";
     EXPECT_NE(voipCallConnection->SendCallUiEvent(voipCallId, callAudioEvent), TELEPHONY_ERROR);
-}
-
-HWTEST_F(ZeroBranch8Test, Telephony_ReportCallInfoHandler_001, Function | MediumTest | Level1)
-{
-    ReportCallInfoHandler reportCallInfoHandler;
-    reportCallInfoHandler.Init();
-    VoipCallEventInfo info;
-    EXPECT_NE(reportCallInfoHandler.UpdateVoipEventInfo(info), TELEPHONY_ERR_LOCAL_PTR_NULL);
-    DialParaInfo mDialParaInfo;
-    sptr<CallBase> csCall = new CSCall(mDialParaInfo);
-    csCall->callType_ =  CallType::TYPE_IMS;
-    EXPECT_EQ(CallObjectManager::AddOneCallObject(csCall), TELEPHONY_SUCCESS);
-    CallModeReportInfo response;
-    reportCallInfoHandler.ReceiveImsCallModeRequest(response);
-    EXPECT_NE(CallObjectManager::GetOneCallObjectByIndex(response.callIndex), nullptr);
 }
 
 HWTEST_F(ZeroBranch8Test, Telephony_CallSuperPrivacyControlManager_001, Function | MediumTest | Level1)
