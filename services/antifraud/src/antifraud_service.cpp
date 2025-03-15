@@ -183,7 +183,7 @@ void AntiFraudService::InitAntiFraudService(const std::string &phoneNum, int32_t
 
 void AntiFraudService::StopAntiFraudService(int32_t slotId, int32_t index)
 {
-    auto antiFraudAdatper = DelayedSingleton<AntiFraudAdapter>::GetInstance();
+    auto antiFraudAdapter = DelayedSingleton<AntiFraudAdapter>::GetInstance();
     int32_t antiFraudErrCode = antiFraudAdapter->StopAntiFraud();
     if (antiFraudErrCode == 0) {
         TELEPHONY_LOGI("AntiFraud stop detect, slotId=%{public}d, index=%{public}d", slotId, index);
