@@ -160,7 +160,8 @@ void ZeroBranch8Test::SetUpTestCase()
     EXPECT_EQ(result, Security::AccessToken::RET_SUCCESS);
 }
 
-void ZeroBranch8Test::TearDownTestCase() {
+void ZeroBranch8Test::TearDownTestCase()
+{
     std::this_thread::sleep_for(std::chrono::seconds(FIVE_SECOND));
 }
 
@@ -319,7 +320,7 @@ HWTEST_F(ZeroBranch8Test, Telephony_CallManagerService_004, Function | MediumTes
 {
     AccessFalseToken token;
     std::u16string test = u"";
-    std::string test_ = "";
+    std::string testStr = "";
     bool enabled;
     auto callManagerService = new CallManagerService();
     EXPECT_FALSE(TelephonyPermission::CheckCallerIsSystemApp());
@@ -361,8 +362,8 @@ HWTEST_F(ZeroBranch8Test, Telephony_CallManagerService_004, Function | MediumTes
     };
     EXPECT_EQ(callManagerService->SetAudioDevice(audioDevice), TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API);
     EXPECT_EQ(callManagerService->ControlCamera(1, test), TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API);
-    EXPECT_EQ(callManagerService->SetPreviewWindow(1, test_, nullptr), TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API);
-    EXPECT_EQ(callManagerService->SetDisplayWindow(1, test_, nullptr), TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API);
+    EXPECT_EQ(callManagerService->SetPreviewWindow(1, testStr, nullptr), TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API);
+    EXPECT_EQ(callManagerService->SetDisplayWindow(1, testStr, nullptr), TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API);
 }
 
 /**
