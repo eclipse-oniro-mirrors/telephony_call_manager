@@ -26,6 +26,7 @@
 #include "audio_routing_manager.h"
 #include "audio_device_info.h"
 #include "audio_info.h"
+#include "audio_device_descriptor.h"
 #include "voip_call_connection.h"
 #include "settings_datashare_helper.h"
 #include "distributed_communication_manager.h"
@@ -1157,6 +1158,66 @@ void AudioControlManager::SetRingToneVolume(float volume)
     } else {
         TELEPHONY_LOGE("volume is valid");
     }
+}
+bool AudioControlManager::IsScoTemporarilyDisabled()
+{
+    return isScoTemporarilyDisabled_;
+}
+void AudioControlManager::ExcludeBluetoothSco()
+{
+    TELEPHONY_LOGI("ExcludeBluetoothSco start");
+    AudioSystemManager *audioSystemMananger = AudioSystemManager::GetInstance();
+    if (audioSystemMananger == nullptr) {
+        TELEPHONY_LOGI("audioSystemMananger nullptr");
+        return;
+    }
+    std::shared_ptr<AudioStandard::AudioDeviceDescriptor> audioDev =
+        std::make_shared<AudioStandard::AudioDeviceDescriptor>();
+    if (audioDev != nullptr) {
+        audioDev->macAddress_ = "";
+        audioDev->deviceType_ = AudioStandard::DEVICE_TYPE_BLUETOOTH_SCO;
+    }
+    std::vector<std::shared_ptr<AudioDeviceDescriptor>> target;
+    target.push_back(audioDev);
+    if (target.size() <= 0) {
+        TELEPHONY_LOGI("target.size <= 0");
+        return;
+    }
+    int32_t result = audioSystemMananger->ExcludeOutputDevices(CALL_OUTPUT_DEVICES, target);
+    if (result != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGI("ExcludeOutputDevices failed");
+        return;
+    }
+    isScoTemporarilyDisabled_ = true;
+    TELEPHONY_LOGI("ExcludeBluetoothSco end");
+}
+void AudioControlManager::UnexcludeBluetoothSco()
+{
+    TELEPHONY_LOGI("UnexcludeBluetoothSco start");
+    AudioSystemManager *audioSystemMananger = AudioSystemManager::GetInstance();
+    if (audioSystemMananger == nullptr) {
+        TELEPHONY_LOGI("audioSystemMananger nullptr");
+        return;
+    }
+    std::shared_ptr<AudioStandard::AudioDeviceDescriptor> audioDev =
+        std::make_shared<AudioStandard::AudioDeviceDescriptor>();
+    if (audioDev != nullptr) {
+        audioDev->macAddress_ = "";
+        audioDev->deviceType_ = AudioStandard::DEVICE_TYPE_BLUETOOTH_SCO;
+    }
+    std::vector<std::shared_ptr<AudioDeviceDescriptor>> target;
+    target.push_back(audioDev);
+    if (target.size() <= 0) {
+        TELEPHONY_LOGI("target.size <= 0");
+        return;
+    }
+    int32_t result = audioSystemMananger->UnexcludeOutputDevices(CALL_OUTPUT_DEVICES, target);
+    if (result != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGI("UnexcludeOutputDevices failed");
+        return;
+    }
+    isScoTemporarilyDisabled_ = false;
+    TELEPHONY_LOGI("UnexcludeBluetoothSco end");
 }
 } // namespace Telephony
 } // namespace OHOS

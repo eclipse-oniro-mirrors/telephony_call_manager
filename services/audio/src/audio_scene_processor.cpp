@@ -169,6 +169,11 @@ bool AudioSceneProcessor::SwitchDialing()
         TELEPHONY_LOGE("make_unique DialingState failed");
         return false;
     }
+    sptr<CallBase> call = CallObjectManager::GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_DIALING);
+    if (call != nullptr && call->GetCallType() == CallType::TYPE_BLUETOOTH &&
+        !DelayedSingleton<AudioControlManager>::GetInstance()->IsScoTemporarilyDisabled()) {
+            DelayedSingleton<AudioControlManager>::GetInstance()->ExcludeBluetoothSco();
+    }
     if (!DelayedSingleton<AudioControlManager>::GetInstance()->PlaySoundtone()) {
         TELEPHONY_LOGE("PlaySoundtone fail");
     }
@@ -199,6 +204,11 @@ bool AudioSceneProcessor::SwitchIncoming()
     if (currentState_ == nullptr) {
         TELEPHONY_LOGE("make_unique IncomingState failed");
         return false;
+    }
+    sptr<CallBase> call = CallObjectManager::GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_RINGING);
+    if (call != nullptr && call->GetCallType() == CallType::TYPE_BLUETOOTH &&
+        !DelayedSingleton<AudioControlManager>::GetInstance()->IsScoTemporarilyDisabled()) {
+        DelayedSingleton<AudioControlManager>::GetInstance()->ExcludeBluetoothSco();
     }
     int32_t state;
     DelayedSingleton<CallControlManager>::GetInstance()->GetVoIPCallState(state);
@@ -261,6 +271,10 @@ bool AudioSceneProcessor::SwitchInactive()
     if (currentState_ == nullptr) {
         TELEPHONY_LOGE("make_unique InActiveState failed");
         return false;
+    }
+    if (DelayedSingleton<AudioControlManager>::GetInstance()->IsScoTemporarilyDisabled()) {
+        TELEPHONY_LOGI("handle UnexcludeBluetoothSco start");
+        DelayedSingleton<AudioControlManager>::GetInstance()->UnexcludeBluetoothSco();
     }
     TELEPHONY_LOGI("current call state : inactive state");
     return true;
