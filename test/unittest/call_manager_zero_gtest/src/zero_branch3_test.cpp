@@ -942,7 +942,7 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallControlManager_005, Function | MediumTes
  * @tc.name     test CallControlManager
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroBranch4Test, Telephony_CallControlManager_006, Function | MediumTest | Level3)
+HWTEST_F(ZeroBranch4Test, Telephony_CallControlManager_006, Function | MediumTest | Level1)
 {
     std::shared_ptr<CallControlManager> callControlManager = std::make_shared<CallControlManager>();
     callControlManager->ReportPhoneUEInSuperPrivacy("");
@@ -963,11 +963,11 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallControlManager_006, Function | MediumTes
     extras.PutIntValue("dialType", static_cast<int32_t>(DialType::DIAL_VOICE_MAIL_TYPE));
     extras.PutIntValue("videoState", static_cast<int32_t>(VideoStateType::TYPE_VIDEO));
     callControlManager->SetCallTypeExtras(extras);
-    EXPECT_NE(callControlManager->DialCall(longNum, extras), TELEPHONY_SUCCESS);
+    EXPECT_NE(callControlManager->DialCall(normalNum, extras), TELEPHONY_SUCCESS);
     extras.PutIntValue("dialType", static_cast<int32_t>(DialType::DIAL_BLUETOOTH_TYPE));
-    EXPECT_NE(callControlManager->DialCall(longNum, extras), TELEPHONY_SUCCESS);
+    EXPECT_NE(callControlManager->DialCall(normalNum, extras), TELEPHONY_SUCCESS);
     callControlManager->CallRequestHandlerPtr_ = nullptr;
-    EXPECT_NE(callControlManager->DialCall(longNum, extras), TELEPHONY_SUCCESS);
+    EXPECT_NE(callControlManager->DialCall(normalNum, extras), TELEPHONY_SUCCESS);
 }
 
 /**
@@ -975,7 +975,7 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallControlManager_006, Function | MediumTes
  * @tc.name     test CallControlManager
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroBranch4Test, Telephony_CallControlManager_007, Function | MediumTest | Level3)
+HWTEST_F(ZeroBranch4Test, Telephony_CallControlManager_007, Function | MediumTest | Level1)
 {
     std::shared_ptr<CallControlManager> callControlManager = std::make_shared<CallControlManager>();
     if (callControlManager->CallRequestHandlerPtr_ == nullptr) {
@@ -986,7 +986,7 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallControlManager_007, Function | MediumTes
         TELEPHONY_ERR_LOCAL_PTR_NULL);
     EXPECT_NE(callControlManager->GetCallState(), static_cast<int32_t>(CallStateToApp::CALL_STATE_UNKNOWN));
     DialParaInfo info;
-    sptr<CallBase> call = new CsCall(info);
+    sptr<CallBase> call = new CSCall(info);
     CallObjectManager::AddOneCallObject(call);
     call->SetCallRunningState(CallRunningState::CALL_RUNNING_STATE_RINGING);
     call->SetCallType(CallType::TYPE_CS);
@@ -1006,7 +1006,7 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallControlManager_007, Function | MediumTes
     callControlManager->VoIPCallState_ = CallStateToApp::CALL_STATE_UNKNOWN;
     EXPECT_NE(callControlManager->AnswerCall(0, static_cast<int32_t>(VideoStateType::TYPE_VOICE)), TELEPHONY_SUCCESS);
     callControlManager->CallRequestHandlerPtr_ = nullptr;
-    EXPECT_EQ(callControlManager->AnswerCall(0, static_cast<int32_t>(VideoStateType::TYPE_VOICE)),
+    EXPECT_EQ(callControlManager->HandlerAnswerCall(0, static_cast<int32_t>(VideoStateType::TYPE_VOICE)),
         TELEPHONY_ERR_LOCAL_PTR_NULL);
     call->SetCallType(CallType::TYPE_CS);
     EXPECT_EQ(callControlManager->AnswerCall(0, static_cast<int32_t>(VideoStateType::TYPE_VOICE)), TELEPHONY_SUCCESS);
@@ -1017,7 +1017,7 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallControlManager_007, Function | MediumTes
  * @tc.name     test CallControlManager
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroBranch4Test, Telephony_CallControlManager_008, Function | MediumTest | Level3)
+HWTEST_F(ZeroBranch4Test, Telephony_CallControlManager_008, Function | MediumTest | Level1)
 {
     std::shared_ptr<CallControlManager> callControlManager = std::make_shared<CallControlManager>();
     if (callControlManager->CallRequestHandlerPtr_ == nullptr) {
@@ -1025,19 +1025,19 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallControlManager_008, Function | MediumTes
         callControlManager->CallRequestHandlerPtr_->callRequestProcessPtr_ = nullptr;
     }
     DialParaInfo info;
-    sptr<CallBase> call = new CsCall(info);
+    sptr<CallBase> call = new CSCall(info);
     CallObjectManager::AddOneCallObject(call);
     call->SetCallRunningState(CallRunningState::CALL_RUNNING_STATE_ACTIVE);
     call->SetTelCallState(TelCallState::CALL_STATUS_INCOMING);
     EXPECT_NE(callControlManager->HoldCall(0), TELEPHONY_SUCCESS);
-    EXPECT_NE(callControlManager->HandUpCall(0), TELEPHONY_SUCCESS);
+    EXPECT_NE(callControlManager->HangUpCall(0), TELEPHONY_SUCCESS);
     EXPECT_NE(callControlManager->RejectCall(0, false, u""), TELEPHONY_SUCCESS);
     call->SetCallRunningState(CallRunningState::CALL_RUNNING_STATE_HOLD);
     EXPECT_NE(callControlManager->UnHoldCall(0), TELEPHONY_SUCCESS);
     callControlManager->CallRequestHandlerPtr_ = nullptr;
     call->SetCallRunningState(CallRunningState::CALL_RUNNING_STATE_ACTIVE);
     EXPECT_NE(callControlManager->HoldCall(0), TELEPHONY_SUCCESS);
-    EXPECT_NE(callControlManager->HandUpCall(0), TELEPHONY_SUCCESS);
+    EXPECT_NE(callControlManager->HangUpCall(0), TELEPHONY_SUCCESS);
     call->SetCallRunningState(CallRunningState::CALL_RUNNING_STATE_HOLD);
     EXPECT_NE(callControlManager->UnHoldCall(0), TELEPHONY_SUCCESS);
     EXPECT_NE(callControlManager->StartDtmf(0, '1'), TELEPHONY_ERR_ARGUMENT_INVALID);
@@ -1456,7 +1456,7 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_011, Function | MediumTest
     sptr<CallBase> call = nullptr;
     callStatusManager->SetOriginalCallTypeForActiveState(call);
     callStatusManager->SetOriginalCallTypeForDisconnectState(call);
-    callStatusManager->SetVideoCallState(call, TelCallState::CALL_STATUS_DISCONNECTING);
+    callStatusManager->SetVideoCallState(call, TelCallState::CALL_STATUS_DISCONNECTED);
     callStatusManager->SetBtCallDialByPhone(call, false);
     CallDetailInfo info;
     callStatusManager->CreateAndSaveNewCall(info, CallDirection::CALL_DIRECTION_IN);
