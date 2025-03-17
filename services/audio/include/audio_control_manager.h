@@ -90,6 +90,9 @@ public:
     void PlayCallEndedTone(CallEndedType type);
     bool IsDistributeCallSinkStatus();
     void SetRingToneVolume(float volume);
+    bool IsScoTemporarilyDisabled();
+    void ExcludeBluetoothSco();
+    void UnexcludeBluetoothSco();
 
 private:
     RingState ringState_ = RingState::STOPPED;
@@ -125,6 +128,7 @@ private:
     std::recursive_mutex toneStateLock_;
     sptr<CallBase> frontCall_ = nullptr;
     bool isSetAudioDeviceByUser_ = false;
+    bool isScoTemporarilyDisabled_ = false;
 };
 } // namespace Telephony
 } // namespace OHOS
