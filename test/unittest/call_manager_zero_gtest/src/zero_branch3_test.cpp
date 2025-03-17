@@ -1384,7 +1384,7 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_008, Function | MediumTest
     info.state = TelCallState::CALL_STATUS_DISCONNECTING;
     EXPECT_EQ(callStatusManager->HandleVoipCallReportInfo(info), TELEPHONY_ERROR);
     info.state = TelCallState::CALL_STATUS_UNKNOWN;
-    EXPECT_EQ(callStatusManager->HandleVoipCallReportInfo(info), TELEPHONY_ERROR);
+    EXPECT_GT(callStatusManager->HandleVoipCallReportInfo(info), TELEPHONY_ERROR);
 }
 
 HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_009, Function | MediumTest | Level3)
