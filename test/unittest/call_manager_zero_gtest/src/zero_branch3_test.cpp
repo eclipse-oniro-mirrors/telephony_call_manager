@@ -938,6 +938,117 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallControlManager_005, Function | MediumTes
 }
 
 /**
+ * @tc.number   Telephony_CallControlManager_006
+ * @tc.name     test CallControlManager
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch4Test, Telephony_CallControlManager_006, Function | MediumTest | Level1)
+{
+    std::shared_ptr<CallControlManager> callControlManager = std::make_shared<CallControlManager>();
+    callControlManager->ReportPhoneUEInSuperPrivacy("");
+    if (callControlManager->CallRequestHandlerPtr_ == nullptr) {
+        callControlManager->CallRequestHandlerPtr_ = std::make_unique<CallRequestHandler>();
+        callControlManager->CallRequestHandlerPtr_->callRequestProcessPtr_ = nullptr;
+    }
+    AppExecFwk::PacMap extras;
+    std::u16string longNum = u"11111111111111111111111111111111111111111111111111111111111111111111111111111111111111"
+        "111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111"
+        "111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111";
+    EXPECT_NE(callControlManager->DialCall(longNum, extras), TELEPHONY_SUCCESS);
+    std::u16string normalNum = u"11111";
+    callControlManager->SetCallTypeExtras(extras);
+
+    extras.PutIntValue("dialType", static_cast<int32_t>(DialType::DIAL_CARRIER_TYPE));
+    callControlManager->SetCallTypeExtras(extras);
+    extras.PutIntValue("dialType", static_cast<int32_t>(DialType::DIAL_VOICE_MAIL_TYPE));
+    extras.PutIntValue("videoState", static_cast<int32_t>(VideoStateType::TYPE_VIDEO));
+    callControlManager->SetCallTypeExtras(extras);
+    EXPECT_NE(callControlManager->DialCall(normalNum, extras), TELEPHONY_SUCCESS);
+    extras.PutIntValue("dialType", static_cast<int32_t>(DialType::DIAL_BLUETOOTH_TYPE));
+    EXPECT_NE(callControlManager->DialCall(normalNum, extras), TELEPHONY_SUCCESS);
+    callControlManager->CallRequestHandlerPtr_ = nullptr;
+    EXPECT_NE(callControlManager->DialCall(normalNum, extras), TELEPHONY_SUCCESS);
+}
+
+/**
+ * @tc.number   Telephony_CallControlManager_007
+ * @tc.name     test CallControlManager
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch4Test, Telephony_CallControlManager_007, Function | MediumTest | Level1)
+{
+    std::shared_ptr<CallControlManager> callControlManager = std::make_shared<CallControlManager>();
+    if (callControlManager->CallRequestHandlerPtr_ == nullptr) {
+        callControlManager->CallRequestHandlerPtr_ = std::make_unique<CallRequestHandler>();
+        callControlManager->CallRequestHandlerPtr_->callRequestProcessPtr_ = nullptr;
+    }
+    EXPECT_EQ(callControlManager->CarrierAndVoipConflictProcess(-1, TelCallState::CALL_STATUS_ANSWERED),
+        TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_NE(callControlManager->GetCallState(), static_cast<int32_t>(CallStateToApp::CALL_STATE_UNKNOWN));
+    DialParaInfo info;
+    sptr<CallBase> call = new CSCall(info);
+    CallObjectManager::AddOneCallObject(call);
+    call->SetCallRunningState(CallRunningState::CALL_RUNNING_STATE_RINGING);
+    call->SetCallType(CallType::TYPE_CS);
+    call->SetCrsType(0);
+    call->SetTelCallState(TelCallState::CALL_STATUS_INCOMING);
+    callControlManager->VoIPCallState_ = CallStateToApp::CALL_STATE_IDLE;
+    EXPECT_NE(callControlManager->AnswerCall(-1, static_cast<int32_t>(VideoStateType::TYPE_VIDEO)), TELEPHONY_SUCCESS);
+    EXPECT_NE(callControlManager->AnswerCall(1, static_cast<int32_t>(VideoStateType::TYPE_VIDEO)), TELEPHONY_SUCCESS);
+    EXPECT_NE(callControlManager->AnswerCall(0, static_cast<int32_t>(VideoStateType::TYPE_VIDEO)), TELEPHONY_SUCCESS);
+    int32_t crsType = 2;
+    call->SetCrsType(crsType);
+    EXPECT_NE(callControlManager->AnswerCall(0, static_cast<int32_t>(VideoStateType::TYPE_VIDEO)), TELEPHONY_SUCCESS);
+    call->SetCallType(CallType::TYPE_VOIP);
+    EXPECT_NE(callControlManager->AnswerCall(0, static_cast<int32_t>(VideoStateType::TYPE_VOICE)), TELEPHONY_SUCCESS);
+    EXPECT_NE(callControlManager->AnswerCall(0, static_cast<int32_t>(VideoStateType::TYPE_SEND_ONLY)),
+        TELEPHONY_SUCCESS);
+    callControlManager->VoIPCallState_ = CallStateToApp::CALL_STATE_UNKNOWN;
+    EXPECT_NE(callControlManager->AnswerCall(0, static_cast<int32_t>(VideoStateType::TYPE_VOICE)), TELEPHONY_SUCCESS);
+    callControlManager->CallRequestHandlerPtr_ = nullptr;
+    EXPECT_EQ(callControlManager->HandlerAnswerCall(0, static_cast<int32_t>(VideoStateType::TYPE_VOICE)),
+        TELEPHONY_ERR_LOCAL_PTR_NULL);
+    call->SetCallType(CallType::TYPE_CS);
+    EXPECT_EQ(callControlManager->AnswerCall(0, static_cast<int32_t>(VideoStateType::TYPE_VOICE)), TELEPHONY_SUCCESS);
+}
+
+/**
+ * @tc.number   Telephony_CallControlManager_008
+ * @tc.name     test CallControlManager
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch4Test, Telephony_CallControlManager_008, Function | MediumTest | Level1)
+{
+    std::shared_ptr<CallControlManager> callControlManager = std::make_shared<CallControlManager>();
+    if (callControlManager->CallRequestHandlerPtr_ == nullptr) {
+        callControlManager->CallRequestHandlerPtr_ = std::make_unique<CallRequestHandler>();
+        callControlManager->CallRequestHandlerPtr_->callRequestProcessPtr_ = nullptr;
+    }
+    DialParaInfo info;
+    sptr<CallBase> call = new CSCall(info);
+    CallObjectManager::AddOneCallObject(call);
+    call->SetCallRunningState(CallRunningState::CALL_RUNNING_STATE_ACTIVE);
+    call->SetTelCallState(TelCallState::CALL_STATUS_INCOMING);
+    EXPECT_NE(callControlManager->HoldCall(0), TELEPHONY_SUCCESS);
+    EXPECT_NE(callControlManager->HangUpCall(0), TELEPHONY_SUCCESS);
+    EXPECT_NE(callControlManager->RejectCall(0, false, u""), TELEPHONY_SUCCESS);
+    call->SetCallRunningState(CallRunningState::CALL_RUNNING_STATE_HOLD);
+    EXPECT_NE(callControlManager->UnHoldCall(0), TELEPHONY_SUCCESS);
+    callControlManager->CallRequestHandlerPtr_ = nullptr;
+    call->SetCallRunningState(CallRunningState::CALL_RUNNING_STATE_ACTIVE);
+    EXPECT_NE(callControlManager->HoldCall(0), TELEPHONY_SUCCESS);
+    EXPECT_NE(callControlManager->HangUpCall(0), TELEPHONY_SUCCESS);
+    call->SetCallRunningState(CallRunningState::CALL_RUNNING_STATE_HOLD);
+    EXPECT_NE(callControlManager->UnHoldCall(0), TELEPHONY_SUCCESS);
+    EXPECT_NE(callControlManager->StartDtmf(0, '1'), TELEPHONY_ERR_ARGUMENT_INVALID);
+    sleep(1);
+    EXPECT_NE(callControlManager->StopDtmf(0), TELEPHONY_ERR_ARGUMENT_INVALID);
+    call->SetTelCallState(TelCallState::CALL_STATUS_IDLE);
+    EXPECT_NE(callControlManager->StartDtmf(0, '1'), TELEPHONY_ERR_ARGUMENT_INVALID);
+    EXPECT_NE(callControlManager->StopDtmf(0), TELEPHONY_ERR_ARGUMENT_INVALID);
+}
+
+/**
  * @tc.number   Telephony_CallStatusManager_001
  * @tc.name     test error branch
  * @tc.desc     Function test
@@ -1272,6 +1383,8 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_008, Function | MediumTest
     EXPECT_EQ(callStatusManager->HandleVoipCallReportInfo(info), TELEPHONY_ERROR);
     info.state = TelCallState::CALL_STATUS_DISCONNECTING;
     EXPECT_EQ(callStatusManager->HandleVoipCallReportInfo(info), TELEPHONY_ERROR);
+    info.state = TelCallState::CALL_STATUS_UNKNOWN;
+    EXPECT_GT(callStatusManager->HandleVoipCallReportInfo(info), TELEPHONY_ERROR);
 }
 
 HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_009, Function | MediumTest | Level3)
@@ -1305,6 +1418,7 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_009, Function | MediumTest
     callStatusManager->SetupAntiFraudService(voipCall, info);
     callStatusManager->SetConferenceCall({voipCall});
     EXPECT_EQ(CallObjectManager::callObjectPtrList_.size(), 1);
+    voipCall->SetCallRunningState(CallRunningState::CALL_RUNNING_STATE_CREATE);
     EXPECT_EQ(callStatusManager->HandleVoipEventReportInfo(voipCallEventInfo), TELEPHONY_ERR_FAIL);
     voipCall->SetCallRunningState(CallRunningState::CALL_RUNNING_STATE_ACTIVE);
     EXPECT_EQ(callStatusManager->HandleVoipEventReportInfo(voipCallEventInfo), TELEPHONY_SUCCESS);
@@ -1337,6 +1451,38 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_010, Function | MediumTest
 }
 
 HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_011, Function | MediumTest | Level3)
+{
+    std::shared_ptr<CallStatusManager> callStatusManager = std::make_shared<CallStatusManager>();
+    sptr<CallBase> call = nullptr;
+    callStatusManager->SetOriginalCallTypeForActiveState(call);
+    callStatusManager->SetOriginalCallTypeForDisconnectState(call);
+    callStatusManager->SetVideoCallState(call, TelCallState::CALL_STATUS_DISCONNECTED);
+    callStatusManager->SetBtCallDialByPhone(call, false);
+    CallDetailInfo info;
+    callStatusManager->CreateAndSaveNewCall(info, CallDirection::CALL_DIRECTION_IN);
+    info.state = TelCallState::CALL_STATUS_ACTIVE;
+    info.callType = CallType::TYPE_IMS;
+    call = callStatusManager->CreateNewCall(info, CallDirection::CALL_DIRECTION_IN);
+    ASSERT_TRUE(call != nullptr);
+    info.callType = CallType::TYPE_ERR_CALL;
+    EXPECT_NE(callStatusManager->RefreshCallIfNecessary(call, info), nullptr);
+    info.callType = CallType::TYPE_CS;
+    NumberMarkInfo numberMarkInfo;
+    numberMarkInfo.markType = MarkType::MARK_TYPE_NONE;
+    call->SetNumberLocation("default");
+    EXPECT_NE(callStatusManager->RefreshCallIfNecessary(call, info), nullptr);
+    call->SetNumberLocation("not_default");
+    numberMarkInfo.markType = MarkType::MARK_TYPE_CRANK;
+    call->SetNumberMarkInfo(numberMarkInfo);
+    callStatusManager->HandleDialWhenHolding(0, call);
+    callStatusManager->RefreshCallDisconnectReason(call,
+        static_cast<int32_t>(RilDisconnectedReason::DISCONNECTED_REASON_ANSWERED_ELSEWHER));
+    callStatusManager->RefreshCallDisconnectReason(call,
+        static_cast<int32_t>(RilDisconnectedReason::DISCONNECTED_REASON_NORMAL));
+    EXPECT_NE(callStatusManager->RefreshCallIfNecessary(call, info), nullptr);
+}
+
+HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_012, Function | MediumTest | Level3)
 {
     std::shared_ptr<CallStatusManager> callStatusManager = std::make_shared<CallStatusManager>();
     CallDetailInfo info;
