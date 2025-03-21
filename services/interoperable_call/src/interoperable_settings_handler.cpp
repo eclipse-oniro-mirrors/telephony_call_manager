@@ -12,36 +12,85 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
-#ifndef INTEROPERABLE_SETTINGS_HANDLER_H
-#define INTEROPERABLE_SETTINGS_HANDLER_H
- 
-#include "settings_datashare_helper.h"
-#include "data_ability_observer_stub.h"
-#include "datashare_helper.h"
-#include "iservice_registry.h"
- 
+
+#include "interoperable_settings_handler.h"
+#include "call_control_manager.h"
+#include "telephony_errors.h"
+#include "telephony_log_wrapper.h"
+
 namespace OHOS {
 namespace Telephony {
-class InteroperableRecvObserver : public AAFwk::DataAbilityObserverStub {
-public:
-    InteroperableRecvObserver() = default;
-    ~InteroperableRecvObserver() = default;
-    void OnChange() override;
-};
- 
-class InteroperableSettingsHandler {
-public:
-    InteroperableSettingsHandler() = default;
-    ~InteroperableSettingsHandler() = default;
-    static void RegisterObserver();
-    static std::string QueryMuteRinger();
-    static void RecoverMuteRinger(std::string muteRinger);
-    static void SendMuteRinger();
- 
-private:
-    static sptr<InteroperableRecvObserver> recvObserver_;
-};
+constexpr const char *SYNERGY_INCOMING_MUTE_URI =
+    "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true&key=synergy_incoming_mute";
+constexpr const char *CALL_MUTE_RINGER_URI =
+    "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true&key=call_mute_ringer";
+constexpr const char *SYNERGY_MUTE_KEY = "synergy_incoming_mute";
+constexpr const char *CALL_MUTE_KEY = "call_mute_ringer";
+constexpr const char *VALUE_DEFAULT = "0";
+constexpr const char *VALUE_MUTE = "3";
+sptr<InteroperableRecvObserver> InteroperableSettingsHandler::recvObserver_ = nullptr;
+
+void InteroperableSettingsHandler::RegisterObserver()
+{
+    if (recvObserver_ != nullptr) {
+        return;
+    }
+    recvObserver_ = new (std::nothrow) InteroperableRecvObserver();
+    if (recvObserver_ == nullptr) {
+        TELEPHONY_LOGE("Interoperable recvObserver_ is null");
+        return;
+    }
+    Uri uri(SYNERGY_INCOMING_MUTE_URI);
+    auto helper = DelayedSingleton<SettingsDataShareHelper>().GetInstance();
+    if (!helper->RegisterToDataShare(uri, recvObserver_)) {
+        TELEPHONY_LOGE("Register recvObserver_ failed");
+    }
+}
+
+std::string InteroperableSettingsHandler::QueryMuteRinger()
+{
+    Uri settingsDataUri(SYNERGY_INCOMING_MUTE_URI);
+    std::string muteValue;
+    auto helper = DelayedSingleton<SettingsDataShareHelper>().GetInstance();
+    int32_t ret = helper->Query(settingsDataUri, SYNERGY_MUTE_KEY, muteValue);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("Query MuteRinger failed");
+        return VALUE_DEFAULT;
+    }
+    TELEPHONY_LOGI("Query end muteValue is %{public}s", muteValue.c_str());
+    return muteValue;
+}
+
+void InteroperableSettingsHandler::RecoverMuteRinger(std::string muteRinger)
+{
+    if (muteRinger == VALUE_DEFAULT) {
+        return;
+    }
+    Uri settingsDataUri(SYNERGY_INCOMING_MUTE_URI);
+    auto helper = DelayedSingleton<SettingsDataShareHelper>().GetInstance();
+    if (helper->Update(settingsDataUri, SYNERGY_MUTE_KEY, VALUE_DEFAULT) != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("Recover MuteRinger failed");
+    }
+}
+
+void InteroperableSettingsHandler::SendMuteRinger()
+{
+    TELEPHONY_LOGI("Send MuteRinger");
+    Uri settingsDataUri(CALL_MUTE_RINGER_URI);
+    auto helper = DelayedSingleton<SettingsDataShareHelper>().GetInstance();
+    if (helper->Update(settingsDataUri, CALL_MUTE_KEY, VALUE_MUTE) != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("Send MuteRinger failed");
+    }
+}
+
+void InteroperableRecvObserver::OnChange()
+{
+    TELEPHONY_LOGI("InteroperableRecvObserver Onchange");
+    std::string muteRinger = InteroperableSettingsHandler::QueryMuteRinger();
+    if (muteRinger == VALUE_MUTE) {
+        DelayedSingleton<CallControlManager>::GetInstance()->MuteRinger();
+        InteroperableSettingsHandler::RecoverMuteRinger(muteRinger);
+    }
 }
 }
-#endif // INTEROPERABLE_SETTINGS_HANDLER_H
+}
