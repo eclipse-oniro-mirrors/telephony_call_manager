@@ -142,7 +142,7 @@ int32_t SettingsDataShareHelper::Update(Uri &uri, const std::string &key, const 
     predicates.EqualTo(SETTINGS_DATA_COLUMN_KEYWORD, key);
     int32_t ret = settingHelper->Update(uri, predicates, valueBucket);
     if (ret <= 0) {
-        TELEPHONY_LOGE("DataShareHelper insert failed, retCode:%{public}d", ret);
+        TELEPHONY_LOGE("DataShareHelper update failed, retCode:%{public}d", ret);
         settingHelper->Release();
         return TELEPHONY_ERROR;
     }
