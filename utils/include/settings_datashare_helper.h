@@ -36,7 +36,7 @@ public:
     static const std::string QUERY_MOTION_PICKUP_REDUCE_KEY;
 
     ErrCode Query(Uri& uri, const std::string& key, std::string& values);
-    int32_t Insert(Uri &uri, const std::string &key, std::string &value);
+    int32_t Insert(Uri &uri, const std::string &key, const std::string &value);
     int32_t Update(Uri &uri, const std::string &key, const std::string &value);
     bool RegisterToDataShare(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &observer);
 private:
