@@ -447,8 +447,7 @@ void DataShareReadyEventSubscriber::OnReceiveEvent(const CommonEventData &data)
         DelayedSingleton<CallRecordsManager>::GetInstance()->QueryUnReadMissedCallLog(activeList[0]);
         LocationSystemAbilityListener::SystemAbilitySubscriber();
 #ifdef SUPPORT_MUTE_BY_DATABASE
-        auto settingsHandler = std::make_shared<InteroperableSettingsHandler>();
-        settingsHandler->RegisterObserver();
+        InteroperableSettingsHandler::RegisterObserver();
 #endif
     }
 }
