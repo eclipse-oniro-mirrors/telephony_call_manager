@@ -910,8 +910,7 @@ int32_t CallManagerService::MuteRinger()
             DelayedSingleton<DistributedCommunicationManager>::GetInstance()->MuteRinger();
             DelayedSingleton<InteroperableCommunicationManager>::GetInstance()->MuteRinger();
 #ifdef SUPPORT_MUTE_BY_DATABASE
-            auto settingsHandler = std::make_shared<InteroperableSettingsHandler>();
-            settingsHandler->SendMuteRinger();
+            InteroperableSettingsHandler::SendMuteRinger();
 #endif
         }
         return ret;
