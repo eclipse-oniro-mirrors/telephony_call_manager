@@ -22,6 +22,7 @@
 
 namespace OHOS {
 namespace Telephony {
+constexpr size_t SINGLE_CALL_COUNT = 1;
 void DistributedDataSinkController::OnCallCreated(const sptr<CallBase> &call, const std::string &devId)
 {
     ConnectRemote(devId);
@@ -32,7 +33,10 @@ void DistributedDataSinkController::OnCallCreated(const sptr<CallBase> &call, co
 
 void DistributedDataSinkController::OnCallDestroyed()
 {
-    if (CallObjectManager::HasCallExist()) {
+    std::list<int32_t> carrierCallList;
+    CallObjectManager::GetCarrierCallList(carrierCallList);
+    // The call is deleted only after the OnCallDestroyed() method is invoked.
+    if (carrierCallList.size() > SINGLE_CALL_COUNT) {
         return;
     }
     if (session_ != nullptr) {
