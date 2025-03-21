@@ -286,3 +286,8 @@ if (defined(global_parts_info) && defined(global_parts_info.msdp_motion) &&
     global_parts_info.msdp_motion) {
   call_manager_defines += [ "OHOS_SUBSCRIBE_MOTION_ENABLE" ]
 }
+
+if (target_platform == "watch") {
+  call_manager_defines += [ "SUPPORT_MUTE_BY_DATABASE" ]
+  call_manager_sources += [ "${call_manager_path}/services/interoperable_call/src/interoperable_settings_handler.cpp" ]
+}

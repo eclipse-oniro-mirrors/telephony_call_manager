@@ -20,7 +20,7 @@
 
 namespace OHOS {
 namespace Telephony {
-constexpr const char* SOFTNET_SESSION_NAME = "ohos.telephony.callmanager.distributed_communication";
+constexpr const char* SOFTNET_SESSION_NAME = "ohos.telephony.callmanager.interoperable_communication";
  
 void InteroperableClientManager::OnCallCreated(const sptr<CallBase> &call, const std::string &networkId)
 {
