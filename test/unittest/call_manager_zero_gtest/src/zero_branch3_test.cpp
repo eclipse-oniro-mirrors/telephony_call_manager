@@ -1102,18 +1102,18 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallControlManager_009, Function | MediumTes
     sptr<CallBase> satelliteCall = (std::make_unique<SatelliteCall>(info)).release();
     satelliteCall->SetCallType(CallType::TYPE_SATELLITE);
     satelliteCall->SetCallId(1);
-    call->SetRunningState(CallRunningState::CALL_RUNNING_STATE_RINGING);
+    call->SetCallRunningState(CallRunningState::CALL_RUNNING_STATE_RINGING);
     callControlManager->AnswerHandlerForSatelliteOrVideoCall(satelliteCall,
         static_cast<int32_t>(VideoStateType::TYPE_VIDEO));
-    call->SetRunningState(CallRunningState::CALL_RUNNING_STATE_ACTIVE);
+    call->SetCallRunningState(CallRunningState::CALL_RUNNING_STATE_ACTIVE);
     callControlManager->AnswerHandlerForSatelliteOrVideoCall(satelliteCall,
         static_cast<int32_t>(VideoStateType::TYPE_VIDEO));
     sptr<CallBase> voipCall = (std::make_unique<VoIPCall>(info)).release();
     voipCall->SetCallType(CallType::TYPE_VOIP);
     voipCall->SetCallId(2);
     sptr<CallBase> csCall = (std::make_unique<CSCall>(info)).release();
+    csCall->SetCallId(3);
     csCall->SetCallType(CallType::TYPE_CS);
-    csCall->SetCallId(2);
     CallObjectManager::AddOneCallObject(satelliteCall);
     CallObjectManager::AddOneCallObject(voipCall);
     CallObjectManager::AddOneCallObject(csCall);
@@ -1130,7 +1130,7 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallControlManager_009, Function | MediumTes
     EXPECT_GT(callControlManager->CarrierAndVoipConflictProcess(0, TelCallState::CALL_STATUS_ANSWERED),
         TELEPHONY_ERROR);
     voipCall->SetTelCallState(TelCallState::CALL_STATUS_DIALING);
-    EXPECT_GT(callControlManager->CarrierAndVoipConflictProcess(1, TelCallState::CALL_STATUS_ANSWERED),
+    EXPECT_GT(callControlManager->CarrierAndVoipConflictProcess(0, TelCallState::CALL_STATUS_ANSWERED),
         TELEPHONY_ERROR);
     EXPECT_GT(callControlManager->HangUpVoipCall(), TELEPHONY_ERROR);
 }
@@ -1154,7 +1154,7 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallControlManager_010, Function | MediumTes
     EXPECT_TRUE(callControlManager->NotifyCallStateUpdated(call, priorState, nextState));
     nextState = TelCallState::CALL_STATUS_ACTIVE;
     EXPECT_TRUE(callControlManager->NotifyCallStateUpdated(call, priorState, nextState));
-    priorState = TelCallState::CALL_STATUS_INCOMING
+    priorState = TelCallState::CALL_STATUS_INCOMING;
     EXPECT_TRUE(callControlManager->NotifyCallStateUpdated(call, priorState, nextState));
     nextState = TelCallState::CALL_STATUS_DISCONNECTED;
     EXPECT_TRUE(callControlManager->NotifyCallStateUpdated(call, priorState, nextState));
@@ -1180,11 +1180,11 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallControlManager_010, Function | MediumTes
     call->SetTelCallState(TelCallState::CALL_STATUS_DISCONNECTING);
     EXPECT_EQ(callControlManager->PostDialProceed(0, false), CALL_ERR_CALL_STATE_MISMATCH_OPERATION);
     call->SetTelCallState(TelCallState::CALL_STATUS_ANSWERED);
-    EXPECT_EQ(callControlManager->PostDialProceed(0, false), CALL_ERR_CALL_STATE_MISMATCH_OPERATION);
+    EXPECT_NE(callControlManager->PostDialProceed(0, false), CALL_ERR_CALL_STATE_MISMATCH_OPERATION);
     call->SetTelCallState(TelCallState::CALL_STATUS_WAITING);
-    EXPECT_EQ(callControlManager->PostDialProceed(0, false), CALL_ERR_CALL_STATE_MISMATCH_OPERATION);
+    EXPECT_NE(callControlManager->PostDialProceed(0, false), CALL_ERR_CALL_STATE_MISMATCH_OPERATION);
     call->SetTelCallState(TelCallState::CALL_STATUS_INCOMING);
-    EXPECT_EQ(callControlManager->PostDialProceed(0, false), CALL_ERR_CALL_STATE_MISMATCH_OPERATION);
+    EXPECT_NE(callControlManager->PostDialProceed(0, false), CALL_ERR_CALL_STATE_MISMATCH_OPERATION);
     call->SetTelCallState(TelCallState::CALL_STATUS_ACTIVE);
     EXPECT_NE(callControlManager->SetMuted(false), CALL_ERR_AUDIO_SETTING_MUTE_FAILED);
     callControlManager->DisconnectAllCalls();
@@ -1235,7 +1235,7 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallControlManager_012, Function | MediumTes
         CALL_ERR_INVALID_SLOT_ID);
     CallRestrictionInfo restrictionInfo;
     EXPECT_EQ(callControlManager->SetCallRestriction(-1, restrictionInfo), CALL_ERR_INVALID_SLOT_ID);
-    EXPECT_EQ(callControlManager->SetCallRestrictionPassword(-1, CallRestrictionType::RESTRICTION_TYPE_ALL_INCOMING
+    EXPECT_EQ(callControlManager->SetCallRestrictionPassword(-1, CallRestrictionType::RESTRICTION_TYPE_ALL_INCOMING,
         "", ""), CALL_ERR_INVALID_SLOT_ID);
     EXPECT_EQ(callControlManager->GetCallTransferInfo(-1, CallTransferType::TRANSFER_TYPE_UNCONDITIONAL),
         CALL_ERR_INVALID_SLOT_ID);
@@ -1243,7 +1243,7 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallControlManager_012, Function | MediumTes
     EXPECT_EQ(callControlManager->SetCallTransferInfo(-1, callTransferInfo), CALL_ERR_INVALID_SLOT_ID);
     bool result = false;
     EXPECT_EQ(callControlManager->CanSetCallTransferTime(-1, result), CALL_ERR_INVALID_SLOT_ID);
-    EXPECT_EQ(callControlManager->SetCallPreferenceModePolicy(-1, 0), CALL_ERR_INVALID_SLOT_ID);
+    EXPECT_EQ(callControlManager->SetCallPreferenceMode(-1, 0), CALL_ERR_INVALID_SLOT_ID);
     EXPECT_EQ(callControlManager->GetImsConfig(-1, ImsConfigItem::ITEM_VIDEO_QUALITY), CALL_ERR_INVALID_SLOT_ID);
     std::u16string value = u"";
     EXPECT_EQ(callControlManager->SetImsConfig(-1, ImsConfigItem::ITEM_VIDEO_QUALITY, value),

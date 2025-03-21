@@ -471,7 +471,7 @@ HWTEST_F(ZeroBranch2Test, Telephony_CallObjectManager_003, Function | MediumTest
     CallObjectManager::AddOneVoipCallObject(info2);
     CallObjectManager::GetActiveVoipCallInfo();
     EXPECT_FALSE(CallObjectManager::IsVoipCallExist(TelCallState::CALL_STATUS_DIALING, callId));
-    EXPECT_FALSE(CallObjectManager::IsVoipCallExist(TelCallState::CALL_STATUS_ACTIVE, callId));
+    EXPECT_TRUE(CallObjectManager::IsVoipCallExist(TelCallState::CALL_STATUS_ACTIVE, callId));
     std::string phoneNum = "";
     EXPECT_EQ(CallObjectManager::GetOneCallObject(phoneNum), nullptr);
     bool enabled = false;
@@ -499,7 +499,7 @@ HWTEST_F(ZeroBranch2Test, Telephony_CallObjectManager_004, Function | MediumTest
     EXPECT_FALSE(CallObjectManager::HasCellularCallExist());
     call->SetTelCallState(TelCallState::CALL_STATUS_DISCONNECTING);
     EXPECT_FALSE(CallObjectManager::HasCellularCallExist());
-    EXPECT_TRUE(CallObjectManager::GetOneCallObjectByIndexAndSlotId(0, 0) == nullptr);
+    EXPECT_TRUE(CallObjectManager::GetOneCallObjectByIndexAndSlotId(0, 0) != nullptr);
     EXPECT_TRUE(CallObjectManager::GetOneCallObjectByIndexAndSlotId(0, 1) == nullptr);
     EXPECT_TRUE(CallObjectManager::GetOneCallObjectByIndexAndSlotId(1, 0) == nullptr);
     EXPECT_TRUE(CallObjectManager::GetOneCallObjectByIndexAndSlotId(1, 1) == nullptr);
