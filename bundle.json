@@ -87,8 +87,7 @@
                 ],
                 "service_group": [
                     "//base/telephony/call_manager:tel_call_manager",
-                    "//base/telephony/call_manager/sa_profile:call_manager_sa_profile",
-                    "//base/telephony/call_manager/frameworks/cj:cj_telephony_call_ffi"
+                    "//base/telephony/call_manager/sa_profile:call_manager_sa_profile"
                 ]
             },
             "inner_kits": [
@@ -98,6 +97,13 @@
                         "header_files": []
                     },
                     "name":"//base/telephony/call_manager/frameworks/native:tel_call_manager_api"
+                },
+                {
+                    "header": {
+                        "header_base" : "//base/telephony/call_manager/frameworks/cj/src",
+                        "header_files": []
+                    },
+                    "name":"//base/telephony/call_manager/frameworks/cj:cj_telephony_call_ffi"
                 }
             ],
             "test": [
