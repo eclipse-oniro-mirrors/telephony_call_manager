@@ -44,6 +44,10 @@
 #include "bluetooth_call_connection.h"
 #include "interoperable_communication_manager.h"
 
+#ifdef SUPPORT_MUTE_BY_DATABASE
+#include "interoperable_settings_handler.h"
+#endif
+
 #ifdef OHOS_BUILD_ENABLE_TELEPHONY_CUST
 #include "telephony_cust_wrapper.h"
 #endif
@@ -905,6 +909,10 @@ int32_t CallManagerService::MuteRinger()
         if (ret == TELEPHONY_SUCCESS) {
             DelayedSingleton<DistributedCommunicationManager>::GetInstance()->MuteRinger();
             DelayedSingleton<InteroperableCommunicationManager>::GetInstance()->MuteRinger();
+#ifdef SUPPORT_MUTE_BY_DATABASE
+            auto settingsHandler = std::make_shared<InteroperableSettingsHandler>();
+            settingsHandler->SendMuteRinger();
+#endif
         }
         return ret;
     } else {

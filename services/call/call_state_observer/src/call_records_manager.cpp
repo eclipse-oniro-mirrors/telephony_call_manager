@@ -27,6 +27,9 @@
 #include "telephony_cust_wrapper.h"
 #include "settings_datashare_helper.h"
 #include "call_manager_utils.h"
+#ifdef SUPPORT_MUTE_BY_DATABASE
+#include "interoperable_settings_handler.h"
+#endif
 
 namespace OHOS {
 namespace Telephony {
@@ -443,6 +446,10 @@ void DataShareReadyEventSubscriber::OnReceiveEvent(const CommonEventData &data)
         DelayedSingleton<AppExecFwk::OsAccountManagerWrapper>::GetInstance()->QueryActiveOsAccountIds(activeList);
         DelayedSingleton<CallRecordsManager>::GetInstance()->QueryUnReadMissedCallLog(activeList[0]);
         LocationSystemAbilityListener::SystemAbilitySubscriber();
+#ifdef SUPPORT_MUTE_BY_DATABASE
+        auto settingsHandler = std::make_shared<InteroperableSettingsHandler>();
+        settingsHandler->RegisterObserver();
+#endif
     }
 }
 } // namespace Telephony

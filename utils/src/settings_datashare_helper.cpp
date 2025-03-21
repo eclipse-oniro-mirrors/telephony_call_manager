@@ -101,6 +101,11 @@ int32_t SettingsDataShareHelper::Query(Uri& uri, const std::string& key, std::st
     return TELEPHONY_SUCCESS;
 }
 
+int32_t SettingsDataShareHelper::Insert(Uri &uri, const std::string &key, const std::string &value)
+{
+    
+}
+
 int32_t SettingsDataShareHelper::Update(Uri &uri, const std::string &key, const std::string &value)
 {
     std::shared_ptr<DataShare::DataShareHelper> dataShareHelper =
