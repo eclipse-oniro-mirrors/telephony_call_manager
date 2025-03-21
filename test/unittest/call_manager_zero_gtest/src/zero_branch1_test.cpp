@@ -339,6 +339,29 @@ HWTEST_F(ZeroBranch2Test, Telephony_CallRequestProcess_003, Function | MediumTes
 }
 
 /**
+ * @tc.number   Telephony_CallRequestProcess_004
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch2Test, Telephony_CallRequestProcess_004, Function | MediumTest | Level1)
+{
+    std::unique_ptr<CallRequestProcess> callRequestProcess = std::make_unique<CallRequestProcess>();
+    DialParaInfo info;
+    info.dialType = DialType::DIAL_CARRIER_TYPE;
+    EXPECT_GT(callRequestProcess->HandleDialRequest(info), TELEPHONY_ERROR);
+    info.dialType = DialType::DIAL_VOICE_MAIL_TYPE;
+    EXPECT_GT(callRequestProcess->HandleDialRequest(info), TELEPHONY_ERROR);
+    info.dialType = DialType::DIAL_OTT_TYPE;
+    EXPECT_GT(callRequestProcess->HandleDialRequest(info), TELEPHONY_ERROR);
+    info.dialType = DialType::DIAL_BLUETOOTH_TYPE;
+    EXPECT_GT(callRequestProcess->HandleDialRequest(info), TELEPHONY_ERROR);
+    sleep(1);
+    std::vector<std::u16string> fdnNumberList = { u"11111", u"22222" };
+    EXPECT_TRUE(callRequestProcess->IsFdnNumber(fdnNumberList, "22222"));
+    EXPECT_GT(callRequestProcess->BluetoothDialProcess(info), TELEPHONY_ERROR);
+}
+
+/**
  * @tc.number   Telephony_CallObjectManager_001
  * @tc.name     test error branch
  * @tc.desc     Function test
@@ -411,6 +434,100 @@ HWTEST_F(ZeroBranch2Test, Telephony_CallObjectManager_002, Function | MediumTest
     EXPECT_EQ(CallObjectManager::GetForegroundLiveCallByCallId(0), nullptr);
     EXPECT_FALSE(CallObjectManager::HasIncomingCallCrsType());
     CallObjectManager::DeleteOneCallObject(0);
+}
+
+/**
+ * @tc.number   Telephony_CallObjectManager_003
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch2Test, Telephony_CallObjectManager_003, Function | MediumTest | Level1)
+{
+    DialParaInfo dialInfo;
+    sptr<CallBase> call = new VoIPCall(dialInfo);
+    call->callId_ = 0;
+    call->callType_ = CallType::TYPE_VOIP;
+    call->callRunningState_ = CallRunningState::CALL_RUNNING_STATE_RINGING;
+    call->callState_ = TelCallState::CALL_STATUS_ACTIVE;
+    CallObjectManager::AddOneCallObject(call);
+    call->SetCallIndex(0);
+    call->SetSlotId(0);
+    EXPECT_TRUE(CallObjectManager::GetOneCallObjectByIndexAndSlotId(0, 0) == nullptr);
+    EXPECT_TRUE(CallObjectManager::GetOneCallObjectByIndexAndSlotId(0, 1) == nullptr);
+    EXPECT_TRUE(CallObjectManager::GetOneCallObjectByIndexAndSlotId(1, 0) == nullptr);
+    EXPECT_TRUE(CallObjectManager::GetOneCallObjectByIndexAndSlotId(1, 1) == nullptr);
+    EXPECT_TRUE(CallObjectManager::HasVoipCallExist());
+    int32_t callId = 0;
+    EXPECT_TRUE(CallObjectManager::IsCallExist(0));
+    EXPECT_FALSE(CallObjectManager::IsCallExist(1));
+    CallAttributeInfo info;
+    CallObjectManager::AddOneVoipCallObject(info);
+    CallObjectManager::GetActiveVoipCallInfo();
+    info.callState = TelCallState::CALL_STATUS_ACTIVE;
+    CallObjectManager::AddOneVoipCallObject(info);
+    CallAttributeInfo info2;
+    info2.callId = 1;
+    info2.callState = TelCallState::CALL_STATUS_ACTIVE;
+    CallObjectManager::AddOneVoipCallObject(info2);
+    CallObjectManager::GetActiveVoipCallInfo();
+    EXPECT_FALSE(CallObjectManager::IsVoipCallExist(TelCallState::CALL_STATUS_DIALING, callId));
+    EXPECT_FALSE(CallObjectManager::IsVoipCallExist(TelCallState::CALL_STATUS_ACTIVE, callId));
+    std::string phoneNum = "";
+    EXPECT_EQ(CallObjectManager::GetOneCallObject(phoneNum), nullptr);
+    bool enabled = false;
+    EXPECT_GT(CallObjectManager::IsNewCallAllowedCreate(enabled), TELEPHONY_ERROR);
+    CallObjectManager::DeleteOneCallObject(0);
+}
+
+/**
+ * @tc.number   Telephony_CallObjectManager_004
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch2Test, Telephony_CallObjectManager_004, Function | MediumTest | Level1)
+{
+    DialParaInfo dialInfo;
+    sptr<CallBase> call = new CSCall(dialInfo);
+    call->callId_ = 1;
+    call->SetCallIndex(0);
+    call->SetSlotId(0);
+    call->SetTelCallState(TelCallState::CALL_STATUS_INCOMING);
+    call->SetCallType(CallType::TYPE_CS);
+    CallObjectManager::AddOneCallObject(call);
+    EXPECT_TRUE(CallObjectManager::HasCellularCallExist());
+    call->SetTelCallState(TelCallState::CALL_STATUS_DISCONNECTED);
+    EXPECT_FALSE(CallObjectManager::HasCellularCallExist());
+    call->SetTelCallState(TelCallState::CALL_STATUS_DISCONNECTING);
+    EXPECT_FALSE(CallObjectManager::HasCellularCallExist());
+    EXPECT_TRUE(CallObjectManager::GetOneCallObjectByIndexAndSlotId(0, 0) == nullptr);
+    EXPECT_TRUE(CallObjectManager::GetOneCallObjectByIndexAndSlotId(0, 1) == nullptr);
+    EXPECT_TRUE(CallObjectManager::GetOneCallObjectByIndexAndSlotId(1, 0) == nullptr);
+    EXPECT_TRUE(CallObjectManager::GetOneCallObjectByIndexAndSlotId(1, 1) == nullptr);
+    bool enabled = false;
+    call->SetCallRunningState(CallRunningState::CALL_RUNNING_STATE_CREATE);
+    EXPECT_GT(CallObjectManager::IsNewCallAllowedCreate(enabled), TELEPHONY_ERROR);
+    EXPECT_GT(CallObjectManager::HasRingingCall(enabled), TELEPHONY_ERROR);
+    EXPECT_GT(CallObjectManager::HasHoldCall(enabled), TELEPHONY_ERROR);
+    call->SetCallRunningState(CallRunningState::CALL_RUNNING_STATE_CONNECTING);
+    EXPECT_GT(CallObjectManager::IsNewCallAllowedCreate(enabled), TELEPHONY_ERROR);
+    EXPECT_GT(CallObjectManager::HasRingingCall(enabled), TELEPHONY_ERROR);
+    EXPECT_GT(CallObjectManager::HasHoldCall(enabled), TELEPHONY_ERROR);
+    call->SetCallRunningState(CallRunningState::CALL_RUNNING_STATE_DIALING);
+    EXPECT_GT(CallObjectManager::IsNewCallAllowedCreate(enabled), TELEPHONY_ERROR);
+    EXPECT_GT(CallObjectManager::HasRingingCall(enabled), TELEPHONY_ERROR);
+    EXPECT_GT(CallObjectManager::HasHoldCall(enabled), TELEPHONY_ERROR);
+    call->SetCallRunningState(CallRunningState::CALL_RUNNING_STATE_RINGING);
+    EXPECT_GT(CallObjectManager::IsNewCallAllowedCreate(enabled), TELEPHONY_ERROR);
+    EXPECT_GT(CallObjectManager::HasRingingCall(enabled), TELEPHONY_ERROR);
+    EXPECT_GT(CallObjectManager::HasHoldCall(enabled), TELEPHONY_ERROR);
+    call->SetCallRunningState(CallRunningState::CALL_RUNNING_STATE_ENDED);
+    EXPECT_GT(CallObjectManager::IsNewCallAllowedCreate(enabled), TELEPHONY_ERROR);
+    EXPECT_GT(CallObjectManager::HasRingingCall(enabled), TELEPHONY_ERROR);
+    EXPECT_GT(CallObjectManager::HasHoldCall(enabled), TELEPHONY_ERROR);
+    call->SetCallRunningState(CallRunningState::CALL_RUNNING_STATE_HOLD);
+    EXPECT_GT(CallObjectManager::HasRingingCall(enabled), TELEPHONY_ERROR);
+    EXPECT_GT(CallObjectManager::HasHoldCall(enabled), TELEPHONY_ERROR);
+    CallObjectManager::DeleteOneCallObject(1);
 }
 
 /**
