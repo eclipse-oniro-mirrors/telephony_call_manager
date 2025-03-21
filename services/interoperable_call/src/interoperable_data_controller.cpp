@@ -100,9 +100,11 @@ std::string InteroperableDataController::CreateMuteMsg(InteroperableMsgType msgT
  
     cJSON_AddNumberToObject(muteMsg, DATA_TYPE, static_cast<int32_t>(msgType));
     cJSON_AddBoolToObject(muteMsg, INTEROPERABLE_ITEM_MUTE, isMute);
-    std::string jsonData = cJSON_PrintUnformatted(muteMsg);
-    if (!jsonData.empty()) {
+    char *jsonData = cJSON_PrintUnformatted(muteMsg);
+    if (jsonData != nullptr) {
         data = jsonData;
+        free(jsonData);
+        jsonData = nullptr;
     }
     cJSON_Delete(muteMsg);
     return data;
@@ -118,9 +120,11 @@ std::string InteroperableDataController::CreateMuteRingerMsg(InteroperableMsgTyp
     }
  
     cJSON_AddNumberToObject(muteRingerMsg, DATA_TYPE, static_cast<int32_t>(msgType));
-    std::string jsonData = cJSON_PrintUnformatted(muteRingerMsg);
-    if (!jsonData.empty()) {
+    char *jsonData = cJSON_PrintUnformatted(muteRingerMsg);
+    if (jsonData != nullptr) {
         data = jsonData;
+        free(jsonData);
+        jsonData = nullptr;
     }
     cJSON_Delete(muteRingerMsg);
     return data;
