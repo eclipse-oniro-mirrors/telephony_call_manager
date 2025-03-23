@@ -85,12 +85,14 @@ int32_t SettingsDataShareHelper::Query(Uri& uri, const std::string& key, std::st
         return TELEPHONY_SUCCESS;
     }
 
+#ifndef SUPPORT_MUTE_BY_DATABASE
     if (result->GoToFirstRow() != DataShare::E_OK) {
         TELEPHONY_LOGE("query error, go to first row error");
         result->Close();
         settingHelper->Release();
         return TELEPHONY_ERR_DATABASE_READ_FAIL;
     }
+#endif
 
     int columnIndex = 0;
     result->GetColumnIndex(SETTINGS_DATA_COLUMN_VALUE, columnIndex);

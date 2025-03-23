@@ -24,6 +24,7 @@
 #include "bluetooth_hfp_ag.h"
 #include "call_manager_connect.h"
 #include "call_manager_service.h"
+#include "interoperable_settings_handler.h"
 #include "surface_utils.h"
 #include "telephony_types.h"
 #include "voip_call.h"
@@ -47,6 +48,9 @@ constexpr int SLEEP_TIME_MS = 50;
 constexpr int MAX_LIMIT_TIME = 18000;
 constexpr int16_t SIM1_SLOTID = 0;
 const std::string PHONE_NUMBER = "0000000000";
+constexpr const char *SYNERGY_INCOMING_MUTE_URI =
+    "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true&key=synergy_incoming_mute";
+constexpr const char *SYNERGY_MUTE_KEY = "synergy_incoming_mute";
 
 std::unordered_map<int32_t, std::unordered_set<int32_t>> g_callStateMap;
 int32_t g_newCallId = -1;
@@ -994,6 +998,31 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetDeviceDirection_0300, Functi
     int32_t callId = 1;
     int32_t rotation = CAMERA_ROTATION_90;
     EXPECT_NE(CallManagerGtest::clientPtr_->SetDeviceDirection(callId, rotation), RETURN_VALUE_IS_ZERO);
+}
+
+/**
+ * @tc.number   Telephony_InteroperableSettingsHandlerTest_001
+ * @tc.name     test interoperable settings handler
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_InteroperableSettingsHandlerTest_001, Function | MediumTest | Level2)
+{
+    auto handler = std::make_shared<InteroperableSettingsHandler>();
+    auto helper = DelayedSingleton<SettingsDataShareHelper>().GetInstance();
+    Uri uri(SYNERGY_INCOMING_MUTE_URI);
+
+    handler->RegisterObserver();
+    EXPECT_NE(handler->recvObserver_, nullptr);
+    handler->RegisterObserver();
+    EXPECT_NE(handler->recvObserver_, nullptr);
+    auto recvObserver = std::make_shared<InteroperableRecvObserver>();
+    recvObserver->OnChange();
+    EXPECT_EQ(handler->QueryMuteRinger(), "0");
+    handler->RecoverMuteRinger("0");
+    handler->RecoverMuteRinger("3");
+    handler->SendMuteRinger();
+    EXPECT_EQ(helper->Insert(uri, SYNERGY_MUTE_KEY, "0"), -1);
+    EXPECT_EQ(helper->Update(uri, "nokey", "0"), -1);
 }
 } // namespace Telephony
 } // namespace OHOS
