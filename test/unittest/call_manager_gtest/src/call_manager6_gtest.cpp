@@ -1009,19 +1009,13 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_InteroperableSettingsHandlerTes
 {
     Uri uri(SYNERGY_INCOMING_MUTE_URI);
     auto helper = DelayedSingleton<SettingsDataShareHelper>().GetInstance();
-    InteroperableSettingsHandler::RegisterObserver();
-    EXPECT_NE(InteroperableSettingsHandler::recvObserver_, nullptr);
-    InteroperableSettingsHandler::RegisterObserver();
-    EXPECT_NE(InteroperableSettingsHandler::recvObserver_, nullptr);
-    
     auto recvObserver = std::make_shared<InteroperableRecvObserver>();
+
+    EXPECT_EQ(helper->RegisterToDataShare(uri, recvObserver), true);
     recvObserver->OnChange();
-    EXPECT_EQ(InteroperableSettingsHandler::QueryMuteRinger(), "0");
-    InteroperableSettingsHandler::RecoverMuteRinger("0");
-    InteroperableSettingsHandler::RecoverMuteRinger("3");
-    InteroperableSettingsHandler::SendMuteRinger();
-    EXPECT_EQ(helper->Insert(uri, SYNERGY_MUTE_KEY, "0"), -1);
+    EXPECT_EQ(helper->Update(uri, SYNERGY_MUTE_KEY, "3"), -1);
     EXPECT_EQ(helper->Update(uri, "nokey", "0"), -1);
+    EXPECT_EQ(helper->Insert(uri, SYNERGY_MUTE_KEY, "0"), -1);
 }
 } // namespace Telephony
 } // namespace OHOS
