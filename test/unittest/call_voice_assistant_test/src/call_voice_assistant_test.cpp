@@ -51,10 +51,10 @@ public:
  */
 HWTEST_F(CallVoiceAssistantManagerTest, Telephony_CallVoiceAssistantManager_001, Function | MediumTest | Level3)
 {
-    const int32_t CALL_ID = -1;
-    const int32_t ACCOUNT_ID = -1;
-    const std::string INCOMING = "come";
-    const std::string DIALING = "dial";
+    const int32_t callId = -1;
+    const int32_t accountId = -1;
+    const std::string incoming = "come";
+    const std::string dialing = "dial";
     DialParaInfo paraInfo;
     sptr<CallBase> callObjectPtr = std::make_unique<CSCall>(paraInfo).release();
     TelCallState priorState = TelCallState::CALL_STATUS_DIALING;
@@ -66,17 +66,17 @@ HWTEST_F(CallVoiceAssistantManagerTest, Telephony_CallVoiceAssistantManager_001,
     }
     voicePtr->mInstance_ = voicePtr;
     voicePtr->CallStateUpdated(callObjectPtr, priorState, nextState);
-    voicePtr->CallStatusDialing(CALL_ID, ACCOUNT_ID);
-    voicePtr->CallStatusIncoming(CALL_ID, ACCOUNT_ID);
-    voicePtr->CallStatusActive(CALL_ID, ACCOUNT_ID);
-    voicePtr->CallStatusDisconnected(CALL_ID, ACCOUNT_ID);
-    voicePtr->ConnectAbility(ACCOUNT_ID);
-    voicePtr->OnStartService(INCOMING, ACCOUNT_ID);
+    voicePtr->CallStatusDialing(callId, accountId);
+    voicePtr->CallStatusIncoming(callId, accountId);
+    voicePtr->CallStatusActive(callId, accountId);
+    voicePtr->CallStatusDisconnected(callId, accountId);
+    voicePtr->ConnectAbility(accountId);
+    voicePtr->OnStartService(incoming, accountId);
     voicePtr->RegisterListenSwitchState();
-    voicePtr->PublishCommonEvent(true, INCOMING);
+    voicePtr->PublishCommonEvent(true, incoming);
     voicePtr->DisconnectAbility();
     voicePtr->UnRegisterListenSwitchState();
-    voicePtr->PublishCommonEvent(false, DIALING);
+    voicePtr->PublishCommonEvent(false, dialing);
     voicePtr->OnStopService();
     voicePtr->Release();
     ASSERT_TRUE(voicePtr->GetInstance() != nullptr);
@@ -92,11 +92,11 @@ HWTEST_F(CallVoiceAssistantManagerTest, Telephony_CallVoiceAssistantManager_001,
  */
 HWTEST_F(CallVoiceAssistantManagerTest, Telephony_CallVoiceAssistantManager_002, Function | MediumTest | Level3)
 {
-    const int32_t CALL_ID = -1;
-    const int32_t ACCOUNT_ID = -1;
-    const std::string CONTROL_SWITCH = "incoming_call_voice_control_switch";
-    const std::string INCOMING = "come";
-    const std::string DIALING = "dial";
+    const int32_t callId = -1;
+    const int32_t accountId = -1;
+    const std::string controlSwitch = "incoming_call_voice_control_switch";
+    const std::string incoming = "come";
+    const std::string dialing = "dial";
     std::string value = "";
     ContactInfo contactInfo;
     std::shared_ptr<CallVoiceAssistantManager> voicePtr = CallVoiceAssistantManager::GetInstance();
@@ -109,17 +109,17 @@ HWTEST_F(CallVoiceAssistantManagerTest, Telephony_CallVoiceAssistantManager_002,
     voicePtr->SetIsControlSwitchOn(true);
     voicePtr->GetIsControlSwitchOn();
     voicePtr->GetIsPlayRing();
-    voicePtr->UpdateVoipCallState(ACCOUNT_ID);
-    auto infoptr = voicePtr->GetContactInfo(ACCOUNT_ID);
-    voicePtr->UpdateNumberLocation(value, ACCOUNT_ID);
-    voicePtr->UpdateContactInfo(contactInfo, ACCOUNT_ID);
-    voicePtr->UpdateRemoteObject(remoteObject, ACCOUNT_ID, nullptr);
+    voicePtr->UpdateVoipCallState(accountId);
+    auto infoptr = voicePtr->GetContactInfo(accountId);
+    voicePtr->UpdateNumberLocation(value, accountId);
+    voicePtr->UpdateContactInfo(contactInfo, accountId);
+    voicePtr->UpdateRemoteObject(remoteObject, accountId, nullptr);
     voicePtr->OnStopService();
     voicePtr->Initial();
-    voicePtr->QueryValue(CONTROL_SWITCH, value);
+    voicePtr->QueryValue(controlSwitch, value);
     voicePtr->IsStartVoiceBroadcast();
-    voicePtr->IsSwitchOn(CONTROL_SWITCH);
-    voicePtr->OnStartService(DIALING, ACCOUNT_ID);
+    voicePtr->IsSwitchOn(controlSwitch);
+    voicePtr->OnStartService(dialing, accountId);
     voicePtr->MuteRinger();
     voicePtr->UpdateReplyData(value);
     voicePtr->GetSendString(infoptr);
@@ -151,12 +151,12 @@ HWTEST_F(CallVoiceAssistantManagerTest, Telephony_VoiceAssistantSwitchObserver_0
  */
 HWTEST_F(CallVoiceAssistantManagerTest, Telephony_VoiceAssistantConnectCallback_001, Function | MediumTest | Level3)
 {
-    const int32_t ACCOUNT_ID = 1;
-    sptr<IRemoteObject> remoteObject = sptr<VoiceAssistantConnectCallback>::MakeSptr(ACCOUNT_ID);
+    const int32_t accountId = 1;
+    sptr<IRemoteObject> remoteObject = sptr<VoiceAssistantConnectCallback>::MakeSptr(accountId);
     AppExecFwk::ElementName element;
-    sptr<AAFwk::IAbilityConnection> connectCallback = sptr<VoiceAssistantConnectCallback>::MakeSptr(ACCOUNT_ID);
-    connectCallback->OnAbilityConnectDone(element, remoteObject, ACCOUNT_ID);
-    connectCallback->OnAbilityDisconnectDone(element, ACCOUNT_ID);
+    sptr<AAFwk::IAbilityConnection> connectCallback = sptr<VoiceAssistantConnectCallback>::MakeSptr(accountId);
+    connectCallback->OnAbilityConnectDone(element, remoteObject, accountId);
+    connectCallback->OnAbilityDisconnectDone(element, accountId);
     ASSERT_TRUE(connectCallback != nullptr);
 }
 

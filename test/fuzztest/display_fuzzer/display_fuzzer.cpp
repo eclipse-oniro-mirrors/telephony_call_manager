@@ -26,7 +26,7 @@ namespace OHOS {
 void FoldStatusManagerFunc(const uint8_t *data, size_t size)
 {
     std::shared_ptr<FoldStatusManager> foldStatusManager = DelayedSingleton<FoldStatusManager>::GetInstance();
-    (void *)data;
+    reinterpret_cast<void *>(data);
     foldStatusManager->UnregisterFoldableListener();
     foldStatusManager->RegisterFoldableListener();
     foldStatusManager->RegisterFoldableListener();
