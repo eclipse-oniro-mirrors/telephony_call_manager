@@ -774,6 +774,25 @@ bool CallObjectManager::HasActivedCallExist(int32_t &callId)
     std::lock_guard<std::mutex> lock(listMutex_);
     std::list<sptr<CallBase>>::iterator it;
     for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
+        if ((*it)->GetTelCallState() == TelCallState::CALL_STATUS_ACTIVE) {
+            callId = (*it)->GetCallID();
+            return true;
+        }
+    }
+    CallAttributeInfo res = GetActiveVoipCallInfo();
+    if (res.callId >= VOIP_CALL_MINIMUM) {
+        callId = res.callId;
+        return true;
+    }
+    TELEPHONY_LOGI("the call is does not exist.");
+    return false;
+}
+
+bool CallObjectManager::HasActivedNonVoipCallExist(int32_t &callId)
+{
+    std::lock_guard<std::mutex> lock(listMutex_);
+    std::list<sptr<CallBase>>::iterator it;
+    for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
         if ((*it)->GetTelCallState() == TelCallState::CALL_STATUS_ACTIVE
             && (*it)->GetCallType() != CallType::TYPE_VOIP) {
             callId = (*it)->GetCallID();

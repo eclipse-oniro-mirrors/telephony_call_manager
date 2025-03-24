@@ -64,6 +64,7 @@ public:
     static bool IsCallExist(std::string &phoneNumber);
     static bool HasCallExist();
     static bool HasActivedCallExist(int32_t &callId);
+    static bool HasActivedNonVoipCallExist(int32_t &callId);
     static int32_t HasRingingCall(bool &hasRingingCall);
     static int32_t HasHoldCall(bool &hasHoldCall);
     static TelCallState GetCallState(int32_t callId);
