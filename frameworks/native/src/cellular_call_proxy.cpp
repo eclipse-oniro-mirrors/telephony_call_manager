@@ -1662,5 +1662,31 @@ int32_t CellularCallProxy::RequestCameraCapabilities(int32_t slotId, int32_t ind
     }
     return error;
 }
+
+int32_t CellularCallProxy::SendUssdResponse(int32_t slotId, const std::string &content)
+{
+    MessageOption option;
+    MessageParcel in;
+    MessageParcel out;
+    int32_t result = TELEPHONY_SUCCESS;
+    result = SetCommonParamForMessageParcel(slotId, in);
+    if (result != TELEPHONY_SUCCESS) {
+        return result;
+    }
+    if (!in.WriteString(content)) {
+        return TELEPHONY_ERR_WRITE_DATA_FAIL;
+    }
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("function Remote() return nullptr!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(CellularCallInterfaceCode::SEND_USSD_RESPONSE),
+        in, out, option);
+    if (ret == ERR_NONE) {
+        return out.ReadInt32();
+    }
+    return ret;
+}
 } // namespace Telephony
 } // namespace OHOS

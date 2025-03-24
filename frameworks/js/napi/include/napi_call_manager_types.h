@@ -71,6 +71,11 @@ struct DialAsyncContext : AsyncContext {
     AAFwk::WantParams extraParams;
 };
 
+struct UssdAsyncContext : AsyncContext {
+    int32_t slotId = 0;
+    char content[kMaxNumberLen + 1] = { 0 };
+};
+
 struct AnswerAsyncContext : AsyncContext {
     int32_t videoState = 0;
 };

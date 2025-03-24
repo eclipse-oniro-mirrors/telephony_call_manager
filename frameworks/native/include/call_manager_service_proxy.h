@@ -756,6 +756,14 @@ public:
      */
     sptr<ICallStatusCallback> RegisterBluetoothCallManagerCallbackPtr(std::string &macAddress) override;
 
+    /**
+     * SendUssdResponse
+     *
+     * @brief send ussd response to modem
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t SendUssdResponse(int32_t slotId, const std::string &content) override;
+
 private:
     int32_t SendRequest(CallManagerInterfaceCode code);
     int32_t SendRequest(CallManagerInterfaceCode code, MessageParcel &dataParcel, MessageParcel &replyParcel);

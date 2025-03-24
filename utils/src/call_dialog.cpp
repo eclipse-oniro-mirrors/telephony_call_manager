@@ -28,6 +28,7 @@
 namespace OHOS {
 namespace Telephony {
 constexpr int32_t DEFAULT_USER_ID = -1;
+const int32_t SCB_SYS_DIALOG_ZORDER_UNDER_LOCK = 1;
 const int32_t SOURCE_SCREENLOCKED = 2;
 
 bool CallDialog::DialogConnectExtension(const std::string &dialogReason)
@@ -218,6 +219,33 @@ std::string CallDialog::BuildCallingPrivacyModeCommand(int32_t &videoState)
     root["isInCall"] = true;
     root["isAnswer"] = false;
     root["isFold"] = true;
+    std::string startCommand = root.dump();
+    TELEPHONY_LOGI("startCommand is: %{public}s", startCommand.c_str());
+    return startCommand;
+}
+
+void CallDialog::DialogProcessMMICodeExtension()
+{
+    std::string commandStr = BuildProcessMMICodeCommand();
+    AAFwk::Want want;
+    std::string bundleName = "com.ohos.sceneboard";
+    std::string abilityName = "com.ohos.sceneboard.systemdialog";
+    want.SetElementName(bundleName, abilityName);
+    bool connectResult = CallSettingDialogConnectExtensionAbility(want, commandStr);
+    if (!connectResult) {
+        TELEPHONY_LOGE("CallSettingDialogConnectExtensionAbility failed!");
+    }
+}
+
+std::string CallDialog::BuildProcessMMICodeCommand()
+{
+    TELEPHONY_LOGI("BuildProcessMMICodeCommand enter");
+    nlohmann::json root;
+    std::string uiExtensionType = "sysDialog/common";
+    std::string dialogReason = "PROCESS_MMI_CODE";
+    root["ability.want.params.uiExtensionType"] = uiExtensionType;
+    root["sysDialogZOrder"] = SCB_SYS_DIALOG_ZORDER_UNDER_LOCK;
+    root["dialogReason"] = dialogReason;
     std::string startCommand = root.dump();
     TELEPHONY_LOGI("startCommand is: %{public}s", startCommand.c_str());
     return startCommand;

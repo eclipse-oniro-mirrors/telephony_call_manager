@@ -204,5 +204,6 @@ export default {
     EmergencyNumberOptions: call.EmergencyNumberOptions,
     NumberFormatOptions: call.NumberFormatOptions,
     startRTT: call.startRTT,
-    stopRTT: call.stopRTT
+    stopRTT: call.stopRTT,
+    sendUssdResponse: call.sendUssdResponse
 };

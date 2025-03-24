@@ -994,5 +994,19 @@ void CellularCallConnection::SystemAbilityListener::OnRemoveSystemAbility(
 
     cellularCallConnection->Clean();
 }
+
+int32_t CellularCallConnection::SendUssdResponse(int32_t slotId, const std::string &content)
+{
+    if (ReConnectService() != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("ipc reconnect failed!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t errCode = cellularCallInterfacePtr_->SendUssdResponse(slotId, content);
+    if (errCode != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("SendUssdResponse failed, errcode:%{public}d", errCode);
+        return errCode;
+    }
+    return TELEPHONY_SUCCESS;
+}
 } // namespace Telephony
 } // namespace OHOS

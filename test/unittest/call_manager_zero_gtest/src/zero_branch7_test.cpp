@@ -199,6 +199,7 @@ HWTEST_F(ZeroBranch8Test, Telephony_CallManagerService_001, Function | MediumTes
     auto callManagerService = new CallManagerService();
     callManagerService->state_ =  CallManagerService::ServiceRunningState::STATE_RUNNING;
     callManagerService->OnStart();
+    callManagerService->Init();
     std::string deviceId("123");
     int32_t systemAbilityId = 100;
     std::u16string test = u"";
@@ -214,7 +215,14 @@ HWTEST_F(ZeroBranch8Test, Telephony_CallManagerService_001, Function | MediumTes
     EXPECT_EQ(callManagerService->SendCallUiEvent(callId, eventName), TELEPHONY_SUCCESS);
     callManagerService->dealCeliaCallEvent(1);
     std::string number = "123456";
-    EXPECT_NE(callManagerService->MakeCall(number), TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API);
+    EXPECT_EQ(callManagerService->MakeCall(number), TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API);
+    EXPECT_TRUE(TelephonyPermission::CheckCallerIsSystemApp());
+    EXPECT_TRUE(TelephonyPermission::CheckPermission(OHOS_PERMISSION_SET_TELEPHONY_STATE));
+    if (TelephonyPermission::CheckCallerIsSystemApp() && TelephonyPermission::CheckPermission(
+        OHOS_PERMISSION_SET_TELEPHONY_STATE)) {
+        std::string content = "1";
+        EXPECT_EQ(callManagerService->SendUssdResponse(slotId, content), TELEPHONY_SUCCESS);
+    }
 }
 
 HWTEST_F(ZeroBranch8Test, Telephony_CallManagerService_002, Function | MediumTest | Level3)
@@ -400,6 +408,9 @@ HWTEST_F(ZeroBranch8Test, Telephony_CallManagerService_005, Function | MediumTes
     EXPECT_EQ(callManagerService->JoinConference(false, numberList), TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API);
     std::string number = "123456";
     EXPECT_EQ(callManagerService->MakeCall(number), TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API);
+    int32_t slotId = 0;
+    std::string content = "1";
+    EXPECT_EQ(callManagerService->SendUssdResponse(slotId, content), TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API);
 }
 
 HWTEST_F(ZeroBranch8Test, Telephony_BluetoothCallService_001, Function | MediumTest | Level3)
@@ -541,6 +552,9 @@ HWTEST_F(ZeroBranch8Test, Telephony_CallManagerClient_001, Function | MediumTest
     std::string eventName = "abc";
     EXPECT_NE(callManagerClient->SendCallUiEvent(callId, eventName), TELEPHONY_ERR_UNINIT);
     EXPECT_EQ(callManagerClient->RegisterBluetoothCallManagerCallbackPtr(eventName), nullptr);
+    int32_t slotId = 0;
+    std::string content = "1";
+    EXPECT_NE(callManagerClient->SendUssdResponse(slotId, content), TELEPHONY_ERR_UNINIT);
 }
 
 HWTEST_F(ZeroBranch8Test, Telephony_CallStatusCallback_001, Function | MediumTest | Level1)

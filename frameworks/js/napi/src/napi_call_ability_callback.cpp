@@ -976,12 +976,24 @@ int32_t NapiCallAbilityCallback::ReportMmiCode(MmiCodeInfo &info, EventCallback 
         return TELEPHONY_ERROR;
     }
     napi_value callbackFunc = nullptr;
-    napi_value callbackValues[ARRAY_INDEX_THIRD] = { 0 };
-    callbackValues[ARRAY_INDEX_FIRST] = NapiCallManagerUtils::CreateUndefined(env);
-    napi_create_object(env, &callbackValues[ARRAY_INDEX_SECOND]);
+    napi_value callbackValues[ARRAY_INDEX_FOURTH] = { 0 };
+    napi_create_object(env, &callbackValues[ARRAY_INDEX_FIRST]);
     NapiCallManagerUtils::SetPropertyInt32(
-        env, callbackValues[ARRAY_INDEX_SECOND], "result", static_cast<int32_t>(info.result));
-    NapiCallManagerUtils::SetPropertyStringUtf8(env, callbackValues[ARRAY_INDEX_SECOND], "message", info.message);
+        env, callbackValues[ARRAY_INDEX_FIRST], "result", static_cast<int32_t>(info.result));
+    NapiCallManagerUtils::SetPropertyStringUtf8(env, callbackValues[ARRAY_INDEX_FIRST], "message", info.message);
+    NapiCallManagerUtils::SetPropertyInt32(env, callbackValues[ARRAY_INDEX_FIRST], "mmiCodeType",
+        static_cast<int32_t>(info.mmiCodeType));
+    NapiCallManagerUtils::SetPropertyInt32(env, callbackValues[ARRAY_INDEX_FIRST], "action",
+        static_cast<int32_t>(info.action));
+    NapiCallManagerUtils::SetPropertyInt32(env, callbackValues[ARRAY_INDEX_FIRST], "status",
+        static_cast<int32_t>(info.status));
+    NapiCallManagerUtils::SetPropertyInt32(env, callbackValues[ARRAY_INDEX_FIRST], "classCw",
+        static_cast<int32_t>(info.classCw));
+    NapiCallManagerUtils::SetPropertyInt32(env, callbackValues[ARRAY_INDEX_FIRST], "reason",
+        static_cast<int32_t>(info.reason));
+    NapiCallManagerUtils::SetPropertyInt32(env, callbackValues[ARRAY_INDEX_FIRST], "time",
+        static_cast<int32_t>(info.time));
+    NapiCallManagerUtils::SetPropertyStringUtf8(env, callbackValues[ARRAY_INDEX_FIRST], "number", info.number);
     napi_get_reference_value(env, eventCallback.callbackRef, &callbackFunc);
     if (callbackFunc == nullptr) {
         TELEPHONY_LOGE("callbackFunc is null!");
@@ -991,7 +1003,7 @@ int32_t NapiCallAbilityCallback::ReportMmiCode(MmiCodeInfo &info, EventCallback 
     napi_value thisVar = nullptr;
     napi_get_reference_value(env, eventCallback.thisVar, &thisVar);
     napi_value callbackResult = nullptr;
-    napi_call_function(env, thisVar, callbackFunc, DATA_LENGTH_TWO, callbackValues, &callbackResult);
+    napi_call_function(env, thisVar, callbackFunc, DATA_LENGTH_ONE, callbackValues, &callbackResult);
     napi_close_handle_scope(env, mmiCodeScope);
     return TELEPHONY_SUCCESS;
 }

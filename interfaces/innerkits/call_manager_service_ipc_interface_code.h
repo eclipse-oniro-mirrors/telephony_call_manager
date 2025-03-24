@@ -98,6 +98,7 @@ enum CallManagerInterfaceCode {
     INTERFACE_SEND_CALLUI_EVENT,
     INTERFACE_MAKE_CALL,
     INTERFACE_BLUETOOTH_REGISTER_CALLBACKPTR,
+    INTERFACE_SEND_USSD_RESPONSE,
 };
 } // end extern
 } // namespace Telephony

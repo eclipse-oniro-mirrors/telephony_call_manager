@@ -817,5 +817,15 @@ sptr<ICallStatusCallback> CallManagerClient::RegisterBluetoothCallManagerCallbac
         return nullptr;
     }
 }
+
+int32_t CallManagerClient::SendUssdResponse(int32_t slotId, std::string &content)
+{
+    if (g_callManagerProxy != nullptr) {
+        return g_callManagerProxy->SendUssdResponse(slotId, content);
+    } else {
+        TELEPHONY_LOGE("init first please!");
+        return TELEPHONY_ERR_UNINIT;
+    }
+}
 } // namespace Telephony
 } // namespace OHOS

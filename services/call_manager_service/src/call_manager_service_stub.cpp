@@ -153,6 +153,8 @@ void CallManagerServiceStub::InitCallSupplementRequest()
         [this](MessageParcel &data, MessageParcel &reply) { return OnCanSetCallTransferTime(data, reply); };
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_CLOSE_UNFINISHED_USSD)] =
         [this](MessageParcel &data, MessageParcel &reply) { return OnCloseUnFinishedUssd(data, reply); };
+    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_SEND_USSD_RESPONSE)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnSendUssdResponse(data, reply); };
 }
 
 void CallManagerServiceStub::initCallConferenceExRequest()
@@ -1470,6 +1472,20 @@ int32_t CallManagerServiceStub::OnRegisterBluetoothCallManagerCallbackPtr(Messag
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
     return TELEPHONY_SUCCESS;
+}
+
+int32_t CallManagerServiceStub::OnSendUssdResponse(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t result = TELEPHONY_ERR_FAIL;
+    int32_t slotId = data.ReadInt32();
+    std::string content = data.ReadString();
+    result = SendUssdResponse(slotId, content);
+    TELEPHONY_LOGI("result:%{public}d", result);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("fail to write parcel");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return result;
 }
 } // namespace Telephony
 } // namespace OHOS
