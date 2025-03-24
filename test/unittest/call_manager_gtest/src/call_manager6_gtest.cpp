@@ -1008,6 +1008,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetDeviceDirection_0300, Functi
 HWTEST_F(CallManagerGtest, Telephony_CallManager_InteroperableSettingsHandlerTest_001, Function | MediumTest | Level2)
 {
     Uri uri(SYNERGY_INCOMING_MUTE_URI);
+    auto helper = DelayedSingleton<SettingsDataShareHelper>().GetInstance();
     InteroperableSettingsHandler::RegisterObserver();
     EXPECT_NE(InteroperableSettingsHandler::recvObserver_, nullptr);
     InteroperableSettingsHandler::RegisterObserver();
@@ -1018,8 +1019,8 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_InteroperableSettingsHandlerTes
     InteroperableSettingsHandler::RecoverMuteRinger("0");
     InteroperableSettingsHandler::RecoverMuteRinger("3");
     InteroperableSettingsHandler::SendMuteRinger();
-    EXPECT_EQ(SettingsDataShareHelper::Insert(uri, SYNERGY_MUTE_KEY, "0"), -1);
-    EXPECT_EQ(SettingsDataShareHelper::Update(uri, "nokey", "0"), -1);
+    EXPECT_EQ(helper->Insert(uri, SYNERGY_MUTE_KEY, "0"), -1);
+    EXPECT_EQ(helper->Update(uri, "nokey", "0"), -1);
 }
 } // namespace Telephony
 } // namespace OHOS
