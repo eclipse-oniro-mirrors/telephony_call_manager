@@ -1013,6 +1013,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_InteroperableSettingsHandlerTes
     EXPECT_NE(InteroperableSettingsHandler::recvObserver_, nullptr);
     InteroperableSettingsHandler::RegisterObserver();
     EXPECT_NE(InteroperableSettingsHandler::recvObserver_, nullptr);
+    
     auto recvObserver = std::make_shared<InteroperableRecvObserver>();
     recvObserver->OnChange();
     EXPECT_EQ(InteroperableSettingsHandler::QueryMuteRinger(), "0");
