@@ -97,6 +97,7 @@ private:
     int32_t IncomingFilterPolicy(const CallDetailInfo &info);
     void QueryCallerInfo(ContactInfo &contactInfo, std::string phoneNum);
     void SetupAntiFraudService(const sptr<CallBase> &call, const CallDetailInfo &info);
+    void StopAntiFraudDetect(const sptr<CallBase> &call, const CallDetailInfo &info);
     bool IsContactPhoneNum(const std::string &phoneNum);
     int32_t UpdateDialingCallInfo(const CallDetailInfo &info);
     void SetContactInfo(sptr<CallBase> &call, std::string phoneNum);
@@ -148,6 +149,7 @@ private:
     std::map<OttCallEventId, CallAbilityEventId> mOttEventIdTransferMap_;
     VideoStateType priorVideoState_[SLOT_NUM] = {VideoStateType::TYPE_VOICE};
     const std::string DETAIL_INFO = "detail_info";
+    const std::string FORMAT_PHONE_NUMBER = "format_phone_number";
     const std::string CONTENT_TYPE = "content_type";
     const std::string PHONE = "phone";
     const std::string TYPE_ID = "type_id";

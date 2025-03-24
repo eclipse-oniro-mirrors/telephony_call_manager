@@ -30,7 +30,7 @@ public:
     explicit AntiFraudCloudService(const std::string &phoneNum);
     bool UploadPostRequest(const OHOS::AntiFraudService::AntiFraudResult &antiFraudResult);
 private:
-    bool isSettled_;
+    bool isSettled_ = false;
     std::string phoneNum_;
     std::mutex mutex_;
     std::condition_variable cv_;
