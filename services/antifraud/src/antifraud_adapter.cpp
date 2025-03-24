@@ -66,5 +66,22 @@ int32_t AntiFraudAdapter::DetectAntiFraud(
  
     return func(listener);
 }
+
+int32_t AntiFraudAdapter::StopAntiFraud()
+{
+    libAntiFraud_ = GetLibAntiFraud();
+    if (libAntiFraud_ == nullptr) {
+        return -1;
+    }
+
+    PfnStopAntiFraudVoiceDetect func =
+        reinterpret_cast<PfnStopAntiFraudVoiceDetect>(dlsym(libAntiFraud_, "StopAntiFraudVoiceDetect"));
+    if (func == nullptr) {
+        TELEPHONY_LOGE("func is NULL");
+        return -1;
+    }
+
+    return func();
+}
 }
 }

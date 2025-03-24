@@ -1340,23 +1340,34 @@ HWTEST_F(CallManagerGtest, Telephony_AntiFraud_0100, Function | MediumTest | Lev
 
     OHOS::AntiFraudService::AntiFraudResult fraudResult;
     std::string phoneNum = "123456";
-    antiFraudService->RecordDetectResult(fraudResult);
-    EXPECT_EQ(antiFraudService->antiFraudState_, 3);
-    fraudResult.result = true;
-    antiFraudService->RecordDetectResult(fraudResult);
-    EXPECT_EQ(antiFraudService->antiFraudState_, 2);
-    antiFraudService->InitAntiFraudService(phoneNum);
+    antiFraudService->InitAntiFraudService(phoneNum, 0, 1);
+    EXPECT_EQ(antiFraudService->antiFraudState_, 1);
+    antiFraudService->StopAntiFraudService(0, 1);
+    antiFraudService->RecordDetectResult(fraudResult, -1, -1);
     EXPECT_EQ(antiFraudService->antiFraudState_, 1);
 
-    auto callStatusManager1 = std::make_shared<CallStatusManager>();
-    antiFraudService->SetCallStatusManager(callStatusManager1);
-    antiFraudService->RecordDetectResult(fraudResult);
-    fraudResult.result = false;
-    antiFraudService->RecordDetectResult(fraudResult);
-    auto callStatusManager2 = std::make_shared<CallStatusManager>();
-    antiFraudService->SetCallStatusManager(callStatusManager2);
-    antiFraudService->InitAntiFraudService(phoneNum);
-    EXPECT_EQ(antiFraudService->antiFraudState_, 0);
+    antiFraudService->InitAntiFraudService(phoneNum, 0, 1);
+    antiFraudService->StopAntiFraudService(0, 1);
+    antiFraudService->RecordDetectResult(fraudResult, -1, 0);
+    EXPECT_EQ(antiFraudService->antiFraudState_, 3);
+
+    fraudResult.result = true;
+    antiFraudService->InitAntiFraudService(phoneNum, 0, 1);
+    antiFraudService->RecordDetectResult(fraudResult, 0, -1);
+    EXPECT_EQ(antiFraudService->antiFraudState_, 2);
+
+    antiFraudService->InitAntiFraudService(phoneNum, 0, 1);
+    antiFraudService->RecordDetectResult(fraudResult, 0, 0);
+    EXPECT_EQ(antiFraudService->antiFraudState_, 2);
+
+    antiFraudService->RecordDetectResult(fraudResult, 0, 0);
+    EXPECT_EQ(antiFraudService->antiFraudState_, 2);
+    
+    auto callStatusManager = std::make_shared<CallStatusManager>();
+    antiFraudService->SetCallStatusManager(callStatusManager);
+    antiFraudService->InitAntiFraudService(phoneNum, 0, 3);
+    antiFraudService->RecordDetectResult(fraudResult, 0, 3);
+    EXPECT_EQ(antiFraudService->antiFraudState_, 2);
 
     auto antiFraudAdapter = DelayedSingleton<AntiFraudAdapter>::GetInstance();
     antiFraudAdapter->ReleaseAntiFraud();
