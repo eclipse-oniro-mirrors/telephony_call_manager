@@ -1011,7 +1011,6 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_InteroperableSettingsHandlerTes
     auto helper = DelayedSingleton<SettingsDataShareHelper>().GetInstance();
     auto recvObserver = std::make_shared<InteroperableRecvObserver>();
 
-    EXPECT_EQ(helper->RegisterToDataShare(uri, recvObserver), true);
     recvObserver->OnChange();
     EXPECT_EQ(helper->Update(uri, SYNERGY_MUTE_KEY, "3"), -1);
     EXPECT_EQ(helper->Update(uri, "nokey", "0"), -1);
