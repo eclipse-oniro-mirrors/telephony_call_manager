@@ -22,6 +22,7 @@
 
 namespace OHOS {
 namespace Telephony {
+const int32_t MAX_LENGTH_SHORT_CODE = 2;
 
 bool MMICodeUtils::IsMMICode(std::string &analyseString)
 {
@@ -112,7 +113,7 @@ bool MMICodeUtils::IsShortCode(const std::string &analyseString)
 
 bool MMICodeUtils::IsShortCodeWithoutCellularCall(const std::string &analyseString)
 {
-    if (analyseString.length() != 2) {
+    if (analyseString.length() != MAX_LENGTH_SHORT_CODE) {
         return false;
     }
     if (analyseString[0] == '1' && std::isdigit(analyseString[1])) {
@@ -123,7 +124,7 @@ bool MMICodeUtils::IsShortCodeWithoutCellularCall(const std::string &analyseStri
 
 bool MMICodeUtils::IsShortCodeWithCellularCall(const std::string &analyseString)
 {
-    if (analyseString.length() < 1 || analyseString.length() > 2) {
+    if (analyseString.length() < 1 || analyseString.length() > MAX_LENGTH_SHORT_CODE) {
         return false;
     }
     return true;
