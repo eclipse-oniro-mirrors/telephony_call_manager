@@ -28,6 +28,7 @@
 #include "core_service_connection.h"
 #include "cs_call.h"
 #include "ims_call.h"
+#include "mmi_code_utils.h"
 #include "ott_call.h"
 #include "report_call_info_handler.h"
 #include "telephony_log_wrapper.h"
@@ -831,7 +832,7 @@ int32_t CallRequestProcess::CarrierDialProcess(DialParaInfo &info)
         needWaitHold_ = false;
         return ret;
     }
-    bool isMMiCode = DelayedSingleton<CallNumberUtils>::GetInstance()->IsMMICode(newPhoneNum);
+    bool isMMiCode = DelayedSingleton<MMICodeUtils>::GetInstance()->IsMMICode(newPhoneNum);
     if (!isMMiCode) {
         isFirstDialCallAdded_ = false;
         info.number = newPhoneNum;
@@ -844,6 +845,8 @@ int32_t CallRequestProcess::CarrierDialProcess(DialParaInfo &info)
     } else {
         callRequestEventHandler->RestoreDialingFlag(false);
         callRequestEventHandler->RemoveEventHandlerTask();
+        TELEPHONY_LOGI("CarrierDialProcess: isMMiCode is true!");
+        DelayedSingleton<CallDialog>::GetInstance()->DialogProcessMMICodeExtension();
     }
     CellularCallInfo callInfo;
     ret = PackCellularCallInfo(info, callInfo);

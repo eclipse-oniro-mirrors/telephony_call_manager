@@ -672,6 +672,13 @@ public:
      * @return Returns sptr<ICallStatusCallback>.
      */
     sptr<ICallStatusCallback> RegisterBluetoothCallManagerCallbackPtr(std::string &macAddress);
+
+    /**
+     * @brief send ussd response to modem
+     *
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t SendUssdResponse(int32_t slotId, std::string &content);
 };
 } // namespace Telephony
 } // namespace OHOS

@@ -124,6 +124,38 @@ struct MmiCodeInfo {
      * Indicates the specific message of MMI code response.
      */
     char message[kMaxMessageLen + 1] = { 0 };
+    /**
+     * SC type
+     */
+    int32_t mmiCodeType = -1;
+    /**
+     * 0: query, 1:active, 2:deactive
+     */
+    int32_t action = -1;
+    /**
+     * parameter sets/shows the result code presentation status in the TA
+     * 0: disable
+     * 1: enable
+     */
+    int32_t status = -1;
+    /*
+     * <classCw> is a sum of integers each representing a class of information (default 7):
+     * 1	voice (telephony)
+     * 2	data (refers to all bearer services)
+     * 4	fax (facsimile services)
+     * 8	short message service
+     * 16	data circuit sync
+     * 32	data circuit async
+     * 64	dedicated packet access
+     * 128	dedicated PAD access
+     */
+    int32_t classCw = -1;
+    /**
+     * Indication the phone number which will forward to.
+     */
+    char number[kMaxNumberLen + 1] = { 0 };
+    int32_t reason = -1;
+    int32_t time = -1;
 };
 
 /**

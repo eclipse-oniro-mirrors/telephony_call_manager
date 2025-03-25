@@ -1714,5 +1714,24 @@ sptr<ICallStatusCallback> CallManagerProxy::RegisterBluetoothCallManagerCallback
     }
     return ptr;
 }
+
+int32_t CallManagerProxy::SendUssdResponse(int32_t slotId, std::string &content)
+{
+    if (ReConnectService() != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("ipc reconnect failed!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    Utils::UniqueReadGuard<Utils::RWLock> guard(rwClientLock_);
+    if (callManagerServicePtr_ == nullptr) {
+        TELEPHONY_LOGE("callManagerServicePtr_ is null");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    int32_t errCode = callManagerServicePtr_->SendUssdResponse(slotId, content);
+    if (errCode != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("SendUssdResponse failed, errcode:%{public}d", errCode);
+        return errCode;
+    }
+    return TELEPHONY_SUCCESS;
+}
 } // namespace Telephony
 } // namespace OHOS

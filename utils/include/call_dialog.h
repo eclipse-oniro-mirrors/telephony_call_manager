@@ -33,6 +33,8 @@ public:
     bool DialogConnectAnswerPrivpacyModeExtension(const std::string &dialogReason,
         int32_t &callId, int32_t &videoState, bool isVideo);
     void DialogCallingPrivacyModeExtension(Rosen::FoldStatus foldStatus);
+    void DialogProcessMMICodeExtension();
+
 private:
     bool DialogConnectExtensionAbility(const AAFwk::Want &want, const std::string commandStr);
     bool CallSettingDialogConnectExtensionAbility(const AAFwk::Want &want, const std::string commandStr);
@@ -42,6 +44,7 @@ private:
     std::string BuildStartAnswerPrivpacyModeCommand(const std::string &dialogReason,
         int32_t &callId, int32_t &videoState, bool isVideo);
     std::string BuildCallingPrivacyModeCommand(int32_t &videoState);
+    std::string BuildProcessMMICodeCommand();
 };
 } // namespace Telephony
 } // namespace OHOS

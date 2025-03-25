@@ -143,6 +143,7 @@ public:
     static napi_value SetVoIPCallInfo(napi_env env, napi_callback_info info);
     static napi_value CancelCallUpgrade(napi_env env, napi_callback_info info);
     static napi_value SendCallUiEvent(napi_env env, napi_callback_info info);
+    static napi_value SendUssdResponse(napi_env env, napi_callback_info info);
 
 private:
     static void RegisterCallBack();
@@ -260,6 +261,7 @@ private:
         napi_env env, const napi_value parameters[], const size_t parameterCount);
     static void HandleRejectCall(napi_env env, RejectAsyncContext &asyncContext,
         const napi_value parameters[], const size_t parameterCount);
+    static void NativeSendUssdResponse(napi_env env, void *data);
 private:
     static int32_t registerStatus_;
 };

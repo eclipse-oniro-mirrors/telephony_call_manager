@@ -296,6 +296,18 @@ HWTEST_F(ClientErrorBranchTest, Telephony_CallManagerClient_002, Function | Medi
 }
 
 /**
+ * @tc.number   Telephony_CallManagerClient_003
+ * @tc.name     test error nullptr branch
+ * @tc.desc     Function test
+ */
+ HWTEST_F(ClientErrorBranchTest, Telephony_CallManagerClient_003, Function | MediumTest | Level3)
+ {
+    std::shared_ptr<CallManagerClient> client = std::make_shared<CallManagerClient>();
+    std::string content = "1";
+    ASSERT_EQ(client->SendUssdResponse(SIM1_SLOTID, content), TELEPHONY_ERR_UNINIT);
+}
+
+/**
  * @tc.number   Telephony_BluetoothCallClient_001
  * @tc.name     test error branch
  * @tc.desc     Function test

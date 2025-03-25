@@ -29,6 +29,7 @@ namespace Telephony {
 constexpr size_t CHAR_INDEX = 0;
 constexpr int32_t ERR_CALL_ID = 0;
 const uint64_t DELAY_STOP_PLAY_TIME = 3000000;
+const uint64_t REPORT_SEND_USSD_DELAY_TIME = 1000000;
 const int32_t MIN_MULITY_CALL_COUNT = 2;
 constexpr int32_t INIT_INDEX = 0;
 
@@ -201,14 +202,17 @@ int32_t CallStatusCallback::SendUssdResult(const int32_t result)
 
 int32_t CallStatusCallback::SendMmiCodeResult(const MmiCodeInfo &info)
 {
-    TELEPHONY_LOGI("SendMmiCodeResult result = %{public}d, message = %{public}s", info.result, info.message);
-    int32_t ret = DelayedSingleton<CallAbilityReportProxy>::GetInstance()->ReportMmiCodeResult(info);
-    if (ret != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("UpdateDisconnectedCause failed! errCode:%{public}d", ret);
-    } else {
-        TELEPHONY_LOGI("UpdateDisconnectedCause success!");
-    }
-    return ret;
+    ffrt::submit_h([info] {
+        TELEPHONY_LOGI("SendMmiCodeResult result = %{public}d, message = %{public}s", info.result, info.message);
+        int32_t ret = DelayedSingleton<CallAbilityReportProxy>::GetInstance()->ReportMmiCodeResult(info);
+        if (ret != TELEPHONY_SUCCESS) {
+            TELEPHONY_LOGE("SendMmiCodeResult failed! errCode:%{public}d", ret);
+        } else {
+            TELEPHONY_LOGI("SendMmiCodeResult success!");
+        }
+        return ret;
+        }, {}, {}, ffrt::task_attr().delay(REPORT_SEND_USSD_DELAY_TIME));
+    return TELEPHONY_SUCCESS;
 }
 
 int32_t CallStatusCallback::GetImsCallDataResult(const int32_t result)

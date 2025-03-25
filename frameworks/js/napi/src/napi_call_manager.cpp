@@ -112,6 +112,7 @@ napi_value NapiCallManager::DeclareCallSupplementInterface(napi_env env, napi_va
         DECLARE_NAPI_FUNCTION("canSetCallTransferTime", CanSetCallTransferTime),
         DECLARE_NAPI_FUNCTION("closeUnfinishedUssd", CloseUnFinishedUssd),
         DECLARE_NAPI_FUNCTION("inputDialerSpecialCode", InputDialerSpecialCode),
+        DECLARE_NAPI_FUNCTION("sendUssdResponse", SendUssdResponse),
     };
     NAPI_CALL(env, napi_define_properties(env, exports, sizeof(desc) / sizeof(desc[0]), desc));
     return exports;
@@ -5051,6 +5052,49 @@ napi_value NapiCallManager::HandleAsyncWork(napi_env env, AsyncContext *context,
     napi_create_async_work(env, resource, resourceName, execute, complete, (void *)context, &context->work);
     napi_queue_async_work_with_qos(env, context->work, napi_qos_default);
     return result;
+}
+
+napi_value NapiCallManager::SendUssdResponse(napi_env env, napi_callback_info info)
+{
+    GET_PARAMS(env, info, VALUE_MAXIMUM_LIMIT);
+    if (!MatchNumberAndStringParameters(env, argv, argc)) {
+        TELEPHONY_LOGE("MatchNumberAndStringParameters failed.");
+        NapiUtil::ThrowParameterError(env);
+        return nullptr;
+    }
+    auto asyncContext = std::make_unique<UssdAsyncContext>();
+    if (asyncContext == nullptr) {
+        TELEPHONY_LOGE("asyncContext is nullptr.");
+        NapiUtil::ThrowParameterError(env);
+        return nullptr;
+    }
+    napi_get_value_int32(env, argv[ARRAY_INDEX_FIRST], &asyncContext->slotId);
+    napi_get_value_string_utf8(
+        env, argv[ARRAY_INDEX_SECOND], asyncContext->content, PHONE_NUMBER_MAXIMUM_LIMIT, &(asyncContext->numberLen));
+
+    if (argc == VALUE_MAXIMUM_LIMIT &&
+        NapiCallManagerUtils::MatchValueType(env, argv[ARRAY_INDEX_THIRD], napi_function)) {
+        napi_create_reference(env, argv[ARRAY_INDEX_THIRD], DATA_LENGTH_ONE, &(asyncContext->callbackRef));
+    }
+    return HandleAsyncWork(
+        env, asyncContext.release(), "SendUssdResponse", NativeSendUssdResponse, NativeVoidCallBackWithErrorCode);
+}
+
+void NapiCallManager::NativeSendUssdResponse(napi_env env, void *data)
+{
+    if (data == nullptr) {
+        TELEPHONY_LOGE("NapiCallManager::NativeSendUssdResponse data is nullptr");
+        NapiUtil::ThrowParameterError(env);
+        return;
+    }
+    auto asyncContext = (UssdAsyncContext *)data;
+    std::string content(asyncContext->content, asyncContext->numberLen);
+    asyncContext->errorCode = DelayedSingleton<CallManagerClient>::GetInstance()->SendUssdResponse(
+        asyncContext->slotId, content);
+    if (asyncContext->errorCode == TELEPHONY_SUCCESS) {
+        asyncContext->resolved = TELEPHONY_SUCCESS;
+    }
+    asyncContext->eventId = CALL_MANAGER_SEND_USSD_RESPONSE;
 }
 } // namespace Telephony
 } // namespace OHOS
