@@ -49,16 +49,25 @@ public:
 HWTEST_F(DistributedDataTest, Telephony_DistributedDataTest_001, Function | MediumTest | Level1)
 {
     auto controller = std::make_shared<DistributedDataSinkController>();
-    sptr<CallBase> call = nullptr;
+    DialParaInfo mDialParaInfo;
+    sptr<CallBase> csCall = nullptr;
+    sptr<CallBase> imsCall = nullptr;
     std::string devId = "";
-    controller->OnCallCreated(call, devId);
-    controller->ProcessCallInfo(call, DistributedDataType::NAME);
-    CallObjectManager::callObjectPtrList_.emplace_back(nullptr);
+    controller->OnCallCreated(csCall, devId);
+    controller->ProcessCallInfo(csCall, DistributedDataType::NAME);
+    csCall = new CSCall(mDialParaInfo);
+    imsCall = new IMSCall(mDialParaInfo);
+    csCall->SetCallType(CallType::TYPE_CS);
+    imsCall->SetCallType(CallType::TYPE_IMS);
+    CallObjectManager::callObjectPtrList_.emplace_back(csCall);
     controller->OnCallDestroyed();
     controller->OnConnected();
     CallObjectManager::callObjectPtrList_.clear();
     std::shared_ptr<ISessionCallback> callback = std::make_shared<DataSessionCallbackTest>();
     controller->session_ = DelayedSingleton<TransmissionManager>::GetInstance()->CreateServerSession(callback);
+    controller->OnCallDestroyed();
+    CallObjectManager::callObjectPtrList_.emplace_back(csCall);
+    CallObjectManager::callObjectPtrList_.emplace_back(imsCall);
     controller->OnCallDestroyed();
     EXPECT_TRUE(controller->queryInfo_.empty());
 }
