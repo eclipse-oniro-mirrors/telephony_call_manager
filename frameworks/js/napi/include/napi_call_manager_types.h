@@ -46,6 +46,7 @@ const int16_t PHONE_NUMBER_MAXIMUM_LIMIT = 255;
 const int16_t MESSAGE_CONTENT_MAXIMUM_LIMIT = 160;
 const int16_t NAPI_MAX_TIMEOUT_SECOND = 10;
 const int16_t UNKNOWN_EVENT = 0;
+const int16_t USSD_CONTENT_MAX_LEN = 255;
 
 struct AsyncContext {
     virtual ~AsyncContext() {}
@@ -73,7 +74,7 @@ struct DialAsyncContext : AsyncContext {
 
 struct UssdAsyncContext : AsyncContext {
     int32_t slotId = 0;
-    char content[kMaxNumberLen + 1] = { 0 };
+    char content[USSD_CONTENT_MAX_LEN] = { 0 };
 };
 
 struct AnswerAsyncContext : AsyncContext {

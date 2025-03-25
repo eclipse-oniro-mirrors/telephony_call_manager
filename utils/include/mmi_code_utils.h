@@ -66,13 +66,7 @@ public:
      */
     bool IsMMICode(std::string &analyseString);
 
-    /**
-     * GetMMIData
-     *
-     * @return MMIData
-     */
-    MMIData GetMMIData();
-
+private:
     /**
      * RegexMatchMmi
      *
@@ -89,6 +83,10 @@ public:
     bool IsShortCode(const std::string &analyseString);
 
     bool SpecialMatch(const MMIData mmiData, std::string &analyseString);
+
+    bool IsShortCodeWithCellularCall(const std::string &analyseString);
+
+    bool IsShortCodeWithoutCellularCall(const std::string &analyseString);
 
 private:
     MMIData mmiData_;

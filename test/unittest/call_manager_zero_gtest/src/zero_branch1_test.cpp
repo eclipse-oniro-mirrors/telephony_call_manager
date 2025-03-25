@@ -1143,7 +1143,6 @@ HWTEST_F(ZeroBranch2Test, Telephony_MmiCodeUtils_001, Function | MediumTest | Le
     ASSERT_TRUE(mmiCodeUtils->IsMMICode(dialStr));
     dialStr = "*21*10086#";
     ASSERT_TRUE(mmiCodeUtils->IsMMICode(dialStr));
-    mmiCodeUtils->GetMMIData();
     dialStr = "10086";
     ASSERT_FALSE(mmiCodeUtils->IsMMICode(dialStr));
     dialStr = "*30#10086";

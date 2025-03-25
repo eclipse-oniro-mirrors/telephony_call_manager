@@ -91,11 +91,6 @@ bool MMICodeUtils::RegexMatchMmi(std::string &analyseString)
     return true;
 }
 
-MMIData MMICodeUtils::GetMMIData()
-{
-    return mmiData_;
-}
-
 bool MMICodeUtils::SpecialMatch(const MMIData mmiData, std::string &analyseString)
 {
     if ((mmiData.actionString == "#" || mmiData.actionString == "*")
@@ -109,18 +104,29 @@ bool MMICodeUtils::SpecialMatch(const MMIData mmiData, std::string &analyseStrin
 
 bool MMICodeUtils::IsShortCode(const std::string &analyseString)
 {
-    std::string symbols = "^(?!1\\d)\\d{2}";
     if (CallObjectManager::HasCellularCallExist()) {
-        TELEPHONY_LOGI("IsShortCode: HasCellularCallExist true");
-        symbols = "\\d{1,2}";
+        return IsShortCodeWithCellularCall(analyseString);
     }
-    std::regex shortCodePattern(symbols);
-    std::smatch shortCodeResult;
-    if (regex_match(analyseString, shortCodeResult, shortCodePattern)) {
-        TELEPHONY_LOGI("patterns shortCodeResults true");
-        return true;
+    return IsShortCodeWithoutCellularCall(analyseString);
+}
+
+bool MMICodeUtils::IsShortCodeWithoutCellularCall(const std::string &analyseString)
+{
+    if (analyseString.length() != 2) {
+        return false;
     }
-    return false;
+    if (analyseString[0] == '1' && std::isdigit(analyseString[1])) {
+        return false;
+    }
+    return true;
+}
+
+bool MMICodeUtils::IsShortCodeWithCellularCall(const std::string &analyseString)
+{
+    if (analyseString.length() < 1 || analyseString.length() > 2) {
+        return false;
+    }
+    return true;
 }
 } // namespace Telephony
 } // namespace OHOS
