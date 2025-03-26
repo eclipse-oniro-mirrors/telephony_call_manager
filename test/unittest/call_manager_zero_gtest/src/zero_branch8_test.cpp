@@ -310,9 +310,9 @@ HWTEST_F(ZeroBranch7Test, Telephony_FoldStatusManager_001, Function | MediumTest
     EXPECT_TRUE(foldStatusManagerPtr != nullptr);
 }
 
-HWTEST_F(ZeroBranch7Test, Telephony_BluetoothConnection_001, Function | MediumTest | Level3)
+HWTEST_F(ZeroBranch7Test, Telephony_BluetoothCallConnection_001, Function | MediumTest | Level3)
 {
-    auto blueToothConnectionPtr = DelayedSingleton<BluetoothConnection>::GetInstance();
+    auto blueToothConnectionPtr = DelayedSingleton<BluetoothCallConnection>::GetInstance();
     if (blueToothConnectionPtr == nullptr) {
         return;
     }
