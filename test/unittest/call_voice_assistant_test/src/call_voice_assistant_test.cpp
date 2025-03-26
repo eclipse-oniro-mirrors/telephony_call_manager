@@ -100,7 +100,7 @@ HWTEST_F(CallVoiceAssistantManagerTest, Telephony_CallVoiceAssistantManager_002,
     std::string value = "";
     ContactInfo contactInfo;
     std::shared_ptr<CallVoiceAssistantManager> voicePtr = CallVoiceAssistantManager::GetInstance();
-    sptr<IRemoteObject> remoteObject = sptr<VoiceAssistantConnectCallback>::MakeSptr(ACCOUNT_ID);
+    sptr<IRemoteObject> remoteObject = sptr<VoiceAssistantConnectCallback>::MakeSptr(accountId);
     if (voicePtr == nullptr) {
         TELEPHONY_LOGE("voicePtr is nullptr");
         return;
