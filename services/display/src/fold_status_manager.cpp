@@ -22,7 +22,8 @@
 namespace OHOS {
 namespace Telephony {
 const std::string FOLD_PRODUCT_TYPE_KEY = "const.window.foldscreen.type";
-const std::string SMALL_FOLD_PRODUCT_TYPE = "2,0,0,0";
+const char SMALL_FOLD_PRODUCT_TYPE = '2';
+const int FOLD_TYPE_INDEX = 0;
 
 FoldStatusManager::~FoldStatusManager() {};
 
@@ -84,9 +85,12 @@ void FoldStatusManager::FoldStatusListener::OnFoldStatusChanged(Rosen::FoldStatu
 
 bool FoldStatusManager::IsSmallFoldDevice()
 {
-    std::string foldType = system::GetParameter(FOLD_PRODUCT_TYPE_KEY, "0,0,0,0");
-    TELEPHONY_LOGI("IsSmallFoldDevice foldType is %{public}s", foldType.c_str());
-    return foldType == SMALL_FOLD_PRODUCT_TYPE;
+    std::string screenType = system::GetParameter(FOLD_PRODUCT_TYPE_KEY, "0,0,0,0");
+    TELEPHONY_LOGI("IsSmallFoldDevice foldType is %{public}s", screenType.c_str());
+    if (screenType.empty()) {
+        return false;
+    }
+    return screenType[FOLD_TYPE_INDEX] == SMALL_FOLD_PRODUCT_TYPE;
 }
 } // namespace Telephony
 } // namespace OHOS
