@@ -303,7 +303,7 @@ HWTEST_F(ZeroBranch7Test, Telephony_FoldStatusManager_001, Function | MediumTest
         return;
     }
     foldStatusManagerPtr->RegisterFoldableListener();
-    foldStatusManagerPtr->UnRegisterFoldableListener();
+    foldStatusManagerPtr->UnregisterFoldableListener();
     FoldStatusManager::FoldStatusListener listenerPtr;
     listenerPtr.OnFoldStatusChanged(Rosen::FoldStatus::UNKNOWN);
     listenerPtr.OnFoldStatusChanged(Rosen::FoldStatus::EXPAND);
