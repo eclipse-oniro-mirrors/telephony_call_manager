@@ -769,13 +769,13 @@ bool CallObjectManager::IsConferenceCallExist(TelConferenceState state, int32_t 
     return false;
 }
 
-bool CallObjectManager::HasActivedNonVoipCallExist(int32_t &callId)
+bool CallObjectManager::HasActivedCallExist(int32_t &callId, bool isIncludeCallServiceKitCall)
 {
     std::lock_guard<std::mutex> lock(listMutex_);
     std::list<sptr<CallBase>>::iterator it;
     for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
         if ((*it)->GetTelCallState() == TelCallState::CALL_STATUS_ACTIVE
-            && (*it)->GetCallType() != CallType::TYPE_VOIP) {
+            && (isIncludeCallServiceKitCall || (*it)->GetCallType() != CallType::TYPE_VOIP)) {
             callId = (*it)->GetCallID();
             return true;
         }
