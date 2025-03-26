@@ -25,6 +25,8 @@
 #include "voip_call.h"
 #include "audio_control_manager.h"
 #include "call_state_processor.h"
+#include "fold_status_manager.h"
+#include "bluetooth_call_connection.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -292,6 +294,42 @@ HWTEST_F(ZeroBranch7Test, Telephony_CallStatusCallbackStub_002, Function | Mediu
     dataParce6.WriteInt32(0);
     dataParce6.WriteInt32(0);
     ASSERT_EQ(callStatusCallback->OnUpdateVoipEventInfo(dataParce6, reply), TELEPHONY_SUCCESS);
+}
+
+HWTEST_F(ZeroBranch7Test, Telephony_FoldStatusManager_001, Function | MediumTest | Level3)
+{
+    auto foldStatusManagerPtr = DelayedSingleton<FoldStatusManager>::GetInstance();
+    if (foldStatusManagerPtr == nullptr) {
+        return;
+    }
+    foldStatusManagerPtr->RegisterFoldableListener();
+    foldStatusManagerPtr->UnRegisterFoldableListener();
+    FoldStatusManager::FoldStatusListener listenerPtr;
+    listenerPtr.OnFoldStatusChanged(Rosen::FoldStatus::UNKNOWN);
+    listenerPtr.OnFoldStatusChanged(Rosen::FoldStatus::EXPAND);
+    EXPECT_TRUE(foldStatusManagerPtr != nullptr);
+}
+
+HWTEST_F(ZeroBranch7Test, Telephony_BluetoothConnection_001, Function | MediumTest | Level3)
+{
+    auto blueToothConnectionPtr = DelayedSingleton<BluetoothConnection>::GetInstance();
+    if (blueToothConnectionPtr == nullptr) {
+        return;
+    }
+    DialParaInfo info;
+    blueToothConnectionPtr->Dial(info);
+    blueToothConnectionPtr->SetMacAddress("");
+    blueToothConnectionPtr->SetMacAddress("abc");
+    blueToothConnectionPtr->ConnectBtSco();
+    blueToothConnectionPtr->DisConnectBtSco();
+    blueToothConnectionPtr->GetBtScoIsConnected();
+    blueToothConnectionPtr->SetHfpConnected(false);
+    blueToothConnectionPtr->SetHfpConnected(true);
+    blueToothConnectionPtr->GetHfpContactName("");
+    blueToothConnectionPtr->GetHfpContactName("a");
+    blueToothConnectionPtr->SetHfpContactName("a", "b");
+    blueToothConnectionPtr->GetHfpContactName("a");
+    EXPECT_TRUE(blueToothConnectionPtr != nullptr);
 }
 } // namespace Telephony
 } // namespace OHOS

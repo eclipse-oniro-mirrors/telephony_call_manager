@@ -20,7 +20,7 @@ ohos_unittest("tel_call_earthquake_alarm_test") {
   subsystem_name = "telephony"
   part_name = "call_manager"
   test_module = "tel_call_earthquake_alarm_test"
-  module_out_path = part_name + "/" + test_module
+  module_out_path = part_name + "/" + part_name + "/" + test_module
 
   sources = [
     "${CALL_MANAGER_PATH}/frameworks/native/src/call_manager_service_proxy.cpp",
