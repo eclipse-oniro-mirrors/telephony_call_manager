@@ -32,6 +32,7 @@
 #include "antifraud_adapter.h"
 #include "antifraud_service.h"
 #include "number_identity_service.h"
+#include "call_setting_ability_connection.h"
 
 using namespace OHOS::Bluetooth;
 namespace OHOS {
@@ -1418,6 +1419,24 @@ HWTEST_F(CallManagerGtest, Telephony_NumberIdentityConnection_0001, Function | M
     helper.Disconnect();
     EXPECT_EQ(helper.connection_, nullptr);
     helper.NotifyNumberMarkDataUpdate();
+}
+
+/**
+ * @tc.number   Telephony_CallSettingAbilityConnection_0001
+ * @tc.name     Test branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallSettingAbilityConnection_0001, Function | MediumTest | Level3)
+{
+    sptr<CallSettingAbilityConnection> connection = new (std::nothrow) CallSettingAbilityConnection("str");
+    if (connection == nullptr) {
+        return;
+    }
+    AppExecFwk::ElementName element;
+    connection->OnAbilityConnectDone(element, nullptr, 0);
+    sptr<OHOS::IRemoteObject> remoteObj = new MockRemoteObject(0);
+    connection->OnAbilityConnectDone(element, remoteObj, 0);
+    EXPECT_TRUE(connection != nullptr);
 }
 } // namespace Telephony
 } // namespace OHOS

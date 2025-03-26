@@ -20,7 +20,7 @@ ohos_unittest("tel_call_manager_zero1_gtest") {
   subsystem_name = "telephony"
   part_name = "call_manager"
   test_module = "tel_call_manager_zero_gtest"
-  module_out_path = part_name + "/" + test_module
+  module_out_path = part_name + "/" + part_name + "/" + test_module
   sanitize = {
     cfi = true
     cfi_cross_dso = true
@@ -64,7 +64,7 @@ ohos_unittest("tel_call_manager_zero2_gtest") {
   subsystem_name = "telephony"
   part_name = "call_manager"
   test_module = "tel_call_manager_zero_gtest"
-  module_out_path = part_name + "/" + test_module
+  module_out_path = part_name + "/" + part_name + "/" + test_module
   sanitize = {
     cfi = true
     cfi_cross_dso = true
@@ -106,7 +106,7 @@ ohos_unittest("tel_call_manager_zero3_gtest") {
   subsystem_name = "telephony"
   part_name = "call_manager"
   test_module = "tel_call_manager_zero_gtest"
-  module_out_path = part_name + "/" + test_module
+  module_out_path = part_name + "/" + part_name + "/" + test_module
   sanitize = {
     cfi = true
     cfi_cross_dso = true
@@ -150,7 +150,7 @@ ohos_unittest("tel_call_manager_zero4_gtest") {
   subsystem_name = "telephony"
   part_name = "call_manager"
   test_module = "tel_call_manager_zero_gtest"
-  module_out_path = part_name + "/" + test_module
+  module_out_path = part_name + "/" + part_name + "/" + test_module
   sanitize = {
     cfi = true
     cfi_cross_dso = true
@@ -193,7 +193,7 @@ ohos_unittest("tel_call_manager_zero5_gtest") {
   subsystem_name = "telephony"
   part_name = "call_manager"
   test_module = "tel_call_manager_zero_gtest"
-  module_out_path = part_name + "/" + test_module
+  module_out_path = part_name + "/" + part_name + "/" + test_module
   sanitize = {
     cfi = true
     cfi_cross_dso = true
@@ -235,7 +235,7 @@ ohos_unittest("tel_call_manager_zero6_gtest") {
   subsystem_name = "telephony"
   part_name = "call_manager"
   test_module = "tel_call_manager_zero_gtest"
-  module_out_path = part_name + "/" + test_module
+  module_out_path = part_name + "/" + part_name + "/" + test_module
   sanitize = {
     cfi = true
     cfi_cross_dso = true
@@ -281,7 +281,7 @@ ohos_unittest("tel_call_manager_zero7_gtest") {
   subsystem_name = "telephony"
   part_name = "call_manager"
   test_module = "tel_call_manager_zero_gtest"
-  module_out_path = part_name + "/" + test_module
+  module_out_path = part_name + "/" + part_name + "/" + test_module
   sanitize = {
     cfi = true
     cfi_cross_dso = true
@@ -325,7 +325,7 @@ ohos_unittest("tel_call_manager_zero8_gtest") {
   subsystem_name = "telephony"
   part_name = "call_manager"
   test_module = "tel_call_manager_zero_gtest"
-  module_out_path = part_name + "/" + test_module
+  module_out_path = part_name + "/" + part_name + "/" + test_module
   sanitize = {
     cfi = true
     cfi_cross_dso = true

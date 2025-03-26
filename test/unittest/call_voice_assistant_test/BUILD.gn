@@ -20,7 +20,7 @@ ohos_unittest("tel_call_voice_assistant_test") {
   subsystem_name = "telephony"
   part_name = "call_manager"
   test_module = "tel_call_voice_assistant_test"
-  module_out_path = part_name + "/" + test_module
+  module_out_path = part_name + "/" + part_name + "/" + test_module
   sanitize = {
     cfi = true
     cfi_cross_dso = true
