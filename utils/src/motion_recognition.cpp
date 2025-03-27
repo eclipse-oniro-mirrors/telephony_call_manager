@@ -181,6 +181,14 @@ void MotionRecogntion::ReduceRingToneVolume()
 void CloseToEarMotionEventCallback(const Rosen::MotionSensorEvent &motionData)
 {
     TELEPHONY_LOGI("type = %{public}d, status = %{public}d", motionData.type, motionData.status);
+    auto controlManager = DelayedSingleton<CallControlManager>::GetInstance();
+    if (controlManager == nullptr) {
+        return;
+    }
+    sptr<CallBase> ringCall = controlManager->GetOneCarrierCallObject(CallRunningState::CALL_RUNNING_STATE_RINGING);
+    sptr<CallBase> dialingCall = controlManager->GetOneCarrierCallObject(CallRunningState::CALL_RUNNING_STATE_DIALING);
+    sptr<CallBase> activeCall = controlManager->GetOneCarrierCallObject(CallRunningState::CALL_RUNNING_STATE_ACTIVE);
+    sptr<CallBase> holdingCall = controlManager->GetOneCarrierCallObject(CallRunningState::CALL_RUNNING_STATE_HOLD);
     AudioDevice device = {
         .deviceType = AudioDeviceType::DEVICE_EARPIECE,
         .address = { 0 },
@@ -193,20 +201,6 @@ void CloseToEarMotionEventCallback(const Rosen::MotionSensorEvent &motionData)
                 TELEPHONY_LOGI("ignore status is not success");
                 break;
             }
-
-            auto controlManager = DelayedSingleton<CallControlManager>::GetInstance();
-            if (controlManager == nullptr) {
-                break;
-            }
-            sptr<CallBase> ringCall = controlManager->
-                GetOneCarrierCallObject(CallRunningState::CALL_RUNNING_STATE_RINGING);
-            sptr<CallBase> dialingCall = controlManager->
-                GetOneCarrierCallObject(CallRunningState::CALL_RUNNING_STATE_DIALING);
-            sptr<CallBase> activeCall = controlManager->
-                GetOneCarrierCallObject(CallRunningState::CALL_RUNNING_STATE_ACTIVE);
-            sptr<CallBase> holdingCall = controlManager->
-                GetOneCarrierCallObject(CallRunningState::CALL_RUNNING_STATE_HOLD);
-
             if (dialingCall == nullptr && activeCall == nullptr && holdingCall == nullptr && ringCall != nullptr) {
                 controlManager->AnswerCall(ringCall->GetCallID(), static_cast<int32_t>(VideoStateType::TYPE_VOICE));
                 TELEPHONY_LOGI("close to ear: AnswerCall");
