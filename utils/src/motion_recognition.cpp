@@ -124,12 +124,13 @@ void FlipMotionEventCallback(const Rosen::MotionSensorEvent &motionData)
 {
     TELEPHONY_LOGI("type = %{public}d, status = %{public}d", motionData.type, motionData.status);
     auto controlManager = DelayedSingleton<CallControlManager>::GetInstance();
-    sptr<CallBase> ringCall = controlManager->GetOneCarrierCallObject(CallRunningState::CALL_RUNNING_STATE_RINGING);
 
     switch (motionData.type) {
         case MOTION_TYPE_FLIP:
-            if (motionData.status == FilpDirection::FLIP_UP) {
-                if (controlManager != nullptr && ringCall != nullptr) {
+            if (motionData.status == FilpDirection::FLIP_UP && controlManager != nullptr) {
+                sptr<CallBase> ringCall = controlManager->
+                    GetOneCarrierCallObject(CallRunningState::CALL_RUNNING_STATE_RINGING);
+                if (ringCall != nullptr) {
                     controlManager->MuteRinger();
                     TELEPHONY_LOGI("flip motion muteRinger");
                 }
@@ -180,28 +181,37 @@ void MotionRecogntion::ReduceRingToneVolume()
 void CloseToEarMotionEventCallback(const Rosen::MotionSensorEvent &motionData)
 {
     TELEPHONY_LOGI("type = %{public}d, status = %{public}d", motionData.type, motionData.status);
-    auto controlManager = DelayedSingleton<CallControlManager>::GetInstance();
-    sptr<CallBase> ringCall = controlManager->GetOneCarrierCallObject(CallRunningState::CALL_RUNNING_STATE_RINGING);
-    sptr<CallBase> dialingCall = controlManager->GetOneCarrierCallObject(CallRunningState::CALL_RUNNING_STATE_DIALING);
-    sptr<CallBase> activeCall = controlManager->GetOneCarrierCallObject(CallRunningState::CALL_RUNNING_STATE_ACTIVE);
-    sptr<CallBase> holdingCall = controlManager->GetOneCarrierCallObject(CallRunningState::CALL_RUNNING_STATE_HOLD);
     AudioDevice device = {
         .deviceType = AudioDeviceType::DEVICE_EARPIECE,
         .address = { 0 },
     };
     AudioDeviceType deviceType = DelayedSingleton<AudioDeviceManager>::GetInstance()->GetCurrentAudioDevice();
+
     switch (motionData.type) {
         case MOTION_TYPE_CLOSE_TO_EAR:
             if (motionData.status != 0) {
                 TELEPHONY_LOGI("ignore status is not success");
                 break;
             }
-            if (dialingCall == nullptr && activeCall == nullptr && holdingCall == nullptr &&
-                controlManager != nullptr && ringCall != nullptr) {
+
+            auto controlManager = DelayedSingleton<CallControlManager>::GetInstance();
+            if (controlManager == nullptr) {
+                break;
+            }
+            sptr<CallBase> ringCall = controlManager->
+                GetOneCarrierCallObject(CallRunningState::CALL_RUNNING_STATE_RINGING);
+            sptr<CallBase> dialingCall = controlManager->
+                GetOneCarrierCallObject(CallRunningState::CALL_RUNNING_STATE_DIALING);
+            sptr<CallBase> activeCall = controlManager->
+                GetOneCarrierCallObject(CallRunningState::CALL_RUNNING_STATE_ACTIVE);
+            sptr<CallBase> holdingCall = controlManager->
+                GetOneCarrierCallObject(CallRunningState::CALL_RUNNING_STATE_HOLD);
+
+            if (dialingCall == nullptr && activeCall == nullptr && holdingCall == nullptr && ringCall != nullptr) {
                 controlManager->AnswerCall(ringCall->GetCallID(), static_cast<int32_t>(VideoStateType::TYPE_VOICE));
                 TELEPHONY_LOGI("close to ear: AnswerCall");
             };
-            if (controlManager != nullptr && (dialingCall != nullptr || activeCall != nullptr)) {
+            if (dialingCall != nullptr || activeCall != nullptr) {
                 if (deviceType == AudioDeviceType::DEVICE_SPEAKER ||
                     deviceType == AudioDeviceType::DEVICE_BLUETOOTH_SCO) {
                         TELEPHONY_LOGI("current deviceType = %{public}d, det audioDevice to earpiece",
