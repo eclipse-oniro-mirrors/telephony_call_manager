@@ -1070,6 +1070,7 @@ int32_t CallStatusManager::DisconnectedHandle(const CallDetailInfo &info)
     std::string tmpStr(info.phoneNum);
     sptr<CallBase> call = GetOneCallObjectByIndexSlotIdAndCallType(info.index, info.accountId, info.callType);
     if (call == nullptr && !RefreshDialingStateByOtherState(call, info)) {
+        TELEPHONY_LOGE("Call is Null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     StopAntiFraudDetect(call, info);
