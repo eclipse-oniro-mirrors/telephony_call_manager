@@ -14,19 +14,32 @@
  */
 #define private public
 #define protected public
+#include "bluetooth_call.h"
 #include "bluetooth_call_client.h"
+#include "bluetooth_call_connection.h"
 #include "bluetooth_call_manager.h"
 #include "bluetooth_call_service.h"
+#include "bluetooth_call_state.h"
 #include "bluetooth_connection.h"
+#include "call_ability_connect_callback.h"
+#include "call_broadcast_subscriber.h"
+#include "call_connect_ability.h"
+#include "call_incoming_filter_manager.h"
+#include "call_object_manager.h"
+#include "call_request_event_handler_helper.h"
+#include "call_status_policy.h"
+#include "call_superprivacy_control_manager.h"
+#include "call_wired_headset.h"
 #include "common_event_manager.h"
 #include "common_event_support.h"
+#include "fold_status_manager.h"
 #include "gtest/gtest.h"
 #include "ims_call.h"
+#include "ims_conference.h"
+#include "ott_call.h"
 #include "voip_call.h"
 #include "audio_control_manager.h"
 #include "call_state_processor.h"
-#include "fold_status_manager.h"
-#include "bluetooth_call_connection.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -330,6 +343,607 @@ HWTEST_F(ZeroBranch7Test, Telephony_BluetoothCallConnection_001, Function | Medi
     blueToothConnectionPtr->SetHfpContactName("a", "b");
     blueToothConnectionPtr->GetHfpContactName("a");
     EXPECT_TRUE(blueToothConnectionPtr != nullptr);
+}
+
+/**
+ * @tc.number   Telephony_CallWiredHeadSet_001
+ * @tc.name     test key mute press
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch7Test, Telephony_CallWiredHeadSet_001, Function | MediumTest | Level1)
+{
+    auto instance = DelayedSingleton<CallWiredHeadSet>::GetInstance();
+    instance->UnregistKeyMutePressedUp();
+    instance->UnregistKeyMutePressedDown();
+    DelayedSingleton<AudioDeviceManager>::GetInstance()->isWiredHeadsetConnected_ = false;
+    EXPECT_TRUE(instance->RegistKeyMutePressedUp());
+    EXPECT_TRUE(instance->RegistKeyMutePressedDown());
+    instance->downFirstTime_ = 0;
+    instance->isProcessed_ = true;
+    instance->DealKeyMutePressedDown(nullptr);
+    instance->DealKeyMutePressedUp(nullptr);
+    EXPECT_FALSE(instance->isProcessed_);
+    instance->DealKeyMutePressedDown(nullptr);
+    DelayedSingleton<AudioDeviceManager>::GetInstance()->isWiredHeadsetConnected_ = true;
+    instance->DealKeyMutePressedDown(nullptr);
+    EXPECT_NE(instance->downFirstTime_, 0);
+    instance->DealKeyMutePressedUp(nullptr);
+    instance->DealKeyMutePressedDown(nullptr);
+    instance->DealKeyMutePressedDown(nullptr);
+    sleep(WAIT_TIME);
+    instance->DealKeyMutePressedDown(nullptr);
+    EXPECT_TRUE(instance->isProcessed_);
+    instance->DealKeyMutePressedUp(nullptr);
+    instance->UnregistKeyMutePressedUp();
+    instance->UnregistKeyMutePressedDown();
+}
+
+/**
+ * @tc.number   Telephony_CallWiredHeadSet_002
+ * @tc.name     test key mute press
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch7Test, Telephony_CallWiredHeadSet_002, Function | MediumTest | Level1)
+{
+    auto instance = DelayedSingleton<CallWiredHeadSet>::GetInstance();
+    DialParaInfo info;
+    sptr<CallBase> ringingCall = new IMSCall(info);
+    ringingCall->SetCallRunningState(CallRunningState::CALL_RUNNING_STATE_RINGING);
+    ringingCall->SetCallId(0);
+    sptr<CallBase> holdCall = new IMSCall(info);
+    holdCall->SetCallId(1);
+    holdCall->SetCallRunningState(CallRunningState::CALL_RUNNING_STATE_HOLD);
+    sptr<CallBase> activeCall = new IMSCall(info);
+    activeCall->SetCallId(2);
+    activeCall->SetCallRunningState(CallRunningState::CALL_RUNNING_STATE_ACTIVE);
+    sptr<CallBase> alertingCall = new IMSCall(info);
+    activeCall->SetCallId(3);
+    activeCall->SetTelCallState(TelCallState::CALL_STATUS_ALERTING);
+    CallObjectManager::AddOneCallObject(ringingCall);
+    ringingCall->SetVideoStateType(VideoStateType::TYPE_VOICE);
+    instance->DealKeyMuteShortPressed();
+    ringingCall->SetVideoStateType(VideoStateType::TYPE_VIDEO);
+    instance->DealKeyMuteShortPressed();
+    ringingCall->SetVideoStateType(VideoStateType::TYPE_SEND_ONLY);
+    instance->DealKeyMuteShortPressed();
+    instance->DealKeyMuteLongPressed();
+    CallObjectManager::DeleteOneCallObject(ringingCall);
+    EXPECT_NE(ringingCall, nullptr);
+    CallObjectManager::AddOneCallObject(alertingCall);
+    alertingCall->SetTelConferenceState(TelConferenceState::TEL_CONFERENCE_IDLE);
+    instance->DealKeyMuteShortPressed();
+    instance->DealKeyMuteLongPressed();
+    alertingCall->SetTelConferenceState(TelConferenceState::TEL_CONFERENCE_ACTIVE);
+    instance->DealKeyMuteLongPressed();
+    CallObjectManager::DeleteOneCallObject(alertingCall);
+    EXPECT_NE(alertingCall, nullptr);
+    CallObjectManager::AddOneCallObject(activeCall);
+    instance->DealKeyMuteShortPressed();
+    CallObjectManager::DeleteOneCallObject(activeCall);
+    CallObjectManager::AddOneCallObject(holdCall);
+    instance->DealKeyMuteShortPressed();
+    CallObjectManager::AddOneCallObject(activeCall);
+    EXPECT_NE(CallObjectManager::GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_HOLD), nullptr);
+    EXPECT_NE(CallObjectManager::GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_ACTIVE), nullptr);
+    instance->DealKeyMuteShortPressed();
+    CallObjectManager::DeleteOneCallObject(holdCall);
+    EXPECT_NE(holdCall, nullptr);
+    CallObjectManager::DeleteOneCallObject(activeCall);
+    EXPECT_NE(activeCall, nullptr);
+    EXPECT_EQ(ringingCall->answerType_, CallAnswerType::CALL_ANSWER_REJECT);
+}
+
+static bool g_receiveUnknownEvent_ = false;
+
+static void UnknownBroadcastStub(const EventFwk::CommonEventData &data)
+{
+    g_receiveUnknownEvent_ = true;
+}
+
+/**
+ * @tc.number   Telephony_CallBroadCastSubscriber_002
+ * @tc.name     test OnReceiveEvent
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch7Test, Telephony_CallBroadCastSubscriber_002, Function | MediumTest | Level1)
+{
+    g_receiveUnknownEvent_ = false;
+    EventFwk::MatchingSkills matchingSkills;
+    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
+    std::shared_ptr<CallBroadcastSubscriber> subscriberPtr = std::make_shared<CallBroadcastSubscriber>(subscriberInfo);
+    subscriberPtr->memberFuncMap_[CallBroadcastSubscriber::UNKNOWN_BROADCAST_EVENT] =
+        [](const EventFwk::CommonEventData &data) { UnknownBroadcastStub(data); };
+    EventFwk::CommonEventData data;
+    OHOS::EventFwk::Want want;
+    want.SetAction(EventFwk::CommonEventSupport::COMMON_EVENT_SIM_STATE_CHANGED);
+    data.SetWant(want);
+    subscriberPtr->OnReceiveEvent(data);
+    want.SetAction("event.custom.contacts.PAGE_STATE_CHANGE");
+    data.SetWant(want);
+    subscriberPtr->OnReceiveEvent(data);
+    want.SetAction("usual.event.thermal.satcomm.HIGH_TEMP_LEVEL");
+    data.SetWant(want);
+    subscriberPtr->OnReceiveEvent(data);
+    want.SetAction("usual.event.SUPER_PRIVACY_MODE");
+    data.SetWant(want);
+    subscriberPtr->OnReceiveEvent(data);
+    want.SetAction("usual.event.HSDR_EVENT");
+    data.SetWant(want);
+    subscriberPtr->OnReceiveEvent(data);
+    want.SetAction(EventFwk::CommonEventSupport::COMMON_EVENT_BLUETOOTH_REMOTEDEVICE_NAME_UPDATE);
+    data.SetWant(want);
+    subscriberPtr->OnReceiveEvent(data);
+    want.SetAction(EventFwk::CommonEventSupport::COMMON_EVENT_USER_SWITCHED);
+    data.SetWant(want);
+    subscriberPtr->OnReceiveEvent(data);
+    want.SetAction(EventFwk::CommonEventSupport::COMMON_EVENT_SHUTDOWN);
+    data.SetWant(want);
+    subscriberPtr->OnReceiveEvent(data);
+    want.SetAction(EventFwk::CommonEventSupport::COMMON_EVENT_SCREEN_UNLOCKED);
+    data.SetWant(want);
+    subscriberPtr->OnReceiveEvent(data);
+    want.SetAction("usual.event.bluetooth.CONNECT_HFP_HF");
+    data.SetWant(want);
+    subscriberPtr->OnReceiveEvent(data);
+    want.SetAction("unknown.event");
+    data.SetWant(want);
+    subscriberPtr->OnReceiveEvent(data);
+    subscriberPtr->memberFuncMap_.clear();
+    subscriberPtr->OnReceiveEvent(data);
+    EXPECT_TRUE(g_receiveUnknownEvent_);
+}
+
+/**
+ * @tc.number   Telephony_CallBroadCastSubscriber_003
+ * @tc.name     test ConnectCallUiSuperPrivacyMoeBroadcast
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch7Test, Telephony_CallBroadCastSubscriber_003, Function | MediumTest | Level1)
+{
+    EventFwk::MatchingSkills matchingSkills;
+    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
+    std::shared_ptr<CallBroadcastSubscriber> subscriberPtr = std::make_shared<CallBroadcastSubscriber>(subscriberInfo);
+    EventFwk::CommonEventData data;
+    OHOS::EventFwk::Want want;
+    want.SetAction("usual.event.SUPER_PRIVACY_MODE");
+    want.SetParam("isInCall", false);
+    want.SetParem("isHangup", true);
+    data.SetWant(want);
+    DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance()->SetIsChangeSuperPrivacyMode(false);
+    subscriberPtr->OnReceiveEvent(data);
+    EXPECT_TRUE(DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance()->GetIsChangeSuperPrivacyMode());
+    want.SetParam("isInCall", true);
+    want.SetParem("isHangup", false);
+    want.SetParam("isAnswer", true);
+    data.SetWant(want);
+    DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance()->SetIsChangeSuperPrivacyMode(false);
+    subscriberPtr->OnReceiveEvent(data);
+    want.SetParam("isInCall", true);
+    want.SetParam("isHangup", true);
+    data.SetWant(want);
+    subscriberPtr->OnReceiveEvent(data);
+    EXPECT_TRUE(DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance()->GetIsChangeSuperPrivacyMode());
+}
+
+/**
+ * @tc.number   Telephony_CallBroadCastSubscriber_004
+ * @tc.name     test HfpConnectBroadcast
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch7Test, Telephony_CallBroadCastSubscriber_004, Function | MediumTest | Level1)
+{
+    EventFwk::MatchingSkills matchingSkills;
+    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
+    std::shared_ptr<CallBroadcastSubscriber> subscriberPtr = std::make_shared<CallBroadcastSubscriber>(subscriberInfo);
+    EventFwk::CommonEventData data;
+    OHOS::EventFwk::Want want;
+    want.SetAction("usual.event.bluetooth.CONNECT_HFP_HF");
+    std::string contact = "contact";
+    std::string phoneNumber = "123456";
+    want.SetParam("contact", contact);
+    want.SetParam("phoneNumber", phoneNumber);
+    data.SetWant(want);
+    subscriberPtr->OnReceiveEvent(data);
+    DialParaInfo info;
+    sptr<CallBase> alertingCall = new IMSCall(info);
+    alertingCall->SetTelCallState(TelCallState::CALL_STATUS_ALERTING);
+    CallObjectManager::AddOneCallObject(alertingCall);
+    subscriberPtr->OnReceiveEvent(data);
+    alertingCall->SetAccountNumber(phoneNumber);
+    subscriberPtr->OnReceiveEvent(data);
+    EXPECT_EQ(DelayedSingleton<BluetoothCallConnection>::GetInstance()->hfpPhoneNumber_, phoneNumber);
+    EXPECT_EQ(DelayedSingleton<BluetoothCallConnection>::GetInstance()->hfpContactName_, contact);
+    CallObjectManager::DeleteOneCallObject(alertingCall);
+}
+
+/**
+ * @tc.number   Telephony_BluetoothCallState_001
+ * @tc.name     test OnConnectionStateChanged & OnScoStateChanged
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch7Test, Telephony_BluetoothCallState_001, Function | MediumTest | Level1)
+{
+    auto bluetoothCallState = std::make_shared<BluetoothCallState>();
+    Bluetooth::BluetoothRemoteDevice device("macAddress");
+    bluetoothCallState->OnConnectionStateChanged(device,
+        static_cast<int32_t>(Bluetooth::BTConnectState::CONNECTED), 0);
+    EXPECT_TRUE(DelayedSingleton<BluetoothCallConnection>::GetInstance()->isHfpConnected);
+    DelayedSingleton<BluetoothCallConnection>::GetInstance()->hfpPhoneNumber_ = "123";
+    DelayedSingleton<BluetoothCallConnection>::GetInstance()->hfpContactName_ = "456";
+    bluetoothCallState->OnConnectionStateChanged(device,
+        static_cast<int32_t>(Bluetooth::BTConnectState::DISCONNECTED), 0);
+    EXPECT_EQ(DelayedSingleton<BluetoothCallConnection>::GetInstance()->hfpPhoneNumber_, "");
+    EXPECT_EQ(DelayedSingleton<BluetoothCallConnection>::GetInstance()->hfpContactName_, "");
+    bluetoothCallState->OnConnectionStateChanged(device, 1111111, 0);
+    EXPECT_FALSE(DelayedSingleton<BluetoothCallConnection>::GetInstance()->isHfpConnected);
+    bluetoothCallState->OnScoStateChanged(device, static_cast<int32_t>(Bluetooth::HfpScoConnectState::SCO_CONNECTED));
+    EXPECT_TRUE(DelayedSingleton<BluetoothCallConnection>::GetInstance()->isBtCallScoConnected_);
+    bluetoothCallState->OnScoStateChanged(device,
+        static_cast<int32_t>(Bluetooth::HfpScoConnectState::SCO_DISCONNECTED));
+    EXPECT_FALSE(DelayedSingleton<BluetoothCallConnection>::GetInstance()->isBtCallScoConnected_);
+}
+
+/**
+ * @tc.number   Telephony_BluetoothCall_001
+ * @tc.name     test bluetoothCall
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch7Test, Telephony_BluetoothCall_001, Function | MediumTest | Level1)
+{
+    DialParaInfo info;
+    EXPECT_TRUE(std::make_shared<BluetoothCall>(info, "")->macAddress_.empty());
+    AppExecFwk::PacMap extras;
+    EXPECT_TRUE(std::make_shared<BluetoothCall>(info, extras, "")->macAddress_.empty());
+    EXPECT_FALSE(std::make_shared<BluetoothCall>(info, "macAddress")->macAddress_.empty());
+    EXPECT_FALSE(std::make_shared<BluetoothCall>(info, extras, "macAddress")->macAddress_.empty());
+    EXPECT_GT(std::make_shared<BluetoothCall>(info, "")->AnswerCall(0), TELEPHONY_ERROR);
+    EXPECT_GT(std::make_shared<BluetoothCall>(info, "")->RejectCall(), TELEPHONY_ERROR);
+    EXPECT_GT(std::make_shared<BluetoothCall>(info, "")->HangUpCall(), TELEPHONY_ERROR);
+    EXPECT_GT(std::make_shared<BluetoothCall>(info, "")->StartDtmf('0'), TELEPHONY_ERROR);
+    EXPECT_GT(std::make_shared<BluetoothCall>(info, "macAddress")->AnswerCall(0), TELEPHONY_ERROR);
+    EXPECT_GT(std::make_shared<BluetoothCall>(info, "macAddress")->RejectCall(), TELEPHONY_ERROR);
+    EXPECT_GT(std::make_shared<BluetoothCall>(info, "macAddress")->HangUpCall(), TELEPHONY_ERROR);
+    EXPECT_GT(std::make_shared<BluetoothCall>(info, "macAddress")->StartDtmf('0'), TELEPHONY_ERROR);
+}
+
+class MockRemoteObject : public IRemoteObject {
+public:
+    explicit MockRemoteObject() : IRemoteObject(u"default") {}
+
+    int SendRequest(uint32_t code, MessageParcel &data, MessageParcel &reply, MessageOption &option)
+    {
+        return 0;
+    }
+
+    int32_t GetObjectRefCount()
+    {
+        return 0;
+    }
+
+    bool AddDeathRecipient(const sptr<DeathRecipient> &recipient)
+    {
+        return true;
+    }
+
+    bool RemoveDeathRecipient(const sptr<DeathRecipient> &recipient)
+    {
+        return true;
+    }
+
+    bool IsObjectDead() const
+    {
+        return false;
+    }
+
+    int Dump(int fd, const std::vector<std::u16string> &args)
+    {
+        return 0;
+    }
+};
+
+/**
+ * @tc.number   Telephony_CallAbilityConnectCallback_001
+ * @tc.name     test CallAbilityConnectCallback
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch7Test, Telephony_CallAbilityConnectCallback_001, Function | MediumTest | Level1)
+{
+    sptr<IRemoteObject> remoteObject = new MockRemoteObject();
+    auto callback = std::make_shared<CallAbilityConnectCallback>();
+    AppExecFwk::ElementName element;
+    callback->OnAbilityConnectDone(element, remoteObject, -1);
+    DelayedSingleton<CallConnectAbility>::GetInstance()->SetConnectFlag(true);
+    CallObjectManager::callObjectPtrList_.clear();
+    DialParaInfo info;
+    sptr<CallBase> call0 = new IMSCall(info);
+    call0->SetCallId(0);
+    call0->SetTelCallState(TelCallState::CALL_STATUS_DISCONNECTING);
+    sptr<CallBase> call1 = new IMSCall(info);
+    call1->SetCallId(1);
+    call1->SetTelCallState(TelCallState::CALL_STATUS_DISCONNECTED);
+    sptr<CallBase> call2 = new IMSCall(info);
+    call2->SetCallId(2);
+    call2->SetTelCallState(TelCallState::CALL_STATUS_UNKNOWN);
+    sptr<CallBase> call3 = new IMSCall(info);
+    call3->SetCallId(3);
+    call3->SetTelCallState(TelCallState::CALL_STATUS_IDLE);
+    CallObjectManager::AddOneCallObject(call0);
+    CallObjectManager::AddOneCallObject(call1);
+    CallObjectManager::AddOneCallObject(call2);
+    CallObjectManager::AddOneCallObject(call3);
+    callback->OnAbilityDisconnectDone(element, -1);
+    EXPECT_FALSE(DelayedSingleton<CallConnectAbility>::GetInstance()->GetConnectFlag());
+    CallObjectManager::callObjectPtrList_.clear();
+}
+
+/**
+ * @tc.number   Telephony_CallStatusPolicy_001
+ * @tc.name     test CallStatusPolicy
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch7Test, Telephony_CallStatusPolicy_001, Function | MediumTest | Level1)
+{
+    CellularCallInfo callInfo;
+    CallDetailInfo detaiInfo;
+    EXPECT_EQ(std::make_shared<CallIncomingFilterManager>()->PackCellularCallInfo(callInfo, detaiInfo),
+        TELEPHONY_SUCCESS);
+    DialParaInfo info;
+    sptr<CallBase> call = new IMSCall(info);
+    call->SetCallId(0);
+    call->SetAccountNumber("111");
+    strcpy_s(detaiInfo.phoneNum, kMaxNumberLen, "111");
+    CallObjectManager::AddOneCallObject(call);
+    EXPECT_EQ(std::make_shared<CallStatusPolicy>()->DialingHandlePolicy(detaiInfo), CALL_ERR_CALL_ALREADY_EXISTS);
+    CallObjectManager::DeleteOneCallObject(call);
+    DelayedSingleton<CallControlManager>::GetInstance()->VoIPCallState_ = CallStateToApp::CALL_STATE_IDLE;
+    EXPECT_EQ(std::make_shared<CallStatusPolicy>()->FilterResultsDispose(call), TELEPHONY_SUCCESS);
+    DelayedSingleton<CallControlManager>::GetInstance()->VoIPCallState_ = CallStateToApp::CALL_STATE_RINGING;
+    EXPECT_GT(std::make_shared<CallStatusPolicy>()->FilterResultsDispose(call), TELEPHONY_ERROR);
+    for (int32_t i = 1; i < 31; i++) {
+        sptr<CallBase> tempCall = new IMSCall(info);
+        tempCall->SetCallId(i);
+        tempCall->SetCallRunningState(CallRunningState::CALL_RUNNING_STATE_RINGING);
+        CallObjectManager::AddOneCallObject(tempCall);
+    }
+    EXPECT_GT(std::make_shared<CallStatusPolicy>()->FilterResultsDispose(call), TELEPHONY_ERROR);
+    CallObjectManager::callObjectPtrList_.clear();
+    for (int32_t i = 1; i < 31; i++) {
+        sptr<CallBase> tempCall = new IMSCall(info);
+        tempCall->SetCallId(i);
+        tempCall->SetCallRunningState(CallRunningState::CALL_RUNNING_STATE_ACTIVE);
+        CallObjectManager::AddOneCallObject(tempCall);
+    }
+    EXPECT_GT(std::make_shared<CallStatusPolicy>()->FilterResultsDispose(call), TELEPHONY_ERROR);
+    CallObjectManager::callObjectPtrList_.clear();
+}
+
+/**
+ * @tc.number   Telephony_IMSCall_001
+ * @tc.name     test IMSCall
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch7Test, Telephony_IMSCall_001, Function | MediumTest | Level1)
+{
+    DialParaInfo info;
+    std::shared_ptr<IMSCall> call = std::make_shared<IMSCall>(info);
+    for (int16_t i = 0; i < kMaxNumberLen; i++) {
+        call->accountNumber_ += "1";
+    }
+    std::u16string msg = u"";
+    EXPECT_EQ(call->StartRtt(msg), CALL_ERR_NUMBER_OUT_OF_RANGE);
+    EXPECT_EQ(call->StopRtt(), CALL_ERR_NUMBER_OUT_OF_RANGE);
+    EXPECT_EQ(call->SendUpdateCallMediaModeRequest(ImsCallMode::CALL_MODE_AUDIO_ONLY), CALL_ERR_NUMBER_OUT_OF_RANGE);
+    EXPECT_EQ(call->SendUpdateCallMediaModeResponse(ImsCallMode::CALL_MODE_AUDIO_ONLY), CALL_ERR_NUMBER_OUT_OF_RANGE);
+    call->accountNumber_ = "111";
+    EXPECT_GT(call->StartRtt(msg), TELEPHONY_ERROR);
+    EXPECT_GT(call->StopRtt(), TELEPHONY_ERROR);
+    EXPECT_GT(call->SendUpdateCallMediaModeRequest(ImsCallMode::CALL_MODE_AUDIO_ONLY), TELEPHONY_ERROR);
+    EXPECT_GT(call->SendUpdateCallMediaModeResponse(ImsCallMode::CALL_MODE_AUDIO_ONLY), TELEPHONY_ERROR);
+    call->SetCallId(-2);
+    EXPECT_EQ(call->CombineConference(), CALL_ERR_INVALID_CALLID);
+    call->SetCallId(0);
+    DelayedSingleton<ImsConference>::GetInstance()->state_ = ConferenceState::CONFERENCE_STATE_IDLE;
+    EXPECT_NE(call->CombineConference(), CALL_ERR_INVALID_CALLID);
+    EXPECT_EQ(DelayedSingleton<ImsConference>::GetInstance()->state_, ConferenceState::CONFERENCE_STATE_CREATING);
+    EXPECT_NE(call->CombineConference(), CALL_ERR_INVALID_CALLID);
+    call->HandleCombineConferenceFailEvent();
+    EXPECT_GT(call->CanCombineConference(), TELEPHONY_ERROR);
+    EXPECT_GT(call->HoldConference(), TELEPHONY_ERROR);
+    EXPECT_GT(call->LaunchConference(), TELEPHONY_ERROR);
+    EXPECT_GT(call->HoldConference(), TELEPHONY_ERROR);
+    EXPECT_GT(call->ExitConference(), TELEPHONY_ERROR);
+    DelayedSingleton<ImsConference>::GetInstance()->state_ = ConferenceState::CONFERENCE_STATE_IDLE;
+    EXPECT_GT(call->LaunchConference(), TELEPHONY_ERROR);
+    call->SetTelCallState(TelCallState::CALL_STATUS_ACTIVE);
+    EXPECT_GT(call->UpdateImsCallMode(ImsCallMode::CALL_MODE_AUDIO_ONLY), TELEPHONY_ERROR);
+    call->SetTelCallState(TelCallState::CALL_STATUS_INCOMING);
+    EXPECT_FALSE(call->IsSupportVideoCall());
+    EXPECT_FALSE(call->IsVoiceModifyToVideo());
+}
+
+/**
+ * @tc.number   Telephony_CallConnectAbility_001
+ * @tc.name     test CallConnectAbility
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch7Test, Telephony_CallConnectAbility_001, Function | MediumTest | Level1)
+{
+    DelayedSingleton<CallConnectAbility>::GetInstance()->isDisconnecting_ = false;
+    DelayedSingleton<CallConnectAbility>::GetInstance()->isConnected_ = true;
+    DelayedSingleton<CallConnectAbility>::GetInstance()->ConnectAbility();
+    EXPECT_FALSE(DelayedSingleton<CallConnectAbility>::GetInstance()->isConnecting_);
+    DelayedSingleton<CallConnectAbility>::GetInstance()->DisconnectAbility();
+    EXPECT_TRUE(DelayedSingleton<CallConnectAbility>::GetInstance()->isDisconnecting_);
+    DelayedSingleton<CallConnectAbility>::GetInstance()->isConnected_ = false;
+    DelayedSingleton<CallConnectAbility>::GetInstance()->isConnecting_ = true;
+    DelayedSingleton<CallConnectAbility>::GetInstance()->isDisconnecting_ = false;
+    DelayedSingleton<CallConnectAbility>::GetInstance()->SetDisconnectingFlag(false);
+    DelayedSingleton<CallConnectAbility>::GetInstance()->WaitForConnectResult();
+    DelayedSingleton<CallConnectAbility>::GetInstance()->isDisconnecting_ = true;
+    DialParaInfo info;
+    sptr<CallBase> call = new IMSCall(info);
+    CallObjectManager::callObjectPtrList_.clear();
+    CallObjectManager::AddOneCallObject(call);
+    DelayedSingleton<CallConnectAbility>::GetInstance()->SetConnectingFlag(false);
+    EXPECT_FALSE(DelayedSingleton<CallConnectAbility>::GetInstance()->isConnecting_);
+    CallObjectManager::callObjectPtrList_.clear();
+    DelayedSingleton<CallConnectAbility>::GetInstance()->SetConnectingFlag(false);
+}
+
+/**
+ * @tc.number   Telephony_OTTCall_001
+ * @tc.name     test OTTCall
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch7Test, Telephony_OTTCall_001, Function | MediumTest | Level1)
+{
+    DialParaInfo info;
+    std::shared_ptr<OTTCall> call = std::make_shared<OTTCall>(info);
+    for (int16_t i = 0; i < kMaxNumberLen; i++) {
+        call->accountNumber_ += "1";
+    }
+    call->callRunningState_ = CallRunningState::CALL_RUNNING_STATE_RINGING;
+    EXPECT_EQ(call->AnswerCall(0), CALL_ERR_ANSWER_FAILED);
+    EXPECT_EQ(call->RejectCall(), CALL_ERR_REJECT_FAILED);
+    EXPECT_EQ(call->HangUpCall(), CALL_ERR_HANGUP_FAILED);
+    EXPECT_EQ(call->HoldCall(), CALL_ERR_HOLD_FAILED);
+    EXPECT_EQ(call->UnHoldCall(), CALL_ERR_UNHOLD_FAILED);
+    EXPECT_EQ(call->SwitchCall(), CALL_ERR_ANSWER_FAILED);
+    EXPECT_EQ(call->CombineConference(), CALL_ERR_NUMBER_OUT_OF_RANGE);
+    EXPECT_EQ(call->SeparateConference(), CALL_ERR_NUMBER_OUT_OF_RANGE);
+    EXPECT_EQ(call->KickOutConference(), CALL_ERR_NUMBER_OUT_OF_RANGE);
+    call->accountNumber_ = "1111";
+    EXPECT_NE(call->AnswerCall(0), CALL_ERR_NUMBER_OUT_OF_RANGE);
+    EXPECT_NE(call->RejectCall(), CALL_ERR_NUMBER_OUT_OF_RANGE);
+    EXPECT_NE(call->HangUpCall(), CALL_ERR_NUMBER_OUT_OF_RANGE);
+    EXPECT_NE(call->HoldCall(), CALL_ERR_NUMBER_OUT_OF_RANGE);
+    EXPECT_NE(call->UnHoldCall(), CALL_ERR_NUMBER_OUT_OF_RANGE);
+    EXPECT_NE(call->SwitchCall(), CALL_ERR_NUMBER_OUT_OF_RANGE);
+    EXPECT_NE(call->CombineConference(), CALL_ERR_NUMBER_OUT_OF_RANGE);
+    EXPECT_NE(call->SeparateConference(), CALL_ERR_NUMBER_OUT_OF_RANGE);
+    EXPECT_EQ(call->KickOutConference(), CALL_ERR_NUMBER_OUT_OF_RANGE);
+    call->ottCallConnectionPtr_ = nullptr;
+    EXPECT_EQ(call->AnswerCall(0), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(call->CombineConference(), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(call->SeparateConference(), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_EQ(call->KickOutConference(), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    for (int16_t i = 0; i <= kMaxBundleNameLen; i++) {
+        call->bundleName_ += "1";
+    }
+    OttCallRequestInfo requestInfo;
+    EXPECT_EQ(call->PackOttCallRequestInfo(requestInfo), CALL_ERR_NUMBER_OUT_OF_RANGE);
+}
+
+/**
+ * @tc.number   Telephony_CallSuperPrivacyControlManager_001
+ * @tc.name     test CallSuperPrivacyControlManager
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch7Test, Telephony_CallSuperPrivacyControlManager_001, Function | MediumTest | Level1)
+{
+    DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance()->ParamChangeCallback(nullptr, "", nullptr);
+    DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance()->ParamChangeCallback("", nullptr, nullptr);
+    DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance()->ParamChangeCallback(nullptr, nullptr, nullptr);
+    DialParaInfo info;
+    info.isEcc = true;
+    sptr<CallBase> call0 = new IMSCall(info);
+    call0->SetCallId(0);
+    call0->isEccContact_ = false;
+    info.isEcc = true;
+    sptr<CallBase> call1 = new IMSCall(info);
+    call1->SetCallId(1);
+    call1->isEccContact_ = true;
+    info.isEcc = false;
+    sptr<CallBase> call2 = new IMSCall(info);
+    call2->SetCallId(2);
+    call2->isEccContact_ = true;
+    info.isEcc = false;
+    sptr<CallBase> call3 = new IMSCall(info);
+    call3->SetCallId(3);
+    call3->isEccContact_ = false;
+    call3->SetTelCallState(TelCallState::CALL_STATUS_WAITING);
+    sptr<CallBase> call4 = new IMSCall(info);
+    call4->SetCallId(4);
+    call4->isEccContact_ = false;
+    call4->SetTelCallState(TelCallState::CALL_STATUS_INCOMING);
+    sptr<CallBase> call5 = new IMSCall(info);
+    call5->SetCallId(5);
+    call5->isEccContact_ = false;
+    call5->SetTelCallState(TelCallState::CALL_STATUS_DISCONNECTED);
+    CallObjectManager::AddOneCallObject(call0);
+    CallObjectManager::AddOneCallObject(call1);
+    CallObjectManager::AddOneCallObject(call2);
+    CallObjectManager::AddOneCallObject(call3);
+    CallObjectManager::AddOneCallObject(call4);
+    CallObjectManager::AddOneCallObject(call5);
+    DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance()->CloseAllCall();
+    EXPECT_FALSE(DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance()->GetCurrentIsSuperPrivacyMode());
+    CallObjectManager::callObjectPtrList_.clear();
+}
+
+/**
+ * @tc.number   Telephony_CallRequestEventHandlerHelper_001
+ * @tc.name     test CallRequestEventHandlerHelper
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch7Test, Telephony_CallRequestEventHandlerHelper_001, Function | MediumTest | Level1)
+{
+    auto callRequestEventHandler = DelayedSingleton<CallRequestEventHandlerHelper>::GetInstance();
+    callRequestEventHandler->pendingHangupCallId_ = 0;
+    callRequestEventHandler->pendingHangup_ = false;
+    EXPECT_FALSE(callRequestEventHandler->IsPendingHangup());
+    EXPECT_EQ(callRequestEventHandler->GetPendingHangupCallId(), -1);
+    callRequestEventHandler->pendingHangup_ = true;
+    EXPECT_EQ(callRequestEventHandler->GetPendingHangupCallId(), 0);
+}
+
+/**
+ * @tc.number   Telephony_CallBase_001
+ * @tc.name     test CallBase
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch7Test, Telephony_CallBase_001, Function | MediumTest | Level1)
+{
+    DialParaInfo info;
+    sptr<CallBase> call0 = new VoIPCall(info);
+    call0->SetCallId(0);
+    call0->SetCallType(CallType::TYPE_VOIP);
+    CALL0->SetTelCallState(TelCallState::CALL_STATUS_ACTIVE);
+    sptr<CallBase> call1 = new VoIPCall(info);
+    call1->SetCallId(1);
+    call1->SetCallType(CallType::TYPE_VOIP);
+    CALL1->SetTelCallState(TelCallState::CALL_STATUS_INCOMING);
+    sptr<CallBase> call2 = new VoIPCall(info);
+    call2->SetCallId(2);
+    call2->SetCallType(CallType::TYPE_VOIP);
+    CALL2->SetTelCallState(TelCallState::CALL_STATUS_DIALING);
+    sptr<CallBase> call3 = new IMSCall(info);
+    call3->SetCallId(3);
+    call3->SetCallType(CallType::TYPE_IMS);
+    CallObjectManager::AddOneCallObject(call0);
+    CallObjectManager::AddOneCallObject(call1);
+    CallObjectManager::AddOneCallObject(call2);
+    CallObjectManager::AddOneCallObject(call3);
+    call3->HangupVoipCall();
+    call3->conferenceState_ = TelConferenceState::TEL_CONFERENCE_ACTIVE;
+    call3->StateChangesToHolding();
+    EXPECT_EQ(call3->conferenceState_, TelConferenceState::TEL_CONFERENCE_DISCONNECTED);
+    call3->conferenceState_ = TelConferenceState::TEL_CONFERENCE_DISCONNECTING;
+    call3->ringEndTime_ = 0;
+    call3->StateChangesToDisconnected();
+    EXPECT_EQ(call3->conferenceState_, TelConferenceState::TEL_CONFERENCE_DISCONNECTED);
+    call3->conferenceState_ = TelConferenceState::TEL_CONFERENCE_ACTIVE;
+    call3->ringEndTime_ = 0;
+    call3->StateChangesToDisconnected();
+    EXPECT_EQ(call3->conferenceState_, TelConferenceState::TEL_CONFERENCE_DISCONNECTED);
+    call3->conferenceState_ = TelConferenceState::TEL_CONFERENCE_ACTIVE;
+    call3->ringEndTime_ = -1;
+    call3->StateChangesToDisconnecting();
+    EXPECT_EQ(call3->conferenceState_, TelConferenceState::TEL_CONFERENCE_DISCONNECTING);
+    call3->conferenceState_ = TelConferenceState::TEL_CONFERENCE_ACTIVE;
+    call3->StateChangesToDisconnecting();
+    EXPECT_EQ(call3->conferenceState_, TelConferenceState::TEL_CONFERENCE_DISCONNECTING);
+    CallObjectManager::callObjectPtrList_.clear();
 }
 } // namespace Telephony
 } // namespace OHOS
