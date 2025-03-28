@@ -784,7 +784,7 @@ int32_t CallStatusManager::ActiveHandle(const CallDetailInfo &info)
         CreateAndSaveNewCall(info, CallDirection::CALL_DIRECTION_UNKNOW);
         call = GetOneCallObjectByIndexSlotIdAndCallType(info.index, info.accountId, info.callType);
     }
-    if (call == nullptr) {
+    if (call == nullptr && !RefreshDialingStateByOtherState(call, info)) {
         TELEPHONY_LOGE("Call is NULL");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
@@ -1000,7 +1000,7 @@ int32_t CallStatusManager::AlertHandle(const CallDetailInfo &info)
         CreateAndSaveNewCall(info, CallDirection::CALL_DIRECTION_OUT);
         call = GetOneCallObjectByIndexSlotIdAndCallType(info.index, info.accountId, info.callType);
     }
-    if (call == nullptr) {
+    if (call == nullptr && !RefreshDialingStateByOtherState(call, info)) {
         TELEPHONY_LOGE("Call is NULL");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
@@ -1069,7 +1069,8 @@ int32_t CallStatusManager::DisconnectedHandle(const CallDetailInfo &info)
     }
     std::string tmpStr(info.phoneNum);
     sptr<CallBase> call = GetOneCallObjectByIndexSlotIdAndCallType(info.index, info.accountId, info.callType);
-    if (call == nullptr) {
+    if (call == nullptr && !RefreshDialingStateByOtherState(call, info)) {
+        TELEPHONY_LOGE("Call is Null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     StopAntiFraudDetect(call, info);
@@ -2326,6 +2327,24 @@ void CallStatusManager::StartOutGoingCallMotionRecognition()
         TELEPHONY_LOGI("LoadMotionSensor success");
         MotionRecogntion::SubscribeCloseToEarSensor();
     }
+}
+
+bool CallStatusManager::RefreshDialingStateByOtherState(sptr<CallBase> &call, const CallDetailInfo &info)
+{
+    sptr<CallBase> initCall = GetOneCallObjectByIndex(INIT_INDEX);
+    if (initCall == nullptr) {
+        TELEPHONY_LOGE("initCall is nullptr!");
+        return false;
+    }
+    DialingHandle(info);
+    HandleDsdaInfo(info.accountId);
+    DelayedSingleton<BluetoothCallService>::GetInstance()->GetCallState();
+    call = GetOneCallObjectByIndexSlotIdAndCallType(info.index, info.accountId, info.callType);
+    if (call == nullptr) {
+        TELEPHONY_LOGE("after recalling dialingHandle, call still is nullptr!");
+        return false;
+    }
+    return true;
 }
 } // namespace Telephony
 } // namespace OHOS
