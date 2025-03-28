@@ -1070,7 +1070,6 @@ int32_t CallStatusManager::DisconnectedHandle(const CallDetailInfo &info)
     std::string tmpStr(info.phoneNum);
     sptr<CallBase> call = GetOneCallObjectByIndexSlotIdAndCallType(info.index, info.accountId, info.callType);
     if (call == nullptr && !RefreshDialingStateByOtherState(call, info)) {
-        TELEPHONY_LOGE("Call is Null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     StopAntiFraudDetect(call, info);
@@ -1100,8 +1099,7 @@ int32_t CallStatusManager::DisconnectedHandle(const CallDetailInfo &info)
             UpdateCallState(leftOneConferenceCall, leftOneConferenceCall->GetTelCallState());
         }
     }
-    int32_t currentCallNum = CallObjectManager::GetCurrentCallNum();
-    if (currentCallNum <= 0) {
+    if (CallObjectManager::GetCurrentCallNum() <= 0) {
         DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance()->RestoreSuperPrivacyMode();
     }
 #ifdef NOT_SUPPORT_MULTICALL

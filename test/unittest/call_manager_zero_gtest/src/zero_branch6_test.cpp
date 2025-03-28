@@ -262,7 +262,7 @@ HWTEST_F(ZeroBranch5Test, Telephony_CallStatusManager_004, Function | MediumTest
     callStatusManager->Init();
     CallObjectManager::callObjectPtrList_.clear();
     CallDetailInfo info;
-    info.state = TelCallState::CALL_STATE_DIALING;
+    info.state = TelCallState::CALL_STATUS_DIALING;
     info.callType = CallType::TYPE_IMS;
     info.index = 0;
     std::string number = "10086";
@@ -287,7 +287,7 @@ HWTEST_F(ZeroBranch5Test, Telephony_CallStatusManager_004, Function | MediumTest
     callStatusManager->Init();
     CallObjectManager::callObjectPtrList_.clear();
     CallDetailInfo info;
-    info.state = TelCallState::CALL_STATE_DIALING;
+    info.state = TelCallState::CALL_STATUS_DIALING;
     info.callType = CallType::TYPE_IMS;
     info.index = 0;
     std::string number = "10086";
@@ -312,7 +312,7 @@ HWTEST_F(ZeroBranch5Test, Telephony_CallStatusManager_004, Function | MediumTest
     callStatusManager->Init();
     CallObjectManager::callObjectPtrList_.clear();
     CallDetailInfo info;
-    info.state = TelCallState::CALL_STATE_DIALING;
+    info.state = TelCallState::CALL_STATUS_DIALING;
     info.callType = CallType::TYPE_IMS;
     info.index = 0;
     std::string number = "10086";
