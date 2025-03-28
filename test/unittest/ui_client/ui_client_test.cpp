@@ -1003,11 +1003,11 @@ void ControlCamera()
     std::cout << "please input cameraId(1~3):" << std::endl;
     std::string cameraId = "";
     std::cin >> cameraId;
-    std::u16string CameraID;
-    CameraID.clear();
-    CameraID = Str8ToStr16(cameraId);
+    std::u16string u16CameraId;
+    u16CameraId.clear();
+    u16CameraId = Str8ToStr16(cameraId);
 
-    int32_t ret = g_clientPtr->ControlCamera(callId, CameraID);
+    int32_t ret = g_clientPtr->ControlCamera(callId, u16CameraId);
     std::cout << "return value:" << ret << std::endl;
 
     std::cout << "ControlCamera done" << std::endl;
@@ -1103,20 +1103,20 @@ void SetPausePicture()
 void SetDeviceDirection()
 {
     AccessToken token;
-    const int32_t DeviceDirectionError1 = 50;
-    const int32_t DeviceDirectionError2 = 350;
-    const int32_t DeviceDirection90 = 90;
+    const int32_t deviceDirectionError1 = 50;
+    const int32_t deviceDirectionError2 = 350;
+    const int32_t deviceDirection90 = 90;
     std::cout << "------SetDeviceDirection test------" << std::endl;
     std::cout << "please input callId:" << std::endl;
     int32_t callId = DEFAULT_CALL_ID;
     std::cin >> callId;
-    int32_t ret = g_clientPtr->SetDeviceDirection(callId, DeviceDirectionError1);
+    int32_t ret = g_clientPtr->SetDeviceDirection(callId, deviceDirectionError1);
     std::cout << "\n return value:" << ret << std::endl;
 
-    ret = g_clientPtr->SetDeviceDirection(callId, DeviceDirectionError2);
+    ret = g_clientPtr->SetDeviceDirection(callId, deviceDirectionError2);
     std::cout << "\n return value:" << ret << std::endl;
 
-    ret = g_clientPtr->SetDeviceDirection(callId, DeviceDirection90);
+    ret = g_clientPtr->SetDeviceDirection(callId, deviceDirection90);
     std::cout << "\n return value:" << ret << std::endl;
     std::cout << "SetDeviceDirection done" << std::endl;
 }
@@ -1719,7 +1719,7 @@ void PrintfUsage()
     std::cout << "1000:exit\n";
 }
 
-int32_t mainExit()
+int32_t MainExit()
 {
     if (OHOS::Telephony::g_clientPtr == nullptr) {
         std::cout << "g_clientPtr is nullptr" << std::endl;
@@ -1767,7 +1767,7 @@ int32_t RunTest()
         }
         std::cout << "err: invalid input!" << std::endl;
     }
-    return mainExit();
+    return MainExit();
 }
 } // namespace Telephony
 } // namespace OHOS
@@ -1785,7 +1785,7 @@ int32_t main()
         switch (code) {
             case static_cast<int32_t>(OHOS::Telephony::CallManagerInterfaceType::INTERFACE_CALL_MANAGER_TYPE):
                 OHOS::Telephony::RunTest();
-                OHOS::Telephony::mainExit();
+                OHOS::Telephony::MainExit();
                 break;
             case static_cast<int32_t>(OHOS::Telephony::CallManagerInterfaceType::INTERFACE_BLUETOOTH_CALL_TYPE): {
                 std::unique_ptr<OHOS::Telephony::BluetoothCallTest> testPtr =
