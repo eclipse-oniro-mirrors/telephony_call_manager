@@ -251,6 +251,78 @@ HWTEST_F(ZeroBranch5Test, Telephony_CallStatusManager_004, Function | MediumTest
 }
 
 /**
+ * @tc.number   Telephony_CallStatusManager_005
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+ HWTEST_F(ZeroBranch5Test, Telephony_CallStatusManager_005, Function | MediumTest | Level3)
+{
+    std::shared_ptr<CallStatusManager> callStatusManager = std::make_shared<CallStatusManager>();
+    ASSERT_TRUE(callStatusManager != nullptr);
+    callStatusManager->Init();
+    CallObjectManager::callObjectPtrList_.clear();
+    CallDetailInfo info;
+    info.state = TelCallState::CALL_STATUS_DIALING;
+    info.callType = CallType::TYPE_IMS;
+    info.index = 0;
+    std::string number = "10086";
+    memcpy_s(&info.phoneNum, kMaxNumberLen, number.c_str(), number.length());
+    EXPECT_NE(callStatusManager->HandleCallReportInfo(info), TELEPHONY_SUCCESS);
+    info.index = 1;
+    info.state = TelCallState::CALL_STATUS_ALERTING;
+    callStatusManager->HandleCallReportInfo(info);
+    info.state = TelCallState::CALL_STATUS_DISCONNECTED;
+    callStatusManager->HandleCallReportInfo(info);
+}
+
+/**
+ * @tc.number   Telephony_CallStatusManager_006
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+ HWTEST_F(ZeroBranch5Test, Telephony_CallStatusManager_006, Function | MediumTest | Level3)
+{
+    std::shared_ptr<CallStatusManager> callStatusManager = std::make_shared<CallStatusManager>();
+    ASSERT_TRUE(callStatusManager != nullptr);
+    callStatusManager->Init();
+    CallObjectManager::callObjectPtrList_.clear();
+    CallDetailInfo info;
+    info.state = TelCallState::CALL_STATUS_DIALING;
+    info.callType = CallType::TYPE_IMS;
+    info.index = 0;
+    std::string number = "10086";
+    memcpy_s(&info.phoneNum, kMaxNumberLen, number.c_str(), number.length());
+    EXPECT_NE(callStatusManager->HandleCallReportInfo(info), TELEPHONY_SUCCESS);
+    info.index = 1;
+    info.state = TelCallState::CALL_STATUS_ACTIVE;
+    callStatusManager->HandleCallReportInfo(info);
+    info.state = TelCallState::CALL_STATUS_DISCONNECTED;
+    callStatusManager->HandleCallReportInfo(info);
+}
+
+/**
+ * @tc.number   Telephony_CallStatusManager_007
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+ HWTEST_F(ZeroBranch5Test, Telephony_CallStatusManager_007, Function | MediumTest | Level3)
+{
+    std::shared_ptr<CallStatusManager> callStatusManager = std::make_shared<CallStatusManager>();
+    ASSERT_TRUE(callStatusManager != nullptr);
+    callStatusManager->Init();
+    CallObjectManager::callObjectPtrList_.clear();
+    CallDetailInfo info;
+    info.state = TelCallState::CALL_STATUS_DIALING;
+    info.callType = CallType::TYPE_IMS;
+    info.index = 0;
+    std::string number = "10086";
+    memcpy_s(&info.phoneNum, kMaxNumberLen, number.c_str(), number.length());
+    EXPECT_NE(callStatusManager->HandleCallReportInfo(info), TELEPHONY_SUCCESS);
+    info.index = 1;
+    info.state = TelCallState::CALL_STATUS_DISCONNECTED;
+    callStatusManager->HandleCallReportInfo(info);
+}
+/**
  * @tc.number   Telephony_IncomingCallWakeup_001
  * @tc.name     test error branch
  * @tc.desc     Function test
