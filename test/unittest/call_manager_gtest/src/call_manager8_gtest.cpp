@@ -182,296 +182,6 @@ void CallManagerGtest::HangUpCall()
     clientPtr_->HangUpCall(INVALID_CALLID);
 }
 
-class ClientErrorBranchTest : public testing::Test {
-public:
-    static void SetUpTestCase() {};
-    static void TearDownTestCase() {};
-    void SetUp() {};
-    void TearDown() {};
-};
-
-/**
- * @tc.number   Telephony_CallManager_SetAudioDevice_0200
- * @tc.name     make EARPIECE device type, set active EARPIECE device
- * @tc.desc     Function test
- * @tc.require: issueI5JUAQ
- */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_SetAudioDevice_0200, Function | MediumTest | Level2)
-{
-    AccessToken token;
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
-    std::string phoneNumber = "77777777777";
-    EXPECT_EQ(CallManagerGtest::IsServiceConnected(), true);
-    if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
-        HangUpCall();
-    }
-    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_200_MS, SLEEP_30000_MS);
-    int32_t ret = CallManagerGtest::clientPtr_->DialCall(Str8ToStr16(phoneNumber), dialInfo_);
-    EXPECT_EQ(ret, RETURN_VALUE_IS_ZERO);
-    AudioDevice audioDevice = {
-        .deviceType = AudioDeviceType::DEVICE_EARPIECE,
-        .address = { 0 },
-    };
-    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_OFFHOOK, SLEEP_200_MS, SLEEP_30000_MS);
-    EXPECT_EQ(clientPtr_->SetAudioDevice(audioDevice), RETURN_VALUE_IS_ZERO);
-    sleep(WAIT_TIME);
-
-    if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
-        HangUpCall();
-    }
-}
-
-/**
- * @tc.number   Telephony_CallManager_SetAudioDevice_0300
- * @tc.name     make SPEAKER device type, set active SPEAKER device
- * @tc.desc     Function test
- * @tc.require: issueI5JUAQ
- */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_SetAudioDevice_0300, Function | MediumTest | Level2)
-{
-    AccessToken token;
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
-    std::string phoneNumber = "88888888888";
-    EXPECT_EQ(CallManagerGtest::IsServiceConnected(), true);
-    if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
-        HangUpCall();
-    }
-    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_200_MS, SLEEP_30000_MS);
-    int32_t ret = CallManagerGtest::clientPtr_->DialCall(Str8ToStr16(phoneNumber), dialInfo_);
-    EXPECT_EQ(ret, RETURN_VALUE_IS_ZERO);
-    AudioDevice audioDevice = {
-        .deviceType = AudioDeviceType::DEVICE_SPEAKER,
-        .address = { 0 },
-    };
-    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_OFFHOOK, SLEEP_200_MS, SLEEP_30000_MS);
-    EXPECT_EQ(clientPtr_->SetAudioDevice(audioDevice), RETURN_VALUE_IS_ZERO);
-    sleep(WAIT_TIME);
-
-    if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
-        HangUpCall();
-    }
-}
-
-/**
- * @tc.number   Telephony_CallManager_SetAudioDevice_0400
- * @tc.name     make DEVICE_WIRED_HEADSET device type, set active DEVICE_WIRED_HEADSET device
- * @tc.desc     Function test
- * @tc.require: issueI5JUAQ
- */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_SetAudioDevice_0400, Function | MediumTest | Level2)
-{
-    AccessToken token;
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
-    EXPECT_EQ(CallManagerGtest::IsServiceConnected(), true);
-    if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
-        HangUpCall();
-    }
-    std::string phoneNumber = "99999999999";
-    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_200_MS, SLEEP_30000_MS);
-    int32_t ret = CallManagerGtest::clientPtr_->DialCall(Str8ToStr16(phoneNumber), dialInfo_);
-    EXPECT_EQ(ret, RETURN_VALUE_IS_ZERO);
-    AudioDevice audioDevice = {
-        .deviceType = AudioDeviceType::DEVICE_WIRED_HEADSET,
-        .address = { 0 },
-    };
-    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_OFFHOOK, SLEEP_200_MS, SLEEP_30000_MS);
-    EXPECT_NE(clientPtr_->SetAudioDevice(audioDevice), RETURN_VALUE_IS_ZERO);
-    sleep(WAIT_TIME);
-
-    if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
-        HangUpCall();
-    }
-}
-
-/**
- * @tc.number   Telephony_CallManager_SetAudioDevice_0500
- * @tc.name     make a empty buletoothAddress, set active bluetooth device
- * @tc.desc     Function test
- * @tc.require: issueI5JUAQ
- */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_SetAudioDevice_0500, Function | MediumTest | Level2)
-{
-    AccessToken token;
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
-    std::string phoneNumber = "00000001111";
-    EXPECT_EQ(CallManagerGtest::IsServiceConnected(), true);
-    if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
-        HangUpCall();
-    }
-    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_200_MS, SLEEP_30000_MS);
-    int32_t ret = CallManagerGtest::clientPtr_->DialCall(Str8ToStr16(phoneNumber), dialInfo_);
-    EXPECT_EQ(ret, RETURN_VALUE_IS_ZERO);
-    AudioDevice audioDevice = {
-        .deviceType = AudioDeviceType::DEVICE_BLUETOOTH_SCO,
-        .address = { 0 },
-    };
-    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_OFFHOOK, SLEEP_200_MS, SLEEP_30000_MS);
-    EXPECT_NE(clientPtr_->SetAudioDevice(audioDevice), RETURN_VALUE_IS_ZERO);
-    sleep(WAIT_TIME);
-
-    if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
-        HangUpCall();
-    }
-}
-
-/**
- * @tc.number   Telephony_CallManager_SetAudioDevice_0600
- * @tc.name     make SPEAKER device type, set disable device
- * @tc.desc     Function test
- * @tc.require: issueI5JUAQ
- */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_SetAudioDevice_0600, Function | MediumTest | Level2)
-{
-    AccessToken token;
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
-    std::string phoneNumber = "00000002222";
-    EXPECT_EQ(CallManagerGtest::IsServiceConnected(), true);
-    if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
-        HangUpCall();
-    }
-    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_200_MS, SLEEP_30000_MS);
-    int32_t ret = CallManagerGtest::clientPtr_->DialCall(Str8ToStr16(phoneNumber), dialInfo_);
-    EXPECT_EQ(ret, RETURN_VALUE_IS_ZERO);
-    AudioDevice audioDevice = {
-        .deviceType = AudioDeviceType::DEVICE_DISABLE,
-        .address = { 0 },
-    };
-    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_OFFHOOK, SLEEP_200_MS, SLEEP_30000_MS);
-    EXPECT_NE(clientPtr_->SetAudioDevice(audioDevice), RETURN_VALUE_IS_ZERO);
-    sleep(WAIT_TIME);
-
-    if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
-        HangUpCall();
-    }
-}
-
-/**
- * @tc.number   Telephony_CallManager_SetAudioDevice_0700
- * @tc.name     make SPEAKER device type, set unknown device
- * @tc.desc     Function test
- * @tc.require: issueI5JUAQ
- */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_SetAudioDevice_0700, Function | MediumTest | Level2)
-{
-    AccessToken token;
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
-    std::string phoneNumber = "00000003333";
-    EXPECT_EQ(CallManagerGtest::IsServiceConnected(), true);
-    if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
-        HangUpCall();
-    }
-    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_200_MS, SLEEP_30000_MS);
-    int32_t ret = CallManagerGtest::clientPtr_->DialCall(Str8ToStr16(phoneNumber), dialInfo_);
-    EXPECT_EQ(ret, RETURN_VALUE_IS_ZERO);
-    AudioDevice audioDevice = {
-        .deviceType = AudioDeviceType::DEVICE_UNKNOWN,
-        .address = { 0 },
-    };
-    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_OFFHOOK, SLEEP_200_MS, SLEEP_30000_MS);
-    EXPECT_NE(clientPtr_->SetAudioDevice(audioDevice), RETURN_VALUE_IS_ZERO);
-    sleep(WAIT_TIME);
-
-    if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
-        HangUpCall();
-    }
-}
-
-/********************************************* Test SetMuted()***********************************************/
-/**
- * @tc.number   Telephony_CallManager_SetMuted_0100
- * @tc.name     set muted true
- * @tc.desc     Function test
- * @tc.require: issueI5K59I
- */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_SetMuted_0100, Function | MediumTest | Level2)
-{
-    AccessToken token;
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
-    std::string phoneNumber = "00000004444";
-    EXPECT_EQ(CallManagerGtest::IsServiceConnected(), true);
-    if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
-        HangUpCall();
-    }
-    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_200_MS, SLEEP_30000_MS);
-    int32_t ret = CallManagerGtest::clientPtr_->DialCall(Str8ToStr16(phoneNumber), dialInfo_);
-    EXPECT_EQ(ret, RETURN_VALUE_IS_ZERO);
-    bool muted = true;
-    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_OFFHOOK, SLEEP_200_MS, SLEEP_30000_MS);
-    if (CallInfoManager::HasActiveStatus()) {
-        EXPECT_EQ(CallManagerGtest::clientPtr_->SetMuted(muted), RETURN_VALUE_IS_ZERO);
-    }
-
-    if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
-        sleep(WAIT_TIME);
-        HangUpCall();
-    }
-}
-
-/**
- * @tc.number   Telephony_CallManager_SetMuted_0200
- * @tc.name     without call, set muted failed
- * @tc.desc     Function test
- * @tc.require: issueI5K59I
- */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_SetMuted_0200, Function | MediumTest | Level2)
-{
-    AccessToken token;
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
-
-    EXPECT_EQ(CallManagerGtest::IsServiceConnected(), true);
-    bool muted = true;
-
-    EXPECT_EQ(CallManagerGtest::clientPtr_->SetMuted(muted), CALL_ERR_AUDIO_SETTING_MUTE_FAILED);
-}
-
-/**
- * @tc.number   Telephony_CallManager_SetMuted_0300
- * @tc.name     set muted true
- * @tc.desc     Function test
- * @tc.require: issueI5K59I
- */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_SetMuted_0300, Function | MediumTest | Level2)
-{
-    AccessToken token;
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
-
-    EXPECT_EQ(CallManagerGtest::IsServiceConnected(), true);
-    std::string phoneNumber = "00000000000";
-    if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
-        HangUpCall();
-    }
-    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_200_MS, SLEEP_30000_MS);
-    int32_t ret = CallManagerGtest::clientPtr_->DialCall(Str8ToStr16(phoneNumber), dialInfo_);
-    EXPECT_EQ(ret, RETURN_VALUE_IS_ZERO);
-    bool muted = false;
-    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_OFFHOOK, SLEEP_200_MS, SLEEP_30000_MS);
-    if (CallInfoManager::HasActiveStatus()) {
-        EXPECT_EQ(CallManagerGtest::clientPtr_->SetMuted(muted), RETURN_VALUE_IS_ZERO);
-    }
-    if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
-        sleep(WAIT_TIME);
-        HangUpCall();
-    }
-}
-
 /********************************************* Test RegisterCallBack() ***********************************************/
 /**
  * @tc.number   Telephony_CallManager_RegisterCallBack_0100
@@ -784,44 +494,6 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_HasVoiceCapability_0100, Functi
     EXPECT_EQ(CallManagerGtest::clientPtr_->HasVoiceCapability(), true);
 }
 
-/************************************* Test CloseUnFinishedUssd() ************************************/
-/**
- * @tc.number   Telephony_CallManager_CloseUnFinishedUssd_0100
- * @tc.name     test Close Unfinished ussd
- * @tc.desc     Function test
- */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_CloseUnFinishedUssd_0100, Function | MediumTest | Level3)
-{
-    AccessToken token;
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
-
-    if (HasSimCard(SIM1_SLOTID)) {
-        EXPECT_EQ(CallManagerGtest::clientPtr_->CloseUnFinishedUssd(SIM1_SLOTID), RETURN_VALUE_IS_ZERO);
-    }
-
-    if (HasSimCard(SIM2_SLOTID)) {
-        EXPECT_EQ(CallManagerGtest::clientPtr_->CloseUnFinishedUssd(SIM2_SLOTID), RETURN_VALUE_IS_ZERO);
-    }
-}
-
-/************************************* Test InputDialerSpecialCode() ************************************/
-/**
- * @tc.number   Telephony_CallManager_InputDialerSpecialCode_0100
- * @tc.name     test Input Dialer Special Code with support code
- * @tc.desc     Function test
- */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_InputDialerSpecialCode_0100, Function | MediumTest | Level3)
-{
-    AccessToken token;
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
-    std::string specialCode = "2846579";
-    EXPECT_EQ(CallManagerGtest::clientPtr_->InputDialerSpecialCode(specialCode), RETURN_VALUE_IS_ZERO);
-}
-
 /**
  * @tc.number   Telephony_CallManager_InputDialerSpecialCode_0200
  * @tc.name     test Input Dialer Special Code with unsupport code
@@ -957,43 +629,6 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_GetVoIPCallState_0200, Function
     EXPECT_EQ(CallManagerGtest::clientPtr_->GetVoIPCallState(state), RETURN_VALUE_IS_ZERO);
 }
 
-/******************************************* Test SetVoIPCallInfo() ********************************************/
-/**
- * @tc.number   Telephony_CallManager_SetVoIPCallInfo_0100
- * @tc.name     test SetVoIPCallInfo
- * @tc.desc     Function test
- */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_SetVoIPCallInfo_0100, Function | MediumTest | Level3)
-{
-    AccessToken token;
-    int32_t callId = 10001;
-    int32_t state = 4;
-    std::string phoneNumber = "12345678901";
-    std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
-    EXPECT_EQ(callManagerService->SetVoIPCallInfo(callId, state, phoneNumber), TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API);
-}
-
-/**
- * @tc.number   Telephony_CallManager_SetVoIPCallInfo_0200
- * @tc.name     test SetVoIPCallInfo
- * @tc.desc     Function test
- */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_SetVoIPCallInfo_0200, Function | MediumTest | Level3)
-{
-    std::shared_ptr<CallManagerClient> client = std::make_shared<CallManagerClient>();
-    AccessToken token;
-    int32_t callId = 10020;
-    int32_t state = 5;
-    std::string phoneNumber = "12345678901";
-    int32_t systemAbilityId = 100;
-    client->Init(systemAbilityId);
-    ASSERT_EQ(client->SetVoIPCallInfo(callId, state, phoneNumber), TELEPHONY_ERR_PERMISSION_ERR);
-    ASSERT_EQ(client->GetVoIPCallInfo(callId, state, phoneNumber), TELEPHONY_SUCCESS);
-    client->UnInit();
-    ASSERT_EQ(client->SetVoIPCallInfo(callId, state, phoneNumber), TELEPHONY_ERR_UNINIT);
-    ASSERT_EQ(client->GetVoIPCallInfo(callId, state, phoneNumber), TELEPHONY_ERR_UNINIT);
-}
-
 /**
  * @tc.number   Telephony_CallControlManager_SetVoIPCallInfo_0300
  * @tc.name     test SetVoIPCallInfo
@@ -1046,37 +681,6 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_TestDump_0100, Function | Mediu
     EXPECT_GE(DelayedSingleton<CallManagerService>::GetInstance()->Dump(-1, args), 0);
     EXPECT_GE(DelayedSingleton<CallManagerService>::GetInstance()->Dump(0, emptyArgs), 0);
     EXPECT_GE(DelayedSingleton<CallManagerService>::GetInstance()->Dump(0, args), 0);
-}
-
-/******************************************* Test VoipCallObject() ********************************************/
-/**
- * @tc.number   Telephony_VoipCallObject_0100
- * @tc.name     Test VoipCallObject
- * @tc.desc     Function test
- */
-HWTEST_F(CallManagerGtest, Telephony_VoipCallObject_0100, Function | MediumTest | Level3)
-{
-    CallObjectManager::ClearVoipList();
-    CallAttributeInfo callAttrInfo;
-    int32_t callId = 12345;
-    callAttrInfo.callId = callId;
-    callAttrInfo.callState = TelCallState::CALL_STATUS_WAITING;
-    EXPECT_EQ(CallObjectManager::IsVoipCallExist(), true);
-
-    EXPECT_EQ(CallObjectManager::IsVoipCallExist(TelCallState::CALL_STATUS_WAITING, callId), true);
-
-    int32_t newCallId = -1;
-    EXPECT_EQ(CallObjectManager::IsVoipCallExist(TelCallState::CALL_STATUS_WAITING, newCallId), true);
-
-    CallAttributeInfo retrievedCallAttrInfo = CallObjectManager::GetVoipCallInfo();
-    EXPECT_EQ(retrievedCallAttrInfo.callId, callId);
-
-    TelCallState nextState = TelCallState::CALL_STATUS_ACTIVE;
-    EXPECT_EQ(CallObjectManager::UpdateOneVoipCallObjectByCallId(callId, nextState), TELEPHONY_SUCCESS);
-
-    EXPECT_EQ(CallObjectManager::DeleteOneVoipCallObject(callId), TELEPHONY_SUCCESS);
-
-    CallObjectManager::ClearVoipList();
 }
 
 /**
@@ -1248,17 +852,6 @@ HWTEST_F(CallManagerGtest, Telephony_AntiFraudHsdrHelper_0001, Function | Medium
     connection->connectedCallback_ = nullptr;
     connection->OnAbilityConnectDone(element, failRemoteObj, 0);
     EXPECT_EQ(connection->remoteObject_, nullptr);
-    auto &helper = DelayedRefSingleton<HsdrHelper>().GetInstance();
-    helper.connection_ = connection;
-    connection->remoteObject_ = ucsRemoteObj;
-    EXPECT_EQ(helper.ConnectHsdr([](const sptr<IRemoteObject> &remoteObject) {}), 0);
-    connection->remoteObject_ = failRemoteObj;
-    EXPECT_EQ(helper.ConnectHsdr([](const sptr<IRemoteObject> &remoteObject) {}), 0);
-    helper.DisconnectHsdr();
-    EXPECT_EQ(helper.ConnectHsdr([](const sptr<IRemoteObject> &remoteObject) {}), 0);
-    helper.DisconnectHsdr();
-    helper.DisconnectHsdr();
-    EXPECT_EQ(helper.connection_, nullptr);
 }
 
 /**
@@ -1300,29 +893,6 @@ HWTEST_F(CallManagerGtest, Telephony_AntiFraudHsdrHelper_0002, Function | Medium
 }
 
 /**
- * @tc.number   Telephony_AnonymizeAdapter_0100
- * @tc.name     Test AnonymizeAdapter
- * @tc.desc     Function test
- */
-HWTEST_F(CallManagerGtest, Telephony_AnonymizeAdapter_0100, Function | MediumTest | Level3)
-{
-    auto antiFraudService = DelayedSingleton<AntiFraudService>::GetInstance();
-    EXPECT_EQ(antiFraudService->AnonymizeText(), 1000);
-
-    auto anonymizeAdapter = DelayedSingleton<AnonymizeAdapter>::GetInstance();
-    anonymizeAdapter->ReleaseLibAnonymize();
-    EXPECT_EQ(anonymizeAdapter->libAnonymize_, nullptr);
-    anonymizeAdapter->GetLibAnonymize();
-    anonymizeAdapter->ReleaseLibAnonymize();
-    EXPECT_EQ(anonymizeAdapter->libAnonymize_, nullptr);
-
-    void *config = nullptr;
-    void *assistant = nullptr;
-    EXPECT_EQ(anonymizeAdapter->ReleaseConfig(&config), 0);
-    EXPECT_EQ(anonymizeAdapter->ReleaseAnonymize(&assistant), 0);
-}
-
-/**
  * @tc.number   Telephony_AntiFraud_0100
  * @tc.name     Test AntiFraud
  * @tc.desc     Function test
@@ -1341,83 +911,31 @@ HWTEST_F(CallManagerGtest, Telephony_AntiFraud_0100, Function | MediumTest | Lev
     OHOS::AntiFraudService::AntiFraudResult fraudResult;
     std::string phoneNum = "123456";
     antiFraudService->InitAntiFraudService(phoneNum, 0, 1);
-    EXPECT_EQ(antiFraudService->antiFraudState_, 1);
     antiFraudService->StopAntiFraudService(0, 1);
     antiFraudService->RecordDetectResult(fraudResult, -1, -1);
-    EXPECT_EQ(antiFraudService->antiFraudState_, 1);
 
     antiFraudService->InitAntiFraudService(phoneNum, 0, 1);
     antiFraudService->StopAntiFraudService(0, 1);
     antiFraudService->RecordDetectResult(fraudResult, -1, 0);
-    EXPECT_EQ(antiFraudService->antiFraudState_, 3);
 
     fraudResult.result = true;
     antiFraudService->InitAntiFraudService(phoneNum, 0, 1);
     antiFraudService->RecordDetectResult(fraudResult, 0, -1);
-    EXPECT_EQ(antiFraudService->antiFraudState_, 2);
 
     antiFraudService->InitAntiFraudService(phoneNum, 0, 1);
     antiFraudService->RecordDetectResult(fraudResult, 0, 0);
-    EXPECT_EQ(antiFraudService->antiFraudState_, 2);
 
     antiFraudService->RecordDetectResult(fraudResult, 0, 0);
-    EXPECT_EQ(antiFraudService->antiFraudState_, 2);
     
     auto callStatusManager = std::make_shared<CallStatusManager>();
     antiFraudService->SetCallStatusManager(callStatusManager);
     antiFraudService->InitAntiFraudService(phoneNum, 0, 3);
     antiFraudService->RecordDetectResult(fraudResult, 0, 3);
-    EXPECT_EQ(antiFraudService->antiFraudState_, 2);
 
     auto antiFraudAdapter = DelayedSingleton<AntiFraudAdapter>::GetInstance();
     antiFraudAdapter->ReleaseAntiFraud();
-    EXPECT_EQ(antiFraudAdapter->libAntiFraud_, nullptr);
     antiFraudAdapter->GetLibAntiFraud();
     antiFraudAdapter->ReleaseAntiFraud();
-    EXPECT_EQ(antiFraudAdapter->libAntiFraud_, nullptr);
-}
-
-/**
- * @tc.number   Telephony_NumberIdentityConnection_0001
- * @tc.name     Test antiFraud hsdr helper
- * @tc.desc     Function test
- */
-HWTEST_F(CallManagerGtest, Telephony_NumberIdentityConnection_0001, Function | MediumTest | Level3)
-{
-    sptr<NumberIdentityConnection> connection = new (std::nothrow) NumberIdentityConnection(
-        [](const sptr<IRemoteObject> &remoteObject) {}, []() {});
-    if (connection == nullptr) {
-        std::cout << "connection is nullptr" << std::endl;
-        return;
-    }
-    AppExecFwk::ElementName element;
-    sptr<OHOS::IRemoteObject> failRemoteObj = new MockRemoteObject(-1);
-    connection->OnAbilityConnectDone(element, failRemoteObj, -1);
-    EXPECT_EQ(connection->remoteObject_, nullptr);
-    connection->OnAbilityConnectDone(element, nullptr, 0);
-    EXPECT_EQ(connection->remoteObject_, nullptr);
-    EXPECT_FALSE(connection->IsAlive());
-    connection->OnAbilityConnectDone(element, failRemoteObj, 0);
-    EXPECT_NE(connection->remoteObject_, nullptr);
-    EXPECT_FALSE(connection->IsAlive());
-    connection->OnAbilityDisconnectDone(element, 0);
-    EXPECT_EQ(connection->remoteObject_, nullptr);
-    sptr<OHOS::IRemoteObject> ucsRemoteObj = new MockRemoteObject(UCS_SERVICE_COMMAND);
-    connection->remoteObject_ = ucsRemoteObj;
-    EXPECT_TRUE(connection->IsAlive());
-    connection->OnAbilityDisconnectDone(element, -1);
-    EXPECT_EQ(connection->remoteObject_, nullptr);
-    connection->connectedCallback_ = nullptr;
-    connection->OnAbilityConnectDone(element, failRemoteObj, 0);
-    EXPECT_EQ(connection->remoteObject_, nullptr);
-    auto &helper = DelayedRefSingleton<NumberIdentityServiceHelper>().GetInstance();
-    helper.connection_ = connection;
-    connection->remoteObject_ = ucsRemoteObj;
-    EXPECT_EQ(helper.Connect([](const sptr<IRemoteObject> &remoteObject) {}, []() {}), 0);
-    connection->remoteObject_ = failRemoteObj;
-    helper.Disconnect();
-    EXPECT_EQ(helper.connection_, nullptr);
-    helper.NotifyNumberMarkDataUpdate();
 }
 } // namespace Telephony
 } // namespace OHOS

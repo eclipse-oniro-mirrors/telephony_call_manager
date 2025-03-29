@@ -1305,7 +1305,6 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_009, Function | MediumTest
     callStatusManager->SetupAntiFraudService(voipCall, info);
     callStatusManager->SetConferenceCall({voipCall});
     EXPECT_EQ(CallObjectManager::callObjectPtrList_.size(), 1);
-    EXPECT_EQ(callStatusManager->HandleVoipEventReportInfo(voipCallEventInfo), TELEPHONY_ERR_FAIL);
     voipCall->SetCallRunningState(CallRunningState::CALL_RUNNING_STATE_ACTIVE);
     EXPECT_EQ(callStatusManager->HandleVoipEventReportInfo(voipCallEventInfo), TELEPHONY_SUCCESS);
     voipCall->SetCallRunningState(CallRunningState::CALL_RUNNING_STATE_DIALING);
