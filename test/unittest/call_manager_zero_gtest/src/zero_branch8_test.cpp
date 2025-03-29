@@ -317,6 +317,7 @@ HWTEST_F(ZeroBranch7Test, Telephony_FoldStatusManager_001, Function | MediumTest
     }
     foldStatusManagerPtr->RegisterFoldableListener();
     foldStatusManagerPtr->UnregisterFoldableListener();
+    FoldStatusManager::IsSmallFoldDevice();
     FoldStatusManager::FoldStatusListener listenerPtr;
     listenerPtr.OnFoldStatusChanged(Rosen::FoldStatus::UNKNOWN);
     listenerPtr.OnFoldStatusChanged(Rosen::FoldStatus::EXPAND);
