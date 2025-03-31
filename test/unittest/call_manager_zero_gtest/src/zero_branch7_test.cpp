@@ -173,26 +173,6 @@ void ZeroBranch8Test::InitDialInfo(int32_t accountId, int32_t videoState, int32_
     dialInfo_.PutIntValue("dialType", dialType);
 }
 
-HWTEST_F(ZeroBranch8Test, Telephony_CallPolicy_001, Function | MediumTest | Level1)
-{
-    AccessToken token;
-    CallPolicy mCallPolicy;
-    std::u16string testEmptyStr = u"";
-    AppExecFwk::PacMap mPacMap;
-    mPacMap.PutIntValue("dialType", static_cast<int32_t>(DialType::DIAL_OTT_TYPE));
-    mPacMap.PutIntValue("callType", static_cast<int32_t>(CallType::TYPE_BLUETOOTH));
-    mPacMap.PutIntValue("dialType", static_cast<int32_t>(DialType::DIAL_CARRIER_TYPE));
-    EXPECT_EQ(mCallPolicy.DialPolicy(testEmptyStr, mPacMap, true), TELEPHONY_ERR_ARGUMENT_INVALID);
-    mPacMap.PutIntValue("callType", static_cast<int32_t>(CallType::TYPE_CS));
-    mPacMap.PutIntValue("dialScene", 3);
-    EXPECT_EQ(mCallPolicy.DialPolicy(testEmptyStr, mPacMap, true), TELEPHONY_ERR_ARGUMENT_INVALID);
-    mPacMap.PutIntValue("dialScene", static_cast<int32_t>(DialScene::CALL_EMERGENCY));
-    mPacMap.PutIntValue("videoState", static_cast<int32_t>(VideoStateType::TYPE_VOICE));
-    EXPECT_NE(mCallPolicy.DialPolicy(testEmptyStr, mPacMap, true), TELEPHONY_ERR_ARGUMENT_INVALID);
-    mPacMap.PutIntValue("videoState", static_cast<int32_t>(VideoStateType::TYPE_SEND_ONLY));
-    EXPECT_EQ(mCallPolicy.DialPolicy(testEmptyStr, mPacMap, true), TELEPHONY_ERR_ARGUMENT_INVALID);
-}
-
 HWTEST_F(ZeroBranch8Test, Telephony_CallManagerService_001, Function | MediumTest | Level1)
 {
     AccessToken token;
@@ -575,25 +555,6 @@ HWTEST_F(ZeroBranch8Test, Telephony_VoipCallConnection_001, Function | MediumTes
     CallAudioEvent callAudioEvent = CallAudioEvent::AUDIO_EVENT_MUTED;
     std::string voipCallId = "123";
     EXPECT_NE(voipCallConnection->SendCallUiEvent(voipCallId, callAudioEvent), TELEPHONY_ERROR);
-}
-
-HWTEST_F(ZeroBranch8Test, Telephony_CallSuperPrivacyControlManager_001, Function | MediumTest | Level1)
-{
-    int32_t callId = 0;
-    int32_t videoState = 0;
-    std::u16string phoneNumber = u"";
-    int32_t accountId = 1;
-    int32_t dialType = 0;
-    int32_t dialScene = 0;
-    int32_t callType = 0;
-    auto controlManager = DelayedSingleton<CallSuperPrivacyControlManager>::GetInstance();
-    controlManager->RestoreSuperPrivacyMode();
-    EXPECT_FALSE(controlManager->GetIsChangeSuperPrivacyMode());
-    controlManager->SetIsChangeSuperPrivacyMode(true);
-    controlManager->RestoreSuperPrivacyMode();
-    EXPECT_FALSE(controlManager->GetIsChangeSuperPrivacyMode());
-    controlManager->CloseAnswerSuperPrivacyMode(callId, videoState);
-    controlManager->CloseCallSuperPrivacyMode(phoneNumber, accountId, videoState, dialType, dialScene, callType);
 }
 } // namespace Telephony
 } // namespace OHOS

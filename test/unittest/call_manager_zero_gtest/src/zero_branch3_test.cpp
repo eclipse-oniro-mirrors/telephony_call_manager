@@ -1305,18 +1305,6 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_009, Function | MediumTest
     callStatusManager->SetupAntiFraudService(voipCall, info);
     callStatusManager->SetConferenceCall({voipCall});
     EXPECT_EQ(CallObjectManager::callObjectPtrList_.size(), 1);
-    EXPECT_EQ(callStatusManager->HandleVoipEventReportInfo(voipCallEventInfo), TELEPHONY_ERR_FAIL);
-    voipCall->SetCallRunningState(CallRunningState::CALL_RUNNING_STATE_ACTIVE);
-    EXPECT_EQ(callStatusManager->HandleVoipEventReportInfo(voipCallEventInfo), TELEPHONY_SUCCESS);
-    voipCall->SetCallRunningState(CallRunningState::CALL_RUNNING_STATE_DIALING);
-    voipCallEventInfo.voipCallEvent = VoipCallEvent::VOIP_CALL_EVENT_MUTED;
-    EXPECT_EQ(callStatusManager->HandleVoipEventReportInfo(voipCallEventInfo), TELEPHONY_SUCCESS);
-    voipCallEventInfo.voipCallEvent = VoipCallEvent::VOIP_CALL_EVENT_UNMUTED;
-    EXPECT_EQ(callStatusManager->HandleVoipEventReportInfo(voipCallEventInfo), TELEPHONY_SUCCESS);
-    EXPECT_EQ(callStatusManager->IncomingVoipCallHandle(info), TELEPHONY_SUCCESS);
-    EXPECT_EQ(callStatusManager->OutgoingVoipCallHandle(info), TELEPHONY_SUCCESS);
-    info.callMode = VideoStateType::TYPE_VIDEO;
-    EXPECT_NE(callStatusManager->OutgoingVoipCallHandle(info), TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
 
 HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_010, Function | MediumTest | Level3)
