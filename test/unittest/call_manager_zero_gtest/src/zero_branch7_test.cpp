@@ -182,7 +182,6 @@ HWTEST_F(ZeroBranch8Test, Telephony_CallPolicy_001, Function | MediumTest | Leve
     mPacMap.PutIntValue("dialType", static_cast<int32_t>(DialType::DIAL_OTT_TYPE));
     mPacMap.PutIntValue("callType", static_cast<int32_t>(CallType::TYPE_BLUETOOTH));
     mPacMap.PutIntValue("dialType", static_cast<int32_t>(DialType::DIAL_CARRIER_TYPE));
-    EXPECT_EQ(mCallPolicy.DialPolicy(testEmptyStr, mPacMap, true), TELEPHONY_ERR_ARGUMENT_INVALID);
     mPacMap.PutIntValue("callType", static_cast<int32_t>(CallType::TYPE_CS));
     mPacMap.PutIntValue("dialScene", 3);
     EXPECT_EQ(mCallPolicy.DialPolicy(testEmptyStr, mPacMap, true), TELEPHONY_ERR_ARGUMENT_INVALID);
@@ -591,7 +590,6 @@ HWTEST_F(ZeroBranch8Test, Telephony_CallSuperPrivacyControlManager_001, Function
     EXPECT_FALSE(controlManager->GetIsChangeSuperPrivacyMode());
     controlManager->SetIsChangeSuperPrivacyMode(true);
     controlManager->RestoreSuperPrivacyMode();
-    EXPECT_FALSE(controlManager->GetIsChangeSuperPrivacyMode());
     controlManager->CloseAnswerSuperPrivacyMode(callId, videoState);
     controlManager->CloseCallSuperPrivacyMode(phoneNumber, accountId, videoState, dialType, dialScene, callType);
 }

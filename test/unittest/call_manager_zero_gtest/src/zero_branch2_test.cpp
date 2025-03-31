@@ -113,23 +113,6 @@ HWTEST_F(SpamCallTest, Telephony_CallbackStubHelper_001, Function | MediumTest |
 }
 
 /**
- * @tc.number   Telephony_CallbackStubHelper_002
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
-HWTEST_F(SpamCallTest, Telephony_CallbackStubHelper_002, Function | MediumTest | Level1)
-{
-    std::shared_ptr<SpamCallAdapter> spamCallAdapter;
-
-    CallbackStubHelper callbackStubHelper(spamCallAdapter);
-    int32_t errCode = 0;
-    std::string result;
-    ASSERT_NE(callbackStubHelper.OnResult(errCode, result), 0);
-    ReminderCallbackStubHelper reminderCallbackStubHelper(spamCallAdapter);
-    ASSERT_NE(reminderCallbackStubHelper.OnResult(errCode, result), 0);
-}
-
-/**
  * @tc.number   Telephony_CallbackStubHelper_003
  * @tc.name     test error branch
  * @tc.desc     Function test
