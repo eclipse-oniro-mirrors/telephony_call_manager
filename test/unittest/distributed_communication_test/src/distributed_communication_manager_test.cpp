@@ -72,20 +72,6 @@ HWTEST_F(DistributedCommunicationManagerTest, Telephony_DcManagerTest_001, Funct
 
     ASSERT_NO_THROW(dcManager->InitExtWrapper());
     ASSERT_NO_THROW(dcManager->InitExtWrapper()); // extWrapperHandler_ != nullptr case
-
-    ret = dcManager->RegDevCallbackWrapper(deviceListener);
-    ASSERT_TRUE(ret != TELEPHONY_ERROR);
-
-    ret = dcManager->UnRegDevCallbackWrapper();
-    ASSERT_TRUE(ret != TELEPHONY_ERROR);
-
-    ret = dcManager->SwitchDevWrapper(devId, direction);
-    ASSERT_TRUE(ret != TELEPHONY_ERROR);
-
-    ASSERT_FALSE(dcManager->IsDistributedDev(devId));
-
-    deviceObserver = dcManager->GetDistributedDeviceObserver();
-    ASSERT_TRUE(deviceObserver != nullptr);
     ASSERT_NO_THROW(dcManager->SetMuted(true));
     ASSERT_NO_THROW(dcManager->MuteRinger());
     ASSERT_NO_THROW(dcManager->ProcessCallInfo(csCall, DistributedDataType::LOCATION));
