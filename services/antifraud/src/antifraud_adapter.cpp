@@ -50,6 +50,21 @@ void AntiFraudAdapter::ReleaseAntiFraud()
 }
 
 int32_t AntiFraudAdapter::CheckAntiFraud(std::string phoneNum)
+{
+    libAntiFraud_ = GetLibAntiFraud();
+    if (libAntiFraud_ == nullptr) {
+        return -1;
+    }
+ 
+    PfnAntiFraudVoiceCheck func =
+        reinterpret_cast<PfnAntiFraudVoiceCheck>(dlsym(libAntiFraud_, "AntiFraudVoiceCheck"));
+    if (func == nullptr) {
+        TELEPHONY_LOGE("func is NULL");
+        return -1;
+    }
+ 
+    return func(phoneNum);
+}
 
 int32_t AntiFraudAdapter::DetectAntiFraud(
     const std::shared_ptr<OHOS::AntiFraudService::AntiFraudDetectResListener> &listener)
