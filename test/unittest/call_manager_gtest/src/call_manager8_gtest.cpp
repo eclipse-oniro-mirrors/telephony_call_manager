@@ -1342,39 +1342,22 @@ HWTEST_F(CallManagerGtest, Telephony_AntiFraud_0100, Function | MediumTest | Lev
     OHOS::AntiFraudService::AntiFraudResult fraudResult;
     std::string phoneNum = "123456";
     antiFraudService->stoppedSlotId_ = 0;
-    antiFraudService->InitAntiFraudService(phoneNum, 0, 1);
-    EXPECT_EQ(antiFraudService->antiFraudState_, 1);
-    antiFraudService->StopAntiFraudService(0, 1);
-    antiFraudService->RecordDetectResult(fraudResult, -1, -1);
-    EXPECT_EQ(antiFraudService->antiFraudState_, 1);
-
-    antiFraudService->InitAntiFraudService(phoneNum, 0, 1);
-    antiFraudService->StopAntiFraudService(0, 1);
-    antiFraudService->RecordDetectResult(fraudResult, -1, 0);
+    antiFraudService->stoppedIndex_ = 0;
+    antiFraudService->RecordDetectResult(fraudResult, phoneNum, 1, 1);
     EXPECT_EQ(antiFraudService->antiFraudState_, 3);
-
+    antiFraudService->RecordDetectResult(fraudResult, phoneNum, 0, 1);
+    EXPECT_EQ(antiFraudService->antiFraudState_, 3);
     fraudResult.result = true;
-    antiFraudService->InitAntiFraudService(phoneNum, 0, 1);
-    antiFraudService->RecordDetectResult(fraudResult, 0, -1);
+    antiFraudService->RecordDetectResult(fraudResult, phoneNum, 1, 0);
     EXPECT_EQ(antiFraudService->antiFraudState_, 2);
+    antiFraudService->RecordDetectResult(fraudResult, phoneNum, 0, 0);
+    EXPECT_EQ(antiFraudService->stoppedIndex_, -1);
 
-    antiFraudService->InitAntiFraudService(phoneNum, 0, 1);
-    antiFraudService->RecordDetectResult(fraudResult, 0, 0);
-    EXPECT_EQ(antiFraudService->antiFraudState_, 2);
-
-    antiFraudService->RecordDetectResult(fraudResult, 0, 0);
-    EXPECT_EQ(antiFraudService->antiFraudState_, 2);
-    
-    auto callStatusManager = std::make_shared<CallStatusManager>();
-    antiFraudService->SetCallStatusManager(callStatusManager);
-    antiFraudService->InitAntiFraudService(phoneNum, 0, 3);
-    antiFraudService->RecordDetectResult(fraudResult, 0, 3);
-    EXPECT_EQ(antiFraudService->antiFraudState_, 2);
+    EXPECT_NE(antiFraudService->InitAntiFraudService(phoneNum, 0, 0), 0);
+    EXPECT_NE(antiFraudService->StopAntiFraudService(0, 0), 0);
 
     auto antiFraudAdapter = DelayedSingleton<AntiFraudAdapter>::GetInstance();
-    antiFraudAdapter->ReleaseAntiFraud();
-    EXPECT_EQ(antiFraudAdapter->libAntiFraud_, nullptr);
-    antiFraudAdapter->GetLibAntiFraud();
+    antiFraudAdapter->DetectAntiFraud(nullptr);
     antiFraudAdapter->ReleaseAntiFraud();
     EXPECT_EQ(antiFraudAdapter->libAntiFraud_, nullptr);
 }
