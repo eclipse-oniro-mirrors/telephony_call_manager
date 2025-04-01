@@ -48,7 +48,9 @@ void AntiFraudAdapter::ReleaseAntiFraud()
         libAntiFraud_ = nullptr;
     }
 }
- 
+
+int32_t AntiFraudAdapter::CheckAntiFraud(std::string phoneNum)
+
 int32_t AntiFraudAdapter::DetectAntiFraud(
     const std::shared_ptr<OHOS::AntiFraudService::AntiFraudDetectResListener> &listener)
 {

@@ -1341,6 +1341,7 @@ HWTEST_F(CallManagerGtest, Telephony_AntiFraud_0100, Function | MediumTest | Lev
 
     OHOS::AntiFraudService::AntiFraudResult fraudResult;
     std::string phoneNum = "123456";
+    antiFraudService->stoppedSlotId_ = 0;
     antiFraudService->InitAntiFraudService(phoneNum, 0, 1);
     EXPECT_EQ(antiFraudService->antiFraudState_, 1);
     antiFraudService->StopAntiFraudService(0, 1);

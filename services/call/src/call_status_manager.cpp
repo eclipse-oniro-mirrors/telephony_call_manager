@@ -839,7 +839,7 @@ void CallStatusManager::SetupAntiFraudService(const sptr<CallBase> &call, const 
         if (slotId == -1) {
             return;
         }
-        if (antiFraudSlotId_ != -1 || antiFraudIndex_ != -1) {
+        if (GetAntiFraudSlotId() != -1 || GetAntiFraudIndex() != -1) {
             return;
         }
         antiFraudSlotId_ = slotId;
