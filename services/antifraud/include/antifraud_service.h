@@ -100,7 +100,7 @@ private:
     int32_t stoppedSlotId_ = -1;
     int32_t stoppedIndex_ = -1;
 
-    std::mutex mutex_;
+    ffrt::mutex mutex_;
  
 private:
     std::shared_ptr<CallStatusManager> callStatusManagerPtr_ = nullptr;
