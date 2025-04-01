@@ -839,13 +839,13 @@ int32_t CallStatusManager::GetAntiFraudIndex()
     return antiFraudIndex_;
 }
 
-int32_t CallStatusManager::SetAntiFraudSlotId(int32_t slotId)
+void CallStatusManager::SetAntiFraudSlotId(int32_t slotId)
 {
     std::lock_guard<ffrt::mutex> lock(mutex_);
     antiFraudSlotId_ = slotId;
 }
 
-int32_t CallStatusManager::SetAntiFraudIndex(int32_t index)
+void CallStatusManager::SetAntiFraudIndex(int32_t index)
 {
     std::lock_guard<ffrt::mutex> lock(mutex_);
     antiFraudIndex_ = index;
