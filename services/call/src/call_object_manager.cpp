@@ -58,7 +58,6 @@ CallObjectManager::~CallObjectManager()
 
 int32_t CallObjectManager::AddOneCallObject(sptr<CallBase> &call)
 {
-    TELEPHONY_LOGI("AddOneCallObject start");
     if (call == nullptr) {
         TELEPHONY_LOGE("call is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -208,7 +207,7 @@ void CallObjectManager::DelayedDisconnectCallConnectAbility(uint64_t time = DISC
 
 int32_t CallObjectManager::DeleteOneCallObject(int32_t callId)
 {
-    TELEPHONY_LOGI("DeleteOneCallObject start");
+    TELEPHONY_LOGI("call list size:%{public}zu", callObjectPtrList_.size());
     std::unique_lock<std::mutex> lock(listMutex_);
     std::list<sptr<CallBase>>::iterator it;
     for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
