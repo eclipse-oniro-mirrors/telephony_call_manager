@@ -87,7 +87,9 @@ bool CallWiredHeadSet::RegistKeyMutePressedUp()
 
     std::set<int32_t> preKeys;
     std::shared_ptr<MMI::KeyOption> keyOption = InitOption(preKeys, MMI::KeyEvent::KEYCODE_HEADSETHOOK, false, 0);
+    keyOption->SetPriority(MMI::SubscribePriority::PRIORITY_100);
     subscribeIdForPressedUp_ = MMI::InputManager::GetInstance()->SubscribeKeyEvent(keyOption, pressedFunc);
+    TELEPHONY_LOGI("subscribeIdForPressedUp_: %{public}d", subscribeIdForPressedUp_);
     return subscribeIdForPressedUp_ < 0 ? false : true;
 }
 
@@ -99,7 +101,9 @@ bool CallWiredHeadSet::RegistKeyMutePressedDown()
 
     std::set<int32_t> preKeys;
     std::shared_ptr<MMI::KeyOption> keyOption = InitOption(preKeys, MMI::KeyEvent::KEYCODE_HEADSETHOOK, true, 0);
+    keyOption->SetPriority(MMI::SubscribePriority::PRIORITY_100);
     subscribeIdForPressedDown_ = MMI::InputManager::GetInstance()->SubscribeKeyEvent(keyOption, pressedFunc);
+    TELEPHONY_LOGI("subscribeIdForPressedDown_: %{public}d", subscribeIdForPressedDown_);
     return subscribeIdForPressedDown_ < 0 ? false : true;
 }
 
