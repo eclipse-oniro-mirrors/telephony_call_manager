@@ -207,7 +207,7 @@ void CallObjectManager::DelayedDisconnectCallConnectAbility(uint64_t time = DISC
 
 int32_t CallObjectManager::DeleteOneCallObject(int32_t callId)
 {
-    TELEPHONY_LOGI("call list size:%{public}zu", callObjectPtrList_.size());
+    TELEPHONY_LOGI("delete one call object, callId:%{public}zu", callId);
     std::unique_lock<std::mutex> lock(listMutex_);
     std::list<sptr<CallBase>>::iterator it;
     for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
