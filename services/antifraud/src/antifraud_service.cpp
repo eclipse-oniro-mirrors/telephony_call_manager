@@ -116,20 +116,38 @@ void AntiFraudService::InitParams()
     fraudDetectProb_ = 0.0;
     antiFraudState_ = static_cast<int32_t>(AntiFraudState::ANTIFRAUD_STATE_DEFAULT);
 }
- 
-void AntiFraudService::RecordDetectResult(const OHOS::AntiFraudService::AntiFraudResult &antiFraudResult,
-                                          int32_t resultSlotId, int32_t resultIndex)
+
+int32_t AntiFraudService::GetStoppedSlotId()
 {
-    std::lock_guard<std::mutex> lock(queueMutex_);
-    std::string phoneNum = "";
-    if (!phoneNumQueue_.empty()) {
-        phoneNum = phoneNumQueue_.front();
-        phoneNumQueue_.pop();
-    }
-    if (resultSlotId == stoppedSlotId_ && resultIndex == stoppedIndex_) {
+    std::lock_guard<ffrt::mutex> lock(mutex_);
+    return stoppedSlotId_;
+}
+ 
+int32_t AntiFraudService::GetStoppedIndex()
+{
+    std::lock_guard<ffrt::mutex> lock(mutex_);
+    return stoppedIndex_;
+}
+ 
+void AntiFraudService::SetStoppedSlotId(int32_t slotId)
+{
+    std::lock_guard<ffrt::mutex> lock(mutex_);
+    stoppedSlotId_ = slotId;
+}
+ 
+void AntiFraudService::SetStoppedIndex(int32_t index)
+{
+    std::lock_guard<ffrt::mutex> lock(mutex_);
+    stoppedIndex_ = index;
+}
+
+void AntiFraudService::RecordDetectResult(const OHOS::AntiFraudService::AntiFraudResult &antiFraudResult,
+                                          std::string resultPhoneNum, int32_t resultSlotId, int32_t resultIndex)
+{
+    if (GetStoppedSlotId() == resultSlotId && GetStoppedIndex() == resultIndex) {
         TELEPHONY_LOGI("detect stopped, no need to record result");
-        stoppedSlotId_ = -1;
-        stoppedIndex_ = -1;
+        SetStoppedSlotId(-1);
+        SetStoppedIndex(-1);
         return;
     }
     fraudDetectErr_ = antiFraudResult.errCode;
@@ -138,8 +156,7 @@ void AntiFraudService::RecordDetectResult(const OHOS::AntiFraudService::AntiFrau
     fraudDetectType_ = antiFraudResult.fraudType;
     fraudDetectText_ = antiFraudResult.text;
     fraudDetectProb_ = antiFraudResult.pvalue;
- 
-    auto antiFraudAdapter = DelayedSingleton<AntiFraudAdapter>::GetInstance();
+
     if (isResultFraud_) {
         TELEPHONY_LOGI("AntiFraud detect finish, is fraud call");
         antiFraudState_ = static_cast<int32_t>(AntiFraudState::ANTIFRAUD_STATE_RISK);
@@ -149,8 +166,8 @@ void AntiFraudService::RecordDetectResult(const OHOS::AntiFraudService::AntiFrau
     }
     if (callStatusManagerPtr_ != nullptr) {
         callStatusManagerPtr_->TriggerAntiFraud(antiFraudState_);
-        }
- 
+    }
+
     if (isResultFraud_ && IsUserImprovementPlanSwitchOn()) {
         TELEPHONY_LOGI("text reported to the cloud after anonymize");
         int ret = AnonymizeText();
@@ -160,46 +177,57 @@ void AntiFraudService::RecordDetectResult(const OHOS::AntiFraudService::AntiFrau
         }
         OHOS::AntiFraudService::AntiFraudResult fraudResult = antiFraudResult;
         fraudResult.text = fraudDetectText_;
-        std::make_shared<AntiFraudCloudService>(phoneNum)->UploadPostRequest(fraudResult);
+        std::make_shared<AntiFraudCloudService>(resultPhoneNum)->UploadPostRequest(fraudResult);
     }
 }
- 
+
 int32_t AntiFraudService::InitAntiFraudService(const std::string &phoneNum, int32_t slotId, int32_t index)
 {
-    InitParams();
     auto antiFraudAdapter = DelayedSingleton<AntiFraudAdapter>::GetInstance();
-    auto listener = std::make_shared<AntiFraudDetectResListenerImpl>(slotId, index);
-    int32_t antiFraudErrCode = antiFraudAdapter->DetectAntiFraud(listener);
-    if (antiFraudErrCode == 0) {
-        TELEPHONY_LOGI("AntiFraud begin detect, slotId=%{public}d, index=%{public}d", slotId, index);
-        std::lock_guard<std::mutex> lock(queueMutex_);
-        phoneNumQueue_.push(phoneNum);
-        antiFraudState_ = static_cast<int32_t>(AntiFraudState::ANTIFRAUD_STATE_STARTED);
-        if (callStatusManagerPtr_ != nullptr) {
-            callStatusManagerPtr_->TriggerAntiFraud(antiFraudState_);
-        }
+    int32_t antiFraudErrCode = antiFraudAdapter->CheckAntiFraud(phoneNum);
+    if (antiFraudErrCode != 0) {
+        TELEPHONY_LOGE("Check AntiFraud, no need to detect, ErrCode:%{public}d", antiFraudErrCode);
+        return antiFraudErrCode;
     }
+    auto listener = std::make_shared<AntiFraudDetectResListenerImpl>(phoneNum, slotId, index);
+    antiFraudErrCode = antiFraudAdapter->DetectAntiFraud(listener);
+    if (antiFraudErrCode != 0) {
+        TELEPHONY_LOGE("Detect AntiFraud failed, ErrCode=%{public}d", antiFraudErrCode);
+        return antiFraudErrCode;
+    }
+    TELEPHONY_LOGI("AntiFraud begin detect, slotId=%{public}d, index=%{public}d", slotId, index);
+    antiFraudState_ = static_cast<int32_t>(AntiFraudState::ANTIFRAUD_STATE_STARTED);
+    if (callStatusManagerPtr_ != nullptr) {
+        callStatusManagerPtr_->TriggerAntiFraud(antiFraudState_);
+    }
+    InitParams();
+    return 0;
 }
 
 int32_t AntiFraudService::StopAntiFraudService(int32_t slotId, int32_t index)
 {
     auto antiFraudAdapter = DelayedSingleton<AntiFraudAdapter>::GetInstance();
     int32_t antiFraudErrCode = antiFraudAdapter->StopAntiFraud();
-    if (antiFraudErrCode == 0) {
-        TELEPHONY_LOGI("AntiFraud stop detect, slotId=%{public}d, index=%{public}d", slotId, index);
-        stoppedSlotId_ = slotId;
-        stoppedIndex_ = index;
+    if (antiFraudErrCode != 0) {
+        TELEPHONY_LOGE("Stop AntiFraud failed, ErrCode=%{public}d", antiFraudErrCode);
+        return antiFraudErrCode;
     }
+    TELEPHONY_LOGI("AntiFraud stop detect, slotId=%{public}d, index=%{public}d", slotId, index);
+    SetStoppedSlotId(slotId);
+    SetStoppedIndex(index);
+    return 0;
 }
- 
+
 void AntiFraudService::AntiFraudDetectResListenerImpl::HandleAntiFraudDetectRes(
     const OHOS::AntiFraudService::AntiFraudResult &antiFraudResult)
 {
+    std::string resultPhoneNum = phoneNum_;
     int32_t resultSlotId = slotId_;
     int32_t resultIndex = index_;
     TELEPHONY_LOGI("HandleAntiFraudDetectRes, result=%{public}d, slotId=%{public}d, index=%{public}d",
         antiFraudResult.result, slotId_, index_);
-    DelayedSingleton<AntiFraudService>::GetInstance()->RecordDetectResult(antiFraudResult, resultSlotId, resultIndex);
+    DelayedSingleton<AntiFraudService>::GetInstance()->
+        RecordDetectResult(antiFraudResult, resultPhoneNum, resultSlotId, resultIndex);
 }
 
 void AntiFraudService::AddRuleToConfig(const std::string rulesName, void *config)
