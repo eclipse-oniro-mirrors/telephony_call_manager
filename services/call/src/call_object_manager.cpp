@@ -86,8 +86,9 @@ int32_t CallObjectManager::AddOneCallObject(sptr<CallBase> &call)
     if (callObjectPtrList_.size() == ONE_CALL_EXIST) {
         DelayedSingleton<CallWiredHeadSet>::GetInstance()->Init();
         if (callObjectPtrList_.front()->GetTelCallState() == TelCallState::CALL_STATUS_DIALING) {
-        isFirstDialCallAdded_ = true;
-        cv_.notify_all();
+            isFirstDialCallAdded_ = true;
+            cv_.notify_all();
+        }
     }
     if (FoldStatusManager::IsSmallFoldDevice()) {
         DelayedSingleton<FoldStatusManager>::GetInstance()->RegisterFoldableListener();
