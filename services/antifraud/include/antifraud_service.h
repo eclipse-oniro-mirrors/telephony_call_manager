@@ -79,7 +79,7 @@ private:
 private:
     class AntiFraudDetectResListenerImpl : public OHOS::AntiFraudService::AntiFraudDetectResListener {
     public:
-        AntiFraudDetectResListenerImpl(int slotId, int index) : AntiFraudDetectResListener(),
+        AntiFraudDetectResListenerImpl(std::string phoneNum, int slotId, int index) : AntiFraudDetectResListener(),
             phoneNum_(phoneNum), slotId_(slotId), index_(index) {}
         void HandleAntiFraudDetectRes(const OHOS::AntiFraudService::AntiFraudResult &antiFraudResult) override;
     private:
