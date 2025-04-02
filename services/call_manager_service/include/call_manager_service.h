@@ -22,6 +22,7 @@
 #include "call_control_manager.h"
 #include "call_manager_service_stub.h"
 #include "call_state_report_proxy.h"
+#include "call_status_manager.h"
 #include "i_call_status_callback.h"
 #include "iremote_stub.h"
 #include "iservice_registry.h"
@@ -38,6 +39,7 @@ class CallManagerService : public SystemAbility,
     DECLARE_DELAYED_SINGLETON(CallManagerService)
     DECLARE_SYSTEM_ABILITY(CallManagerService)
 public:
+    void SetCallStatusManager(std::shared_ptr<CallStatusManager> callStatusManager);
     bool Init();
     void UnInit();
 
@@ -836,6 +838,7 @@ private:
     int32_t spendTime_ = 0;
     sptr<ICallStatusCallback> bluetoothCallCallbackPtr_ = nullptr;
     std::shared_ptr<BluetoothCallState> bluetoothCallObserver_  = nullptr;
+    std::shared_ptr<CallStatusManager> callStatusManagerPtr_ = nullptr;
 };
 } // namespace Telephony
 } // namespace OHOS

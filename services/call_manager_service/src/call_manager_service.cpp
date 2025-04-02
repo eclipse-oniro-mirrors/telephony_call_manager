@@ -76,6 +76,11 @@ CallManagerService::CallManagerService()
 CallManagerService::~CallManagerService()
 {}
 
+void CallManagerService::SetCallStatusManager(std::shared_ptr<CallStatusManager> callStatusManager)
+{
+    callStatusManagerPtr_ = callStatusManager;
+}
+
 bool CallManagerService::Init()
 {
 #ifdef OHOS_BUILD_ENABLE_TELEPHONY_CUST
@@ -1632,6 +1637,9 @@ int32_t CallManagerService::dealCeliaCallEvent(int32_t callId)
     if (callPtr == nullptr) {
         TELEPHONY_LOGI("the call object is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    if (callStatusManagerPtr_ != nullptr) {
+        callStatusManagerPtr_->HandleCeliaCall(callPtr);
     }
     callPtr->SetCeliaCallType(IS_CELIA_CALL);
     TELEPHONY_LOGI("set selia call type!");

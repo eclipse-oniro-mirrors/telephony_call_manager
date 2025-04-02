@@ -1635,6 +1635,8 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_009, Function | MediumTest
     callStatusManager->antiFraudIndex_ = 0;
     CallObjectManager::AddOneCallObject(voipCall);
     callStatusManager->SetupAntiFraudService(voipCall, info);
+    callStatusManager->StopAntiFraudDetect(voipCall, info);
+    callStatusManager->HandleCeliaCall(voipCall);
     callStatusManager->SetConferenceCall({voipCall});
     EXPECT_EQ(CallObjectManager::callObjectPtrList_.size(), 1);
     voipCall->SetCallRunningState(CallRunningState::CALL_RUNNING_STATE_CREATE);
@@ -1769,6 +1771,41 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_013, Function | MediumTest
     EXPECT_EQ(call->GetTelCallState(), TelCallState::CALL_STATUS_DIALING);
     callStatusManager->BtCallDialingHandle(call, info);
     EXPECT_EQ(call->phoneOrWatch_, static_cast<int32_t>(PhoneOrWatchDial::WATCH_DIAL));
+}
+
+HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_014, Function | MediumTest | Level3)
+{
+    std::shared_ptr<CallStatusManager> manager = std::make_shared<CallStatusManager>();
+    CallDetailInfo info;
+    info.state = TelCallState::CALL_STATUS_ACTIVE;
+    info.callType = CallType::TYPE_IMS;
+    sptr<CallBase> call = manager->CreateNewCall(info, CallDirection::CALL_DIRECTION_IN);
+    ASSERT_TRUE(call != nullptr);
+    manager->antiFraudSlotId_ = 0;
+    manager->antiFraudIndex_ = 0;
+    call->SetSlotId(1);
+    manager->StopAntiFraudDetect(call, info);
+    manager->HandleCeliaCall(call);
+    info.index = 1;
+    call->SetCallIndex(1);
+    manager->StopAntiFraudDetect(call, info);
+    manager->HandleCeliaCall(call);
+    call->SetSlotId(0);
+    manager->StopAntiFraudDetect(call, info);
+    manager->HandleCeliaCall(call);
+    EXPECT_EQ(manager->antiFraudIndex_, 0);
+
+    NumberMarkInfo markInfo;
+    markInfo.markType = MarkType::MARK_TYPE_FRAUD;
+    call->SetNumberMarkInfo(markInfo);
+    manager->SetupAntiFraudService(call, info);
+    markInfo.markType = MarkType::MARK_TYPE_YELLOW_PAGE;
+    call->SetNumberMarkInfo(markInfo);
+    manager->SetupAntiFraudService(call, info);
+    markInfo.markType = MarkType::MARK_TYPE_TAXI;
+    call->SetNumberMarkInfo(markInfo);
+    manager->SetupAntiFraudService(call, info);
+    EXPECT_EQ(manager->antiFraudIndex_, 0);
 }
 } // namespace Telephony
 } // namespace OHOS
