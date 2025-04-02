@@ -1773,7 +1773,7 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_013, Function | MediumTest
     EXPECT_EQ(call->phoneOrWatch_, static_cast<int32_t>(PhoneOrWatchDial::WATCH_DIAL));
 }
 
-HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_013, Function | MediumTest | Level3)
+HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_014, Function | MediumTest | Level3)
 {
     std::shared_ptr<CallStatusManager> manager = std::make_shared<CallStatusManager>();
     CallDetailInfo info;
