@@ -1635,8 +1635,8 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_009, Function | MediumTest
     callStatusManager->antiFraudIndex_ = 0;
     CallObjectManager::AddOneCallObject(voipCall);
     callStatusManager->SetupAntiFraudService(voipCall, info);
-    callStatusManager->StopAntiFraudDetect(voipcall, info);
-    callStatusManager->HandleCeliaCall(voipcall);
+    callStatusManager->StopAntiFraudDetect(voipCall, info);
+    callStatusManager->HandleCeliaCall(voipCall);
     callStatusManager->SetConferenceCall({voipCall});
     EXPECT_EQ(CallObjectManager::callObjectPtrList_.size(), 1);
     voipCall->SetCallRunningState(CallRunningState::CALL_RUNNING_STATE_CREATE);
