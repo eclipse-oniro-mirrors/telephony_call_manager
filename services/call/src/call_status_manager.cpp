@@ -883,7 +883,7 @@ void CallStatusManager::StopAntiFraudDetect(const sptr<CallBase> &call, const Ca
         return;
     }
     int32_t ret = DelayedSingleton<AntiFraudService>::GetInstance()->
-        StopAntiFraudService(call->GetSlotId, info.index);
+        StopAntiFraudService(call->GetSlotId(), info.index);
     if (ret != 0) {
         return;
     }
