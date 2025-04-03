@@ -796,7 +796,7 @@ HWTEST_F(ZeroBranch7Test, Telephony_CallConnectAbility_001, Function | MediumTes
  * @tc.name     test CallConnectAbility
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroBranch7Test, Telephony_CallConnectAbility_001, Function | MediumTest | Level1)
+HWTEST_F(ZeroBranch7Test, Telephony_CallConnectAbility_002, Function | MediumTest | Level1)
 {
     DelayedSingleton<CallConnectAbility>::GetInstance()->isDisconnecting_ = false;
     DelayedSingleton<CallConnectAbility>::GetInstance()->isConnected_ = true;
