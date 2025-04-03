@@ -55,7 +55,11 @@ void CallConnectAbility::ConnectAbility()
     }
     int32_t userId = -1;
     std::string identity = IPCSkeleton::ResetCallingIdentity();
-    AAFwk::AbilityManagerClient::GetInstance()->ConnectAbility(want, connectCallback_, userId);
+    ErrCode err = AAFwk::AbilityManagerClient::GetInstance()->ConnectAbility(want, connectCallback_, userId);
+    if (err != ERR_OK) {
+        TELEPHONY_LOGE("Fail to connect callui ,err:%{public}d", err);
+        SetConnectingFlag(false);
+    }
     IPCSkeleton::SetCallingIdentity(identity);
 }
 
@@ -74,7 +78,11 @@ void CallConnectAbility::DisconnectAbility()
     if (connectCallback_ != nullptr) {
         TELEPHONY_LOGW("Disconnect callui ability");
         std::string identity = IPCSkeleton::ResetCallingIdentity();
-        AAFwk::AbilityManagerClient::GetInstance()->DisconnectAbility(connectCallback_);
+        ErrCode err = AAFwk::AbilityManagerClient::GetInstance()->DisconnectAbility(connectCallback_);
+        if (err != ERR_OK) {
+            TELEPHONY_LOGE("Fail to disconnect callui ,err:%{public}d", err);
+            SetDisconnectingFlag(false);
+        }
         IPCSkeleton::SetCallingIdentity(identity);
         connectCallback_ = nullptr;
     }

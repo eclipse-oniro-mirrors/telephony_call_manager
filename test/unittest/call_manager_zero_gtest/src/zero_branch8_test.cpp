@@ -792,6 +792,27 @@ HWTEST_F(ZeroBranch7Test, Telephony_CallConnectAbility_001, Function | MediumTes
 }
 
 /**
+ * @tc.number   Telephony_CallConnectAbility_002
+ * @tc.name     test CallConnectAbility
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch7Test, Telephony_CallConnectAbility_001, Function | MediumTest | Level1)
+{
+    DelayedSingleton<CallConnectAbility>::GetInstance()->isDisconnecting_ = false;
+    DelayedSingleton<CallConnectAbility>::GetInstance()->isConnected_ = true;
+    DelayedSingleton<CallConnectAbility>::GetInstance()->DisconnectAbility();
+    EXPECT_TRUE(DelayedSingleton<CallConnectAbility>::GetInstance()->isDisconnecting_);
+
+    DelayedSingleton<CallConnectAbility>::GetInstance()->isDisconnecting_ = false;
+    DelayedSingleton<CallConnectAbility>::GetInstance()->isConnected_ = false;
+    DelayedSingleton<CallConnectAbility>::GetInstance()->ConnectAbility();
+
+    DelayedSingleton<CallConnectAbility>::GetInstance()->isConnecting_ = false;
+    DelayedSingleton<CallConnectAbility>::GetInstance()->isConnected_ = true;
+    DelayedSingleton<CallConnectAbility>::GetInstance()->ConnectAbility();
+}
+
+/**
  * @tc.number   Telephony_OTTCall_001
  * @tc.name     test OTTCall
  * @tc.desc     Function test
