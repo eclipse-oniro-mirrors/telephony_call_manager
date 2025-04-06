@@ -1427,7 +1427,6 @@ int32_t CallManagerServiceStub::SetTimer(uint32_t code)
         auto TimerCallback = [collieStr](void *) {
             TELEPHONY_LOGE("OnRemoteRequest timeout func: %{public}s",
                 collieStr.c_str());
-            exit(1);
         };
         idTimer = HiviewDFX::XCollie::GetInstance().SetTimer(
             collieName, XCOLLIE_TIMEOUT_SECONDS, TimerCallback, nullptr, flag);
