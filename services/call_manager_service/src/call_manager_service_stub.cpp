@@ -303,6 +303,7 @@ int32_t CallManagerServiceStub::OnRemoteRequest(
 
 int32_t CallManagerServiceStub::OnRegisterCallBack(MessageParcel &data, MessageParcel &reply)
 {
+    TELEPHONY_LOGI("OnRegisterCallBack entry");
     int32_t result = TELEPHONY_ERR_FAIL;
     sptr<IRemoteObject> remote = data.ReadRemoteObject();
     if (remote == nullptr) {
