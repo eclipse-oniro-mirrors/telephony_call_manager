@@ -252,7 +252,7 @@ int32_t CallManagerService::RegisterCallBack(const sptr<ICallAbilityCallback> &c
     }
     if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_SET_TELEPHONY_STATE) &&
         !TelephonyPermission::CheckPermission(OHOS_PERMISSION_GET_TELEPHONY_STATE)) {
-        TELEPHONY_LOGD("Permission denied.");
+        TELEPHONY_LOGE("Permission denied.");
         return TELEPHONY_ERR_PERMISSION_ERR;
     }
     return DelayedSingleton<CallAbilityReportProxy>::GetInstance()->RegisterCallBack(callback, GetBundleInfo());

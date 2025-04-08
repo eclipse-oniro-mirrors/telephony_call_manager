@@ -305,6 +305,7 @@ int32_t CallManagerServiceStub::OnRemoteRequest(
 
 int32_t CallManagerServiceStub::OnRegisterCallBack(MessageParcel &data, MessageParcel &reply)
 {
+    TELEPHONY_LOGI("OnRegisterCallBack entry");
     int32_t result = TELEPHONY_ERR_FAIL;
     sptr<IRemoteObject> remote = data.ReadRemoteObject();
     if (remote == nullptr) {
@@ -1429,7 +1430,6 @@ int32_t CallManagerServiceStub::SetTimer(uint32_t code)
         auto TimerCallback = [collieStr](void *) {
             TELEPHONY_LOGE("OnRemoteRequest timeout func: %{public}s",
                 collieStr.c_str());
-            exit(1);
         };
         idTimer = HiviewDFX::XCollie::GetInstance().SetTimer(
             collieName, XCOLLIE_TIMEOUT_SECONDS, TimerCallback, nullptr, flag);
