@@ -41,7 +41,7 @@ public:
 
     static bool IsEmergencyPhoneNumber(char *cPhoneNumber, int32_t slotId, int32_t* errCode);
 
-    static int32_t MakeCall(OHOS::AbilityRuntime::Context* context, char* phoneNumber);
+    static int32_t MakeCall(char* phoneNumber);
 };
 }
 }

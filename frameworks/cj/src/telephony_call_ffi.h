@@ -42,7 +42,7 @@ extern "C" {
 
     FFI_EXPORT bool FfiOHOSTelephonyCallIsEmergencyPhoneNumber(char *phoneNumber, int32_t slotId, int32_t* errCode);
 
-    FFI_EXPORT int32_t FfiOHOSTelephonyCallMakeCall(OHOS::AbilityRuntime::Context* context, char* number);
+    FFI_EXPORT int32_t FfiOHOSTelephonyCallMakeCall(char* number);
 }
 }
 }

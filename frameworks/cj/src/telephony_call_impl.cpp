@@ -111,7 +111,7 @@ namespace Telephony {
         return MallocCString(result);
     }
 
-    int32_t TelephonyCallImpl::MakeCall(OHOS::AbilityRuntime::Context* context, char* phoneNumber)
+    int32_t TelephonyCallImpl::MakeCall(char* phoneNumber)
     {
         AAFwk::Want want;
         AppExecFwk::ElementName element("", "com.ohos.contacts", "com.ohos.contacts.MainAbility");
@@ -121,10 +121,7 @@ namespace Telephony {
         wantParams.SetParam("pageFlag", AAFwk::String::Box("page_flag_edit_before_calling"));
         wantParams.SetParam(AAFwk::Want::PARAM_BACK_TO_OTHER_MISSION_STACK, AAFwk::Boolean::Box(true));
         want.SetParams(wantParams);
-        if (context == nullptr) {
-            return CJ_ERROR_TELEPHONY_ARGUMENT_ERROR;
-        }
-        int32_t err = AAFwk::AbilityManagerClient::GetInstance()->StartAbility(want, context->GetToken());
+        int32_t err = AAFwk::AbilityManagerClient::GetInstance()->StartAbility(want);
         return ConvertCJErrCode(err);
     }
 
