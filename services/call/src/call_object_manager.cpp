@@ -19,6 +19,7 @@
 #include "call_control_manager.h"
 #include "call_manager_errors.h"
 #include "call_number_utils.h"
+#include "call_wired_headset.h"
 #include "conference_base.h"
 #include "ims_conference.h"
 #include "report_call_info_handler.h"
@@ -58,6 +59,7 @@ CallObjectManager::~CallObjectManager()
 int32_t CallObjectManager::AddOneCallObject(sptr<CallBase> &call)
 {
     if (call == nullptr) {
+        TELEPHONY_LOGE("call is nullptr!");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     std::lock_guard<std::mutex> lock(listMutex_);
@@ -80,10 +82,12 @@ int32_t CallObjectManager::AddOneCallObject(sptr<CallBase> &call)
         DelayedSingleton<CallConnectAbility>::GetInstance()->ConnectAbility();
     }
     callObjectPtrList_.emplace_back(call);
-    if (callObjectPtrList_.size() == ONE_CALL_EXIST &&
-        callObjectPtrList_.front()->GetTelCallState() == TelCallState::CALL_STATUS_DIALING) {
-        isFirstDialCallAdded_ = true;
-        cv_.notify_all();
+    if (callObjectPtrList_.size() == ONE_CALL_EXIST) {
+        DelayedSingleton<CallWiredHeadSet>::GetInstance()->Init();
+        if (callObjectPtrList_.front()->GetTelCallState() == TelCallState::CALL_STATUS_DIALING) {
+            isFirstDialCallAdded_ = true;
+            cv_.notify_all();
+        }
     }
     if (FoldStatusManager::IsSmallFoldDevice()) {
         DelayedSingleton<FoldStatusManager>::GetInstance()->RegisterFoldableListener();
@@ -203,6 +207,7 @@ void CallObjectManager::DelayedDisconnectCallConnectAbility(uint64_t time = DISC
 
 int32_t CallObjectManager::DeleteOneCallObject(int32_t callId)
 {
+    TELEPHONY_LOGI("delete one call object, callId:%{public}zu", callId);
     std::unique_lock<std::mutex> lock(listMutex_);
     std::list<sptr<CallBase>>::iterator it;
     for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
@@ -213,6 +218,7 @@ int32_t CallObjectManager::DeleteOneCallObject(int32_t callId)
         }
     }
     if (callObjectPtrList_.size() == NO_CALL_EXIST) {
+        DelayedSingleton<CallWiredHeadSet>::GetInstance()->DeInit();
         if (FoldStatusManager::IsSmallFoldDevice()) {
             DelayedSingleton<FoldStatusManager>::GetInstance()->UnregisterFoldableListener();
         }
