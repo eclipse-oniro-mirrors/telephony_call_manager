@@ -20,11 +20,24 @@
 #include "singleton.h"
 #include "phonenumberutil.h"
 
-#include "common_type.h"
 #include "call_base.h"
+#include "common_type.h"
 
 namespace OHOS {
 namespace Telephony {
+/**
+ * 3GPP TS 22.030 V4.0.0 (2001-03)  6.5.2 Structure of the MMI
+ * The following sequence of functions shall be used for the control of Supplementary Services:
+ *  SELECT:	Entry of the procedure information (may be a digit or a sequence of characters).
+ *  SEND:	Transmission of the information to the network.
+ *  INDICATION:	Call progress indications.
+ */
+ struct MMIData {
+    std::string actionString = "";
+    std::string serviceCode = "";
+    std::string dialString = "";
+};
+
 class CallNumberUtils {
     DECLARE_DELAYED_SINGLETON(CallNumberUtils)
 public:
@@ -43,7 +56,7 @@ public:
     int32_t CheckNumberIsEmergency(const std::string &phoneNumber, const int32_t slotId, bool &enabled);
     bool IsValidSlotId(int32_t slotId) const;
     int32_t IsCarrierVtConfig(const int32_t slotId, bool &enabled);
-    bool IsMMICode(const std::string &number);
+    bool IsMMICode(std::string &number);
     bool RegexMatchMmi(const std::string &number);
     std::string RemoveSeparatorsPhoneNumber(const std::string &phoneString);
     std::string RemovePostDialPhoneNumber(const std::string &phoneString);
@@ -56,10 +69,14 @@ public:
     void YellowPageAndMarkUpdate(const sptr<CallBase> &callObjectPtr);
 private:
     void ProcessSpace(std::string &number);
+    bool IsShortCode(const std::string &number);
+    bool IsShortCodeWithCellularCall(const std::string &number);
+    bool IsShortCodeWithoutCellularCall(const std::string &number);
 
 private:
     static const int16_t HAS_A_SLOT = 1;
     static const int16_t HAS_TWO_SLOT = 2;
+    MMIData mmiData_;
 };
 } // namespace Telephony
 } // namespace OHOS

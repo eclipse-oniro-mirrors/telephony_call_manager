@@ -75,7 +75,7 @@ private:
     int32_t PackCellularCallInfo(DialParaInfo &info, CellularCallInfo &callInfo);
     bool IsFdnNumber(std::vector<std::u16string> fdnNumberList, std::string phoneNumber);
     int32_t UpdateCallReportInfo(const DialParaInfo &info, TelCallState state);
-    int32_t HandleStartDial(bool isMMiCode, CellularCallInfo callInfo);
+    int32_t HandleStartDial(bool isMMiCode, DialParaInfo &info);
     int32_t HandleDialFail();
     int32_t GetOtherRingingCall(int32_t currentCallId);
     int32_t EccDialPolicy();

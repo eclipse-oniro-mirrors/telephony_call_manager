@@ -48,7 +48,6 @@
 #include "ims_conference.h"
 #include "incoming_call_notification.h"
 #include "missed_call_notification.h"
-#include "mmi_code_utils.h"
 #include "ott_call.h"
 #include "ott_conference.h"
 #include "reject_call_sms.h"
@@ -1127,28 +1126,53 @@ HWTEST_F(ZeroBranch2Test, Telephony_CallDialog_001, Function | MediumTest | Leve
 }
 
 /**
- * @tc.number   Telephony_MmiCodeUtils_001
+ * @tc.number   Telephony_CallNumberUtils_003
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroBranch2Test, Telephony_MmiCodeUtils_001, Function | MediumTest | Level1)
+HWTEST_F(ZeroBranch2Test, Telephony_CallNumberUtils_003, Function | MediumTest | Level1)
 {
-    auto mmiCodeUtils = DelayedSingleton<MMICodeUtils>::GetInstance();
-    EXPECT_NE(mmiCodeUtils, nullptr);
+    auto callNumUtils = DelayedSingleton<CallNumberUtils>::GetInstance();
+    EXPECT_NE(callNumUtils, nullptr);
     std::string dialStr = "";
-    ASSERT_FALSE(mmiCodeUtils->IsMMICode(dialStr));
-    dialStr = "12";
-    ASSERT_FALSE(mmiCodeUtils->IsMMICode(dialStr));
+    ASSERT_FALSE(callNumUtils->IsMMICode(dialStr));
+    DialParaInfo dialInfo;
+    sptr<CallBase> call = new IMSCall(dialInfo);
+    call->callId_ = 1;
+    call->SetCallIndex(0);
+    call->SetSlotId(0);
+    call->SetTelCallState(TelCallState::CALL_STATUS_INCOMING);
+    call->SetCallType(CallType::TYPE_IMS);
+    CallObjectManager::AddOneCallObject(call);
+    dialStr = "333";
+    ASSERT_FALSE(callNumUtils->IsMMICode(dialStr));
     dialStr = "33";
-    ASSERT_TRUE(mmiCodeUtils->IsMMICode(dialStr));
+    ASSERT_TRUE(callNumUtils->IsMMICode(dialStr));
+    CallObjectManager::DeleteOneCallObject(call);
+    dialStr = "333";
+    ASSERT_FALSE(callNumUtils->IsMMICode(dialStr));
+    dialStr = "12";
+    ASSERT_FALSE(callNumUtils->IsMMICode(dialStr));
+    dialStr = "1*";
+    ASSERT_TRUE(callNumUtils->IsMMICode(dialStr));
+    dialStr = "*1";
+    ASSERT_TRUE(callNumUtils->IsMMICode(dialStr));
+    dialStr = "**";
+    ASSERT_TRUE(callNumUtils->IsMMICode(dialStr));
+    dialStr = "33";
+    ASSERT_TRUE(callNumUtils->IsMMICode(dialStr));
     dialStr = "*21*10086#";
-    ASSERT_TRUE(mmiCodeUtils->IsMMICode(dialStr));
+    ASSERT_TRUE(callNumUtils->IsMMICode(dialStr));
     dialStr = "10086";
-    ASSERT_FALSE(mmiCodeUtils->IsMMICode(dialStr));
+    ASSERT_FALSE(callNumUtils->IsMMICode(dialStr));
     dialStr = "*30#10086";
-    ASSERT_FALSE(mmiCodeUtils->IsMMICode(dialStr));
+    ASSERT_FALSE(callNumUtils->IsMMICode(dialStr));
     dialStr = "*33##123#";
-    ASSERT_TRUE(mmiCodeUtils->IsMMICode(dialStr));
+    ASSERT_FALSE(callNumUtils->IsMMICode(dialStr));
+    dialStr = "*10086#";
+    ASSERT_TRUE(callNumUtils->IsMMICode(dialStr));
+    dialStr = "#10086#";
+    ASSERT_TRUE(callNumUtils->IsMMICode(dialStr));
 }
 } // namespace Telephony
 } // namespace OHOS
