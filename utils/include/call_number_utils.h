@@ -32,7 +32,7 @@ namespace Telephony {
  *  SEND:	Transmission of the information to the network.
  *  INDICATION:	Call progress indications.
  */
- struct MMIData {
+struct MMIData {
     std::string actionString = "";
     std::string serviceCode = "";
     std::string dialString = "";

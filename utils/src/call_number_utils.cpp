@@ -442,7 +442,7 @@ int32_t CallNumberUtils::QueryYellowPageAndMarkInfo(NumberMarkInfo &numberMarkIn
     return TELEPHONY_SUCCESS;
 }
 
-bool MMICodeUtils::IsShortCode(const std::string &number)
+bool CallNumberUtils::IsShortCode(const std::string &number)
 {
     if (CallObjectManager::HasCellularCallExist()) {
         return IsShortCodeWithCellularCall(number);
@@ -450,7 +450,7 @@ bool MMICodeUtils::IsShortCode(const std::string &number)
     return IsShortCodeWithoutCellularCall(number);
 }
 
-bool MMICodeUtils::IsShortCodeWithoutCellularCall(const std::string &number)
+bool CallNumberUtils::IsShortCodeWithoutCellularCall(const std::string &number)
 {
     if (number.length() != MAX_LENGTH_SHORT_CODE) {
         return false;
@@ -461,7 +461,7 @@ bool MMICodeUtils::IsShortCodeWithoutCellularCall(const std::string &number)
     return true;
 }
 
-bool MMICodeUtils::IsShortCodeWithCellularCall(const std::string &number)
+bool CallNumberUtils::IsShortCodeWithCellularCall(const std::string &number)
 {
     if (number.length() < 1 || number.length() > MAX_LENGTH_SHORT_CODE) {
         return false;
