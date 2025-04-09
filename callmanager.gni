@@ -142,7 +142,6 @@ call_manager_sources = [
   "${call_manager_path}/utils/src/call_manager_utils.cpp",
   "${call_manager_path}/utils/src/call_number_utils.cpp",
   "${call_manager_path}/utils/src/call_setting_ability_connection.cpp",
-  "${call_manager_path}/utils/src/mmi_code_utils.cpp",
   "${call_manager_path}/utils/src/motion_recognition.cpp",
   "${call_manager_path}/utils/src/number_identity_data_base_helper.cpp",
   "${call_manager_path}/utils/src/screen_sensor_plugin.cpp",

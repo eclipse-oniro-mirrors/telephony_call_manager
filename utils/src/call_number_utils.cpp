@@ -17,21 +17,23 @@
 
 #include <regex>
 
+#include "asyoutypeformatter.h"
+#include "call_ability_report_proxy.h"
+#include "call_manager_errors.h"
+#include "call_voice_assistant_manager.h"
+#include "cellular_call_connection.h"
+#include "cellular_data_client.h"
+#include "core_service_client.h"
+#include "number_identity_data_base_helper.h"
+#include "parameters.h"
 #include "phonenumbers/phonenumber.pb.h"
 #include "telephony_log_wrapper.h"
 #include "telephony_types.h"
-#include "call_manager_errors.h"
-#include "cellular_call_connection.h"
-#include "core_service_client.h"
-#include "cellular_data_client.h"
-#include "call_ability_report_proxy.h"
-#include "number_identity_data_base_helper.h"
-#include "asyoutypeformatter.h"
-#include "call_voice_assistant_manager.h"
-#include "parameters.h"
 
 namespace OHOS {
 namespace Telephony {
+const int32_t MAX_LENGTH_SHORT_CODE = 2;
+
 CallNumberUtils::CallNumberUtils() {}
 
 CallNumberUtils::~CallNumberUtils() {}
@@ -179,13 +181,23 @@ bool CallNumberUtils::IsValidSlotId(int32_t slotId) const
     return false;
 }
 
-bool CallNumberUtils::IsMMICode(const std::string &number)
+bool CallNumberUtils::IsMMICode(std::string &number)
 {
     if (number.empty()) {
         TELEPHONY_LOGE("number is empty.");
         return false;
     }
+    if (IsShortCode(number)) {
+        TELEPHONY_LOGI("number is shortCode.");
+        return true;
+    }
     if (RegexMatchMmi(number)) {
+        if (!mmiData_.serviceCode.empty() && !mmiData_.dialString.empty() &&
+            (mmiData_.actionString == "*" || mmiData_.actionString == "#")) {
+            number = mmiData_.dialString;
+            TELEPHONY_LOGI("change number for dial");
+            return false;
+        }
         return true;
     }
 
@@ -204,7 +216,23 @@ bool CallNumberUtils::RegexMatchMmi(const std::string &number)
     std::regex pattern(symbols);
     std::smatch results;
     if (regex_match(number, results, pattern)) {
-        TELEPHONY_LOGI("regex_match ture");
+        TELEPHONY_LOGI("regex_match true");
+       /**
+        * The following sequence of functions shall be used for the control of Supplementary Services:
+        *  SELECT:	Entry of the procedure information (may be a digit or a sequence of characters).
+        *  SEND: Transmission of the information to the network.
+        *  INDICATION:	Call progress indications.
+        */
+        int32_t action = 2;
+        // 3GPP TS 22.030 V4.0.0 (2001-03)  6.5.2 Structure of the MMI
+        // This structure consists of the following parts:
+        //     Service Code, SC( (2 or 3 digits)
+        //     Supplementary Information, SI (variable length).
+        int32_t serviceCode = 3;
+        int32_t dialingNumber = 12;
+        mmiData_.actionString = results.str(action);
+        mmiData_.serviceCode = results.str(serviceCode);
+        mmiData_.dialString = results.str(dialingNumber);
         return true;
     }
     return false;
@@ -412,6 +440,33 @@ int32_t CallNumberUtils::QueryYellowPageAndMarkInfo(NumberMarkInfo &numberMarkIn
         return TELEPHONY_ERR_DATABASE_READ_FAIL;
     }
     return TELEPHONY_SUCCESS;
+}
+
+bool CallNumberUtils::IsShortCode(const std::string &number)
+{
+    if (CallObjectManager::HasCellularCallExist()) {
+        return IsShortCodeWithCellularCall(number);
+    }
+    return IsShortCodeWithoutCellularCall(number);
+}
+
+bool CallNumberUtils::IsShortCodeWithoutCellularCall(const std::string &number)
+{
+    if (number.length() != MAX_LENGTH_SHORT_CODE) {
+        return false;
+    }
+    if (number[0] == '1' && std::isdigit(number[1])) {
+        return false;
+    }
+    return true;
+}
+
+bool CallNumberUtils::IsShortCodeWithCellularCall(const std::string &number)
+{
+    if (number.length() < 1 || number.length() > MAX_LENGTH_SHORT_CODE) {
+        return false;
+    }
+    return true;
 }
 } // namespace Telephony
 } // namespace OHOS
