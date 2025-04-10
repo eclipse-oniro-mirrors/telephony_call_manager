@@ -102,7 +102,8 @@ private:
     void SetAntiFraudSlotId(int32_t slotId);
     void SetAntiFraudIndex(int32_t index);
     void SetupAntiFraudService(const sptr<CallBase> &call, const CallDetailInfo &info);
-    void StopAntiFraudDetect(const sptr<CallBase> &call, const CallDetailInfo &info);
+    void StopAntiFraudDetect(sptr<CallBase> &call, const CallDetailInfo &info);
+    void UpdateAntiFraudState(sptr<CallBase> &call, int32_t antiFraudState);
     bool IsContactPhoneNum(const std::string &phoneNum);
     int32_t UpdateDialingCallInfo(const CallDetailInfo &info);
     void SetContactInfo(sptr<CallBase> &call, std::string phoneNum);
