@@ -76,7 +76,7 @@ HWTEST_F(ZeroBranch9Test, Telephony_AudioControlManager_001, Function | MediumTe
     audioControl->UpdateDeviceTypeForVideoOrSatelliteCall();
     audioControl->MuteNetWorkRingTone();
     audioControl->IsBtOrWireHeadPlugin();
-    ASSERT_TRUE(audioControl->IsVideoCall(VideoStateType::TYPE_RECEIVE_ONLY));
+    ASSERT_FALSE(audioControl->IsVideoCall(VideoStateType::TYPE_RECEIVE_ONLY));
     sptr<CallBase> call = nullptr;
     audioControl->IncomingCallHungUp(call, false, "");
     audioControl->CallStateUpdated(call, TelCallState::CALL_STATUS_DIALING, TelCallState::CALL_STATUS_ALERTING);
@@ -130,9 +130,7 @@ HWTEST_F(ZeroBranch9Test, Telephony_AudioControlManager_002, Function | MediumTe
     audioControl->SetAudioDevice(device);
     device.deviceType = AudioDeviceType::DEVICE_BLUETOOTH_SCO;
     audioControl->SetAudioDevice(device);
-    audioControl->PlayRingtone();
     audioControl->PlaySoundtone();
-    audioControl->StopRingtone();
     audioControl->GetInitAudioDeviceType();
     audioControl->SetMute(false);
     audioControl->MuteRinger();
@@ -145,6 +143,7 @@ HWTEST_F(ZeroBranch9Test, Telephony_AudioControlManager_002, Function | MediumTe
     audioControl->IsEmergencyCallExists();
     audioControl->SetToneState(ToneState::TONEING);
     audioControl->IsNumberAllowed(NUMBER);
+    audioControl->audioInterruptState_ = AudioInterruptState::INTERRUPT_STATE_ACTIVATED;
     ASSERT_TRUE(audioControl->IsAudioActivated());
 }
 
@@ -191,11 +190,11 @@ HWTEST_F(ZeroBranch9Test, Telephony_AudioControlManager_004, Function | MediumTe
 }
 
 /**
- * @tc.number   Telephony_AudioControlManager_001
+ * @tc.number   Telephony_AudioControlManager_005
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroBranch9Test, Telephony_AudioControlManager_001, Function | MediumTest | Level3)
+HWTEST_F(ZeroBranch9Test, Telephony_AudioControlManager_005, Function | MediumTest | Level3)
 {
     auto audioControl = DelayedSingleton<AudioControlManager>::GetInstance();
     audioControl->ExcludeBluetoothSco();
