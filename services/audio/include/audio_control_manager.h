@@ -31,6 +31,8 @@
 
 namespace OHOS {
 namespace Telephony {
+static constexpr const char *VIDEO_RING_PATH_FIX_TAIL = ".mp4";
+constexpr int32_t VIDEO_RING_PATH_FIX_TAIL_LENGTH = 4;
 class AudioControlManager : public CallStateListenerBase, public std::enable_shared_from_this<AudioControlManager> {
     DECLARE_DELAYED_SINGLETON(AudioControlManager)
 

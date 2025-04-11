@@ -559,6 +559,12 @@ int32_t AudioControlManager::HandleBluetoothAudioDevice(const AudioDevice &devic
 
 bool AudioControlManager::PlayRingtone()
 {
+    sptr<CallBase> incomingCall = CallObjectManager::GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_RINGING);
+    if (incomingCall == nullptr) {
+        TELEPHONY_LOGE("incomingCall is nullptr");
+        return false;
+    }
+    ContactInfo contactInfo = incomingCall->GetCallerInfo();
     if (!ShouldPlayRingtone()) {
         TELEPHONY_LOGE("should not play ringtone");
         return false;
@@ -568,14 +574,8 @@ bool AudioControlManager::PlayRingtone()
         TELEPHONY_LOGE("create ring object failed");
         return false;
     }
-    sptr<CallBase> incomingCall = CallObjectManager::GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_RINGING);
-    if (incomingCall == nullptr) {
-        TELEPHONY_LOGE("incomingCall is nullptr");
-        return false;
-    }
     CallAttributeInfo info;
     incomingCall->GetCallAttributeBaseInfo(info);
-    ContactInfo contactInfo = incomingCall->GetCallerInfo();
     AudioStandard::AudioRingerMode ringMode = DelayedSingleton<AudioProxy>::GetInstance()->GetRingerMode();
     if (incomingCall->GetCrsType() == CRS_TYPE) {
         if (!isCrsVibrating_ && (ringMode != AudioStandard::AudioRingerMode::RINGER_MODE_SILENT)) {
