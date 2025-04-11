@@ -940,13 +940,13 @@ bool AudioControlManager::ShouldPlayRingtone(const std::string &ringtonePath) co
     int32_t incomingCallNum = processor->GetCallNumber(TelCallState::CALL_STATUS_INCOMING);
     if (incomingCallNum == EMPTY_VALUE || alertingCallNum > EMPTY_VALUE || ringState_ == RingState::RINGING
         || (soundState_ == SoundState::SOUNDING && CallObjectManager::HasIncomingCallCrsType())) {
+        TELEPHONY_LOGI("should not play ring tone.");
         return false;
     }
     if (ringtonePath.substr(ringtonePath.length() - VIDEO_RING_PATH_FIX_TAIL_LENGTH,
         VIDEO_RING_PATH_FIX_TAIL_LENGTH) == VIDEO_RING_PATH_FIX_TAIL) {
-        AAFwk::WantParams params = call->GetExtraParams();
-        params.SetParam("VideoRingPath", AAFwk::String::Box(ringtonePath));
-        call->SetExtraParams(params);
+        TELEPHONY_LOGI("video ring scene.");
+        return false;
     }
     return true;
 }
