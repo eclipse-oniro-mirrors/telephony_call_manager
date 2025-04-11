@@ -565,7 +565,7 @@ bool AudioControlManager::PlayRingtone()
         return false;
     }
     ContactInfo contactInfo = incomingCall->GetCallerInfo();
-    if (!ShouldPlayRingtone()) {
+    if (!ShouldPlayRingtone(contactInfo.ringtonePath)) {
         TELEPHONY_LOGE("should not play ringtone");
         return false;
     }
