@@ -51,7 +51,8 @@ void ZeroBranch9Test::TearDown()
 
 void ZeroBranch9Test::SetUpTestCase() {}
     
-void ZeroBranch9Test::TearDownTestCase() {
+void ZeroBranch9Test::TearDownTestCase() 
+{
     sleep(WAIT_TIME);
 }
 
