@@ -33,7 +33,7 @@ public:
     void SetUp();
     void TearDown();
     static void SetUpTestCase();
-    static void TearDownTestCase(); 
+    static void TearDownTestCase();
 };
 void ZeroBranch9Test::SetUp()
 {
@@ -51,7 +51,7 @@ void ZeroBranch9Test::TearDown()
 
 void ZeroBranch9Test::SetUpTestCase() {}
     
-void ZeroBranch9Test::TearDownTestCase() 
+void ZeroBranch9Test::TearDownTestCase()
 {
     sleep(WAIT_TIME);
 }
