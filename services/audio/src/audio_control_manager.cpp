@@ -933,7 +933,7 @@ bool AudioControlManager::IsNumberAllowed(const std::string &phoneNum)
     return true;
 }
 
-bool AudioControlManager::ShouldPlayRingtone() const
+bool AudioControlManager::ShouldPlayRingtone(const std::string &ringtonePath) const
 {
     auto processor = DelayedSingleton<CallStateProcessor>::GetInstance();
     int32_t alertingCallNum = processor->GetCallNumber(TelCallState::CALL_STATUS_ALERTING);
@@ -941,6 +941,12 @@ bool AudioControlManager::ShouldPlayRingtone() const
     if (incomingCallNum == EMPTY_VALUE || alertingCallNum > EMPTY_VALUE || ringState_ == RingState::RINGING
         || (soundState_ == SoundState::SOUNDING && CallObjectManager::HasIncomingCallCrsType())) {
         return false;
+    }
+    if (ringtonePath.substr(ringtonePath.length() - VIDEO_RING_PATH_FIX_TAIL_LENGTH,
+        VIDEO_RING_PATH_FIX_TAIL_LENGTH) == VIDEO_RING_PATH_FIX_TAIL) {
+        AAFwk::WantParams params = call->GetExtraParams();
+        params.SetParam("VideoRingPath", AAFwk::String::Box(ringtonePath));
+        call->SetExtraParams(params);
     }
     return true;
 }
