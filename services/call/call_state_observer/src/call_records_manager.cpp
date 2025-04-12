@@ -30,6 +30,7 @@
 #ifdef SUPPORT_MUTE_BY_DATABASE
 #include "interoperable_settings_handler.h"
 #endif
+#include "call_control_manager.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -446,6 +447,7 @@ void DataShareReadyEventSubscriber::OnReceiveEvent(const CommonEventData &data)
         DelayedSingleton<AppExecFwk::OsAccountManagerWrapper>::GetInstance()->QueryActiveOsAccountIds(activeList);
         DelayedSingleton<CallRecordsManager>::GetInstance()->QueryUnReadMissedCallLog(activeList[0]);
         LocationSystemAbilityListener::SystemAbilitySubscriber();
+        DelayedSingleton<CallControlManager>::GetInstance()->RegisterObserver();
 #ifdef SUPPORT_MUTE_BY_DATABASE
         InteroperableSettingsHandler::RegisterObserver();
 #endif

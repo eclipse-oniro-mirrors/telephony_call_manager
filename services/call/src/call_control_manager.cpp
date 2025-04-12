@@ -47,6 +47,7 @@
 #include "distributed_communication_manager.h"
 #include "call_voice_assistant_manager.h"
 #include "interoperable_communication_manager.h"
+#include "settings_datashare_helper.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -2054,5 +2055,56 @@ void CallControlManager::HangUpFirstCallBySecondCallID(int32_t secondCallId, boo
     }
 }
 #endif
+void WearStatusObserver::OnChange()
+{
+    std::string wearStatus = "";
+    auto settingHelper = SettingsDataShareHelper::GetInstance();
+    auto callControlMgr = DelayedSingleton<CallControlManager>().GetInstance();
+    if (settingHelper != nullptr) {
+        OHOS::Uri settingUri(SettingsDataShareHelper::SETTINGS_DATASHARE_URI);
+        settingHelper->Query(settingUri, "wear_status", wearStatus);
+    }
+    TELEPHONY_LOGI("OnChange wear status: %{public}s", wearStatus.c_str());
+    if (wearStatus == "1") {
+        callControlMgr->setWearState(WEAR_STATUS_OFF);
+        return;
+    } else if (wearStatus == "2") {
+        callControlMgr->setWearState(WEAR_STATUS_ON);
+        return;
+    }
+    callControlMgr->setWearState(WEAR_STATUS_INVALID);
+    return;
+}
+void CallControlManager::RegisterObserver()
+{
+    if (wearStatusObserver_ != nullptr) {
+        return;
+    }
+    wearStatusObserver_ = new (std::nothrow) WearStatusObserver();
+    if (wearStatusObserver_ == nullptr) {
+        TELEPHONY_LOGE("wearStatusObserver_ is null");
+        return;
+    }
+
+    std::string wearStatus = "wear_status";
+    OHOS::Uri wearStatusUri(SettingsDataShareHelper::SETTINGS_DATASHARE_URI + "&key=" + wearStatus);
+    auto helper = DelayedSingleton<SettingsDataShareHelper>().GetInstance();
+    if (!helper->RegisterToDataShare(wearStatusUri, wearStatusObserver_)) {
+        TELEPHONY_LOGE("RegisterObserver failed");
+    }
+}
+
+void CallControlManager::setWearState(int32_t state)
+{
+    wearStatus = state;
+}
+
+bool CallControlManager::isNotWearOnWrist()
+{
+    if (wearStatus == WEAR_STATUS_OFF) {
+        return true;
+    }
+    return false;
+}
 } // namespace Telephony
 } // namespace OHOS
