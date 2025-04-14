@@ -1802,6 +1802,9 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_014, Function | MediumTest
     markInfo.markType = MarkType::MARK_TYPE_YELLOW_PAGE;
     call->SetNumberMarkInfo(markInfo);
     manager->SetupAntiFraudService(call, info);
+    markInfo.markType = MarkType::MARK_TYPE_ENTERPRISE;
+    call->SetNumberMarkInfo(markInfo);
+    manager->SetupAntiFraudService(call, info);
     markInfo.markType = MarkType::MARK_TYPE_TAXI;
     call->SetNumberMarkInfo(markInfo);
     manager->SetupAntiFraudService(call, info);
