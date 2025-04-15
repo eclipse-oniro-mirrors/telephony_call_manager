@@ -907,7 +907,7 @@ void CallStatusManager::HandleCeliaCall(sptr<CallBase> &call)
     UpdateAntiFraudState(call, static_cast<int32_t>(AntiFraudState::ANTIFRAUD_STATE_FINISHED));
 
     if (call->GetTelCallState() == TelCallState::CALL_STATUS_ACTIVE) {
-        ret = UpdateCallState(call, TelCallState::CALL_STATUS_ACTIVE);
+        int32_t ret = UpdateCallState(call, TelCallState::CALL_STATUS_ACTIVE);
         if (ret != TELEPHONY_SUCCESS) {
             TELEPHONY_LOGE("UpdateCallState failed, errCode:%{public}d", ret);
         }
