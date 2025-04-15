@@ -1353,7 +1353,8 @@ HWTEST_F(CallManagerGtest, Telephony_AntiFraud_0100, Function | MediumTest | Lev
     antiFraudService->RecordDetectResult(fraudResult, phoneNum, 0, 0);
     EXPECT_EQ(antiFraudService->stoppedIndex_, -1);
 
-    EXPECT_NE(antiFraudService->InitAntiFraudService(phoneNum, 0, 0), 0);
+    EXPECT_NE(antiFraudService->CheckAntiFraudService(phoneNum, 0, 0), 0);
+    EXPECT_NE(antiFraudService->StartAntiFraudService(phoneNum, 0, 0), 0);
     EXPECT_NE(antiFraudService->StopAntiFraudService(0, 0), 0);
 
     auto antiFraudAdapter = DelayedSingleton<AntiFraudAdapter>::GetInstance();

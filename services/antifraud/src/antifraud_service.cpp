@@ -181,7 +181,7 @@ void AntiFraudService::RecordDetectResult(const OHOS::AntiFraudService::AntiFrau
     }
 }
 
-int32_t AntiFraudService::InitAntiFraudService(const std::string &phoneNum, int32_t slotId, int32_t index)
+int32_t AntiFraudService::StartAntiFraudService(const std::string &phoneNum, int32_t slotId, int32_t index)
 {
     auto antiFraudAdapter = DelayedSingleton<AntiFraudAdapter>::GetInstance();
     int32_t antiFraudErrCode = antiFraudAdapter->CheckAntiFraud(phoneNum);

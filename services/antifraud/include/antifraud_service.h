@@ -63,7 +63,7 @@ public:
     void InitParams();
     void RecordDetectResult(const OHOS::AntiFraudService::AntiFraudResult &antiFraudResult,
         std::string resultPhoneNum, int32_t slotId, int32_t index);
-    int32_t InitAntiFraudService(const std::string &phoneNum, int32_t slotId, int32_t index);
+    int32_t StartAntiFraudService(const std::string &phoneNum, int32_t slotId, int32_t index);
     int32_t StopAntiFraudService(int32_t slotId, int32_t index);
     std::shared_ptr<DataShare::DataShareHelper> CreateDataShareHelper(
         int32_t systemAbilityId, const char *uri);
@@ -75,6 +75,7 @@ private:
     int32_t GetStoppedIndex();
     void SetStoppedSlotId(int32_t slotId);
     void SetStoppedIndex(int32_t index);
+    int32_t CheckAntiFraudService(const std::string &phoneNum, int32_t slotId, int32_t index)；
  
 private:
     class AntiFraudDetectResListenerImpl : public OHOS::AntiFraudService::AntiFraudDetectResListener {
