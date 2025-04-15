@@ -452,7 +452,7 @@ bool CallNumberUtils::IsShortCode(const std::string &number)
 
 bool CallNumberUtils::IsShortCodeWithoutCellularCall(const std::string &number)
 {
-    if (number.length() != MAX_LENGTH_SHORT_CODE) {
+    if (number.length() > MAX_LENGTH_SHORT_CODE) {
         return false;
     }
     if (number[0] == '1' && std::isdigit(number[1])) {
