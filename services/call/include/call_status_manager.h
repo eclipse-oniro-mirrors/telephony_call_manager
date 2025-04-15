@@ -54,6 +54,7 @@ public:
     int32_t HandleVoipCallReportInfo(const CallDetailInfo &info);
     void CallFilterCompleteResult(const CallDetailInfo &info);
     int32_t HandleVoipEventReportInfo(const VoipCallEventInfo &info);
+    void HandleCeliaCall(sptr<CallBase> &call);
     void TriggerAntiFraud(int32_t antiFraudState);
 
 private:
@@ -96,6 +97,10 @@ private:
     int32_t TurnOffMute(sptr<CallBase> &call);
     int32_t IncomingFilterPolicy(const CallDetailInfo &info);
     void QueryCallerInfo(ContactInfo &contactInfo, std::string phoneNum);
+    int32_t GetAntiFraudSlotId();
+    int32_t GetAntiFraudIndex();
+    void SetAntiFraudSlotId(int32_t slotId);
+    void SetAntiFraudIndex(int32_t index);
     void SetupAntiFraudService(const sptr<CallBase> &call, const CallDetailInfo &info);
     void StopAntiFraudDetect(const sptr<CallBase> &call, const CallDetailInfo &info);
     bool IsContactPhoneNum(const std::string &phoneNum);
@@ -159,6 +164,7 @@ private:
     std::chrono::system_clock::time_point detectStartTime = std::chrono::system_clock::from_time_t(0);
     int32_t antiFraudSlotId_ = -1;
     int32_t antiFraudIndex_ = -1;
+    ffrt::mutex mutex_;
 };
 } // namespace Telephony
 } // namespace OHOS

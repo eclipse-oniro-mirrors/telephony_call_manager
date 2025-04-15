@@ -22,6 +22,7 @@
  
 namespace OHOS {
 namespace Telephony {
+typedef OHOS::ErrCode (*PfnAntiFraudVoiceCheck)(std::string phoneNum);
 typedef OHOS::ErrCode (*PfnAntiFraudVoiceDetect)(
     const std::shared_ptr<OHOS::AntiFraudService::AntiFraudDetectResListener> &listener);
 typedef OHOS::ErrCode (*PfnStopAntiFraudVoiceDetect)();
@@ -31,6 +32,7 @@ class AntiFraudAdapter {
 public:
     void *GetLibAntiFraud();
     void ReleaseAntiFraud();
+    int32_t CheckAntiFraud(std::string phoneNum);
     int32_t DetectAntiFraud(const std::shared_ptr<OHOS::AntiFraudService::AntiFraudDetectResListener> &listener);
     int32_t StopAntiFraud();
  
