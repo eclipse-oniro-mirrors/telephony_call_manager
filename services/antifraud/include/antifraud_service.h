@@ -62,21 +62,28 @@ public:
     bool IsUserImprovementPlanSwitchOn();
     void InitParams();
     void RecordDetectResult(const OHOS::AntiFraudService::AntiFraudResult &antiFraudResult,
-        int32_t slotId, int32_t index);
-    void InitAntiFraudService(const std::string &phoneNum, int32_t slotId, int32_t index);
-    void StopAntiFraudService(int32_t slotId, int32_t index);
+        std::string resultPhoneNum, int32_t slotId, int32_t index);
+    int32_t InitAntiFraudService(const std::string &phoneNum, int32_t slotId, int32_t index);
+    int32_t StopAntiFraudService(int32_t slotId, int32_t index);
     std::shared_ptr<DataShare::DataShareHelper> CreateDataShareHelper(
         int32_t systemAbilityId, const char *uri);
     void AddRuleToConfig(const std::string rulesName, void *config);
     int AnonymizeText();
  
 private:
+    int32_t GetStoppedSlotId();
+    int32_t GetStoppedIndex();
+    void SetStoppedSlotId(int32_t slotId);
+    void SetStoppedIndex(int32_t index);
+
+private:
     class AntiFraudDetectResListenerImpl : public OHOS::AntiFraudService::AntiFraudDetectResListener {
     public:
-        AntiFraudDetectResListenerImpl(int slotId, int index) : AntiFraudDetectResListener(),
-            slotId_(slotId), index_(index) {}
+        AntiFraudDetectResListenerImpl(std::string phoneNum, int slotId, int index) : AntiFraudDetectResListener(),
+            phoneNum_(phoneNum), slotId_(slotId), index_(index) {}
         void HandleAntiFraudDetectRes(const OHOS::AntiFraudService::AntiFraudResult &antiFraudResult) override;
     private:
+        std::string phoneNum_;
         int32_t slotId_;
         int32_t index_;
     };
@@ -93,8 +100,7 @@ private:
     int32_t stoppedSlotId_ = -1;
     int32_t stoppedIndex_ = -1;
 
-    std::mutex queueMutex_;
-    std::queue<std::string> phoneNumQueue_;
+    ffrt::mutex mutex_;
  
 private:
     std::shared_ptr<CallStatusManager> callStatusManagerPtr_ = nullptr;
