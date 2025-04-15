@@ -1340,5 +1340,90 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_011, Function | MediumTest
     EXPECT_EQ(callStatusManager->antiFraudSlotId_, -1);
     sleep(WAIT_TIME);
 }
+
+HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_013, Function | MediumTest | Level3)
+{
+    std::shared_ptr<CallStatusManager> callStatusManager = std::make_shared<CallStatusManager>();
+    CallDetailInfo info;
+    bool isExistedOldCall = false;
+    CallObjectManager::callObjectPtrList_.clear();
+    EXPECT_EQ(callStatusManager->RefreshOldCall(info, isExistedOldCall), TELEPHONY_SUCCESS);
+    info.state = TelCallState::CALL_STATUS_ACTIVE;
+    info.callType = CallType::TYPE_IMS;
+    info.callMode = VideoStateType::TYPE_VOICE;
+    callStatusManager->tmpCallDetailsInfo_[0].callVec.push_back(info);
+    EXPECT_TRUE(callStatusManager->GetConferenceCallList(0).empty());
+    auto &tmpInfo = callStatusManager->tmpCallDetailsInfo_[0].callVec[0];
+    tmpInfo.mpty = 1;
+    EXPECT_TRUE(callStatusManager->GetConferenceCallList(0).empty());
+    sptr<CallBase> call = callStatusManager->CreateNewCall(info, CallDirection::CALL_DIRECTION_IN);
+    ASSERT_TRUE(call != nullptr);
+    DialParaInfo paraInfo;
+    AppExecFwk::PacMap extras;
+    EXPECT_TRUE(callStatusManager->CreateNewCallByCallTypeEx(paraInfo, info, CallDirection::CALL_DIRECTION_IN,
+        extras) == nullptr);
+    CallObjectManager::AddOneCallObject(call);
+    callStatusManager->StartInComingCallMotionRecognition();
+    EXPECT_FALSE(callStatusManager->GetConferenceCallList(0).empty());
+    callStatusManager->StopCallMotionRecognition(TelCallState::CALL_STATUS_DISCONNECTED);
+    EXPECT_GT(callStatusManager->RefreshOldCall(info, isExistedOldCall), TELEPHONY_ERROR);
+    info.callType = CallType::TYPE_CS;
+    EXPECT_GT(callStatusManager->RefreshOldCall(info, isExistedOldCall), TELEPHONY_ERROR);
+    info.state = TelCallState::CALL_STATUS_HOLDING;
+    EXPECT_GT(callStatusManager->RefreshOldCall(info, isExistedOldCall), TELEPHONY_ERROR);
+    info.callMode = VideoStateType::TYPE_VIDEO;
+    EXPECT_GT(callStatusManager->RefreshOldCall(info, isExistedOldCall), TELEPHONY_ERROR);
+    info.callType = CallType::TYPE_IMS;
+    info.state = TelCallState::CALL_STATUS_ACTIVE;
+    EXPECT_GT(callStatusManager->RefreshOldCall(info, isExistedOldCall), TELEPHONY_ERROR);
+    info.callType = CallType::TYPE_CS;
+    info.callMode = VideoStateType::TYPE_VOICE;
+    EXPECT_GT(callStatusManager->RefreshOldCall(info, isExistedOldCall), TELEPHONY_ERROR);
+    call->SetCallRunningState(CallRunningState::CALL_RUNNING_STATE_HOLD);
+    callStatusManager->StartInComingCallMotionRecognition();
+    callStatusManager->BtCallDialingHandleFirst(call, info);
+    info.state = TelCallState::CALL_STATUS_ALERTING;
+    callStatusManager->BtCallDialingHandleFirst(call, info);
+    call->SetTelCallState(TelCallState::CALL_STATUS_ALERTING);
+    callStatusManager->BtCallDialingHandleFirst(call, info);
+    EXPECT_EQ(call->GetTelCallState(), TelCallState::CALL_STATUS_DIALING);
+    callStatusManager->BtCallDialingHandle(call, info);
+    EXPECT_EQ(call->phoneOrWatch_, static_cast<int32_t>(PhoneOrWatchDial::WATCH_DIAL));
+}
+
+HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_014, Function | MediumTest | Level3)
+{
+    std::shared_ptr<CallStatusManager> manager = std::make_shared<CallStatusManager>();
+    CallDetailInfo info;
+    info.state = TelCallState::CALL_STATUS_ACTIVE;
+    info.callType = CallType::TYPE_IMS;
+    sptr<CallBase> call = manager->CreateNewCall(info, CallDirection::CALL_DIRECTION_IN);
+    ASSERT_TRUE(call != nullptr);
+    manager->antiFraudSlotId_ = 0;
+    manager->antiFraudIndex_ = 0;
+    call->SetSlotId(1);
+    manager->StopAntiFraudDetect(call, info);
+    manager->HandleCeliaCall(call);
+    info.index = 1;
+    call->SetCallIndex(1);
+    manager->StopAntiFraudDetect(call, info);
+    manager->HandleCeliaCall(call);
+    call->SetSlotId(0);
+    manager->StopAntiFraudDetect(call, info);
+    manager->HandleCeliaCall(call);
+    EXPECT_EQ(manager->antiFraudIndex_, 0);
+
+    NumberMarkInfo markInfo;
+    markInfo.markType = MarkType::MARK_TYPE_FRAUD;
+    call->SetNumberMarkInfo(markInfo);
+    manager->SetupAntiFraudService(call, info);
+    markInfo.markType = MarkType::MARK_TYPE_YELLOW_PAGE;
+    call->SetNumberMarkInfo(markInfo);
+    manager->SetupAntiFraudService(call, info);
+    markInfo.markType = MarkType::MARK_TYPE_TAXI;
+    call->SetNumberMarkInfo(markInfo);
+    manager->SetupAntiFraudService(call, info);
+    EXPECT_EQ(manager->antiFraudIndex_, 0);
+}
 } // namespace Telephony
 } // namespace OHOS

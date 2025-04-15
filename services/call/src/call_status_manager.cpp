@@ -827,6 +827,30 @@ int32_t CallStatusManager::ActiveHandle(const CallDetailInfo &info)
     return ret;
 }
 
+int32_t CallStatusManager::GetAntiFraudSlotId()
+{
+    std::lock_guard<ffrt::mutex> lock(mutex_);
+    return antiFraudSlotId_;
+}
+
+int32_t CallStatusManager::GetAntiFraudIndex()
+{
+    std::lock_guard<ffrt::mutex> lock(mutex_);
+    return antiFraudIndex_;
+}
+
+void CallStatusManager::SetAntiFraudSlotId(int32_t slotId)
+{
+    std::lock_guard<ffrt::mutex> lock(mutex_);
+    antiFraudSlotId_ = slotId;
+}
+
+void CallStatusManager::SetAntiFraudIndex(int32_t index)
+{
+    std::lock_guard<ffrt::mutex> lock(mutex_);
+    antiFraudIndex_ = index;
+}
+
 void CallStatusManager::SetupAntiFraudService(const sptr<CallBase> &call, const CallDetailInfo &info)
 {
     auto antiFraudService = DelayedSingleton<AntiFraudService>::GetInstance();
@@ -839,25 +863,61 @@ void CallStatusManager::SetupAntiFraudService(const sptr<CallBase> &call, const 
         if (slotId == -1) {
             return;
         }
-        if (antiFraudSlotId_ != -1 || antiFraudIndex_ != -1) {
+        if (GetAntiFraudSlotId() != -1 || GetAntiFraudIndex() != -1) {
             return;
         }
-        antiFraudSlotId_ = slotId;
-        antiFraudIndex_ = info.index;
-        ffrt::submit([tmpStr, slotId, info]() {
-            DelayedSingleton<AntiFraudService>::GetInstance()->InitAntiFraudService(tmpStr, slotId, info.index);
-        });
+        SetAntiFraudSlotId(slotId);
+        SetAntiFraudIndex(info.index);
+        int32_t ret = DelayedSingleton<AntiFraudService>::GetInstance()->
+            InitAntiFraudService(tmpStr, slotId, info.index);
+        if (ret != 0) {
+            SetAntiFraudSlotId(-1);
+            SetAntiFraudIndex(-1);
+        }
     }
 }
+
 void CallStatusManager::StopAntiFraudDetect(const sptr<CallBase> &call, const CallDetailInfo &info)
 {
-    if (call->GetSlotId() == antiFraudSlotId_ && info.index == antiFraudIndex_) {
-        ffrt::submit([call, info]() {
-            DelayedSingleton<AntiFraudService>::GetInstance()->StopAntiFraudService(call->GetSlotId(), info.index);
-        });
-        antiFraudSlotId_ = -1;
-        antiFraudIndex_ = -1;
-        TELEPHONY_LOGI("call ending, can begin a new antifraud");
+    if (GetAntiFraudSlotId() != call->GetSlotId() || GetAntiFraudIndex() != info.index) {
+        return;
+    }
+    int32_t ret = DelayedSingleton<AntiFraudService>::GetInstance()->
+        StopAntiFraudService(call->GetSlotId(), info.index);
+    if (ret != 0) {
+        return;
+    }
+    SetAntiFraudSlotId(-1);
+    SetAntiFraudIndex(-1);
+    TELEPHONY_LOGI("call ending, can begin a new antifraud");
+}
+
+void CallStatusManager::HandleCeliaCall(sptr<CallBase> &call)
+{
+    int32_t slotId = call->GetSlotId();
+    int32_t index = call->GetCallIndex();
+    TELEPHONY_LOGI("handle celia call, slotId=%{public}d, index=%{public}d", slotId, index);
+    if (GetAntiFraudSlotId() != slotId || GetAntiFraudIndex() != index) {
+        return;
+    }
+    int32_t ret = DelayedSingleton<AntiFraudService>::GetInstance()->
+        StopAntiFraudService(slotId, index);
+    if (ret != 0) {
+        return;
+    }
+    SetAntiFraudSlotId(-1);
+    SetAntiFraudIndex(-1);
+    TELEPHONY_LOGI("celia call begin, recover AntiFraud SlotId and Index");
+    AAFwk::WantParams extraParams = call->GetExtraParams();
+    int32_t antiFraudState = static_cast<int32_t>(AntiFraudState::ANTIFRAUD_STATE_FINISHED);
+    extraParams.SetParam("antiFraudState", AAFwk::Integer::Box(antiFraudState));
+    call->SetExtraParams(extraParams);
+
+    if (call->GetTelCallState() == TelCallState::CALL_STATUS_ACTIVE) {
+        ret = UpdateCallState(call, TelCallState::CALL_STATUS_ACTIVE);
+        if (ret != TELEPHONY_SUCCESS) {
+            TELEPHONY_LOGE("UpdateCallState failed, errCode:%{public}d", ret);
+        }
     }
 }
 
@@ -886,11 +946,12 @@ void CallStatusManager::TriggerAntiFraud(int32_t antiFraudState)
 {
     TELEPHONY_LOGI("TriggerAntiState, antiFraudState = %{public}d", antiFraudState);
     sptr<CallBase> call = nullptr;
-    if (antiFraudSlotId_ >= SLOT_NUM || antiFraudSlotId_ < 0) {
+    int32_t antiFraudSlotId = GetAntiFraudSlotId();
+    if (antiFraudSlotId >= SLOT_NUM || antiFraudSlotId < 0) {
         return;
     }
-    for (auto &it : callDetailsInfo_[antiFraudSlotId_].callVec) {
-        if (it.index == antiFraudIndex_) {
+    for (auto &it : callDetailsInfo_[antiFraudSlotId].callVec) {
+        if (it.index == GetAntiFraudIndex()) {
             it.antiFraudState = antiFraudState;
             call = GetOneCallObjectByIndexSlotIdAndCallType(it.index, it.accountId, it.callType);
             break;
@@ -898,8 +959,8 @@ void CallStatusManager::TriggerAntiFraud(int32_t antiFraudState)
     }
     if (antiFraudState == static_cast<int32_t>(AntiFraudState::ANTIFRAUD_STATE_RISK) ||
         antiFraudState == static_cast<int32_t>(AntiFraudState::ANTIFRAUD_STATE_FINISHED)) {
-        antiFraudSlotId_ = -1;
-        antiFraudIndex_ = -1;
+        SetAntiFraudSlotId(-1);
+        SetAntiFraudIndex(-1);
         TELEPHONY_LOGI("detect finish, can begin a new antifraud");
     }
 
@@ -907,7 +968,7 @@ void CallStatusManager::TriggerAntiFraud(int32_t antiFraudState)
         return;
     }
     if (antiFraudState != static_cast<int32_t>(AntiFraudState::ANTIFRAUD_STATE_DEFAULT)) {
-        AAFwk::WantParams extraParams;
+        AAFwk::WantParams extraParams = call->GetExtraParams();
         extraParams.SetParam("antiFraudState", AAFwk::Integer::Box(antiFraudState));
         call->SetExtraParams(extraParams);
     }

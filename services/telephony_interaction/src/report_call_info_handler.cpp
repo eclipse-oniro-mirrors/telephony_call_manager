@@ -17,6 +17,7 @@
 
 #include "call_manager_errors.h"
 #include "call_manager_hisysevent.h"
+#include "call_manager_service.h"
 #include "ffrt.h"
 #include "ims_call.h"
 #include "telephony_log_wrapper.h"
@@ -37,6 +38,7 @@ void ReportCallInfoHandler::Init()
     callStatusManagerPtr_ = std::make_shared<CallStatusManager>();
     callStatusManagerPtr_->Init();
     DelayedSingleton<AntiFraudService>::GetInstance()->SetCallStatusManager(callStatusManagerPtr_);
+    DelayedSingleton<CallManagerService>::GetInstance()->SetCallStatusManager(callStatusManagerPtr_);
     return;
 }
 
