@@ -38,8 +38,7 @@ public:
     void OnDeviceOffline(const DistributedHardware::DmDeviceInfo &deviceInfo);
     void SetMuted(bool isMute);
     void MuteRinger();
-    void NewCallCreated(sptr<CallBase> &call) override;
-    void CallDestroyed(const DisconnectedDetails &details) override;
+    void CallStateUpdated(sptr<CallBase> &callObjectPtr, TelCallState priorState, TelCallState nextState) override;
  
 private:
     ffrt::mutex mutex_{};

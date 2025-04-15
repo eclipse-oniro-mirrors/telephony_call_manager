@@ -16,6 +16,7 @@
 #include "interoperable_communication_manager.h"
 #include "interoperable_server_manager.h"
 #include "interoperable_client_manager.h"
+#include "parameters.h"
 #include "telephony_log_wrapper.h"
 
 namespace OHOS {
@@ -39,9 +40,10 @@ void InteroperableCommunicationManager::OnDeviceOnline(const DistributedHardware
     uint16_t devType = deviceInfo.deviceTypeId;
     {
         std::lock_guard<ffrt::mutex> lock(mutex_);
-        if (devType == 0x0E) {                           // 0x0E手机
+        std::string ownType = system::GetParameter("const.product.devicetype", "");
+        if (devType == 0x0E && (ownType == "wearable" || ownType == "car")) {    // 0x0E手机
             role_ = InteroperableRole::OTHERS;
-        } else if (devType == 0x6D || devType == 0x83) { // 0x6D手表，0x83车机
+        } else if (devType == 0x6D || devType == 0x83) {    // 0x6D手表，0x83车机
             role_ = InteroperableRole::PHONE;
         } else {
             TELEPHONY_LOGE("not interoperable device");
@@ -65,7 +67,7 @@ void InteroperableCommunicationManager::OnDeviceOnline(const DistributedHardware
  
 void InteroperableCommunicationManager::OnDeviceOffline(const DistributedHardware::DmDeviceInfo &deviceInfo)
 {
-    TELEPHONY_LOGI("DSHT Interoperable device offline, networkId = %{public}s, devrole = %{public}d",
+    TELEPHONY_LOGI("Interoperable device offline, networkId = %{public}s, devrole = %{public}d",
         deviceInfo.networkId, deviceInfo.deviceTypeId);
     if (devObserver_ == nullptr) {
         return;
@@ -73,6 +75,11 @@ void InteroperableCommunicationManager::OnDeviceOffline(const DistributedHardwar
     std::string networkId = deviceInfo.networkId;
     std::string devName = deviceInfo.deviceName;
     uint16_t devType = deviceInfo.deviceTypeId;
+    std::string ownType = system::GetParameter("const.product.devicetype", "");
+    if (devType == 0x0E && ownType != "wearable" && ownType != "car") {    // 0x0E手机
+        TELEPHONY_LOGE("not interoperable device");
+        return;
+    }
     devObserver_->OnDeviceOffline(networkId, devName, devType);
     devObserver_->UnRegisterDevStatusCallback(dataController_);
 
@@ -113,26 +120,28 @@ void InteroperableCommunicationManager::MuteRinger()
     dataController_->MuteRinger();
 }
  
-void InteroperableCommunicationManager::NewCallCreated(sptr<CallBase> &call)
+void InteroperableCommunicationManager::CallStateUpdated(
+    sptr<CallBase> &callObjectPtr, TelCallState priorState, TelCallState nextState)
 {
-    if (call == nullptr || role_ == InteroperableRole::PHONE) {
-        TELEPHONY_LOGE("no found call or phone recv call");
+    std::lock_guard<ffrt::mutex> lock(mutex_);
+    if (callObjectPtr == nullptr || dataController_ == nullptr) {
+        TELEPHONY_LOGE("callObjectPtr is null or dataController_ is null");
         return;
     }
-    std::lock_guard<ffrt::mutex> lock(mutex_);
-    if (dataController_ != nullptr) {
+    if (nextState == TelCallState::CALL_STATUS_INCOMING) {
+        TELEPHONY_LOGI("interoperable new call created");
+        if (role_ == InteroperableRole::PHONE) {
+            TELEPHONY_LOGI("phone recv call");
+            return;
+        }
         if (peerDevices_.empty()) {
             TELEPHONY_LOGE("call created but no peer device");
             return;
         }
-        dataController_->OnCallCreated(call, peerDevices_.front());
-    }
-}
- 
-void InteroperableCommunicationManager::CallDestroyed(const DisconnectedDetails &details)
-{
-    std::lock_guard<ffrt::mutex> lock(mutex_);
-    if (dataController_ != nullptr) {
+        dataController_->OnCallCreated(callObjectPtr, peerDevices_.front());
+    } else if (nextState == TelCallState::CALL_STATUS_DISCONNECTED ||
+        nextState == TelCallState::CALL_STATUS_DISCONNECTING) {
+        TELEPHONY_LOGI("interoperable call destroyed");
         dataController_->OnCallDestroyed();
     }
 }

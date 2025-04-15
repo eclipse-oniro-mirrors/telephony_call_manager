@@ -15,6 +15,7 @@
 
 #include <gtest/gtest.h>
 #include <cstring>
+#include "cs_call.h"
 #include "interoperable_communication_manager.h"
 #include "singleton.h"
 
