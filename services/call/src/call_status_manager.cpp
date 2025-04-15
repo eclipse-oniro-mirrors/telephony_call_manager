@@ -869,12 +869,14 @@ void CallStatusManager::SetupAntiFraudService(const sptr<CallBase> &call, const 
         }
         SetAntiFraudSlotId(slotId);
         SetAntiFraudIndex(info.index);
-        int32_t ret = DelayedSingleton<AntiFraudService>::GetInstance()->
-            InitAntiFraudService(tmpStr, slotId, info.index);
-        if (ret != 0) {
-            SetAntiFraudSlotId(-1);
-            SetAntiFraudIndex(-1);
-        }
+        ffrt::submit([tmpStr, slotId, info, this]() {
+            int32_t ret = DelayedSingleton<AntiFraudService>::GetInstance()->
+                StartAntiFraudService(tmpStr, slotId, info.index);
+            if (ret != 0) {
+                SetAntiFraudSlotId(-1);
+                SetAntiFraudIndex(-1);
+            }
+        });
     }
 }
 
@@ -883,11 +885,7 @@ void CallStatusManager::StopAntiFraudDetect(sptr<CallBase> &call, const CallDeta
     if (GetAntiFraudSlotId() != call->GetSlotId() || GetAntiFraudIndex() != info.index) {
         return;
     }
-    int32_t ret = DelayedSingleton<AntiFraudService>::GetInstance()->
-        StopAntiFraudService(call->GetSlotId(), info.index);
-    if (ret != 0) {
-        return;
-    }
+    DelayedSingleton<AntiFraudService>::GetInstance()->StopAntiFraudService(call->GetSlotId(), info.index);
     SetAntiFraudSlotId(-1);
     SetAntiFraudIndex(-1);
     TELEPHONY_LOGI("call ending, can begin a new antifraud");
@@ -902,18 +900,14 @@ void CallStatusManager::HandleCeliaCall(sptr<CallBase> &call)
     if (GetAntiFraudSlotId() != slotId || GetAntiFraudIndex() != index) {
         return;
     }
-    int32_t ret = DelayedSingleton<AntiFraudService>::GetInstance()->
-        StopAntiFraudService(slotId, index);
-    if (ret != 0) {
-        return;
-    }
+    DelayedSingleton<AntiFraudService>::GetInstance()->StopAntiFraudService(slotId, index);
     SetAntiFraudSlotId(-1);
     SetAntiFraudIndex(-1);
     TELEPHONY_LOGI("celia call begin, recover AntiFraud SlotId and Index");
     UpdateAntiFraudState(call, static_cast<int32_t>(AntiFraudState::ANTIFRAUD_STATE_FINISHED));
 
     if (call->GetTelCallState() == TelCallState::CALL_STATUS_ACTIVE) {
-        ret = UpdateCallState(call, TelCallState::CALL_STATUS_ACTIVE);
+        int32_t ret = UpdateCallState(call, TelCallState::CALL_STATUS_ACTIVE);
         if (ret != TELEPHONY_SUCCESS) {
             TELEPHONY_LOGE("UpdateCallState failed, errCode:%{public}d", ret);
         }

@@ -56,6 +56,8 @@ public:
     int32_t HandleVoipEventReportInfo(const VoipCallEventInfo &info);
     void HandleCeliaCall(sptr<CallBase> &call);
     void TriggerAntiFraud(int32_t antiFraudState);
+    int32_t GetAntiFraudSlotId();
+    int32_t GetAntiFraudIndex();
 
 private:
     void InitCallBaseEvent();
@@ -97,8 +99,6 @@ private:
     int32_t TurnOffMute(sptr<CallBase> &call);
     int32_t IncomingFilterPolicy(const CallDetailInfo &info);
     void QueryCallerInfo(ContactInfo &contactInfo, std::string phoneNum);
-    int32_t GetAntiFraudSlotId();
-    int32_t GetAntiFraudIndex();
     void SetAntiFraudSlotId(int32_t slotId);
     void SetAntiFraudIndex(int32_t index);
     void SetupAntiFraudService(const sptr<CallBase> &call, const CallDetailInfo &info);
