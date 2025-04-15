@@ -531,11 +531,13 @@ void CallStatusManager::DealVideoRingPath(std::string &ringtonePath, sptr<CallBa
             TELEPHONY_LOGI("ringtonePath: %{public}s.", ringtonePath.c_str());
         }
     }
+
     if (ringtonePath.substr(ringtonePath.length() - VIDEO_RING_PATH_FIX_TAIL_LENGTH,
         VIDEO_RING_PATH_FIX_TAIL_LENGTH) == VIDEO_RING_PATH_FIX_TAIL) {
-        AAFwk::WantParams params = call->GetExtraParams();
+        TELEPHONY_LOGI("notify callui to play video ring.");
+        AAFwk::WantParams params = callObjectPtr->GetExtraParams();
         params.SetParam("VideoRingPath", AAFwk::String::Box(ringtonePath));
-        call->SetExtraParams(params);
+        callObjectPtr->SetExtraParams(params);
     }
 }
 
