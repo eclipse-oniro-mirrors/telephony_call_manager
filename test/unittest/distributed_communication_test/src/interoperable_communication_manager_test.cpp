@@ -40,15 +40,29 @@ HWTEST_F(InteroperableCommunicationManagerTest,
          Telephony_InteroperableCommunicationManagerTest_001, Function | MediumTest | Level1)
 {
     DisconnectedDetails details;
-    sptr<CallBase> csCall = nullptr;
+    sptr<CallBase> call1 = nullptr;
+    DialParaInfo mDialParaInfo;
+    sptr<CallBase> call2 = new CSCall(mDialParaInfo);
     std::string devId = "UnitTestDeviceId";
     auto dcManager = DelayedSingleton<InteroperableCommunicationManager>::GetInstance();
+    TelCallState pState = TelCallState::CALL_STATUS_UNKNOWN;
+    TelCallState nState1 = TelCallState::CALL_STATUS_INCOMING;
+    TelCallState nState2 = TelCallState::CALL_STATUS_DISCONNECTED;
+    TelCallState nState3 = TelCallState::CALL_STATUS_DISCONNECTING;
+    DistributedHardware::DmDeviceInfo deviceInfo;
+    deviceInfo.deviceTypeId = 0x6D;
  
-    ASSERT_NO_THROW(dcManager->NewCallCreated(csCall));
+    ASSERT_NO_THROW(dcManager->CallStateUpdated(call1, pState, nState1));
+    ASSERT_NO_THROW(dcManager->CallStateUpdated(call2, pState, nState1));
     ASSERT_NO_THROW(dcManager->SetMuted(true));
     ASSERT_NO_THROW(dcManager->MuteRinger());
-    ASSERT_NO_THROW(dcManager->NewCallCreated(csCall));
-    ASSERT_NO_THROW(dcManager->CallDestroyed(details));
+    dcManager->OnDeviceOnline(deviceInfo);
+    ASSERT_NO_THROW(dcManager->CallStateUpdated(call1, pState, nState1));
+    ASSERT_NO_THROW(dcManager->CallStateUpdated(call2, pState, nState1));
+    ASSERT_NO_THROW(dcManager->CallStateUpdated(call2, pState, nState2));
+    ASSERT_NO_THROW(dcManager->CallStateUpdated(call2, pState, nState3));
+    ASSERT_NO_THROW(dcManager->SetMuted(true));
+    ASSERT_NO_THROW(dcManager->MuteRinger());
 }
  
 /**
