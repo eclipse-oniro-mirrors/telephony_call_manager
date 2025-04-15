@@ -885,8 +885,7 @@ void CallStatusManager::StopAntiFraudDetect(sptr<CallBase> &call, const CallDeta
     if (GetAntiFraudSlotId() != call->GetSlotId() || GetAntiFraudIndex() != info.index) {
         return;
     }
-    int32_t ret = DelayedSingleton<AntiFraudService>::GetInstance()->
-        StopAntiFraudService(call->GetSlotId(), info.index);
+    DelayedSingleton<AntiFraudService>::GetInstance()->StopAntiFraudService(call->GetSlotId(), info.index);
     SetAntiFraudSlotId(-1);
     SetAntiFraudIndex(-1);
     TELEPHONY_LOGI("call ending, can begin a new antifraud");
@@ -901,8 +900,7 @@ void CallStatusManager::HandleCeliaCall(sptr<CallBase> &call)
     if (GetAntiFraudSlotId() != slotId || GetAntiFraudIndex() != index) {
         return;
     }
-    int32_t ret = DelayedSingleton<AntiFraudService>::GetInstance()->
-        StopAntiFraudService(slotId, index);
+    DelayedSingleton<AntiFraudService>::GetInstance()->StopAntiFraudService(slotId, index);
     SetAntiFraudSlotId(-1);
     SetAntiFraudIndex(-1);
     TELEPHONY_LOGI("celia call begin, recover AntiFraud SlotId and Index");
