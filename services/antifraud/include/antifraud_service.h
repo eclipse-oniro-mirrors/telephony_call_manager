@@ -75,7 +75,7 @@ private:
     int32_t GetStoppedIndex();
     void SetStoppedSlotId(int32_t slotId);
     void SetStoppedIndex(int32_t index);
-    int32_t CheckAntiFraudService(const std::string &phoneNum, int32_t slotId, int32_t index)；
+    int32_t CheckAntiFraudService(const std::string &phoneNum, int32_t slotId, int32_t index);
  
 private:
     class AntiFraudDetectResListenerImpl : public OHOS::AntiFraudService::AntiFraudDetectResListener {
