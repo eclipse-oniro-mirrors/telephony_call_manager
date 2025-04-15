@@ -513,17 +513,30 @@ void CallStatusManager::SetContactInfo(sptr<CallBase> &call, std::string phoneNu
         ContactInfo contactInfoTemp = contactInfo;
         QueryCallerInfo(contactInfoTemp, phoneNum);
         std::string ringtonePath = contactInfoTemp.ringtonePath;
-        if (ringtonePath.substr(ringtonePath.length() - VIDEO_RING_PATH_FIX_TAIL_LENGTH,
-            VIDEO_RING_PATH_FIX_TAIL_LENGTH) == VIDEO_RING_PATH_FIX_TAIL) {
-            AAFwk::WantParams params = call->GetExtraParams();
-            params.SetParam("VideoRingPath", AAFwk::String::Box(ringtonePath));
-            call->SetExtraParams(params);
-        }
+        DealVideoRingPath(ringtonePath, callObjectPtr);
         callObjectPtr->SetCallerInfo(contactInfoTemp);
         CallVoiceAssistantManager::GetInstance()->UpdateContactInfo(contactInfoTemp, callObjectPtr->GetCallID());
         DelayedSingleton<DistributedCommunicationManager>::GetInstance()->ProcessCallInfo(callObjectPtr,
             DistributedDataType::NAME);
     });
+}
+
+void CallStatusManager::DealVideoRingPath(std::string &ringtonePath, sptr<CallBase> &callObjectPtr)
+{
+    if (ringtonePath.empty()) {
+        auto settingHelper = SettingsDataShareHelper::GetInstance();
+        if (settingHelper != nullptr) {
+            OHOS::Uri settingUri(SettingsDataShareHelper::SETTINGS_DATASHARE_URI);
+            settingHelper->Query(settingUri, "distributed_modem_state", ringtonePath);
+            TELEPHONY_LOGI("ringtonePath: %{public}s.", ringtonePath.c_str());
+        }
+    }
+    if (ringtonePath.substr(ringtonePath.length() - VIDEO_RING_PATH_FIX_TAIL_LENGTH,
+        VIDEO_RING_PATH_FIX_TAIL_LENGTH) == VIDEO_RING_PATH_FIX_TAIL) {
+        AAFwk::WantParams params = call->GetExtraParams();
+        params.SetParam("VideoRingPath", AAFwk::String::Box(ringtonePath));
+        call->SetExtraParams(params);
+    }
 }
 
 int32_t CallStatusManager::HandleRejectCall(sptr<CallBase> &call, bool isBlock)
