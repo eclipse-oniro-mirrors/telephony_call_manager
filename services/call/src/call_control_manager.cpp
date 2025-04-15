@@ -124,6 +124,7 @@ void CallControlManager::UnInit()
             appStateObserver = nullptr;
         }
     }
+    UnRegisterObserver();
     DelayedSingleton<AudioControlManager>::GetInstance()->UnInit();
 }
 
@@ -2067,13 +2068,11 @@ void WearStatusObserver::OnChange()
     TELEPHONY_LOGI("OnChange wear status: %{public}s", wearStatus.c_str());
     if (wearStatus == "1") {
         callControlMgr->setWearState(WEAR_STATUS_OFF);
-        return;
     } else if (wearStatus == "2") {
         callControlMgr->setWearState(WEAR_STATUS_ON);
-        return;
+    } else {
+        callControlMgr->setWearState(WEAR_STATUS_INVALID);
     }
-    callControlMgr->setWearState(WEAR_STATUS_INVALID);
-    return;
 }
 void CallControlManager::RegisterObserver()
 {
@@ -2086,21 +2085,35 @@ void CallControlManager::RegisterObserver()
         return;
     }
 
-    std::string wearStatus = "wear_status";
-    OHOS::Uri wearStatusUri(SettingsDataShareHelper::SETTINGS_DATASHARE_URI + "&key=" + wearStatus);
+    OHOS::Uri wearStatusUri(SettingsDataShareHelper::SETTINGS_DATASHARE_URI + "&key=wear_status");
     auto helper = DelayedSingleton<SettingsDataShareHelper>().GetInstance();
     if (!helper->RegisterToDataShare(wearStatusUri, wearStatusObserver_)) {
         TELEPHONY_LOGE("RegisterObserver failed");
     }
 }
 
+void CallControlManager::UnRegisterObserver()
+{
+    if (wearStatusObserver_ == nullptr) {
+        return;
+    }
+
+    OHOS::Uri wearStatusUri(SettingsDataShareHelper::SETTINGS_DATASHARE_URI + "&key=wear_status");
+    auto helper = DelayedSingleton<SettingsDataShareHelper>().GetInstance();
+    if (!helper->UnRegisterToDataShare(wearStatusUri, wearStatusObserver_)) {
+        TELEPHONY_LOGE("RegisterObserver failed");
+    }
+}
+
 void CallControlManager::setWearState(int32_t state)
 {
+    std::lock_guard<std::mutex> lock(wearStatusMutex_);
     wearStatus = state;
 }
 
 bool CallControlManager::isNotWearOnWrist()
 {
+    std::lock_guard<std::mutex> lock(wearStatusMutex_);
     if (wearStatus == WEAR_STATUS_OFF) {
         return true;
     }

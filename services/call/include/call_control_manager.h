@@ -155,6 +155,7 @@ public:
     bool isNotWearOnWrist();
     void setWearState(int32_t state);
     void RegisterObserver();
+    void UnRegisterObserver();
 private:
     void CallStateObserve();
     int32_t NumberLegalityCheck(std::string &number);
@@ -229,7 +230,8 @@ private:
     
     std::mutex voipMutex_;
     sptr<WearStatusObserver> wearStatusObserver_ = nullptr;
-    int32_t wearStatus = WEAR_STATUS_INVALID;
+    int32_t wearStatus_ = WEAR_STATUS_INVALID;
+    std::mutex wearStatusMutex_;
 };
 } // namespace Telephony
 } // namespace OHOS

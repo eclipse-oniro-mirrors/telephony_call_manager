@@ -164,5 +164,19 @@ bool SettingsDataShareHelper::RegisterToDataShare(const Uri &uri, const sptr<AAF
     TELEPHONY_LOGI("SettingsDataShareHelper:Register observer success");
     return true;
 }
+
+bool SettingsDataShareHelper::UnRegisterToDataShare(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &observer)
+{
+    std::shared_ptr<DataShare::DataShareHelper> settingHelper =
+        CreateDataShareHelper(TELEPHONY_CALL_MANAGER_SYS_ABILITY_ID);
+    if (settingHelper == nullptr) {
+        TELEPHONY_LOGE("settingHelper is null");
+        return false;
+    }
+    settingHelper->UnregisterObserver(uri, observer);
+    settingHelper->Release();
+    TELEPHONY_LOGI("SettingsDataShareHelper:UnRegister observer success");
+    return true;
+}
 } // namespace Telephony
 } // namespace OHOS
