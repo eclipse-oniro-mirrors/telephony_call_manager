@@ -38,8 +38,6 @@ ohos_shared_library("ani_call") {
     "-O2",
   ]
 
-  configs = [ "$SUBSYSTEM_DIR/core_service/utils:telephony_log_config" ]
-
   deps = [
   ]
 
