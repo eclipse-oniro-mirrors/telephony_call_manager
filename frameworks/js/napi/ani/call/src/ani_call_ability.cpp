@@ -35,7 +35,7 @@ static int32_t makeCallExecute([[maybe_unused]]ani_env* env, [[maybe_unused]]ani
         isUndefined = true;
     }
     std::string phoneNumber;
-    int32_t status = DelayedSingleton<CallManagerClient>::GetInstance()->MakeCall(phoneNumber);
+    DelayedSingleton<CallManagerClient>::GetInstance()->MakeCall(phoneNumber);
     return 0;
 }
 
