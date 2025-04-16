@@ -24,7 +24,6 @@ namespace Telephony {
 static bool hasVoiceCapability([[maybe_unused]] ani_env *env)
 {
     bool status = DelayedSingleton<CallManagerClient>::GetInstance()->HasVoiceCapability();
-    TELEPHONY_LOGI("HasVoiceCapability end. status:%{public}d", status);
     return status;
 }
 
@@ -34,21 +33,18 @@ static int32_t makeCallExecute([[maybe_unused]]ani_env* env, [[maybe_unused]]ani
     ani_boolean isUndefined;
     env->Reference_IsUndefined(callback, &isUndefined);
     if (isUndefined) {
-        TELEPHONY_LOGE("ANI_makeCall create promise.");
+        isUndefined = true;
     }
     std::string phoneNumber;
     int32_t status = DelayedSingleton<CallManagerClient>::GetInstance()->MakeCall(phoneNumber);
-    TELEPHONY_LOGI("MakeCall end. status:%{public}d", status);
     return 0;
 }
 
 ANI_EXPORT ani_status ANI_Constructor(ani_vm* vm, uint32_t* result)
 {
-    TELEPHONY_LOGI("ANI_Constructor call.");
     ani_env* env;
     ani_status status = ANI_ERROR;
     if (ANI_OK != vm->GetEnv(ANI_VERSION_1, &env)) {
-        TELEPHONY_LOGE("Unsupported ANI_VERSION_1.");
         return ANI_ERROR;
     }
 
@@ -56,7 +52,6 @@ ANI_EXPORT ani_status ANI_Constructor(ani_vm* vm, uint32_t* result)
     ani_namespace spc;
     status = env->FindNamespace(spaceName, &spc);
     if (ANI_OK != status) {
-        TELEPHONY_LOGE("Not found L@ohos.call.d.ets/CallAbility.");
         return ANI_INVALID_ARGS;
     }
 
@@ -68,7 +63,6 @@ ANI_EXPORT ani_status ANI_Constructor(ani_vm* vm, uint32_t* result)
     };
     status = env->Namespace_BindNativeFunctions(spc, methods.data(), methods.size());
     if (ANI_OK != status) {
-        TELEPHONY_LOGE("Cannot bind native methods in L@ohos.call.d.ets/CallAbility.");
         return ANI_INVALID_TYPE;
     };
 
