@@ -1532,7 +1532,6 @@ int32_t CallControlManager::HandleVoipDisconnected(int32_t &numActive, int32_t n
             TELEPHONY_LOGE("GetOneCallObject is faild");
             return DelayedSingleton<BluetoothCallManager>::GetInstance()->
                 SendBtCallState(numActive, numHeld, (int32_t)TelCallState::CALL_STATUS_IDLE, "");
-
         }
         return DelayedSingleton<BluetoothCallManager>::GetInstance()->
             SendBtCallState(0, 0, (int32_t)TelCallState::CALL_STATUS_INCOMING, call->GetAccountNumber());
