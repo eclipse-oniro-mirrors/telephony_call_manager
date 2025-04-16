@@ -2108,13 +2108,13 @@ void CallControlManager::UnRegisterObserver()
 void CallControlManager::setWearState(int32_t state)
 {
     std::lock_guard<std::mutex> lock(wearStatusMutex_);
-    wearStatus = state;
+    wearStatus_ = state;
 }
 
 bool CallControlManager::isNotWearOnWrist()
 {
     std::lock_guard<std::mutex> lock(wearStatusMutex_);
-    if (wearStatus == WEAR_STATUS_OFF) {
+    if (wearStatus_ == WEAR_STATUS_OFF) {
         return true;
     }
     return false;
