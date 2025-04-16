@@ -548,6 +548,10 @@ int32_t AudioControlManager::HandleBluetoothAudioDevice(const AudioDevice &devic
     remoteDevice.push_back(audioDev);
     AudioSystemManager* audioSystemManager = AudioSystemManager::GetInstance();
     sptr<AudioRendererFilter> audioRendererFilter = new(std::nothrow) AudioRendererFilter();
+    if (audioRendererFilter == nullptr) {
+        TELEPHONY_LOGE("audioRendererFilter is nullptr");
+        return CALL_ERR_AUDIO_SET_AUDIO_DEVICE_FAILED;
+    }
     audioRendererFilter->rendererInfo.streamUsage = StreamUsage::STREAM_USAGE_VOICE_MODEM_COMMUNICATION;
     int32_t ret = audioSystemManager->SelectOutputDevice(audioRendererFilter, remoteDevice);
     if (ret != 0) {
