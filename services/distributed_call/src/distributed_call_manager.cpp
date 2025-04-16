@@ -460,9 +460,13 @@ void DistributedCallManager::ReportDistributedDeviceInfo(const AudioDevice& devi
             remoteDevice.clear();
             remoteDevice.push_back(*device);
             break;
-        }
+        }Ren
     }
     sptr<AudioRendererFilter> audioRendererFilter = new(std::nothrow) AudioRendererFilter();
+    if (audioRendererFilter == nullptr) {
+        TELEPHONY_LOGW("audioRendererFilter nullptr");
+        return;
+    }
     audioRendererFilter->rendererInfo.contentType = ContentType::CONTENT_TYPE_SPEECH;
     audioRendererFilter->rendererInfo.streamUsage = StreamUsage::STREAM_USAGE_VOICE_MODEM_COMMUNICATION;
     audioSystemMananger->SelectOutputDevice(audioRendererFilter, remoteDevice);
