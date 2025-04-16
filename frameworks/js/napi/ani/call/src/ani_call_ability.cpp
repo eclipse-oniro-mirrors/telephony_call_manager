@@ -17,7 +17,6 @@
 #include <array>
 #include <iostream>
 #include "call_manager_client.h"
-#include "telephony_log_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
