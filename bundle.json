@@ -70,7 +70,8 @@
                 "dsoftbus",
                 "input",
                 "device_manager",
-                "openssl"
+                "openssl",
+                "runtime_core"
             ],
             "third_party": [
                 "libphonenumber",
@@ -83,7 +84,8 @@
                 "base_group": [
                 ],
                 "fwk_group": [
-                    "//base/telephony/call_manager/frameworks/js:call"
+                    "//base/telephony/call_manager/frameworks/js:call",
+                    "//base/telephony/call_manager/frameworks/js/napi/ani:ani_call_packages"
                 ],
                 "service_group": [
                     "//base/telephony/call_manager:tel_call_manager",
