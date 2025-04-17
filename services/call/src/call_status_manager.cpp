@@ -858,6 +858,7 @@ void CallStatusManager::SetupAntiFraudService(const sptr<CallBase> &call, const 
     std::string tmpStr(info.phoneNum);
     if (numberMarkInfo.markType != MarkType::MARK_TYPE_FRAUD &&
         numberMarkInfo.markType != MarkType::MARK_TYPE_YELLOW_PAGE &&
+        numberMarkInfo.markType != MarkType::MARK_TYPE_ENTERPRISE &&
         !IsContactPhoneNum(tmpStr) && antiFraudService->IsAntiFraudSwitchOn()) {
         int32_t slotId = call->GetSlotId();
         if (slotId == -1) {
@@ -868,28 +869,27 @@ void CallStatusManager::SetupAntiFraudService(const sptr<CallBase> &call, const 
         }
         SetAntiFraudSlotId(slotId);
         SetAntiFraudIndex(info.index);
-        int32_t ret = DelayedSingleton<AntiFraudService>::GetInstance()->
-            InitAntiFraudService(tmpStr, slotId, info.index);
-        if (ret != 0) {
-            SetAntiFraudSlotId(-1);
-            SetAntiFraudIndex(-1);
-        }
+        ffrt::submit([tmpStr, slotId, info, this]() {
+            int32_t ret = DelayedSingleton<AntiFraudService>::GetInstance()->
+                StartAntiFraudService(tmpStr, slotId, info.index);
+            if (ret != 0) {
+                SetAntiFraudSlotId(-1);
+                SetAntiFraudIndex(-1);
+            }
+        });
     }
 }
 
-void CallStatusManager::StopAntiFraudDetect(const sptr<CallBase> &call, const CallDetailInfo &info)
+void CallStatusManager::StopAntiFraudDetect(sptr<CallBase> &call, const CallDetailInfo &info)
 {
     if (GetAntiFraudSlotId() != call->GetSlotId() || GetAntiFraudIndex() != info.index) {
         return;
     }
-    int32_t ret = DelayedSingleton<AntiFraudService>::GetInstance()->
-        StopAntiFraudService(call->GetSlotId(), info.index);
-    if (ret != 0) {
-        return;
-    }
+    DelayedSingleton<AntiFraudService>::GetInstance()->StopAntiFraudService(call->GetSlotId(), info.index);
     SetAntiFraudSlotId(-1);
     SetAntiFraudIndex(-1);
     TELEPHONY_LOGI("call ending, can begin a new antifraud");
+    UpdateAntiFraudState(call, static_cast<int32_t>(AntiFraudState::ANTIFRAUD_STATE_FINISHED));
 }
 
 void CallStatusManager::HandleCeliaCall(sptr<CallBase> &call)
@@ -900,25 +900,25 @@ void CallStatusManager::HandleCeliaCall(sptr<CallBase> &call)
     if (GetAntiFraudSlotId() != slotId || GetAntiFraudIndex() != index) {
         return;
     }
-    int32_t ret = DelayedSingleton<AntiFraudService>::GetInstance()->
-        StopAntiFraudService(slotId, index);
-    if (ret != 0) {
-        return;
-    }
+    DelayedSingleton<AntiFraudService>::GetInstance()->StopAntiFraudService(slotId, index);
     SetAntiFraudSlotId(-1);
     SetAntiFraudIndex(-1);
     TELEPHONY_LOGI("celia call begin, recover AntiFraud SlotId and Index");
-    AAFwk::WantParams extraParams = call->GetExtraParams();
-    int32_t antiFraudState = static_cast<int32_t>(AntiFraudState::ANTIFRAUD_STATE_FINISHED);
-    extraParams.SetParam("antiFraudState", AAFwk::Integer::Box(antiFraudState));
-    call->SetExtraParams(extraParams);
-
+    UpdateAntiFraudState(call, static_cast<int32_t>(AntiFraudState::ANTIFRAUD_STATE_FINISHED));
+   
     if (call->GetTelCallState() == TelCallState::CALL_STATUS_ACTIVE) {
-        ret = UpdateCallState(call, TelCallState::CALL_STATUS_ACTIVE);
+        int32_t ret = UpdateCallState(call, TelCallState::CALL_STATUS_ACTIVE);
         if (ret != TELEPHONY_SUCCESS) {
             TELEPHONY_LOGE("UpdateCallState failed, errCode:%{public}d", ret);
         }
     }
+}
+
+void CallStatusManager::UpdateAntiFraudState(sptr<CallBase> &call, int32_t antiFraudState)
+{
+    AAFwk::WantParams extraParams = call->GetExtraParams();
+    extraParams.SetParam("antiFraudState", AAFwk::Integer::Box(antiFraudState));
+    call->SetExtraParams(extraParams);
 }
 
 bool CallStatusManager::IsContactPhoneNum(const std::string &phoneNum)
@@ -968,9 +968,7 @@ void CallStatusManager::TriggerAntiFraud(int32_t antiFraudState)
         return;
     }
     if (antiFraudState != static_cast<int32_t>(AntiFraudState::ANTIFRAUD_STATE_DEFAULT)) {
-        AAFwk::WantParams extraParams = call->GetExtraParams();
-        extraParams.SetParam("antiFraudState", AAFwk::Integer::Box(antiFraudState));
-        call->SetExtraParams(extraParams);
+        UpdateAntiFraudState(call, antiFraudState);
     }
 
     if (call->GetTelCallState() == TelCallState::CALL_STATUS_ACTIVE) {
