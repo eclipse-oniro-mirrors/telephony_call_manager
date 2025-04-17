@@ -876,7 +876,7 @@ void CallStatusManager::SetupAntiFraudService(const sptr<CallBase> &call, const 
                 SetAntiFraudSlotId(-1);
                 SetAntiFraudIndex(-1);
             }
-        })
+        });
     }
 }
 
