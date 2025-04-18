@@ -93,7 +93,6 @@ public:
     bool IsScoTemporarilyDisabled();
     void ExcludeBluetoothSco();
     void UnexcludeBluetoothSco();
-    void RestoreVoiceValumeIfNecessary();
 
 private:
     RingState ringState_ = RingState::STOPPED;
@@ -120,6 +119,7 @@ private:
     void AdjustVolumesForCrs();
     void SaveVoiceVolume(int32_t volume);
     int32_t GetBackupVoiceVolume();
+    void RestoreVoiceValumeIfNecessary();
     ToneState toneState_ = ToneState::STOPPED;
     SoundState soundState_ = SoundState::STOPPED;
     bool isLocalRingbackNeeded_ = false;
