@@ -612,6 +612,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_CanSetCallTransferTime_0300, Fu
             CallManagerGtest::clientPtr_->CanSetCallTransferTime(SIM2_SLOTID, result), TELEPHONY_ERR_PERMISSION_ERR);
     }
 }
+
 /**
  * @tc.number   Telephony_CallManager_Telephony_CallManager_SendUssdResponse_0100SetAudioDevice_0100
  * @tc.name     input slotId:0, content:1, Test SendUssdResponse, return error code if failed
