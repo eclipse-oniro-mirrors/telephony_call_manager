@@ -259,10 +259,10 @@ HWTEST_F(ZeroBranch9Test, Telephony_AudioControlManager_006, Function | MediumTe
     callStateProcessor->alertingCalls_.clear();
     ringingCall->SetCallRunningState(CallRunningState::CALL_RUNNING_STATE_RINGING);
     CallPolicy callPolicy;
-    callPolicy.AddOneCallObject(ringringCall);
+    callPolicy.AddOneCallObject(ringingCall);
     audioControl->ringState_ = RingState::STOPPED;
     audioControl->soundState_ = SoundState::STOPPED;
-    audioControl->isCrsvibrating_ =true;
+    audioControl->isCrsVibrating_ =true;
     ASSERT_FALSE(audioControl->PlayRingtone());
 }
 }
