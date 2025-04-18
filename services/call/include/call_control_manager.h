@@ -44,6 +44,15 @@ namespace OHOS {
 namespace Telephony {
     constexpr const char *KEY_CONST_TELEPHONY_READ_SET_VOIP_CALL_INFO =
         "const.telephony.read_set_voip_call_info";
+    constexpr int32_t WEAR_STATUS_INVALID = 0;
+    constexpr int32_t WEAR_STATUS_OFF = 1;
+    constexpr int32_t WEAR_STATUS_ON = 2;
+class WearStatusObserver : public AAFwk::DataAbilityObserverStub {
+public:
+    WearStatusObserver() = default;
+    ~WearStatusObserver() = default;
+    void OnChange() override;
+};
 class CallControlManager : public CallPolicy {
     DECLARE_DELAYED_SINGLETON(CallControlManager)
 
@@ -143,6 +152,10 @@ public:
     bool HangUpFirstCall(int32_t secondCallId);
     void HangUpFirstCallBySecondCallID(int32_t secondCallId, bool secondAutoAnswer = false);
 #endif
+    bool isNotWearOnWrist();
+    void setWearState(int32_t state);
+    void RegisterObserver();
+    void UnRegisterObserver();
 private:
     void CallStateObserve();
     int32_t NumberLegalityCheck(std::string &number);
@@ -216,6 +229,9 @@ private:
     sptr<AppExecFwk::IAppMgr> appMgrProxy = nullptr;
     
     std::mutex voipMutex_;
+    sptr<WearStatusObserver> wearStatusObserver_ = nullptr;
+    int32_t wearStatus_ = WEAR_STATUS_INVALID;
+    std::mutex wearStatusMutex_;
 };
 } // namespace Telephony
 } // namespace OHOS

@@ -47,6 +47,7 @@
 #include "distributed_communication_manager.h"
 #include "call_voice_assistant_manager.h"
 #include "interoperable_communication_manager.h"
+#include "settings_datashare_helper.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -123,6 +124,7 @@ void CallControlManager::UnInit()
             appStateObserver = nullptr;
         }
     }
+    UnRegisterObserver();
     DelayedSingleton<AudioControlManager>::GetInstance()->UnInit();
 }
 
@@ -2054,5 +2056,68 @@ void CallControlManager::HangUpFirstCallBySecondCallID(int32_t secondCallId, boo
     }
 }
 #endif
+void WearStatusObserver::OnChange()
+{
+    std::string wearStatus = "";
+    auto settingHelper = SettingsDataShareHelper::GetInstance();
+    auto callControlMgr = DelayedSingleton<CallControlManager>().GetInstance();
+    if (settingHelper != nullptr) {
+        OHOS::Uri settingUri(SettingsDataShareHelper::SETTINGS_DATASHARE_URI);
+        settingHelper->Query(settingUri, "wear_status", wearStatus);
+    }
+    TELEPHONY_LOGI("OnChange wear status: %{public}s", wearStatus.c_str());
+    if (wearStatus == "1") {
+        callControlMgr->setWearState(WEAR_STATUS_OFF);
+    } else if (wearStatus == "2") {
+        callControlMgr->setWearState(WEAR_STATUS_ON);
+    } else {
+        callControlMgr->setWearState(WEAR_STATUS_INVALID);
+    }
+}
+void CallControlManager::RegisterObserver()
+{
+    if (wearStatusObserver_ != nullptr) {
+        return;
+    }
+    wearStatusObserver_ = new (std::nothrow) WearStatusObserver();
+    if (wearStatusObserver_ == nullptr) {
+        TELEPHONY_LOGE("wearStatusObserver_ is null");
+        return;
+    }
+
+    OHOS::Uri wearStatusUri(SettingsDataShareHelper::SETTINGS_DATASHARE_URI + "&key=wear_status");
+    auto helper = DelayedSingleton<SettingsDataShareHelper>().GetInstance();
+    if (!helper->RegisterToDataShare(wearStatusUri, wearStatusObserver_)) {
+        TELEPHONY_LOGE("RegisterObserver failed");
+    }
+}
+
+void CallControlManager::UnRegisterObserver()
+{
+    if (wearStatusObserver_ == nullptr) {
+        return;
+    }
+
+    OHOS::Uri wearStatusUri(SettingsDataShareHelper::SETTINGS_DATASHARE_URI + "&key=wear_status");
+    auto helper = DelayedSingleton<SettingsDataShareHelper>().GetInstance();
+    if (!helper->UnRegisterToDataShare(wearStatusUri, wearStatusObserver_)) {
+        TELEPHONY_LOGE("RegisterObserver failed");
+    }
+}
+
+void CallControlManager::setWearState(int32_t state)
+{
+    std::lock_guard<std::mutex> lock(wearStatusMutex_);
+    wearStatus_ = state;
+}
+
+bool CallControlManager::isNotWearOnWrist()
+{
+    std::lock_guard<std::mutex> lock(wearStatusMutex_);
+    if (wearStatus_ == WEAR_STATUS_OFF) {
+        return true;
+    }
+    return false;
+}
 } // namespace Telephony
 } // namespace OHOS
