@@ -1227,28 +1227,29 @@ int32_t AudioControlManager::GetBackupVoiceVolume()
     return voiceVolume_;
 }
 
-void AudioControlManager::SaveVoiceVolume(int32_t Volume)
+void AudioControlManager::SaveVoiceVolume(int32_t volume)
 {
-    voiceVolume_ = Volume;
+    voiceVolume_ = volume;
 }
 
 void AudioControlManager::AdjustVolumesForCrs()
 {
     auto audioProxy = DelayedSingleton<AudioProxy>::GetInstance();
-    int32_t ringVolume = audioProxy->GetVolume(AudioStandart::AudioVolumeType::STREAM_RING);
-    int32_t voiceVolume = audioProxy->GetVolume(AudioStandart::AudioVolumeType::STREAM_VOICE_CALL);
-    audioProxy->SetVolume(AudioStandart::AudioVolumeType::STREAM_VOICE_CALL, ringVolume);
+    int32_t ringVolume = audioProxy->GetVolume(AudioStandard::AudioVolumeType::STREAM_RING);
+    int32_t voiceVolume = audioProxy->GetVolume(AudioStandard::AudioVolumeType::STREAM_VOICE_CALL);
+    TELEPHONY_LOGI("now ringVolume is %{public}d, voiceVolume is %{public}d", ringVolume, voiceVolume);
+    audioProxy->SetVolume(AudioStandard::AudioVolumeType::STREAM_VOICE_CALL, ringVolume);
     SaveVoiceVolume(voiceVolume);
 }
 
 void AudioControlManager::RestoreVoiceValumeIfNecessary()
 {
-    if (GetBackupVoiceVolume() >= 0) {
+    auto voiceVolume = GetBackupVoiceVolume();
+    TELEPHONY_LOGI("now voiceVolume is %{public}d", voiceVolume);
+    if (voiceVolume >= 0) {
         DelayedSingleton<AudioProxy>::GetInstance()->SetVolume(
-            AudioStandart::AudioVolumeType::STREAM_VOICE_CALL, GetBackupVoiceVolume);
+            AudioStandard::AudioVolumeType::STREAM_VOICE_CALL, voiceVolume);
         SaveVoiceVolume(-1);
-    } else {
-        TELEPHONY_LOGE("the call volume does need to be restored!");
     }
 }
 } // namespace Telephony
