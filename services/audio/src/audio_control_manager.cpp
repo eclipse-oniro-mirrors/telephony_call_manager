@@ -411,6 +411,7 @@ void AudioControlManager::ProcessAudioWhenCallActive(sptr<CallBase> &callObjectP
         int ringCallCount = CallObjectManager::GetCallNumByRunningState(CallRunningState::CALL_RUNNING_STATE_RINGING);
         if ((CallObjectManager::GetCurrentCallNum() - ringCallCount) < MIN_MULITY_CALL_COUNT) {
             StopSoundtone();
+            RestoreVoiceValumeIfNecessary();
             PlaySoundtone();
         }
         UpdateDeviceTypeForVideoOrSatelliteCall();
@@ -584,6 +585,7 @@ bool AudioControlManager::PlayRingtone()
             }
         }
         if ((ringMode == AudioStandard::AudioRingerMode::RINGER_MODE_NORMAL) || IsBtOrWireHeadPlugin()) {
+            AdjustVolumesForCrs();
             if (PlaySoundtone()) {
                 TELEPHONY_LOGI("play soundtone success");
                 return true;
@@ -1218,6 +1220,36 @@ void AudioControlManager::UnexcludeBluetoothSco()
     }
     isScoTemporarilyDisabled_ = false;
     TELEPHONY_LOGI("UnexcludeBluetoothSco end");
+}
+
+int32_t AudioControlManager::GetBackupVoiceVolume()
+{
+    return voiceVolume_;
+}
+
+void AudioControlManager::SaveVoiceVolume(int32_t Volume)
+{
+    voiceVolume_ = Volume;
+}
+
+void AudioControlManager::AdjustVolumesForCrs()
+{
+    auto audioProxy = DelayedSingleton<AudioProxy>::GetInstance();
+    int32_t ringVolume = audioProxy->GetVolume(AudioStandart::AudioVolumeType::STREAM_RING);
+    int32_t voiceVolume = audioProxy->GetVolume(AudioStandart::AudioVolumeType::STREAM_VOICE_CALL);
+    audioProxy->SetVolume(AudioStandart::AudioVolumeType::STREAM_VOICE_CALL, ringVolume);
+    SaveVoiceVolume(voiceVolume);
+}
+
+void AudioControlManager::RestoreVoiceValumeIfNecessary()
+{
+    if (GetBackupVoiceVolume() >= 0) {
+        DelayedSingleton<AudioProxy>::GetInstance()->SetVolume(
+            AudioStandart::AudioVolumeType::STREAM_VOICE_CALL, GetBackupVoiceVolume);
+        SaveVoiceVolume(-1);
+    } else {
+        TELEPHONY_LOGE("the call volume does need to be restored!");
+    }
 }
 } // namespace Telephony
 } // namespace OHOS
