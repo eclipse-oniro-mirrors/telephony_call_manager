@@ -124,6 +124,7 @@ public:
     int32_t RequestCameraCapabilities(int32_t callId);
     int32_t SendCallUiEvent(int32_t callId, std::string &eventName);
     sptr<ICallStatusCallback> RegisterBluetoothCallManagerCallbackPtr(std::string &macAddress);
+    int32_t SendUssdResponse(int32_t slotId, std::string &content);
 
 private:
     int32_t ConnectService();

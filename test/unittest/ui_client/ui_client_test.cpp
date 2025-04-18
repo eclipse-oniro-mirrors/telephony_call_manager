@@ -1422,6 +1422,24 @@ void RequestCameraCapabilities()
     std::cout << "return value:" << ret << std::endl;
 }
 
+void SendUssdResponse()
+{
+    int32_t accountId = DEFAULT_CALL_ID;
+    std::cout << "------SendUssdResponse------" << std::endl;
+    std::cout << "please input account id:" << std::endl;
+    std::cin >> accountId;
+    std::string content;
+    content.clear();
+    std::cout << "please input content that send to modem:" << std::endl;
+    std::cin >> content;
+    if (g_clientPtr == nullptr) {
+        std::cout << "g_clientPtr is nullptr" << std::endl;
+        return;
+    }
+    int32_t ret = g_clientPtr->SendUssdResponse(accountId, content);
+    std::cout << "return value:" << ret << std::endl;
+}
+
 void AddPermission()
 {
     return;
@@ -1557,6 +1575,8 @@ void InitCallMultimediaPower()
         &OHOS::Telephony::RequestCameraCapabilities;
     g_memberFuncMap[DEFINE_INIT_PERMISSIONS] = &OHOS::Telephony::InitPermission;
     g_memberFuncMap[DEFINE_VERIFY_PERMISSIONS] = &OHOS::Telephony::VerifyPermission;
+    g_memberFuncMap[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_SEND_USSD_RESPONSE)] =
+        &OHOS::Telephony::SendUssdResponse;
 }
 
 void InitImsServicePower()

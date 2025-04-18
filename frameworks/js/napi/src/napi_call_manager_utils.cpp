@@ -57,6 +57,7 @@ static std::unordered_map<int32_t, const char *> eventNameMap_ = {
     { CALL_MANAGER_SET_DEVICE_DIRECTION, "setDeviceDirection" },
     { CALL_MANAGER_QUERY_CAMERA_CAPABILITIES, "queryCameraCapabilities" },
     { CALL_MANAGER_CANCEL_CALL_UPGRADE, "cancelCallUpgrade" },
+    { CALL_MANAGER_SEND_USSD_RESPONSE, "sendUssdResponse" },
 };
 
 static std::unordered_map<int32_t, const char *> eventPermissionMap_ = {
@@ -89,6 +90,7 @@ static std::unordered_map<int32_t, const char *> eventPermissionMap_ = {
     { CALL_MANAGER_SET_DEVICE_DIRECTION, SET_TELEPHONY_STATE },
     { CALL_MANAGER_QUERY_CAMERA_CAPABILITIES, GET_TELEPHONY_STATE },
     { CALL_MANAGER_CANCEL_CALL_UPGRADE, PLACE_CALL },
+    { CALL_MANAGER_SEND_USSD_RESPONSE, SET_TELEPHONY_STATE },
 };
 
 std::string NapiCallManagerUtils::GetEventName(int32_t eventId)

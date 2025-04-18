@@ -282,6 +282,9 @@ HWTEST_F(CallManagerGtest, Telephony_CallManagerService_002, Function | MediumTe
     std::vector<OttCallDetailsInfo> ottVec;
     ASSERT_NE(callManagerService->ReportOttCallDetailsInfo(ottVec), TELEPHONY_SUCCESS);
     ASSERT_NE(callManagerService->GetMainCallId(value, value), TELEPHONY_SUCCESS);
+    int32_t slotId = 0;
+    std::string content = "1";
+    ASSERT_NE(callManagerService->SendUssdResponse(slotId, content), TELEPHONY_SUCCESS);
 }
 
 /**
@@ -533,6 +536,8 @@ HWTEST_F(CallManagerGtest, Telephony_CallManagerServiceStub_004, Function | Medi
         CallManagerInterfaceCode::INTERFACE_VOIP_UNREGISTER_CALLBACK), data, reply, option);
     callManagerService->OnRemoteRequest(static_cast<uint32_t>(
         CallManagerInterfaceCode::INTERFACE_OBSERVER_ON_CALL_DETAILS_CHANGE), data, reply, option);
+    callManagerService->OnRemoteRequest(static_cast<uint32_t>(
+        CallManagerInterfaceCode::INTERFACE_SEND_USSD_RESPONSE), data, reply, option);
     ASSERT_NE(callManagerService->OnRemoteRequest(
         static_cast<uint32_t>(CallManagerInterfaceCode::INTERFACE_SEND_CALLUI_EVENT),
         data, reply, option), TELEPHONY_SUCCESS);
@@ -803,6 +808,12 @@ HWTEST_F(CallManagerGtest, Telephony_CallManagerServiceStub_009, Function | Medi
     data15.WriteString("hello");
     callManagerService->OnGetProxyObjectPtr(data15, reply);
     ASSERT_NE(callManagerService->OnSendCallUiEvent(data15, reply), TELEPHONY_SUCCESS);
+
+    MessageParcel data16;
+    data15.WriteInt32(0);
+    data15.WriteString("1");
+    callManagerService->OnGetProxyObjectPtr(data16, reply);
+    ASSERT_NE(callManagerService->OnSendUssdResponse(data16, reply), TELEPHONY_SUCCESS);
 }
 
 /**

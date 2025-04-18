@@ -556,6 +556,15 @@ public:
      */
     int32_t RequestCameraCapabilities(int32_t slotId, int32_t index) override;
 
+    /**
+     * @brief send ussd response to modem
+     *
+     * @param slotId[in] the slot id
+     * @param content[in] the content need send to modem
+     * @return Returns TELEPHONY_SUCCESS on success, others on failure.
+     */
+    int32_t SendUssdResponse(int32_t slotId, const std::string &content) override;
+
 private:
     /**
      * @brief SetCommonParamForMessageParcel, set common param for MessageParcel

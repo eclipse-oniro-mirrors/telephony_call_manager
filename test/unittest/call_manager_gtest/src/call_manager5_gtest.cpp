@@ -612,5 +612,27 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_CanSetCallTransferTime_0300, Fu
             CallManagerGtest::clientPtr_->CanSetCallTransferTime(SIM2_SLOTID, result), TELEPHONY_ERR_PERMISSION_ERR);
     }
 }
+/**
+ * @tc.number   Telephony_CallManager_Telephony_CallManager_SendUssdResponse_0100SetAudioDevice_0100
+ * @tc.name     input slotId:0, content:1, Test SendUssdResponse, return error code if failed
+ * @tc.desc     Function test
+ * @tc.require: issueI5JUAQ
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_SendUssdResponse_0100, Function | MediumTest | Level2)
+{
+    AccessToken token;
+    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
+        return;
+    }
+    std::string content = "1";
+    if (HasSimCard(SIM1_SLOTID)) {
+        EXPECT_EQ(CallManagerGtest::clientPtr_->SendUssdResponse(SIM1_SLOTID, content), RETURN_VALUE_IS_ZERO);
+        return;
+    }
+    if (HasSimCard(SIM2_SLOTID)) {
+        EXPECT_EQ(CallManagerGtest::clientPtr_->SendUssdResponse(SIM2_SLOTID, content), RETURN_VALUE_IS_ZERO);
+        return;
+    }
+}
 } // namespace Telephony
 } // namespace OHOS
