@@ -411,7 +411,6 @@ void AudioControlManager::ProcessAudioWhenCallActive(sptr<CallBase> &callObjectP
         int ringCallCount = CallObjectManager::GetCallNumByRunningState(CallRunningState::CALL_RUNNING_STATE_RINGING);
         if ((CallObjectManager::GetCurrentCallNum() - ringCallCount) < MIN_MULITY_CALL_COUNT) {
             StopSoundtone();
-            RestoreVoiceValumeIfNecessary();
             PlaySoundtone();
         }
         UpdateDeviceTypeForVideoOrSatelliteCall();
@@ -665,6 +664,7 @@ bool AudioControlManager::StopSoundtone()
     }
     sound_->ReleaseRenderer();
     TELEPHONY_LOGI("stop soundtone success");
+    RestoreVoiceValumeIfNecessary();
     return true;
 }
 
