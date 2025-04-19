@@ -75,6 +75,8 @@ void AudioSceneProcessor::ProcessEventInner(AudioEvent event)
         case AudioEvent::SWITCH_AUDIO_INACTIVE_STATE:
             if (DelayedSingleton<CallStateProcessor>::GetInstance()->ShouldStopSoundtone()) {
                 DelayedSingleton<AudioControlManager>::GetInstance()->StopSoundtone();
+                // Acquire disconnected lock in DisconnectedHandle when the remote hangup
+                DelayedSingleton<CallControlManager>::GetInstance()->ReleaseDisconnectedLock();
             }
             SwitchState(event);
             break;

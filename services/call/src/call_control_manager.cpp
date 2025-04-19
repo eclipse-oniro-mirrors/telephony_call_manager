@@ -49,6 +49,10 @@
 #include "interoperable_communication_manager.h"
 #include "settings_datashare_helper.h"
 
+#ifdef ABILITY_POWER_SUPPORT
+#include "power_mgr_client.h"
+#endif
+
 namespace OHOS {
 namespace Telephony {
 bool CallControlManager::alarmSeted = false;
@@ -1724,6 +1728,31 @@ void CallControlManager::ReleaseIncomingLock()
         return;
     }
     incomingCallWakeup_->ReleaseIncomingLock();
+}
+
+void CallControlManager::AcquireDisconnectedLock()
+{
+#ifdef ABILITY_POWER_SUPPORT
+    if (disconnectedRunningLock_ == nullptr) {
+        disconnectedRunningLock_ = PowerMgr::PowerMgrClient::GetInstance().
+            CreateRunningLock("disconnectedrunninglock", PowerMgr::RunningLockType::RUNNINGLOCK_BACKGROUND_PHONE);
+    }
+    if (disconnectedRunningLock_ != nullptr) {
+        disconnectedRunningLock_->Lock(DISCONNECTED_LOCK_TIMEOUT);
+        TELEPHONY_LOGI("disconnectedRunningLock_ locked");
+    }
+#endif
+}
+ 
+void CallControlManager::ReleaseDisconnectedLock()
+{
+#ifdef ABILITY_POWER_SUPPORT
+    if (disconnectedRunningLock_ == nullptr || !disconnectedRunningLock_->IsUsed()) {
+        return;
+    }
+    disconnectedRunningLock_->UnLock();
+    TELEPHONY_LOGI("disconnectedRunningLock_ unlocked");
+#endif
 }
 
 void CallControlManager::DisconnectAllCalls()

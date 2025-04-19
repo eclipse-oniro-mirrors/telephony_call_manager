@@ -34,6 +34,10 @@
 #include "system_ability_status_change_stub.h"
 #include "ffrt.h"
 
+#ifdef ABILITY_POWER_SUPPORT
+#include "power_mgr_client.h"
+#endif
+
 /**
  * Singleton
  * @ClassName:CallControlManager
@@ -144,6 +148,8 @@ public:
     int32_t CarrierAndVoipConflictProcess(int32_t callId, TelCallState callState);
     void AcquireIncomingLock();
     void ReleaseIncomingLock();
+    void AcquireDisconnectedLock();
+    void ReleaseDisconnectedLock();
     void DisconnectAllCalls();
 #ifdef NOT_SUPPORT_MULTICALL
     bool HangUpFirstCallBtAndESIM(int32_t secondCallId);
@@ -203,6 +209,10 @@ private:
     std::unique_ptr<CallRequestHandler> CallRequestHandlerPtr_;
     // notify when incoming calls are ignored, not rejected or answered
     std::shared_ptr<IncomingCallWakeup> incomingCallWakeup_;
+#ifdef ABILITY_POWER_SUPPORT
+    std::shared_ptr<PowerMgr::RunningLock> disconnectedRunningLock_;
+#endif
+    const int32_t DISCONNECTED_LOCK_TIMEOUT = 2000;
     std::shared_ptr<MissedCallNotification> missedCallNotification_;
     std::unique_ptr<CallSettingManager> callSettingManagerPtr_;
     sptr<ISystemAbilityStatusChange> statusChangeListener_ = nullptr;
