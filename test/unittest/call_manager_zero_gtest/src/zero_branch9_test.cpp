@@ -233,4 +233,36 @@ HWTEST_F(ZeroBranch9Test, Telephony_AudioControlManager_005, Function | MediumTe
     audioControl->PlayCallTone(ToneDescriptor::TONE_ENGAGED);
     EXPECT_EQ(audioControl->StopRingback(), 0);
 }
+
+/**
+ * @tc.number   Telephony_AudioControlManager_006
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch9Test, Telephony_AudioControlManager_006, Function | MediumTest | Level3)
+{
+    auto audioControl = DelayedSingleton<AudioControlManager>::GetInstance();
+    DialParaInfo info;
+    sptr<CallBase> ringingCall = new IMSCall(info);
+    ringingCall->SetCallRunningState(CallRunningState::CALL_RUNNING_STATE_ACTIVE);
+    audioControl->SaveVoiceVolume(1);
+    ASSERT_NO_THROW(audioControl->ProcessAudioWhenCallActive(ringingCall));
+    audioControl->SaveVoiceVolume(-1);
+    ASSERT_NO_THROW(audioControl->ProcessAudioWhenCallActive(ringingCall));
+    audioControl->soundState_ = SoundState::SOUNDING;
+    audioControl->SetRingState(RingState::RINGING);
+    ringingCall->SetCrsType(2);
+    auto audioDeviceManager = DelayedSingleton<AudioDeviceManager>::GetInstance();
+    audioDeviceManager->isWiredHeadsetConnected_ = true;
+    auto callStateProcessor = DelayedSingleton<CallStateProcessor>::GetInstance();
+    callStateProcessor->incomingCalls_.insert(1);
+    callStateProcessor->alertingCalls_.clear();
+    ringingCall->SetCallRunningState(CallRunningState::CALL_RUNNING_STATE_RINGING);
+    CallPolicy callPolicy;
+    callPolicy.AddOneCallObject(ringingCall);
+    audioControl->ringState_ = RingState::STOPPED;
+    audioControl->soundState_ = SoundState::STOPPED;
+    audioControl->isCrsVibrating_ =true;
+    ASSERT_FALSE(audioControl->PlayRingtone());
+}
 }

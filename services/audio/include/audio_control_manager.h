@@ -116,6 +116,10 @@ private:
     bool IsVoIPCallActived();
     int32_t SwitchAudioDevice(AudioDeviceType audioDeviceType);
     bool IsBtCallDisconnected();
+    void AdjustVolumesForCrs();
+    void SaveVoiceVolume(int32_t volume);
+    int32_t GetBackupVoiceVolume();
+    void RestoreVoiceValumeIfNecessary();
     ToneState toneState_ = ToneState::STOPPED;
     SoundState soundState_ = SoundState::STOPPED;
     bool isLocalRingbackNeeded_ = false;
@@ -129,6 +133,7 @@ private:
     sptr<CallBase> frontCall_ = nullptr;
     bool isSetAudioDeviceByUser_ = false;
     bool isScoTemporarilyDisabled_ = false;
+    int32_t voiceVolume_ = -1;
 };
 } // namespace Telephony
 } // namespace OHOS

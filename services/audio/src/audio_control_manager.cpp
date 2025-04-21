@@ -584,6 +584,7 @@ bool AudioControlManager::PlayRingtone()
             }
         }
         if ((ringMode == AudioStandard::AudioRingerMode::RINGER_MODE_NORMAL) || IsBtOrWireHeadPlugin()) {
+            AdjustVolumesForCrs();
             if (PlaySoundtone()) {
                 TELEPHONY_LOGI("play soundtone success");
                 return true;
@@ -663,6 +664,7 @@ bool AudioControlManager::StopSoundtone()
     }
     sound_->ReleaseRenderer();
     TELEPHONY_LOGI("stop soundtone success");
+    RestoreVoiceValumeIfNecessary();
     return true;
 }
 
@@ -1218,6 +1220,37 @@ void AudioControlManager::UnexcludeBluetoothSco()
     }
     isScoTemporarilyDisabled_ = false;
     TELEPHONY_LOGI("UnexcludeBluetoothSco end");
+}
+
+int32_t AudioControlManager::GetBackupVoiceVolume()
+{
+    return voiceVolume_;
+}
+
+void AudioControlManager::SaveVoiceVolume(int32_t volume)
+{
+    voiceVolume_ = volume;
+}
+
+void AudioControlManager::AdjustVolumesForCrs()
+{
+    auto audioProxy = DelayedSingleton<AudioProxy>::GetInstance();
+    int32_t ringVolume = audioProxy->GetVolume(AudioStandard::AudioVolumeType::STREAM_RING);
+    int32_t voiceVolume = audioProxy->GetVolume(AudioStandard::AudioVolumeType::STREAM_VOICE_CALL);
+    TELEPHONY_LOGI("now ringVolume is %{public}d, voiceVolume is %{public}d", ringVolume, voiceVolume);
+    audioProxy->SetVolume(AudioStandard::AudioVolumeType::STREAM_VOICE_CALL, ringVolume);
+    SaveVoiceVolume(voiceVolume);
+}
+
+void AudioControlManager::RestoreVoiceValumeIfNecessary()
+{
+    auto voiceVolume = GetBackupVoiceVolume();
+    TELEPHONY_LOGI("now voiceVolume is %{public}d", voiceVolume);
+    if (voiceVolume >= 0) {
+        DelayedSingleton<AudioProxy>::GetInstance()->SetVolume(
+            AudioStandard::AudioVolumeType::STREAM_VOICE_CALL, voiceVolume);
+        SaveVoiceVolume(-1);
+    }
 }
 } // namespace Telephony
 } // namespace OHOS
