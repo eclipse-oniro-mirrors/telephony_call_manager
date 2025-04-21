@@ -651,7 +651,6 @@ bool AudioControlManager::StopSoundtone()
 {
     if (soundState_ == SoundState::STOPPED) {
         TELEPHONY_LOGI("soundtone already stopped");
-        RestoreVoiceValumeIfNecessary();
         return true;
     }
     if (sound_ == nullptr) {
