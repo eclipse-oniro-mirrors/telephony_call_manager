@@ -82,7 +82,7 @@ int32_t SettingsDataShareHelper::Query(Uri& uri, const std::string& key, std::st
     if (rowCount == 0) {
         TELEPHONY_LOGW("query success, but rowCount is 0");
         settingHelper->Release();
-        return TELEPHONY_SUCCESS;
+        return TELEPHONY_ERROR;
     }
 
     if (result->GoToFirstRow() != DataShare::E_OK) {
@@ -101,29 +101,68 @@ int32_t SettingsDataShareHelper::Query(Uri& uri, const std::string& key, std::st
     return TELEPHONY_SUCCESS;
 }
 
-int32_t SettingsDataShareHelper::Update(Uri &uri, const std::string &key, const std::string &value)
+int32_t SettingsDataShareHelper::Insert(Uri &uri, const std::string &key, const std::string &value)
 {
-    std::shared_ptr<DataShare::DataShareHelper> dataShareHelper =
-            CreateDataShareHelper(TELEPHONY_CALL_MANAGER_SYS_ABILITY_ID);
-    if (dataShareHelper == nullptr) {
+    std::shared_ptr<DataShare::DataShareHelper> settingHelper =
+        CreateDataShareHelper(TELEPHONY_CALL_MANAGER_SYS_ABILITY_ID);
+    if (settingHelper == nullptr) {
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     DataShare::DataShareValueObject keyObj(key);
     DataShare::DataShareValueObject valueObj(value);
-    DataShare::DataShareValuesBucket valuesBucket;
-    valuesBucket.Put(SETTINGS_DATA_COLUMN_KEYWORD, keyObj);
-    valuesBucket.Put(SETTINGS_DATA_COLUMN_VALUE, valueObj);
-    DataShare::DataSharePredicates predicates;
-    predicates.EqualTo(SETTINGS_DATA_COLUMN_KEYWORD, key);
-    int32_t ret = dataShareHelper->Update(uri, predicates, valuesBucket);
+    DataShare::DataShareValuesBucket valueBucket;
+    valueBucket.Put(SETTINGS_DATA_COLUMN_KEYWORD, keyObj);
+    valueBucket.Put(SETTINGS_DATA_COLUMN_VALUE, valueObj);
+    int32_t ret = settingHelper->Insert(uri, valueBucket);
     if (ret <= 0) {
-        TELEPHONY_LOGE("DataShareHelper update failed, retCode:%{public}d", ret);
-        dataShareHelper->Release();
+        TELEPHONY_LOGE("DataShareHelper insert failed, retCode:%{public}d", ret);
+        settingHelper->Release();
         return TELEPHONY_ERROR;
     }
-    dataShareHelper->NotifyChange(uri);
-    dataShareHelper->Release();
+    settingHelper->NotifyChange(uri);
+    settingHelper->Release();
     return TELEPHONY_SUCCESS;
+}
+ 
+int32_t SettingsDataShareHelper::Update(Uri &uri, const std::string &key, const std::string &value)
+{
+    std::string queryValue = "";
+    if (Query(uri, key, queryValue) != 0) {
+        return Insert(uri, key, value);
+    }
+    std::shared_ptr<DataShare::DataShareHelper> settingHelper =
+        CreateDataShareHelper(TELEPHONY_CALL_MANAGER_SYS_ABILITY_ID);
+    if (settingHelper == nullptr) {
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    DataShare::DataShareValueObject valueObj(value);
+    DataShare::DataShareValuesBucket valueBucket;
+    valueBucket.Put(SETTINGS_DATA_COLUMN_VALUE, valueObj);
+    DataShare::DataSharePredicates predicates;
+    predicates.EqualTo(SETTINGS_DATA_COLUMN_KEYWORD, key);
+    int32_t ret = settingHelper->Update(uri, predicates, valueBucket);
+    if (ret <= 0) {
+        TELEPHONY_LOGE("DataShareHelper update failed, retCode:%{public}d", ret);
+        settingHelper->Release();
+        return TELEPHONY_ERROR;
+    }
+    settingHelper->NotifyChange(uri);
+    settingHelper->Release();
+    return TELEPHONY_SUCCESS;
+}
+ 
+bool SettingsDataShareHelper::RegisterToDataShare(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &observer)
+{
+    std::shared_ptr<DataShare::DataShareHelper> settingHelper =
+        CreateDataShareHelper(TELEPHONY_CALL_MANAGER_SYS_ABILITY_ID);
+    if (settingHelper == nullptr) {
+        TELEPHONY_LOGE("settingHelper is null");
+        return false;
+    }
+    settingHelper->RegisterObserver(uri, observer);
+    settingHelper->Release();
+    TELEPHONY_LOGI("SettingsDataShareHelper:Register observer success");
+    return true;
 }
 } // namespace Telephony
 } // namespace OHOS
