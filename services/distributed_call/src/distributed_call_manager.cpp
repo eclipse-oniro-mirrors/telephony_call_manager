@@ -464,7 +464,7 @@ void DistributedCallManager::ReportDistributedDeviceInfo(const AudioDevice& devi
     }
     sptr<AudioRendererFilter> audioRendererFilter = new(std::nothrow) AudioRendererFilter();
     if (audioRendererFilter == nullptr) {
-        TELEPHONY_LOGW("audioRendererFilter nullptr");
+        TELEPHONY_LOGE("audioRendererFilter nullptr");
         return;
     }
     audioRendererFilter->rendererInfo.contentType = ContentType::CONTENT_TYPE_SPEECH;
@@ -499,7 +499,7 @@ void DistributedCallManager::ReportDistributedDeviceInfoForSwitchOff()
     }
     sptr<AudioRendererFilter> audioRendererFilter = new(std::nothrow) AudioRendererFilter();
     if (audioRendererFilter == nullptr) {
-        TELEPHONY_LOGW("audioRendererFilter nullptr");
+        TELEPHONY_LOGE("audioRendererFilter nullptr");
         return;
     }
     audioRendererFilter->rendererInfo.contentType = ContentType::CONTENT_TYPE_SPEECH;
