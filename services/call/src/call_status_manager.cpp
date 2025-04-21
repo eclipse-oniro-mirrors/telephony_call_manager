@@ -1132,6 +1132,10 @@ int32_t CallStatusManager::DisconnectedHandle(const CallDetailInfo &info)
         TELEPHONY_LOGE("Call is Null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
+    if (call->GetTelCallState() != TelCallState::CALL_STATUS_DISCONNECTING) {
+        // Acquire disconnected lock when the remote hangup and will release after StopSoundtone
+        DelayedSingleton<CallControlManager>::GetInstance()->AcquireDisconnectedLock();
+    }
     StopAntiFraudDetect(call, info);
 #ifdef NOT_SUPPORT_MULTICALL
     bool isTwoCallBtCallAndESIM = CallObjectManager::IsTwoCallBtCallAndESIM();
