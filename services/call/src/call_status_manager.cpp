@@ -1731,7 +1731,8 @@ bool CallStatusManager::ShouldRejectIncomingCall()
     OHOS::Uri uri(
         "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true&key=device_provisioned");
     int resp = datashareHelper->Query(uri, "device_provisioned", device_provisioned);
-    if (resp == TELEPHONY_SUCCESS && (device_provisioned == "0" || device_provisioned.empty())) {
+    if ((resp == TELEPHONY_SUCCESS || resp == TELEPHONY_ERROR) &&
+        (device_provisioned == "0" || device_provisioned.empty())) {
         TELEPHONY_LOGW("ShouldRejectIncomingCall: device_provisioned = 0");
         return true;
     }

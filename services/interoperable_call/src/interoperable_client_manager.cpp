@@ -20,7 +20,7 @@
 
 namespace OHOS {
 namespace Telephony {
-constexpr const char* SOFTNET_SESSION_NAME = "ohos.telephony.callmanager.distributed_communication";
+constexpr const char* SOFTNET_SESSION_NAME = "ohos.telephony.callmanager.interoperable_communication";
  
 void InteroperableClientManager::OnCallCreated(const sptr<CallBase> &call, const std::string &networkId)
 {
@@ -29,10 +29,8 @@ void InteroperableClientManager::OnCallCreated(const sptr<CallBase> &call, const
  
 void InteroperableClientManager::OnCallDestroyed()
 {
-    if (CallObjectManager::HasCallExist()) {
-        return;
-    }
     if (session_ != nullptr) {
+        TELEPHONY_LOGI("disconnect session_");
         session_->Disconnect();
         session_.reset();
         session_ = nullptr;
@@ -47,6 +45,7 @@ void InteroperableClientManager::ConnectRemote(const std::string &networkId)
     auto transMgr = DelayedSingleton<TransmissionManager>::GetInstance();
     session_ = transMgr->CreateClientSession(shared_from_this());
     if (session_ != nullptr) {
+        TELEPHONY_LOGI("connect session_");
         session_->Connect(networkId, SOFTNET_SESSION_NAME, SOFTNET_SESSION_NAME);
     }
 }
