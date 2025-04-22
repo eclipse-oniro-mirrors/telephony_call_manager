@@ -545,6 +545,15 @@ public:
      */
     virtual int32_t RequestCameraCapabilities(int32_t slotId, int32_t index) = 0;
 
+    /**
+     * @brief send ussd response to modem
+     *
+     * @param slotId[in] the slot id
+     * @param content[in] the content need send to modem
+     * @return Returns TELEPHONY_SUCCESS on success, others on failure.
+     */
+    virtual int32_t SendUssdResponse(int32_t slotId, const std::string &content) = 0;
+
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"OHOS.Telephony.CellularCallInterface");
 };

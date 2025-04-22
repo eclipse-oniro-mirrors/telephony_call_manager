@@ -823,7 +823,7 @@ HWTEST_F(CallStateTest, Telephony_CallRequestProcess_004, Function | MediumTest 
     sptr<OHOS::Telephony::CallBase> callBase2 = new IMSCall(mDialParaInfo);
     callRequestProcess->HangUpForDsdaRequest(callBase2);
     CellularCallInfo callInfo;
-    callRequestProcess->HandleStartDial(false, callInfo);
+    callRequestProcess->HandleStartDial(false, mDialParaInfo);
     ASSERT_EQ(callRequestProcess->EccDialPolicy(), TELEPHONY_SUCCESS);
 }
 

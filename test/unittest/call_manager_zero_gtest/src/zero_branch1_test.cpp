@@ -24,6 +24,7 @@
 #include "call_ability_report_proxy.h"
 #include "call_connect_ability.h"
 #include "call_control_manager.h"
+#include "call_dialog.h"
 #include "call_manager_client.h"
 #include "call_manager_hisysevent.h"
 #include "call_number_utils.h"
@@ -227,6 +228,8 @@ HWTEST_F(ZeroBranch2Test, Telephony_CallRequestProcess_001, Function | MediumTes
     callRequestProcess->IsDsdsMode3();
     callRequestProcess->DisconnectOtherSubIdCall(1, 0, 0);
     callRequestProcess->DisconnectOtherCallForVideoCall(1);
+    mDialParaInfo.number = "*#21#";
+    callRequestProcess->CarrierDialProcess(mDialParaInfo);
     ASSERT_FALSE(callRequestProcess->IsDsdsMode5());
 }
 
@@ -555,6 +558,9 @@ HWTEST_F(ZeroBranch2Test, Telephony_CellularCallConnection_002, Function | Mediu
     ASSERT_NE(cellularCallConnection->SetDeviceDirection(SIM1_SLOTID, DEFAULT_INDEX, 1), TELEPHONY_ERR_SUCCESS);
     ASSERT_NE(cellularCallConnection->CancelCallUpgrade(SIM1_SLOTID, DEFAULT_INDEX), TELEPHONY_ERR_SUCCESS);
     ASSERT_NE(cellularCallConnection->RequestCameraCapabilities(SIM1_SLOTID, DEFAULT_INDEX), TELEPHONY_ERR_SUCCESS);
+    int32_t slotId = 0;
+    std::string content = "1";
+    ASSERT_EQ(cellularCallConnection->SendUssdResponse(slotId, content), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
 }
 
 /**
@@ -973,6 +979,83 @@ HWTEST_F(ZeroBranch2Test, Telephony_VideoControlManager_002, Function | MediumTe
     ASSERT_TRUE(DelayedSingleton<VideoControlManager>::GetInstance()->CheckWindow(mVideoWindow));
     mVideoWindow.z = 1;
     ASSERT_TRUE(DelayedSingleton<VideoControlManager>::GetInstance()->CheckWindow(mVideoWindow));
+}
+
+/**
+ * @tc.number   Telephony_CallDialog_001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch2Test, Telephony_CallDialog_001, Function | MediumTest | Level1)
+{
+    auto callDialog = DelayedSingleton<CallDialog>::GetInstance();
+    ASSERT_NE(callDialog, nullptr);
+    callDialog->DialogProcessMMICodeExtension();
+    std::string diallogReason = "SATELLITE";
+    int32_t slotId = 0;
+    ASSERT_TRUE(callDialog->DialogConnectExtension(diallogReason, slotId));
+    ASSERT_TRUE(callDialog->DialogConnectExtension(diallogReason));
+    std::u16string number = u"13333333333";
+    int32_t videoState = 0;
+    int32_t dialType = 0;
+    int32_t dialScene = 0;
+    int32_t callType = 1;
+    bool isVideo = false;
+    ASSERT_TRUE(callDialog->DialogConnectPrivpacyModeExtension(
+        diallogReason, number, slotId, videoState, dialType, dialScene, callType, isVideo));
+    ASSERT_TRUE(callDialog->DialogConnectAnswerPrivpacyModeExtension(diallogReason, slotId, videoState, isVideo));
+    callDialog->DialogCallingPrivacyModeExtension(Rosen::FoldStatus::FOLDED);
+    callDialog->DialogCallingPrivacyModeExtension(Rosen::FoldStatus::EXPAND);
+}
+
+/**
+ * @tc.number   Telephony_CallNumberUtils_003
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch2Test, Telephony_CallNumberUtils_003, Function | MediumTest | Level1)
+{
+    auto callNumUtils = DelayedSingleton<CallNumberUtils>::GetInstance();
+    EXPECT_NE(callNumUtils, nullptr);
+    std::string dialStr = "";
+    ASSERT_FALSE(callNumUtils->IsMMICode(dialStr));
+    DialParaInfo dialInfo;
+    sptr<CallBase> call = new IMSCall(dialInfo);
+    call->callId_ = 1;
+    call->SetCallIndex(0);
+    call->SetSlotId(0);
+    call->SetTelCallState(TelCallState::CALL_STATUS_INCOMING);
+    call->SetCallType(CallType::TYPE_IMS);
+    CallObjectManager::AddOneCallObject(call);
+    dialStr = "333";
+    ASSERT_FALSE(callNumUtils->IsMMICode(dialStr));
+    dialStr = "33";
+    ASSERT_TRUE(callNumUtils->IsMMICode(dialStr));
+    CallObjectManager::DeleteOneCallObject(call);
+    dialStr = "333";
+    ASSERT_FALSE(callNumUtils->IsMMICode(dialStr));
+    dialStr = "12";
+    ASSERT_FALSE(callNumUtils->IsMMICode(dialStr));
+    dialStr = "1*";
+    ASSERT_TRUE(callNumUtils->IsMMICode(dialStr));
+    dialStr = "*1";
+    ASSERT_TRUE(callNumUtils->IsMMICode(dialStr));
+    dialStr = "**";
+    ASSERT_TRUE(callNumUtils->IsMMICode(dialStr));
+    dialStr = "33";
+    ASSERT_TRUE(callNumUtils->IsMMICode(dialStr));
+    dialStr = "*21*10086#";
+    ASSERT_TRUE(callNumUtils->IsMMICode(dialStr));
+    dialStr = "10086";
+    ASSERT_FALSE(callNumUtils->IsMMICode(dialStr));
+    dialStr = "*30#10086";
+    ASSERT_FALSE(callNumUtils->IsMMICode(dialStr));
+    dialStr = "*33##123#";
+    ASSERT_FALSE(callNumUtils->IsMMICode(dialStr));
+    dialStr = "*10086#";
+    ASSERT_TRUE(callNumUtils->IsMMICode(dialStr));
+    dialStr = "#10086#";
+    ASSERT_TRUE(callNumUtils->IsMMICode(dialStr));
 }
 } // namespace Telephony
 } // namespace OHOS

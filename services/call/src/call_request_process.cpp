@@ -831,11 +831,13 @@ int32_t CallRequestProcess::CarrierDialProcess(DialParaInfo &info)
         needWaitHold_ = false;
         return ret;
     }
+    std::string tempNumber = info.number;
     bool isMMiCode = DelayedSingleton<CallNumberUtils>::GetInstance()->IsMMICode(newPhoneNum);
     if (!isMMiCode) {
         isFirstDialCallAdded_ = false;
         info.number = newPhoneNum;
         ret = UpdateCallReportInfo(info, TelCallState::CALL_STATUS_DIALING);
+        info.number = tempNumber;
         if (ret != TELEPHONY_SUCCESS) {
             TELEPHONY_LOGE("UpdateCallReportInfo failed!");
             needWaitHold_ = false;
@@ -844,23 +846,10 @@ int32_t CallRequestProcess::CarrierDialProcess(DialParaInfo &info)
     } else {
         callRequestEventHandler->RestoreDialingFlag(false);
         callRequestEventHandler->RemoveEventHandlerTask();
+        TELEPHONY_LOGI("CarrierDialProcess: isMMiCode is true!");
+        DelayedSingleton<CallDialog>::GetInstance()->DialogProcessMMICodeExtension();
     }
-    CellularCallInfo callInfo;
-    ret = PackCellularCallInfo(info, callInfo);
-    if (ret != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGW("PackCellularCallInfo failed!");
-        CallManagerHisysevent::WriteDialCallFaultEvent(info.accountId, static_cast<int32_t>(info.callType),
-            static_cast<int32_t>(info.videoState), ret, "Carrier type PackCellularCallInfo failed");
-        needWaitHold_ = false;
-        return ret;
-    }
-    if (needWaitHold_ && !isMMiCode) {
-        TELEPHONY_LOGI("waitting for call hold");
-        dialCallInfo_ = callInfo;
-        return ret;
-    }
-    ret = HandleStartDial(isMMiCode, callInfo);
-    return ret;
+    return HandleStartDial(isMMiCode, info);
 }
 
 int32_t CallRequestProcess::HandleDialingInfo(std::string newPhoneNum, DialParaInfo &info)
@@ -887,9 +876,23 @@ int32_t CallRequestProcess::HandleDialingInfo(std::string newPhoneNum, DialParaI
     return TELEPHONY_SUCCESS;
 }
 
-int32_t CallRequestProcess::HandleStartDial(bool isMMiCode, CellularCallInfo callInfo)
+int32_t CallRequestProcess::HandleStartDial(bool isMMiCode, DialParaInfo &info)
 {
-    int32_t ret = DelayedSingleton<CellularCallConnection>::GetInstance()->Dial(callInfo);
+    CellularCallInfo callInfo;
+    int32_t ret = PackCellularCallInfo(info, callInfo);
+    if (ret != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGW("PackCellularCallInfo failed!");
+        CallManagerHisysevent::WriteDialCallFaultEvent(info.accountId, static_cast<int32_t>(info.callType),
+            static_cast<int32_t>(info.videoState), ret, "Carrier type PackCellularCallInfo failed");
+        needWaitHold_ = false;
+        return ret;
+    }
+    if (needWaitHold_ && !isMMiCode) {
+        TELEPHONY_LOGI("waitting for call hold");
+        dialCallInfo_ = callInfo;
+        return ret;
+    }
+    ret = DelayedSingleton<CellularCallConnection>::GetInstance()->Dial(callInfo);
     if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("Dial failed!");
         if (isMMiCode) {
