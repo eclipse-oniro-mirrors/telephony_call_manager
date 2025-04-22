@@ -1534,8 +1534,10 @@ int32_t CallControlManager::HandleVoipDisconnected(int32_t &numActive, int32_t n
     if (carrierCallId != ERR_ID) {
         TELEPHONY_LOGI("SetVoIPCallInfo handle cs call sucessed");
         sptr<CallBase> call = GetOneCallObject(carrierCallId);
-        return DelayedSingleton<BluetoothCallManager>::GetInstance()->
-            SendBtCallState(0, 0, (int32_t)TelCallState::CALL_STATUS_INCOMING, call->GetAccountNumber());
+        if (call != nullptr) {
+            return DelayedSingleton<BluetoothCallManager>::GetInstance()->
+                SendBtCallState(0, 0, (int32_t)TelCallState::CALL_STATUS_INCOMING, call->GetAccountNumber());
+        }
     }
     return DelayedSingleton<BluetoothCallManager>::GetInstance()->
         SendBtCallState(numActive, numHeld, (int32_t)TelCallState::CALL_STATUS_IDLE, "");
