@@ -577,7 +577,7 @@ int32_t CallStatusManager::OutgoingVoipCallHandle(const CallDetailInfo &info)
             call->SetVideoStateType(info.callMode);
         }
         sptr<VoIPCall> voipCall = reinterpret_cast<VoIPCall *>(call.GetRefPtr());
-        if (voipCall != null) {
+        if (voipCall != nullptr) {
             voipCall->UpdateCallAttributeInfo(info);
         }
         return UpdateCallState(call, info.state);
@@ -1010,7 +1010,7 @@ int32_t CallStatusManager::ActiveVoipCallHandle(const CallDetailInfo &info)
         call->SetVideoStateType(info.callMode);
     }
     sptr<VoIPCall> voipCall = reinterpret_cast<VoIPCall *>(call.GetRefPtr());
-    if (voipCall != null) {
+    if (voipCall != nullptr) {
         voipCall->UpdateCallAttributeInfo(info);
     }
     int32_t ret = UpdateCallState(call, TelCallState::CALL_STATUS_ACTIVE);
