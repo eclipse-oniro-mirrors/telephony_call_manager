@@ -575,9 +575,12 @@ int32_t CallStatusManager::OutgoingVoipCallHandle(const CallDetailInfo &info)
             TELEPHONY_LOGI("change VideoStateType from %{public}d to %{public}d",
                 static_cast<int32_t>(originalType), static_cast<int32_t>(info.callMode));
             call->SetVideoStateType(info.callMode);
-            return UpdateCallState(call, info.state);
         }
-        return TELEPHONY_SUCCESS;
+        sptr<VoIPCall> voipCall = reinterpret_cast<VoIPCall *>(call.GetRefPtr());
+        if (voipCall != nullptr) {
+            voipCall->UpdateCallAttributeInfo(info);
+        }
+        return UpdateCallState(call, info.state);
     }
     call = CreateNewCall(info, CallDirection::CALL_DIRECTION_OUT);
     if (call == nullptr) {
@@ -1005,6 +1008,10 @@ int32_t CallStatusManager::ActiveVoipCallHandle(const CallDetailInfo &info)
         TELEPHONY_LOGI("change VideoStateType from %{public}d to %{public}d",
             static_cast<int32_t>(originalType), static_cast<int32_t>(info.callMode));
         call->SetVideoStateType(info.callMode);
+    }
+    sptr<VoIPCall> voipCall = reinterpret_cast<VoIPCall *>(call.GetRefPtr());
+    if (voipCall != nullptr) {
+        voipCall->UpdateCallAttributeInfo(info);
     }
     int32_t ret = UpdateCallState(call, TelCallState::CALL_STATUS_ACTIVE);
     if (ret != TELEPHONY_SUCCESS) {
