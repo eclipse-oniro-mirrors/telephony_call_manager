@@ -37,5 +37,6 @@ group("unittest") {
   deps += [ "call_earthquake_alarm_test:tel_call_earthquake_alarm_test" ]
   deps += [ "call_voice_assistant_test:tel_call_voice_assistant_test" ]
   deps += [ "distributed_communication_test:distributed_communication_test" ]
-  deps += [ "call_manager_special_test:tel_call_manager_special_test" ]
+  deps += [ "call_manager_special_test:tel_call_manager_special1_test" ]
+  deps += [ "call_manager_special_test:tel_call_manager_special2_test" ]
 }

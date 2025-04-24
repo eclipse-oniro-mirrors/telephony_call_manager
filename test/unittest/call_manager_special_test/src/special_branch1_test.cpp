@@ -139,6 +139,7 @@ void SpecialBranch1Test::SetUp()
 
 void SpecialBranch1Test::TearDown()
 {
+    sleep(1);
 }
 
 /**
@@ -149,9 +150,10 @@ void SpecialBranch1Test::TearDown()
 HWTEST_F(SpecialBranch1Test, Telephony_CallManagerService_001, Function | MediumTest | Level3)
 {
     std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
-    sptr<ICallAbilityCallback> callback;
-    callManagerService->RegisterCallBack(callback);
     ASSERT_TRUE(callManagerService != nullptr);
+    sptr<ICallAbilityCallback> callback;
+    int32_t ret = callManagerService->RegisterCallBack(callback);
+    EXPECT_NE(ret, 0);
 }
 
 /**
@@ -162,8 +164,9 @@ HWTEST_F(SpecialBranch1Test, Telephony_CallManagerService_001, Function | Medium
 HWTEST_F(SpecialBranch1Test, Telephony_CallManagerService_002, Function | MediumTest | Level3)
 {
     std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
-    callManagerService->UnRegisterCallBack();
     ASSERT_TRUE(callManagerService != nullptr);
+    int32_t ret = callManagerService->UnRegisterCallBack();
+    EXPECT_NE(ret, 0);
 }
 
 /**
@@ -174,8 +177,9 @@ HWTEST_F(SpecialBranch1Test, Telephony_CallManagerService_002, Function | Medium
 HWTEST_F(SpecialBranch1Test, Telephony_CallManagerService_003, Function | MediumTest | Level3)
 {
     std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
-    callManagerService->ObserverOnCallDetailsChange();
     ASSERT_TRUE(callManagerService != nullptr);
+    int32_t ret = callManagerService->ObserverOnCallDetailsChange();
+    EXPECT_NE(ret, 0);
 }
 
 /**
@@ -186,9 +190,10 @@ HWTEST_F(SpecialBranch1Test, Telephony_CallManagerService_003, Function | Medium
 HWTEST_F(SpecialBranch1Test, Telephony_CallManagerService_004, Function | MediumTest | Level3)
 {
     std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
-    CallRestrictionInfo info;
-    callManagerService->SetCallRestriction(0, info);
     ASSERT_TRUE(callManagerService != nullptr);
+    CallRestrictionInfo info;
+    int32_t ret = callManagerService->SetCallRestriction(0, info);
+    EXPECT_NE(ret, 0);
 }
 
 /**
@@ -199,9 +204,10 @@ HWTEST_F(SpecialBranch1Test, Telephony_CallManagerService_004, Function | Medium
 HWTEST_F(SpecialBranch1Test, Telephony_CallManagerService_005, Function | MediumTest | Level3)
 {
     std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
-    CallTransferInfo info;
-    callManagerService->SetCallTransferInfo(0, info);
     ASSERT_TRUE(callManagerService != nullptr);
+    CallTransferInfo info;
+    int32_t ret = callManagerService->SetCallTransferInfo(0, info);
+    EXPECT_NE(ret, 0);
 }
 
 /**
@@ -212,9 +218,10 @@ HWTEST_F(SpecialBranch1Test, Telephony_CallManagerService_005, Function | Medium
 HWTEST_F(SpecialBranch1Test, Telephony_CallManagerService_006, Function | MediumTest | Level3)
 {
     std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
-    AudioDevice audioDevice;
-    callManagerService->SetAudioDevice(audioDevice);
     ASSERT_TRUE(callManagerService != nullptr);
+    AudioDevice audioDevice;
+    int32_t ret = callManagerService->SetAudioDevice(audioDevice);
+    EXPECT_NE(ret, 0);
 }
 
 /**
@@ -225,9 +232,10 @@ HWTEST_F(SpecialBranch1Test, Telephony_CallManagerService_006, Function | Medium
 HWTEST_F(SpecialBranch1Test, Telephony_CallManagerService_007, Function | MediumTest | Level3)
 {
     std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
-    std::string surfaceId;
-    callManagerService->SetPreviewWindow(0, surfaceId, nullptr);
     ASSERT_TRUE(callManagerService != nullptr);
+    std::string surfaceId;
+    int32_t ret = callManagerService->SetPreviewWindow(0, surfaceId, nullptr);
+    EXPECT_NE(ret, 0);
 }
 
 /**
@@ -238,9 +246,10 @@ HWTEST_F(SpecialBranch1Test, Telephony_CallManagerService_007, Function | Medium
 HWTEST_F(SpecialBranch1Test, Telephony_CallManagerService_008, Function | MediumTest | Level3)
 {
     std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
-    std::string surfaceId;
-    callManagerService->SetDisplayWindow(0, surfaceId, nullptr);
     ASSERT_TRUE(callManagerService != nullptr);
+    std::string surfaceId;
+    int32_t ret = callManagerService->SetDisplayWindow(0, surfaceId, nullptr);
+    EXPECT_NE(ret, 0);
 }
 
 /**
@@ -251,9 +260,10 @@ HWTEST_F(SpecialBranch1Test, Telephony_CallManagerService_008, Function | Medium
 HWTEST_F(SpecialBranch1Test, Telephony_CallManagerService_009, Function | MediumTest | Level3)
 {
     std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
-    std::vector<OttCallDetailsInfo> ottVec;
-    callManagerService->ReportOttCallDetailsInfo(ottVec);
     ASSERT_TRUE(callManagerService != nullptr);
+    std::vector<OttCallDetailsInfo> ottVec;
+    int32_t ret = callManagerService->ReportOttCallDetailsInfo(ottVec);
+    EXPECT_NE(ret, 0);
 }
 
 /**
@@ -264,9 +274,10 @@ HWTEST_F(SpecialBranch1Test, Telephony_CallManagerService_009, Function | Medium
 HWTEST_F(SpecialBranch1Test, Telephony_CallManagerService_010, Function | MediumTest | Level3)
 {
     std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
-    OttCallEventInfo eventInfo;
-    callManagerService->ReportOttCallEventInfo(eventInfo);
     ASSERT_TRUE(callManagerService != nullptr);
+    OttCallEventInfo eventInfo;
+    int32_t ret = callManagerService->ReportOttCallEventInfo(eventInfo);
+    EXPECT_NE(ret, 0);
 }
 
 /**
@@ -278,6 +289,7 @@ HWTEST_F(SpecialBranch1Test, Telephony_SatelliteCall_001, Function | MediumTest 
 {
     DialParaInfo info;
     std::shared_ptr<SatelliteCall> satelliteCall = std::make_shared<SatelliteCall>(info);
+    ASSERT_TRUE(satelliteCall != nullptr);
     satelliteCall->HoldCall();
     satelliteCall->UnHoldCall();
     satelliteCall->SwitchCall();
@@ -297,8 +309,8 @@ HWTEST_F(SpecialBranch1Test, Telephony_SatelliteCall_001, Function | MediumTest 
     std::vector<std::u16string> callIdList;
     satelliteCall->GetSubCallIdList(callIdList);
     satelliteCall->GetCallIdListForConference(callIdList);
-    satelliteCall->IsSupportConferenceable();
-    ASSERT_TRUE(satelliteCall != nullptr);
+    int32_t ret = satelliteCall->IsSupportConferenceable();
+    EXPECT_NE(ret, 0);
 }
 
 /**
@@ -309,10 +321,11 @@ HWTEST_F(SpecialBranch1Test, Telephony_SatelliteCall_001, Function | MediumTest 
 HWTEST_F(SpecialBranch1Test, Telephony_CallRequestProcess_001, Function | MediumTest | Level3)
 {
     std::shared_ptr<CallRequestProcess> callRequestProcess = std::make_shared<CallRequestProcess>();
+    ASSERT_TRUE(callRequestProcess != nullptr);
     DialParaInfo info;
     info.dialType = static_cast<DialType>(-1);
-    callRequestProcess->HandleDialRequest(info);
-    ASSERT_TRUE(callRequestProcess != nullptr);
+    int32_t ret = callRequestProcess->HandleDialRequest(info);
+    EXPECT_NE(ret, 0);
 }
 } // namespace Telephony
 } // namespace OHOS

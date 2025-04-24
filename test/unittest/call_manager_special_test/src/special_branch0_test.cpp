@@ -145,18 +145,7 @@ void SpecialBranch0Test::SetUp()
 
 void SpecialBranch0Test::TearDown()
 {
-}
-
-/**
- * @tc.number   Telephony_NumberIdentityServiceHelper_001
- * @tc.name     test branch
- * @tc.desc     Function test
- */
-HWTEST_F(SpecialBranch0Test, Telephony_NumberIdentityServiceHelper_001, Function | MediumTest | Level3)
-{
-    auto &help = DelayedRefSingleton<NumberIdentityServiceHelper>().GetInstance();
-    help.NotifyNumberMarkDataUpdate();
-    ASSERT_TRUE(help.connection_ == nullptr);
+    sleep(1);
 }
 
 /**
@@ -179,8 +168,8 @@ HWTEST_F(SpecialBranch0Test, Telephony_NumberIdentityServiceHelper_002, Function
             TELEPHONY_LOGI("NumberIdentityService notify task is working, skip this notify.");
         }
     };
-    help.Connect(onConnected, onDisconnected);
-    ASSERT_TRUE(help.connection_ != nullptr);
+    int ret = help.Connect(onConnected, onDisconnected);
+    EXPECT_EQ(ret, 0);
 }
 
 /**
@@ -262,11 +251,12 @@ HWTEST_F(SpecialBranch0Test, Telephony_CallManagerHisysevent_001, Function | Med
 HWTEST_F(SpecialBranch0Test, Telephony_CallSettingManager_001, Function | MediumTest | Level3)
 {
     std::shared_ptr<CallSettingManager> callSettingManager = std::make_shared<CallSettingManager>();
+    ASSERT_TRUE(callSettingManager != nullptr);
     callSettingManager->cellularCallConnectionPtr_ = nullptr;
     callSettingManager->GetCallWaiting(0);
     callSettingManager->SetCallWaiting(0, false);
-    callSettingManager->GetImsFeatureValue(0, FeatureType::TYPE_VOICE_OVER_LTE);
-    ASSERT_TRUE(callSettingManager != nullptr);
+    int32_t ret = callSettingManager->GetImsFeatureValue(0, FeatureType::TYPE_VOICE_OVER_LTE);
+    EXPECT_NE(ret, 0);
 }
 
 /**
@@ -277,6 +267,7 @@ HWTEST_F(SpecialBranch0Test, Telephony_CallSettingManager_001, Function | Medium
 HWTEST_F(SpecialBranch0Test, Telephony_CallSettingManager_002, Function | MediumTest | Level3)
 {
     std::shared_ptr<CallSettingManager> callSettingManager = std::make_shared<CallSettingManager>();
+    ASSERT_TRUE(callSettingManager != nullptr);
     std::u16string temp = u"123";
     callSettingManager->SetImsConfig(0, ITEM_VIDEO_QUALITY, temp);
     callSettingManager->SetImsConfig(0, static_cast<ImsConfigItem>(-1), temp);
@@ -304,8 +295,8 @@ HWTEST_F(SpecialBranch0Test, Telephony_CallSettingManager_002, Function | Medium
     info2.settingType = CallTransferSettingType::CALL_TRANSFER_DISABLE;
     info2.startHour = 0;
     (void)memcpy_s(info2.transferNum, 0, "138666688889999", strlen("138666688889999"));
-    callSettingManager->SetCallTransferInfoPolicy(0, info2);
-    ASSERT_TRUE(callSettingManager != nullptr);
+    int32_t ret = callSettingManager->SetCallTransferInfoPolicy(0, info2);
+    EXPECT_EQ(ret, 0);
 }
 
 /**
@@ -316,7 +307,6 @@ HWTEST_F(SpecialBranch0Test, Telephony_CallSettingManager_002, Function | Medium
 HWTEST_F(SpecialBranch0Test, Telephony_CallVoiceAssistantManager_001, Function | MediumTest | Level3)
 {
     std::shared_ptr<CallVoiceAssistantManager> voicePtr = CallVoiceAssistantManager::GetInstance();
-    sptr<IRemoteObject> remoteObject = sptr<VoiceAssistantConnectCallback>::MakeSptr(-1);
     voicePtr->mInstance_ = nullptr;
     voicePtr->GetInstance();
     ASSERT_TRUE(voicePtr->GetInstance() != nullptr);
@@ -330,8 +320,7 @@ HWTEST_F(SpecialBranch0Test, Telephony_CallVoiceAssistantManager_001, Function |
 HWTEST_F(SpecialBranch0Test, Telephony_CallVoiceAssistantManager_002, Function | MediumTest | Level3)
 {
     std::shared_ptr<CallVoiceAssistantManager> voicePtr = CallVoiceAssistantManager::GetInstance();
-    voicePtr->IsSwitchOn("1");
-    ASSERT_TRUE(voicePtr->GetInstance() != nullptr);
+    ASSERT_FALSE(voicePtr->IsSwitchOn("1"));
 }
 
 /**
@@ -384,8 +373,8 @@ HWTEST_F(SpecialBranch0Test, Telephony_CallVoiceAssistantManager_005, Function |
 HWTEST_F(SpecialBranch0Test, Telephony_CallVoiceAssistantManager_006, Function | MediumTest | Level3)
 {
     std::shared_ptr<CallVoiceAssistantManager> voicePtr = CallVoiceAssistantManager::GetInstance();
-    voicePtr->GetSendString(nullptr);
-    ASSERT_TRUE(voicePtr->GetInstance() != nullptr);
+    std::u16string ret = voicePtr->GetSendString(nullptr);
+    ASSERT_TRUE(ret.empty());
 }
 
 /**
@@ -467,8 +456,8 @@ HWTEST_F(SpecialBranch0Test, Telephony_CallVoiceAssistantManager_012, Function |
     voicePtr->accountIds[1] = info;
     voicePtr->nowCallId = 0;
     voicePtr->nowAccountId = 0;
-    voicePtr->CheckTelCallState(TelCallState::CALL_STATUS_WAITING);
-    ASSERT_TRUE(voicePtr->GetInstance() != nullptr);
+    int32_t ret = voicePtr->CheckTelCallState(TelCallState::CALL_STATUS_WAITING);
+    EXPECT_NE(ret, 0);
 }
 
 /**
@@ -496,7 +485,7 @@ HWTEST_F(SpecialBranch0Test, Telephony_SpamCallAdapter_001, Function | MediumTes
     int32_t blockReason = 0;
     std::string detectDetails;
     spamCallAdapter->GetParseResult(isBlock, info, blockReason, detectDetails);
-    ASSERT_TRUE(spamCallAdapter != nullptr);
+    EXPECT_EQ(blockReason, 0);
 }
 
 /**
@@ -507,8 +496,8 @@ HWTEST_F(SpecialBranch0Test, Telephony_SpamCallAdapter_001, Function | MediumTes
 HWTEST_F(SpecialBranch0Test, Telephony_SpamCallAdapter_002, Function | MediumTest | Level3)
 {
     std::shared_ptr<SpamCallAdapter> spamCallAdapter = std::make_shared<SpamCallAdapter>();
-    spamCallAdapter->GetDetectPhoneNum();
-    ASSERT_TRUE(spamCallAdapter != nullptr);
+    std::string phone = spamCallAdapter->GetDetectPhoneNum();
+    ASSERT_TRUE(phone.empty());
 }
 
 /**
@@ -520,8 +509,7 @@ HWTEST_F(SpecialBranch0Test, Telephony_SpamCallAdapter_003, Function | MediumTes
 {
     std::shared_ptr<SpamCallAdapter> spamCallAdapter = std::make_shared<SpamCallAdapter>();
     spamCallAdapter->timeWaitHelper_ = nullptr;
-    spamCallAdapter->WaitForDetectResult();
-    ASSERT_TRUE(spamCallAdapter != nullptr);
+    ASSERT_FALSE(spamCallAdapter->WaitForDetectResult());
 }
 
 /**
@@ -532,14 +520,15 @@ HWTEST_F(SpecialBranch0Test, Telephony_SpamCallAdapter_003, Function | MediumTes
 HWTEST_F(SpecialBranch0Test, Telephony_CallManagerServiceStub_001, Function | MediumTest | Level3)
 {
     std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
+    ASSERT_TRUE(callManagerService != nullptr);
     MessageParcel data;
     MessageParcel reply;
     MessageOption option;
     data.WriteInterfaceToken(CallManagerServiceStub::GetDescriptor());
     data.RewindRead(0);
-    callManagerService->OnRemoteRequest(
+    int32_t ret = callManagerService->OnRemoteRequest(
         static_cast<uint32_t>(CallManagerInterfaceCode::INTERFACE_BLUETOOTH_REGISTER_CALLBACKPTR), data, reply, option);
-    ASSERT_TRUE(callManagerService != nullptr);
+    EXPECT_EQ(ret, 0);
 }
 
 /**
@@ -550,12 +539,13 @@ HWTEST_F(SpecialBranch0Test, Telephony_CallManagerServiceStub_001, Function | Me
 HWTEST_F(SpecialBranch0Test, Telephony_CallManagerServiceStub_002, Function | MediumTest | Level3)
 {
     std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
+    ASSERT_TRUE(callManagerService != nullptr);
     MessageParcel data;
     MessageParcel reply;
     data.WriteInterfaceToken(CallManagerServiceStub::GetDescriptor());
     data.RewindRead(0);
-    callManagerService->OnRegisterCallBack(data, reply);
-    ASSERT_TRUE(callManagerService != nullptr);
+    int32_t ret = callManagerService->OnRegisterCallBack(data, reply);
+    EXPECT_NE(ret, 0);
 }
 
 /**
@@ -566,12 +556,13 @@ HWTEST_F(SpecialBranch0Test, Telephony_CallManagerServiceStub_002, Function | Me
 HWTEST_F(SpecialBranch0Test, Telephony_CallManagerServiceStub_003, Function | MediumTest | Level3)
 {
     std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
+    ASSERT_TRUE(callManagerService != nullptr);
     MessageParcel data;
     MessageParcel reply;
     data.WriteInterfaceToken(CallManagerServiceStub::GetDescriptor());
     data.RewindRead(0);
-    callManagerService->OnUnRegisterCallBack(data, reply);
-    ASSERT_TRUE(callManagerService != nullptr);
+    int32_t ret = callManagerService->OnUnRegisterCallBack(data, reply);
+    EXPECT_NE(ret, 0);
 }
 
 /**
@@ -582,12 +573,13 @@ HWTEST_F(SpecialBranch0Test, Telephony_CallManagerServiceStub_003, Function | Me
 HWTEST_F(SpecialBranch0Test, Telephony_CallManagerServiceStub_004, Function | MediumTest | Level3)
 {
     std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
+    ASSERT_TRUE(callManagerService != nullptr);
     MessageParcel data;
     MessageParcel reply;
     data.WriteInterfaceToken(CallManagerServiceStub::GetDescriptor());
     data.RewindRead(0);
-    callManagerService->OnObserverOnCallDetailsChange(data, reply);
-    ASSERT_TRUE(callManagerService != nullptr);
+    int32_t ret = callManagerService->OnObserverOnCallDetailsChange(data, reply);
+    EXPECT_EQ(ret, 0);
 }
 
 /**
@@ -598,12 +590,13 @@ HWTEST_F(SpecialBranch0Test, Telephony_CallManagerServiceStub_004, Function | Me
 HWTEST_F(SpecialBranch0Test, Telephony_CallManagerServiceStub_005, Function | MediumTest | Level3)
 {
     std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
+    ASSERT_TRUE(callManagerService != nullptr);
     MessageParcel data;
     MessageParcel reply;
     data.WriteInterfaceToken(CallManagerServiceStub::GetDescriptor());
     data.RewindRead(0);
-    callManagerService->OnMakeCall(data, reply);
-    ASSERT_TRUE(callManagerService != nullptr);
+    int32_t ret = callManagerService->OnMakeCall(data, reply);
+    EXPECT_EQ(ret, 0);
 }
 
 /**
@@ -614,12 +607,13 @@ HWTEST_F(SpecialBranch0Test, Telephony_CallManagerServiceStub_005, Function | Me
 HWTEST_F(SpecialBranch0Test, Telephony_CallManagerServiceStub_006, Function | MediumTest | Level3)
 {
     std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
+    ASSERT_TRUE(callManagerService != nullptr);
     MessageParcel data;
     MessageParcel reply;
     data.WriteInterfaceToken(CallManagerServiceStub::GetDescriptor());
     data.RewindRead(0);
-    callManagerService->OnSetPreviewWindow(data, reply);
-    ASSERT_TRUE(callManagerService != nullptr);
+    int32_t ret = callManagerService->OnSetPreviewWindow(data, reply);
+    EXPECT_EQ(ret, 0);
 }
 
 /**
@@ -630,12 +624,13 @@ HWTEST_F(SpecialBranch0Test, Telephony_CallManagerServiceStub_006, Function | Me
 HWTEST_F(SpecialBranch0Test, Telephony_CallManagerServiceStub_007, Function | MediumTest | Level3)
 {
     std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
+    ASSERT_TRUE(callManagerService != nullptr);
     MessageParcel data;
     MessageParcel reply;
     data.WriteInterfaceToken(CallManagerServiceStub::GetDescriptor());
     data.RewindRead(0);
-    callManagerService->OnSetDisplayWindow(data, reply);
-    ASSERT_TRUE(callManagerService != nullptr);
+    int32_t ret = callManagerService->OnSetDisplayWindow(data, reply);
+    EXPECT_EQ(ret, 0);
 }
 
 /**
@@ -646,14 +641,15 @@ HWTEST_F(SpecialBranch0Test, Telephony_CallManagerServiceStub_007, Function | Me
 HWTEST_F(SpecialBranch0Test, Telephony_CallManagerServiceStub_008, Function | MediumTest | Level3)
 {
     std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
+    ASSERT_TRUE(callManagerService != nullptr);
     MessageParcel data;
     MessageParcel reply;
     data.WriteInterfaceToken(CallManagerServiceStub::GetDescriptor());
     data.RewindRead(0);
     int32_t temp = 1;
     data.WriteRawData((const void *)&temp, sizeof(int32_t));
-    callManagerService->OnReportOttCallDetailsInfo(data, reply);
-    ASSERT_TRUE(callManagerService != nullptr);
+    int32_t ret = callManagerService->OnReportOttCallDetailsInfo(data, reply);
+    EXPECT_NE(ret, 0);
 }
 
 /**
@@ -676,14 +672,15 @@ HWTEST_F(SpecialBranch0Test, Telephony_CallManagerServiceStub_009, Function | Me
 HWTEST_F(SpecialBranch0Test, Telephony_CallManagerServiceStub_010, Function | MediumTest | Level3)
 {
     std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
+    ASSERT_TRUE(callManagerService != nullptr);
     MessageParcel data;
     MessageParcel reply;
     data.WriteInterfaceToken(CallManagerServiceStub::GetDescriptor());
     data.RewindRead(0);
     int32_t temp = 1;
     data.WriteRawData((const void *)&temp, sizeof(int32_t));
-    callManagerService->OnRegisterBluetoothCallManagerCallbackPtr(data, reply);
-    ASSERT_TRUE(callManagerService != nullptr);
+    int32_t ret = callManagerService->OnRegisterBluetoothCallManagerCallbackPtr(data, reply);
+    EXPECT_EQ(ret, 0);
 }
 
 /**
@@ -732,9 +729,10 @@ HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_003, Function | Medium
 HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_005, Function | MediumTest | Level3)
 {
     std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
-    callManagerService->callControlManagerPtr_ = std::make_shared<CallControlManager>();
-    callManagerService->PostDialProceed(1, false);
     ASSERT_TRUE(callManagerService != nullptr);
+    callManagerService->callControlManagerPtr_ = std::make_shared<CallControlManager>();
+    int32_t ret = callManagerService->PostDialProceed(1, false);
+    EXPECT_NE(ret, 0);
 }
 
 /**
@@ -745,10 +743,11 @@ HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_005, Function | Medium
 HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_006, Function | MediumTest | Level3)
 {
     std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
+    ASSERT_TRUE(callManagerService != nullptr);
     callManagerService->callControlManagerPtr_ = std::make_shared<CallControlManager>();
     CallTransferInfo info;
-    callManagerService->SetCallTransferInfo(0, info);
-    ASSERT_TRUE(callManagerService != nullptr);
+    int32_t ret = callManagerService->SetCallTransferInfo(0, info);
+    EXPECT_NE(ret, 0);
 }
 
 /**
@@ -759,10 +758,11 @@ HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_006, Function | Medium
 HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_007, Function | MediumTest | Level3)
 {
     std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
+    ASSERT_TRUE(callManagerService != nullptr);
     callManagerService->callControlManagerPtr_ = std::make_shared<CallControlManager>();
     std::u16string msg;
-    callManagerService->StartRtt(0, msg);
-    ASSERT_TRUE(callManagerService != nullptr);
+    int32_t ret = callManagerService->StartRtt(0, msg);
+    EXPECT_NE(ret, 0);
 }
 
 /**
@@ -773,9 +773,10 @@ HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_007, Function | Medium
 HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_008, Function | MediumTest | Level3)
 {
     std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
-    callManagerService->callControlManagerPtr_ = std::make_shared<CallControlManager>();
-    callManagerService->StopRtt(0);
     ASSERT_TRUE(callManagerService != nullptr);
+    callManagerService->callControlManagerPtr_ = std::make_shared<CallControlManager>();
+    int32_t ret = callManagerService->StopRtt(0);
+    EXPECT_NE(ret, 0);
 }
 
 /**
@@ -786,9 +787,10 @@ HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_008, Function | Medium
 HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_009, Function | MediumTest | Level3)
 {
     std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
-    callManagerService->callControlManagerPtr_ = std::make_shared<CallControlManager>();
-    callManagerService->KickOutFromConference(0);
     ASSERT_TRUE(callManagerService != nullptr);
+    callManagerService->callControlManagerPtr_ = std::make_shared<CallControlManager>();
+    int32_t ret = callManagerService->KickOutFromConference(0);
+    EXPECT_NE(ret, 0);
 }
 
 /**
@@ -799,9 +801,10 @@ HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_009, Function | Medium
 HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_010, Function | MediumTest | Level3)
 {
     std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
-    callManagerService->callControlManagerPtr_ = std::make_shared<CallControlManager>();
-    callManagerService->SetMuted(false);
     ASSERT_TRUE(callManagerService != nullptr);
+    callManagerService->callControlManagerPtr_ = std::make_shared<CallControlManager>();
+    int32_t ret = callManagerService->SetMuted(false);
+    EXPECT_NE(ret, 0);
 }
 
 /**
@@ -812,9 +815,10 @@ HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_010, Function | Medium
 HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_011, Function | MediumTest | Level3)
 {
     std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
-    callManagerService->callControlManagerPtr_ = std::make_shared<CallControlManager>();
-    callManagerService->MuteRinger();
     ASSERT_TRUE(callManagerService != nullptr);
+    callManagerService->callControlManagerPtr_ = std::make_shared<CallControlManager>();
+    int32_t ret = callManagerService->MuteRinger();
+    EXPECT_EQ(ret, 0);
 }
 
 /**
@@ -825,9 +829,10 @@ HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_011, Function | Medium
 HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_012, Function | MediumTest | Level3)
 {
     std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
-    callManagerService->callControlManagerPtr_ = nullptr;
-    callManagerService->CloseUnFinishedUssd(0);
     ASSERT_TRUE(callManagerService != nullptr);
+    callManagerService->callControlManagerPtr_ = nullptr;
+    int32_t ret = callManagerService->CloseUnFinishedUssd(0);
+    EXPECT_NE(ret, 0);
 }
 
 /**
@@ -838,9 +843,10 @@ HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_012, Function | Medium
 HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_013, Function | MediumTest | Level3)
 {
     std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
-    callManagerService->supportSpecialCode_[0] = "123";
-    callManagerService->InputDialerSpecialCode("123");
     ASSERT_TRUE(callManagerService != nullptr);
+    callManagerService->supportSpecialCode_[0] = "123";
+    int32_t ret = callManagerService->InputDialerSpecialCode("123");
+    EXPECT_EQ(ret, 0);
 }
 
 /**
@@ -851,9 +857,10 @@ HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_013, Function | Medium
 HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_014, Function | MediumTest | Level3)
 {
     std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
-    callManagerService->callControlManagerPtr_ = nullptr;
-    callManagerService->SetVoIPCallState(0);
     ASSERT_TRUE(callManagerService != nullptr);
+    callManagerService->callControlManagerPtr_ = nullptr;
+    int32_t ret = callManagerService->SetVoIPCallState(0);
+    EXPECT_NE(ret, 0);
 }
 
 /**
@@ -864,9 +871,10 @@ HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_014, Function | Medium
 HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_015, Function | MediumTest | Level3)
 {
     std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
-    callManagerService->callControlManagerPtr_ = std::make_shared<CallControlManager>();
-    callManagerService->SetVoIPCallState(0);
     ASSERT_TRUE(callManagerService != nullptr);
+    callManagerService->callControlManagerPtr_ = std::make_shared<CallControlManager>();
+    int32_t ret = callManagerService->SetVoIPCallState(0);
+    EXPECT_EQ(ret, 0);
 }
 
 /**
@@ -877,12 +885,13 @@ HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_015, Function | Medium
 HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_016, Function | MediumTest | Level3)
 {
     std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
+    ASSERT_TRUE(callManagerService != nullptr);
     callManagerService->callControlManagerPtr_ = std::make_shared<CallControlManager>();
     int32_t callId = 0;
     int32_t state = 0;
     std::string phoneNumber;
-    callManagerService->GetVoIPCallInfo(callId, state, phoneNumber);
-    ASSERT_TRUE(callManagerService != nullptr);
+    int32_t ret = callManagerService->GetVoIPCallInfo(callId, state, phoneNumber);
+    EXPECT_EQ(ret, 0);
 }
 
 /**
@@ -893,10 +902,11 @@ HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_016, Function | Medium
 HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_017, Function | MediumTest | Level3)
 {
     std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
+    ASSERT_TRUE(callManagerService != nullptr);
     sptr<OHOS::IRemoteObject> failRemoteObj = new MockRemoteObject(-1);
     callManagerService->proxyObjectPtrMap_[1] = failRemoteObj;
-    callManagerService->GetProxyObjectPtr(static_cast<CallManagerProxyType>(1));
-    ASSERT_TRUE(callManagerService != nullptr);
+    sptr<IRemoteObject> ret = callManagerService->GetProxyObjectPtr(static_cast<CallManagerProxyType>(1));
+    EXPECT_NE(ret, nullptr);
 }
 
 /**
@@ -907,12 +917,13 @@ HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_017, Function | Medium
 HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_018, Function | MediumTest | Level3)
 {
     std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
+    ASSERT_TRUE(callManagerService != nullptr);
     DialParaInfo dialParaInfo;
     dialParaInfo.callId = 1;
     sptr<CallBase> callObjectPtr = new CSCall(dialParaInfo);
     CallObjectManager::AddOneCallObject(callObjectPtr);
-    callManagerService->dealCeliaCallEvent(1);
-    ASSERT_TRUE(callManagerService != nullptr);
+    int32_t ret = callManagerService->dealCeliaCallEvent(1);
+    EXPECT_EQ(ret, 0);
 }
 
 /**
@@ -923,6 +934,7 @@ HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_018, Function | Medium
 HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_019, Function | MediumTest | Level3)
 {
     std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
+    ASSERT_TRUE(callManagerService != nullptr);
     std::string eventName = "DISPLAY_SPECIFIED_CALL_PAGE_BY_CALL_ID";
     callManagerService->SendCallUiEvent(1, eventName);
     eventName = "EVENT_BLUETOOTH_SCO_STATE_OFF";
@@ -932,8 +944,8 @@ HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_019, Function | Medium
     eventName = "EVENT_NOT_SUPPORT_BLUETOOTH_CALL";
     callManagerService->SendCallUiEvent(1, eventName);
     eventName = "123";
-    callManagerService->SendCallUiEvent(1, eventName);
-    ASSERT_TRUE(callManagerService != nullptr);
+    int32_t ret = callManagerService->SendCallUiEvent(1, eventName);
+    EXPECT_EQ(ret, 0);
 }
 
 /**
@@ -944,9 +956,10 @@ HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_019, Function | Medium
 HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_021, Function | MediumTest | Level3)
 {
     std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
-    callManagerService->callControlManagerPtr_ = nullptr;
-    callManagerService->RemoveMissedIncomingCallNotification();
     ASSERT_TRUE(callManagerService != nullptr);
+    callManagerService->callControlManagerPtr_ = nullptr;
+    int32_t ret = callManagerService->RemoveMissedIncomingCallNotification();
+    EXPECT_NE(ret, 0);
 }
 
 /**
@@ -957,9 +970,10 @@ HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_021, Function | Medium
 HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_022, Function | MediumTest | Level3)
 {
     std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
-    callManagerService->callControlManagerPtr_ = std::make_shared<CallControlManager>();
-    callManagerService->UnHoldCall(0);
     ASSERT_TRUE(callManagerService != nullptr);
+    callManagerService->callControlManagerPtr_ = std::make_shared<CallControlManager>();
+    int32_t ret = callManagerService->UnHoldCall(0);
+    EXPECT_NE(ret, 0);
 }
 
 /**
@@ -970,10 +984,11 @@ HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_022, Function | Medium
 HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_023, Function | MediumTest | Level3)
 {
     std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
+    ASSERT_TRUE(callManagerService != nullptr);
     callManagerService->callControlManagerPtr_ = std::make_shared<CallControlManager>();
     bool result;
-    callManagerService->CanSetCallTransferTime(0, result);
-    ASSERT_TRUE(callManagerService != nullptr);
+    int32_t ret = callManagerService->CanSetCallTransferTime(0, result);
+    EXPECT_NE(ret, 0);
 }
 
 /**
@@ -984,10 +999,11 @@ HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_023, Function | Medium
 HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_024, Function | MediumTest | Level3)
 {
     std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
+    ASSERT_TRUE(callManagerService != nullptr);
     callManagerService->callControlManagerPtr_ = std::make_shared<CallControlManager>();
     int32_t mode = 0;
-    callManagerService->SetCallPreferenceMode(0, mode);
-    ASSERT_TRUE(callManagerService != nullptr);
+    int32_t ret = callManagerService->SetCallPreferenceMode(0, mode);
+    EXPECT_NE(ret, 0);
 }
 
 /**
@@ -998,9 +1014,10 @@ HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_024, Function | Medium
 HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_025, Function | MediumTest | Level3)
 {
     std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
-    callManagerService->callControlManagerPtr_ = std::make_shared<CallControlManager>();
-    callManagerService->SeparateConference(0);
     ASSERT_TRUE(callManagerService != nullptr);
+    callManagerService->callControlManagerPtr_ = std::make_shared<CallControlManager>();
+    int32_t ret = callManagerService->SeparateConference(0);
+    EXPECT_NE(ret, 0);
 }
 
 /**
@@ -1011,10 +1028,11 @@ HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_025, Function | Medium
 HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_026, Function | MediumTest | Level3)
 {
     std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
+    ASSERT_TRUE(callManagerService != nullptr);
     callManagerService->callControlManagerPtr_ = std::make_shared<CallControlManager>();
     AudioDevice audioDevice;
-    callManagerService->SetAudioDevice(audioDevice);
-    ASSERT_TRUE(callManagerService != nullptr);
+    int32_t ret = callManagerService->SetAudioDevice(audioDevice);
+    EXPECT_NE(ret, 0);
 }
 } // namespace Telephony
 } // namespace OHOS
