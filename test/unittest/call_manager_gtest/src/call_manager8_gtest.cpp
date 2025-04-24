@@ -1145,6 +1145,8 @@ HWTEST_F(CallManagerGtest, Telephony_AntiFraudCloudService_0001, Function | Medi
     EXPECT_FALSE(service->GenerateRequestJson(headers, "").empty());
     EXPECT_FALSE(service->GetDeviceSerial().empty());
     EXPECT_EQ(service->GetSubstringBeforeSymbol("1234", "."), "1234");
+    EXPECT_TRUE(service->EncodeBase64("").empty());
+    EXPECT_FALSE(service->EncodeBase64("1234").empty());
 }
 
 constexpr int UCS_SERVICE_COMMAND = 0;

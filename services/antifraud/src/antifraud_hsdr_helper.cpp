@@ -47,7 +47,7 @@ static bool ReadStr16(MessageParcel &parcel, std::string &str8)
 void HsdrConnection::OnAbilityConnectDone(
     const AppExecFwk::ElementName &element, const sptr<IRemoteObject> &remoteObject, int resultCode)
 {
-    std::lock_guard<std::mutex> lock(remoteProxyMutex_);
+    std::lock_guard<ffrt::mutex> lock(remoteProxyMutex_);
     TELEPHONY_LOGI("HsdrConnection::OnAbilityConnectDone begin.");
     if (resultCode != 0) {
         TELEPHONY_LOGE("connect failed, resultCode: %{public}d", resultCode);
@@ -63,7 +63,7 @@ void HsdrConnection::OnAbilityConnectDone(
 
 void HsdrConnection::OnAbilityDisconnectDone(const AppExecFwk::ElementName &element, int resultCode)
 {
-    std::lock_guard<std::mutex> lock(remoteProxyMutex_);
+    std::lock_guard<ffrt::mutex> lock(remoteProxyMutex_);
     if (resultCode == UNEXPECT_DISCONNECT_CODE) {
         TELEPHONY_LOGE("unexpected disconnect!");
     }
@@ -73,20 +73,20 @@ void HsdrConnection::OnAbilityDisconnectDone(const AppExecFwk::ElementName &elem
 
 bool HsdrConnection::IsAlive()
 {
-    std::lock_guard<std::mutex> lock(remoteProxyMutex_);
+    std::lock_guard<ffrt::mutex> lock(remoteProxyMutex_);
     return remoteObject_ != nullptr && !remoteObject_->IsObjectDead();
 }
 
 sptr<IRemoteObject> HsdrConnection::GetAbilityProxy()
 {
-    std::lock_guard<std::mutex> lock(remoteProxyMutex_);
+    std::lock_guard<ffrt::mutex> lock(remoteProxyMutex_);
     return remoteObject_;
 }
 
 HsdrHelper::HsdrHelper() {}
 int HsdrHelper::ConnectHsdr(ConnectedCallback connectedCallback)
 {
-    std::lock_guard<std::mutex> lock(connectionMutex_);
+    std::lock_guard<ffrt::mutex> lock(connectionMutex_);
     TELEPHONY_LOGI("ConnectHsdr begin.");
     if (connection_ != nullptr && connection_->IsAlive()) {
         TELEPHONY_LOGI("Already connected, use old connection.");
@@ -113,7 +113,7 @@ int HsdrHelper::ConnectHsdr(ConnectedCallback connectedCallback)
 
 void HsdrHelper::DisconnectHsdr()
 {
-    std::lock_guard<std::mutex> lock(connectionMutex_);
+    std::lock_guard<ffrt::mutex> lock(connectionMutex_);
     TELEPHONY_LOGI("HsdrHelper::DisconnectHsdr begin.");
     if (connection_ == nullptr) {
         return;
