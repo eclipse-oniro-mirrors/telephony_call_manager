@@ -30,6 +30,7 @@
 #include "call_manager_hisysevent.h"
 #include "call_number_utils.h"
 #include "call_request_event_handler_helper.h"
+#include "call_state_processor.h"
 #include "call_superprivacy_control_manager.h"
 #include "call_voice_assistant_manager.h"
 #include "cs_call.h"
@@ -2411,8 +2412,12 @@ bool CallStatusManager::RefreshDialingStateByOtherState(sptr<CallBase> &call, co
     call = GetOneCallObjectByIndexSlotIdAndCallType(info.index, info.accountId, info.callType);
     if (call == nullptr) {
         TELEPHONY_LOGE("after recalling dialingHandle, call still is nullptr!");
+        DelayedSingleton<CallStateProcessor>::GetInstance()->DeleteCall(initCall->GetCallID(),
+            TelCallState::CALL_STATUS_DIALING);
         return false;
     }
+    DelayedSingleton<CallStateProcessor>::GetInstance()->DeleteCall(call->GetCallID(),
+        TelCallState::CALL_STATUS_DIALING);
     return true;
 }
 } // namespace Telephony
