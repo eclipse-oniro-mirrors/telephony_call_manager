@@ -324,6 +324,7 @@ void Tone::ReleaseRenderer()
 
 ToneDescriptor Tone::getCurrentToneType()
 {
+    TELEPHONY_LOGI("currentToneDescriptor_ = %{public}d", currentToneDescriptor_);
     return currentToneDescriptor_;
 }
 } // namespace Telephony

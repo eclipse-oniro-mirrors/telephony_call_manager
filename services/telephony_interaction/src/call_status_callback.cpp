@@ -410,6 +410,7 @@ int32_t CallStatusCallback::ReceiveUpdateCallMediaModeRequest(const CallModeRepo
             waitingToneHandle_ = ffrt::submit_h([weak]() {
                 auto strong = weak.lock();
                 if (strong) {
+                    TELEPHONY_LOGI("ReceiveUpdateCallMediaModeRequest timeout")
                     strong->ShouldStopWaitingTone();
                 }
             }, {}, {}, ffrt::task_attr().delay(DELAY_STOP_PLAY_TIME));
