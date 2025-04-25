@@ -980,6 +980,7 @@ int32_t AudioControlManager::PlayCallTone(ToneDescriptor type)
 
 int32_t AudioControlManager::StopCallTone()
 {
+    TELEPHONY_LOGI("stop call tone enter");
     std::lock_guard<std::recursive_mutex> lock(toneStateLock_);
     if (toneState_ == ToneState::STOPPED) {
         TELEPHONY_LOGI("tone is already stopped");
