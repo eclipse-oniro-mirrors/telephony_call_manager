@@ -225,9 +225,6 @@ bool AudioProxy::IsMicrophoneMute()
 
 bool AudioProxy::SetMicrophoneMute(bool mute)
 {
-    if (mute == IsMicrophoneMute()) {
-        return true;
-    }
     std::shared_ptr<AudioStandard::AudioGroupManager> audioGroupManager =
         AudioStandard::AudioSystemManager::GetInstance()->GetGroupManager(AudioStandard::DEFAULT_VOLUME_GROUP_ID);
     if (audioGroupManager == nullptr) {
