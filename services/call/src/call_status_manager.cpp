@@ -2406,18 +2406,16 @@ bool CallStatusManager::RefreshDialingStateByOtherState(sptr<CallBase> &call, co
         TELEPHONY_LOGE("initCall is nullptr!");
         return false;
     }
-    DialingHandle(info);
+    CallDetailInfo tempInfo = info;
+    tempInfo.state = TelCallState::CALL_STATUS_DIALING;
+    DialingHandle(tempInfo);
     HandleDsdaInfo(info.accountId);
     DelayedSingleton<BluetoothCallService>::GetInstance()->GetCallState();
     call = GetOneCallObjectByIndexSlotIdAndCallType(info.index, info.accountId, info.callType);
     if (call == nullptr) {
         TELEPHONY_LOGE("after recalling dialingHandle, call still is nullptr!");
-        DelayedSingleton<CallStateProcessor>::GetInstance()->DeleteCall(initCall->GetCallID(),
-            TelCallState::CALL_STATUS_DIALING);
         return false;
     }
-    DelayedSingleton<CallStateProcessor>::GetInstance()->DeleteCall(call->GetCallID(),
-        TelCallState::CALL_STATUS_DIALING);
     return true;
 }
 } // namespace Telephony
