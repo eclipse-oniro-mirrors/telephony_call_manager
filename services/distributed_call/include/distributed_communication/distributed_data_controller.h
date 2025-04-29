@@ -34,6 +34,7 @@ constexpr const char* DISTRIBUTED_ITEM_DIRECTION = "direction";
 
 constexpr uint32_t DISTRIBUTED_DATA_TYPE_OFFSET_BASE = 1;
 constexpr uint32_t DISTRIBUTED_MAX_RECV_DATA_LEN = 2048;
+constexpr int32_t QOS_MIN_BW = 4 * 1024 * 1024;
 
 enum class DistributedDataType : int32_t {
     NAME = 0,

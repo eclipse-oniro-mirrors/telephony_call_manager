@@ -23,7 +23,8 @@ ClientSession::~ClientSession()
     Disconnect();
 }
 
-void ClientSession::Connect(const std::string &peerDevId, const std::string &localName, const std::string &peerName)
+void ClientSession::Connect(const std::string &peerDevId, const std::string &localName, const std::string &peerName,
+    const int32_t &qosMinBw)
 {
     {
         std::lock_guard<ffrt::mutex> lock(mutex_);
@@ -37,7 +38,7 @@ void ClientSession::Connect(const std::string &peerDevId, const std::string &loc
         return;
     }
     QosTV qos[] = {
-        { .qos = QOS_TYPE_MIN_BW, .value = QOS_MIN_BW },
+        { .qos = QOS_TYPE_MIN_BW, .value = qosMinBw },
         { .qos = QOS_TYPE_MAX_LATENCY, .value = QOS_MAX_LATENCY }
     };
     int32_t ret = BindAsync(socket, qos, sizeof(qos) / sizeof(qos[0]), &listener_);

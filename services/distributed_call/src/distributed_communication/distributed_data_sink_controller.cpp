@@ -90,7 +90,7 @@ void DistributedDataSinkController::ConnectRemote(const std::string &devId)
     }
     session_ = transMgr->CreateClientSession(shared_from_this());
     if (session_ != nullptr) {
-        session_->Connect(devId, SESSION_NAME, SESSION_NAME);
+        session_->Connect(devId, SESSION_NAME, SESSION_NAME, QOS_MIN_BW);
     }
 }
 

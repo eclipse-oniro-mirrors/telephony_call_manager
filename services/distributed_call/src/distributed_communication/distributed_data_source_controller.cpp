@@ -34,7 +34,7 @@ void DistributedDataSourceController::OnDeviceOnline(const std::string &devId, c
     }
     session_ = transMgr->CreateServerSession(shared_from_this());
     if (session_ != nullptr) {
-        session_->Create(SESSION_NAME);
+        session_->Create(SESSION_NAME, QOS_MIN_BW);
     }
 
     // save current call info

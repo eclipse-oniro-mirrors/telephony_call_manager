@@ -23,7 +23,7 @@ ServerSession::~ServerSession()
     Destroy();
 }
 
-void ServerSession::Create(const std::string &localName)
+void ServerSession::Create(const std::string &localName, const int32_t &qosMinBw)
 {
     if (localName.empty()) {
         TELEPHONY_LOGE("create server socket fail, empty local name");
@@ -51,7 +51,7 @@ void ServerSession::Create(const std::string &localName)
     }
 
     QosTV qos[] = {
-        { .qos = QOS_TYPE_MIN_BW, .value = QOS_MIN_BW },
+        { .qos = QOS_TYPE_MIN_BW, .value = qosMinBw },
         { .qos = QOS_TYPE_MAX_LATENCY, .value = QOS_MAX_LATENCY }
     };
     int32_t ret = Listen(socket, qos, sizeof(qos) / sizeof(qos[0]), &listener_);
