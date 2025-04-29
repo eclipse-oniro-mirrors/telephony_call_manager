@@ -490,37 +490,14 @@ int32_t NapiCallAbilityCallback::UpdateCallStateInfo(const CallAttributeInfo &in
     if (stateCallback_.thisVar == nullptr) {
         return CALL_ERR_CALLBACK_NOT_EXIST;
     }
-    uv_loop_s *loop = nullptr;
-#if defined(NAPI_VERSION) && NAPI_VERSION >= 2
-    napi_get_uv_event_loop(stateCallback_.env, &loop);
-#endif
-    if (loop == nullptr) {
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-    CallStateWorker *callStateWorker = std::make_unique<CallStateWorker>().release();
-    if (callStateWorker == nullptr) {
-        TELEPHONY_LOGE("callStateWorker is nullptr!");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
+    auto callStateWorker = std::make_shared<CallStateWorker>();
     callStateWorker->info = info;
     callStateWorker->callback = stateCallback_;
-    uv_work_t *work = std::make_unique<uv_work_t>().release();
-    if (work == nullptr) {
-        delete callStateWorker;
-        callStateWorker = nullptr;
-        TELEPHONY_LOGE("work is nullptr!");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    auto task = [callStateWorker]() {
+        ReportCallState(callStateWorker->info, callStateWorker->callback);
     }
-    work->data = (void *)callStateWorker;
-    int32_t errCode = uv_queue_work_with_qos(loop, work, [](uv_work_t *work) {
-        TELEPHONY_LOGD("UpdateCallStateInfo uv_queue_work_with_qos");
-    }, ReportCallStateWork, uv_qos_default);
-    if (errCode != 0) {
-        delete callStateWorker;
-        callStateWorker = nullptr;
-        delete work;
-        work = nullptr;
-        TELEPHONY_LOGE("failed to add uv_queue_work_with_qos, errCode: %{public}d", errCode);
+    if (napi_status::napi_ok != napi_send_event(stateCallback_.env, task, napi_eprio_high)) {
+        TELEPHONY_LOGE("napi_send_event: Failed to Send UpdateCallStateInfo Event");
         return TELEPHONY_ERROR;
     }
     return TELEPHONY_SUCCESS;
@@ -531,70 +508,17 @@ int32_t NapiCallAbilityCallback::UpdateMeeTimeStateInfo(const CallAttributeInfo 
     if (meeTimeStateCallback_.thisVar == nullptr) {
         return CALL_ERR_CALLBACK_NOT_EXIST;
     }
-    uv_loop_s *loop = nullptr;
-#if defined(NAPI_VERSION) && NAPI_VERSION >= 2
-    napi_get_uv_event_loop(meeTimeStateCallback_.env, &loop);
-#endif
-    if (loop == nullptr) {
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
-    MeeTimeStateWorker *meeTimeStateWorker = std::make_unique<MeeTimeStateWorker>().release();
-    if (meeTimeStateWorker == nullptr) {
-        TELEPHONY_LOGE("meeTimeStateWorker is nullptr!");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
-    }
+    auto meeTimeStateWorker = std::make_shared<MeeTimeStateWorker>();
     meeTimeStateWorker->info = info;
     meeTimeStateWorker->callback = meeTimeStateCallback_;
-    uv_work_t *work = std::make_unique<uv_work_t>().release();
-    if (work == nullptr) {
-        delete meeTimeStateWorker;
-        meeTimeStateWorker = nullptr;
-        TELEPHONY_LOGE("work is nullptr!");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    auto task = [meeTimeStateWorker]() {
+        ReportCallState(meeTimeStateWorker->info, meeTimeStateWorker->callback);
     }
-    work->data = (void *)meeTimeStateWorker;
-    int32_t errCode = uv_queue_work_with_qos(loop, work, [](uv_work_t *work) {
-        TELEPHONY_LOGD("UpdateMeeTimeStateInfo uv_queue_work_with_qos");
-    }, ReportMeeTimeStateWork, uv_qos_default);
-    if (errCode != 0) {
-        delete meeTimeStateWorker;
-        meeTimeStateWorker = nullptr;
-        delete work;
-        work = nullptr;
-        TELEPHONY_LOGE("failed to add uv_queue_work_with_qos, errCode: %{public}d", errCode);
+    if (napi_status::napi_ok != napi_send_event(meeTimeStateWorker.env, task, napi_eprio_high)) {
+        TELEPHONY_LOGE("napi_send_event: Failed to Send UpdateMeeTimeStateInfo Event");
         return TELEPHONY_ERROR;
     }
     return TELEPHONY_SUCCESS;
-}
-
-void NapiCallAbilityCallback::ReportCallStateWork(uv_work_t *work, int32_t status)
-{
-    CallStateWorker *dataWorkerData = (CallStateWorker *)work->data;
-    if (dataWorkerData == nullptr) {
-        TELEPHONY_LOGE("dataWorkerData is nullptr!");
-        return;
-    }
-    int32_t ret = ReportCallState(dataWorkerData->info, dataWorkerData->callback);
-    TELEPHONY_LOGI("ReportCallState result = %{public}d", ret);
-    delete dataWorkerData;
-    dataWorkerData = nullptr;
-    delete work;
-    work = nullptr;
-}
-
-void NapiCallAbilityCallback::ReportMeeTimeStateWork(uv_work_t *work, int32_t status)
-{
-    MeeTimeStateWorker *dataWorkerData = (MeeTimeStateWorker *)work->data;
-    if (dataWorkerData == nullptr) {
-        TELEPHONY_LOGE("meeTimeStateWorker is nullptr!");
-        return;
-    }
-    int32_t ret = ReportCallState(dataWorkerData->info, dataWorkerData->callback);
-    TELEPHONY_LOGI("ReportMeeTimeState result = %{public}d", ret);
-    delete dataWorkerData;
-    dataWorkerData = nullptr;
-    delete work;
-    work = nullptr;
 }
 
 /**
