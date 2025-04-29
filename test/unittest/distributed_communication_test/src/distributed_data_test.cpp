@@ -21,6 +21,7 @@
 #include "distributed_data_controller.h"
 #include "distributed_data_sink_controller.h"
 #include "distributed_data_source_controller.h"
+#include "interoperable_client_manager.h"
 #include "transmission_manager.h"
 
 namespace OHOS {
@@ -348,6 +349,7 @@ HWTEST_F(DistributedDataTest, Telephony_DistributedDataTest_011, Function | Medi
 HWTEST_F(DistributedDataTest, Telephony_DistributedDataTest_012, Function | MediumTest | Level1)
 {
     auto controller = std::make_shared<DistributedDataSinkController>();
+    auto iController = std::make_shared<InteroperableClientManager>();
     ASSERT_NO_THROW(controller->OnReceiveMsg(nullptr, DISTRIBUTED_MAX_RECV_DATA_LEN + 1));
     std::string data = "test";
     ASSERT_NO_THROW(controller->OnReceiveMsg(data.c_str(), data.length()));

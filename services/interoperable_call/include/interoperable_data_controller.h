@@ -26,6 +26,7 @@ namespace Telephony {
 constexpr const char* DATA_TYPE = "dataType";
 constexpr const char* INTEROPERABLE_ITEM_MUTE = "mute";
 constexpr uint32_t INTEROPERABLE_MAX_RECV_DATA_LEN = 2048;
+constexpr int32_t QOS_MIN_BW = 4 * 64 * 1024;    // 小于384*1024才可选路蓝牙，优先wifi，可选蓝牙
  
 enum class InteroperableMsgType : int32_t {
     DATA_TYPE_UNKNOWN = -1,
