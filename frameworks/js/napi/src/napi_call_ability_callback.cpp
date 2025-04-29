@@ -495,7 +495,7 @@ int32_t NapiCallAbilityCallback::UpdateCallStateInfo(const CallAttributeInfo &in
     callStateWorker->callback = stateCallback_;
     auto task = [callStateWorker]() {
         ReportCallState(callStateWorker->info, callStateWorker->callback);
-    }
+    };
     if (napi_status::napi_ok != napi_send_event(stateCallback_.env, task, napi_eprio_high)) {
         TELEPHONY_LOGE("napi_send_event: Failed to Send UpdateCallStateInfo Event");
         return TELEPHONY_ERROR;
@@ -513,8 +513,8 @@ int32_t NapiCallAbilityCallback::UpdateMeeTimeStateInfo(const CallAttributeInfo 
     meeTimeStateWorker->callback = meeTimeStateCallback_;
     auto task = [meeTimeStateWorker]() {
         ReportCallState(meeTimeStateWorker->info, meeTimeStateWorker->callback);
-    }
-    if (napi_status::napi_ok != napi_send_event(meeTimeStateWorker.env, task, napi_eprio_high)) {
+    };
+    if (napi_status::napi_ok != napi_send_event(meeTimeStateCallback_.env, task, napi_eprio_high)) {
         TELEPHONY_LOGE("napi_send_event: Failed to Send UpdateMeeTimeStateInfo Event");
         return TELEPHONY_ERROR;
     }
