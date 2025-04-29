@@ -351,20 +351,26 @@ HWTEST_F(DistributedDataTest, Telephony_DistributedDataTest_012, Function | Medi
     auto controller = std::make_shared<DistributedDataSinkController>();
     auto iController = std::make_shared<InteroperableClientManager>();
     ASSERT_NO_THROW(controller->OnReceiveMsg(nullptr, DISTRIBUTED_MAX_RECV_DATA_LEN + 1));
+    ASSERT_NO_THROW(iController->OnReceiveMsg(nullptr, INTEROPERABLE_MAX_RECV_DATA_LEN + 1));
     std::string data = "test";
     ASSERT_NO_THROW(controller->OnReceiveMsg(data.c_str(), data.length()));
+    ASSERT_NO_THROW(iController->OnReceiveMsg(data.c_str(), data.length()));
 
     data = "{ \"itemType\": 0, \"num\": \"123456\" }";
     ASSERT_NO_THROW(controller->OnReceiveMsg(data.c_str(), data.length()));
+    ASSERT_NO_THROW(iController->OnReceiveMsg(data.c_str(), data.length()));
 
     data = "{ \"dataType\": 104, \"itemType\": 0, \"num\": \"123456\" }";
     ASSERT_NO_THROW(controller->OnReceiveMsg(data.c_str(), data.length()));
+    ASSERT_NO_THROW(iController->OnReceiveMsg(data.c_str(), data.length()));
 
     data = "{ \"dataType\": 102, \"itemType\": 0, \"num\": \"123456\" }";
     ASSERT_NO_THROW(controller->OnReceiveMsg(data.c_str(), data.length()));
+    ASSERT_NO_THROW(iController->OnReceiveMsg(data.c_str(), data.length()));
 
     data = "{ \"dataType\": 0, \"itemType\": 0, \"num\": \"123456\" }";
     ASSERT_NO_THROW(controller->OnReceiveMsg(data.c_str(), data.length()));
+    ASSERT_NO_THROW(iController->OnReceiveMsg(data.c_str(), data.length()));
 }
 
 /**
@@ -375,14 +381,20 @@ HWTEST_F(DistributedDataTest, Telephony_DistributedDataTest_012, Function | Medi
 HWTEST_F(DistributedDataTest, Telephony_DistributedDataTest_013, Function | MediumTest | Level1)
 {
     auto controller = std::make_shared<DistributedDataSinkController>();
+    auto iController = std::make_shared<InteroperableClientManager>();
     controller->session_ = nullptr;
     ASSERT_NO_THROW(controller->SetMuted(true));
     ASSERT_NO_THROW(controller->MuteRinger());
+    ASSERT_NO_THROW(iController->SetMuted(true));
+    ASSERT_NO_THROW(iController->MuteRinger());
 
     std::shared_ptr<ISessionCallback> callback = std::make_shared<DataSessionCallbackTest>();
     controller->session_ = DelayedSingleton<TransmissionManager>::GetInstance()->CreateServerSession(callback);
     ASSERT_NO_THROW(controller->SetMuted(true));
     ASSERT_NO_THROW(controller->MuteRinger());
+    iController->session_ = DelayedSingleton<TransmissionManager>::GetInstance()->CreateServerSession(callback);
+    ASSERT_NO_THROW(iController->SetMuted(true));
+    ASSERT_NO_THROW(iController->MuteRinger());
 }
 
 /**
@@ -393,24 +405,29 @@ HWTEST_F(DistributedDataTest, Telephony_DistributedDataTest_013, Function | Medi
 HWTEST_F(DistributedDataTest, Telephony_DistributedDataTest_014, Function | MediumTest | Level1)
 {
     auto controller = std::make_shared<DistributedDataSinkController>();
+    auto iController = std::make_shared<InteroperableClientManager>();
     cJSON *msg = cJSON_Parse("{ \"test\": 0 }");
     std::string name = "test";
     std::string stringValue = "";
     int32_t intValue = 0;
     cJSON *dataJson = cJSON_GetObjectItem(msg, name.c_str());
     EXPECT_TRUE(controller->GetInt32Value(msg, name, intValue));
+    EXPECT_TRUE(iController->GetInt32Value(msg, name, intValue));
     EXPECT_FALSE(controller->GetStringValue(msg, name, stringValue));
     cJSON_Delete(msg);
 
     msg = cJSON_Parse("{ \"test\": \"hello\" }");
     EXPECT_FALSE(controller->GetInt32Value(msg, name, intValue));
+    EXPECT_FALSE(iController->GetInt32Value(msg, name, intValue));
     EXPECT_TRUE(controller->GetStringValue(msg, name, stringValue));
     bool boolValue = false;
     EXPECT_FALSE(controller->GetBoolValue(msg, name, boolValue));
+    EXPECT_FALSE(iController->GetBoolValue(msg, name, boolValue));
     cJSON_Delete(msg);
 
     msg = cJSON_Parse("{ \"test\": true }");
     EXPECT_TRUE(controller->GetBoolValue(msg, name, boolValue));
+    EXPECT_TRUE(iController->GetBoolValue(msg, name, boolValue));
     cJSON_Delete(msg);
 }
 
