@@ -154,6 +154,7 @@ bool BluetoothCallConnection::GetBtCallScoConnected()
 
 void BluetoothCallConnection::HfpDisConnectedEndBtCall()
 {
+    TELEPHONY_LOGI("hfp disconnected,hangup all bt call.");
     std::list<sptr<CallBase>> allCallList = CallObjectManager::GetAllCallList();
     for (auto call : allCallList) {
         if (call == nullptr || call->GetCallType() != CallType::TYPE_BLUETOOTH) {
