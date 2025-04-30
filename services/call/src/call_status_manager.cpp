@@ -512,7 +512,7 @@ void CallStatusManager::SetContactInfo(sptr<CallBase> &call, std::string phoneNu
         // Get the contact data from the database
         ContactInfo contactInfoTemp = contactInfo;
         QueryCallerInfo(contactInfoTemp, phoneNum);
-        DealVideoRingPath(ringtonePath, callObjectPtr);
+        DealVideoRingPath(contactInfoTemp, callObjectPtr);
         callObjectPtr->SetCallerInfo(contactInfoTemp);
         CallVoiceAssistantManager::GetInstance()->UpdateContactInfo(contactInfoTemp, callObjectPtr->GetCallID());
         DelayedSingleton<DistributedCommunicationManager>::GetInstance()->ProcessCallInfo(callObjectPtr,
@@ -527,8 +527,8 @@ void CallStatusManager::DealVideoRingPath(ContactInfo &contactInfo, sptr<CallBas
         CallAttributeInfo info;
         callObjectPtr->GetCallAttributeBaseInfo(info);
         const std::shared_ptr<AbilityRuntime::Context> context;
-        Media::RingtoneType type = info.accountId == DEFAULT_SIM_SLOT_ID ? Media::RingtoneType::RINGTONE_TYPE_SIM_CARD_0 :
-            Media::RingtoneType::RINGTONE_TYPE_SIM_CARD_1;
+        Media::RingtoneType type = info.accountId == DEFAULT_SIM_SLOT_ID ?
+        Media::RingtoneType::RINGTONE_TYPE_SIM_CARD_0 : Media::RingtoneType::RINGTONE_TYPE_SIM_CARD_1;
         TELEPHONY_LOGI("type: %{public}d", type);
         std::shared_ptr<Media::SystemSoundManager> systemSoundManager =
             Media::SystemSoundManagerFactory::CreateSystemSoundManager();
@@ -536,7 +536,8 @@ void CallStatusManager::DealVideoRingPath(ContactInfo &contactInfo, sptr<CallBas
             TELEPHONY_LOGE("get systemSoundManager failed");
             return;
         }
-        ringtonePath = systemSoundManager->GetRingToneUri(context, type);
+        ringtonePath = systemSoundManager->GetRingtoneUri(context, type);
+        TELEPHONY_LOGI("ringtonePath: %{public}s", ringtonePath.c_str());
         if (memset_s(&contactInfo.ringtonePath, sizeof(contactInfo.ringtonePath), 0, sizeof(contactInfo.ringtonePath))
             != EOK) {
             TELEPHONY_LOGE("memset_s ringtonePath fail");
