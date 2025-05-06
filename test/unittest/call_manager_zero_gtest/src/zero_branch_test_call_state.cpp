@@ -45,6 +45,7 @@
 #include "gtest/gtest.h"
 #include "audio_scene_processor.h"
 #include "core_service_connection.h"
+#include "ringtone_player.h"
 
 namespace OHOS {
 namespace Telephony {
