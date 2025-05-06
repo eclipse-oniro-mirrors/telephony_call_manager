@@ -555,10 +555,10 @@ void CallStatusManager::DealVideoRingPath(ContactInfo &contactInfo, sptr<CallBas
     if (ringtonePath.substr(ringtonePath.length() - VIDEO_RING_PATH_FIX_TAIL_LENGTH,
         VIDEO_RING_PATH_FIX_TAIL_LENGTH) == VIDEO_RING_PATH_FIX_TAIL || ringtonePath.empty()) {
         TELEPHONY_LOGI("notify callui to play video ring.");
-        params.SetParam("VideoRingType", AAFwk::String::Integer(RING_TYPE_VIDEO));
+        params.SetParam("VideoRingType", AAFwk::Integer::Box(RING_TYPE_VIDEO));
         params.SetParam("VideoRingPath", AAFwk::String::Box(ringtonePath));
     } else {
-        params.SetParam("VideoRingType", AAFwk::String::Integer(RING_TYPE_AUDIO));
+        params.SetParam("VideoRingType", AAFwk::Integer::Box(RING_TYPE_AUDIO));
     }
     callObjectPtr->SetExtraParams(params);
 }
