@@ -58,6 +58,8 @@
 namespace OHOS {
 namespace Telephony {
 constexpr int32_t INIT_INDEX = 0;
+constexpr int32_t RING_TYPE_AUDIO = 0;
+constexpr int32_t RING_TYPE_VIDEO = 1;
 constexpr int32_t PRESENTATION_RESTRICTED = 3;
 
 CallStatusManager::CallStatusManager()
@@ -549,14 +551,16 @@ void CallStatusManager::DealVideoRingPath(ContactInfo &contactInfo, sptr<CallBas
             return;
         }
     }
-
+    AAFwk::WantParams params = callObjectPtr->GetExtraParams();
     if (ringtonePath.substr(ringtonePath.length() - VIDEO_RING_PATH_FIX_TAIL_LENGTH,
         VIDEO_RING_PATH_FIX_TAIL_LENGTH) == VIDEO_RING_PATH_FIX_TAIL || ringtonePath.empty()) {
         TELEPHONY_LOGI("notify callui to play video ring.");
-        AAFwk::WantParams params = callObjectPtr->GetExtraParams();
+        params.SetParam("VideoRingType", AAFwk::String::Integer(RING_TYPE_VIDEO));
         params.SetParam("VideoRingPath", AAFwk::String::Box(ringtonePath));
-        callObjectPtr->SetExtraParams(params);
+    } else {
+        params.SetParam("VideoRingType", AAFwk::String::Integer(RING_TYPE_AUDIO));
     }
+    callObjectPtr->SetExtraParams(params);
 }
 
 int32_t CallStatusManager::HandleRejectCall(sptr<CallBase> &call, bool isBlock)
