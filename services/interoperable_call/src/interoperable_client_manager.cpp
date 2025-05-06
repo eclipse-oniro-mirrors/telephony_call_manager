@@ -46,7 +46,7 @@ void InteroperableClientManager::ConnectRemote(const std::string &networkId)
     session_ = transMgr->CreateClientSession(shared_from_this());
     if (session_ != nullptr) {
         TELEPHONY_LOGI("connect session_");
-        session_->Connect(networkId, SOFTNET_SESSION_NAME, SOFTNET_SESSION_NAME);
+        session_->Connect(networkId, SOFTNET_SESSION_NAME, SOFTNET_SESSION_NAME, QOS_BW_BT);
     }
 }
 } // namespace Telephony
