@@ -23,7 +23,6 @@
 namespace OHOS {
 namespace Telephony {
 constexpr int32_t INVALID_SOCKET_ID = -1;
-constexpr int32_t QOS_MIN_BW = 4 * 1024 * 1024;
 constexpr int32_t QOS_MAX_LATENCY = 10000;
 constexpr const char* PACKET_NAME = "ohos.telephony.callmanager";
 constexpr const char* SESSION_NAME = "ohos.telephony.callmanager.distributed_communication";
