@@ -31,6 +31,7 @@
 #include "settings_datashare_helper.h"
 #include "distributed_communication_manager.h"
 #include "os_account_manager.h"
+#include "ringtone_player.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -563,6 +564,7 @@ int32_t AudioControlManager::HandleBluetoothAudioDevice(const AudioDevice &devic
 
 bool AudioControlManager::PlayRingtone()
 {
+    int32_t ret;
     if (!ShouldPlayRingtone()) {
         TELEPHONY_LOGE("should not play ringtone");
         return false;
@@ -598,7 +600,13 @@ bool AudioControlManager::PlayRingtone()
         TELEPHONY_LOGI("type_crs but not play ringtone");
         return false;
     }
-    if (ring_->Play(info.accountId, contactInfo.ringtonePath) != TELEPHONY_SUCCESS) {
+
+    if (incomingCall->GetCallType() == CallType::TYPE_BLUETOOTH) {
+        ret = ring_->Play(info.accountId, contactInfo.ringtonePath, Media::HapticStartupMode::FAST);
+    } else {
+        ret = ring_->Play(info.accountId, contactInfo.ringtonePath, Media::HapticStartupMode::DEFAULT);
+    }
+    if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("play ringtone failed");
         return false;
     }
