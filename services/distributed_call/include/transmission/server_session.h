@@ -24,9 +24,10 @@ class ServerSession : public SessionAdapter {
 public:
     explicit ServerSession(const std::shared_ptr<ISessionCallback> &callback) : SessionAdapter(callback) {}
     ~ServerSession() override;
-    void Create(const std::string &localName) override;
+    void Create(const std::string &localName, const int32_t &qosMinBw) override;
     void Destroy() override;
-    void Connect(const std::string &peerDevId, const std::string &localName, const std::string &peerName) override {}
+    void Connect(const std::string &peerDevId, const std::string &localName, const std::string &peerName,
+        const int32_t &qosMinBw) override {}
     void Disconnect() override {}
     void OnSessionBind(int32_t socket) override;
     void OnSessionShutdown(int32_t socket) override;

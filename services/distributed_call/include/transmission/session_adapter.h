@@ -41,9 +41,10 @@ public:
     explicit SessionAdapter(const std::shared_ptr<ISessionCallback> &callback);
     virtual ~SessionAdapter() = default;
 
-    virtual void Create(const std::string &localName) = 0;
+    virtual void Create(const std::string &localName, const int32_t &qosMinBw) = 0;
     virtual void Destroy() = 0;
-    virtual void Connect(const std::string &peerDevId, const std::string &localName, const std::string &peerName) = 0;
+    virtual void Connect(const std::string &peerDevId, const std::string &localName, const std::string &peerName,
+        const int32_t &qosMinBw) = 0;
     virtual void Disconnect() = 0;
     virtual void OnSessionBind(int32_t socket) = 0;
     virtual void OnSessionShutdown(int32_t socket) = 0;

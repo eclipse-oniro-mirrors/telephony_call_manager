@@ -64,9 +64,9 @@ HWTEST_F(DistributedTransmissionTest, Telephony_DistributedTransmissionTest_002,
     auto session = DelayedSingleton<TransmissionManager>::GetInstance()->CreateClientSession(callback);
     ASSERT_NE(session, nullptr);
     session->socket_ = 0;
-    session->Connect("12345", SESSION_NAME, SESSION_NAME);
+    session->Connect("12345", SESSION_NAME, SESSION_NAME, 4194304);
     session->socket_ = INVALID_SOCKET_ID;
-    session->Connect("", SESSION_NAME, SESSION_NAME);
+    session->Connect("", SESSION_NAME, SESSION_NAME, 4194304);
     session->OnSessionBind(0);
     session->Disconnect();
     session->OnSessionShutdown(0);
@@ -77,7 +77,7 @@ HWTEST_F(DistributedTransmissionTest, Telephony_DistributedTransmissionTest_002,
     std::string peerName = "peerName";
     auto clientSession = std::make_shared<ClientSession>(callback);
     clientSession->clientSocket_ = INVALID_SOCKET_ID + 1;
-    clientSession->Connect("", SESSION_NAME, SESSION_NAME); // already connect
+    clientSession->Connect("", SESSION_NAME, SESSION_NAME, 4194304); // already connect
     clientSession->socket_ = INVALID_SOCKET_ID + 1;
     clientSession->Disconnect();
     clientSession->socket_ = 1;
@@ -96,18 +96,18 @@ HWTEST_F(DistributedTransmissionTest, Telephony_DistributedTransmissionTest_003,
     std::shared_ptr<ISessionCallback> callback = std::make_shared<SessionCallbackTest>();
     auto session = std::make_shared<ServerSession>(callback);
     ASSERT_NE(session, nullptr);
-    session->Create("");
+    session->Create("", 4194304);
     session->socket_ = 0;
-    session->Create(SESSION_NAME);
+    session->Create(SESSION_NAME, 4194304);
     session->socket_ = INVALID_SOCKET_ID;
-    session->Create(SESSION_NAME);
+    session->Create(SESSION_NAME, 4194304);
     session->OnSessionBind(66);
     session->OnSessionShutdown(66);
     session->OnSessionShutdown(session->serverSocket_);
     session->serverSocket_ = 0;
 
     session->serverSocket_ = INVALID_SOCKET_ID + 1;
-    EXPECT_NO_THROW(session->Create("123"));
+    EXPECT_NO_THROW(session->Create("123", 4194304));
     session->serverSocket_ = INVALID_SOCKET_ID;
     EXPECT_NO_THROW(session->Destroy());
     session->serverSocket_ = INVALID_SOCKET_ID + 1;
