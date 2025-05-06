@@ -553,7 +553,7 @@ void CallStatusManager::DealVideoRingPath(ContactInfo &contactInfo, sptr<CallBas
     }
     AAFwk::WantParams params = callObjectPtr->GetExtraParams();
     if (ringtonePath.substr(ringtonePath.length() - VIDEO_RING_PATH_FIX_TAIL_LENGTH,
-        VIDEO_RING_PATH_FIX_TAIL_LENGTH) == VIDEO_RING_PATH_FIX_TAIL || ringtonePath.empty()) {
+        VIDEO_RING_PATH_FIX_TAIL_LENGTH) == VIDEO_RING_PATH_FIX_TAIL || ringtonePath == VIDEO_RING_FOR_SYSTEM) {
         TELEPHONY_LOGI("notify callui to play video ring.");
         params.SetParam("VideoRingType", AAFwk::Integer::Box(RING_TYPE_VIDEO));
         params.SetParam("VideoRingPath", AAFwk::String::Box(ringtonePath));

@@ -944,7 +944,7 @@ bool AudioControlManager::ShouldPlayRingtone(const std::string &ringtonePath) co
         return false;
     }
     if (ringtonePath.substr(ringtonePath.length() - VIDEO_RING_PATH_FIX_TAIL_LENGTH,
-        VIDEO_RING_PATH_FIX_TAIL_LENGTH) == VIDEO_RING_PATH_FIX_TAIL || ringtonePath.empty()) {
+        VIDEO_RING_PATH_FIX_TAIL_LENGTH) == VIDEO_RING_PATH_FIX_TAIL || ringtonePath == VIDEO_RING_FOR_SYSTEM) {
         TELEPHONY_LOGI("video ring scene.");
         return false;
     }
