@@ -593,6 +593,9 @@ bool AudioControlManager::PlayRingtone()
         TELEPHONY_LOGI("type_crs but not play ringtone");
         return false;
     }
+    if (IsVideoRingScene(contactInfo.personalNotificaltionRington, contactInfo.ringtonePath)) {
+        return false;
+    }
     if (ring_->Play(info.accountId, contactInfo.ringtonePath) != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("play ringtone failed");
         return false;
@@ -602,6 +605,22 @@ bool AudioControlManager::PlayRingtone()
     if (incomingCall == nullptr) {
         TELEPHONY_LOGI("play ringtone success but incoming call is null stop it");
         StopRingtone();
+    }
+    return true;
+}
+
+bool AudioControlManager::IsVideoRingScene(const std::string &personalNotificaltionRington,
+    const std::string &ringtonePath)
+{
+    if (personalNotificaltionRington.substr(personalNotificaltionRington.length() - VIDEO_RING_PATH_FIX_TAIL_LENGTH,
+        VIDEO_RING_PATH_FIX_TAIL_LENGTH) == VIDEO_RING_PATH_FIX_TAIL || ringtonePath == VIDEO_RING_FOR_SYSTEM) {
+        TELEPHONY_LOGI("video ring scene.");
+        AudioStandard::AudioRingerMode ringMode = DelayedSingleton<AudioProxy>::GetInstance()->GetRingerMode();
+        if (ringMode == AudioStandard::AudioRingerMode::RINGER_MODE_VIBRATE || IsRingingVibrateModeOn()) {
+            TELEPHONY_LOGI("need start vibrator.");
+            DelayedSingleton<AudioProxy>::GetInstance()->StartVibrator();
+        }
+        return false;
     }
     return true;
 }
