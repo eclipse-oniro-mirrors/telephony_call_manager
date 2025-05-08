@@ -559,13 +559,7 @@ int32_t AudioControlManager::HandleBluetoothAudioDevice(const AudioDevice &devic
 
 bool AudioControlManager::PlayRingtone()
 {
-    sptr<CallBase> incomingCall = CallObjectManager::GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_RINGING);
-    if (incomingCall == nullptr) {
-        TELEPHONY_LOGE("incomingCall is nullptr");
-        return false;
-    }
-    ContactInfo contactInfo = incomingCall->GetCallerInfo();
-    if (!ShouldPlayRingtone(contactInfo.ringtonePath)) {
+    if (!ShouldPlayRingtone()) {
         TELEPHONY_LOGE("should not play ringtone");
         return false;
     }
@@ -574,8 +568,14 @@ bool AudioControlManager::PlayRingtone()
         TELEPHONY_LOGE("create ring object failed");
         return false;
     }
+    sptr<CallBase> incomingCall = CallObjectManager::GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_RINGING);
+    if (incomingCall == nullptr) {
+        TELEPHONY_LOGE("incomingCall is nullptr");
+        return false;
+    }
     CallAttributeInfo info;
     incomingCall->GetCallAttributeBaseInfo(info);
+    ContactInfo contactInfo = incomingCall->GetCallerInfo();
     AudioStandard::AudioRingerMode ringMode = DelayedSingleton<AudioProxy>::GetInstance()->GetRingerMode();
     if (incomingCall->GetCrsType() == CRS_TYPE) {
         if (!isCrsVibrating_ && (ringMode != AudioStandard::AudioRingerMode::RINGER_MODE_SILENT)) {
@@ -952,7 +952,7 @@ bool AudioControlManager::IsNumberAllowed(const std::string &phoneNum)
     return true;
 }
 
-bool AudioControlManager::ShouldPlayRingtone(const std::string &ringtonePath) const
+bool AudioControlManager::ShouldPlayRingtone() const
 {
     auto processor = DelayedSingleton<CallStateProcessor>::GetInstance();
     int32_t alertingCallNum = processor->GetCallNumber(TelCallState::CALL_STATUS_ALERTING);
@@ -960,11 +960,6 @@ bool AudioControlManager::ShouldPlayRingtone(const std::string &ringtonePath) co
     if (incomingCallNum == EMPTY_VALUE || alertingCallNum > EMPTY_VALUE || ringState_ == RingState::RINGING
         || (soundState_ == SoundState::SOUNDING && CallObjectManager::HasIncomingCallCrsType())) {
         TELEPHONY_LOGI("should not play ring tone.");
-        return false;
-    }
-    if (ringtonePath.substr(ringtonePath.length() - VIDEO_RING_PATH_FIX_TAIL_LENGTH,
-        VIDEO_RING_PATH_FIX_TAIL_LENGTH) == VIDEO_RING_PATH_FIX_TAIL || ringtonePath == VIDEO_RING_FOR_SYSTEM) {
-        TELEPHONY_LOGI("video ring scene.");
         return false;
     }
     return true;
