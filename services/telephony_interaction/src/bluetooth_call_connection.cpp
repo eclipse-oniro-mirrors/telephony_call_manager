@@ -154,27 +154,29 @@ bool BluetoothCallConnection::GetBtCallScoConnected()
 
 void BluetoothCallConnection::HfpDisConnectedEndBtCall()
 {
-    sptr<CallBase> call = CallObjectManager::GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_DIALING);
-    if (call == nullptr || call->GetCallType() != CallType::TYPE_BLUETOOTH) {
-        return;
-    }
-    TELEPHONY_LOGW("When BluetoothCall dialing Hfp is disconnected.");
-    CallAttributeInfo info;
-    (void)memset_s(&info, sizeof(CallAttributeInfo), 0, sizeof(CallAttributeInfo));
-    call->GetCallAttributeBaseInfo(info);
-    CallDetailInfo detailInfo;
-    detailInfo.callType = info.callType;
-    detailInfo.accountId = info.accountId;
-    detailInfo.index = info.index;
-    detailInfo.state = TelCallState::CALL_STATUS_DISCONNECTED;
-    (void)memcpy_s(detailInfo.phoneNum, kMaxNumberLen, info.accountNumber, kMaxNumberLen);
-    (void)memset_s(detailInfo.bundleName, kMaxBundleNameLen  + 1, 0, kMaxBundleNameLen + 1);
-    int32_t ret = DelayedSingleton<ReportCallInfoHandler>::GetInstance()->UpdateCallReportInfo(detailInfo);
-    if (ret != TELEPHONY_SUCCESS) {
-        TELEPHONY_LOGE("UpdateCallReportInfo failed! errCode:%{public}d", ret);
-    } else {
-        TELEPHONY_LOGW("UpdateCallReportInfo success! state:%{public}d, index:%{public}d",
-            detailInfo.state, detailInfo.index);
+    TELEPHONY_LOGI("hfp disconnected, hangup all bt call.");
+    std::list<sptr<CallBase>> allCallList = CallObjectManager::GetAllCallList();
+    for (auto call : allCallList) {
+        if (call == nullptr || call->GetCallType() != CallType::TYPE_BLUETOOTH) {
+            continue;
+        }
+        CallAttributeInfo info;
+        (void)memset_s(&info, sizeof(CallAttributeInfo), 0, sizeof(CallAttributeInfo));
+        call->GetCallAttributeBaseInfo(info);
+        CallDetailInfo detailInfo;
+        detailInfo.callType = info.callType;
+        detailInfo.accountId = info.accountId;
+        detailInfo.index = call->GetCallIndex();
+        detailInfo.state = TelCallState::CALL_STATUS_DISCONNECTED;
+        (void)memcpy_s(detailInfo.phoneNum, kMaxNumberLen, info.accountNumber, kMaxNumberLen);
+        (void)memset_s(detailInfo.bundleName, kMaxBundleNameLen  + 1, 0, kMaxBundleNameLen + 1);
+        int32_t ret = DelayedSingleton<ReportCallInfoHandler>::GetInstance()->UpdateCallReportInfo(detailInfo);
+        if (ret != TELEPHONY_SUCCESS) {
+            TELEPHONY_LOGE("UpdateCallReportInfo failed! errCode:%{public}d", ret);
+        } else {
+            TELEPHONY_LOGI("UpdateCallReportInfo success! state:%{public}d, index:%{public}d",
+                detailInfo.state, detailInfo.index);
+        }
     }
 }
 

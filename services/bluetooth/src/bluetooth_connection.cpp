@@ -14,7 +14,7 @@
  */
 
 #include "bluetooth_connection.h"
-
+#include "bluetooth_call_connection.h"
 #include "audio_control_manager.h"
 #include "bluetooth_call_manager.h"
 #include "telephony_log_wrapper.h"
@@ -280,7 +280,7 @@ void SystemAbilityListener::OnRemoveSystemAbility(int32_t systemAbilityId, const
         TELEPHONY_LOGE("removed SA is not bluetooth service, ignored.");
         return;
     }
-
+    DelayedSingleton<BluetoothCallConnection>::GetInstance()->HfpDisConnectedEndBtCall();
     DelayedSingleton<BluetoothConnection>::GetInstance()->ResetBtConnection();
     std::shared_ptr<AudioDeviceManager> audioDeviceManager = DelayedSingleton<AudioDeviceManager>::GetInstance();
     audioDeviceManager->ResetBtAudioDevicesList();

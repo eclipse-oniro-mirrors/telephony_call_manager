@@ -47,6 +47,11 @@
 #include "distributed_communication_manager.h"
 #include "call_voice_assistant_manager.h"
 #include "interoperable_communication_manager.h"
+#include "settings_datashare_helper.h"
+
+#ifdef ABILITY_POWER_SUPPORT
+#include "power_mgr_client.h"
+#endif
 
 namespace OHOS {
 namespace Telephony {
@@ -123,6 +128,7 @@ void CallControlManager::UnInit()
             appStateObserver = nullptr;
         }
     }
+    UnRegisterObserver();
     DelayedSingleton<AudioControlManager>::GetInstance()->UnInit();
 }
 
@@ -1528,8 +1534,10 @@ int32_t CallControlManager::HandleVoipDisconnected(int32_t &numActive, int32_t n
     if (carrierCallId != ERR_ID) {
         TELEPHONY_LOGI("SetVoIPCallInfo handle cs call sucessed");
         sptr<CallBase> call = GetOneCallObject(carrierCallId);
-        return DelayedSingleton<BluetoothCallManager>::GetInstance()->
-            SendBtCallState(0, 0, (int32_t)TelCallState::CALL_STATUS_INCOMING, call->GetAccountNumber());
+        if (call != nullptr) {
+            return DelayedSingleton<BluetoothCallManager>::GetInstance()->
+                SendBtCallState(0, 0, (int32_t)TelCallState::CALL_STATUS_INCOMING, call->GetAccountNumber());
+        }
     }
     return DelayedSingleton<BluetoothCallManager>::GetInstance()->
         SendBtCallState(numActive, numHeld, (int32_t)TelCallState::CALL_STATUS_IDLE, "");
@@ -1722,6 +1730,31 @@ void CallControlManager::ReleaseIncomingLock()
         return;
     }
     incomingCallWakeup_->ReleaseIncomingLock();
+}
+
+void CallControlManager::AcquireDisconnectedLock()
+{
+#ifdef ABILITY_POWER_SUPPORT
+    if (disconnectedRunningLock_ == nullptr) {
+        disconnectedRunningLock_ = PowerMgr::PowerMgrClient::GetInstance().
+            CreateRunningLock("disconnectedrunninglock", PowerMgr::RunningLockType::RUNNINGLOCK_BACKGROUND_PHONE);
+    }
+    if (disconnectedRunningLock_ != nullptr) {
+        disconnectedRunningLock_->Lock(DISCONNECTED_LOCK_TIMEOUT);
+        TELEPHONY_LOGI("disconnectedRunningLock_ locked");
+    }
+#endif
+}
+ 
+void CallControlManager::ReleaseDisconnectedLock()
+{
+#ifdef ABILITY_POWER_SUPPORT
+    if (disconnectedRunningLock_ == nullptr || !disconnectedRunningLock_->IsUsed()) {
+        return;
+    }
+    disconnectedRunningLock_->UnLock();
+    TELEPHONY_LOGI("disconnectedRunningLock_ unlocked");
+#endif
 }
 
 void CallControlManager::DisconnectAllCalls()
@@ -2054,5 +2087,68 @@ void CallControlManager::HangUpFirstCallBySecondCallID(int32_t secondCallId, boo
     }
 }
 #endif
+void WearStatusObserver::OnChange()
+{
+    std::string wearStatus = "";
+    auto settingHelper = SettingsDataShareHelper::GetInstance();
+    auto callControlMgr = DelayedSingleton<CallControlManager>().GetInstance();
+    if (settingHelper != nullptr) {
+        OHOS::Uri settingUri(SettingsDataShareHelper::SETTINGS_DATASHARE_URI);
+        settingHelper->Query(settingUri, "wear_status", wearStatus);
+    }
+    TELEPHONY_LOGI("OnChange wear status: %{public}s", wearStatus.c_str());
+    if (wearStatus == "1") {
+        callControlMgr->setWearState(WEAR_STATUS_OFF);
+    } else if (wearStatus == "2") {
+        callControlMgr->setWearState(WEAR_STATUS_ON);
+    } else {
+        callControlMgr->setWearState(WEAR_STATUS_INVALID);
+    }
+}
+void CallControlManager::RegisterObserver()
+{
+    if (wearStatusObserver_ != nullptr) {
+        return;
+    }
+    wearStatusObserver_ = new (std::nothrow) WearStatusObserver();
+    if (wearStatusObserver_ == nullptr) {
+        TELEPHONY_LOGE("wearStatusObserver_ is null");
+        return;
+    }
+
+    OHOS::Uri wearStatusUri(SettingsDataShareHelper::SETTINGS_DATASHARE_URI + "&key=wear_status");
+    auto helper = DelayedSingleton<SettingsDataShareHelper>().GetInstance();
+    if (!helper->RegisterToDataShare(wearStatusUri, wearStatusObserver_)) {
+        TELEPHONY_LOGE("RegisterObserver failed");
+    }
+}
+
+void CallControlManager::UnRegisterObserver()
+{
+    if (wearStatusObserver_ == nullptr) {
+        return;
+    }
+
+    OHOS::Uri wearStatusUri(SettingsDataShareHelper::SETTINGS_DATASHARE_URI + "&key=wear_status");
+    auto helper = DelayedSingleton<SettingsDataShareHelper>().GetInstance();
+    if (!helper->UnRegisterToDataShare(wearStatusUri, wearStatusObserver_)) {
+        TELEPHONY_LOGE("RegisterObserver failed");
+    }
+}
+
+void CallControlManager::setWearState(int32_t state)
+{
+    std::lock_guard<std::mutex> lock(wearStatusMutex_);
+    wearStatus_ = state;
+}
+
+bool CallControlManager::isNotWearOnWrist()
+{
+    std::lock_guard<std::mutex> lock(wearStatusMutex_);
+    if (wearStatus_ == WEAR_STATUS_OFF) {
+        return true;
+    }
+    return false;
+}
 } // namespace Telephony
 } // namespace OHOS

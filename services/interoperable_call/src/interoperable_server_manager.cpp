@@ -32,7 +32,7 @@ void InteroperableServerManager::OnDeviceOnline(const std::string &networkId, co
     auto transMgr = DelayedSingleton<TransmissionManager>::GetInstance();
     session_ = transMgr->CreateServerSession(shared_from_this());
     if (session_ != nullptr) {
-        session_->Create(SOFTNET_SESSION_NAME);
+        session_->Create(SOFTNET_SESSION_NAME, QOS_BW_BT);
     }
 }
  

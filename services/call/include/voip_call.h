@@ -52,6 +52,7 @@ public:
     std::string GetVoipCallId();
     std::string GetVoipBundleName();
     int32_t GetVoipUid();
+    void UpdateCallAttributeInfo(const CallDetailInfo &info);
 
 protected:
     int32_t PackVoipCallInfo(VoipCallEventInfo &voipcallInfo);

@@ -31,6 +31,7 @@
 #include "settings_datashare_helper.h"
 #include "distributed_communication_manager.h"
 #include "os_account_manager.h"
+#include "ringtone_player.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -556,6 +557,10 @@ int32_t AudioControlManager::HandleBluetoothAudioDevice(const AudioDevice &devic
     remoteDevice.push_back(audioDev);
     AudioSystemManager* audioSystemManager = AudioSystemManager::GetInstance();
     sptr<AudioRendererFilter> audioRendererFilter = new(std::nothrow) AudioRendererFilter();
+    if (audioRendererFilter == nullptr) {
+        TELEPHONY_LOGE("audioRendererFilter is nullptr");
+        return CALL_ERR_AUDIO_SET_AUDIO_DEVICE_FAILED;
+    }
     audioRendererFilter->rendererInfo.streamUsage = StreamUsage::STREAM_USAGE_VOICE_MODEM_COMMUNICATION;
     int32_t ret = audioSystemManager->SelectOutputDevice(audioRendererFilter, remoteDevice);
     if (ret != 0) {
@@ -567,6 +572,7 @@ int32_t AudioControlManager::HandleBluetoothAudioDevice(const AudioDevice &devic
 
 bool AudioControlManager::PlayRingtone()
 {
+    int32_t ret;
     if (!ShouldPlayRingtone()) {
         TELEPHONY_LOGE("should not play ringtone");
         return false;
@@ -592,6 +598,7 @@ bool AudioControlManager::PlayRingtone()
             }
         }
         if ((ringMode == AudioStandard::AudioRingerMode::RINGER_MODE_NORMAL) || IsBtOrWireHeadPlugin()) {
+            AdjustVolumesForCrs();
             if (PlaySoundtone()) {
                 TELEPHONY_LOGI("play soundtone success");
                 return true;
@@ -604,7 +611,12 @@ bool AudioControlManager::PlayRingtone()
     if (IsVideoRingScene(contactInfo.personalNotificationRington, contactInfo.ringtonePath)) {
         return false;
     }
-    if (ring_->Play(info.accountId, contactInfo.ringtonePath) != TELEPHONY_SUCCESS) {
+    if (incomingCall->GetCallType() == CallType::TYPE_BLUETOOTH) {
+        ret = ring_->Play(info.accountId, contactInfo.ringtonePath, Media::HapticStartupMode::FAST);
+    } else {
+        ret = ring_->Play(info.accountId, contactInfo.ringtonePath, Media::HapticStartupMode::DEFAULT);
+    }
+    if (ret != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("play ringtone failed");
         return false;
     }
@@ -693,6 +705,7 @@ bool AudioControlManager::StopSoundtone()
     }
     sound_->ReleaseRenderer();
     TELEPHONY_LOGI("stop soundtone success");
+    RestoreVoiceValumeIfNecessary();
     return true;
 }
 
@@ -1005,6 +1018,7 @@ int32_t AudioControlManager::PlayCallTone(ToneDescriptor type)
 
 int32_t AudioControlManager::StopCallTone()
 {
+    TELEPHONY_LOGI("stop call tone enter");
     std::lock_guard<std::recursive_mutex> lock(toneStateLock_);
     if (toneState_ == ToneState::STOPPED) {
         TELEPHONY_LOGI("tone is already stopped");
@@ -1253,6 +1267,37 @@ void AudioControlManager::UnexcludeBluetoothSco()
     }
     isScoTemporarilyDisabled_ = false;
     TELEPHONY_LOGI("UnexcludeBluetoothSco end");
+}
+
+int32_t AudioControlManager::GetBackupVoiceVolume()
+{
+    return voiceVolume_;
+}
+
+void AudioControlManager::SaveVoiceVolume(int32_t volume)
+{
+    voiceVolume_ = volume;
+}
+
+void AudioControlManager::AdjustVolumesForCrs()
+{
+    auto audioProxy = DelayedSingleton<AudioProxy>::GetInstance();
+    int32_t ringVolume = audioProxy->GetVolume(AudioStandard::AudioVolumeType::STREAM_RING);
+    int32_t voiceVolume = audioProxy->GetVolume(AudioStandard::AudioVolumeType::STREAM_VOICE_CALL);
+    TELEPHONY_LOGI("now ringVolume is %{public}d, voiceVolume is %{public}d", ringVolume, voiceVolume);
+    audioProxy->SetVolume(AudioStandard::AudioVolumeType::STREAM_VOICE_CALL, ringVolume);
+    SaveVoiceVolume(voiceVolume);
+}
+
+void AudioControlManager::RestoreVoiceValumeIfNecessary()
+{
+    auto voiceVolume = GetBackupVoiceVolume();
+    TELEPHONY_LOGI("now voiceVolume is %{public}d", voiceVolume);
+    if (voiceVolume >= 0) {
+        DelayedSingleton<AudioProxy>::GetInstance()->SetVolume(
+            AudioStandard::AudioVolumeType::STREAM_VOICE_CALL, voiceVolume);
+        SaveVoiceVolume(-1);
+    }
 }
 } // namespace Telephony
 } // namespace OHOS

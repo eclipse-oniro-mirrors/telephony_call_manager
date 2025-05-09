@@ -39,6 +39,7 @@ public:
     int32_t Insert(Uri &uri, const std::string &key, const std::string &value);
     int32_t Update(Uri &uri, const std::string &key, const std::string &value);
     bool RegisterToDataShare(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &observer);
+    bool UnRegisterToDataShare(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &observer);
 private:
     std::shared_ptr<DataShare::DataShareHelper> CreateDataShareHelper(int systemAbilityId);
 };

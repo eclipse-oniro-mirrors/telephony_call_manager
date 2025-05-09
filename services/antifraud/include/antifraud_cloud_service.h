@@ -39,7 +39,7 @@ private:
     std::string GenerateRequestJson(const std::map<std::string, std::string> &headersMap, const std::string &body);
     std::string GetAuthSync(const std::string &metaData, const std::string &ak, sptr<IRemoteObject> remoteObject);
     std::string GenerateUcsRequestBody(UcsMethod code, const std::string &requestData);
-    std::string EncodeBase64(const char *bytes, unsigned int size);
+    std::string EncodeBase64(const std::string &src);
     std::string GeneratePayload(const OHOS::AntiFraudService::AntiFraudResult &antiFraudResult);
     std::string GetRomVersion();
     std::string GetSubstringBeforeSymbol(const std::string &str, const std::string &symbol);

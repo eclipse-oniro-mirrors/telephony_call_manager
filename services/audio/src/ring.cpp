@@ -47,7 +47,7 @@ void Ring::Init()
     }
 }
 
-int32_t Ring::Play(int32_t slotId, std::string ringtonePath)
+int32_t Ring::Play(int32_t slotId, std::string ringtonePath, Media::HapticStartupMode mode)
 {
     if (SystemSoundManager_ == nullptr || audioPlayer_ == nullptr) {
         TELEPHONY_LOGE("SystemSoundManager_ or audioPlayer_ is nullptr");
@@ -68,7 +68,7 @@ int32_t Ring::Play(int32_t slotId, std::string ringtonePath)
         TELEPHONY_LOGE("configure failed");
     }
     audioPlayer_->SetStop(PlayerType::TYPE_RING, false);
-    return RingtonePlayer_->Start();
+    return RingtonePlayer_->Start(mode);
 }
 
 int32_t Ring::Stop()

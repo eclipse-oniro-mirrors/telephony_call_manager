@@ -181,7 +181,7 @@ void AntiFraudService::RecordDetectResult(const OHOS::AntiFraudService::AntiFrau
     }
 }
 
-int32_t AntiFraudService::InitAntiFraudService(const std::string &phoneNum, int32_t slotId, int32_t index)
+int32_t AntiFraudService::CheckAntiFraudService(const std::string &phoneNum, int32_t slotId, int32_t index)
 {
     auto antiFraudAdapter = DelayedSingleton<AntiFraudAdapter>::GetInstance();
     int32_t antiFraudErrCode = antiFraudAdapter->CheckAntiFraud(phoneNum);
@@ -189,6 +189,24 @@ int32_t AntiFraudService::InitAntiFraudService(const std::string &phoneNum, int3
         TELEPHONY_LOGE("Check AntiFraud, no need to detect, ErrCode:%{public}d", antiFraudErrCode);
         return antiFraudErrCode;
     }
+    return 0;
+}
+
+int32_t AntiFraudService::StartAntiFraudService(const std::string &phoneNum, int32_t slotId, int32_t index)
+{
+    int32_t antiFraudErrCode = CheckAntiFraudService(phoneNum, slotId, index);
+    if (antiFraudErrCode != 0) {
+        return antiFraudErrCode;
+    }
+    std::lock_guard<ffrt::mutex> lock(mutex_);
+    if (callStatusManagerPtr_ != nullptr) {
+        if (callStatusManagerPtr_->GetAntiFraudSlotId() != slotId ||
+            callStatusManagerPtr_->GetAntiFraudIndex() != index) {
+            TELEPHONY_LOGI("call ending, no need to detect");
+            return -1;
+        }
+    }
+    auto antiFraudAdapter = DelayedSingleton<AntiFraudAdapter>::GetInstance();
     auto listener = std::make_shared<AntiFraudDetectResListenerImpl>(phoneNum, slotId, index);
     antiFraudErrCode = antiFraudAdapter->DetectAntiFraud(listener);
     if (antiFraudErrCode != 0) {
@@ -206,13 +224,16 @@ int32_t AntiFraudService::InitAntiFraudService(const std::string &phoneNum, int3
 
 int32_t AntiFraudService::StopAntiFraudService(int32_t slotId, int32_t index)
 {
-    auto antiFraudAdapter = DelayedSingleton<AntiFraudAdapter>::GetInstance();
-    int32_t antiFraudErrCode = antiFraudAdapter->StopAntiFraud();
-    if (antiFraudErrCode != 0) {
-        TELEPHONY_LOGE("Stop AntiFraud failed, ErrCode=%{public}d", antiFraudErrCode);
-        return antiFraudErrCode;
+    {
+        std::lock_guard<ffrt::mutex> lock(mutex_);
+        auto antiFraudAdapter = DelayedSingleton<AntiFraudAdapter>::GetInstance();
+        int32_t antiFraudErrCode = antiFraudAdapter->StopAntiFraud();
+        if (antiFraudErrCode != 0) {
+            TELEPHONY_LOGE("Stop AntiFraud failed, ErrCode=%{public}d", antiFraudErrCode);
+            return antiFraudErrCode;
+        }
+        TELEPHONY_LOGI("AntiFraud stop detect, slotId=%{public}d, index=%{public}d", slotId, index);
     }
-    TELEPHONY_LOGI("AntiFraud stop detect, slotId=%{public}d, index=%{public}d", slotId, index);
     SetStoppedSlotId(slotId);
     SetStoppedIndex(index);
     return 0;

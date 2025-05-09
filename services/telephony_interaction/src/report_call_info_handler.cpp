@@ -19,6 +19,7 @@
 #include "call_manager_hisysevent.h"
 #include "call_manager_service.h"
 #include "ffrt.h"
+#include "ffrt_inner.h"
 #include "ims_call.h"
 #include "telephony_log_wrapper.h"
 #include "antifraud_service.h"
@@ -27,7 +28,7 @@
 namespace OHOS {
 namespace Telephony {
 namespace {
-ffrt::queue reportCallInfoQueue { "report_call_info_queue" };
+ffrt::queue reportCallInfoQueue { "report_call_info_queue", ffrt::queue_attr().qos(ffrt_qos_user_interactive)};
 }
 ReportCallInfoHandler::ReportCallInfoHandler() {}
 

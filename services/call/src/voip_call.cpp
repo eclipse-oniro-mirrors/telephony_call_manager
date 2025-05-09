@@ -172,6 +172,14 @@ void VoIPCall::GetCallAttributeInfo(CallAttributeInfo &info)
     return;
 }
 
+void VoIPCall::UpdateCallAttributeInfo(const CallDetailInfo &info)
+{
+    if (hasMicPermission_ != info.voipCallInfo.hasMicPermission) {
+        hasMicPermission_ = info.voipCallInfo.hasMicPermission;
+        TELEPHONY_LOGI("UpdateCallAttributeInfo hasMicPermission change to %{public}d", hasMicPermission_);
+    }
+}
+
 int32_t VoIPCall::CombineConference()
 {
     return TELEPHONY_SUCCESS;
