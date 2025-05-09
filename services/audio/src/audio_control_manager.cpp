@@ -604,12 +604,7 @@ bool AudioControlManager::PlayRingtone()
     if (IsVideoRingScene(contactInfo.personalNotificationRington, contactInfo.ringtonePath)) {
         return false;
     }
-    if (incomingCall->GetCallType() == CallType::TYPE_BLUETOOTH) {
-        ret = ring_->Play(info.accountId, contactInfo.ringtonePath, Media::HapticStartupMode::FAST);
-    } else {
-        ret = ring_->Play(info.accountId, contactInfo.ringtonePath, Media::HapticStartupMode::DEFAULT);
-    }
-    if (ret != TELEPHONY_SUCCESS) {
+    if (ring_->Play(info.accountId, contactInfo.ringtonePath) != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("play ringtone failed");
         return false;
     }
