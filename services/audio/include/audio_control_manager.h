@@ -124,6 +124,7 @@ private:
     SoundState soundState_ = SoundState::STOPPED;
     bool isLocalRingbackNeeded_ = false;
     bool isCrsVibrating_ = false;
+    bool isVideoRingVibrating_ = false;
     std::set<sptr<CallBase>> totalCalls_;
     std::unique_ptr<Ring> ring_;
     std::unique_ptr<Tone> tone_;

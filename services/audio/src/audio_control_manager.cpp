@@ -345,6 +345,10 @@ void AudioControlManager::HandleNextState(sptr<CallBase> &callObjectPtr, TelCall
                 DelayedSingleton<AudioProxy>::GetInstance()->StopVibrator();
                 isCrsVibrating_ = false;
             }
+            if (isVideoRingVibrating_) {
+                DelayedSingleton<AudioProxy>::GetInstance()->StopVibrator();
+                isVideoRingVibrating_ = false;
+            }
             audioInterruptState_ = AudioInterruptState::INTERRUPT_STATE_DEACTIVATED;
             break;
         default:
@@ -407,6 +411,10 @@ void AudioControlManager::ProcessAudioWhenCallActive(sptr<CallBase> &callObjectP
         if (isCrsVibrating_) {
             DelayedSingleton<AudioProxy>::GetInstance()->StopVibrator();
             isCrsVibrating_ = false;
+        }
+        if (isVideoRingVibrating_) {
+            DelayedSingleton<AudioProxy>::GetInstance()->StopVibrator();
+            isVideoRingVibrating_ = false;
         }
         int ringCallCount = CallObjectManager::GetCallNumByRunningState(CallRunningState::CALL_RUNNING_STATE_RINGING);
         if ((CallObjectManager::GetCurrentCallNum() - ringCallCount) < MIN_MULITY_CALL_COUNT) {
@@ -612,13 +620,15 @@ bool AudioControlManager::PlayRingtone()
 bool AudioControlManager::IsVideoRingScene(const std::string &personalNotificaltionRington,
     const std::string &ringtonePath)
 {
-    if (personalNotificaltionRington.substr(personalNotificaltionRington.length() - VIDEO_RING_PATH_FIX_TAIL_LENGTH,
-        VIDEO_RING_PATH_FIX_TAIL_LENGTH) == VIDEO_RING_PATH_FIX_TAIL || ringtonePath == VIDEO_RING_FOR_SYSTEM) {
+    if ((personalNotificaltionRington.length() > VIDEO_RING_PATH_FIX_TAIL_LENGTH &&
+        personalNotificaltionRington.substr(personalNotificaltionRington.length() - VIDEO_RING_PATH_FIX_TAIL_LENGTH,
+        VIDEO_RING_PATH_FIX_TAIL_LENGTH) == VIDEO_RING_PATH_FIX_TAIL) ||
+        strcmp(ringtonePath.c_str(), VIDEO_RING_FOR_SYSTEM) == 0) {
         TELEPHONY_LOGI("video ring scene.");
         AudioStandard::AudioRingerMode ringMode = DelayedSingleton<AudioProxy>::GetInstance()->GetRingerMode();
         if (ringMode == AudioStandard::AudioRingerMode::RINGER_MODE_VIBRATE || IsRingingVibrateModeOn()) {
             TELEPHONY_LOGI("need start vibrator.");
-            DelayedSingleton<AudioProxy>::GetInstance()->StartVibrator();
+            isVideoRingVibrating_ = (DelayedSingleton<AudioProxy>::GetInstance()->StartVibrator() == TELEPHONY_SUCCESS);
         }
         return false;
     }
@@ -1111,6 +1121,10 @@ void AudioControlManager::MuteNetWorkRingTone()
     if (isCrsVibrating_) {
         DelayedSingleton<AudioProxy>::GetInstance()->StopVibrator();
         isCrsVibrating_ = false;
+    }
+    if (isVideoRingVibrating_) {
+        DelayedSingleton<AudioProxy>::GetInstance()->StopVibrator();
+        isVideoRingVibrating_ = false;
     }
 }
 
