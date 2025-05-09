@@ -200,7 +200,7 @@ bool CallDataBaseHelper::Query(ContactInfo &contactInfo, DataShare::DataSharePre
     }
     int32_t columnIndex;
     std::string ringtonePath = "";
-    std::string personalNotificaltionRington = "";
+    std::string personalNotificationRington = "";
     resultSet->GetColumnIndex(CALL_DISPLAY_NAME, columnIndex);
     resultSet->GetString(columnIndex, contactInfo.name);
     resultSet->GetColumnIndex(PERSONAL_RINGTONE, columnIndex);
@@ -212,15 +212,15 @@ bool CallDataBaseHelper::Query(ContactInfo &contactInfo, DataShare::DataSharePre
     }
     TELEPHONY_LOGI("ringtonePath: %{public}s", contactInfo.ringtonePath);
     resultSet->GetColumnIndex(PERSONAL_NOTIFICATION_RINGTONE, columnIndex);
-    resultSet->GetString(columnIndex, personalNotificaltionRington);
-    length = personalNotificaltionRington.length() > FILE_PATH_MAX_LEN ?
-        FILE_PATH_MAX_LEN : personalNotificaltionRington.length();
-    if (memcpy_s(contactInfo.personalNotificaltionRington, FILE_PATH_MAX_LEN, personalNotificaltionRington.c_str(), 
+    resultSet->GetString(columnIndex, personalNotificationRington);
+    length = personalNotificationRington.length() > FILE_PATH_MAX_LEN ?
+        FILE_PATH_MAX_LEN : personalNotificationRington.length();
+    if (memcpy_s(contactInfo.personalNotificationRington, FILE_PATH_MAX_LEN, personalNotificationRington.c_str(), 
         length) != EOK) {
-        TELEPHONY_LOGE("memcpy_s personalNotificaltionRington fail!");
+        TELEPHONY_LOGE("memcpy_s personalNotificationRington fail!");
         return false;
     }
-    TELEPHONY_LOGI("personalNotificaltionRington: %{public}s", contactInfo.personalNotificaltionRington);
+    TELEPHONY_LOGI("personalNotificationRington: %{public}s", contactInfo.personalNotificationRington);
     resultSet->Close();
     helper->Release();
     TELEPHONY_LOGI("Query end, contactName length: %{public}zu", contactInfo.name.length());
@@ -477,7 +477,7 @@ bool CallDataBaseHelper::QueryContactInfoEnhanced(ContactInfo &contactInfo, Data
     }
     int32_t columnIndex;
     std::string ringtonePath = "";
-    std::string personalNotificaltionRington = "";
+    std::string personalNotificationRington = "";
     resultSet->GetColumnIndex(CALL_DISPLAY_NAME, columnIndex);
     resultSet->GetString(columnIndex, contactInfo.name);
     resultSet->GetColumnIndex(PERSONAL_RINGTONE, columnIndex);
@@ -489,15 +489,15 @@ bool CallDataBaseHelper::QueryContactInfoEnhanced(ContactInfo &contactInfo, Data
     }
     TELEPHONY_LOGI("ringtonePath: %{public}s", contactInfo.ringtonePath);
     resultSet->GetColumnIndex(PERSONAL_NOTIFICATION_RINGTONE, columnIndex);
-    resultSet->GetString(columnIndex, personalNotificaltionRington);
-    length = personalNotificaltionRington.length() > FILE_PATH_MAX_LEN ?
-        FILE_PATH_MAX_LEN : personalNotificaltionRington.length();
-    if (memcpy_s(contactInfo.personalNotificaltionRington, FILE_PATH_MAX_LEN, personalNotificaltionRington.c_str(),
+    resultSet->GetString(columnIndex, personalNotificationRington);
+    length = personalNotificationRington.length() > FILE_PATH_MAX_LEN ?
+        FILE_PATH_MAX_LEN : personalNotificationRington.length();
+    if (memcpy_s(contactInfo.personalNotificationRington, FILE_PATH_MAX_LEN, personalNotificationRington.c_str(),
         length) != EOK) {
-        TELEPHONY_LOGE("memcpy_s personalNotificaltionRington fail!");
+        TELEPHONY_LOGE("memcpy_s personalNotificationRington fail!");
         return false;
     }
-    TELEPHONY_LOGI("personalNotificaltionRington: %{public}s", contactInfo.personalNotificaltionRington);
+    TELEPHONY_LOGI("personalNotificationRington: %{public}s", contactInfo.personalNotificationRington);
     resultSet->Close();
     helper->Release();
     TELEPHONY_LOGI("Query end, contactName length: %{public}zu", contactInfo.name.length());

@@ -601,7 +601,7 @@ bool AudioControlManager::PlayRingtone()
         TELEPHONY_LOGI("type_crs but not play ringtone");
         return false;
     }
-    if (IsVideoRingScene(contactInfo.personalNotificaltionRington, contactInfo.ringtonePath)) {
+    if (IsVideoRingScene(contactInfo.personalNotificationRington, contactInfo.ringtonePath)) {
         return false;
     }
     if (ring_->Play(info.accountId, contactInfo.ringtonePath) != TELEPHONY_SUCCESS) {
@@ -617,22 +617,23 @@ bool AudioControlManager::PlayRingtone()
     return true;
 }
 
-bool AudioControlManager::IsVideoRingScene(const std::string &personalNotificaltionRington,
-    const std::string &ringtonePath)
+bool AudioControlManager::IsVideoRingScene(const std::string personalNotificationRington,
+    const std::string ringtonePath)
 {
-    if ((personalNotificaltionRington.length() > VIDEO_RING_PATH_FIX_TAIL_LENGTH &&
-        personalNotificaltionRington.substr(personalNotificaltionRington.length() - VIDEO_RING_PATH_FIX_TAIL_LENGTH,
+    if ((personalNotificationRington.length() > VIDEO_RING_PATH_FIX_TAIL_LENGTH &&
+        personalNotificationRington.substr(personalNotificationRington.length() - VIDEO_RING_PATH_FIX_TAIL_LENGTH,
         VIDEO_RING_PATH_FIX_TAIL_LENGTH) == VIDEO_RING_PATH_FIX_TAIL) ||
         strcmp(ringtonePath.c_str(), VIDEO_RING_FOR_SYSTEM) == 0) {
         TELEPHONY_LOGI("video ring scene.");
         AudioStandard::AudioRingerMode ringMode = DelayedSingleton<AudioProxy>::GetInstance()->GetRingerMode();
-        if (ringMode == AudioStandard::AudioRingerMode::RINGER_MODE_VIBRATE || IsRingingVibrateModeOn()) {
+        if (ringMode != AudioStandard::AudioRingerMode::RINGER_MODE_SILENT || IsRingingVibrateModeOn()) {
             TELEPHONY_LOGI("need start vibrator.");
             isVideoRingVibrating_ = (DelayedSingleton<AudioProxy>::GetInstance()->StartVibrator() == TELEPHONY_SUCCESS);
         }
-        return false;
+        return true;
     }
-    return true;
+    TELEPHONY_LOGI("audio ring scene.");
+    return false;
 }
 
 bool AudioControlManager::IsDistributeCallSinkStatus()

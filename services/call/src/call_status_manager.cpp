@@ -530,8 +530,7 @@ void CallStatusManager::DealVideoRingPath(ContactInfo &contactInfo, sptr<CallBas
         callObjectPtr->GetCallAttributeBaseInfo(info);
         const std::shared_ptr<AbilityRuntime::Context> context;
         Media::RingtoneType type = info.accountId == DEFAULT_SIM_SLOT_ID ?
-        Media::RingtoneType::RINGTONE_TYPE_SIM_CARD_0 : Media::RingtoneType::RINGTONE_TYPE_SIM_CARD_1;
-        TELEPHONY_LOGI("type: %{public}d", type);
+            Media::RingtoneType::RINGTONE_TYPE_SIM_CARD_0 : Media::RingtoneType::RINGTONE_TYPE_SIM_CARD_1;
         std::shared_ptr<Media::SystemSoundManager> systemSoundManager =
             Media::SystemSoundManagerFactory::CreateSystemSoundManager();
         if (systemSoundManager == nullptr) {
@@ -552,9 +551,9 @@ void CallStatusManager::DealVideoRingPath(ContactInfo &contactInfo, sptr<CallBas
         }
     }
     AAFwk::WantParams params = callObjectPtr->GetExtraParams();
-    std::string personalNotificaltionRington = contactInfo.personalNotificaltionRington;
-    if ((personalNotificaltionRington.length() > VIDEO_RING_PATH_FIX_TAIL_LENGTH &&
-        personalNotificaltionRington.substr(personalNotificaltionRington.length() - VIDEO_RING_PATH_FIX_TAIL_LENGTH,
+    std::string personalNotificationRington = contactInfo.personalNotificationRington;
+    if ((personalNotificationRington.length() > VIDEO_RING_PATH_FIX_TAIL_LENGTH &&
+        personalNotificationRington.substr(personalNotificationRington.length() - VIDEO_RING_PATH_FIX_TAIL_LENGTH,
         VIDEO_RING_PATH_FIX_TAIL_LENGTH) == VIDEO_RING_PATH_FIX_TAIL) ||
         strcmp(contactInfo.ringtonePath, VIDEO_RING_FOR_SYSTEM) == 0) {
         TELEPHONY_LOGI("notify callui to play video ring.");
