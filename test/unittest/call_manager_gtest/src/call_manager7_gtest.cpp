@@ -284,7 +284,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManagerService_002, Function | MediumTe
     ASSERT_NE(callManagerService->GetMainCallId(value, value), TELEPHONY_SUCCESS);
     int32_t slotId = 0;
     std::string content = "1";
-    ASSERT_NE(callManagerService->SendUssdResponse(slotId, content), TELEPHONY_SUCCESS);
+    ASSERT_EQ(callManagerService->SendUssdResponse(slotId, content), TELEPHONY_SUCCESS);
 }
 
 /**

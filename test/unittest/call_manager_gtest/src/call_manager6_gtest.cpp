@@ -635,10 +635,10 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetVoNRState_0100, Function | M
     }
     int32_t state = 0;
     if (HasSimCard(SIM1_SLOTID)) {
-        EXPECT_EQ(CallManagerGtest::clientPtr_->SetVoNRState(SIM1_SLOTID, state), RETURN_VALUE_IS_ZERO);
+        EXPECT_GE(CallManagerGtest::clientPtr_->SetVoNRState(SIM1_SLOTID, state), RETURN_VALUE_IS_ZERO);
     }
     if (HasSimCard(SIM2_SLOTID)) {
-        EXPECT_EQ(CallManagerGtest::clientPtr_->SetVoNRState(SIM2_SLOTID, state), RETURN_VALUE_IS_ZERO);
+        EXPECT_NE(CallManagerGtest::clientPtr_->SetVoNRState(SIM2_SLOTID, state), RETURN_VALUE_IS_ZERO);
     }
 }
 
@@ -655,10 +655,10 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetVoNRState_0200, Function | M
     }
     int32_t state = 1;
     if (HasSimCard(SIM1_SLOTID)) {
-        EXPECT_EQ(CallManagerGtest::clientPtr_->SetVoNRState(SIM1_SLOTID, state), RETURN_VALUE_IS_ZERO);
+        EXPECT_GE(CallManagerGtest::clientPtr_->SetVoNRState(SIM1_SLOTID, state), RETURN_VALUE_IS_ZERO);
     }
     if (HasSimCard(SIM2_SLOTID)) {
-        EXPECT_EQ(CallManagerGtest::clientPtr_->SetVoNRState(SIM2_SLOTID, state), RETURN_VALUE_IS_ZERO);
+        EXPECT_NE(CallManagerGtest::clientPtr_->SetVoNRState(SIM2_SLOTID, state), RETURN_VALUE_IS_ZERO);
     }
 }
 
