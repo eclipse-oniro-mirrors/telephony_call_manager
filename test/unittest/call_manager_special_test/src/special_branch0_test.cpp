@@ -153,7 +153,7 @@ void SpecialBranch0Test::TearDown()
  * @tc.name     test branch
  * @tc.desc     Function test
  */
-HWTEST_F(SpecialBranch0Test, Telephony_NumberIdentityServiceHelper_002, Function | MediumTest | Level3)
+HWTEST_F(SpecialBranch0Test, Telephony_NumberIdentityServiceHelper_002, TestSize.Level0)
 {
     auto &help = DelayedRefSingleton<NumberIdentityServiceHelper>::GetInstance();
     ConnectedCallback onConnected = [&help](sptr<IRemoteObject> remote) {
@@ -177,7 +177,7 @@ HWTEST_F(SpecialBranch0Test, Telephony_NumberIdentityServiceHelper_002, Function
  * @tc.name     test branch
  * @tc.desc     Function test
  */
-HWTEST_F(SpecialBranch0Test, Telephony_NumberIdentityServiceHelper_003, Function | MediumTest | Level3)
+HWTEST_F(SpecialBranch0Test, Telephony_NumberIdentityServiceHelper_003, TestSize.Level0)
 {
     auto &help = DelayedRefSingleton<NumberIdentityServiceHelper>().GetInstance();
     help.working_ = true;
@@ -190,7 +190,7 @@ HWTEST_F(SpecialBranch0Test, Telephony_NumberIdentityServiceHelper_003, Function
  * @tc.name     test branch
  * @tc.desc     Function test
  */
-HWTEST_F(SpecialBranch0Test, Telephony_NumberIdentityConnection_001, Function | MediumTest | Level3)
+HWTEST_F(SpecialBranch0Test, Telephony_NumberIdentityConnection_001, TestSize.Level0)
 {
     sptr<NumberIdentityConnection> connection = new (std::nothrow) NumberIdentityConnection(
             [](const sptr<IRemoteObject> &remoteObject) {}, []() {});
@@ -216,7 +216,7 @@ HWTEST_F(SpecialBranch0Test, Telephony_NumberIdentityConnection_001, Function | 
  * @tc.name     test branch
  * @tc.desc     Function test
  */
-HWTEST_F(SpecialBranch0Test, Telephony_NumberIdentityConnection_002, Function | MediumTest | Level3)
+HWTEST_F(SpecialBranch0Test, Telephony_NumberIdentityConnection_002, TestSize.Level0)
 {
     sptr<NumberIdentityConnection> connection = new (std::nothrow) NumberIdentityConnection(
             [](const sptr<IRemoteObject> &remoteObject) {}, []() {});
@@ -231,7 +231,7 @@ HWTEST_F(SpecialBranch0Test, Telephony_NumberIdentityConnection_002, Function | 
  * @tc.name     test branch
  * @tc.desc     Function test
  */
-HWTEST_F(SpecialBranch0Test, Telephony_CallManagerHisysevent_001, Function | MediumTest | Level3)
+HWTEST_F(SpecialBranch0Test, Telephony_CallManagerHisysevent_001, TestSize.Level0)
 {
     std::shared_ptr<CallManagerHisysevent> callManagerHisysevent = std::make_shared<CallManagerHisysevent>();
     std::string errorDesc;
@@ -248,7 +248,7 @@ HWTEST_F(SpecialBranch0Test, Telephony_CallManagerHisysevent_001, Function | Med
  * @tc.name     test branch
  * @tc.desc     Function test
  */
-HWTEST_F(SpecialBranch0Test, Telephony_CallSettingManager_001, Function | MediumTest | Level3)
+HWTEST_F(SpecialBranch0Test, Telephony_CallSettingManager_001, TestSize.Level0)
 {
     std::shared_ptr<CallSettingManager> callSettingManager = std::make_shared<CallSettingManager>();
     ASSERT_TRUE(callSettingManager != nullptr);
@@ -264,7 +264,7 @@ HWTEST_F(SpecialBranch0Test, Telephony_CallSettingManager_001, Function | Medium
  * @tc.name     test branch
  * @tc.desc     Function test
  */
-HWTEST_F(SpecialBranch0Test, Telephony_CallSettingManager_002, Function | MediumTest | Level3)
+HWTEST_F(SpecialBranch0Test, Telephony_CallSettingManager_002, TestSize.Level0)
 {
     std::shared_ptr<CallSettingManager> callSettingManager = std::make_shared<CallSettingManager>();
     ASSERT_TRUE(callSettingManager != nullptr);
@@ -304,7 +304,7 @@ HWTEST_F(SpecialBranch0Test, Telephony_CallSettingManager_002, Function | Medium
  * @tc.name     test branch
  * @tc.desc     Function test
  */
-HWTEST_F(SpecialBranch0Test, Telephony_CallVoiceAssistantManager_001, Function | MediumTest | Level3)
+HWTEST_F(SpecialBranch0Test, Telephony_CallVoiceAssistantManager_001, TestSize.Level0)
 {
     std::shared_ptr<CallVoiceAssistantManager> voicePtr = CallVoiceAssistantManager::GetInstance();
     voicePtr->mInstance_ = nullptr;
@@ -317,7 +317,7 @@ HWTEST_F(SpecialBranch0Test, Telephony_CallVoiceAssistantManager_001, Function |
  * @tc.name     test branch
  * @tc.desc     Function test
  */
-HWTEST_F(SpecialBranch0Test, Telephony_CallVoiceAssistantManager_002, Function | MediumTest | Level3)
+HWTEST_F(SpecialBranch0Test, Telephony_CallVoiceAssistantManager_002, TestSize.Level0)
 {
     std::shared_ptr<CallVoiceAssistantManager> voicePtr = CallVoiceAssistantManager::GetInstance();
     ASSERT_FALSE(voicePtr->IsSwitchOn("1"));
@@ -328,7 +328,7 @@ HWTEST_F(SpecialBranch0Test, Telephony_CallVoiceAssistantManager_002, Function |
  * @tc.name     test branch
  * @tc.desc     Function test
  */
-HWTEST_F(SpecialBranch0Test, Telephony_CallVoiceAssistantManager_003, Function | MediumTest | Level3)
+HWTEST_F(SpecialBranch0Test, Telephony_CallVoiceAssistantManager_003, TestSize.Level0)
 {
     std::shared_ptr<CallVoiceAssistantManager> voicePtr = CallVoiceAssistantManager::GetInstance();
     voicePtr->PublishCommonEvent(false, "a");
@@ -340,7 +340,7 @@ HWTEST_F(SpecialBranch0Test, Telephony_CallVoiceAssistantManager_003, Function |
  * @tc.name     test branch
  * @tc.desc     Function test
  */
-HWTEST_F(SpecialBranch0Test, Telephony_CallVoiceAssistantManager_004, Function | MediumTest | Level3)
+HWTEST_F(SpecialBranch0Test, Telephony_CallVoiceAssistantManager_004, TestSize.Level0)
 {
     std::shared_ptr<CallVoiceAssistantManager> voicePtr = CallVoiceAssistantManager::GetInstance();
     voicePtr->SendRequest(nullptr, false);
@@ -355,7 +355,7 @@ HWTEST_F(SpecialBranch0Test, Telephony_CallVoiceAssistantManager_004, Function |
  * @tc.name     test branch
  * @tc.desc     Function test
  */
-HWTEST_F(SpecialBranch0Test, Telephony_CallVoiceAssistantManager_005, Function | MediumTest | Level3)
+HWTEST_F(SpecialBranch0Test, Telephony_CallVoiceAssistantManager_005, TestSize.Level0)
 {
     auto voicePtr = std::make_shared<VoiceAssistantConnectCallback>(1);
     AppExecFwk::ElementName element;
@@ -370,7 +370,7 @@ HWTEST_F(SpecialBranch0Test, Telephony_CallVoiceAssistantManager_005, Function |
  * @tc.name     test branch
  * @tc.desc     Function test
  */
-HWTEST_F(SpecialBranch0Test, Telephony_CallVoiceAssistantManager_006, Function | MediumTest | Level3)
+HWTEST_F(SpecialBranch0Test, Telephony_CallVoiceAssistantManager_006, TestSize.Level0)
 {
     std::shared_ptr<CallVoiceAssistantManager> voicePtr = CallVoiceAssistantManager::GetInstance();
     std::u16string ret = voicePtr->GetSendString(nullptr);
@@ -382,7 +382,7 @@ HWTEST_F(SpecialBranch0Test, Telephony_CallVoiceAssistantManager_006, Function |
  * @tc.name     test branch
  * @tc.desc     Function test
  */
-HWTEST_F(SpecialBranch0Test, Telephony_CallVoiceAssistantManager_007, Function | MediumTest | Level3)
+HWTEST_F(SpecialBranch0Test, Telephony_CallVoiceAssistantManager_007, TestSize.Level0)
 {
     std::shared_ptr<CallVoiceAssistantManager> voicePtr = CallVoiceAssistantManager::GetInstance();
     voicePtr->SetIsControlSwitchOn(true);
@@ -396,7 +396,7 @@ HWTEST_F(SpecialBranch0Test, Telephony_CallVoiceAssistantManager_007, Function |
  * @tc.name     test branch
  * @tc.desc     Function test
  */
-HWTEST_F(SpecialBranch0Test, Telephony_CallVoiceAssistantManager_009, Function | MediumTest | Level3)
+HWTEST_F(SpecialBranch0Test, Telephony_CallVoiceAssistantManager_009, TestSize.Level0)
 {
     std::shared_ptr<CallVoiceAssistantManager> voicePtr = CallVoiceAssistantManager::GetInstance();
     voicePtr->nowCallId = 0;
@@ -413,7 +413,7 @@ HWTEST_F(SpecialBranch0Test, Telephony_CallVoiceAssistantManager_009, Function |
  * @tc.name     test branch
  * @tc.desc     Function test
  */
-HWTEST_F(SpecialBranch0Test, Telephony_CallVoiceAssistantManager_010, Function | MediumTest | Level3)
+HWTEST_F(SpecialBranch0Test, Telephony_CallVoiceAssistantManager_010, TestSize.Level0)
 {
     std::shared_ptr<CallVoiceAssistantManager> voicePtr = CallVoiceAssistantManager::GetInstance();
     voicePtr->accountIds[1] = std::make_shared<IncomingContactInformation>();
@@ -428,7 +428,7 @@ HWTEST_F(SpecialBranch0Test, Telephony_CallVoiceAssistantManager_010, Function |
  * @tc.name     test branch
  * @tc.desc     Function test
  */
-HWTEST_F(SpecialBranch0Test, Telephony_CallVoiceAssistantManager_011, Function | MediumTest | Level3)
+HWTEST_F(SpecialBranch0Test, Telephony_CallVoiceAssistantManager_011, TestSize.Level0)
 {
     std::shared_ptr<CallVoiceAssistantManager> voicePtr = CallVoiceAssistantManager::GetInstance();
     auto info = std::make_shared<IncomingContactInformation>();
@@ -448,7 +448,7 @@ HWTEST_F(SpecialBranch0Test, Telephony_CallVoiceAssistantManager_011, Function |
  * @tc.name     test branch
  * @tc.desc     Function test
  */
-HWTEST_F(SpecialBranch0Test, Telephony_CallVoiceAssistantManager_012, Function | MediumTest | Level3)
+HWTEST_F(SpecialBranch0Test, Telephony_CallVoiceAssistantManager_012, TestSize.Level0)
 {
     std::shared_ptr<CallVoiceAssistantManager> voicePtr = CallVoiceAssistantManager::GetInstance();
     auto info = std::make_shared<IncomingContactInformation>();
@@ -465,7 +465,7 @@ HWTEST_F(SpecialBranch0Test, Telephony_CallVoiceAssistantManager_012, Function |
  * @tc.name     test branch
  * @tc.desc     Function test
  */
-HWTEST_F(SpecialBranch0Test, Telephony_CallVoiceAssistantManager_014, Function | MediumTest | Level3)
+HWTEST_F(SpecialBranch0Test, Telephony_CallVoiceAssistantManager_014, TestSize.Level0)
 {
     std::shared_ptr<CallVoiceAssistantManager> voicePtr = CallVoiceAssistantManager::GetInstance();
     voicePtr->UpdateReplyData("a\"\"b");
@@ -477,7 +477,7 @@ HWTEST_F(SpecialBranch0Test, Telephony_CallVoiceAssistantManager_014, Function |
  * @tc.name     test branch
  * @tc.desc     Function test
  */
-HWTEST_F(SpecialBranch0Test, Telephony_SpamCallAdapter_001, Function | MediumTest | Level3)
+HWTEST_F(SpecialBranch0Test, Telephony_SpamCallAdapter_001, TestSize.Level0)
 {
     std::shared_ptr<SpamCallAdapter> spamCallAdapter = std::make_shared<SpamCallAdapter>();
     bool isBlock = false;
@@ -493,7 +493,7 @@ HWTEST_F(SpecialBranch0Test, Telephony_SpamCallAdapter_001, Function | MediumTes
  * @tc.name     test branch
  * @tc.desc     Function test
  */
-HWTEST_F(SpecialBranch0Test, Telephony_SpamCallAdapter_002, Function | MediumTest | Level3)
+HWTEST_F(SpecialBranch0Test, Telephony_SpamCallAdapter_002, TestSize.Level0)
 {
     std::shared_ptr<SpamCallAdapter> spamCallAdapter = std::make_shared<SpamCallAdapter>();
     std::string phone = spamCallAdapter->GetDetectPhoneNum();
@@ -505,7 +505,7 @@ HWTEST_F(SpecialBranch0Test, Telephony_SpamCallAdapter_002, Function | MediumTes
  * @tc.name     test branch
  * @tc.desc     Function test
  */
-HWTEST_F(SpecialBranch0Test, Telephony_SpamCallAdapter_003, Function | MediumTest | Level3)
+HWTEST_F(SpecialBranch0Test, Telephony_SpamCallAdapter_003, TestSize.Level0)
 {
     std::shared_ptr<SpamCallAdapter> spamCallAdapter = std::make_shared<SpamCallAdapter>();
     spamCallAdapter->timeWaitHelper_ = nullptr;
@@ -517,7 +517,7 @@ HWTEST_F(SpecialBranch0Test, Telephony_SpamCallAdapter_003, Function | MediumTes
  * @tc.name     test branch
  * @tc.desc     Function test
  */
-HWTEST_F(SpecialBranch0Test, Telephony_CallManagerServiceStub_001, Function | MediumTest | Level3)
+HWTEST_F(SpecialBranch0Test, Telephony_CallManagerServiceStub_001, TestSize.Level0)
 {
     std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
     ASSERT_TRUE(callManagerService != nullptr);
@@ -536,7 +536,7 @@ HWTEST_F(SpecialBranch0Test, Telephony_CallManagerServiceStub_001, Function | Me
  * @tc.name     test branch
  * @tc.desc     Function test
  */
-HWTEST_F(SpecialBranch0Test, Telephony_CallManagerServiceStub_002, Function | MediumTest | Level3)
+HWTEST_F(SpecialBranch0Test, Telephony_CallManagerServiceStub_002, TestSize.Level0)
 {
     std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
     ASSERT_TRUE(callManagerService != nullptr);
@@ -553,7 +553,7 @@ HWTEST_F(SpecialBranch0Test, Telephony_CallManagerServiceStub_002, Function | Me
  * @tc.name     test branch
  * @tc.desc     Function test
  */
-HWTEST_F(SpecialBranch0Test, Telephony_CallManagerServiceStub_003, Function | MediumTest | Level3)
+HWTEST_F(SpecialBranch0Test, Telephony_CallManagerServiceStub_003, TestSize.Level0)
 {
     std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
     ASSERT_TRUE(callManagerService != nullptr);
@@ -570,7 +570,7 @@ HWTEST_F(SpecialBranch0Test, Telephony_CallManagerServiceStub_003, Function | Me
  * @tc.name     test branch
  * @tc.desc     Function test
  */
-HWTEST_F(SpecialBranch0Test, Telephony_CallManagerServiceStub_004, Function | MediumTest | Level3)
+HWTEST_F(SpecialBranch0Test, Telephony_CallManagerServiceStub_004, TestSize.Level0)
 {
     std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
     ASSERT_TRUE(callManagerService != nullptr);
@@ -587,7 +587,7 @@ HWTEST_F(SpecialBranch0Test, Telephony_CallManagerServiceStub_004, Function | Me
  * @tc.name     test branch
  * @tc.desc     Function test
  */
-HWTEST_F(SpecialBranch0Test, Telephony_CallManagerServiceStub_005, Function | MediumTest | Level3)
+HWTEST_F(SpecialBranch0Test, Telephony_CallManagerServiceStub_005, TestSize.Level0)
 {
     std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
     ASSERT_TRUE(callManagerService != nullptr);
@@ -604,7 +604,7 @@ HWTEST_F(SpecialBranch0Test, Telephony_CallManagerServiceStub_005, Function | Me
  * @tc.name     test branch
  * @tc.desc     Function test
  */
-HWTEST_F(SpecialBranch0Test, Telephony_CallManagerServiceStub_006, Function | MediumTest | Level3)
+HWTEST_F(SpecialBranch0Test, Telephony_CallManagerServiceStub_006, TestSize.Level0)
 {
     std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
     ASSERT_TRUE(callManagerService != nullptr);
@@ -621,7 +621,7 @@ HWTEST_F(SpecialBranch0Test, Telephony_CallManagerServiceStub_006, Function | Me
  * @tc.name     test branch
  * @tc.desc     Function test
  */
-HWTEST_F(SpecialBranch0Test, Telephony_CallManagerServiceStub_007, Function | MediumTest | Level3)
+HWTEST_F(SpecialBranch0Test, Telephony_CallManagerServiceStub_007, TestSize.Level0)
 {
     std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
     ASSERT_TRUE(callManagerService != nullptr);
@@ -638,7 +638,7 @@ HWTEST_F(SpecialBranch0Test, Telephony_CallManagerServiceStub_007, Function | Me
  * @tc.name     test branch
  * @tc.desc     Function test
  */
-HWTEST_F(SpecialBranch0Test, Telephony_CallManagerServiceStub_008, Function | MediumTest | Level3)
+HWTEST_F(SpecialBranch0Test, Telephony_CallManagerServiceStub_008, TestSize.Level0)
 {
     std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
     ASSERT_TRUE(callManagerService != nullptr);
@@ -657,7 +657,7 @@ HWTEST_F(SpecialBranch0Test, Telephony_CallManagerServiceStub_008, Function | Me
  * @tc.name     test branch
  * @tc.desc     Function test
  */
-HWTEST_F(SpecialBranch0Test, Telephony_CallManagerServiceStub_009, Function | MediumTest | Level3)
+HWTEST_F(SpecialBranch0Test, Telephony_CallManagerServiceStub_009, TestSize.Level0)
 {
     std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
     callManagerService->CancelTimer(1);
@@ -669,7 +669,7 @@ HWTEST_F(SpecialBranch0Test, Telephony_CallManagerServiceStub_009, Function | Me
  * @tc.name     test branch
  * @tc.desc     Function test
  */
-HWTEST_F(SpecialBranch0Test, Telephony_CallManagerServiceStub_010, Function | MediumTest | Level3)
+HWTEST_F(SpecialBranch0Test, Telephony_CallManagerServiceStub_010, TestSize.Level0)
 {
     std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
     ASSERT_TRUE(callManagerService != nullptr);
@@ -688,7 +688,7 @@ HWTEST_F(SpecialBranch0Test, Telephony_CallManagerServiceStub_010, Function | Me
  * @tc.name     test branch
  * @tc.desc     Function test
  */
-HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_001, Function | MediumTest | Level3)
+HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_001, TestSize.Level0)
 {
     std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
     callManagerService->OnAddSystemAbility(3009, "");
@@ -701,7 +701,7 @@ HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_001, Function | Medium
  * @tc.name     test branch
  * @tc.desc     Function test
  */
-HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_002, Function | MediumTest | Level3)
+HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_002, TestSize.Level0)
 {
     std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
     callManagerService->UnInit();
@@ -713,7 +713,7 @@ HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_002, Function | Medium
  * @tc.name     test branch
  * @tc.desc     Function test
  */
-HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_003, Function | MediumTest | Level3)
+HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_003, TestSize.Level0)
 {
     std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
     callManagerService->UnInit();
@@ -726,7 +726,7 @@ HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_003, Function | Medium
  * @tc.name     test branch
  * @tc.desc     Function test
  */
-HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_005, Function | MediumTest | Level3)
+HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_005, TestSize.Level0)
 {
     std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
     ASSERT_TRUE(callManagerService != nullptr);
@@ -740,7 +740,7 @@ HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_005, Function | Medium
  * @tc.name     test branch
  * @tc.desc     Function test
  */
-HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_006, Function | MediumTest | Level3)
+HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_006, TestSize.Level0)
 {
     std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
     ASSERT_TRUE(callManagerService != nullptr);
@@ -755,7 +755,7 @@ HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_006, Function | Medium
  * @tc.name     test branch
  * @tc.desc     Function test
  */
-HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_007, Function | MediumTest | Level3)
+HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_007, TestSize.Level0)
 {
     std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
     ASSERT_TRUE(callManagerService != nullptr);
@@ -770,7 +770,7 @@ HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_007, Function | Medium
  * @tc.name     test branch
  * @tc.desc     Function test
  */
-HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_008, Function | MediumTest | Level3)
+HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_008, TestSize.Level0)
 {
     std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
     ASSERT_TRUE(callManagerService != nullptr);
@@ -784,7 +784,7 @@ HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_008, Function | Medium
  * @tc.name     test branch
  * @tc.desc     Function test
  */
-HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_009, Function | MediumTest | Level3)
+HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_009, TestSize.Level0)
 {
     std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
     ASSERT_TRUE(callManagerService != nullptr);
@@ -798,7 +798,7 @@ HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_009, Function | Medium
  * @tc.name     test branch
  * @tc.desc     Function test
  */
-HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_010, Function | MediumTest | Level3)
+HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_010, TestSize.Level0)
 {
     std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
     ASSERT_TRUE(callManagerService != nullptr);
@@ -812,7 +812,7 @@ HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_010, Function | Medium
  * @tc.name     test branch
  * @tc.desc     Function test
  */
-HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_011, Function | MediumTest | Level3)
+HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_011, TestSize.Level0)
 {
     std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
     ASSERT_TRUE(callManagerService != nullptr);
@@ -826,7 +826,7 @@ HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_011, Function | Medium
  * @tc.name     test branch
  * @tc.desc     Function test
  */
-HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_012, Function | MediumTest | Level3)
+HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_012, TestSize.Level0)
 {
     std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
     ASSERT_TRUE(callManagerService != nullptr);
@@ -840,7 +840,7 @@ HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_012, Function | Medium
  * @tc.name     test branch
  * @tc.desc     Function test
  */
-HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_013, Function | MediumTest | Level3)
+HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_013, TestSize.Level0)
 {
     std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
     ASSERT_TRUE(callManagerService != nullptr);
@@ -854,7 +854,7 @@ HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_013, Function | Medium
  * @tc.name     test branch
  * @tc.desc     Function test
  */
-HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_014, Function | MediumTest | Level3)
+HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_014, TestSize.Level0)
 {
     std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
     ASSERT_TRUE(callManagerService != nullptr);
@@ -868,7 +868,7 @@ HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_014, Function | Medium
  * @tc.name     test branch
  * @tc.desc     Function test
  */
-HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_015, Function | MediumTest | Level3)
+HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_015, TestSize.Level0)
 {
     std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
     ASSERT_TRUE(callManagerService != nullptr);
@@ -882,7 +882,7 @@ HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_015, Function | Medium
  * @tc.name     test branch
  * @tc.desc     Function test
  */
-HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_016, Function | MediumTest | Level3)
+HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_016, TestSize.Level0)
 {
     std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
     ASSERT_TRUE(callManagerService != nullptr);
@@ -899,7 +899,7 @@ HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_016, Function | Medium
  * @tc.name     test branch
  * @tc.desc     Function test
  */
-HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_017, Function | MediumTest | Level3)
+HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_017, TestSize.Level0)
 {
     std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
     ASSERT_TRUE(callManagerService != nullptr);
@@ -914,7 +914,7 @@ HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_017, Function | Medium
  * @tc.name     test branch
  * @tc.desc     Function test
  */
-HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_018, Function | MediumTest | Level3)
+HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_018, TestSize.Level0)
 {
     std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
     ASSERT_TRUE(callManagerService != nullptr);
@@ -931,7 +931,7 @@ HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_018, Function | Medium
  * @tc.name     test branch
  * @tc.desc     Function test
  */
-HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_019, Function | MediumTest | Level3)
+HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_019, TestSize.Level0)
 {
     std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
     ASSERT_TRUE(callManagerService != nullptr);
@@ -953,7 +953,7 @@ HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_019, Function | Medium
  * @tc.name     test branch
  * @tc.desc     Function test
  */
-HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_021, Function | MediumTest | Level3)
+HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_021, TestSize.Level0)
 {
     std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
     ASSERT_TRUE(callManagerService != nullptr);
@@ -967,7 +967,7 @@ HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_021, Function | Medium
  * @tc.name     test branch
  * @tc.desc     Function test
  */
-HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_022, Function | MediumTest | Level3)
+HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_022, TestSize.Level0)
 {
     std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
     ASSERT_TRUE(callManagerService != nullptr);
@@ -981,7 +981,7 @@ HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_022, Function | Medium
  * @tc.name     test branch
  * @tc.desc     Function test
  */
-HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_023, Function | MediumTest | Level3)
+HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_023, TestSize.Level0)
 {
     std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
     ASSERT_TRUE(callManagerService != nullptr);
@@ -996,7 +996,7 @@ HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_023, Function | Medium
  * @tc.name     test branch
  * @tc.desc     Function test
  */
-HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_024, Function | MediumTest | Level3)
+HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_024, TestSize.Level0)
 {
     std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
     ASSERT_TRUE(callManagerService != nullptr);
@@ -1011,7 +1011,7 @@ HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_024, Function | Medium
  * @tc.name     test branch
  * @tc.desc     Function test
  */
-HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_025, Function | MediumTest | Level3)
+HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_025, TestSize.Level0)
 {
     std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
     ASSERT_TRUE(callManagerService != nullptr);
@@ -1025,7 +1025,7 @@ HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_025, Function | Medium
  * @tc.name     test branch
  * @tc.desc     Function test
  */
-HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_026, Function | MediumTest | Level3)
+HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_026, TestSize.Level0)
 {
     std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
     ASSERT_TRUE(callManagerService != nullptr);

@@ -190,7 +190,7 @@ public:
  * @tc.name     test error nullptr branch
  * @tc.desc     Function test
  */
-HWTEST_F(ClientErrorBranchTest, Telephony_CallManagerClient_001, Function | MediumTest | Level3)
+HWTEST_F(ClientErrorBranchTest, Telephony_CallManagerClient_001, TestSize.Level0)
 {
     std::shared_ptr<CallManagerClient> client = std::make_shared<CallManagerClient>();
     std::u16string str = u"";
@@ -244,7 +244,7 @@ HWTEST_F(ClientErrorBranchTest, Telephony_CallManagerClient_001, Function | Medi
  * @tc.name     test error nullptr branch
  * @tc.desc     Function test
  */
-HWTEST_F(ClientErrorBranchTest, Telephony_CallManagerClient_002, Function | MediumTest | Level3)
+HWTEST_F(ClientErrorBranchTest, Telephony_CallManagerClient_002, TestSize.Level0)
 {
     std::shared_ptr<CallManagerClient> client = std::make_shared<CallManagerClient>();
     std::u16string str = u"";
@@ -300,7 +300,7 @@ HWTEST_F(ClientErrorBranchTest, Telephony_CallManagerClient_002, Function | Medi
  * @tc.name     test error nullptr branch
  * @tc.desc     Function test
  */
- HWTEST_F(ClientErrorBranchTest, Telephony_CallManagerClient_003, Function | MediumTest | Level3)
+ HWTEST_F(ClientErrorBranchTest, Telephony_CallManagerClient_003, TestSize.Level0)
  {
     std::shared_ptr<CallManagerClient> client = std::make_shared<CallManagerClient>();
     std::string content = "1";
@@ -312,7 +312,7 @@ HWTEST_F(ClientErrorBranchTest, Telephony_CallManagerClient_002, Function | Medi
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(ClientErrorBranchTest, Telephony_BluetoothCallClient_001, Function | MediumTest | Level3)
+HWTEST_F(ClientErrorBranchTest, Telephony_BluetoothCallClient_001, TestSize.Level0)
 {
     bluetoothCallClient.UnInit();
     ASSERT_NE(bluetoothCallClient.RegisterCallBack(nullptr), TELEPHONY_SUCCESS);
@@ -499,7 +499,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_0400, Function | Mediu
  * @tc.desc     Function test
  * @tc.require: I5P2WO
  */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_0500, Function | MediumTest | Level3)
+HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_0500, TestSize.Level0)
 {
     AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {

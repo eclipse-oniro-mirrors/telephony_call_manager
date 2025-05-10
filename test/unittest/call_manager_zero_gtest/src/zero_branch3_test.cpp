@@ -189,7 +189,7 @@ std::shared_ptr<DataShare::DataShareHelper> CreateDataShareHelper(int systemAbil
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroBranch4Test, Telephony_Ott_Conference_001, Function | MediumTest | Level3)
+HWTEST_F(ZeroBranch4Test, Telephony_Ott_Conference_001, TestSize.Level0)
 {
     OttConference ottConference;
     ottConference.state_ = CONFERENCE_STATE_IDLE;
@@ -225,7 +225,7 @@ HWTEST_F(ZeroBranch4Test, Telephony_Ott_Conference_001, Function | MediumTest | 
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroBranch4Test, Telephony_Cs_Conference_001, Function | MediumTest | Level3)
+HWTEST_F(ZeroBranch4Test, Telephony_Cs_Conference_001, TestSize.Level0)
 {
     CsConference csConference;
     csConference.state_ = CONFERENCE_STATE_IDLE;
@@ -261,7 +261,7 @@ HWTEST_F(ZeroBranch4Test, Telephony_Cs_Conference_001, Function | MediumTest | L
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroBranch4Test, Telephony_Ims_Conference_001, Function | MediumTest | Level3)
+HWTEST_F(ZeroBranch4Test, Telephony_Ims_Conference_001, TestSize.Level0)
 {
     ImsConference imsConference;
     imsConference.state_ = CONFERENCE_STATE_IDLE;
@@ -297,7 +297,7 @@ HWTEST_F(ZeroBranch4Test, Telephony_Ims_Conference_001, Function | MediumTest | 
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroBranch4Test, Telephony_BluetoothCallService_001, Function | MediumTest | Level3)
+HWTEST_F(ZeroBranch4Test, Telephony_BluetoothCallService_001, TestSize.Level0)
 {
     BluetoothCallService bluetoothCallService;
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, bluetoothCallService.AnswerCall());
@@ -337,7 +337,7 @@ HWTEST_F(ZeroBranch4Test, Telephony_BluetoothCallService_001, Function | MediumT
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroBranch4Test, Telephony_BluetoothCallService_002, Function | MediumTest | Level3)
+HWTEST_F(ZeroBranch4Test, Telephony_BluetoothCallService_002, TestSize.Level0)
 {
     BluetoothCallService bluetoothCallService;
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, bluetoothCallService.AnswerCall());
@@ -358,7 +358,7 @@ HWTEST_F(ZeroBranch4Test, Telephony_BluetoothCallService_002, Function | MediumT
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroBranch4Test, Telephony_BluetoothCallService_003, Function | MediumTest | Level3)
+HWTEST_F(ZeroBranch4Test, Telephony_BluetoothCallService_003, TestSize.Level0)
 {
     int32_t callId = 10020;
     int32_t numActive = 1;
@@ -391,7 +391,7 @@ HWTEST_F(ZeroBranch4Test, Telephony_BluetoothCallService_003, Function | MediumT
  * @tc.name     test error nullptr branch
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroBranch4Test, Telephony_BluetoothCallStub_001, Function | MediumTest | Level3)
+HWTEST_F(ZeroBranch4Test, Telephony_BluetoothCallStub_001, TestSize.Level0)
 {
     auto bluetoothCallService = std::make_shared<BluetoothCallService>();
     MessageParcel data1;
@@ -435,7 +435,7 @@ HWTEST_F(ZeroBranch4Test, Telephony_BluetoothCallStub_001, Function | MediumTest
  * @tc.name     test error nullptr branch
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroBranch4Test, Telephony_BluetoothConnection_001, Function | MediumTest | Level3)
+HWTEST_F(ZeroBranch4Test, Telephony_BluetoothConnection_001, TestSize.Level0)
 {
     auto bluetoothConnection = std::make_shared<BluetoothConnection>();
     bluetoothConnection->IsAudioActivated();
@@ -467,7 +467,7 @@ std::string GetTestNumber()
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroBranch4Test, Telephony_BluetoothCallPolicy_001, Function | MediumTest | Level3)
+HWTEST_F(ZeroBranch4Test, Telephony_BluetoothCallPolicy_001, TestSize.Level0)
 {
     BluetoothCallPolicy callPolicy;
     DialParaInfo dialParaInfo;
@@ -520,7 +520,7 @@ HWTEST_F(ZeroBranch4Test, Telephony_BluetoothCallPolicy_001, Function | MediumTe
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroBranch4Test, Telephony_BluetoothCallPolicy_002, Function | MediumTest | Level3)
+HWTEST_F(ZeroBranch4Test, Telephony_BluetoothCallPolicy_002, TestSize.Level0)
 {
     BluetoothCallPolicy callPolicy;
     DialParaInfo dialParaInfo;
@@ -558,7 +558,7 @@ HWTEST_F(ZeroBranch4Test, Telephony_BluetoothCallPolicy_002, Function | MediumTe
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroBranch4Test, Telephony_ImsCall_002, Function | MediumTest | Level3)
+HWTEST_F(ZeroBranch4Test, Telephony_ImsCall_002, TestSize.Level0)
 {
     DialParaInfo dialParaInfo;
     IMSCall call { dialParaInfo };
@@ -600,7 +600,7 @@ HWTEST_F(ZeroBranch4Test, Telephony_ImsCall_002, Function | MediumTest | Level3)
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroBranch4Test, Telephony_CSCall_001, Function | MediumTest | Level3)
+HWTEST_F(ZeroBranch4Test, Telephony_CSCall_001, TestSize.Level0)
 {
     DialParaInfo dialParaInfo;
     CSCall call { dialParaInfo };
@@ -626,7 +626,7 @@ HWTEST_F(ZeroBranch4Test, Telephony_CSCall_001, Function | MediumTest | Level3)
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroBranch4Test, Telephony_CallRecordsManager_001, Function | MediumTest | Level3)
+HWTEST_F(ZeroBranch4Test, Telephony_CallRecordsManager_001, TestSize.Level0)
 {
     CallRecordsManager callRecordsManager;
     callRecordsManager.Init();
@@ -676,7 +676,7 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallRecordsManager_001, Function | MediumTes
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroBranch4Test, Telephony_CallControlManager_001, Function | MediumTest | Level3)
+HWTEST_F(ZeroBranch4Test, Telephony_CallControlManager_001, TestSize.Level0)
 {
     std::shared_ptr<CallControlManager> callControlManager = std::make_shared<CallControlManager>();
     int32_t videoState = 0;
@@ -732,7 +732,7 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallControlManager_001, Function | MediumTes
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroBranch4Test, Telephony_CallControlManager_002, Function | MediumTest | Level3)
+HWTEST_F(ZeroBranch4Test, Telephony_CallControlManager_002, TestSize.Level0)
 {
     std::shared_ptr<CallControlManager> callControlManager = std::make_shared<CallControlManager>();
     ASSERT_NE(callControlManager->StartDtmf(INVALID_CALLID, 'a'), TELEPHONY_SUCCESS);
@@ -788,7 +788,7 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallControlManager_002, Function | MediumTes
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroBranch4Test, Telephony_CallControlManager_003, Function | MediumTest | Level3)
+HWTEST_F(ZeroBranch4Test, Telephony_CallControlManager_003, TestSize.Level0)
 {
     std::shared_ptr<CallControlManager> callControlManager = std::make_shared<CallControlManager>();
     callControlManager->UnInit();
@@ -843,7 +843,7 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallControlManager_003, Function | MediumTes
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroBranch4Test, Telephony_CallControlManager_004, Function | MediumTest | Level3)
+HWTEST_F(ZeroBranch4Test, Telephony_CallControlManager_004, TestSize.Level0)
 {
     std::shared_ptr<CallControlManager> callControlManager = std::make_shared<CallControlManager>();
     std::vector<std::u16string> numberList = { u"123", u"124" };
@@ -899,7 +899,7 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallControlManager_004, Function | MediumTes
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroBranch4Test, Telephony_CallControlManager_005, Function | MediumTest | Level3)
+HWTEST_F(ZeroBranch4Test, Telephony_CallControlManager_005, TestSize.Level0)
 {
     std::shared_ptr<CallControlManager> callControlManager = std::make_shared<CallControlManager>();
     std::u16string number = u"";
@@ -1272,7 +1272,7 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallControlManager_012, Function | MediumTes
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_001, Function | MediumTest | Level3)
+HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_001, TestSize.Level0)
 {
     std::shared_ptr<CallStatusManager> callStatusManager = std::make_shared<CallStatusManager>();
     CallDetailInfo info;
@@ -1328,7 +1328,7 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_001, Function | MediumTest
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_002, Function | MediumTest | Level3)
+HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_002, TestSize.Level0)
 {
     std::shared_ptr<CallStatusManager> callStatusManager = std::make_shared<CallStatusManager>();
     CallDetailInfo callDetailInfo;
@@ -1374,7 +1374,7 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_002, Function | MediumTest
     callStatusManager->AutoAnswerForVideoCall(activeCallNum);
 }
 
-HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_003, Function | MediumTest | Level3)
+HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_003, TestSize.Level0)
 {
     std::shared_ptr<CallStatusManager> callStatusManager = std::make_shared<CallStatusManager>();
     // scene-0: null input
@@ -1416,7 +1416,7 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_003, Function | MediumTest
     ASSERT_NO_THROW(callStatusManager->ModifyEsimType());
 }
 
-HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_004, Function | MediumTest | Level3)
+HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_004, TestSize.Level0)
 {
     std::shared_ptr<CallStatusManager> callStatusManager = std::make_shared<CallStatusManager>();
     
@@ -1458,7 +1458,7 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_004, Function | MediumTest
     ASSERT_NO_THROW(callStatusManager->ModifyEsimType());
 }
 
-HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_005, Function | MediumTest | Level3)
+HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_005, TestSize.Level0)
 {
     std::shared_ptr<CallStatusManager> callStatusManager = std::make_shared<CallStatusManager>();
     
@@ -1497,7 +1497,7 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_005, Function | MediumTest
     ASSERT_NO_THROW(callStatusManager->ModifyEsimType());
 }
 
-HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_006, Function | MediumTest | Level3)
+HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_006, TestSize.Level0)
 {
     std::shared_ptr<DataShare::DataShareHelper> dataShareHelper =
             CreateDataShareHelper(TELEPHONY_CALL_MANAGER_SYS_ABILITY_ID);
@@ -1517,7 +1517,7 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_006, Function | MediumTest
     }
 }
 
-HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_007, Function | MediumTest | Level3)
+HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_007, TestSize.Level0)
 {
     std::shared_ptr<CallStatusManager> callStatusManager = std::make_shared<CallStatusManager>();
     CallDetailInfo info;
@@ -1566,7 +1566,7 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_007, Function | MediumTest
     EXPECT_GT(callStatusManager->HandleVoipEventReportInfo(voipCallInfo), TELEPHONY_ERROR);
 }
 
-HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_008, Function | MediumTest | Level3)
+HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_008, TestSize.Level0)
 {
     std::shared_ptr<CallStatusManager> callStatusManager = std::make_shared<CallStatusManager>();
     CallDetailsInfo infos;
@@ -1606,7 +1606,7 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_008, Function | MediumTest
     EXPECT_GT(callStatusManager->HandleVoipCallReportInfo(info), TELEPHONY_ERROR);
 }
 
-HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_009, Function | MediumTest | Level3)
+HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_009, TestSize.Level0)
 {
     std::shared_ptr<CallStatusManager> callStatusManager = std::make_shared<CallStatusManager>();
     CallObjectManager::callObjectPtrList_.clear();
@@ -1656,7 +1656,7 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_009, Function | MediumTest
     EXPECT_NE(callStatusManager->OutgoingVoipCallHandle(info), TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
 
-HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_010, Function | MediumTest | Level3)
+HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_010, TestSize.Level0)
 {
     std::shared_ptr<CallStatusManager> callStatusManager = std::make_shared<CallStatusManager>();
     CallObjectManager::callObjectPtrList_.clear();
@@ -1673,7 +1673,7 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_010, Function | MediumTest
     EXPECT_NE(callStatusManager->DialingHandle(info), TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
 
-HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_011, Function | MediumTest | Level3)
+HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_011, TestSize.Level0)
 {
     std::shared_ptr<CallStatusManager> callStatusManager = std::make_shared<CallStatusManager>();
     callStatusManager->StopCallMotionRecognition(TelCallState::CALL_STATUS_ALERTING);
@@ -1706,7 +1706,7 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_011, Function | MediumTest
     EXPECT_NE(callStatusManager->RefreshCallIfNecessary(call, info), nullptr);
 }
 
-HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_012, Function | MediumTest | Level3)
+HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_012, TestSize.Level0)
 {
     std::shared_ptr<CallStatusManager> callStatusManager = std::make_shared<CallStatusManager>();
     CallDetailInfo info;
@@ -1723,7 +1723,7 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_012, Function | MediumTest
     sleep(WAIT_TIME);
 }
 
-HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_013, Function | MediumTest | Level3)
+HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_013, TestSize.Level0)
 {
     std::shared_ptr<CallStatusManager> callStatusManager = std::make_shared<CallStatusManager>();
     CallDetailInfo info;
@@ -1773,7 +1773,7 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_013, Function | MediumTest
     EXPECT_EQ(call->phoneOrWatch_, static_cast<int32_t>(PhoneOrWatchDial::WATCH_DIAL));
 }
 
-HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_014, Function | MediumTest | Level3)
+HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_014, TestSize.Level0)
 {
     std::shared_ptr<CallStatusManager> manager = std::make_shared<CallStatusManager>();
     CallDetailInfo info;

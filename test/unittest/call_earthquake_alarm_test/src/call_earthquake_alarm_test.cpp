@@ -79,7 +79,7 @@ public:
  * @tc.name     test normal branch
  * @tc.desc     Function test
  */
-HWTEST_F(LocationEngineTest, Telephony_MyLocationEngine_001, Function | MediumTest | Level3)
+HWTEST_F(LocationEngineTest, Telephony_MyLocationEngine_001, TestSize.Level0)
 {
     auto engine = std::make_shared<MyLocationEngine>();
     if (engine == nullptr) {
@@ -112,7 +112,7 @@ HWTEST_F(LocationEngineTest, Telephony_MyLocationEngine_001, Function | MediumTe
  * @tc.name     test normal branch
  * @tc.desc     Function test
  */
-HWTEST_F(LocationEngineTest, Telephony_MyLocationEngine_002, Function | MediumTest | Level3)
+HWTEST_F(LocationEngineTest, Telephony_MyLocationEngine_002, TestSize.Level0)
 {
     auto engine1 = std::make_shared<MyLocationEngine>();
     engine1->mylocator = engine1;
@@ -159,7 +159,7 @@ HWTEST_F(LocationEngineTest, Telephony_MyLocationEngine_002, Function | MediumTe
  * @tc.name     test normal branch
  * @tc.desc     Function test
  */
-HWTEST_F(LocationEngineTest, Telephony_MyLocationEngine_003, Function | MediumTest | Level3)
+HWTEST_F(LocationEngineTest, Telephony_MyLocationEngine_003, TestSize.Level0)
 {
     auto engine1 = std::make_shared<MyLocationEngine>();
     engine1->mylocator = engine1;
@@ -197,7 +197,7 @@ HWTEST_F(LocationEngineTest, Telephony_MyLocationEngine_003, Function | MediumTe
  * @tc.name     test normal branch
  * @tc.desc     Function test
  */
-HWTEST_F(LocationEngineTest, Telephony_EmergencyCallConnectCallback_001, Function | MediumTest | Level3)
+HWTEST_F(LocationEngineTest, Telephony_EmergencyCallConnectCallback_001, TestSize.Level0)
 {
     auto engine1 = std::make_shared<MyLocationEngine>();
     engine1->mylocator = engine1;
@@ -224,7 +224,7 @@ HWTEST_F(LocationEngineTest, Telephony_EmergencyCallConnectCallback_001, Functio
  * @tc.name     test normal branch
  * @tc.desc     Function test
  */
-HWTEST_F(LocationEngineTest, Telephony_LocationSubscriber_001, Function | MediumTest | Level3)
+HWTEST_F(LocationEngineTest, Telephony_LocationSubscriber_001, TestSize.Level0)
 {
     const char* keyword = "switchtest";
     std::string value1 = "true";
@@ -256,7 +256,7 @@ HWTEST_F(LocationEngineTest, Telephony_LocationSubscriber_001, Function | Medium
  * @tc.name     test normal branch
  * @tc.desc     Function test
  */
-HWTEST_F(LocationEngineTest, Telephony_DataShareSwitchState_001, Function | MediumTest | Level3)
+HWTEST_F(LocationEngineTest, Telephony_DataShareSwitchState_001, TestSize.Level0)
 {
     auto datashareHelper = std::make_shared<DataShareSwitchState>();
     OHOS::Uri uriTest(string("datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?")
@@ -284,7 +284,7 @@ HWTEST_F(LocationEngineTest, Telephony_DataShareSwitchState_001, Function | Medi
  * @tc.name     test normal branch
  * @tc.desc     Function test
  */
-HWTEST_F(LocationEngineTest, Telephony_LocationSystemAbilityListener_001, Function | MediumTest | Level3)
+HWTEST_F(LocationEngineTest, Telephony_LocationSystemAbilityListener_001, TestSize.Level0)
 {
     int32_t ability1301 = OHOS::DISTRIBUTED_KV_DATA_SERVICE_ABILITY_ID;
     int32_t ability2802 = OHOS::LOCATION_LOCATOR_SA_ID;

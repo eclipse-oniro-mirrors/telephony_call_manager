@@ -194,7 +194,7 @@ public:
  *              test GetCallTransferInfo() return failed
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_GetCallTransferInfo_0900, Function | MediumTest | Level3)
+HWTEST_F(CallManagerGtest, Telephony_CallManager_GetCallTransferInfo_0900, TestSize.Level0)
 {
     AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
@@ -211,7 +211,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_GetCallTransferInfo_0900, Funct
  * @tc.name     input slotId 0, CallTransferType invalid, test GetCallTransferInfo() return failed
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_GetCallTransferInfo_1000, Function | MediumTest | Level3)
+HWTEST_F(CallManagerGtest, Telephony_CallManager_GetCallTransferInfo_1000, TestSize.Level0)
 {
     AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
@@ -233,7 +233,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_GetCallTransferInfo_1000, Funct
  * @tc.name     test GetCallTransferInfo() without permission
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_GetCallTransferInfo_1100, Function | MediumTest | Level3)
+HWTEST_F(CallManagerGtest, Telephony_CallManager_GetCallTransferInfo_1100, TestSize.Level0)
 {
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
@@ -256,7 +256,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_GetCallTransferInfo_1100, Funct
  *              test SetCallTransferInfo()
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallTransferInfo_0100, Function | MediumTest | Level3)
+HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallTransferInfo_0100, TestSize.Level0)
 {
     AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
@@ -284,7 +284,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallTransferInfo_0100, Funct
  *              test SetCallTransferInfo() return failed
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallTransferInfo_0200, Function | MediumTest | Level3)
+HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallTransferInfo_0200, TestSize.Level0)
 {
     AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
@@ -307,7 +307,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallTransferInfo_0200, Funct
  *              CallTransferType TRANSFER_TYPE_BUSY, test SetCallTransferInfo() return failed
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallTransferInfo_0300, Function | MediumTest | Level3)
+HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallTransferInfo_0300, TestSize.Level0)
 {
     AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
@@ -331,7 +331,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallTransferInfo_0300, Funct
  *              test SetCallTransferInfo() return failed
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallTransferInfo_0400, Function | MediumTest | Level3)
+HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallTransferInfo_0400, TestSize.Level0)
 {
     AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
@@ -361,7 +361,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallTransferInfo_0400, Funct
  *              test SetCallTransferInfo() return failed
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallTransferInfo_0500, Function | MediumTest | Level3)
+HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallTransferInfo_0500, TestSize.Level0)
 {
     AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
@@ -391,7 +391,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallTransferInfo_0500, Funct
  *              too long, test SetCallTransferInfo() return failed
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallTransferInfo_0600, Function | MediumTest | Level3)
+HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallTransferInfo_0600, TestSize.Level0)
 {
     AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
@@ -422,7 +422,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallTransferInfo_0600, Funct
  *              test SetCallTransferInfo()
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallTransferInfo_0700, Function | MediumTest | Level3)
+HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallTransferInfo_0700, TestSize.Level0)
 {
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
@@ -449,7 +449,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallTransferInfo_0700, Funct
  * @tc.name     input slotId 0, test EnableImsSwitch
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_EnableImsSwitch_0100, Function | MediumTest | Level3)
+HWTEST_F(CallManagerGtest, Telephony_CallManager_EnableImsSwitch_0100, TestSize.Level0)
 {
     AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
@@ -469,7 +469,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_EnableImsSwitch_0100, Function 
  * @tc.name     input invalid slotId, test EnableImsSwitch return failed
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_EnableImsSwitch_0200, Function | MediumTest | Level3)
+HWTEST_F(CallManagerGtest, Telephony_CallManager_EnableImsSwitch_0200, TestSize.Level0)
 {
     AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
@@ -484,7 +484,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_EnableImsSwitch_0200, Function 
  * @tc.name     input slotId was out of count, test EnableImsSwitch return failed
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_EnableImsSwitch_0300, Function | MediumTest | Level3)
+HWTEST_F(CallManagerGtest, Telephony_CallManager_EnableImsSwitch_0300, TestSize.Level0)
 {
     AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
@@ -500,7 +500,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_EnableImsSwitch_0300, Function 
  * @tc.name     test EnableImsSwitch without permission
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_EnableImsSwitch_0400, Function | MediumTest | Level3)
+HWTEST_F(CallManagerGtest, Telephony_CallManager_EnableImsSwitch_0400, TestSize.Level0)
 {
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
@@ -520,7 +520,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_EnableImsSwitch_0400, Function 
  * @tc.name     input slotId 0, test DisableImsSwitch
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_DisableImsSwitch_0100, Function | MediumTest | Level3)
+HWTEST_F(CallManagerGtest, Telephony_CallManager_DisableImsSwitch_0100, TestSize.Level0)
 {
     AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
@@ -540,7 +540,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_DisableImsSwitch_0100, Function
  * @tc.name     input invalid slotId, test DisableImsSwitch return failed
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_DisableImsSwitch_0200, Function | MediumTest | Level3)
+HWTEST_F(CallManagerGtest, Telephony_CallManager_DisableImsSwitch_0200, TestSize.Level0)
 {
     AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
@@ -555,7 +555,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_DisableImsSwitch_0200, Function
  * @tc.name     input slotId was out of count, test DisableImsSwitch return failed
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_DisableImsSwitch_0300, Function | MediumTest | Level3)
+HWTEST_F(CallManagerGtest, Telephony_CallManager_DisableImsSwitch_0300, TestSize.Level0)
 {
     AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
@@ -572,7 +572,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_DisableImsSwitch_0300, Function
  * @tc.name     input slotId 0, test IsImsSwitchEnabled
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_IsImsSwitchEnabled_0100, Function | MediumTest | Level3)
+HWTEST_F(CallManagerGtest, Telephony_CallManager_IsImsSwitchEnabled_0100, TestSize.Level0)
 {
     AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
@@ -593,7 +593,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_IsImsSwitchEnabled_0100, Functi
  * @tc.name     input invalid slotId, test IsImsSwitchEnabled return failed
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_IsImsSwitchEnabled_0200, Function | MediumTest | Level3)
+HWTEST_F(CallManagerGtest, Telephony_CallManager_IsImsSwitchEnabled_0200, TestSize.Level0)
 {
     AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
@@ -609,7 +609,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_IsImsSwitchEnabled_0200, Functi
  * @tc.name     input slotId was out of count, test IsImsSwitchEnabled return failed
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_IsImsSwitchEnabled_0300, Function | MediumTest | Level3)
+HWTEST_F(CallManagerGtest, Telephony_CallManager_IsImsSwitchEnabled_0300, TestSize.Level0)
 {
     AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
@@ -627,7 +627,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_IsImsSwitchEnabled_0300, Functi
  * @tc.name     input slotId 0, VoNRstate ON(0) test SetVoNRState
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_SetVoNRState_0100, Function | MediumTest | Level3)
+HWTEST_F(CallManagerGtest, Telephony_CallManager_SetVoNRState_0100, TestSize.Level0)
 {
     AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
@@ -647,7 +647,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetVoNRState_0100, Function | M
  * @tc.name     input slotId 0, VoNRstate OFF(1) test SetVoNRState
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_SetVoNRState_0200, Function | MediumTest | Level3)
+HWTEST_F(CallManagerGtest, Telephony_CallManager_SetVoNRState_0200, TestSize.Level0)
 {
     AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
@@ -667,7 +667,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetVoNRState_0200, Function | M
  * @tc.name     input invalid slotId, test SetVoNRState return failed
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_SetVoNRState_0300, Function | MediumTest | Level3)
+HWTEST_F(CallManagerGtest, Telephony_CallManager_SetVoNRState_0300, TestSize.Level0)
 {
     AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
@@ -682,7 +682,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetVoNRState_0300, Function | M
  * @tc.name     input slotId was out of count, test SetVoNRState return failed
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_SetVoNRState_0400, Function | MediumTest | Level3)
+HWTEST_F(CallManagerGtest, Telephony_CallManager_SetVoNRState_0400, TestSize.Level0)
 {
     AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
@@ -698,7 +698,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetVoNRState_0400, Function | M
  * @tc.name     input invalid state, test SetVoNRState return failed
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_SetVoNRState_0500, Function | MediumTest | Level3)
+HWTEST_F(CallManagerGtest, Telephony_CallManager_SetVoNRState_0500, TestSize.Level0)
 {
     AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
@@ -718,7 +718,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetVoNRState_0500, Function | M
  * @tc.name     test SetVoNRState without permission
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_SetVoNRState_0600, Function | MediumTest | Level3)
+HWTEST_F(CallManagerGtest, Telephony_CallManager_SetVoNRState_0600, TestSize.Level0)
 {
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
@@ -738,7 +738,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetVoNRState_0600, Function | M
  * @tc.name     input slotId 0, test GetVoNRState
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_GetVoNRState_0100, Function | MediumTest | Level3)
+HWTEST_F(CallManagerGtest, Telephony_CallManager_GetVoNRState_0100, TestSize.Level0)
 {
     AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
@@ -759,7 +759,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_GetVoNRState_0100, Function | M
  * @tc.name     input invalid slotId, test GetVoNRState return failed
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_GetVoNRState_0200, Function | MediumTest | Level3)
+HWTEST_F(CallManagerGtest, Telephony_CallManager_GetVoNRState_0200, TestSize.Level0)
 {
     AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
@@ -775,7 +775,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_GetVoNRState_0200, Function | M
  * @tc.name     input slotId was out of count, test GetVoNRState return failed
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_GetVoNRState_0300, Function | MediumTest | Level3)
+HWTEST_F(CallManagerGtest, Telephony_CallManager_GetVoNRState_0300, TestSize.Level0)
 {
     AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
@@ -792,7 +792,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_GetVoNRState_0300, Function | M
  * @tc.name     test GetVoNRState without permission
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_GetVoNRState_0400, Function | MediumTest | Level3)
+HWTEST_F(CallManagerGtest, Telephony_CallManager_GetVoNRState_0400, TestSize.Level0)
 {
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;

@@ -147,7 +147,7 @@ void SpecialBranch2Test::TearDown()
  * @tc.name     test branch
  * @tc.desc     Function test
  */
-HWTEST_F(SpecialBranch2Test, Telephony_CSCall_001, Function | MediumTest | Level3)
+HWTEST_F(SpecialBranch2Test, Telephony_CSCall_001, TestSize.Level0)
 {
     DialParaInfo info;
     auto csCall = std::make_shared<CSCall>(info);
@@ -163,7 +163,7 @@ HWTEST_F(SpecialBranch2Test, Telephony_CSCall_001, Function | MediumTest | Level
  * @tc.name     test branch
  * @tc.desc     Function test
  */
-HWTEST_F(SpecialBranch2Test, Telephony_CallStateListener_001, Function | MediumTest | Level3)
+HWTEST_F(SpecialBranch2Test, Telephony_CallStateListener_001, TestSize.Level0)
 {
     auto callStateListener = std::make_shared<CallStateListener>();
     CallAttributeInfo info = {};
@@ -178,7 +178,7 @@ HWTEST_F(SpecialBranch2Test, Telephony_CallStateListener_001, Function | MediumT
  * @tc.name     test branch
  * @tc.desc     Function test
  */
-HWTEST_F(SpecialBranch2Test, Telephony_CallControlManager_001, Function | MediumTest | Level3)
+HWTEST_F(SpecialBranch2Test, Telephony_CallControlManager_001, TestSize.Level0)
 {
     auto callControlManager = std::make_shared<CallControlManager>();
     ASSERT_TRUE(callControlManager != nullptr);
@@ -196,7 +196,7 @@ HWTEST_F(SpecialBranch2Test, Telephony_CallControlManager_001, Function | Medium
  * @tc.name     test branch
  * @tc.desc     Function test
  */
-HWTEST_F(SpecialBranch2Test, Telephony_CellularCallConnection_001, Function | MediumTest | Level3)
+HWTEST_F(SpecialBranch2Test, Telephony_CellularCallConnection_001, TestSize.Level0)
 {
     auto cellularCallConnection = std::make_shared<CellularCallConnection>();
     ASSERT_TRUE(cellularCallConnection != nullptr);
@@ -239,7 +239,7 @@ HWTEST_F(SpecialBranch2Test, Telephony_CellularCallConnection_001, Function | Me
  * @tc.name     test branch
  * @tc.desc     Function test
  */
-HWTEST_F(SpecialBranch2Test, Telephony_CellularCallConnection_002, Function | MediumTest | Level3)
+HWTEST_F(SpecialBranch2Test, Telephony_CellularCallConnection_002, TestSize.Level0)
 {
     auto cellularCallConnection = std::make_shared<CellularCallConnection>();
     ASSERT_TRUE(cellularCallConnection != nullptr);
@@ -278,7 +278,7 @@ HWTEST_F(SpecialBranch2Test, Telephony_CellularCallConnection_002, Function | Me
  * @tc.name     test branch
  * @tc.desc     Function test
  */
-HWTEST_F(SpecialBranch2Test, Telephony_CellularCallConnection_003, Function | MediumTest | Level3)
+HWTEST_F(SpecialBranch2Test, Telephony_CellularCallConnection_003, TestSize.Level0)
 {
     auto cellularCallConnection = std::make_shared<CellularCallConnection>();
     ASSERT_TRUE(cellularCallConnection != nullptr);
@@ -293,7 +293,7 @@ HWTEST_F(SpecialBranch2Test, Telephony_CellularCallConnection_003, Function | Me
  * @tc.name     test branch
  * @tc.desc     Function test
  */
-HWTEST_F(SpecialBranch2Test, Telephony_MyLocationEngine_001, Function | MediumTest | Level3)
+HWTEST_F(SpecialBranch2Test, Telephony_MyLocationEngine_001, TestSize.Level0)
 {
     auto myLocationEngine = std::make_shared<MyLocationEngine>();
     myLocationEngine->mylocator = nullptr;
@@ -305,7 +305,7 @@ HWTEST_F(SpecialBranch2Test, Telephony_MyLocationEngine_001, Function | MediumTe
  * @tc.name     test branch
  * @tc.desc     Function test
  */
-HWTEST_F(SpecialBranch2Test, Telephony_MyLocationEngine_002, Function | MediumTest | Level3)
+HWTEST_F(SpecialBranch2Test, Telephony_MyLocationEngine_002, TestSize.Level0)
 {
     auto myLocationEngine = std::make_shared<MyLocationEngine>();
     myLocationEngine->mylocator = nullptr;
@@ -318,7 +318,7 @@ HWTEST_F(SpecialBranch2Test, Telephony_MyLocationEngine_002, Function | MediumTe
  * @tc.name     test branch
  * @tc.desc     Function test
  */
-HWTEST_F(SpecialBranch2Test, Telephony_MyLocationEngine_003, Function | MediumTest | Level3)
+HWTEST_F(SpecialBranch2Test, Telephony_MyLocationEngine_003, TestSize.Level0)
 {
     auto myLocationEngine = std::make_shared<MyLocationEngine>();
     myLocationEngine->mylocator = nullptr;
@@ -331,7 +331,7 @@ HWTEST_F(SpecialBranch2Test, Telephony_MyLocationEngine_003, Function | MediumTe
  * @tc.name     test branch
  * @tc.desc     Function test
  */
-HWTEST_F(SpecialBranch2Test, Telephony_MyLocationEngine_004, Function | MediumTest | Level3)
+HWTEST_F(SpecialBranch2Test, Telephony_MyLocationEngine_004, TestSize.Level0)
 {
     auto myLocationEngine = std::make_shared<MyLocationEngine>();
     myLocationEngine->mylocator = nullptr;
@@ -344,7 +344,7 @@ HWTEST_F(SpecialBranch2Test, Telephony_MyLocationEngine_004, Function | MediumTe
  * @tc.name     test branch
  * @tc.desc     Function test
  */
-HWTEST_F(SpecialBranch2Test, Telephony_MyLocationEngine_005, Function | MediumTest | Level3)
+HWTEST_F(SpecialBranch2Test, Telephony_MyLocationEngine_005, TestSize.Level0)
 {
     auto oOBESwitchObserver = std::make_shared<OOBESwitchObserver>("");
     oOBESwitchObserver->OnChange();
@@ -356,7 +356,7 @@ HWTEST_F(SpecialBranch2Test, Telephony_MyLocationEngine_005, Function | MediumTe
  * @tc.name     test branch
  * @tc.desc     Function test
  */
-HWTEST_F(SpecialBranch2Test, Telephony_MyLocationEngine_006, Function | MediumTest | Level3)
+HWTEST_F(SpecialBranch2Test, Telephony_MyLocationEngine_006, TestSize.Level0)
 {
     auto myLocationEngine = std::make_shared<MyLocationEngine>();
     EmergencyCallConnectCallback::isStartEccService = true;
@@ -373,7 +373,7 @@ HWTEST_F(SpecialBranch2Test, Telephony_MyLocationEngine_006, Function | MediumTe
  * @tc.name     test branch
  * @tc.desc     Function test
  */
-HWTEST_F(SpecialBranch2Test, Telephony_NetCallBase_001, Function | MediumTest | Level3)
+HWTEST_F(SpecialBranch2Test, Telephony_NetCallBase_001, TestSize.Level0)
 {
     DialParaInfo paraInfo;
     sptr<NetCallBase> netCallBase = (std::make_unique<OTTCall>(paraInfo)).release();
@@ -392,7 +392,7 @@ HWTEST_F(SpecialBranch2Test, Telephony_NetCallBase_001, Function | MediumTest | 
  * @tc.name     test branch
  * @tc.desc     Function test
  */
-HWTEST_F(SpecialBranch2Test, Telephony_CallRequestProcess_002, Function | MediumTest | Level3)
+HWTEST_F(SpecialBranch2Test, Telephony_CallRequestProcess_002, TestSize.Level0)
 {
     std::shared_ptr<CallRequestProcess> callRequestProcess = std::make_shared<CallRequestProcess>();
     ASSERT_TRUE(callRequestProcess != nullptr);
@@ -406,7 +406,7 @@ HWTEST_F(SpecialBranch2Test, Telephony_CallRequestProcess_002, Function | Medium
  * @tc.name     test branch
  * @tc.desc     Function test
  */
-HWTEST_F(SpecialBranch2Test, Telephony_CallRequestProcess_003, Function | MediumTest | Level3)
+HWTEST_F(SpecialBranch2Test, Telephony_CallRequestProcess_003, TestSize.Level0)
 {
     std::shared_ptr<CallRequestProcess> callRequestProcess = std::make_shared<CallRequestProcess>();
     ASSERT_TRUE(callRequestProcess != nullptr);
@@ -432,7 +432,7 @@ HWTEST_F(SpecialBranch2Test, Telephony_CallRequestProcess_003, Function | Medium
  * @tc.name     test branch
  * @tc.desc     Function test
  */
-HWTEST_F(SpecialBranch2Test, Telephony_CallRequestProcess_004, Function | MediumTest | Level3)
+HWTEST_F(SpecialBranch2Test, Telephony_CallRequestProcess_004, TestSize.Level0)
 {
     std::shared_ptr<CallRequestProcess> callRequestProcess = std::make_shared<CallRequestProcess>();
     ASSERT_TRUE(callRequestProcess != nullptr);
@@ -458,7 +458,7 @@ HWTEST_F(SpecialBranch2Test, Telephony_CallRequestProcess_004, Function | Medium
  * @tc.name     test branch
  * @tc.desc     Function test
  */
-HWTEST_F(SpecialBranch2Test, Telephony_CallRequestProcess_005, Function | MediumTest | Level3)
+HWTEST_F(SpecialBranch2Test, Telephony_CallRequestProcess_005, TestSize.Level0)
 {
     std::shared_ptr<CallRequestProcess> callRequestProcess = std::make_shared<CallRequestProcess>();
     ASSERT_TRUE(callRequestProcess != nullptr);
@@ -507,7 +507,7 @@ HWTEST_F(SpecialBranch2Test, Telephony_CallRequestProcess_005, Function | Medium
  * @tc.name     test branch
  * @tc.desc     Function test
  */
-HWTEST_F(SpecialBranch2Test, Telephony_CallRequestProcess_006, Function | MediumTest | Level3)
+HWTEST_F(SpecialBranch2Test, Telephony_CallRequestProcess_006, TestSize.Level0)
 {
     std::shared_ptr<CallRequestProcess> callRequestProcess = std::make_shared<CallRequestProcess>();
     ASSERT_TRUE(callRequestProcess != nullptr);
@@ -525,7 +525,7 @@ HWTEST_F(SpecialBranch2Test, Telephony_CallRequestProcess_006, Function | Medium
  * @tc.name     test branch
  * @tc.desc     Function test
  */
-HWTEST_F(SpecialBranch2Test, Telephony_VideoReceiveState_001, Function | MediumTest | Level3)
+HWTEST_F(SpecialBranch2Test, Telephony_VideoReceiveState_001, TestSize.Level0)
 {
     DialParaInfo paraInfo;
     sptr<NetCallBase> netCallBase = (std::make_unique<OTTCall>(paraInfo)).release();

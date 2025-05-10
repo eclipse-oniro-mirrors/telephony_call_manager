@@ -76,7 +76,7 @@ void CallStateTest::TearDown() {}
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(CallStateTest, Telephony_CSCallState_001, Function | MediumTest | Level3)
+HWTEST_F(CallStateTest, Telephony_CSCallState_001, TestSize.Level0)
 {
     auto csCallState = std::make_shared<CSCallState>();
     csCallState->ProcessEvent(AudioEvent::NO_MORE_ACTIVE_CALL);
@@ -90,7 +90,7 @@ HWTEST_F(CallStateTest, Telephony_CSCallState_001, Function | MediumTest | Level
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(CallStateTest, Telephony_IMSCallState_001, Function | MediumTest | Level3)
+HWTEST_F(CallStateTest, Telephony_IMSCallState_001, TestSize.Level0)
 {
     auto imsCallState = std::make_shared<IMSCallState>();
     imsCallState->ProcessEvent(AudioEvent::NO_MORE_ACTIVE_CALL);
@@ -104,7 +104,7 @@ HWTEST_F(CallStateTest, Telephony_IMSCallState_001, Function | MediumTest | Leve
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(CallStateTest, Telephony_OTTCallState_001, Function | MediumTest | Level3)
+HWTEST_F(CallStateTest, Telephony_OTTCallState_001, TestSize.Level0)
 {
     auto ottCallState = std::make_shared<OTTCallState>();
     ASSERT_FALSE(ottCallState->ProcessEvent(AudioEvent::UNKNOWN_EVENT));
@@ -115,7 +115,7 @@ HWTEST_F(CallStateTest, Telephony_OTTCallState_001, Function | MediumTest | Leve
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(CallStateTest, Telephony_HoldingState_001, Function | MediumTest | Level3)
+HWTEST_F(CallStateTest, Telephony_HoldingState_001, TestSize.Level0)
 {
     auto holdingState = std::make_shared<HoldingState>();
     holdingState->ProcessEvent(AudioEvent::NEW_ACTIVE_CS_CALL);
@@ -129,7 +129,7 @@ HWTEST_F(CallStateTest, Telephony_HoldingState_001, Function | MediumTest | Leve
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(CallStateTest, Telephony_AlertingState_001, Function | MediumTest | Level3)
+HWTEST_F(CallStateTest, Telephony_AlertingState_001, TestSize.Level0)
 {
     auto alertingState = std::make_shared<AlertingState>();
     alertingState->ProcessEvent(AudioEvent::NO_MORE_ALERTING_CALL);
@@ -143,7 +143,7 @@ HWTEST_F(CallStateTest, Telephony_AlertingState_001, Function | MediumTest | Lev
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(CallStateTest, Telephony_IncomingState_001, Function | MediumTest | Level3)
+HWTEST_F(CallStateTest, Telephony_IncomingState_001, TestSize.Level0)
 {
     auto incomingState = std::make_shared<IncomingState>();
     incomingState->ProcessEvent(AudioEvent::NO_MORE_INCOMING_CALL);
@@ -157,7 +157,7 @@ HWTEST_F(CallStateTest, Telephony_IncomingState_001, Function | MediumTest | Lev
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(CallStateTest, Telephony_InActiveState_001, Function | MediumTest | Level3)
+HWTEST_F(CallStateTest, Telephony_InActiveState_001, TestSize.Level0)
 {
     auto inActiveState = std::make_shared<InActiveState>();
     inActiveState->ProcessEvent(AudioEvent::NEW_DIALING_CALL);
@@ -173,7 +173,7 @@ HWTEST_F(CallStateTest, Telephony_InActiveState_001, Function | MediumTest | Lev
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(CallStateTest, Telephony_DialingState_001, Function | MediumTest | Level3)
+HWTEST_F(CallStateTest, Telephony_DialingState_001, TestSize.Level0)
 {
     auto dialingState = std::make_shared<DialingState>();
     dialingState->ProcessEvent(AudioEvent::NO_MORE_DIALING_CALL);
@@ -188,7 +188,7 @@ HWTEST_F(CallStateTest, Telephony_DialingState_001, Function | MediumTest | Leve
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(CallStateTest, Telephony_WiredHeadsetDeviceState_001, Function | MediumTest | Level3)
+HWTEST_F(CallStateTest, Telephony_WiredHeadsetDeviceState_001, TestSize.Level0)
 {
     auto wiredHeadsetDeviceState = std::make_shared<WiredHeadsetDeviceState>();
     wiredHeadsetDeviceState->ProcessEvent(AudioEvent::WIRED_HEADSET_DISCONNECTED);
@@ -201,7 +201,7 @@ HWTEST_F(CallStateTest, Telephony_WiredHeadsetDeviceState_001, Function | Medium
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(CallStateTest, Telephony_BluetoothDeviceState_001, Function | MediumTest | Level3)
+HWTEST_F(CallStateTest, Telephony_BluetoothDeviceState_001, TestSize.Level0)
 {
     auto bluetoothDeviceState = std::make_shared<BluetoothDeviceState>();
     bluetoothDeviceState->ProcessEvent(AudioEvent::BLUETOOTH_SCO_CONNECTED);
@@ -217,7 +217,7 @@ HWTEST_F(CallStateTest, Telephony_BluetoothDeviceState_001, Function | MediumTes
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(CallStateTest, Telephony_EarpieceDeviceState_001, Function | MediumTest | Level3)
+HWTEST_F(CallStateTest, Telephony_EarpieceDeviceState_001, TestSize.Level0)
 {
     auto earpieceDeviceState = std::make_shared<EarpieceDeviceState>();
     earpieceDeviceState->ProcessEvent(AudioEvent::WIRED_HEADSET_CONNECTED);
@@ -230,7 +230,7 @@ HWTEST_F(CallStateTest, Telephony_EarpieceDeviceState_001, Function | MediumTest
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(CallStateTest, Telephony_SpeakerDeviceState_001, Function | MediumTest | Level3)
+HWTEST_F(CallStateTest, Telephony_SpeakerDeviceState_001, TestSize.Level0)
 {
     auto speakerDeviceState = std::make_shared<SpeakerDeviceState>();
     speakerDeviceState->ProcessEvent(AudioEvent::WIRED_HEADSET_CONNECTED);
@@ -244,7 +244,7 @@ HWTEST_F(CallStateTest, Telephony_SpeakerDeviceState_001, Function | MediumTest 
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(CallStateTest, Telephony_InactiveDeviceState_001, Function | MediumTest | Level3)
+HWTEST_F(CallStateTest, Telephony_InactiveDeviceState_001, TestSize.Level0)
 {
     auto inactiveDeviceState = std::make_shared<InactiveDeviceState>();
     inactiveDeviceState->ProcessEvent(AudioEvent::AUDIO_ACTIVATED);
@@ -258,7 +258,7 @@ HWTEST_F(CallStateTest, Telephony_InactiveDeviceState_001, Function | MediumTest
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(CallStateTest, Telephony_AudioProxy_001, Function | MediumTest | Level3)
+HWTEST_F(CallStateTest, Telephony_AudioProxy_001, TestSize.Level0)
 {
     auto audioProxy = std::make_shared<AudioProxy>();
     audioProxy->SetAudioDeviceChangeCallback();
@@ -302,7 +302,7 @@ HWTEST_F(CallStateTest, Telephony_AudioProxy_001, Function | MediumTest | Level3
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(CallStateTest, Telephony_AudioProxy_002, Function | MediumTest | Level3)
+HWTEST_F(CallStateTest, Telephony_AudioProxy_002, TestSize.Level0)
 {
     auto audioProxy = std::make_shared<AudioProxy>();
     audioProxy->GetRingerMode();
@@ -319,7 +319,7 @@ HWTEST_F(CallStateTest, Telephony_AudioProxy_002, Function | MediumTest | Level3
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(CallStateTest, Telephony_AudioDeviceManager_001, Function | MediumTest | Level3)
+HWTEST_F(CallStateTest, Telephony_AudioDeviceManager_001, TestSize.Level0)
 {
     auto audioDeviceManager = DelayedSingleton<AudioDeviceManager>::GetInstance();
     audioDeviceManager->AddAudioDeviceList(NAME, AudioDeviceType::DEVICE_SPEAKER, NAME);
@@ -349,7 +349,7 @@ HWTEST_F(CallStateTest, Telephony_AudioDeviceManager_001, Function | MediumTest 
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(CallStateTest, Telephony_AudioDeviceManager_002, Function | MediumTest | Level3)
+HWTEST_F(CallStateTest, Telephony_AudioDeviceManager_002, TestSize.Level0)
 {
     auto audioDeviceManager = DelayedSingleton<AudioDeviceManager>::GetInstance();
     audioDeviceManager->AddAudioDeviceList(NAME, AudioDeviceType::DEVICE_SPEAKER, NAME);
@@ -379,7 +379,7 @@ HWTEST_F(CallStateTest, Telephony_AudioDeviceManager_002, Function | MediumTest 
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(CallStateTest, Telephony_AudioPlayer_001, Function | MediumTest | Level3)
+HWTEST_F(CallStateTest, Telephony_AudioPlayer_001, TestSize.Level0)
 {
     auto audioPlayer = DelayedSingleton<AudioPlayer>::GetInstance();
     std::string profilePath = "";
@@ -396,7 +396,7 @@ HWTEST_F(CallStateTest, Telephony_AudioPlayer_001, Function | MediumTest | Level
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(CallStateTest, Telephony_AudioSceneProcessor_001, Function | MediumTest | Level3)
+HWTEST_F(CallStateTest, Telephony_AudioSceneProcessor_001, TestSize.Level0)
 {
     auto audioSceneProcessor = DelayedSingleton<AudioSceneProcessor>::GetInstance();
     audioSceneProcessor->SwitchState(CallStateType::DIALING_STATE);
@@ -415,7 +415,7 @@ HWTEST_F(CallStateTest, Telephony_AudioSceneProcessor_001, Function | MediumTest
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(CallStateTest, Telephony_Ring_001, Function | MediumTest | Level3)
+HWTEST_F(CallStateTest, Telephony_Ring_001, TestSize.Level0)
 {
     auto ring = std::make_shared<Ring>();
     ring->Play(DEFAULT_SLOT_ID, "", Media::HapticStartupMode::DEFAULT);
@@ -432,7 +432,7 @@ HWTEST_F(CallStateTest, Telephony_Ring_001, Function | MediumTest | Level3)
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(CallStateTest, Telephony_Tone_001, Function | MediumTest | Level3)
+HWTEST_F(CallStateTest, Telephony_Tone_001, TestSize.Level0)
 {
     auto unknownTone = std::make_shared<Tone>(ToneDescriptor::TONE_UNKNOWN);
     unknownTone->Init();
@@ -468,7 +468,7 @@ HWTEST_F(CallStateTest, Telephony_Tone_001, Function | MediumTest | Level3)
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(CallStateTest, Telephony_Tone_002, Function | MediumTest | Level3)
+HWTEST_F(CallStateTest, Telephony_Tone_002, TestSize.Level0)
 {
     ASSERT_EQ(Tone::ConvertDigitToTone('0'), ToneDescriptor::TONE_DTMF_CHAR_0);
     ASSERT_EQ(Tone::ConvertDigitToTone('1'), ToneDescriptor::TONE_DTMF_CHAR_1);
@@ -490,7 +490,7 @@ HWTEST_F(CallStateTest, Telephony_Tone_002, Function | MediumTest | Level3)
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(CallStateTest, Telephony_Tone_003, Function | MediumTest | Level3)
+HWTEST_F(CallStateTest, Telephony_Tone_003, TestSize.Level0)
 {
     auto tone = std::make_shared<Tone>();
     ASSERT_EQ(tone->ConvertToneDescriptorToToneType(ToneDescriptor::TONE_DTMF_CHAR_0),
@@ -529,7 +529,7 @@ HWTEST_F(CallStateTest, Telephony_Tone_003, Function | MediumTest | Level3)
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(CallStateTest, Telephony_Tone_004, Function | MediumTest | Level3)
+HWTEST_F(CallStateTest, Telephony_Tone_004, TestSize.Level0)
 {
     auto tone = std::make_shared<Tone>();
     ASSERT_EQ(tone->GetStreamUsageByToneType(ToneDescriptor::TONE_DTMF_CHAR_0),
@@ -566,7 +566,7 @@ HWTEST_F(CallStateTest, Telephony_Tone_004, Function | MediumTest | Level3)
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(CallStateTest, Telephony_CallStatusCallbackProxy_001, Function | MediumTest | Level3)
+HWTEST_F(CallStateTest, Telephony_CallStatusCallbackProxy_001, TestSize.Level0)
 {
     auto callStatusCallbackProxy = std::make_shared<CallStatusCallbackProxy>(nullptr);
     CallReportInfo callReportInfo;
@@ -618,7 +618,7 @@ HWTEST_F(CallStateTest, Telephony_CallStatusCallbackProxy_001, Function | Medium
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(CallStateTest, Telephony_CallStatusCallbackProxy_002, Function | MediumTest | Level3)
+HWTEST_F(CallStateTest, Telephony_CallStatusCallbackProxy_002, TestSize.Level0)
 {
     sptr<ISystemAbilityManager> systemAbilityMgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (systemAbilityMgr == nullptr) {
@@ -659,7 +659,7 @@ HWTEST_F(CallStateTest, Telephony_CallStatusCallbackProxy_002, Function | Medium
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(CallStateTest, Telephony_CallStatusCallbackProxy_003, Function | MediumTest | Level3)
+HWTEST_F(CallStateTest, Telephony_CallStatusCallbackProxy_003, TestSize.Level0)
 {
     sptr<ISystemAbilityManager> systemAbilityMgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (systemAbilityMgr == nullptr) {
@@ -713,7 +713,7 @@ HWTEST_F(CallStateTest, Telephony_CallStatusCallbackProxy_003, Function | Medium
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(CallStateTest, Telephony_CallRequestProcess_002, Function | MediumTest | Level3)
+HWTEST_F(CallStateTest, Telephony_CallRequestProcess_002, TestSize.Level0)
 {
     std::unique_ptr<CallRequestProcess> callRequestProcess = std::make_unique<CallRequestProcess>();
     DialParaInfo mDialParaInfo;
@@ -768,7 +768,7 @@ HWTEST_F(CallStateTest, Telephony_CallRequestProcess_002, Function | MediumTest 
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(CallStateTest, Telephony_CallRequestProcess_003, Function | MediumTest | Level3)
+HWTEST_F(CallStateTest, Telephony_CallRequestProcess_003, TestSize.Level0)
 {
     int32_t defaultCallId = 1;
     std::unique_ptr<CallRequestProcess> callRequestProcess = std::make_unique<CallRequestProcess>();
@@ -804,7 +804,7 @@ HWTEST_F(CallStateTest, Telephony_CallRequestProcess_003, Function | MediumTest 
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(CallStateTest, Telephony_CallRequestProcess_004, Function | MediumTest | Level3)
+HWTEST_F(CallStateTest, Telephony_CallRequestProcess_004, TestSize.Level0)
 {
     int32_t defaultCallId = 1;
     std::unique_ptr<CallRequestProcess> callRequestProcess = std::make_unique<CallRequestProcess>();
@@ -833,7 +833,7 @@ HWTEST_F(CallStateTest, Telephony_CallRequestProcess_004, Function | MediumTest 
  * @tc.name     test error nullptr branch with permission
  * @tc.desc     Function test
  */
-HWTEST_F(CallStateTest, Telephony_VoipCallConnection_001, Function | MediumTest | Level3)
+HWTEST_F(CallStateTest, Telephony_VoipCallConnection_001, TestSize.Level0)
 {
     std::shared_ptr<VoipCallConnection> voipCallConnection = std::make_shared<VoipCallConnection>();
     int32_t systemAbilityId = 1;
@@ -856,7 +856,7 @@ HWTEST_F(CallStateTest, Telephony_VoipCallConnection_001, Function | MediumTest 
  * @tc.name     test error nullptr branch with permission
  * @tc.desc     Function test
  */
-HWTEST_F(CallStateTest, Telephony_CallStateProcessor_001, Function | MediumTest | Level3)
+HWTEST_F(CallStateTest, Telephony_CallStateProcessor_001, TestSize.Level0)
 {
     auto callStateProcessor = DelayedSingleton<CallStateProcessor>::GetInstance();
     TelCallState state = TelCallState::CALL_STATUS_ACTIVE;
@@ -875,7 +875,7 @@ HWTEST_F(CallStateTest, Telephony_CallStateProcessor_001, Function | MediumTest 
  * @tc.name     test error nullptr branch with permission
  * @tc.desc     Function test
  */
-HWTEST_F(CallStateTest, Telephony_CoreServiceConnection_001, Function | MediumTest | Level3)
+HWTEST_F(CallStateTest, Telephony_CoreServiceConnection_001, TestSize.Level0)
 {
     CoreServiceConnection coreServiceConnection;
     coreServiceConnection.GetFdnNumberList(DEFAULT_SLOT_ID);

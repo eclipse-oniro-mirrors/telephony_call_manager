@@ -479,7 +479,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetMuted_0300, Function | Mediu
  * @tc.name     test register callback
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_RegisterCallBack_0100, Function | MediumTest | Level3)
+HWTEST_F(CallManagerGtest, Telephony_CallManager_RegisterCallBack_0100, TestSize.Level0)
 {
     AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
@@ -499,7 +499,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_RegisterCallBack_0100, Function
  * @tc.name     test register callback
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_UnRegisterCallBack_0100, Function | MediumTest | Level3)
+HWTEST_F(CallManagerGtest, Telephony_CallManager_UnRegisterCallBack_0100, TestSize.Level0)
 {
     AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
@@ -515,7 +515,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_UnRegisterCallBack_0100, Functi
  * @tc.name     test set call preference mode cs voice only
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallPreferenceMode_0100, Function | MediumTest | Level3)
+HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallPreferenceMode_0100, TestSize.Level0)
 {
     AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
@@ -536,7 +536,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallPreferenceMode_0100, Fun
  * @tc.name     test set call preference mode with error mode
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallPreferenceMode_0200, Function | MediumTest | Level3)
+HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallPreferenceMode_0200, TestSize.Level0)
 {
     AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
@@ -557,7 +557,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallPreferenceMode_0200, Fun
  * @tc.name     test set call preference mode with cs voice prefered
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallPreferenceMode_0300, Function | MediumTest | Level3)
+HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallPreferenceMode_0300, TestSize.Level0)
 {
     AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
@@ -578,7 +578,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallPreferenceMode_0300, Fun
  * @tc.name     test set call preference mode with ims ps voice prefered
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallPreferenceMode_0400, Function | MediumTest | Level3)
+HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallPreferenceMode_0400, TestSize.Level0)
 {
     AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
@@ -599,7 +599,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallPreferenceMode_0400, Fun
  * @tc.name     test set call preference mode with ims ps voice only
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallPreferenceMode_0500, Function | MediumTest | Level3)
+HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallPreferenceMode_0500, TestSize.Level0)
 {
     AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
@@ -621,7 +621,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallPreferenceMode_0500, Fun
  * @tc.name     test is in emergency call
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_IsInEmergencyCall_0100, Function | MediumTest | Level3)
+HWTEST_F(CallManagerGtest, Telephony_CallManager_IsInEmergencyCall_0100, TestSize.Level0)
 {
     AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
@@ -637,7 +637,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_IsInEmergencyCall_0100, Functio
  * @tc.name     test is in emergency call
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_IsInEmergencyCall_0200, Function | MediumTest | Level3)
+HWTEST_F(CallManagerGtest, Telephony_CallManager_IsInEmergencyCall_0200, TestSize.Level0)
 {
     AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
@@ -653,7 +653,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_IsInEmergencyCall_0200, Functio
  * @tc.name     test is in emergency call without permission
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_IsInEmergencyCall_0300, Function | MediumTest | Level3)
+HWTEST_F(CallManagerGtest, Telephony_CallManager_IsInEmergencyCall_0300, TestSize.Level0)
 {
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
@@ -669,7 +669,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_IsInEmergencyCall_0300, Functio
  * @tc.name     test mute ringer
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_MuteRinger_0100, Function | MediumTest | Level3)
+HWTEST_F(CallManagerGtest, Telephony_CallManager_MuteRinger_0100, TestSize.Level0)
 {
     AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
@@ -685,7 +685,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_MuteRinger_0100, Function | Med
  * @tc.name     test join conference
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_JoinConference_0100, Function | MediumTest | Level3)
+HWTEST_F(CallManagerGtest, Telephony_CallManager_JoinConference_0100, TestSize.Level0)
 {
     AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
@@ -701,7 +701,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_JoinConference_0100, Function |
  * @tc.name     test join conference with empty numberList
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_JoinConference_0200, Function | MediumTest | Level3)
+HWTEST_F(CallManagerGtest, Telephony_CallManager_JoinConference_0200, TestSize.Level0)
 {
     AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
@@ -718,7 +718,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_JoinConference_0200, Function |
  * @tc.name     test report ott call details info
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_ReportOttCallDetailsInfo_0100, Function | MediumTest | Level3)
+HWTEST_F(CallManagerGtest, Telephony_CallManager_ReportOttCallDetailsInfo_0100, TestSize.Level0)
 {
     AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
@@ -740,7 +740,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_ReportOttCallDetailsInfo_0100, 
  * @tc.name     test report ott call details info
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_ReportOttCallDetailsInfo_0200, Function | MediumTest | Level3)
+HWTEST_F(CallManagerGtest, Telephony_CallManager_ReportOttCallDetailsInfo_0200, TestSize.Level0)
 {
     AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
@@ -756,7 +756,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_ReportOttCallDetailsInfo_0200, 
  * @tc.name     test report ott call details info
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_ReportOttCallEventInfo_0100, Function | MediumTest | Level3)
+HWTEST_F(CallManagerGtest, Telephony_CallManager_ReportOttCallEventInfo_0100, TestSize.Level0)
 {
     AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
@@ -775,7 +775,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_ReportOttCallEventInfo_0100, Fu
  * @tc.name     test report ott call details info
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_HasVoiceCapability_0100, Function | MediumTest | Level3)
+HWTEST_F(CallManagerGtest, Telephony_CallManager_HasVoiceCapability_0100, TestSize.Level0)
 {
     AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
@@ -791,7 +791,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_HasVoiceCapability_0100, Functi
  * @tc.name     test Close Unfinished ussd
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_CloseUnFinishedUssd_0100, Function | MediumTest | Level3)
+HWTEST_F(CallManagerGtest, Telephony_CallManager_CloseUnFinishedUssd_0100, TestSize.Level0)
 {
     AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
@@ -813,7 +813,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_CloseUnFinishedUssd_0100, Funct
  * @tc.name     test Input Dialer Special Code with support code
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_InputDialerSpecialCode_0100, Function | MediumTest | Level3)
+HWTEST_F(CallManagerGtest, Telephony_CallManager_InputDialerSpecialCode_0100, TestSize.Level0)
 {
     AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
@@ -828,7 +828,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_InputDialerSpecialCode_0100, Fu
  * @tc.name     test Input Dialer Special Code with unsupport code
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_InputDialerSpecialCode_0200, Function | MediumTest | Level3)
+HWTEST_F(CallManagerGtest, Telephony_CallManager_InputDialerSpecialCode_0200, TestSize.Level0)
 {
     AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
@@ -843,7 +843,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_InputDialerSpecialCode_0200, Fu
  * @tc.name     test Input Dialer Special Code without permission
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_InputDialerSpecialCode_0300, Function | MediumTest | Level3)
+HWTEST_F(CallManagerGtest, Telephony_CallManager_InputDialerSpecialCode_0300, TestSize.Level0)
 {
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
@@ -859,7 +859,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_InputDialerSpecialCode_0300, Fu
  * @tc.desc     Function test
  */
 HWTEST_F(
-    CallManagerGtest, Telephony_CallManager_RemoveMissedIncomingCallNotification_0100, Function | MediumTest | Level3)
+    CallManagerGtest, Telephony_CallManager_RemoveMissedIncomingCallNotification_0100, TestSize.Level0)
 {
     AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
@@ -874,7 +874,7 @@ HWTEST_F(
  * @tc.desc     Function test
  */
 HWTEST_F(
-    CallManagerGtest, Telephony_CallManager_RemoveMissedIncomingCallNotification_0200, Function | MediumTest | Level3)
+    CallManagerGtest, Telephony_CallManager_RemoveMissedIncomingCallNotification_0200, TestSize.Level0)
 {
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
@@ -888,7 +888,7 @@ HWTEST_F(
  * @tc.name     input VoIP call state 0 test SetVoIPCallState
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_SetVoIPCallState_0100, Function | MediumTest | Level3)
+HWTEST_F(CallManagerGtest, Telephony_CallManager_SetVoIPCallState_0100, TestSize.Level0)
 {
     AccessToken token;
     int32_t state = 0;
@@ -901,7 +901,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetVoIPCallState_0100, Function
  * @tc.name     input VoIP call state 1 test SetVoIPCallState
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_SetVoIPCallState_0200, Function | MediumTest | Level3)
+HWTEST_F(CallManagerGtest, Telephony_CallManager_SetVoIPCallState_0200, TestSize.Level0)
 {
     AccessToken token;
     int32_t state = 1;
@@ -914,7 +914,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetVoIPCallState_0200, Function
  * @tc.name     input VoIP call state 2 test SetVoIPCallState
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_SetVoIPCallState_0300, Function | MediumTest | Level3)
+HWTEST_F(CallManagerGtest, Telephony_CallManager_SetVoIPCallState_0300, TestSize.Level0)
 {
     AccessToken token;
     int32_t state = 2;
@@ -927,7 +927,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetVoIPCallState_0300, Function
  * @tc.name     input VoIP call state 3 test SetVoIPCallState
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_SetVoIPCallState_0400, Function | MediumTest | Level3)
+HWTEST_F(CallManagerGtest, Telephony_CallManager_SetVoIPCallState_0400, TestSize.Level0)
 {
     AccessToken token;
     int32_t state = 3;
@@ -940,7 +940,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetVoIPCallState_0400, Function
  * @tc.name     test GetVoIPCallState
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_GetVoIPCallState_0100, Function | MediumTest | Level3)
+HWTEST_F(CallManagerGtest, Telephony_CallManager_GetVoIPCallState_0100, TestSize.Level0)
 {
     AccessToken token;
     int32_t state = -1;
@@ -952,7 +952,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_GetVoIPCallState_0100, Function
  * @tc.name     test GetVoIPCallState no permission
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_GetVoIPCallState_0200, Function | MediumTest | Level3)
+HWTEST_F(CallManagerGtest, Telephony_CallManager_GetVoIPCallState_0200, TestSize.Level0)
 {
     int32_t state = -1;
     EXPECT_EQ(CallManagerGtest::clientPtr_->GetVoIPCallState(state), RETURN_VALUE_IS_ZERO);
@@ -964,7 +964,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_GetVoIPCallState_0200, Function
  * @tc.name     test SetVoIPCallInfo
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_SetVoIPCallInfo_0100, Function | MediumTest | Level3)
+HWTEST_F(CallManagerGtest, Telephony_CallManager_SetVoIPCallInfo_0100, TestSize.Level0)
 {
     AccessToken token;
     int32_t callId = 10001;
@@ -979,7 +979,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetVoIPCallInfo_0100, Function 
  * @tc.name     test SetVoIPCallInfo
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_SetVoIPCallInfo_0200, Function | MediumTest | Level3)
+HWTEST_F(CallManagerGtest, Telephony_CallManager_SetVoIPCallInfo_0200, TestSize.Level0)
 {
     std::shared_ptr<CallManagerClient> client = std::make_shared<CallManagerClient>();
     AccessToken token;
@@ -1000,7 +1000,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetVoIPCallInfo_0200, Function 
  * @tc.name     test SetVoIPCallInfo
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerGtest, Telephony_CallControlManager_SetVoIPCallInfo_0300, Function | MediumTest | Level3)
+HWTEST_F(CallManagerGtest, Telephony_CallControlManager_SetVoIPCallInfo_0300, TestSize.Level0)
 {
     std::shared_ptr<CallControlManager> callControlManager = std::make_shared<CallControlManager>();
     int32_t callId = 10020;
@@ -1022,7 +1022,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallControlManager_SetVoIPCallInfo_0300, Fu
  * @tc.name     test SetVoIPCallInfo
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerGtest, Telephony_CallManagerServiceStub_SetVoIPCallInfo_0400, Function | MediumTest | Level3)
+HWTEST_F(CallManagerGtest, Telephony_CallManagerServiceStub_SetVoIPCallInfo_0400, TestSize.Level0)
 {
     std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
     MessageParcel data;
@@ -1040,7 +1040,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManagerServiceStub_SetVoIPCallInfo_0400
  * @tc.name     Test Dump
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_TestDump_0100, Function | MediumTest | Level3)
+HWTEST_F(CallManagerGtest, Telephony_CallManager_TestDump_0100, TestSize.Level0)
 {
     std::vector<std::u16string> emptyArgs = {};
     std::vector<std::u16string> args = { u"test", u"test1" };
@@ -1055,7 +1055,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_TestDump_0100, Function | Mediu
  * @tc.name     Test VoipCallObject
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerGtest, Telephony_VoipCallObject_0100, Function | MediumTest | Level3)
+HWTEST_F(CallManagerGtest, Telephony_VoipCallObject_0100, TestSize.Level0)
 {
     CallObjectManager::ClearVoipList();
     CallAttributeInfo callAttrInfo;
@@ -1085,7 +1085,7 @@ HWTEST_F(CallManagerGtest, Telephony_VoipCallObject_0100, Function | MediumTest 
  * @tc.name     Test VoipCallObject
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerGtest, Telephony_VoipCallObject_0200, Function | MediumTest | Level3)
+HWTEST_F(CallManagerGtest, Telephony_VoipCallObject_0200, TestSize.Level0)
 {
     CallObjectManager::ClearVoipList();
     int32_t callId = 10010;
@@ -1120,7 +1120,7 @@ HWTEST_F(CallManagerGtest, Telephony_VoipCallObject_0200, Function | MediumTest 
  * @tc.name     Test antiFraud cloud service
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerGtest, Telephony_AntiFraudCloudService_0001, Function | MediumTest | Level3)
+HWTEST_F(CallManagerGtest, Telephony_AntiFraudCloudService_0001, TestSize.Level0)
 {
     auto service = std::make_shared<AntiFraudCloudService>("10000");
     std::string fileContent = "abcdefghij";
@@ -1204,7 +1204,7 @@ private:
  * @tc.name     Test antiFraud cloud service
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerGtest, Telephony_AntiFraudCloudService_0002, Function | MediumTest | Level3)
+HWTEST_F(CallManagerGtest, Telephony_AntiFraudCloudService_0002, TestSize.Level0)
 {
     auto service = std::make_shared<AntiFraudCloudService>("10000");
     sptr<OHOS::IRemoteObject> failRemoteObj = new MockRemoteObject(-1);
@@ -1223,7 +1223,7 @@ HWTEST_F(CallManagerGtest, Telephony_AntiFraudCloudService_0002, Function | Medi
  * @tc.name     Test antiFraud hsdr helper
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerGtest, Telephony_AntiFraudHsdrHelper_0001, Function | MediumTest | Level3)
+HWTEST_F(CallManagerGtest, Telephony_AntiFraudHsdrHelper_0001, TestSize.Level0)
 {
     sptr<HsdrConnection> connection = new (std::nothrow) HsdrConnection(
         [](const sptr<IRemoteObject> &remoteObject) {});
@@ -1269,7 +1269,7 @@ HWTEST_F(CallManagerGtest, Telephony_AntiFraudHsdrHelper_0001, Function | Medium
  * @tc.name     Test antiFraud hsdr helper
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerGtest, Telephony_AntiFraudHsdrHelper_0002, Function | MediumTest | Level3)
+HWTEST_F(CallManagerGtest, Telephony_AntiFraudHsdrHelper_0002, TestSize.Level0)
 {
     OnResponse onResponse = [](const HsdrResponse &response) {};
     OnError onError = [](int errCode) {};
@@ -1307,7 +1307,7 @@ HWTEST_F(CallManagerGtest, Telephony_AntiFraudHsdrHelper_0002, Function | Medium
  * @tc.name     Test AnonymizeAdapter
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerGtest, Telephony_AnonymizeAdapter_0100, Function | MediumTest | Level3)
+HWTEST_F(CallManagerGtest, Telephony_AnonymizeAdapter_0100, TestSize.Level0)
 {
     auto antiFraudService = DelayedSingleton<AntiFraudService>::GetInstance();
     EXPECT_EQ(antiFraudService->AnonymizeText(), 1000);
@@ -1330,7 +1330,7 @@ HWTEST_F(CallManagerGtest, Telephony_AnonymizeAdapter_0100, Function | MediumTes
  * @tc.name     Test AntiFraud
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerGtest, Telephony_AntiFraud_0100, Function | MediumTest | Level3)
+HWTEST_F(CallManagerGtest, Telephony_AntiFraud_0100, TestSize.Level0)
 {
     auto antiFraudService = DelayedSingleton<AntiFraudService>::GetInstance();
     EXPECT_EQ(antiFraudService->CreateDataShareHelper(-1, USER_SETTINGSDATA_URI.c_str()), nullptr);
@@ -1370,7 +1370,7 @@ HWTEST_F(CallManagerGtest, Telephony_AntiFraud_0100, Function | MediumTest | Lev
  * @tc.name     Test antiFraud hsdr helper
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerGtest, Telephony_NumberIdentityConnection_0001, Function | MediumTest | Level3)
+HWTEST_F(CallManagerGtest, Telephony_NumberIdentityConnection_0001, TestSize.Level0)
 {
     sptr<NumberIdentityConnection> connection = new (std::nothrow) NumberIdentityConnection(
         [](const sptr<IRemoteObject> &remoteObject) {}, []() {});
@@ -1413,7 +1413,7 @@ HWTEST_F(CallManagerGtest, Telephony_NumberIdentityConnection_0001, Function | M
  * @tc.name     Test branch
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerGtest, Telephony_CallSettingAbilityConnection_0001, Function | MediumTest | Level3)
+HWTEST_F(CallManagerGtest, Telephony_CallSettingAbilityConnection_0001, TestSize.Level0)
 {
     sptr<CallSettingAbilityConnection> connection = new (std::nothrow) CallSettingAbilityConnection("str");
     if (connection == nullptr) {
