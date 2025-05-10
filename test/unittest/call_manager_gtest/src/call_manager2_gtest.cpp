@@ -169,7 +169,11 @@ void CallInfoManager::LockCallState(bool eq, int32_t targetState, int32_t slipMs
     int32_t callState = CallManagerGtest::clientPtr_->GetCallState();
     std::cout << "waited " << usedTimeMs << " seconds" << std::endl;
     std::cout << "target call state:" << targetState << std::endl;
-    EXPECT_EQ(callState, targetState);
+    if (eq) {
+        EXPECT_EQ(callState, targetState);
+    } else {
+        EXPECT_NE(callState, targetState);
+    }
 }
 
 void CallManagerGtest::HangUpCall()

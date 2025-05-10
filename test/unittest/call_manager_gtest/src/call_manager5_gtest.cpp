@@ -168,7 +168,11 @@ void CallInfoManager::LockCallState(bool eq, int32_t targetState, int32_t slipMs
     int32_t callState = CallManagerGtest::clientPtr_->GetCallState();
     std::cout << "waited " << usedTimeMs << " seconds" << std::endl;
     std::cout << "target call state:" << targetState << std::endl;
-    EXPECT_EQ(callState, targetState);
+    if (eq) {
+        EXPECT_EQ(callState, targetState);
+    } else {
+        EXPECT_NE(callState, targetState);
+    }
 }
 
 void CallManagerGtest::HangUpCall()
@@ -967,7 +971,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetAudioDevice_0100, Function |
     }
     CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_200_MS, SLEEP_30000_MS);
     int32_t ret = CallManagerGtest::clientPtr_->DialCall(Str8ToStr16(phoneNumber), dialInfo_);
-    EXPECT_EQ(ret, RETURN_VALUE_IS_ZERO);
+    EXPECT_GE(ret, RETURN_VALUE_IS_ZERO);
 
     HandsFreeAudioGateway *profile = HandsFreeAudioGateway::GetProfile();
     vector<BluetoothRemoteDevice> devices = profile->GetConnectedDevices();

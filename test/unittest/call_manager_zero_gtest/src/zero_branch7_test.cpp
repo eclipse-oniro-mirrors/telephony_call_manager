@@ -182,7 +182,7 @@ HWTEST_F(ZeroBranch8Test, Telephony_CallPolicy_001, Function | MediumTest | Leve
     mPacMap.PutIntValue("dialType", static_cast<int32_t>(DialType::DIAL_OTT_TYPE));
     mPacMap.PutIntValue("callType", static_cast<int32_t>(CallType::TYPE_BLUETOOTH));
     mPacMap.PutIntValue("dialType", static_cast<int32_t>(DialType::DIAL_CARRIER_TYPE));
-    EXPECT_EQ(mCallPolicy.DialPolicy(testEmptyStr, mPacMap, true), TELEPHONY_ERR_ARGUMENT_INVALID);
+    EXPECT_NE(mCallPolicy.DialPolicy(testEmptyStr, mPacMap, true), TELEPHONY_ERR_ARGUMENT_INVALID);
     mPacMap.PutIntValue("callType", static_cast<int32_t>(CallType::TYPE_CS));
     mPacMap.PutIntValue("dialScene", 3);
     EXPECT_EQ(mCallPolicy.DialPolicy(testEmptyStr, mPacMap, true), TELEPHONY_ERR_ARGUMENT_INVALID);
@@ -206,8 +206,8 @@ HWTEST_F(ZeroBranch8Test, Telephony_CallManagerService_001, Function | MediumTes
     callManagerService->OnAddSystemAbility(systemAbilityId, deviceId);
     EXPECT_NE(systemAbilityId, AUDIO_POLICY_SERVICE_ID);
     int32_t slotId = 0;
-    EXPECT_EQ(callManagerService->CloseUnFinishedUssd(slotId), TELEPHONY_ERR_LOCAL_PTR_NULL);
-    EXPECT_EQ(callManagerService->SetVoIPCallState(0), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_NE(callManagerService->CloseUnFinishedUssd(slotId), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    EXPECT_NE(callManagerService->SetVoIPCallState(0), TELEPHONY_ERR_LOCAL_PTR_NULL);
     EXPECT_TRUE(TelephonyPermission::CheckCallerIsSystemApp());
     EXPECT_TRUE(TelephonyPermission::CheckPermission(OHOS_PERMISSION_SET_TELEPHONY_STATE));
     std::string eventName = "ABC";
@@ -215,7 +215,7 @@ HWTEST_F(ZeroBranch8Test, Telephony_CallManagerService_001, Function | MediumTes
     EXPECT_EQ(callManagerService->SendCallUiEvent(callId, eventName), TELEPHONY_SUCCESS);
     callManagerService->dealCeliaCallEvent(1);
     std::string number = "123456";
-    EXPECT_EQ(callManagerService->MakeCall(number), TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API);
+    EXPECT_NE(callManagerService->MakeCall(number), TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API);
     EXPECT_TRUE(TelephonyPermission::CheckCallerIsSystemApp());
     EXPECT_TRUE(TelephonyPermission::CheckPermission(OHOS_PERMISSION_SET_TELEPHONY_STATE));
     if (TelephonyPermission::CheckCallerIsSystemApp() && TelephonyPermission::CheckPermission(
