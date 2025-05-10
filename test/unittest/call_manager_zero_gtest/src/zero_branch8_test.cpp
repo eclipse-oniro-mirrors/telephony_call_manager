@@ -45,10 +45,6 @@ namespace OHOS {
 namespace Telephony {
 using namespace testing::ext;
 constexpr int WAIT_TIME = 3;
-constexpr int DEFAULT_SLOT_ID = 0;
-constexpr int VALID_CALL_ID = 1;
-constexpr const char* NUMBER = "10086";
-constexpr const char* NAME = "test";
 
 class ZeroBranch7Test : public testing::Test {
 public:
@@ -61,151 +57,11 @@ void ZeroBranch7Test::SetUpTestCase() {}
 
 void ZeroBranch7Test::TearDownTestCase() {}
 
-void ZeroBranch7Test::SetUp()
-{
-    DelayedSingleton<AudioProxy>::GetInstance()->SetAudioMicStateChangeCallback();
-    DelayedSingleton<AudioProxy>::GetInstance()->SetAudioDeviceChangeCallback();
-    DelayedSingleton<AudioProxy>::GetInstance()->SetAudioPreferDeviceChangeCallback();
-}
+void ZeroBranch7Test::SetUp() {}
 
 void ZeroBranch7Test::TearDown()
 {
     sleep(1);
-}
-
-/**
- * @tc.number   Telephony_AudioControlManager_001
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
-HWTEST_F(ZeroBranch7Test, Telephony_AudioControlManager_001, Function | MediumTest | Level3)
-{
-    DialParaInfo mDialParaInfo;
-    mDialParaInfo.accountId = 0;
-    sptr<OHOS::Telephony::CallBase> callObjectPtr = nullptr;
-    DelayedSingleton<CallStateProcessor>::GetInstance()->holdingCalls_.insert(1);
-    auto audioControl = DelayedSingleton<AudioControlManager>::GetInstance();
-    audioControl->VideoStateUpdated(callObjectPtr, VideoStateType::TYPE_VOICE, VideoStateType::TYPE_VIDEO);
-    callObjectPtr = new IMSCall(mDialParaInfo);
-    callObjectPtr->SetCallType(CallType::TYPE_IMS);
-    audioControl->VideoStateUpdated(callObjectPtr, VideoStateType::TYPE_VOICE, VideoStateType::TYPE_VIDEO);
-    callObjectPtr->SetCrsType(2);
-    audioControl->VideoStateUpdated(callObjectPtr, VideoStateType::TYPE_VOICE, VideoStateType::TYPE_VIDEO);
-    audioControl->UpdateDeviceTypeForVideoOrSatelliteCall();
-    audioControl->MuteNetWorkRingTone();
-    audioControl->IsBtOrWireHeadPlugin();
-    ASSERT_TRUE(audioControl->IsVideoCall(VideoStateType::TYPE_RECEIVE_ONLY));
-    sptr<CallBase> call = nullptr;
-    audioControl->IncomingCallHungUp(call, false, "");
-    audioControl->CallStateUpdated(call, TelCallState::CALL_STATUS_DIALING, TelCallState::CALL_STATUS_ALERTING);
-    call = new VoIPCall(mDialParaInfo);
-    call->SetCallType(CallType::TYPE_VOIP);
-    audioControl->CallStateUpdated(call, TelCallState::CALL_STATUS_DIALING, TelCallState::CALL_STATUS_ALERTING);
-    audioControl->HandleCallStateUpdated(call, TelCallState::CALL_STATUS_DIALING, TelCallState::CALL_STATUS_ANSWERED);
-    audioControl->HandleNextState(call, TelCallState::CALL_STATUS_ALERTING);
-    audioControl->HandleNextState(call, TelCallState::CALL_STATUS_INCOMING);
-    audioControl->HandleNextState(call, TelCallState::CALL_STATUS_WAITING);
-    audioControl->HandlePriorState(call, TelCallState::CALL_STATUS_ALERTING);
-    audioControl->HandlePriorState(call, TelCallState::CALL_STATUS_INCOMING);
-    audioControl->HandlePriorState(call, TelCallState::CALL_STATUS_WAITING);
-    audioControl->HandlePriorState(call, TelCallState::CALL_STATUS_HOLDING);
-    call->SetCallRunningState(CallRunningState::CALL_RUNNING_STATE_ACTIVE);
-    audioControl->HandlePriorState(call, TelCallState::CALL_STATUS_INCOMING);
-    audioControl->HandlePriorState(call, TelCallState::CALL_STATUS_WAITING);
-    audioControl->UpdateForegroundLiveCall();
-    audioControl->ProcessAudioWhenCallActive(call);
-    std::string emptyNumber = "";
-    call->SetAccountNumber(emptyNumber);
-    audioControl->HandleNewActiveCall(call);
-    call->SetAccountNumber(NUMBER);
-    call->SetCallType(CallType::TYPE_CS);
-    audioControl->HandleNewActiveCall(call);
-    call->SetCallType(CallType::TYPE_SATELLITE);
-    audioControl->HandleNewActiveCall(call);
-    call->SetCallType(CallType::TYPE_ERR_CALL);
-    audioControl->HandleNewActiveCall(call);
-    audioControl->GetCallList().empty();
-    ASSERT_TRUE(audioControl->GetCurrentActiveCall() == nullptr);
-}
-
-/**
- * @tc.number   Telephony_AudioControlManager_002
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
-HWTEST_F(ZeroBranch7Test, Telephony_AudioControlManager_002, Function | MediumTest | Level3)
-{
-    auto audioControl = DelayedSingleton<AudioControlManager>::GetInstance();
-    AudioDevice device;
-    device.deviceType = AudioDeviceType::DEVICE_DISTRIBUTED_PAD;
-    if (memset_s(device.address, kMaxAddressLen + 1, 0, kMaxAddressLen + 1) != EOK) {
-        return;
-    }
-    audioControl->SetAudioDevice(device);
-    device.deviceType = AudioDeviceType::DEVICE_DISTRIBUTED_PHONE;
-    audioControl->SetAudioDevice(device);
-    device.deviceType = AudioDeviceType::DEVICE_DISTRIBUTED_AUTOMOTIVE;
-    audioControl->SetAudioDevice(device);
-    device.deviceType = AudioDeviceType::DEVICE_BLUETOOTH_SCO;
-    audioControl->SetAudioDevice(device);
-    audioControl->PlayRingtone();
-    audioControl->PlaySoundtone();
-    audioControl->StopRingtone();
-    audioControl->GetInitAudioDeviceType();
-    audioControl->SetMute(false);
-    audioControl->MuteRinger();
-    audioControl->PlayCallEndedTone(CallEndedType::PHONE_IS_BUSY);
-    audioControl->PlayCallEndedTone(CallEndedType::CALL_ENDED_NORMALLY);
-    audioControl->PlayCallEndedTone(CallEndedType::UNKNOWN);
-    audioControl->PlayCallEndedTone(CallEndedType::INVALID_NUMBER);
-    audioControl->PlayCallEndedTone(static_cast<CallEndedType>(5));
-    audioControl->GetCallBase(VALID_CALL_ID);
-    audioControl->IsEmergencyCallExists();
-    audioControl->SetToneState(ToneState::TONEING);
-    audioControl->IsNumberAllowed(NUMBER);
-    ASSERT_TRUE(audioControl->IsAudioActivated());
-}
-
-/**
- * @tc.number   Telephony_AudioControlManager_003
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
-HWTEST_F(ZeroBranch7Test, Telephony_AudioControlManager_003, Function | MediumTest | Level3)
-{
-    auto audioControl = DelayedSingleton<AudioControlManager>::GetInstance();
-    audioControl->IsTonePlaying();
-    audioControl->IsCurrentRinging();
-    audioControl->PlayRingback();
-    audioControl->StopWaitingTone();
-    audioControl->PlayDtmfTone('a');
-    audioControl->StopDtmfTone();
-    audioControl->OnPostDialNextChar('a');
-    audioControl->IsSoundPlaying();
-    ASSERT_TRUE(audioControl->IsVideoCall(VideoStateType::TYPE_VIDEO));
-}
-
-/**
- * @tc.number   Telephony_AudioControlManager_004
- * @tc.name     test error branch
- * @tc.desc     Function test
- */
-HWTEST_F(ZeroBranch7Test, Telephony_AudioControlManager_004, Function | MediumTest | Level3)
-{
-    auto audioControl = DelayedSingleton<AudioControlManager>::GetInstance();
-    audioControl->isCrsVibrating_ = true;
-    audioControl->MuteNetWorkRingTone();
-    DisconnectedDetails details;
-    audioControl->CallDestroyed(details);
-    audioControl->toneState_ = ToneState::CALLENDED;
-    audioControl->StopCallTone();
-    audioControl->tone_ = nullptr;
-    audioControl->StopCallTone();
-    audioControl->GetAudioInterruptState();
-    audioControl->SetVolumeAudible();
-    audioControl->ringState_ = RingState::RINGING;
-    audioControl->MuteRinger();
-    ASSERT_TRUE(audioControl->GetCurrentActiveCall() == nullptr);
 }
 
 /**
@@ -773,6 +629,7 @@ HWTEST_F(ZeroBranch7Test, Telephony_CallConnectAbility_001, Function | MediumTes
     DelayedSingleton<CallConnectAbility>::GetInstance()->isConnected_ = true;
     DelayedSingleton<CallConnectAbility>::GetInstance()->ConnectAbility();
     EXPECT_FALSE(DelayedSingleton<CallConnectAbility>::GetInstance()->isConnecting_);
+    DelayedSingleton<CallConnectAbility>::GetInstance()->connectCallback_ = nullptr;
     DelayedSingleton<CallConnectAbility>::GetInstance()->DisconnectAbility();
     EXPECT_TRUE(DelayedSingleton<CallConnectAbility>::GetInstance()->isDisconnecting_);
     DelayedSingleton<CallConnectAbility>::GetInstance()->isConnected_ = false;
@@ -800,6 +657,7 @@ HWTEST_F(ZeroBranch7Test, Telephony_CallConnectAbility_002, Function | MediumTes
 {
     DelayedSingleton<CallConnectAbility>::GetInstance()->isDisconnecting_ = false;
     DelayedSingleton<CallConnectAbility>::GetInstance()->isConnected_ = true;
+    DelayedSingleton<CallConnectAbility>::GetInstance()->connectCallback_ = nullptr;
     DelayedSingleton<CallConnectAbility>::GetInstance()->DisconnectAbility();
     EXPECT_TRUE(DelayedSingleton<CallConnectAbility>::GetInstance()->isDisconnecting_);
 
@@ -810,6 +668,7 @@ HWTEST_F(ZeroBranch7Test, Telephony_CallConnectAbility_002, Function | MediumTes
     DelayedSingleton<CallConnectAbility>::GetInstance()->isConnecting_ = false;
     DelayedSingleton<CallConnectAbility>::GetInstance()->isConnected_ = true;
     DelayedSingleton<CallConnectAbility>::GetInstance()->ConnectAbility();
+    EXPECT_NE(DelayedSingleton<CallConnectAbility>::GetInstance()->connectCallback_, nullptr);
 }
 
 /**

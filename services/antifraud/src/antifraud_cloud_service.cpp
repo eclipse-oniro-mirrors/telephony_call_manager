@@ -24,6 +24,7 @@
 #include <parameters.h>
 #include <random>
 #include <sstream>
+#include "base64.h"
 #include "telephony_log_wrapper.h"
 
 namespace OHOS {
@@ -32,11 +33,7 @@ constexpr size_t BOUNDARY_LENGTH = 32;
 constexpr size_t REQUEST_NO_LENGTH = 10;
 constexpr size_t SERIAL_NUM_LEN = 16;
 constexpr int BASE64_NUMBER2 = 2;
-constexpr int BASE64_NUMBER3 = 3;
-constexpr int BASE64_NUMBER4 = 4;
-constexpr int BASE64_NUMBER6 = 6;
 constexpr int COMMON_TIME_OUT = 5000;
-const std::string BASE_64_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 const std::string RANDOM_CHAR_SET = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 const std::string UPLOAD_MODEL_PATH = "/rms/v1/antiFraud/upload-model-result";
 const std::string CLOUD_CONNECT_SERVICE_NAME = "com.cloud.afs.ROOT";
@@ -223,7 +220,7 @@ std::string AntiFraudCloudService::GenerateUcsRequestBody(UcsMethod code, const 
         return "";
     }
     cJSON_AddNumberToObject(root, "method", static_cast<int>(code));
-    cJSON_AddStringToObject(root, "data", EncodeBase64(requestData.c_str(), requestData.size()).c_str());
+    cJSON_AddStringToObject(root, "data", EncodeBase64(requestData).c_str());
     char *jsonString = cJSON_Print(root);
     if (jsonString == nullptr) {
         TELEPHONY_LOGE("Failed to generate json string.");
@@ -236,53 +233,11 @@ std::string AntiFraudCloudService::GenerateUcsRequestBody(UcsMethod code, const 
     return requestBody;
 }
 
-std::string AntiFraudCloudService::EncodeBase64(const char *bytes, unsigned int size)
+std::string AntiFraudCloudService::EncodeBase64(const std::string &src)
 {
-    std::string result;
-    int i = 0;
-    int j = 0;
-    uint8_t charArray3[BASE64_NUMBER3] = { 0 }; // store 3 byte of bytes_to_encode
-    uint8_t charArray4[BASE64_NUMBER4] = { 0 }; // store encoded character to 4 bytes
-
-    while (size--) {
-        charArray3[i++] = *(bytes++); // get three bytes (24 bits)
-        if (i == BASE64_NUMBER3) {
-            // eg. we have 3 bytes as ( 0100 1101, 0110 0001, 0110 1110) --> (010011, 010110, 000101, 101110)
-            charArray4[0] = (charArray3[0] & 0xfc) >> BASE64_NUMBER2; // get first 6 bits of first byte
-            // get last 2 bits of first byte and first 4 bit of second byte
-            charArray4[1] = ((charArray3[0] & 0x03) << BASE64_NUMBER4) + ((charArray3[1] & 0xf0) >> BASE64_NUMBER4);
-            // get last 4 bits of second byte and first 2 bits of third byte
-            charArray4[BASE64_NUMBER2] = ((charArray3[1] & 0x0f) << BASE64_NUMBER2) +
-                ((charArray3[BASE64_NUMBER2] & 0xc0) >> BASE64_NUMBER6);
-            charArray4[BASE64_NUMBER3] = charArray3[BASE64_NUMBER2] & 0x3f; // get last 6 bits of third byte
-
-            for (i = 0; (i < BASE64_NUMBER4); i++) {
-                result += BASE_64_CHARS[charArray4[i]];
-            }
-            i = 0;
-        }
-    }
-
-    if (i) {
-        for (j = i; j < BASE64_NUMBER3; j++) {
-            charArray3[j] = '\0';
-        }
-
-        charArray4[0] = (charArray3[0] & 0xfc) >> BASE64_NUMBER2;
-        charArray4[1] = ((charArray3[0] & 0x03) << BASE64_NUMBER4) + ((charArray3[1] & 0xf0) >> BASE64_NUMBER4);
-        charArray4[BASE64_NUMBER2] = ((charArray3[1] & 0x0f) << BASE64_NUMBER2) +
-            ((charArray3[BASE64_NUMBER2] & 0xc0) >> BASE64_NUMBER6);
-
-        for (j = 0; (j < i + 1); j++) {
-            result += BASE_64_CHARS[charArray4[j]];
-        }
-
-        while ((i++ < BASE64_NUMBER3)) {
-            result += '=';
-        }
-    }
-
-    return result;
+    auto results = Base64::Encode(std::vector<unsigned char>(src.begin(), src.end()));
+    std::string res = (results != nullptr) ? *results : "";
+    return res;
 }
 
 bool AntiFraudCloudService::ConnectCloudAsync(const std::string &metaData, const std::string &auth,

@@ -30,6 +30,7 @@
 #include "call_manager_hisysevent.h"
 #include "call_number_utils.h"
 #include "call_request_event_handler_helper.h"
+#include "call_state_processor.h"
 #include "call_superprivacy_control_manager.h"
 #include "call_voice_assistant_manager.h"
 #include "cs_call.h"
@@ -621,9 +622,12 @@ int32_t CallStatusManager::OutgoingVoipCallHandle(const CallDetailInfo &info)
             TELEPHONY_LOGI("change VideoStateType from %{public}d to %{public}d",
                 static_cast<int32_t>(originalType), static_cast<int32_t>(info.callMode));
             call->SetVideoStateType(info.callMode);
-            return UpdateCallState(call, info.state);
         }
-        return TELEPHONY_SUCCESS;
+        sptr<VoIPCall> voipCall = reinterpret_cast<VoIPCall *>(call.GetRefPtr());
+        if (voipCall != nullptr) {
+            voipCall->UpdateCallAttributeInfo(info);
+        }
+        return UpdateCallState(call, info.state);
     }
     call = CreateNewCall(info, CallDirection::CALL_DIRECTION_OUT);
     if (call == nullptr) {
@@ -904,6 +908,7 @@ void CallStatusManager::SetupAntiFraudService(const sptr<CallBase> &call, const 
     std::string tmpStr(info.phoneNum);
     if (numberMarkInfo.markType != MarkType::MARK_TYPE_FRAUD &&
         numberMarkInfo.markType != MarkType::MARK_TYPE_YELLOW_PAGE &&
+        numberMarkInfo.markType != MarkType::MARK_TYPE_ENTERPRISE &&
         !IsContactPhoneNum(tmpStr) && antiFraudService->IsAntiFraudSwitchOn()) {
         int32_t slotId = call->GetSlotId();
         if (slotId == -1) {
@@ -914,12 +919,14 @@ void CallStatusManager::SetupAntiFraudService(const sptr<CallBase> &call, const 
         }
         SetAntiFraudSlotId(slotId);
         SetAntiFraudIndex(info.index);
-        int32_t ret = DelayedSingleton<AntiFraudService>::GetInstance()->
-            InitAntiFraudService(tmpStr, slotId, info.index);
-        if (ret != 0) {
-            SetAntiFraudSlotId(-1);
-            SetAntiFraudIndex(-1);
-        }
+        ffrt::submit([tmpStr, slotId, info, this]() {
+            int32_t ret = DelayedSingleton<AntiFraudService>::GetInstance()->
+                StartAntiFraudService(tmpStr, slotId, info.index);
+            if (ret != 0) {
+                SetAntiFraudSlotId(-1);
+                SetAntiFraudIndex(-1);
+            }
+        });
     }
 }
 
@@ -928,11 +935,7 @@ void CallStatusManager::StopAntiFraudDetect(sptr<CallBase> &call, const CallDeta
     if (GetAntiFraudSlotId() != call->GetSlotId() || GetAntiFraudIndex() != info.index) {
         return;
     }
-    int32_t ret = DelayedSingleton<AntiFraudService>::GetInstance()->
-        StopAntiFraudService(call->GetSlotId(), info.index);
-    if (ret != 0) {
-        return;
-    }
+    DelayedSingleton<AntiFraudService>::GetInstance()->StopAntiFraudService(call->GetSlotId(), info.index);
     SetAntiFraudSlotId(-1);
     SetAntiFraudIndex(-1);
     TELEPHONY_LOGI("call ending, can begin a new antifraud");
@@ -947,18 +950,14 @@ void CallStatusManager::HandleCeliaCall(sptr<CallBase> &call)
     if (GetAntiFraudSlotId() != slotId || GetAntiFraudIndex() != index) {
         return;
     }
-    int32_t ret = DelayedSingleton<AntiFraudService>::GetInstance()->
-        StopAntiFraudService(slotId, index);
-    if (ret != 0) {
-        return;
-    }
+    DelayedSingleton<AntiFraudService>::GetInstance()->StopAntiFraudService(slotId, index);
     SetAntiFraudSlotId(-1);
     SetAntiFraudIndex(-1);
     TELEPHONY_LOGI("celia call begin, recover AntiFraud SlotId and Index");
     UpdateAntiFraudState(call, static_cast<int32_t>(AntiFraudState::ANTIFRAUD_STATE_FINISHED));
 
     if (call->GetTelCallState() == TelCallState::CALL_STATUS_ACTIVE) {
-        ret = UpdateCallState(call, TelCallState::CALL_STATUS_ACTIVE);
+        int32_t ret = UpdateCallState(call, TelCallState::CALL_STATUS_ACTIVE);
         if (ret != TELEPHONY_SUCCESS) {
             TELEPHONY_LOGE("UpdateCallState failed, errCode:%{public}d", ret);
         }
@@ -1056,6 +1055,10 @@ int32_t CallStatusManager::ActiveVoipCallHandle(const CallDetailInfo &info)
         TELEPHONY_LOGI("change VideoStateType from %{public}d to %{public}d",
             static_cast<int32_t>(originalType), static_cast<int32_t>(info.callMode));
         call->SetVideoStateType(info.callMode);
+    }
+    sptr<VoIPCall> voipCall = reinterpret_cast<VoIPCall *>(call.GetRefPtr());
+    if (voipCall != nullptr) {
+        voipCall->UpdateCallAttributeInfo(info);
     }
     int32_t ret = UpdateCallState(call, TelCallState::CALL_STATUS_ACTIVE);
     if (ret != TELEPHONY_SUCCESS) {
@@ -1182,6 +1185,10 @@ int32_t CallStatusManager::DisconnectedHandle(const CallDetailInfo &info)
     if (call == nullptr && !RefreshDialingStateByOtherState(call, info)) {
         TELEPHONY_LOGE("Call is Null");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    if (call->GetTelCallState() != TelCallState::CALL_STATUS_DISCONNECTING) {
+        // Acquire disconnected lock when the remote hangup and will release after StopSoundtone
+        DelayedSingleton<CallControlManager>::GetInstance()->AcquireDisconnectedLock();
     }
     StopAntiFraudDetect(call, info);
 #ifdef NOT_SUPPORT_MULTICALL
@@ -2445,7 +2452,9 @@ bool CallStatusManager::RefreshDialingStateByOtherState(sptr<CallBase> &call, co
         TELEPHONY_LOGE("initCall is nullptr!");
         return false;
     }
-    DialingHandle(info);
+    CallDetailInfo tempInfo = info;
+    tempInfo.state = TelCallState::CALL_STATUS_DIALING;
+    DialingHandle(tempInfo);
     HandleDsdaInfo(info.accountId);
     DelayedSingleton<BluetoothCallService>::GetInstance()->GetCallState();
     call = GetOneCallObjectByIndexSlotIdAndCallType(info.index, info.accountId, info.callType);

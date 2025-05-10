@@ -75,6 +75,8 @@ void AudioSceneProcessor::ProcessEventInner(AudioEvent event)
         case AudioEvent::SWITCH_AUDIO_INACTIVE_STATE:
             if (DelayedSingleton<CallStateProcessor>::GetInstance()->ShouldStopSoundtone()) {
                 DelayedSingleton<AudioControlManager>::GetInstance()->StopSoundtone();
+                // Acquire disconnected lock in DisconnectedHandle when the remote hangup
+                DelayedSingleton<CallControlManager>::GetInstance()->ReleaseDisconnectedLock();
             }
             SwitchState(event);
             break;
@@ -217,13 +219,15 @@ bool AudioSceneProcessor::SwitchIncoming()
     } else {
         bool isStartBroadcast = CallVoiceAssistantManager::GetInstance()->IsStartVoiceBroadcast();
         bool isNeedSilent = CallObjectManager::IsNeedSilentInDoNotDisturbMode();
-        if (!isStartBroadcast && !isNeedSilent) {
+        bool isNotWearWatch = DelayedSingleton<CallControlManager>::GetInstance()->isNotWearOnWrist();
+        if (!isStartBroadcast && !isNeedSilent && !isNotWearWatch) {
             TELEPHONY_LOGI("broadcast switch and doNotDisturbMode close, start play system ring");
             DelayedSingleton<AudioControlManager>::GetInstance()->StopRingtone();
             // play ringtone while incoming state
             DelayedSingleton<AudioControlManager>::GetInstance()->PlayRingtone();
         } else {
-            TELEPHONY_LOGI("isStartBroadcast: %{public}d, isNeedSilent: %{public}d", isStartBroadcast, isNeedSilent);
+            TELEPHONY_LOGI("isStartBroadcast: %{public}d, isNeedSilent: %{public}d, isNotWearWatch: %{public}d",
+                isStartBroadcast, isNeedSilent, isNotWearWatch);
         }
         DelayedSingleton<AudioDeviceManager>::GetInstance()->ProcessEvent(AudioEvent::AUDIO_RINGING);
     }

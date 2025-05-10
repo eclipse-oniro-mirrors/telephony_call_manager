@@ -34,6 +34,10 @@
 #include "system_ability_status_change_stub.h"
 #include "ffrt.h"
 
+#ifdef ABILITY_POWER_SUPPORT
+#include "power_mgr_client.h"
+#endif
+
 /**
  * Singleton
  * @ClassName:CallControlManager
@@ -44,6 +48,15 @@ namespace OHOS {
 namespace Telephony {
     constexpr const char *KEY_CONST_TELEPHONY_READ_SET_VOIP_CALL_INFO =
         "const.telephony.read_set_voip_call_info";
+    constexpr int32_t WEAR_STATUS_INVALID = 0;
+    constexpr int32_t WEAR_STATUS_OFF = 1;
+    constexpr int32_t WEAR_STATUS_ON = 2;
+class WearStatusObserver : public AAFwk::DataAbilityObserverStub {
+public:
+    WearStatusObserver() = default;
+    ~WearStatusObserver() = default;
+    void OnChange() override;
+};
 class CallControlManager : public CallPolicy {
     DECLARE_DELAYED_SINGLETON(CallControlManager)
 
@@ -135,6 +148,8 @@ public:
     int32_t CarrierAndVoipConflictProcess(int32_t callId, TelCallState callState);
     void AcquireIncomingLock();
     void ReleaseIncomingLock();
+    void AcquireDisconnectedLock();
+    void ReleaseDisconnectedLock();
     void DisconnectAllCalls();
 #ifdef NOT_SUPPORT_MULTICALL
     bool HangUpFirstCallBtAndESIM(int32_t secondCallId);
@@ -143,6 +158,10 @@ public:
     bool HangUpFirstCall(int32_t secondCallId);
     void HangUpFirstCallBySecondCallID(int32_t secondCallId, bool secondAutoAnswer = false);
 #endif
+    bool isNotWearOnWrist();
+    void setWearState(int32_t state);
+    void RegisterObserver();
+    void UnRegisterObserver();
 private:
     void CallStateObserve();
     int32_t NumberLegalityCheck(std::string &number);
@@ -190,6 +209,10 @@ private:
     std::unique_ptr<CallRequestHandler> CallRequestHandlerPtr_;
     // notify when incoming calls are ignored, not rejected or answered
     std::shared_ptr<IncomingCallWakeup> incomingCallWakeup_;
+#ifdef ABILITY_POWER_SUPPORT
+    std::shared_ptr<PowerMgr::RunningLock> disconnectedRunningLock_;
+#endif
+    const int32_t DISCONNECTED_LOCK_TIMEOUT = 2000;
     std::shared_ptr<MissedCallNotification> missedCallNotification_;
     std::unique_ptr<CallSettingManager> callSettingManagerPtr_;
     sptr<ISystemAbilityStatusChange> statusChangeListener_ = nullptr;
@@ -216,6 +239,9 @@ private:
     sptr<AppExecFwk::IAppMgr> appMgrProxy = nullptr;
     
     std::mutex voipMutex_;
+    sptr<WearStatusObserver> wearStatusObserver_ = nullptr;
+    int32_t wearStatus_ = WEAR_STATUS_INVALID;
+    std::mutex wearStatusMutex_;
 };
 } // namespace Telephony
 } // namespace OHOS

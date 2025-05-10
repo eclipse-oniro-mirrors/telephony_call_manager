@@ -45,6 +45,7 @@
 #include "gtest/gtest.h"
 #include "audio_scene_processor.h"
 #include "core_service_connection.h"
+#include "ringtone_player.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -417,11 +418,11 @@ HWTEST_F(CallStateTest, Telephony_AudioSceneProcessor_001, Function | MediumTest
 HWTEST_F(CallStateTest, Telephony_Ring_001, Function | MediumTest | Level3)
 {
     auto ring = std::make_shared<Ring>();
-    ring->Play(DEFAULT_SLOT_ID, "");
+    ring->Play(DEFAULT_SLOT_ID, "", Media::HapticStartupMode::DEFAULT);
     sleep(WAIT_TIME);
     ring->Stop();
     ring->ReleaseRenderer();
-    ring->Play(DEFAULT_SLOT_ID, "");
+    ring->Play(DEFAULT_SLOT_ID, "", Media::HapticStartupMode::DEFAULT);
     sleep(WAIT_TIME);
     ASSERT_NE(ring->Stop(), TELEPHONY_ERR_LOCAL_PTR_NULL);
 }

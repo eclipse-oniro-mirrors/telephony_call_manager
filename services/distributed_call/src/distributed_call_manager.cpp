@@ -463,6 +463,10 @@ void DistributedCallManager::ReportDistributedDeviceInfo(const AudioDevice& devi
         }
     }
     sptr<AudioRendererFilter> audioRendererFilter = new(std::nothrow) AudioRendererFilter();
+    if (audioRendererFilter == nullptr) {
+        TELEPHONY_LOGE("audioRendererFilter nullptr");
+        return;
+    }
     audioRendererFilter->rendererInfo.contentType = ContentType::CONTENT_TYPE_SPEECH;
     audioRendererFilter->rendererInfo.streamUsage = StreamUsage::STREAM_USAGE_VOICE_MODEM_COMMUNICATION;
     audioSystemMananger->SelectOutputDevice(audioRendererFilter, remoteDevice);
@@ -494,6 +498,10 @@ void DistributedCallManager::ReportDistributedDeviceInfoForSwitchOff()
         }
     }
     sptr<AudioRendererFilter> audioRendererFilter = new(std::nothrow) AudioRendererFilter();
+    if (audioRendererFilter == nullptr) {
+        TELEPHONY_LOGE("audioRendererFilter nullptr");
+        return;
+    }
     audioRendererFilter->rendererInfo.contentType = ContentType::CONTENT_TYPE_SPEECH;
     audioRendererFilter->rendererInfo.streamUsage = StreamUsage::STREAM_USAGE_VOICE_MODEM_COMMUNICATION;
     audioSystemMananger->SelectOutputDevice(audioRendererFilter, remoteDevice);

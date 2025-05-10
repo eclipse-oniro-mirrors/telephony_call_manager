@@ -20,6 +20,7 @@
 #include <mutex>
 
 #include "ability_connect_callback_stub.h"
+#include "ffrt.h"
 #include "iremote_broker.h"
 #include "iremote_object.h"
 #include "iremote_proxy.h"
@@ -101,7 +102,7 @@ public:
 
 private:
     ConnectedCallback connectedCallback_;
-    std::mutex remoteProxyMutex_;
+    ffrt::mutex remoteProxyMutex_;
     sptr<IRemoteObject> remoteObject_;
 };
 
@@ -113,7 +114,7 @@ public:
     void DisconnectHsdr();
 
 private:
-    std::mutex connectionMutex_;
+    ffrt::mutex connectionMutex_;
     sptr<HsdrConnection> connection_;
 };
 
