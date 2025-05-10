@@ -248,7 +248,7 @@ HWTEST_F(SpecialBranch0Test, Telephony_CallManagerHisysevent_001, TestSize.Level
  * @tc.name     test branch
  * @tc.desc     Function test
  */
-HWTEST_F(SpecialBranch0Test, Telephony_CallSettingManager_001, TestSize.Level0)
+HWTEST_F(SpecialBranch0Test, Telephony_CallSettingManager_001, TestSize.Level1)
 {
     std::shared_ptr<CallSettingManager> callSettingManager = std::make_shared<CallSettingManager>();
     ASSERT_TRUE(callSettingManager != nullptr);

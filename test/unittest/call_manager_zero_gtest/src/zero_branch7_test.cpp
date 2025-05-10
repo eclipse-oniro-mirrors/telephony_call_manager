@@ -426,7 +426,7 @@ HWTEST_F(ZeroBranch8Test, Telephony_BluetoothCallService_001, TestSize.Level0)
     EXPECT_NE(bluetoothCallService.KickOutFromConference(), TELEPHONY_SUCCESS);
 }
 
-HWTEST_F(ZeroBranch8Test, Telephony_BluetoothCallService_002, TestSize.Level0)
+HWTEST_F(ZeroBranch8Test, Telephony_BluetoothCallService_002, TestSize.Level1)
 {
     AccessToken token;
     BluetoothCallService bluetoothCallService;

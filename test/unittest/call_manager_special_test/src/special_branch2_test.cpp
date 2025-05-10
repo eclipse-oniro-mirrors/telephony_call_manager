@@ -278,7 +278,7 @@ HWTEST_F(SpecialBranch2Test, Telephony_CellularCallConnection_002, TestSize.Leve
  * @tc.name     test branch
  * @tc.desc     Function test
  */
-HWTEST_F(SpecialBranch2Test, Telephony_CellularCallConnection_003, TestSize.Level0)
+HWTEST_F(SpecialBranch2Test, Telephony_CellularCallConnection_003, TestSize.Level1)
 {
     auto cellularCallConnection = std::make_shared<CellularCallConnection>();
     ASSERT_TRUE(cellularCallConnection != nullptr);

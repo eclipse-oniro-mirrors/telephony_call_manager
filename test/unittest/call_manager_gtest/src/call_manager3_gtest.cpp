@@ -350,7 +350,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallWaiting_0100, TestSize.L
  * @tc.name     input invalid slotId, test SetCallWaiting() enable callWaiting
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallWaiting_0200, TestSize.Level0)
+HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallWaiting_0200, TestSize.Level1)
 {
     AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {

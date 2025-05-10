@@ -382,7 +382,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_ReportAudioDeviceInfo_0100, Tes
  * @tc.name     test report audio device info without active call
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_ReportAudioDeviceInfo_0200, TestSize.Level0)
+HWTEST_F(CallManagerGtest, Telephony_CallManager_ReportAudioDeviceInfo_0200, TestSize.Level1)
 {
     AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {

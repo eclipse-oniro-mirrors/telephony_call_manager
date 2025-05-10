@@ -116,7 +116,7 @@ HWTEST_F(ZeroBranch9Test, Telephony_AudioControlManager_001, TestSize.Level0)
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroBranch9Test, Telephony_AudioControlManager_002, TestSize.Level0)
+HWTEST_F(ZeroBranch9Test, Telephony_AudioControlManager_002, TestSize.Level1)
 {
     auto audioControl = DelayedSingleton<AudioControlManager>::GetInstance();
     AudioDevice device;

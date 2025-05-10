@@ -404,7 +404,7 @@ HWTEST_F(ZeroBranch6Test, Telephony_SatelliteCallControl_001, TestSize.Level0)
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroBranch6Test, Telephony_ProximitySensor_001, TestSize.Level0)
+HWTEST_F(ZeroBranch6Test, Telephony_ProximitySensor_001, TestSize.Level1)
 {
     auto proximitySensor = DelayedSingleton<ProximitySensor>::GetInstance();
     sptr<CallBase> callObjectPtr = nullptr;

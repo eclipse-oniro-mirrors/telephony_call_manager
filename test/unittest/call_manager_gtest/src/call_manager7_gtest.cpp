@@ -292,7 +292,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManagerService_002, TestSize.Level0)
  * @tc.name     test error nullptr branch with permission
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerGtest, Telephony_CallManagerService_003, TestSize.Level0)
+HWTEST_F(CallManagerGtest, Telephony_CallManagerService_003, TestSize.Level1)
 {
     AccessToken token;
     std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();

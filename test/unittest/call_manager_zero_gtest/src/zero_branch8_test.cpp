@@ -165,7 +165,7 @@ HWTEST_F(ZeroBranch7Test, Telephony_CallStatusCallbackStub_002, TestSize.Level0)
     ASSERT_EQ(callStatusCallback->OnUpdateVoipEventInfo(dataParce6, reply), TELEPHONY_SUCCESS);
 }
 
-HWTEST_F(ZeroBranch7Test, Telephony_FoldStatusManager_001, TestSize.Level0)
+HWTEST_F(ZeroBranch7Test, Telephony_FoldStatusManager_001, TestSize.Level1)
 {
     auto foldStatusManagerPtr = DelayedSingleton<FoldStatusManager>::GetInstance();
     if (foldStatusManagerPtr == nullptr) {

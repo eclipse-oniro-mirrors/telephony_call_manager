@@ -472,7 +472,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_GetImsConfig_0200, TestSize.Lev
  * @tc.name     test get ims config item with invalid item
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_GetImsConfig_0300, TestSize.Level0)
+HWTEST_F(CallManagerGtest, Telephony_CallManager_GetImsConfig_0300, TestSize.Level1)
 {
     AccessToken token;
     ImsConfigItem item = static_cast<ImsConfigItem>(2);

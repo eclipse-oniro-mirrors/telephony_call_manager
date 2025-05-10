@@ -243,7 +243,7 @@ HWTEST_F(SpecialBranch1Test, Telephony_CallManagerService_007, TestSize.Level0)
  * @tc.name     test branch
  * @tc.desc     Function test
  */
-HWTEST_F(SpecialBranch1Test, Telephony_CallManagerService_008, TestSize.Level0)
+HWTEST_F(SpecialBranch1Test, Telephony_CallManagerService_008, TestSize.Level1)
 {
     std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
     ASSERT_TRUE(callManagerService != nullptr);

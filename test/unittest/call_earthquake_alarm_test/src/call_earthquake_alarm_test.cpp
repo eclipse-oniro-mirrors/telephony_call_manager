@@ -197,7 +197,7 @@ HWTEST_F(LocationEngineTest, Telephony_MyLocationEngine_003, TestSize.Level0)
  * @tc.name     test normal branch
  * @tc.desc     Function test
  */
-HWTEST_F(LocationEngineTest, Telephony_EmergencyCallConnectCallback_001, TestSize.Level0)
+HWTEST_F(LocationEngineTest, Telephony_EmergencyCallConnectCallback_001, TestSize.Level1)
 {
     auto engine1 = std::make_shared<MyLocationEngine>();
     engine1->mylocator = engine1;

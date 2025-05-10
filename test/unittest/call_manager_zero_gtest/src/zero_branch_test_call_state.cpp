@@ -129,7 +129,7 @@ HWTEST_F(CallStateTest, Telephony_HoldingState_001, TestSize.Level0)
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(CallStateTest, Telephony_AlertingState_001, TestSize.Level0)
+HWTEST_F(CallStateTest, Telephony_AlertingState_001, TestSize.Level1)
 {
     auto alertingState = std::make_shared<AlertingState>();
     alertingState->ProcessEvent(AudioEvent::NO_MORE_ALERTING_CALL);

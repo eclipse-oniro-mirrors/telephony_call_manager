@@ -327,7 +327,7 @@ HWTEST_F(ZeroBranch5Test, Telephony_CallStatusManager_004, TestSize.Level0)
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroBranch5Test, Telephony_IncomingCallWakeup_001, TestSize.Level0)
+HWTEST_F(ZeroBranch5Test, Telephony_IncomingCallWakeup_001, TestSize.Level1)
 {
     auto incomingCallWakeup = std::make_shared<IncomingCallWakeup>();
     sptr<CallBase> callObjectPtr = nullptr;

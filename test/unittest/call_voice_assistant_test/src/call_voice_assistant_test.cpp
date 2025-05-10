@@ -149,7 +149,7 @@ HWTEST_F(CallVoiceAssistantManagerTest, Telephony_VoiceAssistantSwitchObserver_0
  * @tc.name     test normal branch
  * @tc.desc     Function test
  */
-HWTEST_F(CallVoiceAssistantManagerTest, Telephony_VoiceAssistantConnectCallback_001, TestSize.Level0)
+HWTEST_F(CallVoiceAssistantManagerTest, Telephony_VoiceAssistantConnectCallback_001, TestSize.Level1)
 {
     const int32_t accountId = 1;
     sptr<IRemoteObject> remoteObject = sptr<VoiceAssistantConnectCallback>::MakeSptr(accountId);

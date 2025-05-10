@@ -337,7 +337,7 @@ HWTEST_F(ZeroBranch4Test, Telephony_BluetoothCallService_001, TestSize.Level0)
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroBranch4Test, Telephony_BluetoothCallService_002, TestSize.Level0)
+HWTEST_F(ZeroBranch4Test, Telephony_BluetoothCallService_002, TestSize.Level1)
 {
     BluetoothCallService bluetoothCallService;
     ASSERT_NE(TELEPHONY_ERR_SUCCESS, bluetoothCallService.AnswerCall());

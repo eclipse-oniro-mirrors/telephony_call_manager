@@ -644,7 +644,7 @@ HWTEST_F(ZeroBranch3Test, Telephony_CallAbilityCallbackStub_001, TestSize.Level0
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroBranch3Test, Telephony_BluetoothCallClient_001, TestSize.Level0)
+HWTEST_F(ZeroBranch3Test, Telephony_BluetoothCallClient_001, TestSize.Level1)
 {
     BluetoothCallClient &bluetoothCallClient = DelayedRefSingleton<BluetoothCallClient>::GetInstance();
     bluetoothCallClient.UnInit();

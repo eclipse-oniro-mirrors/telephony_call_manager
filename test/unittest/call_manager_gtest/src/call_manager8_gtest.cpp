@@ -621,7 +621,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallPreferenceMode_0500, Tes
  * @tc.name     test is in emergency call
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_IsInEmergencyCall_0100, TestSize.Level0)
+HWTEST_F(CallManagerGtest, Telephony_CallManager_IsInEmergencyCall_0100, TestSize.Level1)
 {
     AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
