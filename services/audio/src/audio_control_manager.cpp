@@ -626,7 +626,8 @@ bool AudioControlManager::IsVideoRingScene(const std::string personalNotificatio
         strcmp(ringtonePath.c_str(), VIDEO_RING_FOR_SYSTEM) == 0) {
         TELEPHONY_LOGI("video ring scene.");
         AudioStandard::AudioRingerMode ringMode = DelayedSingleton<AudioProxy>::GetInstance()->GetRingerMode();
-        if (ringMode != AudioStandard::AudioRingerMode::RINGER_MODE_SILENT || IsRingingVibrateModeOn()) {
+        if ((ringMode == AudioStandard::AudioRingerMode::RINGER_MODE_NORMAL && IsRingingVibrateModeOn()) ||
+            ringMode == AudioStandard::AudioRingerMode::RINGER_MODE_VIBRATE) {
             TELEPHONY_LOGI("need start vibrator.");
             isVideoRingVibrating_ = (DelayedSingleton<AudioProxy>::GetInstance()->StartVibrator() == TELEPHONY_SUCCESS);
         }
