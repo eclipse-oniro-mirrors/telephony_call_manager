@@ -635,7 +635,7 @@ bool AudioControlManager::IsVideoRingScene(const std::string personalNotificatio
     if ((personalNotificationRington.length() > VIDEO_RING_PATH_FIX_TAIL_LENGTH &&
         personalNotificationRington.substr(personalNotificationRington.length() - VIDEO_RING_PATH_FIX_TAIL_LENGTH,
         VIDEO_RING_PATH_FIX_TAIL_LENGTH) == VIDEO_RING_PATH_FIX_TAIL) ||
-        strcmp(ringtonePath.c_str(), VIDEO_RING_FOR_SYSTEM) == 0) {
+        strcmp(ringtonePath.c_str(), SYSTEM_VIDEO_RING) == 0) {
         TELEPHONY_LOGI("video ring scene.");
         AudioStandard::AudioRingerMode ringMode = DelayedSingleton<AudioProxy>::GetInstance()->GetRingerMode();
         if ((ringMode == AudioStandard::AudioRingerMode::RINGER_MODE_NORMAL && IsRingingVibrateModeOn()) ||

@@ -525,30 +525,36 @@ void CallStatusManager::SetContactInfo(sptr<CallBase> &call, std::string phoneNu
 
 void CallStatusManager::DealVideoRingPath(ContactInfo &contactInfo, sptr<CallBase> &callObjectPtr)
 {
-    std::string ringtonePath = contactInfo.ringtonePath;
-    if (ringtonePath.empty()) {
+    if (!strlen(contactInfo.ringtonePath)) {
         CallAttributeInfo info;
         callObjectPtr->GetCallAttributeBaseInfo(info);
-        const std::shared_ptr<AbilityRuntime::Context> context;
-        Media::RingtoneType type = info.accountId == DEFAULT_SIM_SLOT_ID ?
-            Media::RingtoneType::RINGTONE_TYPE_SIM_CARD_0 : Media::RingtoneType::RINGTONE_TYPE_SIM_CARD_1;
-        std::shared_ptr<Media::SystemSoundManager> systemSoundManager =
-            Media::SystemSoundManagerFactory::CreateSystemSoundManager();
-        if (systemSoundManager == nullptr) {
-            TELEPHONY_LOGE("get systemSoundManager failed");
+        auto settingHelper = SettingsDataShareHelper::GetInstance();
+        if (settingHelper == nullptr) {
+            TELEPHONY_LOGE("settingHelper is nullptr.");
             return;
         }
-        ringtonePath = systemSoundManager->GetRingtoneUri(context, type);
-        TELEPHONY_LOGI("ringtonePath: %{public}s", ringtonePath.c_str());
-        if (memset_s(&contactInfo.ringtonePath, sizeof(contactInfo.ringtonePath), 0, sizeof(contactInfo.ringtonePath))
-            != EOK) {
-            TELEPHONY_LOGE("memset_s ringtonePath fail");
-            return;
+        std::string ringtoneFlagCardKey;
+        std::string videoRingtoneNameCardKey;
+        std::string ringtoneFlagCard;
+        std::string videoRingtoneNameCard;
+        if (info.accountId == DEFAULT_SIM_SLOT_ID) {
+            ringtoneFlagCardKey = "ringtoneFlagCardKey1"
+            videoRingtoneNameCardKey = "videoRingtoneNameCardKey1"
+        } else {
+            ringtoneFlagCardKey = "ringtoneFlagCardKey2"
+            videoRingtoneNameCardKey = "videoRingtoneNameCardKey2"
         }
-        if (memcpy_s(contactInfo.ringtonePath, FILE_PATH_MAX_LEN, ringtonePath.c_str(), ringtonePath.length())
-            != EOK) {
-            TELEPHONY_LOGE("memcpy_s ringtonePath fail");
-            return;
+        OHOS::Uri settingUri(SettingsDataShareHelper::SETTINGS_DATASHARE_URI);
+        settingHelper->Query(settingUri, "ringtoneFlagCardKey", ringtoneFlagCard);
+        settingHelper->Query(settingUri, "videoRingtoneNameCardKey", videoRingtoneNameCard);
+        TELEPHONY_LOGI("ringtoneFlagCard: %{public}s, ringtoneFlagCard: %{public}s.",
+            ringtoneFlagCard.c_str(), videoRingtoneNameCard.c_str());
+        if (ringtoneFlagCard == "1" && !videoRingtoneNameCard.empty()) {
+            if (memcpy_s(contactInfo.ringtonePath, FILE_PATH_MAX_LEN, SYSTEM_VIDEO_RING,
+                sizeof(SYSTEM_VIDEO_RING)) != EOK) {
+                TELEPHONY_LOGE("memcpy_s ringtonePath fail");
+                return;
+            }
         }
     }
     AAFwk::WantParams params = callObjectPtr->GetExtraParams();
@@ -556,12 +562,9 @@ void CallStatusManager::DealVideoRingPath(ContactInfo &contactInfo, sptr<CallBas
     if ((personalNotificationRington.length() > VIDEO_RING_PATH_FIX_TAIL_LENGTH &&
         personalNotificationRington.substr(personalNotificationRington.length() - VIDEO_RING_PATH_FIX_TAIL_LENGTH,
         VIDEO_RING_PATH_FIX_TAIL_LENGTH) == VIDEO_RING_PATH_FIX_TAIL) ||
-        strcmp(contactInfo.ringtonePath, VIDEO_RING_FOR_SYSTEM) == 0) {
+        strcmp(contactInfo.ringtonePath, SYSTEM_VIDEO_RING) == 0) {
         TELEPHONY_LOGI("notify callui to play video ring.");
-        params.SetParam("VideoRingType", AAFwk::Integer::Box(RING_TYPE_VIDEO));
-        params.SetParam("VideoRingPath", AAFwk::String::Box(ringtonePath));
-    } else {
-        params.SetParam("VideoRingType", AAFwk::Integer::Box(RING_TYPE_AUDIO));
+        params.SetParam("VideoRingPath", AAFwk::String::Box(std::string(contactInfo.ringtonePath)));
     }
     callObjectPtr->SetExtraParams(params);
 }
