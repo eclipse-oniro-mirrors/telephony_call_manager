@@ -538,11 +538,11 @@ void CallStatusManager::DealVideoRingPath(ContactInfo &contactInfo, sptr<CallBas
         std::string ringtoneFlagCard;
         std::string videoRingtoneNameCard;
         if (info.accountId == DEFAULT_SIM_SLOT_ID) {
-            ringtoneFlagCardKey = "ringtoneFlagCardKey1"
-            videoRingtoneNameCardKey = "videoRingtoneNameCardKey1"
+            ringtoneFlagCardKey = "ringtoneFlagCard1";
+            videoRingtoneNameCardKey = "videoRingtoneNameCard1";
         } else {
-            ringtoneFlagCardKey = "ringtoneFlagCardKey2"
-            videoRingtoneNameCardKey = "videoRingtoneNameCardKey2"
+            ringtoneFlagCardKey = "ringtoneFlagCard2";
+            videoRingtoneNameCardKey = "videoRingtoneNameCard2";
         }
         OHOS::Uri settingUri(SettingsDataShareHelper::SETTINGS_DATASHARE_URI);
         settingHelper->Query(settingUri, "ringtoneFlagCardKey", ringtoneFlagCard);
