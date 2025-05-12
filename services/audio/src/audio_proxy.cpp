@@ -26,6 +26,7 @@
 #include "audio_group_manager.h"
 #include "distributed_call_manager.h"
 #include "distributed_communication_manager.h"
+#include "voip_call.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -88,22 +89,12 @@ bool AudioProxy::SetBluetoothDevActive()
         TELEPHONY_LOGI("bluetooth device is already active");
         return true;
     }
-    bool ret = AudioStandard::AudioSystemManager::GetInstance()->SetDeviceActive(
-        AudioStandard::DeviceType::DEVICE_TYPE_BLUETOOTH_SCO, true);
-    if (ret == ERR_NONE) {
-        return true;
-    }
-    return false;
+    return SetDeviceActiveInner(AudioStandard::DeviceType::DEVICE_TYPE_BLUETOOTH_SCO, true);
 }
 
 bool AudioProxy::SetSpeakerDevActive(bool isActive)
 {
-    bool ret = AudioStandard::AudioSystemManager::GetInstance()->SetDeviceActive(
-        AudioStandard::DeviceType::DEVICE_TYPE_SPEAKER, isActive);
-    if (ret == ERR_NONE) {
-        return true;
-    }
-    return false;
+    return SetDeviceActiveInner(AudioStandard::DeviceType::DEVICE_TYPE_SPEAKER, isActive);
 }
 
 bool AudioProxy::SetWiredHeadsetDevActive()
@@ -117,12 +108,7 @@ bool AudioProxy::SetWiredHeadsetDevActive()
         TELEPHONY_LOGI("wired headset device is already active");
         return true;
     }
-    bool ret = AudioStandard::AudioSystemManager::GetInstance()->SetDeviceActive(
-        AudioStandard::DeviceType::DEVICE_TYPE_USB_HEADSET, true);
-    if (ret == ERR_NONE) {
-        return true;
-    }
-    return false;
+    return SetDeviceActiveInner(AudioStandard::DeviceType::DEVICE_TYPE_USB_HEADSET, true);
 }
 
 bool AudioProxy::SetEarpieceDevActive()
@@ -136,12 +122,7 @@ bool AudioProxy::SetEarpieceDevActive()
         TELEPHONY_LOGI("earpiece device is already active");
         return true;
     }
-    if (AudioStandard::AudioSystemManager::GetInstance()->SetDeviceActive(
-        AudioStandard::DeviceType::DEVICE_TYPE_EARPIECE, true) != ERR_NONE) {
-        TELEPHONY_LOGE("SetEarpieceDevActive earpiece active fail");
-        return false;
-    }
-    return true;
+    return SetDeviceActiveInner(AudioStandard::DeviceType::DEVICE_TYPE_EARPIECE, true);
 }
 
 int32_t AudioProxy::StartVibrator()
@@ -522,6 +503,34 @@ float AudioProxy::GetSystemRingVolumeInDb(int32_t volumeLevel)
     }
     return audioGroupManager->GetSystemVolumeInDb(AudioStandard::AudioVolumeType::STREAM_RING,
         volumeLevel, AudioStandard::DEVICE_TYPE_SPEAKER);
+}
+
+bool AudioProxy::SetDeviceActiveInner(AudioStandard::DeviceType deviceType, bool flag)
+{
+    sptr<CallBase> call = CallObjectManager::GetAudioLiveCall();
+    if (call == nullptr) {
+        TELEPHONY_LOGE("SetDeviceActiveInner failed, call is nullptr");
+        return false;
+    }
+    if (call->GetCallType() == CallType::TYPE_VOIP) {
+        sptr<VoIPCall> voipCall = reinterpret_cast<VoIPCall *>(call.GetRefPtr());
+        if (AudioStandard::AudioSystemManager::GetInstance()->SetDeviceAcctive(
+            deviceType, flag, voipCall->GetVoipUid()) != ERR_NONE) {
+            TELEPHONY_LOGE("SetDeviceActiveInner voip devicetype :%{public}d failed", deviceType);
+            return false;
+        }
+        return true;
+    } else if (call->GetCallType() == CallType::TYPE_IMS
+        || call->GetCallType() == CallType::TYPE_CS){
+        if (AudioStandard::AudioSystemManager::GetInstance()->SetDeviceAcctive(
+            deviceType, flag) != ERR_NONE) {
+            TELEPHONY_LOGE("SetDeviceActiveInner devicetype :%{public}d failed", deviceType);
+            return false;                   
+        }
+        return true;
+    }
+    TELEPHONY_LOGE("SetDeviceActiveInner failed, no valid call type");
+    return false;
 }
 } // namespace Telephony
 } // namespace OHOS

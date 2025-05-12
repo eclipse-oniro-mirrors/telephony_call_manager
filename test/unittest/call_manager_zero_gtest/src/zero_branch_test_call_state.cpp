@@ -21,8 +21,10 @@
 #include "call_ability_callback_stub.h"
 #include "call_policy.h"
 #include "call_request_process.h"
+#include "call_object_manager.h"
 #include "call_state_processor.h"
 #include "call_status_callback_proxy.h"
+#include "cs_call.h"
 #include "cs_call_state.h"
 #include "dialing_state.h"
 #include "earpiece_device_state.h"
@@ -312,6 +314,24 @@ HWTEST_F(CallStateTest, Telephony_AudioProxy_002, Function | MediumTest | Level3
     audioProxy->UnsetAudioPreferDeviceChangeCallback();
     ASSERT_FALSE(audioProxy->GetDefaultTonePath().empty());
     ASSERT_FALSE(audioProxy->GetDefaultDtmfPath().empty());
+    DialParaInfo info;
+    info.voipCallInfo.uid = 1;
+    sptr<CallBase> call0 = new CSCall(dialInfo);
+    call0->SetCallId(0);
+    call0->SetCallIndex(0);
+    call0->SetSlotId(0);
+    call0->SetTelCallState(TelCallState::CALL_STATUS_ACTIVE);
+    call0->SetCallType(CallType::TYPE_CS);
+    CallObjectManager::AddOneCallObject(call0);
+    EXPECT_TRUE(CallObjectManager::GetAudioLiveCall() != nullptr);
+    audioProxy->SetDeviceActiveInner(AudioStandard::DeviceType::DEVICE_TYPE_BLUETOOTH_SCO, true);
+    call0->SetTelCallState(TelCallState::CALL_STATUS_DISCONNECTED);
+    sptr<CallBase> call1 = new VoIPCall(dialInfo);
+    call1->SetCallId(1);
+    call1->SetCallType(CallType::TYPE_VOIP);
+    call1->SetTelCallState(TelCallState::CALL_STATUS_ACTIVE);
+    EXPECT_TRUE(CallObjectManager::GetAudioLiveCall() != nullptr);
+    audioProxy->SetDeviceActiveInner(AudioStandard::DeviceType::DEVICE_TYPE_SPEAKERl, true);
 }
 
 /**
