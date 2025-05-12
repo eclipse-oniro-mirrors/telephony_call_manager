@@ -225,7 +225,7 @@ HWTEST_F(ZeroBranch8Test, Telephony_CallManagerService_001, Function | MediumTes
     }
 }
 
-HWTEST_F(ZeroBranch8Test, Telephony_CallManagerService_002, Function | MediumTest | Level3)
+HWTEST_F(ZeroBranch8Test, Telephony_CallManagerService_002, TestSize.Level0)
 {
     AccessToken token;
     std::u16string test = u"";
@@ -267,7 +267,7 @@ HWTEST_F(ZeroBranch8Test, Telephony_CallManagerService_002, Function | MediumTes
  * @tc.name     test error nullptr branch with permission
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroBranch8Test, Telephony_CallManagerService_003, Function | MediumTest | Level3)
+HWTEST_F(ZeroBranch8Test, Telephony_CallManagerService_003, TestSize.Level0)
 {
     AccessToken token;
     float zoomRatio = 1;
@@ -324,7 +324,7 @@ HWTEST_F(ZeroBranch8Test, Telephony_CallManagerService_003, Function | MediumTes
  * @tc.name     test error nullptr branch with permission
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroBranch8Test, Telephony_CallManagerService_004, Function | MediumTest | Level3)
+HWTEST_F(ZeroBranch8Test, Telephony_CallManagerService_004, TestSize.Level0)
 {
     AccessFalseToken token;
     std::u16string test = u"";
@@ -379,7 +379,7 @@ HWTEST_F(ZeroBranch8Test, Telephony_CallManagerService_004, Function | MediumTes
  * @tc.name     test error nullptr branch with permission
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroBranch8Test, Telephony_CallManagerService_005, Function | MediumTest | Level3)
+HWTEST_F(ZeroBranch8Test, Telephony_CallManagerService_005, TestSize.Level0)
 {
     AccessFalseToken token;
     float zoomRatio = 1;
@@ -413,7 +413,7 @@ HWTEST_F(ZeroBranch8Test, Telephony_CallManagerService_005, Function | MediumTes
     EXPECT_EQ(callManagerService->SendUssdResponse(slotId, content), TELEPHONY_ERR_ILLEGAL_USE_OF_SYSTEM_API);
 }
 
-HWTEST_F(ZeroBranch8Test, Telephony_BluetoothCallService_001, Function | MediumTest | Level3)
+HWTEST_F(ZeroBranch8Test, Telephony_BluetoothCallService_001, TestSize.Level0)
 {
     AccessToken token;
     BluetoothCallService bluetoothCallService;
@@ -426,7 +426,7 @@ HWTEST_F(ZeroBranch8Test, Telephony_BluetoothCallService_001, Function | MediumT
     EXPECT_NE(bluetoothCallService.KickOutFromConference(), TELEPHONY_SUCCESS);
 }
 
-HWTEST_F(ZeroBranch8Test, Telephony_BluetoothCallService_002, Function | MediumTest | Level3)
+HWTEST_F(ZeroBranch8Test, Telephony_BluetoothCallService_002, TestSize.Level1)
 {
     AccessToken token;
     BluetoothCallService bluetoothCallService;
@@ -435,7 +435,7 @@ HWTEST_F(ZeroBranch8Test, Telephony_BluetoothCallService_002, Function | MediumT
     EXPECT_NE(bluetoothCallService.KickOutFromConference(), TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
 
-HWTEST_F(ZeroBranch8Test, Telephony_CallSettingManager_001, Function | MediumTest | Level3)
+HWTEST_F(ZeroBranch8Test, Telephony_CallSettingManager_001, TestSize.Level0)
 {
     std::shared_ptr<CallSettingManager> callSettingManager = std::make_shared<CallSettingManager>();
     callSettingManager->cellularCallConnectionPtr_ = nullptr;
@@ -483,7 +483,7 @@ HWTEST_F(ZeroBranch8Test, Telephony_CallSettingManager_001, Function | MediumTes
     EXPECT_EQ(callSettingManager->CloseUnFinishedUssd(SIM1_SLOTID), TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
 
-HWTEST_F(ZeroBranch8Test, Telephony_CallSettingManager_002, Function | MediumTest | Level3)
+HWTEST_F(ZeroBranch8Test, Telephony_CallSettingManager_002, TestSize.Level0)
 {
     std::shared_ptr<CallSettingManager> callSettingManager = std::make_shared<CallSettingManager>();
     CallRestrictionType fac = CallRestrictionType::RESTRICTION_TYPE_ALL_INCOMING;

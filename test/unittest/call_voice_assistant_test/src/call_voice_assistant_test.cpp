@@ -49,7 +49,7 @@ public:
  * @tc.name     test normal branch
  * @tc.desc     Function test
  */
-HWTEST_F(CallVoiceAssistantManagerTest, Telephony_CallVoiceAssistantManager_001, Function | MediumTest | Level3)
+HWTEST_F(CallVoiceAssistantManagerTest, Telephony_CallVoiceAssistantManager_001, TestSize.Level0)
 {
     const int32_t callId = -1;
     const int32_t accountId = -1;
@@ -90,7 +90,7 @@ HWTEST_F(CallVoiceAssistantManagerTest, Telephony_CallVoiceAssistantManager_001,
  * @tc.name     test normal branch
  * @tc.desc     Function test
  */
-HWTEST_F(CallVoiceAssistantManagerTest, Telephony_CallVoiceAssistantManager_002, Function | MediumTest | Level3)
+HWTEST_F(CallVoiceAssistantManagerTest, Telephony_CallVoiceAssistantManager_002, TestSize.Level0)
 {
     const int32_t callId = -1;
     const int32_t accountId = -1;
@@ -137,7 +137,7 @@ HWTEST_F(CallVoiceAssistantManagerTest, Telephony_CallVoiceAssistantManager_002,
  * @tc.name     test normal branch
  * @tc.desc     Function test
  */
-HWTEST_F(CallVoiceAssistantManagerTest, Telephony_VoiceAssistantSwitchObserver_001, Function | MediumTest | Level3)
+HWTEST_F(CallVoiceAssistantManagerTest, Telephony_VoiceAssistantSwitchObserver_001, TestSize.Level0)
 {
     sptr<AAFwk::IDataAbilityObserver> settingsCallback = sptr<VoiceAssistantSwitchObserver>::MakeSptr();
     settingsCallback->OnChange();
@@ -149,7 +149,7 @@ HWTEST_F(CallVoiceAssistantManagerTest, Telephony_VoiceAssistantSwitchObserver_0
  * @tc.name     test normal branch
  * @tc.desc     Function test
  */
-HWTEST_F(CallVoiceAssistantManagerTest, Telephony_VoiceAssistantConnectCallback_001, Function | MediumTest | Level3)
+HWTEST_F(CallVoiceAssistantManagerTest, Telephony_VoiceAssistantConnectCallback_001, TestSize.Level1)
 {
     const int32_t accountId = 1;
     sptr<IRemoteObject> remoteObject = sptr<VoiceAssistantConnectCallback>::MakeSptr(accountId);
@@ -165,7 +165,7 @@ HWTEST_F(CallVoiceAssistantManagerTest, Telephony_VoiceAssistantConnectCallback_
  * @tc.name     test normal branch
  * @tc.desc     Function test
  */
-HWTEST_F(CallVoiceAssistantManagerTest, Telephony_VoiceAssistantRingSubscriber_001, Function | MediumTest | Level3)
+HWTEST_F(CallVoiceAssistantManagerTest, Telephony_VoiceAssistantRingSubscriber_001, TestSize.Level0)
 {
     std::string event = "test.test.test.test";
     EventFwk::MatchingSkills matchingSkills;

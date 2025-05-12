@@ -69,7 +69,7 @@ void ZeroBranch7Test::TearDown()
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroBranch7Test, Telephony_CallBroadcastSubscriber_001, Function | MediumTest | Level3)
+HWTEST_F(ZeroBranch7Test, Telephony_CallBroadcastSubscriber_001, TestSize.Level0)
 {
     EventFwk::MatchingSkills matchingSkills;
     matchingSkills.AddEvent(EventFwk::CommonEventSupport::COMMON_EVENT_SIM_STATE_CHANGED);
@@ -94,7 +94,7 @@ HWTEST_F(ZeroBranch7Test, Telephony_CallBroadcastSubscriber_001, Function | Medi
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroBranch7Test, Telephony_CallStatusCallbackStub_001, Function | MediumTest | Level3)
+HWTEST_F(ZeroBranch7Test, Telephony_CallStatusCallbackStub_001, TestSize.Level0)
 {
     auto callStatusCallback = std::make_shared<CallStatusCallback>();
     MessageParcel messageParcel;
@@ -129,7 +129,7 @@ HWTEST_F(ZeroBranch7Test, Telephony_CallStatusCallbackStub_001, Function | Mediu
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroBranch7Test, Telephony_CallStatusCallbackStub_002, Function | MediumTest | Level3)
+HWTEST_F(ZeroBranch7Test, Telephony_CallStatusCallbackStub_002, TestSize.Level0)
 {
     auto callStatusCallback = std::make_shared<CallStatusCallback>();
     MessageParcel dataParce3;
@@ -165,7 +165,7 @@ HWTEST_F(ZeroBranch7Test, Telephony_CallStatusCallbackStub_002, Function | Mediu
     ASSERT_EQ(callStatusCallback->OnUpdateVoipEventInfo(dataParce6, reply), TELEPHONY_SUCCESS);
 }
 
-HWTEST_F(ZeroBranch7Test, Telephony_FoldStatusManager_001, Function | MediumTest | Level3)
+HWTEST_F(ZeroBranch7Test, Telephony_FoldStatusManager_001, TestSize.Level1)
 {
     auto foldStatusManagerPtr = DelayedSingleton<FoldStatusManager>::GetInstance();
     if (foldStatusManagerPtr == nullptr) {
@@ -180,7 +180,7 @@ HWTEST_F(ZeroBranch7Test, Telephony_FoldStatusManager_001, Function | MediumTest
     EXPECT_TRUE(foldStatusManagerPtr != nullptr);
 }
 
-HWTEST_F(ZeroBranch7Test, Telephony_BluetoothCallConnection_001, Function | MediumTest | Level3)
+HWTEST_F(ZeroBranch7Test, Telephony_BluetoothCallConnection_001, TestSize.Level0)
 {
     auto blueToothConnectionPtr = DelayedSingleton<BluetoothCallConnection>::GetInstance();
     if (blueToothConnectionPtr == nullptr) {

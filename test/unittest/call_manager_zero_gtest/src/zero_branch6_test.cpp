@@ -167,7 +167,7 @@ std::shared_ptr<DataShare::DataShareHelper> CreateDataShareHelper(std::string ur
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroBranch5Test, Telephony_CallStatusManager_003, Function | MediumTest | Level3)
+HWTEST_F(ZeroBranch5Test, Telephony_CallStatusManager_003, TestSize.Level0)
 {
     std::shared_ptr<CallStatusManager> callStatusManager = std::make_shared<CallStatusManager>();
     callStatusManager->Init();
@@ -215,7 +215,7 @@ HWTEST_F(ZeroBranch5Test, Telephony_CallStatusManager_003, Function | MediumTest
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroBranch5Test, Telephony_CallStatusManager_004, Function | MediumTest | Level3)
+HWTEST_F(ZeroBranch5Test, Telephony_CallStatusManager_004, TestSize.Level0)
 {
     std::shared_ptr<CallStatusManager> callStatusManager = std::make_shared<CallStatusManager>();
     callStatusManager->Init();
@@ -255,7 +255,7 @@ HWTEST_F(ZeroBranch5Test, Telephony_CallStatusManager_004, Function | MediumTest
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
- HWTEST_F(ZeroBranch5Test, Telephony_CallStatusManager_005, Function | MediumTest | Level3)
+ HWTEST_F(ZeroBranch5Test, Telephony_CallStatusManager_005, TestSize.Level0)
 {
     std::shared_ptr<CallStatusManager> callStatusManager = std::make_shared<CallStatusManager>();
     ASSERT_TRUE(callStatusManager != nullptr);
@@ -280,7 +280,7 @@ HWTEST_F(ZeroBranch5Test, Telephony_CallStatusManager_004, Function | MediumTest
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
- HWTEST_F(ZeroBranch5Test, Telephony_CallStatusManager_006, Function | MediumTest | Level3)
+ HWTEST_F(ZeroBranch5Test, Telephony_CallStatusManager_006, TestSize.Level0)
 {
     std::shared_ptr<CallStatusManager> callStatusManager = std::make_shared<CallStatusManager>();
     ASSERT_TRUE(callStatusManager != nullptr);
@@ -305,7 +305,7 @@ HWTEST_F(ZeroBranch5Test, Telephony_CallStatusManager_004, Function | MediumTest
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
- HWTEST_F(ZeroBranch5Test, Telephony_CallStatusManager_007, Function | MediumTest | Level3)
+ HWTEST_F(ZeroBranch5Test, Telephony_CallStatusManager_007, TestSize.Level0)
 {
     std::shared_ptr<CallStatusManager> callStatusManager = std::make_shared<CallStatusManager>();
     ASSERT_TRUE(callStatusManager != nullptr);
@@ -327,7 +327,7 @@ HWTEST_F(ZeroBranch5Test, Telephony_CallStatusManager_004, Function | MediumTest
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroBranch5Test, Telephony_IncomingCallWakeup_001, Function | MediumTest | Level3)
+HWTEST_F(ZeroBranch5Test, Telephony_IncomingCallWakeup_001, TestSize.Level1)
 {
     auto incomingCallWakeup = std::make_shared<IncomingCallWakeup>();
     sptr<CallBase> callObjectPtr = nullptr;
@@ -340,7 +340,7 @@ HWTEST_F(ZeroBranch5Test, Telephony_IncomingCallWakeup_001, Function | MediumTes
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroBranch5Test, Telephony_CallStateReportProxy_001, Function | MediumTest | Level3)
+HWTEST_F(ZeroBranch5Test, Telephony_CallStateReportProxy_001, TestSize.Level0)
 {
     CallStateReportProxy callStateReportPtr;
     sptr<CallBase> callObjectPtr = nullptr;
@@ -370,7 +370,7 @@ HWTEST_F(ZeroBranch5Test, Telephony_CallStateReportProxy_001, Function | MediumT
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroBranch5Test, Telephony_CallStateListener_001, Function | MediumTest | Level3)
+HWTEST_F(ZeroBranch5Test, Telephony_CallStateListener_001, TestSize.Level0)
 {
     CallStateListener callStateListener;
     sptr<CallBase> callObjectPtr = nullptr;
@@ -399,7 +399,7 @@ HWTEST_F(ZeroBranch5Test, Telephony_CallStateListener_001, Function | MediumTest
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroBranch5Test, Telephony_ConferenceBase_001, Function | MediumTest | Level3)
+HWTEST_F(ZeroBranch5Test, Telephony_ConferenceBase_001, TestSize.Level0)
 {
     std::shared_ptr<ConferenceBase> conference = std::make_shared<CsConference>();
     std::vector<std::u16string> callIdList;
@@ -431,7 +431,7 @@ HWTEST_F(ZeroBranch5Test, Telephony_ConferenceBase_001, Function | MediumTest | 
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroBranch5Test, Telephony_CallAbilityReportProxy_001, Function | MediumTest | Level3)
+HWTEST_F(ZeroBranch5Test, Telephony_CallAbilityReportProxy_001, TestSize.Level0)
 {
     CallAbilityConnectCallback callAbilityConnectCallback;
     callAbilityConnectCallback.ReConnectAbility();
@@ -486,7 +486,7 @@ HWTEST_F(ZeroBranch5Test, Telephony_CallAbilityReportProxy_001, Function | Mediu
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroBranch5Test, Telephony_CallAbilityReportProxy_002, Function | MediumTest | Level3)
+HWTEST_F(ZeroBranch5Test, Telephony_CallAbilityReportProxy_002, TestSize.Level0)
 {
     CallAbilityConnectCallback callAbilityConnectCallback;
     callAbilityConnectCallback.ReConnectAbility();
@@ -510,7 +510,7 @@ HWTEST_F(ZeroBranch5Test, Telephony_CallAbilityReportProxy_002, Function | Mediu
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroBranch5Test, Telephony_CallAbilityReportProxy_003, Function | MediumTest | Level3)
+HWTEST_F(ZeroBranch5Test, Telephony_CallAbilityReportProxy_003, TestSize.Level0)
 {
     CallAttributeInfo callAttributeInfo;
     std::shared_ptr<CallAbilityReportProxy> callAbilityReportProxy = std::make_shared<CallAbilityReportProxy>();
@@ -522,7 +522,7 @@ HWTEST_F(ZeroBranch5Test, Telephony_CallAbilityReportProxy_003, Function | Mediu
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroBranch5Test, Telephony_CallAbilityConnectCallback_001, Function | MediumTest | Level3)
+HWTEST_F(ZeroBranch5Test, Telephony_CallAbilityConnectCallback_001, TestSize.Level0)
 {
     CallAbilityConnectCallback callAbilityConnectCallback;
     callAbilityConnectCallback.ReConnectAbility();
@@ -544,7 +544,7 @@ HWTEST_F(ZeroBranch5Test, Telephony_CallAbilityConnectCallback_001, Function | M
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroBranch5Test, Telephony_AutoAnswerState_001, Function | MediumTest | Level3)
+HWTEST_F(ZeroBranch5Test, Telephony_AutoAnswerState_001, TestSize.Level0)
 {
     bool flag = true;
     sptr<CallBase> callObjectPtr = nullptr;
@@ -562,7 +562,7 @@ HWTEST_F(ZeroBranch5Test, Telephony_AutoAnswerState_001, Function | MediumTest |
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroBranch5Test, Telephony_CanUnHoldState_001, Function | MediumTest | Level3)
+HWTEST_F(ZeroBranch5Test, Telephony_CanUnHoldState_001, TestSize.Level0)
 {
     bool flag = true;
     sptr<CallBase> callObjectPtr = nullptr;
@@ -580,7 +580,7 @@ HWTEST_F(ZeroBranch5Test, Telephony_CanUnHoldState_001, Function | MediumTest | 
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroBranch5Test, Telephony_SatelliteCall_001, Function | MediumTest | Level3)
+HWTEST_F(ZeroBranch5Test, Telephony_SatelliteCall_001, TestSize.Level0)
 {
     DialParaInfo dialParaInfo;
     SatelliteCall call { dialParaInfo };
@@ -601,7 +601,7 @@ HWTEST_F(ZeroBranch5Test, Telephony_SatelliteCall_001, Function | MediumTest | L
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroBranch5Test, Telephony_VoipCallManagerProxy_001, Function | MediumTest | Level3)
+HWTEST_F(ZeroBranch5Test, Telephony_VoipCallManagerProxy_001, TestSize.Level0)
 {
     sptr<ISystemAbilityManager> managerPtr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     sptr<IVoipCallManagerService> voipCallManagerInterfacePtr = nullptr;
@@ -658,7 +658,7 @@ HWTEST_F(ZeroBranch5Test, Telephony_VoipCallManagerProxy_001, Function | MediumT
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroBranch5Test, Telephony_CallRequestEventHandlerHelper_001, Function | MediumTest | Level3)
+HWTEST_F(ZeroBranch5Test, Telephony_CallRequestEventHandlerHelper_001, TestSize.Level0)
 {
     bool flag = false;
     DelayedSingleton<CallRequestEventHandlerHelper>::GetInstance()->RestoreDialingFlag(flag);
@@ -670,7 +670,7 @@ HWTEST_F(ZeroBranch5Test, Telephony_CallRequestEventHandlerHelper_001, Function 
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroBranch5Test, Telephony_DistributedCallManager_001, Function | MediumTest | Level3)
+HWTEST_F(ZeroBranch5Test, Telephony_DistributedCallManager_001, TestSize.Level0)
 {
     DistributedCallManager manager;
     AudioDevice device;
@@ -721,7 +721,7 @@ HWTEST_F(ZeroBranch5Test, Telephony_DistributedCallManager_001, Function | Mediu
  * @tc.name     test normal branch
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroBranch5Test, Telephony_DistributedCallManager_002, Function | MediumTest | Level3)
+HWTEST_F(ZeroBranch5Test, Telephony_DistributedCallManager_002, TestSize.Level0)
 {
     DistributedCallManager manager;
     AudioDevice device;
@@ -779,7 +779,7 @@ HWTEST_F(ZeroBranch5Test, Telephony_DistributedCallManager_002, Function | Mediu
  * @tc.name     test normal branch
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroBranch5Test, Telephony_DistributedCallManager_003, Function | MediumTest | Level3)
+HWTEST_F(ZeroBranch5Test, Telephony_DistributedCallManager_003, TestSize.Level0)
 {
     AudioDevice device;
     std::string deviceId = "";
@@ -813,7 +813,7 @@ HWTEST_F(ZeroBranch5Test, Telephony_DistributedCallManager_003, Function | Mediu
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroBranch5Test, Telephony_DistributedCallProxy_001, Function | MediumTest | Level3)
+HWTEST_F(ZeroBranch5Test, Telephony_DistributedCallProxy_001, TestSize.Level0)
 {
     std::unique_ptr<DistributedCallProxy> proxy = std::make_unique<DistributedCallProxy>();
     std::shared_ptr<OHOS::DistributedHardware::IDCallDeviceCallback> callback = nullptr;
@@ -861,7 +861,7 @@ HWTEST_F(ZeroBranch5Test, Telephony_DistributedCallProxy_001, Function | MediumT
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroBranch5Test, Telephony_BluetoothCallManager_001, Function | MediumTest | Level3)
+HWTEST_F(ZeroBranch5Test, Telephony_BluetoothCallManager_001, TestSize.Level0)
 {
     int32_t state = 0;
     int32_t numActive = CallObjectManager::GetCallNum(TelCallState::CALL_STATUS_ACTIVE);
@@ -884,7 +884,7 @@ HWTEST_F(ZeroBranch5Test, Telephony_BluetoothCallManager_001, Function | MediumT
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroBranch5Test, Telephony_CallAbilityCallbackDeathRecipient_001, Function | MediumTest | Level3)
+HWTEST_F(ZeroBranch5Test, Telephony_CallAbilityCallbackDeathRecipient_001, TestSize.Level0)
 {
     CallAbilityCallbackDeathRecipient recipient;
     OHOS::wptr<OHOS::IRemoteObject> object;
@@ -897,7 +897,7 @@ HWTEST_F(ZeroBranch5Test, Telephony_CallAbilityCallbackDeathRecipient_001, Funct
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroBranch5Test, Telephony_ApplicationStateObserver_001, Function | MediumTest | Level3)
+HWTEST_F(ZeroBranch5Test, Telephony_ApplicationStateObserver_001, TestSize.Level0)
 {
     ApplicationStateObserver applicationStateObserver;
     AppExecFwk::ProcessData processData;
@@ -910,7 +910,7 @@ HWTEST_F(ZeroBranch5Test, Telephony_ApplicationStateObserver_001, Function | Med
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroBranch5Test, Telephony_CallAbilityCallbackProxy_001, Function | MediumTest | Level3)
+HWTEST_F(ZeroBranch5Test, Telephony_CallAbilityCallbackProxy_001, TestSize.Level0)
 {
     sptr<IRemoteObject> impl;
     CallAbilityCallbackProxy callAbilityCallbackProxy(impl);
@@ -950,7 +950,7 @@ HWTEST_F(ZeroBranch5Test, Telephony_CallAbilityCallbackProxy_001, Function | Med
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroBranch5Test, Telephony_OTTCallConnection_001, Function | MediumTest | Level3)
+HWTEST_F(ZeroBranch5Test, Telephony_OTTCallConnection_001, TestSize.Level0)
 {
     OTTCallConnection ott;
     OttCallRequestInfo requestInfo;
@@ -976,7 +976,7 @@ HWTEST_F(ZeroBranch5Test, Telephony_OTTCallConnection_001, Function | MediumTest
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroBranch5Test, Telephony_SuperPrivacyManagerClient_001, Function | MediumTest | Level3)
+HWTEST_F(ZeroBranch5Test, Telephony_SuperPrivacyManagerClient_001, TestSize.Level0)
 {
     int32_t privacy = SuperPrivacyManagerClient::GetInstance().
         SetSuperPrivacyMode(static_cast<int32_t>(CallSuperPrivacyModeType::OFF), SOURCE_CALL);
@@ -992,7 +992,7 @@ HWTEST_F(ZeroBranch5Test, Telephony_SuperPrivacyManagerClient_001, Function | Me
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroBranch5Test, Telephony_CallStatusCallback_001, Function | MediumTest | Level3)
+HWTEST_F(ZeroBranch5Test, Telephony_CallStatusCallback_001, TestSize.Level0)
 {
     auto callStatusCallback = std::make_shared<CallStatusCallback>();
     CallReportInfo callReportInfo;
@@ -1048,7 +1048,7 @@ HWTEST_F(ZeroBranch5Test, Telephony_CallStatusCallback_001, Function | MediumTes
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroBranch5Test, Telephony_CallStatusCallback_002, Function | MediumTest | Level3)
+HWTEST_F(ZeroBranch5Test, Telephony_CallStatusCallback_002, TestSize.Level0)
 {
     auto callStatusCallback = std::make_shared<CallStatusCallback>();
     std::string c("a");
@@ -1073,7 +1073,7 @@ HWTEST_F(ZeroBranch5Test, Telephony_CallStatusCallback_002, Function | MediumTes
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroBranch5Test, Telephony_CallStatusCallbackStub_001, Function | MediumTest | Level3)
+HWTEST_F(ZeroBranch5Test, Telephony_CallStatusCallbackStub_001, TestSize.Level0)
 {
     auto callStatusCallback = std::make_shared<CallStatusCallback>();
     MessageParcel data;
@@ -1128,7 +1128,7 @@ HWTEST_F(ZeroBranch5Test, Telephony_CallStatusCallbackStub_001, Function | Mediu
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroBranch5Test, Telephony_CallStatusCallbackStub_002, Function | MediumTest | Level3)
+HWTEST_F(ZeroBranch5Test, Telephony_CallStatusCallbackStub_002, TestSize.Level0)
 {
     auto callStatusCallback = std::make_shared<CallStatusCallback>();
     MessageParcel data;
@@ -1185,7 +1185,7 @@ HWTEST_F(ZeroBranch5Test, Telephony_CallStatusCallbackStub_002, Function | Mediu
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroBranch5Test, Telephony_CallStatusCallbackStub_003, Function | MediumTest | Level3)
+HWTEST_F(ZeroBranch5Test, Telephony_CallStatusCallbackStub_003, TestSize.Level0)
 {
     auto callStatusCallback = std::make_shared<CallStatusCallback>();
     MessageParcel data;
