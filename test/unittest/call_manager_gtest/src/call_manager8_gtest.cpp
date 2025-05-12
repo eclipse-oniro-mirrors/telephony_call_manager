@@ -791,7 +791,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_HasVoiceCapability_0100, TestSi
  * @tc.name     test Close Unfinished ussd
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_CloseUnFinishedUssd_0100, TestSize.Level0)
+HWTEST_F(CallManagerGtest, Telephony_CallManager_CloseUnFinishedUssd_0100, TestSize.Level1)
 {
     AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
@@ -813,7 +813,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_CloseUnFinishedUssd_0100, TestS
  * @tc.name     test Input Dialer Special Code with support code
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_InputDialerSpecialCode_0100, TestSize.Level0)
+HWTEST_F(CallManagerGtest, Telephony_CallManager_InputDialerSpecialCode_0100, TestSize.Level1)
 {
     AccessToken token;
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
@@ -964,7 +964,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_GetVoIPCallState_0200, TestSize
  * @tc.name     test SetVoIPCallInfo
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_SetVoIPCallInfo_0100, TestSize.Level0)
+HWTEST_F(CallManagerGtest, Telephony_CallManager_SetVoIPCallInfo_0100, TestSize.Level1)
 {
     AccessToken token;
     int32_t callId = 10001;
@@ -979,7 +979,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetVoIPCallInfo_0100, TestSize.
  * @tc.name     test SetVoIPCallInfo
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_SetVoIPCallInfo_0200, TestSize.Level0)
+HWTEST_F(CallManagerGtest, Telephony_CallManager_SetVoIPCallInfo_0200, TestSize.Level1)
 {
     std::shared_ptr<CallManagerClient> client = std::make_shared<CallManagerClient>();
     AccessToken token;
@@ -1055,7 +1055,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_TestDump_0100, TestSize.Level0)
  * @tc.name     Test VoipCallObject
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerGtest, Telephony_VoipCallObject_0100, TestSize.Level0)
+HWTEST_F(CallManagerGtest, Telephony_VoipCallObject_0100, TestSize.Level1)
 {
     CallObjectManager::ClearVoipList();
     CallAttributeInfo callAttrInfo;
@@ -1370,7 +1370,7 @@ HWTEST_F(CallManagerGtest, Telephony_AntiFraud_0100, TestSize.Level0)
  * @tc.name     Test antiFraud hsdr helper
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerGtest, Telephony_NumberIdentityConnection_0001, TestSize.Level0)
+HWTEST_F(CallManagerGtest, Telephony_NumberIdentityConnection_0001, TestSize.Level1)
 {
     sptr<NumberIdentityConnection> connection = new (std::nothrow) NumberIdentityConnection(
         [](const sptr<IRemoteObject> &remoteObject) {}, []() {});

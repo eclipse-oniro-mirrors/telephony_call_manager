@@ -318,7 +318,7 @@ HWTEST_F(SpecialBranch1Test, Telephony_SatelliteCall_001, TestSize.Level0)
  * @tc.name     test branch
  * @tc.desc     Function test
  */
-HWTEST_F(SpecialBranch1Test, Telephony_CallRequestProcess_001, TestSize.Level0)
+HWTEST_F(SpecialBranch1Test, Telephony_CallRequestProcess_001, TestSize.Level1)
 {
     std::shared_ptr<CallRequestProcess> callRequestProcess = std::make_shared<CallRequestProcess>();
     ASSERT_TRUE(callRequestProcess != nullptr);
