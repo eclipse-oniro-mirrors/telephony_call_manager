@@ -324,14 +324,14 @@ HWTEST_F(CallStateTest, Telephony_AudioProxy_002, Function | MediumTest | Level3
     call0->SetCallType(CallType::TYPE_CS);
     CallObjectManager::AddOneCallObject(call0);
     EXPECT_TRUE(CallObjectManager::GetAudioLiveCall() != nullptr);
-    audioProxy->SetDeviceActiveInner(AudioStandard::DeviceType::DEVICE_TYPE_BLUETOOTH_SCO, true);
+    audioProxy->SetDeviceActive(AudioStandard::DeviceType::DEVICE_TYPE_BLUETOOTH_SCO, true);
     call0->SetTelCallState(TelCallState::CALL_STATUS_DISCONNECTED);
     sptr<CallBase> call1 = new VoIPCall(dialInfo);
     call1->SetCallId(1);
     call1->SetCallType(CallType::TYPE_VOIP);
     call1->SetTelCallState(TelCallState::CALL_STATUS_ACTIVE);
     EXPECT_TRUE(CallObjectManager::GetAudioLiveCall() != nullptr);
-    audioProxy->SetDeviceActiveInner(AudioStandard::DeviceType::DEVICE_TYPE_SPEAKERl, true);
+    audioProxy->SetDeviceActive(AudioStandard::DeviceType::DEVICE_TYPE_SPEAKERl, true);
 }
 
 /**
