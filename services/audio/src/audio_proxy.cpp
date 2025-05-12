@@ -523,7 +523,7 @@ bool AudioProxy::SetDeviceActive(AudioStandard::DeviceType deviceType, bool flag
     }
     if (AudioStandard::AudioSystemManager::GetInstance()->SetDeviceAcctive(deviceType, flag) != ERR_NONE) {
         TELEPHONY_LOGE("SetDeviceActive devicetype :%{public}d failed", deviceType);
-        return false;                   
+        return false;
     }
     return true;
 }
