@@ -514,14 +514,14 @@ bool AudioProxy::SetDeviceActive(AudioStandard::DeviceType deviceType, bool flag
     }
     if (call->GetCallType() == CallType::TYPE_VOIP) {
         sptr<VoIPCall> voipCall = reinterpret_cast<VoIPCall *>(call.GetRefPtr());
-        if (AudioStandard::AudioSystemManager::GetInstance()->SetDeviceAcctive(
+        if (AudioStandard::AudioSystemManager::GetInstance()->SetDeviceActive(
             deviceType, flag, voipCall->GetVoipUid()) != ERR_NONE) {
             TELEPHONY_LOGE("SetDeviceActive voip devicetype :%{public}d failed", deviceType);
             return false;
         }
         return true;
     }
-    if (AudioStandard::AudioSystemManager::GetInstance()->SetDeviceAcctive(deviceType, flag) != ERR_NONE) {
+    if (AudioStandard::AudioSystemManager::GetInstance()->SetDeviceActive(deviceType, flag) != ERR_NONE) {
         TELEPHONY_LOGE("SetDeviceActive devicetype :%{public}d failed", deviceType);
         return false;
     }
