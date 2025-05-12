@@ -61,7 +61,7 @@ void ZeroBranch9Test::TearDownTestCase()
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroBranch9Test, Telephony_AudioControlManager_001, Function | MediumTest | Level3)
+HWTEST_F(ZeroBranch9Test, Telephony_AudioControlManager_001, TestSize.Level0)
 {
     DialParaInfo mDialParaInfo;
     mDialParaInfo.accountId = 0;
@@ -116,7 +116,7 @@ HWTEST_F(ZeroBranch9Test, Telephony_AudioControlManager_001, Function | MediumTe
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroBranch9Test, Telephony_AudioControlManager_002, Function | MediumTest | Level3)
+HWTEST_F(ZeroBranch9Test, Telephony_AudioControlManager_002, TestSize.Level1)
 {
     auto audioControl = DelayedSingleton<AudioControlManager>::GetInstance();
     AudioDevice device;
@@ -153,7 +153,7 @@ HWTEST_F(ZeroBranch9Test, Telephony_AudioControlManager_002, Function | MediumTe
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroBranch9Test, Telephony_AudioControlManager_003, Function | MediumTest | Level3)
+HWTEST_F(ZeroBranch9Test, Telephony_AudioControlManager_003, TestSize.Level0)
 {
     auto audioControl = DelayedSingleton<AudioControlManager>::GetInstance();
     audioControl->IsTonePlaying();
@@ -172,7 +172,7 @@ HWTEST_F(ZeroBranch9Test, Telephony_AudioControlManager_003, Function | MediumTe
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroBranch9Test, Telephony_AudioControlManager_004, Function | MediumTest | Level3)
+HWTEST_F(ZeroBranch9Test, Telephony_AudioControlManager_004, TestSize.Level0)
 {
     auto audioControl = DelayedSingleton<AudioControlManager>::GetInstance();
     audioControl->isCrsVibrating_ = true;
@@ -195,7 +195,7 @@ HWTEST_F(ZeroBranch9Test, Telephony_AudioControlManager_004, Function | MediumTe
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroBranch9Test, Telephony_AudioControlManager_005, Function | MediumTest | Level3)
+HWTEST_F(ZeroBranch9Test, Telephony_AudioControlManager_005, TestSize.Level0)
 {
     auto audioControl = DelayedSingleton<AudioControlManager>::GetInstance();
     audioControl->ExcludeBluetoothSco();
@@ -239,7 +239,7 @@ HWTEST_F(ZeroBranch9Test, Telephony_AudioControlManager_005, Function | MediumTe
  * @tc.name     test error branch
  * @tc.desc     Function test
  */
-HWTEST_F(ZeroBranch9Test, Telephony_AudioControlManager_006, Function | MediumTest | Level3)
+HWTEST_F(ZeroBranch9Test, Telephony_AudioControlManager_006, TestSize.Level0)
 {
     auto audioControl = DelayedSingleton<AudioControlManager>::GetInstance();
     DialParaInfo info;

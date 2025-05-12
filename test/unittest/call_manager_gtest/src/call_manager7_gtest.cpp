@@ -189,7 +189,7 @@ public:
  * @tc.name     test error nullptr branch with permission
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerGtest, Telephony_CallManagerService_001, Function | MediumTest | Level3)
+HWTEST_F(CallManagerGtest, Telephony_CallManagerService_001, TestSize.Level1)
 {
     AccessToken token;
     std::u16string test = u"";
@@ -246,7 +246,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManagerService_001, Function | MediumTe
  * @tc.name     test error nullptr branch with permission
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerGtest, Telephony_CallManagerService_002, Function | MediumTest | Level3)
+HWTEST_F(CallManagerGtest, Telephony_CallManagerService_002, TestSize.Level1)
 {
     AccessToken token;
     std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
@@ -292,7 +292,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManagerService_002, Function | MediumTe
  * @tc.name     test error nullptr branch with permission
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerGtest, Telephony_CallManagerService_003, Function | MediumTest | Level3)
+HWTEST_F(CallManagerGtest, Telephony_CallManagerService_003, TestSize.Level1)
 {
     AccessToken token;
     std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
@@ -337,7 +337,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManagerService_003, Function | MediumTe
  * @tc.name     test error nullptr branch with permission
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerGtest, Telephony_CallManagerServiceStub_001, Function | MediumTest | Level3)
+HWTEST_F(CallManagerGtest, Telephony_CallManagerServiceStub_001, TestSize.Level0)
 {
     std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
     MessageParcel data;
@@ -394,7 +394,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManagerServiceStub_001, Function | Medi
  * @tc.name     test error nullptr branch with permission
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerGtest, Telephony_CallManagerServiceStub_002, Function | MediumTest | Level3)
+HWTEST_F(CallManagerGtest, Telephony_CallManagerServiceStub_002, TestSize.Level0)
 {
     std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
     MessageParcel data;
@@ -450,7 +450,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManagerServiceStub_002, Function | Medi
  * @tc.name     test error nullptr branch with permission
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerGtest, Telephony_CallManagerServiceStub_003, Function | MediumTest | Level3)
+HWTEST_F(CallManagerGtest, Telephony_CallManagerServiceStub_003, TestSize.Level0)
 {
     std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
     MessageParcel data;
@@ -506,7 +506,7 @@ ASSERT_NE(res, TELEPHONY_SUCCESS);
  * @tc.name     test error nullptr branch with permission
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerGtest, Telephony_CallManagerServiceStub_004, Function | MediumTest | Level3)
+HWTEST_F(CallManagerGtest, Telephony_CallManagerServiceStub_004, TestSize.Level0)
 {
     std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
     MessageParcel data;
@@ -548,7 +548,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManagerServiceStub_004, Function | Medi
  * @tc.name     test error nullptr branch with permission
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerGtest, Telephony_CallManagerServiceStub_005, Function | MediumTest | Level3)
+HWTEST_F(CallManagerGtest, Telephony_CallManagerServiceStub_005, TestSize.Level0)
 {
     std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
     MessageParcel data;
@@ -598,7 +598,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManagerServiceStub_005, Function | Medi
  * @tc.name     test error nullptr branch with permission
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerGtest, Telephony_CallManagerServiceStub_006, Function | MediumTest | Level3)
+HWTEST_F(CallManagerGtest, Telephony_CallManagerServiceStub_006, TestSize.Level0)
 {
     std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
     MessageParcel data;
@@ -658,7 +658,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManagerServiceStub_006, Function | Medi
  * @tc.name     test error nullptr branch with permission
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerGtest, Telephony_CallManagerServiceStub_007, Function | MediumTest | Level3)
+HWTEST_F(CallManagerGtest, Telephony_CallManagerServiceStub_007, TestSize.Level0)
 {
     std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
     MessageParcel data;
@@ -719,7 +719,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManagerServiceStub_007, Function | Medi
  * @tc.name     test error nullptr branch with permission
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerGtest, Telephony_CallManagerServiceStub_008, Function | MediumTest | Level3)
+HWTEST_F(CallManagerGtest, Telephony_CallManagerServiceStub_008, TestSize.Level0)
 {
     std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
     MessageParcel data6;
@@ -769,7 +769,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManagerServiceStub_008, Function | Medi
  * @tc.name     test error nullptr branch with permission
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerGtest, Telephony_CallManagerServiceStub_009, Function | MediumTest | Level3)
+HWTEST_F(CallManagerGtest, Telephony_CallManagerServiceStub_009, TestSize.Level0)
 {
     std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
     MessageParcel data;
@@ -821,7 +821,7 @@ HWTEST_F(CallManagerGtest, Telephony_CallManagerServiceStub_009, Function | Medi
  * @tc.name     test error nullptr branch with permission
  * @tc.desc     Function test
  */
-HWTEST_F(CallManagerGtest, Telephony_VoipCall_001, Function | MediumTest | Level3)
+HWTEST_F(CallManagerGtest, Telephony_VoipCall_001, TestSize.Level0)
 {
     AccessToken token;
     DialParaInfo dialInfo;
