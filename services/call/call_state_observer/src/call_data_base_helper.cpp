@@ -215,7 +215,7 @@ bool CallDataBaseHelper::Query(ContactInfo &contactInfo, DataShare::DataSharePre
     resultSet->GetString(columnIndex, personalNotificationRington);
     length = personalNotificationRington.length() > FILE_PATH_MAX_LEN ?
         FILE_PATH_MAX_LEN : personalNotificationRington.length();
-    if (memcpy_s(contactInfo.personalNotificationRington, FILE_PATH_MAX_LEN, personalNotificationRington.c_str(), 
+    if (memcpy_s(contactInfo.personalNotificationRington, FILE_PATH_MAX_LEN, personalNotificationRington.c_str(),
         length) != EOK) {
         TELEPHONY_LOGE("memcpy_s personalNotificationRington fail!");
         return false;
@@ -497,7 +497,6 @@ bool CallDataBaseHelper::QueryContactInfoEnhanced(ContactInfo &contactInfo, Data
         TELEPHONY_LOGE("memcpy_s personalNotificationRington fail!");
         return false;
     }
-    TELEPHONY_LOGI("personalNotificationRington: %{public}s", contactInfo.personalNotificationRington);
     resultSet->Close();
     helper->Release();
     TELEPHONY_LOGI("Query end, contactName length: %{public}zu", contactInfo.name.length());
