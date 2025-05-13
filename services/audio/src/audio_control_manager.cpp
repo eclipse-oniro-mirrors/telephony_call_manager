@@ -759,6 +759,7 @@ int32_t AudioControlManager::SetMute(bool isMute)
             std::pair<std::string, std::string>("hfp_set_mic_mute", strMute)
         };
         OHOS::AudioStandard::AudioSystemManager::GetInstance()->SetExtraParameters("hfp_extra", vec);
+        DelayedSingleton<AudioProxy>::GetInstance()->SetMicrophoneMute(isMute);
     } else {
         if (!DelayedSingleton<AudioProxy>::GetInstance()->SetMicrophoneMute(isMute)) {
             TELEPHONY_LOGE("set mute failed");
