@@ -166,10 +166,13 @@ void AudioControlManager::VideoStateUpdated(
             if (initDeviceType == AudioDeviceType::DEVICE_WIRED_HEADSET ||
                 initDeviceType == AudioDeviceType::DEVICE_BLUETOOTH_SCO) {
                 device.deviceType = initDeviceType;
+                SetAudioDevice(device);
+                TELEPHONY_LOGI("VideoStateUpdated DEVICE_BLUETOOTH_SCO or DEVICE_WIRED_HEADSET");
             }
+        } else {
+            TELEPHONY_LOGI("crs ring tone should be speaker");
+            SetAudioDevice(device);
         }
-        TELEPHONY_LOGI("crs ring tone should be speaker");
-        SetAudioDevice(device);
         return;
     }
     CheckTypeAndSetAudioDevice(callObjectPtr, priorVideoState, nextVideoState, initDeviceType, device);
