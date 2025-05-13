@@ -316,7 +316,7 @@ HWTEST_F(CallStateTest, Telephony_AudioProxy_002, TestSize.Level0)
     ASSERT_FALSE(audioProxy->GetDefaultDtmfPath().empty());
     DialParaInfo info;
     info.voipCallInfo.uid = 1;
-    sptr<CallBase> call0 = new CSCall(dialInfo);
+    sptr<CallBase> call0 = new CSCall(info);
     call0->SetCallId(0);
     call0->SetCallIndex(0);
     call0->SetSlotId(0);
@@ -326,7 +326,7 @@ HWTEST_F(CallStateTest, Telephony_AudioProxy_002, TestSize.Level0)
     EXPECT_TRUE(CallObjectManager::GetAudioLiveCall() != nullptr);
     audioProxy->SetDeviceActive(AudioStandard::DeviceType::DEVICE_TYPE_BLUETOOTH_SCO, true);
     call0->SetTelCallState(TelCallState::CALL_STATUS_DISCONNECTED);
-    sptr<CallBase> call1 = new VoIPCall(dialInfo);
+    sptr<CallBase> call1 = new VoIPCall(info);
     call1->SetCallId(1);
     call1->SetCallType(CallType::TYPE_VOIP);
     call1->SetTelCallState(TelCallState::CALL_STATUS_ACTIVE);
