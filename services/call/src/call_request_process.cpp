@@ -833,7 +833,7 @@ int32_t CallRequestProcess::CarrierDialProcess(DialParaInfo &info)
     }
     std::string tempNumber = info.number;
     bool isMMiCode = DelayedSingleton<CallNumberUtils>::GetInstance()->IsMMICode(newPhoneNum);
-    if (!isMMiCode) {
+    if (info.isEcc || !isMMiCode) {
         isFirstDialCallAdded_ = false;
         info.number = newPhoneNum;
         ret = UpdateCallReportInfo(info, TelCallState::CALL_STATUS_DIALING);
