@@ -836,7 +836,7 @@ int32_t CallRequestProcess::CarrierDialProcess(DialParaInfo &info)
     if (!info.isEcc) {
         isMMiCode = DelayedSingleton<CallNumberUtils>::GetInstance()->IsMMICode(newPhoneNum);
     }
-    if (info.isEcc || !isMMiCode) {
+    if (!isMMiCode) {
         isFirstDialCallAdded_ = false;
         info.number = newPhoneNum;
         ret = UpdateCallReportInfo(info, TelCallState::CALL_STATUS_DIALING);
