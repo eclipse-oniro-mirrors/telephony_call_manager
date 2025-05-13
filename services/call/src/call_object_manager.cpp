@@ -1085,7 +1085,7 @@ bool CallObjectManager::IsTwoCallBtCallAndESIM()
     bool hasBtCall = false;
     std::list<sptr<CallBase>>::iterator it;
     for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
-        if ((*it)->GetCallType() == CallType::TYPE_IMS) {
+        if ((*it)->GetCallType() == CallType::TYPE_CS || (*it)->GetCallType() == CallType::TYPE_IMS) {
             hasEsim = true;
             numberEsim = (*it)->GetAccountNumber();
         }
@@ -1126,7 +1126,7 @@ bool CallObjectManager::IsTwoCallESIMCall()
     }
     std::list<sptr<CallBase>>::iterator it;
     for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
-        if ((*it)->GetCallType() != CallType::TYPE_IMS) {
+        if ((*it)->GetCallType() != CallType::TYPE_CS || (*it)->GetCallType() != CallType::TYPE_IMS) {
             return false;
         }
     }
@@ -1145,7 +1145,7 @@ bool CallObjectManager::IsOneNumberDualTerminal()
     bool hasBtCall = false;
     std::list<sptr<CallBase>>::iterator it;
     for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
-        if ((*it)->GetCallType() == CallType::TYPE_IMS) {
+        if ((*it)->GetCallType() == CallType::TYPE_CS || (*it)->GetCallType() == CallType::TYPE_IMS) {
             hasEsim = true;
             numberEsim = (*it)->GetAccountNumber();
         }

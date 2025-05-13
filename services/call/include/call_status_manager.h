@@ -134,7 +134,6 @@ private:
     void RefreshCallDisconnectReason(const sptr<CallBase> &call, int32_t reason);
 #ifdef NOT_SUPPORT_MULTICALL
     void AutoAnswerSecondCall();
-    void OneCallAnswerAtPhone(int32_t callId);
 #endif
     bool IsFromTheSameNumberAtTheSameTime(const sptr<CallBase> &newCall);
     void ModifyEsimType();
