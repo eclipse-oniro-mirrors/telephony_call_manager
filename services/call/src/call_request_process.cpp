@@ -832,7 +832,10 @@ int32_t CallRequestProcess::CarrierDialProcess(DialParaInfo &info)
         return ret;
     }
     std::string tempNumber = info.number;
-    bool isMMiCode = DelayedSingleton<CallNumberUtils>::GetInstance()->IsMMICode(newPhoneNum);
+    bool isMMiCode = false;
+    if (!info.isEcc) {
+        isMMiCode = DelayedSingleton<CallNumberUtils>::GetInstance()->IsMMICode(newPhoneNum);
+    }
     if (info.isEcc || !isMMiCode) {
         isFirstDialCallAdded_ = false;
         info.number = newPhoneNum;
