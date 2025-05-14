@@ -544,9 +544,9 @@ void CallStatusManager::DealVideoRingPath(ContactInfo &contactInfo, sptr<CallBas
             ringtoneFlagCardKey = "ringtoneFlagCard2";
             videoRingtoneNameCardKey = "videoRingtoneNameCard2";
         }
-        OHOS::Uri settingUri(SettingsDataShareHelper::SETTINGS_DATASHARE_URI);
-        settingHelper->Query(settingUri, ringtoneFlagCardKey, ringtoneFlagCard);
-        settingHelper->Query(settingUri, videoRingtoneNameCardKey, videoRingtoneNameCard);
+        OHOS::Uri settingUri(SettingsDataShareHelper::SETTINGS_DATASHARE_SECURE100_URI);
+        settingHelper->QuerySecure100(settingUri, ringtoneFlagCardKey, ringtoneFlagCard);
+        settingHelper->QuerySecure100(settingUri, videoRingtoneNameCardKey, videoRingtoneNameCard);
         TELEPHONY_LOGI("ringtoneFlagCard: %{public}s, videoRingtoneNameCard: %{public}s.",
             ringtoneFlagCard.c_str(), videoRingtoneNameCard.c_str());
         if (ringtoneFlagCard == "1" && !videoRingtoneNameCard.empty()) {

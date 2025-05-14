@@ -28,6 +28,8 @@ namespace OHOS {
 namespace Telephony {
 const std::string SettingsDataShareHelper::SETTINGS_DATASHARE_URI =
     "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true";
+const std::string SettingsDataShareHelper::SETTINGS_DATASHARE_SECURE100_URI =
+    "datashare:///com.ohos.settingsdata/entry/settingsdata/USER_SETTINGSDATA_SECURE_100?Proxy=true";
 const std::string SETTINGS_DATASHARE_EXT_URI = "datashare:///com.ohos.settingsdata.DataAbility";
 constexpr const char *SETTINGS_DATA_COLUMN_KEYWORD = "KEYWORD";
 constexpr const char *SETTINGS_DATA_COLUMN_VALUE = "VALUE";
@@ -57,11 +59,71 @@ std::shared_ptr<DataShare::DataShareHelper> SettingsDataShareHelper::CreateDataS
     return DataShare::DataShareHelper::Creator(remote, SETTINGS_DATASHARE_URI, SETTINGS_DATASHARE_EXT_URI);
 }
 
+std::shared_ptr<DataShare::DataShareHelper> SettingsDataShareHelper::CreateDataShareSecure100Helper(int systemAbilityId)
+{
+    sptr<ISystemAbilityManager> saManager = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (saManager == nullptr) {
+        TELEPHONY_LOGE("GetSystemAbilityManager failed.");
+        return nullptr;
+    }
+    sptr<IRemoteObject> remote = saManager->GetSystemAbility(systemAbilityId);
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("GetSystemAbility Service Failed.");
+        return nullptr;
+    }
+    TELEPHONY_LOGI("systemAbilityId = %{public}d", systemAbilityId);
+    return DataShare::DataShareHelper::Creator(remote, SETTINGS_DATASHARE_SECURE100_URI, SETTINGS_DATASHARE_EXT_URI);
+}
+
 int32_t SettingsDataShareHelper::Query(Uri& uri, const std::string& key, std::string& value)
 {
     TELEPHONY_LOGW("start Query");
     std::shared_ptr<DataShare::DataShareHelper> settingHelper =
         CreateDataShareHelper(TELEPHONY_CALL_MANAGER_SYS_ABILITY_ID);
+    if (settingHelper == nullptr) {
+        TELEPHONY_LOGE("query error, datashareHelper_ is nullptr");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+
+    std::vector<std::string> columns;
+    DataShare::DataSharePredicates predicates;
+    predicates.EqualTo(SETTINGS_DATA_COLUMN_KEYWORD, key);
+    auto result = settingHelper->Query(uri, predicates, columns);
+    if (result == nullptr) {
+        TELEPHONY_LOGE("query error, result is nullptr");
+        settingHelper->Release();
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+
+    int rowCount = 0;
+    result->GetRowCount(rowCount);
+    if (rowCount == 0) {
+        TELEPHONY_LOGW("query success, but rowCount is 0");
+        settingHelper->Release();
+        return TELEPHONY_ERROR;
+    }
+
+    if (result->GoToFirstRow() != DataShare::E_OK) {
+        TELEPHONY_LOGE("query error, go to first row error");
+        result->Close();
+        settingHelper->Release();
+        return TELEPHONY_ERR_DATABASE_READ_FAIL;
+    }
+
+    int columnIndex = 0;
+    result->GetColumnIndex(SETTINGS_DATA_COLUMN_VALUE, columnIndex);
+    result->GetString(columnIndex, value);
+    result->Close();
+    settingHelper->Release();
+    TELEPHONY_LOGW("SettingUtils: query success");
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t SettingsDataShareHelper::QuerySecure100(Uri& uri, const std::string& key, std::string& value)
+{
+    TELEPHONY_LOGW("start Query");
+    std::shared_ptr<DataShare::DataShareHelper> settingHelper =
+        CreateDataShareSecure100Helper(TELEPHONY_CALL_MANAGER_SYS_ABILITY_ID);
     if (settingHelper == nullptr) {
         TELEPHONY_LOGE("query error, datashareHelper_ is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
