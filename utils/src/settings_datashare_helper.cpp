@@ -59,7 +59,8 @@ std::shared_ptr<DataShare::DataShareHelper> SettingsDataShareHelper::CreateDataS
     return DataShare::DataShareHelper::Creator(remote, SETTINGS_DATASHARE_URI, SETTINGS_DATASHARE_EXT_URI);
 }
 
-std::shared_ptr<DataShare::DataShareHelper> SettingsDataShareHelper::CreateDataShareSecure100Helper(int systemAbilityId)
+std::shared_ptr<DataShare::DataShareHelper> SettingsDataShareHelper::CreateDataShareSecure100Helper(
+    int systemAbilityId)
 {
     sptr<ISystemAbilityManager> saManager = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
     if (saManager == nullptr) {

@@ -551,7 +551,7 @@ void CallStatusManager::DealVideoRingPath(ContactInfo &contactInfo, sptr<CallBas
             ringtoneFlagCard.c_str(), videoRingtoneNameCard.c_str());
         if (ringtoneFlagCard == "1" && !videoRingtoneNameCard.empty()) {
             if (memcpy_s(contactInfo.ringtonePath, FILE_PATH_MAX_LEN, SYSTEM_VIDEO_RING,
-                sizeof(SYSTEM_VIDEO_RING)) != EOK) {
+                strlen(SYSTEM_VIDEO_RING)) != EOK) {
                 TELEPHONY_LOGE("memcpy_s ringtonePath fail");
                 return;
             }
