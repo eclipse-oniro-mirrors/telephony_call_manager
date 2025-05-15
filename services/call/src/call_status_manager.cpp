@@ -538,16 +538,16 @@ void CallStatusManager::DealVideoRingPath(ContactInfo &contactInfo, sptr<CallBas
         }
     }
 
-    AAFwk::WantParams params = callObjectPtr->GetExtraParams();
     std::string personalNotificationRington = contactInfo.personalNotificationRington;
     if ((personalNotificationRington.length() > VIDEO_RING_PATH_FIX_TAIL_LENGTH &&
         personalNotificationRington.substr(personalNotificationRington.length() - VIDEO_RING_PATH_FIX_TAIL_LENGTH,
         VIDEO_RING_PATH_FIX_TAIL_LENGTH) == VIDEO_RING_PATH_FIX_TAIL) ||
         strcmp(contactInfo.ringtonePath, SYSTEM_VIDEO_RING) == 0) {
         TELEPHONY_LOGI("notify callui to play video ring.");
+        AAFwk::WantParams params = callObjectPtr->GetExtraParams();
         params.SetParam("VideoRingPath", AAFwk::String::Box(std::string(contactInfo.ringtonePath)));
+        callObjectPtr->SetExtraParams(params);
     }
-    callObjectPtr->SetExtraParams(params);
 }
 
 int32_t CallStatusManager::QuerySystemVideoConfig(sptr<CallBase> &callObjectPtr, ContactInfo &contactInfo)
