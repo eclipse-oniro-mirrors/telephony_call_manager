@@ -240,7 +240,7 @@ void AudioControlManager::UpdateDeviceTypeForVideoOrSatelliteCall()
     }
 }
 
-void AudioControlManager::UpdateDeviceTypeForCrs()
+void AudioControlManager::UpdateDeviceTypeForCrs(int32_t deviceType))
 {
     sptr<CallBase> incomingCall = CallObjectManager::GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_RINGING);
     if (incomingCall == nullptr || incomingCall->IsAnsweredCall()) {
@@ -258,6 +258,10 @@ void AudioControlManager::UpdateDeviceTypeForCrs()
                 initDeviceType == AudioDeviceType::DEVICE_BLUETOOTH_SCO) {
                 device.deviceType = initDeviceType;
             }
+        }
+        if (device.deviceType == deviceType)
+        {
+            return;
         }
         TELEPHONY_LOGI("crs ring tone should be speaker");
         SetAudioDevice(device);
