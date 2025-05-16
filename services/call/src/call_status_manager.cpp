@@ -538,7 +538,6 @@ void CallStatusManager::DealVideoRingPath(ContactInfo &contactInfo, sptr<CallBas
         }
     }
 
-    std::string personalNotificationRingtone = contactInfo.personalNotificationRingtone;
     if (DelayedSingleton<AudioControlManager>::GetInstance()->IsVideoRing(contactInfo.personalNotificationRingtone,
         contactInfo.ringtonePath)) {
         TELEPHONY_LOGI("notify callui to play video ring.");

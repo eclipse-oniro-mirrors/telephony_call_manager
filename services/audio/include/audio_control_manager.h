@@ -109,7 +109,7 @@ private:
     sptr<CallBase> GetCallBase(int32_t callId);
     AudioInterruptState audioInterruptState_ = AudioInterruptState::INTERRUPT_STATE_DEACTIVATED;
     bool ShouldPlayRingtone() const;
-    bool CheckAndDealvideoRingScene(const std::string personalNotificationRingtone, const std::string ringtonePath);
+    bool CheckAndDealVideoRingScene(const std::string personalNotificationRingtone, const std::string ringtonePath);
     bool IsEmergencyCallExists();
     void UpdateForegroundLiveCall();
     bool IsBtOrWireHeadPlugin();

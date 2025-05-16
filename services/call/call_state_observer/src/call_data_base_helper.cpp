@@ -221,7 +221,6 @@ bool CallDataBaseHelper::Query(ContactInfo &contactInfo, DataShare::DataSharePre
         TELEPHONY_LOGE("memcpy_s personalNotificationRingtone fail!");
         return false;
     }
-    TELEPHONY_LOGI("personalNotificationRingtone: %{public}s", contactInfo.personalNotificationRingtone);
     TELEPHONY_LOGI("Query end, contactName length: %{public}zu", contactInfo.name.length());
     return true;
 }

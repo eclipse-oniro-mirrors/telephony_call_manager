@@ -608,7 +608,7 @@ bool AudioControlManager::PlayRingtone()
         TELEPHONY_LOGI("type_crs but not play ringtone");
         return false;
     }
-    if (CheckAndDealvideoRingScene(contactInfo.personalNotificationRingtone, contactInfo.ringtonePath)) {
+    if (CheckAndDealVideoRingScene(contactInfo.personalNotificationRingtone, contactInfo.ringtonePath)) {
         return false;
     }
     if (incomingCall->GetCallType() == CallType::TYPE_BLUETOOTH) {
@@ -634,20 +634,16 @@ bool AudioControlManager::IsVideoRing(const std::string &personalNotificationRin
     if ((personalNotificationRingtone.length() > VIDEO_RING_PATH_FIX_TAIL_LENGTH &&
         personalNotificationRingtone.substr(personalNotificationRingtone.length() - VIDEO_RING_PATH_FIX_TAIL_LENGTH,
         VIDEO_RING_PATH_FIX_TAIL_LENGTH) == VIDEO_RING_PATH_FIX_TAIL) || ringtonePath == SYSTEM_VIDEO_RING) {
-        TELEPHONY_LOGI("Is ring scene.");
-        AudioStandard::AudioRingerMode ringMode = DelayedSingleton<AudioProxy>::GetInstance()->GetRingerMode();
+        TELEPHONY_LOGI("Is video ring.");
         return true;
     }
     return false;
 }
 
-bool AudioControlManager::CheckAndDealvideoRingScene(const std::string &personalNotificationRingtone,
+bool AudioControlManager::CheckAndDealVideoRingScene(const std::string &personalNotificationRingtone,
     const std::string &ringtonePath)
 {
-    if ((personalNotificationRingtone.length() > VIDEO_RING_PATH_FIX_TAIL_LENGTH &&
-        personalNotificationRingtone.substr(personalNotificationRingtone.length() - VIDEO_RING_PATH_FIX_TAIL_LENGTH,
-        VIDEO_RING_PATH_FIX_TAIL_LENGTH) == VIDEO_RING_PATH_FIX_TAIL) ||
-        strcmp(ringtonePath.c_str(), SYSTEM_VIDEO_RING) == 0) {
+    if (IsVideoRing(personalNotificationRingtone, ringtonePath)) {
         TELEPHONY_LOGI("video ring scene.");
         AudioStandard::AudioRingerMode ringMode = DelayedSingleton<AudioProxy>::GetInstance()->GetRingerMode();
         if ((ringMode == AudioStandard::AudioRingerMode::RINGER_MODE_NORMAL && IsRingingVibrateModeOn()) ||
