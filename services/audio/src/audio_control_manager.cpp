@@ -712,10 +712,6 @@ bool AudioControlManager::StopSoundtone()
 
 bool AudioControlManager::StopRingtone()
 {
-    if (isVideoRingVibrating_) {
-        DelayedSingleton<AudioProxy>::GetInstance()->StopVibrator();
-        isVideoRingVibrating_ = false;
-    }
     if (ringState_ == RingState::STOPPED) {
         TELEPHONY_LOGI("ringtone already stopped");
         return true;

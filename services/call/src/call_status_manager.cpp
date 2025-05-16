@@ -578,9 +578,10 @@ int32_t CallStatusManager::QuerySystemVideoConfig(sptr<CallBase> &callObjectPtr,
         ringtoneFlagCardKey = "ringtoneFlagCard2";
         videoRingtoneNameCardKey = "videoRingtoneNameCard2";
     }
-    OHOS::Uri settingUri(SettingsDataShareHelper::SETTINGS_DATASHARE_SECURE100_URI);
-    settingHelper->QuerySecure100(settingUri, ringtoneFlagCardKey, ringtoneFlagCard);
-    settingHelper->QuerySecure100(settingUri, videoRingtoneNameCardKey, videoRingtoneNameCard);
+    OHOS::Uri settingUri(SettingsDataShareHelper::SETTINGS_DATASHARE_SECURE_URI_BASE + std::to_string(userId) +
+        "?Proxy=true");
+    settingHelper->QuerySecure(settingUri, ringtoneFlagCardKey, ringtoneFlagCard);
+    settingHelper->QuerySecure(settingUri, videoRingtoneNameCardKey, videoRingtoneNameCard);
     TELEPHONY_LOGI("ringtoneFlagCard: %{public}s, videoRingtoneNameCard: %{public}s.",
         ringtoneFlagCard.c_str(), videoRingtoneNameCard.c_str());
     if (ringtoneFlagCard == "1" && !videoRingtoneNameCard.empty()) {
