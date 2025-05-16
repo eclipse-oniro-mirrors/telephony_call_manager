@@ -240,7 +240,7 @@ void AudioControlManager::UpdateDeviceTypeForVideoOrSatelliteCall()
     }
 }
 
-void AudioControlManager::UpdateDeviceTypeForCrs(int32_t deviceType)
+void AudioControlManager::UpdateDeviceTypeForCrs(AudioDeviceType deviceType)
 {
     sptr<CallBase> incomingCall = CallObjectManager::GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_RINGING);
     if (incomingCall == nullptr || incomingCall->IsAnsweredCall()) {

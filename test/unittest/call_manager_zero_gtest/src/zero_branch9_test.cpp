@@ -200,7 +200,7 @@ HWTEST_F(ZeroBranch9Test, Telephony_AudioControlManager_005, TestSize.Level0)
     auto audioControl = DelayedSingleton<AudioControlManager>::GetInstance();
     audioControl->ExcludeBluetoothSco();
     audioControl->UnexcludeBluetoothSco();
-    int32_t deviceType = 0;
+    AudioDeviceType deviceType = AudioDeviceType::DEVICE_BLUETOOTH_SCO;
     audioControl->UpdateDeviceTypeForCrs(deviceType);
     EXPECT_FALSE(audioControl->IsRingingVibrateModeOn());
     auto callControl = DelayedSingleton<CallControlManager>::GetInstance();
