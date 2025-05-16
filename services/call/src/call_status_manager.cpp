@@ -792,9 +792,6 @@ int32_t CallStatusManager::ActiveHandle(const CallDetailInfo &info)
         TELEPHONY_LOGE("Call is NULL");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-#ifdef NOT_SUPPORT_MULTICALL
-    OneCallAnswerAtPhone(call->GetCallID());
-#endif
     ClearPendingState(call);
     TELEPHONY_LOGI("refresh call.");
     call = RefreshCallIfNecessary(call, info);
@@ -2196,40 +2193,6 @@ void CallStatusManager::AutoAnswerSecondCall()
                 TELEPHONY_LOGE("Auto AnswerCall failed callid=%{public}d", call->GetCallID());
             }
             return;
-        }
-    }
-    return;
-}
-void CallStatusManager::OneCallAnswerAtPhone(int32_t callId)
-{
-    TELEPHONY_LOGI("One Call AnswerCall AtPhone callid=%{public}d", callId);
-    if (CallObjectManager::IsOneNumberDualTerminal()) {
-        return;
-    }
-    if (!CallObjectManager::IsTwoCallBtCallAndESIM()) {
-        return;
-    }
-    std::list<sptr<CallBase>> allCallList = CallObjectManager::GetAllCallList();
-    for (auto call : allCallList) {
-        if (call->GetCallID() == callId) {
-            continue;
-        }
-        if (call->GetTelCallState() == TelCallState::CALL_STATUS_DIALING ||
-            call->GetTelCallState() == TelCallState::CALL_STATUS_ALERTING ||
-            call->GetTelCallState() == TelCallState::CALL_STATUS_ACTIVE) {
-            int32_t ret = DelayedSingleton<CallControlManager>::GetInstance()->HangUpCall(call->GetCallID());
-            if (ret != TELEPHONY_SUCCESS) {
-                TELEPHONY_LOGE("One Call AnswerCall AtPhone HangUpCall failed callid=%{public}d", call->GetCallID());
-            }
-        }
-        if (call->GetTelCallState() == TelCallState::CALL_STATUS_INCOMING ||
-            call->GetTelCallState() == TelCallState::CALL_STATUS_WAITING) {
-            TELEPHONY_LOGI("Need AnswerCall callid=%{public}d", call->GetCallID());
-            int32_t ret = DelayedSingleton<CallControlManager>::GetInstance()->RejectCall(
-                call->GetCallID(), false, u"");
-            if (ret != TELEPHONY_SUCCESS) {
-                TELEPHONY_LOGE("One Call AnswerCall AtPhone RejectCall failed callid=%{public}d", call->GetCallID());
-            }
         }
     }
     return;
