@@ -608,7 +608,7 @@ bool AudioControlManager::PlayRingtone()
         TELEPHONY_LOGI("type_crs but not play ringtone");
         return false;
     }
-    if (IsVideoRingScene(contactInfo.personalNotificationRington, contactInfo.ringtonePath)) {
+    if (CheckAndDealvideoRingScene(contactInfo.personalNotificationRingtone, contactInfo.ringtonePath)) {
         return false;
     }
     if (incomingCall->GetCallType() == CallType::TYPE_BLUETOOTH) {
@@ -629,11 +629,23 @@ bool AudioControlManager::PlayRingtone()
     return true;
 }
 
-bool AudioControlManager::IsVideoRingScene(const std::string personalNotificationRington,
-    const std::string ringtonePath)
+bool AudioControlManager::IsVideoRing(const std::string &personalNotificationRingtone, const std::string &ringtonePath)
 {
-    if ((personalNotificationRington.length() > VIDEO_RING_PATH_FIX_TAIL_LENGTH &&
-        personalNotificationRington.substr(personalNotificationRington.length() - VIDEO_RING_PATH_FIX_TAIL_LENGTH,
+    if ((personalNotificationRingtone.length() > VIDEO_RING_PATH_FIX_TAIL_LENGTH &&
+        personalNotificationRingtone.substr(personalNotificationRingtone.length() - VIDEO_RING_PATH_FIX_TAIL_LENGTH,
+        VIDEO_RING_PATH_FIX_TAIL_LENGTH) == VIDEO_RING_PATH_FIX_TAIL) || ringtonePath == SYSTEM_VIDEO_RING) {
+        TELEPHONY_LOGI("Is ring scene.");
+        AudioStandard::AudioRingerMode ringMode = DelayedSingleton<AudioProxy>::GetInstance()->GetRingerMode();
+        return true;
+    }
+    return false;
+}
+
+bool AudioControlManager::CheckAndDealvideoRingScene(const std::string &personalNotificationRingtone,
+    const std::string &ringtonePath)
+{
+    if ((personalNotificationRingtone.length() > VIDEO_RING_PATH_FIX_TAIL_LENGTH &&
+        personalNotificationRingtone.substr(personalNotificationRingtone.length() - VIDEO_RING_PATH_FIX_TAIL_LENGTH,
         VIDEO_RING_PATH_FIX_TAIL_LENGTH) == VIDEO_RING_PATH_FIX_TAIL) ||
         strcmp(ringtonePath.c_str(), SYSTEM_VIDEO_RING) == 0) {
         TELEPHONY_LOGI("video ring scene.");

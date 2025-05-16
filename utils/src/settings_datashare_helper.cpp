@@ -23,6 +23,7 @@
 #include "telephony_log_wrapper.h"
 #include "uri.h"
 #include "singleton.h"
+#include "os_account_manager.h"
 
 namespace OHOS {
 namespace Telephony {

@@ -96,6 +96,7 @@ public:
     bool IsScoTemporarilyDisabled();
     void ExcludeBluetoothSco();
     void UnexcludeBluetoothSco();
+    bool IsVideoRing(const std::string &personalNotificationRingtone, const std::string &ringtonePath);
 
 private:
     RingState ringState_ = RingState::STOPPED;
@@ -108,7 +109,7 @@ private:
     sptr<CallBase> GetCallBase(int32_t callId);
     AudioInterruptState audioInterruptState_ = AudioInterruptState::INTERRUPT_STATE_DEACTIVATED;
     bool ShouldPlayRingtone() const;
-    bool IsVideoRingScene(const std::string personalNotificationRington, const std::string ringtonePath);
+    bool CheckAndDealvideoRingScene(const std::string personalNotificationRingtone, const std::string ringtonePath);
     bool IsEmergencyCallExists();
     void UpdateForegroundLiveCall();
     bool IsBtOrWireHeadPlugin();
