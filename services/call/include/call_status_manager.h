@@ -107,6 +107,8 @@ private:
     bool IsContactPhoneNum(const std::string &phoneNum);
     int32_t UpdateDialingCallInfo(const CallDetailInfo &info);
     void SetContactInfo(sptr<CallBase> &call, std::string phoneNum);
+    void DealVideoRingPath(ContactInfo &ringtonePath, sptr<CallBase> &callObjectPtr);
+    int32_t QuerySystemVideoConfig(sptr<CallBase> &callObjectPtr, ContactInfo &contactInfo);
     int32_t HandleRejectCall(sptr<CallBase> &call, bool isBlock);
     bool ShouldRejectIncomingCall();
     bool ShouldBlockIncomingCall(const sptr<CallBase> &call, const CallDetailInfo &info);

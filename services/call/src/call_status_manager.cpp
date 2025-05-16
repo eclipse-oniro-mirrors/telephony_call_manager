@@ -59,6 +59,8 @@
 namespace OHOS {
 namespace Telephony {
 constexpr int32_t INIT_INDEX = 0;
+constexpr int32_t RING_TYPE_AUDIO = 0;
+constexpr int32_t RING_TYPE_VIDEO = 1;
 constexpr int32_t PRESENTATION_RESTRICTED = 3;
 
 CallStatusManager::CallStatusManager()
@@ -513,11 +515,80 @@ void CallStatusManager::SetContactInfo(sptr<CallBase> &call, std::string phoneNu
         // Get the contact data from the database
         ContactInfo contactInfoTemp = contactInfo;
         QueryCallerInfo(contactInfoTemp, phoneNum);
+        DealVideoRingPath(contactInfoTemp, callObjectPtr);
         callObjectPtr->SetCallerInfo(contactInfoTemp);
         CallVoiceAssistantManager::GetInstance()->UpdateContactInfo(contactInfoTemp, callObjectPtr->GetCallID());
         DelayedSingleton<DistributedCommunicationManager>::GetInstance()->ProcessCallInfo(callObjectPtr,
             DistributedDataType::NAME);
     });
+}
+
+void CallStatusManager::DealVideoRingPath(ContactInfo &contactInfo, sptr<CallBase> &callObjectPtr)
+{
+    bool isStartBroadcast = CallVoiceAssistantManager::GetInstance()->IsStartVoiceBroadcast();
+    if (isStartBroadcast) {
+        TELEPHONY_LOGI("Incoming call broadcast is on.");
+        return;
+    }
+
+    if (!strlen(contactInfo.ringtonePath)) {
+        int32_t result = QuerySystemVideoConfig(callObjectPtr, contactInfo);
+        if (result != TELEPHONY_SUCCESS) {
+            return;
+        }
+    }
+
+    if (DelayedSingleton<AudioControlManager>::GetInstance()->IsVideoRing(contactInfo.personalNotificationRingtone,
+        contactInfo.ringtonePath)) {
+        TELEPHONY_LOGI("notify callui to play video ring.");
+        AAFwk::WantParams params = callObjectPtr->GetExtraParams();
+        params.SetParam("VideoRingPath", AAFwk::String::Box(std::string(contactInfo.ringtonePath)));
+        callObjectPtr->SetExtraParams(params);
+    }
+}
+
+int32_t CallStatusManager::QuerySystemVideoConfig(sptr<CallBase> &callObjectPtr, ContactInfo &contactInfo)
+{
+    int32_t userId = 0;
+    bool isUserUnlocked = false;
+    AccountSA::OsAccountManager::GetForegroundOsAccountLocalId(userId);
+    AccountSA::OsAccountManager::IsOsAccountVerified(userId, isUserUnlocked);
+    TELEPHONY_LOGI("isUserUnlocked: %{public}d", isUserUnlocked);
+    if (!isUserUnlocked) {
+        return CALL_ERR_VIDEO_NOT_SUPPORTED;
+    }
+    CallAttributeInfo info;
+    callObjectPtr->GetCallAttributeBaseInfo(info);
+    auto settingHelper = SettingsDataShareHelper::GetInstance();
+    if (settingHelper == nullptr) {
+        TELEPHONY_LOGE("settingHelper is nullptr.");
+        return CALL_ERR_CALL_OBJECT_IS_NULL;
+    }
+    std::string ringtoneFlagCardKey;
+    std::string videoRingtoneNameCardKey;
+    std::string ringtoneFlagCard;
+    std::string videoRingtoneNameCard;
+    if (info.accountId == DEFAULT_SIM_SLOT_ID) {
+        ringtoneFlagCardKey = "ringtoneFlagCard1";
+        videoRingtoneNameCardKey = "videoRingtoneNameCard1";
+    } else {
+        ringtoneFlagCardKey = "ringtoneFlagCard2";
+        videoRingtoneNameCardKey = "videoRingtoneNameCard2";
+    }
+    OHOS::Uri settingUri(SettingsDataShareHelper::SETTINGS_DATASHARE_SECURE_URI_BASE + std::to_string(userId) +
+        "?Proxy=true");
+    settingHelper->QuerySecure(settingUri, ringtoneFlagCardKey, ringtoneFlagCard);
+    settingHelper->QuerySecure(settingUri, videoRingtoneNameCardKey, videoRingtoneNameCard);
+    TELEPHONY_LOGI("ringtoneFlagCard: %{public}s, videoRingtoneNameCard: %{public}s.",
+        ringtoneFlagCard.c_str(), videoRingtoneNameCard.c_str());
+    if (ringtoneFlagCard == "1" && !videoRingtoneNameCard.empty()) {
+        if (memcpy_s(contactInfo.ringtonePath, FILE_PATH_MAX_LEN, SYSTEM_VIDEO_RING,
+            strlen(SYSTEM_VIDEO_RING)) != EOK) {
+            TELEPHONY_LOGE("memcpy_s ringtonePath fail");
+            return TELEPHONY_ERROR;
+        }
+    }
+    return TELEPHONY_SUCCESS;
 }
 
 int32_t CallStatusManager::HandleRejectCall(sptr<CallBase> &call, bool isBlock)
