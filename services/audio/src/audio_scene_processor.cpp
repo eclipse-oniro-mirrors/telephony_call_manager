@@ -33,7 +33,8 @@
 namespace OHOS {
 namespace Telephony {
 namespace {
-    ffrt::queue reportAudioStateChangeQueue { "report_audio_state_change", ffrt::queue_attr().qos(ffrt_qos_user_interactive)};
+    ffrt::queue reportAudioStateChangeQueue { "report_audio_state_change",
+        ffrt::queue_attr().qos(ffrt_qos_user_interactive)};
 }
 AudioSceneProcessor::AudioSceneProcessor()
     : currentState_(nullptr)

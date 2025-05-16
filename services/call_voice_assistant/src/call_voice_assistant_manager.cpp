@@ -18,7 +18,8 @@
 #include "ffrt_inner.h"
 
 namespace {
-    ffrt::queue callVoiceAssistantQueue { "call_voice_assistant_manager", ffrt::queue_attr().qos(ffrt_qos_user_interactive)};
+    ffrt::queue callVoiceAssistantQueue { "call_voice_assistant_manager",
+        ffrt::queue_attr().qos(ffrt_qos_user_interactive)};
 }
 
 namespace OHOS {
