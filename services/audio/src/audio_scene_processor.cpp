@@ -26,14 +26,14 @@
 #include "audio_control_manager.h"
 #include "call_state_processor.h"
 #include "ffrt.h"
-
+#include "ffrt_inner.h"
 #include "telephony_log_wrapper.h"
 #include "call_voice_assistant_manager.h"
 
 namespace OHOS {
 namespace Telephony {
 namespace {
-    ffrt::queue reportAudioStateChangeQueue { "report_audio_state_change" };
+    ffrt::queue reportAudioStateChangeQueue { "report_audio_state_change", ffrt::queue_attr().qos(ffrt_qos_user_interactive)};
 }
 AudioSceneProcessor::AudioSceneProcessor()
     : currentState_(nullptr)
