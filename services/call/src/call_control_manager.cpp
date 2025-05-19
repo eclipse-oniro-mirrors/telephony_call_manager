@@ -1809,9 +1809,9 @@ void CallControlManager::SystemAbilityListener::OnAddSystemAbility(int32_t syste
     if (ret) {
         TELEPHONY_LOGW("HSDRBroadcastSubscriber fail.");
     }
-    ret = AmendRingBroadcast();
+    ret = AmendRingBroadcastSubscriber();
     if (ret) {
-        TELEPHONY_LOGW("AmendRingBroadcast fail.");
+        TELEPHONY_LOGW("AmendRingBroadcastSubscriber fail.");
     }
     ret = HfpBroadcastSubscriber();
     if (ret) {
@@ -1934,7 +1934,7 @@ int32_t CallControlManager::SystemAbilityListener::HSDRBroadcastSubscriber()
     return TELEPHONY_SUCCESS;
 }
 
-int32_t CallControlManager::SystemAbilityListener::AmendRingBroadcast()
+int32_t CallControlManager::SystemAbilityListener::AmendRingBroadcastSubscriber()
 {
     EventFwk::MatchingSkills matchingSkills;
     matchingSkills.AddEvent("usual.event.AMEND_RING_EVENT");

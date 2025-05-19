@@ -61,7 +61,7 @@ CallBroadcastSubscriber::CallBroadcastSubscriber(const OHOS::EventFwk::CommonEve
         [this](const EventFwk::CommonEventData &data) { HfpConnectBroadcast(data); };
     memberFuncMap_[SCREEN_UNLOCKED] =
         [this](const EventFwk::CommonEventData &data) { ScreenUnlockedBroadcast(data); };
-    memberFuncMap_[SCREEN_UNLOCKED] =
+    memberFuncMap_[AMEND_RING] =
         [this](const EventFwk::CommonEventData &data) { AmendRingBroadcast(data); };
 }
 
@@ -264,13 +264,13 @@ void CallBroadcastSubscriber::AmendRingBroadcast(const EventFwk::CommonEventData
     }
     int32_t userId = 0;
     AccountSA::OsAccountManager::GetForegroundOsAccountLocalId(userId);
-    TELEPHONY_LOGI("slotId: %{public}d, userId: %{public}d", slotId, userId);
+    TELEPHONY_LOGI("slotId: %{public}d, userId: %{public}d.", slotId, userId);
     OHOS::Uri settingUri(SettingsDataShareHelper::SETTINGS_DATASHARE_SECURE_URI_BASE + std::to_string(userId) +
         "?Proxy=true");
-    int32_t result = settingHelper->QuerySecure(settingUri, ringtoneFlagCardKey, "");
-    TELEPHONY_LOGI("ringtoneFlagCardKey update result: %{public}d", result);
-    result = settingHelper->QuerySecure(settingUri, videoRingtoneNameCardKey, "");
-    TELEPHONY_LOGI("ringtoneFlagCardKey update result: %{public}d", result);
+    int32_t result = settingHelper->UpdateSecure(settingUri, ringtoneFlagCardKey, "");
+    TELEPHONY_LOGI("ringtoneFlagCardKey update result: %{public}d.", result);
+    result = settingHelper->UpdateSecure(settingUri, videoRingtoneNameCardKey, "");
+    TELEPHONY_LOGI("videoRingtoneNameCardKey update result: %{public}d.", result);
 }
 } // namespace Telephony
 } // namespace OHOS

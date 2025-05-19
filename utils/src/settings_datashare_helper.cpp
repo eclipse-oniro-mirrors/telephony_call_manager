@@ -127,7 +127,7 @@ int32_t SettingsDataShareHelper::QuerySecure(Uri& uri, const std::string& key, s
     std::shared_ptr<DataShare::DataShareHelper> settingHelper =
         CreateDataShareSecureHelper(TELEPHONY_CALL_MANAGER_SYS_ABILITY_ID);
     if (settingHelper == nullptr) {
-        TELEPHONY_LOGE("query error, datashareHelper_ is nullptr");
+        TELEPHONY_LOGE("query error, settingHelper is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
 
@@ -167,6 +167,7 @@ int32_t SettingsDataShareHelper::UpdateSecure(Uri &uri, const std::string &key, 
     std::shared_ptr<DataShare::DataShareHelper> settingHelper =
         CreateDataShareSecureHelper(TELEPHONY_CALL_MANAGER_SYS_ABILITY_ID);
     if (settingHelper == nullptr) {
+        TELEPHONY_LOGE("query error, settingHelper is nullptr");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
     DataShare::DataShareValueObject valueObj(value);
@@ -176,9 +177,9 @@ int32_t SettingsDataShareHelper::UpdateSecure(Uri &uri, const std::string &key, 
     predicates.EqualTo(SETTINGS_DATA_COLUMN_KEYWORD, key);
     int32_t ret = settingHelper->Update(uri, predicates, valueBucket);
     if (ret <= 0) {
-        TELEPHONY_LOGE("DataShareHelper update failed, retCode:%{public}d", ret);
+        TELEPHONY_LOGE("update failed, retCode:%{public}d", ret);
         settingHelper->Release();
-        return TELEPHONY_ERROR;
+        return TELEPHONY_ERR_DATABASE_WRITE_FAIL;
     }
     settingHelper->NotifyChange(uri);
     settingHelper->Release();
