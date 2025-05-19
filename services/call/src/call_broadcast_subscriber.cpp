@@ -61,6 +61,8 @@ CallBroadcastSubscriber::CallBroadcastSubscriber(const OHOS::EventFwk::CommonEve
         [this](const EventFwk::CommonEventData &data) { HfpConnectBroadcast(data); };
     memberFuncMap_[SCREEN_UNLOCKED] =
         [this](const EventFwk::CommonEventData &data) { ScreenUnlockedBroadcast(data); };
+    memberFuncMap_[SCREEN_UNLOCKED] =
+        [this](const EventFwk::CommonEventData &data) { AmendRingBroadcast(data); };
 }
 
 void CallBroadcastSubscriber::OnReceiveEvent(const EventFwk::CommonEventData &data)
@@ -89,6 +91,8 @@ void CallBroadcastSubscriber::OnReceiveEvent(const EventFwk::CommonEventData &da
         code = SCREEN_UNLOCKED;
     } else if (action == "usual.event.bluetooth.CONNECT_HFP_HF") {
         code = HFP_EVENT;
+    } else if (action == "usual.event.AMEND_RING_EVENT") {
+        code = AMEND_RING;
     } else {
         code = UNKNOWN_BROADCAST_EVENT;
     }
@@ -239,6 +243,34 @@ void CallBroadcastSubscriber::ScreenUnlockedBroadcast(const EventFwk::CommonEven
         publishInfo.SetOrdered(true);
         EventFwk::CommonEventManager::PublishCommonEvent(eventData, publishInfo, nullptr);
     }
+}
+
+void CallBroadcastSubscriber::AmendRingBroadcast(const EventFwk::CommonEventData &data)
+{
+    auto settingHelper = SettingsDataShareHelper::GetInstance();
+    if (settingHelper == nullptr) {
+        TELEPHONY_LOGE("settingHelper is nullptr.");
+        return;
+    }
+    std::string ringtoneFlagCardKey;
+    std::string videoRingtoneNameCardKey;
+    int32_t slotId = data.GetWant().GetIntParam("slotId", -1);
+    if (slotId == DEFAULT_SIM_SLOT_ID) {
+        ringtoneFlagCardKey = "ringtoneFlagCard1";
+        videoRingtoneNameCardKey = "videoRingtoneNameCard1";
+    } else {
+        ringtoneFlagCardKey = "ringtoneFlagCard2";
+        videoRingtoneNameCardKey = "videoRingtoneNameCard2";
+    }
+    int32_t userId = 0;
+    AccountSA::OsAccountManager::GetForegroundOsAccountLocalId(userId);
+    TELEPHONY_LOGI("slotId: %{public}d, userId: %{public}d", slotId, userId);
+    OHOS::Uri settingUri(SettingsDataShareHelper::SETTINGS_DATASHARE_SECURE_URI_BASE + std::to_string(userId) +
+        "?Proxy=true");
+    int32_t result = settingHelper->QuerySecure(settingUri, ringtoneFlagCardKey, "");
+    TELEPHONY_LOGI("ringtoneFlagCardKey update result: %{public}d", result);
+    result = settingHelper->QuerySecure(settingUri, videoRingtoneNameCardKey, "");
+    TELEPHONY_LOGI("ringtoneFlagCardKey update result: %{public}d", result);
 }
 } // namespace Telephony
 } // namespace OHOS

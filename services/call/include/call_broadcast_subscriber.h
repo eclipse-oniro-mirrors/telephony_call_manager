@@ -44,7 +44,8 @@ private:
         SHUTDOWN,
         HSDR_EVENT,
         HFP_EVENT,
-        SCREEN_UNLOCKED
+        SCREEN_UNLOCKED,
+        AMEND_RING
     };
     using broadcastSubscriberFunc = std::function<void(const EventFwk::CommonEventData &data)>;
 
@@ -59,6 +60,7 @@ private:
     void HsdrEventBroadcast(const EventFwk::CommonEventData &data);
     void HfpConnectBroadcast(const EventFwk::CommonEventData &data);
     void ScreenUnlockedBroadcast(const EventFwk::CommonEventData &data);
+    void AmendRingBroadcast(const EventFwk::CommonEventData &data);
     std::map<uint32_t, broadcastSubscriberFunc> memberFuncMap_;
 };
 } // namespace Telephony

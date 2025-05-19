@@ -162,6 +162,30 @@ int32_t SettingsDataShareHelper::QuerySecure(Uri& uri, const std::string& key, s
     return TELEPHONY_SUCCESS;
 }
 
+int32_t SettingsDataShareHelper::UpdateSecure(Uri &uri, const std::string &key, const std::string &value)
+{
+    std::shared_ptr<DataShare::DataShareHelper> settingHelper =
+        CreateDataShareSecureHelper(TELEPHONY_CALL_MANAGER_SYS_ABILITY_ID);
+    if (settingHelper == nullptr) {
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    DataShare::DataShareValueObject valueObj(value);
+    DataShare::DataShareValuesBucket valueBucket;
+    valueBucket.Put(SETTINGS_DATA_COLUMN_VALUE, valueObj);
+    DataShare::DataSharePredicates predicates;
+    predicates.EqualTo(SETTINGS_DATA_COLUMN_KEYWORD, key);
+    int32_t ret = settingHelper->Update(uri, predicates, valueBucket);
+    if (ret <= 0) {
+        TELEPHONY_LOGE("DataShareHelper update failed, retCode:%{public}d", ret);
+        settingHelper->Release();
+        return TELEPHONY_ERROR;
+    }
+    settingHelper->NotifyChange(uri);
+    settingHelper->Release();
+    TELEPHONY_LOGI("SettingUtils: update success");
+    return TELEPHONY_SUCCESS;
+}
+
 int32_t SettingsDataShareHelper::Insert(Uri &uri, const std::string &key, const std::string &value)
 {
     std::shared_ptr<DataShare::DataShareHelper> settingHelper =
