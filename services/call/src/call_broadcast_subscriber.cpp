@@ -37,6 +37,7 @@ namespace OHOS {
 namespace Telephony {
 using namespace OHOS::EventFwk;
 static constexpr int16_t INCOMING_CALL_MISSED_CODE = 0;
+static constexpr int16_t UNKONWN_SLOT_ID = -1;
 static constexpr int16_t PUBLISH_MISSCALL_EVENT_DELAY_TIME = 2000;
 CallBroadcastSubscriber::CallBroadcastSubscriber(const OHOS::EventFwk::CommonEventSubscribeInfo &subscriberInfo)
     : CommonEventSubscriber(subscriberInfo)
@@ -259,31 +260,12 @@ void CallBroadcastSubscriber::AmendRingBroadcast(const EventFwk::CommonEventData
     std::string ringtoneFlagCardKey;
     std::string videoRingtoneNameCardKey;
     int32_t slotId = data.GetWant().GetIntParam("slotId", -1);
+    if (slotId == UNKONWN_SLOT_ID) {
+        return;
+    }
     std::string bundleName = data.GetWant().GetElement().GetBundleName();
     TELEPHONY_LOGI("slotId: %{public}d, bundleName: %{public}s.", slotId, bundleName.c_str());
-    auto samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    if (samgr == nullptr) {
-        TELEPHONY_LOGE("Get ability manager failed.");
-        return;
-    }
-    sptr<IRemoteObject> object = samgr->GetSystemAbility(BUNDLE_MGR_SERVICE_SYS_ABILITY_ID);
-    if (object == nullptr) {
-        TELEPHONY_LOGE("object is null.");
-        return;
-    }
-    sptr<AppExecFwk::IBundleMgr> bms = iface_cast<OHOS::AppExecFwk::IBundleMgr>(object);
-    if (bms == nullptr) {
-        TELEPHONY_LOGE("bundle manager service is null.");
-        return;
-    }
-    AppExecFwk::ApplicationInfo applicationInfo;
-    auto result = bms->GetApplicationInfoV9(bundleName, 1, userId, applicationInfo);
-    if (result != ERR_OK) {
-        TELEPHONY_LOGE("get application info error.");
-        return;
-    }
-    if (!applicationInfo.isSystemApp) {
-        TELEPHONY_LOGE("is not system app.");
+    if (!CheckBundleName(bundleName, userId)) {
         return;
     }
     if (slotId == DEFAULT_SIM_SLOT_ID) {
@@ -297,6 +279,36 @@ void CallBroadcastSubscriber::AmendRingBroadcast(const EventFwk::CommonEventData
         "?Proxy=true");
     settingHelper->UpdateSecure(settingUri, ringtoneFlagCardKey, "");
     settingHelper->UpdateSecure(settingUri, videoRingtoneNameCardKey, "");
+}
+
+bool CallBroadcastSubscriber::CheckBundleName(std::string &bundleName, int32_t userId)
+{
+    auto samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (samgr == nullptr) {
+        TELEPHONY_LOGE("Get ability manager failed.");
+        return false;
+    }
+    sptr<IRemoteObject> object = samgr->GetSystemAbility(BUNDLE_MGR_SERVICE_SYS_ABILITY_ID);
+    if (object == nullptr) {
+        TELEPHONY_LOGE("object is null.");
+        return false;
+    }
+    sptr<AppExecFwk::IBundleMgr> bms = iface_cast<OHOS::AppExecFwk::IBundleMgr>(object);
+    if (bms == nullptr) {
+        TELEPHONY_LOGE("bundle manager service is null.");
+        return false;
+    }
+    AppExecFwk::ApplicationInfo applicationInfo;
+    auto result = bms->GetApplicationInfoV9(bundleName, 1, userId, applicationInfo);
+    if (result != ERR_OK) {
+        TELEPHONY_LOGE("get application info error.");
+        return false;
+    }
+    if (!applicationInfo.isSystemApp) {
+        TELEPHONY_LOGE("is not system app.");
+        return false;
+    }
+    return true;
 }
 } // namespace Telephony
 } // namespace OHOS

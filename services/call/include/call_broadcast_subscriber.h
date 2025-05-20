@@ -61,6 +61,7 @@ private:
     void HfpConnectBroadcast(const EventFwk::CommonEventData &data);
     void ScreenUnlockedBroadcast(const EventFwk::CommonEventData &data);
     void AmendRingBroadcast(const EventFwk::CommonEventData &data);
+    bool CheckBundleName(std::string &bundleName, int32_t userId);
     std::map<uint32_t, broadcastSubscriberFunc> memberFuncMap_;
 };
 } // namespace Telephony
