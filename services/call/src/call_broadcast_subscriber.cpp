@@ -271,18 +271,18 @@ void CallBroadcastSubscriber::AmendRingBroadcast(const EventFwk::CommonEventData
         TELEPHONY_LOGE("object is null.");
         return;
     }
-    sptr<OHOS::AppExecFwk::IBundleMgr> bms = iface_cast<OHOS::AppExecFwk::IBundleMgr>(object);
+    sptr<AppExecFwk::IBundleMgr> bms = iface_cast<OHOS::AppExecFwk::IBundleMgr>(object);
     if (bms == nullptr) {
         TELEPHONY_LOGE("bundle manager service is null.");
         return;
     }
-    AppExecfwk::ApplicationInfio applicationInfio;
-    auto result = bms->GetApplicationInfoV9(bundleName, 1, userId, applicationInfio);
+    AppExecFwk::ApplicationInfo applicationInfo;
+    auto result = bms->GetApplicationInfoV9(bundleName, 1, userId, applicationInfo);
     if (result != ERR_OK) {
         TELEPHONY_LOGE("get application info error.");
         return;
     }
-    if (!applicationInfio.isSystemApp) {
+    if (!applicationInfo.isSystemApp) {
         TELEPHONY_LOGE("is not system app.");
         return;
     }
@@ -295,8 +295,8 @@ void CallBroadcastSubscriber::AmendRingBroadcast(const EventFwk::CommonEventData
     }
     OHOS::Uri settingUri(SettingsDataShareHelper::SETTINGS_DATASHARE_SECURE_URI_BASE + std::to_string(userId) +
         "?Proxy=true");
-    int32_t result = settingHelper->UpdateSecure(settingUri, ringtoneFlagCardKey, "");
-    result = settingHelper->UpdateSecure(settingUri, videoRingtoneNameCardKey, "");
+    settingHelper->UpdateSecure(settingUri, ringtoneFlagCardKey, "");
+    settingHelper->UpdateSecure(settingUri, videoRingtoneNameCardKey, "");
 }
 } // namespace Telephony
 } // namespace OHOS
