@@ -317,6 +317,13 @@ HWTEST_F(ZeroBranch8Test, Telephony_CallManagerService_003, TestSize.Level0)
     EXPECT_NE(callManagerService->ControlCamera(1, test), TELEPHONY_ERR_LOCAL_PTR_NULL);
     EXPECT_NE(callManagerService->SetPreviewWindow(1, testStr, nullptr), TELEPHONY_ERR_LOCAL_PTR_NULL);
     EXPECT_NE(callManagerService->SetDisplayWindow(1, testStr, nullptr), TELEPHONY_ERR_LOCAL_PTR_NULL);
+    std::string testStr_ = "123";
+    uint64_t tempSurfaceId = std::stoull(testStr_);
+    auto surface = SurfaceUtils::GetInstance()->GetSurface(tempSurfaceId);
+    if (surface == nullptr) {
+        testStr_ = "";
+    }
+    callManagerService->SetPreviewWindow(0, testStr, surface)
 }
 
 /**
