@@ -975,13 +975,23 @@ int32_t CallManagerService::SetPreviewWindow(int32_t callId, std::string &surfac
     auto videoControlManager = DelayedSingleton<VideoControlManager>::GetInstance();
     if (videoControlManager != nullptr) {
         uint32_t callerToken = IPCSkeleton::GetCallingTokenID();
+        int32_t ret = 0；
         if (surface == nullptr) {
             PrivacyKit::StopUsingPermission(callerToken, "ohos.permission.CAMERA");
+            if (ret != 0 ) {
+                TELEPHONY_LOGE("StopUsingPermission faild!");
+            }
         } else {
             sptr<CallBase> call = CallObjectManager::GetOneCallObjectByIndex(callId);
             if (call == nullptr || call->GetVideoStateType() != VideoStateType::TYPE_RECEIVE_ONLY) {
                 PrivacyKit::AddPermissionUsedRecord(callerToken, "ohos.permission.CAMERA", 1, 0);
+                if (ret != 0 ) {
+                    TELEPHONY_LOGE("AddPermissionUsedRecord faild!");
+                }
                 PrivacyKit::StartUsingPermission(callerToken, "ohos.permission.CAMERA");
+                if (ret != 0 ) {
+                    TELEPHONY_LOGE("StartUsingPermission faild!");
+                }
             }
         }
         return videoControlManager->SetPreviewWindow(callId, surfaceId, surface);
