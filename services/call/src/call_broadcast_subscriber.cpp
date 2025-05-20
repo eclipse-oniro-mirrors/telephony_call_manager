@@ -260,7 +260,7 @@ void CallBroadcastSubscriber::AmendRingBroadcast(const EventFwk::CommonEventData
     std::string ringtoneFlagCardKey;
     std::string videoRingtoneNameCardKey;
     int32_t slotId = data.GetWant().GetIntParam("slotId", -1);
-    if (slotId == UNKONWN_SLOT_ID) {
+    if (slotId == UNKNOWN_SLOT_ID) {
         TELEPHONY_LOGE("unknow slotId.");
         return;
     }
