@@ -30,6 +30,8 @@
 #include "os_account_manager.h"
 #include "call_object_manager.h"
 #include "bluetooth_call_connection.h"
+#include "bundle_mgr_interface.h"
+#include "iservice_registry.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -252,9 +254,38 @@ void CallBroadcastSubscriber::AmendRingBroadcast(const EventFwk::CommonEventData
         TELEPHONY_LOGE("settingHelper is nullptr.");
         return;
     }
+    int32_t userId = 0;
+    AccountSA::OsAccountManager::GetForegroundOsAccountLocalId(userId);
     std::string ringtoneFlagCardKey;
     std::string videoRingtoneNameCardKey;
     int32_t slotId = data.GetWant().GetIntParam("slotId", -1);
+    std::string bundleName = data.GetWant().GetElement().GetBundleName();
+    TELEPHONY_LOGI("slotId: %{public}d, bundleName: %{public}s.", slotId, bundleName.c_str());
+    auto samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    if (samgr == nullptr) {
+        TELEPHONY_LOGE("Get ability manager failed.");
+        return;
+    }
+    sptr<IRemoteObject> object = samgr->GetSystemAbility(BUNDLE_MGR_SERVICE_SYS_ABILITY_ID);
+    if (object == nullptr) {
+        TELEPHONY_LOGE("object is null.");
+        return;
+    }
+    sptr<OHOS::AppExecFwk::IBundleMgr> bms = iface_cast<OHOS::AppExecFwk::IBundleMgr>(object);
+    if (bms == nullptr) {
+        TELEPHONY_LOGE("bundle manager service is null.");
+        return;
+    }
+    AppExecfwk::ApplicationInfio applicationInfio;
+    auto result = bms->GetApplicationInfoV9(bundleName, 1, userId, applicationInfio);
+    if (result != ERR_OK) {
+        TELEPHONY_LOGE("get application info error.");
+        return;
+    }
+    if (!applicationInfio.isSystemApp) {
+        TELEPHONY_LOGE("is not system app.");
+        return;
+    }
     if (slotId == DEFAULT_SIM_SLOT_ID) {
         ringtoneFlagCardKey = "ringtoneFlagCard1";
         videoRingtoneNameCardKey = "videoRingtoneNameCard1";
@@ -262,15 +293,10 @@ void CallBroadcastSubscriber::AmendRingBroadcast(const EventFwk::CommonEventData
         ringtoneFlagCardKey = "ringtoneFlagCard2";
         videoRingtoneNameCardKey = "videoRingtoneNameCard2";
     }
-    int32_t userId = 0;
-    AccountSA::OsAccountManager::GetForegroundOsAccountLocalId(userId);
-    TELEPHONY_LOGI("slotId: %{public}d, userId: %{public}d.", slotId, userId);
     OHOS::Uri settingUri(SettingsDataShareHelper::SETTINGS_DATASHARE_SECURE_URI_BASE + std::to_string(userId) +
         "?Proxy=true");
     int32_t result = settingHelper->UpdateSecure(settingUri, ringtoneFlagCardKey, "");
-    TELEPHONY_LOGI("ringtoneFlagCardKey update result: %{public}d.", result);
     result = settingHelper->UpdateSecure(settingUri, videoRingtoneNameCardKey, "");
-    TELEPHONY_LOGI("videoRingtoneNameCardKey update result: %{public}d.", result);
 }
 } // namespace Telephony
 } // namespace OHOS
