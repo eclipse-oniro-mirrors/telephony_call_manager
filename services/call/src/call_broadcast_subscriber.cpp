@@ -37,7 +37,7 @@ namespace OHOS {
 namespace Telephony {
 using namespace OHOS::EventFwk;
 static constexpr int16_t INCOMING_CALL_MISSED_CODE = 0;
-static constexpr int16_t UNKONWN_SLOT_ID = -1;
+static constexpr int16_t UNKNOWN_SLOT_ID = -1;
 static constexpr int16_t PUBLISH_MISSCALL_EVENT_DELAY_TIME = 2000;
 CallBroadcastSubscriber::CallBroadcastSubscriber(const OHOS::EventFwk::CommonEventSubscribeInfo &subscriberInfo)
     : CommonEventSubscriber(subscriberInfo)
@@ -261,11 +261,13 @@ void CallBroadcastSubscriber::AmendRingBroadcast(const EventFwk::CommonEventData
     std::string videoRingtoneNameCardKey;
     int32_t slotId = data.GetWant().GetIntParam("slotId", -1);
     if (slotId == UNKONWN_SLOT_ID) {
+        TELEPHONY_LOGE("unknow slotId.");
         return;
     }
     std::string bundleName = data.GetWant().GetElement().GetBundleName();
     TELEPHONY_LOGI("slotId: %{public}d, bundleName: %{public}s.", slotId, bundleName.c_str());
     if (!CheckBundleName(bundleName, userId)) {
+        TELEPHONY_LOGE("not system bundle name.");
         return;
     }
     if (slotId == DEFAULT_SIM_SLOT_ID) {
@@ -277,7 +279,7 @@ void CallBroadcastSubscriber::AmendRingBroadcast(const EventFwk::CommonEventData
     }
     OHOS::Uri settingUri(SettingsDataShareHelper::SETTINGS_DATASHARE_SECURE_URI_BASE + std::to_string(userId) +
         "?Proxy=true");
-    settingHelper->UpdateSecure(settingUri, ringtoneFlagCardKey, "");
+    auto result = settingHelper->UpdateSecure(settingUri, ringtoneFlagCardKey, "");
     settingHelper->UpdateSecure(settingUri, videoRingtoneNameCardKey, "");
 }
 
