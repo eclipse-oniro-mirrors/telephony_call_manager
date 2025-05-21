@@ -323,7 +323,7 @@ HWTEST_F(ZeroBranch8Test, Telephony_CallManagerService_003, TestSize.Level0)
     if (surface == nullptr) {
         testStr_ = "";
     }
-    callManagerService->SetPreviewWindow(0, testStr, surface)
+    callManagerService->SetPreviewWindow(0, testStr, surface);
 }
 
 /**
