@@ -576,8 +576,8 @@ std::string AudioDeviceManager::ConvertAddress()
 
 int32_t AudioDeviceManager::ReportAudioDeviceInfo(sptr<CallBase> call)
 {
-    if (call != nullptr && (call->GetCallType() == CallType::TYPE_VOIP) ||
-        call->GetCallType() == CallType::TYPE_BLUETOOTH) {
+    if (call != nullptr && (call->GetCallType() == CallType::TYPE_VOIP ||
+        call->GetCallType() == CallType::TYPE_BLUETOOTH)) {
         info_.isMuted = call->IsMuted();
     } else {
         info_.isMuted = DelayedSingleton<AudioProxy>::GetInstance()->IsMicrophoneMute();
