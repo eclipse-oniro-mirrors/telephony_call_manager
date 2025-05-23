@@ -31,7 +31,6 @@ public:
     static const std::string QUERY_SATELLITE_MODE_KEY;
     static const std::string QUERY_SATELLITE_CONNECTED_KEY;
     static const std::string SETTINGS_DATASHARE_URI;
-    static const std::string SETTINGS_DATASHARE_SECURE_URI_BASE;
     static const std::string QUERY_MOTION_CLOSE_TO_EAR_KEY;
     static const std::string QUERY_MOTION_FLIP_MUTE_KEY;
     static const std::string QUERY_MOTION_PICKUP_REDUCE_KEY;
