@@ -800,6 +800,11 @@ int32_t AudioControlManager::SetMute(bool isMute)
     if ((DelayedSingleton<CallControlManager>::GetInstance()->HasEmergency(enabled) == TELEPHONY_SUCCESS) && enabled) {
         isMute = false;
     }
+    sptr<CallBase> currentCall = frontCall_;
+    if (currentCall == nullptr) {
+        TELEPHONY_LOGE("frontCall_ is nullptr");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     if (DelayedSingleton<CallControlManager>::GetInstance()->IsCallExist(CallType::TYPE_BLUETOOTH,
         TelCallState::CALL_STATUS_ACTIVE)) {
         std::string strMute = isMute ? "true" : "false";
@@ -808,7 +813,7 @@ int32_t AudioControlManager::SetMute(bool isMute)
             std::pair<std::string, std::string>("hfp_set_mic_mute", strMute)
         };
         OHOS::AudioStandard::AudioSystemManager::GetInstance()->SetExtraParameters("hfp_extra", vec);
-        DelayedSingleton<AudioProxy>::GetInstance()->SetMicrophoneMute(isMute);
+        currentCall->SetMicPhoneState(isMute);
     } else {
         if (!DelayedSingleton<AudioProxy>::GetInstance()->SetMicrophoneMute(isMute)) {
             TELEPHONY_LOGE("set mute failed");
@@ -816,14 +821,11 @@ int32_t AudioControlManager::SetMute(bool isMute)
         }
     }
     DelayedSingleton<AudioDeviceManager>::GetInstance()->ReportAudioDeviceInfo();
-    sptr<CallBase> currentCall = frontCall_;
-    if (currentCall == nullptr) {
-        TELEPHONY_LOGE("frontCall_ is nullptr");
-        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    if (currentCall->GetCallType() != CallType::TYPE_BLUETOOTH) {
+        bool muted = DelayedSingleton<AudioProxy>::GetInstance()->IsMicrophoneMute();
+        currentCall->SetMicPhoneState(muted);
+        TELEPHONY_LOGI("SetMute success callId:%{public}d, mute:%{public}d", currentCall->GetCallID(), muted);
     }
-    bool muted = DelayedSingleton<AudioProxy>::GetInstance()->IsMicrophoneMute();
-    currentCall->SetMicPhoneState(muted);
-    TELEPHONY_LOGI("SetMute success callId:%{public}d, mute:%{public}d", currentCall->GetCallID(), muted);
     return TELEPHONY_SUCCESS;
 }
 
