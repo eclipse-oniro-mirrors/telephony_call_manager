@@ -96,7 +96,7 @@ int32_t SettingsDataShareHelper::Query(Uri& uri, const std::string& key, std::st
     result->GetColumnIndex(SETTINGS_DATA_COLUMN_VALUE, columnIndex);
     result->GetString(columnIndex, value);
     result->Close();
-    TELEPHONY_LOGI("SettingUtils: query success");
+    TELEPHONY_LOGW("SettingUtils: query success");
     return TELEPHONY_SUCCESS;
 }
 
