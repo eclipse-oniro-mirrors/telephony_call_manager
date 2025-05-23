@@ -85,7 +85,6 @@ struct ContactInfo {
     std::string number = "";
     bool isContacterExists = false;
     char ringtonePath[FILE_PATH_MAX_LEN] = { 0 };
-    char personalNotificationRingtone[FILE_PATH_MAX_LEN] = { 0 };
     bool isSendToVoicemail = false;
     bool isEcc = false;
     bool isVoiceMail = false;
