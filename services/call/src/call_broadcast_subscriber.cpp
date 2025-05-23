@@ -30,14 +30,11 @@
 #include "os_account_manager.h"
 #include "call_object_manager.h"
 #include "bluetooth_call_connection.h"
-#include "bundle_mgr_interface.h"
-#include "iservice_registry.h"
 
 namespace OHOS {
 namespace Telephony {
 using namespace OHOS::EventFwk;
 static constexpr int16_t INCOMING_CALL_MISSED_CODE = 0;
-static constexpr int16_t UNKNOWN_SLOT_ID = -1;
 static constexpr int16_t PUBLISH_MISSCALL_EVENT_DELAY_TIME = 2000;
 CallBroadcastSubscriber::CallBroadcastSubscriber(const OHOS::EventFwk::CommonEventSubscribeInfo &subscriberInfo)
     : CommonEventSubscriber(subscriberInfo)
@@ -64,8 +61,6 @@ CallBroadcastSubscriber::CallBroadcastSubscriber(const OHOS::EventFwk::CommonEve
         [this](const EventFwk::CommonEventData &data) { HfpConnectBroadcast(data); };
     memberFuncMap_[SCREEN_UNLOCKED] =
         [this](const EventFwk::CommonEventData &data) { ScreenUnlockedBroadcast(data); };
-    memberFuncMap_[AMEND_RING] =
-        [this](const EventFwk::CommonEventData &data) { AmendRingBroadcast(data); };
 }
 
 void CallBroadcastSubscriber::OnReceiveEvent(const EventFwk::CommonEventData &data)
@@ -94,8 +89,6 @@ void CallBroadcastSubscriber::OnReceiveEvent(const EventFwk::CommonEventData &da
         code = SCREEN_UNLOCKED;
     } else if (action == "usual.event.bluetooth.CONNECT_HFP_HF") {
         code = HFP_EVENT;
-    } else if (action == "usual.event.AMEND_RING_EVENT") {
-        code = AMEND_RING;
     } else {
         code = UNKNOWN_BROADCAST_EVENT;
     }
@@ -246,71 +239,6 @@ void CallBroadcastSubscriber::ScreenUnlockedBroadcast(const EventFwk::CommonEven
         publishInfo.SetOrdered(true);
         EventFwk::CommonEventManager::PublishCommonEvent(eventData, publishInfo, nullptr);
     }
-}
-
-void CallBroadcastSubscriber::AmendRingBroadcast(const EventFwk::CommonEventData &data)
-{
-    auto settingHelper = SettingsDataShareHelper::GetInstance();
-    if (settingHelper == nullptr) {
-        TELEPHONY_LOGE("settingHelper is nullptr.");
-        return;
-    }
-    int32_t userId = 0;
-    AccountSA::OsAccountManager::GetForegroundOsAccountLocalId(userId);
-    std::string ringtoneFlagCardKey;
-    std::string videoRingtoneNameCardKey;
-    int32_t slotId = data.GetWant().GetIntParam("slotId", -1);
-    if (slotId == UNKNOWN_SLOT_ID) {
-        TELEPHONY_LOGE("unknow slotId.");
-        return;
-    }
-    std::string bundleName = data.GetWant().GetElement().GetBundleName();
-    TELEPHONY_LOGI("slotId: %{public}d, bundleName: %{public}s.", slotId, bundleName.c_str());
-    if (!CheckBundleName(bundleName, userId)) {
-        TELEPHONY_LOGE("not system bundle name.");
-        return;
-    }
-    if (slotId == DEFAULT_SIM_SLOT_ID) {
-        ringtoneFlagCardKey = "ringtoneFlagCard1";
-        videoRingtoneNameCardKey = "videoRingtoneNameCard1";
-    } else {
-        ringtoneFlagCardKey = "ringtoneFlagCard2";
-        videoRingtoneNameCardKey = "videoRingtoneNameCard2";
-    }
-    OHOS::Uri settingUri(SettingsDataShareHelper::SETTINGS_DATASHARE_SECURE_URI_BASE + std::to_string(userId) +
-        "?Proxy=true");
-    auto result = settingHelper->UpdateSecure(settingUri, ringtoneFlagCardKey, "");
-    settingHelper->UpdateSecure(settingUri, videoRingtoneNameCardKey, "");
-}
-
-bool CallBroadcastSubscriber::CheckBundleName(std::string &bundleName, int32_t userId)
-{
-    auto samgr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
-    if (samgr == nullptr) {
-        TELEPHONY_LOGE("Get ability manager failed.");
-        return false;
-    }
-    sptr<IRemoteObject> object = samgr->GetSystemAbility(BUNDLE_MGR_SERVICE_SYS_ABILITY_ID);
-    if (object == nullptr) {
-        TELEPHONY_LOGE("object is null.");
-        return false;
-    }
-    sptr<AppExecFwk::IBundleMgr> bms = iface_cast<OHOS::AppExecFwk::IBundleMgr>(object);
-    if (bms == nullptr) {
-        TELEPHONY_LOGE("bundle manager service is null.");
-        return false;
-    }
-    AppExecFwk::ApplicationInfo applicationInfo;
-    auto result = bms->GetApplicationInfoV9(bundleName, 1, userId, applicationInfo);
-    if (result != ERR_OK) {
-        TELEPHONY_LOGE("get application info error.");
-        return false;
-    }
-    if (!applicationInfo.isSystemApp) {
-        TELEPHONY_LOGE("is not system app.");
-        return false;
-    }
-    return true;
 }
 } // namespace Telephony
 } // namespace OHOS

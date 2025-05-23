@@ -38,7 +38,6 @@ public:
 
     int32_t Query(Uri& uri, const std::string& key, std::string& value);
     int32_t QuerySecure(Uri& uri, const std::string& key, std::string& value);
-    int32_t UpdateSecure(Uri &uri, const std::string &key, const std::string &value);
     int32_t Insert(Uri &uri, const std::string &key, const std::string &value);
     int32_t Update(Uri &uri, const std::string &key, const std::string &value);
     bool RegisterToDataShare(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &observer);

@@ -1809,10 +1809,6 @@ void CallControlManager::SystemAbilityListener::OnAddSystemAbility(int32_t syste
     if (ret) {
         TELEPHONY_LOGW("HSDRBroadcastSubscriber fail.");
     }
-    ret = AmendRingBroadcastSubscriber();
-    if (ret) {
-        TELEPHONY_LOGW("AmendRingBroadcastSubscriber fail.");
-    }
     ret = HfpBroadcastSubscriber();
     if (ret) {
         TELEPHONY_LOGW("HfpBroadcastSubscriber fail.");
@@ -1930,24 +1926,6 @@ int32_t CallControlManager::SystemAbilityListener::HSDRBroadcastSubscriber()
     }
     subscriberPtrList_.emplace_back(subscriberHsdr_);
     bool subscribeResult = EventFwk::CommonEventManager::SubscribeCommonEvent(subscriberHsdr_);
-    TELEPHONY_LOGI("CallControlManager SubscribeCommonEvent subscribeResult = %{public}d", subscribeResult);
-    return TELEPHONY_SUCCESS;
-}
-
-int32_t CallControlManager::SystemAbilityListener::AmendRingBroadcastSubscriber()
-{
-    EventFwk::MatchingSkills matchingSkills;
-    matchingSkills.AddEvent("usual.event.AMEND_RING_EVENT");
-    EventFwk::CommonEventSubscribeInfo subscriberInfo(matchingSkills);
-    subscriberInfo.SetThreadMode(EventFwk::CommonEventSubscribeInfo::COMMON);
-    std::shared_ptr<CallBroadcastSubscriber> subscriber =
-        std::make_shared<CallBroadcastSubscriber>(subscriberInfo);
-    if (subscriber == nullptr) {
-        TELEPHONY_LOGE("CallControlManager::BroadcastSubscriber subscriber is nullptr");
-        return TELEPHONY_ERROR;
-    }
-    subscriberPtrList_.emplace_back(subscriber);
-    bool subscribeResult = EventFwk::CommonEventManager::SubscribeCommonEvent(subscriber);
     TELEPHONY_LOGI("CallControlManager SubscribeCommonEvent subscribeResult = %{public}d", subscribeResult);
     return TELEPHONY_SUCCESS;
 }

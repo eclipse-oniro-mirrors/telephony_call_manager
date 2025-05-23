@@ -199,7 +199,6 @@ private:
         int32_t SuperPrivacyModeBroadcastSubscriber();
         int32_t HSDRBroadcastSubscriber();
         int32_t HfpBroadcastSubscriber();
-        int32_t AmendRingBroadcastSubscriber();
 
     private:
         std::vector<std::shared_ptr<CallBroadcastSubscriber>> subscriberPtrList_;
