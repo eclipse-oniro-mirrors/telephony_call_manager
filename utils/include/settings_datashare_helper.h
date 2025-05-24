@@ -31,20 +31,17 @@ public:
     static const std::string QUERY_SATELLITE_MODE_KEY;
     static const std::string QUERY_SATELLITE_CONNECTED_KEY;
     static const std::string SETTINGS_DATASHARE_URI;
-    static const std::string SETTINGS_DATASHARE_SECURE_URI_BASE;
     static const std::string QUERY_MOTION_CLOSE_TO_EAR_KEY;
     static const std::string QUERY_MOTION_FLIP_MUTE_KEY;
     static const std::string QUERY_MOTION_PICKUP_REDUCE_KEY;
 
-    int32_t Query(Uri& uri, const std::string& key, std::string& value);
-    int32_t QuerySecure(Uri& uri, const std::string& key, std::string& value);
+    ErrCode Query(Uri& uri, const std::string& key, std::string& value);
     int32_t Insert(Uri &uri, const std::string &key, const std::string &value);
     int32_t Update(Uri &uri, const std::string &key, const std::string &value);
     bool RegisterToDataShare(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &observer);
     bool UnRegisterToDataShare(const Uri &uri, const sptr<AAFwk::IDataAbilityObserver> &observer);
 private:
     std::shared_ptr<DataShare::DataShareHelper> CreateDataShareHelper(int systemAbilityId);
-    std::shared_ptr<DataShare::DataShareHelper> CreateDataShareSecureHelper(int systemAbilityId);
 };
 } // namespace Telephony
 } // namespace OHOS

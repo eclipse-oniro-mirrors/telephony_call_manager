@@ -349,10 +349,6 @@ void AudioControlManager::HandleNextState(sptr<CallBase> &callObjectPtr, TelCall
                 DelayedSingleton<AudioProxy>::GetInstance()->StopVibrator();
                 isCrsVibrating_ = false;
             }
-            if (isVideoRingVibrating_) {
-                DelayedSingleton<AudioProxy>::GetInstance()->StopVibrator();
-                isVideoRingVibrating_ = false;
-            }
             audioInterruptState_ = AudioInterruptState::INTERRUPT_STATE_DEACTIVATED;
             break;
         default:
@@ -415,10 +411,6 @@ void AudioControlManager::ProcessAudioWhenCallActive(sptr<CallBase> &callObjectP
         if (isCrsVibrating_) {
             DelayedSingleton<AudioProxy>::GetInstance()->StopVibrator();
             isCrsVibrating_ = false;
-        }
-        if (isVideoRingVibrating_) {
-            DelayedSingleton<AudioProxy>::GetInstance()->StopVibrator();
-            isVideoRingVibrating_ = false;
         }
         int ringCallCount = CallObjectManager::GetCallNumByRunningState(CallRunningState::CALL_RUNNING_STATE_RINGING);
         if ((CallObjectManager::GetCurrentCallNum() - ringCallCount) < MIN_MULITY_CALL_COUNT) {
@@ -611,9 +603,7 @@ bool AudioControlManager::PlayRingtone()
         TELEPHONY_LOGI("type_crs but not play ringtone");
         return false;
     }
-    if (CheckAndDealVideoRingScene(contactInfo.personalNotificationRingtone, contactInfo.ringtonePath)) {
-        return false;
-    }
+
     if (incomingCall->GetCallType() == CallType::TYPE_BLUETOOTH) {
         ret = ring_->Play(info.accountId, contactInfo.ringtonePath, Media::HapticStartupMode::FAST);
     } else {
@@ -630,34 +620,6 @@ bool AudioControlManager::PlayRingtone()
         StopRingtone();
     }
     return true;
-}
-
-bool AudioControlManager::IsVideoRing(const std::string &personalNotificationRingtone, const std::string &ringtonePath)
-{
-    if ((personalNotificationRingtone.length() > VIDEO_RING_PATH_FIX_TAIL_LENGTH &&
-        personalNotificationRingtone.substr(personalNotificationRingtone.length() - VIDEO_RING_PATH_FIX_TAIL_LENGTH,
-        VIDEO_RING_PATH_FIX_TAIL_LENGTH) == VIDEO_RING_PATH_FIX_TAIL) || ringtonePath == SYSTEM_VIDEO_RING) {
-        TELEPHONY_LOGI("Is video ring.");
-        return true;
-    }
-    return false;
-}
-
-bool AudioControlManager::CheckAndDealVideoRingScene(const std::string &personalNotificationRingtone,
-    const std::string &ringtonePath)
-{
-    if (IsVideoRing(personalNotificationRingtone, ringtonePath)) {
-        TELEPHONY_LOGI("video ring scene.");
-        AudioStandard::AudioRingerMode ringMode = DelayedSingleton<AudioProxy>::GetInstance()->GetRingerMode();
-        if ((ringMode == AudioStandard::AudioRingerMode::RINGER_MODE_NORMAL && IsRingingVibrateModeOn()) ||
-            ringMode == AudioStandard::AudioRingerMode::RINGER_MODE_VIBRATE) {
-            TELEPHONY_LOGI("need start vibrator.");
-            isVideoRingVibrating_ = (DelayedSingleton<AudioProxy>::GetInstance()->StartVibrator() == TELEPHONY_SUCCESS);
-        }
-        return true;
-    }
-    TELEPHONY_LOGI("audio ring scene.");
-    return false;
 }
 
 bool AudioControlManager::IsDistributeCallSinkStatus()
@@ -998,7 +960,6 @@ bool AudioControlManager::ShouldPlayRingtone() const
     int32_t incomingCallNum = processor->GetCallNumber(TelCallState::CALL_STATUS_INCOMING);
     if (incomingCallNum == EMPTY_VALUE || alertingCallNum > EMPTY_VALUE || ringState_ == RingState::RINGING
         || (soundState_ == SoundState::SOUNDING && CallObjectManager::HasIncomingCallCrsType())) {
-        TELEPHONY_LOGI("should not play ring tone.");
         return false;
     }
     return true;
@@ -1151,10 +1112,6 @@ void AudioControlManager::MuteNetWorkRingTone()
     if (isCrsVibrating_) {
         DelayedSingleton<AudioProxy>::GetInstance()->StopVibrator();
         isCrsVibrating_ = false;
-    }
-    if (isVideoRingVibrating_) {
-        DelayedSingleton<AudioProxy>::GetInstance()->StopVibrator();
-        isVideoRingVibrating_ = false;
     }
 }
 

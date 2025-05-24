@@ -31,9 +31,6 @@
 
 namespace OHOS {
 namespace Telephony {
-static constexpr const char *VIDEO_RING_PATH_FIX_TAIL = ".mp4";
-constexpr int32_t VIDEO_RING_PATH_FIX_TAIL_LENGTH = 4;
-static constexpr const char *SYSTEM_VIDEO_RING = "system_video_ring";
 class AudioControlManager : public CallStateListenerBase, public std::enable_shared_from_this<AudioControlManager> {
     DECLARE_DELAYED_SINGLETON(AudioControlManager)
 
@@ -96,7 +93,6 @@ public:
     bool IsScoTemporarilyDisabled();
     void ExcludeBluetoothSco();
     void UnexcludeBluetoothSco();
-    bool IsVideoRing(const std::string &personalNotificationRingtone, const std::string &ringtonePath);
 
 private:
     RingState ringState_ = RingState::STOPPED;
@@ -109,7 +105,6 @@ private:
     sptr<CallBase> GetCallBase(int32_t callId);
     AudioInterruptState audioInterruptState_ = AudioInterruptState::INTERRUPT_STATE_DEACTIVATED;
     bool ShouldPlayRingtone() const;
-    bool CheckAndDealVideoRingScene(const std::string &personalNotificationRingtone, const std::string &ringtonePath);
     bool IsEmergencyCallExists();
     void UpdateForegroundLiveCall();
     bool IsBtOrWireHeadPlugin();
@@ -129,7 +124,6 @@ private:
     SoundState soundState_ = SoundState::STOPPED;
     bool isLocalRingbackNeeded_ = false;
     bool isCrsVibrating_ = false;
-    bool isVideoRingVibrating_ = false;
     std::set<sptr<CallBase>> totalCalls_;
     std::unique_ptr<Ring> ring_;
     std::unique_ptr<Tone> tone_;
