@@ -565,6 +565,15 @@ public:
      */
     int32_t SendUssdResponse(int32_t slotId, const std::string &content) override;
 
+    /**
+     * @brief is mmi code
+     *
+     * @param slotId[in] the slot id
+     * @param number[in] the phone number
+     * @return Returns true on phone number is mmi code, else return false.
+     */
+    bool IsMmiCode(int32_t slotId, std::string &number) override;
+
 private:
     /**
      * @brief SetCommonParamForMessageParcel, set common param for MessageParcel

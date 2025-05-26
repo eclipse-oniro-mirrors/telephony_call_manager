@@ -1132,10 +1132,10 @@ HWTEST_F(ZeroBranch2Test, Telephony_CallDialog_001, Function | MediumTest | Leve
  */
 HWTEST_F(ZeroBranch2Test, Telephony_CallNumberUtils_003, Function | MediumTest | Level1)
 {
-    auto callNumUtils = DelayedSingleton<CallNumberUtils>::GetInstance();
-    EXPECT_NE(callNumUtils, nullptr);
+    auto cellularCallConnection = DelayedSingleton<CellularCallConnection>::GetInstance();
+    EXPECT_NE(cellularCallConnection, nullptr);
     std::string dialStr = "";
-    ASSERT_FALSE(callNumUtils->IsMMICode(dialStr));
+    ASSERT_FALSE(cellularCallConnection->IsMmiCode(0, dialStr));
     DialParaInfo dialInfo;
     sptr<CallBase> call = new IMSCall(dialInfo);
     call->callId_ = 1;
@@ -1145,34 +1145,34 @@ HWTEST_F(ZeroBranch2Test, Telephony_CallNumberUtils_003, Function | MediumTest |
     call->SetCallType(CallType::TYPE_IMS);
     CallObjectManager::AddOneCallObject(call);
     dialStr = "333";
-    ASSERT_FALSE(callNumUtils->IsMMICode(dialStr));
+    ASSERT_FALSE(cellularCallConnection->IsMmiCode(0,dialStr));
     dialStr = "33";
-    ASSERT_TRUE(callNumUtils->IsMMICode(dialStr));
+    ASSERT_TRUE(cellularCallConnection->IsMmiCode(0, dialStr));
     CallObjectManager::DeleteOneCallObject(call);
     dialStr = "333";
-    ASSERT_FALSE(callNumUtils->IsMMICode(dialStr));
+    ASSERT_FALSE(cellularCallConnection->IsMmiCode(0, dialStr));
     dialStr = "12";
-    ASSERT_FALSE(callNumUtils->IsMMICode(dialStr));
+    ASSERT_FALSE(cellularCallConnection->IsMmiCode(0, dialStr));
     dialStr = "1*";
-    ASSERT_TRUE(callNumUtils->IsMMICode(dialStr));
+    ASSERT_TRUE(cellularCallConnection->IsMmiCode(0, dialStr));
     dialStr = "*1";
-    ASSERT_TRUE(callNumUtils->IsMMICode(dialStr));
+    ASSERT_TRUE(cellularCallConnection->IsMmiCode(0, dialStr));
     dialStr = "**";
-    ASSERT_TRUE(callNumUtils->IsMMICode(dialStr));
+    ASSERT_TRUE(cellularCallConnection->IsMmiCode(0, dialStr));
     dialStr = "33";
-    ASSERT_TRUE(callNumUtils->IsMMICode(dialStr));
+    ASSERT_TRUE(cellularCallConnection->IsMmiCode(0, dialStr));
     dialStr = "*21*10086#";
-    ASSERT_TRUE(callNumUtils->IsMMICode(dialStr));
+    ASSERT_TRUE(cellularCallConnection->IsMmiCode(0, dialStr));
     dialStr = "10086";
-    ASSERT_FALSE(callNumUtils->IsMMICode(dialStr));
+    ASSERT_FALSE(cellularCallConnection->IsMmiCode(0, dialStr));
     dialStr = "*30#10086";
-    ASSERT_FALSE(callNumUtils->IsMMICode(dialStr));
+    ASSERT_FALSE(cellularCallConnection->IsMmiCode(0, dialStr));
     dialStr = "*33##123#";
-    ASSERT_FALSE(callNumUtils->IsMMICode(dialStr));
+    ASSERT_FALSE(cellularCallConnection->IsMmiCode(0, dialStr));
     dialStr = "*10086#";
-    ASSERT_TRUE(callNumUtils->IsMMICode(dialStr));
+    ASSERT_TRUE(cellularCallConnection->IsMmiCode(0, dialStr));
     dialStr = "#10086#";
-    ASSERT_TRUE(callNumUtils->IsMMICode(dialStr));
+    ASSERT_TRUE(cellularCallConnection->IsMmiCode(0, dialStr));
 }
 } // namespace Telephony
 } // namespace OHOS
