@@ -43,7 +43,7 @@ CallBase::CallBase(DialParaInfo &info)
       ringEndTime_(0), answerType_(CallAnswerType::CALL_ANSWER_MISSED), accountId_(info.accountId),
       crsType_(info.crsType), originalCallType_(info.originalCallType), isMuted_(false), numberLocation_("default"),
       blockReason_(0), isEccContact_(false), celiaCallType_(-1), extraParams_(info.extraParams), isAnswered_(false),
-      detectDetails_(""), phoneOrWatch_(info.phoneOrWatch)
+      detectDetails_(""), phoneOrWatch_(info.phoneOrWatch), isAiAutoAnswer_(false)
 {
     (void)memset_s(&contactInfo_, sizeof(ContactInfo), 0, sizeof(ContactInfo));
     (void)memset_s(&numberMarkInfo_, sizeof(NumberMarkInfo), 0, sizeof(NumberMarkInfo));
@@ -60,7 +60,8 @@ CallBase::CallBase(DialParaInfo &info, AppExecFwk::PacMap &extras)
       callEndTime_(0), ringBeginTime_(0), ringEndTime_(0), answerType_(CallAnswerType::CALL_ANSWER_MISSED),
       accountId_(info.accountId), crsType_(info.crsType), originalCallType_(info.originalCallType), isMuted_(false),
       numberLocation_("default"), blockReason_(0), isEccContact_(false), celiaCallType_(-1),
-      extraParams_(info.extraParams), isAnswered_(false), detectDetails_(""), phoneOrWatch_(info.phoneOrWatch)
+      extraParams_(info.extraParams), isAnswered_(false), detectDetails_(""), phoneOrWatch_(info.phoneOrWatch),
+      isAiAutoAnswer_(false)
 {
     (void)memset_s(&contactInfo_, sizeof(ContactInfo), 0, sizeof(ContactInfo));
     (void)memset_s(&numberMarkInfo_, sizeof(NumberMarkInfo), 0, sizeof(NumberMarkInfo));
@@ -704,6 +705,16 @@ CallDirection CallBase::GetCallDirection()
 void CallBase::SetPhoneOrWatchDial(int32_t phoneOrWatch)
 {
     phoneOrWatch_ = phoneOrWatch;
+}
+
+void CallBase::SetAiAutoAnswer(bool isAiAutoAnswer)
+{
+    isAiAutoAnswer_ = isAiAutoAnswer;
+}
+
+bool CallBase::IsAiAutoAnswer()
+{
+    return isAiAutoAnswer_;
 }
 } // namespace Telephony
 } // namespace OHOS

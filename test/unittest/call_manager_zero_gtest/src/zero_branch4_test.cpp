@@ -495,7 +495,16 @@ HWTEST_F(ZeroBranch3Test, Telephony_MissedCallNotification_001, TestSize.Level0)
         callObjectPtr, TelCallState::CALL_STATUS_INCOMING, TelCallState::CALL_STATUS_INCOMING);
     missedCallNotification->CallStateUpdated(
         callObjectPtr, TelCallState::CALL_STATUS_DISCONNECTED, TelCallState::CALL_STATUS_INCOMING);
-
+    callObjectPtr->SetAnswerType(CallAnswerType::CALL_ANSWER_MISSED);
+    missedCallNotification->CallStateUpdated(
+        callObjectPtr, TelCallState::CALL_STATUS_DISCONNECTED, TelCallState::CALL_STATUS_INCOMING);
+    callObjectPtr->SetAnswerType(CallAnswerType::CALL_ANSWER_ACTIVED);
+    callObjectPtr->SetAiAutoAnswer(false);
+    missedCallNotification->CallStateUpdated(
+        callObjectPtr, TelCallState::CALL_STATUS_DISCONNECTED, TelCallState::CALL_STATUS_INCOMING);
+    callObjectPtr->SetAiAutoAnswer(true);
+    missedCallNotification->CallStateUpdated(
+        callObjectPtr, TelCallState::CALL_STATUS_DISCONNECTED, TelCallState::CALL_STATUS_INCOMING);
     missedCallNotification->PublishMissedCallEvent(callObjectPtr);
     std::map<std::string, int32_t> phoneNumAndUnReadCountMap;
     phoneNumAndUnReadCountMap.insert(pair<string, int>("000", 1));

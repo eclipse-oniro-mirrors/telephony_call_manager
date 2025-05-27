@@ -132,6 +132,12 @@ void CallRecordsManager::CallStateUpdated(
         TELEPHONY_LOGI("markType is default.");
         info.numberMarkInfo.markType = MarkType::MARK_TYPE_NONE;
     }
+
+    if (nextState == TelCallState::CALL_STATUS_DISCONNECTED &&
+        callObjectPtr->GetCallDirection() == CallDirection::CALL_DIRECTION_IN && 
+        callObjectPtr->IsAiAutoAnswer()) {
+        info.answerType = CallAnswerType::CALL_ANSWER_MISSED;
+    }
     AddOneCallRecord(info);
 }
 

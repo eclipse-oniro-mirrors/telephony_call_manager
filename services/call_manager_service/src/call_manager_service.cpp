@@ -1674,20 +1674,7 @@ int32_t CallManagerService::SendCallUiEvent(int32_t callId, std::string &eventNa
             return TELEPHONY_ERR_FAIL;
         }
     } else if (eventName == "DISPLAY_SPECIFIED_CALL_PAGE_BY_CALL_ID") {
-        TELEPHONY_LOGI("enter emergency start callui event");
-        sptr<CallBase> callPtr = CallObjectManager::GetOneCallObject(callId);
-        if (callPtr == nullptr) {
-            TELEPHONY_LOGI("the call object is nullptr!");
-            return TELEPHONY_ERR_LOCAL_PTR_NULL;
-        }
-        CallAttributeInfo info;
-        callPtr->GetCallAttributeInfo(info);
-        AAFwk::WantParams object = AAFwk::WantParamWrapper::ParseWantParamsWithBrackets(info.extraParamsString);
-        object.SetParam("sosWithOutCallUiAbility", AAFwk::String::Box(SOS_PULL_CALL_PAGE));
-        info.extraParamsString = AAFwk::WantParamWrapper(object).ToString();
-        object.Remove("sosWithOutCallUiAbility");
-        callPtr->SetExtraParams(object);
-        DelayedSingleton<CallAbilityReportProxy>::GetInstance()->ReportCallStateInfo(info);
+        return HandleDisplaySpecifiedCallPage(callId);
     } else if (eventName == "EVENT_BLUETOOTH_SCO_STATE_OFF") {
         return DelayedSingleton<BluetoothCallConnection>::GetInstance()->DisConnectBtSco();
     } else if (eventName == "EVENT_BLUETOOTH_SCO_STATE_ON") {
@@ -1702,7 +1689,38 @@ int32_t CallManagerService::SendCallUiEvent(int32_t callId, std::string &eventNa
             return TELEPHONY_SUCCESS;
         }
         return TELEPHONY_ERR_FAIL;
+    } else if (eventName == "EVENT_CELIA_AUTO_ANSWER_CALL_ON" || eventName == "EVENT_CELIA_AUTO_ANSWER_CALL_OFF") {
+        return HandleCeliaAutoAnswerCall(callId, eventName == "EVENT_CELIA_AUTO_ANSWER_CALL_ON");
     }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallManagerService::HandleDisplaySpecifiedCallPage(int32_t callId)
+{
+    sptr<CallBase> callPtr = CallObjectManager::GetOneCallObject(callId);
+    if (callPtr == nullptr) {
+        TELEPHONY_LOGI("the call object is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    CallAttributeInfo info;
+    callPtr->GetCallAttributeInfo(info);
+    AAFwk::WantParams object = AAFwk::WantParamWrapper::ParseWantParamsWithBrackets(info.extraParamsString);
+    object.SetParam("sosWithOutCallUiAbility", AAFwk::String::Box(SOS_PULL_CALL_PAGE));
+    info.extraParamsString = AAFwk::WantParamWrapper(object).ToString();
+    object.Remove("sosWithOutCallUiAbility");
+    callPtr->SetExtraParams(object);
+    DelayedSingleton<CallAbilityReportProxy>::GetInstance()->ReportCallStateInfo(info);
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallManagerService::HandleCeliaAutoAnswerCall(int32_t callId, bool enable)
+{
+    sptr<CallBase> callPtr = CallObjectManager::GetOneCallObject(callId);
+    if (callPtr == nullptr) {
+        TELEPHONY_LOGI("the call object is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    callPtr->SetAiAutoAnswer(enable);
     return TELEPHONY_SUCCESS;
 }
 

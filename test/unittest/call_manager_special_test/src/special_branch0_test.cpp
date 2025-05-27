@@ -935,8 +935,29 @@ HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_019, TestSize.Level0)
 {
     std::shared_ptr<CallManagerService> callManagerService = std::make_shared<CallManagerService>();
     ASSERT_TRUE(callManagerService != nullptr);
+    CallObjectManager::callObjectPtrList_.clear();
+    DialParaInfo info;
+    sptr<CallBase> call = new IMSCall(info);
+    call->SetCallId(0);
+    CallObjectManager::AddOneCallObject(call);
     std::string eventName = "DISPLAY_SPECIFIED_CALL_PAGE_BY_CALL_ID";
     callManagerService->SendCallUiEvent(1, eventName);
+    eventName = "EVENT_CELIA_AUTO_ANSWER_CALL_ON";
+    callManagerService->SendCallUiEvent(1, eventName);
+    eventName = "EVENT_CELIA_AUTO_ANSWER_CALL_OFF";
+    callManagerService->SendCallUiEvent(1, eventName);
+
+    CallObjectManager::callObjectPtrList_.clear();
+    call->SetCallId(1);
+    CallObjectManager::AddOneCallObject(call);
+    eventName = "DISPLAY_SPECIFIED_CALL_PAGE_BY_CALL_ID";
+    callManagerService->SendCallUiEvent(1, eventName);
+    eventName = "EVENT_CELIA_AUTO_ANSWER_CALL_ON";
+    callManagerService->SendCallUiEvent(1, eventName);
+    ASSERT_TRUE(call->IsAiAutoAnswer());
+    eventName = "EVENT_CELIA_AUTO_ANSWER_CALL_OFF";
+    callManagerService->SendCallUiEvent(1, eventName);
+    ASSERT_FALSE(call->IsAiAutoAnswer());
     eventName = "EVENT_BLUETOOTH_SCO_STATE_OFF";
     callManagerService->SendCallUiEvent(1, eventName);
     eventName = "EVENT_BLUETOOTH_SCO_STATE_ON";
