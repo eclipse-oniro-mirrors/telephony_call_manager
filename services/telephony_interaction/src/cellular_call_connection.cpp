@@ -1008,5 +1008,14 @@ int32_t CellularCallConnection::SendUssdResponse(int32_t slotId, const std::stri
     }
     return TELEPHONY_SUCCESS;
 }
+
+bool CellularCallConnection::IsMmiCode(int32_t slotId, std::string &number)
+{
+    if (ReConnectService() != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("ipc reconnect failed!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return cellularCallInterfacePtr_->IsMmiCode(slotId, number);
+}
 } // namespace Telephony
 } // namespace OHOS

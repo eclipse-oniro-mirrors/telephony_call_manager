@@ -572,6 +572,15 @@ public:
      */
     int32_t SendUssdResponse(int32_t slotId, const std::string &content);
 
+    /**
+     * @brief is mmi code
+     *
+     * @param slotId[in] the slot id
+     * @param number[in] the phone number
+     * @return Returns true on phone number is mmi code, else return false.
+     */
+    bool IsMmiCode(int32_t slotId, std::string &number);
+
 private:
     int32_t ConnectService();
     int32_t RegisterCallBackFun();

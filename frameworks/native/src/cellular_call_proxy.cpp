@@ -1688,5 +1688,31 @@ int32_t CellularCallProxy::SendUssdResponse(int32_t slotId, const std::string &c
     }
     return ret;
 }
+
+bool CellularCallProxy::IsMmiCode(int32_t slotId, std::string &number)
+{
+    MessageOption option;
+    MessageParcel in;
+    MessageParcel out;
+    int32_t result = TELEPHONY_SUCCESS;
+    result = SetCommonParamForMessageParcel(slotId, in);
+    if (result != TELEPHONY_SUCCESS) {
+        return false;
+    }
+    if (!in.WriteString(number)) {
+        return false;
+    }
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("function Remote() return nullptr!");
+        return false;
+    }
+    int32_t ret = remote->SendRequest(static_cast<uint32_t>(CellularCallInterfaceCode::IS_MMI_CODE),
+        in, out, option);
+    if (ret == ERR_NONE) {
+        return out.ReadBool();
+    }
+    return false;
+}
 } // namespace Telephony
 } // namespace OHOS
