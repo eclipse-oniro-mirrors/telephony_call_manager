@@ -709,13 +709,11 @@ void CallBase::SetPhoneOrWatchDial(int32_t phoneOrWatch)
 
 void CallBase::SetAiAutoAnswer(bool isAiAutoAnswer)
 {
-    std::lock_guard<std::mutex> lock(mutex_);
     isAiAutoAnswer_ = isAiAutoAnswer;
 }
 
 bool CallBase::IsAiAutoAnswer()
 {
-    std::lock_guard<std::mutex> lock(mutex_);
     return isAiAutoAnswer_;
 }
 } // namespace Telephony

@@ -38,14 +38,18 @@ void MissedCallNotification::NewCallCreated(sptr<CallBase> &callObjectPtr) {}
 void MissedCallNotification::CallStateUpdated(
     sptr<CallBase> &callObjectPtr, TelCallState priorState, TelCallState nextState)
 {
-    if (callObjectPtr != nullptr && callObjectPtr->GetCallType() == CallType::TYPE_VOIP) {
+    if (callObjectPtr == nullptr) {
+        return;
+    }
+    if (callObjectPtr->GetCallType() == CallType::TYPE_VOIP) {
         TELEPHONY_LOGI("Voip call should not save  missed notification");
         return;
     }
-    if (callObjectPtr != nullptr && nextState == TelCallState::CALL_STATUS_DISCONNECTED &&
+    CallAnswerType answerType = callObjectPtr->GetAnswerType();
+    if (nextState == TelCallState::CALL_STATUS_DISCONNECTED &&
         callObjectPtr->GetCallDirection() == CallDirection::CALL_DIRECTION_IN &&
-        ((callObjectPtr->GetAnswerType() == CallAnswerType::CALL_ANSWER_MISSED) ||
-        (callObjectPtr->GetAnswerType() == CallAnswerType::CALL_ANSWER_ACTIVED &&
+        ((answerType == CallAnswerType::CALL_ANSWER_MISSED) ||
+        (answerType == CallAnswerType::CALL_ANSWER_ACTIVED &&
         callObjectPtr->IsAiAutoAnswer()))) {
         int32_t userId = 0;
         bool isUserUnlocked = false;

@@ -1697,7 +1697,6 @@ int32_t CallManagerService::SendCallUiEvent(int32_t callId, std::string &eventNa
 
 int32_t CallManagerService::HandleDisplaySpecifiedCallPage(int32_t callId)
 {
-    TELEPHONY_LOGI("enter emergency start callui event");
     sptr<CallBase> callPtr = CallObjectManager::GetOneCallObject(callId);
     if (callPtr == nullptr) {
         TELEPHONY_LOGI("the call object is nullptr!");
@@ -1716,7 +1715,6 @@ int32_t CallManagerService::HandleDisplaySpecifiedCallPage(int32_t callId)
 
 int32_t CallManagerService::HandleCeliaAutoAnswerCall(int32_t callId, bool enable)
 {
-    TELEPHONY_LOGI("enter anto answer mode is %{public}d", enable);
     sptr<CallBase> callPtr = CallObjectManager::GetOneCallObject(callId);
     if (callPtr == nullptr) {
         TELEPHONY_LOGI("the call object is nullptr!");
