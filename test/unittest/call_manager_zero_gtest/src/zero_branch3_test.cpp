@@ -669,6 +669,12 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallRecordsManager_001, TestSize.Level0)
     callRecordsManager.RemoveMissedIncomingCallNotification();
     int32_t videoState = static_cast<int32_t>(VideoStateType::TYPE_VIDEO);
     callRecordsManager.GetCallFeatures(videoState);
+    nextState = TelCallState::CALL_STATUS_DISCONNECTED;
+    callRecordsManager.CallStateUpdated(callObjectPtr, priorState, nextState);
+    callObjectPtr->SetCallDirection(CallDirection::CALL_DIRECTION_IN);
+    callRecordsManager.CallStateUpdated(callObjectPtr, priorState, nextState);
+    callObjectPtr->SetAiAutoAnswer(true);
+    callRecordsManager.CallStateUpdated(callObjectPtr, priorState, nextState);
 }
 
 /**

@@ -143,6 +143,8 @@ public:
     void SetAnsweredCall(bool isAnswered);
     AAFwk::WantParams GetExtraParams();
     void SetPhoneOrWatchDial(int32_t phoneOrWatch);
+    bool IsAiAutoAnswer();
+    void SetAiAutoAnswer(bool isAiAutoAnswer);
 
 protected:
     int32_t callId_;
@@ -195,6 +197,7 @@ private:
     bool isAnswered_;
     std::string detectDetails_;
     int32_t phoneOrWatch_ = 0;
+    bool isAiAutoAnswer_;
 };
 } // namespace Telephony
 } // namespace OHOS

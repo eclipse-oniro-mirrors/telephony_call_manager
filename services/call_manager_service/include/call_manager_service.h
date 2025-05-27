@@ -813,6 +813,8 @@ public:
 private:
     std::string GetBundleInfo();
     int32_t dealCeliaCallEvent(int32_t callId);
+    int32_t HandleDisplaySpecifiedCallPage(int32_t callId);
+    int32_t HandleCeliaAutoAnswerCall(int32_t callId, bool enable);
 
 private:
     enum ServiceRunningState {
