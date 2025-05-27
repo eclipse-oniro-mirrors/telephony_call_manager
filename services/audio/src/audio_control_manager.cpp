@@ -627,7 +627,6 @@ void AudioControlManager::PostProcessRingtone()
     } else if (isNeedMuteRing_) {
         TELEPHONY_LOGI("play ringtone success but need mute it");
         MuteRinger();
-        isNeedMuteRing_ = false;
     }
 }
 
@@ -825,6 +824,7 @@ int32_t AudioControlManager::MuteRinger()
         TELEPHONY_LOGE("SetMute fail");
         return CALL_ERR_AUDIO_SETTING_MUTE_FAILED;
     }
+    isNeedMuteRing_ = false;
     TELEPHONY_LOGI("mute ring success");
     return TELEPHONY_SUCCESS;
 }
