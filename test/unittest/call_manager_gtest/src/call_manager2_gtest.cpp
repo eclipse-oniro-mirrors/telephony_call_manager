@@ -852,7 +852,6 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_2000, Function | Mediu
         HangUpCall();
     }
     std::string phoneNumber = "10086";
-    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_200_MS, SLEEP_30000_MS);
     if (HasSimCard(SIM1_SLOTID)) {
         InitDialInfo(
             SIM1_SLOTID, (int32_t)VideoStateType::TYPE_VOICE, DIAL_SCENE_TEST, (int32_t)DialType::DIAL_CARRIER_TYPE);
@@ -906,7 +905,6 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_2100, Function | Mediu
     }
     std::string phoneNumber = "10086,123";
     if (HasSimCard(SIM1_SLOTID)) {
-        CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_200_MS, SLEEP_30000_MS);
         InitDialInfo(
             SIM1_SLOTID, (int32_t)VideoStateType::TYPE_VOICE, DIAL_SCENE_TEST, (int32_t)DialType::DIAL_CARRIER_TYPE);
         EXPECT_EQ(CallManagerGtest::clientPtr_->DialCall(Str8ToStr16(phoneNumber), dialInfo_), RETURN_VALUE_IS_ZERO);
@@ -917,7 +915,6 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_DialCall_2100, Function | Mediu
     }
 
     if (HasSimCard(SIM2_SLOTID)) {
-        CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_200_MS, SLEEP_30000_MS);
         InitDialInfo(
             SIM2_SLOTID, (int32_t)VideoStateType::TYPE_VOICE, DIAL_SCENE_TEST, (int32_t)DialType::DIAL_CARRIER_TYPE);
         EXPECT_EQ(CallManagerGtest::clientPtr_->DialCall(Str8ToStr16(phoneNumber), dialInfo_), RETURN_VALUE_IS_ZERO);
@@ -944,7 +941,6 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_AnswerCall_0100, Function | Med
     if (clientPtr_->GetCallState() == static_cast<int>(CallStateToApp::CALL_STATE_OFFHOOK)) {
         HangUpCall();
     }
-    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_200_MS, SLEEP_30000_MS);
     int32_t callId = INVALID_NEGATIVE_ID;
     int32_t videoState = (int32_t)VideoStateType::TYPE_VOICE;
     EXPECT_NE(CallManagerGtest::clientPtr_->AnswerCall(callId, videoState), RETURN_VALUE_IS_ZERO);
@@ -962,7 +958,6 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_AnswerCall_0200, Function | Med
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
     }
-    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_200_MS, SLEEP_30000_MS);
     int32_t callId = INVALID_POSITIVE_ID;
     int32_t videoState = INVALID_NEGATIVE_ID;
     EXPECT_NE(CallManagerGtest::clientPtr_->AnswerCall(callId, videoState), RETURN_VALUE_IS_ZERO);
@@ -978,7 +973,6 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_AnswerCall_0300, Function | Med
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
     }
-    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_200_MS, SLEEP_30000_MS);
     int32_t callId = INVALID_POSITIVE_ID;
     int32_t videoState = INVALID_NEGATIVE_ID;
     EXPECT_NE(CallManagerGtest::clientPtr_->AnswerCall(callId, videoState), RETURN_VALUE_IS_ZERO);
@@ -995,7 +989,6 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_AnswerCall_0400, Function | Med
     if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
         return;
     }
-    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_200_MS, SLEEP_30000_MS);
     EXPECT_NE(bluetoothCallClient.AnswerCall(), RETURN_VALUE_IS_ZERO);
 }
 } // namespace Telephony
