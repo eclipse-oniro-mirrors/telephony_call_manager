@@ -49,8 +49,7 @@ void MissedCallNotification::CallStateUpdated(
     if (nextState == TelCallState::CALL_STATUS_DISCONNECTED &&
         callObjectPtr->GetCallDirection() == CallDirection::CALL_DIRECTION_IN &&
         ((answerType == CallAnswerType::CALL_ANSWER_MISSED) ||
-        (answerType == CallAnswerType::CALL_ANSWER_ACTIVED &&
-        callObjectPtr->IsAiAutoAnswer()))) {
+        (answerType == CallAnswerType::CALL_ANSWER_ACTIVED && callObjectPtr->IsAiAutoAnswer()))) {
         int32_t userId = 0;
         bool isUserUnlocked = false;
         AccountSA::OsAccountManager::GetForegroundOsAccountLocalId(userId);
