@@ -120,6 +120,7 @@ private:
     void SaveVoiceVolume(int32_t volume);
     int32_t GetBackupVoiceVolume();
     void RestoreVoiceValumeIfNecessary();
+    void PostProcessRingtone();
     ToneState toneState_ = ToneState::STOPPED;
     SoundState soundState_ = SoundState::STOPPED;
     bool isLocalRingbackNeeded_ = false;
@@ -134,6 +135,7 @@ private:
     bool isSetAudioDeviceByUser_ = false;
     bool isScoTemporarilyDisabled_ = false;
     int32_t voiceVolume_ = -1;
+    bool isNeedMuteRing_ = false;
 };
 } // namespace Telephony
 } // namespace OHOS

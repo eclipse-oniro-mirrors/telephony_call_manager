@@ -614,12 +614,21 @@ bool AudioControlManager::PlayRingtone()
         return false;
     }
     TELEPHONY_LOGI("play ringtone success");
-    incomingCall = CallObjectManager::GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_RINGING);
+    PostProcessRingtone();
+    return true;
+}
+
+void AudioControlManager::PostProcessRingtone()
+{
+    sptr<CallBase> incomingCall = CallObjectManager::GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_RINGING);
     if (incomingCall == nullptr) {
         TELEPHONY_LOGI("play ringtone success but incoming call is null stop it");
         StopRingtone();
+    } else if (isNeedMuteRing_) {
+        TELEPHONY_LOGI("play ringtone success but need mute it");
+        MuteRinger();
+        isNeedMuteRing_ = false;
     }
-    return true;
 }
 
 bool AudioControlManager::IsDistributeCallSinkStatus()
@@ -698,6 +707,7 @@ bool AudioControlManager::StopRingtone()
         return false;
     }
     ring_->ReleaseRenderer();
+    isNeedMuteRing_ = false;
     TELEPHONY_LOGI("stop ringtone success");
     return true;
 }
@@ -804,6 +814,7 @@ int32_t AudioControlManager::MuteRinger()
     SendMuteRingEvent();
     if (ringState_ == RingState::STOPPED) {
         TELEPHONY_LOGI("ring already stopped");
+        isNeedMuteRing_ = true;
         return TELEPHONY_SUCCESS;
     }
     if (ring_ == nullptr) {

@@ -265,4 +265,22 @@ HWTEST_F(ZeroBranch9Test, Telephony_AudioControlManager_006, TestSize.Level0)
     audioControl->isCrsVibrating_ =true;
     ASSERT_FALSE(audioControl->PlayRingtone());
 }
+
+/**
+ * @tc.number   Telephony_AudioControlManager_007
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch9Test, Telephony_AudioControlManager_007, Function | MediumTest | Level3)
+{
+    auto audioControl = DelayedSingleton<AudioControlManager>::GetInstance();
+    ASSERT_NO_THROW(audioControl->PostProcessRingtone());
+    DialParaInfo info;
+    sptr<CallBase> ringingCall = new IMSCall(info);
+    ringingCall->SetCallRunningState(CallRunningState::CALL_RUNNING_STATE_RINGING);
+    CallPolicy callPolicy;
+    callPolicy.AddOneCallObject(ringingCall);
+    audioControl->isNeedMuteRing_ =true;
+    ASSERT_NO_THROW(audioControl->PostProcessRingtone());
+}
 }
