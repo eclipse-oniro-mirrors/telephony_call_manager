@@ -965,7 +965,6 @@ HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_019, TestSize.Level0)
     eventName = "EVENT_NOT_SUPPORT_BLUETOOTH_CALL";
     callManagerService->SendCallUiEvent(1, eventName);
     eventName = "123";
-    std::string eventName = "123";
     int32_t ret = callManagerService->SendCallUiEvent(1, eventName);
     EXPECT_EQ(ret, 0);
 }
