@@ -233,8 +233,10 @@ void CallVoiceAssistantManager::OnStartService(const std::string& isDial, const 
 
 void CallVoiceAssistantManager::OnStopService()
 {
+    TELEPHONY_LOGI("OnStopService enter");
     DisconnectAbility();
     UnRegisterListenSwitchState();
+    DelayedSingleton<AudioControlManager>::GetInstance()->StopRingtone();
     VoiceAssistantRingSubscriber::Release();
     PublishCommonEvent(false, std::string("on_stop_service"));
     Release();
@@ -352,7 +354,8 @@ void CallVoiceAssistantManager::UpdateContactInfo(const ContactInfo& info, int32
 void CallVoiceAssistantManager::MuteRinger()
 {
     callVoiceAssistantQueue.submit([=]() {
-        TELEPHONY_LOGI("stop broadcast event");
+        TELEPHONY_LOGI("stop broadcast event and SetRingToneVolume");
+        DelayedSingleton<AudioControlManager>::GetInstance()->SetRingToneVolume(0.0f);
         VoiceAssistantRingSubscriber::Release();
         isplay = SWITCH_TURN_OFF;
         if (nowCallId == FAIL_CODE) {
@@ -594,7 +597,8 @@ void CallVoiceAssistantManager::CallStatusDialing(const int32_t& callId, const i
 
 void CallVoiceAssistantManager::CallStatusActive(const int32_t& callId, const int32_t& accountId)
 {
-    TELEPHONY_LOGI("call_status_active, [%{public}d][%{public}d]", accountId, callId);
+    TELEPHONY_LOGI("muteRinger before playSoundTone, [%{public}d][%{public}d]", accountId, callId);
+    DelayedSingleton<AudioControlManager>::GetInstance()->SetRingToneVolume(0.0f);
     VoiceAssistantRingSubscriber::Release();
     PublishCommonEvent(false, std::string("call_status_active"));
     mRemoteObject = nullptr;
@@ -671,8 +675,7 @@ bool VoiceAssistantRingSubscriber::Initial()
 void VoiceAssistantRingSubscriber::Release()
 {
     if (subscriber_ != nullptr) {
-        TELEPHONY_LOGI("stop play system ring");
-        DelayedSingleton<AudioControlManager>::GetInstance()->StopRingtone();
+        TELEPHONY_LOGI("UnSubscribeCommonEvent");
         EventFwk::CommonEventManager::UnSubscribeCommonEvent(subscriber_);
         subscriber_ = nullptr;
     }
