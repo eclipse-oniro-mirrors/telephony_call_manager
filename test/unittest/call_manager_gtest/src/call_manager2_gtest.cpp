@@ -240,6 +240,8 @@ HWTEST_F(ClientErrorBranchTest, Telephony_CallManagerClient_001, TestSize.Level0
     ASSERT_EQ(client->PostDialProceed(SIM1_SLOTID, true), TELEPHONY_ERR_UNINIT);
     ASSERT_EQ(client->IsRinging(boolValue), TELEPHONY_ERR_UNINIT);
     ASSERT_FALSE(client->HasCall());
+    ASSERT_FALSE(client->HasCall(false));
+    ASSERT_FALSE(client->HasCall(true));
     ASSERT_EQ(client->CancelCallUpgrade(g_newCallId), TELEPHONY_ERR_UNINIT);
 }
 
