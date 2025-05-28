@@ -597,7 +597,7 @@ void CallVoiceAssistantManager::CallStatusDialing(const int32_t& callId, const i
 
 void CallVoiceAssistantManager::CallStatusActive(const int32_t& callId, const int32_t& accountId)
 {
-    TELEPHONY_LOGI("call_status_active and SetRingToneVolume, [%{public}d][%{public}d]", accountId, callId);
+    TELEPHONY_LOGI("muteRiner before playSoundTone, [%{public}d][%{public}d]", accountId, callId);
     DelayedSingleton<AudioControlManager>::GetInstance()->SetRingToneVolume(0.0f);
     VoiceAssistantRingSubscriber::Release();
     PublishCommonEvent(false, std::string("call_status_active"));
