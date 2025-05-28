@@ -80,7 +80,7 @@ public:
     void CheckTypeAndSetAudioDevice(sptr<CallBase> &callObjectPtr, VideoStateType priorVideoState,
         VideoStateType nextVideoState, AudioDeviceType &initDeviceType, AudioDevice &device);
     void UpdateDeviceTypeForVideoOrSatelliteCall();
-    void UpdateDeviceTypeForCrs();
+    void UpdateDeviceTypeForCrs(AudioDeviceType deviceType);
     void UpdateDeviceTypeForVideoDialing();
     void MuteNetWorkRingTone();
     bool IsVideoCall(VideoStateType videoState);
