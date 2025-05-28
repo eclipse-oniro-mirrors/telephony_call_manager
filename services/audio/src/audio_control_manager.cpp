@@ -259,8 +259,7 @@ void AudioControlManager::UpdateDeviceTypeForCrs(AudioDeviceType deviceType)
                 device.deviceType = initDeviceType;
             }
         }
-        if (device.deviceType == deviceType)
-        {
+        if (device.deviceType == deviceType) {
             return;
         }
         TELEPHONY_LOGI("crs ring tone should be speaker");
