@@ -242,6 +242,8 @@ HWTEST_F(ZeroBranch8Test, Telephony_CallManagerService_002, TestSize.Level0)
     EXPECT_NE(callManagerService->HoldCall(0), TELEPHONY_ERR_PERMISSION_ERR);
     EXPECT_NE(callManagerService->SwitchCall(0), TELEPHONY_ERR_PERMISSION_ERR);
     EXPECT_FALSE(callManagerService->HasCall());
+    EXPECT_FALSE(callManagerService->HasCall(false));
+    EXPECT_FALSE(callManagerService->HasCall(true));
     EXPECT_NE(callManagerService->IsNewCallAllowed(enabled), TELEPHONY_ERR_LOCAL_PTR_NULL);
     EXPECT_NE(callManagerService->IsRinging(enabled), TELEPHONY_ERR_PERMISSION_ERR);
     EXPECT_NE(callManagerService->IsInEmergencyCall(enabled), TELEPHONY_ERR_LOCAL_PTR_NULL);

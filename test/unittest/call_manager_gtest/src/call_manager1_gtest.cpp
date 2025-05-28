@@ -643,6 +643,8 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_HasCall_0100, Function | Medium
     int32_t idleState = (int32_t)CallStateToApp::CALL_STATE_IDLE;
     ASSERT_GE(callState, idleState);
     EXPECT_NE(CallManagerGtest::clientPtr_->HasCall(), false);
+    EXPECT_NE(CallManagerGtest::clientPtr_->HasCall(false), false);
+    EXPECT_NE(CallManagerGtest::clientPtr_->HasCall(true), false);
 }
 
 /**
@@ -665,6 +667,10 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_HasCall_0200, Function | Medium
     EXPECT_NE(ret, RETURN_VALUE_IS_ZERO);
     bool isRet = CallManagerGtest::clientPtr_->HasCall();
     EXPECT_EQ(isRet, true);
+    isRet = CallManagerGtest::clientPtr_->HasCall(false);
+    EXPECT_EQ(isRet, true);
+    isRet = CallManagerGtest::clientPtr_->HasCall(true);
+    EXPECT_EQ(isRet, true);
 }
 
 /**
@@ -680,6 +686,10 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_HasCall_0300, Function | Medium
     }
     CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_IDLE, SLEEP_200_MS, SLEEP_30000_MS);
     bool isRet = CallManagerGtest::clientPtr_->HasCall();
+    EXPECT_EQ(isRet, true);
+    isRet = CallManagerGtest::clientPtr_->HasCall(false);
+    EXPECT_EQ(isRet, true);
+    isRet = CallManagerGtest::clientPtr_->HasCall(true);
     EXPECT_EQ(isRet, true);
 }
 

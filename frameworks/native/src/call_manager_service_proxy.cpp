@@ -231,7 +231,7 @@ int32_t CallManagerServiceProxy::SwitchCall(int32_t callId)
     return replyParcel.ReadInt32();
 }
 
-bool CallManagerServiceProxy::HasCall()
+bool CallManagerServiceProxy::HasCall(const bool isInCludeVoipCall)
 {
     MessageParcel dataParcel;
     if (!dataParcel.WriteInterfaceToken(CallManagerServiceProxy::GetDescriptor())) {
@@ -239,6 +239,7 @@ bool CallManagerServiceProxy::HasCall()
         return false;
     }
     MessageParcel replyParcel;
+    dataParcel.WriteBool(isInCludeVoipCall);
     int32_t error = SendRequest(INTERFACE_HAS_CALL, dataParcel, replyParcel);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("Function HasCall! errCode:%{public}d", error);

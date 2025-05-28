@@ -723,6 +723,8 @@ HWTEST_F(ZeroBranch3Test, Telephony_CallManagerClient_001, TestSize.Level0)
     callManagerClient->StopDtmf(0);
     callManagerClient->IsRinging(result);
     callManagerClient->HasCall();
+    callManagerClient->HasCall(false);
+    callManagerClient->HasCall(true);
     callManagerClient->IsNewCallAllowed(result);
     callManagerClient->IsInEmergencyCall(result);
     callManagerClient->ObserverOnCallDetailsChange();
