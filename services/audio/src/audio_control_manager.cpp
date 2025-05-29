@@ -838,7 +838,7 @@ void AudioControlManager::PlayCallEndedTone(CallEndedType type)
     }
     AudioStandard::AudioRingerMode ringMode = DelayedSingleton<AudioProxy>::GetInstance()->GetRingerMode();
     if (ringMode != AudioStandard::AudioRingerMode::RINGER_MODE_NORMAL) {
-
+        HandleNotNormalRingerMode(type);
         return;
     }
     switch (type) {
@@ -883,7 +883,7 @@ void AudioControlManager::HandleNotNormalRingerMode(CallEndedType type)
     switch (type) {
         case CallEndedType::CALL_ENDED_NORMALLY:
             if (toneState_ == ToneState::TONEING) {
-                stopCallTone();
+                StopCallTone();
                 TELEPHONY_LOGI("ringer mode is not normal, stop call tone!");
             }
             break;
