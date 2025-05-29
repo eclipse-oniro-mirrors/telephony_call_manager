@@ -453,16 +453,18 @@ int32_t CallStatusManager::IncomingHandle(const CallDetailInfo &info)
     if (IsFromTheSameNumberAtTheSameTime(call)) {
         ModifyEsimType();
     }
+    AddOneCallObject(call);
     SetContactInfo(call, std::string(info.phoneNum));
     bool block = false;
     if (IsRejectCall(call, info, block)) {
+        DeleteOneCallObject(call);
         return HandleRejectCall(call, block);
     }
     if (info.callType != CallType::TYPE_VOIP && info.callType != CallType::TYPE_BLUETOOTH &&
         IsRingOnceCall(call, info)) {
+        DeleteOneCallObject(call);
         return HandleRingOnceCall(call);
     }
-    AddOneCallObject(call);
     StartInComingCallMotionRecognition();
     DelayedSingleton<CallControlManager>::GetInstance()->NotifyNewCallCreated(call);
     ret = UpdateCallState(call, info.state);
