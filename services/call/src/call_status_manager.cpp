@@ -453,18 +453,16 @@ int32_t CallStatusManager::IncomingHandle(const CallDetailInfo &info)
     if (IsFromTheSameNumberAtTheSameTime(call)) {
         ModifyEsimType();
     }
-    AddOneCallObject(call);
     SetContactInfo(call, std::string(info.phoneNum));
     bool block = false;
     if (IsRejectCall(call, info, block)) {
-        DeleteOneCallObject(call);
         return HandleRejectCall(call, block);
     }
     if (info.callType != CallType::TYPE_VOIP && info.callType != CallType::TYPE_BLUETOOTH &&
         IsRingOnceCall(call, info)) {
-        DeleteOneCallObject(call);
         return HandleRingOnceCall(call);
     }
+    AddOneCallObject(call);
     StartInComingCallMotionRecognition();
     DelayedSingleton<CallControlManager>::GetInstance()->NotifyNewCallCreated(call);
     ret = UpdateCallState(call, info.state);
@@ -509,13 +507,8 @@ void CallStatusManager::SetContactInfo(sptr<CallBase> &call, std::string phoneNu
             return;
         }
     }
-    int32_t callId = call->GetCallID();
-    ffrt::submit([=, callId]() {
-        sptr<CallBase> callObjectPtr = GetOneCallObject(callId);
-        if (callObjectPtr == nullptr) {
-            TELEPHONY_LOGE("callObjectPtr is nullptr.");
-            return;
-        }
+    ffrt::submit([=, &call]() {
+        sptr<CallBase> callObjectPtr = call;
         // allow list filtering
         // Get the contact data from the database
         ContactInfo contactInfoTemp = contactInfo;
