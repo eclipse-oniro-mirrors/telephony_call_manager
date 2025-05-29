@@ -838,11 +838,7 @@ void AudioControlManager::PlayCallEndedTone(CallEndedType type)
     }
     AudioStandard::AudioRingerMode ringMode = DelayedSingleton<AudioProxy>::GetInstance()->GetRingerMode();
     if (ringMode != AudioStandard::AudioRingerMode::RINGER_MODE_NORMAL) {
-<<<<<<< HEAD
         HandleNotNormalRingerMode(type);
-=======
-        HandleNotNormalRingerMode(type)
->>>>>>> 8b8d1e00202afaa05f5aa75e35de8284edf3664c
         return;
     }
     switch (type) {
