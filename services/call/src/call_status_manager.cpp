@@ -509,8 +509,13 @@ void CallStatusManager::SetContactInfo(sptr<CallBase> &call, std::string phoneNu
             return;
         }
     }
-    ffrt::submit([=, &call]() {
-        sptr<CallBase> callObjectPtr = call;
+    int32_t callId = call->GetCallID();
+    ffrt::submit([=, callId]() {
+        sptr<CallBase> callObjectPtr = GetOneCallObject(callId);
+        if (callObjectPtr == nullptr) {
+            TELEPHONY_LOGE("callObjectPtr is nullptr.");
+            return;
+        }
         // allow list filtering
         // Get the contact data from the database
         ContactInfo contactInfoTemp = contactInfo;
