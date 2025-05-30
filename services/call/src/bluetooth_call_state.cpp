@@ -33,9 +33,10 @@ void BluetoothCallState::OnConnectionStateChanged(const Bluetooth::BluetoothRemo
             break;
         case (int32_t)Bluetooth::BTConnectState::DISCONNECTED:
             DelayedSingleton<BluetoothCallConnection>::GetInstance()->SetHfpContactName("", "");
-        default:
             DelayedSingleton<BluetoothCallConnection>::GetInstance()->SetHfpConnected(false);
             DelayedSingleton<BluetoothCallConnection>::GetInstance()->SetBtCallScoConnected(false);
+            break;
+        default:
             break;
     }
 }
