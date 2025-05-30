@@ -135,7 +135,6 @@ private:
     bool isSetAudioDeviceByUser_ = false;
     bool isScoTemporarilyDisabled_ = false;
     int32_t voiceVolume_ = -1;
-    bool isNeedMuteRing_ = false;
 };
 } // namespace Telephony
 } // namespace OHOS

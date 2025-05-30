@@ -32,6 +32,7 @@
 #include "distributed_communication_manager.h"
 #include "os_account_manager.h"
 #include "ringtone_player.h"
+#include "int_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -621,12 +622,16 @@ bool AudioControlManager::PlayRingtone()
 void AudioControlManager::PostProcessRingtone()
 {
     sptr<CallBase> incomingCall = CallObjectManager::GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_RINGING);
+    AAFwk::WantParams params = incomingCall->GetExtraParams();
+    bool isNeedMuteRing = static_cast<bool>(params.GetIntParam("isNeedMuteRing", 0));
     if (incomingCall == nullptr) {
         TELEPHONY_LOGI("play ringtone success but incoming call is null stop it");
         StopRingtone();
-    } else if (isNeedMuteRing_) {
+    } else if (isNeedMuteRing) {
         TELEPHONY_LOGI("play ringtone success but need mute it");
         MuteRinger();
+        params.SetParam("isNeedMuteRing", AAFwk::Integer::Box(0));
+        incomingCall->SetExtraParams(params);
     }
 }
 
@@ -706,7 +711,6 @@ bool AudioControlManager::StopRingtone()
         return false;
     }
     ring_->ReleaseRenderer();
-    isNeedMuteRing_ = false;
     TELEPHONY_LOGI("stop ringtone success");
     return true;
 }
@@ -813,7 +817,9 @@ int32_t AudioControlManager::MuteRinger()
     SendMuteRingEvent();
     if (ringState_ == RingState::STOPPED) {
         TELEPHONY_LOGI("ring already stopped");
-        isNeedMuteRing_ = true;
+        AAFwk::WantParams params = incomingCall->GetExtraParams();
+        params.SetParam("isNeedMuteRing", AAFwk::Integer::Box(1));
+        incomingCall->SetExtraParams(params);
         return TELEPHONY_SUCCESS;
     }
     if (ring_ == nullptr) {
@@ -824,7 +830,6 @@ int32_t AudioControlManager::MuteRinger()
         TELEPHONY_LOGE("SetMute fail");
         return CALL_ERR_AUDIO_SETTING_MUTE_FAILED;
     }
-    isNeedMuteRing_ = false;
     TELEPHONY_LOGI("mute ring success");
     return TELEPHONY_SUCCESS;
 }
