@@ -36,6 +36,8 @@ void BluetoothCallState::OnConnectionStateChanged(const Bluetooth::BluetoothRemo
             DelayedSingleton<BluetoothCallConnection>::GetInstance()->SetHfpConnected(false);
             DelayedSingleton<BluetoothCallConnection>::GetInstance()->SetBtCallScoConnected(false);
             break;
+        default:
+            break;
     }
 }
 
