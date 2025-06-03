@@ -121,6 +121,7 @@ private:
     void SaveVoiceVolume(int32_t volume);
     int32_t GetBackupVoiceVolume();
     void RestoreVoiceValumeIfNecessary();
+    void PostProcessRingtone();
     ToneState toneState_ = ToneState::STOPPED;
     SoundState soundState_ = SoundState::STOPPED;
     bool isLocalRingbackNeeded_ = false;

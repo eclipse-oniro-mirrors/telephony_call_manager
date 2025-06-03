@@ -22,6 +22,7 @@
 #include "gtest/gtest.h"
 #include "ims_call.h"
 #include "voip_call.h"
+#include "int_wrapper.h"
 
 namespace OHOS::Telephony {
 using namespace testing::ext;
@@ -265,5 +266,24 @@ HWTEST_F(ZeroBranch9Test, Telephony_AudioControlManager_006, TestSize.Level0)
     audioControl->soundState_ = SoundState::STOPPED;
     audioControl->isCrsVibrating_ =true;
     ASSERT_FALSE(audioControl->PlayRingtone());
+}
+
+/**
+ * @tc.number   Telephony_AudioControlManager_007
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch9Test, Telephony_AudioControlManager_007, Function | MediumTest | Level3)
+{
+    auto audioControl = DelayedSingleton<AudioControlManager>::GetInstance();
+    ASSERT_NO_THROW(audioControl->PostProcessRingtone());
+    DialParaInfo info;
+    sptr<CallBase> ringingCall = new IMSCall(info);
+    AAFwk::WantParams params = ringingCall->GetExtraParams();
+    params.SetParam("isNeedMuteRing", AAFwk::Integer::Box(1));
+    ringingCall->SetExtraParams(params);
+    ringingCall->SetCallRunningState(CallRunningState::CALL_RUNNING_STATE_RINGING);
+    CallObjectManager::AddOneCallObject(ringingCall);
+    ASSERT_NO_THROW(audioControl->PostProcessRingtone());
 }
 }
