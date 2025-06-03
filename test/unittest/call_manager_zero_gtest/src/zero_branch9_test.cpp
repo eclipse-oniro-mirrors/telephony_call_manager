@@ -278,12 +278,11 @@ HWTEST_F(ZeroBranch9Test, Telephony_AudioControlManager_007, Function | MediumTe
     ASSERT_NO_THROW(audioControl->PostProcessRingtone());
     DialParaInfo info;
     sptr<CallBase> ringingCall = new IMSCall(info);
-    ringingCall->SetCallRunningState(CallRunningState::CALL_RUNNING_STATE_RINGING);
-    CallPolicy callPolicy;
-    callPolicy.AddOneCallObject(ringingCall);
     AAFwk::WantParams params = ringingCall->GetExtraParams();
     params.SetParam("isNeedMuteRing", AAFwk::Integer::Box(1));
     ringingCall->SetExtraParams(params);
+    ringingCall->SetCallRunningState(CallRunningState::CALL_RUNNING_STATE_RINGING);
+    CallObjectManager::AddOneCallObject(ringingCall);
     ASSERT_NO_THROW(audioControl->PostProcessRingtone());
 }
 }
