@@ -2159,11 +2159,10 @@ void CallStatusManager::ClearPendingState(sptr<CallBase> &call)
 
 void CallStatusManager::RefreshCallDisconnectReason(const sptr<CallBase> &call, int32_t reason)
 {
-    std::string ownType = system::GetParameter("const.product.devicetype", "");
     switch (reason) {
         case static_cast<int32_t>(RilDisconnectedReason::DISCONNECTED_REASON_ANSWERED_ELSEWHER):
             if ((DelayedSingleton<DistributedCommunicationManager>::GetInstance()->IsSinkRole()) ||
-                (ownType == "wearable")) {
+                (system::GetParameter("const.product.devicetype", "") == "wearable")) {
                 call->SetAnswerType(CallAnswerType::CALL_ANSWERED_ELSEWHER);
                 TELEPHONY_LOGI("call answered elsewhere");
             }
