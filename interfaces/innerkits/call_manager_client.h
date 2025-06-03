@@ -297,9 +297,10 @@ public:
     /**
      * @brief Is there Call
      *
+     * @param isInCludeVoipCall[in], include voip call or not
      * @return Returns true on has call, others on there is no call.
      */
-    bool HasCall();
+    bool HasCall(const bool isInCludeVoipCall = true);
 
     /**
      * @brief Can I initiate a call

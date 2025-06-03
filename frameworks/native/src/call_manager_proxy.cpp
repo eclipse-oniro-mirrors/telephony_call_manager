@@ -868,7 +868,7 @@ int32_t CallManagerProxy::IsRinging(bool &enabled)
     return callManagerServicePtr_->IsRinging(enabled);
 }
 
-bool CallManagerProxy::HasCall()
+bool CallManagerProxy::HasCall(const bool isInCludeVoipCall)
 {
     if (ReConnectService() != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("ipc reconnect failed!");
@@ -879,7 +879,7 @@ bool CallManagerProxy::HasCall()
         TELEPHONY_LOGE("callManagerServicePtr_ is null");
         return false;
     }
-    return callManagerServicePtr_->HasCall();
+    return callManagerServicePtr_->HasCall(isInCludeVoipCall);
 }
 
 int32_t CallManagerProxy::IsNewCallAllowed(bool &enabled)
