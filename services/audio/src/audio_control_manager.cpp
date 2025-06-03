@@ -604,7 +604,14 @@ bool AudioControlManager::PlayRingtone()
     if (incomingCall->GetCrsType() == CRS_TYPE) {
         return dealCrsScene(ringMode);
     }
-
+    if (IsVideoRing(contactInfo.personalNotificationRingtone, contactInfo.ringtonePath)) {
+        if ((ringMode == AudioStandard::AudioRingerMode::RINGER_MODE_NORMAL && IsRingingVibrateModeOn()) ||
+            ringMode == AudioStandard::AudioRingerMode::RINGER_MODE_VIBRATE) {
+            TELEPHONY_LOGI("need start vibrator.");
+            isVideoRingVibrating_ = (DelayedSingleton::GetInstance()->StartVibrator() == TELEPHONY_SUCCESS);
+        }
+        return true;
+    }
     if (incomingCall->GetCallType() == CallType::TYPE_BLUETOOTH) {
         ret = ring_->Play(info.accountId, contactInfo.ringtonePath, Media::HapticStartupMode::FAST);
     } else {
@@ -1025,6 +1032,7 @@ bool AudioControlManager::ShouldPlayRingtone() const
     int32_t incomingCallNum = processor->GetCallNumber(TelCallState::CALL_STATUS_INCOMING);
     if (incomingCallNum == EMPTY_VALUE || alertingCallNum > EMPTY_VALUE || ringState_ == RingState::RINGING
         || (soundState_ == SoundState::SOUNDING && CallObjectManager::HasIncomingCallCrsType())) {
+        TELEPHONY_LOGI("should not play ring tone.");
         return false;
     }
     return true;
