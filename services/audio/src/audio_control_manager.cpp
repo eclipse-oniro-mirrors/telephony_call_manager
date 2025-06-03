@@ -41,6 +41,9 @@ constexpr int32_t DTMF_PLAY_TIME = 30;
 constexpr int32_t VOICE_TYPE = 0;
 constexpr int32_t CRS_TYPE = 2;
 constexpr int32_t CALL_ENDED_PLAY_TIME = 300;
+static constexpr const char *VIDEO_RING_PATH_FIX_TAIL = ".mp4";
+constexpr int32_t VIDEO_RING_PATH_FIX_TAIL_LENGTH = 4;
+static constexpr const char *SYSTEM_VIDEO_RING = "system_video_ring";
 
 AudioControlManager::AudioControlManager()
     : isLocalRingbackNeeded_(false), ring_(nullptr), tone_(nullptr), sound_(nullptr)
@@ -353,6 +356,10 @@ void AudioControlManager::HandleNextState(sptr<CallBase> &callObjectPtr, TelCall
                 DelayedSingleton<AudioProxy>::GetInstance()->StopVibrator();
                 isCrsVibrating_ = false;
             }
+            if (isVideoRingVibrating_) {
+                DelayedSingleton<AudioProxy>::GetInstance()->StopVibrator();
+                isVideoRingVibrating_ = false;
+            }
             audioInterruptState_ = AudioInterruptState::INTERRUPT_STATE_DEACTIVATED;
             break;
         default:
@@ -415,6 +422,10 @@ void AudioControlManager::ProcessAudioWhenCallActive(sptr<CallBase> &callObjectP
         if (isCrsVibrating_) {
             DelayedSingleton<AudioProxy>::GetInstance()->StopVibrator();
             isCrsVibrating_ = false;
+        }
+        if (isVideoRingVibrating_) {
+            DelayedSingleton<AudioProxy>::GetInstance()->StopVibrator();
+            isVideoRingVibrating_ = false;
         }
         int ringCallCount = CallObjectManager::GetCallNumByRunningState(CallRunningState::CALL_RUNNING_STATE_RINGING);
         if ((CallObjectManager::GetCurrentCallNum() - ringCallCount) < MIN_MULITY_CALL_COUNT) {
@@ -591,21 +602,7 @@ bool AudioControlManager::PlayRingtone()
     ContactInfo contactInfo = incomingCall->GetCallerInfo();
     AudioStandard::AudioRingerMode ringMode = DelayedSingleton<AudioProxy>::GetInstance()->GetRingerMode();
     if (incomingCall->GetCrsType() == CRS_TYPE) {
-        if (!isCrsVibrating_ && (ringMode != AudioStandard::AudioRingerMode::RINGER_MODE_SILENT)) {
-            if (ringMode == AudioStandard::AudioRingerMode::RINGER_MODE_VIBRATE || IsRingingVibrateModeOn()) {
-                isCrsVibrating_ = (DelayedSingleton<AudioProxy>::GetInstance()->StartVibrator() == TELEPHONY_SUCCESS);
-            }
-        }
-        if ((ringMode == AudioStandard::AudioRingerMode::RINGER_MODE_NORMAL) || IsBtOrWireHeadPlugin()) {
-            AdjustVolumesForCrs();
-            if (PlaySoundtone()) {
-                TELEPHONY_LOGI("play soundtone success");
-                return true;
-            }
-            return false;
-        }
-        TELEPHONY_LOGI("type_crs but not play ringtone");
-        return false;
+        return dealCrsScene(ringMode);
     }
 
     if (incomingCall->GetCallType() == CallType::TYPE_BLUETOOTH) {
@@ -620,6 +617,36 @@ bool AudioControlManager::PlayRingtone()
     TELEPHONY_LOGI("play ringtone success");
     PostProcessRingtone();
     return true;
+}
+
+bool AudioControlManager::dealCrsScene(const AudioStandard::AudioRingerMode &ringMode)
+{
+    if (!isCrsVibrating_ && (ringMode != AudioStandard::AudioRingerMode::RINGER_MODE_SILENT)) {
+        if (ringMode == AudioStandard::AudioRingerMode::RINGER_MODE_VIBRATE || IsRingingVibrateModeOn()) {
+            isCrsVibrating_ = (DelayedSingleton<AudioProxy>::GetInstance()->StartVibrator() == TELEPHONY_SUCCESS);
+        }
+    }
+    if ((ringMode == AudioStandard::AudioRingerMode::RINGER_MODE_NORMAL) || IsBtOrWireHeadPlugin()) {
+        AdjustVolumesForCrs();
+        if (PlaySoundtone()) {
+            TELEPHONY_LOGI("play soundtone success");
+            return true;
+        }
+        return false;
+    }
+    TELEPHONY_LOGI("type_crs but not play ringtone");
+    return false;
+}
+
+bool AudioControlManager::IsVideoRing(const std::string &personalNotificationRingtone, const std::string &ringtonePath)
+{
+    if ((personalNotificationRingtone.length() > VIDEO_RING_PATH_FIX_TAIL_LENGTH &&
+        personalNotificationRingtone.substr(personalNotificationRingtone.length() - VIDEO_RING_PATH_FIX_TAIL_LENGTH,
+        VIDEO_RING_PATH_FIX_TAIL_LENGTH) == VIDEO_RING_PATH_FIX_TAIL) || ringtonePath == SYSTEM_VIDEO_RING) {
+        TELEPHONY_LOGI("Is video ring.");
+        return true;
+    }
+    return false;
 }
 
 void AudioControlManager::PostProcessRingtone()
