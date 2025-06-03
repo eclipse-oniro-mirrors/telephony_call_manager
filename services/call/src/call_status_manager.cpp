@@ -2162,7 +2162,7 @@ void CallStatusManager::RefreshCallDisconnectReason(const sptr<CallBase> &call, 
     std::string ownType = system::GetParameter("const.product.devicetype", "");
     switch (reason) {
         case static_cast<int32_t>(RilDisconnectedReason::DISCONNECTED_REASON_ANSWERED_ELSEWHER):
-        if ((DelayedSingleton::GetInstance()->IsSinkRole()) ||
+        if ((DelayedSingleton<DistributedCommunicationManager>::GetInstance()->IsSinkRole()) ||
             (ownType == "wearable")) {
                 call->SetAnswerType(CallAnswerType::CALL_ANSWERED_ELSEWHER);
                 TELEPHONY_LOGI("call answered elsewhere");
