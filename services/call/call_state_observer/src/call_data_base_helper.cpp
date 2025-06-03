@@ -482,6 +482,7 @@ bool CallDataBaseHelper::QueryContactInfoEnhanced(ContactInfo &contactInfo, Data
     uint32_t length = ringtonePath.length() > FILE_PATH_MAX_LEN ? FILE_PATH_MAX_LEN : ringtonePath.length();
     if (memcpy_s(contactInfo.ringtonePath, FILE_PATH_MAX_LEN, ringtonePath.c_str(), length) != EOK) {
         TELEPHONY_LOGE("memcpy_s ringtonePath fail!");
+        resultSet->Close();
         return false;
     }
     TELEPHONY_LOGI("ringtonePath: %{public}s", contactInfo.ringtonePath);

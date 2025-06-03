@@ -521,7 +521,7 @@ void CallStatusManager::SetContactInfo(sptr<CallBase> &call, std::string phoneNu
     });
 }
 
-void CallStatusManager::DealVideoRingPath(ContactInfo &contactInfo, sptr &callObjectPtr)
+void CallStatusManager::DealVideoRingPath(ContactInfo &contactInfo, sptr<CallBase> &callObjectPtr)
 {
     bool isStartBroadcast = CallVoiceAssistantManager::GetInstance()->IsStartVoiceBroadcast();
     if (isStartBroadcast) {
@@ -548,15 +548,15 @@ void CallStatusManager::DealVideoRingPath(ContactInfo &contactInfo, sptr &callOb
     }
 }
 
-bool CallStatusManager::IsSetSystemVideoRing(sptr &callObjectPtr)
+bool CallStatusManager::IsSetSystemVideoRing(sptr<CallBase> &callObjectPtr)
 {
     CallAttributeInfo info;
     callObjectPtr->GetCallAttributeBaseInfo(info);
-    const std::shared_ptrAbilityRuntime::Context context;
+    const std::shared_ptr<AbilityRuntime::Context> context;
     Media::RingtoneType type = info.accountId == DEFAULT_SIM_SLOT_ID ? Media::RingtoneType::RINGTONE_TYPE_SIM_CARD_0 :
-    Media::RingtoneType::RINGTONE_TYPE_SIM_CARD_1;
+        Media::RingtoneType::RINGTONE_TYPE_SIM_CARD_1;
     TELEPHONY_LOGI("type: %{public}d", type);
-    std::shared_ptrMedia::SystemSoundManager systemSoundManager =
+    std::shared_ptr<Media::SystemSoundManager> systemSoundManager =
     Media::SystemSoundManagerFactory::CreateSystemSoundManager();
     if (systemSoundManager == nullptr) {
         TELEPHONY_LOGE("get systemSoundManager failed");
@@ -564,9 +564,9 @@ bool CallStatusManager::IsSetSystemVideoRing(sptr &callObjectPtr)
     }
     Media::ToneAttrs toneAttrs = systemSoundManager->GetInUseRingtoneAttrs(type);
     // if (toneAttrs.GetMediaType() == MediaType::MEDIA_TYPE_VID) {
-    // return true;
+    //     return true;
     // } else {
-    return false;
+        return false;
     // }
 }
 
@@ -1790,7 +1790,7 @@ bool CallStatusManager::ShouldRejectIncomingCall()
     OHOS::Uri uri(
         "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true&key=device_provisioned");
     int resp = datashareHelper->Query(uri, "device_provisioned", device_provisioned);
-    if ((resp == TELEPHONY_SUCCESS || resp == TELEPHONY_ERROR) &&
+    if ((resp == TELEPHONY_SUCCESS || resp == TELEPHONY_UNINIT) &&
         (device_provisioned == "0" || device_provisioned.empty())) {
         TELEPHONY_LOGW("ShouldRejectIncomingCall: device_provisioned = 0");
         return true;

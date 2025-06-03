@@ -608,7 +608,7 @@ bool AudioControlManager::PlayRingtone()
         if ((ringMode == AudioStandard::AudioRingerMode::RINGER_MODE_NORMAL && IsRingingVibrateModeOn()) ||
             ringMode == AudioStandard::AudioRingerMode::RINGER_MODE_VIBRATE) {
             TELEPHONY_LOGI("need start vibrator.");
-            isVideoRingVibrating_ = (DelayedSingleton::GetInstance()->StartVibrator() == TELEPHONY_SUCCESS);
+            isVideoRingVibrating_ = (DelayedSingleton<AudioProxy>::GetInstance()->StartVibrator() == TELEPHONY_SUCCESS);
         }
         return true;
     }
@@ -1201,7 +1201,7 @@ bool AudioControlManager::IsBtOrWireHeadPlugin()
 bool AudioControlManager::IsRingingVibrateModeOn()
 {
     auto datashareHelper = SettingsDataShareHelper::GetInstance();
-    std::string ringingVibrateModeEnable {"1"};
+    std::string ringingVibrateModeEnable {"0"};
     std::vector<int> activedOsAccountIds;
     OHOS::AccountSA::OsAccountManager::QueryActiveOsAccountIds(activedOsAccountIds);
     if (activedOsAccountIds.empty()) {
@@ -1213,7 +1213,7 @@ bool AudioControlManager::IsRingingVibrateModeOn()
         "datashare:///com.ohos.settingsdata/entry/settingsdata/USER_SETTINGSDATA_"
         + std::to_string(userId) + "?Proxy=true");
     int resp = datashareHelper->Query(uri, "hw_vibrate_when_ringing", ringingVibrateModeEnable);
-    if (resp == TELEPHONY_SUCCESS && ringingVibrateModeEnable == "1") {
+    if ((resp == TELEPHONY_SUCCESS && ringingVibrateModeEnable == "1") || resp == TELEPHONY_ERR_UNINIT) {
         TELEPHONY_LOGI("RingingVibrateModeOpen:true");
         return true;
     }

@@ -82,7 +82,7 @@ int32_t SettingsDataShareHelper::Query(Uri& uri, const std::string& key, std::st
     if (rowCount == 0) {
         TELEPHONY_LOGW("query success, but rowCount is 0");
         settingHelper->Release();
-        return TELEPHONY_ERROR;
+        return TELEPHONY_UNINIT;
     }
 
     if (result->GoToFirstRow() != DataShare::E_OK) {
