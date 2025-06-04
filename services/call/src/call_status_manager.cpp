@@ -514,6 +514,7 @@ void CallStatusManager::SetContactInfo(sptr<CallBase> &call, std::string phoneNu
         // Get the contact data from the database
         ContactInfo contactInfoTemp = contactInfo;
         QueryCallerInfo(contactInfoTemp, phoneNum);
+        DealVideoRingPath(contactInfoTemp, callObjectPtr);
         callObjectPtr->SetCallerInfo(contactInfoTemp);
         CallVoiceAssistantManager::GetInstance()->UpdateContactInfo(contactInfoTemp, callObjectPtr->GetCallID());
         DelayedSingleton<DistributedCommunicationManager>::GetInstance()->ProcessCallInfo(callObjectPtr,
@@ -557,7 +558,7 @@ bool CallStatusManager::IsSetSystemVideoRing(sptr<CallBase> &callObjectPtr)
         Media::RingtoneType::RINGTONE_TYPE_SIM_CARD_1;
     TELEPHONY_LOGI("type: %{public}d", type);
     std::shared_ptr<Media::SystemSoundManager> systemSoundManager =
-    Media::SystemSoundManagerFactory::CreateSystemSoundManager();
+        Media::SystemSoundManagerFactory::CreateSystemSoundManager();
     if (systemSoundManager == nullptr) {
         TELEPHONY_LOGE("get systemSoundManager failed");
         return false;
@@ -1790,7 +1791,7 @@ bool CallStatusManager::ShouldRejectIncomingCall()
     OHOS::Uri uri(
         "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true&key=device_provisioned");
     int resp = datashareHelper->Query(uri, "device_provisioned", device_provisioned);
-    if ((resp == TELEPHONY_SUCCESS || resp == TELEPHONY_UNINIT) &&
+    if ((resp == TELEPHONY_SUCCESS || resp == TELEPHONY_ERR_UNINIT) &&
         (device_provisioned == "0" || device_provisioned.empty())) {
         TELEPHONY_LOGW("ShouldRejectIncomingCall: device_provisioned = 0");
         return true;
