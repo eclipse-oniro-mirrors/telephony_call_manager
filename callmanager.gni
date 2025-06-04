@@ -219,6 +219,7 @@ call_manager_external_deps = [
   "player_framework:system_sound_client",
   "safwk:system_ability_fwk",
   "samgr:samgr_proxy",
+  "ringtone_library:ringtone_data_extension",
 ]
 
 call_manager_defines = []

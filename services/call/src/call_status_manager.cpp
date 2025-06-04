@@ -564,11 +564,11 @@ bool CallStatusManager::IsSetSystemVideoRing(sptr<CallBase> &callObjectPtr)
         return false;
     }
     Media::ToneAttrs toneAttrs = systemSoundManager->GetInUseRingtoneAttrs(type);
-    // if (toneAttrs.GetMediaType() == MediaType::MEDIA_TYPE_VID) {
-    //     return true;
-    // } else {
+    if (toneAttrs.GetMediaType() == Media::RingtoneMediaType::RINGTONE_MEDIA_TYPE_VIDEO) {
+        return true;
+    } else {
         return false;
-    // }
+    }
 }
 
 int32_t CallStatusManager::HandleRejectCall(sptr<CallBase> &call, bool isBlock)

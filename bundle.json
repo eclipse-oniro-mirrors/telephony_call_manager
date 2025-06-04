@@ -70,7 +70,8 @@
                 "dsoftbus",
                 "input",
                 "device_manager",
-                "openssl"
+                "openssl",
+                "ringtone_library"
             ],
             "third_party": [
                 "libphonenumber",
