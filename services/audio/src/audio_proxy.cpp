@@ -267,11 +267,13 @@ void AudioProxy::SetWiredHeadsetState(bool isConnected)
     isWiredHeadsetConnected_ = isConnected;
 }
 
-int32_t AudioProxy::GetPreferredOutputAudioDevice(AudioDevice &device)
+int32_t AudioProxy::GetPreferredOutputAudioDevice(AudioDevice &device, bool isNeedCurrentDevice)
 {
     AudioStandard::AudioRendererInfo rendererInfo;
     rendererInfo.contentType = AudioStandard::ContentType::CONTENT_TYPE_UNKNOWN;
-    rendererInfo.streamUsage = AudioStandard::StreamUsage::STREAM_USAGE_VOICE_MODEM_COMMUNICATION;
+    rendererInfo.streamUsage = isNeedCurrentDevice ?
+        AudioStandard::StreamUsage::STREAM_USAGE_INVALID :
+        AudioStandard::StreamUsage::STREAM_USAGE_VOICE_MODEM_COMMUNICATION;
     rendererInfo.rendererFlags = RENDERER_FLAG;
     std::vector<std::shared_ptr<AudioStandard::AudioDeviceDescriptor>> desc;
     int32_t ret =
@@ -350,6 +352,23 @@ int32_t AudioProxy::UnsetAudioPreferDeviceChangeCallback()
     return TELEPHONY_SUCCESS;
 }
 
+bool AudioPreferDeviceChangeCallback::ProcessVoipCallOutputDeviceUpdated()
+{
+    if (!DelayedSingleton<CallControlManager>::GetInstance()->HasVoipCall()) {
+        return false;
+    }
+    AudioDevice device = {
+        .deviceType = AudioDeviceType::DEVICE_EARPIECE,
+        .address = { 0 },
+    };
+    if (DelayedSingleton<AudioProxy>::GetInstance()->GetPreferredOutputAudioDevice(device, true) !=
+        TELEPHONY_SUCCESS) {
+        return false;
+    }
+    DelayedSingleton<AudioDeviceManager>::GetInstance()->SetCurrentAudioDevice(device);
+    return true;
+}
+
 void AudioPreferDeviceChangeCallback::OnPreferredOutputDeviceUpdated(
     const std::vector<std::shared_ptr<AudioStandard::AudioDeviceDescriptor>> &desc)
 {
@@ -374,6 +393,9 @@ void AudioPreferDeviceChangeCallback::OnPreferredOutputDeviceUpdated(
     if (IsDistributedDeviceSelected(desc)) {
         return;
     }
+    if (ProcessVoipCallOutputDeviceUpdated()) {
+    return;
+}
 
     switch (desc[0]->deviceType_) {
         case AudioStandard::DEVICE_TYPE_BLUETOOTH_SCO:
