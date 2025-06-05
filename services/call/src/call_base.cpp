@@ -43,7 +43,7 @@ CallBase::CallBase(DialParaInfo &info)
       ringEndTime_(0), answerType_(CallAnswerType::CALL_ANSWER_MISSED), accountId_(info.accountId),
       crsType_(info.crsType), originalCallType_(info.originalCallType), isMuted_(false), numberLocation_("default"),
       blockReason_(0), isEccContact_(false), celiaCallType_(-1), extraParams_(info.extraParams), isAnswered_(false),
-      detectDetails_(""), phoneOrWatch_(info.phoneOrWatch), isAiAutoAnswer_(false)
+      detectDetails_(""), phoneOrWatch_(info.phoneOrWatch), isAiAutoAnswer_(false), isForcedReportVoiceCall_(false)
 {
     (void)memset_s(&contactInfo_, sizeof(ContactInfo), 0, sizeof(ContactInfo));
     (void)memset_s(&numberMarkInfo_, sizeof(NumberMarkInfo), 0, sizeof(NumberMarkInfo));
@@ -61,7 +61,7 @@ CallBase::CallBase(DialParaInfo &info, AppExecFwk::PacMap &extras)
       accountId_(info.accountId), crsType_(info.crsType), originalCallType_(info.originalCallType), isMuted_(false),
       numberLocation_("default"), blockReason_(0), isEccContact_(false), celiaCallType_(-1),
       extraParams_(info.extraParams), isAnswered_(false), detectDetails_(""), phoneOrWatch_(info.phoneOrWatch),
-      isAiAutoAnswer_(false)
+      isAiAutoAnswer_(false), isForcedReportVoiceCall_(false)
 {
     (void)memset_s(&contactInfo_, sizeof(ContactInfo), 0, sizeof(ContactInfo));
     (void)memset_s(&numberMarkInfo_, sizeof(NumberMarkInfo), 0, sizeof(NumberMarkInfo));
@@ -715,6 +715,16 @@ void CallBase::SetAiAutoAnswer(bool isAiAutoAnswer)
 bool CallBase::IsAiAutoAnswer()
 {
     return isAiAutoAnswer_;
+}
+
+bool CallBase::IsForcedReportVoiceCall()
+{
+    return isForcedReportVoiceCall_;
+}
+
+void CallBase::SetForcedReportVoiceCall(bool isForcedReportVoiceCall)
+{
+    isForcedReportVoiceCall_ = isForcedReportVoiceCall;
 }
 } // namespace Telephony
 } // namespace OHOS

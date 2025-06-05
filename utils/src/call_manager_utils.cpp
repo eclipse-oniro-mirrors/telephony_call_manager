@@ -16,9 +16,22 @@
 #include "call_manager_utils.h"
 #include "call_manager_base.h"
 #include "want_params_wrapper.h"
+#include "call_object_manager.h"
 
 namespace OHOS {
 namespace Telephony {
+
+bool CallManagerUtils::IsForcedReportVoiceCall(const CallAttributeInfo &info)
+{
+    if (info.callState != TelCallState::CALL_STATUS_INCOMING) {
+        return false;
+    }
+    auto call = CallObjectManager::GetOneCallObject(info.callId);
+    if (call == nullptr) {
+        return false;
+    }
+    return call->IsForcedReportVoiceCall();
+}
 
 void CallManagerUtils::WriteCallAttributeInfo(const CallAttributeInfo &info, MessageParcel &messageParcel)
 {
@@ -26,7 +39,11 @@ void CallManagerUtils::WriteCallAttributeInfo(const CallAttributeInfo &info, Mes
     messageParcel.WriteCString(info.bundleName);
     messageParcel.WriteBool(info.speakerphoneOn);
     messageParcel.WriteInt32(info.accountId);
-    messageParcel.WriteInt32(static_cast<int32_t>(info.videoState));
+    if (IsForcedReportVoiceCall(info)) {
+        messageParcel.WriteInt32(static_cast<int32_t>(VideoStateType::TYPE_VOICE));
+    } else {
+        messageParcel.WriteInt32(static_cast<int32_t>(info.videoState));
+    }
     messageParcel.WriteInt64(info.startTime);
     messageParcel.WriteBool(info.isEcc);
     messageParcel.WriteInt32(static_cast<int32_t>(info.callType));
