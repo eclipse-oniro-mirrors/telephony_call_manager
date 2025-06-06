@@ -503,7 +503,7 @@ void CallStatusManager::HandleVideoCallInAdvsecMode(const sptr<CallBase> &call, 
     }
 }
 
-bool CallStatusManager::IsTrustedNumber(NumberMarkInfo numberMarkInfo, std::string phoneNumber);
+bool CallStatusManager::IsTrustedNumber(NumberMarkInfo numberMarkInfo, std::string phoneNumber)
 {
     if (numberMarkInfo.markType == MarkType::MARK_TYPE_YELLOW_PAGE ||
         numberMarkInfo.markType == MarkType::MARK_TYPE_ENTERPRISE ||
