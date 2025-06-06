@@ -481,7 +481,6 @@ int32_t CallStatusManager::IncomingHandle(const CallDetailInfo &info)
 
 void CallStatusManager::HandleVideoCallInAdvsecMode(const sptr<CallBase> &call, const CallDetailInfo &info)
 {
-    // 坚盾模式下，查询当前来电是否为联系人，非联系人需要将通话的类型修改为voice
     if (call->GetVideoStateType() != VideoStateType::TYPE_VIDEO) {
         return;
     }
