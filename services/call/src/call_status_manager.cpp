@@ -423,6 +423,14 @@ int32_t CallStatusManager::HandleVoipEventReportInfo(const VoipCallEventInfo &in
         call->SetMicPhoneState(true);
     } else if (info.voipCallEvent == VoipCallEvent::VOIP_CALL_EVENT_UNMUTED) {
         call->SetMicPhoneState(false);
+        AudioDevice device = {
+            .deviceType = AudioDeviceType::DEVICE_EARPIECE,
+            .address = { 0 },
+        };
+        if (DelayedSingleton<AudioProxy>::GetInstance()->GetPreferredOutputAudioDevice(device, true) ==
+            TELEPHONY_SUCCESS) {
+            DelayedSingleton<AudioDeviceManager>::GetInstance()->SetCurrentAudioDevice(device);
+        }
     }
     DelayedSingleton<AudioDeviceManager>::GetInstance()->ReportAudioDeviceInfo(call);
     return TELEPHONY_SUCCESS;
