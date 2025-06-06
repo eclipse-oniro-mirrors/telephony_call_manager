@@ -482,10 +482,6 @@ int32_t CallStatusManager::IncomingHandle(const CallDetailInfo &info)
 void CallStatusManager::HandleVideoCallInAdvsecMode(const sptr<CallBase> &call, const CallDetailInfo &info)
 {
     // 坚盾模式下，查询当前来电是否为联系人，非联系人需要将通话的类型修改为voice
-    if (call == nullptr) {
-        TELEPHONY_LOGE("call is nullptr!");
-        return;
-    }
     if (call->GetVideoStateType() != VideoStateType::TYPE_VIDEO) {
         return;
     }
@@ -494,7 +490,7 @@ void CallStatusManager::HandleVideoCallInAdvsecMode(const sptr<CallBase> &call, 
     }
     std::string phoneNumber(info.phoneNum);
     NumberMarkInfo numberMarkInfo = call->GetNumberMarkInfo();
-    if (IsTrustedNumber(numberMarkInfo, phoneNumber)) {
+    if (IsTrustedNumber(numberMarkInfo.markType, phoneNumber)) {
         return;
     }
     if (OHOS::system::GetBoolParameter(ADVSECMODE_STATE, false)) {
@@ -503,10 +499,10 @@ void CallStatusManager::HandleVideoCallInAdvsecMode(const sptr<CallBase> &call, 
     }
 }
 
-bool CallStatusManager::IsTrustedNumber(NumberMarkInfo numberMarkInfo, std::string phoneNumber)
+bool CallStatusManager::IsTrustedNumber(MarkType markType, std::string phoneNumber)
 {
-    if (numberMarkInfo.markType == MarkType::MARK_TYPE_YELLOW_PAGE ||
-        numberMarkInfo.markType == MarkType::MARK_TYPE_ENTERPRISE ||
+    if (markType == MarkType::MARK_TYPE_YELLOW_PAGE ||
+        markType == MarkType::MARK_TYPE_ENTERPRISE ||
         IsContactPhoneNum(phoneNumber)) {
         return true;
     }
