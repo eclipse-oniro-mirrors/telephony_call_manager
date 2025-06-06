@@ -60,6 +60,7 @@ namespace OHOS {
 namespace Telephony {
 constexpr int32_t INIT_INDEX = 0;
 constexpr int32_t PRESENTATION_RESTRICTED = 3;
+const std::string ADVSECMODE_STATE = "ohos.boot.advsecmode.state";
 
 CallStatusManager::CallStatusManager()
 {
@@ -470,6 +471,7 @@ int32_t CallStatusManager::IncomingHandle(const CallDetailInfo &info)
         IsRingOnceCall(call, info)) {
         return HandleRingOnceCall(call);
     }
+    HandleVideoCallInAdvsecMode(call, info);
     AddOneCallObject(call);
     StartInComingCallMotionRecognition();
     DelayedSingleton<CallControlManager>::GetInstance()->NotifyNewCallCreated(call);
@@ -483,6 +485,35 @@ int32_t CallStatusManager::IncomingHandle(const CallDetailInfo &info)
         TELEPHONY_LOGE("FilterResultsDispose failed!");
     }
     return ret;
+}
+
+void CallStatusManager::HandleVideoCallInAdvsecMode(const sptr<CallBase> &call, const CallDetailInfo &info)
+{
+    if (call->GetVideoStateType() != VideoStateType::TYPE_VIDEO) {
+        return;
+    }
+    if (call->GetCallType() != CallType::TYPE_IMS) {
+        return;
+    }
+    std::string phoneNumber(info.phoneNum);
+    NumberMarkInfo numberMarkInfo = call->GetNumberMarkInfo();
+    if (IsTrustedNumber(numberMarkInfo.markType, phoneNumber)) {
+        return;
+    }
+    if (OHOS::system::GetBoolParameter(ADVSECMODE_STATE, false)) {
+        TELEPHONY_LOGI("is video call in AdvsecMode.");
+        call->SetForcedReportVoiceCall(true);
+    }
+}
+
+bool CallStatusManager::IsTrustedNumber(MarkType markType, std::string phoneNumber)
+{
+    if (markType == MarkType::MARK_TYPE_YELLOW_PAGE ||
+        markType == MarkType::MARK_TYPE_ENTERPRISE ||
+        IsContactPhoneNum(phoneNumber)) {
+        return true;
+    }
+    return false;
 }
 
 void CallStatusManager::SetContactInfo(sptr<CallBase> &call, std::string phoneNum)

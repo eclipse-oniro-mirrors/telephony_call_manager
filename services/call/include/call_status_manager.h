@@ -105,6 +105,8 @@ private:
     void StopAntiFraudDetect(sptr<CallBase> &call, const CallDetailInfo &info);
     void UpdateAntiFraudState(sptr<CallBase> &call, int32_t antiFraudState);
     bool IsContactPhoneNum(const std::string &phoneNum);
+    void HandleVideoCallInAdvsecMode(const sptr<CallBase> &call, const CallDetailInfo &info);
+    bool IsTrustedNumber(MarkType markType, std::string phoneNumber);
     int32_t UpdateDialingCallInfo(const CallDetailInfo &info);
     void SetContactInfo(sptr<CallBase> &call, std::string phoneNum);
     int32_t HandleRejectCall(sptr<CallBase> &call, bool isBlock);
