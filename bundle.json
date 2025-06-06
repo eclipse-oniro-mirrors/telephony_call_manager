@@ -71,7 +71,7 @@
                 "input",
                 "device_manager",
                 "openssl",
-                "ringtone_library"
+                "media_foundation"
             ],
             "third_party": [
                 "libphonenumber",

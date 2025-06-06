@@ -563,8 +563,8 @@ bool CallStatusManager::IsSetSystemVideoRing(sptr<CallBase> &callObjectPtr)
         TELEPHONY_LOGE("get systemSoundManager failed");
         return false;
     }
-    Media::ToneAttrs toneAttrs = systemSoundManager->GetInUseRingtoneAttrs(type);
-    if (toneAttrs.GetMediaType() == Media::RingtoneMediaType::RINGTONE_MEDIA_TYPE_VIDEO) {
+    Media::ToneAttrs toneAttrs = systemSoundManager->getCurrentRingtoneAttribute(type);
+    if (toneAttrs.GetMediaType() == Media::MediaType::MEDIA_TYPE_VID) {
         return true;
     } else {
         return false;
