@@ -15,8 +15,8 @@
 
 #include "call_manager_utils.h"
 #include "call_manager_base.h"
-#include "want_params_wrapper.h"
 #include "call_object_manager.h"
+#include "want_params_wrapper.h"
 
 namespace OHOS {
 namespace Telephony {
