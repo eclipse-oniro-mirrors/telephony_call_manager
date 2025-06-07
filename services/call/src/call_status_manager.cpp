@@ -556,14 +556,14 @@ bool CallStatusManager::IsSetSystemVideoRing(sptr<CallBase> &callObjectPtr)
     const std::shared_ptr<AbilityRuntime::Context> context;
     Media::RingtoneType type = info.accountId == DEFAULT_SIM_SLOT_ID ? Media::RingtoneType::RINGTONE_TYPE_SIM_CARD_0 :
         Media::RingtoneType::RINGTONE_TYPE_SIM_CARD_1;
-    TELEPHONY_LOGI("type: %{public}d", type);
     std::shared_ptr<Media::SystemSoundManager> systemSoundManager =
         Media::SystemSoundManagerFactory::CreateSystemSoundManager();
     if (systemSoundManager == nullptr) {
         TELEPHONY_LOGE("get systemSoundManager failed");
         return false;
     }
-    Media::ToneAttrs toneAttrs = systemSoundManager->getCurrentRingtoneAttribute(type);
+    Media::ToneAttrs toneAttrs = systemSoundManager->GetCurrentRingtoneAttribute(type);
+    TELEPHONY_LOGI("type: %{public}d, mediatype: %{public}d", type, toneAttrs.GetMediaType());
     if (toneAttrs.GetMediaType() == Media::MediaType::MEDIA_TYPE_VID) {
         return true;
     } else {
