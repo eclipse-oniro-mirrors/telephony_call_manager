@@ -111,7 +111,7 @@ void AudioControlManager::HandleCallStateUpdatedForVoip(
                 .deviceType = AudioDeviceType::DEVICE_EARPIECE,
                 .address = { 0 },
             };
-            if (DelayedSingleton<AudioProxy>::GetInstance()->GetPreferredOutputAudioDevice(device) ==
+            if (DelayedSingleton<AudioProxy>::GetInstance()->GetPreferredOutputAudioDevice(device, true) ==
                 TELEPHONY_SUCCESS) {
                 DelayedSingleton<AudioDeviceManager>::GetInstance()->SetCurrentAudioDevice(device.deviceType);
                 TELEPHONY_LOGI("control audio for voip finish, callId:%{public}d", callObjectPtr->GetCallID());

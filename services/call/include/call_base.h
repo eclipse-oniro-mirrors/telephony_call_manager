@@ -145,6 +145,8 @@ public:
     void SetPhoneOrWatchDial(int32_t phoneOrWatch);
     bool IsAiAutoAnswer();
     void SetAiAutoAnswer(bool isAiAutoAnswer);
+    bool IsForcedReportVoiceCall();
+    void SetForcedReportVoiceCall(bool isForcedReportVoiceCall);
 
 protected:
     int32_t callId_;
@@ -198,6 +200,7 @@ private:
     std::string detectDetails_;
     int32_t phoneOrWatch_ = 0;
     bool isAiAutoAnswer_;
+    bool isForcedReportVoiceCall_{false};
 };
 } // namespace Telephony
 } // namespace OHOS
