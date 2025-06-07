@@ -575,7 +575,7 @@ void CallStatusManager::DealVideoRingPath(ContactInfo &contactInfo, sptr<CallBas
 
     if (!strlen(contactInfo.ringtonePath)) {
         if (IsSetSystemVideoRing(callObjectPtr)) {
-            if (memcpy_s(contactInfo.ringtonePath, FILE_PATH_MAX_LEN, SYSTEM_VIDEO_RING, sizeof(SYSTEM_VIDEO_RING))
+            if (memcpy_s(contactInfo.ringtonePath, FILE_PATH_MAX_LEN, SYSTEM_VIDEO_RING, strlen(SYSTEM_VIDEO_RING))
                 != EOK) {
                 TELEPHONY_LOGE("memcpy_s ringtonePath fail");
                 return;
