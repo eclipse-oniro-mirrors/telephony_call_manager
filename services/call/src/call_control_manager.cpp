@@ -1444,8 +1444,8 @@ int32_t CallControlManager::SetVoIPCallInfo(int32_t callId, int32_t state, std::
         ClearVoipList();
         return TELEPHONY_ERROR;
     }
-    int32_t numActive = GetCallNum(TelCallState::CALL_STATUS_ACTIVE, true);
-    int32_t numHeld = GetCallNum(TelCallState::CALL_STATUS_HOLDING, true);
+    int32_t numActive = GetCallNum(TelCallState::CALL_STATUS_ACTIVE, false);
+    int32_t numHeld = GetCallNum(TelCallState::CALL_STATUS_HOLDING, false);
     switch (state) {
         case (int32_t)TelCallState::CALL_STATUS_IDLE: {
             HandleVoipConnected(numActive, callId);
