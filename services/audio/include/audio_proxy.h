@@ -47,6 +47,7 @@ class AudioDeviceChangeCallback : public AudioStandard::AudioManagerDeviceChange
 
 class AudioPreferDeviceChangeCallback : public AudioStandard::AudioPreferredOutputDeviceChangeCallback {
 public:
+    bool ProcessVoipCallOutputDeviceUpdated();
     void OnPreferredOutputDeviceUpdated(
         const std::vector<std::shared_ptr<AudioStandard::AudioDeviceDescriptor>> &desc) override;
 
@@ -90,7 +91,7 @@ public:
     std::string GetDefaultDtmfPath() const;
     int32_t UnsetDeviceChangeCallback();
     void SetWiredHeadsetState(bool isConnected);
-    int32_t GetPreferredOutputAudioDevice(AudioDevice &device);
+    int32_t GetPreferredOutputAudioDevice(AudioDevice &device, bool isNeedCurrentDevice = false);
     int32_t SetAudioPreferDeviceChangeCallback();
     int32_t UnsetAudioPreferDeviceChangeCallback();
     int32_t SetAudioMicStateChangeCallback();
