@@ -70,7 +70,8 @@
                 "dsoftbus",
                 "input",
                 "device_manager",
-                "openssl"
+                "openssl",
+                "media_foundation"
             ],
             "third_party": [
                 "libphonenumber",

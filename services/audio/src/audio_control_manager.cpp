@@ -41,6 +41,9 @@ constexpr int32_t DTMF_PLAY_TIME = 30;
 constexpr int32_t VOICE_TYPE = 0;
 constexpr int32_t CRS_TYPE = 2;
 constexpr int32_t CALL_ENDED_PLAY_TIME = 300;
+static constexpr const char *VIDEO_RING_PATH_FIX_TAIL = ".mp4";
+constexpr int32_t VIDEO_RING_PATH_FIX_TAIL_LENGTH = 4;
+static constexpr const char *SYSTEM_VIDEO_RING = "system_video_ring";
 
 AudioControlManager::AudioControlManager()
     : isLocalRingbackNeeded_(false), ring_(nullptr), tone_(nullptr), sound_(nullptr)
@@ -353,6 +356,10 @@ void AudioControlManager::HandleNextState(sptr<CallBase> &callObjectPtr, TelCall
                 DelayedSingleton<AudioProxy>::GetInstance()->StopVibrator();
                 isCrsVibrating_ = false;
             }
+            if (isVideoRingVibrating_) {
+                DelayedSingleton<AudioProxy>::GetInstance()->StopVibrator();
+                isVideoRingVibrating_ = false;
+            }
             audioInterruptState_ = AudioInterruptState::INTERRUPT_STATE_DEACTIVATED;
             break;
         default:
@@ -415,6 +422,10 @@ void AudioControlManager::ProcessAudioWhenCallActive(sptr<CallBase> &callObjectP
         if (isCrsVibrating_) {
             DelayedSingleton<AudioProxy>::GetInstance()->StopVibrator();
             isCrsVibrating_ = false;
+        }
+        if (isVideoRingVibrating_) {
+            DelayedSingleton<AudioProxy>::GetInstance()->StopVibrator();
+            isVideoRingVibrating_ = false;
         }
         int ringCallCount = CallObjectManager::GetCallNumByRunningState(CallRunningState::CALL_RUNNING_STATE_RINGING);
         if ((CallObjectManager::GetCurrentCallNum() - ringCallCount) < MIN_MULITY_CALL_COUNT) {
@@ -591,23 +602,16 @@ bool AudioControlManager::PlayRingtone()
     ContactInfo contactInfo = incomingCall->GetCallerInfo();
     AudioStandard::AudioRingerMode ringMode = DelayedSingleton<AudioProxy>::GetInstance()->GetRingerMode();
     if (incomingCall->GetCrsType() == CRS_TYPE) {
-        if (!isCrsVibrating_ && (ringMode != AudioStandard::AudioRingerMode::RINGER_MODE_SILENT)) {
-            if (ringMode == AudioStandard::AudioRingerMode::RINGER_MODE_VIBRATE || IsRingingVibrateModeOn()) {
-                isCrsVibrating_ = (DelayedSingleton<AudioProxy>::GetInstance()->StartVibrator() == TELEPHONY_SUCCESS);
-            }
-        }
-        if ((ringMode == AudioStandard::AudioRingerMode::RINGER_MODE_NORMAL) || IsBtOrWireHeadPlugin()) {
-            AdjustVolumesForCrs();
-            if (PlaySoundtone()) {
-                TELEPHONY_LOGI("play soundtone success");
-                return true;
-            }
-            return false;
-        }
-        TELEPHONY_LOGI("type_crs but not play ringtone");
-        return false;
+        return dealCrsScene(ringMode);
     }
-
+    if (IsVideoRing(contactInfo.personalNotificationRingtone, contactInfo.ringtonePath)) {
+        if ((ringMode == AudioStandard::AudioRingerMode::RINGER_MODE_NORMAL && IsRingingVibrateModeOn()) ||
+            ringMode == AudioStandard::AudioRingerMode::RINGER_MODE_VIBRATE) {
+            TELEPHONY_LOGI("need start vibrator.");
+            isVideoRingVibrating_ = (DelayedSingleton<AudioProxy>::GetInstance()->StartVibrator() == TELEPHONY_SUCCESS);
+        }
+        return true;
+    }
     if (incomingCall->GetCallType() == CallType::TYPE_BLUETOOTH) {
         ret = ring_->Play(info.accountId, contactInfo.ringtonePath, Media::HapticStartupMode::FAST);
     } else {
@@ -620,6 +624,36 @@ bool AudioControlManager::PlayRingtone()
     TELEPHONY_LOGI("play ringtone success");
     PostProcessRingtone();
     return true;
+}
+
+bool AudioControlManager::dealCrsScene(const AudioStandard::AudioRingerMode &ringMode)
+{
+    if (!isCrsVibrating_ && (ringMode != AudioStandard::AudioRingerMode::RINGER_MODE_SILENT)) {
+        if (ringMode == AudioStandard::AudioRingerMode::RINGER_MODE_VIBRATE || IsRingingVibrateModeOn()) {
+            isCrsVibrating_ = (DelayedSingleton<AudioProxy>::GetInstance()->StartVibrator() == TELEPHONY_SUCCESS);
+        }
+    }
+    if ((ringMode == AudioStandard::AudioRingerMode::RINGER_MODE_NORMAL) || IsBtOrWireHeadPlugin()) {
+        AdjustVolumesForCrs();
+        if (PlaySoundtone()) {
+            TELEPHONY_LOGI("play soundtone success");
+            return true;
+        }
+        return false;
+    }
+    TELEPHONY_LOGI("type_crs but not play ringtone");
+    return false;
+}
+
+bool AudioControlManager::IsVideoRing(const std::string &personalNotificationRingtone, const std::string &ringtonePath)
+{
+    if ((personalNotificationRingtone.length() > VIDEO_RING_PATH_FIX_TAIL_LENGTH &&
+        personalNotificationRingtone.substr(personalNotificationRingtone.length() - VIDEO_RING_PATH_FIX_TAIL_LENGTH,
+        VIDEO_RING_PATH_FIX_TAIL_LENGTH) == VIDEO_RING_PATH_FIX_TAIL) || ringtonePath == SYSTEM_VIDEO_RING) {
+        TELEPHONY_LOGI("Is video ring.");
+        return true;
+    }
+    return false;
 }
 
 void AudioControlManager::PostProcessRingtone()
@@ -998,6 +1032,7 @@ bool AudioControlManager::ShouldPlayRingtone() const
     int32_t incomingCallNum = processor->GetCallNumber(TelCallState::CALL_STATUS_INCOMING);
     if (incomingCallNum == EMPTY_VALUE || alertingCallNum > EMPTY_VALUE || ringState_ == RingState::RINGING
         || (soundState_ == SoundState::SOUNDING && CallObjectManager::HasIncomingCallCrsType())) {
+        TELEPHONY_LOGI("should not play ring tone.");
         return false;
     }
     return true;
@@ -1166,7 +1201,7 @@ bool AudioControlManager::IsBtOrWireHeadPlugin()
 bool AudioControlManager::IsRingingVibrateModeOn()
 {
     auto datashareHelper = SettingsDataShareHelper::GetInstance();
-    std::string ringingVibrateModeEnable {"1"};
+    std::string ringingVibrateModeEnable {"0"};
     std::vector<int> activedOsAccountIds;
     OHOS::AccountSA::OsAccountManager::QueryActiveOsAccountIds(activedOsAccountIds);
     if (activedOsAccountIds.empty()) {
@@ -1178,7 +1213,7 @@ bool AudioControlManager::IsRingingVibrateModeOn()
         "datashare:///com.ohos.settingsdata/entry/settingsdata/USER_SETTINGSDATA_"
         + std::to_string(userId) + "?Proxy=true");
     int resp = datashareHelper->Query(uri, "hw_vibrate_when_ringing", ringingVibrateModeEnable);
-    if (resp == TELEPHONY_SUCCESS && ringingVibrateModeEnable == "1") {
+    if ((resp == TELEPHONY_SUCCESS && ringingVibrateModeEnable == "1") || resp == TELEPHONY_ERR_UNINIT) {
         TELEPHONY_LOGI("RingingVibrateModeOpen:true");
         return true;
     }
