@@ -180,6 +180,14 @@ void AudioControlManager::VideoStateUpdated(
     CheckTypeAndSetAudioDevice(callObjectPtr, priorVideoState, nextVideoState, initDeviceType, device);
 }
 
+void AudioControlManager::CheckInitType(AudioDeviceType initDeviceType)
+{
+    return (initDeviceType == AudioDeviceType::DEVICE_WIRED_HEADSET ||
+        initDeviceType == AudioDeviceType::DEVICE_BLUETOOTH_SCO ||
+        initDeviceType == AudioDeviceType::DEVICE_NEARLINK ||
+        initDeviceType == AudioDeviceType::DEVICE_DISTRIBUTED_AUTOMOTIVE);
+}
+
 void AudioControlManager::CheckTypeAndSetAudioDevice(sptr<CallBase> &callObjectPtr, VideoStateType priorVideoState,
     VideoStateType nextVideoState, AudioDeviceType &initDeviceType, AudioDevice &device)
 {
@@ -192,10 +200,7 @@ void AudioControlManager::CheckTypeAndSetAudioDevice(sptr<CallBase> &callObjectP
             TELEPHONY_LOGI("before modify set device to EARPIECE, now not set");
             return;
         }
-        if (initDeviceType == AudioDeviceType::DEVICE_WIRED_HEADSET ||
-            initDeviceType == AudioDeviceType::DEVICE_BLUETOOTH_SCO ||
-            initDeviceType == AudioDeviceType::DEVICE_NEARLINK ||
-            initDeviceType == AudioDeviceType::DEVICE_DISTRIBUTED_AUTOMOTIVE) {
+        if (CheckInitType(initDeviceType)) {
             device.deviceType = initDeviceType;
         }
         TELEPHONY_LOGI("set device type, type: %{public}d", static_cast<int32_t>(device.deviceType));
@@ -203,10 +208,7 @@ void AudioControlManager::CheckTypeAndSetAudioDevice(sptr<CallBase> &callObjectP
     } else if (!DelayedSingleton<DistributedCommunicationManager>::GetInstance()->IsAudioOnSink() &&
                !isSetAudioDeviceByUser_ && IsVideoCall(priorVideoState) && !IsVideoCall(nextVideoState)) {
         device.deviceType = AudioDeviceType::DEVICE_EARPIECE;
-        if (initDeviceType == AudioDeviceType::DEVICE_WIRED_HEADSET ||
-            initDeviceType == AudioDeviceType::DEVICE_BLUETOOTH_SCO ||
-            initDeviceType == AudioDeviceType::DEVICE_NEARLINK ||
-            initDeviceType == AudioDeviceType::DEVICE_DISTRIBUTED_AUTOMOTIVE) {
+        if (CheckInitType(initDeviceType)) {
             device.deviceType = initDeviceType;
         }
         TELEPHONY_LOGI("set device type, type: %{public}d", static_cast<int32_t>(device.deviceType));
@@ -234,10 +236,7 @@ void AudioControlManager::UpdateDeviceTypeForVideoOrSatelliteCall()
     AudioDeviceType initDeviceType = GetInitAudioDeviceType();
     if (IsVideoCall(foregroundCall->GetVideoStateType()) ||
         foregroundCall->GetCallType() == CallType::TYPE_SATELLITE) {
-        if (initDeviceType == AudioDeviceType::DEVICE_WIRED_HEADSET ||
-            initDeviceType == AudioDeviceType::DEVICE_BLUETOOTH_SCO ||
-            initDeviceType == AudioDeviceType::DEVICE_NEARLINK ||
-            initDeviceType == AudioDeviceType::DEVICE_DISTRIBUTED_AUTOMOTIVE) {
+        if (CheckInitType(initDeviceType)) {
             device.deviceType = initDeviceType;
         }
         TELEPHONY_LOGI("set device type, type: %{public}d", static_cast<int32_t>(device.deviceType));
@@ -557,7 +556,7 @@ int32_t AudioControlManager::HandleBluetoothOrNearlinkAudioDevice(const AudioDev
             address = activeBluetoothDevice->macAddress_;
         } else {
             AudioDevice preferredAudioDevice;
-            if (!AudioDeviceManager::IsNearlinkActive(preferredAudioDevice)) {
+            if (!AudioDeviceManager::IsNearlinkActived(preferredAudioDevice)) {
                 TELEPHONY_LOGE("Get active nearlink device failed.");
                 return CALL_ERR_AUDIO_SET_AUDIO_DEVICE_FAILED;
             }

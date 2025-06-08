@@ -133,7 +133,7 @@ HWTEST_F(ZeroBranch10Test, Telephony_BluetoothCallService_001, TestSize.Level0)
 
 class MockCallManagerCallback : public CallManagerCallback {
 public:
-    MockCallManagerCallback(int32_t value) : value_(value) {}
+    explicit MockCallManagerCallback(int32_t value) : value_(value) {}
     int32_t OnCallDetailsChange(const CallAttributeInfo &info)
     {
         return value_;
@@ -282,11 +282,14 @@ HWTEST_F(ZeroBranch10Test, Telephony_AudioControlManager_002, TestSize.Level0)
     AudioDevice device;
     device.deviceType = AudioDeviceType::DEVICE_NEARLINK;
     auto audioControlManager = DelayedSingleton<AudioControlManager>::GetInstance();
-    EXPECT_EQ(audioControlManager->HandleBluetoothOrNearlinkAudioDevice(device), CALL_ERR_AUDIO_SET_AUDIO_DEVICE_FAILED);
+    EXPECT_EQ(audioControlManager->HandleBluetoothOrNearlinkAudioDevice(device),
+        CALL_ERR_AUDIO_SET_AUDIO_DEVICE_FAILED);
     device.deviceType = AudioDeviceType::DEVICE_BLUETOOTH_SCO;
-    EXPECT_EQ(audioControlManager->HandleBluetoothOrNearlinkAudioDevice(device), CALL_ERR_AUDIO_SET_AUDIO_DEVICE_FAILED);
+    EXPECT_EQ(audioControlManager->HandleBluetoothOrNearlinkAudioDevice(device),
+        CALL_ERR_AUDIO_SET_AUDIO_DEVICE_FAILED);
     strcpy_s(device.address, kMaxAddressLen, "1");
-    EXPECT_EQ(audioControlManager->HandleBluetoothOrNearlinkAudioDevice(device), CALL_ERR_AUDIO_SET_AUDIO_DEVICE_FAILED);
+    EXPECT_EQ(audioControlManager->HandleBluetoothOrNearlinkAudioDevice(device),
+        CALL_ERR_AUDIO_SET_AUDIO_DEVICE_FAILED);
     audioControlManager->audioInterruptState_ = AudioInterruptState::INTERRUPT_STATE_ACTIVATED;
     EXPECT_NE(audioControlManager->GetInitAudioDeviceType(), AudioDeviceType::DEVICE_NEARLINK);
 }

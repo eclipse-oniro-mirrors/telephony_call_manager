@@ -114,7 +114,7 @@ std::vector<CallAttributeInfo> BluetoothCallProxy::GetCurrentCallList(int32_t sl
         SendRequest(BluetoothCallInterfaceCode::INTERFACE_BT_GET_CURRENT_CALL_LIST, dataParcel, replyParcel);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("Function GetCurrentCallList call failed! errCode:%{public}d", error);
-        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+        return callVec;
     }
     int32_t vecCnt = replyParcel.ReadInt32();
     if (vecCnt <= 0 || vecCnt >= MAX_SIZE) {

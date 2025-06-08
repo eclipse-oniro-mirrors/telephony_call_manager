@@ -592,6 +592,7 @@ void AudioDeviceManager::UpdateBtDevice(std::string &address, std::string &devic
     if (!address.empty() && !deviceName.empty()) {
         return;
     }
+
     std::shared_ptr<AudioStandard::AudioDeviceDescriptor> activeBluetoothDevice =
         AudioStandard::AudioRoutingManager::GetInstance()->GetActiveBluetoothDevice();
     if (activeBluetoothDevice != nullptr && !activeBluetoothDevice->macAddress_.empty()) {
@@ -605,6 +606,7 @@ void AudioDeviceManager::UpdateNearlinkDevice(std::string &address, std::string 
     if (!address.empty() && !deviceName.empty()) {
         return;
     }
+
     AudioDevice device;
     if (!IsNearlinkActived(device)) {
         TELEPHONY_LOGE("Get active nearlink device failed.");

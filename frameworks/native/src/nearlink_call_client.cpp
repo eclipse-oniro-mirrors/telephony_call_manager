@@ -57,6 +57,7 @@ void NearlinkCallClient::UnInit()
         TELEPHONY_LOGE("init first please!");
         return;
     }
+
     g_callManagerProxyPtr->UnInit();
 }
 

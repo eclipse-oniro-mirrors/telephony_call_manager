@@ -122,6 +122,7 @@ private:
     int32_t GetBackupVoiceVolume();
     void RestoreVoiceValumeIfNecessary();
     void PostProcessRingtone();
+    bool CheckInitType(AudioDeviceType initDeviceType);
     ToneState toneState_ = ToneState::STOPPED;
     SoundState soundState_ = SoundState::STOPPED;
     bool isLocalRingbackNeeded_ = false;

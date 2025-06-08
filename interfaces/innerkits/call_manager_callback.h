@@ -116,10 +116,10 @@ public:
     /**
      * @brief report phone state change
      *
-     * @param numActive[out] number of active calls
-     * @param numHeld[out] number of hold calls
-     * @param callState[out] call state
-     * @param number[out] phone number
+     * @param numActive[in] number of active calls
+     * @param numHeld[in] number of hold calls
+     * @param callState[in] call state
+     * @param number[in] phone number
      * @return Returns 0 on success, others on failure.
      */
     virtual int32_t OnPhoneStateChange(int32_t numActive, int32_t numHeld, int32_t callState,

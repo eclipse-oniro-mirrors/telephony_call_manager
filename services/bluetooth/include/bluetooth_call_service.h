@@ -134,9 +134,9 @@ public:
      */
     std::vector<CallAttributeInfo> GetCurrentCallList(int32_t slotId) override;
 
-        /**
+    /**
      * AddAudioDeviceList
-     * 
+     *
      * @brief Add an audio device
      * @param address[in], The device address
      * @param deviceType[in], The device type
@@ -147,7 +147,7 @@ public:
 
     /**
      * RemoveAudioDeviceList
-     * 
+     *
      * @brief Remove an audio device
      * @param address[in], The device address
      * @param deviceType[in], The device type
@@ -157,7 +157,7 @@ public:
 
     /**
      * ResetNearlinkDeviceList
-     * 
+     *
      * @brief Reset all nearlink devices
      * @return Returns 0 on success, others on failure.
      */
