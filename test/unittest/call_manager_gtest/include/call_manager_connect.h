@@ -374,6 +374,13 @@ public:
         return TELEPHONY_SUCCESS;
     }
 
+    int32_t OnPhoneStateChange(int32_t numActive, int32_t numHeld, int32_t callState,
+        const std::string &number)
+    {
+        TELEPHONY_LOGI("OnPhoneStateChange success!");
+        return TELEPHONY_SUCCESS;
+    }
+
 private:
     using CallAbilityCallbackFunc = int32_t (CallAbilityCallbackStub::*)(MessageParcel &data, MessageParcel &reply);
     int32_t OnUpdateCallStateInfoRequest(MessageParcel &data, MessageParcel &reply);
