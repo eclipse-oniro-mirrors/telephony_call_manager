@@ -455,6 +455,12 @@ public:
     {
         return TELEPHONY_SUCCESS;
     }
+
+    int32_t OnPhoneStateChange(int32_t numActive, int32_t numHeld, int32_t callState,
+        const std::string &number)
+    {
+        return TELEPHONY_SUCCESS;
+    }
 };
 
 class CallManagerConnect {

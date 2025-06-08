@@ -51,6 +51,8 @@ public:
     int32_t ReportPeerDimensionsChange(const PeerDimensionsDetail &peerDimensionsDetail);
     int32_t ReportCallDataUsageChange(const int64_t dataUsage);
     int32_t ReportCameraCapabilities(const CameraCapabilities &cameraCapabilities);
+    int32_t ReportPhoneStateChange(int32_t numActive, int32_t numHeld, int32_t callState,
+        const std::string &number) override;
 
 private:
     int32_t ReportCallEvent(const CallEventInfo &info);

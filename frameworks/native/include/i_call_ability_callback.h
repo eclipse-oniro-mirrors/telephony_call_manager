@@ -42,6 +42,8 @@ public:
     virtual int32_t OnReportPeerDimensionsChange(const PeerDimensionsDetail &peerDimensionsDetail) = 0;
     virtual int32_t OnReportCallDataUsageChange(const int64_t dataUsage) = 0;
     virtual int32_t OnReportCameraCapabilities(const CameraCapabilities &cameraCapabilities) = 0;
+    virtual int32_t OnPhoneStateChange(int32_t numActive, int32_t numHeld, int32_t, callState,
+        const std::string &number) = 0;
 
     void SetBundleInfo(const std::string &info)
     {

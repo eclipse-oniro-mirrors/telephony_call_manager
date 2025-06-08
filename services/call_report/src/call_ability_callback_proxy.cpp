@@ -445,5 +445,33 @@ int32_t CallAbilityCallbackProxy::OnReportCameraCapabilities(const CameraCapabil
     }
     return replyParcel.ReadInt32();
 }
+
+int32_t CallAbilityCallbackProxy::OnPhoneStateChange(int32_t numActive, int32_t numHeld, int32_t callState,
+    const std::string &number)
+{
+    MessageParcel dataParcel;
+    MessageParcel replyParcel;
+    MessageOption option(MessageOption::TF_ASYNC);
+    if (!dataParcel.WriteInterfaceToken(CallAbilityCallbackProxy::GetDescriptor())) {
+        TELEPHONY_LOGE("write descriptor fail");
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    dataParcel.WriteInt32(numActive);
+    dataParcel.WriteInt32(numHeld);
+    dataParcel.WriteInt32(callState);
+    dataParcel.WriteString(number);
+    if (Remote() == nullptr) {
+        TELEPHONY_LOGE("function Remote() return nullptr!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    int32_t error = Remote()->SendRequest(static_cast<uint32_t>(
+        CallManagerCallAbilityInterfaceCode::UPDATE_PHONE_STATE), dataParcel,
+        replyParcel, option);
+    if (error != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("report async results failed, error: %{public}d", error);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return replyParcel.ReadInt32();
+}
 } // namespace Telephony
 } // namespace OHOS

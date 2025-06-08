@@ -15,6 +15,7 @@
 
 #include "bluetooth_call_service.h"
 
+#include "audio_device_manager.h"
 #include "bluetooth_call_manager.h"
 #include "call_manager_errors.h"
 #include "telephony_errors.h"
@@ -404,6 +405,46 @@ std::vector<CallAttributeInfo> BluetoothCallService::GetCurrentCallList(int32_t 
         return GetAllCallInfoList();
     }
     return GetCallInfoList(slotId);
+}
+
+int32_t BluetoothCallService::AddAudioDeviceList(const std::string &address, int32_t deviceType,
+    const std::string &name)
+{
+    if (!TelephonyPermission::CheckPermission(Permission::SET_TELEPHONY_STATE)) {
+        TELEPHONY_LOGE("AddAudioDeviceList, Permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
+    if (deviceType != AudioDeviceType::DEVICE_NEARLINK) {
+        TELEPHONY_LOGE("AddAudioDeviceList, invalid device type!");
+        return TELEPHONY_ERR_ARGUEMENT_INVALID;
+    }
+    DelayedSingleton<AudioDeviceManager>::GetInstance()->AddAudioDeviceList(address, AudioDeviceType::DEVICE_NEARLINK, name);
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t BluetoothCallService::RemoveAudioDeviceList(const std::string &address, int32_t deviceType)
+{
+    if (!TelephonyPermission::CheckPermission(Permission::SET_TELEPHONY_STATE)) {
+        TELEPHONY_LOGE("RemoveAudioDeviceList, Permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
+    if (deviceType != AudioDeviceType::DEVICE_NEARLINK) {
+        TELEPHONY_LOGE("RemoveAudioDeviceList, invalid device type!");
+        return TELEPHONY_ERR_ARGUEMENT_INVALID;
+    }
+    DelayedSingleton<AudioDeviceManager>::GetInstance()->RemoveAudioDeviceList(address,
+        AudioDeviceType::DEVICE_NEARLINK);
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t BluetoothCallService::ResetNearlinkDeviceList()
+{
+    if (!TelephonyPermission::CheckPermission(Permission::SET_TELEPHONY_STATE)) {
+        TELEPHONY_LOGE("AddAudioDeviceList, Permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
+    DelayedSingleton<AudioDeviceManager>::GetInstance()->ResetNearlinkAudioDevicesList();
+    return TELEPHONY_SUCCESS;
 }
 } // namespace Telephony
 } // namespace OHOS

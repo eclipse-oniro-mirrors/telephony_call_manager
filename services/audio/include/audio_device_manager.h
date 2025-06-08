@@ -39,6 +39,7 @@ public:
     static bool IsSpeakerAvailable();
     static bool IsBtScoConnected();
     static bool IsBtActived();
+    static bool IsNearlinkActived(AudioDevice &device);
     static bool IsDistributedCallConnected();
     static bool IsWiredHeadsetConnected();
     static void SetDeviceAvailable(AudioDeviceType deviceType, bool available);
@@ -48,6 +49,7 @@ public:
     void RemoveAudioDeviceList(const std::string &address, AudioDeviceType deviceType);
     void ResetBtAudioDevicesList();
     void ResetDistributedCallDevicesList();
+    void ResetNearlinkAudioDevicesList();
     int32_t ReportAudioDeviceChange(const AudioDevice &device);
     bool CheckAndSwitchDistributedAudioDevice();
     int32_t ReportAudioDeviceInfo();
@@ -98,6 +100,7 @@ private:
     AudioDeviceInfo info_;
     bool SwitchDevice(AudioEvent event);
     bool EnableBtSco();
+    bool EnableNearlink();
     bool EnableWiredHeadset();
     bool EnableSpeaker();
     bool EnableEarpiece();
@@ -110,6 +113,8 @@ private:
     bool IsDistributedAudioDeviceType(AudioDeviceType deviceType);
     bool IsSupportEarpiece();
     void AddEarpiece();
+    void UpdateBtDevice(std::string &address, std::string name);
+    void UpdateNearlinkDevice(std::string &address, std::string name);
 };
 } // namespace Telephony
 } // namespace OHOS

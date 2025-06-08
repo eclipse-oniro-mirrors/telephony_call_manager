@@ -160,5 +160,15 @@ int32_t CallAbilityCallback::OnReportCameraCapabilities(const CameraCapabilities
     }
     return TELEPHONY_SUCCESS;
 }
+
+int32_t CallAbilityCallback::OnPhoneStateChange(int32_t numActive, int32_t numHeld, int32_t callState,
+    const std::string &number)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (callbackPtr_ != nullptr) {
+        return callbackPtr_->OnPhoneStateChange(numActive, numHeld, callState, number);
+    }
+    return TELEPHONY_SUCCESS;
+}
 } // namespace Telephony
 } // namespace OHOS

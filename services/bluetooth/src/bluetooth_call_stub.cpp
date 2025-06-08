@@ -56,6 +56,12 @@ BluetoothCallStub::BluetoothCallStub()
         [this](MessageParcel &data, MessageParcel &reply) { return OnStopDtmf(data, reply); };
     memberFuncMap_[static_cast<uint32_t>(BluetoothCallInterfaceCode::INTERFACE_BT_GET_CURRENT_CALL_LIST)] =
         [this](MessageParcel &data, MessageParcel &reply) { return OnGetCurrentCallList(data, reply); };
+    memberFuncMap_[static_cast<uint32_t>(BluetoothCallInterfaceCode::INTERFACE_BT_ADD_AUDIO_DEVICE)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnAddAudioDeviceList(data, reply); };
+    memberFuncMap_[static_cast<uint32_t>(BluetoothCallInterfaceCode::INTERFACE_BT_REMOVE_AUDIO_DEVICE)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnRemoveAudioDeviceList(data, reply); };
+    memberFuncMap_[static_cast<uint32_t>(BluetoothCallInterfaceCode::INTERFACE_BT_RESET_NEARLIK_AUDIO_DEVICE)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnResetNearlinkDeviceList(data, reply); };
 }
 
 BluetoothCallStub::~BluetoothCallStub()
@@ -226,6 +232,44 @@ int32_t BluetoothCallStub::OnGetCurrentCallList(MessageParcel &data, MessageParc
     std::vector<CallAttributeInfo>::iterator it = callVec.begin();
     for (; it != callVec.end(); ++it) {
         CallManagerUtils::WriteCallAttributeInfo(*it, reply);
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t BluetoothCallStub::OnAddAudioDeviceList(MessageParcel &data, MessageParcel &reply)
+{
+    std::string address = data.ReadString();
+    int32_t deviceType = data.ReadInt32t();
+    std::string name = data.ReadString();
+    int32_t result = AddAudioDeviceList(address, decltype, name);
+    TELEPHONY_LOGI("result:%{public}d", result);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("fail to write parcel");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t BluetoothCallStub::OnRemoveAudioDeviceList(MessageParcel &data, MessageParcel &reply)
+{
+    std::string address = data.ReadString();
+    int32_t deviceType = data.ReadInt32t();
+    int32_t result = RemoveAudioDeviceList(address, decltype);
+    TELEPHONY_LOGI("result:%{public}d", result);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("fail to write parcel");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t BluetoothCallStub::OnResetNearlinkDeviceList(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t result = ResetNearlinkDeviceList();
+    TELEPHONY_LOGI("result:%{public}d", result);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("fail to write parcel");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
     return TELEPHONY_SUCCESS;
 }

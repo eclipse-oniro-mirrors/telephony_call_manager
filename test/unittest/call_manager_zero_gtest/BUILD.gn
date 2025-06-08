@@ -403,3 +403,45 @@ ohos_unittest("tel_call_manager_zero9_gtest") {
   ]
   defines += call_manager_defines
 }
+
+ohos_unittest("tel_call_manager_zero10_gtest") {
+  install_enable = true
+  subsystem_name = "telephony"
+  part_name = "call_manager"
+  test_module = "tel_call_manager_zero_gtest"
+  module_out_path = part_name + "/" + part_name + "/" + test_module
+  sanitize = {
+    cfi = true
+    cfi_cross_dso = true
+    debug = false
+    blocklist = "../../cfi_blocklist.txt"
+  }
+  branch_protector_ret = "pac_ret"
+
+  sources = [
+    "${CALL_MANAGER_PATH}/frameworks/native/src/call_manager_service_proxy.cpp",
+    "src/zero_branch10_test.cpp",
+  ]
+  sources += call_manager_sources
+
+  include_dirs = [ "${CALL_MANAGER_PATH}/interfaces/innerkits" ]
+  include_dirs += call_manager_include_dirs
+
+  external_deps = [
+    "access_token:libnativetoken",
+    "access_token:libtoken_setproc",
+    "cJSON:cjson",
+    "libphonenumber:phonenumber_standard",
+  ]
+  external_deps += call_manager_external_deps
+
+  deps = [
+    "${CALL_MANAGER_PATH}/frameworks/native:tel_call_manager_api",
+  ]
+  remove_configs = [ "//build/config/compiler:no_exceptions" ]
+  defines = [
+    "TELEPHONY_LOG_TAG = \"CallManagerGtest\"",
+    "LOG_DOMAIN = 0xD000F00",
+  ]
+  defines += call_manager_defines
+}

@@ -34,6 +34,7 @@ enum CallManagerCallAbilityInterfaceCode {
     PEERD_DIMENSIONS_CHANGE,
     CALL_DATA_USAGE_CHANGE,
     CAMERA_CAPABILITIES_CHANGE,
+    UPDATE_PHONE_STATE,
 };
 } // namespace Telephony
 } // namespace OHOS

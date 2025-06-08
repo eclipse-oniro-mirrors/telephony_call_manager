@@ -55,6 +55,8 @@ CallAbilityCallbackStub::CallAbilityCallbackStub()
         [this](MessageParcel &data, MessageParcel &reply) { return OnUpdateCallDataUsageChange(data, reply); };
     memberFuncMap_[static_cast<uint32_t>(CallManagerCallAbilityInterfaceCode::CAMERA_CAPABILITIES_CHANGE)] =
         [this](MessageParcel &data, MessageParcel &reply) { return OnUpdateCameraCapabilities(data, reply); };
+    memberFuncMap_[static_cast<uint32_t>(CallManagerCallAbilityInterfaceCode::UPDATE_PHONE_STATE)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnUpdatePhoneState(data, reply); };
 }
 
 CallAbilityCallbackStub::~CallAbilityCallbackStub() {}
@@ -418,6 +420,24 @@ int32_t CallAbilityCallbackStub::OnUpdateCameraCapabilities(MessageParcel &data,
     }
 
     result = OnReportCameraCapabilities(*parcelPtr);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("writing parcel failed");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t CallAbilityCallbackStub::OnUpdateCameraCapabilities(MessageParcel &data, MessageParcel &reply)
+{
+    if (!data.ContainFileDescriptors()) {
+        TELEPHONY_LOGD("sent raw data is less than 32k");
+    }
+
+    int32_t numActive = data.ReadInt32();
+    int32_t numHeld = data.ReadInt32();
+    int32_t callState = data.ReadInt32();
+    std::string number = data.ReadString();
+    int32_t resulte = OnPhoneStateChange(numActive, numHeld, callState, number);
     if (!reply.WriteInt32(result)) {
         TELEPHONY_LOGE("writing parcel failed");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;

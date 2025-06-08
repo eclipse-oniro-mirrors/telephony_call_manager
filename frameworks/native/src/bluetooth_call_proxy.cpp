@@ -129,6 +129,39 @@ std::vector<CallAttributeInfo> BluetoothCallProxy::GetCurrentCallList(int32_t sl
     return callVec;
 }
 
+int32_t BluetoothCallProxy::AddAudioDeviceList(const std::string &address, int32_t deviceType,
+    const std::string &name)
+{
+    MessageParcel dataParcel;
+    if (!dataParcel.WriteInterfaceToken(BluetoothCallProxy::GetDescriptor())) {
+        TELEPHONY_LOGE("write descriptor fail");
+        return callVec;
+    }
+    dataParcel.WriteString(address);
+    dataParcel.WriteInt32(deviceType);
+    dataParcel.WriteString(name);
+    MessageParcel replyParcel;
+    return SendRequest(BluetoothCallInterfaceCode::INTERFACE_BT_ADD_AUDIO_DEVICE, dataParcel, replyParcel);
+}
+
+int32_t BluetoothCallProxy::RemoveAudioDeviceList(const std::string &address, int32_t deviceType)
+{
+    MessageParcel dataParcel;
+    if (!dataParcel.WriteInterfaceToken(BluetoothCallProxy::GetDescriptor())) {
+        TELEPHONY_LOGE("write descriptor fail");
+        return callVec;
+    }
+    dataParcel.WriteString(address);
+    dataParcel.WriteInt32(deviceType);
+    MessageParcel replyParcel;
+    return SendRequest(BluetoothCallInterfaceCode::INTERFACE_BT_REMOVE_AUDIO_DEVICE, dataParcel, replyParcel);
+}
+
+int32_t BluetoothCallProxy::ResetNearlinkDeviceList()
+{
+    return SendRequest(BluetoothCallInterfaceCode::INTERFACE_BT_RESET_NEARLINK_AUDIO_DEVICE);
+}
+
 int32_t BluetoothCallProxy::SendRequest(BluetoothCallInterfaceCode code)
 {
     MessageParcel dataParcel;

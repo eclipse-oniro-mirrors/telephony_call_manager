@@ -111,7 +111,7 @@ private:
     bool IsBtOrWireHeadPlugin();
     void ProcessAudioWhenCallActive(sptr<CallBase> &callObjectPtr);
     int32_t HandleDistributeAudioDevice(const AudioDevice &device);
-    int32_t HandleBluetoothAudioDevice(const AudioDevice &device);
+    int32_t HandleBluetoothOrNearlinkAudioDevice(const AudioDevice &device);
     void SendMuteRingEvent();
     bool IsRingingVibrateModeOn();
     bool IsVoIPCallActived();
