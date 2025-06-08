@@ -414,11 +414,12 @@ int32_t BluetoothCallService::AddAudioDeviceList(const std::string &address, int
         TELEPHONY_LOGE("AddAudioDeviceList, Permission denied!");
         return TELEPHONY_ERR_PERMISSION_ERR;
     }
-    if (deviceType != AudioDeviceType::DEVICE_NEARLINK) {
+    if (deviceType != static_cast<int32_t>(AudioDeviceType::DEVICE_NEARLINK)) {
         TELEPHONY_LOGE("AddAudioDeviceList, invalid device type!");
-        return TELEPHONY_ERR_ARGUEMENT_INVALID;
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
-    DelayedSingleton<AudioDeviceManager>::GetInstance()->AddAudioDeviceList(address, AudioDeviceType::DEVICE_NEARLINK, name);
+    DelayedSingleton<AudioDeviceManager>::GetInstance()->AddAudioDeviceList(address, AudioDeviceType::DEVICE_NEARLINK,
+        name);
     return TELEPHONY_SUCCESS;
 }
 
@@ -428,9 +429,9 @@ int32_t BluetoothCallService::RemoveAudioDeviceList(const std::string &address, 
         TELEPHONY_LOGE("RemoveAudioDeviceList, Permission denied!");
         return TELEPHONY_ERR_PERMISSION_ERR;
     }
-    if (deviceType != AudioDeviceType::DEVICE_NEARLINK) {
+    if (deviceType != static_cast<int32_t>(AudioDeviceType::DEVICE_NEARLINK)) {
         TELEPHONY_LOGE("RemoveAudioDeviceList, invalid device type!");
-        return TELEPHONY_ERR_ARGUEMENT_INVALID;
+        return TELEPHONY_ERR_ARGUMENT_INVALID;
     }
     DelayedSingleton<AudioDeviceManager>::GetInstance()->RemoveAudioDeviceList(address,
         AudioDeviceType::DEVICE_NEARLINK);
@@ -440,7 +441,7 @@ int32_t BluetoothCallService::RemoveAudioDeviceList(const std::string &address, 
 int32_t BluetoothCallService::ResetNearlinkDeviceList()
 {
     if (!TelephonyPermission::CheckPermission(Permission::SET_TELEPHONY_STATE)) {
-        TELEPHONY_LOGE("AddAudioDeviceList, Permission denied!");
+        TELEPHONY_LOGE("ResetNearlinkDeviceList, Permission denied!");
         return TELEPHONY_ERR_PERMISSION_ERR;
     }
     DelayedSingleton<AudioDeviceManager>::GetInstance()->ResetNearlinkAudioDevicesList();

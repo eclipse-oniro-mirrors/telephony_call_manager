@@ -113,8 +113,8 @@ private:
     bool IsDistributedAudioDeviceType(AudioDeviceType deviceType);
     bool IsSupportEarpiece();
     void AddEarpiece();
-    void UpdateBtDevice(std::string &address, std::string name);
-    void UpdateNearlinkDevice(std::string &address, std::string name);
+    void UpdateBtDevice(std::string &address, std::string &deviceName);
+    void UpdateNearlinkDevice(std::string &address, std::string &deviceName);
 };
 } // namespace Telephony
 } // namespace OHOS

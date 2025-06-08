@@ -60,7 +60,7 @@ BluetoothCallStub::BluetoothCallStub()
         [this](MessageParcel &data, MessageParcel &reply) { return OnAddAudioDeviceList(data, reply); };
     memberFuncMap_[static_cast<uint32_t>(BluetoothCallInterfaceCode::INTERFACE_BT_REMOVE_AUDIO_DEVICE)] =
         [this](MessageParcel &data, MessageParcel &reply) { return OnRemoveAudioDeviceList(data, reply); };
-    memberFuncMap_[static_cast<uint32_t>(BluetoothCallInterfaceCode::INTERFACE_BT_RESET_NEARLIK_AUDIO_DEVICE)] =
+    memberFuncMap_[static_cast<uint32_t>(BluetoothCallInterfaceCode::INTERFACE_BT_RESET_NEARLINK_AUDIO_DEVICE)] =
         [this](MessageParcel &data, MessageParcel &reply) { return OnResetNearlinkDeviceList(data, reply); };
 }
 
@@ -239,28 +239,28 @@ int32_t BluetoothCallStub::OnGetCurrentCallList(MessageParcel &data, MessageParc
 int32_t BluetoothCallStub::OnAddAudioDeviceList(MessageParcel &data, MessageParcel &reply)
 {
     std::string address = data.ReadString();
-    int32_t deviceType = data.ReadInt32t();
+    int32_t deviceType = data.ReadInt32();
     std::string name = data.ReadString();
-    int32_t result = AddAudioDeviceList(address, decltype, name);
+    int32_t result = AddAudioDeviceList(address, deviceType, name);
     TELEPHONY_LOGI("result:%{public}d", result);
     if (!reply.WriteInt32(result)) {
         TELEPHONY_LOGE("fail to write parcel");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    return TELEPHONY_SUCCESS;
+    return result;
 }
 
 int32_t BluetoothCallStub::OnRemoveAudioDeviceList(MessageParcel &data, MessageParcel &reply)
 {
     std::string address = data.ReadString();
-    int32_t deviceType = data.ReadInt32t();
-    int32_t result = RemoveAudioDeviceList(address, decltype);
+    int32_t deviceType = data.ReadInt32();
+    int32_t result = RemoveAudioDeviceList(address, deviceType);
     TELEPHONY_LOGI("result:%{public}d", result);
     if (!reply.WriteInt32(result)) {
         TELEPHONY_LOGE("fail to write parcel");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    return TELEPHONY_SUCCESS;
+    return result;
 }
 
 int32_t BluetoothCallStub::OnResetNearlinkDeviceList(MessageParcel &data, MessageParcel &reply)
@@ -271,7 +271,7 @@ int32_t BluetoothCallStub::OnResetNearlinkDeviceList(MessageParcel &data, Messag
         TELEPHONY_LOGE("fail to write parcel");
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
-    return TELEPHONY_SUCCESS;
+    return result;
 }
 } // namespace Telephony
 } // namespace OHOS

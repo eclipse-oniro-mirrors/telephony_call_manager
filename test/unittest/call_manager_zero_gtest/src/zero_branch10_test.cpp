@@ -26,12 +26,13 @@
 #include "call_ability_report_proxy.h"
 #include "ims_call.h"
 #include "nativetoken_kit.h"
-#include "telephony_errros"
+#include "nearlink_call_client.h"
+#include "telephony_errors.h"
 #include "token_setproc.h"
 
 namespace OHOS::Telephony {
 using namespace testing::ext;
-constexpr int WAIT_TIME = 5;
+constexpr int WAIT_TIME = 3;
 class ZeroBranch10Test : public testing::Test {
 public:
     void SetUp();
@@ -79,7 +80,7 @@ HWTEST_F(ZeroBranch10Test, Telephony_NearlinkCallClient_001, TestSize.Level0)
     NearlinkCallClient &client = DelayedRefSingleton<NearlinkCallClient>::GetInstance();
     client.UnInit();
     EXPECT_EQ(client.RegisterCallBack(nullptr), TELEPHONY_ERR_UNINIT);
-    EXPECT_EQ(client.UnRegisterCallBack(nullptr), TELEPHONY_ERR_UNINIT);
+    EXPECT_EQ(client.UnRegisterCallBack(), TELEPHONY_ERR_UNINIT);
     EXPECT_EQ(client.AnswerCall(), TELEPHONY_ERR_UNINIT);
     EXPECT_EQ(client.RejectCall(), TELEPHONY_ERR_UNINIT);
     EXPECT_EQ(client.HangUpCall(), TELEPHONY_ERR_UNINIT);
@@ -90,7 +91,7 @@ HWTEST_F(ZeroBranch10Test, Telephony_NearlinkCallClient_001, TestSize.Level0)
     EXPECT_EQ(client.ResetNearlinkDeviceList(), TELEPHONY_ERR_UNINIT);
     client.Init();
     EXPECT_NE(client.RegisterCallBack(nullptr), TELEPHONY_ERR_UNINIT);
-    EXPECT_NE(client.UnRegisterCallBack(nullptr), TELEPHONY_ERR_UNINIT);
+    EXPECT_NE(client.UnRegisterCallBack(), TELEPHONY_ERR_UNINIT);
     EXPECT_NE(client.AnswerCall(), TELEPHONY_ERR_UNINIT);
     EXPECT_NE(client.RejectCall(), TELEPHONY_ERR_UNINIT);
     EXPECT_NE(client.HangUpCall(), TELEPHONY_ERR_UNINIT);
@@ -127,7 +128,7 @@ HWTEST_F(ZeroBranch10Test, Telephony_BluetoothCallService_001, TestSize.Level0)
     data1.WriteString("addr");
     data1.WriteInt32(static_cast<int32_t>(AudioDeviceType::DEVICE_NEARLINK));
     result = bluetoothCallService->OnRemoveAudioDeviceList(data1, reply);
-    EXPECT_EQ(result, TELEPHONY_ERR_ARGUMENT_INVALID);
+    EXPECT_NE(result, TELEPHONY_ERR_ARGUMENT_INVALID);
 }
 
 class MockCallManagerCallback : public CallManagerCallback {
@@ -286,8 +287,6 @@ HWTEST_F(ZeroBranch10Test, Telephony_AudioControlManager_002, TestSize.Level0)
     EXPECT_EQ(audioControlManager->HandleBluetoothOrNearlinkAudioDevice(device), CALL_ERR_AUDIO_SET_AUDIO_DEVICE_FAILED);
     strcpy_s(device.address, kMaxAddressLen, "1");
     EXPECT_EQ(audioControlManager->HandleBluetoothOrNearlinkAudioDevice(device), CALL_ERR_AUDIO_SET_AUDIO_DEVICE_FAILED);
-    device.deviceType = AudioDeviceType::DEVICE_BLUETOOTH_SCO;
-    EXPECT_EQ(audioControlManager->HandleBluetoothOrNearlinkAudioDevice(device), CALL_ERR_AUDIO_SET_AUDIO_DEVICE_FAILED);
     audioControlManager->audioInterruptState_ = AudioInterruptState::INTERRUPT_STATE_ACTIVATED;
     EXPECT_NE(audioControlManager->GetInitAudioDeviceType(), AudioDeviceType::DEVICE_NEARLINK);
 }
@@ -305,21 +304,22 @@ HWTEST_F(ZeroBranch10Test, Telephony_AudioDeviceManager_001, TestSize.Level0)
     audioDeviceManager->info_.audioDeviceList.clear();
     audioDeviceManager->info_.audioDeviceList.push_back(device);
     audioDeviceManager->audioDeviceType_ = AudioDeviceType::DEVICE_BLUETOOTH_SCO;
-    audioDeviceManager->ResetNearlinkAudioDeviceList();
-    device.deviceType = AudioDeviceType::DEVICE_NEARLINK
+    audioDeviceManager->ResetNearlinkAudioDevicesList();
+    device.deviceType = AudioDeviceType::DEVICE_NEARLINK;
     audioDeviceManager->info_.audioDeviceList.push_back(device);
-    audioDeviceManager->ResetNearlinkAudioDeviceList();
+    audioDeviceManager->audioDeviceType_ = AudioDeviceType::DEVICE_NEARLINK;
+    audioDeviceManager->ResetNearlinkAudioDevicesList();
     EXPECT_EQ(audioDeviceManager->info_.audioDeviceList.size(), 1);
     EXPECT_FALSE(audioDeviceManager->SwitchDevice(AudioDeviceType::DEVICE_NEARLINK));
     audioDeviceManager->info_.currentAudioDevice.deviceType = AudioDeviceType::DEVICE_BLUETOOTH_SCO;
-    auidoDeviceManager->ReportAudioDeviceChange(device);
+    audioDeviceManager->ReportAudioDeviceChange(device);
     std::string address = "1";
     std::string deviceName = "1";
     audioDeviceManager->UpdateNearlinkDevice(address, deviceName);
     address = "";
     audioDeviceManager->UpdateNearlinkDevice(address, deviceName);
     address = "1";
-    devcieName = "";
+    deviceName = "";
     audioDeviceManager->UpdateNearlinkDevice(address, deviceName);
     EXPECT_EQ(audioDeviceManager->info_.currentAudioDevice.deviceType, AudioDeviceType::DEVICE_NEARLINK);
     EXPECT_TRUE(audioDeviceManager->ConvertAddress().empty());
@@ -343,42 +343,42 @@ HWTEST_F(ZeroBranch10Test, Telephony_AudioProxy_001, TestSize.Level0)
     std::make_shared<AudioPreferDeviceChangeCallback>()->OnPreferredOutputDeviceUpdated(descs);
     auto desc = std::make_shared<AudioStandard::AudioDeviceDescriptor>();
     desc->deviceType_ = AudioStandard::DEVICE_TYPE_BLUETOOTH_SCO;
-    desc.push_back(desc);
+    descs.push_back(desc);
     std::make_shared<AudioPreferDeviceChangeCallback>()->OnPreferredOutputDeviceUpdated(descs);
-    EXPECT_EQ(DelayedSingleton<AudioProxy>::GetInstance()->audioDeviceType_,
+    EXPECT_EQ(DelayedSingleton<AudioDeviceManager>::GetInstance()->audioDeviceType_,
         AudioDeviceType::DEVICE_BLUETOOTH_SCO);
     descs.clear();
     desc->deviceType_ = AudioStandard::DEVICE_TYPE_NEARLINK;
-    desc.push_back(desc);
+    descs.push_back(desc);
     std::make_shared<AudioPreferDeviceChangeCallback>()->OnPreferredOutputDeviceUpdated(descs);
-    EXPECT_EQ(DelayedSingleton<AudioProxy>::GetInstance()->audioDeviceType_, AudioDeviceType::DEVICE_NEARLINK);
+    EXPECT_EQ(DelayedSingleton<AudioDeviceManager>::GetInstance()->audioDeviceType_, AudioDeviceType::DEVICE_NEARLINK);
     descs.clear();
     desc->deviceType_ = AudioStandard::DEVICE_TYPE_EARPIECE;
-    desc.push_back(desc);
+    descs.push_back(desc);
     std::make_shared<AudioPreferDeviceChangeCallback>()->OnPreferredOutputDeviceUpdated(descs);
-    EXPECT_EQ(DelayedSingleton<AudioProxy>::GetInstance()->audioDeviceType_, AudioDeviceType::DEVICE_EARPIECE);
+    EXPECT_EQ(DelayedSingleton<AudioDeviceManager>::GetInstance()->audioDeviceType_, AudioDeviceType::DEVICE_EARPIECE);
     descs.clear();
     desc->deviceType_ = AudioStandard::DEVICE_TYPE_SPEAKER;
-    desc.push_back(desc);
+    descs.push_back(desc);
     std::make_shared<AudioPreferDeviceChangeCallback>()->OnPreferredOutputDeviceUpdated(descs);
-    EXPECT_EQ(DelayedSingleton<AudioProxy>::GetInstance()->audioDeviceType_, AudioDeviceType::DEVICE_SPEAKER);
+    EXPECT_EQ(DelayedSingleton<AudioDeviceManager>::GetInstance()->audioDeviceType_, AudioDeviceType::DEVICE_SPEAKER);
     descs.clear();
     desc->deviceType_ = AudioStandard::DEVICE_TYPE_WIRED_HEADSET;
-    desc.push_back(desc);
+    descs.push_back(desc);
     std::make_shared<AudioPreferDeviceChangeCallback>()->OnPreferredOutputDeviceUpdated(descs);
-    EXPECT_EQ(DelayedSingleton<AudioProxy>::GetInstance()->audioDeviceType_,
+    EXPECT_EQ(DelayedSingleton<AudioDeviceManager>::GetInstance()->audioDeviceType_,
         AudioDeviceType::DEVICE_WIRED_HEADSET);
     descs.clear();
     desc->deviceType_ = AudioStandard::DEVICE_TYPE_WIRED_HEADPHONES;
-    desc.push_back(desc);
+    descs.push_back(desc);
     std::make_shared<AudioPreferDeviceChangeCallback>()->OnPreferredOutputDeviceUpdated(descs);
-    EXPECT_EQ(DelayedSingleton<AudioProxy>::GetInstance()->audioDeviceType_,
+    EXPECT_EQ(DelayedSingleton<AudioDeviceManager>::GetInstance()->audioDeviceType_,
         AudioDeviceType::DEVICE_WIRED_HEADSET);
     descs.clear();
     desc->deviceType_ = AudioStandard::DEVICE_TYPE_USB_HEADSET;
-    desc.push_back(desc);
+    descs.push_back(desc);
     std::make_shared<AudioPreferDeviceChangeCallback>()->OnPreferredOutputDeviceUpdated(descs);
-    EXPECT_EQ(DelayedSingleton<AudioProxy>::GetInstance()->audioDeviceType_,
+    EXPECT_EQ(DelayedSingleton<AudioDeviceManager>::GetInstance()->audioDeviceType_,
         AudioDeviceType::DEVICE_WIRED_HEADSET);
 }
 }

@@ -556,18 +556,19 @@ int32_t AudioControlManager::HandleBluetoothOrNearlinkAudioDevice(const AudioDev
             }
             address = activeBluetoothDevice->macAddress_;
         } else {
-            AudioDevice preferredAuidoDevice;
-            if (!AudioDeviceManager::IsNearlinkActive(preferredAuidoDevice)) {
+            AudioDevice preferredAudioDevice;
+            if (!AudioDeviceManager::IsNearlinkActive(preferredAudioDevice)) {
                 TELEPHONY_LOGE("Get active nearlink device failed.");
                 return CALL_ERR_AUDIO_SET_AUDIO_DEVICE_FAILED;
             }
-            address = preferredAuidoDevice.address;
+            address = preferredAudioDevice.address;
         }
     }
     std::shared_ptr<AudioStandard::AudioDeviceDescriptor> audioDev =
         std::make_shared<AudioStandard::AudioDeviceDescriptor>();
     audioDev->macAddress_ = address;
-    audioDev->deviceType_ = AudioStandard::DEVICE_TYPE_BLUETOOTH_SCO;
+    audioDev->deviceType_ = (device.deviceType == AudioDeviceType::DEVICE_BLUETOOTH_SCO) ?
+        AudioStandard::DEVICE_TYPE_BLUETOOTH_SCO : AudioStandard::DEVICE_TYPE_NEARLINK;
     audioDev->deviceRole_ = AudioStandard::OUTPUT_DEVICE;
     audioDev->networkId_ = AudioStandard::LOCAL_NETWORK_ID;
     std::vector<std::shared_ptr<AudioDeviceDescriptor>> remoteDevice;

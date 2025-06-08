@@ -314,7 +314,7 @@ void AudioDeviceManager::ResetNearlinkAudioDevicesList()
         TELEPHONY_LOGI("Nearlink SA removed, init audio device");
         ProcessEvent(AudioEvent::INIT_AUDIO_DEVICE);
     }
-    TELEPHONY_LOGI("ResetBtAudioDevicesList success");
+    TELEPHONY_LOGI("ResetNearlinkAudioDevicesList success");
 }
 
 bool AudioDeviceManager::InitAudioDevice()
@@ -606,7 +606,7 @@ void AudioDeviceManager::UpdateNearlinkDevice(std::string &address, std::string 
         return;
     }
     AudioDevice device;
-    if (!IsNearlinkActive(device)) {
+    if (!IsNearlinkActived(device)) {
         TELEPHONY_LOGE("Get active nearlink device failed.");
         return;
     }
@@ -718,7 +718,6 @@ bool AudioDeviceManager::IsNearlinkActived(AudioDevice &device)
         return false;
     }
     if (device.deviceType != AudioDeviceType::DEVICE_NEARLINK || strlen(device.address) == 0) {
-        TELEPHONY_LOGE("Get active nearlink device failed.");
         return false;
     }
     return true;

@@ -116,7 +116,10 @@ public:
     /**
      * @brief report phone state change
      *
-     * @param info[out] the audio information, contains the audio device list, current audio device and ismuted.
+     * @param numActive[out] number of active calls
+     * @param numHeld[out] number of hold calls
+     * @param callState[out] call state
+     * @param number[out] phone number
      * @return Returns 0 on success, others on failure.
      */
     virtual int32_t OnPhoneStateChange(int32_t numActive, int32_t numHeld, int32_t callState,

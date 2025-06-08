@@ -114,7 +114,7 @@ std::vector<CallAttributeInfo> BluetoothCallProxy::GetCurrentCallList(int32_t sl
         SendRequest(BluetoothCallInterfaceCode::INTERFACE_BT_GET_CURRENT_CALL_LIST, dataParcel, replyParcel);
     if (error != TELEPHONY_SUCCESS) {
         TELEPHONY_LOGE("Function GetCurrentCallList call failed! errCode:%{public}d", error);
-        return callVec;
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
     int32_t vecCnt = replyParcel.ReadInt32();
     if (vecCnt <= 0 || vecCnt >= MAX_SIZE) {
@@ -135,7 +135,7 @@ int32_t BluetoothCallProxy::AddAudioDeviceList(const std::string &address, int32
     MessageParcel dataParcel;
     if (!dataParcel.WriteInterfaceToken(BluetoothCallProxy::GetDescriptor())) {
         TELEPHONY_LOGE("write descriptor fail");
-        return callVec;
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
     dataParcel.WriteString(address);
     dataParcel.WriteInt32(deviceType);
@@ -149,7 +149,7 @@ int32_t BluetoothCallProxy::RemoveAudioDeviceList(const std::string &address, in
     MessageParcel dataParcel;
     if (!dataParcel.WriteInterfaceToken(BluetoothCallProxy::GetDescriptor())) {
         TELEPHONY_LOGE("write descriptor fail");
-        return callVec;
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
     }
     dataParcel.WriteString(address);
     dataParcel.WriteInt32(deviceType);

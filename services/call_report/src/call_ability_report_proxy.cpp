@@ -460,7 +460,6 @@ int32_t CallAbilityReportProxy::ReportPhoneStateChange(int32_t numActive, int32_
             if (ret != TELEPHONY_SUCCESS) {
                 TELEPHONY_LOGW("ReportPhoneStateChange failed, errcode:%{public}d, bundleInfo:%{public}s", ret,
                     ((*it)->GetBundleInfo()).c_str());
-                continue;
             }
         }
     }
