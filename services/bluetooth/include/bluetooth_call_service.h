@@ -140,7 +140,7 @@ public:
      * @brief Add an audio device
      * @param address[in], The device address
      * @param deviceType[in], The device type
-     * @param deviceName[in], The device name
+     * @param name[in], The device name
      * @return Returns 0 on success, others on failure.
      */
     int32_t AddAudioDeviceList(const std::string &address, int32_t deviceType, const std::string &name) override;

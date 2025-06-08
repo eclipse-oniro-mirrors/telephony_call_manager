@@ -180,7 +180,7 @@ void AudioControlManager::VideoStateUpdated(
     CheckTypeAndSetAudioDevice(callObjectPtr, priorVideoState, nextVideoState, initDeviceType, device);
 }
 
-void AudioControlManager::CheckInitType(AudioDeviceType initDeviceType)
+bool AudioControlManager::CheckInitType(AudioDeviceType initDeviceType)
 {
     return (initDeviceType == AudioDeviceType::DEVICE_WIRED_HEADSET ||
         initDeviceType == AudioDeviceType::DEVICE_BLUETOOTH_SCO ||
