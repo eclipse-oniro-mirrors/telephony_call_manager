@@ -20,11 +20,11 @@
 #include "pac_map.h"
 
 #include "call_manager_callback.h"
-#include "call_manager_proxy.h"
 #include "i_bluetooth_call.h"
 
 namespace OHOS {
 namespace Telephony {
+class CallManagerProxy;
 class NearlinkCallClient : public DelayedRefSingleton<NearlinkCallClient> {
     DECLARE_DELAYED_REF_SINGLETON(NearlinkCallClient)
 public:

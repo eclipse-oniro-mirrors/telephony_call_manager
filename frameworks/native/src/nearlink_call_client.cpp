@@ -16,6 +16,7 @@
 #include "nearlink_call_client.h"
 
 #include <memory>
+#include "call_manager_proxy.h"
 #include "system_ability_definition.h"
 #include "telephony_errors.h"
 
@@ -55,6 +56,8 @@ void NearlinkCallClient::UnInit()
     }
 
     callManagerProxyPtr_->UnInit();
+    callManagerProxyPtr_ = nullptr;
+    bluetoothCallProxyPtr_ = nullptr;
 }
 
 int32_t NearlinkCallClient::RegisterCallBack(std::unique_ptr<CallManagerCallback> callback)
