@@ -401,6 +401,8 @@ HWTEST_F(ZeroBranch2Test, Telephony_CallObjectManager_001, Function | MediumTest
     csCall->SetCallType(CallType::TYPE_OTT);
     CallObjectManager::GetCallInfoList(SIM1_SLOTID);
     CallObjectManager::GetCallInfoList(DEFAULT_INDEX);
+    CallObjectManager::GetCallInfoList(DEFAULT_INDEX, false);
+    CallObjectManager::GetAllCallInfoList(false);    
     ASSERT_FALSE(res);
 }
 
