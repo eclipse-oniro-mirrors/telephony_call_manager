@@ -455,7 +455,7 @@ int32_t CallAbilityReportProxy::ReportPhoneStateChange(int32_t numActive, int32_
     std::lock_guard<std::mutex> lock(mutex_);
     std::list<sptr<ICallAbilityCallback>>::iterator it = callbackPtrList_.begin();
     for (; it != callbackPtrList_.end(); ++it) {
-        if ((*it)) {
+        if ((*it) != nullptr) {
             ret = (*it)->OnPhoneStateChange(numActive, numHeld, callState, number);
             if (ret != TELEPHONY_SUCCESS) {
                 TELEPHONY_LOGW("ReportPhoneStateChange failed, errcode:%{public}d, bundleInfo:%{public}s", ret,

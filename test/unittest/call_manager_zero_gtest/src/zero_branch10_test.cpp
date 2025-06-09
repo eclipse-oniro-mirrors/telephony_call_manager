@@ -282,13 +282,13 @@ HWTEST_F(ZeroBranch10Test, Telephony_AudioControlManager_002, TestSize.Level0)
     AudioDevice device;
     device.deviceType = AudioDeviceType::DEVICE_NEARLINK;
     auto audioControlManager = DelayedSingleton<AudioControlManager>::GetInstance();
-    EXPECT_EQ(audioControlManager->HandleBluetoothOrNearlinkAudioDevice(device),
+    EXPECT_EQ(audioControlManager->HandleWirelessAudioDevice(device),
         CALL_ERR_AUDIO_SET_AUDIO_DEVICE_FAILED);
     device.deviceType = AudioDeviceType::DEVICE_BLUETOOTH_SCO;
-    EXPECT_EQ(audioControlManager->HandleBluetoothOrNearlinkAudioDevice(device),
+    EXPECT_EQ(audioControlManager->HandleWirelessAudioDevice(device),
         CALL_ERR_AUDIO_SET_AUDIO_DEVICE_FAILED);
     strcpy_s(device.address, kMaxAddressLen, "1");
-    EXPECT_EQ(audioControlManager->HandleBluetoothOrNearlinkAudioDevice(device),
+    EXPECT_EQ(audioControlManager->HandleWirelessAudioDevice(device),
         CALL_ERR_AUDIO_SET_AUDIO_DEVICE_FAILED);
     audioControlManager->audioInterruptState_ = AudioInterruptState::INTERRUPT_STATE_ACTIVATED;
     EXPECT_NE(audioControlManager->GetInitAudioDeviceType(), AudioDeviceType::DEVICE_NEARLINK);

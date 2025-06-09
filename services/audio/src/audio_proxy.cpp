@@ -267,7 +267,7 @@ void AudioProxy::SetWiredHeadsetState(bool isConnected)
     isWiredHeadsetConnected_ = isConnected;
 }
 
-static int32_t SetCommonDevice(AudioDevice &device, AudioStandard::DeviceType deviceType,
+static int32_t SetWirelessAudioDevice(AudioDevice &device, AudioStandard::DeviceType deviceType,
     const std::vector<std::shared_ptr<AudioStandard::AudioDeviceDescriptor>> &desc)
 {
     device.deviceType = (deviceType == AudioStandard::DEVICE_TYPE_BLUETOOTH_SCO) ?
@@ -309,7 +309,7 @@ int32_t AudioProxy::GetPreferredOutputAudioDevice(AudioDevice &device, bool isNe
     switch (desc[0]->deviceType_) {
         case AudioStandard::DEVICE_TYPE_NEARLINK:
         case AudioStandard::DEVICE_TYPE_BLUETOOTH_SCO: {
-            int32_t result = SetCommonDevice(device, desc[0]->deviceType_, desc);
+            int32_t result = SetWirelessAudioDevice(device, desc[0]->deviceType_, desc);
             if (result != TELEPHONY_SUCCESS) {
                 return result;
             }
@@ -413,7 +413,7 @@ void AudioPreferDeviceChangeCallback::OnPreferredOutputDeviceUpdated(
     switch (desc[0]->deviceType_) {
         case AudioStandard::DEVICE_TYPE_NEARLINK:
         case AudioStandard::DEVICE_TYPE_BLUETOOTH_SCO:
-            if (SetCommonDevice(device, desc[0]->deviceType_, desc) != TELEPHONY_SUCCESS) {
+            if (SetWirelessAudioDevice(device, desc[0]->deviceType_, desc) != TELEPHONY_SUCCESS) {
                 return;
             }
             DelayedSingleton<AudioDeviceManager>::GetInstance()->SetCurrentAudioDevice(device);

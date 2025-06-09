@@ -180,7 +180,7 @@ void AudioControlManager::VideoStateUpdated(
     CheckTypeAndSetAudioDevice(callObjectPtr, priorVideoState, nextVideoState, initDeviceType, device);
 }
 
-bool AudioControlManager::CheckInitType(AudioDeviceType initDeviceType)
+bool AudioControlManager::IsExternalAudioDevice(AudioDeviceType initDeviceType)
 {
     return (initDeviceType == AudioDeviceType::DEVICE_WIRED_HEADSET ||
         initDeviceType == AudioDeviceType::DEVICE_BLUETOOTH_SCO ||
@@ -200,7 +200,7 @@ void AudioControlManager::CheckTypeAndSetAudioDevice(sptr<CallBase> &callObjectP
             TELEPHONY_LOGI("before modify set device to EARPIECE, now not set");
             return;
         }
-        if (CheckInitType(initDeviceType)) {
+        if (IsExternalAudioDevice(initDeviceType)) {
             device.deviceType = initDeviceType;
         }
         TELEPHONY_LOGI("set device type, type: %{public}d", static_cast<int32_t>(device.deviceType));
@@ -208,7 +208,7 @@ void AudioControlManager::CheckTypeAndSetAudioDevice(sptr<CallBase> &callObjectP
     } else if (!DelayedSingleton<DistributedCommunicationManager>::GetInstance()->IsAudioOnSink() &&
                !isSetAudioDeviceByUser_ && IsVideoCall(priorVideoState) && !IsVideoCall(nextVideoState)) {
         device.deviceType = AudioDeviceType::DEVICE_EARPIECE;
-        if (CheckInitType(initDeviceType)) {
+        if (IsExternalAudioDevice(initDeviceType)) {
             device.deviceType = initDeviceType;
         }
         TELEPHONY_LOGI("set device type, type: %{public}d", static_cast<int32_t>(device.deviceType));
@@ -236,7 +236,7 @@ void AudioControlManager::UpdateDeviceTypeForVideoOrSatelliteCall()
     AudioDeviceType initDeviceType = GetInitAudioDeviceType();
     if (IsVideoCall(foregroundCall->GetVideoStateType()) ||
         foregroundCall->GetCallType() == CallType::TYPE_SATELLITE) {
-        if (CheckInitType(initDeviceType)) {
+        if (IsExternalAudioDevice(initDeviceType)) {
             device.deviceType = initDeviceType;
         }
         TELEPHONY_LOGI("set device type, type: %{public}d", static_cast<int32_t>(device.deviceType));
@@ -497,7 +497,7 @@ int32_t AudioControlManager::SetAudioDevice(const AudioDevice &device, bool isBy
             return HandleDistributeAudioDevice(device);
         case AudioDeviceType::DEVICE_BLUETOOTH_SCO:
         case AudioDeviceType::DEVICE_NEARLINK: {
-            if (HandleBluetoothOrNearlinkAudioDevice(device) != TELEPHONY_SUCCESS) {
+            if (HandleWirelessAudioDevice(device) != TELEPHONY_SUCCESS) {
                 return CALL_ERR_AUDIO_SET_AUDIO_DEVICE_FAILED;
             }
             audioDeviceType = device.deviceType;
@@ -542,7 +542,7 @@ int32_t AudioControlManager::HandleDistributeAudioDevice(const AudioDevice &devi
     return TELEPHONY_SUCCESS;
 }
 
-int32_t AudioControlManager::HandleBluetoothOrNearlinkAudioDevice(const AudioDevice &device)
+int32_t AudioControlManager::HandleWirelessAudioDevice(const AudioDevice &device)
 {
     std::string address = device.address;
     if (address.empty()) {

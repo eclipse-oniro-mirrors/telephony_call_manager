@@ -20,6 +20,8 @@
 #include "pac_map.h"
 
 #include "call_manager_callback.h"
+#include "call_manager_proxy.h"
+#include "i_bluetooth_call.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -103,6 +105,9 @@ public:
      * @return Returns 0 on success, others on failure.
      */
     int32_t ResetNearlinkDeviceList();
+private:
+    std::shared_ptr<CallManagerProxy> callManagerProxyPtr_ = nullptr;
+    sptr<IBluetoothCall> bluetoothCallProxyPtr_ = nullptr;
 };
 }
 }
