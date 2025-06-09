@@ -567,6 +567,7 @@ void CallStatusManager::SetContactInfo(sptr<CallBase> &call, std::string phoneNu
 
 void CallStatusManager::DealVideoRingPath(ContactInfo &contactInfo, sptr<CallBase> &callObjectPtr)
 {
+    int32_t userId = 0;
     bool isStartBroadcast = CallVoiceAssistantManager::GetInstance()->IsStartVoiceBroadcast();
     if (isStartBroadcast) {
         TELEPHONY_LOGI("Incoming call broadcast is on.");
