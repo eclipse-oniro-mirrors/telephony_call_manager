@@ -200,7 +200,7 @@ void VoipCallConnection::ClearVoipCall()
             //通知界面，voipcall异常，界面销毁
             TelCallState currentState = call->GetTelCallState();
             if (currentState != TelCallState::CALL_STATUS_DISCONNECTED) {
-                call->SetTelCallState(TelCallState::CALL_STATUS_DISCONNECTED)
+                call->SetTelCallState(TelCallState::CALL_STATUS_DISCONNECTED);
             }
             CallObjectManager::ClearVoipCall(call);
         }

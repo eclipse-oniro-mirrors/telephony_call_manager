@@ -91,10 +91,9 @@ void ReportCallInfoHandler::ClearVoipCall(sptr<CallBase> &call)
         TELEPHONY_LOGE("callStatusManagerPtr_ is null");
         return;
     }
-    CallDetailInfo callDetailInfo = info;
     std::weak_ptr<CallStatusManager> callStatusManagerPtr = callStatusManagerPtr_;
     TELEPHONY_LOGW("UpdateCallReportInfo submit task enter");
-    reportCallInfoQueue.submit([callStatusManagerPtr, callDetatilInfo, call]() {
+    reportCallInfoQueue.submit([callStatusManagerPtr, callDetatilInfo, &call]() {
         std::shared_ptr<CallStatusManager> managerPtr = callStatusManagerPtr.lock();
         if (managerPtr == nullptr) {
             TELEPHONY_LOGE("managerPtr is null");
