@@ -401,9 +401,9 @@ std::vector<CallAttributeInfo> BluetoothCallService::GetCurrentCallList(int32_t 
         return vec;
     }
     if (slotId < 0) {
-        return GetAllCallInfoList();
+        return GetAllCallInfoList(false);
     }
-    return GetCallInfoList(slotId);
+    return GetCallInfoList(slotId, false);
 }
 } // namespace Telephony
 } // namespace OHOS
