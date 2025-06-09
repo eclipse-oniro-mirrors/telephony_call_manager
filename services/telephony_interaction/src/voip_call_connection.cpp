@@ -197,7 +197,12 @@ void VoipCallConnection::ClearVoipCall()
     for (auto call : allCallList) {
         if (call != nullptr && call->GetCallType() == CallType::TYPE_VOIP) {
             TELEPHONY_LOGI("clearVoipCall callId %{public}d", call->GetCallID());
-            CallObjectManager::DeleteOneCallObject(call);
+            //通知界面，voipcall异常，界面销毁
+            TelCallState currentState = call->GetTelCallState();
+            if (currentState != TelCallState::CALL_STATUS_DISCONNECTED) {
+                call->SetTelCallState(TelCallState::CALL_STATUS_DISCONNECTED)
+            }
+            CallObjectManager::ClearVoipCall(call);
         }
     }
 }

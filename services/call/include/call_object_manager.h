@@ -99,6 +99,7 @@ public:
     static int32_t GetCallNumByRunningState(CallRunningState callState);
     static sptr<CallBase> GetForegroundLiveCallByCallId(int32_t callId);
     static bool IsNeedSilentInDoNotDisturbMode();
+    static void ClearVoipCall(sptr<CallBase> &call);
 #ifdef NOT_SUPPORT_MULTICALL
     static bool IsTwoCallBtCallAndESIM();
     static bool IsTwoCallBtCall();

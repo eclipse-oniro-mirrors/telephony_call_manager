@@ -29,6 +29,7 @@ class ReportCallInfoHandler : public std::enable_shared_from_this<ReportCallInfo
 public:
     void Init();
     int32_t UpdateCallReportInfo(const CallDetailInfo &info);
+    void ClearVoipCall(sptr<CallBase> &call);
     int32_t UpdateCallsReportInfo(CallDetailsInfo &info);
     int32_t UpdateDisconnectedCause(const DisconnectedDetails &details);
     int32_t UpdateEventResultInfo(const CellularCallEventInfo &info);

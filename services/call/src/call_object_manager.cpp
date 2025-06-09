@@ -1072,6 +1072,12 @@ bool CallObjectManager::IsNeedSilentInDoNotDisturbMode()
     }
     return false;
 }
+
+void CallObjectManager::ClearVoipCall(sptr<CallBase> &call)
+{
+    DelayedSingleton<ReportCallInfoHandler>::GetInstance()->ClearVoipCall(call);
+}
+
 #ifdef NOT_SUPPORT_MULTICALL
 bool CallObjectManager::IsTwoCallBtCallAndESIM()
 {
