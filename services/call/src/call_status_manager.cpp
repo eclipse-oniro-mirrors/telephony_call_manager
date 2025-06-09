@@ -568,6 +568,13 @@ void CallStatusManager::SetContactInfo(sptr<CallBase> &call, std::string phoneNu
 void CallStatusManager::DealVideoRingPath(ContactInfo &contactInfo, sptr<CallBase> &callObjectPtr)
 {
     int32_t userId = 0;
+    bool isUserUnlocked = false;
+    AccountSA::OsAccountManager::GetForegroundOsAccountLocalId(userId);
+    AccountSA::OsAccountManager::IsOsAccountVerified(userId, isUserUnlocked);
+    TELEPHONY_LOGI("isUserUnlocked: %{public}d", isUserUnlocked);
+    if (!isUserUnlocked) {
+        return;
+    }
     bool isStartBroadcast = CallVoiceAssistantManager::GetInstance()->IsStartVoiceBroadcast();
     if (isStartBroadcast) {
         TELEPHONY_LOGI("Incoming call broadcast is on.");
