@@ -319,11 +319,14 @@ HWTEST_F(ZeroBranch10Test, Telephony_AudioDeviceManager_001, TestSize.Level0)
     std::string address = "1";
     std::string deviceName = "1";
     audioDeviceManager->UpdateNearlinkDevice(address, deviceName);
+    audioDeviceManager->UpdateBtDevice(address, deviceName);
     address = "";
     audioDeviceManager->UpdateNearlinkDevice(address, deviceName);
+    audioDeviceManager->UpdateBtDevice(address, deviceName);
     address = "1";
     deviceName = "";
     audioDeviceManager->UpdateNearlinkDevice(address, deviceName);
+    audioDeviceManager->UpdateBtDevice(address, deviceName);
     EXPECT_EQ(audioDeviceManager->info_.currentAudioDevice.deviceType, AudioDeviceType::DEVICE_NEARLINK);
     EXPECT_TRUE(audioDeviceManager->ConvertAddress().empty());
 }
