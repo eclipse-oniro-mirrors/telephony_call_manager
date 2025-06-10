@@ -149,28 +149,6 @@ void SpecialBranch0Test::TearDown()
 }
 
 /**
- * @tc.number   Telephony_NumberIdentityServiceHelper_002
- * @tc.name     test branch
- * @tc.desc     Function test
- */
-HWTEST_F(SpecialBranch0Test, Telephony_NumberIdentityServiceHelper_002, TestSize.Level0)
-{
-    auto &help = DelayedRefSingleton<NumberIdentityServiceHelper>::GetInstance();
-    ConnectedCallback onConnected = [&help](sptr<IRemoteObject> remote) {
-        TELEPHONY_LOGI("NumberIdentityService async notify end.");
-        if (help.working_) {
-            TELEPHONY_LOGI("NumberIdentityService notify task is working, skip this notify.");
-        }
-    };
-    DisconnectedCallback onDisconnected = [&help]() {
-        TELEPHONY_LOGI("NumberIdentityService notify task disconnected.");
-        if (help.working_) {
-            TELEPHONY_LOGI("NumberIdentityService notify task is working, skip this notify.");
-        }
-    };
-}
-
-/**
  * @tc.number   Telephony_NumberIdentityServiceHelper_003
  * @tc.name     test branch
  * @tc.desc     Function test
