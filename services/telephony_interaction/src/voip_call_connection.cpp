@@ -22,6 +22,7 @@
 #include "system_ability_definition.h"
 #include "telephony_log_wrapper.h"
 #include "voip_call_manager_proxy.h"
+#include "report_call_info_handler.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -202,7 +203,7 @@ void VoipCallConnection::ClearVoipCall()
             if (currentState != TelCallState::CALL_STATUS_DISCONNECTED) {
                 call->SetTelCallState(TelCallState::CALL_STATUS_DISCONNECTED);
             }
-            CallObjectManager::ClearVoipCall(call);
+            DelayedSingleton<ReportCallInfoHandler>::GetInstance()->ClearVoipCall(call);
         }
     }
 }
