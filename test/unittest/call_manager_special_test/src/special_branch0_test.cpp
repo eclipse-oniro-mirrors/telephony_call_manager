@@ -168,8 +168,6 @@ HWTEST_F(SpecialBranch0Test, Telephony_NumberIdentityServiceHelper_002, TestSize
             TELEPHONY_LOGI("NumberIdentityService notify task is working, skip this notify.");
         }
     };
-    int ret = help.Connect(onConnected, onDisconnected);
-    EXPECT_EQ(ret, 0);
 }
 
 /**

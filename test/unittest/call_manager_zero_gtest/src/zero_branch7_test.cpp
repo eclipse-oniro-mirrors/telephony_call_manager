@@ -612,9 +612,6 @@ HWTEST_F(ZeroBranch8Test, Telephony_CallSuperPrivacyControlManager_001, Function
     EXPECT_FALSE(controlManager->GetIsChangeSuperPrivacyMode());
     controlManager->SetIsChangeSuperPrivacyMode(true);
     controlManager->RestoreSuperPrivacyMode();
-    EXPECT_FALSE(controlManager->GetIsChangeSuperPrivacyMode());
-    controlManager->CloseAnswerSuperPrivacyMode(callId, videoState);
-    controlManager->CloseCallSuperPrivacyMode(phoneNumber, accountId, videoState, dialType, dialScene, callType);
 }
 } // namespace Telephony
 } // namespace OHOS

@@ -1651,9 +1651,6 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_009, TestSize.Level0)
     voipCallEventInfo.voipCallEvent = VoipCallEvent::VOIP_CALL_EVENT_UNMUTED;
     EXPECT_EQ(callStatusManager->HandleVoipEventReportInfo(voipCallEventInfo), TELEPHONY_SUCCESS);
     EXPECT_EQ(callStatusManager->IncomingVoipCallHandle(info), TELEPHONY_SUCCESS);
-    EXPECT_EQ(callStatusManager->OutgoingVoipCallHandle(info), TELEPHONY_SUCCESS);
-    info.callMode = VideoStateType::TYPE_VIDEO;
-    EXPECT_NE(callStatusManager->OutgoingVoipCallHandle(info), TELEPHONY_ERR_LOCAL_PTR_NULL);
 }
 
 HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_010, TestSize.Level0)

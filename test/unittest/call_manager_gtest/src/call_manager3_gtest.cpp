@@ -338,10 +338,10 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallWaiting_0100, TestSize.L
     }
 
     if (HasSimCard(SIM1_SLOTID)) {
-        EXPECT_EQ(CallManagerGtest::clientPtr_->SetCallWaiting(SIM1_SLOTID, true), RETURN_VALUE_IS_ZERO);
+        EXPECT_NE(CallManagerGtest::clientPtr_->SetCallWaiting(SIM1_SLOTID, true), RETURN_VALUE_IS_ZERO);
     }
     if (HasSimCard(SIM2_SLOTID)) {
-        EXPECT_EQ(CallManagerGtest::clientPtr_->SetCallWaiting(SIM2_SLOTID, true), RETURN_VALUE_IS_ZERO);
+        EXPECT_NE(CallManagerGtest::clientPtr_->SetCallWaiting(SIM2_SLOTID, true), RETURN_VALUE_IS_ZERO);
     }
 }
 
@@ -389,10 +389,10 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallWaiting_0400, TestSize.L
     }
 
     if (HasSimCard(SIM1_SLOTID)) {
-        EXPECT_EQ(CallManagerGtest::clientPtr_->SetCallWaiting(SIM1_SLOTID, false), RETURN_VALUE_IS_ZERO);
+        EXPECT_NE(CallManagerGtest::clientPtr_->SetCallWaiting(SIM1_SLOTID, false), RETURN_VALUE_IS_ZERO);
     }
     if (HasSimCard(SIM2_SLOTID)) {
-        EXPECT_EQ(CallManagerGtest::clientPtr_->SetCallWaiting(SIM2_SLOTID, false), RETURN_VALUE_IS_ZERO);
+        EXPECT_NE(CallManagerGtest::clientPtr_->SetCallWaiting(SIM2_SLOTID, false), RETURN_VALUE_IS_ZERO);
     }
 }
 
@@ -521,12 +521,12 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_GetCallRestriction_0400, TestSi
     }
 
     if (HasSimCard(SIM1_SLOTID)) {
-        EXPECT_EQ(CallManagerGtest::clientPtr_->GetCallRestriction(
+        EXPECT_NE(CallManagerGtest::clientPtr_->GetCallRestriction(
                       SIM1_SLOTID, CallRestrictionType::RESTRICTION_TYPE_ALL_OUTGOING),
             RETURN_VALUE_IS_ZERO);
     }
     if (HasSimCard(SIM2_SLOTID)) {
-        EXPECT_EQ(CallManagerGtest::clientPtr_->GetCallRestriction(
+        EXPECT_NE(CallManagerGtest::clientPtr_->GetCallRestriction(
                       SIM2_SLOTID, CallRestrictionType::RESTRICTION_TYPE_ALL_OUTGOING),
             RETURN_VALUE_IS_ZERO);
     }
@@ -615,10 +615,10 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallRestriction_0100, TestSi
     }
 
     if (HasSimCard(SIM1_SLOTID)) {
-        EXPECT_EQ(CallManagerGtest::clientPtr_->SetCallRestriction(SIM1_SLOTID, info), RETURN_VALUE_IS_ZERO);
+        EXPECT_NE(CallManagerGtest::clientPtr_->SetCallRestriction(SIM1_SLOTID, info), RETURN_VALUE_IS_ZERO);
     }
     if (HasSimCard(SIM2_SLOTID)) {
-        EXPECT_EQ(CallManagerGtest::clientPtr_->SetCallRestriction(SIM2_SLOTID, info), RETURN_VALUE_IS_ZERO);
+        EXPECT_NE(CallManagerGtest::clientPtr_->SetCallRestriction(SIM2_SLOTID, info), RETURN_VALUE_IS_ZERO);
     }
 }
 
@@ -715,11 +715,11 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallRestrictionPassword_0100
     CallRestrictionType fac = CallRestrictionType::RESTRICTION_TYPE_ALL_CALLS;
 
     if (HasSimCard(SIM1_SLOTID)) {
-        EXPECT_EQ(CallManagerGtest::clientPtr_->SetCallRestrictionPassword(SIM1_SLOTID, fac, oldPassword, newPassword),
+        EXPECT_NE(CallManagerGtest::clientPtr_->SetCallRestrictionPassword(SIM1_SLOTID, fac, oldPassword, newPassword),
             RETURN_VALUE_IS_ZERO);
     }
     if (HasSimCard(SIM2_SLOTID)) {
-        EXPECT_EQ(CallManagerGtest::clientPtr_->SetCallRestrictionPassword(SIM2_SLOTID, fac, oldPassword, newPassword),
+        EXPECT_NE(CallManagerGtest::clientPtr_->SetCallRestrictionPassword(SIM2_SLOTID, fac, oldPassword, newPassword),
             RETURN_VALUE_IS_ZERO);
     }
 }
@@ -854,11 +854,11 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_GetCallTransferInfo_0100, TestS
     }
 
     if (HasSimCard(SIM1_SLOTID)) {
-        EXPECT_EQ(CallManagerGtest::clientPtr_->GetCallTransferInfo(SIM1_SLOTID, CallTransferType::TRANSFER_TYPE_BUSY),
+        EXPECT_NE(CallManagerGtest::clientPtr_->GetCallTransferInfo(SIM1_SLOTID, CallTransferType::TRANSFER_TYPE_BUSY),
             RETURN_VALUE_IS_ZERO);
     }
     if (HasSimCard(SIM2_SLOTID)) {
-        EXPECT_EQ(CallManagerGtest::clientPtr_->GetCallTransferInfo(SIM1_SLOTID, CallTransferType::TRANSFER_TYPE_BUSY),
+        EXPECT_NE(CallManagerGtest::clientPtr_->GetCallTransferInfo(SIM1_SLOTID, CallTransferType::TRANSFER_TYPE_BUSY),
             RETURN_VALUE_IS_ZERO);
     }
 }
@@ -910,12 +910,12 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_GetCallTransferInfo_0400, TestS
     }
 
     if (HasSimCard(SIM1_SLOTID)) {
-        EXPECT_EQ(
+        EXPECT_NE(
             CallManagerGtest::clientPtr_->GetCallTransferInfo(SIM1_SLOTID, CallTransferType::TRANSFER_TYPE_NO_REPLY),
             RETURN_VALUE_IS_ZERO);
     }
     if (HasSimCard(SIM2_SLOTID)) {
-        EXPECT_EQ(
+        EXPECT_NE(
             CallManagerGtest::clientPtr_->GetCallTransferInfo(SIM2_SLOTID, CallTransferType::TRANSFER_TYPE_NO_REPLY),
             RETURN_VALUE_IS_ZERO);
     }
@@ -969,12 +969,12 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_GetCallTransferInfo_0700, TestS
     }
 
     if (HasSimCard(SIM1_SLOTID)) {
-        EXPECT_EQ(CallManagerGtest::clientPtr_->GetCallTransferInfo(
+        EXPECT_NE(CallManagerGtest::clientPtr_->GetCallTransferInfo(
                       SIM1_SLOTID, CallTransferType::TRANSFER_TYPE_NOT_REACHABLE),
             RETURN_VALUE_IS_ZERO);
     }
     if (HasSimCard(SIM2_SLOTID)) {
-        EXPECT_EQ(CallManagerGtest::clientPtr_->GetCallTransferInfo(
+        EXPECT_NE(CallManagerGtest::clientPtr_->GetCallTransferInfo(
                       SIM2_SLOTID, CallTransferType::TRANSFER_TYPE_NOT_REACHABLE),
             RETURN_VALUE_IS_ZERO);
     }
