@@ -207,7 +207,8 @@ void CloseToEarMotionEventCallback(const Rosen::MotionSensorEvent &motionData)
             };
             if (dialingCall != nullptr || activeCall != nullptr) {
                 if (deviceType == AudioDeviceType::DEVICE_SPEAKER ||
-                    deviceType == AudioDeviceType::DEVICE_BLUETOOTH_SCO) {
+                    deviceType == AudioDeviceType::DEVICE_BLUETOOTH_SCO ||
+                    deviceType == AudioDeviceType::DEVICE_NEARLINK) {
                         TELEPHONY_LOGI("current deviceType = %{public}d, det audioDevice to earpiece",
                             static_cast<int32_t>(deviceType));
                         controlManager->SetAudioDevice(device);

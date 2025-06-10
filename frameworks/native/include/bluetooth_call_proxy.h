@@ -146,6 +146,35 @@ public:
      */
     std::vector<CallAttributeInfo> GetCurrentCallList(int32_t slotId) override;
 
+    /**
+     * AddAudioDeviceList
+     *
+     * @brief Add an audio device
+     * @param address[in], The device address
+     * @param deviceType[in], The device type
+     * @param name[in], The device name
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t AddAudioDeviceList(const std::string &address, int32_t deviceType, const std::string &name) override;
+
+    /**
+     * RemoveAudioDeviceList
+     *
+     * @brief Remove an audio device
+     * @param address[in], The device address
+     * @param deviceType[in], The device type
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t RemoveAudioDeviceList(const std::string &address, int32_t deviceType) override;
+
+    /**
+     * ResetNearlinkDeviceList
+     *
+     * @brief Reset all nearlink devices
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t ResetNearlinkDeviceList() override;
+
 private:
     int32_t SendRequest(BluetoothCallInterfaceCode code);
     int32_t SendRequest(BluetoothCallInterfaceCode code, MessageParcel &dataParcel, MessageParcel &replyParcel);

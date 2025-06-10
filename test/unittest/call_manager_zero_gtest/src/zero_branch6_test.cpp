@@ -942,6 +942,7 @@ HWTEST_F(ZeroBranch5Test, Telephony_CallAbilityCallbackProxy_001, TestSize.Level
     callAbilityCallbackProxy.OnReportAudioDeviceChange(audioDeviceInfo);
     const std::string str {"123"};
     callAbilityCallbackProxy.OnReportPostDialDelay(str);
+    callAbilityCallbackProxy.OnPhoneStateChange(0, 0, 0, "");
     ASSERT_TRUE(!str.empty());
 }
 

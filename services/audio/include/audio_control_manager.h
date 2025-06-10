@@ -113,7 +113,7 @@ private:
     bool IsBtOrWireHeadPlugin();
     void ProcessAudioWhenCallActive(sptr<CallBase> &callObjectPtr);
     int32_t HandleDistributeAudioDevice(const AudioDevice &device);
-    int32_t HandleBluetoothAudioDevice(const AudioDevice &device);
+    int32_t HandleWirelessAudioDevice(const AudioDevice &device);
     void SendMuteRingEvent();
     bool IsRingingVibrateModeOn();
     bool IsVoIPCallActived();
@@ -124,6 +124,7 @@ private:
     int32_t GetBackupVoiceVolume();
     void RestoreVoiceValumeIfNecessary();
     void PostProcessRingtone();
+    bool IsExternalAudioDevice(AudioDeviceType initDeviceType);
     ToneState toneState_ = ToneState::STOPPED;
     SoundState soundState_ = SoundState::STOPPED;
     bool isLocalRingbackNeeded_ = false;

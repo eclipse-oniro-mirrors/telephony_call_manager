@@ -428,6 +428,12 @@ HWTEST_F(ZeroBranch4Test, Telephony_BluetoothCallStub_001, TestSize.Level0)
     ASSERT_EQ(result, TELEPHONY_SUCCESS);
     result = bluetoothCallService->OnGetCurrentCallList(messageParcel, reply);
     ASSERT_EQ(result, TELEPHONY_SUCCESS);
+    result = bluetoothCallService->OnAddAudioDeviceList(messageParcel, reply);
+    ASSERT_EQ(result, TELEPHONY_ERR_PERMISSION_ERR);
+    result = bluetoothCallService->OnRemoveAudioDeviceList(messageParcel, reply);
+    ASSERT_EQ(result, TELEPHONY_ERR_PERMISSION_ERR);
+    result = bluetoothCallService->OnResetNearlinkDeviceList(messageParcel, reply);
+    ASSERT_EQ(result, TELEPHONY_ERR_PERMISSION_ERR);
 }
 
 /**
