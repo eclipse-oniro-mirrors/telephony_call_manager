@@ -387,10 +387,10 @@ int32_t CallManagerClient::IsRinging(bool &enabled)
     }
 }
 
-bool CallManagerClient::HasCall()
+bool CallManagerClient::HasCall(const bool isInCludeVoipCall)
 {
     if (g_callManagerProxy != nullptr) {
-        return g_callManagerProxy->HasCall();
+        return g_callManagerProxy->HasCall(isInCludeVoipCall);
     } else {
         TELEPHONY_LOGE("init first please!");
         return false;

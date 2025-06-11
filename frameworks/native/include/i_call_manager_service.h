@@ -50,7 +50,7 @@ public:
     virtual int32_t HoldCall(int32_t callId) = 0;
     virtual int32_t UnHoldCall(int32_t callId) = 0;
     virtual int32_t SwitchCall(int32_t callId) = 0;
-    virtual bool HasCall() = 0;
+    virtual bool HasCall(const bool isInCludeVoipCall = true) = 0;
     virtual int32_t IsNewCallAllowed(bool &enabled) = 0;
     virtual int32_t SetMuted(bool isMute) = 0;
     virtual int32_t MuteRinger() = 0;

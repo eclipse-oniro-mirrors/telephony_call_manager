@@ -77,7 +77,7 @@ public:
     int32_t StopDtmf(int32_t callId);
     int32_t PostDialProceed(int32_t callId, bool proceed);
     int32_t IsRinging(bool &enabled);
-    bool HasCall();
+    bool HasCall(const bool isInCludeVoipCall = true);
     int32_t IsNewCallAllowed(bool &enabled);
     int32_t RegisterVoipCallManagerCallback();
     int32_t UnRegisterVoipCallManagerCallback();
