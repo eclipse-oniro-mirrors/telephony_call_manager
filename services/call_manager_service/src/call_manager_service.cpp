@@ -446,10 +446,15 @@ int32_t CallManagerService::SwitchCall(int32_t callId)
     }
 }
 
-bool CallManagerService::HasCall()
+bool CallManagerService::HasCall(const bool isInCludeVoipCall)
 {
+    TELEPHONY_LOGI("isInCludeVoipCall = %{public}d", isInCludeVoipCall);
     if (callControlManagerPtr_ != nullptr) {
-        return callControlManagerPtr_->HasCall();
+        if (isInCludeVoipCall) {
+            return callControlManagerPtr_->HasCall();
+        } else {
+            return callControlManagerPtr_->HasCellularCallExist();
+        }
     } else {
         TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");
         return false;
