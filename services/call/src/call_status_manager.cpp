@@ -615,7 +615,7 @@ bool CallStatusManager::IsSetSystemVideoRing(sptr<CallBase> &callObjectPtr)
     }
     Media::ToneAttrs toneAttrs = systemSoundManager->GetCurrentRingtoneAttribute(type);
     TELEPHONY_LOGI("type: %{public}d, mediatype: %{public}d", type, toneAttrs.GetMediaType());
-    if (toneAttrs.GetMediaType() == Media::MediaType::MEDIA_TYPE_VID) {
+    if (toneAttrs.GetMediaType() == Media::ToneMediaType::MEDIA_TYPE_VID) {
         return true;
     } else {
         return false;

@@ -52,7 +52,6 @@ ohos_executable("tel_call_manager_ui_test") {
     "player_framework:system_sound_client",
     "safwk:system_ability_fwk",
     "samgr:samgr_proxy",
-    "media_foundation:media_monitor_common",
   ]
 
   defines = [
