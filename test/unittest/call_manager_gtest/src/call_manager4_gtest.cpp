@@ -635,7 +635,6 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_StartDtmf_0400, Function | Medi
         (int32_t)DialType::DIAL_CARRIER_TYPE);
     int32_t ret = CallManagerGtest::clientPtr_->DialCall(Str8ToStr16(phoneNumber), dialInfo_);
     EXPECT_GE(ret, RETURN_VALUE_IS_ZERO);
-    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_OFFHOOK, SLEEP_200_MS, SLEEP_30000_MS);
     if (CallInfoManager::HasActiveStatus()) {
         EXPECT_GE(CallManagerGtest::clientPtr_->StartDtmf(g_newCallId, '1'), RETURN_VALUE_IS_ZERO);
     }
@@ -712,7 +711,6 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_StopDtmf_0400, Function | Mediu
         (int32_t)DialType::DIAL_CARRIER_TYPE);
     int32_t ret = CallManagerGtest::clientPtr_->DialCall(Str8ToStr16(phoneNumber), dialInfo_);
     EXPECT_GE(ret, RETURN_VALUE_IS_ZERO);
-    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_OFFHOOK, SLEEP_200_MS, SLEEP_30000_MS);
     if (CallInfoManager::HasActiveStatus()) {
         sleep(WAIT_TIME);
         EXPECT_EQ(CallManagerGtest::clientPtr_->StopDtmf(g_newCallId), RETURN_VALUE_IS_ZERO);
@@ -776,8 +774,6 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_PostDialProceed_0300, TestSize.
             (int32_t)DialType::DIAL_CARRIER_TYPE);
         int32_t ret = CallManagerGtest::clientPtr_->DialCall(Str8ToStr16("10086;123"), dialInfo_);
         EXPECT_EQ(ret, RETURN_VALUE_IS_ZERO);
-        CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_OFFHOOK, SLEEP_200_MS,
-            SLEEP_30000_MS);
         if (CallInfoManager::HasActiveStatus()) {
             sleep(1);
             EXPECT_EQ(CallManagerGtest::clientPtr_->PostDialProceed(g_newCallId, true), RETURN_VALUE_IS_ZERO);
@@ -792,8 +788,6 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_PostDialProceed_0300, TestSize.
             (int32_t)DialType::DIAL_CARRIER_TYPE);
         int32_t ret = CallManagerGtest::clientPtr_->DialCall(Str8ToStr16("10086;456"), dialInfo_);
         EXPECT_EQ(ret, RETURN_VALUE_IS_ZERO);
-        CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_OFFHOOK, SLEEP_200_MS,
-            SLEEP_30000_MS);
         if (CallInfoManager::HasActiveStatus()) {
             sleep(1);
             EXPECT_EQ(CallManagerGtest::clientPtr_->PostDialProceed(g_newCallId, true), RETURN_VALUE_IS_ZERO);
