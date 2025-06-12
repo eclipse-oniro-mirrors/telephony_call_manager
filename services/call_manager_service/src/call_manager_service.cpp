@@ -1695,9 +1695,24 @@ int32_t CallManagerService::SendCallUiEvent(int32_t callId, std::string &eventNa
         }
         return TELEPHONY_ERR_FAIL;
     } else if (eventName == "EVENT_CELIA_AUTO_ANSWER_CALL_ON" || eventName == "EVENT_CELIA_AUTO_ANSWER_CALL_OFF") {
-        return HandleCeliaAutoAnswerCall(callId, eventName == "EVENT_CELIA_AUTO_ANSWER_CALL_ON");
+        return HandleVoIPCallEvent(callId, eventName == "EVENT_CELIA_AUTO_ANSWER_CALL_ON");
     }
     return TELEPHONY_SUCCESS;
+}
+
+int32_t CallManagerService::HandleVoIPCallEvent(int32_t callId, std::string &eventName)
+{
+    AppExecFwk::PacMap mPacMap;
+    sptr<CallBase> call = CallObjectManager::GetOneCallObject(callId);
+    if (call->GetCallType() == CallType::TYPE_VOIP) {
+        CallAttributeInfo info;
+        call->GetCallAttributeInfo(info);
+        mPacMap.PutStringValue("callId", info.voipCallInfo.voipCallId);
+    }
+    mPacMap.PutStringValue("eventName", eventNmae);
+    mPacMap.PutStringValue("publishTime", std::chrono::duration_cast<std::chrono::milliseconds>
+        (std::chrono::system_clock::now().time_since_epoch()).count());
+    return DelayedSingleton<VoipCallConnection>::GetInstance()->SendCallUiEventForWindow(mPacMap)
 }
 
 int32_t CallManagerService::HandleDisplaySpecifiedCallPage(int32_t callId)

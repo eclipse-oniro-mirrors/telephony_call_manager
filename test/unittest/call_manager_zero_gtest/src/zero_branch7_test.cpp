@@ -598,6 +598,10 @@ HWTEST_F(ZeroBranch8Test, Telephony_VoipCallConnection_001, Function | MediumTes
     CallAudioEvent callAudioEvent = CallAudioEvent::AUDIO_EVENT_MUTED;
     std::string voipCallId = "123";
     EXPECT_NE(voipCallConnection->SendCallUiEvent(voipCallId, callAudioEvent), TELEPHONY_ERROR);
+    AppExecFwk::PacMap extras;
+    voipCallConnection->SendCallUiEventForWindow(extras);
+    voipCallConnection->VoipCallManagerInterfacePtr_ = nullptr;
+    voipCallConnection->SendCallUiEventForWindow(extras);
 }
 
 HWTEST_F(ZeroBranch8Test, Telephony_CallSuperPrivacyControlManager_001, Function | MediumTest | Level1)

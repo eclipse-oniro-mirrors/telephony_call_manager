@@ -816,6 +816,7 @@ private:
     int32_t dealCeliaCallEvent(int32_t callId);
     int32_t HandleDisplaySpecifiedCallPage(int32_t callId);
     int32_t HandleCeliaAutoAnswerCall(int32_t callId, bool enable);
+    int32_t HandleVoIPCallEvent(int32_t callId, std::string &eventName) override;
 
 private:
     enum ServiceRunningState {

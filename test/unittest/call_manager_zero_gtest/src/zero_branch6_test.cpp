@@ -617,6 +617,7 @@ HWTEST_F(ZeroBranch5Test, Telephony_VoipCallManagerProxy_001, TestSize.Level0)
         std::vector<uint8_t> userProfile = { 0 };
         int32_t ret1 = voipCallManagerInterfacePtr->ReportIncomingCall(mPacMap, userProfile, error);
         int32_t ret2 = voipCallManagerInterfacePtr->ReportIncomingCallError(mPacMap);
+        voipCallManagerInterfacePtr->SendCallUiEventForWindow(mPacMap);
         VoipCallState voipCallState = VoipCallState::VOIP_CALL_STATE_ACTIVE;
         VoipCallType voipCallType = VoipCallType::VOIP_CALL_VOICE;
         std::string callId = "123";

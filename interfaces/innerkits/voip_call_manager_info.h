@@ -96,6 +96,20 @@ enum class VoipCallType {
 };
 
 /**
+ * @brief Indicates the live video pane is released successfully or fails to be released.
+ */
+enum class LiveVideWindowEvent {
+    /**
+     * Indicates the live video window is released successfully.
+     */
+    LIVE_VIDEO_WINDOW_EVENT_SUCCESS = 0,
+    /**
+     * Indicates failed to publish the live video window.
+     */
+    LIVE_VIDEO_WINDOW_EVENT_FAIL,
+};
+
+/**
  * @brief Indicates the voip call attribute.
  */
 struct VoipCallAttribute {
@@ -310,6 +324,9 @@ enum class VoIPCallStatus : uint32_t {
 
     VOIP_MANAGER_BUSY = 6,
     VOIP_MANAGER_OTHER_REASON = 7,
+
+    LIVE_VIDEO_PUBLISH_SUCCESSED = 13,
+    LIVE_VIDEO_PUBLISH_FAILED = 14,
 
     EXTENSION_LOAD_SUCCEED = 20,
     EXTENSION_LOAD_FAILED = 21,
