@@ -44,6 +44,7 @@ public:
     int32_t RegisterCallManagerCallBack(const sptr<ICallStatusCallback> &callback);
     int32_t UnRegisterCallManagerCallBack();
     int32_t SendCallUiEvent(std::string voipCallId, const CallAudioEvent &callAudioEvent);
+    int32_t SendCallUiEventForWindow(AppExecFwk::PacMap &extras);
 
 private:
     class SystemAbilityListener : public SystemAbilityStatusChangeStub {

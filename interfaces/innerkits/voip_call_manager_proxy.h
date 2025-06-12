@@ -166,6 +166,14 @@ public:
     int32_t SendCallUiEvent(std::string voipCallId, const CallAudioEvent &callAudioEvent) override;
 
     /**
+     * @brief Send Call ui event window
+     *
+     * @param extras[in], extras date.
+     * @return Returns 0 on success, others on failure.
+     */
+    int32_t SendCallUiEventForWindow(AppExecFwk::PacMap &extras) override;
+
+    /**
      * @brief thrid-party applications report call audio event change
      *
      * @param voipCallId[in], The VoipCallId

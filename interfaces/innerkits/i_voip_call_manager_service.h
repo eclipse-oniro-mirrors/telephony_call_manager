@@ -46,7 +46,8 @@ public:
         INTERFACE_UNLOAD_VOIP_SA,
         INTERFACE_SEND_CALL_UI_EVENT,
         INTERFACE_REPORT_CALL_AUDIO_EVENT_CHANGE,
-        INTERFACE_REPORT_OUTGOING_CALL
+        INTERFACE_REPORT_OUTGOING_CALL,
+        INTERFACE_SEND_CALL_UI_EVENT_FOR_WINDOW
     };
     virtual ~IVoipCallManagerService() = default;
     virtual int32_t ReportIncomingCall(
@@ -72,6 +73,7 @@ public:
     virtual int32_t ReportCallAudioEventChange(std::string voipCallId, const CallAudioEvent &callAudioEvent) = 0;
     virtual int32_t ReportOutgoingCall(
         AppExecFwk::PacMap &extras, std::vector<uint8_t> &userProfile, ErrorReason &reason) = 0;
+    virtual int32_t SendCallUiEventForWindow(AppExecFwk::PacMap &extras) = 0;
 
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"OHOS.Telephony.IVoipCallManagerService");
