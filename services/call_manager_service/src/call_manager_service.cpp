@@ -1696,14 +1696,13 @@ int32_t CallManagerService::SendCallUiEvent(int32_t callId, std::string &eventNa
         }
         return TELEPHONY_ERR_FAIL;
     } else if (eventName == "EVENT_CELIA_AUTO_ANSWER_CALL_ON" || eventName == "EVENT_CELIA_AUTO_ANSWER_CALL_OFF") {
-        return HandleVoIPCallEvent(callId, eventName == "EVENT_CELIA_AUTO_ANSWER_CALL_ON");
+        return HandleCeliaAutoAnswerCall(callId, eventName == "EVENT_CELIA_AUTO_ANSWER_CALL_ON");
     } else if (eventName == "EVENT_VOIP_CALL_SUCCESS" || eventName == "EVENT_VOIP_CALL_FAILED") {
         HandleVoIPCallEvent(callId, eventName);
     }
     return TELEPHONY_SUCCESS;
 }
 
- 
 int32_t CallManagerService::HandleVoIPCallEvent(int32_t callId, std::string &eventName)
 {
     AppExecFwk::PacMap mPacMap;
