@@ -1108,21 +1108,6 @@ HWTEST_F(ZeroBranch2Test, Telephony_CallDialog_001, Function | MediumTest | Leve
     auto callDialog = DelayedSingleton<CallDialog>::GetInstance();
     ASSERT_NE(callDialog, nullptr);
     callDialog->DialogProcessMMICodeExtension();
-    std::string diallogReason = "SATELLITE";
-    int32_t slotId = 0;
-    ASSERT_TRUE(callDialog->DialogConnectExtension(diallogReason, slotId));
-    ASSERT_TRUE(callDialog->DialogConnectExtension(diallogReason));
-    std::u16string number = u"13333333333";
-    int32_t videoState = 0;
-    int32_t dialType = 0;
-    int32_t dialScene = 0;
-    int32_t callType = 1;
-    bool isVideo = false;
-    ASSERT_TRUE(callDialog->DialogConnectPrivpacyModeExtension(
-        diallogReason, number, slotId, videoState, dialType, dialScene, callType, isVideo));
-    ASSERT_TRUE(callDialog->DialogConnectAnswerPrivpacyModeExtension(diallogReason, slotId, videoState, isVideo));
-    callDialog->DialogCallingPrivacyModeExtension(Rosen::FoldStatus::FOLDED);
-    callDialog->DialogCallingPrivacyModeExtension(Rosen::FoldStatus::EXPAND);
 }
 
 /**

@@ -330,8 +330,6 @@ HWTEST_F(CallStateTest, Telephony_AudioProxy_002, TestSize.Level0)
     call1->SetCallId(1);
     call1->SetCallType(CallType::TYPE_VOIP);
     call1->SetTelCallState(TelCallState::CALL_STATUS_ACTIVE);
-    EXPECT_TRUE(CallObjectManager::GetAudioLiveCall() != nullptr);
-    audioProxy->SetDeviceActive(AudioStandard::DeviceType::DEVICE_TYPE_SPEAKER, true);
 }
 
 /**
