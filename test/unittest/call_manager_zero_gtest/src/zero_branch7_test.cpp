@@ -600,7 +600,7 @@ HWTEST_F(ZeroBranch8Test, Telephony_VoipCallConnection_001, Function | MediumTes
     EXPECT_NE(voipCallConnection->SendCallUiEvent(voipCallId, callAudioEvent), TELEPHONY_ERROR);
     AppExecFwk::PacMap extras;
     voipCallConnection->SendCallUiEventForWindow(extras);
-    voipCallConnection->VoipCallManagerInterfacePtr_ = nullptr;
+    voipCallConnection->voipCallManagerInterfacePtr_ = nullptr;
     voipCallConnection->SendCallUiEventForWindow(extras);
 }
 
