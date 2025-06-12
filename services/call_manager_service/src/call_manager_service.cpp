@@ -42,6 +42,7 @@
 #include "string_wrapper.h"
 #include "bluetooth_call_connection.h"
 #include "interoperable_communication_manager.h"
+#include "voip_call_connection.h"
 
 #ifdef SUPPORT_MUTE_BY_DATABASE
 #include "interoperable_settings_handler.h"
@@ -1696,10 +1697,13 @@ int32_t CallManagerService::SendCallUiEvent(int32_t callId, std::string &eventNa
         return TELEPHONY_ERR_FAIL;
     } else if (eventName == "EVENT_CELIA_AUTO_ANSWER_CALL_ON" || eventName == "EVENT_CELIA_AUTO_ANSWER_CALL_OFF") {
         return HandleVoIPCallEvent(callId, eventName == "EVENT_CELIA_AUTO_ANSWER_CALL_ON");
+    } else if (eventName == "EVENT_VOIP_CALL_SUCCESS" || eventName == "EVENT_VOIP_CALL_FAILED") {
+        HandleVoIPCallEvent(callId, eventName);
     }
     return TELEPHONY_SUCCESS;
 }
 
+ 
 int32_t CallManagerService::HandleVoIPCallEvent(int32_t callId, std::string &eventName)
 {
     AppExecFwk::PacMap mPacMap;
@@ -1709,10 +1713,10 @@ int32_t CallManagerService::HandleVoIPCallEvent(int32_t callId, std::string &eve
         call->GetCallAttributeInfo(info);
         mPacMap.PutStringValue("callId", info.voipCallInfo.voipCallId);
     }
-    mPacMap.PutStringValue("eventName", eventNmae);
-    mPacMap.PutStringValue("publishTime", std::chrono::duration_cast<std::chrono::milliseconds>
-        (std::chrono::system_clock::now().time_since_epoch()).count());
-    return DelayedSingleton<VoipCallConnection>::GetInstance()->SendCallUiEventForWindow(mPacMap)
+    mPacMap.PutStringValue("eventName", eventName);
+    mPacMap.PutLongValue("publishTime", std::chrono::duration_cast<std::chrono::milliseconds>(
+        std::chrono::system_clock::now().time_since_epoch()).count());
+    return DelayedSingleton<VoipCallConnection>::GetInstance()->SendCallUiEventForWindow(mPacMap);
 }
 
 int32_t CallManagerService::HandleDisplaySpecifiedCallPage(int32_t callId)
