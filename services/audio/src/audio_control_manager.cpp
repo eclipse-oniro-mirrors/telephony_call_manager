@@ -622,7 +622,8 @@ bool AudioControlManager::PlayRingtone()
     if (incomingCall->GetCrsType() == CRS_TYPE) {
         return dealCrsScene(ringMode);
     }
-    if (IsVideoRing(contactInfo.personalNotificationRingtone, contactInfo.ringtonePath)) {
+    if (IsVideoRing(contactInfo.personalNotificationRingtone, contactInfo.ringtonePath) &&
+        !CallObjectManager::IsNeedSilentInDoNotDisturbMode()) {
         if ((ringMode == AudioStandard::AudioRingerMode::RINGER_MODE_NORMAL && IsRingingVibrateModeOn()) ||
             ringMode == AudioStandard::AudioRingerMode::RINGER_MODE_VIBRATE) {
             TELEPHONY_LOGI("need start vibrator.");
@@ -867,6 +868,10 @@ int32_t AudioControlManager::SetMute(bool isMute)
 
 int32_t AudioControlManager::MuteRinger()
 {
+    if (isVideoRingVibrating_) {
+        DelayedSingleton<AudioProxy>::GetInstance()->StopVibrator();
+        isVideoRingVibrating_ = false;
+    }
     sptr<CallBase> incomingCall = CallObjectManager::GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_RINGING);
     if (incomingCall != nullptr) {
         if (incomingCall->GetCrsType() == CRS_TYPE && !IsVoIPCallActived() &&
