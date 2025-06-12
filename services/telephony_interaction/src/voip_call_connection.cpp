@@ -221,7 +221,7 @@ int32_t VoipCallConnection::SendCallUiEventForWindow(AppExecFwk::PacMap &extras)
         TELEPHONY_LOGE("voipCallManagerInterfacePtr_ is nullptr");
         return TELEPHONY_ERROR;
     }
-    return VoipCallManagerInterfacePtr_->SendCallUiEventForWindow(extras);
+    return voipCallManagerInterfacePtr_->SendCallUiEventForWindow(extras);
 }
 } // namespace Telephony
 } // namespace OHOS
