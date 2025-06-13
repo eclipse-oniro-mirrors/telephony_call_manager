@@ -447,5 +447,24 @@ int32_t CallAbilityReportProxy::ReportCameraCapabilities(const CameraCapabilitie
     TELEPHONY_LOGI("ReportCameraCapabilities success");
     return ret;
 }
+
+int32_t CallAbilityReportProxy::ReportPhoneStateChange(int32_t numActive, int32_t numHeld, int32_t callState,
+    const std::string &number)
+{
+    int32_t ret = TELEPHONY_ERR_FAIL;
+    std::lock_guard<std::mutex> lock(mutex_);
+    std::list<sptr<ICallAbilityCallback>>::iterator it = callbackPtrList_.begin();
+    for (; it != callbackPtrList_.end(); ++it) {
+        if ((*it) != nullptr) {
+            ret = (*it)->OnPhoneStateChange(numActive, numHeld, callState, number);
+            if (ret != TELEPHONY_SUCCESS) {
+                TELEPHONY_LOGW("ReportPhoneStateChange failed, errcode:%{public}d, bundleInfo:%{public}s", ret,
+                    ((*it)->GetBundleInfo()).c_str());
+            }
+        }
+    }
+    TELEPHONY_LOGI("ReportPhoneStateChange success");
+    return ret;
+}
 } // namespace Telephony
 } // namespace OHOS

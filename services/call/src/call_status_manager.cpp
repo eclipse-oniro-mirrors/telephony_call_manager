@@ -60,6 +60,8 @@ namespace OHOS {
 namespace Telephony {
 constexpr int32_t INIT_INDEX = 0;
 constexpr int32_t PRESENTATION_RESTRICTED = 3;
+static constexpr const char *SYSTEM_VIDEO_RING = "system_video_ring";
+const std::string ADVSECMODE_STATE = "ohos.boot.advsecmode.state";
 
 CallStatusManager::CallStatusManager()
 {
@@ -423,6 +425,14 @@ int32_t CallStatusManager::HandleVoipEventReportInfo(const VoipCallEventInfo &in
         call->SetMicPhoneState(true);
     } else if (info.voipCallEvent == VoipCallEvent::VOIP_CALL_EVENT_UNMUTED) {
         call->SetMicPhoneState(false);
+        AudioDevice device = {
+            .deviceType = AudioDeviceType::DEVICE_EARPIECE,
+            .address = { 0 },
+        };
+        if (DelayedSingleton<AudioProxy>::GetInstance()->GetPreferredOutputAudioDevice(device, true) ==
+            TELEPHONY_SUCCESS) {
+            DelayedSingleton<AudioDeviceManager>::GetInstance()->SetCurrentAudioDevice(device);
+        }
     }
     DelayedSingleton<AudioDeviceManager>::GetInstance()->ReportAudioDeviceInfo(call);
     return TELEPHONY_SUCCESS;
@@ -462,6 +472,7 @@ int32_t CallStatusManager::IncomingHandle(const CallDetailInfo &info)
         IsRingOnceCall(call, info)) {
         return HandleRingOnceCall(call);
     }
+    HandleVideoCallInAdvsecMode(call, info);
     AddOneCallObject(call);
     StartInComingCallMotionRecognition();
     DelayedSingleton<CallControlManager>::GetInstance()->NotifyNewCallCreated(call);
@@ -475,6 +486,35 @@ int32_t CallStatusManager::IncomingHandle(const CallDetailInfo &info)
         TELEPHONY_LOGE("FilterResultsDispose failed!");
     }
     return ret;
+}
+
+void CallStatusManager::HandleVideoCallInAdvsecMode(const sptr<CallBase> &call, const CallDetailInfo &info)
+{
+    if (call->GetVideoStateType() != VideoStateType::TYPE_VIDEO) {
+        return;
+    }
+    if (call->GetCallType() != CallType::TYPE_IMS) {
+        return;
+    }
+    std::string phoneNumber(info.phoneNum);
+    NumberMarkInfo numberMarkInfo = call->GetNumberMarkInfo();
+    if (IsTrustedNumber(numberMarkInfo.markType, phoneNumber)) {
+        return;
+    }
+    if (OHOS::system::GetBoolParameter(ADVSECMODE_STATE, false)) {
+        TELEPHONY_LOGI("is video call in AdvsecMode.");
+        call->SetForcedReportVoiceCall(true);
+    }
+}
+
+bool CallStatusManager::IsTrustedNumber(MarkType markType, std::string phoneNumber)
+{
+    if (markType == MarkType::MARK_TYPE_YELLOW_PAGE ||
+        markType == MarkType::MARK_TYPE_ENTERPRISE ||
+        IsContactPhoneNum(phoneNumber)) {
+        return true;
+    }
+    return false;
 }
 
 void CallStatusManager::SetContactInfo(sptr<CallBase> &call, std::string phoneNum)
@@ -508,16 +548,78 @@ void CallStatusManager::SetContactInfo(sptr<CallBase> &call, std::string phoneNu
         }
     }
     ffrt::submit([=, &call]() {
+        if (call == nullptr) {
+            TELEPHONY_LOGE("Call is nullptr.");
+            return;
+        }
         sptr<CallBase> callObjectPtr = call;
         // allow list filtering
         // Get the contact data from the database
         ContactInfo contactInfoTemp = contactInfo;
         QueryCallerInfo(contactInfoTemp, phoneNum);
+        DealVideoRingPath(contactInfoTemp, callObjectPtr);
         callObjectPtr->SetCallerInfo(contactInfoTemp);
         CallVoiceAssistantManager::GetInstance()->UpdateContactInfo(contactInfoTemp, callObjectPtr->GetCallID());
         DelayedSingleton<DistributedCommunicationManager>::GetInstance()->ProcessCallInfo(callObjectPtr,
             DistributedDataType::NAME);
     });
+}
+
+void CallStatusManager::DealVideoRingPath(ContactInfo &contactInfo, sptr<CallBase> &callObjectPtr)
+{
+    int32_t userId = 0;
+    bool isUserUnlocked = false;
+    AccountSA::OsAccountManager::GetForegroundOsAccountLocalId(userId);
+    AccountSA::OsAccountManager::IsOsAccountVerified(userId, isUserUnlocked);
+    TELEPHONY_LOGI("isUserUnlocked: %{public}d", isUserUnlocked);
+    if (!isUserUnlocked) {
+        return;
+    }
+    bool isStartBroadcast = CallVoiceAssistantManager::GetInstance()->IsStartVoiceBroadcast();
+    if (isStartBroadcast) {
+        TELEPHONY_LOGI("Incoming call broadcast is on.");
+        return;
+    }
+
+    if (!strlen(contactInfo.ringtonePath)) {
+        if (IsSetSystemVideoRing(callObjectPtr)) {
+            if (memcpy_s(contactInfo.ringtonePath, FILE_PATH_MAX_LEN, SYSTEM_VIDEO_RING, strlen(SYSTEM_VIDEO_RING))
+                != EOK) {
+                TELEPHONY_LOGE("memcpy_s ringtonePath fail");
+                return;
+            };
+        }
+    }
+
+    if (DelayedSingleton<AudioControlManager>::GetInstance()->IsVideoRing(contactInfo.personalNotificationRingtone,
+        contactInfo.ringtonePath)) {
+        TELEPHONY_LOGI("notify callui to play video ring.");
+        AAFwk::WantParams params = callObjectPtr->GetExtraParams();
+        params.SetParam("VideoRingPath", AAFwk::String::Box(std::string(contactInfo.ringtonePath)));
+        callObjectPtr->SetExtraParams(params);
+    }
+}
+
+bool CallStatusManager::IsSetSystemVideoRing(sptr<CallBase> &callObjectPtr)
+{
+    CallAttributeInfo info;
+    callObjectPtr->GetCallAttributeBaseInfo(info);
+    const std::shared_ptr<AbilityRuntime::Context> context;
+    Media::RingtoneType type = info.accountId == DEFAULT_SIM_SLOT_ID ? Media::RingtoneType::RINGTONE_TYPE_SIM_CARD_0 :
+        Media::RingtoneType::RINGTONE_TYPE_SIM_CARD_1;
+    std::shared_ptr<Media::SystemSoundManager> systemSoundManager =
+        Media::SystemSoundManagerFactory::CreateSystemSoundManager();
+    if (systemSoundManager == nullptr) {
+        TELEPHONY_LOGE("get systemSoundManager failed");
+        return false;
+    }
+    Media::ToneAttrs toneAttrs = systemSoundManager->GetCurrentRingtoneAttribute(type);
+    TELEPHONY_LOGI("type: %{public}d, mediatype: %{public}d", type, toneAttrs.GetMediaType());
+    if (toneAttrs.GetMediaType() == Media::MediaType::MEDIA_TYPE_VID) {
+        return true;
+    } else {
+        return false;
+    }
 }
 
 int32_t CallStatusManager::HandleRejectCall(sptr<CallBase> &call, bool isBlock)
@@ -1740,7 +1842,7 @@ bool CallStatusManager::ShouldRejectIncomingCall()
     OHOS::Uri uri(
         "datashare:///com.ohos.settingsdata/entry/settingsdata/SETTINGSDATA?Proxy=true&key=device_provisioned");
     int resp = datashareHelper->Query(uri, "device_provisioned", device_provisioned);
-    if ((resp == TELEPHONY_SUCCESS || resp == TELEPHONY_ERROR) &&
+    if ((resp == TELEPHONY_SUCCESS || resp == TELEPHONY_ERR_UNINIT) &&
         (device_provisioned == "0" || device_provisioned.empty())) {
         TELEPHONY_LOGW("ShouldRejectIncomingCall: device_provisioned = 0");
         return true;

@@ -50,6 +50,7 @@ private:
     int32_t OnUpdatePeerDimensionsChange(MessageParcel &data, MessageParcel &reply);
     int32_t OnUpdateCallDataUsageChange(MessageParcel &data, MessageParcel &reply);
     int32_t OnUpdateCameraCapabilities(MessageParcel &data, MessageParcel &reply);
+    int32_t OnUpdatePhoneState(MessageParcel &data, MessageParcel &reply);
 
     std::map<uint32_t, CallAbilityCallbackFunc> memberFuncMap_;
 };

@@ -964,6 +964,12 @@ HWTEST_F(SpecialBranch0Test, Telephony_CallManagerService_019, TestSize.Level0)
     callManagerService->SendCallUiEvent(1, eventName);
     eventName = "EVENT_NOT_SUPPORT_BLUETOOTH_CALL";
     callManagerService->SendCallUiEvent(1, eventName);
+    eventName = "EVENT_VOIP_CALL_SUCCESS";
+    callManagerService->SendCallUiEvent(1, eventName);
+    eventName = "EVENT_VOIP_CALL_FAILED";
+    callManagerService->SendCallUiEvent(1, eventName);
+    call->SetCallType(CallType::TYPE_VOIP);
+    callManagerService->HandleVoIPCallEvent(1, eventName);
     eventName = "123";
     int32_t ret = callManagerService->SendCallUiEvent(1, eventName);
     EXPECT_EQ(ret, 0);

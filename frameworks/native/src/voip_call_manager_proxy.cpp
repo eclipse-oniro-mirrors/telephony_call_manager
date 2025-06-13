@@ -20,6 +20,7 @@
 #include "telephony_errors.h"
 #include "telephony_log_wrapper.h"
 #include "native_call_manager_hisysevent.h"
+#include "hitrace/tracechain.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -30,6 +31,10 @@ VoipCallManagerProxy::VoipCallManagerProxy(const sptr<IRemoteObject> &impl)
 int32_t VoipCallManagerProxy::ReportIncomingCall(
     AppExecFwk::PacMap &extras, std::vector<uint8_t> &userProfile, ErrorReason &reason)
 {
+    OHOS::HiviewDFX::HiTraceId chainId = OHOS::HiviewDFX::HiTraceChain::GetId();
+    if (!chainId.IsValid()) {
+        chainId = OHOS::HiviewDFX::HiTraceChain::Begin("ReportIncomingCall", HiTraceFlag::HITRACE_FLAG_INCLUDE_ASYNC);
+    }
     MessageParcel dataParcel;
     if (!dataParcel.WriteInterfaceToken(VoipCallManagerProxy::GetDescriptor())) {
         TELEPHONY_LOGE("write descriptor fail");
@@ -43,6 +48,7 @@ int32_t VoipCallManagerProxy::ReportIncomingCall(
     dataParcel.WriteBool(extras.GetBooleanValue("showBannerForIncomingCall"));
     dataParcel.WriteBool(extras.GetBooleanValue("isConferenceCall"));
     dataParcel.WriteBool(extras.GetBooleanValue("isVoiceAnswerSupported"));
+    dataParcel.WriteInt64(extras.GetLongValue("startReportTime"));
     if (!dataParcel.WriteUInt8Vector(userProfile)) {
         TELEPHONY_LOGE("ReportIncomingCall userProfile write fail, size:%{public}u",
             static_cast<uint32_t>(userProfile.size()));
@@ -77,6 +83,11 @@ int32_t VoipCallManagerProxy::ReportIncomingCall(
 
 int32_t VoipCallManagerProxy::ReportIncomingCallError(AppExecFwk::PacMap &extras)
 {
+    OHOS::HiviewDFX::HiTraceId chainId = OHOS::HiviewDFX::HiTraceChain::GetId();
+    if (!chainId.IsValid()) {
+        chainId = OHOS::HiviewDFX::HiTraceChain::Begin("ReportIncomingCallError",
+            HiTraceFlag::HITRACE_FLAG_INCLUDE_ASYNC);
+    }
     MessageParcel dataParcel;
     if (!dataParcel.WriteInterfaceToken(VoipCallManagerProxy::GetDescriptor())) {
         TELEPHONY_LOGE("write descriptor fail");
@@ -84,6 +95,7 @@ int32_t VoipCallManagerProxy::ReportIncomingCallError(AppExecFwk::PacMap &extras
     }
     dataParcel.WriteString(extras.GetStringValue("callId"));
     dataParcel.WriteInt32(extras.GetIntValue("reportVoipCallFailedCause"));
+    dataParcel.WriteInt64(extras.GetLongValue("startReportTime"));
     auto remote = Remote();
     if (remote == nullptr) {
         TELEPHONY_LOGE("ReportIncomingCallError Remote is null");
@@ -484,5 +496,31 @@ int32_t VoipCallManagerProxy::ReportCallAudioEventChange(std::string voipCallId,
     return replyParcel.ReadInt32();
 }
 
+int32_t VoipCallManagerProxy::SendCallUiEventForWindow(AppExecFwk::PacMap &extras)
+{
+    MessageParcel dataParcel;
+    if (!dataParcel.WriteInterfaceToken(VoipCallManagerProxy::GetDescriptor())) {
+        TELEPHONY_LOGE("write descriptor fail");
+        return TELEPHONY_ERR_WRITE_DESCRIPTOR_TOKEN_FAIL;
+    }
+    dataParcel.WriteString(extras.GetStringValue("callId"));
+    dataParcel.WriteString(extras.GetStringValue("eventName"));
+    dataParcel.WriteInt64(extras.GetLongValue("publishTime"));
+
+    auto remote = Remote();
+    if (remote == nullptr) {
+        TELEPHONY_LOGE("SendCallUiEventForWindow Remote is null");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    MessageOption option;
+    MessageParcel replyParcel;
+    int32_t error = remote->SendRequest(static_cast<int32_t>(INTERFACE_SEND_CALL_UI_EVENT_FOR_WINDOW),
+        dataParcel, replyParcel, option);
+    if (error != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("function SendCallUiEventForWindow call failed! errCode:%{public}d", error);
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    return replyParcel.ReadInt32();
+}
 } // namespace Telephony
 } // namespace OHOS

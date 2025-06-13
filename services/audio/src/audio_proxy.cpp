@@ -267,11 +267,33 @@ void AudioProxy::SetWiredHeadsetState(bool isConnected)
     isWiredHeadsetConnected_ = isConnected;
 }
 
-int32_t AudioProxy::GetPreferredOutputAudioDevice(AudioDevice &device)
+static int32_t SetWirelessAudioDevice(AudioDevice &device, AudioStandard::DeviceType deviceType,
+    const std::vector<std::shared_ptr<AudioStandard::AudioDeviceDescriptor>> &desc)
+{
+    device.deviceType = (deviceType == AudioStandard::DEVICE_TYPE_BLUETOOTH_SCO) ?
+        AudioDeviceType::DEVICE_BLUETOOTH_SCO : AudioDeviceType::DEVICE_NEARLINK;
+    if (memset_s(&device.address, kMaxAddressLen + 1, 0, kMaxAddressLen + 1) != EOK ||
+        memset_s(&device.deviceName, kMaxDeviceNameLen + 1, 0, kMaxDeviceNameLen + 1) != EOK) {
+        TELEPHONY_LOGE("memset_s address fail");
+        return TELEPHONY_ERR_MEMSET_FAIL;
+    }
+    if (memcpy_s(device.address, kMaxAddressLen, desc[0]->macAddress_.c_str(),
+        desc[0]->macAddress_.length()) != EOK ||
+        memcpy_s(device.deviceName, kMaxDeviceNameLen, desc[0]->deviceName_.c_str(),
+        desc[0]->deviceName_.length()) != EOK) {
+        TELEPHONY_LOGE("memcpy_s address fail");
+        return TELEPHONY_ERR_MEMCPY_FAIL;
+    }
+    return TELEPHONY_SUCCESS;
+}
+
+int32_t AudioProxy::GetPreferredOutputAudioDevice(AudioDevice &device, bool isNeedCurrentDevice)
 {
     AudioStandard::AudioRendererInfo rendererInfo;
     rendererInfo.contentType = AudioStandard::ContentType::CONTENT_TYPE_UNKNOWN;
-    rendererInfo.streamUsage = AudioStandard::StreamUsage::STREAM_USAGE_VOICE_MODEM_COMMUNICATION;
+    rendererInfo.streamUsage = isNeedCurrentDevice ?
+        AudioStandard::StreamUsage::STREAM_USAGE_INVALID :
+        AudioStandard::StreamUsage::STREAM_USAGE_VOICE_MODEM_COMMUNICATION;
     rendererInfo.rendererFlags = RENDERER_FLAG;
     std::vector<std::shared_ptr<AudioStandard::AudioDeviceDescriptor>> desc;
     int32_t ret =
@@ -285,21 +307,14 @@ int32_t AudioProxy::GetPreferredOutputAudioDevice(AudioDevice &device)
         return CALL_ERR_AUDIO_OPERATE_FAILED;
     }
     switch (desc[0]->deviceType_) {
-        case AudioStandard::DEVICE_TYPE_BLUETOOTH_SCO:
-            device.deviceType = AudioDeviceType::DEVICE_BLUETOOTH_SCO;
-            if (memset_s(&device.address, kMaxAddressLen + 1, 0, kMaxAddressLen + 1) != EOK ||
-                memset_s(&device.deviceName, kMaxDeviceNameLen + 1, 0, kMaxDeviceNameLen + 1) != EOK) {
-                TELEPHONY_LOGE("memset_s address fail");
-                return TELEPHONY_ERR_MEMSET_FAIL;
-            }
-            if (memcpy_s(device.address, kMaxAddressLen, desc[0]->macAddress_.c_str(),
-                desc[0]->macAddress_.length()) != EOK ||
-                memcpy_s(&device.deviceName, kMaxDeviceNameLen, desc[0]->deviceName_.c_str(),
-                desc[0]->deviceName_.length()) != EOK) {
-                TELEPHONY_LOGE("memcpy_s address fail");
-                return TELEPHONY_ERR_MEMCPY_FAIL;
+        case AudioStandard::DEVICE_TYPE_NEARLINK:
+        case AudioStandard::DEVICE_TYPE_BLUETOOTH_SCO: {
+            int32_t result = SetWirelessAudioDevice(device, desc[0]->deviceType_, desc);
+            if (result != TELEPHONY_SUCCESS) {
+                return result;
             }
             break;
+        }
         case AudioStandard::DEVICE_TYPE_EARPIECE:
             device.deviceType = AudioDeviceType::DEVICE_EARPIECE;
             break;
@@ -350,6 +365,23 @@ int32_t AudioProxy::UnsetAudioPreferDeviceChangeCallback()
     return TELEPHONY_SUCCESS;
 }
 
+bool AudioPreferDeviceChangeCallback::ProcessVoipCallOutputDeviceUpdated()
+{
+    if (!DelayedSingleton<CallControlManager>::GetInstance()->HasVoipCall()) {
+        return false;
+    }
+    AudioDevice device = {
+        .deviceType = AudioDeviceType::DEVICE_EARPIECE,
+        .address = { 0 },
+    };
+    if (DelayedSingleton<AudioProxy>::GetInstance()->GetPreferredOutputAudioDevice(device, true) !=
+        TELEPHONY_SUCCESS) {
+        return false;
+    }
+    DelayedSingleton<AudioDeviceManager>::GetInstance()->SetCurrentAudioDevice(device);
+    return true;
+}
+
 void AudioPreferDeviceChangeCallback::OnPreferredOutputDeviceUpdated(
     const std::vector<std::shared_ptr<AudioStandard::AudioDeviceDescriptor>> &desc)
 {
@@ -374,10 +406,14 @@ void AudioPreferDeviceChangeCallback::OnPreferredOutputDeviceUpdated(
     if (IsDistributedDeviceSelected(desc)) {
         return;
     }
+    if (ProcessVoipCallOutputDeviceUpdated()) {
+    return;
+}
 
     switch (desc[0]->deviceType_) {
+        case AudioStandard::DEVICE_TYPE_NEARLINK:
         case AudioStandard::DEVICE_TYPE_BLUETOOTH_SCO:
-            if (!SetBluetoothDevice(device, desc)) {
+            if (SetWirelessAudioDevice(device, desc[0]->deviceType_, desc) != TELEPHONY_SUCCESS) {
                 return;
             }
             DelayedSingleton<AudioDeviceManager>::GetInstance()->SetCurrentAudioDevice(device);
@@ -406,25 +442,6 @@ void AudioPreferDeviceChangeCallback::OnPreferredOutputDeviceUpdated(
         AudioDeviceType deviceType = static_cast<AudioDeviceType>(desc[0]->deviceType_);
         DelayedSingleton<AudioControlManager>::GetInstance()->UpdateDeviceTypeForCrs(deviceType);
     }
-}
-
-bool AudioPreferDeviceChangeCallback::SetBluetoothDevice(AudioDevice &device,
-    const std::vector<std::shared_ptr<AudioStandard::AudioDeviceDescriptor>> &desc)
-{
-    device.deviceType = AudioDeviceType::DEVICE_BLUETOOTH_SCO;
-    if (memset_s(&device.address, kMaxAddressLen + 1, 0, kMaxAddressLen + 1) != EOK ||
-        memset_s(&device.deviceName, kMaxDeviceNameLen + 1, 0, kMaxDeviceNameLen + 1) != EOK) {
-        TELEPHONY_LOGE("memset_s address fail");
-        return false;
-    }
-    if (memcpy_s(device.address, kMaxAddressLen, desc[0]->macAddress_.c_str(),
-        desc[0]->macAddress_.length()) != EOK ||
-        memcpy_s(device.deviceName, kMaxDeviceNameLen, desc[0]->deviceName_.c_str(),
-        desc[0]->deviceName_.length()) != EOK) {
-        TELEPHONY_LOGE("memcpy_s address fail");
-        return false;
-    }
-    return true;
 }
 
 bool AudioPreferDeviceChangeCallback::IsDistributedDeviceSelected(

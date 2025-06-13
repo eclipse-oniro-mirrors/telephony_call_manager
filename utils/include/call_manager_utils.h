@@ -29,6 +29,9 @@ class CallManagerUtils {
 public:
     static void WriteCallAttributeInfo(const CallAttributeInfo &info, MessageParcel &messageParcel);
     static bool IsBundleInstalled(const std::string &bundleName, int32_t userId);
+
+private:
+    static bool IsForcedReportVoiceCall(const CallAttributeInfo &info);
 };
 } // namespace Telephony
 } // namespace OHOS

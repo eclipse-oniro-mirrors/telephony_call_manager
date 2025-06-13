@@ -617,6 +617,7 @@ HWTEST_F(ZeroBranch5Test, Telephony_VoipCallManagerProxy_001, TestSize.Level0)
         std::vector<uint8_t> userProfile = { 0 };
         int32_t ret1 = voipCallManagerInterfacePtr->ReportIncomingCall(mPacMap, userProfile, error);
         int32_t ret2 = voipCallManagerInterfacePtr->ReportIncomingCallError(mPacMap);
+        voipCallManagerInterfacePtr->SendCallUiEventForWindow(mPacMap);
         VoipCallState voipCallState = VoipCallState::VOIP_CALL_STATE_ACTIVE;
         VoipCallType voipCallType = VoipCallType::VOIP_CALL_VOICE;
         std::string callId = "123";
@@ -626,8 +627,7 @@ HWTEST_F(ZeroBranch5Test, Telephony_VoipCallManagerProxy_001, TestSize.Level0)
         std::string processMode = "0";
         int32_t uid = 0;
         int32_t ret5 = voipCallManagerInterfacePtr->ReportVoipIncomingCall(callId, bundleName, processMode, uid);
-        std::string extensionId = " ";
-        int32_t ret6 = voipCallManagerInterfacePtr->ReportVoipCallExtensionId(callId, bundleName, extensionId, uid);
+        int32_t ret6 = voipCallManagerInterfacePtr->ReportVoipCallExtensionId(callId, bundleName, " ", uid);
         VoipCallEventInfo voipCallEventInfo;
         voipCallEventInfo.voipCallId = "123";
         int32_t ret7 = voipCallManagerInterfacePtr->Answer(voipCallEventInfo,
@@ -942,6 +942,7 @@ HWTEST_F(ZeroBranch5Test, Telephony_CallAbilityCallbackProxy_001, TestSize.Level
     callAbilityCallbackProxy.OnReportAudioDeviceChange(audioDeviceInfo);
     const std::string str {"123"};
     callAbilityCallbackProxy.OnReportPostDialDelay(str);
+    callAbilityCallbackProxy.OnPhoneStateChange(0, 0, 0, "");
     ASSERT_TRUE(!str.empty());
 }
 

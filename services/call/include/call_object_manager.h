@@ -78,12 +78,12 @@ public:
     static CallAttributeInfo GetVoipCallInfo();
     static CallAttributeInfo GetActiveVoipCallInfo();
     static void ClearVoipList();
-    static std::vector<CallAttributeInfo> GetCallInfoList(int32_t slotId);
+    static std::vector<CallAttributeInfo> GetCallInfoList(int32_t slotId, bool isIncludeVoipCall = true);
     static sptr<CallBase> GetForegroundCall(bool isIncludeVoipCall = true);
     static sptr<CallBase> GetForegroundLiveCall(bool isIncludeVoipCall = true);
     static sptr<CallBase> GetIncomingCall(bool isIncludeVoipCall = true);
     static sptr<CallBase> GetAudioLiveCall();
-    static std::vector<CallAttributeInfo> GetAllCallInfoList();
+    static std::vector<CallAttributeInfo> GetAllCallInfoList(bool isIncludeVoipCall = true);
     static std::vector<CallAttributeInfo> GetVoipCallInfoList();
     int32_t DealFailDial(sptr<CallBase> call);
     static bool HasVideoCall();

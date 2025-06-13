@@ -244,5 +244,16 @@ int32_t VoipCallConnection::SendCallUiEvent(std::string voipCallId, const CallAu
     }
     return voipCallManagerInterfacePtr_->SendCallUiEvent(voipCallId, callAudioEvent);
 }
+
+int32_t VoipCallConnection::SendCallUiEventForWindow(AppExecFwk::PacMap &extras)
+{
+    std::lock_guard<std::mutex> lock(mutex_);
+    GetCallManagerProxy();
+    if (voipCallManagerInterfacePtr_ == nullptr) {
+        TELEPHONY_LOGE("voipCallManagerInterfacePtr_ is nullptr");
+        return TELEPHONY_ERROR;
+    }
+    return voipCallManagerInterfacePtr_->SendCallUiEventForWindow(extras);
+}
 } // namespace Telephony
 } // namespace OHOS

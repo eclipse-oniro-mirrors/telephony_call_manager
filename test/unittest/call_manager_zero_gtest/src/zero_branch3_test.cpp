@@ -428,6 +428,12 @@ HWTEST_F(ZeroBranch4Test, Telephony_BluetoothCallStub_001, TestSize.Level0)
     ASSERT_EQ(result, TELEPHONY_SUCCESS);
     result = bluetoothCallService->OnGetCurrentCallList(messageParcel, reply);
     ASSERT_EQ(result, TELEPHONY_SUCCESS);
+    result = bluetoothCallService->OnAddAudioDeviceList(messageParcel, reply);
+    ASSERT_EQ(result, TELEPHONY_ERR_PERMISSION_ERR);
+    result = bluetoothCallService->OnRemoveAudioDeviceList(messageParcel, reply);
+    ASSERT_EQ(result, TELEPHONY_ERR_PERMISSION_ERR);
+    result = bluetoothCallService->OnResetNearlinkDeviceList(messageParcel, reply);
+    ASSERT_EQ(result, TELEPHONY_ERR_PERMISSION_ERR);
 }
 
 /**
@@ -1815,6 +1821,37 @@ HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_014, TestSize.Level0)
     call->SetNumberMarkInfo(markInfo);
     manager->SetupAntiFraudService(call, info);
     EXPECT_EQ(manager->antiFraudIndex_, 0);
+}
+
+HWTEST_F(ZeroBranch4Test, Telephony_CallStatusManager_015, TestSize.Level0)
+{
+    std::shared_ptr<CallStatusManager> callStatusManager = std::make_shared<CallStatusManager>();
+    CallDetailInfo callDetailInfo;
+    callDetailInfo.state = TelCallState::CALL_STATUS_INCOMING;
+    callDetailInfo.callType = CallType::TYPE_IMS;
+    callDetailInfo.callMode = VideoStateType::TYPE_VOICE;
+    std::string number = "";
+    memcpy_s(&callDetailInfo.phoneNum, kMaxNumberLen, number.c_str(), number.length());
+    sptr<CallBase> call = callStatusManager->CreateNewCall(callDetailInfo, CallDirection::CALL_DIRECTION_IN);
+    callStatusManager->HandleVideoCallInAdvsecMode(call, callDetailInfo);
+    EXPECT_EQ(call->IsForcedReportVoiceCall(), false);
+
+    call->SetVideoStateType(VideoStateType::TYPE_VIDEO);
+    callStatusManager->HandleVideoCallInAdvsecMode(call, callDetailInfo);
+    EXPECT_EQ(call->IsForcedReportVoiceCall(), true);
+
+    call->SetForcedReportVoiceCall(false);
+    call->SetVideoStateType(VideoStateType::TYPE_VIDEO);
+    call->SetCallType(CallType::TYPE_VOIP);
+    callStatusManager->HandleVideoCallInAdvsecMode(call, callDetailInfo);
+    EXPECT_EQ(call->IsForcedReportVoiceCall(), false);
+
+    call->SetCallType(CallType::TYPE_IMS);
+    NumberMarkInfo markInfo;
+    markInfo.markType = MarkType::MARK_TYPE_YELLOW_PAGE;
+    call->SetNumberMarkInfo(markInfo);
+    callStatusManager->HandleVideoCallInAdvsecMode(call, callDetailInfo);
+    EXPECT_EQ(call->IsForcedReportVoiceCall(), false);
 }
 } // namespace Telephony
 } // namespace OHOS

@@ -41,6 +41,9 @@ constexpr int32_t DTMF_PLAY_TIME = 30;
 constexpr int32_t VOICE_TYPE = 0;
 constexpr int32_t CRS_TYPE = 2;
 constexpr int32_t CALL_ENDED_PLAY_TIME = 300;
+static constexpr const char *VIDEO_RING_PATH_FIX_TAIL = ".mp4";
+constexpr int32_t VIDEO_RING_PATH_FIX_TAIL_LENGTH = 4;
+static constexpr const char *SYSTEM_VIDEO_RING = "system_video_ring";
 
 AudioControlManager::AudioControlManager()
     : isLocalRingbackNeeded_(false), ring_(nullptr), tone_(nullptr), sound_(nullptr)
@@ -108,7 +111,7 @@ void AudioControlManager::HandleCallStateUpdatedForVoip(
                 .deviceType = AudioDeviceType::DEVICE_EARPIECE,
                 .address = { 0 },
             };
-            if (DelayedSingleton<AudioProxy>::GetInstance()->GetPreferredOutputAudioDevice(device) ==
+            if (DelayedSingleton<AudioProxy>::GetInstance()->GetPreferredOutputAudioDevice(device, true) ==
                 TELEPHONY_SUCCESS) {
                 DelayedSingleton<AudioDeviceManager>::GetInstance()->SetCurrentAudioDevice(device.deviceType);
                 TELEPHONY_LOGI("control audio for voip finish, callId:%{public}d", callObjectPtr->GetCallID());
@@ -165,10 +168,11 @@ void AudioControlManager::VideoStateUpdated(
         AudioStandard::AudioRingerMode ringMode = DelayedSingleton<AudioProxy>::GetInstance()->GetRingerMode();
         if (ringMode != AudioStandard::AudioRingerMode::RINGER_MODE_NORMAL) {
             if (initDeviceType == AudioDeviceType::DEVICE_WIRED_HEADSET ||
-                initDeviceType == AudioDeviceType::DEVICE_BLUETOOTH_SCO) {
+                initDeviceType == AudioDeviceType::DEVICE_BLUETOOTH_SCO ||
+                initDeviceType == AudioDeviceType::DEVICE_NEARLINK) {
                 device.deviceType = initDeviceType;
                 SetAudioDevice(device);
-                TELEPHONY_LOGI("VideoStateUpdated DEVICE_BLUETOOTH_SCO or DEVICE_WIRED_HEADSET");
+                TELEPHONY_LOGI("VideoStateUpdated DEVICE_BLUETOOTH_SCO or DEVICE_WIRED_HEADSET or DEVICE_NEARLINK");
             }
         } else {
             TELEPHONY_LOGI("crs ring tone should be speaker");
@@ -177,6 +181,14 @@ void AudioControlManager::VideoStateUpdated(
         return;
     }
     CheckTypeAndSetAudioDevice(callObjectPtr, priorVideoState, nextVideoState, initDeviceType, device);
+}
+
+bool AudioControlManager::IsExternalAudioDevice(AudioDeviceType initDeviceType)
+{
+    return (initDeviceType == AudioDeviceType::DEVICE_WIRED_HEADSET ||
+        initDeviceType == AudioDeviceType::DEVICE_BLUETOOTH_SCO ||
+        initDeviceType == AudioDeviceType::DEVICE_NEARLINK ||
+        initDeviceType == AudioDeviceType::DEVICE_DISTRIBUTED_AUTOMOTIVE);
 }
 
 void AudioControlManager::CheckTypeAndSetAudioDevice(sptr<CallBase> &callObjectPtr, VideoStateType priorVideoState,
@@ -191,9 +203,7 @@ void AudioControlManager::CheckTypeAndSetAudioDevice(sptr<CallBase> &callObjectP
             TELEPHONY_LOGI("before modify set device to EARPIECE, now not set");
             return;
         }
-        if (initDeviceType == AudioDeviceType::DEVICE_WIRED_HEADSET ||
-            initDeviceType == AudioDeviceType::DEVICE_BLUETOOTH_SCO ||
-            initDeviceType == AudioDeviceType::DEVICE_DISTRIBUTED_AUTOMOTIVE) {
+        if (IsExternalAudioDevice(initDeviceType)) {
             device.deviceType = initDeviceType;
         }
         TELEPHONY_LOGI("set device type, type: %{public}d", static_cast<int32_t>(device.deviceType));
@@ -201,9 +211,7 @@ void AudioControlManager::CheckTypeAndSetAudioDevice(sptr<CallBase> &callObjectP
     } else if (!DelayedSingleton<DistributedCommunicationManager>::GetInstance()->IsAudioOnSink() &&
                !isSetAudioDeviceByUser_ && IsVideoCall(priorVideoState) && !IsVideoCall(nextVideoState)) {
         device.deviceType = AudioDeviceType::DEVICE_EARPIECE;
-        if (initDeviceType == AudioDeviceType::DEVICE_WIRED_HEADSET ||
-            initDeviceType == AudioDeviceType::DEVICE_BLUETOOTH_SCO ||
-            initDeviceType == AudioDeviceType::DEVICE_DISTRIBUTED_AUTOMOTIVE) {
+        if (IsExternalAudioDevice(initDeviceType)) {
             device.deviceType = initDeviceType;
         }
         TELEPHONY_LOGI("set device type, type: %{public}d", static_cast<int32_t>(device.deviceType));
@@ -231,9 +239,7 @@ void AudioControlManager::UpdateDeviceTypeForVideoOrSatelliteCall()
     AudioDeviceType initDeviceType = GetInitAudioDeviceType();
     if (IsVideoCall(foregroundCall->GetVideoStateType()) ||
         foregroundCall->GetCallType() == CallType::TYPE_SATELLITE) {
-        if (initDeviceType == AudioDeviceType::DEVICE_WIRED_HEADSET ||
-            initDeviceType == AudioDeviceType::DEVICE_BLUETOOTH_SCO ||
-            initDeviceType == AudioDeviceType::DEVICE_DISTRIBUTED_AUTOMOTIVE) {
+        if (IsExternalAudioDevice(initDeviceType)) {
             device.deviceType = initDeviceType;
         }
         TELEPHONY_LOGI("set device type, type: %{public}d", static_cast<int32_t>(device.deviceType));
@@ -256,7 +262,8 @@ void AudioControlManager::UpdateDeviceTypeForCrs(AudioDeviceType deviceType)
         if (ringMode != AudioStandard::AudioRingerMode::RINGER_MODE_NORMAL) {
             AudioDeviceType initDeviceType = GetInitAudioDeviceType();
             if (initDeviceType == AudioDeviceType::DEVICE_WIRED_HEADSET ||
-                initDeviceType == AudioDeviceType::DEVICE_BLUETOOTH_SCO) {
+                initDeviceType == AudioDeviceType::DEVICE_BLUETOOTH_SCO ||
+                initDeviceType == AudioDeviceType::DEVICE_NEARLINK) {
                 device.deviceType = initDeviceType;
             }
         }
@@ -281,7 +288,8 @@ void AudioControlManager::UpdateDeviceTypeForVideoDialing()
         };
         AudioDeviceType initDeviceType = GetInitAudioDeviceType();
         if (initDeviceType == AudioDeviceType::DEVICE_WIRED_HEADSET ||
-            initDeviceType == AudioDeviceType::DEVICE_BLUETOOTH_SCO) {
+            initDeviceType == AudioDeviceType::DEVICE_BLUETOOTH_SCO ||
+            initDeviceType == AudioDeviceType::DEVICE_NEARLINK) {
             device.deviceType = initDeviceType;
         }
         TELEPHONY_LOGI("dialing video call should be speaker");
@@ -353,6 +361,10 @@ void AudioControlManager::HandleNextState(sptr<CallBase> &callObjectPtr, TelCall
                 DelayedSingleton<AudioProxy>::GetInstance()->StopVibrator();
                 isCrsVibrating_ = false;
             }
+            if (isVideoRingVibrating_) {
+                DelayedSingleton<AudioProxy>::GetInstance()->StopVibrator();
+                isVideoRingVibrating_ = false;
+            }
             audioInterruptState_ = AudioInterruptState::INTERRUPT_STATE_DEACTIVATED;
             break;
         default:
@@ -415,6 +427,10 @@ void AudioControlManager::ProcessAudioWhenCallActive(sptr<CallBase> &callObjectP
         if (isCrsVibrating_) {
             DelayedSingleton<AudioProxy>::GetInstance()->StopVibrator();
             isCrsVibrating_ = false;
+        }
+        if (isVideoRingVibrating_) {
+            DelayedSingleton<AudioProxy>::GetInstance()->StopVibrator();
+            isVideoRingVibrating_ = false;
         }
         int ringCallCount = CallObjectManager::GetCallNumByRunningState(CallRunningState::CALL_RUNNING_STATE_RINGING);
         if ((CallObjectManager::GetCurrentCallNum() - ringCallCount) < MIN_MULITY_CALL_COUNT) {
@@ -490,8 +506,9 @@ int32_t AudioControlManager::SetAudioDevice(const AudioDevice &device, bool isBy
         case AudioDeviceType::DEVICE_DISTRIBUTED_PAD:
         case AudioDeviceType::DEVICE_DISTRIBUTED_PC:
             return HandleDistributeAudioDevice(device);
-        case AudioDeviceType::DEVICE_BLUETOOTH_SCO: {
-            if (HandleBluetoothAudioDevice(device) != TELEPHONY_SUCCESS) {
+        case AudioDeviceType::DEVICE_BLUETOOTH_SCO:
+        case AudioDeviceType::DEVICE_NEARLINK: {
+            if (HandleWirelessAudioDevice(device) != TELEPHONY_SUCCESS) {
                 return CALL_ERR_AUDIO_SET_AUDIO_DEVICE_FAILED;
             }
             audioDeviceType = device.deviceType;
@@ -536,22 +553,34 @@ int32_t AudioControlManager::HandleDistributeAudioDevice(const AudioDevice &devi
     return TELEPHONY_SUCCESS;
 }
 
-int32_t AudioControlManager::HandleBluetoothAudioDevice(const AudioDevice &device)
+int32_t AudioControlManager::HandleWirelessAudioDevice(const AudioDevice &device)
 {
     std::string address = device.address;
-    std::shared_ptr<AudioStandard::AudioDeviceDescriptor> activeBluetoothDevice =
-        AudioStandard::AudioRoutingManager::GetInstance()->GetActiveBluetoothDevice();
-    if (address.empty() && activeBluetoothDevice != nullptr && !activeBluetoothDevice->macAddress_.empty()) {
-        address = activeBluetoothDevice->macAddress_;
+    if (address.empty()) {
+        if (device.deviceType == AudioDeviceType::DEVICE_BLUETOOTH_SCO) {
+            std::shared_ptr<AudioStandard::AudioDeviceDescriptor> activeBluetoothDevice =
+                AudioStandard::AudioRoutingManager::GetInstance()->GetActiveBluetoothDevice();
+            if (activeBluetoothDevice == nullptr || activeBluetoothDevice->macAddress_.empty()) {
+                TELEPHONY_LOGE("Get active bluetooth device failed.");
+                return CALL_ERR_AUDIO_SET_AUDIO_DEVICE_FAILED;
+            }
+            address = activeBluetoothDevice->macAddress_;
+        } else {
+            AudioDevice preferredAudioDevice;
+            if (!AudioDeviceManager::IsNearlinkActived(preferredAudioDevice)) {
+                TELEPHONY_LOGE("Get active nearlink device failed.");
+                return CALL_ERR_AUDIO_SET_AUDIO_DEVICE_FAILED;
+            }
+            address = preferredAudioDevice.address;
+        }
     }
     std::shared_ptr<AudioStandard::AudioDeviceDescriptor> audioDev =
         std::make_shared<AudioStandard::AudioDeviceDescriptor>();
-    if (audioDev != nullptr) {
-        audioDev->macAddress_ = address;
-        audioDev->deviceType_ = AudioStandard::DEVICE_TYPE_BLUETOOTH_SCO;
-        audioDev->deviceRole_ = AudioStandard::OUTPUT_DEVICE;
-        audioDev->networkId_ = AudioStandard::LOCAL_NETWORK_ID;
-    }
+    audioDev->macAddress_ = address;
+    audioDev->deviceType_ = (device.deviceType == AudioDeviceType::DEVICE_BLUETOOTH_SCO) ?
+        AudioStandard::DEVICE_TYPE_BLUETOOTH_SCO : AudioStandard::DEVICE_TYPE_NEARLINK;
+    audioDev->deviceRole_ = AudioStandard::OUTPUT_DEVICE;
+    audioDev->networkId_ = AudioStandard::LOCAL_NETWORK_ID;
     std::vector<std::shared_ptr<AudioDeviceDescriptor>> remoteDevice;
     remoteDevice.push_back(audioDev);
     AudioSystemManager* audioSystemManager = AudioSystemManager::GetInstance();
@@ -591,23 +620,16 @@ bool AudioControlManager::PlayRingtone()
     ContactInfo contactInfo = incomingCall->GetCallerInfo();
     AudioStandard::AudioRingerMode ringMode = DelayedSingleton<AudioProxy>::GetInstance()->GetRingerMode();
     if (incomingCall->GetCrsType() == CRS_TYPE) {
-        if (!isCrsVibrating_ && (ringMode != AudioStandard::AudioRingerMode::RINGER_MODE_SILENT)) {
-            if (ringMode == AudioStandard::AudioRingerMode::RINGER_MODE_VIBRATE || IsRingingVibrateModeOn()) {
-                isCrsVibrating_ = (DelayedSingleton<AudioProxy>::GetInstance()->StartVibrator() == TELEPHONY_SUCCESS);
-            }
-        }
-        if ((ringMode == AudioStandard::AudioRingerMode::RINGER_MODE_NORMAL) || IsBtOrWireHeadPlugin()) {
-            AdjustVolumesForCrs();
-            if (PlaySoundtone()) {
-                TELEPHONY_LOGI("play soundtone success");
-                return true;
-            }
-            return false;
-        }
-        TELEPHONY_LOGI("type_crs but not play ringtone");
-        return false;
+        return dealCrsScene(ringMode);
     }
-
+    if (IsVideoRing(contactInfo.personalNotificationRingtone, contactInfo.ringtonePath)) {
+        if ((ringMode == AudioStandard::AudioRingerMode::RINGER_MODE_NORMAL && IsRingingVibrateModeOn()) ||
+            ringMode == AudioStandard::AudioRingerMode::RINGER_MODE_VIBRATE) {
+            TELEPHONY_LOGI("need start vibrator.");
+            isVideoRingVibrating_ = (DelayedSingleton<AudioProxy>::GetInstance()->StartVibrator() == TELEPHONY_SUCCESS);
+        }
+        return true;
+    }
     if (incomingCall->GetCallType() == CallType::TYPE_BLUETOOTH) {
         ret = ring_->Play(info.accountId, contactInfo.ringtonePath, Media::HapticStartupMode::FAST);
     } else {
@@ -620,6 +642,36 @@ bool AudioControlManager::PlayRingtone()
     TELEPHONY_LOGI("play ringtone success");
     PostProcessRingtone();
     return true;
+}
+
+bool AudioControlManager::dealCrsScene(const AudioStandard::AudioRingerMode &ringMode)
+{
+    if (!isCrsVibrating_ && (ringMode != AudioStandard::AudioRingerMode::RINGER_MODE_SILENT)) {
+        if (ringMode == AudioStandard::AudioRingerMode::RINGER_MODE_VIBRATE || IsRingingVibrateModeOn()) {
+            isCrsVibrating_ = (DelayedSingleton<AudioProxy>::GetInstance()->StartVibrator() == TELEPHONY_SUCCESS);
+        }
+    }
+    if ((ringMode == AudioStandard::AudioRingerMode::RINGER_MODE_NORMAL) || IsBtOrWireHeadPlugin()) {
+        AdjustVolumesForCrs();
+        if (PlaySoundtone()) {
+            TELEPHONY_LOGI("play soundtone success");
+            return true;
+        }
+        return false;
+    }
+    TELEPHONY_LOGI("type_crs but not play ringtone");
+    return false;
+}
+
+bool AudioControlManager::IsVideoRing(const std::string &personalNotificationRingtone, const std::string &ringtonePath)
+{
+    if ((personalNotificationRingtone.length() > VIDEO_RING_PATH_FIX_TAIL_LENGTH &&
+        personalNotificationRingtone.substr(personalNotificationRingtone.length() - VIDEO_RING_PATH_FIX_TAIL_LENGTH,
+        VIDEO_RING_PATH_FIX_TAIL_LENGTH) == VIDEO_RING_PATH_FIX_TAIL) || ringtonePath == SYSTEM_VIDEO_RING) {
+        TELEPHONY_LOGI("Is video ring.");
+        return true;
+    }
+    return false;
 }
 
 void AudioControlManager::PostProcessRingtone()
@@ -744,6 +796,10 @@ AudioDeviceType AudioControlManager::GetInitAudioDeviceType() const
          */
         if (AudioDeviceManager::IsDistributedCallConnected()) {
             return AudioDeviceType::DEVICE_DISTRIBUTED_AUTOMOTIVE;
+        }
+        AudioDevice device;
+        if (AudioDeviceManager::IsNearlinkActived(device)) {
+            return AudioDeviceType::DEVICE_NEARLINK;
         }
         if (AudioDeviceManager::IsBtActived()) {
             return AudioDeviceType::DEVICE_BLUETOOTH_SCO;
@@ -998,6 +1054,7 @@ bool AudioControlManager::ShouldPlayRingtone() const
     int32_t incomingCallNum = processor->GetCallNumber(TelCallState::CALL_STATUS_INCOMING);
     if (incomingCallNum == EMPTY_VALUE || alertingCallNum > EMPTY_VALUE || ringState_ == RingState::RINGING
         || (soundState_ == SoundState::SOUNDING && CallObjectManager::HasIncomingCallCrsType())) {
+        TELEPHONY_LOGI("should not play ring tone.");
         return false;
     }
     return true;
@@ -1166,7 +1223,7 @@ bool AudioControlManager::IsBtOrWireHeadPlugin()
 bool AudioControlManager::IsRingingVibrateModeOn()
 {
     auto datashareHelper = SettingsDataShareHelper::GetInstance();
-    std::string ringingVibrateModeEnable {"1"};
+    std::string ringingVibrateModeEnable {"0"};
     std::vector<int> activedOsAccountIds;
     OHOS::AccountSA::OsAccountManager::QueryActiveOsAccountIds(activedOsAccountIds);
     if (activedOsAccountIds.empty()) {
@@ -1178,7 +1235,7 @@ bool AudioControlManager::IsRingingVibrateModeOn()
         "datashare:///com.ohos.settingsdata/entry/settingsdata/USER_SETTINGSDATA_"
         + std::to_string(userId) + "?Proxy=true");
     int resp = datashareHelper->Query(uri, "hw_vibrate_when_ringing", ringingVibrateModeEnable);
-    if (resp == TELEPHONY_SUCCESS && ringingVibrateModeEnable == "1") {
+    if ((resp == TELEPHONY_SUCCESS && ringingVibrateModeEnable == "1") || resp == TELEPHONY_ERR_UNINIT) {
         TELEPHONY_LOGI("RingingVibrateModeOpen:true");
         return true;
     }

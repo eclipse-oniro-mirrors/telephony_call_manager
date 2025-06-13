@@ -219,6 +219,8 @@ napi_value NapiCallManager::DeclareAudioDeviceEnum(napi_env env, napi_value expo
             NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(AudioDeviceType::DEVICE_SPEAKER))),
         DECLARE_NAPI_STATIC_PROPERTY("DEVICE_EARPIECE",
             NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(AudioDeviceType::DEVICE_EARPIECE))),
+        DECLARE_NAPI_STATIC_PROPERTY("DEVICE_NEARLINK",
+            NapiCallManagerUtils::ToInt32Value(env, static_cast<int32_t>(AudioDeviceType::DEVICE_NEARLINK))),
     };
     napi_value result = nullptr;
     napi_define_class(env, "AudioDeviceType", NAPI_AUTO_LENGTH, NapiCallManagerUtils::CreateEnumConstructor, nullptr,

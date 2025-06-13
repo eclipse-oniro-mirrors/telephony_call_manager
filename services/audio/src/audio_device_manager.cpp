@@ -294,6 +294,29 @@ void AudioDeviceManager::ResetDistributedCallDevicesList()
     TELEPHONY_LOGI("Reset Distributed Audio Devices List success");
 }
 
+void AudioDeviceManager::ResetNearlinkAudioDevicesList()
+{
+    std::lock_guard<std::mutex> lock(infoMutex_);
+    std::vector<AudioDevice>::iterator it = info_.audioDeviceList.begin();
+    bool hadNearlinkActived = false;
+    while (it != info_.audioDeviceList.end()) {
+        if (it->deviceType == AudioDeviceType::DEVICE_NEARLINK) {
+            hadNearlinkActived = true;
+            it = info_.audioDeviceList.erase(it);
+        } else {
+            ++it;
+        }
+    }
+    if (hadNearlinkActived) {
+        ReportAudioDeviceInfo();
+    }
+    if (audioDeviceType_ == AudioDeviceType::DEVICE_NEARLINK) {
+        TELEPHONY_LOGI("Nearlink SA removed, init audio device");
+        ProcessEvent(AudioEvent::INIT_AUDIO_DEVICE);
+    }
+    TELEPHONY_LOGI("ResetNearlinkAudioDevicesList success");
+}
+
 bool AudioDeviceManager::InitAudioDevice()
 {
     // when audio deactivate interrupt , reinit
@@ -374,6 +397,9 @@ bool AudioDeviceManager::SwitchDevice(AudioDeviceType device)
         case AudioDeviceType::DEVICE_DISABLE:
             result = DisableAll();
             break;
+        case AudioDeviceType::DEVICE_NEARLINK:
+            result = EnableNearlink();
+            break;
         default:
             break;
     }
@@ -422,6 +448,18 @@ bool AudioDeviceManager::EnableBtSco()
         return true;
     }
     TELEPHONY_LOGI("enable bluetooth sco device failed");
+    return false;
+}
+
+bool AudioDeviceManager::EnableNearlink()
+{
+    AudioDevice device;
+    if (IsNearlinkActived(device)) {
+        TELEPHONY_LOGI("nearlink enabled , current audio device : nearlink");
+        SetCurrentAudioDevice(AudioDeviceType::DEVICE_NEARLINK);
+        return true;
+    }
+    TELEPHONY_LOGI("enable nearlink device failed");
     return false;
 }
 
@@ -513,18 +551,13 @@ int32_t AudioDeviceManager::ReportAudioDeviceChange(const AudioDevice &device)
     std::string address = device.address;
     std::string deviceName = device.deviceName;
     if (audioDeviceType_ == AudioDeviceType::DEVICE_BLUETOOTH_SCO) {
-        if (address.empty() || deviceName.empty()) {
-            std::shared_ptr<AudioStandard::AudioDeviceDescriptor> activeBluetoothDevice =
-                AudioStandard::AudioRoutingManager::GetInstance()->GetActiveBluetoothDevice();
-            if (activeBluetoothDevice != nullptr && !activeBluetoothDevice->macAddress_.empty()) {
-                address = activeBluetoothDevice->macAddress_;
-                deviceName = activeBluetoothDevice->deviceName_;
-            }
-        }
+        UpdateBtDevice(address, deviceName);
     } else if (DelayedSingleton<DistributedCommunicationManager>::GetInstance()->IsDistributedDev(device)) {
         TELEPHONY_LOGI("audio device is distributed communication dev");
     } else if (IsDistributedAudioDeviceType(audioDeviceType_)) {
         address = DelayedSingleton<DistributedCallManager>::GetInstance()->GetConnectedDCallDeviceAddr();
+    } else if (audioDeviceType_ == AudioDeviceType::DEVICE_NEARLINK) {
+        UpdateNearlinkDevice(address, deviceName);
     }
     if (address.length() > kMaxAddressLen) {
         TELEPHONY_LOGE("address is not too long");
@@ -554,6 +587,35 @@ int32_t AudioDeviceManager::ReportAudioDeviceChange(const AudioDevice &device)
     return ReportAudioDeviceInfo();
 }
 
+void AudioDeviceManager::UpdateBtDevice(std::string &address, std::string &deviceName)
+{
+    if (!address.empty() && !deviceName.empty()) {
+        return;
+    }
+
+    std::shared_ptr<AudioStandard::AudioDeviceDescriptor> activeBluetoothDevice =
+        AudioStandard::AudioRoutingManager::GetInstance()->GetActiveBluetoothDevice();
+    if (activeBluetoothDevice != nullptr && !activeBluetoothDevice->macAddress_.empty()) {
+        address = activeBluetoothDevice->macAddress_;
+        deviceName = activeBluetoothDevice->deviceName_;
+    }
+}
+
+void AudioDeviceManager::UpdateNearlinkDevice(std::string &address, std::string &deviceName)
+{
+    if (!address.empty() && !deviceName.empty()) {
+        return;
+    }
+
+    AudioDevice device;
+    if (!IsNearlinkActived(device)) {
+        TELEPHONY_LOGE("Get active nearlink device failed.");
+        return;
+    }
+    address = device.address;
+    deviceName = device.deviceName;
+}
+
 int32_t AudioDeviceManager::ReportAudioDeviceInfo()
 {
     sptr<CallBase> liveCall = CallObjectManager::GetAudioLiveCall();
@@ -563,7 +625,8 @@ int32_t AudioDeviceManager::ReportAudioDeviceInfo()
 std::string AudioDeviceManager::ConvertAddress()
 {
     std::string addr = info_.currentAudioDevice.address;
-    if (info_.currentAudioDevice.deviceType == AudioDeviceType::DEVICE_BLUETOOTH_SCO) {
+    if (info_.currentAudioDevice.deviceType == AudioDeviceType::DEVICE_BLUETOOTH_SCO ||
+        info_.currentAudioDevice.deviceType == AudioDeviceType::DEVICE_NEARLINK) {
         if (!addr.empty() && addr.length() > DEVICE_ADDR_LEN) {
             return (addr.substr(0, ADDR_HEAD_VALID_LEN) + ":*:*:*:" +
                 addr.substr(addr.length() - ADDR_TAIL_VALID_LEN));
@@ -649,6 +712,17 @@ bool AudioDeviceManager::IsBtActived()
         return true;
     }
     return false;
+}
+
+bool AudioDeviceManager::IsNearlinkActived(AudioDevice &device)
+{
+    if (DelayedSingleton<AudioProxy>::GetInstance()->GetPreferredOutputAudioDevice(device) != TELEPHONY_SUCCESS) {
+        return false;
+    }
+    if (device.deviceType != AudioDeviceType::DEVICE_NEARLINK || strlen(device.address) == 0) {
+        return false;
+    }
+    return true;
 }
 
 bool AudioDeviceManager::IsDistributedCallConnected()

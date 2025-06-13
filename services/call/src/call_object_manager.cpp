@@ -832,7 +832,7 @@ std::string CallObjectManager::GetCallNumber(TelCallState callState, bool isIncl
     return number;
 }
 
-std::vector<CallAttributeInfo> CallObjectManager::GetCallInfoList(int32_t slotId)
+std::vector<CallAttributeInfo> CallObjectManager::GetCallInfoList(int32_t slotId, bool isIncludeVoipCall)
 {
     std::vector<CallAttributeInfo> callVec;
     CallAttributeInfo info;
@@ -842,7 +842,8 @@ std::vector<CallAttributeInfo> CallObjectManager::GetCallInfoList(int32_t slotId
     for (it = callObjectPtrList_.begin(); it != callObjectPtrList_.end(); ++it) {
         (void)memset_s(&info, sizeof(CallAttributeInfo), 0, sizeof(CallAttributeInfo));
         (*it)->GetCallAttributeInfo(info);
-        if (info.accountId == slotId && info.callType != CallType::TYPE_OTT) {
+        if (info.accountId == slotId && info.callType != CallType::TYPE_OTT &&
+            (isIncludeVoipCall || info.callType != CallType::TYPE_VOIP)) {
             callVec.emplace_back(info);
         }
     }
@@ -993,7 +994,7 @@ int32_t CallObjectManager::DealFailDial(sptr<CallBase> call)
     return DelayedSingleton<ReportCallInfoHandler>::GetInstance()->UpdateCallReportInfo(callDetatilInfo);
 }
 
-std::vector<CallAttributeInfo> CallObjectManager::GetAllCallInfoList()
+std::vector<CallAttributeInfo> CallObjectManager::GetAllCallInfoList(bool isIncludeVoipCall)
 {
     std::vector<CallAttributeInfo> callVec;
     callVec.clear();
@@ -1006,7 +1007,9 @@ std::vector<CallAttributeInfo> CallObjectManager::GetAllCallInfoList()
             continue;
         }
         (*it)->GetCallAttributeInfo(info);
-        callVec.emplace_back(info);
+        if (isIncludeVoipCall || info.callType != CallType::TYPE_VOIP) {
+            callVec.emplace_back(info);
+        }
     }
     std::vector<CallAttributeInfo> voipCallVec = GetVoipCallInfoList();
     for (CallAttributeInfo voipCall : voipCallVec) {
