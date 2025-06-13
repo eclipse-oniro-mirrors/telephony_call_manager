@@ -827,5 +827,15 @@ int32_t CallManagerClient::SendUssdResponse(int32_t slotId, std::string &content
         return TELEPHONY_ERR_UNINIT;
     }
 }
+
+int32_t CallManagerClient::SetCallPolicyInfo(int32_t dialingPolicy, const std::vector<std::string> &dialingList,
+    int32_t incomingPolicy, const std::vector<std::string> &incomingList)
+{
+    if (g_callManagerProxy != nullptr) {
+        return g_callManagerProxy->SetCallPolicyInfo(dialingPolicy, dialingList, incomingPolicy, incomingList);
+    }
+    TELEPHONY_LOGE("init first please!");
+    return TELEPHONY_ERR_UNINIT;
+}
 } // namespace Telephony
 } // namespace OHOS

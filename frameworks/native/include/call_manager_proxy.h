@@ -125,7 +125,9 @@ public:
     int32_t SendCallUiEvent(int32_t callId, std::string &eventName);
     sptr<ICallStatusCallback> RegisterBluetoothCallManagerCallbackPtr(std::string &macAddress);
     int32_t SendUssdResponse(int32_t slotId, std::string &content);
-
+    int32_t SetCallPolicyInfo(int32_t dialingPolicy, const std::vector<std::string> &dialingList,
+        int32_t incomingPolicy, const std::vector<std::string> &incomingList);
+        
 private:
     int32_t ConnectService();
     void DisconnectService();

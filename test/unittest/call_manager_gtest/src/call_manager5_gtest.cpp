@@ -1020,5 +1020,19 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SendUssdResponse_0100, Function
         return;
     }
 }
+
+/**
+ * @tc.number   Telephony_CallManager_Telephony_CallManager_SetCallPolicyInfo_0100
+ * @tc.name     input slotId:0, content:1, Test SetCallPolicyInfo, return error code if failed
+ * @tc.desc     Function test
+ * @tc.require: issueI5JUAQ
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallPolicyInfo_0100, Function | MediumTest | Level2)
+{
+    std::vector<std::string> dialingList;
+    std::vector<std::string> incomingList;
+    EXPECT_EQ(CallManagerGtest::clientPtr_->SetCallPolicyInfo(0, dialingList, 0, incomingList),
+        TELEPHONY_ERR_PERMISSION_ERR);
+}
 } // namespace Telephony
 } // namespace OHOS

@@ -146,6 +146,7 @@ call_manager_sources = [
   "${call_manager_path}/utils/src/number_identity_data_base_helper.cpp",
   "${call_manager_path}/utils/src/screen_sensor_plugin.cpp",
   "${call_manager_path}/utils/src/settings_datashare_helper.cpp",
+  "${call_manager_path}/utils/src/edm_call_policy.cpp",
 ]
 
 call_manager_include_dirs = [
