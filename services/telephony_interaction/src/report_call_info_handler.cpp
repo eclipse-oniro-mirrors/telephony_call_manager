@@ -66,47 +66,6 @@ int32_t ReportCallInfoHandler::UpdateCallReportInfo(const CallDetailInfo &info)
     return TELEPHONY_SUCCESS;
 }
 
-void ReportCallInfoHandler::ClearVoipCall(sptr<CallBase> &call)
-{
-    CallDetailInfo callDetatilInfo;
-    if (memset_s(&callDetatilInfo, sizeof(CallDetailInfo), 0, sizeof(CallDetailInfo)) != EOK) {
-        TELEPHONY_LOGE("memset_s callDetatilInfo fail");
-        return;
-    }
-    std::string number = call->GetAccountNumber();
-    callDetatilInfo.callType = call->GetCallType();
-    callDetatilInfo.accountId = call->GetSlotId();
-    callDetatilInfo.state = TelCallState::CALL_STATUS_DISCONNECTED;
-    callDetatilInfo.callMode = call->GetVideoStateType();
-    callDetatilInfo.voiceDomain = static_cast<int32_t>(call->GetCallType());
-    if (number.length() > kMaxNumberLen) {
-        TELEPHONY_LOGE("numbser length out of range");
-        return;
-    }
-    if (memcpy_s(&callDetatilInfo.phoneNum, kMaxNumberLen, number.c_str(), number.length()) != EOK) {
-        TELEPHONY_LOGE("memcpy_s number failed!");
-        return;
-    }
-    if (callStatusManagerPtr_ == nullptr) {
-        TELEPHONY_LOGE("callStatusManagerPtr_ is null");
-        return;
-    }
-    std::weak_ptr<CallStatusManager> callStatusManagerPtr = callStatusManagerPtr_;
-    TELEPHONY_LOGW("UpdateCallReportInfo submit task enter");
-    reportCallInfoQueue.submit([callStatusManagerPtr, callDetatilInfo, &call]() {
-        std::shared_ptr<CallStatusManager> managerPtr = callStatusManagerPtr.lock();
-        if (managerPtr == nullptr) {
-            TELEPHONY_LOGE("managerPtr is null");
-            return;
-        }
-        auto ret = managerPtr->HandleCallReportInfo(callDetatilInfo);
-        if (ret != TELEPHONY_SUCCESS) {
-            TELEPHONY_LOGE("HandleCallReportInfo failed! ret:%{public}d", ret);
-        }
-        CallObjectManager::DeleteOneCallObject(call);
-    });
-}
-
 void ReportCallInfoHandler::BuildCallDetailsInfo(CallDetailsInfo &info, CallDetailsInfo &callDetailsInfo)
 {
     CallDetailInfo callDetailInfo;

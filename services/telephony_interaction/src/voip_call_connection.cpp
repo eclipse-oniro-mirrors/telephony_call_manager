@@ -22,7 +22,6 @@
 #include "system_ability_definition.h"
 #include "telephony_log_wrapper.h"
 #include "voip_call_manager_proxy.h"
-#include "report_call_info_handler.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -147,6 +146,7 @@ int32_t VoipCallConnection::RegisterCallManagerCallBack(const sptr<ICallStatusCa
         TELEPHONY_LOGI("Voipconnect RegisterCallManagerCallBack voipCallManagerInterfacePtr_ is null");
         return TELEPHONY_ERROR;
     }
+    voipCallCallbackPtr_ = callback;
     return voipCallManagerInterfacePtr_->RegisterCallManagerCallBack(callback);
 }
 
@@ -160,6 +160,7 @@ int32_t VoipCallConnection::UnRegisterCallManagerCallBack()
             TELEPHONY_LOGI("Voipconnect UnRegisterCallManagerCallBack voipCallManagerInterfacePtr_ is null");
             return TELEPHONY_ERROR;
         }
+        voipCallCallbackPtr_ = nullptr;
         ret = voipCallManagerInterfacePtr_->UnRegisterCallManagerCallBack();
     }
     UnInit();
@@ -188,6 +189,24 @@ void VoipCallConnection::SystemAbilityListener::OnRemoveSystemAbility(
     voipCallConnection->UnInit();
 }
 
+void VoipCallConnection::BuildDisconnectedCallInfo(CallReportInfo &callReportInfo, const VoipCallReportInfo &voipinfo)
+{
+    callReportInfo.callType = CallType::TYPE_VOIP;
+    callReportInfo.state = TelCallState::CALL_STATUS_DISCONNECTED;
+    callReportInfo.voipCallInfo.voipCallId = voipInfo.voipCallId;
+    callReportInfo.voipCallInfo.extensionId = voipInfo.extensionId;
+    callReportInfo.voipCallInfo.userName = voipinfo.userName;
+    (callReportInfo.voipCallInfo.userProfile).assign(voipInfo.userProfile.begin(), voipinfo.userProfile.end());
+    callReportInfo.voipCallInfo.abilityName = voipinfo.abilityName;
+    callReportInfo.voipCallInfo.voipBundleName = voipinfo.voipBundleName;
+    callReportInfo.voipCallInfo.showBannerForIncomingCall = voipinfo.showBannerForIncomingCall;
+    callReportInfo.voipCallInfo.isConferenceCall = voipinfo.isConferenceCall;
+    callReportInfo.voipCallInfo.isVoiceAnswerSupported = voipinfo.isVoiceAnswerSupported;
+    callReportInfo.voipCallInfo.hasMicPermission = voipinfo.hasMicPermission;
+    callReportInfo.voipCallInfo.isCapsuleSticky = voipinfo.isCapsuleSticky;
+    callReportInfo.voipCallInfo.uid = voipinfo.uid;
+}
+
 void VoipCallConnection::ClearVoipCall()
 {
     if (!CallObjectManager::HasVoipCallExist()) {
@@ -197,13 +216,20 @@ void VoipCallConnection::ClearVoipCall()
     std::list<sptr<CallBase>> allCallList = CallObjectManager::GetAllCallList();
     for (auto call : allCallList) {
         if (call != nullptr && call->GetCallType() == CallType::TYPE_VOIP) {
-            TELEPHONY_LOGI("clearVoipCall callId %{public}d", call->GetCallID());
-            //通知界面，voipcall异常，界面销毁
-            TelCallState currentState = call->GetTelCallState();
-            if (currentState != TelCallState::CALL_STATUS_DISCONNECTED) {
-                call->SetTelCallState(TelCallState::CALL_STATUS_DISCONNECTED);
+            //再上报一次，防止界面未销毁，上报DISCONNECTED后，会删除CallObject对象
+            std::lock_guard<std::mutex> lock(mutex_);
+            if (voipCallCallbackPtr_ != nullptr) {
+                TELEPHONY_LOGI("Report disconnected voip call again!");
+                CallAttributeInfo info;
+                call->GetCallAttributeInfo(info);
+                CallReportInfo callReportInfo;
+                BuildDisconnectedCallInfo(callReportInfo, info.voipCallInfo);
+                callReportInfo.callMode = call->GetVideoStateType();
+                voipCallCallbackPtr_->UpdateCallReportInfo(callReportInfo);
+            } else {
+                CallObjectManager::DeleteOneCallObject(call);
             }
-            DelayedSingleton<ReportCallInfoHandler>::GetInstance()->ClearVoipCall(call);
+
         }
     }
 }
