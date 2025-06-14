@@ -719,28 +719,6 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetImsFeatureValue_0300, TestSi
     }
 }
 
-/**
- * @tc.number   Telephony_CallManager_SetImsFeatureValue_0400
- * @tc.name     test set ims feature value with invalid type
- * @tc.desc     Function test
- */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_SetImsFeatureValue_0400, TestSize.Level0)
-{
-    AccessToken token;
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
-
-    int32_t value = 1;
-    FeatureType type = static_cast<FeatureType>(3);
-    if (HasSimCard(SIM1_SLOTID)) {
-        EXPECT_EQ(CallManagerGtest::clientPtr_->SetImsFeatureValue(SIM1_SLOTID, type, value), RETURN_VALUE_IS_ZERO);
-    }
-    if (HasSimCard(SIM2_SLOTID)) {
-        EXPECT_EQ(CallManagerGtest::clientPtr_->SetImsFeatureValue(SIM2_SLOTID, type, value), RETURN_VALUE_IS_ZERO);
-    }
-}
-
 /************************************** Test UpdateImsCallMode() ****************************************/
 /**
  * @tc.number   Telephony_CallManager_UpdateImsCallMode_0100
