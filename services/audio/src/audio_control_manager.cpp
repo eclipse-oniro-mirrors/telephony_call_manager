@@ -623,8 +623,6 @@ bool AudioControlManager::PlayRingtone()
         return dealCrsScene(ringMode);
     }
     if (IsVideoRing(contactInfo.personalNotificationRingtone, contactInfo.ringtonePath)) {
-        if (CallObjectManager::IsNeedSilentInDoNotDisturbMode())
-            return true;
         if ((ringMode == AudioStandard::AudioRingerMode::RINGER_MODE_NORMAL && IsRingingVibrateModeOn()) ||
             ringMode == AudioStandard::AudioRingerMode::RINGER_MODE_VIBRATE) {
             TELEPHONY_LOGI("need start vibrator.");
