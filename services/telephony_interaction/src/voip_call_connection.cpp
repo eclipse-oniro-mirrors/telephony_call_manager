@@ -189,22 +189,22 @@ void VoipCallConnection::SystemAbilityListener::OnRemoveSystemAbility(
     voipCallConnection->UnInit();
 }
 
-void VoipCallConnection::BuildDisconnectedCallInfo(CallReportInfo &callReportInfo, const VoipCallReportInfo &voipinfo)
+void VoipCallConnection::BuildDisconnectedCallInfo(CallReportInfo &callReportInfo, const VoipCallReportInfo &voipInfo)
 {
     callReportInfo.callType = CallType::TYPE_VOIP;
     callReportInfo.state = TelCallState::CALL_STATUS_DISCONNECTED;
     callReportInfo.voipCallInfo.voipCallId = voipInfo.voipCallId;
     callReportInfo.voipCallInfo.extensionId = voipInfo.extensionId;
-    callReportInfo.voipCallInfo.userName = voipinfo.userName;
-    (callReportInfo.voipCallInfo.userProfile).assign(voipInfo.userProfile.begin(), voipinfo.userProfile.end());
-    callReportInfo.voipCallInfo.abilityName = voipinfo.abilityName;
-    callReportInfo.voipCallInfo.voipBundleName = voipinfo.voipBundleName;
-    callReportInfo.voipCallInfo.showBannerForIncomingCall = voipinfo.showBannerForIncomingCall;
-    callReportInfo.voipCallInfo.isConferenceCall = voipinfo.isConferenceCall;
-    callReportInfo.voipCallInfo.isVoiceAnswerSupported = voipinfo.isVoiceAnswerSupported;
-    callReportInfo.voipCallInfo.hasMicPermission = voipinfo.hasMicPermission;
-    callReportInfo.voipCallInfo.isCapsuleSticky = voipinfo.isCapsuleSticky;
-    callReportInfo.voipCallInfo.uid = voipinfo.uid;
+    callReportInfo.voipCallInfo.userName = voipInfo.userName;
+    (callReportInfo.voipCallInfo.userProfile).assign(voipInfo.userProfile.begin(), voipInfo.userProfile.end());
+    callReportInfo.voipCallInfo.abilityName = voipInfo.abilityName;
+    callReportInfo.voipCallInfo.voipBundleName = voipInfo.voipBundleName;
+    callReportInfo.voipCallInfo.showBannerForIncomingCall = voipInfo.showBannerForIncomingCall;
+    callReportInfo.voipCallInfo.isConferenceCall = voipInfo.isConferenceCall;
+    callReportInfo.voipCallInfo.isVoiceAnswerSupported = voipInfo.isVoiceAnswerSupported;
+    callReportInfo.voipCallInfo.hasMicPermission = voipInfo.hasMicPermission;
+    callReportInfo.voipCallInfo.isCapsuleSticky = voipInfo.isCapsuleSticky;
+    callReportInfo.voipCallInfo.uid = voipInfo.uid;
 }
 
 void VoipCallConnection::ClearVoipCall()
@@ -229,7 +229,6 @@ void VoipCallConnection::ClearVoipCall()
             } else {
                 CallObjectManager::DeleteOneCallObject(call);
             }
-
         }
     }
 }
