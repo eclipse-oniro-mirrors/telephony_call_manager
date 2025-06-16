@@ -216,7 +216,7 @@ inline PermissionStateFull testPermConCellularCall = {
 };
 
 inline PermissionStateFull addPermissonManagerLocalAccounts = {
-    .permissionName = "ohos.permission.MANAGER_LOCAL_ACCOUNTS",
+    .permissionName = "ohos.permission.MANAGE_LOCAL_ACCOUNTS",
     .isGeneral = true,
     .resDeviceID = { "local" },
     .grantStatus = { PermissionState::PERMISSION_GRANTED },
