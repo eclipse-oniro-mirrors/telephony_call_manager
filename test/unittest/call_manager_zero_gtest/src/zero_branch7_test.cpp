@@ -602,6 +602,7 @@ HWTEST_F(ZeroBranch8Test, Telephony_VoipCallConnection_001, Function | MediumTes
     voipCallConnection->SendCallUiEventForWindow(extras);
     voipCallConnection->voipCallManagerInterfacePtr_ = nullptr;
     voipCallConnection->SendCallUiEventForWindow(extras);
+    voipCallConnection->ClearVoipCall();
 }
 
 HWTEST_F(ZeroBranch8Test, Telephony_CallSuperPrivacyControlManager_001, Function | MediumTest | Level1)

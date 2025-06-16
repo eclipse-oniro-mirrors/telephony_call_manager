@@ -57,6 +57,7 @@ private:
 #ifndef TELEPHONY_VOIP_CALL_MANAGER_SYS_ABILITY_ID
 #define TELEPHONY_VOIP_CALL_MANAGER_SYS_ABILITY_ID 65968
 #endif
+    void BuildDisconnectedCallInfo(CallReportInfo &callReportInfo, const VoipCallReportInfo &voipInfo);
     int32_t systemAbilityId_ = TELEPHONY_VOIP_CALL_MANAGER_SYS_ABILITY_ID;
     sptr<ICallStatusCallback> voipCallCallbackPtr_;
     sptr<IVoipCallManagerService> voipCallManagerInterfacePtr_ = nullptr;
