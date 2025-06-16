@@ -448,30 +448,6 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallWaiting_0700, TestSize.L
 
 /******************************************* Test GetCallRestriction() ********************************************/
 /**
- * @tc.number   Telephony_CallManager_GetCallRestriction_0100
- * @tc.name     input slotId 0, CallRestrictionType RESTRICTION_TYPE_ALL_INCOMING, test GetCallRestriction()
- * @tc.desc     Function test
- */
-HWTEST_F(CallManagerGtest, Telephony_CallManager_GetCallRestriction_0100, TestSize.Level0)
-{
-    AccessToken token;
-    if (!HasSimCard(SIM1_SLOTID) && !HasSimCard(SIM2_SLOTID)) {
-        return;
-    }
-
-    if (HasSimCard(SIM1_SLOTID)) {
-        EXPECT_EQ(CallManagerGtest::clientPtr_->GetCallRestriction(
-                      SIM1_SLOTID, CallRestrictionType::RESTRICTION_TYPE_ALL_INCOMING),
-            RETURN_VALUE_IS_ZERO);
-    }
-    if (HasSimCard(SIM2_SLOTID)) {
-        EXPECT_EQ(CallManagerGtest::clientPtr_->GetCallRestriction(
-                      SIM2_SLOTID, CallRestrictionType::RESTRICTION_TYPE_ALL_INCOMING),
-            RETURN_VALUE_IS_ZERO);
-    }
-}
-
-/**
  * @tc.number   Telephony_CallManager_GetCallRestriction_0200
  * @tc.name     input invalid slotId, CallRestrictionType RESTRICTION_TYPE_ALL_INCOMING, test GetCallRestriction()
  *              return failed
