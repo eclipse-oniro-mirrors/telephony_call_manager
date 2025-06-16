@@ -23,6 +23,7 @@
 #include "ims_call.h"
 #include "voip_call.h"
 #include "int_wrapper.h"
+#include "call_manager_connect.h"
 
 namespace OHOS::Telephony {
 using namespace testing::ext;
@@ -292,9 +293,9 @@ HWTEST_F(ZeroBranch9Test, Telephony_AudioControlManager_007, Function | MediumTe
 }
 
 /**
- * @tc.number Telephony_DealVideoRingPath_001
- * @tc.name test error branch
- * @tc.desc Function test
+ * @tc.number   Telephony_DealVideoRingPath_001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
  */
 HWTEST_F(ZeroBranch9Test, Telephony_DealVideoRingPath_001, TestSize.Level0)
 {
@@ -316,12 +317,13 @@ HWTEST_F(ZeroBranch9Test, Telephony_DealVideoRingPath_001, TestSize.Level0)
     memcpy_s(contactInfo.ringtonePath, strlen(SYSTEM_VIDEO_RING) + 1, SYSTEM_VIDEO_RING, strlen(SYSTEM_VIDEO_RING));
     memcpy_s(contactInfo.personalNotificationRingtone, strlen(STR_NOT_MP4) + 1, STR_NOT_MP4, strlen(STR_NOT_MP4));
     ASSERT_NO_THROW(callStatusManager->DealVideoRingPath(contactInfo, callObjectPtr));
-    DelayedSingleton::GetInstance()->UnInit();
+    DelayedSingleton<AudioControlManager>::GetInstance()->UnInit();
 }
+
 /**
- * @tc.number Telephony_PlayRingtone_001
- * @tc.name test error branch
- * @tc.desc Function test
+ * @tc.number   Telephony_PlayRingtone_001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
  */
 HWTEST_F(ZeroBranch9Test, Telephony_PlayRingtone_001, Function | MediumTest | Level3)
 {
@@ -342,6 +344,6 @@ HWTEST_F(ZeroBranch9Test, Telephony_PlayRingtone_001, Function | MediumTest | Le
     ASSERT_TRUE(audioControl->PlayRingtone());
     ringingCall->SetCrsType(CRS_TYPE);
     ASSERT_FALSE(audioControl->PlayRingtone());
-    DelayedSingleton::GetInstance()->UnInit();
+    DelayedSingleton<AudioControlManager>::GetInstance()->UnInit();
 }
 }

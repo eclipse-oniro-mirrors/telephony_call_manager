@@ -215,6 +215,14 @@ inline PermissionStateFull testPermConCellularCall = {
     .resDeviceID = { "local" },
 };
 
+inline PermissionStateFull addPermissonManagerLocalAccounts = {
+    .permissionName = "ohos.permission.MANAGER_LOCAL_ACCOUNTS",
+    .isGeneral = true,
+    .resDeviceID = { "local" },
+    .grantStatus = { PermissionState::PERMISSION_GRANTED },
+    .grantFlags = { 1 },
+};
+
 inline HapPolicyParams testPolicyParams = {
     .apl = APL_SYSTEM_BASIC,
     .domain = "test.domain",
@@ -222,7 +230,8 @@ inline HapPolicyParams testPolicyParams = {
         testPermAnswerCallDef, testReadCallLogDef, testWriteCallLogDef, testStartAbilityFromBGDef,
         testConCellularCallDef },
     .permStateList = { testPlaceCallState, testSetTelephonyState, testGetTelephonyState, testAnswerCallState,
-        testPermReadCallLog, testPermWriteCallLog, testPermStartAbilityFromBG, testPermConCellularCall },
+        testPermReadCallLog, testPermWriteCallLog, testPermStartAbilityFromBG, testPermConCellularCall,
+        addPermissonManagerLocalAccounts },
 };
 
 class AccessToken {
