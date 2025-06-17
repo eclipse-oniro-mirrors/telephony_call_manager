@@ -36,7 +36,7 @@ enum VideoUpdateStatus {
 
 class VideoCallState : public virtual RefBase {
 public:
-    VideoCallState(sptr<NetCallBase> callPtr);
+    VideoCallState(wptr<NetCallBase> callPtr);
     virtual ~VideoCallState() = default;
     bool IsCallSupportVideoCall();
     void SetVideoUpdateStatus(VideoUpdateStatus status);
@@ -52,13 +52,13 @@ public:
     sptr<VideoCallState> GetCallVideoState(ImsCallMode mode);
 
 protected:
-    sptr<NetCallBase> call_;
+    wptr<NetCallBase> call_;
     VideoUpdateStatus updateStatus_;
 };
 
 class AudioOnlyState : public VideoCallState {
 public:
-    AudioOnlyState(sptr<NetCallBase> callPtr);
+    AudioOnlyState(wptr<NetCallBase> callPtr);
     ~AudioOnlyState() = default;
     int32_t SendUpdateCallMediaModeRequest(ImsCallMode mode) override;
     int32_t RecieveUpdateCallMediaModeRequest(CallMediaModeInfo &imsCallModeInfo) override;
@@ -68,7 +68,7 @@ public:
 
 class VideoSendState : public VideoCallState {
 public:
-    VideoSendState(sptr<NetCallBase> callPtr);
+    VideoSendState(wptr<NetCallBase> callPtr);
     ~VideoSendState() = default;
     int32_t SendUpdateCallMediaModeRequest(ImsCallMode mode) override;
     int32_t RecieveUpdateCallMediaModeRequest(CallMediaModeInfo &imsCallModeInfo) override;
@@ -78,7 +78,7 @@ public:
 
 class VideoReceiveState : public VideoCallState {
 public:
-    VideoReceiveState(sptr<NetCallBase> callPtr);
+    VideoReceiveState(wptr<NetCallBase> callPtr);
     ~VideoReceiveState() = default;
     int32_t SendUpdateCallMediaModeRequest(ImsCallMode mode) override;
     int32_t RecieveUpdateCallMediaModeRequest(CallMediaModeInfo &imsCallModeInfo) override;
@@ -88,7 +88,7 @@ public:
 
 class VideoSendReceiveState : public VideoCallState {
 public:
-    VideoSendReceiveState(sptr<NetCallBase> callPtr);
+    VideoSendReceiveState(wptr<NetCallBase> callPtr);
     ~VideoSendReceiveState() = default;
     int32_t SendUpdateCallMediaModeRequest(ImsCallMode mode) override;
     int32_t RecieveUpdateCallMediaModeRequest(CallMediaModeInfo &imsCallModeInfo) override;
@@ -98,7 +98,7 @@ public:
 
 class VideoPauseState : public VideoCallState {
 public:
-    VideoPauseState(sptr<NetCallBase> callPtr);
+    VideoPauseState(wptr<NetCallBase> callPtr);
     ~VideoPauseState() = default;
     int32_t SendUpdateCallMediaModeRequest(ImsCallMode mode) override;
     int32_t RecieveUpdateCallMediaModeRequest(CallMediaModeInfo &imsCallModeInfo) override;
