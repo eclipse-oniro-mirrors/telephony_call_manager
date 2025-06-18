@@ -28,7 +28,7 @@ VideoCallState::VideoCallState(wptr<NetCallBase> callPtr)
 
 bool VideoCallState::IsCallSupportVideoCall()
 {
-    sprt<NetCallBase> callObjectPtr = call_.promote();
+    sptr<NetCallBase> callObjectPtr = call_.promote();
     if (callObjectPtr == nullptr) {
         TELEPHONY_LOGE("unexpected null pointer.");
         return false;
@@ -49,7 +49,7 @@ VideoUpdateStatus VideoCallState::GetVideoUpdateStatus()
 
 int32_t VideoCallState::SwitchCallVideoState(ImsCallMode mode)
 {
-    sprt<NetCallBase> callObjectPtr = call_.promote();
+    sptr<NetCallBase> callObjectPtr = call_.promote();
     if (callObjectPtr == nullptr) {
         TELEPHONY_LOGE("unexpected null pointer.");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -61,7 +61,7 @@ int32_t VideoCallState::SwitchCallVideoState(ImsCallMode mode)
 
 int32_t VideoCallState::DispatchUpdateVideoRequest(ImsCallMode mode)
 {
-    sprt<NetCallBase> callObjectPtr = call_.promote();
+    sptr<NetCallBase> callObjectPtr = call_.promote();
     if (callObjectPtr == nullptr) {
         TELEPHONY_LOGE("unexpected null pointer.");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -71,7 +71,7 @@ int32_t VideoCallState::DispatchUpdateVideoRequest(ImsCallMode mode)
 
 int32_t VideoCallState::DispatchUpdateVideoResponse(ImsCallMode mode)
 {
-    sprt<NetCallBase> callObjectPtr = call_.promote();
+    sptr<NetCallBase> callObjectPtr = call_.promote();
     if (callObjectPtr == nullptr) {
         TELEPHONY_LOGE("unexpected null pointer.");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -81,7 +81,7 @@ int32_t VideoCallState::DispatchUpdateVideoResponse(ImsCallMode mode)
 
 int32_t VideoCallState::DispatchReportVideoCallInfo(CallMediaModeInfo &imsCallModeInfo)
 {
-    sprt<NetCallBase> callObjectPtr = call_.promote();
+    sptr<NetCallBase> callObjectPtr = call_.promote();
     if (callObjectPtr == nullptr) {
         TELEPHONY_LOGE("unexpected null pointer.");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
@@ -91,7 +91,7 @@ int32_t VideoCallState::DispatchReportVideoCallInfo(CallMediaModeInfo &imsCallMo
 
 sptr<VideoCallState> VideoCallState::GetCallVideoState(ImsCallMode mode)
 {
-    sprt<NetCallBase> callObjectPtr = call_.promote();
+    sptr<NetCallBase> callObjectPtr = call_.promote();
     if (callObjectPtr == nullptr) {
         TELEPHONY_LOGE("unexpected null pointer.");
         return nullptr;
