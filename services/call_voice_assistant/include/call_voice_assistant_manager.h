@@ -58,7 +58,7 @@ public:
     bool DisconnectAbility();
     void PublishCommonEvent(bool isConnect, std::string publisher);
     void OnStartService(const std::string& isDial, const int32_t& callId);
-    void OnStopService();
+    void OnStopService(bool isDestructor = false);
     void UpdateReplyData(const std::string& str);
     void CallStateUpdated(sptr<CallBase> &callObjectPtr, TelCallState priorState, TelCallState nextState) override;
     void CallStatusIncoming(const int32_t& callId, const int32_t& accountId);
