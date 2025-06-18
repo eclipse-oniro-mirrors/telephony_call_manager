@@ -59,6 +59,7 @@ namespace OHOS {
 namespace Telephony {
 constexpr int32_t INIT_INDEX = 0;
 constexpr int32_t PRESENTATION_RESTRICTED = 3;
+constexpr int32_t MAIN_USER_SPACE = 100;
 
 CallStatusManager::CallStatusManager()
 {
@@ -856,6 +857,12 @@ void CallStatusManager::SetupAntiFraudService(const sptr<CallBase> &call, const 
     auto antiFraudService = DelayedSingleton<AntiFraudService>::GetInstance();
     NumberMarkInfo numberMarkInfo = call->GetNumberMarkInfo();
     std::string tmpStr(info.phoneNum);
+    std::vector<int> activedOsAccountIds;
+    OHOS::AccountSA::OsAccountManager::QueryActiveOsAccountIds(activedOsAccountIds);
+    if (activedOsAccountIds.empty() || activedOsAccountIds[0] != MAIN_USER_SPACE) {
+        TELEPHONY_LOGI("SetupAntiFraudService not in main user space");
+        return;
+    }
     if (numberMarkInfo.markType != MarkType::MARK_TYPE_FRAUD &&
         numberMarkInfo.markType != MarkType::MARK_TYPE_YELLOW_PAGE &&
         numberMarkInfo.markType != MarkType::MARK_TYPE_ENTERPRISE &&
