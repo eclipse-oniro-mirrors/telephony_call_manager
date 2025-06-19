@@ -22,6 +22,7 @@
 #include "pac_map.h"
 
 #include "call_object_manager.h"
+#include "edm_call_policy.h"
 
 /**
  * @ClassName: CallPolicy
@@ -73,9 +74,14 @@ public:
     int32_t HasNormalCall(bool isEcc, int32_t slotId, CallType callType);
     int32_t GetAirplaneMode(bool &isAirplaneModeOn);
     int32_t SuperPrivacyMode(std::u16string &number, AppExecFwk::PacMap &extras, bool isEcc);
+    int32_t SetEdmPolicy(int32_t dialingPolicy, const std::vector<std::string> &dialingList,
+        int32_t incomingPolicy, const std::vector<std::string> &incomingList);
+    bool IsDialingEnable(const std::string &phoneNum);
+    bool IsIncomingEnable(const std::string &phoneNum);
 
 private:
     bool IsCtSimCardSwitchToChnOrMc(int32_t slotId);
+    std::shared_ptr<EdmCallPolicy> edmCallPolicy_{nullptr};
 
 private:
     uint16_t onlyTwoCall_ = 2;

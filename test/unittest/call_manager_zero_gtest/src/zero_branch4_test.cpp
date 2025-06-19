@@ -787,6 +787,9 @@ HWTEST_F(ZeroBranch3Test, Telephony_CallManagerClient_002, TestSize.Level0)
     int32_t slotId = 0;
     std::string content = "1";
     ASSERT_GT(callManagerClient->SendUssdResponse(slotId, content), TELEPHONY_ERROR);
+    std::vector<std::string> dialingList;
+    std::vector<std::string> incomingList;
+    ASSERT_GT(callManagerClient->SetCallPolicyInfo(0, dialingList, 0, incomingList), TELEPHONY_ERROR);
 }
 
 /**

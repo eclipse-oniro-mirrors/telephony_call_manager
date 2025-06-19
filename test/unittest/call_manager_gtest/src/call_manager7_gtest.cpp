@@ -285,6 +285,9 @@ HWTEST_F(CallManagerGtest, Telephony_CallManagerService_002, TestSize.Level1)
     int32_t slotId = 0;
     std::string content = "1";
     ASSERT_EQ(callManagerService->SendUssdResponse(slotId, content), TELEPHONY_SUCCESS);
+    std::vector<std::string> dialingList;
+    std::vector<std::string> incomingList;
+    ASSERT_NE(callManagerService->SetCallPolicyInfo(0, dialingList, 0, incomingList), TELEPHONY_SUCCESS);
 }
 
 /**
@@ -330,6 +333,9 @@ HWTEST_F(CallManagerGtest, Telephony_CallManagerService_003, TestSize.Level1)
     callManagerService->ReportAudioDeviceInfo();
     std::string eventName = "EVENT_IS_CELIA_CALL";
     ASSERT_NE(callManagerService->SendCallUiEvent(callId, eventName), TELEPHONY_SUCCESS);
+    std::vector<std::string> dialingList;
+    std::vector<std::string> incomingList;
+    ASSERT_NE(callManagerService->SetCallPolicyInfo(0, dialingList, 0, incomingList), TELEPHONY_SUCCESS);
 }
 
 /**

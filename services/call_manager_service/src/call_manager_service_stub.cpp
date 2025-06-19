@@ -109,6 +109,8 @@ void CallManagerServiceStub::InitCallUtilsRequest()
             MessageParcel &data, MessageParcel &reply) { return OnRemoveMissedIncomingCallNotification(data, reply); };
     memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_OBSERVER_ON_CALL_DETAILS_CHANGE)] =
         [this](MessageParcel &data, MessageParcel &reply) { return OnObserverOnCallDetailsChange(data, reply); };
+    memberFuncMap_[static_cast<int32_t>(CallManagerInterfaceCode::INTERFACE_SET_CALL_POLICY_INFO)] =
+        [this](MessageParcel &data, MessageParcel &reply) { return OnSetCallPolicyInfo(data, reply); };
 }
 
 void CallManagerServiceStub::InitCallConferenceRequest()
@@ -1487,6 +1489,24 @@ int32_t CallManagerServiceStub::OnSendUssdResponse(MessageParcel &data, MessageP
         return TELEPHONY_ERR_WRITE_REPLY_FAIL;
     }
     return result;
+}
+
+int32_t CallManagerServiceStub::OnSetCallPolicyInfo(MessageParcel &data, MessageParcel &reply)
+{
+    int32_t result = TELEPHONY_ERR_FAIL;
+    int32_t dialingPolicy = data.ReadInt32();
+    std::vector<std::string> dialingList;
+    data.ReadStringVector(&dialingList);
+    int32_t incomingPolicy = data.ReadInt32();
+    std::vector<std::string> incomingList;
+    data.ReadStringVector(&incomingList);
+
+    result = SetCallPolicyInfo(dialingPolicy, dialingList, incomingPolicy, incomingList);
+    if (!reply.WriteInt32(result)) {
+        TELEPHONY_LOGE("SetCallPolicyInfo fail to write parcel");
+        return TELEPHONY_ERR_WRITE_REPLY_FAIL;
+    }
+    return TELEPHONY_SUCCESS;
 }
 } // namespace Telephony
 } // namespace OHOS

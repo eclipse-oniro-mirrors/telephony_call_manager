@@ -99,6 +99,7 @@ enum CallManagerInterfaceCode {
     INTERFACE_MAKE_CALL,
     INTERFACE_BLUETOOTH_REGISTER_CALLBACKPTR,
     INTERFACE_SEND_USSD_RESPONSE,
+    INTERFACE_SET_CALL_POLICY_INFO,
 };
 } // end extern
 } // namespace Telephony

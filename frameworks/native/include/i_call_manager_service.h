@@ -119,6 +119,8 @@ public:
     virtual int32_t SendCallUiEvent(int32_t callId, std::string &eventName) = 0;
     virtual sptr<ICallStatusCallback> RegisterBluetoothCallManagerCallbackPtr(std::string &macAddress) = 0;
     virtual int32_t SendUssdResponse(int32_t slotId, const std::string &content) = 0;
+    virtual int32_t SetCallPolicyInfo(int32_t dialingPolicy, const std::vector<std::string> &dialingList,
+        int32_t incomingPolicy, const std::vector<std::string> &incomingList) = 0;
 
 public:
     DECLARE_INTERFACE_DESCRIPTOR(u"OHOS.Telephony.ICallManagerService");
