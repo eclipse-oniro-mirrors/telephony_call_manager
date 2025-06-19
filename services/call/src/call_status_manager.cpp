@@ -1904,6 +1904,9 @@ bool CallStatusManager::ShouldBlockIncomingCall(const sptr<CallBase> &call, cons
         call->SetNumberMarkInfo(numberMarkInfo);
         call->SetBlockReason(blockReason);
         call->SetDetectDetails(detectDetails);
+        AAFwk::WantParams params = call->GetExtraParams();
+        params.SetParam("blockReason", AAFwk::Integer::Box(blockReason));
+        call->SetExtraParams(params);
         if (isBlock) {
             return true;
         }
