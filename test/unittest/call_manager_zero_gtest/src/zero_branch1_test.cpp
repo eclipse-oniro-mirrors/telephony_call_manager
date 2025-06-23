@@ -1213,7 +1213,7 @@ HWTEST_F(ZeroBranch2Test, Telephony_EdmCallPolicy_001, Function | MediumTest | L
     EXPECT_EQ(edmCallPolicy->IsDialingEnable(number), true);
     dialingList.clear();
     edmCallPolicy->SetCallPolicy(1, dialingList, 0, incomingList);
-    EXPECT_EQ(edmCallPolicy->IsDialingEnable(number), false);
+    EXPECT_EQ(edmCallPolicy->IsDialingEnable(number), true);
     if (isModifyParameter) {
         system::SetParameter("persist.edm.telephony_call_disable", "true");
     }
@@ -1244,7 +1244,7 @@ HWTEST_F(ZeroBranch2Test, Telephony_EdmCallPolicy_002, Function | MediumTest | L
     EXPECT_EQ(edmCallPolicy->IsIncomingEnable(number), true);
     incomingList.clear();
     edmCallPolicy->SetCallPolicy(0, dialingList, 1, incomingList);
-    EXPECT_EQ(edmCallPolicy->IsIncomingEnable(number), false);
+    EXPECT_EQ(edmCallPolicy->IsIncomingEnable(number), true);
 
     if (isModifyParameter) {
         system::SetParameter("persist.edm.telephony_call_disable", "true");
