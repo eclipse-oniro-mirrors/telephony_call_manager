@@ -40,4 +40,5 @@ group("unittest") {
   deps += [ "distributed_communication_test:distributed_communication_test" ]
   deps += [ "call_manager_special_test:tel_call_manager_special1_test" ]
   deps += [ "call_manager_special_test:tel_call_manager_special2_test" ]
+  deps += [ "call_manager_special_test:tel_call_manager_special3_test" ]
 }
