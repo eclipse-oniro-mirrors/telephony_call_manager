@@ -278,9 +278,8 @@ HWTEST_F(SpecialBranch3Test, Telephony_callularCallProxy_001, TestSize.Level1)
     auto cellularCallProxy = std::make_shared<CellularCallProxy>(impl);
     EXPECT_NE(cellularCallProxy->Dial(callInfo), TELEPHONY_SUCCESS);
     EXPECT_NE(cellularCallProxy->Reject(callInfo), TELEPHONY_SUCCESS);
-    EXPECT_NE(cellularCallProxy->AnSwer(callInfo), TELEPHONY_SUCCESS);
+    EXPECT_NE(cellularCallProxy->Answer(callInfo), TELEPHONY_SUCCESS);
     EXPECT_NE(cellularCallProxy->HoldCall(callInfo), TELEPHONY_SUCCESS);
-    EXPECT_NE(cellularCallProxy->UnHoldCall(callInfo), TELEPHONY_SUCCESS);
     EXPECT_NE(cellularCallProxy->UnHoldCall(callInfo), TELEPHONY_SUCCESS);
     EXPECT_NE(cellularCallProxy->SwitchCall(callInfo) TELEPHONY_SUCCESS);
     EXPECT_NE(cellularCallProxy->CombineConference(callInfo), TELEPHONY_SUCCESS);
@@ -305,7 +304,7 @@ HWTEST_F(SpecialBranch3Test, Telephony_callularCallProxy_002, TestSize.Level1)
     CellularCallInfo callInfo;
     CallTransferInfo ctInfo;
     auto Proxy = std::make_shared<CellularCallProxy>(impl);
-    std::vector<std::string> numberLisrt;
+    std::vector<std::string> numberList;
     char cDtmfCode = '1';
     bool proceed = false;
     bool result = false;
@@ -315,11 +314,11 @@ HWTEST_F(SpecialBranch3Test, Telephony_callularCallProxy_002, TestSize.Level1)
     std::string surfaceId = "123";
     std::string msg = "";
     sptr<Surface> surface;
-    std::string path= "";
+    std::string path = "";
     std::vector<EmergencyCall> eccVec;
     std::vector<CellularCallInfo> infos;
     std::string number = "0123456789";
-    EXPECT_NE(Proxy->HangUp(callInfo,CallSupplementType::TYPE_DEFAULT), TELEPHONY_SUCCESS);
+    EXPECT_NE(Proxy->HangUp(callInfo, CallSupplementType::TYPE_DEFAULT), TELEPHONY_SUCCESS);
     EXPECT_NE(Proxy->InviteToConference(slotId, numberList), TELEPHONY_SUCCESS);
     EXPECT_NE(Proxy->InviteToConference(slotId, numberList), TELEPHONY_SUCCESS);
     EXPECT_NE(Proxy->SendUpdateCallMediaModeRequest(callInfo, ImsCallMode::CALL_MODE_AUDIO_ONLY), TELEPHONY_SUCCESS);
@@ -335,8 +334,8 @@ HWTEST_F(SpecialBranch3Test, Telephony_callularCallProxy_002, TestSize.Level1)
     EXPECT_NE(Proxy->GetCarrierVtConfig(slotId, enabled), TELEPHONY_SUCCESS);
     EXPECT_NE(Proxy->SetImsConfig(slotId, ImsConfigltem::ITEM_VIDEO_QUALITY, 1), TELEPHONY_SUCCESS);
     EXPECT_NE(Proxy->ControlCamera(slotId, index, cameraId), TELEPHONY_SUCCESS);
-    EXPECT_NE(Proxy->SerPreviewWindow(slotId,index, surfaceId, surface), TELEPHONY_SUCCESS);
-    EXPECT_NE(Proxy->SetDisplayWindow(slotId,index, surfaceId, surface), TELEPHONY_SUCCESS);
+    EXPECT_NE(Proxy->SetPreviewWindow(slotId, index, surfaceId, surface), TELEPHONY_SUCCESS);
+    EXPECT_NE(Proxy->SetDisplayWindow(slotId, index, surfaceId, surface), TELEPHONY_SUCCESS);
     EXPECT_NE(Proxy->SetCameraZoom(1.0), TELEPHONY_SUCCESS);
     EXPECT_NE(Proxy->SetPausePicture(slotId, index, path), TELEPHONY_SUCCESS);
     EXPECT_NE(Proxy->SetDeviceDirection(slotId, index, 0), TELEPHONY_SUCCESS);
@@ -345,6 +344,6 @@ HWTEST_F(SpecialBranch3Test, Telephony_callularCallProxy_002, TestSize.Level1)
     EXPECT_NE(Proxy->ClearAllCalls(infos), TELEPHONY_SUCCESS);
     EXPECT_NE(Proxy->CancelCallUpgrade(slotId, index), TELEPHONY_SUCCESS);
     EXPECT_NE(Proxy->RequestCameraCapabilities(slotId, index), TELEPHONY_SUCCESS);
-    EXPECT_TRUE(croxy->isMniCode(slotId, number));     
+    EXPECT_TRUE(Proxy->isMniCode(slotId, number));     
 }
 } // namespace OHOS::Telephony
