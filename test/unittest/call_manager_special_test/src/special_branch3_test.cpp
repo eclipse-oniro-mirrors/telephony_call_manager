@@ -18,15 +18,14 @@
 #include <chrono>
 #include "call_manager_service_proxy.h"
 #include "call_manager_errors.h"
-#include "message_options.h"
+#include "message_option.h"
 #include "message_parcel.h"
-#include "cal_manager_proxy.h"
+#include "call_manager_proxy.h"
 #include "call_status_callback_proxy.h"
 #include "voip_call_manager_proxy.h"
 #include "call_status_callback.h"
 
-namespace OHOS {
-namespace Telephony {
+namespace OHOS::Telephony {
 using namespace testing::ext;
 class SpecialBranch3Test : public testing::Test {
 public:
@@ -61,10 +60,10 @@ void SpecialBranch3Test::TearDown()
 HWTEST_F(SpecialBranch3Test, Telephony_CallManagerServiceProxy_001, TestSize.Level1)
 {
     sptr<IRemoteObject> impl;
-    CallManagerServiceProxy proxy;
+    CallManagerServiceProxy proxy(impl);
     EXPECT_EQ(proxy.ObserverOnCallDetailsChange(), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
     EXPECT_EQ(proxy.MakeCall(""), TELEPHONY_ERR_ARGUMENT_INVALID);
-    EXPECT_EQ(proxy.MakeCall("1234"), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+    EXPECT_EQ(proxy.MakeCall("12345"), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
     EXPECT_EQ(proxy.AnswerCall(0, 0), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
     EXPECT_EQ(proxy.HoldCall(0), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
     EXPECT_EQ(proxy.UnHoldCall(0), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
@@ -79,6 +78,7 @@ HWTEST_F(SpecialBranch3Test, Telephony_CallManagerServiceProxy_001, TestSize.Lev
     EXPECT_EQ(proxy.StopDtmf(0), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
     EXPECT_EQ(proxy.PostDialProceed(0, false), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
     EXPECT_EQ(proxy.GetCallWaiting(0), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+    EXPECT_EQ(proxy.SetCallWaiting(0, false), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
     EXPECT_EQ(proxy.PostDialProceed(0, false), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
     EXPECT_EQ(proxy.GetCallRestriction(0, CallRestrictionType::RESTRICTION_TYPE_ALL_INCOMING),
         TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
@@ -112,7 +112,7 @@ HWTEST_F(SpecialBranch3Test, Telephony_CallManagerServiceProxy_001, TestSize.Lev
 HWTEST_F(SpecialBranch3Test, Telephony_CallManagerServiceProxy_002, TestSize.Level1)
 {
     sptr<IRemoteObject> impl;
-    CallManagerServiceProxy proxy;
+    CallManagerServiceProxy proxy(impl);
     EXPECT_EQ(proxy.SetCallPreferenceMode(0, 0), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
     std::u16string msg = u"";
     EXPECT_EQ(proxy.StartRtt(0, msg), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
@@ -120,7 +120,7 @@ HWTEST_F(SpecialBranch3Test, Telephony_CallManagerServiceProxy_002, TestSize.Lev
     EXPECT_EQ(proxy.CombineConference(0), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
     EXPECT_EQ(proxy.SeparateConference(0), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
     EXPECT_EQ(proxy.KickOutFromConference(0), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
-    EXPECT_EQ(proxy.ControlCameras(0, enabled), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+    EXPECT_EQ(proxy.ControlCamera(0, msg), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
     std::string id = "";
     EXPECT_EQ(proxy.SetPreviewWindow(0, id, nullptr), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
     EXPECT_EQ(proxy.SetDisplayWindow(0, id, nullptr), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
@@ -143,7 +143,7 @@ HWTEST_F(SpecialBranch3Test, Telephony_CallManagerServiceProxy_002, TestSize.Lev
     EXPECT_EQ(proxy.GetSubCallIdList(0, callIdList), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
     EXPECT_EQ(proxy.GetCallIdListForConference(0, callIdList), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
     EXPECT_EQ(proxy.GetImsConfig(0, ImsConfigItem::ITEM_VIDEO_QUALITY), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
-    EXPECT_EQ(proxy.SetImsConfig(0, ImsConfigItem::ITEM_VIDEO_QUALITY), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+    EXPECT_EQ(proxy.SetImsConfig(0, ImsConfigItem::ITEM_VIDEO_QUALITY, msg), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
     EXPECT_EQ(proxy.GetImsFeatureValue(0, FeatureType::TYPE_VOICE_OVER_LTE), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
     EXPECT_EQ(proxy.SetImsFeatureValue(0, FeatureType::TYPE_VOICE_OVER_LTE, 0), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
     EXPECT_EQ(proxy.UpdateImsCallMode(0, ImsCallMode::CALL_MODE_AUDIO_ONLY), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
@@ -167,7 +167,7 @@ HWTEST_F(SpecialBranch3Test, Telephony_CallManagerServiceProxy_002, TestSize.Lev
 HWTEST_F(SpecialBranch3Test, Telephony_CallManagerServiceProxy_003, TestSize.Level1)
 {
     sptr<IRemoteObject> impl;
-    CallManagerServiceProxy proxy;
+    CallManagerServiceProxy proxy(impl);
     EXPECT_EQ(proxy.CloseUnFinishedUssd(0), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
     std::string code = "";
     EXPECT_EQ(proxy.InputDialerSpecialCode(code), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
@@ -208,7 +208,7 @@ HWTEST_F(SpecialBranch3Test, Telephony_CallManagerProxy_001, TestSize.Level1)
     EXPECT_EQ(callManagerProxyPtr->ReportOttCallDetailsInfo(ottVec), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
     OttCallEventInfo ottInfo;
     EXPECT_EQ(callManagerProxyPtr->ReportOttCallEventInfo(ottInfo), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
-    EXPECT_EQ(callManagerProxyPtr->CloseUnFinishedUsed(0), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+    EXPECT_EQ(callManagerProxyPtr->CloseUnFinishedUssd(0), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
     EXPECT_EQ(callManagerProxyPtr->InputDialerSpecialCode(id), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
     EXPECT_EQ(callManagerProxyPtr->RemoveMissedIncomingCallNotification(), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
     EXPECT_EQ(callManagerProxyPtr->ReportAudioDeviceInfo(), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
@@ -230,16 +230,16 @@ HWTEST_F(SpecialBranch3Test, Telephony_VoipCallManagerProxy_001, TestSize.Level1
     EXPECT_EQ(proxy.RegisterCallManagerCallBack(nullptr), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
     sptr<ICallStatusCallback> statusCallback = (std::make_unique<CallStatusCallback>()).release();
     EXPECT_EQ(proxy.RegisterCallManagerCallBack(statusCallback), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
-    EXPECT_EQ(proxy.UnRegisterCallManagerCallBack(events, 0), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+    EXPECT_EQ(proxy.UnRegisterCallManagerCallBack(), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
     EXPECT_EQ(proxy.SendCallUiEvent("", CallAudioEvent::AUDIO_EVENT_MUTED), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
-    EXPECT_EQ(proxy.reportcall("", CallAudioEvent::AUDIO_EVENT_MUTED), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+    EXPECT_EQ(proxy.ReportCallAudioEventChange("", CallAudioEvent::AUDIO_EVENT_MUTED), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
 }
 /**
- * @tc.number   Telephony_CallManagerProxy_001
+ * @tc.number   Telephony_CallStatusCallbackProxy_001
  * @tc.name     test branch
  * @tc.desc     Function test
  */
-HWTEST_F(SpecialBranch3Test, Telephony_CallManagerProxy_001, TestSize.Level1)
+HWTEST_F(SpecialBranch3Test, Telephony_CallStatusCallbackProxy_001, TestSize.Level1)
 {
     auto callStatusCallbackProxy = std::make_shared<CallStatusCallbackProxy>(nullptr);
     CallModeReportInfo response;
@@ -255,9 +255,8 @@ HWTEST_F(SpecialBranch3Test, Telephony_CallManagerProxy_001, TestSize.Level1)
     PeerDimensionsReportInfo peerInfo;
     EXPECT_EQ(callStatusCallbackProxy->HandlePeerDimensionsChanged(peerInfo), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
     int64_t result = 0;
-    EXPECT_EQ(callStatusCallbackProxy->HandleCallDataUsageChanged(peerInfo), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+    EXPECT_EQ(callStatusCallbackProxy->HandleCallDataUsageChanged(result), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
     CameraCapabilitiesReportInfo cameraInfo;
     EXPECT_EQ(callStatusCallbackProxy->HandleCameraCapabilitiesChanged(cameraInfo), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
 }
-} // namespace Telephony
-} // namespace OHOS
+} // namespace OHOS::Telephony
