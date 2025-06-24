@@ -232,7 +232,8 @@ HWTEST_F(SpecialBranch3Test, Telephony_VoipCallManagerProxy_001, TestSize.Level1
     EXPECT_EQ(proxy.RegisterCallManagerCallBack(statusCallback), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
     EXPECT_EQ(proxy.UnRegisterCallManagerCallBack(), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
     EXPECT_EQ(proxy.SendCallUiEvent("", CallAudioEvent::AUDIO_EVENT_MUTED), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
-    EXPECT_EQ(proxy.ReportCallAudioEventChange("", CallAudioEvent::AUDIO_EVENT_MUTED), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+    EXPECT_EQ(proxy.ReportCallAudioEventChange("", CallAudioEvent::AUDIO_EVENT_MUTED),
+        TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
 }
 /**
  * @tc.number   Telephony_CallStatusCallbackProxy_001
@@ -243,8 +244,10 @@ HWTEST_F(SpecialBranch3Test, Telephony_CallStatusCallbackProxy_001, TestSize.Lev
 {
     auto callStatusCallbackProxy = std::make_shared<CallStatusCallbackProxy>(nullptr);
     CallModeReportInfo response;
-    EXPECT_EQ(callStatusCallbackProxy->ReceiveUpdateCallMediaModeRequest(response), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
-    EXPECT_EQ(callStatusCallbackProxy->ReceiveUpdateCallMediaModeResponse(response), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+    EXPECT_EQ(callStatusCallbackProxy->ReceiveUpdateCallMediaModeRequest(response),
+        TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+    EXPECT_EQ(callStatusCallbackProxy->ReceiveUpdateCallMediaModeResponse(response),
+        TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
     std::string str = "";
     const VoipCallEventInfo info;
     EXPECT_EQ(callStatusCallbackProxy->ReportPostDialChar(str), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
@@ -257,6 +260,7 @@ HWTEST_F(SpecialBranch3Test, Telephony_CallStatusCallbackProxy_001, TestSize.Lev
     int64_t result = 0;
     EXPECT_EQ(callStatusCallbackProxy->HandleCallDataUsageChanged(result), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
     CameraCapabilitiesReportInfo cameraInfo;
-    EXPECT_EQ(callStatusCallbackProxy->HandleCameraCapabilitiesChanged(cameraInfo), TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+    EXPECT_EQ(callStatusCallbackProxy->HandleCameraCapabilitiesChanged(cameraInfo),
+        TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
 }
 } // namespace OHOS::Telephony
