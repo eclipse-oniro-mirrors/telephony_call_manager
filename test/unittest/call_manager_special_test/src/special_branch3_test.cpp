@@ -281,7 +281,7 @@ HWTEST_F(SpecialBranch3Test, Telephony_callularCallProxy_001, TestSize.Level1)
     EXPECT_NE(cellularCallProxy->Answer(callInfo), TELEPHONY_SUCCESS);
     EXPECT_NE(cellularCallProxy->HoldCall(callInfo), TELEPHONY_SUCCESS);
     EXPECT_NE(cellularCallProxy->UnHoldCall(callInfo), TELEPHONY_SUCCESS);
-    EXPECT_NE(cellularCallProxy->SwitchCall(callInfo) TELEPHONY_SUCCESS);
+    EXPECT_NE(cellularCallProxy->SwitchCall(callInfo), TELEPHONY_SUCCESS);
     EXPECT_NE(cellularCallProxy->CombineConference(callInfo), TELEPHONY_SUCCESS);
     EXPECT_NE(cellularCallProxy->SeparateConference(callInfo), TELEPHONY_SUCCESS);
     EXPECT_NE(cellularCallProxy->KickOutFromConference(callInfo), TELEPHONY_SUCCESS);
@@ -289,6 +289,7 @@ HWTEST_F(SpecialBranch3Test, Telephony_callularCallProxy_001, TestSize.Level1)
     EXPECT_NE(cellularCallProxy->StopDtmf(callInfo), TELEPHONY_SUCCESS);
     EXPECT_NE(cellularCallProxy->StopRtt(slotId), TELEPHONY_SUCCESS);
     EXPECT_NE(cellularCallProxy->GetDomainPreferenceMode(slotId), TELEPHONY_SUCCESS);
+    std::string value = "";
     EXPECT_NE(cellularCallProxy->SetImsConfig(slotId, ImsConfigItem::ITEM_VIDEO_QUALITY, value), TELEPHONY_SUCCESS);
 }
 
@@ -324,7 +325,7 @@ HWTEST_F(SpecialBranch3Test, Telephony_callularCallProxy_002, TestSize.Level1)
     EXPECT_NE(Proxy->SendUpdateCallMediaModeRequest(callInfo, ImsCallMode::CALL_MODE_AUDIO_ONLY), TELEPHONY_SUCCESS);
     EXPECT_NE(Proxy->SendUpdateCallMediaModeResponse(callInfo, ImsCallMode::CALL_MODE_AUDIO_ONLY), TELEPHONY_SUCCESS);
     EXPECT_NE(Proxy->StartDtmf(cDtmfCode, callInfo), TELEPHONY_SUCCESS);
-    EXPECT_NE(Proxy->PostDiaProceed(callInfo, 0), TELEPHONY_SUCCESS);
+    EXPECT_NE(Proxy->PostDialProceed(callInfo, 0), TELEPHONY_SUCCESS);
     EXPECT_NE(Proxy->SendDtmf(cDtmfCode, callInfo), TELEPHONY_SUCCESS);
     EXPECT_NE(Proxy->StartRtt(slotId, msg), TELEPHONY_SUCCESS);
     EXPECT_NE(Proxy->SetCallTransferInfo(slotId, ctInfo), TELEPHONY_SUCCESS);
@@ -332,7 +333,7 @@ HWTEST_F(SpecialBranch3Test, Telephony_callularCallProxy_002, TestSize.Level1)
     EXPECT_NE(Proxy->GetVideoCallWaiting(slotId, enabled), TELEPHONY_SUCCESS);
     EXPECT_NE(Proxy->SetDomainPreferenceMode(slotId, -1), TELEPHONY_SUCCESS);
     EXPECT_NE(Proxy->GetCarrierVtConfig(slotId, enabled), TELEPHONY_SUCCESS);
-    EXPECT_NE(Proxy->SetImsConfig(slotId, ImsConfigltem::ITEM_VIDEO_QUALITY, 1), TELEPHONY_SUCCESS);
+    EXPECT_NE(Proxy->SetImsConfig(slotId, ImsConfigItem::ITEM_VIDEO_QUALITY, 1), TELEPHONY_SUCCESS);
     EXPECT_NE(Proxy->ControlCamera(slotId, index, cameraId), TELEPHONY_SUCCESS);
     EXPECT_NE(Proxy->SetPreviewWindow(slotId, index, surfaceId, surface), TELEPHONY_SUCCESS);
     EXPECT_NE(Proxy->SetDisplayWindow(slotId, index, surfaceId, surface), TELEPHONY_SUCCESS);
@@ -344,6 +345,6 @@ HWTEST_F(SpecialBranch3Test, Telephony_callularCallProxy_002, TestSize.Level1)
     EXPECT_NE(Proxy->ClearAllCalls(infos), TELEPHONY_SUCCESS);
     EXPECT_NE(Proxy->CancelCallUpgrade(slotId, index), TELEPHONY_SUCCESS);
     EXPECT_NE(Proxy->RequestCameraCapabilities(slotId, index), TELEPHONY_SUCCESS);
-    EXPECT_TRUE(Proxy->isMniCode(slotId, number));     
+    EXPECT_TRUE(Proxy->IsMniCode(slotId, number));
 }
 } // namespace OHOS::Telephony
