@@ -321,8 +321,14 @@ bool DistributedCallManager::SwitchOnDCallDeviceSync(const AudioDevice& device)
             TELEPHONY_LOGE("dcallProxy_ is nullptr");
             return false;
         }
+        if (isSwitching_) {
+            TELEPHONY_LOGI("in switching");
+            return false;
+        }
+        isSwitching_ = true;
         ReportDistributedDeviceInfo(device);
         ret = dcallProxy_->SwitchDevice(devId, DCALL_SWITCH_DEVICE_TYPE_SINK);
+        isSwitching_ = false;
     }
     if (ret == TELEPHONY_SUCCESS) {
         dCallDeviceSwitchedOn_.store(true);

@@ -620,9 +620,7 @@ bool CallControlManager::NotifyCallStateUpdated(
         if (callObjectPtr->GetCallType() == CallType::TYPE_VOIP) {
             return true;
         }
-        if ((priorState == TelCallState::CALL_STATUS_DIALING && nextState == TelCallState::CALL_STATUS_ALERTING) ||
-            (priorState == TelCallState::CALL_STATUS_DIALING && nextState == TelCallState::CALL_STATUS_ACTIVE) ||
-            (priorState == TelCallState::CALL_STATUS_INCOMING && nextState == TelCallState::CALL_STATUS_ACTIVE)) {
+        if (IsCallActivated(priorState, nextState)) {
             TELEPHONY_LOGI("call is actived, now check and switch call to distributed audio device");
             DelayedSingleton<AudioDeviceManager>::GetInstance()->CheckAndSwitchDistributedAudioDevice();
         } else if ((priorState == TelCallState::CALL_STATUS_ACTIVE &&
@@ -644,6 +642,14 @@ bool CallControlManager::NotifyCallStateUpdated(
         return true;
     }
     return false;
+}
+
+bool CallControlManager::IsCallActivated(const TelCallState& priorState, const TelCallState& nextState)
+{
+    return (priorState == TelCallState::CALL_STATUS_DIALING && nextState == TelCallState::CALL_STATUS_ALERTING) ||
+           (priorState == TelCallState::CALL_STATUS_DIALING && nextState == TelCallState::CALL_STATUS_ACTIVE) ||
+           (priorState == TelCallState::CALL_STATUS_INCOMING && nextState == TelCallState::CALL_STATUS_ACTIVE) ||
+           (priorState == TelCallState::CALL_STATUS_ALERTING && nextState == TelCallState::CALL_STATUS_ACTIVE);
 }
 
 bool CallControlManager::NotifyVoipCallStateUpdated(

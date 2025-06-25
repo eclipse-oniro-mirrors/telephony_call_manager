@@ -90,6 +90,7 @@ private:
     std::mutex dcallProxyMtx_;
     std::shared_ptr<DistributedCallProxy> dcallProxy_ = nullptr;
     std::shared_ptr<DistributedCallDeviceListener> dcallDeviceListener_ = nullptr;
+    bool isSwitching_ = false;
 };
 
 class DCallSystemAbilityListener : public SystemAbilityStatusChangeStub {
