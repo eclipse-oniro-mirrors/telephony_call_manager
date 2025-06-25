@@ -24,6 +24,7 @@
 #include "call_status_callback_proxy.h"
 #include "voip_call_manager_proxy.h"
 #include "call_status_callback.h"
+#include "cellular_call_proxy.h"
 
 namespace OHOS::Telephony {
 using namespace testing::ext;
@@ -262,5 +263,88 @@ HWTEST_F(SpecialBranch3Test, Telephony_CallStatusCallbackProxy_001, TestSize.Lev
     CameraCapabilitiesReportInfo cameraInfo;
     EXPECT_EQ(callStatusCallbackProxy->HandleCameraCapabilitiesChanged(cameraInfo),
         TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL);
+}
+
+/**
+ * @tc.number   Telephony_callularCallProxy_001
+ * @tc.name     test branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(SpecialBranch3Test, Telephony_callularCallProxy_001, TestSize.Level1)
+{
+    sptr<IRemoteObject> impl;
+    int32_t slotId = 0;
+    CellularCallInfo callInfo;
+    auto cellularCallProxy = std::make_shared<CellularCallProxy>(impl);
+    EXPECT_NE(cellularCallProxy->Dial(callInfo), TELEPHONY_SUCCESS);
+    EXPECT_NE(cellularCallProxy->Reject(callInfo), TELEPHONY_SUCCESS);
+    EXPECT_NE(cellularCallProxy->Answer(callInfo), TELEPHONY_SUCCESS);
+    EXPECT_NE(cellularCallProxy->HoldCall(callInfo), TELEPHONY_SUCCESS);
+    EXPECT_NE(cellularCallProxy->UnHoldCall(callInfo), TELEPHONY_SUCCESS);
+    EXPECT_NE(cellularCallProxy->SwitchCall(callInfo), TELEPHONY_SUCCESS);
+    EXPECT_NE(cellularCallProxy->CombineConference(callInfo), TELEPHONY_SUCCESS);
+    EXPECT_NE(cellularCallProxy->SeparateConference(callInfo), TELEPHONY_SUCCESS);
+    EXPECT_NE(cellularCallProxy->KickOutFromConference(callInfo), TELEPHONY_SUCCESS);
+    EXPECT_NE(cellularCallProxy->HangUpAllConnection(), TELEPHONY_SUCCESS);
+    EXPECT_NE(cellularCallProxy->StopDtmf(callInfo), TELEPHONY_SUCCESS);
+    EXPECT_NE(cellularCallProxy->StopRtt(slotId), TELEPHONY_SUCCESS);
+    EXPECT_NE(cellularCallProxy->GetDomainPreferenceMode(slotId), TELEPHONY_SUCCESS);
+    std::string value = "";
+    EXPECT_NE(cellularCallProxy->SetImsConfig(slotId, ImsConfigItem::ITEM_VIDEO_QUALITY, value), TELEPHONY_SUCCESS);
+}
+
+/**
+ * @tc.number   Telephony_callularCallProxy_002
+ * @tc.name     test branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(SpecialBranch3Test, Telephony_callularCallProxy_002, TestSize.Level1)
+{
+    sptr<IRemoteObject> impl;
+    int32_t slotId = 0;
+    CellularCallInfo callInfo;
+    CallTransferInfo ctInfo;
+    auto Proxy = std::make_shared<CellularCallProxy>(impl);
+    std::vector<std::string> numberList;
+    char cDtmfCode = '1';
+    bool proceed = false;
+    bool result = false;
+    bool enabled = false;
+    int32_t index = 1;
+    std::string cameraId = "";
+    std::string surfaceId = "123";
+    std::string msg = "";
+    sptr<Surface> surface;
+    std::string path = "";
+    std::vector<EmergencyCall> eccVec;
+    std::vector<CellularCallInfo> infos;
+    std::string number = "0123456789";
+    EXPECT_NE(Proxy->HangUp(callInfo, CallSupplementType::TYPE_DEFAULT), TELEPHONY_SUCCESS);
+    EXPECT_NE(Proxy->InviteToConference(slotId, numberList), TELEPHONY_SUCCESS);
+    EXPECT_NE(Proxy->InviteToConference(slotId, numberList), TELEPHONY_SUCCESS);
+    EXPECT_NE(Proxy->SendUpdateCallMediaModeRequest(callInfo, ImsCallMode::CALL_MODE_AUDIO_ONLY), TELEPHONY_SUCCESS);
+    EXPECT_NE(Proxy->SendUpdateCallMediaModeResponse(callInfo, ImsCallMode::CALL_MODE_AUDIO_ONLY), TELEPHONY_SUCCESS);
+    EXPECT_NE(Proxy->StartDtmf(cDtmfCode, callInfo), TELEPHONY_SUCCESS);
+    EXPECT_NE(Proxy->PostDialProceed(callInfo, 0), TELEPHONY_SUCCESS);
+    EXPECT_NE(Proxy->SendDtmf(cDtmfCode, callInfo), TELEPHONY_SUCCESS);
+    EXPECT_NE(Proxy->StartRtt(slotId, msg), TELEPHONY_SUCCESS);
+    EXPECT_NE(Proxy->SetCallTransferInfo(slotId, ctInfo), TELEPHONY_SUCCESS);
+    EXPECT_NE(Proxy->CanSetCallTransferTime(slotId, result), TELEPHONY_SUCCESS);
+    EXPECT_NE(Proxy->GetVideoCallWaiting(slotId, enabled), TELEPHONY_SUCCESS);
+    EXPECT_NE(Proxy->SetDomainPreferenceMode(slotId, -1), TELEPHONY_SUCCESS);
+    EXPECT_NE(Proxy->GetCarrierVtConfig(slotId, enabled), TELEPHONY_SUCCESS);
+    EXPECT_NE(Proxy->SetImsConfig(slotId, ImsConfigItem::ITEM_VIDEO_QUALITY, 1), TELEPHONY_SUCCESS);
+    EXPECT_NE(Proxy->ControlCamera(slotId, index, cameraId), TELEPHONY_SUCCESS);
+    EXPECT_NE(Proxy->SetPreviewWindow(slotId, index, surfaceId, surface), TELEPHONY_SUCCESS);
+    EXPECT_NE(Proxy->SetDisplayWindow(slotId, index, surfaceId, surface), TELEPHONY_SUCCESS);
+    EXPECT_NE(Proxy->SetCameraZoom(1.0), TELEPHONY_SUCCESS);
+    EXPECT_NE(Proxy->SetPausePicture(slotId, index, path), TELEPHONY_SUCCESS);
+    EXPECT_NE(Proxy->SetDeviceDirection(slotId, index, 0), TELEPHONY_SUCCESS);
+    EXPECT_NE(Proxy->SetMute(slotId, 0), TELEPHONY_SUCCESS);
+    EXPECT_NE(Proxy->SetEmergencyCallList(slotId, eccVec), TELEPHONY_SUCCESS);
+    EXPECT_NE(Proxy->ClearAllCalls(infos), TELEPHONY_SUCCESS);
+    EXPECT_NE(Proxy->CancelCallUpgrade(slotId, index), TELEPHONY_SUCCESS);
+    EXPECT_NE(Proxy->RequestCameraCapabilities(slotId, index), TELEPHONY_SUCCESS);
+    EXPECT_TRUE(Proxy->IsMmiCode(slotId, number));
 }
 } // namespace OHOS::Telephony
