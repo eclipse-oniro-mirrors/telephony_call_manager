@@ -1708,6 +1708,9 @@ int32_t CallManagerService::HandleVoIPCallEvent(int32_t callId, std::string &eve
 {
     AppExecFwk::PacMap mPacMap;
     sptr<CallBase> call = CallObjectManager::GetOneCallObject(callId);
+    if (call == nullptr) {
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
     if (call->GetCallType() == CallType::TYPE_VOIP) {
         CallAttributeInfo info;
         call->GetCallAttributeInfo(info);
