@@ -89,6 +89,8 @@ void NapiCallAbilityCallback::RegisterCallStateCallback(EventCallback stateCallb
 void NapiCallAbilityCallback::UnRegisterCallStateCallback()
 {
     if (stateCallback_.callbackRef) {
+        napi_delete_reference(stateCallback_.env, stateCallback_.callbackRef);
+        napi_delete_reference(stateCallback_..env, stateCallback_..thisVar);
         (void)memset_s(&stateCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
     }
 }
@@ -101,6 +103,8 @@ void NapiCallAbilityCallback::RegisterMmiCodeCallback(EventCallback eventCallbac
 void NapiCallAbilityCallback::UnRegisterMmiCodeCallback()
 {
     if (mmiCodeCallback_.callbackRef) {
+        napi_delete_reference(mmiCodeCallback_.env, mmiCodeCallback_.callbackRef);
+        napi_delete_reference(mmiCodeCallback_.env, mmiCodeCallback_.thisVar);
         (void)memset_s(&mmiCodeCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
     }
 }
@@ -144,6 +148,8 @@ void NapiCallAbilityCallback::RegisterCallEventCallback(EventCallback eventCallb
 void NapiCallAbilityCallback::UnRegisterCallEventCallback()
 {
     if (eventCallback_.callbackRef) {
+        napi_delete_reference(eventCallback_.env, eventCallback_.callbackRef);
+        napi_delete_reference(eventCallback_.env, eventCallback_.thisVar);
         (void)memset_s(&eventCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
     }
 }
@@ -156,6 +162,8 @@ void NapiCallAbilityCallback::RegisterImsCallModeChangeCallback(EventCallback ev
 void NapiCallAbilityCallback::UnRegisterImsCallModeChangeCallback()
 {
     if (eventCallback_.callbackRef) {
+        napi_delete_reference(imsCallModeCallback_.env, imsCallModeCallback_.callbackRef);
+        napi_delete_reference(imsCallModeCallback_.env, imsCallModeCallback_.thisVar);
         (void)memset_s(&imsCallModeCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
     }
 }
@@ -168,6 +176,8 @@ void NapiCallAbilityCallback::RegisterPeerDimensionsChangeCallback(EventCallback
 void NapiCallAbilityCallback::UnRegisterPeerDimensionsChangeCallback()
 {
     if (eventCallback_.callbackRef) {
+        napi_delete_reference(peerDimensionsCallback_.env, peerDimensionsCallback_.callbackRef);
+        napi_delete_reference(peerDimensionsCallback_.env, peerDimensionsCallback_.thisVar);
         (void)memset_s(&peerDimensionsCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
     }
 }
@@ -180,6 +190,8 @@ void NapiCallAbilityCallback::RegisterCallDataUsageChangeCallback(EventCallback 
 void NapiCallAbilityCallback::UnRegisterCallDataUsageChangeCallback()
 {
     if (eventCallback_.callbackRef) {
+        napi_delete_reference(callDataUsageCallback_.env, callDataUsageCallback_.callbackRef);
+        napi_delete_reference(callDataUsageCallback_.env, callDataUsageCallback_.thisVar);
         (void)memset_s(&callDataUsageCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
     }
 }
@@ -204,6 +216,8 @@ void NapiCallAbilityCallback::RegisterCallSessionEventChangeCallback(EventCallba
 void NapiCallAbilityCallback::UnRegisterCallSessionEventChangeCallback()
 {
     if (eventCallback_.callbackRef) {
+        napi_delete_reference(callSessionEventCallback_.env, callSessionEventCallback_.callbackRef);
+        napi_delete_reference(callSessionEventCallback_.env, callSessionEventCallback_.thisVar);
         (void)memset_s(&callSessionEventCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
     }
 }
@@ -216,6 +230,8 @@ void NapiCallAbilityCallback::RegisterDisconnectedCauseCallback(EventCallback ev
 void NapiCallAbilityCallback::UnRegisterDisconnectedCauseCallback()
 {
     if (callDisconnectCauseCallback_.callbackRef) {
+        napi_delete_reference(callDisconnectCauseCallback_.env, callDisconnectCauseCallback_.callbackRef);
+        napi_delete_reference(callDisconnectCauseCallback_.env, callDisconnectCauseCallback_.thisVar);
         (void)memset_s(&callDisconnectCauseCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
     }
 }
@@ -228,6 +244,8 @@ void NapiCallAbilityCallback::RegisterCallOttRequestCallback(EventCallback ottRe
 void NapiCallAbilityCallback::UnRegisterCallOttRequestCallback()
 {
     if (ottRequestCallback_.callbackRef) {
+        napi_delete_reference(ottRequestCallback_.env, ottRequestCallback_.callbackRef);
+        napi_delete_reference(ottRequestCallback_.env, ottRequestCallback_.thisVar);
         (void)memset_s(&ottRequestCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
     }
 }
