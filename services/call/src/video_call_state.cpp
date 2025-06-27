@@ -22,17 +22,18 @@
 
 namespace OHOS {
 namespace Telephony {
-VideoCallState::VideoCallState(sptr<NetCallBase> callPtr)
+VideoCallState::VideoCallState(wptr<NetCallBase> callPtr)
     : call_(callPtr), updateStatus_(VideoUpdateStatus::STATUS_NONE)
 {}
 
 bool VideoCallState::IsCallSupportVideoCall()
 {
-    if (call_ == nullptr) {
+    sptr<NetCallBase> callObjectPtr = call_.promote();
+    if (callObjectPtr == nullptr) {
         TELEPHONY_LOGE("unexpected null pointer.");
         return false;
     }
-    sptr<IMSCall> netCall = static_cast<IMSCall *>(call_.GetRefPtr());
+    sptr<IMSCall> netCall = static_cast<IMSCall *>(callObjectPtr.GetRefPtr());
     return netCall->IsSupportVideoCall();
 }
 
@@ -48,53 +49,58 @@ VideoUpdateStatus VideoCallState::GetVideoUpdateStatus()
 
 int32_t VideoCallState::SwitchCallVideoState(ImsCallMode mode)
 {
-    if (call_ == nullptr) {
+    sptr<NetCallBase> callObjectPtr = call_.promote();
+    if (callObjectPtr == nullptr) {
         TELEPHONY_LOGE("unexpected null pointer.");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    sptr<IMSCall> netCall = static_cast<IMSCall *>(call_.GetRefPtr());
+    sptr<IMSCall> netCall = static_cast<IMSCall *>(callObjectPtr.GetRefPtr());
     netCall->SwitchVideoState(mode);
     return TELEPHONY_SUCCESS;
 }
 
 int32_t VideoCallState::DispatchUpdateVideoRequest(ImsCallMode mode)
 {
-    if (call_ == nullptr) {
+    sptr<NetCallBase> callObjectPtr = call_.promote();
+    if (callObjectPtr == nullptr) {
         TELEPHONY_LOGE("unexpected null pointer.");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return call_->SendUpdateCallMediaModeRequest(mode);
+    return callObjectPtr->SendUpdateCallMediaModeRequest(mode);
 }
 
 int32_t VideoCallState::DispatchUpdateVideoResponse(ImsCallMode mode)
 {
-    if (call_ == nullptr) {
+    sptr<NetCallBase> callObjectPtr = call_.promote();
+    if (callObjectPtr == nullptr) {
         TELEPHONY_LOGE("unexpected null pointer.");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return call_->SendUpdateCallMediaModeResponse(mode);
+    return callObjectPtr->SendUpdateCallMediaModeResponse(mode);
 }
 
 int32_t VideoCallState::DispatchReportVideoCallInfo(CallMediaModeInfo &imsCallModeInfo)
 {
-    if (call_ == nullptr) {
+    sptr<NetCallBase> callObjectPtr = call_.promote();
+    if (callObjectPtr == nullptr) {
         TELEPHONY_LOGE("unexpected null pointer.");
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
     }
-    return call_->ReportImsCallModeInfo(imsCallModeInfo);
+    return callObjectPtr->ReportImsCallModeInfo(imsCallModeInfo);
 }
 
 sptr<VideoCallState> VideoCallState::GetCallVideoState(ImsCallMode mode)
 {
-    if (call_ == nullptr) {
+    sptr<NetCallBase> callObjectPtr = call_.promote();
+    if (callObjectPtr == nullptr) {
         TELEPHONY_LOGE("unexpected null pointer.");
         return nullptr;
     }
-    sptr<IMSCall> netCall = static_cast<IMSCall *>(call_.GetRefPtr());
+    sptr<IMSCall> netCall = static_cast<IMSCall *>(callObjectPtr.GetRefPtr());
     return netCall->GetCallVideoState(mode);
 }
 
-AudioOnlyState::AudioOnlyState(sptr<NetCallBase> callPtr) : VideoCallState(callPtr) {}
+AudioOnlyState::AudioOnlyState(wptr<NetCallBase> callPtr) : VideoCallState(callPtr) {}
 
 int32_t AudioOnlyState::SendUpdateCallMediaModeRequest(ImsCallMode mode)
 {
@@ -267,7 +273,7 @@ int32_t AudioOnlyState::ReceiveUpdateCallMediaModeResponse(CallMediaModeInfo &im
     return ret;
 }
 
-VideoSendState::VideoSendState(sptr<NetCallBase> callPtr) : VideoCallState(callPtr) {}
+VideoSendState::VideoSendState(wptr<NetCallBase> callPtr) : VideoCallState(callPtr) {}
 
 int32_t VideoSendState::SendUpdateCallMediaModeRequest(ImsCallMode mode)
 {
@@ -394,7 +400,7 @@ int32_t VideoSendState::ReceiveUpdateCallMediaModeResponse(CallMediaModeInfo &im
     return ret;
 }
 
-VideoReceiveState::VideoReceiveState(sptr<NetCallBase> callPtr) : VideoCallState(callPtr) {}
+VideoReceiveState::VideoReceiveState(wptr<NetCallBase> callPtr) : VideoCallState(callPtr) {}
 
 int32_t VideoReceiveState::SendUpdateCallMediaModeRequest(ImsCallMode mode)
 {
@@ -543,7 +549,7 @@ int32_t VideoReceiveState::ReceiveUpdateCallMediaModeResponse(CallMediaModeInfo 
     return ret;
 }
 
-VideoSendReceiveState::VideoSendReceiveState(sptr<NetCallBase> callPtr) : VideoCallState(callPtr) {}
+VideoSendReceiveState::VideoSendReceiveState(wptr<NetCallBase> callPtr) : VideoCallState(callPtr) {}
 
 int32_t VideoSendReceiveState::SendUpdateCallMediaModeRequest(ImsCallMode mode)
 {
@@ -667,7 +673,7 @@ int32_t VideoSendReceiveState::ReceiveUpdateCallMediaModeResponse(CallMediaModeI
     return ret;
 }
 
-VideoPauseState::VideoPauseState(sptr<NetCallBase> callPtr) : VideoCallState(callPtr) {}
+VideoPauseState::VideoPauseState(wptr<NetCallBase> callPtr) : VideoCallState(callPtr) {}
 
 int32_t VideoPauseState::SendUpdateCallMediaModeRequest(ImsCallMode mode)
 {

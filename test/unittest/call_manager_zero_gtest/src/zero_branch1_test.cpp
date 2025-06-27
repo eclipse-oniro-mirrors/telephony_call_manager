@@ -75,6 +75,7 @@
 #include "status_bar.h"
 #include "wired_headset.h"
 #include "call_status_policy.h"
+#include "edm_call_policy.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -401,6 +402,8 @@ HWTEST_F(ZeroBranch2Test, Telephony_CallObjectManager_001, Function | MediumTest
     csCall->SetCallType(CallType::TYPE_OTT);
     CallObjectManager::GetCallInfoList(SIM1_SLOTID);
     CallObjectManager::GetCallInfoList(DEFAULT_INDEX);
+    CallObjectManager::GetCallInfoList(DEFAULT_INDEX, false);
+    CallObjectManager::GetAllCallInfoList(false);
     ASSERT_FALSE(res);
 }
 
@@ -955,10 +958,20 @@ HWTEST_F(ZeroBranch2Test, Telephony_CallPolicy_006, Function | MediumTest | Leve
     CallPolicy callPolicy;
     bool isEcc = false;
     int32_t slotId = 0;
+    std::string number = "111111";
     callPolicy.HasNormalCall(isEcc, slotId, CallType::TYPE_IMS);
     bool isAirplaneModeOn = false;
     callPolicy.GetAirplaneMode(isAirplaneModeOn);
     ASSERT_EQ(isAirplaneModeOn, false);
+    std::vector<std::string> dialingList;
+    std::vector<std::string> incomingList;
+    ASSERT_EQ(callPolicy.IsDialingEnable(number), true);
+    ASSERT_EQ(callPolicy.IsIncomingEnable(number), true);
+    dialingList.push_back(number);
+    incomingList.push_back(number);
+    ASSERT_EQ(callPolicy.SetEdmPolicy(0, dialingList, 0, incomingList), TELEPHONY_ERR_SUCCESS);
+    ASSERT_EQ(callPolicy.IsDialingEnable(number), false);
+    ASSERT_EQ(callPolicy.IsIncomingEnable(number), false);
 }
 
 /**
@@ -1173,6 +1186,69 @@ HWTEST_F(ZeroBranch2Test, Telephony_CallNumberUtils_003, Function | MediumTest |
     ASSERT_TRUE(cellularCallConnection->IsMmiCode(0, dialStr));
     dialStr = "#10086#";
     ASSERT_TRUE(cellularCallConnection->IsMmiCode(0, dialStr));
+}
+
+/**
+ * @tc.number   Telephony_EdmCallPolicy_001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch2Test, Telephony_EdmCallPolicy_001, Function | MediumTest | Level1)
+{
+    std::vector<std::string> dialingList;
+    std::vector<std::string> incomingList;
+    std::string number = "11111111";
+    bool isModifyParameter = false;
+    std::shared_ptr<EdmCallPolicy> edmCallPolicy = std::make_shared<EdmCallPolicy>();
+    if (system::GetBoolParameter("persist.edm.telephony_call_disable", false)) {
+        system::SetParameter("persist.edm.telephony_call_disable", "false");
+        isModifyParameter = true;
+    }
+    edmCallPolicy->SetCallPolicy(0, dialingList, 0, incomingList);
+    EXPECT_EQ(edmCallPolicy->IsDialingEnable(number), true);
+    dialingList.push_back(number);
+    edmCallPolicy->SetCallPolicy(0, dialingList, 0, incomingList);
+    EXPECT_EQ(edmCallPolicy->IsDialingEnable(number), false);
+    edmCallPolicy->SetCallPolicy(1, dialingList, 0, incomingList);
+    EXPECT_EQ(edmCallPolicy->IsDialingEnable(number), true);
+    dialingList.clear();
+    edmCallPolicy->SetCallPolicy(1, dialingList, 0, incomingList);
+    EXPECT_EQ(edmCallPolicy->IsDialingEnable(number), true);
+    if (isModifyParameter) {
+        system::SetParameter("persist.edm.telephony_call_disable", "true");
+    }
+}
+
+/**
+ * @tc.number   Telephony_EdmCallPolicy_002
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch2Test, Telephony_EdmCallPolicy_002, Function | MediumTest | Level1)
+{
+    std::vector<std::string> dialingList;
+    std::vector<std::string> incomingList;
+    std::string number = "11111111";
+    bool isModifyParameter = false;
+    std::shared_ptr<EdmCallPolicy> edmCallPolicy = std::make_shared<EdmCallPolicy>();
+    if (system::GetBoolParameter("persist.edm.telephony_call_disable", false)) {
+        system::SetParameter("persist.edm.telephony_call_disable", "false");
+        isModifyParameter = true;
+    }
+    edmCallPolicy->SetCallPolicy(0, dialingList, 0, incomingList);
+    EXPECT_EQ(edmCallPolicy->IsIncomingEnable(number), true);
+    incomingList.push_back(number);
+    edmCallPolicy->SetCallPolicy(0, dialingList, 0, incomingList);
+    EXPECT_EQ(edmCallPolicy->IsIncomingEnable(number), false);
+    edmCallPolicy->SetCallPolicy(0, dialingList, 1, incomingList);
+    EXPECT_EQ(edmCallPolicy->IsIncomingEnable(number), true);
+    incomingList.clear();
+    edmCallPolicy->SetCallPolicy(0, dialingList, 1, incomingList);
+    EXPECT_EQ(edmCallPolicy->IsIncomingEnable(number), true);
+
+    if (isModifyParameter) {
+        system::SetParameter("persist.edm.telephony_call_disable", "true");
+    }
 }
 } // namespace Telephony
 } // namespace OHOS

@@ -42,6 +42,7 @@
 #include "string_wrapper.h"
 #include "bluetooth_call_connection.h"
 #include "interoperable_communication_manager.h"
+#include "voip_call_connection.h"
 
 #ifdef SUPPORT_MUTE_BY_DATABASE
 #include "interoperable_settings_handler.h"
@@ -65,6 +66,7 @@ static constexpr const char *CALL_TYPE = "callType";
 static constexpr const char *VIDEO_STATE = "videoState";
 static constexpr int32_t CLEAR_VOICE_MAIL_COUNT = 0;
 static constexpr int32_t IS_CELIA_CALL = 1;
+static constexpr int32_t EDM_UID = 3057;
 
 const bool g_registerResult =
     SystemAbility::MakeAndRegisterAbility(DelayedSingleton<CallManagerService>::GetInstance().get());
@@ -1696,8 +1698,28 @@ int32_t CallManagerService::SendCallUiEvent(int32_t callId, std::string &eventNa
         return TELEPHONY_ERR_FAIL;
     } else if (eventName == "EVENT_CELIA_AUTO_ANSWER_CALL_ON" || eventName == "EVENT_CELIA_AUTO_ANSWER_CALL_OFF") {
         return HandleCeliaAutoAnswerCall(callId, eventName == "EVENT_CELIA_AUTO_ANSWER_CALL_ON");
+    } else if (eventName == "EVENT_VOIP_CALL_SUCCESS" || eventName == "EVENT_VOIP_CALL_FAILED") {
+        HandleVoIPCallEvent(callId, eventName);
     }
     return TELEPHONY_SUCCESS;
+}
+
+int32_t CallManagerService::HandleVoIPCallEvent(int32_t callId, std::string &eventName)
+{
+    AppExecFwk::PacMap mPacMap;
+    sptr<CallBase> call = CallObjectManager::GetOneCallObject(callId);
+    if (call == nullptr) {
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    if (call->GetCallType() == CallType::TYPE_VOIP) {
+        CallAttributeInfo info;
+        call->GetCallAttributeInfo(info);
+        mPacMap.PutStringValue("callId", info.voipCallInfo.voipCallId);
+    }
+    mPacMap.PutStringValue("eventName", eventName);
+    mPacMap.PutLongValue("publishTime", std::chrono::duration_cast<std::chrono::milliseconds>(
+        std::chrono::system_clock::now().time_since_epoch()).count());
+    return DelayedSingleton<VoipCallConnection>::GetInstance()->SendCallUiEventForWindow(mPacMap);
 }
 
 int32_t CallManagerService::HandleDisplaySpecifiedCallPage(int32_t callId)
@@ -1771,6 +1793,29 @@ int32_t CallManagerService::SendUssdResponse(int32_t slotId, const std::string &
     }
     DelayedSingleton<CellularCallConnection>::GetInstance()->SendUssdResponse(slotId, content);
     return TELEPHONY_SUCCESS;
+}
+
+int32_t CallManagerService::SetCallPolicyInfo(int32_t dialingPolicy, const std::vector<std::string> &dialingList,
+    int32_t incomingPolicy, const std::vector<std::string> &incomingList)
+{
+    TELEPHONY_LOGI("SetCallPolicyInfo dialingPolicy:%{public}d, dialingList size:%{public}u, "
+        "incomingPolicy:%{public}d, incomingList size:%{public}u", dialingPolicy, dialingList.size(),
+        incomingPolicy, incomingList.size());
+    if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_SET_TELEPHONY_STATE)) {
+        TELEPHONY_LOGE("Permission denied!");
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
+    if (callControlManagerPtr_ == nullptr) {
+        TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    int32_t uid = IPCSkeleton::GetCallingUid();
+    if (uid == EDM_UID) {
+        return callControlManagerPtr_->SetEdmPolicy(dialingPolicy, dialingList,
+            incomingPolicy, incomingList);
+    } else {
+        return TELEPHONY_ERR_PERMISSION_ERR;
+    }
 }
 } // namespace Telephony
 } // namespace OHOS

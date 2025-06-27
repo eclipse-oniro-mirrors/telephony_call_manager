@@ -630,6 +630,10 @@ enum class AudioDeviceType {
      * Indicates the device type is a distributed pc device.
      */
     DEVICE_DISTRIBUTED_PC,
+    /**
+     * Indicates the device type is a nearlink device.
+     */
+    DEVICE_NEARLINK,
 };
 
 /**

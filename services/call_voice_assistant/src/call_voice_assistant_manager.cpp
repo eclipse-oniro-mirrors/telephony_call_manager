@@ -66,7 +66,7 @@ std::shared_ptr<DataShare::DataShareHelper> CallVoiceAssistantManager::Initial()
 
 CallVoiceAssistantManager::~CallVoiceAssistantManager()
 {
-    OnStopService();
+    OnStopService(true);
 }
 
 void CallVoiceAssistantManager::Release()
@@ -231,12 +231,14 @@ void CallVoiceAssistantManager::OnStartService(const std::string& isDial, const 
     TELEPHONY_LOGE("start service failed");
 };
 
-void CallVoiceAssistantManager::OnStopService()
+void CallVoiceAssistantManager::OnStopService(bool isDestructor)
 {
     TELEPHONY_LOGI("OnStopService enter");
     DisconnectAbility();
     UnRegisterListenSwitchState();
-    DelayedSingleton<AudioControlManager>::GetInstance()->StopRingtone();
+    if (!isDestructor) {
+        DelayedSingleton<AudioControlManager>::GetInstance()->StopRingtone();
+    }
     VoiceAssistantRingSubscriber::Release();
     PublishCommonEvent(false, std::string("on_stop_service"));
     Release();

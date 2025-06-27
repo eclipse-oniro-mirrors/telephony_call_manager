@@ -1733,5 +1733,26 @@ int32_t CallManagerProxy::SendUssdResponse(int32_t slotId, std::string &content)
     }
     return TELEPHONY_SUCCESS;
 }
+
+int32_t CallManagerProxy::SetCallPolicyInfo(int32_t dialingPolicy, const std::vector<std::string> &dialingList,
+    int32_t incomingPolicy, const std::vector<std::string> &incomingList)
+{
+    if (ReConnectService() != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("ipc reconnect failed!");
+        return TELEPHONY_ERR_IPC_CONNECT_STUB_FAIL;
+    }
+    Utils::UniqueReadGuard<Utils::RWLock> guard(rwClientLock_);
+    if (callManagerServicePtr_ == nullptr) {
+        TELEPHONY_LOGE("callManagerServicePtr_ is null");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    int32_t errCode = callManagerServicePtr_->SetCallPolicyInfo(dialingPolicy, dialingList,
+        incomingPolicy, incomingList);
+    if (errCode != TELEPHONY_SUCCESS) {
+        TELEPHONY_LOGE("failed, errcode:%{public}d", errCode);
+        return errCode;
+    }
+    return TELEPHONY_SUCCESS;
+}
 } // namespace Telephony
 } // namespace OHOS

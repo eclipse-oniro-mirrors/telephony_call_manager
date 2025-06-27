@@ -43,6 +43,8 @@ public:
     int32_t OnReportPeerDimensionsChange(const PeerDimensionsDetail &peerDimensionsDetail) override;
     int32_t OnReportCallDataUsageChange(const int64_t dataUsage) override;
     int32_t OnReportCameraCapabilities(const CameraCapabilities &cameraCapabilities) override;
+    int32_t OnPhoneStateChange(int32_t numActive, int32_t numHeld, int32_t callState,
+        const std::string &number) override;
 
 private:
     void PackDataParcel(CallResultReportId reportId, AppExecFwk::PacMap &resultInfo, MessageParcel &dataParcel);

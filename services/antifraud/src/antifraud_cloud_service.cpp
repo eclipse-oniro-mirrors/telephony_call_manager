@@ -17,6 +17,7 @@
 
 #include <chrono>
 #include <cJSON.h>
+#include <iomanip>
 #include <limits>
 #include <openssl/sha.h>
 #include <openssl/hmac.h>

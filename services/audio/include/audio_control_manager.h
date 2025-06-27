@@ -95,6 +95,7 @@ public:
     bool IsScoTemporarilyDisabled();
     void ExcludeBluetoothSco();
     void UnexcludeBluetoothSco();
+    bool IsVideoRing(const std::string &personalNotificationRingtone, const std::string &ringtonePath);
 
 private:
     RingState ringState_ = RingState::STOPPED;
@@ -107,13 +108,14 @@ private:
     sptr<CallBase> GetCallBase(int32_t callId);
     AudioInterruptState audioInterruptState_ = AudioInterruptState::INTERRUPT_STATE_DEACTIVATED;
     bool ShouldPlayRingtone() const;
+    bool dealCrsScene(const AudioStandard::AudioRingerMode &ringMode);
     bool IsEmergencyCallExists();
     void UpdateForegroundLiveCall();
     bool IsBtOrWireHeadPlugin();
     void ProcessAudioWhenCallActive(sptr<CallBase> &callObjectPtr);
     void ResumeCrsSoundTone();
     int32_t HandleDistributeAudioDevice(const AudioDevice &device);
-    int32_t HandleBluetoothAudioDevice(const AudioDevice &device);
+    int32_t HandleWirelessAudioDevice(const AudioDevice &device);
     void SendMuteRingEvent();
     bool IsRingingVibrateModeOn();
     bool IsVoIPCallActived();
@@ -124,11 +126,13 @@ private:
     int32_t GetBackupVoiceVolume();
     void RestoreVoiceValumeIfNecessary();
     void PostProcessRingtone();
+    bool IsExternalAudioDevice(AudioDeviceType initDeviceType);
     ToneState toneState_ = ToneState::STOPPED;
     SoundState soundState_ = SoundState::STOPPED;
     bool isLocalRingbackNeeded_ = false;
     bool isCrsVibrating_ = false;
     bool isCrsStartSoundTone_ = false;
+    bool isVideoRingVibrating_ = false;
     std::set<sptr<CallBase>> totalCalls_;
     std::unique_ptr<Ring> ring_;
     std::unique_ptr<Tone> tone_;

@@ -44,6 +44,7 @@ public:
     int32_t RegisterCallManagerCallBack(const sptr<ICallStatusCallback> &callback);
     int32_t UnRegisterCallManagerCallBack();
     int32_t SendCallUiEvent(std::string voipCallId, const CallAudioEvent &callAudioEvent);
+    int32_t SendCallUiEventForWindow(AppExecFwk::PacMap &extras);
 
 private:
     class SystemAbilityListener : public SystemAbilityStatusChangeStub {
@@ -56,6 +57,7 @@ private:
 #ifndef TELEPHONY_VOIP_CALL_MANAGER_SYS_ABILITY_ID
 #define TELEPHONY_VOIP_CALL_MANAGER_SYS_ABILITY_ID 65968
 #endif
+    void BuildDisconnectedCallInfo(CallReportInfo &callReportInfo, const VoipCallReportInfo &voipInfo);
     int32_t systemAbilityId_ = TELEPHONY_VOIP_CALL_MANAGER_SYS_ABILITY_ID;
     sptr<ICallStatusCallback> voipCallCallbackPtr_;
     sptr<IVoipCallManagerService> voipCallManagerInterfacePtr_ = nullptr;

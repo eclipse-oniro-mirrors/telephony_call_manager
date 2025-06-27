@@ -30,7 +30,7 @@
 
 namespace OHOS {
 namespace Telephony {
-CallPolicy::CallPolicy() {}
+CallPolicy::CallPolicy() : edmCallPolicy_(std::make_shared<EdmCallPolicy>()) {}
 
 CallPolicy::~CallPolicy() {}
 
@@ -41,6 +41,11 @@ int32_t CallPolicy::DialPolicy(std::u16string &number, AppExecFwk::PacMap &extra
         dialType != DialType::DIAL_OTT_TYPE && dialType != DialType::DIAL_BLUETOOTH_TYPE) {
         TELEPHONY_LOGE("dial type invalid! dialType=%{public}d", dialType);
         return TELEPHONY_ERR_ARGUMENT_INVALID;
+    }
+    std::string phoneNum = Str16ToStr8(number);
+    if (!IsDialingEnable(phoneNum)) {
+        TELEPHONY_LOGE("MDM policy is disabled!");
+        return TELEPHONY_ERR_POLICY_DISABLED;
     }
     int32_t accountId = extras.GetIntValue("accountId");
     if (dialType == DialType::DIAL_CARRIER_TYPE) {
@@ -574,6 +579,34 @@ int32_t CallPolicy::CloseUnFinishedUssdPolicy(int32_t slotId)
         return CALL_ERR_INVALID_SLOT_ID;
     }
     return TELEPHONY_SUCCESS;
+}
+
+int32_t CallPolicy::SetEdmPolicy(int32_t dialingPolicy, const std::vector<std::string> &dialingList,
+    int32_t incomingPolicy, const std::vector<std::string> &incomingList)
+{
+    if (edmCallPolicy_ == nullptr) {
+        TELEPHONY_LOGE("edmCallPolicy_ is null!");
+        return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+    return edmCallPolicy_->SetCallPolicy(dialingPolicy, dialingList, incomingPolicy, incomingList);
+}
+
+bool CallPolicy::IsDialingEnable(const std::string &phoneNum)
+{
+    if (edmCallPolicy_ == nullptr) {
+        TELEPHONY_LOGE("edmCallPolicy_ is null!");
+        return true;
+    }
+    return edmCallPolicy_->IsDialingEnable(phoneNum);
+}
+
+bool CallPolicy::IsIncomingEnable(const std::string &phoneNum)
+{
+    if (edmCallPolicy_ == nullptr) {
+        TELEPHONY_LOGE("edmCallPolicy_ is null!");
+        return true;
+    }
+    return edmCallPolicy_->IsIncomingEnable(phoneNum);
 }
 } // namespace Telephony
 } // namespace OHOS

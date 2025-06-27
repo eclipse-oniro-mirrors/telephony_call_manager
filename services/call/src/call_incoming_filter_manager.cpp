@@ -49,6 +49,10 @@ int32_t CallIncomingFilterManager::PackCellularCallInfo(CellularCallInfo &callIn
 int32_t CallIncomingFilterManager::DoIncomingFilter(const CallDetailInfo &info)
 {
     bool isEcc = false;
+    if (!DelayedSingleton<CallControlManager>::GetInstance()->IsIncomingEnable(std::string(info.phoneNum))) {
+        TELEPHONY_LOGE("MDM policy is disabled!");
+        return TELEPHONY_ERR_POLICY_DISABLED;
+    }
     DelayedSingleton<CellularCallConnection>::GetInstance()->IsEmergencyPhoneNumber(
         info.phoneNum, info.accountId, isEcc);
     if (isEcc) {

@@ -995,8 +995,6 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SetAudioDevice_0100, Function |
         TELEPHONY_LOGE("memcpy_s address fail");
         return;
     }
-
-    CallInfoManager::LockCallState(false, (int32_t)CallStateToApp::CALL_STATE_OFFHOOK, SLEEP_200_MS, SLEEP_30000_MS);
     EXPECT_NE(clientPtr_->SetAudioDevice(audioDevice), RETURN_VALUE_IS_ZERO);
 }
 
@@ -1021,6 +1019,20 @@ HWTEST_F(CallManagerGtest, Telephony_CallManager_SendUssdResponse_0100, Function
         EXPECT_EQ(CallManagerGtest::clientPtr_->SendUssdResponse(SIM2_SLOTID, content), RETURN_VALUE_IS_ZERO);
         return;
     }
+}
+
+/**
+ * @tc.number   Telephony_CallManager_Telephony_CallManager_SetCallPolicyInfo_0100
+ * @tc.name     input slotId:0, content:1, Test SetCallPolicyInfo, return error code if failed
+ * @tc.desc     Function test
+ * @tc.require: issueI5JUAQ
+ */
+HWTEST_F(CallManagerGtest, Telephony_CallManager_SetCallPolicyInfo_0100, Function | MediumTest | Level2)
+{
+    std::vector<std::string> dialingList;
+    std::vector<std::string> incomingList;
+    EXPECT_EQ(CallManagerGtest::clientPtr_->SetCallPolicyInfo(0, dialingList, 0, incomingList),
+        TELEPHONY_ERR_PERMISSION_ERR);
 }
 } // namespace Telephony
 } // namespace OHOS

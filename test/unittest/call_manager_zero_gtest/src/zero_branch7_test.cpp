@@ -564,6 +564,9 @@ HWTEST_F(ZeroBranch8Test, Telephony_CallManagerClient_001, Function | MediumTest
     int32_t slotId = 0;
     std::string content = "1";
     EXPECT_NE(callManagerClient->SendUssdResponse(slotId, content), TELEPHONY_ERR_UNINIT);
+    std::vector<std::string> dialingList;
+    std::vector<std::string> incomingList;
+    EXPECT_NE(callManagerClient->SetCallPolicyInfo(0, dialingList, 0, incomingList), TELEPHONY_ERR_UNINIT);
 }
 
 HWTEST_F(ZeroBranch8Test, Telephony_CallStatusCallback_001, Function | MediumTest | Level1)
@@ -598,6 +601,11 @@ HWTEST_F(ZeroBranch8Test, Telephony_VoipCallConnection_001, Function | MediumTes
     CallAudioEvent callAudioEvent = CallAudioEvent::AUDIO_EVENT_MUTED;
     std::string voipCallId = "123";
     EXPECT_NE(voipCallConnection->SendCallUiEvent(voipCallId, callAudioEvent), TELEPHONY_ERROR);
+    AppExecFwk::PacMap extras;
+    voipCallConnection->SendCallUiEventForWindow(extras);
+    voipCallConnection->voipCallManagerInterfacePtr_ = nullptr;
+    voipCallConnection->SendCallUiEventForWindow(extras);
+    voipCallConnection->ClearVoipCall();
 }
 
 HWTEST_F(ZeroBranch8Test, Telephony_CallSuperPrivacyControlManager_001, Function | MediumTest | Level1)

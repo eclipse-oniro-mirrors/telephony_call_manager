@@ -23,12 +23,17 @@
 #include "ims_call.h"
 #include "voip_call.h"
 #include "int_wrapper.h"
+#include "call_manager_connect.h"
 
 namespace OHOS::Telephony {
 using namespace testing::ext;
 constexpr int WAIT_TIME = 5;
 constexpr int VALID_CALL_ID = 1;
+constexpr int32_t CRS_TYPE = 2;
 constexpr const char* NUMBER = "10086";
+static constexpr const char *SYSTEM_VIDEO_RING = "system_video_ring";
+static constexpr const char *STR_MP4 = "123.mp4";
+static constexpr const char *STR_NOT_MP4 = "1234567";
 class ZeroBranch9Test : public testing::Test {
 public:
     void SetUp();
@@ -285,5 +290,60 @@ HWTEST_F(ZeroBranch9Test, Telephony_AudioControlManager_007, Function | MediumTe
     ringingCall->SetCallRunningState(CallRunningState::CALL_RUNNING_STATE_RINGING);
     CallObjectManager::AddOneCallObject(ringingCall);
     ASSERT_NO_THROW(audioControl->PostProcessRingtone());
+}
+
+/**
+ * @tc.number   Telephony_DealVideoRingPath_001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch9Test, Telephony_DealVideoRingPath_001, TestSize.Level0)
+{
+    std::shared_ptr<CallStatusManager> callStatusManager = std::make_shared<CallStatusManager>();
+    callStatusManager->Init();
+    sptr<CallBase> callObjectPtr = nullptr;
+    DialParaInfo dialParaInfo;
+    dialParaInfo.callType = CallType::TYPE_CS;
+    dialParaInfo.callState = TelCallState::CALL_STATUS_INCOMING;
+    callObjectPtr = new IMSCall(dialParaInfo);
+    ContactInfo contactInfo;
+    ASSERT_NO_THROW(callStatusManager->DealVideoRingPath(contactInfo, callObjectPtr));
+    AccessToken token;
+    ASSERT_NO_THROW(callStatusManager->DealVideoRingPath(contactInfo, callObjectPtr));
+    memcpy_s(contactInfo.ringtonePath, 3, "123", 3);
+    ASSERT_NO_THROW(callStatusManager->DealVideoRingPath(contactInfo, callObjectPtr));
+    memcpy_s(contactInfo.personalNotificationRingtone, strlen(STR_MP4) + 1, STR_MP4, strlen(STR_MP4));
+    ASSERT_NO_THROW(callStatusManager->DealVideoRingPath(contactInfo, callObjectPtr));
+    memcpy_s(contactInfo.ringtonePath, strlen(SYSTEM_VIDEO_RING) + 1, SYSTEM_VIDEO_RING, strlen(SYSTEM_VIDEO_RING));
+    memcpy_s(contactInfo.personalNotificationRingtone, strlen(STR_NOT_MP4) + 1, STR_NOT_MP4, strlen(STR_NOT_MP4));
+    ASSERT_NO_THROW(callStatusManager->DealVideoRingPath(contactInfo, callObjectPtr));
+    DelayedSingleton<AudioControlManager>::GetInstance()->UnInit();
+}
+
+/**
+ * @tc.number   Telephony_PlayRingtone_001
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch9Test, Telephony_PlayRingtone_001, Function | MediumTest | Level3)
+{
+    auto audioControl = DelayedSingleton<AudioControlManager>::GetInstance();
+    ASSERT_FALSE(audioControl->PlayRingtone());
+    DialParaInfo info;
+    sptr<CallBase> ringingCall = new IMSCall(info);
+    AAFwk::WantParams params = ringingCall->GetExtraParams();
+    params.SetParam("isNeedMuteRing", AAFwk::Integer::Box(1));
+    ringingCall->SetExtraParams(params);
+    ringingCall->SetCallRunningState(CallRunningState::CALL_RUNNING_STATE_RINGING);
+    CallObjectManager::AddOneCallObject(ringingCall);
+    ASSERT_TRUE(audioControl->PlayRingtone());
+    ContactInfo contactInfo;
+    memcpy_s(contactInfo.personalNotificationRingtone, strlen(STR_MP4) + 1, STR_MP4, strlen(STR_MP4));
+    ringingCall->SetCallerInfo(contactInfo);
+    audioControl->StopRingtone();
+    ASSERT_TRUE(audioControl->PlayRingtone());
+    ringingCall->SetCrsType(CRS_TYPE);
+    ASSERT_FALSE(audioControl->PlayRingtone());
+    DelayedSingleton<AudioControlManager>::GetInstance()->UnInit();
 }
 }
