@@ -460,13 +460,13 @@ void AudioControlManager::ResumeCrsSoundTone()
         .deviceType = AudioDeviceType::DEVICE_EARPIECE,
         .address = { 0 },
     };
-    DelaySingleton<AudioProxy>::GetInstance()->GetpreferredOutputAudioDevice(device);
+    DelayedSingleton<AudioProxy>::GetInstance()->GetPreferredOutputAudioDevice(device);
     TELEPHONY_LOGI("crs soundtone preferred deivce = %{public}d", device.deviceType);
     device.deviceType = initCrsDeviceType_;
     SetAudioDevice(device);
     auto weak = weak_from_this();
     ffrt::submit_h([weak]() {
-        auto strong = weal.lock();
+        auto strong = weak.lock();
         if (strong != nullptr) {
             TELEPHONY_LOGI("unmuteSound timeout");
             strong->MuteNetWorkRingTone(false);
