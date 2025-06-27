@@ -654,23 +654,15 @@ bool AudioControlManager::PlayRingtone()
     ContactInfo contactInfo = incomingCall->GetCallerInfo();
     AudioStandard::AudioRingerMode ringMode = DelayedSingleton<AudioProxy>::GetInstance()->GetRingerMode();
     if (incomingCall->GetCrsType() == CRS_TYPE) {
-        if (!isCrsVibrating_ && (ringMode != AudioStandard::AudioRingerMode::RINGER_MODE_SILENT)) {
-            if (ringMode == AudioStandard::AudioRingerMode::RINGER_MODE_VIBRATE || IsRingingVibrateModeOn()) {
-                isCrsVibrating_ = (DelayedSingleton<AudioProxy>::GetInstance()->StartVibrator() == TELEPHONY_SUCCESS);
-            }
+        return dealCrsScene(ringMode);
+    }
+    if (IsVideoRing(contactInfo.personalNotificationRingtone, contactInfo.ringtonePath)) {
+        if ((ringMode == AudioStandard::AudioRingerMode::RINGER_MODE_NORMAL && IsRingingVibrateModeOn()) ||
+            ringMode == AudioStandard::AudioRingerMode::RINGER_MODE_VIBRATE) {
+            TELEPHONY_LOGI("need start vibrator.");
+            isVideoRingVibrating_ = (DelayedSingleton<AudioProxy>::GetInstance()->StartVibrator() == TELEPHONY_SUCCESS);
         }
-        if ((ringMode == AudioStandard::AudioRingerMode::RINGER_MODE_NORMAL) || IsBtOrWireHeadPlugin()) {
-            isCrsStartSoundTone_ = true;
-            if (PlaySoundtone()) {
-                TELEPHONY_LOGI("play soundtone success");
-                AdjustVolumesForCrs();
-                return true;
-            }
-            AdjustVolumesForCrs();
-            return false;
-        }
-        TELEPHONY_LOGI("type_crs but not play ringtone");
-        return false;
+        return true;
     }
     if (incomingCall->GetCallType() == CallType::TYPE_BLUETOOTH) {
         ret = ring_->Play(info.accountId, contactInfo.ringtonePath, Media::HapticStartupMode::FAST);
@@ -694,11 +686,13 @@ bool AudioControlManager::dealCrsScene(const AudioStandard::AudioRingerMode &rin
         }
     }
     if ((ringMode == AudioStandard::AudioRingerMode::RINGER_MODE_NORMAL) || IsBtOrWireHeadPlugin()) {
-        AdjustVolumesForCrs();
+        isCrsStartSoundTone_ = true;
         if (PlaySoundtone()) {
             TELEPHONY_LOGI("play soundtone success");
+            AdjustVolumesForCrs();
             return true;
         }
+        AdjustVolumesForCrs();
         return false;
     }
     TELEPHONY_LOGI("type_crs but not play ringtone");
