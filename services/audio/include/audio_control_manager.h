@@ -143,7 +143,7 @@ private:
     bool isSetAudioDeviceByUser_ = false;
     bool isScoTemporarilyDisabled_ = false;
     int32_t voiceVolume_ = -1;
-    AudioDeviceType initCrsDeviceType_ = AudioDeviceType::DEVICE_UNKOWN;
+    AudioDeviceType initCrsDeviceType_ = AudioDeviceType::DEVICE_UNKNOWN;
 };
 } // namespace Telephony
 } // namespace OHOS
