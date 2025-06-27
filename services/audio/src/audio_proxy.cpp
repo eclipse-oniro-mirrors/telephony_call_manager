@@ -163,7 +163,7 @@ int32_t AudioProxy::SetVolume(AudioStandard::AudioVolumeType audioVolumeType, in
 int32_t AudioProxy::SetVolumeWithDevice(AudioStandard::AudioVolumeType audioVolumeType, int32_t volume,
     AudioStandard::Device deviceType)
 {
-    return AudioStandard::AudioSystemManager::GetInstance()->SetVolume(audioVolumeType, volume, deviceType);
+    return AudioStandard::AudioSystemManager::GetInstance()->SetVolumeWithDevice(audioVolumeType, volume, deviceType);
 }
 
 int32_t AudioProxy::SetMaxVolume(AudioStandard::AudioVolumeType audioVolumeType)
