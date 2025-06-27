@@ -76,7 +76,7 @@ HWTEST_F(ZeroBranch9Test, Telephony_AudioControlManager_001, TestSize.Level0)
     callObjectPtr->SetCrsType(2);
     audioControl->VideoStateUpdated(callObjectPtr, VideoStateType::TYPE_VOICE, VideoStateType::TYPE_VIDEO);
     audioControl->UpdateDeviceTypeForVideoOrSatelliteCall();
-    audioControl->MuteNetWorkRingTone();
+    audioControl->MuteNetWorkRingTone(true);
     audioControl->IsBtOrWireHeadPlugin();
     ASSERT_FALSE(audioControl->IsVideoCall(VideoStateType::TYPE_RECEIVE_ONLY));
     sptr<CallBase> call = nullptr;
@@ -177,7 +177,7 @@ HWTEST_F(ZeroBranch9Test, Telephony_AudioControlManager_004, TestSize.Level0)
 {
     auto audioControl = DelayedSingleton<AudioControlManager>::GetInstance();
     audioControl->isCrsVibrating_ = true;
-    audioControl->MuteNetWorkRingTone();
+    audioControl->MuteNetWorkRingTone(true);
     DisconnectedDetails details;
     audioControl->CallDestroyed(details);
     audioControl->toneState_ = ToneState::CALLENDED;

@@ -24,6 +24,7 @@
 #include "audio_scene_processor.h"
 #include "call_manager_inner_type.h"
 #include "call_state_listener_base.h"
+#include "ffrt.h"
 #include "ring.h"
 #include "singleton.h"
 #include "sound.h"
@@ -82,7 +83,7 @@ public:
     void UpdateDeviceTypeForVideoOrSatelliteCall();
     void UpdateDeviceTypeForCrs(AudioDeviceType deviceType);
     void UpdateDeviceTypeForVideoDialing();
-    void MuteNetWorkRingTone();
+    void MuteNetWorkRingTone(bool isMute =true);
     bool IsVideoCall(VideoStateType videoState);
     bool IsSoundPlaying();
     bool StopSoundtone();
@@ -110,6 +111,7 @@ private:
     void UpdateForegroundLiveCall();
     bool IsBtOrWireHeadPlugin();
     void ProcessAudioWhenCallActive(sptr<CallBase> &callObjectPtr);
+    void ResumeCrsSoundTone();
     int32_t HandleDistributeAudioDevice(const AudioDevice &device);
     int32_t HandleBluetoothAudioDevice(const AudioDevice &device);
     void SendMuteRingEvent();
@@ -126,6 +128,7 @@ private:
     SoundState soundState_ = SoundState::STOPPED;
     bool isLocalRingbackNeeded_ = false;
     bool isCrsVibrating_ = false;
+    bool isCrsStartSoundTone_ = false;
     std::set<sptr<CallBase>> totalCalls_;
     std::unique_ptr<Ring> ring_;
     std::unique_ptr<Tone> tone_;
@@ -136,6 +139,7 @@ private:
     bool isSetAudioDeviceByUser_ = false;
     bool isScoTemporarilyDisabled_ = false;
     int32_t voiceVolume_ = -1;
+    AudioDeviceType initCrsDeviceType_ = AudioDeviceType::DEVICE_UNKOWN;
 };
 } // namespace Telephony
 } // namespace OHOS
