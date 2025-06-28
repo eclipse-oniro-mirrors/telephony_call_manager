@@ -472,7 +472,8 @@ void AudioControlManager::ResumeCrsSoundTone()
             strong->MuteNetWorkRingTone(false);
             strong->isCrsStartSoundTone_ = false;
         }
-    }, {}, {}, ffrt::task_attr().delay(UNMUTE_SOUNDTONE_DELAY_TIME));
+    }, {}, {},
+        ffrt::task_attr().delay(UNMUTE_SOUNDTONE_DELAY_TIME));
 }
 
 void AudioControlManager::HandleNewActiveCall(sptr<CallBase> &callObjectPtr)
