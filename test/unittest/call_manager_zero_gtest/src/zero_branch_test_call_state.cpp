@@ -857,6 +857,14 @@ HWTEST_F(CallStateTest, Telephony_VoipCallConnection_001, TestSize.Level0)
 {
     std::shared_ptr<VoipCallConnection> voipCallConnection = std::make_shared<VoipCallConnection>();
     int32_t systemAbilityId = 1;
+    sptr<ISystemAbilityManager> managerPtr = SystemAbilityManagerClient::GetInstance().GetSystemAbilityManager();
+    sptr<IVoipCallManagerService> voipCallManagerInterfacePtr = nullptr;
+    if (managerPtr != nullptr) {
+        sptr<IRemoteObject> iRemoteObjectPtr = managerPtr->GetSystemAbility(TELEPHONY_CALL_MANAGER_SYS_ABILITY_ID);
+        if (iRemoteObjectPtr != nullptr) {
+            voipCallManagerInterfacePtr = iface_cast<IVoipCallManagerService>(iRemoteObjectPtr);
+        }
+    }
     voipCallConnection->Init(systemAbilityId);
     voipCallConnection->UnInit();
     voipCallConnection->GetCallManagerProxy();
