@@ -604,6 +604,8 @@ HWTEST_F(ZeroBranch8Test, Telephony_VoipCallConnection_001, Function | MediumTes
     AppExecFwk::PacMap extras;
     voipCallConnection->SendCallUiEventForWindow(extras);
     voipCallConnection->voipCallManagerInterfacePtr_ = nullptr;
+    int32_t systemAbilityId = 1;
+    voipCallConnection->Init(systemAbilityId);
     voipCallConnection->SendCallUiEventForWindow(extras);
     voipCallConnection->ClearVoipCall();
 }
