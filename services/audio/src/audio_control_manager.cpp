@@ -465,15 +465,16 @@ void AudioControlManager::ResumeCrsSoundTone()
     device.deviceType = initCrsDeviceType_;
     SetAudioDevice(device);
     auto weak = weak_from_this();
-    ffrt::submit_h([weak]() {
-        auto strong = weak.lock();
-        if (strong != nullptr) {
-            TELEPHONY_LOGI("unmuteSound timeout");
-            strong->MuteNetWorkRingTone(false);
-            strong->isCrsStartSoundTone_ = false;
-        }
-    }, {}, {},
-        ffrt::task_attr().delay(UNMUTE_SOUNDTONE_DELAY_TIME));
+    ffrt::submit_h(
+        [weak]() {
+            auto strong = weak.lock();
+            if (strong != nullptr) {
+                TELEPHONY_LOGI("unmuteSound timeout");
+                strong->MuteNetWorkRingTone(false);
+                strong->isCrsStartSoundTone_ = false;
+            }
+        },
+        {}, {}, ffrt::task_attr().delay(UNMUTE_SOUNDTONE_DELAY_TIME));
 }
 
 void AudioControlManager::HandleNewActiveCall(sptr<CallBase> &callObjectPtr)
