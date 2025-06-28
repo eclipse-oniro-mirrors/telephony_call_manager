@@ -83,7 +83,7 @@ public:
     void UpdateDeviceTypeForVideoOrSatelliteCall();
     void UpdateDeviceTypeForCrs(AudioDeviceType deviceType);
     void UpdateDeviceTypeForVideoDialing();
-    void MuteNetWorkRingTone(bool isMute =true);
+    void MuteNetWorkRingTone(bool isMute = true);
     bool IsVideoCall(VideoStateType videoState);
     bool IsSoundPlaying();
     bool StopSoundtone();
