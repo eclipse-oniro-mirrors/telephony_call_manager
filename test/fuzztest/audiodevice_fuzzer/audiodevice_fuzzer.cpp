@@ -140,7 +140,7 @@ void AudioProxyFunc(const uint8_t *data, size_t size)
     audioProxy->GetVolume(audioVolumeType);
     audioProxy->SetVolume(audioVolumeType, volume);
     audioProxy->SetVolumeWithDevice(audioVolumeType, volume,
-        AudioStandard:DeviceType::DEVICE_TYPE_SPEAKER);
+        AudioStandard::DeviceType::DEVICE_TYPE_SPEAKER);
     audioProxy->SetMaxVolume(audioVolumeType);
     audioProxy->IsStreamActive(audioVolumeType);
     audioProxy->IsStreamMute(audioVolumeType);
