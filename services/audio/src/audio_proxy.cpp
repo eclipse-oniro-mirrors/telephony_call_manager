@@ -161,7 +161,7 @@ int32_t AudioProxy::SetVolume(AudioStandard::AudioVolumeType audioVolumeType, in
 }
 
 int32_t AudioProxy::SetVolumeWithDevice(AudioStandard::AudioVolumeType audioVolumeType, int32_t volume,
-    AudioStandard::Device deviceType)
+    AudioStandard::DeviceType deviceType)
 {
     return AudioStandard::AudioSystemManager::GetInstance()->SetVolumeWithDevice(audioVolumeType, volume, deviceType);
 }
