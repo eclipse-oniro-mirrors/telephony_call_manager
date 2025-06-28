@@ -289,7 +289,7 @@ HWTEST_F(CallStateTest, Telephony_AudioProxy_001, TestSize.Level0)
     audioProxy->SetMaxVolume(AudioStandard::AudioStreamType::STREAM_VOICE_CALL);
     audioProxy->SetVolumeAudible();
     audioProxy->SetVolume(AudioStandard::AudioStreamType::STREAM_VOICE_CALL, volume);
-    audioProxy->SetVolumeWithDevice(AudioStandard::AudioStreamType::STREAM_VOICE_CALL, volume
+    audioProxy->SetVolumeWithDevice(AudioStandard::AudioStreamType::STREAM_VOICE_CALL, volume,
         AudioStandard::DeviceType::DEVICE_TYPE_SPEAKER);
     audioProxy->IsStreamActive(AudioStandard::AudioStreamType::STREAM_VOICE_CALL);
     audioProxy->IsStreamMute(AudioStandard::AudioStreamType::STREAM_VOICE_CALL);
