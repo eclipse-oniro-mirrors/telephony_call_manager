@@ -29,9 +29,23 @@
 #include "system_ability_status_change_stub.h"
 #include "call_manager_inner_type.h"
 #include "distributed_call_proxy.h"
+#ifdef ABILITY_BLUETOOTH_SUPPORT
+#include "bluetooth_hfp_ag.h"
+#endif
 
 namespace OHOS {
 namespace Telephony {
+#ifdef ABILITY_BLUETOOTH_SUPPORT
+class DCallHfpListener : public Bluetooth::HandsFreeAudioGatewayObserver {
+public:
+    DCallHfpListener() = default;
+    ~DCallHfpListener() override = default;
+    void OnHfpStackChanged(const Bluetooth::BluetoothRemoteDevice &device, int32_t action) override;
+ 
+private:
+    BLUETOOTH_DISALLOW_COPY_AND_ASSIGN(DCallHfpListener);
+};
+#endif
 class DistributedCallManager : public std::enable_shared_from_this<DistributedCallManager> {
     DECLARE_DELAYED_SINGLETON(DistributedCallManager)
 public:
@@ -90,6 +104,10 @@ private:
     std::mutex dcallProxyMtx_;
     std::shared_ptr<DistributedCallProxy> dcallProxy_ = nullptr;
     std::shared_ptr<DistributedCallDeviceListener> dcallDeviceListener_ = nullptr;
+#ifdef ABILITY_BLUETOOTH_SUPPORT
+    std::mutex mutex_;
+    std::shared_ptr<DCallHfpListener> dcallHfpListener_{nullptr};
+#endif
 };
 
 class DCallSystemAbilityListener : public SystemAbilityStatusChangeStub {

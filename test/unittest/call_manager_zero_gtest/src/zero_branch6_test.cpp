@@ -809,6 +809,29 @@ HWTEST_F(ZeroBranch5Test, Telephony_DistributedCallManager_003, TestSize.Level0)
 }
 
 /**
+ * @tc.number   Telephony_DistributedCallManager_004
+ * @tc.name     test normal branch
+ * @tc.desc     Function test
+ */
+#ifdef ABILITY_BLUETOOTH_SUPPORT
+HWTEST_F(ZeroBranch5Test, Telephony_DistributedCallManager_004, TestSize.Level0)
+{
+    Bluetooth::BluetoothRemoteDevice device;
+    int32_t action = 1; // unwear bt headset
+    DCallHfpListener listener;
+    listener.OnHfpStackChanged(device, action); // not bt head set
+
+    DistributedCallManager manager;
+    manager.dcallHfpListener_ = nullptr;
+    EXPECT_EQ(manager.AddDCallDevice(TEST_STR), TELEPHONY_ERR_FAIL);
+    manager.OnDCallDeviceOffline(TEST_STR);
+    manager.dcallHfpListener_ = std::make_shared<DCallHfpListener>();
+    EXPECT_EQ(manager.AddDCallDevice(TEST_STR), TELEPHONY_ERR_FAIL);
+    manager.OnDCallDeviceOffline(TEST_STR);
+}
+#endif
+
+/**
  * @tc.number   Telephony_DistributedCallProxy_001
  * @tc.name     test error branch
  * @tc.desc     Function test
