@@ -90,7 +90,7 @@ void NapiCallAbilityCallback::UnRegisterCallStateCallback()
 {
     if (stateCallback_.callbackRef) {
         napi_delete_reference(stateCallback_.env, stateCallback_.callbackRef);
-        napi_delete_reference(stateCallback_..env, stateCallback_..thisVar);
+        napi_delete_reference(stateCallback_.env, stateCallback_.thisVar);
         (void)memset_s(&stateCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
     }
 }
@@ -204,6 +204,8 @@ void NapiCallAbilityCallback::RegisterCameraCapabilitiesChangeCallback(EventCall
 void NapiCallAbilityCallback::UnRegisterCameraCapabilitiesChangeCallback()
 {
     if (eventCallback_.callbackRef) {
+        napi_delete_reference(cameraCapabilitiesCallback_.env, cameraCapabilitiesCallback_.callbackRef);
+        napi_delete_reference(cameraCapabilitiesCallback_.env, cameraCapabilitiesCallback_.thisVar);
         (void)memset_s(&cameraCapabilitiesCallback_, sizeof(EventCallback), 0, sizeof(EventCallback));
     }
 }
