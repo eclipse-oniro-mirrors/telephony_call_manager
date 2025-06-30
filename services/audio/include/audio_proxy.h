@@ -79,6 +79,8 @@ public:
     AudioStandard::AudioRingerMode GetRingerMode() const;
     int32_t GetVolume(AudioStandard::AudioVolumeType audioVolumeType);
     int32_t SetVolume(AudioStandard::AudioVolumeType audioVolumeType, int32_t volume);
+    int32_t SetVolumeWithDevice(AudioStandard::AudioVolumeType audioVolumeType, int32_t volume,
+        AudioStandard::DeviceType deviceType);
     int32_t SetMaxVolume(AudioStandard::AudioVolumeType audioVolumeType);
     bool IsStreamActive(AudioStandard::AudioVolumeType audioVolumeType);
     bool IsStreamMute(AudioStandard::AudioVolumeType audioVolumeType);
