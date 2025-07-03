@@ -184,6 +184,7 @@ private:
     void SetVoipCallInfoInner(const int32_t callId, const int32_t state,
         const std::string phoneNumber);
     void sendEventToVoip(CallAbilityEventId eventId);
+    bool IsCallActivated(const TelCallState& priorState, const TelCallState& nextState);
 private:
     class SystemAbilityListener : public SystemAbilityStatusChangeStub {
     public:
