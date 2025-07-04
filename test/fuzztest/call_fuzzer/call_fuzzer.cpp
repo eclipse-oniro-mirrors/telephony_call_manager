@@ -486,7 +486,7 @@ static Type GetInt(const uint8_t *data, size_t size, int index = 0)
     if (size - align < typeSize * index + (typeSize - align)) {
         return 0;
     }
-    return *(reinterpret_cast<const Type*>(base + index * typeSize));
+    return *reinterpret_cast<const Type*>(base + index * typeSize);
 }
 
 void AntiFraudServiceFunc(const uint8_t *data, size_t size)
@@ -498,7 +498,7 @@ void AntiFraudServiceFunc(const uint8_t *data, size_t size)
     antiFraudService->CheckAntiFraudService(std::string(reinterpret_cast<const char *>(data), size), slotId, count);
     antiFraudService->StartAntiFraudService(std::string(reinterpret_cast<const char *>(data), size), slotId, count);
     antiFraudService->CreateDataShareHelper(slotId, reinterpret_cast<const char *>(data));
-    antiFraudService->IsSwitchOn(std::string(reinterpret_cast<const char *>(data), size))
+    antiFraudService->IsSwitchOn(std::string(reinterpret_cast<const char *>(data), size));
     antiFraudService->IsAntiFraudSwitchOn();
     antiFraudService->IsUserImprovementPlanSwitchOn();
     antiFraudService->InitParams();
@@ -506,15 +506,16 @@ void AntiFraudServiceFunc(const uint8_t *data, size_t size)
     antiFraudService->GetStoppedIndex();
     antiFraudService->AnonymizeText();
     OHOS::AntiFraudService::AntiFraudResult antiFraudResult;
-    antiFraudResult.errCode = GetInt<int32_t>(data, size, index++);
+    antiFraudResult.modelVersion = GetInt<int32_t>(data, size, index++);
     antiFraudResult.fraudType = GetInt<int32_t>(data, size, index++);
-    antiFraudService->RecordDetectResult(antiFraudResult, std::string(reinterpret_cast<const char *>(data), size), slot, count);
+    antiFraudService->RecordDetectResult(antiFraudResult, std::string(reinterpret_cast<const char *>(data), size),
+        slot, count);
     antiFraudService->StopAntiFraudService(slotId, count);
     antiFraudService->SetStoppedSlotId(slotId);
     antiFraudService->SetStoppedIndex(count);
 }
 
-void InteroperableCommunicationManagerFunc(const uint8_t *data, size_t size)
+void InterOperableCommunicationManagerFunc(const uint8_t *data, size_t size)
 {
     int index = 0;
     auto communicationManager = DelayedSingleton<InteroperableCommunicationManager>::GetInstance();
@@ -527,9 +528,9 @@ void InteroperableCommunicationManagerFunc(const uint8_t *data, size_t size)
     communicationManager->MuteRinger();
 }
 
-void InteroperabledDeviceObserverFunc(const uint8_t *data, size_t size)
+void InterOperableDeviceObserverFunc(const uint8_t *data, size_t size)
 {
-    auto observer = DelayedSingleton<InteroperableCommunicationManager>::GetInstance();
+    auto observer = DelayedSingleton<InterOperableDeviceObserver>::GetInstance();
     auto stateCallback = std::make_shared<DmStateCallback>();
     observer->Init();
     size_t length = size / DATA_COUNT;
@@ -556,15 +557,15 @@ void BluetoothCallConnectionFunc(const uint8_t *data, size_t size)
     bluetoothConnection->ConnectBtSco();
     bluetoothConnection->DisConnectBtSco();
     bluetoothConnection->GetBtScoIsConnected();
-    bluetoothConnection->SetHfpConneted(GetInt<bool>(data, size, index++));
+    bluetoothConnection->SetHfpConnected(GetInt<bool>(data, size, index++));
     bluetoothConnection->GetSupportBtCall();
     bluetoothConnection->SetBtCallScoConnected(GetInt<bool>(data, size, index++));
     bluetoothConnection->HfpDisConnectedEndBtCall();
     size_t length = size / DATA_COUNT;
     std::string hfpPhoneNumber = std::string(reinterpret_cast<const char *>(data), length);
-    std::string hfpPhoneName = std::string(reinterpret_cast<const char *>(data + length), length);
-    bluetoothConnection->SetHfpContactName(hfpPhoneNumber, hfpPhoneName);
-    bluetoothConnection->SetHfpContactName(hfpPhoneNumber);
+    std::string hfpContactName = std::string(reinterpret_cast<const char *>(data + length), length);
+    bluetoothConnection->SetHfpContactName(hfpPhoneNumber, hfpContactName);
+    bluetoothConnection->GetHfpContactName(hfpPhoneNumber);
 }
 
 void BluetoothCallStateFunc(const uint8_t *data, size_t size)
@@ -595,8 +596,8 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     OttVideoCallWindowFunc(data, size);
     SatelliteCallFunc(data, size);
     AntiFraudServiceFunc(data, size);
-    InteroperableCommunicationManagerFunc(data, size);
-    InteroperabledDeviceObserverFunc(data, size);
+    InterOperableCommunicationManagerFunc(data, size);
+    InterOperableDeviceObserverFunc(data, size);
     BluetoothCallConnectionFunc(data, size);
 }
 } // namespace OHOS
