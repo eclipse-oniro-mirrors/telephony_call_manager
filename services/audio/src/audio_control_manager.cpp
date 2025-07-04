@@ -336,7 +336,7 @@ void AudioControlManager::HandleCallStateUpdated(
         MuteRinger();
     }
     if (nextState == TelCallState::CALL_STATUS_ACTIVE && priorState == TelCallState::CALL_STATUS_INCOMING) {
-        return ProcessUnMuteWhenRecvActive();
+        return UnmuteSoundTone();
     }
     HandleNextState(callObjectPtr, nextState);
     if (priorState == nextState) {
@@ -346,17 +346,17 @@ void AudioControlManager::HandleCallStateUpdated(
     HandlePriorState(callObjectPtr, priorState);
 }
 
-void AudioControlManager::ProcessUnMuteWhenRecvActive() {
+void AudioControlManager::UnmuteSoundTone() {
     auto weak = weak_from_this();
         ffrt::submit_h([weak]() {
         auto strong = weak.lock();
-            if (strong) {
+            if (strong != nullptr) {
                 if (strong->isCrsStartSoundTone_) {
-                    TELEPHONY_LOGI("crs unmuteSound timeout");
+                    TELEPHONY_LOGI("crs unmuteSound");
                     strong->MuteNetWorkRingTone(false);
                     strong->isCrsStartSoundTone_ = false;
                 } else {
-                    TELEPHONY_LOGI("MT unmuteSound timeout");
+                    TELEPHONY_LOGI("MT unmuteSound");
                     DelayedSingleton<AudioProxy>::GetInstance()->SetVoiceRingtoneMute(false);
                 }
             }
@@ -456,8 +456,9 @@ void AudioControlManager::HandlePriorState(sptr<CallBase> &callObjectPtr, TelCal
 
 void AudioControlManager::ProcessAudioWhenCallActive(sptr<CallBase> &callObjectPtr)
 {
-    if (callObjectPtr->GetCallRunningState() == CallRunningState::CALL_RUNNING_STATE_ACTIVE ||
-        callObjectPtr->GetCallRunningState() == CallRunningState::CALL_RUNNING_STATE_RINGING) {
+    auto callRunningState = callObjectPtr->GetCallRunningState();
+    if (callRunningState == CallRunningState::CALL_RUNNING_STATE_ACTIVE ||
+        callRunningState == CallRunningState::CALL_RUNNING_STATE_RINGING) {
         if (isCrsVibrating_) {
             DelayedSingleton<AudioProxy>::GetInstance()->StopVibrator();
             isCrsVibrating_ = false;
@@ -474,7 +475,7 @@ void AudioControlManager::ProcessAudioWhenCallActive(sptr<CallBase> &callObjectP
                 TELEPHONY_LOGI("local ring  MT call is answer, now playsoundtone");
                 StopSoundtone();
                 PlaySoundtone();
-                if (callObjectPtr->GetCallRunningState() == CallRunningState::CALL_RUNNING_STATE_RINGING) {
+                if (callRunningState == CallRunningState::CALL_RUNNING_STATE_RINGING) {
                     TELEPHONY_LOGI("mute when mt call is answer");
                     DelayedSingleton<AudioProxy>::GetInstance()->SetVoiceRingtoneMute(true);
                 }
