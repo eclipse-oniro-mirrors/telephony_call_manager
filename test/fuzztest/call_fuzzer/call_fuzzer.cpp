@@ -508,7 +508,7 @@ void AntiFraudServiceFunc(const uint8_t *data, size_t size)
     OHOS::AntiFraudService::AntiFraudResult antiFraudResult;
     antiFraudResult.modelVersion = GetInt<int32_t>(data, size, index++);
     antiFraudResult.fraudType = GetInt<int32_t>(data, size, index++);
-    antiFraudService->RecordDetectResult(antiFraudResult, std::string(reinterpret_cast<const char *>(data), size),
+    antiFraudService->RecordDetectResult(antiFraudResult, std::string(reinterpret_cast<const char*>(data), size),
         slotId, count);
     antiFraudService->StopAntiFraudService(slotId, count);
     antiFraudService->SetStoppedSlotId(slotId);
