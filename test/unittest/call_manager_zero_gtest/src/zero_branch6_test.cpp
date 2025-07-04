@@ -191,6 +191,9 @@ HWTEST_F(ZeroBranch5Test, Telephony_CallStatusManager_003, TestSize.Level0)
     callDetailInfo.state = TelCallState::CALL_STATUS_INCOMING;
     callDetailInfo.callType = CallType::TYPE_CS;
     ASSERT_EQ(callStatusManager->IncomingFilterPolicy(callDetailInfo), TELEPHONY_SUCCESS);
+    system::SetParameter("persist.edm.telephony_call_disable", "true");
+    ASSERT_EQ(callStatusManager->IncomingFilterPolicy(callDetailInfo), TELEPHONY_ERR_POLICY_DISABLED);
+    system::SetParameter("persist.edm.telephony_call_disable", "false");
     callStatusManager->CallFilterCompleteResult(callDetailInfo);
     CallDirection dir = CallDirection::CALL_DIRECTION_OUT;
     ASSERT_FALSE(callStatusManager->CreateNewCall(callDetailInfo, dir) == nullptr);

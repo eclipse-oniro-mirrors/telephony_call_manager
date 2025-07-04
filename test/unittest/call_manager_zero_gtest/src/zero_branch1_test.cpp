@@ -753,6 +753,9 @@ HWTEST_F(ZeroBranch2Test, Telephony_CallPolicy_001, Function | MediumTest | Leve
     mPacMap.PutIntValue("videoState", static_cast<int32_t>(VideoStateType::TYPE_VOICE));
     ASSERT_EQ(mCallPolicy.DialPolicy(testEmptyStr, mPacMap, true), TELEPHONY_ERR_SUCCESS);
     ASSERT_NE(mCallPolicy.DialPolicy(testEmptyStr, mPacMap, false), TELEPHONY_ERR_SUCCESS);
+    system::SetParameter("persist.edm.telephony_call_disable", "true");
+    ASSERT_EQ(mCallPolicy.DialPolicy(testEmptyStr, mPacMap, true), TELEPHONY_ERR_POLICY_DISABLED);
+    system::SetParameter("persist.edm.telephony_call_disable", "false");
     mPacMap.PutIntValue("dialType", static_cast<int32_t>(DialType::DIAL_VOICE_MAIL_TYPE));
     ASSERT_EQ(mCallPolicy.DialPolicy(testEmptyStr, mPacMap, true), TELEPHONY_ERR_SUCCESS);
     ASSERT_NE(mCallPolicy.DialPolicy(testEmptyStr, mPacMap, false), TELEPHONY_ERR_SUCCESS);
@@ -1211,6 +1214,8 @@ HWTEST_F(ZeroBranch2Test, Telephony_EdmCallPolicy_001, Function | MediumTest | L
     EXPECT_EQ(edmCallPolicy->IsDialingEnable(number), false);
     edmCallPolicy->SetCallPolicy(1, dialingList, 0, incomingList);
     EXPECT_EQ(edmCallPolicy->IsDialingEnable(number), true);
+    dialingList.insert(dialingList.end(), 1000, "22222222");
+    EXPECT_EQ(edmCallPolicy->SetCallPolicy(0, dialingList, 0, incomingList), TELEPHONY_ERR_ARGUMENT_INVALID);
     dialingList.clear();
     edmCallPolicy->SetCallPolicy(1, dialingList, 0, incomingList);
     EXPECT_EQ(edmCallPolicy->IsDialingEnable(number), true);
@@ -1242,6 +1247,8 @@ HWTEST_F(ZeroBranch2Test, Telephony_EdmCallPolicy_002, Function | MediumTest | L
     EXPECT_EQ(edmCallPolicy->IsIncomingEnable(number), false);
     edmCallPolicy->SetCallPolicy(0, dialingList, 1, incomingList);
     EXPECT_EQ(edmCallPolicy->IsIncomingEnable(number), true);
+    incomingList.insert(incomingList.end(), 1000, "22222222");
+    EXPECT_EQ(edmCallPolicy->SetCallPolicy(0, dialingList, 0, incomingList), TELEPHONY_ERR_ARGUMENT_INVALID);
     incomingList.clear();
     edmCallPolicy->SetCallPolicy(0, dialingList, 1, incomingList);
     EXPECT_EQ(edmCallPolicy->IsIncomingEnable(number), true);

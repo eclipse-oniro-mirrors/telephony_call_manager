@@ -768,6 +768,15 @@ HWTEST_F(CallManagerGtest, Telephony_CallManagerServiceStub_008, TestSize.Level0
     data11.WriteRawData((const void *)&imsCallMode, length);
     data11.RewindRead(0);
     ASSERT_EQ(callManagerService->OnUpdateCallMediaMode(data11, reply), TELEPHONY_SUCCESS);
+    MessageParcel data12;
+    data12.WriteInterfaceToken(CallManagerServiceStub::GetDescriptor());
+    std::vector<std::string> dialingList;
+    std::vector<std::string> incomingList;
+    data12.WriteInt32(0);
+    data12.WriteStringVector(dialingList);
+    data12.WriteInt32(0);
+    data12.WriteStringVector(incomingList);
+    ASSERT_EQ(callManagerService->OnSetCallPolicyInfo(data12, reply), TELEPHONY_SUCCESS);
 }
 
 /**
