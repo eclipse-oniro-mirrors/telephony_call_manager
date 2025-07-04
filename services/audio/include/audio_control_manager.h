@@ -96,6 +96,7 @@ public:
     void ExcludeBluetoothSco();
     void UnexcludeBluetoothSco();
     bool IsVideoRing(const std::string &personalNotificationRingtone, const std::string &ringtonePath);
+    void ProcessUnMuteWhenRecvActive();
 
 private:
     RingState ringState_ = RingState::STOPPED;

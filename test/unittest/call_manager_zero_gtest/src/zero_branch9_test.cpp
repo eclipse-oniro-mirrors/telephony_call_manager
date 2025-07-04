@@ -293,6 +293,33 @@ HWTEST_F(ZeroBranch9Test, Telephony_AudioControlManager_007, Function | MediumTe
 }
 
 /**
+ * @tc.number   Telephony_AudioControlManager_008
+ * @tc.name     test error branch
+ * @tc.desc     Function test
+ */
+HWTEST_F(ZeroBranch9Test, Telephony_AudioControlManager_008, Function | MediumTest | Level3)
+{
+    DialParaInfo info;
+    sptr<CallBase> call = new IMSCall(info);
+    auto audioControl = DelayedSingleton<AudioControlManager>::GetInstance();
+    audioControl->isCrsStartSoundTone_ = false;
+    audioControl->HandleCallStateUpdated(call, TelCallState::CALL_STATUS_INCOMING, TelCallState::CALL_STATUS_ACTIVE);
+    ASSERT_NO_THROW(audioControl->ProcessUnMuteWhenRecvActive());
+    audioControl->HandleNextState(call, TelCallState::CALL_STATUS_ANSWERED);
+    audioControl->HandlePriorState(call, TelCallState::CALL_STATUS_INCOMING);
+    call->SetCallRunningState(CallRunningState::CALL_RUNNING_STATE_RINGING);
+    audioControl->UpdateForegroundLiveCall();
+    ASSERT_NO_THROW(audioControl->ProcessAudioWhenCallActive(call));
+    audioControl->isCrsStartSoundTone_ = true;
+    ASSERT_NO_THROW(audioControl->ProcessUnMuteWhenRecvActive());
+    audioControl->HandlePriorState(call, TelCallState::CALL_STATUS_INCOMING);
+    ASSERT_NO_THROW(audioControl->ProcessAudioWhenCallActive(call));
+    ASSERT_NO_THROW(audioControl->MuteNetWorkRingTone(false));
+    audioControl->HandleCallStateUpdated(call, TelCallState::CALL_STATUS_INCOMING, TelCallState::CALL_STATUS_DISCONNECTING);
+    ASSERT_NO_THROW(DelayedSingleton<CallStateProcessor>::GetInstance()->DeleteCall(call->GetCallID(), TelCallState::CALL_STATUS_ACTIVE));
+}
+
+/**
  * @tc.number   Telephony_DealVideoRingPath_001
  * @tc.name     test error branch
  * @tc.desc     Function test

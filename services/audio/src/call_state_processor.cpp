@@ -57,6 +57,7 @@ void CallStateProcessor::AddCall(int32_t callId, TelCallState state)
             }
             break;
         case TelCallState::CALL_STATUS_ACTIVE:
+        case TelCallState::CALL_STATUS_ANSWERED:
             if (activeCalls_.count(callId) == EMPTY_VALUE) {
                 TELEPHONY_LOGI("add call , state : active");
                 activeCalls_.insert(callId);
