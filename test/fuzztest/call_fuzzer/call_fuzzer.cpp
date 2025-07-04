@@ -509,7 +509,7 @@ void AntiFraudServiceFunc(const uint8_t *data, size_t size)
     antiFraudResult.modelVersion = GetInt<int32_t>(data, size, index++);
     antiFraudResult.fraudType = GetInt<int32_t>(data, size, index++);
     antiFraudService->RecordDetectResult(antiFraudResult, std::string(reinterpret_cast<const char *>(data), size),
-        slot, count);
+        slotId, count);
     antiFraudService->StopAntiFraudService(slotId, count);
     antiFraudService->SetStoppedSlotId(slotId);
     antiFraudService->SetStoppedIndex(count);
@@ -530,14 +530,14 @@ void InterOperableCommunicationManagerFunc(const uint8_t *data, size_t size)
 
 void InterOperableDeviceObserverFunc(const uint8_t *data, size_t size)
 {
-    auto observer = DelayedSingleton<InterOperableDeviceObserver>::GetInstance();
+    auto observer = DelayedSingleton<InteroperableDeviceObserver>::GetInstance();
     auto stateCallback = std::make_shared<DmStateCallback>();
     observer->Init();
     size_t length = size / DATA_COUNT;
-    std::string networkId = std::string(reinterpret_cast<const char *>(data), length);
-    std::string devName = std::string(reinterpret_cast<const char *>(data + length), length);
-    observer->OndeviceOnline(networkId, devName, GetInt<uint16_t>(data, size, 0));
-    observer->OndeviceOffline(networkId, devName, GetInt<uint16_t>(data, size, 0));
+    std::string networkId = std::string(reinterpret_cast<const char*>(data), length);
+    std::string devName = std::string(reinterpret_cast<const char*>(data + length), length);
+    observer->OnDeviceOnline(networkId, devName, GetInt<uint16_t>(data, size, 0));
+    observer->OnDeviceOffline(networkId, devName, GetInt<uint16_t>(data, size, 0));
     DistributedHardware::DmDeviceInfo deviceInfo;
     deviceInfo.range = GetInt<int32_t>(data, size, 0);
     deviceInfo.networkType = GetInt<int32_t>(data, size, 1);
@@ -562,8 +562,8 @@ void BluetoothCallConnectionFunc(const uint8_t *data, size_t size)
     bluetoothConnection->SetBtCallScoConnected(GetInt<bool>(data, size, index++));
     bluetoothConnection->HfpDisConnectedEndBtCall();
     size_t length = size / DATA_COUNT;
-    std::string hfpPhoneNumber = std::string(reinterpret_cast<const char *>(data), length);
-    std::string hfpContactName = std::string(reinterpret_cast<const char *>(data + length), length);
+    std::string hfpPhoneNumber = std::string(reinterpret_cast<const char*>(data), length);
+    std::string hfpContactName = std::string(reinterpret_cast<const char*>(data + length), length);
     bluetoothConnection->SetHfpContactName(hfpPhoneNumber, hfpContactName);
     bluetoothConnection->GetHfpContactName(hfpPhoneNumber);
 }
