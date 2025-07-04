@@ -361,8 +361,7 @@ void AudioControlManager::UnmuteSoundTone()
                 DelayedSingleton<AudioProxy>::GetInstance()->SetVoiceRingtoneMute(false);
             }
         }
-    }, {}, {},
-        ffrt::task_attr().delay(UNMUTE_SOUNDTONE_DELAY_TIME));
+        }, {}, {}, ffrt::task_attr().delay(UNMUTE_SOUNDTONE_DELAY_TIME));
     return;
 }
 
