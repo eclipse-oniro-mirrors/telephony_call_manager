@@ -185,6 +185,7 @@ bool CallStateProcessor::UpdateCurrentCallState()
     } else {
         event = AudioEvent::SWITCH_AUDIO_INACTIVE_STATE;
     }
+    TELEPHONY_LOGI("UpdateCurrentCallState ProcessEvent event=%{public}d", event);
     return DelayedSingleton<AudioSceneProcessor>::GetInstance()->ProcessEvent(event);
 }
 
