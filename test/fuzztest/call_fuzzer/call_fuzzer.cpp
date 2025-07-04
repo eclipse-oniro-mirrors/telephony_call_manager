@@ -599,6 +599,7 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     InterOperableCommunicationManagerFunc(data, size);
     InterOperableDeviceObserverFunc(data, size);
     BluetoothCallConnectionFunc(data, size);
+    BluetoothCallStateFunc(data, size);
 }
 } // namespace OHOS
 
