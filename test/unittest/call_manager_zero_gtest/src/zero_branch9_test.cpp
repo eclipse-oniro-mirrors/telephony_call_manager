@@ -315,8 +315,10 @@ HWTEST_F(ZeroBranch9Test, Telephony_AudioControlManager_008, Function | MediumTe
     audioControl->HandlePriorState(call, TelCallState::CALL_STATUS_INCOMING);
     ASSERT_NO_THROW(audioControl->ProcessAudioWhenCallActive(call));
     ASSERT_NO_THROW(audioControl->MuteNetWorkRingTone(false));
-    audioControl->HandleCallStateUpdated(call, TelCallState::CALL_STATUS_INCOMING, TelCallState::CALL_STATUS_DISCONNECTING);
-    ASSERT_NO_THROW(DelayedSingleton<CallStateProcessor>::GetInstance()->DeleteCall(call->GetCallID(), TelCallState::CALL_STATUS_ACTIVE));
+    audioControl->HandleCallStateUpdated(call, TelCallState::CALL_STATUS_INCOMING,
+        TelCallState::CALL_STATUS_DISCONNECTING);
+    ASSERT_NO_THROW(DelayedSingleton<CallStateProcessor>::GetInstance()->DeleteCall(call->GetCallID(),
+        TelCallState::CALL_STATUS_ACTIVE));
 }
 
 /**
