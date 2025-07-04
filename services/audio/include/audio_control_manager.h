@@ -96,7 +96,6 @@ public:
     void ExcludeBluetoothSco();
     void UnexcludeBluetoothSco();
     bool IsVideoRing(const std::string &personalNotificationRingtone, const std::string &ringtonePath);
-    void ProcessUnMuteWhenRecvActive();
 
 private:
     RingState ringState_ = RingState::STOPPED;
@@ -128,6 +127,7 @@ private:
     void RestoreVoiceValumeIfNecessary();
     void PostProcessRingtone();
     bool IsExternalAudioDevice(AudioDeviceType initDeviceType);
+    void UnmuteSoundTone();
     ToneState toneState_ = ToneState::STOPPED;
     SoundState soundState_ = SoundState::STOPPED;
     bool isLocalRingbackNeeded_ = false;
