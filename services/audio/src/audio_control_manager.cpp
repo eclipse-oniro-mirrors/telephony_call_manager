@@ -322,16 +322,16 @@ void AudioControlManager::HandleCallStateUpdated(
         TELEPHONY_LOGE("call object is nullptr");
         return;
     }
+    auto callStateProcessor = DelayedSingleton<CallStateProcessor>::GetInstance();
     TELEPHONY_LOGI("HandleCallStateUpdated priorState:%{public}d, nextState:%{public}d", priorState, nextState);
     if ((nextState == TelCallState::CALL_STATUS_DISCONNECTING ||
          nextState == TelCallState::CALL_STATUS_DISCONNECTED) && priorState == TelCallState::CALL_STATUS_INCOMING) {
-        auto callStateProcessor = DelayedSingleton<CallStateProcessor>::GetInstance();
         callStateProcessor->DeleteCall(callObjectPtr->GetCallID(), TelCallState::CALL_STATUS_ACTIVE);
     }
     if (nextState == TelCallState::CALL_STATUS_ANSWERED) {
         TELEPHONY_LOGI("user answered, mute ringer instead of release renderer");
         if (priorState == TelCallState::CALL_STATUS_INCOMING) {
-            DelayedSingleton<CallStateProcessor>::GetInstance()->DeleteCall(callObjectPtr->GetCallID(), priorState);
+            callStateProcessor->DeleteCall(callObjectPtr->GetCallID(), priorState);
         }
         MuteRinger();
     }
