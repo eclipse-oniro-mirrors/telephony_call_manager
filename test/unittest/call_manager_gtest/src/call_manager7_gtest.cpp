@@ -800,6 +800,8 @@ HWTEST_F(CallManagerGtest, Telephony_CallManagerServiceStub_009, TestSize.Level0
     data.WriteInt32(defaultNumber);
     data.WriteString(bundleName);
     callManagerService->OnDialCall(data, reply);
+    data.WriteBool(true);
+    callManagerService->OnDialCall(data, reply);
 
     MessageParcel data12;
     data12.WriteInterfaceToken(CallManagerServiceStub::GetDescriptor());

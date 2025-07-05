@@ -689,8 +689,9 @@ sptr<CallBase> CallObjectManager::GetOneCallObjectByIndexSlotIdAndCallType(int32
         std::list<sptr<CallBase>>::iterator it = callObjectPtrList_.begin();
         for (; it != callObjectPtrList_.end(); ++it) {
             if ((*it)->GetCallType() == CallType::TYPE_BLUETOOTH && (*it)->GetCallIndex() == index &&
-                (*it)->GetSlotId() == slotId) {
-                    return (*it);
+                ((*it)->GetSlotId() == slotId || (*it)->GetPhoneOrWatchDial() ==
+                    static_cast<int32_t>(PhoneOrWatchDial::WATCH_DIAL))) {
+                return (*it);
             }
         }
     } else {

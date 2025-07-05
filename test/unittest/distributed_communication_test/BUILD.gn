@@ -37,6 +37,7 @@ ohos_unittest("distributed_communication_test") {
     "src/distributed_transmission_test.cpp",
     "src/interoperable_client_manager_test.cpp",
     "src/interoperable_communication_manager_test.cpp",
+    "src/interoperable_data_controller_test.cpp",
     "src/interoperable_device_observer_test.cpp",
     "src/interoperable_server_manager_test.cpp",
   ]

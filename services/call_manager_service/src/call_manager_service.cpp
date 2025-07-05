@@ -51,6 +51,7 @@
 #ifdef OHOS_BUILD_ENABLE_TELEPHONY_CUST
 #include "telephony_cust_wrapper.h"
 #endif
+#include "core_service_client.h"
 
 namespace OHOS {
 namespace Telephony {
@@ -304,6 +305,9 @@ int32_t CallManagerService::DialCall(std::u16string number, AppExecFwk::PacMap &
     std::string bundleName = "";
     TelephonyPermission::GetBundleNameByUid(uid, bundleName);
     extras.PutStringValue("bundleName", bundleName);
+    if (extras.GetBooleanValue("btSlotIdUnknown", false)) {
+        BtCallWaitSlotId(extras, number);
+    }
     if (!TelephonyPermission::CheckPermission(OHOS_PERMISSION_PLACE_CALL)) {
         TELEPHONY_LOGE("Permission denied!");
         CallManagerHisysevent::WriteDialCallFaultEvent(extras.GetIntValue(SLOT_ID), extras.GetIntValue(CALL_TYPE),
@@ -311,6 +315,12 @@ int32_t CallManagerService::DialCall(std::u16string number, AppExecFwk::PacMap &
         FinishAsyncTrace(HITRACE_TAG_OHOS, "DialCall", getpid());
         return TELEPHONY_ERR_PERMISSION_ERR;
     }
+#ifdef OHOS_BUILD_ENABLE_TELEPHONY_CUST
+    if (TELEPHONY_CUST_WRAPPER.isChangeDialNumberToTwEmc_ != nullptr &&
+        TELEPHONY_CUST_WRAPPER.isChangeDialNumberToTwEmc_(number, extras.GetIntValue(SLOT_ID))) {
+        TELEPHONY_LOGI("changed dial num to tw emc");
+    }
+#endif
     if (callControlManagerPtr_ != nullptr) {
         int32_t ret = callControlManagerPtr_->DialCall(number, extras);
         if (ret == TELEPHONY_SUCCESS) {
@@ -331,6 +341,19 @@ int32_t CallManagerService::DialCall(std::u16string number, AppExecFwk::PacMap &
         TELEPHONY_LOGE("callControlManagerPtr_ is nullptr!");
         FinishAsyncTrace(HITRACE_TAG_OHOS, "DialCall", getpid());
         return TELEPHONY_ERR_LOCAL_PTR_NULL;
+    }
+}
+
+void CallManagerService::BtCallWaitSlotId(AppExecFwk::PacMap &dialInfo, const std::u16string &number)
+{
+    TELEPHONY_LOGE("BtCallWaitSlotId enter");
+    std::string phoneNum(Str16ToStr8(number));
+    auto slotId = DelayedSingleton<InteroperableCommunicationManager>::GetInstance()->GetBtCallSlotId(phoneNum);
+    bool hasSimCard = false;
+    DelayedRefSingleton<CoreServiceClient>::GetInstance().HasSimCard(slotId, hasSimCard);
+    if (hasSimCard) {
+        TELEPHONY_LOGI("bt call, slotId[%{public}d]", slotId);
+        dialInfo.PutIntValue(SLOT_ID, slotId);
     }
 }
 

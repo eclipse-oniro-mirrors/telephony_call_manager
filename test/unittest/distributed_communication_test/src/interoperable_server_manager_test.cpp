@@ -46,5 +46,57 @@ HWTEST_F(InteroperableServerManagerTest, Telephony_InteroperableServerManager_00
     ASSERT_NO_THROW(deviceObserver->OnDeviceOffline(devId, devName, deviceType));
 }
  
+/**
+ * @tc.number   Telephony_InteroperableServerManager_002
+ * @tc.name     test recv message
+ * @tc.desc     normal branch test
+ */
+HWTEST_F(InteroperableServerManagerTest, Telephony_InteroperableServerManager_002, Function | MediumTest | Level1)
+{
+    int32_t msgType = 1;
+    cJSON *msg = nullptr;
+    auto deviceObserver = std::make_shared<InteroperableServerManager>();
+    EXPECT_NO_THROW(deviceObserver->HandleSpecificMsg(msgType, msg));
+
+    msg = cJSON_Parse("{ \"testData\": 101 }");
+    msgType = static_cast<int32_t>(InteroperableMsgType::DATA_TYPE_QUERY_REQUISITES_DATA);
+    EXPECT_NO_THROW(deviceObserver->HandleSpecificMsg(msgType, msg));
+    cJSON_Delete(msg);
+}
+
+/**
+ * @tc.number   Telephony_InteroperableServerManager_003
+ * @tc.name     test recv message
+ * @tc.desc     normal branch test
+ */
+HWTEST_F(InteroperableServerManagerTest, Telephony_InteroperableServerManager_003, Function | MediumTest | Level1)
+{
+    int32_t msgType = 1;
+    cJSON *msg = nullptr;
+    auto deviceObserver = std::make_shared<InteroperableServerManager>();
+    EXPECT_NO_THROW(deviceObserver->HandleSpecificMsg(msgType, msg));
+
+    msg = cJSON_Parse("{ \"testData\": 101 }");
+    msgType = static_cast<int32_t>(InteroperableMsgType::DATA_TYPE_QUERY_REQUISITES_DATA);
+    EXPECT_NO_THROW(deviceObserver->HandleSpecificMsg(msgType, msg));
+    cJSON_Delete(msg);
+}
+
+/**
+ * @tc.number   Telephony_InteroperableServerManager_004
+ * @tc.name     test recv query requisites data msg
+ * @tc.desc     normal branch test
+ */
+HWTEST_F(InteroperableServerManagerTest, Telephony_InteroperableServerManager_004, Function | MediumTest | Level1)
+{
+    cJSON *msg = cJSON_Parse("{ \"123\": \"123456\"}");
+    auto deviceObserver = std::make_shared<InteroperableServerManager>();
+    EXPECT_NO_THROW(deviceObserver->OnQueryRequisitesDataMsgReceived(msg));
+    cJSON_Delete(msg);
+
+    msg = cJSON_Parse("{ \"phoneNumber\": \"123456\"}");
+    EXPECT_NO_THROW(deviceObserver->OnQueryRequisitesDataMsgReceived(msg));
+    cJSON_Delete(msg);
+}
 } // namespace Telephony
 } // namespace OHOS

@@ -29,12 +29,16 @@ public:
     ~InteroperableClientManager() override = default;
     void OnDeviceOnline(const std::string &networkId, const std::string &devName, uint16_t devType) override {}
     void OnDeviceOffline(const std::string &networkId, const std::string &devName, uint16_t devType) override {}
-    void OnConnected() override {}
+    void OnConnected() override;
     void OnCallCreated(const sptr<CallBase> &call, const std::string &networkId) override;
     void OnCallDestroyed() override;
+    void CallCreated(const sptr<CallBase> &call, const std::string &networkId) override;
+    void HandleSpecificMsg(int32_t msgType, const cJSON *msg) override {}
  
 private:
     void ConnectRemote(const std::string &networkId);
+    ffrt::mutex mutex_{};
+    std::string phoneNum_{""};
 };
 }
 }
