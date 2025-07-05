@@ -45,6 +45,7 @@ constexpr uint64_t UNMUTE_SOUNDTONE_DELAY_TIME = 500000;
 static constexpr const char *VIDEO_RING_PATH_FIX_TAIL = ".mp4";
 constexpr int32_t VIDEO_RING_PATH_FIX_TAIL_LENGTH = 4;
 static constexpr const char *SYSTEM_VIDEO_RING = "system_video_ring";
+const int16_t MIN_MULITY_ACTIVE_CALL_COUNT = 1;
 
 AudioControlManager::AudioControlManager()
     : isLocalRingbackNeeded_(false), ring_(nullptr), tone_(nullptr), sound_(nullptr)
@@ -321,14 +322,21 @@ void AudioControlManager::HandleCallStateUpdated(
         TELEPHONY_LOGE("call object is nullptr");
         return;
     }
+    auto callStateProcessor = DelayedSingleton<CallStateProcessor>::GetInstance();
     TELEPHONY_LOGI("HandleCallStateUpdated priorState:%{public}d, nextState:%{public}d", priorState, nextState);
+    if ((nextState == TelCallState::CALL_STATUS_DISCONNECTING ||
+         nextState == TelCallState::CALL_STATUS_DISCONNECTED) && priorState == TelCallState::CALL_STATUS_INCOMING) {
+        callStateProcessor->DeleteCall(callObjectPtr->GetCallID(), TelCallState::CALL_STATUS_ACTIVE);
+    }
     if (nextState == TelCallState::CALL_STATUS_ANSWERED) {
         TELEPHONY_LOGI("user answered, mute ringer instead of release renderer");
         if (priorState == TelCallState::CALL_STATUS_INCOMING) {
-            DelayedSingleton<CallStateProcessor>::GetInstance()->DeleteCall(callObjectPtr->GetCallID(), priorState);
+            callStateProcessor->DeleteCall(callObjectPtr->GetCallID(), priorState);
         }
         MuteRinger();
-        return;
+    }
+    if (nextState == TelCallState::CALL_STATUS_ACTIVE && priorState == TelCallState::CALL_STATUS_INCOMING) {
+        return UnmuteSoundTone();
     }
     HandleNextState(callObjectPtr, nextState);
     if (priorState == nextState) {
@@ -336,6 +344,25 @@ void AudioControlManager::HandleCallStateUpdated(
         return;
     }
     HandlePriorState(callObjectPtr, priorState);
+}
+
+void AudioControlManager::UnmuteSoundTone()
+{
+    auto weak = weak_from_this();
+    ffrt::submit_h([weak]() {
+        auto strong = weak.lock();
+        if (strong != nullptr) {
+            if (strong->isCrsStartSoundTone_) {
+                TELEPHONY_LOGI("crs unmuteSound");
+                strong->MuteNetWorkRingTone(false);
+                strong->isCrsStartSoundTone_ = false;
+            } else {
+                TELEPHONY_LOGI("MT unmuteSound");
+                DelayedSingleton<AudioProxy>::GetInstance()->SetVoiceRingtoneMute(false);
+            }
+        }
+        }, {}, {}, ffrt::task_attr().delay(UNMUTE_SOUNDTONE_DELAY_TIME));
+    return;
 }
 
 void AudioControlManager::HandleNextState(sptr<CallBase> &callObjectPtr, TelCallState nextState)
@@ -353,6 +380,7 @@ void AudioControlManager::HandleNextState(sptr<CallBase> &callObjectPtr, TelCall
             audioInterruptState_ = AudioInterruptState::INTERRUPT_STATE_RINGING;
             break;
         case TelCallState::CALL_STATUS_ACTIVE:
+        case TelCallState::CALL_STATUS_ANSWERED:
             HandleNewActiveCall(callObjectPtr);
             audioInterruptState_ = AudioInterruptState::INTERRUPT_STATE_ACTIVATED;
             break;
@@ -429,7 +457,9 @@ void AudioControlManager::HandlePriorState(sptr<CallBase> &callObjectPtr, TelCal
 
 void AudioControlManager::ProcessAudioWhenCallActive(sptr<CallBase> &callObjectPtr)
 {
-    if (callObjectPtr->GetCallRunningState() == CallRunningState::CALL_RUNNING_STATE_ACTIVE) {
+    auto callRunningState = callObjectPtr->GetCallRunningState();
+    if (callRunningState == CallRunningState::CALL_RUNNING_STATE_ACTIVE ||
+        callRunningState == CallRunningState::CALL_RUNNING_STATE_RINGING) {
         if (isCrsVibrating_) {
             DelayedSingleton<AudioProxy>::GetInstance()->StopVibrator();
             isCrsVibrating_ = false;
@@ -438,17 +468,26 @@ void AudioControlManager::ProcessAudioWhenCallActive(sptr<CallBase> &callObjectP
             DelayedSingleton<AudioProxy>::GetInstance()->StopVibrator();
             isVideoRingVibrating_ = false;
         }
-        int ringCallCount = CallObjectManager::GetCallNumByRunningState(CallRunningState::CALL_RUNNING_STATE_RINGING);
-        if ((CallObjectManager::GetCurrentCallNum() - ringCallCount) < MIN_MULITY_CALL_COUNT) {
-            if (isCrsStartSoundTone_) {
-                ResumeCrsSoundTone();
-            } else {
-                TELEPHONY_LOGI("crs not play sound");
-                StopSoundtone();
-                PlaySoundtone();
+        ProcessSoundtone(callObjectPtr);
+        UpdateDeviceTypeForVideoOrSatelliteCall();
+    }
+}
+
+void AudioControlManager::ProcessSoundtone(sptr<CallBase> &callObjectPtr)
+{
+    int ringCallCount = CallObjectManager::GetCallNumByRunningState(CallRunningState::CALL_RUNNING_STATE_RINGING);
+    if ((CallObjectManager::GetCurrentCallNum() - ringCallCount) < MIN_MULITY_ACTIVE_CALL_COUNT) {
+        if (isCrsStartSoundTone_ == true) {
+            ResumeCrsSoundTone();
+        } else {
+            TELEPHONY_LOGI("local ring  MT call is answer, now playsoundtone");
+            StopSoundtone();
+            PlaySoundtone();
+            if (callObjectPtr->GetCallRunningState() == CallRunningState::CALL_RUNNING_STATE_RINGING) {
+                TELEPHONY_LOGI("mute when mt call is answer");
+                DelayedSingleton<AudioProxy>::GetInstance()->SetVoiceRingtoneMute(true);
             }
         }
-        UpdateDeviceTypeForVideoOrSatelliteCall();
     }
 }
 
@@ -464,17 +503,6 @@ void AudioControlManager::ResumeCrsSoundTone()
     TELEPHONY_LOGI("crs soundtone preferred deivce = %{public}d", device.deviceType);
     device.deviceType = initCrsDeviceType_;
     SetAudioDevice(device);
-    auto weak = weak_from_this();
-    ffrt::submit_h(
-        [weak]() {
-            auto strong = weak.lock();
-            if (strong != nullptr) {
-                TELEPHONY_LOGI("unmuteSound timeout");
-                strong->MuteNetWorkRingTone(false);
-                strong->isCrsStartSoundTone_ = false;
-            }
-        },
-        {}, {}, ffrt::task_attr().delay(UNMUTE_SOUNDTONE_DELAY_TIME));
 }
 
 void AudioControlManager::HandleNewActiveCall(sptr<CallBase> &callObjectPtr)
