@@ -468,12 +468,12 @@ void AudioControlManager::ProcessAudioWhenCallActive(sptr<CallBase> &callObjectP
             DelayedSingleton<AudioProxy>::GetInstance()->StopVibrator();
             isVideoRingVibrating_ = false;
         }
-        ProcessSoundtone();
+        ProcessSoundtone(callObjectPtr);
         UpdateDeviceTypeForVideoOrSatelliteCall();
     }
 }
 
-void AudioControlManager::ProcessSoundtone()
+void AudioControlManager::ProcessSoundtone(sptr<CallBase> &callObjectPtr)
 {
     int ringCallCount = CallObjectManager::GetCallNumByRunningState(CallRunningState::CALL_RUNNING_STATE_RINGING);
     if ((CallObjectManager::GetCurrentCallNum() - ringCallCount) < MIN_MULITY_ACTIVE_CALL_COUNT) {
