@@ -128,7 +128,7 @@ private:
     void PostProcessRingtone();
     bool IsExternalAudioDevice(AudioDeviceType initDeviceType);
     void UnmuteSoundTone();
-    void ProcessSoundtone();
+    void ProcessSoundtone(sptr<CallBase> &callObjectPtr);
     ToneState toneState_ = ToneState::STOPPED;
     SoundState soundState_ = SoundState::STOPPED;
     bool isLocalRingbackNeeded_ = false;
