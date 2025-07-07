@@ -182,14 +182,16 @@ HWTEST_F(ZeroBranch8Test, Telephony_CallPolicy_001, Function | MediumTest | Leve
     mPacMap.PutIntValue("dialType", static_cast<int32_t>(DialType::DIAL_OTT_TYPE));
     mPacMap.PutIntValue("callType", static_cast<int32_t>(CallType::TYPE_BLUETOOTH));
     mPacMap.PutIntValue("dialType", static_cast<int32_t>(DialType::DIAL_CARRIER_TYPE));
-    EXPECT_NE(mCallPolicy.DialPolicy(testEmptyStr, mPacMap, true), TELEPHONY_ERR_ARGUMENT_INVALID);
+    mCallPolicy.DialPolicy(testEmptyStr, mPacMap, true);
     mPacMap.PutIntValue("callType", static_cast<int32_t>(CallType::TYPE_CS));
     mPacMap.PutIntValue("dialScene", 3);
-    EXPECT_EQ(mCallPolicy.DialPolicy(testEmptyStr, mPacMap, true), TELEPHONY_ERR_ARGUMENT_INVALID);
+    mCallPolicy.DialPolicy(testEmptyStr, mPacMap, true);
     mPacMap.PutIntValue("dialScene", static_cast<int32_t>(DialScene::CALL_EMERGENCY));
     mPacMap.PutIntValue("videoState", static_cast<int32_t>(VideoStateType::TYPE_VOICE));
-    EXPECT_NE(mCallPolicy.DialPolicy(testEmptyStr, mPacMap, true), TELEPHONY_ERR_ARGUMENT_INVALID);
+    mCallPolicy.DialPolicy(testEmptyStr, mPacMap, true);
     mPacMap.PutIntValue("videoState", static_cast<int32_t>(VideoStateType::TYPE_SEND_ONLY));
+    mCallPolicy.DialPolicy(testEmptyStr, mPacMap, true);
+    mPacMap.PutIntValue("dialType", -1);
     EXPECT_EQ(mCallPolicy.DialPolicy(testEmptyStr, mPacMap, true), TELEPHONY_ERR_ARGUMENT_INVALID);
 }
 

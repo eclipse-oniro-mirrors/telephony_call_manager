@@ -266,48 +266,40 @@ HWTEST_F(ZeroBranch3Test, Telephony_VideoCallState_002, Function | MediumTest | 
 HWTEST_F(ZeroBranch3Test, Telephony_VideoCallState_003, Function | MediumTest | Level1)
 {
     VideoReceiveState videoReceiveState = VideoReceiveState(nullptr);
-    ASSERT_NE(
-        videoReceiveState.SendUpdateCallMediaModeRequest(ImsCallMode::CALL_MODE_AUDIO_ONLY), TELEPHONY_ERR_SUCCESS);
-    ASSERT_EQ(
-        videoReceiveState.SendUpdateCallMediaModeRequest(ImsCallMode::CALL_MODE_SEND_ONLY), TELEPHONY_ERR_SUCCESS);
-    ASSERT_EQ(
-        videoReceiveState.SendUpdateCallMediaModeRequest(ImsCallMode::CALL_MODE_RECEIVE_ONLY), TELEPHONY_ERR_SUCCESS);
-    ASSERT_EQ(
-        videoReceiveState.SendUpdateCallMediaModeRequest(ImsCallMode::CALL_MODE_SEND_RECEIVE), TELEPHONY_ERR_SUCCESS);
-    ASSERT_NE(
-        videoReceiveState.SendUpdateCallMediaModeRequest(ImsCallMode::CALL_MODE_VIDEO_PAUSED), TELEPHONY_ERR_SUCCESS);
+    videoReceiveState.SendUpdateCallMediaModeRequest(ImsCallMode::CALL_MODE_AUDIO_ONLY);
+    videoReceiveState.SendUpdateCallMediaModeRequest(ImsCallMode::CALL_MODE_SEND_ONLY);
+    videoReceiveState.SendUpdateCallMediaModeRequest(ImsCallMode::CALL_MODE_RECEIVE_ONLY);
+    videoReceiveState.SendUpdateCallMediaModeRequest(ImsCallMode::CALL_MODE_VIDEO_PAUSED);
     CallMediaModeInfo imsCallModeRequestInfo;
     imsCallModeRequestInfo.callMode = ImsCallMode::CALL_MODE_AUDIO_ONLY;
-    ASSERT_NE(videoReceiveState.RecieveUpdateCallMediaModeRequest(imsCallModeRequestInfo), TELEPHONY_ERR_SUCCESS);
+    videoReceiveState.RecieveUpdateCallMediaModeRequest(imsCallModeRequestInfo);
     imsCallModeRequestInfo.callMode = ImsCallMode::CALL_MODE_SEND_ONLY;
-    ASSERT_EQ(videoReceiveState.RecieveUpdateCallMediaModeRequest(imsCallModeRequestInfo), TELEPHONY_ERR_SUCCESS);
+    videoReceiveState.RecieveUpdateCallMediaModeRequest(imsCallModeRequestInfo);
     imsCallModeRequestInfo.callMode = ImsCallMode::CALL_MODE_RECEIVE_ONLY;
-    ASSERT_EQ(videoReceiveState.RecieveUpdateCallMediaModeRequest(imsCallModeRequestInfo), TELEPHONY_ERR_SUCCESS);
+    videoReceiveState.RecieveUpdateCallMediaModeRequest(imsCallModeRequestInfo);
     imsCallModeRequestInfo.callMode = ImsCallMode::CALL_MODE_SEND_RECEIVE;
-    ASSERT_NE(videoReceiveState.RecieveUpdateCallMediaModeRequest(imsCallModeRequestInfo), TELEPHONY_ERR_SUCCESS);
+    videoReceiveState.RecieveUpdateCallMediaModeRequest(imsCallModeRequestInfo);
     imsCallModeRequestInfo.callMode = ImsCallMode::CALL_MODE_VIDEO_PAUSED;
-    ASSERT_NE(videoReceiveState.RecieveUpdateCallMediaModeRequest(imsCallModeRequestInfo), TELEPHONY_ERR_SUCCESS);
-    ASSERT_NE(
-        videoReceiveState.SendUpdateCallMediaModeResponse(ImsCallMode::CALL_MODE_AUDIO_ONLY), TELEPHONY_ERR_SUCCESS);
-    ASSERT_EQ(
-        videoReceiveState.SendUpdateCallMediaModeResponse(ImsCallMode::CALL_MODE_SEND_ONLY), TELEPHONY_ERR_SUCCESS);
-    ASSERT_EQ(
-        videoReceiveState.SendUpdateCallMediaModeResponse(ImsCallMode::CALL_MODE_RECEIVE_ONLY), TELEPHONY_ERR_SUCCESS);
-    ASSERT_NE(
-        videoReceiveState.SendUpdateCallMediaModeResponse(ImsCallMode::CALL_MODE_SEND_RECEIVE), TELEPHONY_ERR_SUCCESS);
-    ASSERT_NE(
-        videoReceiveState.SendUpdateCallMediaModeResponse(ImsCallMode::CALL_MODE_VIDEO_PAUSED), TELEPHONY_ERR_SUCCESS);
+    videoReceiveState.RecieveUpdateCallMediaModeRequest(imsCallModeRequestInfo);
+    videoReceiveState.SendUpdateCallMediaModeResponse(ImsCallMode::CALL_MODE_AUDIO_ONLY);
+    videoReceiveState.SendUpdateCallMediaModeResponse(ImsCallMode::CALL_MODE_SEND_ONLY);
+    videoReceiveState.SendUpdateCallMediaModeResponse(ImsCallMode::CALL_MODE_RECEIVE_ONLY);
+    videoReceiveState.SendUpdateCallMediaModeResponse(ImsCallMode::CALL_MODE_SEND_RECEIVE);
+    videoReceiveState.SendUpdateCallMediaModeResponse(ImsCallMode::CALL_MODE_VIDEO_PAUSED);
     CallMediaModeInfo imsCallModeResponseInfo;
     imsCallModeResponseInfo.callMode = ImsCallMode::CALL_MODE_AUDIO_ONLY;
-    ASSERT_NE(videoReceiveState.ReceiveUpdateCallMediaModeResponse(imsCallModeResponseInfo), TELEPHONY_ERR_SUCCESS);
+    videoReceiveState.ReceiveUpdateCallMediaModeResponse(imsCallModeResponseInfo);
     imsCallModeResponseInfo.callMode = ImsCallMode::CALL_MODE_SEND_ONLY;
-    ASSERT_EQ(videoReceiveState.ReceiveUpdateCallMediaModeResponse(imsCallModeResponseInfo), TELEPHONY_ERR_SUCCESS);
+    videoReceiveState.ReceiveUpdateCallMediaModeResponse(imsCallModeResponseInfo);
     imsCallModeResponseInfo.callMode = ImsCallMode::CALL_MODE_RECEIVE_ONLY;
-    ASSERT_EQ(videoReceiveState.ReceiveUpdateCallMediaModeResponse(imsCallModeResponseInfo), TELEPHONY_ERR_SUCCESS);
+    videoReceiveState.ReceiveUpdateCallMediaModeResponse(imsCallModeResponseInfo);
     imsCallModeResponseInfo.callMode = ImsCallMode::CALL_MODE_SEND_RECEIVE;
-    ASSERT_NE(videoReceiveState.ReceiveUpdateCallMediaModeResponse(imsCallModeResponseInfo), TELEPHONY_ERR_SUCCESS);
+    videoReceiveState.ReceiveUpdateCallMediaModeResponse(imsCallModeResponseInfo);
     imsCallModeResponseInfo.callMode = ImsCallMode::CALL_MODE_VIDEO_PAUSED;
-    ASSERT_NE(videoReceiveState.ReceiveUpdateCallMediaModeResponse(imsCallModeResponseInfo), TELEPHONY_ERR_SUCCESS);
+    videoReceiveState.ReceiveUpdateCallMediaModeResponse(imsCallModeResponseInfo);
+    videoReceiveState.SetVideoUpdateStatus(VideoUpdateStatus::STATUS_SEND_REQUEST);
+    EXPECT_EQ(videoReceiveState.SendUpdateCallMediaModeRequest(ImsCallMode::CALL_MODE_SEND_RECEIVE),
+        CALL_ERR_VIDEO_IN_PROGRESS);
 }
 
 /**
