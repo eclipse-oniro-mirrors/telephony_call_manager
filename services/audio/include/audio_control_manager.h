@@ -146,6 +146,7 @@ private:
     bool isScoTemporarilyDisabled_ = false;
     int32_t voiceVolume_ = -1;
     AudioDeviceType initCrsDeviceType_ = AudioDeviceType::DEVICE_UNKNOWN;
+    ffrt::mutex crsMutex_{};
 };
 } // namespace Telephony
 } // namespace OHOS
