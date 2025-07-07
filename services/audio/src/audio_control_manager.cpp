@@ -352,17 +352,15 @@ void AudioControlManager::UnmuteSoundTone()
     ffrt::submit_h([weak]() {
         auto strong = weak.lock();
         if (strong != nullptr) {
+            std::unique_lock<ffrt::mutex> lock(strong->crsMutex_);
             if (strong->isCrsStartSoundTone_) {
                 TELEPHONY_LOGI("crs unmuteSound");
-                strong->MuteNetWorkRingTone(false);
                 strong->isCrsStartSoundTone_ = false;
-            } else {
-                TELEPHONY_LOGI("MT unmuteSound");
-                DelayedSingleton<AudioProxy>::GetInstance()->SetVoiceRingtoneMute(false);
             }
+            lock.unlock();
+            DelayedSingleton<AudioProxy>::GetInstance()->SetVoiceRingtoneMute(false);
         }
         }, {}, {}, ffrt::task_attr().delay(UNMUTE_SOUNDTONE_DELAY_TIME));
-    return;
 }
 
 void AudioControlManager::HandleNextState(sptr<CallBase> &callObjectPtr, TelCallState nextState)
