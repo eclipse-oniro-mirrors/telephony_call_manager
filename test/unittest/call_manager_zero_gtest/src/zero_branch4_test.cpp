@@ -269,7 +269,6 @@ HWTEST_F(ZeroBranch3Test, Telephony_VideoCallState_003, Function | MediumTest | 
     videoReceiveState.SendUpdateCallMediaModeRequest(ImsCallMode::CALL_MODE_AUDIO_ONLY);
     videoReceiveState.SendUpdateCallMediaModeRequest(ImsCallMode::CALL_MODE_SEND_ONLY);
     videoReceiveState.SendUpdateCallMediaModeRequest(ImsCallMode::CALL_MODE_RECEIVE_ONLY);
-    videoReceiveState.SendUpdateCallMediaModeRequest(ImsCallMode::CALL_MODE_SEND_RECEIVE);
     videoReceiveState.SendUpdateCallMediaModeRequest(ImsCallMode::CALL_MODE_VIDEO_PAUSED);
     CallMediaModeInfo imsCallModeRequestInfo;
     imsCallModeRequestInfo.callMode = ImsCallMode::CALL_MODE_AUDIO_ONLY;
@@ -299,7 +298,7 @@ HWTEST_F(ZeroBranch3Test, Telephony_VideoCallState_003, Function | MediumTest | 
     imsCallModeResponseInfo.callMode = ImsCallMode::CALL_MODE_VIDEO_PAUSED;
     videoReceiveState.ReceiveUpdateCallMediaModeResponse(imsCallModeResponseInfo);
     videoReceiveState.SetVideoUpdateStatus(VideoUpdateStatus::STATUS_SEND_REQUEST);
-    EXPECT_EQ(videoReceiveState.SendUpdateCallMediaModeRequest(ImsCallMode::CALL_MODE_AUDIO_ONLY),
+    EXPECT_EQ(videoReceiveState.SendUpdateCallMediaModeRequest(ImsCallMode::CALL_MODE_SEND_RECEIVE),
         CALL_ERR_VIDEO_IN_PROGRESS);
 }
 
