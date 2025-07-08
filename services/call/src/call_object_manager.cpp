@@ -294,8 +294,7 @@ int32_t CallObjectManager::HasNewCall()
             ((*it)->GetCallRunningState() == CallRunningState::CALL_RUNNING_STATE_CREATE ||
             (*it)->GetCallRunningState() == CallRunningState::CALL_RUNNING_STATE_CONNECTING ||
             (*it)->GetCallRunningState() == CallRunningState::CALL_RUNNING_STATE_DIALING ||
-            (*it)->GetCallType() == CallType::TYPE_SATELLITE ||
-            (*it)->GetCallType() == CallType::TYPE_BLUETOOTH)) {
+            (*it)->GetCallType() == CallType::TYPE_SATELLITE) {
             TELEPHONY_LOGE("there is already a new call[callId:%{public}d,state:%{public}d], please redial later",
                 (*it)->GetCallID(), (*it)->GetCallRunningState());
             return CALL_ERR_CALL_COUNTS_EXCEED_LIMIT;
@@ -321,6 +320,9 @@ int32_t CallObjectManager::IsNewCallAllowedCreate(bool &enabled)
     }
     int32_t count = 0;
     int32_t callNum = 2;
+#ifdef NOT_SUPPORT_MULTICALL
+    callNum = 1;
+#endif
     std::list<int32_t> callIdList;
     GetCarrierCallList(callIdList);
     for (int32_t otherCallId : callIdList) {
