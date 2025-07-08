@@ -294,7 +294,7 @@ int32_t CallObjectManager::HasNewCall()
             ((*it)->GetCallRunningState() == CallRunningState::CALL_RUNNING_STATE_CREATE ||
             (*it)->GetCallRunningState() == CallRunningState::CALL_RUNNING_STATE_CONNECTING ||
             (*it)->GetCallRunningState() == CallRunningState::CALL_RUNNING_STATE_DIALING ||
-            (*it)->GetCallType() == CallType::TYPE_SATELLITE) {
+            (*it)->GetCallType() == CallType::TYPE_SATELLITE)) {
             TELEPHONY_LOGE("there is already a new call[callId:%{public}d,state:%{public}d], please redial later",
                 (*it)->GetCallID(), (*it)->GetCallRunningState());
             return CALL_ERR_CALL_COUNTS_EXCEED_LIMIT;
