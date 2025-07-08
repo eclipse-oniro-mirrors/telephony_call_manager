@@ -31,6 +31,9 @@
 #include "interoperable_communication_manager.h"
 #include "bluetooth_call_connection.h"
 #include "bluetooth_call_state.h"
+#include "antifraud_adapter.h"
+#include "call_manager_service.h"
+#include "call_manager_utils.h"
 
 using namespace OHOS::Telephony;
 namespace OHOS {
@@ -513,6 +516,12 @@ void AntiFraudServiceFunc(const uint8_t *data, size_t size)
     antiFraudService->StopAntiFraudService(slotId, count);
     antiFraudService->SetStoppedSlotId(slotId);
     antiFraudService->SetStoppedIndex(count);
+    auto antiFraudAdapter = DelayedSingleton<AntiFraudAdapter>::GetInstance();
+    antiFraudAdapter->ReleaseAntiFraud();
+    std::string phoneNum = std::string(reinterpret_cast<const char*>(data), size);
+    auto listener = std::make_shared<Telephony::AntiFraudService::AntiFraudDetectResListenerImpl>(
+        phoneNum, slotId, index);
+    listener->HandleAntiFraudDetectRes(antiFraudResult);
 }
 
 void InterOperableCommunicationManagerFunc(const uint8_t *data, size_t size)
@@ -578,6 +587,62 @@ void BluetoothCallStateFunc(const uint8_t *data, size_t size)
     bluetoothCallState->OnScoStateChanged(device, state);
 }
 
+void CallMangerServiceFunc(const uint8_t *data, size_t size)
+{
+    auto callMangerService = DelayedSingleton<CallMangerService>::GetInstance();
+    int index = 0;
+    int32_t systemAbilityId = GetInt<int32_t>(data, size, index++);
+    callMangerService->OnAddSystemAbility(systemAbilityId, std::string(reinterpret_cast<const char*>(data), size));
+    std::vector<std::u16string> args;
+    std::u16string arg = Str8ToStr16(std::string(reinterpret_cast<const char*>(data), size));
+    args.push_back(arg);
+    std::int32_t fd = GetInt<int32_t>(data, size, index++);
+    callMangerService->Dump(fd, args);
+    callMangerService->GetBindTime();
+    callMangerService->GetStartServieSpent();
+    bool enabled = GetInt<bool>(data, size, index++);
+    callMangerService->IsNewCallAllowed(enabled);
+    int32_t callId = GetInt<int32_t>(data, size, index++);
+    callMangerService->SwitchCall(callId);
+    callMangerService->UnHoldCall(callId);
+    callMangerService->StopDtmf(callId);
+    callMangerService->EnableImsSwitch(callId);
+    callMangerService->GetBundleInfo();
+    callMangerService->dealCeliaCallEvent(callId);
+    std::string eventName = std::string(reinterpret_cast<const char*>(data), size);
+    callMangerService->HandleVoIPCallEvent(callId, eventName);
+    callMangerService->HandleDisplaySpecifiedCallPage(callId);
+    callMangerService->HandleCeliaAutoAnswerCall(calllId, GetInt<bool>(data, size, index++));
+    callMangerService->SendUssdResponse(callId, std::string(reinterpret_cast<const char*>(data), size));
+    callMangerService->OnStop();
+    callMangerService->UnRegisterCallBack();
+    callMangerService->UnInit();
+    MessageParcel messageParcel;
+    CallAttributeInfo info;
+    info.accountId = GetInt<int32_t>(data, size, index);
+    callMangerService->CallType::TYPE_VOIP;
+    CallManagerUtils::WriteCallAttributeInfo(info, messageParcel);
+    CallManagerUtils::IsBundleInstalled(std::string(reinterpret_cast<const char*>(data), size), callId)
+}
+
+void CallMangerServiceStubFunc(const uint8_t *data, size_t size)
+{
+    auto callMangerService = DelayedSingleton<CallMangerService>::GetInstance();
+    MessageParcel dataParcel;
+    MessageParcel reply;
+    int index = 0;
+    int32_t callId = GetInt<int32_t>(data, size, index++);
+    dataParcel.WriteInt32(callId);
+    callMangerService->OnUnHoldCall(dataParcel, reply);
+    callMangerService->OnSwitchCall(dataParcel, reply);
+    callMangerService->OnStopDtmf(dataParcel, reply);
+    callMangerService->OnCombineConference(dataParcel, reply);
+    callMangerService->OnEnableVoLte(dataParcel, reply);
+    callMangerService->OnSendUssdResponse(dataParcel, reply);
+    dataParcel.WriteBool(GetInt<BOOL>(data, size, index++););
+    callMangerService->OnIsNewCallAllowed(dataParcel, reply);
+}
+
 void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
 {
     if (data == nullptr || size == 0) {
@@ -600,6 +665,8 @@ void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
     InterOperableDeviceObserverFunc(data, size);
     BluetoothCallConnectionFunc(data, size);
     BluetoothCallStateFunc(data, size);
+    CallMangerServiceFunc(data, size);
+    CallMangerServiceStubFunc(data, size);
 }
 } // namespace OHOS
 
