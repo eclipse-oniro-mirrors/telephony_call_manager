@@ -589,58 +589,58 @@ void BluetoothCallStateFunc(const uint8_t *data, size_t size)
 
 void CallMangerServiceFunc(const uint8_t *data, size_t size)
 {
-    auto callMangerService = DelayedSingleton<CallMangerService>::GetInstance();
+    auto callManagerService = DelayedSingleton<CallMangerService>::GetInstance();
     int index = 0;
     int32_t systemAbilityId = GetInt<int32_t>(data, size, index++);
-    callMangerService->OnAddSystemAbility(systemAbilityId, std::string(reinterpret_cast<const char*>(data), size));
+    callManagerService->OnAddSystemAbility(systemAbilityId, std::string(reinterpret_cast<const char*>(data), size));
     std::vector<std::u16string> args;
     std::u16string arg = Str8ToStr16(std::string(reinterpret_cast<const char*>(data), size));
     args.push_back(arg);
     std::int32_t fd = GetInt<int32_t>(data, size, index++);
-    callMangerService->Dump(fd, args);
-    callMangerService->GetBindTime();
-    callMangerService->GetStartServieSpent();
+    callManagerService->Dump(fd, args);
+    callManagerService->GetBindTime();
+    callManagerService->GetStartServieSpent();
     bool enabled = GetInt<bool>(data, size, index++);
-    callMangerService->IsNewCallAllowed(enabled);
+    callManagerService->IsNewCallAllowed(enabled);
     int32_t callId = GetInt<int32_t>(data, size, index++);
-    callMangerService->SwitchCall(callId);
-    callMangerService->UnHoldCall(callId);
-    callMangerService->StopDtmf(callId);
-    callMangerService->EnableImsSwitch(callId);
-    callMangerService->GetBundleInfo();
-    callMangerService->dealCeliaCallEvent(callId);
+    callManagerService->SwitchCall(callId);
+    callManagerService->UnHoldCall(callId);
+    callManagerService->StopDtmf(callId);
+    callManagerService->EnableImsSwitch(callId);
+    callManagerService->GetBundleInfo();
+    callManagerService->dealCeliaCallEvent(callId);
     std::string eventName = std::string(reinterpret_cast<const char*>(data), size);
-    callMangerService->HandleVoIPCallEvent(callId, eventName);
-    callMangerService->HandleDisplaySpecifiedCallPage(callId);
-    callMangerService->HandleCeliaAutoAnswerCall(calllId, GetInt<bool>(data, size, index++));
-    callMangerService->SendUssdResponse(callId, std::string(reinterpret_cast<const char*>(data), size));
-    callMangerService->OnStop();
-    callMangerService->UnRegisterCallBack();
-    callMangerService->UnInit();
+    callManagerService->HandleVoIPCallEvent(callId, eventName);
+    callManagerService->HandleDisplaySpecifiedCallPage(callId);
+    callManagerService->HandleCeliaAutoAnswerCall(calllId, GetInt<bool>(data, size, index++));
+    callManagerService->SendUssdResponse(callId, std::string(reinterpret_cast<const char*>(data), size));
+    callManagerService->OnStop();
+    callManagerService->UnRegisterCallBack();
+    callManagerService->UnInit();
     MessageParcel messageParcel;
     CallAttributeInfo info;
     info.accountId = GetInt<int32_t>(data, size, index);
-    callMangerService->CallType::TYPE_VOIP;
+    info.callType = CallType::TYPE_VOIP;
     CallManagerUtils::WriteCallAttributeInfo(info, messageParcel);
     CallManagerUtils::IsBundleInstalled(std::string(reinterpret_cast<const char*>(data), size), callId)
 }
 
 void CallMangerServiceStubFunc(const uint8_t *data, size_t size)
 {
-    auto callMangerService = DelayedSingleton<CallMangerService>::GetInstance();
+    auto callManagerService = DelayedSingleton<CallMangerService>::GetInstance();
     MessageParcel dataParcel;
     MessageParcel reply;
     int index = 0;
     int32_t callId = GetInt<int32_t>(data, size, index++);
     dataParcel.WriteInt32(callId);
-    callMangerService->OnUnHoldCall(dataParcel, reply);
-    callMangerService->OnSwitchCall(dataParcel, reply);
-    callMangerService->OnStopDtmf(dataParcel, reply);
-    callMangerService->OnCombineConference(dataParcel, reply);
-    callMangerService->OnEnableVoLte(dataParcel, reply);
-    callMangerService->OnSendUssdResponse(dataParcel, reply);
-    dataParcel.WriteBool(GetInt<BOOL>(data, size, index++););
-    callMangerService->OnIsNewCallAllowed(dataParcel, reply);
+    callManagerService->OnUnHoldCall(dataParcel, reply);
+    callManagerService->OnSwitchCall(dataParcel, reply);
+    callManagerService->OnStopDtmf(dataParcel, reply);
+    callManagerService->OnCombineConference(dataParcel, reply);
+    callManagerService->OnEnableVoLte(dataParcel, reply);
+    callManagerService->OnSendUssdResponse(dataParcel, reply);
+    dataParcel.WriteBool(GetInt<bool>(data, size, index++););
+    callManagerService->OnIsNewCallAllowed(dataParcel, reply);
 }
 
 void DoSomethingInterestingWithMyAPI(const uint8_t *data, size_t size)
