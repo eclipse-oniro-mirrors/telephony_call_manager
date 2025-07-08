@@ -589,7 +589,7 @@ void BluetoothCallStateFunc(const uint8_t *data, size_t size)
 
 void CallMangerServiceFunc(const uint8_t *data, size_t size)
 {
-    auto callManagerService = DelayedSingleton<CallMangerService>::GetInstance();
+    auto callManagerService = DelayedSingleton<CallManagerService>::GetInstance();
     int index = 0;
     int32_t systemAbilityId = GetInt<int32_t>(data, size, index++);
     callManagerService->OnAddSystemAbility(systemAbilityId, std::string(reinterpret_cast<const char*>(data), size));
@@ -599,7 +599,7 @@ void CallMangerServiceFunc(const uint8_t *data, size_t size)
     std::int32_t fd = GetInt<int32_t>(data, size, index++);
     callManagerService->Dump(fd, args);
     callManagerService->GetBindTime();
-    callManagerService->GetStartServieSpent();
+    callManagerService->GetStartServiceSpent();
     bool enabled = GetInt<bool>(data, size, index++);
     callManagerService->IsNewCallAllowed(enabled);
     int32_t callId = GetInt<int32_t>(data, size, index++);
@@ -612,7 +612,7 @@ void CallMangerServiceFunc(const uint8_t *data, size_t size)
     std::string eventName = std::string(reinterpret_cast<const char*>(data), size);
     callManagerService->HandleVoIPCallEvent(callId, eventName);
     callManagerService->HandleDisplaySpecifiedCallPage(callId);
-    callManagerService->HandleCeliaAutoAnswerCall(calllId, GetInt<bool>(data, size, index++));
+    callManagerService->HandleCeliaAutoAnswerCall(callId, GetInt<bool>(data, size, index++));
     callManagerService->SendUssdResponse(callId, std::string(reinterpret_cast<const char*>(data), size));
     callManagerService->OnStop();
     callManagerService->UnRegisterCallBack();
@@ -622,12 +622,12 @@ void CallMangerServiceFunc(const uint8_t *data, size_t size)
     info.accountId = GetInt<int32_t>(data, size, index);
     info.callType = CallType::TYPE_VOIP;
     CallManagerUtils::WriteCallAttributeInfo(info, messageParcel);
-    CallManagerUtils::IsBundleInstalled(std::string(reinterpret_cast<const char*>(data), size), callId)
+    CallManagerUtils::IsBundleInstalled(std::string(reinterpret_cast<const char*>(data), size), callId);
 }
 
 void CallMangerServiceStubFunc(const uint8_t *data, size_t size)
 {
-    auto callManagerService = DelayedSingleton<CallMangerService>::GetInstance();
+    auto callManagerService = DelayedSingleton<CallManagerService>::GetInstance();
     MessageParcel dataParcel;
     MessageParcel reply;
     int index = 0;
@@ -639,7 +639,7 @@ void CallMangerServiceStubFunc(const uint8_t *data, size_t size)
     callManagerService->OnCombineConference(dataParcel, reply);
     callManagerService->OnEnableVoLte(dataParcel, reply);
     callManagerService->OnSendUssdResponse(dataParcel, reply);
-    dataParcel.WriteBool(GetInt<bool>(data, size, index++););
+    dataParcel.WriteBool(GetInt<bool>(data, size, index++));
     callManagerService->OnIsNewCallAllowed(dataParcel, reply);
 }
 
