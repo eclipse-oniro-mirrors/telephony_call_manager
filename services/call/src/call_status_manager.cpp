@@ -2392,6 +2392,10 @@ void CallStatusManager::ModifyEsimType()
 int32_t CallStatusManager::RefreshOldCall(const CallDetailInfo &info, bool &isExistedOldCall)
 {
     TELEPHONY_LOGI("RefreshOldCall enter.");
+    sptr<CallBase> initCall = GetOneCallObjectByIndex(INIT_INDEX);
+    if (initCall != nullptr) {
+        DealFailDial(initCall);
+    }
     sptr<CallBase> call = GetOneCallObjectByIndexSlotIdAndCallType(info.index, info.accountId, info.callType);
     if (call == nullptr) {
         isExistedOldCall = false;

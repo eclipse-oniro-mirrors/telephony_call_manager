@@ -80,6 +80,7 @@ private:
     int32_t GetOtherRingingCall(int32_t currentCallId);
     int32_t EccDialPolicy();
     int32_t BluetoothDialProcess(DialParaInfo &info);
+    void SelectDialFailCall(sptr<CallBase> &call);
 
 private:
     std::mutex mutex_;

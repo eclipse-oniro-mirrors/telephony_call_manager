@@ -971,6 +971,7 @@ CellularCallInfo CallObjectManager::GetDialCallInfo()
 
 int32_t CallObjectManager::DealFailDial(sptr<CallBase> call)
 {
+    TELEPHONY_LOGI("DealFailDial");
     CallDetailInfo callDetatilInfo;
     if (memset_s(&callDetatilInfo, sizeof(CallDetailInfo), 0, sizeof(CallDetailInfo)) != EOK) {
         TELEPHONY_LOGE("memset_s callDetatilInfo fail");

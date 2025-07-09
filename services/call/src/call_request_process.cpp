@@ -790,27 +790,37 @@ int32_t CallRequestProcess::UpdateCallReportInfo(const DialParaInfo &info, TelCa
 int32_t CallRequestProcess::HandleDialFail()
 {
     std::unique_lock<std::mutex> lock(mutex_);
+    sptr<CallBase> call = nullptr;
     while (!isFirstDialCallAdded_) {
         if (cv_.wait_for(lock, std::chrono::seconds(WAIT_TIME_ONE_SECOND)) == std::cv_status::timeout) {
             TELEPHONY_LOGE("CarrierDialProcess call is not added");
+            SelectDialFailCall(call);
+            if (call != nullptr) {
+                DealFailDial(call);
+            }
             return CALL_ERR_DIAL_FAILED;
         }
     }
-    sptr<CallBase> call = nullptr;
-    call = GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_CREATE);
-    if (call != nullptr) {
-        return DealFailDial(call);
-    }
-    call = GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_CONNECTING);
-    if (call != nullptr) {
-        return DealFailDial(call);
-    }
-    call = GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_DIALING);
+    SelectDialFailCall(call);
     if (call != nullptr) {
         return DealFailDial(call);
     }
     TELEPHONY_LOGE("can not find connect call or dialing call");
     return CALL_ERR_CALL_STATE;
+}
+
+void CallRequestProcess::SelectDialFailCall(sptr<CallBase> &call)
+{
+    call = GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_CREATE);
+    if (call != nullptr) {
+        return;
+    }
+    call = GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_CONNECTING);
+    if (call != nullptr) {
+        return;
+    }
+    call = GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_DIALING);
+    return;
 }
 
 int32_t CallRequestProcess::CarrierDialProcess(DialParaInfo &info)
