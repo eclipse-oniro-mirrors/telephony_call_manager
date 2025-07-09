@@ -1702,7 +1702,17 @@ int32_t CallManagerService::SendCallUiEvent(int32_t callId, std::string &eventNa
     } else if (eventName == "EVENT_VOIP_CALL_SUCCESS" || eventName == "EVENT_VOIP_CALL_FAILED") {
         HandleVoIPCallEvent(callId, eventName);
     } else if (eventName == "EVENT_INVALID_VIDEO_FD") {
-        DelayedSingleton<AudioControlManager>::GetInstance()->PlayRingtoneForVideoRingFail();
+        sptr<CallBase> incomingCall = CallObjectManager::GetOneCallObject(CallRunningState::CALL_RUNNING_STATE_RINGING);
+        if (incomingCall == nullptr) {
+            TELEPHONY_LOGE("incomingCall is nullptr");
+            return TELEPHONY_ERR_FAIL;
+        }
+        ContactInfo contactInfo = incomingCall->GetCallerInfo();
+        if (memset_s(&contactInfo.ringtonePath, sizeof(contactInfo.ringtonePath), 0, sizeof(contactInfo.ringtonePath))) {
+            TELEPHONY_LOGE("memset_s fail.");
+        }
+        incomingCall->SetCallerInfo(contactInfo);
+        DelayedSingleton<AudioControlManager>::GetInstance()->PlayRingtone();
     }
     return TELEPHONY_SUCCESS;
 }
